@@ -216,14 +216,53 @@ HELP: <datagram>
 { $errors "Throws an error if the port is already in use, or if the OS forbids access." } ;
 
 HELP: receive
-{ $values { "datagram" "a datagram socket" } { "packet" byte-array } { "addrspec" "an address specifier" } }
+{ $values { "datagram" "a datagram socket" } { "bytes" byte-array } { "addrspec" "an address specifier" } }
 { $description "Waits for an incoming packet on the given datagram socket. Outputs the packet data, as well as the sender's address." }
 { $errors "Throws an error if the packet could not be received." } ;
 
 HELP: send
-{ $values { "packet" byte-array } { "addrspec" "an address specifier" } { "datagram" "a datagram socket" } }
+{ $values { "bytes" byte-array } { "addrspec" "an address specifier" } { "datagram" "a datagram socket" } }
 { $description "Sends a packet to the given address." }
 { $errors "Throws an error if the packet could not be sent." } ;
+
+HELP: send-once
+{ $values
+    { "bytes" byte-array } { "addrspec" "an address specifier" }
+}
+{ $examples
+    "Send a datagram to localhost, port 7777:"
+    { $example "USING: io.sockets prettyprint ;"
+        "B{ 1 2 3 } f 7777 <inet4> send-once"
+        ""
+    }
+}
+{ $description "Sends a packet one time to the address and closes the sending datagram port." } ;
+
+HELP: broadcast-once
+{ $values
+    { "bytes" byte-array } { "addrspec" "an address specifier" }
+}
+{ $examples
+    "Send a datagram to localhost, port 7777:"
+    { $example "USING: io.sockets prettyprint ;"
+        "B{ 1 2 3 } f 7777 <inet4> broadcast-once"
+        ""
+    }
+}
+{ $description "Broadcasts a packet one time to the address and closes the sending broadcast port." } ;
+
+HELP: with-any-port-local-broadcast
+{ $values
+    { "quot" quotation }
+}
+{ $description "Creates a broadcast datagram socket and calls the quotation with this datagram on top of the stack, cleaning up afterwards." } ;
+
+HELP: with-any-port-local-datagram
+{ $values
+    { "quot" quotation }
+}
+{ $description "Creates a datagram socket and calls the quotation with this datagram on top of the stack, cleaning up afterwards." } ;
+
 
 HELP: resolve-host
 { $values { "addrspec" "an address specifier" } { "seq" "a sequence of address specifiers" } }
@@ -253,3 +292,9 @@ HELP: with-local-address
 HELP: protocol-port
 { $values { "protocol" "a protocol string" } { "port" { $maybe integer } } }
 { $description "Outputs the port number associated with a protocol, or " { $link f } " if the protocol is unknown." } ;
+
+HELP: port-protocol
+{ $values { "port" integer } { "protocol" { $maybe "a protocol string" } } }
+{ $description "Outputs the protocol associated with a port number, or " { $link f } " if the port number is unknown." } ;
+
+{ protocol-port port-protocol } related-words

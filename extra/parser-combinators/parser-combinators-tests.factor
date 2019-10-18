@@ -1,8 +1,7 @@
 ! Copyright (C) 2005 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel lists lists.lazy tools.test strings math
-sequences parser-combinators arrays math.parser unicode.categories ;
-IN: parser-combinators.tests
+sequences parser-combinators arrays math.parser unicode ;
 
 ! Testing <&>
 { { T{ parse-result f { "a" "b" } T{ slice f 2 4 "abcd" } } }  } [
@@ -44,11 +43,11 @@ IN: parser-combinators.tests
 
 ! Testing sp
 { { } } [
-  "  abcd" "a" token parse list>array 
+  "  abcd" "a" token parse list>array
 ] unit-test
 
 { { T{ parse-result f "a" T{ slice f 3 6 "  abcd" } } }  } [
-  "  abcd" "a" token sp parse list>array 
+  "  abcd" "a" token sp parse list>array
 ] unit-test
 
 ! Testing just
@@ -58,15 +57,15 @@ IN: parser-combinators.tests
 
 { { T{ parse-result f "abcd" T{ slice f 4 4 "abcd" } } } } [
   "abcd" "abcd" token "abc" token <|> just parse list>array
-] unit-test 
+] unit-test
 
 ! Testing <@
 { { T{ parse-result f 48 T{ slice f 1 5 "01234" } } } } [
-  "01234" [ digit? ] satisfy parse list>array 
+  "01234" [ digit? ] satisfy parse list>array
 ] unit-test
 
 { { T{ parse-result f 0 T{ slice f 1 5 "01234" } } } } [
-  "01234" [ digit? ] satisfy [ digit> ] <@ parse list>array 
+  "01234" [ digit? ] satisfy [ digit> ] <@ parse list>array
 ] unit-test
 
 ! Testing some
@@ -75,11 +74,11 @@ IN: parser-combinators.tests
 ] unit-test
 
 [
-  "begin1" "begin" token some parse 
-] must-fail 
+  "begin1" "begin" token some parse
+] must-fail
 
 { "begin" } [
-  "begin" "begin" token some parse 
+  "begin" "begin" token some parse
 ] unit-test
 
 ! <& parser and &> parser
@@ -100,7 +99,7 @@ IN: parser-combinators.tests
   "1234" "1" token <*> parse list>array
 ] unit-test
 
-{ 
+{
   {
     T{ parse-result f { "1" "1" "1" "1" } T{ slice f 4 7 "1111234" }  }
     T{ parse-result f { "1" "1" "1" } T{ slice f 3 7 "1111234" } }
@@ -113,7 +112,7 @@ IN: parser-combinators.tests
   "1111234" "1" token <*> parse list>array
 ] unit-test
 
-{ 
+{
   {
     T{ parse-result f { "1111" } T{ slice f 4 7 "1111234" } }
     T{ parse-result f { "111" } T{ slice f 3 7 "1111234" } }
@@ -134,7 +133,7 @@ IN: parser-combinators.tests
   "1234" "1" token <+> parse list>array
 ] unit-test
 
-{ 
+{
   {
     T{ parse-result f { "1" "1" "1" "1" } T{ slice f 4 7 "1111234" } }
     T{ parse-result f { "1" "1" "1" }  T{ slice f 3 7 "1111234" } }

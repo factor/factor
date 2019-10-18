@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types ascii assocs combinators combinators.smart
-endian fry io kernel macros math math.vectors sequences strings ;
+endian fry io kernel macros math math.statistics math.vectors
+sequences strings ;
 IN: pack
 
 GENERIC: >n-byte-array ( obj n -- byte-array )
@@ -9,7 +10,7 @@ GENERIC: >n-byte-array ( obj n -- byte-array )
 M: integer >n-byte-array ( m n -- byte-array ) >endian ;
 
 ! for doing native, platform-dependent sized values
-M: string >n-byte-array ( n string -- byte-array ) heap-size >n-byte-array ;
+M: object >n-byte-array ( n string -- byte-array ) heap-size >n-byte-array ;
 
 : s8>byte-array ( n -- byte-array ) 1 >n-byte-array ;
 : u8>byte-array ( n -- byte-array ) 1 >n-byte-array ;
@@ -102,7 +103,7 @@ MACRO: pack ( str -- quot )
 
 : packed-length ( str -- n )
     [ ch>packed-length ] map-sum ;
- 
+
 : pack-native ( seq str -- seq )
     '[ _ _ pack ] with-native-endian ; inline
 
@@ -115,14 +116,14 @@ MACRO: pack ( str -- quot )
 <PRIVATE
 
 : start/end ( seq -- seq1 seq2 )
-    [ 0 [ + ] accumulate nip dup ] keep v+ ; inline
+    [ cum-sum0 dup ] keep v+ ; inline
 
 PRIVATE>
 
 MACRO: unpack ( str -- quot )
     expand-pack-format
     [ [ ch>packed-length ] { } map-as start/end ]
-    [ [ unpack-table at '[ @ ] ] { } map-as ] bi
+    [ [ unpack-table at ] { } map-as ] bi
     [ '[ [ _ _ ] dip <slice> @ ] ] 3map
     '[ [ _ cleave ] output>array ] ;
 

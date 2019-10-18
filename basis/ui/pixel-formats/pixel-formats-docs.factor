@@ -5,8 +5,8 @@ IN: ui.pixel-formats
 ! break circular dependency
 <<
     "ui.gadgets.worlds" create-vocab drop
-    "world" "ui.gadgets.worlds" create drop
-    "ui.gadgets.worlds" vocab-words use-words
+    "world" "ui.gadgets.worlds" create-word drop
+    "ui.gadgets.worlds" vocab-words-assoc use-words
 >>
 
 ARTICLE: "ui.pixel-formats-attributes" "Pixel format attributes"
@@ -25,7 +25,7 @@ ARTICLE: "ui.pixel-formats-attributes" "Pixel format attributes"
     sample-alpha
     color-float
 }
-"Integer attributes are represented by a " { $link tuple } " with a single " { $snippet "value" } "slot:"
+"Integer attributes are represented by a " { $link tuple } " with a single " { $snippet "value" } " slot:"
 { $subsections
     color-bits
     red-bits
@@ -45,7 +45,7 @@ ARTICLE: "ui.pixel-formats-attributes" "Pixel format attributes"
 }
 { $examples
 "The following " { $link world } " subclass will request a double-buffered window with minimum 24-bit color and depth buffers, and will throw an error if the requirements aren't met:"
-{ $code """USING: kernel ui.gadgets.worlds ui.pixel-formats ;
+{ $code "USING: kernel ui.gadgets.worlds ui.pixel-formats ;
 IN: ui.pixel-formats.examples
 
 TUPLE: picky-depth-buffered-world < world ;
@@ -59,10 +59,10 @@ M: picky-depth-buffered-world world-pixel-format-attributes
 
 M: picky-depth-buffered-world check-world-pixel-format
     nip
-    [ double-buffered pixel-format-attribute 0 = [ "Not double buffered!" throw ] when ]
-    [ color-bits pixel-format-attribute 24 < [ "Not enough color bits!" throw ] when ]
-    [ depth-bits pixel-format-attribute 24 < [ "Not enough depth bits!" throw ] when ]
-    tri ;""" } }
+    [ double-buffered pixel-format-attribute 0 = [ \"Not double buffered!\" throw ] when ]
+    [ color-bits pixel-format-attribute 24 < [ \"Not enough color bits!\" throw ] when ]
+    [ depth-bits pixel-format-attribute 24 < [ \"Not enough depth bits!\" throw ] when ]
+    tri ;" } }
 ;
 
 HELP: double-buffered

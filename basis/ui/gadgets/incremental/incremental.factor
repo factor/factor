@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io kernel math namespaces math.vectors ui.gadgets
-ui.gadgets.private ui.gadgets.packs accessors
-math.rectangles combinators ;
+USING: accessors combinators grouping kernel math math.vectors
+namespaces sequences threads ui.gadgets ui.gadgets.packs
+ui.gadgets.private ;
 IN: ui.gadgets.incremental
 
 TUPLE: incremental < pack cursor ;
@@ -35,8 +35,20 @@ M: incremental pref-dim*
 
 M: incremental dim-changed drop ;
 
+: scroll-children ( incremental -- )
+    dup children>> length 200,000 > [
+        ! We let the length oscillate between 100k-200k, so we don't
+        ! have to relayout the container every time a gadget is added.
+        [ 100,000 short cut* ] change-children relayout yield
+
+        ! Then we ungraft the scrolled of gadgets. Yield every 10k
+        ! gadget so to not overflow the ungraft queue.
+        10 <groups> [ [ ungraft ] each yield ] each
+    ] [ drop ] if ;
+
 : add-incremental ( gadget incremental -- )
     not-in-layout
+    dup scroll-children
     2dup (add-gadget)
     t in-layout? [
         {

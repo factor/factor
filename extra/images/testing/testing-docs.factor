@@ -14,14 +14,14 @@ HELP: encode-test
 { $values
     { "path" "a pathname string" } { "image-class" object }
 }
-{ $description "Runs a unit-test on the image at " { $snippet "path" } " to test the image encoder. The image is decoded, encoded, and then decoded again to verify that the final decoded output matches the original decoded output. Before comparison for equality, the images are normalized in order to accomodate differences in representation between the two potential encoders." }
+{ $description "Runs a unit-test on the image at " { $snippet "path" } " to test the image encoder. The image is decoded, encoded, and then decoded again to verify that the final decoded output matches the original decoded output. Before comparison for equality, the images are normalized in order to accommodate differences in representation between the two potential encoders." }
 { $warning "This test assumes that the image decoder is working correctly. If the image fails both the " { $link decode-test } " and the " { $link encode-test } ", then you should first debug the decoder. Once the decoder is working correctly, proceed with testing the encoder." } ;
 
 HELP: images.
 { $values
     { "dirpath" "a pathname string" } { "extension" string }
 }
-{ $description "Renders each image at " { $snippet "dirpath" } " directly to the Listener tool." } ;
+{ $description "Renders each image at " { $snippet "dirpath" } " directly to the listener tool." } ;
 { images. image. } related-words
 
 HELP: load-reference-image
@@ -29,7 +29,7 @@ HELP: load-reference-image
     { "path" "a pathname string" }
     { "image" image }
 }
-{ $description "Loads the " { $link { "images" "testing" "reference" } } " that corresponds to the original image at " { $snippet "path" } " into memory."  } ;
+{ $description "Loads the " { $link { "images" "testing" "reference" } } " that corresponds to the original image at " { $snippet "path" } " into memory." } ;
 
 HELP: ls
 { $values

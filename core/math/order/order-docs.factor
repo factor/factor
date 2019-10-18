@@ -56,8 +56,8 @@ HELP: clamp
 { $description "Outputs " { $snippet "x" } " if contained in the interval " { $snippet "[min,max]" } " or else outputs one of the endpoints." } ;
 
 HELP: between?
-{ $values { "x" object } { "y" object } { "z" object } { "?" boolean } }
-{ $description "Tests if " { $snippet "x" } " is in the interval " { $snippet "[y,z]" } "." }
+{ $values { "x" object } { "min" object } { "max" object } { "?" boolean } }
+{ $description "Tests if " { $snippet "x" } " is in the interval " { $snippet "[min,max]" } "." }
 { $notes "As per the closed interval notation, the end-points are included in the interval." } ;
 
 HELP: before?

@@ -1,21 +1,23 @@
-USING: documents help.markup help.syntax ui.gadgets
-ui.gadgets.scrollers models strings ui.commands
-ui.text colors fonts help.tips ;
+USING: colors documents fonts help.markup help.syntax help.tips models
+sequences strings ui.commands ui.gadgets ui.gadgets.line-support
+ui.gadgets.scrollers ;
 IN: ui.gadgets.editors
 
+HELP: <multiline-editor>
+{ $values { "editor" multiline-editor } }
+{ $description "Creates a new multi-line editor gadget." } ;
+
 HELP: editor
-{ $class-description "An editor is a control for editing a multi-line passage of text stored in a " { $link document } " model. Editors are crated by calling " { $link <editor> } "."
+{ $class-description "An editor is a control for editing a multi-line passage of text stored in a " { $link document } " model. Editors are created by calling " { $link <editor> } "."
 $nl
 "Editors have the following slots:"
 { $list
-    { { $snippet "font" } " - a " { $link font } "." }
-    { { $snippet "color" } " - a " { $link color } "." }
     { { $snippet "caret-color" } " - a " { $link color } "." }
-    { { $snippet "selection-color" } " - a " { $link color } "." }
     { { $snippet "caret" } " - a " { $link model } " storing a line/column pair." }
     { { $snippet "mark" } " - a " { $link model } " storing a line/column pair. If there is no selection, the mark is equal to the caret, otherwise the mark is located at the opposite end of the selection from the caret." }
     { { $snippet "focused?" } " - a boolean." }
-} } ;
+} }
+{ $see-also line-gadget } ;
 
 HELP: <editor>
 { $values { "editor" "a new " { $link editor } } }
@@ -57,13 +59,24 @@ HELP: remove-selection
 { $values { "editor" editor } }
 { $description "Removes currently selected text from the editor's " { $link document } "." } ;
 
+HELP: <model-field>
+{ $values { "model" model } { "gadget" editor } }
+{ $description "Creates an editor gadget which targets the specified model. The model must contain a string, or another item with a defined " { $link length } ", as this will be checked during layout." } ;
+
+HELP: <action-field>
+{ $values { "quot" { $quotation ( string -- ) } } { "gadget" editor } }
+{ $description "Creates an editor gadget with a blank model. Whenever a value is entered into the editor and Return pressed, the value is pushed on the stack as a string and the specified quotation is called. Note that the quotation cannot update the value in the field. " } ;
+
+
 HELP: editor-string
 { $values { "editor" editor } { "string" string } }
 { $description "Outputs the contents of the editor's " { $link document } " as a string. Lines are separated by " { $snippet "\\n" } "." } ;
 
+
+
 HELP: set-editor-string
 { $values { "string" string } { "editor" editor } }
-{ $description "Sets the contents of the editor's " { $link document } " to a string,  which may use either " { $snippet "\\n" } ", " { $snippet "\\r\\n" } " or " { $snippet "\\r" } " line separators." } ;
+{ $description "Sets the contents of the editor's " { $link document } " to a string, which may use either " { $snippet "\\n" } ", " { $snippet "\\r\\n" } " or " { $snippet "\\r" } " line separators." } ;
 
 ARTICLE: "gadgets-editors-selection" "The caret and mark"
 "If there is no selection, the caret and the mark are at the same location; otherwise the mark delimits the end-point of the selection opposite the caret."

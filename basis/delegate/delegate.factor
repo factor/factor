@@ -12,10 +12,10 @@ ERROR: broadcast-words-must-have-no-outputs group ;
 <PRIVATE
 
 : protocol-words ( protocol -- words )
-    \ protocol-words word-prop ;
+    "protocol-words" word-prop ;
 
 : protocol-consult ( protocol -- consulters )
-    \ protocol-consult word-prop ;
+    "protocol-consult" word-prop ;
 
 GENERIC: group-words ( group -- words )
 
@@ -43,12 +43,14 @@ M: tuple-class group-words
 ! Consultation
 
 TUPLE: consultation group class quot loc ;
+
 TUPLE: broadcast < consultation ;
 
 : <consultation> ( group class quot -- consultation )
-    f consultation boa ; 
+    f consultation boa ;
+
 : <broadcast> ( group class quot -- consultation )
-    [ check-broadcast-group ] 2dip f broadcast boa ; 
+    [ check-broadcast-group ] 2dip f broadcast boa ;
 
 : create-consult-method ( word consultation -- method )
     [ class>> swap first create-method dup fake-definition ] keep
@@ -60,10 +62,11 @@ PREDICATE: consult-method < method
 M: consult-method reset-word
     [ call-next-method ] [ f "consultation" set-word-prop ] bi ;
 
-GENERIC# (consult-method-quot) 2 ( consultation quot word -- object )
+GENERIC#: (consult-method-quot) 2 ( consultation quot word -- object )
 
 M: consultation (consult-method-quot)
     '[ _ call _ execute ] nip ;
+
 M: broadcast (consult-method-quot)
     '[ _ call [ _ execute ] each ] nip ;
 
@@ -81,7 +84,7 @@ M: broadcast (consult-method-quot)
     [ [ group>> group-words ] keep ] dip curry each ; inline
 
 : register-consult ( consultation -- )
-    [ group>> \ protocol-consult ] [ ] [ class>> ] tri
+    [ group>> "protocol-consult" ] [ ] [ class>> ] tri
     '[ [ _ _ ] dip ?set-at ] change-word-prop ;
 
 : consult-methods ( consultation -- )
@@ -89,7 +92,7 @@ M: broadcast (consult-method-quot)
 
 : unregister-consult ( consultation -- )
     [ class>> ] [ group>> ] bi
-    \ protocol-consult word-prop delete-at ;
+    "protocol-consult" word-prop delete-at ;
 
 : unconsult-method ( word consultation -- )
     [ class>> swap first ?lookup-method ] keep
@@ -146,9 +149,9 @@ M: consultation forget*
 
 : initialize-protocol-props ( protocol wordlist -- )
     [
-        drop \ protocol-consult
+        drop "protocol-consult"
         [ H{ } assoc-like ] change-word-prop
-    ] [ { } like \ protocol-words set-word-prop ] 2bi ;
+    ] [ { } like "protocol-words" set-word-prop ] 2bi ;
 
 : fill-in-depth ( wordlist -- wordlist' )
     [ dup word? [ 0 2array ] when ] map ;
@@ -180,7 +183,6 @@ PREDICATE: protocol < word protocol-words ; ! Subclass of symbol?
 
 M: protocol forget*
     [ f forget-old-definitions ] [ call-next-method ] bi ;
-
 
 M: protocol definition protocol-words show-words ;
 

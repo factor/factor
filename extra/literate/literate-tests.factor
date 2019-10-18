@@ -1,5 +1,4 @@
-USING: eval kernel math tools.test ;
-IN: literate
+USING: eval kernel literate math tools.test ;
 
 { 2 3 t } [
 <LITERATE

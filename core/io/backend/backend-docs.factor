@@ -9,4 +9,4 @@ HELP: init-io
 { $contract "Initializes the I/O system. Called on startup." } ;
 
 HELP: init-stdio
-{ $contract "Initializes the global " { $link input-stream } " and " { $link output-stream } ".  Called on startup." } ;
+{ $contract "Initializes the global " { $link input-stream } " and " { $link output-stream } ". Called on startup." } ;

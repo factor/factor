@@ -36,8 +36,8 @@ $nl
 { $subsections instance? }
 "You can ask a class for its superclass:"
 { $subsections
-    superclass
-    superclasses
+    superclass-of
+    superclasses-of
     subclass-of?
 }
 "Class predicates can be used to test instances directly:"
@@ -54,6 +54,7 @@ $nl
     "builtin-classes"
     "unions"
     "intersections"
+    "maybes"
     "mixins"
     "predicates"
     "singletons"
@@ -72,45 +73,70 @@ ABOUT: "classes"
 HELP: class
 { $class-description "The class of all class words." } ;
 
+HELP: class-members
+{ $values { "class" class } { "seq" "a sequence of union members, or " { $link f } } }
+{ $description "If " { $snippet "class" } " is a union class, outputs a sequence of its member classes, otherwise outputs " { $link f } "." } ;
+
 HELP: class-of
 { $values { "object" object } { "class" class } }
 { $description "Outputs an object's canonical class. While an object may be an instance of more than one class, the canonical class is either its built-in class, or if the object is a tuple, its tuple class." }
 { $examples { $example "USING: classes prettyprint ;" "1.0 class-of ." "float" } { $example "USING: classes prettyprint ;" "IN: scratchpad" "TUPLE: point x y z ;\nT{ point f 1 2 3 } class-of ." "point" } } ;
 
+HELP: class-usage
+{ $values { "class" class } { "seq" sequence } }
+{ $description "Lists all classes that uses or depends on this class." } ;
+
 HELP: classes
 { $values { "seq" "a sequence of class words" } }
 { $description "Finds all class words in the dictionary." } ;
 
-HELP: update-map
-{ $var-description "Assoc mapping each class to a set of classes defined in terms of this class. The " { $link define-class } " word uses this information to update generic words when classes are redefined." } ;
-
-HELP: predicate-word
-{ $values { "word" word } { "predicate" "a predicate word" } }
-{ $description "Suffixes the word's name with \"?\" and creates a word with that name in the same vocabulary as the word itself." } ;
+HELP: contained-classes
+{ $values { "obj" class } { "members" sequence } }
+{ $description "Lists all classes contained in the class." }
+{ $see-also all-contained-classes } ;
 
 HELP: define-predicate
 { $values { "class" class } { "quot" quotation } }
 { $description "Defines a predicate word for a class." }
 $low-level-note ;
 
-HELP: superclass
+HELP: metaclass-changed
+{ $values { "use" class } { "class" class } }
+{ $description "Notifies the class 'class' that its metaclass 'use' has changed." } ;
+
+HELP: predicate-def
+{ $values { "obj" "a type object" } { "quot" quotation } }
+{ $description "Outputs a quotation that can be used to check if objects are an instance of the given type." }
+{ $examples
+  { $example
+    "USING: classes math prettyprint ;"
+    "fixnum predicate-def ."
+    "[ fixnum? ]"
+  }
+} ;
+
+HELP: predicate-word
+{ $values { "word" word } { "predicate" "a predicate word" } }
+{ $description "Suffixes the word's name with \"?\" and creates a word with that name in the same vocabulary as the word itself." } ;
+
+HELP: superclass-of
 { $values { "class" class } { "super" class } }
 { $description "Outputs the superclass of a class. All instances of this class are also instances of the superclass." }
 { $examples
     { $example "USING: classes prettyprint ;"
-               "t superclass ."
+               "t superclass-of ."
                "word"
     }
 } ;
 
-HELP: superclasses
+HELP: superclasses-of
 { $values
      { "class" class }
      { "supers" sequence } }
 { $description "Outputs a sequence of superclasses of a class along with the class itself." }
 { $examples
     { $example "USING: classes prettyprint ;"
-               "t superclasses ."
+               "t superclasses-of ."
                "{ word t }"
     }
 } ;
@@ -129,13 +155,13 @@ HELP: subclass-of?
     }
 } ;
 
-{ superclass superclasses subclass-of? } related-words
+HELP: update-map
+{ $var-description "Assoc mapping each class to a set of classes defined in terms of this class. The " { $link define-class } " word uses this information to update generic words when classes are redefined." }
+{ $see-also class-usage } ;
 
-HELP: members
-{ $values { "class" class } { "seq" "a sequence of union members, or " { $link f } } }
-{ $description "If " { $snippet "class" } " is a union class, outputs a sequence of its member classes, otherwise outputs " { $link f } "." } ;
+{ superclass-of superclasses-of subclass-of? } related-words
 
-HELP: participants
+HELP: class-participants
 { $values { "class" class } { "seq" "a sequence of intersection participants, or " { $link f } } }
 { $description "If " { $snippet "class" } " is an intersection class, outputs a sequence of its participant classes, otherwise outputs " { $link f } "." } ;
 
@@ -165,4 +191,3 @@ HELP: forget-class
 HELP: forget-methods
 { $values { "class" class } }
 { $description "Forgets all methods defined on a class. In contrast to " { $link reset-class } ", this not only forgets accessors but also any methods at all on the class." } ;
-

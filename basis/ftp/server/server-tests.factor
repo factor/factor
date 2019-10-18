@@ -1,44 +1,41 @@
-USING: calendar ftp.server io.encodings.ascii io.files
-io.files.unique namespaces threads tools.test kernel
-io.servers ftp.client accessors urls
-io.pathnames io.directories sequences fry io.backend
-continuations ;
+USING: accessors fry ftp.server io.encodings.ascii io.files
+io.pathnames io.servers kernel tools.test urls ;
 FROM: ftp.client => ftp-get ;
 IN: ftp.server.tests
 
 CONSTANT: test-file-contents "Files are so boring anymore."
 
 : create-test-file ( -- path )
-    test-file-contents
-    "ftp.server" "test" make-unique-file
-    [ ascii set-file-contents ] [ normalize-path ] bi ;
+    test-file-contents "ftp.server" [ ascii set-file-contents ] keep ;
 
-: test-ftp-server ( quot -- )
+: test-ftp-server ( quot: ( server path -- ) -- )
     '[
-        current-temporary-directory get
-        0 <ftp-server> [
+        "." 0 <ftp-server> [
             "ftp://localhost" >url insecure-addr set-url-addr
                 "ftp" >>protocol
                 create-test-file >>path
                 @
         ] with-threaded-server
-    ] cleanup-unique-directory ; inline
+    ] with-test-directory ; inline
 
-[ t ]
-[
+{ t } [
     [
+        ! give client its own directory so we don't overwrite the ftp server's file
         [
-            [ ftp-get ] [ path>> file-name ascii file-contents ] bi
-        ] cleanup-unique-working-directory
+            [ ftp-get ]
+            [ path>> file-name ascii file-contents ] bi
+        ] with-test-directory
     ] test-ftp-server test-file-contents =
 ] unit-test
 
 [
-    
+
     [
-        "/" >>path
+        ! give client its own directory so we don't overwrite the ftp server's file
         [
-            [ ftp-get ] [ path>> file-name ascii file-contents ] bi
-        ] cleanup-unique-working-directory
+            "/" >>path
+            [ ftp-get ]
+            [ path>> file-name ascii file-contents ] bi
+        ] with-test-directory
     ] test-ftp-server test-file-contents =
 ] must-fail

@@ -5,7 +5,7 @@ math system strings sbufs vectors byte-arrays quotations
 io.streams.byte-array classes.builtin parser lexer
 classes.predicate classes.union classes.intersection
 classes.singleton classes.tuple help.vocabs math.parser
-accessors definitions sets ;
+accessors definitions sets lists ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
@@ -22,7 +22,7 @@ ARTICLE: "conventions" "Conventions"
     { "combinator"            { "a word taking a quotation or another word as input; a higher-order function. See " { $link "combinators" } } }
     { "definition specifier"  { "an instance of " { $link definition } " which implements the " { $link "definition-protocol" } } }
     { "generalized boolean"   { "an object interpreted as a boolean; a value of " { $link f } " denotes false and anything else denotes true" } }
-    { "generic word"          { "a word whose behavior depends can be specialized on the class of one of its inputs. See " { $link "generic" } } }
+    { "generic word"          { "a word whose behavior depends on the class of one of its inputs. See " { $link "generic" } } }
     { "method"                { "a specialized behavior of a generic word on a class. See " { $link "generic" } } }
     { "object"                { "any datum which can be identified" } }
     { "ordering specifier"    { "see " { $link "order-specifiers" } } }
@@ -35,7 +35,7 @@ ARTICLE: "conventions" "Conventions"
     { { "vocabulary " { $strong "or" } " vocab" } { "a named set of words. See " { $link "vocabularies" } } }
     { "vocabulary specifier"  { "a " { $link vocab } ", " { $link vocab-link } " or a string naming a vocabulary" } }
     { "word"                  { "the basic unit of code, analogous to a function or procedure in other programming languages. See " { $link "words" } } }
-} 
+}
 { $heading "Documentation conventions" }
 "Factor documentation consists of two distinct bodies of text. There is a hierarchy of articles, much like this one, and there is word documentation. Help articles reference word documentation, and vice versa, but not every documented word is referenced from some help article."
 $nl
@@ -122,7 +122,7 @@ ARTICLE: "numbers" "Numbers"
 
 USE: io.buffers
 
-ARTICLE: "collections" "Collections" 
+ARTICLE: "collections" "Collections"
 { $heading "Sequences" }
 { $subsections
     "sequences"
@@ -362,7 +362,7 @@ ARTICLE: "handbook-tools-reference" "Developer tools"
 
 ARTICLE: "handbook-library-reference" "Libraries"
 "This index lists articles from loaded vocabularies which are not subsections of any other article. To explore more vocabularies, see " { $link "vocab-index" } "."
-{ $index [ orphan-articles { "help.home" "handbook" } diff ] } ;
+{ $index [ orphan-articles ] } ;
 
 ARTICLE: "handbook" "Factor handbook"
 { $heading "Getting started" }
@@ -388,7 +388,6 @@ ARTICLE: "handbook" "Factor handbook"
   "primitive-index"
   "error-index"
   "class-index"
-}
-;
+} ;
 
 ABOUT: "handbook"

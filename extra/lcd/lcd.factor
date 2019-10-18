@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar.format calendar.model fonts fry
-grouping kernel math models.arrow namespaces sequences ui
+USING: accessors calendar calendar.format fonts fry grouping
+kernel math sequences timers threads ui ui.gadgets
 ui.gadgets.labels ;
 IN: lcd
 
@@ -17,12 +17,21 @@ IN: lcd
     '[ _ lcd-digit ] { } map-as concat ;
 
 : lcd ( digit-str -- string )
-    4 iota [ lcd-row ] with map "\n" join ;
+    4 <iota> [ lcd-row ] with map "\n" join ;
 
-: <time-display> ( model -- gadget )
-    [ timestamp>hms lcd ] <arrow> <label-control>
-    "99:99:99" lcd >>string
-    monospace-font >>font ;
+TUPLE: time-display < label timer ;
+
+: <time-display> ( -- gadget )
+    "99:99:99" lcd time-display new-label
+        monospace-font >>font
+        dup '[ now timestamp>hms lcd _ string<< ]
+        f 1 seconds <timer> >>timer ;
+
+M: time-display graft*
+    [ timer>> start-timer yield ] [ call-next-method ] bi ;
+
+M: time-display ungraft*
+    [ timer>> stop-timer ] [ call-next-method ] bi ;
 
 MAIN-WINDOW: time-window { { title "Time" } }
-    time get <time-display> >>gadgets ;
+    <time-display> >>gadgets ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel words math accessors sequences namespaces
-assocs layouts cpu.x86.assembler.syntax ;
+USING: accessors arrays assocs cpu.x86.assembler.syntax hashtables
+kernel kernel.private layouts math namespaces sequences words ;
 IN: cpu.x86.assembler.operands
 
 REGISTERS: 8 AL CL DL BL SPL BPL SIL DIL R8B R9B R10B R11B R12B R13B R14B R15B ;
@@ -59,7 +59,7 @@ M: indirect extended? base>> extended? ;
     [ f >>displacement ] when ;
 
 : canonicalize-EBP ( indirect -- indirect )
-    #! { EBP } ==> { EBP 0 }
+    ! { EBP } ==> { EBP 0 }
     dup [ base>> { EBP RBP R13 } member? ] [ displacement>> not ] bi and
     [ 0 >>displacement ] when ;
 
@@ -69,8 +69,8 @@ ERROR: bad-index indirect ;
     dup index>> { ESP RSP } member-eq? [ bad-index ] when ;
 
 : canonicalize ( indirect -- indirect )
-    #! Modify the indirect to work around certain addressing mode
-    #! quirks.
+    ! Modify the indirect to work around certain addressing mode
+    ! quirks.
     canonicalize-displacement canonicalize-EBP check-ESP ;
 
 ! Utilities
@@ -130,8 +130,32 @@ C: <byte> byte
     dup extended-8-bit-register? cell 4 = and
     [ drop f ] when ;
 
-: 8-bit-version-of ( register -- register' ) 8 n-bit-version-of ;
-: 16-bit-version-of ( register -- register' ) 16 n-bit-version-of ;
-: 32-bit-version-of ( register -- register' ) 32 n-bit-version-of ;
-: 64-bit-version-of ( register -- register' ) 64 n-bit-version-of ;
-: native-version-of ( register -- register' ) cell-bits n-bit-version-of ;
+: cached-n-bit-version-of ( register n -- register' )
+    swap { word } declare props>> { hashtable } declare at ; inline
+
+: 8-bit-version-of ( register -- register' )
+    8 cached-n-bit-version-of ; inline
+: 16-bit-version-of ( register -- register' )
+    16 cached-n-bit-version-of ; inline
+: 32-bit-version-of ( register -- register' )
+    32 cached-n-bit-version-of ; inline
+: 64-bit-version-of ( register -- register' )
+    64 cached-n-bit-version-of ; inline
+: native-version-of ( register -- register' )
+    cell-bits cached-n-bit-version-of ; inline
+
+! copy paste
+: set-extra-props ( word extra-props -- )
+    [ rot set-word-prop ] with assoc-each ;
+
+! All the bit size register mapping are precalculated to make code
+! generation a little faster.
+: precalc-register-versions ( reg -- )
+    dup { 8 16 32 64 } [
+        dup swapd n-bit-version-of 2array
+    ] with map set-extra-props ;
+
+: precalc-all-register-versions ( -- )
+    registers get values concat [ precalc-register-versions ] each ;
+
+precalc-all-register-versions

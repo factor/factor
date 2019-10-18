@@ -45,5 +45,3 @@ IN: math.splines.testing
     0 0 1 test3
     0 0 -1 test3
     test4 ;
-    
-

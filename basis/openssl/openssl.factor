@@ -1,10 +1,12 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: init kernel namespaces openssl.libcrypto openssl.libssl
-sequences ;
+USING: alien.libraries init kernel math namespaces openssl.libcrypto
+openssl.libssl sequences ;
 IN: openssl
 
 ! This code is based on http://www.rtfm.com/openssl-examples/
+
+SYMBOLS: ssl-initialized? ssl-new-api? ;
 
 SINGLETON: openssl
 
@@ -20,13 +22,22 @@ SINGLETON: openssl
 : ssl-error ( obj -- )
     { f 0 } member? [ (ssl-error) ] when ;
 
-: init-ssl ( -- )
+: init-old-api ( -- )
     SSL_library_init ssl-error
     SSL_load_error_strings
-    OpenSSL_add_all_digests
-    OpenSSL_add_all_ciphers ;
+    OpenSSL_add_all_digests ;
 
-SYMBOL: ssl-initialized?
+: init-new-api ( -- )
+    0 f OPENSSL_init_ssl ssl-error
+    OPENSSL_INIT_LOAD_SSL_STRINGS
+    OPENSSL_INIT_LOAD_CRYPTO_STRINGS bitand
+    f OPENSSL_init_ssl ssl-error
+    OPENSSL_INIT_ADD_ALL_DIGESTS f OPENSSL_init_ssl ssl-error ;
+
+: init-ssl ( -- )
+    "OPENSSL_init_ssl" "libssl" dlsym? >boolean
+    [ ssl-new-api? set-global ]
+    [ [ init-new-api ] [ init-old-api ] if ] bi ;
 
 : maybe-init-ssl ( -- )
     ssl-initialized? get-global [

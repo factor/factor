@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax combinators kernel layouts
-classes.struct cocoa.runtime core-graphics.types ;
+USING: alien.c-types alien.syntax classes.struct cocoa.runtime
+core-graphics.types ;
 IN: cocoa.types
 
 TYPEDEF: long NSInteger

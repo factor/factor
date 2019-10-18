@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences ui.gadgets ui.baseline-alignment
-ui.baseline-alignment.private kernel math math.functions math.vectors
-math.order math.rectangles namespaces accessors fry combinators arrays ;
+USING: accessors arrays combinators fry kernel math math.order
+math.vectors sequences ui.baseline-alignment
+ui.baseline-alignment.private ui.gadgets ;
 IN: ui.gadgets.packs
 
 TUPLE: pack < aligned-gadget

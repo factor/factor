@@ -1,9 +1,7 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs accessors arrays kernel sequences namespaces words
-math math.order layouts classes.union compiler.units alien
-byte-arrays combinators compiler.cfg.registers
-compiler.cfg.instructions.syntax ;
+USING: accessors compiler.cfg.instructions.syntax kernel math
+namespaces ;
 IN: compiler.cfg.instructions
 
 <<
@@ -59,11 +57,11 @@ literal: loc ;
 INSN: ##replace-imm
 literal: src loc ;
 
-INSN: ##inc-d
-literal: n ;
+INSN: ##clear
+literal: loc ;
 
-INSN: ##inc-r
-literal: n ;
+INSN: ##inc
+literal: loc ;
 
 ! Subroutine calls
 INSN: ##call
@@ -225,6 +223,11 @@ use: src/int-rep ;
 FOLDABLE-INSN: ##bit-count
 def: dst/int-rep
 use: src/int-rep ;
+
+FOLDABLE-INSN: ##bit-test
+def: dst/tagged-rep
+use: src1/int-rep src2/int-rep
+temp: temp/int-rep ;
 
 ! Float arithmetic
 FOLDABLE-INSN: ##add-float
@@ -666,14 +669,14 @@ literal: boxer gc-map ;
 ! { vreg rep stack#/reg }
 
 VREG-INSN: ##alien-invoke
-literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size symbols dll gc-map ;
+literal: varargs? reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size symbols dll gc-map ;
 
 VREG-INSN: ##alien-indirect
 use: src/int-rep
-literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size gc-map ;
+literal: varargs? reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size gc-map ;
 
 VREG-INSN: ##alien-assembly
-literal: reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot gc-map ;
+literal: varargs? reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot ;
 
 VREG-INSN: ##callback-inputs
 literal: reg-outputs stack-outputs ;
@@ -810,77 +813,49 @@ VREG-INSN: ##reload
 def: dst
 literal: rep src ;
 
-UNION: ##allocation
-##allot
-##box-alien
-##box-displaced-alien ;
+UNION: allocation-insn
+    ##allot
+    ##box-alien
+    ##box-displaced-alien ;
 
 UNION: conditional-branch-insn
-##compare-branch
-##compare-imm-branch
-##compare-integer-branch
-##compare-integer-imm-branch
-##test-branch
-##test-imm-branch
-##compare-float-ordered-branch
-##compare-float-unordered-branch
-##test-vector-branch
-##check-nursery-branch
-##fixnum-add
-##fixnum-sub
-##fixnum-mul ;
+    ##compare-branch
+    ##compare-imm-branch
+    ##compare-integer-branch
+    ##compare-integer-imm-branch
+    ##test-branch
+    ##test-imm-branch
+    ##compare-float-ordered-branch
+    ##compare-float-unordered-branch
+    ##test-vector-branch
+    ##check-nursery-branch
+    ##fixnum-add
+    ##fixnum-sub
+    ##fixnum-mul ;
 
 ! For alias analysis
-UNION: ##read ##slot ##slot-imm ##vm-field ##alien-global ;
-UNION: ##write ##set-slot ##set-slot-imm ##set-vm-field ;
+UNION: read-insn ##slot ##slot-imm ##vm-field ##alien-global ;
+UNION: write-insn ##set-slot ##set-slot-imm ##set-vm-field ;
 
 UNION: alien-call-insn
-##alien-invoke
-##alien-indirect
-##alien-assembly ;
+    ##alien-assembly
+    ##alien-indirect
+    ##alien-invoke ;
 
-! Instructions that contain subroutine calls to functions which
-! can callback arbitrary Factor code
-UNION: factor-call-insn
-alien-call-insn ;
-
-! Instructions that contain subroutine calls to functions which
-! allocate memory
 UNION: gc-map-insn
-##call-gc
-##box
-##box-long-long
-factor-call-insn ;
+    ##call-gc
+    ##box
+    ##box-long-long
+    ##alien-indirect
+    ##alien-invoke ;
 
 M: gc-map-insn clone call-next-method [ clone ] change-gc-map ;
 
-! Each one has a gc-map slot
-TUPLE: gc-map scrub-d check-d scrub-r check-r gc-roots derived-roots ;
+TUPLE: gc-map gc-roots derived-roots ;
 
 : <gc-map> ( -- gc-map ) gc-map new ;
 
-! Instructions that clobber registers. They receive inputs and
-! produce outputs in spill slots.
-UNION: hairy-clobber-insn
-##call-gc
-alien-call-insn
-##callback-inputs
-##callback-outputs
-##unbox-long-long ;
-
-! Instructions that clobber registers but are allowed to produce
-! outputs in registers. Inputs are in spill slots, except for
-! inputs coalesced with the output, in which case that input
-! will be in a register.
-UNION: clobber-insn
-hairy-clobber-insn
-##unbox
-##box
-##box-long-long ;
-
-! Instructions that have complex expansions and require that the
-! output registers are not equal to any of the input registers
 UNION: def-is-use-insn
-##box-alien
-##box-displaced-alien
-##unbox-any-c-ptr ;
+    ##box-alien
+    ##box-displaced-alien
+    ##unbox-any-c-ptr ;

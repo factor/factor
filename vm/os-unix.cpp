@@ -2,6 +2,12 @@
 
 namespace factor {
 
+bool set_memory_locked(cell base, cell size, bool locked) {
+  int prot = locked ? PROT_NONE : PROT_READ | PROT_WRITE;
+  int status = mprotect((char*)base, size, prot);
+  return status != -1;
+}
+
 THREADHANDLE start_thread(void* (*start_routine)(void*), void* args) {
   pthread_attr_t attr;
   pthread_t thread;
@@ -39,19 +45,13 @@ void factor_vm::ffi_dlopen(dll* dll) {
   dll->handle = dlopen(alien_offset(dll->path), RTLD_LAZY | RTLD_GLOBAL);
 }
 
-void* factor_vm::ffi_dlsym_raw(dll* dll, symbol_char* symbol) {
-  return dlsym(dll ? dll->handle : null_dll, symbol);
+cell factor_vm::ffi_dlsym_raw(dll* dll, symbol_char* symbol) {
+  return (cell)dlsym(dll ? dll->handle : null_dll, symbol);
 }
 
-void* factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
+cell factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
   return FUNCTION_CODE_POINTER(ffi_dlsym_raw(dll, symbol));
 }
-
-#ifdef FACTOR_PPC
-void* factor_vm::ffi_dlsym_toc(dll* dll, symbol_char* symbol) {
-  return FUNCTION_TOC_POINTER(ffi_dlsym_raw(dll, symbol));
-}
-#endif
 
 void factor_vm::ffi_dlclose(dll* dll) {
   if (dlclose(dll->handle))
@@ -65,14 +65,13 @@ void factor_vm::primitive_existsp() {
   ctx->push(tag_boolean(stat(path, &sb) >= 0));
 }
 
-void factor_vm::move_file(const vm_char* path1, const vm_char* path2) {
+bool move_file(const vm_char* path1, const vm_char* path2) {
   int ret = 0;
   do {
     ret = rename((path1), (path2));
   } while (ret < 0 && errno == EINTR);
 
-  if (ret < 0)
-    general_error(ERROR_IO, tag_fixnum(errno), false_object);
+  return ret == 0;
 }
 
 segment::segment(cell size_, bool executable_p) {
@@ -82,47 +81,28 @@ segment::segment(cell size_, bool executable_p) {
 
   int prot;
   if (executable_p)
-    prot = (PROT_READ | PROT_WRITE | PROT_EXEC);
+    prot = PROT_READ | PROT_WRITE | PROT_EXEC;
   else
-    prot = (PROT_READ | PROT_WRITE);
+    prot = PROT_READ | PROT_WRITE;
 
-  char* array = (char*)mmap(NULL, pagesize + size + pagesize, prot,
+  cell alloc_size = 2 * pagesize + size;
+  char* array = (char*)mmap(NULL, alloc_size, prot,
                             MAP_ANON | MAP_PRIVATE, -1, 0);
-  if (array == (char*)- 1)
-    out_of_memory();
 
-  if (mprotect(array, pagesize, PROT_NONE) == -1)
-    fatal_error("Cannot protect low guard page", (cell)array);
-
-  if (mprotect(array + pagesize + size, pagesize, PROT_NONE) == -1)
-    fatal_error("Cannot protect high guard page", (cell)array);
+  if (array == (char*)-1)
+    fatal_error("Out of memory in mmap", alloc_size);
 
   start = (cell)(array + pagesize);
   end = start + size;
+
+  set_border_locked(true);
 }
 
 segment::~segment() {
   int pagesize = getpagesize();
-  int retval = munmap((void*)(start - pagesize), pagesize + size + pagesize);
+  int retval = munmap((void*)(start - pagesize), 2 * pagesize + size);
   if (retval)
     fatal_error("Segment deallocation failed", 0);
-}
-
-void code_heap::guard_safepoint() {
-  if (mprotect(safepoint_page, getpagesize(), PROT_NONE) == -1)
-    fatal_error("Cannot protect safepoint guard page", (cell)safepoint_page);
-}
-
-void code_heap::unguard_safepoint() {
-  if (mprotect(safepoint_page, getpagesize(), PROT_WRITE) == -1)
-    fatal_error("Cannot unprotect safepoint guard page", (cell)safepoint_page);
-}
-
-void factor_vm::dispatch_signal(void* uap, void(handler)()) {
-  dispatch_signal_handler((cell*)&UAP_STACK_POINTER(uap),
-                          (cell*)&UAP_PROGRAM_COUNTER(uap),
-                          (cell)FUNCTION_CODE_POINTER(handler));
-  UAP_SET_TOC_POINTER(uap, (cell)FUNCTION_TOC_POINTER(handler));
 }
 
 void factor_vm::start_sampling_profiler_timer() {
@@ -139,11 +119,18 @@ void factor_vm::end_sampling_profiler_timer() {
   setitimer(ITIMER_REAL, &timer, NULL);
 }
 
+void factor_vm::dispatch_signal(void* uap, void(handler)()) {
+  dispatch_signal_handler((cell*)&UAP_STACK_POINTER(uap),
+                          (cell*)&UAP_PROGRAM_COUNTER(uap),
+                          (cell)FUNCTION_CODE_POINTER(handler));
+}
+
 void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
+
+  cell fault_addr = (cell)siginfo->si_addr;
+  cell fault_pc = (cell)UAP_PROGRAM_COUNTER(uap);
   factor_vm* vm = current_vm();
-  vm->verify_memory_protection_error((cell)siginfo->si_addr);
-  vm->signal_fault_addr = (cell)siginfo->si_addr;
-  vm->signal_fault_pc = (cell)UAP_PROGRAM_COUNTER(uap);
+  vm->set_memory_protection_error(fault_addr, fault_pc);
   vm->dispatch_signal(uap, factor::memory_signal_handler_impl);
 }
 
@@ -152,11 +139,10 @@ void synchronous_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
     return;
 
   factor_vm* vm = current_vm_p();
-  if (vm) {
-    vm->signal_number = signal;
-    vm->dispatch_signal(uap, factor::synchronous_signal_handler_impl);
-  } else
+  if (!vm)
     fatal_error("Foreign thread received signal", signal);
+  vm->signal_number = signal;
+  vm->dispatch_signal(uap, factor::synchronous_signal_handler_impl);
 }
 
 void safe_write_nonblock(int fd, void* data, ssize_t size);
@@ -181,7 +167,7 @@ void fep_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
 
   factor_vm* vm = current_vm_p();
   if (vm) {
-    vm->safepoint.enqueue_fep(vm);
+    vm->enqueue_fep();
     enqueue_signal(vm, signal);
   } else
     fatal_error("Foreign thread received signal", signal);
@@ -195,8 +181,7 @@ void sample_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
     vm = thread_vms.begin()->second;
   }
   if (atomic::load(&vm->sampling_profiler_p))
-    vm->safepoint.enqueue_samples(vm, 1, (cell)UAP_PROGRAM_COUNTER(uap),
-                                  foreign_thread);
+    vm->enqueue_samples(1, (cell)UAP_PROGRAM_COUNTER(uap), foreign_thread);
   else if (!foreign_thread)
     enqueue_signal(vm, signal);
 }
@@ -318,27 +303,27 @@ void factor_vm::unix_init_signals() {
     sigaction_safe(SIGALRM, &sample_sigaction, NULL);
   }
 
-  /* We don't use SA_IGN here because then the ignore action is inherited
-     by subprocesses, which we don't want. There is a unit test in
-     io.launcher.unix for this. */
+  // We don't use SA_IGN here because then the ignore action is inherited
+  // by subprocesses, which we don't want. There is a unit test in
+  // io.launcher.unix for this.
   {
     struct sigaction ignore_sigaction;
     init_sigaction_with_handler(&ignore_sigaction, ignore_signal_handler);
     sigaction_safe(SIGPIPE, &ignore_sigaction, NULL);
-    /* We send SIGUSR2 to the stdin_loop thread to interrupt it on FEP */
+    // We send SIGUSR2 to the stdin_loop thread to interrupt it on FEP
     sigaction_safe(SIGUSR2, &ignore_sigaction, NULL);
   }
 }
 
-/* On Unix, shared fds such as stdin cannot be set to non-blocking mode
-   (http://homepages.tesco.net/J.deBoynePollard/FGA/dont-set-shared-file-descriptors-to-non-blocking-mode.html)
-   so we kludge around this by spawning a thread, which waits on a control pipe
-   for a signal, upon receiving this signal it reads one block of data from
-   stdin and writes it to a data pipe. Upon completion, it writes a 4-byte
-   integer to the size pipe, indicating how much data was written to the data
-   pipe.
+// On Unix, shared fds such as stdin cannot be set to non-blocking mode
+// (http://homepages.tesco.net/J.deBoynePollard/FGA/dont-set-shared-file-descriptors-to-non-blocking-mode.html)
+// so we kludge around this by spawning a thread, which waits on a control pipe
+// for a signal, upon receiving this signal it reads one block of data from
+// stdin and writes it to a data pipe. Upon completion, it writes a 4-byte
+// integer to the size pipe, indicating how much data was written to the data
+// pipe.
 
-   The read end of the size pipe can be set to non-blocking. */
+// The read end of the size pipe can be set to non-blocking.
 extern "C" {
 int stdin_read;
 int stdin_write;
@@ -362,12 +347,9 @@ void safe_close(int fd) {
 bool check_write(int fd, void* data, ssize_t size) {
   if (write(fd, data, size) == size)
     return true;
-  else {
-    if (errno == EINTR)
-      return check_write(fd, data, size);
-    else
-      return false;
-  }
+  if (errno == EINTR)
+    return check_write(fd, data, size);
+  return false;
 }
 
 void safe_write(int fd, void* data, ssize_t size) {
@@ -417,8 +399,8 @@ void* stdin_loop(void* arg) {
       fatal_error("stdin_loop: bad data on control fd", buf[0]);
 
     for (;;) {
-      /* If we fep, the parent thread will grab stdin_mutex and send us
-         SIGUSR2 to interrupt the read() call. */
+      // If we fep, the parent thread will grab stdin_mutex and send us
+      // SIGUSR2 to interrupt the read() call.
       pthread_mutex_lock(&stdin_mutex);
       pthread_mutex_unlock(&stdin_mutex);
       ssize_t bytes = read(0, buf, sizeof(buf));
@@ -445,7 +427,7 @@ void* stdin_loop(void* arg) {
   return NULL;
 }
 
-void factor_vm::open_console() {
+void open_console() {
   FACTOR_ASSERT(!stdin_thread_initialized_p);
   safe_pipe(&control_read, &control_write);
   safe_pipe(&size_read, &size_write);
@@ -455,41 +437,49 @@ void factor_vm::open_console() {
   pthread_mutex_init(&stdin_mutex, NULL);
 }
 
-/* This method is used to kill the stdin_loop before exiting from factor.
-   A Nvidia driver bug on Linux is the reason this has to be done, see:
-     http://www.nvnews.net/vbulletin/showthread.php?t=164619 */
-void factor_vm::close_console() {
+// This method is used to kill the stdin_loop before exiting from factor.
+// An Nvidia driver bug on Linux is the reason this has to be done, see:
+//   http://www.nvnews.net/vbulletin/showthread.php?t=164619
+void close_console() {
   if (stdin_thread_initialized_p) {
     pthread_cancel(stdin_thread);
     pthread_join(stdin_thread, 0);
   }
 }
 
-void factor_vm::lock_console() {
+void lock_console() {
   FACTOR_ASSERT(stdin_thread_initialized_p);
-  /* Lock the stdin_mutex and send the stdin_loop thread a signal to interrupt
-     any read() it has in progress. When the stdin loop iterates again, it will
-     try to lock the same mutex and wait until unlock_console() is called. */
+  // Lock the stdin_mutex and send the stdin_loop thread a signal to interrupt
+  // any read() it has in progress. When the stdin loop iterates again, it will
+  // try to lock the same mutex and wait until unlock_console() is called.
   pthread_mutex_lock(&stdin_mutex);
   pthread_kill(stdin_thread, SIGUSR2);
 }
 
-void factor_vm::unlock_console() {
+void unlock_console() {
   FACTOR_ASSERT(stdin_thread_initialized_p);
   pthread_mutex_unlock(&stdin_mutex);
 }
 
-void factor_vm::ignore_ctrl_c() {
+void ignore_ctrl_c() {
   sig_t ret;
   do {
     ret = signal(SIGINT, SIG_DFL);
   } while (ret == SIG_ERR && errno == EINTR);
 }
 
-void factor_vm::handle_ctrl_c() {
+void handle_ctrl_c() {
   struct sigaction fep_sigaction;
   init_sigaction_with_handler(&fep_sigaction, fep_signal_handler);
   sigaction_safe(SIGINT, &fep_sigaction, NULL);
+}
+
+void factor_vm::primitive_disable_ctrl_break() {
+  stop_on_ctrl_break = false;
+}
+
+void factor_vm::primitive_enable_ctrl_break() {
+  stop_on_ctrl_break = true;
 }
 
 void abort() {
@@ -498,7 +488,7 @@ void abort() {
     ret = signal(SIGABRT, SIG_DFL);
   } while (ret == SIG_ERR && errno == EINTR);
 
-  factor_vm::close_console();
+  close_console();
   ::abort();
 }
 

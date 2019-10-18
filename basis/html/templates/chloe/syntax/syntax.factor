@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors sequences combinators kernel namespaces classes.tuple
 assocs splitting words arrays memoize parser lexer io io.files
-io.encodings.utf8 io.streams.string unicode.case mirrors fry math urls
+io.encodings.utf8 io.streams.string unicode mirrors fry math urls
 multiline xml xml.data xml.writer xml.syntax html.components
 html.templates ;
 IN: html.templates.chloe.syntax

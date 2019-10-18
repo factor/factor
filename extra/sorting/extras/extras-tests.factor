@@ -22,13 +22,12 @@ IN: sorting.extras
 
 { { 0 1 2 3 4 5 6 7 8 9 } } [
     { }
-    10 iota >array randomize
+    10 <iota> >array randomize
     [ swap insort-right ] each
 ] unit-test
 
 { V{ 0 1 2 3 4 5 6 7 8 9 } } [
     V{ } clone
-    10 iota >array randomize
+    10 <iota> >array randomize
     [ swap insort-right! ] each
 ] unit-test
-

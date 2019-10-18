@@ -1,5 +1,6 @@
-USING: accessors http.client http.server io.servers
-io.sockets.secure io.sockets.secure.openssl kernel tools.test ;
+USING: accessors continuations http.client http.server io.servers
+io.sockets.secure io.sockets.secure.openssl io.timeouts kernel
+tools.test ;
 IN: io.sockets.secure.openssl.tests
 
 { 200 } [ "https://www.google.se" http-get drop code>> ] unit-test
@@ -14,3 +15,16 @@ IN: io.sockets.secure.openssl.tests
 
 [ "test" 33 <ssl-handle> handle>> check-subject-name ]
 [ certificate-missing-error? ] must-fail-with
+
+{ t } [ "badssl.com" "*.badssl.com" subject-names-match? ] unit-test
+{ t } [ "www.badssl.com" "*.badssl.com" subject-names-match? ] unit-test
+{ f } [ "foo.bar.badssl.com" "*.badssl.com" subject-names-match? ] unit-test
+{ f } [ ".com" "*.badssl.com" subject-names-match? ] unit-test
+
+TUPLE: fake-fd fd ;
+
+M: fake-fd cancel-operation ( obj -- ) drop ;
+
+{ f } [
+    33 fake-fd boa <ssl-handle> [ maybe-handshake ] ignore-errors connected>>
+] unit-test

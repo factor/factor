@@ -15,12 +15,12 @@ CONSTANT: quoted-entities-out
     H{
         { CHAR: & "&amp;"  }
         { CHAR: ' "&apos;" }
-        { CHAR: " "&quot;" }
+        { CHAR: \" "&quot;" }
         { CHAR: < "&lt;"   }
     }
 
 : escape-string-by ( str table -- escaped )
-    #! Convert <, >, &, ' and " to HTML entities.
+    ! Convert <, >, &, ' and " to HTML entities.
     [ '[ dup _ at [ % ] [ , ] ?if ] each ] "" make ;
 
 : escape-string ( str -- newstr )
@@ -35,8 +35,8 @@ CONSTANT: entities
         { "gt"    CHAR: >  }
         { "amp"   CHAR: &  }
         { "apos"  CHAR: '  }
-        { "quot"  CHAR: "  }
+        { "quot"  CHAR: \"  }
     }
 
 : with-entities ( entities quot -- )
-    [ swap extra-entities set call ] with-scope ; inline
+    [ extra-entities ] dip with-variable ; inline

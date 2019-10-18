@@ -1,9 +1,6 @@
-USING: accessors assocs couchdb furnace.auth.providers
-json.writer kernel mirrors sequences urls urls.encoding
-arrays furnace.auth byte-arrays combinators.short-circuit
-strings continuations combinators base64 make
-locals namespaces ;
-FROM: assocs => change-at ;
+USING: accessors assocs base64 byte-arrays combinators.short-circuit
+continuations couchdb fry furnace.auth.providers json.writer kernel
+locals make mirrors namespaces sequences strings urls urls.encoding ;
 IN: furnace.auth.providers.couchdb
 
 ! !!! Implement the authentication protocol for CouchDB.
@@ -58,13 +55,10 @@ TUPLE: couchdb-auth-provider
     prefix>> [ % url-encode-full % "!" % url-encode-full % ] "" make ;
 
 : (reserve) ( value name -- id/f )
-    reservation-id
-    get-url
-    [
-        H{ } clone >json swap couch-put
-    ] [
-        nip dup is-couchdb-conflict-error? [ drop f ] [ rethrow ] if
-    ] recover ;
+    '[
+        _ _ reservation-id get-url
+        H{ } clone swap couch-put
+    ] [ is-couchdb-conflict-error? ] ignore-error/f ;
 
 ! Don't reserve false values (e.g. if the email field is f, don't reserve f,
 ! or the first user who registers without an email address will block all
@@ -79,13 +73,11 @@ TUPLE: couchdb-auth-provider
     couch-delete drop ;
 
 : unreserve-from-id ( id -- )
-    [
-        get-url dup couch-get
+    '[
+        _ get-url dup couch-get
         "_rev" of "rev" set-query-param
         couch-delete drop
-    ] [
-        dup is-couchdb-not-found-error? [ 2drop ] [ rethrow ] if
-    ] recover ;
+    ] [ is-couchdb-not-found-error? ] ignore-error ;
 
 :: (reserve-multiple) ( hash keys made -- ? )
     keys empty? [ t ] [
@@ -108,7 +100,7 @@ TUPLE: couchdb-auth-provider
     over [ change-at ] dip ; inline
 
 ! Should be given a view URL.
-: ((get-user)) ( couchdb-url -- user/f )
+: url>user ( couchdb-url -- user/f )
     couch-get
     "rows" of dup empty? [ drop f ] [ first "value" of ] if ;
 
@@ -116,10 +108,10 @@ TUPLE: couchdb-auth-provider
     couchdb-auth-provider get
     username-view>> get-url
     swap >json "key" set-query-param
-    ((get-user)) ;
+    url>user ;
 
 : strip-hash ( hash1 -- hash2 )
-    [ drop first CHAR: _ = not ] assoc-filter ;
+    [ drop first CHAR: _ = ] assoc-reject ;
 
 : at-or-k ( key hash -- newkey )
     dupd at [ nip ] when* ;
@@ -162,7 +154,7 @@ TUPLE: couchdb-auth-provider
     ] H{ } make
     reserve-multiple
     [
-        user>user-hash >json
+        user>user-hash
         "" get-url
         couch-post
     ] [
@@ -220,7 +212,7 @@ M: couchdb-auth-provider update-user ( user provider -- )
         [ drop "_id" of get-url ]
         [ user>user-hash swapd
           2dup check-update drop
-          unify-users >json swap couch-put drop
+          unify-users swap couch-put drop
         ]
         tri
     ] with-variable ;

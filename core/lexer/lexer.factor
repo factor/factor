@@ -15,7 +15,7 @@ TUPLE: lexer
 
 TUPLE: lexer-parsing-word word line line-text column ;
 
-ERROR: not-a-lexer obj ;
+ERROR: not-a-lexer object ;
 
 : check-lexer ( lexer -- lexer )
     dup lexer? [ not-a-lexer ] unless ; inline
@@ -57,39 +57,35 @@ ERROR: unexpected want got ;
         [ swap forbid-tab CHAR: \s eq? xor ] curry find-from drop
     ] dip or ; inline
 
-: change-lexer-column ( lexer quot -- )
+: change-lexer-column ( ..a lexer quot: ( ..a col line -- ..b newcol ) -- ..b )
     [ check-lexer [ column>> ] [ line-text>> ] bi ] prepose
     keep column<< ; inline
 
 GENERIC: skip-blank ( lexer -- )
 
-M: lexer skip-blank
-    [ t skip ] change-lexer-column ;
-
-GENERIC: skip-word ( lexer -- )
-
 <PRIVATE
 
-: quote? ( column text -- ? )
-    { fixnum string } declare nth CHAR: " eq? ;
-
-: shebang? ( column text -- ? )
-    { fixnum string } declare swap zero? [
-        dup length 1 > [
-            dup first-unsafe CHAR: # =
-            [ second-unsafe CHAR: ! = ] [ drop f ] if
-        ] [ drop f ] if
-    ] [ drop f ] if ;
+: shebang? ( lexer -- lexer ? )
+    dup line>> 1 = [
+        dup column>> zero? [
+            dup line-text>> "#!" head?
+        ] [ f ] if
+    ] [ f ] if ; inline
 
 PRIVATE>
 
+M: lexer skip-blank
+    shebang? [
+        [ nip length ] change-lexer-column
+    ] [
+        [ t skip ] change-lexer-column
+    ] if ;
+
+GENERIC: skip-word ( lexer -- )
+
 M: lexer skip-word
     [
-        {
-            { [ 2dup quote? ] [ drop 1 + ] }
-            { [ 2dup shebang? ] [ drop 2 + ] }
-            [ f skip ]
-        } cond
+        2dup nth CHAR: \" eq? [ drop 1 + ] [ f skip ] if
     ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )
@@ -98,7 +94,7 @@ M: lexer skip-word
 : still-parsing-line? ( lexer -- ? )
     check-lexer [ column>> ] [ line-length>> ] bi < ;
 
-: (parse-token) ( lexer -- str )
+: (parse-raw) ( lexer -- str )
     check-lexer {
         [ column>> ]
         [ skip-word ]
@@ -106,12 +102,24 @@ M: lexer skip-word
         [ line-text>> ]
     } cleave subseq ;
 
-: parse-token ( lexer -- str/f )
+: parse-raw ( lexer -- str/f )
     dup still-parsing? [
         dup skip-blank
         dup still-parsing-line?
-        [ (parse-token) ] [ dup next-line parse-token ] if
+        [ (parse-raw) ] [ dup next-line parse-raw ] if
     ] [ drop f ] if ;
+
+DEFER: parse-token
+
+: skip-comments ( lexer str -- str' )
+    dup "!" = [
+        drop [ next-line ] keep parse-token
+    ] [
+        nip
+    ] if ;
+
+: parse-token ( lexer -- str/f )
+    dup parse-raw [ skip-comments ] [ drop f ] if* ;
 
 : ?scan-token ( -- str/f ) lexer get parse-token ;
 
@@ -178,4 +186,5 @@ M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
     [ last parsing-word-lexer-dump ] if-empty ;
 
 : with-lexer ( lexer quot -- newquot )
-    [ lexer set ] dip [ <lexer-error> rethrow ] recover ; inline
+    [ [ <lexer-error> rethrow ] recover ] curry
+    [ lexer ] dip with-variable ; inline

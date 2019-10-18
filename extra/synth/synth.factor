@@ -4,7 +4,7 @@ USING: accessors kernel locals math math.constants math.functions memoize openal
 IN: synth
 
 MEMO: single-sine-wave ( samples/wave -- seq )
-    [ iota ] [ pi 2 * swap / [ * sin ] curry ] bi map ;
+    [ <iota> ] [ pi 2 * swap / [ * sin ] curry ] bi map ;
 
 : (sine-wave) ( samples/wave n-samples -- seq )
     [ single-sine-wave ] dip <cycles> ;
@@ -33,4 +33,3 @@ C: <note> note
 
 : >note ( harmonics note buffer -- buffer )
     [ [ note-harmonic-data ] 2curry map <summed> ] [ data<< ] [ ] tri ;
-

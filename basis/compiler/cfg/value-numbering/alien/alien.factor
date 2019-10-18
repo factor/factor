@@ -1,15 +1,11 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.short-circuit fry
-kernel make math sequences
-cpu.architecture
-compiler.cfg.hats
-compiler.cfg.utilities
-compiler.cfg.registers
-compiler.cfg.instructions
+USING: accessors combinators combinators.short-circuit
+compiler.cfg.hats compiler.cfg.instructions
+compiler.cfg.utilities compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.math
-compiler.cfg.value-numbering.graph
-compiler.cfg.value-numbering.rewrite ;
+compiler.cfg.value-numbering.rewrite cpu.architecture fry kernel
+make math sequences ;
 IN: compiler.cfg.value-numbering.alien
 
 M: ##box-displaced-alien rewrite

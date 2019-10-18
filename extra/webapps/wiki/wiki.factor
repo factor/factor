@@ -120,7 +120,7 @@ M: revision feed-entry-url id>> revision-url ;
         ] >>init
 
         { wiki "view" } >>template
-    
+
     <article-boilerplate> ;
 
 : <random-article-action> ( -- action )
@@ -244,7 +244,7 @@ M: revision feed-entry-url id>> revision-url ;
             [ add-revision ]
             [ title>> revisions-url <redirect> ] bi
         ] >>submit
-    
+
     <protected>
         "rollback wiki articles" >>description ;
 
@@ -297,7 +297,7 @@ M: revision feed-entry-url id>> revision-url ;
                 [ "new" [ from-object ] nest-form ]
                 bi*
             ]
-            [ [ content>> string-lines ] bi@ diff "diff" set-value ]
+            [ [ content>> string-lines ] bi@ lcs-diff "diff" set-value ]
             2bi
         ] >>init
 
@@ -370,18 +370,3 @@ M: revision feed-entry-url id>> revision-url ;
     <boilerplate>
         [ init-sidebars init-relative-link-prefix ] >>init
         { wiki "wiki-common" } >>template ;
-
-: init-wiki ( -- )
-    "resource:extra/webapps/wiki/initial-content" [
-        [
-            dup ".txt" ?tail [
-                swap ascii file-contents
-                f <revision>
-                    swap >>content
-                    swap >>title
-                    "slava" >>author
-                    now >>date
-                add-revision
-            ] [ 2drop ] if
-        ] each
-    ] with-directory-files ;

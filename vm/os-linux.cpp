@@ -2,20 +2,30 @@
 
 namespace factor {
 
-/* Snarfed from SBCL linux-so.c. You must free() the result yourself. */
 const char* vm_executable_path() {
-  char* path = new char[PATH_MAX + 1];
+  ssize_t bufsiz = 4096;
 
-  int size = readlink("/proc/self/exe", path, PATH_MAX);
-  if (size < 0) {
-    fatal_error("Cannot read /proc/self/exe", 0);
-    return NULL;
-  } else {
-    path[size] = '\0';
-
-    const char* ret = safe_strdup(path);
-    delete[] path;
-    return ret;
+  // readlink is called in a loop with increasing buffer sizes in case
+  // someone tries to run Factor from a incredibly deeply nested
+  // path.
+  while (true) {
+    char* buf = new char[bufsiz + 1];
+    ssize_t size= readlink("/proc/self/exe", buf, bufsiz);
+    if (size < 0) {
+      fatal_error("Cannot read /proc/self/exe", errno);
+    } else {
+      if (size < bufsiz) {
+        // Buffer was large enough, return string.
+        buf[size] = '\0';
+        const char* ret = safe_strdup(buf);
+        delete[] buf;
+        return ret;
+      } else {
+        // Buffer wasn't big enough, double it and try again.
+        delete[] buf;
+        bufsiz *= 2;
+      }
+    }
   }
 }
 

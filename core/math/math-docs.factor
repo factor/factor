@@ -150,8 +150,8 @@ HELP: bitand
 { $values { "x" integer } { "y" integer } { "z" integer } }
 { $description "Outputs a new integer where each bit is set if and only if the corresponding bit is set in both inputs." }
 { $examples
-    { $example "USING: math prettyprint ;" "0b101 0b10 bitand .b" "0" }
-    { $example "USING: math prettyprint ;" "0b110 0b10 bitand .b" "10" }
+    { $example "USING: math prettyprint ;" "0b101 0b10 bitand .b" "0b0" }
+    { $example "USING: math prettyprint ;" "0b110 0b10 bitand .b" "0b10" }
 }
 { $notes "This word implements bitwise and, so applying it to booleans will throw an error. Boolean and is the " { $link and } " word." } ;
 
@@ -159,8 +159,8 @@ HELP: bitor
 { $values { "x" integer } { "y" integer } { "z" integer } }
 { $description "Outputs a new integer where each bit is set if and only if the corresponding bit is set in at least one of the inputs." }
 { $examples
-    { $example "USING: math prettyprint ;" "0b101 0b10 bitor .b" "111" }
-    { $example "USING: math prettyprint ;" "0b110 0b10 bitor .b" "110" }
+    { $example "USING: math prettyprint ;" "0b101 0b10 bitor .b" "0b111" }
+    { $example "USING: math prettyprint ;" "0b110 0b10 bitor .b" "0b110" }
 }
 { $notes "This word implements bitwise inclusive or, so applying it to booleans will throw an error. Boolean inclusive or is the " { $link and } " word." } ;
 
@@ -168,15 +168,15 @@ HELP: bitxor
 { $values { "x" integer } { "y" integer } { "z" integer } }
 { $description "Outputs a new integer where each bit is set if and only if the corresponding bit is set in exactly one of the inputs." }
 { $examples
-    { $example "USING: math prettyprint ;" "0b101 0b10 bitxor .b" "111" }
-    { $example "USING: math prettyprint ;" "0b110 0b10 bitxor .b" "100" }
+    { $example "USING: math prettyprint ;" "0b101 0b10 bitxor .b" "0b111" }
+    { $example "USING: math prettyprint ;" "0b110 0b10 bitxor .b" "0b100" }
 }
 { $notes "This word implements bitwise exclusive or, so applying it to booleans will throw an error. Boolean exclusive or is the " { $link xor } " word." } ;
 
 HELP: shift
 { $values { "x" integer } { "n" integer } { "y" integer } }
 { $description "Shifts " { $snippet "x" } " to the left by " { $snippet "n" } " bits if " { $snippet "n" } " is positive, or " { $snippet "-n" } " bits to the right if " { $snippet "n" } " is negative. A left shift of a fixnum may overflow, yielding a bignum. A right shift may result in bits “falling off” the right hand side and being discarded." }
-{ $examples { $example "USING: math prettyprint ;" "0b101 5 shift .b" "10100000" } { $example "USING: math prettyprint ;" "0b11111 -2 shift .b" "111" } } ;
+{ $examples { $example "USING: math prettyprint ;" "0b101 5 shift .b" "0b10100000" } { $example "USING: math prettyprint ;" "0b11111 -2 shift .b" "0b111" } } ;
 
 HELP: bitnot
 { $values { "x" integer } { "y" integer } }
@@ -235,6 +235,19 @@ HELP: sgn
     }
 } ;
 
+HELP: rect>
+{ $values { "x" real } { "y" real } { "z" number } }
+{ $description "Creates a complex number from real and imaginary components. If " { $snippet "z" } " is an integer zero, this will simply output " { $snippet "x" } "." } ;
+
+HELP: >rect
+{ $values { "z" number } { "x" real } { "y" real } }
+{ $description "Extracts the real and imaginary components of a complex number." } ;
+
+HELP: gcd
+{ $values { "x" integer } { "y" integer } { "a" integer } { "d" integer } }
+{ $description "Computes the positive greatest common divisor " { $snippet "d" } " of " { $snippet "x" } " and " { $snippet "y" } ", and another value " { $snippet "a" } " satisfying:" { $code "a*y = d mod x" } }
+{ $notes "If " { $snippet "d" } " is 1, then " { $snippet "a" } " is the inverse of " { $snippet "y" } " modulo " { $snippet "x" } "." } ;
+
 HELP: 2/
 { $values { "x" integer } { "y" integer } }
 { $description "Shifts " { $snippet "x" } " to the right by one bit." }
@@ -264,7 +277,7 @@ HELP: if-zero
 
 HELP: when-zero
 { $values
-     { "n" number } { "quot" "the first quotation of an " { $link if-zero } } }
+     { "n" number } { "quot" "the first quotation of an " { $link if-zero } } { "x" object } }
 { $description "Makes an implicit check if the number is zero. A zero is dropped and the " { $snippet "quot" } " is called." }
 { $examples "This word is equivalent to " { $link if-zero } " with an empty second quotation:"
     { $example
@@ -281,17 +294,17 @@ HELP: when-zero
 
 HELP: unless-zero
 { $values
-     { "n" number } { "quot" "the second quotation of an " { $link if-empty } } }
+     { "n" number } { "quot" "the second quotation of an " { $link if-zero } } }
 { $description "Makes an implicit check if the number is zero. A zero is dropped. Otherwise, the " { $snippet "quot" } " is called on the number." }
 { $examples "This word is equivalent to " { $link if-zero } " with an empty first quotation:"
     { $example
     "USING: sequences math prettyprint ;"
-    "3 [ ] [ sq ] if-zero ."
+    "3 [ ] [ sq . ] if-zero"
     "9"
     }
     { $example
     "USING: sequences math prettyprint ;"
-    "3 [ sq ] unless-zero ."
+    "3 [ sq . ] unless-zero"
     "9"
     }
 } ;
@@ -423,12 +436,12 @@ HELP: all-integers?
 { $notes "This word is used to implement " { $link all? } "." } ;
 
 HELP: find-integer
-{ $values { "n" integer } { "quot" { $quotation ( ... i -- ... ? ) } } { "i" "an integer or " { $link f } } }
+{ $values { "n" integer } { "quot" { $quotation ( ... i -- ... ? ) } } { "i/f" { $maybe integer } } }
 { $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iteration stops when the quotation outputs a true value or the end is reached. If the quotation yields a true value for some integer, this word outputs that integer. Otherwise, this word outputs " { $link f } "." }
 { $notes "This word is used to implement " { $link find } "." } ;
 
 HELP: find-last-integer
-{ $values { "n" integer } { "quot" { $quotation ( ... i -- ... ? ) } } { "i" "an integer or " { $link f } } }
+{ $values { "n" integer } { "quot" { $quotation ( ... i -- ... ? ) } } { "i/f" { $maybe integer } } }
 { $description "Applies the quotation to each integer from " { $snippet "n" } " down to 0, inclusive. Iteration stops when the quotation outputs a true value or 0 is reached. If the quotation yields a true value for some integer, the word outputs that integer. Otherwise, the word outputs " { $link f } "." }
 { $notes "This word is used to implement " { $link find-last } "." } ;
 
@@ -509,4 +522,3 @@ $nl
 { $see-also "integers" "rationals" "floats" "complex-numbers" } ;
 
 ABOUT: "arithmetic"
-

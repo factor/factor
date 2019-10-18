@@ -33,7 +33,7 @@ ARTICLE: "namespaces-global" "Global variables"
 ARTICLE: "namespaces.private" "Namespace implementation details"
 "The namestack holds namespaces."
 { $subsections
-    namestack
+    get-namestack
     set-namestack
     namespace
 }
@@ -65,12 +65,12 @@ $nl
 ABOUT: "namespaces"
 
 HELP: get
-{ $values { "variable" "a variable, by convention a symbol" } { "value" "the value, or " { $link f } } }
-{ $description "Searches the name stack for a namespace containing the variable, and outputs the associated value. If no such namespace is found, outputs " { $link f } "." } ;
+{ $values { "variable" "a variable, by convention a symbol" } { "value" { $maybe "the value" } } }
+{ $description "Searches the namestack for a namespace containing the variable, and outputs the associated value. If no such namespace is found, outputs " { $link f } "." } ;
 
 HELP: set
 { $values { "value" "the new value" } { "variable" "a variable, by convention a symbol" } }
-{ $description "Assigns a value to the variable in the namespace at the top of the name stack." }
+{ $description "Assigns a value to the variable in the namespace at the top of the namestack." }
 { $side-effects "variable" } ;
 
 HELP: off
@@ -95,13 +95,13 @@ HELP: change-global
 
 HELP: toggle
 { $values
-    { "variable" "a variable, by convention a symbol" }    
+    { "variable" "a variable, by convention a symbol" }
 }
 { $description "Changes the boolean value of a variable to its opposite." } ;
 
 HELP: with-global
 { $values
-    { "quot" quotation }    
+    { "quot" quotation }
 }
 { $description "Runs the quotation in the global namespace." } ;
 
@@ -165,27 +165,27 @@ HELP: set-global
 { $description "Assigns a value to the variable in the global namespace." }
 { $side-effects "variable" } ;
 
-HELP: namestack*
+HELP: (get-namestack)
 { $values { "namestack" "a vector of assocs" } }
-{ $description "Outputs the current name stack." } ;
+{ $description "Outputs the current namestack." } ;
 
-HELP: namestack
+HELP: get-namestack
 { $values { "namestack" "a vector of assocs" } }
-{ $description "Outputs a copy of the current name stack." } ;
+{ $description "Outputs a copy of the current namestack." } ;
 
 HELP: set-namestack
 { $values { "namestack" "a vector of assocs" } }
-{ $description "Replaces the name stack with a copy of the given vector." } ;
+{ $description "Replaces the namestack with a copy of the given vector." } ;
 
 HELP: >n
 { $values { "namespace" assoc } }
-{ $description "Pushes a namespace on the name stack." } ;
+{ $description "Pushes a namespace on the namestack." } ;
 
 HELP: ndrop
-{ $description "Pops a namespace from the name stack." } ;
+{ $description "Pops a namespace from the namestack." } ;
 
 HELP: init-namespaces
-{ $description "Resets the name stack to its initial state, holding a single copy of the global namespace." }
+{ $description "Resets the namestack to its initial state, holding a single copy of the global namespace." }
 $low-level-note ;
 
 HELP: initialize

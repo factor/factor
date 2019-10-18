@@ -1,60 +1,53 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs continuations debugger fry help.markup io
-io.styles kernel math memory namespaces prettyprint sequences
-tools.profiler.sampling tools.time vocabs vocabs.hierarchy
-vocabs.loader ;
+USING: arrays assocs command-line continuations debugger formatting
+fry help.markup io io.styles kernel math memory namespaces prettyprint
+sequences tools.profiler.sampling tools.test tools.time
+vocabs.hierarchy vocabs.loader ;
 IN: benchmark
 
-<PRIVATE
-
-SYMBOL: results
-SYMBOL: errors
-
-PRIVATE>
+SYMBOL: benchmarks-disabled?
 
 : run-timing-benchmark ( vocab -- time )
-    [ 5 ] dip '[ gc [ _ run ] benchmark ] replicate infimum ;
+    5 swap '[ gc [ _ run ] benchmark ] replicate infimum ;
 
 : run-profile-benchmark ( vocab -- profile )
     compact-gc '[ _ run ] profile most-recent-profile-data ;
 
+: all-benchmark-vocabs ( -- seq )
+    "benchmark" disk-child-vocab-names [ find-vocab-root ] filter ;
+
 : find-benchmark-vocabs ( -- seq )
-    "benchmark" child-vocab-names
-    [ find-vocab-root ] filter ;
+    benchmarks-disabled? get [
+        "benchmarks-disabled? is true, not benchmarking anything!" print
+        { }
+    ] [
+        command-line get [ all-benchmark-vocabs ] when-empty
+    ] if ;
 
 <PRIVATE
 
-: print-record-header ( vocab -- )
-    "=== " write print flush ;
+: write-header ( str -- )
+    "=== %s\n" printf ;
 
-: run-benchmark ( vocab quot -- )
-    [ drop print-record-header ] [
-        '[
-            _ [ [ require ] _ [ ] tri results ]
-            [ swap errors ]
-            recover get set-at
-        ] call
-    ] 2bi ; inline
-
-: run-benchmarks ( quot -- results errors )
-    '[
-        results errors
-        [ [ V{ } clone swap set ] bi@ ]
-        [ 2drop find-benchmark-vocabs [ _ run-benchmark ] each ]
-        [ [ get ] bi@ ]
-        2tri
-    ] with-scope ; inline
+: run-benchmark ( vocab quot: ( vocab -- res ) -- result ok? )
+    over write-header '[ _ @ t ] [
+        f f f <test-failure> f
+    ] recover ; inline
 
 PRIVATE>
 
-: run-timing-benchmarks ( -- results errors )
-    [ run-timing-benchmark ] run-benchmarks ;
+: run-benchmarks ( benchmarks quot: ( vocab -- res ) -- results errors )
+    '[ dup _ run-benchmark 3array ] map
+    [ third ] partition [ [ 2 head ] map ] bi@ ; inline
 
 : run-profile-benchmarks ( -- results errors )
-    [ run-profile-benchmark ] run-benchmarks ;
+    find-benchmark-vocabs [ run-profile-benchmark ] run-benchmarks ;
 
-: timings. ( assocs -- )
+: run-timing-benchmarks ( -- results errors )
+    find-benchmark-vocabs [ run-timing-benchmark ] run-benchmarks ;
+
+: timings. ( assoc -- )
     standard-table-style [
         [
             [ "Benchmark" write ] with-cell
@@ -69,15 +62,12 @@ PRIVATE>
         ] assoc-each
     ] tabular-output nl ;
 
-: benchmark-errors. ( errors -- )
+: benchmark-errors. ( assoc -- )
     [
-        [ "=== " write vocab-name print ]
-        [ error. ]
-        bi*
+        [ write-header ] [ error. ] bi*
     ] assoc-each ;
 
 : timing-benchmarks ( -- )
-    run-timing-benchmarks
-    [ timings. ] [ benchmark-errors. ] bi* ;
+    run-timing-benchmarks [ timings. ] [ benchmark-errors. ] bi* ;
 
 MAIN: timing-benchmarks

@@ -1,12 +1,10 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors assocs classes colors combinators
-continuations grouping io io.streams.string io.styles kernel
-make math math.parser namespaces parser prettyprint.backend
-prettyprint.config prettyprint.custom prettyprint.sections
-quotations sequences sorting strings vocabs vocabs.prettyprint
-words sets generic ;
-FROM: namespaces => set ;
+USING: accessors arrays classes colors.constants combinators
+continuations generic grouping io io.streams.string io.styles
+kernel make math math.parser namespaces prettyprint.config
+prettyprint.custom prettyprint.sections sequences strings
+vocabs.prettyprint words ;
 IN: prettyprint
 
 : with-use ( obj quot -- )
@@ -40,9 +38,9 @@ IN: prettyprint
 : error-in-pprint ( obj -- str )
     class-of name>> "~pprint error: " "~" surround ;
 
-: .b ( n -- ) >bin print ;
-: .o ( n -- ) >oct print ;
-: .h ( n -- ) >hex print ;
+: .b ( n -- ) 2 number-base [ . ] with-variable ;
+: .o ( n -- ) 8 number-base [ . ] with-variable ;
+: .h ( n -- ) 16 number-base [ . ] with-variable ;
 
 : stack. ( seq -- )
     [
@@ -51,15 +49,15 @@ IN: prettyprint
         ] recover
     ] each ;
 
-: .s ( -- ) datastack stack. ;
-: .r ( -- ) retainstack stack. ;
+: .s ( -- ) get-datastack stack. ;
+: .r ( -- ) get-retainstack stack. ;
 
 <PRIVATE
 
-SYMBOL: ->
+SYMBOL: =>
 
-\ ->
-{ { foreground T{ rgba f 1 1 1 1 } } { background T{ rgba f 0 0 0 1 } } }
+\ =>
+{ { foreground COLOR: white } { background COLOR: black } }
 "word-style" set-word-prop
 
 : remove-step-into ( word -- )
@@ -78,7 +76,7 @@ SYMBOL: ->
     ] [ ] make ;
 
 : remove-breakpoints ( quot pos -- quot' )
-    1 + short cut [ (remove-breakpoints) ] bi@ [ -> ] glue ;
+    1 + short cut [ (remove-breakpoints) ] bi@ [ => ] glue ;
 
 : optimized-frame? ( triple -- ? ) second word? ;
 
@@ -124,10 +122,10 @@ SYMBOL: ->
 PRIVATE>
 
 : callstack. ( callstack -- )
-    callstack>array 3 <groups>
+    callstack>array 3 <groups> reverse
     { { table-gap { 5 5 } } } [ [ callframe. ] each ] tabular-output nl ;
 
-: .c ( -- ) callstack callstack. ;
+: .c ( -- ) get-callstack callstack. ;
 
 : pprint-cell ( obj -- ) [ pprint-short ] with-cell ;
 

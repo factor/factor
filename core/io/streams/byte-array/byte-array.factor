@@ -7,12 +7,13 @@ IN: io.streams.byte-array
 
 INSTANCE: byte-vector output-stream
 M: byte-vector stream-element-type drop +byte+ ; inline
+M: byte-vector stream-tell length ; inline
 
 : <byte-writer> ( encoding -- stream )
     512 <byte-vector> swap <encoder> ; inline
 
 : with-byte-writer ( encoding quot -- byte-array )
-    [ <byte-writer> ] dip [ with-output-stream* ] 2keep drop
+    [ <byte-writer> ] dip [ with-output-stream* ] keepd
     dup encoder? [ stream>> ] when >byte-array ; inline
 
 TUPLE: byte-reader { underlying byte-array read-only } { i array-capacity } ;

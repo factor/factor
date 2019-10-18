@@ -38,7 +38,7 @@ sharp-continue ;
         e1 e0!
         edge face-ccw edge!
     ] do while
-    
+
     e-end face-ccw :> e-end
     e0 e-end make-ef drop
 
@@ -65,7 +65,7 @@ sharp-continue ;
 
 :: project-pt-line ( p p0 p1 -- q )
     p1 p0 v- :> vt
-    p p0 v- vt v* sum
+    p p0 v- vt v.
     vt norm-sq /
     vt n*v p0 v+ ; inline
 

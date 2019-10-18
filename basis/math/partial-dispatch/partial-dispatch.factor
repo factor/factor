@@ -84,7 +84,7 @@ M: word integer-op-input-classes
     ] [ ] make ;
 
 : integer-op-word ( triple -- word )
-    [ name>> ] map "-" join "math.partial-dispatch" create ;
+    [ name>> ] map "-" join "math.partial-dispatch" create-word ;
 
 : integer-op-quot ( fix-word big-word triple -- quot )
     [ second ] [ third ] bi 2array {
@@ -143,7 +143,7 @@ SYMBOL: fast-math-ops
 
 : math-method* ( word left right -- quot )
     3dup math-op
-    [ [ 3drop ] dip 1quotation ] [ drop math-method ] if ;
+    [ 3nip 1quotation ] [ drop math-method ] if ;
 
 : math-both-known? ( word left right -- ? )
     3dup math-op
@@ -216,7 +216,7 @@ SYMBOL: fast-math-ops
         \ mod \ fixnum-mod \ bignum-mod define-integer-ops
         \ /i \ fixnum/i \ bignum/i define-integer-ops
 
-        \ fast-gcd \ simple-gcd \ bignum-gcd define-integer-ops
+        \ simple-gcd \ fixnum-gcd \ bignum-gcd define-integer-ops
 
         \ bitand \ fixnum-bitand \ bignum-bitand define-integer-ops
         \ bitor \ fixnum-bitor \ bignum-bitor define-integer-ops

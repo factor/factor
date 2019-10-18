@@ -1,18 +1,14 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays combinators environment kernel math math.parser
+USING: accessors arrays environment kernel math math.parser
 sequences system vocabs ;
 
 IN: terminal
 
 HOOK: (terminal-size) os ( -- columns lines )
 
-{
-    { [ os macosx?  ] [ "terminal.macosx"  ] }
-    { [ os linux?   ] [ "terminal.linux"   ] }
-    { [ os windows? ] [ "terminal.windows" ] }
-} cond require
+"terminal." os name>> append require
 
 : terminal-size ( -- dim )
     "COLUMNS" "LINES"

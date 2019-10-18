@@ -116,6 +116,23 @@ $nl
 
 ABOUT: "slots"
 
+HELP: bad-initial-value
+{ $error-description "Thrown by " { $link POSTPONE: TUPLE: } " if a slot has an impossible initial value. "
+  { $examples
+    { $unchecked-example
+      "TUPLE: a { b integer initial: \"invalid\" } ;"
+      "1: TUPLE: a { b integer initial: \"invalid\" } ;"
+      "                                              ^"
+      "Incompatible initial value"
+      "name          \"b\""
+      "initial-value \"invalid\""
+      "class         integer"
+      ""
+      "Type :help for debugging help."
+    }
+  }
+} ;
+
 HELP: slot-spec
 { $class-description "A slot specification. The " { $snippet "\"slots\"" } " word property of " { $link builtin-class } " and " { $link tuple-class } " instances holds sequences of slot specifications."
 $nl
@@ -158,7 +175,7 @@ HELP: define-slot-methods
 $low-level-note ;
 
 HELP: define-accessors
-{ $values { "class" class } { "specs" "a sequence of " { $link slot-spec } " instances" } }
+{ $values { "class" class } { "specs" { $sequence slot-spec } } }
 { $description "Defines slot methods." }
 $low-level-note ;
 
@@ -173,5 +190,5 @@ HELP: set-slot
 { $warning "This word is in the " { $vocab-link "slots.private" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
 
 HELP: slot-named
-{ $values { "name" string } { "specs" "a sequence of " { $link slot-spec } " instances" } { "spec/f" { $maybe slot-spec } } }
+{ $values { "name" string } { "specs" { $sequence slot-spec } } { "spec/f" { $maybe slot-spec } } }
 { $description "Outputs the " { $link slot-spec } " with the given name." } ;

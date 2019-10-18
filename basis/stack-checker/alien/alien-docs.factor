@@ -1,4 +1,4 @@
-USING: alien alien.c-types compiler.tree effects help.markup help.syntax
+USING: alien alien.c-types compiler.tree help.markup help.syntax
 quotations sequences ;
 IN: stack-checker.alien
 
@@ -7,8 +7,10 @@ HELP: alien-node-params
   { $table
     { { $slot "return" } { "a " { $link c-type-name } " which indicates the type of the functions return value." } }
     { { $slot "parameters" } { "a " { $link sequence } " of " { $link c-type-name } " giving the types of the functions parameters." } }
+    { { $slot "abi" } { "calling convention of the function the node parameters operates on." } }
   }
-} ;
+}
+{ $see-also abi } ;
 
 HELP: alien-callback-params
 { $class-description "Class that holds the parameter types and return value type of an alien callback call." }
@@ -20,7 +22,7 @@ HELP: param-prep-quot
 { $examples
   { $unchecked-example
     "USING: alien.c-types prettyprint stack-checker.alien ;"
-    "T{ alien-invoke-params { parameters { void* c-string int } } }  param-prep-quot ."
+    "T{ alien-invoke-params { parameters { void* c-string int } } } param-prep-quot ."
     "[ [ [ [ ] dip >c-ptr ] dip \\ utf8 string>alien ] dip >fixnum ]"
   }
 } ;
@@ -35,6 +37,9 @@ HELP: callback-parameter-quot
     "[ { object } declare [ ] dip \ utf8 alien>string ]"
   }
 } ;
+
+HELP: infer-alien-assembly
+{ $description "Infers " { $link alien-assembly } " calls." } ;
 
 HELP: infer-alien-invoke
 { $description "Appends the necessary SSA nodes for performing an " { $link alien-invoke } " call to the IR tree being constructed." } ;
@@ -59,3 +64,13 @@ HELP: wrap-callback-quot
     "]"
   }
 } ;
+
+ARTICLE: "stack-checker.alien" "Inferring alien words" "This vocab contains code for inferring the words that form part of the alien FFI: " { $link alien-invoke } ", " { $link alien-indirect } ", " { $link alien-assembly } " and " { $link alien-callback } ". The words performing the inferring are:"
+{ $subsections
+  infer-alien-invoke
+  infer-alien-indirect
+  infer-alien-assembly
+  infer-alien-callback
+} ;
+
+ABOUT: "stack-checker.alien"

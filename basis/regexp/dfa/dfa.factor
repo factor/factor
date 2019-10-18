@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators fry kernel locals
-math math.order regexp.nfa regexp.transition-tables sequences
-sets sorting vectors regexp.ast regexp.classes ;
+USING: accessors arrays assocs fry kernel locals regexp.ast
+regexp.classes regexp.transition-tables sequences sets vectors ;
 IN: regexp.dfa
 
 : find-delta ( states transition nfa -- new-states )
@@ -40,7 +39,7 @@ IN: regexp.dfa
 : find-transitions ( dfa-state nfa -- next-dfa-state )
     transitions>>
     '[ _ at keys [ condition-states ] map concat ] gather
-    [ tagged-epsilon? not ] filter ;
+    [ tagged-epsilon? ] reject ;
 
 : add-todo-state ( state visited-states new-states -- )
     2over ?adjoin [ nip push ] [ 3drop ] if ;

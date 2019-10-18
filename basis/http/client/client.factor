@@ -4,19 +4,44 @@ USING: accessors ascii assocs calendar combinators.short-circuit
 destructors fry hashtables http http.client.post-data
 http.parsers io io.crlf io.encodings io.encodings.ascii
 io.encodings.binary io.encodings.iana io.encodings.string
-io.files io.pathnames io.sockets io.timeouts kernel locals math
-math.order math.parser mime.types namespaces present sequences
-splitting urls vocabs.loader ;
+io.files io.pathnames io.sockets io.sockets.secure io.timeouts
+kernel locals math math.order math.parser mime.types namespaces
+present sequences splitting urls vocabs.loader combinators
+environment ;
 IN: http.client
 
 ERROR: too-many-redirects ;
+ERROR: invalid-proxy proxy ;
+
+: success? ( code -- ? ) 200 299 between? ;
+
+ERROR: download-failed response ;
+
+: check-response ( response -- response )
+    dup code>> success? [ download-failed ] unless ;
 
 <PRIVATE
+
+: authority-uri ( url -- str )
+    [ host>> ] [ port>> number>string ] bi ":" glue ;
+
+: absolute-uri ( url -- str )
+    clone f >>username f >>password f >>anchor present ;
+
+: abs-path-uri ( url -- str )
+    relative-url f >>anchor present ;
+
+: request-uri ( request -- str )
+    {
+        { [ dup proxy-url>> ] [ url>> absolute-uri ] }
+        { [ dup method>> "CONNECT" = ] [ url>> authority-uri ] }
+        [ url>> abs-path-uri ]
+    } cond ;
 
 : write-request-line ( request -- request )
     dup
     [ method>> write bl ]
-    [ url>> relative-url present write bl ]
+    [ request-uri write bl ]
     [ "HTTP/" write version>> write crlf ]
     tri ;
 
@@ -37,9 +62,17 @@ ERROR: too-many-redirects ;
 : set-cookie-header ( header cookies -- header )
     unparse-cookie "cookie" pick set-at ;
 
+: ?set-basic-auth ( header url name -- header )
+    swap [
+        [ username>> ] [ password>> ] bi 2dup and
+        [ basic-auth swap pick set-at ] [ 3drop ] if
+    ] [ drop ] if* ;
+
 : write-request-header ( request -- request )
     dup header>> >hashtable
     over url>> host>> [ set-host-header ] when
+    over url>> "Authorization" ?set-basic-auth
+    over proxy-url>> "Proxy-Authorization" ?set-basic-auth
     over post-data>> [ set-post-data-headers ] when*
     over cookies>> [ set-cookie-header ] unless-empty
     write-header ;
@@ -91,7 +124,7 @@ SYMBOL: redirects
     redirects get request get redirects>> < [
         request get clone
         response "location" header redirect-url
-        response code>> 307 = [ "GET" >>method ] unless
+        response code>> 307 = [ "GET" >>method f >>post-data ] unless
         quot (with-http-request)
     ] [ too-many-redirects ] if ; inline recursive
 
@@ -106,19 +139,95 @@ SYMBOL: redirects
         read-crlf B{ } assert= read-chunked
     ] if ; inline recursive
 
-: read-response-body ( quot response -- )
+: read-response-body ( quot: ( chunk -- ) response -- )
     binary decode-input
     "transfer-encoding" header "chunked" =
     [ read-chunked ] [ each-block ] if ; inline
 
+: request-socket-endpoints ( request -- physical logical )
+    [ proxy-url>> ] [ url>> ] bi [ or ] keep ;
+
 : <request-socket> ( -- stream )
-    request get url>> url-addr ascii <client> drop
+    request get request-socket-endpoints [ url-addr ] bi@
+    remote-address set ascii <client> local-address set
     1 minutes over set-timeout ;
 
+: https-tunnel? ( request -- ? )
+    [ proxy-url>> ] [ url>> protocol>> "https" = ] bi and ;
+
+: ?copy-proxy-basic-auth ( dst-request src-request -- dst-request )
+    proxy-url>> [ username>> ] [ password>> ] bi 2dup and
+    [ set-proxy-basic-auth ] [ 2drop ] if ;
+
+: ?https-tunnel ( -- )
+    request get dup https-tunnel? [
+        <request> swap [ url>> >>url ] [ ?copy-proxy-basic-auth ] bi
+        f >>proxy-url "CONNECT" >>method write-request
+        read-response check-response drop send-secure-handshake
+    ] [ drop ] if ;
+
+! Note: ipv4 addresses are interpreted as subdomains but "work"
+: no-proxy-match? ( host-path no-proxy-path -- ? )
+    dup first empty? [ [ rest ] bi@ ] when
+    [ drop f ] [ tail? ] if-empty ;
+
+: get-no-proxy-list ( -- list )
+    "no_proxy" get
+    [ "no_proxy" os-env ] unless*
+    [ "NO_PROXY" os-env ] unless* ;
+
+: no-proxy? ( request -- ? )
+    get-no-proxy-list [
+       [ url>> host>> "." split ] dip "," split
+       [ "." split no-proxy-match? ] with any?
+    ] [ drop f ] if* ;
+
+: (check-proxy) ( proxy -- ? )
+    {
+        { [ dup URL" " = ] [ drop f ] }
+        { [ dup host>> ] [ drop t ] }
+        [ invalid-proxy ]
+    } cond ;
+
+: check-proxy ( request proxy -- request' )
+    dup [ (check-proxy) ] [ f ] if*
+    [ drop f ] unless [ clone ] dip >>proxy-url ;
+
+: get-default-proxy ( request -- default-proxy )
+    url>> protocol>> "https" = [
+        "https.proxy" get
+        [ "https_proxy" os-env ] unless*
+        [ "HTTPS_PROXY" os-env ] unless*
+    ] [
+        "http.proxy" get
+        [ "http_proxy" os-env ] unless*
+        [ "HTTP_PROXY" os-env ] unless*
+    ] if ;
+
+: misparsed-url? ( url -- url' )
+    [ protocol>> not ] [ host>> not ] [ path>> ]
+    tri and and ;
+
+: request-url ( url -- url' )
+    dup >url dup misparsed-url? [
+        drop dup url? [ present ] when
+        "http://" prepend >url
+    ] [ nip ] if ensure-port ;
+
+: ?default-proxy ( request -- request' )
+    dup get-default-proxy
+    over proxy-url>> dup [ request-url ] when 2dup and [
+        pick no-proxy? [ nip ] [ [ request-url ] dip derive-url ] if
+    ] [ nip ] if check-proxy ;
+
 : (with-http-request) ( request quot: ( chunk -- ) -- response )
-    swap
+    swap ?default-proxy
     request [
         <request-socket> [
+            [
+                [ in>> ] [ out>> ] bi
+                [ ?https-tunnel ] with-streams*
+            ]
             [
                 out>>
                 [ request get write-request ]
@@ -133,16 +242,10 @@ SYMBOL: redirects
                         2tri f
                     ] if
                 ] with-input-stream*
-            ] bi
+            ] tri
         ] with-disposal
         [ do-redirect ] [ nip ] if
     ] with-variable ; inline recursive
-
-: request-url ( url -- url' )
-    dup >url dup protocol>> [ nip ] [
-        drop dup url? [ present ] when
-        "http://" prepend >url
-    ] if ensure-port ;
 
 : <client-request> ( url method -- request )
     <request>
@@ -150,13 +253,6 @@ SYMBOL: redirects
         swap request-url >>url ; inline
 
 PRIVATE>
-
-: success? ( code -- ? ) 200 299 between? ;
-
-ERROR: download-failed response ;
-
-: check-response ( response -- response )
-    dup code>> success? [ download-failed ] unless ;
 
 : with-http-request* ( request quot: ( chunk -- ) -- response )
     [ (with-http-request) ] with-destructors ; inline

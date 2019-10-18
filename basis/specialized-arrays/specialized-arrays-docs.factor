@@ -107,7 +107,7 @@ ARTICLE: "specialized-array-examples" "Specialized array examples"
 { $code "1.0 [ sin ] [ cos ] [ tan ] tri float-array{ } 3sequence ." }
 "Create a float array and sum the elements:"
 { $code
-    "1000 iota [ 1000 /f pi * sin ] float-array{ } map-as"
+    "1000 <iota> [ 1000 /f pi * sin ] float-array{ } map-as"
     "0.0 [ + ] reduce ."
 } ;
 

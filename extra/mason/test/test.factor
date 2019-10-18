@@ -1,15 +1,44 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs benchmark bootstrap.stage2 command-line
-compiler.errors generic help.html help.lint io io.directories
-io.encodings.utf8 io.files kernel locals mason.common namespaces
-parser.notes sequences sets sorting source-files.errors system
-tools.errors tools.test tools.time vocabs.errors
-vocabs.hierarchy vocabs.refresh words ;
+compiler.errors continuations debugger fry generic help.html
+help.lint io io.directories io.encodings.utf8 io.files io.styles
+kernel locals mason.common namespaces parser.notes sequences
+sets sorting source-files.errors system tools.errors tools.test
+tools.time vocabs vocabs.hierarchy.private vocabs.loader
+vocabs.refresh words ;
 IN: mason.test
 
+: vocab-heading. ( vocab -- )
+    nl
+    "==== " write
+    [ vocab-name ] [ lookup-vocab write-object ] bi ":" print
+    nl ;
+
+: load-error. ( triple -- )
+    [ first vocab-heading. ] [ second print-error ] bi ;
+
+: load-failures. ( failures -- ) [ load-error. nl ] each ;
+
+: require-all-no-restarts ( vocabs -- failures )
+    V{ } clone blacklist [
+        V{ } clone [
+            '[
+                [ require ]
+                [ swap vocab-name _ set-at ] recover
+            ] each
+        ] keep
+    ] with-variable ;
+
+: load-from-root-no-restarts ( root prefix -- failures )
+    vocabs-to-load require-all-no-restarts ;
+
+: load-no-restarts ( prefix -- failures )
+    [ vocab-roots get ] dip
+    '[ _ load-from-root-no-restarts ] map concat ;
+
 : do-load ( -- )
-    "" (load)
+    "" load-no-restarts
     [ keys load-all-vocabs-file to-file ]
     [ load-all-errors-file utf8 [ load-failures. ] with-file-writer ]
     bi ;
@@ -22,8 +51,8 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
 
 :: do-step ( errors summary-file details-file -- )
     errors
-    [ error-type +linkage-error+ eq? not ] filter
-    [ file>> ] map members natural-sort summary-file to-file
+    [ error-type +linkage-error+ eq? ] reject
+    [ path>> ] map members natural-sort summary-file to-file
     errors details-file utf8 [ errors. ] with-file-writer ;
 
 : do-tests ( -- )
@@ -74,6 +103,7 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
 
 : do-all ( -- )
     f parser-quiet? set-global
+    f restartable-tests? set-global
     ".." [
         run-mason-rc check-user-init-errors [ 1 exit ] when
         bootstrap-time get boot-time-file to-file

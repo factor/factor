@@ -2,7 +2,7 @@ USING: help.syntax help.markup words.symbol words compiler.units ;
 IN: words.symbol
 
 HELP: symbol
-{ $description "The class of symbols created by " { $link POSTPONE: SYMBOL: } "." } ;
+{ $class-description "The class of symbols created by " { $link POSTPONE: SYMBOL: } "." } ;
 
 HELP: define-symbol
 { $values { "word" word } }

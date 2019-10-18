@@ -1,15 +1,6 @@
-USING: kernel system alien.c-types alien.syntax combinators vocabs ;
+USING: accessors alien.c-types alien.syntax system vocabs ;
+QUALIFIED: sequences
 IN: unix.types
-
-TYPEDEF: char int8_t
-TYPEDEF: short int16_t
-TYPEDEF: int int32_t
-TYPEDEF: longlong int64_t
-
-TYPEDEF: uchar uint8_t
-TYPEDEF: ushort uint16_t
-TYPEDEF: uint uint32_t
-TYPEDEF: ulonglong uint64_t
 
 TYPEDEF: uchar u_int8_t
 TYPEDEF: ushort u_int16_t
@@ -31,7 +22,7 @@ TYPEDEF: uint in_addr_t
 TYPEDEF: uint socklen_t
 
 TYPEDEF: __uint64_t fsblkcnt_t
-TYPEDEF: fsblkcnt_t __fsblkcnt_t    
+TYPEDEF: fsblkcnt_t __fsblkcnt_t
 TYPEDEF: __uint64_t fsfilcnt_t
 TYPEDEF: fsfilcnt_t __fsfilcnt_t
 TYPEDEF: __uint64_t rlim_t
@@ -44,7 +35,4 @@ C-TYPE: rlimit
 C-TYPE: rusage
 C-TYPE: sockaddr
 
-os {
-    { linux   [ "unix.types.linux"   require ] }
-    { macosx  [ "unix.types.macosx"  require ] }
-} case
+"unix.types." os name>> sequences:append require

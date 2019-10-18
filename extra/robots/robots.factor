@@ -1,13 +1,12 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar.format combinators
-combinators.short-circuit fry globs http.client kernel make
-math.parser multiline namespaces present regexp
-regexp.combinators sequences sets splitting splitting.monotonic
-unicode.case unicode.categories urls ;
+USING: accessors arrays assocs calendar.parser combinators
+combinators.short-circuit fry globs http.client kernel math.parser
+namespaces present regexp regexp.combinators sequences splitting
+splitting.monotonic unicode urls ;
 IN: robots
 
-! visit-time is GMT, request-rate is pages/second 
+! visit-time is GMT, request-rate is pages/second
 ! crawl-rate is seconds
 
 SYMBOL: robot-identities
@@ -35,14 +34,14 @@ visit-time request-rate crawl-delay unknowns ;
 : normalize-robots.txt ( string -- sitemaps seq )
     string-lines
     [ [ blank? ] trim ] map
-    [ "#" head? not ] filter harvest
+    [ "#" head? ] reject harvest
     [ ":" split1 [ [ blank? ] trim ] bi@ [ >lower ] dip  ] { } map>assoc
     [ first "sitemap" = ] partition [ values ] dip
     [
         {
             [ [ first "user-agent" = ] both? ]
             [ nip first "user-agent" = not ]
-        } 2|| 
+        } 2||
     ] monotonic-split ;
 
 : <rules> ( -- rules )
@@ -64,7 +63,7 @@ visit-time request-rate crawl-delay unknowns ;
         { "crawl-delay" [ string>number >>crawl-delay ] }
         { "request-rate" [ string>number >>request-rate ] }
         {
-            "visit-time" [ "-" split1 [ hhmm>timestamp ] bi@ 2array
+            "visit-time" [ "-" split1 [ hhmm>duration ] bi@ 2array
             >>visit-time
         ] }
         [ pick unknowns>> push-at ]

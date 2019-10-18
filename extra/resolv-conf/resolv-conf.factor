@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators constructors io.encodings.utf8
 io.files kernel math math.parser sequences splitting
-unicode.categories ;
+unicode ;
 IN: resolv-conf
 
 TUPLE: network ip netmask ;
-CONSTRUCTOR: network ( ip netmask -- network ) ;
+CONSTRUCTOR: <network> network ( ip netmask -- network ) ;
 
 TUPLE: options
 debug?
@@ -18,11 +18,11 @@ insecure2?
 { attempts integer initial: 2 }
 rotate? no-check-names? inet6? tcp? ;
 
-CONSTRUCTOR: options ( -- options ) ;
+CONSTRUCTOR: <options> options ( -- options ) ;
 
 TUPLE: resolv.conf nameserver domain lookup search sortlist options ;
 
-CONSTRUCTOR: resolv.conf ( -- resolv.conf )
+CONSTRUCTOR: <resolv.conf> resolv.conf ( -- resolv.conf )
     V{ } clone >>nameserver
     V{ } clone >>domain
     V{ } clone >>search
@@ -90,7 +90,7 @@ PRIVATE>
     [ <resolv.conf> ] dip
     utf8 file-lines
     [ [ blank? ] trim ] map harvest
-    [ "#" head? not ] filter
+    [ "#" head? ] reject
     [ parse-resolv.conf-line ] each ;
 
 : default-resolv.conf ( -- resolv.conf )

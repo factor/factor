@@ -1,20 +1,15 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! Portions copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.data alien.strings arrays assocs ui
-ui.private ui.gadgets ui.gadgets.private ui.backend
-ui.clipboards ui.gadgets.worlds ui.gestures ui.event-loop io
-kernel math math.vectors namespaces make sequences strings
-vectors words windows.dwmapi system-info.windows
-windows.kernel32 windows.gdi32 windows.user32 windows.opengl32
-windows.messages windows.types windows.offscreen windows threads
-libc combinators fry combinators.short-circuit continuations
-command-line shuffle opengl ui.render math.bitwise locals
-accessors math.rectangles math.order calendar ascii sets
-io.encodings.utf16n windows.errors literals ui.pixel-formats
-ui.pixel-formats.private memoize classes colors
-specialized-arrays classes.struct ;
-FROM: namespaces => change-global set ;
+USING: accessors alien alien.data alien.strings arrays ascii assocs
+calendar classes classes.struct colors combinators continuations fry
+io io.crlf io.encodings.utf16n kernel libc literals locals make math
+math.bitwise namespaces sequences sets specialized-arrays strings
+threads ui ui.backend ui.clipboards ui.event-loop ui.gadgets
+ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
+ui.private windows.dwmapi windows.errors windows.gdi32
+windows.kernel32 windows.messages windows.offscreen windows.opengl32
+windows.types windows.user32 assocs.extras ;
 SPECIALIZED-ARRAY: POINT
 QUALIFIED-WITH: alien.c-types c
 IN: ui.backend.windows
@@ -23,13 +18,13 @@ SINGLETON: windows-ui-backend
 
 TUPLE: win-base hDC hRC ;
 TUPLE: win < win-base hWnd world title ;
-TUPLE: win-offscreen < win-base hBitmap bits ;
 C: <win> win
-C: <win-offscreen> win-offscreen
 
 <PRIVATE
 
-PIXEL-FORMAT-ATTRIBUTE-TABLE: WGL_ARB { $ WGL_SUPPORT_OPENGL_ARB 1 } H{
+CONSTANT: perm-attribs { $ WGL_SUPPORT_OPENGL_ARB 1 }
+
+CONSTANT: attrib-table H{
     { double-buffered { $ WGL_DOUBLE_BUFFER_ARB 1 } }
     { stereo { $ WGL_STEREO_ARB 1 } }
     { offscreen { $ WGL_DRAW_TO_BITMAP_ARB 1 } }
@@ -60,17 +55,10 @@ PIXEL-FORMAT-ATTRIBUTE-TABLE: WGL_ARB { $ WGL_SUPPORT_OPENGL_ARB 1 } H{
     drop f ;
 
 : arb-make-pixel-format ( world attributes -- pf )
-    [ handle>> hDC>> ] dip >WGL_ARB-int-array f 1 { c:int c:int }
+    [ handle>> hDC>> ] dip
+    perm-attribs attrib-table pixel-format-attributes>int-array
+    f 1 { c:int c:int }
     [ wglChoosePixelFormatARB win32-error=0/f ] with-out-parameters drop ;
-
-: arb-pixel-format-attribute ( pixel-format attribute -- value )
-    >WGL_ARB
-    [ drop f ] [
-        [ [ world>> handle>> hDC>> ] [ handle>> ] bi 0 1 ] dip
-        first c:int <ref> { c:int }
-        [ wglGetPixelFormatAttribivARB win32-error=0/f ]
-        with-out-parameters
-    ] if-empty ;
 
 CONSTANT: pfd-flag-map H{
     { double-buffered $ PFD_DOUBLEBUFFER }
@@ -120,42 +108,6 @@ CONSTANT: pfd-flag-map H{
     [ handle>> hDC>> ] [ >pfd ] bi*
     ChoosePixelFormat dup win32-error=0/f ;
 
-: get-pfd ( pixel-format -- pfd )
-    [ world>> handle>> hDC>> ] [ handle>> ] bi
-    PIXELFORMATDESCRIPTOR c:heap-size
-    PIXELFORMATDESCRIPTOR <struct>
-    [ DescribePixelFormat win32-error=0/f ] keep ;
-
-: pfd-flag? ( pfd flag -- ? )
-    [ dwFlags>> ] dip bitand c:c-bool> ;
-
-: (pfd-pixel-format-attribute) ( pfd attribute -- value )
-    {
-        { double-buffered [ PFD_DOUBLEBUFFER pfd-flag? ] }
-        { stereo [ PFD_STEREO pfd-flag? ] }
-        { offscreen [ PFD_DRAW_TO_BITMAP pfd-flag? ] }
-        { fullscreen [ PFD_DRAW_TO_WINDOW pfd-flag? ] }
-        { windowed [ PFD_DRAW_TO_WINDOW pfd-flag? ] }
-        { software-rendered [ PFD_GENERIC_FORMAT pfd-flag? ] }
-        { color-bits [ cColorBits>> ] }
-        { red-bits [ cRedBits>> ] }
-        { green-bits [ cGreenBits>> ] }
-        { blue-bits [ cBlueBits>> ] }
-        { alpha-bits [ cAlphaBits>> ] }
-        { accum-bits [ cAccumBits>> ] }
-        { accum-red-bits [ cAccumRedBits>> ] }
-        { accum-green-bits [ cAccumGreenBits>> ] }
-        { accum-blue-bits [ cAccumBlueBits>> ] }
-        { accum-alpha-bits [ cAccumAlphaBits>> ] }
-        { depth-bits [ cDepthBits>> ] }
-        { stencil-bits [ cStencilBits>> ] }
-        { aux-buffers [ cAuxBuffers>> ] }
-        [ 2drop f ]
-    } case ;
-
-: pfd-pixel-format-attribute ( pixel-format attribute -- value )
-    [ get-pfd ] dip (pfd-pixel-format-attribute) ;
-
 M: windows-ui-backend (make-pixel-format)
     over has-wglChoosePixelFormatARB?
     [ arb-make-pixel-format ] [ pfd-make-pixel-format ] if ;
@@ -163,20 +115,10 @@ M: windows-ui-backend (make-pixel-format)
 M: windows-ui-backend (free-pixel-format)
     drop ;
 
-M: windows-ui-backend (pixel-format-attribute)
-    over world>> has-wglChoosePixelFormatARB?
-    [ arb-pixel-format-attribute ] [ pfd-pixel-format-attribute ] if ;
-
 PRIVATE>
 
 : GET_APPCOMMAND_LPARAM ( lParam -- appCommand )
     hi-word FAPPCOMMAND_MASK lo-word bitnot bitand ; inline
-
-: crlf>lf ( str -- str' )
-    CHAR: \r swap remove ;
-
-: lf>crlf ( str -- str' )
-    [ [ dup CHAR: \n = [ CHAR: \r , ] when , ] each ] "" make ;
 
 : enum-clipboard ( -- seq )
     0
@@ -209,7 +151,7 @@ PRIVATE>
         EmptyClipboard win32-error=0/f
         GMEM_MOVEABLE over length 1 + GlobalAlloc
             dup win32-error=0/f
-    
+
         dup GlobalLock dup win32-error=0/f
         rot binary-object memcpy
         dup GlobalUnlock win32-error=0/f
@@ -278,9 +220,9 @@ CONSTANT: window-control>ex-style
     [ get-RECT-top-left ] [ get-RECT-width/height ] bi ;
 
 : handle-wm-paint ( hWnd uMsg wParam lParam -- )
-    #! wParam and lParam are unused
-    #! only paint if width/height both > 0
-    3drop window relayout-1 yield ;
+    ! wParam and lParam are unused
+    ! only paint if width/height both > 0
+    3drop window t >>active? relayout-1 yield ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     2nip
@@ -424,7 +366,7 @@ CONSTANT: exclude-keys-wm-char
         { [ over SC_RESTORE = ] [ t set-window-active ] }
         { [ over SC_MAXIMIZE = ] [ t set-window-active ] }
         { [ dup alpha? ] [ 4drop 0 ] }
-        { [ t ] [ DefWindowProc ] }
+        [ DefWindowProc ]
     } cond ;
 
 : cleanup-window ( handle -- )
@@ -492,7 +434,7 @@ SYMBOL: nc-buttons
         drop
     ] [
         [ SetCapture drop ] keep
-        mouse-captured set
+        mouse-captured namespaces:set
     ] if ;
 
 : release-capture ( -- )
@@ -506,7 +448,7 @@ SYMBOL: nc-buttons
         { APPCOMMAND_BROWSER_FORWARD [ pick window right-action send-action ] }
         [ drop ]
     } case 3drop ;
-    
+
 : handle-wm-buttondown ( hWnd uMsg wParam lParam -- )
     [
         over set-capture
@@ -516,7 +458,7 @@ SYMBOL: nc-buttons
 : handle-wm-buttonup ( hWnd uMsg wParam lParam -- )
     mouse-captured get [ release-capture ] when
     pick message>button drop dup nc-buttons get member? [
-        nc-buttons get remove! drop 4drop
+        nc-buttons get remove! 5drop
     ] [
         drop prepare-mouse send-button-up
     ] if ;
@@ -538,11 +480,11 @@ SYMBOL: nc-buttons
     wParam mouse-scroll hand-loc get-global hWnd window send-scroll ;
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
-    #! message sent if windows needs application to stop dragging
+    ! message sent if windows needs application to stop dragging
     4drop release-capture ;
 
 : handle-wm-mouseleave ( hWnd uMsg wParam lParam -- )
-    #! message sent if mouse leaves main application 
+    ! message sent if mouse leaves main application
     4drop forget-rollover ;
 
 : system-background-color ( -- color )
@@ -562,9 +504,7 @@ SYMBOL: nc-buttons
 
 SYMBOL: wm-handlers
 
-H{ } clone wm-handlers set-global
-
-: add-wm-handler ( quot wm -- )
+: add-wm-handler ( quot: ( hWnd Msg wParam lParam -- LRESULT ) wm -- )
     dup array?
     [ [ execute( -- wm ) add-wm-handler ] with each ]
     [ wm-handlers get-global set-at ] if ;
@@ -572,56 +512,52 @@ H{ } clone wm-handlers set-global
 : remove-wm-handler ( wm -- )
     wm-handlers get-global delete-at ;
 
-[ handle-wm-close 0                  ] WM_CLOSE add-wm-handler
-[ 4dup handle-wm-paint DefWindowProc ] WM_PAINT add-wm-handler
+wm-handlers [
+    H{
+        ${ WM_CLOSE [ handle-wm-close 0 ] }
+        ${ WM_PAINT [ 4dup handle-wm-paint DefWindowProc ] }
 
-[ handle-wm-size 0 ] WM_SIZE add-wm-handler
-[ handle-wm-move 0 ] WM_MOVE add-wm-handler
+        ${ WM_SIZE [ handle-wm-size 0 ] }
+        ${ WM_MOVE [ handle-wm-move 0 ] }
 
-[ 4dup handle-wm-keydown DefWindowProc ] { WM_KEYDOWN WM_SYSKEYDOWN } add-wm-handler
-[ 4dup handle-wm-char DefWindowProc    ] { WM_CHAR WM_SYSCHAR }       add-wm-handler
-[ 4dup handle-wm-keyup DefWindowProc   ] { WM_KEYUP WM_SYSKEYUP }     add-wm-handler
+        { ${ WM_CHAR WM_SYSCHAR } [ 4dup handle-wm-char DefWindowProc ] }
+        { ${ WM_KEYDOWN WM_SYSKEYDOWN } [ 4dup handle-wm-keydown DefWindowProc ] }
+        { ${ WM_KEYUP WM_SYSKEYUP } [ 4dup handle-wm-keyup DefWindowProc ] }
 
-[ handle-wm-syscommand   ] WM_SYSCOMMAND add-wm-handler
-[ handle-wm-set-focus 0  ] WM_SETFOCUS add-wm-handler
-[ handle-wm-kill-focus 0 ] WM_KILLFOCUS add-wm-handler
+        ${ WM_SYSCOMMAND [ handle-wm-syscommand ] }
+        ${ WM_SETFOCUS [ handle-wm-set-focus 0 ]  }
+        ${ WM_KILLFOCUS [ handle-wm-kill-focus 0 ] }
 
-[ handle-app-command 0 ] WM_APPCOMMAND add-wm-handler
+        ${ WM_APPCOMMAND [ handle-app-command 0 ] }
 
-[ handle-wm-buttondown 0 ] WM_LBUTTONDOWN add-wm-handler
-[ handle-wm-buttondown 0 ] WM_MBUTTONDOWN add-wm-handler
-[ handle-wm-buttondown 0 ] WM_RBUTTONDOWN add-wm-handler
-[ handle-wm-buttonup 0   ] WM_LBUTTONUP   add-wm-handler
-[ handle-wm-buttonup 0   ] WM_MBUTTONUP   add-wm-handler
-[ handle-wm-buttonup 0   ] WM_RBUTTONUP   add-wm-handler
-[ handle-wm-dwmcompositionchanged 0   ] WM_DWMCOMPOSITIONCHANGED add-wm-handler
+        { ${ WM_LBUTTONDOWN WM_MBUTTONDOWN WM_RBUTTONDOWN } [ handle-wm-buttondown 0 ] }
+        { ${ WM_LBUTTONUP WM_MBUTTONUP WM_RBUTTONUP } [ handle-wm-buttonup 0 ] }
+        ${ WM_DWMCOMPOSITIONCHANGED [ handle-wm-dwmcompositionchanged 0 ] }
 
-[ 4dup handle-wm-ncbutton DefWindowProc ]
-{ WM_NCLBUTTONDOWN WM_NCMBUTTONDOWN WM_NCRBUTTONDOWN
-WM_NCLBUTTONUP WM_NCMBUTTONUP WM_NCRBUTTONUP }
-add-wm-handler
+        {
+            ${
+                WM_NCLBUTTONDOWN WM_NCMBUTTONDOWN WM_NCRBUTTONDOWN
+                WM_NCLBUTTONUP WM_NCMBUTTONUP WM_NCRBUTTONUP
+            } [ 4dup handle-wm-ncbutton DefWindowProc ]
+        }
 
-[ nc-buttons get-global delete-all DefWindowProc ]
-{ WM_EXITSIZEMOVE WM_EXITMENULOOP } add-wm-handler
+        { ${ WM_EXITMENULOOP WM_EXITSIZEMOVE } [ nc-buttons get-global delete-all DefWindowProc ] }
 
-[ handle-wm-mousemove 0  ] WM_MOUSEMOVE  add-wm-handler
-[ handle-wm-mousewheel 0 ] WM_MOUSEWHEEL add-wm-handler
-[ handle-wm-cancelmode 0 ] WM_CANCELMODE add-wm-handler
-[ handle-wm-mouseleave 0 ] WM_MOUSELEAVE add-wm-handler
+        ${ WM_MOUSEMOVE [ handle-wm-mousemove 0 ] }
+        ${ WM_MOUSEWHEEL [ handle-wm-mousewheel 0 ] }
+        ${ WM_CANCELMODE [ handle-wm-cancelmode 0 ] }
+        ${ WM_MOUSELEAVE [ handle-wm-mouseleave 0 ] }
+    } expand-keys-set-at
+] initialize
 
 SYMBOL: trace-messages?
 
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
     c:uint { c:void* c:uint WPARAM LPARAM } stdcall [
-        pick
-
-        trace-messages? get-global
-        [ dup windows-message-name name>> print flush ] when
-
-        wm-handlers get-global at*
-        [ call( hWnd Msg wParam lParam -- result ) ] [ drop DefWindowProc ] if
-     ] alien-callback ;
+        pick wm-handlers get-global at*
+        [ flush call( hWnd Msg wParam lParam -- result ) ] [ drop DefWindowProc ] if
+    ] alien-callback ;
 
 : peek-message? ( msg -- ? ) f 0 0 PM_REMOVE PeekMessage zero? ;
 
@@ -642,7 +578,7 @@ M: windows-ui-backend do-events
         0 >>cbWndExtra
         f GetModuleHandle >>hInstance
         f GetModuleHandle "APPICON" native-string>alien LoadIcon >>hIcon
-        f IDC_ARROW LoadCursor >>hCursor
+        f IDC_ARROW MAKEINTRESOURCE LoadCursor >>hCursor
 
         class-name-ptr >>lpszClassName
         RegisterClassEx win32-error=0/f
@@ -723,7 +659,7 @@ M: windows-ui-backend do-events
     swap window-controls>> close-button swap member? not
     [ disable-close-button ] [ drop ] if ;
 
-M: windows-ui-backend (open-window) ( world -- )
+M: windows-ui-backend (open-window)
     [
         dup
         [ ] [ world>style ] [ world>ex-style ] tri create-window
@@ -734,26 +670,12 @@ M: windows-ui-backend (open-window) ( world -- )
     [ dup handle>> hWnd>> register-window ]
     [ handle>> hWnd>> show-window ] tri ;
 
-M: win-base select-gl-context ( handle -- )
+M: win-base select-gl-context
     [ hDC>> ] [ hRC>> ] bi wglMakeCurrent win32-error=0/f
     GdiFlush drop ;
 
-M: win-base flush-gl-context ( handle -- )
+M: win-base flush-gl-context
     hDC>> SwapBuffers win32-error=0/f ;
-
-: setup-offscreen-gl ( world -- )
-    dup [ handle>> ] [ dim>> ] bi make-offscreen-dc-and-bitmap
-    [ >>hDC ] [ >>hBitmap ] [ >>bits ] tri* drop [
-        swap [ handle>> hDC>> set-pixel-format ] [ get-rc ] bi
-    ] with-world-pixel-format ;
-
-M: windows-ui-backend (open-offscreen-buffer) ( world -- )
-    win-offscreen new >>handle
-    setup-offscreen-gl ;
-
-M: windows-ui-backend (close-offscreen-buffer) ( handle -- )
-    [ hDC>> DeleteDC drop ]
-    [ hBitmap>> DeleteObject drop ] bi ;
 
 ! Windows 32-bit bitmaps don't actually use the alpha byte of
 ! each pixel; it's left as zero
@@ -766,13 +688,10 @@ M: windows-ui-backend (close-offscreen-buffer) ( handle -- )
 : (opaque-pixels) ( world -- pixels )
     [ handle>> bits>> ] [ dim>> ] bi bitmap>byte-array (make-opaque) ;
 
-M: windows-ui-backend offscreen-pixels ( world -- alien w h )
-    [ (opaque-pixels) ] [ dim>> first2 ] bi ;
-
-M: windows-ui-backend raise-window* ( world -- )
+M: windows-ui-backend raise-window*
     handle>> [ hWnd>> SetFocus drop ] when* ;
 
-M: windows-ui-backend set-title ( string world -- )
+M: windows-ui-backend set-title
     handle>>
     dup title>> [ free ] when*
     swap utf16n malloc-string
@@ -781,15 +700,13 @@ M: windows-ui-backend set-title ( string world -- )
 
 M: windows-ui-backend (with-ui)
     [
-        [
-            init-clipboard
-            init-win32-ui
-            start-ui
-            event-loop
-        ] [ cleanup-win32-ui ] [ ] cleanup
-    ] ui-running ;
+        init-clipboard
+        init-win32-ui
+        start-ui
+        event-loop
+    ] [ cleanup-win32-ui ] [ ] cleanup ;
 
-M: windows-ui-backend beep ( -- )
+M: windows-ui-backend beep
     0 MessageBeep drop ;
 
 M: windows-ui-backend system-alert
@@ -810,11 +727,11 @@ M: windows-ui-backend system-alert
 : hwnd>RECT ( hwnd -- RECT )
     RECT <struct> [ GetWindowRect win32-error=0/f ] keep ;
 
-M: windows-ui-backend (grab-input) ( handle -- )
+M: windows-ui-backend (grab-input)
     0 ShowCursor drop
     hWnd>> client-area>RECT ClipCursor drop ;
 
-M: windows-ui-backend (ungrab-input) ( handle -- )
+M: windows-ui-backend (ungrab-input)
     drop
     f ClipCursor drop
     1 ShowCursor drop ;
@@ -852,20 +769,23 @@ CONSTANT: fullscreen-flags flags{ WS_CAPTION WS_BORDER WS_THICKFRAME }
         [ drop SW_RESTORE ShowWindow win32-error=0/f ]
     } 2cleave ;
 
-M: windows-ui-backend (set-fullscreen) ( ? world -- )
+M: windows-ui-backend (set-fullscreen)
     [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
-M: windows-ui-backend (fullscreen?) ( world -- ? )
+M: windows-ui-backend (fullscreen?)
     handle>> hWnd>>
     [ hwnd>RECT ] [ fullscreen-RECT ] bi
     [ get-RECT-dimensions 2array 2nip ] same? ;
 
-M: windows-ui-backend resize-window ( world dim -- )
-  [ handle>> hWnd>> dup hwnd>RECT get-RECT-top-left ]
-  [ first2 FALSE ] bi* MoveWindow win32-error=0/f ;
+M:: windows-ui-backend resize-window ( world dim -- )
+    world handle>> hWnd>>
+    world window-loc>> dim <RECT> dup
+    world world>style
+    world world>ex-style
+    adjust-RECT get-RECT-dimensions FALSE
+    MoveWindow win32-error=0/f ;
 
 M: windows-ui-backend ui-backend-available?
     t ;
 
 windows-ui-backend ui-backend set-global
-

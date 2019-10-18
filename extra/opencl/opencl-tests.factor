@@ -6,7 +6,7 @@ accessors arrays destructors kernel namespaces alien.data ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: opencl.tests
-    
+
 STRING: kernel-source
 __kernel void square(
     __global float* input,
@@ -31,10 +31,10 @@ __kernel void square(
             "" kernel-source 1array <cl-program> &dispose "square" <cl-kernel> &dispose :> kernel
             cl-read-access num-bytes in <cl-buffer> &dispose :> in-buffer
             cl-write-access num-bytes f <cl-buffer> &dispose :> out-buffer
-           
+
             kernel in-buffer out-buffer num-floats uint <ref> 3array
             { num-floats } [ ] cl-queue-kernel &dispose drop
-            
+
             cl-finish
 
             out-buffer 0 num-bytes <cl-buffer-range>
@@ -42,5 +42,5 @@ __kernel void square(
         ] with-cl-state
     ] with-destructors ;
 
-[ float-array{ 1.0 4.0 9.0 16.0 100.0 } ]
+{ float-array{ 1.0 4.0 9.0 16.0 100.0 } }
 [ float-array{ 1.0 2.0 3.0 4.0 10.0 } opencl-square ] unit-test

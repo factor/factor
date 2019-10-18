@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io formatting locals kernel math sequences unicode.case ;
+USING: combinators kernel locals math sequences ;
 IN: rosetta-code.balanced-brackets
 
 ! http://rosettacode.org/wiki/Balanced_brackets
@@ -21,19 +21,15 @@ IN: rosetta-code.balanced-brackets
 ! [][]      OK   ][][      NOT OK
 ! [[][]]    OK   []][[]    NOT OK
 
-:: balanced ( str -- )
-   0 :> counter!
-   1 :> ok!
-   str
-   [ dup length 0 > ]
-   [ 1 cut swap
-        "[" = [ counter 1 + counter! ] [ counter 1 - counter! ] if
-        counter 0 < [ 0 ok! ] when
-   ]
-   while
-   drop
-   ok 0 =
-   [ "NO" ]
-   [ counter 0 > [ "NO" ] [ "YES" ] if ]
-   if
-   print ;
+:: balanced? ( str -- ? )
+    0 :> counter!
+    t :> ok!
+    str [
+        {
+            { CHAR: [ [ 1 ] }
+            { CHAR: ] [ -1 ] }
+            [ drop 0 ]
+        } case counter + counter!
+        counter 0 < [ f ok! ] when
+    ] each
+    ok [ counter 0 <= ] [ f ] if ;

@@ -1,18 +1,14 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math namespaces assocs ;
+USING: assocs kernel namespaces ;
 IN: compiler.cfg.value-numbering.graph
 
 SYMBOL: input-expr-counter
 
-! assoc mapping vregs to value numbers
-! this is the identity on canonical representatives
 SYMBOL: vregs>vns
 
-! assoc mapping expressions to value numbers
 SYMBOL: exprs>vns
 
-! assoc mapping value numbers to instructions
 SYMBOL: vns>insns
 
 : vn>insn ( vn -- insn ) vns>insns get at ;

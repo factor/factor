@@ -8,7 +8,7 @@ IN: benchmark.tcp-echo0
 ! Max size here is 26 2^ 1 - because array-capacity limits on 32bit platforms
 CONSTANT: test-size0 $[ 23 2^ 1 - ]
 
-MEMO: test-bytes ( n -- byte-array ) iota >byte-array ;
+MEMO: test-bytes ( n -- byte-array ) <iota> >byte-array ;
 
 TUPLE: tcp-echo < threaded-server #times #bytes ;
 
@@ -16,7 +16,7 @@ TUPLE: tcp-echo < threaded-server #times #bytes ;
     binary \ tcp-echo new-threaded-server
         swap >>#bytes
         swap >>#times
-        f 0 <inet4> >>insecure ;
+        <any-port-local-inet4> >>insecure ;
 
 ERROR: incorrect-#bytes ;
 
@@ -46,7 +46,7 @@ M: tcp-echo handle-client*
     <tcp-echo> [
         \ threaded-server get server>address binary [
             #times [ #bytes read-write ] times
-            contents length 0 = [ incorrect-#bytes ] unless
+            contents empty? [ incorrect-#bytes ] unless
         ] with-client
     ] with-threaded-server ;
 

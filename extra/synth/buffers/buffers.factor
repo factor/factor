@@ -77,4 +77,3 @@ CONSTANT: professional-sample-freq 88200
 
 : ?send-buffer ( buffer -- buffer )
     dup id>> [ send-buffer ] unless ;
-

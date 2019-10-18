@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors timers audio audio.engine audio.loader calendar
 destructors io kernel locals math math.functions math.ranges specialized-arrays
 sequences random math.vectors ;

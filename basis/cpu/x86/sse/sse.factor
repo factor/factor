@@ -1,11 +1,9 @@
 ! Copyright (C) 2009, 2010 Joe Groff, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.data arrays assocs combinators fry kernel locals
-macros math math.vectors namespaces quotations sequences system
-compiler.cfg.comparisons compiler.cfg.intrinsics
-compiler.codegen.labels compiler.codegen.relocation
-cpu.architecture cpu.x86 cpu.x86.assembler
-cpu.x86.assembler.operands cpu.x86.features ;
+USING: alien.data arrays assocs combinators compiler.cfg.comparisons
+compiler.cfg.intrinsics cpu.architecture cpu.x86 cpu.x86.assembler
+cpu.x86.assembler.operands cpu.x86.features fry kernel locals macros
+math math.vectors quotations sequences system ;
 QUALIFIED-WITH: alien.c-types c
 IN: cpu.x86.sse
 
@@ -54,10 +52,10 @@ M: float-4-rep copy-register* drop MOVAPS ;
 M: double-2-rep copy-register* drop MOVAPS ;
 M: vector-rep copy-register* drop MOVDQA ;
 
-MACRO: available-reps ( alist -- )
+MACRO: available-reps ( alist -- quot )
     ! Each SSE version adds new representations and supports
     ! all old ones
-    unzip { } [ append ] accumulate rest swap suffix
+    unzip { } [ append ] accumulate*
     [ [ 1quotation ] map ] bi@ zip
     reverse [ { } ] suffix
     '[ _ cond ] ;
@@ -875,9 +873,6 @@ M: x86 %shl-vector-imm-reps %shl-vector-reps ;
 M: x86 %shr-vector-imm %shr-vector ;
 M: x86 %shr-vector-imm-reps %shr-vector-reps ;
 
-: scalar-sized-reg ( reg rep -- reg' )
-    rep-size 8 * n-bit-version-of ;
-
 M: x86 %integer>scalar drop MOVD ;
 
 :: %scalar>integer-32 ( dst src rep -- )
@@ -928,7 +923,3 @@ M: x86.64 %scalar>integer ( dst src rep -- )
 M: x86 %vector>scalar %copy ;
 
 M: x86 %scalar>vector %copy ;
-
-enable-float-intrinsics
-enable-float-min/max
-enable-fsqrt

@@ -14,7 +14,7 @@ IN: mongodb.tuple.collection
 
 TUPLE: toid key value ;
 
-CONSTRUCTOR: toid ( value key -- toid ) ;
+CONSTRUCTOR: <toid> toid ( value key -- toid ) ;
 
 FROM: mongodb.tuple => +transient+ +load+ <tuple-index> ;
 
@@ -48,7 +48,7 @@ M: mdb-persistent id<< ( object value -- )
    over class-of id-slot writer-word execute( object value -- ) ;
 
 
- 
+
 TUPLE: mdb-tuple-collection < mdb-collection { classes } ;
 
 GENERIC: tuple-collection ( object -- mdb-collection )
@@ -60,16 +60,16 @@ GENERIC: mdb-index-map ( tuple -- sequence )
 <PRIVATE
 
 
-: (mdb-collection) ( class -- mdb-collection )     
+: (mdb-collection) ( class -- mdb-collection )
     dup MDB_COLLECTION word-prop
     [ nip ]
-    [ superclass [ (mdb-collection) ] [ f ] if* ] if* ; inline recursive
+    [ superclass-of [ (mdb-collection) ] [ f ] if* ] if* ; inline recursive
 
 : (mdb-slot-map) ( class -- slot-map )
-    superclasses [ MDB_SLOTDEF_MAP word-prop ] map assoc-combine  ; inline
+    superclasses-of [ MDB_SLOTDEF_MAP word-prop ] map assoc-combine  ; inline
 
 : (mdb-index-map) ( class -- index-map )
-    superclasses [ MDB_INDEX_MAP word-prop ] map assoc-combine ; inline
+    superclasses-of [ MDB_INDEX_MAP word-prop ] map assoc-combine ; inline
 
 : split-optl ( seq -- key options )
     [ first ] [ rest ] bi ; inline
@@ -79,7 +79,7 @@ GENERIC: mdb-index-map ( tuple -- sequence )
     '[ split-optl swap _ set-at ] each ; inline
 
 : index-list>map ( seq -- map )
-    [ H{ } clone ] dip over 
+    [ H{ } clone ] dip over
     '[ dup name>> _ set-at ] each ; inline
 
 : user-defined-key ( map -- key value ? )
@@ -123,10 +123,10 @@ PRIVATE>
 
 M: tuple-class tuple-collection ( tuple -- mdb-collection )
     (mdb-collection) ;
- 
+
 M: mdb-persistent tuple-collection ( tuple -- mdb-collection )
     class-of (mdb-collection) ;
- 
+
 M: mdb-persistent mdb-slot-map ( tuple -- string )
     class-of (mdb-slot-map) ;
 
@@ -153,13 +153,13 @@ M: mdb-collection mdb-index-map
 : slot-option? ( tuple slot option -- ? )
     [ swap mdb-slot-map at ] dip
     '[ _ swap member-eq? ] [ f ] if* ;
-  
+
 PRIVATE>
 
 GENERIC: <mdb-tuple-collection> ( name -- mdb-tuple-collection )
-M: string <mdb-tuple-collection> 
-    collection-map [ ] [ key? ] 2bi 
-    [ at ] [ [ mdb-tuple-collection new dup ] 2dip 
+M: string <mdb-tuple-collection>
+    collection-map [ ] [ key? ] 2bi
+    [ at ] [ [ mdb-tuple-collection new dup ] 2dip
              [ [ >>name ] keep ] dip set-at ] if ; inline
 M: mdb-tuple-collection <mdb-tuple-collection> ;
 M: mdb-collection <mdb-tuple-collection>

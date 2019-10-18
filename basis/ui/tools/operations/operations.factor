@@ -3,7 +3,7 @@
 USING: accessors combinators.short-circuit compiler.errors
 compiler.units continuations definitions destructors editors
 help.topics io.pathnames io.styles kernel libc.private
-macros.expander models parser prettyprint quotations
+macros.expander models parser prettyprint quotations see
 source-files.errors stack-checker threads tools.annotations
 tools.crossref tools.test tools.time tools.walker ui.commands
 ui.gestures ui.operations ui.tools.browser ui.tools.deploy
@@ -87,7 +87,7 @@ IN: ui.tools.operations
 } define-operation
 
 : com-reload ( error -- )
-    file>> run-file ;
+    path>> run-file ;
 
 [ compiler-error? ] \ com-reload H{
     { +listener+ t }
@@ -119,6 +119,10 @@ IN: ui.tools.operations
 [ annotated? ] \ reset H{ } define-operation
 
 [ word? ] \ breakpoint H{ } define-operation
+
+[ word? ] \ see H{
+    { +listener+ t }
+} define-operation
 
 GENERIC: com-stack-effect ( obj -- )
 

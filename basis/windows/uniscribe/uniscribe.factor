@@ -1,11 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs math sequences fry io.encodings.string
-io.encodings.utf16n accessors arrays combinators destructors
-cache namespaces init fonts alien.c-types alien.data
-windows.usp10 windows.offscreen windows.gdi32 windows.ole32
-windows.types windows.fonts opengl.textures locals
-windows.errors classes.struct ;
+USING: accessors alien.c-types alien.data arrays assocs cache
+classes.struct combinators destructors fonts init io.encodings.string
+io.encodings.utf16n kernel literals locals math namespaces sequences
+windows.errors windows.fonts windows.gdi32 windows.offscreen
+windows.ole32 windows.types windows.usp10 ;
 IN: windows.uniscribe
 
 TUPLE: script-string < disposable font string metrics ssa size image ;
@@ -29,13 +28,15 @@ TUPLE: script-string < disposable font string metrics ssa size image ;
 
 <PRIVATE
 
+CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
+
 : make-ssa ( dc script-string -- ssa )
     dup selection? [ string>> ] when
     [ utf16n encode ] ! pString
     [ length ] bi ! cString
     dup 1.5 * 16 + >integer ! cGlyphs -- MSDN says this is "recommended size"
     -1 ! iCharset -- Unicode
-    SSA_GLYPHS ! dwFlags
+    ssa-dwFlags
     0 ! iReqWidth
     f ! psControl
     f ! psState

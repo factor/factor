@@ -12,3 +12,5 @@ ARTICLE: "colors.yuv" "YUV colors"
     >yuva
 }
 { $see-also "colors" } ;
+
+ABOUT: "colors.yuv"

@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hints kernel locals math math.order math.ranges project-euler.common
-    sequences sequences.private ;
+USING: kernel locals math math.order math.ranges math.statistics
+project-euler.common sequences sequences.private ;
 IN: project-euler.150
 
 ! http://projecteuler.net/index.php?section=problems&id=150
@@ -34,7 +34,7 @@ IN: project-euler.150
 ! sequence helper functions
 
 : partial-sums ( seq -- sums )
-    0 [ + ] accumulate swap suffix ; inline
+    cum-sum 0 prefix ; inline
 
 : partial-sum-infimum ( seq quot -- seq )
     [ 0 0 ] 2dip [ + [ min ] keep ] compose each drop ; inline
@@ -52,9 +52,9 @@ IN: project-euler.150
 
 :: (euler150) ( m -- n )
     sums-triangle :> table
-    m iota [| x |
-        x 1 + iota [| y |
-            m x - iota [| z |
+    m <iota> [| x |
+        x 1 + <iota> [| y |
+            m x - <iota> [| z |
                 x z + table nth-unsafe
                 [ y z + 1 + swap nth-unsafe ]
                 [ y         swap nth-unsafe ] bi -

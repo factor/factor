@@ -44,7 +44,7 @@ DESTRUCTOR: cuda-free
     cuMemcpyDtoH cuda-error ; inline
 
 : host>device ( data -- ptr )
-    [ >c-ptr ] [ byte-length ] bi
+    binary-object
     [ nip cuda-malloc dup ] [ memcpy-host>device ] 2bi ; inline
 
 : device>host ( ptr len -- byte-array )

@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors peg peg.parsers memoize kernel sequences
-logging arrays words strings vectors io io.files
-io.encodings.utf8 namespaces make combinators logging.server
-calendar calendar.format assocs prettyprint ;
+USING: accessors assocs calendar calendar.format calendar.parser
+combinators io io.encodings.utf8 io.files kernel logging
+logging.server make namespaces peg peg.parsers prettyprint sequences
+strings vectors words ;
 IN: logging.parser
 
 TUPLE: log-entry date level word-name message ;
@@ -13,44 +13,44 @@ TUPLE: log-entry date level word-name message ;
 
 SYMBOL: multiline
 
-: 'date' ( -- parser )
+: date-parser ( -- parser )
     [ "]" member? not ] string-of [
         dup multiline-header =
         [ drop multiline ] [ rfc3339>timestamp ] if
     ] action
     "[" "]" surrounded-by ;
 
-: 'log-level' ( -- parser )
+: log-level-parser ( -- parser )
     log-levels keys [
         [ name>> token ] keep [ nip ] curry action
     ] map choice ;
 
-: 'word-name' ( -- parser )
+: word-name-parser ( -- parser )
     [ " :" member? not ] string-of ;
 
 SYMBOL: malformed
 
-: 'malformed-line' ( -- parser )
+: malformed-line-parser ( -- parser )
     [ drop t ] string-of
     [ log-entry new swap >>message malformed >>level ] action ;
 
-: 'log-message' ( -- parser )
+: log-message-parser ( -- parser )
     [ drop t ] string-of
     [ 1vector ] action ;
 
-: 'log-line' ( -- parser )
+: log-line-parser ( -- parser )
     [
-        'date' ,
+        date-parser ,
         " " token hide ,
-        'log-level' ,
+        log-level-parser ,
         " " token hide ,
-        'word-name' ,
+        word-name-parser ,
         ": " token hide ,
-        'log-message' ,
+        log-message-parser ,
     ] seq* [ first4 log-entry boa ] action
-    'malformed-line' 2choice ;
+    malformed-line-parser 2choice ;
 
-PEG: parse-log-line ( string -- entry ) 'log-line' ;
+PEG: parse-log-line ( string -- entry ) log-line-parser ;
 
 : malformed? ( line -- ? )
     level>> malformed eq? ;

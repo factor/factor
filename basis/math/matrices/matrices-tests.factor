@@ -1,9 +1,9 @@
 USING: math.matrices math.vectors tools.test math kernel ;
 IN: math.matrices.tests
 
-[
+{
     { { 0 } { 0 } { 0 } }
-] [
+} [
     3 1 zero-matrix
 ] unit-test
 
@@ -94,32 +94,32 @@ IN: math.matrices.tests
     4 3 -1 eye
 ] unit-test
 
-[
+{
     { { 1   1/2 1/3 1/4 }
       { 1/2 1/3 1/4 1/5 }
       { 1/3 1/4 1/5 1/6 }
     }
-] [ 3 4 hilbert-matrix ] unit-test
+} [ 3 4 hilbert-matrix ] unit-test
 
-[
+{
     { { 1 2 3 4 }
       { 2 1 2 3 }
       { 3 2 1 2 }
       { 4 3 2 1 } }
-] [ 4 toeplitz-matrix ] unit-test
+} [ 4 toeplitz-matrix ] unit-test
 
-[
+{
     { { 1 2 3 4 }
       { 2 3 4 0 }
       { 3 4 0 0 }
       { 4 0 0 0 } }
-] [ 4 hankel-matrix ] unit-test
+} [ 4 hankel-matrix ] unit-test
 
-[
+{
     { { 1 0 4 }
       { 0 7 0 }
       { 6 0 3 } }
-] [
+} [
     { { 1 0 0 }
       { 0 2 0 }
       { 0 0 3 } }
@@ -131,11 +131,11 @@ IN: math.matrices.tests
     m+
 ] unit-test
 
-[
+{
     { { 1 0 4 }
        { 0 7 0 }
        { 6 0 3 } }
-] [
+} [
     { { 1 0 0 }
        { 0 2 0 }
        { 0 0 3 } }
@@ -147,15 +147,15 @@ IN: math.matrices.tests
     m-
 ] unit-test
 
-[
+{
     { 10 20 30 }
-] [
+} [
     10 { 1 2 3 } n*v
 ] unit-test
 
-[
+{
     { 3 4 }
-] [
+} [
     { { 1 0 }
        { 0 1 } }
 
@@ -164,9 +164,9 @@ IN: math.matrices.tests
     m.v
 ] unit-test
 
-[
+{
     { 4 3 }
-] [
+} [
     { { 0 1 }
        { 1 0 } }
 
@@ -175,38 +175,38 @@ IN: math.matrices.tests
     m.v
 ] unit-test
 
-[
+{
     { { 6 } }
-] [
+} [
     { { 3 } } { { 2 } } m.
 ] unit-test
 
-[
+{
     { { 11 } }
-] [
+} [
     { { 1 3 } } { { 5 } { 2 } } m.
 ] unit-test
 
-[
+{
     { { 28 } }
-] [
+} [
     { { 2 4 6 } }
 
     { { 1 }
        { 2 }
        { 3 } }
-    
+
     m.
 ] unit-test
 
-[ { 0 0 1 } ] [ { 1 0 0 } { 0 1 0 } cross ] unit-test
-[ { 1 0 0 } ] [ { 0 1 0 } { 0 0 1 } cross ] unit-test
-[ { 0 1 0 } ] [ { 0 0 1 } { 1 0 0 } cross ] unit-test
-[ { 0.0 -0.707 0.707 } ] [ { 1.0 0.0 0.0 } { 0.0 0.707 0.707 } cross ] unit-test
-[ { 0 -2 2 } ] [ { -1 -1 -1 } { 1 -1 -1 } cross ] unit-test
-[ { 1 0 0 } ] [ { 1 1 0 } { 1 0 0 } proj ] unit-test
+{ { 0 0 1 } } [ { 1 0 0 } { 0 1 0 } cross ] unit-test
+{ { 1 0 0 } } [ { 0 1 0 } { 0 0 1 } cross ] unit-test
+{ { 0 1 0 } } [ { 0 0 1 } { 1 0 0 } cross ] unit-test
+{ { 0.0 -0.707 0.707 } } [ { 1.0 0.0 0.0 } { 0.0 0.707 0.707 } cross ] unit-test
+{ { 0 -2 2 } } [ { -1 -1 -1 } { 1 -1 -1 } cross ] unit-test
+{ { 1 0 0 } } [ { 1 1 0 } { 1 0 0 } proj ] unit-test
 
-[ { { 4181 6765 } { 6765 10946 } } ]
+{ { { 4181 6765 } { 6765 10946 } } }
 [ { { 0 1 } { 1 1 } } 20 m^n ] unit-test
 [ { { 0 1 } { 1 1 } } -20 m^n ] [ negative-power-matrix? ] must-fail-with
 
@@ -312,7 +312,7 @@ CONSTANT: test-points {
         { 23+59/147 6+15/49 27+17/49 }
     }
 } [
-    test-points cov-matrix
+    test-points population-cov-matrix
 ] unit-test
 
 {
@@ -383,3 +383,12 @@ CONSTANT: test-points {
 { t } [ { { 1 2 } { 3 4 } } square-matrix? ] unit-test
 { f } [ { { 1 } { 2 3 } } square-matrix? ] unit-test
 { f } [ { { 1 2 } } square-matrix? ] unit-test
+
+{ 9 }
+[ { { 2 -2 1 } { 1 3 -1 } { 2 -4 2 } } m-1norm ] unit-test
+
+{ 8 }
+[ { { 2 -2 1 } { 1 3 -1 } { 2 -4 2 } } m-infinity-norm ] unit-test
+
+{ 2.0 }
+[ { { 1 1 } { 1 1 } } frobenius-norm ] unit-test

@@ -16,7 +16,7 @@ HELP: search
 { $values
   { "string" string }
   { "parser" "a peg based parser" }
-  { "seq"    sequence }
+  { "seq" sequence }
 }
 { $description
     "Returns a sequence containing the parse results of all substrings "
@@ -24,8 +24,8 @@ HELP: search
     "parser."
 }
 
-{ $example "USING: peg.parsers peg.search prettyprint ;" "\"one 123 two 456\" 'integer' search ." "V{ 123 456 }" }
-{ $example "USING: peg peg.parsers peg.search prettyprint ;" "\"one 123 \\\"hello\\\" two 456\" 'integer' 'string' 2choice search ." "V{ 123 \"hello\" 456 }" }
+{ $example "USING: peg.parsers peg.search prettyprint ;" "\"one 123 two 456\" integer-parser search ." "V{ 123 456 }" }
+{ $example "USING: peg peg.parsers peg.search prettyprint ;" "\"one 123 \\\"hello\\\" two 456\" integer-parser string-parser 2choice search ." "V{ 123 \"hello\" 456 }" }
 { $see-also replace } ;
 
 HELP: replace
@@ -39,6 +39,5 @@ HELP: replace
     "successfully parse with the given parser replaced with "
     "the result of that parser."
 }
-{ $example "USING: math math.parser peg peg.parsers peg.search prettyprint ;" "\"one 123 two 456\" 'integer' [ 2 * number>string ] action replace ." "\"one 246 two 912\"" }
+{ $example "USING: math math.parser peg peg.parsers peg.search prettyprint ;" "\"one 123 two 456\" integer-parser [ 2 * number>string ] action replace ." "\"one 246 two 912\"" }
 { $see-also search } ;
-

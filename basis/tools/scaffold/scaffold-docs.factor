@@ -32,18 +32,18 @@ HELP: scaffold-examples
     "Create docs for the + word:"
     { $example "USING: math tools.scaffold prettyprint ;"
         "\\ + scaffold-examples"
-        """{ $examples
-    "Example:"
-    { $example "USING: math prettyprint ;"
-        ""
-        ""
+        "{ $examples
+    \"Example:\"
+    { $example \"USING: math prettyprint ;\"
+        \"\"
+        \"\"
     }
-    "Example:"
-    { $example "USING: math prettyprint ;"
-        ""
-        ""
+    \"Example:\"
+    { $example \"USING: math prettyprint ;\"
+        \"\"
+        \"\"
     }
-}"""
+}"
     }
 } ;
 
@@ -65,6 +65,11 @@ HELP: scaffold-extra
 }
 { $description "Create a placeholder vocabulary in the extra vocabulary root." } ;
 
+HELP: scaffold-work
+{ $values
+    { "string" string }
+}
+{ $description "Create a placeholder vocabulary in the work vocabulary root." } ;
 
 HELP: scaffold-authors
 { $values
@@ -120,7 +125,7 @@ ARTICLE: "tools.scaffold" "Scaffold tool"
 "Scaffold setup:"
 { $subsections developer-name }
 "Generate new vocabs:"
-{ $subsections scaffold-vocab scaffold-core scaffold-basis scaffold-extra }
+{ $subsections scaffold-vocab scaffold-core scaffold-basis scaffold-extra scaffold-work }
 "Generate help scaffolding:"
 { $subsections
     scaffold-docs

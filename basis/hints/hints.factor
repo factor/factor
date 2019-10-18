@@ -4,8 +4,8 @@ USING: accessors arrays assocs byte-arrays byte-vectors classes
 combinators definitions effects fry generic generic.single
 generic.standard hashtables io.binary io.encodings
 io.streams.string kernel kernel.private math math.parser
-namespaces parser sbufs sequences splitting splitting.private
-strings vectors words ;
+namespaces parser sbufs sequences sequences.private splitting
+splitting.private strings vectors words ;
 IN: hints
 
 GENERIC: specializer-predicate ( spec -- quot )
@@ -24,9 +24,9 @@ M: object specializer-declaration class-of ;
     "specializer" word-prop ;
 
 : make-specializer ( specs -- quot )
-    dup length iota <reversed>
+    dup length <iota> <reversed>
     [ (picker) 2array ] 2map
-    [ drop object eq? not ] assoc-filter
+    [ drop object eq? ] assoc-reject
     [ [ t ] ] [
         [ swap specializer-predicate append ] { } assoc>map
         [ ] [ swap [ f ] \ if 3array append [ ] like ] map-reduce
@@ -95,9 +95,10 @@ set-specializer
     set-specializer
 ] each
 
-\ subseq
-{ { fixnum fixnum string } { fixnum fixnum array } }
-set-specializer
+{ subseq subseq-unsafe } [
+    { { fixnum fixnum string } { fixnum fixnum array } }
+    set-specializer
+] each
 
 \ reverse!
 { { string } { array } }
@@ -141,5 +142,3 @@ set-specializer
 M\ hashtable set-at
 { { object fixnum object } { object word object } }
 set-specializer
-
-\ encode-string { string object object } set-specializer

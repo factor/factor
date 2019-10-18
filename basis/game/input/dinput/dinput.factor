@@ -7,7 +7,6 @@ specialized-arrays ui.backend.windows vectors windows.com
 windows.directx.dinput windows.directx.dinput.constants
 windows.kernel32 windows.messages windows.ole32 windows.errors
 windows.user32 classes.struct ;
-FROM: namespaces => change-global ;
 SPECIALIZED-ARRAY: DIDEVICEOBJECTDATA
 IN: game.input.dinput
 
@@ -159,7 +158,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
 
 : find-and-remove-detached-devices ( -- )
     +controller-devices+ get-global keys
-    [ device-attached? not ] filter
+    [ device-attached? ] reject
     [ remove-controller ] each ;
 
 : ?device-interface ( dbt-broadcast-hdr -- ? )
@@ -177,7 +176,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     <alien> DEV_BROADCAST_HDR memory>struct ;
 
 : handle-wm-devicechange ( hWnd uMsg wParam lParam -- )
-    [ 2drop ] 2dip swap {
+    2nipd swap {
         { [ dup DBT_DEVICEARRIVAL = ]         [ drop <DEV_BROADCAST_HDR> device-arrived ] }
         { [ dup DBT_DEVICEREMOVECOMPLETE = ]  [ drop <DEV_BROADCAST_HDR> device-removed ] }
         [ 2drop ]
@@ -316,7 +315,7 @@ CONSTANT: pov-values
     } case ;
 
 : fill-mouse-state ( buffer count -- state )
-    iota [ +mouse-state+ get-global ] 2dip swap [ nth (fill-mouse-state) ] curry each ;
+    <iota> [ +mouse-state+ get-global ] 2dip swap [ nth (fill-mouse-state) ] curry each ;
 
 : get-device-state ( device DIJOYSTATE2 -- )
     [ dup IDirectInputDevice8W::Poll check-ole32-error ] dip

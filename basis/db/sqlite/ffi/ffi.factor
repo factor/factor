@@ -2,12 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! An interface to the sqlite database. Tested against sqlite v3.1.3.
 ! Not all functions have been wrapped.
-USING: alien alien.libraries alien.libraries.finder compiler kernel
-math namespaces sequences strings alien.syntax system combinators
-alien.c-types ;
+USING: alien alien.c-types alien.libraries alien.syntax
+combinators system ;
 IN: db.sqlite.ffi
 
-<< "sqlite" "sqlite3" find-library cdecl add-library >>
+<< "sqlite" {
+    { [ os windows? ] [ "sqlite3.dll" ] }
+    { [ os macosx? ] [ "libsqlite3.dylib" ] }
+    { [ os unix? ] [ "libsqlite3.so" ] }
+} cond cdecl add-library >>
 
 ! Return values from sqlite functions
 CONSTANT: SQLITE_OK           0 ! Successful result
@@ -79,7 +82,7 @@ CONSTANT: SQLITE_TEXT        3
 CONSTANT: SQLITE_BLOB        4
 CONSTANT: SQLITE_NULL        5
 
-! Values for the 'destructor' parameter of the 'bind' routines. 
+! Values for the 'destructor' parameter of the 'bind' routines.
 CONSTANT: SQLITE_STATIC      0
 CONSTANT: SQLITE_TRANSIENT   -1
 
@@ -102,36 +105,36 @@ TYPEDEF: longlong sqlite3_int64
 TYPEDEF: ulonglong sqlite3_uint64
 
 LIBRARY: sqlite
-FUNCTION: int sqlite3_open ( c-string filename, void* ppDb ) ;
-FUNCTION: int sqlite3_close ( sqlite3* pDb ) ;
-FUNCTION: c-string sqlite3_errmsg ( sqlite3* pDb ) ;
-FUNCTION: int sqlite3_prepare ( sqlite3* pDb, c-string zSql, int nBytes, void* ppStmt, void* pzTail ) ;
-FUNCTION: int sqlite3_prepare_v2 ( sqlite3* pDb, c-string zSql, int nBytes, void* ppStmt, void* pzTail ) ;
-FUNCTION: int sqlite3_finalize ( sqlite3_stmt* pStmt ) ;
-FUNCTION: int sqlite3_reset ( sqlite3_stmt* pStmt ) ;
-FUNCTION: int sqlite3_step ( sqlite3_stmt* pStmt ) ;
-FUNCTION: sqlite3_uint64 sqlite3_last_insert_rowid ( sqlite3* pStmt ) ;
-FUNCTION: int sqlite3_bind_blob ( sqlite3_stmt* pStmt, int index, void* ptr, int len, int destructor ) ;
-FUNCTION: int sqlite3_bind_double ( sqlite3_stmt* pStmt, int index, double x ) ;
-FUNCTION: int sqlite3_bind_int ( sqlite3_stmt* pStmt, int index, int n ) ;
-FUNCTION: int sqlite3_bind_int64 ( sqlite3_stmt* pStmt, int index, sqlite3_int64 n ) ;
+FUNCTION: int sqlite3_open ( c-string filename, void* ppDb )
+FUNCTION: int sqlite3_close ( sqlite3* pDb )
+FUNCTION: c-string sqlite3_errmsg ( sqlite3* pDb )
+FUNCTION: int sqlite3_prepare ( sqlite3* pDb, c-string zSql, int nBytes, void* ppStmt, void* pzTail )
+FUNCTION: int sqlite3_prepare_v2 ( sqlite3* pDb, c-string zSql, int nBytes, void* ppStmt, void* pzTail )
+FUNCTION: int sqlite3_finalize ( sqlite3_stmt* pStmt )
+FUNCTION: int sqlite3_reset ( sqlite3_stmt* pStmt )
+FUNCTION: int sqlite3_step ( sqlite3_stmt* pStmt )
+FUNCTION: sqlite3_uint64 sqlite3_last_insert_rowid ( sqlite3* pStmt )
+FUNCTION: int sqlite3_bind_blob ( sqlite3_stmt* pStmt, int index, void* ptr, int len, int destructor )
+FUNCTION: int sqlite3_bind_double ( sqlite3_stmt* pStmt, int index, double x )
+FUNCTION: int sqlite3_bind_int ( sqlite3_stmt* pStmt, int index, int n )
+FUNCTION: int sqlite3_bind_int64 ( sqlite3_stmt* pStmt, int index, sqlite3_int64 n )
 ! Bind the same function as above, but for unsigned 64bit integers
 FUNCTION-ALIAS: sqlite3-bind-uint64
-    int sqlite3_bind_int64 ( sqlite3_stmt* pStmt, int index, sqlite3_uint64 in64 ) ;
-FUNCTION: int sqlite3_bind_null ( sqlite3_stmt* pStmt, int n ) ;
-FUNCTION: int sqlite3_bind_text ( sqlite3_stmt* pStmt, int index, c-string text, int len, int destructor ) ;
-FUNCTION: int sqlite3_bind_parameter_index ( sqlite3_stmt* pStmt, c-string name ) ;
-FUNCTION: int sqlite3_clear_bindings ( sqlite3_stmt* pStmt ) ;
-FUNCTION: int sqlite3_column_count ( sqlite3_stmt* pStmt ) ;
-FUNCTION: void* sqlite3_column_blob ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: int sqlite3_column_bytes ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: c-string sqlite3_column_decltype ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: int sqlite3_column_int ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: sqlite3_int64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col ) ;
+    int sqlite3_bind_int64 ( sqlite3_stmt* pStmt, int index, sqlite3_uint64 in64 )
+FUNCTION: int sqlite3_bind_null ( sqlite3_stmt* pStmt, int n )
+FUNCTION: int sqlite3_bind_text ( sqlite3_stmt* pStmt, int index, c-string text, int len, int destructor )
+FUNCTION: int sqlite3_bind_parameter_index ( sqlite3_stmt* pStmt, c-string name )
+FUNCTION: int sqlite3_clear_bindings ( sqlite3_stmt* pStmt )
+FUNCTION: int sqlite3_column_count ( sqlite3_stmt* pStmt )
+FUNCTION: void* sqlite3_column_blob ( sqlite3_stmt* pStmt, int col )
+FUNCTION: int sqlite3_column_bytes ( sqlite3_stmt* pStmt, int col )
+FUNCTION: c-string sqlite3_column_decltype ( sqlite3_stmt* pStmt, int col )
+FUNCTION: int sqlite3_column_int ( sqlite3_stmt* pStmt, int col )
+FUNCTION: sqlite3_int64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col )
 ! Bind the same function as above, but for unsigned 64bit integers
-FUNCTION-ALIAS: sqlite3-column-uint64
-    sqlite3_uint64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: double sqlite3_column_double ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: c-string sqlite3_column_name ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: c-string sqlite3_column_text ( sqlite3_stmt* pStmt, int col ) ;
-FUNCTION: int sqlite3_column_type ( sqlite3_stmt* pStmt, int col ) ;
+FUNCTION-ALIAS: sqlite3_column_uint64
+    sqlite3_uint64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col )
+FUNCTION: double sqlite3_column_double ( sqlite3_stmt* pStmt, int col )
+FUNCTION: c-string sqlite3_column_name ( sqlite3_stmt* pStmt, int col )
+FUNCTION: c-string sqlite3_column_text ( sqlite3_stmt* pStmt, int col )
+FUNCTION: int sqlite3_column_type ( sqlite3_stmt* pStmt, int col )

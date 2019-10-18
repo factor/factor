@@ -1,8 +1,8 @@
 USING: editors help.markup help.syntax summary inspector io io.styles
 listener parser prettyprint tools.walker ui.commands
-ui.gadgets.panes ui.gadgets.presentations ui.operations
-ui.tools.operations ui.tools.common vocabs see
-help.tips ;
+ui.gadgets.panes ui.gadgets.presentations ui.gestures
+ui.operations ui.tools.operations ui.tools.common
+vocabs see help.tips ;
 IN: ui.tools
 
 ARTICLE: "starting-ui-tools" "Starting the UI tools"
@@ -29,7 +29,7 @@ $nl
 $nl
 "Clicking a presentation with the left mouse button invokes a default operation, which usually views the object in some way. For example, clicking a presentation of a word jumps to the word definition in the " { $link "ui-browser" } "."
 $nl
-"Clicking and holding the right mouse button on a presentation displays a popup menu listing available operations."
+"Clicking the right mouse button on a presentation displays a popup menu listing available operations."
 $nl
 "For more about presentation gadgets, see " { $link "ui.gadgets.presentations" } "." ;
 
@@ -41,8 +41,11 @@ $nl
 "Dropping a source file onto the Factor icon in the dock runs the source file in the listener."
 $nl
 "If you install " { $strong "Factor.app" } " in your " { $strong "Applications" } " folder, then other applications will be able to call Factor via the System Services feature. For example, you can select some text in " { $strong "TextEdit.app" } ", then invoke the " { $strong "TextEdit->Services->Factor->Evaluate Selection" } " menu item, which will replace the selected text with the result of evaluating it in Factor."
-
 ;
+
+ARTICLE: "ui-windows" "Functionality specific to Windows"
+"Files can be dropped from other applications onto the listener window to push their names onto the stack:"
+{ $subsections "filedrop-gestures" } ;
 
 ARTICLE: "ui-tools" "UI developer tools"
 "The " { $vocab-link "ui.tools" } " vocabulary hierarchy implements a collection of simple developer tools."
@@ -65,7 +68,10 @@ $nl
     "ui.tools.deploy"
 }
 "Platform-specific features:"
-{ $subsections "ui-cocoa" } ;
+{ $subsections
+    "ui-cocoa"
+    "ui-windows"
+} ;
 
 TIP: "All UI developer tools support a common set of " { $link "ui-shortcuts" } ". Each individual tool has its own shortcuts as well; the F1 key is context-sensitive." ;
 

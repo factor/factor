@@ -1,14 +1,13 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: benchmark combinators.smart debugger fry io assocs
-io.encodings.utf8 io.files io.sockets io.streams.string kernel
-locals mason.common mason.config mason.disk mason.platform math
-namespaces prettyprint sequences xml.syntax xml.writer
-combinators.short-circuit literals splitting ;
+USING: assocs combinators.smart debugger fry io.encodings.utf8
+io.files io.streams.string kernel literals locals mason.common
+mason.config mason.disk mason.test math namespaces sequences
+xml.syntax xml.writer ;
 IN: mason.report
 
 : git-link ( id -- link )
-    [ "http://github.com/slavapestov/factor/commit/" "" prepend-as ] keep
+    [ "http://github.com/factor/factor/commit/" "" prepend-as ] keep
     [XML <a href=<->><-></a> XML] ;
 
 : common-report ( -- xml )
@@ -28,12 +27,12 @@ IN: mason.report
     </table>
     XML] ;
 
-: with-report ( quot -- )
+: with-report ( quot: ( -- xml ) -- )
     [ "report" utf8 ] dip
     '[
         common-report
         _ call( -- xml )
-        [XML <html><body><-><-></body></html> XML]
+        [XML <div><-><-></div> XML]
         write-xml
     ] with-file-writer ; inline
 
@@ -130,7 +129,7 @@ IN: mason.report
             error-dump
 
             benchmarks-file eval-file benchmarks-table
-        ] output>array
+        ] output>array sift
     ] with-report ;
 
 : build-clean? ( -- ? )

@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays bit-arrays classes
 classes.tuple.private fry kernel locals math parser
 sequences sequences.private vectors words ;
@@ -51,4 +52,3 @@ PRIVATE>
 
 SYNTAX: POOL:
     scan-word scan-word '[ _ swap <pool> ] [ swap set-class-pool ] bi ;
-

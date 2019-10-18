@@ -1,6 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 USING: accessors kernel arrays strings math.parser peg peg.ebnf
-gml.types gml.runtime sequences sequences.deep locals combinators math ;
+multiline gml.types gml.runtime sequences sequences.deep locals
+combinators math ;
 IN: gml.parser
 
 TUPLE: comment string ;
@@ -52,7 +53,7 @@ ERROR: bad-vector-length seq n ;
         [ bad-vector-length ]
     } case ;
 
-EBNF: parse-gml
+EBNF: parse-gml [=[
 
 Letter = [a-zA-Z]
 Digit = [0-9]
@@ -62,11 +63,11 @@ Sign = ('+' => [[ first ]]|'-' => [[ first ]])?
 
 StopChar = ('('|')'|'['|']'|'{'|'}'|'/'|'/'|';'|':'|'!'|'.')
 
-Space = ' ' | '\t' | '\r' | '\n'
+Space = [ \t\n\r]
 
 Spaces = Space* => [[ ignore ]]
 
-Newline = ('\n' | '\r')
+Newline = [\n\r]
 
 Number = Sign Digit+ ('.' => [[ first ]] Digit+)? ('e' => [[ first ]] Sign Digit+)?
     => [[ flatten sift >string string>number ]]
@@ -91,7 +92,7 @@ ArrayEnd = ']' => [[ exec" ]" ]]
 
 ExecArray = '{' Token*:ts Spaces '}' => [[ ts parse-proc ]]
 
-LiteralName = '/' Name:n => [[ n name ]]
+LiteralName = '/' Name:n => [[ n >gml-name ]]
 
 UseReg = "usereg" !(NameChar) => [[ <use-registers> ]]
 
@@ -99,9 +100,9 @@ ReadReg = ";" Name:n => [[ n <read-register> ]]
 ExecReg = ":" Name:n => [[ n <exec-register> ]]
 WriteReg = "!" Name:n => [[ n <write-register> ]]
 
-ExecName = Name:n => [[ n exec-name ]]
+ExecName = Name:n => [[ n >gml-exec-name ]]
 
-PathNameComponent = "." Name:n => [[ n name ]]
+PathNameComponent = "." Name:n => [[ n >gml-name ]]
 PathName = PathNameComponent+ => [[ <pathname> ]]
 
 Token = Spaces
@@ -120,9 +121,8 @@ Token = Spaces
      ExecName |
      PathName)
 
-Tokens = Token* => [[ [ comment? not ] filter ]]
+Tokens = Token* => [[ [ comment? ] reject ]]
 
 Program = Tokens Spaces !(.) => [[ parse-proc ]]
 
-;EBNF
-
+]=]

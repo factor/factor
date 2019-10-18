@@ -1,12 +1,15 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors arrays assocs calendar combinators
+USING: accessors arrays assocs calendar calendar.english combinators
 combinators.smart fry generalizations io io.streams.string
 kernel macros math math.functions math.parser namespaces
-peg.ebnf present prettyprint quotations sequences strings
-unicode.case unicode.categories vectors ;
+peg.ebnf present prettyprint quotations sequences
+sequences.generalizations strings unicode vectors
+math.functions.integer-logs splitting multiline ;
 FROM: math.parser.private => format-float ;
 IN: formatting
+
+ERROR: unknown-format-directive value ;
 
 <PRIVATE
 
@@ -14,31 +17,83 @@ IN: formatting
     [ ] [ compose ] reduce ; inline
 
 : fix-sign ( string -- string )
-    dup CHAR: 0 swap index 0 =
-      [ dup 0 swap [ [ CHAR: 0 = not ] keep digit? and ] find-from
-         [ dup 1 - rot dup [ nth ] dip swap
-            {
-               { CHAR: - [ [ 1 - ] dip remove-nth "-" prepend ] }
-               { CHAR: + [ [ 1 - ] dip remove-nth "+" prepend ] }
-               [ drop nip ]
+    dup first CHAR: 0 = [
+        dup [ [ CHAR: 0 = not ] [ digit? ] bi and ] find
+        [
+            1 - swap 2dup nth {
+                { CHAR: - [ remove-nth "-" prepend ] }
+                { CHAR: + [ remove-nth "+" prepend ] }
+                [ drop nip ]
             } case
-         ] [ drop ] if
-      ] when ;
+        ] [ drop ] if
+    ] when ;
 
 : >digits ( string -- digits )
     [ 0 ] [ string>number ] if-empty ;
 
-: format-simple ( x digits string -- string )
-    [ [ >float ] [ number>string ] bi* "%." ] dip
-    surround format-float ;
+: format-decimal-simple ( x digits -- string )
+    [
+        [ abs ] dip
+        [ 10^ * round-to-even >integer number>string ]
+        [ 1 + CHAR: 0 pad-head ]
+        [ cut* ] tri [ "." glue ] unless-empty
+    ] keepd neg? [ CHAR: - prefix ] when ;
 
-: format-scientific ( x digits -- string ) "e" format-simple ;
+: format-scientific-mantissa ( x log10x digits -- string rounded-up? )
+    [ swap - 10^ * round-to-even >integer number>string ] keep
+    over length 1 - < [
+        [ but-last >string ] when ! 9.9 rounded to 1e+01
+        1 cut [ "." glue ] unless-empty
+    ] keep ;
 
-: format-decimal ( x digits -- string ) "f" format-simple ;
+: format-scientific-exponent ( rounded-up? log10x -- string )
+    swap [ 1 + ] when number>string 2 CHAR: 0 pad-head
+    dup CHAR: - swap index "e" "e+" ? prepend ;
 
-ERROR: unknown-printf-directive ;
+: format-scientific-simple ( x digits -- string )
+    [
+        [ abs dup integer-log10 ] dip
+        [ format-scientific-mantissa ]
+        [ drop nip format-scientific-exponent ] 3bi append
+    ] keepd neg? [ CHAR: - prefix ] when ;
 
-EBNF: parse-printf
+: format-float-fast ( x digits string -- string )
+    [ "" -1 ] 2dip "C" format-float ;
+
+: format-fast-scientific? ( x digits -- x' digits ? )
+    over float? [ t ]
+    [ 2dup
+        [ [ t ] [ abs integer-log10 abs 308 < ] if-zero ]
+        [ 15 < ] bi* and
+        [ [ [ >float ] dip ] when ] keep
+    ] if ;
+
+: format-scientific ( x digits -- string )
+    format-fast-scientific?  [
+        [ "e" format-float-fast ]
+        [ [ ".0e" "e" replace ] [ drop ] if-zero ] bi
+    ] [ format-scientific-simple ] if ;
+
+: format-fast-decimal? ( x digits -- x' digits ? )
+    over float? [ t ]
+    [
+        2dup
+        [ drop dup integer?  [ abs 53 2^ < ] [ drop f ] if ]
+        [ over ratio?
+            [ [ abs integer-log10 ] dip
+              [ drop abs 308 < ] [ + 15 <= ] 2bi and ]
+            [ 2drop f ] if
+        ] 2bi or
+        [ [ [ >float ] dip ] when ] keep
+    ] if ; inline
+
+: format-decimal ( x digits -- string )
+    format-fast-decimal? [
+        [ "f" format-float-fast ]
+        [ [ ".0" ?tail drop ] [ drop ] if-zero ] bi
+    ] [ format-decimal-simple ] if ;
+
+EBNF: parse-printf [=[
 
 zero      = "0"                  => [[ CHAR: 0 ]]
 char      = "'" (.)              => [[ second ]]
@@ -48,7 +103,8 @@ pad-align = ("-")?               => [[ \ pad-tail \ pad-head ? ]]
 pad-width = ([0-9])*             => [[ >digits ]]
 pad       = pad-align pad-char pad-width => [[ <reversed> >quotation dup first 0 = [ drop [ ] ] when ]]
 
-sign      = ("+")?               => [[ [ dup CHAR: - swap index [ "+" prepend ] unless ] [ ] ? ]]
+sign_     = [+ ]                 => [[ '[ dup first CHAR: - = [ _ prefix ] unless ] ]]
+sign      = (sign_)?             => [[ [ ] or ]]
 
 width_    = "." ([0-9])*         => [[ second >digits '[ _ short head ] ]]
 width     = (width_)?            => [[ [ ] or ]]
@@ -68,9 +124,9 @@ fmt-b     = "b"                  => [[ [ >integer >bin ] ]]
 fmt-e     = digits "e"           => [[ first '[ _ format-scientific ] ]]
 fmt-E     = digits "E"           => [[ first '[ _ format-scientific >upper ] ]]
 fmt-f     = digits "f"           => [[ first '[ _ format-decimal ] ]]
-fmt-x     = "x"                  => [[ [ >hex ] ]]
-fmt-X     = "X"                  => [[ [ >hex >upper ] ]]
-unknown   = (.)*                 => [[ unknown-printf-directive ]]
+fmt-x     = "x"                  => [[ [ >integer >hex ] ]]
+fmt-X     = "X"                  => [[ [ >integer >hex >upper ] ]]
+unknown   = (.)*                 => [[ "" like unknown-format-directive ]]
 
 strings_  = fmt-c|fmt-C|fmt-s|fmt-S|fmt-u
 strings   = pad width strings_   => [[ <reversed> compose-all ]]
@@ -90,20 +146,25 @@ plain-text = (!("%").)+          => [[ >string ]]
 
 text      = (formats|plain-text)* => [[ ]]
 
-;EBNF
+]=]
 
-PRIVATE>
-
-MACRO: printf ( format-string -- )
+: printf-quot ( format-string -- format-quot n )
     parse-printf [ [ callable? ] count ] keep [
         dup string? [ 1quotation ] [ [ 1 - ] dip ] if
         over [ ndip ] 2curry
-    ] map nip [ compose-all ] [ length ] bi '[
+    ] map nip [ compose-all ] [ length ] bi ; inline
+
+PRIVATE>
+
+MACRO: printf ( format-string -- quot )
+    printf-quot '[
         @ output-stream get [ stream-write ] curry _ napply
     ] ;
 
-: sprintf ( format-string -- result )
-    [ printf ] with-string-writer ; inline
+MACRO: sprintf ( format-string -- quot )
+    printf-quot '[
+        @ _ "" nappend-as
+    ] ;
 
 : vprintf ( seq format-string -- )
     parse-printf output-stream get '[
@@ -117,17 +178,19 @@ MACRO: printf ( format-string -- )
 
 <PRIVATE
 
-: pad-00 ( n -- string ) number>string 2 CHAR: 0 pad-head ; inline
+: pad-00 ( n -- string )
+    number>string 2 CHAR: 0 pad-head ; inline
 
-: pad-000 ( n -- string ) number>string 3 CHAR: 0 pad-head ; inline
+: pad-000 ( n -- string )
+    number>string 3 CHAR: 0 pad-head ; inline
 
 : >time ( timestamp -- string )
-    [ hour>> ] [ minute>> ] [ second>> floor ] tri 3array
-    [ pad-00 ] map ":" join ; inline
+    [ hour>> ] [ minute>> ] [ second>> floor ] tri
+    [ pad-00 ] tri@ 3array ":" join ; inline
 
 : >date ( timestamp -- string )
-    [ month>> ] [ day>> ] [ year>> ] tri 3array
-    [ pad-00 ] map "/" join ; inline
+    [ month>> ] [ day>> ] [ year>> ] tri
+    [ pad-00 ] tri@ 3array "/" join ; inline
 
 : >datetime ( timestamp -- string )
     [
@@ -140,15 +203,15 @@ MACRO: printf ( format-string -- )
        } cleave
     ] output>array " " join ; inline
 
-: (week-of-year) ( timestamp day -- n )
+: week-of-year ( timestamp day -- n )
     [ dup clone 1 >>month 1 >>day day-of-week dup ] dip > [ 7 swap - ] when
     [ day-of-year ] dip 2dup < [ 0 2nip ] [ - 7 / 1 + >fixnum ] if ;
 
-: week-of-year-sunday ( timestamp -- n ) 0 (week-of-year) ; inline
+: week-of-year-sunday ( timestamp -- n ) 0 week-of-year ; inline
 
-: week-of-year-monday ( timestamp -- n ) 1 (week-of-year) ; inline
+: week-of-year-monday ( timestamp -- n ) 1 week-of-year ; inline
 
-EBNF: parse-strftime
+EBNF: parse-strftime [=[
 
 fmt-%     = "%"                  => [[ "%" ]]
 fmt-a     = "a"                  => [[ [ day-of-week day-abbreviation3 ] ]]
@@ -172,7 +235,7 @@ fmt-X     = "X"                  => [[ [ >time ] ]]
 fmt-y     = "y"                  => [[ [ year>> 100 mod pad-00 ] ]]
 fmt-Y     = "Y"                  => [[ [ year>> number>string ] ]]
 fmt-Z     = "Z"                  => [[ [ "Not yet implemented" throw ] ]]
-unknown   = (.)*                 => [[ "Unknown directive" throw ]]
+unknown   = (.)*                 => [[ "" like unknown-format-directive ]]
 
 formats_  = fmt-%|fmt-a|fmt-A|fmt-b|fmt-B|fmt-c|fmt-d|fmt-H|fmt-I|
             fmt-j|fmt-m|fmt-M|fmt-p|fmt-S|fmt-U|fmt-w|fmt-W|fmt-x|
@@ -184,11 +247,11 @@ plain-text = (!("%").)+          => [[ >string ]]
 
 text      = (formats|plain-text)* => [[ ]]
 
-;EBNF
+]=]
 
 PRIVATE>
 
-MACRO: strftime ( format-string -- )
+MACRO: strftime ( format-string -- quot )
     parse-strftime [
         dup string? [
             '[ _ swap push-all ]

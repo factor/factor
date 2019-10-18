@@ -71,7 +71,7 @@ M: array array-base-type first ;
 >>
 
 MACRO: <DIDATAFORMAT> ( dwFlags dwDataSize struct rgodf-array -- alien )
-    [ DIDATAFORMAT heap-size DIOBJECTDATAFORMAT heap-size ] 4 ndip
+    [ DIDATAFORMAT heap-size DIOBJECTDATAFORMAT heap-size ] 4dip
     [ nip length ] [ make-DIOBJECTDATAFORMAT-array-quot ] 2bi
     '[ _ _ _ _ _ @ DIDATAFORMAT <struct-boa> ] ;
 
@@ -835,7 +835,7 @@ MACRO: <DIDATAFORMAT> ( dwFlags dwDataSize struct rgodf-array -- alien )
 [ define-constants ] "windows.directx.dinput.constants" add-startup-hook
 
 : uninitialize ( variable quot -- )
-    [ [ get-global ] dip when* ] [ drop global delete-at ] 2bi ; inline
+    '[ _ when* f ] change-global ; inline
 
 : free-dinput-constants ( -- )
     {
@@ -851,4 +851,3 @@ MACRO: <DIDATAFORMAT> ( dwFlags dwDataSize struct rgodf-array -- alien )
     } [ [ rgodf>> free ] uninitialize ] each ;
 
 PRIVATE>
-

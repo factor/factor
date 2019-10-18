@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors pair-methods classes kernel sequences tools.test ;
 IN: pair-methods.tests
 
@@ -27,17 +28,17 @@ PAIR-M: barm thang blibble
 PAIR-M: barm zim blibble
     "coconut " class-names ;
 
-[ "vanilla zang-zim" ] [ zim new zang new blibble ] unit-test
+{ "vanilla zang-zim" } [ zim new zang new blibble ] unit-test
 
 ! args automatically swap to match most specific method
-[ "chocolate foom-zim" ] [ foom new zim  new blibble ] unit-test
-[ "chocolate foom-zim" ] [ zim  new foom new blibble ] unit-test
+{ "chocolate foom-zim" } [ foom new zim  new blibble ] unit-test
+{ "chocolate foom-zim" } [ zim  new foom new blibble ] unit-test
 
-[ "strawberry barm-barm" ] [ barm new barm new blibble ] unit-test
-[ "strawberry barm-foom" ] [ barm new foom new blibble ] unit-test
-[ "strawberry barm-foom" ] [ foom new barm new blibble ] unit-test
+{ "strawberry barm-barm" } [ barm new barm new blibble ] unit-test
+{ "strawberry barm-foom" } [ barm new foom new blibble ] unit-test
+{ "strawberry barm-foom" } [ foom new barm new blibble ] unit-test
 
-[ "coconut barm-zang" ] [ zang new barm new blibble ] unit-test
-[ "coconut barm-zim" ] [ barm new zim  new blibble ] unit-test
+{ "coconut barm-zang" } [ zang new barm new blibble ] unit-test
+{ "coconut barm-zim" } [ barm new zim  new blibble ] unit-test
 
 [ 1 2 blibble ] [ no-pair-method? ] must-fail-with

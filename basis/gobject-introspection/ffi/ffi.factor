@@ -12,7 +12,7 @@ IN: gobject-introspection.ffi
 
 : defer-c-type ( c-type-name -- c-type )
     deferred-type swap (CREATE-C-TYPE) [ typedef ] keep ;
-!     create-in dup
+!     create-word-in dup
 !     [ fake-definition ] [ undefined-def define ] bi ;
 
 :: defer-types ( types type-info-class -- )
@@ -180,9 +180,9 @@ M: type type>data-type
 
 : def-callback-type ( callback -- )
     {
-        [ drop current-library get ]
         [ return>> return-c-type ]
         [ c-type>> ]
+        [ drop current-library get ]
         [ ?suffix-parameters-with-error parameter-names&types ]
     } cleave make-callback-type define-inline ;
 
@@ -258,15 +258,15 @@ M: array-type field-type>c-type type>c-type ;
 
 :: def-signal ( signal type -- )
     signal {
-        [ drop current-library get ]
         [ return>> return-c-type ]
         [ type signal-name ]
+        [ drop current-library get ]
         [
             parameters>> type type>parameter prefix
             user-data-parameter suffix parameter-names&types
         ]
     } cleave make-callback-type define-inline ;
-    
+
 : def-signals ( signals type -- )
     [ def-signal ] curry each ;
 
@@ -304,7 +304,7 @@ M: array-type field-type>c-type type>c-type ;
     [
         [
             dup find-existing-boxed-type
-            [ nip ] [ c-type>> defer-c-type ] if*
+            [ ] [ c-type>> defer-c-type ] ?if
         ]
         [ name>> qualified-name ] bi
         boxed-info new swap register-type
@@ -323,7 +323,7 @@ M: array-type field-type>c-type type>c-type ;
 : def-classes ( classes -- ) [ def-class ] each ;
 
 : def-boxeds ( boxeds -- )
-    [ find-existing-boxed-type not ] filter
+    [ find-existing-boxed-type ] reject
     [ def-boxed-type ] each ;
 
 : def-records ( records -- )
@@ -360,4 +360,3 @@ M: array-type field-type>c-type type>c-type ;
 
 : def-ffi-repository ( repository -- )
     namespace>> def-namespace ;
-     

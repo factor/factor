@@ -14,13 +14,13 @@ $nl
 }
 "Getting all vocabularies from disk:"
 { $subsections
-    all-vocabs
-    all-vocabs-recursive
+    all-disk-vocabs-by-root
+    all-disk-vocabs-recursive
 }
 "Getting all vocabularies from disk whose names which match a string prefix:"
 { $subsections
-    child-vocabs
-    child-vocabs-recursive
+    disk-vocabs-for-prefix
+    disk-vocabs-recursive-for-prefix
 }
 "Words for modifying output:"
 { $subsections

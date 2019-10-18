@@ -1,7 +1,10 @@
 ! (c)2009 Joe Groff, see BSD license
-USING: accessors arrays assocs fry kernel math math.affine-transforms math.constants
-math.functions math.parser math.vectors memoize peg.ebnf sequences sequences.squish
-splitting strings xml.data xml.syntax ;
+
+USING: accessors arrays assocs fry kernel math
+math.affine-transforms math.functions math.parser math.trig
+peg.ebnf sequences sequences.squish splitting strings xml.data
+xml.syntax multiline ;
+
 IN: svg
 
 XML-NS: svg-name http://www.w3.org/2000/svg
@@ -14,9 +17,7 @@ XML-NS: inkscape-name http://www.inkscape.org/namespaces/inkscape
     [ string>number ] [ [ string>number 10^ ] [ 1 ] if* ] bi* *
     >float ;
 
-: degrees ( deg -- rad ) pi * 180.0 / ;
-
-EBNF: svg-transform>affine-transform
+EBNF: svg-transform>affine-transform [=[
 
 transforms =
     transform:m comma-wsp+ transforms:n => [[ m n a. ]]
@@ -45,13 +46,13 @@ scale =
         => [[ sx sy sx or <scale> ]]
 rotate =
     "rotate" wsp* "(" wsp* number:a ( comma-wsp number:cx comma-wsp number:cy => [[ cx cy 2array ]])?:c wsp* ")"
-        => [[ a degrees <rotation> c [ center-rotation ] when* ]]
+        => [[ a deg>rad <rotation> c [ center-rotation ] when* ]]
 skewX =
     "skewX" wsp* "(" wsp* number:a wsp* ")"
-        => [[ { 1.0 0.0 } a degrees tan 1.0 2array { 0.0 0.0 } <affine-transform> ]]
+        => [[ { 1.0 0.0 } a deg>rad tan 1.0 2array { 0.0 0.0 } <affine-transform> ]]
 skewY =
     "skewY" wsp* "(" wsp* number:a wsp* ")"
-        => [[ 1.0 a degrees tan 2array { 0.0 1.0 } { 0.0 0.0 } <affine-transform> ]]
+        => [[ 1.0 a deg>rad tan 2array { 0.0 1.0 } { 0.0 0.0 } <affine-transform> ]]
 number =
     sign? (floating-point-constant | integer-constant) => [[ squish-strings svg-string>number ]]
 comma-wsp =
@@ -71,12 +72,12 @@ exponent =
 sign =
     "+" => [[ f ]] | "-"
 digit-sequence = [0-9]+ => [[ >string ]]
-wsp = (" " | "\t" | "\r" | "\n")
+wsp = [ \t\r\n]
 
 transform-list = wsp* transforms?:t wsp*
     => [[ t [ identity-transform ] unless* ]]
 
-;EBNF
+]=]
 
 : tag-transform ( tag -- transform )
     "transform" svg-name attr svg-transform>affine-transform ;
@@ -95,7 +96,7 @@ TUPLE: elliptical-arc radii x-axis-rotation large-arc? sweep? p relative? ;
 : (set-relative) ( args rel -- args )
     '[ [ _ >>relative? drop ] each ] keep ;
 
-EBNF: svg-path>array
+EBNF: svg-path>array [=[
 
 moveto-drawto-command-groups =
     moveto-drawto-command-group:first wsp* moveto-drawto-command-groups:rest
@@ -214,11 +215,11 @@ fractional-constant = digit-sequence? "." digit-sequence | digit-sequence "."
 exponent = ( "e" | "E" ) sign? digit-sequence
 sign = "+" => [[ drop f ]] | "-"
 digit-sequence = [0-9]+ => [[ >string ]]
-wsp = (" " | "\t" | "\r" | "\n")
+wsp = [ \t\r\n]
 
 svg-path = wsp* moveto-drawto-command-groups?:x wsp* => [[ x ]]
 
-;EBNF
+]=]
 
 : tag-d ( tag -- d )
     "d" svg-name attr svg-path>array ;

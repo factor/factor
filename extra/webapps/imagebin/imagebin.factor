@@ -1,10 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors furnace.actions furnace.redirection
-html.forms http http.server http.server.dispatchers
-io.directories io.encodings.utf8 io.files io.pathnames
-kernel math.parser multiline namespaces sequences urls 
-math ;
+USING: accessors furnace.actions furnace.redirection http.server
+http.server.dispatchers io.directories io.encodings.utf8 io.files
+io.pathnames kernel math math.parser namespaces sequences
+webapps.utils ;
 IN: webapps.imagebin
 
 TUPLE: imagebin < dispatcher path n ;
@@ -15,7 +14,7 @@ TUPLE: imagebin < dispatcher path n ;
 
 : next-image-path ( -- path )
     imagebin get
-    [ path>> ] [ [ 1 + ] change-n n>> number>string ] bi append-path ; 
+    [ path>> ] [ [ 1 + ] change-n n>> number>string ] bi append-path ;
 
 M: imagebin call-responder*
     [ imagebin set ] [ call-next-method ] bi ;
@@ -43,4 +42,6 @@ M: imagebin call-responder*
         <upload-image-action> "upload-image" add-responder
         <uploaded-image-action> "uploaded-image" add-responder ;
 
-"resource:images" <imagebin> main-responder set-global
+: start-imagebin ( -- )
+    "resource:images" <imagebin> main-responder set-global
+    run-test-httpd ;

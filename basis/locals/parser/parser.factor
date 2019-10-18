@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators effects.parser
-generic.parser kernel lexer locals.errors fry
-locals.rewrite.closures locals.types make namespaces parser
-quotations sequences splitting words vocabs.parser ;
+USING: accessors arrays assocs effects.parser fry generic.parser
+kernel lexer locals.errors locals.rewrite.closures locals.types
+make namespaces parser quotations sequences splitting
+vocabs.parser words ;
 IN: locals.parser
 
 SYMBOL: in-lambda?
@@ -27,47 +27,40 @@ ERROR: invalid-local-name name ;
     [ [ make-local ] map ] H{ } make ;
 
 : parse-local-defs ( -- words assoc )
-    [ "|" [ make-local ] map-tokens ] H{ } make ;
+    "|" parse-tokens make-locals ;
 
 SINGLETON: lambda-parser
 
-SYMBOL: locals
-
-: ((parse-lambda)) ( assoc quot -- quot' )
-    '[
-        in-lambda? on
-        lambda-parser quotation-parser set
-        [ locals set ]
-        [ use-words @ ]
-        [ unuse-words ] tri
-    ] with-scope ; inline
+: with-lambda-scope ( assoc reader-quot: ( -- quot ) -- quot )
+    H{
+        { in-lambda? t }
+        { quotation-parser lambda-parser }
+    } swap '[
+        [ use-words @ ] [ unuse-words ] bi
+    ] with-variables ; inline
 
 : (parse-lambda) ( assoc -- quot )
-    [ \ ] parse-until >quotation ] ((parse-lambda)) ;
+    [ \ ] parse-until >quotation ] with-lambda-scope ;
 
 : parse-lambda ( -- lambda )
     parse-local-defs
     (parse-lambda) <lambda>
     ?rewrite-closures ;
 
-: parse-multi-def ( locals -- multi-def )
-    [ [ ")" [ make-local ] map-tokens ] H{ } make ] dip
-    swap assoc-union! drop <multi-def> ;
+: parse-multi-def ( -- multi-def assoc )
+    ")" parse-tokens make-locals [ <multi-def> ] dip ;
 
-: parse-def ( name/paren locals -- def )
-    over "(" =
-    [ nip parse-multi-def ]
-    [ [ [ make-local ] H{ } make ] dip swap assoc-union! drop <def> ]
-    if ;
+: parse-single-def ( name -- def assoc )
+    [ make-local <def> ] H{ } make ;
+
+: update-locals ( assoc -- )
+    qualified-vocabs last words>> swap assoc-union! drop ;
+
+: parse-def ( name/paren -- def )
+    dup "(" = [ drop parse-multi-def ] [ parse-single-def ] if update-locals ;
 
 M: lambda-parser parse-quotation ( -- quotation )
     H{ } clone (parse-lambda) ;
-
-: parse-binding ( end -- pair/f )
-    scan-token {
-        { [ 2dup = ] [ 2drop f ] }
-        [ nip scan-object 2array ]
-    } cond ;
 
 : parse-let ( -- form )
     H{ } clone (parse-lambda) <let> ?rewrite-closures ;
@@ -77,13 +70,13 @@ M: lambda-parser parse-quotation ( -- quotation )
     dup
     in>> [ dup pair? [ first ] when ] map make-locals ;
 
-: (parse-locals-definition) ( effect vars assoc reader -- word quot effect )
-    ((parse-lambda)) <lambda>
+: (parse-locals-definition) ( effect vars assoc reader-quot -- word quot effect )
+    with-lambda-scope <lambda>
     [ nip "lambda" set-word-prop ]
     [ nip rewrite-closures dup length 1 = [ first ] [ bad-rewrite ] if ]
     [ drop nip ] 3tri ; inline
 
-: parse-locals-definition ( word reader -- word quot effect )
+: parse-locals-definition ( word reader-quot -- word quot effect )
     [ parse-locals ] dip (parse-locals-definition) ; inline
 
 : parse-locals-method-definition ( word reader -- word quot effect )

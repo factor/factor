@@ -1,30 +1,44 @@
 ! Copyright (C) 2009 Bruno Deferrari.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar calendar.format destructors fry io io.encodings.8-bit
-io.files io.pathnames irc.client irc.client.chats irc.messages
-irc.messages.base kernel make namespaces sequences threads
-irc.logbot.log-line io.encodings.8-bit.latin1 ;
+USING: accessors calendar destructors formatting fry io io.directories
+io.encodings.utf8 io.files io.pathnames irc.client irc.client.chats
+irc.logbot.log-line irc.messages.base kernel namespaces sequences
+splitting threads ;
 IN: irc.logbot
 
 CONSTANT: bot-channel "#concatenative"
-CONSTANT: log-directory "/tmp/logs"
+CONSTANT: default-log-directory "resource:logs/irc"
+CONSTANT: default-nickserv-handle "flogbot2"
+
+SYMBOL: ircbot-log-directory
+SYMBOL: nickserv-handle
+SYMBOL: nickserv-password
 
 SYMBOL: current-day
 SYMBOL: current-stream
 
 : bot-profile ( -- obj )
-    "irc.freenode.org" 6667 "flogger" f <irc-profile> ;
+    "irc.freenode.org" 6667
+    nickserv-handle get default-nickserv-handle or
+    nickserv-password get <irc-profile> ;
 
 : add-timestamp ( string timestamp -- string )
-    timestamp>hms [ "[" % % "] " % % ] "" make ;
+    "[%H:%M:%S] " strftime prepend ;
+
+: make-log-path ( -- path )
+    ircbot-log-directory get default-log-directory or
+    bot-channel "#" ?head drop
+    append-path ;
 
 : timestamp-path ( timestamp -- path )
-    timestamp>ymd ".log" append log-directory prepend-path ;
+    "%Y-%m-%d.log" strftime
+    make-log-path dup make-directories
+    prepend-path ;
 
 : update-current-stream ( timestamp -- )
     current-stream get [ dispose ] when*
     [ day-of-year current-day set ]
-    [ timestamp-path latin1 <file-appender> ] bi
+    [ timestamp-path utf8 <file-appender> ] bi
     current-stream set ;
 
 : same-day? ( timestamp -- ? ) day-of-year current-day get = ;

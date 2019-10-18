@@ -23,25 +23,27 @@ SLOT: i
 : <sequence-copy> ( dst n src-i src dst-i -- n copy )
     [ ] curry 3curry dip <copy> ; inline
 
-: ((sequence-read-unsafe)) ( n buf stream offset -- count )
+: sequence-copy-unsafe ( n buf stream offset -- count )
     [
         [ (sequence-read-length) ]
         [ [ dup pick + ] change-i underlying>> ] bi
     ] dip [ <sequence-copy> (copy) drop ] 3curry keep ; inline
 
+ERROR: not-a-byte-array obj ;
 : check-byte-array ( buf stream offset -- buf stream offset )
-    pick byte-array? [ "not a byte array" throw ] unless ; inline
+    pick byte-array? [ pick not-a-byte-array ] unless ; inline
 
+ERROR: not-a-string obj ;
 : check-string ( buf stream offset -- buf stream offset )
-    pick string? [ "not a string" throw ] unless ; inline
+    pick string? [ pick not-a-string ] unless ; inline
 
 : (sequence-read-unsafe) ( n buf stream -- count )
     [ integer>fixnum ]
     [ dup slice? [ [ seq>> ] [ from>> ] bi ] [ 0 ] if ]
     [
-        swap over stream-element-type +byte+ eq?
-        [ check-byte-array ((sequence-read-unsafe)) ]
-        [ check-string ((sequence-read-unsafe)) ] if
+        tuck stream-element-type +byte+ eq?
+        [ check-byte-array sequence-copy-unsafe ]
+        [ check-string sequence-copy-unsafe ] if
     ] tri* ; inline
 
 PRIVATE>
@@ -61,7 +63,7 @@ PRIVATE>
     [ find-separator ] keep
     [ [ (sequence-read-unsafe) ] (read-into-new) ]
     [ [ 1 + ] change-i drop ]
-    [ stream-element-type +byte+ eq? B{ } "" ? or ] tri swap ; inline
+    [ stream-exemplar or ] tri swap ; inline
 
 PRIVATE>
 

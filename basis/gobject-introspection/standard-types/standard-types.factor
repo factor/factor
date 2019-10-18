@@ -38,7 +38,7 @@ int lookup-c-type clone
     [ >c-bool ] >>unboxer-quot
     [ c-bool> ] >>boxer-quot
     object >>boxed-class
-"gboolean" create-in typedef
+"gboolean" create-word-in typedef
 
 STRUCT: longdouble { data char[10] } ;
 >>

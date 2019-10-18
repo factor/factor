@@ -5,6 +5,9 @@ IN: arrays
 
 BUILTIN: array { length array-capacity read-only initial: 0 } ;
 
+PRIMITIVE: <array> ( n elt -- array )
+PRIMITIVE: resize-array ( n array -- new-array )
+
 M: array clone (clone) ; inline
 M: array length length>> ; inline
 M: array nth-unsafe [ integer>fixnum ] dip array-nth ; inline
@@ -22,4 +25,4 @@ INSTANCE: array sequence
 : 3array ( x y z -- array ) { } 3sequence ; inline
 : 4array ( w x y z -- array ) { } 4sequence ; inline
 
-PREDICATE: pair < array length 2 number= ;
+PREDICATE: pair < array length>> 2 number= ;

@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax namespaces kernel words
-sequences math math.bitwise math.vectors colors
-io.encodings.utf16n classes.struct accessors ;
+USING: alien.c-types alien.syntax classes.struct colors
+io.encodings.utf16n io.encodings.utf8 kernel math math.bitwise
+math.vectors sequences ;
 FROM: alien.c-types => float short ;
 IN: windows.types
 
@@ -72,6 +72,8 @@ TYPEDEF: size_t SIZE_T
 TYPEDEF: ptrdiff_t SSIZE_T
 
 TYPEDEF: { c-string utf16n } LPCSTR
+TYPEDEF: { c-string utf16n } LPTCSTR
+
 TYPEDEF: { c-string utf16n } LPWSTR
 TYPEDEF: WCHAR       TCHAR
 TYPEDEF: LPWSTR      LPTCH
@@ -126,13 +128,13 @@ TYPEDEF: DWORD               LGRPID
 TYPEDEF: LONG_PTR            LPARAM
 TYPEDEF: BOOL*               LPBOOL
 TYPEDEF: BYTE*               LPBYTE
+
 TYPEDEF: { c-string utf16n } LPCWSTR
 ! TYPEDEF: WCHAR*              LPWSTR
 
-TYPEDEF: { c-string utf16n } LPSTR
+TYPEDEF: { c-string utf8 } LPSTR
 TYPEDEF: { c-string utf16n } LPCTSTR
 TYPEDEF: { c-string utf16n } LPWTSTR
-
 TYPEDEF: { c-string utf16n } LPTSTR
 TYPEDEF: LPCSTR      PCTSTR
 TYPEDEF: LPSTR       PTSTR
@@ -191,6 +193,8 @@ TYPEDEF: LPVOID              SC_LOCK
 TYPEDEF: HANDLE              SERVICE_STATUS_HANDLE
 TYPEDEF: LONGLONG            USN
 TYPEDEF: UINT_PTR            WPARAM
+TYPEDEF: DWORD               ACCESS_MASK
+TYPEDEF: ACCESS_MASK*        PACCESS_MASK
 
 TYPEDEF: size_t socklen_t
 
@@ -271,7 +275,8 @@ TYPEDEF: void* PAINTSTRUCT
 
 STRUCT: POINT
     { x LONG }
-    { y LONG } ; 
+    { y LONG } ;
+TYPEDEF: POINT* LPPOINT
 
 STRUCT: SIZE
     { cx LONG }
@@ -402,3 +407,6 @@ STRUCT: TEXTMETRICW
 TYPEDEF: TEXTMETRICW* LPTEXTMETRIC
 
 TYPEDEF: ULONG PROPID
+
+CALLBACK: BOOL WNDENUMPROC ( HWND hWnd, LPARAM lParam )
+CALLBACK: LRESULT HOOKPROC ( int nCode, WPARAM wParam, LPARAM lParam )

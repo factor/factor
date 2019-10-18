@@ -4,16 +4,13 @@ USING: accessors arrays assocs binary-search grouping kernel
 locals make math math.order sequences sequences.private sorting ;
 IN: interval-maps
 
+! Intervals are triples of { start end value }
 TUPLE: interval-map { array array read-only } ;
 
 <PRIVATE
 
-ALIAS: start first-unsafe
-ALIAS: end second-unsafe
-ALIAS: value third-unsafe
-
 : find-interval ( key interval-map -- interval-node )
-    array>> [ start <=> ] with search nip ; inline
+    array>> [ first-unsafe <=> ] with search nip ; inline
 
 : interval-contains? ( key interval-node -- ? )
     first2-unsafe between? ; inline
@@ -22,7 +19,7 @@ ALIAS: value third-unsafe
     [ [ dup number? [ dup 2array ] when ] dip ] { } assoc-map-as ;
 
 : disjoint? ( node1 node2 -- ? )
-    [ end ] [ start ] bi* < ;
+    [ second-unsafe ] [ first-unsafe ] bi* < ;
 
 : ensure-disjoint ( intervals -- intervals )
     dup [ disjoint? ] monotonic?
@@ -42,14 +39,14 @@ PRIVATE>
     check-interval-map
     [ drop ] [ find-interval ] 2bi
     [ nip ] [ interval-contains? ] 2bi
-    [ value t ] [ drop f f ] if ; inline
+    [ third-unsafe t ] [ drop f f ] if ; inline
 
 : interval-at ( key map -- value ) interval-at* drop ; inline
 
 : interval-key? ( key map -- ? ) interval-at* nip ; inline
 
 : interval-values ( map -- values )
-    check-interval-map array>> [ value ] map ;
+    check-interval-map array>> [ third-unsafe ] map ;
 
 : <interval-map> ( specification -- map )
     all-intervals [ first-unsafe second-unsafe ] sort-with

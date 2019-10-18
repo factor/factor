@@ -1,34 +1,21 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators combinators.short-circuit fry kernel make math
-math.bitwise math.functions math.order math.primes.erato
+USING: combinators combinators.short-circuit fry kernel locals
+math math.bitwise math.functions math.order math.primes.erato
 math.primes.erato.private math.primes.miller-rabin math.ranges
 literals random sequences sets vectors ;
 IN: math.primes
 
 <PRIVATE
 
-: look-in-bitmap ( n -- ? ) $[ 8999999 sieve ] marked-unsafe? ; inline
+: look-in-bitmap ( n -- ? )
+    integer>fixnum $[ 8,999,999 sieve ] marked-unsafe? ; inline
 
 : (prime?) ( n -- ? )
-    dup 8999999 <= [ look-in-bitmap ] [ miller-rabin ] if ;
+    dup 8,999,999 <= [ look-in-bitmap ] [ miller-rabin ] if ;
 
-! In order not to reallocate large vectors, we compute the upper bound
-! of the number of primes in a given interval. We use a double inequality given
-! by Pierre Dusart in http://www.ams.org/mathscinet-getitem?mr=99d:11133
-! for x > 598. Under this limit, we know that there are at most 108 primes.
-: upper-pi ( x -- y )
-    dup log [ / ] [ 1.2762 swap / 1 + ] bi * ceiling ;
-
-: lower-pi ( x -- y )
-    dup log [ / ] [ 0.992 swap / 1 + ] bi * floor ;
-
-: <primes-vector> ( low high -- vector )
-    swap [ [ upper-pi ] [ lower-pi ] bi* - >integer
-    108 max 10000 min <vector> ] keep
-    3 < [ [ 2 swap push ] keep ] when ;
-
-: simple? ( n -- ? ) { [ even? ] [ 3 divisor? ] [ 5 divisor? ] } 1|| ;
+: simple? ( n -- ? )
+    { [ even? ] [ 3 divisor? ] [ 5 divisor? ] } 1|| ;
 
 PRIVATE>
 
@@ -48,10 +35,29 @@ PRIVATE>
 
 <PRIVATE
 
+: <primes-range> ( low high -- range )
+    [ 3 max dup even? [ 1 + ] when ] dip 2 <range> ;
+
+! In order not to reallocate large vectors, we compute the upper
+! bound of the number of primes in a given interval. We use a
+! double inequality given by Pierre Dusart in
+! http://www.ams.org/mathscinet-getitem?mr=99d:11133 for x >
+! 598. Under this limit, we know that there are at most 108
+! primes.
+: upper-pi ( x -- y )
+    dup log [ / ] [ 1.2762 swap / 1 + ] bi * ceiling ;
+
+: lower-pi ( x -- y )
+    dup log [ / ] [ 0.992 swap / 1 + ] bi * floor ;
+
+:: <primes-vector> ( low high -- vector )
+    high upper-pi low lower-pi - >integer
+    108 10000 clamp <vector>
+    low 3 < [ 2 suffix! ] when ;
+
 : (primes-between) ( low high -- seq )
-    [ [ 3 max dup even? [ 1 + ] when ] dip 2 <range> ]
-    [ <primes-vector> ] 2bi
-    [ '[ [ prime? ] _ push-if ] each ] keep clone ;
+    [ <primes-range> ] [ <primes-vector> ] 2bi
+    [ '[ [ prime? ] _ push-if ] each ] keep ;
 
 PRIVATE>
 
@@ -64,11 +70,13 @@ PRIVATE>
         [ (primes-between) ]
     } cond ;
 
-: primes-upto ( n -- seq ) 2 swap primes-between ;
+: primes-upto ( n -- seq )
+    2 swap primes-between ;
 
-: nprimes ( n -- seq ) [ 2 swap [ dup , next-prime ] times ] { } make nip ;
+: nprimes ( n -- seq )
+    2 swap [ [ next-prime ] keep ] replicate nip ;
 
-: coprime? ( a b -- ? ) gcd nip 1 = ; foldable
+: coprime? ( a b -- ? ) simple-gcd 1 = ; foldable
 
 : random-prime ( numbits -- p )
     [ ] [ 2^ ] [ random-bits* next-prime ] tri
@@ -79,18 +87,10 @@ PRIVATE>
 
 ERROR: no-relative-prime n ;
 
-<PRIVATE
-
-: (find-relative-prime) ( n guess -- p )
-    over 1 <= [ over no-relative-prime ] when
-    dup 1 <= [ drop 3 ] when
-    [ 2dup coprime? ] [ 2 + ] until nip ;
-
-PRIVATE>
-
 : find-relative-prime* ( n guess -- p )
-    #! find a prime relative to n with initial guess
-    >odd (find-relative-prime) ;
+    [ dup 1 <= [ no-relative-prime ] when ]
+    [ >odd dup 1 <= [ drop 3 ] when ] bi*
+    [ 2dup coprime? ] [ 2 + ] until nip ;
 
 : find-relative-prime ( n -- p )
     dup random find-relative-prime* ;

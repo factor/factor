@@ -35,16 +35,16 @@ HELP: query>assoc
 { $description "Parses a URL query string and URL-decodes each component." }
 { $notes "This word is used by the implementation of " { $link "urls" } ". It is also used by the HTTP server to parse POST requests." }
 { $examples
-    { $unchecked-example
-        "USING: prettyprint urls.encoding ;"
+    { $example
+        "USING: linked-assocs prettyprint urls.encoding ;"
         "\"gender=female&agefrom=22&ageto=28&location=Omaha+NE\""
         "query>assoc ."
-        """H{
-    { "gender" "female" }
-    { "agefrom" "22" }
-    { "ageto" "28" }
-    { "location" "Omaha NE" }
-}"""
+        "LH{
+    { \"gender\" \"female\" }
+    { \"agefrom\" \"22\" }
+    { \"ageto\" \"28\" }
+    { \"location\" \"Omaha NE\" }
+}"
     }
 } ;
 

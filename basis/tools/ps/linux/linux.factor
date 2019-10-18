@@ -1,23 +1,24 @@
 ! Copyright (C) 2012 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs io.directories io.pathnames kernel
-math.parser prettyprint sequences splitting system
-tools.ps unix.linux.proc ;
+USING: accessors arrays assocs continuations io.directories kernel
+math.parser sequences splitting system tools.ps unix.linux.proc ;
 IN: tools.ps.linux
 
 ! If cmdline is empty, read the filename from /proc/pid/stat
-: ps-cmdline ( path -- path string )
+: ps-cmdline ( path -- string )
     dup parse-proc-pid-cmdline [
-        dup parse-proc-pid-stat filename>>
+        parse-proc-pid-stat filename>>
         [ "()" member? ] trim
         "[" "]" surround
     ] [
-        "\0" split " " join
+        nip "\0" split harvest " " join
     ] if-empty ;
+
+: safe-ps-cmdline ( path -- string/f )
+    [ ps-cmdline ] [ 2drop f ] recover ;
 
 M: linux ps ( -- assoc )
     "/proc" [
-        "." directory-files
-        [ file-name string>number ] filter
-        [ ps-cmdline ] { } map>assoc
+        "." directory-files [ string>number ] filter
+        [ dup safe-ps-cmdline 2array ] map sift-values
     ] with-directory ;

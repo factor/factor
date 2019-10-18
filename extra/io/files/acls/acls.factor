@@ -15,5 +15,3 @@ SYMBOLS: +read+ +write+ +append+ +execute+ ;
 
 ! Directory inheritance
 SYMBOLS: +file-inherit+ +directory-inherit+ +limit-inherit+ only-inherit+ ;
-
-

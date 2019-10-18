@@ -37,7 +37,7 @@ CONSTANT: IN_MASK_ADD 0x20000000   ! add to the mask of an already existing watc
 CONSTANT: IN_ISDIR 0x40000000      ! event occurred against dir
 CONSTANT: IN_ONESHOT 0x80000000    ! only send event once
 
-CONSTANT: IN_CHANGE_EVENTS 
+CONSTANT: IN_CHANGE_EVENTS
     flags{
         IN_MODIFY IN_ATTRIB IN_MOVED_FROM
         IN_MOVED_TO IN_DELETE IN_CREATE IN_DELETE_SELF
@@ -52,6 +52,6 @@ CONSTANT: IN_ALL_EVENTS
         IN_MOVE_SELF
     }
 
-FUNCTION: int inotify_init ( ) ;
-FUNCTION: int inotify_add_watch ( int fd, c-string name, uint mask  ) ;
-FUNCTION: int inotify_rm_watch ( int fd, uint wd ) ;
+FUNCTION: int inotify_init ( )
+FUNCTION: int inotify_add_watch ( int fd, c-string name, uint mask  )
+FUNCTION: int inotify_rm_watch ( int fd, uint wd )

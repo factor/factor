@@ -1,16 +1,9 @@
-USING: help.markup help.syntax quotations strings ;
+USING: help.markup help.syntax io.directories io.pathnames
+quotations strings ;
 IN: io.files.unique
 
-HELP: default-temporary-directory
-{ $values
-     { "path" "a pathname string" }
-}
-{ $description "A hook that returns the path of the temporary directory in a platform-specific way. Does not guarantee that path is writable by your user." } ;
-
 HELP: touch-unique-file
-{ $values
-     { "path" "a pathname string" }
-}
+{ $values { "path" "a pathname string" } }
 { $description "Creates a unique file in a platform-specific way. The file is guaranteed not to exist and is openable by your user." } ;
 
 HELP: unique-length
@@ -21,92 +14,46 @@ HELP: unique-retries
 
 { unique-length unique-retries } related-words
 
-HELP: make-unique-file
-{ $values { "prefix" string } { "suffix" string }
-{ "path" "a pathname string" } }
-{ $description "Creates a file that is guaranteed not to exist in the directory stored in " { $link current-temporary-directory } ". The file name is composed of a prefix, a number of random digits and letters, and the suffix. Returns the full pathname." }
-{ $errors "Throws an error if a new unique file cannot be created after a number of tries. The most likely error is incorrect directory permissions on the temporary directory." } ;
+HELP: unique-file
+{ $values { "prefix" string } { "suffix" string } { "path" "a pathname string" } }
+{ $description "Creates a file that is guaranteed not to exist in the " { $link current-directory } ". The file name is composed of a prefix, a " { $link unique-length } " number of random digits and letters, and the suffix. Returns the full pathname." }
+{ $errors "Throws an error if a new unique file cannot be created after a " { $link unique-retries } " number of tries. The most likely error is incorrect directory permissions on the " { $link current-directory } "." } ;
 
-{ unique-file make-unique-file cleanup-unique-file } related-words
+{ unique-file cleanup-unique-file } related-words
 
 HELP: cleanup-unique-file
-{ $values { "prefix" string } { "suffix" string }
-{ "quot" quotation } }
-{ $description "Creates a file with " { $link make-unique-file } " and calls the quotation with the path name on the stack." }
-{ $notes "The unique file will be deleted after calling this word." } ;
+{ $values { "prefix" string } { "suffix" string } { "quot" { $quotation ( ..a path -- ..b ) } } }
+{ $description "Creates a file with " { $link unique-file } " and calls the quotation with the path name on the stack." }
+{ $notes "The unique file will be deleted after calling this word, even if an error is thrown in the quotation." } ;
 
 HELP: unique-directory
 { $values { "path" "a pathname string" } }
-{ $description "Creates a directory in the value in " { $link current-temporary-directory } " that is guaranteed not to exist in and returns the full pathname." }
-{ $errors "Throws an error if the directory cannot be created after a number of tries. The most likely error is incorrect directory permissions on the temporary directory." } ;
+{ $description "Creates a directory in the " { $link current-directory } " that is guaranteed not to exist and return the full pathname. The mechanism for the guarantee of uniqueness is retrying with a " { $link unique-length } " randomly generated filename until " { $link make-directory } " succeeds." }
+{ $errors "Throws an error if the directory cannot be created after a " { $link unique-retries } " number of tries. The most likely error is incorrect directory permissions on the " { $link current-directory } "." } ;
+
+HELP: with-unique-directory
+{ $values { "quot" quotation } { "path" "a pathname string" } }
+{ $description "Creates a directory with " { $link unique-directory } " and calls the quotation using " { $link with-directory } " to set it as the " { $link current-directory } "." } ;
 
 HELP: cleanup-unique-directory
 { $values { "quot" quotation } }
-{ $description "Creates a directory with " { $link unique-directory } " and calls the quotation with the pathname on the stack using the " { $link with-temporary-directory } " combinator. The quotation can access the " { $link current-temporary-directory } " symbol for the name of the temporary directory. Subsequent unique files will be created in this unique directory until the combinator returns." }
-{ $notes "The directory will be deleted after calling this word, even if an error is thrown in the quotation. This combinator is like " { $link with-unique-directory } " but does not delete the directory." } ;
+{ $description "Creates a directory with " { $link unique-directory } " and calls the quotation using " { $link with-directory } " to set it as the " { $link current-directory } "." }
+{ $notes "The unique directory will be deleted after calling this word, even if an error is thrown in the quotation." } ;
 
-HELP: with-unique-directory
-{ $values
-     { "quot" quotation }
-     { "path" "a pathname string" }
-}
-{ $description "Creates a directory with " { $link unique-directory } " and calls the quotation with the pathname on the stack using the " { $link with-temporary-directory } " combinator. The quotation can access the " { $link current-temporary-directory } " symbol for the name of the temporary directory. Subsequent unique files will be created in this unique directory until the combinator returns." } ;
-
-HELP: copy-file-unique
-{ $values
-    { "path" "a pathname string" } { "prefix" string } { "suffix" string }
-    { "path'" "a pathname string" }
-}
-{ $description "Copies " { $snippet "path" } " to a new unique file in the directory stored in " { $link current-temporary-directory } ". Returns the new path." } ;
-
-HELP: move-file-unique
-{ $values
-    { "path" "a pathname string" } { "prefix" string } { "suffix" string }
-    { "path'" "a pathname string" }
-}
-{ $description "Moves " { $snippet "path" } " to a new unique file in the directory stored in " { $link current-temporary-directory } ". Returns the new path." } ;
-
-HELP: current-temporary-directory
-{ $values
-     { "value" "a path" }
-}
-{ $description "The temporary directory used for creating unique files and directories." } ;
-
-HELP: unique-file
-{ $values
-     { "prefix" string }
-     { "path" "a pathname string" }
-}
-{ $description "Creates a temporary file in the directory stored in " { $link current-temporary-directory } " and outputs the path name." } ;
-
-HELP: with-temporary-directory
-{ $values
-     { "path" "a pathname string" } { "quot" quotation }
-}
-{ $description "Sets " { $link current-temporary-directory } " to " { $snippet "path" } " and calls the quotation, restoring the previous temporary path after execution completes." } ;
+{ unique-directory with-unique-directory cleanup-unique-directory } related-words
 
 ARTICLE: "io.files.unique" "Unique files"
-"The " { $vocab-link "io.files.unique" } " vocabulary implements cross-platform unique file creation in temporary directories in a high-level and secure way." $nl
-"Changing the temporary path:"
-{ $subsections current-temporary-directory }
+"The " { $vocab-link "io.files.unique" } " vocabulary implements cross-platform unique file creation in a high-level and secure way." $nl
 "Creating unique files:"
 { $subsections
     unique-file
     cleanup-unique-file
-    make-unique-file
 }
 "Creating unique directories:"
 { $subsections
     unique-directory
     with-unique-directory
     cleanup-unique-directory
-}
-"Default temporary directory:"
-{ $subsections default-temporary-directory }
-"Copying and moving files to a new unique file:"
-{ $subsections
-    copy-file-unique
-    move-file-unique
 } ;
 
 ABOUT: "io.files.unique"

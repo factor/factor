@@ -1,16 +1,14 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.strings arrays assocs classes
+USING: accessors alien alien.strings arrays assocs classes
 classes.builtin classes.mixin classes.tuple classes.tuple.parser
-combinators combinators.short-circuit compiler.errors
-compiler.units continuations definitions destructors
-effects.parser fry generic generic.math generic.parser
-generic.single grouping io io.encodings io.styles kernel
-kernel.private lexer make math math.order math.parser namespaces
-parser prettyprint sequences sequences.private slots
-source-files.errors strings strings.parser summary system vocabs
-vocabs.loader vocabs.parser words ;
-FROM: namespaces => change-global ;
+combinators combinators.short-circuit compiler.errors compiler.units
+continuations definitions destructors effects.parser fry generic
+generic.math generic.parser generic.single grouping io io.encodings
+io.styles kernel kernel.private lexer libc make math math.order
+math.parser math.ratios namespaces parser prettyprint sequences
+sequences.private slots source-files.errors strings strings.parser
+summary system vocabs vocabs.loader vocabs.parser words ;
 IN: debugger
 
 GENERIC: error-help ( error -- topic )
@@ -84,7 +82,7 @@ M: string error. print ;
     "Object did not survive image save/load: " write third . ;
 
 : io-error. ( error -- )
-    "I/O error #" write third . ;
+    "I/O error #" write third [ . ] [ strerror print ] bi ;
 
 : type-check-error. ( obj -- )
     "Type check error" print
@@ -103,9 +101,6 @@ HOOK: signal-error. os ( obj -- )
 
 : fixnum-range-error. ( obj -- )
     "Cannot convert to fixnum: " write third . ;
-
-: c-string-error. ( obj -- )
-    "Cannot convert to C string: " write third . ;
 
 : ffi-error. ( obj -- )
     "FFI error" print drop ;
@@ -139,9 +134,6 @@ HOOK: signal-error. os ( obj -- )
 : memory-error. ( error -- )
     "Memory protection fault at address " write third .h ;
 
-: primitive-error. ( error -- )
-    "Unimplemented primitive" print drop ;
-
 : fp-trap-error. ( error -- )
     "Floating point trap" print drop ;
 
@@ -154,7 +146,7 @@ HOOK: signal-error. os ( obj -- )
 PREDICATE: vm-error < array
     dup length 2 < [ drop f ] [
         {
-            [ first-unsafe "kernel-error" = ]
+            [ first-unsafe KERNEL-ERROR = ]
             [ second-unsafe 0 kernel-error-count 1 - between? ]
         } 1&&
     ] if ;
@@ -163,13 +155,12 @@ PREDICATE: vm-error < array
     second {
         [ expired-error.           ]
         [ io-error.                ]
-        [ primitive-error.         ]
+        [ drop                     ]
         [ type-check-error.        ]
         [ divide-by-zero-error.    ]
         [ signal-error.            ]
         [ array-size-error.        ]
         [ fixnum-range-error.      ]
-        [ c-string-error.          ]
         [ ffi-error.               ]
         [ undefined-symbol-error.  ]
         [ datastack-underflow.     ]
@@ -190,6 +181,9 @@ M: vm-error error. dup vm-errors dispatch ;
 
 M: vm-error error-help vm-errors nth first ;
 
+M: division-by-zero summary
+    drop "Division by zero" ;
+
 M: no-method summary
     drop "No suitable method" ;
 
@@ -204,6 +198,8 @@ M: no-method error.
 M: bad-slot-value summary drop "Bad store to specialized slot" ;
 
 M: bad-slot-name summary drop "Bad slot name in object literal" ;
+
+M: bad-vocab-name summary drop "Vocab name cannot contain \":/\\ \"" ;
 
 M: no-math-method summary
     drop "No suitable arithmetic method" ;
@@ -233,7 +229,12 @@ M: no-case summary
     drop "Fall-through in case" ;
 
 M: slice-error summary
-    drop "Cannot create slice" ;
+    "Cannot create slice" swap {
+        { [ dup from>> 0 < ] [ ": from < 0" ] }
+        { [ dup [ to>> ] [ seq>> length ] bi > ] [ ": to > length" ] }
+        { [ dup [ from>> ] [ to>> ] bi > ] [ ": from > to" ] }
+        [ f ]
+    } cond nip append ;
 
 M: bounds-error summary drop "Sequence index out of bounds" ;
 
@@ -304,8 +305,8 @@ M: no-word-in-vocab summary
 M: no-word-in-vocab error. summary print ;
 
 M: ambiguous-use-error summary
-    words>> first name>>
-    "More than one vocabulary defines a word named “" "”" surround ;
+    name>>
+    "The name “" "” resolves to more than one word." surround ;
 
 M: ambiguous-use-error error. summary print ;
 
@@ -369,7 +370,7 @@ M: bad-escape error.
 
 M: bad-literal-tuple summary drop "Bad literal tuple" ;
 
-M: check-mixin-class-error summary drop "Not a mixin class" ;
+M: not-a-mixin-class summary drop "Not a mixin class" ;
 
 M: not-found-in-roots summary
     path>> "Cannot resolve vocab: " prepend ;
@@ -377,5 +378,8 @@ M: not-found-in-roots summary
 M: wrong-values summary drop "Quotation's stack effect does not match call site" ;
 
 M: stack-effect-omits-dashes summary drop "Stack effect must contain “--”" ;
+
+M: callsite-not-compiled summary
+    drop "Caller not compiled with the optimizing compiler" ;
 
 { "threads" "debugger" } "debugger.threads" require-when

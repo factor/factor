@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces make assocs sequences kernel classes splitting
-words vocabs.loader accessors strings combinators arrays
-continuations present fry urls http http.server xml.syntax xml.writer
-http.server.redirection http.server.remapping ;
+USING: accessors arrays assocs classes combinators continuations
+definitions fry http http.server http.server.redirection
+http.server.remapping io.pathnames kernel make namespaces
+sequences splitting strings urls words xml.syntax ;
 IN: furnace.utilities
 
 : word>string ( word -- string )
@@ -31,23 +31,21 @@ ERROR: no-such-responder responder ;
 
 : base-path ( string -- seq )
     dup responder-nesting get
-    [ second class-of superclasses [ name>> = ] with any? ] with find nip
+    [ second class-of superclasses-of [ name>> = ] with any? ] with find nip
     [ first ] [ no-such-responder ] ?if ;
 
 : resolve-base-path ( string -- string' )
     "$" ?head [
         [
-            "/" split1 [ base-path [  "/" % % ] each "/" % ] dip %
+            "/" split1 [ base-path [ "/" % % ] each "/" % ] dip %
         ] "" make
     ] when ;
 
-: vocab-path ( vocab -- path )
-    dup vocab-dir vocab-append-path ;
+: resolve-word-path ( word -- path/f )
+    where [ first parent-directory ] [ f ] if* ;
 
 : resolve-template-path ( pair -- path )
-    [
-        first2 [ vocabulary>> vocab-path % ] [ "/" % % ] bi*
-    ] "" make ;
+    first2 [ resolve-word-path ] dip append-path ;
 
 GENERIC: modify-query ( query responder -- query' )
 
@@ -94,12 +92,12 @@ M: object modify-form drop f ;
 CONSTANT: nested-forms-key "__n"
 
 : referrer ( -- referrer/f )
-    #! Typo is intentional, it's in the HTTP spec!
-    "referer" request get header>> at
+    ! Typo is intentional, it's in the HTTP spec!
+    request get "referer" header
     dup [ >url ensure-port [ remap-port ] change-port ] when ;
 
 : user-agent ( -- user-agent )
-    "user-agent" request get header>> at "" or ;
+    request get "user-agent" header "" or ;
 
 : same-host? ( url -- ? )
     dup [

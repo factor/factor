@@ -1,6 +1,6 @@
 USING:
     alien alien.c-types alien.data
-    alien.libraries alien.libraries.finder
+    alien.libraries
     alien.syntax
     classes.struct
     combinators
@@ -8,7 +8,11 @@ USING:
     system ;
 IN: pcre.ffi
 
-<< "pcre" dup find-library cdecl add-library >>
+<< "pcre" {
+    { [ os windows? ] [ "pcre.dll" ] }
+    { [ os macosx? ] [ "libpcre.dylib" ] }
+    { [ os unix? ] [ "libpcre.so" ] }
+} cond cdecl add-library >>
 
 LIBRARY: pcre
 
@@ -45,6 +49,7 @@ CONSTANT: PCRE_NO_START_OPTIMIZE  0x04000000
 CONSTANT: PCRE_NO_START_OPTIMISE  0x04000000
 CONSTANT: PCRE_PARTIAL_HARD       0x08000000
 CONSTANT: PCRE_NOTEMPTY_ATSTART   0x10000000
+! New in 8.10
 CONSTANT: PCRE_UCP                0x20000000
 
 ENUM: PCRE_ERRORS
@@ -117,25 +122,27 @@ STRUCT: pcre_extra
     { mark uchar** }
     { executable_jit void* } ;
 
-FUNCTION: int pcre_config ( int what, void* where ) ;
+FUNCTION: int pcre_config ( int what, void* where )
 
 FUNCTION: void* pcre_compile ( c-string pattern,
                                int options,
                                char** errptr,
                                int* erroffset,
-                               char* tableptr ) ;
+                               char* tableptr )
 
 FUNCTION: void* pcre_compile2 ( c-string pattern,
                                 int options,
                                 int* errcodeptr,
                                 char** errptr,
                                 int* erroffset,
-                                char* tableptr ) ;
+                                char* tableptr )
 
-FUNCTION: int pcre_info ( void* pcre, int* optptr, int* first_byte ) ;
-FUNCTION: int pcre_fullinfo ( void* pcre, pcre_extra* extra, int what, void *where ) ;
+FUNCTION: int pcre_info ( void* pcre, int* optptr, int* first_byte )
+FUNCTION: int pcre_fullinfo ( void* pcre,
+                              pcre_extra* extra,
+                              int what, void *where )
 
-FUNCTION: pcre_extra* pcre_study ( void* pcre, int options, char** errptr ) ;
+FUNCTION: pcre_extra* pcre_study ( void* pcre, int options, char** errptr )
 FUNCTION: int pcre_exec ( void* pcre,
                           pcre_extra* extra,
                           c-string subject,
@@ -143,23 +150,23 @@ FUNCTION: int pcre_exec ( void* pcre,
                           int startoffset,
                           int options,
                           int* ovector,
-                          int ovecsize ) ;
+                          int ovecsize )
 
-FUNCTION: int pcre_get_stringnumber ( void* pcre, c-string name ) ;
+FUNCTION: int pcre_get_stringnumber ( void* pcre, c-string name )
 
 FUNCTION: int pcre_get_substring ( c-string subject,
                                    int* ovector,
                                    int stringcount,
                                    int stringnumber,
-                                   void *stringptr ) ;
+                                   void *stringptr )
 
 FUNCTION: int pcre_get_substring_list ( c-string subject,
                                         int* ovector,
                                         int stringcount,
-                                        void *stringptr ) ;
+                                        void *stringptr )
 
-FUNCTION: c-string pcre_version ( ) ;
+FUNCTION: c-string pcre_version ( )
 
-FUNCTION: uchar* pcre_maketables ( ) ;
+FUNCTION: uchar* pcre_maketables ( )
 
-FUNCTION: void pcre_free ( void* pcre ) ;
+FUNCTION: void pcre_free ( void* pcre )

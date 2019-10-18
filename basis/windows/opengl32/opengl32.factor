@@ -51,13 +51,13 @@ LIBRARY: gl
 ! FUNCTION: int SaveDC( HDC hDC ) ;
 ! FUNCTION: HGDIOBJ SelectObject ( HDC hDC, HGDIOBJ hgdiobj ) ;
 
-FUNCTION: HGLRC wglCreateContext ( HDC hDC ) ;
-FUNCTION: BOOL wglDeleteContext ( HGLRC hRC ) ;
-FUNCTION: BOOL wglMakeCurrent ( HDC hDC, HGLRC hglrc ) ;
+FUNCTION: HGLRC wglCreateContext ( HDC hDC )
+FUNCTION: BOOL wglDeleteContext ( HGLRC hRC )
+FUNCTION: BOOL wglMakeCurrent ( HDC hDC, HGLRC hglrc )
 
 ! WGL_ARB_extensions_string extension
 
-GL-FUNCTION: c-string wglGetExtensionsStringARB { } ( HDC hDC ) ;
+GL-FUNCTION: c-string wglGetExtensionsStringARB { } ( HDC hDC )
 
 ! WGL_ARB_pixel_format extension
 
@@ -121,7 +121,7 @@ GL-FUNCTION: BOOL wglGetPixelFormatAttribivARB { } (
         UINT nAttributes,
         int* piAttributes,
         int* piValues
-    ) ;
+    )
 
 GL-FUNCTION: BOOL wglGetPixelFormatAttribfvARB { } (
         HDC hdc,
@@ -130,7 +130,7 @@ GL-FUNCTION: BOOL wglGetPixelFormatAttribfvARB { } (
         UINT nAttributes,
         int* piAttributes,
         FLOAT* pfValues
-    ) ;
+    )
 
 GL-FUNCTION: BOOL wglChoosePixelFormatARB { } (
         HDC hdc,
@@ -139,7 +139,7 @@ GL-FUNCTION: BOOL wglChoosePixelFormatARB { } (
         UINT nMaxFormats,
         int* piFormats,
         UINT* nNumFormats
-    ) ;
+    )
 
 ! WGL_ARB_multisample extension
 

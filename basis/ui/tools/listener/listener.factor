@@ -1,26 +1,24 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar colors.constants
-combinators combinators.short-circuit concurrency.flags
+USING: accessors arrays assocs calendar combinators
+combinators.short-circuit concurrency.flags
 concurrency.mailboxes continuations destructors documents
-documents.elements fry hashtables help help.markup help.tips io
-io.styles kernel lexer listener locals make math models
-models.arrow models.delay namespaces parser prettyprint
-quotations sequences source-files.errors strings threads
-tools.errors.model ui ui.commands ui.gadgets ui.gadgets.buttons
-ui.gadgets.editors ui.gadgets.glass ui.gadgets.labeled
-ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
+documents.elements fonts fry hashtables help help.markup
+help.tips io io.styles kernel lexer listener literals locals
+math math.vectors models models.arrow models.delay namespaces
+parser prettyprint sequences source-files.errors strings system
+threads ui ui.commands ui.gadgets ui.gadgets.editors
+ui.gadgets.glass ui.gadgets.labeled ui.gadgets.panes
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.toolbar
 ui.gadgets.tracks ui.gestures ui.operations ui.pens.solid
-ui.tools.browser ui.tools.common ui.tools.debugger
+ui.theme ui.tools.browser ui.tools.common ui.tools.debugger
 ui.tools.error-list ui.tools.listener.completion
 ui.tools.listener.history ui.tools.listener.popups vocabs
 vocabs.loader vocabs.parser vocabs.refresh words ;
 IN: ui.tools.listener
 
-! If waiting is t, we're waiting for user input, and invoking
-! evaluate-input resumes the thread.
 TUPLE: interactor < source-editor
-output history flag mailbox thread waiting token-model word-model popup ;
+    output history flag mailbox thread waiting token-model word-model popup ;
 
 INSTANCE: interactor input-stream
 
@@ -33,7 +31,6 @@ INSTANCE: interactor input-stream
     thread>> thread-continuation ;
 
 : interactor-busy? ( interactor -- ? )
-    #! We're busy if there's no thread to resume.
     {
         [ waiting>> ]
         [ thread>> dup [ thread-registered? ] when ]
@@ -47,18 +44,20 @@ M: interactor manifest>>
         manifest swap assoc-stack
     ] if ;
 
-: vocab-exists? ( name -- ? )
-    '[ _ { [ lookup-vocab ] [ find-vocab-root ] } 1|| ] [ drop f ] recover ;
-
 GENERIC: (word-at-caret) ( token completion-mode -- obj )
 
 M: vocab-completion (word-at-caret)
-    drop dup vocab-exists? [ >vocab-link ] [ drop f ] if ;
+    drop
+    [ dup vocab-exists? [ >vocab-link ] [ drop f ] if ]
+    [ 2drop f ] recover ;
 
 M: word-completion (word-at-caret)
-    manifest>> dup [
+    manifest>> [
         '[ _ _ search-manifest ] [ drop f ] recover
-    ] [ 2drop f ] if ;
+    ] [ drop f ] if* ;
+
+M: vocab-word-completion (word-at-caret)
+    vocab-name>> lookup-word ;
 
 M: char-completion (word-at-caret) 2drop f ;
 
@@ -97,16 +96,26 @@ M: interactor stream-element-type drop +character+ ;
 
 GENERIC: (print-input) ( object -- )
 
+SYMBOL: listener-input-style
+H{
+    { font-style bold }
+    { foreground $ text-color }
+} listener-input-style set-global
+
+SYMBOL: listener-word-style
+H{
+    { font-name "sans-serif" }
+    { font-style bold }
+    { foreground $ text-color }
+} listener-word-style set-global
+
 M: input (print-input)
-    dup presented associate
-    [ string>> H{ { font-style bold } } format ] with-nesting nl ;
+    dup presented associate [
+        string>> listener-input-style get-global format
+    ] with-nesting nl ;
 
 M: word (print-input)
-    "Command: "
-    [
-        "sans-serif" font-name ,,
-        bold font-style ,,
-    ] H{ } make format . ;
+    "Command: " listener-word-style get-global format . ;
 
 : print-input ( object interactor -- )
     output>> [ (print-input) ] with-output-stream* ;
@@ -186,10 +195,7 @@ M: interactor dispose drop ;
 
 TUPLE: listener-gadget < tool error-summary output scroller input ;
 
-{ 600 700 } listener-gadget set-tool-dim
-
-: find-listener ( gadget -- listener )
-    [ listener-gadget? ] find-parent ;
+listener-gadget default-font-size  { 50 58 } n*v set-tool-dim
 
 : listener-streams ( listener -- input output )
     [ input>> ] [ output>> <pane-stream> ] bi ;
@@ -211,26 +217,28 @@ TUPLE: listener-gadget < tool error-summary output scroller input ;
 
 : <error-summary> ( -- gadget )
     error-list-model get [ drop error-summary. ] <pane-control>
-        COLOR: light-yellow <solid> >>interior ;
+    error-summary-background <solid> >>interior ;
 
 : init-error-summary ( listener -- listener )
     <error-summary> >>error-summary
     dup error-summary>> f track-add ;
 
+: add-listener-area ( listener -- listener )
+    dup output>> margins <scroller> >>scroller
+    dup scroller>> white-interior 1 track-add ;
+
 : <listener-gadget> ( -- listener )
-    vertical listener-gadget new-track
-        add-toolbar
-        init-input/output
-        dup output>> <scroller> >>scroller
-        dup scroller>> 1 track-add
-        init-error-summary ;
+    vertical listener-gadget new-track with-lines
+    add-toolbar
+    init-input/output
+    add-listener-area
+    init-error-summary ;
 
 M: listener-gadget focusable-child*
     input>> dup popup>> or ;
 
 : wait-for-listener ( listener -- )
-    #! Wait for the listener to start.
-    input>> flag>> wait-for-flag ;
+    input>> flag>> 5 seconds wait-for-flag-timeout ;
 
 : listener-busy? ( listener -- ? )
     input>> interactor-busy? ;
@@ -280,9 +288,10 @@ M: string listener-input
     [ set-editor-string ] [ request-focus ] bi ;
 
 : call-listener ( quot command -- )
-    get-ready-listener
-    '[ _ _ _ dup wait-for-listener (call-listener) ]
-    "Listener call" spawn drop ;
+    get-ready-listener '[
+        _ _ _ dup wait-for-listener
+        [ (call-listener) ] with-ctrl-break
+    ] "Listener call" spawn drop ;
 
 M: listener-command invoke-command ( target command -- )
     [ command-quot ] [ nip ] 2bi call-listener ;
@@ -329,52 +338,53 @@ M: object accept-completion-hook 2drop ;
     [ history>> history-add drop ] [ control-value ] [ select-all ] tri
     parse-lines-interactive ;
 
-: <debugger-popup> ( error continuation -- popup )
-    over compute-restarts [ hide-glass ] <debugger> "Error" <labeled-gadget> ;
+: do-recall? ( table error -- ? )
+    [ selection>> value>> not ] [ lexer-error? ] bi* and ;
+
+: recall-lexer-error ( interactor error -- )
+    over recall-previous go-to-error ;
+
+: make-restart-hook-quot ( error interactor -- quot )
+    over '[
+        dup hide-glass
+        _ do-recall? [ _ _ recall-lexer-error ] when
+    ] ;
+
+: frame-debugger ( debugger -- labeled )
+    "Error" debugger-color <framed-labeled-gadget> ;
+
+:: <debugger-popup> ( error continuation interactor -- popup )
+    error
+    continuation
+    error compute-restarts
+    error interactor make-restart-hook-quot
+    <debugger> frame-debugger ;
 
 : debugger-popup ( interactor error continuation -- )
-    [ one-line-elt ] 2dip <debugger-popup> show-listener-popup ;
+    pick <debugger-popup> one-line-elt swap show-listener-popup ;
 
-: handle-parse-error ( interactor error -- )
-    dup lexer-error? [ 2dup go-to-error error>> ] when
-    error-continuation get
-    debugger-popup ;
+: try-parse ( lines -- quot/f )
+    [ parse-lines-interactive ] [ nip '[ _ rethrow ] ] recover ;
 
-: try-parse ( lines interactor -- quot/error/f )
-    [ drop parse-lines-interactive ] [
-        2nip
-        dup lexer-error? [
-            dup error>> unexpected-eof? [ drop f ] when
-        ] when
-    ] recover ;
-
-: handle-interactive ( lines interactor -- quot/f ? )
-    [ nip ] [ try-parse ] 2bi {
-        { [ dup quotation? ] [ nip t ] }
-        { [ dup not ] [ drop insert-newline f f ] }
-        [ handle-parse-error f f ]
-    } cond ;
-
-M: interactor stream-read-quot
-    [ interactor-yield ] keep {
-        { [ over not ] [ drop ] }
-        { [ over callable? ] [ drop ] }
-        [
-            [ handle-interactive ] keep swap
-            [ interactor-finish ] [ nip stream-read-quot ] if
-        ]
-    } cond ;
+M: interactor stream-read-quot ( stream -- quot/f )
+    dup interactor-yield dup array? [
+        over interactor-finish try-parse
+        [ ] [ stream-read-quot ] ?if
+    ] [ nip ] if ;
 
 : interactor-operation ( gesture interactor -- ? )
     [ token-model>> value>> ] keep word-at-caret
     [ nip ] [ gesture>operation ] 2bi
-    dup [ invoke-command f ] [ 2drop t ] if ;
+    [ invoke-command f ] [ drop t ] if* ;
 
 M: interactor handle-gesture
     {
         { [ over key-gesture? not ] [ call-next-method ] }
         { [ dup popup>> ] [ { [ pass-to-popup ] [ call-next-method ] } 2&& ] }
-        { [ dup token-model>> value>> ] [ { [ interactor-operation ] [ call-next-method ] } 2&& ] }
+        {
+            [ dup token-model>> value>> ]
+            [ { [ interactor-operation ] [ call-next-method ] } 2&& ]
+        }
         [ call-next-method ]
     } cond ;
 
@@ -391,8 +401,13 @@ interactor "completion" f {
 } define-command-map
 
 : introduction. ( -- )
-    tip-of-the-day. nl
-    { $strong "Press " { $snippet "F1" } " at any time for help." } print-content nl nl ;
+    [
+        H{ { font-size $ default-font-size } } [
+            { $tip-of-the-day } print-element nl
+            { $strong "Press " { $snippet "F1" } " at any time for help." } print-element nl
+            version-info print-element
+        ] with-style
+    ] with-default-style nl nl ;
 
 : listener-thread ( listener -- )
     dup listener-streams [
@@ -414,7 +429,7 @@ interactor "completion" f {
     ] "Listener" spawn drop ;
 
 : restart-listener ( listener -- )
-    #! Returns when listener is ready to receive input.
+    ! Returns when listener is ready to receive input.
     {
         [ com-end ]
         [ clear-output ]
@@ -431,6 +446,11 @@ interactor "completion" f {
     auto-use? toggle ;
 
 \ com-auto-use H{ { +nullary+ t } { +listener+ t } } define-command
+
+: com-file-drop ( -- files )
+    dropped-files get-global ;
+
+\ com-file-drop H{ { +nullary+ t } { +listener+ t } } define-command
 
 listener-gadget "toolbar" f {
     { f restart-listener }
@@ -454,6 +474,17 @@ listener-gadget "multi-touch" f {
     { up-action refresh-all }
 } define-command-map
 
+listener-gadget "touchbar" f {
+    { f refresh-all }
+    { f com-auto-use }
+    { f com-help }
+} define-command-map
+
+listener-gadget "file-drop" "Files can be drag-and-dropped onto the listener."
+{
+    { T{ file-drop f f } com-file-drop }
+} define-command-map
+
 M: listener-gadget graft*
     [ call-next-method ] [ restart-listener ] bi ;
 
@@ -474,8 +505,9 @@ PRIVATE>
     family size make-font-style
     inter output>> make-span-stream :> ostream
     ostream inter output<<
-    inter font>> clone
+    inter [
+        clone
         family >>name
         size >>size
-    inter font<<
+    ] change-font f >>line-height drop
     ostream output-stream set ;

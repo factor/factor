@@ -1,8 +1,7 @@
-USING: arrays assocs classes.tuple combinators command-line
-effects generic generic.math generic.single help.markup
-help.syntax io.pathnames kernel math parser sequences
-vocabs.loader vocabs.parser words words.alias words.constant
-words.symbol ;
+USING: arrays assocs classes.algebra.private classes.tuple combinators
+command-line effects generic generic.math generic.single help.markup
+help.syntax io.pathnames kernel math parser sequences vocabs.loader
+vocabs.parser words words.alias words.constant words.symbol ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
@@ -26,12 +25,6 @@ $nl
 $nl
 "While parsing words supporting arbitrary syntax can be defined, the default set is found in the " { $vocab-link "syntax" } " vocabulary and provides the basis for all further syntactic interaction with Factor." ;
 
-ARTICLE: "syntax-comments" "Comments"
-{ $subsections
-    POSTPONE: !
-    POSTPONE: #!
-} ;
-
 ARTICLE: "syntax-immediate" "Parse time evaluation"
 "Code can be evaluated at parse time. This is a rarely-used feature; one use-case is " { $link "loading-libs" } ", where you want to execute some code before the words in a source file are compiled."
 { $subsections
@@ -40,11 +33,11 @@ ARTICLE: "syntax-immediate" "Parse time evaluation"
 } ;
 
 ARTICLE: "syntax-integers" "Integer syntax"
-"The printed representation of an integer consists of a sequence of digits, optionally prefixed by a sign."
+"The printed representation of an integer consists of a sequence of digits, optionally prefixed by a sign and arbitrarily separated by commas."
 { $code
     "123456"
     "-10"
-    "2432902008176640000"
+    "2,432,902,008,176,640,000"
 }
 "Integers are entered in base 10 unless prefixed with a base-changing prefix. " { $snippet "0x" } " begins a hexadecimal literal, " { $snippet "0o" } " an octal literal, and " { $snippet "0b" } " a binary literal. A sign, if any, goes before the base prefix."
 { $example
@@ -107,7 +100,7 @@ ARTICLE: "syntax-floats" "Float syntax"
 }
 "A Not-a-number literal with an arbitrary payload can also be input:"
 { $subsections POSTPONE: NAN: }
-"Hexadecimal float literals are also supported. These consist of a hexadecimal literal with a decimal point and an optional base-two exponent expressed as a decimal number after " { $snippet "p" } " or " { $snippet "P" } ":"
+"Hexadecimal, octal and binary float literals are also supported. These consist of a hexadecimal, octal or binary literal with a decimal point and a mandatory base-two exponent expressed as a decimal number after " { $snippet "p" } " or " { $snippet "P" } ":"
 { $example
     "8.0 0x1.0p3 = ."
     "t"
@@ -118,6 +111,14 @@ ARTICLE: "syntax-floats" "Float syntax"
 }
 { $example
     "10.125 0x1.44p3 = ."
+    "t"
+}
+{ $example
+    "10.125 0b1.010001p3 = ."
+    "t"
+}
+{ $example
+    "10.125 0o1.21p3 = ."
     "t"
 }
 "The normalized hex form " { $snippet "±0x1.MMMMMMMMMMMMMp±EEEE" } " allows any floating-point number to be specified precisely. The values of MMMMMMMMMMMMM and EEEE map directly to the mantissa and exponent fields of the binary IEEE 754 representation."
@@ -253,7 +254,6 @@ ARTICLE: "syntax" "Syntax"
     "parser-algorithm"
     "word-search"
     "top-level-forms"
-    "syntax-comments"
     "syntax-literals"
     "syntax-immediate"
 } ;
@@ -363,6 +363,11 @@ HELP: B{
 { $description "Marks the beginning of a literal byte array. Literal byte arrays are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "B{ 1 2 3 }" } } ;
 
+HELP: intersection{
+{ $syntax "intersection{ elements... }" }
+{ $values { "elements" "a list of classoids" } }
+{ $description "Marks the beginning of a literal " { $link anonymous-intersection } " class." } ;
+
 HELP: H{
 { $syntax "H{ { key value }... }" }
 { $values { "key" object } { "value" object } }
@@ -411,7 +416,7 @@ $nl
 HELP: W{
 { $syntax "W{ object }" }
 { $values { "object" object } }
-{ $description "Marks the beginning of a literal wrapper. Literal wrappers are terminated by " { $link POSTPONE: } } "." }  ;
+{ $description "Marks the beginning of a literal wrapper. Literal wrappers are terminated by " { $link POSTPONE: } } "." } ;
 
 HELP: POSTPONE:
 { $syntax "POSTPONE: word" }
@@ -446,7 +451,7 @@ HELP: SYMBOL:
 
 HELP: SYMBOLS:
 { $syntax "SYMBOLS: words... ;" }
-{ $values { "words" "a sequence of new words to define" } }
+{ $values { "words" { $sequence "new words to define" } } }
 { $description "Creates a new symbol for every token until the " { $snippet ";" } "." }
 { $examples { $example "USING: prettyprint ;" "IN: scratchpad" "SYMBOLS: foo bar baz ;\nfoo . bar . baz ." "foo\nbar\nbaz" } } ;
 
@@ -459,12 +464,12 @@ HELP: SINGLETON:
     "Defines a new singleton class. The class word itself is the sole instance of the singleton class."
 }
 { $examples
-    { $example "USING: classes.singleton kernel io ;" "IN: singleton-demo" "USE: prettyprint SINGLETON: foo\nGENERIC: bar ( obj -- )\nM: foo bar drop \"a foo!\" print ;\nfoo bar" "a foo!" }
+    { $example "USING: classes.singleton kernel io ;" "IN: singleton-demo" "USE: prettyprint\nSINGLETON: foo\nGENERIC: bar ( obj -- )\nM: foo bar drop \"a foo!\" print ;\nfoo bar" "a foo!" }
 } ;
 
 HELP: SINGLETONS:
 { $syntax "SINGLETONS: words... ;" }
-{ $values { "words" "a sequence of new words to define" } }
+{ $values { "words" { $sequence "new words to define" } } }
 { $description "Creates a new singleton for every token until the " { $snippet ";" } "." } ;
 
 HELP: ALIAS:
@@ -603,9 +608,9 @@ HELP: CHAR:
 } ;
 
 HELP: "
-{ $syntax "\"string...\"" "\"\"\"string...\"\"\"" }
+{ $syntax "\"string...\"" }
 { $values { "string" "literal and escaped characters" } }
-{ $description "Reads from the input string until the next occurrence of " { $snippet "\"" } " or " { $snippet "\"\"\"" } ", and appends the resulting string to the parse tree. String literals can span multiple lines. Various special characters can be read by inserting " { $link "escape" } ". For triple quoted strings, the double-quote character does not require escaping." }
+{ $description "Reads from the input string until the next occurrence of " { $snippet "\"" } ", and appends the resulting string to the parse tree. String literals can span multiple lines. Various special characters can be read by inserting " { $link "escape" } "." }
 { $examples
     "A string with an escaped newline in it:"
     { $example "USE: io" "\"Hello\\nworld\" print" "Hello\nworld" }
@@ -613,9 +618,6 @@ HELP: "
     { $example "USE: io" "\"Hello\nworld\" print" "Hello\nworld" }
     "A string with a named Unicode code point:"
     { $example "USE: io" "\"\\u{greek-capital-letter-sigma}\" print" "\u{greek-capital-letter-sigma}" }
-    "A triple-quoted string:"
-    { $example "USE: io \"\"\"Teach a man to \"fish\"...\nand fish will go extinct\"\"\" print" """Teach a man to \"fish\"...
-and fish will go extinct""" }
 } ;
 
 HELP: SBUF"
@@ -633,7 +635,7 @@ HELP: P"
 HELP: (
 { $syntax "( inputs -- outputs )" }
 { $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
-{ $description "Literal stack effect syntax.  Also used by syntax words (such as " { $link POSTPONE: : } "), typically declaring the stack effect of the word definition which follows." }
+{ $description "Literal stack effect syntax. Also used by syntax words (such as " { $link POSTPONE: : } "), typically declaring the stack effect of the word definition which follows." }
 { $notes "Useful for meta-programming with " { $link define-declared } "." }
 { $examples
     { $example
@@ -654,25 +656,6 @@ HELP: (
 { $see-also "effects" }
 ;
 
-HELP: !
-{ $syntax "! comment..." }
-{ $values { "comment" "characters" } }
-{ $description "Discards all input until the end of the line." } ;
-
-{ POSTPONE: ! POSTPONE: #! } related-words
-
-HELP: #!
-{ $syntax "#!comment..." }
-{ $values { "comment" "characters" } }
-{ $description "Discards all input until the end of the line." }
-{ $notes "To allow Unix-style \"shebang\" scripts to work as expected, " { $snippet "#!" } " is parsed as a separate token regardless of following whitespace if it appears at the beginning of a line."
-{ $example
-    "#!/usr/bin/env/factor"
-    "USING: io ;"
-    "\"Hello world\" print"
-    "Hello world"
-} } ;
-
 HELP: NAN:
 { $syntax "NAN: payload" }
 { $values { "payload" "64-bit hexadecimal integer" } }
@@ -688,16 +671,16 @@ HELP: NAN:
 HELP: GENERIC:
 { $syntax "GENERIC: word ( stack -- effect )" }
 { $values { "word" "a new word to define" } }
-{ $description "Defines a new generic word in the current vocabulary. Initially, it contains no methods, and thus will throw a " { $link no-method } " error when called." } ;
+{ $description "Defines a new generic word in the current vocabulary. The word dispatches on the topmost stack element. Initially it contains no methods, and thus will throw a " { $link no-method } " error when called." } ;
 
-HELP: GENERIC#
-{ $syntax "GENERIC# word n ( stack -- effect )" }
+HELP: GENERIC#:
+{ $syntax "GENERIC#: word n ( stack -- effect )" }
 { $values { "word" "a new word to define" } { "n" "the stack position to dispatch on" } }
-{ $description "Defines a new generic word which dispatches on the " { $snippet "n" } "th most element from the top of the stack in the current vocabulary. Initially, it contains no methods, and thus will throw a " { $link no-method } " error when called." }
+{ $description "Defines a new generic word in the current vocabulary. The word dispatches on the " { $snippet "n" } "th element from the top of the stack. Initially it contains no methods, and thus will throw a " { $link no-method } " error when called." }
 { $notes
     "The following two definitions are equivalent:"
-    { $code "GENERIC: foo ( obj -- )" }
-    { $code "GENERIC# foo 0 ( obj -- )" }
+    { $code "GENERIC: foo ( x y z obj -- )" }
+    { $code "GENERIC#: foo 0 ( x y z obj -- )" }
 } ;
 
 HELP: MATH:
@@ -818,7 +801,7 @@ HELP: SLOT:
 HELP: ERROR:
 { $syntax "ERROR: class slots... ;" }
 { $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
-{ $description "Defines a new tuple class whose class word throws a new instance of the error." }
+{ $description "Defines a new tuple class and a word " { $snippet "classname" } " that throws a new instance of the error." }
 { $notes
     "The following two snippets are equivalent:"
     { $code

@@ -19,66 +19,66 @@ SYMBOL: html
 CONSTANT: elements-vocab "html.elements"
 
 : html-word ( name def effect -- )
-    #! Define 'word creating' word to allow
-    #! dynamically creating words.
-    [ elements-vocab create ] 2dip define-declared ;
+    ! Define 'word creating' word to allow
+    ! dynamically creating words.
+    [ elements-vocab create-word ] 2dip define-declared ;
 
 : <foo> ( str -- <str> ) "<" ">" surround ;
 
 : def-for-html-word-<foo> ( name -- )
-    #! Return the name and code for the <foo> patterned
-    #! word.
+    ! Return the name and code for the <foo> patterned
+    ! word.
     dup <foo> swap '[ _ <foo> write-html ]
     ( -- ) html-word ;
 
 : <foo ( str -- <str ) "<" prepend ;
 
 : def-for-html-word-<foo ( name -- )
-    #! Return the name and code for the <foo patterned
-    #! word.
+    ! Return the name and code for the <foo patterned
+    ! word.
     <foo dup '[ _ write-html ]
     ( -- ) html-word ;
 
 : foo> ( str -- foo> ) ">" append ;
 
 : def-for-html-word-foo> ( name -- )
-    #! Return the name and code for the foo> patterned
-    #! word.
+    ! Return the name and code for the foo> patterned
+    ! word.
     foo> [ ">" write-html ] ( -- ) html-word ;
 
 : </foo> ( str -- </str> ) "</" ">" surround ;
 
 : def-for-html-word-</foo> ( name -- )
-    #! Return the name and code for the </foo> patterned
-    #! word.
+    ! Return the name and code for the </foo> patterned
+    ! word.
     </foo> dup '[ _ write-html ] ( -- ) html-word ;
 
 : <foo/> ( str -- <str/> ) "<" "/>" surround ;
 
 : def-for-html-word-<foo/> ( name -- )
-    #! Return the name and code for the <foo/> patterned
-    #! word.
+    ! Return the name and code for the <foo/> patterned
+    ! word.
     dup <foo/> swap '[ _ <foo/> write-html ]
     ( -- ) html-word ;
 
 : foo/> ( str -- str/> ) "/>" append ;
 
 : def-for-html-word-foo/> ( name -- )
-    #! Return the name and code for the foo/> patterned
-    #! word.
+    ! Return the name and code for the foo/> patterned
+    ! word.
     foo/> [ "/>" write-html ] ( -- ) html-word ;
 
 : define-closed-html-word ( name -- )
-    #! Given an HTML tag name, define the words for
-    #! that closable HTML tag.
+    ! Given an HTML tag name, define the words for
+    ! that closable HTML tag.
     dup def-for-html-word-<foo>
     dup def-for-html-word-<foo
     dup def-for-html-word-foo>
     def-for-html-word-</foo> ;
 
 : define-open-html-word ( name -- )
-    #! Given an HTML tag name, define the words for
-    #! that open HTML tag.
+    ! Given an HTML tag name, define the words for
+    ! that open HTML tag.
     dup def-for-html-word-<foo/>
     dup def-for-html-word-<foo
     def-for-html-word-foo/> ;

@@ -5,9 +5,9 @@ math.private sequences sequences.private slots.private vectors ;
 IN: hashtables
 
 TUPLE: hashtable
-{ count array-capacity }
-{ deleted array-capacity }
-{ array array } ;
+    { count array-capacity }
+    { deleted array-capacity }
+    { array array } ;
 
 <PRIVATE
 
@@ -23,7 +23,7 @@ TUPLE: hashtable
 : no-key ( key array -- array n ? ) nip f f ; inline
 
 : (key@) ( key array i probe# -- array n ? )
-    [ 3dup swap array-nth ] dip over ((empty)) eq?
+    [ 3dup swap array-nth ] dip over +empty+ eq?
     [ 4drop no-key ] [
         [ = ] dip swap
         [ drop rot drop t ]
@@ -36,7 +36,7 @@ TUPLE: hashtable
     [ no-key ] [ 2dup hash@ 0 (key@) ] if ; inline
 
 : <hash-array> ( n -- array )
-    1 + next-power-of-2 4 * ((empty)) <array> ; inline
+    3 * 1 + 2/ next-power-of-2 2 * +empty+ <array> ; inline
 
 : init-hash ( hash -- )
     0 >>count 0 >>deleted drop ; inline
@@ -68,12 +68,12 @@ TUPLE: hashtable
 : (new-key@) ( key array i probe# j -- array i j empty? )
     [ 2dup swap array-nth ] 2dip pick tombstone?
     [
-        rot ((empty)) eq?
+        rot +empty+ eq?
         [ nip [ drop ] 3dip t ]
         [ pick or [ probe ] dip (new-key@) ]
         if
     ] [
-        [ [ pick ] dip = ] 2dip rot
+        [ pickd = ] 2dip rot
         [ nip [ drop ] 3dip f ]
         [ [ probe ] dip (new-key@) ]
         if
@@ -83,7 +83,7 @@ TUPLE: hashtable
     [ array>> 2dup hash@ 0 f (new-key@) ] keep swap
     [ over [ hash-deleted- ] [ hash-count+ ] if swap or ] [ 2drop ] if ; inline
 
-: set-nth-pair ( value key seq n -- )
+: set-nth-pair ( value key array n -- )
     2 fixnum+fast [ set-slot ] 2keep
     1 fixnum+fast set-slot ; inline
 
@@ -94,7 +94,7 @@ TUPLE: hashtable
     [ swapd (set-at) ] curry assoc-each ; inline
 
 : hash-large? ( hash -- ? )
-    [ count>> 3 fixnum*fast ]
+    [ count>> 1 fixnum+fast 3 fixnum*fast ]
     [ array>> length>> ] bi fixnum>= ; inline
 
 : each-pair ( ... array quot: ( ... key value -- ... ) -- ... )
@@ -119,17 +119,18 @@ TUPLE: hashtable
 PRIVATE>
 
 : <hashtable> ( n -- hash )
+    integer>fixnum-strict
     [ 0 0 ] dip <hash-array> hashtable boa ; inline
 
 M: hashtable at*
     key@ [ 3 fixnum+fast slot t ] [ 2drop f f ] if ;
 
 M: hashtable clear-assoc
-    [ init-hash ] [ array>> [ drop ((empty)) ] map! drop ] bi ;
+    [ init-hash ] [ array>> [ drop +empty+ ] map! drop ] bi ;
 
 M: hashtable delete-at
     [ nip ] [ key@ ] 2bi [
-        [ ((tombstone)) dup ] 2dip set-nth-pair
+        [ +tombstone+ dup ] 2dip set-nth-pair
         hash-deleted+
     ] [
         3drop
@@ -153,7 +154,7 @@ M: hashtable set-at
 
 : collect-pairs ( hash quot: ( key value -- elt ) -- seq )
     [ [ array>> 0 swap ] [ assoc-size f <array> ] bi ] dip swap [
-        [ [ over ] dip set-nth-unsafe 1 + ] curry compose each-pair
+        [ overd set-nth-unsafe 1 + ] curry compose each-pair
     ] keep nip ; inline
 
 PRIVATE>
@@ -187,9 +188,8 @@ M: hashtable assoc-like
 ! borrowed from boost::hash_combine, but the
 ! magic number is 2^29/phi instead of 2^32/phi
 ! due to max fixnum value on 32-bit machines
-: hash-combine ( obj oldhash -- newhash )
-    [ hashcode 0x13c6ef37 + ] dip
-    [ 6 shift ] [ -2 shift ] bi + + ;
+: hash-combine ( hash1 hash2 -- newhash )
+    [ 0x13c6ef37 + ] dip [ 6 shift ] [ -2 shift ] bi + + ; inline
 
 ERROR: malformed-hashtable-pair seq pair ;
 

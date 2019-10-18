@@ -1,21 +1,21 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators fry kernel math math.functions math.order
-math.ranges math.vectors namespaces opengl sequences ui.gadgets
-ui.render ui.text ui.gadgets.scrollers ui.gadgets.viewports ;
+USING: accessors arrays combinators fry kernel math
+math.functions math.order math.ranges math.vectors namespaces
+opengl sequences ui.gadgets ui.gadgets.scrollers
+ui.gadgets.viewports ui.render ui.text ui.theme ;
 IN: ui.gadgets.line-support
 
 ! Some code shared by table and editor gadgets
 TUPLE: line-gadget < gadget
-font selection-color
-min-rows max-rows
-min-cols max-cols
-line-leading line-height
-pref-viewport-dim ;
+    font selection-color
+    min-rows max-rows
+    min-cols max-cols
+    line-leading line-height
+    pref-viewport-dim ;
 
 : new-line-gadget ( class -- gadget )
-    new
-        selection-color >>selection-color ;
+    new selection-color >>selection-color ;
 
 GENERIC: line-leading* ( gadget -- n )
 
@@ -85,7 +85,7 @@ GENERIC: draw-line ( line index gadget -- )
 <PRIVATE
 
 : clamp ( dim unit min max -- dim' )
-    [ -1/0. or * ] [ 1/.0 or * ] bi-curry* bi
+    [ -1/0. or * ] [ 1/0. or * ] bi-curry* bi
     [ max ] [ min ] bi* ;
 
 : em ( font -- x ) "m" text-width ;

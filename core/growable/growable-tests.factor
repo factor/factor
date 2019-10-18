@@ -1,9 +1,7 @@
-USING: math sequences classes growable tools.test kernel
-layouts ;
-IN: growable.tests
+USING: classes kernel layouts math sequences tools.test ;
 
 ! erg found this one
-[ fixnum ] [
+{ fixnum } [
     2 >bignum V{ } [ set-length ] keep length class-of
 ] unit-test
 

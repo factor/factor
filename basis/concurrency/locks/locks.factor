@@ -85,14 +85,14 @@ TUPLE: rw-lock readers writers reader# writer ;
     [ notify-writer ] [ readers>> notify-all ] if ;
 
 : reentrant-read-lock-ok? ( lock -- ? )
-    #! If we already have a write lock, then we can grab a read
-    #! lock too.
+    ! If we already have a write lock, then we can grab a read
+    ! lock too.
     writer>> self eq? ;
 
 : reentrant-write-lock-ok? ( lock -- ? )
-    #! The only case where we have a writer and > 1 reader is
-    #! write -> read re-entrancy, and in this case we prohibit
-    #! a further write -> read -> write re-entrancy.
+    ! The only case where we have a writer and > 1 reader is
+    ! write -> read re-entrancy, and in this case we prohibit
+    ! a further write -> read -> write re-entrancy.
     { [ writer>> self eq? ] [ reader#>> zero? ] } 1&& ;
 
 PRIVATE>

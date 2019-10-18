@@ -1,15 +1,16 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables kernel math sequences vectors ;
-FROM: assocs => change-at ;
 IN: sets
 
 ! Set protocol
 MIXIN: set
+
 GENERIC: adjoin ( elt set -- )
 GENERIC: ?adjoin ( elt set -- ? )
 GENERIC: in? ( elt set -- ? )
 GENERIC: delete ( elt set -- )
+GENERIC: ?delete ( elt set -- ? )
 GENERIC: set-like ( set exemplar -- set' )
 GENERIC: fast-set ( set -- set' )
 GENERIC: members ( set -- seq )
@@ -38,7 +39,9 @@ M: f clear-set drop ; inline
 
 M: set ?adjoin 2dup in? [ 2drop f ] [ adjoin t ] if ;
 
-M: set null? members null? ; inline
+M: set ?delete 2dup in? [ delete t ] [ 2drop f ] if ;
+
+M: set null? cardinality 0 = ; inline
 
 M: set cardinality members length ;
 
@@ -73,7 +76,7 @@ M: set union [ (union) ] keep set-like ;
     small/large sequence/tester filter ; inline
 
 : (diff) ( set1 set2 -- seq )
-    sequence/tester [ not ] compose filter ; inline
+    sequence/tester reject ; inline
 
 PRIVATE>
 
@@ -95,24 +98,13 @@ M: set subset?
     2dup [ cardinality ] bi@ > [ 2drop f ] [ (subset?) ] if ;
 
 M: set set=
-    2dup [ cardinality ] bi@ eq? [ (subset?) ] [ 2drop f ] if ;
+    2dup [ cardinality ] bi@ = [ (subset?) ] [ 2drop f ] if ;
 
 M: set fast-set ;
 
 M: set duplicates drop f ;
 
 M: set all-unique? drop t ;
-
-<PRIVATE
-
-: (pruned) ( elt set accum -- )
-    2over ?adjoin [ nip push ] [ 3drop ] if ; inline
-
-: pruned ( seq -- newseq )
-    [ f fast-set ] [ length <vector> ] bi
-    [ [ (pruned) ] 2curry each ] keep ;
-
-PRIVATE>
 
 ! Sequences are sets
 INSTANCE: sequence set
@@ -130,7 +122,7 @@ M: sequence set-like
     [ members ] dip like ;
 
 M: sequence members
-    [ pruned ] keep like ;
+    f fast-set [ ?adjoin ] curry filter ;
 
 M: sequence null?
     empty? ; inline
@@ -149,6 +141,9 @@ M: sequence clear-set
 : intersection ( sets -- set/f )
     [ f ] [ [ ] [ intersect ] map-reduce ] if-empty ;
 
+: refine ( sets -- set/f )
+    [ f ] [ [ ] [ intersect ] map-reduce ] if-empty ;
+
 : gather ( ... seq quot: ( ... elt -- ... elt' ) -- ... newseq )
     map concat members ; inline
 
@@ -159,7 +154,7 @@ M: sequence clear-set
     tester filter ;
 
 : without ( seq set -- subseq )
-    tester [ not ] compose filter ;
+    tester reject ;
 
 : adjoin-all ( seq set -- )
     [ adjoin ] curry each ;
@@ -174,12 +169,3 @@ M: sequence clear-set
 : intersect! ( set1 set2 -- set1 )
     dupd sequence/tester [ dup ] prepose [ not ] compose pick
     [ delete ] curry [ [ drop ] if ] curry compose each ;
-
-! Temporarily for compatibility
-
-: unique ( seq -- assoc )
-    [ dup ] H{ } map>assoc ;
-: conjoin ( elt assoc -- )
-    dupd set-at ;
-: conjoin-at ( value key assoc -- )
-    [ dupd ?set-at ] change-at ;

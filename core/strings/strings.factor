@@ -7,7 +7,12 @@ IN: strings
 
 BUILTIN: string { length array-capacity read-only initial: 0 } aux ;
 
+PRIMITIVE: <string> ( n ch -- string )
+PRIMITIVE: resize-string ( n str -- newstr )
+
 <PRIVATE
+PRIMITIVE: set-string-nth-fast ( ch n string -- )
+PRIMITIVE: string-nth-fast ( n string -- ch )
 
 : string-hashcode ( str -- n ) 3 slot ; inline
 
@@ -51,7 +56,8 @@ PRIVATE>
 
 M: string equal?
     over string? [
-        2dup [ hashcode ] bi@ eq?
+        ! faster during bootstrap than ``[ hashcode ] bi@``
+        over hashcode over hashcode eq?
         [ sequence= ] [ 2drop f ] if
     ] [
         2drop f

@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays definitions kernel sequences strings
-math assocs words generic make quotations splitting
-ui.gestures unicode.case unicode.categories tr fry ;
+USING: accessors assocs fry help.markup kernel make quotations
+sequences splitting tr ui.gestures unicode words ;
 IN: ui.commands
 
 SYMBOL: +nullary+
@@ -22,15 +21,49 @@ GENERIC: command-description ( command -- str/f )
 GENERIC: command-word ( command -- word )
 
 : <command-map> ( blurb commands -- command-map )
-    { } like \ command-map boa ;
+    { } like command-map boa ;
 
 : commands ( class -- hash )
     dup "commands" word-prop [ ] [
         H{ } clone [ "commands" set-word-prop ] keep
     ] ?if ;
 
+TR: convert-command-name "-" " " ;
+
+: (command-name) ( string -- newstring )
+    convert-command-name >title ;
+
 : get-command-at ( group class -- command-map )
     commands at ;
+
+: command-map-row ( gesture command -- seq )
+    [
+        [ gesture>string , ]
+        [
+            [ command-name , ]
+            [ command-word <$link> , ]
+            [ command-description , ]
+            tri
+        ] bi*
+    ] { } make ;
+
+: command-map. ( alist -- )
+    [ command-map-row ] { } assoc>map
+    { "Shortcut" "Command" "Word" "Notes" }
+    [ \ $strong swap ] { } map>assoc prefix
+    $table ;
+
+: $command-map ( element -- )
+    [ second (command-name) " commands" append $heading ]
+    [
+        first2 swap get-command-at
+        [ blurb>> print-element ] [ commands>> command-map. ] bi
+    ] bi ;
+
+: $command ( element -- )
+    reverse first3 get-command-at
+    commands>> value-at gesture>string
+    $snippet ;
 
 : command-gestures ( class -- hash )
     commands values [
@@ -49,13 +82,8 @@ GENERIC: command-word ( command -- word )
     swap pick commands set-at
     update-gestures ;
 
-TR: convert-command-name "-" " " ;
-
-: (command-name) ( string -- newstring )
-    convert-command-name >title ;
-
 M: word command-name ( word -- str )
-    name>> 
+    name>>
     "com-" ?head drop "." ?tail drop
     dup first Letter? [ rest ] unless
     (command-name) ;

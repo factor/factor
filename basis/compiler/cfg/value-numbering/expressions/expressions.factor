@@ -1,12 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes classes.algebra combinators fry
-generic.parser kernel math namespaces quotations sequences slots
-words make sets
-compiler.cfg.instructions
-compiler.cfg.instructions.syntax
-compiler.cfg.value-numbering.graph ;
-FROM: sequences.private => set-array-nth ;
+USING: accessors arrays classes.algebra combinators
+compiler.cfg.instructions compiler.cfg.instructions.syntax
+compiler.cfg.value-numbering.graph generic.parser kernel make
+math namespaces quotations sequences sequences.private sets
+slots words ;
 IN: compiler.cfg.value-numbering.expressions
 
 <<
@@ -28,8 +26,8 @@ GENERIC: >expr ( insn -- expr )
 : narray-quot ( length -- quot )
     [
         [ , [ f <array> ] % ]
-        [ 
-            dup iota [
+        [
+            dup <iota> [
                 - 1 - , [ swap [ set-array-nth ] keep ] %
             ] with each
         ] bi

@@ -33,4 +33,3 @@ HELP: ini>string
 { $description
     "Encodes the specified " { $link hashtable } " as an INI configuration."
 } ;
-

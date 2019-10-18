@@ -69,24 +69,22 @@ $nl
 ARTICLE: "locals-examples" "Examples of lexical variables"
 { $heading "Definitions with lexical variables" }
 "The following example demonstrates lexical variable bindings in word definitions. The " { $snippet "quadratic-roots" } " word is defined with " { $link POSTPONE: :: } ", so it takes its inputs from the top three elements of the datastack and binds them to the variables " { $snippet "a" } ", " { $snippet "b" } ", and " { $snippet "c" } ". In the body, the " { $snippet "disc" } " variable is bound using " { $link POSTPONE: :> } " and then used in the following line of code."
-{ $example """USING: locals math math.functions kernel ;
+{ $example "USING: locals math math.functions kernel ;
 IN: scratchpad
 :: quadratic-roots ( a b c -- x y )
     b sq 4 a c * * - sqrt :> disc
     b neg disc [ + ] [ - ] 2bi [ 2 a * / ] bi@ ;
-1.0 1.0 -6.0 quadratic-roots [ . ] bi@"""
-"""2.0
--3.0"""
+1.0 1.0 -6.0 quadratic-roots"
+"\n--- Data stack:\n2.0\n-3.0"
 }
 "If you wanted to perform the quadratic formula interactively from the listener, you could use " { $link POSTPONE: [let } " to provide a scope for the variables:"
-{ $example """USING: locals math math.functions kernel ;
+{ $example "USING: locals math math.functions kernel ;
 IN: scratchpad
 [let 1.0 :> a 1.0 :> b -6.0 :> c
     b sq 4 a c * * - sqrt :> disc
     b neg disc [ + ] [ - ] 2bi [ 2 a * / ] bi@
-] [ . ] bi@"""
-"""2.0
--3.0"""
+]"
+"\n--- Data stack:\n2.0\n-3.0"
 }
 
 $nl
@@ -94,27 +92,27 @@ $nl
 { $heading "Quotations with lexical variables, and closures" }
 "These next two examples demonstrate lexical variable bindings in quotations defined with " { $link POSTPONE: [| } ". In this example, the values " { $snippet "5" } " and " { $snippet "3" } " are put on the datastack. When the quotation is called, it takes those values as inputs and binds them respectively to " { $snippet "m" } " and " { $snippet "n" } " before executing the quotation:"
 { $example
-    "USING: kernel locals math prettyprint ;"
+    "USING: kernel locals math ;"
     "IN: scratchpad"
-    "5 3 [| m n | m n - ] call ."
-    "2"
+    "5 3 [| m n | m n - ] call( x x -- x )"
+    "\n--- Data stack:\n2"
 }
 $nl
 
 "In this example, the " { $snippet "adder" } " word creates a quotation that closes over its argument " { $snippet "n" } ". When called, the result quotation of " { $snippet "5 adder" } " pulls " { $snippet "3" } " off the datastack and binds it to " { $snippet "m" } ", which is added to the value " { $snippet "5" } " bound to " { $snippet "n" } " in the outer scope of " { $snippet "adder" } ":"
 { $example
-    "USING: kernel locals math prettyprint ;"
+    "USING: kernel locals math ;"
     "IN: scratchpad"
     ":: adder ( n -- quot ) [| m | m n + ] ;"
-    "3 5 adder call ."
-    "8"
+    "3 5 adder call( x -- x )"
+    "\n--- Data stack:\n8"
 }
 $nl
 
 { $heading "Mutable bindings" }
 "This next example demonstrates closures and mutable variable bindings. The " { $snippet "<counter>" } " word outputs a tuple containing a pair of quotations that respectively increment and decrement an internal counter in the mutable " { $snippet "value" } " variable and then return the new value. The quotations close over the counter, so each invocation of the word gives new quotations with a new internal counter."
 { $example
-"""USING: locals kernel math ;
+"USING: accessors locals kernel math ;
 IN: scratchpad
 
 TUPLE: counter adder subtractor ;
@@ -125,17 +123,15 @@ TUPLE: counter adder subtractor ;
     [ value 1 + dup value! ] >>adder
     [ value 1 - dup value! ] >>subtractor ;
 <counter>
-[ adder>>      call . ]
-[ adder>>      call . ]
-[ subtractor>> call . ] tri"""
-"""1
-2
-1"""
+[ adder>>      call( -- x ) ]
+[ adder>>      call( -- x ) ]
+[ subtractor>> call( -- x ) ] tri"
+"\n--- Data stack:\n1\n2\n1"
 }
     $nl
     "The same variable name can be bound multiple times in the same scope. This is different from reassigning the value of a mutable variable. The most recent binding for a variable name will mask previous bindings for that name. However, the old binding referring to the previous value can still persist in closures. The following contrived example demonstrates this:"
     { $example
-"""USING: kernel locals prettyprint ;
+"USING: kernel locals ;
 IN: scratchpad
 :: rebinding-example ( -- quot1 quot2 )
     5 :> a [ a ]
@@ -143,23 +139,20 @@ IN: scratchpad
 :: mutable-example ( -- quot1 quot2 )
     5 :> a! [ a ]
     6 a! [ a ] ;
-rebinding-example [ call . ] bi@
-mutable-example [ call . ] bi@"""
-"""5
-6
-6
-6"""
+rebinding-example [ call( -- x ) ] bi@
+mutable-example [ call( -- x ) ] bi@"
+"\n--- Data stack:\n5\n6\n6\n6"
 }
     "In " { $snippet "rebinding-example" } ", the binding of " { $snippet "a" } " to " { $snippet "5" } " is closed over in the first quotation, and the binding of " { $snippet "a" } " to " { $snippet "6" } " is closed over in the second, so calling both quotations results in " { $snippet "5" } " and " { $snippet "6" } " respectively. By contrast, in " { $snippet "mutable-example" } ", both quotations close over a single binding of " { $snippet "a" } ". Even though " { $snippet "a" } " is assigned to " { $snippet "6" } " after the first quotation is made, calling either quotation will output the new value of " { $snippet "a" } "."
 { $heading "Lexical variables in literals" }
 "Some kinds of literals can include references to lexical variables as described in " { $link "locals-literals" } ". For example, the " { $link 3array } " word could be implemented as follows:"
 { $example
-"""USING: locals prettyprint ;
+"USING: locals ;
 IN: scratchpad
 
 :: my-3array ( x y z -- array ) { x y z } ;
-1 "two" 3.0 my-3array ."""
-"""{ 1 "two" 3.0 }"""
+1 \"two\" 3.0 my-3array"
+"\n--- Data stack:\n{ 1 \"two\" 3.0 }"
 } ;
 
 ARTICLE: "locals-literals" "Lexical variables in literals"
@@ -176,33 +169,34 @@ $nl
 { $heading "Object identity" }
 "This feature changes the semantics of literal object identity. An ordinary word containing a literal pushes the same literal on the stack every time it is invoked:"
 { $example
+    "USING: kernel ;"
     "IN: scratchpad"
     "TUPLE: person first-name last-name ;"
     ": ordinary-word-test ( -- tuple )"
     "    T{ person { first-name \"Alan\" } { last-name \"Kay\" } } ;"
-    "ordinary-word-test ordinary-word-test eq? ."
-    "t"
+    "ordinary-word-test ordinary-word-test eq?"
+    "\n--- Data stack:\nt"
 }
 "Inside a lexical scope, literals which do not contain lexical variables still behave in the same way:"
 { $example
-    "USE: locals"
+    "USING: kernel locals ;"
     "IN: scratchpad"
     "TUPLE: person first-name last-name ;"
     ":: locals-word-test ( -- tuple )"
     "    T{ person { first-name \"Alan\" } { last-name \"Kay\" } } ;"
-    "locals-word-test locals-word-test eq? ."
-    "t"
+    "locals-word-test locals-word-test eq?"
+    "\n--- Data stack:\nt"
 }
 "However, literals with lexical variables in them actually construct a new object:"
 { $example
-    "USING: locals splitting ;"
+    "USING: locals kernel splitting ;"
     "IN: scratchpad"
     "TUPLE: person first-name last-name ;"
     ":: constructor-test ( -- tuple )"
     "    \"Jane Smith\" \" \" split1 :> last :> first"
     "    T{ person { first-name first } { last-name last } } ;"
-    "constructor-test constructor-test eq? ."
-    "f"
+    "constructor-test constructor-test eq?"
+    "\n--- Data stack:\nf"
 }
 "One exception to the above rule is that array instances containing free lexical variables (that is, immutable lexical variables not referenced in a closure) do retain identity. This allows macros such as " { $link cond } " to expand at compile time even when their arguments reference variables." ;
 

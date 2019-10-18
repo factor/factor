@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data destructors kernel libc math ;
 IN: memory.piles
 
@@ -36,4 +37,3 @@ M: pile dispose
 
 : pile-align ( pile align -- pile )
     [ align ] curry change-offset ;
-    

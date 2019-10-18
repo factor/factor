@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators.smart fry functors kernel
-kernel.private macros sequences combinators sequences.private
-stack-checker parser math classes.tuple classes.tuple.private ;
+USING: accessors arrays classes.tuple classes.tuple.private
+combinators combinators.smart fry functors kernel macros math parser
+sequences sequences.private ;
 FROM: inverse => undo ;
 IN: tuple-arrays
 
@@ -14,12 +14,6 @@ MACRO: boa-unsafe ( class -- quot ) tuple-layout '[ _ <tuple-boa> ] ;
 
 : tuple-arity ( class -- quot ) '[ _ boa ] inputs ; inline
 
-: smart-tuple>array ( tuple class -- array )
-    '[ [ _ boa ] undo ] output>array ; inline
-
-: tuple-prototype ( class -- array )
-    [ new ] [ smart-tuple>array ] bi ; inline
-
 : tuple-slice ( n seq -- slice )
     [ n>> [ * dup ] keep + ] [ seq>> ] bi <slice-unsafe> ; inline
 
@@ -28,7 +22,7 @@ MACRO: boa-unsafe ( class -- quot ) tuple-layout '[ _ <tuple-boa> ] ;
 
 MACRO: write-tuple ( class -- quot )
     [ '[ [ _ boa ] undo ] ]
-    [ tuple-arity iota <reversed> [ '[ [ _ ] dip set-nth-unsafe ] ] map '[ _ cleave ] ]
+    [ tuple-arity <iota> <reversed> [ '[ [ _ ] dip set-nth-unsafe ] ] map '[ _ cleave ] ]
     bi '[ _ dip @ ] ;
 
 : check-final ( class -- )
@@ -40,7 +34,7 @@ MACRO: write-tuple ( class -- quot )
 
 PRIVATE>
 
-FUNCTOR: define-tuple-array ( CLASS -- )
+<FUNCTOR: define-tuple-array ( CLASS -- )
 
 CLASS IS ${CLASS}
 
@@ -60,7 +54,7 @@ TUPLE: CLASS-array
 { length array-capacity read-only } ;
 
 : <CLASS-array> ( length -- tuple-array )
-    [ \ CLASS [ tuple-prototype <repetition> concat ] [ tuple-arity ] bi ] keep
+    [ \ CLASS [ initial-values <repetition> concat ] [ tuple-arity ] bi ] keep
     \ CLASS-array boa ; inline
 
 M: CLASS-array length length>> ; inline
@@ -77,6 +71,6 @@ M: CLASS-array like drop dup CLASS-array? [ >CLASS-array ] unless ; inline
 
 INSTANCE: CLASS-array sequence
 
-;FUNCTOR
+;FUNCTOR>
 
 SYNTAX: TUPLE-ARRAY: scan-word define-tuple-array ;

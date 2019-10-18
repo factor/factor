@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: opengl.capabilities tools.test ;
 IN: opengl.capabilities.tests
 
@@ -9,13 +10,13 @@ CONSTANT: test-extensions
         "GL_EXT_slipgate"
     }
 
-[ t ]
+{ t }
 [ "GL_ARB_vent_core_frogblast" test-extensions (has-extension?) ] unit-test
 
-[ f ]
+{ f }
 [ "GL_ARB_wallhack" test-extensions (has-extension?) ] unit-test
 
-[ t ] [
+{ t } [
     { "GL_EXT_dimensional_portal" "GL_EXT_slipgate" }
     test-extensions (has-extension?)
 ] unit-test

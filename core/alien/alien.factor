@@ -8,6 +8,15 @@ IN: alien
 BUILTIN: alien { underlying c-ptr read-only initial: f } expired ;
 BUILTIN: dll { path byte-array read-only initial: B{ } } ;
 
+PRIMITIVE: <callback> ( word return-rewind -- alien )
+PRIMITIVE: <displaced-alien> ( displacement c-ptr -- alien )
+PRIMITIVE: alien-address ( c-ptr -- addr )
+PRIMITIVE: free-callback ( alien -- )
+
+<PRIVATE
+PRIMITIVE: current-callback ( -- n )
+PRIVATE>
+
 PREDICATE: pinned-alien < alien underlying>> not ;
 
 UNION: pinned-c-ptr pinned-alien POSTPONE: f ;
@@ -74,25 +83,19 @@ UNION: abi stdcall thiscall fastcall cdecl mingw ;
 : callee-cleanup? ( abi -- ? )
     { stdcall fastcall thiscall } member? ;
 
-ERROR: alien-callback-error ;
-
-: alien-callback ( return parameters abi quot -- alien )
-    alien-callback-error ;
-
-ERROR: alien-indirect-error ;
-
-: alien-indirect ( args... funcptr return parameters abi -- return... )
-    alien-indirect-error ;
-
-ERROR: alien-invoke-error library symbol ;
-
-: alien-invoke ( args... return library function parameters -- return... )
-    2over alien-invoke-error ;
-
-ERROR: alien-assembly-error code ;
+ERROR: callsite-not-compiled word ;
 
 : alien-assembly ( args... return parameters abi quot -- return... )
-    dup alien-assembly-error ;
+    \ alien-assembly callsite-not-compiled ;
+
+: alien-callback ( return parameters abi quot -- alien )
+    \ alien-callback callsite-not-compiled ;
+
+: alien-indirect ( args... funcptr return parameters abi -- return... )
+    \ alien-indirect callsite-not-compiled ;
+
+: alien-invoke ( args... return library function parameters varargs? -- return... )
+    \ alien-invoke callsite-not-compiled ;
 
 <PRIVATE
 
@@ -117,10 +120,10 @@ SYMBOL: callbacks
 TUPLE: expiry-check object alien ;
 
 : recompute-value? ( check -- ? )
-    dup [ alien>> expired? ] [ drop t ] if ;
+    [ alien>> expired? ] [ t ] if* ;
 
 : delete-values ( value assoc -- )
-    [ rot drop = not ] with assoc-filter! drop ;
+    [ rot drop = ] with assoc-reject! drop ;
 
 PRIVATE>
 

@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences kernel splitting lists fry accessors assocs math.order
-math combinators namespaces urls.encoding xml.syntax xmode.code2html
-xml.data arrays strings vectors xml.writer io.streams.string locals
-unicode.categories ;
-FROM: namespaces => set ;
+USING: accessors arrays assocs combinators fry io.streams.string
+kernel lists locals math math.order namespaces sequences splitting
+strings urls urls.encoding xml.data xml.syntax xml.writer
+xmode.code2html ;
 IN: farkup
 
 SYMBOL: relative-link-prefix
@@ -34,7 +33,7 @@ TUPLE: line ;
 TUPLE: line-break ;
 
 : absolute-url? ( string -- ? )
-    { "http://" "https://" "ftp://" } [ head? ] with any? ;
+    >url protocol>> >boolean ;
 
 : simple-link-title ( string -- string' )
     dup absolute-url? [ "/" split1-last swap or ] unless ;
@@ -152,7 +151,7 @@ DEFER: (parse-paragraph)
         '[
             _ dup ?last ?last CHAR: \\ =
             [ [ pop "|" rot 3append ] keep ] when
-            push 
+            push
         ] each
     ] keep ;
 
@@ -197,7 +196,7 @@ DEFER: (parse-paragraph)
         { CHAR: | [ parse-table ] }
         { CHAR: _ [ parse-line ] }
         { CHAR: - [ parse-ul ] }
-        { CHAR: # [ parse-ol ] } 
+        { CHAR: # [ parse-ol ] }
         { CHAR: [ [ parse-code ] }
         { f [ rest-slice f ] }
         [ drop unclip-slice make-paragraph ]
@@ -290,4 +289,3 @@ M: array (write-farkup) [ (write-farkup) ] map ;
 
 : convert-farkup ( string -- string' )
     [ write-farkup ] with-string-writer ;
-

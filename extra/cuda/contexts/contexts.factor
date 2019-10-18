@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data continuations cuda cuda.ffi
 cuda.libraries alien.destructors fry kernel namespaces ;
 IN: cuda.contexts
@@ -31,4 +32,3 @@ DESTRUCTOR: clean-up-context
 
 : with-cuda-context ( device flags quot -- )
     [ set-up-cuda-context create-context ] dip (with-cuda-context) ; inline
-

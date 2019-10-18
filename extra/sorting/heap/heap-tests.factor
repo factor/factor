@@ -1,5 +1,4 @@
-USING: kernel sequences tools.test ;
-IN: sorting.heap
+USING: kernel sequences sorting.heap tools.test ;
 
 { { } } [ { } heapsort ] unit-test
 { { 1 } } [ { 1 } heapsort ] unit-test
@@ -11,4 +10,3 @@ IN: sorting.heap
     { "fred" "wilma" "pebbles" "dino" "barney" "betty" "bamm-bamm" }
     [ length ] heapsort-with
 ] unit-test
-

@@ -286,9 +286,9 @@ cell 8 = [
 
 ! 64-bit overflow
 cell 8 = [
-    [ t ] [ 1 58 fixnum-shift dup [ fixnum+ ] compile-call 1 59 fixnum-shift = ] unit-test
-    [ -576460752303423489 ] [ 1 59 shift neg >fixnum [ -1 fixnum+ ] compile-call ] unit-test
-    
+    [ t ] [ 1 fixnum-bits 2 - fixnum-shift dup [ fixnum+ ] compile-call 1 fixnum-bits 1 - fixnum-shift = ] unit-test
+    [ t ] [ most-negative-fixnum [ -1 fixnum+ ] compile-call first-bignum 1 + neg = ] unit-test
+
     [ t ] [ 1 40 shift 1 40 shift [ fixnum* ] compile-call 1 80 shift = ] unit-test
     [ t ] [ 1 40 shift neg 1 40 shift [ fixnum* ] compile-call 1 80 shift neg = ] unit-test
     [ t ] [ 1 40 shift neg 1 40 shift neg [ fixnum* ] compile-call 1 80 shift = ] unit-test
@@ -302,9 +302,9 @@ cell 8 = [
     [ -18446744073709551616 ] [ -1 [ 64 fixnum-shift ] compile-call ] unit-test
     [ -18446744073709551616 ] [ -1 [ 32 fixnum-shift 32 fixnum-shift ] compile-call ] unit-test
 
-    [ 576460752303423488 ] [ -576460752303423488 >fixnum -1 [ fixnum/i ] compile-call ] unit-test
+    [ t ] [ most-negative-fixnum -1 [ fixnum/i ] compile-call first-bignum = ] unit-test
 
-    [ 576460752303423488 0 ] [ -576460752303423488 >fixnum -1 [ fixnum/mod ] compile-call ] unit-test
+    [ t ] [ most-negative-fixnum -1 [ fixnum/mod ] compile-call [ first-bignum = ] [ zero? ] bi* and ] unit-test
 
     [ -268435457 ] [ 28 2^ [ fixnum-bitnot ] compile-call ] unit-test
 ] when
@@ -339,7 +339,7 @@ ERROR: bug-in-fixnum* x y a b ;
 
 [ ] [
     10000 [
-        5 random iota [ drop 32 random-bits ] map product >bignum
+        5 random <iota> [ drop 32 random-bits ] map product >bignum
         dup [ bignum>fixnum ] keep compiled-bignum>fixnum =
         [ drop ] [ "Oops" throw ] if
     ] times

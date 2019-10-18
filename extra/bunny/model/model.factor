@@ -3,7 +3,6 @@ http.client io io.encodings.ascii io.files io.files.temp kernel
 locals math math.matrices math.parser math.vectors opengl
 opengl.capabilities opengl.gl opengl.demo-support sequences
 splitting vectors words specialized-arrays alien.data ;
-FROM: sequences => change-nth ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
 SPECIALIZED-ARRAY: c:uint

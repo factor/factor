@@ -1,5 +1,5 @@
-USING: help.syntax help.markup assocs ;
-IN: trees.splay 
+USING: assocs help.markup help.syntax trees ;
+IN: trees.splay
 
 HELP: SPLAY{
 { $syntax "SPLAY{ { key value }... }" }
@@ -12,7 +12,7 @@ HELP: <splay>
 
 HELP: >splay
 { $values { "assoc" assoc } { "tree" splay } }
-{ $description "Converts any " { $link assoc } " into an splay tree." } ;
+{ $description "Converts any " { $link assoc } " into an splay tree. If the input assoc is any kind of " { $link tree } ", the elements are added in reverse level order (reverse breadth-first search) to attempt to copy it's shape." } ;
 
 HELP: splay
 { $class-description "This is the class for splay trees. Splay trees have amortized average-case logarithmic time storage and retrieval operations, and better complexity on more skewed lookup distributions, though in bad situations they can degrade to linear time, resembling a linked list. These conform to the assoc protocol." } ;

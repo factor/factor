@@ -31,10 +31,10 @@ M: fuzz-test-failure summary
         " trials" %
     ] "" make ;
 
-: (fuzz-test) ( generator predicate -- error ? )
+: (fuzz-test) ( generator predicate -- error/f failed? tested? )
     [ fuzz-test-failures [ f f ] ]
     [ '[ _ fuzz-test-trials get <fuzz-test-failure> t ] ] bi
-    if-empty ; inline
+    if-empty t ; inline
 
 PRIVATE>
 

@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math sequences strings sbufs ;
+USING: arrays kernel math sbufs sequences sequences.private
+strings ;
 IN: splitting
 
 <PRIVATE
@@ -29,7 +30,7 @@ PRIVATE>
 : (split1) ( seq subseq snip-quot -- before after )
     [
         swap [
-            [ drop length ] [ start dup ] 2bi
+            [ drop length ] [ subseq-start dup ] 2bi
             [ [ nip ] [ + ] 2bi t ]
             [ 2drop f f f ]
             if
@@ -89,10 +90,10 @@ PRIVATE>
 PRIVATE>
 
 : split-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
-    [ subseq ] (split) ; inline
+    [ subseq-unsafe ] (split) ; inline
 
 : split-when-slice ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
-    [ <slice> ] (split) ; inline
+    [ <slice-unsafe> ] (split) ; inline
 
 : split ( seq separators -- pieces )
     [ member? ] curry split-when ; inline
@@ -100,22 +101,24 @@ PRIVATE>
 : split-slice ( seq separators -- pieces )
     [ member? ] curry split-when-slice ; inline
 
-GENERIC: string-lines ( str -- seq )
+: split-indices ( seq indices -- pieces )
+    over length suffix 0 swap [
+        [ pick subseq ] keep swap
+    ] map 2nip ;
+
+! string-lines uses string-nth-fast which is 50% faster over
+! nth-unsafe. be careful when changing the definition so that
+! you don't unoptimize it.
+GENERIC: string-lines ( seq -- seq' )
 
 M: string string-lines
-    dup [ "\r\n" member? ] any? [
-        "\n" split
-        [
-            but-last-slice [
-                "\r" ?tail drop "\r" split
-            ] map! drop
-        ] [
-            [ length 1 - ] keep [ "\r" split ] change-nth
-        ]
-        [ concat ]
-        tri
-    ] [
-        1array
-    ] if ;
+    [ V{ } clone 0 ] dip [ 2dup bounds-check? ] [
+        2dup [ "\r\n" member? ] find-from swapd [
+            over [ [ nip length ] keep ] unless
+            [ "" subseq-as suffix! ] 2keep [ 1 + ] dip
+        ] dip CHAR: \r eq? [
+            2dup ?nth CHAR: \n eq? [ [ 1 + ] dip ] when
+        ] when
+    ] while 2drop { } like ;
 
 M: sbuf string-lines "" like string-lines ;

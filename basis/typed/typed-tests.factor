@@ -1,13 +1,13 @@
-USING: accessors effects eval kernel layouts math namespaces
-quotations tools.test typed words words.symbol combinators.short-circuit
-compiler.tree.debugger prettyprint definitions compiler.units sequences
-classes.intersection strings classes.union ;
+USING: accessors compiler.units effects eval kernel kernel.private layouts
+literals math namespaces quotations tools.test typed words words.symbol
+combinators.short-circuit compiler.tree.debugger prettyprint definitions
+sequences classes.intersection strings classes.union ;
 IN: typed.tests
 
 TYPED: f+ ( a: float b: float -- c: float )
     + ;
 
-[ 3.5 ]
+{ 3.5 }
 [ 2 1+1/2 f+ ] unit-test
 
 TYPED: fix+ ( a: fixnum b: fixnum -- c: fixnum )
@@ -18,7 +18,7 @@ TYPED: fix+ ( a: fixnum b: fixnum -- c: fixnum )
 ! [ most-positive-fixnum 1 fix+ ] unit-test
 
 ! XXX: Check that we throw an error. This used to underflow to the least-positive-fixnum.
-[ most-positive-fixnum 1 fix+ ] [ { "kernel-error" 7 } head? ] must-fail-with
+[ most-positive-fixnum 1 fix+ ] [ ${ KERNEL-ERROR 7 } head? ] must-fail-with
 
 TUPLE: tweedle-dee ; final
 TUPLE: tweedle-dum ; final
@@ -44,7 +44,7 @@ TYPED: dumdum ( x -- y: tweedle-dum )
 TYPED:: f+locals ( a: float b: float -- c: float )
     a b + ;
 
-[ 3.5 ] [ 2 1+1/2 f+locals ] unit-test
+{ 3.5 } [ 2 1+1/2 f+locals ] unit-test
 
 TUPLE: unboxable
     { x fixnum read-only }
@@ -57,15 +57,15 @@ TUPLE: unboxable2
 TYPED: unboxy ( in: unboxable -- out: unboxable2 )
     dup [ x>> ] [ y>> ] bi - unboxable2 boa ;
 
-[ ( in: fixnum in: fixnum -- out: fixnum out: fixnum out: fixnum ) ]
+{ ( in: fixnum in: fixnum -- out: fixnum out: fixnum out: fixnum ) }
 [ \ unboxy "typed-word" word-prop stack-effect ] unit-test
 
-[ T{ unboxable2 { u T{ unboxable { x 12 } { y 3 } } } { xy 9 } } ]
+{ T{ unboxable2 { u T{ unboxable { x 12 } { y 3 } } } { xy 9 } } }
 [ T{ unboxable { x 12 } { y 3 } } unboxy ] unit-test
 
-[ 9 ]
+{ 9 }
 [
-"""
+"
 USING: kernel math ;
 IN: typed.tests
 
@@ -73,19 +73,19 @@ TUPLE: unboxable
     { x fixnum read-only }
     { y fixnum read-only }
     { z float read-only } ; final
-""" eval( -- )
+" eval( -- )
 
-"""
+"
 USING: accessors kernel math ;
 IN: typed.tests
 T{ unboxable f 12 3 4.0 } unboxy xy>>
-""" eval( -- xy )
+" eval( -- xy )
 ] unit-test
 
 TYPED: no-inputs ( -- out: integer )
     1 ;
 
-[ 1 ] [ no-inputs ] unit-test
+{ 1 } [ no-inputs ] unit-test
 
 TUPLE: unboxable3
     { x read-only } ; final
@@ -93,23 +93,23 @@ TUPLE: unboxable3
 TYPED: no-inputs-unboxable-output ( -- out: unboxable3 )
     T{ unboxable3 } ;
 
-[ T{ unboxable3 } ] [ no-inputs-unboxable-output ] unit-test
+{ T{ unboxable3 } } [ no-inputs-unboxable-output ] unit-test
 
-[ f ] [ no-inputs-unboxable-output no-inputs-unboxable-output eq? ] unit-test
+{ f } [ no-inputs-unboxable-output no-inputs-unboxable-output eq? ] unit-test
 
 SYMBOL: buh
 
 TYPED: no-outputs ( x: integer -- )
     buh set ;
 
-[ 2 ] [ 2 no-outputs buh get ] unit-test
+{ 2 } [ 2 no-outputs buh get ] unit-test
 
 TYPED: no-outputs-unboxable-input ( x: unboxable3 -- )
     buh set ;
 
-[ T{ unboxable3 } ] [ T{ unboxable3 } no-outputs-unboxable-input buh get ] unit-test
+{ T{ unboxable3 } } [ T{ unboxable3 } no-outputs-unboxable-input buh get ] unit-test
 
-[ f ] [
+{ f } [
     T{ unboxable3 } no-outputs-unboxable-input buh get
     T{ unboxable3 } no-outputs-unboxable-input buh get
     eq?
@@ -121,21 +121,21 @@ TUPLE: subclass < superclass { y read-only } ; final
 
 TYPED: unbox-fail ( a: superclass -- ? ) subclass? ;
 
-[ t ] [ subclass new unbox-fail ] unit-test
+{ t } [ subclass new unbox-fail ] unit-test
 
 ! If a final class becomes non-final, typed words need to be recompiled
 TYPED: recompile-fail ( a: subclass -- ? ) buh get eq? ;
 
-[ f ] [ subclass new [ buh set ] [ recompile-fail ] bi ] unit-test
+{ f } [ subclass new [ buh set ] [ recompile-fail ] bi ] unit-test
 
-[ ] [ "IN: typed.tests TUPLE: subclass < superclass { y read-only } ;" eval( -- ) ] unit-test
+{ } [ "IN: typed.tests TUPLE: subclass < superclass { y read-only } ;" eval( -- ) ] unit-test
 
-[ t ] [ subclass new [ buh set ] [ recompile-fail ] bi ] unit-test
+{ t } [ subclass new [ buh set ] [ recompile-fail ] bi ] unit-test
 
 ! Make sure that foldable and flushable work on typed words
 TYPED: add ( a: integer b: integer -- c: integer ) + ; foldable
 
-[ [ 3 ] ] [ [ 1 2 add ] cleaned-up-tree nodes>quot ] unit-test
+{ [ 3 ] } [ [ 1 2 add ] cleaned-up-tree nodes>quot ] unit-test
 
 TYPED: flush-test ( s: symbol -- ? ) on t ; flushable
 
@@ -144,14 +144,14 @@ TYPED: flush-test ( s: symbol -- ? ) on t ; flushable
 
 SYMBOL: a-symbol
 
-[ f ] [
+{ f } [
     f a-symbol [
         a-symbol flush-print-1
         a-symbol get
     ] with-variable
 ] unit-test
 
-[ t ] [
+{ t } [
     f a-symbol [
         a-symbol flush-print-2
         a-symbol get
@@ -163,27 +163,27 @@ TUPLE: forget-class { x read-only } ; final
 
 TYPED: forget-fail ( a: forget-class -- ) drop ;
 
-[ ] [ [ \ forget-class forget ] with-compilation-unit ] unit-test
+{ } [ [ \ forget-class forget ] with-compilation-unit ] unit-test
 
-[ ] [ [ \ forget-fail forget ] with-compilation-unit ] unit-test
+{ } [ [ \ forget-fail forget ] with-compilation-unit ] unit-test
 
 TYPED: typed-maybe ( x: maybe{ integer } -- ? ) >boolean ;
 
-[ f ] [ f typed-maybe ] unit-test
-[ t ] [ 30 typed-maybe ] unit-test
+{ f } [ f typed-maybe ] unit-test
+{ t } [ 30 typed-maybe ] unit-test
 [ 30.0 typed-maybe ] [ input-mismatch-error? ] must-fail-with
 
 TYPED: typed-union ( x: union{ integer string } -- ? ) >boolean ;
 
-[ t ] [ 3 typed-union ] unit-test
-[ t ] [ "asdf" typed-union ] unit-test
+{ t } [ 3 typed-union ] unit-test
+{ t } [ "asdf" typed-union ] unit-test
 [ 3.3 typed-union ] [ input-mismatch-error? ] must-fail-with
 
 TYPED: typed-intersection ( x: intersection{ integer bignum } -- ? ) >boolean ;
 
-[ t ] [ 5555555555555555555555555555555555555555555555555555 typed-intersection ] unit-test
+{ t } [ 5555555555555555555555555555555555555555555555555555 typed-intersection ] unit-test
 [ 0 typed-intersection ] [ input-mismatch-error? ] must-fail-with
 
 [
-    """IN: test123 USE: typed TYPED: foo ( x -- y ) ;""" eval( -- )
+    "IN: test123 USE: typed TYPED: foo ( x -- y ) ;" eval( -- )
 ] [ error>> no-types-specified? ] must-fail-with

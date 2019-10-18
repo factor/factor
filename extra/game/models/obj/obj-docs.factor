@@ -65,4 +65,3 @@ HELP: push-current-model
 HELP: line>obj
 { $values { "line" string } }
 { $description "Process a line from the object file within the current parsing context." } ;
-

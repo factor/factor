@@ -46,14 +46,14 @@ void main()
     gl_FragColor = col;
 }
 ;
-   
+
 UNIFORM-TUPLE: blur-uniforms
     { "texture"    texture-uniform f }
     { "horizontal" bool-uniform    f }
     { "blurSize"   float-uniform   f } ;
 
 GLSL-PROGRAM: blur-program window-vertex-shader blur-fragment-shader window-vertex-format ;
-                        
+
 :: (blur) ( texture horizontal? framebuffer dim -- )
     { 0 0 } dim <rect> <viewport-state> set-gpu-state
     texture horizontal? 1.0 dim horizontal? [ first ] [ second ] if / blur-uniforms boa framebuffer {
@@ -63,16 +63,16 @@ GLSL-PROGRAM: blur-program window-vertex-shader blur-fragment-shader window-vert
         { "indexes"        [ 2drop T{ index-range f 0 4 } ] }
         { "framebuffer"    [ nip ] }
     } 2<render-set> render ;
-                         
+
 :: blur ( texture horizontal? -- texture )
     texture 0 texture-dim :> dim
     dim RGB float-components <2d-render-texture> :> ( target-framebuffer target-texture )
     texture horizontal? target-framebuffer dim (blur)
     target-framebuffer dispose
     target-texture ;
-                         
+
 : horizontal-blur ( texture -- texture ) t blur ; inline
-                         
+
 : vertical-blur ( texture -- texture ) f blur ; inline
 
 : discompose ( quot1 quot2 -- compose )

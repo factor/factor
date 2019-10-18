@@ -22,7 +22,7 @@ M: windowed-sequence length
     [ drop 0 ] [ length ] bi clamp ; inline
 
 : in-bounds ( a b sequence -- a' b' sequence )
-    [ nip in-bound ] [ [ nip ] dip in-bound ] [ 2nip ] 3tri ;
+    [ nip in-bound ] [ nipd in-bound ] [ 2nip ] 3tri ;
 
 :: rolling-map ( ... seq n quot: ( ... slice -- ... elt ) -- ... newseq )
     seq length [

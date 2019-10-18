@@ -1,6 +1,6 @@
-USING: io io.streams.string io.streams.duplex listener
-tools.test parser math namespaces continuations vocabs kernel
-compiler.units eval vocabs.parser words definitions ;
+USING: compiler.units continuations definitions eval io
+io.streams.string kernel listener listener.private math namespaces
+parser parser.notes tools.test vocabs vocabs.parser words ;
 IN: listener.tests
 
 SYNTAX: hello "Hi" print ;
@@ -28,7 +28,7 @@ SYNTAX: hello "Hi" print ;
     ] unit-test
 ] with-file-vocabs
 
-[ ] [
+{ } [
     [
         "vocabs.loader.test.c" forget-vocab
     ] with-compilation-unit
@@ -40,7 +40,7 @@ SYNTAX: hello "Hi" print ;
     ] must-fail
 ] with-file-vocabs
 
-[ ] [
+{ } [
     [
         "vocabs.loader.test.c" forget-vocab
     ] with-compilation-unit
@@ -53,15 +53,26 @@ SYNTAX: hello "Hi" print ;
     ] unit-test
 ] with-file-vocabs
 
-[ "call" "scratchpad" create drop ] with-compilation-unit
+[ "call" "scratchpad" create-word drop ] with-compilation-unit
 
 [
-    [ t ]
+    { t }
     [
         "call" "scratchpad" lookup-word
         [ "call" search ] with-interactive-vocabs
         eq?
-    ] unit-test 
+    ] unit-test
 ] with-file-vocabs
 
 [ "call" "scratchpad" lookup-word forget ] with-compilation-unit
+
+[
+    { t } [
+        "[ ]" [
+            t parser-quiet? [
+                { } listener-step drop
+                parser-quiet? get
+            ] with-variable
+        ] with-string-reader
+    ] unit-test
+] with-file-vocabs

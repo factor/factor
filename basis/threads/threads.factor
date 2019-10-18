@@ -1,20 +1,23 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.private arrays hashtables heaps kernel kernel.private
-math namespaces sequences vectors continuations continuations.private
-dlists assocs system combinators init boxes accessors math.order
-deques strings quotations fry ;
-FROM: assocs => change-at ;
+USING: accessors alien.private arrays assocs boxes combinators
+continuations continuations.private deques dlists fry hashtables
+heaps init kernel kernel.private math math.order namespaces
+quotations sequences strings system ;
 IN: threads
 
 <PRIVATE
+PRIMITIVE: (set-context) ( obj context -- obj' )
+PRIMITIVE: (set-context-and-delete) ( obj context -- * )
+PRIMITIVE: (sleep) ( nanos -- )
+PRIMITIVE: (start-context) ( obj quot -- obj' )
+PRIMITIVE: (start-context-and-delete) ( obj quot -- * )
+
+PRIMITIVE: context-object-for ( n context -- obj )
 
 ! Wrap sub-primitives; we don't want them inlined into callers
 ! since their behavior depends on what frames are on the callstack
-: context ( -- context )
-    CONTEXT-OBJ-CONTEXT context-object ; inline
-
 : set-context ( obj context -- obj' )
     (set-context) ; inline
 
@@ -48,16 +51,16 @@ PRIVATE>
 SYMBOL: initial-thread
 
 TUPLE: thread
-{ name string }
-{ quot callable initial: [ ] }
-{ exit-handler callable initial: [ ] }
-{ id integer }
-{ context box }
-state
-runnable
-mailbox
-{ variables hashtable }
-sleep-entry ;
+    { name string }
+    { quot callable initial: [ ] }
+    { exit-handler callable initial: [ ] }
+    { id integer }
+    { context box }
+    state
+    runnable
+    mailbox
+    { variables hashtable }
+    sleep-entry ;
 
 : self ( -- thread )
     OBJ-CURRENT-THREAD special-object { thread } declare ; inline
@@ -92,7 +95,8 @@ sleep-entry ;
 : unregister-thread ( thread -- )
     id>> threads delete-at ;
 
-: set-self ( thread -- ) OBJ-CURRENT-THREAD set-special-object ; inline
+: set-self ( thread -- )
+    OBJ-CURRENT-THREAD set-special-object ; inline
 
 PRIVATE>
 
@@ -135,9 +139,9 @@ PRIVATE>
 
 : interrupt ( thread -- )
     dup state>> [
-        dup sleep-entry>> [ sleep-queue heap-delete ] when*
-        f >>sleep-entry
-        dup resume
+        [
+            [ sleep-queue heap-delete ] when* f
+        ] change-sleep-entry dup resume
     ] when drop ;
 
 DEFER: stop
@@ -202,7 +206,8 @@ PRIVATE>
     [ context ] dip context>> >box
     next (next) ;
 
-: yield ( -- ) self resume f suspend drop ;
+: yield ( -- )
+    self resume f suspend drop ;
 
 GENERIC: sleep-until ( n/f -- )
 
@@ -218,7 +223,7 @@ M: real sleep
     >integer nano-count + sleep-until ;
 
 : (spawn) ( thread -- )
-    [ register-thread ] [ [ namestack ] dip resume-with ] bi ;
+    [ register-thread ] [ [ get-namestack ] dip resume-with ] bi ;
 
 : spawn ( quot name -- thread )
     <thread> [ (spawn) ] keep ;
@@ -227,7 +232,7 @@ M: real sleep
     [ '[ _ loop ] ] dip spawn ;
 
 : in-thread ( quot -- )
-    [ datastack ] dip
+    [ get-datastack ] dip
     '[ _ set-datastack @ ]
     "Thread" spawn drop ;
 

@@ -22,7 +22,10 @@ CONSTANT: SOL_SOCKET 1
 
 CONSTANT: FD_SETSIZE 1024
 
+CONSTANT: SO_DEBUG 1
 CONSTANT: SO_REUSEADDR 2
+CONSTANT: SO_TYPE 3
+CONSTANT: SO_ERROR 4
 CONSTANT: SO_DONTROUTE 5
 CONSTANT: SO_BROADCAST 6
 CONSTANT: SO_SNDBUF 7
@@ -83,7 +86,13 @@ ALIAS: PF_INET6 AF_INET6
 CONSTANT: IPPROTO_TCP 6
 CONSTANT: IPPROTO_UDP 17
 
-CONSTANT: AI_PASSIVE 1
+! Flags only valid in gnu libcs' getaddrinfo
+CONSTANT: AI_IDN                        0x0040
+CONSTANT: AI_CANONIDN                   0x0080
+CONSTANT: AI_IDN_ALLOW_UNASSIGNED       0x0100
+CONSTANT: AI_IDN_USE_STD3_ASCII_RULES   0x0200
+CONSTANT: AI_NUMERICSERV                0x0400
+
 
 CONSTANT: SEEK_SET 0
 CONSTANT: SEEK_CUR 1
@@ -106,11 +115,11 @@ STRUCT: dirent
     { d_type uchar }
     { d_name char[256] } ;
 
-FUNCTION: int open64 ( c-string path, int flags, int prot ) ;
-FUNCTION: dirent* readdir64 ( DIR* dirp ) ;
-FUNCTION: int readdir64_r ( void* dirp, dirent* entry, dirent** result ) ;
+FUNCTION: int open64 ( c-string path, int flags, int prot )
+FUNCTION: dirent* readdir64 ( DIR* dirp )
+FUNCTION: int readdir64_r ( void* dirp, dirent* entry, dirent** result )
 
-FUNCTION: ssize_t sendfile ( int out_fd, int in_fd, off_t* offset, size_t count ) ;
+FUNCTION: ssize_t sendfile ( int out_fd, int in_fd, off_t* offset, size_t count )
 
 
 CONSTANT: __UT_LINESIZE 32

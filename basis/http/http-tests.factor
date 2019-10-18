@@ -1,31 +1,29 @@
-USING: destructors http http.server http.client http.client.private tools.test
-multiline fry io.streams.string io.encodings.utf8 io.encodings.8-bit
-io.encodings.binary io.encodings.string io.encodings.ascii kernel
-arrays splitting sequences assocs io.sockets db db.sqlite make
-continuations urls hashtables accessors namespaces xml.data
-io.encodings.8-bit.latin1 random combinators.short-circuit ;
+USING: destructors http http.server http.server.requests http.client
+http.client.private tools.test multiline fry io.streams.string io.crlf
+io.encodings.utf8 io.encodings.latin1 io.encodings.binary io.encodings.string
+io.encodings.ascii kernel arrays splitting sequences assocs io.sockets db
+db.sqlite make continuations urls hashtables accessors namespaces xml.data
+random combinators.short-circuit literals ;
 IN: http.tests
 
-[ "text/plain" "UTF-8" ] [ "text/plain" parse-content-type ] unit-test
+{ "text/plain" "UTF-8" } [ "text/plain" parse-content-type ] unit-test
 
-[ "text/html" "ASCII" ] [ "text/html;  charset=ASCII" parse-content-type ] unit-test
+{ "text/html" "ASCII" } [ "text/html;  charset=ASCII" parse-content-type ] unit-test
 
-[ "text/html" "utf-8" ] [ "text/html; charset=\"utf-8\"" parse-content-type ] unit-test
+{ "text/html" "utf-8" } [ "text/html; charset=\"utf-8\"" parse-content-type ] unit-test
 
-[ "application/octet-stream" f ] [ "application/octet-stream" parse-content-type ] unit-test
+{ "application/octet-stream" f } [ "application/octet-stream" parse-content-type ] unit-test
 
-[ "localhost" f ] [ "localhost" parse-host ] unit-test
-[ "localhost" 8888 ] [ "localhost:8888" parse-host ] unit-test
-[ "::1" 8888 ] [ "::1:8888" parse-host ] unit-test
-[ "127.0.0.1" 8888 ] [ "127.0.0.1:8888" parse-host ] unit-test
+{ "localhost" f } [ "localhost" parse-host ] unit-test
+{ "localhost" 8888 } [ "localhost:8888" parse-host ] unit-test
+{ "::1" 8888 } [ "::1:8888" parse-host ] unit-test
+{ "127.0.0.1" 8888 } [ "127.0.0.1:8888" parse-host ] unit-test
 
-[ "localhost" ] [ T{ url { protocol "http" } { host "localhost" } } unparse-host ] unit-test
-[ "localhost" ] [ T{ url { protocol "http" } { host "localhost" } { port 80 } } unparse-host ] unit-test
-[ "localhost" ] [ T{ url { protocol "https" } { host "localhost" } { port 443 } } unparse-host ] unit-test
-[ "localhost:8080" ] [ T{ url { protocol "http" } { host "localhost" } { port 8080 } } unparse-host ] unit-test
-[ "localhost:8443" ] [ T{ url { protocol "https" } { host "localhost" } { port 8443 } } unparse-host ] unit-test
-
-: lf>crlf ( string -- string' ) "\n" split "\r\n" join ;
+{ "localhost" } [ T{ url { protocol "http" } { host "localhost" } } unparse-host ] unit-test
+{ "localhost" } [ T{ url { protocol "http" } { host "localhost" } { port 80 } } unparse-host ] unit-test
+{ "localhost" } [ T{ url { protocol "https" } { host "localhost" } { port 443 } } unparse-host ] unit-test
+{ "localhost:8080" } [ T{ url { protocol "http" } { host "localhost" } { port 8080 } } unparse-host ] unit-test
+{ "localhost:8443" } [ T{ url { protocol "https" } { host "localhost" } { port 8443 } } unparse-host ] unit-test
 
 STRING: read-request-test-1
 POST /bar HTTP/1.1
@@ -37,9 +35,10 @@ Content-type: application/octet-stream
 blah
 ;
 
-[
+{
     T{ request
         { url T{ url { path "/bar" } } }
+        { proxy-url T{ url } }
         { method "POST" }
         { version "1.1" }
         { header H{ { "some-header" "1; 2" } { "content-length" "4" } { "content-type" "application/octet-stream" } } }
@@ -47,7 +46,7 @@ blah
         { cookies V{ } }
         { redirects 10 }
     }
-] [
+} [
     read-request-test-1 lf>crlf [
         read-request
     ] with-string-reader
@@ -62,7 +61,7 @@ some-header: 1; 2
 blah
 ;
 
-read-request-test-1' 1array [
+${ read-request-test-1' } [
     read-request-test-1 lf>crlf
     [ read-request ] with-string-reader
     [ write-request ] with-string-writer
@@ -76,16 +75,17 @@ Host: www.sex.com
 
 ;
 
-[
+{
     T{ request
         { url T{ url { host "www.sex.com" } { path "/bar" } } }
+        { proxy-url T{ url } }
         { method "HEAD" }
         { version "1.1" }
         { header H{ { "host" "www.sex.com" } } }
         { cookies V{ } }
         { redirects 10 }
     }
-] [
+} [
     read-request-test-2 lf>crlf [
         read-request
     ] with-string-reader
@@ -97,16 +97,17 @@ Host: www.sex.com:101
 
 ;
 
-[
+{
     T{ request
         { url T{ url { host "www.sex.com" } { port 101 } { path "/bar" } } }
+        { proxy-url T{ url } }
         { method "HEAD" }
         { version "1.1" }
         { header H{ { "host" "www.sex.com:101" } } }
         { cookies V{ } }
         { redirects 10 }
     }
-] [
+} [
     read-request-test-2' lf>crlf [
         read-request
     ] with-string-reader
@@ -122,7 +123,7 @@ GET /blah HTTP/1.0
 Host: "www.amazon.com"
 ;
 
-[ "www.amazon.com" ]
+{ "www.amazon.com" }
 [
     read-request-test-4 lf>crlf [ read-request ] with-string-reader
     "host" header
@@ -135,7 +136,7 @@ Content-Type: text/html; charset=UTF-8
 blah
 ;
 
-[
+{
     T{ response
         { version "1.1" }
         { code 404 }
@@ -146,7 +147,7 @@ blah
         { content-charset "UTF-8" }
         { content-encoding utf8 }
     }
-] [
+} [
     read-response-test-1 lf>crlf
     [ read-response ] with-string-reader
 ] unit-test
@@ -156,10 +157,9 @@ STRING: read-response-test-1'
 HTTP/1.1 404 not found
 content-type: text/html; charset=UTF-8
 
-
 ;
 
-read-response-test-1' 1array [
+${ read-response-test-1' } [
     URL" http://localhost/" url set
     read-response-test-1 lf>crlf
     [ read-response ] with-string-reader
@@ -168,12 +168,12 @@ read-response-test-1' 1array [
     string-lines "\n" join
 ] unit-test
 
-[ t ] [
+{ t } [
     "rmid=732423sdfs73242; path=/; domain=.example.net; expires=Fri, 31-Dec-2010 23:59:59 GMT"
     dup parse-set-cookie first unparse-set-cookie =
 ] unit-test
 
-[ t ] [
+{ t } [
     "a="
     dup parse-set-cookie first unparse-set-cookie =
 ] unit-test
@@ -185,7 +185,7 @@ Set-Cookie: oo="bar; a=b"; httponly=yes; sid=123456
 
 ;
 
-[ 2 ] [
+{ 2 } [
     read-response-test-2 lf>crlf
     [ read-response ] with-string-reader
     cookies>> length
@@ -198,7 +198,7 @@ Set-Cookie: oo="bar; a=b"; comment="your mom"; httponly=yes
 
 ;
 
-[ 1 ] [
+{ 1 } [
     read-response-test-3 lf>crlf
     [ read-response ] with-string-reader
     cookies>> length
@@ -228,8 +228,8 @@ http.server.dispatchers db.tuples ;
     "http://localhost/quit" add-addr http-get nip
     "Goodbye" assert= ;
 
-[ ] [
-    [ test-db-file delete-file ] ignore-errors
+{ } [
+    test-db-file ?delete-file
 
     test-db [
         init-furnace-tables
@@ -237,13 +237,12 @@ http.server.dispatchers db.tuples ;
 ] unit-test
 
 : test-with-dispatcher ( dispatcher quot -- )
-    '[
-        main-responder set
+    [ main-responder ] dip '[
         <http-server> 0 >>insecure f >>secure
         [
             server-addrs random "addr" set @
         ] with-threaded-server
-    ] with-scope ; inline
+    ] with-variable ; inline
 
 USING: locals ;
 
@@ -346,7 +345,7 @@ SYMBOL: a
 <dispatcher>
     <action>
         [ a get-global "a" set-value ] >>init
-        [ [ "<html>" write "a" <field> render "</html>" write ] "text/html" <content> ] >>display
+        [ [ "<!DOCTYPE html><html>" write "a" <field> render "</html>" write ] "text/html" <content> ] >>display
         [ { { "a" [ v-integer ] } } validate-params ] >>validate
         [ "a" value a set-global URL" " <redirect> ] >>submit
     <conversations>
@@ -393,11 +392,11 @@ test-db <db-persistence> [
 ] test-with-db-persistence
 
 ! Test cloning
-[ f ] [ <404> dup clone "b" "a" set-header drop "a" header ] unit-test
-[ f ] [ <404> dup clone "b" "a" <cookie> put-cookie drop "a" get-cookie ] unit-test
+{ f } [ <404> dup clone "b" "a" set-header drop "a" header ] unit-test
+{ f } [ <404> dup clone "b" "a" <cookie> put-cookie drop "a" get-cookie ] unit-test
 
 ! Test basic auth
-[ "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==" ] [
+{ "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==" } [
     <request> "Aladdin" "open sesame" set-basic-auth "Authorization" header
 ] unit-test
 
@@ -445,7 +444,7 @@ test-db <db-persistence> [
     "resource:basis/http/test/" <static> enable-fhtml >>default
     add-quit-action [
 
-    [ "OK\n\n" ] [ "http://localhost/" add-addr http-get nip ] unit-test
+    [ "OK\n" ] [ "http://localhost/" add-addr http-get nip ] unit-test
 
     [ ] [ stop-test-httpd ] unit-test
 

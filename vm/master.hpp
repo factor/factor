@@ -11,7 +11,7 @@
 
 #include <errno.h>
 
-/* C headers */
+// C headers
 #include <fcntl.h>
 #include <limits.h>
 #include <math.h>
@@ -22,7 +22,7 @@
 #include <wchar.h>
 #include <stdint.h>
 
-/* C++ headers */
+// C++ headers
 #include <algorithm>
 #include <list>
 #include <map>
@@ -31,12 +31,13 @@
 #include <iostream>
 #include <iomanip>
 #include <limits>
+#include <sstream>
 #include <string>
 
 #define FACTOR_STRINGIZE_I(x) #x
 #define FACTOR_STRINGIZE(x) FACTOR_STRINGIZE_I(x)
 
-/* Record compiler version */
+// Record compiler version
 #if defined(__clang__)
 #define FACTOR_COMPILER_VERSION "Clang (GCC " __VERSION__ ")"
 #elif defined(__INTEL_COMPILER)
@@ -51,7 +52,10 @@
 #define FACTOR_COMPILER_VERSION "unknown"
 #endif
 
-/* Detect target CPU type */
+// Record compilation time
+#define FACTOR_COMPILE_TIME __DATE__ " " __TIME__
+
+// Detect target CPU type
 #if defined(__arm__)
 #define FACTOR_ARM
 #elif defined(__amd64__) || defined(__x86_64__) || defined(_M_AMD64)
@@ -78,64 +82,54 @@
 #define WINDOWS
 #endif
 
-/* Forward-declare this since it comes up in function prototypes */
+// Forward-declare this since it comes up in function prototypes
 namespace factor { struct factor_vm; }
 
-/* Factor headers */
+// Factor headers
 #include "assert.hpp"
+#include "debug.hpp"
 #include "layouts.hpp"
 #include "platform.hpp"
+#include "utilities.hpp"
 #include "primitives.hpp"
+#include "errors.hpp"
 #include "segments.hpp"
 #include "gc_info.hpp"
 #include "contexts.hpp"
 #include "run.hpp"
 #include "objects.hpp"
 #include "sampling_profiler.hpp"
-#include "errors.hpp"
 #include "bignumint.hpp"
 #include "bignum.hpp"
 #include "booleans.hpp"
 #include "instruction_operands.hpp"
+#include "tagged.hpp"
 #include "code_blocks.hpp"
 #include "bump_allocator.hpp"
 #include "bitwise_hacks.hpp"
 #include "mark_bits.hpp"
-#include "free_list.hpp"
 #include "fixup.hpp"
-#include "tuples.hpp"
-#include "free_list_allocator.hpp"
+#include "free_list.hpp"
 #include "write_barrier.hpp"
 #include "object_start_map.hpp"
-#include "nursery_space.hpp"
 #include "aging_space.hpp"
 #include "tenured_space.hpp"
 #include "data_heap.hpp"
 #include "code_heap.hpp"
 #include "gc.hpp"
-#include "strings.hpp"
 #include "float_bits.hpp"
 #include "io.hpp"
 #include "image.hpp"
 #include "callbacks.hpp"
 #include "dispatch.hpp"
-#include "entry_points.hpp"
-#include "safepoints.hpp"
 #include "vm.hpp"
 #include "allot.hpp"
-#include "tagged.hpp"
 #include "data_roots.hpp"
 #include "code_roots.hpp"
 #include "generic_arrays.hpp"
 #include "callstack.hpp"
 #include "slot_visitor.hpp"
-#include "collector.hpp"
-#include "copying_collector.hpp"
-#include "nursery_collector.hpp"
-#include "aging_collector.hpp"
 #include "to_tenured_collector.hpp"
-#include "code_block_visitor.hpp"
-#include "full_collector.hpp"
 #include "arrays.hpp"
 #include "math.hpp"
 #include "byte_arrays.hpp"
@@ -144,6 +138,5 @@ namespace factor { struct factor_vm; }
 #include "inline_cache.hpp"
 #include "mvm.hpp"
 #include "factor.hpp"
-#include "utilities.hpp"
 
-#endif /* __FACTOR_MASTER_H__ */
+#endif // __FACTOR_MASTER_H__

@@ -1,13 +1,12 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.tuple colors
-colors.constants combinators combinators.short-circuit
-combinators.smart fry kernel locals math math.rectangles
-math.vectors models namespaces opengl opengl.gl quotations
-sequences strings ui.commands ui.gadgets ui.gadgets.borders
-ui.gadgets.labels ui.gadgets.packs ui.gadgets.theme
-ui.gadgets.tracks ui.gadgets.worlds ui.gestures ui.pens
-ui.pens.image ui.pens.solid ui.pens.tile ;
+USING: accessors assocs colors colors.constants combinators
+combinators.short-circuit combinators.smart fry kernel locals
+math.vectors memoize models namespaces sequences system
+ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.labels
+ui.gadgets.packs ui.gadgets.worlds ui.gestures ui.pens
+ui.pens.image ui.pens.solid ui.pens.tile ui.theme
+ui.theme.images ;
 FROM: models => change-model ;
 IN: ui.gadgets.buttons
 
@@ -27,17 +26,17 @@ TUPLE: button < border pressed? selected? quot tooltip ;
 : mouse-clicked? ( gadget -- ? )
     hand-clicked get-global child? ;
 
+: button-pressed? ( button -- ? )
+    { [ mouse-clicked? ] [ button-rollover? ] } 1&&
+    buttons-down? and ;
+
 PRIVATE>
 
 : button-update ( button -- )
-    dup
-    { [ mouse-clicked? ] [ button-rollover? ] } 1&&
-    buttons-down? and
-    >>pressed?
-    relayout-1 ;
+    dup button-pressed? >>pressed? relayout-1 ;
 
 : button-enter ( button -- )
-    dup dup tooltip>> [ swap show-status ] [ drop ] if* button-update ;
+    dup tooltip>> [ over show-status ] when* button-update ;
 
 : button-leave ( button -- )
     [ hide-status ] [ button-update ] bi ;
@@ -58,12 +57,12 @@ button H{
 : new-button ( label quot class -- button )
     [ swap >label ] dip new-border swap >>quot ; inline
 
-: <button> ( label quot -- button )
+: <button> ( label quot: ( button -- ) -- button )
     button new-button ;
 
 TUPLE: button-pen
-plain rollover
-pressed selected pressed-selected ;
+    plain rollover
+    pressed selected pressed-selected ;
 
 C: <button-pen> button-pen
 
@@ -79,10 +78,10 @@ C: <button-pen> button-pen
     } cond ;
 
 M: button-pen draw-interior
-    lookup-button-pen dup [ draw-interior ] [ 2drop ] if ;
+    lookup-button-pen [ draw-interior ] [ drop ] if* ;
 
 M: button-pen draw-boundary
-    lookup-button-pen dup [ draw-boundary ] [ 2drop ] if ;
+    lookup-button-pen [ draw-boundary ] [ drop ] if* ;
 
 M: button-pen pen-pref-dim
     [
@@ -105,14 +104,20 @@ M: button-pen pen-foreground
 : align-left ( button -- button )
     { 0 1/2 } >>align ; inline
 
+MEMO: button-pen-boundary ( -- button-pen )
+    f roll-button-rollover-border <solid> dup f f <button-pen> ;
+
+MEMO: button-pen-interior ( -- button-pen )
+    f f roll-button-selected-background <solid> f f <button-pen> ;
+
 : roll-button-theme ( button -- button )
-    f COLOR: black <solid> dup f f <button-pen> >>boundary
-    f f COLOR: dark-gray <solid> f f <button-pen> >>interior
+    button-pen-boundary >>boundary
+    button-pen-interior >>interior
     align-left ; inline
 
 PRIVATE>
 
-: <roll-button> ( label quot -- button )
+: <roll-button> ( label quot: ( button -- ) -- button )
     <button> roll-button-theme ;
 
 <PRIVATE
@@ -123,13 +128,10 @@ PRIVATE>
         [ append theme-image ] tri-curry@ tri
     ] 2dip <tile-pen> ;
 
-CONSTANT: button-background COLOR: FactorTan
-CONSTANT: button-clicked-background COLOR: FactorDarkSlateBlue
-
 : <border-button-pen> ( -- pen )
-    "button" button-background button-clicked-background
+    "button" os windows? [ COLOR: grey95 ] [ transparent ] if button-text-color
     <border-button-state-pen> dup
-    "button-clicked" button-clicked-background COLOR: white
+    "button-clicked" transparent button-clicked-text-color
     <border-button-state-pen> dup dup
     <button-pen> ;
 
@@ -145,7 +147,7 @@ CONSTANT: button-clicked-background COLOR: FactorDarkSlateBlue
 
 PRIVATE>
 
-: <border-button> ( label quot -- button )
+: <border-button> ( label quot: ( button -- ) -- button )
     <button> border-button-theme ;
 
 TUPLE: repeat-button < button ;
@@ -156,9 +158,9 @@ repeat-button H{
     { T{ button-up } [ button-update ] }
 } set-gestures
 
-: <repeat-button> ( label quot -- button )
-    #! Button that calls the quotation every 100ms as long as
-    #! the mouse is held down.
+: <repeat-button> ( label quot: ( button -- ) -- button )
+    ! Button that calls the quotation every 100ms as long as
+    ! the mouse is held down.
     repeat-button new-button border-button-theme ;
 
 <PRIVATE
@@ -239,18 +241,8 @@ PRIVATE>
 : gesture>tooltip ( gesture -- str/f )
     gesture>string dup [ "Shortcut: " prepend ] when ;
 
-: <command-button> ( target gesture command -- button )
-    swapd [ command-name swap ] keep command-button-quot
-    '[ drop @ ] <border-button> swap gesture>tooltip >>tooltip ;
-
-: <toolbar> ( target -- toolbar )
-    <shelf>
-        1 >>fill
-        { 5 5 } >>gap
-        swap
-        [ [ "toolbar" ] dip class-of get-command-at commands>> ]
-        [ '[ [ _ ] 2dip <command-button> add-gadget ] ]
-        bi assoc-each ;
-
-: add-toolbar ( track -- track )
-    dup <toolbar> { 3 3 } <border> align-left f track-add ;
+:: <command-button> ( target gesture command -- button )
+    command command-name
+    target command command-button-quot
+    '[ drop @ ] <border-button>
+    gesture gesture>tooltip >>tooltip ; inline

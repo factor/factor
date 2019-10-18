@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.data byte-arrays destructors help.markup help.syntax
 kernel math quotations ;
 IN: gpu.buffers
@@ -104,7 +105,7 @@ HELP: buffer-upload-pattern
 { $class-description { $snippet "buffer-upload-pattern" } " values aid the graphics driver in optimizing access to " { $link buffer } " objects by declaring the frequency with which the buffer will be supplied new data."
 { $list
 { { $link stream-upload } " declares that the buffer data will only be used a few times before being deallocated by " { $link dispose } " or replaced by " { $link allocate-buffer } "." }
-{ { $link static-upload } " declares that the buffer data will be provided once and accessed frequently without modification." } 
+{ { $link static-upload } " declares that the buffer data will be provided once and accessed frequently without modification." }
 { { $link dynamic-upload } " declares that the buffer data will be frequently modified." }
 }
 "A " { $snippet "buffer-upload-pattern" } " is only a declaration and does not actually control access to the underlying buffer data." } ;
@@ -114,7 +115,7 @@ HELP: buffer-usage-pattern
 { $list
 { { $link draw-usage } " declares that the buffer will be supplied with data from CPU memory and read from by the GPU for vertex or texture image data." }
 { { $link read-usage } " declares that the buffer will be supplied with data from other GPU resources and read from primarily by the CPU." }
-{ { $link copy-usage } " declares that the buffer will both receive and supply data primarily for other GPU resources." } 
+{ { $link copy-usage } " declares that the buffer will both receive and supply data primarily for other GPU resources." }
 }
 "A " { $snippet "buffer-usage-pattern" } " is only a declaration and does not actually control access to the underlying buffer data." } ;
 

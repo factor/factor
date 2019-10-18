@@ -1,10 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry accessors namespaces assocs deques search-deques
-dlists kernel sequences compiler.utilities words sets
-stack-checker.branches compiler.tree compiler.tree.def-use
-compiler.tree.combinators ;
-FROM: namespaces => set ;
+USING: accessors assocs compiler.tree compiler.tree.combinators
+compiler.tree.def-use compiler.utilities deques dlists kernel
+namespaces sets stack-checker.branches ;
 IN: compiler.tree.dead-code.liveness
 
 SYMBOL: work-list
@@ -20,8 +18,8 @@ SYMBOL: live-values
 : look-at-inputs ( node -- ) in-d>> look-at-values ;
 
 : init-dead-code ( -- )
-    <hashed-dlist> work-list set
-    H{ { +bottom+ f } } clone live-values set ;
+    <hashed-dlist> work-list namespaces:set
+    H{ { +bottom+ f } } clone live-values namespaces:set ;
 
 GENERIC: mark-live-values* ( node -- )
 

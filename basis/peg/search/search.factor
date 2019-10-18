@@ -9,7 +9,7 @@ IN: peg.search
         { [ over number? ] [ stream-write1 ] }
         { [ over string? ] [ stream-write ] }
         { [ over sequence? ] [ [ stream-tree-write ] curry each ] }
-        { [ t ] [ stream-write ] }
+        [ stream-write ]
     } cond ;
 
 : tree-write ( object -- )

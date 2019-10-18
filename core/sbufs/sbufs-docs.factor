@@ -23,13 +23,13 @@ $nl
 ABOUT: "sbufs"
 
 HELP: sbuf
-{ $description "The class of resizable character strings. See " { $link "syntax-sbufs" } " for syntax and " { $link "sbufs" } " for general information." } ;
+{ $class-description "The class of resizable character strings. See " { $link "syntax-sbufs" } " for syntax and " { $link "sbufs" } " for general information." } ;
 
 HELP: <sbuf>
 { $values { "n" "a positive integer specifying initial capacity" } { "sbuf" sbuf } }
 { $description "Creates a new string buffer that can hold " { $snippet "n" } " characters before resizing." } ;
 
 HELP: >sbuf
-{ $values { "seq" "a sequence of non-negative integers" } { "sbuf" sbuf } }
+{ $values { "seq" { $sequence "non-negative integers" } } { "sbuf" sbuf } }
 { $description "Outputs a freshly-allocated string buffer with the same elements as a given sequence." }
 { $errors "Throws an error if the sequence contains elements other than real numbers." } ;

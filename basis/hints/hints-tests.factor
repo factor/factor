@@ -9,4 +9,4 @@ M: hashtable blahblah 2nip [ 1 + ] change-count drop ;
 
 HINTS: M\ hashtable blahblah { object fixnum object } { object word object } ;
 
-[ t ] [ M\ hashtable blahblah { count>> count<< } inlined? ] unit-test
+{ t } [ M\ hashtable blahblah { count>> count<< } inlined? ] unit-test

@@ -1,7 +1,7 @@
-USING: tools.test words sequences kernel memory accessors ;
+USING: accessors kernel memory sequences tools.test words ;
 IN: classes.builtin.tests
 
-[ f ] [
+{ f } [
     [ word? ] instances
     [
         [ name>> "f?" = ]

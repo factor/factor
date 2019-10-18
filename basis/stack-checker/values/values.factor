@@ -1,22 +1,18 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors namespaces fry kernel assocs sequences
-stack-checker.recursive-state stack-checker.errors
-quotations ;
+USING: accessors assocs fry kernel namespaces quotations
+sequences stack-checker.errors stack-checker.recursive-state ;
 IN: stack-checker.values
 
-! Values
 : <value> ( -- value ) \ <value> counter ;
 
 SYMBOL: known-values
 
-: init-known-values ( -- )
-    H{ } clone known-values set ;
-
-: known ( value -- known ) known-values get at ;
+: known ( value -- known )
+    known-values get at ;
 
 : set-known ( known value -- )
-    over [ known-values get set-at ] [ 2drop ] if ;
+    '[ _ known-values get set-at ] when* ;
 
 : make-known ( known -- value )
     <value> [ set-known ] keep ;
@@ -29,15 +25,16 @@ SYMBOL: known-values
 
 GENERIC: (literal-value?) ( value -- ? )
 
-: literal-value? ( value -- ? ) known (literal-value?) ;
+: literal-value? ( value -- ? )
+    known (literal-value?) ;
 
 GENERIC: (input-value?) ( value -- ? )
 
-: input-value? ( value -- ? ) known (input-value?) ;
+: input-value? ( value -- ? )
+    known (input-value?) ;
 
 GENERIC: (literal) ( known -- literal )
 
-! Literal value
 TUPLE: literal-tuple < identity-tuple value recursion ;
 
 : literal ( value -- literal ) known (literal) ;
@@ -45,7 +42,7 @@ TUPLE: literal-tuple < identity-tuple value recursion ;
 M: literal-tuple hashcode* nip value>> identity-hashcode ;
 
 : <literal> ( obj -- value )
-    recursive-state get \ literal-tuple boa ;
+    recursive-state get literal-tuple boa ;
 
 M: literal-tuple (input-value?) drop f ;
 
@@ -56,38 +53,40 @@ M: literal-tuple (literal) ;
 : curried/composed-literal ( input1 input2 quot -- literal )
     [ [ literal ] bi@ ] dip
     [ [ [ value>> ] bi@ ] dip call ] [ drop nip recursion>> ] 3bi
-    \ literal-tuple boa ; inline
+    literal-tuple boa ; inline
 
-! Result of curry
-TUPLE: curried obj quot ;
+TUPLE: curried-effect obj quot ;
 
-C: <curried> curried
+C: <curried-effect> curried-effect
 
-: >curried< ( curried -- obj quot )
+: >curried-effect< ( curried-effect -- obj quot )
     [ obj>> ] [ quot>> ] bi ; inline
 
-M: curried (input-value?) >curried< [ input-value? ] either? ;
+M: curried-effect (input-value?)
+    >curried-effect< [ input-value? ] either? ;
 
-M: curried (literal-value?) >curried< [ literal-value? ] both? ;
+M: curried-effect (literal-value?)
+    >curried-effect< [ literal-value? ] both? ;
 
-M: curried (literal) >curried< [ curry ] curried/composed-literal ;
+M: curried-effect (literal)
+    >curried-effect< [ curry ] curried/composed-literal ;
 
-! Result of compose
-TUPLE: composed quot1 quot2 ;
+TUPLE: composed-effect quot1 quot2 ;
 
-C: <composed> composed
+C: <composed-effect> composed-effect
 
-: >composed< ( composed -- quot1 quot2 )
+: >composed-effect< ( composed-effect -- quot1 quot2 )
     [ quot1>> ] [ quot2>> ] bi ; inline
 
-M: composed (input-value?)
-    [ quot1>> input-value? ] [ quot2>> input-value? ] bi or ;
+M: composed-effect (input-value?)
+    >composed-effect< [ input-value? ] either? ;
 
-M: composed (literal-value?) >composed< [ literal-value? ] both? ;
+M: composed-effect (literal-value?)
+    >composed-effect< [ literal-value? ] both? ;
 
-M: composed (literal) >composed< [ compose ] curried/composed-literal ;
+M: composed-effect (literal)
+    >composed-effect< [ compose ] curried/composed-literal ;
 
-! Input parameters
 SINGLETON: input-parameter
 
 SYMBOL: current-word
@@ -123,16 +122,17 @@ M: f (literal) current-word get bad-macro-input ;
 GENERIC: known>callable ( known -- quot )
 
 : ?@ ( x -- y )
-    dup callable? [ drop [ @ ] ] unless ;
+    dup callable? [ drop _ ] unless ;
 
 M: object known>callable drop \ _ ;
+
 M: literal-tuple known>callable value>> ;
-M: composed known>callable
-    [ quot1>> known known>callable ?@ ] [ quot2>> known known>callable ?@ ] bi
-    append ;
-M: curried known>callable
-    [ quot>> known known>callable ] [ obj>> known known>callable ] bi
-    prefix ;
+
+M: composed-effect known>callable
+    >composed-effect< [ known known>callable ?@ ] bi@ append ;
+
+M: curried-effect known>callable
+    >curried-effect< [ known known>callable ] bi@ swap prefix ;
+
 M: declared-effect known>callable
     known>> known>callable ;
-

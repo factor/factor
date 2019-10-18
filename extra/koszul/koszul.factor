@@ -4,7 +4,6 @@ USING: accessors arrays assocs combinators fry hashtables io
 kernel locals make math math.matrices math.matrices.elimination
 math.order math.parser math.vectors namespaces prettyprint
 sequences sets shuffle sorting splitting ;
-FROM: namespaces => set ;
 IN: koszul
 
 ! Utilities
@@ -20,13 +19,13 @@ IN: koszul
     } cond ;
 
 : canonicalize ( assoc -- assoc' )
-    [ nip zero? not ] assoc-filter ;
+    [ nip zero? ] assoc-reject ;
 
 SYMBOL: terms
 
 : with-terms ( quot -- hash )
     [
-        H{ } clone terms set call terms get canonicalize
+        H{ } clone terms namespaces:set call terms get canonicalize
     ] with-scope ; inline
 
 ! Printing elements
@@ -75,7 +74,7 @@ SYMBOL: terms
     [ > ] with count ;
 
 : inversions ( seq -- n )
-    0 swap [ length iota ] keep [
+    0 swap [ length <iota> ] keep [
         [ nth ] 2keep swap 1 + tail-slice (inversions) +
     ] curry each ;
 
@@ -104,9 +103,9 @@ SYMBOL: boundaries
 : d= ( value basis -- )
     boundaries [ ?set-at ] change ;
 
-: ((d)) ( basis -- value ) boundaries get at ;
+: get-boundary ( basis -- value ) boundaries get at ;
 
-: dx.y ( x y -- vec ) [ ((d)) ] dip wedge ;
+: dx.y ( x y -- vec ) [ get-boundary ] dip wedge ;
 
 DEFER: (d)
 
@@ -134,7 +133,7 @@ DEFER: (d)
     ] if ;
 
 : interior ( x y -- i_y[x] )
-    #! y is a generator
+    ! y is a generator
     swap >alt [ dupd (interior) ] linear-op nip ;
 
 ! Computing a basis
@@ -143,12 +142,12 @@ DEFER: (d)
     [ dup length pick nth push ] reduce ;
 
 : nth-basis-elt ( generators n -- elt )
-    over length iota [
+    over length <iota> [
         3dup bit? [ nth ] [ 2drop f ] if
     ] map sift 2nip ;
 
 : basis ( generators -- seq )
-    natural-sort dup length 2^ iota [ nth-basis-elt ] with map ;
+    natural-sort dup length 2^ <iota> [ nth-basis-elt ] with map ;
 
 : (tensor) ( seq1 seq2 -- seq )
     [
@@ -173,25 +172,25 @@ DEFER: (d)
 
 ! Graded by degree
 : (graded-ker/im-d) ( n seq -- null/rank )
-    #! d: C(n) ---> C(n+1)
+    ! d: C(n) ---> C(n+1)
     [ ?nth ] [ [ 1 + ] dip ?nth ] 2bi
     dim-im/ker-d ;
 
 : graded-ker/im-d ( graded-basis -- seq )
-    [ length iota ] keep [ (graded-ker/im-d) ] curry map ;
+    [ length <iota> ] keep [ (graded-ker/im-d) ] curry map ;
 
 : graded-betti ( generators -- seq )
     basis graded graded-ker/im-d unzip but-last 0 prefix v- ;
 
 ! Bi-graded for two-step complexes
 : (bigraded-ker/im-d) ( u-deg z-deg bigraded-basis -- null/rank )
-    #! d: C(u,z) ---> C(u+2,z-1)
+    ! d: C(u,z) ---> C(u+2,z-1)
     [ ?nth ?nth ] 3keep [ [ 2 + ] dip 1 - ] dip ?nth ?nth
     dim-im/ker-d ;
 
 :: bigraded-ker/im-d ( basis -- seq )
-    basis length iota [| z |
-         basis first length iota [| u |
+    basis length <iota> [| z |
+         basis first length <iota> [| u |
             u z basis (bigraded-ker/im-d)
         ] map
     ] map ;
@@ -242,8 +241,7 @@ DEFER: (d)
     dup length [ graded-triple ] with map ;
 
 : graded-laplacian ( generators quot -- seq )
-    [ basis graded graded-triples [ first3 ] ] dip compose map ;
-    inline
+    [ basis graded graded-triples [ first3 ] ] dip compose map ; inline
 
 : graded-laplacian-betti ( generators -- seq )
     [ laplacian-betti ] graded-laplacian ;
@@ -259,7 +257,7 @@ DEFER: (d)
     ] each-index ;
 
 : bigraded-triple ( u-deg z-deg bigraded-basis -- triple )
-    #! d: C(u,z) ---> C(u+2,z-1)
+    ! d: C(u,z) ---> C(u+2,z-1)
     [ [ 2 - ] [ 1 + ] [ ] tri* ?nth ?nth ]
     [ ?nth ?nth ]
     [ [ 2 + ] [ 1 - ] [ ] tri* ?nth ?nth ]
@@ -267,8 +265,8 @@ DEFER: (d)
     3array ;
 
 :: bigraded-triples ( grid -- triples )
-    grid length iota [| z |
-        grid first length iota [| u |
+    grid length <iota> [| z |
+        grid first length <iota> [| u |
             u z grid bigraded-triple
         ] map
     ] map ;

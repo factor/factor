@@ -1,11 +1,11 @@
 ! Copyright (C) 2009 Philipp Brüschweiler
 ! See http://factorcode.org/license.txt for BSD license.
 USING: infix.ast infix.tokenizer kernel math peg.ebnf sequences
-strings vectors ;
+strings vectors multiline ;
 IN: infix.parser
 
-EBNF: parse-infix
-Number      = . ?[ ast-number? ]?
+EBNF: parse-infix [=[
+Number      = . ?[ ast-value? ]?
 Identifier  = . ?[ string? ]?
 Array       = Identifier:i "[" Sum:s "]" => [[ i s ast-array boa ]]
 Slice1      = Identifier:i "[" Sum?:from ":" Sum?:to "]" => [[ i from to f ast-slice boa ]]
@@ -29,7 +29,7 @@ Sum         =   Sum:s ("+"|"-"):op Product:p  => [[ s p op ast-op boa ]]
 
 End         = !(.)
 Expression  = Sum End
-;EBNF
+]=]
 
 : build-infix-ast ( string -- ast )
     tokenize-infix parse-infix ;

@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors sequences sequences.private
-persistent.sequences assocs persistent.assocs kernel math
-vectors parser prettyprint.custom ;
+USING: accessors assocs grouping kernel math parser
+persistent.assocs persistent.sequences prettyprint.custom
+sequences sequences.private vectors ;
 IN: vlists
 
 TUPLE: vlist
@@ -77,7 +77,8 @@ M: valist at*
 M: valist new-at
     vlist>> ppush ppush valist boa ;
 
-M: valist >alist vlist>> ;
+M: valist >alist
+    vlist>> 2 <groups> [ { } like ] map ;
 
 : >valist ( assoc -- valist )
     >alist concat >vlist valist boa ; inline

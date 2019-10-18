@@ -1,7 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math cocoa cocoa.messages cocoa.classes
-sequences math.bitwise ;
+USING: cocoa cocoa.classes kernel math ;
 IN: cocoa.windows
 
 ! Window styles
@@ -12,7 +11,7 @@ CONSTANT: NSMiniaturizableWindowMask       4
 CONSTANT: NSResizableWindowMask            8
 CONSTANT: NSTexturedBackgroundWindowMask 256
 
-! Additional panel-only styles 
+! Additional panel-only styles
 CONSTANT: NSUtilityWindowMask       16
 CONSTANT: NSDocModalWindowMask      64
 CONSTANT: NSNonactivatingPanelMask 128

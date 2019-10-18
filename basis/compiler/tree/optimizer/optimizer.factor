@@ -28,7 +28,7 @@ SYMBOL: check-optimizer?
         analyze-recursive
         normalize
         propagate
-        cleanup
+        cleanup-tree
         dup run-escape-analysis? [
             escape-analysis
             unbox-tuples

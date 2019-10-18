@@ -1,8 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types kernel compiler.constants compiler.cfg.hats
-compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.stacks cpu.architecture ;
+USING: alien.c-types compiler.cfg.hats compiler.cfg.instructions
+compiler.cfg.stacks compiler.constants cpu.architecture kernel ;
 IN: compiler.cfg.intrinsics.strings
 
 : (string-nth) ( n string -- base offset rep c-type )

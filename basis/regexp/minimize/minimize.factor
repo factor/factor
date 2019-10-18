@@ -1,13 +1,12 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences regexp.transition-tables fry assocs
-accessors locals math sorting arrays sets hashtables regexp.dfa
-combinators.short-circuit regexp.classes ;
-FROM: assocs => change-at ;
+USING: accessors arrays assocs combinators.short-circuit fry
+hash-sets kernel locals math regexp.classes
+regexp.transition-tables sequences sets sorting ;
 IN: regexp.minimize
 
 : table>state-numbers ( table -- assoc )
-    transitions>> keys <enum> [ swap ] H{ } assoc-map-as ;
+    transitions>> keys H{ } zip-index-as ;
 
 : number-states ( table -- newtable )
     dup table>state-numbers transitions-at ;
@@ -18,54 +17,40 @@ IN: regexp.minimize
 : initially-same? ( s1 s2 transition-table -- ? )
     {
         [ drop <= ]
-        [ transitions>> '[ _ at keys ] bi@ set= ]
         [ final-states>> '[ _ in? ] bi@ = ]
+        [ transitions>> '[ _ at keys ] bi@ set= ]
     } 3&& ;
 
 :: initialize-partitions ( transition-table -- partitions )
     ! Partition table is sorted-array => ?
-    H{ } clone :> out
-    transition-table transitions>> keys :> states
-    states [| s1 |
+    transition-table transitions>> keys natural-sort :> states
+    states length 2/ sq <hash-set> :> out
+    states [| s1 i1 |
         states [| s2 |
             s1 s2 transition-table initially-same?
-            [ s1 s2 2array out conjoin ] when
-        ] each
-    ] each out ;
+            [ s1 s2 2array out adjoin ] when
+        ] i1 each-from
+    ] each-index out ;
 
 : same-partition? ( s1 s2 partitions -- ? )
-    { [ [ sort-pair 2array ] dip key? ] [ drop = ] } 3|| ;
-
-: assemble-values ( assoc1 assoc2 -- values )
-    dup keys '[ _ swap [ at ] curry map ] bi@ zip ;
+    { [ [ sort-pair 2array ] dip in? ] [ drop = ] } 3|| ;
 
 : stay-same? ( s1 s2 transition partitions -- ? )
-    [ '[ _ transitions>> at ] bi@ assemble-values ] dip
-    '[ _ same-partition? ] assoc-all? ;
+    [ '[ _ transitions>> at ] bi@ ] dip
+    '[ [ at ] dip _ same-partition? ] with assoc-all? ;
 
-: partition-more ( partitions transition-table -- partitions )
-    over '[ drop first2 _ _ stay-same? ] assoc-filter ;
+:: partition-more ( partitions transition-table -- partitions changed? )
+    partitions cardinality :> size
+    partitions members [
+        dup first2 transition-table partitions stay-same?
+        [ drop ] [ partitions delete ] if
+    ] each partitions dup cardinality size = not ;
 
 : partition>classes ( partitions -- synonyms ) ! old-state => new-state
-    sort-keys
-    [ drop first2 swap ] assoc-map
-    <reversed>
-    >hashtable ;
-
-:: (while-changes) ( ..a obj quot: ( ..a obj -- ..b obj' ) comp: ( ..b obj' -- ..a key ) old-key -- ..a obj )
-    obj quot call :> new-obj
-    new-obj comp call :> new-key
-    new-key old-key =
-    [ new-obj ]
-    [ new-obj quot comp new-key (while-changes) ]
-    if ; inline recursive
-
-: while-changes ( obj quot pred -- obj' )
-    3dup nip call (while-changes) ; inline
+    members natural-sort <reversed> [ swap ] H{ } assoc-map-as ;
 
 : (state-classes) ( transition-table -- partition )
-    [ initialize-partitions ] keep
-    '[ _ partition-more ] [ assoc-size ] while-changes ;
+    [ initialize-partitions ] keep '[ _ partition-more ] loop ;
 
 : assoc>set ( assoc -- keys-set )
     [ drop dup ] assoc-map ;

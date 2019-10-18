@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: audio.engine game.loop help.markup help.syntax kernel math method-chains
 ui ui.gadgets.worlds words ;
 IN: game.worlds
@@ -37,7 +38,7 @@ HELP: tick-game-world
 { game-world begin-game-world end-game-world tick-game-world } related-words
 
 ARTICLE: "game.worlds" "Game worlds"
-"The " { $vocab-link "game.worlds" } " vocabulary provides a " { $link world } " subclass that integrates with " { $vocab-link "game.loop" } " and optionally " { $vocab-link "game.input" } " and " { $vocab-link "audio.engine" } " to quickly provide game infrastructure." 
+"The " { $vocab-link "game.worlds" } " vocabulary provides a " { $link world } " subclass that integrates with " { $vocab-link "game.loop" } " and optionally " { $vocab-link "game.input" } " and " { $vocab-link "audio.engine" } " to quickly provide game infrastructure."
 { $subsections
     game-world
     game-attributes

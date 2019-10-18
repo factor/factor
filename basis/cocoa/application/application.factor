@@ -1,9 +1,7 @@
 ! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax io kernel namespaces
-core-foundation core-foundation.strings cocoa.messages cocoa
-cocoa.classes cocoa.runtime sequences init summary
-kernel.private assocs ;
+USING: alien.c-types alien.syntax cocoa cocoa.classes
+cocoa.runtime core-foundation.strings kernel sequences ;
 IN: cocoa.application
 
 : <NSString> ( str -- alien ) <CFString> -> autorelease ;
@@ -19,7 +17,7 @@ CONSTANT: NSApplicationDelegateReplyFailure 2
 
 CONSTANT: NSAnyEventMask 0xffffffff
 
-FUNCTION: void NSBeep ( ) ;
+FUNCTION: void NSBeep ( )
 
 : with-cocoa ( quot -- )
     [ NSApp drop call ] with-autorelease-pool ; inline
@@ -41,7 +39,7 @@ FUNCTION: void NSBeep ( ) ;
     -> alloc -> init -> setDelegate: ;
 
 : running.app? ( -- ? )
-    #! Test if we're running a .app.
+    ! Test if we're running a .app.
     ".app"
     NSBundle -> mainBundle -> bundlePath CF>string
     subseq? ;

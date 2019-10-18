@@ -1,6 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs hashtables kernel math namespaces vocabs ;
+USING: assocs combinators.smart hashtables kernel math namespaces
+sequences vocabs ;
 IN: tools.deploy.config
 
 SYMBOL: deploy-name
@@ -69,3 +70,16 @@ SYMBOL: deploy-image
 
 SYMBOL: deploy-directory
 "resource:" deploy-directory set-global
+
+: config>profile ( config -- profile )
+    {
+        ! The order should be similar to default-components in
+        ! bootstrap.stage2.
+        [ deploy-math? of "math" f ? ]
+        [ deploy-threads? of "threads" f ? ]
+        [ drop "compiler" ]
+        [ deploy-io of 3 = "io" f ? ]
+        [ deploy-ui? of "ui" f ? ]
+        [ deploy-unicode? of "unicode" f ? ]
+        [ deploy-help? of "help" f ? ]
+    } cleave>array sift ;

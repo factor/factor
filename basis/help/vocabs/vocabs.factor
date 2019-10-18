@@ -8,7 +8,6 @@ help.topics io io.pathnames io.styles kernel macros make
 namespaces sequences sorting summary vocabs vocabs.files
 vocabs.hierarchy vocabs.loader vocabs.metadata words
 words.symbol ;
-FROM: vocabs.hierarchy => child-vocabs ;
 IN: help.vocabs
 
 : about ( vocab -- )
@@ -26,6 +25,11 @@ IN: help.vocabs
 : root-heading ( root -- )
     [ "Children from " prepend ] [ "Children" ] if*
     $heading ;
+
+<PRIVATE
+: convert-prefixes ( seq -- seq' )
+    [ dup vocab-prefix? [ name>> <vocab-link> ] when ] map ;
+PRIVATE>
 
 : $vocabs ( seq -- )
     convert-prefixes [ vocab-row ] map vocab-headings prefix $table ;
@@ -60,7 +64,7 @@ C: <vocab-author> vocab-author
     ] unless-empty ;
 
 : describe-children ( vocab -- )
-    vocab-name child-vocabs
+    vocab-name disk-vocabs-for-prefix
     $vocab-roots ;
 
 : files. ( seq -- )
@@ -83,7 +87,7 @@ C: <vocab-author> vocab-author
         "Tuple classes" $subheading
         [
             [ <$pretty-link> ]
-            [ superclass <$pretty-link> ]
+            [ superclass-of <$pretty-link> ]
             [ "slots" word-prop [ name>> ] map " " join <$snippet> ]
             tri 3array
         ] map
@@ -96,7 +100,7 @@ C: <vocab-author> vocab-author
         "Predicate classes" $subheading
         [
             [ <$pretty-link> ]
-            [ superclass <$pretty-link> ]
+            [ superclass-of <$pretty-link> ]
             bi 2array
         ] map
         { { $strong "Class" } { $strong "Superclass" } } prefix
@@ -200,7 +204,7 @@ C: <vocab-author> vocab-author
         natural-sort
         [ [ class? ] filter describe-classes ]
         [
-            [ [ class? ] [ symbol? ] bi and not ] filter
+            [ [ class? ] [ symbol? ] bi and ] reject
             [ parsing-word? ] partition
             [ generic? ] partition
             [ macro? ] partition
@@ -226,14 +230,14 @@ C: <vocab-author> vocab-author
 
 : describe-words ( vocab -- )
     {
-        { [ dup lookup-vocab ] [ words $words ] }
+        { [ dup lookup-vocab ] [ vocab-words $words ] }
         { [ dup find-vocab-root ] [ vocab-is-not-loaded ] }
         [ drop ]
     } cond ;
 
 : words. ( vocab -- )
     last-element off
-    [ require ] [ words $words ] bi nl ;
+    [ require ] [ vocab-words $words ] bi nl ;
 
 : describe-metadata ( vocab -- )
     [
@@ -254,7 +258,7 @@ C: <vocab-author> vocab-author
     } cleave ;
 
 : keyed-vocabs ( str quot -- seq )
-    [ all-vocabs-recursive ] 2dip '[
+    [ all-disk-vocabs-recursive ] 2dip '[
         [ _ swap @ member? ] filter no-prefixes
         [ name>> ] sort-with
     ] assoc-map ; inline

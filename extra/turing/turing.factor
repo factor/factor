@@ -41,30 +41,30 @@ SYMBOL: tape
 20 0 <array> >vector tape set
 
 : sym ( -- sym )
-    #! Symbol at head position.
+    ! Symbol at head position.
     position get tape get nth ;
 
 : set-sym ( sym -- )
-    #! Set symbol at head position.
+    ! Set symbol at head position.
     position get tape get set-nth ;
 
 : next-state ( -- state )
-    #! Look up the next state/symbol/direction triplet.
+    ! Look up the next state/symbol/direction triplet.
     state get sym 2array states get at ;
 
 : turing-step ( -- )
-    #! Do one step of the turing machine.
+    ! Do one step of the turing machine.
     next-state
     dup sym>> set-sym
     dup dir>> position [ + ] change
     next>> state set ;
 
 : c ( -- )
-    #! Print current turing machine state.
+    ! Print current turing machine state.
     state get .
     tape get .
     2 position get 2 * + CHAR: \s <string> write "^" print ;
 
 : n ( -- )
-    #! Do one step and print new state.
+    ! Do one step and print new state.
     turing-step c ;

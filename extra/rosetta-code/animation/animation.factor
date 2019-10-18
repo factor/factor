@@ -25,7 +25,7 @@ CONSTANT: sentence "Hello World! "
 TUPLE: animated-label < label-control reversed alarm ;
 
 : <animated-label> ( model -- <animated-model> )
-    sentence animated-label new-label swap >>model 
+    sentence animated-label new-label swap >>model
     monospace-font >>font ;
 
 : update-string ( str reverse -- str )
@@ -46,7 +46,6 @@ M: animated-label graft*
 M: animated-label ungraft*
     alarm>> stop-timer ;
 
-: animated-main ( -- )
-   [ sentence <model> <animated-label> "Rosetta" open-window ] with-ui ;
-
-MAIN: animated-main
+MAIN-WINDOW: animated-main
+    { { title "Rosetta" } }
+    sentence <model> <animated-label> >>gadgets ;

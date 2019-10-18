@@ -12,7 +12,7 @@ HELP: list-of
     "'items' is a parser that can parse the individual elements. 'separator' "
     "is a parser for the symbol that separatest them. The result tree of "
     "the resulting parser is an array of the parsed elements." }
-{ $example "USING: parser-combinators parser-combinators.simple prettyprint ;" "\"1,2,3,4\" 'integer' \",\" token list-of parse-1 ." "{ 1 2 3 4 }" }
+{ $example "USING: parser-combinators parser-combinators.simple prettyprint ;" "\"1,2,3,4\" integer-parser \",\" token list-of parse-1 ." "{ 1 2 3 4 }" }
 { $see-also list-of } ;
 
 HELP: any-char-parser

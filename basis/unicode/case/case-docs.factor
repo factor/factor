@@ -1,4 +1,4 @@
-USING: help.syntax help.markup kernel strings ;
+USING: help.syntax help.markup kernel strings unicode ;
 IN: unicode.case
 
 ABOUT: "unicode.case"

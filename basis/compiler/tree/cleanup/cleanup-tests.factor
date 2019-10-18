@@ -1,42 +1,35 @@
-USING: tools.test kernel.private kernel arrays sequences
-math.private math generic words quotations alien alien.c-types
-alien.data strings sbufs sequences.private slots.private
-combinators definitions system layouts vectors
-math.partial-dispatch math.order math.functions accessors
-hashtables classes assocs io.encodings.utf8 io.encodings.ascii
-io.encodings fry slots sorting.private combinators.short-circuit
-grouping prettyprint generalizations
-compiler.tree
-compiler.tree.combinators
-compiler.tree.cleanup
-compiler.tree.builder
-compiler.tree.recursive
-compiler.tree.normalization
-compiler.tree.propagation
-compiler.tree.propagation.info
-compiler.tree.checker
-compiler.tree.debugger ;
+USING: accessors alien alien.c-types alien.data arrays assocs
+combinators combinators.short-circuit compiler.tree
+compiler.tree.builder compiler.tree.checker compiler.tree.cleanup
+compiler.tree.combinators compiler.tree.debugger
+compiler.tree.normalization compiler.tree.propagation
+compiler.tree.propagation.info generalizations grouping hashtables
+io.encodings io.encodings.ascii io.encodings.utf8 kernel
+kernel.private layouts math math.functions math.intervals math.order
+math.partial-dispatch math.private prettyprint quotations sequences
+sequences.private slots slots.private sorting.private tools.test
+vectors ;
 FROM: math => float ;
 QUALIFIED-WITH: alien.c-types c
 IN: compiler.tree.cleanup.tests
 
-[ t ] [ [ [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
+{ t } [ [ [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
 
-[ f ] [ [ f [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
+{ f } [ [ f [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
 
-[ f ] [ [ { array } declare [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
+{ f } [ [ { array } declare [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
 
-[ t ] [ [ { sequence } declare [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
+{ t } [ [ { sequence } declare [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
 
 : recursive-test ( a -- b ) dup [ not recursive-test ] when ; inline recursive
 
-[ t ] [ [ recursive-test ] cleaned-up-tree [ #recursive? ] contains-node? ] unit-test
+{ t } [ [ recursive-test ] cleaned-up-tree [ #recursive? ] contains-node? ] unit-test
 
-[ f ] [ [ f recursive-test ] cleaned-up-tree [ #recursive? ] contains-node? ] unit-test
+{ f } [ [ f recursive-test ] cleaned-up-tree [ #recursive? ] contains-node? ] unit-test
 
-[ t ] [ [ t recursive-test ] cleaned-up-tree [ #recursive? ] contains-node? ] unit-test
+{ t } [ [ t recursive-test ] cleaned-up-tree [ #recursive? ] contains-node? ] unit-test
 
-[ f ] [
+{ f } [
     [ { integer } declare >fixnum ]
     \ >fixnum inlined?
 ] unit-test
@@ -51,7 +44,7 @@ GENERIC: detect-f ( x -- y )
 
 M: f detect-f ; inline
 
-[ t ] [
+{ t } [
     [ dup [ mynot ] [ ] if detect-f ] \ detect-f inlined?
 ] unit-test
 
@@ -61,11 +54,11 @@ M: integer xyz ; inline
 
 M: object xyz ; inline
 
-[ t ] [
+{ t } [
     [ { integer } declare xyz ] \ xyz inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ dup fixnum? [ xyz ] [ drop "hi" ] if ]
     \ xyz inlined?
 ] unit-test
@@ -82,7 +75,7 @@ M: object xyz ; inline
 
 ! The + should be optimized into fixnum+, if it was not, then
 ! the type of the loop index was not inferred correctly
-[ t ] [
+{ t } [
     [ [ dup 2 + drop ] fx-repeat ] \ + inlined?
 ] unit-test
 
@@ -95,78 +88,78 @@ M: object xyz ; inline
 
 : i-repeat ( n quot -- ) [ { integer } declare ] dip 0 -rot (i-repeat) ; inline
 
-[ t ] [
+{ t } [
     [ [ dup xyz drop ] i-repeat ] \ xyz inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { fixnum } declare dup 100 >= [ 1 + ] unless ] \ fixnum+ inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { fixnum fixnum } declare dupd < [ 1 + 1 + ] when ]
     \ + inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { fixnum fixnum } declare dupd < [ 1 + 1 + ] when ]
     \ + inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { fixnum } declare [ ] times ] \ >= inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { fixnum } declare [ ] times ] \ + inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { fixnum } declare [ ] times ] \ fixnum+ inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { integer fixnum } declare dupd < [ 1 + ] when ]
     \ + inlined?
 ] unit-test
 
-[ f ] [
+{ f } [
     [ { integer fixnum } declare dupd < [ 1 + ] when ]
     \ +-integer-fixnum inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [
         [ no-cond ] 1
         [ 1array dup quotation? [ >quotation ] unless ] times
     ] \ quotation? inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [
         1000000000000000000000000000000000 [ ] times
     ] \ + inlined?
 ] unit-test
-[ f ] [
+{ f } [
     [
         1000000000000000000000000000000000 [ ] times
     ] \ +-integer-fixnum inlined?
 ] unit-test
 
-[ f ] [
+{ f } [
     [ { bignum } declare [ ] times ]
     \ +-integer-fixnum inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { array-capacity } declare 0 < ] \ < inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { array-capacity } declare 0 < ] \ fixnum< inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { array-capacity } declare 1 fixnum- ] \ fixnum- inlined?
 ] unit-test
 
@@ -183,12 +176,12 @@ M: fixnum annotate-entry-test-1 drop ;
 
 : annotate-entry-test-2 ( from to -- obj ) 0 -rot (annotate-entry-test-2) ; inline
 
-[ f ] [
+{ f } [
     [ { bignum } declare annotate-entry-test-2 ]
     \ annotate-entry-test-1 inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { float } declare 10 [ 2.3 * ] times >float ]
     \ >float inlined?
 ] unit-test
@@ -197,42 +190,42 @@ GENERIC: detect-float ( a -- b )
 
 M: float detect-float ;
 
-[ t ] [
+{ t } [
     [ { real float } declare + detect-float ]
     \ detect-float inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { float real } declare + detect-float ]
     \ detect-float inlined?
 ] unit-test
 
-[ f ] [
+{ f } [
     [ { fixnum fixnum } declare 7 bitand neg shift ]
     \ fixnum-shift-fast inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { fixnum fixnum } declare 7 bitand neg shift ]
     { shift fixnum-shift } inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { fixnum fixnum } declare 1 swap 7 bitand shift ]
     { shift fixnum-shift } inlined?
 ] unit-test
 
-[ f ] [
+{ f } [
     [ { fixnum fixnum } declare 1 swap 7 bitand shift ]
     { fixnum-shift-fast } inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ 1 swap 7 bitand shift ]
     { shift fixnum-shift } inlined?
 ] unit-test
 
-cell-bits 32 = [
+32bit? [
     [ t ] [
         [ { fixnum fixnum } declare 1 swap 31 bitand shift ]
         \ shift inlined?
@@ -244,41 +237,41 @@ cell-bits 32 = [
     ] unit-test
 ] when
 
-[ t ] [
+{ t } [
     [ B{ 1 0 } c:short deref 0 number= ]
     \ number= inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ B{ 1 0 } c:short deref 0 { number number } declare number= ]
     \ number= inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ B{ 1 0 } c:short deref 0 = ]
     \ number= inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ B{ 1 0 } c:short deref dup number? [ 0 number= ] [ drop f ] if ]
     \ number= inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ 0xff bitand 0 0xff between? ]
     \ >= inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ 0xff swap 0xff bitand >= ]
     \ >= inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { vector } declare nth-unsafe ] \ nth-unsafe inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [
         dup integer? [
             dup fixnum? [
@@ -293,7 +286,7 @@ cell-bits 32 = [
 : rec ( a -- b )
     dup 0 > [ 1 - rec ] when ; inline recursive
 
-[ t ] [
+{ t } [
     [ { fixnum } declare rec 1 + ]
     { > - + } inlined?
 ] unit-test
@@ -301,116 +294,116 @@ cell-bits 32 = [
 : fib ( m -- n )
     dup 2 < [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] if ; inline recursive
 
-[ t ] [
+{ t } [
     [ 27.0 fib ] { < - + } inlined?
 ] unit-test
 
-[ f ] [
+{ f } [
     [ 27.0 fib ] { +-integer-integer } inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ 27 fib ] { < - + } inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ 27 >bignum fib ] { < - + } inlined?
 ] unit-test
 
-[ f ] [
+{ f } [
     [ 27/2 fib ] { < - } inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ 10 [ -1 shift ] times ] \ shift inlined?
 ] unit-test
 
-[ f ] [
+{ f } [
     [ { fixnum } declare 1048575 fixnum-bitand 524288 fixnum- ]
     \ fixnum-bitand inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { fixnum } declare [ drop ] each-integer ]
     { < <-integer-fixnum +-integer-fixnum + } inlined?
 ] unit-test
 
-[ t ] [
-    [ { fixnum } declare iota [ drop ] each ]
+{ t } [
+    [ { fixnum } declare <iota> [ drop ] each ]
     { < <-integer-fixnum +-integer-fixnum + } inlined?
 ] unit-test
 
-[ t ] [
-    [ { fixnum } declare iota 0 [ + ] reduce ]
+{ t } [
+    [ { fixnum } declare <iota> 0 [ + ] reduce ]
     { < <-integer-fixnum nth-unsafe } inlined?
 ] unit-test
 
-[ f ] [
-    [ { fixnum } declare iota 0 [ + ] reduce ]
+{ f } [
+    [ { fixnum } declare <iota> 0 [ + ] reduce ]
     \ +-integer-fixnum inlined?
 ] unit-test
 
-[ f ] [
+{ t } [
     [
-        { integer } declare iota [ ] map
+        { integer } declare <iota> [ ] map
     ] \ integer>fixnum inlined?
 ] unit-test
 
-[ f ] [
+{ f } [
     [
         { integer } declare { } set-nth-unsafe
     ] \ integer>fixnum inlined?
 ] unit-test
 
-[ f ] [
+{ f } [
     [
         { integer } declare 1 + { } set-nth-unsafe
     ] \ >fixnum inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [
         { array } declare length
         1 + dup 100 fixnum> [ 1 fixnum+ ] when
     ] \ fixnum+ inlined?
 ] unit-test
- 
-[ t ] [
+
+{ t } [
     [ [ resize-array ] keep length ] \ length inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ dup 0 > [ sqrt ] when ] \ sqrt inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { utf8 } declare decode-char ] \ decode-char inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { ascii } declare decode-char ] \ decode-char inlined?
 ] unit-test
 
-[ t ] [ [ { 1 2 } length ] { length length>> slot } inlined? ] unit-test
+{ t } [ [ { 1 2 } length ] { length length>> slot } inlined? ] unit-test
 
-[ t ] [
+{ t } [
     [
-        { integer } declare iota [ 0 >= ] map
+        { integer } declare <iota> [ 0 >= ] map
     ] { >= fixnum>= } inlined?
 ] unit-test
 
-[ ] [
+{ } [
     [
         4 pick array-capacity?
         [ set-slot ] [ \ array-capacity 2nip bad-slot-value ] if
     ] cleaned-up-tree drop
 ] unit-test
 
-[ ] [
+{ } [
     [ { merge-state } declare accum>> 0 >>length ] cleaned-up-tree drop
 ] unit-test
 
-[ ] [
+{ } [
     [
         [ "X" throw ]
         [ dupd dup -1 < [ 0 >= [ ] [ "X" throw ] if ] [ drop ] if ]
@@ -418,12 +411,12 @@ cell-bits 32 = [
     ] cleaned-up-tree drop
 ] unit-test
 
-[ t ] [
+{ t } [
     [ [ 2array ] [ 0 3array ] if first ]
     { nth-unsafe < <= > >= } inlined?
 ] unit-test
 
-[ ] [
+{ } [
     [ [ [ "A" throw ] dip ] [ "B" throw ] if ]
     cleaned-up-tree drop
 ] unit-test
@@ -444,7 +437,7 @@ cell-bits 32 = [
         2drop
     ] if ; inline recursive
 
-[ t ] [
+{ t } [
     [ 2 swap >fixnum buffalo-wings ]
     { <-integer-fixnum +-integer-fixnum } inlined?
 ] unit-test
@@ -463,41 +456,41 @@ cell-bits 32 = [
         2drop
     ] if ; inline recursive
 
-[ t ] [
+{ t } [
     [ 2 swap >fixnum ribs ]
     { <-integer-fixnum +-integer-fixnum } inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ hashtable new ] \ new inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { array-capacity } declare 1 fixnum+ ] cleaned-up-tree
     [ { [ #call? ] [ node-input-infos second literal>> 1 = ] } 1&& ] any?
 ] unit-test
 
-[ ] [
+{ } [
     [ { null } declare [ 1 ] [ 2 ] if ]
-    build-tree normalize propagate cleanup check-nodes
+    build-tree normalize propagate cleanup-tree check-nodes
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { array } declare 2 <groups> [ . . ] assoc-each ]
     \ nth-unsafe inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { fixnum fixnum } declare = ]
     \ both-fixnums? inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ { integer integer } declare + drop ]
     { + +-integer-integer } inlined?
 ] unit-test
 
-[ [ ] ] [
+{ [ ] } [
     [
         20 f <array>
         [ 0 swap nth ] keep
@@ -517,27 +510,113 @@ cell-bits 32 = [
     ] cleaned-up-tree nodes>quot
 ] unit-test
 
-[ t ] [
+{ t } [
     [ int { } cdecl [ 2 2 + ] alien-callback ]
     { + } inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ double { double double } cdecl [ + ] alien-callback ]
     \ + inlined?
 ] unit-test
 
-[ f ] [
+{ f } [
     [ double { double double } cdecl [ + ] alien-callback ]
     \ float+ inlined?
 ] unit-test
 
-[ f ] [
+{ f } [
     [ char { char char } cdecl [ + ] alien-callback ]
     \ fixnum+fast inlined?
 ] unit-test
 
-[ t ] [
+{ t } [
     [ void { } cdecl [ ] alien-callback void { } cdecl alien-indirect ]
     \ >c-ptr inlined?
+] unit-test
+
+MIXIN: foo-mix
+
+! cleanup-folding?
+: call-node-foldable2 ( -- node )
+    T{ #call
+       { word foo-mix? }
+       { in-d V{ 8815401 } }
+       { out-d { 8815405 } }
+       { info
+         H{
+             {
+                 8815401
+                 T{ value-info-state
+                    { class
+                      intersection{
+                          not{
+                              POSTPONE: f
+                          }
+                          not{ foo-mix }
+                      }
+                    }
+                    { interval
+                      full-interval
+                    }
+                  }
+             }
+             {
+                 8815405
+                 T{ value-info-state
+                    { class POSTPONE: f }
+                    { interval
+                      empty-interval
+                    }
+                    { literal? t }
+                  }
+             }
+         }
+       }
+    } ;
+
+{ t } [
+    call-node-foldable2 cleanup-folding?
+] unit-test
+
+
+! cleanup-folding
+: call-node-foldable ( -- node )
+    T{ #call
+       { word set-slot }
+       { in-d V{ 1 2 } }
+       { out-d V{ 3 } }
+       { info
+         H{
+             {
+                 1
+                 T{ value-info-state
+                    { class fixnum }
+                    { literal 2 }
+                    { literal? t }
+                 }
+             }
+             {
+                 2
+                 T{ value-info-state
+                    { class fixnum }
+                    { literal 3 }
+                    { literal? t }
+                 }
+             }
+             {
+                 3
+                 T{ value-info-state
+                    { class fixnum }
+                    { literal 5 }
+                    { literal? t }
+                 }
+             }
+         }
+       }
+    } ;
+
+{ t t } [
+    call-node-foldable cleanup-folding
+    [ length 2 = ] [ last literal>> 5 = ] bi
 ] unit-test

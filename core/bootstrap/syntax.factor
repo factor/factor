@@ -8,9 +8,7 @@ IN: bootstrap.syntax
     "syntax" create-vocab drop
 
     {
-        "!"
         "\""
-        "#!"
         "("
         ":"
         ";"
@@ -22,7 +20,7 @@ IN: bootstrap.syntax
         "DEFER:"
         "ERROR:"
         "FORGET:"
-        "GENERIC#"
+        "GENERIC#:"
         "GENERIC:"
         "HOOK:"
         "H{"
@@ -50,6 +48,7 @@ IN: bootstrap.syntax
         "final"
         "SLOT:"
         "T{"
+        "TH{"
         "UNION:"
         "INTERSECTION:"
         "USE:"
@@ -96,7 +95,7 @@ IN: bootstrap.syntax
         "<<<<<<<"
         "======="
         ">>>>>>>"
-    } [ "syntax" create drop ] each
+    } [ "syntax" create-word drop ] each
 
     "t" "syntax" lookup-word define-symbol
 ] with-compilation-unit

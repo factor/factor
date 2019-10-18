@@ -32,6 +32,8 @@ SYMBOL: header-bits
 : hashcode-shift ( -- n )
     tag-bits get header-bits get + ;
 
+: leaf-stack-frame-size ( -- n ) 16 ;
+
 ! We do this in its own compilation unit so that they can be
 ! folded below
 <<
@@ -46,6 +48,10 @@ SYMBOL: header-bits
 
 : cell-bits ( -- n ) 8 cells ; inline
 
+: 32bit? ( -- ? ) cell-bits 32 = ; inline
+
+: 64bit? ( -- ? ) cell-bits 64 = ; inline
+
 : bootstrap-cell ( -- n ) \ cell get cell or ; inline
 
 : bootstrap-cells ( m -- n ) bootstrap-cell * ; inline
@@ -58,6 +64,9 @@ SYMBOL: header-bits
 : fixnum-bits ( -- n )
     cell-bits (fixnum-bits) ; inline
 
+: bootstrap-fixnum-bits ( -- n )
+    bootstrap-cell-bits (fixnum-bits) ; inline
+
 : most-positive-fixnum ( -- n )
     first-bignum 1 - >fixnum ; inline
 
@@ -65,10 +74,10 @@ SYMBOL: header-bits
     first-bignum neg >fixnum ; inline
 
 : (max-array-capacity) ( b -- n )
-    6 - 2^ 1 - ; inline
+    2 - 2^ 1 - ; inline
 
 : max-array-capacity ( -- n )
-    cell-bits (max-array-capacity) ; inline
+    fixnum-bits (max-array-capacity) ; inline
 
 : bootstrap-first-bignum ( -- n )
     bootstrap-cell-bits (first-bignum) ;
@@ -80,7 +89,7 @@ SYMBOL: header-bits
     bootstrap-first-bignum neg ;
 
 : bootstrap-max-array-capacity ( -- n )
-    bootstrap-cell-bits (max-array-capacity) ;
+    bootstrap-fixnum-bits (max-array-capacity) ;
 
 M: bignum >integer
     dup most-negative-fixnum most-positive-fixnum between?

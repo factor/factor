@@ -1,12 +1,13 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.parser sequences xml.syntax xml.writer
-mason.email webapps.mason.backend ;
+USING: formatting kernel mason.email math sequences
+webapps.mason.backend xml.syntax xml.writer ;
 IN: webapps.mason.backend.watchdog
 
 : crashed-builder-body ( crashed-builders -- string content-type )
     [ os/cpu [XML <li><-></li> XML] ] map
     <XML
+        <!DOCTYPE html>
         <html>
             <body>
                 <p>Machines which are not sending heartbeats:</p>
@@ -17,12 +18,9 @@ IN: webapps.mason.backend.watchdog
     XML> xml>string
     "text/html" ;
 
-: s ( n before after -- string )
-    pick 1 > [ "s" append ] when
-    [ number>string ] 2dip surround ;
-
 : crashed-builder-subject ( crashed-builders -- string )
-    length "Take note: " " crashed build machine" s ;
+    length dup 1 > "" "s" ?
+    "Take note: %d crashed build machine%s" sprintf ;
 
 : send-crashed-builder-email ( crashed-builders -- )
     [ crashed-builder-body ]

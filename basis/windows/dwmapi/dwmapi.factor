@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data alien.libraries
 alien.syntax classes.struct kernel math system-info.windows
 windows.types ;
@@ -26,9 +27,9 @@ STRUCT: DWM_BLURBEHIND
 
 LIBRARY: dwmapi
 
-FUNCTION: HRESULT DwmExtendFrameIntoClientArea ( HWND hWnd, MARGINS* pMarInset ) ;
-FUNCTION: HRESULT DwmEnableBlurBehindWindow ( HWND hWnd, DWM_BLURBEHIND* pBlurBehind ) ;
-FUNCTION: HRESULT DwmIsCompositionEnabled ( BOOL* pfEnabled ) ;
+FUNCTION: HRESULT DwmExtendFrameIntoClientArea ( HWND hWnd, MARGINS* pMarInset )
+FUNCTION: HRESULT DwmEnableBlurBehindWindow ( HWND hWnd, DWM_BLURBEHIND* pBlurBehind )
+FUNCTION: HRESULT DwmIsCompositionEnabled ( BOOL* pfEnabled )
 
 CONSTANT: WM_DWMCOMPOSITIONCHANGED 0x31E
 

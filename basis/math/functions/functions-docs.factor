@@ -51,7 +51,7 @@ ARTICLE: "power-functions" "Powers and logarithms"
 "Exponential and natural logarithm:"
 { $subsections e^ cis log }
 "Other logarithms:"
-{ $subsections log1+ log10 }
+{ $subsections log1+ log10 logn }
 "Raising a number to a power:"
 { $subsections ^ e^ 10^ }
 "Logistics functions:"
@@ -95,22 +95,14 @@ ARTICLE: "math-functions" "Mathematical functions"
 
 ABOUT: "math-functions"
 
-HELP: rect>
-{ $values { "x" real } { "y" real } { "z" number } }
-{ $description "Creates a complex number from real and imaginary components. If " { $snippet "z" } " is an integer zero, this will simply output " { $snippet "x" } "." } ;
-
-HELP: >rect
-{ $values { "z" number } { "x" real } { "y" real } }
-{ $description "Extracts the real and imaginary components of a complex number." } ;
-
 HELP: align
 { $values { "m" integer } { "w" "a power of 2" } { "n" "an integer multiple of " { $snippet "w" } } }
 { $description "Outputs the least multiple of " { $snippet "w" } " greater than " { $snippet "m" } "." }
 { $notes "This word will give an incorrect result if " { $snippet "w" } " is not a power of 2." } ;
 
 HELP: e^
-{ $values { "x" number } { "y" number } }
-{ $description "Exponential function, " { $snippet "y=e^x" } "." } ;
+{ $values { "x" number } { "e^x" number } }
+{ $description "Exponential function, raises " { $link e } " to the power of " { $snippet "x" } "." } ;
 
 HELP: frexp
 { $values { "x" number } { "y" float } { "exp" integer } }
@@ -124,6 +116,10 @@ HELP: ldexp
 HELP: log
 { $values { "x" number } { "y" number } }
 { $description "Natural logarithm function. Outputs negative infinity if " { $snippet "x" } " is 0." } ;
+
+HELP: logn
+{ $values { "x" number } { "n" number } { "y" number } }
+{ $description "Finds the base " { $snippet "n" } " logarithm of " { $snippet "x" } "." } ;
 
 HELP: log1+
 { $values { "x" number } { "y" number } }
@@ -261,14 +257,15 @@ HELP: [-1,1]?
 
 HELP: abs
 { $values { "x" number } { "y" "a non-negative real number" } }
-{ $description "Computes the absolute value of a complex number." } ;
+{ $description "Computes the absolute value of a number." }
+{ $see-also absq } ;
 
 HELP: absq
 { $values { "x" number } { "y" "a non-negative real number" } }
-{ $description "Computes the squared absolute value of a complex number. This is marginally more efficient than " { $link abs } "." } ;
+{ $description "Computes the squared absolute value of a number. For complex numbers this is marginally more efficient than " { $link abs } "." } ;
 
 HELP: ^
-{ $values { "x" number } { "y" number } { "z" number } }
+{ $values { "x" number } { "y" number } { "x^y" number } }
 { $description "Raises " { $snippet "x" } " to the power of " { $snippet "y" } ". If " { $snippet "y" } " is an integer the answer is computed exactly, otherwise a floating point approximation is used." }
 { $errors "Throws an error if " { $snippet "x" } " and " { $snippet "y" } " are both integer 0." } ;
 
@@ -277,13 +274,8 @@ HELP: nth-root
 { $description "Calculates the nth root of a number, such that " { $snippet "y^n=x" } "." } ;
 
 HELP: 10^
-{ $values { "x" number } { "y" number } }
+{ $values { "x" number } { "10^x" number } }
 { $description "Raises 10 to the power of " { $snippet "x" } ". If " { $snippet "x" } " is an integer the answer is computed exactly, otherwise a floating point approximation is used." } ;
-
-HELP: gcd
-{ $values { "x" integer } { "y" integer } { "a" integer } { "d" integer } }
-{ $description "Computes the positive greatest common divisor " { $snippet "d" } " of " { $snippet "x" } " and " { $snippet "y" } ", and another value " { $snippet "a" } " satisfying:" { $code "a*y = d mod x" } }
-{ $notes "If " { $snippet "d" } " is 1, then " { $snippet "a" } " is the inverse of " { $snippet "y" } " modulo " { $snippet "x" } "." } ;
 
 HELP: divisor?
 { $values { "m" integer } { "n" integer } { "?" boolean } }
@@ -337,6 +329,24 @@ HELP: round
     { $example "USING: math.functions prettyprint ;" "4.4 round ." "4.0" }
 } ;
 
+HELP: round-to-even
+{ $values { "x" real } { "y" "a whole real number" } }
+{ $description "Outputs the whole number closest to " { $snippet "x" } ", rounding out at half, breaking ties towards even numbers. This is also known as banker's rounding or unbiased rounding." }
+{ $notes "The result is not necessarily an integer." }
+{ $examples
+    { $example "USING: math.functions prettyprint ;" "0.5 round-to-even ." "0.0" }
+    { $example "USING: math.functions prettyprint ;" "1.5 round-to-even ." "2.0" }
+} ;
+
+HELP: round-to-odd
+{ $values { "x" real } { "y" "a whole real number" } }
+{ $description "Outputs the whole number closest to " { $snippet "x" } ", rounding out at half, breaking ties towards odd numbers." }
+{ $notes "The result is not necessarily an integer." }
+{ $examples
+    { $example "USING: math.functions prettyprint ;" "0.5 round-to-odd ." "1.0" }
+    { $example "USING: math.functions prettyprint ;" "1.5 round-to-odd ." "1.0" }
+} ;
+
 HELP: roots
 { $values { "x" number } { "t" integer } { "seq" sequence } }
 { $description "Outputs the " { $snippet "t" } " roots of a number " { $snippet "x" } "." }
@@ -348,7 +358,7 @@ HELP: sigmoid
 
 HELP: signum
 { $values { "x" number } { "y" number } }
-{ $description "Calculates the signum value.  For a real number, " { $snippet "x" } ", this is its sign (-1, 0, or 1).  For a complex number, " { $snippet "x" } ", this is the point on the unit circle of the complex plane that is nearest to " { $snippet "x" } "." } ;
+{ $description "Calculates the signum value. For a real number, " { $snippet "x" } ", this is its sign (-1, 0, or 1). For a complex number, " { $snippet "x" } ", this is the point on the unit circle of the complex plane that is nearest to " { $snippet "x" } "." } ;
 
 HELP: copysign
 { $values { "x" number } { "y" number } { "x'" number } }

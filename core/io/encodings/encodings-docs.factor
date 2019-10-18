@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io quotations math ;
+USING: help.markup help.syntax io quotations math sequences strings ;
 IN: io.encodings
 
 HELP: <encoder>
@@ -18,8 +18,18 @@ $low-level-note ;
 HELP: decode-char
 { $values { "stream" "an underlying input stream" }
     { "encoding" "An encoding descriptor tuple" } { "char/f" "a code point or " { $link f } } }
-{ $contract "Reads a single code point from the underlying stream, interpreting it by the encoding. Returns " { $link f } " if the stream is reached." }
+{ $contract "Reads a single code point from the underlying stream, interpreting it by the encoding. Returns " { $link f } " if the stream end is reached." }
 $low-level-note ;
+
+HELP: decode-until
+{ $values
+  { "seps" sequence }
+  { "stream" "an input stream" }
+  { "encoding" "an encoding descriptor" }
+  { "string/f" { $maybe string } }
+  { "sep/f" { $maybe "encountered separator" } }
+}
+{ $description "Decodes characters from the stream until one of the separators are encountered." } ;
 
 HELP: encode-char
 { $values { "char" "a character" }

@@ -5,9 +5,9 @@ id3.private strings ;
 IN: id3
 
 HELP: mp3>id3
-{ $values 
-    { "path" "a path string" } 
-    { "id3/f" "a tuple storing ID3v2 metadata or f" } }
+{ $values
+    { "path" "a path string" }
+    { "id3/f" { $maybe "tuple storing ID3v2 metadata" } } }
     { $description "Return a tuple containing the ID3 information parsed out of the MP3 file, or " { $link f } " if no metadata is present. Words to access the ID3v1 information are here:"
         { $list
           { $link title }
@@ -23,49 +23,49 @@ HELP: mp3>id3
 HELP: album
 { $values
     { "id3" id3 }
-    { "string/f" "string or f" }
+    { "string/f" { $maybe string } }
 }
 { $description "Returns the album, or " { $link f } " if this field is missing, from a parsed id3 tag." } ;
 
 HELP: artist
 { $values
     { "id3" id3 }
-    { "string/f" "string or f" }
+    { "string/f" { $maybe string } }
 }
 { $description "Returns the artist, or " { $link f } " if this field is missing, from a parsed id3 tag." } ;
 
 HELP: comment
 { $values
     { "id3" id3 }
-    { "string/f" "string or f" }
+    { "string/f" { $maybe string } }
 }
 { $description "Returns the comment, or " { $link f } " if this field is missing, from a parsed id3 tag." } ;
 
 HELP: genre
 { $values
     { "id3" id3 }
-    { "string/f" "string or f" }
+    { "string/f" { $maybe string } }
 }
 { $description "Returns the genre, or " { $link f } " if this field is missing, from a parsed id3 tag." } ;
 
 HELP: title
 { $values
     { "id3" id3 }
-    { "string/f" "string or f" }
+    { "string/f" { $maybe string } }
 }
 { $description "Returns the title, or " { $link f } " if this field is missing, from a parsed id3 tag." } ;
 
 HELP: year
 { $values
     { "id3" id3 }
-    { "string/f" "string or f" }
+    { "string/f" { $maybe string } }
 }
 { $description "Returns the year, or " { $link f } " if this field is missing, from a parsed id3 tag." } ;
 
 HELP: find-id3-frame
 { $values
     { "id3" id3 } { "name" string }
-    { "obj/f" "object or f" }
+    { "obj/f" { $maybe object } }
 }
 { $description "Returns the " { $slot "data" } " slot of the ID3 frame with the given name, or " { $link f } "." } ;
 

@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs colors colors.constants fry io
-io.styles kernel make math.order namespaces parser
-prettyprint.backend prettyprint.sections prettyprint.stylesheet
-sequences sets sorting vocabs vocabs.parser ;
+USING: accessors assocs colors.constants fry io io.styles kernel
+make namespaces parser prettyprint.backend prettyprint.sections
+prettyprint.stylesheet sequences sorting vocabs vocabs.parser ;
 FROM: io.styles => inset ;
 IN: vocabs.prettyprint
 
@@ -19,7 +18,7 @@ IN: vocabs.prettyprint
     [ vocab-name ] sort-with ;
 
 : pprint-using ( seq -- )
-    [ "syntax" lookup-vocab = not ] filter
+    "syntax" lookup-vocab '[ _ = ] reject
     sort-vocabs [
         \ USING: pprint-word
         [ pprint-vocab ] each
@@ -65,7 +64,7 @@ M: rename pprint-qualified ( rename -- )
     ] with-pprint ;
 
 : filter-interesting ( seq -- seq' )
-    [ [ vocab? ] [ extra-words? ] bi or not ] filter ;
+    [ [ vocab? ] [ extra-words? ] bi or ] reject ;
 
 PRIVATE>
 
@@ -83,6 +82,12 @@ PRIVATE>
 : pprint-manifest ( manifest -- )
     (pprint-manifest pprint-manifest) ;
 
+CONSTANT: manifest-style H{
+    { page-color COLOR: FactorLightTan }
+    { border-color COLOR: FactorDarkTan }
+    { inset { 5 5 } }
+}
+
 [
     nl
     { { font-style bold } { font-name "sans-serif" } } [
@@ -90,10 +95,6 @@ PRIVATE>
         "To avoid doing this in the future, add the following forms" print
         "at the top of the source file:" print nl
     ] with-style
-    {
-        { page-color COLOR: FactorLightTan }
-        { border-color COLOR: FactorDarkTan }
-        { inset { 5 5 } }
-    } [ manifest get pprint-manifest ] with-nesting
+    manifest-style [ manifest get pprint-manifest ] with-nesting
     nl nl
 ] print-use-hook set-global

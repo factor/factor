@@ -5,7 +5,7 @@ math math.vectors math.matrices assocs arrays hashtables ;
 FROM: namespaces => set ;
 IN: euler.b-rep
 
-: >index-hash ( seq -- hash ) [ 2array ] map-index >hashtable ; inline
+: >index-hash ( seq -- hash ) H{ } zip-index-as ; inline
 
 TUPLE: b-edge < edge sharpness macro ;
 
@@ -94,7 +94,7 @@ sharpness-stack [ V{ t } ] initialize
     [ face-ccw ] keep [ vertex-pos ] bi@ v- ;
 
 : normal ( v0 v1 v2 -- v )
-    [ drop v- ] [ [ drop ] 2dip v- ] 3bi cross ;
+    [ drop v- ] [ nipd v- ] 3bi cross ;
 
 ERROR: all-points-colinear ;
 
@@ -127,7 +127,7 @@ ERROR: all-points-colinear ;
     tri ;
 
 : connect-opposite-edges ( b-rep -- )
-    edges>> 
+    edges>>
     [ [ [ next-edge>> vertex>> ] [ vertex>> 2array ] [ ] tri ] H{ } map>assoc ]
     [ swap '[ [ vertex>> ] [ next-edge>> vertex>> 2array _ at ] [ opposite-edge<< ] tri ] each ] bi ;
 

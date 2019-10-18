@@ -10,5 +10,5 @@ site-watcher-from [ "factor-site-watcher@gmail.com" ] initialize
     [ account>> email>> ] 2dip
     pick [
         [ <email> site-watcher-from get >>from ] 3dip
-        [ 1array >>to ] [ >>body ] [ >>subject ] tri* send-email 
+        [ 1array >>to ] [ >>body ] [ >>subject ] tri* send-email
     ] [ 3drop ] if ;

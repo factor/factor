@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff, see bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: assocs environment kernel sequences ;
 IN: env
 
@@ -23,4 +24,3 @@ M: env delete-at
 
 M: env clear-assoc
     drop os-envs keys [ unset-os-env ] each ;
-

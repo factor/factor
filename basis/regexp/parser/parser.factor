@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: peg.ebnf kernel math.parser sequences assocs arrays fry math
-combinators regexp.classes strings splitting peg locals accessors
-regexp.ast unicode.case unicode.script.private unicode.categories
-memoize interval-maps sets unicode.data combinators.short-circuit
-namespaces ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit interval-maps kernel locals
+math.parser memoize multiline peg.ebnf regexp.ast regexp.classes
+sequences sets splitting strings unicode unicode.data unicode.script ;
 IN: regexp.parser
 
 : allowed-char? ( ch -- ? )
@@ -22,7 +21,7 @@ ERROR: bad-class name ;
 
 : simple ( str -- simple )
     ! Alternatively, first collation key level?
-    >case-fold [ " \t_" member? not ] filter ;
+    >case-fold [ " \t_" member? ] reject ;
 
 : simple-table ( seq -- table )
     [ [ simple ] keep ] H{ } map>assoc ;
@@ -116,7 +115,7 @@ ERROR: nonexistent-option name ;
 
 : string>options ( string -- options )
     "-" split1 parse-options ;
- 
+
 : options>string ( options -- string )
     [ on>> ] [ off>> ] bi
     [ [ option>ch ] map ] bi@
@@ -127,7 +126,7 @@ ERROR: nonexistent-option name ;
 !       add greedy and nongreedy forms of matching
 ! (once it's all implemented)
 
-EBNF: parse-regexp
+EBNF: parse-regexp [=[
 
 CharacterInBracket = !("}") Character
 
@@ -218,4 +217,4 @@ Alternation = Concatenation:c ("|" Concatenation)*:a
 End = !(.)
 
 Main = Alternation End
-;EBNF
+]=]

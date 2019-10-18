@@ -3,7 +3,7 @@
 USING: tools.test redis.command-writer io.streams.string ;
 IN: redis.command-writer.tests
 
-#! Connection
+! Connection
 { "*1\r\n$4\r\nQUIT\r\n" }
 [ [ quit ] with-string-writer ] unit-test
 
@@ -13,7 +13,7 @@ IN: redis.command-writer.tests
 { "*2\r\n$4\r\nAUTH\r\n$8\r\npassword\r\n" }
 [ [ "password" auth ] with-string-writer ] unit-test
 
-#! String values
+! String values
 { "*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$3\r\nfoo\r\n" }
 [ [ "foo" "key" set ] with-string-writer ] unit-test
 
@@ -50,7 +50,7 @@ IN: redis.command-writer.tests
 { "*2\r\n$4\r\nTYPE\r\n$3\r\nkey\r\n" }
 [ [ "key" type ] with-string-writer ] unit-test
 
-#! Key space
+! Key space
 { "*2\r\n$4\r\nKEYS\r\n$4\r\npat*\r\n" }
 [ [ "pat*" keys ] with-string-writer ] unit-test
 
@@ -73,7 +73,7 @@ IN: redis.command-writer.tests
 { "*3\r\n$6\r\nEXPIRE\r\n$3\r\nkey\r\n$1\r\n7\r\n" }
 [ [ 7 "key" expire ] with-string-writer ] unit-test
 
-#! Lists
+! Lists
 { "*3\r\n$5\r\nRPUSH\r\n$3\r\nkey\r\n$3\r\nfoo\r\n" }
 [ [ "foo" "key" rpush ] with-string-writer ] unit-test
 
@@ -104,7 +104,7 @@ IN: redis.command-writer.tests
 { "*2\r\n$4\r\nRPOP\r\n$3\r\nkey\r\n" }
 [ [ "key" rpop ] with-string-writer ] unit-test
 
-#! Sets
+! Sets
 { "*3\r\n$4\r\nSADD\r\n$3\r\nkey\r\n$3\r\nfoo\r\n" }
 [ [ "foo" "key" sadd ] with-string-writer ] unit-test
 
@@ -140,7 +140,7 @@ IN: redis.command-writer.tests
 { "*2\r\n$8\r\nSMEMBERS\r\n$3\r\nkey\r\n" }
 [ [ "key" smembers ] with-string-writer ] unit-test
 
-#! Hashes
+! Hashes
 { "*3\r\n$4\r\nHDEL\r\n$3\r\nkey\r\n$5\r\nfield\r\n" }
 [ [ "field" "key" hdel ] with-string-writer ] unit-test
 
@@ -201,7 +201,7 @@ IN: redis.command-writer.tests
 { "*2\r\n$5\r\nHVALS\r\n$3\r\nkey\r\n" }
 [ [ "key" hvals ] with-string-writer ] unit-test
 
-#! Multiple db
+! Multiple db
 { "*2\r\n$6\r\nSELECT\r\n$1\r\n2\r\n" }
 [ [ 2 select ] with-string-writer ] unit-test
 
@@ -214,9 +214,9 @@ IN: redis.command-writer.tests
 { "*1\r\n$8\r\nFLUSHALL\r\n" }
 [ [ flushall ] with-string-writer ] unit-test
 
-#! Sorting
+! Sorting
 
-#! Persistence control
+! Persistence control
 { "*1\r\n$4\r\nSAVE\r\n" } [ [ save ] with-string-writer ] unit-test
 
 { "*1\r\n$6\r\nBGSAVE\r\n" } [ [ bgsave ] with-string-writer ] unit-test
@@ -225,7 +225,7 @@ IN: redis.command-writer.tests
 
 { "*1\r\n$8\r\nSHUTDOWN\r\n" } [ [ shutdown ] with-string-writer ] unit-test
 
-#! Remote server control
+! Remote server control
 { "*1\r\n$4\r\nINFO\r\n" } [ [ info ] with-string-writer ] unit-test
 
 { "*1\r\n$7\r\nMONITOR\r\n" } [ [ monitor ] with-string-writer ] unit-test

@@ -1,1 +1,0 @@
-Offscreen world gadgets for rendering UI elements to bitmaps

@@ -1,7 +1,6 @@
-USING: accessors assocs compiler.cfg
-compiler.cfg.branch-splitting compiler.cfg.debugger
-compiler.cfg.predecessors compiler.cfg.rpo compiler.cfg.instructions fry kernel
-tools.test namespaces sequences vectors ;
+USING: accessors assocs compiler.cfg.branch-splitting
+compiler.cfg.instructions compiler.cfg.predecessors compiler.cfg.rpo
+compiler.cfg.utilities compiler.test fry kernel namespaces tools.test ;
 IN: compiler.cfg.branch-splitting.tests
 
 : get-predecessors ( cfg -- assoc )
@@ -9,16 +8,14 @@ IN: compiler.cfg.branch-splitting.tests
 
 : check-predecessors ( cfg -- )
     [ get-predecessors ]
-    [ needs-predecessors drop ]
+    [ needs-predecessors ]
     [ get-predecessors ] tri assert= ;
 
 : check-branch-splitting ( cfg -- )
-    needs-predecessors
-    split-branches
-    check-predecessors ;
+    [ needs-predecessors ] [ split-branches ] [ check-predecessors ] tri ;
 
 : test-branch-splitting ( -- )
-    cfg new 0 get >>entry check-branch-splitting ;
+    0 get block>cfg check-branch-splitting ;
 
 V{ T{ ##branch } } 0 test-bb
 
@@ -32,7 +29,7 @@ V{ T{ ##branch } } 4 test-bb
 
 test-diamond
 
-[ ] [ test-branch-splitting ] unit-test
+{ } [ test-branch-splitting ] unit-test
 
 V{ T{ ##branch } } 0 test-bb
 
@@ -52,7 +49,7 @@ V{ T{ ##branch } } 5 test-bb
 
 2 { 3 4 } edges
 
-[ ] [ test-branch-splitting ] unit-test
+{ } [ test-branch-splitting ] unit-test
 
 V{ T{ ##branch } } 0 test-bb
 
@@ -70,7 +67,7 @@ V{ T{ ##branch } } 4 test-bb
 
 2 4 edge
 
-[ ] [ test-branch-splitting ] unit-test
+{ } [ test-branch-splitting ] unit-test
 
 V{ T{ ##branch } } 0 test-bb
 
@@ -82,4 +79,4 @@ V{ T{ ##branch } } 2 test-bb
 
 1 2 edge
 
-[ ] [ test-branch-splitting ] unit-test
+{ } [ test-branch-splitting ] unit-test

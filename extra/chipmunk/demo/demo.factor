@@ -107,8 +107,8 @@ M:: chipmunk-world begin-game-world ( world -- )
     space 2.0 10000 cpSpaceResizeActiveHash
     space 1 >>iterations drop
 
-    image-height iota [| y |
-        image-width iota [| x |
+    image-height <iota> [| y |
+        image-width <iota> [| x |
             x y get-pixel [
                 x image-width 2 / - 0.05 random-unit * + 2 *
                 image-height 2 / y - 0.05 random-unit * + 2 *
@@ -118,7 +118,7 @@ M:: chipmunk-world begin-game-world ( world -- )
             ] when
         ] each
     ] each
-    
+
     space cpBodyAlloc NAN: 0 dup cpBodyInit cpSpaceAddBody :> body
     body -1000 -10 cpv >>p drop
     body 400 0 cpv >>v drop

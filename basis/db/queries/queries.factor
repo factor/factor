@@ -23,7 +23,7 @@ SINGLETON: retryable
     [ make-retryable ] when ;
 
 : regenerate-params ( statement -- statement )
-    dup 
+    dup
     [ bind-params>> ] [ in-params>> ] bi
     [
         dup generator-bind? [
@@ -32,13 +32,13 @@ SINGLETON: retryable
             drop
         ] if
     ] 2map >>bind-params ;
-    
+
 M: retryable execute-statement* ( statement type -- )
-    drop [ retries>> iota ] [
+    drop [ retries>> <iota> ] [
         [
             nip
             [ query-results dispose t ]
-            [ ] 
+            [ ]
             [ regenerate-params bind-statement* f ] cleanup
         ] curry
     ] bi attempt-all drop ;
@@ -46,11 +46,10 @@ M: retryable execute-statement* ( statement type -- )
 : sql-props ( class -- columns table )
     [ db-columns ] [ db-table-name ] bi ;
 
-: query-make ( class quot -- statements )
-    #! query, input, outputs, secondary queries
-    over db-table-name "table-name" set
+: query-make ( ..a class quot: ( ..a columns table -- ..b ) -- ..b statements )
+    ! query, input, outputs, secondary queries
     [ sql-props ] dip
-    [ 0 sql-counter rot with-variable ] curry
+    '[ 0 sql-counter [ dup "table-name" set @ ] with-variable ]
     { "" { } { } { } } nmake
     [ <simple-statement> maybe-make-retryable ] dip
     [ [ 1array ] dip append ] unless-empty ; inline
@@ -205,6 +204,9 @@ M: db-connection <count-statement> ( query -- statement )
         [ [ "create index " % % ] dip " on " % % ] dip "(" %
         "," join % ")" %
     ] "" make sql-command ;
+
+: ensure-index ( index-name table-name columns -- )
+    '[ _ _ _ create-index ] ignore-index-exists ;
 
 : drop-index ( index-name -- )
     [ "drop index " % % ] "" make sql-command ;

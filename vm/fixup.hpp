@@ -1,9 +1,5 @@
 namespace factor {
 
-template <typename T> struct identity {
-  T operator()(T t) { return t; }
-};
-
 struct no_fixup {
   static const bool translated_code_block_map = false;
 

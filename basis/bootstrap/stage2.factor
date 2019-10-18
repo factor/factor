@@ -13,25 +13,24 @@ SYMBOL: bootstrap-time
 : strip-encodings ( -- )
     os unix? [
         [
-            P" resource:core/io/encodings/utf16/utf16.factor" 
+            P" resource:core/io/encodings/utf16/utf16.factor"
             P" resource:core/io/encodings/utf16n/utf16n.factor" [ forget ] bi@
-            "io.encodings.utf16" 
-            "io.encodings.utf16n" [ child-vocabs [ forget-vocab ] each ] bi@
+            "io.encodings.utf16"
+            "io.encodings.utf16n" [ loaded-child-vocab-names [ forget-vocab ] each ] bi@
         ] with-compilation-unit
     ] when ;
 
 : default-image-name ( -- string )
-    vm file-name os windows? [ "." split1-last drop ] when
+    vm-path file-name os windows? [ "." split1-last drop ] when
     ".image" append resource-path ;
 
-: load-components ( -- )
-    "include" "exclude"
-    [ get-global " " split harvest ] bi@
-    diff
-    [ "bootstrap." prepend require ] each ;
+: load-component ( name -- )
+    dup "* Loading the " write write " component" print
+    "bootstrap." prepend require ;
 
-: count-words ( pred -- )
-    all-words swap count number>string write ; inline
+: load-components ( -- )
+    "include" "exclude" [ get-global " " split harvest ] bi@ diff
+    [ load-component ] each ;
 
 : print-time ( us -- )
     1,000,000,000 /i
@@ -45,7 +44,7 @@ SYMBOL: bootstrap-time
 
     "Bootstrapping is complete." print
     "Now, you can run Factor:" print
-    vm write " -i=" write "output-image" get print flush ;
+    vm-path write " -i=" write "output-image" get print flush ;
 
 : save/restore-error ( quot -- )
     error get-global
@@ -55,6 +54,9 @@ SYMBOL: bootstrap-time
     error-continuation set-global
     original-error set-global
     error set-global ; inline
+
+CONSTANT: default-components
+    "math compiler threads io tools ui ui.tools unicode help handbook"
 
 [
     ! We time bootstrap
@@ -66,7 +68,7 @@ SYMBOL: bootstrap-time
 
     default-image-name "output-image" set-global
 
-    "math compiler threads help io tools ui ui.tools unicode handbook" "include" set-global
+    default-components "include" set-global
     "" "exclude" set-global
 
     strip-encodings
@@ -76,12 +78,11 @@ SYMBOL: bootstrap-time
     ! Set dll paths
     os windows? [ "windows" require ] when
 
-    "staging" get "deploy-vocab" get or [
+    "staging" get [
         "stage2: deployment mode" print
     ] [
         "debugger" require
         "listener" require
-        "none" require
     ] if
 
     load-components
@@ -90,24 +91,19 @@ SYMBOL: bootstrap-time
 
     run-bootstrap-init
 
-    f error set-global
-    f original-error set-global
-    f error-continuation set-global
-
     nano-count swap - bootstrap-time set-global
     print-report
 
-    "deploy-vocab" get [
-        "tools.deploy.shaker" run
+    "staging" get [
+        "vocab:bootstrap/finish-staging.factor" run-file
     ] [
-        "staging" get [
-            "vocab:bootstrap/finish-staging.factor" run-file
-        ] [
-            "vocab:bootstrap/finish-bootstrap.factor" run-file
-        ] if
-
-        "output-image" get save-image-and-exit
+        "vocab:bootstrap/finish-bootstrap.factor" run-file
     ] if
+
+    f error set-global
+    f original-error set-global
+    f error-continuation set-global
+    "output-image" get save-image-and-exit
 ] [
     drop
     [

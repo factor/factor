@@ -1,13 +1,12 @@
-USING: kernel sequences namespaces make math assocs words arrays
-tools.annotations vocabs sorting prettyprint io system
-math.statistics accessors tools.time fry ;
-FROM: namespaces => change-global ;
+USING: accessors arrays assocs fry io kernel make math
+math.statistics namespaces prettyprint sequences sorting
+tools.annotations tools.time vocabs ;
 IN: wordtimer
 
 SYMBOL: *wordtimes*
 SYMBOL: *calling*
 
-: reset-word-timer ( -- ) 
+: reset-word-timer ( -- )
     H{ } clone *wordtimes* set-global
     H{ } clone *calling* set-global ;
 
@@ -38,16 +37,16 @@ SYMBOL: *calling*
     [ timed-call ] [ drop call ] if ; inline
 
 : (add-timer) ( word quot -- quot' )
-    [ swap time-unless-recursing ] 2curry ; 
+    [ swap time-unless-recursing ] 2curry ;
 
 : add-timer ( word -- )
     dup '[ [ _ ] dip (add-timer) ] annotate ;
 
 : add-timers ( vocab -- )
-    words [ add-timer ] each ;
+    vocab-words [ add-timer ] each ;
 
 : reset-vocab ( vocab -- )
-    words [ reset ] each ;
+    vocab-words [ reset ] each ;
 
 : dummy-word ( -- ) ;
 
@@ -59,7 +58,7 @@ SYMBOL: *calling*
     swap [ * - ] keep 2array ;
 
 : (correct-for-timing-overhead) ( timingshash -- timingshash )
-    time-dummy-word [ subtract-overhead ] curry assoc-map ;  
+    time-dummy-word [ subtract-overhead ] curry assoc-map ;
 
 : correct-for-timing-overhead ( -- )
     *wordtimes* [ (correct-for-timing-overhead) ] change-global ;
@@ -68,7 +67,7 @@ SYMBOL: *calling*
     *wordtimes* get-global [ swap suffix ] { } assoc>map natural-sort reverse pprint ;
 
 : wordtimer-call ( quot -- )
-    reset-word-timer 
+    reset-word-timer
     benchmark [
         correct-for-timing-overhead
         "total time:" write

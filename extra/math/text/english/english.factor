@@ -1,8 +1,8 @@
-! Copyright (c) 2007, 2008 Aaron Schaefer.
+! Copyright (c) 2007, 2008, 2018 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit grouping kernel math
-math.functions math.parser math.text.utils namespaces sequences
-splitting ;
+USING: combinators combinators.short-circuit grouping kernel
+math math.functions math.parser math.order math.text.utils namespaces
+sequences splitting ;
 IN: math.text.english
 
 <PRIVATE
@@ -65,12 +65,10 @@ SYMBOL: and-needed?
     [ " " glue ] unless-empty ;
 
 : append-with-conjunction ( str1 str2 -- newstr )
-    over length 0 = [
-        nip
-    ] [
-        swap and-needed? get " and " ", " ?
-        glue and-needed? off
-    ] if ;
+    swap [
+        and-needed? get " and " ", " ? glue
+        and-needed? off
+    ] unless-empty ;
 
 : (recombine) ( str index seq -- newstr )
     2dup nth 0 = [
@@ -114,3 +112,13 @@ M: complex number>text
         [ 0 < " minus " " plus " ? ]
         [ abs number>text " i" append ] bi
     ] bi* 3append ;
+
+: ordinal-suffix ( n -- suffix )
+    abs dup 100 mod 11 13 between? [ drop "th" ] [
+        10 mod {
+            { 1 [ "st" ] }
+            { 2 [ "nd" ] }
+            { 3 [ "rd" ] }
+            [ drop "th" ]
+        } case
+    ] if ;

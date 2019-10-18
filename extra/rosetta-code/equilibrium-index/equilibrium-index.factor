@@ -1,11 +1,14 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences ;
+USING: kernel math math.statistics math.vectors sequences ;
 IN: rosetta-code.equilibrium-index
 
 ! http://rosettacode.org/wiki/Equilibrium_index
 
-! An equilibrium index of a sequence is an index into the sequence such that the sum of elements at lower indices is equal to the sum of elements at higher indices. For example, in a sequence A:
+! An equilibrium index of a sequence is an index into the
+! sequence such that the sum of elements at lower indices is
+! equal to the sum of elements at higher indices. For example,
+! in a sequence A:
 !   A0 = − 7
 !   A1 = 1
 !   A2 = 5
@@ -28,12 +31,6 @@ IN: rosetta-code.equilibrium-index
 ! equilibrium indices (if any). Assume that the sequence may be
 ! very long.
 
-: accum-left ( seq id quot -- seq )
-    accumulate nip ; inline
-
-: accum-right ( seq id quot -- seq )
-    [ <reversed> ] 2dip accum-left <reversed> ; inline
-
-: equilibrium-indices ( seq -- inds )
-    0 [ + ] [ accum-left ] [ accum-right ] 3bi [ = ] 2map
-    V{ } swap dup length iota [ [ suffix ] curry [ ] if ] 2each ;
+: equilibrium-indices ( seq -- indices )
+    [ cum-sum0 ] [ <reversed> cum-sum0 <reversed> ] bi
+    v= t swap indices ;

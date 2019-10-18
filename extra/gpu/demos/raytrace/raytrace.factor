@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.tuple game.loop game.worlds
 generalizations gpu gpu.render gpu.shaders gpu.util gpu.util.wasd
 kernel literals math math.libm math.matrices math.order math.vectors
@@ -20,7 +21,7 @@ UNIFORM-TUPLE: sphere-uniforms
 UNIFORM-TUPLE: raytrace-uniforms
     { "mv-inv-matrix"    mat4-uniform f }
     { "fov"              vec2-uniform f }
-    
+
     { "spheres"          sphere-uniforms 4 }
 
     { "floor-height"     float-uniform f }
@@ -87,13 +88,13 @@ CONSTANT: initial-spheres {
     "vocab:gpu/demos/raytrace/green-ball.aiff" read-audio t <static-audio-clip>
     audio-engine spheres fourth
     "vocab:gpu/demos/raytrace/yellow-ball.aiff" read-audio t <static-audio-clip>
-    
+
     4array play-clips ;
 
 M: raytrace-world begin-game-world
     init-gpu
     { -2.0 6.25 10.0 } 0.19 0.55 set-wasd-view
-    initial-spheres [ clone ] map >>spheres    
+    initial-spheres [ clone ] map >>spheres
     raytrace-program <program-instance> <window-vertex-array> >>vertex-array
     set-up-audio ;
 

@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs deques dlists kernel locals sequences lexer
-namespaces functors compiler.cfg.rpo compiler.cfg.utilities
-compiler.cfg.predecessors compiler.cfg ;
+USING: accessors assocs combinators.short-circuit compiler.cfg.predecessors
+compiler.cfg.rpo compiler.cfg.utilities deques dlists functors kernel lexer
+locals namespaces sequences ;
 IN: compiler.cfg.dataflow-analysis
 
 GENERIC: join-sets ( sets bb dfa -- set )
@@ -39,28 +39,27 @@ MIXIN: dataflow-analysis
     bb in-sets dfa compute-out-set
     bb out-sets maybe-set-at ; inline
 
-:: dfa-step ( bb in-sets out-sets dfa work-list -- )
-    bb in-sets out-sets dfa update-in-set [
-        bb in-sets out-sets dfa update-out-set [
-            bb dfa successors work-list push-all-front
-        ] when
-    ] when ; inline
+: update-in/out-set ( bb in-sets out-sets dfa -- ? )
+    { [ update-in-set ] [ update-out-set ] } 4 n&& ;
+
+:: dfa-step ( bb in-sets out-sets dfa -- bbs )
+    bb in-sets out-sets dfa update-in/out-set bb dfa successors { } ? ;
 
 :: run-dataflow-analysis ( cfg dfa -- in-sets out-sets )
-    cfg needs-predecessors drop
     H{ } clone :> in-sets
     H{ } clone :> out-sets
-    cfg dfa <dfa-worklist> :> work-list
-    work-list [ in-sets out-sets dfa work-list dfa-step ] slurp-deque
+    cfg needs-predecessors
+    cfg dfa <dfa-worklist>
+    [ in-sets out-sets dfa dfa-step ] slurp/replenish-deque
     in-sets
     out-sets ; inline
 
 M: dataflow-analysis join-sets 2drop assoc-refine ;
 M: dataflow-analysis ignore-block? drop kill-block?>> ;
 
-FUNCTOR: define-analysis ( name -- )
+<FUNCTOR: define-analysis ( name -- )
 
-name-analysis DEFINES-CLASS ${name}-analysis
+name DEFINES-CLASS ${name}
 name-ins DEFINES ${name}-ins
 name-outs DEFINES ${name}-outs
 name-in DEFINES ${name}-in
@@ -68,7 +67,7 @@ name-out DEFINES ${name}-out
 
 WHERE
 
-SINGLETON: name-analysis
+SINGLETON: name
 
 SYMBOL: name-ins
 
@@ -78,7 +77,7 @@ SYMBOL: name-outs
 
 : name-out ( bb -- set ) name-outs get at ;
 
-;FUNCTOR
+;FUNCTOR>
 
 ! ! ! Forward dataflow analysis
 
@@ -89,22 +88,22 @@ M: forward-analysis block-order  drop reverse-post-order ;
 M: forward-analysis successors   drop successors>> ;
 M: forward-analysis predecessors drop predecessors>> ;
 
-FUNCTOR: define-forward-analysis ( name -- )
+<FUNCTOR: define-forward-analysis ( name -- )
 
-name-analysis IS ${name}-analysis
+name IS ${name}
 name-ins IS ${name}-ins
 name-outs IS ${name}-outs
 compute-name-sets DEFINES compute-${name}-sets
 
 WHERE
 
-INSTANCE: name-analysis forward-analysis
+INSTANCE: name forward-analysis
 
 : compute-name-sets ( cfg -- )
-    name-analysis run-dataflow-analysis
+    name run-dataflow-analysis
     [ name-ins set ] [ name-outs set ] bi* ;
 
-;FUNCTOR
+;FUNCTOR>
 
 ! ! ! Backward dataflow analysis
 
@@ -115,22 +114,22 @@ M: backward-analysis block-order  drop post-order ;
 M: backward-analysis successors   drop predecessors>> ;
 M: backward-analysis predecessors drop successors>> ;
 
-FUNCTOR: define-backward-analysis ( name -- )
+<FUNCTOR: define-backward-analysis ( name -- )
 
-name-analysis IS ${name}-analysis
+name IS ${name}
 name-ins IS ${name}-ins
 name-outs IS ${name}-outs
 compute-name-sets DEFINES compute-${name}-sets
 
 WHERE
 
-INSTANCE: name-analysis backward-analysis
+INSTANCE: name backward-analysis
 
 : compute-name-sets ( cfg -- )
-    \ name-analysis run-dataflow-analysis
+    \ name run-dataflow-analysis
     [ name-outs set ] [ name-ins set ] bi* ;
 
-;FUNCTOR
+;FUNCTOR>
 
 PRIVATE>
 

@@ -1,12 +1,13 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar calendar.format
 combinators combinators.short-circuit fry io io.backend
 io.directories io.directories.hierarchy io.encodings.binary
 io.encodings.detect io.encodings.utf8 io.files io.files.info
-io.files.types io.files.unique io.launcher io.pathnames kernel
-locals math math.parser namespaces sequences sorting strings
-system unicode.categories xml.syntax xml.writer xmode.catalog
-xmode.marker xmode.tokens ;
+io.files.temp io.files.types io.files.unique io.launcher
+io.pathnames kernel locals math math.parser namespaces sequences
+sorting strings system unicode xml.syntax xml.writer
+xmode.catalog xmode.marker xmode.tokens ;
 IN: codebook
 
 ! Usage: "my/source/tree" codebook
@@ -44,8 +45,8 @@ TUPLE: code-file
 
 : include-file-name? ( name -- ? )
     {
-        [ path-components [ "." head? ] any? not ] 
-        [ link-info type>> +regular-file+ = ]
+        [ path-components [ "." head? ] none? ]
+        [ link-info regular-file? ]
     } 1&& ;
 
 : code-files ( dir -- files )
@@ -96,7 +97,7 @@ TUPLE: code-file
     file mode>> load-mode :> rules
     f lines [| l i | l rules tokenize-line i 1 + line#len line#>string htmlize-tokens ]
     map-index concat nip :> html-lines
-    <XML <html>
+    <XML <!DOCTYPE html> <html>
         <head>
             <title><-name-></title>
             <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
@@ -116,7 +117,7 @@ TUPLE: code-file
     dir [
         files toc-list :> toc
 
-        <XML <html>
+        <XML <!DOCTYPE html> <html>
             <head>
                 <title><-name-></title>
                 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
@@ -140,7 +141,7 @@ TUPLE: code-file
         file name>> :> name
         name file-html-name :> filename
         i 2 + number>string :> istr
-        
+
         [XML <navPoint class="book" id=<-filename-> playOrder=<-istr->>
             <navLabel><text><-name-></text></navLabel>
             <content src=<-filename-> />
@@ -157,7 +158,7 @@ TUPLE: code-file
             <-file-nav-points->
         </navMap>
     </ncx> XML> ;
-    
+
 :: code>opf ( dir name files -- xml )
     "Generating OPF manifest" print flush
     name ".ncx"  append :> ncx-name
@@ -194,8 +195,8 @@ TUPLE: code-file
         </guide>
     </package> XML> ;
 
-: write-dest-file ( xml dest-dir name ext -- )
-    append append-path utf8 [ write-xml ] with-file-writer ;
+: write-dest-file ( xml name ext -- )
+    append utf8 [ write-xml ] with-file-writer ;
 
 SYMBOL: kindlegen-path
 kindlegen-path [ "kindlegen" ] initialize
@@ -216,30 +217,31 @@ codebook-output-path [ "resource:codebooks" ] initialize
 
     dest-dir make-directories
     [
-        current-temporary-directory get :> temp-dir
-        src-dir file-name :> name
-        src-dir code-files :> files
+        [
+            src-dir file-name :> name
+            src-dir code-files :> files
 
-        src-dir name files code>opf
-        temp-dir name ".opf" write-dest-file
+            src-dir name files code>opf
+            name ".opf" write-dest-file
 
-        "vocab:codebook/cover.jpg" temp-dir copy-file-into
+            "vocab:codebook/cover.jpg" "." copy-file-into
 
-        src-dir name files code>ncx
-        temp-dir name ".ncx" write-dest-file
+            src-dir name files code>ncx
+            name ".ncx" write-dest-file
 
-        src-dir name files code>toc-html
-        temp-dir "_toc.html" "" write-dest-file
+            src-dir name files code>toc-html
+            "_toc.html" "" write-dest-file
 
-        files [| file |
-            src-dir file code>html
-            temp-dir file name>> file-html-name "" write-dest-file
-        ] each
+            files [| file |
+                src-dir file code>html
+                file name>> file-html-name "" write-dest-file
+            ] each
 
-        temp-dir name ".opf" kindle-path kindlegen
-        temp-dir name ".mobi" kindle-path dest-dir copy-file-into
+            "." name ".opf" kindle-path kindlegen
+            "." name ".mobi" kindle-path dest-dir copy-file-into
 
-        dest-dir name ".mobi" kindle-path :> mobi-path
+            dest-dir name ".mobi" kindle-path :> mobi-path
 
-        "Job's finished: " write mobi-path print flush
-    ] cleanup-unique-working-directory ;
+            "Job's finished: " write mobi-path print flush
+        ] cleanup-unique-directory
+    ] with-temp-directory ;

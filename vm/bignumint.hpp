@@ -1,48 +1,48 @@
-/* -*-C-*-
+// -*-C-*-
 
-$Id$
+// $Id$
 
-Copyright (c) 1989-1992 Massachusetts Institute of Technology
+// Copyright (c) 1989-1992 Massachusetts Institute of Technology
 
-This material was developed by the Scheme project at the Massachusetts
-Institute of Technology, Department of Electrical Engineering and
-Computer Science.  Permission to copy and modify this software, to
-redistribute either the original software or a modified version, and
-to use this software for any purpose is granted, subject to the
-following restrictions and understandings.
+// This material was developed by the Scheme project at the Massachusetts
+// Institute of Technology, Department of Electrical Engineering and
+// Computer Science.  Permission to copy and modify this software, to
+// redistribute either the original software or a modified version, and
+// to use this software for any purpose is granted, subject to the
+// following restrictions and understandings.
 
-1. Any copy made of this software must include this copyright notice
-in full.
+// 1. Any copy made of this software must include this copyright notice
+// in full.
 
-2. Users of this software agree to make their best efforts (a) to
-return to the MIT Scheme project any improvements or extensions that
-they make, so that these may be included in future releases; and (b)
-to inform MIT of noteworthy uses of this software.
+// 2. Users of this software agree to make their best efforts (a) to
+// return to the MIT Scheme project any improvements or extensions that
+// they make, so that these may be included in future releases; and (b)
+// to inform MIT of noteworthy uses of this software.
 
-3. All materials developed as a consequence of the use of this
-software shall duly acknowledge such use, in accordance with the usual
-standards of acknowledging credit in academic research.
+// 3. All materials developed as a consequence of the use of this
+// software shall duly acknowledge such use, in accordance with the usual
+// standards of acknowledging credit in academic research.
 
-4. MIT has made no warrantee or representation that the operation of
-this software will be error-free, and MIT is under no obligation to
-provide any services, by way of maintenance, update, or otherwise.
+// 4. MIT has made no warrantee or representation that the operation of
+// this software will be error-free, and MIT is under no obligation to
+// provide any services, by way of maintenance, update, or otherwise.
 
-5. In conjunction with products arising from the use of this material,
-there shall be no use of the name of the Massachusetts Institute of
-Technology nor of any adaptation thereof in any advertising,
-promotional, or sales literature without prior written consent from
-MIT in each case. */
+// 5. In conjunction with products arising from the use of this material,
+// there shall be no use of the name of the Massachusetts Institute of
+// Technology nor of any adaptation thereof in any advertising,
+// promotional, or sales literature without prior written consent from
+// MIT in each case.
 
 namespace factor {
 
-/* Internal Interface to Bignum Code */
+// Internal Interface to Bignum Code
 #undef BIGNUM_ZERO_P
 #undef BIGNUM_NEGATIVE_P
 
-/* The memory model is based on the following definitions, and on the
-   definition of the type `bignum_type'.  The only other special
-   definition is `CHAR_BIT', which is defined in the Ansi C header
-   file "limits.h". */
+// The memory model is based on the following definitions, and on the
+// definition of the type `bignum_type'.  The only other special
+// definition is `CHAR_BIT', which is defined in the Ansi C header
+// file "limits.h".
 
 typedef fixnum bignum_digit_type;
 typedef fixnum bignum_length_type;
@@ -55,10 +55,10 @@ typedef int64_t bignum_twodigit_type;
 #endif
 #endif
 
-/* BIGNUM_TO_POINTER casts a bignum object to a digit array pointer. */
-#define BIGNUM_TO_POINTER(bignum) ((bignum_digit_type*)(bignum + 1))
+// BIGNUM_TO_POINTER casts a bignum object to a digit array pointer.
+#define BIGNUM_TO_POINTER(bignum) ((bignum_digit_type*)(bignum->data()))
 
-/* BIGNUM_EXCEPTION is invoked to handle assertion violations. */
+// BIGNUM_EXCEPTION is invoked to handle assertion violations.
 #define BIGNUM_EXCEPTION abort
 
 #define BIGNUM_DIGIT_LENGTH (((sizeof(bignum_digit_type)) * CHAR_BIT) - 2)
@@ -79,10 +79,11 @@ typedef int64_t bignum_twodigit_type;
 
 #define BIGNUM_REF(bignum, index) (*((BIGNUM_START_PTR(bignum)) + (index)))
 
-/* These definitions are here to facilitate caching of the constants
-   0, 1, and -1. */
-#define BIGNUM_ZERO() untag<bignum>(bignum_zero)
-#define BIGNUM_ONE(neg_p) untag<bignum>(neg_p ? bignum_neg_one : bignum_pos_one)
+// These definitions are here to facilitate caching of the constants
+// 0, 1, and -1.
+#define BIGNUM_ZERO() untag<bignum>(special_objects[OBJ_BIGNUM_ZERO])
+#define BIGNUM_ONE(neg_p) untag<bignum>(        \
+            special_objects[neg_p ? OBJ_BIGNUM_NEG_ONE : OBJ_BIGNUM_POS_ONE])
 
 #define HD_LOW(digit) ((digit) & BIGNUM_HALF_DIGIT_MASK)
 #define HD_HIGH(digit) ((digit) >> BIGNUM_HALF_DIGIT_LENGTH)
@@ -102,6 +103,6 @@ typedef int64_t bignum_twodigit_type;
       BIGNUM_EXCEPTION();         \
   }
 
-#endif /* not BIGNUM_DISABLE_ASSERTION_CHECKS */
+#endif // not BIGNUM_DISABLE_ASSERTION_CHECKS
 
 }

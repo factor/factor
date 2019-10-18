@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.tuple generalizations kernel
 locals quotations sequences ;
 IN: combinators.tuple
@@ -13,11 +14,11 @@ IN: combinators.tuple
 
 PRIVATE>
 
-MACRO:: nmake-tuple ( class assoc n -- )
+MACRO:: nmake-tuple ( class assoc n -- quot )
     class all-slots [ assoc n (tuple-slot-quot) ] map :> quots
     class <wrapper> :> \class
     { quots n ncleave \class boa } >quotation ;
-    
+
 : make-tuple ( x class assoc -- tuple )
     1 nmake-tuple ; inline
 
@@ -26,4 +27,3 @@ MACRO:: nmake-tuple ( class assoc n -- )
 
 : 3make-tuple ( x y z class assoc -- tuple )
     3 nmake-tuple ; inline
-

@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test lists math kernel ;
-IN: lists.tests
 
 { { 3 4 5 6 7 } } [
     { 1 2 3 4 5 } sequence>list [ 2 + ] lmap list>array
@@ -47,4 +46,8 @@ IN: lists.tests
     { 1 2 3 } sequence>list { 4 5 6 } sequence>list lappend list>array
 ] unit-test
 
-[ { 1 } { 2 } ] [ { 1 2 } sequence>list 1 lcut [ list>array ] bi@ ] unit-test
+{ { 1 } { 2 } } [ { 1 2 } sequence>list 1 lcut [ list>array ] bi@ ] unit-test
+
+{ { { 1 } { { 2 } } } } [
+    1 nil cons 2 nil cons nil cons nil cons cons deeplist>array
+] unit-test

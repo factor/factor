@@ -7,9 +7,9 @@ instruction_operand::instruction_operand(relocation_entry rel,
     : rel(rel),
       compiled(compiled),
       index(index),
-      pointer((cell)compiled->entry_point() + rel.rel_offset()) {}
+      pointer(compiled->entry_point() + rel.offset()) {}
 
-/* Load a 32-bit value from a PowerPC LIS/ORI sequence */
+// Load a 32-bit value from a PowerPC LIS/ORI sequence
 fixnum instruction_operand::load_value_2_2() {
   uint32_t* ptr = (uint32_t*)pointer;
   cell hi = (ptr[-2] & 0xffff);
@@ -17,7 +17,7 @@ fixnum instruction_operand::load_value_2_2() {
   return hi << 16 | lo;
 }
 
-/* Load a 64-bit value from a PowerPC LIS/ORI/SLDI/ORIS/ORI sequence */
+// Load a 64-bit value from a PowerPC LIS/ORI/SLDI/ORIS/ORI sequence
 fixnum instruction_operand::load_value_2_2_2_2() {
   uint32_t* ptr = (uint32_t*)pointer;
   uint64_t hhi = (ptr[-5] & 0xffff);
@@ -28,7 +28,7 @@ fixnum instruction_operand::load_value_2_2_2_2() {
   return (cell)val;
 }
 
-/* Load a value from a bitfield of a PowerPC instruction */
+// Load a value from a bitfield of a PowerPC instruction
 fixnum instruction_operand::load_value_masked(cell mask, cell bits,
                                               cell shift) {
   int32_t* ptr = (int32_t*)(pointer - sizeof(uint32_t));
@@ -37,7 +37,7 @@ fixnum instruction_operand::load_value_masked(cell mask, cell bits,
 }
 
 fixnum instruction_operand::load_value(cell relative_to) {
-  switch (rel.rel_class()) {
+  switch (rel.klass()) {
     case RC_ABSOLUTE_CELL:
       return *(cell*)(pointer - sizeof(cell));
     case RC_ABSOLUTE:
@@ -68,29 +68,23 @@ fixnum instruction_operand::load_value(cell relative_to) {
     case RC_ABSOLUTE_PPC_2_2_2_2:
       return load_value_2_2_2_2();
     default:
-      critical_error("Bad rel class", rel.rel_class());
+      critical_error("Bad rel class", rel.klass());
       return 0;
   }
 }
 
-fixnum instruction_operand::load_value() { return load_value(pointer); }
-
-code_block* instruction_operand::load_code_block(cell relative_to) {
-  return ((code_block*)load_value(relative_to) - 1);
-}
-
 code_block* instruction_operand::load_code_block() {
-  return load_code_block(pointer);
+  return ((code_block*)load_value(pointer) - 1);
 }
 
-/* Store a 32-bit value into a PowerPC LIS/ORI sequence */
+// Store a 32-bit value into a PowerPC LIS/ORI sequence
 void instruction_operand::store_value_2_2(fixnum value) {
   uint32_t* ptr = (uint32_t*)pointer;
   ptr[-2] = ((ptr[-2] & ~0xffff) | ((value >> 16) & 0xffff));
   ptr[-1] = ((ptr[-1] & ~0xffff) | (value & 0xffff));
 }
 
-/* Store a 64-bit value into a PowerPC LIS/ORI/SLDI/ORIS/ORI sequence */
+// Store a 64-bit value into a PowerPC LIS/ORI/SLDI/ORIS/ORI sequence
 void instruction_operand::store_value_2_2_2_2(fixnum value) {
   uint64_t val = value;
   uint32_t* ptr = (uint32_t*)pointer;
@@ -100,7 +94,7 @@ void instruction_operand::store_value_2_2_2_2(fixnum value) {
   ptr[-1] = ((ptr[-1] & ~0xffff) | ((val >> 0) & 0xffff));
 }
 
-/* Store a value into a bitfield of a PowerPC instruction */
+// Store a value into a bitfield of a PowerPC instruction
 void instruction_operand::store_value_masked(fixnum value, cell mask,
                                              cell shift) {
   uint32_t* ptr = (uint32_t*)(pointer - sizeof(uint32_t));
@@ -110,7 +104,7 @@ void instruction_operand::store_value_masked(fixnum value, cell mask,
 void instruction_operand::store_value(fixnum absolute_value) {
   fixnum relative_value = absolute_value - pointer;
 
-  switch (rel.rel_class()) {
+  switch (rel.klass()) {
     case RC_ABSOLUTE_CELL:
       *(cell*)(pointer - sizeof(cell)) = absolute_value;
       break;
@@ -153,13 +147,9 @@ void instruction_operand::store_value(fixnum absolute_value) {
       store_value_2_2_2_2(absolute_value);
       break;
     default:
-      critical_error("Bad rel class", rel.rel_class());
+      critical_error("Bad rel class", rel.klass());
       break;
   }
-}
-
-void instruction_operand::store_code_block(code_block* compiled) {
-  store_value((cell)compiled->entry_point());
 }
 
 }

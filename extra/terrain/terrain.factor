@@ -1,7 +1,8 @@
-! (c)2009 Joe Groff, Doug Coleman. bsd license
+! Copyright (C) 2009 Joe Groff, Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators game.input game.loop
 game.input.scancodes grouping kernel literals locals
-math math.constants math.functions math.order
+math math.constants math.functions math.order math.trig
 math.vectors opengl opengl.capabilities opengl.gl
 opengl.shaders opengl.textures opengl.textures.private
 sequences sequences.product specialized-arrays
@@ -69,12 +70,9 @@ TUPLE: terrain-world < game-world
     [ yaw>> 0.0 1.0 0.0 glRotatef ]
     [ location>> vneg first3 glTranslatef ] tri ;
 
-: degrees ( deg -- rad )
-    pi 180.0 / * ; inline
-
 TYPED: eye-rotate ( yaw: float pitch: float v: float-4 -- v': float-4 )
-    [ float-4{  0.0 -1.0 0.0 0.0 } swap degrees rotation-matrix4 ]
-    [ float-4{ -1.0  0.0 0.0 0.0 } swap degrees rotation-matrix4 m4. ]
+    [ float-4{  0.0 -1.0 0.0 0.0 } swap deg>rad rotation-matrix4 ]
+    [ float-4{ -1.0  0.0 0.0 0.0 } swap deg>rad rotation-matrix4 m4. ]
     [ m4.v ] tri* float-4{ t t t f } vand ;
 
 : forward-vector ( player -- v )
@@ -130,17 +128,17 @@ terrain-world H{
         [ key-5 keys nth 10000 f ? ]
     } 0|| player reverse-time<<
 
-    key-w keys nth [ player walk-forward ] when 
-    key-s keys nth [ player walk-backward ] when 
-    key-a keys nth [ player walk-leftward ] when 
-    key-d keys nth [ player walk-rightward ] when 
-    key-q keys nth [ player -1 look-horizontally ] when 
-    key-e keys nth [ player 1 look-horizontally ] when 
-    key-left-arrow keys nth [ player -1 look-horizontally ] when 
-    key-right-arrow keys nth [ player 1 look-horizontally ] when 
-    key-down-arrow keys nth [ player 1 look-vertically ] when 
-    key-up-arrow keys nth [ player -1 look-vertically ] when 
-    key-space keys nth [ player jump ] when 
+    key-w keys nth [ player walk-forward ] when
+    key-s keys nth [ player walk-backward ] when
+    key-a keys nth [ player walk-leftward ] when
+    key-d keys nth [ player walk-rightward ] when
+    key-q keys nth [ player -1 look-horizontally ] when
+    key-e keys nth [ player 1 look-horizontally ] when
+    key-left-arrow keys nth [ player -1 look-horizontally ] when
+    key-right-arrow keys nth [ player 1 look-horizontally ] when
+    key-down-arrow keys nth [ player 1 look-vertically ] when
+    key-up-arrow keys nth [ player -1 look-vertically ] when
+    key-space keys nth [ player jump ] when
     key-escape keys nth [ world close-window ] when
     player read-mouse rotate-with-mouse
     reset-mouse ;
@@ -152,10 +150,10 @@ terrain-world H{
     GRAVITY v+ ;
 
 : clamp-coords ( coords dim -- coords' )
-    [ { 0 0 } vmax ] dip { 2 2 } v- vmin ;
+    { 0 0 } swap { 2 2 } v- vclamp ;
 
 :: pixel-indices ( coords dim -- indices )
-    coords vfloor [ >integer ] map dim clamp-coords :> floor-coords
+    coords vfloor v>integer dim clamp-coords :> floor-coords
     floor-coords first2 dim first * + :> base-index
     base-index dim first + :> next-row-index
 
@@ -170,7 +168,7 @@ terrain-world H{
     pixel dup vfloor v- :> pixel-mantissa
     segment bitmap>> 4 <groups> :> pixels
     pixel dim pixel-indices :> indices
-    
+
     indices [ pixels nth COMPONENT-SCALE v. 255.0 / ] map
     first4 pixel-mantissa bilerp ;
 

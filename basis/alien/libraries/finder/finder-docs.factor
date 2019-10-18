@@ -4,7 +4,7 @@ IN: alien.libraries.finder
 HELP: find-library*
 { $values
   { "name" "a shared library name" }
-  { "path/f" "a filesystem path or f" }
+  { "path/f" { $maybe "filesystem path" } }
 }
 { $description
   "Returns a filesystem path for a plain shared library name, or f if no library can be found."

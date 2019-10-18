@@ -17,11 +17,14 @@ TUPLE: recaptcha-app < dispatcher recaptcha ;
         [ "?good" >url <redirect> ] >>submit
         { recaptcha-app "example" } >>template ;
 
+: <test-recaptcha> ( responder -- recaptcha )
+    <recaptcha>
+        "concatenative.org" >>domain
+        "6LeJWQgAAAAAAFlYV7SuBClE9uSpGtV_ZS-qVON7" >>public-key
+        "6LeJWQgAAAAAALh-XJgSSQ6xKygRgJ8-029Ip2Xv" >>private-key ;
+
 : <recaptcha-app> ( -- obj )
     \ recaptcha-app new-dispatcher
         <recaptcha-challenge> "" add-responder
-        <recaptcha>
-            "concatenative.org" >>domain
-            "6LeJWQgAAAAAAFlYV7SuBClE9uSpGtV_ZS-qVON7" >>public-key
-            "6LeJWQgAAAAAALh-XJgSSQ6xKygRgJ8-029Ip2Xv" >>private-key
+        <test-recaptcha>
         recaptcha-db <alloy> ;

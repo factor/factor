@@ -1,34 +1,36 @@
-! Copyright (C) 2006, 2009 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov, 2015 Nicolas Pénet.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sequences colors fonts ui.gadgets
-ui.gadgets.frames ui.gadgets.grids ui.gadgets.icons ui.gadgets.labels
-ui.gadgets.borders ui.pens.image ui.gadgets.corners ui.render ;
+USING: accessors kernel system ui.gadgets ui.gadgets.borders
+ui.gadgets.labels ui.gadgets.packs ui.gadgets.tracks
+ui.pens.gradient ui.pens.solid ui.theme ;
 IN: ui.gadgets.labeled
 
-TUPLE: labeled-gadget < frame content ;
+TUPLE: labeled-gadget < track content ;
 
 <PRIVATE
 
-: <labeled-title> ( gadget -- label )
-    >label
-    [ panel-background-color font-with-background ] change-font
-    { 0 2 } <border>
-    "title-middle" corner-image
-    <image-pen> t >>fill? >>interior ;
-
-: /-FOO-\ ( title labeled -- labeled )
-    "title-left" corner-icon @top-left grid-add
-    swap <labeled-title> @top grid-add
-    "title-right" corner-icon @top-right grid-add ;
-
 M: labeled-gadget focusable-child* content>> ;
+
+! gradients don't work as backgrounds on windows, see #152 and #1397
+: title-bar-interior ( -- interior )
+    os windows?
+    [ toolbar-background <solid> ]
+    [ title-bar-gradient <gradient> ]
+    if ;
+
+: <title-bar> ( title -- title-bar )
+    >label [ t >>bold? ] change-font
+    { 0 4 } <border> title-bar-interior >>interior ;
 
 PRIVATE>
 
-: <labeled-gadget> ( gadget title -- newgadget )
-    labeled-gadget "labeled-block" [
-        pick >>content
-        /-FOO-\
-        |-----|
-        \-----/
-    ] make-corners ;
+: <labeled-gadget> ( content title -- labeled )
+    vertical labeled-gadget new-track
+        swap <title-bar> f track-add
+        swap [ >>content ] [ 1 track-add ] bi ;
+
+: <colored-labeled-gadget> ( content title color -- labeled )
+    [ <labeled-gadget> ] dip <solid> >>interior { 0 3 } >>gap ;
+
+: <framed-labeled-gadget> ( content title color -- labeled )
+    <colored-labeled-gadget> labeled-border-color <solid> >>boundary ;

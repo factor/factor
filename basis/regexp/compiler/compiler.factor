@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: regexp.classes kernel sequences regexp.negation
-quotations assocs fry math locals combinators sets
-accessors words compiler.units kernel.private strings
-sequences.private arrays namespaces unicode.breaks
-regexp.transition-tables combinators.short-circuit ;
+USING: accessors assocs combinators combinators.short-circuit
+fry kernel kernel.private locals math namespaces regexp.classes
+regexp.transition-tables sequences sequences.private sets
+strings unicode words ;
 IN: regexp.compiler
 
 GENERIC: question>quot ( question -- quot )
@@ -120,7 +119,7 @@ C: <box> box
     dup transitions>> keys [ gensym ] H{ } map>assoc
     [ transitions-at ]
     [ values ]
-    bi swap ; 
+    bi swap ;
 
 : dfa>main-word ( dfa -- word )
     states>words [ states>code ] keep start-state>> ;

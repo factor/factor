@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs concurrency.mailboxes io kernel namespaces
-strings words.symbol irc.client.chats irc.messages ;
-EXCLUDE: sequences => join ;
+USING: accessors assocs concurrency.mailboxes io irc.client.chats
+irc.messages kernel namespaces sequences strings words.symbol ;
 IN: irc.client.base
 
 SYMBOL: current-irc-client
@@ -18,7 +17,7 @@ SYMBOL: current-irc-client
     \ current-irc-client swap with-variable ; inline
 
 UNION: to-target privmsg notice ;
-UNION: to-channel join part topic kick rpl-channel-modes
+UNION: to-channel irc.messages:join part topic kick rpl-channel-modes
                   topic rpl-names rpl-names-end ;
 UNION: to-one-chat to-target to-channel mode ;
 UNION: to-many-chats nick quit ;
@@ -29,7 +28,13 @@ GENERIC: chat-name ( irc-message -- name )
 M: mode       chat-name name>> ;
 M: to-target  chat-name target>> ;
 M: to-me      chat-name sender>> ;
-M: to-channel chat-name channel>> ;
+
+! to-channel messages are things like JOIN
+! Freenode's join looks like:
+! ":flogbot2_!~flogbot2@c-50-174-221-28.hsd1.ca.comcast.net JOIN #concatenative-bots"
+! The channel>> field is empty and it's in parameters instead.
+! This fixes chat> for these kinds of messages.
+M: to-channel chat-name dup channel>> [ ] [ parameters>> ?first ] ?if ;
 
 GENERIC: chat> ( obj -- chat/f )
 M: string      chat> irc> chats>> at ;

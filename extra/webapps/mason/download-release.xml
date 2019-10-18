@@ -1,8 +1,5 @@
 <?xml version='1.0' ?>
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+<!DOCTYPE html>
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
 	<t:title>Factor binary package for <t:label t:name="platform" /></t:title>

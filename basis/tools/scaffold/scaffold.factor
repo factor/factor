@@ -1,39 +1,28 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays assocs calendar classes
-combinators combinators.short-circuit fry hashtables interpolate
-io io.directories io.encodings.utf8 io.files io.pathnames
-io.streams.string kernel math math.parser namespaces prettyprint
-quotations sequences sets sorting splitting strings system
-timers unicode.categories urls vocabs vocabs.loader
-vocabs.metadata words words.symbol ;
-FROM: sets => members ;
+USING: accessors alien arrays assocs byte-arrays calendar
+classes classes.error combinators combinators.short-circuit fry
+hashtables help.markup interpolate io io.directories
+io.encodings.utf8 io.files io.pathnames io.streams.string kernel
+math math.parser namespaces prettyprint quotations sequences
+sets sorting splitting strings system timers unicode urls vocabs
+vocabs.loader vocabs.metadata words words.symbol ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
 SYMBOL: using
 
 ERROR: not-a-vocab-root string ;
-ERROR: vocab-name-contains-separator path ;
-ERROR: vocab-name-contains-dot path ;
+
+ERROR: vocab-must-not-exist string ;
 
 <PRIVATE
 
 : vocab-root? ( string -- ? )
-    trim-tail-separators
-    vocab-roots get member? ;
-
-: contains-dot? ( string -- ? ) ".." swap subseq? ;
-
-: contains-separator? ( string -- ? ) [ path-separator? ] any? ;
+    trim-tail-separators vocab-roots get member? ;
 
 : ensure-vocab-exists ( string -- string )
-    dup vocabs member? [ no-vocab ] unless ;
-
-: check-vocab-name ( string -- string )
-    [ ]
-    [ contains-dot? [ vocab-name-contains-dot ] when ]
-    [ contains-separator? [ vocab-name-contains-separator ] when ] tri ;
+    dup lookup-vocab [ no-vocab ] unless ;
 
 : check-root ( string -- string )
     dup vocab-root? [ not-a-vocab-root ] unless ;
@@ -42,15 +31,14 @@ ERROR: vocab-name-contains-dot path ;
     [ check-root ] [ check-vocab-name ] bi* ;
 
 : replace-vocab-separators ( vocab -- path )
-    path-separator first CHAR: . associate substitute ; inline
+    path-separator first CHAR: . associate substitute ;
 
 : vocab-root/vocab>path ( vocab-root vocab -- path )
     check-vocab-root/vocab
     [ ] [ replace-vocab-separators ] bi* append-path ;
 
 : vocab>path ( vocab -- path )
-    check-vocab
-    [ find-vocab-root ] keep vocab-root/vocab>path ;
+    check-vocab [ find-vocab-root ] keep vocab-root/vocab>path ;
 
 : vocab-root/vocab/file>path ( vocab-root vocab file -- path )
     [ vocab-root/vocab>path ] dip append-path ;
@@ -115,9 +103,11 @@ ERROR: vocab-name-contains-dot path ;
     ] if* ;
 
 : lookup-type ( string -- object/string ? )
+    "/f" ?tail swap
     "new" ?head drop [ { [ CHAR: ' = ] [ digit? ] } 1|| ] trim-tail
     H{
-        { "object" object } { "obj" object }
+        { "object" object }
+        { "obj" object }
         { "quot" quotation }
         { "string" string }
         { "str" string }
@@ -127,35 +117,43 @@ ERROR: vocab-name-contains-dot path ;
         { "ch" "a character" }
         { "word" word }
         { "array" array }
-        { "timers" timer }
+        { "byte-array" byte-array }
+        { "timer" timer }
         { "duration" duration }
         { "path" "a pathname string" }
         { "vocab" "a vocabulary specifier" }
         { "vocab-root" "a vocabulary root string" }
         { "c-ptr" c-ptr }
+        { "sequence" sequence }
         { "seq" sequence }
+        { "exemplar" object }
         { "assoc" assoc }
         { "alist" "an array of key/value pairs" }
-        { "keys" sequence } { "values" sequence }
-        { "class" class } { "tuple" tuple }
+        { "keys" sequence }
+        { "values" sequence }
+        { "class" class }
+        { "tuple" tuple }
         { "url" url }
-    } at* ;
+    } at* [ swap [ \ $maybe swap 2array ] when ] dip ;
 
-: add-using ( object -- )
+GENERIC: add-using ( object -- )
+
+M: array add-using [ add-using ] each ;
+
+M: string add-using drop ;
+
+M: object add-using ( object -- )
     vocabulary>> using get [ adjoin ] [ drop ] if* ;
-
-: 4bl ( -- )
-    "    " write ; inline
 
 : ($values.) ( array -- )
     [
-        4bl
+        "    " write
         [ bl ] [
             "{ " write
             dup array? [ first ] when
             dup lookup-type [
                 [ unparse write bl ]
-                [ [ pprint ] [ dup string? [ drop ] [ add-using ] if ] bi ] bi*
+                [ [ pprint ] [ add-using ] bi ] bi*
             ] [
                 drop unparse write bl null pprint
                 null add-using
@@ -182,20 +180,29 @@ ERROR: vocab-name-contains-dot path ;
         ] if
     ] when* ;
 
+: error-description. ( word -- )
+    [ $values. ] [
+        "{ $description \"Throws " write
+        name>> dup a/an write " \" { $link " write
+        write " } \" error.\" }" print
+    ] bi "{ $error-description \"\" } ;" print ;
+
+: class-description. ( word -- )
+    drop "{ $class-description \"\" } ;" print ;
+
 : symbol-description. ( word -- )
-    drop
-    "{ $var-description \"\" } ;" print ;
+    drop "{ $var-description \"\" } ;" print ;
 
 : $description. ( word -- )
-    drop
-    "{ $description \"\" } ;" print ;
+    drop "{ $description \"\" } ;" print ;
 
 : docs-body. ( word/symbol -- )
-    dup symbol? [
-        symbol-description.
-    ] [
-        [ $values. ] [ $description. ] bi
-    ] if ;
+    {
+        { [ dup error-class? ] [ error-description. ] }
+        { [ dup class? ] [ class-description. ] }
+        { [ dup symbol? ] [ symbol-description. ] }
+        [ [ $values. ] [ $description. ] bi ]
+    } cond ;
 
 : docs-header. ( word -- )
     "HELP: " write name>> print ;
@@ -204,8 +211,8 @@ ERROR: vocab-name-contains-dot path ;
     [ docs-header. ] [ docs-body. ] bi ;
 
 : interesting-words ( vocab -- array )
-    words
-    [ { [ "help" word-prop ] [ predicate? ] } 1|| not ] filter
+    vocab-words
+    [ { [ "help" word-prop ] [ predicate? ] } 1|| ] reject
     natural-sort ;
 
 : interesting-words. ( vocab -- )
@@ -277,7 +284,11 @@ PRIVATE>
 : scaffold-platforms ( vocab platforms -- )
     [ "platforms.txt" ] dip scaffold-metadata ;
 
+: delete-from-root-cache ( string -- )
+    root-cache get delete-at ;
+
 : scaffold-vocab ( vocab-root string -- )
+    dup delete-from-root-cache
     {
         [ scaffold-directory ]
         [ scaffold-main ]
@@ -321,12 +332,12 @@ SYMBOL: nested-examples
 : example-using ( using -- )
     " " join "example-using" [
         nested-examples get 4 0 ? CHAR: \s <string> "example-indent" [
-            """${example-indent}"Example:"
-${example-indent}{ $example "USING: ${example-using} ;"
-${example-indent}    ""
-${example-indent}    ""
+            "${example-indent}\"Example:\"
+${example-indent}{ $example \"USING: ${example-using} ;\"
+${example-indent}    \"\"
+${example-indent}    \"\"
 ${example-indent}}
-"""
+"
             interpolate
         ] with-variable
     ] with-variable ;
@@ -346,12 +357,12 @@ ${example-indent}}
 : scaffold-examples ( word -- )
     2 swap scaffold-n-examples ;
 
-: touch. ( path -- )
+: scaffold-file ( path -- )
     [ touch-file ]
     [ "Click to edit: " write <pathname> . ] bi ;
 
 : scaffold-rc ( path -- )
-    [ home ] dip append-path touch. ;
+    [ home ] dip append-path scaffold-file ;
 
 : scaffold-factor-boot-rc ( -- )
     ".factor-boot-rc" scaffold-rc ;

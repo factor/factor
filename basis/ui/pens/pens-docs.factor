@@ -2,11 +2,11 @@ IN: ui.pens
 USING: help.markup help.syntax kernel ui.gadgets ;
 
 HELP: draw-interior
-{ $values { "gadget" gadget } { "pen" object } } 
+{ $values { "gadget" gadget } { "pen" object } }
 { $contract "Draws the interior of a gadget by making OpenGL calls. The " { $snippet "interior" } " slot may be set to objects implementing this generic word." } ;
 
 HELP: draw-boundary
-{ $values { "gadget" gadget } { "pen" object } } 
+{ $values { "gadget" gadget } { "pen" object } }
 { $contract "Draws the boundary of a gadget by making OpenGL calls. The " { $snippet "boundary" } " slot may be set to objects implementing this generic word." } ;
 
 ARTICLE: "ui-pen-protocol" "UI pen protocol"

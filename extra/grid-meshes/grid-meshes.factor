@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data.map arrays destructors fry grouping
 kernel math math.ranges math.vectors.simd opengl opengl.gl sequences
 sequences.product specialized-arrays ;
@@ -31,7 +32,7 @@ PRIVATE>
 : draw-grid-mesh ( grid-mesh -- )
     GL_ARRAY_BUFFER over buffer>> [
         [ 4 GL_FLOAT 0 f glVertexPointer ] dip
-        dup dim>> second iota [ draw-vertex-buffer-row ] with each
+        dup dim>> second <iota> [ draw-vertex-buffer-row ] with each
     ] with-gl-buffer ;
 
 : <grid-mesh> ( dim -- grid-mesh )
@@ -41,4 +42,3 @@ PRIVATE>
 M: grid-mesh dispose
     [ [ delete-gl-buffer ] when* f ] change-buffer
     drop ;
-

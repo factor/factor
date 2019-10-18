@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.encodings io.backend io.ports io.streams.duplex
-io splitting grouping sequences namespaces kernel
-destructors math concurrency.combinators accessors fry
-arrays continuations quotations system vocabs combinators ;
+USING: accessors combinators concurrency.combinators destructors
+fry grouping io io.backend io.ports io.streams.duplex kernel
+math namespaces quotations sequences simple-tokenizer splitting
+strings system vocabs ;
 IN: io.pipes
 
 TUPLE: pipe in out ;
@@ -52,10 +52,13 @@ M: integer <pipes> ( n -- pipes )
 M: sequence <pipes>
     [ { } ] [ length 1 - <pipes> ] if-empty ;
 
+: pipeline-args ( seq -- args )
+    dup string? [ tokenize { "|" } split ] when ;
+
 PRIVATE>
 
 : run-pipeline ( seq -- results )
-    [ <pipes> ] keep
+    pipeline-args [ <pipes> ] keep
     [
         [ [ first in>> ] [ second out>> ] bi ] dip
         run-pipeline-element

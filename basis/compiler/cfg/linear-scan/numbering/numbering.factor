@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors math sequences grouping namespaces
-compiler.cfg.linearization ;
+USING: accessors compiler.cfg.linearization grouping kernel math
+namespaces sequences ;
 IN: compiler.cfg.linear-scan.numbering
 
 : number-instruction ( n insn -- n' )

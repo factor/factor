@@ -2,7 +2,7 @@ USING: accessors annotations combinators.short-circuit
 io.pathnames kernel math sequences sorting tools.test ;
 IN: annotations.tests
 
-!NOTE testing toplevel form 
+!NOTE testing toplevel form
 
 : three ( -- x )
     !BROKEN english plz
@@ -16,15 +16,15 @@ IN: annotations.tests
     !TODO return 5
     f ;
 
-[ t ] [
+{ t } [
     NOTEs {
         [ length 1 = ]
         [ first string>> file-name "annotations-tests.factor" = ]
     } 1&&
 ] unit-test
 
-[ t ] [
+{ t } [
     BROKENs { [ \ four swap member? ] [ \ three swap member? ] } 1&&
 ] unit-test
 
-[ t ] [ TODOs \ five swap member? ] unit-test
+{ t } [ TODOs \ five swap member? ] unit-test

@@ -18,7 +18,7 @@ HELP: user
 
 HELP: add-user
 { $values { "provider" "an authentication provider" } { "user" user } }
-{ $description "A utility word which calls " { $link new-user }  " and throws an error if the user already exists." } ;
+{ $description "A utility word which calls " { $link new-user } " and throws an error if the user already exists." } ;
 
 HELP: get-user
 { $values { "username" string } { "provider" "an authentication provider" } { "user/f" { $maybe user } } }

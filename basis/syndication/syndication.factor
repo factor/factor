@@ -4,8 +4,8 @@
 USING: xml.traversal kernel assocs math.order strings sequences
 xml.data xml.writer io.streams.string combinators xml
 xml.entities.html io.files io http.client namespaces make
-xml.syntax hashtables calendar.format accessors continuations
-urls present byte-arrays ;
+xml.syntax hashtables calendar.format calendar.parser accessors
+continuations urls present byte-arrays ;
 IN: syndication
 
 : any-tag-named ( tag names -- tag-inside )
@@ -107,7 +107,7 @@ M: string parse-feed [ string>xml xml>feed ] with-html-entities ;
 M: byte-array parse-feed [ bytes>xml xml>feed ] with-html-entities ;
 
 : download-feed ( url -- feed )
-    #! Retrieve an news syndication file, return as a feed tuple.
+    ! Retrieve an news syndication file, return as a feed tuple.
     http-get nip parse-feed ;
 
 ! Atom generation

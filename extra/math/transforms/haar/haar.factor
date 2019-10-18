@@ -27,4 +27,3 @@ PRIVATE>
 
 : rev-haar ( seq -- seq' )
     dup length 2 > [ halves swap rev-haar prepend ] when rev-haar-step ;
-

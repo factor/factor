@@ -1,5 +1,6 @@
 ;;; fuel-connection.el -- asynchronous comms with the fuel listener
 
+;; Copyright (C) 2018 Björn Lindqvist
 ;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
@@ -40,7 +41,7 @@
 
 (defun fuel-con--make-request (str cont &optional sender-buffer)
   (list :fuel-connection-request
-        (cons :id (random))
+        (cons :id (+ 10000 (random 89999)))
         (cons :string str)
         (cons :continuation cont)
         (cons :buffer (or sender-buffer (current-buffer)))))
@@ -48,23 +49,11 @@
 (defsubst fuel-con--request-p (req)
   (and (listp req) (eq (car req) :fuel-connection-request)))
 
-(defsubst fuel-con--request-id (req)
-  (cdr (assoc :id req)))
-
-(defsubst fuel-con--request-string (req)
-  (cdr (assoc :string req)))
-
-(defsubst fuel-con--request-continuation (req)
-  (cdr (assoc :continuation req)))
-
-(defsubst fuel-con--request-buffer (req)
-  (cdr (assoc :buffer req)))
-
 (defsubst fuel-con--request-deactivate (req)
   (setcdr (assoc :continuation req) nil))
 
 (defsubst fuel-con--request-deactivated-p (req)
-  (null (cdr (assoc :continuation req))))
+  (null (alist-get :continuation req)))
 
 ;;; TODO Replace with a defstruct
 (defsubst fuel-con--make-connection (buffer)
@@ -78,24 +67,15 @@
 (defsubst fuel-con--connection-p (c)
   (and (listp c) (eq (car c) :fuel-connection)))
 
-(defsubst fuel-con--connection-requests (c)
-  (cdr (assoc :requests c)))
-
-(defsubst fuel-con--connection-current-request (c)
-  (cdr (assoc :current c)))
-
 (defun fuel-con--connection-clean-current-request (c)
   (let* ((cell (assoc :current c))
          (req (cdr cell)))
     (when req
-      (puthash (fuel-con--request-id req) req (cdr (assoc :completed c)))
+      (puthash (alist-get :id req) req (alist-get :completed c))
       (setcdr cell nil))))
 
 (defsubst fuel-con--connection-completed-p (c id)
-  (gethash id (cdr (assoc :completed c))))
-
-(defsubst fuel-con--connection-buffer (c)
-  (cdr (assoc :buffer c)))
+  (gethash id (alist-get :completed c)))
 
 (defun fuel-con--connection-pop-request (c)
   (let ((reqs (assoc :requests c))
@@ -199,10 +179,10 @@ sexp. fuel-con-error is thrown if the sexp is malformed."
       (error (list 'fuel-con-error (format "%s" cerr))))))
 
 (defun fuel-con--process-next (con)
-  (when (not (fuel-con--connection-current-request con))
-    (let* ((buffer (fuel-con--connection-buffer con))
+  (when (not (alist-get :current con))
+    (let* ((buffer (alist-get :buffer con))
            (req (fuel-con--connection-pop-request con))
-           (str (and req (fuel-con--request-string req)))
+           (str (and req (alist-get :string req)))
            (cbuf (with-current-buffer (fuel-con--comint-buffer)
                    (erase-buffer)
                    (current-buffer))))
@@ -210,16 +190,16 @@ sexp. fuel-con-error is thrown if the sexp is malformed."
           (fuel-con--connection-cancel-timer con)
         (when (and buffer req str)
           (set-buffer buffer)
-          (fuel-log--info "<%s>: %s" (fuel-con--request-id req) str)
+          (fuel-log--info "<%s>: %s" (alist-get :id req) str)
           (comint-redirect-send-command (format "%s" str) cbuf nil t))))))
 
 (defun fuel-con--process-completed-request (req)
-  (let ((cont (fuel-con--request-continuation req))
-        (id (fuel-con--request-id req))
-        (rstr (fuel-con--request-string req))
-        (buffer (fuel-con--request-buffer req)))
+  (let ((cont (alist-get :continuation req))
+        (id (alist-get :id req))
+        (rstr (alist-get :string req))
+        (buffer (alist-get :buffer req)))
     (if (not cont)
-        (fuel-log--warn "<%s> Droping result for request %S (%s)"
+        (fuel-log--warn "<%s> Dropping result for request %S (%s)"
                             id rstr req)
       (condition-case cerr
           (with-current-buffer (or buffer (current-buffer))
@@ -231,7 +211,7 @@ sexp. fuel-con-error is thrown if the sexp is malformed."
 (defun fuel-con--comint-redirect-hook ()
   (if (not fuel-con--connection)
       (fuel-log--error "No connection in buffer")
-    (let ((req (fuel-con--connection-current-request fuel-con--connection)))
+    (let ((req (alist-get :current fuel-con--connection)))
       (if (not req) (fuel-log--error "No current request")
         (fuel-con--process-completed-request req)
         (fuel-con--connection-clean-current-request fuel-con--connection)))))
@@ -258,7 +238,7 @@ sexp. fuel-con-error is thrown if the sexp is malformed."
     (let ((con (fuel-con--get-connection buffer/proc)))
       (unless con (error fuel-con--error-message))
       (let* ((req (fuel-con--send-string buffer/proc str cont sbuf))
-             (id (and req (fuel-con--request-id req)))
+             (id (and req (alist-get :id req)))
              (time (or timeout fuel-connection-timeout))
              (step 100)
              (waitsecs (/ step 1000.0)))

@@ -4,37 +4,31 @@ USING: accessors arrays assocs checksums checksums.crc32
 compiler.units continuations definitions io.encodings.utf8
 io.files io.pathnames kernel namespaces sequences sets
 source-files.errors strings words ;
-FROM: namespaces => set ;
 IN: source-files
 
 SYMBOL: source-files
 
-TUPLE: source-file-tuple
-path
+TUPLE: source-file
+{ path string }
 top-level-form
 checksum
 definitions
 main ;
 
-: record-top-level-form ( quot file -- )
+: record-top-level-form ( quot source-file -- )
     top-level-form<<
     [ ] [ f notify-definition-observers ] if-bootstrapping ;
 
 : record-checksum ( lines source-file -- )
     [ crc32 checksum-lines ] dip checksum<< ;
 
-: record-definitions ( file -- )
+: record-definitions ( source-file -- )
     new-definitions get >>definitions drop ;
 
 : <source-file> ( path -- source-file )
-    \ source-file-tuple new
-        swap >>path
-        <definitions> >>definitions ;
+    f f <definitions> f source-file boa ;
 
-ERROR: invalid-source-file-path path ;
-
-: source-file ( path -- source-file )
-    dup string? [ invalid-source-file-path ] unless
+: path>source-file ( path -- source-file )
     source-files get [ <source-file> ] cache ;
 
 : reset-checksums ( -- )
@@ -53,27 +47,27 @@ M: pathname where string>> 1 2array ;
 M: pathname forget*
     string>> forget-source ;
 
-: rollback-source-file ( file -- )
+: rollback-source-file ( source-file -- )
     [
         new-definitions get [ union ] 2map
     ] change-definitions drop ;
 
-SYMBOL: file
+SYMBOL: current-source-file
 
 : wrap-source-file-error ( error -- * )
-    file get rollback-source-file
-    \ source-file-error new
+    current-source-file get rollback-source-file
+    source-file-error new
         f >>line#
-        file get path>> >>file
+        current-source-file get path>> >>path
         swap >>error rethrow ;
 
 : with-source-file ( name quot -- )
-    #! Should be called from inside with-compilation-unit.
-    [
+    ! Should be called from inside with-compilation-unit.
+    H{ } clone [
         [
-            source-file
-            [ file set ]
-            [ definitions>> old-definitions set ] bi
+            path>source-file
+            [ current-source-file namespaces:set ]
+            [ definitions>> old-definitions namespaces:set ] bi
         ] dip
         [ wrap-source-file-error ] recover
-    ] with-scope ; inline
+    ] with-variables ; inline

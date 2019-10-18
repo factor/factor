@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ui.gadgets ui.gadgets.viewports
-ui.gadgets.frames ui.gadgets.grids ui.gadgets.sliders
-ui.gestures kernel math namespaces sequences models models.range
-models.product combinators math.vectors classes.tuple
-math.rectangles combinators.short-circuit ;
+USING: accessors arrays combinators combinators.short-circuit
+kernel math.rectangles math.vectors models models.product
+models.range namespaces sequences ui.gadgets ui.gadgets.frames
+ui.gadgets.grids ui.gadgets.private ui.gadgets.sliders
+ui.gadgets.viewports ui.gestures ;
 IN: ui.gadgets.scrollers
 
 TUPLE: scroller < frame column-header viewport x y follows ;
@@ -96,10 +96,12 @@ M: rect update-scroller swap (scroll>rect) ;
 M: f update-scroller drop (update-scroller) ;
 
 M: scroller layout*
-    [ call-next-method ] [
-        dup follows>>
-        [ update-scroller ] [ >>follows drop ] 2bi
-    ] bi ; 
+    {
+        [ call-next-method ]
+        [ dup follows>> [ update-scroller ] [ >>follows drop ] 2bi ]
+        [ [ x>> ] [ y>> ] bi [ forget-pref-dim ] bi@ ]
+        [ call-next-method ]
+    } cleave ;
 
 M: scroller focusable-child*
     viewport>> ;
@@ -123,7 +125,6 @@ M: scroller model-changed
     dup viewport>> { 0 1 } grid-add ; inline
 
 : init-scroller ( column-header scroller -- scroller )
-    { 1 1 } >>gap
     over { 0 1 } { 0 0 } ? >>filled-cell
     t >>root?
     <scroller-model> >>model
@@ -146,19 +147,19 @@ PRIVATE>
         [ build-header-scroller ] [ build-scroller ] if ;
 
 : scroll>rect ( rect gadget -- )
-    dup find-scroller* dup [
+    dup find-scroller* [
         [ relative-scroll-rect ] keep
         swap >>follows
         relayout
-    ] [ 3drop ] if ;
+    ] [ 2drop ] if* ;
 
 : scroll>gadget ( gadget -- )
-    dup find-scroller* dup [
+    dup find-scroller* [
         swap >>follows
         relayout
     ] [
-        2drop
-    ] if ;
+        drop
+    ] if* ;
 
 : scroll>bottom ( gadget -- )
     find-scroller [ t >>follows relayout-1 ] when* ;

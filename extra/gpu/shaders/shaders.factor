@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs byte-arrays classes.mixin classes.parser
 classes.singleton classes.struct combinators combinators.short-circuit
@@ -76,7 +77,7 @@ MEMO: output-index ( program-instance output-name -- index )
     [ handle>> ] dip glGetFragDataLocation ;
 
 : vertex-format-attributes ( vertex-format -- attributes )
-    "vertex-format-attributes" word-prop ; inline    
+    "vertex-format-attributes" word-prop ; inline
 
 <PRIVATE
 
@@ -97,7 +98,7 @@ TR: hyphens>underscores "-" "_" ;
         { uint-integer-components   [ GL_UNSIGNED_INT   ] }
     } case ;
 
-: vertex-type-size ( component-type -- size ) 
+: vertex-type-size ( component-type -- size )
     {
         { ubyte-components          [ 1 ] }
         { ushort-components         [ 2 ] }
@@ -136,7 +137,7 @@ TR: hyphens>underscores "-" "_" ;
 
 :: assert-feedback-attribute ( size gl-type name vertex-attribute -- )
     {
-        [ vertex-attribute name>> name = ] 
+        [ vertex-attribute name>> name = ]
         [ size 1 = ]
         [ gl-type vertex-attribute [ component-type>> ] [ dim>> ] bi feedback-type= ]
     } 0&& [ vertex-attribute inaccurate-feedback-attribute-error ] unless ;
@@ -178,7 +179,7 @@ TR: hyphens>underscores "-" "_" ;
     stride 0 vertex-attributes [ [bind-vertex-attribute] ] { } map-as 2nip :> attributes-cleave
     { attributes-cleave 2cleave } >quotation :> with-block
 
-    { drop vertex-buffer with-block with-buffer-ptr } >quotation ; 
+    { drop vertex-buffer with-block with-buffer-ptr } >quotation ;
 
 :: [link-feedback-format] ( vertex-attributes -- quot )
     vertex-attributes [ name>> not ] any?
@@ -199,7 +200,7 @@ TR: hyphens>underscores "-" "_" ;
         [ f 0 int <ref> 0 int <ref> ] dip <byte-array>
         [ glGetTransformFeedbackVarying ] 3keep
         ascii alien>string
-        vertex-attribute assert-feedback-attribute    
+        vertex-attribute assert-feedback-attribute
     } >quotation ;
 
 :: [verify-feedback-format] ( vertex-attributes -- quot )
@@ -240,7 +241,7 @@ M: f link-feedback-format
 
 : link-vertex-formats ( program-handle formats -- )
     [ vertex-format-attributes [ name>> ] map sift ] map concat
-    swap '[ [ _ ] 2dip swap glBindAttribLocation ] each-index ; 
+    swap '[ [ _ ] 2dip swap glBindAttribLocation ] each-index ;
 
 GENERIC: link-geometry-shader-parameter ( program-handle parameter -- )
 
@@ -310,7 +311,7 @@ SYMBOL: padding-no
     { } <struct-slot-spec> ;
 
 : shader-filename ( shader/program -- filename )
-    dup filename>> [ nip ] [ name>> where first ] if* file-name ;
+    dup filename>> [ ] [ name>> where first ] ?if file-name ;
 
 : numbered-log-line? ( log-line-components -- ? )
     {
@@ -392,7 +393,7 @@ M: vertex-array-object dispose
     '[ _ swap first2 bind-vertex-format ] each ; inline
 
 : (reset-vertex-array) ( -- )
-    GL_MAX_VERTEX_ATTRIBS get-gl-int iota [ glDisableVertexAttribArray ] each ; inline
+    GL_MAX_VERTEX_ATTRIBS get-gl-int <iota> [ glDisableVertexAttribArray ] each ; inline
 
 :: <multi-vertex-array-object> ( vertex-formats program-instance -- vertex-array )
     gen-vertex-array :> handle
@@ -431,7 +432,7 @@ M: vertex-array-collection bind-vertex-array
     has-vertex-array-objects? get
     [ <multi-vertex-array-object> ]
     [ <multi-vertex-array-collection> ] if ; inline
-    
+
 : <vertex-array*> ( vertex-buffer program-instance format -- vertex-array )
     has-vertex-array-objects? get
     [ <vertex-array-object> ]
@@ -451,16 +452,16 @@ M: vertex-array-collection vertex-array-buffers
 : vertex-array-buffer ( vertex-array: vertex-array -- vertex-buffer: buffer )
     vertex-array-buffers first ; inline
 
-ERROR: compile-shader-error shader log ;
-ERROR: link-program-error program log ;
+TUPLE: compile-shader-error shader log ;
+TUPLE: link-program-error program log ;
 
 : throw-compile-shader-error ( shader instance -- * )
-    [ dup ] dip [ gl-shader-info-log ] [ delete-gl-shader ] bi
-    replace-log-line-numbers compile-shader-error ;
+    [ dup ] dip [ gl-shader-info-log ] [ glDeleteShader ] bi
+    replace-log-line-numbers compile-shader-error boa throw ;
 
 : throw-link-program-error ( program instance -- * )
     [ dup ] dip [ gl-program-info-log ] [ delete-gl-program ] bi
-    replace-log-line-numbers link-program-error ;
+    replace-log-line-numbers link-program-error boa throw ;
 
 DEFER: <shader-instance>
 
@@ -493,11 +494,14 @@ DEFER: <shader-instance>
 : link-program ( program -- program-instance )
     dup shaders>> [ <shader-instance> ] map (link-program) ;
 
+: word-directory ( word -- directory )
+    where first parent-directory ;
+
 : in-word's-path ( word kind filename -- word kind filename' )
-    [ over ] dip [ where first parent-directory ] dip append-path ;
+    pick word-directory prepend-path ;
 
 : become-shader-instance ( shader-instance new-shader-instance -- )
-    handle>> [ swap delete-gl-shader ] curry change-handle drop ;
+    handle>> [ swap glDeleteShader ] curry change-handle drop ;
 
 : refresh-shader-source ( shader -- )
     dup filename>>
@@ -505,7 +509,7 @@ DEFER: <shader-instance>
     [ drop ] if* ;
 
 : become-program-instance ( program-instance new-program-instance -- )
-    handle>> [ swap delete-gl-program-only ] curry change-handle drop ;
+    handle>> [ swap glDeleteProgram ] curry change-handle drop ;
 
 : reset-memos ( -- )
     \ uniform-index reset-memoized
@@ -603,7 +607,7 @@ SYNTAX: GLSL-SHADER-FILE:
         scan-word execute( -- kind )
         scan-object in-word's-path
         0
-        over ascii file-contents 
+        over ascii file-contents
     ] dip
     shader boa
     over reset-generic
@@ -614,18 +618,18 @@ SYNTAX: GLSL-PROGRAM:
     dup old-instances [
         f
         lexer get line>>
-        \ ; parse-until >array shaders-and-formats
+        parse-array-def shaders-and-formats
     ] dip
     program boa
     over reset-generic
     define-constant ;
 
 M: shader-instance dispose
-    [ dup valid-handle? [ delete-gl-shader ] [ drop ] if f ] change-handle
+    [ dup valid-handle? [ glDeleteShader ] [ drop ] if f ] change-handle
     [ world>> ] [ shader>> instances>> ] [ ] tri ?delete-at ;
 
 M: program-instance dispose
-    [ dup valid-handle? [ delete-gl-program-only ] [ drop ] if f ] change-handle
+    [ dup valid-handle? [ glDeleteProgram ] [ drop ] if f ] change-handle
     [ world>> ] [ program>> instances>> ] [ ] tri ?delete-at
     reset-memos ;
 

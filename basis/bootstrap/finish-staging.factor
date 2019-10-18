@@ -1,4 +1,5 @@
-USING: init command-line system namespaces kernel vocabs.loader io ;
+USING: command-line init io kernel namespaces sequences system
+vocabs.loader ;
 
 [
     boot

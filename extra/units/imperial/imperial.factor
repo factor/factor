@@ -1,6 +1,11 @@
 USING: kernel math prettyprint units units.si inverse ;
 IN: units.imperial
 
+! TEMPERATURE
+
+: deg-F ( n -- Fahrenheit ) 32 - 5/9 * deg-C ;
+ALIAS: °F deg-F
+
 ! LENGTH
 
 : inches ( n -- dimensioned ) 254/100 * cm ;
@@ -125,8 +130,6 @@ DEFER: imperial-fluid-ounces
 
 : knots ( n -- dimensioned ) 1852/3600 * m/s ;
 
-: deg-F ( n -- dimensioned ) 32 - 5/9 * deg-C ;
-
 : imperial-gallons ( n -- dimensioned ) 454609/100000 * L ;
 
 : imperial-quarts ( n -- dimensioned ) 1/4 * imperial-gallons ;
@@ -138,7 +141,7 @@ DEFER: imperial-fluid-ounces
 : imperial-gill ( n -- dimensioned ) 5 * imperial-fluid-ounces ;
 
 
-: dry-gallons ( n -- dimensioned ) 440488377086/100000000000 * L ; 
+: dry-gallons ( n -- dimensioned ) 440488377086/100000000000 * L ;
 
 : dry-quarts ( n -- dimensioned ) 1/4 * dry-gallons ;
 

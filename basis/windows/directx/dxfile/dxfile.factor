@@ -51,7 +51,7 @@ C-TYPE: IDirectXFileBinary
 TYPEDEF: IDirectXFileBinary* LPDIRECTXFILEBINARY
 TYPEDEF: IDirectXFileBinary** LPLPDIRECTXFILEBINARY
 
-FUNCTION: HRESULT DirectXFileCreate ( LPDIRECTXFILE* lplpDirectXFile ) ;
+FUNCTION: HRESULT DirectXFileCreate ( LPDIRECTXFILE* lplpDirectXFile )
 
 COM-INTERFACE: IDirectXFile IUnknown {3d82ab40-62da-11cf-ab39-0020af71e433}
     HRESULT CreateEnumObject ( LPVOID v, DXFILELOADOPTIONS y,
@@ -92,7 +92,7 @@ COM-INTERFACE: IDirectXFileBinary IDirectXFileObject {3d82ab46-62da-11cf-ab39-00
     HRESULT Read         ( LPVOID x, DWORD y, LPDWORD z ) ;
 
 CONSTANT: DXFILE_OK   0
-                               
+
 CONSTANT: DXFILEERR_BADOBJECT                 0x88760352
 CONSTANT: DXFILEERR_BADVALUE                  0x88760353
 CONSTANT: DXFILEERR_BADTYPE                   0x88760354

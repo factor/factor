@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff, Erik Charlebois bsd license
+! Copyright (C) 2010 Joe Groff, Erik Charlebois.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs classes.singleton
 combinators delegate fry kernel macros math parser sequences
 words ;
@@ -21,7 +22,7 @@ M: word enum>number "enum-value" word-prop ;
     { } map-as [ ] suffix '[ _ case ] ;
 PRIVATE>
 
-MACRO: number>enum ( enum-c-type -- )
+MACRO: number>enum ( enum-c-type -- quot )
     lookup-c-type members>> enum-boxer ;
 
 M: enum-c-type c-type-boxed-class drop object ;
@@ -39,7 +40,7 @@ M: enum-c-type c-type-setter
     [ first define-singleton-class ] each ;
 
 : define-enum-constructor ( word -- )
-    [ name>> "<" ">" surround create-in ] keep
+    [ name>> "<" ">" surround create-word-in ] keep
     [ number>enum ] curry ( number -- enum ) define-inline ;
 
 PRIVATE>
@@ -55,3 +56,9 @@ PRIVATE>
 
 PREDICATE: enum-c-type-word < c-type-word
     "c-type" word-prop enum-c-type? ;
+
+: enum>values ( enum -- seq )
+    "c-type" word-prop members>> values ;
+
+: enum>keys ( enum -- seq )
+    "c-type" word-prop members>> keys [ name>> ] map ;

@@ -22,14 +22,16 @@ void early_init(void) {
   }
 }
 
+// You must free() this yourself.
 const char* vm_executable_path(void) {
-  return [[[NSBundle mainBundle] executablePath] UTF8String];
+  return safe_strdup([[[NSBundle mainBundle] executablePath] UTF8String]);
 }
 
 const char* default_image_path(void) {
   NSBundle* bundle = [NSBundle mainBundle];
   NSString* path = [bundle bundlePath];
-  NSString* executable = [[bundle executablePath] lastPathComponent];
+  NSString* executablePath = [[bundle executablePath] stringByResolvingSymlinksInPath];
+  NSString* executable = [executablePath lastPathComponent];
   NSString* image = [executable stringByAppendingString:@".image"];
 
   NSString* returnVal;
@@ -45,8 +47,16 @@ const char* default_image_path(void) {
 
     returnVal = ([mgr fileExistsAtPath:imageInBundle] ? imageInBundle
                                                       : imageAlongBundle);
-  } else
+  } else if ([executablePath hasSuffix:@".app/Contents/MacOS/factor"]) {
+    returnVal = executablePath;
+    returnVal = [returnVal stringByDeletingLastPathComponent];
+    returnVal = [returnVal stringByDeletingLastPathComponent];
+    returnVal = [returnVal stringByDeletingLastPathComponent];
+    returnVal = [returnVal stringByDeletingLastPathComponent];
+    returnVal = [returnVal stringByAppendingPathComponent:image];
+  } else {
     returnVal = [path stringByAppendingPathComponent:image];
+  }
 
   return [returnVal UTF8String];
 }
@@ -56,7 +66,7 @@ void factor_vm::init_signals(void) {
   mach_initialize();
 }
 
-/* Amateurs at Apple: implement this function, properly! */
+// Amateurs at Apple: implement this function, properly!
 Protocol* objc_getProtocol(char* name) {
   if (strcmp(name, "NSTextInput") == 0)
     return @protocol(NSTextInput);

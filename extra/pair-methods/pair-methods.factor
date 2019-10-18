@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes classes.tuple.private combinators
 effects.parser generic.parser kernel math math.order parser
 quotations sequences sorting words ;
@@ -32,7 +33,7 @@ ERROR: no-pair-method a b generic ;
     dup pair-generic-definition define ;
 
 : define-pair-generic ( word effect -- )
-    [ swap set-stack-effect ]
+    [ set-stack-effect ]
     [ drop H{ } clone "pair-generic-methods" set-word-prop ]
     [ drop make-pair-generic ] 2tri ;
 
@@ -51,7 +52,7 @@ SYNTAX: PAIR-GENERIC: (PAIR-GENERIC:) ;
 
 : (PAIR-M:) ( -- )
     scan-word scan-word 2dup <=> +gt+ eq? [
-        ?swap scan-word parse-definition 
+        ?swap scan-word parse-definition
     ] keep ?prefix-swap define-pair-method ;
 
 SYNTAX: PAIR-M: (PAIR-M:) ;

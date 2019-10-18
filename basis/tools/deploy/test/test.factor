@@ -5,19 +5,22 @@ tools.deploy.backend tools.deploy.config.editor ;
 IN: tools.deploy.test
 
 : test-image ( -- str )
-    my-arch "test." ".image" surround ;
+    my-arch-name "test." ".image" surround ;
+
+: test-image-path ( -- str )
+    test-image temp-file ;
 
 : shake-and-bake ( vocab -- )
-    [ test-image temp-file delete-file ] ignore-errors
+    test-image-path ?delete-file
     [
-        [ vm test-image temp-file ] dip
+        [ vm-path test-image temp-file ] dip
         dup deploy-config make-deploy-image drop
     ] with-resource-directory ;
 
 ERROR: image-too-big actual-size max-size ;
 
 : small-enough? ( n -- )
-    [ test-image temp-file file-info size>> ]
+    [ test-image-path file-info size>> ]
     [
         cell 4 / *
         cpu ppc? [ 100000 + ] when
@@ -27,8 +30,8 @@ ERROR: image-too-big actual-size max-size ;
 
 : deploy-test-command ( -- args )
     os macosx?
-    "resource:Factor.app/Contents/MacOS/factor" normalize-path vm ?
-    "-i=" test-image temp-file append 2array ;
+    "resource:Factor.app/Contents/MacOS/factor" normalize-path vm-path ?
+    "-i=" test-image-path append 2array ;
 
 : run-temp-image ( -- )
     deploy-test-command try-output-process ;

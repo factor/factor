@@ -131,9 +131,9 @@ unit-test
 ! Regression
 : hellish-bug-1 ( a b -- ) 2drop ;
 
-: hellish-bug-2 ( i array x -- x ) 
-    2dup 1 slot eq? [ 2drop ] [ 
-        2dup array-nth tombstone? [ 
+: hellish-bug-2 ( i array x -- x )
+    2dup 1 slot eq? [ 2drop ] [
+        2dup array-nth tombstone? [
             [
                 [ array-nth ] 2keep [ 1 fixnum+fast ] dip array-nth
                 pick 2dup hellish-bug-1 3drop
@@ -141,7 +141,7 @@ unit-test
         ] unless [ 2 fixnum+fast ] dip hellish-bug-2
     ] if ; inline recursive
 
-: hellish-bug-3 ( hash array -- ) 
+: hellish-bug-3 ( hash array -- )
     0 swap hellish-bug-2 drop ;
 
 [ ] [
@@ -201,7 +201,7 @@ TUPLE: my-tuple ;
     { tuple vector } 3 slot { word } declare
     dup 1 slot 0 fixnum-bitand { [ ] } dispatch ;
 
-[ t ] [ \ dispatch-alignment-regression optimized? ] unit-test
+[ t ] [ \ dispatch-alignment-regression word-optimized? ] unit-test
 
 [ vector ] [ dispatch-alignment-regression ] unit-test
 
@@ -257,8 +257,8 @@ TUPLE: id obj ;
     { float } declare dup 0 =
     [ drop 1 ] [
         dup 0 >=
-        [ 2 double "libm" "pow" { double double } alien-invoke ]
-        [ -0.5 double "libm" "pow" { double double } alien-invoke ]
+        [ 2 double "libm" "pow" { double double } f alien-invoke ]
+        [ -0.5 double "libm" "pow" { double double } f alien-invoke ]
         if
     ] if ;
 
@@ -316,7 +316,7 @@ cell 4 = [
 
 ! Bug with ##return node construction
 : return-recursive-bug ( nodes -- ? )
-    { fixnum } declare iota [
+    { fixnum } declare <iota> [
         dup 3 bitand 1 = [ drop t ] [
             dup 3 bitand 2 = [
                 return-recursive-bug
@@ -383,7 +383,7 @@ cell 4 = [
  [ 2 3 1 ] [ 2 3 V{ } coalescing-bug-4 ] unit-test
  [ 3 3 1 ] [ 4 3 V{ } coalescing-bug-4 ] unit-test
  [ 3 3 1 ] [ 4 3 V{ } coalescing-bug-4 ] unit-test
- 
+
 ! Global stack analysis dataflow equations are wrong
 : some-word ( a -- b ) 2 + ;
 : global-dcn-bug-1 ( a b -- c d )
@@ -476,8 +476,8 @@ TUPLE: myseq { underlying1 byte-array read-only } { underlying2 byte-array read-
 : gc-root-messup ( a -- b )
     dup [
         1024 (byte-array) 2array
-        10 void* "libc" "malloc" { ulong } alien-invoke
-        void "libc" "free" { void* } alien-invoke
+        10 void* "libc" "malloc" { ulong } f alien-invoke
+        void "libc" "free" { void* } f alien-invoke
     ] when ;
 
 [ ] [ 2000 [ "hello" clone dup gc-root-messup first eq? t assert= ] times ] unit-test
@@ -532,7 +532,7 @@ TUPLE: myseq { underlying1 byte-array read-only } { underlying2 byte-array read-
 ! Stupid repro
 USE: compiler.cfg.registers
 
-0 vreg-counter set-global
+reset-vreg-counter
 
 { fib-count2 } compile
 

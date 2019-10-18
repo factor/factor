@@ -1,5 +1,5 @@
-USING: alien.c-types alien.data accessors assocs classes
-destructors functors kernel lexer math parser sequences
+USING: accessors alien.c-types alien.data assocs classes
+combinators destructors fry kernel math sequences
 specialized-arrays ui.backend words ;
 SPECIALIZED-ARRAY: int
 IN: ui.pixel-formats
@@ -14,7 +14,7 @@ SYMBOLS:
     software-rendered
     backing-store
     multisampled
-    supersampled 
+    supersampled
     sample-alpha
     color-float ;
 
@@ -41,9 +41,9 @@ TUPLE: aux-buffers < pixel-format-attribute ;
 TUPLE: sample-buffers < pixel-format-attribute ;
 TUPLE: samples < pixel-format-attribute ;
 
-HOOK: (make-pixel-format) ui-backend ( world attributes -- pixel-format-handle )
+HOOK: (make-pixel-format) ui-backend ( world attributes --
+                                       pixel-format-handle )
 HOOK: (free-pixel-format) ui-backend ( pixel-format -- )
-HOOK: (pixel-format-attribute) ui-backend ( pixel-format attribute-name -- value )
 
 ERROR: invalid-pixel-format-attributes world attributes ;
 
@@ -58,37 +58,21 @@ TUPLE: pixel-format < disposable world handle ;
 M: pixel-format dispose*
     [ (free-pixel-format) ] [ f >>handle drop ] bi ;
 
-<PRIVATE
+: (pixel-format-attribute) ( attribute table -- arr/f )
+    [ dup class-of ] dip at [ swap value>> suffix ] [ drop f ] if* ;
 
-FUNCTOR: define-pixel-format-attribute-table ( NAME PERM TABLE -- )
+: pixel-format-attribute>array ( obj table -- arr/f )
+    {
+        { [ over pixel-format-attribute? ] [ (pixel-format-attribute) ] }
+        { [ over word? ] [ at ] }
+        [ 2drop f ]
+    } cond ;
 
->PFA              DEFINES >${NAME}
->PFA-int-array    DEFINES >${NAME}-int-array
-
-WHERE
-
-GENERIC: >PFA ( attribute -- pfas )
-
-M: object >PFA
-    drop { } ;
-M: word >PFA
-    TABLE at [ { } ] unless* ;
-M: pixel-format-attribute >PFA
-    dup class-of TABLE at
-    [ swap value>> suffix ]
-    [ drop { } ] if* ;
-
-: >PFA-int-array ( attribute -- int-array )
-    [ >PFA ] map concat PERM prepend 0 suffix int >c-array ;
-
-;FUNCTOR
-
-SYNTAX: PIXEL-FORMAT-ATTRIBUTE-TABLE:
-    scan-token scan-object scan-object define-pixel-format-attribute-table ;
-
-PRIVATE>
+: pixel-format-attributes>int-array ( attrs perm table -- arr )
+    swapd '[ _ pixel-format-attribute>array ] map sift concat append
+    ! 0 happens to work as a sentinel value for all ui backends.
+    0 suffix int >c-array ;
 
 GENERIC: world-pixel-format-attributes ( world -- attributes )
 
-GENERIC# check-world-pixel-format 1 ( world pixel-format -- )
-
+GENERIC#: check-world-pixel-format 1 ( world pixel-format -- )

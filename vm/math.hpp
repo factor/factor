@@ -5,30 +5,28 @@ static const fixnum fixnum_max =
 static const fixnum fixnum_min = (-((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)));
 static const fixnum array_size_max = ((cell)1 << (WORD_SIZE - TAG_BITS - 2));
 
-/* Allocates memory */
+// Allocates memory
 inline cell factor_vm::from_signed_cell(fixnum x) {
   if (x < fixnum_min || x > fixnum_max)
     return tag<bignum>(fixnum_to_bignum(x));
-  else
-    return tag_fixnum(x);
+  return tag_fixnum(x);
 }
 
-/* Allocates memory */
+// Allocates memory
 inline cell factor_vm::from_unsigned_cell(cell x) {
   if (x > (cell)fixnum_max)
     return tag<bignum>(cell_to_bignum(x));
-  else
-    return tag_fixnum(x);
+  return tag_fixnum(x);
 }
 
-/* Allocates memory */
+// Allocates memory
 inline cell factor_vm::allot_float(double n) {
   boxed_float* flo = allot<boxed_float>(sizeof(boxed_float));
   flo->n = n;
   return tag(flo);
 }
 
-/* Allocates memory */
+// Allocates memory
 inline bignum* factor_vm::float_to_bignum(cell tagged) {
   return double_to_bignum(untag_float(tagged));
 }
@@ -56,7 +54,7 @@ inline cell factor_vm::unbox_array_size() {
     return n;
   }
   general_error(ERROR_ARRAY_SIZE, obj, tag_fixnum(array_size_max));
-  return 0; /* can't happen */
+  return 0; // can't happen
 }
 
 VM_C_API cell from_signed_cell(fixnum integer, factor_vm* vm);

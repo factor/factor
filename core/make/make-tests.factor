@@ -1,6 +1,4 @@
-
 USING: make sequences tools.test ;
-IN: make
 
 { "ABCD" } [ [ "ABCD" [ , ] each ] "" make ] unit-test
 

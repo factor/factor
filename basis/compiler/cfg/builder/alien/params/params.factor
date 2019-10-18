@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cpu.architecture fry kernel layouts math math.order
-namespaces sequences vectors assocs arrays locals ;
+USING: arrays assocs cpu.architecture fry kernel layouts locals
+math math.order namespaces sequences vectors ;
 IN: compiler.cfg.builder.alien.params
 
 SYMBOL: stack-params
@@ -40,18 +40,12 @@ M: int-rep next-reg-param
     ] when ]
     2tri int-regs get pop ;
 
-M: float-rep next-reg-param
+M: object next-reg-param
     nip [ ?dummy-stack-params ] [ ?dummy-int-params ] bi
     float-regs get pop ;
 
-M: double-rep next-reg-param
-    nip [ ?dummy-stack-params ] [ ?dummy-int-params ] bi
-    float-regs get pop ;
-
-:: reg-class-full? ( reg-class odd-register? -- ? )
-    reg-class get empty?
-    reg-class get length 1 = odd-register? and
-    dup [ reg-class get delete-all ] when or ;
+: reg-class-full? ( reg-class odd-register? -- ? )
+    over length 1 = and [ dup delete-all ] when empty? ;
 
 : init-reg-class ( abi reg-class -- )
     [ swap param-regs at <reversed> >vector ] keep set ;
@@ -59,14 +53,11 @@ M: double-rep next-reg-param
 : init-regs ( regs -- )
     [ <reversed> >vector swap set ] assoc-each ;
 
-: with-param-regs ( abi quot -- )
-    '[ param-regs init-regs 0 stack-params set @ ] with-scope ; inline
-
 SYMBOLS: stack-values reg-values ;
 
 :: next-parameter ( vreg rep on-stack? odd-register? -- )
     vreg rep on-stack?
-    [ dup dup reg-class-of odd-register? reg-class-full? ] dip or
+    [ dup dup reg-class-of get odd-register? reg-class-full? ] dip or
     [ alloc-stack-param stack-values ] [ odd-register? swap next-reg-param reg-values ] if
     [ 3array ] dip get push ;
 

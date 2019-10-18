@@ -99,7 +99,7 @@ CONSTANT: DW_TAG_SUN_dtor                 0x420b
 CONSTANT: DW_TAG_SUN_f90_interface        0x420c
 CONSTANT: DW_TAG_SUN_fortran_vax_structure 0x420d
 CONSTANT: DW_TAG_SUN_hi                   0x42ff
-    
+
 CONSTANT: DW_TAG_hi_user                  0xffff
 
 CONSTANT: DW_children_no  0
@@ -280,7 +280,7 @@ CONSTANT: DW_AT_body_end                          0x2106
 CONSTANT: DW_AT_GNU_vector                        0x2107
 CONSTANT: DW_AT_GNU_template_name                 0x2108
 
-CONSTANT: DW_AT_ALTIUM_loclist    0x2300         
+CONSTANT: DW_AT_ALTIUM_loclist    0x2300
 
 CONSTANT: DW_AT_SUN_template                      0x2201
 CONSTANT: DW_AT_VMS_rtnbeg_pd_address             0x2201
@@ -333,8 +333,8 @@ CONSTANT: DW_AT_SUN_fortran_based                 0x223b
 CONSTANT: DW_AT_upc_threads_scaled                0x3210
 
 CONSTANT: DW_AT_PGI_lbase                         0x3a00
-CONSTANT: DW_AT_PGI_soffset                       0x3a01 
-CONSTANT: DW_AT_PGI_lstride                       0x3a02 
+CONSTANT: DW_AT_PGI_soffset                       0x3a01
+CONSTANT: DW_AT_PGI_lstride                       0x3a02
 
 CONSTANT: DW_AT_APPLE_closure                     0x3fe4
 CONSTANT: DW_AT_APPLE_major_runtime_vers          0x3fe5
@@ -599,7 +599,7 @@ CONSTANT: DW_LANG_Python                  0x0014
 CONSTANT: DW_LANG_lo_user                 0x8000
 CONSTANT: DW_LANG_Mips_Assembler          0x8001
 CONSTANT: DW_LANG_Upc                     0x8765
-CONSTANT: DW_LANG_ALTIUM_Assembler        0x9101 
+CONSTANT: DW_LANG_ALTIUM_Assembler        0x9101
 CONSTANT: DW_LANG_SUN_Assembler           0x9001
 CONSTANT: DW_LANG_hi_user                 0xffff
 
@@ -613,10 +613,10 @@ CONSTANT: DW_CC_program                   0x02
 CONSTANT: DW_CC_nocall                    0x03
 
 CONSTANT: DW_CC_lo_user                   0x40
-CONSTANT: DW_CC_ALTIUM_interrupt          0x65 
-CONSTANT: DW_CC_ALTIUM_near_system_stack  0x66 
-CONSTANT: DW_CC_ALTIUM_near_user_stack    0x67 
-CONSTANT: DW_CC_ALTIUM_huge_user_stack    0x68 
+CONSTANT: DW_CC_ALTIUM_interrupt          0x65
+CONSTANT: DW_CC_ALTIUM_near_system_stack  0x66
+CONSTANT: DW_CC_ALTIUM_near_user_stack    0x67
+CONSTANT: DW_CC_ALTIUM_huge_user_stack    0x68
 CONSTANT: DW_CC_hi_user                   0xff
 
 CONSTANT: DW_INL_not_inlined              0x00
@@ -646,7 +646,7 @@ CONSTANT: DW_LNS_set_isa                  0x0c
 CONSTANT: DW_LNE_end_sequence             0x01
 CONSTANT: DW_LNE_set_address              0x02
 CONSTANT: DW_LNE_define_file              0x03
-CONSTANT: DW_LNE_set_discriminator        0x04 
+CONSTANT: DW_LNE_set_discriminator        0x04
 
 CONSTANT: DW_LNE_HP_negate_is_UV_update       0x11
 CONSTANT: DW_LNE_HP_push_context              0x12
@@ -720,7 +720,7 @@ CONSTANT: DW_EH_PE_funcrel  0x40
 CONSTANT: DW_EH_PE_aligned  0x50
 CONSTANT: DW_EH_PE_omit     0xff
 
-CONSTANT: DW_FRAME_CFA_COL 0  
+CONSTANT: DW_FRAME_CFA_COL 0
 
 CONSTANT: DW_FRAME_REG1   1
 CONSTANT: DW_FRAME_REG2   2

@@ -3,10 +3,9 @@
 USING: accessors arrays assocs colors.constants combinators
 combinators.short-circuit fry io.directories io.files
 io.files.info io.pathnames kernel locals make math math.order
-sequences sequences.private sorting splitting typed
-unicode.categories unicode.data vectors vocabs vocabs.hierarchy
-;
-
+sequences sequences.private sorting splitting
+splitting.monotonic unicode unicode.data vectors vocabs
+vocabs.hierarchy ;
 IN: tools.completion
 
 <PRIVATE
@@ -29,21 +28,8 @@ PRIVATE>
     dup [ length <vector> 0 ] curry 2dip
     [ (fuzzy) ] with all? 2drop ;
 
-<PRIVATE
-
-: (runs) ( runs n seq -- runs n )
-    [
-        [
-            2dup number=
-            [ drop ] [ nip V{ } clone pick push ] if
-            1 +
-        ] keep pick last push
-    ] each ; inline
-
-PRIVATE>
-
 : runs ( seq -- newseq )
-    [ V{ } clone 1vector ] dip [ first ] keep (runs) drop ;
+    [ 1 - = ] monotonic-split-slice ;
 
 <PRIVATE
 
@@ -70,15 +56,12 @@ PRIVATE>
     ] if ;
 
 : rank-completions ( results -- newresults )
-    sort-keys <reversed>
     [ 0 [ first max ] reduce 3 /f ] keep
     [ first-unsafe < ] with filter
-    values ;
+    sort-keys <reversed> values ;
 
 : complete ( full short -- score )
-    [ dupd fuzzy score ] 2keep
-    [ <reversed> ] bi@
-    dupd fuzzy score max ;
+    2dup [ <reversed> ] bi@ [ dupd fuzzy score ] 2bi@ max ;
 
 : completion ( short candidate -- result )
     [ second swap complete ] keep 2array ; inline
@@ -99,7 +82,10 @@ PRIVATE>
     all-words name-completions ;
 
 : vocabs-matching ( str -- seq )
-    all-vocabs-recursive filter-vocabs name-completions ;
+    all-disk-vocabs-recursive filter-vocabs name-completions ;
+
+: vocab-words-matching ( str vocab -- seq )
+    vocab-words name-completions ;
 
 : chars-matching ( str -- seq )
     name-map keys dup zip completions ;
@@ -115,11 +101,11 @@ PRIVATE>
 : directory-paths ( directory -- alist )
     dup '[
         [
-            [ dup _ prepend-path ]
-            [ file-info directory? [ path-separator append ] when ]
+            [ name>> dup _ prepend-path ]
+            [ directory? [ path-separator append ] when ]
             bi swap
         ] { } map>assoc
-    ] with-directory-files ;
+    ] with-directory-entries ;
 
 PRIVATE>
 
@@ -131,8 +117,10 @@ PRIVATE>
 <PRIVATE
 
 : (complete-single-vocab?) ( str -- ? )
-    { "IN:" "USE:" "UNUSE:" "QUALIFIED:" "QUALIFIED-WITH:" }
-    member? ; inline
+    {
+        "IN:" "USE:" "UNUSE:" "QUALIFIED:"
+        "QUALIFIED-WITH:" "FROM:" "EXCLUDE:"
+    } member? ; inline
 
 : complete-single-vocab? ( tokens -- ? )
     dup last empty? [
@@ -152,6 +140,13 @@ PRIVATE>
 
 : complete-vocab? ( tokens -- ? )
     { [ complete-single-vocab? ] [ complete-vocab-list? ] } 1|| ;
+
+: complete-vocab-words? ( tokens -- ? )
+    harvest chop-; {
+        [ length 3 >= ]
+        [ first { "FROM:" "EXCLUDE:" } member? ]
+        [ third "=>" = ]
+    } 1&& ;
 
 <PRIVATE
 

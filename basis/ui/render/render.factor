@@ -1,9 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math.rectangles math.vectors namespaces kernel accessors
-assocs combinators sequences sets opengl opengl.gl colors
-colors.constants ui.gadgets ui.pens ;
-FROM: namespaces => set ;
+USING: accessors colors colors.constants combinators kernel
+math.rectangles math.vectors namespaces opengl opengl.capabilities
+opengl.gl opengl.textures sequences sets ui.gadgets ui.pens ;
 IN: ui.render
 
 SYMBOL: clip
@@ -18,26 +17,29 @@ SYMBOL: viewport-translation
 
 : do-clip ( -- ) clip get flip-rect gl-set-clip ;
 
-: init-clip ( clip-rect -- )
+: init-clip ( gadget -- )
     [
         dim>>
-        [ { 0 1 } v* viewport-translation set ]
+        [ { 0 1 } v* viewport-translation namespaces:set ]
         [ [ { 0 0 } ] dip gl-viewport ]
         [ [ 0 ] dip first2 0 1 -1 glOrtho ] tri
     ]
-    [ clip set ] bi
+    [ clip namespaces:set ] bi
     do-clip ;
 
 SLOT: background-color
 
-: init-gl ( world -- )
+: gl-init ( -- )
+    check-extensions "1.0" require-gl-version
     GL_SMOOTH glShadeModel
-    GL_SCISSOR_TEST glEnable
     GL_BLEND glEnable
-    GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
     GL_VERTEX_ARRAY glEnableClientState
     GL_PACK_ALIGNMENT 1 glPixelStorei
-    GL_UNPACK_ALIGNMENT 1 glPixelStorei
+    GL_UNPACK_ALIGNMENT 1 glPixelStorei ;
+
+: gl-draw-init ( world -- )
+    GL_SCISSOR_TEST glEnable
+    GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
     init-matrices
     [ init-clip ]
     [
@@ -85,12 +87,12 @@ M: gadget gadget-foreground dup interior>> pen-foreground ;
 <PRIVATE
 
 : draw-selection-background ( gadget -- )
-    selection-background get background set
+    selection-background get background namespaces:set
     selection-background get gl-color
     [ { 0 0 } ] dip dim>> gl-fill-rect ;
 
 : draw-standard-background ( object -- )
-    dup interior>> dup [ draw-interior ] [ 2drop ] if ;
+    dup interior>> [ draw-interior ] [ drop ] if* ;
 
 : draw-background ( gadget -- )
     origin get [
@@ -102,9 +104,9 @@ M: gadget gadget-foreground dup interior>> pen-foreground ;
     ] with-translation ;
 
 : draw-border ( object -- )
-    dup boundary>> dup [
+    dup boundary>> [
         origin get [ draw-boundary ] with-translation
-    ] [ 2drop ] if ;
+    ] [ drop ] if* ;
 
 PRIVATE>
 
@@ -120,7 +122,8 @@ PRIVATE>
     >absolute clip [ rect-intersect ] change ;
 
 : with-clipping ( gadget quot -- )
-    clip get [ over change-clip do-clip call ] dip clip set do-clip ; inline
+    clip get [ over change-clip do-clip call ] dip
+    clip namespaces:set do-clip ; inline
 
 : draw-gadget ( gadget -- )
     {
@@ -139,23 +142,11 @@ M: gadget draw-children
         } cleave [
 
             {
-                [ [ selected-gadgets set ] when* ]
-                [ [ selection-background set ] when* ]
-                [ [ background set ] when* ]
-                [ [ foreground set ] when* ]
+                [ [ selected-gadgets namespaces:set ] when* ]
+                [ [ selection-background namespaces:set ] when* ]
+                [ [ background namespaces:set ] when* ]
+                [ [ foreground namespaces:set ] when* ]
             } spread
             [ draw-gadget ] each
         ] with-scope
     ] [ drop ] if ;
-
-CONSTANT: selection-color T{ rgba f 0.8 0.8 1.0 1.0 }
-
-CONSTANT: panel-background-color
-    T{ rgba f
-        0.7843137254901961
-        0.7686274509803922
-        0.7176470588235294
-        1.0
-    }
-
-CONSTANT: focus-border-color COLOR: dark-gray

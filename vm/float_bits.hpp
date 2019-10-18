@@ -1,7 +1,7 @@
 namespace factor {
 
-/* Some functions for converting floating point numbers to binary
-representations and vice versa */
+// Some functions for converting floating point numbers to binary
+// representations and vice versa
 
 union double_bits_pun {
   double x;

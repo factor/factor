@@ -8,21 +8,27 @@ HELP: send
 { $values { "message" object }
           { "thread" thread }
 }
-{ $description "Send the message to the thread by placing it in the threads mailbox. This is an asynchronous operation and will return immediately. The receiving thread will act on the message the next time it retrieves that item from its mailbox (usually using the " { $link receive } " word. The message can be any Factor object. For destinations that are instances of remote-thread the message must be a serializable Factor type." }
+{ $description "Send the message to the thread by placing it in the thread's mailbox. This is an asynchronous operation and will return immediately. The receiving thread will act on the message the next time it retrieves that item from its mailbox (usually using the " { $link receive } " word). The message can be any Factor object. For destinations that are instances of remote-thread the message must be a serializable Factor type." }
 { $see-also receive receive-if } ;
 
 HELP: receive
 { $values { "message" object }
 }
-{ $description "Return a message from the current threads mailbox. If the box is empty, suspend the thread until another thread places an item in the mailbox (usually via the " { $link send } " word." }
+{ $description "Return a message from the current thread's mailbox. If the box is empty, suspend the thread until another thread places an item in the mailbox (usually via the " { $link send } " word)." }
 { $see-also send receive-if } ;
 
 HELP: receive-if
 { $values { "pred" "a predicate with stack effect " { $snippet "( obj -- ? )" } }
           { "message" object }
 }
-{ $description "Return the first message from the current threads mailbox that satisfies the predicate. To satisfy the predicate, " { $snippet "pred" } " is called with the item on the stack and the predicate should leave a boolean indicating whether it was satisfied or not. If nothing in the mailbox satisfies the predicate then the thread will block until something does." }
+{ $description "Return the first message from the current thread's mailbox that satisfies the predicate. To satisfy the predicate, " { $snippet "pred" } " is called with the item on the stack and the predicate should leave a boolean indicating whether it was satisfied or not. If nothing in the mailbox satisfies the predicate then the thread will block until something does." }
 { $see-also send receive } ;
+
+HELP: handle-synchronous
+{ $values { "quot" "a " { $link quotation } " with stack effect " { $snippet "( ... message -- ... reply )" } }
+}
+{ $description "Receive a message that was sent with " { $link send-synchronous } ", call " { $snippet "quot" } " to transform it into a response and use " { $link reply-synchronous } " to reply."
+} ;
 
 HELP: spawn-linked
 { $values { "quot" quotation }
@@ -52,13 +58,13 @@ ARTICLE: "concurrency-synchronous-sends" "Synchronous sends"
 "The " { $link send } " word sends a message asynchronously, and the sending thread continues immediately. It is also possible to send a message to a thread and block until a response is received:"
 { $subsections send-synchronous }
 "To reply to a synchronous message:"
-{ $subsections reply-synchronous }
+{ $subsections reply-synchronous handle-synchronous }
 "An example:"
 { $example
     "USING: concurrency.messaging threads ;"
     "IN: scratchpad"
     ": pong-server ( -- )"
-    "    receive [ \"pong\" ] dip reply-synchronous ;"
+    "    [ drop \"pong\" ] handle-synchronous ;"
     "[ pong-server t ] \"pong-server\" spawn-server"
     "\"ping\" swap send-synchronous ."
     "\"pong\""

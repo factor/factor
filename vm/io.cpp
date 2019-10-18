@@ -2,36 +2,59 @@
 
 namespace factor {
 
-/* Simple wrappers for ANSI C I/O functions, used for bootstrapping.
+// Simple wrappers for ANSI C I/O functions, used for bootstrapping.
 
-Note the ugly loop logic in almost every function; we have to handle EINTR
-and restart the operation if the system call was interrupted. Naive
-applications don't do this, but then they quickly fail if one enables
-itimer()s or other signals.
+// Note the ugly loop logic in almost every function; we have to handle EINTR
+// and restart the operation if the system call was interrupted. Naive
+// applications don't do this, but then they quickly fail if one enables
+// itimer()s or other signals.
 
-The Factor library provides platform-specific code for Unix and Windows
-with many more capabilities so these words are not usually used in
-normal operation. */
+// The Factor library provides platform-specific code for Unix and Windows
+// with many more capabilities so these words are not usually used in
+// normal operation.
 
-void factor_vm::init_c_io() {
-  special_objects[OBJ_STDIN] = allot_alien(false_object, (cell)stdin);
-  special_objects[OBJ_STDOUT] = allot_alien(false_object, (cell)stdout);
-  special_objects[OBJ_STDERR] = allot_alien(false_object, (cell)stderr);
+size_t raw_fread(void* ptr, size_t size, size_t nitems, FILE* stream) {
+  FACTOR_ASSERT(nitems > 0);
+  size_t items_read = 0;
+
+  do {
+    size_t ret = fread((void*)((int*)ptr + items_read * size), size,
+                       nitems - items_read, stream);
+    if (ret == 0) {
+      if (feof(stream)) {
+        break;
+      }
+      else if (errno != EINTR) {
+        return 0;
+      }
+    }
+    items_read += ret;
+  } while (items_read != nitems);
+
+  return items_read;
 }
 
-void factor_vm::io_error() {
+// Call fclose() once only. Issues #1335, #908.
+int raw_fclose(FILE* stream) {
+  if (fclose(stream) == EOF && errno != EINTR)
+    return -1;
+  return 0;
+}
+
+// Allocates memory
+void factor_vm::io_error_if_not_EINTR() {
   if (errno == EINTR)
     return;
 
   general_error(ERROR_IO, tag_fixnum(errno), false_object);
 }
 
-FILE* factor_vm::safe_fopen(char* filename, char* mode) {
+FILE* factor_vm::safe_fopen(char* filename, const char* mode) {
   FILE* file;
   for (;;) {
     file = fopen(filename, mode);
     if (file == NULL)
-      io_error();
+      io_error_if_not_EINTR();
     else
       break;
   }
@@ -46,7 +69,7 @@ int factor_vm::safe_fgetc(FILE* stream) {
       if (feof(stream))
         return EOF;
       else
-        io_error();
+        io_error_if_not_EINTR();
     } else
       break;
   }
@@ -55,28 +78,16 @@ int factor_vm::safe_fgetc(FILE* stream) {
 
 size_t factor_vm::safe_fread(void* ptr, size_t size, size_t nitems,
                              FILE* stream) {
-  size_t items_read = 0;
-  size_t ret = 0;
-
-  do {
-    ret = fread((void*)((int*)ptr + items_read * size), size,
-                nitems - items_read, stream);
-    if (ret == 0) {
-      if (feof(stream))
-        break;
-      else
-        io_error();
-    }
-    items_read += ret;
-  } while (items_read != nitems);
-
-  return items_read;
+  size_t ret = raw_fread(ptr, size, nitems, stream);
+  if (ret == 0 && !feof(stream))
+    io_error_if_not_EINTR();
+  return ret;
 }
 
 void factor_vm::safe_fputc(int c, FILE* stream) {
   for (;;) {
     if (putc(c, stream) == EOF)
-      io_error();
+      io_error_if_not_EINTR();
     else
       break;
   }
@@ -91,7 +102,7 @@ size_t factor_vm::safe_fwrite(void* ptr, size_t size, size_t nitems,
     ret = fwrite((void*)((int*)ptr + items_written * size), size,
                  nitems - items_written, stream);
     if (ret == 0)
-      io_error();
+      io_error_if_not_EINTR();
     items_written += ret;
   } while (items_written != nitems);
 
@@ -102,7 +113,7 @@ int factor_vm::safe_ftell(FILE* stream) {
   off_t offset;
   for (;;) {
     if ((offset = FTELL(stream)) == -1)
-      io_error();
+      io_error_if_not_EINTR();
     else
       break;
   }
@@ -121,12 +132,12 @@ void factor_vm::safe_fseek(FILE* stream, off_t offset, int whence) {
       whence = SEEK_END;
       break;
     default:
-      critical_error("Bad value for whence", whence);
+      general_error(ERROR_IO, tag_fixnum(EINVAL), false_object);
   }
 
   for (;;) {
     if (FSEEK(stream, offset, whence) == -1)
-      io_error();
+      io_error_if_not_EINTR();
     else
       break;
   }
@@ -135,35 +146,27 @@ void factor_vm::safe_fseek(FILE* stream, off_t offset, int whence) {
 void factor_vm::safe_fflush(FILE* stream) {
   for (;;) {
     if (fflush(stream) == EOF)
-      io_error();
-    else
-      break;
-  }
-}
-
-void factor_vm::safe_fclose(FILE* stream) {
-  for (;;) {
-    if (fclose(stream) == EOF)
-      io_error();
+      io_error_if_not_EINTR();
     else
       break;
   }
 }
 
 void factor_vm::primitive_fopen() {
-  data_root<byte_array> mode(ctx->pop(), this);
-  data_root<byte_array> path(ctx->pop(), this);
-  mode.untag_check(this);
-  path.untag_check(this);
+  byte_array *mode = untag_check<byte_array>(ctx->pop());
+  byte_array *path = untag_check<byte_array>(ctx->pop());
 
-  FILE* file;
-  file = safe_fopen((char*)(path.untagged() + 1), (char*)(mode.untagged() + 1));
-  ctx->push(allot_alien(file));
+  FILE* file = safe_fopen((char*)(path + 1), (char*)(mode + 1));
+  ctx->push(allot_alien((cell)file));
 }
 
-FILE* factor_vm::pop_file_handle() { return (FILE*)alien_offset(ctx->pop()); }
+FILE* factor_vm::pop_file_handle() {
+  return (FILE*)alien_offset(ctx->pop());
+}
 
-FILE* factor_vm::peek_file_handle() { return (FILE*)alien_offset(ctx->peek()); }
+FILE* factor_vm::peek_file_handle() {
+  return (FILE*)alien_offset(ctx->peek());
+}
 
 void factor_vm::primitive_fgetc() {
   FILE* file = peek_file_handle();
@@ -176,7 +179,7 @@ void factor_vm::primitive_fgetc() {
     ctx->replace(tag_fixnum(c));
 }
 
-/* Allocates memory */
+// Allocates memory (from_unsigned_cell())
 void factor_vm::primitive_fread() {
   FILE* file = pop_file_handle();
   void* buf = (void*)alien_offset(ctx->pop());
@@ -186,7 +189,6 @@ void factor_vm::primitive_fread() {
     ctx->push(from_unsigned_cell(0));
     return;
   }
-
   size_t c = safe_fread(buf, 1, size, file);
   if (c == 0 || feof(file))
     clearerr(file);
@@ -209,7 +211,7 @@ void factor_vm::primitive_fwrite() {
 
   size_t written = safe_fwrite(text, 1, length, file);
   if (written != length)
-    io_error();
+    io_error_if_not_EINTR();
 }
 
 void factor_vm::primitive_ftell() {
@@ -231,12 +233,13 @@ void factor_vm::primitive_fflush() {
 
 void factor_vm::primitive_fclose() {
   FILE* file = pop_file_handle();
-  safe_fclose(file);
+  if (raw_fclose(file) == -1)
+    io_error_if_not_EINTR();
 }
 
-/* This function is used by FFI I/O. Accessing the errno global directly is
-not portable, since on some libc's errno is not a global but a funky macro that
-reads thread-local storage. */
+// This function is used by FFI I/O. Accessing the errno global directly is
+// not portable, since on some libc's errno is not a global but a funky macro that
+// reads thread-local storage.
 VM_C_API int err_no() { return errno; }
 
 VM_C_API void set_err_no(int err) { errno = err; }

@@ -34,7 +34,7 @@ HELP: edge-attributes
 { $class-description "Represents Graphviz attributes that are valid for edges. See attributes marked " { $emphasis "E" } " in " { $url "http://graphviz.org/content/attrs" } ". Each slot must be " { $maybe string } "." } ;
 
 HELP: graph-attributes
-{ $class-description "Represents Graphviz attributes that are valid for graphs and subgraphs (including clusters). See attributes marked " { $emphasis "G" } ", " { $emphasis "S" } ",  and " { $emphasis "C" } " in " { $url "http://graphviz.org/content/attrs" } ". Each slot must be " { $maybe string } "." } ;
+{ $class-description "Represents Graphviz attributes that are valid for graphs and subgraphs (including clusters). See attributes marked " { $emphasis "G" } ", " { $emphasis "S" } ", and " { $emphasis "C" } " in " { $url "http://graphviz.org/content/attrs" } ". Each slot must be " { $maybe string } "." } ;
 
 HELP: node-attributes
 { $class-description "Represents Graphviz attributes that are valid for nodes. See attributes marked " { $emphasis "N" } " in " { $url "http://graphviz.org/content/attrs" } ". Each slot must be " { $maybe string } "." } ;

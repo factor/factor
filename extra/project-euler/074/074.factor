@@ -1,7 +1,7 @@
 ! Copyright (c) 2009 Guillaume Nargeot.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs hashtables kernel math math.ranges
-project-euler.common sequences sets ;
+USING: hash-sets kernel math.ranges project-euler.common
+sequences sets ;
 IN: project-euler.074
 
 ! http://projecteuler.net/index.php?section=problems&id=074
@@ -51,10 +51,9 @@ IN: project-euler.074
     number>digits [ digit-factorial ] map-sum ;
 
 : chain-length ( n -- n )
-    61 <hashtable>
-    [ 2dup key? not ]
-    [ [ conjoin ] [ [ digits-factorial-sum ] dip ] 2bi ]
-    while nip assoc-size ;
+    61 <hash-set> [ 2dup ?adjoin ] [
+        [ digits-factorial-sum ] dip
+    ] while nip cardinality ;
 
 PRIVATE>
 
@@ -65,4 +64,3 @@ PRIVATE>
 ! 25134 ms ave run time - 31.96 SD (10 trials)
 
 SOLUTION: euler074
-

@@ -46,7 +46,7 @@ IN: memoize
     out>> [
         packer '[
             _ dup first-unsafe
-            [ nip ] [ @ @ [ 0 rot set-nth-unsafe ] keep ] if*
+            [ ] [ @ @ [ 0 rot set-nth-unsafe ] keep ] ?if
         ]
     ] keep unpacker compose ;
 
@@ -81,7 +81,7 @@ M: memoized definition "memo-quot" word-prop ;
 
 M: memoized reset-word
     [ call-next-method ]
-    [ { "memoize" "memo-quot" } reset-props ]
+    [ { "memoize" "memo-quot" } remove-word-props ]
     bi ;
 
 : memoize-quot ( quot effect -- memo-quot )

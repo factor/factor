@@ -1,8 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data alien.strings
-parser threads words kernel.private kernel io.encodings.utf8
-eval ;
+USING: alien alien.c-types alien.data eval io.encodings.utf8
+kernel kernel.private threads words ;
 IN: alien.remote-control
 
 : eval-callback ( -- callback )
@@ -16,7 +15,7 @@ IN: alien.remote-control
     void { long } cdecl [ sleep ] alien-callback ;
 
 : ?callback ( word -- alien )
-    dup optimized? [ execute ] [ drop f ] if ; inline
+    dup word-optimized? [ execute ] [ drop f ] if ; inline
 
 : init-remote-control ( -- )
     \ eval-callback ?callback OBJ-EVAL-CALLBACK set-special-object

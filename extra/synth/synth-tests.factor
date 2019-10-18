@@ -1,8 +1,6 @@
 USING: synth tools.test ;
 
-IN: synth.tests
-
-[
+{
     {
         0.0
         0.9510565162951535
@@ -10,4 +8,4 @@ IN: synth.tests
         -0.587785252292473
         -0.9510565162951536
     }
-] [ 5 single-sine-wave ] unit-test
+} [ 5 single-sine-wave ] unit-test

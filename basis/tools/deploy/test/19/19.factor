@@ -4,6 +4,8 @@ USING: io io.files io.encodings.ascii ;
 IN: tools.deploy.test.19
 
 : main ( -- )
-    "vocab:license.txt" ascii file-contents write ;
+    ! make sure to test vocab: paths. This file is a copy of Factors
+    ! LICENSE.txt.
+    "vocab:local-license.txt" ascii file-contents write ;
 
 MAIN: main

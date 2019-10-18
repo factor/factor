@@ -21,7 +21,7 @@ PREDICATE: intersection-class < class
     ] if-empty ;
 
 : define-intersection-predicate ( class -- )
-    dup participants intersection-predicate-quot define-predicate ;
+    dup class-participants intersection-predicate-quot define-predicate ;
 
 M: intersection-class update-class define-intersection-predicate ;
 
@@ -34,10 +34,10 @@ M: anonymous-intersection instance?
     participants>> [ instance? ] with all? ;
 
 M: intersection-class normalize-class
-    participants <anonymous-intersection> normalize-class ;
+    class-participants <anonymous-intersection> normalize-class ;
 
 M: intersection-class (flatten-class)
-    participants <anonymous-intersection> (flatten-class) ;
+    class-participants <anonymous-intersection> (flatten-class) ;
 
 ! Horribly inefficient and inaccurate
 : intersect-flattened-classes ( seq1 seq2 -- seq3 )

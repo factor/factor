@@ -1,7 +1,6 @@
-USING: xmode.loader.syntax xmode.tokens xmode.rules
-xmode.keyword-map xml.data xml.traversal xml assocs kernel
-combinators sequences math.parser namespaces parser
-xmode.utilities regexp io.files accessors xml.syntax ;
+USING: accessors assocs kernel math.parser namespaces sequences
+xml xml.data xml.syntax xml.traversal xmode.keyword-map
+xmode.loader.syntax xmode.rules xmode.tokens xmode.utilities ;
 IN: xmode.loader
 
 ! Based on org.gjt.sp.jedit.XModeHandler
@@ -51,8 +50,7 @@ TAG: KEYWORDS parse-rule-tag
     dup [ rule-set get ignore-case?>> <?insensitive-regexp> ] when ;
 
 : (parse-rules-tag) ( tag -- rule-set )
-    <rule-set> dup rule-set set
-    {
+    rule-set get {
         { "SET" string>rule-set-name name<< }
         { "IGNORE_CASE" string>boolean ignore-case?<< }
         { "HIGHLIGHT_DIGITS" string>boolean highlight-digits?<< }
@@ -63,11 +61,11 @@ TAG: KEYWORDS parse-rule-tag
     } init-from-tag ;
 
 : parse-rules-tag ( tag -- rule-set )
-    [
+    <rule-set> rule-set [
         [ (parse-rules-tag) ] [ children-tags ] bi
         [ parse-rule-tag ] with each
         rule-set get
-    ] with-scope ;
+    ] with-variable ;
 
 : merge-rule-set-props ( props rule-set -- )
     [ assoc-union ] change-props drop ;
@@ -75,7 +73,7 @@ TAG: KEYWORDS parse-rule-tag
 ! Top-level entry points
 : parse-mode-tag ( tag -- rule-sets )
     dup "RULES" tags-named [
-        parse-rules-tag dup name>> swap
+        parse-rules-tag [ name>> ] keep
     ] H{ } map>assoc
     swap "PROPS" tag-named [
         parse-props-tag over values

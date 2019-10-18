@@ -1,21 +1,13 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs accessors kernel kernel.private combinators
-classes.algebra sequences slots.private fry vectors
-classes.tuple.private math math.private arrays
-stack-checker.branches stack-checker.values
-compiler.utilities
-compiler.tree
-compiler.tree.builder
-compiler.tree.cleanup
-compiler.tree.combinators
-compiler.tree.propagation
-compiler.tree.propagation.info
-compiler.tree.escape-analysis.simple
-compiler.tree.escape-analysis.allocations ;
+USING: accessors arrays assocs classes.tuple.private combinators
+compiler.tree compiler.tree.builder compiler.tree.combinators
+compiler.tree.escape-analysis.allocations
+compiler.tree.escape-analysis.simple compiler.tree.propagation
+compiler.utilities fry kernel kernel.private math namespaces
+sequences slots.private stack-checker.branches
+stack-checker.values vectors ;
 IN: compiler.tree.tuple-unboxing
-
-! This pass must run after escape analysis
 
 GENERIC: unbox-tuples* ( node -- node/nodes )
 
@@ -75,7 +67,7 @@ M: #call unbox-tuples*
     } case ;
 
 M: #declare unbox-tuples*
-    #! We don't look at declarations after escape analysis anyway.
+    ! We don't look at declarations after escape analysis anyway.
     drop f ;
 
 M: #copy unbox-tuples*

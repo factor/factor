@@ -1,172 +1,166 @@
-USING: accessors alien.c-types alien.data arrays calendar colors
-combinators combinators.short-circuit flatland generalizations
-grouping kernel locals math math.intervals math.order
-math.rectangles math.vectors namespaces opengl opengl.gl
-opengl.glu processing.shapes sequences sequences.generalizations
-shuffle threads ui ui.gadgets ui.gestures ui.render ;
-FROM: multi-methods => GENERIC: METHOD: ;
-FROM: syntax => M: ;
+USING: accessors arrays calendar colors.constants
+combinators.short-circuit fonts fry kernel literals locals math
+math.order math.ranges math.vectors namespaces opengl random
+sequences timers ui ui.commands ui.gadgets ui.gadgets.worlds
+ui.gestures ui.pens.solid ui.render ui.text ;
+
 IN: pong
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! 
-! Inspired by this Ruby/Shoes version by why: http://gist.github.com/26431
-!
-! Which was based on this Nodebox version: http://billmill.org/pong.html
-! by Bill Mill.
-! 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+CONSTANT: BOUNCE 6/5
+CONSTANT: MAX-SPEED 6
+CONSTANT: BALL-SIZE 10
+CONSTANT: BALL-DIM ${ BALL-SIZE BALL-SIZE }
+CONSTANT: PADDLE-SIZE 80
+CONSTANT: PADDLE-DIM ${ PADDLE-SIZE 10 }
+CONSTANT: FONT $[
+    monospace-font
+        t >>bold?
+        COLOR: red >>foreground
+        COLOR: gray95 >>background
+    ]
 
-: clamp-to-interval ( x interval -- x )
-  [ from>> first max ] [ to>> first min ] bi ;
+TUPLE: ball pos vel ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+TUPLE: pong-gadget < gadget timer ball player computer game-over? ;
 
-TUPLE: <play-field> < <rectangle>    ;
-TUPLE: <paddle>     < <rectangle>    ;
+: initial-state ( gadget -- gadget )
+    T{ ball { pos { 50 50 } } { vel { 3 4 } } } clone >>ball
+    200 >>player
+    200 >>computer
+    f >>game-over? ;
 
-TUPLE: <computer>   < <paddle> { speed initial: 10 } ;
+DEFER: on-tick
 
-: computer-move-left  ( computer -- ) dup speed>> move-left-by  ;
-: computer-move-right ( computer -- ) dup speed>> move-right-by ;
+: <pong-gadget> ( -- gadget )
+    pong-gadget new initial-state
+        COLOR: gray95 <solid> >>interior
+        dup '[ _ on-tick ] f 16 milliseconds <timer> >>timer ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+M: pong-gadget pref-dim* drop { 400 400 } ;
 
-TUPLE: <ball> < <vel>
-  { diameter   initial: 20   }
-  { bounciness initial:  1.2 }
-  { max-speed  initial: 10   } ;
+M: pong-gadget ungraft*
+    [ timer>> stop-timer ] [ call-next-method ] bi ;
 
-: above-lower-bound? ( ball field -- ? ) bottom 50 - above? ;
-: below-upper-bound? ( ball field -- ? ) top    50 + below? ;
+M:: pong-gadget draw-gadget* ( PONG -- )
+    COLOR: gray80 gl-color
+    15 390 20 <range> [
+        197 2array { 10 6 } gl-fill-rect
+    ] each
 
-: in-bounds? ( ball field -- ? )
-  {
-    [ above-lower-bound? ]
-    [ below-upper-bound? ]
-  } 2&& ;
+    COLOR: black gl-color
+    { 0 0 } { 10 400 } gl-fill-rect
+    { 390 0 } { 10 400 } gl-fill-rect
 
-:: bounce-change-vertical-velocity ( BALL -- )
+    PONG computer>> 0 2array PADDLE-DIM gl-fill-rect
+    PONG player>> 390 2array PADDLE-DIM gl-fill-rect
+    PONG ball>> pos>> BALL-DIM gl-fill-rect
 
-  BALL vel>> y neg
-  BALL bounciness>> *
+    PONG game-over?>> [
+        FONT 48 >>size
+        PONG ball>> pos>> second 200 <
+        "YOU WIN!" "YOU LOSE!" ?
+        [ text-width 390 swap - 2 / 100 2array ]
+        [ '[ _ _ draw-text ] with-translation ] 2bi
+    ] [
+        PONG timer>> thread>> [
+            FONT 24 >>size
+            { "    N - New Game" "SPACE - Pause" }
+            [ text-width 390 swap - 2 / 100 2array ]
+            [ '[ _ _ draw-text ] with-translation ] 2bi
+        ] unless
+    ] if ;
 
-  BALL max-speed>> min
+:: move-player ( GADGET -- )
+    hand-loc get first PADDLE-SIZE 2 / -
+    10 390 PADDLE-SIZE - clamp GADGET player<< ;
 
-  BALL vel>> (y!) ;
+:: move-ball ( GADGET -- )
+    GADGET ball>> :> BALL
+
+    ! minimum movement to hit wall or paddle
+    BALL vel>> first dup 0 > 380 10 ?
+    BALL pos>> first - swap / 1 min
+    BALL vel>> second dup 0 > 380 10 ?
+    BALL pos>> second - swap / 1 min min :> movement
+
+    movement 0 > [ movement throw ] unless
+    BALL pos>> BALL vel>> movement v*n v+ BALL pos<< ;
+
+: move-computer-by ( GADGET N -- )
+    '[ _ + 10 390 PADDLE-SIZE - clamp ] change-computer drop ;
+
+:: move-computer ( GADGET -- )
+    GADGET ball>> pos>> first :> X
+    GADGET computer>> PADDLE-SIZE 2/ + :> COMPUTER
+
+    ! ball on the left
+    X BALL-SIZE + COMPUTER - dup 0 < [
+        >integer -10 max 0 [a,b] random
+        GADGET swap move-computer-by
+    ] [ drop ] if
+
+    ! ball on the right
+    X COMPUTER - dup 0 > [
+        >integer 10 min [0,b] random
+        GADGET swap move-computer-by
+    ] [ drop ] if ;
 
 :: bounce-off-paddle ( BALL PADDLE -- )
+    BALL pos>> first BALL-SIZE 2 / +
+    PADDLE PADDLE-SIZE 2 / + - 1/4 *
+    BALL vel>> second neg BOUNCE * MAX-SPEED min 2array
+    BALL vel<< ;
 
-   BALL bounce-change-vertical-velocity
+:: ?bounce-off-paddle ( BALL GADGET PADDLE -- )
+    BALL pos>> first dup BALL-SIZE +
+    PADDLE dup PADDLE-SIZE + '[ _ _ between? ] either? [
+        BALL PADDLE bounce-off-paddle
+    ] [
+        GADGET t >>game-over? timer>> stop-timer
+    ] if ;
 
-   BALL x   PADDLE center x   -   0.25 *   BALL vel>> (x!)
+: bounce-off-wall ( BALL -- )
+    0 swap vel>> [ neg ] change-nth ;
 
-   PADDLE top   BALL pos>> (y!) ;
+:: on-tick ( GADGET -- )
+    GADGET move-player
+    GADGET move-ball
+    GADGET move-computer
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: mouse-x ( -- x ) hand-loc get first ;
-
-:: valid-paddle-interval ( PADDLE PLAY-FIELD -- interval )
-    
-   PLAY-FIELD [ left ] [ right ] bi PADDLE width - [a,b] ;
-
-:: align-paddle-with-mouse ( PADDLE PLAY-FIELD -- )
-
-   mouse-x
-
-   PADDLE PLAY-FIELD valid-paddle-interval
-
-   clamp-to-interval
-
-   PADDLE pos>> (x!) ;
-   
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! Protocol for drawing PONG objects
-
-GENERIC: draw ( obj -- )
-
-METHOD: draw { <paddle> } [ bottom-left ] [ dim>>          ] bi rectangle ;
-METHOD: draw { <ball>   } [ pos>>       ] [ diameter>> 2 / ] bi circle    ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-TUPLE: <pong> < gadget paused field ball player computer ;
-
-: pong ( -- gadget )
-  <pong> new
-  T{ <play-field> { pos {   0   0 } } { dim { 400 400 } } } clone >>field
-  T{ <ball>       { pos {  50  50 } } { vel {   3   4 } } } clone >>ball
-  T{ <paddle>     { pos { 200 396 } } { dim {  75   4 } } } clone >>player
-  T{ <computer>   { pos { 200   0 } } { dim {  75   4 } } } clone >>computer ;
-
-M: <pong> pref-dim* ( <pong> -- dim ) drop { 400 400 } ;
-M: <pong> ungraft*  ( <pong> --     ) t >>paused drop  ;
-    
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-M:: <pong> draw-gadget* ( PONG -- )
-
-  PONG computer>> draw
-  PONG player>>   draw
-  PONG ball>>     draw ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-:: iterate-system ( GADGET -- )
-
-    GADGET field>>    :> FIELD
     GADGET ball>>     :> BALL
     GADGET player>>   :> PLAYER
     GADGET computer>> :> COMPUTER
 
-    BALL FIELD in-bounds? [
+    BALL pos>> first2 :> ( X Y )
+    BALL vel>> first2 :> ( DX DY )
 
-        PLAYER FIELD align-paddle-with-mouse
+    { [ DY 0 > ] [ Y 380 >= ] } 0&&
+    [ BALL GADGET PLAYER ?bounce-off-paddle ] when
 
-        BALL 1 move-for
+    { [ DY 0 < ] [ Y 10 <= ] } 0&&
+    [ BALL GADGET COMPUTER ?bounce-off-paddle ] when
 
-        ! computer reaction
+    X { [ 10 <= ] [ 380 >= ] } 1||
+    [ BALL bounce-off-wall ] when
 
-        BALL COMPUTER to-the-left-of?  [ COMPUTER computer-move-left  ] when
-        BALL COMPUTER to-the-right-of? [ COMPUTER computer-move-right ] when
+    GADGET relayout-1 ;
 
-        ! check if ball bounced off something
+: com-new-game ( gadget -- )
+    initial-state timer>> start-timer ;
 
-        ! player-blocked-ball?
-        BALL PLAYER { [ above? ] [ in-between-horizontally? ] } 2&&
-        [ BALL PLAYER   bounce-off-paddle  ] when
+: com-pause ( gadget -- )
+    dup game-over?>> [
+        dup timer>> dup thread>>
+        [ stop-timer ] [ restart-timer ] if
+    ] unless relayout-1 ;
 
-        ! computer-blocked-ball?
-        BALL COMPUTER { [ below? ] [ in-between-horizontally? ] } 2&&
-        [ BALL COMPUTER bounce-off-paddle  ] when
+pong-gadget "gestures" f {
+    { T{ key-down { sym "n" } } com-new-game }
+    { T{ key-down { sym " " } } com-pause }
+} define-command-map
 
-        ! bounced-off-wall?
-        BALL FIELD in-between-horizontally? not
-        [ BALL reverse-horizontal-velocity ] when
-
-    ] [ t GADGET paused<< ] if ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-:: start-pong-thread ( GADGET -- )
-  f GADGET paused<<
-  [
-    [
-      GADGET paused>>
-      [ f ]
-      [ GADGET iterate-system GADGET relayout-1 25 milliseconds sleep t ]
-      if
-    ]
-    loop
-  ]
-  in-thread ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: pong-window ( -- ) pong [ "PONG" open-window ] [ start-pong-thread ] bi ;
-
-: pong-main ( -- ) [ pong-window ] with-ui ;
-
-MAIN: pong-window
+MAIN-WINDOW: pong-window {
+    { title "PONG" }
+    { window-controls
+        { normal-title-bar close-button minimize-button } }
+    } <pong-gadget> >>gadgets ;

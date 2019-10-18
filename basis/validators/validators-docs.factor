@@ -3,7 +3,7 @@ strings ;
 IN: validators
 
 HELP: v-checkbox
-{ $values { "str" string } {  "?" boolean } }
+{ $values { "str" string } { "?" boolean } }
 { $description "Converts the string value of a checkbox component (either \"on\" or \"off\") to a boolean value." } ;
 
 HELP: v-captcha
@@ -40,7 +40,7 @@ HELP: v-max-value
 { $description "Throws an error if " { $snippet "x" } " is larger than " { $snippet "n" } "." } ;
 
 HELP: v-min-value
-{ $values { "x" integer } { "n" integer } }  
+{ $values { "x" integer } { "n" integer } }
 { $description "Throws an error if " { $snippet "x" } " is smaller than " { $snippet "n" } "." } ;
 
 HELP: v-mode

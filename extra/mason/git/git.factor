@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators.short-circuit continuations
-debugger io io.directories io.encodings.utf8 io.files
-io.launcher io.sockets io.streams.string kernel mason.common
-mason.email sequences splitting io.directories.hierarchy ;
+USING: accessors continuations debugger io io.directories
+io.directories.hierarchy io.encodings.utf8 io.files io.launcher
+io.sockets io.streams.string kernel mason.common mason.email sequences
+splitting ;
 IN: mason.git
 
 : git-id ( -- id )
@@ -20,7 +20,7 @@ IN: mason.git
     } ;
 
 : git-clone ( -- )
-    #! Must be run from builds-dir
+    ! Must be run from builds-dir
     "Cloning initial repository" print-timestamp
     git-clone-cmd try-output-process ;
 
@@ -53,24 +53,11 @@ IN: mason.git
         if
     ] [ rethrow ] if ;
 
-: with-process-reader* ( desc encoding quot -- )
-    [ <process-reader*> ] dip swap [ with-input-stream ] dip
-    dup wait-for-process dup { 0 1 } member?
-    [ 2drop ] [ process-failed ] if ; inline
-
 : git-status-cmd ( -- cmd )
-    { "git" "status" } ;
-
-: git-status-failed ( error -- )
-    #! Exit code 1 means there's nothing to commit.
-    dup { [ process-failed? ] [ code>> 1 = ] } 1&&
-    [ drop ] [ rethrow ] if ;
+    { "git" "status" "--porcelain" } ;
 
 : git-status ( -- seq )
-    [
-        git-status-cmd utf8 [ lines ] with-process-reader*
-        [ "#\t" head? ] filter
-    ] [ git-status-failed { } ] recover ;
+    git-status-cmd utf8 [ lines ] with-process-reader ;
 
 : check-repository ( -- seq )
     "factor" [ git-status ] with-directory ;
@@ -89,8 +76,8 @@ IN: mason.git
 
 PRIVATE>
 
-: git-pull ( -- id )
-    #! Must be run from builds-dir.
+: git-clone-or-pull ( -- id )
+    ! Must be run from builds-dir.
     "factor" exists? [
         check-repository [
             "factor" [

@@ -1,104 +1,15 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences arrays namespaces splitting
-vocabs.loader destructors assocs debugger continuations
-combinators combinators.short-circuit vocabs.refresh tools.time math math.parser
-present vectors hashtables
-io
-io.sockets
-io.sockets.secure
-io.encodings
-io.encodings.iana
-io.encodings.utf8
-io.encodings.ascii
-io.encodings.binary
-io.streams.limited
-io.streams.string
-io.streams.throwing
-io.servers
-io.timeouts
-io.crlf
-fry logging logging.insomniac calendar urls urls.encoding
-unicode.categories
-http
-http.parsers
-http.server.responses
-http.server.remapping
-html.templates
-html.streams
-html
-mime.types
-math.order
-peg
-xml.writer
-vocabs ;
-FROM: mime.multipart => parse-multipart ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit continuations debugger destructors fry
+hashtables html html.streams html.templates http
+http.server.remapping http.server.requests http.server.responses
+io io.crlf io.encodings io.encodings.ascii io.encodings.iana
+io.encodings.utf8 io.servers io.sockets io.sockets.secure
+io.streams.limited kernel logging logging.insomniac math
+mime.types namespaces present sequences splitting tools.time
+urls vectors vocabs vocabs.refresh xml.writer ;
 IN: http.server
-
-: check-absolute ( url -- url )
-    dup path>> "/" head? [ "Bad request: URL" throw ] unless ; inline
-
-: read-request-line ( request -- request )
-    read-?crlf [ dup "" = ] [ drop read-?crlf ] while
-    parse-request-line first3
-    [ >>method ] [ >url check-absolute >>url ] [ >>version ] tri* ;
-
-: read-request-header ( request -- request )
-    read-header >>header ;
-
-ERROR: no-boundary ;
-
-: parse-multipart-form-data ( string -- separator )
-    ";" split1 nip
-    "=" split1 nip [ no-boundary ] unless* ;
-
-SYMBOL: request-limit
-
-request-limit [ 64 1024 * ] initialize
-
-SYMBOL: upload-limit
-
-upload-limit [ 200,000,000 ] initialize
-
-: read-multipart-data ( request -- mime-parts )
-    [ "content-type" header ]
-    [ "content-length" header string>number ] bi
-    unlimited-input
-    upload-limit get [ min ] when* limited-input
-    binary decode-input
-    parse-multipart-form-data parse-multipart ;
-
-: read-content ( request -- bytes )
-    "content-length" header string>number read ;
-
-: parse-content ( request content-type -- post-data )
-    [ <post-data> swap ] keep {
-        { "multipart/form-data" [ read-multipart-data >>params ] }
-        { "application/x-www-form-urlencoded" [ read-content query>assoc >>params ] }
-        [ drop read-content >>data ]
-    } case ;
-
-: read-post-data ( request -- request )
-    dup method>> "POST" = [
-        dup dup "content-type" header
-        ";" split1 drop parse-content >>post-data
-    ] when ;
-
-: extract-host ( request -- request )
-    [ ] [ url>> ] [ "host" header parse-host ] tri
-    [ >>host ] [ >>port ] bi*
-    drop ;
-
-: extract-cookies ( request -- request )
-    dup "cookie" header [ parse-cookie >>cookies ] when* ;
-
-: read-request ( -- request )
-    <request>
-    read-request-line
-    read-request-header
-    read-post-data
-    extract-host
-    extract-cookies ;
 
 GENERIC: write-response ( response -- )
 
@@ -124,8 +35,8 @@ GENERIC: write-full-response ( request response -- )
     ] change-domain ;
 
 : write-response-header ( response -- response )
-    #! We send one set-cookie header per cookie, because that's
-    #! what Firefox expects.
+    ! We send one set-cookie header per cookie, because that's
+    ! what Firefox expects.
     dup header>> >alist >vector
     over unparse-content-type "content-type" pick set-at
     over cookies>> [
@@ -254,7 +165,7 @@ SYMBOL: params
     [
         local-address get
         [ secure? "https" "http" ? >>protocol ]
-        [ port>> remap-port '[ _ or ] change-port ]
+        [ port>> remap-port >>port ]
         bi
     ] change-url drop ;
 
@@ -286,8 +197,17 @@ LOG: httpd-benchmark DEBUG
 
 TUPLE: http-server < threaded-server ;
 
+SYMBOL: request-limit
+
+request-limit [ 64 1024 * ] initialize
+
+LOG: httpd-bad-request NOTICE
+
 : handle-client-error ( error -- )
-    dup { [ parse-error? ] [ got>> empty? ] } 1&& [ drop ] [ rethrow ] if ;
+    dup request-error? [
+        dup { [ bad-request-line? ] [ parse-error>> got>> empty? ] } 1&&
+        [ drop ] [ httpd-bad-request <400> write-response ] if
+    ] [ rethrow ] if ;
 
 M: http-server handle-client*
     drop [

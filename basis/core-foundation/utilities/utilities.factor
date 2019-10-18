@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math assocs kernel sequences byte-arrays strings
-hashtables alien destructors
-core-foundation.numbers core-foundation.strings
-core-foundation.arrays core-foundation.dictionaries
-core-foundation.data core-foundation ;
+USING: alien assocs byte-arrays core-foundation
+core-foundation.arrays core-foundation.data
+core-foundation.dictionaries core-foundation.numbers
+core-foundation.strings destructors hashtables kernel math
+sequences strings ;
 IN: core-foundation.utilities
 
 GENERIC: (>cf) ( obj -- cf )

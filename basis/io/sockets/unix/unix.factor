@@ -1,24 +1,27 @@
 ! Copyright (C) 2004, 2008 Slava Pestov, Ivan Tikhonov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-arrays classes.struct combinators destructors io.backend.unix
-io.encodings.utf8 io.files io.pathnames io.sockets.private kernel
-libc locals math namespaces sequences system unix
-unix.ffi vocabs ;
-EXCLUDE: io => read write ;
-EXCLUDE: io.sockets => accept ;
+byte-arrays classes.struct combinators destructors io.backend.unix
+io.encodings.ascii io.encodings.utf8 io.files io.pathnames io.sockets
+io.sockets.private kernel libc locals math namespaces sequences system
+unix unix.ffi vocabs ;
 IN: io.sockets.unix
 
 : socket-fd ( domain type protocol -- fd )
     socket dup io-error <fd> init-fd |dispose ;
 
+: get-socket-option ( fd level opt -- val )
+    [ handle-fd ] 2dip -1 int <ref> [
+        dup byte-length int <ref> getsockopt io-error
+    ] keep int deref ;
+
 : set-socket-option ( fd level opt -- )
     [ handle-fd ] 2dip 1 int <ref> dup byte-length setsockopt io-error ;
 
-M: unix addrinfo-error-string ( n -- string )
+M: unix addrinfo-error-string
     gai_strerror ;
 
-M: unix sockaddr-of-family ( alien af -- addrspec )
+M: unix sockaddr-of-family
     {
         { AF_INET [ sockaddr-in memory>struct ] }
         { AF_INET6 [ sockaddr-in6 memory>struct ] }
@@ -26,7 +29,7 @@ M: unix sockaddr-of-family ( alien af -- addrspec )
         [ 2drop f ]
     } case ;
 
-M: unix addrspec-of-family ( af -- addrspec )
+M: unix addrspec-of-family
     {
         { AF_INET [ T{ ipv4 } ] }
         { AF_INET6 [ T{ ipv6 } ] }
@@ -35,40 +38,32 @@ M: unix addrspec-of-family ( af -- addrspec )
     } case ;
 
 ! Client sockets - TCP and Unix domain
-M: object (get-local-address) ( handle remote -- sockaddr )
+M: object (get-local-address)
     [ handle-fd ] dip empty-sockaddr/size int <ref>
-    [ getsockname io-error ] 2keep drop ;
+    [ getsockname io-error ] keepd ;
 
-M: object (get-remote-address) ( handle local -- sockaddr )
+M: object (get-remote-address)
     [ handle-fd ] dip empty-sockaddr/size int <ref>
-    [ getpeername io-error ] 2keep drop ;
+    [ getpeername io-error ] keepd ;
 
 : init-client-socket ( fd -- )
     SOL_SOCKET SO_OOBINLINE set-socket-option ;
 
 : wait-to-connect ( port -- )
-    dup handle>> handle-fd f 0 write
-    {
-        { [ 0 = ] [ drop ] }
-        { [ errno EAGAIN = ] [ dup +output+ wait-for-port wait-to-connect ] }
-        { [ errno EINTR = ] [ wait-to-connect ] }
-        [ (io-error) ]
-    } cond ;
+    dup +output+ wait-for-port
+    dup handle>> SOL_SOCKET SO_ERROR get-socket-option
+    [ drop ] [ (throw-errno) ] if-zero ; inline
 
-M:: object establish-connection ( client-out remote -- )
-    client-out remote
-    [ drop ]
-    [
-        [ handle>> handle-fd ] [ make-sockaddr/size ] bi* connect
-    ] 2bi
-    {
-        { [ 0 = ] [ drop ] }
-        { [ errno EINTR = ] [ drop client-out remote establish-connection ] }
-        { [ errno EINPROGRESS = ] [
-            [ +output+ wait-for-port ] [ wait-to-connect ] bi
-        ] }
-        [ (io-error) ]
-    } cond ;
+M: object establish-connection
+    2dup
+    [ handle>> handle-fd ] [ make-sockaddr/size ] bi*
+    connect 0 = [ 2drop ] [
+        errno {
+            { EINTR [ establish-connection ] }
+            { EINPROGRESS [ drop wait-to-connect ] }
+            [ (throw-errno) ]
+        } case
+    ] if ;
 
 : ?bind-client ( socket -- )
     bind-local-address get [
@@ -78,7 +73,7 @@ M:: object establish-connection ( client-out remote -- )
         drop
     ] if* ; inline
 
-M: object ((client)) ( addrspec -- fd )
+M: object remote>handle
     [ protocol-family SOCK_STREAM ] [ protocol ] bi socket-fd
     [ init-client-socket ] [ ?bind-client ] [ ] tri ;
 
@@ -91,7 +86,7 @@ M: object ((client)) ( addrspec -- fd )
     [ init-server-socket ] keep
     [ handle-fd swap make-sockaddr/size [ bind ] unix-system-call drop ] keep ;
 
-M: object (server) ( addrspec -- handle )
+M: object (server)
     [
         SOCK_STREAM server-socket-fd
         dup handle-fd 128 [ listen ] unix-system-call drop
@@ -99,21 +94,23 @@ M: object (server) ( addrspec -- handle )
 
 : do-accept ( server addrspec -- fd sockaddr )
     [ handle>> handle-fd ] [ empty-sockaddr/size int <ref> ] bi*
-    [ accept ] 2keep drop ; inline
+    [ unix.ffi:accept ] keepd ; inline
 
-M: object (accept) ( server addrspec -- fd sockaddr )
-    2dup do-accept
-    {
-        { [ over 0 >= ] [ [ 2nip <fd> init-fd ] dip ] }
-        { [ errno EINTR = ] [ 2drop (accept) ] }
-        { [ errno EAGAIN = ] [
-            2drop
-            [ drop +input+ wait-for-port ]
-            [ (accept) ]
-            2bi
-        ] }
-        [ (io-error) ]
-    } cond ;
+M: object (accept)
+    2dup do-accept over 0 >= [
+        [ 2nip <fd> init-fd ] dip
+    ] [
+        errno {
+            { EINTR [ 2drop (accept) ] }
+            { EAGAIN [
+                2drop
+                [ drop +input+ wait-for-port ]
+                [ (accept) ]
+                2bi
+            ] }
+            [ (throw-errno) ]
+        } case
+    ] if ;
 
 ! Datagram sockets - UDP and Unix domain
 M: unix (datagram)
@@ -136,30 +133,30 @@ M: unix (broadcast)
     recvfrom sockaddr ; inline
 
 : (receive-loop) ( n buf datagram -- count sockaddr )
-    3dup do-receive over 0 > [ [ 3drop ] 2dip ] [
+    3dup do-receive over 0 > [ 3nipd ] [
         2drop [ +input+ wait-for-port ] [ (receive-loop) ] bi
     ] if ; inline recursive
 
-M: unix (receive-unsafe) ( n buf datagram -- count sockaddr )
+M: unix (receive-unsafe)
     (receive-loop) ;
 
 :: do-send ( packet sockaddr len socket datagram -- )
     socket handle-fd packet dup length 0 sockaddr len sendto
     0 < [
-        errno EINTR = [
-            packet sockaddr len socket datagram do-send
-        ] [
-            errno EAGAIN = [
+        errno {
+            { EINTR [
+                packet sockaddr len socket datagram do-send
+            ] }
+            { EAGAIN [
                 datagram +output+ wait-for-port
                 packet sockaddr len socket datagram do-send
-            ] [
-                (io-error)
-            ] if
-        ] if
+            ] }
+            [ (throw-errno) ]
+        } case
     ] when ; inline recursive
 
-M: unix (send) ( packet addrspec datagram -- )
-    [ make-sockaddr/size ] [ [ handle>> ] keep ] bi* do-send ;
+M: unix (send)
+    [ make-sockaddr/size-outgoing ] [ [ handle>> ] keep ] bi* do-send ;
 
 ! Unix domain sockets
 M: local protocol-family drop PF_UNIX ;
@@ -178,5 +175,9 @@ M: local make-sockaddr
 M: local parse-sockaddr
     drop
     path>> utf8 alien>string <local> ;
+
+M: unix host-name
+    256 [ <byte-array> dup ] keep gethostname io-error
+    ascii alien>string ;
 
 os linux? [ "io.sockets.unix.linux" require ] when

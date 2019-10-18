@@ -10,7 +10,7 @@ HELP: hexdump.
 
 HELP: hexdump
 { $values { "byte-array" byte-array } { "str" string } }
-{ $description "Converts a sequence to its hexadecimal and ASCII representation sixteen characters at a time.  Lines are separated by a newline character." }
+{ $description "Converts a sequence to its hexadecimal and ASCII representation sixteen characters at a time. Lines are separated by a newline character." }
 { $see-also hexdump. } ;
 
 ARTICLE: "tools.hexdump" "Hexdump"

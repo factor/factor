@@ -3,9 +3,8 @@ tools.test kernel io io.streams.plain definitions namespaces
 ui.gadgets ui.gadgets.grids prettyprint documents ui.gestures
 ui.gadgets.debug models documents.elements ui.gadgets.scrollers
 ui.gadgets.line-support sequences ;
-IN: ui.gadgets.editors.tests
 
-[ "foo bar" ] [
+{ "foo bar" } [
     <editor> "editor" set
     "editor" get [
         "foo bar" "editor" get set-editor-string
@@ -14,7 +13,7 @@ IN: ui.gadgets.editors.tests
     ] with-grafted-gadget
 ] unit-test
 
-[ "baz quux" ] [
+{ "baz quux" } [
     <editor> "editor" set
     "editor" get [
         "foo bar\nbaz quux" "editor" get set-editor-string
@@ -23,7 +22,7 @@ IN: ui.gadgets.editors.tests
     ] with-grafted-gadget
 ] unit-test
 
-[ ] [
+{ } [
     <editor> "editor" set
     "editor" get [
         "foo bar\nbaz quux" "editor" get set-editor-string
@@ -32,7 +31,7 @@ IN: ui.gadgets.editors.tests
     ] with-grafted-gadget
 ] unit-test
 
-[ "bar" ] [
+{ "bar" } [
     <editor> "editor" set
     "editor" get [
         "bar\nbaz quux" "editor" get set-editor-string
@@ -48,22 +47,21 @@ IN: ui.gadgets.editors.tests
     [ "hello" ] [ "field" get field-model>> value>> ] unit-test
 ] with-grafted-gadget
 
-[ "Hello world." ] [ "Hello    \n    world." join-lines ] unit-test
-[ "  Hello world.  " ] [ "  Hello    \n    world.  " join-lines ] unit-test
-[ "  Hello world. Goodbye." ] [ "  Hello    \n    world.  \n  Goodbye." join-lines ] unit-test
+{ "Hello world." } [ "Hello    \n    world." join-lines ] unit-test
+{ "  Hello world.  " } [ "  Hello    \n    world.  " join-lines ] unit-test
+{ "  Hello world. Goodbye." } [ "  Hello    \n    world.  \n  Goodbye." join-lines ] unit-test
 
-[ ] [ <editor> com-join-lines ] unit-test
-[ ] [ <editor> "A" over set-editor-string com-join-lines ] unit-test
-[ "A B" ] [ <editor> "A\nB" over set-editor-string [ com-join-lines ] [ editor-string ] bi ] unit-test
-[ "A B\nC\nD" ] [ <editor> "A\nB\nC\nD" over set-editor-string { 0 0 } over set-caret dup mark>caret [ com-join-lines ] [ editor-string ] bi ] unit-test
-[ "A\nB C\nD" ] [ <editor> "A\nB\nC\nD" over set-editor-string { 1 0 } over set-caret dup mark>caret [ com-join-lines ] [ editor-string ] bi ] unit-test
-[ "A\nB\nC D" ] [ <editor> "A\nB\nC\nD" over set-editor-string { 2 0 } over set-caret dup mark>caret [ com-join-lines ] [ editor-string ] bi ] unit-test
+{ } [ <editor> com-join-lines ] unit-test
+{ } [ <editor> "A" over set-editor-string com-join-lines ] unit-test
+{ "A B" } [ <editor> "A\nB" over set-editor-string [ com-join-lines ] [ editor-string ] bi ] unit-test
+{ "A B\nC\nD" } [ <editor> "A\nB\nC\nD" over set-editor-string { 0 0 } over set-caret dup mark>caret [ com-join-lines ] [ editor-string ] bi ] unit-test
+{ "A\nB C\nD" } [ <editor> "A\nB\nC\nD" over set-editor-string { 1 0 } over set-caret dup mark>caret [ com-join-lines ] [ editor-string ] bi ] unit-test
+{ "A\nB\nC D" } [ <editor> "A\nB\nC\nD" over set-editor-string { 2 0 } over set-caret dup mark>caret [ com-join-lines ] [ editor-string ] bi ] unit-test
 
-[ 2 ] [ <editor> 20 >>min-rows 20 >>min-cols pref-viewport-dim length ] unit-test
+{ 2 } [ <editor> 20 >>min-rows 20 >>min-cols pref-viewport-dim length ] unit-test
 
-[ 20 ] [
+{ 20 } [
     <editor> 20 >>min-rows 20 >>min-cols
     dup pref-viewport-dim >>dim
     visible-lines
 ] unit-test
-

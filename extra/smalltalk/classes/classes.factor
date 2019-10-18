@@ -8,7 +8,7 @@ SYMBOL: classes
 classes [ H{ } clone ] initialize
 
 : create-class ( class -- class )
-    "smalltalk.classes" create ;
+    "smalltalk.classes" create-word ;
 
 ERROR: no-class name ;
 

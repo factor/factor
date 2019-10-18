@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors calendar combinators delegate destructors io
-io.sockets io.sockets.private kernel namespaces present
-sequences summary system vocabs ;
+USING: accessors alien.libraries calendar combinators delegate
+destructors io io.sockets io.sockets.private kernel memoize namespaces
+openssl.libssl present sequences summary system vocabs ;
 IN: io.sockets.secure
 
 SYMBOL: secure-socket-timeout
@@ -17,7 +17,17 @@ HOOK: ssl-certificate-verification-supported? secure-socket-backend ( -- ? )
 M: object ssl-supported? f ;
 M: object ssl-certificate-verification-supported? f ;
 
-SINGLETONS: SSLv2 SSLv23 SSLv3 TLSv1 ;
+SINGLETONS: TLSv1 TLSv1.1 TLSv1.2 ;
+
+ERROR: no-tls-supported ;
+
+MEMO: best-tls-method ( -- class )
+    {
+        { [ "TLSv1_2_method" "libssl" dlsym? ] [ TLSv1.2 ] }
+        { [ "TLSv1_1_method" "libssl" dlsym? ] [ TLSv1.1 ] }
+        { [ "TLSv1_method" "libssl" dlsym? ] [ TLSv1 ] }
+        [ no-tls-supported ]
+    } cond ;
 
 TUPLE: secure-config
 method
@@ -30,7 +40,7 @@ ephemeral-key-bits ;
 
 : <secure-config> ( -- config )
     secure-config new
-        SSLv23 >>method
+        best-tls-method >>method
         1024 >>ephemeral-key-bits
         ssl-certificate-verification-supported? >>verify ;
 
@@ -44,16 +54,21 @@ HOOK: <secure-context> secure-socket-backend ( config -- context )
         with-disposal
     ] with-scope ; inline
 
-TUPLE: secure { addrspec read-only } ;
+TUPLE: secure
+    { addrspec read-only }
+    { hostname read-only } ;
 
 C: <secure> secure
 
 M: secure present addrspec>> present " (secure)" append ;
 
+M: secure (server) addrspec>> (server) ;
+
 CONSULT: inet secure addrspec>> ;
 
 M: secure resolve-host ( secure -- seq )
-    addrspec>> resolve-host [ <secure> ] map ;
+    [ addrspec>> resolve-host ] [ hostname>> ] bi
+    [ <secure> ] curry map ;
 
 HOOK: check-certificate secure-socket-backend ( host handle -- )
 

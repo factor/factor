@@ -1,25 +1,19 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.short-circuit arrays
-fry kernel layouts math namespaces sequences cpu.architecture
-math.bitwise math.order classes generalizations
-locals make alien.c-types io.binary grouping
-math.vectors.simd.intrinsics
-compiler.cfg
-compiler.cfg.registers
-compiler.cfg.utilities
-compiler.cfg.comparisons
-compiler.cfg.instructions
+USING: accessors alien.c-types combinators
+combinators.short-circuit compiler.cfg.instructions
+compiler.cfg.utilities compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.math
-compiler.cfg.value-numbering.graph
-compiler.cfg.value-numbering.rewrite ;
+compiler.cfg.value-numbering.rewrite cpu.architecture
+generalizations grouping io.binary kernel locals make math
+sequences ;
 IN: compiler.cfg.value-numbering.simd
 
 ! Some lame constant folding for SIMD intrinsics. Eventually this
 ! should be redone completely.
 
 : useless-shuffle-vector-imm? ( insn -- ? )
-    [ shuffle>> ] [ rep>> rep-length iota ] bi sequence= ;
+    [ shuffle>> ] [ rep>> rep-length <iota> ] bi sequence= ;
 
 : compose-shuffle-vector-imm ( outer inner -- insn' )
     2dup [ rep>> ] bi@ eq? [
@@ -91,8 +85,8 @@ M: ##gather-int-vector-2 rewrite rewrite-gather-vector-2 ;
 : rewrite-gather-vector-4 ( insn -- insn/f )
     dup { [ src1>> ] [ src2>> ] [ src3>> ] [ src4>> ] } cleave [ vreg>insn ] 4 napply
     {
-        { [ 4 ndup [ literal-insn? ] 4 napply and and and ] [ fold-gather-vector-4 ] }
-        [ 5 ndrop f ]
+        { [ 4dup [ literal-insn? ] 4 napply and and and ] [ fold-gather-vector-4 ] }
+        [ 5drop f ]
     } cond ;
 
 M: ##gather-vector-4 rewrite rewrite-gather-vector-4 ;
@@ -131,7 +125,7 @@ M: ##not-vector vector-not-src
 M: ##xor-vector vector-not-src
     dup src1>> vreg>insn ##fill-vector? [ src2>> ] [ src1>> ] if ;
 
-M: ##and-vector rewrite 
+M: ##and-vector rewrite
     {
         { [ dup src1>> vreg>insn vector-not? ] [
             {

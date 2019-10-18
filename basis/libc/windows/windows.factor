@@ -106,11 +106,11 @@ CONSTANT: SIGABRT_COMPAT  6
 
 LIBRARY: libc
 
-FUNCTION: int strerror_s ( char *buffer, size_t numberOfElements, int errnum ) ;
+FUNCTION: int strerror_s ( char *buffer, size_t numberOfElements, int errnum )
 
 M: windows strerror ( errno -- str )
     [
         [ 1024 [ malloc &free ] keep ] dip
-        [ strerror_s drop ] 3keep 2drop
+        [ strerror_s drop ] keepdd
         utf8 alien>string
     ] with-destructors ;

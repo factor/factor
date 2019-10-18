@@ -8,13 +8,11 @@ IN: glib.ffi
 
 LIBRARY: glib
 
-<<
-"glib" {
-    { [ os windows? ] [ "libglib-2.0-0.dll" cdecl add-library ] }
-    { [ os macosx? ] [ "libglib-2.0.0.dylib" cdecl add-library ] }
-    { [ os unix? ] [ "libglib-2.0.so" cdecl add-library ] }
-} cond
->>
+<< "glib" {
+    { [ os windows? ] [ "libglib-2.0-0.dll" ] }
+    { [ os macosx? ] [ "libglib-2.0.dylib" ] }
+    { [ os unix? ] [ "libglib-2.0.so" ] }
+} cond cdecl add-library >>
 
 IMPLEMENT-STRUCTS: GError GPollFD GSource GSourceFuncs ;
 
@@ -36,9 +34,9 @@ GIR: vocab:glib/GLib-2.0.gir
 DESTRUCTOR: g_source_unref
 DESTRUCTOR: g_free
 
-CALLBACK: gboolean GSourceFuncsPrepareFunc ( GSource* source, gint* timeout_ ) ;
-CALLBACK: gboolean GSourceFuncsCheckFunc ( GSource* source ) ;
-CALLBACK: gboolean GSourceFuncsDispatchFunc ( GSource* source, GSourceFunc callback, gpointer user_data ) ;
+CALLBACK: gboolean GSourceFuncsPrepareFunc ( GSource* source, gint* timeout_ )
+CALLBACK: gboolean GSourceFuncsCheckFunc ( GSource* source )
+CALLBACK: gboolean GSourceFuncsDispatchFunc ( GSource* source, GSourceFunc callback, gpointer user_data )
 
 ERROR: g-error domain code message ;
 

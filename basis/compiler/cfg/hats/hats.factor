@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays byte-arrays classes.algebra
-combinators.short-circuit kernel layouts math namespaces
-sequences combinators splitting parser effects words
-cpu.architecture compiler.constants compiler.cfg.registers
-compiler.cfg.instructions compiler.cfg.instructions.syntax ;
+USING: accessors alien byte-arrays classes.algebra combinators
+compiler.cfg.instructions compiler.cfg.instructions.syntax
+compiler.cfg.registers compiler.constants effects kernel layouts
+math namespaces parser sequences splitting words ;
 IN: compiler.cfg.hats
 
 <<
@@ -12,7 +11,7 @@ IN: compiler.cfg.hats
 <PRIVATE
 
 : hat-name ( insn -- word )
-    name>> "##" ?head drop "^^" prepend create-in ;
+    name>> "##" ?head drop "^^" prepend create-word-in ;
 
 : hat-quot ( insn -- quot )
     [
@@ -27,7 +26,7 @@ IN: compiler.cfg.hats
 
 : hat-effect ( insn -- effect )
     "insn-slots" word-prop
-    [ type>> { def temp } member-eq? not ] filter [ name>> ] map
+    [ type>> { def temp } member-eq? ] reject [ name>> ] map
     { "vreg" } <effect> ;
 
 : define-hat ( insn -- )

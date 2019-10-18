@@ -25,12 +25,12 @@ M: sequence write-resp ( sequence -- )
 
 PRIVATE>
 
-#! Connection
+! Connection
 : quit ( -- ) { "QUIT" } write-resp ;
 : ping ( -- ) { "PING" } write-resp ;
 : auth ( password -- ) 1array "AUTH" write-command ;
 
-#! String values
+! String values
 : set ( value key -- ) 2array "SET" write-command ;
 : get ( key -- ) 1array "GET" write-command ;
 : getset ( value key -- ) 2array "GETSET" write-command ;
@@ -44,7 +44,7 @@ PRIVATE>
 : del ( key -- ) 1array "DEL" write-command ;
 : type ( key -- ) 1array "TYPE" write-command ;
 
-#! Key space
+! Key space
 : keys ( pattern -- ) 1array "KEYS" write-command ;
 : randomkey ( -- ) { "RANDOMKEY" } write-resp ;
 : rename ( newkey key -- ) 2array "RENAME" write-command ;
@@ -52,21 +52,21 @@ PRIVATE>
 : dbsize ( -- ) { "DBSIZE" } write-resp ;
 : expire ( integer key -- ) 2array "EXPIRE" write-command ;
 
-#! Lists
+! Lists
 : rpush ( value key -- ) 2array "RPUSH" write-command ;
 : lpush ( value key -- ) 2array "LPUSH" write-command ;
 : llen ( key -- ) 1array "LLEN" write-command ;
 : lrange ( start end key -- )
-    [ swap ] dip 3array "LRANGE" write-command ;
+    swapd 3array "LRANGE" write-command ;
 : ltrim ( start end key -- )
-    [ swap ] dip 3array "LTRIM" write-command ;
+    swapd 3array "LTRIM" write-command ;
 : lindex ( integer key -- ) 2array "LINDEX" write-command ;
 : lset ( value index key -- ) 3array "LSET" write-command ;
 : lrem ( value amount key -- ) 3array "LREM" write-command ;
 : lpop ( key -- ) 1array "LPOP" write-command ;
 : rpop ( key -- ) 1array "RPOP" write-command ;
 
-#! Sets
+! Sets
 : sadd ( member key -- ) 2array "SADD" write-command ;
 : srem  ( member key -- ) 2array "SREM" write-command ;
 : smove ( member newkey key -- )
@@ -82,7 +82,7 @@ PRIVATE>
     [ reverse ] dip suffix "SUNIONSTORE" write-command ;
 : smembers ( key -- ) 1array "SMEMBERS" write-command ;
 
-#! Hashes
+! Hashes
 : hdel ( field key -- ) 2array "HDEL" write-command ;
 : hexists ( field key -- ) 2array "HEXISTS" write-command ;
 : hget ( field key -- ) 2array "HGET" write-command ;
@@ -103,21 +103,22 @@ PRIVATE>
     3array "HSETNX" write-command ;
 : hvals ( key -- ) 1array "HVALS" write-command ;
 
-#! Multiple db
+! Multiple db
 : select ( integer -- ) 1array "SELECT" write-command ;
 : move ( integer key -- ) 2array "MOVE" write-command ;
+: swapdb ( old new -- ) 2array "SWAPDB" write-command ;
 : flushdb ( -- ) { "FLUSHDB" } write-resp ;
 : flushall ( -- ) { "FLUSHALL" } write-resp ;
 
-#! Sorting
+! Sorting
 ! sort
 
-#! Persistence control
+! Persistence control
 : save ( -- ) { "SAVE" } write-resp ;
 : bgsave ( -- ) { "BGSAVE" } write-resp ;
 : lastsave ( -- ) { "LASTSAVE" } write-resp ;
 : shutdown ( -- ) { "SHUTDOWN" } write-resp ;
 
-#! Remote server control
+! Remote server control
 : info ( -- ) { "INFO" } write-resp ;
 : monitor ( -- ) { "MONITOR" } write-resp ;

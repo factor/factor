@@ -1,52 +1,61 @@
 ! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays calendar combinators.short-circuit fry
-continuations debugger io.directories io.files io.launcher
-io.pathnames io.encodings.ascii kernel make mason.common
-mason.config mason.platform mason.report mason.notify namespaces
-sequences quotations macros system combinators splitting ;
+USING: accessors arrays calendar combinators
+combinators.short-circuit continuations fry io.directories
+io.launcher io.pathnames kernel layouts macros make mason.config
+mason.notify mason.platform mason.report math.parser namespaces
+quotations sequences splitting system system-info ;
 IN: mason.child
-
-: nmake-cmd ( -- args )
-    { "nmake" "/f" "nmakefile" }
-    target-cpu get name>> "." split "-" join suffix ;
 
 : gnu-make-cmd ( -- args )
     gnu-make
     target-os get name>> target-cpu get name>> (platform)
     2array ;
 
-: make-cmd ( -- args )
-    {
-        { [ target-os get windows = ] [ nmake-cmd ] }
-        [ gnu-make-cmd ]
-    } cond ;
+HOOK: compile-factor-command os ( -- array )
+M: unix compile-factor-command ( -- array )
+    gnu-make-cmd ;
 
-: make-vm ( -- )
+! Windows has separate 32/64 bit shells, so assuming the cell bits here is fine
+! because it won't find the right toolchain otherwise.
+M: windows compile-factor-command ( -- array )
+    { "nmake" "/f" "NMakefile" } cell-bits 64 = "x86-64-vista" "x86-32-vista" ? suffix ;
+
+HOOK: factor-path os ( -- path )
+M: unix factor-path "./factor" ;
+M: windows factor-path "./factor.com" ;
+
+: make-mason-child-vm ( -- )
     "factor" [
         <process>
-            make-cmd >>command
+            compile-factor-command >>command
             "../compile-log" >>stdout
             +stdout+ >>stderr
             +new-group+ >>group
         try-process
     ] with-directory ;
 
-: factor-vm ( -- string )
-    target-os get windows = "./factor.com" "./factor" ? ;
+! On windows, process launches relative to current process, ignoring
+! current-directory variables. Must pass absolute-path of factor.com
+: mason-child-vm ( -- string )
+    target-os get windows = [
+        "./factor.com" absolute-path
+    ] [
+        "./factor"
+    ] if ;
 
-: boot-cmd ( -- cmd )
+: mason-child-boot-cmd ( -- cmd )
     [
-        factor-vm ,
-        "-i=" boot-image-name append ,
+        mason-child-vm ,
+        "-i=" target-boot-image-name append ,
         "-no-user-init" ,
         boot-flags get %
     ] { } make ;
 
-: boot ( -- )
+: bootstrap-mason-child ( -- )
     "factor" [
         <process>
-            boot-cmd >>command
+            mason-child-boot-cmd >>command
             +closed+ >>stdin
             "../boot-log" >>stdout
             +stdout+ >>stderr
@@ -55,16 +64,16 @@ IN: mason.child
         try-process
     ] with-directory ;
 
-: test-cmd ( -- cmd ) factor-vm "-run=mason.test" 2array ;
+: mason-child-test-cmd ( -- cmd ) mason-child-vm "-run=mason.test" 2array ;
 
-: test ( -- )
+: test-mason-child ( -- )
     "factor" [
         <process>
-            test-cmd >>command
+            mason-child-test-cmd >>command
             +closed+ >>stdin
             "../test-log" >>stdout
             +stdout+ >>stderr
-            4 hours >>timeout
+            6 hours >>timeout
             +new-group+ >>group
         try-process
     ] with-directory ;
@@ -72,7 +81,7 @@ IN: mason.child
 : recover-else ( try catch else -- )
     [ [ '[ @ f t ] ] [ '[ @ f ] ] bi* recover ] dip '[ drop @ ] when ; inline
 
-MACRO: recover-cond ( alist -- )
+MACRO: recover-cond ( alist -- quot )
     dup { [ length 1 = ] [ first callable? ] } 1&&
     [ first ] [
         [ first first2 ] [ rest ] bi
@@ -81,8 +90,8 @@ MACRO: recover-cond ( alist -- )
 
 : build-child ( -- status )
     {
-        { [ notify-make-vm make-vm ] [ compile-failed ] }
-        { [ notify-boot boot ] [ boot-failed ] }
-        { [ notify-test test ] [ test-failed ] }
+        { [ notify-make-vm make-mason-child-vm ] [ compile-failed ] }
+        { [ notify-boot bootstrap-mason-child ] [ boot-failed ] }
+        { [ notify-test test-mason-child ] [ test-failed ] }
         [ success ]
     } recover-cond ;

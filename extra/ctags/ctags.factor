@@ -4,41 +4,29 @@
 ! Simple Ctags generator
 ! Alfredo Beaumont <alfredo.beaumont@gmail.com>
 
-USING: arrays kernel sequences io io.files io.backend
-io.encodings.ascii math.parser vocabs definitions
-namespaces make words sorting present ;
+USING: assocs definitions io.backend io.encodings.ascii io.files
+kernel make math.parser present sequences sorting vocabs ;
 IN: ctags
 
-: ctag-word ( ctag -- word )
-    first ;
+<PRIVATE
 
-: ctag-path ( ctag -- path )
-    second first ;
+: locations ( words -- alist )
+    [ dup where ] { } map>assoc sift-values ;
 
-: ctag-lineno ( ctag -- n )
-    second second ;
-
-: ctag ( seq -- str )
+: ctag ( word path lineno -- str )
     [
-        dup ctag-word present %
-        "\t" %
-        dup ctag-path normalize-path %
-        "\t" %
-        ctag-lineno number>string %
+        [ present % CHAR: \t , ]
+        [ normalize-path % CHAR: \t , ]
+        [ number>string % ] tri*
     ] "" make ;
 
-: ctag-strings ( alist -- seq )
-    [ ctag ] map ;
+: make-ctags ( alist -- seq )
+    [ first2 ctag ] { } assoc>map ;
 
-: ctags-write ( seq path -- )
-    [ ctag-strings ] dip ascii set-file-lines ;
+PRIVATE>
 
-: (ctags) ( -- seq )
-    all-words [
-        dup where [
-            2array
-        ] when*
-    ] map [ sequence? ] filter ;
+: ctags ( -- ctags )
+    all-words locations sort-keys make-ctags ;
 
-: ctags ( path -- )
-    (ctags) sort-keys swap ctags-write ;
+: write-ctags ( path -- )
+    [ ctags ] dip ascii set-file-lines ;

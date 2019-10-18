@@ -1,21 +1,16 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences combinators fry
-classes.algebra namespaces assocs words math math.private
-math.partial-dispatch math.intervals classes classes.tuple
-classes.tuple.private layouts definitions stack-checker.dependencies
-stack-checker.branches
-compiler.utilities
-compiler.tree
-compiler.tree.combinators
-compiler.tree.propagation.info
-compiler.tree.propagation.branches ;
+USING: accessors classes classes.algebra combinators compiler.tree
+compiler.tree.combinators compiler.tree.propagation.branches
+compiler.tree.propagation.info compiler.utilities fry kernel layouts
+math math.intervals math.partial-dispatch math.private namespaces
+sequences stack-checker.branches stack-checker.dependencies words ;
 IN: compiler.tree.cleanup
 
 GENERIC: delete-node ( node -- )
 
 M: #call-recursive delete-node
-    dup label>> calls>> [ node>> eq? not ] with filter! drop ;
+    dup label>> calls>> [ node>> eq? ] with reject! drop ;
 
 M: #return-recursive delete-node
     label>> f >>return drop ;
@@ -24,12 +19,10 @@ M: node delete-node drop ;
 
 : delete-nodes ( nodes -- ) [ delete-node ] each-node ;
 
-GENERIC: cleanup* ( node -- node/nodes )
+GENERIC: cleanup-tree* ( node -- node/nodes )
 
-: cleanup ( nodes -- nodes' )
-    #! We don't recurse into children here, instead the methods
-    #! do it since the logic is a bit more involved
-    [ cleanup* ] map-flat ;
+: cleanup-tree ( nodes -- nodes' )
+    [ cleanup-tree* ] map-flat ;
 
 ! Constant folding
 : cleanup-folding? ( #call -- ? )
@@ -37,8 +30,6 @@ GENERIC: cleanup* ( node -- node/nodes )
     [ f ] [ [ literal?>> ] all? ] if-empty ;
 
 : (cleanup-folding) ( #call -- nodes )
-    #! Replace a #call having a known result with a #drop of its
-    #! inputs followed by #push nodes for the outputs.
     [
         [ node-output-infos ] [ out-d>> ] bi
         [ [ literal>> ] dip <#push> ] 2map
@@ -60,7 +51,7 @@ GENERIC: cleanup* ( node -- node/nodes )
 : record-folding ( #call -- )
     dup word>> predicate?
     [ record-predicate-folding ]
-    [ word>> add-depends-on-definition ]
+    [ word>> +definition+ depends-on ]
     if ;
 
 : cleanup-folding ( #call -- nodes )
@@ -77,10 +68,10 @@ GENERIC: cleanup* ( node -- node/nodes )
 : record-inlining ( #call -- )
     dup method>>
     [ add-method-dependency ]
-    [ word>> add-depends-on-definition ] if ;
+    [ word>> +definition+ depends-on ] if ;
 
 : cleanup-inlining ( #call -- nodes )
-    [ record-inlining ] [ body>> cleanup ] bi ;
+    [ record-inlining ] [ body>> cleanup-tree ] bi ;
 
 ! Removing overflow checks
 : (remove-overflow-check?) ( #call -- ? )
@@ -92,15 +83,18 @@ GENERIC: cleanup* ( node -- node/nodes )
 
 : remove-overflow-check? ( #call -- ? )
     {
-        { [ dup word>> \ fixnum-shift eq? ] [ [ (remove-overflow-check?) ] [ small-shift? ] bi and ] }
+        {
+            [ dup word>> \ fixnum-shift eq? ]
+            [ [ (remove-overflow-check?) ] [ small-shift? ] bi and ]
+        }
         { [ dup word>> no-overflow-variant ] [ (remove-overflow-check?) ] }
         [ drop f ]
     } cond ;
 
 : remove-overflow-check ( #call -- #call )
-    [ no-overflow-variant ] change-word cleanup* ;
+    [ no-overflow-variant ] change-word cleanup-tree* ;
 
-M: #call cleanup*
+M: #call cleanup-tree*
     {
         { [ dup body>> ] [ cleanup-inlining ] }
         { [ dup cleanup-folding? ] [ cleanup-folding ] }
@@ -117,8 +111,6 @@ M: #call cleanup*
     ] change-children drop ;
 
 : fold-only-branch ( #branch -- node/nodes )
-    #! If only one branch is live we don't need to branch at
-    #! all; just drop the condition value.
     dup live-children sift dup length {
         { 0 [ drop in-d>> <#drop> ] }
         { 1 [ first swap in-d>> <#drop> prefix ] }
@@ -128,9 +120,9 @@ M: #call cleanup*
 SYMBOL: live-branches
 
 : cleanup-children ( #branch -- )
-    [ [ cleanup ] map ] change-children drop ;
+    [ [ cleanup-tree ] map ] change-children drop ;
 
-M: #branch cleanup*
+M: #branch cleanup-tree*
     {
         [ delete-unreachable-branches ]
         [ cleanup-children ]
@@ -154,8 +146,8 @@ M: #branch cleanup*
         [ drop ]
     } case ;
 
-M: #phi cleanup*
-    #! Remove #phi function inputs which no longer exist.
+M: #phi cleanup-tree*
+    ! Remove #phi function inputs which no longer exist.
     live-branches get
     [ '[ _ sift-children ] change-phi-in-d ]
     [ '[ _ sift-children ] change-phi-info-d ]
@@ -166,18 +158,16 @@ M: #phi cleanup*
 : >copy ( node -- #copy ) [ in-d>> ] [ out-d>> ] bi <#copy> ;
 
 : flatten-recursive ( #recursive -- nodes )
-    #! convert #enter-recursive and #return-recursive into
-    #! #copy nodes.
     child>>
     unclip >copy prefix
     unclip-last >copy suffix ;
 
-M: #recursive cleanup*
-    #! Inline bodies of #recursive blocks with no calls left.
-    [ cleanup ] change-child
+M: #recursive cleanup-tree*
+    ! Inline bodies of #recursive blocks with no calls left.
+    [ cleanup-tree ] change-child
     dup label>> calls>> empty? [ flatten-recursive ] when ;
 
-M: #alien-callback cleanup*
-    [ cleanup ] change-child ;
+M: #alien-callback cleanup-tree*
+    [ cleanup-tree ] change-child ;
 
-M: node cleanup* ;
+M: node cleanup-tree* ;

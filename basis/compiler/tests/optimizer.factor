@@ -2,17 +2,17 @@ USING: accessors arrays compiler.units generic hashtables
 stack-checker kernel kernel.private math prettyprint sequences
 sbufs strings tools.test vectors words sequences.private
 quotations classes classes.algebra classes.tuple.private
-continuations growable namespaces hints alien.accessors
+continuations growable memory namespaces hints alien.accessors
 compiler.tree.builder compiler.tree.optimizer sequences.deep
 compiler.test definitions generic.single shuffle math.order
 compiler.cfg.debugger classes.struct alien.syntax alien.data
-alien.c-types ;
+alien.c-types splitting ;
 IN: compiler.tests.optimizer
 
 GENERIC: xyz ( obj -- obj )
 M: array xyz xyz ;
 
-[ t ] [ M\ array xyz optimized? ] unit-test
+[ t ] [ M\ array xyz word-optimized? ] unit-test
 
 ! Test predicate inlining
 : pred-test-1 ( a -- b c )
@@ -92,12 +92,12 @@ TUPLE: pred-test ;
 : double-label-2 ( a -- b )
     dup array? [ ] [ ] if 0 t double-label-1 ;
 
-[ 0 ] [ 10 iota double-label-2 ] unit-test
+[ 0 ] [ 10 <iota> double-label-2 ] unit-test
 
 ! regression
 GENERIC: void-generic ( obj -- * )
 : breakage ( -- * ) "hi" void-generic ;
-[ t ] [ \ breakage optimized? ] unit-test
+[ t ] [ \ breakage word-optimized? ] unit-test
 [ breakage ] must-fail
 
 ! regression
@@ -122,7 +122,7 @@ GENERIC: void-generic ( obj -- * )
 ! compiling <tuple> with a non-literal class failed
 : <tuple>-regression ( class -- tuple ) <tuple> ;
 
-[ t ] [ \ <tuple>-regression optimized? ] unit-test
+[ t ] [ \ <tuple>-regression word-optimized? ] unit-test
 
 ! regression
 : constant-fold-2 ( -- value ) f ; foldable
@@ -203,7 +203,7 @@ M: number detect-number ;
 : node-successor-f-bug ( x -- * )
     [ 3 throw ] [ empty-compound ] compose [ 3 throw ] if ;
 
-[ t ] [ \ node-successor-f-bug optimized? ] unit-test
+[ t ] [ \ node-successor-f-bug word-optimized? ] unit-test
 
 [ ] [ [ new ] build-tree optimize-tree drop ] unit-test
 
@@ -217,7 +217,7 @@ M: number detect-number ;
         ] if
     ] if ;
 
-[ t ] [ \ lift-throw-tail-regression optimized? ] unit-test
+[ t ] [ \ lift-throw-tail-regression word-optimized? ] unit-test
 [ 3 "an integer" ] [ 3 lift-throw-tail-regression ] unit-test
 [ "hi" "a string" ] [ "hi" lift-throw-tail-regression ] unit-test
 
@@ -248,7 +248,7 @@ HINTS: recursive-inline-hang array ;
 : recursive-inline-hang-1 ( -- a )
     { } recursive-inline-hang ;
 
-[ t ] [ \ recursive-inline-hang-1 optimized? ] unit-test
+[ t ] [ \ recursive-inline-hang-1 word-optimized? ] unit-test
 
 DEFER: recursive-inline-hang-3
 
@@ -302,7 +302,7 @@ PREDICATE: list < improper-list
     dup "a" get { array-capacity } declare >=
     [ dup "b" get { array-capacity } declare >= [ 3 ] [ 4 ] if ] [ 5 ] if ;
 
-[ t ] [ \ interval-inference-bug optimized? ] unit-test
+[ t ] [ \ interval-inference-bug word-optimized? ] unit-test
 
 [ ] [ 1 "a" set 2 "b" set ] unit-test
 [ 2 3 ] [ 2 interval-inference-bug ] unit-test
@@ -337,7 +337,7 @@ TUPLE: some-tuple x ;
 [ 5 ] [ { 1 2 { 3 { 4 5 } } } deep-find-test ] unit-test
 [ f ] [ { 1 2 { 3 { 4 } } } deep-find-test ] unit-test
 
-[ B{ 0 1 2 3 4 5 6 7 } ] [ [ 8 iota [ ] B{ } map-as ] compile-call ] unit-test
+[ B{ 0 1 2 3 4 5 6 7 } ] [ [ 8 <iota> [ ] B{ } map-as ] compile-call ] unit-test
 
 [ 0 ] [ 1234 [ { fixnum } declare -64 shift ] compile-call ] unit-test
 
@@ -364,7 +364,7 @@ DEFER: loop-bbb
 
 : broken-declaration ( -- ) \ + declare ;
 
-[ f ] [ \ broken-declaration optimized? ] unit-test
+[ f ] [ \ broken-declaration word-optimized? ] unit-test
 
 [ ] [ [ \ broken-declaration forget ] with-compilation-unit ] unit-test
 
@@ -384,22 +384,6 @@ DEFER: loop-bbb
 
 [ 1 ] [ 257 modular-arithmetic-bug ] unit-test
 [ -10 ] [ -10 modular-arithmetic-bug ] unit-test
-
-! Optimizer needs to ignore invalid generics
-GENERIC# bad-dispatch-position-test* 3 ( -- )
-
-M: object bad-dispatch-position-test* ;
-
-: bad-dispatch-position-test ( -- ) bad-dispatch-position-test* ;
-
-[ 1 2 3 4 bad-dispatch-position-test ] must-fail
-
-[ ] [
-    [
-        \ bad-dispatch-position-test forget
-        \ bad-dispatch-position-test* forget
-    ] with-compilation-unit
-] unit-test
 
 [ 16 ] [
     [
@@ -462,4 +446,9 @@ STRUCT: BitmapData { Scan0 void* } ;
         [ BitmapData memory>struct ALIEN: 123 >>Scan0 drop ]
         with-out-parameters Scan0>>
     ] compile-call
+] unit-test
+
+! #1187
+{ } [
+    10 [ [ minor-gc split-slice ] ignore-errors ] times
 ] unit-test

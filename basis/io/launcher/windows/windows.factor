@@ -1,14 +1,15 @@
 ! Copyright (C) 2007, 2010 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data arrays assocs
-classes classes.struct combinators concurrency.flags
-continuations debugger destructors init io io.backend
-io.backend.windows io.files io.files.private io.files.windows
-io.launcher io.pathnames io.pipes io.pipes.windows io.ports
-kernel libc locals make math namespaces prettyprint sequences
-specialized-arrays splitting splitting.monotonic
-strings system threads windows windows.errors windows.handles
-windows.kernel32 windows.types combinators.short-circuit ;
+classes classes.struct combinators combinators.short-circuit
+concurrency.flags continuations debugger destructors init io
+io.backend io.backend.windows io.files io.files.private
+io.files.windows io.launcher io.launcher.private io.pathnames
+io.pipes io.pipes.windows io.ports kernel libc literals locals
+make math namespaces prettyprint sequences specialized-arrays
+splitting splitting.monotonic strings system threads windows
+windows.errors windows.handles windows.kernel32 windows.types
+windows.user32 ;
 SPECIALIZED-ARRAY: ushort
 SPECIALIZED-ARRAY: void*
 IN: io.launcher.windows
@@ -63,10 +64,10 @@ TUPLE: CreateProcess-args
     [
         { [ drop CHAR: \ = ] [ nip "\\\"" member? ] } 2&&
     ] monotonic-split [
-        dup last CHAR: " = [
+        dup last CHAR: \" = [
             dup length 1 > [
                 ! String of backslashes + double-quote
-                length 1 - 2 * CHAR: \ <repetition> "\\\"" append
+                length 1 - 2 * CHAR: \\ <repetition> "\\\"" append
             ] [
                 ! Single double-quote
                 drop "\\\""
@@ -107,7 +108,14 @@ TUPLE: CreateProcess-args
 : fill-dwCreateFlags ( process args -- process args )
     0
     pick pass-environment? [ CREATE_UNICODE_ENVIRONMENT bitor ] when
-    pick detached>> os windows? and [ DETACHED_PROCESS bitor ] when
+    pick group>> [
+        {
+            { +same-group+ [ ] }
+            { +new-session+ [ DETACHED_PROCESS bitor CREATE_NEW_PROCESS_GROUP bitor ] }
+            { +new-group+ [ DETACHED_PROCESS bitor CREATE_NEW_PROCESS_GROUP bitor ] }
+            [ drop ]
+        } case
+    ] when*
     pick lookup-priority [ bitor ] when*
     >>dwCreateFlags ;
 
@@ -122,7 +130,13 @@ TUPLE: CreateProcess-args
     ] when ;
 
 : fill-startup-info ( process args -- process args )
-    dup lpStartupInfo>> STARTF_USESTDHANDLES >>dwFlags drop ;
+    over hidden>> [ dup lpStartupInfo>> ] dip
+    [
+        flags{ STARTF_USESTDHANDLES STARTF_USESHOWWINDOW } >>dwFlags
+        SW_HIDE >>wShowWindow
+    ] [
+        STARTF_USESTDHANDLES >>dwFlags
+    ] if drop ;
 
 : make-CreateProcess-args ( process -- args )
     default-CreateProcess-args
@@ -132,7 +146,7 @@ TUPLE: CreateProcess-args
     fill-startup-info
     nip ;
 
-M: windows current-process-handle ( -- handle )
+M: windows (current-process) ( -- handle )
     GetCurrentProcessId ;
 
 ERROR: launch-error process error ;
@@ -143,12 +157,12 @@ M: launch-error error.
     "Launch descriptor:" print nl
     process>> . ;
 
-M: windows kill-process* ( process -- )
+M: windows (kill-process) ( process -- )
     handle>> hProcess>> 255 TerminateProcess win32-error=0/f ;
 
 : dispose-process ( process-information -- )
-    #! From MSDN: "Handles in PROCESS_INFORMATION must be closed
-    #! with CloseHandle when they are no longer needed."
+    ! From MSDN: "Handles in PROCESS_INFORMATION must be closed
+    ! with CloseHandle when they are no longer needed."
     [ hProcess>> [ CloseHandle drop ] when* ]
     [ hThread>> [ CloseHandle drop ] when* ] bi ;
 
@@ -162,7 +176,7 @@ M: windows kill-process* ( process -- )
     over handle>> dispose-process
     notify-exit ;
 
-M: windows wait-for-processes ( -- ? )
+M: windows (wait-for-processes) ( -- ? )
     processes get keys dup
     [ handle>> hProcess>> ] void*-array{ } map-as
     [ length ] keep 0 0
@@ -264,21 +278,20 @@ M: windows wait-for-processes ( -- ? )
     OPEN_EXISTING
     redirect
     STD_INPUT_HANDLE GetStdHandle or ;
-    
+
 : fill-redirection ( process args -- )
     dup lpStartupInfo>>
     [ [ redirect-stdout ] dip hStdOutput<< ]
     [ [ redirect-stderr ] dip hStdError<< ]
     [ [ redirect-stdin ] dip hStdInput<< ] 3tri ;
 
-M: windows run-process* ( process -- handle )
+M: windows (run-process) ( process -- handle )
     [
         [
-            current-directory get absolute-path cd
-    
             dup make-CreateProcess-args
+            current-directory get absolute-path >>lpCurrentDirectory
             [ fill-redirection ] keep
             dup call-CreateProcess
             lpProcessInformation>>
         ] with-destructors
-    ] [ launch-error ] recover ;    
+    ] [ launch-error ] recover ;

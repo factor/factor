@@ -1,9 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman, Michael Judge, Loryn Jenkins.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators generalizations kernel locals math
-math.functions math.order math.vectors math.ranges sequences
-sequences.private sorting fry arrays grouping sets
-splitting.monotonic ;
+USING: arrays assocs combinators fry generalizations grouping
+kernel locals math math.functions math.order math.vectors
+sequences sequences.private sorting ;
 IN: math.statistics
 
 : power-mean ( seq p -- x )
@@ -16,9 +15,6 @@ IN: math.statistics
 
 : mean ( seq -- x )
     0 mean-ddof ; inline
-
-: unbiased-mean ( seq -- x )
-    1 mean-ddof ; inline
 
 : sum-of-squares ( seq -- x )
     [ sq ] map-sum ; inline
@@ -36,7 +32,7 @@ IN: math.statistics
     [ [ log ] map-sum ] [ length ] bi /f e^ ; inline
 
 : harmonic-mean ( seq -- x )
-    [ recip ] map-sum recip ; inline
+    [ [ recip ] map-sum ] [ length swap / ] bi ; inline
 
 : contraharmonic-mean ( seq -- x )
     [ sum-of-squares ] [ sum ] bi / ; inline
@@ -60,8 +56,8 @@ PRIVATE>
 
 <PRIVATE
 
-:: ((kth-object)) ( seq k nth-quot exchange-quot quot: ( x y -- ? ) -- elt )
-    #! Wirth's method, Algorithm's + Data structues = Programs p. 84
+:: kth-object-impl ( seq k nth-quot exchange-quot quot: ( x y -- ? ) -- elt )
+    ! Wirth's method, Algorithm's + Data structues = Programs p. 84
     k seq bounds-check 2drop
     0 :> i!
     0 :> j!
@@ -90,8 +86,8 @@ PRIVATE>
     k seq nth-unsafe ; inline
 
 : (kth-object) ( seq k nth-quot exchange-quot quot: ( x y -- ? ) -- elt )
-    #! The algorithm modifiers seq, so we clone it
-    [ >array ] 4dip ((kth-object)) ; inline
+    ! The algorithm modifiers seq, so we clone it
+    [ >array ] 4dip kth-object-impl ; inline
 
 : kth-object-unsafe ( seq k quot: ( x y -- ? ) -- elt )
     [ [ nth-unsafe ] [ exchange-unsafe ] ] dip (kth-object) ; inline
@@ -133,7 +129,7 @@ PRIVATE>
         } case
     ] each ;
 
-: lower-median-index ( seq -- n )    
+: lower-median-index ( seq -- n )
     [ midpoint@ ]
     [ length odd? [ 1 - ] unless ] bi ;
 
@@ -208,36 +204,11 @@ PRIVATE>
 : trimean ( seq -- x )
     quartile first3 [ 2 * ] dip + + 4 / ;
 
-<PRIVATE
-
-: (sequence>assoc) ( seq map-quot insert-quot assoc -- assoc )
-    [ swap curry compose each ] keep ; inline
-
-: (sequence-index>assoc) ( seq map-quot insert-quot assoc -- assoc )
-    [ swap curry compose each-index ] keep ; inline
-
-PRIVATE>
-
-: sequence>assoc! ( assoc seq map-quot: ( x -- ..y ) insert-quot: ( ..y assoc -- ) -- assoc )
-    4 nrot (sequence>assoc) ; inline
-
-: sequence>assoc ( seq map-quot insert-quot exemplar -- assoc )
-    clone (sequence>assoc) ; inline
-
-: sequence-index>assoc ( seq map-quot insert-quot exemplar -- assoc )
-    clone (sequence-index>assoc) ; inline
-
-: sequence-index>hashtable ( seq map-quot insert-quot -- hashtable )
-    H{ } sequence-index>assoc ; inline
-
-: sequence>hashtable ( seq map-quot insert-quot -- hashtable )
-    H{ } sequence>assoc ; inline
-
 : histogram! ( hashtable seq -- hashtable )
-    [ ] [ inc-at ] sequence>assoc! ;
+    over '[ _ inc-at ] each ;
 
 : histogram-by ( seq quot: ( x -- bin ) -- hashtable )
-    [ inc-at ] sequence>hashtable ; inline
+    H{ } clone [ '[ @ _ inc-at ] each ] keep ; inline
 
 : histogram ( seq -- hashtable )
     [ ] histogram-by ;
@@ -248,12 +219,6 @@ PRIVATE>
 : normalized-histogram ( seq -- alist )
     [ histogram ] [ length ] bi '[ _ / ] assoc-map ;
 
-: collect-index-by ( ... seq quot: ( ... obj -- ... key ) -- ... hashtable )
-    [ dip swap ] curry [ push-at ] sequence-index>hashtable ; inline
-
-: collect-by ( ... seq quot: ( ... obj -- ... key ) -- ... hashtable )
-    [ keep swap ] curry [ push-at ] sequence>hashtable ; inline
-
 : equal-probabilities ( n -- array )
     dup recip <array> ; inline
 
@@ -261,7 +226,7 @@ PRIVATE>
     histogram >alist [ second ] supremum-by first ;
 
 : minmax ( seq -- min max )
-    [ first dup ] keep [ [ min ] [ max ] bi-curry bi* ] each ;
+    [ first dup ] keep [ [ min ] [ max ] bi-curry bi* ] 1 each-from ;
 
 : range ( seq -- x )
     minmax swap - ;
@@ -277,8 +242,7 @@ PRIVATE>
 
 : sample-var ( seq -- x ) 1 var-ddof ; inline
 
-: std-ddof ( seq n -- x )
-    var-ddof sqrt ; inline
+: std-ddof ( seq n -- x ) var-ddof sqrt ; inline
 
 : population-std ( seq -- x ) 0 std-ddof ; inline
 
@@ -302,67 +266,65 @@ ALIAS: std sample-std
 
 : sample-ste ( seq -- x ) 1 ste-ddof ;
 
-: ((r)) ( mean(x) mean(y) {x} {y} -- (r) )
+<PRIVATE
+: r-sum-diffs ( x-mean y-mean x-seq y-seq -- (r) )
     ! finds sigma((xi-mean(x))(yi-mean(y))
-    0 [ [ [ pick ] dip swap - ] bi@ * + ] 2reduce 2nip ;
+    0 [ [ reach - ] bi@ * + ] 2reduce 2nip ;
 
-: (r) ( mean(x) mean(y) {x} {y} sx sy -- r )
-    * recip [ [ ((r)) ] keep length 1 - / ] dip * ;
+: (r) ( x-mean y-mean x-seq y-seq x-std y-std -- r )
+    * recip [ [ r-sum-diffs ] keep length 1 - / ] dip * ;
 
-: [r] ( {{x,y}...} -- mean(x) mean(y) {x} {y} sx sy )
+: r-stats ( xy-pairs -- x-mean y-mean x-seq y-seq x-std y-std )
     first2 [ [ [ mean ] bi@ ] 2keep ] 2keep [ population-std ] bi@ ;
+PRIVATE>
 
-: r ( {{x,y}...} -- r )
-    [r] (r) ;
+: pearson-r ( xy-pairs -- r ) r-stats (r) ;
 
-: r^2 ( {{x,y}...} -- r )
-    r sq ;
-
-: least-squares ( {{x,y}...} -- alpha beta )
-    [r] { [ 2dup ] [ ] [ ] [ ] [ ] } spread
-    ! stack is mean(x) mean(y) mean(x) mean(y) {x} {y} sx sy
+: least-squares ( xy-pairs -- alpha beta )
+    r-stats [ 2dup ] 4dip
+    ! stack is x-mean y-mean x-mean y-mean x-seq y-seq x-std y-std
     [ (r) ] 2keep ! stack is mean(x) mean(y) r sx sy
     swap / * ! stack is mean(x) mean(y) beta
     [ swapd * - ] keep ;
 
-: cov-ddof ( {x} {y} ddof -- cov )
+: cov-ddof ( x-seq y-seq ddof -- cov )
     [ [ demean ] bi@ v* ] dip mean-ddof ;
 
-: population-cov ( {x} {y} -- cov ) 0 cov-ddof ; inline
+: population-cov ( x-seq y-seq -- cov ) 0 cov-ddof ; inline
 
-: sample-cov ( {x} {y} -- cov ) 1 cov-ddof ; inline
+: sample-cov ( x-seq y-seq -- cov ) 1 cov-ddof ; inline
 
-: corr-ddof ( {x} {y} n -- corr )
+: corr-ddof ( x-seq y-seq n -- corr )
     [ [ population-cov ] ] dip
     '[ [ _ var-ddof ] bi@ * sqrt ] 2bi / ;
 
-: population-corr ( {x} {y} -- corr ) 0 corr-ddof ; inline
+: population-corr ( x-seq y-seq -- corr ) 0 corr-ddof ; inline
 
-: sample-corr ( {x} {y} -- corr ) 1 corr-ddof ; inline
-
-: cum-map ( seq identity quot: ( prev elt -- next ) -- seq' )
-    swapd [ dup ] compose map nip ; inline
+: sample-corr ( x-seq y-seq -- corr ) 1 corr-ddof ; inline
 
 : cum-sum ( seq -- seq' )
-    0 [ + ] cum-map ;
+    0 [ + ] accumulate* ;
 
 : cum-sum0 ( seq -- seq' )
     0 [ + ] accumulate nip ;
 
 : cum-product ( seq -- seq' )
-    1 [ * ] cum-map ;
+    1 [ * ] accumulate* ;
+
+: cum-product1 ( seq -- seq' )
+    1 [ * ] accumulate nip ;
 
 : cum-mean ( seq -- seq' )
     0 swap [ [ + dup ] dip 1 + / ] map-index nip ;
 
-: cum-count ( seq quot -- seq' )
-    [ 0 ] dip '[ _ call [ 1 + ] when ] cum-map ; inline
+: cum-count ( seq quot: ( elt -- ? ) -- seq' )
+    [ 0 ] dip '[ @ [ 1 + ] when ] accumulate* ; inline
 
 : cum-min ( seq -- seq' )
-    dup ?first [ min ] cum-map ;
+    dup ?first [ min ] accumulate* ;
 
 : cum-max ( seq -- seq' )
-    dup ?first [ max ] cum-map ;
+    dup ?first [ max ] accumulate* ;
 
 : entropy ( probabilities -- n )
     dup sum '[ _ / dup log * ] map-sum neg ;

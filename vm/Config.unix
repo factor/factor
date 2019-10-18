@@ -12,12 +12,6 @@ PLAF_DLL_OBJS = vm/os-unix.o
 PLAF_EXE_OBJS += vm/main-unix.o
 PLAF_MASTER_HEADERS += vm/os-unix.hpp
 
-ifdef NO_UI
-	X11_UI_LIBS =
-else
-	X11_UI_LIBS = `pkg-config --libs gtk+-2.0 gtkglext-1.0`
-endif
-
 FFI_TEST_CFLAGS = -fPIC
 
 # LINKER = gcc -shared -o

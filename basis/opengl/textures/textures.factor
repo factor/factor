@@ -3,8 +3,8 @@
 USING: accessors alien.data assocs cache colors.constants
 destructors kernel opengl opengl.gl opengl.capabilities
 combinators images images.tessellation grouping sequences math
-math.vectors generalizations fry arrays namespaces system locals
-literals specialized-arrays ;
+math.statistics math.vectors generalizations fry arrays
+namespaces system locals literals specialized-arrays ;
 FROM: alien.c-types => int float ;
 SPECIALIZED-ARRAY: float
 IN: opengl.textures
@@ -12,8 +12,8 @@ IN: opengl.textures
 SYMBOL: non-power-of-2-textures?
 
 : check-extensions ( -- )
-    #! ATI frglx driver doesn't implement GL_ARB_texture_non_power_of_two properly.
-    #! See thread 'Linux font display problem' April 2009 on Factor-talk
+    ! ATI frglx driver doesn't implement GL_ARB_texture_non_power_of_two properly.
+    ! See thread 'Linux font display problem' April 2009 on Factor-talk
     gl-vendor "ATI Technologies Inc." = not os macosx? or [
         "2.0" { "GL_ARB_texture_non_power_of_two" }
         has-gl-version-or-extensions?
@@ -237,19 +237,23 @@ M: u-10-10-10-2-components   (component-type>type)
 
 M: u-24-components           (component-type>type)
     over DEPTH =
-    [ 2drop GL_UNSIGNED_INT ] [ unsupported-component-order ] if ;
+    [ 2drop GL_UNSIGNED_INT ]
+    [ unsupported-component-order ] if ;
 
 M: u-24-8-components         (component-type>type)
     over DEPTH-STENCIL =
-    [ 2drop GL_UNSIGNED_INT_24_8 ] [ unsupported-component-order ] if ;
+    [ 2drop GL_UNSIGNED_INT_24_8 ]
+    [ unsupported-component-order ] if ;
 
 M: u-9-9-9-e5-components     (component-type>type)
     over BGR =
-    [ 2drop GL_UNSIGNED_INT_5_9_9_9_REV ] [ unsupported-component-order ] if ;
+    [ 2drop GL_UNSIGNED_INT_5_9_9_9_REV ]
+    [ unsupported-component-order ] if ;
 
 M: float-11-11-10-components (component-type>type)
     over BGR =
-    [ 2drop GL_UNSIGNED_INT_10F_11F_11F_REV ] [ unsupported-component-order ] if ;
+    [ 2drop GL_UNSIGNED_INT_10F_11F_11F_REV ]
+    [ unsupported-component-order ] if ;
 
 : image-data-format ( component-order component-type -- gl-format gl-type )
     [ (component-order>format) ] [ (component-type>type) ] 2bi ;
@@ -286,7 +290,7 @@ TUPLE: single-texture < disposable image dim loc texture-coords texture display-
 : tex-sub-image ( image -- )
     [ GL_TEXTURE_2D 0 0 0 ] dip
     [ dim>> first2 ]
-    [ image-format [ drop ] 2dip ]
+    [ image-format nipd ]
     [ bitmap>> ] tri
     glTexSubImage2D ;
 
@@ -370,8 +374,7 @@ TUPLE: multi-texture < disposable grid display-list loc ;
 : image-locs ( image-grid -- loc-grid )
     [ first [ image-dim first ] map ]
     [ [ first image-dim second ] map ] bi
-    [ 0 [ + ] accumulate nip ] bi@
-    cartesian-product flip ;
+    [ cum-sum0 ] bi@ cartesian-product flip ;
 
 : <texture-grid> ( image-grid loc -- grid )
     [ dup image-locs ] dip
@@ -406,8 +409,8 @@ CONSTANT: max-texture-size { 512 512 }
 PRIVATE>
 
 : make-texture ( image -- id )
-    #! We use glTexSubImage2D to work around the power of 2 texture size
-    #! limitation
+    ! We use glTexSubImage2D to work around the power of 2 texture size
+    ! limitation
     gen-texture [
         GL_TEXTURE_BIT [
             GL_TEXTURE_2D swap glBindTexture

@@ -1,11 +1,9 @@
 USING: accessors hashtables images images.viewer io io.styles
 kernel math namespaces prettyprint.custom prettyprint.sections
 sequences ui.gadgets.panes ;
-FROM: images => image ;
 IN: images.viewer.prettyprint
 
-TUPLE: image-section < section
-    image ;
+TUPLE: image-section < section image ;
 
 CONSTANT: approx-pixels-per-cell 8
 
@@ -16,9 +14,13 @@ CONSTANT: approx-pixels-per-cell 8
 
 M: image-section long-section
     short-section ;
+
 M: image-section short-section
     image>> <image-gadget> output-stream get write-gadget ;
 
-M: image pprint*
-    <image-section> add-section ;
+SYMBOL: prettyprint-images?
 
+M: image pprint*
+    prettyprint-images? get
+    [ <image-section> add-section ]
+    [ call-next-method ] if ;

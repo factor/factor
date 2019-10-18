@@ -1,9 +1,16 @@
-USING: ui.gadgets models help.markup help.syntax io kernel
-quotations ;
+USING: help.markup help.syntax io kernel models quotations ui.gadgets
+ui.gadgets.panes.private ;
 IN: ui.gadgets.panes
 
 HELP: pane
-{ $class-description "A pane " { $link gadget } " displays formatted text which is written to a " { $link pane-stream } " targetting the pane. Panes are created by calling " { $link <pane> } " or " { $link <pane-control> } "." } ;
+{ $class-description "A pane " { $link gadget } " displays formatted text which is written to a " { $link pane-stream } " targetting the pane. Panes are created by calling " { $link <pane> } " or " { $link <pane-control> } ". Panes have the following slots"
+  { $table
+    {
+        { $slot "input" }
+        { "A gadget that receives input events and writes to the pane's input stream." }
+    }
+  }
+} ;
 
 HELP: <pane>
 { $values { "pane" "a new " { $link pane } } }
@@ -15,6 +22,11 @@ HELP: write-gadget
 { $notes "Not all streams support this operation." } ;
 
 { write-gadget print-gadget gadget. } related-words
+
+HELP: pane-nl
+{ $values { "pane" pane } }
+{ $description "Outputs a virtual newline character to the pane stream." }
+{ $see-also nl } ;
 
 HELP: print-gadget
 { $values { "gadget" gadget } { "stream" "an output stream" } }
@@ -63,7 +75,7 @@ ARTICLE: "ui.gadgets.panes" "Pane gadgets"
     pane-stream
     <pane-stream>
 }
-"In addition to the stream output words (" { $link "stream-protocol" } ", pane streams can have gadgets written to them:"
+"In addition to the stream output words (" { $link "stream-protocol" } "), pane streams can have gadgets written to them:"
 { $subsections
     write-gadget
     print-gadget

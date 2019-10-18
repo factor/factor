@@ -117,7 +117,7 @@ PRIVATE>
 
 ! XXX should do a dense clone
 M: blas-matrix-base clone
-    [ 
+    [
         [ {
             [ underlying>> ]
             [ ld>> ]
@@ -168,7 +168,7 @@ M: blas-matrix-base clone
     [ 1.0 ] 2dip n*V(*)Vconj ; inline
 
 : n*M.M ( alpha A B -- alpha*A.B )
-    2dup [ Mheight ] [ Mwidth ] bi* pick <empty-matrix> 
+    2dup [ Mheight ] [ Mwidth ] bi* pick <empty-matrix>
     [ 1.0 ] dip n*M.M+n*M! ;
 
 : M. ( A B -- A.B )
@@ -247,7 +247,7 @@ M: blas-matrix-base equal?
 
 <<
 
-FUNCTOR: (define-blas-matrix) ( TYPE T U C -- )
+<FUNCTOR: (define-blas-matrix) ( TYPE T U C -- )
 
 VECTOR      IS ${TYPE}-blas-vector
 <VECTOR>    IS <${TYPE}-blas-vector>
@@ -296,7 +296,7 @@ SYNTAX: XMATRIX{ \ } [ >MATRIX ] parse-literal ;
 M: MATRIX pprint-delims
     drop \ XMATRIX{ \ } ;
 
-;FUNCTOR
+;FUNCTOR>
 
 
 : define-real-blas-matrix ( TYPE T -- )

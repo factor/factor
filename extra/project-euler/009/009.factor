@@ -37,7 +37,7 @@ IN: project-euler.009
     ] { } make natural-sort ;
 
 : (ptriplet) ( target p q triplet -- target p q )
-    sum [ pick ] dip = [ next-pq 2dup abc (ptriplet) ] unless ;
+    sum pickd = [ next-pq 2dup abc (ptriplet) ] unless ;
 
 : ptriplet ( target -- triplet )
    3 1 { 3 4 5 } (ptriplet) abc nip ;

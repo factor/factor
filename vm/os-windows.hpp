@@ -1,7 +1,7 @@
 #include <ctype.h>
 
 #ifndef wcslen
-/* for cygwin */
+// for cygwin
 #include <wchar.h>
 #endif
 
@@ -23,7 +23,7 @@
 #undef max
 #endif
 
-/* Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970 */
+// Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970
 #define EPOCH_OFFSET 0x019db1ded53e8000LL
 
 namespace factor {
@@ -44,11 +44,9 @@ typedef HANDLE THREADHANDLE;
 #ifdef _MSC_VER
 #define FTELL ftell
 #define FSEEK fseek
-#define SNPRINTF _snprintf
 #else
 #define FTELL ftello64
 #define FSEEK fseeko64
-#define SNPRINTF snprintf
 #endif
 
 #define FACTOR_OS_STRING "windows"
@@ -72,7 +70,6 @@ inline static void early_init() {}
 uint64_t nano_count();
 void sleep_nanos(uint64_t nsec);
 long getpagesize();
-void move_file(const vm_char* path1, const vm_char* path2);
 VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
                                 void* dispatch);
 THREADHANDLE start_thread(void* (*start_routine)(void*), void* args);

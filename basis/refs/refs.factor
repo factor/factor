@@ -1,6 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, 2009 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs accessors boxes math namespaces ;
+USING: accessors assocs boxes kernel math namespaces
+slots.private ;
 IN: refs
 
 MIXIN: ref
@@ -22,7 +23,7 @@ GENERIC: delete-ref ( ref -- )
 : ref-dec ( ref -- ) -1 swap ref-+@ ;
 
 : take ( ref -- obj )
-    dup get-ref swap delete-ref ;
+    [ get-ref ] [ delete-ref ] bi ;
 
 ! delete-ref defaults to setting ref to f
 M: ref delete-ref ref-off ;
@@ -45,7 +46,6 @@ M: global-var-ref get-ref var>> get-global ;
 M: global-var-ref set-ref var>> set-global ;
 INSTANCE: global-var-ref ref
 
-USE: slots.private
 TUPLE: slot-ref tuple slot ;
 C: <slot-ref> slot-ref
 : >slot-ref< ( slot-ref -- tuple slot ) [ tuple>> ] [ slot>> ] bi ; inline
@@ -59,9 +59,7 @@ M: box delete-ref box> drop ;
 INSTANCE: box ref
 
 TUPLE: assoc-ref assoc key ;
-
 : >assoc-ref< ( assoc-ref -- key value ) [ key>> ] [ assoc>> ] bi ; inline
-
 M: assoc-ref delete-ref ( assoc-ref -- ) >assoc-ref< delete-at ;
 
 TUPLE: key-ref < assoc-ref ;

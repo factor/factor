@@ -20,7 +20,7 @@ CONSTANT: NS-EACH-BUFFER-SIZE 16
     object state stackbuf count -> countByEnumeratingWithState:objects:count: :> items-count
     items-count 0 = [
         state itemsPtr>> [ items-count id <c-direct-array> ] [ stackbuf ] if* :> items
-        items-count iota [ items nth quot call ] each
+        items-count <iota> [ items nth quot call ] each
         object quot state stackbuf count (NSFastEnumeration-each)
     ] unless ; inline recursive
 

@@ -5,12 +5,6 @@ compiler.constants kernel make math math.bitwise memoize
 namespaces sequences ;
 IN: compiler.codegen.relocation
 
-! Common code shared by optimizing and non-optimizing compilers.
-! Should not have too many dependencies on the rest of the
-! optimizing compiler.
-
-! Code is compiled into the 'make' vector.
-
 SYMBOL: extra-offset  ! Only used by non-optimizing compiler
 
 : compiled-offset ( -- n )
@@ -25,7 +19,6 @@ SYMBOL: extra-offset  ! Only used by non-optimizing compiler
 : align-code ( n -- )
     alignment (align-code) ;
 
-! Parameter table
 SYMBOL: parameter-table
 
 : add-parameter ( obj -- ) parameter-table get push ;
@@ -35,7 +28,6 @@ SYMBOL: literal-table
 
 : add-literal ( obj -- ) literal-table get push ;
 
-! Relocation table
 SYMBOL: relocation-table
 
 : push-uint ( value vector -- )
@@ -95,9 +87,6 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 
 : rel-megamorphic-cache-hits ( class -- )
     rt-megamorphic-cache-hits add-relocation ;
-
-: rel-exception-handler ( class -- )
-    rt-exception-handler add-relocation ;
 
 : rel-inline-cache-miss ( class -- )
     rt-inline-cache-miss add-relocation ;

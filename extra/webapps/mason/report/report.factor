@@ -4,18 +4,20 @@ USING: accessors furnace.actions http.server.responses kernel
 urls xml.syntax webapps.mason.backend webapps.mason.utils ;
 IN: webapps.mason.report
 
+: build-report ( -- response )
+    [
+        current-builder [
+            last-report>> <html-content>
+        ] [ <404> ] if*
+    ] with-mason-db ;
+
 : <build-report-action> ( -- action )
     <action>
         [ validate-os/cpu ] >>init
-        [
-            [
-                current-builder last-report>>
-                <html-content>
-            ] with-mason-db
-        ] >>display ;
+        [ build-report ] >>display ;
 
 : report-link ( builder -- xml )
-    [ URL" report" ] dip
+    [ URL" report" clone ] dip
     [ os>> "os" set-query-param ]
     [ cpu>> "cpu" set-query-param ] bi
     [XML <a href=<->>Latest build report</a> XML] ;

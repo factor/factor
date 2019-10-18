@@ -4,14 +4,6 @@ IN: checksums
 HELP: checksum
 { $class-description "The class of checksum algorithms." } ;
 
-HELP: hex-string
-{ $values { "seq" sequence } { "str" string } }
-{ $description "Converts a sequence of values from 0-255 to a string of hex numbers from 0-ff." }
-{ $examples
-    { $example "USING: checksums io ;" "B{ 1 2 3 4 } hex-string print" "01020304" }
-}
-{ $notes "Numbers are zero-padded on the left." } ;
-
 HELP: checksum-stream
 { $values { "stream" "an input stream" } { "checksum" "a checksum specifier" } { "value" byte-array } }
 { $contract "Computes the checksum of all data read from the stream." }
@@ -34,22 +26,22 @@ HELP: checksum-lines
 { $examples
     { $example
         "USING: checksums checksums.crc32 prettyprint ;"
-"""{
-    "Take me out to the ball game"
-    "Take me out with the crowd"
-} crc32 checksum-lines ."""
+"{
+    \"Take me out to the ball game\"
+    \"Take me out with the crowd\"
+} crc32 checksum-lines ."
         "B{ 111 205 9 27 }"
     }
 } ;
 
 HELP: checksum-file
 { $values { "path" "a pathname specifier" } { "checksum" "a checksum specifier" } { "value" byte-array } }
-{ $contract "Computes the checksum of all data in a file." }
+{ $description "Computes the checksum of all data in a file." }
 { $examples
     { $example
         "USING: checksums checksums.crc32 prettyprint ;"
-        """"resource:license.txt" crc32 checksum-file ."""
-        "B{ 100 139 199 92 }"
+        "\"resource:LICENSE.txt\" crc32 checksum-file ."
+        "B{ 125 29 106 28 }"
     }
 } ;
 
@@ -63,20 +55,27 @@ $nl
     checksum-bytes
     checksum-stream
     checksum-lines
+    checksum-file
 }
 "Checksums should implement at least one of " { $link checksum-bytes } " and " { $link checksum-stream } ". Implementing " { $link checksum-lines } " is optional."
 $nl
-"Utilities:"
+"Checksums can also implement a stateful checksum protocol that allows users to push bytes when needed and then at a later point request the checksum value. The default implementation is not very efficient, storing all of the bytes and then calling " { $link checksum-bytes } " when " { $link get-checksum } " is requested."
+$nl
 { $subsections
-    checksum-file
-    hex-string
+    initialize-checksum-state
+    add-checksum-bytes
+    add-checksum-stream
+    add-checksum-lines
+    add-checksum-file
+    get-checksum
 }
 "Checksum implementations:"
-{ $subsections "checksums.crc32" }
+{ $vocab-subsection "CRC32 checksum" "checksums.crc32" }
 { $vocab-subsection "MD5 checksum" "checksums.md5" }
 { $vocab-subsection "SHA checksums" "checksums.sha" }
 { $vocab-subsection "Adler-32 checksum" "checksums.adler-32" }
-{ $vocab-subsection "OpenSSL checksums" "checksums.openssl" } 
-{ $vocab-subsection "Internet checksum" "checksums.internet" } ;
+{ $vocab-subsection "OpenSSL checksums" "checksums.openssl" }
+{ $vocab-subsection "Internet checksum" "checksums.internet" }
+{ $vocab-subsection "Checksum using an external utility" "checksums.process" } ;
 
 ABOUT: "checksums"

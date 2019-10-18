@@ -1,10 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel delegate fry sequences models
-combinators.short-circuit models.search models.delay calendar locals
-ui.gestures ui.pens ui.pens.image ui.gadgets.editors ui.gadgets.labels
-ui.gadgets.scrollers ui.gadgets.tables ui.gadgets.theme ui.gadgets.tracks
-ui.gadgets.borders ui.gadgets.buttons ui.baseline-alignment ui.gadgets ;
+USING: accessors calendar combinators.short-circuit delegate fry
+kernel locals models models.delay models.search
+ui.baseline-alignment ui.gadgets ui.gadgets.borders
+ui.gadgets.buttons ui.gadgets.editors ui.gadgets.labels
+ui.gadgets.scrollers ui.gadgets.tables ui.gadgets.tracks
+ui.gestures ui.pens ui.pens.image ui.theme.images ;
 IN: ui.gadgets.search-tables
 
 TUPLE: search-table < track table field ;
@@ -31,8 +32,8 @@ TUPLE: search-field < track field ;
         0 >>fill
         { 5 5 } >>gap
         +baseline+ >>align
-        swap <model-field> 10 >>min-cols >>field
-        dup field>> "Search:" label-on-left 1 track-add
+        swap <model-field> 10 >>min-cols "Search" >>default-text
+        [ >>field ] keep 1 track-add
         dup <clear-button> f track-add ;
 
 M: search-field focusable-child* field>> ;
@@ -44,26 +45,6 @@ M: search-field handle-gesture
     over key-gesture? [
         { [ pass-to-table ] [ call-next-method ] } 2&&
     ] [ call-next-method ] if ;
-
-! A protocol with customizable slots
-SLOT-PROTOCOL: table-protocol
-renderer
-action
-hook
-font
-selection-color
-focus-border-color
-mouse-color
-column-line-color
-selection-required?
-single-click?
-selection
-min-rows
-min-cols
-max-rows
-max-cols ;
-
-CONSULT: table-protocol search-table table>> ;
 
 :: <search-table> ( values renderer quot -- gadget )
     f <model> :> search

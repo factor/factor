@@ -4,9 +4,8 @@
 USING: accessors arrays byte-arrays fry hints kernel lists make math
     math.functions math.matrices math.order math.parser math.primes.factors
     math.primes.lists math.primes.miller-rabin math.ranges math.ratios
-    namespaces parser prettyprint quotations sequences sorting strings
-    unicode.case vocabs vocabs.parser words ;
-FROM: sequences => change-nth ;
+    math.vectors namespaces parser prettyprint quotations sequences sorting
+    strings unicode vocabs vocabs.parser words ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -49,7 +48,7 @@ IN: project-euler.common
 HINTS: count-digits fixnum ;
 
 : max-children ( seq -- seq )
-    [ dup length 1 - iota [ nth-pair max , ] with each ] { } make ;
+    [ dup length 1 - <iota> [ nth-pair max , ] with each ] { } make ;
 
 ! Propagate one row into the upper one
 : propagate ( bottom top -- newtop )
@@ -74,13 +73,16 @@ PRIVATE>
 
 : max-path ( triangle -- n )
     dup length 1 > [
-        2 cut* first2 max-children [ + ] 2map suffix max-path
+        2 cut* first2 max-children v+ suffix max-path
     ] [
         first first
     ] if ;
 
 : number>digits ( n -- seq )
     [ dup 0 = not ] [ 10 /mod ] produce reverse! nip ;
+
+: digits>number ( seq -- n )
+    0 [ [ 10 * ] [ + ] bi* ] reduce ;
 
 : number-length ( n -- m )
     abs [
@@ -111,11 +113,12 @@ PRIVATE>
 : penultimate ( seq -- elt )
     dup length 2 - swap nth ;
 
-! Not strictly needed, but it is nice to be able to dump the triangle after the
-! propagation
+! Not strictly needed, but it is nice to be able to dump the
+! triangle after the propagation
 : propagate-all ( triangle -- new-triangle )
-    reverse [ first dup ] [ rest ] bi
-    [ propagate dup ] map nip reverse swap suffix ;
+    reverse unclip dup rot
+    [ propagate dup ] map nip
+    reverse swap suffix ;
 
 : permutations? ( n m -- ? )
     [ count-digits ] same? ;
@@ -124,7 +127,7 @@ PRIVATE>
     dup 4 < [ { 0 1 3 4 } nth ] [ (sum-divisors) ] if ;
 
 : sum-proper-divisors ( n -- sum )
-    dup sum-divisors swap - ;
+    [ sum-divisors ] keep - ;
 
 : abundant? ( n -- ? )
     dup sum-proper-divisors < ;
@@ -157,7 +160,7 @@ PRIVATE>
 
 SYNTAX: SOLUTION:
     scan-word
-    [ name>> "-main" append create-in ] keep
+    [ name>> "-main" append create-word-in ] keep
     [ drop current-vocab main<< ]
     [ [ . ] swap prefix ( -- ) define-declared ]
     2bi ;

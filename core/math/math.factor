@@ -1,11 +1,79 @@
 ! Copyright (C) 2003, 2009 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel ;
+USING: kernel kernel.private ;
 IN: math
 
 BUILTIN: fixnum ;
 BUILTIN: bignum ;
 BUILTIN: float ;
+
+PRIMITIVE: bits>double ( n -- x )
+PRIMITIVE: bits>float ( n -- x )
+PRIMITIVE: double>bits ( x -- n )
+PRIMITIVE: float>bits ( x -- n )
+
+<PRIVATE
+PRIMITIVE: bignum* ( x y -- z )
+PRIMITIVE: bignum+ ( x y -- z )
+PRIMITIVE: bignum- ( x y -- z )
+PRIMITIVE: bignum-bit? ( x n -- ? )
+PRIMITIVE: bignum-bitand ( x y -- z )
+PRIMITIVE: bignum-bitnot ( x -- y )
+PRIMITIVE: bignum-bitor ( x y -- z )
+PRIMITIVE: bignum-bitxor ( x y -- z )
+PRIMITIVE: bignum-gcd ( x y -- z )
+PRIMITIVE: bignum-log2 ( x -- n )
+PRIMITIVE: bignum-mod ( x y -- z )
+PRIMITIVE: bignum-shift ( x y -- z )
+PRIMITIVE: bignum/i ( x y -- z )
+PRIMITIVE: bignum/mod ( x y -- z w )
+PRIMITIVE: bignum< ( x y -- ? )
+PRIMITIVE: bignum<= ( x y -- ? )
+PRIMITIVE: bignum= ( x y -- ? )
+PRIMITIVE: bignum> ( x y -- ? )
+PRIMITIVE: bignum>= ( x y -- ? )
+PRIMITIVE: bignum>fixnum ( x -- y )
+PRIMITIVE: bignum>fixnum-strict ( x -- y )
+PRIMITIVE: both-fixnums? ( x y -- ? )
+PRIMITIVE: fixnum* ( x y -- z )
+PRIMITIVE: fixnum*fast ( x y -- z )
+PRIMITIVE: fixnum+ ( x y -- z )
+PRIMITIVE: fixnum+fast ( x y -- z )
+PRIMITIVE: fixnum- ( x y -- z )
+PRIMITIVE: fixnum-bitand ( x y -- z )
+PRIMITIVE: fixnum-bitnot ( x -- y )
+PRIMITIVE: fixnum-bitor ( x y -- z )
+PRIMITIVE: fixnum-bitxor ( x y -- z )
+PRIMITIVE: fixnum-fast ( x y -- z )
+PRIMITIVE: fixnum-mod ( x y -- z )
+PRIMITIVE: fixnum-shift ( x y -- z )
+PRIMITIVE: fixnum-shift-fast ( x y -- z )
+PRIMITIVE: fixnum/i ( x y -- z )
+PRIMITIVE: fixnum/i-fast ( x y -- z )
+PRIMITIVE: fixnum/mod ( x y -- z w )
+PRIMITIVE: fixnum/mod-fast ( x y -- z w )
+PRIMITIVE: fixnum< ( x y -- ? )
+PRIMITIVE: fixnum<= ( x y -- z )
+PRIMITIVE: fixnum> ( x y -- ? )
+PRIMITIVE: fixnum>= ( x y -- ? )
+PRIMITIVE: fixnum>bignum ( x -- y )
+PRIMITIVE: fixnum>float ( x -- y )
+PRIMITIVE: float* ( x y -- z )
+PRIMITIVE: float+ ( x y -- z )
+PRIMITIVE: float- ( x y -- z )
+PRIMITIVE: float-u< ( x y -- ? )
+PRIMITIVE: float-u<= ( x y -- ? )
+PRIMITIVE: float-u> ( x y -- ? )
+PRIMITIVE: float-u>= ( x y -- ? )
+PRIMITIVE: float/f ( x y -- z )
+PRIMITIVE: float< ( x y -- ? )
+PRIMITIVE: float<= ( x y -- ? )
+PRIMITIVE: float= ( x y -- ? )
+PRIMITIVE: float> ( x y -- ? )
+PRIMITIVE: float>= ( x y -- ? )
+PRIMITIVE: float>bignum ( x -- y )
+PRIMITIVE: float>fixnum ( x -- y )
+PRIVATE>
 
 GENERIC: >fixnum ( x -- n ) foldable
 GENERIC: >bignum ( x -- n ) foldable
@@ -16,6 +84,7 @@ GENERIC: integer>fixnum-strict ( x -- y ) foldable
 
 GENERIC: numerator ( a/b -- a )
 GENERIC: denominator ( a/b -- b )
+GENERIC: >fraction ( a/b -- a b )
 
 GENERIC: real-part ( z -- x )
 GENERIC: imaginary-part ( z -- y )
@@ -50,9 +119,9 @@ MATH: /mod ( x y -- z w ) foldable
 MATH: bitand ( x y -- z ) foldable
 MATH: bitor  ( x y -- z ) foldable
 MATH: bitxor ( x y -- z ) foldable
-GENERIC# shift 1 ( x n -- y ) foldable
+GENERIC#: shift 1 ( x n -- y ) foldable
 GENERIC: bitnot ( x -- y ) foldable
-GENERIC# bit? 1 ( x n -- ? ) foldable
+GENERIC#: bit? 1 ( x n -- ? ) foldable
 
 GENERIC: abs ( x -- y ) foldable
 
@@ -78,18 +147,20 @@ ERROR: log2-expects-positive x ;
 : even? ( n -- ? ) 1 bitand zero? ; inline
 : odd? ( n -- ? ) 1 bitand 1 number= ; inline
 
-GENERIC: neg? ( x -- -x )
+GENERIC: neg? ( x -- ? )
 
 : if-zero ( ..a n quot1: ( ..a -- ..b ) quot2: ( ..a n -- ..b ) -- ..b )
     [ dup zero? ] [ [ drop ] prepose ] [ ] tri* if ; inline
 
-: when-zero ( ..a n quot: ( ..a -- ..b ) -- ..b ) [ ] if-zero ; inline
+: when-zero ( ... n quot: ( ... -- ... x ) -- ... x ) [ ] if-zero ; inline
 
-: unless-zero ( ..a n quot: ( ..a n -- ..b ) -- ..b ) [ ] swap if-zero ; inline
+: unless-zero ( ... n quot: ( ... n -- ... ) -- ... ) [ ] swap if-zero ; inline
 
 UNION: integer fixnum bignum ;
 
-TUPLE: ratio { numerator integer read-only } { denominator integer read-only } ;
+TUPLE: ratio
+    { numerator integer read-only }
+    { denominator integer read-only } ;
 
 UNION: rational integer ratio ;
 
@@ -97,13 +168,51 @@ M: rational neg? 0 < ; inline
 
 UNION: real rational float ;
 
-TUPLE: complex { real real read-only } { imaginary real read-only } ;
+TUPLE: complex
+    { real real read-only }
+    { imaginary real read-only } ;
 
 UNION: number real complex ;
 
 GENERIC: recip ( x -- y )
 
 M: number recip 1 swap / ; inline
+
+: rect> ( x y -- z )
+    ! Note: an imaginary 0.0 should still create a complex
+    dup 0 = [ drop ] [ complex boa ] if ; inline
+
+GENERIC: >rect ( z -- x y )
+
+M: real >rect 0 ; inline
+
+M: complex >rect [ real-part ] [ imaginary-part ] bi ; inline
+
+<PRIVATE
+
+: (gcd) ( b a x y -- a d )
+    swap [
+        nip
+    ] [
+        [ /mod [ over * swapd - ] dip ] keep (gcd)
+    ] if-zero ; inline recursive
+
+PRIVATE>
+
+: gcd ( x y -- a d )
+    [ 0 1 ] 2dip (gcd) dup 0 < [ neg ] when ; inline
+
+MATH: simple-gcd ( x y -- d ) foldable
+
+<PRIVATE
+
+: fixnum-gcd ( x y -- d ) { fixnum fixnum } declare gcd nip ;
+
+PRIVATE>
+
+M: fixnum simple-gcd fixnum-gcd ; inline
+
+M: bignum simple-gcd bignum-gcd ; inline
 
 : fp-bitwise= ( x y -- ? ) [ double>bits ] same? ; inline
 
@@ -136,52 +245,45 @@ GENERIC: prev-float ( m -- n )
 : align ( m w -- n )
     1 - [ + ] keep bitnot bitand ; inline
 
-<PRIVATE
-
-: iterate-prep ( n quot -- i n quot ) [ 0 ] 2dip ; inline
-
-: if-iterate? ( i n true false -- ) [ 2over < ] 2dip if ; inline
-
-: iterate-step ( i n quot -- i n quot )
-    #! Apply quot to i, keep i and quot, hide n.
-    [ nip call ] 3keep ; inline
-
-: iterate-rot ( ? i n quot -- i n quot ? )
-    [ rot ] dip swap ; inline
-
-: iterate-next ( i n quot -- i' n quot ) [ 1 + ] 2dip ; inline
-
-PRIVATE>
-
 : (each-integer) ( ... i n quot: ( ... i -- ... ) -- ... )
-    [ iterate-step iterate-next (each-integer) ]
-    [ 3drop ] if-iterate? ; inline recursive
+    2over < [
+        [ nip call ] 3keep
+        [ 1 + ] 2dip (each-integer)
+    ] [
+        3drop
+    ] if ; inline recursive
 
 : (find-integer) ( ... i n quot: ( ... i -- ... ? ) -- ... i/f )
-    [
-        iterate-step iterate-rot
-        [ 2drop ] [ iterate-next (find-integer) ] if
-    ] [ 3drop f ] if-iterate? ; inline recursive
+    2over < [
+        [ nip call ] 3keep roll
+        [ 2drop ]
+        [ [ 1 + ] 2dip (find-integer) ] if
+    ] [
+        3drop f
+    ] if ; inline recursive
 
 : (all-integers?) ( ... i n quot: ( ... i -- ... ? ) -- ... ? )
-    [
-        iterate-step iterate-rot
-        [ iterate-next (all-integers?) ] [ 3drop f ] if
-    ] [ 3drop t ] if-iterate? ; inline recursive
+    2over < [
+        [ nip call ] 3keep roll
+        [ [ 1 + ] 2dip (all-integers?) ]
+        [ 3drop f ] if
+    ] [
+        3drop t
+    ] if ; inline recursive
 
 : each-integer ( ... n quot: ( ... i -- ... ) -- ... )
-    iterate-prep (each-integer) ; inline
+    [ 0 ] 2dip (each-integer) ; inline
 
 : times ( ... n quot: ( ... -- ... ) -- ... )
     [ drop ] prepose each-integer ; inline
 
-: find-integer ( ... n quot: ( ... i -- ... ? ) -- ... i )
-    iterate-prep (find-integer) ; inline
+: find-integer ( ... n quot: ( ... i -- ... ? ) -- ... i/f )
+    [ 0 ] 2dip (find-integer) ; inline
 
 : all-integers? ( ... n quot: ( ... i -- ... ? ) -- ... ? )
-    iterate-prep (all-integers?) ; inline
+    [ 0 ] 2dip (all-integers?) ; inline
 
-: find-last-integer ( ... n quot: ( ... i -- ... ? ) -- ... i )
+: find-last-integer ( ... n quot: ( ... i -- ... ? ) -- ... i/f )
     over 0 < [
         2drop f
     ] [

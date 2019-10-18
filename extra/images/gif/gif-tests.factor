@@ -32,21 +32,21 @@ IN: images.gif.tests
 : declared-num-colors ( gif -- n ) flags>> 3 bits 1 + 2^ ;
 : actual-num-colors ( gif -- n ) global-color-table>> length ;
 
-[ 2 ] [ monochrome.gif actual-num-colors ] unit-test
-[ 2 ] [ monochrome.gif declared-num-colors ] unit-test
+{ 2 } [ monochrome.gif actual-num-colors ] unit-test
+{ 2 } [ monochrome.gif declared-num-colors ] unit-test
 
-[ 16 ] [ circle.gif actual-num-colors ] unit-test
-[ 16 ] [ circle.gif declared-num-colors ] unit-test
+{ 16 } [ circle.gif actual-num-colors ] unit-test
+{ 16 } [ circle.gif declared-num-colors ] unit-test
 
-[ 256 ] [ checkmark.gif actual-num-colors ] unit-test
-[ 256 ] [ checkmark.gif declared-num-colors ] unit-test
+{ 256 } [ checkmark.gif actual-num-colors ] unit-test
+{ 256 } [ checkmark.gif declared-num-colors ] unit-test
 
 : >index-stream ( gif -- seq )
     [ compressed-bytes>> ]
     [ image-descriptor>> first-code-size>> ] bi
     gif-lzw-uncompress ;
 
-[
+{
     BV{
         0 0 0 0 0 0
         1 0 0 0 0 1
@@ -55,11 +55,11 @@ IN: images.gif.tests
         1 0 1 1 0 1
         1 0 0 0 0 1
     }
-] [ monochrome.gif >index-stream ] unit-test
+} [ monochrome.gif >index-stream ] unit-test
 
-[
+{
     BV{
         0 1
         1 0
     }
-] [ alpha.gif >index-stream ] unit-test
+} [ alpha.gif >index-stream ] unit-test

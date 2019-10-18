@@ -3,7 +3,9 @@
 USING: accessors kernel kernel.private math math.private
 math.functions arrays math.functions.private sequences
 sequences.private parser ;
-IN: math.complex.private
+IN: math.complex
+
+<PRIVATE
 
 M: real real-part ; inline
 M: real imaginary-part drop 0 ; inline
@@ -28,6 +30,8 @@ M: complex /f [ /f ] complex/ ; inline
 M: complex /i [ /i ] complex/ ; inline
 M: complex abs absq sqrt ; inline
 M: complex sqrt >polar [ sqrt ] [ 2.0 / ] bi* polar> ; inline
+
+PRIVATE>
 
 IN: syntax
 

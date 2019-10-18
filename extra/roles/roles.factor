@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes classes.mixin classes.parser
 classes.tuple classes.tuple.parser combinators
 combinators.short-circuit kernel lexer make parser sequences
@@ -65,6 +66,4 @@ PREDICATE: role < mixin-class
     [ drop [ role? ] filter add-to-roles ] 3tri ;
 
 SYNTAX: ROLE: parse-role-definition define-role ;
-SYNTAX: TUPLE: parse-role-definition define-tuple-class-with-roles ;
-
-
+SYNTAX: ROLE-TUPLE: parse-role-definition define-tuple-class-with-roles ;

@@ -1,5 +1,4 @@
-IN: source-files.tests
-USING: source-files tools.test assocs sequences strings
-namespaces kernel ;
+USING: assocs namespaces sequences source-files strings
+tools.test ;
 
-[ { } ] [ source-files get keys [ string? not ] filter ] unit-test
+{ { } } [ source-files get keys [ string? ] reject ] unit-test

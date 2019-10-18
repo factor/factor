@@ -9,26 +9,31 @@ BUILTIN: quotation
     cached-effect
     cache-counter ;
 
+PRIMITIVE: jit-compile ( quot -- )
+PRIMITIVE: quotation-code ( quot -- start end )
+PRIMITIVE: quotation-compiled? ( quot -- ? )
+
 <PRIVATE
+PRIMITIVE: array>quotation ( array -- quot )
 
 : uncurry ( curry -- obj quot )
-    { curry } declare dup 2 slot swap 3 slot ; inline
+    { curried } declare dup 2 slot swap 3 slot ; inline
 
 : uncompose ( compose -- quot quot2 )
-    { compose } declare dup 2 slot swap 3 slot ; inline
+    { composed } declare dup 2 slot swap 3 slot ; inline
 
 PRIVATE>
 
 M: quotation call (call) ;
 
-M: curry call uncurry call ;
+M: curried call uncurry call ;
 
-M: compose call uncompose [ call ] dip call ;
+M: composed call uncompose [ call ] dip call ;
 
 M: wrapper equal?
     over wrapper? [ [ wrapped>> ] same? ] [ 2drop f ] if ;
 
-UNION: callable quotation curry compose ;
+UNION: callable quotation curried composed ;
 
 M: callable equal?
     over callable? [ sequence= ] [ 2drop f ] if ;
@@ -52,26 +57,26 @@ M: object literalize ;
 
 M: wrapper literalize <wrapper> ;
 
-M: curry length quot>> length 1 + ;
+M: curried length quot>> length 1 + ;
 
-M: curry nth
+M: curried nth
     over 0 =
     [ nip obj>> literalize ]
     [ [ 1 - ] dip quot>> nth ]
     if ;
 
-INSTANCE: curry immutable-sequence
+INSTANCE: curried immutable-sequence
 
-M: compose length
+M: composed length
     [ first>> length ] [ second>> length ] bi + ;
 
-M: compose virtual-exemplar first>> ;
+M: composed virtual-exemplar first>> ;
 
-M: compose virtual@
+M: composed virtual@
     2dup first>> length < [
         first>>
     ] [
         [ first>> length - ] [ second>> ] bi
     ] if ;
 
-INSTANCE: compose virtual-sequence
+INSTANCE: composed virtual-sequence

@@ -12,9 +12,11 @@ IN: debugger.threads
         ", " % dup quot>> unparse-short % ")" %
     ] "" make swap write-object ":" print ;
 
-! ( error thread -- )
+! ( error thread -- * )
 [
-    dup initial-thread get-global eq? [ die ] [
+    dup initial-thread get-global eq? [
+        die drop rethrow
+    ] [
         [
             error-in-thread. nl
             print-error nl

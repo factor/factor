@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel continuations fry words ;
+USING: continuations kernel ;
 IN: db.errors
 
 ERROR: db-error ;
@@ -9,54 +9,59 @@ TUPLE: sql-error location ;
 ERROR: bad-schema ;
 
 TUPLE: sql-unknown-error < sql-error message ;
+
 : <sql-unknown-error> ( message -- error )
-    \ sql-unknown-error new
-        swap >>message ;
+    f swap sql-unknown-error boa ;
 
 TUPLE: sql-table-exists < sql-error table ;
+
 : <sql-table-exists> ( table -- error )
-    \ sql-table-exists new
-        swap >>table ;
+    f swap sql-table-exists boa ;
 
 TUPLE: sql-table-missing < sql-error table ;
+
 : <sql-table-missing> ( table -- error )
-    \ sql-table-missing new
-        swap >>table ;
+    f swap sql-table-missing boa ;
 
 TUPLE: sql-syntax-error < sql-error message ;
+
 : <sql-syntax-error> ( message -- error )
-    \ sql-syntax-error new
-        swap >>message ;
+    f swap sql-syntax-error boa ;
 
 TUPLE: sql-function-exists < sql-error message ;
+
 : <sql-function-exists> ( message -- error )
-    \ sql-function-exists new
-        swap >>message ;
+    f swap sql-function-exists boa ;
 
 TUPLE: sql-function-missing < sql-error message ;
+
 : <sql-function-missing> ( message -- error )
-    \ sql-function-missing new
-        swap >>message ;
+    f swap sql-function-missing boa ;
 
 TUPLE: sql-database-exists < sql-error message ;
-: <sql-database-exists> ( message -- error )
-    \ sql-database-exists new
-        swap >>message ;
 
-: ignore-error ( quot word -- )
-    '[ dup _ execute [ drop ] [ rethrow ] if ] recover ; inline
+: <sql-database-exists> ( message -- error )
+    f swap sql-database-exists boa ;
+
+TUPLE: sql-index-exists < sql-error name ;
+
+: <sql-index-exists> ( name -- error )
+    f swap sql-index-exists boa ;
 
 : ignore-table-exists ( quot -- )
-    \ sql-table-exists? ignore-error ; inline
+    [ sql-table-exists? ] ignore-error ; inline
 
 : ignore-table-missing ( quot -- )
-    \ sql-table-missing? ignore-error ; inline
+    [ sql-table-missing? ] ignore-error ; inline
 
 : ignore-function-exists ( quot -- )
-    \ sql-function-exists? ignore-error ; inline
+    [ sql-function-exists? ] ignore-error ; inline
 
 : ignore-function-missing ( quot -- )
-    \ sql-function-missing? ignore-error ; inline
+    [ sql-function-missing? ] ignore-error ; inline
 
 : ignore-database-exists ( quot -- )
-    \ sql-database-exists? ignore-error ; inline
+    [ sql-database-exists? ] ignore-error ; inline
+
+: ignore-index-exists ( quot -- )
+    [ sql-index-exists? ] ignore-error ; inline

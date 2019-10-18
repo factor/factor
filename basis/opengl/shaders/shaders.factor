@@ -54,27 +54,24 @@ IN: opengl.shaders
 : check-gl-shader ( shader -- shader )
     dup gl-shader-ok? [ dup gl-shader-info-log throw ] unless ;
 
-: delete-gl-shader ( shader -- ) glDeleteShader ; inline
-
 PREDICATE: gl-shader < integer (gl-shader?) ;
 PREDICATE: vertex-shader < gl-shader (vertex-shader?) ;
 PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
 
 ! Programs
 
-: (gl-program) ( shaders quot: ( gl-program -- ) -- program )
-    glCreateProgram 
-    [
-        [ swap [ glAttachShader ] with each ]
-        [ swap call ] bi-curry bi*
-    ] [ glLinkProgram ] [ ] tri gl-error ; inline
+: attach-shaders ( program shaders -- )
+    [ glAttachShader ] with each ;
 
-: <mrt-gl-program> ( shaders frag-data-locations -- program )
-    [ [ first2 swap glBindFragDataLocation ] with each ] curry (gl-program) ;
+: (gl-program) ( shaders quot: ( gl-program -- ) -- program )
+    glCreateProgram
+    [
+        dup roll attach-shaders swap call
+    ] [ glLinkProgram ] [ ] tri gl-error ; inline
 
 : <gl-program> ( shaders -- program )
     [ drop ] (gl-program) ;
-    
+
 : (gl-program?) ( object -- ? )
     dup integer? [ glIsProgram c-bool> ] [ drop f ] if ;
 
@@ -109,26 +106,20 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
     dup gl-program-shaders-length 2 *
     0 int <ref>
     over uint <c-array>
-    [ glGetAttachedShaders ] keep [ zero? not ] filter ;
-
-: delete-gl-program-only ( program -- )
-    glDeleteProgram ; inline
-
-: detach-gl-program-shader ( program shader -- )
-    glDetachShader ; inline
+    [ glGetAttachedShaders ] keep [ zero? ] reject ;
 
 : delete-gl-program ( program -- )
     dup gl-program-shaders [
-        2dup detach-gl-program-shader delete-gl-shader
-    ] each delete-gl-program-only ;
+        2dup glDetachShader glDeleteShader
+    ] each glDeleteProgram ;
 
 : with-gl-program ( program quot -- )
     over glUseProgram [ 0 glUseProgram ] [ ] cleanup ; inline
 
 PREDICATE: gl-program < integer (gl-program?) ;
 
-: <simple-gl-program> ( vertex-shader-source fragment-shader-source -- program )
+: <simple-gl-program> ( vertex-shader-source fragment-shader-source
+                        -- program )
     [ <vertex-shader> check-gl-shader ]
     [ <fragment-shader> check-gl-shader ] bi*
     2array <gl-program> check-gl-program ;
-

@@ -84,7 +84,7 @@ CONSTANT: revalidate-url-key "__u"
     ] with-exit-continuation ;
 
 : handle-rest ( path action -- )
-    rest>> dup [ [ "/" join ] dip set-param ] [ 2drop ] if ;
+    rest>> [ [ "/" join ] dip set-param ] [ drop ] if* ;
 
 : init-action ( path action -- )
     begin-form
@@ -96,6 +96,7 @@ M: action call-responder* ( path action -- response )
         { "GET" [ handle-get ] }
         { "HEAD" [ handle-get ] }
         { "POST" [ handle-post ] }
+        [ 2drop <405> ]
     } case ;
 
 M: action modify-form

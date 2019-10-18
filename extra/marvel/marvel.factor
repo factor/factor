@@ -15,7 +15,7 @@ marvel-base-url [ "http://gateway.marvel.com/v1/public/" ] initialize
     number>string
     marvel-private-key get
     marvel-public-key get
-    3append md5 checksum-bytes hex-string ;
+    3append md5 checksum-bytes bytes>hex-string ;
 
 :: make-marvel-params-url ( endpoint params -- url )
     nano-count

@@ -1,10 +1,19 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators combinators.short-circuit
-cpu.architecture kernel layouts locals make math namespaces sequences
-sets vectors fry arrays compiler.cfg compiler.cfg.instructions
-compiler.cfg.rpo compiler.utilities ;
+USING: accessors arrays assocs combinators.short-circuit
+compiler.cfg compiler.cfg.instructions compiler.cfg.rpo
+cpu.architecture deques fry hashtables heaps kernel locals
+macros math sequences sets ;
 IN: compiler.cfg.utilities
+
+: block>cfg ( bb -- cfg )
+    f f rot <cfg> ;
+
+: insns>block ( insns n -- bb )
+    <basic-block> swap >>number swap V{ } like >>instructions ;
+
+: insns>cfg ( insns -- cfg )
+    0 insns>block block>cfg ;
 
 : back-edge? ( from to -- ? )
     [ number>> ] bi@ >= ;
@@ -39,20 +48,11 @@ IN: compiler.cfg.utilities
     from successors>> [ dup to eq? [ drop bb ] when ] map! drop ;
 
 :: insert-basic-block ( from to insns -- )
-    ! Insert basic block on the edge between 'from' and 'to'.
-    <basic-block> :> bb
-    insns V{ } like bb instructions<<
+    insns f insns>block :> bb
     V{ from } bb predecessors<<
     V{ to } bb successors<<
     from to bb update-predecessors
     from to bb update-successors ;
-
-: add-instructions ( bb quot -- )
-    [ instructions>> building ] dip '[
-        building get pop
-        [ @ ] dip
-        ,
-    ] with-variable ; inline
 
 : has-phis? ( bb -- ? )
     instructions>> first ##phi? ;
@@ -76,3 +76,24 @@ IN: compiler.cfg.utilities
 
 : <copy> ( dst src -- insn )
     any-rep ##copy new-insn ;
+
+: connect-bbs ( from to -- )
+    [ [ successors>> ] dip suffix! drop ]
+    [ predecessors>> swap suffix! drop ] 2bi ;
+
+: connect-Nto1-bbs ( froms to -- )
+    '[ _ connect-bbs ] each ;
+
+! Abstract generic stuff
+MACRO: apply-passes ( passes -- quot: ( obj -- ) )
+    unclip-last [ [ 1array \ dup prefix ] map [ ] concat-as ] dip suffix ;
+
+: slurp/replenish-deque ( ... deque quot: ( ... obj -- ... seq ) -- ... )
+      over '[ @ _ push-all-front ] slurp-deque ; inline
+
+: heap-members ( heap -- seq )
+    data>> [ value>> ] map ;
+
+: heap-pop-while ( heap quot: ( key -- ? ) -- values )
+    '[ dup heap-empty? [ f f ] [ dup heap-peek @ ] if ]
+    [ over heap-pop* ] produce 2nip ; inline

@@ -5,7 +5,7 @@ USING: accessors calendar combinators.short-circuit environment
 formatting io io.directories io.encodings.utf8 io.files
 io.files.info io.files.info.unix io.files.trash io.files.types
 io.pathnames kernel math math.parser sequences system unix.stat
-unix.users ;
+unix.users xdg ;
 
 IN: io.files.trash.unix
 
@@ -27,13 +27,11 @@ IN: io.files.trash.unix
     {
         [ file-info directory? ]
         [ sticky? ]
-        [ link-info type>> +symbolic-link+ = not ]
+        [ link-info symbolic-link? not ]
     } 1&& [ "invalid trash path" throw ] unless ;
 
 : trash-home ( -- path )
-    "XDG_DATA_HOME" os-env
-    home ".local/share" append-path or
-    "Trash" append-path dup check-trash-path ;
+    xdg-data-home "Trash" append-path dup check-trash-path ;
 
 : trash-1 ( root -- path )
     ".Trash" append-path dup check-trash-path
@@ -72,12 +70,10 @@ M: unix send-to-trash ( path -- )
         to-directory safe-file-name
     ] [
         "info" append-path [ make-user-directory ] keep
-        to-directory ".trashinfo" append [ over ] dip utf8 [
+        to-directory ".trashinfo" append overd utf8 [
             "[Trash Info]" write nl
             "Path=" write write nl
             "DeletionDate=" write
             now "%Y-%m-%dT%H:%M:%S" strftime write nl
         ] with-file-writer
     ] bi move-file ;
-
-

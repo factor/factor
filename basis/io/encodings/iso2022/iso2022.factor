@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.encodings kernel sequences io simple-flat-file sets math
-combinators.short-circuit io.binary arrays assocs namespaces
-locals accessors combinators biassocs byte-arrays parser ;
+USING: accessors assocs biassocs byte-arrays combinators
+combinators.short-circuit io io.binary io.encodings kernel
+literals locals math namespaces sequences simple-flat-file ;
 IN: io.encodings.iso2022
 
 SINGLETON: iso2022
@@ -13,12 +13,12 @@ SYMBOL: jis201
 SYMBOL: jis208
 SYMBOL: jis212
 
-"vocab:io/encodings/iso2022/201.txt" flat-file>biassoc jis201 set-global
-"vocab:io/encodings/iso2022/208.txt" flat-file>biassoc jis208 set-global
-"vocab:io/encodings/iso2022/212.txt" flat-file>biassoc jis212 set-global
+"vocab:io/encodings/iso2022/201.txt" load-codetable-file jis201 set-global
+"vocab:io/encodings/iso2022/208.txt" load-codetable-file jis208 set-global
+"vocab:io/encodings/iso2022/212.txt" load-codetable-file jis212 set-global
 
 SYMBOL: ascii
-128 iota unique >biassoc ascii set-global
+128 <iota> dup zip >biassoc ascii set-global
 
 TUPLE: iso2022-state type ;
 
@@ -31,12 +31,12 @@ M: iso2022 <encoder>
 M: iso2022 <decoder>
     make-iso-coder <decoder> ;
 
-<< SYNTAX: ESC 0x16 suffix! ; >>
+CONSTANT: ESC 0x16
 
-CONSTANT: switch-ascii B{ ESC CHAR: ( CHAR: B }
-CONSTANT: switch-jis201 B{ ESC CHAR: ( CHAR: J }
-CONSTANT: switch-jis208 B{ ESC CHAR: $ CHAR: B }
-CONSTANT: switch-jis212 B{ ESC CHAR: $ CHAR: ( CHAR: D }
+CONSTANT: switch-ascii B{ $ ESC CHAR: ( CHAR: B }
+CONSTANT: switch-jis201 B{ $ ESC CHAR: ( CHAR: J }
+CONSTANT: switch-jis208 B{ $ ESC CHAR: $ CHAR: B }
+CONSTANT: switch-jis212 B{ $ ESC CHAR: $ CHAR: ( CHAR: D }
 
 : find-type ( char -- code type )
     {
@@ -71,7 +71,7 @@ M:: iso2022-state encode-char ( char stream encoding -- )
         ] }
         { CHAR: $ [
             dup stream-read1 {
-                { CHAR: @ [ drop jis208 get-global ] } ! want: JIS X 0208-1978 
+                { CHAR: @ [ drop jis208 get-global ] } ! want: JIS X 0208-1978
                 { CHAR: B [ drop jis208 get-global ] }
                 { CHAR: ( [
                     stream-read1 CHAR: D = jis212 get-global f ?
@@ -90,7 +90,7 @@ M:: iso2022-state encode-char ( char stream encoding -- )
 
 M:: iso2022-state decode-char ( stream encoding -- char )
     stream stream-read1 {
-        { ESC [
+        { $ ESC [
             stream read-escape [
                 encoding type<<
                 stream encoding decode-char

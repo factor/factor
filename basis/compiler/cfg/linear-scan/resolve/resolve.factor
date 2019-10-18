@@ -1,26 +1,18 @@
 ! Copyright (C) 2009, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit fry kernel locals namespaces
-make math sequences hashtables
-cpu.architecture
-compiler.cfg
-compiler.cfg.rpo
-compiler.cfg.liveness
-compiler.cfg.registers
-compiler.cfg.utilities
-compiler.cfg.instructions
-compiler.cfg.predecessors
-compiler.cfg.parallel-copy
-compiler.cfg.ssa.destruction
-compiler.cfg.linear-scan.assignment
-compiler.cfg.linear-scan.allocation.state ;
+combinators.short-circuit compiler.cfg compiler.cfg.instructions
+compiler.cfg.linear-scan.allocation.state
+compiler.cfg.linear-scan.assignment compiler.cfg.parallel-copy
+compiler.cfg.predecessors compiler.cfg.registers
+compiler.cfg.rpo compiler.cfg.utilities cpu.architecture fry
+kernel locals make namespaces sequences ;
 IN: compiler.cfg.linear-scan.resolve
 
 TUPLE: location
-{ reg read-only }
-{ rep read-only }
-{ reg-class read-only } ;
+    { reg read-only }
+    { rep read-only }
+    { reg-class read-only } ;
 
 : <location> ( reg rep -- location )
     dup reg-class-of location boa ;
@@ -37,7 +29,7 @@ SYMBOL: temp-spills
 
 : temp-spill ( rep -- spill-slot )
     rep-size temp-spills get
-    [ next-spill-slot ] cache ;
+    [ cfg get stack-frame>> next-spill-slot ] cache ;
 
 SYMBOL: temp-locations
 
@@ -93,10 +85,10 @@ SYMBOL: temp-locations
     ] { } make ;
 
 : perform-mappings ( bb to mappings -- )
-    dup empty? [ 3drop ] [
+    [ 2drop ] [
         mapping-instructions insert-basic-block
-        cfg get cfg-changed drop
-    ] if ;
+        cfg get cfg-changed
+    ] if-empty ;
 
 : resolve-edge-data-flow ( bb to -- )
     2dup compute-mappings perform-mappings ;
@@ -107,6 +99,6 @@ SYMBOL: temp-locations
     ] if ;
 
 : resolve-data-flow ( cfg -- )
-    needs-predecessors
     init-resolve
-    [ resolve-block-data-flow ] each-basic-block ;
+    [ needs-predecessors ]
+    [ [ resolve-block-data-flow ] each-basic-block ] bi ;

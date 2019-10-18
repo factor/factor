@@ -39,31 +39,36 @@ HELP: <hashed-dlist>
 { $values { "search-deque" search-deque } }
 { $description "Creates a new " { $link search-deque } " backed by a " { $link dlist } ", with a " { $link hashtable } " for fast membership tests." } ;
 
+HELP: dlist-any?
+{ $values { "dlist" { $link dlist } } { "quot" quotation } { "?" boolean } }
+{ $description "Just like " { $link dlist-find } " except it doesn't return the object." }
+{ $notes "This operation is O(n)." } ;
+
 HELP: dlist-find
-{ $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" "an object or " { $link f } } { "?" boolean } }
-{ $description "Applies the quotation to each element of the " { $link dlist } " in turn, until it outputs a true value or the end of the " { $link dlist } " is reached.  Outputs either the object it found or " { $link f } ", and a boolean which is true if an object is found." }
+{ $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" { $maybe object } } { "?" boolean } }
+{ $description "Applies the quotation to each element of the " { $link dlist } " in turn, until it outputs a true value or the end of the " { $link dlist } " is reached. Outputs either the object it found or " { $link f } ", and a boolean which is true if an object is found." }
 { $notes "Returns a boolean to allow dlists to store " { $link f } "."
     $nl
     "This operation is O(n)."
 } ;
 
 HELP: dlist-filter
-{ $values { "dlist" { $link dlist } } { "quot" quotation } { "dlist'" { $link dlist } } }
+{ $values { "dlist" dlist } { "quot" quotation } { "dlist'" dlist } }
 { $description "Applies the quotation to each element of the " { $link dlist } " in turn, removing the corresponding nodes if the quotation returns " { $link f } "." }
 { $side-effects { "dlist" } } ;
 
-HELP: dlist-any?
-{ $values { "dlist" { $link dlist } } { "quot" quotation } { "?" boolean } }
-{ $description "Just like " { $link dlist-find } " except it doesn't return the object." }
+HELP: dlist-length
+{ $values { "dlist" dlist } { "n" "a non-negative number" } }
+{ $description "Calculates the length of the linked list." }
 { $notes "This operation is O(n)." } ;
 
 HELP: delete-node-if*
-{ $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" "an object or " { $link f } } { "?" boolean } }
-{ $description "Calls " { $link dlist-find } " on the " { $link dlist } " and deletes the node returned, if any.  Returns the value of the deleted node and a boolean to allow the deleted value to distinguished from " { $link f } ", for nothing deleted." }
+{ $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" { $maybe object } } { "?" boolean } }
+{ $description "Calls " { $link dlist-find } " on the " { $link dlist } " and deletes the node returned, if any. Returns the value of the deleted node and a boolean to allow the deleted value to distinguished from " { $link f } ", for nothing deleted." }
 { $notes "This operation is O(n)." } ;
 
 HELP: delete-node-if
-{ $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" "an object or " { $link f } } }
+{ $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" { $maybe object } } }
 { $description "Like " { $link delete-node-if* } " but cannot distinguish from deleting a node whose value is " { $link f } " or not deleting an element." }
 { $notes "This operation is O(n)." } ;
 

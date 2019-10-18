@@ -1,25 +1,10 @@
 ! Copyright (C) 2007, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs sorting sequences kernel accessors
-hashtables db.types db.tuples db combinators
-calendar calendar.format math.parser math.order syndication urls
-xml.writer xmode.catalog validators
-html.forms
-html.components
-html.templates.chloe
-http.server
-http.server.dispatchers
-http.server.redirection
-http.server.responses
-furnace
-furnace.actions
-furnace.redirection
-furnace.auth
-furnace.auth.login
-furnace.boilerplate
-furnace.recaptcha
-furnace.syndication
-furnace.conversations ;
+USING: accessors calendar db db.tuples db.types furnace.actions
+furnace.auth furnace.boilerplate furnace.recaptcha
+furnace.redirection furnace.syndication html.forms
+http.server.dispatchers http.server.responses kernel math.parser
+sequences sorting urls validators xmode.catalog ;
 IN: webapps.pastebin
 
 TUPLE: pastebin < dispatcher ;
@@ -80,10 +65,10 @@ TUPLE: annotation < entity parent ;
 : lookup-annotation ( id -- annotation )
     [ f ] dip <annotation> select-tuple ;
 
-: paste ( id -- paste )
-    [ <paste-state> select-tuple ]
-    [ f <annotation> select-tuples ]
-    bi >>annotations ;
+: paste ( id -- paste/f )
+    [ <paste-state> select-tuple ] keep over [
+        f <annotation> select-tuples >>annotations
+    ] [ drop ] if ;
 
 ! ! !
 ! LINKS, ETC

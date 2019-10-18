@@ -11,19 +11,12 @@ PREDICATE: mixin-class < union-class "mixin" word-prop ;
 M: mixin-class normalize-class ;
 
 M: mixin-class (classes-intersect?)
-    members [ classes-intersect? ] with any? ;
+    class-members [ classes-intersect? ] with any? ;
 
 M: mixin-class reset-class
-    [ call-next-method ] [ { "mixin" } reset-props ] bi ;
+    [ call-next-method ] [ "mixin" remove-word-prop ] bi ;
 
 M: mixin-class rank-class drop 8 ;
-
-ERROR: check-mixin-class-error class ;
-
-: check-mixin-class ( mixin -- mixin )
-    dup mixin-class? [
-        check-mixin-class-error
-    ] unless ;
 
 <PRIVATE
 
@@ -34,18 +27,18 @@ ERROR: check-mixin-class-error class ;
     2tri ;
 
 : if-mixin-member? ( class mixin true false -- )
-    [ check-mixin-class 2dup members member-eq? ] 2dip if ; inline
+    [ 2dup class-members member-eq? ] 2dip if ; inline
 
 : change-mixin-class ( class mixin quot -- )
-    [ [ members swap bootstrap-word ] dip call ] [ drop ] 2bi
+    [ [ class-members swap bootstrap-word ] dip call ] [ drop ] 2bi
     swap redefine-mixin-class ; inline
 
 : (add-mixin-instance) ( class mixin -- )
-    #! Call update-methods before adding the member:
-    #! - Call sites of generics specializing on 'mixin'
-    #! where the inferred type is 'class' are updated,
-    #! - Call sites where the inferred type is a subtype
-    #! of 'mixin' disjoint from 'class' are not updated
+    ! Call update-methods before adding the member:
+    ! - Call sites of generics specializing on 'mixin'
+    ! where the inferred type is 'class' are updated,
+    ! - Call sites where the inferred type is a subtype
+    ! of 'mixin' disjoint from 'class' are not updated
     dup class-usages {
         [ nip update-methods ]
         [ drop [ suffix ] change-mixin-class ]
@@ -54,11 +47,11 @@ ERROR: check-mixin-class-error class ;
     } 3cleave ;
 
 : (remove-mixin-instance) ( class mixin -- )
-    #! Call update-methods after removing the member:
-    #! - Call sites of generics specializing on 'mixin'
-    #! where the inferred type is 'class' are updated,
-    #! - Call sites where the inferred type is a subtype
-    #! of 'mixin' disjoint from 'class' are not updated
+    ! Call update-methods after removing the member:
+    ! - Call sites of generics specializing on 'mixin'
+    ! where the inferred type is 'class' are updated,
+    ! - Call sites where the inferred type is a subtype
+    ! of 'mixin' disjoint from 'class' are not updated
     dup class-usages {
         [ drop [ swap remove ] change-mixin-class ]
         [ drop "instances" word-prop delete-at ]
@@ -68,10 +61,16 @@ ERROR: check-mixin-class-error class ;
 
 PRIVATE>
 
-GENERIC# add-mixin-instance 1 ( class mixin -- )
+ERROR: not-a-class object ;
 
-M: class add-mixin-instance
-    [ 2drop ] [ (add-mixin-instance) ] if-mixin-member? ;
+ERROR: not-a-mixin-class object ;
+
+: check-types ( class mixin -- class mixin )
+    [ dup class? [ not-a-class ] unless ]
+    [ dup mixin-class? [ not-a-mixin-class ] unless ] bi* ;
+
+: add-mixin-instance ( class mixin -- )
+    check-types [ 2drop ] [ (add-mixin-instance) ] if-mixin-member? ;
 
 : remove-mixin-instance ( class mixin -- )
     [ (remove-mixin-instance) ] [ 2drop ] if-mixin-member? ;

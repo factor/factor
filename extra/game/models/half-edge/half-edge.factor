@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays fry kernel locals math sequences ;
 IN: game.models.half-edge
 
@@ -29,7 +30,7 @@ TUPLE: edge < identity-tuple face vertex opposite-edge next-edge ;
 : each-face-edge ( ... edge quot: ( ... edge -- ... ) -- ... )
     [ next-edge>> ] edge-loop ; inline
 
-! 
+!
 
 : vertex-edges ( edge -- edges )
     [ ] [ each-vertex-edge ] (collect) ;
@@ -51,4 +52,3 @@ TUPLE: edge < identity-tuple face vertex opposite-edge next-edge ;
 
 : face-sides ( edge -- count )
     [ each-face-edge ] (count) ;
-

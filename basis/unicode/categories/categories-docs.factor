@@ -1,66 +1,21 @@
-! Copyright (C) 2009 Daniel Ehrenberg
+! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel ;
+USING: help.syntax help.markup ;
 IN: unicode.categories
 
-HELP: LETTER
-{ $class-description "The class of upper cased letters." } ;
+ABOUT: "unicode.categories"
 
-HELP: Letter
-{ $class-description "The class of letters." } ;
-
-HELP: alpha
-{ $class-description "The class of alphanumeric characters." } ;
-
-HELP: math
-{ $class-description "The class of Unicode math characters." } ;
-
-HELP: blank
-{ $class-description "The class of whitespace characters." } ;
-
-HELP: character
-{ $class-description "The class of pre-defined Unicode code points." } ;
-
-HELP: control
-{ $class-description "The class of control characters." } ;
-
-HELP: digit
-{ $class-description "The class of digits." } ;
-
-HELP: letter
-{ $class-description "The class of lower-cased letters." } ;
-
-HELP: printable
-{ $class-description "The class of characters which are printable, as opposed to being control or formatting characters." } ;
-
-HELP: uncased
-{ $class-description "The class of letters which don't have a case." } ;
-
-ARTICLE: "unicode.categories" "Character classes"
-"The " { $vocab-link "unicode.categories" } " vocabulary implements predicates for determining if a code point has a particular property, for example being a lower cased letter. These should be used in preference to the " { $vocab-link "ascii" } " equivalents in most cases. Each character class has an associated predicate word."
+ARTICLE: "unicode.categories" "Unicode category syntax"
+"There is special syntax sugar for making predicate classes which are unions of Unicode general categories, plus some other code."
 { $subsections
-    blank
-    blank?
-    letter
-    letter?
-    LETTER
-    LETTER?
-    Letter
-    Letter?
-    digit
-    digit?
-    printable
-    printable?
-    alpha
-    alpha?
-    control
-    control?
-    uncased
-    uncased?
-    character
-    character?
-    math
-    math?
+    POSTPONE: CATEGORY:
+    POSTPONE: CATEGORY-NOT:
 } ;
 
-ABOUT: "unicode.categories"
+HELP: CATEGORY:
+{ $syntax "CATEGORY: foo Nl Pd Lu | \"Diacritic\" property? ;" }
+{ $description "This defines a predicate class which is a subset of code points. In this example, " { $snippet "foo" } " is the class of characters which are in the general category Nl or Pd or Lu, or which have the Diacritic property." } ;
+
+HELP: CATEGORY-NOT:
+{ $syntax "CATEGORY-NOT: foo Nl Pd Lu | \"Diacritic\" property? ;" }
+{ $description "This defines a predicate class which is a subset of code points, the complement of what " { $link POSTPONE: CATEGORY: } " would define. In this example, " { $snippet "foo" } " is the class of characters which are neither in the general category Nl or Pd or Lu, nor have the Diacritic property." } ;

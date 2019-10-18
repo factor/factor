@@ -2,9 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.algebra
 classes.algebra.private classes.maybe classes.private
-combinators definitions kernel make namespaces sequences sets
-words ;
-FROM: sets => members ;
+combinators definitions kernel make math namespaces sequences
+sets words ;
 IN: generic
 
 ! Method combination protocol
@@ -18,7 +17,7 @@ PREDICATE: generic < word
 M: generic definition drop f ;
 
 : make-generic ( word -- )
-    [ { "unannotated-def" } reset-props ]
+    [ "unannotated-def" remove-word-prop ]
     [ dup "combination" word-prop perform-combination ]
     bi ;
 
@@ -61,7 +60,8 @@ PRIVATE>
     method-classes interesting-classes smallest-class ;
 
 : method-for-class ( class generic -- method/f )
-    [ nip ] [ nearest-class ] 2bi dup [ swap ?lookup-method ] [ 2drop f ] if ;
+    [ nip ] [ nearest-class ] 2bi
+    [ swap ?lookup-method ] [ drop f ] if* ;
 
 GENERIC: effective-method ( generic -- method )
 
@@ -186,8 +186,12 @@ M: method forget*
         [ call-next-method ] bi
     ] if ;
 
+GENERIC#: check-combination-effect 1 ( combination effect -- )
+
+M: object check-combination-effect 2drop ;
+
 : define-generic ( word combination effect -- )
-    [ nip swap set-stack-effect ]
+    [ [ check-combination-effect ] keep set-stack-effect ]
     [
         drop
         2dup [ "combination" word-prop ] dip = [ 2drop ] [

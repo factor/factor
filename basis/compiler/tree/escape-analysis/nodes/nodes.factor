@@ -1,9 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences fry math namespaces
-compiler.tree
-compiler.tree.def-use
-compiler.tree.escape-analysis.allocations ;
+USING: compiler.tree.def-use
+compiler.tree.escape-analysis.allocations fry kernel math
+namespaces sequences ;
 IN: compiler.tree.escape-analysis.nodes
 
 GENERIC: escape-analysis* ( node -- )

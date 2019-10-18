@@ -20,7 +20,7 @@ ARTICLE: "math.blas.vectors" "BLAS interface vector operations"
     V/n
     Vneg
 }
-"Vector addition:" 
+"Vector addition:"
 { $subsections
     n*V+V!
     n*V+V
@@ -158,11 +158,10 @@ HELP: cvector{
 { $description "Construct a literal " { $link complex-float-blas-vector } "." } ;
 
 HELP: zvector{
-{ $syntax "dvector{ 1.0 -2.0 C{ 3.0 -1.0 } }" }
+{ $syntax "zvector{ 1.0 -2.0 C{ 3.0 -1.0 } }" }
 { $description "Construct a literal " { $link complex-double-blas-vector } "." } ;
 
 {
     POSTPONE: svector{ POSTPONE: dvector{
     POSTPONE: cvector{ POSTPONE: zvector{
 } related-words
-

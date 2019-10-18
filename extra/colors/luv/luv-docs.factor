@@ -13,3 +13,5 @@ ARTICLE: "colors.luv" "CIE 1976 LUV colors"
 }
 "For more information, see " { $url "https://en.wikipedia.org/wiki/CIELUV_color_space" }
 { $see-also "colors" } ;
+
+ABOUT: "colors.luv"

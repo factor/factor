@@ -1,9 +1,13 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs hashtables hashtables.wrapped kernel
 parser vocabs.loader ;
 IN: hashtables.identity
 
-TUPLE: identity-wrapper < wrapped-key identity-hashcode ;
+<PRIVATE
+
+TUPLE: identity-wrapper
+    { underlying read-only } identity-hashcode ;
 
 : <identity-wrapper> ( wrapped-key -- identity-wrapper )
     dup identity-hashcode identity-wrapper boa ; inline
@@ -14,6 +18,8 @@ M: identity-wrapper equal?
     [ 2drop f ] if ; inline
 
 M: identity-wrapper hashcode* nip identity-hashcode>> ; inline
+
+PRIVATE>
 
 TUPLE: identity-hashtable < wrapped-hashtable ;
 

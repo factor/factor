@@ -17,7 +17,7 @@ SYMBOL: board
 : cell-any? ( n x y i -- ? ) 3 /mod pair+ board> = ;
 
 : box-any? ( n x y -- ? )
-    [ 3 /i 3 * ] bi@ 9 iota [ cell-any? ] 3 nwith any? ;
+    [ 3 /i 3 * ] bi@ 9 <iota> [ cell-any? ] 3 nwith any? ;
 
 : board-any? ( n x y -- ? )
     { [ nip row-any? ] [ drop col-any? ] [ box-any? ] } 3|| ;

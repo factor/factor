@@ -7,6 +7,11 @@ kernel.private make math quotations sequences sequences.private
 slots.private strings words ;
 IN: slots
 
+<PRIVATE
+PRIMITIVE: set-slot ( value obj n -- )
+PRIMITIVE: slot ( obj m -- value )
+PRIVATE>
+
 TUPLE: slot-spec name offset class initial read-only ;
 
 PREDICATE: reader < word "reader" word-prop ;
@@ -28,7 +33,7 @@ PREDICATE: writer-method < method "writing" word-prop >boolean ;
     [ 2drop make-inline ]
     3tri ;
 
-GENERIC# reader-quot 1 ( class slot-spec -- quot )
+GENERIC#: reader-quot 1 ( class slot-spec -- quot )
 
 M: object reader-quot
     nip [
@@ -39,7 +44,7 @@ M: object reader-quot
     ] [ ] make ;
 
 : reader-word ( name -- word )
-    ">>" append "accessors" create
+    ">>" append "accessors" create-word
     dup t "reader" set-word-prop ;
 
 : reader-props ( slot-spec -- assoc )
@@ -60,7 +65,7 @@ M: object reader-quot
     ] 2bi ;
 
 : writer-word ( name -- word )
-    "<<" append "accessors" create
+    "<<" append "accessors" create-word
     dup t "writer" set-word-prop ;
 
 ERROR: bad-slot-value value class ;
@@ -82,7 +87,7 @@ M: object instance-check-quot
         \ unless ,
     ] [ ] make ;
 
-GENERIC# writer-quot 1 ( class slot-spec -- quot )
+GENERIC#: writer-quot 1 ( class slot-spec -- quot )
 
 M: object writer-quot
     nip
@@ -107,7 +112,7 @@ M: object writer-quot
     ] 2bi ;
 
 : setter-word ( name -- word )
-    ">>" prepend "accessors" create ;
+    ">>" prepend "accessors" create-word ;
 
 : define-setter ( name -- )
     dup setter-word dup deferred? [
@@ -116,7 +121,7 @@ M: object writer-quot
     ] [ 2drop ] if ;
 
 : changer-word ( name -- word )
-    "change-" prepend "accessors" create ;
+    "change-" prepend "accessors" create-word ;
 
 : define-changer ( name -- )
     dup changer-word dup deferred? [
@@ -198,6 +203,7 @@ M: anonymous-intersection initial-value*
         { [ dup "initial-value" word-prop ] [ dup "initial-value" word-prop t ] }
         { [ \ f bootstrap-word over class<= ] [ f t ] }
         { [ \ array-capacity bootstrap-word over class<= ] [ 0 t ] }
+        { [ \ integer-array-capacity bootstrap-word over class<= ] [ 0 t ] }
         { [ bignum bootstrap-word over class<= ] [ 0 >bignum t ] }
         { [ float bootstrap-word over class<= ] [ 0.0 t ] }
         { [ string bootstrap-word over class<= ] [ "" t ] }
@@ -206,7 +212,7 @@ M: anonymous-intersection initial-value*
         { [ pinned-alien bootstrap-word over class<= ] [ <bad-alien> t ] }
         { [ quotation bootstrap-word over class<= ] [ [ ] t ] }
         [ dup initial-value* ]
-    } cond [ drop ] 2dip ;
+    } cond nipd ;
 
 GENERIC: make-slot ( desc -- slot-spec )
 
@@ -223,9 +229,7 @@ M: string make-slot
 : peel-off-class ( slot-spec array -- slot-spec array )
     dup empty? [
         dup first classoid? [
-            [ first init-slot-class ]
-            [ rest ]
-            bi
+            [ first init-slot-class ] [ rest ] bi
         ] when
     ] unless ;
 
@@ -267,18 +271,10 @@ M: slot-spec make-slot
     [ make-slot ] map ;
 
 : finalize-slots ( specs base -- specs )
-    over length iota [ + ] with map [ >>offset ] 2map ;
+    over length <iota> [ + ] with map [ >>offset ] 2map ;
 
 : slot-named* ( name specs -- offset spec/f )
     [ name>> = ] with find ;
 
 : slot-named ( name specs -- spec/f )
     slot-named* nip ;
-
-! Predefine some slots, because there are change-* words in other vocabs
-! that nondeterministically cause ambiguities when USEd alongside
-! accessors
-
-SLOT: at
-SLOT: nth
-SLOT: global

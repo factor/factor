@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax byte-arrays classes
 gpu.buffers gpu.framebuffers gpu.shaders gpu.textures help.markup
 help.syntax images kernel math sequences
@@ -41,11 +42,11 @@ HELP: <multi-index-range>
 { $description "Constructs a " { $link multi-index-range } " tuple." } ;
 
 HELP: UNIFORM-TUPLE:
-{ $syntax """UNIFORM-TUPLE: class-name
-    { "slot" uniform-type dimension }
-    { "slot" uniform-type dimension }
+{ $syntax "UNIFORM-TUPLE: class-name
+    { \"slot\" uniform-type dimension }
+    { \"slot\" uniform-type dimension }
     ...
-    { "slot" uniform-type dimension } ;""" }
+    { \"slot\" uniform-type dimension } ;" }
 { $description "Defines a new " { $link uniform-tuple } " class. Tuples of the new class can be used as the " { $snippet "uniforms" } " slot of a " { $link render-set } " in order to set the uniform parameters of the active shader program. The " { $link uniform-type } " of each slot defines the component type, and the " { $snippet "dimension" } " specifies an array length if not " { $link f } "."
 $nl
 "Uniform parameters are passed from Factor to the shader program through the uniform tuple as follows:"
@@ -62,7 +63,7 @@ $nl
     { "Boolean vector types: " { $link bvec2-uniform } ", " { $link bvec3-uniform } ", " { $link bvec4-uniform } }
     }
 }
-{ "Matrix uniforms take their values either from row-major Factor " { $link sequence } "s of sequences of floats, or from " { $link alien } "s or " { $link float-array } "s referencing packed column-major arrays of floats. Matrix types are:" 
+{ "Matrix uniforms take their values either from row-major Factor " { $link sequence } "s of sequences of floats, or from " { $link alien } "s or " { $link float-array } "s referencing packed column-major arrays of floats. Matrix types are:"
     { $list
     { { $link mat2-uniform } ", " { $link mat2x3-uniform } ", " { $link mat2x4-uniform } }
     { { $link mat3x2-uniform } ", " { $link mat3-uniform } ", " { $link mat3x4-uniform } }
@@ -105,7 +106,7 @@ HELP: index-elements
 { $list
 { "The " { $snippet "ptr" } " slot contains a " { $link byte-array } ", " { $link alien } ", or " { $link buffer-ptr } " value referencing the beginning of the index array." }
 { "The " { $snippet "count" } " slot contains an " { $link integer } " value specifying the number of indexes to supply from the array." }
-{ "The " { $snippet "index-type" } " slot contains an " { $link index-type } " value specifying whether the array consists of " { $link ubyte-indexes } ", " { $link ushort-indexes } ", or " { $link uint-indexes } "." } 
+{ "The " { $snippet "index-type" } " slot contains an " { $link index-type } " value specifying whether the array consists of " { $link ubyte-indexes } ", " { $link ushort-indexes } ", or " { $link uint-indexes } "." }
 } } ;
 
 HELP: index-range
@@ -116,7 +117,7 @@ HELP: index-range
 } } ;
 
 HELP: index-type
-{ $class-description "The " { $snippet "index-type" } " slot of an " { $link index-elements } " or " { $link multi-index-elements } " tuple indicates the type of the index array's elements: one-byte " { $link ubyte-indexes } ", two-byte " { $link ushort-indexes } ", or four-byte " { $link uint-indexes } "."  } ;
+{ $class-description "The " { $snippet "index-type" } " slot of an " { $link index-elements } " or " { $link multi-index-elements } " tuple indicates the type of the index array's elements: one-byte " { $link ubyte-indexes } ", two-byte " { $link ushort-indexes } ", or four-byte " { $link uint-indexes } "." } ;
 
 { index-type ubyte-indexes ushort-indexes uint-indexes } related-words
 
@@ -194,14 +195,14 @@ HELP: points-mode
 { $class-description "This " { $link primitive-mode } " value instructs " { $link render } " to generate a point for each indexed vertex array element." } ;
 
 HELP: primitive-mode
-{ $class-description "The " { $snippet "primitive-mode" } " slot of a " { $link render-set } " tells " { $link render } " what kind of primitives to generate and how to assemble them from the selected elements of the active " { $link vertex-array } "."  }
+{ $class-description "The " { $snippet "primitive-mode" } " slot of a " { $link render-set } " tells " { $link render } " what kind of primitives to generate and how to assemble them from the selected elements of the active " { $link vertex-array } "." }
 { $list
 { { $link points-mode } " causes each element to generate a point." }
 { { $link lines-mode } " causes each pair of elements to generate a disconnected line." }
 { { $link line-strip-mode } " causes each consecutive pair of elements to generate a connected strip of lines." }
-{ { $link line-loop-mode } " causes each consecutive pair of elements to generate a connected loop of lines, with an extra line connecting the last and first elements." } 
+{ { $link line-loop-mode } " causes each consecutive pair of elements to generate a connected loop of lines, with an extra line connecting the last and first elements." }
 { { $link triangles-mode } " causes every 3 elements to generate an independent triangle." }
-{ { $link triangle-strip-mode } " causes every consecutive group of 3 elements to generate a connected strip of triangles." } 
+{ { $link triangle-strip-mode } " causes every consecutive group of 3 elements to generate a connected strip of triangles." }
 { { $link triangle-fan-mode } " causes a triangle to be generated from the first element and every subsequent consecutive pair of elements in a fan pattern." } } ;
 
 { primitive-mode points-mode lines-mode line-strip-mode line-loop-mode triangles-mode triangle-strip-mode triangle-fan-mode } related-words

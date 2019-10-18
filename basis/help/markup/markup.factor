@@ -9,7 +9,6 @@ quotations see sequences sequences.private sets slots sorting
 splitting strings urls vectors vocabs vocabs.loader words
 words.symbol ;
 FROM: prettyprint.sections => with-pprint ;
-FROM: namespaces => set ;
 IN: help.markup
 
 PREDICATE: simple-element < array
@@ -30,11 +29,11 @@ SYMBOL: blank-line
     and [ nl ] when ;
 
 : ($blank-line) ( -- )
-    nl nl blank-line last-element set ;
+    nl nl blank-line last-element namespaces:set ;
 
 : ($span) ( quot -- )
     last-block? [ nl ] when
-    span last-element set
+    span last-element namespaces:set
     call ; inline
 
 GENERIC: print-element ( element -- )
@@ -59,9 +58,9 @@ M: f print-element drop ;
 
 : ($block) ( quot -- )
     ?nl
-    span last-element set
+    span last-element namespaces:set
     call
-    block last-element set ; inline
+    block last-element namespaces:set ; inline
 
 ! Some spans
 
@@ -78,14 +77,14 @@ ALIAS: $slot $snippet
     [ strong-style get print-element* ] ($span) ;
 
 : $url ( children -- )
-    first dup >url [
+    [ ?second ] [ first ] bi [ or ] keep >url [
         dup present href associate url-style get assoc-union
         [ write-object ] with-style
     ] ($span) ;
 
 : $nl ( children -- )
     drop nl last-element get [ nl ] when
-    blank-line last-element set ;
+    blank-line last-element namespaces:set ;
 
 ! Some blocks
 : ($heading) ( children quot -- )
@@ -132,12 +131,12 @@ ALIAS: $slot $snippet
     "Examples" $heading print-element ;
 
 : $example ( element -- )
-    1 cut* [ "\n" join ] bi@ over <input> [
+    unclip-last [ "\n" join ] dip over <input> [
         [ print ] [ output-style get format ] bi*
     ] ($code) ;
 
 : $unchecked-example ( element -- )
-    #! help-lint ignores these.
+    ! help-lint ignores these.
     $example ;
 
 : $markup-example ( element -- )
@@ -267,7 +266,7 @@ PRIVATE>
     ] ($subsection) ;
 
 : $vocab-link ( element -- )
-    check-first dup vocab-name swap ($vocab-link) ;
+    check-first [ vocab-name ] keep ($vocab-link) ;
 
 : $vocabulary ( element -- )
     check-first vocabulary>> [
@@ -347,14 +346,13 @@ PRIVATE>
 
 GENERIC: ($instance) ( element -- )
 
-M: word ($instance)
-    dup name>> a/an write bl ($link) ;
+M: word ($instance) dup name>> a/an write bl ($link) ;
 
-M: string ($instance)
-    write ;
+M: string ($instance) write ;
 
-M: f ($instance)
-    drop { f } $link ;
+M: array ($instance) print-element ;
+
+M: f ($instance) ($link) ;
 
 : $instance ( element -- ) first ($instance) ;
 
@@ -378,6 +376,23 @@ M: f ($instance)
     check-first
     { "a " { $link quotation } " with stack effect " }
     print-element $snippet ;
+
+: ($instances) ( element -- )
+     dup word? [ ($link) "s" print-element ] [ print-element ] if ;
+
+: $sequence ( element -- )
+    { "a " { $link sequence } " of " } print-element
+    dup length {
+        { 1 [ first ($instances) ] }
+        { 2 [ first2 [ ($instances) " or " print-element ] [ ($instances) ] bi* ] }
+        [
+            drop
+            unclip-last
+            [ [ ($instances) ", " print-element ] each ]
+            [ "or " print-element ($instances) ]
+            bi*
+        ]
+    } case ;
 
 : values-row ( seq -- seq )
     unclip \ $snippet swap present 2array
@@ -459,6 +474,9 @@ M: f ($instance)
         "This word should only be called from inside the "
         { $link with-pprint } " combinator."
     } $notes ;
+
+: $content ( element -- )
+    first article-content print-content nl ;
 
 GENERIC: elements* ( elt-type element -- )
 

@@ -22,7 +22,7 @@ $nl
 ABOUT: "bit-vectors"
 
 HELP: bit-vector
-{ $description "The class of resizable bit vectors. See " { $link "bit-vectors" } " for information." } ;
+{ $class-description "The class of resizable bit vectors. See " { $link "bit-vectors" } " for information." } ;
 
 HELP: <bit-vector>
 { $values { "capacity" "a positive integer specifying initial capacity" } { "vector" bit-vector } }
@@ -35,6 +35,5 @@ HELP: >bit-vector
 HELP: ?V{
 { $syntax "?V{ elements... }" }
 { $values { "elements" "a list of booleans" } }
-{ $description "Marks the beginning of a literal bit vector. Literal bit vectors are terminated by " { $link POSTPONE: } } "." } 
+{ $description "Marks the beginning of a literal bit vector. Literal bit vectors are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "?V{ t f t }" } } ;
-

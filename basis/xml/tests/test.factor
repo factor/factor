@@ -57,7 +57,7 @@ SYMBOL: xml-file
 [ ] [ "<?xml version='1.0'?><!-- declarations for <head> & <body> --><foo/>" string>xml drop ] unit-test
 
 : first-thing ( seq -- elt )
-    [ "" = not ] filter first ;
+    [ "" = ] reject first ;
 
 [ T{ element-decl f "br" "EMPTY" } ] [ "<!ELEMENT br EMPTY>" string>dtd directives>> first-thing ] unit-test
 [ T{ element-decl f "p" "(#PCDATA|emph)*" } ] [ "<!ELEMENT p (#PCDATA|emph)*>" string>dtd directives>> first-thing ] unit-test

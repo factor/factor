@@ -10,12 +10,11 @@ struct object_start_map {
   object_start_map(cell size, cell start);
   ~object_start_map();
 
-  cell first_object_in_card(cell card_index);
   cell find_object_containing_card(cell card_index);
   void record_object_start_offset(object* obj);
   void clear_object_start_offsets();
   void update_card_for_sweep(cell index, uint16_t mask);
-  void update_for_sweep(mark_bits<object>* state);
+  void update_for_sweep(mark_bits* state);
 };
 
 }

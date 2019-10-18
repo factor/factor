@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.private math.order ;
-IN: math.floats.private
+IN: math.floats
 
+<PRIVATE
 : float-unordered? ( x y -- ? ) [ fp-nan? ] either? ;
 : float-min ( x y -- z ) [ float< ] most ; foldable
 : float-max ( x y -- z ) [ float> ] most ; foldable
@@ -79,3 +80,5 @@ M: float fp-sign double>bits 63 bit? ; inline
 M: float neg? fp-sign ; inline
 
 M: float abs double>bits 63 2^ bitnot bitand bits>double ; inline
+
+PRIVATE>

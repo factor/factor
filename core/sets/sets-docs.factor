@@ -3,7 +3,7 @@ quotations sequences vectors ;
 IN: sets
 
 ARTICLE: "sets" "Sets"
-"A set is an unordered list of elements. Words for working with sets are in the " { $vocab-link "sets" } " vocabulary." $nl
+"A set is an unordered collection of elements. Words for working with sets are in the " { $vocab-link "sets" } " vocabulary." $nl
 "All sets are instances of a mixin class:"
 { $subsections
     set
@@ -93,13 +93,16 @@ HELP: adjoin
 
 HELP: ?adjoin
 { $values { "elt" object } { "set" set } { "?" boolean } }
-{ $description "A version of " { $link adjoin } " which returns whether the element was added to the set." }
-{ $notes "This is slightly less efficient than " { $link adjoin } " due to the initial membership test." } ;
+{ $description "A version of " { $link adjoin } " which returns whether the element was added to the set." } ;
 
 HELP: delete
 { $values { "elt" object } { "set" set } }
 { $description "Destructively removes " { $snippet "elt" } " from " { $snippet "set" } ". If the element is not present, this does nothing." $nl "Each mutable set type is expected to implement a method on this generic word." }
 { $side-effects "set" } ;
+
+HELP: ?delete
+{ $values { "elt" object } { "set" set } { "?" boolean } }
+{ $description "A version of " { $link delete } " which returns whether the element was removed from the set." } ;
 
 HELP: clear-set
 { $values { "set" set } }
@@ -190,7 +193,7 @@ HELP: subset?
 
 HELP: set=
 { $values { "set1" set } { "set2" set } { "?" boolean } }
-{ $description "Tests if both sets contain the same elements, disregrading order and duplicates." } ;
+{ $description "Tests if both sets contain the same elements, disregarding order and duplicates." } ;
 
 HELP: gather
 { $values
@@ -222,5 +225,9 @@ HELP: cardinality
 { $description "Returns the number of elements in the set. All sets support this operation." } ;
 
 HELP: combine
-{ $values { "sets" "a sequence of sets" } { "set/f" { $maybe set } } }
+{ $values { "sets" { $sequence set } } { "set/f" { $maybe set } } }
 { $description "Outputs the union of a sequence of sets, or " { $link f } " if the sequence is empty." } ;
+
+HELP: refine
+{ $values { "sets" { $sequence set } } { "set/f" { $maybe set } } }
+{ $description "Outputs the intersection of a sequence of sets, or " { $link f } " if the sequence is empty." } ;

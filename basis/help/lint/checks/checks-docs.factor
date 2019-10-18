@@ -7,7 +7,7 @@ HELP: check-example
 
 HELP: check-values
 { $values { "word" word } { "element" sequence } }
-{ $description "Throws an error if the $values pair doesnt match the declared stack effect." }
+{ $description "Throws an error if the $values pair doesn't match the declared stack effect." }
 { $examples
   { $unchecked-example
     "USING: help.lint.checks math ;"

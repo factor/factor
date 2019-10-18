@@ -39,6 +39,6 @@ HELP: <kochanek-bartels-curve>
 { $description "Creates a sequence of cubic hermite curves (each a sequence of polynomials) passing through the given points, generating tangents with the given tuning parameters." } ;
 
 ARTICLE: "math.splines" "Common parametric curves."
-"The curve creating functions create sequences of polynomials, one for each degree of the input points. The spline creating functions create sequences of these curve polynomial sequences. The " { $vocab-link "math.splines.viewer" } " vocabulary provides a gadget to evaluate the generated polynomials and view the results.";
+"The curve creating functions create sequences of polynomials, one for each degree of the input points. The spline creating functions create sequences of these curve polynomial sequences. The " { $vocab-link "math.splines.viewer" } " vocabulary provides a gadget to evaluate the generated polynomials and view the results." ;
 
 ABOUT: "math.splines"

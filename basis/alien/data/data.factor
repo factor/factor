@@ -1,10 +1,10 @@
-! (c)2009, 2010 Slava Pestov, Joe Groff bsd license
+! Copyright (C) 2009, 2010 Slava Pestov, Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.arrays alien.c-types alien.strings
 arrays byte-arrays combinators combinators.short-circuit
 cpu.architecture fry generalizations io io.streams.memory kernel
 libc locals macros math math.functions parser sequences
 stack-checker.dependencies summary words ;
-QUALIFIED: math
 IN: alien.data
 
 : <ref> ( value c-type -- c-ptr )
@@ -126,7 +126,7 @@ ERROR: local-allocation-error ;
 
 : (cleanup-allot) ( -- )
     ! Inhibit TCO in order for the last word in the quotation
-    ! to still be abl to access scope-allocated data.
+    ! to still be able to access scope-allocated data.
     ;
 
 MACRO: (simple-local-allot) ( c-type -- quot )

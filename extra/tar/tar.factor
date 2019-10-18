@@ -85,12 +85,9 @@ M: unknown-typeflag summary
 : read/write-blocks ( header path -- )
     binary [ read-data-blocks ] with-file-writer ;
 
-: prepend-current-directory ( path -- path' )
-    current-directory get prepend-path ;
-
 ! Normal file
 : typeflag-0 ( header -- )
-    dup name>> prepend-current-directory read/write-blocks ;
+    dup name>> read/write-blocks ;
 
 TUPLE: hard-link linkname name ;
 C: <hard-link> hard-link
@@ -114,7 +111,7 @@ C: <symbolic-link> symbolic-link
 
 ! Directory
 : typeflag-5 ( header -- )
-    name>> prepend-current-directory make-directories ;
+    name>> make-directories ;
 
 ! FIFO
 : typeflag-6 ( header -- ) unknown-typeflag ;
@@ -158,7 +155,7 @@ C: <symbolic-link> symbolic-link
     ;
     ! [ read-data-blocks ] with-string-writer
     ! [ zero? ] trim-tail filename set
-    ! filename get prepend-current-directory make-directories ;
+    ! filename get make-directories ;
 
 ! Multi volume continuation entry
 : typeflag-M ( header -- ) unknown-typeflag ;
@@ -211,12 +208,10 @@ C: <symbolic-link> symbolic-link
 GENERIC: do-link ( object -- )
 
 M: hard-link do-link
-    [ linkname>> ]
-    [ name>> prepend-current-directory ] bi make-hard-link ;
+    [ linkname>> ] [ name>> ] bi make-hard-link ;
 
 M: symbolic-link do-link
-    [ linkname>> ]
-    [ name>> prepend-current-directory ] bi make-link ;
+    [ linkname>> ] [ name>> ] bi make-link ;
 
 ! FIXME: linux tar calls unlinkat and makelinkat
 : make-links ( -- )

@@ -1,15 +1,13 @@
 ! Copyright (C) 2007, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.data accessors io.binary math math.bitwise
-alien.accessors kernel kernel.private sequences
-sequences.private byte-arrays parser prettyprint.custom fry
-locals ;
-FROM: sequences.private => change-nth-unsafe ;
+USING: accessors alien alien.accessors byte-arrays fry io.binary
+kernel kernel.private locals math math.bitwise parser
+prettyprint.custom sequences sequences.private ;
 IN: bit-arrays
 
 TUPLE: bit-array
-{ length array-capacity read-only }
-{ underlying byte-array read-only } ;
+    { length array-capacity read-only }
+    { underlying byte-array read-only } ;
 
 <PRIVATE
 
@@ -18,7 +16,8 @@ TUPLE: bit-array
 : bit/byte ( n -- bit byte ) [ 7 bitand ] [ n>byte ] bi ; inline
 
 : bit-index ( n bit-array -- bit# byte# byte-array )
-    [ integer>fixnum bit/byte ] [ underlying>> ] bi* ; inline
+    [ { integer-array-capacity } declare integer>fixnum bit/byte ]
+    [ underlying>> ] bi* ; inline
 
 : bits>cells ( m -- n ) 31 + -5 shift ; inline
 
@@ -28,7 +27,7 @@ TUPLE: bit-array
     [ [ length bits>cells ] keep ] dip swap underlying>>
     '[ [ _ _ ] dip 4 * set-alien-unsigned-4 ] each-integer ; inline
 
-: clean-up ( bit-array -- bit-array )
+: zero-end-bits ( bit-array -- bit-array )
     ! Zero bits after the end.
     dup underlying>> [ ] [
         [
@@ -83,7 +82,7 @@ M: bit-array equal?
 
 M: bit-array resize
     dupd [ bits>bytes ] [ underlying>> ] bi*
-    resize-byte-array bit-array boa clean-up ; inline
+    resize-byte-array bit-array boa zero-end-bits ; inline
 
 M: bit-array byte-length length bits>bytes ; inline
 

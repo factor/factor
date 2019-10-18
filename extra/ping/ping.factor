@@ -59,4 +59,3 @@ M: macosx <ping-port> <datagram> ;
 
 : alive? ( host -- ? )
     [ ping drop t ] [ 2drop f ] recover ;
-

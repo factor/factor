@@ -1,10 +1,10 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data alien.parser arrays assocs
-byte-arrays classes.struct combinators combinators.short-circuit
-cuda cuda.ffi fry generalizations io.backend kernel macros math
-namespaces sequences variants words ;
-FROM: classes.struct.private => compute-struct-offsets write-struct-slot ;
+byte-arrays classes.struct classes.struct.private combinators
+combinators.short-circuit cuda cuda.ffi fry generalizations
+io.backend kernel locals macros math namespaces sequences
+variants vocabs.loader words ;
 QUALIFIED-WITH: alien.c-types c
 IN: cuda.libraries
 
@@ -162,7 +162,7 @@ MACRO: cuda-arguments ( c-types abi -- quot: ( args... function -- ) )
     [ cached-module ] dip
     2array cuda-functions get [ first2 get-function-ptr ] cache ;
 
-MACRO: cuda-invoke ( module-name function-name arguments -- )
+MACRO: cuda-invoke ( module-name function-name arguments -- quot )
     pick lookup-cuda-library abi>> '[
         _ _ cached-function
         [ nip _ _ cuda-arguments ]
@@ -171,16 +171,17 @@ MACRO: cuda-invoke ( module-name function-name arguments -- )
 
 : cuda-global* ( module-name symbol-name -- device-ptr size )
     [ { CUdeviceptr { c:uint initial: 0 } } ] 2dip
-    [ cached-module ] dip 
+    [ cached-module ] dip
     '[ _ _ cuModuleGetGlobal cuda-error ] with-out-parameters ; inline
 
 : cuda-global ( module-name symbol-name -- device-ptr )
     cuda-global* drop ; inline
 
-: define-cuda-function ( word module-name function-name arguments -- )
-    [ '[ _ _ _ cuda-invoke ] ]
-    [ 2nip \ grid suffix c:void function-effect ]
-    3bi define-inline ;
+:: define-cuda-function ( word module-name function-name types names -- )
+    word
+    [ module-name function-name types cuda-invoke ]
+    names "grid" suffix c:void function-effect
+    define-inline ;
 
 : define-cuda-global ( word module-name symbol-name -- )
     '[ _ _ cuda-global ] ( -- device-ptr ) define-inline ;
@@ -201,3 +202,4 @@ ERROR: bad-cuda-abi abi ;
     normalize-path <cuda-library>
     dup name>> cuda-libraries get-global set-at ;
 
+{ "cuda.libraries" "prettyprint" } "cuda.prettyprint" require-when

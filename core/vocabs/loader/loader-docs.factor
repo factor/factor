@@ -1,5 +1,5 @@
 USING: vocabs vocabs.loader.private help.markup help.syntax
-words strings io ;
+words strings io hashtables ;
 IN: vocabs.loader
 
 ARTICLE: "add-vocab-roots" "Working with code outside of the Factor source tree"
@@ -30,10 +30,11 @@ ARTICLE: "vocabs.roots" "Vocabulary roots"
 ARTICLE: "vocabs.icons" "Vocabulary icons"
 "An icon file representing the vocabulary can be provided for use by " { $link "tools.deploy" } ". If any of the following files exist inside the vocabulary directory, they will be used as icons when the application is deployed."
 { $list
-    { { $snippet "icon.ico" } " on Windows" }
+    { { $snippet "icon.ico" } " on Windows and Linux" }
     { { $snippet "icon.icns" } " on MacOS X" }
-    { { $snippet "icon.png" } " on Linux and *BSD" }
-} ;
+    { { $snippet "icon.png" } " on Linux" }
+}
+"The icon file will be embedded in the vocab's image file." ;
 
 ARTICLE: "vocabs.loader" "Vocabulary loader"
 "The " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " words load vocabularies using the vocabulary loader. The vocabulary loader is implemented in the " { $vocab-link "vocabs.loader" } " vocabulary."
@@ -72,7 +73,7 @@ $nl
 ABOUT: "vocabs.loader"
 
 HELP: load-vocab
-{ $values { "name" "a string" } { "vocab" "a hashtable or " { $link f } } }
+{ $values { "name" "a string" } { "vocab" { $maybe hashtable } } }
 { $description "Attempts to load a vocabulary from disk, or looks up the vocabulary in the dictionary, and then outputs that vocabulary object." } ;
 
 HELP: vocab-main
@@ -85,15 +86,19 @@ HELP: vocab-roots
 HELP: add-vocab-root
 { $values { "root" "a pathname string" } }
 { $description "Adds a directory pathname to the list of vocabulary roots." }
-{ $see-also ".factor-roots" } ;
+{ $see-also ".factor-roots" add-vocab-root-hook } ;
+
+HELP: add-vocab-root-hook
+{ $var-description "A quotation that is run when a vocab root is added." }
+{ $see-also add-vocab-root } ;
 
 HELP: find-vocab-root
 { $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string" } }
 { $description "Searches for a vocabulary in the vocabulary roots." } ;
 
 HELP: no-vocab
-{ $values { "name" "a vocabulary name" } } 
-{ $description "Throws a " { $link no-vocab } "." }
+{ $values { "name" "a vocabulary name" } }
+{ $description "A " { $link no-vocab } " error tuple. Call " { $link no-vocab } " to throw it." }
 { $error-description "Thrown when a " { $link POSTPONE: USE: } " or " { $link POSTPONE: USING: } " form refers to a non-existent vocabulary." } ;
 
 HELP: load-help?
@@ -113,7 +118,7 @@ HELP: reload
 { $errors "Throws a " { $link no-vocab } " error if the vocabulary does not exist on disk." } ;
 
 HELP: require-when
-{ $values { "if" "a sequence of vocabulary specifiers" } { "then" "a vocabulary specifier" } }
+{ $values { "if" { $sequence "vocabulary specifiers" } } { "then" "a vocabulary specifier" } }
 { $description "Loads the " { $snippet "then" } " vocabulary if it is not loaded and all of the " { $snippet "if" } " vocabulary is. If some of the " { $snippet "if" } " vocabularies are not loaded now, but they are later, then the " { $snippet "then" } " vocabulary will be loaded along with the final one." }
 { $notes "This is used to express a joint dependency of vocabularies. If vocabularies " { $snippet "a" } " and " { $snippet "b" } " use code in vocabulary " { $snippet "c" } " to interact, then the following line, which can be placed in " { $snippet "a" } " or " { $snippet "b" } ", expresses the dependency."
 { $code "{ \"a\" \"b\" } \"c\" require-when" } } ;
@@ -123,9 +128,9 @@ HELP: run
 { $description "Runs a vocabulary's main entry point. The main entry point is set with the " { $link POSTPONE: MAIN: } " parsing word." } ;
 
 HELP: vocab-source-path
-{ $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string or " { $link f } } }
-{ $description "Outputs a pathname where source code for " { $snippet "vocab" } " might be found. Outputs " { $link f } " if the vocabulary does not have a directory on disk." } ;
+{ $values { "vocab" "a vocabulary specifier" } { "path/f" { $maybe "a pathname string" } } }
+{ $description "Outputs a pathname where source code for " { $snippet "vocab" } " might be found. Outputs " { $link f } " if the vocabulary does not have a known directory on disk." } ;
 
 HELP: vocab-docs-path
-{ $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string or " { $link f } } }
+{ $values { "vocab" "a vocabulary specifier" } { "path/f" { $maybe "a pathname string" } } }
 { $description "Outputs a pathname where the documentation for " { $snippet "vocab" } " might be found. Outputs " { $link f } " if the vocabulary does not have a directory on disk." } ;

@@ -1,7 +1,6 @@
 ! Copyright (C) 2005, 2006 Alex Chapman, Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license
-USING: kernel sequences math sequences.private strings
-accessors locals fry ;
+USING: accessors arrays fry kernel math sequences strings ;
 IN: circular
 
 TUPLE: circular { seq read-only } { start integer } ;
@@ -24,7 +23,7 @@ M: circular virtual@ circular-wrap seq>> ; inline
 M: circular virtual-exemplar seq>> ; inline
 
 : change-circular-start ( n circular -- )
-    #! change start to (start + n) mod length
+    ! change start to (start + n) mod length
     circular-wrap start<< ; inline
 
 : rotate-circular ( circular -- )
@@ -54,7 +53,7 @@ PRIVATE>
     [ [ 1 + ] change-length set-last ] if ;
 
 : <growing-circular> ( capacity -- growing-circular )
-    { } new-sequence 0 0 growing-circular boa ; inline
+    f <array> 0 0 growing-circular boa ; inline
 
 TUPLE: circular-iterator
     { circular read-only } { n integer } { last-start integer } ;

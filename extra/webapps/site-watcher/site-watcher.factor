@@ -1,17 +1,15 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs db.sqlite furnace furnace.actions
+USING: accessors assocs db db.sqlite db.tuples furnace furnace.actions
 furnace.alloy furnace.auth furnace.auth.features.deactivate-user
 furnace.auth.features.edit-profile
 furnace.auth.features.recover-password
 furnace.auth.features.registration furnace.auth.login
 furnace.boilerplate furnace.redirection html.forms http.server
 http.server.dispatchers kernel namespaces site-watcher site-watcher.db
-site-watcher.private urls validators io.sockets.secure.debug
-io.servers io.files.temp db db.tuples sequences
+site-watcher.private urls sequences validators
 webapps.site-watcher.common webapps.site-watcher.watching
-webapps.site-watcher.spidering ;
-QUALIFIED: assocs
+webapps.site-watcher.spidering webapps.utils ;
 IN: webapps.site-watcher
 
 : <main-action> ( -- action )
@@ -42,7 +40,7 @@ IN: webapps.site-watcher
     <protected>
         "update notification details" >>description ;
 
-: <site-watcher-app> ( -- dispatcher )
+: <site-watcher> ( -- dispatcher )
     site-watcher-app new-dispatcher
         <main-action> "" add-responder
         <watch-list-action> "watch-list" add-responder
@@ -57,26 +55,20 @@ IN: webapps.site-watcher
 
 : <login-config> ( responder -- responder' )
     "SiteWatcher" <login-realm>
-        "SiteWatcher" >>name
         allow-registration
         allow-password-recovery
         allow-edit-profile
         allow-deactivation ;
 
-: <site-watcher-server> ( -- threaded-server )
-    <http-server>
-        <test-secure-config> >>secure-config
-        8081 >>insecure
-        8431 >>secure ;
-
 : site-watcher-db ( -- db )
-    "test.db" temp-file <sqlite-db> ;
+    "test.db" <temp-sqlite-db> ;
 
-<site-watcher-app>
-<login-config>
-<boilerplate> { site-watcher-app "site-watcher" } >>template
-site-watcher-db <alloy>
-main-responder set-global
+: <site-watcher-app> ( -- dispatcher )
+    <site-watcher>
+    <login-config>
+    <boilerplate>
+        { site-watcher-app "site-watcher" } >>template
+    site-watcher-db <alloy> ;
 
 M: site-watcher-app init-user-profile
     drop "username" value "email" value <account> insert-tuple ;
@@ -90,4 +82,5 @@ M: site-watcher-app init-user-profile
 : start-site-watcher ( -- )
     init-db
     site-watcher-db run-site-watcher
-    <site-watcher-server> start-server drop ;
+    <site-watcher-app> main-responder set-global
+    run-test-httpd ;

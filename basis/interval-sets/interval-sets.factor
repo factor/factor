@@ -7,6 +7,7 @@ SPECIALIZED-ARRAY: uint
 IN: interval-sets
 ! Sets of positive integers
 
+! Intervals are a pair of { start end }
 TUPLE: interval-set { array uint-array read-only } ;
 
 <PRIVATE
@@ -29,11 +30,8 @@ PRIVATE>
 : spec>pairs ( sequence -- intervals )
     [ dup number? [ dup 2array ] when ] map ;
 
-ALIAS: start first-unsafe
-ALIAS: end second-unsafe
-
 : disjoint? ( node1 node2 -- ? )
-    [ end ] [ start ] bi* < ;
+    [ second-unsafe ] [ first-unsafe ] bi* < ;
 
 : (delete-redundancies) ( seq -- )
     dup length {

@@ -1,10 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays io kernel math models namespaces make
-sequences strings splitting combinators unicode.categories
-math.order math.ranges fry locals ;
-FROM: models => change-model ;
-FROM: sequences => change-nth ;
+USING: accessors arrays fry kernel locals math math.order
+math.ranges models sequences splitting ;
 IN: documents
 
 : +col ( loc n -- newloc ) [ first2 ] dip + 2array ;
@@ -80,14 +77,12 @@ CONSTANT: doc-start { 0 0 }
 : (doc-range) ( from to line# document -- slice )
     [ start/end-on-line ] 2keep doc-line <slice> ;
 
-: text+loc ( lines loc -- loc )
-    over [
-        over length 1 = [
-            nip first2
-        ] [
-            first swap length 1 - + 0
-        ] if
-    ] dip last length + 2array ;
+:: text+loc ( lines loc -- loc )
+    lines length 1 = [
+        loc first2
+    ] [
+        loc first lines length 1 - + 0
+    ] if lines last length + 2array ;
 
 : prepend-first ( str seq -- )
     0 swap [ append ] change-nth ;
@@ -113,12 +108,16 @@ CONSTANT: doc-start { 0 0 }
 : with-undo ( ..a document quot: ( ..a document -- ..b ) -- ..b )
     [ t >>inside-undo? ] dip keep f >>inside-undo? drop ; inline
 
+: split-lines ( str -- seq )
+    [ string-lines ] keep ?last
+    [ "\r\n" member? ] [ t ] if*
+    [ "" suffix ] when ;
+
 PRIVATE>
 
-: doc-range ( from to document -- string )
-    [ 2dup ] dip
-    '[ [ 2dup ] dip _ (doc-range) ] map-lines
-    2nip "\n" join ;
+:: doc-range ( from to document -- string )
+    from to [ [ from to ] dip document (doc-range) ] map-lines
+    "\n" join ;
 
 : add-undo ( edit document -- )
     dup inside-undo?>> [ 2drop ] [
@@ -128,11 +127,11 @@ PRIVATE>
 
 :: set-doc-range ( string from to document -- )
     from to = string empty? and [
-        string string-lines :> new-lines
+        string split-lines :> new-lines
         new-lines from text+loc :> new-to
         from to document doc-range :> old-string
         old-string string from to new-to <edit> document add-undo
-        new-lines from to document [ (set-doc-range) ] change-model
+        new-lines from to document [ (set-doc-range) ] models:change-model
         new-to document update-locs
     ] unless ;
 

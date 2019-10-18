@@ -1,12 +1,16 @@
-! (c)2011 Joe Groff bsd license
+! Copyright (C) 2011 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 continuations formatting fry generalizations hashtables.identity
 io kernel kernel.private layouts locals math math.parser
-math.statistics math.vectors memory namespaces prettyprint
-sequences sequences.generalizations sets sorting ;
-FROM: sequences => change-nth ;
-FROM: assocs => change-at ;
+math.vectors memory namespaces prettyprint sequences
+sequences.generalizations sets sorting ;
 IN: tools.profiler.sampling
+
+<PRIVATE
+PRIMITIVE: (get-samples) ( -- samples/f )
+PRIMITIVE: profiling ( n -- )
+PRIVATE>
 
 SYMBOL: samples-per-second
 
@@ -38,7 +42,7 @@ PRIVATE>
 : sample-thread ( sample -- thread ) 5 swap nth ;
 : sample-callstack ( sample -- array ) 6 swap nth ;
 : unclip-callstack ( sample -- sample' callstack-top )
-    clone 6 over [ unclip swap ] change-nth ;
+    clone 6 over [ unclip-last swap ] change-nth ;
 
 : samples>time ( samples -- seconds )
     samples-per-second get-global / ;
@@ -95,7 +99,7 @@ CONSTANT: zero-counts { 0 0 0 0 0 }
 
 :: (collect-subtrees) ( samples max-depth depth child-quot: ( samples -- child ) -- children )
     max-depth depth > [
-        samples [ sample-callstack leaf-callstack? not ] filter
+        samples [ sample-callstack leaf-callstack? ] reject
         [ f ] [ child-quot call ] if-empty
     ] [ f ] if ; inline
 
@@ -144,7 +148,7 @@ PRIVATE>
 :: collect-flat ( samples -- flat )
     IH{ } clone :> per-word-samples
     samples [| sample |
-        sample sample-callstack members [ ignore-word? not ] filter [
+        sample sample-callstack members [ ignore-word? ] reject [
             per-word-samples sample counts+at
         ] each
     ] each
@@ -154,7 +158,7 @@ PRIVATE>
     [ total-time>> ] same? ;
 
 : trim-flat ( root-node -- root-node' )
-    dup '[ [ nip _ redundant-flat-node? not ] assoc-filter ] change-children ;
+    dup '[ [ nip _ redundant-flat-node? ] assoc-reject ] change-children ;
 
 PRIVATE>
 

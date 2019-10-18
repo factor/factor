@@ -1,7 +1,6 @@
 USING: help.markup help.syntax ui.commands ui.operations
 editors vocabs.loader kernel sequences prettyprint tools.test
-vocabs.refresh strings unicode.categories unicode.case
-ui.tools.browser ui.tools.common ;
+vocabs.refresh strings unicode ui.tools.browser ui.tools.common ;
 IN: help.tutorial
 
 ARTICLE: "first-program-start" "Creating a vocabulary for your first program"
@@ -106,8 +105,8 @@ $nl
 $nl
 "Add the following two lines to " { $snippet "palindrome-tests.factor" } ":"
 { $code
-    "[ f ] [ \"hello\" palindrome? ] unit-test"
-    "[ t ] [ \"racecar\" palindrome? ] unit-test"
+    "{ f } [ \"hello\" palindrome? ] unit-test"
+    "{ t } [ \"racecar\" palindrome? ] unit-test"
 }
 $nl
 "Now, you can run unit tests:"
@@ -116,9 +115,9 @@ $nl
 "It should report that all your tests have been run and there were no test failures, displaying the following output:"
 $nl
 { $snippet
-    "Unit Test: { [ f ] [ \"hello\" palindrome? ] }"
+    "Unit Test: { { f } [ \"hello\" palindrome? ] }"
     "\n"
-    "Unit Test: { [ t ] [ \"racecar\" palindrome? ] }"
+    "Unit Test: { { t } [ \"racecar\" palindrome? ] }"
 }
 $nl
 "Now you can read about " { $link "first-program-extend" } "." ;
@@ -189,7 +188,7 @@ $nl
 "Now if you press " { $command tool "common" refresh-all } ", the source file should reload without any errors. You can run unit tests again, and this time, they will all pass:"
 { $code "\"palindrome\" test" }
 $nl
-"Congratulations, you have now completed " { $link "first-program" } "!";
+"Congratulations, you have now completed " { $link "first-program" } "!" ;
 
 ARTICLE: "first-program" "Your first program"
 "In this tutorial, we will write a simple Factor program which prompts the user to enter a word, and tests if it is a palindrome (that is, the word is spelled the same backwards and forwards)."

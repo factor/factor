@@ -1,8 +1,8 @@
-USING: accessors arrays assocs calendar calendar.format calendar.format.macros
-formatting fry grouping io io.crlf io.encodings.ascii io.encodings.binary
-io.encodings.string io.encodings.utf7 io.encodings.utf8 io.sockets
-io.sockets.secure io.streams.duplex io.streams.string kernel math math.parser
-sequences splitting strings ;
+USING: accessors arrays assocs calendar calendar.english calendar.format
+calendar.parser formatting fry grouping io io.crlf io.encodings.ascii
+io.encodings.binary io.encodings.string io.encodings.utf7 io.encodings.utf8
+io.sockets io.sockets.secure io.streams.duplex io.streams.string kernel math
+math.parser sequences splitting strings ;
 QUALIFIED: pcre
 IN: imap
 
@@ -27,7 +27,7 @@ CONSTANT: IMAP4_SSL_PORT 993
         ! Date, month, year.
         "-" read-token checked-number
         "-" read-token month-abbreviations index 1 +
-        read-sp checked-number -rot swap
+        read-sp checked-number spin
         ! Hour, minute second and gmt offset.
         read-hms " " expect readln parse-rfc822-gmt-offset <timestamp>
     ] with-string-reader  ;
@@ -57,7 +57,7 @@ CONSTANT: IMAP4_SSL_PORT 993
             read-?crlf drop
         ] if-empty t
     ]
-    [ nip first 1 tail values f ] if-empty ;
+    [ nip first rest values f ] if-empty ;
 
 : read-response ( tag -- lines )
     "^%s (BAD|NO|OK) (.*)$" sprintf
@@ -81,7 +81,7 @@ CONSTANT: IMAP4_SSL_PORT 993
 
 : parse-list-folders ( str -- folder )
     "\\* LIST \\(([^\\)]+)\\) \"([^\"]+)\" \"([^\"]+)\"" pcre:findall
-    first 1 tail values [ utf7imap4 decode ] map ;
+    first rest values [ utf7imap4 decode ] map ;
 
 : parse-select-folder ( seq -- count )
     [ "\\* (\\d+) EXISTS" pcre:findall ] map harvest
@@ -98,7 +98,7 @@ CONSTANT: IMAP4_SSL_PORT 993
 
 : parse-store-mail-line ( str -- pair/f )
     "\\(FLAGS \\(([^\\)]+)\\) UID (\\d+)\\)" pcre:findall [ f ] [
-        first 1 tail values first2 [ " " split ] dip string>number swap 2array
+        first rest values first2 [ " " split ] dip string>number swap 2array
     ] if-empty ;
 
 : parse-store-mail ( seq -- assoc )
@@ -108,7 +108,7 @@ PRIVATE>
 
 ! Constructor
 : <imap4ssl> ( host -- imap4 )
-    IMAP4_SSL_PORT <inet> <secure> binary <client> drop
+    IMAP4_SSL_PORT <inet> f <secure> binary <client> drop
     ! Read the useless welcome message.
     dup [ "\\*" read-response drop ] with-stream* ;
 

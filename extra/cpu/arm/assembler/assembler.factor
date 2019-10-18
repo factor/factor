@@ -57,7 +57,7 @@ SYMBOL: cond-code
     cond-code set ;
 
 : CC> ( -- n )
-    #! Default value is 0b1110 AL (= always)
+    ! Default value is 0b1110 AL (= always)
     cond-code [ f ] change 0b1110 or ;
 
 : EQ ( -- ) 0b0000 >CC ;
@@ -84,7 +84,7 @@ SYMBOL: cond-code
 : insn ( bitspec -- ) bitfield (insn) ; inline
 
 ! Branching instructions
-GENERIC# (B) 1 ( target l -- )
+GENERIC#: (B) 1 ( target l -- )
 
 M: integer (B) { 24 { 1 25 } { 0 26 } { 1 27 } 0 } insn ;
 
@@ -109,7 +109,7 @@ PRIVATE>
 : sinsn ( bitspec -- )
     bitfield S> [ 20 2^ bitor ] when (insn) ; inline
 
-GENERIC# shift-imm/reg 2 ( shift-imm/Rs Rm shift -- n )
+GENERIC#: shift-imm/reg 2 ( shift-imm/Rs Rm shift -- n )
 
 M: integer shift-imm/reg ( shift-imm Rm shift -- n )
     { { 0 4 } 5 { register 0 } 7 } bitfield ;
@@ -294,7 +294,7 @@ SYMBOL: have-BLX?
 
 <PRIVATE
 
-GENERIC# (BX) 1 ( Rm l -- )
+GENERIC#: (BX) 1 ( Rm l -- )
 
 M: register-class (BX) ( Rm l -- )
     {

@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences kernel fry vectors accessors namespaces assocs sets
-stack-checker.branches compiler.tree compiler.tree.def-use ;
-FROM: namespaces => set ;
+USING: accessors compiler.tree compiler.tree.def-use kernel
+namespaces sequences sets stack-checker.branches ;
 IN: compiler.tree.def-use.simplified
 
 ! Simplified def-use follows chains of copies.
@@ -19,8 +18,8 @@ SYMBOLS: visited accum ;
 
 : with-simplified-def-use ( quot -- real-usages )
     [
-        HS{ } clone visited set
-        HS{ } clone accum set
+        HS{ } clone visited namespaces:set
+        HS{ } clone accum namespaces:set
         call
         accum get members
     ] with-scope ; inline

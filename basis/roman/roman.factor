@@ -1,10 +1,9 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.smart effects
-effects.parser fry generalizations grouping kernel lexer macros
-math math.order math.vectors namespaces parser quotations
-sequences sequences.private splitting.monotonic stack-checker
-strings unicode.case words ;
+USING: accessors combinators.smart effects.parser fry
+generalizations grouping kernel lexer macros math math.order
+parser quotations sequences splitting.monotonic strings unicode
+words ;
 IN: roman
 
 <PRIVATE
@@ -23,14 +22,14 @@ ERROR: roman-range-error n ;
 : roman-digit-index ( ch -- n )
     1string roman-digits index ; inline
 
-: roman>= ( ch1 ch2 -- ? )
+: roman-digit>= ( ch1 ch2 -- ? )
     [ roman-digit-index ] bi@ >= ;
 
-: roman>n ( ch -- n )
+: roman-digit-value ( ch -- n )
     roman-digit-index roman-values nth ;
 
-: (roman>) ( seq -- n )
-    [ [ roman>n ] map ] [ all-eq? ] bi
+: roman-value ( seq -- n )
+    [ [ roman-digit-value ] map ] [ all-eq? ] bi
     [ sum ] [ first2 swap - ] if ;
 
 PRIVATE>
@@ -44,7 +43,8 @@ PRIVATE>
 : >ROMAN ( n -- str ) >roman >upper ;
 
 : roman> ( str -- n )
-    >lower [ roman>= ] monotonic-split [ (roman>) ] map-sum ;
+    >lower [ roman-digit>= ] monotonic-split
+    [ roman-value ] map-sum ;
 
 <PRIVATE
 
@@ -57,7 +57,7 @@ PRIVATE>
 <<
 
 SYNTAX: ROMAN-OP:
-    scan-word [ name>> "roman" prepend create-in ] keep
+    scan-word [ name>> "roman" prepend create-word-in ] keep
     1quotation '[ _ binary-roman-op ]
     scan-effect define-declared ;
 

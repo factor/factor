@@ -6,7 +6,7 @@ namespace factor {
 // FXSR
 // environment
 struct _fpstate {
-  /* Regular FPU environment */
+  // Regular FPU environment
   unsigned long cw;
   unsigned long sw;
   unsigned long tag;
@@ -16,13 +16,13 @@ struct _fpstate {
   unsigned long datasel;
   struct _fpreg _st[8];
   unsigned short status;
-  unsigned short magic; /* 0xffff = regular FPU data only */
+  unsigned short magic; // 0xffff = regular FPU data only
 
-  /* FXSR FPU environment */
-  unsigned long _fxsr_env[6]; /* FXSR FPU env is ignored */
+  // FXSR FPU environment
+  unsigned long _fxsr_env[6]; // FXSR FPU env is ignored
   unsigned long mxcsr;
   unsigned long reserved;
-  struct _fpxreg _fxsr_st[8]; /* FXSR FPU reg data is ignored */
+  struct _fpxreg _fxsr_st[8]; // FXSR FPU reg data is ignored
   struct _xmmreg _xmm[8];
   unsigned long padding[56];
 };
@@ -50,12 +50,10 @@ inline static void uap_clear_fpu_status(void* uap) {
   (((ucontext_t*)ucontext)->uc_mcontext.gregs[7])
 #define UAP_PROGRAM_COUNTER(ucontext) \
   (((ucontext_t*)ucontext)->uc_mcontext.gregs[14])
-#define UAP_SET_TOC_POINTER(uap, ptr) (void)0
 
 #define CODE_TO_FUNCTION_POINTER(code) (void)0
 #define CODE_TO_FUNCTION_POINTER_CALLBACK(vm, code) (void)0
 #define FUNCTION_CODE_POINTER(ptr) ptr
 #define FUNCTION_TOC_POINTER(ptr) ptr
 
-#define UAP_STACK_POINTER_TYPE greg_t
 }

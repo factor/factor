@@ -6,8 +6,8 @@ IN: continuations
 
 : with-datastack ( stack quot -- new-stack )
     [
-        [ [ datastack ] dip swap [ { } like set-datastack ] dip ] dip
-        swap [ call datastack ] dip
+        [ [ get-datastack ] dip swap [ { } like set-datastack ] dip ] dip
+        swap [ call get-datastack ] dip
         swap [ set-datastack ] dip
     ] ( stack quot -- new-stack ) call-effect-unsafe ;
 
@@ -19,14 +19,14 @@ SYMBOL: restarts
 
 <PRIVATE
 
-: catchstack* ( -- catchstack )
+: (get-catchstack) ( -- catchstack )
     CONTEXT-OBJ-CATCHSTACK context-object { vector } declare ; inline
 
 ! We have to defeat some optimizations to make continuations work
 : dummy-1 ( -- obj ) f ;
 : dummy-2 ( obj -- obj ) ;
 
-: catchstack ( -- catchstack ) catchstack* clone ; inline
+: get-catchstack ( -- catchstack ) (get-catchstack) clone ; inline
 
 : (set-catchstack) ( catchstack -- )
     CONTEXT-OBJ-CATCHSTACK set-context-object ; inline
@@ -44,12 +44,12 @@ TUPLE: continuation data call retain name catch ;
 C: <continuation> continuation
 
 : current-continuation ( -- continuation )
-    datastack callstack retainstack namestack catchstack
+    get-datastack get-callstack get-retainstack get-namestack get-catchstack
     <continuation> ;
 
 <PRIVATE
 
-ERROR: not-a-continuation obj ;
+ERROR: not-a-continuation object ;
 
 : >continuation< ( continuation -- data call retain name catch )
     dup continuation? [ not-a-continuation ] unless
@@ -100,7 +100,7 @@ PRIVATE>
 SYMBOL: return-continuation
 
 : with-return ( quot -- )
-    [ [ return-continuation set ] prepose callcc0 ] with-scope ; inline
+    [ return-continuation ] dip [ with-variable ] 2curry callcc0 ; inline
 
 : return ( -- * )
     return-continuation get continue ;
@@ -117,39 +117,47 @@ PRIVATE>
 
 GENERIC: error-in-thread ( error thread -- * )
 
-SYMBOL: thread-error-hook ! ( error thread -- )
+SYMBOL: thread-error-hook ! ( error thread -- * )
 
-thread-error-hook [ [ die ] ] initialize
-
-M: object error-in-thread ( error thread -- * )
+M: object error-in-thread
     thread-error-hook get-global call( error thread -- * ) ;
 
 : in-callback? ( -- ? ) CONTEXT-OBJ-IN-CALLBACK-P context-object ;
 
 SYMBOL: callback-error-hook ! ( error -- * )
 
-callback-error-hook [ [ die ] ] initialize
-
 : rethrow ( error -- * )
     dup save-error
-    catchstack* [
+    (get-catchstack) [
         in-callback?
         [ callback-error-hook get-global call( error -- * ) ]
         [ OBJ-CURRENT-THREAD special-object error-in-thread ]
         if
     ] [ pop continue-with ] if-empty ;
 
+thread-error-hook [ [ die drop rethrow ] ] initialize
+
+callback-error-hook [ [ die rethrow ] ] initialize
+
 : recover ( ..a try: ( ..a -- ..b ) recovery: ( ..a error -- ..b ) -- ..b )
     [
         [
-            [ catchstack* push ] dip
+            [ (get-catchstack) push ] dip
             call
-            catchstack* pop*
+            (get-catchstack) pop*
         ] curry
     ] dip ifcc ; inline
 
 : ignore-errors ( quot -- )
     [ drop ] recover ; inline
+
+: ignore-error ( quot check: ( error -- ? ) -- )
+    [ dup ] prepose [ [ drop ] [ rethrow ] if ] compose
+    recover ; inline
+
+: ignore-error/f ( quot check: ( error -- ? ) -- )
+    [ dup ] prepose [ [ drop f ] [ rethrow ] if ] compose
+    recover ; inline
 
 : cleanup ( try cleanup-always cleanup-error -- )
     [ compose [ dip rethrow ] curry recover ] [ drop ] 2bi call ; inline
@@ -198,15 +206,11 @@ M: condition compute-restarts
 <PRIVATE
 
 : init-error-handler ( -- )
-    init-catchstack
     ! VM calls on error
     [
         OBJ-CURRENT-THREAD special-object error-thread set-global
         current-continuation error-continuation set-global
         [ original-error set-global ] [ rethrow ] bi
-    ] ERROR-HANDLER-QUOT set-special-object
-    ! VM adds this to kernel errors, so that user-space
-    ! can identify them
-    "kernel-error" OBJ-ERROR set-special-object ;
+    ] ERROR-HANDLER-QUOT set-special-object ;
 
 PRIVATE>

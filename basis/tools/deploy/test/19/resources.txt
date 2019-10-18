@@ -1,1 +1,1 @@
-license.txt
+local-license.txt

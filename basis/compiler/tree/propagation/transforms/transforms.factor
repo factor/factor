@@ -1,17 +1,15 @@
 ! Copyright (C) 2008, 2011 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types kernel sequences words fry generic
-generic.single accessors classes.tuple classes classes.algebra
-definitions stack-checker.dependencies quotations
-classes.tuple.private math math.partial-dispatch math.private
-math.intervals sets.private math.floats.private
-math.integers.private layouts math.order vectors hashtables
-combinators effects generalizations sequences.generalizations
-assocs sets combinators.short-circuit sequences.private locals
-growable stack-checker namespaces compiler.tree.propagation.info
-hash-sets arrays hashtables.private ;
+USING: accessors alien.c-types assocs classes classes.algebra
+classes.tuple classes.tuple.private combinators
+combinators.short-circuit compiler.tree.propagation.info effects
+fry generalizations generic generic.single growable hash-sets
+hashtables kernel layouts locals math math.integers.private
+math.intervals math.order math.partial-dispatch math.private
+namespaces quotations sequences sequences.generalizations
+sequences.private sets sets.private stack-checker
+stack-checker.dependencies vectors words ;
 FROM: math => float ;
-FROM: sets => set members ;
 IN: compiler.tree.propagation.transforms
 
 \ equal? [
@@ -218,7 +216,7 @@ ERROR: bad-partial-eval quot word ;
 \ index [
     dup sequence? [
         dup length 4 >= [
-            dup length iota zip >hashtable '[ _ at ]
+            H{ } zip-index-as '[ _ at ]
         ] [ drop f ] if
     ] [ drop f ] if
 ] 1 define-partial-eval
@@ -248,7 +246,7 @@ ERROR: bad-partial-eval quot word ;
 CONSTANT: lookup-table-at-max 256
 
 : lookup-table-at? ( assoc -- ? )
-    #! Can we use a fast byte array test here?
+    ! Can we use a fast byte array test here?
     {
         [ assoc-size 4 > ]
         [ values [ ] all? ]
@@ -257,7 +255,7 @@ CONSTANT: lookup-table-at-max 256
     } 1&& ;
 
 : lookup-table-seq ( assoc -- table )
-    [ keys supremum 1 + iota ] keep '[ _ at ] { } map-as ;
+    [ keys supremum 1 + <iota> ] keep '[ _ at ] { } map-as ;
 
 : lookup-table-quot ( seq -- newquot )
     lookup-table-seq
@@ -302,19 +300,19 @@ CONSTANT: lookup-table-at-max 256
 \ at* [ at-quot ] 1 define-partial-eval
 
 : diff-quot ( seq -- quot: ( seq' -- seq'' ) )
-    [ tester ] keep '[ members [ @ not ] filter _ set-like ] ;
+    [ tester ] keep '[ members _ reject _ set-like ] ;
 
-M\ set diff [ diff-quot ] 1 define-partial-eval
+M\ sets:set diff [ diff-quot ] 1 define-partial-eval
 
 : intersect-quot ( seq -- quot: ( seq' -- seq'' ) )
     [ tester ] keep '[ members _ filter _ set-like ] ;
 
-M\ set intersect [ intersect-quot ] 1 define-partial-eval
+M\ sets:set intersect [ intersect-quot ] 1 define-partial-eval
 
 : intersects?-quot ( seq -- quot: ( seq' -- seq'' ) )
     tester '[ members _ any? ] ;
 
-M\ set intersects? [ intersects?-quot ] 1 define-partial-eval
+M\ sets:set intersects? [ intersects?-quot ] 1 define-partial-eval
 
 : bit-quot ( #call -- quot/f )
     in-d>> second value-info interval>> 0 fixnum-bits [a,b] interval-subset?

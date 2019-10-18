@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors formatting kernel math math.functions
-models models.arrow models.product models.range sequences ui
-ui.gadgets ui.gadgets.labels ui.gadgets.packs ui.gadgets.sliders
+math.vectors models models.arrow models.product models.range sequences
+ui ui.gadgets ui.gadgets.labels ui.gadgets.packs ui.gadgets.sliders
 ui.gadgets.tracks ui.pens.solid ;
 IN: color-picker
 
@@ -30,21 +30,17 @@ M: color-preview model-changed
     [ [ range-model ] map <product> ]
     bi ;
 
+: color>str ( seq -- str )
+    vtruncate v>integer first3 3dup "%d %d %d #%02x%02x%02x" sprintf ;
+
 : <color-picker> ( -- gadget )
-    vertical <track>
-        { 5 5 } >>gap
-        <color-sliders>
-        [ f track-add ]
-        [
-            [ <color-model> <color-preview> 1 track-add ]
-            [
-                [
-                    [ truncate >integer ] map
-                    first3 3dup "%d %d %d #%02x%02x%02x" sprintf
-                ] <arrow> <label-control>
-                f track-add
-            ] bi
-        ] bi* ;
+    vertical <track> { 5 5 } >>gap
+    <color-sliders>
+    [ f track-add ]
+    [
+        [ <color-model> <color-preview> 1 track-add ]
+        [ [ color>str ] <arrow> <label-control> f track-add ] bi
+    ] bi* ;
 
 MAIN-WINDOW: color-picker-window { { title "Color Picker" } }
     <color-picker> >>gadgets ;

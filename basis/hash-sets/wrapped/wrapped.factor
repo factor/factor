@@ -6,9 +6,6 @@ vocabs.loader ;
 
 IN: hash-sets.wrapped
 
-TUPLE: wrapped-key
-    { underlying read-only } ;
-
 TUPLE: wrapped-hash-set
     { underlying hash-set read-only } ;
 
@@ -35,6 +32,9 @@ M: wrapped-hash-set clear-set
 
 M: wrapped-hash-set delete
     wrapper@ delete ; inline
+
+M: wrapped-hash-set ?delete
+    wrapper@ ?delete ; inline
 
 M: wrapped-hash-set cardinality
     underlying>> cardinality ; inline

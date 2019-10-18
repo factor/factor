@@ -1,10 +1,11 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays classes classes.singleton classes.tuple help.markup
 help.syntax kernel multiline slots quotations ;
 IN: variants
 
 HELP: VARIANT:
-{ $syntax """
+{ $syntax "
 VARIANT: class-name
     singleton
     singleton
@@ -12,9 +13,9 @@ VARIANT: class-name
     .
     .
     .
-    ; """ }
+    ; " }
 { $description "Defines " { $snippet "class-name" } " as a union of the following " { $link singleton-class } " and " { $link tuple-class } " definitions. Each " { $snippet "singleton" } " word is defined as a " { $snippet "singleton-class" } ", and each " { $snippet "tuple" } " word is defined as a " { $snippet "tuple-class" } " with the given set of " { $snippet "slot" } "s, using the same syntax for slot specifiers as " { $link POSTPONE: TUPLE: } ". Typed tuple slots can recursively reference the variant " { $snippet "class-name" } " being defined. For " { $snippet "tuple" } " types, a " { $link boa } " constructor word " { $snippet "<tuple>" } " is defined as well." }
-{ $examples { $code """
+{ $examples { $code "
 USING: kernel variants ;
 IN: scratchpad
 
@@ -22,24 +23,24 @@ VARIANT: list
     nil
     cons: { { first object } { rest list } }
     ;
-""" } } ;
+" } } ;
 
 HELP: VARIANT-MEMBER:
 { $description "Defines a new member of a variant class without restricting such definitions to a single statement or source file. The variant class should be listed first, and the class member should follow." }
-{ $examples { $code """
+{ $examples { $code "
 USING: kernel variants ;
 IN: scratchpad
 
 VARIANT: list ;
 
-VARIANT-MEMBER: list nil
-VARIANT-MEMBER: list cons: { { first object } { rest list } }
-""" } } ;
+VARIANT-MEMBER: list nil ;
+VARIANT-MEMBER: list cons: { { first object } { rest list } } ;
+" } } ;
 
 HELP: match
 { $values { "branches" array } }
 { $description "Dispatches on the type of the value on the top of the stack. If the type is a " { $link singleton-class } ", the corresponding quotation is called with the underlying stack unchanged. If the type is a " { $link tuple-class } ", the tuple slots are pushed onto the stack by order of arguments." }
-{ $examples { $example """
+{ $examples { $example "
 USING: kernel math prettyprint variants ;
 IN: scratchpad
 
@@ -55,7 +56,7 @@ VARIANT: list
     } match ;
 
 1 2 3 4 nil <cons> <cons> <cons> <cons> list-length .
-""" "4" } } ;
+" "4" } } ;
 
 HELP: unboa
 { $values { "class" class } }

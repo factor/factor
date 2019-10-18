@@ -13,7 +13,7 @@ IN: furnace.auth.providers.db.tests
 : auth-test-db-name ( -- string )
     cpu name>> "auth-test." ".db" surround ;
 
-[ auth-test-db-name temp-file delete-file ] ignore-errors
+auth-test-db-name temp-file ?delete-file
 
 auth-test-db-name temp-file <sqlite-db> [
 

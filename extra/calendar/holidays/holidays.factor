@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs calendar fry kernel locals parser 
-sequences vocabs words memoize ;
+USING: accessors assocs calendar fry kernel locals parser
+sequences vocabs words ;
 IN: calendar.holidays
 
 SINGLETONS: all world commonwealth-of-nations ;
@@ -15,7 +15,10 @@ SYNTAX: HOLIDAY:
     parse-definition ( timestamp/n -- timestamp ) define-declared ;
 
 SYNTAX: HOLIDAY-NAME:
-    [let scan-word "holiday" word-prop :> holidays scan-word :> name scan-object :> value
+    [let
+        scan-word "holiday" word-prop :> holidays
+        scan-word :> name
+        scan-object :> value
     value name holidays set-at ] ;
 >>
 
@@ -24,16 +27,14 @@ GENERIC: holidays ( n singleton -- seq )
 <PRIVATE
 
 : (holidays) ( singleton -- seq )
-    all-words swap '[ "holiday" word-prop _ swap key? ] filter ;
+    all-words [ "holiday" word-prop key? ] with filter ;
 
 M: object holidays
     (holidays) [ execute( timestamp -- timestamp' ) ] with map ;
 
 PRIVATE>
 
-M: all holidays
-    drop
-    all-words [ "holiday" word-prop key? ] with filter ;
+M: all holidays drop (holidays) ;
 
 : holiday? ( timestamp/n singleton -- ? )
     [ holidays ] [ drop ] 2bi '[ _ same-day? ] any? ;

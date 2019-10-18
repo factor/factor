@@ -16,7 +16,8 @@ ARTICLE: "slot-class-declaration" "Slot class declarations"
     { "The " { $link slots>tuple } " and " { $link >tuple } " words ensure that the values in the sequence satisfy the correct class predicates." }
     { { $link "tuple-redefinition" } " fills in new slots with initial values and ensures that changes to existing declarations result in incompatible values being replaced with the initial value of their respective slots." }
 }
-{ $subsections "slot-class-coercion" } ;
+{ $subsections "slot-class-coercion" }
+"The " { $link "maybes" } " are a useful way to specify class for an optional slot." ;
 
 ARTICLE: "slot-class-coercion" "Coercive slot declarations"
 "If the class of a slot is declared to be one of " { $link fixnum } " or " { $link float } ", then rather than testing values with the class predicate, writer words coerce values to the relevant type with " { $link >fixnum } " or " { $link >float } ". This may still result in error, but permits a wider range of values than a class predicate test. It also results in a possible loss of precision; for example, storing a large integer into a " { $link fixnum } " slot will silently overflow and discard high bits, and storing a ratio into a " { $link float } " slot may lose precision if the ratio is one which cannot be represented exactly with floating-point."
@@ -36,10 +37,10 @@ ARTICLE: "tuple-declarations" "Tuple slot declarations"
     "slot-initial-values"
 } ;
 
-ARTICLE: "parametrized-constructors" "Parameterized constructors"
-"A " { $emphasis "parametrized constructor" } " is a word which directly or indirectly calls " { $link new } " or " { $link boa } ", but instead of passing a literal class symbol, it takes the class symbol as an input from the stack."
+ARTICLE: "parameterized-constructors" "Parameterized constructors"
+"A " { $emphasis "parameterized constructor" } " is a word which directly or indirectly calls " { $link new } " or " { $link boa } ", but instead of passing a literal class symbol, it takes the class symbol as an input from the stack."
 $nl
-"Parametrized constructors are useful in many situations, in particular with subclassing. For example, consider the following code:"
+"Parameterized constructors are useful in many situations, in particular with subclassing. For example, consider the following code:"
 { $code
     "TUPLE: vehicle max-speed occupants ;"
     ""
@@ -59,7 +60,7 @@ $nl
     "        swap >>max-altitude"
     "        swap >>max-speed ;"
 }
-"The two constructors depend on the implementation of " { $snippet "vehicle" } " because they are responsible for initializing the " { $snippet "occupants" } " slot to an empty vector. If this slot is changed to contain a hashtable instead, there will be two places instead of one. A better approach is to use a parametrized constructor for vehicles:"
+"The two constructors depend on the implementation of " { $snippet "vehicle" } " because they are responsible for initializing the " { $snippet "occupants" } " slot to an empty vector. If this slot is changed to contain a hashtable instead, there will be two places instead of one. A better approach is to use a parameterized constructor for vehicles:"
 { $code
     "TUPLE: vehicle max-speed occupants ;"
     ""
@@ -81,7 +82,7 @@ $nl
     "        swap >>max-altitude"
     "        swap >>max-speed ;"
 }
-"The naming convention for parametrized constructors is " { $snippet "new-" { $emphasis "class" } } "." ;
+"The naming convention for parameterized constructors is " { $snippet "new-" { $emphasis "class" } } "." ;
 
 ARTICLE: "tuple-constructors" "Tuple constructors"
 "Tuples are created by calling one of two constructor primitives:"
@@ -118,7 +119,7 @@ $nl
     "! Run-time error"
     "\"not a number\" 2 3 4 color boa"
 }
-{ $subsections "parametrized-constructors" } ;
+{ $subsections "parameterized-constructors" } ;
 
 ARTICLE: "tuple-inheritance-example" "Tuple subclassing example"
 "Rectangles, parallelograms and circles are all shapes. We support two operations on shapes:"
@@ -176,8 +177,8 @@ $nl
 $nl
 "The second is to use ad-hoc slot polymorphism. If two classes define a slot with the same name, then code which uses " { $link "accessors" } " can operate on instances of both objects, assuming the values stored in that slot implement a common protocol. This allows code to be shared without creating contrived relationships between classes."
 { $heading "Anti-pattern #3: subclassing to override a method definition" }
-"While method overriding is a very powerful tool, improper use can cause tight coupling of code and lead to difficulty in testing and refactoring. Subclassing should not be used as a means of “monkey patching” methods to fix bugs and add features. Only subclass from classes which were designed to be inherited from, and when writing classes of your own which are intended to be subclassed, clearly document what subclasses may and may not do. This includes construction policy; document whether subclasses should use " { $link new } ", " { $link boa } ", or a custom parametrized constructor."
-{ $see-also "parametrized-constructors" } ;
+"While method overriding is a very powerful tool, improper use can cause tight coupling of code and lead to difficulty in testing and refactoring. Subclassing should not be used as a means of “monkey patching” methods to fix bugs and add features. Only subclass from classes which were designed to be inherited from, and when writing classes of your own which are intended to be subclassed, clearly document what subclasses may and may not do. This includes construction policy; document whether subclasses should use " { $link new } ", " { $link boa } ", or a custom parameterized constructor."
+{ $see-also "parameterized-constructors" } ;
 
 ARTICLE: "tuple-subclassing" "Tuple subclassing"
 "Tuple subclassing can be used to express natural relationships between classes at the language level. For example, every car " { $emphasis "is a" } " vehicle, so if the " { $snippet "car" } " class subclasses the " { $snippet "vehicle" } " class, it can " { $emphasis "inherit" } " the slots and methods of " { $snippet "vehicle" } "."
@@ -192,7 +193,7 @@ $nl
 }
 "Declaring a tuple class final prohibits other classes from subclassing it:"
 { $subsections POSTPONE: final }
-{ $see-also "call-next-method" "parametrized-constructors" "unions" "mixins" } ;
+{ $see-also "call-next-method" "parameterized-constructors" "unions" "mixins" "maybes" } ;
 
 ARTICLE: "tuple-introspection" "Tuple introspection"
 "In addition to the slot reader and writer words which " { $link POSTPONE: TUPLE: } " defines for every tuple class, it is possible to construct and take apart entire tuples in a generic way."
@@ -200,6 +201,7 @@ ARTICLE: "tuple-introspection" "Tuple introspection"
     >tuple
     tuple>array
     tuple-slots
+    slots>tuple
 }
 "Tuples can be compared for slot equality even if the tuple class overrides " { $link equal? } ":"
 { $subsections tuple= }
@@ -418,6 +420,10 @@ HELP: tuple>array
 { $values { "tuple" tuple } { "array" array } }
 { $description "Outputs an array having the tuple's slots as elements. The first element is the tuple class word and remainder are declared slots." } ;
 
+HELP: initial-values
+{ $values { "class" class } { "seq" sequence } }
+{ $description "Gets a sequence with the initial value for each tuple slot." } ;
+
 HELP: <tuple>
 { $values { "layout" "a tuple layout array" } { "tuple" tuple } }
 { $description "Low-level tuple constructor. User code should never call this directly, and instead use " { $link new } "." } ;
@@ -448,17 +454,24 @@ HELP: boa
 HELP: bad-superclass
 { $error-description "Thrown if an attempt is made to subclass a class that is not a tuple class, or a tuple class declared " { $link POSTPONE: final } "." } ;
 
+HELP: ?offset-of-slot
+{ $values { "name" string } { "tuple" tuple } { "n/f" { $maybe integer } } }
+{ $description "Returns the offset of a tuple slot accessed by " { $snippet "name" } ", or " { $link f } " if no slot with that name." } ;
+
 HELP: offset-of-slot
 { $values { "name" string } { "tuple" tuple } { "n" integer } }
-{ $description "Returns the offset of a tuple slot accessed by " { $snippet "name" } "." } ;
+{ $description "Returns the offset of a tuple slot accessed by " { $snippet "name" } "." }
+{ $errors "Throws a " { $link no-slot } " error if no slot with that name." } ;
 
 HELP: get-slot-named
 { $values { "name" string } { "tuple" tuple } { "value" object } }
-{ $description "Returns the " { $snippet "value" } " stored in a tuple slot accessed by " { $snippet "name" } "." } ;
+{ $description "Returns the " { $snippet "value" } " stored in a tuple slot accessed by " { $snippet "name" } "." }
+{ $errors "Throws a " { $link no-slot } " error if no slot with that name." } ;
 
 HELP: set-slot-named
 { $values { "value" object } { "name" string } { "tuple" tuple } }
-{ $description "Stores the " { $snippet "value" } " into a tuple slot accessed by " { $snippet "name" } "." } ;
+{ $description "Stores the " { $snippet "value" } " into a tuple slot accessed by " { $snippet "name" } "." }
+{ $errors "Throws a " { $link no-slot } " error if no slot with that name." } ;
 
 HELP: set-slots
 { $values { "assoc" assoc } { "tuple" tuple } }

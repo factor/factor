@@ -1,20 +1,17 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
-!
-USING: kernel tools.test math channels channels.private 
-sequences threads sorting ;
-IN: channels.tests
+USING: channels kernel sequences sorting threads tools.test ;
 
 { V{ 10 } } [
     V{ } clone <channel>
     [ from swap push ] in-thread
-    10 swap to 
+    10 swap to
 ] unit-test
 
 { 20 } [
     <channel>
     [ 20 swap to ] in-thread
-    from 
+    from
 ] unit-test
 
 { { 1 2 3 4 } } [
@@ -23,10 +20,10 @@ IN: channels.tests
     [ from swap push ] in-thread
     [ from swap push ] in-thread
     [ from swap push ] in-thread
-    4 over to 
-    2 over to 
-    1 over to 
-    3 swap to 
+    4 over to
+    2 over to
+    1 over to
+    3 swap to
     natural-sort
 ] unit-test
 
@@ -36,9 +33,9 @@ IN: channels.tests
     [ 2 swap to ] in-thread
     [ 1 swap to ] in-thread
     [ 9 swap to ] in-thread
-    2dup from swap push 
-    2dup from swap push 
-    2dup from swap push 
-    dupd from swap push 
+    2dup from swap push
+    2dup from swap push
+    2dup from swap push
+    dupd from swap push
     natural-sort
 ] unit-test

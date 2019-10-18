@@ -1,1 +1,0 @@
-Computing checksums of streaming data

@@ -1,18 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry namespaces assocs kernel sequences words accessors
-definitions math math.order effects classes arrays combinators
-vectors hints
-stack-checker.state
-stack-checker.errors
-stack-checker.values
-stack-checker.visitor
-stack-checker.backend
-stack-checker.branches
-stack-checker.known-words
-stack-checker.dependencies
-stack-checker.row-polymorphism
-stack-checker.recursive-state ;
+USING: accessors arrays effects fry hints kernel locals math
+math.order namespaces sequences stack-checker.backend
+stack-checker.dependencies stack-checker.errors
+stack-checker.known-words stack-checker.recursive-state
+stack-checker.state stack-checker.values stack-checker.visitor
+vectors words ;
 IN: stack-checker.inlining
 
 ! Code to handle inline words. Much of the complexity stems from
@@ -63,17 +56,15 @@ SYMBOL: enter-out
 : entry-stack-height ( label -- stack )
     enter-out>> length ;
 
-: check-return ( word label -- )
-    2dup
-    [ stack-height ]
-    [ entry-stack-height current-stack-height swap - ]
-    bi*
-    = [ 2drop ] [
-        terminated? get [ 2drop ] [
-            word>> current-stack-height
+:: check-return ( word label -- )
+    word stack-height
+    current-stack-height label entry-stack-height -
+    = [
+        terminated? get [
+            label word>> current-stack-height
             unbalanced-recursion-error inference-error
-        ] if
-    ] if ;
+        ] unless
+    ] unless ;
 
 : end-recursive-word ( word label -- )
     [ check-return ]
@@ -107,8 +98,9 @@ SYMBOL: enter-out
     [ terminate ] when ;
 
 : check-call-height ( label -- )
-    dup entry-stack-height current-stack-height >
-    [ word>> diverging-recursion-error inference-error ] [ drop ] if ;
+    dup entry-stack-height current-stack-height > [
+        word>> diverging-recursion-error inference-error
+    ] [ drop ] if ;
 
 : trim-stack ( label seq -- stack )
     swap word>> required-stack-effect in>> length tail* ;
@@ -140,20 +132,22 @@ M: declared-effect (undeclared-known) known>> (undeclared-known) ;
     <effect> ;
 
 : call-recursive-inline-word ( word label -- )
-    over "recursive" word-prop [
+    over recursive? [
         [ required-stack-effect adjust-stack-effect ] dip
         [ check-call ] [ '[ _ #call-recursive, ] consume/produce ] bi
-    ] [ drop undeclared-recursion-error inference-error ] if ;
+    ] [
+        drop undeclared-recursion-error inference-error
+    ] if ;
 
 : inline-word ( word -- )
     commit-literals
-    [ add-depends-on-definition ]
+    [ +definition+ depends-on ]
     [ declare-input-effects ]
     [
         dup inline-recursive-label [
             call-recursive-inline-word
         ] [
-            dup "recursive" word-prop
+            dup recursive?
             [ inline-recursive-word ]
             [ dup infer-inline-word-def ]
             if

@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables sequences.parser
 html.parser.utils kernel namespaces sequences make math
-unicode.case unicode.categories combinators.short-circuit
-quoting fry ;
+unicode combinators.short-circuit quoting fry ;
 IN: html.parser
 
 TUPLE: tag name attributes text closing? ;
@@ -44,7 +43,7 @@ SYMBOL: tagstack
     CHAR: ' (read-quote) ;
 
 : read-double-quote ( sequence-parser -- string )
-    CHAR: " (read-quote) ;
+    CHAR: \" (read-quote) ;
 
 : read-quote ( sequence-parser -- string )
     dup get+increment CHAR: ' =
@@ -75,8 +74,10 @@ SYMBOL: tagstack
     [ advance advance read-comment ] [ read-dtd ] if ;
 
 : read-tag ( sequence-parser -- string )
-    [ [ current "><" member? ] take-until ]
-    [ dup current CHAR: < = [ advance ] unless drop ] bi ;
+    [
+        [ current "><" member? ] take-until
+        [ CHAR: / = ] trim-tail
+    ] [ dup current CHAR: < = [ advance ] unless drop ] bi ;
 
 : read-until-< ( sequence-parser -- string )
     [ current CHAR: < = ] take-until ;

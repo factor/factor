@@ -38,7 +38,7 @@ CONSTANT: pov-polygons
     indicator-polygon <polygon-gadget> ;
 
 : (>loc) ( axisloc -- windowloc )
-    0.5 v*n { 0.5 0.5 } v+ SIZE v* [ >integer ] map
+    0.5 v*n { 0.5 0.5 } v+ SIZE v* v>integer
     INDICATOR-SIZE 2 v/n v- ;
 
 : (xy>loc) ( x y -- xyloc )
@@ -88,7 +88,7 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons timer ;
     <axis-gadget> [ >>raxis ] [ add-gadget-with-border ] bi-curry bi* ;
 
 :: (add-button-gadgets) ( gadget shelf -- )
-    gadget controller>> read-controller buttons>> length iota [
+    gadget controller>> read-controller buttons>> length <iota> [
         number>string [ drop ] <border-button>
         shelf over add-gadget drop
     ] map gadget buttons<< ;

@@ -1,8 +1,7 @@
-/* This file is linked into the runtime for the sole purpose
- * of testing FFI code. */
 #include "ffi_test.h"
 
 #include <assert.h>
+#include <stdarg.h>
 #include <string.h>
 
 void ffi_test_0(void) {}
@@ -85,7 +84,10 @@ FACTOR_STDCALL(struct bar) ffi_test_19(long x, long y, long z) {
 }
 
 void ffi_test_20(double x1, double x2, double x3, double y1, double y2,
-                 double y3, double z1, double z2, double z3) {}
+                 double y3, double z1, double z2, double z3) {
+  (void) x1, (void) x2, (void) x3, (void) y1, (void) y2,
+  (void) y3, (void) z1, (void) z2, (void) z3;
+}
 
 long long ffi_test_21(long x, long y) { return (long long) x * (long long) y; }
 
@@ -305,4 +307,67 @@ signed long long ffi_test_59(signed long long x) {
 
 unsigned long long ffi_test_60(unsigned long long x) {
   return x;
+}
+
+/* C99 features */
+#ifndef _MSC_VER
+
+struct bool_and_ptr ffi_test_61(void) {
+  struct bool_and_ptr bap;
+  bap.b = true;
+  bap.ptr = NULL;
+  return bap;
+}
+
+#endif
+
+struct uint_pair ffi_test_62(void) {
+  struct uint_pair uip;
+  uip.a = 0xabcdefab;
+  uip.b = 0x12345678;
+  return uip;
+}
+
+struct ulonglong_pair ffi_test_63(void) {
+  struct ulonglong_pair ullp;
+  ullp.a = 0xabcdefabcdefabcd;
+  ullp.b = 0x1234567891234567;
+  return ullp;
+}
+
+int ffi_test_64(int n, ...) {
+    va_list ap;
+    va_start(ap, n);
+    int sum = 0;
+    for (int i = 0; i < n; i++) {
+        sum += va_arg(ap, int);
+    }
+    va_end(ap);
+    return sum;
+}
+
+double ffi_test_65(int n, ...) {
+    va_list ap;
+    va_start(ap, n);
+    double sum = 0.0;
+    for (int i = 0; i < n; i++) {
+        sum += va_arg(ap, double);
+    }
+    va_end(ap);
+    return sum;
+}
+
+
+void* bug1021_test_1(void* x, int y) {
+  return (void*)(y * y + (size_t)x);
+}
+
+int bug1021_test_2(int x, char *y, void *z) {
+  (void) x;
+  (void) z;
+  return y[0];
+}
+
+void* bug1021_test_3(int x) {
+  return (void*)(size_t)((long)x);
 }

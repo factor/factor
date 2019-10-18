@@ -8,8 +8,9 @@ $nl
 { $subsections row-columns }
 "Renderers can also implement the following optional generic words for additional row information:"
 { $subsections
-    row-value
     row-color
+    row-value
+    row-value?
 }
 "The following optional generic words allow the renderer to provide some information about the display of all rows:"
 { $subsections

@@ -1,34 +1,24 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs kernel fry accessors sequences make math locals
-combinators compiler.cfg compiler.cfg.hats compiler.cfg.instructions
-compiler.cfg.utilities compiler.cfg.rpo compiler.cfg.stacks.local
-compiler.cfg.stacks.global compiler.cfg.stacks.height
-compiler.cfg.predecessors ;
+USING: accessors compiler.cfg compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.rpo compiler.cfg.stacks.global
+compiler.cfg.stacks.local compiler.cfg.utilities fry kernel locals
+make math sequences sets ;
 IN: compiler.cfg.stacks.finalize
 
-! This pass inserts peeks and replaces.
-
-:: inserting-peeks ( from to -- assoc )
-    ! A peek is inserted on an edge if the destination anticipates
-    ! the stack location, the source does not anticipate it and
-    ! it is not available from the source in a register.
+:: inserting-peeks ( from to -- set )
     to anticip-in
-    from anticip-out from avail-out assoc-union
-    assoc-diff ;
+    from anticip-out from avail-out union
+    diff ;
 
-:: inserting-replaces ( from to -- assoc )
-    ! A replace is inserted on an edge if two conditions hold:
-    ! - the location is not dead at the destination, OR
-    !   the location is live at the destination but not available
-    !   at the destination
-    ! - the location is pending in the source but not the destination
-    from pending-out to pending-in assoc-diff
-    to dead-in to live-in to anticip-in assoc-diff assoc-diff
-    assoc-diff ;
+:: inserting-replaces ( from to -- set )
+    from pending-out to pending-in diff
+    to dead-in to live-in to anticip-in diff diff
+    diff ;
 
-: each-insertion ( ... assoc bb quot: ( ... vreg loc -- ... ) -- ... )
-    '[ drop [ loc>vreg ] [ _ untranslate-loc ] bi @ ] assoc-each ; inline
+: each-insertion ( ... set bb quot: ( ... vreg loc -- ... ) -- ... )
+    [ members ] 2dip
+    '[ [ loc>vreg ] [ _ height>> local-loc>global ] bi @ ] each ; inline
 
 ERROR: bad-peek dst loc ;
 
@@ -41,19 +31,13 @@ ERROR: bad-peek dst loc ;
     [ dup n>> 0 < [ 2drop ] [ ##replace, ] if ] each-insertion ;
 
 : visit-edge ( from to -- )
-    ! If both blocks are subroutine calls, don't bother
-    ! computing anything.
-    2dup [ kill-block?>> ] both? [ 2drop ] [
-        2dup [ [ insert-replaces ] [ insert-peeks ] 2bi ##branch, ] V{ } make
-        [ 2drop ] [ insert-basic-block ] if-empty
-    ] if ;
+    2dup [ [ insert-replaces ] [ insert-peeks ] 2bi ##branch, ] V{ } make
+    dup length 1 > [
+        insert-basic-block
+    ] [ 3drop ] if ;
 
 : visit-block ( bb -- )
     [ predecessors>> ] keep '[ _ visit-edge ] each ;
 
-: finalize-stack-shuffling ( cfg -- cfg' )
-    needs-predecessors
-
-    dup [ visit-block ] each-basic-block
-
-    cfg-changed ;
+: finalize-stack-shuffling ( cfg -- )
+    [ [ visit-block ] each-basic-block ] [ cfg-changed ] bi ;

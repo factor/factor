@@ -1,4 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes db kernel namespaces
 classes.tuple words sequences slots math accessors
@@ -33,20 +34,21 @@ GENERIC: eval-generator ( singleton -- object )
         '[ slot-name>> _ set-slot-named ] 2each
     ] keep ;
 
+: query-tuples-each ( exemplar-tuple statement quot: ( tuple -- ) -- )
+    [ [ out-params>> ] keep query-results ] dip '[
+        [ sql-row-typed swap resulting-tuple @ ] 2with query-each
+    ] with-disposal ; inline
+
 : query-tuples ( exemplar-tuple statement -- seq )
-    [ out-params>> ] keep query-results [
-        [ sql-row-typed swap resulting-tuple ] 2with query-map
-    ] with-disposal ;
+    [ ] collector [ query-tuples-each ] dip { } like ;
 
 : query-modify-tuple ( tuple statement -- )
     [ query-results [ sql-row-typed ] with-disposal ] keep
-    out-params>> rot [
-        [ slot-name>> ] dip set-slot-named
-    ] curry 2each ;
+    out-params>> rot '[ slot-name>> _ set-slot-named ] 2each ;
 
 : with-disposals ( object quotation -- )
     over sequence? [
-        [ with-disposal ] curry each
+        over '[ _ dispose-each ] [ ] cleanup
     ] [
         with-disposal
     ] if ; inline
@@ -63,6 +65,10 @@ GENERIC: eval-generator ( singleton -- object )
     [ <insert-user-assigned-statement> ] cache
     [ bind-tuple ] keep execute-statement ;
 
+: do-each-tuple ( exemplar-tuple statement quot: ( tuple -- ) -- tuples )
+    '[ [ bind-tuple ] [ _ query-tuples-each ] 2bi ] with-disposal
+    ; inline
+
 : do-select ( exemplar-tuple statement -- tuples )
     [ [ bind-tuple ] [ query-tuples ] 2bi ] with-disposal ;
 
@@ -73,7 +79,8 @@ PRIVATE>
 
 ! High level
 ERROR: no-slots-named class seq ;
-: check-columns ( class columns -- )
+
+: check-columns ( columns class -- )
     [ nip ] [
         [ keys ]
         [ all-slots [ name>> ] map ] bi* diff
@@ -115,17 +122,10 @@ ERROR: no-defined-persistent object ;
     drop-sql-statement [ execute-statement ] with-disposals ;
 
 : recreate-table ( class -- )
-    ensure-defined-persistent
-    [
-        '[
-            [
-                _ drop-sql-statement [ execute-statement ] with-disposals
-            ] ignore-table-missing
-        ] ignore-function-missing
-    ] [ create-table ] bi ;
+    [ '[ [ _ drop-table ] ignore-table-missing ] ignore-function-missing ]
+    [ create-table ] bi ;
 
 : ensure-table ( class -- )
-    ensure-defined-persistent
     '[ [ _ create-table ] ignore-table-exists ] ignore-function-exists ;
 
 : ensure-tables ( classes -- ) [ ensure-table ] each ;
@@ -155,5 +155,11 @@ ERROR: no-defined-persistent object ;
 
 : count-tuples ( query/tuple -- n )
     >query [ tuple>> ] [ <count-statement> ] bi do-count
-    dup length 1 =
-    [ first first string>number ] [ [ first string>number ] map ] if ;
+    [ first string>number ] map dup length 1 = [ first ] when ;
+
+: each-tuple ( query/tuple quot: ( tuple -- ) -- )
+    [ >query [ tuple>> ] [ query>statement ] bi ] dip do-each-tuple
+    ; inline
+
+: update-tuples ( query/tuple quot: ( tuple -- tuple'/f ) -- )
+    '[ @ [ update-tuple ] when* ] each-tuple ; inline

@@ -3,7 +3,6 @@
 USING: accessors assocs combinators.short-circuit
 compiler.cfg.instructions compiler.cfg.rpo kernel namespaces
 sequences sets ;
-FROM: namespaces => set ;
 IN: compiler.cfg.write-barrier
 
 ! This pass must run after GC check insertion and scheduling.
@@ -55,10 +54,10 @@ M: ##copy eliminate-write-barrier
 M: insn eliminate-write-barrier drop t ;
 
 : write-barriers-step ( insns -- insns' )
-    HS{ } clone fresh-allocations set
-    HS{ } clone mutated-objects set
-    H{ } clone copies set
+    HS{ } clone fresh-allocations namespaces:set
+    HS{ } clone mutated-objects namespaces:set
+    H{ } clone copies namespaces:set
     [ eliminate-write-barrier ] filter! ;
 
-: eliminate-write-barriers ( cfg -- cfg )
-    dup [ write-barriers-step ] simple-optimization ;
+: eliminate-write-barriers ( cfg -- )
+    [ write-barriers-step ] simple-optimization ;

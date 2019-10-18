@@ -11,15 +11,15 @@ IN: webapps.benchmark
     <page-action>
         [ "Hello, world!" <text-content> ] >>display ;
 
-TUPLE: benchmark < dispatcher ;
+TUPLE: benchmark-dispatcher < dispatcher ;
 
-: <benchmark> ( -- dispatcher )
-    benchmark new-dispatcher
+: <benchmark-dispatcher> ( -- dispatcher )
+    benchmark-dispatcher new-dispatcher
         <hello-action> "hello" add-responder
         "resource:" <static> "static" add-responder ;
 
 : run-benchmark-webapp ( -- )
-    <benchmark>
+    <benchmark-dispatcher>
         main-responder set-global
     8080 httpd drop ;
 

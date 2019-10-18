@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs growable.private kernel math
-math.order sequences sequences.private vectors ;
+USING: accessors arrays assocs growable.private hashtables
+kernel kernel.private math math.order sequences
+sequences.private vectors ;
 IN: sorting
 
 ! Optimized merge-sort:
@@ -40,20 +41,18 @@ TUPLE: merge-state
     push-all-unsafe ; inline
 
 : l-next ( merge -- )
-    [ [ l-elt ] [ [ 1 + ] change-from1 drop ] bi ] [ accum>> ] bi
-    push-unsafe ; inline
+    [ l-elt ] [ [ 1 + ] change-from1 accum>> ] bi push-unsafe ; inline
 
 : r-next ( merge -- )
-    [ [ r-elt ] [ [ 1 + ] change-from2 drop ] bi ] [ accum>> ] bi
-    push-unsafe ; inline
+    [ r-elt ] [ [ 1 + ] change-from2 accum>> ] bi push-unsafe ; inline
 
-: decide ( merge quot: ( elt1 elt2 -- <=> ) -- ? )
+: decide? ( merge quot: ( elt1 elt2 -- <=> ) -- ? )
     [ [ l-elt ] [ r-elt ] bi ] dip call +gt+ eq? ; inline
 
 : (merge) ( merge quot: ( elt1 elt2 -- <=> ) -- )
     over r-done? [ drop dump-l ] [
         over l-done? [ drop dump-r ] [
-            2dup decide
+            2dup decide?
             [ over r-next ] [ over l-next ] if
             (merge)
         ] if
@@ -134,8 +133,7 @@ PRIVATE>
 
 : sort ( seq quot: ( obj1 obj2 -- <=> ) -- sortedseq )
     [ <merge> ] dip
-    [ sort-pairs ] [ sort-loop ] [ drop accum>> underlying>> ] 2tri ;
-    inline
+    [ sort-pairs ] [ sort-loop ] [ drop accum>> underlying>> ] 2tri ; inline
 
 : natural-sort ( seq -- sortedseq ) [ <=> ] sort ;
 
@@ -148,7 +146,7 @@ PRIVATE>
 <PRIVATE
 
 : check-bounds ( alist n -- alist )
-    [ swap bounds-check 2drop ] curry dupd each ;
+    [ swap bounds-check 2drop ] curry dupd each ; inline
 
 PRIVATE>
 
@@ -159,11 +157,17 @@ M: object sort-keys >alist sort-keys ;
 M: sequence sort-keys
     0 check-bounds [ first-unsafe ] sort-with ;
 
+M: hashtable sort-keys
+    >alist [ { array } declare first-unsafe ] sort-with ;
+
 GENERIC: sort-values ( obj -- sortedseq )
 
 M: object sort-values >alist sort-values ;
 
 M: sequence sort-values
     1 check-bounds [ second-unsafe ] sort-with ;
+
+M: hashtable sort-values
+    >alist [ { array } declare second-unsafe ] sort-with ;
 
 : sort-pair ( a b -- c d ) 2dup after? [ swap ] when ;

@@ -52,7 +52,7 @@ Set it to 0 to disable highlighting."
 (defun fuel-stack--infer-effect (str)
   (let ((cmd `(:fuel*
                ((:using stack-checker effects)
-                ([ (:factor ,str) ] infer effect>string :get)))))
+                ([ (:factor ,str) ] infer effect>string)))))
     (fuel-eval--retort-result (fuel-eval--send/wait cmd 500))))
 
 (defsubst fuel-stack--infer-effect/prop (str)

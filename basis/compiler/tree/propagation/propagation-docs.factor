@@ -50,3 +50,8 @@ HELP: propagate
 { $description "Performs the propagation pass of the AST optimization. All nodes info slots are initialized here." }
 { $examples { $unchecked-example $[ propagate-ex ] }
 } ;
+
+ARTICLE: "compiler.tree.propagation" "Class, interval, constant propagation"
+"This pass must be run after " { $vocab-link "compiler.tree.normalization" } "." ;
+
+ABOUT: "compiler.tree.propagation"

@@ -1,7 +1,7 @@
-USING: accessors arrays assocs calendar calendar.format
+USING: accessors arrays assocs calendar calendar.format calendar.parser
 combinators continuations destructors formatting fry grouping.extras imap
 imap.private io.streams.duplex kernel math math.parser math.ranges
-math.statistics namespaces random sequences sets sorting uuid
+namespaces random sequences sets sorting uuid multiline
 splitting strings system tools.test memoize combinators.smart ;
 FROM: pcre => findall ;
 IN: imap.tests
@@ -45,26 +45,29 @@ MEMO: my-uuid ( -- str )
         base-folder "/" my-uuid "/" _
     ] "" append-outputs-as ;
 
-[ t ] [
+
+![[
+
+{ t } [
     get-test-host <imap4ssl> [ duplex-stream? ] with-disposal
 ] unit-test
 
-[ t ] [
+{ t } [
     get-test-host <imap4ssl> [ capabilities ] with-stream
     { "IMAP4rev1" "UNSELECT" "IDLE" "NAMESPACE" "QUOTA" } swap subset?
 ] unit-test
 
-[ "NO" ] [
+{ "NO" } [
     [ get-test-host <imap4ssl> [ "dont@exist.com" "foo" login ] with-stream ]
     [ ind>> ] recover
 ] unit-test
 
-[ "BAD" ] [
+{ "BAD" } [
     [ get-test-host <imap4ssl> [ f f login ] with-stream ] [ ind>> ] recover
 ] unit-test
 
 ! Try to reset test folder before starting tests
-[ ] [
+{ } [
     [ "foo/bar/baz/日本語" test-folder delete-folder ] ignore-errors
     [ "foo/bar/baz/boo" test-folder delete-folder ] ignore-errors
     [ "foo/bar/baz" test-folder delete-folder ] ignore-errors
@@ -75,10 +78,10 @@ MEMO: my-uuid ( -- str )
 ] imap-test
 
 
-[ ] [ \ imap-settings get-global [ ] with-imap-settings ] unit-test
+{ } [ \ imap-settings get-global [ ] with-imap-settings ] unit-test
 
 ! Newly created and then selected folder is empty.
-[ 0 { } ] [
+{ 0 { } } [
     10 random-ascii
     [ create-folder ]
     [ select-folder ]
@@ -87,19 +90,19 @@ MEMO: my-uuid ( -- str )
 ] imap-test
 
 ! Create delete select again.
-[ 0 ] [
+{ 0 } [
     "örjan" test-folder
     [ create-folder ] [ select-folder ] [ delete-folder ] tri
 ] imap-test
 
 ! Test list folders
-[ t ] [
+{ t } [
     10 random-ascii
     [ create-folder "*" list-folders length 0 > ] [ delete-folder ] bi
 ] imap-test
 
 ! Generate some mails for searching
-[ t t f f ] [
+{ t t f f } [
     10 random-ascii {
         [ create-folder ]
         [
@@ -119,7 +122,7 @@ MEMO: my-uuid ( -- str )
 ] imap-test
 
 ! Stat folder
-[ t ] [
+{ t } [
     10 random-ascii {
         [ create-folder ]
         [
@@ -135,7 +138,7 @@ MEMO: my-uuid ( -- str )
 ] imap-test
 
 ! Rename folder
-[ ] [
+{ } [
     "日本語" test-folder [ create-folder ] [
         "ascii-name" test-folder
         [ rename-folder ] [ delete-folder ] bi
@@ -143,7 +146,7 @@ MEMO: my-uuid ( -- str )
 ] imap-test
 
 ! Create a folder hierarchy
-[ t ] [
+{ t } [
     "foo/bar/baz/日本語" test-folder
     [ '[ _ delete-folder ] ignore-errors ]
     [
@@ -155,13 +158,13 @@ MEMO: my-uuid ( -- str )
 ] imap-test
 
 ! A gmail compliant way of creating a folder hierarchy.
-[ ] [
+{ } [
     "foo/bar/baz/boo" test-folder "/" split
-    { } [ suffix ] cum-map [ "/" join ] map
+    { } [ suffix ] accumulate* [ "/" join ] map
     [ [ create-folder ] each ] [ [ delete-folder ] each ] bi
 ] imap-test
 
-[ ] [
+{ } [
     "örjan" test-folder {
         [ create-folder ]
         [ select-folder drop ]
@@ -174,22 +177,22 @@ MEMO: my-uuid ( -- str )
 ] imap-test
 
 ! Exercise store-mail
-[ 5 ] [
+{ 5 } [
     "INBOX" select-folder drop "ALL" "" search-mails
     5 sample "+FLAGS" "(\\Recent)" store-mail length
 ] imap-test
 
 ! Internal date parsing
-[ "Mon, 19 Aug 2013 23:16:36 GMT" ] [
+{ "Mon, 19 Aug 2013 23:16:36 GMT" } [
     "19-Aug-2013 23:16:36 +0000" internal-date>timestamp timestamp>rfc822
 ] unit-test
 
-[ "19-Aug-2014 23:16:36 GMT" ] [
+{ "19-Aug-2014 23:16:36 GMT" } [
     "Mon, 19 Aug 2014 23:16:36 GMT" rfc822>timestamp timestamp>internal-date
 ] unit-test
 
 ! Test parsing an INTERNALDATE from a real mail.
-[ t ] [
+{ t } [
     "INBOX" select-folder drop
     "ALL" "" search-mails
     "(INTERNALDATE)" fetch-mails first
@@ -215,3 +218,5 @@ MEMO: my-uuid ( -- str )
         ] map
     ] [ "(BODY[HEADER.FIELDS (SUBJECT)])" fetch-mails ] bi zip
     [ first first ] [ sort-with ] [ group-by ] bi ;
+
+]]

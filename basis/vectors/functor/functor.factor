@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: functors sequences sequences.private growable
-kernel words classes math parser ;
+USING: classes functors growable kernel math sequences
+sequences.private ;
 IN: vectors.functor
 
-FUNCTOR: define-vector ( V A <A> -- )
+<FUNCTOR: define-vector ( V A <A> -- )
 
 <V> DEFINES <${V}>
 >V  DEFINES >${V}
@@ -32,4 +32,4 @@ M: V equal? over V instance? [ sequence= ] [ 2drop f ] if ;
 
 INSTANCE: V growable
 
-;FUNCTOR
+;FUNCTOR>

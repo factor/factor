@@ -1,12 +1,11 @@
 ! Copyright (C) 2011 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs compiler.cfg compiler.cfg.debugger
-compiler.cfg.graphviz compiler.cfg.gvn
-compiler.cfg.gvn.expressions compiler.cfg.gvn.graph
-compiler.cfg.optimizer continuations formatting graphviz
-graphviz.notation graphviz.render io.directories kernel
-math.parser namespaces prettyprint sequences sorting splitting
-tools.annotations ;
+USING: accessors assocs compiler.cfg compiler.cfg.graphviz
+compiler.cfg.gvn compiler.cfg.gvn.expressions compiler.cfg.gvn.graph
+compiler.cfg.optimizer compiler.cfg.utilities compiler.test
+continuations formatting graphviz.notation graphviz.render
+io.directories kernel math.parser namespaces prettyprint sequences
+sorting splitting tools.annotations ;
 IN: compiler.cfg.gvn.testing
 
 GENERIC: expr>str ( expr -- str )
@@ -48,12 +47,12 @@ M: object expr>str unparse ;
     basic-block get number>> ;
 
 : add-gvns ( graph -- graph' )
-    "gvns" add-node[
+    "gvns" [add-node
         congruence-classes =label
         "plaintext" =shape
     ];
-    "gvns" 0 add-edge[ "invis" =style ];
-    basic-block# add-node[ "bold" =style ];
+    "gvns" 0 [add-edge "invis" =style ];
+    basic-block# [add-node "bold" =style ];
     ;
 
 SYMBOL: iteration
@@ -104,4 +103,4 @@ SYMBOL: iteration
     ] [ reset-gvn ] [ ] cleanup ;
 
 : watch-gvn-bb ( path insns -- )
-    0 test-bb cfg new 0 get >>entry watch-gvn-cfg ;
+    0 test-bb 0 get block>cfg watch-gvn-cfg ;

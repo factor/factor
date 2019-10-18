@@ -53,7 +53,7 @@ TUPLE: comment-extension
 introducer label comment-data ;
 
 TUPLE: trailer byte ;
-CONSTRUCTOR: trailer ( byte -- obj ) ;
+CONSTRUCTOR: <trailer> trailer ( byte -- obj ) ;
 
 CONSTANT: IMAGE-DESCRIPTOR 0x2c
 ! Extensions
@@ -113,7 +113,7 @@ CONSTANT: BLOCK-TERMINATOR 0x00
 : read-comment-extension ( -- comment-extension )
     \ comment-extension new
         read-sub-blocks >>comment-data ;
-    
+
 : read-application-extension ( -- read-application-extension )
    \ application-extension new
        1 read le> >>block-size

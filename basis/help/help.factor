@@ -1,19 +1,28 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.tuple
-combinators combinators.short-circuit continuations debugger
-effects generic help.crossref help.markup help.stylesheet
-help.topics io io.styles kernel make namespaces prettyprint
-sequences sorting vocabs words words.symbol ;
+USING: accessors arrays assocs classes classes.error
+classes.tuple combinators combinators.short-circuit
+continuations debugger effects generic help.crossref help.markup
+help.stylesheet help.topics io io.styles kernel locals make
+namespaces prettyprint sequences sets sorting vocabs words
+words.symbol ;
 IN: help
 
 GENERIC: word-help* ( word -- content )
 
 : word-help ( word -- content )
-    dup "help" word-prop [ ] [
-        dup word-help* dup
-        [ swap 2array 1array ] [ 2drop f ] if
-    ] ?if ;
+    dup "help" word-prop [ ] [ word-help* ] ?if ;
+
+M: word word-help*
+    stack-effect [ in>> ] [ out>> ] bi [
+        [
+            dup pair? [
+                first2 dup effect? [ \ $quotation swap 2array ] when
+            ] [
+                object
+            ] if [ effect>string ] dip
+        ] { } map>assoc
+    ] bi@ append members \ $values prefix 1array ;
 
 : $predicate ( element -- )
     { { "object" object } { "?" boolean } } $values
@@ -23,17 +32,17 @@ GENERIC: word-help* ( word -- content )
         " class." ,
     ] { } make $description ;
 
-M: word word-help* drop f ;
+M: predicate word-help* \ $predicate swap 2array 1array ;
 
-M: predicate word-help* drop \ $predicate ;
+M: class word-help* drop f ;
 
 : all-articles ( -- seq )
     articles get keys
     all-words [ word-help ] filter append ;
 
 : orphan-articles ( -- seq )
-    articles get keys
-    [ article-parent not ] filter ;
+    articles get keys [ article-parent ] reject
+    { "help.home" "handbook" } diff ;
 
 : xref-help ( -- )
     all-articles [ xref-article ] each ;
@@ -56,7 +65,7 @@ M: word article-name name>> ;
 
 M: word article-title
     dup [ parsing-word? ] [ symbol? ] bi or [
-        name>> 
+        name>>
     ] [
         [ unparse ]
         [ stack-effect [ effect>string " " prepend ] [ "" ] if* ] bi
@@ -71,7 +80,7 @@ M: word article-title
             [ \ $vocabulary swap 2array , ]
             [ word-help % ]
             [ \ $related swap 2array , ]
-            [ dup is-global [ get-global \ $value swap 2array , ] [ drop ] if ]
+            [ dup global at [ get-global \ $value swap 2array , ] [ drop ] if ]
             [ \ $definition swap 2array , ]
         } cleave
     ] { } make ;
@@ -98,36 +107,40 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 : ($title) ( topic -- )
     [ [ article-title ] [ >link ] bi write-object ] ($block) ;
 
-: $navigation-row ( content element label -- )
-    [ prefix 1array ] dip prefix , ;
-
 : ($navigation-table) ( element -- )
     help-path-style get table-style [ $table ] with-variable ;
 
-: $navigation-table ( topic -- )
-    [
-        [ prev-article [ 1array \ $long-link "Prev:" $navigation-row ] when* ]
-        [ next-article [ 1array \ $long-link "Next:" $navigation-row ] when* ]
-        bi
-    ] { } make [ ($navigation-table) ] unless-empty ;
-
-: ($navigation) ( topic -- )
+: ($navigation-path) ( topic -- )
     help-path-style get [
-        [ help-path [ reverse $breadcrumbs ] unless-empty ]
-        [ $navigation-table ] bi
+       help-path [ reverse $breadcrumbs ] unless-empty
+    ] with-style ;
+
+: ($navigation-link) ( content element label -- )
+    [ prefix 1array ] dip prefix , ;
+
+: ($navigation-links) ( topic -- )
+    help-path-style get [
+        [
+            [ prev-article [ 1array \ $long-link "Prev:" ($navigation-link) ] when* ]
+            [ next-article [ 1array \ $long-link "Next:" ($navigation-link) ] when* ]
+            bi
+        ] { } make [ ($navigation-table) ] unless-empty
     ] with-style ;
 
 : $title ( topic -- )
     title-style get [
         title-style get [
-            [ ($title) ] [ ($navigation) ] bi
+            [ ($title) ]
+            [ ($navigation-path) ]
+            [ ($navigation-links) ] tri
         ] with-nesting
     ] with-style ;
 
 : print-topic ( topic -- )
     >link
     last-element off
-    [ $title ] [ ($blank-line) article-content print-content nl ] bi ;
+    [ $title ($blank-line) ]
+    [ article-content print-content nl ] bi ;
 
 SYMBOL: help-hook
 
@@ -168,14 +181,10 @@ help-hook [ [ print-topic ] ] initialize
     articles get delete-at ;
 
 : add-article ( article name -- )
-    [ remove-article ] keep
-    [ articles get set-at ] keep
-    xref-article ;
+    [ articles get set-at ] keep xref-article ;
 
 : remove-word-help ( word -- )
     f "help" set-word-prop ;
 
 : set-word-help ( content word -- )
-    [ remove-word-help ] keep
-    [ swap "help" set-word-prop ] keep
-    xref-article ;
+    [ swap "help" set-word-prop ] keep xref-article ;

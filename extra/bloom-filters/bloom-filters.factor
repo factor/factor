@@ -49,7 +49,7 @@ TUPLE: bloom-filter
 { capacity fixnum read-only }
 { count fixnum } ;
 
-ERROR: invalid-size ;
+ERROR: invalid-size size ;
 ERROR: invalid-error-rate error-rate ;
 ERROR: invalid-capacity capacity ;
 
@@ -109,6 +109,7 @@ PRIVATE>
 ! See "Bloom Filters in Probabilistic Verification" by Peter C.
 ! Dillinger and Panagiotis Manolios, section 5.2, "Enhanced
 ! Double Hashing":
+! http://www.ccs.neu.edu/home/pete/research/bloom-filters-verification.html
 ! http://www.cc.gatech.edu/~manolios/research/bloom-filters-verification.html
 : combine-hashcodes ( index hash0 hash1 -- hash )
     { fixnum fixnum fixnum } declare
@@ -126,7 +127,7 @@ PRIVATE>
 
 : relevant-indices ( object bloom-filter -- n quot: ( elt -- n ) )
     [ double-hashcodes ] [ #hashes-and-length ] bi*
-    [ -rot ] dip '[ _ _ combine-hashcodes _ mod ] ; inline
+    -rotd '[ _ _ combine-hashcodes _ mod ] ; inline
 
 PRIVATE>
 

@@ -1,12 +1,9 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generic hashtables io kernel math assocs
-namespaces make sequences strings io.styles vectors words
-prettyprint.config splitting classes continuations
-accessors sets vocabs.parser combinators vocabs
-classes.maybe combinators.short-circuit ;
-FROM: sets => members ;
-FROM: namespaces => set ;
+USING: accessors classes.maybe combinators
+combinators.short-circuit continuations hashtables io io.styles
+kernel make math namespaces prettyprint.config sequences sets
+splitting strings vocabs vocabs.parser words ;
 IN: prettyprint.sections
 
 ! State
@@ -45,23 +42,27 @@ M: maybe vocabulary-name
 : line-limit? ( -- ? )
     line-limit get dup [ pprinter get line-count>> <= ] when ;
 
-: do-indent ( -- ) pprinter get indent>> CHAR: \s <string> write ;
+: do-indent ( -- )
+    pprinter get indent>> [ CHAR: \s <string> write ] unless-zero ;
 
 : fresh-line ( n -- )
-    dup pprinter get last-newline>> = [
-        drop
+    pprinter get 2dup last-newline>> = [
+        2drop
     ] [
-        pprinter get last-newline<<
+        swap >>last-newline
         line-limit? [
-            "..." write pprinter get return
+            "..." write return
         ] when
-        pprinter get [ 1 + ] change-line-count drop
+        [ 1 + ] change-line-count drop
         nl do-indent
     ] if ;
 
 : text-fits? ( len -- ? )
-    margin get
-    [ drop t ] [ [ pprinter get indent>> + ] dip <= ] if-zero ;
+    margin get [
+        drop t
+    ] [
+        [ pprinter get indent>> + ] dip <=
+    ] if-zero ;
 
 ! break only if position margin 2 / >
 SYMBOL: soft
@@ -92,15 +93,16 @@ style overhang ;
 
 : new-section ( length class -- section )
     new
-        position get >>start
-        swap position [ + ] change
-        position get >>end
+        position [
+            [ >>start ] keep
+            swapd +
+            [ >>end ] keep
+        ] change
         0 >>overhang ; inline
 
 M: section section-fits? ( section -- ? )
     [ end>> 1 - pprinter get last-newline>> - ]
-    [ overhang>> ] bi
-    + text-fits? ;
+    [ overhang>> ] bi + text-fits? ;
 
 M: section indent-section? drop f ;
 
@@ -146,7 +148,7 @@ M: object short-section? section-fits? ;
 TUPLE: line-break < section type ;
 
 : <line-break> ( type -- section )
-    0 \ line-break new-section
+    0 line-break new-section
         swap >>type ;
 
 M: line-break short-section drop ;
@@ -156,13 +158,13 @@ M: line-break long-section drop ;
 ! Block sections
 TUPLE: block < section sections ;
 
-: new-block ( style class -- block )
+: new-block ( class -- block )
     0 swap new-section
-        V{ } clone >>sections
-        swap >>style ; inline
+        V{ } clone >>sections ; inline
 
 : <block> ( style -- block )
-    block new-block ;
+    block new-block
+        swap >>style ;
 
 : pprinter-block ( -- block ) pprinter-stack get last ;
 
@@ -192,7 +194,7 @@ M: block section-fits? ( section -- ? )
 
 : pprint-sections ( block advancer -- )
     [
-        sections>> [ line-break? not ] filter
+        sections>> [ line-break? ] reject
         unclip-slice pprint-section
     ] dip
     [ [ pprint-section ] bi ] curry each ; inline
@@ -208,7 +210,7 @@ M: block short-section ( block -- )
 
 : empty-block? ( block -- ? ) sections>> empty? ;
 
-: if-nonempty ( block quot -- )
+: unless-empty-block ( block quot: ( block -- ) -- )
     [ dup empty-block? [ drop ] ] dip if ; inline
 
 : (<block) ( block -- ) pprinter-stack get push ;
@@ -221,7 +223,7 @@ M: block short-section ( block -- )
 TUPLE: text-section < section string ;
 
 : <text> ( string style -- text )
-    over length 1 + \ text-section new-section
+    over length 1 + text-section new-section
         swap >>style
         swap >>string ;
 
@@ -231,13 +233,13 @@ M: text-section long-section short-section ;
 
 : styled-text ( string style -- ) <text> add-section ;
 
-: text ( string -- ) H{ } styled-text ;
+: text ( string -- ) f styled-text ;
 
 ! Inset section
 TUPLE: inset < block narrow? ;
 
 : <inset> ( narrow? -- block )
-    H{ } inset new-block
+    inset new-block
         2 >>overhang
         swap >>narrow? ;
 
@@ -258,12 +260,12 @@ M: inset newline-after? drop t ;
 TUPLE: flow < block ;
 
 : <flow> ( -- block )
-    H{ } flow new-block ;
+    flow new-block ;
 
 M: flow short-section? ( section -- ? )
-    #! If we can make room for this entire block by inserting
-    #! a newline, do it; otherwise, don't bother, print it as
-    #! a short section
+    ! If we can make room for this entire block by inserting
+    ! a newline, do it; otherwise, don't bother, print it as
+    ! a short section
     {
         [ section-fits? ]
         [ [ end>> 1 - ] [ start>> ] bi - text-fits? not ]
@@ -275,7 +277,7 @@ M: flow short-section? ( section -- ? )
 TUPLE: colon < block ;
 
 : <colon> ( -- block )
-    H{ } colon new-block ;
+    colon new-block ;
 
 M: colon long-section short-section ;
 
@@ -289,8 +291,9 @@ M: colon unindent-first-line? drop t ;
     position get >>end drop ;
 
 : block> ( -- )
-    pprinter-stack get pop
-    [ [ save-end-position ] [ add-section ] bi ] if-nonempty ;
+    pprinter-stack get pop [
+        [ save-end-position ] [ add-section ] bi
+    ] unless-empty-block ;
 
 : do-pprint ( block -- )
     <pprinter> pprinter [
@@ -300,12 +303,12 @@ M: colon unindent-first-line? drop t ;
                     short-section
                 ] curry with-return
             ] with-nesting
-        ] if-nonempty
+        ] unless-empty-block
     ] with-variable ;
 
 ! Long section layout algorithm
 : chop-break ( seq -- seq )
-    dup last line-break? [ but-last-slice chop-break ] when ;
+    [ dup last line-break? ] [ but-last-slice ] while ;
 
 SYMBOL: prev
 SYMBOL: next
@@ -314,7 +317,7 @@ SYMBOL: next
 
 : split-before ( section -- )
     {
-        [ start-group?>> prev get [ end-group?>> ] [ t ] if* and ]
+        [ start-group?>> prev get [ end-group?>> and ] when* ]
         [ flow? prev get flow? not and ]
     } 1|| split-groups ;
 
@@ -323,9 +326,9 @@ SYMBOL: next
 
 : group-flow ( seq -- newseq )
     [
-        dup length iota [
-            2dup 1 - swap ?nth prev set
-            2dup 1 + swap ?nth next set
+        dup length <iota> [
+            2dup 1 - swap ?nth prev namespaces:set
+            2dup 1 + swap ?nth next namespaces:set
             swap nth dup split-before dup , split-after
         ] with each
     ] { } make { t } split harvest ;
@@ -347,25 +350,23 @@ M: block long-section ( block -- )
                 ] if
             ] each
         ] each
-    ] if-nonempty ;
+    ] unless-empty-block ;
 
 : pprinter-manifest ( -- manifest )
     <manifest>
-    [ [ pprinter-use get members >vector ] dip search-vocabs<< ]
-    [ [ pprinter-in get ] dip current-vocab<< ]
-    [ ]
-    tri ;
+        pprinter-use get members V{ } like >>search-vocabs
+        pprinter-in get >>current-vocab ;
 
 : make-pprint ( obj quot manifest? -- block manifest/f )
     [
-        0 position ,,
-        HS{ } clone pprinter-use ,,
-        V{ } clone recursion-check ,,
-        V{ } clone pprinter-stack ,,
-    ] H{ } make [
+        0 position namespaces:set
+        HS{ } clone pprinter-use namespaces:set
+        V{ } clone recursion-check namespaces:set
+        V{ } clone pprinter-stack namespaces:set
+
         [ over <object call pprinter-block ] dip
         [ pprinter-manifest ] [ f ] if
-    ] with-variables ; inline
+    ] with-scope ; inline
 
 : with-pprint ( obj quot -- )
     f make-pprint drop do-pprint ; inline

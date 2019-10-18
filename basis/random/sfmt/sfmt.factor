@@ -4,7 +4,6 @@ USING: accessors alien.c-types alien.data kernel locals math
 math.ranges math.bitwise math.vectors math.vectors.simd random
 sequences specialized-arrays sequences.private classes.struct
 combinators.short-circuit fry ;
-FROM: sequences => change-nth ;
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: uint-4
 IN: random.sfmt
@@ -67,7 +66,7 @@ M:: sfmt generate ( sfmt -- )
     state n>> :> n
     state mask>> :> mask
 
-    n m - >fixnum iota [| i |
+    n m - >fixnum <iota> [| i |
         i array nth-unsafe
         i m + array nth-unsafe
         mask state r1>> state r2>> formula :> r
@@ -78,7 +77,7 @@ M:: sfmt generate ( sfmt -- )
     ] each
 
     ! n m - 1 + n [a,b) [
-    m 1 - iota [
+    m 1 - <iota> [
         n m - 1 + + >fixnum :> i
         i array nth-unsafe
         m n - i + array nth-unsafe

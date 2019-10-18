@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.strings alien.c-types alien.accessors
-arrays words sequences math kernel namespaces fry cpu.architecture
-io.encodings.binary io.encodings.utf8 accessors compiler.units ;
+USING: accessors alien.accessors alien.c-types alien.strings
+arrays compiler.units cpu.architecture fry io.encodings.binary
+io.encodings.utf8 kernel math sequences words ;
 IN: alien.arrays
 
 INSTANCE: array value-type
@@ -63,4 +63,3 @@ M: string-type c-type-setter
     drop [ set-alien-cell ] ;
 
 [ { c-string utf8 } c-string typedef ] with-compilation-unit
-

@@ -1,6 +1,25 @@
-USING: arrays classes combinators help.markup help.syntax
-kernel.private layouts math quotations words ;
+USING: alien arrays classes combinators heaps help.markup help.syntax
+kernel.private layouts math quotations sequences system threads words ;
 IN: kernel
+
+HELP: OBJ-CURRENT-THREAD
+{ $description "Contains a reference to the running " { $link thread } " instance." } ;
+
+HELP: JIT-PUSH-LITERAL
+{ $description "JIT code template for pushing literals unto the datastack." } ;
+
+HELP: OBJ-SAMPLE-CALLSTACKS
+{ $description "A " { $link sequence } " that contains all call frames that is being captured during sampling profiling. See the " { $vocab-link "tools.profiler.sampling" } " vocab." } ;
+
+HELP: OBJ-SLEEP-QUEUE
+{ $description "A " { $link min-heap } " containing sleeping threads." }
+{ $see-also sleep-queue } ;
+
+HELP: OBJ-UNDEFINED
+{ $description "Default definition for undefined words" } ;
+
+HELP: WIN-EXCEPTION-HANDLER
+{ $description "This special object is an " { $link alien } " containing a pointer to the processes global exception handler. Only applicable on " { $link windows } "." } ;
 
 HELP: eq?
 { $values { "obj1" object } { "obj2" object } { "?" boolean } }
@@ -21,12 +40,19 @@ HELP: 2over $shuffle ;
 HELP: pick  $shuffle ;
 HELP: swap  $shuffle ;
 
+HELP: roll  $complex-shuffle ;
+HELP: -roll $complex-shuffle ;
+HELP: tuck  $complex-shuffle ;
 HELP: rot   $complex-shuffle ;
 HELP: -rot  $complex-shuffle ;
 HELP: dupd  $complex-shuffle ;
 HELP: swapd $complex-shuffle ;
 
-HELP: datastack
+HELP: callstack>array
+{ $values { "callstack" callstack } { "array" array } }
+{ $description "Converts the callstack to an array containing groups of three elements. The array is in reverse order so that the innermost frame comes first." } ;
+
+HELP: get-datastack
 { $values { "array" array } }
 { $description "Outputs an array containing a copy of the data stack contents right before the call to this word, with the top of the stack at the end of the array." } ;
 
@@ -34,7 +60,7 @@ HELP: set-datastack
 { $values { "array" array } }
 { $description "Replaces the data stack contents with a copy of an array. The end of the array becomes the top of the stack." } ;
 
-HELP: retainstack
+HELP: get-retainstack
 { $values { "array" array } }
 { $description "Outputs an array containing a copy of the retain stack contents right before the call to this word, with the top of the stack at the end of the array." } ;
 
@@ -42,9 +68,15 @@ HELP: set-retainstack
 { $values { "array" array } }
 { $description "Replaces the retain stack contents with a copy of an array. The end of the array becomes the top of the stack." } ;
 
-HELP: callstack
+HELP: get-callstack
 { $values { "callstack" callstack } }
-{ $description "Outputs a copy of the call stack contents, with the top of the stack at the end of the vector. The stack frame of the caller word is " { $emphasis "not" } " included." } ;
+{ $description "Outputs a copy of the call stack contents, with the top of the stack at the end of the vector. The stack frame of the caller word is " { $emphasis "not" } " included. Each group of three elements in the callstack is frame:"
+  { $list
+    "The first element is the executing word or quotation."
+    "The second element is the executing quotation."
+    "The third element is the offset in the executing quotation, or -1 if the offset can't be determined."
+  }
+} ;
 
 HELP: set-callstack
 { $values { "callstack" callstack } }
@@ -56,6 +88,9 @@ HELP: clear
 HELP: build
 { $values { "n" integer } }
 { $description "The current build number. Factor increments this number whenever a new boot image is created." } ;
+
+HELP: leaf-signal-handler
+{ $description "A word called by the VM when a VM error occurs." } ;
 
 HELP: hashcode*
 { $values { "depth" integer } { "obj" object } { "code" fixnum } }
@@ -127,7 +162,7 @@ HELP: clone
 { $contract "Outputs a new object equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a shallow copy of the original." } ;
 
 HELP: ?
-{ $values { "?" "a generalized boolean" } { "true" object } { "false" object } { "true/false" "one two input objects" } }
+{ $values { "?" "a generalized boolean" } { "true" object } { "false" object } { "true/false" { { $snippet "true" } " or " { $snippet "false" } } } }
 { $description "Chooses between two values depending on the boolean value of " { $snippet "cond" } "." } ;
 
 HELP: boolean
@@ -713,7 +748,7 @@ HELP: declare
 
 HELP: tag
 { $values { "object" object } { "n" "a tag number" } }
-{ $description "Outputs an object's tag number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class } " instead." } ;
+{ $description "Outputs an object's tag number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class-of } " instead." } ;
 
 HELP: special-object
 { $values { "n" "a non-negative integer" } { "obj" object } }
@@ -742,9 +777,8 @@ HELP: most
 { $description "If the quotation yields a true value when applied to " { $snippet "x" } " and " { $snippet "y" } ", outputs " { $snippet "x" } ", otherwise outputs " { $snippet "y" } "." } ;
 
 HELP: curry
-{ $values { "obj" object } { "quot" callable } { "curry" curry } }
+{ $values { "obj" object } { "quot" callable } { "curry" curried } }
 { $description "Partial application. Outputs a " { $link callable } " which first pushes " { $snippet "obj" } " and then calls " { $snippet "quot" } "." }
-{ $class-description "The class of objects created by " { $link curry } ". These objects print identically to quotations and implement the sequence protocol, however they only use two cells of storage; a reference to the object and a reference to the underlying quotation." }
 { $notes "Even if " { $snippet "obj" } " is a word, it will be pushed as a literal."
 $nl
 "This operation is efficient and does not copy the quotation." }
@@ -754,8 +788,13 @@ $nl
     { $example "USING: kernel math prettyprint sequences ;" "{ 1 2 3 } 2 [ - ] curry map ." "{ -1 0 1 }" }
 } ;
 
+HELP: curried
+{ $class-description "The class of objects created by " { $link curry } ". These objects print identically to quotations and implement the sequence protocol, however they only use two cells of storage; a reference to the object and a reference to the underlying quotation." } ;
+
+{ curry curried compose prepose composed } related-words
+
 HELP: 2curry
-{ $values { "obj1" object } { "obj2" object } { "quot" callable } { "curry" curry } }
+{ $values { "obj1" object } { "obj2" object } { "quot" callable } { "curried" curried } }
 { $description "Outputs a " { $link callable } " which pushes " { $snippet "obj1" } " and " { $snippet "obj2" } " and then calls " { $snippet "quot" } "." }
 { $notes "This operation is efficient and does not copy the quotation." }
 { $examples
@@ -763,12 +802,12 @@ HELP: 2curry
 } ;
 
 HELP: 3curry
-{ $values { "obj1" object } { "obj2" object } { "obj3" object } { "quot" callable } { "curry" curry } }
+{ $values { "obj1" object } { "obj2" object } { "obj3" object } { "quot" callable } { "curried" curried } }
 { $description "Outputs a " { $link callable } " which pushes " { $snippet "obj1" } ", " { $snippet "obj2" } " and " { $snippet "obj3" } ", and then calls " { $snippet "quot" } "." }
 { $notes "This operation is efficient and does not copy the quotation." } ;
 
 HELP: with
-{ $values { "param" object } { "obj" object } { "quot" { $quotation ( param elt -- ... ) } } { "curry" curry } }
+{ $values { "param" object } { "obj" object } { "quot" { $quotation ( param elt -- ... ) } } { "curried" curried } }
 { $description "Partial application on the left. The following two lines are equivalent:"
     { $code "swap [ swap A ] curry B" }
     { $code "[ A ] with B" }
@@ -777,7 +816,7 @@ HELP: with
 { $notes "This operation is efficient and does not copy the quotation." }
 { $examples
     { $example "USING: kernel math prettyprint sequences ;" "1 { 1 2 3 } [ / ] with map ." "{ 1 1/2 1/3 }" }
-    { $example "USING: kernel math prettyprint sequences ;" "1000 100 5 iota [ sq + + ] 2with map ." "{ 1100 1101 1104 1109 1116 }" }
+    { $example "USING: kernel math prettyprint sequences ;" "1000 100 5 <iota> [ sq + + ] 2with map ." "{ 1100 1101 1104 1109 1116 }" }
 } ;
 
 HELP: 2with
@@ -786,12 +825,12 @@ HELP: 2with
   { "param2" object }
   { "obj" object }
   { "quot" { $quotation ( param1 param2 elt -- ... ) } }
-  { "curry" curry }
+  { "curried" curried }
 }
 { $description "Partial application on the left of two parameters." } ;
 
 HELP: compose
-{ $values { "quot1" callable } { "quot2" callable } { "compose" compose } }
+{ $values { "quot1" callable } { "quot2" callable } { "compose" composed } }
 { $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot1" } " followed by " { $snippet "quot2" } "." }
 { $notes
     "The following two lines are equivalent:"
@@ -802,13 +841,13 @@ HELP: compose
     "However, " { $link compose } " runs in constant time, and the optimizing compiler is able to compile code which calls composed quotations."
 } ;
 
-
 HELP: prepose
-{ $values { "quot1" callable } { "quot2" callable } { "compose" compose } }
+{ $values { "quot1" callable } { "quot2" callable } { "composed" composed } }
 { $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot2" } " followed by " { $snippet "quot1" } "." }
 { $notes "See " { $link compose } " for details." } ;
 
-{ compose prepose } related-words
+HELP: composed
+{ $class-description "The class of objects created by " { $link compose } ". These objects print identically to quotations and implement the sequence protocol, however they only use two cells of storage; references to the first and second underlying quotations." } ;
 
 HELP: dip
 { $values { "x" object } { "quot" quotation } }
@@ -908,6 +947,20 @@ $nl
     swapd
     rot
     -rot
+} ;
+
+ARTICLE: "callables" "Callables"
+"Aside from " { $link "quotations" } ", there are two other callables that efficiently combine computations."
+$nl
+"Currying an object onto a quotation:"
+{ $subsections
+    curry
+    curried
+}
+"Composing two quotations:"
+{ $subsections
+    compose
+    composed
 } ;
 
 ARTICLE: "shuffle-words" "Shuffle words"

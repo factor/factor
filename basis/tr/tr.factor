@@ -18,14 +18,14 @@ M: bad-tr summary
     [ [ ascii? ] all? ] both? [ bad-tr ] unless ;
 
 : compute-tr ( quot from to -- mapping )
-    [ 128 iota ] 3dip zip
+    [ 128 <iota> ] 3dip zip
     '[ [ _ call( x -- y ) _ at ] keep or ] B{ } map-as ; inline
 
 : tr-hints ( word -- )
     { { byte-array } { string } } set-specializer ;
 
 : create-tr ( token -- word )
-    create-in dup tr-hints ;
+    create-word-in dup tr-hints ;
 
 : tr-quot ( mapping -- quot )
     '[ [ dup ascii? [ _ tr-nth ] when ] map ] ;

@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-! mersenne twister based on 
+! mersenne twister based on
 ! http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c
 USING: accessors alien.c-types alien.data fry init kernel math
 math.bitwise namespaces random sequences sequences.private
@@ -64,9 +64,7 @@ PRIVATE>
 
 M: mersenne-twister seed-random
     init-mt-seq >>seq
-    [ mt-generate ]
-    [ 0 >>i drop ]
-    [ ] tri ;
+    dup mt-generate ;
 
 M: mersenne-twister random-32*
     [ next-index ]
@@ -79,4 +77,3 @@ M: mersenne-twister random-32*
 [
     default-mersenne-twister random-generator set-global
 ] "bootstrap.random" add-startup-hook
-

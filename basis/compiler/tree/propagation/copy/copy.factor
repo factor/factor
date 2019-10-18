@@ -1,19 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces sequences assocs math kernel accessors fry
-combinators sets locals columns grouping
-stack-checker.branches
-compiler.tree
-compiler.tree.def-use
-compiler.tree.combinators
-compiler.utilities ;
+USING: accessors assocs compiler.tree compiler.tree.def-use
+compiler.utilities grouping kernel namespaces sequences sets
+stack-checker.branches ;
 IN: compiler.tree.propagation.copy
 
-! Two values are copy-equivalent if they are always identical
-! at run-time ("DS" relation). This is just a weak form of
-! value numbering.
-
-! Mapping from values to their canonical leader
 SYMBOL: copies
 
 : resolve-copy ( copy -- val ) copies get compress-path ;
@@ -35,8 +26,6 @@ GENERIC: compute-copy-equiv* ( node -- )
 M: #renaming compute-copy-equiv* inputs/outputs are-copies-of ;
 
 : compute-phi-equiv ( inputs outputs -- )
-    #! An output is a copy of every input if all inputs are
-    #! copies of the same original value.
     [
         swap remove-bottom resolve-copies
         dup [ f ] [ all-equal? ] if-empty

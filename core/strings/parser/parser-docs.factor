@@ -11,6 +11,6 @@ HELP: escape
 
 HELP: parse-string
 { $values { "str" "a new " { $link string } } }
-{ $description "Parses the line until a quote (\"), interpreting escape codes along the way." }
+{ $description "Parses one or more lines until a quote (\"), interpreting escape codes along the way." }
 { $errors "Throws an error if the string contains an invalid escape sequence." }
 $parsing-note ;

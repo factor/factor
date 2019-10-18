@@ -1,16 +1,16 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! Copyright (C) 2005, 2011 John Benediktsson, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays growable.private hash-sets
+USING: accessors arrays combinators growable.private hash-sets
 hashtables.private kernel kernel.private math math.private
 sequences sequences.private sets sets.private slots.private
 vectors ;
 IN: hash-sets
 
 TUPLE: hash-set
-{ count array-capacity }
-{ deleted array-capacity }
-{ array array } ;
+    { count array-capacity }
+    { deleted array-capacity }
+    { array array } ;
 
 <PRIVATE
 
@@ -23,7 +23,7 @@ TUPLE: hash-set
 : no-key ( key array -- array n ? ) nip f f ; inline
 
 : (key@) ( key array i probe# -- array n ? )
-    [ 3dup swap array-nth ] dip over ((empty)) eq?
+    [ 3dup swap array-nth ] dip over +empty+ eq?
     [ 4drop no-key ] [
         [ = ] dip swap
         [ drop rot drop t ]
@@ -36,7 +36,7 @@ TUPLE: hash-set
     [ no-key ] [ 2dup hash@ 0 (key@) ] if ; inline
 
 : <hash-array> ( n -- array )
-    1 + next-power-of-2 2 * ((empty)) <array> ; inline
+    3 * 1 + 2/ next-power-of-2 +empty+ <array> ; inline
 
 : reset-hash ( n hash -- )
     swap <hash-array> >>array init-hash ; inline
@@ -44,12 +44,12 @@ TUPLE: hash-set
 : (new-key@) ( key array i probe# j -- array i j empty? )
     [ 2dup swap array-nth ] 2dip pick tombstone?
     [
-        rot ((empty)) eq?
+        rot +empty+ eq?
         [ nip [ drop ] 3dip t ]
         [ pick or [ probe ] dip (new-key@) ]
         if
     ] [
-        [ [ pick ] dip = ] 2dip rot
+        [ pickd = ] 2dip rot
         [ nip [ drop ] 3dip f ]
         [ [ probe ] dip (new-key@) ]
         if
@@ -59,17 +59,25 @@ TUPLE: hash-set
     [ array>> 2dup hash@ 0 f (new-key@) ] keep swap
     [ over [ hash-deleted- ] [ hash-count+ ] if swap or t ] [ 2drop f ] if ; inline
 
-: set-nth-item ( key seq n -- )
+: set-nth-item ( key array n -- )
     2 fixnum+fast set-slot ; inline
 
 : (adjoin) ( key hash -- ? )
     dupd new-key@ [ set-nth-item ] dip ; inline
 
+: (delete) ( key hash -- ? )
+    [ nip ] [ key@ ] 2bi [
+        [ +tombstone+ ] 2dip set-nth-item
+        hash-deleted+ t
+    ] [
+        3drop f
+    ] if ; inline
+
 : (rehash) ( seq hash -- )
     [ (adjoin) drop ] curry each ; inline
 
 : hash-large? ( hash -- ? )
-    [ count>> 3 fixnum*fast ]
+    [ count>> 1 fixnum+fast 3 fixnum*fast ]
     [ array>> length>> 1 fixnum-shift-fast ] bi fixnum>= ; inline
 
 : each-member ( ... array quot: ( ... elt -- ... ) -- ... )
@@ -88,21 +96,20 @@ TUPLE: hash-set
 PRIVATE>
 
 : <hash-set> ( capacity -- hash-set )
+    integer>fixnum-strict
     [ 0 0 ] dip <hash-array> hash-set boa ; inline
 
 M: hash-set in?
      key@ 2nip ;
 
 M: hash-set clear-set
-    [ init-hash ] [ array>> [ drop ((empty)) ] map! drop ] bi ;
+    [ init-hash ] [ array>> [ drop +empty+ ] map! drop ] bi ;
 
 M: hash-set delete
-    [ nip ] [ key@ ] 2bi [
-        [ ((tombstone)) ] 2dip set-nth-item
-        hash-deleted+
-    ] [
-        3drop
-    ] if ;
+    (delete) drop ;
+
+M: hash-set ?delete
+    (delete) ;
 
 M: hash-set cardinality
     [ count>> ] [ deleted>> ] bi - ; inline
@@ -118,7 +125,7 @@ M: hash-set ?adjoin
 
 M: hash-set members
     [ array>> 0 swap ] [ cardinality f <array> ] bi [
-        [ [ over ] dip set-nth-unsafe 1 + ] curry each-member
+        [ overd set-nth-unsafe 1 + ] curry each-member
     ] keep nip ;
 
 M: hash-set clone
@@ -193,6 +200,12 @@ M: hash-set set=
         ] [ 2drop f ] if
     ] [ call-next-method ] if ;
 
+M: hash-set hashcode*
+    [
+        dup cardinality 1 eq?
+        [ members hashcode* ] [ nip cardinality ] if
+    ] recursive-hashcode ;
+
 ! Default methods
 
 M: f fast-set drop 0 <hash-set> ;
@@ -200,7 +213,7 @@ M: f fast-set drop 0 <hash-set> ;
 M: sequence fast-set >hash-set ;
 
 M: sequence duplicates
-    dup length <hash-set> [ ?adjoin not ] curry filter ;
+    dup length <hash-set> [ ?adjoin ] curry reject ;
 
 M: sequence all-unique?
     dup length <hash-set> [ ?adjoin ] curry all? ;

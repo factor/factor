@@ -12,3 +12,5 @@ ARTICLE: "colors.cmyk" "CMYK colors"
     >cmyka
 }
 { $see-also "colors" } ;
+
+ABOUT: "colors.cmyk"

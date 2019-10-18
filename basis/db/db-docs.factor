@@ -14,7 +14,7 @@ HELP: new-db-connection
 
 HELP: db-open
 { $values { "db" "a database configuration object" } { "db-connection" db-connection } }
-{ $description "Opens a database using the configuration data stored in a " { $snippet "database configuration object" } "tuple. The database object now references a database handle that must be cleaned up. Therefore, it is better to use the " { $link with-db } " combinator than calling this word directly." } ;
+{ $description "Opens a database using the configuration data stored in a " { $snippet "database configuration object" } " tuple. The database object now references a database handle that must be cleaned up. Therefore, it is better to use the " { $link with-db } " combinator than calling this word directly." } ;
 
 HELP: db-close
 { $values { "handle" alien } }
@@ -60,7 +60,7 @@ HELP: bind-statement*
 HELP: <simple-statement>
 { $values { "string" string } { "in" sequence } { "out" sequence }
     { "statement" statement } }
-{ $description "Makes a new simple statement object from the given parameters.." }
+{ $description "Makes a new simple statement object from the given parameters." }
 { $warning "Using a simple statement can lead to SQL injection attacks in PostgreSQL. The Factor database implementation for SQLite only uses " { $link <prepared-statement> } " as the sole kind of statement; simple statements alias to prepared ones." } ;
 
 HELP: <prepared-statement>
@@ -81,7 +81,7 @@ HELP: query-results
 { $values { "query" object }
     { "result-set" result-set }
 }
-{ $description "Returns a " { $link result-set } " object representing the results of a SQL query. See " { $link "db-result-sets" } "." } ;
+{ $description "Returns a " { $link result-set } " object representing the results of an SQL query. See " { $link "db-result-sets" } "." } ;
 
 HELP: #rows
 { $values { "result-set" result-set } { "n" integer } }
@@ -128,14 +128,14 @@ HELP: in-transaction?
 
 HELP: query-each
 { $values
-     { "statement" statement } { "quot" quotation } }
-{ $description "A combinator that calls a quotation on a sequence of SQL statements to their results query results." } ;
+     { "result-set" result-set } { "quot" quotation } }
+{ $description "Applies the quotation to each row of the " { $link result-set } " in order." } ;
 
 HELP: query-map
 { $values
-     { "statement" statement } { "quot" quotation }
+     { "result-set" result-set } { "quot" quotation }
      { "seq" sequence } }
-{ $description "A combinator that maps a sequence of SQL statements to their results query results." } ;
+{ $description "Applies the quotation to each row of the " { $link result-set } " in order." } ;
 
 HELP: rollback-transaction
 { $description "Rolls back a transaction; no data is committed to the database. User code should make use of the " { $link with-transaction } " combinator." } ;
@@ -143,13 +143,13 @@ HELP: rollback-transaction
 HELP: sql-command
 { $values
      { "sql" string } }
-{ $description "Executes a SQL string using the database in the " { $link db-connection } " symbol." } ;
+{ $description "Executes an SQL string using the database in the " { $link db-connection } " symbol." } ;
 
 HELP: sql-query
 { $values
      { "sql" string }
      { "rows" "an array of arrays of strings" } }
-{ $description "Runs a SQL query of raw text in the database in the " { $link db-connection } " symbol. Each row is returned as an array of strings; no type-conversions are done on the resulting data." } ;
+{ $description "Runs an SQL query of raw text in the database in the " { $link db-connection } " symbol. Each row is returned as an array of strings; no type-conversions are done on the resulting data." } ;
 
 { sql-command sql-query } related-words
 
@@ -183,6 +183,7 @@ ARTICLE: "db" "Database library"
 "Higher-level database help:"
 { $vocab-subsection "Database types" "db.types" }
 { $vocab-subsection "High-level tuple/database integration" "db.tuples" }
+$nl
 "Low-level database help:"
 { $subsections
     "db-protocol"
@@ -216,7 +217,7 @@ $nl
 } ;
 
 ARTICLE: "db-result-sets" "Result sets"
-"Result sets are the encapsulated, database-specific results from a SQL query."
+"Result sets are the encapsulated, database-specific results from an SQL query."
 $nl
 "Two possible protocols for iterating over result sets exist:"
 { $subsections
@@ -265,27 +266,27 @@ ARTICLE: "db-protocol" "Low-level database protocol"
 
 ARTICLE: "db-lowlevel-tutorial" "Low-level database tutorial"
 "Although Factor makes integrating a database with its object system easy (see " { $vocab-link "db.tuples" } "), sometimes you may want to write SQL directly and get the results back as arrays of strings, for instance, when interfacing with a legacy database that doesn't easily map to " { $snippet "tuples" } "." $nl
-"Executing a SQL command:"
+"Executing an SQL command:"
 { $subsections sql-command }
 "Executing a query directly:"
 { $subsections sql-query }
 "Here's an example usage where we'll make a book table, insert some objects, and query them." $nl
 "First, let's set up a custom combinator for using our database. See " { $link "db-custom-database-combinators" } " for more details."
-{ $code """USING: db.sqlite db io.files io.files.temp ;
+{ $code "USING: db.sqlite db io.files io.files.temp ;
 : with-book-db ( quot -- )
-    "book.db" temp-file <sqlite-db> swap with-db ; inline""" }
+    \"book.db\" temp-file <sqlite-db> swap with-db ; inline" }
 "Now let's create the table manually:"
-{ $code """"create table books
+{ $code "\"create table books
     (id integer primary key, title text, author text, date_published timestamp,
-     edition integer, cover_price double, condition text)"
-    [ sql-command ] with-book-db""" }
+     edition integer, cover_price double, condition text)\"
+    [ sql-command ] with-book-db" }
 "Time to insert some books:"
-{ $code """"insert into books
+{ $code "\"insert into books
     (title, author, date_published, edition, cover_price, condition)
-    values('Factor for Sheeple', 'Mister Stacky Pants', date('now'), 1, 13.37, 'mint')"
-[ sql-command ] with-book-db""" }
+    values('Factor for Sheeple', 'Mister Stacky Pants', date('now'), 1, 13.37, 'mint')\"
+[ sql-command ] with-book-db" }
 "Now let's select the book:"
-{ $code """"select id, title, cover_price from books;" [ sql-query ] with-book-db""" }
+{ $code "\"select id, title, cover_price from books;\" [ sql-query ] with-book-db" }
 "Notice that the result of this query is a Factor array containing the database rows as arrays of strings. We would have to convert the " { $snippet "cover_price" } " from a string to a number in order to use it in a calculation." $nl
 "In conclusion, this method of accessing a database is supported, but it is fairly low-level and generally specific to a single database. The " { $vocab-link "db.tuples" } " vocabulary is a good alternative to writing SQL by hand." ;
 
@@ -295,20 +296,20 @@ ARTICLE: "db-custom-database-combinators" "Custom database combinators"
 "Make a " { $snippet "with-" } " combinator to open and close a database so that resources are not leaked." $nl
 
 "SQLite example combinator:"
-{ $code """USING: db.sqlite db io.files io.files.temp ;
+{ $code "USING: db.sqlite db io.files io.files.temp ;
 : with-sqlite-db ( quot -- )
-    "my-database.db" temp-file <sqlite-db> swap with-db ; inline""" }
+    \"my-database.db\" temp-file <sqlite-db> swap with-db ; inline" }
 
 "PostgreSQL example combinator:"
-{ $code """USING: db.postgresql db ;
+{ $code "USING: db.postgresql db ;
 : with-postgresql-db ( quot -- )
     <postgresql-db>
-        "localhost" >>host
+        \"localhost\" >>host
         5432 >>port
-        "erg" >>username
-        "secrets?" >>password
-        "factor-test" >>database
-    swap with-db ; inline"""
+        \"erg\" >>username
+        \"secrets?\" >>password
+        \"factor-test\" >>database
+    swap with-db ; inline"
 } ;
 
 ABOUT: "db"

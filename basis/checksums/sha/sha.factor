@@ -1,28 +1,36 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays checksums checksums.common
-checksums.stream combinators combinators.smart fry grouping
-io.binary kernel literals locals math math.bitwise math.ranges
-sequences sequences.generalizations sequences.private ;
+USING: accessors alien.c-types arrays checksums checksums.common
+combinators combinators.smart fry grouping io.binary kernel
+kernel.private literals locals math math.bitwise math.ranges
+sequences sequences.generalizations sequences.private
+specialized-arrays ;
+SPECIALIZED-ARRAY: uint
+SPECIALIZED-ARRAY: ulong
 IN: checksums.sha
 
+MIXIN: sha
+INSTANCE: sha block-checksum
+
 SINGLETON: sha1
-INSTANCE: sha1 stream-checksum
+INSTANCE: sha1 sha
 
 SINGLETON: sha-224
 SINGLETON: sha-256
 
-INSTANCE: sha-224 stream-checksum
-INSTANCE: sha-256 stream-checksum
+INSTANCE: sha-224 sha
+INSTANCE: sha-256 sha
 
-TUPLE: sha1-state < checksum-state
-{ K array }
-{ H array }
-{ W array }
+<PRIVATE
+
+TUPLE: sha1-state < block-checksum-state
+{ K uint-array }
+{ H uint-array }
+{ W uint-array }
 { word-size fixnum } ;
 
 CONSTANT: initial-H-sha1
-    {
+    uint-array{
         0x67452301
         0xefcdab89
         0x98badcfe
@@ -35,13 +43,13 @@ CONSTANT: K-sha1
         20 0x5a827999 <repetition>
         20 0x6ed9eba1 <repetition>
         20 0x8f1bbcdc <repetition>
-        20 0xca62c1d6 <repetition> 
-        4 { } nappend-as
+        20 0xca62c1d6 <repetition>
+        4 uint-array{ } nappend-as
     ]
 
-TUPLE: sha2-state < checksum-state
-{ K array }
-{ H array }
+TUPLE: sha2-state < block-checksum-state
+{ K uint-array }
+{ H uint-array }
 { word-size fixnum } ;
 
 TUPLE: sha2-short < sha2-state ;
@@ -57,8 +65,6 @@ M: sha2-state clone
     [ clone ] change-H
     [ clone ] change-K ;
 
-<PRIVATE
-
 CONSTANT: a 0
 CONSTANT: b 1
 CONSTANT: c 2
@@ -69,19 +75,19 @@ CONSTANT: g 6
 CONSTANT: h 7
 
 CONSTANT: initial-H-224
-    {
+    uint-array{
         0xc1059ed8 0x367cd507 0x3070dd17 0xf70e5939
         0xffc00b31 0x68581511 0x64f98fa7 0xbefa4fa4
     }
 
 CONSTANT: initial-H-256
-    {
+    uint-array{
         0x6a09e667 0xbb67ae85 0x3c6ef372 0xa54ff53a
         0x510e527f 0x9b05688c 0x1f83d9ab 0x5be0cd19
     }
 
 CONSTANT: initial-H-384
-    {
+    ulong-array{
         0xcbbb9d5dc1059ed8
         0x629a292a367cd507
         0x9159015a3070dd17
@@ -93,7 +99,7 @@ CONSTANT: initial-H-384
     }
 
 CONSTANT: initial-H-512
-    {
+    ulong-array{
         0x6a09e667f3bcc908
         0xbb67ae8584caa73b
         0x3c6ef372fe94f82b
@@ -105,7 +111,7 @@ CONSTANT: initial-H-512
     }
 
 CONSTANT: K-256
-    {
+    uint-array{
         0x428a2f98 0x71374491 0xb5c0fbcf 0xe9b5dba5
         0x3956c25b 0x59f111f1 0x923f82a4 0xab1c5ed5
         0xd807aa98 0x12835b01 0x243185be 0x550c7dc3
@@ -125,27 +131,26 @@ CONSTANT: K-256
     }
 
 CONSTANT: K-384
-    {
-
-        0x428a2f98d728ae22 0x7137449123ef65cd 0xb5c0fbcfec4d3b2f 0xe9b5dba58189dbbc 
-        0x3956c25bf348b538 0x59f111f1b605d019 0x923f82a4af194f9b 0xab1c5ed5da6d8118 
+    ulong-array{
+        0x428a2f98d728ae22 0x7137449123ef65cd 0xb5c0fbcfec4d3b2f 0xe9b5dba58189dbbc
+        0x3956c25bf348b538 0x59f111f1b605d019 0x923f82a4af194f9b 0xab1c5ed5da6d8118
         0xd807aa98a3030242 0x12835b0145706fbe 0x243185be4ee4b28c 0x550c7dc3d5ffb4e2
-        0x72be5d74f27b896f 0x80deb1fe3b1696b1 0x9bdc06a725c71235 0xc19bf174cf692694 
-        0xe49b69c19ef14ad2 0xefbe4786384f25e3 0x0fc19dc68b8cd5b5 0x240ca1cc77ac9c65 
-        0x2de92c6f592b0275 0x4a7484aa6ea6e483 0x5cb0a9dcbd41fbd4 0x76f988da831153b5 
-        0x983e5152ee66dfab 0xa831c66d2db43210 0xb00327c898fb213f 0xbf597fc7beef0ee4 
-        0xc6e00bf33da88fc2 0xd5a79147930aa725 0x06ca6351e003826f 0x142929670a0e6e70 
-        0x27b70a8546d22ffc 0x2e1b21385c26c926 0x4d2c6dfc5ac42aed 0x53380d139d95b3df 
-        0x650a73548baf63de 0x766a0abb3c77b2a8 0x81c2c92e47edaee6 0x92722c851482353b 
-        0xa2bfe8a14cf10364 0xa81a664bbc423001 0xc24b8b70d0f89791 0xc76c51a30654be30 
-        0xd192e819d6ef5218 0xd69906245565a910 0xf40e35855771202a 0x106aa07032bbd1b8 
-        0x19a4c116b8d2d0c8 0x1e376c085141ab53 0x2748774cdf8eeb99 0x34b0bcb5e19b48a8 
-        0x391c0cb3c5c95a63 0x4ed8aa4ae3418acb 0x5b9cca4f7763e373 0x682e6ff3d6b2b8a3 
-        0x748f82ee5defb2fc 0x78a5636f43172f60 0x84c87814a1f0ab72 0x8cc702081a6439ec 
-        0x90befffa23631e28 0xa4506cebde82bde9 0xbef9a3f7b2c67915 0xc67178f2e372532b 
-        0xca273eceea26619c 0xd186b8c721c0c207 0xeada7dd6cde0eb1e 0xf57d4f7fee6ed178 
-        0x06f067aa72176fba 0x0a637dc5a2c898a6 0x113f9804bef90dae 0x1b710b35131c471b 
-        0x28db77f523047d84 0x32caab7b40c72493 0x3c9ebe0a15c9bebc 0x431d67c49c100d4c 
+        0x72be5d74f27b896f 0x80deb1fe3b1696b1 0x9bdc06a725c71235 0xc19bf174cf692694
+        0xe49b69c19ef14ad2 0xefbe4786384f25e3 0x0fc19dc68b8cd5b5 0x240ca1cc77ac9c65
+        0x2de92c6f592b0275 0x4a7484aa6ea6e483 0x5cb0a9dcbd41fbd4 0x76f988da831153b5
+        0x983e5152ee66dfab 0xa831c66d2db43210 0xb00327c898fb213f 0xbf597fc7beef0ee4
+        0xc6e00bf33da88fc2 0xd5a79147930aa725 0x06ca6351e003826f 0x142929670a0e6e70
+        0x27b70a8546d22ffc 0x2e1b21385c26c926 0x4d2c6dfc5ac42aed 0x53380d139d95b3df
+        0x650a73548baf63de 0x766a0abb3c77b2a8 0x81c2c92e47edaee6 0x92722c851482353b
+        0xa2bfe8a14cf10364 0xa81a664bbc423001 0xc24b8b70d0f89791 0xc76c51a30654be30
+        0xd192e819d6ef5218 0xd69906245565a910 0xf40e35855771202a 0x106aa07032bbd1b8
+        0x19a4c116b8d2d0c8 0x1e376c085141ab53 0x2748774cdf8eeb99 0x34b0bcb5e19b48a8
+        0x391c0cb3c5c95a63 0x4ed8aa4ae3418acb 0x5b9cca4f7763e373 0x682e6ff3d6b2b8a3
+        0x748f82ee5defb2fc 0x78a5636f43172f60 0x84c87814a1f0ab72 0x8cc702081a6439ec
+        0x90befffa23631e28 0xa4506cebde82bde9 0xbef9a3f7b2c67915 0xc67178f2e372532b
+        0xca273eceea26619c 0xd186b8c721c0c207 0xeada7dd6cde0eb1e 0xf57d4f7fee6ed178
+        0x06f067aa72176fba 0x0a637dc5a2c898a6 0x113f9804bef90dae 0x1b710b35131c471b
+        0x28db77f523047d84 0x32caab7b40c72493 0x3c9ebe0a15c9bebc 0x431d67c49c100d4c
         0x4cc5d4becb3e42b6 0x597f299cfc657e2a 0x5fcb6fab3ad6faec 0x6c44198c4a475817
     }
 
@@ -235,6 +240,7 @@ M: sha-256 initialize-checksum-state drop <sha-256-state> ;
     ] [ bitxor ] reduce-outputs ; inline
 
 : prepare-M-256 ( n seq -- )
+    { uint-array } declare
     {
         [ [ 16 - ] dip nth-unsafe ]
         [ [ 15 - ] dip nth-unsafe s0-256 ]
@@ -244,6 +250,7 @@ M: sha-256 initialize-checksum-state drop <sha-256-state> ;
     } 2cleave set-nth-unsafe ; inline
 
 : prepare-M-512 ( n seq -- )
+    { ulong-array } declare
     {
         [ [ 16 - ] dip nth-unsafe ]
         [ [ 15 - ] dip nth-unsafe s0-512 ]
@@ -270,9 +277,9 @@ GENERIC: pad-initial-bytes ( string sha2 -- padded-string )
     e H nth-unsafe S1-256 w+
     h H nth-unsafe w+ ; inline
 
-: T2-256 ( H -- T2 )
-    [ a swap nth-unsafe S0-256 ]
-    [ a swap slice3 maj w+ ] bi ; inline
+:: T2-256 ( H -- T2 )
+    a H nth-unsafe S0-256
+    a H slice3 maj w+ ; inline
 
 :: T1-512 ( n M H sha2 -- T1 )
     n M nth-unsafe
@@ -281,26 +288,24 @@ GENERIC: pad-initial-bytes ( string sha2 -- padded-string )
     e H nth-unsafe S1-512 w+
     h H nth-unsafe w+ ; inline
 
-: T2-512 ( H -- T2 )
-    [ a swap nth-unsafe S0-512 ]
-    [ a swap slice3 maj w+ ] bi ; inline
+:: T2-512 ( H -- T2 )
+    a H nth-unsafe S0-512
+    a H slice3 maj w+ ; inline
 
-: update-H ( T1 T2 H -- )
-    h g pick exchange-unsafe
-    g f pick exchange-unsafe
-    f e pick exchange-unsafe
-    pick d pick nth-unsafe w+ e pick set-nth-unsafe
-    d c pick exchange-unsafe
-    c b pick exchange-unsafe
-    b a pick exchange-unsafe
-    [ w+ a ] dip set-nth-unsafe ; inline
+:: update-H ( T1 T2 H -- )
+    h g H exchange-unsafe
+    g f H exchange-unsafe
+    f e H exchange-unsafe
+    T1 d H nth-unsafe w+ e H set-nth-unsafe
+    d c H exchange-unsafe
+    c b H exchange-unsafe
+    b a H exchange-unsafe
+    T1 T2 w+ a H set-nth-unsafe ; inline
 
 : prepare-message-schedule ( seq sha2 -- w-seq )
-    [ word-size>> <groups> [ be> ] map ]
-    [
-        block-size>> [ 0 pad-tail 16 ] keep [a,b) over
-        '[ _ prepare-M-256 ] each
-    ] bi ; inline
+    [ word-size>> <groups> ] [ block-size>> <uint-array> ] bi
+    [ '[ [ be> ] dip _ set-nth-unsafe ] each-index ]
+    [ 16 over length [a,b) over '[ _ prepare-M-256 ] each ] bi ; inline
 
 :: process-chunk ( M block-size cloned-H sha2 -- )
     block-size [
@@ -315,7 +320,7 @@ M: sha2-short checksum-block
     [ [ block-size>> ] [ H>> clone ] [ ] tri process-chunk ] bi ;
 
 : sequence>byte-array ( seq n -- bytes )
-    '[ _ >be ] map B{ } concat-as ; inline
+    '[ _ >be ] { } map-as B{ } concat-as ; inline
 
 : sha1>checksum ( sha2 -- bytes )
     H>> 4 sequence>byte-array ; inline
@@ -330,8 +335,6 @@ M: sha2-short checksum-block
     [ bytes>> t ] [ bytes-read>> pad-last-block ] [ ] tri
     [ checksum-block ] curry each ; inline
 
-PRIVATE>
-
 M: sha-224-state get-checksum
     clone
     [ pad-last-short-block ] [ sha-224>checksum ] bi ;
@@ -340,15 +343,8 @@ M: sha-256-state get-checksum
     clone
     [ pad-last-short-block ] [ sha-256>checksum ] bi ;
 
-M: sha-224 checksum-stream ( stream checksum -- byte-array )
-    drop
-    [ <sha-224-state> ] dip add-checksum-stream get-checksum ;
-
-M: sha-256 checksum-stream ( stream checksum -- byte-array )
-    drop
-    [ <sha-256-state> ] dip add-checksum-stream get-checksum ;
-
 : sha1-W ( t seq -- )
+    { uint-array } declare
     {
         [ [ 3 - ] dip nth-unsafe ]
         [ [ 8 - ] dip nth-unsafe bitxor ]
@@ -358,9 +354,9 @@ M: sha-256 checksum-stream ( stream checksum -- byte-array )
     } 2cleave set-nth-unsafe ; inline
 
 : prepare-sha1-message-schedule ( seq -- w-seq )
-    4 <groups> [ be> ] map
-    80 0 pad-tail 16 80 [a,b) over
-    '[ _ sha1-W ] each ; inline
+    4 <groups> 80 <uint-array>
+    [ '[ [ be> ] dip _ set-nth-unsafe ] each-index ]
+    [ 16 80 [a,b) over '[ _ sha1-W ] each ] bi ; inline
 
 : sha1-f ( B C D n -- f_nbcd )
     20 /i
@@ -409,6 +405,4 @@ M: sha1-state get-checksum
     clone
     [ pad-last-short-block ] [ sha-256>checksum ] bi ;
 
-M: sha1 checksum-stream ( stream checksum -- byte-array )
-    drop
-    [ <sha1-state> ] dip add-checksum-stream get-checksum ;
+PRIVATE>

@@ -63,6 +63,5 @@ M:: bounty <=> ( a b -- <=> )
     ] 2map ;
 
 : best-bounty ( -- bounty )
-    find-max-amounts [ 1 + iota ] map <product-sequence>
+    find-max-amounts [ 1 + <iota> ] map <product-sequence>
     [ <bounty> ] [ max ] map-reduce ;
-

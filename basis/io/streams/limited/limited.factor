@@ -20,7 +20,7 @@ INSTANCE: limited-stream input-stream
     [ drop file-info size>> ] 2bi
     <limited-stream> ;
 
-GENERIC# limit-stream 1 ( stream limit -- stream' )
+GENERIC#: limit-stream 1 ( stream limit -- stream' )
 
 M: decoder limit-stream ( stream limit -- stream' )
     '[ stream>> _ limit-stream ] [ code>> ] [ cr>> ] tri
@@ -86,7 +86,7 @@ ERROR: limit-exceeded n stream ;
 PRIVATE>
 
 M: limited-stream stream-read1
-    1 swap 
+    1 swap
     [ nip stream-read1 ] maybe-read ;
 
 M: limited-stream stream-read-unsafe

@@ -1,29 +1,25 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors cpu.architecture vocabs system
-sequences namespaces parser kernel kernel.private classes
-classes.private arrays hashtables vectors classes.tuple sbufs
-hashtables.private sequences.private math classes.tuple.private
-growable namespaces.private assocs words command-line io
-io.encodings.string libc splitting math.parser memory compiler.units
-math.order quotations quotations.private assocs.private vocabs.loader ;
+USING: accessors arrays assocs assocs.private classes
+classes.tuple.private compiler.units cpu.architecture hashtables
+hashtables.private io kernel libc math math.parser memory
+namespaces namespaces.private quotations quotations.private
+sbufs sequences sequences.private splitting system vectors
+vocabs vocabs.loader words ;
 FROM: compiler => enable-optimizer ;
 IN: bootstrap.compiler
 
-"profile-compiler" get [
-    "bootstrap.compiler.timing" require
-] when
-
 ! Don't bring this in when deploying, since it will store a
 ! reference to 'eval' in a global variable
-"deploy-vocab" get "staging" get or [
+"staging" get [
     "alien.remote-control" require
 ] unless
 
 { "boostrap.compiler" "prettyprint" } "alien.prettyprint" require-when
-{ "boostrap.compiler" "debugger" } "alien.debugger" require-when
 
 "cpu." cpu name>> append require
+
+enable-cpu-features
 
 enable-optimizer
 
@@ -32,7 +28,7 @@ gc
 
 : compile-unoptimized ( words -- )
     [ [ subwords ] map ] keep suffix concat
-    [ optimized? not ] filter compile ;
+    [ word-optimized? ] reject compile ;
 
 "debug-compiler" get [
 
@@ -52,7 +48,7 @@ gc
 
         array? hashtable? vector?
         tuple? sbuf? tombstone?
-        curry? compose? callable?
+        curried? composed? callable?
         quotation?
 
         curry compose uncurry
@@ -61,7 +57,7 @@ gc
 
         wrap probe
 
-        namestack*
+        (get-namestack)
 
         layout-of
     } compile-unoptimized
@@ -93,7 +89,7 @@ gc
     "." write flush
 
     {
-        member-eq? split harvest sift cut cut-slice start index clone
+        member-eq? split harvest sift cut cut-slice subseq-start index clone
         set-at reverse push-all class-of number>string string>number
         like clone-like
     } compile-unoptimized
@@ -124,7 +120,7 @@ gc
 
     "." write flush
 
-    vocabs [ words compile-unoptimized "." write flush ] each
+    loaded-vocab-names [ vocab-words compile-unoptimized "." write flush ] each
 
     " done" print flush
 

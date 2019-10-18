@@ -1,33 +1,46 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors colors.constants
-combinators.short-circuit compiler.units continuations debugger
-fry io io.styles kernel lexer locals math math.parser namespaces
-parser parser.notes prettyprint sequences sets
-source-files.errors vocabs vocabs.loader vocabs.parser ;
+USING: accessors colors colors.constants combinators.short-circuit
+compiler.units continuations debugger fry io io.styles kernel lexer
+locals math math.parser namespaces parser parser.notes prettyprint
+sequences sets source-files.errors system vocabs vocabs.loader
+vocabs.parser ;
 IN: listener
 
 GENERIC: stream-read-quot ( stream -- quot/f )
-GENERIC# prompt. 1 ( stream prompt -- )
+GENERIC#: prompt. 1 ( stream prompt -- )
 
 : prompt ( -- str )
-    manifest get current-vocab>> [ name>> "IN: " prepend ] [ "" ] if* 
+    manifest get current-vocab>> [ name>> "IN: " prepend ] [ "" ] if*
     auto-use? get [ " auto-use" append ] when ;
 
+SYMBOL: prompt-style
+H{
+    { background T{ rgba f 1 0.7 0.7 1 } }
+    { foreground COLOR: black }
+} prompt-style set-global
+
 M: object prompt.
-    nip H{
-        { background T{ rgba f 1 0.7 0.7 1 } }
-        { foreground COLOR: black }
-    } format bl flush ;
+    nip prompt-style get-global format bl flush ;
+
+SYMBOL: handle-ctrl-break
+
+: maybe-enable-ctrl-break ( -- )
+    handle-ctrl-break get-global [ enable-ctrl-break ] when ;
+
+: with-ctrl-break ( quot -- )
+    maybe-enable-ctrl-break
+    ! Always call disable-ctrl-break, no matter what handle-ctrl-break
+    ! says: it might've been changed just now by the user in the Listener.
+    ! It's a no-op if it's not enabled.
+    [ disable-ctrl-break ] [ ] cleanup ; inline
 
 : parse-lines-interactive ( lines -- quot/f )
-    [ parse-lines ] with-compilation-unit ;
+    [ [ parse-lines ] with-ctrl-break ] with-compilation-unit ;
 
 : read-quot-step ( lines -- quot/f )
-    [ parse-lines-interactive ] [
-        dup error>> unexpected-eof?
-        [ 2drop f ] [ rethrow ] if
-    ] recover ;
+    '[ _ parse-lines-interactive ]
+    [ error>> unexpected-eof? ] ignore-error/f ;
 
 : read-quot-loop ( stream accum -- quot/f )
     over stream-readln dup [
@@ -108,8 +121,7 @@ t error-summary? set-global
         [ nl "--- Data stack:" title. trimmed-stack. ] unless-empty
     ] [ drop ] if ;
 
-:: (listener) ( datastack -- )
-    parser-quiet? off
+:: listener-step ( datastack -- datastack' )
     error-summary? get [ error-summary ] when
     visible-vars.
     datastack datastack.
@@ -117,7 +129,7 @@ t error-summary? set-global
 
     [
         read-quot [
-            '[ datastack _ with-datastack ]
+            '[ [ datastack _ with-datastack ] with-ctrl-break ]
             [ call-error-hook datastack ]
             recover
         ] [ return ] if*
@@ -126,9 +138,10 @@ t error-summary? set-global
         [ call-error-hook datastack ]
         [ rethrow ]
         if
-    ] recover
+    ] recover ;
 
-    (listener) ;
+: (listener) ( datastack -- )
+    listener-step (listener) ;
 
 PRIVATE>
 
@@ -209,6 +222,12 @@ SYMBOL: interactive-vocabs
     ] with-manifest ; inline
 
 : listener ( -- )
-    [ [ { } (listener) ] with-return ] with-interactive-vocabs ;
+    [
+        parser-quiet? off
+        [ { } (listener) ] with-return
+    ] with-interactive-vocabs ;
 
-MAIN: listener
+: listener-main ( -- )
+    version-info print flush listener ;
+
+MAIN: listener-main

@@ -21,5 +21,5 @@ M: literate-lexer skip-blank
 
 SYNTAX: <LITERATE
     "LITERATE>" parse-multiline-string string-lines [
-        <literate-lexer> (parse-lines) over push-all
+        <literate-lexer> (parse-lines) append!
     ] with-nested-compilation-unit ;

@@ -1,31 +1,39 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cocoa.messages compiler.units core-foundation.bundles
+USING: assocs cocoa.messages compiler.units core-foundation.bundles
 hashtables init io kernel lexer namespaces sequences vocabs ;
-FROM: cocoa.messages => selector ;
 IN: cocoa
 
 SYMBOL: sent-messages
 
-: (remember-send) ( selector variable -- )
-    [ dupd ?set-at ] change-global ;
+sent-messages [ H{ } clone ] initialize
 
 : remember-send ( selector -- )
-    sent-messages (remember-send) ;
+    dup sent-messages get set-at ;
 
-SYNTAX: -> scan-token dup remember-send suffix! \ send suffix! ;
+SYNTAX: ->
+    scan-token dup remember-send
+    [ lookup-method suffix! ] [ suffix! ] bi \ send suffix! ;
+
+SYNTAX: ?->
+    dup last cache-stubs
+    scan-token dup remember-send
+    suffix! \ send suffix! ;
 
 SYNTAX: SEL:
-    scan-token
-    [ remember-send ]
-    [ <selector> suffix! \ selector suffix! ] bi ;
+    scan-token dup remember-send
+    <selector> suffix! \ cocoa.messages:selector suffix! ;
 
 SYMBOL: super-sent-messages
 
-: remember-super-send ( selector -- )
-    super-sent-messages (remember-send) ;
+super-sent-messages [ H{ } clone ] initialize
 
-SYNTAX: SUPER-> scan-token dup remember-super-send suffix! \ super-send suffix! ;
+: remember-super-send ( selector -- )
+    dup super-sent-messages get set-at ;
+
+SYNTAX: SUPER->
+    scan-token dup remember-super-send
+    [ lookup-method suffix! ] [ suffix! ] bi \ super-send suffix! ;
 
 SYMBOL: frameworks
 
@@ -50,7 +58,9 @@ SYNTAX: IMPORT: scan-token [ ] import-objc-class ;
         "NSAutoreleasePool"
         "NSBitmapImageRep"
         "NSBundle"
+        "NSButton"
         "NSColorSpace"
+        "NSCustomTouchBarItem"
         "NSData"
         "NSDictionary"
         "NSError"
@@ -75,6 +85,8 @@ SYNTAX: IMPORT: scan-token [ ] import-objc-class ;
         "NSSavePanel"
         "NSScreen"
         "NSString"
+        "NSTouchBar"
+        "NSTouchBarItem"
         "NSView"
         "NSWindow"
         "NSWorkspace"

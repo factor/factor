@@ -1,11 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.parser
-assocs byte-arrays classes compiler.units functors kernel lexer
-libc math math.vectors math.vectors.private namespaces
-parser prettyprint.custom sequences sequences.private strings
-summary vocabs vocabs.loader vocabs.parser vocabs.generated
-words fry combinators make ;
+byte-arrays classes combinators fry functors kernel lexer locals
+make math math.vectors parser prettyprint.custom sequences
+sequences.private vocabs.generated vocabs.loader vocabs.parser
+words ;
 IN: specialized-arrays
 
 MIXIN: specialized-array
@@ -39,14 +38,13 @@ GENERIC: direct-like ( alien len exemplar -- seq )
 M: byte-array nth-c-ptr <displaced-alien> ; inline
 M: byte-array direct-like drop uchar <c-direct-array> ; inline
 
-FUNCTOR: define-array ( T -- )
+<FUNCTOR: define-array ( T -- )
 
 A          DEFINES-CLASS ${T}-array
 <A>        DEFINES <${A}>
 (A)        DEFINES (${A})
 <direct-A> DEFINES <direct-${A}>
 A{         DEFINES ${A}{
-A@         DEFINES ${A}@
 
 WHERE
 
@@ -68,11 +66,11 @@ M: A clone [ underlying>> clone ] [ length>> ] bi <direct-A> ; inline
 
 M: A length length>> ; inline
 
-M: A nth-unsafe underlying>> \ T alien-element ; inline
+M: A nth-unsafe [ integer>fixnum ] dip underlying>> \ T alien-element ; inline
 
 M: A nth-c-ptr underlying>> \ T array-accessor drop swap <displaced-alien> ; inline
 
-M: A set-nth-unsafe underlying>> \ T set-alien-element ; inline
+M: A set-nth-unsafe [ integer>fixnum ] dip underlying>> \ T set-alien-element ; inline
 
 M: A like drop dup A instance? [ \ T >c-array ] unless ; inline
 
@@ -105,7 +103,7 @@ M: A vs* [ * \ T c-type-clamp ] 2map ; inline
 
 M: A v*high [ * \ T heap-size neg shift ] 2map ; inline
 
-;FUNCTOR
+;FUNCTOR>
 
 : specialized-array-vocab ( c-type -- vocab )
     [
@@ -115,10 +113,8 @@ M: A v*high [ * \ T heap-size neg shift ] 2map ; inline
         bi
     ] "" make ;
 
-: direct-slice-unsafe ( from to seq -- seq' )
-    [ nip nth-c-ptr ]
-    [ drop swap - ]
-    [ 2nip ] 3tri direct-like ; inline
+:: direct-slice-unsafe ( from to seq -- seq' )
+    from seq nth-c-ptr to from - seq direct-like ; inline
 
 PRIVATE>
 

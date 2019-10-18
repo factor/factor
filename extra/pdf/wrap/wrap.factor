@@ -1,8 +1,7 @@
 ! Copyright (C) 2011-2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: kernel fry make math sequences ui.text unicode.categories
-wrap ;
+USING: kernel fry make math sequences ui.text unicode wrap ;
 
 IN: pdf.wrap
 
@@ -32,7 +31,7 @@ PRIVATE>
 
 : string>elements ( string font -- elements )
     [ word-split ] dip '[
-        dup word-split1 "" or
+        dup dup [ blank? ] find drop [ cut ] [ "" ] if*
         [ _ swap text-width ] bi@
         <element>
     ] map ;
@@ -40,5 +39,4 @@ PRIVATE>
 PRIVATE>
 
 : visual-wrap ( line font line-width -- lines )
-    [ string>elements ] dip dup wrap [ concat ] map ;
-
+    [ string>elements ] dip wrap [ concat ] map ;

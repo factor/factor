@@ -7,7 +7,7 @@ TYPEDEF: long      __sword_type
 TYPEDEF: ulong     __uword_type
 TYPEDEF: long      __slongword_type
 TYPEDEF: uint      __u32_type
-TYPEDEF: int       __s32_type 
+TYPEDEF: int       __s32_type
 
 TYPEDEF: __uquad_type     dev_t
 TYPEDEF: __ulongword_type ino_t

@@ -1,30 +1,12 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators combinators.private effects
-fry kernel kernel.private make namespaces sequences continuations
-quotations words math stack-checker stack-checker.dependencies
-combinators.short-circuit stack-checker.transforms
-compiler.tree.propagation.info
-compiler.tree.propagation.inlining compiler.units ;
+USING: accessors combinators combinators.private
+combinators.short-circuit compiler.tree.propagation.info
+compiler.tree.propagation.inlining compiler.units continuations
+effects fry kernel kernel.private namespaces quotations
+sequences stack-checker stack-checker.dependencies
+stack-checker.transforms words ;
 IN: compiler.tree.propagation.call-effect
-
-! call( and execute( have complex expansions.
-
-! If the input quotation is a literal, or built up from curry and
-! compose with terminal quotations literal, it is inlined at the
-! call site.
-
-! For dynamic call sites, call( uses the following strategy:
-! - Inline caching. If the quotation is the same as last time, just call it unsafely
-! - Effect inference. Infer quotation's effect, caching it in the cached-effect slot,
-!   and compare it with declaration. If matches, call it unsafely.
-! - Fallback. If the above doesn't work, call it and compare the datastack before
-!   and after to make sure it didn't mess anything up.
-! - Inline caches and cached effects are invalidated whenever a macro is redefined, or
-!   a word's effect changes, by comparing a global counter against the counter value
-!   last observed. The counter is incremented by compiler.units.
-
-! execute( uses a similar strategy.
 
 TUPLE: inline-cache value counter ;
 
@@ -32,8 +14,7 @@ TUPLE: inline-cache value counter ;
     { [ value>> eq? ] [ nip counter>> effect-counter eq? ] } 2&& ; inline
 
 : update-inline-cache ( word/quot ic -- )
-    [ effect-counter ] dip
-    [ value<< ] [ counter<< ] bi-curry bi* ; inline
+    swap >>value effect-counter >>counter drop ; inline
 
 SINGLETON: +unknown+
 
@@ -47,7 +28,7 @@ M: +unknown+ curry-effect* ;
 
 M: effect curry-effect* curry-effect ;
 
-M: curry cached-effect
+M: curried cached-effect
     quot>> cached-effect curry-effect* ;
 
 : compose-effects* ( effect1 effect2 -- effect' )
@@ -56,12 +37,10 @@ M: curry cached-effect
         { [ 2dup [ +unknown+ eq? ] either? ] [ 2drop +unknown+ ] }
     } cond ;
 
-M: compose cached-effect
+M: composed cached-effect
     [ first>> ] [ second>> ] bi [ cached-effect ] bi@ compose-effects* ;
 
 : safe-infer ( quot -- effect )
-    ! Save and restore error variables here, so that we don't
-    ! pollute words such as :error and :c for the user.
     error get-global error-continuation get-global
     [ [ [ infer ] [ 2drop +unknown+ ] recover ] without-dependencies ] 2dip
     [ error set-global ] [ error-continuation set-global ] bi* ;
@@ -70,17 +49,11 @@ M: compose cached-effect
     cache-counter>> effect-counter eq? ; inline
 
 : save-effect ( effect quot -- )
-    [ effect-counter ] dip
-    [ cached-effect<< ] [ cache-counter<< ] bi-curry bi* ;
+    swap >>cached-effect effect-counter >>cache-counter drop ;
 
 M: quotation cached-effect
     dup cached-effect-valid?
     [ cached-effect>> ] [ [ safe-infer dup ] keep save-effect ] if ;
-
-: call-effect-unsafe? ( quot effect -- ? )
-    [ cached-effect ] dip
-    over +unknown+ eq?
-    [ 2drop f ] [ [ { effect } declare ] dip effect<= ] if ; inline
 
 : call-effect-slow>quot ( effect -- quot )
     [ \ call-effect def>> curry ] [ add-effect-input ] bi
@@ -91,6 +64,11 @@ M: quotation cached-effect
 \ call-effect-slow [ call-effect-slow>quot ] 1 define-transform
 
 \ call-effect-slow t "no-compile" set-word-prop
+
+: call-effect-unsafe? ( quot effect -- ? )
+    [ cached-effect ] dip
+    over +unknown+ eq?
+    [ 2drop f ] [ [ { effect } declare ] dip effect<= ] if ; inline
 
 : call-effect-fast ( quot effect inline-cache -- )
     2over call-effect-unsafe?
@@ -111,7 +89,7 @@ M: quotation cached-effect
     [ '[ _ execute ] ] dip call-effect-slow ; inline
 
 : execute-effect-unsafe? ( word effect -- ? )
-    over optimized?
+    over word-optimized?
     [ [ stack-effect { effect } declare ] dip effect<= ]
     [ 2drop f ]
     if ; inline
@@ -131,14 +109,11 @@ M: quotation cached-effect
 : execute-effect>quot ( effect -- quot )
     inline-cache new '[ drop _ _ execute-effect-ic ] ;
 
-! Some bookkeeping to make sure that crap like
-! [ dup curry call( quot -- ) ] dup curry call( quot -- ) ]
-! doesn't hang the compiler.
 GENERIC: already-inlined-quot? ( quot -- ? )
 
-M: curry already-inlined-quot? quot>> already-inlined-quot? ;
+M: curried already-inlined-quot? quot>> already-inlined-quot? ;
 
-M: compose already-inlined-quot?
+M: composed already-inlined-quot?
     [ first>> already-inlined-quot? ]
     [ second>> already-inlined-quot? ] bi or ;
 
@@ -146,9 +121,9 @@ M: quotation already-inlined-quot? already-inlined? ;
 
 GENERIC: add-quot-to-history ( quot -- )
 
-M: curry add-quot-to-history quot>> add-quot-to-history ;
+M: curried add-quot-to-history quot>> add-quot-to-history ;
 
-M: compose add-quot-to-history
+M: composed add-quot-to-history
     [ first>> add-quot-to-history ]
     [ second>> add-quot-to-history ] bi ;
 
@@ -174,27 +149,25 @@ ERROR: uninferable ;
         [ safe-infer dup +unknown+ = [ uninferable ] when ] tri
     ] [
         dup class>> {
-            { \ curry [ slots>> third (infer-value) remove-effect-input ] }
-            { \ compose [ slots>> last2 [ (infer-value) ] bi@ compose-effects ] }
+            { \ curried [ slots>> third (infer-value) remove-effect-input ] }
+            { \ composed [ slots>> last2 [ (infer-value) ] bi@ compose-effects ] }
             [ uninferable ]
         } case
     ] if ;
 
 : infer-value ( value-info -- effect/f )
-    [ (infer-value) ]
-    [ dup uninferable? [ 2drop f ] [ rethrow ] if ]
-    recover ;
+    '[ _ (infer-value) ] [ uninferable? ] ignore-error/f ;
 
 : (value>quot) ( value-info -- quot )
     dup literal?>> [
         literal>> [ add-quot-to-history ] [ '[ drop @ ] ] bi
     ] [
         dup class>> {
-            { \ curry [
+            { \ curried [
                 slots>> third (value>quot)
                 '[ [ obj>> ] [ quot>> @ ] bi ]
             ] }
-            { \ compose [
+            { \ composed [
                 slots>> last2 [ (value>quot) ] bi@
                 '[ [ first>> @ ] [ second>> @ ] bi ]
             ] }

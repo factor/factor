@@ -3,12 +3,15 @@ fry io.files.temp kernel math namespaces python python.ffi
 python.modules.__builtin__ python.modules.argparse python.modules.datetime
 python.modules.os python.modules.os.path python.modules.sys
 python.modules.time python.objects python.syntax sets splitting tools.test
-unicode.categories ;
+unicode ;
 QUALIFIED-WITH: sequences s
 IN: python.syntax.tests
 
 : py-test ( result quot -- )
-    '[ _ with-destructors ] unit-test ; inline
+    '[ python-dll-loaded? [ _ [ _ with-destructors ] unit-test ] when ] call ; inline
+
+: long-py-test ( result quot -- )
+    '[ python-dll-loaded? [ _ [ _ with-destructors ] long-unit-test ] when ] call ; inline
 
 { t } [ getpid py> integer? ] py-test
 
@@ -22,22 +25,22 @@ IN: python.syntax.tests
 [ ] [ 0 >py sleep ] py-test
 
 ! Module variables are bound as zero-arg functions
-[ t ] [ $path py> s:sequence? ] py-test
+{ t } [ $path py> s:sequence? ] py-test
 
-[ t ] [ $path len int py> 5 > ] py-test
+{ t } [ $path len int py> 5 > ] py-test
 
 [ 10 ] [ 10 >py range len py> ] py-test
 
 ! Callables
-[ t ] [
+{ t } [
     "os" py-import "getpid" getattr
     [ callable ] [ PyCallable_Check 1 = ] bi and
 ] py-test
 
 ! Reference counting
-[ 1 ] [ 3 <py-tuple> getrefcount py> ] py-test
+{ 1 } [ 3 <py-tuple> getrefcount py> ] py-test
 
-[ -1 ] [
+{ -1 } [
     H{ { "foo" 33 } { "bar" 44 } } >py
     [ "foo" py-dict-get-item-string getrefcount py> ]
     [
@@ -48,7 +51,7 @@ IN: python.syntax.tests
     [ "foo" py-dict-get-item-string getrefcount py> ] tri -
 ] py-test
 
-[ -1 ] [
+{ -1 } [
     "abcd" >py <1py-tuple>
     [ 0 py-tuple-get-item getrefcount py> ]
     [
@@ -63,14 +66,14 @@ IN: python.syntax.tests
     [ always-destructors get [ alien>> = ] with s:count ] bi =
 ] py-test
 
-[ t ] [
+{ t } [
     "python-file" temp-file >py "wb" >py open
     [ tell ] [ fileno ] [ close ] tri
-    [ py> integer? ] bi@ and
+    [ py> integer? ] both?
 ] py-test
 
 ! Method chaining
-[ t ] [
+{ t } [
     "hello there" >py title 20 >py zfill "00" >py startswith py>
 ] py-test
 
@@ -85,10 +88,10 @@ PY-METHODS: func =>
 PY-METHODS: code =>
     co_argcount ( code -- n ) ;
 
-[ 1 ] [ $splitext $func_code $co_argcount py> ] py-test
+{ 1 } [ $splitext $func_code $co_argcount py> ] py-test
 
 ! Change sys.path
-[ t ] [
+{ t } [
     $path "test" >py [ append ] [ drop py> ] [ remove ] 2tri
     "test" swap in?
 ] py-test
@@ -99,7 +102,7 @@ PY-METHODS: code =>
 ] py-test
 
 ! Kwargs in methods
-[ t ] [
+{ t } [
     [
         ArgumentParser dup
         "--foo" >py H{ { "help" "badger" } } >py add_argument
@@ -118,14 +121,14 @@ PY-METHODS: code =>
     100000 [
         [ [ 987 >py basename drop ] ignore-errors ] with-destructors
     ] times
-] unit-test
+] long-py-test
 
 ! Another leaky test
 { } [
     1000000 [
         [ { 9 8 7 6 5 4 3 2 1 } >py ] with-destructors drop
     ] times
-] unit-test
+] long-py-test
 
 ! Working with types
 PY-QUALIFIED-FROM: types => UnicodeType ( -- ) ;

@@ -1,11 +1,10 @@
-#!/bin/bash 
+#!/bin/bash
 
 # change directories to a factor module
-function cdfactor { 
-    code=$(printf "USING: io io.pathnames vocabs vocabs.loader ; "
-           printf "\"%s\" <vocab> vocab-source-path absolute-path print" $1)
-    echo $code > $HOME/.cdfactor
-    fn=$(factor $HOME/.cdfactor)
+function cdfactor {
+    code=$(printf "USING: io io.backend vocabs vocabs.loader ; "
+           printf "\"%s\" <vocab> vocab-source-path normalize-path print" $1)
+    fn=$(factor -e="$code")
     dn=$(dirname $fn)
     echo $dn
     if [ -z "$dn" ]; then
@@ -14,5 +13,3 @@ function cdfactor {
         cd $dn
     fi
 }
-
-

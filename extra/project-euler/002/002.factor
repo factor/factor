@@ -23,7 +23,7 @@ IN: project-euler.002
 <PRIVATE
 
 : (fib-upto) ( seq n limit -- seq )
-    2dup <= [ [ over push dup 2 tail* sum ] dip (fib-upto) ] [ 2drop ] if ;
+    2dup <= [ [ suffix! dup 2 tail* sum ] dip (fib-upto) ] [ 2drop ] if ;
 
 PRIVATE>
 
@@ -41,7 +41,7 @@ PRIVATE>
 ! -------------------
 
 : fib-upto* ( n -- seq )
-    0 1 [ pick over >= ] [ [ nip ] 2keep + dup ] produce [ 3drop ] dip
+    0 1 [ pick over >= ] [ [ nip ] 2keep + dup ] produce 3nip
     but-last-slice { 0 1 } prepend ;
 
 : euler002a ( -- answer )

@@ -1,10 +1,9 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel math namespaces sequences
-vectors models models.range math.vectors math.functions quotations
-colors colors.constants math.rectangles fry combinators ui.gestures
-ui.pens ui.gadgets ui.gadgets.buttons ui.gadgets.tracks math.order
-ui.gadgets.icons ui.gadgets.theme ui.pens.tile ui.pens.image ;
+USING: accessors assocs combinators fry kernel math math.order
+math.vectors models models.range ui.gadgets ui.gadgets.buttons
+ui.gadgets.icons ui.gadgets.tracks ui.gestures ui.pens
+ui.pens.image ui.pens.tile ui.theme.images ;
 IN: ui.gadgets.sliders
 
 TUPLE: slider < track elevator thumb saved line ;
@@ -33,7 +32,7 @@ CONSTANT: elevator-padding 4
 
 : elevator-length ( slider -- n )
     [ elevator>> dim>> ] [ orientation>> ] bi v.
-    elevator-padding 2 * - ;
+    elevator-padding 2 * [-] ;
 
 CONSTANT: min-thumb-dim 30
 
@@ -50,9 +49,9 @@ CONSTANT: min-thumb-dim 30
     [ elevator-length ] bi min ;
 
 : slider-scale ( slider -- n )
-    #! A scaling factor such that if x is a slider co-ordinate,
-    #! x*n is the screen position of the thumb, and conversely
-    #! for x/n. The '1 max' calls avoid division by zero.
+    ! A scaling factor such that if x is a slider co-ordinate,
+    ! x*n is the screen position of the thumb, and conversely
+    ! for x/n. The '1 max' calls avoid division by zero.
     [ [ elevator-length ] [ thumb-dim ] bi - 1 max ]
     [ slider-length* 1 max ]
     bi / ;
@@ -193,7 +192,7 @@ M: slide-button pref-dim* dup interior>> pen-pref-dim ;
     "vertical-scroller-downarrow-clicked"
     <slide-button> ;
 
-TUPLE: slider-pen-tuple enabled disabled ;
+TUPLE: slider-pen enabled disabled ;
 
 : <slider-pen> ( orientation -- pen )
     {
@@ -210,23 +209,24 @@ TUPLE: slider-pen-tuple enabled disabled ;
             "vertical-scroller-bottom-disabled" theme-image
         ] }
     } case
-    [ f f <tile-pen> ] bi-curry@ 2bi \ slider-pen-tuple boa ;
+    [ f f <tile-pen> ] bi-curry@ 2bi slider-pen boa ;
 
-: slider-pen ( slider pen -- pen )
+: current-pen ( slider pen -- pen )
     [ slider-enabled? ] [ [ enabled>> ] [ disabled>> ] bi ] bi* ? ;
 
-M: slider-pen-tuple draw-interior
-    dupd slider-pen draw-interior ;
+M: slider-pen draw-interior
+    dupd current-pen draw-interior ;
 
-M: slider-pen-tuple draw-boundary
-    dupd slider-pen draw-boundary ;
+M: slider-pen draw-boundary
+    dupd current-pen draw-boundary ;
 
-M: slider-pen-tuple pen-pref-dim
+M: slider-pen pen-pref-dim
     enabled>> pen-pref-dim ;
 
 M: slider pref-dim*
-    [ dup interior>> pen-pref-dim ] [ drop { 100 100 } ] [ orientation>> ] tri
-    set-axis ;
+    [ dup slider-enabled? [ dup interior>> pen-pref-dim ] [ drop { 0 0 } ] if ]
+    [ drop { 100 100 } ]
+    [ orientation>> ] tri set-axis ;
 
 PRIVATE>
 
@@ -243,4 +243,3 @@ PRIVATE>
             [ <down-button> f track-add ]
             [ drop <gadget> { 1 1 } >>dim f track-add ]
         } cleave ;
-

@@ -1,26 +1,39 @@
 namespace factor {
 
-struct to_tenured_policy {
-  factor_vm* parent;
+struct from_tenured_refs_copier : no_fixup {
   tenured_space* tenured;
+  std::vector<cell> *mark_stack;
 
-  explicit to_tenured_policy(factor_vm* parent)
-      : parent(parent), tenured(parent->data->tenured) {}
+  from_tenured_refs_copier(tenured_space* tenured,
+                           std::vector<cell> *mark_stack)
+      : tenured(tenured), mark_stack(mark_stack) { }
 
-  bool should_copy_p(object* untagged) {
-    return !tenured->contains_p(untagged);
+  object* fixup_data(object* obj) {
+    if (tenured->contains_p(obj)) {
+      return obj;
+    }
+
+    // Is there another forwarding pointer?
+    while (obj->forwarding_pointer_p()) {
+      object* dest = obj->forwarding_pointer();
+      obj = dest;
+    }
+
+    if (tenured->contains_p(obj)) {
+      return obj;
+    }
+
+    cell size = obj->size();
+    object* newpointer = tenured->allot(size);
+    if (!newpointer)
+      throw must_start_gc_again();
+
+    memcpy(newpointer, obj, size);
+    obj->forward_to(newpointer);
+
+    mark_stack->push_back((cell)newpointer);
+    return newpointer;
   }
-
-  void promoted_object(object* obj) {
-    parent->mark_stack.push_back((cell)obj);
-  }
-
-  void visited_object(object* obj) {}
-};
-
-struct to_tenured_collector : collector<tenured_space, to_tenured_policy> {
-  explicit to_tenured_collector(factor_vm* parent);
-  void tenure_reachable_objects();
 };
 
 }

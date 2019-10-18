@@ -34,10 +34,10 @@ M: string new-resizable drop <sbuf> ; inline
 M: sbuf new-resizable drop <sbuf> ; inline
 
 M: string like
-    #! If we have a string, we're done.
-    #! If we have an sbuf, and it's at full capacity, we're done.
-    #! Otherwise, call resize-string, which is a relatively
-    #! fast primitive.
+    ! If we have a string, we're done.
+    ! If we have an sbuf, and it's at full capacity, we're done.
+    ! Otherwise, call resize-string, which is a relatively
+    ! fast primitive.
     drop dup string? [
         dup sbuf? [
             [ length ] [ underlying>> ] bi

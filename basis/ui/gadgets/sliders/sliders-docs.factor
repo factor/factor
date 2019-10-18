@@ -6,7 +6,7 @@ HELP: elevator
 { $class-description "An elevator is the part of a " { $link slider } " between the up/down arrow buttons, where a " { $link thumb } " may be moved up and down." } ;
 
 HELP: slider
-{ $class-description "A slider is a control for graphically manipulating a " { $link "models-range" } "."
+{ $class-description "A slider is a control for graphically manipulating a " { $link "models.range" } "."
 $nl
 "Sliders are created by calling " { $link <slider> } "." } ;
 
@@ -45,6 +45,6 @@ ARTICLE: "ui.gadgets.sliders" "Slider gadgets"
     slide-by-line
     slide-by-page
 }
-"Since sliders are controls the value can be get and set by via the " { $snippet "model" } " slot. " ;
+"Since sliders are controls the value can be get and set by via the " { $snippet "model" } " slot." ;
 
 ABOUT: "ui.gadgets.sliders"

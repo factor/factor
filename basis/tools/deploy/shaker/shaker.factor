@@ -1,47 +1,39 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays alien.libraries accessors io.backend
-io.encodings.utf8 io.files io.streams.c init fry namespaces math
-make assocs kernel parser parser.notes lexer strings.parser
-vocabs sequences sequences.deep sequences.private words memory
-kernel.private continuations io vocabs.loader system strings
-sets vectors quotations byte-arrays sorting compiler.units
-definitions generic generic.standard generic.single
-tools.deploy.config combinators combinators.private classes
-vocabs.loader.private classes.builtin slots.private grouping
-command-line io.pathnames memoize namespaces.private
-hashtables locals ;
-QUALIFIED: bootstrap.stage2
+USING: accessors alien.libraries arrays assocs byte-arrays classes
+classes.builtin combinators combinators.private command-line
+compiler.crossref compiler.errors compiler.units continuations
+definitions fry generic generic.single generic.standard grouping
+hashtables init io io.backend io.encodings.utf8 io.files io.pathnames
+io.streams.c kernel kernel.private locals make math memoize memory
+namespaces parser parser.notes quotations sequences sequences.deep
+sequences.private sets slots.private source-files source-files.errors
+strings strings.parser system tools.deploy.config vocabs vocabs.loader
+vocabs.loader.private vocabs.parser words ;
 QUALIFIED: classes.private
-QUALIFIED: compiler.crossref
-QUALIFIED: compiler.errors
-QUALIFIED: continuations
-QUALIFIED: definitions
-QUALIFIED: init
-QUALIFIED: layouts
-QUALIFIED: source-files
-QUALIFIED: source-files.errors
-QUALIFIED: vocabs
-QUALIFIED: vocabs.loader
-FROM: assocs => change-at ;
-FROM: namespaces => set ;
-FROM: sequences => change-nth ;
-FROM: sets => members ;
 IN: tools.deploy.shaker
 
 ! This file is some hairy shit.
 
 : add-command-line-hook ( -- )
-    [ (command-line) command-line set-global ] "command-line"
-    startup-hooks get set-at ;
+    [
+        (command-line) rest
+        command-line set-global
+    ] "command-line" startup-hooks get set-at ;
+
+: set-stop-after-last-window? ( -- )
+    get-namestack [ "stop-after-last-window?" swap key? ] any? [
+        "ui-stop-after-last-window?" "ui.backend" lookup-word [
+            "stop-after-last-window?" get swap set-global
+        ] when*
+    ] when ;
 
 : strip-startup-hooks ( -- )
     "Stripping startup hooks" show
     {
         "alien.strings"
-        "cpu.x86"
+        "cpu.x86.features"
         "environment"
-        "libc"
     }
     [ startup-hooks get delete-at ] each
     deploy-threads? get [
@@ -52,9 +44,10 @@ IN: tools.deploy.shaker
     ] when
     strip-dictionary? [
         {
+            "compiler.units"
+            "source-files.errors"
             "vocabs"
             "vocabs.cache"
-            "source-files.errors"
         } [ startup-hooks get delete-at ] each
     ] when ;
 
@@ -122,14 +115,13 @@ IN: tools.deploy.shaker
 
 : strip-word-defs ( words -- )
     "Stripping symbolic word definitions" show
-    [ "no-def-strip" word-prop not ] filter
     [ [ ] >>def drop ] each ;
 
 : strip-word-props ( stripped-props words -- )
     "Stripping word properties" show
     swap '[
         [
-            [ drop _ member? not ] assoc-filter sift-values
+            [ drop _ member? ] assoc-reject sift-values
             >alist f like
         ] change-props drop
     ] each ;
@@ -142,11 +134,6 @@ IN: tools.deploy.shaker
                 "boa-check"
                 "coercer"
                 "combination"
-                "generic-call-sites"
-                "effect-dependencies"
-                "definition-dependencies"
-                "conditional-dependencies"
-                "dependency-checks"
                 "constant"
                 "constraints"
                 "custom-inlining"
@@ -155,10 +142,19 @@ IN: tools.deploy.shaker
                 "default"
                 "default-method"
                 "default-output-classes"
+                "dependencies"
+                "dependency-checks"
                 "derived-from"
                 "ebnf-parser"
                 "engines"
                 "forgotten"
+
+                "generic-call-sites"
+
+                "help"
+                "help-loc"
+                "help-parent"
+
                 "identities"
                 "inline"
                 "inlined-block"
@@ -166,6 +162,7 @@ IN: tools.deploy.shaker
                 "instances"
                 "interval"
                 "intrinsic"
+
                 "lambda"
                 "loc"
                 "local-reader"
@@ -174,12 +171,13 @@ IN: tools.deploy.shaker
                 "local-writer?"
                 "local?"
                 "low-order"
+
                 "macro"
                 "members"
                 "memo-quot"
-                "methods"
                 "method-class"
                 "method-generic"
+                "methods"
                 "modular-arithmetic"
                 "no-compile"
                 "owner-generic"
@@ -188,11 +186,14 @@ IN: tools.deploy.shaker
                 "predicate"
                 "predicate-definition"
                 "predicating"
+
                 "reader"
                 "reading"
                 "recursive"
                 "register"
                 "register-size"
+                "related"
+
                 "shuffle"
                 "slots"
                 "special"
@@ -209,7 +210,7 @@ IN: tools.deploy.shaker
                 "writing"
             } %
         ] when
-        
+
         strip-prettyprint? [
             {
                 "delimiter"
@@ -223,7 +224,7 @@ IN: tools.deploy.shaker
                 "word-style"
             } %
         ] when
-        
+
         deploy-c-types? get [
             { "c-type" "struct-slots" "struct-align" } %
         ] unless
@@ -240,10 +241,12 @@ IN: tools.deploy.shaker
     "Clearing memoized word caches" show
     [ memoized? ] instances [ reset-memoized ] each ;
 
-: compiler-classes ( -- seq )
-    { "compiler" "stack-checker" }
-    [ child-vocabs [ words ] map concat [ class? ] filter ]
-    map concat unique ;
+: compiler-classes ( -- set )
+    { "compiler" "stack-checker" } [
+        loaded-child-vocab-names
+        [ vocab-words ] map concat
+        [ class? ] filter
+    ] map concat fast-set ;
 
 : prune-decision-tree ( tree classes -- )
     [ tuple class>type ] 2dip '[
@@ -252,7 +255,7 @@ IN: tools.deploy.shaker
                 dup array? [
                     [
                         2 group
-                        [ drop _ key? not ] assoc-filter
+                        [ drop _ in? ] assoc-reject
                         concat
                     ] map
                 ] when
@@ -301,7 +304,7 @@ IN: tools.deploy.shaker
     ] when ;
 
 : vocab-tree-globals ( except names -- words )
-    [ child-vocabs [ words ] map concat ] map concat
+    [ loaded-child-vocab-names [ vocab-words ] map concat ] map concat
     swap [ first2 lookup-word ] map sift diff ;
 
 : stripped-globals ( -- seq )
@@ -365,6 +368,7 @@ IN: tools.deploy.shaker
                 vocabs:require-hook
                 vocabs:vocab-observers
                 vocabs.loader:add-vocab-root-hook
+                vocabs.parser:manifest
                 word
                 parser-quiet?
             } %
@@ -395,8 +399,8 @@ IN: tools.deploy.shaker
             input-stream
             output-stream
             error-stream
-            vm
-            image
+            vm-path
+            image-path
             current-directory
         } %
 
@@ -429,7 +433,7 @@ IN: tools.deploy.shaker
         stripped-globals :> to-strip
         cleared-globals :> to-clear
         global boxes>>
-        [ drop to-strip strip-global? not ] assoc-filter!
+        [ drop to-strip strip-global? ] assoc-reject!
         [
             [
                 swap to-clear clear-global?
@@ -471,7 +475,7 @@ IN: tools.deploy.shaker
     ! Quotations which were formerly compiled must remain
     ! compiled.
     2dup [
-        2dup [ quot-compiled? ] [ quot-compiled? not ] bi* and
+        2dup [ quotation-compiled? ] [ quotation-compiled? not ] bi* and
         [ nip jit-compile ] [ 2drop ] if
     ] 2each ;
 
@@ -549,7 +553,7 @@ SYMBOL: deploy-vocab
 
 : write-vocab-manifest ( vocab-manifest-out -- )
     "Writing vocabulary manifest to " write dup print flush
-    vocabs "VOCABS:" prefix
+    loaded-vocab-names "VOCABS:" prefix
     deploy-libraries get [ lookup-library path>> ] map members
     "LIBRARIES:" prefix append
     swap utf8 set-file-lines ;
@@ -561,7 +565,7 @@ SYMBOL: deploy-vocab
             [ path>> >deployed-library-path ] [ abi>> ] bi make-library
         ] change-at
     ] each
-    
+
     [
         "deploy-libraries" "alien.libraries" lookup-word forget
         "deploy-library" "alien.libraries" lookup-word forget
@@ -600,11 +604,11 @@ SYMBOL: deploy-vocab
     clear-megamorphic-caches ;
 
 : die-with ( error original-error -- * )
-    #! We don't want DCE to drop the error before the die call!
+    ! We don't want DCE to drop the error before the die call!
     [ die 1 exit ] ( a -- * ) call-effect-unsafe ;
 
 : die-with2 ( error original-error -- * )
-    #! We don't want DCE to drop the error before the die call!
+    ! We don't want DCE to drop the error before the die call!
     [ die 1 exit ] ( a b -- * ) call-effect-unsafe ;
 
 : deploy-error-handler ( quot -- )
@@ -618,8 +622,8 @@ SYMBOL: deploy-vocab
     ] recover ; inline
 
 : (deploy) ( final-image vocab-manifest-out vocab config -- )
-    #! Does the actual work of a deployment in the slave
-    #! stage2 image
+    ! Does the actual work of a deployment in the slave
+    ! stage2 image
     [
         [
             strip-debugger? [
@@ -630,11 +634,12 @@ SYMBOL: deploy-vocab
                     "ui.debugger" require
                 ] when
             ] unless
-            [ deploy-vocab set ] [ require ] [
+            [ deploy-vocab namespaces:set ] [ require ] [
                 vocab-main [
                     "Vocabulary has no MAIN: word." print flush 1 exit
                 ] unless
             ] tri
+            set-stop-after-last-window?
             strip
             "Saving final image" show
             save-image-and-exit

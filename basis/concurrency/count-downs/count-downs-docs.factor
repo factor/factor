@@ -3,7 +3,7 @@ IN: concurrency.count-downs
 
 HELP: <count-down>
 { $values { "n" "a non-negative integer" } { "count-down" count-down } }
-{ $description "Creates a new count-down latch." } 
+{ $description "Creates a new count-down latch." }
 { $errors "Throws an error if the count is lower than zero." } ;
 
 HELP: count-down

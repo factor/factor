@@ -5,7 +5,6 @@ combinators.short-circuit grouping hashtables interval-sets
 io.encodings.utf8 io.files kernel locals make math math.bitwise
 math.order math.parser math.ranges memoize namespaces sequences
 sets simple-flat-file sorting splitting strings.parser ;
-QUALIFIED: interval-sets
 IN: unicode.data
 
 <PRIVATE
@@ -29,17 +28,12 @@ PRIVATE>
 CONSTANT: name-map H{ }
 
 : canonical-entry ( char -- seq ) canonical-map at ; inline
-: combine-chars ( a b -- char/f ) >2ch combine-map at ; inline
 : compatibility-entry ( char -- seq ) compatibility-map at ; inline
+: combine-chars ( a b -- char/f ) >2ch combine-map at ; inline
 : combining-class ( char -- n ) class-map at ; inline
 : non-starter? ( char -- ? ) combining-class { 0 f } member? not ; inline
-: name>char ( name -- char ) name-map at ; inline
-: char>name ( char -- name ) name-map value-at ; inline
 : property ( property -- interval-map ) properties at ; foldable
 : property? ( char property -- ? ) property interval-sets:in? ; inline
-: ch>lower ( ch -- lower ) simple-lower ?at drop ; inline
-: ch>upper ( ch -- upper ) simple-upper ?at drop ; inline
-: ch>title ( ch -- title ) simple-title ?at drop ; inline
 : special-case ( ch -- casing-tuple ) special-casing at ; inline
 
 ! For non-existent characters, use Cn
@@ -57,7 +51,7 @@ CONSTANT: categories {
 <PRIVATE
 
 MEMO: categories-map ( -- hashtable )
-    categories <enum> [ swap ] H{ } assoc-map-as ;
+    categories H{ } zip-index-as ;
 
 CONSTANT: num-chars 0x2FA1E
 
@@ -83,7 +77,7 @@ PRIVATE>
 ! Loading data from UnicodeData.txt
 
 : load-data ( -- data )
-    "vocab:unicode/data/UnicodeData.txt" data ;
+    "vocab:unicode/data/UnicodeData.txt" load-data-file ;
 
 : (process-data) ( index data -- newdata )
     [ [ nth ] keep first swap ] with { } map>assoc
@@ -114,10 +108,10 @@ PRIVATE>
 : exclusions ( -- set )
     exclusions-file utf8 file-lines
     [ "#" split1 drop [ blank? ] trim-tail hex> ] map
-    [ 0 = not ] filter ;
+    [ 0 = ] reject fast-set ;
 
 : remove-exclusions ( alist -- alist )
-    exclusions unique assoc-diff ;
+    exclusions [ nip sets:in? ] curry assoc-reject ;
 
 : process-canonical ( data -- hash hash )
     (process-decomposed) [ first* ] filter
@@ -129,13 +123,13 @@ PRIVATE>
 : process-compatibility ( data -- hash )
     (process-decomposed)
     [ dup first* [ first2 rest 2array ] unless ] map
-    [ second empty? not ] filter
+    [ second empty? ] reject
     >hashtable chain-decomposed ;
 
 : process-combining ( data -- hash )
     3 swap (process-data)
     [ string>number ] assoc-map
-    [ nip zero? not ] assoc-filter
+    [ nip zero? ] assoc-reject
     >hashtable ;
 
 ! the maximum unicode char in the first 3 planes
@@ -144,7 +138,7 @@ PRIVATE>
     name-map sort-values keys
     [ { [ "first>" tail? ] [ "last>" tail? ] } 1|| ] filter
     2 group [
-        [ name>char ] bi@ [ [a,b] ] [ table ?nth ] bi
+        [ name-map at ] bi@ [ [a,b] ] [ table ?nth ] bi
         [ swap table ?set-nth ] curry each
     ] assoc-each table ;
 
@@ -174,9 +168,9 @@ C: <code-point> code-point
     4 head [ multihex ] map first4
     <code-point> swap first ,, ;
 
-! Extra properties
-: parse-properties ( -- {{[a,b],prop}} )
-    "vocab:unicode/data/PropList.txt" data [
+! Extra properties {{[a,b],prop}}
+: parse-properties ( -- assoc )
+    "vocab:unicode/data/PropList.txt" load-data-file [
         [
             ".." split1 [ dup ] unless*
             [ hex> ] bi@ 2array
@@ -193,7 +187,7 @@ C: <code-point> code-point
 
 ! Special casing data
 : load-special-casing ( -- special-casing )
-    "vocab:unicode/data/SpecialCasing.txt" data
+    "vocab:unicode/data/SpecialCasing.txt" load-data-file
     [ length 5 = ] filter
     [ [ set-code-point ] each ] H{ } make ;
 
@@ -209,14 +203,15 @@ load-data {
 } cleave
 
 combine-map keys [ 2ch> nip ] map
-[ combining-class not ] filter
+[ class-map at ] reject
 [ 0 swap class-map set-at ] each
 
 load-special-casing special-casing swap assoc-union! drop
 
 load-properties properties swap assoc-union! drop
 
-[ name>char [ "Invalid character" throw ] unless* ]
-name>char-hook set-global
-
 PRIVATE>
+
+[
+    name-map at [ "Invalid character" throw ] unless*
+] name>char-hook set-global

@@ -112,12 +112,13 @@ PRIVATE>
 : add-output-logging ( word level -- )
     [ output-logging-quot ] (define-logging) ;
 
+: error>string ( error -- string )
+    [ print-error :c ] with-string-writer ;
+
 : (log-error) ( object word level -- )
     log-service get [
-        [ [ print-error ] with-string-writer ] 2dip log-message
-    ] [
-        2drop rethrow
-    ] if ;
+        [ error>string ] 2dip log-message
+    ] [ 2drop rethrow ] if ;
 
 : log-error ( error word -- ) ERROR (log-error) ;
 
@@ -133,11 +134,11 @@ PRIVATE>
     '[ _ [ _ log-error @ ] recover ] ;
 
 : add-error-logging ( word level -- )
-    [ [ input-logging-quot ] 2keep drop error-logging-quot ]
+    [ [ input-logging-quot ] keepd error-logging-quot ]
     (define-logging) ;
 
 SYNTAX: LOG:
-    #! Syntax: name level
+    ! Syntax: name level
     scan-new-word dup scan-word
     '[ 1array stack>message _ _ log-message ]
     ( message -- ) define-declared ;

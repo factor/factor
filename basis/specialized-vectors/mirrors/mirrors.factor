@@ -2,5 +2,3 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: specialized-vectors mirrors ;
 IN: specialized-vectors.mirrors
-
-INSTANCE: specialized-vector inspected-sequence

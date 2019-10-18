@@ -18,9 +18,9 @@ IN: io.binary
 
 PRIVATE>
 
-: >le ( x n -- byte-array ) iota map-bytes ;
+: >le ( x n -- byte-array ) <iota> map-bytes ;
 
-: >be ( x n -- byte-array ) iota <reversed> map-bytes ;
+: >be ( x n -- byte-array ) <iota> <reversed> map-bytes ;
 
 : d>w/w ( d -- w1 w2 )
     [ 0xffffffff bitand ] [ -32 shift 0xffffffff bitand ] bi ;

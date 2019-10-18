@@ -1,11 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel locals math math.functions math.order math.vectors
-sequences ui.gadgets accessors combinators ;
+USING: accessors combinators kernel locals math math.functions
+math.order sequences ui.gadgets ;
 IN: ui.baseline-alignment
 
 SYMBOL: +baseline+
-
 
 TUPLE: aligned-gadget < gadget baseline cap-height ;
 
@@ -58,11 +57,11 @@ TUPLE: gadget-metrics height ascent descent cap-height ;
     [ descent>> ] map ?supremum ;
 
 : max-graphics-height ( seq -- y )
-    [ ascent>> not ] filter [ height>> ] map ?supremum 0 or ;
+    [ ascent>> ] reject [ height>> ] map ?supremum 0 or ;
 
 :: combine-metrics ( graphics-height ascent descent cap-height -- ascent' descent' )
     ascent [
-        cap-height 2 / :> mid-line 
+        cap-height 0 or 2 / :> mid-line
         graphics-height 2 /
         [ ascent mid-line - max mid-line + floor >integer ]
         [ descent mid-line + max mid-line - ceiling >integer ] bi
@@ -99,4 +98,4 @@ PRIVATE>
     (measure-metrics) combine-metrics ;
 
 : measure-height ( children sizes -- height )
-    (measure-metrics) dup [ combine-metrics + ] [ 3drop ] if ;
+    (measure-metrics) [ combine-metrics + ] [ 2drop ] if* ;

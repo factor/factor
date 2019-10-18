@@ -66,7 +66,7 @@ ARTICLE: "yaml-output" "YAML serialization control"
 ;
 
 HELP: implicit-tags
-{ $var-description """When this is set, tags are omitted during serialization when it safe to do so. For example, 42 can be safely serialized as "42", but "42" must be serialized as "'42'" or ""42"" or "!!str 42". This uses the """
+{ $var-description "When this is set, tags are omitted during serialization when it safe to do so. For example, 42 can be safely serialized as \"42\", but \"42\" must be serialized as \"'42'\" or \"\"42\"\" or \"!!str 42\". This uses the "
 { $snippet "implicit" } " parameter of "
 { $link yaml_scalar_event_initialize } ", " { $link yaml_sequence_start_event_initialize } " and " { $link yaml_mapping_start_event_initialize } "."
  } ;
@@ -84,10 +84,10 @@ HELP: implicit-end
 { implicit-start implicit-end } related-words
 
 HELP: merge
-{ $var-description "If false, deserialized yaml documents will contain instances of " { $link yaml-merge } " for !!merge keys and the value associated with this key will not be merged into the enclosing mapping. You can then call ?apply-merge-key on such a mapping to perform the merge."  } ;
+{ $var-description "If false, deserialized yaml documents will contain instances of " { $link yaml-merge } " for !!merge keys and the value associated with this key will not be merged into the enclosing mapping. You can then call ?apply-merge-key on such a mapping to perform the merge." } ;
 
 HELP: value
-{ $var-description "If false, deserialized yaml documents will contain instances of " { $link yaml-value } " for !!value keys and the value associated with this key will replace the enclosing mapping. You can then call scalar-value on such a mapping to get the default value."  } ;
+{ $var-description "If false, deserialized yaml documents will contain instances of " { $link yaml-value } " for !!value keys and the value associated with this key will replace the enclosing mapping. You can then call scalar-value on such a mapping to get the default value." } ;
 ABOUT: "yaml-config"
 { yaml-merge merge } related-words
 { yaml-value value } related-words

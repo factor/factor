@@ -1,12 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays continuations db io kernel math namespaces
-quotations sequences db.postgresql.ffi alien alien.c-types
-alien.data db.types tools.walker ascii splitting math.parser
-combinators libc calendar.format byte-arrays destructors
-prettyprint accessors strings serialize io.encodings.binary
-io.encodings.utf8 alien.strings io.streams.byte-array summary
-present urls specialized-arrays db.private ;
+USING: accessors alien.c-types alien.data alien.strings arrays ascii
+calendar.format calendar.parser combinators db db.postgresql.ffi
+db.types destructors io.encodings.utf8 kernel libc math math.parser
+namespaces present sequences serialize specialized-arrays splitting
+strings summary urls ;
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: void*
 IN: db.postgresql.lib
@@ -85,7 +83,7 @@ M: postgresql-result-null summary ( obj -- str )
             ] }
             { BLOB [ dup [ malloc-byte-array/length ] [ 0 ] if ] }
             { DATE [ dup [ timestamp>ymd ] when default-param-value ] }
-            { TIME [ dup [ timestamp>hms ] when default-param-value ] }
+            { TIME [ dup [ duration>hms ] when default-param-value ] }
             { DATETIME [ dup [ timestamp>ymdhms ] when default-param-value ] }
             { TIMESTAMP [ dup [ timestamp>ymdhms ] when default-param-value ] }
             { URL [ dup [ present ] when default-param-value ] }
@@ -120,7 +118,7 @@ M: postgresql-result-null summary ( obj -- str )
 
 : pq-get-string ( handle row column -- obj )
     3dup PQgetvalue utf8 alien>string
-    dup empty? [ [ pq-get-is-null f ] dip ? ] [ [ 3drop ] dip ] if ;
+    dup empty? [ [ pq-get-is-null f ] dip ? ] [ 3nip ] if ;
 
 : pq-get-number ( handle row column -- obj )
     pq-get-string dup [ string>number ] when ;
@@ -137,7 +135,7 @@ M: postgresql-malloc-destructor dispose ( obj -- )
 : pq-get-blob ( handle row column -- obj/f )
     [ PQgetvalue ] 3keep 3dup PQgetlength
     dup 0 > [
-        [ 3drop ] dip
+        3nip
         [
             memory>byte-array >string
             { uint }
@@ -150,7 +148,7 @@ M: postgresql-malloc-destructor dispose ( obj -- )
             ] with-out-parameters memory>byte-array
         ] with-destructors
     ] [
-        drop pq-get-is-null nip [ f ] [ B{ } clone ] if
+        drop pq-get-is-null nip f B{ } ?
     ] if ;
 
 : postgresql-column-typed ( handle row column type -- obj )
@@ -164,7 +162,7 @@ M: postgresql-malloc-destructor dispose ( obj -- )
         { TEXT [ pq-get-string ] }
         { VARCHAR [ pq-get-string ] }
         { DATE [ pq-get-string dup [ ymd>timestamp ] when ] }
-        { TIME [ pq-get-string dup [ hms>timestamp ] when ] }
+        { TIME [ pq-get-string dup [ hms>duration ] when ] }
         { TIMESTAMP [ pq-get-string dup [ ymdhms>timestamp ] when ] }
         { DATETIME [ pq-get-string dup [ ymdhms>timestamp ] when ] }
         { BLOB [ pq-get-blob ] }

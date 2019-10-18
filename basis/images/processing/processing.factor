@@ -6,13 +6,13 @@ math.ranges math.vectors sequences sequences.deep fry ;
 IN: images.processing
 
 : coord-matrix ( dim -- m )
-    [ iota ] map first2 cartesian-product ;
+    [ <iota> ] map first2 cartesian-product ;
 
 : map^2 ( m quot -- m' ) '[ _ map ] map ; inline
 : each^2 ( m quot -- m' ) '[ _ each ] each ; inline
 
 : matrix-dim ( m -- dim ) [ length ] [ first length ] bi 2array ;
-    
+
 : matrix>image ( m -- image )
     <image> over matrix-dim >>dim
     swap flip flatten
@@ -26,7 +26,7 @@ IN: images.processing
 :: image-offset ( x,y image -- xy )
     image dim>> first
     x,y second * x,y first + ;
-        
+
 :: draw-grey ( value x,y image -- )
     x,y image image-offset 3 * { 0 1 2 }
     [

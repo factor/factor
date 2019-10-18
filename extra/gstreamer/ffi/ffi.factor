@@ -35,4 +35,3 @@ FOREIGN-ATOMIC-TYPE: libxml2.NsPtr xmlNsPtr
 PRIVATE>
 
 GIR: Gst-0.10.gir
-

@@ -1,14 +1,11 @@
-! (c)2012 Joe Groff bsd license
-USING: io.directories io.files.temp io.pathnames kernel memoize
-system ;
+! Copyright (C) 2012 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
+USING: environment io.files.temp io.pathnames sequences system
+xdg ;
 IN: io.files.temp.unix
 
-MEMO: (temp-directory) ( -- path )
-    "/tmp/factor-temp" dup make-directories ;
+M: unix default-temp-directory
+    "TMPDIR" os-env [ "/tmp" ] when-empty "factor-temp" append-path ;
 
-M: unix temp-directory (temp-directory) ;
-
-MEMO: (cache-directory) ( -- path )
-    home ".factor-cache" append-path dup make-directories ;
-
-M: unix cache-directory (cache-directory) ;
+M: unix default-cache-directory
+    xdg-cache-home "factor" append-path absolute-path ;

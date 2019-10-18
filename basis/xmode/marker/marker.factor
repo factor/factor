@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces make xmode.rules xmode.tokens
-xmode.marker.state xmode.marker.context xmode.utilities
-xmode.catalog sequences math assocs combinators strings
-regexp splitting ascii combinators.short-circuit accessors ;
+USING: accessors ascii assocs combinators
+combinators.short-circuit kernel make math namespaces regexp
+sequences strings xmode.marker.state xmode.rules xmode.tokens
+xmode.utilities ;
 IN: xmode.marker
 
 ! Next two words copied from parser-combinators
@@ -33,7 +33,7 @@ IN: xmode.marker
         [
             dup [ digit? ] all? [
                 current-rule-set digit-re>>
-                dup [ dupd matches? ] [ drop f ] if
+                [ dupd matches? ] [ f ] if*
             ] unless*
         ]
     } 0&& nip ;
@@ -94,7 +94,7 @@ M: regexp text-matches?
 
 : rule-end-matches? ( rule -- match-count/f )
     dup mark-following-rule? [
-        dup start>> swap can-match-here? 0 and
+        [ start>> ] keep can-match-here? 0 and
     ] [
         [ end>> dup ] keep can-match-here? [
             rest-of-line
@@ -130,25 +130,25 @@ GENERIC: handle-rule-end ( match-count rule -- )
 : check-escape-rule ( rule -- ? )
     no-escape?>> [ f ] [
         find-escape-rule dup [
-            dup rule-start-matches? dup [
+            dup rule-start-matches? [
                 swap handle-rule-start
                 delegate-end-escaped? toggle
                 t
             ] [
-                2drop f
-            ] if
+                drop f
+            ] if*
         ] when
     ] if ;
 
 : check-every-rule ( -- ? )
     current-char current-rule-set get-rules
     [ rule-start-matches? ] map-find
-    dup [ handle-rule-start t ] [ 2drop f ] if ;
+    [ handle-rule-start t ] [ drop f ] if* ;
 
 : ?end-rule ( -- )
     current-rule [
         dup rule-end-matches?
-        dup [ swap handle-rule-end ] [ 2drop ] if
+        [ swap handle-rule-end ] [ drop ] if*
     ] when* ;
 
 : rule-match-token* ( rule -- id )
@@ -213,7 +213,7 @@ M: mark-previous-rule handle-rule-start
 : check-end-delegate ( -- ? )
     context get parent>> [
         in-rule>> [
-            dup rule-end-matches? dup [
+            dup rule-end-matches? [
                 [
                     swap handle-rule-end
                     ?end-rule
@@ -223,7 +223,7 @@ M: mark-previous-rule handle-rule-start
                 rule-match-token* next-token,
                 pop-context
                 seen-whitespace-end? on t
-            ] [ drop check-escape-rule ] if
+            ] [ check-escape-rule ] if*
         ] [ f ] if*
     ] [ f ] if* ;
 
@@ -245,7 +245,7 @@ M: mark-previous-rule handle-rule-start
 
 : (check-word-break) ( -- )
     check-rule
-    
+
     1 current-rule-set default>> next-token, ;
 
 : rule-set-empty? ( ruleset -- ? )

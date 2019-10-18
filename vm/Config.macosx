@@ -1,6 +1,6 @@
 include vm/Config.unix
 #SITE_CFLAGS +=
-SITE_CFLAGS += -mmacosx-version-min=10.5
+SITE_CFLAGS += -mmacosx-version-min=10.9
 
 PLAF_DLL_OBJS += vm/os-macosx.o vm/mach_signal.o vm/mvm-unix.o
 PLAF_MASTER_HEADERS += vm/os-macosx.hpp vm/mach_signal.hpp
@@ -11,7 +11,7 @@ SHARED_DLL_EXTENSION = .dylib
 SHARED_FLAG = -dynamiclib
 
 ifdef X11
-	LIBS = -lm -framework Cocoa -L/opt/local/lib $(X11_UI_LIBS) -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
+	LIBS = -lm -framework Cocoa -L/opt/local/lib -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
 else
 	LIBS = -lm -framework Cocoa -framework AppKit
 endif
@@ -20,7 +20,7 @@ LINKER = $(CXX) $(CFLAGS) -dynamiclib -single_module \
 	-current_version $(VERSION) \
 	-compatibility_version $(VERSION) \
 	-fvisibility=hidden \
-	$(LIBS) $(LIBPATH) -o
+	$(LIBS) -o
 
 LINK_WITH_ENGINE = -lfactor
 
@@ -36,4 +36,3 @@ ifeq ($(XCODE_4_P),0)
 	CC ?= clang
 	CXX ?= clang++
 endif
-

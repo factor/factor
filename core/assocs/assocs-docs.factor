@@ -1,8 +1,7 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg, Slava Pestov, and Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel sequences
-sequences.private namespaces math quotations assocs.private
-sets ;
+USING: assocs.private help.markup help.syntax kernel math
+namespaces quotations sequences ;
 IN: assocs
 
 ARTICLE: "alists" "Association lists"
@@ -20,19 +19,19 @@ $nl
 ARTICLE: "enums" "Enumerations"
 "An enumeration provides a view of a sequence as an assoc mapping integer indices to elements:"
 { $subsections
-    enum
-    <enum>
+    enumerated
+    <enumerated>
 }
 "Inverting a permutation using enumerations:"
-{ $example "IN: scratchpad" ": invert ( perm -- perm' )" "    <enum> sort-values keys ;" "{ 2 0 4 1 3 } invert ." "{ 1 3 0 4 2 }" } ;
+{ $example "IN: scratchpad" ": invert ( perm -- perm' )" "    <enumerated> sort-values keys ;" "{ 2 0 4 1 3 } invert ." "{ 1 3 0 4 2 }" } ;
 
-HELP: enum
+HELP: enumerated
 { $class-description "An associative structure which wraps a sequence and maps integers to the corresponding elements of the sequence."
 $nl
 "Enumerations are mutable; note that deleting a key calls " { $link remove-nth! } ", which results in all subsequent elements being shifted down." } ;
 
-HELP: <enum>
-{ $values { "seq" sequence } { "enum" enum } }
+HELP: <enumerated>
+{ $values { "seq" sequence } { "enumerated" enumerated } }
 { $description "Creates a new enumeration." } ;
 
 ARTICLE: "assocs-protocol" "Associative mapping protocol"
@@ -103,11 +102,6 @@ $nl
     substitute
     extract-keys
 }
-"Adding elements to sets:"
-{ $subsections
-    conjoin
-    conjoin-at
-}
 "Destructive operations:"
 { $subsections
     assoc-union!
@@ -132,7 +126,9 @@ ARTICLE: "assocs-conversions" "Associative mapping conversions"
 "Combining a sequence of assocs into a single assoc:"
 { $subsections assoc-combine }
 "Creating an assoc from key/value sequences:"
-{ $subsections zip }
+{ $subsections zip zip-as }
+"Creating an assoc from key/value sequences and their indices:"
+{ $subsections zip-index zip-index-as }
 "Creating key/value sequences from an assoc:"
 { $subsections unzip }
 ;
@@ -149,6 +145,8 @@ $nl
     assoc-map
     assoc-filter
     assoc-filter-as
+    assoc-reject
+    assoc-reject-as
     assoc-partition
     assoc-any?
     assoc-all?
@@ -157,16 +155,20 @@ $nl
 { $subsections
     sift-keys
     sift-values
+    harvest-keys
+    harvest-values
 }
 "Mapping between assocs and sequences:"
 { $subsections
     map>assoc
+    map>alist
     assoc>map
     assoc-map-as
 }
 "Destructive combinators:"
 { $subsections
     assoc-filter!
+    assoc-reject!
     cache
     2cache
 } ;
@@ -298,6 +300,21 @@ HELP: assoc-filter!
 
 { assoc-filter assoc-filter-as assoc-filter! } related-words
 
+HELP: assoc-reject
+{ $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } { "subassoc" "a new assoc" } }
+{ $description "Outputs an assoc of the same type as " { $snippet "assoc" } " consisting of all entries for which the predicate quotation yields false." } ;
+
+HELP: assoc-reject-as
+{ $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } { "exemplar" assoc } { "subassoc" "a new assoc" } }
+{ $description "Outputs an assoc of the same type as " { $snippet "exemplar" } " consisting of all entries for which the predicate quotation yields false." } ;
+
+HELP: assoc-reject!
+{ $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } }
+{ $description "Removes all entries for which the predicate quotation yields false." }
+{ $side-effects "assoc" } ;
+
+{ assoc-reject assoc-reject-as assoc-reject! } related-words
+
 HELP: assoc-partition
 { $values
     { "assoc" assoc } { "quot" quotation }
@@ -323,11 +340,42 @@ HELP: assoc-subset?
 
 HELP: sift-keys
 { $values { "assoc" assoc } { "assoc'" "a new assoc" } }
-{ $description "Outputs an assoc removing keys that are " { $link f } "." } ;
+{ $description "Outputs an assoc removing keys that are " { $link f } "." }
+{ $examples
+    { $example "USING: prettyprint assocs hashtables ;"
+        "H{ { 1 2 } { f 3 } } sift-keys ."
+        "H{ { 1 2 } }" }
+} ;
 
 HELP: sift-values
 { $values { "assoc" assoc } { "assoc'" "a new assoc" } }
-{ $description "Outputs an assoc removing values that are " { $link f } "." } ;
+{ $description "Outputs an assoc removing values that are " { $link f } "." }
+{ $examples
+    { $example "USING: prettyprint assocs hashtables ;"
+        "H{ { 1 f } { 3 4 } } sift-values ."
+        "H{ { 3 4 } }" }
+} ;
+
+{ sift-keys sift-values harvest-keys harvest-values } related-words
+
+HELP: harvest-keys
+{ $values { "assoc" assoc } { "assoc'" "a new assoc" } }
+{ $description "Outputs an assoc removing keys that are empty sequences." }
+{ $examples
+    { $example "USING: prettyprint assocs hashtables ;"
+        "H{ { { 2 } 1 } { { } 3 } } harvest-keys ."
+        "H{ { { 2 } 1 } }" }
+} ;
+
+HELP: harvest-values
+{ $values { "assoc" assoc } { "assoc'" "a new assoc" } }
+{ $description "Outputs an assoc removing values that are empty sequences." }
+{ $examples
+    { $example "USING: prettyprint assocs hashtables ;"
+        "H{ { 1 { } } { 3 { 4 } } } harvest-values ."
+        "H{ { 3 { 4 } } }" }
+} ;
+
 
 HELP: assoc=
 { $values { "assoc1" assoc } { "assoc2" assoc } { "?" boolean } }
@@ -340,16 +388,16 @@ HELP: assoc-hashcode
 { $notes "Custom assoc implementations should use this word to implement a method for the " { $link hashcode* } " generic word." } ;
 
 HELP: assoc-stack
-{ $values { "key" "a key" } { "seq" "a sequence of assocs" } { "value" "a value or " { $link f } } }
+{ $values { "key" "a key" } { "seq" { $sequence assoc } } { "value" { $maybe "a value" } } }
 { $description "Searches for the key in successive elements of the sequence, starting from the end. If an assoc containing the key is found, the associated value is output. If no assoc contains the key, outputs " { $link f } "." }
 { $notes "This word is used to implement abstractions such as nested scopes; if the sequence is a stack represented by a vector, then the most recently pushed assoc -- the innermost scope -- will be searched first." } ;
 
 HELP: value-at*
-{ $values { "value" object } { "assoc" assoc } { "key/f" "the key associated to the value, or " { $link f } } { "?" boolean } }
+{ $values { "value" object } { "assoc" assoc } { "key/f" { $maybe "the key associated to the value" } } { "?" boolean } }
 { $description "Looks up the key associated with a value. The boolean flag can decide between the case of a missing key, and a key of " { $link f } "." } ;
 
 HELP: value-at
-{ $values { "value" object } { "assoc" assoc } { "key/f" "the key associated to the value, or " { $link f } } }
+{ $values { "value" object } { "assoc" assoc } { "key/f" { $maybe "the key associated to the value" } } }
 { $description "Looks up the key associated with a value. No distinction is made between a missing key and a key set to " { $link f } "." } ;
 
 HELP: value?
@@ -357,7 +405,7 @@ HELP: value?
 { $description "Tests if an assoc contains at least one key with the given value." } ;
 
 HELP: delete-at*
-{ $values { "key" "a key" } { "assoc" assoc } { "old" "the previous value or " { $link f } } { "?" boolean } }
+{ $values { "key" "a key" } { "assoc" assoc } { "old" { $maybe "the previous value" } } { "?" boolean } }
 { $description "Removes an entry from the assoc and outputs the previous value together with a boolean indicating whether it was present." }
 { $side-effects "assoc" } ;
 
@@ -417,6 +465,12 @@ HELP: 2cache
 HELP: map>assoc
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... key value ) } } { "exemplar" assoc } { "assoc" "a new assoc" } }
 { $description "Applies the quotation to each element of the sequence, and collects the keys and values into a new assoc having the same type as " { $snippet "exemplar" } "." } ;
+
+HELP: map>alist
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... key value ) } } { "alist" "a new alist" } }
+{ $description "Applies the quotation to each element of the sequence, and collects the keys and values into a new alist." } ;
+
+{ map>assoc map>alist } related-words
 
 HELP: assoc>map
 { $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... elt ) } } { "exemplar" sequence } { "seq" "a new sequence" } }
@@ -523,4 +577,67 @@ HELP: zip
                "{ { 1 4 } { 2 5 } { 3 6 } }"
     }
 } ;
-{ unzip zip } related-words
+
+HELP: zip-as
+{ $values
+     { "keys" sequence } { "values" sequence } { "exemplar" sequence }
+     { "assoc" "a sequence of key/value pairs of type " { $snippet "exemplar" } } }
+{ $description "Combines two sequences pairwise into a single sequence of key/value pairs of type " { $snippet "exemplar" } "." }
+{ $notes "Exemplar must be a sequence type; hashtables will not work yet." }
+{ $examples
+    { $example "USING: prettyprint assocs ;"
+               "{ 1 2 3 } { 4 5 6 } V{ } zip-as ."
+               "V{ { 1 4 } { 2 5 } { 3 6 } }"
+    }
+} ;
+
+HELP: zip-index
+{ $values
+    { "values" sequence }
+    { "alist" "an array of key/value pairs" }
+}
+{ $examples
+    "Zip a sequnce with its indices:"
+    { $example "USING: assocs prettyprint ;"
+        "{ 100 200 300 } zip-index ."
+        "{ { 100 0 } { 200 1 } { 300 2 } }"
+    }
+}
+{ $description "Zip a sequence with its index and return an associative list where the input sequence is the keys and the indices are the values." } ;
+
+HELP: zip-index-as
+{ $values
+    { "values" sequence } { "exemplar" sequence }
+    { "assoc" assoc }
+}
+{ $examples
+    "Zip a sequnce with its indices as a vector:"
+    { $example "USING: assocs prettyprint ;"
+        "{ 100 200 300 } V{ } zip-index-as ."
+        "V{ { 100 0 } { 200 1 } { 300 2 } }"
+    }
+}
+{ $description "Zip a sequence with its index and return an associative list of type " { $snippet "exemplar" } " where the input sequence is the keys and the indices are the values." } ;
+
+{ unzip zip zip-as zip-index zip-index-as } related-words
+
+HELP: collect-by
+{ $values
+    { "seq" sequence } { "quot" { $quotation ( ... obj -- ... key ) } }
+    { "assoc" assoc }
+}
+{ $description "Applies a quotation to each element in the input sequence and returns a " { $snippet "hashtable" } " of like elements. The keys of this " { $snippet "hashtable" } " are the output of " { $snippet "quot" } " and the values at each key are the elements that transformed to that key." }
+{ $examples
+    "Collect even and odd elements:"
+    { $example
+               "USING: assocs math prettyprint ;"
+               "{ 11 12 13 14 14 13 12 11 } [ odd? ] collect-by ."
+               "H{ { t V{ 11 13 13 11 } } { f V{ 12 14 14 12 } } }"
+    }
+    "Collect strings by length:"
+    { $example
+               "USING: assocs prettyprint sequences ;"
+               "{ \"one\" \"two\" \"three\" \"four\" \"five\" } [ length ] collect-by ."
+               "H{\n    { 3 V{ \"one\" \"two\" } }\n    { 4 V{ \"four\" \"five\" } }\n    { 5 V{ \"three\" } }\n}"
+    }
+} ;

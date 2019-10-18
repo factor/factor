@@ -1,9 +1,9 @@
-USING: math eval lexer tools.test effects sequences ;
+USING: effects eval math tools.test ;
 IN: words.alias.tests
 
 ALIAS: foo +
-[ ] [ "IN: words.alias.tests CONSTANT: foo 5" eval( -- ) ] unit-test
-[ ( -- value ) ] [ \ foo stack-effect ] unit-test
+{ } [ "IN: words.alias.tests CONSTANT: foo 5" eval( -- ) ] unit-test
+{ ( -- value ) } [ \ foo stack-effect ] unit-test
 
 ALIAS: MY-H{ H{
 { H{ { 1 2 } } } [

@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors math math.vectors locals sequences
-specialized-arrays colors arrays combinators alien.data
-opengl opengl.gl ui.pens ui.pens.caching ;
+USING: accessors alien.data arrays colors combinators kernel
+locals math math.vectors opengl opengl.gl sequences
+specialized-arrays ui.pens ui.pens.caching ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: ui.pens.gradient
@@ -16,7 +16,7 @@ TUPLE: gradient < caching-pen colors last-vertices last-colors ;
 
 :: gradient-vertices ( direction dim colors -- seq )
     direction dim v* dim over v- swap
-    colors length [ iota ] [ 1 - ] bi v/n [ v*n ] with map
+    colors length [ <iota> ] [ 1 - ] bi v/n [ v*n ] with map
     swap [ over v+ 2array ] curry map
     concat concat float >c-array ;
 

@@ -1,10 +1,11 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors formatting http.client images.http
+USING: accessors formatting html.entities html.parser
+html.parser.analyzer html.parser.printer http.client images.http
 images.viewer images.viewer.prettyprint io kernel parser
-prettyprint.custom prettyprint.sections regexp sequences
-strings ui wrap.strings xml xml.traversal ;
+prettyprint.custom prettyprint.sections regexp sequences strings
+ui wrap.strings ;
 
 IN: xkcd
 
@@ -12,17 +13,18 @@ IN: xkcd
 
 : comic-image ( url -- image )
     http-get nip
-    R" http://imgs\.xkcd\.com/comics/[^\.]+\.(png|jpg)"
-    first-match >string load-http-image ;
+    R/ \/\/imgs\.xkcd\.com\\/comics\\/[^\.]+\.(png|jpg)/
+    first-match >string "http:" prepend load-http-image ;
 
-: comic-image. ( url -- ) comic-image image. ;
+: comic-image. ( url -- )
+    comic-image image. ;
 
-: comic-string ( url -- string )
-    http-get nip string>xml
-    "transcript" "id" deep-tag-with-attr children>string ;
+: comic-text ( url -- string )
+    scrape-html nip "transcript" find-by-id-between
+    html-text html-unescape ;
 
 : comic-text. ( url -- )
-    comic-image 80 wrap-lines [ print ] each ;
+    comic-text 80 wrap-string print ;
 
 : comic. ( url -- )
     ui-running? [ comic-image. ] [ comic-text. ] if ;
@@ -44,10 +46,10 @@ PRIVATE>
 : latest-xkcd. ( -- )
     "http://xkcd.com" comic. ;
 
-TUPLE: xkcd image ;
+TUPLE: xkcd number image ;
 
 C: <xkcd> xkcd
 
-SYNTAX: XKCD: scan-number xkcd-image <xkcd> suffix! ;
+SYNTAX: XKCD: scan-number dup xkcd-image <xkcd> suffix! ;
 
 M: xkcd pprint* image>> <image-section> add-section ;

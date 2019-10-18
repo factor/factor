@@ -3,7 +3,7 @@ IN: mongodb.cmd
 
 <PRIVATE
 
-TUPLE: mongodb-cmd 
+TUPLE: mongodb-cmd
     { name string }
     { const? boolean }
     { admin? boolean }
@@ -13,7 +13,7 @@ TUPLE: mongodb-cmd
 
 PRIVATE>
 
-CONSTANT: buildinfo-cmd 
+CONSTANT: buildinfo-cmd
     T{ mongodb-cmd f "buildinfo" t t f H{ { "buildinfo" 1 } } }
 
 CONSTANT: list-databases-cmd
@@ -54,7 +54,7 @@ CONSTANT: repair-db-cmd
     T{ mongodb-cmd f "repairDatabase" f f f H{ { "repairDatabase" 1 } } }
 
 ! Options: -1 gets the current profile level; 0-2 set the profile level
-CONSTANT: profile-cmd 
+CONSTANT: profile-cmd
     T{ mongodb-cmd f "profile" f f f H{ { "profile" 0 } } }
 
 CONSTANT: server-status-cmd
@@ -117,14 +117,14 @@ CONSTANT: logout-cmd
     T{ mongodb-cmd f "logout" t f f H{ { "logout" 1 } } }
 
 ! Value: { "findandmodify" collection-name }
-! Options: { { "query" selector } { "sort" sort-spec } 
-!            { "remove" t/f } { "update" modified-object } 
+! Options: { { "query" selector } { "sort" sort-spec }
+!            { "remove" t/f } { "update" modified-object }
 !            { "new" t/f } }
 CONSTANT: findandmodify-cmd
     T{ mongodb-cmd f "findandmodify" f f f H{ { "findandmodify" f } } }
 
 : make-cmd ( cmd-stub -- cmd-assoc )
-    dup const?>> [  ] [  
+    dup const?>> [  ] [
         clone [ clone <linked-assoc> ] change-assoc
     ] if ; inline
 

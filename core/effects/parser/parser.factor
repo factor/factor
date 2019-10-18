@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators effects kernel lexer make namespaces
-parser sequences splitting words ;
+USING: accessors arrays combinators continuations effects
+kernel lexer make namespaces parser sequences sets
+splitting vocabs.parser words ;
 IN: effects.parser
 
 DEFER: parse-effect
@@ -15,9 +16,10 @@ SYMBOL: effect-var
 
 <PRIVATE
 : end-token? ( end token -- token ? ) [ nip ] [ = ] 2bi ; inline
-: effect-opener? ( token -- token ? ) dup { f "(" "((" "--" } member? ; inline
-: effect-closer? ( token -- token ? ) dup { ")" "))" } member? ; inline
+: effect-opener? ( token -- token ? ) dup { f "(" "--" } member? ; inline
+: effect-closer? ( token -- token ? ) dup ")" sequence= ; inline
 : row-variable? ( token -- token' ? ) ".." ?head ; inline
+: standalone-type? ( token -- token' ? ) ":" ?head ; inline
 
 : parse-effect-var ( first? var name -- var )
     nip
@@ -26,6 +28,14 @@ SYMBOL: effect-var
 
 : parse-effect-value ( token -- value )
     ":" ?tail [ scan-object 2array ] when ;
+
+ERROR: bad-standalone-effect obj ;
+: parse-standalone-type ( obj -- var )
+    parse-datum
+    dup parsing-word? [
+        ?execute-parsing dup length 1 =
+        [ first ] [ bad-standalone-effect ] if
+    ] when f swap 2array ;
 PRIVATE>
 
 : parse-effect-token ( first? var end -- var more? )
@@ -34,7 +44,10 @@ PRIVATE>
         { [ effect-opener? ] [ bad-effect ] }
         { [ effect-closer? ] [ stack-effect-omits-dashes ] }
         { [ row-variable? ] [ parse-effect-var t ] }
-        [ [ drop ] 2dip parse-effect-value , t ]
+        [
+            nipd standalone-type?
+            [ parse-standalone-type ] [ parse-effect-value ] if , t
+        ]
     } cond ;
 
 : parse-effect-tokens ( end -- var tokens )
@@ -49,18 +62,22 @@ PRIVATE>
 : scan-effect ( -- effect )
     "(" expect ")" parse-effect ;
 
-: parse-call( ( accum word -- accum )
+: parse-call-paren ( accum word -- accum )
     [ ")" parse-effect ] dip 2array append! ;
 
-SYMBOL: in-definition
+CONSTANT: in-definition HS{ }
 
 ERROR: can't-nest-definitions word ;
 
-: check-in-definition ( -- )
-    in-definition get [ last-word can't-nest-definitions ] when ;
+: set-in-definition ( -- )
+    manifest get current-vocab>> t or in-definition ?adjoin
+    [ last-word can't-nest-definitions ] unless ;
+
+: unset-in-definition ( -- )
+    manifest get current-vocab>> t or in-definition delete ;
 
 : with-definition ( quot -- )
-    [ check-in-definition t in-definition ] dip with-variable ; inline
+    [ set-in-definition ] prepose [ unset-in-definition ] [ ] cleanup ; inline
 
 : (:) ( -- word def effect )
     [

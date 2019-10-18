@@ -5,8 +5,8 @@ IN: windows.psapi
 
 LIBRARY: psapi
 
-FUNCTION: BOOL EnumDeviceDrivers ( LPVOID* lpImageBase, DWORD cb, LPDWORD lpcbNeeded ) ;
+FUNCTION: BOOL EnumDeviceDrivers ( LPVOID* lpImageBase, DWORD cb, LPDWORD lpcbNeeded )
 
-FUNCTION: DWORD GetDeviceDriverBaseNameW ( LPVOID ImageBase, LPTSTR lpBaseName, DWORD nSize ) ;
+FUNCTION: DWORD GetDeviceDriverBaseNameW ( LPVOID ImageBase, LPTSTR lpBaseName, DWORD nSize )
 
 ALIAS: GetDeviceDriverBaseName GetDeviceDriverBaseNameW

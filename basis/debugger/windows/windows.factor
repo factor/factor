@@ -52,4 +52,3 @@ M: windows-error error.
     "Win32 error 0x" write
     dup n>> 0xffff,ffff bitand >hex write ": " write
     string>> write ;
-

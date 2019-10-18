@@ -4,7 +4,7 @@ IN: benchmark.matrix-exponential-simd
 
 TYPED:: e^m4 ( m: matrix4 iterations: fixnum -- e^m: matrix4 )
     zero-matrix4
-    iterations iota [| i |
+    iterations <iota> [| i |
         m i m4^n i factorial >float m4/n m4+
     ] each ;
 

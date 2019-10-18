@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators combinators.short-circuit fry kernel
-locals accessors sequences compiler.utilities arrays
-stack-checker.inlining namespaces compiler.tree math.order ;
+USING: accessors assocs combinators combinators.short-circuit
+compiler.tree compiler.utilities kernel locals namespaces
+sequences stack-checker.inlining ;
 IN: compiler.tree.combinators
 
 :: each-node ( ... nodes quot: ( ... node -- ... ) -- ... )
@@ -53,5 +53,5 @@ IN: compiler.tree.combinators
 : until-fixed-point ( ... #recursive quot: ( ... node -- ... ) -- ... )
     over label>> t >>fixed-point drop
     [ with-scope ] 2keep
-    over label>> fixed-point>> [ 2drop ] [ until-fixed-point ] if ;
-    inline recursive
+    over label>> fixed-point>>
+    [ 2drop ] [ until-fixed-point ] if ; inline recursive

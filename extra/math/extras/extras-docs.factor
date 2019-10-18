@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: help.markup help.syntax kernel math sequences ;
+USING: help.markup help.syntax kernel math math.functions sequences ;
 
 IN: math.extras
 
@@ -77,6 +77,18 @@ HELP: logspace[a,b]
 HELP: majority
 { $values { "seq" sequence } { "elt/f" object } }
 { $description "Returns the element of " { $snippet "seq" } " that is in the majority, provided there is such an element, using a linear-time majority vote algorithm." } ;
+
+HELP: nonzero
+{ $values { "seq" sequence } { "seq'" sequence } }
+{ $description "Outputs a new sequence of the same type as " { $snippet "seq" } " with all non-zero elements removed." } ;
+
+HELP: round-away-from-zero
+{ $values { "x" number } { "y" number } }
+{ $description "Rounds " { $snippet "x" } " via " { $link ceiling } " if " { $snippet "x" } " is greater than zero, and " { $link floor } " if x is less than zero." }
+{ $examples
+    { $example "USING: math.extras prettyprint ;" "0.5 round-away-from-zero ." "1.0" }
+    { $example "USING: math.extras prettyprint ;" "-0.5 round-away-from-zero ." "-1.0" } }
+{ $see-also ceiling floor } ;
 
 HELP: round-to-decimal
 { $values { "x" real } { "n" integer } { "y" real } }

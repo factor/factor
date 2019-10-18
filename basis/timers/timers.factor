@@ -1,13 +1,12 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs calendar combinators.short-circuit fry
-heaps init kernel math math.functions math.parser namespaces
-quotations sequences system threads typed ;
+USING: accessors calendar combinators.short-circuit fry kernel
+math math.functions quotations system threads typed ;
 IN: timers
 
 TUPLE: timer
     { quot callable initial: [ ] }
-    start-nanos 
+    start-nanos
     delay-nanos
     interval-nanos
     iteration-start-nanos

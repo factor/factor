@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings assocs
 classes.struct continuations fry io.backend io.backend.unix
-io.directories io.encodings.utf8 io.files io.files.info
-io.files.info.unix io.files.types kernel libc literals math
-sequences system unix unix.ffi vocabs ;
+io.directories io.files io.files.info io.files.info.unix
+io.files.types kernel libc literals math sequences system unix
+unix.ffi vocabs ;
 IN: io.directories.unix
 
 CONSTANT: touch-mode flags{ O_WRONLY O_APPEND O_CREAT O_EXCL }
@@ -17,8 +17,15 @@ M: unix touch-file ( path -- )
         touch-mode file-mode open-file close-file
     ] if ;
 
-M: unix move-file ( from to -- )
+M: unix move-file-atomically ( from to -- )
     [ normalize-path ] bi@ [ rename ] unix-system-call drop ;
+
+M: unix move-file ( from to -- )
+    [ move-file-atomically ] [
+        dup errno>> EXDEV = [
+            drop [ copy-file ] [ drop delete-file ] 2bi
+        ] [ rethrow ] if
+    ] recover ;
 
 M: unix delete-file ( path -- ) normalize-path unlink-file ;
 
@@ -29,13 +36,12 @@ M: unix delete-directory ( path -- )
     normalize-path [ rmdir ] unix-system-call drop ;
 
 M: unix copy-file ( from to -- )
-    [ normalize-path ] bi@
     [ call-next-method ]
     [ [ file-permissions ] dip swap set-file-permissions ] 2bi ;
 
 : with-unix-directory ( path quot -- )
     dupd '[ _ _
-        [ opendir dup [ (io-error) ] unless ] dip
+        [ opendir dup [ throw-errno ] unless ] dip
         dupd curry swap '[ _ closedir io-error ] [ ] cleanup
     ] with-directory ; inline
 
@@ -56,11 +62,11 @@ M: unix copy-file ( from to -- )
 
 : next-dirent ( DIR* dirent* -- dirent* ? )
     f void* <ref> [
-        readdir_r [ dup strerror libc-error ] unless-zero
+        readdir_r [ (throw-errno) ] unless-zero
     ] 2keep void* deref ; inline
 
 : >directory-entry ( dirent* -- directory-entry )
-    [ d_name>> utf8 alien>string ]
+    [ d_name>> alien>native-string ]
     [ d_type>> dirent-type>file-type ] bi
     dup +unknown+ = [ drop dup file-info type>> ] when
     <directory-entry> ; inline

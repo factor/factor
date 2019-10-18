@@ -1,7 +1,5 @@
-USING: interpolate multiline
-io io.directories io.encodings.ascii io.files
-io.files.temp io.launcher io.streams.string kernel locals system
-tools.test sequences ;
+USING: interpolate io io.encodings.ascii io.files io.files.temp
+io.launcher io.streams.string kernel locals sequences system ;
 IN: alien.remote-control.tests
 
 : compile-file ( contents -- )
@@ -15,10 +13,10 @@ IN: alien.remote-control.tests
     ascii [ readln ] with-process-reader ;
 
 :: test-embedding ( code -- line )
-    image :> image
+    image-path :> image
 
     [
-        I[
+        [I
 #include <vm/master.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -34,7 +32,7 @@ int main(int argc, char **argv)
     printf("Done.\n");
     return 0;
 }
-        ]I
+        I]
     ] with-string-writer
     [ compile-file ] with-temp-directory
     [ run-test ] with-temp-directory ;

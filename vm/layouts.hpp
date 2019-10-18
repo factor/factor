@@ -9,6 +9,9 @@ inline static cell alignment_for(cell a, cell b) { return align(a, b) - a; }
 
 static const cell data_alignment = 16;
 
+// Must match leaf-stack-frame-size in core/layouts/layouts.factor
+#define LEAF_FRAME_SIZE 16
+
 #define WORD_SIZE (signed)(sizeof(cell) * 8)
 
 #define TAG_MASK 15
@@ -17,7 +20,8 @@ static const cell data_alignment = 16;
 #define UNTAG(x) ((cell)(x) & ~TAG_MASK)
 #define RETAG(x, tag) (UNTAG(x) | (tag))
 
-/*** Tags ***/
+// Type tags, should be kept in sync with:
+//   core/bootstrap/layouts/layouts.factor
 #define FIXNUM_TYPE 0
 #define F_TYPE 1
 #define ARRAY_TYPE 2
@@ -72,12 +76,12 @@ static inline const char* type_name(cell type) {
 }
 
 enum code_block_type {
-  code_block_unoptimized,
-  code_block_optimized,
-  code_block_pic
+  CODE_BLOCK_UNOPTIMIZED,
+  CODE_BLOCK_OPTIMIZED,
+  CODE_BLOCK_PIC
 };
 
-/* Constants used when floating-point trap exceptions are thrown */
+// Constants used when floating-point trap exceptions are thrown
 enum {
   FP_TRAP_INVALID_OPERATION = 1 << 0,
   FP_TRAP_OVERFLOW = 1 << 1,
@@ -86,11 +90,11 @@ enum {
   FP_TRAP_INEXACT = 1 << 4,
 };
 
-/* What Factor calls 'f' */
+// What Factor calls 'f'
 static const cell false_object = F_TYPE;
 
 inline static bool immediate_p(cell obj) {
-  /* We assume that fixnums have tag 0 and false_object has tag 1 */
+  // We assume that fixnums have tag 0 and false_object has tag 1
   return TAG(obj) <= F_TYPE;
 }
 
@@ -100,27 +104,36 @@ inline static fixnum untag_fixnum(cell tagged) {
 }
 
 inline static cell tag_fixnum(fixnum untagged) {
-  return (untagged << TAG_BITS) | FIXNUM_TYPE;
+  return ( (cell)untagged << TAG_BITS) | FIXNUM_TYPE;
 }
 
 #define NO_TYPE_CHECK static const cell type_number = TYPE_COUNT
 
 struct object {
   NO_TYPE_CHECK;
+  // header format (bits indexed with least significant as zero):
+  // bit 0      : free?
+  // bit 1      : forwarding pointer?
+  // if not forwarding:
+  //   bit 2-5    : tag
+  //   bit 7-end  : hashcode
+  // if forwarding:
+  //   bit 2-end  : forwarding pointer
   cell header;
 
-  cell size() const;
+  template <typename Fixup> cell base_size(Fixup fixup) const;
   template <typename Fixup> cell size(Fixup fixup) const;
+  cell size() const;
 
-  cell binary_payload_start() const;
-  template <typename Fixup> cell binary_payload_start(Fixup fixup) const;
+  cell slot_count() const;
+  template <typename Fixup> cell slot_count(Fixup fixup) const;
 
   cell* slots() const { return (cell*)this; }
 
   template <typename Iterator> void each_slot(Iterator& iter);
 
-  /* Only valid for objects in tenured space; must cast to free_heap_block
-     to do anything with it if its free */
+  // Only valid for objects in tenured space; must cast to free_heap_block
+  // to do anything with it if its free
   bool free_p() const { return (header & 1) == 1; }
 
   cell type() const { return (header >> 2) & TAG_MASK; }
@@ -140,32 +153,32 @@ struct object {
   void forward_to(object* pointer) { header = ((cell)pointer | 2); }
 };
 
-/* Assembly code makes assumptions about the layout of this struct */
+// Assembly code makes assumptions about the layout of this struct
 struct array : public object {
   static const cell type_number = ARRAY_TYPE;
   static const cell element_size = sizeof(cell);
-  /* tagged */
+  // tagged
   cell capacity;
 
   cell* data() const { return (cell*)(this + 1); }
 };
 
-/* These are really just arrays, but certain elements have special
-   significance */
+// These are really just arrays, but certain elements have special
+// significance
 struct tuple_layout : public array {
   NO_TYPE_CHECK;
-  /* tagged */
+  // tagged
   cell klass;
-  /* tagged fixnum */
+  // tagged fixnum
   cell size;
-  /* tagged fixnum */
+  // tagged fixnum
   cell echelon;
 };
 
 struct bignum : public object {
   static const cell type_number = BIGNUM_TYPE;
   static const cell element_size = sizeof(cell);
-  /* tagged */
+  // tagged
   cell capacity;
 
   cell* data() const { return (cell*)(this + 1); }
@@ -174,7 +187,7 @@ struct bignum : public object {
 struct byte_array : public object {
   static const cell type_number = BYTE_ARRAY_TYPE;
   static const cell element_size = 1;
-  /* tagged */
+  // tagged
   cell capacity;
 
 #ifndef FACTOR_64
@@ -187,14 +200,14 @@ struct byte_array : public object {
   }
 };
 
-/* Assembly code makes assumptions about the layout of this struct */
+// Assembly code makes assumptions about the layout of this struct
 struct string : public object {
   static const cell type_number = STRING_TYPE;
-  /* tagged num of chars */
+  // tagged num of chars
   cell length;
-  /* tagged */
+  // tagged
   cell aux;
-  /* tagged */
+  // tagged
   cell hashcode;
 
   uint8_t* data() const { return (uint8_t*)(this + 1); }
@@ -202,46 +215,46 @@ struct string : public object {
 
 struct code_block;
 
-/* Assembly code makes assumptions about the layout of this struct:
-     basis/bootstrap/images/images.factor
-     basis/compiler/constants/constants.factor
-     core/bootstrap/primitives.factor
-*/
+// Assembly code makes assumptions about the layout of this struct:
+//   basis/bootstrap/images/images.factor
+//   basis/compiler/constants/constants.factor
+//   core/bootstrap/primitives.factor
+
 struct word : public object {
   static const cell type_number = WORD_TYPE;
-  /* TAGGED hashcode */
+  // TAGGED hashcode
   cell hashcode;
-  /* TAGGED word name */
+  // TAGGED word name
   cell name;
-  /* TAGGED word vocabulary */
+  // TAGGED word vocabulary
   cell vocabulary;
-  /* TAGGED definition */
+  // TAGGED definition
   cell def;
-  /* TAGGED property assoc for library code */
+  // TAGGED property assoc for library code
   cell props;
-  /* TAGGED alternative entry point for direct non-tail calls. Used for inline
-   * caching */
+  // TAGGED alternative entry point for direct non-tail calls. Used for inline
+  // caching
   cell pic_def;
-  /* TAGGED alternative entry point for direct tail calls. Used for inline
-   * caching */
+  // TAGGED alternative entry point for direct tail calls. Used for inline
+  // caching
   cell pic_tail_def;
-  /* TAGGED machine code for sub-primitive */
+  // TAGGED machine code for sub-primitive
   cell subprimitive;
-  /* UNTAGGED entry point: jump here to execute word */
-  void* entry_point;
-  /* UNTAGGED compiled code block */
+  // UNTAGGED entry point: jump here to execute word
+  cell entry_point;
+  // UNTAGGED compiled code block
 
-  /* defined in code_blocks.hpp */
+  // defined in code_blocks.hpp
   code_block* code() const;
 };
 
-/* Assembly code makes assumptions about the layout of this struct */
+// Assembly code makes assumptions about the layout of this struct
 struct wrapper : public object {
   static const cell type_number = WRAPPER_TYPE;
   cell object;
 };
 
-/* Assembly code makes assumptions about the layout of this struct */
+// Assembly code makes assumptions about the layout of this struct
 struct boxed_float : object {
   static const cell type_number = FLOAT_TYPE;
 
@@ -252,36 +265,36 @@ struct boxed_float : object {
   double n;
 };
 
-/* Assembly code makes assumptions about the layout of this struct:
-     basis/bootstrap/images/images.factor
-     basis/compiler/constants/constants.factor
-     core/bootstrap/primitives.factor
-*/
+// Assembly code makes assumptions about the layout of this struct:
+//   basis/bootstrap/images/images.factor
+//   basis/compiler/constants/constants.factor
+//   core/bootstrap/primitives.factor
+
 struct quotation : public object {
   static const cell type_number = QUOTATION_TYPE;
-  /* tagged */
+  // tagged
   cell array;
-  /* tagged */
+  // tagged
   cell cached_effect;
-  /* tagged */
+  // tagged
   cell cache_counter;
-  /* UNTAGGED entry point; jump here to call quotation */
-  void* entry_point;
+  // UNTAGGED entry point; jump here to call quotation
+  cell entry_point;
 
-  /* defined in code_blocks.hpp */
+  // defined in code_blocks.hpp
   code_block* code() const;
 };
 
-/* Assembly code makes assumptions about the layout of this struct */
+// Assembly code makes assumptions about the layout of this struct
 struct alien : public object {
   static const cell type_number = ALIEN_TYPE;
-  /* tagged */
+  // tagged
   cell base;
-  /* tagged */
+  // tagged
   cell expired;
-  /* untagged */
+  // untagged
   cell displacement;
-  /* untagged */
+  // untagged
   cell address;
 
   void update_address() {
@@ -294,19 +307,19 @@ struct alien : public object {
 
 struct dll : public object {
   static const cell type_number = DLL_TYPE;
-  /* tagged byte array holding a C string */
+  // tagged byte array holding a C string
   cell path;
-  /* OS-specific handle */
+  // OS-specific handle
   void* handle;
 };
 
 struct callstack : public object {
   static const cell type_number = CALLSTACK_TYPE;
-  /* tagged */
+  // tagged
   cell length;
 
-  void* frame_top_at(cell offset) const {
-    return (void*)((char*)(this + 1) + offset);
+  cell frame_top_at(cell offset) const {
+    return (cell)(this + 1) + offset;
   }
 
   void* top() const { return (void*)(this + 1); }
@@ -317,10 +330,24 @@ struct callstack : public object {
 
 struct tuple : public object {
   static const cell type_number = TUPLE_TYPE;
-  /* tagged layout */
+  // tagged layout
   cell layout;
 
   cell* data() const { return (cell*)(this + 1); }
 };
+
+inline static cell tuple_capacity(const tuple_layout *layout) {
+  return untag_fixnum(layout->size);
+}
+
+inline static cell tuple_size(const tuple_layout* layout) {
+  return sizeof(tuple) + tuple_capacity(layout) * sizeof(cell);
+}
+
+inline static cell string_capacity(const string* str) {
+  return untag_fixnum(str->length);
+}
+
+inline static cell string_size(cell size) { return sizeof(string) + size; }
 
 }

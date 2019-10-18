@@ -43,7 +43,7 @@ GML: faceCCW ( e0 -- e1 ) face-ccw ;
 
 GML: baseface ( e0 -- e1 ) base-face>> ;
 
-GML: nextring ( e0 -- e1 ) dup next-ring>> [ nip ] [ base-face>> ] if* ;
+GML: nextring ( e0 -- e1 ) dup next-ring>> [ ] [ base-face>> ] ?if ;
 
 GML: facenormal ( e0 -- n ) face-normal ;
 GML: faceplanedist ( e0 -- d ) face-plane-dist ;
@@ -83,12 +83,12 @@ GML: isValidEdge ( e -- ? ) b-rep get is-valid-edge? ;
 GML: materialF ( e material -- ) material-f ;
 
 GML: setcurrentmaterial ( material -- ) drop ;
-GML: getcurrentmaterial ( -- material ) "none" name ;
+GML: getcurrentmaterial ( -- material ) "none" >gml-name ;
 GML: pushcurrentmaterial ( material -- ) drop ;
-GML: popcurrentmaterial ( -- material ) "none" name ;
+GML: popcurrentmaterial ( -- material ) "none" >gml-name ;
 GML: getmaterialnames ( -- [material] ) { } ;
 GML: setfacematerial ( e material -- ) material-f ;
-GML: getfacematerial ( e -- material ) drop "none" name ;
+GML: getfacematerial ( e -- material ) drop "none" >gml-name ;
 
 GML: setsharpness ( sharp -- ) c-bool> set-sharpness ;
 GML: getsharpness ( -- sharp ) get-sharpness >c-bool ;

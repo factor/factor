@@ -1,0 +1,1 @@
+Contains sequence operations that are not commonly needed.  Most of these words are elaborations on functions already available in the main sequences vocabulary.

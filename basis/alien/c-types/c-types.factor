@@ -1,10 +1,9 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.accessors arrays byte-arrays
-classes combinators compiler.units cpu.architecture delegate
-fry kernel layouts locals macros math math.order quotations
-sequences system words words.symbol summary ;
-QUALIFIED: math
+USING: accessors alien alien.accessors arrays classes combinators
+compiler.units cpu.architecture delegate fry kernel layouts macros
+math math.order math.parser quotations sequences summary system words
+words.symbol ;
 IN: alien.c-types
 
 SYMBOLS:
@@ -19,21 +18,21 @@ SYMBOLS:
 SINGLETON: void
 
 TUPLE: abstract-c-type
-{ class class initial: object }
-{ boxed-class class initial: object }
-{ boxer-quot callable }
-{ unboxer-quot callable }
-{ getter callable }
-{ setter callable }
-{ size integer }
-{ signed boolean }
-{ align integer }
-{ align-first integer } ;
+    { class class initial: object }
+    { boxed-class class initial: object }
+    { boxer-quot callable }
+    { unboxer-quot callable }
+    { getter callable }
+    { setter callable }
+    { size integer }
+    { signed boolean }
+    { align integer }
+    { align-first integer } ;
 
 TUPLE: c-type < abstract-c-type
-boxer
-unboxer
-{ rep initial: int-rep } ;
+    boxer
+    unboxer
+    { rep initial: int-rep } ;
 
 : <c-type> ( -- c-type )
     \ c-type new ; inline
@@ -61,7 +60,6 @@ UNION: c-type-name
 M: word lookup-c-type
     dup "c-type" word-prop resolve-typedef
     [ ] [ no-c-type ] ?if ;
-
 
 GENERIC: c-type-class ( name -- class )
 
@@ -139,7 +137,7 @@ MACRO: set-alien-value ( c-type -- quot: ( value c-ptr offset -- ) )
 : set-alien-element ( value n c-ptr c-type -- )
     array-accessor set-alien-value ; inline
 
-PROTOCOL: c-type-protocol 
+PROTOCOL: c-type-protocol
     c-type-class
     c-type-boxed-class
     c-type-boxer-quot
@@ -176,7 +174,8 @@ TUPLE: long-long-type < c-type ;
 
 SYMBOLS:
     ptrdiff_t intptr_t uintptr_t size_t
-    c-string ;
+    c-string int8_t uint8_t int16_t uint16_t
+    int32_t uint32_t int64_t uint64_t ;
 
 CONSTANT: primitive-types
     {
@@ -332,7 +331,7 @@ M: pointer lookup-c-type
             "to_signed_4" >>unboxer
             [ >fixnum ] >>unboxer-quot
         \ int typedef
-    
+
         ! 64bit-vm uint
         <c-type>
             fixnum >>class
@@ -404,7 +403,7 @@ M: pointer lookup-c-type
             "to_fixnum" >>unboxer
             [ >integer ] >>unboxer-quot
         \ int typedef
-    
+
         ! 32bit-vm uint
         <c-type>
             integer >>class
@@ -462,6 +461,16 @@ M: pointer lookup-c-type
         object >>boxed-class
     \ bool typedef
 
+    \ char lookup-c-type int8_t typedef
+    \ short lookup-c-type int16_t typedef
+    \ int lookup-c-type int32_t typedef
+    \ longlong lookup-c-type int64_t typedef
+
+    \ uchar lookup-c-type uint8_t typedef
+    \ ushort lookup-c-type uint16_t typedef
+    \ uint lookup-c-type uint32_t typedef
+    \ ulonglong lookup-c-type uint64_t typedef
+
 ] with-compilation-unit
 
 M: char-16-rep rep-component-type drop char ;
@@ -490,3 +499,20 @@ M: double-2-rep rep-component-type drop double ;
 : c-type-clamp ( value c-type -- value' )
     dup { float double } member-eq?
     [ drop ] [ c-type-interval clamp ] if ; inline
+
+GENERIC: pointer-string ( pointer -- string/f )
+M: object pointer-string drop f ;
+M: word pointer-string name>> ;
+M: pointer pointer-string to>> pointer-string [ CHAR: * suffix ] [ f ] if* ;
+
+GENERIC: c-type-string ( c-type -- string )
+
+M: integer c-type-string number>string ;
+M: word c-type-string name>> ;
+M: pointer c-type-string pointer-string ;
+M: wrapper c-type-string wrapped>> c-type-string ;
+M: array c-type-string
+    unclip
+    [ [ c-type-string "[" "]" surround ] map ]
+    [ c-type-string ] bi*
+    prefix concat ;

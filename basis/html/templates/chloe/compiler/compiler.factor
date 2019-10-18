@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs namespaces make kernel sequences accessors
 combinators strings splitting io io.streams.string present
-xml.writer xml.data xml.entities html.forms
+sets ascii xml.writer xml.data xml.entities html.forms
 html.templates html.templates.chloe.syntax ;
 IN: html.templates.chloe.compiler
 
@@ -10,7 +10,7 @@ IN: html.templates.chloe.compiler
     [ drop chloe-name? ] assoc-filter ;
 
 : non-chloe-attrs-only ( assoc -- assoc' )
-    [ drop chloe-name? not ] assoc-filter ;
+    [ drop chloe-name? ] assoc-reject ;
 
 : chloe-tag? ( tag -- ? )
     dup xml? [ body>> ] when
@@ -60,6 +60,11 @@ DEFER: compile-element
         "\"" [write]
     ] assoc-each ;
 
+: compile-self-closing-tag ( tag -- )
+    "<" [write]
+    [ name>string [write] ] [ attrs>> compile-attrs ] bi
+    " />" [write] ;
+
 : compile-start-tag ( tag -- )
     "<" [write]
     [ name>string [write] ] [ attrs>> compile-attrs ] bi
@@ -74,17 +79,39 @@ SYMBOL: string-context?
 
 ERROR: tag-not-allowed-here ;
 
+CONSTANT: self-closing-tags {
+        "area"
+        "base"
+        "br"
+        "embed"
+        "hr"
+        "iframe"
+        "img"
+        "input"
+        "link"
+        "meta"
+        "param"
+        "source"
+        "track"
+    }
+
 : check-tag ( -- )
     string-context? get [ tag-not-allowed-here ] when ;
 
-: compile-tag ( tag -- )
-    check-tag
-    {
-        [ main>> tag-stack get push ]
+: (compile-tag) ( tag -- )
+    dup name>string >lower self-closing-tags
+    member? [
+        compile-self-closing-tag
+    ] [
         [ compile-start-tag ]
         [ compile-children ]
-        [ compile-end-tag ]
-    } cleave
+        [ compile-end-tag ] tri
+    ] if ;
+
+: compile-tag ( tag -- )
+    check-tag
+    [ main>> tag-stack get push ]
+    [ (compile-tag) ] bi
     tag-stack get pop* ;
 
 ERROR: unknown-chloe-tag tag ;
@@ -113,8 +140,8 @@ ERROR: unknown-chloe-tag tag ;
 
 : with-compiler ( quot -- quot' )
     [
-        SBUF" " string-buffer set
-        V{ } clone tag-stack set
+        SBUF" " string-buffer namespaces:set
+        V{ } clone tag-stack namespaces:set
         call
         reset-buffer
     ] [ ] make ; inline
@@ -125,7 +152,7 @@ ERROR: unknown-chloe-tag tag ;
 : compile-quot ( quot -- )
     reset-buffer
     [
-        SBUF" " string-buffer set
+        SBUF" " string-buffer namespaces:set
         call
         reset-buffer
     ] [ ] make , ; inline
@@ -149,9 +176,7 @@ ERROR: unknown-chloe-tag tag ;
 
 : compile-prologue ( xml -- )
     [
-        [ prolog>> [ write-xml ] [code-with] ]
-        [ before>> compile-chunk ]
-        bi
+        before>> compile-chunk
     ] compile-quot
     [ if-not-nested ] [code] ;
 

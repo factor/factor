@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ui.pens ui.gadgets.tracks ui.gadgets.buttons
-ui.gadgets.buttons.private ui.gadgets.books ui.gadgets.packs
-ui.gadgets.borders ui.gadgets.icons ui.gadgets ui.gadgets.theme
-ui.pens.image sequences models accessors kernel colors
-colors.constants ;
+USING: accessors colors.constants kernel models sequences
+ui.gadgets ui.gadgets.books ui.gadgets.borders
+ui.gadgets.buttons ui.gadgets.buttons.private ui.gadgets.icons
+ui.gadgets.packs ui.gadgets.tracks ui.pens ui.theme.images ;
 IN: ui.gadgets.tabbed
 
 TUPLE: tabbed-gadget < track tabs book ;
@@ -14,14 +13,8 @@ TUPLE: tabbed-gadget < track tabs book ;
 : <lip> ( -- gadget )
     "active-tab-lip" theme-image <icon> ;
 
-CONSTANT: active-tab-background
-    T{ rgba
-        f
-        0.6745098039215687
-        0.6549019607843137
-        0.5764705882352941
-        1.0
-    }
+CONSTANT: button-background COLOR: FactorTan
+CONSTANT: active-tab-background COLOR: FactorDarkTan
 
 : <tab-pen> ( -- pen )
     "inactive-tab" button-background f <border-button-state-pen> dup dup

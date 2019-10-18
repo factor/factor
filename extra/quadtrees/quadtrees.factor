@@ -30,10 +30,10 @@ TUPLE: quadtree { bounds rect } point value ll lr ul ur leaf? ;
 
 : each-quadrant ( node quot -- )
     {
-        [ [ ll>> ] [ call ] bi* ] 
-        [ [ lr>> ] [ call ] bi* ] 
-        [ [ ul>> ] [ call ] bi* ] 
-        [ [ ur>> ] [ call ] bi* ] 
+        [ [ ll>> ] [ call ] bi* ]
+        [ [ lr>> ] [ call ] bi* ]
+        [ [ ul>> ] [ call ] bi* ]
+        [ [ ur>> ] [ call ] bi* ]
     } 2cleave ; inline
 : map-quadrant ( node quot: ( child-node -- x ) -- array )
     each-quadrant 4array ; inline
@@ -59,7 +59,7 @@ DEFER: in-rect*
 : ur-bounds ( rect -- rect' )
     [ [ loc>> ] [ dim>> { 0.5 0.5 } v* ] bi v+ ] [ child-dim ] bi <rect> ;
 
-: {quadrants} ( node -- quadrants )
+: node>quadrants ( node -- quadrants )
     { [ ll>> ] [ lr>> ] [ ul>> ] [ ur>> ] } cleave 4array ;
 
 : add-subnodes ( node -- node )
@@ -104,7 +104,7 @@ DEFER: in-rect*
 : node-in-rect* ( values rect node -- values )
     [ (node-in-rect*) ] with each-quadrant ;
 
-:: leaf-in-rect* ( values rect leaf -- values ) 
+:: leaf-in-rect* ( values rect leaf -- values )
     { [ leaf point>> ] [ leaf point>> rect contains-point? ] } 0&&
     [ values leaf value>> suffix! ] [ values ] if ;
 
@@ -120,17 +120,17 @@ DEFER: in-rect*
 : erase ( point tree -- )
     dup leaf?>> [ leaf-erase ] [ node-erase ] if ;
 
-: (?leaf) ( quadrant -- {point,value}/f )
+: (?leaf) ( quadrant -- pair/f )
     dup point>> [ swap value>> 2array ] [ drop f ] if* ;
-: ?leaf ( quadrants -- {point,value}/f )
+: ?leaf ( quadrants -- pair/f )
     [ (?leaf) ] map sift dup length {
         { 1 [ first ] }
         { 0 [ drop { f f } ] }
         [ 2drop f ]
     } case ;
 
-: collapseable? ( node -- {point,value}/f )
-    {quadrants} { [ [ leaf?>> ] all? ] [ ?leaf ] } 1&& ;
+: collapseable? ( node -- pair/f )
+    node>quadrants { [ [ leaf?>> ] all? ] [ ?leaf ] } 1&& ;
 
 : remove-subnodes ( node -- leaf ) f >>ll f >>lr f >>ul f >>ur t >>leaf? ;
 
@@ -155,14 +155,14 @@ DEFER: in-rect*
 : leaf-size ( leaf -- count )
     point>> [ 1 ] [ 0 ] if ;
 : node-size ( node -- count )
-    0 swap [ quadtree-size + ] each-quadrant ; 
-    
+    0 swap [ quadtree-size + ] each-quadrant ;
+
 : quadtree-size ( tree -- count )
     dup leaf?>> [ leaf-size ] [ node-size ] if ;
 
 : leaf= ( a b -- ? ) [ [ point>> ] [ value>> ] bi 2array ] same? ;
 
-: node= ( a b -- ? ) [ {quadrants} ] same? ;
+: node= ( a b -- ? ) [ node>quadrants ] same? ;
 
 : (tree=) ( a b -- ? ) dup leaf?>> [ leaf= ] [ node= ] if ;
 
@@ -196,4 +196,3 @@ M: quadtree clear-assoc ( assoc -- )
     [ dup ] dip map
     [ zip ] [ rect-containing <quadtree> ] bi
     [ '[ first2 _ set-at ] each ] [ values ] bi ; inline
-

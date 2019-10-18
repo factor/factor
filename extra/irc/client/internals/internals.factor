@@ -3,8 +3,7 @@
 USING: accessors assocs arrays concurrency.mailboxes continuations destructors
 hashtables io irc.client.base irc.client.chats irc.messages kernel namespaces
 strings words.symbol irc.messages.base irc.client.participants fry threads
-combinators irc.messages.parser math ;
-EXCLUDE: sequences => join ;
+combinators irc.messages.parser math sequences ;
 IN: irc.client.internals
 
 : do-connect ( server port quot: ( host port -- stream ) attempts -- stream/f )
@@ -76,7 +75,9 @@ GENERIC: process-message ( irc-message -- )
 M: object process-message drop ;
 M: ping   process-message trailing>> /PONG ;
 ! FIXME: it shouldn't be checking for the presence of chat here...
-M: join   process-message [ sender>> ] [ chat> ] bi [ join-participant ] [ drop ] if* ;
+M: irc.messages:join
+    process-message [ sender>> ] [ chat> ] bi
+    [ join-participant ] [ drop ] if* ;
 M: part   process-message [ sender>> ] [ chat> ] bi [ part-participant ] [ drop ] if* ;
 M: quit   process-message sender>> quit-participant ;
 M: nick   process-message [ trailing>> ] [ sender>> ] bi rename-participant* ;

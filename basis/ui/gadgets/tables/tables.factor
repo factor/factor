@@ -1,17 +1,15 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs hashtables arrays colors colors.constants fry
-kernel math math.functions math.ranges math.rectangles math.order
-math.vectors namespaces opengl sequences ui.gadgets
+USING: accessors arrays colors colors.constants combinators
+combinators.short-circuit fonts fry kernel locals math
+math.functions math.order math.rectangles math.vectors models
+namespaces opengl sequences splitting strings ui.commands
+ui.gadgets ui.gadgets.line-support ui.gadgets.menus
 ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.worlds
-ui.gestures ui.render ui.pens.solid ui.text ui.commands ui.images
-ui.gadgets.menus ui.gadgets.line-support models combinators
-combinators.short-circuit fonts locals splitting strings sets
-sorting ;
-FROM: sequences => change-nth ;
+ui.gestures ui.images ui.pens.solid ui.render ui.text ui.theme ;
 IN: ui.gadgets.tables
 
-! Row rendererer protocol
+! Row renderer protocol
 GENERIC: prototype-row ( renderer -- columns )
 GENERIC: column-alignment ( renderer -- alignment )
 GENERIC: filled-column ( renderer -- n )
@@ -42,7 +40,7 @@ single-click?
 { gap initial: 2 }
 column-widths total-width
 focus-border-color
-{ mouse-color initial: COLOR: black }
+mouse-color
 column-line-color
 selection-required?
 selection-index
@@ -69,6 +67,9 @@ rows ;
 GENERIC: cell-dim ( font cell -- width height padding )
 GENERIC: draw-cell ( font cell -- )
 
+M: f cell-dim 2drop 0 0 0 ;
+M: f draw-cell 2drop ;
+
 : single-line ( str -- str' )
     dup [ "\r\n" member? ] any? [ string-lines " " join ] when ;
 
@@ -82,8 +83,6 @@ M: image-name draw-cell nip draw-image ;
 
 : column-offsets ( widths gap -- x xs )
     [ 0 ] dip '[ _ + + ] accumulate ;
-
-CONSTANT: column-title-background COLOR: light-gray
 
 : column-title-font ( font -- font' )
     column-title-background font-with-background t >>bold? ;
@@ -100,7 +99,9 @@ CONSTANT: column-title-background COLOR: light-gray
 : compute-total-width ( gap widths -- total )
     swap [ column-offsets drop ] keep - ;
 
-: compute-column-widths ( table -- total widths )
+GENERIC: compute-column-widths ( table -- total widths )
+
+M: table compute-column-widths
     dup rows>> [ drop 0 { } ] [
         [ drop gap>> ] [ initial-widths ] [ ] 2tri
         [ row-column-widths vmax ] with each
@@ -146,7 +147,7 @@ M: table layout*
 
 : draw-moused-row ( table -- )
     dup mouse-index>> [
-        dup mouse-color>> gl-color
+        dup mouse-color>> [ text-color ] unless* gl-color
         dup mouse-index>> row-bounds gl-rect
     ] [ drop ] if ;
 
@@ -251,25 +252,25 @@ PRIVATE>
 : hide-mouse-help ( table -- )
     f >>mouse-index [ update-status ] [ relayout-1 ] bi ;
 
-: ((select-row)) ( n table -- )
+: select-table-row ( n table -- )
     [ selection-index>> set-model ]
     [ [ selected-row drop ] keep selection>> set-model ]
     bi ;
 
 : update-mouse-index ( table -- )
-    dup [ model>> value>> ] [ mouse-index>> ] bi
+    dup [ control-value ] [ mouse-index>> ] bi
     dup [ swap length [ drop f ] [ 1 - min ] if-zero ] [ 2drop f ] if
     >>mouse-index drop ;
 
 : initial-selection-index ( table -- n/f )
     {
-        [ model>> value>> empty? not ]
+        [ control-value empty? not ]
         [ selection-required?>> ]
         [ drop 0 ]
     } 1&& ;
 
 : find-row-index ( value table -- n/f )
-    [ model>> value>> ] [ renderer>> ] bi
+    [ control-value ] [ renderer>> ] bi
     '[ _ row-value? ] with find drop ;
 
 : update-table-rows ( table -- )
@@ -286,7 +287,7 @@ PRIVATE>
             [ initial-selection-index ]
         } 1||
     ] keep
-    over [ ((select-row)) ] [
+    over [ select-table-row ] [
         [ selection-index>> set-model ]
         [ selection>> set-model ]
         2bi
@@ -303,11 +304,11 @@ M: table model-changed
     row-rect [ { 0 1 } v* ] change-dim ;
 
 : scroll-to-row ( table n -- )
-    dup [ [ thin-row-rect ] [ drop ] 2bi scroll>rect ] [ 2drop ] if ;
+    [ [ thin-row-rect ] [ drop ] 2bi scroll>rect ] [ drop ] if* ;
 
 : (select-row) ( table n -- )
     [ scroll-to-row ]
-    [ swap ((select-row)) ]
+    [ swap select-table-row ]
     [ drop relayout-1 ]
     2tri ;
 

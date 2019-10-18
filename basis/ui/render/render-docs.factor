@@ -1,42 +1,46 @@
-USING: ui.gadgets ui.pens ui.gestures help.markup help.syntax
-kernel classes strings opengl opengl.gl models
-math.rectangles math colors ;
+USING: help.markup help.syntax kernel math.rectangles models
+opengl.gl ui.gadgets ui.gadgets.worlds ui.gestures ui.pens ;
 IN: ui.render
-
-HELP: gadget
-{ $class-description "An object which displays itself on the screen and acts on user input gestures. Gadgets have the following slots:"
-    { $list
-        { { $snippet "pref-dim" } " - a cached value for " { $link pref-dim } "; do not read or write this slot directly." }
-        { { $snippet "parent" } " - the gadget containing this one, or " { $link f } " if this gadget is not part of the visible gadget hierarchy." }
-        { { $snippet "children" } " - a vector of child gadgets. Do not modify this vector directly, instead use " { $link add-gadget } ", " { $link add-gadgets } ", " { $link unparent } " or " { $link clear-gadget } "." }
-        { { $snippet "orientation" } " - an orientation specifier. This slot is used by layout gadgets." }
-        { { $snippet "layout-state" } " - stores the layout state of the gadget. Do not read or write this slot directly, instead call " { $link relayout } " and " { $link relayout-1 } " if the gadget needs to be re-laid out." }
-        { { $snippet "visible?" } " - a boolean indicating if the gadget should display and receive user input." }
-        { { $snippet "root?" } " - if set to " { $link t } ", layout changes in this gadget will not propagate to the gadget's parent." }
-        { { $snippet "clipped?" } " - a boolean indicating if clipping will be enabled when drawing this gadget's children." }
-        { { $snippet "interior" } " - an implementation of the " { $link "ui-pen-protocol" } }
-        { { $snippet "boundary" } " - an implementation of the " { $link "ui-pen-protocol" } }
-        { { $snippet "model" } " - a " { $link model } " or " { $link f } "; see " { $link "ui-control-impl" } }
-    }
-"Gadgets subclass the " { $link rect } " class, and thus all instances have " { $snippet "loc" } " and " { $snippet "dim" } " instances holding their location and dimensions." }
-{ $notes
-"Other classes may inherit from " { $link gadget } " in order to re-implement generic words such as " { $link draw-gadget* } " and " { $link user-input* } ", or to define gestures with " { $link set-gestures } "." } ;
 
 HELP: clip
 { $var-description "The current clipping rectangle." } ;
 
 HELP: draw-gadget*
-{ $values { "gadget" gadget } } 
+{ $values { "gadget" gadget } }
 { $contract "Draws the gadget by making OpenGL calls. The top-left corner of the gadget should be drawn at the location stored in the " { $link origin } " variable." }
 { $notes "This word should not be called directly. To force a gadget to redraw, call " { $link relayout-1 } "." } ;
+
+HELP: gadget
+{ $class-description "An object which displays itself on the screen and acts on user input gestures. Gadgets have the following slots:"
+    { $list
+        { { $slot "pref-dim" } " - a cached value for " { $link pref-dim } "; do not read or write this slot directly." }
+        { { $slot "parent" } " - the gadget containing this one, or " { $link f } " if this gadget is not part of the visible gadget hierarchy." }
+        { { $slot "children" } " - a vector of child gadgets. Do not modify this vector directly, instead use " { $link add-gadget } ", " { $link add-gadgets } ", " { $link unparent } " or " { $link clear-gadget } "." }
+        { { $slot "graft-state" } { " - a pair of " { $link boolean } " values that represent the current graft state of the gadget and what its next state will become." } }
+        { { $slot "orientation" } " - an orientation specifier. This slot is used by layout gadgets." }
+        { { $slot "layout-state" } " - stores the layout state of the gadget. Do not read or write this slot directly, instead call " { $link relayout } " and " { $link relayout-1 } " if the gadget needs to be re-laid out." }
+        { { $slot "visible?" } " - a boolean indicating if the gadget should display and receive user input." }
+        { { $slot "root?" } " - if set to " { $link t } ", layout changes in this gadget will not propagate to the gadget's parent." }
+        { { $slot "clipped?" } " - a boolean indicating if clipping will be enabled when drawing this gadget's children." }
+        { { $slot "interior" } " - an implementation of the " { $link "ui-pen-protocol" } }
+        { { $slot "boundary" } " - an implementation of the " { $link "ui-pen-protocol" } }
+        { { $slot "model" } " - a " { $link model } " or " { $link f } "; see " { $link "ui-control-impl" } }
+    }
+"Gadgets subclass the " { $link rect } " class, and thus all instances have " { $slot "loc" } " and " { $slot "dim" } " instances holding their location and dimensions." }
+{ $notes
+"Other classes may inherit from " { $link gadget } " in order to re-implement generic words such as " { $link draw-gadget* } " and " { $link user-input* } ", or to define gestures with " { $link set-gestures } "." } ;
+
+HELP: gl-draw-init
+{ $values { "world" world } }
+{ $description "Does some OpenGL setup that is required each time the world is to be redrawn." } ;
 
 ARTICLE: "ui-paint" "Customizing gadget appearance"
 "The UI carries out the following steps when drawing a gadget:"
 { $list
-    { "The " { $link draw-interior } " generic word is called on the value of the " { $snippet "interior" } " slot." }
+    { "The " { $link draw-interior } " generic word is called on the value of the " { $slot "interior" } " slot." }
     { "The " { $link draw-gadget* } " generic word is called on the gadget." }
     { "The gadget's visible children are drawn, determined by calling " { $link visible-children } " on the gadget." }
-    { "The " { $link draw-boundary } " generic word is called on the value of the " { $snippet "boundary" } " slot." }
+    { "The " { $link draw-boundary } " generic word is called on the value of the " { $slot "boundary" } " slot." }
 }
 "Now, each one of these steps will be covered in detail."
 { $subsections

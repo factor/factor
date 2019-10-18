@@ -2,25 +2,26 @@
 
 namespace factor {
 
-context::context(cell datastack_size, cell retainstack_size,
-                 cell callstack_size)
-    : callstack_top(NULL),
-      callstack_bottom(NULL),
+context::context(cell ds_size, cell rs_size, cell cs_size)
+    : callstack_top(0),
+      callstack_bottom(0),
       datastack(0),
       retainstack(0),
       callstack_save(0),
-      datastack_seg(new segment(datastack_size, false)),
-      retainstack_seg(new segment(retainstack_size, false)),
-      callstack_seg(new segment(callstack_size, false)) {
+      datastack_seg(new segment(ds_size, false)),
+      retainstack_seg(new segment(rs_size, false)),
+      callstack_seg(new segment(cs_size, false)) {
   reset();
 }
 
 void context::reset_datastack() {
   datastack = datastack_seg->start - sizeof(cell);
+  fill_stack_seg(datastack, datastack_seg, 0x11111111);
 }
 
 void context::reset_retainstack() {
   retainstack = retainstack_seg->start - sizeof(cell);
+  fill_stack_seg(retainstack, retainstack_seg, 0x22222222);
 }
 
 void context::reset_callstack() {
@@ -30,6 +31,35 @@ void context::reset_callstack() {
 void context::reset_context_objects() {
   memset_cell(context_objects, false_object,
               context_object_count * sizeof(cell));
+}
+
+void context::fill_stack_seg(cell top_ptr, segment* seg, cell pattern) {
+#ifdef FACTOR_DEBUG
+  cell clear_start = top_ptr + sizeof(cell);
+  cell clear_size = seg->end - clear_start;
+  memset_cell((void*)clear_start, pattern, clear_size);
+#else
+  (void)top_ptr;
+  (void)seg;
+  (void)pattern;
+#endif
+}
+
+vm_error_type context::address_to_error(cell addr) {
+  if (datastack_seg->underflow_p(addr))
+    return ERROR_DATASTACK_UNDERFLOW;
+  if (datastack_seg->overflow_p(addr))
+    return ERROR_DATASTACK_OVERFLOW;
+  if (retainstack_seg->underflow_p(addr))
+    return ERROR_RETAINSTACK_UNDERFLOW;
+  if (retainstack_seg->overflow_p(addr))
+    return ERROR_RETAINSTACK_OVERFLOW;
+  // These are flipped because the callstack grows downwards.
+  if (callstack_seg->underflow_p(addr))
+    return ERROR_CALLSTACK_OVERFLOW;
+  if (callstack_seg->overflow_p(addr))
+    return ERROR_CALLSTACK_UNDERFLOW;
+  return ERROR_MEMORY;
 }
 
 void context::reset() {
@@ -55,27 +85,6 @@ context::~context() {
   delete callstack_seg;
 }
 
-/* called on startup */
-void factor_vm::init_contexts(cell datastack_size_, cell retainstack_size_,
-                              cell callstack_size_) {
-  datastack_size = datastack_size_;
-  retainstack_size = retainstack_size_;
-  callstack_size = callstack_size_;
-
-  ctx = NULL;
-  spare_ctx = new_context();
-}
-
-void factor_vm::delete_contexts() {
-  FACTOR_ASSERT(!ctx);
-  std::list<context*>::const_iterator iter = unused_contexts.begin();
-  std::list<context*>::const_iterator end = unused_contexts.end();
-  while (iter != end) {
-    delete *iter;
-    iter++;
-  }
-}
-
 context* factor_vm::new_context() {
   context* new_context;
 
@@ -93,21 +102,21 @@ context* factor_vm::new_context() {
   return new_context;
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::init_context(context* ctx) {
-  ctx->context_objects[OBJ_CONTEXT] = allot_alien(ctx);
+  ctx->context_objects[OBJ_CONTEXT] = allot_alien((cell)ctx);
 }
 
-/* Allocates memory */
-context* new_context(factor_vm* parent) {
+// Allocates memory (init_context(), but not parent->new_context()
+VM_C_API context* new_context(factor_vm* parent) {
   context* new_context = parent->new_context();
   parent->init_context(new_context);
   return new_context;
 }
 
-void factor_vm::delete_context(context* old_context) {
-  unused_contexts.push_back(old_context);
-  active_contexts.erase(old_context);
+void factor_vm::delete_context() {
+  unused_contexts.push_back(ctx);
+  active_contexts.erase(ctx);
 
   while (unused_contexts.size() > 10) {
     context* stale_context = unused_contexts.front();
@@ -116,17 +125,27 @@ void factor_vm::delete_context(context* old_context) {
   }
 }
 
-VM_C_API void delete_context(factor_vm* parent, context* old_context) {
-  parent->delete_context(old_context);
+VM_C_API void delete_context(factor_vm* parent) {
+  parent->delete_context();
 }
 
-/* Allocates memory */
-VM_C_API void reset_context(factor_vm* parent, context* ctx) {
+// Allocates memory (init_context())
+VM_C_API void reset_context(factor_vm* parent) {
+
+  // The function is used by (start-context-and-delete) which expects
+  // the top two datastack items to be preserved after the context has
+  // been resetted.
+
+  context* ctx = parent->ctx;
+  cell arg1 = ctx->pop();
+  cell arg2 = ctx->pop();
   ctx->reset();
+  ctx->push(arg2);
+  ctx->push(arg1);
   parent->init_context(ctx);
 }
 
-/* Allocates memory */
+// Allocates memory
 cell factor_vm::begin_callback(cell quot_) {
   data_root<object> quot(quot_, this);
 
@@ -139,13 +158,14 @@ cell factor_vm::begin_callback(cell quot_) {
   return quot.value();
 }
 
+// Allocates memory
 cell begin_callback(factor_vm* parent, cell quot) {
   return parent->begin_callback(quot);
 }
 
 void factor_vm::end_callback() {
   callback_ids.pop_back();
-  delete_context(ctx);
+  delete_context();
 }
 
 void end_callback(factor_vm* parent) { parent->end_callback(); }
@@ -171,77 +191,64 @@ void factor_vm::primitive_context_object_for() {
   ctx->replace(other_ctx->context_objects[n]);
 }
 
-/* Allocates memory */
-cell factor_vm::stack_to_array(cell bottom, cell top) {
+// Allocates memory
+cell factor_vm::stack_to_array(cell bottom, cell top, vm_error_type error) {
   fixnum depth = (fixnum)(top - bottom + sizeof(cell));
 
-  if (depth < 0)
-    return false_object;
-  else {
-    array* a = allot_uninitialized_array<array>(depth / sizeof(cell));
-    memcpy(a + 1, (void*)bottom, depth);
-    return tag<array>(a);
+  if (depth < 0) {
+    general_error(error, false_object, false_object);
   }
+  array* a = allot_uninitialized_array<array>(depth / sizeof(cell));
+  memcpy(a + 1, (void*)bottom, depth);
+  return tag<array>(a);
 }
 
+// Allocates memory
 cell factor_vm::datastack_to_array(context* ctx) {
-  cell array = stack_to_array(ctx->datastack_seg->start, ctx->datastack);
-  if (array == false_object) {
-    general_error(ERROR_DATASTACK_UNDERFLOW, false_object, false_object);
-    return false_object;
-  } else
-    return array;
+  return stack_to_array(ctx->datastack_seg->start,
+                        ctx->datastack,
+                        ERROR_DATASTACK_UNDERFLOW);
 }
 
-void factor_vm::primitive_datastack() { ctx->push(datastack_to_array(ctx)); }
-
+// Allocates memory
 void factor_vm::primitive_datastack_for() {
-  context* other_ctx = (context*)pinned_alien_offset(ctx->peek());
-  ctx->replace(datastack_to_array(other_ctx));
+  data_root<alien> alien_ctx(ctx->pop(), this);
+  context* other_ctx = (context*)pinned_alien_offset(alien_ctx.value());
+  cell array = datastack_to_array(other_ctx);
+  ctx->push(array);
 }
 
+// Allocates memory
 cell factor_vm::retainstack_to_array(context* ctx) {
-  cell array = stack_to_array(ctx->retainstack_seg->start, ctx->retainstack);
-  if (array == false_object) {
-    general_error(ERROR_RETAINSTACK_UNDERFLOW, false_object, false_object);
-    return false_object;
-  } else
-    return array;
+  return stack_to_array(ctx->retainstack_seg->start,
+                        ctx->retainstack,
+                        ERROR_RETAINSTACK_UNDERFLOW);
 }
 
-void factor_vm::primitive_retainstack() {
-  ctx->push(retainstack_to_array(ctx));
-}
-
+// Allocates memory
 void factor_vm::primitive_retainstack_for() {
   context* other_ctx = (context*)pinned_alien_offset(ctx->peek());
   ctx->replace(retainstack_to_array(other_ctx));
 }
 
-/* returns pointer to top of stack */
-cell factor_vm::array_to_stack(array* array, cell bottom) {
+// returns pointer to top of stack
+static cell array_to_stack(array* array, cell bottom) {
   cell depth = array_capacity(array) * sizeof(cell);
   memcpy((void*)bottom, array + 1, depth);
   return bottom + depth - sizeof(cell);
 }
 
-void factor_vm::set_datastack(context* ctx, array* array) {
-  ctx->datastack = array_to_stack(array, ctx->datastack_seg->start);
-}
-
 void factor_vm::primitive_set_datastack() {
-  set_datastack(ctx, untag_check<array>(ctx->pop()));
-}
-
-void factor_vm::set_retainstack(context* ctx, array* array) {
-  ctx->retainstack = array_to_stack(array, ctx->retainstack_seg->start);
+  array* arr = untag_check<array>(ctx->pop());
+  ctx->datastack = array_to_stack(arr, ctx->datastack_seg->start);
 }
 
 void factor_vm::primitive_set_retainstack() {
-  set_retainstack(ctx, untag_check<array>(ctx->pop()));
+  array* arr = untag_check<array>(ctx->pop());
+  ctx->retainstack = array_to_stack(arr, ctx->retainstack_seg->start);
 }
 
-/* Used to implement call( */
+// Used to implement call(
 void factor_vm::primitive_check_datastack() {
   fixnum out = to_fixnum(ctx->pop());
   fixnum in = to_fixnum(ctx->pop());
@@ -261,7 +268,7 @@ void factor_vm::primitive_check_datastack() {
         return;
       }
     }
-    ctx->push(true_object);
+    ctx->push(special_objects[OBJ_CANONICAL_TRUE]);
   }
 }
 

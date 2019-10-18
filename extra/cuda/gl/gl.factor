@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.destructors
 alien.enums continuations cuda cuda.contexts cuda.ffi
 cuda.gl.ffi destructors fry gpu.buffers kernel ;
@@ -10,7 +11,7 @@ IN: cuda.gl
     '[ _ _ cuGLCtxCreate cuda-error ] with-out-parameters ; inline
 
 : with-gl-cuda-context ( device flags quot -- )
-    [ set-up-cuda-context create-gl-cuda-context ] dip (with-cuda-context) ; inline 
+    [ set-up-cuda-context create-gl-cuda-context ] dip (with-cuda-context) ; inline
 
 : gl-buffer>resource ( gl-buffer flags -- resource )
     enum>number

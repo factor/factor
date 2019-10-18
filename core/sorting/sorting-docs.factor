@@ -44,7 +44,7 @@ HELP: sort-values
 { $description "Sorts the elements of " { $snippet "obj" } " (converting to an alist first if not a sequence), comparing second elements of pairs using the " { $link <=> } " word." } ;
 
 HELP: natural-sort
-{ $values { "seq" "a sequence of real numbers" } { "sortedseq" "a new sorted sequence" } }
+{ $values { "seq" sequence } { "sortedseq" "a new sorted sequence" } }
 { $description "Sorts a sequence of objects in natural order using the " { $link <=> } " word." } ;
 
 HELP: sort-pair

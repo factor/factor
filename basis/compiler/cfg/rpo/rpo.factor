@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors namespaces make math sequences sets
-assocs fry compiler.cfg compiler.cfg.instructions ;
-FROM: namespaces => set ;
+USING: accessors compiler.cfg fry kernel make namespaces
+sequences sets ;
 IN: compiler.cfg.rpo
 
 : post-order-traversal ( visited bb -- visited )
@@ -14,7 +13,7 @@ IN: compiler.cfg.rpo
     ] [ drop ] if ; inline recursive
 
 : number-blocks ( blocks -- )
-    dup length iota <reversed>
+    dup length <iota> <reversed>
     [ >>number drop ] 2each ;
 
 : post-order ( cfg -- blocks )
@@ -34,7 +33,7 @@ IN: compiler.cfg.rpo
 
 : optimize-basic-block ( bb quot -- )
     over kill-block?>> [ 2drop ] [
-        over basic-block set
+        over basic-block namespaces:set
         change-instructions drop
     ] if ; inline
 
@@ -43,11 +42,11 @@ IN: compiler.cfg.rpo
 
 : analyze-basic-block ( bb quot -- )
     over kill-block?>> [ 2drop ] [
-        [ dup basic-block set instructions>> ] dip call
+        [ dup basic-block namespaces:set instructions>> ] dip call
     ] if ; inline
 
 : simple-analysis ( ... cfg quot: ( ... insns -- ... ) -- ... )
     '[ _ analyze-basic-block ] each-basic-block ; inline
 
-: needs-post-order ( cfg -- cfg' )
-    dup post-order drop ;
+: needs-post-order ( cfg -- )
+    post-order drop ;

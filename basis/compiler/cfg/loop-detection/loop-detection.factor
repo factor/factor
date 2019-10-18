@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators deques dlists fry kernel
-namespaces sequences sets compiler.cfg compiler.cfg.predecessors ;
-FROM: namespaces => set ;
+USING: accessors assocs combinators.short-circuit compiler.cfg
+compiler.cfg.predecessors compiler.cfg.utilities deques dlists fry kernel
+namespaces sequences sets ;
 IN: compiler.cfg.loop-detection
 
 TUPLE: natural-loop header index ends blocks ;
@@ -39,18 +39,13 @@ DEFER: find-loop-headers
         2tri
     ] [ drop ] if ;
 
-SYMBOL: work-list
-
-: process-loop-block ( bb loop -- )
-    2dup blocks>> ?adjoin [
-        2dup header>> eq? [ 2drop ] [
-            drop predecessors>> work-list get push-all-front
-        ] if
-    ] [ 2drop ] if ;
+: process-loop-block ( bb loop -- bbs )
+    dupd { [ blocks>> ?adjoin ] [ header>> eq? not ] } 2&&
+    swap predecessors>> { } ? ;
 
 : process-loop-ends ( loop -- )
-    [ ends>> members <dlist> [ push-all-front ] [ work-list set ] [ ] tri ] keep
-    '[ _ process-loop-block ] slurp-deque ;
+    dup ends>> members <dlist> [ push-all-front ] keep
+    swap '[ _ process-loop-block ] slurp/replenish-deque ;
 
 : process-loop-headers ( -- )
     loops get values [ process-loop-ends ] each ;
@@ -60,15 +55,16 @@ SYMBOL: loop-nesting
 : compute-loop-nesting ( -- )
     loops get H{ } clone [
         [ values ] dip '[ blocks>> members [ _ inc-at ] each ] each
-    ] keep loop-nesting set ;
+    ] keep loop-nesting namespaces:set ;
 
 : detect-loops ( cfg -- cfg' )
-    needs-predecessors
-    H{ } clone loops set
-    HS{ } clone visited set
-    HS{ } clone active set
-    H{ } clone loop-nesting set
-    dup entry>> find-loop-headers process-loop-headers compute-loop-nesting ;
+    H{ } clone loops namespaces:set
+    HS{ } clone visited namespaces:set
+    HS{ } clone active namespaces:set
+    H{ } clone loop-nesting namespaces:set
+    [ needs-predecessors ]
+    [ entry>> find-loop-headers process-loop-headers compute-loop-nesting ]
+    [ ] tri ;
 
 PRIVATE>
 
@@ -76,6 +72,7 @@ PRIVATE>
 
 : current-loop-nesting ( -- n ) basic-block get loop-nesting-at ;
 
-: needs-loops ( cfg -- cfg' )
-    needs-predecessors
-    dup loops-valid?>> [ detect-loops t >>loops-valid? ] unless ;
+: needs-loops ( cfg -- )
+    dup needs-predecessors
+    dup loops-valid?>> [ detect-loops t >>loops-valid? ] unless
+    drop ;

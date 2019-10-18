@@ -12,7 +12,7 @@ TUPLE: coroutine resumecc exitcc originalcc ;
     coroutine new
     dup current-coro associate
     [
-        swapd , , \ with-variables , 
+        swapd , , \ with-variables ,
         "Coroutine has terminated illegally." , \ throw ,
     ] [ ] make
     [ >>resumecc ] [ >>originalcc ] bi ;
@@ -21,9 +21,9 @@ TUPLE: coroutine resumecc exitcc originalcc ;
     [
         >>exitcc
         resumecc>> call( -- )
-        #! At this point, the coroutine quotation must have terminated
-        #! normally (without calling coyield, coreset, or coterminate).
-        #! This shouldn't happen.
+        ! At this point, the coroutine quotation must have terminated
+        ! normally (without calling coyield, coreset, or coterminate).
+        ! This shouldn't happen.
         f over
     ] callcc1 2nip ;
 

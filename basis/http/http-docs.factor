@@ -4,7 +4,7 @@ IN: http
 
 HELP: <request>
 { $values { "request" request } }
-{ $description "Creates an empty request." } ;
+{ $description "Creates an empty request containing default headers." } ;
 
 HELP: request
 { $description "An HTTP request."
@@ -13,6 +13,7 @@ $nl
 { $table
     { { $slot "method" } { "The HTTP method as a " { $link string } ". The most frequently-used HTTP methods are " { $snippet "GET" } ", " { $snippet "HEAD" } " and " { $snippet "POST" } "." } }
     { { $slot "url" } { "The " { $link url } " being requested" } }
+    { { $slot "proxy-url" } { "The proxy " { $link url } " to use, or " { $link f } " for no proxy. If not " { $link f } ", the url will additionally be " { $link derive-url } "'d from the " { $link "http.proxy-variables" } ". The proxy is used if the result has at least the " { $slot "host" } " slot set." } }
     { { $slot "version" } { "The HTTP version. Default is " { $snippet "1.1" } " and should not be changed without good reason." } }
     { { $slot "header" } { "An assoc of HTTP header values. See " { $link "http.headers" } } }
     { { $slot "post-data" } { "See " { $link "http.post-data" } } }
@@ -22,7 +23,7 @@ $nl
 
 HELP: <response>
 { $values { "response" response } }
-{ $description "Creates an empty response." } ;
+{ $description "Creates an empty response containing default headers." } ;
 
 HELP: response
 { $class-description "An HTTP response."
@@ -122,6 +123,12 @@ HELP: set-basic-auth
 { $notes "This word always returns the same object that was input. This allows for a “pipeline” coding style, where several header parameters are set in a row." }
 { $side-effects "request" } ;
 
+HELP: set-proxy-basic-auth
+{ $values { "request" request } { "username" string } { "password" string } }
+{ $description "Sets the " { $snippet "Proxy-Authorization" } " header of " { $snippet "request" } " to perform HTTP Basic authentication with the given " { $snippet "username" } " and " { $snippet "password" } "." }
+{ $notes "This word always returns the same object that was input. This allows for a “pipeline” coding style, where several header parameters are set in a row." }
+{ $side-effects "request" } ;
+
 ARTICLE: "http.cookies" "HTTP cookies"
 "Every " { $link request } " and " { $link response } " instance can contain cookies."
 $nl
@@ -187,5 +194,61 @@ $nl
     "http.cookies"
 }
 { $see-also "urls" } ;
+
+ARTICLE: "http.proxy-variables" "HTTP(S) proxy variables"
+{ $heading "Proxy Variables" }
+"The http and https proxies can be configured per request, or with Factor's dynamic variables, or with the system's environment variables (searched from left to right) :"
+{ $table
+{ "variable" "Factor dynamic" "environment #1" "environment #2" }
+{ "HTTP" { $snippet "\"http.proxy\"" } "http_proxy" "HTTP_PROXY" }
+{ "HTTPS" { $snippet "\"https.proxy\"" } "https_proxy" "HTTPS_PROXY" }
+{ "no proxy" { $snippet "\"no_proxy\"" } "no_proxy" "NO_PROXY" }
+}
+"When making an http request, if the target host is not matched by the no_proxy list, the " { $vocab-link "http.client" } " will fill the missing components of the " { $slot "proxy-url" } " slot of the " { $link request } " from the value of these variables. If the filled result is not valid, an error is thrown."
+{ $notes "The dynamic variables are keyed by strings. This allows to use Factor's command line support to define them (see in the examples below)." }
+
+{ $heading "no_proxy" }
+"The no_proxy list must be a string containing of comma-separated list of IP addresses (eg " { $snippet "127.0.0.1" } "), hostnames (eg " { $snippet "bar.private" } ") or domain suffixes (eg " { $snippet ".private" } "). A match happens when a value of the list is the same or a suffix of the target for each full subdomain."
+{ $example
+    "USING: http.client http.client.private namespaces prettyprint ;"
+    "\"bar.private\" \"no_proxy\" ["
+         "\"bar.private\" <get-request> no-proxy? ."
+    "] with-variable"
+    "\"bar.private\" \"no_proxy\" ["
+         "\"baz.bar.private\" <get-request> no-proxy? ."
+    "] with-variable"
+    "\"bar.private\" \"no_proxy\" ["
+         "\"foobar.private\" <get-request> no-proxy? ."
+    "] with-variable"
+    "\".private\" \"no_proxy\" ["
+         "\"foobar.private\" <get-request> no-proxy? ."
+    "] with-variable"
+"t
+t
+f
+t"
+}
+
+{ $examples
+{
+{ $subheading "At factor startup:" }
+{ $list
+"$ ./factor -http.proxy=http://localhost:3128"
+"$ http_proxy=\"http://localhost:3128\" ./factor"
+"$ HTTP_PROXY=\"http://localhost:3128\" ./factor"
+}
+
+{ $subheading "Using variables:" }
+{ $example "USE: namespaces \"http://localhost:3128\" \"http.proxy\" set ! or set-global" "" }
+{ $example "USE: namespaces \"http://localhost:3128\" \"http.proxy\" [ ] with-variable" "" }
+
+{ $subheading "Manually making the request:" }
+{ $example "USING: http http.client urls ; URL\" http://localhost:3128\" <request> proxy-url<<" "" }
+
+{ $subheading "Full example:" }
+"$ no_proxy=\"localhost,127.0.0.1,.private\" http_proxy=\"http://proxy.private:3128\" https_proxy=\"http://proxysec.private:3128\" ./factor"
+}
+}
+;
 
 ABOUT: "http"

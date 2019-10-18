@@ -53,17 +53,17 @@ HELP: validate-params
 { $examples
     "A simple validator from " { $vocab-link "webapps.todo" } "; this word is invoked from the " { $slot "validate" } " quotation of action for editing a todo list item:"
     { $code
-        """: validate-todo ( -- )
+        ": validate-todo ( -- )
     {
-        { "summary" [ v-one-line ] }
-        { "priority" [ v-integer 0 v-min-value 10 v-max-value ] }
-        { "description" [ v-required ] }
-    } validate-params ;"""
+        { \"summary\" [ v-one-line ] }
+        { \"priority\" [ v-integer 0 v-min-value 10 v-max-value ] }
+        { \"description\" [ v-required ] }
+    } validate-params ;"
     }
 } ;
 
 { validate-params validate-values } related-words
-      
+
 HELP: validation-failed
 { $description "Stops processing the current request and takes action depending on the type of the current request:"
     { $list
@@ -107,7 +107,7 @@ ARTICLE: "furnace.actions.validation" "Form validation with actions"
 $nl
 "A word to validate parameters and make them available as HTML form values (see " { $link "html.forms.values" } "); typically this word is invoked from the " { $slot "init" } " and " { $slot "validate" } " quotations:"
 { $subsections validate-params }
-"The above word expects an association list mapping parameter names to validator quotations; validator quotations can use the words in the " 
+"The above word expects an association list mapping parameter names to validator quotations; validator quotations can use the words in the "
 "Custom validation logic can invoke a word when validation fails; " { $link validate-params } " invokes this word for you:"
 { $subsections validation-failed }
 "If validation fails, no more action code is executed, and the client is redirected back to the originating page, where validation errors can be displayed. Note that validation errors are rendered automatically by the " { $link "html.components" } " words, and in particular, " { $link "html.templates.chloe" } " use these words." ;
@@ -134,7 +134,7 @@ ARTICLE: "furnace.actions.lifecycle" "Furnace action lifecycle"
 "Any one of the above steps can perform validation; if " { $link validation-failed } " is called during a POST request, the client is sent back to the page containing the form submission, with current form values and validation errors passed in a " { $link "furnace.conversations" } "." ;
 
 ARTICLE: "furnace.actions.impl" "Furnace actions implementation"
-"The following parametrized constructor should be called from constructors for subclasses of " { $link action } ":"
+"The following parameterized constructor should be called from constructors for subclasses of " { $link action } ":"
 { $subsections new-action } ;
 
 ARTICLE: "furnace.actions" "Furnace actions"

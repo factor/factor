@@ -68,7 +68,7 @@ HELP: flags{
         "IN: scratchpad"
         "CONSTANT: x 0x1"
         "flags{ 0x20 x 0b100 } .h"
-        "25"
+        "0x25"
     }
 } ;
 

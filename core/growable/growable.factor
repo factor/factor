@@ -20,7 +20,7 @@ M: growable set-nth-unsafe underlying>> set-nth-unsafe ; inline
     [ set-nth-unsafe ] [ [ 1 fixnum+fast ] dip length<< ] 2bi ; inline
 
 : push-all-unsafe ( from to src dst -- )
-    [ over - swap ] 2dip [ pick ] dip [ length integer>fixnum ] keep
+    [ over - swap ] 2dip pickd [ length integer>fixnum ] keep
     [ [ fixnum+fast ] dip length<< ] 2keep <copy> (copy) drop ; inline
 
 PRIVATE>
@@ -46,14 +46,14 @@ M: growable set-length ( n seq -- )
     ] if
     length<< ;
 
-: new-size ( old -- new ) 1 + 3 * ; inline
+: new-size ( old -- new ) 1 + 2 * ; inline
 
 : ensure ( n seq -- n seq )
     bounds-check-head
     2dup length >= [
         2dup capacity >= [ over new-size over expand ] when
         [ integer>fixnum ] dip
-        over 1 fixnum+fast over length<<
+        over 1 fixnum+fast >>length
     ] [
         [ integer>fixnum ] dip
     ] if ; inline

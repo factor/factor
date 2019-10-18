@@ -110,7 +110,7 @@ TUPLE: dredge-fry-state
 : in-quot-slices ( n i state -- head tail )
     in-quot>>
     [ <slice> ]
-    [ [ drop ] 2dip swap 1 + tail-slice ] 3bi ; inline
+    [ nipd swap 1 + tail-slice ] 3bi ; inline
 
 : push-head-slice ( head state -- )
     quot>> [ push-all ] [ \ _ swap push ] bi ; inline
@@ -122,7 +122,7 @@ TUPLE: dredge-fry-state
     rot {
         [ nip in-quot-slices ] ! head tail i elt state
         [ [ 2drop swap ] dip push-head-slice ]
-        [ [ drop ] 2dip push-subquot ]
+        [ nipd push-subquot ]
         [ [ 1 + ] [ drop ] [ ] tri* dredge-fry ]
     } 3cleave ; inline recursive
 

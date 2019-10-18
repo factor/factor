@@ -17,7 +17,7 @@ HELP: object>bytes
 { $description "Serializes the object to a byte array." } ;
 
 HELP: bytes>object
-{ $values { "bytes" byte-array } { "obj" "deserialized object" } 
+{ $values { "bytes" byte-array } { "obj" "deserialized object" }
 }
 { $description "Deserializes an object from a byte array." } ;
 

@@ -58,7 +58,18 @@ HELP: split-when
 
 HELP: split-when-slice
 { $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ? ) } } { "pieces" "a new array" } }
-{ $description "Splits " { $snippet "seq" } " at each occurrence of an element for which " { $snippet "quot" } " gives a true output and outputs an array of pieces as slices. The pieces do not include the elements along which the sequence was split." } ;
+{ $description "Splits " { $snippet "seq" } " at each occurrence of an element for which " { $snippet "quot" } " gives a true output and outputs an array of pieces as " { $link slice } "s. The pieces do not include the elements along which the sequence was split." } ;
+
+HELP: split-indices
+{ $values { "seq" sequence } { "indices" sequence } { "pieces" "a new array" } }
+{ $description "Splits a sequence at the given indices." }
+{ $examples
+  { $example
+    "USING: prettyprint splitting ;"
+    "\"hello world\" { 3 6 } split-indices ."
+    "{ \"hel\" \"lo \" \"world\" }"
+  }
+} ;
 
 HELP: split
 { $values { "seq" sequence } { "separators" sequence } { "pieces" "a new array" } }
@@ -82,10 +93,10 @@ HELP: ?tail-slice
 { $description "Like " { $link ?tail } ", except the resulting sequence is a " { $link slice } "." } ;
 
 HELP: string-lines
-{ $values { "str" string } { "seq" "a sequence of strings" } }
+{ $values { "seq" sequence } { "seq'" { $sequence string } } }
 { $description "Splits a string along line breaks." }
 { $examples
-    { $example "USING: prettyprint splitting ;" "\"Hello\\r\\nworld\\n\" string-lines ." "{ \"Hello\" \"world\" \"\" }" }
+    { $example "USING: prettyprint splitting ;" "\"Hello\\r\\nworld\\n\" string-lines ." "{ \"Hello\" \"world\" }" }
 } ;
 
 HELP: replace

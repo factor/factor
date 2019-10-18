@@ -51,7 +51,7 @@ TUPLE: range ufirst ulast bfirst blast ;
     [let
         H{ } clone :> mapping V{ } clone :> ranges
         [
-            dup contained? [ 
+            dup contained? [
                 dup name>> main>> {
                     { "range" [ ranges add-range ] }
                     { "a" [ mapping add-mapping ] }

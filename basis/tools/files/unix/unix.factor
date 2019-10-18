@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel system unicode.case io.files
+USING: accessors combinators kernel system unicode io.files
 io.files.info io.files.info.unix generalizations
 strings arrays sequences math.parser unix.groups unix.users
 tools.files.private unix.stat math fry macros combinators.smart
@@ -42,7 +42,7 @@ IN: tools.files.unix
         { [ dup S_IFLNK = ] [ drop "@" ] }
         { [ dup S_IFWHT = ] [ drop "%" ] }
         { [ dup S_IFSOCK = ] [ drop "=" ] }
-        { [ t ] [ drop "" ] }
+        [ drop "" ]
     } cond ;
 
 M: unix (directory.) ( path -- lines )

@@ -1,60 +1,24 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.order strings arrays vectors sequences
-sequences.private accessors fry combinators ;
+USING: accessors combinators fry kernel math math.order
+sequences sequences.private ;
 IN: grouping
 
-ERROR: groups-error seq group-size ;
-<PRIVATE
+ERROR: groups-error seq n ;
 
-MIXIN: chunking
-INSTANCE: chunking sequence
+<PRIVATE
 
 GENERIC: group@ ( n groups -- from to seq )
 
-M: chunking set-nth group@ <slice> 0 swap copy ;
+TUPLE: chunking { seq read-only } { n read-only } ;
+
+INSTANCE: chunking sequence
+
+M: chunking nth-unsafe group@ <slice-unsafe> ; inline
+
+M: chunking set-nth-unsafe group@ <slice-unsafe> 0 swap copy ;
+
 M: chunking like drop { } like ; inline
-
-MIXIN: subseq-chunking
-INSTANCE: subseq-chunking chunking
-INSTANCE: subseq-chunking sequence
-
-M: subseq-chunking nth group@ subseq ; inline
-
-MIXIN: slice-chunking
-INSTANCE: slice-chunking chunking
-INSTANCE: slice-chunking sequence
-
-M: slice-chunking nth group@ <slice> ; inline
-M: slice-chunking nth-unsafe group@ <slice-unsafe> ; inline
-
-MIXIN: abstract-groups
-INSTANCE: abstract-groups sequence
-
-M: abstract-groups length
-    [ seq>> length ] [ n>> ] bi [ + 1 - ] keep /i ; inline
-
-M: abstract-groups set-length
-    [ n>> * ] [ seq>> ] bi set-length ; inline
-
-M: abstract-groups group@
-    [ n>> [ * dup ] keep + ] [ seq>> ] bi [ length min ] keep ; inline
-
-MIXIN: abstract-clumps
-INSTANCE: abstract-clumps sequence
-
-M: abstract-clumps length
-    dup seq>> length [ drop 0 ] [
-        swap [ 1 + ] [ n>> ] bi* [-]
-    ] if-zero ; inline
-
-M: abstract-clumps set-length
-    [ n>> + 1 - ] [ seq>> ] bi set-length ; inline
-
-M: abstract-clumps group@
-    [ n>> over + ] [ seq>> ] bi ; inline
-
-TUPLE: chunking-seq { seq read-only } { n read-only } ;
 
 : check-groups ( seq n -- seq n )
     dup 0 <= [ groups-error ] when ; inline
@@ -64,16 +28,32 @@ TUPLE: chunking-seq { seq read-only } { n read-only } ;
 
 PRIVATE>
 
-TUPLE: groups < chunking-seq ;
-INSTANCE: groups slice-chunking
-INSTANCE: groups abstract-groups
+TUPLE: groups < chunking ;
+
+M: groups length
+    [ seq>> length ] [ n>> ] bi [ + 1 - ] keep /i ; inline
+
+M: groups set-length
+    [ n>> * ] [ seq>> ] bi set-length ; inline
+
+M: groups group@
+    [ n>> [ * dup ] keep + ] [ seq>> ] bi [ length min ] keep ; inline
 
 : <groups> ( seq n -- groups )
     groups new-groups ; inline
 
-TUPLE: clumps < chunking-seq ;
-INSTANCE: clumps slice-chunking
-INSTANCE: clumps abstract-clumps
+TUPLE: clumps < chunking ;
+
+M: clumps length
+    dup seq>> length [ drop 0 ] [
+        swap [ 1 + ] [ n>> ] bi* [-]
+    ] if-zero ; inline
+
+M: clumps set-length
+    [ n>> + 1 - ] [ seq>> ] bi set-length ; inline
+
+M: clumps group@
+    [ n>> over + ] [ seq>> ] bi ; inline
 
 : <clumps> ( seq n -- clumps )
     clumps new-groups ; inline
@@ -81,7 +61,7 @@ INSTANCE: clumps abstract-clumps
 <PRIVATE
 
 : map-like ( seq n quot -- seq )
-    2keep drop '[ _ like ] map ; inline
+    keepd '[ _ like ] map ; inline
 
 PRIVATE>
 
@@ -94,7 +74,7 @@ PRIVATE>
         2 = [
             [ first2-unsafe ] dip call
         ] [
-            [ [ first-unsafe 1 ] [ ((each)) ] bi ] dip
+            [ [ first-unsafe 1 ] [ setup-each ] bi ] dip
             '[ @ _ keep swap ] (all-integers?) nip
         ] if
     ] if ; inline
@@ -103,7 +83,10 @@ PRIVATE>
 
 : all-eq? ( seq -- ? ) [ eq? ] monotonic? ;
 
-TUPLE: circular-slice { from read-only } { to read-only } { seq read-only } ;
+TUPLE: circular-slice
+    { from integer read-only }
+    { to integer read-only }
+    { seq read-only } ;
 
 INSTANCE: circular-slice virtual-sequence
 
@@ -120,7 +103,10 @@ M: circular-slice virtual@
 
 C: <circular-slice> circular-slice
 
-TUPLE: circular-clumps < chunking-seq ;
+TUPLE: circular-clumps
+    { seq read-only }
+    { n read-only } ;
+
 INSTANCE: circular-clumps sequence
 
 M: circular-clumps length

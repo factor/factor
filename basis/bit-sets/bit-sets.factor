@@ -60,7 +60,7 @@ M: bit-set subset?
     [ intersect ] keep = ;
 
 M: bit-set members
-    table>> [ length iota ] keep '[ _ nth-unsafe ] filter ;
+    table>> [ length <iota> ] keep '[ _ nth-unsafe ] filter ;
 
 <PRIVATE
 

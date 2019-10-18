@@ -1,6 +1,7 @@
-USING: accessors alien alien.c-types arrays classes.struct combinators
-io.backend kernel locals math sequences specialized-arrays
-tools.deploy.windows windows.kernel32 windows.types alien.data ;
+USING: accessors alien alien.data alien.c-types classes.struct
+combinators io.backend kernel locals
+math sequences specialized-arrays splitting
+windows.kernel32 windows.types ;
 IN: tools.deploy.windows.ico
 
 <PRIVATE
@@ -46,7 +47,7 @@ STRUCT: group-directory-entry
     ico-header heap-size bytes <displaced-alien>
     header ImageCount>> ico-directory-entry <c-direct-array> :> directory
 
-    directory dup length iota [ ico>group-directory-entry ] { } 2map-as
+    directory dup length <iota> [ ico>group-directory-entry ] { } 2map-as
         :> group-directory
     directory [ bytes ico-icon ] { } map-as :> icon-bytes
 
@@ -79,4 +80,3 @@ PRIVATE>
 
         hUpdate 0 EndUpdateResource drop
     ] when ;
-

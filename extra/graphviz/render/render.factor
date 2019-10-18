@@ -1,11 +1,11 @@
 ! Copyright (C) 2012 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators compiler.units continuations
-destructors graphviz.dot images.viewer io.backend
-io.directories io.encodings.8-bit.latin1 io.encodings.utf8
-io.files io.files.unique io.launcher io.standard-paths kernel
-locals make namespaces parser sequences summary system
-unicode.case vocabs words ;
+USING: calendar combinators compiler.units continuations
+graphviz.dot images.viewer io.backend io.directories
+io.encodings.latin1 io.encodings.utf8 io.files
+io.files.temp io.files.unique io.launcher io.standard-paths
+kernel locals make namespaces sequences summary system threads
+unicode vocabs webbrowser words ;
 IN: graphviz.render
 
 <PRIVATE
@@ -45,7 +45,7 @@ M: unsupported-encoding summary
 HOOK: default-graphviz-program os ( -- path/f )
 
 M: object default-graphviz-program ( -- path/f )
-    standard-layouts [ find-in-path ] find nip ;
+    standard-layouts [ find-in-standard-login-path ] map-find drop ;
 
 ERROR: cannot-find-graphviz-installation ;
 
@@ -115,14 +115,16 @@ PRIVATE>
         [ unsupported-preview-format ]
     } case ;
 
-:: with-preview ( graph quot: ( path -- ) -- )
-    "preview" ".dot" [| code-file |
-        "preview" preview-extension [| image-file |
-            graph code-file ?encoding write-dot
-            code-file image-file try-preview-command
-            image-file quot call( path -- )
+:: with-preview ( ..a graph quot: ( ..a path -- ..b ) -- ..b )
+    [
+        "preview" ".dot" [| code-file |
+            "preview" preview-extension [| image-file |
+                graph code-file ?encoding write-dot
+                code-file image-file try-preview-command
+                image-file quot call
+            ] cleanup-unique-file
         ] cleanup-unique-file
-    ] cleanup-unique-file ;
+    ] with-temp-directory ; inline
 
 PRIVATE>
 
@@ -131,6 +133,9 @@ PRIVATE>
 
 : preview-window ( graph -- )
     [ image-window ] with-preview ;
+
+: preview-open ( graph -- )
+    [ open-item 1 seconds sleep ] with-preview ;
 
 <PRIVATE
 
@@ -176,7 +181,7 @@ CONSTANT: standard-formats {
 }
 
 : define-graphviz-by-layout ( layout -- )
-    [ "graphviz.render" create ]
+    [ "graphviz.render" create-word ]
     [ [ graphviz ] curry ] bi
     ( graph path format -- )
     define-declared ;
@@ -184,7 +189,7 @@ CONSTANT: standard-formats {
 : define-graphviz-by-format ( format -- )
     [
         dup standard-layouts member? [ "-file" append ] when
-        "graphviz.render" create
+        "graphviz.render" create-word
     ]
     [ [ graphviz* ] curry ] bi
     ( graph path -- )

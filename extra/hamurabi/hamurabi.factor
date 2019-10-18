@@ -248,4 +248,3 @@ PRIVATE>
     ] [ 2drop ] recover ;
 
 MAIN: hamurabi
-

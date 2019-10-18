@@ -7,8 +7,8 @@ IN: init
 SYMBOL: startup-hooks
 SYMBOL: shutdown-hooks
 
-startup-hooks global [ drop V{ } clone ] cache drop
-shutdown-hooks global [ drop V{ } clone ] cache drop
+startup-hooks [ V{ } clone ] initialize
+shutdown-hooks [ V{ } clone ] initialize
 
 : do-hooks ( symbol -- )
     get [ nip call( -- ) ] assoc-each ;

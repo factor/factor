@@ -10,7 +10,7 @@ IN: rosetta-code.n-queens
 
 :: safe?  ( board q -- ? )
     [let q board nth :> x
-      q iota [
+      q <iota> [
          x swap
          [ board nth ] keep
          q swap -
@@ -20,10 +20,10 @@ IN: rosetta-code.n-queens
     ] ;
 
 : solution? ( board -- ? )
-    dup length iota [ dupd safe? ] all? nip ;
+    dup length <iota> [ dupd safe? ] all? nip ;
 
 : queens ( n -- l )
-    iota all-permutations [ solution? ] filter ;
+    <iota> all-permutations [ solution? ] filter ;
 
 : queens. ( n -- )
     queens [ [ 1 + "%d " printf ] each nl ] each ;

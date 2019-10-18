@@ -1,9 +1,8 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays hashtables kernel math namespaces
-make sequences quotations math.vectors combinators sorting
-binary-search vectors dlists deques models threads
-concurrency.flags math.order math.rectangles fry locals ;
+USING: accessors arrays binary-search combinators concurrency.flags
+deques fry kernel locals make math math.order math.rectangles
+math.vectors models namespaces sequences threads vectors ;
 IN: ui.gadgets
 
 ! Values for orientation slot
@@ -11,20 +10,20 @@ CONSTANT: horizontal { 1 0 }
 CONSTANT: vertical { 0 1 }
 
 TUPLE: gadget < rect
-pref-dim
-parent
-children
-{ orientation initial: { 0 1 } }
-focus
-{ visible? initial: t }
-root?
-clipped?
-layout-state
-{ graft-state initial: { f f } }
-graft-node
-interior
-boundary
-model ;
+    pref-dim
+    parent
+    children
+    { orientation initial: { 0 1 } }
+    focus
+    { visible? initial: t }
+    root?
+    clipped?
+    layout-state
+    { graft-state initial: { f f } }
+    graft-node
+    interior
+    boundary
+    model ;
 
 M: gadget equal? 2drop f ;
 
@@ -137,13 +136,16 @@ SYMBOL: ui-notify-flag
 
 : forget-pref-dim ( gadget -- ) f >>pref-dim drop ;
 
-: layout-queue ( -- queue ) \ layout-queue get ;
+: layout-queue ( -- queue )
+    \ layout-queue get ;
+
+CONSTANT: layout-queue-limit 8000
 
 : layout-later ( gadget -- )
-    #! When unit testing gadgets without the UI running, the
-    #! invalid queue is not initialized and we simply ignore
-    #! invalidation requests.
-    layout-queue [ push-front notify-ui-thread ] [ drop ] if* ;
+    layout-queue [
+        [ push notify-ui-thread ]
+        [ length layout-queue-limit > [ yield ] when ] bi
+    ] [ drop ] if* ;
 
 : invalidate* ( gadget -- )
     \ invalidate* >>layout-state

@@ -1,6 +1,6 @@
+USING: accessors compiler.units definitions eval kernel
+tools.test vocabs vocabs.parser words ;
 IN: vocabs.parser.tests
-USING: vocabs.parser tools.test eval kernel accessors definitions
-compiler.units words vocabs ;
 
 [ "FROM: kernel => doesnotexist ;" eval( -- ) ]
 [ error>> T{ no-word-in-vocab { word "doesnotexist" } { vocab "kernel" } } = ]
@@ -20,7 +20,7 @@ must-fail-with
     [ aaa ] [ "uutt" search ] unit-test
     [ aaa ] [ "vocabs.parser.tests:aaa" search ] unit-test
 
-    [ ] [ [ "bbb" "vocabs.parser.tests" create drop ] with-compilation-unit ] unit-test
+    [ ] [ [ "bbb" "vocabs.parser.tests" create-word drop ] with-compilation-unit ] unit-test
 
     [ "bbb" ] [ "vocabs.parser.tests:bbb" search name>> ] unit-test
 
@@ -34,18 +34,18 @@ must-fail-with
 
     [ ] [ "vocabs.parser.tests.foo" set-current-vocab ] unit-test
 
-    [ ] [ [ "bbb" current-vocab create drop ] with-compilation-unit ] unit-test
-    
+    [ ] [ [ "bbb" current-vocab create-word drop ] with-compilation-unit ] unit-test
+
     [ t ] [ "bbb" search >boolean ] unit-test
 
     [ ] [ [ "vocabs.parser.tests.foo" forget-vocab ] with-compilation-unit ] unit-test
-    
-    [ [ "bbb" current-vocab create drop ] with-compilation-unit ] [ error>> no-current-vocab-error? ] must-fail-with
+
+    [ [ "bbb" current-vocab create-word drop ] with-compilation-unit ] [ error>> no-current-vocab-error? ] must-fail-with
 
     [ begin-private ] [ error>> no-current-vocab-error? ] must-fail-with
 
     [ end-private ] [ error>> no-current-vocab-error? ] must-fail-with
 
     [ f ] [ "bbb" search >boolean ] unit-test
-    
+
 ] with-manifest

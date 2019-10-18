@@ -4,10 +4,8 @@
 USING: arrays kernel math math.extras math.ranges sequences
 tools.test ;
 
-IN: math.extras.test
-
 { { 1 -1/2 1/6 0 -1/30 0 1/42 0 -1/30 0 } }
-[ 10 iota [ bernoulli ] map ] unit-test
+[ 10 <iota> [ bernoulli ] map ] unit-test
 
 { -1 } [ -1 7 jacobi ] unit-test
 { 0 } [ 3 3 jacobi ] unit-test
@@ -89,28 +87,14 @@ IN: math.extras.test
 { { 1 8+4/5 16+3/5 24+2/5 32+1/5 } } [ 1 40 5 linspace[a,b) >array ] unit-test
 { { 1 10+3/4 20+1/2 30+1/4 40 } } [ 1 40 5 linspace[a,b] >array ] unit-test
 
-[ f ] [ { } majority ] unit-test
-[ 1 ] [ { 1 } majority ] unit-test
-[ f ] [ { 1 2 } majority ] unit-test
-[ 1 ] [ { 1 1 2 } majority ] unit-test
-[ f ] [ { 1 1 2 2 } majority ] unit-test
-[ 2 ] [ { 1 1 2 2 2 } majority ] unit-test
-[ 3 ] [ { 1 2 3 1 2 3 1 2 3 3 } majority ] unit-test
+{ f } [ { } majority ] unit-test
+{ 1 } [ { 1 } majority ] unit-test
+{ f } [ { 1 2 } majority ] unit-test
+{ 1 } [ { 1 1 2 } majority ] unit-test
+{ f } [ { 1 1 2 2 } majority ] unit-test
+{ 2 } [ { 1 1 2 2 2 } majority ] unit-test
+{ 3 } [ { 1 2 3 1 2 3 1 2 3 3 } majority ] unit-test
 { CHAR: C } [ "AAACCBBCCCBCC" majority ] unit-test
-
-[ -5 ] [ -4-3/5 round-to-even ] unit-test
-[ -4 ] [ -4-1/2 round-to-even ] unit-test
-[ -4 ] [ -4-2/5 round-to-even ] unit-test
-[ 5 ] [ 4+3/5 round-to-even ] unit-test
-[ 4 ] [ 4+1/2 round-to-even ] unit-test
-[ 4 ] [ 4+2/5 round-to-even ] unit-test
-
-[ -5.0 ] [ -4.6 round-to-even ] unit-test
-[ -4.0 ] [ -4.5 round-to-even ] unit-test
-[ -4.0 ] [ -4.4 round-to-even ] unit-test
-[ 5.0 ] [ 4.6 round-to-even ] unit-test
-[ 4.0 ] [ 4.5 round-to-even ] unit-test
-[ 4.0 ] [ 4.4 round-to-even ] unit-test
 
 { 0.0 } [ 0 2 round-to-decimal ] unit-test
 { 1.0 } [ 1 2 round-to-decimal ] unit-test
@@ -143,8 +127,21 @@ IN: math.extras.test
 { { 0 1 2 3 0 0 1 } } [ { 1 2 3 3 2 1 2 } [ <= ] monotonic-count ] unit-test
 { 4 } [ { 1 2 3 1 2 3 4 5 } [ < ] max-monotonic-count ] unit-test
 
-{ 2470 } [ 20 iota sum-squares ] unit-test
-{ 2470 } [ 20 iota >array sum-squares ] unit-test
+{ 2470 } [ 20 <iota> sum-squares ] unit-test
+{ 2470 } [ 20 <iota> >array sum-squares ] unit-test
 
-{ 36100 } [ 20 iota sum-cubes ] unit-test
-{ 36100 } [ 20 iota >array sum-cubes ] unit-test
+{ 36100 } [ 20 <iota> sum-cubes ] unit-test
+{ 36100 } [ 20 <iota> >array sum-cubes ] unit-test
+
+{
+    {
+        1 -1 -1 0 -1 1 -1 0 0 1 -1 0 -1 1 1
+        0 -1 0 -1 0 1 1 -1 0 0 1 0 0 -1 -1
+    }
+} [
+    30 [1,b] [ mobius ] map
+] unit-test
+
+{ 1/5 } [ 3/5 1 kelly ] unit-test
+{ 0 } [ 1/2 1 kelly ] unit-test
+{ -1/5 } [ 2/5 1 kelly ] unit-test

@@ -85,15 +85,23 @@ HELP: send-email
 ARTICLE: "smtp-gmail" "Setting up SMTP with gmail"
 "If you plan to send all email from the same address, then setting the config variable in the global namespace is the best option. The code example below does this approach and is meant to go in your " { $link ".factor-boot-rc" } "." $nl
 "First, we set the login and password to a " { $link <plain-auth> } " tuple with our login. Next, we set the gmail server address with an " { $link <inet> } " object. Finally, we tell the SMTP library to use a secure connection."
-{ $notes "Gmail requires the use of application-specific passwords when accessed from anywhere but their website. Visit " { $url "https://support.google.com/accounts/answer/185833?hl=en" } " to create a password for use with Factor." }
+{ $notes
+    "Observed on 2016-03-02: Gmail has restrictions for what they consider \"less secure apps\" (these include the factor smtp client)."
+    { $list
+        { "If the account does not use 2-step verification, Gmail requires explicitly allowing access to less secure apps. Visit " { $url "https://www.google.com/settings/security/lesssecureapps" } " to turn it on. More info: " { $url "https://support.google.com/accounts/answer/6010255?hl=en" } "." }
+        { "If the account does use 2-step verification, Gmail requires the use of application-specific passwords. Visit " { $url "https://security.google.com/settings/security/apppasswords" } " to create a password for use with Factor. More info: " { $url "https://support.google.com/accounts/answer/185833?hl=en" } "." }
+    }
+}
+{ $examples
 { $code
     "USING: smtp namespaces io.sockets ;"
     ""
-    """default-smtp-config
-    "smtp.gmail.com" 587 <inet> >>server
+    "default-smtp-config
+    \"smtp.gmail.com\" 587 <inet> >>server
     t >>tls?
-    "my.gmail.address@gmail.com" "qwertyuiasdfghjk" <plain-auth> >>auth
-    \\ smtp-config set-global"""
+    \"my.gmail.address@gmail.com\" \"qwertyuiasdfghjk\" <plain-auth> >>auth
+    \\ smtp-config set-global"
+}
 } ;
 
 

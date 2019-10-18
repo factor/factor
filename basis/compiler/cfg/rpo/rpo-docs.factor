@@ -23,3 +23,11 @@ HELP: each-basic-block
 HELP: optimize-basic-block
 { $values { "bb" basic-block } { "quot" quotation } }
 { $description "Performs one " { $link simple-optimization } " step. The quotation takes the instructions of the basic block and returns them back in an optimized form." } ;
+
+HELP: simple-analysis
+{ $values { "cfg" cfg } { "quot" quotation } }
+{ $description "Applies a quotation to each sequence of instructions in each " { $link basic-block } " in the cfg." } ;
+
+HELP: simple-optimization
+{ $values { "cfg" cfg } { "quot" quotation } }
+{ $description "Runs a quotation that optimizes each " { $link basic-block } " in the cfg, excluding the kill blocks. The quotation takes the blocks instruction sequence and returns them back in optimized form. The blocks are iterated in " { $link reverse-post-order } "." } ;

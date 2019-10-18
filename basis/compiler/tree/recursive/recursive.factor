@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs arrays namespaces accessors sequences deques fry
-search-deques dlists combinators.short-circuit make sets compiler.tree ;
-FROM: namespaces => set ;
+USING: accessors combinators.short-circuit compiler.tree fry
+kernel namespaces sequences sets ;
 IN: compiler.tree.recursive
 
 TUPLE: call-site tail? node label ;
@@ -36,8 +35,8 @@ GENERIC: node-call-graph ( tail? node -- )
 
 : build-call-graph ( nodes -- labels calls )
     [
-        V{ } clone children set
-        V{ } clone calls set
+        V{ } clone children namespaces:set
+        V{ } clone calls namespaces:set
         [ t ] dip (build-call-graph)
         children get
         calls get
@@ -73,7 +72,7 @@ SYMBOLS: not-loops recursive-nesting ;
 : not-a-loop? ( label -- ? ) not-loops get in? ;
 
 : non-tail-calls ( call-graph-node -- seq )
-    calls>> [ tail?>> not ] filter ;
+    calls>> [ tail?>> ] reject ;
 
 : visit-back-edges ( call-graph -- )
     [
@@ -108,12 +107,12 @@ SYMBOL: changed?
 
 : while-changing ( ... quot: ( ... -- ... ) -- ... )
     changed? off
-    [ call ] [ changed? get [ while-changing ] [ drop ] if ] bi ;
-    inline recursive
+    [ call ]
+    [ changed? get [ while-changing ] [ drop ] if ] bi ; inline recursive
 
 : detect-loops ( call-graph -- )
-    HS{ } clone not-loops set
-    V{ } clone recursive-nesting set
+    HS{ } clone not-loops namespaces:set
+    V{ } clone recursive-nesting namespaces:set
     [ visit-back-edges ]
     [ '[ _ detect-cross-frame-calls ] while-changing ]
     bi ;
@@ -131,7 +130,7 @@ SYMBOL: call-graph
 
 : analyze-recursive ( nodes -- nodes )
     dup build-call-graph drop
-    [ call-graph set ]
+    [ call-graph namespaces:set ]
     [ detect-loops ]
     [ mark-loops ]
     tri ;

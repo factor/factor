@@ -43,7 +43,7 @@ GENERIC: (blas-direct-array) ( blas-vector -- direct-array )
                         copy-data copy-length copy-inc )
     v [ length>> ] [ data-and-inc ] bi
     v length>> element-size * <byte-array>
-    1 
+    1
     over v length>> 1 ;
 
 : (prepare-swap)
@@ -129,7 +129,7 @@ M: blas-vector-base virtual@
 
 <<
 
-FUNCTOR: (define-blas-vector) ( TYPE T -- )
+<FUNCTOR: (define-blas-vector) ( TYPE T -- )
 
 <DIRECT-ARRAY> IS <direct-${TYPE}-array>
 XCOPY          IS ${T}COPY
@@ -184,10 +184,10 @@ SYNTAX: XVECTOR{ \ } [ >VECTOR ] parse-literal ;
 M: VECTOR pprint-delims
     drop \ XVECTOR{ \ } ;
 
-;FUNCTOR
+;FUNCTOR>
 
 
-FUNCTOR: (define-real-blas-vector) ( TYPE T -- )
+<FUNCTOR: (define-real-blas-vector) ( TYPE T -- )
 
 VECTOR         IS ${TYPE}-blas-vector
 XDOT           IS ${T}DOT
@@ -205,10 +205,10 @@ M: VECTOR Vnorm
 M: VECTOR Vasum
     (prepare-nrm2) XASUM ;
 
-;FUNCTOR
+;FUNCTOR>
 
 
-FUNCTOR: (define-complex-blas-vector) ( TYPE C S -- )
+<FUNCTOR: (define-complex-blas-vector) ( TYPE C S -- )
 
 VECTOR         IS ${TYPE}-blas-vector
 XDOTU          IS ${C}DOTU
@@ -227,7 +227,7 @@ M: VECTOR Vnorm
 M: VECTOR Vasum
     (prepare-nrm2) XXASUM ;
 
-;FUNCTOR
+;FUNCTOR>
 
 
 : define-real-blas-vector ( TYPE T -- )

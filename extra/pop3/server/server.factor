@@ -18,7 +18,7 @@ IN: pop3.server
 ! +OK Password required
 ! PASS password
 ! +OK Logged in
-! STAT  
+! STAT
 ! +OK 2 1753
 ! LIST
 ! +OK 2 messages:
@@ -42,7 +42,7 @@ IN: pop3.server
 ! To: username@host.com
 ! Subject: First test with mock POP3 server
 ! Content-Type: text/plain; charset=UTF-8
-! 
+!
 ! .
 ! DELE 1
 ! +OK Marked for deletion
@@ -55,7 +55,7 @@ IN: pop3.server
         {
             [ dup "USER" head? ]
             [
-                 
+
                 "+OK Password required\r\n"
                 write flush t
             ]
@@ -80,7 +80,7 @@ IN: pop3.server
                 "+OK 2 1753\r\n"
                 write flush t
             ]
-        }       
+        }
         {
             [ dup "LIST" = ]
             [
@@ -120,7 +120,7 @@ IN: pop3.server
                     {
                         [ dup "TOP 1 0" = ]
                         [
-"""+OK
+"+OK
 Return-Path: <from.first@mail.com>
 Delivered-To: username@host.com
 Received: from User.local ([66.249.71.201])
@@ -136,14 +136,14 @@ Subject: First test with mock POP3 server
 Content-Type: text/plain; charset=UTF-8
 
 .
-"""
+"
                             write flush t
                         ]
                     }
                     {
                         [ dup "TOP 2 0" = ]
                         [
-"""+OK
+"+OK
 Return-Path: <from.second@mail.com>
 Delivered-To: username@host.com
 Received: from User.local ([66.249.71.201])
@@ -159,7 +159,7 @@ Subject: Second test with mock POP3 server
 Content-Type: text/plain; charset=UTF-8
 
 .
-"""
+"
                             write flush t
                         ]
                     }
@@ -173,7 +173,7 @@ Content-Type: text/plain; charset=UTF-8
                     {
                         [ dup "RETR 1" = ]
                         [
-"""+OK
+"+OK
 Return-Path: <from.first@mail.com>
 Delivered-To: username@host.com
 Received: from User.local ([66.249.71.201])
@@ -190,14 +190,14 @@ Content-Type: text/plain; charset=UTF-8
 
 This is the body of the first test. 
 .
-"""
+"
                             write flush t
                         ]
                     }
                     {
                         [ dup "RETR 2" = ]
                         [
-"""+OK
+"+OK
 Return-Path: <from.second@mail.com>
 Delivered-To: username@host.com
 Received: from User.local ([66.249.71.201])
@@ -214,7 +214,7 @@ Content-Type: text/plain; charset=UTF-8
 
 This is the body of the second test. 
 .
-"""
+"
                             write flush t
                         ]
                     }
@@ -245,7 +245,7 @@ This is the body of the second test.
     } cond nip [ process ] when ;
 
 :: mock-pop3-server ( promise -- )
-    #! Store the port we are running on in the promise.
+    ! Store the port we are running on in the promise.
     [
         [
             "127.0.0.1" 0 <inet4> utf8 <server> [

@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes classes.mixin classes.parser
 classes.singleton classes.tuple classes.tuple.parser
 classes.union combinators inverse kernel lexer macros make
@@ -8,12 +9,13 @@ IN: variants
 PREDICATE: variant-class < mixin-class "variant?" word-prop ;
 
 M: variant-class initial-value*
-    dup members [ drop f f ]
-    [ nip first dup word? [ t ] [ initial-value* ] if ] if-empty ;
+    class-members [ f f ] [
+        first dup word? [ t ] [ initial-value* ] if
+    ] if-empty ;
 
 : define-tuple-class-and-boa-word ( class superclass slots -- )
     pick [ define-tuple-class ] dip
-    dup name>> "<" ">" surround create-in swap define-boa-word ;
+    dup name>> "<" ">" surround create-word-in swap define-boa-word ;
 
 : define-variant-member ( member -- class )
     dup array? [ first3 pick [ define-tuple-class-and-boa-word ] dip ] [ dup define-singleton-class ] if ;
@@ -49,12 +51,12 @@ SYNTAX: VARIANT:
 SYNTAX: VARIANT-MEMBER:
     scan-word
     scan-token parse-variant-member
-    define-variant-class-member ;
+    define-variant-class-member ";" expect ;
 
-MACRO: unboa ( class -- )
+MACRO: unboa ( class -- quot )
     <wrapper> \ boa [ ] 2sequence [undo] ;
 
-GENERIC# (match-branch) 1 ( class quot -- class quot' )
+GENERIC#: (match-branch) 1 ( class quot -- class quot' )
 
 M: singleton-class (match-branch)
     \ drop prefix ;
@@ -64,7 +66,6 @@ M: object (match-branch)
 : ?class ( object -- class )
     dup word? [ class-of ] unless ;
 
-MACRO: match ( branches -- )
+MACRO: match ( branches -- quot )
     [ dup callable? [ first2 (match-branch) 2array ] unless ] map
     [ \ dup \ ?class ] dip \ case [ ] 4sequence ;
-

@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors fry http.client io io.encodings.utf8 io.files
-kernel mason.common mason.config mason.email mason.twitter
-namespaces prettyprint sequences debugger continuations make ;
+USING: accessors continuations debugger fry http.client io
+io.encodings.utf8 io.files kernel make mason.common mason.config
+mason.email mason.twitter namespaces sequences ;
 IN: mason.notify
 
 : status-notify? ( -- ? )

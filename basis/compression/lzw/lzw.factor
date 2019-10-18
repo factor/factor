@@ -20,7 +20,7 @@ TUPLE: tiff-lzw < lzw ;
 TUPLE: gif-lzw < lzw ;
 
 : initial-uncompress-table ( size -- seq )
-    iota [ 1vector ] V{ } map-as ;
+    <iota> [ 1vector ] V{ } map-as ;
 
 : reset-lzw-uncompress ( lzw -- lzw )
     dup end-of-information-code>> 1 + initial-uncompress-table >>table
@@ -37,8 +37,6 @@ ERROR: code-size-zero ;
         swap >>input
         BV{ } clone >>output
         reset-lzw-uncompress ;
-
-ERROR: not-in-table value ;
 
 : lookup-old-code ( lzw -- vector )
     [ old-code>> ] [ table>> ] bi nth ;

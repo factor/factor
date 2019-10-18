@@ -6,54 +6,54 @@ HELP: <n-based-assoc>
 { $values { "seq" sequence } { "base" integer } { "n-based-assoc" n-based-assoc } }
 { $description "Wraps " { $snippet "seq" } " in an " { $link n-based-assoc } " wrapper." }
 { $examples
-{ $example """
+{ $example "
 USING: assocs prettyprint kernel sequences.n-based ;
 IN: scratchpad
 
 : months ( -- assoc )
     {
-        "January"
-        "February"
-        "March"
-        "April"
-        "May"
-        "June"
-        "July"
-        "August"
-        "September"
-        "October"
-        "November"
-        "December"
+        \"January\"
+        \"February\"
+        \"March\"
+        \"April\"
+        \"May\"
+        \"June\"
+        \"July\"
+        \"August\"
+        \"September\"
+        \"October\"
+        \"November\"
+        \"December\"
     } 1 <n-based-assoc> ;
 
 10 months at .
-""" "\"October\"" } } ;
+" "\"October\"" } } ;
 
 HELP: n-based-assoc
 { $class-description "An adaptor class that allows a sequence to be treated as an assoc with non-zero-based keys." }
 { $examples
-{ $example """
+{ $example "
 USING: assocs prettyprint kernel sequences.n-based ;
 IN: scratchpad
 
 : months ( -- assoc )
     {
-        "January"
-        "February"
-        "March"
-        "April"
-        "May"
-        "June"
-        "July"
-        "August"
-        "September"
-        "October"
-        "November"
-        "December"
+        \"January\"
+        \"February\"
+        \"March\"
+        \"April\"
+        \"May\"
+        \"June\"
+        \"July\"
+        \"August\"
+        \"September\"
+        \"October\"
+        \"November\"
+        \"December\"
     } 1 <n-based-assoc> ;
 
 10 months at .
-""" "\"October\"" } } ;
+" "\"October\"" } } ;
 
 { n-based-assoc <n-based-assoc> } related-words
 

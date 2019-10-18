@@ -6,15 +6,15 @@ USE: kernel-internals
 "browser-dom" set-in
 
 : elements ( string -- result )
-  #! Call JQuery's $ function
-  window { "result" } "" "$" { "string" } alien-invoke ;
-  
-: html ( string -- element ) 
-  #! Set the innerHTML of element using jQuery
-  { } "" "html" { "string" } alien-invoke ;
+  ! Call JQuery's $ function
+  window { "result" } "" "$" { "string" } f alien-invoke ;
+
+: html ( string -- element )
+  ! Set the innerHTML of element using jQuery
+  { } "" "html" { "string" } f alien-invoke ;
 
 : bind-event ( name element quot -- )
-  >function swap { } "" "with-variables" { "string" "function" } alien-invoke ;
+  >function swap { } "" "with-variables" { "string" "function" } f alien-invoke ;
 
 "scratchpad" set-in
 
@@ -31,9 +31,9 @@ USE: kernel-internals
       "Waiting for click on button" alert
       continue
     ] callcc0
-    drop "Click done!" alert 
+    drop "Click done!" alert
   ] callcc0 ;
-  
+
 : alert ( string -- )
-  #! Display the string in an alert box
-  window { } "" "alert" { "string" } alien-invoke ;
+  ! Display the string in an alert box
+  window { } "" "alert" { "string" } f alien-invoke ;

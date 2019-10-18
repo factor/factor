@@ -1,13 +1,19 @@
-! (c)2010 Joe Groff bsd license
-USING: help.markup help.syntax kernel ;
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
+USING: help.markup help.syntax strings ;
 IN: vocabs.metadata.resources
 
-HELP: expand-vocab-resource-files
+HELP: copy-vocab-resources
+{ $values { "dir" string } { "vocab" string } }
+{ $description "Copies all the vocabs resource files to the given directory." } ;
+
+HELP: match-patterns
 { $values
-    { "vocab" "a vocabulary specifier" } { "resource-glob-strings" "a sequence of glob patterns" }
-    { "filenames" "a sequence of filenames" }
+  { "patterns" "a sequence of glob patterns" }
+  { "filenames" "a sequence of filenames" }
+  { "filenames'" "a filtered sequence of filenames" }
 }
-{ $description "Matches all the glob patterns in " { $snippet "resource-glob-strings" } " to the set of files inside " { $snippet "vocab" } "'s directory and outputs a sequence containing the individual files and directories that match. Any matching directories will also have their contents recursively included in the output. The paths in the output will be relative to " { $snippet "vocab" } "'s directory." } ;
+{ $description "Matches all the glob patterns in " { $snippet "patterns" } " to the sequence of files in " { $snippet "filenames" } ". If a pattern doesn't match anything, then a " { $link resource-missing } " error will be thrown containing that pattern." } ;
 
 HELP: vocab-resource-files
 { $values
@@ -19,8 +25,8 @@ HELP: vocab-resource-files
 ARTICLE: "vocabs.metadata.resources" "Vocabulary resource metadata"
 "The " { $vocab-link "vocabs.metadata.resources" } " vocabulary contains words to retrieve the full list of files that match the patterns specified in a vocabulary's " { $snippet "resources.txt" } " file."
 { $subsections
-    vocab-resource-files
-    expand-vocab-resource-files
+  match-patterns
+  vocab-resource-files
 } ;
 
 ABOUT: "vocabs.metadata.resources"

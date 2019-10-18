@@ -94,7 +94,10 @@
             (button-get button 'markup-label)
             (button-get button 'markup-link-type)))))
 
-
+(defun fuel-markup--nav-crumbs (e)
+  (fuel-markup--links e " > ")
+  (newline))
+
 ;;; Markup printers:
 
 (defconst fuel-markup--printers
@@ -103,31 +106,34 @@
     ($author . fuel-markup--author)
     ($authors . fuel-markup--authors)
     ($class-description . fuel-markup--class-description)
-    ($code . fuel-markup--code)
+    ($code . (lambda (e) (fuel-markup--code e t)))
     ($command . fuel-markup--command)
     ($command-map . fuel-markup--null)
+    ($complex-shuffle . fuel-markup--complex-shuffle)
     ($contract . fuel-markup--contract)
     ($curious . fuel-markup--curious)
     ($definition . fuel-markup--definition)
-    ($describe-vocab . fuel-markup--describe-vocab)
     ($description . fuel-markup--description)
     ($doc-path . fuel-markup--doc-path)
     ($emphasis . fuel-markup--emphasis)
     ($error-description . fuel-markup--error-description)
     ($errors . fuel-markup--errors)
-    ($example . fuel-markup--example)
+    ($example . (lambda (e) (fuel-markup--code e t)))
     ($examples . fuel-markup--examples)
+    ($fuel-nav-crumbs . fuel-markup--nav-crumbs)
     ($heading . fuel-markup--heading)
     ($index . fuel-markup--index)
     ($instance . fuel-markup--instance)
     ($io-error . fuel-markup--io-error)
     ($link . fuel-markup--link)
-    ($links . fuel-markup--links)
+    ($links . (lambda (e) (fuel-markup--links e ", ")))
     ($list . fuel-markup--list)
     ($low-level-note . fuel-markup--low-level-note)
     ($markup-example . fuel-markup--markup-example)
     ($maybe . fuel-markup--maybe)
+    ($sequence . fuel-markup--sequence)
     ($methods . fuel-markup--methods)
+    ($next-link . (lambda (e) (fuel-markup--prefixed-link "Next:" e)))
     ($nl . fuel-markup--newline)
     ($notes . fuel-markup--notes)
     ($operation . fuel-markup--link)
@@ -135,10 +141,11 @@
     ($parsing-note . fuel-markup--parsing-note)
     ($predicate . fuel-markup--predicate)
     ($prettyprinting-note . fuel-markup--prettyprinting-note)
+    ($prev-link . (lambda (e) (fuel-markup--prefixed-link "Prev:" e)))
     ($quotation . fuel-markup--quotation)
     ($references . fuel-markup--references)
     ($related . fuel-markup--related)
-    ($see . fuel-markup--see)
+    ($see . fuel-markup--word-info)
     ($see-also . fuel-markup--see-also)
     ($shuffle . fuel-markup--shuffle)
     ($side-effects . fuel-markup--side-effects)
@@ -148,20 +155,21 @@
     ($subheading . fuel-markup--subheading)
     ($subsection . fuel-markup--subsection)
     ($subsections . fuel-markup--subsections)
-    ($synopsis . fuel-markup--synopsis)
+    ($synopsis . fuel-markup--word-info)
     ($syntax . fuel-markup--syntax)
     ($table . fuel-markup--table)
     ($tag . fuel-markup--tag)
     ($tags . fuel-markup--tags)
-    ($unchecked-example . fuel-markup--example)
+    ($unchecked-example . (lambda (e) (fuel-markup--code e t)))
+    ($url . fuel-markup--url)
     ($value . fuel-markup--value)
     ($values . fuel-markup--values)
     ($values-x/y . fuel-markup--values-x/y)
     ($var-description . fuel-markup--var-description)
+    ($vocab . fuel-markup--vocab)
     ($vocab-link . fuel-markup--vocab-link)
     ($vocab-links . fuel-markup--vocab-links)
     ($vocab-subsection . fuel-markup--vocab-subsection)
-    ($vocabulary . fuel-markup--vocabulary)
     ($warning . fuel-markup--warning)
     (article . fuel-markup--article)
     (describe-words . fuel-markup--describe-words)
@@ -174,10 +182,10 @@
         ((stringp e) (fuel-markup--insert-string e))
         ((and (listp e) (symbolp (car e))
               (assoc (car e) fuel-markup--printers))
-         (funcall (cdr (assoc (car e) fuel-markup--printers)) e))
+         (funcall (alist-get (car e) fuel-markup--printers) e))
         ((and (symbolp e)
               (assoc e fuel-markup--printers))
-         (funcall (cdr (assoc e fuel-markup--printers)) e))
+         (funcall (alist-get e fuel-markup--printers) e))
         ((listp e) (mapc 'fuel-markup--print e))
         ((symbolp e) (fuel-markup--print (list '$link e)))
         (t (insert (format "\n%S\n" e)))))
@@ -222,7 +230,7 @@
 (defun fuel-markup--article (e)
   (setq fuel-markup--maybe-nl nil)
   (insert (fuel-markup--put-face (cadr e) 'fuel-font-lock-markup-title))
-  (newline 2)
+  (newline 1)
   (fuel-markup--print (car (cddr e))))
 
 (defun fuel-markup--heading (e)
@@ -273,6 +281,20 @@
     (fuel-markup--put-face (cadr e) 'fuel-font-lock-markup-strong)
     (insert (cadr e))))
 
+(define-button-type 'fuel-markup--url
+  'action 'fuel-markup--follow-url
+  'face 'fuel-font-lock-markup-link
+  'follow-link nil)
+
+(defun fuel-markup--follow-url (button)
+  (browse-url (button-get button 'markup-link)))
+
+(defun fuel-markup--url (e)
+  (let ((url (cadr e)))
+    (insert-text-button url
+                        :type 'fuel-markup--url
+                        'markup-link url)))
+
 (defun fuel-markup--snippet (e)
   (insert (mapconcat #'(lambda (s)
                         (if (stringp s)
@@ -281,14 +303,16 @@
                      (cdr e)
                      " ")))
 
-(defun fuel-markup--code (e)
+(defun fuel-markup--code (e indent)
   (fuel-markup--insert-nl-if-nb)
   (newline)
   (dolist (snip (cdr e))
-    (if (stringp snip)
-        (insert (factor-font-lock-string snip))
-      (fuel-markup--print snip))
-    (newline))
+    (unless (stringp snip)
+      (error "snip is not a string"))
+    (dolist (line (split-string (factor-font-lock-string snip) "\n"))
+      (when indent (insert "    "))
+      (insert line)
+      (newline)))
   (newline))
 
 (defun fuel-markup--command (e)
@@ -297,13 +321,6 @@
 (defun fuel-markup--syntax (e)
   (fuel-markup--insert-heading "Syntax")
   (fuel-markup--print (cons '$code (cdr e)))
-  (newline))
-
-(defun fuel-markup--example (e)
-  (fuel-markup--insert-newline)
-  (dolist (s (cdr e))
-    (fuel-markup--snippet (list '$snippet s))
-    (newline))
   (newline))
 
 (defun fuel-markup--markup-example (e)
@@ -319,11 +336,20 @@
                     link)))
     (fuel-markup--insert-button label link type)))
 
-(defun fuel-markup--links (e)
-  (dolist (link (cdr e))
-    (fuel-markup--link (list '$link link))
-    (insert ", "))
-  (delete-char -2))
+(defun fuel-markup--links (e sep)
+  "Inserts a sequence of links. Used for rendering see also lists
+and breadcrumb navigation. The items in e can either be strings
+or lists."
+  (let ((links (cdr e)))
+    (when links
+      (dolist (link links)
+        (message (format "link %s" link))
+        (fuel-markup--link
+         (if (listp link)
+             (cons '$link link)
+           (list '$link link)))
+        (insert sep))
+      (delete-char (- (length sep))))))
 
 (defun fuel-markup--index-quotation (q)
   (cond ((null q) nil)
@@ -333,10 +359,11 @@
 (defun fuel-markup--index (e)
   (let* ((q (fuel-markup--index-quotation (cadr e)))
          (cmd `(:fuel* ((,q fuel-index)) "fuel"
-                       ("builtins" "help" "help.topics" "classes"
-                        "classes.builtin" "classes.tuple"
-                        "classes.singleton" "classes.union"
-                        "classes.intersection" "classes.predicate")))
+                       ("assocs" "builtins" "classes" "classes.builtin"
+                        "classes.intersection" "classes.predicate"
+                        "classes.singleton"  "classes.tuple" "classes.union"
+                        "help" "help.topics" "namespaces" "sequences"
+                        "vocabs" "words")))
          (subs (fuel-eval--retort-result (fuel-eval--send/wait cmd 200))))
     (when subs
       (let ((start (point))
@@ -360,16 +387,11 @@
                       (cdr e))))
     (fuel-markup--table (cons '$table rows))))
 
-(defun fuel-markup--describe-vocab (e)
+(defun fuel-markup--vocab (e)
   (fuel-markup--insert-nl-if-nb)
   (let* ((cmd `(:fuel* ((,(cadr e) fuel-vocab-help)) "fuel" t))
          (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
     (when res (fuel-markup--print res))))
-
-(defun fuel-markup--vocabulary (e)
-  (fuel-markup--insert-heading "Vocabulary: " t)
-  (fuel-markup--vocab-link (cons '$vocab-link (cdr e)))
-  (newline))
 
 (defun fuel-markup--parse-classes ()
   (let ((elems))
@@ -415,6 +437,8 @@
     (reverse elems)))
 
 (defun fuel-markup--parse-words-desc (desc)
+  "This function parses the text description of the vocab that
+the 'words.' word emits."
   (with-temp-buffer
     (insert desc)
     (goto-char (point-min))
@@ -442,7 +466,7 @@
     (fuel-markup--insert-newline)))
 
 (defun fuel-markup--all-tags (e)
-  (let* ((cmd `(:fuel* (all-tags :get) "fuel" t))
+  (let* ((cmd `(:fuel* (all-tags) "fuel" t))
          (tags (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
     (fuel-markup--list
      (cons '$list (mapcar (lambda (tag) (list '$link tag tag 'tag)) tags)))))
@@ -460,10 +484,19 @@
     (fuel-markup--insert-newline)))
 
 (defun fuel-markup--all-authors (e)
-  (let* ((cmd `(:fuel* (all-authors :get) "fuel" t))
+  (let* ((cmd `(:fuel* (all-authors) "fuel" t))
          (authors (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
     (fuel-markup--list
      (cons '$list (mapcar (lambda (a) (list '$link a a 'author)) authors)))))
+
+(defun fuel-markup--complex-shuffle (e)
+  (fuel-markup--description
+   `($description "Shuffle word. Rearranges the top of the datastack as "
+                  "indicated in the stack effect pattern."))
+  (fuel-markup--elem-with-heading
+   `(nil "The data flow represented by this shuffle word can be more clearly "
+         "expressed using " ($vocab-link "Lexical variables" "locals") ".")
+   "This word is deprecated"))
 
 (defun fuel-markup--list (e)
   (fuel-markup--insert-nl-if-nb)
@@ -487,6 +520,13 @@
 (defun fuel-markup--maybe (e)
   (fuel-markup--instance (cons '$instance (cdr e)))
   (insert " or f "))
+
+(defun fuel-markup--sequence (e)
+  (insert "a ")
+  (fuel-markup--link (list '$link 'sequence 'sequence 'word))
+  (insert " of ")
+  (fuel-markup--print (cadr e))
+  (insert "s"))
 
 (defun fuel-markup--or (e)
   (let ((fst (car (cdr e)))
@@ -518,11 +558,11 @@
 
 (defun fuel-markup--definition (e)
   (fuel-markup--insert-heading "Definition")
-  (fuel-markup--code (cons '$code (cdr e))))
+  (fuel-markup--code (cons '$code (cdr e)) nil))
 
 (defun fuel-markup--methods (e)
   (fuel-markup--insert-heading "Methods")
-  (fuel-markup--code (cons '$code (cdr e))))
+  (fuel-markup--code (cons '$code (cdr e)) nil))
 
 (defun fuel-markup--value (e)
   (fuel-markup--insert-heading "Variable value")
@@ -546,11 +586,11 @@
 
 (defun fuel-markup--see-also (e)
   (fuel-markup--insert-heading "See also")
-  (fuel-markup--links (cons '$links (cdr e))))
+  (fuel-markup--links (cons '$links (cdr e)) ", "))
 
 (defun fuel-markup--related (e)
   (fuel-markup--insert-heading "See also")
-  (fuel-markup--links (cons '$links (cadr e))))
+  (fuel-markup--links (cons '$links (cadr e)) ", "))
 
 (defun fuel-markup--shuffle (e)
   (insert "\nShuffle word. Re-arranges the stack "
@@ -574,16 +614,27 @@
   (fuel-markup--print '($notes ("This word should only be called within the "
                                 ($link with-pprint) " combinator."))))
 
+(defun fuel-markup--prefixed-link (prefix e)
+  (insert (format "  %s " prefix))
+  (fuel-markup--link e)
+  (newline))
+
 (defun fuel-markup--elem-with-heading (elem heading)
   (fuel-markup--insert-heading heading)
   (fuel-markup--print (cdr elem))
   (fuel-markup--insert-newline))
 
+(defun fuel-markup--stack-effect (e)
+  (let* ((in (mapconcat 'identity (nth 1 e) " "))
+         (out (mapconcat 'identity (nth 2 e) " "))
+         (str (format "( %s -- %s )" in out)))
+    (fuel-markup--snippet (list '$snippet str))))
+
 (defun fuel-markup--quotation (e)
   (insert "a ")
   (fuel-markup--link (list '$link 'quotation 'quotation 'word))
   (insert " with stack effect ")
-  (fuel-markup--snippet (list '$snippet (nth 1 e))))
+  (fuel-markup--stack-effect (nth 1 e)))
 
 (defun fuel-markup--warning (e)
   (fuel-markup--elem-with-heading e "Warning"))
@@ -612,21 +663,19 @@
 (defun fuel-markup--notes (e)
   (fuel-markup--elem-with-heading e "Notes"))
 
-(defun fuel-markup--word-info (e s)
+(defun fuel-markup--word-info (e)
+  "Uses the 'see' word to lookup info about a given word. Note
+that this function is called in contexts where it is impossible
+to guess the correct usings, so a static using list is used."
   (let* ((word (nth 1 e))
-         (cmd (and word `(:fuel* ((:quote ,(format "%s" word)) ,s) "fuel")))
+         (cmd `(:fuel* ((:quote ,(symbol-name word)) see)
+                       "fuel" ("kernel" "lexer" "see" "sequences")))
          (ret (and cmd (fuel-eval--send/wait cmd)))
          (res (and (not (fuel-eval--retort-error ret))
                    (fuel-eval--retort-output ret))))
     (if res
-        (fuel-markup--code (list '$code res))
+        (fuel-markup--code (list '$code res) nil)
       (fuel-markup--snippet (list '$snippet " " word)))))
-
-(defun fuel-markup--see (e)
-  (fuel-markup--word-info e 'see))
-
-(defun fuel-markup--synopsis (e)
-  (fuel-markup--word-info e 'synopsis))
 
 (defun fuel-markup--null (e))
 

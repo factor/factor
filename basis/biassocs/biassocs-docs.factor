@@ -12,7 +12,7 @@ HELP: <bihash>
 { $values { "biassoc" biassoc } }
 { $description "Creates a new biassoc using a pair of hashtables for underlying storage." } ;
 
-HELP: once-at
+HELP: set-at-once
 { $values { "value" object } { "key" object } { "assoc" assoc } }
 { $description "If the assoc does not contain the given key, adds the key/value pair to the assoc, otherwise does nothing." } ;
 

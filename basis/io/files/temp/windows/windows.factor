@@ -1,4 +1,5 @@
-! (c)2012 Joe Groff bsd license
+! Copyright (C) 2012 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien.data alien.strings io.directories
 io.files.temp io.pathnames kernel math
 memoize specialized-arrays system windows.errors
@@ -9,12 +10,14 @@ IN: io.files.temp.windows
 
 <PRIVATE
 
-: (get-temp-directory) ( -- path )
+: get-temp-directory ( -- path )
     MAX_PATH 1 + dup WCHAR <c-array> [ GetTempPath ] keep
     swap win32-error=0/f
     alien>native-string ;
 
-: (get-appdata-directory) ( -- path )
+PRIVATE>
+
+: get-appdata-directory ( -- path )
     f
     CSIDL_LOCAL_APPDATA CSIDL_FLAG_CREATE bitor
     f
@@ -23,14 +26,8 @@ IN: io.files.temp.windows
     [ SHGetFolderPath ] keep
     swap check-ole32-error alien>native-string ;
 
-PRIVATE>
+M: windows default-temp-directory
+    get-temp-directory "factorcode.org\\Factor" append-path ;
 
-MEMO: (temp-directory) ( -- path )
-    (get-temp-directory) "factorcode.org\\Factor" append-path dup make-directories ;
-
-M: windows temp-directory (temp-directory) ;
-
-MEMO: (cache-directory) ( -- path )
-    (get-appdata-directory) "factorcode.org\\Factor" append-path dup make-directories ;
-
-M: windows cache-directory (cache-directory) ;
+M: windows default-cache-directory
+    get-appdata-directory "factorcode.org\\Factor" append-path ;

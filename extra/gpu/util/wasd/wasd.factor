@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.smart game.input
 game.input.scancodes game.loop game.worlds
 gpu.render gpu.state kernel literals
@@ -65,7 +66,7 @@ CONSTANT: fov 0.7
     near-plane far-plane frustum-matrix4 ;
 
 :: wasd-pixel-ray ( world loc -- direction )
-    loc world dim>> [ /f 0.5 - 2.0 * ] 2map 
+    loc world dim>> [ /f 0.5 - 2.0 * ] 2map
     world wasd-fov-vector v*
     first2 neg -1.0 0.0 4array
     world wasd-mv-inv-matrix swap m.v ;
@@ -123,12 +124,12 @@ M: wasd-world audio-orientation
 
 :: wasd-keyboard-input ( world -- )
     read-keyboard keys>> :> keys
-    key-w keys nth [ world walk-forward   ] when 
-    key-s keys nth [ world walk-backward  ] when 
-    key-a keys nth [ world walk-leftward  ] when 
-    key-d keys nth [ world walk-rightward ] when 
-    key-space keys nth [ world walk-upward ] when 
-    key-c keys nth [ world walk-downward ] when 
+    key-w keys nth [ world walk-forward   ] when
+    key-s keys nth [ world walk-backward  ] when
+    key-a keys nth [ world walk-leftward  ] when
+    key-d keys nth [ world walk-rightward ] when
+    key-space keys nth [ world walk-upward ] when
+    key-c keys nth [ world walk-downward ] when
     key-escape keys nth [ world close-window ] when ;
 
 : wasd-mouse-input ( world -- )
@@ -143,4 +144,3 @@ M: wasd-world tick-game-world
 M: wasd-world resize-world
     [ <viewport-state> set-gpu-state* ]
     [ dup generate-p-matrix >>p-matrix drop ] bi ;
-

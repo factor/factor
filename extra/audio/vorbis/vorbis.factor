@@ -1,4 +1,5 @@
-! (c)2007, 2010 Chris Double, Joe Groff bsd license
+! Copyright (C) 2007, 2010 Chris Double, Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data audio.engine
 byte-arrays classes.struct combinators destructors fry io
 io.files io.encodings.binary kernel libc locals make math
@@ -40,8 +41,8 @@ ERROR: no-vorbis-in-ogg ;
     stream-buffer-size ; inline
 
 : read-bytes-into ( dest size stream -- len )
-    #! Read the given number of bytes from a stream
-    #! and store them in the destination byte array.
+    ! Read the given number of bytes from a stream
+    ! and store them in the destination byte array.
     stream-read >byte-array dup length [ memcpy ] keep  ;
 
 : stream-into-buffer ( buffer size vorbis-stream -- len )
@@ -172,8 +173,8 @@ ERROR: no-vorbis-in-ogg ;
     len max-len min :> len'
     pcm #channels void* <c-direct-array> :> channel*s
 
-    len' iota [| sample |
-        #channels iota [| channel |
+    len' <iota> [| sample |
+        #channels <iota> [| channel |
             channel channel*s nth len c:float <c-direct-array>
             sample swap nth
             float>short-sample short-buffer push

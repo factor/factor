@@ -3,11 +3,24 @@
 USING: accessors io.sockets.secure kernel ;
 IN: io.sockets.secure.debug
 
-: <test-secure-config> ( -- config )
-    <secure-config>
-        "vocab:openssl/test/server.pem" >>key-file
-        "vocab:openssl/test/dh1024.pem" >>dh-file
+
+GENERIC: <test-secure-config>* ( obj -- config )
+
+
+M: TLSv1 <test-secure-config>* ( obj -- config )
+    drop <secure-config>
+        "vocab:openssl/test-1.0/server.pem" >>key-file
+        "vocab:openssl/test-1.0/dh1024.pem" >>dh-file
         "password" >>password ;
+
+M: object <test-secure-config>* ( obj -- config )
+    drop <secure-config>
+        "vocab:openssl/test-1.2/server.pem" >>key-file
+        "vocab:openssl/test-1.2/dh1024.pem" >>dh-file
+        "password" >>password ;
+
+: <test-secure-config> ( -- config )
+    best-tls-method <test-secure-config>* ;
 
 : with-test-context ( quot -- )
     <test-secure-config>

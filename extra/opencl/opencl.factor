@@ -3,12 +3,13 @@
 USING: accessors alien alien.c-types alien.data arrays
 byte-arrays combinators combinators.smart destructors
 io.encodings.ascii io.encodings.string kernel libc locals make
-math namespaces opencl.ffi sequences shuffle specialized-arrays
+math namespaces opencl.ffi sequences specialized-arrays
 variants ;
 IN: opencl
 SPECIALIZED-ARRAYS: void* char size_t ;
 
 <PRIVATE
+
 ERROR: cl-error err ;
 
 : cl-success ( err -- )
@@ -16,21 +17,23 @@ ERROR: cl-error err ;
 
 : cl-not-null ( err -- )
     dup f = [ cl-error ] [ drop ] if ; inline
- 
+
 : info-data-size ( handle name info-quot -- size_t )
-    [ 0 f 0 <size_t> ] dip [ call cl-success ] 2keep drop size_t deref ; inline
+    [ 0 f 0 size_t <ref> ] dip
+    [ call cl-success ] keepd size_t deref ; inline
 
 : info-data-bytes ( handle name info-quot size -- bytes )
-    swap [ dup <byte-array> f ] dip [ call cl-success ] 3keep 2drop ; inline
+    swap [ dup <byte-array> f ] dip [ call cl-success ] keepdd ; inline
 
 : info ( handle name info-quot lift-quot -- value )
     [ 3dup info-data-size info-data-bytes ] dip call ; inline
 
 : 2info-data-size ( handle1 handle2 name info-quot -- size_t )
-    [ 0 f 0 <size_t> ] dip [ call cl-success ] 2keep drop size_t deref ; inline
+    [ 0 f 0 size_t <ref> ] dip
+    [ call cl-success ] keepd size_t deref ; inline
 
 : 2info-data-bytes ( handle1 handle2 name info-quot size -- bytes )
-    swap [ dup <byte-array> f ] dip [ call cl-success ] 3keep 2drop ; inline
+    swap [ dup <byte-array> f ] dip [ call cl-success ] keepdd ; inline
 
 : 2info ( handle1 handle2 name info_quot lift_quot -- value )
     [ 4dup 2info-data-size 2info-data-bytes ] dip call ; inline
@@ -63,6 +66,7 @@ ERROR: cl-error err ;
     [ [ length size_t heap-size / ] keep swap size_t <c-direct-array> ] info ; inline
 
 TUPLE: cl-handle < disposable handle ;
+
 PRIVATE>
 
 VARIANT: cl-device-type
@@ -119,17 +123,17 @@ TUPLE: cl-platform
 
 TUPLE: cl-device
     id type vendor-id max-compute-units max-work-item-dimensions
-    max-work-item-sizes max-work-group-size preferred-vector-width-char 
-    preferred-vector-width-short preferred-vector-width-int 
-    preferred-vector-width-long preferred-vector-width-float 
-    preferred-vector-width-double max-clock-frequency address-bits 
+    max-work-item-sizes max-work-group-size preferred-vector-width-char
+    preferred-vector-width-short preferred-vector-width-int
+    preferred-vector-width-long preferred-vector-width-float
+    preferred-vector-width-double max-clock-frequency address-bits
     max-mem-alloc-size image-support max-read-image-args max-write-image-args
-    image2d-max-width image2d-max-height image3d-max-width image3d-max-height 
+    image2d-max-width image2d-max-height image3d-max-width image3d-max-height
     image3d-max-depth max-samplers max-parameter-size mem-base-addr-align
     min-data-type-align-size single-fp-config global-mem-cache-type
-    global-mem-cacheline-size global-mem-cache-size global-mem-size 
-    max-constant-buffer-size max-constant-args local-mem? local-mem-size 
-    error-correction-support profiling-timer-resolution endian-little 
+    global-mem-cacheline-size global-mem-cache-size global-mem-size
+    max-constant-buffer-size max-constant-args local-mem? local-mem-size
+    error-correction-support profiling-timer-resolution endian-little
     available compiler-available execute-kernels? execute-native-kernels?
     out-of-order-exec-available? profiling-available?
     name vendor driver-version profile version extensions ;
@@ -217,7 +221,7 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
         [ CL_PLATFORM_VERSION    platform-info-string ]
         [ CL_PLATFORM_NAME       platform-info-string ]
         [ CL_PLATFORM_VENDOR     platform-info-string ]
-        [ CL_PLATFORM_EXTENSIONS platform-info-string ] 
+        [ CL_PLATFORM_EXTENSIONS platform-info-string ]
     } cleave ;
 
 : cl_device_fp_config>flags ( ulong -- sequence )
@@ -333,8 +337,10 @@ M: cl-filter-linear  filter-mode-constant drop CL_FILTER_LINEAR ;
     CL_PROGRAM_BUILD_LOG program-build-info-string ;
 
 : strings>char*-array ( strings -- char*-array )
-    [ ascii encode dup length dup malloc [ cl-not-null ]
-      keep &free [ -rot memcpy ] keep ] void*-array{ } map-as ;
+    [
+        ascii encode dup length dup malloc
+        [ cl-not-null ] keep &free [ -rot memcpy ] keep
+    ] void*-array{ } map-as ;
 
 : (program) ( cl-context sources -- program-handle )
     [ handle>> ] dip [
@@ -459,7 +465,7 @@ PRIVATE>
 
 : <cl-buffer> ( buffer-access-mode size initial-data -- buffer )
     [ (current-cl-context) ] 3dip
-    swap over [
+    tuck [
         [ handle>> ]
         [ buffer-access-constant ]
         [ [ CL_MEM_COPY_HOST_PTR ] [ CL_MEM_ALLOC_HOST_PTR ] if ] tri* bitor
@@ -498,7 +504,7 @@ PRIVATE>
         [ (current-cl-queue) handle>> ] dip
         [ buffer>> handle>> CL_FALSE ] [ offset>> ] [ size>> ] tri
     ] 2dip [ length ] keep [ f ] [ [ handle>> ] void*-array{ } map-as ] if-empty
-    f void* <ref> [ clEnqueueReadBuffer cl-success ] keep void* <ref> cl-event
+    f void* <ref> [ clEnqueueReadBuffer cl-success ] keep void* deref cl-event
     new-disposable swap >>handle ;
 
 : cl-queue-write-buffer ( buffer-range alien dependent-events -- event )
@@ -514,7 +520,7 @@ PRIVATE>
     [ [ CL_TRUE ] [ CL_FALSE ] if ]
     [ addressing-mode-constant ]
     [ filter-mode-constant ]
-    tri* 0 int <ref> [ clCreateSampler ] keep int deref cl-success 
+    tri* 0 int <ref> [ clCreateSampler ] keep int deref cl-success
     cl-sampler new-disposable swap >>handle ;
 
 : cl-normalized-coords? ( sampler -- ? )
@@ -580,7 +586,7 @@ PRIVATE>
 
 : cl-barrier ( -- )
     (current-cl-queue) clEnqueueBarrier cl-success ; inline
- 
+
 : cl-flush ( -- )
     (current-cl-queue) handle>> clFlush cl-success ; inline
 

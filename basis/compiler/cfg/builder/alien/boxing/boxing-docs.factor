@@ -1,5 +1,5 @@
-USING: alien.c-types compiler.cfg.instructions help.markup help.syntax make
-math ;
+USING: alien.c-types compiler.cfg.instructions help.markup help.syntax
+math sequences ;
 IN: compiler.cfg.builder.alien.boxing
 
 HELP: box
@@ -35,6 +35,10 @@ HELP: box-return
   }
 }
 { $see-also ##box-alien } ;
+
+HELP: flatten-c-type
+{ $values { "c-type" abstract-c-type } { "pairs" sequence } }
+{ $description "pairs have shape { rep on-stack? f }" } ;
 
 HELP: stack-size
 { $values

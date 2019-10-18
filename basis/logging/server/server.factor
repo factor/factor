@@ -43,15 +43,16 @@ SYMBOL: log-files
 : multiline-header. ( -- )
     "[" write multiline-header write "] " write ;
 
-: write-message ( msg word-name level -- )
-    [ harvest ] 2dip pick empty? [ 3drop ] [
+:: write-message ( msg word-name level -- )
+    msg harvest [
         timestamp-header.
-        [ write bl write ": " write print ] 2curry
-        [ multiline-header. ] swap interleave
-    ] if ;
+        [ multiline-header. ]
+        [ level write bl word-name write ": " write print ]
+        interleave
+    ] unless-empty ;
 
 : (log-message) ( msg -- )
-    #! msg: { msg word-name level service }
+    ! msg: { msg word-name level service }
     first4 log-stream [ write-message flush ] with-output-stream* ;
 
 : try-dispose ( obj -- )

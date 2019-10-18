@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators io io.binary
 io.encodings kernel math math.private namespaces sbufs
-sequences sequences.private splitting strings.private vectors ;
+sequences sequences.private splitting strings strings.private
+vectors ;
 IN: io.encodings.utf16
 
 SINGLETON: utf16be
@@ -60,7 +61,7 @@ M: utf16be decode-char
     ] [ append-nums ] if ;
 
 : begin-utf16le ( stream byte -- stream char )
-    over stream-read1 dup [ double-le ] [ 2drop replacement-char ] if ;
+    over stream-read1 [ double-le ] [ drop replacement-char ] if* ;
 
 M: utf16le decode-char
     drop dup stream-read1 dup [ begin-utf16le ] when nip ;
@@ -100,30 +101,42 @@ M: utf16le encode-char ( char stream encoding -- )
     drop char>utf16le ;
 
 : ascii-char>utf16-byte-array ( off n byte-array string -- )
-    [ over ] dip string-nth-fast -rot
+    overd string-nth-fast -rot
     [ 2 fixnum*fast rot fixnum+fast ] dip
     set-nth-unsafe ; inline
 
 : ascii-string>utf16-byte-array ( off string -- byte-array )
-    [ length >fixnum [ iota ] [ 2 fixnum*fast <byte-array> ] bi ] keep
-    [ [ ascii-char>utf16-byte-array ] 2curry with each ] 2keep drop ; inline
+    [ length >fixnum [ <iota> ] [ 2 fixnum*fast <byte-array> ] bi ] keep
+    [ [ ascii-char>utf16-byte-array ] 2curry with each ] keepd ; inline
 
 : ascii-string>utf16le ( string stream -- )
     [ 0 swap ascii-string>utf16-byte-array ] dip stream-write ; inline
 : ascii-string>utf16be ( string stream -- )
     [ 1 swap ascii-string>utf16-byte-array ] dip stream-write ; inline
 
-M: utf16le encode-string
-    drop
-    over aux>>
-    [ [ char>utf16le ] curry each ]
-    [ ascii-string>utf16le ] if ;
+GENERIC#: encode-string-utf16le 1 ( string stream -- )
 
-M: utf16be encode-string
-    drop
+M: object encode-string-utf16le
+    [ char>utf16le ] curry each ; inline
+
+M: string encode-string-utf16le
     over aux>>
-    [ [ char>utf16be ] curry each ]
-    [ ascii-string>utf16be ] if ;
+    [ call-next-method ]
+    [ ascii-string>utf16le ] if ; inline
+
+M: utf16le encode-string drop encode-string-utf16le ;
+
+GENERIC#: encode-string-utf16be 1 ( string stream -- )
+
+M: object encode-string-utf16be
+    [ char>utf16be ] curry each ; inline
+
+M: string encode-string-utf16be
+    over aux>>
+    [ call-next-method ]
+    [ ascii-string>utf16be ] if ; inline
+
+M: utf16be encode-string drop encode-string-utf16be ;
 
 M: utf16le guess-encoded-length drop 2 * ; inline
 M: utf16le guess-decoded-length drop 2 /i ; inline

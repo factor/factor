@@ -30,18 +30,18 @@ FUNCTION: OSStatus FSMoveObjectToTrashSync (
     FSRef* source,
     FSRef* target,
     OptionBits options
-) ;
+)
 
 FUNCTION: char* GetMacOSStatusCommentString (
     OSStatus err
-) ;
+)
 
 FUNCTION: OSStatus FSPathMakeRefWithOptions (
     UInt8* path,
     OptionBits options,
     FSRef* ref,
     Boolean* isDirectory
-) ;
+)
 
 : check-err ( err -- )
     dup noErr = [ drop ] [
@@ -61,5 +61,3 @@ PRIVATE>
 M: macosx send-to-trash ( path -- )
     <fs-ref> f kFSFileOperationDefaultOptions
     FSMoveObjectToTrashSync check-err ;
-
-

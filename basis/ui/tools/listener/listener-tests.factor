@@ -1,9 +1,8 @@
-USING: continuations documents
-ui.tools.listener hashtables kernel namespaces parser sequences
-tools.test ui.commands ui.gadgets ui.gadgets.editors
-ui.gadgets.panes vocabs words ui.gadgets.debug slots.private
-arrays generic threads accessors listener math
-calendar concurrency.promises io ui.tools.common ;
+USING: accessors arrays calendar concurrency.promises continuations
+documents io kernel lexer listener math namespaces parser quotations
+sequences threads tools.test ui.gadgets.debug ui.gadgets.editors
+ui.gadgets.panes ui.gestures ui.tools.common ui.tools.listener
+vocabs.parser ;
 IN: ui.tools.listener.tests
 
 [
@@ -37,7 +36,7 @@ IN: ui.tools.listener.tests
 
     [ ] [ "interactor" get register-self ] unit-test
 
-    [ ] [ <promise> "promise" set ] unit-test
+    { } [ <promise> "promise" set ] unit-test
 
     [
         self "interactor" get thread<<
@@ -97,67 +96,69 @@ IN: ui.tools.listener.tests
 
     [ ] [ "interactor" get interactor-eof ] unit-test
 
-    [ { "Hello\nWorld\n" f } ] [ "promise" get 5 seconds ?promise-timeout ] unit-test
+    { { "Hello\nWorld\n" f } } [
+        "promise" get 5 seconds ?promise-timeout
+    ] unit-test
 ] with-interactive-vocabs
 
 ! Hang
-[ ] [ <interactor> <pane> <pane-stream> >>output "interactor" set ] unit-test
+{ } [ <interactor> <pane> <pane-stream> >>output "interactor" set ] unit-test
 
-[ ] [ [ "interactor" get stream-read-quot drop ] "A" spawn drop ] unit-test
+{ } [ [ "interactor" get stream-read-quot drop ] "A" spawn drop ] unit-test
 
-[ ] [ [ "interactor" get stream-read-quot drop ] "B" spawn drop ] unit-test
+{ } [ [ "interactor" get stream-read-quot drop ] "B" spawn drop ] unit-test
 
-[ ] [ 1 seconds sleep ] unit-test
+{ } [ 1 seconds sleep ] unit-test
 
-[ ] [ "interactor" get interactor-eof ] unit-test
+{ } [ "interactor" get interactor-eof ] unit-test
 
-[ ] [ <interactor> <pane> <pane-stream> >>output "interactor" set ] unit-test
+{ } [ <interactor> <pane> <pane-stream> >>output "interactor" set ] unit-test
 
 CONSTANT: text "Hello world.\nThis is a test."
 
-[ ] [ text "interactor" get set-editor-string ] unit-test
+{ } [ text "interactor" get set-editor-string ] unit-test
 
-[ ] [ <promise> "promise" set ] unit-test
+{ } [ <promise> "promise" set ] unit-test
 
-[ ] [
+{ } [
     [
         "interactor" get register-self
         "interactor" get stream-contents "promise" get fulfill
     ] in-thread
 ] unit-test
 
-[ ] [ 100 milliseconds sleep ] unit-test
+{ } [ 100 milliseconds sleep ] unit-test
 
-[ ] [ "interactor" get evaluate-input ] unit-test
+{ } [ "interactor" get evaluate-input ] unit-test
 
-[ ] [ 100 milliseconds sleep ] unit-test
+{ } [ 100 milliseconds sleep ] unit-test
 
-[ ] [ "interactor" get interactor-eof ] unit-test
+{ } [ "interactor" get interactor-eof ] unit-test
 
-[ t ] [ "promise" get 2 seconds ?promise-timeout text = ] unit-test
+{ t } [ "promise" get 2 seconds ?promise-timeout text = ] unit-test
 
-[ ] [ <interactor> <pane> <pane-stream> >>output "interactor" set ] unit-test
+{ } [ <interactor> <pane> <pane-stream> >>output "interactor" set ] unit-test
 
-[ ] [ text "interactor" get set-editor-string ] unit-test
+{ } [ text "interactor" get set-editor-string ] unit-test
 
-[ ] [ <promise> "promise" set ] unit-test
+{ } [ <promise> "promise" set ] unit-test
 
-[ ] [
+{ } [
     [
         "interactor" get register-self
         "interactor" get stream-read1 "promise" get fulfill
     ] in-thread
 ] unit-test
 
-[ ] [ 100 milliseconds sleep ] unit-test
+{ } [ 100 milliseconds sleep ] unit-test
 
-[ ] [ "interactor" get evaluate-input ] unit-test
+{ } [ "interactor" get evaluate-input ] unit-test
 
-[ CHAR: H ] [ "promise" get 2 seconds ?promise-timeout ] unit-test
+{ CHAR: H } [ "promise" get 2 seconds ?promise-timeout ] unit-test
 
-[ ] [ <listener-gadget> [ ] with-grafted-gadget ] unit-test
+{ } [ <listener-gadget> [ ] with-grafted-gadget ] unit-test
 
-[ ] [ <listener-gadget> "listener" set ] unit-test
+{ } [ <listener-gadget> "listener" set ] unit-test
 
 "listener" get [
     <interactor> <pane> <pane-stream> >>output "i" set
@@ -193,8 +194,26 @@ CONSTANT: text "Hello world.\nThis is a test."
     [ ] [ "listener" get com-end ] unit-test
 ] with-grafted-gadget
 
-[ ] [ \ + <interactor> manifest>> use-if-necessary ] unit-test
+{ } [ \ + <interactor> manifest>> use-if-necessary ] unit-test
 
-[ ] [ <listener-gadget> "l" set ] unit-test
-[ ] [ "l" get com-scroll-up ] unit-test
-[ ] [ "l" get com-scroll-down ] unit-test
+{ } [ <listener-gadget> "l" set ] unit-test
+{ } [ "l" get com-scroll-up ] unit-test
+{ } [ "l" get com-scroll-down ] unit-test
+
+! stream-read-quot
+{ [ 3 4 + ] } [
+    <listener-gadget> input>> [ register-self ] keep
+    [ { "3 4 +" } swap interactor-continue ] keep
+    [ "math" use-vocab stream-read-quot ] with-manifest
+] unit-test
+
+! try-parse
+{ [ sq ] t t } [
+    [
+        "math" use-vocab
+        { "sq" } try-parse
+        { "[" } try-parse first lexer-error?
+        { "goga" } try-parse
+        [ callable? ] [ length 2 = ] [ first lexer-error? ] tri and and
+    ] with-manifest
+] unit-test

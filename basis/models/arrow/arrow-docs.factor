@@ -7,7 +7,7 @@ HELP: arrow
 { $examples
     "The following code displays a label showing the result of applying " { $link sq } " to the value 5:"
     { $code
-        "USING: models ui.gadgets.labels ui.gadgets.panes ;"
+        "USING: models models.arrow math.parser ui.gadgets.labels ui.gadgets.panes ;"
         "5 <model> [ sq ] <arrow> [ number>string ] <arrow>"
         "<label-control> gadget."
     }

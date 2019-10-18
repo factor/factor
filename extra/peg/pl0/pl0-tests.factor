@@ -1,12 +1,11 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-!
-USING: kernel tools.test peg peg.ebnf peg.ebnf.private peg.pl0 
-       sequences accessors ;
-IN: peg.pl0.tests
+
+USING: kernel tools.test peg peg.ebnf peg.ebnf.private peg.pl0
+sequences accessors ;
 
 { t } [
-  "CONST foo = 1;" "block" \ pl0 rule (parse) remaining>> empty? 
+  "CONST foo = 1;" "block" \ pl0 rule (parse) remaining>> empty?
 ] unit-test
 
 { t } [
@@ -14,35 +13,35 @@ IN: peg.pl0.tests
 ] unit-test
 
 { t } [
-  "VAR foo,bar , baz;" "block" \ pl0 rule (parse) remaining>> empty? 
+  "VAR foo,bar , baz;" "block" \ pl0 rule (parse) remaining>> empty?
 ] unit-test
 
 { t } [
-  "foo := 5" "statement" \ pl0 rule (parse) remaining>> empty? 
+  "foo := 5" "statement" \ pl0 rule (parse) remaining>> empty?
 ] unit-test
 
 { t } [
-  "BEGIN foo := 5 END" "statement" \ pl0 rule (parse) remaining>> empty? 
+  "BEGIN foo := 5 END" "statement" \ pl0 rule (parse) remaining>> empty?
 ] unit-test
 
 { t } [
-  "IF 1=1 THEN foo := 5" "statement" \ pl0 rule (parse) remaining>> empty? 
+  "IF 1=1 THEN foo := 5" "statement" \ pl0 rule (parse) remaining>> empty?
 ] unit-test
 
 { t } [
-  "WHILE 1=1 DO foo := 5" "statement" \ pl0 rule (parse) remaining>> empty? 
+  "WHILE 1=1 DO foo := 5" "statement" \ pl0 rule (parse) remaining>> empty?
 ] unit-test
 
 { t } [
-  "WHILE ODD 1 DO foo := 5" "statement" \ pl0 rule (parse) remaining>> empty? 
+  "WHILE ODD 1 DO foo := 5" "statement" \ pl0 rule (parse) remaining>> empty?
 ] unit-test
 
 { t } [
-  "PROCEDURE square; BEGIN squ:=x*x END" "block" \ pl0 rule (parse) remaining>> empty? 
+  "PROCEDURE square; BEGIN squ:=x*x END" "block" \ pl0 rule (parse) remaining>> empty?
 ] unit-test
 
 { t } [
-"""VAR x, squ;
+"VAR x, squ;
 
 PROCEDURE square;
 BEGIN
@@ -56,11 +55,11 @@ BEGIN
       CALL square;
       x := x + 1;
    END
-END.""" main \ pl0 rule (parse) remaining>> empty?
+END." main \ pl0 rule (parse) remaining>> empty?
 ] unit-test
 
 { f } [
-""" 
+" 
 CONST
   m =  7,
   n = 85;
@@ -122,5 +121,5 @@ BEGIN
   y := 36;
   CALL gcd;
 END.
-""" main \ pl0 rule (parse) remaining>> empty?
+" main \ pl0 rule (parse) remaining>> empty?
 ] unit-test

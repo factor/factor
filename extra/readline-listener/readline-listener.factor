@@ -1,8 +1,8 @@
 ! Copyright (C) 2011 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs colors.constants combinators fry io
-kernel listener readline sequences splitting threads
-tools.completion unicode.data vocabs vocabs.hierarchy ;
+USING: accessors assocs colors.constants combinators fry io kernel
+listener readline sequences splitting threads tools.completion
+unicode.data vocabs vocabs.hierarchy ;
 IN: readline-listener
 
 <PRIVATE
@@ -13,8 +13,9 @@ TUPLE: readline-reader { prompt initial: f } ;
 INSTANCE: readline-reader input-stream
 
 M: readline-reader stream-readln
-    flush [ prompt>> dup [ " " append ] [ ] if readline ]
-    keep f >>prompt drop ;
+    flush
+    [ dup [ " " append ] when readline f ] change-prompt
+    drop ;
 
 M: readline-reader prompt.
     >>prompt drop ;
@@ -29,7 +30,10 @@ M: readline-reader prompt.
     all-words [ name>> ] map! prefixed ;
 
 : prefixed-vocabs ( prefix -- vocabs )
-    all-vocabs-recursive filter-vocabs [ name>> ] map! prefixed ;
+    all-disk-vocabs-recursive filter-vocabs [ name>> ] map! prefixed ;
+
+: prefixed-vocab-words ( prefix vocab-name -- words )
+    vocab-words [ name>> ] map! prefixed ;
 
 : prefixed-colors ( prefix -- colors )
     named-colors prefixed ;
@@ -43,6 +47,7 @@ M: readline-reader prompt.
             { [ dup complete-vocab? ] [ drop prefixed-vocabs ] }
             { [ dup complete-char? ] [ drop prefixed-chars ] }
             { [ dup complete-color? ] [ drop prefixed-colors ] }
+            { [ dup complete-vocab-words? ] [ harvest second prefixed-vocab-words ] }
             [ drop prefixed-words ]
         } cond dup completions tset
     ] if* ;
@@ -54,6 +59,6 @@ PRIVATE>
         swap get-completions ?nth
         [ clear-completions f ] unless*
     ] set-completion
-    readline-reader new [ listener ] with-input-stream* ;
+    readline-reader new [ listener-main ] with-input-stream* ;
 
 MAIN: readline-listener

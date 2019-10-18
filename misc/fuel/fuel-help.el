@@ -26,7 +26,6 @@
 
 (require 'button)
 
-
 ;;; Customization:
 
 ;;;###autoload
@@ -49,7 +48,6 @@
   :type 'list
   :group 'fuel-help)
 
-
 ;;; Help browser history:
 
 (defun fuel-help--make-history ()
@@ -82,6 +80,10 @@
     (setcar fuel-help--history (ring-remove (nth 1 fuel-help--history) 0))))
 
 (defvar fuel-help--history (fuel-help--make-history))
+
+;; https://github.com/jaor/geiser/issues/7
+(eval-after-load "session.el"
+  '(add-to-list 'session-globals-exclude 'fuel-help--history))
 
 
 ;;; Page cache:
@@ -293,11 +295,10 @@ With prefix, the current page is deleted from history."
 (defun fuel-help-clean-history ()
   "Clean up the help browser cache of visited pages."
   (interactive)
-  (when (y-or-n-p "Clean browsing history? ")
-    (fuel-help--cache-clear)
-    (setq fuel-help--history (fuel-help--make-history))
-    (fuel-help-refresh))
-  (message ""))
+  (fuel-help--cache-clear)
+  (setq fuel-help--history (fuel-help--make-history))
+  (fuel-help-refresh)
+  (message "Browsing history cleaned"))
 
 (defun fuel-help-edit ()
   "Edit the current article or word help."
@@ -327,7 +328,7 @@ With prefix, the current page is deleted from history."
   ("Show bookmarks..." "bb" fuel-help-display-bookmarks)
   ("Clean browsing history" "c" fuel-help-clean-history)
   --
-  ("Edit word at point" "\M-." fuel-edit-word-at-point)
+  ("Edit word or vocab at point" "\M-." fuel-edit-word-at-point)
   ("Edit help file" "e" fuel-help-edit)
   --
   ("Next page" "n" fuel-help-next)
@@ -340,17 +341,21 @@ With prefix, the current page is deleted from history."
   --
   ("Switch to listener" "\C-c\C-z" run-factor))
 
-
 ;;; IN: support
+
+(defun fuel-help--find-in-buffer-link ()
+  (when (and fuel-help--buffer-link
+             (equal (nth 2 fuel-help--buffer-link) 'vocab))
+    (car fuel-help--buffer-link)))
 
 (defun fuel-help--find-in ()
   (save-excursion
     (or (factor-find-in)
+        (fuel-help--find-in-buffer-link)
         (and (goto-char (point-min))
              (re-search-forward "Vocabulary: \\(.+\\)$" nil t)
              (match-string-no-properties 1)))))
 
-
 ;;; Help mode definition:
 
 ;;;###autoload
@@ -361,6 +366,5 @@ With prefix, the current page is deleted from history."
   (setq factor-current-vocab-function 'fuel-help--find-in)
   (setq fuel-markup--follow-link-function 'fuel-help--follow-link))
 
-
 (provide 'fuel-help)
 ;;; fuel-help.el ends here

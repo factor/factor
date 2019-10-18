@@ -1,16 +1,34 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: unicode.categories.syntax sequences unicode.data ;
+USING: accessors assocs classes.parser classes.predicate fry
+kernel math parser sequences splitting unicode.data
+unicode.data.private ;
 IN: unicode.categories
 
-CATEGORY: blank Zs Zl Zp | "\r\n\t" member? ;
-CATEGORY: letter Ll | "Other_Lowercase" property? ;
-CATEGORY: LETTER Lu | "Other_Uppercase" property? ;
-CATEGORY: Letter Lu Ll Lt Lm Lo Nl ;
-CATEGORY: digit Nd Nl No ;
-CATEGORY-NOT: printable Cc Cf Cs Co Cn ;
-CATEGORY: alpha Lu Ll Lt Lm Lo Nd Nl No | "Other_Alphabetic" property? ;
-CATEGORY: control Cc ;
-CATEGORY-NOT: uncased Lu Ll Lt Lm Mn Me ;
-CATEGORY-NOT: character Cn ;
-CATEGORY: math Sm | "Other_Math" property? ;
+! For use in CATEGORY:
+SYMBOLS: Cn Lu Ll Lt Lm Lo Mn Mc Me Nd Nl No Pc Pd Ps Pe Pi Pf Po Sm Sc Sk So Zs Zl Zp Cc Cf Cs Co | ;
+
+<PRIVATE
+
+: [category] ( categories code -- quot )
+    '[ integer>fixnum-strict dup category# _ member? [ drop t ] _ if ] ;
+
+: integer-predicate-class ( word predicate -- )
+    integer swap define-predicate-class ;
+
+: define-category ( word categories code -- )
+    [category] integer-predicate-class ;
+
+: define-not-category ( word categories code -- )
+    [category] [ not ] compose integer-predicate-class ;
+
+: parse-category ( -- word tokens quot )
+    scan-new-class \ ; parse-until { | } split1
+    [ [ name>> categories-map at ] B{ } map-as ]
+    [ [ [ ] like ] [ [ drop f ] ] if* ] bi* ;
+
+PRIVATE>
+
+SYNTAX: CATEGORY: parse-category define-category ;
+
+SYNTAX: CATEGORY-NOT: parse-category define-not-category ;

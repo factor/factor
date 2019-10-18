@@ -5,7 +5,7 @@ USING: continuations kernel tools.test strings namespaces make arrays
 sequences peg peg.private peg.parsers words math accessors ;
 IN: peg.tests
 
-[ ] [ reset-pegs ] unit-test
+{ } [ reset-pegs ] unit-test
 
 [
     "endbegin" "begin" token parse
@@ -172,8 +172,8 @@ IN: peg.tests
 ] unit-test
 
 : expr ( -- parser )
-    #! Test direct left recursion. Currently left recursion should cause a
-    #! failure of that parser.
+    ! Test direct left recursion. Currently left recursion should cause a
+    ! failure of that parser.
     [ expr ] delay "+" token "1" token 3seq "1" token 2choice ;
 
 { V{ V{ "1" "+" "1" } "+" "1" } } [
@@ -181,7 +181,7 @@ IN: peg.tests
 ] unit-test
 
 { t } [
-    #! Ensure a circular parser doesn't loop infinitely
+    ! Ensure a circular parser doesn't loop infinitely
     [ f , "a" token , ] seq*
     dup peg>> parsers>>
     dupd 0 swap set-nth compile word?
@@ -199,13 +199,13 @@ IN: peg.tests
 
 USE: compiler
 
-[ ] [ disable-optimizer ] unit-test
+{ } [ disable-optimizer ] unit-test
 
-[ ] [ "" epsilon parse drop ] unit-test
+{ } [ "" epsilon parse drop ] unit-test
 
-[ ] [ enable-optimizer ] unit-test
+{ } [ enable-optimizer ] unit-test
 
-[ [ ] ] [ "" epsilon [ drop [ [ ] ] call ] action parse ] unit-test
+{ [ ] } [ "" epsilon [ drop [ [ ] ] call ] action parse ] unit-test
 
 {
     T{ parse-error

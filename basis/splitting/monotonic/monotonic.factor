@@ -1,64 +1,52 @@
 ! Copyright (C) 2008, 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays circular combinators
-combinators.short-circuit compiler.utilities fry grouping
-kernel make math math.order namespaces sequences sorting ;
+USING: accessors arrays fry kernel locals math namespaces
+sequences sequences.private sorting ;
 IN: splitting.monotonic
 
 <PRIVATE
 
-: ,, ( obj -- ) building get last push ;
-: v, ( -- ) V{ } clone , ;
-: ,v ( -- ) building get dup last empty? [ dup pop* ] when drop ;
+:: monotonic-split-impl ( seq quot slice-quot n -- pieces )
+    V{ 0 } clone :> accum
 
-: (monotonic-split) ( seq quot -- newseq )
-    [
-        [ dup unclip suffix ] dip
-        v, '[ over ,, @ [ v, ] unless ] 2each ,v
-    ] { } make ; inline
+    0 seq [ ] [
+        [ 1 + ] 2dip [
+            quot call [ dup accum push ] unless
+        ] keep
+    ] map-reduce drop
 
-PRIVATE>
+    n = [ n accum push ] unless
 
-: monotonic-split ( seq quot: ( obj1 obj2 -- ? ) -- newseq )
-    over empty? [ 2drop { } ] [ (monotonic-split) ] if ; inline
+    accum dup rest-slice [
+        seq slice-quot call
+    ] { } 2map-as ; inline
 
-<PRIVATE
-
-: (monotonic-slice) ( seq quot class -- slices )
-    [
-        dupd '[
-            [ length iota ] [ ] [ 1 circular boa ] tri
-            [ @ not [ 1 + , ] [ drop ] if ] 3each
-        ] { } make
-        2dup {
-            [ nip empty? ]
-            [ [ length ] [ last ] bi* = not ]
-        } 2|| [ over length suffix ] when
-        0 prefix 2 <clumps>
-        swap
-    ] dip
-    '[ first2 _ _ boa ] map ; inline
+: (monotonic-split) ( seq quot slice-quot -- pieces )
+    pick length [ 3drop { } ] [ monotonic-split-impl ] if-zero ; inline
 
 PRIVATE>
 
-: monotonic-slice ( seq quot: ( obj1 obj2 -- ? ) class -- slices )
-    pick length dup 1 >
-    [ drop (monotonic-slice) ]
-    [ zero? [ 2drop ] [ nip [ 0 1 ] 2dip boa 1array ] if ]
-    if ; inline
+: monotonic-split ( seq quot: ( obj1 obj2 -- ? ) -- pieces )
+    [ subseq-unsafe ] (monotonic-split) ; inline
+
+: monotonic-split-slice ( seq quot: ( obj1 obj2 -- ? ) -- pieces )
+    [ <slice-unsafe> ] (monotonic-split) ; inline
 
 TUPLE: downward-slice < slice ;
 TUPLE: stable-slice < slice ;
 TUPLE: upward-slice < slice ;
 
 : downward-slices ( seq -- slices )
-    [ > ] downward-slice monotonic-slice [ length 1 > ] filter ;
+    [ > ] [ downward-slice boa ] (monotonic-split)
+    [ length 1 > ] filter ;
 
 : stable-slices ( seq -- slices )
-    [ = ] stable-slice monotonic-slice [ length 1 > ] filter ;
+    [ = ] [ stable-slice boa ] (monotonic-split)
+    [ length 1 > ] filter ;
 
 : upward-slices ( seq -- slices )
-    [ < ] upward-slice monotonic-slice [ length 1 > ] filter ;
+    [ < ] [ upward-slice boa ] (monotonic-split)
+    [ length 1 > ] filter ;
 
 : trends ( seq -- slices )
     dup length dup 1 > [
@@ -67,5 +55,5 @@ TUPLE: upward-slice < slice ;
         [ stable-slices ]
         [ upward-slices ] tri 3append [ from>> ] sort-with
     ] [
-        zero? [ ] [ [ 0 1 ] dip stable-slice boa ] if
+        zero? [ drop { } ] [ [ 0 1 ] dip stable-slice boa ] if
     ] if ;

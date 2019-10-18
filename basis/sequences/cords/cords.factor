@@ -27,7 +27,7 @@ GENERIC: cord-append ( seq1 seq2 -- cord )
 M: object cord-append
     generic-cord boa ; inline
 
-FUNCTOR: define-specialized-cord ( T C -- )
+<FUNCTOR: define-specialized-cord ( T C -- )
 
 T-cord DEFINES-CLASS ${C}
 
@@ -41,7 +41,7 @@ M: T cord-append
     2dup [ T instance? ] both?
     [ T-cord boa ] [ generic-cord boa ] if ; inline
 
-;FUNCTOR
+;FUNCTOR>
 
 : cord-map ( cord quot -- cord' )
     [ [ head>> ] dip call ]

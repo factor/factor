@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators.short-circuit fry
 generalizations hash-sets hashtables kernel macros math
 math.functions math.order sequences sets ;
@@ -40,8 +41,8 @@ GENERIC: dec-cursor ( cursor -- cursor' )
 MIXIN: random-access-cursor
 INSTANCE: random-access-cursor bidirectional-cursor
 
-GENERIC# cursor+ 1 ( cursor n -- cursor' )
-GENERIC# cursor- 1 ( cursor n -- cursor' )
+GENERIC#: cursor+ 1 ( cursor n -- cursor' )
+GENERIC#: cursor- 1 ( cursor n -- cursor' )
 GENERIC: cursor-distance ( cursor cursor -- n )
 GENERIC: cursor<  ( cursor cursor -- ? )
 GENERIC: cursor>  ( cursor cursor -- ? )
@@ -67,7 +68,9 @@ GENERIC: cursor-key-value-unsafe ( cursor -- key value )
 PRIVATE>
 M: input-cursor cursor-key-value-unsafe cursor-key-value ; inline
 M: input-cursor cursor-key-value
-    dup cursor-valid? [ cursor-key-value-unsafe ] [ invalid-cursor ] if ; inline
+    dup cursor-valid?
+    [ cursor-key-value-unsafe ]
+    [ invalid-cursor ] if ; inline
 
 : cursor-key ( cursor -- key ) cursor-key-value drop ;
 : cursor-value ( cursor -- key ) cursor-key-value nip ;
@@ -87,7 +90,9 @@ GENERIC: set-cursor-value-unsafe ( value cursor -- )
 PRIVATE>
 M: output-cursor set-cursor-value-unsafe set-cursor-value ; inline
 M: output-cursor set-cursor-value
-    dup cursor-valid? [ set-cursor-value-unsafe ] [ invalid-cursor ] if ; inline
+    dup cursor-valid?
+    [ set-cursor-value-unsafe ]
+    [ invalid-cursor ] if ; inline
 
 !
 ! stream cursors
@@ -387,7 +392,7 @@ M: pusher-cursor set-cursor-value growable>> push ; inline
 : new-growable-cursor ( begin end exemplar -- cursor result )
     [ swap cursor-distance-hint ] dip new-resizable [ <pusher-cursor> ] keep ; inline
 
-GENERIC# new-sequence-cursor 1 ( begin end exemplar -- cursor result )
+GENERIC#: new-sequence-cursor 1 ( begin end exemplar -- cursor result )
 
 M: random-access-cursor new-sequence-cursor
     [ swap cursor-distance ] dip new-sequence [ begin-cursor ] keep ; inline
@@ -507,7 +512,7 @@ M: zip-cursor cursor= ( cursor cursor -- ? )
 
 M: zip-cursor cursor-distance-hint ( cursor cursor -- n )
     [ [ keys>> ] bi@ cursor-distance-hint ]
-    [ [ values>> ] bi@ cursor-distance-hint ] 2bi max ; inline
+    [ [ values>> ] bi@ cursor-distance-hint ] 2bi min ; inline
 
 M: zip-cursor inc-cursor ( cursor -- cursor' )
     [ keys>> inc-cursor ] [ values>> inc-cursor ] bi <zip-cursor> ; inline
@@ -538,7 +543,7 @@ ALIAS: -2in- -assoc-
     [ 2in- ] dip -map-as ; inline
 
 : 2map ( ... a b quot: ( ... x y -- ... z ) -- ... c )
-    pick 2map-as ; inline 
+    pick 2map-as ; inline
 
 !
 ! generalized zips
@@ -547,13 +552,13 @@ ALIAS: -2in- -assoc-
 : -unzip- ( quot -- quot' )
     '[ [ keys>> cursor-value-unsafe ] [ values>> ] bi @ ] ; inline
 
-MACRO: nzip-cursors ( n -- ) 1 - [ zip-cursors ] n*quot ;
+MACRO: nzip-cursors ( n -- quot ) 1 - [ zip-cursors ] n*quot ;
 
 : nall ( seqs... n -- begin end ) [ [ all ] swap napply ] [ nzip-cursors ] bi ; inline
 
 : nall- ( seqs... quot n -- begin end quot ) swap [ nall ] dip ; inline
 
-MACRO: -nin- ( n -- )
+MACRO: -nin- ( n -- quot )
     1 - [ -unzip- ] n*quot [ -in- ] prepend ;
 
 : nin- ( seqs... quot n -- begin end quot ) [ nall- ] [ -nin- ] bi ; inline
@@ -569,11 +574,10 @@ MACRO: -nin- ( n -- )
 !
 
 : -with- ( invariant begin end quot -- begin end quot' )
-    [ rot ] dip '[ [ _ ] dip @ ] ; inline
+    rotd '[ [ _ ] dip @ ] ; inline
 
 : -2with- ( invariant invariant begin end quot -- begin end quot' )
     -with- -with- ; inline
 
-MACRO: -nwith- ( n -- )
+MACRO: -nwith- ( n -- quot )
     [ -with- ] n*quot ;
-

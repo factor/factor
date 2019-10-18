@@ -13,4 +13,3 @@ M: macosx adjust-time-monotonic
     ] [
         timeval>duration since-1970 now time-
     ] if ;
-

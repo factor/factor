@@ -31,19 +31,19 @@ $nl
 "If a quotation does not contain any fry specifiers, then " { $link POSTPONE: '[ } " behaves just like " { $link POSTPONE: [ } ":"
 { $code "{ 10 20 30 } '[ . ] each" }
 "Occurrences of " { $link _ } " on the left map directly to " { $link curry } ". That is, the following three lines are equivalent:"
-{ $code 
+{ $code
     "{ 10 20 30 } 5 '[ _ + ] map"
     "{ 10 20 30 } 5 [ + ] curry map"
     "{ 10 20 30 } [ 5 + ] map"
 }
 "Occurrences of " { $link _ } " in the middle of a quotation map to more complex quotation composition patterns. The following three lines are equivalent:"
-{ $code 
+{ $code
     "{ 10 20 30 } 5 '[ 3 _ / ] map"
     "{ 10 20 30 } 5 [ 3 ] swap [ / ] curry compose map"
     "{ 10 20 30 } [ 3 5 / ] map"
 }
 "Occurrences of " { $link @ } " are simply syntax sugar for " { $snippet "_ call" } ". The following four lines are equivalent:"
-{ $code 
+{ $code
     "{ 10 20 30 } [ sq ] '[ @ . ] each"
     "{ 10 20 30 } [ sq ] [ call . ] curry each"
     "{ 10 20 30 } [ sq ] [ . ] compose each"

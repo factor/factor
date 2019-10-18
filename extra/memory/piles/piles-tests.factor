@@ -1,9 +1,9 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien destructors kernel math
 memory.piles tools.test ;
-IN: memory.piles.tests
 
-[ 25 ] [
+{ 25 } [
     [
         100 <pile> &dispose
         [ 25 pile-alloc ] [ 50 pile-alloc ] bi
@@ -11,7 +11,7 @@ IN: memory.piles.tests
     ] with-destructors
 ] unit-test
 
-[ 32 ] [
+{ 32 } [
     [
         100 <pile> &dispose
         [ 25 pile-alloc ] [ 8 pile-align 50 pile-alloc ] bi
@@ -19,7 +19,7 @@ IN: memory.piles.tests
     ] with-destructors
 ] unit-test
 
-[ 75 ] [
+{ 75 } [
     [
         100 <pile> &dispose
         dup 25 pile-alloc drop
@@ -28,7 +28,7 @@ IN: memory.piles.tests
     ] with-destructors
 ] unit-test
 
-[ 100 ] [
+{ 100 } [
     [
         100 <pile> &dispose
         dup 25 pile-alloc drop
@@ -44,4 +44,3 @@ IN: memory.piles.tests
         dup 76 pile-alloc drop
     ] with-destructors
 ] [ not-enough-pile-space? ] must-fail-with
-

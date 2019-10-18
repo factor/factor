@@ -23,7 +23,6 @@ SYMBOL: root
 
 : init-x ( display-string -- )
     init-locale
-    dup [ ascii string>alien ] when
     XOpenDisplay check-display dpy set-global
     dpy get XDefaultScreen scr set-global
     dpy get scr get XRootWindow root set-global

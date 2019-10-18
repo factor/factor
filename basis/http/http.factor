@@ -1,11 +1,9 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel combinators math namespaces make assocs
-sequences splitting sorting sets strings vectors hashtables
-quotations arrays byte-arrays math.parser calendar
-calendar.format present urls fry io io.encodings
-io.encodings.iana io.encodings.binary io.encodings.utf8 io.crlf
-ascii io.encodings.8-bit.latin1 http.parsers base64 mime.types ;
+USING: accessors arrays assocs base64 calendar calendar.format
+calendar.parser combinators fry hashtables http.parsers io io.crlf
+io.encodings.iana io.encodings.utf8 kernel make math math.parser
+mime.types present sequences sets sorting splitting urls ;
 IN: http
 
 CONSTANT: max-redirects 10
@@ -32,7 +30,7 @@ CONSTANT: max-redirects 10
     } cond ;
 
 : check-header-string ( str -- str )
-    #! http://en.wikipedia.org/wiki/HTTP_Header_Injection
+    ! http://en.wikipedia.org/wiki/HTTP_Header_Injection
     dup "\r\n" intersects?
     [ "Header injection attack" throw ] when ;
 
@@ -132,19 +130,26 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
     ] { } make "; " join ;
 
 TUPLE: request
-method
-url
-version
-header
-post-data
-cookies
-redirects ;
+    method
+    url
+    proxy-url
+    version
+    header
+    post-data
+    cookies
+    redirects ;
 
 : set-header ( request/response value key -- request/response )
     pick header>> set-at ;
 
+: basic-auth ( username password -- str )
+    ":" glue >base64 "Basic " "" prepend-as ;
+
 : set-basic-auth ( request username password -- request )
-    ":" glue >base64 "Basic " "" prepend-as "Authorization" set-header ;
+    basic-auth "Authorization" set-header ;
+
+: set-proxy-basic-auth ( request username password -- request )
+    basic-auth "Proxy-Authorization" set-header ;
 
 : <request> ( -- request )
     request new
@@ -152,6 +157,7 @@ redirects ;
         <url>
             H{ } clone >>query
         >>url
+        <url> >>proxy-url
         H{ } clone >>header
         V{ } clone >>cookies
         "close" "connection" set-header
@@ -163,15 +169,15 @@ redirects ;
 
 
 TUPLE: response
-version
-code
-message
-header
-cookies
-content-type
-content-charset
-content-encoding
-body ;
+    version
+    code
+    message
+    header
+    cookies
+    content-type
+    content-charset
+    content-encoding
+    body ;
 
 : <response> ( -- response )
     response new
@@ -199,10 +205,10 @@ M: response clone
     over cookies>> push ;
 
 TUPLE: raw-response
-version
-code
-message
-body ;
+    version
+    code
+    message
+    body ;
 
 : <raw-response> ( -- response )
     raw-response new
@@ -222,5 +228,5 @@ TUPLE: post-data data params content-type content-encoding ;
 
 : parse-content-type ( content-type -- type encoding )
     ";" split1
-    parse-content-type-attributes "charset" of 
+    parse-content-type-attributes "charset" of
     [ dup mime-type-encoding encoding>name ] unless* ;

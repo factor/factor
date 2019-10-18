@@ -1,6 +1,5 @@
-USING: byte-arrays checksums fry kernel math sequences
-tools.test ;
-IN: checksums.superfast
+USING: byte-arrays checksums checksums.superfast fry kernel math
+sequences tools.test ;
 
 {
     {

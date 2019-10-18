@@ -1,11 +1,12 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel concurrency.messaging inspector
-ui.tools.listener ui.tools.traceback ui.gadgets.buttons
-ui.gadgets.status-bar ui.gadgets.tracks ui.commands ui.gadgets
-models models.arrow ui.tools.browser ui.tools.common ui.gestures
-ui.gadgets.labels ui threads namespaces make tools.walker assocs
-combinators fry ;
+USING: accessors assocs colors colors.constants combinators
+concurrency.messaging formatting fry inspector kernel make
+models models.arrow namespaces sequences threads tools.walker ui
+ui.commands ui.gadgets ui.gadgets.buttons ui.gadgets.labels
+ui.gadgets.status-bar ui.theme ui.gadgets.toolbar
+ui.gadgets.tracks ui.gestures ui.pens.solid ui.tools.browser
+ui.tools.common ui.tools.listener ui.tools.traceback ;
 IN: ui.tools.walker
 
 TUPLE: walker-gadget < tool
@@ -38,34 +39,66 @@ M: walker-gadget ungraft*
 M: walker-gadget focusable-child*
     traceback>> ;
 
-: walker-state-string ( status thread -- string )
-    [
-        "Thread: " %
-        dup name>> %
-        " (" %
-        swap {
-            { +stopped+ "Stopped" }
-            { +suspended+ "Suspended" }
-            { +running+ "Running" }
-        } at %
-        ")" %
-        drop
-    ] "" make ;
+: thread-status-text ( status -- string )
+    {
+        { +stopped+ "Stopped" }
+        { +suspended+ "Suspended" }
+        { +running+ "Running" }
+    } at "(" ")" surround ;
 
-: <thread-status> ( model thread -- gadget )
-    '[ _ walker-state-string ] <arrow> <label-control> ;
+: thread-status-foreground ( status -- color )
+    {
+      { +stopped+   [ thread-status-stopped-foreground ] }
+      { +suspended+ [ thread-status-suspended-foreground ] }
+      { +running+   [ thread-status-running-foreground ] }
+      { f           [ text-color ] }
+    } case ;
+
+: thread-status-background ( status -- color )
+    {
+      { +stopped+   [ thread-status-stopped-background ] }
+      { +suspended+ [ thread-status-suspended-background ] }
+      { +running+   [ thread-status-running-background ] }
+      { f           [ content-background ] }
+    } case ;
+
+TUPLE: thread-status < label ;
+
+M: thread-status model-changed
+    [ value>> ] dip {
+        [ [ thread-status-text ] [ string<< ] bi* ]
+        [ [ thread-status-foreground ] [ font>> foreground<< ] bi* ]
+        [ [ thread-status-background <solid> ] [ parent>> parent>> interior<< ] bi* ]
+    } 2cleave ;
+
+: <thread-status> ( model -- gadget )
+    "" thread-status new-label
+        swap >>model ;
+
+: add-thread-status ( track -- track )
+    horizontal <track> { 5 5 } >>gap
+        "Thread:" <label>
+            [ t >>bold? ] change-font
+            f track-add
+        self name>> <label> f track-add
+        over status>> <thread-status>
+            dup font>> t >>bold? drop
+            f track-add
+    margins f track-add ;
+
+: add-traceback ( track -- track )
+    dup traceback>> 1 track-add ;
 
 : <walker-gadget> ( status continuation thread -- gadget )
-    vertical walker-gadget new-track
+    vertical walker-gadget new-track with-lines
         swap >>thread
         swap >>continuation
         swap >>status
         dup continuation>> <traceback-gadget> >>traceback
-
         add-toolbar
-        dup status>> self <thread-status> f track-add
-        dup traceback>> 1 track-add ;
-    
+        add-thread-status
+        add-traceback ;
+
 : walker-help ( -- ) "ui-walker" com-browse ;
 
 \ walker-help H{ { +nullary+ t } } define-command

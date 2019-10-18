@@ -12,7 +12,7 @@ IN: noise
 
 : float-map>byte-map ( floats: float-array scale: float bias: float -- bytes: byte-array )
     '[
-        [ _ 255.0 * v*n _ 255.0 * v+n float-4 int-4 vconvert ] 4 napply 
+        [ _ 255.0 * v*n _ 255.0 * v+n float-4 int-4 vconvert ] 4 napply
         [ int-4 short-8 vconvert ] 2bi@
         short-8 uchar-16 vconvert
     ] data-map( float-4[4] -- uchar-16 ) ; inline
@@ -49,7 +49,7 @@ TYPED: normal-noise-map ( seed: integer dim -- bytes )
 ERROR: invalid-perlin-noise-table table ;
 
 : <perlin-noise-table> ( -- table )
-    256 iota >byte-array randomize dup append ; inline
+    256 <iota> >byte-array randomize dup append ; inline
 
 : validate-table ( table -- table )
     dup { [ byte-array? ] [ length 512 >= ] } 1&&
@@ -58,7 +58,7 @@ ERROR: invalid-perlin-noise-table table ;
 ! XXX doesn't work when v is nan or |v| >= 2^31
 : floor-vector ( v -- v' )
     [ float-4 int-4 vconvert int-4 float-4 vconvert ]
-    [ [ v> -1.0 float-4-with vand ] curry keep v+ ] bi ; inline
+    [ [ v> -1.0 float-4-with vand ] keepd v+ ] bi ; inline
 
 : unit-cubed ( floats -- ints )
     float-4 int-4 vconvert 255 int-4-with vbitand ; inline
@@ -72,7 +72,7 @@ ERROR: invalid-perlin-noise-table table ;
         [ v* ]
         [ v* ]
     } cleave ; inline
-    
+
 :: hashes ( table x y z -- aaa baa aba bba aab bab abb bbb )
     x      table nth-unsafe y + :> a
     x  1 + table nth-unsafe y + :> b
@@ -120,7 +120,7 @@ TYPED:: perlin-noise ( table: byte-array point: float-4 -- value: float )
     faded trilerp ;
 
 MEMO: perlin-noise-map-coords ( dim -- coords )
-    first2 iota [| x y | x iota [ y 0.0 0.0 float-4-boa ] float-4-array{ } map-as ] with map concat ;
+    first2 <iota> [| x y | x <iota> [ y 0.0 0.0 float-4-boa ] float-4-array{ } map-as ] with map concat ;
 
 TYPED:: perlin-noise-map ( table: byte-array transform: matrix4 coords: float-4-array -- map: float-array )
     coords [| coord | table transform coord m4.v perlin-noise ] data-map( float-4 -- c:float )
@@ -128,4 +128,3 @@ TYPED:: perlin-noise-map ( table: byte-array transform: matrix4 coords: float-4-
 
 : perlin-noise-image ( table transform dim -- image )
     [ perlin-noise-map-coords perlin-noise-map ] [ 5/7. 0.5 float-map>image ] bi ;
-

@@ -4,7 +4,6 @@ combinators.short-circuit core-foundation core-foundation.data
 core-foundation.run-loop core-foundation.strings destructors
 game.input hints iokit iokit.hid kernel locals math namespaces
 sequences vectors ;
-FROM: namespaces => change-global ;
 IN: game.input.iokit
 
 SINGLETON: iokit-game-input-backend
@@ -158,7 +157,7 @@ CONSTANT: pov-values
 
 : record-controller ( controller-state value -- )
     dup IOHIDValueGetElement {
-        { [ dup button? ] [ record-button ] } 
+        { [ dup button? ] [ record-button ] }
         { [ dup axis? ] [ {
             { [ dup x-axis? ] [ drop axis-value >>x drop ] }
             { [ dup y-axis? ] [ drop axis-value >>y drop ] }
@@ -206,7 +205,7 @@ M: iokit-game-input-backend reset-mouse
     +mouse-state+ get-global
         0 >>dx
         0 >>dy
-        0 >>scroll-dx 
+        0 >>scroll-dx
         0 >>scroll-dy
         drop ;
 
@@ -244,7 +243,7 @@ M: iokit-game-input-backend reset-mouse
     } cleave controller-state boa ;
 
 : ?add-mouse-buttons ( device -- )
-    button-count +mouse-state+ get-global buttons>> 
+    button-count +mouse-state+ get-global buttons>>
     2dup length >
     [ set-length ] [ 2drop ] if ;
 
@@ -321,7 +320,7 @@ M: iokit-game-input-backend (reset-game-input)
 
 M: iokit-game-input-backend (close-game-input)
     +hid-manager+ get-global [
-        +hid-manager+ [ 
+        +hid-manager+ [
             [
                 CFRunLoopGetMain CFRunLoopDefaultMode
                 IOHIDManagerUnscheduleFromRunLoop
@@ -339,7 +338,7 @@ M: iokit-game-input-backend get-controllers ( -- sequence )
     +controller-states+ get-global keys [ controller boa ] map ;
 
 : ?join ( pre post sep -- string )
-    2over start [ swap 2nip ] [ [ 2array ] dip join ] if ;
+    2over subseq-start [ swap 2nip ] [ [ 2array ] dip join ] if ;
 
 M: iokit-game-input-backend product-string ( controller -- string )
     handle>>

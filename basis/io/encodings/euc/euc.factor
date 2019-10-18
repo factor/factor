@@ -5,7 +5,7 @@ math.order simple-flat-file io io.binary byte-arrays locals combinators
 words classes.singleton fry classes.parser parser quotations ;
 IN: io.encodings.euc
 
-TUPLE: euc { table biassoc } ;
+TUPLE: euc { table biassoc read-only } ;
 
 <PRIVATE
 
@@ -44,7 +44,7 @@ SYMBOL: euc-table
 
 : setup-euc ( word file-name -- singleton-class biassoc )
     [ dup define-singleton-class ]
-    [ flat-file>biassoc ] bi* ;
+    [ load-codetable-file ] bi* ;
 
 :: define-recursive-methods ( class data words -- )
     words [| word |

@@ -22,7 +22,7 @@ $nl
 ABOUT: "byte-vectors"
 
 HELP: byte-vector
-{ $description "The class of resizable byte vectors. See " { $link "byte-vectors" } " for information." } ;
+{ $class-description "The class of resizable byte vectors. See " { $link "byte-vectors" } " for information." } ;
 
 HELP: <byte-vector>
 { $values { "n" "a positive integer specifying initial capacity" } { "byte-vector" byte-vector } }
@@ -36,5 +36,5 @@ HELP: >byte-vector
 HELP: BV{
 { $syntax "BV{ elements... }" }
 { $values { "elements" "a list of bytes" } }
-{ $description "Marks the beginning of a literal byte vector. Literal byte vectors are terminated by " { $link POSTPONE: } } "." } 
+{ $description "Marks the beginning of a literal byte vector. Literal byte vectors are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "BV{ 1 2 3 12 }" } } ;

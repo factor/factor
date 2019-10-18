@@ -7,7 +7,6 @@ concurrency.semaphores continuations debugger destructors fry
 io io.sockets io.sockets.secure io.streams.duplex io.styles
 io.timeouts kernel logging make math math.parser namespaces
 present prettyprint random sequences sets strings threads ;
-FROM: namespaces => set ;
 IN: io.servers
 
 TUPLE: threaded-server < identity-tuple
@@ -28,25 +27,17 @@ secure-context ;
 SYMBOL: running-servers
 running-servers [ HS{ } clone ] initialize
 
-ERROR: server-already-running threaded-server ;
-
 ERROR: server-not-running threaded-server ;
+
+ERROR: server-already-running threaded-server ;
 
 <PRIVATE
 
-: must-be-running ( threaded-server -- threaded-server )
-    dup running-servers get in? [ server-not-running ] unless ;
+: add-running-server ( threaded-server running-servers -- )
+    dupd ?adjoin [ drop ] [ server-already-running ] if ;
 
-: must-not-be-running ( threaded-server -- threaded-server )
-    dup running-servers get in? [ server-already-running ] when ;
-
-: add-running-server ( threaded-server -- )
-    must-not-be-running
-    running-servers get adjoin ;
-
-: remove-running-server ( threaded-server -- )
-    must-be-running
-    running-servers get delete ;
+: remove-running-server ( threaded-server running-servers -- )
+    dupd ?delete [ drop ] [ server-not-running ] if ;
 
 PRIVATE>
 
@@ -78,18 +69,19 @@ M: inet6 >insecure 1array ;
 M: local >insecure 1array ;
 M: integer >insecure internet-server 1array ;
 M: string >insecure internet-server 1array ;
-M: array >insecure [ >insecure ] map ;
+M: array >insecure [ >insecure ] map concat ;
 M: f >insecure ;
 
 : >secure ( addrspec -- addrspec' )
-    >insecure
-    [ dup secure? [ <secure> ] unless ] map ;
+    >insecure [ dup secure? [ f <secure> ] unless ] map ;
+
+: configurable-addrspecs ( addrspecs -- addrspecs' )
+    [ inet6? not ipv6-supported? or ] filter ;
 
 : listen-on ( threaded-server -- addrspecs )
     [ secure>> ssl-supported? [ >secure ] [ drop { } ] if ]
-    [ insecure>> >insecure ]
-    bi append
-    [ resolve-host ] map concat ;
+    [ insecure>> >insecure ] bi append
+    [ resolve-host ] map concat configurable-addrspecs ;
 
 : accepted-connection ( remote local -- )
     [
@@ -101,7 +93,7 @@ M: f >insecure ;
 
 : log-connection ( remote local -- )
     [ accepted-connection ]
-    [ [ remote-address set ] [ local-address set ] bi* ]
+    [ [ remote-address namespaces:set ] [ local-address namespaces:set ] bi* ]
     2bi ;
 
 M: threaded-server handle-client* handler>> call( -- ) ;
@@ -181,7 +173,7 @@ PRIVATE>
             [ ] [ name>> ] bi
             [
                 set-servers
-                dup add-running-server
+                dup running-servers get add-running-server
                 dup servers>>
                 [
                     [ '[ _ _ [ start-accept-loop ] with-disposal ] ]
@@ -196,7 +188,7 @@ PRIVATE>
 
 : stop-server ( threaded-server -- )
     dup server-running? [
-        [ remove-running-server ]
+        [ running-servers get remove-running-server ]
         [
             [
                 [ secure-context>> [ &dispose drop ] when* ]
@@ -230,7 +222,7 @@ M: inet4 connect-addr [ "127.0.0.1" ] dip port>> <inet4> ;
 
 M: inet6 connect-addr [ "::1" ] dip port>> <inet6> ;
 
-M: secure connect-addr addrspec>> connect-addr <secure> ;
+M: secure connect-addr addrspec>> connect-addr f <secure> ;
 
 M: local connect-addr ;
 
@@ -243,8 +235,8 @@ PRIVATE>
     server-addrs [ secure? ] filter random ;
 
 : insecure-addr ( -- addrspec )
-    server-addrs [ secure? not ] filter random ;
-    
+    server-addrs [ secure? ] reject random ;
+
 : server. ( threaded-server -- )
     [ [ "=== " write name>> ] [ ] bi write-object nl ]
     [ servers>> [ addr>> present print ] each ] bi ;
@@ -254,7 +246,7 @@ PRIVATE>
 
 : get-servers-named ( string -- sequence )
     [ all-servers ] dip '[ name>> _ = ] filter ;
-    
+
 : servers. ( -- )
     all-servers [ server. ] each ;
 

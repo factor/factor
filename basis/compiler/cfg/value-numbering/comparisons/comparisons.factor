@@ -1,24 +1,12 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel math math.order namespaces
-sequences vectors combinators.short-circuit
-cpu.architecture
-compiler.cfg
-compiler.cfg.comparisons
-compiler.cfg.instructions
-compiler.cfg.registers
+USING: accessors combinators combinators.short-circuit
+compiler.cfg compiler.cfg.comparisons compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.math
-compiler.cfg.value-numbering.graph
-compiler.cfg.value-numbering.rewrite ;
+compiler.cfg.value-numbering.rewrite cpu.architecture kernel
+math math.order namespaces sequences vectors ;
 IN: compiler.cfg.value-numbering.comparisons
-
-! Optimizations performed here:
-!
-! 1) Eliminating intermediate boolean values when the result of
-! a comparison is used by a compare-branch
-! 2) Folding comparisons where both inputs are literal
-! 3) Folding comparisons where both inputs are congruent
-! 4) Converting compare instructions into compare-imm instructions
 
 : fold-compare-imm? ( insn -- ? )
     src1>> vreg>insn literal-insn? ;
@@ -105,7 +93,7 @@ UNION: general-compare-insn scalar-compare-insn ##test-vector ;
 : fold-compare-imm-branch ( insn -- insn/f )
     evaluate-compare-imm fold-branch ;
 
-: >test-branch ( insn -- insn )
+: >test-branch ( insn -- insn' )
     [ src1>> ] [ src1>> ] [ cc>> ] tri ##test-branch new-insn ;
 
 M: ##compare-imm-branch rewrite
@@ -135,7 +123,7 @@ M: ##test-imm-branch rewrite
     } cond ;
 
 : swap-compare ( src1 src2 cc swap? -- src1 src2 cc )
-    [ [ swap ] dip swap-cc ] when ; inline
+    [ swapd swap-cc ] when ; inline
 
 : (>compare-imm-branch) ( insn swap? -- src1 src2 cc )
     [ [ src1>> ] [ src2>> ] [ cc>> ] tri ] dip swap-compare ; inline
@@ -258,17 +246,11 @@ M: ##compare-integer-imm rewrite
 : simplify-test ( insn -- insn )
     dup (simplify-test) drop [ >>src1 ] [ >>src2 ] bi* ; inline
 
-: simplify-test-branch ( insn -- insn )
-    dup (simplify-test) drop [ >>src1 ] [ >>src2 ] bi* ; inline
-
-: (simplify-test-imm) ( insn -- src1 src2 cc )
-    [ src1>> vreg>insn [ src1>> ] [ src2>> ] bi ] [ cc>> ] bi ; inline
-
 : simplify-test-imm ( insn -- insn )
-    [ dst>> ] [ (simplify-test-imm) ] [ temp>> ] tri ##test-imm new-insn ; inline
+    [ dst>> ] [ (simplify-test) ] [ temp>> ] tri ##test-imm new-insn ; inline
 
 : simplify-test-imm-branch ( insn -- insn )
-    (simplify-test-imm) ##test-imm-branch new-insn ; inline
+    (simplify-test) ##test-imm-branch new-insn ; inline
 
 : >test-imm ( insn ? -- insn' )
     (>compare-imm) [ vreg>integer ] dip next-vreg
@@ -298,7 +280,7 @@ M: ##test-branch rewrite
         { [ dup src2>> vreg-immediate-comparand? ] [ f >test-imm-branch ] }
         { [ dup diagonal? ] [
             {
-                { [ dup src1>> vreg>insn ##and? ] [ simplify-test-branch ] }
+                { [ dup src1>> vreg>insn ##and? ] [ simplify-test ] }
                 { [ dup src1>> vreg>insn ##and-imm? ] [ simplify-test-imm-branch ] }
                 [ drop f ]
             } cond

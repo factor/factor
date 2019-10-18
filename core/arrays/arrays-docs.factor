@@ -43,7 +43,7 @@ $nl
 ABOUT: "arrays"
 
 HELP: array
-{ $description "The class of fixed-length arrays. See " { $link "syntax-arrays" } " for syntax and " { $link "arrays" } " for general information." } ;
+{ $class-description "The class of fixed-length arrays. See " { $link "syntax-arrays" } " for syntax and " { $link "arrays" } " for general information." } ;
 
 HELP: <array>
 { $values { "n" "a non-negative integer" } { "elt" "an initial element" } { "array" "a new array" } }

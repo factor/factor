@@ -1,14 +1,14 @@
-USING: accessors alien.c-types alien.data.map arrays assocs
-byte-arrays colors combinators combinators.short-circuit
-destructors euler.b-rep euler.b-rep.triangulation fry
-game.input game.loop game.worlds game.models.half-edge gml.printer
-gpu gpu.buffers gpu.framebuffers gpu.render gpu.shaders gpu.state
-gpu.util.wasd hashtables images kernel literals locals math
-math.ranges math.vectors math.vectors.conversion math.vectors.simd
-math.vectors.simd.cords method-chains models sequences sets
-specialized-arrays specialized-vectors typed math.order namespaces
-ui ui.gadgets.worlds ui.gestures ui.pixel-formats growable vectors
-alien.data ;
+USING: accessors alien.c-types alien.data alien.data.map arrays
+assocs byte-arrays colors combinators combinators.short-circuit
+destructors euler.b-rep euler.b-rep.triangulation fry game.input
+game.loop game.models.half-edge game.worlds gml.printer gpu
+gpu.buffers gpu.framebuffers gpu.render gpu.shaders gpu.state
+gpu.util.wasd growable images kernel literals locals math
+math.order math.ranges math.vectors math.vectors.conversion
+math.vectors.simd math.vectors.simd.cords method-chains models
+namespaces sequences sets specialized-vectors typed ui
+ui.gadgets ui.gadgets.worlds ui.gestures ui.pixel-formats
+vectors ;
 FROM: math.matrices => m.v ;
 FROM: models => change-model ;
 SPECIALIZED-VECTORS: ushort float-4 ;
@@ -144,7 +144,7 @@ TUPLE: gml-viewer-world < wasd-world
     drag? ;
 
 TYPED: refresh-b-rep-view ( world: gml-viewer-world -- )
-    dup model>> value>> >>b-rep
+    dup control-value >>b-rep
     dup vertex-array>> [ vertex-array-buffer dispose ] when*
     dup [ b-rep>> ] [ selected>> value>> ] bi make-b-rep-vertices {
         [
@@ -162,7 +162,7 @@ TYPED: refresh-b-rep-view ( world: gml-viewer-world -- )
 
 M: gml-viewer-world model-changed
     nip
-    [ model>> value>> ]
+    [ control-value ]
     [ b-rep<< ]
     [ dup viewable? [ refresh-b-rep-view ] [ drop ] if ] tri ;
 

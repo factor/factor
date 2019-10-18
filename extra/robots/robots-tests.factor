@@ -2,9 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar io.encodings.utf8 io.files robots tools.test
 urls ;
-IN: robots.tests
 
-[
+{
     { "http://www.chiplist.com/sitemap.txt" }
     {
         T{ rules
@@ -26,8 +25,8 @@ IN: robots.tests
             }
             { visit-time
                 {
-                    T{ timestamp { hour 2 } }
-                    T{ timestamp { hour 5 } }
+                    T{ duration { hour 2 } }
+                    T{ duration { hour 5 } }
                 }
             }
             { request-rate 1 }
@@ -332,4 +331,4 @@ IN: robots.tests
             { unknowns H{ } }
         }
     }
-] [ "vocab:robots/robots.txt" utf8 file-contents parse-robots.txt ] unit-test
+} [ "vocab:robots/robots.txt" utf8 file-contents parse-robots.txt ] unit-test

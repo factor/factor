@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators
 combinators.short-circuit fry generalizations inverse kernel
 namespaces sequences sequences.generalizations sorting strings
-unicode.categories xml.data xml.syntax xml.syntax.private ;
+unicode xml.data xml.syntax xml.syntax.private ;
 IN: xml.syntax.inverse
 
 : remove-blanks ( seq -- newseq )
@@ -44,7 +44,7 @@ M: xml-chunk [undo-xml]
 M: tag [undo-xml] ( tag -- quot: ( tag -- ) )
     {
         [ name>> main>> '[ name>> main>> _ =/fail ] ]
-        [ attrs>> undo-attrs ] 
+        [ attrs>> undo-attrs ]
         [ children>> [undo-xml] '[ children>> @ ] ]
     } cleave '[ _ _ _ tri ] ;
 
@@ -66,7 +66,7 @@ M: interpolated [undo-xml]
 
 : >enum ( assoc -- enum )
     ! Assumes keys are 0..n
-    sort-keys values <enum> ;
+    sort-keys values <enumerated> ;
 
 : undo-xml ( xml -- quot )
     [undo-xml] '[ H{ } clone [ _ with-variables ] keep >enum ] ;

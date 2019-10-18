@@ -6,8 +6,8 @@ HELP: deploy-tool
 { $description "Opens the graphical deployment tool for the specified vocabulary." }
 { $examples { $code "\"tetris\" deploy-tool" } } ;
 
-ARTICLE: "ui.tools.deploy" "Application deployment UI tool"
-"The application deployment UI tool provides a graphical front-end to deployment configuration. Using the tool, you can set deployment options graphically."
+ARTICLE: "ui.tools.deploy" "UI application deployment tool"
+"The application deployment tool provides a graphical front-end to deployment configuration. Using the tool, you can set deployment options graphically."
 $nl
 "To start the tool, pass a vocabulary name to a word:"
 { $subsections deploy-tool }

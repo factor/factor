@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.short-circuit
-destructors io io.private kernel locals math namespaces
+USING: accessors alien combinators combinators.short-circuit
+destructors io io.ports io.private kernel locals math namespaces
 sequences vectors ;
 IN: io.streams.peek
 
@@ -49,7 +49,11 @@ M:: peek-stream stream-read-unsafe ( n buf stream -- count )
             peeked <reversed> 0 buf copy
             0 peeked shorten
             n #peeked - :> n'
-            buf #peeked tail-slice :> buf'
+            stream stream>> input-port? [
+                #peeked buf <displaced-alien>
+            ] [
+                buf #peeked tail-slice
+            ] if :> buf'
             n' buf' stream stream-read-unsafe #peeked +
         ] if
     ] if ;
@@ -68,7 +72,7 @@ M: peek-stream stream-flush stream>> stream-flush ;
 M: peek-stream stream-tell stream>> stream-tell ;
 M: peek-stream stream-seek stream>> stream-seek ;
 
-: stream-peek1 ( stream -- ch )
+: stream-peek1 ( stream -- elt )
     dup peeked>> [
         dup stream>> stream-read1 [
             [ 1vector over stream-clone-resizable >>peeked drop ] keep
@@ -88,5 +92,5 @@ M: peek-stream stream-seek stream>> stream-seek ;
         [ reverse swap peeked>> push-all ] keep
     ] if ;
 
-: peek1 ( -- seq ) input-stream get stream-peek1 ; inline
+: peek1 ( -- elt ) input-stream get stream-peek1 ; inline
 : peek ( n -- seq ) input-stream get stream-peek ; inline

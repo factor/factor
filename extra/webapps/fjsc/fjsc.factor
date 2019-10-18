@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Chris Double. All Rights Reserved.
-USING: 
+USING:
     accessors
     fjsc
     furnace
@@ -21,7 +21,7 @@ USING:
     namespaces
     peg
     sequences
-    urls 
+    urls
     validators
 ;
 IN: webapps.fjsc
@@ -29,8 +29,8 @@ IN: webapps.fjsc
 TUPLE: fjsc < dispatcher ;
 
 : absolute-url ( url -- url )
-    "http://" request get "host" header append 
-    over "/" head? [ "/" append ] unless 
+    "http://" request get "host" header append
+    over "/" head? [ "/" append ] unless
     swap append  ;
 
 : <javascript-content> ( body -- content )
@@ -38,7 +38,7 @@ TUPLE: fjsc < dispatcher ;
 
 : do-compile-url ( url -- response )
     [
-        absolute-url http-get nip 'expression' parse
+        absolute-url http-get nip expression-parser parse
         fjsc-compile write "();" write
     ] with-string-writer
     <javascript-content> ;
@@ -59,7 +59,7 @@ TUPLE: fjsc < dispatcher ;
 
 : do-compile ( code -- response )
     [
-        'expression' parse fjsc-compile write
+        expression-parser parse fjsc-compile write
     ] with-string-writer
     <javascript-content> ;
 
@@ -80,14 +80,14 @@ TUPLE: fjsc < dispatcher ;
 
 : <fjsc> ( -- fjsc )
     dispatcher new-dispatcher
-        "extra/webapps/fjsc/www" resource-path <static> "static" add-responder
-        "extra/fjsc/resources" resource-path <static> "fjsc" add-responder
+        "resource:extra/webapps/fjsc/www" <static> "static" add-responder
+        "resource:extra/fjsc/resources" <static> "fjsc" add-responder
         fjsc new-dispatcher
             <main-action> "" add-responder
             <compile-action> "compile" add-responder
             <compile-url-action> "compile-url" add-responder
             <boilerplate>
-                { fjsc "fjsc" } >>template 
+                { fjsc "fjsc" } >>template
          >>default ;
 
 : activate-fjsc ( -- )

@@ -14,7 +14,7 @@ HELP: force
 HELP: LAZY:
 { $syntax "LAZY: word ( stack -- effect ) definition... ;" }
 { $values { "word" "a new word to define" } { "definition" "a word definition" } }
-{ $description "Creates a lazy word in the current vocabulary. When executed the word will return a " { $link promise } " that when forced, executes the word definition. Any values on the stack that are required by the word definition are captured along with the promise." } 
+{ $description "Creates a lazy word in the current vocabulary. When executed the word will return a " { $link promise } " that when forced, executes the word definition. Any values on the stack that are required by the word definition are captured along with the promise." }
 { $examples
   { $example "USING: arrays sequences prettyprint promises ;" "IN: scratchpad" "LAZY: zeroes ( -- pair ) 0 zeroes 2array ;" "zeroes force second force first ." "0" }
 } ;

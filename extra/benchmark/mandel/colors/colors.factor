@@ -11,7 +11,7 @@ CONSTANT: sat 0.85
 CONSTANT: val 0.85
 
 : <color-map> ( nb-cols -- map )
-    [ iota ] keep '[
+    [ <iota> ] keep '[
         360 * _ 1 + / sat val
         1 <hsva> >rgba scale-rgb
     ] map ;

@@ -1,12 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data alien.strings
-assocs byte-arrays classes.struct combinators
-combinators.short-circuit continuations fry io.encodings.utf8
-kernel math math.parser namespaces sequences splitting strings
-unix unix.ffi unix.users unix.utilities ;
-QUALIFIED: unix.ffi
-QUALIFIED: grouping
+USING: accessors alien.c-types alien.data assocs byte-arrays
+classes.struct combinators continuations fry grouping
+io.encodings.utf8 kernel math math.parser namespaces sequences
+strings unix unix.ffi unix.users unix.utilities ;
 IN: unix.groups
 
 TUPLE: group id name passwd members ;
@@ -21,7 +18,7 @@ GENERIC: group-struct ( obj -- group/f )
     gr_mem>> utf8 alien>strings ;
 
 : (group-struct) ( id -- group-struct id group-struct byte-array length void* )
-    [ \ unix.ffi:group <struct> ] dip over 4096
+    [ unix.ffi:group <struct> ] dip over 4096
     [ <byte-array> ] keep f void* <ref> ;
 
 : check-group-struct ( group-struct ptr -- group-struct/f )
@@ -54,7 +51,7 @@ PRIVATE>
     ] [
         group-struct [ gr_name>> ] [ f ] if*
     ] if*
-    [ nip ] [ number>string ] if* ;
+    [ ] [ number>string ] ?if ;
 
 : group-id ( string -- id/f )
     group-struct dup [ gr_gid>> ] when ;
@@ -79,15 +76,15 @@ ERROR: no-group string ;
     ] if* ;
 
 PRIVATE>
-    
+
 GENERIC: user-groups ( string/id -- seq )
 
 M: string user-groups ( string -- seq )
-    (user-groups) ; 
+    (user-groups) ;
 
 M: integer user-groups ( id -- seq )
     user-name (user-groups) ;
-    
+
 : all-groups ( -- seq )
     [ unix.ffi:getgrent dup ] [ group-struct>group ] produce nip
     endgrent ;
@@ -139,14 +136,14 @@ GENERIC: set-effective-group ( obj -- )
     [ unix.ffi:setegid ] unix-system-call drop ; inline
 
 PRIVATE>
-    
+
 M: integer set-real-group ( id -- )
     (set-real-group) ;
 
 M: string set-real-group ( string -- )
     ?group-id (set-real-group) ;
 
-M: integer set-effective-group ( id -- )    
+M: integer set-effective-group ( id -- )
     (set-effective-group) ;
 
 M: string set-effective-group ( string -- )

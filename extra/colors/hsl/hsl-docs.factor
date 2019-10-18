@@ -12,3 +12,5 @@ ARTICLE: "colors.hsl" "HSL colors"
     >hsla
 }
 { $see-also "colors" } ;
+
+ABOUT: "colors.hsl"

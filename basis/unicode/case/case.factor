@@ -1,9 +1,7 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: unicode.data sequences namespaces
-sbufs make unicode.normalize math hints
-unicode.categories combinators assocs combinators.short-circuit
-strings splitting kernel accessors unicode.breaks fry locals ;
+USING: combinators.short-circuit kernel locals namespaces sbufs
+sequences splitting unicode.categories unicode.data ;
 QUALIFIED: ascii
 IN: unicode.case
 
@@ -49,13 +47,16 @@ SYMBOL: locale ! Just casing locale, or overall?
 : fix-sigma-end ( string -- string )
     [ "" ] [
         dup last CHAR: greek-small-letter-sigma =
-        [ 1 head* CHAR: greek-small-letter-final-sigma suffix ] when
+        [ but-last CHAR: greek-small-letter-final-sigma suffix ] when
     ] if-empty ; inline
+
+! this duplicate unicode to prevent dependencies
+CATEGORY-NOT: (uncased) Lu Ll Lt Lm Mn Me ;
 
 : sigma-map ( string -- string )
     { CHAR: greek-capital-letter-sigma } split [ [
         [ { CHAR: greek-small-letter-sigma } ] [
-            dup first uncased?
+            dup first (uncased)?
             CHAR: greek-small-letter-final-sigma
             CHAR: greek-small-letter-sigma ? prefix
         ] if-empty
@@ -85,43 +86,3 @@ SYMBOL: locale ! Just casing locale, or overall?
     [ lithuanian? [ lithuanian>upper ] when ] bi ;
 
 PRIVATE>
-
-: >lower ( string -- lower )
-    locale>lower final-sigma
-    [ lower>> ] [ ch>lower ] map-case ;
-
-HINTS: >lower string ;
-
-: >upper ( string -- upper )
-    locale>upper
-    [ upper>> ] [ ch>upper ] map-case ;
-
-HINTS: >upper string ;
-
-<PRIVATE
-
-: (>title) ( string -- title )
-    locale>upper
-    [ title>> ] [ ch>title ] map-case ; inline
-
-PRIVATE>
-
-: capitalize ( string -- title )
-    unclip-slice 1string [ >lower ] [ (>title) ] bi*
-    "" prepend-as ; inline
-
-: >title ( string -- title )
-    final-sigma >words [ capitalize ] map! concat ;
-
-HINTS: >title string ;
-
-: >case-fold ( string -- fold )
-    >upper >lower ;
-
-: lower? ( string -- ? ) dup >lower = ;
-
-: upper? ( string -- ? ) dup >upper = ;
-
-: title? ( string -- ? ) dup >title = ;
-
-: case-fold? ( string -- ? ) dup >case-fold = ;

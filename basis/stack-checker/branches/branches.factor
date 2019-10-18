@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays effects fry vectors sequences assocs math math.order accessors kernel
-combinators quotations namespaces grouping locals stack-checker.state
-stack-checker.backend stack-checker.errors stack-checker.visitor
-stack-checker.values stack-checker.recursive-state ;
+USING: accessors arrays assocs effects fry grouping kernel math
+namespaces quotations sequences stack-checker.backend
+stack-checker.errors stack-checker.recursive-state
+stack-checker.state stack-checker.values stack-checker.visitor
+vectors ;
 FROM: sequences.private => dispatch ;
 IN: stack-checker.branches
 
@@ -15,7 +16,7 @@ SYMBOLS: +bottom+ +top+ ;
 : unify-inputs ( max-input-count input-count meta-d -- new-meta-d )
     ! Introduced values can be anything, and don't unify with
     ! literals.
-    dup [ [ - +top+ <repetition> ] dip append ] [ 3drop f ] if ;
+    [ [ - +top+ <repetition> ] dip append ] [ 2drop f ] if* ;
 
 : pad-with-bottom ( seq -- newseq )
     ! Terminated branches are padded with bottom values which
@@ -138,8 +139,8 @@ M: callable infer-branch
 
 GENERIC: curried/composed? ( known -- ? )
 M: object curried/composed? drop f ;
-M: curried curried/composed? drop t ;
-M: composed curried/composed? drop t ;
+M: curried-effect curried/composed? drop t ;
+M: composed-effect curried/composed? drop t ;
 M: declared-effect curried/composed? known>> curried/composed? ;
 
 : declare-if-effects ( -- )
@@ -166,5 +167,5 @@ M: declared-effect curried/composed? known>> curried/composed? ;
 
 : infer-dispatch ( -- )
     \ dispatch combinator set
-    pop-literal nip infer-branches
+    pop-literal infer-branches
     [ #dispatch, ] dip compute-phi-function ;

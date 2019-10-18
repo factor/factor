@@ -1,23 +1,23 @@
 #include "master.hpp"
 
-/* A tool to debug write barriers. Call check_data_heap() to ensure that all
-cards that should be marked are actually marked. */
+// A tool to debug write barriers. Call check_data_heap() to ensure that all
+// cards that should be marked are actually marked.
 
 namespace factor {
 
 enum generation {
-  nursery_generation,
-  aging_generation,
-  tenured_generation
+  NURSERY_GENERATION,
+  AGING_GENERATION,
+  TENURED_GENERATION
 };
 
 inline generation generation_of(factor_vm* parent, object* obj) {
   if (parent->data->nursery->contains_p(obj))
-    return nursery_generation;
+    return NURSERY_GENERATION;
   else if (parent->data->aging->contains_p(obj))
-    return aging_generation;
+    return AGING_GENERATION;
   else if (parent->data->tenured->contains_p(obj))
-    return tenured_generation;
+    return TENURED_GENERATION;
   else {
     critical_error("Bad object", (cell)obj);
     return (generation)-1;
@@ -32,7 +32,7 @@ struct slot_checker {
   slot_checker(factor_vm* parent, object* obj, generation gen)
       : parent(parent), obj(obj), gen(gen) {}
 
-  void check_write_barrier(cell* slot_ptr, generation target, char mask) {
+  void check_write_barrier(cell* slot_ptr, generation target, cell mask) {
     cell object_card_pointer = parent->cards_offset + ((cell)obj >> card_bits);
     cell slot_card_pointer =
         parent->cards_offset + ((cell)slot_ptr >> card_bits);
@@ -58,39 +58,28 @@ struct slot_checker {
   }
 
   void operator()(cell* slot_ptr) {
-    if (!immediate_p(*slot_ptr)) {
-      generation target = generation_of(parent, untag<object>(*slot_ptr));
-      switch (gen) {
-        case nursery_generation:
-          break;
-        case aging_generation:
-          if (target == nursery_generation)
-            check_write_barrier(slot_ptr, target, card_points_to_nursery);
-          break;
-        case tenured_generation:
-          if (target == nursery_generation)
-            check_write_barrier(slot_ptr, target, card_points_to_nursery);
-          else if (target == aging_generation)
-            check_write_barrier(slot_ptr, target, card_points_to_aging);
-          break;
+    if (immediate_p(*slot_ptr))
+      return;
+
+    generation target = generation_of(parent, untag<object>(*slot_ptr));
+    if (gen == AGING_GENERATION && target == NURSERY_GENERATION) {
+      check_write_barrier(slot_ptr, target, card_points_to_nursery);
+    } else if (gen == TENURED_GENERATION) {
+      if (target == NURSERY_GENERATION) {
+        check_write_barrier(slot_ptr, target, card_points_to_nursery);
+      } else if (target == AGING_GENERATION) {
+        check_write_barrier(slot_ptr, target, card_points_to_aging);
       }
     }
   }
 };
 
-struct object_checker {
-  factor_vm* parent;
-
-  explicit object_checker(factor_vm* parent) : parent(parent) {}
-
-  void operator()(object* obj) {
-    slot_checker checker(parent, obj, generation_of(parent, obj));
-    obj->each_slot(checker);
-  }
-};
-
 void factor_vm::check_data_heap() {
-  object_checker checker(this);
+  auto checker = [&](object* obj){
+    generation obj_gen = generation_of(this, obj);
+    slot_checker s_checker(this, obj, obj_gen);
+    obj->each_slot(s_checker);
+  };
   each_object(checker);
 }
 

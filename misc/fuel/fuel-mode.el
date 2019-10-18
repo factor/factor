@@ -123,8 +123,7 @@ buffer in case of errors."
 (defun fuel-load-usings ()
   "Loads all vocabularies in the current buffer's USING: from.
 Useful to activate autodoc help messages in a vocabulary not yet
-loaded. See documentation for `fuel-autodoc-eval-using-form-p'
-for details."
+loaded."
   (interactive)
   (message "Loading all vocabularies in USING: form ...")
   (let ((err (fuel-eval--retort-error
@@ -186,9 +185,8 @@ interacting with a factor listener is at your disposal.
   ("Eval region" ("\C-c\C-e\C-r" "\C-c\C-er")
    fuel-eval-region :enable mark-active)
   --
-  ("Edit word at point" ("\M-." "\C-c\C-e\C-d" "\C-c\C-ed")
-   fuel-edit-word-at-point :enable (symbol-at-point))
-  ("Edit word..." ("\C-c\C-e\C-w" "\C-c\C-ew") fuel-edit-word)
+  ("Edit word or vocab at point..." ("\M-." "\C-c\C-e\C-d" "\C-c\C-ed")
+   fuel-edit-word-at-point)
   ("Edit vocab..." ("\C-c\C-e\C-v" "\C-c\C-ev") fuel-edit-vocabulary)
   ("Jump back" "\M-," fuel-edit-pop-edit-word-stack)
   --
@@ -196,11 +194,11 @@ interacting with a factor listener is at your disposal.
   ("Apropos..." ("\C-c\C-d\C-p" "\C-c\C-dp") fuel-apropos)
   ("Show stack effect" ("\C-c\C-d\C-e" "\C-c\C-de") fuel-stack-effect-sexp)
   --
-  ("Show all words" ("\C-c\C-d\C-v" "\C-c\C-dv") fuel-show-file-words)
-  ("Word callers" "\C-c\M-<" fuel-show-callers :enable (symbol-at-point))
-  ("Word callees" "\C-c\M->" fuel-show-callees :enable (symbol-at-point))
-  (mode "Autodoc mode" ("\C-c\C-d\C-a" "\C-c\C-da") fuel-autodoc-mode)
-  --
+  (menu "Crossref"
+        ("Show all words" ("\C-c\C-d\C-v" "\C-c\C-dv") fuel-show-file-words)
+        ("Word callers" "\C-c\M-<" fuel-show-callers :enable (symbol-at-point))
+        ("Word callees" "\C-c\M->" fuel-show-callees :enable (symbol-at-point))
+        (mode "Autodoc mode" ("\C-c\C-d\C-a" "\C-c\C-da") fuel-autodoc-mode))
   (menu "Refactor"
         ("Rename word" ("\C-c\C-x\C-w" "\C-c\C-xw") fuel-refactor-rename-word)
         ("Inline word" ("\C-c\C-x\C-i" "\C-c\C-xi") fuel-refactor-inline-word)
@@ -215,6 +213,14 @@ interacting with a factor listener is at your disposal.
         --
         ("Extract article" ("\C-c\C-x\C-a" "\C-c\C-xa")
          fuel-refactor-extract-article))
+  (menu "Scaffold"
+        ("New vocab" ("\C-c\C-c\C-v") fuel-scaffold-vocab)
+        ("Tests for vocab" ("\C-c\C-c\C-t") fuel-scaffold-tests)
+        ("Help for vocab" ("\C-c\C-c\C-h") fuel-scaffold-help)
+        ("Tags for vocab" ("\C-c\C-c\C-g") fuel-scaffold-tags)
+        ("Summary for vocab" ("\C-c\C-c\C-s") fuel-scaffold-summary)
+        ("Authors for vocab" ("\C-c\C-c\C-a") fuel-scaffold-authors)
+        ("Platforms for vocab" ("\C-c\C-c\C-p") fuel-scaffold-platforms))
   --
   ("Load used vocabs" ("\C-c\C-e\C-l" "\C-c\C-el") fuel-load-usings)
   ("Run file" ("\C-c\C-k" "\C-c\C-l" "\C-c\C-e\C-k") fuel-run-file)

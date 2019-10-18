@@ -1,23 +1,23 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays hashtables io kernel namespaces sequences
-strings quotations math opengl combinators memoize math.vectors
-sorting splitting assocs classes.tuple models continuations
-destructors accessors math.rectangles fry fonts ui.pens.solid
-ui.images ui.gadgets ui.gadgets.private ui.gadgets.borders
-ui.gadgets.buttons ui.gadgets.labels ui.gadgets.scrollers
-ui.gadgets.paragraphs ui.gadgets.incremental ui.gadgets.packs
-ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
-ui.text ui.gadgets.presentations ui.gadgets.grids ui.gadgets.tracks
-ui.gadgets.icons ui.gadgets.grid-lines ui.baseline-alignment
-colors io.styles classes ;
+USING: accessors assocs classes combinators destructors
+documents.private fonts fry io io.styles kernel locals
+math.rectangles math.vectors memoize models namespaces sequences
+sorting splitting strings ui.baseline-alignment ui.clipboards
+ui.gadgets ui.gadgets.borders ui.gadgets.grid-lines
+ui.gadgets.grids ui.gadgets.icons ui.gadgets.incremental
+ui.gadgets.labels ui.gadgets.menus ui.gadgets.packs
+ui.gadgets.paragraphs ui.gadgets.presentations
+ui.gadgets.private ui.gadgets.scrollers ui.gadgets.tracks
+ui.gestures ui.images ui.pens.solid ui.render ui.theme
+ui.traverse ;
 FROM: io.styles => foreground background ;
 FROM: ui.gadgets.wrappers => <wrapper> ;
 IN: ui.gadgets.panes
 
 TUPLE: pane < track
-output current input last-line prototype scrolls?
-selection-color caret mark selecting? ;
+    output current input last-line prototype scrolls?
+    selection-color caret mark selecting? ;
 
 TUPLE: pane-stream pane ;
 INSTANCE: pane-stream output-stream
@@ -118,10 +118,10 @@ M: pane-stream stream-write1
     [ current>> stream-write1 ] do-pane-stream ;
 
 M: pane-stream stream-write
-    [ [ string-lines ] dip pane-write ] do-pane-stream ;
+    [ [ split-lines ] dip pane-write ] do-pane-stream ;
 
 M: pane-stream stream-format
-    [ [ string-lines ] 2dip pane-format ] do-pane-stream ;
+    [ [ split-lines ] 2dip pane-format ] do-pane-stream ;
 
 M: pane-stream dispose drop ;
 
@@ -192,32 +192,33 @@ M: pane-control model-changed ( model pane-control -- )
         swap >>quot
         swap >>model ;
 
-! Character styles
 <PRIVATE
 
-MEMO: specified-font ( assoc -- font )
-    #! We memoize here to avoid creating lots of duplicate font objects.
-    [ monospace-font <font> ] dip
-    {
-        [ font-name of >>name ]
-        [
-            font-style of {
-                { f [ ] }
-                { plain [ ] }
-                { bold [ t >>bold? ] }
-                { italic [ t >>italic? ] }
-                { bold-italic [ t >>bold? t >>italic? ] }
-            } case
-        ]
-        [ font-size of >>size ]
-        [ foreground of >>foreground ]
-        [ background of >>background ]
-    } cleave
-    derive-font ;
+! Character styles
+
+MEMO:: specified-font ( name style size foreground background -- font )
+    ! We memoize here to avoid creating lots of duplicate font objects.
+    monospace-font
+        name [ >>name ] when*
+        style {
+            { f [ ] }
+            { plain [ ] }
+            { bold [ t >>bold? ] }
+            { italic [ t >>italic? ] }
+            { bold-italic [ t >>bold? t >>italic? ] }
+        } case
+        size [ >>size ] when*
+        foreground [ >>foreground ] when*
+        background [ >>background ] when* ;
 
 : apply-font-style ( style gadget -- style gadget )
-    { font-name font-style font-size foreground background }
-    pick extract-keys specified-font >>font ;
+    over {
+        [ font-name of ]
+        [ font-style of ]
+        [ font-size of ]
+        [ foreground of ]
+        [ background of ]
+    } cleave specified-font >>font ;
 
 : apply-style ( style gadget key quot -- style gadget )
     [ pick at ] dip when* ; inline
@@ -226,7 +227,7 @@ MEMO: specified-font ( assoc -- font )
     presented [ <presentation> ] apply-style ;
 
 : apply-image-style ( style gadget -- style gadget )
-    image [ nip <image-name> <icon> ] apply-style ;
+    image-style [ nip <image-name> <icon> ] apply-style ;
 
 : apply-background-style ( style gadget -- style gadget )
     background [ <solid> >>interior ] apply-style ;
@@ -270,8 +271,7 @@ TUPLE: nested-pane-stream < pane-stream style parent ;
 : new-nested-pane-stream ( style parent class -- stream )
     new
         swap >>parent
-        swap <pane> apply-wrap-style [ >>style ] [ >>pane ] bi* ;
-    inline
+        swap <pane> apply-wrap-style [ >>style ] [ >>pane ] bi* ; inline
 
 : unnest-pane-stream ( stream -- child parent )
     [ [ style>> ] [ pane>> smash-pane ] bi style-pane ] [ parent>> ] bi ;
@@ -285,12 +285,12 @@ M: pane-stream make-block-stream
     pane-block-stream new-nested-pane-stream ;
 
 ! Tables
+
 : apply-table-gap-style ( style grid -- style grid )
     table-gap [ >>gap ] apply-style ;
 
 : apply-table-border-style ( style grid -- style grid )
-    table-border [ <grid-lines> >>boundary ]
-    apply-style ;
+    table-border [ <grid-lines> >>boundary ] apply-style ;
 
 : styled-grid ( style grid -- grid )
     <grid>
@@ -319,7 +319,7 @@ M: paragraph dispose drop ;
 
 : gadget-write ( string gadget -- )
     swap dup empty?
-    [ 2drop ] [ <label> text-theme add-gadget drop ] if ;
+    [ 2drop ] [ <label> monospace-font >>font add-gadget drop ] if ;
 
 M: pack stream-write gadget-write ;
 
@@ -341,7 +341,7 @@ M: paragraph stream-write1
     [ H{ } swap gadget-bl drop ] [ gadget-write1 ] if ;
 
 : empty-output? ( string style -- ? )
-    [ empty? ] [ image swap key? not ] bi* and ;
+    [ empty? ] [ image-style swap key? not ] bi* and ;
 
 : gadget-format ( string style stream -- )
     [ [ empty-output? ] 2keep ] dip
@@ -351,7 +351,7 @@ M: pack stream-format
     gadget-format ;
 
 M: paragraph stream-format
-    over { presented image } [ swap key? ] with any? [
+    over { presented image-style } [ swap key? ] with any? [
         gadget-format
     ] [
         [ " " split ] 2dip
@@ -440,9 +440,3 @@ pane H{
 
 GENERIC: content-gadget ( object -- gadget/f )
 M: object content-gadget drop f ;
-
-M: string content-gadget
-    '[ _ write ] make-pane <scroller>
-        { 450 100 } >>pref-dim
-    <wrapper> ;
-

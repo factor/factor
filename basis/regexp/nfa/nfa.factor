@@ -1,14 +1,11 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs grouping kernel locals math namespaces
-sequences fry quotations math.order math.ranges vectors
-unicode.categories regexp.transition-tables words sets hashtables
-combinators.short-circuit unicode.data regexp.ast
-regexp.classes memoize ;
-FROM: namespaces => set ;
+USING: accessors arrays assocs combinators.short-circuit fry
+kernel locals math memoize namespaces regexp.ast regexp.classes
+regexp.transition-tables sequences sets unicode vectors ;
 IN: regexp.nfa
 
-! This uses unicode.data for ch>upper and ch>lower
+! This uses unicode for ch>upper and ch>lower
 ! but case-insensitive matching should be done by case-folding everything
 ! before processing starts
 
@@ -146,7 +143,7 @@ M: range-class modify-class
         dup cased-range? [
             [ from>> ] [ to>> ] bi
             [ [ ch>lower ] bi@ <range-class> ]
-            [ [ ch>upper ] bi@ <range-class> ] 2bi 
+            [ [ ch>upper ] bi@ <range-class> ] 2bi
             2array <or-class>
         ] when
     ] when ;
@@ -159,8 +156,8 @@ M: with-options nfa-node ( node -- start end )
 
 : construct-nfa ( ast -- nfa-table )
     [
-        0 state set
-        <transition-table> nfa-table set
+        0 state namespaces:set
+        <transition-table> nfa-table namespaces:set
         nfa-node
         nfa-table get
             swap 1array fast-set >>final-states

@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: multiline kernel sequences io splitting fry namespaces
-http.parsers hashtables assocs combinators ascii io.files.unique
-accessors io.encodings.binary io.files byte-arrays math
-io.streams.string combinators.short-circuit strings math.order
-quoting ;
+USING: accessors ascii assocs byte-arrays combinators fry
+hashtables http http.parsers io io.encodings.binary io.files
+io.files.temp io.files.unique io.streams.string kernel math
+quoting sequences splitting ;
 IN: mime.multipart
 
 CONSTANT: buffer-size 65536
@@ -20,14 +19,15 @@ name name-content
 mime-parts ;
 
 TUPLE: mime-file headers filename temporary-path ;
+C: <mime-file> mime-file
+
 TUPLE: mime-variable headers key value ;
+C: <mime-variable> mime-variable
 
 : <multipart> ( mime-separator -- multipart )
     multipart new
         swap >>mime-separator
         H{ } clone >>mime-parts ;
-
-ERROR: bad-header bytes ;
 
 : mime-write ( sequence -- )
     >byte-array write ;
@@ -35,15 +35,10 @@ ERROR: bad-header bytes ;
 : parse-headers ( string -- hashtable )
     string-lines harvest [ parse-header-line ] map >hashtable ;
 
-ERROR: end-of-stream multipart ;
-
 : fill-bytes ( multipart -- multipart )
     buffer-size read
     [ '[ _ B{ } append-as ] change-bytes ]
     [ t >>end-of-stream? ] if* ;
-
-: maybe-fill-bytes ( multipart -- multipart )
-    dup bytes>> length 256 < [ fill-bytes ] when ;
 
 : split-bytes ( bytes separator -- leftover-bytes safe-to-dump )
     dupd [ length ] bi@ 1 - - short cut-slice swap ;
@@ -51,7 +46,7 @@ ERROR: end-of-stream multipart ;
 : dump-until-separator ( multipart -- multipart )
     dup
     [ current-separator>> ] [ bytes>> ] bi
-    [ nip ] [ start ] 2bi [
+    [ nip ] [ subseq-start ] 2bi [
         cut-slice
         [ mime-write ]
         [ over current-separator>> length short tail-slice >>bytes ] bi*
@@ -66,7 +61,6 @@ ERROR: end-of-stream multipart ;
     [ dump-until-separator ] with-string-writer ;
 
 : read-header ( multipart -- multipart )
-    maybe-fill-bytes
     dup bytes>> "--\r\n" sequence= [
         t >>end-of-stream?
     ] [
@@ -80,7 +74,7 @@ ERROR: end-of-stream multipart ;
     dup filename>> empty-name? [
         drop
     ] [
-        [ [ header>> ] [ filename>> ] [ temp-file>> ] tri mime-file boa ]
+        [ [ header>> ] [ filename>> ] [ temp-file>> ] tri <mime-file> ]
         [ content-disposition>> "name" of unquote ]
         [ mime-parts>> set-at ] tri
     ] if ;
@@ -100,7 +94,7 @@ ERROR: end-of-stream multipart ;
     ] with-output-stream ;
 
 : dump-file ( multipart -- multipart )
-    "factor-" "-upload" make-unique-file
+    [ "factor-" "-upload" unique-file ] with-temp-directory
     [ >>temp-file ] [ dump-mime-file ] bi ;
 
 : parse-content-disposition-form-data ( string -- hashtable )
@@ -129,7 +123,7 @@ ERROR: unknown-content-disposition multipart ;
 ERROR: no-content-disposition multipart ;
 
 : process-header ( multipart -- multipart )
-    "content-disposition" over header>> at ";" split1 swap {
+    dup "content-disposition" header ";" split1 swap {
         { "form-data" [
             parse-content-disposition-form-data >>content-disposition
             parse-form-data

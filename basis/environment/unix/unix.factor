@@ -1,9 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.strings
-alien.syntax kernel layouts libc sequences system unix
-environment io.encodings.utf8 unix.utilities vocabs
-combinators alien.accessors unix.ffi ;
+USING: alien.accessors alien.c-types alien.data alien.strings
+alien.syntax environment io.encodings.utf8 kernel libc system unix.ffi
+unix.utilities vocabs ;
 IN: environment.unix
 
 HOOK: environ os ( -- void* )
@@ -22,7 +21,7 @@ M: unix set-os-env ( value key -- )
 M: unix unset-os-env ( key -- ) unsetenv io-error ;
 
 M: unix (os-envs) ( -- seq )
-    environ void* deref utf8 alien>strings ;
+    environ void* deref native-string-encoding alien>strings ;
 
 : set-void* ( value alien -- ) 0 set-alien-cell ;
 
@@ -31,7 +30,4 @@ M: unix set-os-envs-pointer ( malloc -- ) environ set-void* ;
 M: unix (set-os-envs) ( seq -- )
     utf8 strings>alien malloc-byte-array set-os-envs-pointer ;
 
-os {
-    { macosx [ "environment.unix.macosx" require ] }
-    [ drop ]
-} case
+os macosx? [ "environment.unix.macosx" require ] when

@@ -118,7 +118,7 @@ SYMBOL: +stopped+
             } case f
         ] handle-synchronous
     ] while ;
- 
+
 : walker-loop ( -- )
     +running+ set-status
     [ status +stopped+ eq? ] [

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov, James Cash.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes deques dlists fry kernel
-sequences sequences.private ;
+USING: accessors arrays assocs classes deques dlists fry
+hashtables kernel parser sequences.private vocabs.loader ;
 IN: linked-assocs
 
 TUPLE: linked-assoc { assoc read-only } { dlist dlist read-only } ;
@@ -50,7 +50,7 @@ M: linked-assoc clone
 
 INSTANCE: linked-assoc assoc
 
-: >linked-hash ( assoc -- assoc )
+: >linked-hash ( assoc -- assoc' )
     [ <linked-hash> ] dip assoc-union! ;
 
 M: linked-assoc assoc-like
@@ -60,3 +60,7 @@ M: linked-assoc assoc-like
 
 M: linked-assoc equal?
     over linked-assoc? [ [ dlist>> ] bi@ = ] [ 2drop f ] if ;
+
+SYNTAX: LH{ \ } [ check-hashtable >linked-hash ] parse-literal ;
+
+{ "linked-assocs" "prettyprint" } "linked-assocs.prettyprint" require-when

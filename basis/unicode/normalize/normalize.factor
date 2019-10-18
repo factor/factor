@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ascii sequences namespaces make unicode.data kernel math arrays
-locals sorting.insertion accessors assocs math.order combinators
-strings sbufs hints combinators.short-circuit vectors ;
+USING: accessors arrays ascii combinators
+combinators.short-circuit hints kernel locals make math
+math.order sbufs sequences sorting.insertion strings
+unicode.data vectors ;
 IN: unicode.normalize
 
 <PRIVATE
@@ -44,7 +45,7 @@ CONSTANT: final-count 28
         medial-base - + final-count *
     ] dip final-base - + hangul-base + ;
 
-! Normalization -- Decomposition 
+! Normalization -- Decomposition
 
 : reorder-slice ( string start -- slice done? )
     2dup swap [ non-starter? not ] find-from drop
@@ -87,23 +88,6 @@ HINTS: (nfd) string ;
     [ compatibility-entry ] decompose ;
 
 HINTS: (nfkd) string ;
-
-PRIVATE>
-
-: nfd ( string -- nfd )
-    [ (nfd) ] with-string ;
-
-: nfkd ( string -- nfkd )
-    [ (nfkd) ] with-string ;
-
-: string-append ( s1 s2 -- string )
-    [ append ] keep
-    0 over ?nth non-starter?
-    [ length dupd reorder-back ] [ drop ] if ;
-
-HINTS: string-append string string ;
-
-<PRIVATE
 
 ! Normalization -- Composition
 
@@ -153,7 +137,7 @@ DEFER: compose-iter
 
 : try-noncombining ( state char -- state )
     [ drop ] [ [ char>> ] dip combine-chars ] 2bi
-    [ >>char to f >>last-class compose-iter ] when* ; inline
+    [ >>char to f >>last-class compose-iter ] when* ; inline recursive
 
 : compose-iter ( state -- state )
     dup current [
@@ -188,9 +172,3 @@ DEFER: compose-iter
 HINTS: combine string ;
 
 PRIVATE>
-
-: nfc ( string -- nfc )
-    [ (nfd) combine ] with-string ;
-
-: nfkc ( string -- nfkc )
-    [ (nfkd) combine ] with-string ;

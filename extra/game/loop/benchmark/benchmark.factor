@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types classes.struct game.loop
 game.loop.private kernel sequences specialized-vectors
 tools.time.struct ;
@@ -34,4 +35,3 @@ M: game-loop record-benchmarking ( loop quot: ( loop -- benchmark-data-pair ) --
     ]
     [ drop ensure-benchmark-data ]
     2bi push ;
-                                

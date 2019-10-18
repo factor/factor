@@ -32,7 +32,6 @@ IN: rosetta-code.hamming-lazy
 :: hamming ( -- hamming )
     f :> h!
     [ 1 ] [
-        h 2 3 5 [ '[ _ * ] lazy-map ] tri-curry@ tri
+        h 2 3 5 [ '[ _ * ] lmap-lazy ] tri-curry@ tri
         sort-merge sort-merge
     ] lazy-cons h! h ;
-

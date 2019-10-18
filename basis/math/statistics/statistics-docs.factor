@@ -1,28 +1,34 @@
 USING: assocs debugger hashtables help.markup help.syntax
-quotations sequences math ;
+kernel quotations sequences math ;
 IN: math.statistics
 
 HELP: geometric-mean
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the geometric mean of all elements in " { $snippet "seq" } ". The geometric mean measures the central tendency of a data set and minimizes the effects of extreme values." }
 { $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } geometric-mean ." "1.81712059283214" } }
 { $errors "Throws a " { $link signal-error. } " (square-root of 0) if the sequence is empty." } ;
 
 HELP: harmonic-mean
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the harmonic mean of the elements in " { $snippet "seq" } ". The harmonic mean is appropriate when the average of rates is desired." }
 { $notes "Positive reals only." }
-{ $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } harmonic-mean ." "6/11" } }
+{ $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } harmonic-mean ." "1+7/11" } }
 { $errors "Throws a " { $link signal-error. } " (divide by zero) if the sequence is empty." } ;
+
+HELP: kth-smallest
+{ $values { "seq" sequence } { "k" integer } { "elt" object } }
+{ $description "Returns the kth smallest element. This is semantically equivalent to " { $snippet "swap natural-sort nth" } ", and is therefore zero-indexed. " { $snippet "k" } " may not be larger than the highest index of " { $snippet "sequence" } "." }
+{ $examples { $example "USING: math.statistics prettyprint ;" "{ 3 1 2 } 1 kth-smallest ." "2" } } ;
 
 HELP: mean
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the arithmetic mean of the elements in " { $snippet "seq" } "." }
 { $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } mean ." "2" } }
-{ $errors "Throws a " { $link signal-error. } " (divide by zero) if the sequence is empty." } ;
+{ $errors "Throws a " { $link signal-error. } " (divide by zero) if the sequence is empty." }
+{ $see-also geometric-mean harmonic-mean } ;
 
 HELP: median
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the median of " { $snippet "seq" } " by finding the middle element of the sequence using " { $link kth-smallest } ". If there is an even number of elements in the sequence, the median is not unique, so the mean of the two middle values is output." }
 { $examples
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } median ." "2" }
@@ -30,7 +36,7 @@ HELP: median
 { $errors "Throws a " { $link signal-error. } " (divide by zero) if the sequence is empty." } ;
 
 HELP: range
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the difference of the maximum and minimum values in " { $snippet "seq" } "." }
 { $examples
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } range ." "2" }
@@ -47,20 +53,20 @@ HELP: minmax
 } ;
 
 HELP: sample-std
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the sample standard deviation of " { $snippet "seq" } ", which is the square root of the sample variance. It measures how widely spread the values in a sequence are about the mean for a random subset of a dataset." }
 { $examples
   { $example "USING: math.statistics prettyprint ;" "{ 7 8 9 } sample-std ." "1.0" } } ;
 
 HELP: sample-ste
-  { $values { "seq" sequence } { "x" "a non-negative real number"} }
+  { $values { "seq" sequence } { "x" "a non-negative real number" } }
   { $description "Computes the standard error of the mean for " { $snippet "seq" } ". It's defined as the standard deviation divided by the square root of the length of the sequence, and measures uncertainty associated with the estimate of the mean." }
   { $examples
     { $example "USING: math.statistics prettyprint ;" "{ -2 2 } sample-ste ." "2.0" }
   } ;
 
 HELP: sample-var
-{ $values { "seq" sequence } { "x" "a non-negative real number"} }
+{ $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the variance of " { $snippet "seq" } ". It's a measurement of the spread of values in a sequence." }
 { $notes "If the number of elements in " { $snippet "seq" } " is 1 or less, it outputs 0." }
 { $examples
@@ -68,13 +74,13 @@ HELP: sample-var
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } sample-var ." "1" }
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 4 } sample-var ." "1+2/3" } } ;
 
-HELP: population-cov 
-{ $values { "{x}" sequence } { "{y}" sequence } { "cov" "a real number" } }
-{ $description "Computes the covariance of two sequences, " { $snippet "{x}" } " and " { $snippet "{y}" } "." } ;
+HELP: population-cov
+{ $values { "x-seq" sequence } { "y-seq" sequence } { "cov" "a real number" } }
+{ $description "Computes the covariance of two sequences, " { $snippet "x-seq" } " and " { $snippet "y-seq" } "." } ;
 
 HELP: population-corr
-{ $values { "{x}" sequence } { "{y}" sequence } { "corr" "a real number" } }
-{ $description "Computes the correlation of two sequences, " { $snippet "{x}" } " and " { $snippet "{y}" } "." } ;
+{ $values { "x-seq" sequence } { "y-seq" sequence } { "corr" "a real number" } }
+{ $description "Computes the correlation of two sequences, " { $snippet "x-seq" } " and " { $snippet "y-seq" } "." } ;
 
 HELP: histogram
 { $values
@@ -100,7 +106,7 @@ HELP: histogram-by
 { $description "Returns a hashtable where the keys are the elements of the sequence binned by being passed through " { $snippet "quot" } ", and the values are the number of times members of each bin appeared in that sequence." }
 { $examples
     { $unchecked-example "! Count the number of times letters and non-letters appear in a sequence."
-               "USING: prettyprint math.statistics unicode.categories ;"
+               "USING: prettyprint math.statistics unicode ;"
                "\"aaa123bc\" [ letter? ] histogram-by ."
                "H{ { t 5 } { f 3 } }"
     }
@@ -127,49 +133,8 @@ HELP: sorted-histogram
 { $description "Outputs a " { $link histogram } " of a sequence sorted by number of occurrences from lowest to highest." }
 { $examples
     { $example "USING: prettyprint math.statistics ;"
-        """"abababbbbbbc" sorted-histogram ."""
+        "\"abababbbbbbc\" sorted-histogram ."
         "{ { 99 1 } { 97 3 } { 98 8 } }"
-    }
-} ;
-
-HELP: sequence>assoc
-{ $values
-    { "seq" sequence } { "map-quot" quotation } { "insert-quot" quotation } { "exemplar" "an exemplar assoc" }
-    { "assoc" assoc }
-}
-{ $description "Iterates over a sequence, allowing elements of the sequence to be added to a newly created " { $snippet "assoc" } ". The " { $snippet "map-quot" } " gets passed each element from the sequence. Its outputs are passed along with the assoc being constructed to the " { $snippet "insert-quot" } ", which can modify the assoc in response." }
-{ $examples
-    { $example "! Iterate over a sequence and increment the count at each element"
-               "! The first quotation has stack effect ( key -- key ), a no-op"
-               "USING: assocs prettyprint kernel math.statistics ;"
-               "\"aaabc\" [ ] [ inc-at ] H{ } sequence>assoc ."
-               "H{ { 97 3 } { 98 1 } { 99 1 } }"
-    }
-} ;
-
-HELP: sequence>assoc!
-{ $values
-    { "assoc" assoc } { "seq" sequence } { "map-quot" quotation } { "insert-quot" quotation } }
-{ $description "Iterates over a sequence, allowing elements of the sequence to be added to an existing " { $snippet "assoc" } ". The " { $snippet "map-quot" } " gets passed each element from the sequence. Its outputs are passed along with the assoc being constructed to the " { $snippet "insert-quot" } ", which can modify the assoc in response." }
-{ $examples
-    { $example "! Iterate over a sequence and add the counts to an existing assoc"
-               "USING: assocs prettyprint math.statistics kernel ;"
-               "H{ { 97 2 } { 98 1 } } clone \"aaabc\" [ ] [ inc-at ] sequence>assoc! ."
-               "H{ { 97 5 } { 98 2 } { 99 1 } }"
-    }
-} ;
-
-HELP: sequence>hashtable
-{ $values
-    { "seq" sequence } { "map-quot" quotation } { "insert-quot" quotation }
-    { "hashtable" hashtable }
-}
-{ $description "Iterates over a sequence, allowing elements of the sequence to be added to a newly created hashtable. The " { $snippet "map-quot" } " gets passed each element from the sequence. Its outputs are passed along with the assoc being constructed to the " { $snippet "insert-quot" } ", which can modify the assoc in response." }
-{ $examples
-    { $example "! Count the number of times an element occurs in a sequence"
-               "USING: assocs kernel prettyprint math.statistics ;"
-               "\"aaabc\" [ ] [ inc-at ] sequence>hashtable ."
-               "H{ { 97 3 } { 98 1 } { 99 1 } }"
     }
 } ;
 
@@ -183,8 +148,18 @@ HELP: cum-sum
     }
 } ;
 
+HELP: cum-sum0
+{ $values { "seq" sequence } { "seq'" sequence } }
+{ $description "Returns the cumulative sum of " { $snippet "seq" } " starting with 0 and not including the whole sum." }
+{ $examples
+    { $example "USING: math.statistics prettyprint ;"
+               "{ 1 -1 2 -1 4 } cum-sum0 ."
+               "{ 0 1 0 2 1 }"
+    }
+} ;
+
 HELP: cum-count
-{ $values { "seq" sequence } { "quot" quotation } { "seq'" sequence } }
+{ $values { "seq" sequence } { "quot" { $quotation ( elt -- ? ) } } { "seq'" sequence } }
 { $description "Returns the cumulative count of how many times " { $snippet "quot" } " returns true." }
 { $examples
     { $example "USING: math math.statistics prettyprint ;"
@@ -199,8 +174,18 @@ HELP: cum-product
 { $description "Returns the cumulative product of " { $snippet "seq" } "." }
 { $examples
     { $example "USING: math.statistics prettyprint ;"
-               "{ 1 2 3 4 } cum-product ."
-               "{ 1 2 6 24 }"
+               "{ 2 3 4 } cum-product ."
+               "{ 2 6 24 }"
+    }
+} ;
+
+HELP: cum-product1
+{ $values { "seq" sequence } { "seq'" sequence } }
+{ $description "Returns the cumulative product of " { $snippet "seq" } " starting with 1 and not including the whole product." }
+{ $examples
+    { $example "USING: math.statistics prettyprint ;"
+               "{ 2 3 4 } cum-product1 ."
+               "{ 1 2 6 }"
     }
 } ;
 
@@ -246,37 +231,6 @@ HELP: rescale
 { $values { "u" sequence } { "v" sequence } }
 { $description "Returns " { $snippet "u" } " rescaled to run from 0 to 1 over the range min to max." } ;
 
-HELP: collect-by
-{ $values
-    { "seq" sequence } { "quot" { $quotation ( ... obj -- ... key ) } }
-    { "hashtable" hashtable }
-}
-{ $description "Applies a quotation to each element in the input sequence and returns a " { $snippet "hashtable" } " of like elements. The keys of this " { $snippet "hashtable" } " are the output of " { $snippet "quot" } " and the values at each key are the elements that transformed to that key." }
-{ $examples
-    "Collect even and odd elements:"
-    { $example
-               "USING: math math.statistics prettyprint ;"
-               "{ 11 12 13 14 14 13 12 11 } [ odd? ] collect-by ."
-               "H{ { f V{ 12 14 14 12 } } { t V{ 11 13 13 11 } } }"
-    }
-}
-{ $notes "May be named " { $snippet "group-by" } " in other languages." } ;
-
-HELP: collect-index-by
-{ $values
-    { "seq" sequence } { "quot" { $quotation ( ... obj -- ... key ) } }
-    { "hashtable" hashtable }
-}
-{ $description "Applies a quotation to each element in the input sequence and returns a " { $snippet "hashtable" } " of like elements. The keys of this " { $snippet "hashtable" } " are the output of " { $snippet "quot" } " and the values at each key are the indices for the elements that transformed to that key." }
-{ $examples
-    "Collect even and odd elements:"
-    { $example
-               "USING: math math.statistics prettyprint ;"
-               "{ 11 12 13 14 14 13 12 11 } [ odd? ] collect-index-by ."
-               "H{ { f V{ 1 3 4 6 } } { t V{ 0 2 5 7 } } }"
-    }
-} ;
-
 HELP: z-score
 { $values { "seq" sequence } { "n" number } }
 { $description "Calculates the Z-Score for " { $snippet "seq" } "." } ;
@@ -288,24 +242,17 @@ ARTICLE: "histogram" "Computing histograms"
     histogram-by
     histogram!
     sorted-histogram
-}
-"Combinators for implementing histogram:"
-{ $subsections
-    sequence>assoc
-    sequence>assoc!
-    sequence>hashtable
 } ;
 
 ARTICLE: "cumulative" "Computing cumulative sequences"
-"Cumulative mapping combinators:"
-{ $subsections
-    cum-map
-}
+"Cumulative words build on " { $link accumulate } " and " { $link accumulate* } "."
+$nl
 "Cumulative math:"
 { $subsections
     cum-sum
     cum-sum0
     cum-product
+    cum-product1
 }
 "Cumulative comparisons:"
 { $subsections
@@ -336,8 +283,6 @@ ARTICLE: "math.statistics" "Statistics"
 { $subsections kth-smallest }
 "Counting the frequency of occurrence of elements:"
 { $subsections "histogram" }
-"Collecting related items:"
-{ $subsections collect-by collect-index-by }
 "Computing cumulative sequences:"
 { $subsections "cumulative" } ;
 

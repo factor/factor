@@ -13,7 +13,7 @@ void main()
 
     vec4 p = gl_ProjectionMatrixInverse * v;
     p.z = -abs(p.z);
-    
+
     float s = sin(sky_theta), c = cos(sky_theta);
     direction = mat3(1, 0, 0,  0, c, s,  0, -s, c)
         * (gl_ModelViewMatrixInverse * vec4(p.xyz, 0.0)).xyz;

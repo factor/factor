@@ -1,16 +1,13 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel math math.order models
-namespaces make sequences words strings system hashtables math.parser
-math.vectors classes.tuple classes boxes calendar timers combinators
-sets columns fry deques ui.gadgets ui.gadgets.private ascii
-combinators.short-circuit ;
-FROM: namespaces => set ;
-FROM: sets => members ;
+USING: accessors arrays ascii assocs boxes calendar classes columns
+combinators combinators.short-circuit deques fry kernel make math
+math.order math.parser math.vectors namespaces sequences sets system
+timers ui.gadgets ui.gadgets.private words ;
 IN: ui.gestures
 
 : get-gesture-handler ( gesture gadget -- quot )
-    class-of superclasses [ "gestures" word-prop ] map assoc-stack ;
+    class-of superclasses-of [ "gestures" word-prop ] map assoc-stack ;
 
 GENERIC: handle-gesture ( gesture gadget -- ? )
 
@@ -82,31 +79,34 @@ M: user-input-tuple send-queued-gesture
 TUPLE: drag # ;             C: <drag> drag
 TUPLE: button-up mods # ;   C: <button-up> button-up
 TUPLE: button-down mods # ; C: <button-down> button-down
+TUPLE: file-drop mods ;     C: <file-drop> file-drop
+
+SYMBOL: dropped-files
 
 SINGLETONS:
-motion
-mouse-scroll
-mouse-enter mouse-leave
-lose-focus gain-focus ;
+    motion
+    mouse-scroll
+    mouse-enter mouse-leave
+    lose-focus gain-focus ;
 
 ! Higher-level actions
 SINGLETONS:
-undo-action redo-action
-cut-action copy-action paste-action
-delete-action select-all-action
-left-action right-action up-action down-action
-zoom-in-action zoom-out-action
-new-action open-action save-action save-as-action
-revert-action close-action ;
+    undo-action redo-action
+    cut-action copy-action paste-action
+    delete-action select-all-action
+    left-action right-action up-action down-action
+    zoom-in-action zoom-out-action
+    new-action open-action save-action save-as-action
+    revert-action close-action ;
 
 UNION: action
-undo-action redo-action
-cut-action copy-action paste-action
-delete-action select-all-action
-left-action right-action up-action down-action
-zoom-in-action zoom-out-action
-new-action open-action save-action save-as-action
-revert-action close-action ;
+    undo-action redo-action
+    cut-action copy-action paste-action
+    delete-action select-all-action
+    left-action right-action up-action down-action
+    zoom-in-action zoom-out-action
+    new-action open-action save-action save-as-action
+    revert-action close-action ;
 
 CONSTANT: action-gestures
     {
@@ -130,7 +130,7 @@ TUPLE: key-gesture mods sym ;
 
 TUPLE: key-down < key-gesture ;
 
-: new-key-gesture ( mods sym action? class -- mods' sym' )
+: new-key-gesture ( mods sym action? class -- key-gesture )
     [ [ [ S+ swap remove f like ] dip ] unless ] dip boa ; inline
 
 : <key-down> ( mods sym action? -- key-down )
@@ -271,10 +271,10 @@ SYMBOL: drag-timer
         dup multi-click? [
             hand-click# inc
         ] [
-            1 hand-click# set
+            1 hand-click# namespaces:set
         ] if
-        hand-last-button set
-        nano-count hand-last-time set
+        hand-last-button namespaces:set
+        nano-count hand-last-time namespaces:set
     ] with-global ;
 
 : update-clicked ( -- )
@@ -359,6 +359,8 @@ M: button-down gesture>string
         "Press Button" %
         #>> [ " " % # ] when*
     ] "" make ;
+
+M: file-drop gesture>string drop "Drop files" ;
 
 M: left-action gesture>string drop "Swipe left" ;
 

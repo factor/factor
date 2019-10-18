@@ -1,11 +1,10 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data arrays assocs
-combinators continuations environment io io.backend
-io.backend.unix io.files io.files.private io.files.unix
-io.launcher io.pathnames io.ports kernel libc math
-namespaces sequences strings system threads unix unix.process
-unix.ffi simple-tokenizer ;
+USING: accessors alien.c-types alien.data assocs combinators
+continuations environment fry io.backend io.backend.unix
+io.files.private io.files.unix io.launcher io.launcher.private
+io.pathnames io.ports kernel libc math namespaces sequences
+simple-tokenizer strings system unix unix.ffi unix.process ;
 IN: io.launcher.unix
 
 : get-arguments ( process -- seq )
@@ -84,18 +83,18 @@ IN: io.launcher.unix
     [ setup-process-group ] [ 2drop 249 _exit ] recover
     [ setup-priority ] [ 2drop 250 _exit ] recover
     [ setup-redirection ] [ 2drop 251 _exit ] recover
-    [ current-directory get absolute-path cd ] [ 2drop 252 _exit ] recover
+    [ current-directory get cd ] [ 2drop 252 _exit ] recover
     [ setup-environment ] [ 2drop 253 _exit ] recover
     [ get-arguments exec-args-with-path ] [ 2drop 254 _exit ] recover
     255 _exit
     f throw ;
 
-M: unix current-process-handle ( -- handle ) getpid ;
+M: unix (current-process) ( -- handle ) getpid ;
 
-M: unix run-process* ( process -- pid )
-    [ spawn-process ] curry [ ] with-fork ;
+M: unix (run-process) ( process -- pid )
+    '[ _ spawn-process ] [ ] with-fork ;
 
-M: unix kill-process* ( process -- )
+M: unix (kill-process) ( process -- )
     [ handle>> SIGTERM ] [ group>> ] bi {
         { +same-group+ [ kill ] }
         { +new-group+ [ killpg ] }
@@ -103,15 +102,14 @@ M: unix kill-process* ( process -- )
     } case io-error ;
 
 : find-process ( handle -- process )
-    processes get swap [ nip swap handle>> = ] curry
-    assoc-find 2drop ;
+    processes get keys [ handle>> = ] with find nip ;
 
 TUPLE: signal n ;
 
 : code>status ( code -- obj )
     dup WIFSIGNALED [ WTERMSIG signal boa ] [ WEXITSTATUS ] if ;
 
-M: unix wait-for-processes ( -- ? )
+M: unix (wait-for-processes) ( -- ? )
     { int } [ -1 swap WNOHANG waitpid ] with-out-parameters
     swap dup 0 <= [
         2drop t

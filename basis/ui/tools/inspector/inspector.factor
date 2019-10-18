@@ -1,12 +1,14 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors inspector namespaces kernel models fry
-colors.constants models.arrow prettyprint sequences mirrors assocs
-classes io io.styles arrays hashtables math.order sorting refs fonts
-ui.tools.browser ui.commands ui.operations ui.gadgets ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks ui.gestures
-ui.gadgets.buttons ui.gadgets.tables ui.gadgets.status-bar
-ui.gadgets.labeled ui.tools.common ui combinators ui.gadgets.worlds ;
+USING: accessors arrays assocs classes combinators fonts fry
+hashtables inspector io io.styles kernel math.vectors mirrors
+models models.arrow namespaces prettyprint sequences sorting ui
+ui.commands ui.gadgets ui.gadgets.labeled ui.gadgets.panes
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tables
+ui.gadgets.tables.private ui.gadgets.toolbar ui.gadgets.tracks
+ui.gestures ui.operations ui.theme ui.tools.browser
+ui.tools.common ui.tools.inspector.slots ;
+
 IN: ui.tools.inspector
 
 TUPLE: inspector-gadget < tool table ;
@@ -69,11 +71,24 @@ M: object make-slot-descriptions
 M: hashtable make-slot-descriptions
     call-next-method [ key-string>> ] sort-with ;
 
+TUPLE: inspector-table < table ;
+
+! Improve performance for big arrays or large hashtables by
+! only calculating column width for the longest key.
+M: inspector-table compute-column-widths
+    dup rows>> [ drop 0 { } ] [
+        [ drop gap>> ]
+        [ initial-widths ]
+        [ keys longest "" 2array row-column-widths ] 2tri
+        vmax [ compute-total-width ] keep
+    ] if-empty ;
+
 : <inspector-table> ( model -- table )
-    [ make-slot-descriptions ] <arrow> inspector-renderer <table>
+    [ make-slot-descriptions ] <arrow> inspector-renderer
+    inspector-table new-table
         [ invoke-primary-operation ] >>action
         monospace-font >>font
-        COLOR: dark-gray >>column-line-color
+        line-color >>column-line-color
         6 >>gap
         15 >>min-rows
         15 >>max-rows
@@ -81,13 +96,14 @@ M: hashtable make-slot-descriptions
         40 >>max-cols ;
 
 : <inspector-gadget> ( model -- gadget )
-    vertical inspector-gadget new-track
-        { 3 3 } >>gap
+    vertical inspector-gadget new-track with-lines
         add-toolbar
         swap >>model
         dup model>> <inspector-table> >>table
-        dup model>> <summary-gadget> "Object" <labeled-gadget> f track-add
-        dup table>> <scroller> "Contents" <labeled-gadget> 1 track-add ;
+        dup model>> <summary-gadget> margins white-interior
+        "Object" object-color <colored-labeled-gadget> f track-add
+        dup table>> <scroller> margins white-interior
+        "Contents" contents-color <colored-labeled-gadget> 1 track-add ;
 
 M: inspector-gadget focusable-child*
     table>> ;
@@ -99,15 +115,6 @@ M: inspector-gadget focusable-child*
     control-value ;
 
 \ com-push H{ { +listener+ t } } define-command
-
-: slot-editor-window ( close-hook update-hook assoc key key-string -- )
-    [ <value-ref> <slot-editor> ]
-    [
-        <world-attributes>
-            swap "Slot editor: " prepend >>title
-            [ { dialog-window } append ] change-window-controls
-    ] bi*
-    open-status-window ;
 
 : com-edit-slot ( inspector -- )
     [ close-window ] swap
@@ -123,7 +130,7 @@ M: inspector-gadget focusable-child*
 \ inspector-help H{ { +nullary+ t } } define-command
 
 inspector-gadget "toolbar" f {
-    { T{ update-object } com-refresh }
+    { T{ key-down f f "r" } com-refresh }
     { T{ key-down f f "p" } com-push }
     { T{ key-down f f "e" } com-edit-slot }
     { T{ key-down f f "F1" } inspector-help }
@@ -139,4 +146,4 @@ inspector-gadget "multi-touch" f {
 : inspector ( obj -- )
     <model> inspect-model ;
 
-{ 550 400 } inspector-gadget set-tool-dim
+inspector-gadget default-font-size { 46 33 } n*v set-tool-dim

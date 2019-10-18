@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien byte-arrays gpu.buffers gpu.textures help.markup
 help.syntax images kernel math math.rectangles sequences ;
 IN: gpu.framebuffers
@@ -42,7 +43,7 @@ HELP: <renderbuffer>
     { "component-order" component-order } { "component-type" component-type } { "samples" { $maybe integer } } { "dim" { $maybe sequence } }
     { "renderbuffer" renderbuffer }
 }
-{ $description "Creates a new " { $link renderbuffer } " object. If " { $snippet "samples" } " is not " { $link f } ", it specifies the multisampling level to use. If " { $snippet "dim" } " is not " { $link f } ", image memory of the given dimensions will be allocated for the renderbuffer; otherwise, memory will have to be allocated separately with " { $link allocate-renderbuffer } "." } 
+{ $description "Creates a new " { $link renderbuffer } " object. If " { $snippet "samples" } " is not " { $link f } ", it specifies the multisampling level to use. If " { $snippet "dim" } " is not " { $link f } ", image memory of the given dimensions will be allocated for the renderbuffer; otherwise, memory will have to be allocated separately with " { $link allocate-renderbuffer } "." }
 { $notes "Renderbuffer objects require OpenGL 3.0 or one of the " { $snippet "GL_ARB_framebuffer_object" } " or " { $snippet "GL_EXT_framebuffer_object" } " extensions. Multisampled renderbuffers require OpenGL 3.0 or one of the " { $snippet "GL_ARB_framebuffer_object" } " or " { $snippet "GL_EXT_framebuffer_multisample" } " extensions." } ;
 
 HELP: <system-attachment>

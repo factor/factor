@@ -1,11 +1,12 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes.mixin classes.parser
-classes.singleton classes.tuple classes.tuple.parser
-combinators effects.parser fry functors.backend generic
-generic.parser interpolate io.streams.string kernel lexer
-locals.parser locals.types macros make namespaces parser
-quotations sequences vocabs.parser words words.symbol ;
+classes.singleton classes.tuple classes.tuple.parser combinators
+effects.parser fry functors.backend generic generic.parser
+interpolate io.streams.string kernel lexer locals.parser
+locals.types macros make namespaces parser quotations sequences
+vocabs.parser words words.symbol ;
+
 IN: functors
 
 ! This is a hack
@@ -83,9 +84,10 @@ FUNCTOR-SYNTAX: M:
 
 FUNCTOR-SYNTAX: C:
     scan-param suffix!
-    scan-param suffix!
-    scan-effect
-    [ [ [ boa ] curry ] append! ] dip suffix!
+    scan-param [
+        suffix!
+        [ [ boa ] curry ] append!
+    ] keep suffix! \ boa-effect suffix!
     \ define-declared* suffix! ;
 
 FUNCTOR-SYNTAX: :
@@ -122,57 +124,50 @@ FUNCTOR-SYNTAX: inline [ last-word make-inline ] append! ;
 FUNCTOR-SYNTAX: call-next-method T{ fake-call-next-method } suffix! ;
 
 : (INTERPOLATE) ( accum quot -- accum )
-    [ scan-token interpolate-locals ] dip
+    [ scan-token interpolate-locals-quot ] dip
     '[ _ with-string-writer @ ] suffix! ;
 
 PRIVATE>
 
 SYNTAX: IS [ parse-word ] (INTERPOLATE) ;
 
-SYNTAX: DEFERS [ current-vocab create ] (INTERPOLATE) ;
+SYNTAX: DEFERS [ current-vocab create-word ] (INTERPOLATE) ;
 
-SYNTAX: DEFINES [ create-in ] (INTERPOLATE) ;
+SYNTAX: DEFINES [ create-word-in ] (INTERPOLATE) ;
 
-SYNTAX: DEFINES-PRIVATE [ begin-private create-in end-private ] (INTERPOLATE) ;
+SYNTAX: DEFINES-PRIVATE [ begin-private create-word-in end-private ] (INTERPOLATE) ;
 
 SYNTAX: DEFINES-CLASS [ create-class-in ] (INTERPOLATE) ;
 
-DEFER: ;FUNCTOR delimiter
+DEFER: ;FUNCTOR> delimiter
 
 <PRIVATE
 
-: push-functor-words ( -- )
-    functor-words use-words ;
-
-: pop-functor-words ( -- )
-    functor-words unuse-words ;
-
-: (parse-bindings) ( end -- words )
-    [ dup parse-binding dup ]
-    [ first2 [ make-local ] dip 2array ]
-    produce 2nip ;
-
-: with-bindings ( quot -- words assoc )
-    in-lambda? on H{ } make ; inline
+: parse-binding ( end -- pair/f )
+    scan-token {
+        { [ 2dup = ] [ 2drop f ] }
+        [ nip scan-object 2array ]
+    } cond ;
 
 : parse-bindings ( end -- words assoc )
-    [
+    '[
         building get use-words
-        (parse-bindings)
-        building get unuse-words
-    ] with-bindings ;
+        [ _ parse-binding dup ]
+        [ first2 [ make-local ] dip 2array ]
+        produce nip
+    ] H{ } make ;
 
 : parse-functor-body ( -- form )
-    push-functor-words
-    "WHERE" parse-bindings
-    [ [ swap <def> suffix ] { } assoc>map concat ]
-    [ [ \ ;FUNCTOR parse-until >quotation ] ((parse-lambda)) ] bi*
-    [ ] append-as
-    pop-functor-words ;
+    functor-words [
+        "WHERE" parse-bindings drop
+        [ swap <def> suffix ] { } assoc>map concat
+        \ ;FUNCTOR> parse-until [ ] append-as
+        qualified-vocabs pop* ! unuse the bindings
+    ] with-lambda-scope ;
 
-: (FUNCTOR:) ( -- word def effect )
+: (<FUNCTOR:) ( -- word def effect )
     scan-new-word [ parse-functor-body ] parse-locals-definition ;
 
 PRIVATE>
 
-SYNTAX: FUNCTOR: (FUNCTOR:) define-declared ;
+SYNTAX: <FUNCTOR: (<FUNCTOR:) define-declared ;

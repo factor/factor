@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: graphviz help.markup help.syntax images.viewer
-io.encodings.8-bit.latin1 io.encodings.utf8 io.launcher kernel
+io.encodings.latin1 io.encodings.utf8 io.launcher kernel
 strings ;
 IN: graphviz.render
 
@@ -76,7 +76,7 @@ $nl
 $nl
 "Throws " { $instance unsupported-encoding } " error if " { $link graph-encoding } " isn't one of " { $link utf8 } " or " { $link latin1 } "."
 }
-{ $examples "To render a " { $link graph } " " { $snippet "G" } " using circo and save the output to a PNG file, you could write" { $code "G \"foo\" \"png\" \"circo\" graphviz" } "(assuming circo and PNG are supported by your Graphviz installation).  This will save the output to the file " { $snippet "foo.png" } "." } ;
+{ $examples "To render a " { $link graph } " " { $snippet "G" } " using circo and save the output to a PNG file, you could write" { $code "G \"foo\" \"png\" \"circo\" graphviz" } "(assuming circo and PNG are supported by your Graphviz installation). This will save the output to the file " { $snippet "foo.png" } "." } ;
 
 HELP: graphviz*
 { $values
@@ -85,7 +85,7 @@ HELP: graphviz*
 { $description "Invokes the " { $link graphviz } " word using the value of " { $link default-layout } " as the layout engine. That is, the following two lines are equivalent:"
 { $code "graph path format default-layout get-global graphviz" "graph path format graphviz*" }
 }
-{ $examples "To render a " { $link graph } " " { $snippet "G" } " when you don't particularly care about the layout engine but want to save the output to a PNG file, you could write" { $code "G \"foo\" \"png\" graphviz*" } "(assuming that " { $link default-layout } " and PNG are supported by your Graphviz installation).  This will save the output to the file " { $snippet "foo.png" } "." } ;
+{ $examples "To render a " { $link graph } " " { $snippet "G" } " when you don't particularly care about the layout engine but want to save the output to a PNG file, you could write" { $code "G \"foo\" \"png\" graphviz*" } "(assuming that " { $link default-layout } " and PNG are supported by your Graphviz installation). This will save the output to the file " { $snippet "foo.png" } "." } ;
 
 HELP: preview
 { $values

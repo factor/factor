@@ -20,4 +20,3 @@ LIBRARY: clutter.cally
 >>
 
 GIR: Cally-1.0.gir
-

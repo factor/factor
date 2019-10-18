@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math math.order sequences wrap wrap.words
-arrays fry ui.gadgets ui.gadgets.labels ui.gadgets.packs.private
-ui.render ui.baseline-alignment ;
+USING: accessors arrays fry kernel math math.order sequences
+ui.baseline-alignment ui.gadgets ui.gadgets.labels
+ui.gadgets.packs.private ui.render wrap.words ;
 IN: ui.gadgets.paragraphs
 
 MIXIN: word-break
@@ -28,7 +28,7 @@ TUPLE: paragraph < aligned-gadget margin wrapped ;
 <PRIVATE
 
 : gadget>word ( gadget -- word )
-    [ ] [ pref-dim first ] [ word-break? ] tri <word> ;
+    [ ] [ pref-dim first ] [ word-break? ] tri <wrapping-word> ;
 
 : line-width ( words -- n )
     [ break?>> ] trim-tail-slice [ width>> ] map-sum ;
@@ -41,11 +41,11 @@ TUPLE: line words width height baseline ;
 
 : wrap-paragraph ( paragraph -- wrapped-paragraph )
     [ children>> [ gadget>word ] map ] [ margin>> ] bi
-    dup wrap-words [ <line> ] map! ;
+    wrap-words [ <line> ] map! ;
 
 : cached-wrapped ( paragraph -- wrapped-paragraph )
     dup wrapped>>
-    [ nip ] [ [ wrap-paragraph dup ] keep wrapped<< ] if* ;
+    [ ] [ [ wrap-paragraph dup ] keep wrapped<< ] ?if ;
 
 : max-line-width ( wrapped-paragraph -- x )
     [ width>> ] [ max ] map-reduce ;
@@ -54,7 +54,11 @@ TUPLE: line words width height baseline ;
     [ height>> ] map-sum ;
 
 M: paragraph pref-dim*
-    cached-wrapped [ max-line-width ] [ sum-line-heights ] bi 2array ;
+    cached-wrapped [
+        { 0 0 }
+    ] [
+        [ max-line-width ] [ sum-line-heights ] bi 2array
+    ] if-empty ;
 
 : line-y-coordinates ( wrapped-paragraph -- ys )
     0 [ height>> + ] accumulate nip ;

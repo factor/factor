@@ -24,7 +24,7 @@ IN: benchmark.mandel
     [ color-map [ length mod ] keep nth ] [ B{ 0 0 0 } ] if* ; inline
 
 : render ( -- )
-    height iota [ width iota swap '[ _ c pixel color write ] each ] each ; inline
+    height <iota> [ width <iota> swap '[ _ c pixel color write ] each ] each ; inline
 
 : ppm-header ( -- )
     ascii encode-output

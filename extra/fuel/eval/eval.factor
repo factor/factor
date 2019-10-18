@@ -1,77 +1,64 @@
 ! Copyright (C) 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays continuations debugger fuel.pprint io
-io.streams.string kernel listener namespaces prettyprint.config sequences
-vocabs.parser ;
-
+USING: accessors arrays continuations debugger fry fuel.pprint io
+io.streams.string kernel listener namespaces parser.notes
+prettyprint.config sequences sets vocabs.parser ;
 IN: fuel.eval
 
-TUPLE: fuel-status manifest restarts ;
+SYMBOL: restarts-stack
+V{ } clone restarts-stack set-global
 
-SYMBOL: fuel-status-stack
-V{ } clone fuel-status-stack set-global
+SYMBOL: eval-res-flag
+t eval-res-flag set-global
 
-SYMBOL: fuel-eval-error
-f fuel-eval-error set-global
+: eval-restartable? ( -- ? )
+    eval-res-flag get-global ;
 
-SYMBOL: fuel-eval-result
-f fuel-eval-result set-global
+: push-status ( -- )
+    restarts get-global clone restarts-stack get push ;
 
-SYMBOL: fuel-eval-output
-f fuel-eval-result set-global
+: pop-restarts ( restarts -- )
+    eval-restartable? [ drop ] [ clone restarts set-global ] if ;
 
-SYMBOL: fuel-eval-res-flag
-t fuel-eval-res-flag set-global
+: pop-status ( -- )
+    restarts-stack get [ pop pop-restarts ] unless-empty ;
 
-: fuel-eval-restartable? ( -- ? )
-    fuel-eval-res-flag get-global ;
+: send-retort ( error result output -- )
+    3array [ fuel-pprint ] without-limits flush nl
+    "<~FUEL~>" write nl flush ;
 
-: fuel-push-status ( -- )
-    manifest get clone restarts get-global clone
-    fuel-status boa
-    fuel-status-stack get push ;
+: begin-eval ( -- )
+    push-status ;
 
-: fuel-pop-restarts ( restarts -- )
-    fuel-eval-restartable? [ drop ] [ clone restarts set-global ] if ;
+: end-eval ( result error/f output -- )
+    swapd send-retort pop-status ;
 
-: fuel-pop-status ( -- )
-    fuel-status-stack get [
-        pop
-        [ manifest>> clone manifest set ]
-        [ restarts>> fuel-pop-restarts ]
-        bi
-    ] unless-empty ;
+: eval ( lines -- result error/f )
+    '[ _ parse-lines-interactive call( -- x ) f ]
+    [ dup print-error f swap ] recover ;
 
-: fuel-forget-error ( -- ) f fuel-eval-error set-global ;
-: fuel-forget-result ( -- ) f fuel-eval-result set-global ;
-: fuel-forget-output ( -- ) f fuel-eval-output set-global ;
-: fuel-forget-status ( -- )
-    fuel-forget-error fuel-forget-result fuel-forget-output ;
+: eval-usings ( usings -- )
+    [ [ use-vocab ] curry ignore-errors ] each ;
 
-: fuel-send-retort ( -- )
-    fuel-eval-error get-global
-    fuel-eval-result get-global
-    fuel-eval-output get-global 3array
-    [ fuel-pprint ] without-limits
-    flush nl "<~FUEL~>" write nl flush ;
-
-: (fuel-begin-eval) ( -- )
-    fuel-push-status fuel-forget-status ;
-
-: (fuel-end-eval) ( output -- )
-    fuel-eval-output set-global fuel-send-retort fuel-pop-status ;
-
-: (fuel-eval) ( lines -- )
-    [ parse-lines-interactive call( -- ) ] curry
-    [ [ fuel-eval-error set-global ] [ print-error ] bi ] recover ;
-
-: (fuel-eval-usings) ( usings -- )
-    [ [ use-vocab ] curry [ drop ] recover ] each ;
-
-: (fuel-eval-in) ( in -- )
+: eval-in ( in -- )
     [ set-current-vocab ] when* ;
 
-: (fuel-eval-in-context) ( lines in usings -- )
-    (fuel-begin-eval)
-    [ (fuel-eval-usings) (fuel-eval-in) (fuel-eval) ] with-string-writer
-    (fuel-end-eval) ;
+: eval-in-context ( lines in usings/f -- )
+    begin-eval
+    [
+        parser-quiet? on
+        [
+            ! The idea is that a correct usings list should always be
+            ! specified. But a lot of code in FUEL sends empty usings
+            ! lists so then we have to use the current manifests
+            ! vocabs instead.
+            manifest get search-vocab-names>> members
+        ] [
+            ! These vocabs are always needed in the manifest. syntax for
+            ! obvious reasons, fuel for FUEL stuff and debugger for the :N
+            ! words.
+            { "fuel" "syntax" "debugger" } prepend
+        ] if-empty
+        <manifest> manifest namespaces:set
+        [ eval-usings eval-in eval ] with-string-writer
+    ] with-scope end-eval ;

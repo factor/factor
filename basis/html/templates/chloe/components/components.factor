@@ -21,7 +21,7 @@ M: singleton-class component-tag ( tag class -- )
     bi* ;
 
 : compile-component-attrs ( tag class -- )
-    [ attrs>> [ drop main>> "name" = not ] assoc-filter ] dip
+    [ attrs>> [ drop main>> "name" = ] assoc-reject ] dip
     [ all-slots swap '[ name>> _ at compile-attr ] each ]
     [ [ boa ] [code-with] ]
     bi ;

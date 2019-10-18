@@ -20,4 +20,3 @@ ERROR: cuda-error-state code ;
 
 : init-cuda ( -- )
     0 cuInit cuda-error ; inline
-

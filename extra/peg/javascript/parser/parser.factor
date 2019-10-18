@@ -1,35 +1,35 @@
 ! Copyright (C) 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences
+USING: kernel accessors sequences multiline
 peg peg.ebnf peg.javascript.ast peg.javascript.tokenizer ;
 IN: peg.javascript.parser
 
-#! Grammar for JavaScript. Based on OMeta-JS example from:
-#! http://jarrett.cs.ucla.edu/ometa-js/#JavaScript_Compiler 
+! Grammar for JavaScript. Based on OMeta-JS example from:
+! http://jarrett.cs.ucla.edu/ometa-js/#JavaScript_Compiler
 
-#! The interesting thing about this parser is the mixing of
-#! a default and non-default tokenizer. The JavaScript tokenizer
-#! removes all newlines. So when operating on tokens there is no
-#! need for newline and space skipping in the grammar. But JavaScript
-#! uses the newline in the 'automatic semicolon insertion' rule. 
-#!
-#! If a statement ends in a newline, sometimes the semicolon can be
-#! skipped. So we define an 'nl' rule using the default tokenizer. 
-#! This operates a character at a time. Using this 'nl' in the parser
-#! allows us to detect newlines when we need to for the semicolon
-#! insertion rule, but ignore it in all other places.
-EBNF: javascript
-tokenizer         = default 
-nl                = "\r" "\n" | "\n"
+! The interesting thing about this parser is the mixing of
+! a default and non-default tokenizer. The JavaScript tokenizer
+! removes all newlines. So when operating on tokens there is no
+! need for newline and space skipping in the grammar. But JavaScript
+! uses the newline in the 'automatic semicolon insertion' rule.
+!
+! If a statement ends in a newline, sometimes the semicolon can be
+! skipped. So we define an 'nl' rule using the default tokenizer.
+! This operates a character at a time. Using this 'nl' in the parser
+! allows us to detect newlines when we need to for the semicolon
+! insertion rule, but ignore it in all other places.
+EBNF: javascript [=[
+tokenizer         = default
+nl                = "\r\n" | "\n"
 
 tokenizer         = <foreign tokenize-javascript Tok>
 End               = !(.)
-Space             = " " | "\t" | "\n" 
+Space             = [ \t\n]
 Spaces            = Space* => [[ ignore ]]
-Name               = . ?[ ast-name?   ]?   => [[ value>> ]] 
+Name               = . ?[ ast-name?   ]?   => [[ value>> ]]
 Number             = . ?[ ast-number? ]?
 String             = . ?[ ast-string? ]?
-RegExp             = . ?[ ast-regexp? ]?   
+RegExp             = . ?[ ast-regexp? ]?
 SpacesNoNl         = (!(nl) Space)* => [[ ignore ]]
 
 Expr               =   OrExpr:e "?" Expr:t ":" Expr:f   => [[ e t f ast-cond-expr boa ]]
@@ -175,7 +175,7 @@ Switch1            =   "case" Expr:c ":" SrcElems:cs => [[ c cs ast-case boa ]]
 SwitchBody         = Switch1*
 Finally            =   "finally" Block:b => [[ b ]]
                      | Spaces => [[ "undefined" ast-get boa ]]
-Stmt               =   Block                     
+Stmt               =   Block
                      | "var" Bindings:bs Sc                   => [[ bs ast-begin boa ]]
                      | "if" "(" Expr:c ")" Stmt:t "else" Stmt:f => [[ c t f ast-if boa ]]
                      | "if" "(" Expr:c ")" Stmt:t               => [[ c t "undefined" ast-get boa ast-if boa ]]
@@ -196,5 +196,5 @@ Stmt               =   Block
 SrcElem            =   "function" Name:n FuncRest:f                  => [[ n f ast-var boa ]]
                      | Stmt
 SrcElems           = SrcElem*                                      => [[ ast-begin boa ]]
-TopLevel           = SrcElems Spaces                               
-;EBNF
+TopLevel           = SrcElems Spaces
+]=]

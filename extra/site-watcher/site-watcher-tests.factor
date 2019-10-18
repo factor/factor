@@ -1,15 +1,13 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: db.tuples locals site-watcher site-watcher.db
-site-watcher.private kernel db io.directories io.files.temp
-continuations db.sqlite
-sequences tools.test ;
+USING: continuations db db.tuples io.directories io.files.temp kernel
+locals sequences site-watcher.db tools.test webapps.utils ;
 IN: site-watcher.tests
 
-[ "site-watcher.db" temp-file delete-file ] ignore-errors
+"site-watcher.db" temp-file ?delete-file
 
 :: fake-sites ( -- seq )
-    "site-watcher.db" temp-file <sqlite-db> [
+    "site-watcher.db" <temp-sqlite-db> [
         account ensure-table
         site ensure-table
         watching-site ensure-table
@@ -22,4 +20,4 @@ IN: site-watcher.tests
         f <site> select-tuples
     ] with-db ;
 
-[ f ] [ fake-sites empty? ] unit-test
+{ f } [ fake-sites empty? ] unit-test

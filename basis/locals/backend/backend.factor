@@ -3,6 +3,11 @@
 USING: slots.private ;
 IN: locals.backend
 
+PRIMITIVE: drop-locals ( n -- )
+PRIMITIVE: get-local ( n -- obj )
+PRIMITIVE: load-local ( obj -- )
+PRIMITIVE: load-locals ( ... n -- )
+
 : local-value ( box -- value ) 2 slot ; inline
 
 : set-local-value ( value box -- ) 2 set-slot ; inline

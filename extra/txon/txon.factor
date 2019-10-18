@@ -3,7 +3,7 @@
 
 USING: assocs combinators combinators.short-circuit formatting
 grouping hashtables io kernel make math math.parser sequences
-splitting strings unicode.categories ;
+splitting strings unicode ;
 
 IN: txon
 
@@ -27,7 +27,8 @@ IN: txon
 DEFER: name/values
 
 : (parse-value) ( string -- values )
-    decode-value string-lines dup length 1 = [ first ] when ;
+    decode-value string-lines
+    [ "" ] [ dup length 1 = [ first ] when ] if-empty ;
 
 : parse-value ( string -- remain value )
     dup find-` [

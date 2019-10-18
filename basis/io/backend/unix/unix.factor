@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax
 classes.struct combinators destructors destructors.private fry
-hints io.backend io.backend.unix.multiplexers io.buffers
-io.files io.ports io.timeouts kernel kernel.private libc locals
-make math namespaces sequences summary system threads unix
-unix.ffi unix.stat unix.types ;
+io.backend io.backend.unix.multiplexers io.buffers io.files
+io.ports io.timeouts kernel kernel.private libc locals make math
+namespaces sequences summary system threads unix unix.ffi
+unix.stat unix.types ;
 QUALIFIED: io
 IN: io.backend.unix
 
@@ -35,7 +35,7 @@ M: fd dispose
         } cleave
     ] unless-disposed ;
 
-M: fd handle-fd dup check-disposed fd>> ;
+M: fd handle-fd check-disposed fd>> ;
 
 M: fd cancel-operation ( fd -- )
     [
@@ -83,40 +83,48 @@ M: unix wait-for-fd ( handle event -- )
 
 ! Some general stuff
 
-M: fd refill
-    fd>> over buffer>> [ buffer-end ] [ buffer-capacity ] bi read
-    {
-        { [ dup 0 >= ] [ swap buffer>> n>buffer f ] }
-        { [ errno EINTR = ] [ 2drop +retry+ ] }
-        { [ errno EAGAIN = ] [ 2drop +input+ ] }
-        [ (io-error) ]
-    } cond ;
+ERROR: not-a-buffered-port port ;
 
-HINTS: M\ fd refill
-    { buffered-port fd } ;
+: check-buffered-port ( port -- port )
+    dup buffered-port? [ not-a-buffered-port ] unless ; inline
+
+M: fd refill
+    [ check-buffered-port buffer>> ] [ fd>> ] bi*
+    over [ buffer-end ] [ buffer-capacity ] bi read
+    { fixnum } declare dup 0 >= [
+        swap buffer+ f
+    ] [
+        errno {
+            { EINTR [ 2drop +retry+ ] }
+            { EAGAIN [ 2drop +input+ ] }
+            [ (throw-errno) ]
+        } case
+    ] if ;
 
 M: unix (wait-to-read) ( port -- )
     dup
-    dup handle>> dup check-disposed refill dup
+    dup handle>> check-disposed refill dup
     [ dupd wait-for-port (wait-to-read) ] [ 2drop ] if ;
 
 ! Writers
 M: fd drain
-    fd>> over buffer>> [ buffer@ ] [ buffer-length ] bi write
-    {
-        { [ dup 0 >= ] [
-            over buffer>> buffer-consume
-            buffer>> buffer-empty? f +output+ ?
-        ] }
-        { [ errno EINTR = ] [ 2drop +retry+ ] }
-        { [ errno EAGAIN = ] [ 2drop +output+ ] }
-        [ (io-error) ]
-    } cond ;
+    [ check-buffered-port buffer>> ] [ fd>> ] bi*
+    over [ buffer@ ] [ buffer-length ] bi write
+    { fixnum } declare dup 0 >= [
+        over buffer-consume
+        buffer-empty? f +output+ ?
+    ] [
+        errno {
+            { EINTR [ 2drop +retry+ ] }
+            { EAGAIN [ 2drop +output+ ] }
+            [ (throw-errno) ]
+        } case
+    ] if ;
 
 M: unix (wait-to-write) ( port -- )
     dup
-    dup handle>> dup check-disposed drain
-    dup [ wait-for-port ] [ 2drop ] if ;
+    dup handle>> check-disposed drain
+    [ wait-for-port ] [ drop ] if* ;
 
 M: unix io-multiplex ( nanos -- )
     mx get-global wait-for-events ;
@@ -147,10 +155,14 @@ M: stdin dispose*
     stdin data>> handle-fd buffer buffer-end size read
     dup 0 < [
         drop
-        errno EINTR = [ buffer stdin size refill-stdin ] [ (io-error) ] if
+        errno EINTR = [
+            buffer stdin size refill-stdin
+        ] [
+            throw-errno
+        ] if
     ] [
         size = [ "Error reading stdin pipe" throw ] unless
-        size buffer n>buffer
+        size buffer buffer+
     ] if ;
 
 M: stdin refill
@@ -207,7 +219,7 @@ TUPLE: mx-port < port mx ;
 : multiplexer-error ( n -- n )
     dup 0 < [
         errno [ EAGAIN = ] [ EINTR = ] bi or
-        [ drop 0 ] [ (io-error) ] if
+        [ drop 0 ] [ throw-errno ] if
     ] when ;
 
 :: ?flag ( n mask symbol -- n )

@@ -1,12 +1,16 @@
 IN: linked-assocs
-USING: help.markup help.syntax assocs ;
+USING: assocs help.markup help.syntax linked-assocs.prettyprint ;
 
 HELP: linked-assoc
-{ $class-description "The class of linked assocs. Linked assoc are implemented by combining an assoc with a dlist.  The assoc is used for lookup and retrieval of single values, while the dlist is used for getting lists of keys/values, which will be in insertion order." } ;
+{ $class-description "The class of linked assocs. Linked assoc are implemented by combining an assoc with a dlist. The assoc is used for lookup and retrieval of single values, while the dlist is used for getting lists of keys/values, which will be in insertion order." } ;
 
 HELP: <linked-assoc>
 { $values { "exemplar" "an exemplar assoc" } { "assoc" linked-assoc } }
 { $description "Creates an empty linked assoc backed by a new instance of the same type as the exemplar." } ;
+
+HELP: >linked-hash
+{ $values { "assoc" assoc } { "assoc'" linked-hash } }
+{ $description "Creates a new " { $link linked-hash } " containing the same elements as 'assoc'. The keys are inserted in the same order as the input assoc, if it has an order." } ;
 
 HELP: <linked-hash>
 { $values { "assoc" linked-assoc } }

@@ -1,13 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays checksums combinators fry io io.binary
-io.encodings.binary io.files io.streams.byte-array kernel
-locals math math.vectors memoize sequences ;
+USING: accessors arrays checksums checksums.common
+io.encodings.binary io.files io.streams.byte-array kernel locals
+math math.vectors sequences ;
 IN: checksums.hmac
 
 <PRIVATE
-
-: seq-bitxor ( seq seq -- seq ) [ bitxor ] 2map ;
 
 : opad ( checksum-state -- seq ) block-size>> 0x5c <array> ;
 
@@ -16,9 +14,9 @@ IN: checksums.hmac
 :: init-key ( checksum key checksum-state -- o i )
     checksum-state block-size>> key length <
     [ key checksum checksum-bytes ] [ key ] if
-    checksum-state block-size>> 0 pad-tail 
-    [ checksum-state opad seq-bitxor ]
-    [ checksum-state ipad seq-bitxor ] bi ;
+    checksum-state block-size>> 0 pad-tail
+    [ checksum-state opad vbitxor ]
+    [ checksum-state ipad vbitxor ] bi ;
 
 PRIVATE>
 

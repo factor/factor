@@ -1,10 +1,13 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data classes.struct
-combinators destructors io.backend io.files.windows io.ports
-io.sockets io.sockets.icmp io.sockets.private kernel libc locals
-math sequences system windows.errors windows.handles
-windows.kernel32 windows.types windows.winsock ;
+
+USING: accessors alien alien.c-types alien.data alien.strings
+byte-arrays classes.struct combinators destructors io.backend
+io.encodings.ascii io.files.windows io.ports io.sockets
+io.sockets.icmp io.sockets.private kernel libc locals math
+sequences system windows.errors windows.handles windows.kernel32
+windows.types windows.winsock ;
+
 FROM: namespaces => get ;
 IN: io.sockets.windows
 
@@ -31,8 +34,6 @@ M: windows addrspec-of-family ( af -- addrspec )
         [ drop f ]
     } case ;
 
-HOOK: WSASocket-flags io-backend ( -- DWORD )
-
 TUPLE: win32-socket < win32-file ;
 
 : <win32-socket> ( handle -- win32-socket )
@@ -49,22 +50,22 @@ M: win32-socket dispose* ( stream -- )
 
 : open-socket ( addrspec type -- win32-socket )
     [ drop protocol-family ] [ swap protocol ] 2bi
-    f 0 WSASocket-flags WSASocket
+    f 0 WSA_FLAG_OVERLAPPED WSASocket
     dup socket-error
     opened-socket ;
 
 M: object (get-local-address) ( socket addrspec -- sockaddr )
     [ handle>> ] dip empty-sockaddr/size int <ref>
-    [ getsockname socket-error ] 2keep drop ;
+    [ getsockname socket-error ] keepd ;
 
 M: object (get-remote-address) ( socket addrspec -- sockaddr )
     [ handle>> ] dip empty-sockaddr/size int <ref>
-    [ getpeername socket-error ] 2keep drop ;
+    [ getpeername socket-error ] keepd ;
 
 : bind-socket ( win32-socket sockaddr len -- )
     [ handle>> ] 2dip bind socket-error ;
 
-M: object ((client)) ( addrspec -- handle )
+M: object remote>handle ( addrspec -- handle )
     [ SOCK_STREAM open-socket ] keep
     [
         bind-local-address get
@@ -97,9 +98,6 @@ M: windows (broadcast) ( datagram -- datagram )
 
 : malloc-int ( n -- alien )
     int <ref> malloc-byte-array ; inline
-
-M: windows WSASocket-flags ( -- DWORD )
-    WSA_FLAG_OVERLAPPED ; inline
 
 : get-ConnectEx-ptr ( socket -- void* )
     SIO_GET_EXTENSION_FUNCTION_POINTER
@@ -149,7 +147,7 @@ TUPLE: ConnectEx-args port
     winsock-error ; inline
 
 M: object establish-connection ( client-out remote -- )
-    make-sockaddr/size <ConnectEx-args>
+    make-sockaddr/size-outgoing <ConnectEx-args>
         swap >>port
         dup port>> handle>> handle>> >>s
         dup s>> get-ConnectEx-ptr >>ptr
@@ -289,7 +287,7 @@ TUPLE: WSASendTo-args port
     WSASendTo-args new
         swap >>port
         dup port>> handle>> handle>> >>s
-        swap make-sockaddr/size
+        swap make-sockaddr/size-outgoing
             [ malloc-byte-array &free ] dip
             [ >>lpTo ] [ >>iToLen ] bi*
         swap make-send-buffer >>lpBuffers
@@ -318,3 +316,7 @@ M: windows (send) ( packet addrspec datagram -- )
         [ wait-for-socket drop ]
         bi
     ] with-destructors ;
+
+M: windows host-name
+    256 [ <byte-array> dup ] keep gethostname socket-error
+    ascii alien>string ;

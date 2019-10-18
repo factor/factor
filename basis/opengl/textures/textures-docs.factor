@@ -12,4 +12,3 @@ HELP: delete-texture
 HELP: make-texture
 { $values { "image" image } { "id" "an OpenGL texture ID" } }
 { $description "Creates a new OpenGL texture from a pixmap image whose dimensions are equal to " { $snippet "dim" } "." } ;
-  

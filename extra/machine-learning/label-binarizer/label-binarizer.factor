@@ -18,6 +18,4 @@ M: label-binarizer transform-y
     ] map ;
 
 M: label-binarizer inverse-transform-y
-    classes_>> '[
-        [ 1 = ] find drop _ nth
-    ] map ;
+    classes_>> '[ 1 swap index _ nth ] map ;

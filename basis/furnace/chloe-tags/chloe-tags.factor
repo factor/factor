@@ -1,26 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel combinators assocs
-namespaces sequences splitting words
-fry urls multiline present
-xml
-xml.data
-xml.entities
-xml.writer
-xml.traversal
-xml.syntax
-html.components
-html.forms
-html.templates
-html.templates.chloe
-html.templates.chloe.compiler
-html.templates.chloe.syntax
-http
-http.server
-http.server.redirection
-http.server.responses
-io.streams.string
-furnace.utilities ;
+USING: accessors assocs combinators fry furnace.utilities
+html.components html.forms html.templates
+html.templates.chloe.compiler html.templates.chloe.syntax kernel
+namespaces present sequences splitting urls xml.data xml.syntax
+xml.traversal xml.writer ;
 IN: furnace.chloe-tags
 
 ! Chloe tags
@@ -32,7 +16,7 @@ IN: furnace.chloe-tags
     [ [ "/" ?tail drop "/" ] dip present 3append ] when* ;
 
 : a-url ( href rest query value-name -- url )
-    dup [ [ 3drop ] dip value ] [
+    dup [ 3nip value ] [
         drop
         <url>
             swap parse-query-attr >>query
@@ -55,7 +39,7 @@ CHLOE: atom
 CHLOE: write-atom drop [ write-atom-feeds ] [code] ;
 
 : compile-link-attrs ( tag -- )
-    #! Side-effects current namespace.
+    ! Side-effects current namespace.
     '[ [ [ _ ] dip link-attr ] each-responder ] [code] ;
 
 : process-attrs ( assoc -- newassoc )

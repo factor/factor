@@ -28,27 +28,27 @@ HELP: bitfield
         "        { 1 15 }"
         "        11"
         "        0"
-        "    } ;"
+        "    } bitfield ;"
     }
 } ;
 
 HELP: bits
 { $values { "m" integer } { "n" integer } { "m'" integer } }
 { $description "Keep only n bits from the integer m." }
-{ $example "USING: math.bitwise prettyprint ;" "0x123abcdef 16 bits .h" "cdef" } ;
+{ $example "USING: math.bitwise prettyprint ;" "0x123abcdef 16 bits .h" "0xcdef" } ;
 
 HELP: bit-range
 { $values { "x" integer } { "high" integer } { "low" integer } { "y" integer } }
 { $description "Extract a range of bits from an integer, inclusive of each boundary." }
-{ $example "USING: math.bitwise prettyprint ;" "0b1100 3 2 bit-range .b" "11" } ;
+{ $example "USING: math.bitwise prettyprint ;" "0b1100 3 2 bit-range .b" "0b11" } ;
 
 HELP: bitroll
 { $values { "x" integer } { "s" "a shift integer" } { "w" "a wrap integer" } { "y" integer }
 }
 { $description "Roll n by s bits to the left, wrapping around after w bits." }
 { $examples
-    { $example "USING: math.bitwise prettyprint ;" "1 -1 32 bitroll .b" "10000000000000000000000000000000" }
-    { $example "USING: math.bitwise prettyprint ;" "0xffff0000 8 32 bitroll .h" "ff0000ff" }
+    { $example "USING: math.bitwise prettyprint ;" "1 -1 32 bitroll .b" "0b10000000000000000000000000000000" }
+    { $example "USING: math.bitwise prettyprint ;" "0xffff0000 8 32 bitroll .h" "0xff0000ff" }
 } ;
 
 { bit? set-bit clear-bit } related-words
@@ -83,11 +83,11 @@ HELP: bitroll-32
 { $examples
     { $example "USING: math.bitwise prettyprint ;"
                "0x1 10 bitroll-32 .h"
-               "400"
+               "0x400"
     }
     { $example "USING: math.bitwise prettyprint ;"
                "0x1 -10 bitroll-32 .h"
-               "400000"
+               "0x400000"
     }
 } ;
 
@@ -100,11 +100,11 @@ HELP: bitroll-64
 { $examples
     { $example "USING: math.bitwise prettyprint ;"
                "0x1 10 bitroll-64 .h"
-               "400"
+               "0x400"
     }
     { $example "USING: math.bitwise prettyprint ;"
                "0x1 -10 bitroll-64 .h"
-               "40000000000000"
+               "0x40000000000000"
     }
 } ;
 
@@ -119,7 +119,7 @@ HELP: clear-bit
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "0xff 7 clear-bit .h"
-        "7f"
+        "0x7f"
     }
 } ;
 
@@ -190,7 +190,7 @@ HELP: mask
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "0b11111111 0b101 mask .b"
-        "101"
+        "0b101"
     }
 } ;
 
@@ -203,7 +203,7 @@ HELP: mask-bit
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "0xff 2 mask-bit .b"
-        "100"
+        "0b100"
     }
 } ;
 
@@ -248,11 +248,11 @@ HELP: on-bits
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "6 on-bits .h"
-        "3f"
+        "0x3f"
     }
     { $example "USING: math.bitwise kernel prettyprint ;"
         "64 on-bits .h"
-        "ffffffffffffffff"
+        "0xffffffffffffffff"
     }
 } ;
 
@@ -266,11 +266,11 @@ HELP: toggle-bit
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "0 3 toggle-bit .b"
-        "1000"
+        "0b1000"
     }
     { $example "USING: math.bitwise kernel prettyprint ;"
         "0b1000 3 toggle-bit .b"
-        "0"
+        "0b0"
     }
 } ;
 
@@ -283,7 +283,7 @@ HELP: set-bit
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "0 5 set-bit .h"
-        "20"
+        "0x20"
     }
 } ;
 
@@ -303,7 +303,7 @@ HELP: unmask
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "0xff 0x0f unmask .h"
-        "f0"
+        "0xf0"
     }
 } ;
 
@@ -408,7 +408,7 @@ HELP: wrap
     { $example
         "USING: math.bitwise prettyprint ;"
         "0xffff 8 wrap .h"
-        "7"
+        "0x7"
     }
 } ;
 
@@ -470,10 +470,11 @@ $nl
     W-
     W*
 }
-"Converting a number to the nearest even/odd:"
+"Converting a number to the nearest even/odd/signed:"
 { $subsections
     >even
     >odd
+    >signed
 }
 "Bitfields:"
 { $subsections

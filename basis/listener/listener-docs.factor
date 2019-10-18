@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel io system prettyprint
-continuations quotations vocabs parser vocabs.loader ;
+USING: continuations help.markup help.syntax io kernel parser
+prettyprint quotations system threads vocabs vocabs.loader ;
 IN: listener
 
 ARTICLE: "listener-watch" "Watching variables in the listener"
@@ -47,7 +47,7 @@ HELP: hide-all-vars
 { $description "Removes all variables from the watch list." } ;
 
 ARTICLE: "listener" "The listener"
-"The listener evaluates Factor expressions read from the input stream. Typically, you write Factor code in a text editor, load it from the listener by calling " { $link require } ", " { $link reload } " or " { $link run-file } ", and then test it from interactively."
+"The listener evaluates Factor expressions read from the input stream. Typically, you write Factor code in a text editor, load it from the listener by calling " { $link require } ", " { $link reload } " or " { $link run-file } ", and then test it interactively."
 $nl
 "The classical first program can be run in the listener:"
 { $example "\"Hello, world\" print" "Hello, world" }
@@ -62,6 +62,12 @@ $nl
 { $example "{ 1 2 3 } [\n    .\n] each" "1\n2\n3" }
 "The listener will display the current contents of the datastack after every line of input."
 $nl
+"If your code runs too long, you can press C-Break to interrupt it (works only on Windows). To enable this feature, run the following code, or add it to your " { $link ".factor-rc" } ":"
+{ $code
+    "USING: listener namespaces ;"
+    "t handle-ctrl-break set-global"
+}
+$nl
 "The listener can watch dynamic variables:"
 { $subsections "listener-watch" }
 "Nested listeners can be useful for testing code in other dynamic scopes. For example, when doing database maintenance using the " { $vocab-link "db.tuples" } " vocabulary, it can be useful to start a listener with a database connection:"
@@ -75,6 +81,12 @@ $nl
 $nl
 "The listener's mechanism for reading multi-line expressions from the input stream can be called from user code:"
 { $subsections read-quot } ;
+
+HELP: handle-ctrl-break
+{ $description "If this variable is " { $link t } ", the listener will wrap the user code with calls to " { $link enable-ctrl-break } " and " { $link disable-ctrl-break } " to make it interruptible with C-Break. This includes both compilation and execution phases, so circular vocab import can be interrupted as well as infinite loops."
+$nl
+"This only works on Windows, and has no effect on other platforms."
+{ $warning "If user code " { $link yield } "s or gets stuck on an asynchronous I/O operation, pressing C-Break will most likely crash the Factor VM." } } ;
 
 ABOUT: "listener"
 

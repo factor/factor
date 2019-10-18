@@ -3,8 +3,8 @@
 USING: alien.c-types alien.data alien.syntax classes.struct
 continuations core-foundation core-foundation.strings
 core-foundation.urls destructors kernel sequences
-specialized-arrays.instances.alien.c-types.char strings
-unix.ffi ;
+specialized-arrays strings unix.ffi ;
+SPECIALIZED-ARRAY: char
 IN: core-foundation.launch-services
 
 FUNCTION: OSStatus LSFindApplicationForInfo (
@@ -13,13 +13,13 @@ FUNCTION: OSStatus LSFindApplicationForInfo (
    CFStringRef inName,
    FSRef *outAppRef,
    CFURLRef *outAppURL
-) ;
+)
 
 FUNCTION: OSStatus FSRefMakePath (
    FSRef *ref,
    UInt8 *path,
    UInt32 maxPathSize
-) ;
+)
 
 ! Abstract base types
 CFSTRING: kUTTypeItem "public.item"
@@ -117,7 +117,7 @@ ERROR: core-foundation-error n ;
     dup 0 = [ drop ] [ core-foundation-error ] if ;
 
 : fsref>string ( fsref -- string )
-    MAXPATHLEN [ <char-array> ] [ ] bi
+    MAXPATHLEN [ char <c-array> ] [ ] bi
     [ FSRefMakePath cf-error ] [ drop ] 2bi
     [ 0 = ] trim-tail >string ;
 

@@ -2,11 +2,11 @@ USING: help.markup help.syntax kernel math ;
 IN: bloom-filters
 
 HELP: <bloom-filter>
-{ $values { "error-rate" "The desired false positive rate.  A " { $link float } " between 0 and 1." }
-          { "capacity" "The expected number of object in the set.  A positive " { $link integer } "." }
+{ $values { "error-rate" "The desired false positive rate. A " { $link float } " between 0 and 1." }
+          { "capacity" "The expected number of object in the set. A positive " { $link integer } "." }
           { "bloom-filter" bloom-filter } }
 { $description "Creates an empty Bloom filter." }
-{ $errors "Throws a " { $link invalid-size } " when unable to produce a filter meeting the given constraints.  Throws a " { $link invalid-error-rate } " or a " { $link invalid-capacity } " when input is invalid." } ;
+{ $errors "Throws a " { $link invalid-size } " when unable to produce a filter meeting the given constraints. Throws a " { $link invalid-error-rate } " or a " { $link invalid-capacity } " when input is invalid." } ;
 
 
 HELP: bloom-filter-insert
@@ -19,7 +19,7 @@ HELP: bloom-filter-member?
 { $values { "object" object }
           { "bloom-filter" bloom-filter }
           { "?" boolean } }
-{ $description "Returns " { $link t } " if the object may be a member of Bloom filter, " { $link f } " otherwise.  The false positive rate is configurable; there are no false negatives." } ;
+{ $description "Returns " { $link t } " if the object may be a member of Bloom filter, " { $link f } " otherwise. The false positive rate is configurable; there are no false negatives." } ;
 
 HELP: bloom-filter
 { $class-description "This is the class for Bloom filters. These provide constant-time insertion and probabilistic membership-testing operations, but do not actually store any elements." } ;

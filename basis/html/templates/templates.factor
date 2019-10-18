@@ -89,8 +89,8 @@ M: f call-template* drop call-next-template ;
 
 : with-boilerplate ( child master -- )
     [
-        title [ <box> or ] change
-        style [ SBUF" " clone or ] change
+        title [ [ <box> ] unless* ] change
+        style [ [ SBUF" " clone ] unless* ] change
         atom-feeds [ V{ } like ] change
 
         [

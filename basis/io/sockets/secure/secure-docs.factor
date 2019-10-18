@@ -1,45 +1,40 @@
-USING: io help.markup help.syntax calendar quotations io.sockets ;
+USING: io help.markup help.syntax calendar quotations strings io.sockets ;
 IN: io.sockets.secure
 
 HELP: secure-socket-timeout
 { $var-description "Timeout for operations not associated with a constructed port instance, such as SSL handshake and shutdown. Represented as a " { $link duration } "." } ;
 
-HELP: SSLv2
-{ $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
-$nl
-"Note that the SSLv2 protocol is vulnerable to truncation attacks and its use is discouraged (" { $url "http://www.gnu.org/software/gnutls/manual/html_node/On-SSL-2-and-older-protocols.html" } ")." } ;
-
-HELP: SSLv3
-{ $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
-$nl
-"SSLv3 is widely used, however it is being supersceded by TLSv1." } ;
-
-HELP: SSLv23
-{ $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
-$nl
-"This value indicates that either SSLv2 or SSLv3 is acceptable." } ;
 
 HELP: TLSv1
 { $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
 $nl
-"TLSv1 is the newest protocol for secure socket communications." } ;
+"TLSv1 is an older protocol for secure socket communications." } ;
+
+HELP: TLSv1.1
+{ $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
+$nl
+"TLSv1.1 is an older protocol for secure socket communications." } ;
+
+HELP: TLSv1.2
+{ $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
+$nl
+"TLSv1.2 is the newest protocol for secure socket communications." } ;
 
 ARTICLE: "ssl-methods" "SSL/TLS methods"
 "The " { $snippet "method" } " slot of a " { $link secure-config } " can be set to one of the following values:"
 { $subsections
-    SSLv2
-    SSLv23
-    SSLv3
     TLSv1
+    TLSv1.1
+    TLSv1.2
 }
-"The default value is " { $link SSLv23 } "." ;
+"The default value is " { $link TLSv1.2 } "." ;
 
 HELP: secure-config
 { $class-description "Instances represent secure socket configurations." } ;
 
 HELP: <secure-config>
 { $values { "config" secure-config } }
-{ $description "Creates a new secure socket configration with default values." } ;
+{ $description "Creates a new secure socket configuration with default values." } ;
 
 ARTICLE: "ssl-key-file" "The key file and password"
 "The " { $snippet "key-file" } " and " { $snippet "password" } " slots of a " { $link secure-config } " can be set to a private key file in PEM format. These slots are required for secure servers, and also for clients when client-side authentication is used." ;
@@ -91,7 +86,7 @@ HELP: secure
 { $class-description "The class of secure socket addresses." } ;
 
 HELP: <secure>
-{ $values { "addrspec" "an address specifier" } { "secure" secure } }
+{ $values { "addrspec" "an address specifier" } { "hostname" { $maybe string } } { "secure" secure } }
 { $description "Creates a new secure socket address, which can then be passed to " { $link <client> } " or " { $link <server> } "." } ;
 
 ARTICLE: "ssl-addresses" "Secure socket addresses"
@@ -121,7 +116,7 @@ $nl
 { $subsections accept-secure-handshake } ;
 
 HELP: premature-close
-{ $error-description "Thrown if an SSL connection is closed without the proper " { $snippet "close_notify" } " sequence. This error is never reported for " { $link SSLv2 } " connections because there is no distinction between expected and unexpected connection closure in that case." } ;
+{ $error-description "Thrown if an SSL connection is closed without the proper " { $snippet "close_notify" } " sequence." } ;
 
 HELP: certificate-verify-error
 { $error-description "Thrown if certificate verification failed. The " { $snippet "result" } " slot contains an object identifying the low-level error that occurred." } ;
@@ -135,6 +130,9 @@ HELP: upgrade-on-non-socket
 HELP: upgrade-buffers-full
 { $error-description "Thrown if " { $link send-secure-handshake } " or " { $link accept-secure-handshake } " is called when there is still data which hasn't been read or written." }
 { $notes "Clients should ensure to " { $link flush } " their last command to the server before calling " { $link send-secure-handshake } "." } ;
+
+HELP: no-tls-supported
+{ $error-description "If you see this error, make sure you have all the necessary libraries installed (libssl and libcrypto) with at least one of " { $link "ssl-methods" } " supported." } ;
 
 ARTICLE: "ssl-errors" "Secure socket errors"
 "Secure sockets can throw one of several errors in addition to the usual I/O errors:"
@@ -152,7 +150,7 @@ ARTICLE: "ssl-errors" "Secure socket errors"
 ARTICLE: "io.sockets.secure" "Secure sockets (SSL, TLS)"
 "The " { $vocab-link "io.sockets.secure" } " vocabulary implements secure, encrypted sockets using the OpenSSL library."
 $nl
-"At present, this vocabulary only works on Unix, and not on Windows."
+"On Windows make sure you have the appropriate DLLs available, e.g. libcrypto-37.dll and libssl-38.dll."
 $nl
 "This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (" { $url "http://www.openssl.org/" } "), cryptographic software written by Eric Young (eay@cryptsoft.com) and software written by Tim Hudson (tjh@cryptsoft.com)."
 { $subsections

@@ -14,8 +14,6 @@ furnace.redirection
 furnace.boilerplate
 furnace.auth.providers
 furnace.auth.providers.db ;
-FROM: assocs => change-at ;
-FROM: namespaces => set ;
 IN: furnace.auth
 
 SYMBOL: logged-in-user
@@ -36,20 +34,20 @@ M: dispatcher init-user-profile
 M: filter-responder init-user-profile
     responder>> init-user-profile ;
 
-: profile ( -- assoc ) logged-in-user get profile>> ;
+: current-profile ( -- assoc ) logged-in-user get profile>> ;
 
 : user-changed ( -- )
     logged-in-user get t >>changed? drop ;
 
 : uget ( key -- value )
-    profile at ;
+    current-profile at ;
 
 : uset ( value key -- )
-    profile set-at
+    current-profile set-at
     user-changed ;
 
 : uchange ( quot key -- )
-    profile swap change-at
+    current-profile swap change-at
     user-changed ; inline
 
 SYMBOL: capabilities
@@ -95,12 +93,12 @@ M: user-saver dispose
     <user-saver> &dispose drop ;
 
 : init-user ( user -- )
-    [ [ logged-in-user set ] [ save-user-after ] bi ] when* ;
+    [ [ logged-in-user namespaces:set ] [ save-user-after ] bi ] when* ;
 
 \ init-user DEBUG add-input-logging
 
 M: realm call-responder* ( path responder -- response )
-    dup realm set
+    dup realm namespaces:set
     logged-in? [
         dup init-realm
         dup logged-in-username
@@ -149,7 +147,7 @@ TUPLE: protected < filter-responder description capabilities ;
     ] if ;
 
 M: protected call-responder* ( path responder -- response )
-    dup protected set
+    dup protected namespaces:set
     dup capabilities>> have-capabilities?
     [ call-next-method ] [
         [ drop ] [ [ description>> ] [ capabilities>> ] bi ] bi*

@@ -5,7 +5,7 @@ IN: stack-checker
 ARTICLE: "inference-simple" "Straight-line stack effects"
 "The simplest case is when a piece of code does not have any branches or recursion, and just pushes literals and calls words."
 $nl
-"Pushing a literal has stack effect " { $snippet "( -- x )" } ". The stack effect of a most words is always known statically from the declaration. Stack effects of " { $link POSTPONE: inline } " words and " { $link "macros" } ", may depend on literals pushed on the stack prior to the call, and this case is discussed in " { $link "inference-combinators" } "."
+"Pushing a literal has stack effect " { $snippet "( -- x )" } ". The stack effect of most words is always known statically from the declaration. Stack effects of " { $link POSTPONE: inline } " words and " { $link "macros" } ", may depend on literals pushed on the stack prior to the call, and this case is discussed in " { $link "inference-combinators" } "."
 $nl
 "The stack effect of each element in a code snippet is composed. The result is then the stack effect of the snippet."
 $nl

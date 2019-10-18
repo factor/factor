@@ -1,9 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.data alien.syntax combinators
+USING: accessors alien.c-types alien.data alien.syntax
 continuations io.encodings.string io.encodings.utf8 kernel
-sequences strings calendar system accessors unix unix.time
-unix.ffi calendar.unix vocabs classes.struct ;
+sequences system unix.ffi vocabs ;
 IN: unix.utmpx
 
 CONSTANT: EMPTY 0
@@ -19,12 +18,12 @@ CONSTANT: ACCOUNTING 9
 CONSTANT: SIGNATURE 10
 CONSTANT: SHUTDOWN_TIME 11
 
-FUNCTION: void setutxent ( ) ;
-FUNCTION: void endutxent ( ) ;
-FUNCTION: utmpx* getutxent ( ) ;
-FUNCTION: utmpx* getutxid ( utmpx* id ) ;
-FUNCTION: utmpx* getutxline ( utmpx* line ) ;
-FUNCTION: utmpx* pututxline ( utmpx* utx ) ;
+FUNCTION: void setutxent ( )
+FUNCTION: void endutxent ( )
+FUNCTION: utmpx* getutxent ( )
+FUNCTION: utmpx* getutxid ( utmpx* id )
+FUNCTION: utmpx* getutxline ( utmpx* line )
+FUNCTION: utmpx* pututxline ( utmpx* utx )
 
 TUPLE: utmpx-record user id line pid type timestamp host ;
 
@@ -48,7 +47,4 @@ M: unix new-utmpx-record
         produce nip
     ] with-utmpx ;
 
-os {
-    { macosx [ "unix.utmpx.macosx" require ] }
-    { linux [ "unix.utmpx.linux" require ] }
-} case
+"unix.utmpx." os name>> append require

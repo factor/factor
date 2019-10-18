@@ -16,6 +16,9 @@ M: object branch? drop f ;
     [ call ] 2keep over branch?
     [ '[ _ deep-each ] each ] [ 2drop ] if ; inline recursive
 
+: deep-reduce ( ... obj identity quot: ( ... prev elt -- ... next ) -- ... result )
+    swapd deep-each ; inline
+
 : deep-map ( ... obj quot: ( ... elt -- ... elt' ) -- ... newobj )
     [ call ] keep over branch?
     [ '[ _ deep-map ] map ] [ drop ] if ; inline recursive
@@ -25,6 +28,12 @@ M: object branch? drop f ;
 
 : deep-filter ( ... obj quot: ( ... elt -- ... ? ) -- ... seq )
     over dup branch? [ drop f ] unless deep-filter-as ; inline
+
+: deep-reject-as ( ... obj quot: ( ... elt -- ... ? ) exemplar -- ... seq )
+    [ [ not ] compose ] dip deep-filter-as ; inline
+
+: deep-reject ( ... obj quot: ( ... elt -- ... ? ) -- ... seq )
+    [ not ] compose deep-filter ; inline
 
 : (deep-find) ( ... obj quot: ( ... elt -- ... ? ) -- ... elt ? )
     [ call ] 2keep rot [ drop t ] [
@@ -56,7 +65,7 @@ M: object branch? drop f ;
     ] [ drop ] if ; inline recursive
 
 : flatten ( obj -- seq )
-    [ branch? not ] deep-filter ;
+    [ branch? ] deep-reject ;
 
 : flatten-as ( obj exemplar -- seq )
-    [ branch? not ] swap deep-filter-as ;
+    [ branch? ] swap deep-reject-as ;

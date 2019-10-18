@@ -45,7 +45,7 @@ HELP: callable
 { $class-description "The class whose instances can be passed to " { $link call } ". This includes quotations and composed quotations built up with " { $link curry } " or " { $link compose } "." } ;
 
 HELP: quotation
-{ $description "The class of quotations. See " { $link "syntax-quots" } " for syntax and " { $link "quotations" } " for general information." } ;
+{ $class-description "The class of quotations. See " { $link "syntax-quots" } " for syntax and " { $link "quotations" } " for general information." } ;
 
 HELP: >quotation
 { $values { "seq" sequence } { "quot" quotation } }
@@ -61,7 +61,7 @@ HELP: 1quotation
 } ;
 
 HELP: wrapper
-{ $description "The class of wrappers. Wrappers are created by calling " { $link literalize } ". See " { $link "syntax-words" } " for syntax." } ;
+{ $class-description "The class of wrappers. Wrappers are created by calling " { $link literalize } ". See " { $link "syntax-words" } " for syntax." } ;
 
 HELP: <wrapper>
 { $values { "obj" object } { "wrapper" wrapper } }

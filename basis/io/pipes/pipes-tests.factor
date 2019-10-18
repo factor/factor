@@ -1,11 +1,9 @@
-USING: io io.pipes io.streams.string io.encodings.utf8
-io.encodings.binary io.streams.duplex io.encodings io.timeouts
-namespaces continuations tools.test kernel calendar destructors
-accessors debugger math sequences threads
-concurrency.count-downs fry ;
-IN: io.pipes.tests
+USING: accessors calendar concurrency.count-downs continuations
+destructors fry io io.encodings io.encodings.binary
+io.encodings.utf8 io.pipes io.streams.duplex io.streams.string
+io.timeouts kernel math namespaces threads tools.test ;
 
-[ "Hello" ] [
+{ "Hello" } [
     utf8 <pipe> [
         "Hello" print flush
         readln
@@ -13,15 +11,15 @@ IN: io.pipes.tests
 ] unit-test
 
 ! Test run-pipeline
-[ { } ] [ { } run-pipeline ] unit-test
-[ { f } ] [ { [ f ] } run-pipeline ] unit-test
-[ { "Hello" } ] [
+{ { } } [ { } run-pipeline ] unit-test
+{ { f } } [ { [ f ] } run-pipeline ] unit-test
+{ { "Hello" } } [
     "Hello" [
         { [ input-stream [ utf8 <decoder> ] change readln ] } run-pipeline
     ] with-string-reader
 ] unit-test
 
-[ { f "Hello" } ] [
+{ { f "Hello" } } [
     {
         [ output-stream [ utf8 <encoder> ] change "Hello" print flush f ]
         [ input-stream [ utf8 <decoder> ] change readln ]
@@ -37,7 +35,7 @@ IN: io.pipes.tests
 ] must-fail
 
 ! Test writing to a half-open pipe
-[ ] [
+{ } [
     1000 [
         utf8 <pipe> [
             [ in>> dispose ]
@@ -48,7 +46,7 @@ IN: io.pipes.tests
 ] unit-test
 
 ! Test non-blocking operation
-[ ] [
+{ } [
     [
         2 <count-down> "count-down" set
 
@@ -61,7 +59,7 @@ IN: io.pipes.tests
                     "count-down" get count-down
                 ] in-thread
             ] bi@
-            
+
             ! Give the threads enough time to start blocking on
             ! read
             1 seconds sleep
@@ -76,7 +74,7 @@ IN: io.pipes.tests
 ] unit-test
 
 ! 0 read should not block
-[ f ] [
+{ f } [
     [
         binary <pipe> &dispose
         in>>

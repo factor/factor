@@ -7,29 +7,36 @@ const cell seh_area_size = 0;
 #endif
 
 struct code_heap {
-  /* The actual memory area */
+  // The actual memory area
   segment* seg;
 
-  /* Memory area reserved for safepoint guard page */
-  void* safepoint_page;
+  // Memory area reserved for safepoint guard page
+  cell safepoint_page;
 
-  /* Memory area reserved for SEH. Only used on Windows */
+  // Memory area reserved for SEH. Only used on Windows
   char* seh_area;
 
-  /* Memory allocator */
+  // Memory allocator
   free_list_allocator<code_block>* allocator;
 
+  // For fast lookup of blocks from addresses.
   std::set<cell> all_blocks;
 
-  /* Keys are blocks which need to be initialized by initialize_code_block().
-     Values are literal tables. Literal table arrays are GC roots until the
-     time the block is initialized, after which point they are discarded. */
+
+  // Code blocks are initialized in two steps in
+  // primitive_modify_code_heap() because they might reference each
+  // other. First they are all allocated and placed in this map with
+  // their literal tables which are GC roots until the block is
+  // initialized. Then they are all initialized by
+  // initialize_code_block() which resolves relocations and updates
+  // addresses. Uninitialized blocks instructions must not be visited
+  // by GC.
   std::map<code_block*, cell> uninitialized_blocks;
 
-  /* Code blocks which may reference objects in the nursery */
+  // Code blocks which may reference objects in the nursery
   std::set<code_block*> points_to_nursery;
 
-  /* Code blocks which may reference objects in aging space or the nursery */
+  // Code blocks which may reference objects in aging space or the nursery
   std::set<code_block*> points_to_aging;
 
   explicit code_heap(cell size);
@@ -37,23 +44,21 @@ struct code_heap {
   void write_barrier(code_block* compiled);
   void clear_remembered_set();
   bool uninitialized_p(code_block* compiled);
-  bool marked_p(code_block* compiled);
-  void set_marked_p(code_block* compiled);
-  void clear_mark_bits();
   void free(code_block* compiled);
   void flush_icache();
-  void guard_safepoint();
-  void unguard_safepoint();
+  void set_safepoint_guard(bool locked);
   void verify_all_blocks_set();
   void initialize_all_blocks_set();
+  cell high_water_mark() { return allocator->size / 20; }
 
   void sweep();
 
   code_block* code_block_for_address(cell address);
+  cell frame_predecessor(cell frame_top);
 
   bool safepoint_p(cell addr) {
     cell page_mask = ~(getpagesize() - 1);
-    return (addr & page_mask) == (cell)safepoint_page;
+    return (addr & page_mask) == safepoint_page;
   }
 };
 

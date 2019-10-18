@@ -3,15 +3,12 @@
 USING: accessors arrays assocs classes combinators.smart
 continuations destructors fry io io.styles kernel namespaces
 prettyprint sequences sets sorting ;
-FROM: sets => members ;
 IN: tools.destructors
 
 <PRIVATE
 
 : class-tally ( set -- assoc' )
-    H{ } clone [
-        [ members ] dip '[ dup class-of _ push-at ] each
-    ] keep ;
+    members [ class-of ] collect-by ;
 
 : (disposables.) ( set -- )
     class-tally >alist [ first2 [ length ] keep 3array ] map [ second ] sort-with

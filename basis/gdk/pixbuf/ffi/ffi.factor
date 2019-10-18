@@ -1,31 +1,27 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.libraries alien.syntax
-combinators gio.ffi glib.ffi gobject-introspection
-gobject-introspection.standard-types kernel libc
-sequences system vocabs ;
+USING: alien alien.c-types alien.data alien.libraries
+alien.syntax combinators gio.ffi glib.ffi gobject-introspection
+gobject-introspection.standard-types kernel libc sequences
+system vocabs ;
 IN: gdk.pixbuf.ffi
 
-<<
-"gio.ffi" require
->>
+<< "gio.ffi" require >>
 
 LIBRARY: gdk.pixbuf
 
-<<
-"gdk.pixbuf" {
-    { [ os windows? ] [ "libgdk_pixbuf-2.0-0.dll" cdecl add-library ] }
-    { [ os macosx? ] [ "libgdk_pixbuf-2.0.dylib" cdecl add-library ] }
-    { [ os unix? ] [ "libgdk_pixbuf-2.0.so" cdecl add-library ] }
-} cond
->>
+<< "gdk.pixbuf" {
+    { [ os windows? ] [ "libgdk_pixbuf-2.0-0.dll" ] }
+    { [ os macosx? ] [ "libgdk_pixbuf-2.0.dylib" ] }
+    { [ os unix? ] [ "libgdk_pixbuf-2.0.so" ] }
+} cond cdecl add-library >>
 
 GIR: vocab:gdk/pixbuf/GdkPixbuf-2.0.gir
 
 ! <workaround incorrect return-values in gir
 
 FORGET: gdk_pixbuf_get_pixels
-FUNCTION: guint8* gdk_pixbuf_get_pixels ( GdkPixbuf* pixbuf ) ;
+FUNCTION: guint8* gdk_pixbuf_get_pixels ( GdkPixbuf* pixbuf )
 
 FORGET: gdk_pixbuf_new_from_data
 FUNCTION: GdkPixbuf* gdk_pixbuf_new_from_data ( guint8* data,
@@ -36,7 +32,7 @@ FUNCTION: GdkPixbuf* gdk_pixbuf_new_from_data ( guint8* data,
                                                 int height,
                                                 int rowstride,
                                                 GdkPixbufDestroyNotify destroy_fn,
-                                                gpointer destroy_fn_data ) ;
+                                                gpointer destroy_fn_data )
 
 FORGET: gdk_pixbuf_save_to_bufferv
 FUNCTION: gboolean gdk_pixbuf_save_to_bufferv ( GdkPixbuf* pixbuf,
@@ -45,7 +41,7 @@ FUNCTION: gboolean gdk_pixbuf_save_to_bufferv ( GdkPixbuf* pixbuf,
                                                 c-string type,
                                                 char **option_keys,
                                                 char **option_values,
-                                                GError **error ) ;
+                                                GError **error )
 
 
 ! workaround>

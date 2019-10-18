@@ -24,14 +24,14 @@ SYMBOL: current-macro
 
 : save-euler-op ( euler-op -- ) current-macro get log>> push ;
 
-MACRO:: log-euler-op ( class def inputs -- )
+MACRO:: log-euler-op ( class def inputs -- quot )
     class inputs def inputs '[ [ current-macro get [ _ boa save-euler-op ] [ _ ndrop ] if ] _ _ nbi ] ;
 
 SYNTAX: LOG-GML:
     [let
         (GML:) :> ( word name effect def )
 
-        name "-record" append create-in :> record-class
+        name "-record" append create-word-in :> record-class
         record-class tuple effect in>> define-tuple-class
 
         record-class def effect in>> length

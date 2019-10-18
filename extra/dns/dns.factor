@@ -5,9 +5,8 @@ combinators combinators.smart constructors destructors grouping
 io io.binary io.encodings.binary io.encodings.string
 io.encodings.utf8 io.sockets io.sockets.private
 io.streams.byte-array io.timeouts kernel make math math.bitwise
-math.parser namespaces nested-comments random sequences
-slots.syntax splitting system vectors vocabs strings
-ascii ;
+math.parser namespaces random sequences slots.syntax splitting
+system vectors vocabs strings ascii ;
 IN: dns
 
 : with-input-seek ( n seek-type quot -- )
@@ -54,7 +53,7 @@ SYMBOL: dns-servers
     "." ?tail drop ;
 
 TUPLE: query name type class ;
-CONSTRUCTOR: query ( name type class -- obj )
+CONSTRUCTOR: <query> query ( name type class -- obj )
     [ >dotted ] change-name ;
 
 TUPLE: rr name type class ttl rdata ;
@@ -66,24 +65,24 @@ TUPLE: mx preference exchange ;
 TUPLE: soa mname rname serial refresh retry expire minimum ;
 
 TUPLE: a name ;
-CONSTRUCTOR: a ( name -- obj ) ;
+CONSTRUCTOR: <a> a ( name -- obj ) ;
 
 TUPLE: aaaa name ;
-CONSTRUCTOR: aaaa ( name -- obj ) ;
+CONSTRUCTOR: <aaaa> aaaa ( name -- obj ) ;
 
 TUPLE: cname name ;
-CONSTRUCTOR: cname ( name -- obj ) ;
+CONSTRUCTOR: <cname> cname ( name -- obj ) ;
 
 TUPLE: ptr name ;
-CONSTRUCTOR: ptr ( name -- obj ) ;
+CONSTRUCTOR: <ptr> ptr ( name -- obj ) ;
 
 TUPLE: ns name ;
-CONSTRUCTOR: ns ( name -- obj ) ;
+CONSTRUCTOR: <ns> ns ( name -- obj ) ;
 
 TUPLE: message id qr opcode aa tc rd ra z rcode
 query answer-section authority-section additional-section ;
 
-CONSTRUCTOR: message ( query -- obj )
+CONSTRUCTOR: <message> message ( query -- obj )
     16 2^ random >>id
     0 >>qr
     QUERY >>opcode
@@ -159,7 +158,7 @@ CONSTANT: ipv6-arpa-suffix ".ip6.arpa"
 
 : trim-ipv6-arpa ( string -- string' )
     dotted> ipv6-arpa-suffix ?tail drop ;
- 
+
 : arpa>ipv4 ( string -- ip ) trim-ipv4-arpa reverse-ipv4 ;
 
 : arpa>ipv6 ( string -- ip )
@@ -270,7 +269,7 @@ M: HINFO rdata>byte-array
     [ os>> >name ] bi append ;
 
 M: MX rdata>byte-array
-    drop 
+    drop
     [ preference>> 2 >be ]
     [ exchange>> >name ] bi append ;
 
@@ -326,10 +325,10 @@ M: TXT rdata>byte-array
     ] B{ } append-outputs-as ;
 
 : udp-query ( bytes server -- bytes' )
-    f 0 <inet4> <datagram>
-    10 seconds over set-timeout [
+    [
+        10 seconds over set-timeout
         [ send ] [ receive drop ] bi
-    ] with-disposal ;
+    ] with-any-port-local-datagram ;
 
 : <dns-inet4> ( -- inet4 )
     dns-servers get random 53 <inet4> ;
@@ -384,7 +383,7 @@ M: TXT rdata>byte-array
 : message>mxs ( message -- assoc )
     answer-section>> [ rdata>> [ preference>> ] [ exchange>> ] bi 2array ] map ;
 
-: messages>names ( messages -- names ) 
+: messages>names ( messages -- names )
     [ message>names ] map concat ;
 
 : forward-confirmed-reverse-dns-ipv4? ( ipv4-string -- ? )
@@ -399,15 +398,14 @@ M: TXT rdata>byte-array
 : message>query-name ( message -- string )
     query>> first name>> dotted> ;
 
-(*
-M: string resolve-host
-    dup >lower "localhost" = [
-        drop resolve-localhost
-    ] [
-        dns-A-query message>a-names [ <ipv4> ] map
-    ] if ;
-*)
-    
+! XXX: Turn on someday for nonblocking DNS lookups
+! M: string resolve-host
+    ! dup >lower "localhost" = [
+        ! drop resolve-localhost
+    ! ] [
+        ! dns-A-query message>a-names [ <ipv4> ] map
+    ! ] if ;
+
 HOOK: initial-dns-servers os ( -- sequence )
 
 {
@@ -417,5 +415,5 @@ HOOK: initial-dns-servers os ( -- sequence )
 
 : with-dns-servers ( servers quot -- )
     [ dns-servers ] dip with-variable ; inline
-    
+
 dns-servers [ initial-dns-servers >vector ] initialize

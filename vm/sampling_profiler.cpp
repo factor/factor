@@ -2,11 +2,45 @@
 
 namespace factor {
 
-profiling_sample_count profiling_sample_count::record_counts() volatile {
+// This is like the growable_array class, except the whole of it
+// exists on the Factor heap. growarr = growable array.
+static cell growarr_capacity(array *growarr) {
+  return untag_fixnum(growarr->data()[0]);
+}
+
+static cell growarr_nth(array *growarr, cell slot) {
+  return array_nth(untag<array>(growarr->data()[1]), slot);
+}
+
+// Allocates memory
+array* factor_vm::allot_growarr() {
+  data_root<array> contents(allot_array(10, false_object), this);
+  array *growarr = allot_uninitialized_array<array>(2);
+  set_array_nth(growarr, 0, tag_fixnum(0));
+  set_array_nth(growarr, 1, contents.value());
+  return growarr;
+}
+
+// Allocates memory
+void factor_vm::growarr_add(array *growarr_, cell elt_) {
+  data_root<array> growarr(growarr_, this);
+  data_root<object> elt(elt_, this);
+  data_root<array> contents(growarr.untagged()->data()[1], this);
+
+  cell count = growarr_capacity(growarr.untagged());
+  if (count == array_capacity(contents.untagged())) {
+    contents.set_untagged(reallot_array(contents.untagged(), 2 * count));
+    set_array_nth(growarr.untagged(), 1, contents.value());
+  }
+  set_array_nth(contents.untagged(), count, elt.value());
+  set_array_nth(growarr.untagged(), 0, tag_fixnum(count + 1));
+}
+
+profiling_sample profiling_sample::record_counts() volatile {
   atomic::fence();
-  profiling_sample_count returned(sample_count, gc_sample_count,
-                                  jit_sample_count, foreign_sample_count,
-                                  foreign_thread_sample_count);
+  profiling_sample returned(sample_count, gc_sample_count,
+                            jit_sample_count, foreign_sample_count,
+                            foreign_thread_sample_count);
   atomic::fetch_subtract(&sample_count, returned.sample_count);
   atomic::fetch_subtract(&gc_sample_count, returned.gc_sample_count);
   atomic::fetch_subtract(&jit_sample_count, returned.jit_sample_count);
@@ -16,7 +50,7 @@ profiling_sample_count profiling_sample_count::record_counts() volatile {
   return returned;
 }
 
-void profiling_sample_count::clear() volatile {
+void profiling_sample::clear_counts() volatile {
   sample_count = 0;
   gc_sample_count = 0;
   jit_sample_count = 0;
@@ -25,74 +59,55 @@ void profiling_sample_count::clear() volatile {
   atomic::fence();
 }
 
-profiling_sample::profiling_sample(factor_vm* vm, bool prolog_p,
-                                   profiling_sample_count const& counts,
-                                   cell thread)
-    : counts(counts), thread(thread) {
-  vm->record_callstack_sample(&callstack_begin, &callstack_end, prolog_p);
-}
-
+// Allocates memory (sample_callstacks2->add)
 void factor_vm::record_sample(bool prolog_p) {
-  profiling_sample_count counts = safepoint.sample_counts.record_counts();
-  if (!counts.empty())
-    samples.push_back(profiling_sample(this, prolog_p, counts,
-                                       special_objects[OBJ_CURRENT_THREAD]));
-}
+  profiling_sample result = current_sample.record_counts();
+  if (result.empty()) {
+    return;
+  }
+  // Appends the callstack, which is just a sequence of quotation or
+  // word references, to sample_callstacks.
+  cell callstacks_cell = special_objects[OBJ_SAMPLE_CALLSTACKS];
+  data_root<array> callstacks = data_root<array>(callstacks_cell, this);
+  cell begin = growarr_capacity(callstacks.untagged());
 
-struct record_callstack_sample_iterator {
-  std::vector<cell>* sample_callstacks;
-  bool skip_p;
-
-  record_callstack_sample_iterator(std::vector<cell>* sample_callstacks,
-                                   bool prolog_p)
-      : sample_callstacks(sample_callstacks), skip_p(prolog_p) {}
-
-  void operator()(void* frame_top, cell frame_size, code_block* owner,
-                  void* addr) {
+  bool skip_p = prolog_p;
+  auto recorder = [&](cell frame_top, cell size, code_block* owner, cell addr) {
+    (void)frame_top;
+    (void)size;
+    (void)addr;
     if (skip_p)
       skip_p = false;
-    else
-      sample_callstacks->push_back(owner->owner);
-  }
-};
-
-void factor_vm::record_callstack_sample(cell* begin, cell* end, bool prolog_p) {
-  *begin = sample_callstacks.size();
-
-  record_callstack_sample_iterator recorder(&sample_callstacks, prolog_p);
+    else {
+      growarr_add(callstacks.untagged(), owner->owner);
+    }
+  };
   iterate_callstack(ctx, recorder);
+  cell end = growarr_capacity(callstacks.untagged());
 
-  *end = sample_callstacks.size();
-
-  std::reverse(sample_callstacks.begin() + *begin, sample_callstacks.end());
+  // Add the sample.
+  result.thread = special_objects[OBJ_CURRENT_THREAD];
+  result.callstack_begin = begin;
+  result.callstack_end = end;
+  samples.push_back(result);
 }
 
 void factor_vm::set_sampling_profiler(fixnum rate) {
-  bool sampling_p = !!rate;
-  if (sampling_p == !!atomic::load(&sampling_profiler_p))
-    return;
-
-  if (sampling_p)
+  bool running_p = (atomic::load(&sampling_profiler_p) != 0);
+  if (rate > 0 && !running_p)
     start_sampling_profiler(rate);
-  else
+  else if (rate == 0 && running_p)
     end_sampling_profiler();
 }
 
-void factor_vm::clear_samples() {
-  // Swapping into temporaries releases the vector's allocated storage,
-  // whereas clear() would leave the allocation as-is
-  std::vector<profiling_sample> sample_graveyard;
-  std::vector<cell> sample_callstack_graveyard;
-  samples.swap(sample_graveyard);
-  sample_callstacks.swap(sample_callstack_graveyard);
-}
-
 void factor_vm::start_sampling_profiler(fixnum rate) {
+  special_objects[OBJ_SAMPLE_CALLSTACKS] = tag<array>(allot_growarr());
   samples_per_second = rate;
-  safepoint.sample_counts.clear();
-  clear_samples();
+  current_sample.clear_counts();
+  // Release the memory consumed by collecting samples.
+  samples.clear();
+  samples.shrink_to_fit();
   samples.reserve(10 * rate);
-  sample_callstacks.reserve(100 * rate);
   atomic::store(&sampling_profiler_p, true);
   start_sampling_profiler_timer();
 }
@@ -107,58 +122,50 @@ void factor_vm::primitive_sampling_profiler() {
   set_sampling_profiler(to_fixnum(ctx->pop()));
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_get_samples() {
   if (atomic::load(&sampling_profiler_p) || samples.empty()) {
     ctx->push(false_object);
-  } else {
-    data_root<array> samples_array(allot_array(samples.size(), false_object),
-                                   this);
-    std::vector<profiling_sample>::const_iterator from_iter = samples.begin();
-    cell to_i = 0;
-
-    for (; from_iter != samples.end(); ++from_iter, ++to_i) {
-      data_root<array> sample(allot_array(7, false_object), this);
-
-      set_array_nth(sample.untagged(), 0,
-                    tag_fixnum(from_iter->counts.sample_count));
-      set_array_nth(sample.untagged(), 1,
-                    tag_fixnum(from_iter->counts.gc_sample_count));
-      set_array_nth(sample.untagged(), 2,
-                    tag_fixnum(from_iter->counts.jit_sample_count));
-      set_array_nth(sample.untagged(), 3,
-                    tag_fixnum(from_iter->counts.foreign_sample_count));
-      set_array_nth(sample.untagged(), 4,
-                    tag_fixnum(from_iter->counts.foreign_thread_sample_count));
-
-      set_array_nth(sample.untagged(), 5, from_iter->thread);
-
-      cell callstack_size =
-          from_iter->callstack_end - from_iter->callstack_begin;
-      data_root<array> callstack(allot_array(callstack_size, false_object),
-                                 this);
-
-      std::vector<cell>::const_iterator callstacks_begin =
-                                            sample_callstacks.begin(),
-                                        c_from_iter =
-                                            callstacks_begin +
-                                            from_iter->callstack_begin,
-                                        c_from_iter_end =
-                                            callstacks_begin +
-                                            from_iter->callstack_end;
-      cell c_to_i = 0;
-
-      for (; c_from_iter != c_from_iter_end; ++c_from_iter, ++c_to_i)
-        set_array_nth(callstack.untagged(), c_to_i, *c_from_iter);
-
-      set_array_nth(sample.untagged(), 6, callstack.value());
-
-      set_array_nth(samples_array.untagged(), to_i, sample.value());
-    }
-    ctx->push(samples_array.value());
+    return;
   }
-}
+  data_root<array> samples_array(allot_array(samples.size(), false_object),
+                                 this);
+  std::vector<profiling_sample>::const_iterator from_iter = samples.begin();
+  cell to_i = 0;
 
-void factor_vm::primitive_clear_samples() { clear_samples(); }
+  cell callstacks_cell = special_objects[OBJ_SAMPLE_CALLSTACKS];
+  data_root<array> callstacks = data_root<array>(callstacks_cell, this);
+
+  for (; from_iter != samples.end(); ++from_iter, ++to_i) {
+    data_root<array> sample(allot_array(7, false_object), this);
+
+    set_array_nth(sample.untagged(), 0,
+                  tag_fixnum(from_iter->sample_count));
+    set_array_nth(sample.untagged(), 1,
+                  tag_fixnum(from_iter->gc_sample_count));
+    set_array_nth(sample.untagged(), 2,
+                  tag_fixnum(from_iter->jit_sample_count));
+    set_array_nth(sample.untagged(), 3,
+                  tag_fixnum(from_iter->foreign_sample_count));
+    set_array_nth(sample.untagged(), 4,
+                  tag_fixnum(from_iter->foreign_thread_sample_count));
+
+    set_array_nth(sample.untagged(), 5, from_iter->thread);
+
+    cell callstack_size =
+        from_iter->callstack_end - from_iter->callstack_begin;
+    data_root<array> callstack(allot_array(callstack_size, false_object),
+                               this);
+
+    for (cell i = 0; i < callstack_size; i++) {
+      cell block_owner = growarr_nth(callstacks.untagged(),
+                                     from_iter->callstack_begin + i);
+      set_array_nth(callstack.untagged(), i, block_owner);
+    }
+    set_array_nth(sample.untagged(), 6, callstack.value());
+    set_array_nth(samples_array.untagged(), to_i, sample.value());
+  }
+  ctx->push(samples_array.value());
+}
 
 }

@@ -1,8 +1,9 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax parser namespaces
-kernel math windows.types generalizations math.bitwise
-classes.struct literals windows.kernel32 system accessors ;
+USING: accessors alien alien.c-types alien.syntax classes.struct
+generalizations kernel literals math math.bitwise namespaces
+parser system windows.com.syntax windows.kernel32 windows.ole32
+windows.types ;
 IN: windows.user32
 
 ! HKL for ActivateKeyboardLayout
@@ -78,7 +79,7 @@ CONSTANT: WS_EX_APPWINDOW         0x00040000
 CONSTANT: WS_EX_OVERLAPPEDWINDOW
     flags{ WS_EX_WINDOWEDGE WS_EX_CLIENTEDGE }
 
-CONSTANT: WS_EX_PALETTEWINDOW 
+CONSTANT: WS_EX_PALETTEWINDOW
     flags{ WS_EX_WINDOWEDGE WS_EX_TOOLWINDOW WS_EX_TOPMOST }
 
 CONSTANT: CS_VREDRAW          0x0001
@@ -115,13 +116,6 @@ CONSTANT: COLOR_BTNTEXT           18
 CONSTANT: COLOR_INACTIVECAPTIONTEXT 19
 CONSTANT: COLOR_BTNHIGHLIGHT      20
 
-CONSTANT: IDI_APPLICATION     32512
-CONSTANT: IDI_HAND            32513
-CONSTANT: IDI_QUESTION        32514
-CONSTANT: IDI_EXCLAMATION     32515
-CONSTANT: IDI_ASTERISK        32516
-CONSTANT: IDI_WINLOGO         32517
-
 ! ShowWindow() Commands
 CONSTANT: SW_HIDE             0
 CONSTANT: SW_SHOWNORMAL       1
@@ -149,7 +143,7 @@ CONSTANT: PM_NOYIELD    2
 ! : PM_QS_SENDMESSAGE   (QS_SENDMESSAGE << 16) ;
 
 
-! 
+!
 ! Standard Cursor IDs
 !
 CONSTANT: IDC_ARROW           32512
@@ -754,6 +748,45 @@ ALIAS: SPIF_SENDCHANGE                 SPIF_SENDWININICHANGE
 TYPEDEF: HANDLE HRAWINPUT
 : GET_RAWINPUT_CODE_WPARAM ( wParam -- n ) 0xff bitand ; inline
 
+CONSTANT: LLMHF_INJECTED 1
+CONSTANT: LLMHF_LOWER_IL_INJECTED 2
+
+
+CONSTANT: WH_JOURNALRECORD 0    ! global
+CONSTANT: WH_JOURNALPLAYBACK 1  ! global
+CONSTANT: WH_KEYBOARD 2         ! thread/global
+CONSTANT: WH_GETMESSAGE 3       ! thread/global
+CONSTANT: WH_CALLWNDPROC 4      ! thread/global
+CONSTANT: WH_CBT 5              ! thread/global
+CONSTANT: WH_SYSMSGFILTER 6     ! global
+CONSTANT: WH_MOUSE 7            ! thread/global
+CONSTANT: WH_DEBUG 9            ! thread/global
+CONSTANT: WH_SHELL 10           ! thread/global
+CONSTANT: WH_FOREGROUNDIDLE 11  ! thread/global
+CONSTANT: WH_CALLWNDPROCRET 12  ! thread/global
+CONSTANT: WH_KEYBOARD_LL 13     ! global
+CONSTANT: WH_MOUSE_LL 14        ! global
+CONSTANT: WH_MSGFILTER -1       ! thread/global
+
+
+STRUCT: KBDLLHOOKSTRUCT
+    { vkCode DWORD }
+    { scanCode DWORD }
+    { flags DWORD }
+    { time DWORD }
+    { dwExtraInfo ULONG_PTR } ;
+TYPEDEF: KBDLLHOOKSTRUCT* PKBDLLHOOKSTRUCT
+TYPEDEF: KBDLLHOOKSTRUCT* LPKBDLLHOOKSTRUCT
+
+STRUCT: MSLLHOOKSTRUCT
+  { pt POINT }
+  { mouseData DWORD }
+  { flags DWORD }
+  { time DWORD }
+  { dwExtraInfo ULONG_PTR } ;
+TYPEDEF: MSLLHOOKSTRUCT* PMSLLHOOKSTRUCT
+TYPEDEF: MSLLHOOKSTRUCT* LPMSLLHOOKSTRUCT
+
 CONSTANT: RIM_INPUT        0
 CONSTANT: RIM_INPUTSINK    1
 
@@ -1007,17 +1040,274 @@ STRUCT: DEVMODE
 TYPEDEF: DEVMODE* PDEVMODE
 TYPEDEF: DEVMODE* LPDEVMODE
 
+CONSTANT: MSGFLT_ADD    1
+CONSTANT: MSGFLT_REMOVE 2
+
+CONSTANT: MSGFLT_RESET    0
+CONSTANT: MSGFLT_ALLOW    1
+CONSTANT: MSGFLT_DISALLOW 2
+
+STRUCT: CHANGEFILTERSTRUCT
+    { cbSize DWORD }
+    { ExtStatus DWORD } ;
+TYPEDEF: CHANGEFILTERSTRUCT* PCHANGEFILTERSTRUCT
+
+CONSTANT: INPUT_MOUSE 0
+CONSTANT: INPUT_KEYBOARD 1
+CONSTANT: INPUT_HARDWARE 2
+
+CONSTANT: XBUTTON1 1
+CONSTANT: XBUTTON2 2
+
+CONSTANT: MOUSEEVENTF_ABSOLUTE 0x8000
+CONSTANT: MOUSEEVENTF_HWHEEL 0x01000
+CONSTANT: MOUSEEVENTF_MOVE 0x0001
+CONSTANT: MOUSEEVENTF_MOVE_NOCOALESCE 0x2000
+CONSTANT: MOUSEEVENTF_LEFTDOWN 0x0002
+CONSTANT: MOUSEEVENTF_LEFTUP 0x0004
+CONSTANT: MOUSEEVENTF_RIGHTDOWN 0x0008
+CONSTANT: MOUSEEVENTF_RIGHTUP 0x0010
+CONSTANT: MOUSEEVENTF_MIDDLEDOWN 0x0020
+CONSTANT: MOUSEEVENTF_MIDDLEUP 0x0040
+CONSTANT: MOUSEEVENTF_VIRTUALDESK 0x4000
+CONSTANT: MOUSEEVENTF_WHEEL 0x0800
+CONSTANT: MOUSEEVENTF_XDOWN 0x0080
+CONSTANT: MOUSEEVENTF_XUP 0x0100
+
+STRUCT: MOUSEINPUT
+    { dx LONG }
+    { dy LONG }
+    { mouseData DWORD }
+    { dwFlags DWORD }
+    { time DWORD }
+    { dwExtraInfo ULONG_PTR } ;
+TYPEDEF: MOUSEINPUT* PMOUSEINPUT
+
+CONSTANT: KEYEVENTF_EXTENDEDKEY 1
+CONSTANT: KEYEVENTF_KEYUP 2
+CONSTANT: KEYEVENTF_UNICODE 4
+CONSTANT: KEYEVENTF_SCANCODE 8
+
+
+STRUCT: KEYBDINPUT
+    { wVk WORD }
+    { wScan WORD }
+    { dwFlags DWORD }
+    { time DWORD }
+    { dwExtraInfo ULONG_PTR } ;
+TYPEDEF: KEYBDINPUT* PKEYBDINPUT
+
+STRUCT: HARDWAREINPUT
+    { uMsg DWORD }
+    { wParamL WORD }
+    { wParamH WORD } ;
+TYPEDEF: HARDWAREINPUT* PHARDWAREINPUT
+
+
+UNION-STRUCT: ANYINPUT
+    { mi MOUSEINPUT }
+    { ki KEYBDINPUT }
+    { hi HARDWAREINPUT } ;
+
+STRUCT: INPUT
+    { type DWORD }
+    { input ANYINPUT } ;
+TYPEDEF: INPUT* PINPUT
+TYPEDEF: INPUT* LPINPUT
+
+
+CONSTANT: LR_DEFAULTCOLOR 0x00
+CONSTANT: LR_MONOCHROME 0x01
+CONSTANT: LR_COLOR 0x02
+CONSTANT: LR_COPYRETURNORG 0x04
+CONSTANT: LR_COPYDELETEORG 0x08
+CONSTANT: LR_LOADFROMFILE 0x10
+CONSTANT: LR_LOADTRANSPARENT 0x20
+CONSTANT: LR_DEFAULTSIZE 0x40
+CONSTANT: LR_VGACOLOR 0x80
+CONSTANT: LR_LOADMAP3DCOLORS 0x1000
+CONSTANT: LR_CREATEDIBSECTION 0x2000
+CONSTANT: LR_COPYFROMRESOURCE 0x4000
+CONSTANT: LR_SHARED 0x8000
+
+CONSTANT: IMAGE_BITMAP 0
+CONSTANT: IMAGE_ICON 1
+CONSTANT: IMAGE_CURSOR 2
+
+CONSTANT: IDI_APPLICATION 32512
+CONSTANT: IDI_ASTERISK 21516
+CONSTANT: IDI_ERROR 32513
+CONSTANT: IDI_EXCLAMATION 32515
+CONSTANT: IDI_HAND 32513
+CONSTANT: IDI_INFORMATION 32516
+CONSTANT: IDI_QUESTION 32514
+CONSTANT: IDI_SHIELD 32518
+CONSTANT: IDI_WARNING 32515
+CONSTANT: IDI_WINLOGO 32517
+
+CONSTANT: OBM_BTNCORNERS 32758
+CONSTANT: OBM_BTSIZE 32761
+CONSTANT: OBM_CHECK 32760
+CONSTANT: OBM_CHECKBOXES 32759
+CONSTANT: OBM_CLOSE 32754
+CONSTANT: OBM_COMBO 32738
+CONSTANT: OBM_DNARROW 32752
+CONSTANT: OBM_DNARROWD 32742
+CONSTANT: OBM_DNARROWI 32736
+CONSTANT: OBM_LFARROW 32750
+CONSTANT: OBM_LFARROWI 32734
+CONSTANT: OBM_LFARROWD 32740
+CONSTANT: OBM_MNARROW 32739
+CONSTANT: OBM_OLD_CLOSE 32767
+CONSTANT: OBM_OLD_DNARROW 32764
+CONSTANT: OBM_OLD_LFARROW 32762
+CONSTANT: OBM_OLD_REDUCE 32757
+CONSTANT: OBM_OLD_RESTORE 32755
+CONSTANT: OBM_OLD_RGARROW 32763
+CONSTANT: OBM_OLD_UPARROW 32765
+CONSTANT: OBM_OLD_ZOOM 32756
+CONSTANT: OBM_REDUCE 32749
+CONSTANT: OBM_REDUCED 32746
+CONSTANT: OBM_RESTORE 32747
+CONSTANT: OBM_RESTORED 32744
+CONSTANT: OBM_RGARROW 32751
+CONSTANT: OBM_RGARROWD 32741
+CONSTANT: OBM_RGARROWI 32735
+CONSTANT: OBM_SIZE 32766
+CONSTANT: OBM_UPARROW 32753
+CONSTANT: OBM_UPARROWD 32743
+CONSTANT: OBM_UPARROWI 32737
+CONSTANT: OBM_ZOOM 32748
+CONSTANT: OBM_ZOOMD 32745
+CONSTANT: OCR_NORMAL 32512
+CONSTANT: OCR_IBEAM 32513
+CONSTANT: OCR_WAIT 32514
+CONSTANT: OCR_CROSS 32515
+CONSTANT: OCR_UP 32516
+CONSTANT: OCR_SIZE 32640
+CONSTANT: OCR_ICON 32641
+CONSTANT: OCR_SIZENWSE 32642
+CONSTANT: OCR_SIZENESW 32643
+CONSTANT: OCR_SIZEWE 32644
+CONSTANT: OCR_SIZENS 32645
+CONSTANT: OCR_SIZEALL 32646
+CONSTANT: OCR_NO 32648
+CONSTANT: OCR_APPSTARTING 32650
+CONSTANT: OIC_SAMPLE 32512
+CONSTANT: OIC_HAND 32513
+CONSTANT: OIC_QUES 32514
+CONSTANT: OIC_BANG 32515
+CONSTANT: OIC_NOTE 32516
+CONSTANT: OIC_WINLOGO 32517
+CONSTANT: OIC_WARNING 32515
+CONSTANT: OIC_ERROR 32513
+CONSTANT: OIC_INFORMATION 32516
+
+CONSTANT: SM_CXSCREEN 0
+CONSTANT: SM_CYSCREEN 1
+CONSTANT: SM_CXVSCROLL 2
+CONSTANT: SM_CYHSCROLL 3
+CONSTANT: SM_CYCAPTION 4
+CONSTANT: SM_CXBORDER 5
+CONSTANT: SM_CYBORDER 6
+CONSTANT: SM_CXDLGFRAME 7
+CONSTANT: SM_CXFIXEDFRAME 7
+CONSTANT: SM_CYDLGFRAME 8
+CONSTANT: SM_CYFIXEDFRAME 8
+CONSTANT: SM_CYVTHUMB 9
+CONSTANT: SM_CXHTHUMB 10
+CONSTANT: SM_CXICON 11
+CONSTANT: SM_CYICON 12
+CONSTANT: SM_CXCURSOR 13
+CONSTANT: SM_CYCURSOR 14
+CONSTANT: SM_CYMENU 15
+CONSTANT: SM_CXFULLSCREEN 16
+CONSTANT: SM_CYFULLSCREEN 17
+CONSTANT: SM_CYKANJIWINDOW 18
+CONSTANT: SM_MOUSEPRESENT 19
+CONSTANT: SM_CYVSCROLL 20
+CONSTANT: SM_CXHSCROLL 21
+CONSTANT: SM_DEBUG 22
+CONSTANT: SM_SWAPBUTTON 23
+CONSTANT: SM_RESERVED1 24
+CONSTANT: SM_RESERVED2 25
+CONSTANT: SM_RESERVED3 26
+CONSTANT: SM_RESERVED4 27
+CONSTANT: SM_CXMIN 28
+CONSTANT: SM_CYMIN 29
+CONSTANT: SM_CXSIZE 30
+CONSTANT: SM_CYSIZE 31
+CONSTANT: SM_CXSIZEFRAME 32
+CONSTANT: SM_CXFRAME 32
+CONSTANT: SM_CYSIZEFRAME 33
+CONSTANT: SM_CYFRAME 33
+CONSTANT: SM_CXMINTRACK 34
+CONSTANT: SM_CYMINTRACK 35
+CONSTANT: SM_CXDOUBLECLK 36
+CONSTANT: SM_CYDOUBLECLK 37
+CONSTANT: SM_CXICONSPACING 38
+CONSTANT: SM_CYICONSPACING 39
+CONSTANT: SM_MENUDROPALIGNMENT 40
+CONSTANT: SM_PENWINDOWS 41
+CONSTANT: SM_DBCSENABLED 42
+CONSTANT: SM_CMOUSEBUTTONS 43
+CONSTANT: SM_SECURE 44
+CONSTANT: SM_CXEDGE 45
+CONSTANT: SM_CYEDGE 46
+CONSTANT: SM_CXMINSPACING 47
+CONSTANT: SM_CYMINSPACING 48
+CONSTANT: SM_CXSMICON 49
+CONSTANT: SM_CYSMICON 50
+CONSTANT: SM_CYSMCAPTION 51
+CONSTANT: SM_CXSMSIZE 52
+CONSTANT: SM_CYSMSIZE 53
+CONSTANT: SM_CXMENUSIZE 54
+CONSTANT: SM_CYMENUSIZE 55
+CONSTANT: SM_ARRANGE 56
+CONSTANT: SM_CXMINIMIZED 57
+CONSTANT: SM_CYMINIMIZED 58
+CONSTANT: SM_CXMAXTRACK 59
+CONSTANT: SM_CYMAXTRACK 60
+CONSTANT: SM_CXMAXIMIZED 61
+CONSTANT: SM_CYMAXIMIZED 62
+CONSTANT: SM_NETWORK 63
+! CONSTANT: LR_DEFAULTSIZE 64
+CONSTANT: SM_CLEANBOOT 67
+CONSTANT: SM_CXDRAG 68
+CONSTANT: SM_CYDRAG 69
+CONSTANT: SM_SHOWSOUNDS 70
+CONSTANT: SM_CXMENUCHECK 71
+CONSTANT: SM_CYMENUCHECK 72
+CONSTANT: SM_SLOWMACHINE 73
+CONSTANT: SM_MIDEASTENABLED 74
+CONSTANT: SM_MOUSEWHEELPRESENT 75
+CONSTANT: SM_XVIRTUALSCREEN 76
+CONSTANT: SM_YVIRTUALSCREEN 77
+CONSTANT: SM_CXVIRTUALSCREEN 78
+CONSTANT: SM_CYVIRTUALSCREEN 79
+CONSTANT: SM_CMONITORS 80
+CONSTANT: SM_SAMEDISPLAYFORMAT 81
+CONSTANT: SM_IMMENABLED 82
+CONSTANT: SM_CXFOCUSBORDER 83
+CONSTANT: SM_CYFOCUSBORDER 84
+CONSTANT: SM_TABLETPC 86
+CONSTANT: SM_MEDIACENTER 87
+CONSTANT: SM_CMETRICS 88
+CONSTANT: SM_REMOTESESSION 0X1000
+
+CONSTANT: DF_ALLOWOTHERACCOUNTHOOK 1
+
 LIBRARY: user32
 
-FUNCTION: HKL ActivateKeyboardLayout ( HKL hkl, UINT Flags ) ;
-FUNCTION: BOOL AdjustWindowRect ( LPRECT lpRect, DWORD dwStyle, BOOL bMenu ) ;
-FUNCTION: BOOL AdjustWindowRectEx ( LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle ) ;
+FUNCTION: HKL ActivateKeyboardLayout ( HKL hkl, UINT Flags )
+FUNCTION: BOOL AdjustWindowRect ( LPRECT lpRect, DWORD dwStyle, BOOL bMenu )
+FUNCTION: BOOL AdjustWindowRectEx ( LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle )
 ! FUNCTION: AlignRects
 ! FUNCTION: AllowForegroundActivation
 ! FUNCTION: AllowSetForegroundWindow
 ! FUNCTION: AnimateWindow
 
-FUNCTION: BOOL AnyPopup ( ) ;
+FUNCTION: BOOL AnyPopup ( )
 
 ! FUNCTION: AppendMenuA
 ! FUNCTION: AppendMenuW
@@ -1025,7 +1315,7 @@ FUNCTION: BOOL AnyPopup ( ) ;
 ! FUNCTION: AttachThreadInput
 ! FUNCTION: BeginDeferWindowPos
 
-FUNCTION: HDC BeginPaint ( HWND hwnd, LPPAINTSTRUCT lpPaint ) ;
+FUNCTION: HDC BeginPaint ( HWND hwnd, LPPAINTSTRUCT lpPaint )
 
 ! FUNCTION: BlockInput
 ! FUNCTION: BringWindowToTop
@@ -1039,18 +1329,28 @@ FUNCTION: HDC BeginPaint ( HWND hwnd, LPPAINTSTRUCT lpPaint ) ;
 ! FUNCTION: CallMsgFilter
 ! FUNCTION: CallMsgFilterA
 ! FUNCTION: CallMsgFilterW
-! FUNCTION: CallNextHookEx
+FUNCTION: LRESULT CallNextHookEx ( HHOOK hhk, int nCode, WPARAM wParam, LPARAM lParam )
 ! FUNCTION: CallWindowProcA
 ! FUNCTION: CallWindowProcW
 ! FUNCTION: CascadeChildWindows
 ! FUNCTION: CascadeWindows
 ! FUNCTION: ChangeClipboardChain
-FUNCTION: LONG ChangeDisplaySettingsExW ( LPCTSTR lpszDeviceName, DEVMODE *lpDevMode, HWND hwnd, DWORD dwFlags, LPVOID lParam ) ;
-FUNCTION: LONG ChangeDisplaySettingsW ( DEVMODE *lpDevMode, DWORD dwFlags ) ;
+FUNCTION: LONG ChangeDisplaySettingsExW ( LPCTSTR lpszDeviceName, DEVMODE *lpDevMode, HWND hwnd, DWORD dwFlags, LPVOID lParam )
+FUNCTION: LONG ChangeDisplaySettingsW ( DEVMODE *lpDevMode, DWORD dwFlags )
 ALIAS: ChangeDisplaySettingsEx ChangeDisplaySettingsExW
 ALIAS: ChangeDisplaySettings ChangeDisplaySettingsW
 ! FUNCTION: ChangeMenuA
 ! FUNCTION: ChangeMenuW
+
+FUNCTION: BOOL ChangeWindowMessageFilter (
+                UINT message,
+                DWORD dwFlag )
+FUNCTION: BOOL ChangeWindowMessageFilterEx (
+                HWND hWnd,
+                UINT message,
+                DWORD action,
+                PCHANGEFILTERSTRUCT pChangeFilterStruct )
+
 ! FUNCTION: CharLowerA
 ! FUNCTION: CharLowerBuffA
 ! FUNCTION: CharLowerBuffW
@@ -1073,30 +1373,31 @@ ALIAS: ChangeDisplaySettings ChangeDisplaySettingsW
 ! FUNCTION: CheckMenuItem
 ! FUNCTION: CheckMenuRadioItem
 ! FUNCTION: CheckRadioButton
-FUNCTION: HWND ChildWindowFromPoint ( HWND hWndParent, POINT point ) ;
+FUNCTION: HWND ChildWindowFromPoint ( HWND hWndParent, POINT point )
 ! FUNCTION: ChildWindowFromPointEx
 ! FUNCTION: ClientThreadSetup
-FUNCTION: BOOL ClientToScreen ( HWND hWnd, POINT* point ) ;
+FUNCTION: BOOL ClientToScreen ( HWND hWnd, POINT* point )
 ! FUNCTION: CliImmSetHotKey
-FUNCTION: int ClipCursor ( RECT* clipRect ) ;
-FUNCTION: BOOL CloseClipboard ( ) ;
+FUNCTION: int ClipCursor ( RECT* clipRect )
+FUNCTION: BOOL CloseClipboard ( )
 ! FUNCTION: CloseDesktop
 ! FUNCTION: CloseWindow
 ! FUNCTION: CloseWindowStation
 ! FUNCTION: CopyAcceleratorTableA
-FUNCTION: int CopyAcceleratorTableW ( HACCEL hAccelSrc, LPACCEL lpAccelDst, int cAccelEntries ) ;
+FUNCTION: int CopyAcceleratorTableW ( HACCEL hAccelSrc, LPACCEL lpAccelDst, int cAccelEntries )
 ALIAS: CopyAcceleratorTable CopyAcceleratorTableW
 ! FUNCTION: CopyIcon
 ! FUNCTION: CopyImage
 ! FUNCTION: CopyRect
 ! FUNCTION: CountClipboardFormats
 ! FUNCTION: CreateAcceleratorTableA
-FUNCTION: HACCEL CreateAcceleratorTableW ( LPACCEL lpaccl, int cEntries ) ;
+FUNCTION: HACCEL CreateAcceleratorTableW ( LPACCEL lpaccl, int cEntries )
 ALIAS: CreateAcceleratorTable CreateAcceleratorTableW
 ! FUNCTION: CreateCaret
 ! FUNCTION: CreateCursor
 ! FUNCTION: CreateDesktopA
-! FUNCTION: CreateDesktopW
+FUNCTION: HDESK CreateDesktopW ( LPCTSTR lpszDesktop, LPCTSTR lpszDevice, DEVMODE* pDevmode, DWORD dwFlags, ACCESS_MASK dwDesiredAccess, LPSECURITY_ATTRIBUTES lpsa )
+ALIAS: CreateDesktop CreateDesktopW
 ! FUNCTION: CreateDialogIndirectParamA
 ! FUNCTION: CreateDialogIndirectParamAorW
 ! FUNCTION: CreateDialogIndirectParamW
@@ -1124,7 +1425,7 @@ FUNCTION: HWND CreateWindowExW (
                 HWND hWndParent,
                 HMENU hMenu,
                 HINSTANCE hInstance,
-                LPVOID lpParam ) ;
+                LPVOID lpParam )
 
 ALIAS: CreateWindowEx CreateWindowExW
 
@@ -1174,18 +1475,18 @@ ALIAS: CreateWindowEx CreateWindowExW
 ! FUNCTION: DefFrameProcW
 ! FUNCTION: DefMDIChildProcA
 ! FUNCTION: DefMDIChildProcW
-FUNCTION: LRESULT DefRawInputProc ( PRAWINPUT* paRawInput, INT nInput, UINT cbSizeHeader ) ;
-FUNCTION: LRESULT DefWindowProcW ( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam ) ;
+FUNCTION: LRESULT DefRawInputProc ( PRAWINPUT* paRawInput, INT nInput, UINT cbSizeHeader )
+FUNCTION: LRESULT DefWindowProcW ( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 ALIAS: DefWindowProc DefWindowProcW
 ! FUNCTION: DeleteMenu
 ! FUNCTION: DeregisterShellHookWindow
-FUNCTION: BOOL DestroyAcceleratorTable ( HACCEL hAccel ) ;
+FUNCTION: BOOL DestroyAcceleratorTable ( HACCEL hAccel )
 ! FUNCTION: DestroyCaret
 ! FUNCTION: DestroyCursor
 ! FUNCTION: DestroyIcon
 ! FUNCTION: DestroyMenu
 ! FUNCTION: DestroyReasons
-FUNCTION: BOOL DestroyWindow ( HWND hWnd ) ;
+FUNCTION: BOOL DestroyWindow ( HWND hWnd )
 ! FUNCTION: DeviceEventWorker
 ! FUNCTION: DialogBoxIndirectParamA
 ! FUNCTION: DialogBoxIndirectParamAorW
@@ -1194,7 +1495,7 @@ FUNCTION: BOOL DestroyWindow ( HWND hWnd ) ;
 ! FUNCTION: DialogBoxParamW
 ! FUNCTION: DisableProcessWindowsGhosting
 
-FUNCTION: LONG DispatchMessageW ( MSG* lpMsg ) ;
+FUNCTION: LONG DispatchMessageW ( MSG* lpMsg )
 ALIAS: DispatchMessage DispatchMessageW
 
 ! FUNCTION: DisplayExitWindowsWarnings
@@ -1210,15 +1511,15 @@ ALIAS: DispatchMessage DispatchMessageW
 ! FUNCTION: DragObject
 
 
-FUNCTION: BOOL DrawAnimatedRects ( HWND hWnd, int idAni, RECT* lprcFrom, RECT* lprcTo ) ;
-! FUNCTION: BOOL DrawCaption ( HWND hWnd, HDC hdc, LPRECT lprc, UINT uFlags ) ;
+FUNCTION: BOOL DrawAnimatedRects ( HWND hWnd, int idAni, RECT* lprcFrom, RECT* lprcTo )
+! FUNCTION: BOOL DrawCaption ( HWND hWnd, HDC hdc, LPRECT lprc, UINT uFlags )
 
 ! FUNCTION: DrawEdge
 ! FUNCTION: DrawFocusRect
 ! FUNCTION: DrawFrame
 ! FUNCTION: DrawFrameControl
 
-FUNCTION: BOOL DrawIcon ( HDC hDC, int X, int Y, HICON hIcon ) ;
+FUNCTION: BOOL DrawIcon ( HDC hDC, int X, int Y, HICON hIcon )
 
 ! FUNCTION: DrawIconEx
 ! FUNCTION: DrawMenuBar
@@ -1230,46 +1531,49 @@ FUNCTION: BOOL DrawIcon ( HDC hDC, int X, int Y, HICON hIcon ) ;
 ! FUNCTION: DrawTextExW
 ! FUNCTION: DrawTextW
 ! FUNCTION: EditWndProc
-FUNCTION: BOOL EmptyClipboard ( ) ;
-FUNCTION: BOOL EnableMenuItem ( HMENU hMenu, UINT uIDEnableItem, UINT uEnable ) ;
+FUNCTION: BOOL EmptyClipboard ( )
+FUNCTION: BOOL EnableMenuItem ( HMENU hMenu, UINT uIDEnableItem, UINT uEnable )
 ! FUNCTION: EnableScrollBar
 ! FUNCTION: EnableWindow
 ! FUNCTION: EndDeferWindowPos
 ! FUNCTION: EndDialog
 ! FUNCTION: EndMenu
 
-FUNCTION: BOOL EndPaint ( HWND hWnd, PAINTSTRUCT* lpPaint) ;
+FUNCTION: BOOL EndPaint ( HWND hWnd, PAINTSTRUCT* lpPaint )
 
 ! FUNCTION: EndTask
 ! FUNCTION: EnterReaderModeHelper
 ! FUNCTION: EnumChildWindows
-FUNCTION: UINT EnumClipboardFormats ( UINT format ) ;
+FUNCTION: UINT EnumClipboardFormats ( UINT format )
 ! FUNCTION: EnumDesktopsA
 ! FUNCTION: EnumDesktopsW
-! FUNCTION: EnumDesktopWindows
+FUNCTION: BOOL EnumDesktopWindows ( HDESK hDesktop, WNDENUMPROC lpFn, LPARAM lParam )
 ! FUNCTION: EnumDisplayDevicesA
 ! FUNCTION: EnumDisplayDevicesW
-! FUNCTION: BOOL EnumDisplayMonitors ( HDC hdc, LPCRECT lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData ) ;
+! FUNCTION: BOOL EnumDisplayMonitors ( HDC hdc, LPCRECT lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData )
 ! FUNCTION: EnumDisplaySettingsA
 ! FUNCTION: EnumDisplaySettingsExA
 ! FUNCTION: EnumDisplaySettingsExW
-FUNCTION: BOOL EnumDisplaySettingsW ( LPCTSTR lpszDeviceName, DWORD iModeNum, DEVMODE *lpDevMode ) ;
+FUNCTION: BOOL EnumDisplaySettingsW ( LPCTSTR lpszDeviceName, DWORD iModeNum, DEVMODE *lpDevMode )
 ALIAS: EnumDisplaySettings EnumDisplaySettingsW
 ! FUNCTION: EnumPropsA
 ! FUNCTION: EnumPropsExA
 ! FUNCTION: EnumPropsExW
 ! FUNCTION: EnumPropsW
 ! FUNCTION: EnumThreadWindows
-! FUNCTION: EnumWindows
+FUNCTION: BOOL EnumWindows ( WNDENUMPROC lpEnumFunc, LPARAM lParam )
 ! FUNCTION: EnumWindowStationsA
 ! FUNCTION: EnumWindowStationsW
 ! FUNCTION: EqualRect
 ! FUNCTION: ExcludeUpdateRgn
 ! FUNCTION: ExitWindowsEx
-FUNCTION: int FillRect ( HDC hDC, RECT* lprc, HBRUSH hbr ) ;
-FUNCTION: HWND FindWindowA ( c-string lpClassName, c-string lpWindowName ) ;
-FUNCTION: HWND FindWindowExA ( HWND hwndParent, HWND childAfter, c-string lpClassName, c-string lpWindowName ) ;
-! FUNCTION: FindWindowExW
+FUNCTION: int FillRect ( HDC hDC, RECT* lprc, HBRUSH hbr )
+FUNCTION: HWND FindWindowA ( c-string lpClassName, c-string lpWindowName )
+FUNCTION: HWND FindWindowW ( c-string lpClassName, c-string lpWindowName )
+ALIAS: FindWindow FindWindowW
+FUNCTION: HWND FindWindowExA ( HWND hwndParent, HWND childAfter, c-string lpClassName, c-string lpWindowName )
+FUNCTION: HWND FindWindowExW ( HWND hwndParent, HWND hwndChildAfter, c-string lpszClass, c-string lpszWindow )
+ALIAS: FindWindowEx FindWindowExW
 ! FUNCTION: FindWindowW
 ! FUNCTION: FlashWindow
 ! FUNCTION: FlashWindowEx
@@ -1283,16 +1587,16 @@ FUNCTION: HWND FindWindowExA ( HWND hwndParent, HWND childAfter, c-string lpClas
 ! FUNCTION: GetAppCompatFlags
 ! FUNCTION: GetAppCompatFlags2
 ! FUNCTION: GetAsyncKeyState
-FUNCTION: HWND GetCapture ( ) ;
+FUNCTION: HWND GetCapture ( )
 ! FUNCTION: GetCaretBlinkTime
 ! FUNCTION: GetCaretPos
-FUNCTION: BOOL GetClassInfoW ( HINSTANCE hInst, LPCWSTR lpszClass, LPWNDCLASS lpwcx ) ;
+FUNCTION: BOOL GetClassInfoW ( HINSTANCE hInst, LPCWSTR lpszClass, LPWNDCLASS lpwcx )
 ALIAS: GetClassInfo GetClassInfoW
 
-FUNCTION: BOOL GetClassInfoExW ( HINSTANCE hInst, LPCWSTR lpszClass, LPWNDCLASSEX lpwcx ) ;
+FUNCTION: BOOL GetClassInfoExW ( HINSTANCE hInst, LPCWSTR lpszClass, LPWNDCLASSEX lpwcx )
 ALIAS: GetClassInfoEx GetClassInfoExW
 
-FUNCTION: ULONG_PTR GetClassLongW ( HWND hWnd, int nIndex ) ;
+FUNCTION: ULONG_PTR GetClassLongW ( HWND hWnd, int nIndex )
 ALIAS: GetClassLong GetClassLongW
 ALIAS: GetClassLongPtr GetClassLongW
 
@@ -1300,33 +1604,34 @@ ALIAS: GetClassLongPtr GetClassLongW
 ! FUNCTION: GetClassNameA
 ! FUNCTION: GetClassNameW
 ! FUNCTION: GetClassWord
-FUNCTION: BOOL GetClientRect ( HWND hWnd, LPRECT lpRect ) ;
+FUNCTION: BOOL GetClientRect ( HWND hWnd, LPRECT lpRect )
 
-FUNCTION: HANDLE GetClipboardData ( UINT uFormat ) ;
+FUNCTION: HANDLE GetClipboardData ( UINT uFormat )
 
 ! FUNCTION: GetClipboardFormatNameA
 ! FUNCTION: GetClipboardFormatNameW
-FUNCTION: HWND GetClipboardOwner ( ) ;
-FUNCTION: DWORD GetClipboardSequenceNumber ( ) ;
+FUNCTION: HWND GetClipboardOwner ( )
+FUNCTION: DWORD GetClipboardSequenceNumber ( )
 ! FUNCTION: GetClipboardViewer
 ! FUNCTION: GetClipCursor
 ! FUNCTION: GetComboBoxInfo
 ! FUNCTION: GetCursor
 ! FUNCTION: GetCursorFrameInfo
 ! FUNCTION: GetCursorInfo
-! FUNCTION: GetCursorPos
-FUNCTION: HDC GetDC ( HWND hWnd ) ;
-FUNCTION: HDC GetDCEx ( HWND hWnd, HRGN hrgnClip, DWORD flags ) ;
-FUNCTION: HWND GetDesktopWindow ( ) ;
+FUNCTION: BOOL GetCursorPos ( LPPOINT lpPoint )
+FUNCTION: HDC GetDC ( HWND hWnd )
+FUNCTION: HDC GetDCEx ( HWND hWnd, HRGN hrgnClip, DWORD flags )
+FUNCTION: HWND GetDesktopWindow ( )
 ! FUNCTION: GetDialogBaseUnits
 ! FUNCTION: GetDlgCtrlID
-! FUNCTION: GetDlgItem
+FUNCTION: HWND GetDlgItem ( HWND hDlg, int nIDDlgItem )
 ! FUNCTION: GetDlgItemInt
 ! FUNCTION: GetDlgItemTextA
-! FUNCTION: GetDlgItemTextW
-FUNCTION: uint GetDoubleClickTime ( ) ;
-FUNCTION: HWND GetFocus ( ) ;
-FUNCTION: HWND GetForegroundWindow ( ) ;
+FUNCTION: UINT GetDlgItemTextW ( HWND hDlg, int nIDDlgItem, LPTSTR lpString, int nMaxCount )
+ALIAS: GetDlgItemText GetDlgItemTextW
+FUNCTION: uint GetDoubleClickTime ( )
+FUNCTION: HWND GetFocus ( )
+FUNCTION: HWND GetForegroundWindow ( )
 ! FUNCTION: GetGuiResources
 ! FUNCTION: GetGUIThreadInfo
 ! FUNCTION: GetIconInfo
@@ -1334,7 +1639,7 @@ FUNCTION: HWND GetForegroundWindow ( ) ;
 ! FUNCTION: GetInputState
 ! FUNCTION: GetInternalWindowPos
 ! FUNCTION: GetKBCodePage
-! FUNCTION: GetKeyboardLayout
+FUNCTION: HKL GetKeyboardLayout ( DWORD idThread )
 ! FUNCTION: GetKeyboardLayoutList
 ! FUNCTION: GetKeyboardLayoutNameA
 ! FUNCTION: GetKeyboardLayoutNameW
@@ -1342,7 +1647,7 @@ FUNCTION: HWND GetForegroundWindow ( ) ;
 ! FUNCTION: GetKeyboardType
 ! FUNCTION: GetKeyNameTextA
 ! FUNCTION: GetKeyNameTextW
-FUNCTION: SHORT GetKeyState ( int nVirtKey ) ;
+FUNCTION: SHORT GetKeyState ( int nVirtKey )
 ! FUNCTION: GetLastActivePopup
 ! FUNCTION: GetLastInputInfo
 ! FUNCTION: GetLayeredWindowAttributes
@@ -1362,36 +1667,36 @@ FUNCTION: SHORT GetKeyState ( int nVirtKey ) ;
 ! FUNCTION: GetMenuStringA
 ! FUNCTION: GetMenuStringW
 
-FUNCTION: BOOL GetMessageW ( LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax ) ;
+FUNCTION: BOOL GetMessageW ( LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax )
 ALIAS: GetMessage GetMessageW
 
-! FUNCTION: GetMessageExtraInfo
+FUNCTION: LPARAM GetMessageExtraInfo ( )
 ! FUNCTION: GetMessagePos
 ! FUNCTION: GetMessageTime
 ! FUNCTION: GetMonitorInfoA
 
-FUNCTION: BOOL GetMonitorInfoW ( HMONITOR hMonitor, LPMONITORINFO lpmi ) ;
+FUNCTION: BOOL GetMonitorInfoW ( HMONITOR hMonitor, LPMONITORINFO lpmi )
 ALIAS: GetMonitorInfo GetMonitorInfoW
 
 ! FUNCTION: GetMouseMovePointsEx
 ! FUNCTION: GetNextDlgGroupItem
 ! FUNCTION: GetNextDlgTabItem
 ! FUNCTION: GetOpenClipboardWindow
-FUNCTION: HWND GetParent ( HWND hWnd ) ;
-FUNCTION: int GetPriorityClipboardFormat ( UINT* paFormatPriorityList, int cFormats ) ;
+FUNCTION: HWND GetParent ( HWND hWnd )
+FUNCTION: int GetPriorityClipboardFormat ( UINT* paFormatPriorityList, int cFormats )
 ! FUNCTION: GetProcessDefaultLayout
 ! FUNCTION: GetProcessWindowStation
 ! FUNCTION: GetProgmanWindow
 ! FUNCTION: GetPropA
 ! FUNCTION: GetPropW
 ! FUNCTION: GetQueueStatus
-FUNCTION: UINT GetRawInputBuffer ( PRAWINPUT pData, PUINT pcbSize, UINT cbSizeHeader ) ;
-FUNCTION: UINT GetRawInputData ( HRAWINPUT hRawInput, UINT uiCommand, LPVOID pData, PUINT pcbSize, UINT cbSizeHeader ) ;
-FUNCTION: UINT GetRawInputDeviceInfoA ( HANDLE hDevice, UINT uiCommand, LPVOID pData, PUINT pcbSize ) ;
-FUNCTION: UINT GetRawInputDeviceInfoW ( HANDLE hDevice, UINT uiCommand, LPVOID pData, PUINT pcbSize ) ;
+FUNCTION: UINT GetRawInputBuffer ( PRAWINPUT pData, PUINT pcbSize, UINT cbSizeHeader )
+FUNCTION: UINT GetRawInputData ( HRAWINPUT hRawInput, UINT uiCommand, LPVOID pData, PUINT pcbSize, UINT cbSizeHeader )
+FUNCTION: UINT GetRawInputDeviceInfoA ( HANDLE hDevice, UINT uiCommand, LPVOID pData, PUINT pcbSize )
+FUNCTION: UINT GetRawInputDeviceInfoW ( HANDLE hDevice, UINT uiCommand, LPVOID pData, PUINT pcbSize )
 ALIAS: GetRawInputDeviceInfo GetRawInputDeviceInfoW
-FUNCTION: UINT GetRawInputDeviceList ( PRAWINPUTDEVICELIST pRawInputDeviceList, PUINT puiNumDevices, UINT cbSize ) ;
-FUNCTION: UINT GetRegisteredRawInputDevices ( PRAWINPUTDEVICE pRawInputDevices, PUINT puiNumDevices, UINT cbSize ) ;
+FUNCTION: UINT GetRawInputDeviceList ( PRAWINPUTDEVICELIST pRawInputDeviceList, PUINT puiNumDevices, UINT cbSize )
+FUNCTION: UINT GetRegisteredRawInputDevices ( PRAWINPUTDEVICE pRawInputDevices, PUINT puiNumDevices, UINT cbSize )
 ! FUNCTION: GetReasonTitleFromReasonCode
 ! FUNCTION: GetScrollBarInfo
 ! FUNCTION: GetScrollInfo
@@ -1399,48 +1704,50 @@ FUNCTION: UINT GetRegisteredRawInputDevices ( PRAWINPUTDEVICE pRawInputDevices, 
 ! FUNCTION: GetScrollRange
 ! FUNCTION: GetShellWindow
 ! FUNCTION: GetSubMenu
-FUNCTION: COLORREF GetSysColor ( int nIndex ) ;
-FUNCTION: HBRUSH GetSysColorBrush ( int nIndex ) ;
-FUNCTION: HMENU GetSystemMenu ( HWND hWnd, BOOL bRevert ) ;
+FUNCTION: COLORREF GetSysColor ( int nIndex )
+FUNCTION: HBRUSH GetSysColorBrush ( int nIndex )
+FUNCTION: HMENU GetSystemMenu ( HWND hWnd, BOOL bRevert )
 ! FUNCTION: GetSystemMetrics
 ! FUNCTION: GetTabbedTextExtentA
 ! FUNCTION: GetTabbedTextExtentW
 ! FUNCTION: GetTaskmanWindow
-! FUNCTION: GetThreadDesktop
+FUNCTION: HDESK GetThreadDesktop ( DWORD dwThreadId )
 ! FUNCTION: GetTitleBarInfo
 
 
-FUNCTION: HWND GetTopWindow ( HWND hWnd ) ;
-! FUNCTION: BOOL GetUpdateRect ( HWND hWnd, LPRECT lpRect, BOOL bErase ) ;
-FUNCTION: int GetUpdateRgn ( HWND hWnd, HRGN hRgn, BOOL bErase ) ;
+FUNCTION: HWND GetTopWindow ( HWND hWnd )
+! FUNCTION: BOOL GetUpdateRect ( HWND hWnd, LPRECT lpRect, BOOL bErase )
+FUNCTION: int GetUpdateRgn ( HWND hWnd, HRGN hRgn, BOOL bErase )
 
 
 ! FUNCTION: GetUserObjectInformationA
 ! FUNCTION: GetUserObjectInformationW
 ! FUNCTION: GetUserObjectSecurity
-FUNCTION: HWND GetWindow ( HWND hWnd, UINT uCmd ) ;
+FUNCTION: HWND GetWindow ( HWND hWnd, UINT uCmd )
 ! FUNCTION: GetWindowContextHelpId
 ! FUNCTION: GetWindowDC
 ! FUNCTION: GetWindowInfo
 ! FUNCTION: GetWindowLongA
 ! FUNCTION: GetWindowLongW
-FUNCTION: LONG_PTR GetWindowLongW ( HANDLE hWnd, int index ) ;
+FUNCTION: LONG_PTR GetWindowLongW ( HANDLE hWnd, int index )
 ALIAS: GetWindowLong GetWindowLongW
 
-FUNCTION: LONG_PTR GetWindowLongPtrW ( HWND hWnd, int nIndex ) ;
+FUNCTION: LONG_PTR GetWindowLongPtrW ( HWND hWnd, int nIndex )
 ALIAS: GetWindowLongPtr GetWindowLongPtrW
 ! FUNCTION: GetWindowModuleFileName
 ! FUNCTION: GetWindowModuleFileNameA
 ! FUNCTION: GetWindowModuleFileNameW
 ! FUNCTION: GetWindowPlacement
-FUNCTION: BOOL GetWindowRect ( HWND hWnd, LPRECT lpRect ) ;
+FUNCTION: BOOL GetWindowRect ( HWND hWnd, LPRECT lpRect )
 ! FUNCTION: GetWindowRgn
 ! FUNCTION: GetWindowRgnBox
-FUNCTION: int GetWindowTextA ( HWND hWnd, char* lpString, int nMaxCount ) ;
+! FUNCTION: int GetWindowTextA ( HWND hWnd, char* lpString, int nMaxCount )
+FUNCTION: int GetWindowTextW ( HWND hWnd, LPTSTR lpString, int nMaxCount )
+ALIAS: GetWindowText GetWindowTextW
 ! FUNCTION: GetWindowTextLengthA
 ! FUNCTION: GetWindowTextLengthW
 ! FUNCTION: GetWindowTextW
-FUNCTION: DWORD GetWindowThreadProcessId ( HWND hWnd, void* lpdwProcessId ) ;
+FUNCTION: DWORD GetWindowThreadProcessId ( HWND hWnd, void* lpdwProcessId )
 ! FUNCTION: GetWindowWord
 ! FUNCTION: GetWinStationInfo
 ! FUNCTION: GrayStringA
@@ -1476,46 +1783,45 @@ FUNCTION: DWORD GetWindowThreadProcessId ( HWND hWnd, void* lpdwProcessId ) ;
 ! FUNCTION: IsCharLowerW
 ! FUNCTION: IsCharUpperA
 ! FUNCTION: IsCharUpperW
-FUNCTION: BOOL IsChild ( HWND hWndParent, HWND hWnd ) ;
-FUNCTION: BOOL IsClipboardFormatAvailable ( UINT format ) ;
+FUNCTION: BOOL IsChild ( HWND hWndParent, HWND hWnd )
+FUNCTION: BOOL IsClipboardFormatAvailable ( UINT format )
 ! FUNCTION: IsDialogMessage
 ! FUNCTION: IsDialogMessageA
 ! FUNCTION: IsDialogMessageW
 ! FUNCTION: IsDlgButtonChecked
-FUNCTION: BOOL IsGUIThread ( BOOL bConvert ) ;
-FUNCTION: BOOL IsHungAppWindow ( HWND hWnd ) ;
-FUNCTION: BOOL IsIconic ( HWND hWnd ) ;
-FUNCTION: BOOL IsMenu ( HMENU hMenu ) ;
+FUNCTION: BOOL IsGUIThread ( BOOL bConvert )
+FUNCTION: BOOL IsHungAppWindow ( HWND hWnd )
+FUNCTION: BOOL IsIconic ( HWND hWnd )
+FUNCTION: BOOL IsMenu ( HMENU hMenu )
 ! FUNCTION: BOOL IsRectEmpty
 ! FUNCTION: BOOL IsServerSideWindow
-FUNCTION: BOOL IsWindow ( HWND hWnd ) ;
+FUNCTION: BOOL IsWindow ( HWND hWnd )
 ! FUNCTION: BOOL IsWindowEnabled
 ! FUNCTION: BOOL IsWindowInDestroy
-FUNCTION: BOOL IsWindowUnicode ( HWND hWnd ) ;
-FUNCTION: BOOL IsWindowVisible ( HWND hWnd ) ;
+FUNCTION: BOOL IsWindowUnicode ( HWND hWnd )
+FUNCTION: BOOL IsWindowVisible ( HWND hWnd )
 ! FUNCTION: BOOL IsWinEventHookInstalled
-FUNCTION: BOOL IsZoomed ( HWND hWnd ) ;
+FUNCTION: BOOL IsZoomed ( HWND hWnd )
 ! FUNCTION: keybd_event
 ! FUNCTION: KillSystemTimer
 ! FUNCTION: KillTimer
 ! FUNCTION: LoadAcceleratorsA
-FUNCTION: HACCEL LoadAcceleratorsW ( HINSTANCE hInstance, LPCTSTR lpTableName ) ;
+FUNCTION: HACCEL LoadAcceleratorsW ( HINSTANCE hInstance, LPCTSTR lpTableName )
 ! FUNCTION: LoadBitmapA
 ! FUNCTION: LoadBitmapW
 ! FUNCTION: LoadCursorFromFileA
 ! FUNCTION: LoadCursorFromFileW
 
 
-! FUNCTION: HCURSOR LoadCursorW ( HINSTANCE hInstance, LPCWSTR lpCursorName ) ;
-FUNCTION: HCURSOR LoadCursorW ( HINSTANCE hInstance, ushort lpCursorName ) ;
+FUNCTION: HCURSOR LoadCursorW ( HINSTANCE hInstance, LPCWSTR lpCursorName )
 ALIAS: LoadCursor LoadCursorW
 
-! FUNCTION: HICON LoadIconA ( HINSTANCE hInstance, LPCTSTR lpIconName ) ;
-FUNCTION: HICON LoadIconW ( HINSTANCE hInstance, LPCTSTR lpIconName ) ;
+FUNCTION: HICON LoadIconW ( HINSTANCE hInstance, LPCWSTR lpIconName )
 ALIAS: LoadIcon LoadIconW
 
 ! FUNCTION: LoadImageA
-! FUNCTION: LoadImageW
+FUNCTION: HANDLE LoadImageW ( HINSTANCE hinst, LPCWSTR lpszName, UINT uType, int cxDesired, int cyDesired, UINT fuLoad )
+ALIAS: LoadImage LoadImageW
 ! FUNCTION: LoadKeyboardLayoutA
 ! FUNCTION: LoadKeyboardLayoutEx
 ! FUNCTION: LoadKeyboardLayoutW
@@ -1535,13 +1841,13 @@ ALIAS: LoadIcon LoadIconW
 ! FUNCTION: LookupIconIdFromDirectoryEx
 ! FUNCTION: MapDialogRect
 
-FUNCTION: UINT MapVirtualKeyW ( UINT uCode, UINT uMapType ) ;
+FUNCTION: UINT MapVirtualKeyW ( UINT uCode, UINT uMapType )
 ALIAS: MapVirtualKey MapVirtualKeyW
 
-FUNCTION: UINT MapVirtualKeyExW ( UINT uCode, UINT uMapType, HKL dwhkl ) ;
+FUNCTION: UINT MapVirtualKeyExW ( UINT uCode, UINT uMapType, HKL dwhkl )
 ALIAS: MapVirtualKeyEx MapVirtualKeyExW
 
-! FUNCTION: MapWindowPoints
+FUNCTION: int MapWindowPoints ( HWND hWndFrom, HWND hWndTo, LPPOINT lpPoints, UINT cPoints )
 ! FUNCTION: MB_GetString
 ! FUNCTION: MBToWCSEx
 ! FUNCTION: MenuItemFromPoint
@@ -1549,36 +1855,35 @@ ALIAS: MapVirtualKeyEx MapVirtualKeyExW
 ! FUNCTION: MenuWindowProcW
 
 ! -1 is Simple beep
-FUNCTION: BOOL MessageBeep ( UINT uType ) ;
+FUNCTION: BOOL MessageBeep ( UINT uType )
 
-FUNCTION: int MessageBoxA ( 
+FUNCTION: int MessageBoxA (
                 HWND hWnd,
                 LPCSTR lpText,
                 LPCSTR lpCaption,
-                UINT uType ) ;
+                UINT uType )
 
 FUNCTION: int MessageBoxW (
                 HWND hWnd,
                 LPCWSTR lpText,
                 LPCWSTR lpCaption,
-                UINT uType) ;
+                UINT uType )
 
 FUNCTION: int MessageBoxExA ( HWND hWnd,
                 LPCSTR lpText,
                 LPCSTR lpCaption,
                 UINT uType,
-                WORD wLanguageId
-                ) ;
+                WORD wLanguageId )
 
 FUNCTION: int MessageBoxExW (
                 HWND hWnd,
                 LPCWSTR lpText,
                 LPCWSTR lpCaption,
                 UINT uType,
-                WORD wLanguageId ) ;
+                WORD wLanguageId )
 
-! FUNCTION: int MessageBoxIndirectA ( MSGBOXPARAMSA* params ) ;
-! FUNCTION: int MessageBoxIndirectW ( MSGBOXPARAMSW* params ) ;
+! FUNCTION: int MessageBoxIndirectA ( MSGBOXPARAMSA* params )
+! FUNCTION: int MessageBoxIndirectW ( MSGBOXPARAMSW* params )
 
 
 ALIAS: MessageBox MessageBoxW
@@ -1595,7 +1900,7 @@ ALIAS: MessageBoxEx MessageBoxExW
 ! FUNCTION: ModifyMenuW
 ! FUNCTION: MonitorFromPoint
 ! FUNCTION: MonitorFromRect
-FUNCTION: HMONITOR MonitorFromWindow ( HWND hWnd, DWORD dwFlags ) ;
+FUNCTION: HMONITOR MonitorFromWindow ( HWND hWnd, DWORD dwFlags )
 ! FUNCTION: mouse_event
 
 
@@ -1605,7 +1910,7 @@ FUNCTION: BOOL MoveWindow (
     int Y,
     int nWidth,
     int nHeight,
-    BOOL bRepaint ) ;
+    BOOL bRepaint )
 
 ! FUNCTION: MsgWaitForMultipleObjects
 ! FUNCTION: MsgWaitForMultipleObjectsEx
@@ -1616,23 +1921,24 @@ FUNCTION: BOOL MoveWindow (
 ! FUNCTION: OemToCharBuffW
 ! FUNCTION: OemToCharW
 ! FUNCTION: OffsetRect
-FUNCTION: BOOL OpenClipboard ( HWND hWndNewOwner ) ;
+FUNCTION: BOOL OpenClipboard ( HWND hWndNewOwner )
 ! FUNCTION: OpenDesktopA
-! FUNCTION: OpenDesktopW
+FUNCTION: HDESK OpenDesktopW ( LPTSTR lpsazDesktop, DWORD dwFlags, BOOL fInherit, ACCESS_MASK dwDesiredAccess )
+ALIAS: OpenDesktop OpenDesktopW
 ! FUNCTION: OpenIcon
-! FUNCTION: OpenInputDesktop
+FUNCTION: HDESK OpenInputDesktop ( DWORD dwFlags, BOOL fInherit, ACCESS_MASK dwDesiredAccess )
 ! FUNCTION: OpenWindowStationA
 ! FUNCTION: OpenWindowStationW
 ! FUNCTION: PackDDElParam
 ! FUNCTION: PaintDesktop
 ! FUNCTION: PaintMenuBar
-FUNCTION: BOOL PeekMessageA ( LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg ) ;
-FUNCTION: BOOL PeekMessageW ( LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg ) ;
+FUNCTION: BOOL PeekMessageA ( LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg )
+FUNCTION: BOOL PeekMessageW ( LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg )
 ALIAS: PeekMessage PeekMessageW
 
 ! FUNCTION: PostMessageA
 ! FUNCTION: PostMessageW
-FUNCTION: void PostQuitMessage ( int nExitCode ) ;
+FUNCTION: void PostQuitMessage ( int nExitCode )
 ! FUNCTION: PostThreadMessageA
 ! FUNCTION: PostThreadMessageW
 ! FUNCTION: PrintWindow
@@ -1654,23 +1960,23 @@ FUNCTION: void PostQuitMessage ( int nExitCode ) ;
 ! FUNCTION: RecordShutdownReason
 ! FUNCTION: RedrawWindow
 
-FUNCTION: ATOM RegisterClassA ( WNDCLASS* lpWndClass ) ;
-FUNCTION: ATOM RegisterClassW ( WNDCLASS* lpWndClass ) ;
-FUNCTION: ATOM RegisterClassExA ( WNDCLASSEX* lpwcx ) ;
-FUNCTION: ATOM RegisterClassExW ( WNDCLASSEX* lpwcx ) ;
+FUNCTION: ATOM RegisterClassA ( WNDCLASS* lpWndClass )
+FUNCTION: ATOM RegisterClassW ( WNDCLASS* lpWndClass )
+FUNCTION: ATOM RegisterClassExA ( WNDCLASSEX* lpwcx )
+FUNCTION: ATOM RegisterClassExW ( WNDCLASSEX* lpwcx )
 
 ALIAS: RegisterClass RegisterClassW
 ALIAS: RegisterClassEx RegisterClassExW
 
 ! FUNCTION: RegisterClipboardFormatA
 ! FUNCTION: RegisterClipboardFormatW
-FUNCTION: HANDLE RegisterDeviceNotificationA ( HANDLE hRecipient, LPVOID NotificationFilter, DWORD Flags ) ;
-FUNCTION: HANDLE RegisterDeviceNotificationW ( HANDLE hRecipient, LPVOID NotificationFilter, DWORD Flags ) ;
+FUNCTION: HANDLE RegisterDeviceNotificationA ( HANDLE hRecipient, LPVOID NotificationFilter, DWORD Flags )
+FUNCTION: HANDLE RegisterDeviceNotificationW ( HANDLE hRecipient, LPVOID NotificationFilter, DWORD Flags )
 ALIAS: RegisterDeviceNotification RegisterDeviceNotificationW
 ! FUNCTION: RegisterHotKey
 ! FUNCTION: RegisterLogonProcess
 ! FUNCTION: RegisterMessagePumpHook
-FUNCTION: BOOL RegisterRawInputDevices ( PCRAWINPUTDEVICE pRawInputDevices, UINT uiNumDevices, UINT cbSize ) ;
+FUNCTION: BOOL RegisterRawInputDevices ( PCRAWINPUTDEVICE pRawInputDevices, UINT uiNumDevices, UINT cbSize )
 ! FUNCTION: RegisterServicesProcess
 ! FUNCTION: RegisterShellHookWindow
 ! FUNCTION: RegisterSystemThread
@@ -1678,15 +1984,15 @@ FUNCTION: BOOL RegisterRawInputDevices ( PCRAWINPUTDEVICE pRawInputDevices, UINT
 ! FUNCTION: RegisterUserApiHook
 ! FUNCTION: RegisterWindowMessageA
 ! FUNCTION: RegisterWindowMessageW
-FUNCTION: BOOL ReleaseCapture ( ) ;
-FUNCTION: int ReleaseDC ( HWND hWnd, HDC hDC ) ;
+FUNCTION: BOOL ReleaseCapture ( )
+FUNCTION: int ReleaseDC ( HWND hWnd, HDC hDC )
 ! FUNCTION: RemoveMenu
 ! FUNCTION: RemovePropA
 ! FUNCTION: RemovePropW
 ! FUNCTION: ReplyMessage
 ! FUNCTION: ResolveDesktopForWOW
 ! FUNCTION: ReuseDDElParam
-! FUNCTION: ScreenToClient
+FUNCTION: BOOL ScreenToClient ( HWND hWnd, LPPOINT lpPoint )
 ! FUNCTION: ScrollChildren
 ! FUNCTION: ScrollDC
 ! FUNCTION: ScrollWindow
@@ -1695,8 +2001,8 @@ FUNCTION: int ReleaseDC ( HWND hWnd, HDC hDC ) ;
 ! FUNCTION: SendDlgItemMessageW
 ! FUNCTION: SendIMEMessageExA
 ! FUNCTION: SendIMEMessageExW
-! FUNCTION: UINT SendInput ( UINT nInputs, LPINPUT pInputs, int cbSize ) ;
-FUNCTION: LRESULT SendMessageW ( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) ;
+FUNCTION: UINT SendInput ( UINT nInputs, LPINPUT pInputs, int cbSize )
+FUNCTION: LRESULT SendMessageW ( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 ALIAS: SendMessage SendMessageW
 ! FUNCTION: SendMessageCallbackA
 ! FUNCTION: SendMessageCallbackW
@@ -1705,16 +2011,16 @@ ALIAS: SendMessage SendMessageW
 ! FUNCTION: SendNotifyMessageA
 ! FUNCTION: SendNotifyMessageW
 ! FUNCTION: SetActiveWindow
-FUNCTION: HWND SetCapture ( HWND hWnd ) ;
+FUNCTION: HWND SetCapture ( HWND hWnd )
 ! FUNCTION: SetCaretBlinkTime
 ! FUNCTION: SetCaretPos
 
-FUNCTION: ULONG_PTR SetClassLongW ( HWND hWnd, int nIndex, LONG_PTR dwNewLong ) ;
+FUNCTION: ULONG_PTR SetClassLongW ( HWND hWnd, int nIndex, LONG_PTR dwNewLong )
 ALIAS: SetClassLongPtr SetClassLongW
 ALIAS: SetClassLong SetClassLongW
 
 ! FUNCTION: SetClassWord
-FUNCTION: HANDLE SetClipboardData ( UINT uFormat, HANDLE hMem ) ;
+FUNCTION: HANDLE SetClipboardData ( UINT uFormat, HANDLE hMem )
 ! FUNCTION: SetClipboardViewer
 ! FUNCTION: SetConsoleReserveKeys
 ! FUNCTION: SetCursor
@@ -1726,12 +2032,12 @@ FUNCTION: HANDLE SetClipboardData ( UINT uFormat, HANDLE hMem ) ;
 ! FUNCTION: SetDlgItemTextA
 ! FUNCTION: SetDlgItemTextW
 ! FUNCTION: SetDoubleClickTime
-FUNCTION: HWND SetFocus ( HWND hWnd ) ;
-FUNCTION: BOOL SetForegroundWindow ( HWND hWnd ) ;
+FUNCTION: HWND SetFocus ( HWND hWnd )
+FUNCTION: BOOL SetForegroundWindow ( HWND hWnd )
 ! FUNCTION: SetInternalWindowPos
 ! FUNCTION: SetKeyboardState
 ! type is ignored
-FUNCTION: void SetLastErrorEx ( DWORD dwErrCode, DWORD dwType ) ; 
+FUNCTION: void SetLastErrorEx ( DWORD dwErrCode, DWORD dwType )
 : SetLastError ( errcode -- ) 0 SetLastErrorEx ; inline
 ! FUNCTION: SetLayeredWindowAttributes
 ! FUNCTION: SetLogonNotifyWindow
@@ -1771,23 +2077,27 @@ FUNCTION: void SetLastErrorEx ( DWORD dwErrCode, DWORD dwType ) ;
 ! FUNCTION: SetWindowContextHelpId
 ! FUNCTION: SetWindowLongA
 ! FUNCTION: SetWindowLongW
-FUNCTION: LONG_PTR SetWindowLongW ( HANDLE hWnd, int index, LONG_PTR dwNewLong ) ;
+FUNCTION: LONG_PTR SetWindowLongW ( HANDLE hWnd, int index, LONG_PTR dwNewLong )
 ALIAS: SetWindowLong SetWindowLongW
 ! FUNCTION: SetWindowPlacement
-FUNCTION: BOOL SetWindowPos ( HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags ) ;
+FUNCTION: BOOL SetWindowPos ( HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags )
 
-FUNCTION: LONG_PTR SetWindowLongPtrW ( HWND hWnd, int nIndex, LONG_PTR dwNewLong ) ;
+FUNCTION: LONG_PTR SetWindowLongPtrW ( HWND hWnd, int nIndex, LONG_PTR dwNewLong )
 ALIAS: SetWindowLongPtr SetWindowLongPtrW
 
 : HWND_BOTTOM ( -- alien ) 1 <alien> ;
+: HWND_MESSAGE ( -- alien ) -3 <alien> ;
 : HWND_NOTOPMOST ( -- alien ) -2 <alien> ;
 CONSTANT: HWND_TOP f
 : HWND_TOPMOST ( -- alien ) -1 <alien> ;
+: HWND_DESKTOP ( -- alien ) 0 <alien> ;
+: HWND_BROADCAST ( -- alien ) 65535 <alien> ;
 
 ! FUNCTION: SetWindowRgn
 ! FUNCTION: SetWindowsHookA
 ! FUNCTION: SetWindowsHookExA
-! FUNCTION: SetWindowsHookExW
+FUNCTION: HHOOK SetWindowsHookExW ( int idHook, HOOKPROC lpfn, HINSTANCE hMod, DWORD dwThreadId )
+ALIAS: SetWindowsHookEx SetWindowsHookExW
 ! FUNCTION: SetWindowsHookW
 ! FUNCTION: SetWindowStationUser
 ! FUNCTION: SetWindowTextA
@@ -1795,12 +2105,12 @@ CONSTANT: HWND_TOP f
 ! FUNCTION: SetWindowWord
 ! FUNCTION: SetWinEventHook
 ! FUNCTION: ShowCaret
-FUNCTION: int ShowCursor ( BOOL show ) ;
+FUNCTION: int ShowCursor ( BOOL show )
 ! FUNCTION: ShowOwnedPopups
 ! FUNCTION: ShowScrollBar
 ! FUNCTION: ShowStartGlass
 
-FUNCTION: BOOL ShowWindow ( HWND hWnd, int nCmdShow ) ;
+FUNCTION: BOOL ShowWindow ( HWND hWnd, int nCmdShow )
 
 ! FUNCTION: ShowWindowAsync
 ! FUNCTION: SoftModalMessageBox
@@ -1810,7 +2120,7 @@ FUNCTION: BOOL ShowWindow ( HWND hWnd, int nCmdShow ) ;
 ! FUNCTION: SwitchToThisWindow
 ! FUNCTION: SystemParametersInfoA
 
-FUNCTION: BOOL SystemParametersInfoW ( UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni ) ;
+FUNCTION: BOOL SystemParametersInfoW ( UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni )
 ALIAS: SystemParametersInfo SystemParametersInfoW
 
 ! FUNCTION: TabbedTextOutA
@@ -1821,34 +2131,34 @@ ALIAS: SystemParametersInfo SystemParametersInfoW
 ! FUNCTION: ToAsciiEx
 ! FUNCTION: ToUnicode
 ! FUNCTION: ToUnicodeEx
-FUNCTION: BOOL TrackMouseEvent ( LPTRACKMOUSEEVENT lpEventTrack ) ;
+FUNCTION: BOOL TrackMouseEvent ( LPTRACKMOUSEEVENT lpEventTrack )
 ! FUNCTION: TrackPopupMenu
 ! FUNCTION: TrackPopupMenuEx
 ! FUNCTION: TranslateAccelerator
 ! FUNCTION: TranslateAcceleratorA
-FUNCTION: int TranslateAcceleratorW ( HWND hWnd, HACCEL hAccTable, LPMSG lpMsg ) ;
+FUNCTION: int TranslateAcceleratorW ( HWND hWnd, HACCEL hAccTable, LPMSG lpMsg )
 ALIAS: TranslateAccelerator TranslateAcceleratorW
 
 ! FUNCTION: TranslateMDISysAccel
-FUNCTION: BOOL TranslateMessage ( MSG* lpMsg ) ;
+FUNCTION: BOOL TranslateMessage ( MSG* lpMsg )
 
 ! FUNCTION: UnhookWindowsHook
-! FUNCTION: UnhookWindowsHookEx
+FUNCTION: BOOL UnhookWindowsHookEx ( HHOOK hhk )
 ! FUNCTION: UnhookWinEvent
 ! FUNCTION: UnionRect
 ! FUNCTION: UnloadKeyboardLayout
 ! FUNCTION: UnlockWindowStation
 ! FUNCTION: UnpackDDElParam
-FUNCTION: BOOL UnregisterClassW ( LPCWSTR lpClassName, HINSTANCE hInstance ) ;
+FUNCTION: BOOL UnregisterClassW ( LPCWSTR lpClassName, HINSTANCE hInstance )
 ALIAS: UnregisterClass UnregisterClassW
-FUNCTION: BOOL UnregisterDeviceNotification ( HANDLE hDevNotify ) ;
+FUNCTION: BOOL UnregisterDeviceNotification ( HANDLE hDevNotify )
 ! FUNCTION: UnregisterHotKey
 ! FUNCTION: UnregisterMessagePumpHook
 ! FUNCTION: UnregisterUserApiHook
 ! FUNCTION: UpdateLayeredWindow
 ! FUNCTION: UpdatePerUserSystemParameters
 
-FUNCTION: BOOL UpdateWindow ( HWND hWnd ) ;
+FUNCTION: BOOL UpdateWindow ( HWND hWnd )
 
 ! FUNCTION: User32InitializeImmEntryTable
 ! FUNCTION: UserClientDllInitialize
@@ -1861,8 +2171,10 @@ FUNCTION: BOOL UpdateWindow ( HWND hWnd ) ;
 ! FUNCTION: ValidateRgn
 ! FUNCTION: VkKeyScanA
 ! FUNCTION: VkKeyScanExA
-! FUNCTION: VkKeyScanExW
-! FUNCTION: VkKeyScanW
+FUNCTION: SHORT VkKeyScanExW ( TCHAR ch, HKL dwhkl )
+ALIAS: VkKeyScanEx VkKeyScanExW
+FUNCTION: SHORT VkKeyScanW ( TCHAR ch )
+ALIAS: VkKeyScan VkKeyScanW
 ! FUNCTION: VRipOutput
 ! FUNCTION: VTagOutput
 ! FUNCTION: WaitForInputIdle
@@ -1880,6 +2192,70 @@ FUNCTION: BOOL UpdateWindow ( HWND hWnd ) ;
 ! FUNCTION: wsprintfW
 ! FUNCTION: wvsprintfA
 ! FUNCTION: wvsprintfW
+
+TYPEDEF: HANDLE HPOWERNOTIFY
+
+FUNCTION: HPOWERNOTIFY RegisterPowerSettingNotification ( HANDLE  hRecipient, LPCGUID PowerSettingGuid, DWORD Flags )
+FUNCTION: BOOL UnregisterPowerSettingNotification ( HPOWERNOTIFY Handle )
+
+CONSTANT: GUID_ACDC_POWER_SOURCE
+    GUID: {5d3e9a59-e9D5-4b00-a6bd-ff34ff516548}
+
+CONSTANT: GUID_BATTERY_PERCENTAGE_REMAINING
+    GUID: {a7ad8041-b45a-4cae-87a3-eecbb468a9e1}
+
+CONSTANT: GUID_CONSOLE_DISPLAY_STATE
+    GUID: {6fe69556-704a-47a0-8f24-c28d936fda47}
+
+CONSTANT: GUID_GLOBAL_USER_PRESENCE
+    GUID: {786e8a1d-b427-4344-9207-09e70bdcbea9}
+
+CONSTANT: GUID_IDLE_BACKGROUND_TASK
+    GUID: {515c31d8-f734-163d-a0fd-11a0-8c91e8f1}
+
+CONSTANT: GUID_MONITOR_POWER_ON
+    GUID: {02731015-4510-4526-99e6-e5a17ebd1aea}
+
+CONSTANT: GUID_POWER_SAVING_STATUS
+    GUID: {e00958c0-c213-4ace-ac77-fecced2eeea5}
+
+CONSTANT: GUID_POWERSCHEME_PERSONALITY
+    GUID: {245d8541-3943-4422-b025-13a7-84f679b7}
+
+CONSTANT: GUID_MIN_POWER_SAVINGS
+    GUID: {8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c}
+
+CONSTANT: GUID_MAX_POWER_SAVINGS
+    GUID: {a1841308-3541-4fab-bc81-f71556f20b4a}
+
+CONSTANT: GUID_TYPICAL_POWER_SAVINGS
+    GUID: {381b4222-f694-41f0-9685-ff5bb260df2e}
+
+CONSTANT: GUID_SESSION_DISPLAY_STATUS
+    GUID: {2b84c20e-ad23-4ddf-93db-05ffbd7efca5}
+
+CONSTANT: GUID_SESSION_USER_PRESENCE
+    GUID: {3c0f4548-c03f-4c4d-b9f2-237ede686376}
+
+CONSTANT: GUID_SYSTEM_AWAYMODE
+    GUID: {98a7f580-01f7-48aa-9c0f-44352c29e5C0}
+
+! This notification fires when the Lid Close Action is
+! changed by user in the Power Manager (Control Panel).
+CONSTANT: GUID_LIDCLOSE_ACTION
+    GUID: {5ca83367-6e45-459f-a27b-476b1d01c936}
+
+! This notifies when the laptop lid is physically opened or closed.
+CONSTANT: GUID_LIDSWITCH_STATE_CHANGE
+    GUID: {ba3e0f4d-b817-4094-a2d1-d56379e6a0f3}
+
+CONSTANT: PBT_POWERSETTINGCHANGE 0x8013
+
+STRUCT: POWERBROADCAST_SETTING
+    { PowerSetting GUID  }
+    { DataLength   DWORD }
+    { Data         UCHAR }
+;
 
 : msgbox ( str -- )
     f swap "DebugMsg" MB_OK MessageBox drop ;

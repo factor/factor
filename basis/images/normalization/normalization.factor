@@ -88,4 +88,3 @@ PRIVATE>
     [ >byte-array ] change-bitmap
     RGBA reorder-components
     normalize-scan-line-order ;
-

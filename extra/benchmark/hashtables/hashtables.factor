@@ -1,13 +1,11 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators kernel locals math
-math.ranges memoize sequences strings hashtables
-math.parser grouping ;
-FROM: assocs => change-at ;
+USING: accessors assocs combinators grouping kernel locals math
+math.parser math.ranges memoize sequences ;
 IN: benchmark.hashtables
 
 MEMO: strings ( -- str )
-    1 100 [a,b] 1 [ + ] accumulate nip [ number>string ] map ;
+    0 100 [a,b) 1 [ + ] accumulate* [ number>string ] map ;
 
 :: add-delete-mix ( hash keys -- )
     keys [| k |
@@ -33,7 +31,7 @@ MEMO: strings ( -- str )
     ] map drop
 
     keys [
-        hash [ 1 + ] change-at
+        hash [ 1 + ] assocs:change-at
     ] each ;
 
 : string-mix ( hash -- )

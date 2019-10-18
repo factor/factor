@@ -73,7 +73,7 @@ Factor contains fuel and the vocabularies it depends on.
 If you prefer to start Factor externally, you can also connect
 remotely from Emacs. Here's how to proceed:
 
-- In the factor listener, run FUEL: `"fuel" run`. This will start a server
+- In the factor listener, run `"fuel.remote" run`. This will start a server
 listener in port 9000.
 - Switch to Emacs and issue the command `M-x connect-to-factor`.
 
@@ -111,12 +111,11 @@ M-x <command>, not necessarily in a factor buffer.
     | C-x 4 s            | switch to other factor buffer in other window              |
     | C-x 5 s            | switch to other factor buffer in other frame               |
     |--------------------+------------------------------------------------------------|
-    | M-.                | edit word at point in Emacs (fuel-edit-word)               |
+    | M-.                | edit word/vocab at point in Emacs (fuel-edit-word-at-point)|
     | M-,                | go back to where M-. was last invoked                      |
     | M-TAB              | complete word at point                                     |
     | C-c C-e u          | update USING: line (fuel-update-usings)                    |
     | C-c C-e v          | edit vocabulary (fuel-edit-vocabulary)                     |
-    | C-c C-e w          | edit word (fuel-edit-word-at-point)                        |
     | C-c C-e d          | edit word's doc (C-u M-x fuel-edit-word-doc-at-point)      |
     | C-c C-e l          | load vocabs in USING: form                                 |
     |--------------------+------------------------------------------------------------|

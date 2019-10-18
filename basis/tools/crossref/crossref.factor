@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.smart compiler.units
-generic generic.single graphs hash-sets.identity hashtables help
+generic generic.single hash-sets.identity hashtables help
 help.crossref help.markup help.topics init io io.pathnames
 io.styles kernel namespaces quotations see sequences sets
 sorting source-files threads vocabs words ;
@@ -15,7 +15,7 @@ GENERIC: uses ( defspec -- seq )
 
 SYMBOL: visited
 
-GENERIC# quot-uses 1 ( obj set -- )
+GENERIC#: quot-uses 1 ( obj set -- )
 
 M: object quot-uses 2drop ;
 
@@ -51,18 +51,18 @@ M: link uses
     [ { $vocab-link } article-links [ >vocab-link ] map ]
     bi append ;
 
-M: pathname uses string>> source-file top-level-form>> [ uses ] [ { } ] if* ;
+M: pathname uses string>> path>source-file top-level-form>> [ uses ] [ { } ] if* ;
 
 ! To make UI browser happy
 M: object uses drop f ;
 
 : crossref-def ( defspec -- )
-    dup uses crossref get-global add-vertex ;
+    dup uses [ crossref get-global adjoin-at ] with each ;
 
 : defs-to-crossref ( -- seq )
     [
         all-words
-        [ [ generic? not ] filter ]
+        [ [ generic? ] reject ]
         [ [ subwords ] map concat ] bi
 
         all-articles [ >link ] map
@@ -91,11 +91,11 @@ M: predicate-engine-word irrelevant? drop t ;
 
 PRIVATE>
 
-: usage ( defspec -- seq ) get-crossref at keys ;
+: usage ( defspec -- seq ) get-crossref at members ;
 
 GENERIC: smart-usage ( defspec -- seq )
 
-M: object smart-usage usage [ irrelevant? not ] filter ;
+M: object smart-usage usage [ irrelevant? ] reject ;
 
 M: method smart-usage "method-generic" word-prop smart-usage ;
 
@@ -115,7 +115,7 @@ M: f smart-usage drop \ f smart-usage ;
     [ "No usages." print ] [ sorted-definitions. ] if-empty ;
 
 : vocab-xref ( vocab quot: ( defspec -- seq ) -- vocabs )
-    [ [ vocab-name ] [ words [ generic? not ] filter ] bi ] dip map
+    [ [ vocab-name ] [ vocab-words [ generic? ] reject ] bi ] dip map
     [
         [ [ word? ] [ generic? not ] bi and ] filter [
             dup method?
@@ -139,7 +139,8 @@ M: f smart-usage drop \ f smart-usage ;
 
 SINGLETON: invalidate-crossref
 
-M: invalidate-crossref definitions-changed 2drop crossref global delete-at ;
+M: invalidate-crossref definitions-changed
+    2drop crossref global delete-at ;
 
 [ invalidate-crossref add-definition-observer ] "tools.crossref" add-startup-hook
 

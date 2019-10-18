@@ -1,13 +1,13 @@
-USING: continuations db db.sqlite io.directories io.files.temp
-webapps.mason.backend tools.test ;
+USING: accessors calendar continuations db io.directories
+io.files.temp kernel tools.test webapps.mason.backend webapps.utils ;
 IN: webapps.mason.backend.tests
 
-[ "mason-test.db" temp-file delete-file ] ignore-errors
+"mason-test.db" temp-file ?delete-file
 
-[ 0 1 2 ] [
+{ 0 1 2 } [
     ! Do it in a with-transaction to simulate semantics of
     ! with-mason-db
-    "mason-test.db" temp-file <sqlite-db> [
+    "mason-test.db" <temp-sqlite-db> [
         [
             init-mason-db
 
@@ -16,4 +16,9 @@ IN: webapps.mason.backend.tests
             increment-counter-value
         ] with-transaction
     ] with-db
+] unit-test
+
+{ f f } [
+    builder new now >>heartbeat-timestamp
+    [ broken? ] [ crashed? ] bi
 ] unit-test

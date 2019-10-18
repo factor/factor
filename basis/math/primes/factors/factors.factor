@@ -1,8 +1,8 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators kernel make math math.functions
-math.primes math.ranges sequences sequences.product sorting
-io math.parser ;
+USING: arrays assocs combinators command-line io kernel make
+math math.functions math.parser math.primes math.ranges
+namespaces sequences sequences.product sorting ;
 IN: math.primes.factors
 
 <PRIVATE
@@ -62,6 +62,10 @@ PRIVATE>
     ] if* ;
 
 : run-unix-factor ( -- )
-    [ readln [ unix-factor t ] [ f ] if* ] loop ;
+    command-line get [
+        [ readln [ unix-factor t ] [ f ] if* ] loop
+    ] [
+        [ unix-factor ] each
+    ] if-empty ;
 
 MAIN: run-unix-factor

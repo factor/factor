@@ -1,5 +1,4 @@
-USING: help.markup help.syntax parser vocabs.loader strings
-vocabs ;
+USING: help.markup help.syntax strings system vocabs vocabs.loader ;
 IN: command-line
 
 HELP: run-bootstrap-init
@@ -23,10 +22,13 @@ $nl
 
 HELP: (command-line)
 { $values { "args" "a sequence of strings" } }
-{ $description "Outputs the command line parameters which were passed to the Factor VM on startup." } ;
+{ $description "Outputs the raw command line parameters which were passed to the Factor VM on startup."
+$nl
+"We recommend using the " { $link vm-path } " and " { $link command-line } " symbols instead." } ;
 
 HELP: command-line
-{ $var-description "When Factor is run with a script, this variable contains command line parameters which follow the name of the script on the command line. In deployed applications, it contains the entire command line. In all other cases it is set to " { $link f } "." } ;
+{ $var-description "When Factor is run with a script, this variable contains the list of command line arguments which follow the name of the script on the command line. In deployed applications, it contains the full list of command line arguments. In all other cases it is set to " { $link f } "." }
+{ $see-also vm-path } ;
 
 HELP: main-vocab-hook
 { $var-description "Global variable holding a quotation which outputs a vocabulary name. UI backends set this so that the UI can automatically start if the prerequisites are met (for example, " { $snippet "$DISPLAY" } " being set on X11)." } ;
@@ -42,15 +44,18 @@ ARTICLE: "runtime-cli-args" "Command line switches for the VM"
 "A handful of command line switches are processed by the VM and not the library. They control low-level features."
 { $table
     { { $snippet "-i=" { $emphasis "image" } } { "Specifies the image file to use; see " { $link "images" } } }
-    { { $snippet "-datastack=" { $emphasis "n" } } "Data stack size, kilobytes" }
-    { { $snippet "-retainstack=" { $emphasis "n" } } "Retain stack size, kilobytes" }
-    { { $snippet "-callstack=" { $emphasis "n" } } "Call stack size, kilobytes" }
+    { { $snippet "-datastack=" { $emphasis "n" } } "Datastack size, kilobytes" }
+    { { $snippet "-retainstack=" { $emphasis "n" } } "Retainstack size, kilobytes" }
+    { { $snippet "-callstack=" { $emphasis "n" } } "Callstack size, kilobytes" }
+    { { $snippet "-callbacks=" { $emphasis "n" } } "Callback heap size, kilobytes" }
     { { $snippet "-young=" { $emphasis "n" } } { "Size of youngest generation (0), megabytes" } }
     { { $snippet "-aging=" { $emphasis "n" } } "Size of aging generation (1), megabytes" }
     { { $snippet "-tenured=" { $emphasis "n" } } "Size of oldest generation (2), megabytes" }
     { { $snippet "-codeheap=" { $emphasis "n" } } "Code heap size, megabytes" }
-    { { $snippet "-callbacks=" { $emphasis "n" } } "Callback heap size, megabytes" }
-    { { $snippet "-pic=" { $emphasis "n" } } "Maximum inline cache size. Setting of 0 disables inline caching, > 1 enables polymorphic inline caching" }
+    { { $snippet "-pic=" { $emphasis "n" } } "Maximum inline cache size. Setting of 0 disables inline caching, >= 1 enables polymorphic inline caching" }
+    { { $snippet "-fep" } "enter low-level debbugger, aka fep mode immediately" }
+    { { $snippet "-no-signals" } "turn off OS signal handling" }
+    { { $snippet "-console" } "open console if possible" }
 }
 "If an " { $snippet "-i=" } " switch is not present, the default image file is used, which is usually a file named " { $snippet "factor.image" } " in the same directory as the Factor executable." ;
 
@@ -86,8 +91,8 @@ $nl
 ARTICLE: "standard-cli-args" "Command line switches for general usage"
 "The following command line switches can be passed to a bootstrapped Factor image:"
 { $table
-    { { $snippet "-e=" { $emphasis "code" } } { "This specifies a code snippet to evaluate. If you want Factor to exit immediately after, also specify " { $snippet "-run=none" } "." } }
-    { { $snippet "-run=" { $emphasis "vocab" } } { { $snippet { $emphasis "vocab" } } " is the name of a vocabulary with a " { $link POSTPONE: MAIN: } " hook to run on startup, for example " { $vocab-link "listener" } ", " { $vocab-link "ui.tools" } " or " { $vocab-link "none" } "." } }
+    { { $snippet "-e=" { $emphasis "code" } } { "This specifies a code snippet to evaluate and then exit Factor." } }
+    { { $snippet "-run=" { $emphasis "vocab" } } { { $snippet { $emphasis "vocab" } } " is the name of a vocabulary with a " { $link POSTPONE: MAIN: } " hook to run on startup, for example " { $vocab-link "listener" } " or " { $vocab-link "ui.tools" } "." } }
     { { $snippet "-no-user-init" } { "Inhibits the running of user initialization files on startup. See " { $link "rc-files" } "." } }
 } ;
 
@@ -107,7 +112,7 @@ $nl
 ARTICLE: ".factor-roots" "Additional vocabulary roots file"
 "The vocabulary roots file is named " { $snippet ".factor-roots" } ". If it exists, it is loaded every time Factor starts. It contains a newline-separated list of " { $link "vocabs.roots" } "."
 $nl
-"A word to run this file from an existing Factor session:"
+"A word to load this file from an existing Factor session:"
 { $subsections load-vocab-roots } ;
 
 ARTICLE: "rc-files" "Running code on startup"
@@ -125,10 +130,10 @@ $nl
     "\".factor-rc\" rc-path print"
     "\".factor-boot-rc\" rc-path print"
 }
-"Here is an example " { $snippet ".factor-boot-rc" } " which sets up GVIM editor integration:"
+"Here is an example " { $snippet ".factor-boot-rc" } " which sets up your developer name:"
 { $code
-    "USING: editors.gvim namespaces ;"
-    "\"/opt/local/bin\" \\ gvim-path set-global"
+    "USING: tools.scaffold namespaces ;"
+    "\"Sheeple Sheepleton\" developer-name set-global"
 } ;
 
 ARTICLE: "command-line" "Command line arguments"
@@ -161,6 +166,6 @@ $nl
 HELP: run-script
 { $values { "file" "a pathname string" } }
 { $description "Parses the Factor source code stored in a file and runs it. The initial vocabulary search path is used. If the source file contains a " { $link POSTPONE: MAIN: } " declaration, the main entry point of the file will be also be executed. Loading messages will be suppressed." }
-{ $errors "Throws an error if loading the file fails, there input is malformed, or if a runtime error occurs while calling the parsed quotation or executing the main entry point." }  ;
+{ $errors "Throws an error if loading the file fails, there input is malformed, or if a runtime error occurs while calling the parsed quotation or executing the main entry point." } ;
 
 ABOUT: "command-line"

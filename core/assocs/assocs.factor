@@ -37,7 +37,7 @@ M: assoc assoc-like drop ; inline
         3drop f
     ] [
         3dup nth-unsafe at*
-        [ [ 3drop ] dip ] [ drop [ 1 - ] dip (assoc-stack) ] if
+        [ 3nip ] [ drop [ 1 - ] dip (assoc-stack) ] if
     ] if ; inline recursive
 
 : search-alist ( key alist -- pair/f i/f )
@@ -74,17 +74,32 @@ PRIVATE>
 : assoc-filter ( ... assoc quot: ( ... key value -- ... ? ) -- ... subassoc )
     over assoc-filter-as ; inline
 
+: assoc-reject-as ( ... assoc quot: ( ... key value -- ... ? ) exemplar -- ... subassoc )
+    [ [ not ] compose ] [ assoc-filter-as ] bi* ; inline
+
+: assoc-reject ( ... assoc quot: ( ... key value -- ... ? ) -- ... subassoc )
+    over assoc-reject-as ; inline
+
 : assoc-filter! ( ... assoc quot: ( ... key value -- ... ? ) -- ... assoc )
     [
         over [ [ [ drop ] 2bi ] dip [ delete-at ] 2curry unless ] 2curry
         assoc-each
     ] [ drop ] 2bi ; inline
 
+: assoc-reject! ( ... assoc quot: ( ... key value -- ... ? ) -- ... assoc )
+    [ not ] compose assoc-filter! ; inline
+
 : sift-keys ( assoc -- assoc' )
     [ drop ] assoc-filter ; inline
 
 : sift-values ( assoc -- assoc' )
     [ nip ] assoc-filter ; inline
+
+: harvest-keys ( assoc -- assoc' )
+    [ drop empty? ] assoc-reject ; inline
+
+: harvest-values ( assoc -- assoc' )
+    [ nip empty? ] assoc-reject ; inline
 
 : assoc-partition ( ... assoc quot: ( ... key value -- ... ? ) -- ... true-assoc false-assoc )
     [ (assoc-each) partition ] [ drop ] 2bi
@@ -129,7 +144,7 @@ M: assoc values [ nip ] { } assoc>map ;
     [ at* [ = ] [ 2drop f ] if ] with-assoc assoc-all? ;
 
 : assoc= ( assoc1 assoc2 -- ? )
-    2dup [ assoc-size ] bi@ eq? [ assoc-subset? ] [ 2drop f ] if ;
+    2dup [ assoc-size ] bi@ = [ assoc-subset? ] [ 2drop f ] if ;
 
 : assoc-hashcode ( n assoc -- code )
     >alist hashcode* ;
@@ -140,9 +155,12 @@ M: assoc values [ nip ] { } assoc>map ;
 : assoc-union! ( assoc1 assoc2 -- assoc1 )
     over [ set-at ] with-assoc assoc-each ;
 
-: assoc-union ( assoc1 assoc2 -- union )
-    [ [ [ assoc-size ] bi@ + ] [ drop ] 2bi new-assoc ] 2keep
+: assoc-union-as ( assoc1 assoc2 exemplar -- union )
+    [ [ [ assoc-size ] bi@ + ] dip new-assoc ] 2keepd
     [ assoc-union! ] bi@ ;
+
+: assoc-union ( assoc1 assoc2 -- union )
+    over assoc-union-as ;
 
 : assoc-combine ( seq -- union )
     H{ } clone [ assoc-union! ] reduce ;
@@ -186,6 +204,9 @@ M: assoc values [ nip ] { } assoc>map ;
         [ [ swapd set-at ] curry compose each ] keep
     ] if ; inline
 
+: map>alist ( ... seq quot: ( ... elt -- ... key value ) -- ... alist )
+    { } map>assoc ; inline
+
 : extract-keys ( seq assoc -- subassoc )
     [ [ dupd at ] curry ] keep map>assoc ;
 
@@ -198,11 +219,30 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
 : push-at ( value key assoc -- )
     [ ?push ] change-at ;
 
+: zip-as ( keys values exemplar -- assoc )
+    dup sequence? [
+        [ 2array ] swap 2map-as
+    ] [
+        [ 2dup min-length ] dip new-assoc
+        [ [ set-at ] with-assoc 2each ] keep
+    ] if ; inline
+
 : zip ( keys values -- alist )
-    [ 2array ] { } 2map-as ; inline
+     { } zip-as ; inline
+
+: zip-index-as ( values exemplar -- assoc )
+    [ dup length <iota> ] dip zip-as ; inline
+
+: zip-index ( values -- alist )
+    { } zip-index-as ; inline
 
 : unzip ( assoc -- keys values )
     dup assoc-empty? [ drop { } { } ] [ >alist flip first2 ] if ;
+
+: collect-by ( ... seq quot: ( ... obj -- ... key ) -- ... assoc )
+    [ keep swap ] curry H{ } clone [
+        [ push-at ] curry compose each
+    ] keep ; inline
 
 M: sequence at*
     search-alist [ second t ] [ f ] if ;
@@ -241,33 +281,32 @@ M: f assoc-like drop dup assoc-empty? [ drop f ] when ; inline
 
 INSTANCE: sequence assoc
 
-TUPLE: enum { seq read-only } ;
+TUPLE: enumerated { seq read-only } ;
 
-C: <enum> enum
+C: <enumerated> enumerated
 
-M: enum at*
+M: enumerated at*
     seq>> 2dup bounds-check?
     [ nth-unsafe t ] [ 2drop f f ] if ; inline
 
-M: enum set-at seq>> set-nth ; inline
+M: enumerated set-at seq>> set-nth ; inline
 
-M: enum delete-at seq>> remove-nth! drop ; inline
+M: enumerated delete-at seq>> remove-nth! drop ; inline
 
-M: enum >alist ( enum -- alist )
-    seq>> [ length iota ] keep zip ; inline
+M: enumerated >alist ( enumerated -- alist ) ; inline
 
-M: enum keys seq>> length iota >array ; inline
+M: enumerated keys seq>> length <iota> >array ; inline
 
-M: enum values seq>> >array ; inline
+M: enumerated values seq>> >array ; inline
 
-M: enum assoc-size seq>> length ; inline
+M: enumerated assoc-size seq>> length ; inline
 
-M: enum clear-assoc seq>> delete-all ; inline
+M: enumerated clear-assoc seq>> delete-all ; inline
 
-INSTANCE: enum assoc
+INSTANCE: enumerated assoc
 
-M: enum length seq>> length ; inline
+M: enumerated length seq>> length ; inline
 
-M: enum nth-unsafe dupd seq>> nth-unsafe 2array ; inline
+M: enumerated nth-unsafe dupd seq>> nth-unsafe 2array ; inline
 
-INSTANCE: enum immutable-sequence
+INSTANCE: enumerated immutable-sequence

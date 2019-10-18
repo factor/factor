@@ -12,42 +12,53 @@ ARTICLE: "grouping" "Groups and clumps"
 { $subsections circular-clump }
 "A virtual sequence for splitting a sequence into overlapping, fixed-length subsequences:"
 { $subsections clumps <clumps> }
-"A virtual sequence for splitting a sequence into overlapping, fixed-length subsequences:"
+"A virtual sequence for splitting a sequence into overlapping, fixed-length subsequences, wrapping around the end of the sequence:"
 { $subsections circular-clumps <circular-clumps> }
 "The difference can be summarized as the following:"
 { $list
     { "With groups, the subsequences form the original sequence when concatenated:"
-        { $unchecked-example
+        { $example
             "USING: grouping ;"
-            "{ 1 2 3 4 } 2 group ." "{ { 1 2 } { 3 4 } }"
+            "{ 1 2 3 4 } 2 group ."
+            "{ { 1 2 } { 3 4 } }"
         }
-        { $unchecked-example
+        { $example
             "USING: grouping ;"
-            "{ 1 2 3 4 } dup" "2 <groups> concat sequence= ." "t"
+            "{ 1 2 3 4 } dup"
+            "2 <groups> concat sequence= ."
+            "t"
         }
     }
     { "With clumps, collecting the first element of each subsequence but the last one, together with the last subsequence, yields the original sequence:"
-        { $unchecked-example
+        { $example
             "USING: grouping ;"
-            "{ 1 2 3 4 } 2 clump ." "{ { 1 2 } { 2 3 } { 3 4 } }"
+            "{ 1 2 3 4 } 2 clump ."
+            "{ { 1 2 } { 2 3 } { 3 4 } }"
         }
-        { $unchecked-example
+        { $example
             "USING: grouping assocs sequences ;"
-            "{ 1 2 3 4 } dup" "2 <clumps> unclip-last [ keys ] dip append sequence= ." "t"
+            "{ 1 2 3 4 } dup"
+            "2 <clumps> unclip-last [ keys ] dip append sequence= ."
+            "t"
         }
     }
     { "With circular clumps, collecting the first element of each subsequence yields the original sequence. Collecting the " { $snippet "n" } "th element of each subsequence would rotate the original sequence " { $snippet "n" } " elements rightward:"
-        { $unchecked-example
+        { $example
             "USING: grouping ;"
-            "{ 1 2 3 4 } 2 circular-clump ." "{ { 1 2 } { 2 3 } { 3 4 } { 4 1 } }"
+            "{ 1 2 3 4 } 2 circular-clump ."
+            "{ { 1 2 } { 2 3 } { 3 4 } { 4 1 } }"
         }
-        { $unchecked-example
+        { $example
             "USING: grouping assocs sequences ;"
-            "{ 1 2 3 4 } dup" "2 <circular-clumps> keys sequence= ." "t"
+            "{ 1 2 3 4 } dup"
+            "2 <circular-clumps> keys sequence= ."
+            "t"
         }
-        { $unchecked-example
+        { $example
             "USING: grouping ;"
-            "{ 1 2 3 4 } dup" "2 <circular-clumps> [ second ] { } map-as ." "{ 2 3 4 1 }"
+            "{ 1 2 3 4 }"
+            "2 <circular-clumps> [ second ] { } map-as ."
+            "{ 2 3 4 1 }"
         }
     }
 }
@@ -78,7 +89,7 @@ HELP: <groups>
 { $examples
     { $example
         "USING: arrays kernel prettyprint sequences grouping ;"
-        "9 iota >array 3 <groups>"
+        "9 <iota> >array 3 <groups>"
         "dup [ reverse! drop ] each concat >array ."
         "{ 2 1 0 5 4 3 8 7 6 }"
     }
@@ -112,7 +123,9 @@ HELP: circular-clump
 { $description "Splits the sequence into overlapping clumps of " { $snippet "n" } " elements, wrapping around the end of the sequence, and collects the clumps into a new array." }
 { $notes "For an empty sequence, the result is an empty sequence." }
 { $examples
-    { $example "USING: grouping prettyprint ;" "{ 3 1 3 3 7 } 2 circular-clump ." "{ { 3 1 } { 1 3 } { 3 3 } { 3 7 } { 7 3 } }" }
+    { $example "USING: grouping prettyprint ;"
+    "{ 3 1 3 3 7 } 2 circular-clump ."
+    "{ { 3 1 } { 1 3 } { 3 3 } { 3 7 } { 7 3 } }" }
 } ;
 
 HELP: <clumps>

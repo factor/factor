@@ -9,7 +9,6 @@ IN: compression.inflate
 
 <PRIVATE
 
-ERROR: zlib-unimplemented ;
 ERROR: bad-zlib-data ;
 ERROR: bad-zlib-header ;
 
@@ -27,14 +26,14 @@ ERROR: bad-zlib-header ;
 CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
 
 : get-table ( values size -- table )
-    16 f <array> <enum>
+    16 f <array> <enumerated>
     [ '[ _ push-at ] 2each ] keep
     seq>> rest-slice [ natural-sort ] map ; inline
 
 :: decode-huffman-tables ( bitstream -- tables )
     5 bitstream bs:read 257 +
     5 bitstream bs:read 1 +
-    4 bitstream bs:read 4 + clen-shuffle swap head 
+    4 bitstream bs:read 4 + clen-shuffle swap head
 
     dup length [ 3 bitstream bs:read ] replicate
     get-table
@@ -60,7 +59,7 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
     ] reduce
     [ dup array? [ second 0 <repetition> ] [ 1array ] if ] map concat
     nip swap cut 2array
-    [ [ length>> iota ] [ ] bi get-table ] map ;
+    [ [ length>> <iota> ] [ ] bi get-table ] map ;
 
 MEMO: static-huffman-tables ( -- obj )
     [
@@ -70,7 +69,7 @@ MEMO: static-huffman-tables ( -- obj )
         280 287 [a,b] length [ 8 ] replicate append
     ] append-outputs
     0 31 [a,b] length [ 5 ] replicate 2array
-    [ [ length>> iota ] [ ] bi get-table ] map ;
+    [ [ length>> <iota> ] [ ] bi get-table ] map ;
 
 CONSTANT: length-table
     {

@@ -1,3 +1,0 @@
-simulation
-physics
-demos

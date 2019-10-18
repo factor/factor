@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes.struct classes.tuple combinators fry
 functors kernel locals macros math parser quotations sequences
 sequences.private slots specialized-arrays words ;
@@ -45,7 +46,7 @@ MACRO: (vectored-element>) ( struct-class -- quot: ( elt -- struct ) )
 SLOT: (n)
 SLOT: (vectored)
 
-FUNCTOR: define-vectored-accessors ( S>> S<< T -- )
+<FUNCTOR: define-vectored-accessors ( S>> S<< T -- )
 
 WHERE
 
@@ -54,14 +55,14 @@ M: T S>>
 M: T S<<
     [ (n)>> ] [ (vectored)>> S>> ] bi set-nth-unsafe ; inline
 
-;FUNCTOR
+;FUNCTOR>
 
 PRIVATE>
 
 GENERIC: struct-transpose ( structstruct -- ssttrruucctt )
 GENERIC: vectored-element> ( elt -- struct )
 
-FUNCTOR: define-vectored-struct ( T -- )
+<FUNCTOR: define-vectored-struct ( T -- )
 
 T-array [ T array-class-of ]
 
@@ -108,10 +109,10 @@ M: vectored-T struct-transpose
     [ vectored-element> ] T-array new map-as ; inline
 
 M: T-array struct-transpose
-    dup length [ nip iota ] [ drop ] [ nip (vectored-T) ] 2tri
+    dup length [ nip <iota> ] [ drop ] [ nip (vectored-T) ] 2tri
     [ [ [ nth ] [ set-nth ] bi-curry* bi ] 2curry each ] keep ; inline
 
-;FUNCTOR
+;FUNCTOR>
 
 SYNTAX: VECTORED-STRUCT:
     scan-word define-vectored-struct ;

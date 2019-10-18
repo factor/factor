@@ -1,6 +1,5 @@
 USING: system-info.linux strings splitting sequences
 tools.test kernel ;
-IN: system-info.linux.tests
 
 [ 6 ] [ uname length ] unit-test
 
@@ -11,6 +10,6 @@ IN: system-info.linux.tests
 [ t ] [ machine    string? ] unit-test
 [ t ] [ domainname string? ] unit-test
 
-[ t ] [
-    release "." split1 drop { "2" "3" } member?
+{ t } [
+    release "." split1 drop { "2" "3" "4" } member?
 ] unit-test

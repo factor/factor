@@ -1,13 +1,13 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences io.files io.encodings.ascii kernel splitting
-accessors math.parser ascii io assocs strings math namespaces make
-sorting combinators math.order arrays unicode.normalize unicode.data
-locals macros sequences.deep words unicode.breaks quotations
-combinators.short-circuit simple-flat-file ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit kernel locals make math math.order
+math.parser namespaces sequences simple-flat-file splitting
+strings unicode.data ;
 IN: unicode.collation
 
 <PRIVATE
+
 SYMBOL: ducet
 
 TUPLE: weight primary secondary tertiary ignorable? ;
@@ -23,7 +23,8 @@ TUPLE: weight primary secondary tertiary ignorable? ;
     " " split [ hex> ] "" map-as ;
 
 : parse-ducet ( file -- ducet )
-    data [ [ parse-keys ] [ parse-weight ] bi* ] H{ } assoc-map-as ;
+    load-data-file
+    [ [ parse-keys ] [ parse-weight ] bi* ] H{ } assoc-map-as ;
 
 "vocab:unicode/collation/allkeys.txt" parse-ducet ducet set-global
 
@@ -41,12 +42,12 @@ TUPLE: weight primary secondary tertiary ignorable? ;
 
 ducet get-global insert-helpers
 
-: base ( char -- base )
+:: base ( char -- base )
     {
-        { [ dup 0x3400 0x4DB5 between? ] [ drop 0xFB80 ] } ! Extension A
-        { [ dup 0x20000 0x2A6D6 between? ] [ drop 0xFB80 ] } ! Extension B
-        { [ dup 0x4E00 0x9FC3 between? ] [ drop 0xFB40 ] } ! CJK
-        [ drop 0xFBC0 ] ! Other
+        { [ char 0x03400 0x04DB5 between? ] [ 0xFB80 ] } ! Extension A
+        { [ char 0x20000 0x2A6D6 between? ] [ 0xFB80 ] } ! Extension B
+        { [ char 0x04E00 0x09FC3 between? ] [ 0xFB40 ] } ! CJK
+        [ 0xFBC0 ] ! Other
     } cond ;
 
 : AAAA ( char -- weight )
@@ -56,15 +57,20 @@ ducet get-global insert-helpers
     0x7FFF bitand 0x8000 bitor 0 0 f weight boa ;
 
 : illegal? ( char -- ? )
-    { [ "Noncharacter_Code_Point" property? ] [ category "Cs" = ] } 1|| ;
+    {
+        [ "Noncharacter_Code_Point" property? ]
+        [ category "Cs" = ]
+    } 1|| ;
 
 : derive-weight ( char -- weights )
-    first dup illegal?
-    [ drop { } ]
-    [ [ AAAA ] [ BBBB ] bi 2array ] if ;
+    first dup illegal? [
+        drop { }
+    ] [
+        [ AAAA ] [ BBBB ] bi 2array
+    ] if ;
 
 : building-last ( -- char )
-    building get empty? [ 0 ] [ building get last last ] if ;
+    building get [ 0 ] [ last last ] if-empty ;
 
 : blocked? ( char -- ? )
     combining-class dup { 0 f } member?
@@ -82,7 +88,7 @@ ducet get-global insert-helpers
 
 : add ( char -- )
     dup blocked? [ 1string , ] [
-        dup possible-bases dup length iota
+        dup possible-bases dup length <iota>
         [ ?combine ] 2with any?
         [ drop ] [ 1string , ] if
     ] if ;
@@ -97,8 +103,8 @@ ducet get-global insert-helpers
     ] { } map-as concat ;
 
 : append-weights ( weights quot -- )
-    [ [ ignorable?>> not ] filter ] dip
-    map [ zero? not ] filter % 0 , ; inline
+    [ [ ignorable?>> ] reject ] dip map
+    [ zero? ] reject % 0 , ; inline
 
 : variable-weight ( weight -- )
     dup ignorable?>> [ primary>> ] [ drop 0xFFFF ] if , ;
@@ -112,11 +118,15 @@ ducet get-global insert-helpers
             [ [ variable-weight ] each ]
         } cleave
     ] { } make ;
+
 PRIVATE>
 
 : completely-ignorable? ( weight -- ? )
-    [ primary>> ] [ secondary>> ] [ tertiary>> ] tri
-    [ zero? ] tri@ and and ;
+    {
+        [ primary>> zero? ]
+        [ secondary>> zero? ]
+        [ tertiary>> zero? ]
+    } 1&& ;
 
 : filter-ignorable ( weights -- weights' )
     f swap [
@@ -124,36 +134,3 @@ PRIVATE>
         [ swap ignorable?>> or ]
         [ swap completely-ignorable? or not ] 2bi
     ] filter nip ;
-
-: collation-key ( string -- key )
-    nfd string>graphemes graphemes>weights
-    filter-ignorable weights>bytes ;
-
-<PRIVATE
-: insensitive= ( str1 str2 levels-removed -- ? )
-    [
-        [ collation-key ] dip
-        [ [ 0 = not ] trim-tail but-last ] times
-    ] curry same? ;
-PRIVATE>
-
-: primary= ( str1 str2 -- ? )
-    3 insensitive= ;
-
-: secondary= ( str1 str2 -- ? )
-    2 insensitive= ;
-
-: tertiary= ( str1 str2 -- ? )
-    1 insensitive= ;
-
-: quaternary= ( str1 str2 -- ? )
-    0 insensitive= ;
-
-: w/collation-key ( str -- {str,key} )
-    [ collation-key ] keep 2array ;
-
-: sort-strings ( strings -- sorted )
-    [ w/collation-key ] map natural-sort values ;
-
-: string<=> ( str1 str2 -- <=> )
-    [ w/collation-key ] compare ;

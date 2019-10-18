@@ -1,13 +1,10 @@
 ! Copyright (C) 2011-2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-
 USING: accessors assocs calendar combinators environment fonts
 formatting fry io io.streams.string kernel literals locals make
-math math.order math.ranges pdf.canvas pdf.values pdf.wrap
-sequences sequences.extras sorting splitting ui.text
+math math.order math.ranges namespaces pdf.canvas pdf.values
+pdf.wrap sequences sequences.extras sorting splitting ui.text
 xml.entities ;
-FROM: assocs => change-at ;
-FROM: sequences => change-nth ;
 FROM: pdf.canvas => draw-text ;
 
 IN: pdf.layout
@@ -152,7 +149,7 @@ M: hr pdf-render
     [
         [ dup 0 > pick avail-lines 0 > and ] [
             over avail-width over min [ - ] keep [
-                [ over ] dip [ draw-line ] [ inc-x ] 2bi
+                overd [ draw-line ] [ inc-x ] 2bi
             ] unless-zero dup 0 > [ over line-break ] when
         ] while
     ] change-width nip dup width>> 0 > [ drop f ] unless ;
@@ -254,7 +251,7 @@ M: table-row pdf-render
     ] each widths >alist sort-keys values
 
     ! make last cell larger
-    dup sum 400 swap [-] [ + ] curry dupd change-last
+    dup sum 400 swap [-] [ + ] curry dupd sequences.extras:change-last
 
     ! size down each column
     dup sum dup 400 > [ 400 swap / [ * ] curry map ] [ drop ] if ;
@@ -355,14 +352,16 @@ M: table pdf-width
         "%%EOF" ,
     ] { } make "\n" join ;
 
+SYMBOLS: pdf-producer pdf-author pdf-creator ;
+
 TUPLE: pdf-info title timestamp producer author creator ;
 
 : <pdf-info> ( -- pdf-info )
     pdf-info new
         now >>timestamp
-        "Factor" >>producer
-        "USER" os-env "unknown" or >>author
-        "created with Factor" >>creator ;
+        pdf-producer get >>producer
+        pdf-author get >>author
+        pdf-creator get >>creator ;
 
 M: pdf-info pdf-value
     [

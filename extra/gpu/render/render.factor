@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data arrays
 assocs classes classes.mixin classes.parser classes.singleton classes.struct
 classes.tuple classes.tuple.private combinators combinators.tuple destructors fry
@@ -122,7 +123,7 @@ ERROR: invalid-uniform-type uniform ;
         { uint-indexes   [ GL_UNSIGNED_INT   ] }
     } case ; inline
 
-: gl-primitive-mode ( primitive-mode -- gl-primitive-mode ) 
+: gl-primitive-mode ( primitive-mode -- gl-primitive-mode )
     {
         { points-mode         [ GL_POINTS         ] }
         { lines-mode          [ GL_LINES          ] }
@@ -139,7 +140,7 @@ ERROR: invalid-uniform-type uniform ;
 
 GENERIC: render-vertex-indexes ( primitive-mode vertex-indexes -- )
 
-GENERIC# render-vertex-indexes-instanced 1 ( primitive-mode vertex-indexes instances -- )
+GENERIC#: render-vertex-indexes-instanced 1 ( primitive-mode vertex-indexes instances -- )
 
 GENERIC: gl-array-element-type ( array -- type )
 M: uchar-array  gl-array-element-type drop GL_UNSIGNED_BYTE  ; inline
@@ -153,7 +154,7 @@ M: index-range render-vertex-indexes-instanced
     [ gl-primitive-mode ] [ [ start>> ] [ count>> ] bi ] [ ] tri*
     glDrawArraysInstanced ;
 
-M: multi-index-range render-vertex-indexes 
+M: multi-index-range render-vertex-indexes
     [ gl-primitive-mode ] [ [ starts>> ] [ counts>> dup length ] bi ] bi*
     glMultiDrawArrays ;
 
@@ -217,7 +218,7 @@ M: uniform-tuple (bind-uniforms)
 
 : all-uniform-tuple-slots ( class -- slots )
     dup "uniform-tuple-slots" word-prop
-    [ [ superclass all-uniform-tuple-slots ] dip append ] [ drop { } ] if* ;
+    [ [ superclass-of all-uniform-tuple-slots ] dip append ] [ drop { } ] if* ;
 
 DEFER: uniform-texture-accessors
 
@@ -229,7 +230,7 @@ DEFER: uniform-texture-accessors
     dup length 1 = [ first swap prefix ] [ [ ] 2sequence ] if ;
 
 : uniform-tuple-texture-accessors ( uniform-type -- accessors )
-    all-uniform-tuple-slots [ uniform-type>> uniform-type-texture-units zero? not ] filter
+    all-uniform-tuple-slots [ uniform-type>> uniform-type-texture-units zero? ] reject
     [ uniform-slot-texture-accessor ] map ;
 
 : uniform-texture-accessors ( uniform-type dim -- accessors )
@@ -239,7 +240,7 @@ DEFER: uniform-texture-accessors
         [ uniform-tuple-texture-accessors ] if
     ] [
         2dup swap empty? not and [
-            iota [
+            <iota> [
                 [ swap nth ] swap prefix
                 over length 1 = [ swap first append ] [ swap suffix ] if
             ] with map
@@ -264,14 +265,14 @@ GENERIC: >uniform-int-array ( sequence -- c-array )
 GENERIC: >uniform-uint-array ( sequence -- c-array )
 GENERIC: >uniform-float-array  ( sequence -- c-array )
 
-GENERIC# >uniform-bvec-array 1 ( sequence dim -- c-array )
-GENERIC# >uniform-ivec-array 1 ( sequence dim -- c-array )
-GENERIC# >uniform-uvec-array 1 ( sequence dim -- c-array )
-GENERIC# >uniform-vec-array  1 ( sequence dim -- c-array )
+GENERIC#: >uniform-bvec-array 1 ( sequence dim -- c-array )
+GENERIC#: >uniform-ivec-array 1 ( sequence dim -- c-array )
+GENERIC#: >uniform-uvec-array 1 ( sequence dim -- c-array )
+GENERIC#: >uniform-vec-array  1 ( sequence dim -- c-array )
 
-GENERIC# >uniform-matrix 2 ( sequence cols rows -- c-array )
+GENERIC#: >uniform-matrix 2 ( sequence cols rows -- c-array )
 
-GENERIC# >uniform-matrix-array 2 ( sequence cols rows -- c-array )
+GENERIC#: >uniform-matrix-array 2 ( sequence cols rows -- c-array )
 
 GENERIC: bind-uniform-bvec2 ( index sequence -- )
 GENERIC: bind-uniform-bvec3 ( index sequence -- )
@@ -287,16 +288,16 @@ GENERIC: bind-uniform-vec3  ( index sequence -- )
 GENERIC: bind-uniform-vec4  ( index sequence -- )
 
 M: object >uniform-bool-array [ >c-bool ] int-array{ } map-as ; inline
-M: binary-data >uniform-bool-array ; inline 
+M: binary-data >uniform-bool-array ; inline
 
 M: object >uniform-int-array c:int >c-array ; inline
-M: binary-data >uniform-int-array ; inline 
+M: binary-data >uniform-int-array ; inline
 
 M: object >uniform-uint-array c:uint >c-array ; inline
-M: binary-data >uniform-uint-array ; inline 
+M: binary-data >uniform-uint-array ; inline
 
 M: object >uniform-float-array c:float >c-array ; inline
-M: binary-data >uniform-float-array ; inline 
+M: binary-data >uniform-float-array ; inline
 
 M: object >uniform-bvec-array '[ _ head-slice [ >c-bool ] int-array{ } map-as ] map concat ; inline
 M: binary-data >uniform-bvec-array drop ; inline
@@ -315,7 +316,7 @@ M:: object >uniform-matrix ( sequence cols rows -- c-array )
      [ rows head-slice c:float >c-array ] { } map-as concat ; inline
 M: binary-data >uniform-matrix 2drop ; inline
 
-M: object >uniform-matrix-array 
+M: object >uniform-matrix-array
      '[ _ _ >uniform-matrix ] map concat ; inline
 M: binary-data >uniform-matrix-array 2drop ; inline
 
@@ -398,7 +399,7 @@ DEFER: [bind-uniform-tuple]
         { mat4x3-uniform { [ dim 0 ] dip 4 3 >uniform-matrix-array glUniformMatrix4x3fv } }
         { mat4-uniform   { [ dim 0 ] dip 4 4 >uniform-matrix-array glUniformMatrix4fv   } }
 
-        { texture-uniform { drop dim dup iota [ texture-unit + ] int-array{ } map-as glUniform1iv } }
+        { texture-uniform { drop dim dup <iota> [ texture-unit + ] int-array{ } map-as glUniform1iv } }
     } at [ uniform invalid-uniform-type ] unless* >quotation :> value-quot
 
     type uniform-type-texture-units dim * texture-unit +
@@ -450,7 +451,7 @@ DEFER: [bind-uniform-tuple]
 :: [bind-uniform-struct] ( value>>-quot type texture-unit name dim -- texture-unit' quot )
     dim
     [
-        iota
+        <iota>
         [ [ [ swap nth ] swap prefix ] map ]
         [ [ number>string name "[" append "]." surround ] map ] bi
     ] [
@@ -505,10 +506,10 @@ DEFER: [bind-uniform-tuple]
 : parse-uniform-tuple-definition ( -- class superclass uniforms )
     scan-new-class scan-token {
         { ";" [ uniform-tuple f ] }
-        { "<" [ scan-word parse-definition [ first3 uniform boa ] map ] }
+        { "<" [ scan-word parse-array-def [ first3 uniform boa ] map ] }
         { "{" [
             uniform-tuple
-            \ } parse-until parse-definition swap prefix
+            \ } parse-until parse-array-def swap prefix
             [ first3 uniform boa ] map
         ] }
     } case ;
@@ -529,7 +530,7 @@ DEFER: [bind-uniform-tuple]
     } 3cleave ;
 
 : true-subclasses ( class -- seq )
-    [ subclasses ] keep [ = not ] curry filter ;
+    [ subclasses ] keep [ = ] curry reject ;
 
 PRIVATE>
 
@@ -539,7 +540,7 @@ PRIVATE>
 SYNTAX: UNIFORM-TUPLE:
     parse-uniform-tuple-definition define-uniform-tuple ;
 
-<PRIVATE 
+<PRIVATE
 
 : bind-unnamed-output-attachments ( framebuffer attachments -- )
     [ gl-attachment ] with map
@@ -553,7 +554,7 @@ SYNTAX: UNIFORM-TUPLE:
 
 : bind-output-attachments ( program-instance framebuffer attachments -- )
     dup first sequence?
-    [ bind-named-output-attachments ] [ [ drop ] 2dip bind-unnamed-output-attachments ] if ;
+    [ bind-named-output-attachments ] [ nipd bind-unnamed-output-attachments ] if ;
 
 GENERIC: bind-transform-feedback-output ( output -- )
 
@@ -586,7 +587,7 @@ TUPLE: render-set
     { primitive-mode primitive-mode read-only }
     { vertex-array vertex-array initial: T{ vertex-array-collection } read-only }
     { uniforms uniform-tuple read-only }
-    { indexes vertex-indexes initial: T{ index-range } read-only } 
+    { indexes vertex-indexes initial: T{ index-range } read-only }
     { instances maybe{ integer } initial: f read-only }
     { framebuffer maybe{ any-framebuffer } initial: system-framebuffer read-only }
     { output-attachments sequence initial: { default-attachment } read-only }
@@ -612,7 +613,7 @@ TUPLE: render-set
             bind-uniforms
         ]
         [
-            framebuffer>> 
+            framebuffer>>
             [ GL_DRAW_FRAMEBUFFER swap framebuffer-handle glBindFramebuffer ]
             [ GL_DRAW_FRAMEBUFFER 0 glBindFramebuffer GL_RASTERIZER_DISCARD glEnable ] if*
         ]
@@ -639,4 +640,3 @@ TUPLE: render-set
         [ transform-feedback-output>> [ glEndTransformFeedback ] when ]
         [ framebuffer>> [ GL_RASTERIZER_DISCARD glDisable ] unless ]
     } cleave ; inline
-

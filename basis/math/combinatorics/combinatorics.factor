@@ -3,9 +3,8 @@
 
 USING: accessors arrays assocs binary-search classes.tuple
 combinators fry hints kernel kernel.private locals math
-math.order math.ranges memoize namespaces sequences
+math.functions math.order math.ranges namespaces sequences
 sequences.private sorting strings vectors ;
-FROM: sequences => change-nth ;
 IN: math.combinatorics
 
 <PRIVATE
@@ -18,7 +17,7 @@ GENERIC: nths-unsafe ( indices seq -- seq' )
 M: string nths-unsafe (nths-unsafe) ;
 M: array nths-unsafe (nths-unsafe) ;
 M: vector nths-unsafe (nths-unsafe) ;
-M: iota-tuple nths-unsafe (nths-unsafe) ;
+M: iota nths-unsafe (nths-unsafe) ;
 M: object nths-unsafe (nths-unsafe) ;
 
 : possible? ( n m -- ? )
@@ -29,7 +28,7 @@ M: object nths-unsafe (nths-unsafe) ;
 
 PRIVATE>
 
-MEMO: factorial ( n -- n! )
+: factorial ( n -- n! )
     dup 1 > [ [1,b] product ] [ drop 1 ] if ;
 
 : nPk ( n k -- nPk )
@@ -58,8 +57,8 @@ MEMO: factorial ( n -- n! )
 : permutation-indices ( n seq -- permutation )
     length [ factoradic ] dip 0 pad-head >permutation ;
 
-: permutation-iota ( seq -- iota )
-    length factorial iota ; inline
+: permutation-iota ( seq -- <iota> )
+    length factorial <iota> ; inline
 
 PRIVATE>
 
@@ -102,7 +101,7 @@ DEFER: next-permutation
 <PRIVATE
 
 : permutations-quot ( seq quot -- seq quot' )
-    [ [ permutation-iota ] [ length iota >array ] [ ] tri ] dip
+    [ [ permutation-iota ] [ length <iota> >array ] [ ] tri ] dip
     '[ drop _ [ _ nths-unsafe @ ] keep next-permutation drop ] ; inline
 
 PRIVATE>
@@ -130,7 +129,7 @@ PRIVATE>
     swapd each-permutation ; inline
 
 : inverse-permutation ( seq -- permutation )
-    <enum> sort-values keys ;
+    <enumerated> sort-values keys ;
 
 <PRIVATE
 
@@ -154,7 +153,7 @@ HINTS: (next-permutation) array ;
 PRIVATE>
 
 : next-permutation ( seq -- seq )
-    dup [ ] [ drop (next-permutation) ] if-empty ;
+    dup empty? [ (next-permutation) ] unless ;
 
 
 ! Combinadic-based combination methodology
@@ -217,7 +216,7 @@ INSTANCE: combinations immutable-sequence
 
 :: combinations-quot ( seq k quot -- seq quot' )
     seq length :> n
-    n k nCk iota k iota >array seq quot n
+    n k nCk <iota> k <iota> >array seq quot n
     '[ drop _ [ _ nths-unsafe @ ] keep _ next-combination drop ] ; inline
 
 PRIVATE>
@@ -245,17 +244,27 @@ PRIVATE>
     [ drop pick [ combination ] [ 3drop f ] if ] 3bi ; inline
 
 : reduce-combinations ( ... seq k identity quot: ( ... prev elt -- ... next ) -- ... result )
-    [ -rot ] dip each-combination ; inline
+    -rotd each-combination ; inline
 
 : all-subsets ( seq -- subsets )
     dup length [0,b] [ all-combinations ] with map concat ;
 
 <PRIVATE
 
-: (selections) ( seq n -- selections )
-    [ dup [ 1sequence ] curry { } map-as dup ] [ 1 - ] bi* [
-        cartesian-product concat [ concat ] map
-    ] with times ;
+:: next-selection ( seq n -- )
+    1 seq length 1 - [
+        dup 0 >= [ over 0 = ] [ t ] if
+    ] [
+        [ seq [ + n /mod ] change-nth-unsafe ] keep 1 -
+    ] do until 2drop ; inline
+
+:: (selections) ( seq n -- selections )
+    seq length :> len
+    n 0 <array> :> idx
+    len n ^ [
+        idx seq nths-unsafe
+        idx len next-selection
+    ] replicate ;
 
 PRIVATE>
 

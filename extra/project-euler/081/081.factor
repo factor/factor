@@ -45,7 +45,7 @@ IN: project-euler.081
 :: minimal-path-sum-to ( x y matrix -- n )
     x y + zero? [ 0 ] [
         x zero? [ 0 y 1 - matrix get-matrix
-        ] [ 
+        ] [
             y zero? [
                 x 1 - 0 matrix get-matrix
             ] [
@@ -60,7 +60,7 @@ IN: project-euler.081
     3dup minimal-path-sum-to '[ _ + ] change-matrix ;
 
 : (euler081) ( matrix -- n )
-    dup first length iota dup
+    dup first length <iota> dup
     [ pick update-minimal-path-sum ] cartesian-each
     last last ;
 

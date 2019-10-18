@@ -1,27 +1,22 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators fry grouping kernel layouts
-locals math make namespaces sequences cpu.architecture
-compiler.cfg
-compiler.cfg.rpo
-compiler.cfg.hats
-compiler.cfg.registers
-compiler.cfg.utilities
-compiler.cfg.comparisons
-compiler.cfg.instructions
-compiler.cfg.predecessors ;
+USING: accessors assocs compiler.cfg compiler.cfg.comparisons
+compiler.cfg.instructions compiler.cfg.predecessors
+compiler.cfg.registers compiler.cfg.rpo compiler.cfg.utilities
+cpu.architecture grouping kernel layouts locals make math
+namespaces sequences ;
 IN: compiler.cfg.gc-checks
 
 <PRIVATE
 
 : insert-gc-check? ( bb -- ? )
     dup kill-block?>>
-    [ drop f ] [ instructions>> [ ##allocation? ] any? ] if ;
+    [ drop f ] [ instructions>> [ allocation-insn? ] any? ] if ;
 
 : blocks-with-gc ( cfg -- bbs )
     post-order [ insert-gc-check? ] filter ;
 
-GENERIC# gc-check-offsets* 1 ( call-index seen-allocation? insn n -- call-index seen-allocation? )
+GENERIC#: gc-check-offsets* 1 ( call-index seen-allocation? insn n -- call-index seen-allocation? )
 
 :: gc-check-here ( call-index seen-allocation? insn insn-index -- call-index seen-allocation? )
     seen-allocation? [ call-index , ] when
@@ -30,14 +25,10 @@ GENERIC# gc-check-offsets* 1 ( call-index seen-allocation? insn n -- call-index 
 M: ##callback-inputs gc-check-offsets* gc-check-here ;
 M: ##phi gc-check-offsets* gc-check-here ;
 M: gc-map-insn gc-check-offsets* gc-check-here ;
-M: ##allocation gc-check-offsets* 3drop t ;
+M: allocation-insn gc-check-offsets* 3drop t ;
 M: insn gc-check-offsets* 2drop ;
 
 : gc-check-offsets ( insns -- seq )
-    ! A basic block is divided into sections by call and phi
-    ! instructions. For every section with at least one
-    ! allocation, record the offset of its first instruction
-    ! in a sequence.
     [
         [ 0 f ] dip
         [ gc-check-offsets* ] each-index
@@ -62,13 +53,10 @@ M: ##box-alien allocation-size* drop 5 cells ;
 M: ##box-displaced-alien allocation-size* drop 5 cells ;
 
 : allocation-size ( insns -- n )
-    [ ##allocation? ] filter
+    [ allocation-insn? ] filter
     [ allocation-size* data-alignment get align ] map-sum ;
 
 : add-gc-checks ( insns-seq -- )
-    ! Insert a GC check at the end of every chunk but the last
-    ! one. This ensures that every section other than the first
-    ! has a GC check in the section immediately preceeding it.
     2 <clumps> [
         first2 allocation-size
         cc<= int-rep next-vreg-rep int-rep next-vreg-rep
@@ -77,12 +65,12 @@ M: ##box-displaced-alien allocation-size* drop 5 cells ;
     ] each ;
 
 : make-blocks ( insns-seq -- bbs )
-    [ <basic-block> swap >>instructions ] map ;
+    [ f insns>block ] map ;
 
 : <gc-call> ( -- bb )
     <basic-block>
     [ <gc-map> ##call-gc, ##branch, ] V{ } make
-    >>instructions t >>unlikely? ;
+    >>instructions ;
 
 :: connect-gc-checks ( bbs -- )
     ! Every basic block but the last has two successors:
@@ -127,9 +115,7 @@ M: ##box-displaced-alien allocation-size* drop 5 cells ;
 
 PRIVATE>
 
-: insert-gc-checks ( cfg -- cfg' )
-    dup blocks-with-gc [
-        [ needs-predecessors ] dip
-        [ process-block ] each
-        cfg-changed
-    ] unless-empty ;
+: insert-gc-checks ( cfg -- )
+    [ needs-predecessors ]
+    [ blocks-with-gc [ process-block ] each ]
+    [ cfg-changed ] tri ;

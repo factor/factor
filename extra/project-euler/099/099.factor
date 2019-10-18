@@ -1,7 +1,8 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.encodings.ascii io.files kernel math math.functions math.parser
-    math.vectors sequences splitting project-euler.common ;
+USING: io.encodings.ascii io.files kernel math math.functions
+math.parser math.vectors project-euler.common sequences
+sequences.extras splitting ;
 IN: project-euler.099
 
 ! http://projecteuler.net/index.php?section=problems&id=99
@@ -35,11 +36,11 @@ IN: project-euler.099
     ascii file-lines [ "," split [ string>number ] map ] map ;
 
 : simplify ( seq -- seq )
-    #! exponent * log(base)
+    ! exponent * log(base)
     flip first2 swap [ log ] map v* ;
 
 : solve ( seq -- index )
-    simplify [ supremum ] keep index 1 + ;
+    simplify arg-max 1 + ;
 
 PRIVATE>
 

@@ -1,8 +1,7 @@
-USING: xmode.loader xmode.utilities xmode.rules namespaces
-strings splitting assocs sequences kernel io.files xml memoize
-words globs combinators io.encodings.utf8 io.pathnames sorting
-accessors regexp unicode.case xml.data xml.traversal
-xml.syntax ;
+USING: accessors assocs globs io.pathnames kernel memoize
+namespaces regexp sequences sorting splitting strings
+unicode xml xml.data xml.syntax xml.traversal xmode.loader
+xmode.rules xmode.utilities ;
 IN: xmode.catalog
 
 TUPLE: mode file file-name-glob first-line-glob ;
@@ -88,8 +87,6 @@ DEFER: finalize-rule-set
         ] with-variable
     ] with each ;
 
-ERROR: mutually-recursive-rulesets ruleset ;
-
 : finalize-rule-set ( ruleset -- )
     dup finalized?>> [ drop ] [
         t >>finalized?
@@ -120,7 +117,7 @@ ERROR: mutually-recursive-rulesets ruleset ;
     [ file-name ] dip
     modes
     [ nip [ 2dup ] dip suitable-mode? ] assoc-find
-    2drop [ 2drop ] dip ;
+    2drop 2nip ;
 
 : find-mode ( file-name first-line -- mode )
     ?find-mode "text" or ; inline

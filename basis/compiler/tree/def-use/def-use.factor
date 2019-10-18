@@ -1,13 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays fry namespaces sequences kernel generic assocs
-classes vectors accessors combinators sets
-stack-checker.state
-stack-checker.branches
-compiler.tree
-compiler.tree.combinators ;
-FROM: namespaces => set ;
-FROM: sets => members ;
+USING: accessors assocs compiler.tree compiler.tree.combinators
+fry kernel namespaces sequences stack-checker.branches ;
+QUALIFIED: sets
 IN: compiler.tree.def-use
 
 SYMBOL: def-use
@@ -56,7 +51,7 @@ GENERIC: node-uses-values ( node -- values )
 
 M: #introduce node-uses-values drop f ;
 M: #push node-uses-values drop f ;
-M: #phi node-uses-values phi-in-d>> concat remove-bottom members ;
+M: #phi node-uses-values phi-in-d>> concat remove-bottom sets:members ;
 M: #declare node-uses-values drop f ;
 M: #terminate node-uses-values [ in-d>> ] [ in-r>> ] bi append ;
 M: #shuffle node-uses-values [ in-d>> ] [ in-r>> ] bi append ;

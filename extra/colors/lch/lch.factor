@@ -2,23 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors colors colors.lab colors.luv colors.xyz kernel
-locals math math.constants math.functions math.libm ;
+locals math math.functions math.libm math.trig ;
 
 IN: colors.lch
 
 TUPLE: LCHuv l c h alpha ;
 
 C: <LCHuv> LCHuv
-
-<PRIVATE
-
-: deg>rad ( degrees -- radians )
-    pi * 180 / ; inline
-
-: rad>deg ( radians -- degrees )
-    180 * pi / ; inline
-
-PRIVATE>
 
 M: LCHuv >rgba >luva >rgba ;
 

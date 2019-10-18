@@ -1,27 +1,24 @@
-USING: alien arrays generic assocs hashtables io
-io.streams.string kernel math namespaces parser prettyprint
-sequences strings tools.test vectors words quotations classes
-classes.private classes.union classes.mixin classes.predicate
-classes.algebra definitions source-files compiler.units
-kernel.private sorting vocabs memory eval accessors sets ;
+USING: assocs classes classes.private compiler.units definitions
+eval generic io.streams.string kernel math multiline namespaces
+parser sequences sets sorting tools.test vocabs words ;
 IN: classes.tests
 
-[ t ] [ 3 object instance? ] unit-test
-[ t ] [ 3 fixnum instance? ] unit-test
-[ f ] [ 3 float instance? ] unit-test
-[ t ] [ 3 number instance? ] unit-test
-[ f ] [ 3 null instance? ] unit-test
+{ t } [ 3 object instance? ] unit-test
+{ t } [ 3 fixnum instance? ] unit-test
+{ f } [ 3 float instance? ] unit-test
+{ t } [ 3 number instance? ] unit-test
+{ f } [ 3 null instance? ] unit-test
 
 ! Regression
 GENERIC: method-forget-test ( obj -- obj )
 TUPLE: method-forget-class ;
 M: method-forget-class method-forget-test ;
 
-[ f ] [ \ method-forget-test "methods" word-prop assoc-empty? ] unit-test
-[ ] [ [ \ method-forget-class forget ] with-compilation-unit ] unit-test
-[ t ] [ \ method-forget-test "methods" word-prop assoc-empty? ] unit-test
+{ f } [ \ method-forget-test "methods" word-prop assoc-empty? ] unit-test
+{ } [ [ \ method-forget-class forget ] with-compilation-unit ] unit-test
+{ t } [ \ method-forget-test "methods" word-prop assoc-empty? ] unit-test
 
-[ { } { } ] [
+{ { } { } } [
     all-words [ class? ] filter
     implementors-map get keys
     [ natural-sort ] bi@
@@ -32,70 +29,70 @@ M: method-forget-class method-forget-test ;
 USE: multiline
 
 ! So the user has some code...
-[ ] [
-    """IN: classes.test.a
+{ } [
+    "IN: classes.test.a
     GENERIC: g ( a -- b )
     TUPLE: x ;
     M: x g ;
-    TUPLE: z < x ;""" <string-reader>
+    TUPLE: z < x ;" <string-reader>
     "class-intersect-no-method-a" parse-stream drop
 ] unit-test
 
 ! Note that q inlines M: x g ;
-[ ] [
-    """IN: classes.test.b
+{ } [
+    "IN: classes.test.b
     USE: classes.test.a
     USE: kernel
-    : q ( -- b ) z new g ;""" <string-reader>
+    : q ( -- b ) z new g ;" <string-reader>
     "class-intersect-no-method-b" parse-stream drop
 ] unit-test
 
 ! Now, the user removes the z class and adds a method,
-[ ] [
-    """IN: classes.test.a
+{ } [
+    "IN: classes.test.a
     GENERIC: g ( a -- b )
     TUPLE: x ;
     M: x g ;
     TUPLE: j ;
-    M: j g ;""" <string-reader>
+    M: j g ;" <string-reader>
     "class-intersect-no-method-a" parse-stream drop
 ] unit-test
 
 ! And changes the definition of q
-[ ] [
-    """IN: classes.test.b
+{ } [
+    "IN: classes.test.b
     USE: classes.test.a
     USE: kernel
-    : q ( -- b ) j new g ;""" <string-reader>
+    : q ( -- b ) j new g ;" <string-reader>
     "class-intersect-no-method-b" parse-stream drop
 ] unit-test
 
 ! Similar problem, but with anonymous classes
-[ ] [
-    """IN: classes.test.c
+{ } [
+    "IN: classes.test.c
     USE: kernel
     GENERIC: g ( a -- b )
     M: object g ;
-    TUPLE: z ;""" <string-reader>
+    TUPLE: z ;" <string-reader>
     "class-intersect-no-method-c" parse-stream drop
 ] unit-test
 
-[ ] [
-    """IN: classes.test.d
+{ } [
+    "IN: classes.test.d
     USE: classes.test.c
     USE: kernel
-    : q ( a -- b ) dup z? [ g ] unless ;""" <string-reader>
+    : q ( a -- b ) dup z? [ g ] unless ;" <string-reader>
     "class-intersect-no-method-d" parse-stream drop
 ] unit-test
 
 ! Now, the user removes the z class and adds a method,
-[ ] [
-    """IN: classes.test.c
+{ } [
+    "IN: classes.test.c
     USE: kernel
     GENERIC: g ( a -- b )
     M: object g ;
     TUPLE: j ;
-    M: j g ;""" <string-reader>
+    M: j g ;" <string-reader>
     "class-intersect-no-method-c" parse-stream drop
 ] unit-test
 
@@ -107,11 +104,39 @@ USE: multiline
 
 TUPLE: forgotten-predicate-test ;
 
-[ ] [ [ \ forgotten-predicate-test forget ] with-compilation-unit ] unit-test
-[ f ] [ \ forgotten-predicate-test? predicate? ] unit-test
+{ } [ [ \ forgotten-predicate-test forget ] with-compilation-unit ] unit-test
+{ f } [ \ forgotten-predicate-test? predicate? ] unit-test
 
 GENERIC: generic-predicate? ( a -- b )
 
-[ ] [ "IN: classes.tests TUPLE: generic-predicate ;" eval( -- ) ] unit-test
+{ } [ "IN: classes.tests TUPLE: generic-predicate ;" eval( -- ) ] unit-test
 
-[ f ] [ \ generic-predicate? generic? ] unit-test
+{ f } [ \ generic-predicate? generic? ] unit-test
+
+! all-contained-classes
+{
+    { maybe{ integer } integer fixnum bignum }
+} [
+    { maybe{ integer } } all-contained-classes
+] unit-test
+
+! contained-classes
+{
+    { fixnum bignum }
+    { integer }
+} [
+    integer contained-classes
+    maybe{ integer } contained-classes
+] unit-test
+
+! make-class-props
+{
+    H{
+        { "superclass" f }
+        { "members" { fixnum } }
+        { "metaclass" f }
+        { "participants" { } }
+    }
+} [
+    f { fixnum } { } f  make-class-props
+] unit-test

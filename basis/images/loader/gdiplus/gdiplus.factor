@@ -1,9 +1,9 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.enums alien.strings
 assocs byte-arrays classes.struct destructors grouping images images.loader
-io kernel locals math mime.types namespaces sequences specialized-arrays
-windows.com windows.gdiplus windows.streams windows.types ;
-FROM: system => os windows? ;
+io kernel libc locals math mime.types namespaces sequences specialized-arrays
+system windows.com windows.gdiplus windows.streams windows.types ;
 IN: images.loader.gdiplus
 
 SPECIALIZED-ARRAY: ImageCodecInfo
@@ -33,9 +33,15 @@ os windows? [
     { UINT } [ GdipGetImageHeight check-gdi+-status ]
     with-out-parameters ;
 
-: gdi+-lock-bitmap ( bitmap rect mode format -- data )
-    { BitmapData } [ GdipBitmapLockBits check-gdi+-status ]
-    with-out-parameters ;
+:: gdi+-lock-bitmap ( bitmap rect mode format -- data )
+    ! Copy the rect to stack space because the gc might move it
+    ! because calling GdipBitmapLockBits triggers callbacks to Factor.
+    { BitmapData GpRect } [
+        :> ( stack-data stack-rect )
+        stack-rect rect binary-object memcpy
+        bitmap stack-rect mode format stack-data GdipBitmapLockBits
+        check-gdi+-status
+    ] with-out-parameters drop ;
 
 :: gdi+-bitmap>data ( bitmap -- w h pixels )
     bitmap [ gdi+-bitmap-width ] [ gdi+-bitmap-height ] bi :> ( w h )
@@ -54,15 +60,14 @@ os windows? [
         ubyte-components >>component-type
         f >>upside-down? ;
 
-! Only one pixel format supported, but I can't find images in the
-! wild, loaded using gdi+, in which the format is different.
+! Loaded images usually have the format BGRA, text rendered BGRX.
 ERROR: unsupported-pixel-format component-order ;
 
-: check-pixel-format ( image -- )
-    component-order>> dup BGRA = [ drop ] [ unsupported-pixel-format ] if ;
+: check-pixel-format ( component-order -- )
+    dup { BGRX BGRA } member? [ drop ] [ unsupported-pixel-format ] if ;
 
 : image>gdi+-bitmap ( image -- bitmap )
-    dup check-pixel-format
+    dup component-order>> check-pixel-format
     [ dim>> first2 ] [ rowstride PixelFormat32bppARGB ] [ bitmap>> ] tri
     { void* } [
         GdipCreateBitmapFromScan0 check-gdi+-status
@@ -76,7 +81,7 @@ ERROR: unsupported-pixel-format component-order ;
 : image-encoders ( -- codec-infos )
     image-encoders-size dup <byte-array> 3dup
     GdipGetImageEncoders check-gdi+-status
-    nip swap <direct-ImageCodecInfo-array> ;
+    nip swap ImageCodecInfo <c-direct-array> ;
 
 : extension>mime-type ( extension -- mime-type )
     ! Crashes if you let this mime through on my machine.

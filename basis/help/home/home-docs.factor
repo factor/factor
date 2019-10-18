@@ -1,27 +1,9 @@
-IN: help.home
 USING: help.markup help.syntax ;
+IN: help.home
 
 ARTICLE: "help.home" "Factor documentation"
-{ $heading "Getting started" }
-{ $subsections
-    "cookbook"
-    "first-program"
-}
-{ $heading "User interface" }
-{ $subsections
-  "listener"
-  "ui-tools"
-}
-{ $heading "Reference" }
-{ $subsections
-  "handbook"
-  "vocab-index"
-  "article-index"
-  "primitive-index"
-  "error-index"
-  "class-index"
-}
-{ $heading "Searches" }
+{ $content "handbook" }
+{ $heading "Recent searches" }
 "Use the search field in the top-right of the " { $link "ui-browser" } " window to search for words, vocabularies, and help articles."
 { $recent-searches }
 { $heading "Recently visited pages" }

@@ -28,17 +28,13 @@ SYMBOL: building-seq
 : 4% ( seq -- ) 4 n% ;
 : 4# ( num -- ) 4 n# ;
 
-MACRO: finish-nmake ( exemplars -- )
+MACRO: finish-nmake ( exemplars -- quot )
     length [ firstn ] curry ;
 
 :: nmake ( quot exemplars -- )
-    [
-        exemplars
-        [ 0 swap new-resizable ] map
-        building-seq set
-
+    exemplars [ 0 swap new-resizable ] map
+    building-seq [
         quot call
-
         building-seq get
         exemplars [ [ like ] 2map ] [ finish-nmake ] bi
-    ] with-scope ; inline
+    ] with-variable ; inline

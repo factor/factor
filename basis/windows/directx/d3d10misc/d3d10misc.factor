@@ -25,7 +25,7 @@ FUNCTION: HRESULT D3D10CreateDevice (
     HMODULE           Software,
     UINT              Flags,
     UINT              SDKVersion,
-    ID3D10Device**    ppDevice ) ;
+    ID3D10Device**    ppDevice )
 
 FUNCTION: HRESULT D3D10CreateDeviceAndSwapChain (
     IDXGIAdapter*         pAdapter,
@@ -34,7 +34,7 @@ FUNCTION: HRESULT D3D10CreateDeviceAndSwapChain (
     UINT                  Flags,
     UINT                  SDKVersion,
     DXGI_SWAP_CHAIN_DESC* pSwapChainDesc,
-    IDXGISwapChain**      ppSwapChain,    
-    ID3D10Device**        ppDevice ) ;
+    IDXGISwapChain**      ppSwapChain,
+    ID3D10Device**        ppDevice )
 
-FUNCTION: HRESULT D3D10CreateBlob ( SIZE_T NumBytes, LPD3D10BLOB* ppBuffer ) ;
+FUNCTION: HRESULT D3D10CreateBlob ( SIZE_T NumBytes, LPD3D10BLOB* ppBuffer )

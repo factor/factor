@@ -1,10 +1,9 @@
-USING: kernel math.functions math.ranges sequences tools.test ;
-IN: math.factorials
+USING: kernel math.factorials math.functions math.ranges sequences tools.test ;
 
-[ 1 ] [ -1 factorial ] unit-test ! not necessarily correct
-[ 1 ] [ 0 factorial ] unit-test
-[ 1 ] [ 1 factorial ] unit-test
-[ 3628800 ] [ 10 factorial ] unit-test
+{ 1 } [ -1 factorial ] unit-test ! not necessarily correct
+{ 1 } [ 0 factorial ] unit-test
+{ 1 } [ 1 factorial ] unit-test
+{ 3628800 } [ 10 factorial ] unit-test
 
 { { 1 1 2 6 24 120 720 5040 40320 362880 3628800 } } [
     10 factorials
@@ -49,29 +48,35 @@ IN: math.factorials
 { t } [ 20 3 [ 1 factorial-power ] [ falling-factorial ] 2bi = ] unit-test
 { t } [ 20 3 [ 0 factorial-power ] [ ^ ] 2bi = ] unit-test
 
-{ { 1 2 6 30 210 2310 } } [ 6 iota [ primorial ] map ] unit-test
+{ { 1 2 6 30 210 2310 } } [ 6 <iota> [ primorial ] map ] unit-test
 
 { t } [
-    6 iota
+    6 <iota>
     [ [ double-factorial ] map ]
     [ [ 2 multifactorial ] map ]
     bi =
 ] unit-test
 
 { { 1 2 12 120 1680 30240 } }
-[ 6 iota [ quadruple-factorial ] map ] unit-test
+[ 6 <iota> [ quadruple-factorial ] map ] unit-test
 
-{ { 1 1 2 12 288 } } [ 5 iota [ super-factorial ] map ] unit-test
+{ { 1 1 2 12 288 } } [ 5 <iota> [ super-factorial ] map ] unit-test
 
-{ { 1 1 4 108 27648 } } [ 5 iota [ hyper-factorial ] map ] unit-test
+{ { 1 1 4 108 27648 } } [ 5 <iota> [ hyper-factorial ] map ] unit-test
 
 { { 1 1 1 5 19 101 619 4421 35899 326981 } }
-[ 10 iota [ alternating-factorial ] map ] unit-test
+[ 10 <iota> [ alternating-factorial ] map ] unit-test
 
-{ { 1 1 2 9 262144 } } [ 5 iota [ exponential-factorial ] map ] unit-test
+{ { 1 1 2 9 262144 } } [ 5 <iota> [ exponential-factorial ] map ] unit-test
 
 { V{ 2 3 5 7 23 719 5039 } }
-[ 10,000 iota [ factorial-prime? ] filter ] unit-test
+[ 10,000 <iota> [ factorial-prime? ] filter ] unit-test
 
 { V{ 3 5 7 29 31 211 2309 2311 } }
-[ 10,000 iota [ primorial-prime? ] filter ] unit-test
+[ 10,000 <iota> [ primorial-prime? ] filter ] unit-test
+
+{ 10 } [ 3628800 reverse-factorial ] unit-test
+{ 12 } [ 479001600 reverse-factorial ] unit-test
+{ 3 } [ 6 reverse-factorial ] unit-test
+{ 1 } [ 1 reverse-factorial ] unit-test
+{ f } [ 18 reverse-factorial ] unit-test

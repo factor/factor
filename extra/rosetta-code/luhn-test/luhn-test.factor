@@ -61,7 +61,7 @@ IN: rosetta-code.luhn-test
     while drop ;
 
 : luhn-digit  ( n -- n )
-    reversed-digits dup length iota [
+    reversed-digits dup length <iota> [
         2dup swap nth
         swap odd? [ 2 *  10 /mod + ] when
     ] map sum 10 mod
@@ -69,4 +69,3 @@ IN: rosetta-code.luhn-test
 
 : luhn? ( n -- ? )
     luhn-digit 0 = ;
-

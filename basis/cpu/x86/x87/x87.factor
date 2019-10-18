@@ -97,6 +97,3 @@ M: x86 %compare-float-ordered-branch ( label src1 src2 cc -- )
 
 M: x86 %compare-float-unordered-branch ( label src1 src2 cc -- )
     [ [ FUCOMI ] compare-op ] (%compare-float-branch) ;
-
-enable-float-intrinsics
-enable-fsqrt

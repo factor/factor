@@ -1,9 +1,9 @@
 USING: accessors alien alien.c-types alien.data alien.syntax
-arrays byte-arrays classes.struct destructors fry io
-io.encodings.string io.encodings.utf16n kernel literals locals
-math nested-comments sequences strings system tools.ps
-windows.errors windows.handles windows.kernel32 windows.ntdll
-windows.types ;
+arrays byte-arrays classes.struct combinators.short-circuit
+continuations destructors fry io io.encodings.string
+io.encodings.utf16n kernel literals locals math sequences
+strings system tools.ps windows.errors windows.handles
+windows.kernel32 windows.ntdll windows.types ;
 IN: tools.ps.windows
 
 : do-snapshot ( snapshot-type -- handle )
@@ -83,10 +83,16 @@ IN: tools.ps.windows
         [ first-process ]
         [ '[ drop _ next-process ] follow ] tri
         [
-            [ th32ProcessID>> ]
-            [ th32ProcessID>> open-process-read dup [ read-args ] when ]
-            [ szExeFile>> [ 0 = ] trim-tail >string or ] tri 2array
-        ] map
+            [
+                [ th32ProcessID>> ]
+                [ th32ProcessID>> open-process-read dup [ read-args ] when ]
+                [ szExeFile>> [ 0 = ] trim-tail >string or ] tri 2array
+            ] [
+                ! Reading the arguments can fail
+                ! Win32 error 0x12b: Only part of a ReadProcessMemory or WriteProcessMemory request was completed.
+                dup { [ windows-error? ] [ n>> 0x12b = ] } 1&& [ 2drop f ] [ rethrow ] if
+            ] recover
+        ] map sift
     ] with-destructors ;
 
 M: windows ps ( -- assoc ) process-list ;

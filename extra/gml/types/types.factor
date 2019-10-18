@@ -23,12 +23,12 @@ INSTANCE: proc sequence
 
 : wrap ( n seq -- n seq ) [ length rem ] keep ; inline
 
-GENERIC# (gml-get) 1 ( collection key -- elt )
+GENERIC#: (gml-get) 1 ( collection key -- elt )
 
 M: sequence (gml-get) swap wrap nth ;
 M: hashtable (gml-get) of ;
 
-GENERIC# (gml-put) 2 ( collection key elt -- )
+GENERIC#: (gml-put) 2 ( collection key elt -- )
 
 M:: sequence (gml-put) ( collection key elt -- )
     elt key collection wrap set-nth ;

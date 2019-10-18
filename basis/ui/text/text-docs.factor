@@ -1,6 +1,9 @@
 IN: ui.text
 USING: help.markup help.syntax kernel ui.text.private strings math fonts images ;
 
+HELP: flush-layout-cache
+{ $description "Flushes the cache of pre-rendered layouts." } ;
+
 HELP: string-width
 { $values { "font" font } { "string" string } { "w" "a positive integer" } }
 { $contract "Outputs the width of a string." }

@@ -5,13 +5,7 @@ classes.algebra.private classes.private classes.union.private
 kernel words ;
 IN: classes.maybe
 
-! The class slot has to be a union of a word and a classoid
-! for TUPLE: foo { a maybe{ foo } } ; and maybe{ union{ integer float } }
-! to work.
-! In the first case, foo is not yet a tuple-class when maybe{ is reached,
-! thus it's not a classoid yet. union{ is a classoid, so the second case works.
-! words are not generally classoids, so classoid alone is insufficient.
-TUPLE: maybe { class union{ word classoid } initial: object read-only } ;
+TUPLE: maybe { class classoid initial: object read-only } ;
 
 C: <maybe> maybe
 
@@ -25,8 +19,6 @@ M: maybe instance?
 
 M: maybe normalize-class
     maybe-class-or ;
-
-M: maybe valid-classoid? class>> valid-classoid? ;
 
 M: maybe rank-class drop 6 ;
 
@@ -42,5 +34,5 @@ M: maybe class-name
 M: maybe predicate-def
     class>> predicate-def [ [ t ] if* ] curry ;
 
-M: maybe classes-contained-by
+M: maybe contained-classes
     class>> 1array ;

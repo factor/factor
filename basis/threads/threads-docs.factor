@@ -73,10 +73,34 @@ ABOUT: "threads"
 HELP: thread
 { $class-description "A thread. The slots are as follows:"
     { $list
-        { { $snippet "id" } " - a unique identifier assigned to each thread." }
-        { { $snippet "name" } " - the name passed to " { $link spawn } "." }
-        { { $snippet "quot" } " - the initial quotation passed to " { $link spawn } "." }
-        { { $snippet "status" } " - a " { $link string } " indicating what the thread is waiting for, or " { $link f } ". This slot is intended to be used for debugging purposes." }
+      {
+          { $snippet "id" }
+          " - a unique identifier assigned to each thread."
+      }
+      {
+          { $snippet "exit-handler" }
+          " - a " { $link quotation } " run when the thread is being stopped."
+      }
+      {
+          { $snippet "name" }
+          " - the name passed to " { $link spawn } "."
+      }
+      {
+          { $snippet "quot" }
+          " - the initial quotation passed to " { $link spawn } "."
+      }
+      {
+          { $snippet "runnable" }
+          " - whether the thread is runnable. Initially it is, " { $link f } "."
+      }
+      {
+          { $snippet "state" }
+          " - a " { $link string } " indicating what the thread is waiting for, or " { $link f } ". This slot is intended to be used for debugging purposes."
+      }
+      {
+          { $snippet "context" }
+          " - a " { $link box } " holding an alien pointer to the threads " { $link context } " object."
+      }
     }
 } ;
 
@@ -111,7 +135,7 @@ HELP: sleep-queue
 { $var-description "A " { $link min-heap } " storing the queue of sleeping threads." } ;
 
 HELP: sleep-time
-{ $values { "nanos/f" "a non-negative integer or " { $link f } } }
+{ $values { "nanos/f" { $maybe "a non-negative integer" } } }
 { $description "Returns the time until the next sleeping thread is scheduled to wake up, which could be zero if there are threads in the run queue, or threads which need to wake up right now. If there are no runnable or sleeping threads, returns " { $link f } "." } ;
 
 HELP: stop
@@ -121,7 +145,7 @@ HELP: yield
 { $description "Adds the current thread to the end of the run queue, and switches to the next runnable thread." } ;
 
 HELP: sleep-until
-{ $values { "n/f" "a non-negative integer or " { $link f } } }
+{ $values { "n/f" { $maybe "a non-negative integer" } } }
 { $description "Suspends the current thread until the given nanosecond count, returned by " { $link nano-count } ", is reached, or indefinitely if a value of " { $link f } " is passed in."
 $nl
 "Other threads may interrupt the sleep by calling " { $link interrupt } "." } ;
@@ -143,7 +167,7 @@ HELP: suspend
 { $values { "state" string } { "obj" object } }
 { $description "Suspends the current thread. Control yields to the next runnable thread and the current thread does not execute again until it is resumed, and so the caller of this word must arrange for another thread to later resume the suspended thread with a call to " { $link resume } " or " { $link resume-with } "."
 $nl
-"The status string is for debugging purposes; see " { $link "tools.threads" } "." } ;
+"The state string is for debugging purposes; see " { $link "tools.threads" } "." } ;
 
 HELP: spawn
 { $values { "quot" quotation } { "name" string } { "thread" thread } }
@@ -157,9 +181,10 @@ $nl
     "A simple thread that adds two numbers:"
     { $code "1 2 [ + . ] 2curry \"Addition thread\" spawn" }
     "A thread that counts to 10:"
+    ! Don't use $example below: it won't pass help-lint.
     { $code
       "USING: math.parser threads ;"
-      "[ 10 iota [ number>string write nl yield ] each ] \"test\" spawn"
+      "[ 10 <iota> [ number>string write nl yield ] each ] \"test\" spawn drop"
       "10 [ yield ] times"
       "0"
       "1"

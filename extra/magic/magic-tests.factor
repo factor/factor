@@ -1,6 +1,5 @@
-USING: system tools.test ;
-IN: magic
+USING: magic system tools.test ;
 
-{ "data" } [ image guess-file ] unit-test
-{ "application/octet-stream" } [ image guess-mime-type ] unit-test
-{ "binary" } [ image guess-mime-encoding ] unit-test
+{ "data" } [ image-path guess-file ] unit-test
+{ "application/octet-stream" } [ image-path guess-mime-type ] unit-test
+{ "binary" } [ image-path guess-mime-encoding ] unit-test

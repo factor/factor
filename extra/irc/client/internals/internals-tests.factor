@@ -1,12 +1,9 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel tools.test accessors arrays sequences
-io io.streams.duplex namespaces threads destructors
-calendar concurrency.mailboxes classes assocs combinators
-irc.messages.parser irc.client.base irc.client.chats
-irc.client.participants irc.client.internals ;
-EXCLUDE: irc.messages => join ;
-RENAME: join irc.messages => join_
+USING: accessors assocs calendar classes combinators
+concurrency.mailboxes destructors io io.streams.duplex irc.client.base
+irc.client.chats irc.client.internals irc.client.participants
+irc.messages irc.messages.parser kernel sequences threads tools.test ;
 IN: irc.client.internals.tests
 
 ! Streams for testing
@@ -113,7 +110,7 @@ M: mb-writer dispose drop ;
   ] unit-test
 ] spawning-irc
 
-[ { join_ "#factortest"} [
+[ { irc.messages:join "#factortest" } [
       "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
       { ":factorbot!n=factorbo@some.where JOIN :#factortest"
         ":ircserver.net 353 factorbot @ #factortest :@factorbot "

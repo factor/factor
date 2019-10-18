@@ -1,5 +1,6 @@
-USING: calendar classes concurrency.semaphores help.markup
-help.syntax io io.sockets io.sockets.secure math quotations ;
+USING: calendar classes concurrency.semaphores help.markup help.syntax
+io io.servers.private io.sockets io.sockets.secure quotations
+sequences ;
 IN: io.servers
 
 ARTICLE: "server-config" "Threaded server configuration"
@@ -80,9 +81,13 @@ ARTICLE: "io.servers" "Threaded servers"
     insecure-addr
 }
 "Additionally, the " { $link local-address } " and "
-{ $subsections remote-address } " variables are set, as in " { $link with-client } "." ;
+{ $link remote-address } " variables are set, as in " { $link with-client } "." ;
 
 ABOUT: "io.servers"
+
+HELP: configurable-addrspecs
+{ $values { "addrspecs" sequence } { "addrspecs'" sequence } }
+{ $description "Filter the list of addrspecs so that only those that are supported by the host system remains." } ;
 
 HELP: threaded-server
 { $var-description "In client handlers, stores the current threaded server instance." }

@@ -2,9 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.tuple combinators
 combinators.short-circuit kernel locals math math.functions
-math.order sequences summary system vocabs vocabs.loader
+math.intervals math.order sequences summary system vocabs vocabs.loader
 assocs ;
 IN: calendar
+
+ERROR: not-in-interval value interval ;
+
+: check-interval ( value interval -- value )
+    2dup interval-contains? [ drop ] [ not-in-interval ] if ;
 
 HOOK: gmt-offset os ( -- hours minutes seconds )
 
@@ -31,7 +36,27 @@ TUPLE: timestamp
     { second real }
     { gmt-offset duration } ;
 
-C: <timestamp> timestamp
+CONSTANT: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 }
+
+GENERIC: leap-year? ( obj -- ? )
+
+M: integer leap-year? ( year -- ? )
+    dup 100 divisor? 400 4 ? divisor? ;
+
+M: timestamp leap-year? ( timestamp -- ? )
+    year>> leap-year? ;
+
+: (days-in-month) ( year month -- n )
+    dup 2 = [ drop leap-year? 29 28 ? ] [ nip day-counts nth ] if ;
+
+:: <timestamp> ( year month day hour minute second gmt-offset -- timestamp )
+    year
+    month 1 12 [a,b] check-interval
+    day 1 year month (days-in-month) [a,b] check-interval
+    hour 0 23 [a,b] check-interval
+    minute 0 59 [a,b] check-interval
+    second 0 60 [a,b) check-interval
+    gmt-offset timestamp boa ;
 
 M: timestamp clone (clone) [ clone ] change-gmt-offset ;
 
@@ -50,71 +75,6 @@ M: timestamp clone (clone) [ clone ] change-gmt-offset ;
 : <year-gmt> ( year -- timestamp )
     1 1 <date-gmt> ; inline
 
-ERROR: not-a-month ;
-M: not-a-month summary
-    drop "Months are indexed starting at 1" ;
-
-<PRIVATE
-
-: check-month ( n -- n )
-    [ not-a-month ] when-zero ;
-
-PRIVATE>
-
-CONSTANT: month-names 
-    {
-        "January" "February" "March" "April" "May" "June"
-        "July" "August" "September" "October" "November" "December"
-    }
-
-GENERIC: month-name ( obj -- string )
-
-M: integer month-name check-month 1 - month-names nth ;
-M: timestamp month-name month>> 1 - month-names nth ;
-
-ERROR: not-a-month-abbreviation string ;
-
-CONSTANT: month-abbreviations
-    {
-        "Jan" "Feb" "Mar" "Apr" "May" "Jun"
-        "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"
-    }
-
-CONSTANT: month-abbreviations-hash
-    H{
-        { "Jan" 1 } { "Feb" 2 } { "Mar" 3 }
-        { "Apr" 4 } { "May" 5 } { "Jun" 6 }
-        { "Jul" 7 } { "Aug" 8 } { "Sep" 9 }
-        { "Oct" 10 } { "Nov" 11 } { "Dec" 12 }
-    }
-
-: month-abbreviation ( n -- string )
-    check-month 1 - month-abbreviations nth ;
-
-: month-abbreviation-index ( string -- n )
-    month-abbreviations-hash ?at
-    [ not-a-month-abbreviation ] unless ;
-
-CONSTANT: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 }
-
-CONSTANT: day-names
-    { "Sunday" "Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday" }
-
-CONSTANT: day-abbreviations2
-    { "Su" "Mo" "Tu" "We" "Th" "Fr" "Sa" }
-
-: day-abbreviation2 ( n -- string )
-    day-abbreviations2 nth ; inline
-
-CONSTANT: day-abbreviations3
-    { "Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" }
-
-CONSTANT: day-abbreviations3-hash
-    H{
-        { "Sun" 0 } { "Mon" 1 } { "Tue" 2 } { "Wed" 3 }
-        { "Thu" 4 } { "Fri" 5 } { "Sat" 6 }
-    }
-
 CONSTANT: average-month 30+5/12
 CONSTANT: months-per-year 12
 CONSTANT: days-per-year 3652425/10000
@@ -123,8 +83,8 @@ CONSTANT: minutes-per-year 5259492/10
 CONSTANT: seconds-per-year 31556952
 
 :: julian-day-number ( year month day -- n )
-    #! Returns a composite date number
-    #! Not valid before year -4800
+    ! Returns a composite date number
+    ! Not valid before year -4800
     14 month - 12 /i :> a
     year 4800 + a - :> y
     month 12 a * + 3 - :> m
@@ -133,7 +93,7 @@ CONSTANT: seconds-per-year 31556952
     y 4 /i + y 100 /i - y 400 /i + 32045 - ;
 
 :: julian-day-number>date ( n -- year month day )
-    #! Inverse of julian-day-number
+    ! Inverse of julian-day-number
     n 32044 + :> a
     4 a * 3 + 146097 /i :> b
     a 146097 b * 4 /i - :> c
@@ -186,14 +146,6 @@ M: timestamp easter ( timestamp -- timestamp )
 : microseconds ( x -- duration ) 1000000 / seconds ;
 : nanoseconds ( x -- duration ) 1000000000 / seconds ;
 
-GENERIC: leap-year? ( obj -- ? )
-
-M: integer leap-year? ( year -- ? )
-    dup 100 divisor? 400 4 ? divisor? ;
-
-M: timestamp leap-year? ( timestamp -- ? )
-    year>> leap-year? ;
-
 <PRIVATE
 
 GENERIC: +year ( timestamp x -- timestamp )
@@ -204,7 +156,7 @@ GENERIC: +minute ( timestamp x -- timestamp )
 GENERIC: +second ( timestamp x -- timestamp )
 
 : /rem ( f n -- q r )
-    #! q is positive or negative, r is positive from 0 <= r < n
+    ! q is positive or negative, r is positive from 0 <= r < n
     [ / floor >integer ] 2keep rem ;
 
 : float>whole-part ( float -- int float )
@@ -276,7 +228,7 @@ M: number +second ( timestamp n -- timestamp )
 
 PRIVATE>
 
-GENERIC# time+ 1 ( time1 time2 -- time3 )
+GENERIC#: time+ 1 ( time1 time2 -- time3 )
 
 M: timestamp time+
     [ clone ] dip (time+) drop ;
@@ -295,8 +247,8 @@ M: duration time+
     ] if ;
 
 : duration>years ( duration -- x )
-    #! Uses average month/year length since duration loses calendar
-    #! data
+    ! Uses average month/year length since duration loses calendar
+    ! data
     0 swap
     {
         [ year>> + ]
@@ -351,7 +303,7 @@ M: timestamp <=> ( ts1 ts2 -- n )
     [ >time< [ [ 3600 * ] [ 60 * ] bi* ] dip + + ] bi@ - + ;
 
 M: timestamp time-
-    #! Exact calendar-time difference
+    ! Exact calendar-time difference
     (time-) seconds ;
 
 : time* ( obj1 obj2 -- obj3 )
@@ -390,13 +342,6 @@ M: duration time-
         2drop <duration>
     ] if ;
 
-: <zero> ( -- timestamp )
-    0 0 0 <date-gmt> ; inline
-
-: valid-timestamp? ( timestamp -- ? )
-    clone instant >>gmt-offset
-    dup <zero> time- <zero> time+ = ;
-
 : unix-1970 ( -- timestamp )
     1970 <year-gmt> ; inline
 
@@ -420,9 +365,9 @@ M: duration time-
 : ago ( duration -- timestamp ) now swap time- ;
 
 : zeller-congruence ( year month day -- n )
-    #! Zeller Congruence
-    #! http://web.textfiles.com/computers/formulas.txt
-    #! good for any date since October 15, 1582
+    ! Zeller Congruence
+    ! http://web.textfiles.com/computers/formulas.txt
+    ! good for any date since October 15, 1582
     [
         dup 2 <= [ [ 1 - ] [ 12 + ] bi* ] when
         [ dup [ 4 /i + ] [ 100 /i - ] [ 400 /i + ] tri ] dip
@@ -434,18 +379,11 @@ GENERIC: days-in-year ( obj -- n )
 M: integer days-in-year ( year -- n ) leap-year? 366 365 ? ;
 M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
 
-: (days-in-month) ( year month -- n )
-    dup 2 = [ drop leap-year? 29 28 ? ] [ nip day-counts nth ] if ;
-
 : days-in-month ( timestamp -- n )
     >date< drop (days-in-month) ;
 
 : day-of-week ( timestamp -- n )
     >date< zeller-congruence ;
-
-GENERIC: day-name ( obj -- string )
-M: integer day-name day-names nth ;
-M: timestamp day-name day-of-week day-names nth ;
 
 :: (day-of-year) ( year month day -- n )
     day-counts month head-slice sum day +
@@ -568,39 +506,17 @@ M: timestamp december clone 12 >>month ;
 : last-friday-of-month ( timestamp -- new-timestamp ) 5 last-day-this-month ;
 : last-saturday-of-month ( timestamp -- new-timestamp ) 6 last-day-this-month ;
 
-CONSTANT: day-predicates
-    { sunday? monday? tuesday? wednesday? thursday? friday? saturday? }
-
-: day-predicate ( string -- predicate )
-    day-predicates nth ;
-
-: day-abbreviation3 ( n -- string )
-    day-abbreviations3 nth ; inline
-
-ERROR: not-a-day-abbreviation string ;
-
-: day-abbreviation3-index ( string -- n )
-    day-abbreviations3-hash ?at [ not-a-day-abbreviation ] unless ; inline
-
-: day-abbreviation3-predicate ( string -- predicate )
-    day-abbreviation3-index day-predicates nth ;
-
 : beginning-of-week ( timestamp -- new-timestamp )
     midnight sunday ;
 
 : o'clock ( timestamp n -- new-timestamp )
     [ midnight ] dip >>hour ;
 
-ERROR: twelve-hour-expected n ;
-
-: check-twelve-hour ( n -- n )
-    dup 0 12 between? [ twelve-hour-expected ] unless ;
-
 : am ( timestamp n -- new-timestamp )
-    check-twelve-hour o'clock ;
+    0 12 [a,b] check-interval o'clock ;
 
 : pm ( timestamp n -- new-timestamp )
-    check-twelve-hour 12 + o'clock ;
+    0 12 [a,b] check-interval 12 + o'clock ;
 
 GENERIC: beginning-of-year ( object -- new-timestamp )
 M: timestamp beginning-of-year beginning-of-month 1 >>month ;

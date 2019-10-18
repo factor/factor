@@ -128,6 +128,15 @@ CONSTANT: LC_LAZY_LOAD_DYLIB    0x20
 CONSTANT: LC_ENCRYPTION_INFO    0x21
 CONSTANT: LC_DYLD_INFO          0x22
 CONSTANT: LC_DYLD_INFO_ONLY     0x80000022
+CONSTANT: LC_LOAD_UPWARD_DYLIB 0x80000023
+CONSTANT: LC_VERSION_MIN_MACOSX 0x24
+CONSTANT: LC_VERSION_MIN_IPHONEOS 0x25
+CONSTANT: LC_FUNCTION_STARTS 0x26
+CONSTANT: LC_DYLD_ENVIRONMENT 0x27
+CONSTANT: LC_MAIN 0x80000028
+CONSTANT: LC_DATA_IN_CODE 0x29
+CONSTANT: LC_SOURCE_VERSION 0x2A
+CONSTANT: LC_DYLIB_CODE_SIGN_DRS 0x2B
 
 UNION-STRUCT: lc_str
     { offset    uint     }
@@ -158,7 +167,7 @@ STRUCT: segment_command_64
     { initprot       vm_prot_t  }
     { nsects         uint       }
     { flags          uint       } ;
-    
+
 CONSTANT: SG_HIGHVM               0x1
 CONSTANT: SG_FVMLIB               0x2
 CONSTANT: SG_NORELOC              0x4
@@ -448,6 +457,12 @@ STRUCT: dyld_info_command
     { export_off       uint }
     { export_size      uint } ;
 
+STRUCT: version_min_command
+    { cmd uint32_t }
+    { cmdsize uint32_t }
+    { version uint32_t }
+    { sdk uint32_t } ;
+
 CONSTANT: REBASE_TYPE_POINTER                     1
 CONSTANT: REBASE_TYPE_TEXT_ABSOLUTE32             2
 CONSTANT: REBASE_TYPE_TEXT_PCREL32                3
@@ -513,6 +528,22 @@ STRUCT: fvmfile_command
     { cmdsize        uint     }
     { name           lc_str   }
     { header_addr    uint     } ;
+
+STRUCT: entry_point_command
+    { cmd uint32_t }
+    { cmdsize uint32_t }
+    { entryoff uint64_t }
+    { stacksize uint64_t } ;
+
+STRUCT: source_version_command
+    { cmd uint32_t }
+    { cmdsize uint32_t }
+    { version uint64_t } ;
+
+STRUCT: data_in_code_entry
+    { offset uint32_t }
+    { length uint16_t }
+    { kind uint16_t } ;
 
 ! machine.h
 CONSTANT: CPU_STATE_MAX       4
@@ -881,6 +912,15 @@ TYPED: 64-bit? ( macho: mach_header_32/64 -- ? )
         { LC_SUB_CLIENT     [ sub_client_command     ] }
         { LC_DYLD_INFO      [ dyld_info_command      ] }
         { LC_DYLD_INFO_ONLY [ dyld_info_command      ] }
+        { LC_LOAD_UPWARD_DYLIB [ dylib_command ] }
+        { LC_VERSION_MIN_MACOSX [ version_min_command ] }
+        { LC_VERSION_MIN_IPHONEOS [ version_min_command ] }
+        { LC_FUNCTION_STARTS [ linkedit_data_command ] }
+        { LC_DYLD_ENVIRONMENT [ dylinker_command ] }
+        { LC_MAIN [ entry_point_command ] }
+        { LC_DATA_IN_CODE [ data_in_code_entry ] }
+        { LC_SOURCE_VERSION [ source_version_command ] }
+        { LC_DYLIB_CODE_SIGN_DRS [ linkedit_data_command ] }
     } case ;
 
 : read-command ( cmd -- next-cmd )
@@ -892,7 +932,7 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
     [
         [ class-of heap-size ]
         [ >c-ptr <displaced-alien> ]
-        [ ncmds>> ] tri iota [
+        [ ncmds>> ] tri <iota> [
             drop read-command
         ] each drop
     ] { } make ;
@@ -904,7 +944,7 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
     [ symtab_command? ] filter ; inline
 
 : read-array-string ( uchar-array -- string )
-    ascii decode [ 0 = not ] filter ;
+    ascii decode [ 0 = ] reject ;
 
 : segment-sections ( segment-command -- sections )
     {
@@ -929,7 +969,7 @@ TYPED: load-commands ( macho: mach_header_32/64 -- load-commands )
       [ nlist_64 <c-direct-array> ]
       [ nlist <c-direct-array> ] if ]
     [ stroff>> swap >c-ptr <displaced-alien> ] 2tri ;
-    
+
 : symbol-name ( symbol string-table -- name )
     [ n_strx>> ] dip <displaced-alien> ascii alien>string ;
 

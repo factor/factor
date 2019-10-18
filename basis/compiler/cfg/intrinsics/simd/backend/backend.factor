@@ -1,12 +1,11 @@
-! (c)2009 Joe Groff bsd license
-USING: accessors arrays assocs classes combinators
-combinators.short-circuit compiler.cfg.builder.blocks
-compiler.cfg.registers compiler.cfg.stacks
-compiler.cfg.stacks.local compiler.tree.propagation.info
-compiler.cfg.instructions
-cpu.architecture effects fry generalizations
-kernel locals macros make math namespaces quotations sequences
-sequences.generalizations splitting stack-checker words ;
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors arrays classes combinators
+compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.stacks compiler.cfg.stacks.local
+compiler.tree.propagation.info cpu.architecture fry
+generalizations kernel locals macros make math quotations
+sequences sequences.generalizations ;
 IN: compiler.cfg.intrinsics.simd.backend
 
 ! Selection of implementation based on available CPU instructions
@@ -71,9 +70,9 @@ M: ##horizontal-shl-vector-imm insn-available? rep>> %horizontal-shl-vector-imm-
 M: ##horizontal-shr-vector-imm insn-available? rep>> %horizontal-shr-vector-imm-reps member? ;
 
 : [vector-op-checked] ( #dup quot -- quot )
-    '[ _ ndup [ @ ] { } make dup [ insn-available? ] all? ] ;
+    '[ _ ndup _ { } make dup [ insn-available? ] all? ] ;
 
-GENERIC# >vector-op-cond 2 ( quot #pick #dup -- quotpair )
+GENERIC#: >vector-op-cond 2 ( quot #pick #dup -- quotpair )
 M:: callable >vector-op-cond ( quot #pick #dup -- quotpair )
     #dup quot [vector-op-checked] '[ 2drop @ ]
     #dup '[ % _ nnip ]
@@ -86,22 +85,22 @@ M:: pair >vector-op-cond ( pair #pick #dup -- quotpair )
     #dup '[ % _ nnip ]
     2array ;
 
-MACRO: v-vector-op ( trials -- )
+MACRO: v-vector-op ( trials -- quot )
     [ 1 2 >vector-op-cond ] map '[ f f _ cond ] ;
-MACRO: vl-vector-op ( trials -- )
+MACRO: vl-vector-op ( trials -- quot )
     [ 1 3 >vector-op-cond ] map '[ f f _ cond ] ;
-MACRO: vvl-vector-op ( trials -- )
+MACRO: vvl-vector-op ( trials -- quot )
     [ 1 4 >vector-op-cond ] map '[ f f _ cond ] ;
-MACRO: vv-vector-op ( trials -- )
+MACRO: vv-vector-op ( trials -- quot )
     [ 1 3 >vector-op-cond ] map '[ f f _ cond ] ;
-MACRO: vv-cc-vector-op ( trials -- )
+MACRO: vv-cc-vector-op ( trials -- quot )
     [ 2 4 >vector-op-cond ] map '[ f f _ cond ] ;
-MACRO: vvvv-vector-op ( trials -- )
+MACRO: vvvv-vector-op ( trials -- quot )
     [ 1 5 >vector-op-cond ] map '[ f f _ cond ] ;
 
 ! Intrinsic code emission
 
-MACRO: check-elements ( quots -- )
+MACRO: check-elements ( quots -- quot )
     [ length '[ _ firstn ] ]
     [ '[ _ spread ] ]
     [ length 1 - \ and <repetition> [ ] like ]
@@ -109,7 +108,7 @@ MACRO: check-elements ( quots -- )
 
 ERROR: bad-simd-intrinsic node ;
 
-MACRO: if-literals-match ( quots -- )
+MACRO: if-literals-match ( quots -- quot )
     [ length ] [ ] [ length ] tri
     ! n quots n
     '[
@@ -126,40 +125,39 @@ MACRO: if-literals-match ( quots -- )
         ] [ 2drop bad-simd-intrinsic ] if
     ] ;
 
-CONSTANT: [unary]        [ ds-drop  ds-pop ]
-CONSTANT: [unary/param]  [ [ -2 inc-d ds-pop ] dip ]
-CONSTANT: [binary]       [ ds-drop 2inputs ]
-CONSTANT: [binary/param] [ [ -2 inc-d 2inputs ] dip ]
-CONSTANT: [quaternary]
+CONSTANT: unary        [ ds-drop  ds-pop ]
+CONSTANT: unary/param  [ [ -2 <ds-loc> inc-stack ds-pop ] dip ]
+CONSTANT: binary       [ ds-drop 2inputs ]
+CONSTANT: binary/param [ [ -2 <ds-loc> inc-stack 2inputs ] dip ]
+CONSTANT: quaternary
     [
-        ds-drop 
-        D 3 peek-loc
-        D 2 peek-loc
-        D 1 peek-loc
-        D 0 peek-loc
-        -4 inc-d
+        ds-drop
+        D: 3 peek-loc
+        D: 2 peek-loc
+        D: 1 peek-loc
+        D: 0 peek-loc
+        -4 <ds-loc> inc-stack
     ]
 
-:: [emit-vector-op] ( trials params-quot op-quot literal-preds -- quot )
-    params-quot trials op-quot literal-preds 
+:: emit-vector-op ( trials params-quot op-quot literal-preds -- quot )
+    params-quot trials op-quot literal-preds
     '[ [ _ dip _ @ ds-push ] _ if-literals-match ] ;
 
-MACRO: emit-v-vector-op ( trials -- )
-    [unary] [ v-vector-op ] { [ representation? ] } [emit-vector-op] ;
-MACRO: emit-vl-vector-op ( trials literal-pred -- )
-    [ [unary/param] [ vl-vector-op ] { [ representation? ] } ] dip prefix [emit-vector-op] ;
-MACRO: emit-vv-vector-op ( trials -- )
-    [binary] [ vv-vector-op ] { [ representation? ] } [emit-vector-op] ;
-MACRO: emit-vvl-vector-op ( trials literal-pred -- )
-    [ [binary/param] [ vvl-vector-op ] { [ representation? ] } ] dip prefix [emit-vector-op] ;
-MACRO: emit-vvvv-vector-op ( trials -- )
-    [quaternary] [ vvvv-vector-op ] { [ representation? ] } [emit-vector-op] ;
+MACRO: emit-v-vector-op ( trials -- quot )
+    unary [ v-vector-op ] { [ representation? ] } emit-vector-op ;
+MACRO: emit-vl-vector-op ( trials literal-pred -- quot )
+    [ unary/param [ vl-vector-op ] { [ representation? ] } ] dip prefix emit-vector-op ;
+MACRO: emit-vv-vector-op ( trials -- quot )
+    binary [ vv-vector-op ] { [ representation? ] } emit-vector-op ;
+MACRO: emit-vvl-vector-op ( trials literal-pred -- quot )
+    [ binary/param [ vvl-vector-op ] { [ representation? ] } ] dip prefix emit-vector-op ;
+MACRO: emit-vvvv-vector-op ( trials -- quot )
+    quaternary [ vvvv-vector-op ] { [ representation? ] } emit-vector-op ;
 
-MACRO:: emit-vv-or-vl-vector-op ( var-trials imm-trials literal-pred -- )
+MACRO:: emit-vv-or-vl-vector-op ( var-trials imm-trials literal-pred -- quot )
     literal-pred imm-trials literal-pred var-trials
     '[
         dup node-input-infos 2 tail-slice* first literal>> @
         [ _ _ emit-vl-vector-op ]
-        [ _   emit-vv-vector-op ] if 
+        [ _   emit-vv-vector-op ] if
     ] ;
-

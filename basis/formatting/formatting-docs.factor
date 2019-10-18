@@ -1,5 +1,5 @@
-
-USING: help.syntax help.markup kernel prettyprint sequences strings ;
+USING: assocs help.markup help.syntax kernel math prettyprint
+sequences strings ;
 
 IN: formatting
 
@@ -13,36 +13,36 @@ HELP: printf
     "padding, and decimals."
     $nl
     { $table
-        { { $snippet "%%" }          "Single %"                   "" }
-        { { $snippet "%P.Ds" }       "String format"              "string" }
-        { { $snippet "%P.DS" }       "String format uppercase"    "string" }
-        { { $snippet "%P.Du" }       "Unparsed format"            "object" }
-        { { $snippet "%c" }          "Character format"           "char" }
-        { { $snippet "%C" }          "Character format uppercase" "char" }
-        { { $snippet "%+Pd" }        "Integer format (base 10)"   "integer" }
-        { { $snippet "%+Po" }        "Octal format (base 8)"      "integer" }
-        { { $snippet "%+Pb" }        "Binary format (base 2)"     "integer" }
-        { { $snippet "%+P.De" }      "Scientific notation"        "integer, float" }
-        { { $snippet "%+P.DE" }      "Scientific notation"        "integer, float" }
-        { { $snippet "%+P.Df" }      "Fixed format"               "integer, float" }
-        { { $snippet "%+Px" }        "Hexadecimal (base 16)"      "integer" }
-        { { $snippet "%+PX" }        "Hexadecimal (base 16) uppercase" "integer" }
-        { { $snippet "%[%?, %]" }    "Sequence format"            "sequence" }
-        { { $snippet "%[%?: %? %]" } "Assocs format"              "assocs" }
+        { { $snippet "%%" }          "Single %" "" }
+        { { $snippet "%P.Ds" }       "String" { $link string } }
+        { { $snippet "%P.DS" }       "String uppercase" { $link string } }
+        { { $snippet "%P.Du" }       "Unparsed" { $link object } }
+        { { $snippet "%c" }          "Character" "char" }
+        { { $snippet "%C" }          "Character uppercase" "char" }
+        { { $snippet "%LPd" }        "Integer decimal (base 10)" { $link real } }
+        { { $snippet "%LPx" }        "Integer hexadecimal (base 16)" { $link real } }
+        { { $snippet "%LPX" }        "Integer hexadecimal uppercase (base 16)" { $link real } }
+        { { $snippet "%LPo" }        "Integer octal (base 8)" { $link real } }
+        { { $snippet "%LPb" }        "Integer binary (base 2)" { $link real } }
+        { { $snippet "%LP.De" }      "Scientific (base 10)" { $link real } }
+        { { $snippet "%LP.DE" }      "Scientific uppercase (base 10)" { $link real } }
+        { { $snippet "%LP.Df" }      "Fixed (base 10)" { $link real } }
+        { { $snippet "%[%?, %]" }    "Sequence" { $link sequence } }
+        { { $snippet "%[%?: %? %]" } "Assocs" { $link assoc } }
     }
     $nl
-    "A plus sign (" { $snippet "+" } ") is used to optionally specify that the number should be "
-    "formatted with a " { $snippet "+" } " preceeding it if positive."
+    "Leading (" { $snippet "L" } ") is used to optionally prefix a plus sign (" { $snippet "\"+\"" } ") or space (" { $snippet "\" \"" } ") "
+    "if the formatted number is positive."
     $nl
     "Padding (" { $snippet "P" } ") is used to optionally specify the minimum width of the result "
-    "string, the padding character, and the alignment.  By default, the padding "
+    "string, the padding character, and the alignment. By default, the padding "
     "character defaults to a space and the alignment defaults to right-aligned. "
     "For example:"
     $nl
     { $list
         { { $snippet "%5s" } " formats a string padding with spaces up to 5 characters wide." }
         { { $snippet "%03d" } " formats an integer padding with zeros up to 3 characters wide." }
-        { { $snippet "%'#5f" } " formats a float padding with " { $snippet "#" } " up to 3 characters wide." }
+        { { $snippet "%'#10f" } " formats a float padding with " { $snippet "#" } " up to 10 characters wide." }
         { { $snippet "%-10d" } " formats an integer to 10 characters wide and left-aligns." }
     }
     $nl
@@ -78,8 +78,10 @@ HELP: printf
         "##12" }
     { $example
         "USING: formatting ;"
-        "1234 \"%+d\" printf"
-        "+1234" }
+        " 1234 \"%+d\\n\" printf"
+        "-1234 \"%+d\\n\" printf"
+        " 1234 \"% d\\n\" printf"
+        "+1234\n-1234\n 1234" }
     { $example
         "USING: formatting ;"
         "{ 1 2 3 } \"%[%d, %]\" printf"
@@ -139,7 +141,7 @@ HELP: strftime
 } ;
 
 ARTICLE: "formatting" "Formatted printing"
-"The " { $vocab-link "formatting" } " vocabulary is used for formatted printing."
+"The " { $vocab-link "formatting" } " vocabulary is used for english formatted printing."
 { $subsections
     printf
     sprintf

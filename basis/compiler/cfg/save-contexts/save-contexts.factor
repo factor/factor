@@ -1,47 +1,33 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.rpo cpu.architecture kernel sequences vectors
-combinators.short-circuit ;
+USING: compiler.cfg.instructions compiler.cfg.registers compiler.cfg.rpo
+cpu.architecture kernel sequences ;
 IN: compiler.cfg.save-contexts
 
-! Insert context saves.
+UNION: context-modifier ##phi ##inc ##callback-inputs ;
 
-GENERIC: needs-save-context? ( insn -- ? )
+: save-context-offset ( insns -- n )
+    [ context-modifier? not ] find drop ;
 
-M: gc-map-insn needs-save-context? drop t ;
-M: insn needs-save-context? drop f ;
+UNION: needs-save-context-insn
+    ##alien-invoke
+    ##alien-indirect
+    ##box-long-long
+    ##box ;
 
-: bb-needs-save-context? ( bb -- ? )
-    {
-        [ kill-block?>> not ]
-        [ instructions>> [ needs-save-context? ] any? ]
-    } 1&& ;
+: insns-needs-save-context? ( insns -- ? )
+    [ needs-save-context-insn? ] any? ;
 
-GENERIC: modifies-context? ( insn -- ? )
-
-M: ##phi modifies-context? drop t ;
-M: ##inc-d modifies-context? drop t ;
-M: ##inc-r modifies-context? drop t ;
-M: ##callback-inputs modifies-context? drop t ;
-M: insn modifies-context? drop f ;
-
-: save-context-offset ( bb -- n )
-    ! ##save-context must be placed after instructions that
-    ! modify the context, or instructions that read parameter
-    ! registers.
-    instructions>> [ modifies-context? not ] find drop ;
-
-: insert-save-context ( bb -- )
-    dup bb-needs-save-context? [
+: insert-save-context ( insns -- insns' )
+    dup insns-needs-save-context? [
         [
             int-rep next-vreg-rep
             int-rep next-vreg-rep
             ##save-context new-insn
         ] dip
         [ save-context-offset ] keep
-        [ insert-nth ] change-instructions drop
-    ] [ drop ] if ;
+        insert-nth
+    ] when ;
 
-: insert-save-contexts ( cfg -- cfg' )
-    dup [ insert-save-context ] each-basic-block ;
+: insert-save-contexts ( cfg -- )
+    [ insert-save-context ] simple-optimization ;

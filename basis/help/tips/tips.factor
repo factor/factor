@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser arrays namespaces sequences random help.markup help.stylesheet
-kernel io io.styles colors.constants definitions accessors ;
+USING: accessors arrays colors.constants definitions help.markup
+help.stylesheet io io.styles kernel literals namespaces parser
+random sequences ui.theme ;
 IN: help.tips
 
 SYMBOL: tips
@@ -21,17 +22,16 @@ M: tip set-where loc<< ;
 : add-tip ( tip -- ) tips get push ;
 
 SYNTAX: TIP:
-    parse-definition >array <tip>
+    parse-array-def <tip>
     [ save-location ] [ add-tip ] bi ;
 
 : a-tip ( -- tip ) tips get random ;
 
 SYMBOL: tip-of-the-day-style
-
 H{
-    { page-color COLOR: lavender }
+    { page-color $ tip-background-color }
     { inset { 5 5 } }
-    { wrap-margin 500 }
+    { wrap-margin $ wrap-margin-full }
 } tip-of-the-day-style set-global
 
 : $tip-title ( tip -- )

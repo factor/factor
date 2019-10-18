@@ -1,8 +1,6 @@
 ! Copyright (C) 2009, 2010 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: accessors io io.encodings.utf8 io.servers kernel math
-namespaces tty-server ;
+USING: io io.servers kernel math tty-server ;
 
 IN: fuel.remote
 
@@ -19,3 +17,5 @@ PRIVATE>
 
 : fuel-start-remote-listener* ( -- ) f fuel-start-remote-listener ;
 
+! Remote connection
+MAIN: fuel-start-remote-listener*

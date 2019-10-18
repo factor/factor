@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
+USING: calendar concurrency.conditions help.markup help.syntax ;
 IN: concurrency.flags
 
 HELP: flag
@@ -10,6 +10,10 @@ HELP: <flag>
 { $values { "flag" flag } }
 { $description "Creates a new flag." } ;
 
+HELP: lower-flag
+{ $values { "flag" flag } }
+{ $description "Attempts to lower a flag. If the flag has been raised previously, returns immediately, otherwise waits for it to be raised first." } ;
+
 HELP: raise-flag
 { $values { "flag" flag } }
 { $description "Raises a flag, notifying any threads waiting on it. Does nothing if the flag has already been raised." } ;
@@ -18,9 +22,9 @@ HELP: wait-for-flag
 { $values { "flag" flag } }
 { $description "Waits for a flag to be raised. If the flag has already been raised, returns immediately." } ;
 
-HELP: lower-flag
-{ $values { "flag" flag } }
-{ $description "Attempts to lower a flag. If the flag has been raised previously, returns immediately, otherwise waits for it to be raised first." } ;
+HELP: wait-for-flag-timeout
+{ $values { "flag" flag } { "timeout" duration } }
+{ $description "Waits for a flag to be raised or throws a " { $link timed-out-error } " if the flag wasn't raised in time." } ;
 
 ARTICLE: "concurrency.flags" "Flags"
 "A " { $emphasis "flag" } " is a condition notification device which can be in one of two states: " { $emphasis "lowered" } " (the initial state) or " { $emphasis "raised" } "."

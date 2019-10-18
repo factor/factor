@@ -1,16 +1,14 @@
 ! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files io.files.temp kernel tools.test db db.tuples classes
-db.types continuations namespaces math
-prettyprint calendar sequences db.sqlite math.intervals
-db.postgresql accessors random math.bitwise system
-math.ranges strings urls fry db.tuples.private db.private
-db.tester ;
+USING: accessors calendar calendar.parser classes continuations
+db.tester db.tuples db.types kernel math math.intervals math.ranges
+namespaces random sequences sorting strings tools.test urls ;
 FROM: math.ranges => [a,b] ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real
-ts date time blob factor-blob url ;
+    ts date time blob factor-blob url ;
 
 : <person> ( name age real ts date time blob factor-blob url -- person )
     person new
@@ -40,7 +38,7 @@ SYMBOL: person4
     [ ] [ person create-table ] unit-test
     [ person create-table ] must-fail
     [ ] [ person ensure-table ] unit-test
-    
+
     [ ] [ person1 get insert-tuple ] unit-test
 
     [ 1 ] [ person1 get the-id>> ] unit-test
@@ -87,7 +85,7 @@ SYMBOL: person4
             3.14
             T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
             T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
-            T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
+            T{ duration f 0 0 0 12 34 56 }
             B{ 115 116 111 114 101 105 110 97 98 108 111 98 }
         }
     ] [ T{ person f 3 } select-tuple ] unit-test
@@ -103,7 +101,7 @@ SYMBOL: person4
             3.14
             T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
             T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
-            T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
+            T{ duration f 0 0 0 12 34 56 }
             f
             H{ { 1 2 } { 3 4 } { 5 "lol" } }
             URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search"
@@ -111,6 +109,21 @@ SYMBOL: person4
     ] [ T{ person f 4 } select-tuple ] unit-test
 
     [ ] [ person drop-table ] unit-test ;
+
+: teddy-data ( -- name age real ts date time blob factor-blob url )
+    "teddy" 10 3.14
+    "2008-03-05 16:24:11" ymdhms>timestamp
+    "2008-11-22 00:00:00" ymdhms>timestamp
+    "12:34:56" hms>duration
+    B{ 115 116 111 114 101 105 110 97 98 108 111 98 } f f ;
+
+: eddie-data ( -- name age real ts date time blob factor-blob url )
+    "eddie" 10 3.14
+    "2008-03-05 16:24:11" ymdhms>timestamp
+    "2008-11-22 00:00:00" ymdhms>timestamp
+    "12:34:56" hms>duration
+    f H{ { 1 2 } { 3 4 } { 5 "lol" } }
+    URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search" ;
 
 : db-assigned-person-schema ( -- )
     person "PERSON"
@@ -128,16 +141,8 @@ SYMBOL: person4
     } define-persistent
     "billy" 10 3.14 f f f f f f <person> person1 set
     "johnny" 10 3.14 f f f f f f <person> person2 set
-    "teddy" 10 3.14
-        T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
-        B{ 115 116 111 114 101 105 110 97 98 108 111 98 } f f <person> person3 set
-    "eddie" 10 3.14
-        T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
-        f H{ { 1 2 } { 3 4 } { 5 "lol" } } URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search"  <person> person4 set ;
+    teddy-data <person> person3 set
+    eddie-data <person> person4 set ;
 
 : user-assigned-person-schema ( -- )
     person "PERSON"
@@ -155,18 +160,8 @@ SYMBOL: person4
     } define-persistent
     1 "billy" 10 3.14 f f f f f f <user-assigned-person> person1 set
     2 "johnny" 10 3.14 f f f f f f <user-assigned-person> person2 set
-    3 "teddy" 10 3.14
-        T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
-        B{ 115 116 111 114 101 105 110 97 98 108 111 98 }
-        f f <user-assigned-person> person3 set
-    4 "eddie" 10 3.14
-        T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
-        f H{ { 1 2 } { 3 4 } { 5 "lol" } } URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search" <user-assigned-person> person4 set ;
-
+    3 teddy-data <user-assigned-person> person3 set
+    4 eddie-data <user-assigned-person> person4 set ;
 
 TUPLE: paste n summary author channel mode contents timestamp annotations ;
 TUPLE: annotation n paste-id summary author mode contents ;
@@ -299,15 +294,14 @@ TUPLE: serialize-me id data ;
         { "id" "ID" +db-assigned-id+ }
         { "data" "DATA" FACTOR-BLOB }
     } define-persistent
-    [ serialize-me drop-table ] [ drop ] recover
-    [ ] [ serialize-me create-table ] unit-test
+    [ ] [ serialize-me recreate-table ] unit-test
 
     [ ] [ T{ serialize-me f f H{ { 1 2 } } } insert-tuple ] unit-test
     [
         { T{ serialize-me f 1 H{ { 1 2 } } } }
     ] [ T{ serialize-me f 1 } select-tuples ] unit-test ;
 
-TUPLE: exam id name score ; 
+TUPLE: exam id name score ;
 
 : random-exam ( -- exam )
         f
@@ -333,8 +327,7 @@ TUPLE: exam id name score ;
         { "name" "NAME" TEXT }
         { "score" "SCORE" INTEGER }
     } define-persistent
-    [ exam drop-table ] [ drop ] recover
-    [ ] [ exam create-table ] unit-test
+    [ ] [ exam recreate-table ] unit-test
 
     [ ] [ T{ exam f f "Kyle" 100 } insert-tuple ] unit-test
     [ ] [ T{ exam f f "Stan" 80 } insert-tuple ] unit-test
@@ -433,7 +426,7 @@ TUPLE: exam id name score ;
     ] [
         T{ exam f T{ interval f { -1/0. t } { 1/0. f } } } select-tuples
     ] unit-test
-    
+
     [
         {
             T{ exam f 1 "Kyle" 100 }
@@ -467,8 +460,7 @@ TUPLE: bignum-test id m n o ;
         { "n" "N" UNSIGNED-BIG-INTEGER }
         { "o" "O" SIGNED-BIG-INTEGER }
     } define-persistent
-    [ bignum-test drop-table ] ignore-errors
-    [ ] [ bignum-test ensure-table ] unit-test
+    [ ] [ bignum-test recreate-table ] unit-test
     [ ] [ 63 2^ 1 - dup dup <bignum-test> insert-tuple ] unit-test ;
 
     ! sqlite only
@@ -552,18 +544,18 @@ fubbclass "FUBCLASS" { } define-persistent
 : test-db-inheritance ( -- )
     [ ] [ subbclass ensure-table ] unit-test
     [ ] [ fubbclass ensure-table ] unit-test
-    
+
     [ ] [
         subbclass new 5 >>a "hi" >>b dup insert-tuple id>> "id" set
     ] unit-test
-    
+
     [ t "hi" 5 ] [
         subbclass new "id" get >>id select-tuple
         [ subbclass? ] [ b>> ] [ a>> ] tri
     ] unit-test
-    
+
     [ ] [ fubbclass new 0 >>a "hi" >>b insert-tuple ] unit-test
-    
+
     [ t ] [ fubbclass new select-tuples [ fubbclass? ] all? ] unit-test ;
 
 [ test-db-inheritance ] test-sqlite
@@ -585,7 +577,7 @@ string-encoding-test "STRING_ENCODING_TEST" {
             "\u{copyright-sign}\u{bengali-letter-cha}" >>string
         [ insert-tuple ] [ id>> "id" set ] bi
     ] unit-test
-    
+
     [ "\u{copyright-sign}\u{bengali-letter-cha}" ] [
         string-encoding-test new "id" get >>id select-tuple string>>
     ] unit-test ;
@@ -605,7 +597,7 @@ string-encoding-test "STRING_ENCODING_TEST" {
 
 TUPLE: compound-foo a b c ;
 
-compound-foo "COMPOUND_FOO" 
+compound-foo "COMPOUND_FOO"
 {
     { "a" "A" INTEGER +user-assigned-id+ }
     { "b" "B" INTEGER +user-assigned-id+ }
@@ -625,6 +617,25 @@ compound-foo "COMPOUND_FOO"
 [ test-compound-primary-key ] test-sqlite
 [ test-compound-primary-key ] test-postgresql
 
+TUPLE: timez id time ;
+
+timez "TIMEZ"
+{
+    { "id" "ID" +db-assigned-id+ }
+    { "time" "TIME" TIME }
+} define-persistent
+
+: test-time-types ( -- )
+    timez ensure-table
+    timez new 3 hours >>time insert-tuple
+    {
+        T{ duration f 0 0 0 3 0 0 }
+    } [
+        timez new 3 hours >>time select-tuple time>>
+    ] unit-test ;
+
+[ test-time-types ] test-sqlite
+[ test-time-types ] test-postgresql
 
 TUPLE: example id data ;
 
@@ -643,3 +654,43 @@ example "EXAMPLE"
 
 [ test-blob-select ] test-sqlite
 [ test-blob-select ] test-postgresql
+
+TUPLE: select-me id data ;
+
+select-me "select_me"
+{
+    { "id" "ID" +db-assigned-id+ }
+    { "data" "DATA" TEXT }
+} define-persistent
+
+: test-mapping ( -- )
+    [ ] [ select-me recreate-table ] unit-test
+    [ ] [ select-me new                insert-tuple ] unit-test
+    [ ] [ select-me new "test2" >>data insert-tuple ] unit-test
+
+    [
+        T{ select-me { id 1 } { data f } }
+        T{ select-me { id 2 } { data "test2" } }
+    ] [ select-me new select-tuples first2 ] unit-test
+
+    [ V{ f "test2" } ]
+    [
+        select-me new [ data>> ] collector [ each-tuple ] dip
+    ] unit-test
+
+    [ { "test" "test2" } ] [
+        select-me new NULL >>data [ "test" >>data ] update-tuples
+        select-me new [ data>> ] collector [ each-tuple ] dip
+        natural-sort
+    ] unit-test
+
+    [ { "test1" "test2" } ] [
+        select-me new [
+            dup data>> "test" = [ "test1" >>data ] [ drop f ] if
+        ] update-tuples
+        select-me new [ data>> ] collector [ each-tuple ] dip
+        natural-sort
+    ] unit-test ;
+
+[ test-mapping ] test-sqlite
+[ test-mapping ] test-postgresql

@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors source-files.errors kernel namespaces assocs fry
-summary command-line ;
+USING: accessors assocs command-line fry kernel namespaces
+source-files.errors summary ;
 IN: compiler.errors
 
 SYMBOL: +compiler-error+
@@ -39,10 +39,10 @@ T{ error-type-holder
 } define-error-type
 
 : <compiler-error> ( error word -- compiler-error )
-    \ compiler-error <definition-error> ;
+    compiler-error new-source-file-error ;
 
 : <linkage-error> ( error word -- linkage-error )
-    \ linkage-error <definition-error> ;
+    linkage-error new-source-file-error ;
 
 : set-linkage-error ( name message word class -- )
     '[ _ boa ] dip <linkage-error> dup asset>> linkage-errors get set-at ; inline
@@ -57,17 +57,19 @@ T{ error-type-holder
    { fatal? f }
 } define-error-type
 
-TUPLE: no-such-library name message ;
+ERROR: no-such-library name message ;
 
 M: no-such-library summary drop "Library not found" ;
 
-: no-such-library-error ( name message word -- ) \ no-such-library set-linkage-error ;
+: no-such-library-error ( name message word -- )
+    \ no-such-library set-linkage-error ;
 
-TUPLE: no-such-symbol name message ;
+ERROR: no-such-symbol name message ;
 
 M: no-such-symbol summary drop "Symbol not found" ;
 
-: no-such-symbol-error ( name message word -- ) \ no-such-symbol set-linkage-error ;
+: no-such-symbol-error ( name message word -- )
+    \ no-such-symbol set-linkage-error ;
 
 ERROR: not-compiled word error ;
 
@@ -79,4 +81,3 @@ T{ error-type-holder
     { quot [ user-init-errors get-global values ] }
     { forget-quot [ user-init-errors get-global delete-at ] }
 } define-error-type
-

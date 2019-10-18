@@ -5,7 +5,7 @@ sequences ;
 IN: benchmark.json
 
 : json-benchmark ( -- )
-    200 iota [ [ number>string ] keep ] H{ } map>assoc
+    200 <iota> [ [ number>string ] keep ] H{ } map>assoc
     1,000 [ >json json> ] times drop ;
 
 MAIN: json-benchmark

@@ -1,8 +1,7 @@
 ! Copyright (C) 2007, 2010 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs continuations init kernel make
-namespaces sequences sets ;
-FROM: namespaces => set ;
+USING: accessors assocs continuations init kernel namespaces
+sequences sets ;
 IN: destructors
 
 SYMBOL: disposables
@@ -20,7 +19,7 @@ SLOT: continuation
     disposables get adjoin ;
 
 : unregister-disposable ( obj -- )
-    disposables get 2dup in? [ delete ] [ drop already-unregistered ] if ;
+    dup disposables get ?delete [ drop ] [ already-unregistered ] if ;
 
 PRIVATE>
 
@@ -35,8 +34,8 @@ GENERIC: dispose* ( disposable -- )
 
 ERROR: already-disposed disposable ;
 
-: check-disposed ( disposable -- )
-    dup disposed>> [ already-disposed ] [ drop ] if ; inline
+: check-disposed ( disposable -- disposable )
+    dup disposed>> [ already-disposed ] when ; inline
 
 GENERIC: dispose ( disposable -- )
 
@@ -83,13 +82,13 @@ PRIVATE>
     dup error-destructors get push ; inline
 
 : with-destructors ( quot -- )
-    [
-        V{ } clone always-destructors set
-        V{ } clone error-destructors set
+    H{ } clone
+    V{ } clone always-destructors pick set-at
+    V{ } clone error-destructors pick set-at [
         [ do-always-destructors ]
         [ do-error-destructors ]
         cleanup
-    ] with-scope ; inline
+    ] with-variables ; inline
 
 [
     HS{ } clone disposables set-global

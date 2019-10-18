@@ -2,9 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.private
 combinators kernel make math math.order namespaces sequences
-sorting vectors words ;
-FROM: classes => members ;
-RENAME: members sets => set-members
+sets sorting vectors words ;
 IN: classes.algebra
 
 DEFER: sort-classes
@@ -19,7 +17,7 @@ ERROR: not-classoids sequence ;
 
 : check-classoids ( members -- members )
     dup [ classoid? ] all?
-    [ [ classoid? not ] filter not-classoids ] unless ;
+    [ [ classoid? ] reject not-classoids ] unless ;
 
 ERROR: not-a-classoid object ;
 
@@ -28,7 +26,7 @@ ERROR: not-a-classoid object ;
 
 : <anonymous-union> ( members -- classoid )
     check-classoids
-    [ null eq? not ] filter set-members
+    [ null eq? ] reject members
     dup length 1 = [ first ] [ sort-classes f like anonymous-union boa ] if ;
 
 M: anonymous-union rank-class drop 6 ;
@@ -39,7 +37,7 @@ INSTANCE: anonymous-intersection classoid
 
 : <anonymous-intersection> ( participants -- classoid )
     check-classoids
-    set-members dup length 1 =
+    members dup length 1 =
     [ first ] [ sort-classes f like anonymous-intersection boa ] if ;
 
 M: anonymous-intersection rank-class drop 4 ;
@@ -49,8 +47,7 @@ TUPLE: anonymous-complement { class read-only } ;
 INSTANCE: anonymous-complement classoid
 
 : <anonymous-complement> ( object -- classoid )
-    dup classoid? [ 1array not-classoids ] unless
-    anonymous-complement boa ;
+    check-classoid anonymous-complement boa ;
 
 M: anonymous-complement rank-class drop 3 ;
 
@@ -80,14 +77,6 @@ M: object normalize-class ;
     [ 2dup [ rank-class ] bi@ > [ swap ] when ] 2dip 2cache ; inline
 
 PRIVATE>
-
-GENERIC: valid-classoid? ( obj -- ? )
-
-M: word valid-classoid? class? ;
-M: anonymous-union valid-classoid? members>> [ valid-classoid? ] all? ;
-M: anonymous-intersection valid-classoid? participants>> [ valid-classoid? ] all? ;
-M: anonymous-complement valid-classoid? class>> valid-classoid? ;
-M: object valid-classoid? drop f ;
 
 : only-classoid? ( obj -- ? )
     dup classoid? [ class? not ] [ drop f ] if ;
@@ -134,13 +123,13 @@ SYMBOL: +incomparable+
 <PRIVATE
 
 : superclass<= ( first second -- ? )
-    swap superclass dup [ swap class<= ] [ 2drop f ] if ;
+    swap superclass-of [ swap class<= ] [ drop f ] if* ;
 
 : left-anonymous-union<= ( first second -- ? )
     [ members>> ] dip [ class<= ] curry all? ;
 
 : right-union<= ( first second -- ? )
-    members [ class<= ] with any? ;
+    class-members [ class<= ] with any? ;
 
 : right-anonymous-union<= ( first second -- ? )
     members>> [ class<= ] with any? ;
@@ -179,8 +168,8 @@ PREDICATE: nontrivial-anonymous-complement < anonymous-complement
     class>> {
         [ anonymous-union? ]
         [ anonymous-intersection? ]
-        [ members ]
-        [ participants ]
+        [ class-members ]
+        [ class-participants ]
     } cleave or or or ;
 
 PREDICATE: empty-union < anonymous-union members>> empty? ;
@@ -199,7 +188,7 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
                 { [ over anonymous-union? ] [ left-anonymous-union<= ] }
                 { [ over nontrivial-anonymous-intersection? ] [ left-anonymous-intersection<= ] }
                 { [ over nontrivial-anonymous-complement? ] [ left-anonymous-complement<= ] }
-                { [ dup members ] [ right-union<= ] }
+                { [ dup class-members ] [ right-union<= ] }
                 { [ dup anonymous-union? ] [ right-anonymous-union<= ] }
                 { [ dup anonymous-intersection? ] [ right-anonymous-intersection<= ] }
                 { [ dup anonymous-complement? ] [ class>> classes-intersect? not ] }
@@ -244,7 +233,7 @@ M: anonymous-complement (classes-intersect?)
 : anonymous-union-or ( first second -- class )
     members>> swap suffix <anonymous-union> ;
 
-: ((class-or)) ( first second -- class )
+: classes>anonymous-union ( first second -- class )
     [ normalize-class ] bi@ {
         { [ dup anonymous-union? ] [ anonymous-union-or ] }
         { [ over anonymous-union? ] [ swap anonymous-union-or ] }
@@ -252,7 +241,7 @@ M: anonymous-complement (classes-intersect?)
     } cond ;
 
 : anonymous-complement-or ( first second -- class )
-    2dup class>> swap class<= [ 2drop object ] [ ((class-or)) ] if ;
+    2dup class>> swap class<= [ 2drop object ] [ classes>anonymous-union ] if ;
 
 : (class-or) ( first second -- class )
     2dup compare-classes {
@@ -263,7 +252,7 @@ M: anonymous-complement (classes-intersect?)
             {
                 { [ dup anonymous-complement? ] [ anonymous-complement-or ] }
                 { [ over anonymous-complement? ] [ swap anonymous-complement-or ] }
-                [ ((class-or)) ]
+                [ classes>anonymous-union ]
             } cond
         ] }
     } case ;
@@ -284,7 +273,7 @@ PRIVATE>
 ERROR: topological-sort-failed ;
 
 : largest-class ( seq -- n elt )
-    dup [ [ class< ] with any? not ] curry find-last
+    dup [ [ class< ] with none? ] curry find-last
     [ topological-sort-failed ] unless* ;
 
 : sort-classes ( seq -- newseq )

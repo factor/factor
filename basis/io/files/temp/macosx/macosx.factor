@@ -1,4 +1,5 @@
-! (c)2012 Joe Groff bsd license
+! Copyright (C) 2012 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax cocoa.plists cocoa.runtime
 cocoa.types core-foundation.strings io.directories io.files
 io.files.temp io.pathnames kernel sequences system ;
@@ -6,7 +7,7 @@ IN: io.files.temp.macosx
 
 <PRIVATE
 
-FUNCTION: id NSTemporaryDirectory ( ) ;
+FUNCTION: id NSTemporaryDirectory ( )
 
 TYPEDEF: NSUInteger NSSearchPathDirectory
 CONSTANT: NSCachesDirectory 13
@@ -18,26 +19,22 @@ FUNCTION: id NSSearchPathForDirectoriesInDomains (
    NSSearchPathDirectory directory,
    NSSearchPathDomainMask domainMask,
    char expandTilde
-) ;
+)
 
 CONSTANT: factor-bundle-name "org.factorcode.Factor"
 
-: (make-factor-bundle-subdir) ( path -- path )
-    factor-bundle-name append-path dup make-directories ;
+: factor-bundle-subdir ( path -- path )
+    factor-bundle-name append-path ;
 
-: (first-existing) ( paths -- path )
-    [ exists? ] map-find nip
+: first-existing ( paths -- path )
+    [ exists? ] find nip
     [ "no user cache directory found" throw ] unless* ; inline
 
 PRIVATE>
 
-: (temp-directory) ( -- path )
-    NSTemporaryDirectory CF>string (make-factor-bundle-subdir) ;
+M: macosx default-temp-directory
+    NSTemporaryDirectory CF>string factor-bundle-subdir ;
 
-M: macosx temp-directory (temp-directory) ;
-
-: (cache-directory) ( -- path )
+M: macosx default-cache-directory
     NSCachesDirectory NSUserDomainMask 1 NSSearchPathForDirectoriesInDomains
-    plist> (first-existing) (make-factor-bundle-subdir) ;
-
-M: macosx cache-directory (cache-directory) ;
+    plist> first-existing factor-bundle-subdir ;

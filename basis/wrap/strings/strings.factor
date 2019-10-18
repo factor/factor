@@ -20,7 +20,7 @@ IN: wrap.strings
 PRIVATE>
 
 : wrap-lines ( string width -- newlines )
-    [ split-lines ] dip '[ _ dup wrap join-elements ] map! concat ;
+    [ split-lines ] dip '[ _ wrap join-elements ] map! concat ;
 
 : wrap-string ( string width -- newstring )
     wrap-lines join-lines ;

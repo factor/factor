@@ -6,13 +6,13 @@ sequences system tools.deploy.backend tools.deploy.config
 tools.deploy.config.editor assocs hashtables prettyprint
 io.backend.unix cocoa io.encodings.utf8 io.backend
 cocoa.application cocoa.classes cocoa.plists
-combinators vocabs.metadata vocabs.loader ;
+combinators vocabs.metadata vocabs.loader webbrowser ;
 QUALIFIED-WITH: tools.deploy.unix unix
 IN: tools.deploy.macosx
 
 : bundle-dir ( -- dir )
     running.app?
-    [ vm parent-directory parent-directory parent-directory ]
+    [ vm-path parent-directory parent-directory parent-directory ]
     [ "resource:Factor.app" ]
     if ;
 
@@ -45,6 +45,9 @@ IN: tools.deploy.macosx
         "Contents/Resources/English.lproj/MiniFactor.nib" copy-bundle-dir
     ] [ drop ] if ;
 
+: vocab-mac-icon-path ( vocab -- string )
+    vocab-dir "icon.icns" append-path ;
+
 : copy-icns ( vocab bundle-name -- icon? )
     swap dup vocab-mac-icon-path vocab-append-path dup exists?
     [ swap "Contents/Resources/Icon.icns" append-path copy-file t ]
@@ -67,33 +70,38 @@ IN: tools.deploy.macosx
 : bundle-name ( -- string )
     deploy-name get ".app" append ;
 
-: show-in-finder ( path -- )
-    [ NSWorkspace -> sharedWorkspace ]
-    [ normalize-path [ <NSString> ] [ parent-directory <NSString> ] bi ] bi*
-    -> selectFile:inFileViewerRootedAtPath: drop ;
-
 : deploy.app-image-name ( vocab bundle-name -- str )
     [ % "/Contents/Resources/" % % ".image" % ] "" make ;
 
 : deploy-app-bundle ( vocab -- )
-    deploy-directory get [
-        dup deploy-config [
-            bundle-name dup exists? [ delete-tree ] [ drop ] if
-            [ bundle-name create-app-dir ] keep
-            [ bundle-name deploy.app-image-name ] keep
-            namespace make-deploy-image
-            bundle-name
-            [ "Contents/Resources" copy-resources ]
-            [ "Contents/Frameworks" copy-libraries ] 2bi
-            bundle-name show-in-finder
-        ] with-variables
-    ] with-directory ;
+    bundle-name dup exists? [ delete-tree ] [ drop ] if
+    [ bundle-name create-app-dir ] keep
+    [ bundle-name deploy.app-image-name ] keep
+    namespace make-deploy-image
+    bundle-name
+    [ "Contents/Resources" copy-resources ]
+    [ "Contents/Frameworks" copy-libraries ] 2bi
+    bundle-name maybe-open-deploy-directory ;
 
 : deploy-app-bundle? ( vocab -- ? )
     deploy-config [ deploy-console? get not deploy-ui? get or ] with-variables ;
 
-M: macosx deploy* ( vocab -- )
+M: macosx deploy*
     ! pass off to M: unix deploy* if we're building a console app
-    dup deploy-app-bundle?
-    [ deploy-app-bundle ]
-    [ call-next-method ] if ;
+    dup deploy-app-bundle? [
+        deploy-app-bundle
+    ] [
+        call-next-method
+    ] if ;
+
+M: macosx deploy-path
+    dup deploy-app-bundle? [
+        deploy-directory get [
+            dup deploy-config [
+                bundle-name "Contents/MacOS/" append-path
+                swap append-path normalize-path
+            ] with-variables
+        ] with-directory
+    ] [
+        call-next-method
+    ] if ;

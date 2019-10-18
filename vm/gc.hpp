@@ -1,12 +1,25 @@
 namespace factor {
 
+struct must_start_gc_again {
+};
+
 enum gc_op {
-  collect_nursery_op,
-  collect_aging_op,
-  collect_to_tenured_op,
-  collect_full_op,
-  collect_compact_op,
-  collect_growing_heap_op
+  COLLECT_NURSERY_OP,
+  COLLECT_AGING_OP,
+  COLLECT_TO_TENURED_OP,
+  COLLECT_FULL_OP,
+  COLLECT_COMPACT_OP,
+  COLLECT_GROWING_DATA_HEAP_OP
+};
+
+// These are the phases of the gc cycles we record the times of.
+enum gc_phase {
+  PHASE_CARD_SCAN,
+  PHASE_CODE_SCAN,
+  PHASE_DATA_SWEEP,
+  PHASE_CODE_SWEEP,
+  PHASE_DATA_COMPACTION,
+  PHASE_MARKING
 };
 
 struct gc_event {
@@ -20,24 +33,12 @@ struct gc_event {
   cell code_blocks_scanned;
   uint64_t start_time;
   cell total_time;
-  cell card_scan_time;
-  cell code_scan_time;
-  cell data_sweep_time;
-  cell code_sweep_time;
-  cell compaction_time;
+  cell times[6];
   uint64_t temp_time;
 
   gc_event(gc_op op, factor_vm* parent);
-  void started_card_scan();
-  void ended_card_scan(cell cards_scanned_, cell decks_scanned_);
-  void started_code_scan();
-  void ended_code_scan(cell code_blocks_scanned_);
-  void started_data_sweep();
-  void ended_data_sweep();
-  void started_code_sweep();
-  void ended_code_sweep();
-  void started_compaction();
-  void ended_compaction();
+  void reset_timer();
+  void ended_phase(gc_phase phase);
   void ended_gc(factor_vm* parent);
 };
 

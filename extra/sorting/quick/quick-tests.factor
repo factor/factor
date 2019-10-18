@@ -1,5 +1,4 @@
-USING: kernel sequences tools.test ;
-IN: sorting.quick
+USING: kernel sequences sorting.quick tools.test ;
 
 { { } } [ { } dup natural-sort! ] unit-test
 { { 1 } } [ { 1 } dup natural-sort! ] unit-test

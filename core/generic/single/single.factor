@@ -4,8 +4,15 @@ USING: accessors arrays assocs classes classes.algebra
 combinators combinators.private definitions effects generic
 hashtables kernel layouts make math namespaces quotations
 sequences words ;
-FROM: assocs => change-at ;
 IN: generic.single
+
+<PRIVATE
+PRIMITIVE: inline-cache-miss ( generic methods index cache -- )
+PRIMITIVE: inline-cache-miss-tail ( generic methods index cache -- )
+PRIMITIVE: lookup-method ( object methods -- method )
+PRIMITIVE: mega-cache-lookup ( methods index cache -- )
+PRIMITIVE: mega-cache-miss ( methods index cache -- method )
+PRIVATE>
 
 ERROR: no-method object generic ;
 
@@ -57,7 +64,7 @@ M: single-combination make-default-method
 ! ! ! Build an engine ! ! !
 
 : find-default ( methods -- default )
-    #! Side-effects methods.
+    ! Side-effects methods.
     [ object bootstrap-word ] dip delete-at* [
         drop generic-word get "default-method" word-prop
     ] unless ;
@@ -82,7 +89,7 @@ C: <predicate-engine> predicate-engine
 
 ! 2. Convert methods
 : split-methods ( assoc class -- first second )
-    [ [ nip class<= not ] curry assoc-filter ]
+    [ [ nip class<= ] curry assoc-reject ]
     [ [ nip class<=     ] curry assoc-filter ] 2bi ;
 
 : convert-methods ( assoc class word -- assoc' )
@@ -101,30 +108,30 @@ TUPLE: tuple-dispatch-engine echelons ;
     [ ?set-at ] change-at ;
 
 : echelon-sort ( assoc -- assoc' )
-    #! Convert an assoc mapping classes to methods into an
-    #! assoc mapping echelons to assocs. The first echelon
-    #! is always there
+    ! Convert an assoc mapping classes to methods into an
+    ! assoc mapping echelons to assocs. The first echelon
+    ! is always there
     H{ { 0 f } } clone [ [ push-echelon ] curry assoc-each ] keep ;
 
 : copy-superclass-methods ( engine superclass assoc -- )
     at* [ [ methods>> ] bi@ assoc-union! drop ] [ 2drop ] if ;
 
 : copy-superclasses-methods ( class engine assoc -- )
-    [ superclasses ] 2dip
+    [ superclasses-of ] 2dip
     [ swapd copy-superclass-methods ] 2curry each ;
 
 : convert-tuple-inheritance ( assoc -- assoc' )
-    #! A method on a superclass A might have a higher precedence
-    #! than a method on a subclass B, if the methods are
-    #! defined on incomparable classes that happen to contain
-    #! A and B, respectively. Copy A's methods into B's set so
-    #! that they can be sorted and selected properly.
+    ! A method on a superclass A might have a higher precedence
+    ! than a method on a subclass B, if the methods are
+    ! defined on incomparable classes that happen to contain
+    ! A and B, respectively. Copy A's methods into B's set so
+    ! that they can be sorted and selected properly.
     dup dup [ copy-superclasses-methods ] curry assoc-each ;
 
 : <tuple-dispatch-engine> ( methods -- engine )
     convert-tuple-inheritance echelon-sort
     [ dupd <echelon-dispatch-engine> ] assoc-map
-    \ tuple-dispatch-engine boa ;
+    tuple-dispatch-engine boa ;
 
 : convert-tuple-methods ( assoc -- assoc' )
     tuple bootstrap-word
@@ -150,7 +157,7 @@ GENERIC: compile-engine ( engine -- obj )
     [ over assumed [ compile-engine ] with-variable ] assoc-map ;
 
 : direct-dispatch-table ( assoc n -- table )
-    default get <array> <enum> swap assoc-union! seq>> ;
+    default get <array> <enumerated> swap assoc-union! seq>> ;
 
 : tag-number ( class -- n ) "type" word-prop ;
 
@@ -177,7 +184,7 @@ M: tuple-dispatch-engine compile-engine
     tuple assumed [
         echelons>> compile-engines
         dup keys supremum 1 + f <array>
-        <enum> swap assoc-union! seq>>
+        <enumerated> swap assoc-union! seq>>
     ] with-variable ;
 
 PREDICATE: predicate-engine-word < word "owner-generic" word-prop ;
@@ -194,7 +201,7 @@ SYMBOL: predicate-engines
     predicate-engines get [ at ] curry map-find drop ;
 
 : next-predicate-engine ( engine -- word )
-    class>> superclasses
+    class>> superclasses-of
     find-predicate-engine
     default get or ;
 

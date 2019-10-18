@@ -51,8 +51,7 @@ ERROR: bit-range-error x high low ;
 : W* ( x y -- z ) * 64 bits ; inline
 
 : symbols>flags ( symbols assoc -- flag-bits )
-    [ at ] curry map
-    0 [ bitor ] reduce ;
+    '[ _ at ] map 0 [ bitor ] reduce ;
 
 ! bitfield
 <PRIVATE
@@ -60,16 +59,21 @@ ERROR: bit-range-error x high low ;
 GENERIC: (bitfield-quot) ( spec -- quot )
 
 M: integer (bitfield-quot) ( spec -- quot )
-    [ swapd shift bitor ] curry ;
+    '[ _ shift ] ;
 
 M: pair (bitfield-quot) ( spec -- quot )
-    first2-unsafe over word? [ [ swapd execute ] dip ] [ ] ?
-    [ shift bitor ] append 2curry ;
+    first2-unsafe over word? [
+        '[ _ execute _ shift ]
+    ] [
+        '[ _ _ shift ]
+    ] if ;
 
 PRIVATE>
 
-MACRO: bitfield ( bitspec -- )
-    [ 0 ] [ (bitfield-quot) compose ] reduce ;
+MACRO: bitfield ( bitspec -- quot )
+    [ [ 0 ] ] [
+        [ (bitfield-quot) ] [ '[ @ _ dip bitor ] ] map-reduce
+    ] if-empty ;
 
 ! bit-count
 <PRIVATE
@@ -79,7 +83,7 @@ DEFER: byte-bit-count
 <<
 
 \ byte-bit-count
-256 iota [
+256 <iota> [
     8 <bits> 0 [ [ 1 + ] when ] reduce
 ] B{ } map-as '[ 0xff bitand _ nth-unsafe ]
 ( byte -- table ) define-declared

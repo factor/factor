@@ -7,12 +7,12 @@ HELP: directory-tree-files
 
 HELP: with-directory-tree-files
 { $values { "path" "a pathname string" } { "quot" quotation } }
-{ $description "Calls the quotation with the recursive directory file names on the stack and with the directory set as the " { $link current-directory } ".  Restores the current directory after the quotation is called." } ;
+{ $description "Calls the quotation with the recursive directory file names on the stack and with the directory set as the " { $link current-directory } ". Restores the current directory after the quotation is called." } ;
 
 HELP: delete-tree
 { $values { "path" "a pathname string" } }
 { $description "Deletes a file or directory, recursing into subdirectories." }
-{ $errors "Throws an error if the deletion fails." } 
+{ $errors "Throws an error if the deletion fails." }
 { $warning "Misuse of this word can lead to catastrophic data loss." } ;
 
 HELP: copy-tree

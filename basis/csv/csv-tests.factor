@@ -1,6 +1,6 @@
 USING: io.streams.string csv tools.test kernel strings
-io.pathnames io.files.unique io.encodings.utf8 io.files
-io.directories ;
+io.pathnames io.files.temp io.files.unique io.encodings.utf8
+io.files io.directories ;
 IN: csv.tests
 
 ! I like to name my unit tests
@@ -48,10 +48,10 @@ IN: csv.tests
 
 ! !!!!!!!!  other tests
 
-[ { { "Phil Dawes" } } ]
+{ { { "Phil Dawes" } } }
 [ "\"Phil Dawes\"" string>csv ] unit-test
 
-[ { { "1" "2" "3" } { "4" "5" "6" } } ]
+{ { { "1" "2" "3" } { "4" "5" "6" } } }
 [ "1,2,3\n4,5,6\n" string>csv ] unit-test
 
 "trims leading and trailing whitespace - n.b. this isn't really conformant, but lots of csv seems to assume this"
@@ -77,19 +77,24 @@ IN: csv.tests
 [ "\"fo\"\"o1\",bar1\n\"fo\no2\",\"b,ar2\"\n" ]
 [ { { "fo\"o1" "bar1" } { "fo\no2" "b,ar2" } } csv>string ] named-unit-test ! "
 
-[ { { "writing" "some" "csv" "tests" } } ]
+{ { { "writing" "some" "csv" "tests" } } }
 [
-    "writing,some,csv,tests"
-    "csv-test1-" unique-file utf8
-    [ set-file-contents ] [ file>csv ] [ drop delete-file ] 2tri
+    [
+        "writing,some,csv,tests"
+        "csv-test1-" ".csv" unique-file utf8
+        [ set-file-contents ] [ file>csv ] [ drop delete-file ] 2tri
+    ] with-temp-directory
 ] unit-test
 
-[ t ] [
-    { { "writing,some,csv,tests" } } dup "csv-test2-"
-    unique-file utf8 [ csv>file ] [ file>csv ] 2bi =
+{ t } [
+    [
+        { { "writing,some,csv,tests" } } dup
+        "csv-test2-" ".csv" unique-file utf8
+        [ csv>file ] [ file>csv ] 2bi =
+    ] with-temp-directory
 ] unit-test
 
-[ { { "hello" "" "" "" "goodbye" "" } } ]
+{ { { "hello" "" "" "" "goodbye" "" } } }
 [ "hello,,\"\",,goodbye," string>csv ] unit-test
 
 { { { "asd\"f\"" "asdf" } } } [ "asd\"f\",asdf" string>csv ] unit-test
@@ -101,11 +106,11 @@ IN: csv.tests
 ! FIXME: { { { "asd\"f\"" "asdf" } } } [ "\"asd\"\"\"f\",asdf" string>csv ] unit-test
 { { { "as,d\"f" "asdf" } } } [ "\"as,\"d\"\"\"\"f,asdf" string>csv ] unit-test
 
-[ { } ] [ "" string>csv ] unit-test
+{ { } } [ "" string>csv ] unit-test
 
-[
+{
     { { "Year" "Make" "Model" }
       { "1997" "Ford" "E350" }
     }
-]
+}
 [ "Year,Make,\"Model\"\r\n1997,Ford,E350" string>csv ] unit-test

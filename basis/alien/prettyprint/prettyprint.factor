@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel combinators alien alien.enums
-alien.strings alien.c-types alien.parser alien.syntax arrays
-assocs effects math.parser prettyprint prettyprint.backend
-prettyprint.custom prettyprint.sections definitions see
-see.private sequences strings words ;
+USING: accessors alien alien.c-types alien.enums alien.strings
+alien.syntax arrays assocs combinators combinators.short-circuit
+definitions effects kernel math.parser prettyprint.backend
+prettyprint.custom prettyprint.sections see see.private sequences
+words ;
 IN: alien.prettyprint
 
 M: alien pprint*
@@ -21,25 +21,20 @@ M: c-type-word definition drop f ;
 M: c-type-word declarations. drop ;
 
 <PRIVATE
-GENERIC: pointer-string ( pointer -- string/f )
-M: object pointer-string drop f ;
-M: word pointer-string [ record-vocab ] [ name>> ] bi ;
-M: pointer pointer-string to>> pointer-string [ CHAR: * suffix ] [ f ] if* ;
+GENERIC: record-pointer ( pointer -- )
+M: object record-pointer drop ;
+M: word record-pointer record-vocab ;
+M: pointer record-pointer to>> record-pointer ;
 
-GENERIC: c-type-string ( c-type -- string )
-
-M: word c-type-string [ record-vocab ] [ name>> ] bi ;
-M: pointer c-type-string dup pointer-string [ ] [ unparse ] ?if ;
-M: wrapper c-type-string wrapped>> c-type-string ;
-M: array c-type-string
-    unclip
-    [ [ unparse "[" "]" surround ] map ]
-    [ c-type-string ] bi*
-    prefix concat ;
+GENERIC: record-c-type ( c-type -- )
+M: word record-c-type record-vocab ;
+M: pointer record-c-type record-pointer ;
+M: wrapper record-c-type wrapped>> record-c-type ;
+M: array record-c-type first record-c-type ;
 PRIVATE>
 
 : pprint-c-type ( c-type -- )
-    [ c-type-string ] keep present-text ;
+    [ record-c-type ] [ c-type-string ] [ ] tri present-text ;
 
 M: pointer pprint*
     <flow \ pointer: pprint-word to>> pprint* block> ;
@@ -77,8 +72,14 @@ M: typedef-word synopsis*
         ")" text block>
     ] tri ; inline
 
+PREDICATE: alien-function-alias-word < word
+    def>> {
+        [ length 6 = ]
+        [ last \ alien-invoke eq? ]
+    } 1&& ;
+
 M: alien-function-alias-word definer
-    drop \ FUNCTION-ALIAS: \ ; ;
+    drop \ FUNCTION-ALIAS: f ;
 M: alien-function-alias-word definition drop f ;
 M: alien-function-alias-word synopsis*
     {
@@ -88,9 +89,13 @@ M: alien-function-alias-word synopsis*
         [ pprint-word ]
         [ [ def>> third text ] pprint-function ]
     } cleave ;
+M: alien-function-alias-word declarations. drop ;
+
+PREDICATE: alien-function-word < alien-function-alias-word
+    [ def>> third ] [ name>> ] bi = ;
 
 M: alien-function-word definer
-    drop \ FUNCTION: \ ; ;
+    drop \ FUNCTION: f ;
 M: alien-function-word synopsis*
     {
         [ seeing-word ]
@@ -99,8 +104,11 @@ M: alien-function-word synopsis*
         [ [ pprint-word ] pprint-function ]
     } cleave ;
 
+PREDICATE: alien-callback-type-word < typedef-word
+    "callback-effect" word-prop >boolean ;
+
 M: alien-callback-type-word definer
-    drop \ CALLBACK: \ ; ;
+    drop \ CALLBACK: f ;
 M: alien-callback-type-word definition drop f ;
 M: alien-callback-type-word synopsis*
     {
@@ -110,7 +118,7 @@ M: alien-callback-type-word synopsis*
         [ def>> first first pprint-c-type ]
         [ pprint-word ]
         [
-            <block "(" text 
+            <block "(" text
             [ def>> first second ] [ "callback-effect" word-prop in>> ] bi
             pprint-function-args
             ")" text block>

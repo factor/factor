@@ -6,9 +6,9 @@ destructors io io.encodings.string io.encodings.utf8 kernel locals
 math math.parser namespaces sequences strings ;
 IN: cuda.demos.hello-world
 
-CUDA-LIBRARY: hello cuda32 vocab:cuda/demos/hello-world/hello.ptx
+CUDA-LIBRARY: hello cuda32 "vocab:cuda/demos/hello-world/hello.ptx"
 
-CUDA-FUNCTION: helloWorld ( char* string-ptr ) ;
+CUDA-FUNCTION: helloWorld ( char* string-ptr )
 
 : cuda-hello-world ( -- )
     init-cuda
@@ -16,8 +16,7 @@ CUDA-FUNCTION: helloWorld ( char* string-ptr ) ;
         [
             context-device number>string
             "CUDA device " ": " surround write
-            "Hello World!" >byte-array [ - ] map-index host>device &cuda-free
-
+            "Hello World!" utf8 encode [ - ] B{ } map-index-as host>device &cuda-free
             [ { 2 1 } { 6 1 1 } <grid> helloWorld ]
             [ 12 device>host >string print ] bi
         ] with-destructors

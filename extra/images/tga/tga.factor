@@ -79,7 +79,7 @@ ERROR: bad-tga-unsupported ;
     41 read ascii decode [ 0 = ] trim ; inline
 
 : read-author-comments ( -- string )
-    4 iota [ drop 81 read ascii decode [ 0 = ] trim ] map concat ; inline
+    4 <iota> [ drop 81 read ascii decode [ 0 = ] trim ] map concat ; inline
 
 : read-date-timestamp ( -- timestamp )
     timestamp new
@@ -132,16 +132,16 @@ ERROR: bad-tga-unsupported ;
     1 read le> 4 = ; inline
 
 : read-scan-line-table ( height -- scan-offsets )
-    iota [ drop 4 read le> ] map ; inline
+    <iota> [ drop 4 read le> ] map ; inline
 
 : read-postage-stamp-image ( depth -- postage-data )
     8 align 8 / 1 read le> 1 read le> * * read ; inline
 
 :: read-color-correction-table ( -- correction-table )
-    256 iota
+    256 <iota>
     [
         drop
-        4 iota
+        4 <iota>
         [
             drop
             2 read le> 65535 /f :> alpha
@@ -153,7 +153,7 @@ ERROR: bad-tga-unsupported ;
     ] map ; inline
 
 : read-developer-directory ( -- developer-directory )
-    2 read le> iota
+    2 read le> <iota>
     [
         drop
         2 read le>
@@ -169,7 +169,7 @@ ERROR: bad-tga-unsupported ;
     ] map >hashtable ; inline
 
 :: read-tga ( -- image )
-    #! Read header
+    ! Read header
     read-id-length                                       :> id-length
     read-color-map-type                                  :> map-type
     read-image-type                                      :> image-type
@@ -187,13 +187,13 @@ ERROR: bad-tga-unsupported ;
     image-width image-height pixel-depth read-image-data :> image-data
 
     [
-        #! Read optional footer
+        ! Read optional footer
         26 seek-end seek-input
         read-extension-area-offset      :> extension-offset
         read-developer-directory-offset :> directory-offset
         read-signature
 
-        #! Read optional extension section
+        ! Read optional extension section
         extension-offset 0 =
         [
             extension-offset seek-absolute seek-input
@@ -228,7 +228,7 @@ ERROR: bad-tga-unsupported ;
             scan-line-offset seek-absolute seek-input
             image-height read-scan-line-table :> scan-offsets
 
-            #! Read optional developer section
+            ! Read optional developer section
             directory-offset 0 =
             [ f ]
             [
@@ -238,14 +238,14 @@ ERROR: bad-tga-unsupported ;
         ] unless
     ] ignore-errors
 
-    #! Only 24-bit uncompressed BGR and 32-bit uncompressed BGRA are supported.
-    #! Other formats would need to be converted to work within the image class.
+    ! Only 24-bit uncompressed BGR and 32-bit uncompressed BGRA are supported.
+    ! Other formats would need to be converted to work within the image class.
     map-type 0 = [ bad-tga-unsupported ] unless
     image-type 2 = [ bad-tga-unsupported ] unless
     pixel-depth { 24 32 } member? [ bad-tga-unsupported ] unless
     pixel-order { 0 2 } member? [ bad-tga-unsupported ] unless
 
-    #! Create image instance
+    ! Create image instance
     image new
     alpha-bits 0 = [ BGR ] [ BGRA ] if >>component-order
     { image-width image-height }       >>dim
@@ -262,11 +262,11 @@ M: tga-image image>stream
         component-order>> { BGRA BGRA } member? [ bad-tga-unsupported ] unless
     ] keep
 
-    B{ 0 }         write #! id-length
-    B{ 0 }         write #! map-type
-    B{ 2 }         write #! image-type
-    B{ 0 0 0 0 0 } write #! color map first, length, entry size
-    B{ 0 0 0 0 }   write #! x-origin, y-origin
+    B{ 0 }         write ! id-length
+    B{ 0 }         write ! map-type
+    B{ 2 }         write ! image-type
+    B{ 0 0 0 0 0 } write ! color map first, length, entry size
+    B{ 0 0 0 0 }   write ! x-origin, y-origin
     {
         [ dim>> first 2 >le write ]
         [ dim>> second 2 >le write ]

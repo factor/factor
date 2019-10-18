@@ -1,8 +1,10 @@
-USING: accessors arrays assocs calendar continuations
-environment eval hashtables io io.directories
-io.encodings.ascii io.encodings.utf8 io.files io.files.temp io.launcher
-io.launcher.windows io.pathnames kernel math namespaces parser
-sequences splitting system tools.test combinators.short-circuit ;
+USING: accessors arrays assocs calendar
+combinators.short-circuit continuations environment eval
+hashtables io io.directories io.encodings.ascii
+io.encodings.utf8 io.files io.files.temp io.files.unique
+io.launcher io.launcher.private io.launcher.windows
+io.pathnames kernel math namespaces parser sequences
+splitting system tools.test ;
 IN: io.launcher.windows.tests
 
 [ "hello world" ] [ { "hello" "world" } join-arguments ] unit-test
@@ -73,23 +75,26 @@ IN: io.launcher.windows.tests
     try-output-process
 ] must-fail
 
-: console-vm ( -- path )
-    vm ".exe" ?tail [ ".com" append ] when ;
+: console-vm-path ( -- path )
+    vm-path ".exe" ?tail [ ".com" append ] when ;
+
+SYMBOLS: out-path err-path ;
 
 [ ] [
     <process>
-        console-vm "-run=hello-world" 2array >>command
-        "out.txt" temp-file >>stdout
+        console-vm-path "-run=hello-world" 2array >>command
+        [ "out" ".txt" unique-file ] with-temp-directory
+        [ out-path set-global ] keep >>stdout
     try-process
 ] unit-test
 
 [ "Hello world" ] [
-    "out.txt" temp-file ascii file-lines first
+    out-path get-global ascii file-lines first
 ] unit-test
 
 [ "IN: scratchpad " ] [
     <process>
-        console-vm "-run=listener" 2array >>command
+        console-vm-path "-run=listener" 2array >>command
         +closed+ >>stdin
         +stdout+ >>stderr
     utf8 [ lines last ] with-process-reader
@@ -101,46 +106,50 @@ IN: io.launcher.windows.tests
 [ ] [
     launcher-test-path [
         <process>
-            console-vm "-script" "stderr.factor" 3array >>command
-            "out.txt" temp-file >>stdout
-            "err.txt" temp-file >>stderr
+            console-vm-path "-script" "stderr.factor" 3array >>command
+            [ "out" ".txt" unique-file ] with-temp-directory
+            [ out-path set-global ] keep >>stdout
+            [ "err" ".txt" unique-file ] with-temp-directory
+            [ err-path set-global ] keep >>stderr
         try-process
     ] with-directory
 ] unit-test
 
 [ "output" ] [
-    "out.txt" temp-file ascii file-lines first
+    out-path get-global ascii file-lines first
 ] unit-test
 
 [ "error" ] [
-    "err.txt" temp-file ascii file-lines first
+    err-path get-global ascii file-lines first
 ] unit-test
 
 [ ] [
     launcher-test-path [
         <process>
-            console-vm "-script" "stderr.factor" 3array >>command
-            "out.txt" temp-file >>stdout
+            console-vm-path "-script" "stderr.factor" 3array >>command
+            [ "out" ".txt" unique-file ] with-temp-directory
+            [ out-path set-global ] keep >>stdout
             +stdout+ >>stderr
         try-process
     ] with-directory
 ] unit-test
 
 [ "outputerror" ] [
-    "out.txt" temp-file ascii file-lines first
+    out-path get-global ascii file-lines first
 ] unit-test
 
 [ "output" ] [
     launcher-test-path [
         <process>
-            console-vm "-script" "stderr.factor" 3array >>command
-            "err2.txt" temp-file >>stderr
-        utf8 <process-reader> stream-lines first
+            console-vm-path "-script" "stderr.factor" 3array >>command
+            [ "err2" ".txt" unique-file ] with-temp-directory
+            [ err-path set-global ] keep >>stderr
+        process-lines first
     ] with-directory
 ] unit-test
 
 [ "error" ] [
-    "err2.txt" temp-file ascii file-lines first
+    err-path get-global ascii file-lines first
 ] unit-test
 
 
@@ -148,7 +157,7 @@ IN: io.launcher.windows.tests
 [ t ] [
     launcher-test-path [
         <process>
-            console-vm "-script" "env.factor" 3array >>command
+            console-vm-path "-script" "env.factor" 3array >>command
         utf8 [ contents ] with-process-reader
     ] with-directory eval( -- alist )
 
@@ -158,7 +167,7 @@ IN: io.launcher.windows.tests
 [ t ] [
     launcher-test-path [
         <process>
-            console-vm "-script" "env.factor" 3array >>command
+            console-vm-path "-script" "env.factor" 3array >>command
             +replace-environment+ >>environment-mode
             os-envs >>environment
         utf8 [ contents ] with-process-reader
@@ -170,7 +179,7 @@ IN: io.launcher.windows.tests
 [ "B" ] [
     launcher-test-path [
         <process>
-            console-vm "-script" "env.factor" 3array >>command
+            console-vm-path "-script" "env.factor" 3array >>command
             { { "A" "B" } } >>environment
         utf8 [ contents ] with-process-reader
     ] with-directory eval( -- alist )
@@ -181,7 +190,7 @@ IN: io.launcher.windows.tests
 [ f ] [
     launcher-test-path [
         <process>
-            console-vm "-script" "env.factor" 3array >>command
+            console-vm-path "-script" "env.factor" 3array >>command
             { { "USERPROFILE" "XXX" } } >>environment
             +prepend-environment+ >>environment-mode
         utf8 [ contents ] with-process-reader
@@ -194,41 +203,45 @@ IN: io.launcher.windows.tests
     [ ] [
         <process>
             "cmd.exe /c dir" >>command
-            "dir.txt" temp-file >>stdout
+            [ "dir" ".txt" unique-file ] with-temp-directory
+            [ out-path set-global ] keep >>stdout
         try-process
     ] unit-test
 
-    [ ] [ "dir.txt" temp-file delete-file ] unit-test
+    [ ] [ out-path get-global delete-file ] unit-test
 ] times
 
-[ "append-test" temp-file delete-file ] ignore-errors
-
 { "Hello appender\r\nÖrjan ågren är åter\r\nHello appender\r\nÖrjan ågren är åter\r\n" } [
+    [ "append-test" "" unique-file ] with-temp-directory out-path set-global
     2 [
         launcher-test-path [
             <process>
-                console-vm "-script" "append.factor" 3array >>command
-                "append-test" temp-file <appender> >>stdout
+                console-vm-path "-script" "append.factor" 3array >>command
+                out-path get-global <appender> >>stdout
             try-process
         ] with-directory
     ] times
 
-    "append-test" temp-file utf8 file-contents
+    out-path get-global utf8 file-contents
+] unit-test
+
+{ t "This is a hidden process.\r\n" } [
+    "cmd /c echo.This is a hidden process." utf8 (process-stream) hidden>> swap stream-contents
 ] unit-test
 
 [ "IN: scratchpad " ] [
-    console-vm "-run=listener" 2array
+    console-vm-path "-run=listener" 2array
     ascii [ "USE: system 0 exit" print flush lines last ] with-process-stream
 ] unit-test
 
 [ ] [
-    console-vm "-run=listener" 2array
+    console-vm-path "-run=listener" 2array
     ascii [ "USE: system 0 exit" print ] with-process-writer
 ] unit-test
 
 [ ] [
     <process>
-    console-vm "-run=listener" 2array >>command
+    console-vm-path "-run=listener" 2array >>command
     "vocab:io/launcher/windows/test/input.txt" >>stdin
     try-process
 ] unit-test

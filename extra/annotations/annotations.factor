@@ -14,7 +14,7 @@ IN: annotations
     [ { [ word? ] [ vocabulary>> "annotations" = ] } 1&& not ]
     filter ;
 
-FUNCTOR: define-annotation ( NAME -- )
+<FUNCTOR: define-annotation ( NAME -- )
 
 (NAME) DEFINES (${NAME})
 !NAME  DEFINES !${NAME}
@@ -31,7 +31,7 @@ SYNTAX: !NAME (parse-annotation) \ (NAME) suffix! ;
 : NAMEs. ( -- )
     NAMEs sorted-definitions. ;
 
-;FUNCTOR
+;FUNCTOR>
 
 CONSTANT: annotation-tags {
     "XXX" "TODO" "FIXME" "BUG" "REVIEW" "LICENSE"
@@ -41,4 +41,3 @@ CONSTANT: annotation-tags {
 annotation-tags [ define-annotation ] each
 
 >>
-

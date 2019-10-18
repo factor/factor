@@ -1,27 +1,18 @@
 namespace factor {
 
-inline static void* frame_return_address(void* frame_top) {
-  return *(void**)frame_top;
-}
-
-inline static void set_frame_return_address(void* frame_top,
-                                            void* return_address) {
-  *(void**)frame_top = return_address;
-}
-
 #define CALLSTACK_BOTTOM(ctx) \
-  (void*)(ctx->callstack_seg->end - sizeof(cell) * 5)
+  (ctx->callstack_seg->end - sizeof(cell) * 5)
 
-inline static void flush_icache(cell start, cell len) {}
+inline static void flush_icache(cell start, cell len) { (void)start; (void)len; }
 
-/* In the instruction sequence:
+// In the instruction sequence:
 
-   MOV EBX,...
-   JMP blah
+// MOV EBX,...
+// JMP blah
 
-   the offset from the immediate operand to MOV to the instruction after
-   the jump is a cell for the immediate operand, 4 bytes for the JMP
-   destination, and one byte for the JMP opcode. */
+// the offset from the immediate operand to MOV to the instruction after
+// the jump is a cell for the immediate operand, 4 bytes for the JMP
+// destination, and one byte for the JMP opcode.
 static const fixnum xt_tail_pic_offset = 4 + 1;
 
 static const unsigned char call_opcode = 0xe8;
@@ -42,9 +33,9 @@ inline static void* get_call_target(cell return_address) {
   return (void*)(*(int*)(return_address - 4) + return_address);
 }
 
-inline static void set_call_target(cell return_address, void* target) {
+inline static void set_call_target(cell return_address, cell target) {
   check_call_site(return_address);
-  *(int*)(return_address - 4) = (uint32_t)((cell)target - return_address);
+  *(int*)(return_address - 4) = (uint32_t)(target - return_address);
 }
 
 inline static bool tail_call_site_p(cell return_address) {

@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators definitions fry kernel
 locals.types namespaces parser quotations see sequences slots
 words ;
@@ -59,7 +60,7 @@ PREDICATE: typed-variable < variable
     } 2cleave (define-variable) ;
 
 SYNTAX: TYPED-VAR:
-    scan-new-word scan-object define-typed-variable ;    
+    scan-new-word scan-object define-typed-variable ;
 
 M: typed-variable definer drop \ TYPED-VAR: f ;
 M: typed-variable definition "variable-type" word-prop 1quotation ;
@@ -95,4 +96,3 @@ SYNTAX: TYPED-GLOBAL:
     scan-new-word scan-object define-typed-global ;
 
 M: typed-global-variable definer drop \ TYPED-GLOBAL: f ;
-

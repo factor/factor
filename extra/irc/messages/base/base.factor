@@ -98,17 +98,17 @@ M: irc-message set-irc-command
     ] [ drop ] if* ;
 
 : define-irc-class ( class params -- )
-    [ { ":" "_" } member? not ] filter
+    [ { ":" "_" } member? ] reject
     [ irc-message ] dip define-tuple-class ;
 
 : define-irc-parameter-slots ( class params -- )
-    { ":" } split1 [ over ] dip
+    { ":" } split1 overd
     [ ?define-irc-parameters ] [ ?define-irc-trailing ] 2bi* ;
 PRIVATE>
 
-#! SYNTAX: name string parameters ;
-#! IRC: type "COMMAND" slot1 ...;
-#! IRC: type "COMMAND" slot1 ... : trailing-slot;
+! SYNTAX: name string parameters ;
+! IRC: type "COMMAND" slot1 ...;
+! IRC: type "COMMAND" slot1 ... : trailing-slot;
 SYNTAX: IRC:
     scan-new-class
     [ scan-object register-irc-message-type ] keep

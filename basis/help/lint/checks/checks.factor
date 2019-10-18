@@ -1,13 +1,13 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.struct
-classes.tuple combinators combinators.short-circuit debugger
-definitions effects eval formatting fry grouping help
-help.markup help.topics io io.streams.string kernel macros
-namespaces sequences sequences.deep sets splitting strings
-summary unicode.categories vocabs vocabs.loader words
-words.constant words.symbol ;
-FROM: sets => members ;
+classes.tuple combinators combinators.short-circuit
+combinators.smart continuations debugger definitions effects
+eval formatting fry grouping help help.markup help.topics io
+io.streams.string kernel macros math math.statistics namespaces
+parser.notes prettyprint sequences sequences.deep sets splitting
+strings summary tools.destructors unicode vocabs vocabs.loader
+words words.constant words.symbol ;
 IN: help.lint.checks
 
 ERROR: simple-lint-error message ;
@@ -17,22 +17,47 @@ M: simple-lint-error summary message>> ;
 M: simple-lint-error error. summary print ;
 
 SYMBOL: vocabs-quot
-SYMBOL: all-vocabs
 SYMBOL: vocab-articles
 
+: no-ui-disposables ( seq -- seq' )
+    [
+        class-of name>> {
+            "single-texture" "multi-texture" ! opengl.textures
+            "line" ! core-text
+            "layout" ! ui.text.pango
+            "script-string" ! windows.uniscribe
+            "linux-monitor" ! github issue #2014, race condition in disposing of child monitors
+        } member?
+    ] reject ;
+
+: eval-with-stack ( str -- output )
+    [
+        [
+            parser-quiet? on parse-string [
+                output>array [
+                    nl "--- Data stack:" print stack.
+                ] unless-empty
+            ] call( quot -- )
+        ] [ nip print-error ] recover
+    ] with-string-writer ;
+
 : check-example ( element -- )
-    ! [
+    [
         '[
             _ rest [
                 but-last "\n" join
-                [ (eval>string) ] call( code -- output )
+                eval-with-stack
                 "\n" ?tail drop
             ] keep
             last assert=
-        ] vocabs-quot get call( quot -- ) ;
-    ! ] leaks members length [
-    !     "%d disposable(s) leaked in example" sprintf simple-lint-error
-    ! ] unless-zero ;
+        ] vocabs-quot get call( quot -- )
+    ] leaks members no-ui-disposables
+    dup length 0 > [
+       dup [ class-of ] histogram-by
+       [ "Leaked resources: " write ... ] with-string-writer simple-lint-error
+    ] [
+        drop
+    ] if ;
 
 : check-examples ( element -- )
     \ $example swap elements [ check-example ] each ;
@@ -79,6 +104,7 @@ SYMBOL: vocab-articles
         [ parsing-word? ]
         [ "declared-effect" word-prop not ]
         [ constant? ]
+        [ "help" word-prop not ]
     } 1|| ;
 
 : skip-check-values? ( word element -- ? )
@@ -108,9 +134,6 @@ SYMBOL: vocab-articles
 : check-see-also ( element -- )
     \ $see-also swap elements [ rest all-unique? ] all?
     [ "$see-also are not unique" simple-lint-error ] unless ;
-
-: vocab-exists? ( name -- ? )
-    [ lookup-vocab ] [ all-vocabs get member? ] bi or ;
 
 : check-modules ( element -- )
     \ $vocab-link swap elements [
@@ -157,7 +180,7 @@ SYMBOL: vocab-articles
             dup struct-class? [ struct-slots ] [ all-slots ] if
             [ name>> ] map
         ] [ extract-slots ] bi*
-        [ swap member? not ] with filter [
+        [ swap member? ] with reject [
             ", " join "Described $slot does not exist: " prepend
             simple-lint-error
         ] unless-empty
@@ -199,7 +222,7 @@ SYMBOL: vocab-articles
     } cleave ;
 
 : files>vocabs ( -- assoc )
-    vocabs
+    loaded-vocab-names
     [ [ [ vocab-docs-path ] keep ] H{ } map>assoc ]
     [ [ [ vocab-source-path ] keep ] H{ } map>assoc ]
     bi assoc-union ;

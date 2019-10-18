@@ -1,19 +1,16 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs classes classes.mixin kernel namespaces
-parser ui.gadgets ui.gadgets.scrollers ui.gadgets.tracks
-combinators.short-circuit ;
+USING: accessors classes combinators.short-circuit kernel ui
+ui.gadgets ui.gadgets.borders ui.gadgets.scrollers
+ui.gadgets.tracks ui.pens.solid ui.theme words ;
+
 IN: ui.tools.common
 
-SYMBOL: tool-dims
-
-tool-dims [ H{ } clone ] initialize
-
-: set-tool-dim ( dim class -- )
-    tool-dims get-global set-at ;
+: set-tool-dim ( class dim -- )
+    "tool-dim" set-word-prop ;
 
 : get-tool-dim ( class -- dim )
-    tool-dims get-global at ;
+    "tool-dim" word-prop ;
 
 TUPLE: tool < track ;
 
@@ -22,8 +19,11 @@ M: tool pref-dim*
 
 M: tool layout*
     [ call-next-method ]
-    [ [ dim>> ] [ class-of ] bi set-tool-dim ]
-    bi ;
+    [
+        dup fullscreen? [ drop ] [
+            [ class-of ] [ dim>> ] bi set-tool-dim
+        ] if
+    ] bi ;
 
 SLOT: scroller
 
@@ -38,3 +38,13 @@ SLOT: scroller
 
 : com-scroll-down ( tool -- )
     scroller>> scroll-down-line ;
+
+: margins ( child -- border )
+    { 9 9 } <filled-border> ;
+
+: with-lines ( track -- track )
+    dup orientation>> >>gap
+    line-color <solid> >>interior ;
+
+: white-interior ( track -- track )
+    content-background <solid> >>interior ;

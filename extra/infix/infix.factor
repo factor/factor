@@ -1,9 +1,10 @@
 ! Copyright (C) 2009 Philipp Brüschweiler
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators effects effects.parser fry
-infix.ast infix.parser kernel locals locals.parser math
-math.functions math.order math.ranges multiline namespaces
-parser quotations sequences summary words ;
+USING: accessors combinators combinators.short-circuit effects
+effects.parser fry infix.ast infix.parser kernel locals
+locals.parser locals.types math math.functions math.order
+math.ranges multiline parser quotations sequences summary
+vocabs.parser words words.constant ;
 IN: infix
 
 <PRIVATE
@@ -15,7 +16,11 @@ M: local-not-defined summary
     drop "local is not defined" ;
 
 : >local-word ( string -- word )
-    locals get ?at [ local-not-defined ] unless ;
+    dup search dup {
+        [ local? ]
+        [ constant? ]
+        [ stack-effect ( -- x ) effect= ]
+    } 1|| [ nip ] [ drop local-not-defined ] if ;
 
 ERROR: invalid-op string ;
 
@@ -32,7 +37,7 @@ ERROR: invalid-op string ;
 
 GENERIC: infix-codegen ( ast -- quot/number )
 
-M: ast-number infix-codegen value>> ;
+M: ast-value infix-codegen value>> ;
 
 M: ast-local infix-codegen
     name>> >local-word ;
@@ -45,11 +50,16 @@ M: ast-array infix-codegen
     [ name>> >local-word ] bi '[ @ _ infix-nth ] ;
 
 : infix-subseq-step ( subseq step -- subseq' )
-    dup 0 < [ [ reverse! ] dip ] when
-    abs dup 1 = [ drop ] [
-        [ dup length 1 [-] 0 swap ] dip
-        <range> swap nths
-    ] if ;
+    {
+        { 0 [ "slice step cannot be zero" throw ] }
+        { 1 [ ] }
+        { -1 [ reverse! ] }
+        [
+            [ dup length 1 [-] 0 ] dip
+            [ 0 > [ swap ] when ] keep
+            <range> swap nths
+        ]
+    } case ;
 
 :: infix-subseq-range ( from to step len -- from to )
     step [ 0 < ] [ f ] if* [

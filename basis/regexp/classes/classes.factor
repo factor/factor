@@ -1,11 +1,9 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math math.order words combinators
-combinators.smart combinators.short-circuit locals
-unicode.categories sequences fry macros arrays assocs sets
-classes unicode.script unicode.data ;
+USING: accessors arrays assocs classes combinators
+combinators.short-circuit combinators.smart fry kernel locals
+math math.order sequences sets unicode unicode.data ;
 FROM: ascii => ascii? ;
-FROM: sets => members ;
 IN: regexp.classes
 
 SINGLETONS: dot letter-class LETTER-class Letter-class digit-class
@@ -217,7 +215,7 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
     dup
     [ simples>> ] [ not-simples>> ] [ and>> ] tri
     3append or-class boa
-    '[ [ _ class-member? not ] filter ] change-integers ;
+    '[ [ _ class-member? ] reject ] change-integers ;
 
 : answer-ands ( partition -- partition' )
     dup [ integers>> ] [ not-simples>> ] [ simples>> ] tri 3append
@@ -276,7 +274,7 @@ M: primitive-class class-member?
 TUPLE: condition question yes no ;
 C: <condition> condition
 
-GENERIC# answer 2 ( class from to -- new-class )
+GENERIC#: answer 2 ( class from to -- new-class )
 
 M:: object answer ( class from to -- new-class )
     class from = to class ? ;
@@ -293,7 +291,7 @@ M: or-class answer
 M: not-class answer
     [ class>> ] 2dip answer <not-class> ;
 
-GENERIC# substitute 1 ( class from to -- new-class )
+GENERIC#: substitute 1 ( class from to -- new-class )
 M: object substitute answer ;
 M: not-class substitute [ <not-class> ] bi@ answer ;
 
@@ -328,7 +326,7 @@ M: object class>questions 1array ;
     ! input table is state => class
     >alist dup table>questions make-condition ;
 
-: condition-map ( condition quot: ( obj -- obj' ) -- new-condition ) 
+: condition-map ( condition quot: ( obj -- obj' ) -- new-condition )
     over condition? [
         [ [ question>> ] [ yes>> ] [ no>> ] tri ] dip
         '[ _ condition-map ] bi@ <condition>

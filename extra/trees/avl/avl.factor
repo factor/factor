@@ -23,15 +23,14 @@ TUPLE: avl-node < node balance ;
     '[ _ + ] change-balance ;
 
 : rotate ( node -- node )
-    dup
-    [ node+link ]
-    [ node-link ]
-    [ set-node+link ] tri
-    [ set-node-link ] keep ;    
+    dup node+link
+    dup node-link
+    pick set-node+link
+    [ set-node-link ] keep ;
 
 : single-rotate ( node -- node )
     0 >>balance
-    0 over node+link 
+    0 over node+link
     balance<< rotate ;
 
 : pick-balances ( a node -- balance balance )
@@ -64,28 +63,29 @@ TUPLE: avl-node < node balance ;
 
 DEFER: avl-set
 
-: avl-insert ( value key node -- node taller? )
+: avl-insert ( value key node -- node taller? created? )
     2dup key>> before? left right ? [
-        [ node-link avl-set ] keep swap
-        [ [ set-node-link ] keep ] dip
-        [ current-side get increase-balance balance-insert ]
-        [ f ] if
+        [ node-link avl-set ] keep -rot
+        [ [ set-node-link ] keep ] 2dip swap
+        [ [ current-side get increase-balance balance-insert ] dip ]
+        [ f swap ] if
     ] with-side ;
 
-: (avl-set) ( value key node -- node taller? )
+: (avl-set) ( value key node -- node taller? created? )
     2dup key>> = [
-        -rot pick key<< over value<< f
+        -rot pick key<< >>value f f
     ] [ avl-insert ] if ;
 
-: avl-set ( value key node -- node taller? )
-    [ (avl-set) ] [ swap <avl-node> t ] if* ;
+: avl-set ( value key node -- node taller? created? )
+    [ (avl-set) ] [ swap <avl-node> t t ] if* ;
 
 M: avl set-at ( value key node -- )
-    [ avl-set drop ] change-root drop ;
+    [ avl-set nip swap ] change-root
+    swap [ dup inc-count ] when drop ;
 
 : delete-select-rotate ( node -- node shorter? )
     dup node+link balance>> zero? [
-        current-side get neg over balance<<
+        current-side get neg >>balance
         current-side get over node+link balance<< rotate f
     ] [
         select-rotate t
@@ -100,7 +100,7 @@ M: avl set-at ( value key node -- )
 
 : balance-delete ( node -- node shorter? )
     current-side get over balance>> {
-        { [ dup zero? ] [ drop neg over balance<< f ] }
+        { [ dup zero? ] [ drop neg >>balance f ] }
         { [ 2dup = ] [ 2drop 0 >>balance t ] }
         [ drop neg increase-balance rebalance-delete ]
     } cond ;
@@ -114,7 +114,7 @@ M: avl set-at ( value key node -- )
     ] if* ;
 
 : replace-with-a-child ( node -- node shorter? )
-    #! assumes that node is not a leaf, otherwise will recurse forever
+    ! assumes that node is not a leaf, otherwise will recurse forever
     dup node-link [
         dupd [ avl-replace-with-extremity ] with-other-side
         [ over set-node-link ] dip [ balance-delete ] [ f ] if
@@ -123,8 +123,8 @@ M: avl set-at ( value key node -- )
     ] if* ;
 
 : avl-delete-node ( node -- node shorter? )
-    #! delete this node, returning its replacement, and whether this subtree is
-    #! shorter as a result
+    ! delete this node, returning its replacement, and whether this subtree is
+    ! shorter as a result
     dup leaf? [
         drop f t
     ] [
@@ -136,7 +136,7 @@ GENERIC: avl-delete ( key node -- node shorter? deleted? )
 M: f avl-delete ( key f -- f f f ) nip f f ;
 
 : (avl-delete) ( key node -- node shorter? deleted? )
-    swap over node-link avl-delete [
+    tuck node-link avl-delete [
         [ over set-node-link ] dip [ balance-delete ] [ f ] if
     ] dip ;
 
@@ -148,7 +148,8 @@ M: avl-node avl-delete ( key node -- node shorter? deleted? )
     ] if-zero ;
 
 M: avl delete-at ( key node -- )
-    [ avl-delete 2drop ] change-root drop ;
+    [ avl-delete nip swap ] change-root
+    swap [ dup dec-count ] when drop ;
 
 M: avl new-assoc 2drop <avl> ;
 

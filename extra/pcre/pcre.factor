@@ -1,11 +1,10 @@
-! Copyright (C) 2013 Björn Lindqvist
+! Copyright (C) 2013, 2016 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors alien alien.accessors alien.c-types alien.data
 alien.enums alien.strings arrays assocs combinators fry
 io.encodings.string io.encodings.utf8 kernel literals math
-math.bitwise pcre.ffi sequences splitting strings ;
-QUALIFIED: regexp
+math.bitwise math.parser pcre.ffi regexp sequences splitting strings ;
 IN: pcre
 
 ERROR: bad-option what ;
@@ -13,6 +12,9 @@ ERROR: bad-option what ;
 ERROR: malformed-regexp expr error ;
 
 ERROR: pcre-error value ;
+
+: version ( -- f )
+    pcre_version " -" splitting:split first string>number ;
 
 <PRIVATE
 
@@ -70,12 +72,13 @@ ERROR: pcre-error value ;
 
 : name-table-entries ( pcre extra -- addrs )
     [ name-table ] [ name-entry-size ] [ name-count ] 2tri
-    iota [ * + name-table-entry 2array ] 2with map ;
+    <iota> [ * + name-table-entry 2array ] 2with map ;
 
 : options ( pcre -- opts )
     f PCRE_INFO_OPTIONS pcre-fullinfo ;
 
-CONSTANT: default-opts flags{ PCRE_UTF8 PCRE_UCP }
+: default-opts ( -- opts )
+    PCRE_UTF8 version 8.10 >= [ PCRE_UCP bitor ] when ;
 
 : (pcre) ( expr -- pcre err-message err-offset )
     default-opts { c-string int } [ f pcre_compile ] with-out-parameters ;
@@ -87,7 +90,7 @@ CONSTANT: default-opts flags{ PCRE_UTF8 PCRE_UCP }
     0 { c-string } [ pcre_study ] with-out-parameters drop ;
 
 : exec ( pcre extra subject ofs opts -- count match-data )
-    [ dup length ] 2dip 30 int <c-array> 30 [ pcre_exec ] 2keep drop ;
+    [ dup length ] 2dip 30 int <c-array> 30 [ pcre_exec ] keepd ;
 
 TUPLE: matcher pcre extra subject ofs exec-opts ;
 

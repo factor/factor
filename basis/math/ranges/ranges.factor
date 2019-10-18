@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel layouts math math.order namespaces sequences
-sequences.private accessors classes.tuple arrays ;
+USING: accessors classes.tuple kernel math math.order sequences
+sequences.private ;
 IN: math.ranges
 
 TUPLE: range

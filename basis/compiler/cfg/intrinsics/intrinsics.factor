@@ -1,34 +1,26 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: words sequences kernel combinators cpu.architecture assocs
-math.bitwise
-compiler.cfg.hats
-compiler.cfg.stacks
-compiler.cfg.instructions
-compiler.cfg.intrinsics.alien
-compiler.cfg.intrinsics.allot
-compiler.cfg.intrinsics.fixnum
-compiler.cfg.intrinsics.float
-compiler.cfg.intrinsics.slots
-compiler.cfg.intrinsics.strings
-compiler.cfg.intrinsics.misc
-compiler.cfg.comparisons ;
+USING: assocs compiler.cfg.comparisons compiler.cfg.hats
+compiler.cfg.intrinsics.alien compiler.cfg.intrinsics.allot
+compiler.cfg.intrinsics.fixnum compiler.cfg.intrinsics.float
+compiler.cfg.intrinsics.misc compiler.cfg.intrinsics.slots
+compiler.cfg.intrinsics.strings compiler.cfg.stacks
+cpu.architecture kernel words ;
 QUALIFIED: alien
 QUALIFIED: alien.accessors
-QUALIFIED: alien.data.private
 QUALIFIED: alien.c-types
-QUALIFIED: kernel
+QUALIFIED: alien.data.private
 QUALIFIED: arrays
 QUALIFIED: byte-arrays
+QUALIFIED: classes.tuple.private
 QUALIFIED: kernel.private
+QUALIFIED: math.bitwise.private
+QUALIFIED: math.floats.private
+QUALIFIED: math.integers.private
+QUALIFIED: math.libm
+QUALIFIED: math.private
 QUALIFIED: slots.private
 QUALIFIED: strings.private
-QUALIFIED: classes.tuple.private
-QUALIFIED: math.private
-QUALIFIED: math.bitwise.private
-QUALIFIED: math.integers.private
-QUALIFIED: math.floats.private
-QUALIFIED: math.libm
 IN: compiler.cfg.intrinsics
 
 ERROR: inline-intrinsics-not-supported word quot ;
@@ -72,7 +64,7 @@ ERROR: inline-intrinsics-not-supported word quot ;
     { byte-arrays:(byte-array) [ emit-(byte-array) ] }
     { kernel:<wrapper> [ emit-simple-allot ] }
     { alien.data.private:(local-allot) [ emit-local-allot ] }
-    { alien.data.private:(cleanup-allot) [ drop emit-cleanup-allot ] }
+    { alien.data.private:(cleanup-allot) [ emit-cleanup-allot ] }
     { alien:<displaced-alien> [ emit-<displaced-alien> ] }
     { alien.accessors:alien-unsigned-1 [ int-rep alien.c-types:uchar emit-load-memory ] }
     { alien.accessors:set-alien-unsigned-1 [ int-rep alien.c-types:uchar emit-store-memory ] }
@@ -145,5 +137,7 @@ ERROR: inline-intrinsics-not-supported word quot ;
         { math.bitwise.private:fixnum-bit-count [ drop [ ^^bit-count ] unary-op ] }
     } enable-intrinsics ;
 
-: emit-intrinsic ( node word -- )
-    "intrinsic" word-prop call( node -- ) ;
+: enable-bit-test ( -- )
+    {
+        { math.integers.private:fixnum-bit? [ drop [ ^^bit-test ] binary-op ] }
+    } enable-intrinsics ;

@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.parser
-assocs classes compiler.units functors growable kernel lexer
-math namespaces parser prettyprint.custom sequences
-specialized-arrays specialized-arrays.private strings
-vocabs vocabs.loader vocabs.parser vocabs.generated fry make ;
+classes fry functors growable kernel lexer make math parser
+prettyprint.custom sequences specialized-arrays vocabs.generated
+vocabs.loader vocabs.parser ;
 FROM: sequences.private => nth-unsafe ;
 FROM: specialized-arrays.private => nth-c-ptr direct-like ;
 QUALIFIED: vectors.functor
@@ -14,7 +13,7 @@ MIXIN: specialized-vector
 
 <PRIVATE
 
-FUNCTOR: define-vector ( T -- )
+<FUNCTOR: define-vector ( T -- )
 
 V DEFINES-CLASS ${T}-vector
 
@@ -57,7 +56,7 @@ SYNTAX: V{ \ } [ >V ] parse-literal ;
 INSTANCE: V specialized-vector
 INSTANCE: V growable
 
-;FUNCTOR
+;FUNCTOR>
 
 : specialized-vector-vocab ( c-type -- vocab )
     [

@@ -1,9 +1,9 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.accessors alien.c-types alien.data
+USING: accessors alien.accessors alien.c-types alien.data arrays
 classes.struct.private combinators compiler.units endian fry
-generalizations kernel macros math namespaces sequences words
-arrays slots math.bitwise ;
+generalizations kernel macros math math.bitwise namespaces
+sequences slots words ;
 QUALIFIED-WITH: alien.c-types c
 IN: alien.endian
 
@@ -22,7 +22,7 @@ MACRO: byte-reverse ( n signed? -- quot )
     [
         drop
         [
-            dup iota [
+            dup <iota> [
                 [ 1 + - -8 * ] [ nip 8 * ] 2bi
                 '[ _ shift 0xff bitand _ shift ]
             ] with map
@@ -65,7 +65,7 @@ ERROR: unknown-endian-c-type symbol ;
                     [ alien-unsigned-4 4 f byte-reverse 32 shift ]
                     [ 4 + alien-unsigned-4 4 f byte-reverse ] 2bi bitor
                 ]
-            ] dip [ [ 64 >signed ] compose ] when 
+            ] dip [ [ 64 >signed ] compose ] when
             >>getter drop
         ]
         [ '[ [ [ _ _ byte-reverse ] 2dip ] prepose ] change-setter ] 3bi
@@ -119,6 +119,7 @@ ERROR: unsupported-endian-type endian slot ;
         first2 [ slot>endian-slot ] dip 2array
     ] [
         {
+            { [ dup bool = ] [ 2drop bool ] }
             { [ dup char = ] [ 2drop char ] }
             { [ dup uchar = ] [ 2drop uchar ] }
             { [ dup c:short = ] [ { le16 be16 } endian-slot ] }
@@ -128,6 +129,7 @@ ERROR: unsupported-endian-type endian slot ;
             { [ dup longlong = ] [ { le64 be64 } endian-slot ] }
             { [ dup ulonglong = ] [ { ule64 ube64 } endian-slot ] }
             { [ dup endian-c-type? ] [ nip ] }
+            { [ dup pointer? ] [ nip ] }
             [ unsupported-endian-type ]
         } cond
     ] if ;
@@ -160,4 +162,3 @@ SYNTAX: LE-PACKED-STRUCT:
 SYNTAX: BE-PACKED-STRUCT:
     parse-struct-definition
     big-endian define-endian-packed-struct-class ;
-

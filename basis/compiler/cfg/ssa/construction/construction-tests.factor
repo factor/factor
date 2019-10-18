@@ -1,20 +1,42 @@
-USING: accessors compiler.cfg compiler.cfg.debugger
-compiler.cfg.dominance compiler.cfg.instructions
-compiler.cfg.predecessors compiler.cfg.ssa.construction assocs
-compiler.cfg.registers cpu.architecture kernel namespaces sequences
-tools.test vectors ;
+USING: accessors assocs compiler.cfg compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.ssa.construction
+compiler.cfg.ssa.construction.private compiler.cfg.utilities
+compiler.test kernel namespaces sequences tools.test ;
 IN: compiler.cfg.ssa.construction.tests
+
+! insert-phi-later
+{
+    { V{ T{ ##phi { dst 789 } { inputs H{ } } } } }
+} [
+    H{ } clone inserting-phis set
+    789 { } 0 insns>block insert-phi-later
+    inserting-phis get values
+] unit-test
+
+{ 99 55 } [
+    H{ } clone inserting-phis set
+    { } 55 insns>block { } 1 insns>block [ connect-bbs ] keep
+    99 swap insert-phi-later
+    inserting-phis get values first first
+    [ dst>> ] [ inputs>> keys first number>> ] bi
+] unit-test
+
+! live-phi?
+{ f t } [
+    HS{ 68 } live-phis set
+    T{ ##phi } live-phi?
+    T{ ##phi { dst 68 } }  live-phi?
+] unit-test
+
 
 : reset-counters ( -- )
     ! Reset counters so that results are deterministic w.r.t. hash order
-    0 vreg-counter set-global
-    0 basic-block set-global ;
+    reset-vreg-counter 0 basic-block set-global ;
 
 : test-ssa ( -- )
-    cfg new 0 get >>entry
+    0 get block>cfg
     dup cfg set
-    construct-ssa
-    drop ;
+    construct-ssa ;
 
 : clean-up-phis ( insns -- insns' )
     [ dup ##phi? [ [ [ [ number>> ] dip ] assoc-map ] change-inputs ] when ] map ;
@@ -40,7 +62,7 @@ V{
 } 2 test-bb
 
 V{
-    T{ ##replace f 3 D 0 }
+    T{ ##replace f 3 D: 0 }
     T{ ##return }
 } 3 test-bb
 
@@ -48,38 +70,38 @@ V{
 1 3 edge
 2 3 edge
 
-[ ] [ test-ssa ] unit-test
+{ } [ test-ssa ] unit-test
 
-[
+{
     V{
         T{ ##load-integer f 1 100 }
         T{ ##add-imm f 2 1 50 }
         T{ ##add-imm f 3 2 10 }
         T{ ##branch }
     }
-] [ 0 get instructions>> ] unit-test
+} [ 0 get instructions>> ] unit-test
 
-[
+{
     V{
         T{ ##load-integer f 4 3 }
         T{ ##branch }
     }
-] [ 1 get instructions>> ] unit-test
+} [ 1 get instructions>> ] unit-test
 
-[
+{
     V{
         T{ ##load-integer f 5 4 }
         T{ ##branch }
     }
-] [ 2 get instructions>> ] unit-test
+} [ 2 get instructions>> ] unit-test
 
-[
+{
     V{
         T{ ##phi f 6 H{ { 1 4 } { 2 5 } } }
-        T{ ##replace f 6 D 0 }
+        T{ ##replace f 6 D: 0 }
         T{ ##return }
     }
-] [
+} [
     3 get instructions>>
     clean-up-phis
 ] unit-test
@@ -89,9 +111,9 @@ reset-counters
 
 V{ } 0 test-bb
 V{ } 1 test-bb
-V{ T{ ##peek f 0 D 0 } } 2 test-bb
-V{ T{ ##peek f 0 D 0 } } 3 test-bb
-V{ T{ ##replace f 0 D 0 } } 4 test-bb
+V{ T{ ##peek f 0 D: 0 } } 2 test-bb
+V{ T{ ##peek f 0 D: 0 } } 3 test-bb
+V{ T{ ##replace f 0 D: 0 } } 4 test-bb
 V{ } 5 test-bb
 V{ } 6 test-bb
 
@@ -102,14 +124,14 @@ V{ } 6 test-bb
 4 6 edge
 5 6 edge
 
-[ ] [ test-ssa ] unit-test
+{ } [ test-ssa ] unit-test
 
-[
+{
     V{
         T{ ##phi f 3 H{ { 2 1 } { 3 2 } } }
-        T{ ##replace f 3 D 0 }
+        T{ ##replace f 3 D: 0 }
     }
-] [
+} [
     4 get instructions>>
     clean-up-phis
 ] unit-test
@@ -144,9 +166,9 @@ V{
 2 4 edge
 3 4 edge
 
-[ ] [ test-ssa ] unit-test
+{ } [ test-ssa ] unit-test
 
-[ V{ } ] [ 4 get instructions>> [ ##phi? ] filter ] unit-test
+{ V{ } } [ 4 get instructions>> [ ##phi? ] filter ] unit-test
 
 ! Test 4
 reset-counters
@@ -193,8 +215,8 @@ V{
 5 7 edge
 6 7 edge
 
-[ ] [ test-ssa ] unit-test
+{ } [ test-ssa ] unit-test
 
-[ V{ } ] [ 5 get instructions>> [ ##phi? ] filter ] unit-test
+{ V{ } } [ 5 get instructions>> [ ##phi? ] filter ] unit-test
 
-[ V{ } ] [ 7 get instructions>> [ ##phi? ] filter ] unit-test
+{ V{ } } [ 7 get instructions>> [ ##phi? ] filter ] unit-test

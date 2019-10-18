@@ -7,7 +7,7 @@ IN: io.directories.unix.linux
 
 : next-dirent ( DIR* dirent* -- dirent* ? )
     f void* <ref> [
-        readdir64_r [ dup strerror libc-error ] unless-zero
+        readdir64_r [ (throw-errno) ] unless-zero
     ] 2keep void* deref ; inline
 
 M: linux (directory-entries) ( path -- seq )

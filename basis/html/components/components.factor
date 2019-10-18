@@ -65,7 +65,7 @@ TUPLE: password size ;
     password new ;
 
 M: password render*
-    #! Don't send passwords back to the user
+    ! Don't send passwords back to the user
     [ drop "" ] 2dip size>> "password" render-field ;
 
 ! Text areas
@@ -150,8 +150,11 @@ TUPLE: code mode ;
 : <code> ( -- code )
     code new ;
 
+: ?string-lines ( str/f -- seq )
+    [ { } ] [ string-lines ] if-empty ;
+
 M: code render*
-    [ string-lines ] [ drop ] [ mode>> value ] tri* htmlize-lines ;
+    [ ?string-lines ] [ drop ] [ mode>> value ] tri* htmlize-lines ;
 
 ! Farkup component
 TUPLE: farkup no-follow disable-images parsed ;

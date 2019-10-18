@@ -1,13 +1,13 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces kernel assocs io.files io.streams.duplex
-combinators arrays io.launcher io.encodings io.encodings.binary io
-http.server.static http.server http accessors sequences strings
-math.parser fry urls urls.encoding calendar make ;
+USING: accessors arrays assocs calendar fry http http.server io
+io.encodings io.encodings.binary io.launcher io.streams.duplex
+kernel make math.parser namespaces sequences urls urls.encoding
+;
 IN: http.server.cgi
 
 : cgi-variables ( script-path -- assoc )
-    #! This needs some work.
+    ! This needs some work.
     [
         "CGI/1.0" "GATEWAY_INTERFACE" ,,
         "HTTP/" request get version>> append "SERVER_PROTOCOL" ,,

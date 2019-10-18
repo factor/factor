@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: fry io io.directories io.encodings.ascii
 io.encodings.utf8 io.launcher io.pathnames kernel lexer
 namespaces parser sequences splitting vocabs vocabs.loader ;
@@ -21,7 +22,7 @@ PRIVATE>
 ERROR: git-revision-not-found path ;
 
 : use-vocab-rev ( vocab-name rev -- )
-    [ create-vocab vocab-source-path dup ] dip git-object-id 
+    [ create-vocab vocab-source-path dup ] dip git-object-id
     [ [ input-stream get swap parse-stream call( -- ) ] with-git-object-stream ]
     [ git-revision-not-found ] if* ;
 

@@ -66,7 +66,7 @@ C: <sphere> sphere
     dup 0.0 < [ 3drop 1/0. ] [ sqrt sphere-t nip ] if ; inline
 
 : if-ray-sphere ( hit ray sphere quot -- hit )
-    #! quot: hit ray sphere l -- hit
+    ! quot: hit ray sphere l -- hit
     [
         [ ] [ swap ray-sphere nip ] [ 2drop lambda>> ] 3tri
         [ drop ] [ < ] 2bi
@@ -148,7 +148,7 @@ DEFER: create
     [ oversampling /f ] bi@ 0.0 double-array{ } 3sequence ;
 
 : ss-grid ( -- ss-grid )
-    oversampling iota [ oversampling iota [ ss-point ] with map ] map ;
+    oversampling <iota> [ oversampling <iota> [ ss-point ] with map ] map ;
 
 : ray-grid ( point ss-grid -- ray-grid )
     [
@@ -160,8 +160,8 @@ DEFER: create
     [ [ swap cast-ray + ] with each ] with each ;
 
 : pixel-grid ( -- grid )
-    size iota reverse [
-        size iota [
+    size <iota> reverse [
+        size <iota> [
             [ size 0.5 * - ] bi@ swap size
             double-array{ } 3sequence
         ] with map
@@ -175,13 +175,13 @@ DEFER: create
 : ray-trace ( scene -- pixels )
     pixel-grid [ [ ray-pixel ] with map ] with map ;
 
-: run ( -- string )
+: run-raytracer ( -- string )
     levels double-array{ 0.0 -1.0 0.0 } 1.0 create ray-trace [
         size size pgm-header
         [ [ oversampling sq / pgm-pixel ] each ] each
     ] B{ } make ;
 
 : raytracer-benchmark ( -- )
-    run "raytracer.pnm" temp-file binary set-file-contents ;
+    run-raytracer "raytracer.pnm" temp-file binary set-file-contents ;
 
 MAIN: raytracer-benchmark

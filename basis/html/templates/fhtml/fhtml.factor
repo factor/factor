@@ -16,7 +16,7 @@ TUPLE: template-lexer < lexer ;
 M: template-lexer skip-word
     [
         {
-            { [ 2dup nth CHAR: " = ] [ drop 1 + ] }
+            { [ 2dup nth CHAR: \" = ] [ drop 1 + ] }
             { [ 2dup swap tail-slice "%>" head? ] [ drop 2 + ] }
             [ f skip ]
         } cond
@@ -25,7 +25,7 @@ M: template-lexer skip-word
 DEFER: <% delimiter
 
 : check-<% ( lexer -- col )
-    "<%" swap [ line-text>> ] [ column>> ] bi start* ;
+    "<%" swap [ line-text>> ] [ column>> ] bi subseq-start-from ;
 
 : found-<% ( accum lexer col -- accum )
     [

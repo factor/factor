@@ -1,6 +1,7 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry kernel math math.primes.factors sequences sets project-euler.common ;
+USING: fry kernel math math.primes.factors math.vectors sequences sets
+project-euler.common ;
 IN: project-euler.203
 
 ! http://projecteuler.net/index.php?section=problems&id=203
@@ -42,7 +43,7 @@ IN: project-euler.203
     swapd '[ @ dup ] replicate nip ; inline
 
 : (generate) ( seq -- seq )
-    [ 0 prefix ] [ 0 suffix ] bi [ + ] 2map ;
+    [ 0 prefix ] [ 0 suffix ] bi v+ ;
 
 : generate ( n -- seq )
     1 - { 1 } [ (generate) ] iterate combine ;

@@ -1,32 +1,28 @@
 ! Copyright (C) 2012 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs classes.tuple colors.constants
-colors.hex combinators formatting fry hashtables http.client io
-io.styles json json.reader kernel make math math.parser
-sequences splitting ui urls ;
-IN: hacker-news
 
-TUPLE: post title postedBy points id url commentCount postedAgo ;
+USING: accessors assocs calendar calendar.elapsed
+colors.constants colors.hex combinators concurrency.combinators
+formatting fry hashtables http.client io io.styles json.reader
+kernel make math math.parser sequences ui urls vocabs ;
+
+IN: hacker-news
 
 <PRIVATE
 
-: json-null>f ( obj -- obj/f )
-    dup json-null = [ drop f ] when ;
+: hacker-news-recent-ids ( -- seq )
+    "https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty"
+    http-get nip json> ;
 
-: items> ( seq -- seq' )
-    [
-        \ post from-slots
-        [ json-null>f ] change-postedAgo
-        [ json-null>f ] change-postedBy
-        dup url>> "/comments" head? [
-            dup url>> "/" split last string>number >>id
-            "self" >>url
-        ] when
-    ] map ;
+: hacker-news-id>json-url ( n -- url )
+    number>string
+    "https://hacker-news.firebaseio.com/v0/item/" ".json?print=pretty" surround ;
 
-: hacker-news-items ( -- seq )
-    "http://api.ihackernews.com/page" http-get nip
-    json> "items" of items> ;
+: hacker-news-items ( seq -- seq' )
+    [ hacker-news-id>json-url http-get nip json> ] parallel-map ;
+
+: hacker-news-recent-items ( n -- seq )
+    [  hacker-news-recent-ids ] dip head hacker-news-items ;
 
 : write-title ( title url -- )
     '[
@@ -44,32 +40,32 @@ TUPLE: post title postedBy points id url commentCount postedAgo ;
     H{ { foreground HEXCOLOR: 888888 } } format ;
 
 : post>user-url ( post -- user-url )
-    postedBy>> "http://news.ycombinator.com/user?id=" prepend >url ;
+    "by" of "http://news.ycombinator.com/user?id=" prepend >url ;
 
 : post>comments-url ( post -- user-url )
-    id>> "http://news.ycombinator.com/item?id=%d" sprintf >url ;
+    "id" of "http://news.ycombinator.com/item?id=%d" sprintf >url ;
 
 ! Api is funky, gives id=0 and /comment/2342342 for self-post ads
 : post>url ( post -- url )
-    dup url>> "self" = [
-        post>comments-url
-    ] [
-        url>> >url
-    ] if ;
+    dup "url" of "self" = [ post>comments-url ] [ "url" of >url ] if ;
 
 PRIVATE>
 
 : post. ( post index -- )
     "%2d. " sprintf write-text {
-        [ [ title>> ] [ post>url ] bi write-title ]
+        [ [ "title" of ] [ "url" of ] bi write-title ]
         [ post>url host>> " (" ")" surround write-text nl ]
-        [ points>> "    %d points" sprintf write-text ]
-        [ dup postedBy>> [ " by " write-text [ postedBy>> ] [ post>user-url ] bi write-link ] [ drop ] if ]
-        [ dup postedAgo>> [ " " write-text postedAgo>> write-text ] [ drop ] if ]
+        [ "score" of "    %d points" sprintf write-text ]
+        [ dup "by" of [ " by " write-text [ "by" of ] [ post>user-url ] bi write-link ] [ drop ] if ]
+        [ "time" of [ " " write-text unix-time>timestamp relative-time write-text ] when* ]
         [
-            " | " write-text
-            [ commentCount>> [ "discuss" ] [ "%d comments" sprintf ] if-zero ]
-            [ post>comments-url ] bi write-link nl nl
+            dup "descendants" of [
+                " | " write-text
+                [ "descendants" of [ "discuss" ] [ "%d comments" sprintf ] if-zero ]
+                [ post>comments-url ] bi write-link
+            ] [
+                drop
+            ] if nl nl
         ]
     } cleave ;
 
@@ -84,5 +80,6 @@ PRIVATE>
     } assoc-union format nl ;
 
 : hacker-news. ( -- )
-    hacker-news-items banner.
+    30 hacker-news-recent-items
+    banner.
     [ 1 + post. ] each-index ;

@@ -1,7 +1,6 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math sequences sets.extras tools.test ;
-IN: sets.extras.tests
 
 { { } } [ { } { } setwise-xor ] unit-test
 { { 1 } } [ { 1 } { } setwise-xor ] unit-test
@@ -23,4 +22,6 @@ IN: sets.extras.tests
 { "abc" } [ "abcddd" non-repeating ] unit-test
 { "" } [ "aabbcc" non-repeating ] unit-test
 
-{ HS{ 0 10 20 30 40 } } [ 5 iota [ 10 * ] mapped-set ] unit-test
+{ HS{ 0 10 20 30 40 } } [ 5 <iota> [ 10 * ] mapped-set ] unit-test
+
+{ { 1 2 4 } } [ { 1 2 3 4 5 } [ 2/ ] unique-by ] unit-test

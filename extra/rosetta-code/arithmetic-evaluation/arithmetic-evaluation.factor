@@ -1,4 +1,4 @@
-USING: accessors kernel locals math math.parser peg.ebnf ;
+USING: accessors kernel locals math math.parser multiline peg.ebnf ;
 IN: rosetta-code.arithmetic-evaluation
 
 ! http://rosettacode.org/wiki/Arithmetic_evaluation
@@ -26,7 +26,7 @@ IN: rosetta-code.arithmetic-evaluation
 
 ! * Parentheses
 ! * Multiplication/Division (left to right)
-! * Addition/Subtraction (left to right) 
+! * Addition/Subtraction (left to right)
 
 TUPLE: operator left right ;
 TUPLE: add < operator ;   C: <add> add
@@ -34,7 +34,7 @@ TUPLE: sub < operator ;   C: <sub> sub
 TUPLE: mul < operator ;   C: <mul> mul
 TUPLE: div < operator ;   C: <div> div
 
-EBNF: expr-ast
+EBNF: expr-ast [=[
 spaces   = [\n\t ]*
 digit    = [0-9]
 number   = (digit)+                         => [[ string>number ]]
@@ -51,7 +51,7 @@ exp      =   exp:a spaces "+" fac:b         => [[ a b <add> ]]
            | fac
 
 main     = exp:e spaces !(.)                => [[ e ]]
-;EBNF
+]=]
 
 GENERIC: eval-ast ( ast -- result )
 

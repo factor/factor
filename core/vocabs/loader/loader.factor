@@ -9,21 +9,22 @@ SYMBOL: vocab-roots
 
 SYMBOL: add-vocab-root-hook
 
+CONSTANT: default-vocab-roots {
+    "resource:core"
+    "resource:basis"
+    "resource:extra"
+    "resource:work"
+}
+
 [
-    V{
-        "resource:core"
-        "resource:basis"
-        "resource:extra"
-        "resource:work"
-    } clone vocab-roots set-global
+    default-vocab-roots V{ } like vocab-roots set-global
 
     [ drop ] add-vocab-root-hook set-global
 ] "vocabs.loader" add-startup-hook
 
 : add-vocab-root ( root -- )
-    trim-tail-separators
-    [ vocab-roots get adjoin ]
-    [ add-vocab-root-hook get-global call( root -- ) ] bi ;
+    trim-tail-separators dup vocab-roots get ?adjoin
+    [ add-vocab-root-hook get-global call( root -- ) ] [ drop ] if ;
 
 SYMBOL: root-cache
 root-cache [ H{ } clone ] initialize
@@ -55,8 +56,11 @@ PRIVATE>
         ] if
     ] cache ;
 
+: vocab-exists? ( name -- ? )
+    dup lookup-vocab [ ] [ find-vocab-root ] ?if ;
+
 : vocab-append-path ( vocab path -- newpath )
-    swap find-vocab-root dup [ prepend-path ] [ 2drop f ] if ;
+    swap find-vocab-root [ prepend-path ] [ drop f ] if* ;
 
 : vocab-source-path ( vocab -- path/f )
     dup ".factor" append-vocab-dir vocab-append-path ;
@@ -133,10 +137,13 @@ PRIVATE>
 
 SYMBOL: blacklist
 
+: require-all ( vocabs -- )
+    V{ } clone blacklist [ [ require ] each ] with-variable ;
+
 <PRIVATE
 
 : add-to-blacklist ( error vocab -- )
-    vocab-name blacklist get dup [ set-at ] [ 3drop ] if ;
+    vocab-name blacklist get [ set-at ] [ 2drop ] if* ;
 
 GENERIC: (require) ( name -- )
 

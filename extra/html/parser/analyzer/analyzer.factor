@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators combinators.short-circuit
-fry html.parser http.client io kernel locals math math.statistics
-sequences sets splitting unicode.case unicode.categories urls
-urls.encoding shuffle ;
+USING: accessors assocs assocs.extras combinators
+combinators.short-circuit fry html.parser http.client io kernel
+locals math math.statistics sequences sets shuffle splitting
+unicode urls urls.encoding ;
 IN: html.parser.analyzer
 
 : scrape-html ( url -- response vector )
@@ -19,10 +19,10 @@ IN: html.parser.analyzer
     swap attributes>> key? ;
 
 : find-all ( seq quot -- alist )
-   [ <enum> >alist ] [ '[ second @ ] ] bi* filter ; inline
+   [ <enumerated> >alist ] [ '[ second @ ] ] bi* filter ; inline
 
 : loopn-index ( n quot -- )
-    [ iota ] [ '[ @ not ] ] bi* find 2drop ; inline
+    [ <iota> ] [ '[ @ not ] ] bi* find 2drop ; inline
 
 : loopn ( n quot -- )
     [ drop ] prepose loopn-index ; inline
@@ -58,7 +58,7 @@ ERROR: undefined-find-nth m n seq quot ;
     >lower '[ name>> _ = ] find ; inline
 
 : stack-find ( seq quot: ( elt -- 1/0/-1 ) -- i/f )
-    map cum-sum [ 0 = ] find drop ; inline
+    map cum-sum 0 swap index ; inline
 
 : tag-classifier ( string -- quot )
     >lower
@@ -179,7 +179,7 @@ ERROR: undefined-find-nth m n seq quot ;
     [ bl bl bl bl [ write "=" write ] [ write bl ] bi* nl ] assoc-each ;
 
 : form. ( vector -- )
-    [ closing?>> not ] filter
+    [ closing?>> ] reject
     [
         {
             { [ dup name>> "form" = ]
@@ -205,3 +205,13 @@ TUPLE: link attributes clickable ;
 : link. ( vector -- )
     [ "href" attribute write nl ]
     [ clickable>> [ bl bl text>> print ] each nl ] bi ;
+
+: find-classes-named ( seq name -- seq' )
+    dupd
+    '[ attributes>> "class" of _ = ] find-all
+    [ find-between ] kv-with { } assoc>map ;
+
+: find-classes-named* ( seq name -- seq' )
+    dupd
+    '[ attributes>> "class" of _ = ] find-all
+    [ find-between* ] kv-with { } assoc>map ;

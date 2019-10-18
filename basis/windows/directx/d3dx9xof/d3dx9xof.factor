@@ -89,7 +89,7 @@ COM-INTERFACE: ID3DXFileData IUnknown {cef08cfd-7b4f-4429-9624-2a690a933201}
     HRESULT GetChildren ( SIZE_T* x )
     HRESULT GetChild ( SIZE_T x, ID3DXFileData** y ) ;
 
-FUNCTION: HRESULT D3DXFileCreate ( ID3DXFile** lplpDirectXFile ) ;
+FUNCTION: HRESULT D3DXFileCreate ( ID3DXFile** lplpDirectXFile )
 
 CONSTANT: D3DXFERR_BADOBJECT              0x88760384
 CONSTANT: D3DXFERR_BADVALUE               0x88760385

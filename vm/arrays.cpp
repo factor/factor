@@ -2,7 +2,7 @@
 
 namespace factor {
 
-/* Allocates memory */
+// Allocates memory
 array* factor_vm::allot_array(cell capacity, cell fill_) {
   data_root<object> fill(fill_, this);
   array* new_array = allot_uninitialized_array<array>(capacity);
@@ -10,7 +10,7 @@ array* factor_vm::allot_array(cell capacity, cell fill_) {
   return new_array;
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_array() {
   cell fill = ctx->pop();
   cell capacity = unbox_array_size();
@@ -18,29 +18,29 @@ void factor_vm::primitive_array() {
   ctx->push(tag<array>(new_array));
 }
 
-/* Allocates memory */
+// Allocates memory
 cell factor_vm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_) {
   data_root<object> v1(v1_, this);
   data_root<object> v2(v2_, this);
   data_root<object> v3(v3_, this);
   data_root<object> v4(v4_, this);
-  data_root<array> a(allot_uninitialized_array<array>(4), this);
-  set_array_nth(a.untagged(), 0, v1.value());
-  set_array_nth(a.untagged(), 1, v2.value());
-  set_array_nth(a.untagged(), 2, v3.value());
-  set_array_nth(a.untagged(), 3, v4.value());
-  return a.value();
+  array *a = allot_uninitialized_array<array>(4);
+  set_array_nth(a, 0, v1.value());
+  set_array_nth(a, 1, v2.value());
+  set_array_nth(a, 2, v3.value());
+  set_array_nth(a, 3, v4.value());
+  return tag<array>(a);
 }
 
-/* Allocates memory */
+// Allocates memory
 void factor_vm::primitive_resize_array() {
   data_root<array> a(ctx->pop(), this);
-  a.untag_check(this);
+  check_tagged(a);
   cell capacity = unbox_array_size();
   ctx->push(tag<array>(reallot_array(a.untagged(), capacity)));
 }
 
-/* Allocates memory */
+// Allocates memory
 cell factor_vm::std_vector_to_array(std::vector<cell>& elements) {
 
   cell element_count = elements.size();
@@ -57,24 +57,30 @@ cell factor_vm::std_vector_to_array(std::vector<cell>& elements) {
   return objects.value();
 }
 
-/* Allocates memory */
+// Allocates memory
+void growable_array::reallot_array(cell count) {
+  array *a_old = elements.untagged();
+  array *a_new = elements.parent->reallot_array(a_old, count);
+  elements.set_untagged(a_new);
+}
+
+// Allocates memory
 void growable_array::add(cell elt_) {
   factor_vm* parent = elements.parent;
   data_root<object> elt(elt_, parent);
-  if (count == array_capacity(elements.untagged()))
-    elements = parent->reallot_array(elements.untagged(), count * 2);
-
+  if (count == array_capacity(elements.untagged())) {
+    reallot_array(2 * count);
+  }
   parent->set_array_nth(elements.untagged(), count++, elt.value());
 }
 
-/* Allocates memory */
+// Allocates memory
 void growable_array::append(array* elts_) {
   factor_vm* parent = elements.parent;
   data_root<array> elts(elts_, parent);
   cell capacity = array_capacity(elts.untagged());
   if (count + capacity > array_capacity(elements.untagged())) {
-    elements =
-        parent->reallot_array(elements.untagged(), (count + capacity) * 2);
+    reallot_array(2 * (count + capacity));
   }
 
   for (cell index = 0; index < capacity; index++)
@@ -82,10 +88,9 @@ void growable_array::append(array* elts_) {
                           array_nth(elts.untagged(), index));
 }
 
-/* Allocates memory */
+// Allocates memory
 void growable_array::trim() {
-  factor_vm* parent = elements.parent;
-  elements = parent->reallot_array(elements.untagged(), count);
+  reallot_array(count);
 }
 
 }

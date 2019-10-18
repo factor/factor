@@ -27,9 +27,9 @@ M: duplex-stream set-timeout
     >duplex-stream< [ set-timeout ] bi-curry@ bi ;
 
 M: duplex-stream dispose
-    #! The output stream is closed first, in case both streams
-    #! are attached to the same file descriptor, the output
-    #! buffer needs to be flushed before we close the fd.
+    ! The output stream is closed first, in case both streams
+    ! are attached to the same file descriptor, the output
+    ! buffer needs to be flushed before we close the fd.
     [ >duplex-stream< [ &dispose drop ] bi@ ] with-destructors ;
 
 : <encoder-duplex> ( stream-in stream-out encoding -- duplex )

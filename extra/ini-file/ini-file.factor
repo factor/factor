@@ -19,7 +19,7 @@ IN: ini-file
         { CHAR: t   CHAR: \t }
         { CHAR: v   CHAR: \v }
         { CHAR: '   CHAR: ' }
-        { CHAR: "   CHAR: " }
+        { CHAR: \"   CHAR: \" }
         { CHAR: \\  CHAR: \\ }
         { CHAR: ?   CHAR: ? }
         { CHAR: ;   CHAR: ; }
@@ -50,7 +50,7 @@ USE: xml.entities
         { CHAR: \t   "\\t"  }
         { 0x0b    "\\v"  }
         { CHAR: '    "\\'"  }
-        { CHAR: "    "\\\"" }
+        { CHAR: \"    "\\\"" }
         { CHAR: \\   "\\\\" }
         { CHAR: ?    "\\?"  }
         { CHAR: ;    "\\;"  }
@@ -146,4 +146,3 @@ PRIVATE>
 
 : ini>string ( assoc -- str )
     [ write-ini ] with-string-writer ;
-

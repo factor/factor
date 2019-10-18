@@ -1,14 +1,16 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar colors colors.constants
-documents documents.elements fry kernel words sets splitting math
-math.vectors models.delay models.arrow combinators.short-circuit
-parser present sequences tools.completion help.vocabs generic fonts
-definitions.icons ui.images ui.commands ui.operations ui.gadgets
-ui.gadgets.editors ui.gadgets.glass ui.gadgets.scrollers
-ui.gadgets.tables ui.gadgets.tracks ui.gadgets.labeled
-ui.gadgets.worlds ui.gadgets.wrappers ui.gestures ui.pens.solid
-ui.tools.listener.history combinators vocabs ui.tools.listener.popups ;
+combinators combinators.short-circuit definitions.icons
+documents documents.elements fonts fry generic help.vocabs
+kernel math math.vectors models.arrow models.delay parser
+present sequences sets splitting tools.completion ui.commands
+ui.gadgets ui.gadgets.editors ui.gadgets.glass
+ui.gadgets.labeled ui.gadgets.scrollers ui.gadgets.tables
+ui.gadgets.tracks ui.gadgets.worlds ui.gadgets.wrappers
+ui.gestures ui.images ui.operations ui.pens.solid ui.theme
+ui.theme.images ui.tools.common ui.tools.listener.history
+ui.tools.listener.popups vocabs words ;
 IN: ui.tools.listener.completion
 
 ! We don't directly depend on the listener tool but we use a few slots
@@ -26,9 +28,13 @@ SLOT: history
 TUPLE: word-completion manifest ;
 C: <word-completion> word-completion
 
+TUPLE: vocab-word-completion vocab-name ;
+C: <vocab-word-completion> vocab-word-completion
+
 SINGLETONS: vocab-completion color-completion char-completion
 path-completion history-completion ;
-UNION: definition-completion word-completion vocab-completion ;
+UNION: definition-completion word-completion
+vocab-word-completion vocab-completion ;
 UNION: listener-completion definition-completion
 color-completion char-completion path-completion history-completion ;
 
@@ -38,6 +44,7 @@ GENERIC: completion-quot ( interactor completion-mode -- quot )
     2nip '[ [ { } ] _ if-empty ] ; inline
 
 M: word-completion completion-quot [ words-matching ] (completion-quot) ;
+M: vocab-word-completion completion-quot nip vocab-name>> '[ _ vocab-words-matching ] ;
 M: vocab-completion completion-quot [ vocabs-matching ] (completion-quot) ;
 M: color-completion completion-quot [ colors-matching ] (completion-quot) ;
 M: char-completion completion-quot [ chars-matching ] (completion-quot) ;
@@ -52,6 +59,7 @@ M: history-completion completion-element drop one-line-elt ;
 GENERIC: completion-banner ( completion-mode -- string )
 
 M: word-completion completion-banner drop "Words" ;
+M: vocab-word-completion completion-banner drop "Words" ;
 M: vocab-completion completion-banner drop "Vocabularies" ;
 M: color-completion completion-banner drop "Colors" ;
 M: char-completion completion-banner drop "Unicode code point names" ;
@@ -78,6 +86,8 @@ M: word-completion row-color
         [ COLOR: dark-gray ]
     } cond 2nip ;
 
+M: vocab-word-completion row-color 2drop COLOR: black ;
+
 M: vocab-completion row-color
     drop dup vocab? [
         name>> ".private" tail? COLOR: dark-red COLOR: black ?
@@ -96,6 +106,7 @@ M: color-completion row-color
         { [ dup complete-char? ] [ 2drop char-completion ] }
         { [ dup complete-color? ] [ 2drop color-completion ] }
         { [ dup complete-pathname? ] [ 2drop path-completion ] }
+        { [ dup complete-vocab-words? ] [ nip harvest second <vocab-word-completion> ] }
         [ drop <word-completion> ]
     } cond ;
 
@@ -124,7 +135,7 @@ M: object completion-string present ;
 
 M: method completion-string method-completion-string ;
 
-GENERIC# accept-completion-hook 1 ( item popup -- )
+GENERIC#: accept-completion-hook 1 ( item popup -- )
 
 : insert-completion ( item popup -- )
     [ completion-string ] [ completion-loc/doc/elt ] bi* set-elt-string ;
@@ -148,13 +159,13 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
         dup '[ _ accept-completion ] >>action ;
 
 : <completion-scroller> ( completion-popup -- scroller )
-    table>> <scroller> COLOR: white <solid> >>interior ;
+    table>> <scroller> white-interior ;
 
 : <completion-popup> ( interactor completion-mode -- popup )
     [ vertical completion-popup new-track ] 2dip
     [ [ >>interactor ] [ >>completion-mode ] bi* ] [ <completion-table> >>table ] 2bi
     dup [ <completion-scroller> ] [ completion-mode>> completion-banner ] bi
-    <labeled-gadget> 1 track-add ;
+    completion-color <framed-labeled-gadget> 1 track-add ;
 
 completion-popup H{
     { T{ key-down f f "TAB" } [ table>> row-action ] }

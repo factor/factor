@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors timers alien.c-types calendar classes.struct
 continuations destructors fry kernel math math.order memory
 namespaces sequences system ui ui.gadgets.worlds vm
@@ -38,7 +39,7 @@ TUPLE: game-loop-error-state error game-loop ;
     [ draw-timer>> iteration-start-nanos>> nano-count swap - ]
     [ tick-interval-nanos>> ] bi /f 1.0 min ;
 
-GENERIC# record-benchmarking 1 ( loop quot -- )
+GENERIC#: record-benchmarking 1 ( loop quot -- )
 
 M: object record-benchmarking
     call( loop -- ) ;

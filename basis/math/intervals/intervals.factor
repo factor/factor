@@ -221,7 +221,7 @@ MEMO: array-capacity-interval ( -- interval )
     ] dip [ 2drop [-inf,inf] ] if ; inline
 
 : interval-shift ( i1 i2 -- i3 )
-    #! Inaccurate; could be tighter
+    ! Inaccurate; could be tighter
     [
         [
             [ interval-closure ] bi@
@@ -274,8 +274,8 @@ MEMO: array-capacity-interval ( -- interval )
     [ [ [ / ] interval-op nan-not-ok ] interval-division-op ] do-empty-interval ;
 
 : interval/-safe ( i1 i2 -- i3 )
-    #! Just a hack to make the compiler work if bootstrap.math
-    #! is not loaded.
+    ! Just a hack to make the compiler work if bootstrap.math
+    ! is not loaded.
     \ integer \ / ?lookup-method [ interval/ ] [ 2drop f ] if ;
 
 : interval/i ( i1 i2 -- i3 )
@@ -387,7 +387,7 @@ SYMBOL: incomparable
     from>> first 0 >= ;
 
 : interval-bitand ( i1 i2 -- i3 )
-    #! Inaccurate.
+    ! Inaccurate.
     [
         {
             {
@@ -403,7 +403,7 @@ SYMBOL: incomparable
     ] do-empty-interval ;
 
 : interval-bitor ( i1 i2 -- i3 )
-    #! Inaccurate.
+    ! Inaccurate.
     [
         2dup [ interval-nonnegative? ] both?
         [
@@ -413,7 +413,7 @@ SYMBOL: incomparable
     ] do-empty-interval ;
 
 : interval-bitxor ( i1 i2 -- i3 )
-    #! Inaccurate.
+    ! Inaccurate.
     interval-bitor ;
 
 : interval-log2 ( i1 -- i2 )

@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien.data alien.strings byte-arrays
 kernel specialized-arrays system tools.deploy.libraries
 windows.kernel32 windows.types ;
@@ -13,4 +14,3 @@ M: windows find-library-file
             alien>native-string
         ] [ FreeLibrary drop ] bi
     ] [ f ] if* ;
-

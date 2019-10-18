@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators fry io io.files io.streams.string kernel
 make math memoize namespaces sbufs sequences sequences.private
-unicode.categories ;
+unicode ;
 IN: csv
 
 SYMBOL: delimiter
@@ -17,10 +17,10 @@ MEMO: field-delimiters ( delimiter -- field-seps quote-seps )
 DEFER: quoted-field,
 
 : maybe-escaped-quote ( delimeter stream quoted? -- delimiter stream sep/f )
-    2over stream-read1 swap over =
+    2over stream-read1 tuck =
     [ nip ] [
         {
-            { CHAR: "    [ [ CHAR: " , ] when quoted-field, ] }
+            { CHAR: \"    [ [ CHAR: \" , ] when quoted-field, ] }
             { CHAR: \n   [ ] } ! Error: cr inside string?
             { CHAR: \r   [ ] } ! Error: lf inside string?
             [ [ , drop f maybe-escaped-quote ] when* ]
@@ -42,12 +42,12 @@ DEFER: quoted-field,
 
 : continue-field ( delimiter stream field-seps seq -- sep/f field )
     swap rot stream-read-until [ "\"" glue ] dip
-    swap ?trim [ drop ] 2dip ; inline
+    swap ?trim nipd ; inline
 
 : field ( delimiter stream field-seps quote-seps -- sep/f field )
-    pick stream-read-until dup CHAR: " = [
+    pick stream-read-until dup CHAR: \" = [
         drop [ drop quoted-field ] [ continue-field ] if-empty
-    ] [ [ 3drop ] 2dip swap ?trim ] if ;
+    ] [ 3nipd swap ?trim ] if ;
 
 : (stream-read-row) ( delimiter stream field-end quoted-field -- sep/f fields )
     [ [ dup '[ dup _ = ] ] keep ] 3dip
@@ -61,7 +61,7 @@ DEFER: quoted-field,
 PRIVATE>
 
 : stream-read-row ( stream -- row )
-    delimiter get swap over field-delimiters
+    delimiter get tuck field-delimiters
     (stream-read-row) nip ; inline
 
 : read-row ( -- row )
@@ -89,10 +89,10 @@ PRIVATE>
     '[ dup "\n\"\r" member? [ drop t ] [ _ = ] if ] any? ; inline
 
 : escape-quotes ( cell stream -- )
-    CHAR: " over stream-write1 swap [
+    CHAR: \" over stream-write1 swap [
         [ over stream-write1 ]
-        [ dup CHAR: " = [ over stream-write1 ] [ drop ] if ] bi
-    ] each CHAR: " swap stream-write1 ;
+        [ dup CHAR: \" = [ over stream-write1 ] [ drop ] if ] bi
+    ] each CHAR: \" swap stream-write1 ;
 
 : escape-if-required ( cell delimiter stream -- )
     [ dupd needs-escaping? ] dip

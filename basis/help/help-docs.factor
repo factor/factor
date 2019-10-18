@@ -1,6 +1,6 @@
-USING: arrays help.crossref help.markup help.stylesheet
-help.syntax help.topics io kernel math prettyprint quotations
-see sequences strings summary vocabs ;
+USING: arrays help.crossref help.lint help.markup
+help.stylesheet help.syntax help.topics io kernel math
+prettyprint quotations see sequences strings summary vocabs ;
 IN: help
 
 ARTICLE: "printing-elements" "Printing markup elements"
@@ -45,6 +45,7 @@ ARTICLE: "block-elements" "Block elements"
     $maybe
     $or
     $quotation
+    $sequence
 }
 "Boilerplate paragraphs:"
 { $subsections
@@ -315,7 +316,12 @@ HELP: $example
     "However the following is right:"
     { $markup-example { $example "USING: math prettyprint ;" "2 2 + ." "4" } }
     "Examples can incorporate a call to " { $link .s } " to show multiple output values; the convention is that you may assume the stack is empty before the example evaluates."
-} ;
+}
+{ $see-also $unchecked-example } ;
+
+HELP: $unchecked-example
+{ $values { "element" object } }
+{ $description "Same as " { $link $example } ", except " { $link help-lint } " ignores its contents and doesn't try to run the code and verify its output." } ;
 
 HELP: $markup-example
 { $values { "element" "a markup element" } }
@@ -407,6 +413,19 @@ HELP: $quotation
 }
 { $examples
     { $markup-example { $quotation ( obj -- ) } }
+} ;
+
+HELP: $sequence
+{ $values { "element" "an array of element types" } }
+{ $description
+    "Produces the text “a sequence of " { $emphasis "element types" } "”."
+}
+{ $examples
+    { $markup-example { $sequence number } }
+    { $markup-example { $sequence real complex } }
+    { $markup-example { $sequence rational float complex } }
+    { $markup-example { $sequence integer ratio float complex } }
+    { $markup-example { $sequence fixnum bignum ratio float complex } }
 } ;
 
 HELP: $list
@@ -506,3 +525,7 @@ HELP: ABOUT:
 HELP: vocab-help
 { $values { "vocab-spec" "a vocabulary specifier" } { "help" "a help article" } }
 { $description "Outputs the main help article for a vocabulary. The main help article can be set with " { $link POSTPONE: ABOUT: } "." } ;
+
+HELP: orphan-articles
+{ $values { "seq" "vocab names" } }
+{ $description "Retrieves all vocabs without parents, except for 'help.home' and 'handbook' which are special." } ;

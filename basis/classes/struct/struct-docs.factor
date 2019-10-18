@@ -1,6 +1,7 @@
-! (c)Joe Groff bsd license
-USING: alien classes help.markup help.syntax kernel libc
-quotations slots ;
+! Copyright (C) Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
+USING: alien classes classes.struct.private help.markup help.syntax
+kernel libc math sequences ;
 IN: classes.struct
 
 HELP: <struct-boa>
@@ -33,7 +34,7 @@ HELP: STRUCT:
 { $description "Defines a new " { $link struct } " type. The syntax is nearly identical to " { $link POSTPONE: TUPLE: } "; however, there are some additional restrictions on struct types:"
 { $list
 { "Struct classes cannot have a superclass defined." }
-{ "The slots of a struct must all have a type declared. The type must be a C type." } 
+{ "The slots of a struct must all have a type declared. The type must be a C type." }
 { { $link read-only } " slots on structs are not enforced, though they may be declared." }
 }
 "Additionally, structs may use bit fields. A slot specifier may use the syntax " { $snippet "bits: n" } " to specify that the bit width of the slot is " { $snippet "n" } ". Bit width may be specified on signed or unsigned integer slots. The layout of bit fields is not guaranteed to match that of any particular C compiler." } ;
@@ -92,6 +93,10 @@ HELP: (malloc-struct)
 }
 { $description "Allocates unmanaged C heap memory for a new " { $link struct } " of the specified " { $snippet "class" } ". The new struct's slots are left uninitialized; to initialize the allocated memory with the slots' initial values, use " { $link malloc-struct } ". The struct should be " { $link free } "d when it is no longer needed." } ;
 
+HELP: compute-struct-offsets
+{ $values { "slots" sequence } { "size" integer } }
+{ $description "Computes how many bytes of memory the struct takes, minus final padding." } ;
+
 HELP: memory>struct
 { $values
     { "ptr" c-ptr } { "class" class }
@@ -110,6 +115,11 @@ HELP: struct
 
 HELP: struct-class
 { $class-description "The metaclass of all " { $link struct } " classes." } ;
+
+HELP: struct-slot-values
+{ $values { "struct" struct } { "sequence" sequence } }
+{ $description "Extracts the values of the structs slots" }
+{ $errors "Throws a memory protection error if the memory the struct references is not accessible." } ;
 
 ARTICLE: "classes.struct.examples" "Struct class examples"
 "A struct with a variety of fields:"
@@ -161,7 +171,8 @@ ARTICLE: "classes.struct.c" "Passing structs to C functions"
 $nl
 "If a parameter is declared with a struct type, the parameter is passed by value. To pass a struct by reference, declare a parameter with a pointer to struct type."
 $nl
-"If a C function is declared as returning a struct type, the struct is returned by value, and wrapped in an instance of the correct struct class automatically. If a C function is declared as returning a pointer to a struct, it will return an " { $link alien } " instance. This is because there is no way to distinguish between a pointer to a single struct and a pointer to an array of zero or more structs. It is up to the caller to wrap it in a struct, or a specialized array of structs, respectively."
+{ $heading "C functions returning structs" }
+"If a C function is declared as returning a struct type, the struct is returned by value, and wrapped in an instance of the correct struct class automatically. If a C function is declared as returning a pointer to a struct, it will return an " { $link alien } " instance. This is because there is no way to distinguish between a pointer to a single struct and a pointer to an array of zero or more structs. It is up to the caller to wrap it in a struct using " { $link memory>struct } ", or a specialized array of structs using " { $snippet "<direct-T-array>" } ", respectively."
 $nl
 "An example of a struct declaration:"
 { $code

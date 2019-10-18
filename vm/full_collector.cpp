@@ -2,111 +2,128 @@
 
 namespace factor {
 
-full_collector::full_collector(factor_vm* parent)
-    : collector<tenured_space, full_policy>(parent, parent->data->tenured,
-                                            full_policy(parent)),
-      code_visitor(parent, workhorse) {}
+struct full_collection_copier : no_fixup {
+  tenured_space* tenured;
+  code_heap* code;
+  std::vector<cell> *mark_stack;
 
-void full_collector::trace_code_block(code_block* compiled) {
-  data_visitor.visit_code_block_objects(compiled);
-  data_visitor.visit_embedded_literals(compiled);
-  code_visitor.visit_embedded_code_pointers(compiled);
-}
+  full_collection_copier(tenured_space* tenured,
+                         code_heap* code,
+                         std::vector<cell> *mark_stack)
+      : tenured(tenured), code(code), mark_stack(mark_stack) { }
 
-void full_collector::trace_context_code_blocks() {
-  code_visitor.visit_context_code_blocks();
-}
+  object* fixup_data(object* obj) {
+    if (tenured->contains_p(obj)) {
+      if (!tenured->state.marked_p((cell)obj)) {
+        tenured->state.set_marked_p((cell)obj, obj->size());
+        mark_stack->push_back((cell)obj);
+      }
+      return obj;
+    }
 
-void full_collector::trace_code_roots() { code_visitor.visit_code_roots(); }
+    // Is there another forwarding pointer?
+    while (obj->forwarding_pointer_p()) {
+      object* dest = obj->forwarding_pointer();
+      obj = dest;
+    }
 
-void full_collector::trace_object_code_block(object* obj) {
-  code_visitor.visit_object_code_block(obj);
-}
+    if (tenured->contains_p(obj)) {
+      if (!tenured->state.marked_p((cell)obj)) {
+        tenured->state.set_marked_p((cell)obj, obj->size());
+        mark_stack->push_back((cell)obj);
+      }
+      return obj;
+    }
 
-/* After a sweep, invalidate any code heap roots which are not marked,
-   so that if a block makes a tail call to a generic word, and the PIC
-   compiler triggers a GC, and the caller block gets gets GCd as a result,
-   the PIC code won't try to overwrite the call site */
-void factor_vm::update_code_roots_for_sweep() {
-  std::vector<code_root*>::const_iterator iter = code_roots.begin();
-  std::vector<code_root*>::const_iterator end = code_roots.end();
+    cell size = obj->size();
+    object* newpointer = tenured->allot(size);
+    if (!newpointer)
+      throw must_start_gc_again();
+    memcpy(newpointer, obj, size);
+    obj->forward_to(newpointer);
 
-  mark_bits<code_block>* state = &code->allocator->state;
-
-  for (; iter < end; iter++) {
-    code_root* root = *iter;
-    code_block* block = (code_block*)(root->value & (~data_alignment - 1));
-    if (root->valid && !state->marked_p(block))
-      root->valid = false;
+    tenured->state.set_marked_p((cell)newpointer, newpointer->size());
+    mark_stack->push_back((cell)newpointer);
+    return newpointer;
   }
-}
 
-void factor_vm::collect_mark_impl(bool trace_contexts_p) {
-  full_collector collector(this);
+  code_block* fixup_code(code_block* compiled) {
+    if (!code->allocator->state.marked_p((cell)compiled)) {
+      code->allocator->state.set_marked_p((cell)compiled, compiled->size());
+      mark_stack->push_back((cell)compiled + 1);
+    }
+    return compiled;
+  }
+};
+
+void factor_vm::collect_mark_impl() {
+  gc_event* event = current_gc->event;
+  if (event)
+    event->reset_timer();
+
+  slot_visitor<full_collection_copier>
+      visitor(this, full_collection_copier(data->tenured, code, &mark_stack));
 
   mark_stack.clear();
 
-  code->clear_mark_bits();
-  data->tenured->clear_mark_bits();
+  code->allocator->state.clear_mark_bits();
+  data->tenured->state.clear_mark_bits();
 
-  collector.trace_roots();
-  if (trace_contexts_p) {
-    collector.trace_contexts();
-    collector.trace_context_code_blocks();
-    collector.trace_code_roots();
-  }
+  visitor.visit_all_roots();
+  visitor.visit_context_code_blocks();
+  visitor.visit_uninitialized_code_blocks();
 
-  while (!mark_stack.empty()) {
-    cell ptr = mark_stack.back();
-    mark_stack.pop_back();
+  visitor.visit_mark_stack(&mark_stack);
 
-    if (ptr & 1) {
-      code_block* compiled = (code_block*)(ptr - 1);
-      collector.trace_code_block(compiled);
-    } else {
-      object* obj = (object*)ptr;
-      collector.trace_object(obj);
-      collector.trace_object_code_block(obj);
-    }
-  }
-
-  data->reset_generation(data->tenured);
-  data->reset_generation(data->aging);
-  data->reset_generation(&nursery);
+  data->reset_tenured();
+  data->reset_aging();
+  data->reset_nursery();
   code->clear_remembered_set();
+
+  if (event)
+    event->ended_phase(PHASE_MARKING);
 }
 
 void factor_vm::collect_sweep_impl() {
   gc_event* event = current_gc->event;
-
   if (event)
-    event->started_data_sweep();
+    event->reset_timer();
   data->tenured->sweep();
   if (event)
-    event->ended_data_sweep();
+    event->ended_phase(PHASE_DATA_SWEEP);
 
-  update_code_roots_for_sweep();
+  // After a sweep, invalidate any code heap roots which are not
+  // marked, so that if a block makes a tail call to a generic word,
+  // and the PIC compiler triggers a GC, and the caller block gets GCd
+  // as a result, the PIC code won't try to overwrite the call site
+  mark_bits* state = &code->allocator->state;
+  FACTOR_FOR_EACH(code_roots) {
+    code_root* root = *iter;
+    cell block = root->value & (~data_alignment - 1);
+    if (root->valid && !state->marked_p(block))
+      root->valid = false;
+  }
 
   if (event)
-    event->started_code_sweep();
+    event->reset_timer();
   code->sweep();
   if (event)
-    event->ended_code_sweep();
+    event->ended_phase(PHASE_CODE_SWEEP);
 }
 
-void factor_vm::collect_full(bool trace_contexts_p) {
-  collect_mark_impl(trace_contexts_p);
+void factor_vm::collect_full() {
+  collect_mark_impl();
   collect_sweep_impl();
 
   if (data->low_memory_p()) {
-    /* Full GC did not free up enough memory. Grow the heap. */
-    set_current_gc_op(collect_growing_heap_op);
-    collect_growing_heap(0, trace_contexts_p);
+    // Full GC did not free up enough memory. Grow the heap.
+    set_current_gc_op(COLLECT_GROWING_DATA_HEAP_OP);
+    collect_growing_data_heap(0);
   } else if (data->high_fragmentation_p()) {
-    /* Enough free memory, but it is not contiguous. Perform a
-       compaction. */
-    set_current_gc_op(collect_compact_op);
-    collect_compact_impl(trace_contexts_p);
+    // Enough free memory, but it is not contiguous. Perform a
+    // compaction.
+    set_current_gc_op(COLLECT_COMPACT_OP);
+    collect_compact_impl();
   }
 
   code->flush_icache();

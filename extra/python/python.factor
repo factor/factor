@@ -1,4 +1,5 @@
-USING: alien alien.c-types alien.data arrays assocs command-line fry
+USING: alien alien.c-types alien.data alien.libraries
+arrays assocs command-line fry
 hashtables init io.encodings.utf8 kernel namespaces
 python.errors python.ffi python.objects sequences
 specialized-arrays strings vectors ;
@@ -54,10 +55,10 @@ SPECIALIZED-ARRAY: void*
     [ rot py-list-set-item ] with each-index ;
 
 : py-tuple>array ( py-tuple -- arr )
-    dup py-tuple-size iota [ py-tuple-get-item ] with map ;
+    dup py-tuple-size <iota> [ py-tuple-get-item ] with map ;
 
 : py-list>vector ( py-list -- vector )
-    dup py-list-size iota [ py-list-get-item ] with V{ } map-as ;
+    dup py-list-size <iota> [ py-list-get-item ] with V{ } map-as ;
 
 DEFER: >py
 
@@ -108,12 +109,15 @@ ERROR: missing-type type ;
 ! Callbacks
 : quot>py-callback ( quot: ( args kw -- ret ) -- alien )
     '[
-        [ nip ] dip
+        nipd
         [ [ py> ] [ { } ] if* ] bi@ @ >py
     ] PyCallback ; inline
 
 : with-quot>py-cfunction ( alien quot -- )
     '[ <py-cfunction> @ ] with-callback ; inline
 
-[ py-initialize ] "py-initialize" add-startup-hook
-[ py-finalize ] "py-finalize" add-shutdown-hook
+: python-dll-loaded? ( -- ? )
+    "Py_IsInitialized" "python" dlsym? ;
+
+[ python-dll-loaded? [ py-initialize ] when ] "python" add-startup-hook
+[ python-dll-loaded? [ py-finalize ] when ] "python" add-shutdown-hook

@@ -1,5 +1,5 @@
-USING: tools.test generic kernel definitions sequences
-compiler.units words ;
+USING: arrays bit-arrays byte-arrays compiler.units definitions
+tools.test ;
 IN: definitions.tests
 
 GENERIC: some-generic ( a -- b )
@@ -20,7 +20,7 @@ TUPLE: some-class ;
 
 M: some-class some-generic ;
 
-[ ] [
+{ } [
     [
         \ some-generic
         \ some-class

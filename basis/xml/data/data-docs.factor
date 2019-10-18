@@ -101,7 +101,7 @@ HELP: xml
 HELP: <xml>
 { $values { "prolog" "an XML prolog" } { "before" "a sequence of XML elements" }
 { "body" tag } { "after" "a sequence of XML elements" } { "xml" "an XML document" } }
-{ $description "Creates an XML document. The " { $snippet "before" } " and " { $snippet "after" } " slots store what comes before and after the main tag, and " { $snippet "body" } "contains the main tag itself." }
+{ $description "Creates an XML document. The " { $snippet "before" } " and " { $snippet "after" } " slots store what comes before and after the main tag, and " { $snippet "body" } " contains the main tag itself." }
 { $see-also xml <tag> } ;
 
 HELP: prolog
@@ -163,7 +163,7 @@ HELP: <simple-name>
 { $description "Converts a string into an XML name with an empty prefix and URL." } ;
 
 HELP: element-decl
-{ $class-description "Describes the class of element declarations, like <!ELEMENT  greeting (#PCDATA)>." } ;
+{ $class-description "Describes the class of element declarations, like <!ELEMENT greeting (#PCDATA)>." } ;
 
 HELP: <element-decl>
 { $values { "name" name } { "content-spec" string } { "element-decl" entity-decl } }

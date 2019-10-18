@@ -12,3 +12,5 @@ ARTICLE: "colors.yiq" "YIQ colors"
     >yiqa
 }
 { $see-also "colors" } ;
+
+ABOUT: "colors.yiq"

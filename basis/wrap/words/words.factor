@@ -4,8 +4,8 @@ USING: accessors grouping kernel math sequences
 sequences.private splitting.monotonic wrap ;
 IN: wrap.words
 
-TUPLE: word key width break? ;
-C: <word> word
+TUPLE: wrapping-word key width break? ;
+C: <wrapping-word> wrapping-word
 
 <PRIVATE
 
@@ -21,7 +21,7 @@ C: <word> word
     ] if ;
 
 : split-words ( seq -- half-elements )
-    [ [ break?>> ] same? ] monotonic-split ;
+    [ [ break?>> ] same? ] monotonic-split-slice ;
 
 : ?first-break ( seq -- newseq f/element )
     dup first first break?>>
@@ -33,10 +33,9 @@ C: <word> word
     [ prefix ] when* ;
 
 : words>elements ( seq -- newseq )
-    split-words ?first-break make-elements ;
+    [ { } ] [ split-words ?first-break make-elements ] if-empty ;
 
 PRIVATE>
 
-: wrap-words ( words line-max line-ideal -- lines )
-    [ words>elements ] 2dip wrap [ concat ] map! ;
-
+: wrap-words ( words width -- lines )
+    [ words>elements ] dip wrap [ concat ] map! ;

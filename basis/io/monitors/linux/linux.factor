@@ -6,7 +6,6 @@ io.backend.unix io.encodings.utf8 unix.linux.inotify assocs
 namespaces make threads continuations init libc math math.bitwise
 sets alien alien.strings alien.c-types vocabs.loader accessors
 system hashtables destructors unix classes.struct literals ;
-FROM: namespaces => set ;
 IN: io.monitors.linux
 
 SYMBOL: watches
@@ -114,7 +113,7 @@ M: linux-monitor dispose* ( monitor -- )
     ] if ;
 
 : inotify-read-loop ( port -- )
-    dup check-disposed
+    check-disposed
     dup wait-to-read drop
     0 over buffer>> parse-file-notifications
     0 over buffer>> buffer-reset
@@ -124,9 +123,9 @@ M: linux-monitor dispose* ( monitor -- )
     [ inotify-read-loop ] curry ignore-errors ;
 
 M: linux init-monitors
-    H{ } clone watches set
+    H{ } clone watches namespaces:set
     <inotify> [
-        [ inotify set ]
+        [ inotify namespaces:set ]
         [
             [ inotify-read-thread ] curry
             "Linux monitor thread" spawn drop

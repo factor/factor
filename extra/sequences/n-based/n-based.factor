@@ -15,7 +15,7 @@ C: <n-based-assoc> n-based-assoc
 
 PRIVATE>
 
-INSTANCE: n-based-assoc assoc 
+INSTANCE: n-based-assoc assoc
 M: n-based-assoc at* ( key assoc -- value ? )
     n-based@ 2dup bounds-check?
     [ nth-unsafe t ] [ 2drop f f ] if ;

@@ -43,10 +43,10 @@ FROM: generalizations => npick ;
 
 : gml-scalar-op ( a b scalar-quot mixed-quot vector-quot -- c )
     {
-        { [ 4 npick float? ] [ 2drop call ] }
-        { [ 4 npick integer? ] [ 2drop call ] }
-        { [ 4 npick vec2d? ] [ drop nip [ scalar>vec2d ] 2dip call ] }
-        { [ 4 npick vec3d? ] [ drop nip [ scalar>vec3d ] 2dip call ] }
+        { [ reach float? ] [ 2drop call ] }
+        { [ reach integer? ] [ 2drop call ] }
+        { [ reach vec2d? ] [ drop nip [ scalar>vec2d ] 2dip call ] }
+        { [ reach vec3d? ] [ drop nip [ scalar>vec3d ] 2dip call ] }
     } cond ; inline
 
 : gml-math-op ( a b scalar-quot mixed-quot vector-quot -- c )
@@ -55,16 +55,16 @@ FROM: generalizations => npick ;
         { [ 5 npick integer? ] [ gml-scalar-op ] }
         { [ 5 npick vec2d? ] [
             {
-                { [ 4 npick vec2d? ] [ 2nip call ] }
-                { [ 4 npick float? ] [ drop nip [ scalar>vec2d ] dip call ] }
-                { [ 4 npick integer? ] [ drop nip [ scalar>vec2d ] dip call ] }
+                { [ reach vec2d? ] [ 2nip call ] }
+                { [ reach float? ] [ drop nip [ scalar>vec2d ] dip call ] }
+                { [ reach integer? ] [ drop nip [ scalar>vec2d ] dip call ] }
             } cond
         ] }
         { [ 5 npick vec3d? ] [
             {
-                { [ 4 npick vec3d? ] [ 2nip call ] }
-                { [ 4 npick float? ] [ drop nip [ scalar>vec3d ] dip call ] }
-                { [ 4 npick integer? ] [ drop nip [ scalar>vec3d ] dip call ] }
+                { [ reach vec3d? ] [ 2nip call ] }
+                { [ reach float? ] [ drop nip [ scalar>vec3d ] dip call ] }
+                { [ reach integer? ] [ drop nip [ scalar>vec3d ] dip call ] }
             } cond
         ] }
     } cond ; inline
@@ -191,7 +191,7 @@ GML: aNormal ( x -- y )
     } cond ;
 
 : det2 ( x y -- z )
-    { 1 0 } vshuffle double-2{ 1 -1 } v* v* sum ; inline
+    { 1 0 } vshuffle double-2{ 1 -1 } v* v. ; inline
 
 : det3 ( x y z -- w )
     [ cross ] dip v. ; inline

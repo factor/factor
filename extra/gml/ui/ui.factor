@@ -1,11 +1,12 @@
 ! Copyright (C) 2010 Slava Pestov.
-USING: arrays accessors euler.b-rep fry gml gml.runtime gml.viewer
-gml.printer io.directories io.encodings.utf8 io.files
-io.pathnames io.streams.string kernel locals models namespaces
-sequences ui ui.gadgets ui.gadgets.buttons ui.gadgets.editors
-ui.gadgets.frames ui.gadgets.grids ui.gadgets.labels
-ui.gadgets.packs ui.gadgets.scrollers ui.gadgets.worlds
-ui.gadgets.tables ui.gadgets.labeled unicode.case ;
+USING: arrays accessors colors.constants euler.b-rep fry gml
+gml.runtime gml.viewer gml.printer io.directories
+io.encodings.utf8 io.files io.pathnames io.streams.string kernel
+locals models namespaces sequences ui ui.gadgets
+ui.gadgets.buttons ui.gadgets.editors ui.gadgets.frames
+ui.gadgets.grids ui.gadgets.labels ui.gadgets.packs
+ui.gadgets.scrollers ui.gadgets.worlds ui.gadgets.tables
+ui.gadgets.labeled unicode ;
 FROM: gml => gml ;
 IN: gml.ui
 
@@ -25,7 +26,8 @@ M: stack-entry-renderer row-value
         40 >>max-cols ;
 
 : <stack-display> ( model -- gadget )
-    <stack-table> <scroller> "Operand stack" <labeled-gadget> ;
+    <stack-table> <scroller> "Operand stack"
+    COLOR: dark-gray <colored-labeled-gadget> ;
 
 TUPLE: gml-editor < frame editor gml stack-model b-rep b-rep-model ;
 
@@ -88,7 +90,7 @@ CONSTANT: example-dir "vocab:gml/examples/"
 
 : <example-buttons> ( -- gadget )
     gml-files
-    <pile> { 5 5 } >>gap 
+    <pile> { 5 5 } >>gap
     "Examples:" <label> add-gadget
     [ <example-button> add-gadget ] reduce ;
 
@@ -97,7 +99,7 @@ CONSTANT: example-dir "vocab:gml/examples/"
         30 >>max-rows
         40 >>min-cols
         40 >>max-cols
-    <scroller> "Editor" <labeled-gadget> ;
+    <scroller> "Editor" COLOR: dark-gray <colored-labeled-gadget> ;
 
 : <gml-editor> ( -- gadget )
     2 3 gml-editor new-frame

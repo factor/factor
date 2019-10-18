@@ -14,12 +14,12 @@ SYMBOL: system-random-generator
 SYMBOL: secure-random-generator
 SYMBOL: random-generator
 
-GENERIC# seed-random 1 ( obj seed -- obj )
+GENERIC#: seed-random 1 ( obj seed -- obj )
 GENERIC: random-32* ( obj -- n )
 GENERIC: random-bytes* ( n obj -- byte-array )
 
 M: object random-bytes*
-    [ integer>fixnum-strict [ <byte-array> ] keep ] dip
+    [ integer>fixnum-strict [ (byte-array) ] keep ] dip
     [ over 4 >= ] [
         [ 4 - ] dip
         [ random-32* 2over c:int c:set-alien-value ] keep
@@ -71,14 +71,14 @@ PRIVATE>
 : next-power-of-2-bits ( m -- numbits )
     dup 2 <= [ drop 1 ] [ 1 - log2 1 + ] if ; inline
 
-:: ((random-integer)) ( m obj -- n )
+:: random-integer-loop ( m obj -- n )
     obj random-32* 32 m next-power-of-2-bits 32 - [ dup 0 > ] [
         [ 32 shift obj random-32* + ] [ 32 + ] [ 32 - ] tri*
     ] while drop [ m * ] [ neg shift ] bi* ; inline
 
-GENERIC# (random-integer) 1 ( m obj -- n )
-M: fixnum (random-integer) ( m obj -- n ) ((random-integer)) ;
-M: bignum (random-integer) ( m obj -- n ) ((random-integer)) ;
+GENERIC#: (random-integer) 1 ( m obj -- n )
+M: fixnum (random-integer) ( m obj -- n ) random-integer-loop ;
+M: bignum (random-integer) ( m obj -- n ) random-integer-loop ;
 
 : random-integer ( m -- n )
     random-generator get (random-integer) ;
@@ -128,7 +128,7 @@ ERROR: too-many-samples seq n ;
 
 : sample ( seq n -- seq' )
     2dup [ length ] dip < [ too-many-samples ] when
-    [ [ length iota >array ] dip [ randomize-n-last ] keep tail-slice* ]
+    [ [ length <iota> >array ] dip [ randomize-n-last ] keep tail-slice* ]
     [ drop ] 2bi nths-unsafe ;
 
 : delete-random ( seq -- elt )

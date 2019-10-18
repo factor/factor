@@ -21,9 +21,10 @@ ARTICLE: "deploy-flags" "Deployment flags"
 { $heading "Advanced deploy options" }
 "There are some flags which may reduce deployed application size in trivial or specialized applications. These settings cannot usually be changed from their defaults and still produce a working application. These settings are not available from the deploy tool UI and must be set by manually editing a vocabulary's " { $snippet "deploy.factor" } " file."
 { $subsections
-    deploy-math?
-    deploy-threads?
-    deploy-io
+  deploy-help?
+  deploy-math?
+  deploy-threads?
+  deploy-io
 } ;
 
 ABOUT: "deploy-flags"
@@ -60,16 +61,14 @@ $nl
 }
 "If your program looks up C types dynamically or from words which do not have a stack effect, you must enable this flag, because in these situations the C type lookup code is not folded away and the word properties must be consulted at runtime." } ;
 
+HELP: deploy-help?
+{ $description "Deploy flag. If set, the deployed image will contain documentation for all included words." } ;
+
 HELP: deploy-math?
 { $description "Deploy flag. If set, the deployed image will contain support for " { $link ratio } " and " { $link complex } " types."
 $nl
 "On by default."
 { $warning "It is unlikely that math support can be safely removed in most nontrivial applications because the library makes extensive use of ratios." } } ;
-
-HELP: deploy-unicode?
-{ $description "Deploy flag. If set, full Unicode " { $link POSTPONE: CHAR: } " syntax is included."
-$nl
-"Off by default. If your program needs to use " { $link POSTPONE: CHAR: } " with named characters, enable this flag." } ;
 
 HELP: deploy-threads?
 { $description "Deploy flag. If set, thread support will be included in the final image."
@@ -81,6 +80,11 @@ HELP: deploy-ui?
 { $description "Deploy flag. If set, the Factor UI will be included in the deployed image."
 $nl
 "Off by default. Programs wishing to use the UI must be deployed with this flag on." } ;
+
+HELP: deploy-unicode?
+{ $description "Deploy flag. If set, full Unicode " { $link POSTPONE: CHAR: } " syntax is included."
+$nl
+"Off by default. If your program needs to use " { $link POSTPONE: CHAR: } " with named characters, enable this flag." } ;
 
 HELP: deploy-console?
 { $description "Deploy flag. If set, the deployed executable will be configured as a console application. On Windows, this means the application will be deployed in the console subsystem and will be attached to a console window. On Mac OS X, this means the application will be deployed as a Unix executable instead of a Mac application bundle. On other Unix platforms, the flag has no effect."

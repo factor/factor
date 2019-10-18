@@ -1,13 +1,9 @@
-
-USING: assocs kernel tools.completion tools.completion.private
-tools.test ;
-
-IN: tools.completion
+USING: assocs kernel sequences tools.completion tools.test ;
 
 { f } [ "abc" "def" fuzzy ] unit-test
 { V{ 4 5 6 } } [ "set-nth" "nth" fuzzy ] unit-test
 
-{ V{ V{ 0 } V{ 4 5 6 } } } [ V{ 0 4 5 6 } runs ] unit-test
+{ { { 0 } { 4 5 6 } } } [ V{ 0 4 5 6 } runs [ { } like ] map ] unit-test
 
 { { "nth" "?nth" "set-nth" } } [
     "nth" { "set-nth" "nth" "?nth" } dup zip completions keys
@@ -29,6 +25,12 @@ IN: tools.completion
 { t } [ { "USING:" "A" "B" "C" } complete-vocab? ] unit-test
 { f } [ { "USING:" "A" "B" "C" ";" } complete-vocab? ] unit-test
 { t } [ { "X" ";" "USING:" "A" "B" "C" } complete-vocab? ] unit-test
+
+{ f } [ { "FROM:" } complete-vocab-words? ] unit-test
+{ f } [ { "FROM:" "math" } complete-vocab-words? ] unit-test
+{ t } [ { "FROM:" "math" "=>" } complete-vocab-words? ] unit-test
+{ f } [ { "FROM:" "math" "=>" "+" ";" } complete-vocab-words? ] unit-test
+{ f } [ { "BOOM:" "math" "=>" "+" } complete-vocab-words? ] unit-test
 
 { f } [ { "CHAR:" } complete-char? ] unit-test
 { t } [ { "CHAR:" "" } complete-char? ] unit-test

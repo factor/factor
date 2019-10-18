@@ -1,17 +1,10 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.syntax byte-vectors
-combinators kernel math math.functions sequences system
-accessors libc ;
-QUALIFIED: compression.zlib.ffi
+USING: accessors alien alien.c-types alien.data alien.syntax
+byte-arrays byte-vectors classes.struct combinators
+compression.zlib.ffi continuations destructors fry kernel libc
+math math.functions math.ranges sequences system ;
 IN: compression.zlib
-
-TUPLE: compressed data length ;
-
-: <compressed> ( data length -- compressed )
-    compressed new
-        swap >>length
-        swap >>data ;
 
 ERROR: zlib-failed n string ;
 
@@ -29,26 +22,53 @@ ERROR: zlib-failed n string ;
     ] if zlib-failed ;
 
 : zlib-error ( n -- )
-    dup compression.zlib.ffi:Z_OK = [ drop ] [ dup zlib-error-message zlib-failed ] if ;
+    dup {
+        { compression.zlib.ffi:Z_OK [ drop ] }
+        { compression.zlib.ffi:Z_STREAM_END [ drop ] }
+        [ dup zlib-error-message zlib-failed ]
+    } case ;
 
 : compressed-size ( byte-array -- n )
     length 1001/1000 * ceiling 12 + ;
 
-: compress ( byte-array -- compressed )
+: compress ( byte-array -- byte-array' )
     [
-        [
-            compressed-size
-            [ <byte-vector> dup underlying>> ] keep ulong <ref>
-        ] keep [
-            dup length compression.zlib.ffi:compress zlib-error
-        ] 2keep drop ulong deref >>length B{ } like
-    ] keep length <compressed> ;
+        compressed-size
+        [ <byte-vector> dup underlying>> ] keep ulong <ref>
+    ] keep [
+        dup length compression.zlib.ffi:compress zlib-error
+    ] keepd ulong deref >>length B{ } like ;
 
-: uncompress ( compressed -- byte-array )
+: (uncompress) ( length byte-array -- byte-array )
     [
-        length>> [ <byte-vector> dup underlying>> ] keep
-        ulong <ref>
-    ] [
-        data>> dup length pick
-        [ compression.zlib.ffi:uncompress zlib-error ] dip
-    ] bi ulong deref >>length B{ } like ;
+        [ drop [ malloc &free ] [ ulong <ref> ] bi ]
+        [ nip dup length ] 2bi
+        [ compression.zlib.ffi:uncompress zlib-error ] 4keep
+        2drop ulong deref memory>byte-array
+    ] with-destructors ;
+
+: uncompress ( byte-array -- byte-array' )
+    [ length 5 [0,b) [ 2^ * ] with map ] keep
+    '[ _ (uncompress) ] attempt-all ;
+
+
+: zlib-inflate-init ( -- z_stream_s )
+    z_stream <struct>
+    dup ZLIB_VERSION over byte-length inflateInit_ zlib-error ;
+
+! window can be 0, 15, 32, 47 (others?)
+: zlib-inflate-init2 ( window -- z_stream_s )
+    [ z_stream <struct> dup ] dip
+    ZLIB_VERSION pick byte-length inflateInit2_ zlib-error ;
+
+: zlib-inflate-end ( z_stream -- )
+    inflateEnd zlib-error ;
+
+: zlib-inflate-reset ( z_stream -- )
+    inflateReset zlib-error ;
+
+: zlib-inflate ( z_stream flush -- )
+    inflate zlib-error ;
+
+: zlib-inflate-get-header ( z_stream -- gz_header )
+    gz_header <struct> [ inflateGetHeader zlib-error ] keep ;

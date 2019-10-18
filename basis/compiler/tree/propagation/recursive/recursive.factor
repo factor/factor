@@ -1,16 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel classes.algebra sequences accessors arrays fry
-math math.intervals layouts combinators namespaces locals
-stack-checker.inlining
-compiler.tree
-compiler.tree.combinators
-compiler.tree.propagation.copy
-compiler.tree.propagation.info
-compiler.tree.propagation.nodes
-compiler.tree.propagation.simple
-compiler.tree.propagation.branches
-compiler.tree.propagation.constraints ;
+USING: accessors classes.algebra combinators compiler.tree
+compiler.tree.combinators compiler.tree.propagation.constraints
+compiler.tree.propagation.copy compiler.tree.propagation.info
+compiler.tree.propagation.nodes compiler.tree.propagation.simple
+kernel locals math math.intervals namespaces sequences ;
 FROM: sequences.private => array-capacity ;
 IN: compiler.tree.propagation.recursive
 
@@ -26,10 +20,8 @@ IN: compiler.tree.propagation.recursive
     [ latest-input-infos ] bi ;
 
 : counter-class ( interval class -- class' )
-    dup fixnum class<= [
-        swap array-capacity-interval interval-subset?
-        [ drop array-capacity ] when
-    ] [ nip ] if ;
+    dup fixnum class<= rot array-capacity-interval interval-subset? and
+    [ drop array-capacity ] when ;
 
 :: generalize-counter-interval ( interval initial-interval class -- interval' )
     interval class counter-class :> class
@@ -51,7 +43,12 @@ IN: compiler.tree.propagation.recursive
     2dup [ not ] either? [ drop ] [
         2dup [ class>> null-class? ] either? [ drop ] [
             [ clone ] dip
-            [ [ drop ] [ [ [ interval>> ] bi@ ] [ drop class>> ] 2bi generalize-counter-interval ] 2bi >>interval ]
+            [
+                [ drop ] [
+                    [ [ interval>> ] bi@ ] [ drop class>> ] 2bi
+                    generalize-counter-interval
+                ] 2bi >>interval
+            ]
             [ [ drop ] [ [ slots>> ] bi@ [ generalize-counter ] 2map ] 2bi >>slots ]
             bi
         ] if
@@ -73,8 +70,6 @@ IN: compiler.tree.propagation.recursive
 M: #recursive propagate-around ( #recursive -- )
     constraints [ H{ } clone suffix ] change
     [
-        loop-nesting inc
-
         constraints [ but-last H{ } clone suffix ] change
 
         child>>
@@ -82,8 +77,6 @@ M: #recursive propagate-around ( #recursive -- )
         [ first propagate-recursive-phi ]
         [ (propagate) ]
         tri
-
-        loop-nesting dec
     ] until-fixed-point ;
 
 : recursive-phi-infos ( node -- infos )

@@ -74,10 +74,10 @@ GML: slice ( array n k -- slice )
 GML:: subarray ( array n k -- slice )
     k n k + array subseq ;
 GML: sort-number-permutation ( array -- permutation )
-    [ 2array ] map-index sort-keys reverse values ;
+    zip-index sort-keys reverse values ;
 
 ! Dictionaries
-ERROR: not-a-dict obj ;
+ERROR: not-a-dict object ;
 : check-dict ( obj -- obj' ) dup hashtable? [ not-a-dict ] unless ; inline
 
 GML: begin ( dict -- ) check-dict over dictionary-stack>> push ;
@@ -105,9 +105,9 @@ GML: where ( key -- ? )
 GML: currentdict ( -- dict ) dup current-dict ;
 GML: load ( name -- value ) over lookup-name ;
 
-ERROR: not-a-name obj ;
+ERROR: not-a-name object ;
 
-: check-name ( obj -- obj' ) dup name? [ not-a-name ] unless ; inline
+: check-name ( obj -- obj' ) dup gml-name? [ not-a-name ] unless ; inline
 
 GML: def ( name value -- ) swap check-name pick current-dict set-at ;
 GML: edef ( value name -- ) check-name pick current-dict set-at ;

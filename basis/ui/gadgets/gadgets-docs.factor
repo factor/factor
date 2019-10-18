@@ -1,20 +1,37 @@
-USING: help.markup help.syntax opengl kernel strings
-classes.tuple classes quotations models math.rectangles
-ui.gadgets.private accessors ;
+USING: accessors concurrency.flags help.markup help.syntax kernel
+math.rectangles models strings ui.gadgets.private ;
 IN: ui.gadgets
+
+HELP: <gadget>
+{ $values { "gadget" "a new " { $link gadget } } }
+{ $description "Creates a new gadget." } ;
+
+HELP: children-on
+{ $values { "rect" rect } { "gadget" gadget } { "seq" "a sequence of gadgets" } }
+{ $contract "Outputs a sequence of gadgets which potentially intersect a rectangle in the co-ordinate system of the gadget." }
+{ $notes "This does not have to be an accurate intersection test, and simply returning " { $link children>> } " is a valid implementation. However, an accurate intersection test reduces the amount of work done when drawing this gadget if it is partially clipped and not all children are visible." } ;
+
+HELP: control-value
+{ $values { "control" gadget } { "value" object } }
+{ $description "Outputs the value of the control's model." } ;
 
 HELP: gadget-child
 { $values { "gadget" gadget } { "child" gadget } }
-{ $description "Outputs the first child of the gadget. Typically this word is used with gadgets which are known to have an only child." } ;
+{ $description "Outputs the first child of the gadget. Typically this word is used with gadgets which are known to have only one child." } ;
+
+HELP: notify
+{ $values { "gadget" gadget } }
+{ $description "Notifies the gadget that it has a graft message to handle." }
+{ $see-also graft* ungraft* } ;
+
+HELP: notify-ui-thread
+{ $description "Notifies the UI thread that there is work to do." }
+{ $see-also ui-notify-flag } ;
 
 HELP: nth-gadget
 { $values { "n" "a non-negative integer" } { "gadget" gadget } { "child" gadget } }
 { $description "Outputs the " { $snippet "n" } "th child of the gadget." }
 { $errors "Throws an error if " { $snippet "n" } " is negative or greater than or equal to the number of children." } ;
-
-HELP: <gadget>
-{ $values { "gadget" "a new " { $link gadget } } }
-{ $description "Creates a new gadget." } ;
 
 HELP: relative-loc
 { $values { "fromgadget" gadget } { "togadget" gadget } { "loc" "a pair of integers" } }
@@ -28,11 +45,6 @@ HELP: relative-loc
 HELP: user-input*
 { $values { "str" string } { "gadget" gadget } { "?" boolean } }
 { $contract "Handle free-form textual input while the gadget has keyboard focus." } ;
-
-HELP: children-on
-{ $values { "rect" rect } { "gadget" gadget } { "seq" "a sequence of gadgets" } }
-{ $contract "Outputs a sequence of gadgets which potentially intersect a rectangle in the co-ordinate system of the gadget." }
-{ $notes "This does not have to be an accurate intersection test, and simply returning " { $link children>> } " is a valid implementation. However, an accurate intersection test reduces the amount of work done when drawing this gadget if it is partially clipped and not all children are visible." } ;
 
 HELP: pick-up
 { $values { "point" "a pair of integers" } { "gadget" gadget } { "child/f" { $maybe gadget } } }
@@ -62,7 +74,7 @@ HELP: relayout
 
 HELP: relayout-1
 { $values { "gadget" gadget } }
-{ $description "Relayout and redraw a gadget before the next iteration of the event loop. Unlike " { $link relayout } ", this does not propagate requests up to the parent, and so this word should only be used when the gadget's internal layout or appearance has changed, but the dimensions have not." } ;
+{ $description "Relayout and redraw a gadget before the next iteration of the event loop. Unlike " { $link relayout } ", this does not propagate requests up to the parent, and so this word should be used when the gadget's internal layout or appearance has changed, but the dimensions have not." } ;
 
 { relayout relayout-1 } related-words
 
@@ -142,9 +154,9 @@ HELP: add-gadgets
 { $notes "This may result in " { $link graft* } " being called on the children, if the parent is visible on the screen." }
 { $side-effects "parent" } ;
 
-HELP: parents
-{ $values { "gadget" gadget } { "seq" "a sequence of gadgets" } }
-{ $description "Outputs a sequence of all parents of the gadget, with the first element being the gadget itself." } ;
+HELP: child?
+{ $values { "parent" gadget } { "child" gadget } { "?" boolean } }
+{ $description "Tests if " { $snippet "child" } " is contained inside " { $snippet "parent" } "." } ;
 
 HELP: each-parent
 { $values { "gadget" gadget } { "quot" { $quotation ( gadget -- ? ) } } { "?" boolean } }
@@ -153,14 +165,6 @@ HELP: each-parent
 HELP: find-parent
 { $values { "gadget" gadget } { "quot" { $quotation ( gadget -- ? ) } } { "parent" gadget } }
 { $description "Outputs the first parent of the gadget, starting from the gadget itself, for which the quotation outputs a true value, or " { $link f } " if the quotation outputs " { $link f } " for every parent." } ;
-
-HELP: screen-loc
-{ $values { "gadget" gadget } { "loc" "a pair of integers" } }
-{ $description "Outputs the location of the gadget relative to the top-left corner of the world containing the gadget. This word does not output a useful value if the gadget is not grafted." } ;
-
-HELP: child?
-{ $values { "parent" gadget } { "child" gadget } { "?" boolean } }
-{ $description "Tests if " { $snippet "child" } " is contained inside " { $snippet "parent" } "." } ;
 
 HELP: focusable-child*
 { $values { "gadget" gadget } { "child/t" "a " { $link gadget } " or " { $link t } } }
@@ -173,13 +177,29 @@ HELP: focusable-child
 
 { control-value set-control-value } related-words
 
-HELP: control-value
-{ $values { "control" gadget } { "value" object } }
-{ $description "Outputs the value of the control's model." } ;
+HELP: layout-later
+{ $values { "gadget" gadget } }
+{ $description "Adds the gadget to the " { $link layout-queue } " and notifies the UI thread that there is a gadget to layout. If the length of the queue is larger than " { $link layout-queue-limit } ", then the current thread is yielded so that the UI thread has a chance to run." } ;
+
+HELP: parents
+{ $values { "gadget" gadget } { "seq" "a sequence of gadgets" } }
+{ $description "Outputs a sequence of all parents of the gadget, with the first element being the gadget itself." } ;
+
+HELP: screen-loc
+{ $values { "gadget" gadget } { "loc" "a pair of integers" } }
+{ $description "Outputs the location of the gadget relative to the top-left corner of the world containing the gadget. This word does not output a useful value if the gadget is not grafted." } ;
 
 HELP: set-control-value
 { $values { "value" object } { "control" gadget } }
 { $description "Sets the value of the control's model." } ;
+
+HELP: unqueue-graft
+{ $values { "gadget" gadget } }
+{ $description "Removes the gadget from the " { $link graft-queue } "." } ;
+
+HELP: ui-notify-flag
+{ $var-description "A " { $link flag } " raised to notify the UI thread that there is work to do." }
+{ $see-also notify-ui-thread } ;
 
 ARTICLE: "ui-control-impl" "Implementing controls"
 "A " { $emphasis "control" } " is a gadget which is linked to an underlying " { $link model } " by having its " { $snippet "model" } " slot set to a " { $link model } " instance."
@@ -188,5 +208,12 @@ $nl
 { $subsections
     control-value
     set-control-value
+}
+"Graft handling:"
+{ $subsections
+  graft
+  notify
+  ungraft
+  unqueue-graft
 }
 { $see-also "models" } ;

@@ -9,20 +9,14 @@ IN: irc.messages.parser
 : split-at-first ( seq separators -- before after )
     dupd '[ _ member? ] find [ cut rest ] [ swap ] if ;
 
-: split-trailing ( string -- string string/f ) ":" split1 ;
-: remove-heading-: ( seq -- seq ) ":" ?head drop ;
-
-: split-prefix ( string -- string/f string )
-    dup ":" head? [
-        remove-heading-: " " split1
-    ] [ f swap ] if ;
-
+! ":ircuser!n=user@isp.net JOIN :#factortest"
 : split-message ( string -- prefix command parameters trailing )
-    split-prefix split-trailing
-    [ [ blank? ] trim " " split unclip swap ] dip ;
+    ":" ?head [ " " split1 ] [ f swap ] if
+    ":" split1
+    [ " " split harvest unclip swap ] dip ;
 
 : sender ( irc-message -- sender )
-    prefix>> [ remove-heading-: "!" split-at-first drop ] [ f ] if* ;
+    prefix>> [ ":" ?head drop "!" split-at-first drop ] [ f ] if* ;
 PRIVATE>
 
 : string>irc-message ( string -- irc-message )

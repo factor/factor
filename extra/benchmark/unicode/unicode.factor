@@ -1,6 +1,6 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math random sequences strings unicode.case ;
+USING: kernel math random sequences strings unicode ;
 IN: benchmark.unicode
 
 : crazy-unicode-string ( -- string )

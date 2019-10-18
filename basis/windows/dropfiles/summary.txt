@@ -1,0 +1,1 @@
+Implementation of the file-drop gesture for Windows

@@ -1,12 +1,12 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel locals words summary slots quotations
-sequences assocs math arrays stack-checker effects continuations
-classes.tuple namespaces make vectors bit-arrays byte-arrays
-strings sbufs math.functions macros sequences.private
-combinators mirrors splitting combinators.smart
-combinators.short-circuit fry words.symbol generalizations
-sequences.generalizations classes ;
+USING: accessors arrays assocs bit-arrays byte-arrays classes
+classes.tuple combinators combinators.short-circuit
+combinators.smart continuations effects fry generalizations
+kernel locals macros make math math.functions namespaces
+quotations sbufs sequences sequences.generalizations slots
+splitting stack-checker strings summary vectors words
+words.symbol ;
 IN: inverse
 
 ERROR: fail ;
@@ -28,24 +28,17 @@ M: fail summary drop "Matching failed" ;
 : define-math-inverse ( word quot1 quot2 -- )
     pick 1quotation 3array "math-inverse" set-word-prop ;
 
-: define-pop-inverse ( word n quot -- )
-    [ dupd "pop-length" set-word-prop ] dip
-    "pop-inverse" set-word-prop ;
-
-ERROR: no-inverse word ;
-M: no-inverse summary
-    drop "The word cannot be used in pattern matching" ;
+:: define-pop-inverse ( word n quot -- )
+    word n "pop-length" set-word-prop
+    word quot "pop-inverse" set-word-prop ;
 
 ERROR: bad-math-inverse ;
 
 : next ( revquot -- revquot* first )
-    [ bad-math-inverse ]
-    [ unclip-slice ] if-empty ;
+    [ bad-math-inverse ] [ unclip-slice ] if-empty ;
 
 : constant-word? ( word -- ? )
-    stack-effect
-    [ out>> length 1 = ]
-    [ in>> empty? ] bi and ;
+    stack-effect [ out>> length 1 = ] [ in>> empty? ] bi and ;
 
 : assure-constant ( constant -- quot )
     dup word? [ bad-math-inverse ] when 1quotation ;
@@ -55,9 +48,6 @@ ERROR: bad-math-inverse ;
 
 : pull-inverse ( math-inverse revquot const -- revquot* quot )
     assure-constant rot first compose ;
-
-: ?word-prop ( word/object name -- value/f )
-    over word? [ word-prop ] [ 2drop f ] if ;
 
 : undo-literal ( object -- quot ) [ =/fail ] curry ;
 
@@ -79,21 +69,21 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
     if ;
 
 : fold ( quot -- folded-quot )
-    [ { } [ fold-word ] reduce % ] [ ] make ; 
+    [ { } [ fold-word ] reduce % ] [ ] make ;
 
 ERROR: no-recursive-inverse ;
 
 SYMBOL: visited
 
 : flattenable? ( object -- ? )
-    { [ word? ] [ primitive? not ] [
-        { "inverse" "math-inverse" "pop-inverse" }
-        [ word-prop ] with any? not
-    ] } 1&& ; 
+    {
+        [ word? ]
+        [ primitive? not ]
+        [ explicit-inverse? not ]
+    } 1&& ;
 
 : flatten ( quot -- expanded )
-    [
-        visited [ over suffix ] change
+    visited get over suffix visited [
         [
             dup flattenable? [
                 def>>
@@ -102,7 +92,7 @@ SYMBOL: visited
                 bi
             ] [ 1quotation ] if
         ] map concat
-    ] with-scope ;
+    ] with-variable ;
 
 ERROR: undefined-inverse ;
 
@@ -132,7 +122,7 @@ M: pop-inverse inverse
 : [undo] ( quot -- undo )
     flatten fold reverse [ (undo) ] [ ] make ;
 
-MACRO: undo ( quot -- ) [undo] ;
+MACRO: undo ( quot -- quot ) [undo] ;
 
 ! Inverse of selected words
 
@@ -162,9 +152,9 @@ MACRO: undo ( quot -- ) [undo] ;
 ERROR: missing-literal ;
 
 : assert-literal ( n -- n )
-    dup
-    [ word? ] [ symbol? not ] bi and
+    dup { [ word? ] [ symbol? not ] } 1&&
     [ missing-literal ] when ;
+
 \ + [ - ] [ - ] define-math-inverse
 \ - [ + ] [ - ] define-math-inverse
 \ * [ / ] [ / ] define-math-inverse
@@ -182,6 +172,7 @@ DEFER: __
 
 : both ( object object -- object )
     dupd assert= ;
+
 \ both [ dup ] define-inverse
 
 {
@@ -219,7 +210,7 @@ DEFER: __
 \ first4 [ 4array ] define-inverse
 
 \ prefix \ unclip define-dual
-\ suffix [ dup but-last swap last ] define-inverse
+\ suffix \ unclip-last define-dual
 
 \ append 1 [ [ ?tail assure ] curry ] define-pop-inverse
 \ prepend 1 [ [ ?head assure ] curry ] define-pop-inverse
@@ -268,7 +259,7 @@ DEFER: __
 
 : recover-fail ( try fail -- )
     [ drop call ] [
-        [ nip ] dip dup fail?
+        nipd dup fail?
         [ drop call ] [ nip throw ] if
     ] recover ; inline
 
@@ -281,9 +272,10 @@ DEFER: __
 : [matches?] ( quot -- undoes?-quot )
     [undo] dup infer [ true-out ] [ false-recover ] bi curry ;
 
-MACRO: matches? ( quot -- ? ) [matches?] ;
+MACRO: matches? ( quot -- quot' ) [matches?] ;
 
 ERROR: no-match ;
+
 M: no-match summary drop "Fall through in switch" ;
 
 : recover-chain ( seq -- quot )
@@ -294,4 +286,4 @@ M: no-match summary drop "Fall through in switch" ;
     reverse [ [ [undo] ] dip compose ] { } assoc>map
     recover-chain ;
 
-MACRO: switch ( quot-alist -- ) [switch] ;
+MACRO: switch ( quot-alist -- quot ) [switch] ;

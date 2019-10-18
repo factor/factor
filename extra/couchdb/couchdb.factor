@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2009 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs continuations debugger hashtables http
+USING: accessors assocs continuations debugger fry hashtables http
 http.client io io.encodings.string io.encodings.utf8 json.reader
 json.writer kernel locals make math math.parser namespaces sequences
-strings urls urls.encoding vectors ;
+strings urls.encoding vectors ;
 IN: couchdb
 
 ! NOTE: This code only works with the latest couchdb (0.9.*), because old
@@ -42,11 +42,14 @@ PREDICATE: file-exists-error < couchdb-error
 : couch-get ( url -- assoc )
     <get-request> couch-request ;
 
-: couch-put ( post-data url -- assoc )
-    <put-request> couch-request ;
+: <json-post-data> ( assoc -- post-data )
+    >json utf8 encode "application/json" <post-data> swap >>data ;
 
-: couch-post ( post-data url -- assoc )
-    <post-request> couch-request ;
+: couch-put ( assoc url -- assoc' )
+    [ <json-post-data> ] dip <put-request> couch-request ;
+
+: couch-post ( assoc url -- assoc' )
+    [ <json-post-data> ] dip <post-request> couch-request ;
 
 : couch-delete ( url -- assoc )
     <delete-request> couch-request ;
@@ -94,7 +97,7 @@ CONSTANT: default-uuids-to-cache 100
 : next-uuid ( server -- uuid )
     ensure-uuids uuids>> pop ;
 
-! db 
+! db
 TUPLE: db { server server } { name string } ;
 C: <db> db
 
@@ -108,9 +111,7 @@ C: <db> db
     f swap db-url couch-put response-ok* ;
 
 : ensure-db ( db -- )
-    [ create-db ] [
-        dup file-exists-error? [ 2drop ] [ rethrow ] if
-    ] recover ;
+    '[ _ create-db ] [ file-exists-error? ] ignore-error ;
 
 : delete-db ( db -- )
     db-url couch-delete drop ;
@@ -118,18 +119,15 @@ C: <db> db
 : db-info ( db -- info )
     db-url couch-get ;
 
-: compact-db ( db -- )
-    f swap db-url "_compact" append couch-post response-ok* ;
-
 : all-docs ( db -- docs )
     ! TODO: queries. Maybe pass in a hashtable with options
     db-url "_all_docs" append couch-get ;
 
-: <json-post-data> ( assoc -- post-data )
-    >json utf8 encode "application/json" <post-data> swap >>data ;
+: compact-db ( db -- )
+    f swap db-url "_compact" append couch-post response-ok* ;
 
 ! documents
-: id> ( assoc -- id ) "_id" of ; 
+: id> ( assoc -- id ) "_id" of ;
 : >id ( assoc id -- assoc ) "_id" pick set-at ;
 : rev> ( assoc -- rev ) "_rev" of ;
 : >rev ( assoc rev -- assoc ) "_rev" pick set-at ;
@@ -153,20 +151,20 @@ C: <db> db
     id> id-url ;
 
 : temp-view ( view -- results )
-    <json-post-data> couch get db-url "_temp_view" append couch-post ;
+    couch get db-url "_temp_view" append couch-post ;
 
 : temp-view-map ( map -- results )
     "map" associate temp-view ;
 
 : save-doc-as ( assoc id -- )
-    [ dup <json-post-data> ] dip id-url couch-put response-ok
+    dupd id-url couch-put response-ok
     [ copy-id ] [ copy-rev ] 2bi ;
 
 : save-new-doc ( assoc -- )
     couch get server>> next-uuid save-doc-as ;
 
 : save-doc ( assoc -- )
-    dup id> [ save-doc-as ] [ save-new-doc ] if* ; 
+    dup id> [ save-doc-as ] [ save-new-doc ] if* ;
 
 : load-doc ( id -- assoc )
     id-url couch-get ;
@@ -185,10 +183,10 @@ C: <db> db
 
 ! : construct-attachment ( content-type data -- assoc )
 !     H{ } clone "name" pick set-at "content-type" pick set-at ;
-! 
+!
 ! : add-attachment ( assoc name attachment -- )
-!     pick attachments> [ H{ } clone ] unless* 
-! 
+!     pick attachments> [ H{ } clone ] unless*
+!
 ! : attach ( assoc name content-type data -- )
 !     construct-attachment H{ } clone
 

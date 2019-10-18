@@ -23,18 +23,20 @@ $nl
 ABOUT: "source-files"
 
 HELP: source-files
-{ $var-description "An assoc mapping pathname strings to " { $link source-file-tuple } " instances, representing loaded source files." } ;
+{ $var-description "An assoc mapping pathname strings to " { $link source-file } " instances, representing loaded source files." } ;
 
-HELP: source-file
-{ $values { "path" "a pathname string" } { "source-file" source-file-tuple } }
+HELP: path>source-file
+{ $values { "path" "a pathname string" } { "source-file" source-file } }
 { $description "Outputs the source file associated to a path name, creating the source file first if it doesn't exist. Source files are retained in the " { $link source-files } " variable." } ;
 
-HELP: source-file-tuple
+HELP: source-file
 { $class-description "Instances retain information about loaded source files, and have the following slots:"
     { $list
         { { $slot "path" } " - a pathname string." }
+        { { $slot "top-level-form" } " - a " { $link quotation } " composed of any code not used to define new words and classes" }
         { { $slot "checksum" } " - the CRC32 checksum of the source file's contents at the time it was most recently loaded." }
         { { $slot "definitions" } " - a pair of assocs, containing definitions and classes defined in this source file, respectively" }
+        { { $slot "main" } " - a word that gets called if you " { $link run } " the vocabulary" }
     }
 } ;
 
@@ -52,12 +54,12 @@ HELP: forget-source
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
 
 HELP: record-definitions
-{ $values { "file" source-file } }
+{ $values { "source-file" source-file } }
 { $description "Records that all " { $link new-definitions } " were defined in " { $snippet "file" } "." } ;
 
 HELP: rollback-source-file
-{ $values { "file" source-file } }
+{ $values { "source-file" source-file } }
 { $description "Records information to the source file after an incomplete parse which ended with an error." } ;
 
-HELP: file
+HELP: current-source-file
 { $var-description "Stores the " { $link source-file } " being parsed. The " { $snippet "path" } " of this object comes from the input parameter to " { $link with-source-file } "." } ;

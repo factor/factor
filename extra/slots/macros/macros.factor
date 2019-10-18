@@ -1,4 +1,5 @@
-! (c) 2011 Joe Groff bsd license
+! Copyright (C) 2011 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: combinators compiler.units fry generalizations kernel
 locals macros math quotations sequences sequences.generalizations
 slots vectors ;
@@ -36,7 +37,7 @@ MACRO: set-slot ( name -- quot: ( value tuple -- ) )
 : set-slot* ( tuple value name -- tuple )
     swapd '[ _ set-slot ] keep ; inline
 
-: change-slot* ( tuple name quot: ( ..a old -- ..b new ) -- ..b tuple ) 
+: change-slot* ( tuple name quot: ( ..a old -- ..b new ) -- ..b tuple )
     '[ _ _ change-slot ] keep ; inline
 
 ! Multiple-slot accessors
@@ -44,12 +45,12 @@ MACRO: set-slot ( name -- quot: ( value tuple -- ) )
 MACRO: slots ( names -- quot: ( tuple -- values... ) )
     [ '[ _ slot ] ] { } map-as '[ _ cleave ] ;
 
-MACRO: {slots} ( names -- quot: ( tuple -- {values} ) )
+MACRO: slots>array ( names -- quot: ( tuple -- values ) )
     dup length '[ _ slots _ narray ] ;
 
 MACRO: set-slots ( names -- quot: ( values... tuple -- ) )
     [ [ '[ _ set-slot ] ] [ ] map-as ] [ length dup ] bi
     '[ @ _ cleave-curry _ spread* ] ;
 
-MACRO: {set-slots} ( names -- quot: ( {values} tuple -- ) )
+MACRO: array>set-slots ( names -- quot: ( values tuple -- ) )
     [ length ] keep '[ [ _ firstn ] dip _ set-slots ] ;

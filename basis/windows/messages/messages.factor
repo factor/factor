@@ -6,8 +6,8 @@ IN: windows.messages
 
 SYMBOL: windows-messages
 
-"windows.messages" words
-[ name>> "windows-message" head? not ] filter
+"windows.messages" vocab-words
+[ name>> "windows-message" head? ] reject
 [ dup execute swap ] { } map>assoc
 windows-messages set-global
 
@@ -69,6 +69,7 @@ CONSTANT: WM_COMMNOTIFY 0x0044
 CONSTANT: WM_WINDOWPOSCHANGING 0x0046
 CONSTANT: WM_WINDOWPOSCHANGED 0x0047
 CONSTANT: WM_POWER 0x0048
+CONSTANT: WM_COPYGLOBALDATA 0x0049
 CONSTANT: WM_COPYDATA 0x004A
 CONSTANT: WM_CANCELJOURNAL 0x004B
 CONSTANT: WM_NOTIFY 0x004E
@@ -432,7 +433,7 @@ CONSTANT: CCM_FIRST 0x2000 ! Common control shared messages
 : HDM_SETBITMAPMARGIN ( -- n ) HDM_FIRST  20  + ; inline
 : HDM_GETBITMAPMARGIN ( -- n ) HDM_FIRST  21  + ; inline
 CONSTANT: HDM_SETUNICODEFORMAT CCM_SETUNICODEFORMAT
-CONSTANT: HDM_GETUNICODEFORMAT CCM_GETUNICODEFORMAT   
+CONSTANT: HDM_GETUNICODEFORMAT CCM_GETUNICODEFORMAT
 : HDM_SETFILTERCHANGETIMEOUT ( -- n ) HDM_FIRST 22  + ; inline
 : HDM_EDITFILTER ( -- n ) HDM_FIRST 23  + ; inline
 : HDM_CLEARFILTER ( -- n ) HDM_FIRST 24  + ; inline

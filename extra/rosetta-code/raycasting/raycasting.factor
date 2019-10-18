@@ -77,9 +77,9 @@ IN: rosetta-code.raycasting
 ! if Py = Ay or Py = By then
 !   Py ← Py + ε
 ! end if
-! if Py < Ay or Py > By then 
+! if Py < Ay or Py > By then
 !   return false
-! else if Px > max(Ax, Bx) then 
+! else if Px > max(Ax, Bx) then
 !   return false
 ! else
 !   if Px < min(Ax, Bx) then
@@ -111,7 +111,7 @@ IN: rosetta-code.raycasting
 : lincomb ( a b x -- w )
     3dup [ last ] tri@
     [ - ] curry bi@
-    [ drop ] 2dip
+    nipd
     neg 2dup + [ / ] curry bi@
     [ [ v*n ] curry ] bi@ bi*  v+ ;
 

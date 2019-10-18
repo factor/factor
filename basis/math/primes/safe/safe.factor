@@ -16,10 +16,7 @@ IN: math.primes.safe
 PRIVATE>
 
 : safe-prime? ( q -- ? )
-    {
-        [ 1 - 2 / dup integer? [ prime? ] [ drop f ] if ]
-        [ prime? ]
-    } 1&& ;
+    { [ prime? ] [ 1 - 2 / prime? ] } 1&& ;
 
 : next-safe-prime ( n -- q )
     next-safe-prime-candidate

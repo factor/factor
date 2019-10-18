@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays fry kernel math.order sequences sorting ;
+USING: arrays assocs fry kernel math.order sequences sorting ;
 IN: sorting.slots
 
 : execute-comparator ( obj1 obj2 word -- <=>/f )
@@ -10,7 +10,7 @@ IN: sorting.slots
     '[ _ execute( tuple -- value ) ] bi@ ;
 
 : compare-slots ( obj1 obj2 sort-specs -- <=> )
-    #! sort-spec: { accessors comparator }
+    ! sort-spec: { accessors comparator }
     [
         dup array? [
             unclip-last-slice
@@ -23,6 +23,8 @@ IN: sorting.slots
 
 : sort-by ( seq sort-specs -- seq' ) [ ] sort-by-with ;
 
-: sort-keys-by ( seq sort-seq -- seq' ) [ first ] sort-by-with ;
+: sort-keys-by ( alist sort-seq -- seq' )
+    [ >alist ] dip [ first ] sort-by-with ;
 
-: sort-values-by ( seq sort-seq -- seq' ) [ second ] sort-by-with ;
+: sort-values-by ( seq sort-seq -- seq' )
+    [ >alist ] dip [ second ] sort-by-with ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: lists lists.lazy promises kernel sequences strings math
 arrays splitting quotations combinators namespaces locals
-unicode.case unicode.categories sequences.deep accessors ;
+unicode sequences.deep accessors ;
 IN: parser-combinators
 
 ! Parser combinator protocol
@@ -72,9 +72,9 @@ TUPLE: satisfy-parser quot ;
 C: satisfy satisfy-parser
 
 M: satisfy-parser parse ( input parser -- list )
-    #! A parser that succeeds if the predicate,
-    #! when passed the first character in the input, returns
-    #! true.
+    ! A parser that succeeds if the predicate,
+    ! when passed the first character in the input, returns
+    ! true.
     over empty? [
         2drop nil
     ] [
@@ -90,10 +90,10 @@ TUPLE: epsilon-parser ;
 C: epsilon epsilon-parser
 
 M: epsilon-parser parse ( input parser -- list )
-    #! A parser that parses the empty string. It
-    #! does not consume any input and always returns
-    #! an empty list as the parse tree with the
-    #! unmodified input.
+    ! A parser that parses the empty string. It
+    ! does not consume any input and always returns
+    ! an empty list as the parse tree with the
+    ! unmodified input.
     drop "" swap <parse-results> ;
 
 TUPLE: succeed-parser result ;
@@ -101,8 +101,8 @@ TUPLE: succeed-parser result ;
 C: succeed succeed-parser
 
 M: succeed-parser parse ( input parser -- list )
-    #! A parser that always returns 'result' as a
-    #! successful parse with no input consumed.
+    ! A parser that always returns 'result' as a
+    ! successful parse with no input consumed.
     result>> swap <parse-results> ;
 
 TUPLE: fail-parser ;
@@ -110,8 +110,8 @@ TUPLE: fail-parser ;
 C: fail fail-parser
 
 M: fail-parser parse ( input parser -- list )
-    #! A parser that always fails and returns
-    #! an empty list of successes.
+    ! A parser that always fails and returns
+    ! an empty list of successes.
     2drop nil ;
 
 TUPLE: ensure-parser test ;
@@ -151,14 +151,14 @@ TUPLE: and-parser parsers ;
             [ parsed>> ] dip
             [ parsed>> 2array ] keep
             unparsed>> <parse-result>
-        ] with lazy-map
-    ] with lazy-map lconcat ;
+        ] with lmap-lazy
+    ] with lmap-lazy lconcat ;
 
 M: and-parser parse ( input parser -- list )
-    #! Parse 'input' by sequentially combining the
-    #! two parsers. First parser1 is applied to the
-    #! input then parser2 is applied to the rest of
-    #! the input strings from the first parser.
+    ! Parse 'input' by sequentially combining the
+    ! two parsers. First parser1 is applied to the
+    ! input then parser2 is applied to the rest of
+    ! the input strings from the first parser.
     parsers>> unclip swapd parse
     [ [ and-parser-parse ] reduce ] 2curry <promise> ;
 
@@ -171,28 +171,28 @@ TUPLE: or-parser parsers ;
     2array <or-parser> ;
 
 M: or-parser parse ( input parser1 -- list )
-    #! Return the combined list resulting from the parses
-    #! of parser1 and parser2 being applied to the same
-    #! input. This implements the choice parsing operator.
+    ! Return the combined list resulting from the parses
+    ! of parser1 and parser2 being applied to the same
+    ! input. This implements the choice parsing operator.
     parsers>> sequence>list
-    [ parse ] with lazy-map lconcat ;
+    [ parse ] with lmap-lazy lconcat ;
 
 : trim-head-slice ( string -- string )
-    #! Return a new string without any leading whitespace
-    #! from the original string.
+    ! Return a new string without any leading whitespace
+    ! from the original string.
     dup empty? [
         dup first blank? [ rest-slice trim-head-slice ] when
     ] unless ;
 
 TUPLE: sp-parser p1 ;
 
-#! Return a parser that first skips all whitespace before
-#! calling the original parser.
+! Return a parser that first skips all whitespace before
+! calling the original parser.
 C: sp sp-parser
 
 M: sp-parser parse ( input parser -- list )
-    #! Skip all leading whitespace from the input then call
-    #! the parser on the remaining input.
+    ! Skip all leading whitespace from the input then call
+    ! the parser on the remaining input.
     [ trim-head-slice ] dip p1>> parse ;
 
 TUPLE: just-parser p1 ;
@@ -200,10 +200,10 @@ TUPLE: just-parser p1 ;
 C: just just-parser
 
 M: just-parser parse ( input parser -- result )
-    #! Calls the given parser on the input removes
-    #! from the results anything where the remaining
-    #! input to be parsed is not empty. So ensures a
-    #! fully parsed input string.
+    ! Calls the given parser on the input removes
+    ! from the results anything where the remaining
+    ! input to be parsed is not empty. So ensures a
+    ! fully parsed input string.
     p1>> parse [ unparsed>> empty? ] lfilter ;
 
 TUPLE: apply-parser p1 quot ;
@@ -211,59 +211,59 @@ TUPLE: apply-parser p1 quot ;
 C: <@ apply-parser
 
 M: apply-parser parse ( input parser -- result )
-    #! Calls the parser on the input. For each successful
-    #! parse the quot is call with the parse result on the stack.
-    #! The result of that quotation then becomes the new parse result.
-    #! This allows modification of parse tree results (like
-    #! converting strings to integers, etc).
+    ! Calls the parser on the input. For each successful
+    ! parse the quot is call with the parse result on the stack.
+    ! The result of that quotation then becomes the new parse result.
+    ! This allows modification of parse tree results (like
+    ! converting strings to integers, etc).
     [ p1>> ] [ quot>> ] bi
     -rot parse [
         [ parsed>> swap call ] keep
         unparsed>> <parse-result>
-    ] with lazy-map ;
+    ] with lmap-lazy ;
 
 TUPLE: some-parser p1 ;
 
 C: some some-parser
 
 M: some-parser parse ( input parser -- result )
-    #! Calls the parser on the input, guarantees
-    #! the parse is complete (the remaining input is empty),
-    #! picks the first solution and only returns the parse
-    #! tree since the remaining input is empty.
+    ! Calls the parser on the input, guarantees
+    ! the parse is complete (the remaining input is empty),
+    ! picks the first solution and only returns the parse
+    ! tree since the remaining input is empty.
     p1>> just parse-1 ;
 
 : <& ( parser1 parser2 -- parser )
-    #! Same as <&> except discard the results of the second parser.
+    ! Same as <&> except discard the results of the second parser.
     <&> [ first ] <@ ;
 
 : &> ( parser1 parser2 -- parser )
-    #! Same as <&> except discard the results of the first parser.
+    ! Same as <&> except discard the results of the first parser.
     <&> [ second ] <@ ;
 
 : <:&> ( parser1 parser2 -- result )
-    #! Same as <&> except flatten the result.
+    ! Same as <&> except flatten the result.
     <&> [ first2 suffix ] <@ ;
 
 : <&:> ( parser1 parser2 -- result )
-    #! Same as <&> except flatten the result.
+    ! Same as <&> except flatten the result.
     <&> [ first2 swap prefix ] <@ ;
 
 : <:&:> ( parser1 parser2 -- result )
-    #! Same as <&> except flatten the result.
+    ! Same as <&> except flatten the result.
     <&> [ first2 append ] <@ ;
 
 LAZY: <*> ( parser -- parser )
     dup <*> <&:> { } succeed <|> ;
 
 : <+> ( parser -- parser )
-    #! Return a parser that accepts one or more occurences of the original
-    #! parser.
+    ! Return a parser that accepts one or more occurrences of the original
+    ! parser.
     dup <*> <&:> ;
 
 LAZY: <?> ( parser -- parser )
-    #! Return a parser that optionally uses the parser
-    #! if that parser would be successful.
+    ! Return a parser that optionally uses the parser
+    ! if that parser would be successful.
     [ 1array ] <@ f succeed <|> ;
 
 TUPLE: only-first-parser p1 ;
@@ -272,62 +272,62 @@ LAZY: only-first ( parser -- parser )
     only-first-parser boa ;
 
 M: only-first-parser parse ( input parser -- list )
-    #! Transform a parser into a parser that only yields
-    #! the first possibility.
+    ! Transform a parser into a parser that only yields
+    ! the first possibility.
     p1>> parse 1 swap ltake ;
 
 LAZY: <!*> ( parser -- parser )
-    #! Like <*> but only return one possible result
-    #! containing all matching parses. Does not return
-    #! partial matches. Useful for efficiency since that's
-    #! usually the effect you want and cuts down on backtracking
-    #! required.
+    ! Like <*> but only return one possible result
+    ! containing all matching parses. Does not return
+    ! partial matches. Useful for efficiency since that's
+    ! usually the effect you want and cuts down on backtracking
+    ! required.
     <*> only-first ;
 
 LAZY: <!+> ( parser -- parser )
-    #! Like <+> but only return one possible result
-    #! containing all matching parses. Does not return
-    #! partial matches. Useful for efficiency since that's
-    #! usually the effect you want and cuts down on backtracking
-    #! required.
+    ! Like <+> but only return one possible result
+    ! containing all matching parses. Does not return
+    ! partial matches. Useful for efficiency since that's
+    ! usually the effect you want and cuts down on backtracking
+    ! required.
     <+> only-first ;
 
 LAZY: <!?> ( parser -- parser )
-    #! Like <?> but only return one possible result
-    #! containing all matching parses. Does not return
-    #! partial matches. Useful for efficiency since that's
-    #! usually the effect you want and cuts down on backtracking
-    #! required.
+    ! Like <?> but only return one possible result
+    ! containing all matching parses. Does not return
+    ! partial matches. Useful for efficiency since that's
+    ! usually the effect you want and cuts down on backtracking
+    ! required.
     <?> only-first ;
 
 LAZY: <(?)> ( parser -- parser )
-    #! Like <?> but take shortest match first.
+    ! Like <?> but take shortest match first.
     f succeed swap [ 1array ] <@ <|> ;
 
 LAZY: <(*)> ( parser -- parser )
-    #! Like <*> but take shortest match first.
-    #! Implementation by Matthew Willis.
+    ! Like <*> but take shortest match first.
+    ! Implementation by Matthew Willis.
     { } succeed swap dup <(*)> <&:> <|> ;
 
 LAZY: <(+)> ( parser -- parser )
-    #! Like <+> but take shortest match first.
-    #! Implementation by Matthew Willis.
+    ! Like <+> but take shortest match first.
+    ! Implementation by Matthew Willis.
     dup <(*)> <&:> ;
 
 : pack ( close body open -- parser )
-    #! Parse a construct enclosed by two symbols,
-    #! given a parser for the opening symbol, the
-    #! closing symbol, and the body.
+    ! Parse a construct enclosed by two symbols,
+    ! given a parser for the opening symbol, the
+    ! closing symbol, and the body.
     <& &> ;
 
 : nonempty-list-of ( items separator -- parser )
     [ over &> <*> <&:> ] keep <?> [ nip ] 2keep pack ;
 
 : list-of ( items separator -- parser )
-    #! Given a parser for the separator and for the
-    #! items themselves, return a parser that parses
-    #! lists of those items. The parse tree is an
-    #! array of the parsed items.
+    ! Given a parser for the separator and for the
+    ! items themselves, return a parser that parses
+    ! lists of those items. The parse tree is an
+    ! array of the parsed items.
     nonempty-list-of { } succeed <|> ;
 
 LAZY: surrounded-by ( parser start end -- parser' )

@@ -71,7 +71,7 @@ CONSTANT: example-tree
             [ [ data>> ] dip call drop ]
             [ drop left>> [ swap push-back ] [ drop ] if* ]
             [ drop right>> [ swap push-back ] [ drop ] if* ]
-            [ nip (levelorder) ] 
+            [ nip (levelorder) ]
         } 3cleave
     ] if ; inline recursive
 

@@ -83,14 +83,14 @@ FUNCTION: HRESULT
         LPCSTR                    pSrcFile,
         ID3DX10ThreadPump*        pPump,
         D3DX10_IMAGE_INFO*        pSrcInfo,
-        HRESULT*                  pHResult ) ;
+        HRESULT*                  pHResult )
 
 FUNCTION: HRESULT
     D3DX10GetImageInfoFromFileW (
         LPCWSTR                   pSrcFile,
         ID3DX10ThreadPump*        pPump,
         D3DX10_IMAGE_INFO*        pSrcInfo,
-        HRESULT*                  pHResult ) ;
+        HRESULT*                  pHResult )
 
 ALIAS: D3DX10GetImageInfoFromFile D3DX10GetImageInfoFromFileW
 
@@ -100,7 +100,7 @@ FUNCTION: HRESULT
         LPCSTR                    pSrcResource,
         ID3DX10ThreadPump*        pPump,
         D3DX10_IMAGE_INFO*        pSrcInfo,
-        HRESULT*                  pHResult ) ;
+        HRESULT*                  pHResult )
 
 FUNCTION: HRESULT
     D3DX10GetImageInfoFromResourceW (
@@ -108,7 +108,7 @@ FUNCTION: HRESULT
         LPCWSTR                   pSrcResource,
         ID3DX10ThreadPump*        pPump,
         D3DX10_IMAGE_INFO*        pSrcInfo,
-        HRESULT*                  pHResult ) ;
+        HRESULT*                  pHResult )
 
 ALIAS: D3DX10GetImageInfoFromResource D3DX10GetImageInfoFromResourceW
 
@@ -118,7 +118,7 @@ FUNCTION: HRESULT
         SIZE_T                    SrcDataSize,
         ID3DX10ThreadPump*        pPump,
         D3DX10_IMAGE_INFO*        pSrcInfo,
-        HRESULT*                  pHResult ) ;
+        HRESULT*                  pHResult )
 
 FUNCTION: HRESULT
     D3DX10CreateShaderResourceViewFromFileA (
@@ -127,7 +127,7 @@ FUNCTION: HRESULT
         D3DX10_IMAGE_LOAD_INFO*     pLoadInfo,
         ID3DX10ThreadPump*          pPump,
         ID3D10ShaderResourceView**  ppShaderResourceView,
-        HRESULT*                    pHResult ) ;
+        HRESULT*                    pHResult )
 
 FUNCTION: HRESULT
     D3DX10CreateShaderResourceViewFromFileW (
@@ -136,7 +136,7 @@ FUNCTION: HRESULT
         D3DX10_IMAGE_LOAD_INFO*     pLoadInfo,
         ID3DX10ThreadPump*          pPump,
         ID3D10ShaderResourceView**  ppShaderResourceView,
-        HRESULT*                    pHResult ) ;
+        HRESULT*                    pHResult )
 
 ALIAS: D3DX10CreateShaderResourceViewFromFile D3DX10CreateShaderResourceViewFromFileW
 
@@ -147,7 +147,7 @@ FUNCTION: HRESULT
         D3DX10_IMAGE_LOAD_INFO*     pLoadInfo,
         ID3DX10ThreadPump*          pPump,
         ID3D10Resource**            ppTexture,
-        HRESULT*                    pHResult ) ;
+        HRESULT*                    pHResult )
 
 FUNCTION: HRESULT
     D3DX10CreateTextureFromFileW (
@@ -156,7 +156,7 @@ FUNCTION: HRESULT
         D3DX10_IMAGE_LOAD_INFO*     pLoadInfo,
         ID3DX10ThreadPump*          pPump,
         ID3D10Resource**            ppTexture,
-        HRESULT*                    pHResult ) ;
+        HRESULT*                    pHResult )
 
 ALIAS: D3DX10CreateTextureFromFile D3DX10CreateTextureFromFileW
 
@@ -168,7 +168,7 @@ FUNCTION: HRESULT
         D3DX10_IMAGE_LOAD_INFO*    pLoadInfo,
         ID3DX10ThreadPump*         pPump,
         ID3D10ShaderResourceView** ppShaderResourceView,
-        HRESULT*                   pHResult ) ;
+        HRESULT*                   pHResult )
 
 FUNCTION: HRESULT
     D3DX10CreateShaderResourceViewFromResourceW (
@@ -178,7 +178,7 @@ FUNCTION: HRESULT
         D3DX10_IMAGE_LOAD_INFO*    pLoadInfo,
         ID3DX10ThreadPump*         pPump,
         ID3D10ShaderResourceView** ppShaderResourceView,
-        HRESULT*                   pHResult ) ;
+        HRESULT*                   pHResult )
 
 ALIAS: D3DX10CreateShaderResourceViewFromResource D3DX10CreateShaderResourceViewFromResourceW
 
@@ -190,7 +190,7 @@ FUNCTION: HRESULT
         D3DX10_IMAGE_LOAD_INFO*  pLoadInfo,
         ID3DX10ThreadPump*       pPump,
         ID3D10Resource**         ppTexture,
-        HRESULT*                 pHResult ) ;
+        HRESULT*                 pHResult )
 
 FUNCTION: HRESULT
     D3DX10CreateTextureFromResourceW (
@@ -200,7 +200,7 @@ FUNCTION: HRESULT
         D3DX10_IMAGE_LOAD_INFO* pLoadInfo,
         ID3DX10ThreadPump*      pPump,
         ID3D10Resource**        ppTexture,
-        HRESULT*                pHResult ) ;
+        HRESULT*                pHResult )
 
 ALIAS: D3DX10CreateTextureFromResource D3DX10CreateTextureFromResourceW
 
@@ -212,7 +212,7 @@ FUNCTION: HRESULT
         D3DX10_IMAGE_LOAD_INFO*    pLoadInfo,
         ID3DX10ThreadPump*         pPump,
         ID3D10ShaderResourceView** ppShaderResourceView,
-        HRESULT*                   pHResult ) ;
+        HRESULT*                   pHResult )
 
 FUNCTION: HRESULT
     D3DX10CreateTextureFromMemory (
@@ -222,7 +222,7 @@ FUNCTION: HRESULT
         D3DX10_IMAGE_LOAD_INFO*   pLoadInfo,
         ID3DX10ThreadPump*        pPump,
         ID3D10Resource**          ppTexture,
-        HRESULT*                  pHResult ) ;
+        HRESULT*                  pHResult )
 
 STRUCT: D3DX10_TEXTURE_LOAD_INFO
     { pSrcBox                    D3D10_BOX* }
@@ -240,25 +240,25 @@ FUNCTION: HRESULT
     D3DX10LoadTextureFromTexture (
         ID3D10Resource*            pSrcTexture,
         D3DX10_TEXTURE_LOAD_INFO*  pLoadInfo,
-        ID3D10Resource*            pDstTexture ) ;
+        ID3D10Resource*            pDstTexture )
 
 FUNCTION: HRESULT
     D3DX10FilterTexture (
         ID3D10Resource*           pTexture,
         UINT                      SrcLevel,
-        UINT                      MipFilter ) ;
+        UINT                      MipFilter )
 
 FUNCTION: HRESULT
     D3DX10SaveTextureToFileA (
         ID3D10Resource*           pSrcTexture,
         D3DX10_IMAGE_FILE_FORMAT  DestFormat,
-        LPCSTR                    pDestFile ) ;
+        LPCSTR                    pDestFile )
 
 FUNCTION: HRESULT
     D3DX10SaveTextureToFileW (
         ID3D10Resource*           pSrcTexture,
         D3DX10_IMAGE_FILE_FORMAT  DestFormat,
-        LPCWSTR                   pDestFile ) ;
+        LPCWSTR                   pDestFile )
 
 ALIAS: D3DX10SaveTextureToFile D3DX10SaveTextureToFileW
 
@@ -267,7 +267,7 @@ FUNCTION: HRESULT
         ID3D10Resource*            pSrcTexture,
         D3DX10_IMAGE_FILE_FORMAT   DestFormat,
         LPD3D10BLOB*               ppDestBuf,
-        UINT                       Flags ) ;
+        UINT                       Flags )
 
 FUNCTION: HRESULT
     D3DX10ComputeNormalMap (
@@ -275,7 +275,7 @@ FUNCTION: HRESULT
         UINT             Flags,
         UINT             Channel,
         FLOAT            Amplitude,
-        ID3D10Texture2D* pDestTexture ) ;
+        ID3D10Texture2D* pDestTexture )
 
 FUNCTION: HRESULT
     D3DX10SHProjectCubeMap (
@@ -283,4 +283,4 @@ FUNCTION: HRESULT
         ID3D10Texture2D* pCubeMap,
         FLOAT*           pROut,
         FLOAT*           pGOut,
-        FLOAT*           pBOut ) ;
+        FLOAT*           pBOut )

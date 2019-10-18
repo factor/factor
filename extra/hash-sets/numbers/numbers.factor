@@ -6,7 +6,10 @@ math.hashcodes parser sequences vocabs.loader ;
 
 IN: hash-sets.numbers
 
-TUPLE: number-wrapper < wrapped-key ;
+<PRIVATE
+
+TUPLE: number-wrapper
+    { underlying number read-only } ;
 
 C: <number-wrapper> number-wrapper
 
@@ -17,6 +20,8 @@ M: number-wrapper equal?
 
 M: number-wrapper hashcode*
     nip underlying>> number-hashcode ; inline
+
+PRIVATE>
 
 TUPLE: number-hash-set < wrapped-hash-set ;
 

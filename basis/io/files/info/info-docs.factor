@@ -2,36 +2,38 @@ USING: arrays help.markup help.syntax kernel io.files ;
 IN: io.files.info
 
 HELP: file-info
-{ $values { "path" "a pathname string" } { "info" file-info } }
+{ $values { "path" "a pathname string" } { "info" file-info-tuple } }
 { $description "Queries the file system for metadata. If " { $snippet "path" } " refers to a symbolic link, it is followed. See the article " { $link "file-types" } " for a list of metadata symbols." }
 { $errors "Throws an error if the file does not exist." } ;
 
 HELP: link-info
-{ $values { "path" "a pathname string" } { "info" "a file-info tuple" } }
-{ $description "Queries the file system for metadata. If path refers to a symbolic link, information about the symbolic link itself is returned. If the file does not exist, an exception is thrown." } ;
+{ $values { "path" "a pathname string" } { "info" file-info-tuple } }
+{ $description "Queries the file system for metadata. If " { $snippet "path" } " refers to a symbolic link, information about the symbolic link itself is returned. See the article " { $link "file-types" } " for a list of metadata symbols." }
+{ $errors "Throws an error if the file does not exist." } ;
 
-{ file-info link-info } related-words
+{ file-info link-info file-info-tuple } related-words
 
 HELP: directory?
-{ $values { "file-info" file-info } { "?" boolean } }
+{ $values { "file-info" file-info-tuple } { "?" boolean } }
 { $description "Tests if " { $snippet "file-info" } " is a directory." } ;
 
 HELP: regular-file?
-{ $values { "file-info" file-info } { "?" boolean } }
+{ $values { "file-info" file-info-tuple } { "?" boolean } }
 { $description "Tests if " { $snippet "file-info" } " is a normal file." } ;
 
 HELP: symbolic-link?
-{ $values { "file-info" file-info } { "?" boolean } }
+{ $values { "file-info" file-info-tuple } { "?" boolean } }
 { $description "Tests if " { $snippet "file-info" } " is a symbolic link." } ;
 
 HELP: file-systems
 { $values { "array" array } }
-{ $description "Returns an array of " { $link file-system-info } " objects returned by iterating the mount points and calling " { $link file-system-info } " on each." } ;
+{ $description "Returns an array of " { $link file-system-info } " objects returned by iterating the mount points and calling " { $link file-system-info } " on each." }
+{ $notes "File systems that the process doesn't have access to aren't included." } ;
 
 HELP: file-system-info
 { $values
 { "path" "a pathname string" }
-{ "file-system-info" file-system-info } }
+{ "file-system-info" file-system-info-tuple } }
 { $description "Returns a platform-specific object describing the file-system that contains the path. The cross-platform slot is " { $slot "free-space" } "." }
 { $examples
     { $unchecked-example

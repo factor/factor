@@ -1,33 +1,34 @@
-USING: io kernel math math.functions math.parser parser lexer
-namespaces make sequences splitting grouping combinators
-continuations ;
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
+USING: grouping io kernel lexer math math.functions math.parser
+namespaces sequences splitting ;
 IN: money
 
 SYMBOL: currency-token
-CHAR: $ \ currency-token set-global
+CHAR: $ currency-token set-global
 
 : dollars/cents ( dollars -- dollars cents )
-    100 * 100 /mod round ;
+    100 * 100 /mod round >integer ;
 
-: (money>string) ( dollars cents -- string )
+: format-money ( dollars cents -- string )
     [ number>string ] bi@
     [ <reversed> 3 group "," join <reversed> ]
     [ 2 CHAR: 0 pad-head ] bi* "." glue ;
 
-: money>string ( object -- string )
-    dollars/cents (money>string) currency-token get prefix ;
+: money>string ( number -- string )
+    dollars/cents format-money currency-token get prefix ;
 
-: money. ( object -- ) money>string print ;
+: money. ( number -- ) money>string print ;
 
 ERROR: not-an-integer x ;
 
+: split-decimal ( str -- neg? dollars cents )
+    "." split1 [ "-" ?head swap ] dip ;
+
 : parse-decimal ( str -- ratio )
-    "." split1
-    [ "-" ?head swap ] dip
-    [ [ "0" ] when-empty ] bi@
+    split-decimal [ [ "0" ] when-empty ] bi@
     [
-        [ dup string>number [ nip ] [ not-an-integer ] if* ] bi@
-    ] keep length
-    10^ / + swap [ neg ] when ;
+        [ dup string>number [ ] [ not-an-integer ] ?if ] bi@
+    ] keep length 10^ / + swap [ neg ] when ;
 
 SYNTAX: DECIMAL: scan-token parse-decimal suffix! ;

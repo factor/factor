@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables kernel math namespaces sequences strings
 assocs combinators io io.streams.string accessors
-xml.data wrap.strings xml.entities unicode.categories fry ;
+xml.data wrap.strings xml.entities unicode fry ;
 IN: xml.writer
 
 SYMBOL: sensitive-tags
@@ -34,7 +34,7 @@ SYMBOL: indentation
 : ?filter-children ( children -- no-whitespace )
     xml-pprint? get [
         [ dup string? [ [ blank? ] trim ] when ] map
-        [ "" = not ] filter
+        [ "" = ] reject
     ] when ;
 
 PRIVATE>
@@ -48,7 +48,7 @@ PRIVATE>
 <PRIVATE
 
 : write-quoted ( string -- )
-    CHAR: " write1 write CHAR: " write1 ;
+    CHAR: \" write1 write CHAR: \" write1 ;
 
 : print-attrs ( assoc -- )
     [
@@ -142,9 +142,10 @@ M: public-id write-xml
 
 M: doctype-decl write-xml
     ?indent "<!DOCTYPE " write
-    [ name>> write bl ]
-    [ external-id>> [ write-xml bl ] when* ]
-    [ internal-subset>> write-internal-subset ">" write ] tri ;
+    [ name>> write ]
+    [ external-id>> [ bl write-xml ] when* ]
+    [ internal-subset>> [ bl write-internal-subset ] when* ] tri
+    ">" write ;
 
 M: directive write-xml
     "<!" write text>> write CHAR: > write1 nl ;

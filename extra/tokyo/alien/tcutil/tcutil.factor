@@ -22,15 +22,15 @@ TYPEDEF: long tokyo_time_t
 
 C-TYPE: TCLIST
 
-FUNCTION: TCLIST* tclistnew ( ) ;
-FUNCTION: TCLIST* tclistnew2 ( int anum ) ;
-FUNCTION: void tclistdel ( TCLIST* list ) ;
-FUNCTION: int tclistnum ( TCLIST* list ) ;
-FUNCTION: void* tclistval ( TCLIST* list, int index, int* sp ) ;
-FUNCTION: c-string tclistval2 ( TCLIST* list, int index ) ;
-FUNCTION: void tclistpush ( TCLIST* list, void* ptr, int size ) ;
-FUNCTION: void tclistpush2 ( TCLIST* list, c-string str ) ;
-FUNCTION: void tcfree ( void* ptr ) ;
+FUNCTION: TCLIST* tclistnew ( )
+FUNCTION: TCLIST* tclistnew2 ( int anum )
+FUNCTION: void tclistdel ( TCLIST* list )
+FUNCTION: int tclistnum ( TCLIST* list )
+FUNCTION: void* tclistval ( TCLIST* list, int index, int* sp )
+FUNCTION: c-string tclistval2 ( TCLIST* list, int index )
+FUNCTION: void tclistpush ( TCLIST* list, void* ptr, int size )
+FUNCTION: void tclistpush2 ( TCLIST* list, c-string str )
+FUNCTION: void tcfree ( void* ptr )
 
 TYPEDEF: void* TCCMP
 TYPEDEF: void* TCCODEC

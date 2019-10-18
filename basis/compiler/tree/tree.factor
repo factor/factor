@@ -1,12 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry arrays generic assocs kernel math namespaces parser
-sequences words vectors math.intervals classes
-accessors combinators stack-checker.state stack-checker.visitor
-stack-checker.inlining ;
+USING: accessors arrays assocs kernel namespaces sequences
+stack-checker.visitor vectors ;
 IN: compiler.tree
-
-! High-level tree SSA form.
 
 TUPLE: node < identity-tuple ;
 
@@ -57,11 +53,6 @@ TUPLE: #shuffle < #renaming mapping in-d out-d in-r out-r ;
     { } { } <#data-shuffle> ;
 
 TUPLE: #terminate < node in-d in-r ;
-
-: <#terminate> ( in-d in-r -- node )
-    #terminate new
-        swap >>in-r
-        swap >>in-d ;
 
 TUPLE: #branch < node in-d children live-branches ;
 
@@ -131,35 +122,15 @@ TUPLE: #copy < #renaming in-d out-d ;
         swap >>out-d
         swap >>in-d ;
 
-TUPLE: #alien-node < node params ;
+TUPLE: #alien-node < node params in-d out-d ;
 
-: new-alien-node ( params class -- node )
-    new
-        over in-d>> >>in-d
-        over out-d>> >>out-d
-        swap >>params ; inline
+TUPLE: #alien-invoke < #alien-node ;
 
-TUPLE: #alien-invoke < #alien-node in-d out-d ;
+TUPLE: #alien-indirect < #alien-node ;
 
-: <#alien-invoke> ( params -- node )
-    #alien-invoke new-alien-node ;
-
-TUPLE: #alien-indirect < #alien-node in-d out-d ;
-
-: <#alien-indirect> ( params -- node )
-    #alien-indirect new-alien-node ;
-
-TUPLE: #alien-assembly < #alien-node in-d out-d ;
-
-: <#alien-assembly> ( params -- node )
-    #alien-assembly new-alien-node ;
+TUPLE: #alien-assembly < #alien-node ;
 
 TUPLE: #alien-callback < node params child ;
-
-: <#alien-callback> ( params child -- node )
-    #alien-callback new
-        swap >>child
-        swap >>params ;
 
 : node, ( node -- ) stack-visitor get push ;
 
@@ -184,14 +155,14 @@ M: vector #return, <#return> node, ;
 M: vector #enter-recursive, <#enter-recursive> node, ;
 M: vector #return-recursive, <#return-recursive> node, ;
 M: vector #call-recursive, <#call-recursive> node, ;
-M: vector #terminate, <#terminate> node, ;
+M: vector #terminate, #terminate boa node, ;
 M: vector #if, <#if> node, ;
 M: vector #dispatch, <#dispatch> node, ;
 M: vector #phi, <#phi> node, ;
 M: vector #declare, <#declare> node, ;
 M: vector #recursive, <#recursive> node, ;
 M: vector #copy, <#copy> node, ;
-M: vector #alien-invoke, <#alien-invoke> node, ;
-M: vector #alien-indirect, <#alien-indirect> node, ;
-M: vector #alien-assembly, <#alien-assembly> node, ;
-M: vector #alien-callback, <#alien-callback> node, ;
+M: vector #alien-invoke, #alien-invoke boa node, ;
+M: vector #alien-indirect, #alien-indirect boa node, ;
+M: vector #alien-assembly, #alien-assembly boa node, ;
+M: vector #alien-callback, #alien-callback boa node, ;

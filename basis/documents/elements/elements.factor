@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators documents fry kernel math sequences
-accessors unicode.categories unicode.breaks combinators.short-circuit ;
+accessors unicode combinators.short-circuit ;
 IN: documents.elements
 
 GENERIC: prev-elt ( loc document elt -- newloc )

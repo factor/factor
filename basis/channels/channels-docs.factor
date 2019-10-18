@@ -26,11 +26,11 @@ HELP: to
 { $see-also <channel> from } ;
 
 HELP: from
-{ $values  { "channel" channel }
-           { "value" object }
+{ $values { "channel" channel }
+          { "value" object }
 }
 { $description "Receives an object from a channel. The operation is synchronous."
-" It will block the calling thread until there is data in the channel." 
+" It will block the calling thread until there is data in the channel."
 }
 { $see-also <channel> to } ;
 

@@ -1,21 +1,17 @@
 ! Copyright (C) 2010 Sascha Matzke.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs bson.constants byte-arrays
-calendar combinators.short-circuit fry hashtables io io.binary
-io.encodings.utf8 io.encodings io.streams.byte-array
-kernel linked-assocs literals math math.parser namespaces byte-vectors
-quotations sequences serialize strings vectors dlists alien.accessors ;
-FROM: words => word? word ;
-FROM: typed => TYPED: ;
-FROM: combinators => cond ;
+USING: accessors alien.accessors arrays assocs bson.constants
+byte-arrays byte-vectors calendar combinators
+combinators.short-circuit dlists fry hashtables io io.binary
+io.encodings io.encodings.utf8 io.streams.byte-array kernel
+linked-assocs literals math math.parser namespaces quotations
+sequences serialize strings typed vectors words ;
 IN: bson.writer
 
 <PRIVATE
 
 CONSTANT: INT32-SIZE 4
 CONSTANT: INT64-SIZE 8
-
-PRIVATE>
 
 TYPED: get-output ( -- stream: byte-vector )
     output-stream get ; inline
@@ -34,10 +30,8 @@ TYPED: with-length ( quot -- bytes-written: integer start-index: integer )
 : with-length-prefix-excl ( quot: ( .. -- .. ) -- )
     [ 4 - ] (with-length-prefix) ; inline
 
-<PRIVATE
-
 : write-le ( x n -- )
-    iota [ nth-byte write1 ] with each ; inline
+    <iota> [ nth-byte write1 ] with each ; inline
 
 TYPED: write-int32 ( int: integer -- )
     INT32-SIZE write-le ; inline
@@ -80,7 +74,7 @@ TYPED: write-oid ( oid: oid -- )
 
 : write-oid-field ( assoc -- )
     [ MDB_OID_FIELD dup ] dip at
-    [ dup oid? [ T_OID write-header write-oid ] [ write-pair ] if ] 
+    [ dup oid? [ T_OID write-header write-oid ] [ write-pair ] if ]
     [ drop ] if* ; inline
 
 : skip-field? ( name value -- name value boolean )
@@ -90,7 +84,7 @@ UNION: hashtables hashtable linked-assoc ;
 
 TYPED: write-assoc ( assoc: hashtables -- )
     '[ _ [ write-oid-field ] [
-            [ skip-field? [ 2drop ] [ write-pair ] if ] assoc-each 
+            [ skip-field? [ 2drop ] [ write-pair ] if ] assoc-each
          ] bi write-eoo
     ] with-length-prefix ; inline recursive
 
@@ -102,7 +96,7 @@ TYPED: (serialize-code) ( code: code -- )
   [ T_Binary_Custom write1 write ] bi ; inline
 
 : write-string-length ( string -- )
-    [ length>> 1 + ] 
+    [ length>> 1 + ]
     [ aux>> [ length ] [ 0 ] if* ] bi + write-int32 ; inline
 
 TYPED: write-string ( string: string -- )
@@ -132,7 +126,7 @@ TYPED: write-pair ( name: string obj -- )
             [ dup integer? ]
             [ T_Integer write-header write-int32 ]
         } {
-            [ dup boolean? ] 
+            [ dup boolean? ]
             [ T_Boolean write-header write-boolean ]
         } {
             [ dup real? ]

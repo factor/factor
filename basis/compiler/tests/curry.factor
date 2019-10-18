@@ -47,7 +47,7 @@ IN: compiler.tests.curry
     ] { } make ; inline
 
 [ t ] [| |
-    1000 iota [ drop 1,000,000 random 1,000,000 random ] H{ } map>assoc :> a-hashtable
+    1000 <iota> [ drop 1,000,000 random 1,000,000 random ] H{ } map>assoc :> a-hashtable
     a-hashtable [ [ drop , ] funky-assoc>map ] compile-call
     a-hashtable keys =
 ] unit-test

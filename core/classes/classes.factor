@@ -1,9 +1,7 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators definitions kernel
+USING: accessors assocs combinators definitions graphs kernel
 make namespaces quotations sequences sets words words.symbol ;
-FROM: namespaces => set ;
-QUALIFIED: sets
 IN: classes
 
 ERROR: bad-inheritance class superclass ;
@@ -26,12 +24,12 @@ SYMBOL: class-or-cache
 SYMBOL: next-method-quot-cache
 
 : init-caches ( -- )
-    H{ } clone class<=-cache set
-    H{ } clone class-not-cache set
-    H{ } clone classes-intersect-cache set
-    H{ } clone class-and-cache set
-    H{ } clone class-or-cache set
-    H{ } clone next-method-quot-cache set ;
+    H{ } clone class<=-cache namespaces:set
+    H{ } clone class-not-cache namespaces:set
+    H{ } clone classes-intersect-cache namespaces:set
+    H{ } clone class-and-cache namespaces:set
+    H{ } clone class-or-cache namespaces:set
+    H{ } clone next-method-quot-cache namespaces:set ;
 
 : reset-caches ( -- )
     class<=-cache get clear-assoc
@@ -62,7 +60,7 @@ M: class reset-class
         "members"
         "participants"
         "predicate"
-    } reset-props ;
+    } remove-word-props ;
 
 M: word reset-class drop ;
 
@@ -73,7 +71,7 @@ PRIVATE>
 PREDICATE: predicate < word "predicating" word-prop >boolean ;
 
 : create-predicate-word ( word -- predicate )
-    [ name>> "?" append ] [ vocabulary>> ] bi create
+    [ name>> "?" append ] [ vocabulary>> ] bi create-word
     dup predicate? [ dup reset-generic ] unless ;
 
 GENERIC: class-of ( object -- class )
@@ -102,69 +100,64 @@ M: predicate reset-word
 : define-predicate ( class quot -- )
     [ predicate-word ] dip ( object -- ? ) define-declared ;
 
-: superclass ( class -- super )
-    #! Output f for non-classes to work with algebra code
+: superclass-of ( class -- super )
+    ! Output f for non-classes to work with algebra code
     dup class? [ "superclass" word-prop ] [ drop f ] if ;
 
-: superclasses ( class -- supers )
-    [ superclass ] follow reverse! ;
+: superclasses-of ( class -- supers )
+    [ superclass-of ] follow reverse! ;
 
 : superclass-of? ( class superclass -- ? )
-    superclasses member-eq? ;
+    superclasses-of member-eq? ;
 
 : subclass-of? ( class superclass -- ? )
     swap superclass-of? ;
 
-: members ( class -- seq )
-    #! Output f for non-classes to work with algebra code
+: class-members ( class -- seq )
+    ! Output f for non-classes to work with algebra code
     dup class? [ "members" word-prop ] [ drop f ] if ;
 
-: participants ( class -- seq )
-    #! Output f for non-classes to work with algebra code
+: class-participants ( class -- seq )
+    ! Output f for non-classes to work with algebra code
     dup class? [ "participants" word-prop ] [ drop f ] if ;
+
+GENERIC: contained-classes ( obj -- members )
+
+M: object contained-classes
+    "members" word-prop ;
+
+: all-contained-classes ( members -- members' )
+    dup dup [ contained-classes ] map concat sift append
+    2dup set= [ drop members ] [ nip all-contained-classes ] if ;
 
 GENERIC: implementors ( class/classes -- seq )
 
 ! update-map
 : class-uses ( class -- seq )
     [
-        [ members % ]
-        [ participants % ]
-        [ superclass [ , ] when* ]
+        [ class-members % ]
+        [ class-participants % ]
+        [ superclass-of [ , ] when* ]
         tri
     ] { } make ;
 
 : class-usage ( class -- seq )
-    update-map get at sets:members ;
-
-<PRIVATE
-
-: (closure) ( obj set quot: ( elt -- seq ) -- )
-    2over ?adjoin [
-        [ dip ] keep [ (closure) ] 2curry each
-    ] [ 3drop ] if ; inline recursive
-
-: closure ( obj quot -- set )
-    HS{ } clone [ swap (closure) ] keep ; inline
-
-PRIVATE>
+    update-map get at members ;
 
 : class-usages ( class -- seq )
-    [ class-usage ] closure sets:members ;
+    [ class-usage ] closure members ;
 
-M: class implementors implementors-map get at sets:members ;
+M: class implementors implementors-map get at members ;
 
 M: sequence implementors [ implementors ] gather ;
 
 <PRIVATE
 
 : update-map+ ( class -- )
-    dup class-uses update-map get
-    [ adjoin-at ] curry with each ;
+    dup class-uses update-map get add-vertex ;
 
 : update-map- ( class -- )
-    dup class-uses update-map get
-    [ at delete ] curry with each ;
+    dup class-uses update-map get remove-vertex ;
 
 : implementors-map+ ( class -- )
     [ HS{ } clone ] dip implementors-map get set-at ;
@@ -185,7 +178,7 @@ M: sequence implementors [ implementors ] gather ;
 GENERIC: metaclass-changed ( use class -- )
 
 : ?metaclass-changed ( class usages/f -- )
-    dup [ [ metaclass-changed ] with each ] [ 2drop ] if ;
+    [ [ metaclass-changed ] with each ] [ drop ] if* ;
 
 : check-metaclass ( class metaclass -- usages/f )
     over class? [
@@ -212,6 +205,7 @@ GENERIC: metaclass-changed ( use class -- )
             2bi
         ]
         [ 2drop t "class" set-word-prop ]
+        [ 2drop f "defining-class" set-word-prop ]
         [ 2drop update-map+ ]
         [ nip ?metaclass-changed ]
     } 3cleave ;

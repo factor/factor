@@ -16,7 +16,7 @@ HELP: random-32*
 
 HELP: random-bytes*
 { $values { "n" integer } { "obj" "a random number generator" } { "byte-array" "a sequence of random bytes" } }
-{ $description "Generates a byte-array of random bytes." } ;
+{ $description "Generates a byte-array of " { $snippet "n" } " random bytes." } ;
 
 HELP: random
 { $values { "obj" object } { "elt" "a random element" } }
@@ -37,9 +37,9 @@ HELP: random-32
 { $description "Outputs 32 random bits. This word is more efficient than calling " { $link random } " because no scaling is done on the output." } ;
 
 HELP: random-bytes
-{ $values { "n" integer } { "byte-array" "a random integer" } }
-{ $description "Outputs an integer with n bytes worth of bits." }
-{ $examples 
+{ $values { "n" integer } { "byte-array" "a sequence of random bytes" } }
+{ $description "Generates a byte-array of " { $snippet "n" } " random bytes." }
+{ $examples
     { $unchecked-example "USING: prettyprint random ;"
                "5 random-bytes ."
                "B{ 135 50 185 119 240 }"
@@ -49,7 +49,7 @@ HELP: random-bytes
 HELP: random-integers
 { $values { "length" integer } { "n" integer } { "sequence" array } }
 { $description "Outputs an array with " { $snippet "length" } " random integers from [0,n)." }
-{ $examples 
+{ $examples
     { $unchecked-example "USING: prettyprint random ;"
                "10 100 random-integers ."
                "{ 32 62 71 89 54 12 57 57 10 19 }"
@@ -63,7 +63,7 @@ HELP: random-unit
 HELP: random-units
 { $values { "length" integer } { "sequence" array } }
 { $description "Outputs an array with " { $snippet "length" } " random uniform floats from [0,1]." }
-{ $examples 
+{ $examples
     { $unchecked-example "USING: prettyprint random ;"
                "7 random-units ."
                "{
@@ -80,23 +80,23 @@ HELP: random-units
 
 HELP: random-bits
 { $values { "numbits" integer } { "n" "a random integer" } }
-{ $description "Outputs an random integer n bits in length." } ;
+{ $description "Outputs a random integer " { $snippet "numbits" } " bits in length." } ;
 
 HELP: random-bits*
 { $values { "numbits" integer } { "n" "a random integer" } }
-{ $description "Returns an integer exactly " { $snippet "numbits" } " in length, with the topmost bit set to one." } ;
+{ $description "Returns an integer exactly " { $snippet "numbits" } " bits in length, with the topmost bit set to one." } ;
 
 HELP: with-random
 { $values { "obj" "a random number generator" } { "quot" quotation } }
-{ $description "Calls the quotation with the random number generator in a dynamic variable.  All random numbers will be generated using this random number generator." } ;
+{ $description "Calls the quotation with the random number generator in a dynamic variable. All random numbers will be generated using this random number generator." } ;
 
 HELP: with-secure-random
 { $values { "quot" quotation } }
-{ $description "Calls the quotation with the secure random number generator in a dynamic variable.  All random numbers will be generated using this random number generator." } ;
+{ $description "Calls the quotation with the secure random number generator in a dynamic variable. All random numbers will be generated using this random number generator." } ;
 
 HELP: with-system-random
 { $values { "quot" quotation } }
-{ $description "Calls the quotation with the system's random number generator in a dynamic variable.  All random numbers will be generated using this random number generator." } ;
+{ $description "Calls the quotation with the system's random number generator in a dynamic variable. All random numbers will be generated using this random number generator." } ;
 
 { with-random with-secure-random with-system-random } related-words
 

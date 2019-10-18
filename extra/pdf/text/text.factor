@@ -78,7 +78,3 @@ IN: pdf.text
 : b ( -- ) "b" print ;
 
 : c ( -- ) "300 400 400 400 400 300 c" print ; ! FIXME:
-
-
-
-

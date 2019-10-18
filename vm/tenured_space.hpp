@@ -11,25 +11,26 @@ struct tenured_space : free_list_allocator<object> {
     if (obj) {
       starts.record_object_start_offset(obj);
       return obj;
-    } else
-      return NULL;
+    }
+    return NULL;
+  }
+
+  cell next_allocated_object_after(cell scan) {
+    while (scan != this->end && ((object*)scan)->free_p()) {
+      free_heap_block* free_block = (free_heap_block*)scan;
+      scan = (cell)free_block + free_block->size();
+    }
+    return scan == this->end ? 0 : scan;
   }
 
   cell first_object() {
-    return (cell)next_allocated_block_after(this->first_block());
+    return next_allocated_object_after(this->start);
   }
 
   cell next_object_after(cell scan) {
     cell size = ((object*)scan)->size();
-    object* next = (object*)(scan + size);
-    return (cell)next_allocated_block_after(next);
+    return next_allocated_object_after(scan + size);
   }
-
-  void clear_mark_bits() { state.clear_mark_bits(); }
-
-  bool marked_p(object* obj) { return this->state.marked_p(obj); }
-
-  void set_marked_p(object* obj) { this->state.set_marked_p(obj); }
 
   void sweep() {
     free_list_allocator<object>::sweep();

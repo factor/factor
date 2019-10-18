@@ -5,28 +5,28 @@ IN: progress-bars.models
 
 HELP: set-progress-bar
 { $values
-    { "ratio/float" "a real number between 0 and 1" }    
+    { "ratio/float" "a real number between 0 and 1" }
 }
 { $description "Sets the progress-bar model in the current scope to the percent that the task has been completed." } ;
 
 HELP: with-file-reader-progress
 { $values
-    { "path" "a pathname string" } { "encoding" "an encoding" } { "quot" quotation }    
+    { "path" "a pathname string" } { "encoding" "an encoding" } { "quot" quotation }
 }
-{ $description "Opens a file for reading, displays a progress bar, and calls the quotation for processing the file. The progress bar will automtically update every 100 milliseconds, but only if the quotation yields (by calling " { $link yield } ") so that the UI has a chance to redraw." }
+{ $description "Opens a file for reading, displays a progress bar, and calls the quotation for processing the file. The progress bar will automatically update every 100 milliseconds, but only if the quotation yields (by calling " { $link yield } ") so that the UI has a chance to redraw." }
 { $examples
     "Loop through the Factor image file, discarding each character as it's read and updating a progress bar:"
-    { $unchecked-example """USING: system progress-bars.models prettyprint io.encodings.binary threads ;
-image binary [
+    { $unchecked-example "USING: system progress-bars.models prettyprint io.encodings.binary threads ;
+image-path binary [
     [ 4096 read yield ] loop
-] with-file-reader-progress"""
+] with-file-reader-progress"
 ""
     }
 } ;
 
 HELP: with-progress-bar
 { $values
-    { "quot" quotation }    
+    { "quot" quotation }
 }
 { $description "Makes a new model for a progress bar for a task that is 0% complete, sets this model in a dynamic variable in a new scope, and calls a quotation that has access to this model. Progress can be updated with " { $link set-progress-bar } "." } ;
 

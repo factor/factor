@@ -44,7 +44,7 @@ CONSTANT: replacement-char 0xfffd
     { string } declare ! aux>> must be f
     [ length ] keep over (byte-array) [
         [
-            [ [ string-nth-fast ] 2keep drop ]
+            [ [ string-nth-fast ] keepd ]
             [ set-nth-unsafe ] bi*
         ] 2curry each-integer
     ] keep ; inline
@@ -53,7 +53,7 @@ CONSTANT: replacement-char 0xfffd
     { byte-array } declare
     [ length ] keep over 0 <string> [
         [
-            [ [ nth-unsafe ] 2keep drop ]
+            [ [ nth-unsafe ] keepd ]
             [
                 pick 127 <=
                 [ set-string-nth-fast ]
@@ -112,8 +112,6 @@ M: decoder stream-element-type
 M: decoder stream-read1 ( decoder -- ch )
     dup (read1) fix-cr ; inline
 
-M: decoder stream-tell stream>> stream-tell ;
-
 : (read-first) ( n buf decoder -- buf stream encoding n c )
     [ rot [ >decoder< ] dip 2over decode-char ]
     [ swap fix-cr ] bi ; inline
@@ -121,17 +119,14 @@ M: decoder stream-tell stream>> stream-tell ;
 : (store-read) ( buf stream encoding n c i -- buf stream encoding n )
     [ rot [ set-nth-unsafe ] keep ] 2curry 3dip ; inline
 
-: (finish-read) ( buf stream encoding n i -- i )
-    2nip 2nip ; inline
-
 : (read-next) ( stream encoding n i -- stream encoding n i c )
     [ 2dup decode-char ] 2dip rot ; inline
 
 : (read-rest) ( buf stream encoding n i -- count )
-    2dup = [ (finish-read) ] [
+    2dup = [ 4nip ] [
         (read-next) [
             swap [ (store-read) ] [ 1 + ] bi (read-rest)
-        ] [ (finish-read) ] if*
+        ] [ 4nip ] if*
     ] if ; inline recursive
 
 M: decoder stream-read-unsafe
@@ -169,11 +164,11 @@ M: decoder stream-read-until
             dup CHAR: \n = [
                 2drop stream-read-until
             ] [
-                [ 2drop ] 2dip
+                2nipd
             ] if
         ] [
             first-unsafe CHAR: \n = [ [ rest ] dip ] when
-            [ 2drop ] 2dip
+            2nipd
         ] if-empty
     ] [
         >decoder< decode-until
@@ -207,7 +202,7 @@ INSTANCE: encoder plain-writer
 
 PRIVATE>
 
-GENERIC# re-encode 1 ( stream encoding -- newstream )
+GENERIC#: re-encode 1 ( stream encoding -- newstream )
 
 M: object re-encode <encoder> ;
 
@@ -220,7 +215,7 @@ M: encoder re-encode [ stream>> ] dip re-encode ;
     [ [ output-stream get ] dip re-encode ] dip
     with-output-stream* ; inline
 
-GENERIC# re-decode 1 ( stream encoding -- newstream )
+GENERIC#: re-decode 1 ( stream encoding -- newstream )
 
 M: object re-decode <decoder> ;
 

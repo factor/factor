@@ -1,5 +1,5 @@
-USING: compiler.units definitions help.markup help.syntax kernel
-lexer math namespaces quotations sequences source-files strings
+USING: arrays compiler.units definitions help.markup help.syntax
+kernel lexer math namespaces quotations sequences source-files strings
 vectors vocabs vocabs.parser words words.symbol ;
 IN: parser
 
@@ -49,7 +49,7 @@ ARTICLE: "defining-words" "Defining words"
 { $subsections parse-definition }
 "The " { $link POSTPONE: ; } " word is just a delimiter; an unpaired occurrence throws a parse error:"
 { $see POSTPONE: ; }
-"There are additional parsing words whose syntax is delimited by " { $link POSTPONE: ; } ", and they are all implemented by calling " { $link parse-definition } "." ;
+"There are additional parsing words whose syntax is delimited by " { $link POSTPONE: ; } ", and they are all implemented by calling " { $link parse-definition } " or " { $link parse-array-def } "." ;
 
 ARTICLE: "parsing-tokens" "Parsing raw tokens"
 "So far we have seen how to read individual tokens, or read a sequence of parsed objects until a delimiter. It is also possible to read raw tokens from the input and perform custom processing."
@@ -123,7 +123,7 @@ HELP: save-location
 HELP: bad-number
 { $error-description "Indicates the parser encountered an invalid numeric literal." } ;
 
-HELP: create-in
+HELP: create-word-in
 { $values { "str" "a word name" } { "word" "a new word" } }
 { $description "Creates a word in the current vocabulary. Until re-defined, the word throws an error when invoked." }
 $parsing-note ;
@@ -150,8 +150,8 @@ HELP: no-word
 
 HELP: parse-word
 { $values { "string" string } { "word" word } }
-{ $description "If " { $snippet "string" } " is a valid number literal, it is converted to a number, otherwise the current vocabulary search path is searched for a word named by the string." }
-{ $errors "Throws an error if the token does not name a word, and does not parse as a number." }
+{ $description "The current vocabulary search path is searched for all words named by the " { $snippet "string" } ". If no words matches, an error is thrown, if one word matches, and it is already loaded, that word is returned. Otherwise throws a restartable error to let the user choose which word to use." }
+{ $errors "Throws a " { $link no-word-error } " if the string doesn't name a word." }
 { $notes "This word is used to implement " { $link scan-word } "." } ;
 
 HELP: parse-datum
@@ -215,7 +215,7 @@ HELP: (parse-lines)
 { $errors "Throws a " { $link lexer-error } " if the input is malformed." } ;
 
 HELP: parse-lines
-{ $values { "lines" "a sequence of strings" } { "quot" "a new " { $link quotation } } }
+{ $values { "lines" { $sequence string } } { "quot" "a new " { $link quotation } } }
 { $description "Parses Factor source code which has been tokenized into lines. The vocabulary search path is taken from the current scope." }
 { $errors "Throws a " { $link lexer-error } " if the input is malformed." } ;
 
@@ -231,28 +231,33 @@ HELP: parse-definition
 { $examples "This word is used to implement " { $link POSTPONE: : } "." }
 $parsing-note ;
 
+HELP: parse-array-def
+{ $values { "array" "a new " { $link array } } }
+{ $description "Like " { $link parse-definition } ", except the parsed sequence it outputted as an array." }
+$parsing-note ;
+
 HELP: bootstrap-syntax
-{ $var-description "Only set during bootstrap. Stores a copy of the " { $link vocab-words } " of the host's syntax vocabulary; this allows the host's parsing words to be used during bootstrap source parsing, not the target's." } ;
+{ $var-description "Only set during bootstrap. Stores a copy of the " { $link vocab-words-assoc } " of the host's syntax vocabulary; this allows the host's parsing words to be used during bootstrap source parsing, not the target's." } ;
 
 HELP: with-file-vocabs
 { $values { "quot" quotation } }
 { $description "Calls the quotation in a scope with an initial vocabulary search path consisting of just the " { $snippet "syntax" } " vocabulary." } ;
 
 HELP: parse-fresh
-{ $values { "lines" "a sequence of strings" } { "quot" quotation } }
+{ $values { "lines" { $sequence string } } { "quot" quotation } }
 { $description "Parses Factor source code in a sequence of lines. The initial vocabulary search path is used (see " { $link with-file-vocabs } ")." }
 { $errors "Throws a parse error if the input is malformed." } ;
 
 HELP: filter-moved
-{ $values { "set1" set } { "set2" set } { "seq" "an sequence of definitions" } }
-{ $description "Removes all definitions from " { $snippet "set2" } " which are in " { $snippet "set1" } " or are no longer present in the current " { $link file } "." } ;
+{ $values { "set1" set } { "set2" set } { "seq" { $sequence "definitions" } } }
+{ $description "Removes all definitions from " { $snippet "set2" } " which are in " { $snippet "set1" } " or are no longer present in the " { $link current-source-file } "." } ;
 
 HELP: forget-smudged
 { $description "Forgets removed definitions." } ;
 
 HELP: finish-parsing
 { $values { "lines" "the lines of text just parsed" } { "quot" "the quotation just parsed" } }
-{ $description "Records information to the current " { $link file } "." }
+{ $description "Records information to the " { $link current-source-file } "." }
 { $notes "This is one of the factors of " { $link parse-stream } "." } ;
 
 HELP: parse-stream
@@ -261,14 +266,14 @@ HELP: parse-stream
 { $errors "Throws an I/O error if there was an error reading from the stream. Throws a parse error if the input is malformed." } ;
 
 HELP: parse-file
-{ $values { "file" "a pathname string" } { "quot" quotation } }
+{ $values { "path" "a pathname string" } { "quot" quotation } }
 { $description "Parses the Factor source code stored in a file. The initial vocabulary search path is used." }
 { $errors "Throws an I/O error if there was an error reading from the file. Throws a parse error if the input is malformed." } ;
 
 HELP: run-file
-{ $values { "file" "a pathname string" } }
+{ $values { "path" "a pathname string" } }
 { $description "Parses the Factor source code stored in a file and runs it. The initial vocabulary search path is used." }
-{ $errors "Throws an error if loading the file fails, there input is malformed, or if a runtime error occurs while calling the parsed quotation." }  ;
+{ $errors "Throws an error if loading the file fails, there input is malformed, or if a runtime error occurs while calling the parsed quotation." } ;
 
 HELP: ?run-file
 { $values { "path" "a pathname string" } }
@@ -283,6 +288,10 @@ HELP: staging-violation
 HELP: auto-use?
 { $var-description "If set to a true value, the behavior of the parser when encountering an unknown word name is changed. If only one loaded vocabulary has a word with this name, instead of throwing an error, the parser adds the vocabulary to the search path and prints a parse note. Off by default." }
 { $notes "This feature is intended to help during development. To generate a " { $link POSTPONE: USING: } " form automatically, enable " { $link auto-use? } ", load the source file, and copy and paste the " { $link POSTPONE: USING: } " form printed by the parser back into the file, then disable " { $link auto-use? } ". See " { $link "word-search-errors" } "." } ;
+
+HELP: use-first-word?
+{ $values { "words" sequence } { "?" boolean } }
+{ $description "Checks if the first word can be used automatically without first throwing a restartable " { $link no-word-error } } ;
 
 HELP: scan-object
 { $values { "object" object } }

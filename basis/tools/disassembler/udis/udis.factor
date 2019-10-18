@@ -1,26 +1,24 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Jorge Acereda Macia.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.disassembler namespaces combinators alien
-alien.syntax alien.c-types lexer parser kernel sequences layouts
-math math.order alien.libraries math.parser system make fry
-arrays libc destructors tools.memory tools.disassembler.utils
-tools.disassembler.private splitting alien.data classes.struct ;
+USING: alien alien.c-types alien.libraries alien.syntax arrays
+combinators destructors fry kernel layouts libc make math
+math.order math.parser namespaces sequences splitting system
+tools.disassembler.private tools.disassembler.utils tools.memory
+;
 IN: tools.disassembler.udis
 
-<<
-"libudis86" {
-    { [ os macosx? ] [ "libudis86.0.dylib" ] }
-    { [ os unix? ] [ "libudis86.so.0" ] }
+<< "libudis86" {
     { [ os windows? ] [ "libudis86.dll" ] }
-} cond cdecl add-library
->>
+    { [ os macosx? ] [ "libudis86.dylib" ] }
+    { [ os unix? ] [ "libudis86.so" ] }
+} cond cdecl add-library >>
 
 LIBRARY: libudis86
 
 TYPEDEF: void ud
 
-FUNCTION: void ud_translate_intel ( ud* u ) ;
-FUNCTION: void ud_translate_att ( ud* u ) ;
+FUNCTION: void ud_translate_intel ( ud* u )
+FUNCTION: void ud_translate_att ( ud* u )
 
 : UD_SYN_INTEL ( -- addr ) &: ud_translate_intel ; inline
 : UD_SYN_ATT ( -- addr ) &: ud_translate_att ; inline
@@ -30,22 +28,22 @@ CONSTANT: UD_INP_CACHE_SZ 32
 CONSTANT: UD_VENDOR_AMD   0
 CONSTANT: UD_VENDOR_INTEL 1
 
-FUNCTION: void ud_init ( ud* u ) ;
-FUNCTION: void ud_set_mode ( ud* u, uchar mode ) ;
-FUNCTION: void ud_set_pc ( ud* u, ulonglong pc ) ;
-FUNCTION: void ud_set_input_buffer ( ud* u, c-string offset, size_t size ) ;
-FUNCTION: void ud_set_vendor ( ud* u, uint vendor ) ;
-FUNCTION: void ud_set_syntax ( ud* u, void* syntax ) ;
-FUNCTION: void ud_input_skip ( ud* u, size_t size ) ;
-FUNCTION: int ud_input_end ( ud* u ) ;
-FUNCTION: uint ud_decode ( ud* u ) ;
-FUNCTION: uint ud_disassemble ( ud* u ) ;
-FUNCTION: c-string ud_insn_asm ( ud* u ) ;
-FUNCTION: void* ud_insn_ptr ( ud* u ) ;
-FUNCTION: ulonglong ud_insn_off ( ud* u ) ;
-FUNCTION: c-string ud_insn_hex ( ud* u ) ;
-FUNCTION: uint ud_insn_len ( ud* u ) ;
-FUNCTION: c-string ud_lookup_mnemonic ( int c ) ;
+FUNCTION: void ud_init ( ud* u )
+FUNCTION: void ud_set_mode ( ud* u, uchar mode )
+FUNCTION: void ud_set_pc ( ud* u, ulonglong pc )
+FUNCTION: void ud_set_input_buffer ( ud* u, c-string offset, size_t size )
+FUNCTION: void ud_set_vendor ( ud* u, uint vendor )
+FUNCTION: void ud_set_syntax ( ud* u, void* syntax )
+FUNCTION: void ud_input_skip ( ud* u, size_t size )
+FUNCTION: int ud_input_end ( ud* u )
+FUNCTION: uint ud_decode ( ud* u )
+FUNCTION: uint ud_disassemble ( ud* u )
+FUNCTION: c-string ud_insn_asm ( ud* u )
+FUNCTION: void* ud_insn_ptr ( ud* u )
+FUNCTION: ulonglong ud_insn_off ( ud* u )
+FUNCTION: c-string ud_insn_hex ( ud* u )
+FUNCTION: uint ud_insn_len ( ud* u )
+FUNCTION: c-string ud_lookup_mnemonic ( int c )
 
 : <ud> ( -- ud )
     1,000 malloc &free

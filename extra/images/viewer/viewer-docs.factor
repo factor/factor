@@ -70,7 +70,7 @@ HELP: stop-control
 { $description "Removes the connection between the gadget and it's model" } ;
 ARTICLE: "images.viewer" "Displaying Images"
 "The " { $vocab-link "images.viewer" } " vocabulary uses the " { $vocab-link "opengl.textures" }
-" vocabulary to display any instance of " { $link image } "."$nl
+" vocabulary to display any instance of " { $link image } "." $nl
 "An " { $link image-gadget } " can be used for static images and " { $instance image-control }
 " for changing images (for example a video feed). For changing images, the image should be contained in " { $instance model }
 ". Change the model value with " { $link set-model } " or mutate the image and call "

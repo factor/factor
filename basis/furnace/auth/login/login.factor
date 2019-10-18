@@ -16,7 +16,7 @@ IN: furnace.auth.login
 SYMBOL: permit-id
 
 : permit-id-key ( realm -- string )
-    hex-string "__p_" prepend ;
+    bytes>hex-string "__p_" prepend ;
 
 : client-permit-id ( realm -- id/f )
     permit-id-key client-state dup [ string>number ] when ;

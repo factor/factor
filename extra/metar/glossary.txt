@@ -1,0 +1,1491 @@
+$,maintenance check indicator
+A01,station without a precipitation discriminator
+A02,station with a precipitation discriminator
+AAF,Army Air Field
+AAL,above aerodrome level
+AATM,at all times
+ABD,aboard
+ABNDT,abundant
+ABNML,abnormal
+ABT,about
+ABV,above
+AC,altocumulus
+ACARS,aircraft communication addressing & reporting system
+ACC,altocumulus castellanus
+ACCUM,accumulate
+ACFT,aircraft
+ACK,acknowledge
+ACL,altimeter check location
+ACLD,above clouds
+ACLT,accelerate
+ACPT,accept
+ACR,air carrier
+ACRBT,acrobatic
+ACRS,across
+ACSL,standing lenticular altocumulus
+ACT,active/activated/activity
+ACTG,acting
+ACTV,active
+ACTVT,activate
+ACYC,anticyclonic
+ADA,advisory area
+ADDN,addition
+ADF,automatic direction finder
+ADIZ,air defense identification zone
+ADJ,adjacent
+ADQT,adequate
+ADRNDCK,adirondack
+ADV,advise
+ADVCTN,advection
+ADVN,advance
+ADVY,advisory
+ADVZY,advisory
+AFB,Air Force Base
+AFCT,affect
+AFD,Airport/Facility Directory
+AFDK,after dark
+AFSS,Automated Flight Service Station
+AFT,after
+AFTN,afternoon
+AGL,above ground level
+AHD,ahead
+AIM,Aeronautical Information Manual
+AIREPS,aircraft reports
+AIRMET,Airmen's Meteorological Information
+ALF,aloft
+ALG,along
+ALGHNY,Allegheny
+ALNMT,alignment
+ALP,aircraft location point
+ALQDS,all quadrants
+ALQS,all quadrants
+ALS,approach light system
+ALSEC,all sectors
+ALSF-1,standard 2400' high-intensity approach lighting system with sequenced flashers (Category I configuration)
+ALSF-2,standard 2400' high-intensity approach lighting system with sequenced flashers (Category II configuration)
+ALSTG,altimeter setting
+ALT,altitude
+ALTA,Alberta
+ALTM,altimeter
+ALTN,alternate
+ALUTN,Aleutian
+AM,ante meridiem
+AMB,amber
+AMD,amended
+AMS,air mass
+AMSL,above mean sea level
+ANAPROP,anomalous propagation
+ANCPT,anticipate
+AND,and
+ANLYS,analysis
+AO1,station without a precipitation discriminator
+AO2,station with a precipitation discriminator
+AOA,at or above
+AOB,at or below
+AOE,airport of entry
+APCH,approach
+APL,airport lights
+APLCN,Appalachian
+APN,Apron
+APRNT,apparent
+APROP,appropriate
+APRX,approximately
+ARB,Air Reserve Base
+ARFOR,area forecast
+ARINC,Aeronautical Radio, Incorporated
+ARND,around
+ARTC,air route traffic control
+ARTCC,Air Route Traffic Control Center
+AS,altostratus
+ASAP,as soon as possible
+ASDA,accelerate-stop distance available
+ASDAR,aircraft to satellite data relay
+ASL,above sea level
+ASOS,Automated Surface Observing System
+ASPH,asphalt
+ASSOCD,associated
+ATA,actual time of arrival
+ATCT,airport traffic control tower
+ATIS,automatic terminal information service
+ATLC,Atlantic
+AURBO,Aurora Borealis
+AUTH,authorized
+AUTO,automated report
+AVG,average
+AVGAS,aviation gasoline
+AWOS,automatic weather observing/reporting system
+AWS,automatic weather station
+AWY,airway
+AZM,azimuth
+B,began
+BA,braking action
+BACLIN,Baroclinic
+BAJA,Baja California
+BATROP,Barotropic
+BC,British Columbia
+BCH,beach
+BCKG,backing
+BCM,become
+BCMG,becoming
+BCMS,becomes
+BD,blowing dust
+BDA,bermuda
+BDRY,boundary
+BECMG,becoming
+BFDK,before dark
+BFR,before
+BGN,begin
+BGNG,beginning
+BGNS,begins
+BHND,behind
+BINOVC,breaks in overcast
+BKN,broken
+BLD,build
+BLDG,building
+BLDS,builds
+BLDUP,buildup
+BLKHLS,Black Hills
+BLKT,blanket
+BLKTG,blanketing
+BLKTS,blankets
+BLO,below
+BLU,blue
+BLW,below
+BLZD,blizzard
+BN,blowing sand
+BND,bound
+BNDRY,boundary
+BNDRYS,boundaries
+BNK,bank
+BNTH,beneath
+BOOTHEEL,Bootheel
+BR,branch
+BRF,brief
+BRG,branching
+BRK,break
+BRKG,breaking
+BRKHIC,breaks in higher clouds
+BRKS,breaks
+BRKSHR,Berkshire
+BRKSHRS,Berkshires
+BRM,barometer
+BRS,branches
+BS,blowing snow
+BTWN,between
+BYD,by day
+C,center
+CA,California
+CAA,cold air advection
+CARIB,Caribbean
+CASCDS,Cascades
+CAT,clear air turbulence
+CAVOK,ceiling and visibility OK
+CAVU,ceiling and visibility unlimited
+CB,cumulonimbus cloud
+CBMAM,cumulonimbus mammatus cloud
+CBS,cumulonimbi
+CC,cirrocumulus cloud
+CCLDS,clear of clouds
+CCLKWS,counter-clockwise
+CCSL,cirrocumulus standing lenticular cloud
+CDFNT,cold front
+CDFNTL,cold frontal
+CFP,cold front passage
+CG,cloud-to-ground
+CHC,chance
+CHCS,chances
+CHG,change
+CHGD,changed
+CHGG,changing
+CHGS,changes
+CHI,cloud-height indicator
+CHINO,sky condition at secondary location not available
+CHSPK,Chesapeake
+CI,cirrus
+CIG,ceiling
+CIGS,ceilings
+CLD,cloud
+CLDNS,cloudiness
+CLDS,clouds
+CLKWS,clockwise
+CLR,clear sky
+CLRG,clearing
+CLRS,clears
+CMPLX,complex
+CNCL,cancel
+CNCLD,cancelled
+CNCLG,cancelling
+CNCLS,cancels
+CNDN,Canadian
+CNFDC,confidence
+CNTR,center
+CNTRD,centered
+CNTRL,central
+CNTRLN,centerline
+CNTRS,Centers
+CNTY,County
+CNTYS,Counties
+CNVG,converge
+CNVGG,converging
+CNVGNC,convergence
+CNVTN,convection
+CNVTV,convective
+CNVTVLY,convectively
+CO,Colorado
+COMPAR,compare
+COMPARD,compared
+COMPARG,comparing
+COMPARS,compares
+COND,conditions
+CONDS,conditions
+CONS,constant/continuous
+CONT,continue
+CONTD,continued
+CONTDVD,Continental Divide
+CONTG,continuing
+CONTLY,continually
+CONTRAILS,Condensation Trails
+CONTS,continues
+CONUS,Continental U.S.
+COORD,coordinate
+COR,correction to a previously disseminated observation
+CPBL,capable
+CRC,circle
+CRCLC,circulate
+CRCLN,circulation
+CRNR,corner
+CRNRS,corners
+CRS,course
+CS,cirrostratus
+CSDR,consider
+CSDRBL,considerable
+CST,coast
+CSTL,coastal
+CT,Connecticut
+CTGY,category
+CTSKLS,Catskills
+CU,cumulus
+CUCON,cumulus congestus cloud
+CUFRA,cumulus fractus
+CUHU,cumulus humilis cloud
+CUMED,cumulus medicoris cloud
+CVR,cover
+CVRD,covered
+CVRG,covering
+CVRS,covers
+CYC,cyclonic
+CYCLGN,cyclogenesis
+DABRK,daybreak
+DALGT,day light
+DALR,dry adiabatic lapse rate
+DATA,data
+DBL,double
+DC,District of Columbia
+DCR,decrease
+DCRD,decreased
+DCRG,decreasing
+DCRGLY,decreasingly
+DCRS,decreases
+DE,Delaware
+DEG,degree
+DEGS,degrees
+DELMARVA,Delaware-Maryland-Virginia
+DEPTH,depth
+DFCLT,difficult
+DFCLTY,difficulty
+DFNT,definite
+DFNTLY,definitely
+DFRS,differs
+DFUS,diffuse
+DGNL,diagonal
+DGNLLY,diagonally
+DIGG,digging
+DIR,direction
+DISC,discontinue
+DISCD,discontinued
+DISCG,discontinuing
+DISRE,disregard
+DISRED,disregarded
+DISREG,disregarding
+DKTS,Dakotas
+DLA,delay
+DLAD,delayed
+DLT,delete
+DLTD,deleted
+DLTG,deleting
+DLY,daily
+DMG,damage
+DMGD,damaged
+DMGG,damaging
+DMNT,dominant
+DMSH,diminish
+DMSHD,diminished
+DMSHG,diminishing
+DMSHS,diminishes
+DNDFTS,downdrafts
+DNS,dense
+DNSLP,downslope
+DNSTRM,downstream
+DNWND,down wind
+DOC,Department of Commerce
+DOD,Department of Defense
+DOT,Department of Transportation
+DP,deep
+DPND,deepened
+DPNG,deepening
+DPNS,deepens
+DPR,deeper
+DPTH,depth
+DRFT,drift
+DRFTD,drifted
+DRFTG,drifting
+DRFTS,drifts
+DRY,dry
+DRZL,drizzle
+DSCNT,descent
+DSIPT,dissipate
+DSIPTD,dissipated
+DSIPTG,dissipating
+DSIPTN,dissipation
+DSIPTS,dissipates
+DSND,descend
+DSNDG,descending
+DSNDS,descends
+DSNT,distant
+DSPTD,dissipated
+DSTBLZ,destabilize
+DSTBLZD,destabilized
+DSTBLZG,destablizing
+DSTBLZN,destablization
+DSTBLZS,destablizes
+DSTC,distance
+DTRT,deteriorate
+DTRTD,deteriorated
+DTRTG,deteriorating
+DTRTS,deteriorates
+DURG,during
+DURN,duration
+DVLP,develop
+DVLPD,developed
+DVLPG,developing
+DVLPMT,development
+DVLPS,develops
+DVR,dispatch visual range
+DVRG,diverge
+DVRGG,diverging
+DVRGNC,divergence
+DVRGS,diverges
+DVV,downward vertical velocity
+DWNDFTS,downdrafts
+DWPNT,dewpoint
+DWPNTS,dewpoints
+DX,duplex
+E,east
+EBND,east bound
+ECMWF,European Centre for Medium Range Weather Forecasts
+EFCT,effect
+ELNGT,elongate
+ELNGTD,elongated
+ELR,environmental lapse rate
+ELSW,elsewhere
+EMBD,embedded
+EMBDD,embedded
+EMERG,emergency
+ENCTR,encounter
+ENDG,ending
+ENE,east-northeast
+ENELY,east-northeasterly
+ENERN,east-northeastern
+ENEWD,east-northeastward
+ENHNC,enhance
+ENHNCD,enhanced
+ENHNCG,enhancing
+ENHNCMNT,enhancement
+ENHNCS,enhances
+ENTR,entire
+ERN,eastern
+ERY,early
+ERYR,earlier
+ESE,east-southeast
+ESELY,east-southeasterly
+ESERN,east-southeastern
+ESEWD,east-southeastward
+ESNTL,essential
+ESTAB,establish
+ESTIMATE,estimate
+ESTMD,estimated
+ESTS,estimates
+ETA,eta model
+ETC,et cetera
+ETIM,elapsed time
+EUMETSTAT,European Meteorological Satellite
+EVE,evening
+EWD,eastward
+EXCLV,exclusive
+EXCLVLY,exclusively
+EXCP,except
+EXPC,expect
+EXPCD,expected
+EXPCG,expecting
+EXTD,extend
+EXTDD,extended
+EXTDG,extending
+EXTDS,extends
+EXTN,extension
+EXTRAP,extrapolate
+EXTRAPD,extrapolated
+EXTRM,extreme
+EXTRMLY,extremely
+EXTSV,extensive
+F,Farenheit
+FA,aviation area forecast
+FAA,Federal Aviation Administration
+FAH,Farenheit
+FAM,familiar
+FCST,forecast
+FCSTD,forecasted
+FCSTG,forecasting
+FCSTR,forecaster
+FCSTS,forecasts
+FEW,few
+FIBI,filed but impracticable to transmit
+FIG,figure
+FILG,filling
+FIRAV,first available
+FIRST,first observation after a break in coverage at manual station
+FL,Florida
+FLG,falling
+FLOP,floating-point operation
+FLOPS,floating-point operations
+FLRY,flurry
+FLRYS,flurries
+FLT,flight
+FLW,follow
+FLWG,following
+FM,from
+FMH-1,Federal Meteorological Handbook No.1, Surface Weather Observations & Reports (METAR)
+FMH2,Federal Meteorological Handbook No.2, Surface Synoptic Codes
+FMT,format
+FNCTN,function
+FNT,front
+FNTGNS,frontogenesis
+FNTL,frontal
+FNTLYS,frontolysis
+FNTS,fronts
+FORNN,forenoon
+FPM,feet per minute
+FPS,feet per second
+FQT,frequent
+FQTLY,frequently
+FRM,form
+FRMG,forming
+FRMN,formation
+FROIN,Frost On The Indicator
+FROPA,frontal passage
+FROSFC,frontal surface
+FRQ,frequent
+FRST,frost
+FRWF,forecast wind factor
+FRZ,freeze
+FRZG,freezing
+FRZN,frozen
+FT,feet
+FTHR,further
+FVRBL,favorable
+FWD,forward
+FYI,for your information
+FZRANO,freezing rain sensor not available
+G,gust
+GA,Georgia
+GARP,Global Atmospheric Research Programme
+GCM,global computer model
+GEN,general
+GENLY,generally
+GEO,geographic
+GEOREF,geographical reference
+GEOS,geostationary satellite
+GF,ground fog
+GICG,glaze icing
+GLFALSK,Gulf of Alaska
+GLFCAL,Gulf of California
+GLFMEX,Gulf of Mexico
+GLFSTLAWR,Gulf of St. Lawrence
+GMT,Grenwich Mean Time
+GND,ground
+GNDFG,ground fog
+GRAD,gradient
+GRDL,gradual
+GRDLY,gradually
+GRN,green
+GRT,great
+GRTLKS,Great Lakes
+GRTLY,greatly
+GRTR,greater
+GRTST,greatest
+GSTS,gusts
+GSTY,gusty
+GTS,Global Telecommunications System
+GV,ground visibility
+HAZ,hazard
+HCVIS,high clouds visible
+HDFRZ,hard freeze
+HDSVLY,Hudson Valley
+HDWND,head wind
+HFS,high-friction surface
+HGT,height
+HI,high
+HIER,higher
+HIFOR,high level forecast
+HLF,half
+HLSTO,hailstone
+HLTP,hilltop
+HLYR,haze layer aloft
+HND,hundred
+HR,hour
+HRS,hours
+HRZN,horizon
+HTG,heating
+HURCN,hurricane
+HUREP,hurricane report
+HV,have
+HVY,heavy
+HVYR,heavier
+HVYST,heaviest
+HWVR,however
+HWY,highway
+IA,Iowa
+IC,ice
+ICAO,International Civil Aviation Organization
+ICG,icing
+ICGIC,icing in clouds
+ICGIP,icing in precipitation
+ID,Idaho
+IFR,IFR
+IL,Illinois
+IMDT,immediate
+IMDTLY,immediately
+IMO,International Meteorological Organization (now WMO)
+IMPL,impulse
+IMPLS,impulses
+IMPT,important
+INCL,include
+INCLD,included
+INCLG,including
+INCLS,includes
+INCR,increase
+INCRD,increased
+INCRG,increasing
+INCRGLY,increasingly
+INCRS,increases
+INDC,indicate
+INDCD,indicated
+INDCG,indicating
+INDCS,indicates
+INDEF,indefinite
+INFO,information
+INLD,inland
+INSAT,Indian Satellite
+INSTBY,instability
+INTCNTL,intercontinental
+INTL,international
+INTMD,intermediate
+INTMT,intermittent
+INTMTLY,intermittently
+INTO,into
+INTR,interior
+INTRMTRGN,intermountain region
+INTS,intense
+INTSFCN,intensification
+INTSFY,intensify
+INTSFYD,intensified
+INTSFYG,intensifying
+INTSFYS,intensifies
+INTSTY,intensity
+INTVL,interval
+INVOF,in vicinity of
+INVRN,inversion
+IOVC,in overcast
+IP,ice pellets
+IPV,improve
+IPVG,improving
+IR,ice on the runway
+ISOL,isolated
+ISOLD,isolated
+ITCZ,Inter-Tropical Convergence Zone
+JCTN,junction
+JTSTR,jetstream
+KFRST,killing frost
+KLYR,smoke layer aloft
+KOCTY,smoke over city
+KS,Kansas
+KT,knots
+KY,Kentucky
+L,left
+LA,Louisiana
+LABRDR,Labrador
+LAM,Limited Area model
+LAST,last observation before a break in coverage at a manual station
+LAT,latitude
+LCL,local
+LCLY,locally
+LCTD,located
+LCTMP,little change in temperature
+LCTN,location
+LDG,landing
+LEVEL,level
+LFM,Limited Fine Mesh Model
+LFTG,lifting
+LGRNG,long range
+LGT,light
+LGTR,lighter
+LGWV,long wave
+LI,Lifted Index
+LIS,lifted indices
+LK,lake
+LKLY,likely
+LKS,lakes
+LLJ,low level jet
+LLWAS,low level wind shear alert system
+LLWS,low level wind shear
+LMTD,limited
+LMTG,limiting
+LMTS,limits
+LN,lines
+LO,low
+LONG,longitude
+LONGL,longitudnal
+LORAN,Long Range Navigation
+LRG,large
+LRGLY,largely
+LRGR,larger
+LRGST,largest
+LSR,loose snow on the runway
+LST,Local Standard Time
+LTD,limited
+LTG,lightning
+LTGCC,lightning cloud-to-cloud
+LTGCCCG,lightning cloud-to-cloud cloud-to-ground
+LTGCG,lightning cloud-to-ground
+LTGCW,lightning cloud-to-water
+LTGIC,lightning in cloud
+LTL,little
+LTLCG,little change
+LTR,later
+LTST,latest
+LV,leaving
+LVL,level
+LVLS,levels
+LWR,lower
+LWRD,lowered
+LWRG,lowering
+LYR,layer
+LYRD,layered
+LYRS,layers
+MA,Massachusetts
+MAN,Manitoba
+MAX,maximum
+MB,millibars
+MCD,Mesoscale discussion
+MD,Maryland
+MDFY,modify
+MDFYD,modified
+MDFYG,modifying
+MDL,model
+MDLS,models
+MDT,moderate
+MDTLY,moderately
+ME,Maine
+MED,medium
+MEDIUM,medium
+MEGG,merging
+MESO,Mesoscale
+MET,meteorological
+METAR,aviation routine weather report
+METEOSAT,Meteorological Satellite
+METRO,metropolitan
+MEX,Mexico
+MHKVLY,Mohawk Valley
+MI,Michigan
+MID,middle
+MIDN,midnight
+MIL,military
+MIN,minimum
+MISG,missing
+MLTLVL,melting level
+MN,Minnesota
+MNLND,Mainland
+MNLY,mainly
+MO,Missouri
+MOD,moderate
+MOGR,Moderate or greater
+MOS,Model Output Statistics
+MOV,moved/moving/movement
+MOVD,moved
+MOVG,moving
+MOVMT,movement
+MOVS,moves
+MPH,miles per hour
+MPS,meters per second
+MRF,medium range forecast
+MRGL,marginal
+MRGLLY,marginally
+MRNG,morning
+MRTM,maritime
+MS,Mississippi
+MSG,message
+MSHP,mishap
+MSL,mean sea level
+MSLP,mean sea level pressure
+MST,most
+MSTLY,mostly
+MSTR,moisture
+MT,mountains
+MTN,mountain
+MTNS,mountains
+MTW,mountain waves
+MULT,multiple
+MULTILVL,multi-level
+MVFR,marginal VFR
+MXD,mixed
+N,north
+N/A,not applicable
+NAB,not above
+NAT,North Atlantic
+NATL,national
+NAV,navigation
+NB,New Brunswick
+NBND,northbound
+NBRHD,neighborhood
+NC,North Carolina
+NCD,clear sky
+NCDC,National Climatic Data Center
+NCWX,no change in weather
+ND,North Dakota
+NE,northeast
+NEB,nebraska
+NEC,necessary
+NEG,negative
+NEGLY,negatively
+NELY,northeasterly
+NERN,northeastern
+NEW ENG,New England
+NEWD,northeastward
+NFLD,Newfoundland
+NGM,Nested Grid Model
+NGT,night
+NH,New Hampshire
+NIL,none
+NJ,New Jersey
+NL,no layers
+NLC,noctilucent cloud
+NLT,not later than
+NLY,northerly
+NM,New Mexico
+NMBR,number
+NMBRS,numbers
+NMC,National Meteorological Center
+NML,normal
+NMRS,numerous
+NNE,north-northeast
+NNELY,north-northeasterly
+NNERN,north-northeastern
+NNEWD,north-northeastward
+NNNN,end of message
+NNW,north-northwest
+NNWLY,north-northwesterly
+NNWRN,north-northwestern
+NNWWD,north-northwestward
+NO,no
+NOAA,National Oceanic and Atmospheric Administration
+NOGAPS,National Oceanographic Global Atmospheric Prediction System
+NOPAC,Northern Pacific
+NOS,National Ocean Survey
+NOSIG,no significant change is expected in next 2 hours
+NOSPECI,no SPECI reports are taken at the station
+NOTAM,Notice to Airmen
+NPRS,nonpersistent
+NR,near
+NRLY,nearly
+NRN,northern
+NRW,narrow
+NS,Nova Scotia
+NSC,clear sky
+NSW,no significant weather
+NTFY,notify
+NTFYD,notified
+NV,Nevada
+NVA,Negative vorticity advection
+NW,northwest
+NWD,northward
+NWLY,northwesterly
+NWRN,northwestern
+NWS,National Weather Service
+NXT,next
+NY,New York
+OAT,outside air temperature
+OBND,outbound
+OBS,observed
+OBSC,obscure
+OBSCD,obscured
+OBSCG,obscuring
+OCFNT,occluded front
+OCLD,occlude
+OCLDD,occluded
+OCLDG,occluding
+OCLDS,occludes
+OCLN,occlusion
+OCNL,occasional
+OCNLY,occasionally
+OCR,occur
+OCRD,occurred
+OCRG,occurring
+OCRS,occurs
+OFC,office
+OFCM,Office of the Federal Coordinator for Meteorology
+OFP,occluded frontal passage
+OFSHR,offshore
+OH,Ohio
+OHD,overhead
+OK,Oklahoma
+OMNTS,over mountains
+OMTNS,over mountains
+ONSHR,on shore
+OPEN,open
+OR,Oregon
+ORGPHC,Orographic
+ORIG,original
+OSV,ocean station vessel
+OTLK,outlook
+OTP,on top
+OTR,other
+OTRW,otherwise
+OUTFLO,outflow
+OVC,overcast
+OVHD,overhead
+OVNGT,overnight
+OVR,over
+OVRN,overrun
+OVRNG,overrunning
+OVTK,overtake
+OVTKG,overtaking
+OVTKS,overtakes
+P,more than
+PA,Pennsylvania
+PAC,Pacific
+PASS,pass
+PBL,planetary boundary layer
+PCPN,precipitation
+PD,period
+PDMT,predominant
+PDS,periods
+PEN,peninsula
+PERM,permanent
+PGTSND,Puget Sound
+PHYS,physical
+PIBAL,pilot balloon observation
+PIBALS,pilot balloon reports
+PIREP,pilot weather report
+PIREPS,pilot weather reports
+PK,peak
+PLNS,plains
+PLS,please
+PLTO,plateau
+PM,post meridian
+PNHDL,pandhandle
+PNO,precipitation amount not available
+POS,positive
+POSLY,positively
+PPI,Plan Position Indicator
+PPINE,PPI no echoes
+PPSN,present position
+PRBL,probable
+PRBLTY,probability
+PRBLY,probably
+PRECD,precede
+PRECDD,preceded
+PRECDG,preceding
+PRECDS,precedes
+PRES,pressure
+PRESFR,pressure falling rapidly
+PRESRR,pressure rising rapidly
+PRIM,primary
+PRIN,principal
+PRIND,present indications are
+PRJMP,pressure jump
+PROB,probability
+PROC,procedure
+PROD,produce
+PRODG,producing
+PROG,forecast
+PROGD,forecasted
+PROGS,forecasts
+PRSNT,present
+PRSNTLY,presently
+PRST,persist
+PRSTNC,persistence
+PRSTNT,persistent
+PRSTS,persists
+PRVD,provide
+PRVDD,provided
+PRVDG,providing
+PRVDS,provides
+PS,plus
+PSBL,possible
+PSBLTY,possiblity
+PSBLY,possibly
+PSG,passage
+PSN,position
+PSND,positioned
+PSR,packed snow on the runway
+PTCHY,patchy
+PTLY,partly
+PTNL,potential
+PTNLY,potentially
+PTNS,portions
+PUGET,Puget Sound
+PVA,positive vorticity advection
+PVL,prevail
+PVLD,prevailed
+PVLG,prevailing
+PVLS,prevails
+PVLT,prevalent
+PWINO,precipitation identifier sensor not available
+PWR,power
+QBO,quasi-biennial oscillation
+QN,question
+QPFERD,NMC excessive rainfall discussion
+QPFHSD,NMC heavy snow discussion
+QPFSPD,NMC special precipitation discussion
+QSTNRY,quasistationary
+QTR,quarter
+QUAD,quadrant
+QUE,Quebec
+R,right
+RADAT,radiosonde observation data
+RAOB,radiosonde observation
+RAOBS,radiosonde observations
+RCH,reach
+RCHD,reached
+RCHG,reaching
+RCHS,reaches
+RCKY,Rocky
+RCKYS,Rockies
+RCMD,recommend
+RCMDD,recommended
+RCMDG,recommending
+RCMDS,recommends
+RCRD,record
+RCRDS,records
+RCRNR,base operations closed
+RCV,receive
+RCVD,received
+RCVG,receiving
+RCVS,receives
+RDC,reduce
+RDGG,ridging
+RDR,radar
+RDVLP,redevelop
+RDVLPG,redeveloping
+RDVLPMT,redevelopment
+RE,regard
+RECON,reconnaissance
+RED,red
+REF,reference
+REPL,replace
+REPLD,replaced
+REPLG,replacing
+REPLS,replaces
+REQ,request
+REQS,requests
+REQSTD,requested
+RES,reserve
+RESP,response
+RESTR,restrict
+RGD,ragged
+RGL,Regional Model
+RGLR,regular
+RGN,region
+RGNS,regions
+RGT,right
+RH,relative humidity
+RHI,Range Height Indicator
+RHINO,RHI not operative
+RI,Rhode Island
+RIOGD,Rio Grande
+RLBL,reliable
+RLTV,relative
+RLTVLY,relativily
+RMK,remarks
+RMN,remain
+RMND,remained
+RMNDR,remainder
+RMNG,remaining
+RMNS,remains
+RNFL,rainfall
+ROT,rotate
+ROTD,rotated
+ROTG,rotating
+ROTOR,rotor
+ROTS,rotates
+RPD,rapid
+RPDLY,rapidly
+RPLC,replace
+RPLCD,replaced
+RPLCG,replacing
+RPLCS,replaces
+RPRT,report
+RPRTD,reported
+RPRTG,reporting
+RPRTS,reports
+RPT,repeat
+RPTG,repeating
+RPTS,repeats
+RQR,require
+RQRD,required
+RQRG,requiring
+RQRS,requires
+RS,receiver station
+RSG,rising
+RSN,reason
+RSNG,reasoning
+RSNS,reasons
+RSTR,restrict
+RSTRD,restricted
+RSTRG,restricting
+RSTRS,restricts
+RTD,Routine Delayed (late) observation
+RTRN,return
+RTRND,returned
+RTRNG,returning
+RTRNS,returns
+RUF,rough
+RUFLY,roughly
+RV,reportable value
+RVR,runway visual range
+RVRNO,RVR system values not available
+RVS,revise
+RVSD,revised
+RVSG,revising
+RVSS,revises
+RW,rain shower
+RWY,runway
+RY,runway
+S,south
+SA,surface observation
+SALR,saturated adiabatic lapse rate
+SAO,surface observation
+SAOS,surface observations
+SASK,Saskatchewan
+SATFY,satisfactory
+SBND,south bound
+SBSD,subside
+SBSDD,subsided
+SBSDNC,subsidence
+SBSDS,subsides
+SC,stratocumulus
+SCND,second
+SCNDRY,secondary
+SCSL,stratocumulus standing lenticular cloud
+SCT,scattered
+SCTD,scattered
+SCTR,sector
+SD,South Dakota
+SE,southeast
+SEC,second
+SELS,Severe Local Storms Unit
+SELY,southeasterly
+SEPN,separation
+SEQ,sequence
+SERN,southeastern
+SEV,severe
+SEWD,southeastward
+SF,sferic (radio interference caused by lightning strikes)
+SFC,surface
+SFERICS,Atmospherics
+SFLOC,sferic location
+SG,snow grains
+SGFNT,significant
+SGFNTLY,significantly
+SHFT,shift
+SHFTD,shifted
+SHFTG,shifting
+SHFTS,shifts
+SHLD,shield
+SHLW,shallow
+SHR,shear
+SHRT,short
+SHRTLY,shortly
+SHRTWV,shortwave
+SHRTWVS,shortwaves
+SHUD,should
+SHWR,shower
+SHWRS,showers
+SIERNEV,Sierra Nevada
+SIG,signature
+SIGMET,significant meteorological information
+SIMUL,simultaneous
+SKC,clear sky
+SKED,schedule
+SLD,solid
+SLGT,slight
+SLGTLY,slightly
+SLO,slow
+SLOLY,slowly
+SLOR,slower
+SLP,sea-level pressure
+SLPG,sloping
+SLPNO,sea-level pressure not available
+SLR,slush on the runway
+SLT,sleet
+SLY,southerly
+SM,statute mile(s)
+SMK,smoke
+SML,small
+SMLR,smaller
+SMRY,summary
+SMS,synchronus meteorological satellite
+SMTH,smooth
+SMTHR,smoother
+SMTHST,smoothest
+SMTM,sometime
+SMWHT,somewhat
+SNBNK,snow bank
+SND,sand
+SNFLK,snow flake
+SNGL,single
+SNINCR,snow increasing rapidly
+SNO,snow
+SNOINCR,snow increase
+SNOINCRG,snow increasing
+SNOW,snow
+SNST,sunset
+SNW,snow
+SNWFL,snowfall
+SOG,snow on the ground
+SOP,standard operating procedure
+SP,snow pellets
+SPCLY,especially
+SPD,speed
+SPDS,speeds
+SPECI,an unscheduled report taken when certain criteria have been met
+SPENES,satellite precipitation estimate statement
+SPKL,sprinkle
+SPKLS,sprinkles
+SPLNS,Southern Plains
+SPRD,spread
+SPRDG,spreading
+SPRDS,spreads
+SPRL,spiral
+SQAL,squall
+SQLN,squall line
+SR,sunrise
+SRN,southern
+SRND,surround
+SRNDD,surrounded
+SRNDG,surrounding
+SRNDS,surrounds
+SS,sunset
+SSE,south-southeast
+SSELY,south-southeasterly
+SSERN,south-southeastern
+SSEWD,south-southeastward
+SST,sea surface temperature
+SSW,south-southwest
+SSWLY,south-southwesterly
+SSWRN,south-southwestern
+SSWWD,south-southwestward
+ST,stratus cloud
+STAGN,stagnation
+STBL,stable
+STBLTY,stability
+STD,standard
+STDY,steady
+STFR,stratus fractus
+STFRM,stratiform
+STG,strong
+STGLY,strongly
+STGR,stronger
+STGST,strongest
+STLT,satellite
+STM,storm
+STMS,storms
+STN,station
+STNRY,stationary
+STNS,stations
+STWS,Storm Tide Warning Service
+SUB,substitute
+SUBTRPCL,subtropical
+SUF,sufficient
+SUFLY,sufficiently
+SUG,suggest
+SUGG,suggesting
+SUGS,suggests
+SUP,supply
+SUPG,supplying
+SUPR,superior
+SUPS,supplies
+SUPSD,supersede
+SUPSDG,superseding
+SUPSDS,supersedes
+SVG,serving
+SVR,severe
+SVRL,several
+SW+,heavy snow shower
+SW,southwest
+SW-,light snow shower
+SWD,southward
+SWLG,swelling
+SWLY,southwesterly
+SWOMCD,SELS Mesoscale Discussion
+SWRN,southwestern
+SWWD,southwestward
+SX,stability index
+SXN,section
+SXNS,sections
+SYNOP,synoptic report
+SYNS,synopsis
+SYS,system
+T,thunder
+TAF,Terminal Aerodrome Forecast
+TCNTL,transcontinental
+TCU,towering cumulus cloud
+TDA,today
+TEMP,temperature
+TEMPO,temporary
+THD,thunderhead
+THDR,thunder
+THI,Temperature-Humidity Index
+THK,thick
+THKNG,thickening
+THKNS,thickness
+THKR,thicker
+THKST,thickest
+THLD,threshold
+THN,thin
+THNG,thinning
+THNR,thinner
+THNST,thinnest
+THR,threshold
+THRFTR,thereafter
+THRU,through
+THRUT,throughout
+THSD,thousand
+THTN,threaten
+THTND,threatened
+THTNG,threatening
+THTNS,threatens
+TIL,until
+TMPRY,temporary
+TMPRYLY,temporarilly
+TMW,tomorrow
+TN,Tennessee
+TNDCY,tendency
+TNDCYS,tendencies
+TNGT,tonight
+TNTV,tentative
+TNTVLY,tentatively
+TO,to
+TOPS,tops
+TOVC,top of overcast
+TPG,topping
+TRBL,trouble
+TRIB,tributary
+TRKG,tracking
+TRML,terminal
+TRMT,terminate
+TRMTD,terminated
+TRMTG,terminating
+TRMTS,terminates
+TRNSP,transport
+TRNSPG,transporting
+TROF,trough
+TROFS,troughs
+TROP,tropopause
+TRPCD,tropical continental
+TRPCL,tropical
+TRRN,terrain
+TRSN,transition
+TRW+,thunderstorm with heavy rain shower
+TRW,thunderstorm
+TS+,thunderstorm with heavy snow
+TS,thunderstorm with snow
+TSFR,transfer
+TSFRD,transfered
+TSFRG,transfering
+TSFRS,transfers
+TSHWR,thundershower
+TSHWRS,thundershowers
+TSNO,thunderstorm information not available
+TSNT,transient
+TSQLS,thundersqualls
+TSTM,thunderstorm
+TSTMS,thunderstorms
+TSW+,thunderstorm with heavy snow showers
+TSW,thunderstorm with snow showers
+TURB,turbulence
+TURBC,turbulence
+TURBT,turbulent
+TWD,toward
+TWDS,towards
+TWI,twilight
+TWR,tower
+TWRG,towering
+TX,Texas
+UDDF,up and down drafts
+UKMO,UK Met Office
+UN,unable
+UNAVBL,unavailable
+UNEC,unnecessary
+UNKN,unknown
+UNL,unlimited
+UNRELBL,unreliable
+UNRSTD,unrestricted
+UNSATFY,unsatisfactory
+UNSBL,unseasonable
+UNSTBL,unstable
+UNSTDY,unsteady
+UNSTL,unsettle
+UNSTLD,unsettled
+UNUSBL,unusable
+UPDFTS,updrafts
+UPR,upper
+UPSLP,upslope
+UPSTRM,upstream
+URG,urgent
+USBL,usable
+UT,Utah
+UTC,Coordinated Universal Time
+UV,ultra-violet
+UVV,upward vertical velocity
+UVVS,upward vertical velocities
+UWNDS,upper winds
+V,varying/variable
+VA,Virginia
+VARN,variation
+VC,(in the) vicinity
+VCNTY,vicinity
+VCOT,VFR conditions on top
+VCTR,vector
+VDUC,VAS Data Utilization Center (NSSFC)
+VFR,VFR
+VFY,verify
+VFYD,verified
+VFYG,verifying
+VFYS,verifies
+VIRGA,virga
+VIS,visible/visibility
+VISNO,visibility at secondary location not available
+VLCTY,velocity
+VLCTYS,velocities
+VLNT,violent
+VLNTLY,violently
+VLY,valley
+VLYS,valleys
+VMC,visual meteorological conditions
+VOL,volume
+VORT,vorticity
+VR,visual range
+VRB,variable
+VRBL,variable
+VRG,veering
+VRISL,Vancouver Island, BC
+VRS,Veers
+VRT MOTN,Vertical Motion
+VRY,very
+VSB,visible
+VSBY,visibility
+VSBYDR,visibility decreasing rapidly
+VSBYIR,visibility increasing rapidly
+VT,Vermont
+VV,vertical visibility
+W,west
+WA,Washington
+WAA,Warm Air Advection
+WBND,west bound
+WDLY,widely
+WDSPRD,widespread
+WEA,weather
+WFO,Weather Forecast Office
+WFOS,Weather Forecast Offices
+WFP,warm front passage
+WG/AOS,Working Group for Atmospheric Observing Systems
+WG/SO,Working Group for Surface Observations
+WHT,white
+WI,Wisconsin
+WIBIS,will be issued
+WINT,winter
+WK,weak
+WKDAY,weekday
+WKEND,weekend
+WKN,weaken
+WKNG,weakening
+WKNS,weakens
+WKR,weaker
+WKST,weakest
+WL,will
+WLY,westerly
+WMO,World Meteorological Organization
+WND,wind
+WNDS,winds
+WNW,west-northwest
+WNWLY,west-northwesterly
+WNWRN,west-northwestern
+WNWWD,west-northwestward
+WO,without
+WPLTO,Western Plateau
+WR,wet runway
+WRM,warm
+WRMFNT,warm front
+WRMFNTL,warm Frontal
+WRMG,warming
+WRMR,warmer
+WRMST,warmest
+WRN,western
+WRNG,warning
+WRNGS,warnings
+WRS,worse
+WS,wind shear
+WSFO,Weather Service Forecast Office
+WSFOS,Weather Service Forecast Offices
+WSHFT,wind shift
+WSHFTS,wind shifts
+WSO,Weather Service Office
+WSOS,Weather Service Offices
+WSTCH,Wasatch Range
+WSW,west-southwest
+WSWLY,west-southwesterly
+WSWRN,west-southwestern
+WSWWD,west-southwestward
+WTR,water
+WTRS,waters
+WTSPT,waterspout
+WTSPTS,waterspouts
+WUD,would
+WV,West Virginia
+WVS,waves
+WW,Severe Weather Watch
+WWAMKC,Status Report
+WWD,westward
+WWS,Severe Weather Watches
+WX,weather
+WY,Wyoming
+XCP,except
+XPC,expect
+XPCD,expected
+XPCG,expecting
+XPCS,expects
+XPLOS,explosive
+XTND,extend
+XTNDD,extended
+XTNDG,extending
+XTRM,extreme
+XTRMLY,extremely
+YDA,yesterday
+YKN,Yukon
+YLO,yellow
+YLSTN,Yellowstone
+Z,Zulu (i.e. Coordinated Universal Time)
+ZL,freezing drizzle
+ZN,zone
+ZNS,zones
+ZR,freezing rain

@@ -9,7 +9,7 @@ SYMBOL: registers
 registers [ H{ } clone ] initialize
 
 : define-register ( name num size -- word )
-    [ create-in ] 2dip {
+    [ create-word-in ] 2dip {
         [ 2drop ]
         [ 2drop define-symbol ]
         [ drop "register" set-word-prop ]

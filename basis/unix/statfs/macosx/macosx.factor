@@ -1,9 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types io.encodings.utf8 io.encodings.string
-kernel sequences unix.stat accessors unix combinators math
-grouping system alien.strings math.bitwise alien.syntax
-unix.types classes.struct unix.ffi literals ;
+USING: alien.c-types alien.syntax classes.struct literals
+unix.ffi unix.types ;
 IN: unix.statfs.macosx
 
 CONSTANT: MNT_RDONLY  0x00000001
@@ -115,5 +113,5 @@ STRUCT: statfs64
     { f_mntfromname { char MAXPATHLEN } }
     { f_reserved uint32_t[8] } ;
 
-FUNCTION-ALIAS: statfs64-func int statfs64 ( c-string path, statfs64* buf ) ;
-FUNCTION: int getmntinfo64 ( statfs64** mntbufp, int flags ) ;
+FUNCTION-ALIAS: statfs64-func int statfs64 ( c-string path, statfs64* buf )
+FUNCTION: int getmntinfo64 ( statfs64** mntbufp, int flags )

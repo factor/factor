@@ -5,7 +5,6 @@ io.encodings.binary io.servers io.sockets
 io.streams.duplex fry kernel locals math math.ranges multiline
 namespaces prettyprint random sequences sets splitting threads
 tools.continuations ;
-FROM: namespaces => set ;
 IN: managed-server
 
 TUPLE: managed-server < threaded-server clients ;
@@ -32,7 +31,7 @@ M: managed-server handle-client-disconnect ;
 : client-streams ( -- assoc ) clients values ;
 : username ( -- string ) client username>> ;
 : everyone-else ( -- assoc )
-    clients [ drop username = not ] assoc-filter ;
+    clients [ drop username = ] assoc-reject ;
 : everyone-else-streams ( -- assoc ) everyone-else values ;
 
 ERROR: no-such-client username ;
@@ -78,7 +77,7 @@ PRIVATE>
     [ username server clients>> delete-at ] when-logged-in ;
 
 : handle-managed-client ( -- )
-    handle-login <managed-client> managed-client set
+    handle-login <managed-client> managed-client namespaces:set
     maybe-login-client [
         handle-client-join
         [ handle-managed-client* client quit?>> not ] loop
@@ -93,7 +92,7 @@ PRIVATE>
 PRIVATE>
 
 M: managed-server handle-client*
-    managed-server set
+    managed-server namespaces:set
     [ handle-managed-client ]
     [ cleanup-client ]
     [ ] cleanup ;
@@ -102,5 +101,10 @@ M: managed-server handle-client*
     new-threaded-server
         swap >>name
         swap >>insecure
+        f >>timeout
+        H{ } clone >>clients ; inline
+
+: new-managed-server* ( encoding class -- server )
+    new-threaded-server
         f >>timeout
         H{ } clone >>clients ; inline

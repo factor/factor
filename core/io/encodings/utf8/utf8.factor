@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators io io.encodings
-io.encodings.private kernel math math.order sequences ;
+io.encodings.private kernel math math.order sequences strings ;
 IN: io.encodings.utf8
 
 ! Decoding UTF-8
@@ -84,11 +84,17 @@ M: utf8 decode-until (decode-until) ;
 M: utf8 encode-char
     drop char>utf8 ;
 
-M: utf8 encode-string
-    drop
+GENERIC#: encode-string-utf8 1 ( string stream -- )
+
+M: object encode-string-utf8
+    [ char>utf8 ] curry each ; inline
+
+M: string encode-string-utf8
     over aux>>
-    [ [ char>utf8 ] curry each ]
-    [ [ string>byte-array-fast ] dip stream-write ] if ;
+    [ call-next-method ]
+    [ [ string>byte-array-fast ] dip stream-write ] if ; inline
+
+M: utf8 encode-string drop encode-string-utf8 ;
 
 PRIVATE>
 

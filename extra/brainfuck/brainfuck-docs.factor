@@ -3,13 +3,13 @@
 
 USING: help.syntax help.markup brainfuck strings ;
 
-IN: brainfuck 
+IN: brainfuck
 
 HELP: run-brainfuck
 { $values { "code" string } }
 { $description
     "A brainfuck program is a sequence of eight commands that are "
-    "executed sequentially.  An instruction pointer begins at the first "
+    "executed sequentially. An instruction pointer begins at the first "
     "command, and each command is executed until the program terminates "
     "when the instruction pointer moves beyond the last command.\n"
     "\n"
@@ -45,5 +45,5 @@ HELP: run-brainfuck
 
 HELP: get-brainfuck
 { $values { "code" string } { "result" string } }
-{ $description "Returns the output from a brainfuck program as a result string." }  
+{ $description "Returns the output from a brainfuck program as a result string." }
 { $see-also run-brainfuck } ;

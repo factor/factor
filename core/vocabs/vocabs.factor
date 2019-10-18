@@ -17,7 +17,7 @@ SYMBOL: +running+
 SYMBOL: +done+
 
 : <vocab> ( name -- vocab )
-    \ vocab new
+    vocab new
         swap >>name
         H{ } clone >>words ;
 
@@ -41,25 +41,19 @@ M: vocab-link vocab-name name>> ;
 
 M: object vocab-name check-vocab-name ;
 
-: vocab-name* ( vocab-spec -- name )
-    vocab-name ".private" ?tail drop ;
-
-: private-vocab? ( vocab -- ? )
-    vocab-name ".private" tail? ;
-
 GENERIC: lookup-vocab ( vocab-spec -- vocab )
 
 M: vocab lookup-vocab ;
 
-M: object lookup-vocab ( name -- vocab ) vocab-name dictionary get at ;
+M: object lookup-vocab vocab-name dictionary get at ;
 
-GENERIC: vocab-words ( vocab-spec -- words )
+GENERIC: vocab-words-assoc ( vocab-spec -- assoc/f )
 
-M: vocab vocab-words words>> ;
+M: vocab vocab-words-assoc words>> ;
 
-M: object vocab-words lookup-vocab vocab-words ;
+M: object vocab-words-assoc lookup-vocab vocab-words-assoc ;
 
-M: f vocab-words ;
+M: f vocab-words-assoc ;
 
 GENERIC: vocab-help ( vocab-spec -- help )
 
@@ -91,24 +85,27 @@ GENERIC: vocab-changed ( vocab obj -- )
     vocab-observers get [ vocab-changed ] with each ;
 
 : create-vocab ( name -- vocab )
-    check-vocab-name dictionary get
-    [ <vocab> dup notify-vocab-observers ] cache ;
+    check-vocab-name dictionary get [ <vocab> ] cache
+    dup notify-vocab-observers ;
 
 ERROR: no-vocab name ;
 
-: vocabs ( -- seq )
+: loaded-vocab-names ( -- seq )
     dictionary get keys natural-sort ;
 
-: words ( vocab -- seq )
-    vocab-words values ;
+: vocab-words ( vocab-spec -- seq )
+    vocab-words-assoc values ;
 
 : all-words ( -- seq )
-    dictionary get values [ words ] map concat ;
+    dictionary get values [ vocab-words ] map concat ;
 
 : words-named ( str -- seq )
-    dictionary get values
-    [ vocab-words at ] with map
-    sift ;
+    dictionary get
+    [ values [ vocab-words-assoc at ] with map sift ]
+    [
+        [ ":" split1 swap ] dip at
+        [ vocab-words-assoc at [ suffix ] when* ] [ drop ] if*
+    ] 2bi ;
 
 : child-vocab? ( prefix name -- ? )
     swap [ drop t ] [
@@ -119,8 +116,8 @@ ERROR: no-vocab name ;
         ] if
     ] if-empty ;
 
-: child-vocabs ( vocab -- seq )
-    vocab-name vocabs [ child-vocab? ] with filter ;
+: loaded-child-vocab-names ( vocab-spec -- seq )
+    vocab-name loaded-vocab-names [ child-vocab? ] with filter ;
 
 GENERIC: >vocab-link ( name -- vocab )
 
@@ -129,7 +126,7 @@ M: vocab-spec >vocab-link ;
 M: object >vocab-link dup lookup-vocab [ ] [ <vocab-link> ] ?if ;
 
 : forget-vocab ( vocab -- )
-    [ words forget-all ]
+    [ vocab-words forget-all ]
     [ vocab-name dictionary get delete-at ]
     [ notify-vocab-observers ] tri ;
 
@@ -142,27 +139,20 @@ PREDICATE: runnable-vocab < vocab
 
 INSTANCE: vocab-spec definition-mixin
 
-: call-require-hook ( name -- )
-    require-hook get call( name -- ) ;
-
 GENERIC: require ( object -- )
 
 M: vocab require name>> require ;
+
 M: vocab-link require name>> require ;
 
-! When calling "foo.private" require, load "foo" instead, but only when
-! "foo.private" does not exist. The reason for this is that stage1 bootstrap
-! starts out with some .private vocabs that contain primitives, and
-! loading the public vocabs would cause circularity issues.
-M: string require ( vocab -- )
-    dup ".private" ?tail [
-        over lookup-vocab
-        [ 2drop ]
-        [ nip call-require-hook ]
-        if
-    ] [
-        nip call-require-hook
-    ] if ;
+! When calling "foo.private" require, load "foo" instead, but
+! only when "foo.private" does not exist. The reason for this is
+! that stage1 bootstrap starts out with some .private vocabs
+! that contain primitives, and loading the public vocabs would
+! cause circularity issues.
+M: string require
+    [ ".private" ?tail ] keep swap [ lookup-vocab not ] when
+    [ require-hook get call( name -- ) ] [ drop ] if ;
 
 : load-vocab ( name -- vocab )
     [ require ] [ lookup-vocab ] bi ;

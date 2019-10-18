@@ -44,8 +44,8 @@ M: quotation uses-vars* [ uses-vars* ] each ;
     [ uses-vars ] [ defs-vars ] bi diff ;
 
 M: callable rewrite-closures*
-    #! Turn free variables into bound variables, curry them
-    #! onto the body
+    ! Turn free variables into bound variables, curry them
+    ! onto the body
     dup free-vars [ <quote> ] map
     [ % ]
     [ var-defs prepend (rewrite-closures) point-free , ]

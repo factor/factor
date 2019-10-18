@@ -102,7 +102,7 @@ TUPLE: vbo
         B{ 0 0 0 } >>bitmap ;
 
 : make-texture ( pathname alt -- texture )
-    swap [ nip load-image ] [ ] if*
+    swap [ nip load-image ] when*
     [
         [ component-order>> ]
         [ component-type>> ] bi
@@ -113,7 +113,7 @@ TUPLE: vbo
         <texture-2d>
     ]
     [
-        0 swap [ allocate-texture-image ] 3keep 2drop
+        0 swap [ allocate-texture-image ] keepdd
     ] bi ;
 
 : <model-buffers> ( models -- buffers )
@@ -166,13 +166,13 @@ TUPLE: vbo
     ] 3map ;
 
 : clear-screen ( -- )
-    0 0 0 0 glClearColor 
+    0 0 0 0 glClearColor
     1 glClearDepth
     0xffffffff glClearStencil
     flags{ GL_COLOR_BUFFER_BIT
       GL_DEPTH_BUFFER_BIT
       GL_STENCIL_BUFFER_BIT } glClear ;
-    
+
 : draw-model ( world -- )
     clear-screen
     face-ccw cull-back <triangle-cull-state> set-gpu-state
@@ -184,8 +184,8 @@ TUPLE: vbo
     [
         {
             { "primitive-mode"     [ 3drop triangles-mode ] }
-            { "uniforms"           [ nip nip ] }
-            { "vertex-array"       [ drop drop ] }
+            { "uniforms"           [ 2nip ] }
+            { "vertex-array"       [ 2drop ] }
             { "indexes"            [ drop nip ] }
         } 3<render-set> render
     ] 3each ;

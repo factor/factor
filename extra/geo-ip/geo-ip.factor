@@ -33,7 +33,7 @@ TUPLE: ip-entry from to registry assigned city cntry country ;
 
 MEMO: ip-db ( -- seq )
     download-db ascii file-lines
-    [ "#" head? not ] filter "\n" join string>csv
+    [ "#" head? ] reject "\n" join string>csv
     [ parse-ip-entry ] map ;
 
 : filter-overlaps ( alist -- alist' )

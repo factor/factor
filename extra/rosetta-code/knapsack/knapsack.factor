@@ -53,12 +53,12 @@ CONSTANT: items {
         T{ item f "socks" 4 50 }
         T{ item f "book" 30 10 }
     }
- 
+
 CONSTANT: limit 400
- 
+
 : make-table ( -- table )
     items length 1 + [ limit 1 + 0 <array> ] replicate ;
- 
+
 :: iterate ( item-no table -- )
     item-no table nth :> prev
     item-no 1 + table nth :> curr
@@ -72,13 +72,13 @@ CONSTANT: limit 400
     ] each ;
 
 : fill-table ( table -- )
-    [ items length iota ] dip
+    [ items length <iota> ] dip
     '[ _ iterate ] each ;
 
 :: extract-packed-items ( table -- items )
     [
         limit :> weight!
-        items length iota <reversed> [| item-no |
+        items length <iota> <reversed> [| item-no |
             item-no table nth :> prev
             item-no 1 + table nth :> curr
             weight [ curr nth ] [ prev nth ] bi =

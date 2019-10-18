@@ -32,7 +32,7 @@ CONSTANT: empty-lexenv T{ lexenv }
 : ivar-reader ( name lexenv -- quot/f )
     dup class>> [
         [ class>> "slots" word-prop slot-named ] [ self>> ] bi
-        swap dup [ name>> reader-word [ ] 2sequence ] [ 2drop f ] if
+        swap [ name>> reader-word [ ] 2sequence ] [ drop f ] if*
     ] [ 2drop f ] if ;
 
 : class-name ( name -- quot/f )
@@ -56,7 +56,7 @@ M: bad-identifier summary drop "Unknown identifier" ;
 : ivar-writer ( name lexenv -- quot/f )
     dup class>> [
         [ class>> "slots" word-prop slot-named ] [ self>> ] bi
-        swap dup [ name>> writer-word [ ] 2sequence ] [ 2drop f ] if
+        swap [ name>> writer-word [ ] 2sequence ] [ drop f ] if*
     ] [ 2drop f ] if ;
 
 : lookup-writer ( name lexenv -- writer-quot )

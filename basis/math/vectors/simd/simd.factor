@@ -9,7 +9,6 @@ QUALIFIED-WITH: alien.c-types c
 IN: math.vectors.simd
 
 ERROR: bad-simd-length got expected ;
-
 ERROR: bad-simd-vector obj ;
 
 <<
@@ -264,7 +263,7 @@ M: simd-128 pprint* pprint-object ;
 
 ! SIMD concrete type functor
 
-FUNCTOR: define-simd-128 ( T -- )
+<FUNCTOR: define-simd-128 ( T -- )
 
 A      DEFINES-CLASS ${T}
 A-rep  IS            ${T}-rep
@@ -330,7 +329,7 @@ c:<c-type>
     A-rep >>rep
 \ A c:typedef
 
-;FUNCTOR
+;FUNCTOR>
 
 SYNTAX: SIMD-128:
     scan-token define-simd-128 ;

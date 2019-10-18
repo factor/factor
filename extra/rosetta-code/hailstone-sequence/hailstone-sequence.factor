@@ -53,4 +53,3 @@ IN: rosetta-code.hailstone-sequence
     " has length " write pprint "." print ;
 
 MAIN: hailstone-main
-

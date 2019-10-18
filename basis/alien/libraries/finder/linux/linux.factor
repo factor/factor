@@ -3,7 +3,7 @@
 USING: alien.libraries.finder arrays assocs
 combinators.short-circuit io io.encodings.utf8 io.files
 io.files.info io.launcher kernel sequences sets splitting system
-unicode.categories ;
+unicode ;
 IN: alien.libraries.finder.linux
 
 <PRIVATE
@@ -20,7 +20,7 @@ CONSTANT: mach-map {
         [
             " " split1 [ "()" in? ] trim "," split
             [ [ blank? ] trim ] map
-            [ "OS ABI:" head? not ] filter
+            [ ": Linux" swap subseq? ] reject
         ] dip 3array
     ] map ;
 
@@ -40,13 +40,8 @@ CONSTANT: mach-map {
 : ldconfig-matches? ( lib triple -- ? )
     { [ name-matches? ] [ arch-matches? ] } 2&& ;
 
-: ldconfig-find-soname ( lib -- seq )
-    load-ldconfig-cache [ ldconfig-matches? ] with filter
-    [ third ] map ;
-
 PRIVATE>
 
 M: linux find-library*
-    "lib" prepend ldconfig-find-soname [
-        { [ exists? ] [ file-info regular-file? ] } 1&&
-    ] map-find nip ;
+    "lib" prepend load-ldconfig-cache
+    [ ldconfig-matches? ] with find nip ?first ;

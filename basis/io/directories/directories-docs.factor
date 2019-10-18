@@ -17,7 +17,12 @@ HELP: cd
 HELP: current-directory
 { $description "A variable holding the current directory as an absolute path. Words that use the filesystem do so in relation to this variable."
 $nl
-"This variable should never be set directly; instead, use " { $link set-current-directory } " or " { $link with-directory } ". This preserves the invariant that the value of this variable is an absolute path." } ;
+  "This variable should never be set directly; instead, use " { $link set-current-directory } " or " { $link with-directory } ". This preserves the invariant that the value of this variable is an absolute path." } ;
+
+HELP: make-parent-directories
+{ $values { "filename" "a pathname string" } }
+{ $description "Creates all parent directories of the path which do not yet exist." }
+{ $errors "Throws an error if the directories could not be created." } ;
 
 HELP: set-current-directory
 { $values { "path" "a pathname string" } }
@@ -40,29 +45,37 @@ HELP: directory-entries
 { $values { "path" "a pathname string" } { "seq" "a sequence of " { $link directory-entry } " objects" } }
 { $description "Outputs the contents of a directory named by " { $snippet "path" } "." } ;
 
+HELP: qualified-directory-entries
+{ $values { "path" "a pathname string" } { "seq" "a sequence of " { $link directory-entry } " objects" } }
+{ $description "Outputs the contents of a directory named by " { $snippet "path" } " using absolute file paths." } ;
+
 HELP: directory-files
 { $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }
-{ $description "Outputs the contents of a directory named by " { $snippet "path" } "." } ;
+{ $description "Outputs the contents of a directory named by " { $snippet "path" } " as a sequence of filenames." } ;
+
+HELP: qualified-directory-files
+{ $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }
+{ $description "Outputs the contents of a directory named by " { $snippet "path" } " as a sequence of absolute paths." } ;
 
 HELP: with-directory-files
 { $values { "path" "a pathname string" } { "quot" quotation } }
-{ $description "Calls the quotation with the directory file names on the stack and with the directory set as the " { $link current-directory } ".  Restores the current directory after the quotation is called." }
+{ $description "Calls the quotation with the directory file names on the stack and with the directory set as the " { $link current-directory } ". Restores the current directory after the quotation is called." }
 { $examples
     "Print all files in your home directory which are larger than a megabyte:"
     { $code
-        """USING: io.directories io.files.info io.pathnames ;
+        "USING: io.directories io.files.info io.pathnames ;
 home [
     [
         dup link-info size>> 20 2^ >
         [ print ] [ drop ] if
     ] each
-] with-directory-files"""
+] with-directory-files"
     }
 } ;
 
 HELP: with-directory-entries
 { $values { "path" "a pathname string" } { "quot" quotation } }
-{ $description "Calls the quotation with the directory entries on the stack and with the directory set as the " { $link current-directory } ".  Restores the current directory after the quotation is called." } ;
+{ $description "Calls the quotation with the directory entries on the stack and with the directory set as the " { $link current-directory } ". Restores the current directory after the quotation is called." } ;
 
 HELP: delete-file
 { $values { "path" "a pathname string" } }
@@ -91,7 +104,13 @@ HELP: touch-file
 
 HELP: move-file
 { $values { "from" "a pathname string" } { "to" "a pathname string" } }
-{ $description "Moves or renames a file." }
+{ $description "Moves or renames a file. This operation is not guaranteed to be atomic. In particular, if you attempt to move a file across volumes, this will copy the file and then delete the original in a nontransactional manner." }
+{ $errors "Throws an error if the file does not exist or if the move operation fails." }
+{ $see-also move-file-atomically } ;
+
+HELP: move-file-atomically
+{ $values { "from" "a pathname string" } { "to" "a pathname string" } }
+{ $description "Moves or renames a file as an atomic operation." }
 { $errors "Throws an error if the file does not exist or if the move operation fails." } ;
 
 HELP: move-file-into
@@ -143,6 +162,10 @@ ARTICLE: "io.directories.listing" "Directory listing"
     directory-files
     with-directory-entries
     with-directory-files
+    qualified-directory-entries
+    qualified-directory-files
+    with-qualified-directory-files
+    with-qualified-directory-entries
 } ;
 
 ARTICLE: "io.directories.create" "Creating directories"

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: peg peg.ebnf smalltalk.ast sequences sequences.deep strings
-math.parser kernel arrays byte-arrays math assocs accessors ;
+math.parser multiline kernel arrays byte-arrays math assocs accessors ;
 IN: smalltalk.parser
 
 ! :mode=text:noTabs=true:
@@ -13,10 +13,10 @@ ERROR: bad-number str ;
 : check-number ( str -- n )
     >string dup string>number [ ] [ bad-number ] ?if ;
 
-EBNF: parse-smalltalk
+EBNF: parse-smalltalk [=[
 
 Character = .
-WhitespaceCharacter = (" " | "\t" | "\n" | "\r" )
+WhitespaceCharacter = [ \t\n\r]
 DecimalDigit = [0-9]
 Letter = [A-Za-z]
 
@@ -27,7 +27,7 @@ OptionalWhiteSpace = (WhitespaceCharacter | Comment)*
 Whitespace = (WhitespaceCharacter | Comment)+
 
 LetterOrDigit = DecimalDigit | Letter
-Identifier = (Letter | "_"):h (LetterOrDigit | "_")*:t => [[ { h t } flatten >string ]]
+Identifier = (Letter | [_]):h (LetterOrDigit | [_])*:t => [[ h 1string t append ]]
 Reference = Identifier => [[ ast-name boa ]]
 
 ConstantReference =   "nil" => [[ nil ]]
@@ -45,7 +45,7 @@ Keyword = Identifier:i ":" => [[ i ":" append ]]
 
 KeywordMessageSelector = Keyword+ => [[ concat ]]
 BinarySelectorChar =   "~" | "!" | "@" | "%" | "&" | "*" | "-" | "+"
-                     | "=" | "|" | "\" | "<" | ">" | "," | "?" | "/"
+                     | "=" | "|" | "\\" | "<" | ">" | "," | "?" | "/"
 BinaryMessageSelector = BinarySelectorChar+ => [[ concat ]]
 
 OptionalMinus = ("-" => [[ CHAR: - ]])?
@@ -225,4 +225,4 @@ End = !(.)
 
 Program = TopLevelForm End
 
-;EBNF
+]=]

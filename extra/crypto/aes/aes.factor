@@ -8,12 +8,12 @@ sequences.unrolled ;
 IN: crypto.aes
 
 CONSTANT: AES_BLOCK_SIZE 16
-#! FIPS-197 AES
-#! input block, state, output block -- 4 32-bit words
+! FIPS-197 AES
+! input block, state, output block -- 4 32-bit words
 CONSTANT: FIPS-197 {
-    { 128 10 } #! aes-128 -- Key(4) Block(4) Rounds(10)
-    { 192 12 } #! aes-192 -- Key(6) Block(4) Rounds(12)
-    { 256 14 } #! aes-256 -- Key(8) Block(4) Rounds(14)
+    { 128 10 } ! aes-128 -- Key(4) Block(4) Rounds(10)
+    { 192 12 } ! aes-192 -- Key(6) Block(4) Rounds(12)
+    { 256 14 } ! aes-256 -- Key(8) Block(4) Rounds(14)
 }
 
 <PRIVATE
@@ -61,19 +61,19 @@ CONSTANT: FIPS-197 {
     256 0 <array>
     dup 256 [ dup sbox nth rot set-nth ] with each-integer ;
 
-#! applies sbox to each byte of word
+! applies sbox to each byte of word
 : subword ( word -- word' )
     [ gb0 sbox nth ] keep [ gb1 sbox nth ] keep
     [ gb2 sbox nth ] keep gb3 sbox nth >ui32 ;
 
-#! applies inverse sbox to each byte of word
+! applies inverse sbox to each byte of word
 : inv-subword ( word -- word' )
     [ gb0 inv-sbox nth ] keep [ gb1 inv-sbox nth ] keep
     [ gb2 inv-sbox nth ] keep gb3 inv-sbox nth >ui32 ;
 
 : rotword ( n -- n ) 8 bitroll-32 ;
 
-#! round constants, 2^n over GF(2^8)
+! round constants, 2^n over GF(2^8)
 : rcon ( -- array )
     {
         0x00 0x01 0x02 0x04 0x08 0x10
@@ -82,12 +82,12 @@ CONSTANT: FIPS-197 {
 
 : (rcon-nth) ( n -- rcon[n] ) rcon nth 24 shift ;
 
-#! Galois field product related
+! Galois field product related
 : xtime ( x -- x' )
     [ 1 shift ]
     [ 0x80 bitand 0 = 0 0x1b ? ] bi bitxor 8 bits ;
 
-#! generate t-box
+! generate t-box
 :: set-t ( T i -- )
     i sbox nth :> a1
     a1 xtime :> a2
@@ -102,13 +102,13 @@ MEMO:: t-table ( -- array )
     1024 0 <array>
     dup 256 [ set-t ] with each-integer ;
 
-#! generate inverse t-box
+! generate inverse t-box
 :: set-d ( D i -- )
     i inv-sbox nth :> a1
     a1 xtime :> a2
     a2 xtime :> a4
     a4 xtime :> a8
-    a8 a1 bitxor :> a9 
+    a8 a1 bitxor :> a9
     a9 a2 bitxor :> ab
     a9 a4 bitxor :> ad
     a8 a4 a2 bitxor bitxor :> ae
@@ -132,8 +132,8 @@ MEMO:: d-table ( -- array )
 : t-transform ( a0 a1 a2 a3 -- word' ) t-table (transform) ;
 : d-transform ( a0 a1 a2 a3 -- word' ) d-table (transform) ;
 
-#! key schedule
-#! expands an 128/192/256 bit key into an 176/208/240 byte schedule
+! key schedule
+! expands an 128/192/256 bit key into an 176/208/240 byte schedule
 
 SYMBOL: aes-expand-inner
 HOOK: key-expand-round aes-expand-inner  ( temp i -- temp' )
@@ -147,16 +147,16 @@ SINGLETON: aes-256-key
 M: aes-128-key key-expand-round ( temp i -- temp' )
     4 /mod 0 = swap and [ (add-rcon) ] when* ;
 
-ERROR: aes-192-256-not-implemented* ;
+ERROR: aes-192-256-not-implemented ;
 M: aes-256-key key-expand-round ( temp i -- temp' )
-    aes-192-256-not-implemented* ;
+    aes-192-256-not-implemented ;
 
 : (key-sched-round) ( output temp i -- output' )
     key-expand-round
     [ dup 4th-from-end ] dip bitxor suffix! ; inline
 
 : (sched-interval) ( K Nr -- seq )
-    [ length ] dip 1 + 4 * [a,b) ;    #! over the interval Nk...Nb(Nr + 1)
+    [ length ] dip 1 + 4 * [a,b) ;    ! over the interval Nk...Nb(Nr + 1)
 
 : (init-round) ( out -- out temp quot )
     [ ]
@@ -166,8 +166,8 @@ M: aes-256-key key-expand-round ( temp i -- temp' )
         6 > [ aes-256-key ] [ aes-128-key ] if
     ] tri ;
 
-#! K -- input key (byte-array), Nr -- number of rounds
-#! output: sched, Nb(Nr+1) byte key schedule
+! K -- input key (byte-array), Nr -- number of rounds
+! output: sched, Nb(Nr+1) byte key schedule
 : (expand-enc-key) ( K Nr -- sched )
     [ bytes>words ] dip
     [ drop (init-round) ]
@@ -180,9 +180,9 @@ M: aes-256-key key-expand-round ( temp i -- temp' )
 
 TUPLE: aes-state nrounds key state ;
 
-: <aes> ( nrounds key state -- aes-state ) \ aes-state boa ; 
+: <aes> ( nrounds key state -- aes-state ) \ aes-state boa ;
 
-#! grabs the 4n...4(n+1) words of the key
+! grabs the 4n...4(n+1) words of the key
 : (key-at-nth-round) ( nth aes -- seq )
     [ 4 * dup 4 + ] [ key>> ] bi* <slice> ;
 
@@ -190,37 +190,37 @@ SYMBOL: aes-strategy
 HOOK: (expand-key) aes-strategy ( K Nr -- sched )
 HOOK: (first-round) aes-strategy ( aes -- aes' )
 HOOK: (counter) aes-strategy ( nrounds -- seq )
-HOOK: (round) aes-strategy ( state -- ) 
+HOOK: (round) aes-strategy ( state -- )
 HOOK: (add-key) aes-strategy ( aes -- aes' )
-HOOK: (final-round) aes-strategy ( aes -- aes' ) 
+HOOK: (final-round) aes-strategy ( aes -- aes' )
 
 SINGLETON: aes-decrypt
 SINGLETON: aes-encrypt
 
 
-#! rotates the 2nd row left by one element
-#! rotates the 3rd row left by two elements
-#! rotates the 4th row left by three elements
-#!
-#! Kind of ugly because the algorithm is specified and
-#! implemented in terms of columns. This approach is very
-#! efficient in terms of execution and only requires one new
-#! word to implement.
-#!
-#! The alternative is to split into arrays of bytes, transpose,
-#! rotate each row n times, transpose again, and then
-#! smash them back into 4-byte words.
+! rotates the 2nd row left by one element
+! rotates the 3rd row left by two elements
+! rotates the 4th row left by three elements
+!
+! Kind of ugly because the algorithm is specified and
+! implemented in terms of columns. This approach is very
+! efficient in terms of execution and only requires one new
+! word to implement.
+!
+! The alternative is to split into arrays of bytes, transpose,
+! rotate each row n times, transpose again, and then
+! smash them back into 4-byte words.
 :: (shift-rows) ( c0 c1 c2 c3 -- c0' c1' c2' c3' )
-    c3 gb0   c2 gb1   c1 gb2   c0 gb3   >ui32   #! c0'
-    c0 gb0   c3 gb1   c2 gb2   c1 gb3   >ui32   #! c1'
-    c1 gb0   c0 gb1   c3 gb2   c2 gb3   >ui32   #! c2'
-    c2 gb0   c1 gb1   c0 gb2   c3 gb3   >ui32 ; #! c3'
+    c3 gb0   c2 gb1   c1 gb2   c0 gb3   >ui32   ! c0'
+    c0 gb0   c3 gb1   c2 gb2   c1 gb3   >ui32   ! c1'
+    c1 gb0   c0 gb1   c3 gb2   c2 gb3   >ui32   ! c2'
+    c2 gb0   c1 gb1   c0 gb2   c3 gb3   >ui32 ; ! c3'
 
 :: (unshift-rows) ( c0 c1 c2 c3 -- c0' c1' c2' c3' )
-    c1 gb0   c2 gb1   c3 gb2   c0 gb3   >ui32   #! c0'
-    c2 gb0   c3 gb1   c0 gb2   c1 gb3   >ui32   #! c1'
-    c3 gb0   c0 gb1   c1 gb2   c2 gb3   >ui32   #! c2'
-    c0 gb0   c1 gb1   c2 gb2   c3 gb3   >ui32 ; #! c3'
+    c1 gb0   c2 gb1   c3 gb2   c0 gb3   >ui32   ! c0'
+    c2 gb0   c3 gb1   c0 gb2   c1 gb3   >ui32   ! c1'
+    c3 gb0   c0 gb1   c1 gb2   c2 gb3   >ui32   ! c2'
+    c0 gb0   c1 gb1   c2 gb2   c3 gb3   >ui32 ; ! c3'
 
 : (add-round-key) ( key state -- state' )
    4 [ bitxor ] unrolled-2map ;
@@ -266,8 +266,7 @@ M:: aes-decrypt (expand-key) ( K Nr -- sched )
     K Nr (expand-enc-key) dup length :> key-length
     [
         [ 4 >= ] [ key-length 4 - < ] bi and
-        [ subword ui32-rev> d-transform ]
-        [ ] if
+        [ subword ui32-rev> d-transform ] when
     ] map-index ;
 
 M: aes-decrypt (first-round) ( aes -- aes' )
@@ -299,7 +298,7 @@ M: aes-decrypt (round) ( state -- )
 
 : (aes-crypt-block-inner) ( nrounds key block -- crypted-block )
     <aes> (aes-crypt) state>> ;
-    
+
 : (aes-crypt-block) ( key block -- output-block )
     [ (aes-expand-key) ] dip bytes>words (aes-crypt-block-inner) ;
 

@@ -12,3 +12,5 @@ ARTICLE: "colors.ryb" "RYB colors"
     >ryba
 }
 { $see-also "colors" } ;
+
+ABOUT: "colors.ryb"

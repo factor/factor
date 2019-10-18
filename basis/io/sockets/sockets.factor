@@ -8,7 +8,7 @@ grouping init io.backend io.binary io.encodings.ascii
 io.encodings.binary io.pathnames io.ports io.streams.duplex
 kernel locals math math.parser memoize namespaces present
 sequences sequences.private splitting strings summary system
-vocabs vocabs.parser ;
+vocabs vocabs.parser ip-parser ip-parser.private random ;
 IN: io.sockets
 
 << {
@@ -16,7 +16,7 @@ IN: io.sockets
     { [ os unix? ] [ "unix.ffi" ] }
 } cond use-vocab >>
 
-GENERIC# with-port 1 ( addrspec port -- addrspec )
+GENERIC#: with-port 1 ( addrspec port -- addrspec )
 
 ! Addressing
 <PRIVATE
@@ -29,6 +29,8 @@ GENERIC: sockaddr-size ( addrspec -- n )
 
 GENERIC: make-sockaddr ( addrspec -- sockaddr )
 
+GENERIC: make-sockaddr-outgoing ( addrspec -- sockaddr )
+
 GENERIC: empty-sockaddr ( addrspec -- sockaddr )
 
 GENERIC: address-size ( addrspec -- n )
@@ -37,11 +39,16 @@ GENERIC: inet-ntop ( data addrspec -- str )
 
 GENERIC: inet-pton ( str addrspec -- data )
 
+: make-sockaddr/size-outgoing ( addrspec -- sockaddr size )
+    [ make-sockaddr-outgoing ] [ sockaddr-size ] bi ;
+
 : make-sockaddr/size ( addrspec -- sockaddr size )
     [ make-sockaddr ] [ sockaddr-size ] bi ;
 
 : empty-sockaddr/size ( addrspec -- sockaddr size )
     [ empty-sockaddr ] [ sockaddr-size ] bi ;
+
+M: object make-sockaddr-outgoing make-sockaddr ;
 
 GENERIC: parse-sockaddr ( sockaddr addrspec -- newaddrspec )
 
@@ -68,32 +75,25 @@ TUPLE: ipv4 { host maybe{ string } read-only } ;
 
 <PRIVATE
 
-ERROR: invalid-ipv4 string reason ;
+ERROR: invalid-ipv4 host reason ;
 
 M: invalid-ipv4 summary drop "Invalid IPv4 address" ;
 
-ERROR: malformed-ipv4 sequence ;
+: ?parse-ipv4 ( string -- seq/f )
+    [ f ] [ parse-ipv4 ] if-empty ;
 
-ERROR: bad-ipv4-component string ;
-
-: parse-ipv4 ( string -- seq )
-    [ f ] [
-        "." split dup length 4 = [ malformed-ipv4 ] unless
-        [ dup string>number [ ] [ bad-ipv4-component ] ?if ] B{ } map-as
-    ] if-empty ;
-
-: check-ipv4 ( string -- )
-    [ parse-ipv4 drop ] [ invalid-ipv4 ] recover ;
+: check-ipv4 ( host -- )
+    [ ?parse-ipv4 drop ] [ invalid-ipv4 ] recover ;
 
 PRIVATE>
 
 : <ipv4> ( host -- ipv4 ) dup check-ipv4 ipv4 boa ;
 
 M: ipv4 inet-ntop ( data addrspec -- str )
-    drop 4 memory>byte-array [ number>string ] { } map-as "." join ;
+    drop 4 memory>byte-array join-ipv4 ;
 
 M: ipv4 inet-pton ( str addrspec -- data )
-    drop [ parse-ipv4 ] [ invalid-ipv4 ] recover ;
+    drop [ ?parse-ipv4 ] [ invalid-ipv4 ] recover ;
 
 M: ipv4 address-size drop 4 ;
 
@@ -103,13 +103,21 @@ M: ipv4 sockaddr-size drop sockaddr-in heap-size ;
 
 M: ipv4 empty-sockaddr drop sockaddr-in <struct> ;
 
-M: ipv4 make-sockaddr ( inet -- sockaddr )
+: make-sockaddr-part ( inet -- sockaddr )
     sockaddr-in <struct>
         AF_INET >>family
         swap
-        [ port>> htons >>port ]
-        [ host>> "0.0.0.0" or ]
-        [ inet-pton uint deref >>addr ] tri ;
+        port>> htons >>port ; inline
+
+M: ipv4 make-sockaddr ( inet -- sockaddr )
+    [ make-sockaddr-part ]
+    [ host>> "0.0.0.0" or ]
+    [ inet-pton uint deref >>addr ] tri ;
+
+M: ipv4 make-sockaddr-outgoing ( inet -- sockaddr )
+    [ make-sockaddr-part ]
+    [ host>> dup { f "0.0.0.0" } member? [ drop "127.0.0.1" ] when ]
+    [ inet-pton uint deref >>addr ] tri ;
 
 M: ipv4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
     [ addr>> uint <ref> ] dip inet-ntop <ipv4> ;
@@ -139,27 +147,8 @@ ERROR: invalid-ipv6 host reason ;
 
 M: invalid-ipv6 summary drop "Invalid IPv6 address" ;
 
-ERROR: bad-ipv6-component obj ;
-
-ERROR: bad-ipv4-embedded-prefix obj ;
-
-ERROR: more-than-8-components ;
-
-: parse-ipv6-component ( seq -- seq' )
-    [ dup hex> [ nip ] [ bad-ipv6-component ] if* ] { } map-as ;
-
-: parse-ipv6 ( string -- seq )
-    [ f ] [
-        ":" split CHAR: . over last member? [
-            unclip-last
-            [ parse-ipv6-component ] [ parse-ipv4 ] bi* append
-        ] [
-            parse-ipv6-component
-        ] if
-    ] if-empty ;
-
-: check-ipv6 ( string -- )
-    [ "::" split1 [ parse-ipv6 ] bi@ 2drop ] [ invalid-ipv6 ] recover ;
+: check-ipv6 ( host -- )
+    [ parse-ipv6 drop ] [ invalid-ipv6 ] recover ;
 
 PRIVATE>
 
@@ -170,21 +159,13 @@ M: ipv6 inet-ntop ( data addrspec -- str )
 
 <PRIVATE
 
-: pad-ipv6 ( string1 string2 -- seq )
-    2dup [ length ] bi@ + 8 swap -
-    dup 0 < [ more-than-8-components ] when
-    <byte-array> glue ;
-
 : ipv6-bytes ( seq -- bytes )
     [ 2 >be ] { } map-as B{ } concat-as ;
 
 PRIVATE>
 
 M: ipv6 inet-pton ( str addrspec -- data )
-    drop
-    [ "::" split1 [ parse-ipv6 ] bi@ pad-ipv6 ipv6-bytes ]
-    [ invalid-ipv6 ]
-    recover ;
+    drop [ parse-ipv6 ipv6-bytes ] [ invalid-ipv6 ] recover ;
 
 M: ipv6 address-size drop 16 ;
 
@@ -194,14 +175,23 @@ M: ipv6 sockaddr-size drop sockaddr-in6 heap-size ;
 
 M: ipv6 empty-sockaddr drop sockaddr-in6 <struct> ;
 
-M: ipv6 make-sockaddr ( inet -- sockaddr )
+: make-sockaddr-in6-part ( inet -- sockaddr )
     sockaddr-in6 <struct>
         AF_INET6 >>family
         swap
-        [ port>> htons >>port ]
-        [ [ host>> "::" or ] keep inet-pton >>addr ]
-        [ scope-id>> >>scopeid ]
-        tri ;
+        port>> htons >>port ; inline
+
+M: ipv6 make-sockaddr ( inet -- sockaddr )
+    [ make-sockaddr-in6-part ]
+    [ [ host>> "::" or ] keep inet-pton >>addr ]
+    [ scope-id>> >>scopeid ]
+    tri ;
+
+M: ipv6 make-sockaddr-outgoing ( inet -- sockaddr )
+    [ make-sockaddr-in6-part ]
+    [ [ host>> dup { f "::" } member? [ drop "::1" ] when ] keep inet-pton >>addr ]
+    [ scope-id>> >>scopeid ]
+    tri ;
 
 M: ipv6 parse-sockaddr
     [ [ addr>> ] dip inet-ntop ] [ drop scopeid>> ] 2bi
@@ -251,7 +241,7 @@ SYMBOL: bind-local-address
 
 GENERIC: establish-connection ( client-out remote -- )
 
-GENERIC: ((client)) ( remote -- handle )
+GENERIC: remote>handle ( remote -- handle )
 
 GENERIC: (client) ( remote -- client-in client-out local )
 
@@ -259,7 +249,7 @@ M: array (client) [ (client) 3array ] attempt-all first3 ;
 
 M: object (client) ( remote -- client-in client-out local )
     [
-        [ ((client)) ] keep
+        [ remote>handle ] keep
         [
             [ <ports> [ |dispose ] bi@ dup ] dip
             establish-connection
@@ -288,20 +278,20 @@ HOOK: (receive-unsafe) io-backend ( n buf datagram -- count addrspec )
 
 ERROR: invalid-port object ;
 
-: check-port ( packet addrspec port -- packet addrspec port )
+: check-port ( bytes addrspec port -- bytes addrspec port )
     2dup addr>> [ class-of ] bi@ assert=
     pick class-of byte-array assert= ;
 
 : check-connectionless-port ( port -- port )
     dup { [ datagram-port? ] [ raw-port? ] } 1|| [ invalid-port ] unless ;
 
-: check-send ( packet addrspec port -- packet addrspec port )
-    check-connectionless-port dup check-disposed check-port ;
+: check-send ( bytes addrspec port -- bytes addrspec port )
+    check-connectionless-port check-disposed check-port ;
 
 : check-receive ( port -- port )
-    check-connectionless-port dup check-disposed ;
+    check-connectionless-port check-disposed ;
 
-HOOK: (send) io-backend ( packet addrspec datagram -- )
+HOOK: (send) io-backend ( bytes addrspec datagram -- )
 
 : addrinfo>addrspec ( addrinfo -- addrspec )
     [ [ addr>> ] [ family>> ] bi sockaddr-of-family ]
@@ -375,7 +365,7 @@ SYMBOL: remote-address
 
 CONSTANT: datagram-size 65536
 
-:: receive ( datagram -- packet addrspec )
+:: receive ( datagram -- bytes addrspec )
     datagram-size (byte-array) :> buf
     datagram-size buf datagram
     receive-unsafe :> ( count addrspec )
@@ -386,7 +376,7 @@ CONSTANT: datagram-size 65536
     n buf datagram receive-unsafe :> ( count addrspec )
     buf count head-slice addrspec ; inline
 
-: send ( packet addrspec datagram -- )
+: send ( bytes addrspec datagram -- )
     check-send (send) ; inline
 
 MEMO: ipv6-supported? ( -- ? )
@@ -442,10 +432,7 @@ M: object resolve-localhost
     { T{ ipv4 f "0.0.0.0" } }
     ? ;
 
-: host-name ( -- string )
-    256 <byte-array> dup dup length gethostname
-    zero? [ "gethostname failed" throw ] unless
-    ascii alien>string ;
+HOOK: host-name os ( -- string )
 
 M: inet (client) resolve-host (client) ;
 
@@ -471,6 +458,34 @@ M: invalid-local-address summary
 
 : protocol-port ( protocol -- port )
     [ f getservbyname [ port>> htons ] [ f ] if* ] [ f ] if* ;
+
+: port-protocol ( port -- protocol )
+    [ htons f getservbyport [ name>> ] [ f ] if* ] [ f ] if* ;
+
+: <any-port-local-inet4> ( -- inet4 ) f 0 <inet4> ;
+: <any-port-local-inet6> ( -- inet6 ) f 0 <inet6> ;
+
+GENERIC: <any-port-local-inet> ( inet -- inet4 )
+M: inet4 <any-port-local-inet> drop <any-port-local-inet4> ;
+M: inet6 <any-port-local-inet> drop f 0 <inet6> ;
+
+: <any-port-local-datagram> ( inet -- datagram )
+    <any-port-local-inet> <datagram> ;
+
+: <any-port-local-broadcast> ( inet -- datagram )
+    <any-port-local-inet> <broadcast> ;
+
+: with-any-port-local-datagram ( quot -- )
+    [ dup <any-port-local-datagram> ] dip with-disposal ; inline
+
+: with-any-port-local-broadcast ( quot -- )
+    [ dup <any-port-local-broadcast> ] dip with-disposal ; inline
+
+: send-once ( bytes addrspec -- )
+    [ send ] with-any-port-local-datagram ;
+
+: broadcast-once ( bytes addrspec -- )
+    [ send ] with-any-port-local-broadcast ;
 
 {
     { [ os unix? ] [ "io.sockets.unix" require ] }

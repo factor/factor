@@ -1,8 +1,9 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files io.pathnames kernel tools.test io.backend
-io.files.windows splitting sequences io.pathnames.private ;
-IN: io.files.windows.tests
+USING: combinators continuations io.backend io.directories io.files
+io.files.temp io.files.windows io.pathnames kernel kernel.private libc
+literals memory sequences splitting tools.test windows.kernel32
+io.files.unique destructors ;
 
 [ f ] [ "\\foo" absolute-path? ] unit-test
 [ t ] [ "\\\\?\\c:\\foo" absolute-path? ] unit-test
@@ -58,3 +59,30 @@ IN: io.files.windows.tests
 
 [ "c:\\blah" ] [ "c:\\foo\\bar" "\\blah" append-path ] unit-test
 [ t ] [ "" resource-path 2 tail exists? ] unit-test
+
+! win32-file-attributes
+{
+    { +read-only+ +hidden+ }
+} [
+    3 win32-file-attributes
+] unit-test
+
+! set-file-attributes & save-image
+{ ${ KERNEL-ERROR ERROR-IO EIO f } } [
+    [
+        "read-only.image" temp-file {
+            [ ?delete-file ]
+            [ touch-file ]
+            [ FILE_ATTRIBUTE_READONLY set-file-attributes ]
+            [ save-image ]
+        } cleave
+    ] [ ] recover
+] unit-test
+
+! test that we can open a shared file
+! https://github.com/factor/factor/pull/1636
+{ } [
+    "open-file-" "-test.txt" [
+        [ open-write ] [ open-read ] bi [ dispose ] bi@
+    ] cleanup-unique-file
+] unit-test

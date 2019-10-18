@@ -1,7 +1,23 @@
-! Copyright (C) 2009 Matthew Willis.
-! See http://factorcode.org/license.txt for BSD license.
-USING: destructors kernel llvm.wrappers sequences tools.test vocabs ;
+USING: accessors alien destructors io.pathnames kernel llvm.ffi
+llvm.reader llvm.wrappers tools.test ;
+IN: llvm.wrappers.tests
 
-[ ] [ "test" <module> dispose ] unit-test
-[ ] [ "test" <module> <provider> dispose ] unit-test
-[ ] [ "llvm.jit" vocabs member? [ "test" <module> <provider> <engine> dispose ] unless ] unit-test
+: add.bc ( -- path )
+    "resource:extra/llvm/wrappers/add.bc" absolute-path ;
+
+{ 728 t } [
+    add.bc <buffer>
+    [ value>> [ LLVMGetBufferSize ] keep ] with-disposal alien?
+] unit-test
+
+{ "sum" 2 32 LLVMIntegerTypeKind } [
+    add.bc load-module <engine>
+    "sum" find-function
+    [ LLVMGetValueName ]
+    [ LLVMCountParams ]
+    [
+        LLVMTypeOf LLVMGetElementType LLVMGetReturnType
+        [ LLVMGetIntTypeWidth ]
+        [ LLVMGetTypeKind ] bi
+    ] tri
+] unit-test

@@ -7,7 +7,7 @@ sorting trees.splay ;
 IN: benchmark.splay
 
 : initial-alist ( n -- alist )
-    iota >array randomize dup zip ;
+    <iota> >array randomize dup zip ;
 
 : change-random ( newkeys splay keys -- splay' )
     swapd [ first pick delete-at first2 pick set-at ] 2each ;

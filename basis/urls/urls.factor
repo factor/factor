@@ -1,11 +1,9 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: accessors arrays assocs combinators fry hashtables
-io.pathnames io.sockets kernel lexer make math.parser
-namespaces peg.ebnf present sequences splitting strings
-strings.parser urls.encoding vocabs.loader ;
-
+USING: accessors arrays ascii assocs combinators fry io.pathnames
+io.sockets io.sockets.secure kernel lexer linked-assocs make
+math.parser namespaces peg.ebnf present sequences splitting
+strings strings.parser urls.encoding vocabs.loader multiline ;
 IN: urls
 
 TUPLE: url protocol username password host port path query anchor ;
@@ -15,15 +13,14 @@ TUPLE: url protocol username password host port path query anchor ;
 : query-param ( url key -- value )
     swap query>> at ;
 
-: delete-query-param ( url key -- url )
-    over query>> delete-at ;
+: set-or-delete ( value key query -- )
+    pick [ set-at ] [ delete-at drop ] if ;
 
 : set-query-param ( url value key -- url )
-    over [
-        '[ [ _ _ ] dip ?set-at ] change-query
-    ] [
-        nip delete-query-param
-    ] if ;
+    pick query>> [ <linked-hash> ] unless* [ set-or-delete ] keep >>query ;
+
+: set-query-params ( url params -- url )
+    [ swap set-query-param ] assoc-each ;
 
 ERROR: malformed-port ;
 
@@ -41,9 +38,9 @@ M: url >url ;
 
 <PRIVATE
 
-EBNF: parse-url
+EBNF: parse-url [=[
 
-protocol = [a-z]+                   => [[ url-decode ]]
+protocol = [a-zA-Z0-9.+-]+          => [[ url-decode ]]
 username = [^/:@#?]+                => [[ url-decode ]]
 password = [^/:@#?]+                => [[ url-decode ]]
 pathname = [^#?]+                   => [[ url-decode ]]
@@ -63,7 +60,7 @@ url      = (((protocol "://") => [[ first ]] auth hostname)
            ("?" query               => [[ second ]])?
            ("#" anchor              => [[ second ]])?
 
-;EBNF
+]=]
 
 PRIVATE>
 
@@ -72,7 +69,7 @@ M: string >url
     parse-url {
         [
             first [
-                [ first >>protocol ]
+                [ first >lower >>protocol ]
                 [
                     second
                     [ first [ first2 [ >>username ] [ >>password ] bi* ] when* ]
@@ -144,7 +141,7 @@ PRIVATE>
         { [ dup "/" head? ] [ nip ] }
         { [ dup empty? ] [ drop ] }
         { [ over "/" tail? ] [ append ] }
-        { [ "/" pick start not ] [ nip ] }
+        { [ "/" pick subseq-start not ] [ nip ] }
         [ [ "/" split1-last drop "/" ] dip 3append ]
     } cond ;
 
@@ -174,20 +171,16 @@ PRIVATE>
 : secure-protocol? ( protocol -- ? )
     "https" = ;
 
-<PRIVATE
-
-GENERIC: >secure-addr ( addrspec -- addrspec' )
-
-PRIVATE>
-
 : url-addr ( url -- addr )
     [
         [ host>> ]
         [ port>> ]
         [ protocol>> protocol-port ]
         tri or <inet>
-    ] [ protocol>> ] bi
-    secure-protocol? [ >secure-addr ] when ;
+    ] [
+        dup protocol>> secure-protocol?
+        [ host>> <secure> ] [ drop ] if
+    ] bi ;
 
 : set-url-addr ( url addr -- url )
     [ host>> >>host ] [ port>> >>port ] bi ;
@@ -199,4 +192,3 @@ PRIVATE>
 SYNTAX: URL" lexer get skip-blank parse-string >url suffix! ;
 
 { "urls" "prettyprint" } "urls.prettyprint" require-when
-{ "urls" "io.sockets.secure" } "urls.secure" require-when

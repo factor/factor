@@ -3,7 +3,7 @@ io.pathnames system ;
 IN: alien.libraries.unix
 
 : (dlerror) ( -- string )
-    \ c-string f "dlerror" { } alien-invoke ; inline
+    \ c-string f "dlerror" { } f alien-invoke ; inline
 
 M: unix dlerror (dlerror) ;
 
@@ -12,4 +12,3 @@ M: unix >deployed-library-path
 
 M: macosx >deployed-library-path
     file-name "@executable_path/../Frameworks" prepend-path ;
-

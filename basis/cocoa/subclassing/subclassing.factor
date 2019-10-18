@@ -1,11 +1,9 @@
 ! Copyright (C) 2006, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.parser alien.strings arrays
-assocs combinators compiler hashtables kernel lexer libc
-locals.parser locals.types math namespaces parser sequences
-words cocoa.messages cocoa.runtime locals compiler.units
-io.encodings.utf8 continuations make fry effects stack-checker
-stack-checker.errors ;
+USING: accessors alien alien.parser alien.strings arrays assocs
+cocoa.messages cocoa.runtime combinators compiler.units fry
+io.encodings.utf8 kernel lexer locals locals.parser locals.types
+make namespaces parser sequences words ;
 IN: cocoa.subclassing
 
 : init-method ( method -- sel imp types )
@@ -66,16 +64,24 @@ IN: cocoa.subclassing
 
 :: define-objc-class ( name superclass protocols methods -- )
     methods prepare-methods :> methods
-    name "cocoa.classes" create drop
+    name "cocoa.classes" create-word drop
     methods name redefine-objc-methods
     name [ methods protocols superclass name (define-objc-class) ] import-objc-class ;
 
-SYNTAX: CLASS:
+TUPLE: cocoa-protocol name ;
+C: <cocoa-protocol> cocoa-protocol
+
+SYNTAX: COCOA-PROTOCOL:
+    scan-token <cocoa-protocol> suffix! ;
+
+SYMBOL: ;CLASS>
+
+SYNTAX: <CLASS:
     scan-token
     "<" expect
     scan-token
-    "[" parse-tokens
-    \ ] parse-until define-objc-class ;
+    \ ;CLASS> parse-until [ cocoa-protocol? ] partition
+    [ [ name>> ] map ] dip define-objc-class ;
 
 : (parse-selector) ( -- )
     scan-token {
@@ -98,5 +104,5 @@ SYNTAX: CLASS:
 SYNTAX: METHOD:
     scan-c-type
     parse-selector
-    parse-method-body [ swap ] 2dip 4array
+    parse-method-body [ swap ] 2dip 4array ";" expect
     suffix! ;

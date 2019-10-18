@@ -13,7 +13,7 @@ GENERIC: history-value ( object -- value )
 GENERIC: set-history-value ( value object -- )
 
 : (add-history) ( history to -- )
-    swap owner>> history-value dup [ swap push ] [ 2drop ] if ;
+    swap owner>> history-value [ swap push ] [ drop ] if* ;
 
 :: go-back/forward ( history to from -- )
     from empty? [

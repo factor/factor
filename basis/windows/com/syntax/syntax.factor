@@ -3,12 +3,12 @@ alien.parser effects kernel windows.ole32 parser lexer splitting
 grouping sequences namespaces assocs quotations generalizations
 accessors words macros alien.syntax fry arrays layouts math
 classes.struct windows.kernel32 locals ;
-FROM: alien.parser.private => parse-pointers return-type-name ;
+FROM: alien.parser.private => parse-pointers ;
 IN: windows.com.syntax
 
 <PRIVATE
 
-MACRO: com-invoke ( n return parameters -- )
+MACRO: com-invoke ( n return parameters -- quot )
     [ 2nip length ] 3keep
     '[
         _ npick void* deref _ cell * alien-cell _ _
@@ -38,7 +38,7 @@ ERROR: no-com-interface interface ;
     dup word>> +com-interface-definitions+ get-global set-at ;
 
 : (parse-com-function) ( return name -- definition )
-    ")" scan-c-args
+    scan-c-args
     [ pointer: void prefix ] [ "this" prefix ] bi*
     <com-function-definition> ;
 
@@ -53,11 +53,11 @@ ERROR: no-com-interface interface ;
     V{ } clone [ (parse-com-functions) ] keep >array ;
 
 : (iid-word) ( definition -- word )
-    word>> name>> "-iid" append create-in ;
+    word>> name>> "-iid" append create-word-in ;
 
 : (function-word) ( function interface -- word )
     swap [ word>> name>> "::" ] [ name>> ] bi*
-    3append create-in ;
+    3append create-word-in ;
 
 : family-tree ( definition -- definitions )
     dup parent>> [ family-tree ] [ { } ] if*

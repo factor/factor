@@ -1,11 +1,11 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays io io.encodings.binary io.files
-io.streams.string kernel math namespaces sequences strings
-io.encodings.utf8 xml.data xml.errors xml.elements ascii
-xml.entities xml.state xml.autoencoding assocs xml.tokenize
-combinators.short-circuit xml.name splitting
-io.streams.byte-array combinators ;
+USING: accessors arrays ascii assocs combinators
+combinators.short-circuit io io.encodings.binary
+io.encodings.utf8 io.files io.streams.byte-array
+io.streams.string kernel namespaces sequences splitting strings
+xml.autoencoding xml.data xml.elements xml.errors xml.name
+xml.state xml.tokenize ;
 IN: xml
 
 <PRIVATE
@@ -31,7 +31,7 @@ M: prolog process
 : before-main? ( -- ? )
     xml-stack get {
         [ length 1 = ]
-        [ first second [ tag? ] any? not ]
+        [ first second [ tag? ] none? ]
     } 1&& ;
 
 M: directive process
@@ -54,7 +54,7 @@ M: closer process
     <tag> add-child ;
 
 : init-xml-stack ( -- )
-    V{ } clone xml-stack set
+    V{ } clone xml-stack namespaces:set
     f push-xml ;
 
 : default-prolog ( -- prolog )
@@ -77,7 +77,7 @@ M: closer process
 
 : no-post-tags ( post -- post/* )
     ! this does *not* affect the contents of the stack
-    dup [ tag? ] any? [ multitags ] when ; 
+    dup [ tag? ] any? [ multitags ] when ;
 
 : assure-tags ( seq -- seq )
     ! this does *not* affect the contents of the stack
@@ -125,7 +125,7 @@ TUPLE: pull-xml scope ;
     scope>> [
         text-now? get [ parse-text f ] [
             get-char [ make-tag t ] [ f f ] if
-        ] if text-now? set
+        ] if text-now? namespaces:set
     ] with-variables ;
 
 <PRIVATE
@@ -157,7 +157,7 @@ PRIVATE>
 
 : read-seq ( stream quot n -- seq )
     rot [
-        depth set
+        depth namespaces:set
         init-xml init-xml-stack
         call
         [ process ] xml-loop
@@ -200,7 +200,7 @@ PRIVATE>
 
 : read-dtd ( stream -- dtd )
     [
-        H{ } clone extra-entities set
+        H{ } clone extra-entities namespaces:set
         take-internal-subset
     ] with-state ;
 

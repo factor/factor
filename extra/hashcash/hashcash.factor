@@ -1,17 +1,18 @@
 ! Copyright (C) 2009 Diego Martinelli.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays calendar calendar.format checksums
-checksums.openssl classes.tuple fry kernel make math math.functions
-math.parser math.ranges present random sequences splitting strings ;
+USING: accessors calendar checksums checksums.openssl classes.tuple
+formatting fry io.encodings.ascii io.encodings.string kernel math
+math.functions math.parser math.ranges present random sequences
+splitting ;
 IN: hashcash
 
 ! Hashcash implementation
 ! Reference materials listed below:
-! 
+!
 ! http://hashcash.org
 ! http://en.wikipedia.org/wiki/Hashcash
 ! http://www.ibm.com/developerworks/linux/library/l-hashcash.html?ca=dgr-lnxw01HashCash
-! 
+!
 ! And the reference implementation (in python):
 ! http://www.gnosis.cx/download/gnosis/util/hashcash.py
 
@@ -19,14 +20,12 @@ IN: hashcash
 
 ! Return a string with today's date in the form YYMMDD
 : get-date ( -- str )
-    now [ year>> 100 mod pad-00 ] 
-        [ month>> pad-00 ] 
-        [ day>> pad-00 ] tri 3append ;
+    now "%y%m%d" strftime ;
 
 ! Random salt is formed by ascii characters
 ! between 33 and 126
 : available-chars ( -- seq )
-    33 126 [a,b] [ CHAR: : = not ] filter ;
+    33 126 [a,b] [ CHAR: : = ] reject ;
 
 PRIVATE>
 
@@ -43,13 +42,13 @@ TUPLE: hashcash version bits date resource ext salt suffix ;
         get-date >>date
         8 salt >>salt ;
 
-M: hashcash string>> 
+M: hashcash string>>
     tuple-slots [ present ] map ":" join ;
 
 <PRIVATE
 
 : sha1-checksum ( str -- bytes )
-    openssl-sha1 checksum-bytes ; inline
+    ascii encode openssl-sha1 checksum-bytes ; inline
 
 : set-suffix ( tuple guess -- tuple )
     >hex >>suffix ;
@@ -67,8 +66,8 @@ M: hashcash string>>
 : valid-guess? ( checksum tuple -- ? )
     bits>> head all-char-zero? ;
 
-: (mint) ( tuple counter -- tuple ) 
-    2dup set-suffix checksummed-bits pick 
+: (mint) ( tuple counter -- tuple )
+    2dup set-suffix checksummed-bits pick
     valid-guess? [ drop ] [ 1 + (mint) ] if ;
 
 PRIVATE>
@@ -86,4 +85,3 @@ PRIVATE>
 : check-stamp ( stamp -- ? )
     dup ":" split [ sha1-checksum get-bits ] dip
     second string>number head all-char-zero? ;
-

@@ -78,9 +78,6 @@ M: cairo-demo-gadget ungraft* ( gadget -- )
 : <cairo-demo-gadget> ( -- gadget )
     cairo-demo-gadget new ;
 
-: run ( -- )
-    [
-        <cairo-demo-gadget> "Hello World from Factor!" open-window
-    ] with-ui ;
-
-MAIN: run
+MAIN-WINDOW: run-cairo-demo
+    { { title "Hello World from Factor!" } }
+    <cairo-demo-gadget> >>gadgets ;

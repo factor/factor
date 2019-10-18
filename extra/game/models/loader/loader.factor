@@ -3,7 +3,7 @@
 USING: accessors assocs byte-arrays combinators game.models
 io.encodings.ascii io.files io.pathnames io.streams.byte-array
 kernel namespaces sequences splitting
-strings unicode.case arrays io.encodings ;
+strings unicode arrays io.encodings ;
 IN: game.models.loader
 
 ERROR: unknown-models-extension extension ;
@@ -26,7 +26,7 @@ types [ H{ } clone ] initialize
 
 PRIVATE>
 
-GENERIC# load-models* 2 ( obj encoding class -- models )
+GENERIC#: load-models* 2 ( obj encoding class -- models )
 
 GENERIC: stream>models ( stream class -- models )
 

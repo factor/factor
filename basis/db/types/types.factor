@@ -32,8 +32,7 @@ SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
 SYMBOL: IGNORE
 
 : filter-ignores ( tuple specs -- specs' )
-    [ <mirror> [ nip IGNORE = ] assoc-filter keys ] dip
-    [ slot-name>> swap member? not ] with filter ;
+    [ <mirror> ] dip [ slot-name>> of IGNORE = ] with reject ;
 
 ERROR: not-persistent class ;
 
@@ -41,7 +40,7 @@ ERROR: not-persistent class ;
     dup "db-table" word-prop [ ] [ not-persistent ] ?if ;
 
 : db-columns ( class -- object )
-    superclasses [ "db-columns" word-prop ] map concat ;
+    superclasses-of [ "db-columns" word-prop ] map concat ;
 
 : db-relations ( class -- object )
     "db-relations" word-prop ;
@@ -99,13 +98,13 @@ FACTOR-BLOB NULL URL ;
     dup number? [ number>string ] when ;
 
 : remove-db-assigned-id ( specs -- obj )
-    [ +db-assigned-id+? not ] filter ;
+    [ +db-assigned-id+? ] reject ;
 
 : remove-relations ( specs -- newcolumns )
-    [ relation? not ] filter ;
+    [ relation? ] reject ;
 
 : remove-id ( specs -- obj )
-    [ primary-key>> not ] filter ;
+    [ primary-key>> ] reject ;
 
 ! SQLite Types: http://www.sqlite.org/datatype3.html
 ! NULL INTEGER REAL TEXT BLOB

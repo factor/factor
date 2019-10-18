@@ -1,15 +1,11 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators
-combinators.short-circuit kernel layouts locals make math
-namespaces sequences cpu.architecture compiler.cfg.registers
-compiler.cfg.instructions
-compiler.cfg.representations.rewrite
-compiler.cfg.representations.selection ;
+combinators.short-circuit compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.representations.rewrite
+compiler.cfg.representations.selection cpu.architecture kernel
+layouts locals make math namespaces sequences ;
 IN: compiler.cfg.representations.peephole
-
-! Representation selection performs some peephole optimizations
-! when inserting conversions to optimize for a few common cases
 
 GENERIC: optimize-insn ( insn -- )
 
@@ -66,8 +62,6 @@ M: ##load-integer optimize-insn
         [ obj>> byte-array? ]
     } 1&& ;
 
-! When a literal zeroes/ones vector is unboxed, we replace the ##load-reference
-! with a ##zero-vector or ##fill-vector instruction since this is more efficient.
 : convert-to-zero-vector? ( insn -- ? )
     {
         [ dst>> rep-of vector-rep? ]
@@ -287,3 +281,6 @@ M: ##not optimize-insn
         }
         [ call-next-method ]
     } cond ;
+
+M: ##bit-count optimize-insn
+    [ no-use-conversion ] [ finish ] [ emit-def-conversion ] tri ;

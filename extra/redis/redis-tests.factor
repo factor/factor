@@ -4,8 +4,6 @@
 USING: continuations kernel redis math math.parser sequences
 sorting tools.test ;
 
-QUALIFIED: redis
-
 IN: redis.tests
 
 : with-redis ( quot -- )

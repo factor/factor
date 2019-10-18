@@ -6,7 +6,10 @@ parser sequences sets vocabs.loader ;
 
 IN: hash-sets.sequences
 
-TUPLE: sequence-wrapper < wrapped-key ;
+<PRIVATE
+
+TUPLE: sequence-wrapper
+    { underlying sequence read-only } ;
 
 C: <sequence-wrapper> sequence-wrapper
 
@@ -17,6 +20,8 @@ M: sequence-wrapper equal?
 
 M: sequence-wrapper hashcode*
     underlying>> [ sequence-hashcode ] recursive-hashcode ; inline
+
+PRIVATE>
 
 TUPLE: sequence-hash-set < wrapped-hash-set ;
 

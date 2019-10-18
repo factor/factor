@@ -1,10 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs bit-arrays bit-sets fry
-hashtables hints kernel locals math namespaces sequences sets
-compiler.cfg compiler.cfg.dominance compiler.cfg.rpo ;
-FROM: namespaces => set ;
-FROM: assocs => change-at ;
+USING: accessors arrays assocs bit-sets compiler.cfg
+compiler.cfg.dominance compiler.cfg.rpo compiler.cfg.utilities
+fry hashtables kernel locals math namespaces sequences sets ;
 IN: compiler.cfg.ssa.construction.tdmsc
 
 ! TDMSC-I algorithm from "A Practical and Fast Iterative Algorithm for
@@ -17,14 +15,15 @@ IN: compiler.cfg.ssa.construction.tdmsc
 SYMBOLS: merge-sets levels again? ;
 
 : init-merge-sets ( cfg -- )
-    post-order dup length '[ _ <bit-set> ] H{ } map>assoc merge-sets set ;
+    post-order dup length '[ _ <bit-set> ] H{ } map>assoc
+    merge-sets namespaces:set ;
 
 : compute-levels ( cfg -- )
     0 over entry>> associate [
         '[
             _ [ [ dom-parent ] dip at 1 + ] 2keep set-at
         ] each-basic-block
-    ] keep levels set ;
+    ] keep levels namespaces:set ;
 
 : j-edge? ( from to -- ? )
     2dup eq? [ 2drop f ] [ dominates? not ] if ;
@@ -81,12 +80,12 @@ SYMBOLS: merge-sets levels again? ;
 PRIVATE>
 
 : compute-merge-sets ( cfg -- )
-    needs-dominance
-
-    [ compute-levels ]
-    [ init-merge-sets ]
-    [ compute-merge-set-loop ]
-    tri ;
+    {
+        needs-dominance
+        compute-levels
+        init-merge-sets
+        compute-merge-set-loop
+    } apply-passes ;
 
 : merge-set ( bbs -- bbs' )
      (merge-set) [ members ] dip nths ;

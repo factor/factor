@@ -1,19 +1,17 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry arrays generic io io.streams.string kernel math namespaces
-parser sequences strings vectors words quotations effects classes
-continuations assocs combinators compiler.errors accessors math.order
-definitions locals sets hints macros stack-checker.state
-stack-checker.visitor stack-checker.errors stack-checker.values
-stack-checker.recursive-state stack-checker.dependencies summary ;
+USING: accessors arrays effects fry kernel locals math
+math.order namespaces quotations sequences
+stack-checker.dependencies stack-checker.errors
+stack-checker.recursive-state stack-checker.state
+stack-checker.values stack-checker.visitor words ;
 FROM: sequences.private => from-end ;
-FROM: namespaces => set ;
 IN: stack-checker.backend
 
 : push-d ( obj -- ) meta-d push ;
 
 : introduce-values ( values -- )
-    [ [ [ input-parameter ] dip set-known ] each ]
+    [ [ input-parameter swap set-known ] each ]
     [ length input-count +@ ]
     [ #introduce, ]
     tri ;
@@ -57,12 +55,10 @@ IN: stack-checker.backend
 : push-r ( obj -- ) meta-r push ;
 
 : pop-r ( -- obj )
-    meta-r dup empty?
-    [ too-many-r> ] [ pop ] if ;
+    meta-r [ too-many-r> ] [ pop ] if-empty ;
 
 : consume-r ( n -- seq )
-    meta-r 2dup length >
-    [ too-many-r> ] when
+    meta-r 2dup length > [ too-many-r> ] when
     [ swap tail* ] [ shorten-by ] 2bi ;
 
 : output-r ( seq -- ) meta-r push-all ;
@@ -70,24 +66,22 @@ IN: stack-checker.backend
 : push-literal ( obj -- )
     literals get push ;
 
-: pop-literal ( -- rstate obj )
+: pop-literal ( -- obj )
     literals get [
-        pop-d
-        [ 1array #drop, ]
-        [ literal [ recursion>> ] [ value>> ] bi ] bi
-    ] [ pop recursive-state get swap ] if-empty ;
+        pop-d [ 1array #drop, ] [ literal value>> ] bi
+    ] [ pop ] if-empty ;
 
 : literals-available? ( n -- literals ? )
-    literals get 2dup length <=
-    [ [ swap tail* ] [ shorten-by ] 2bi t ] [ 2drop f f ] if ;
+    literals get 2dup length <= [
+        [ swap tail* ] [ shorten-by ] 2bi t
+    ] [
+        2drop f f
+    ] if ;
 
 GENERIC: apply-object ( obj -- )
 
 M: wrapper apply-object
-    wrapped>>
-    [ dup word? [ add-depends-on-effect ] [ drop ] if ]
-    [ push-literal ]
-    bi ;
+    wrapped>> push-literal ;
 
 M: object apply-object push-literal ;
 
@@ -152,16 +146,13 @@ M: object apply-object push-literal ;
 : with-infer ( quot -- effect visitor )
     [
         init-inference
-        init-known-values
+        H{ } clone known-values set
         stack-visitor off
         call
         end-infer
         current-effect
         stack-visitor get
     ] with-scope ; inline
-
-: (infer) ( quot -- effect )
-    [ infer-quot-here ] with-infer drop ;
 
 : ?quotation-effect ( in -- effect/f )
     dup pair? [ second dup effect? [ drop f ] unless ] [ drop f ] if ;
@@ -185,4 +176,3 @@ M: object apply-object push-literal ;
             word effect variables branches n declare-effect-d
         ] when*
     ] each-index ;
-

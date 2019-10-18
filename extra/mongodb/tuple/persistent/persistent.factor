@@ -1,8 +1,7 @@
-USING: accessors assocs bson.constants combinators.short-circuit
-constructors continuations fry kernel mirrors mongodb.tuple.collection
-mongodb.tuple.state namespaces sequences words bson.writer combinators
-hashtables linked-assocs ;
-
+USING: accessors assocs bson.constants bson.writer combinators
+combinators.short-circuit constructors continuations fry
+hashtables kernel linked-assocs mirrors mongodb.tuple.collection
+mongodb.tuple.state namespaces sequences words ;
 IN: mongodb.tuple.persistent
 
 SYMBOLS: object-map ;
@@ -19,7 +18,7 @@ DEFER: assoc>tuple
    [ first ] keep second lookup-word ; inline
 
 : tuple-instance ( tuple-info -- instance )
-    mdbinfo>tuple-class new ; inline 
+    mdbinfo>tuple-class new ; inline
 
 : prepare-assoc>tuple ( assoc -- tuple keylist mirror assoc )
    [ tuple-info tuple-instance dup
@@ -43,15 +42,15 @@ DEFER: assoc>tuple
 
 : write-field? ( tuple key value -- ? )
    pick mdb-persistent? [
-      { [ [ 2drop ] dip not ]
+      { [ 2nip not ]
         [ drop transient-slot? ] } 3|| not ] [ 3drop t ] if ; inline
 
 TUPLE: cond-value value quot ;
 
-CONSTRUCTOR: cond-value ( value quot -- cond-value ) ;
+CONSTRUCTOR: <cond-value> cond-value ( value quot -- cond-value ) ;
 
 : write-mdb-persistent ( value quot -- value' )
-   over [ call( tuple -- assoc ) ] dip 
+   over [ call( tuple -- assoc ) ] dip
    [ [ tuple-collection name>> ] [ >toid ] bi ] keep
    [ add-storable ] dip
    [ tuple-collection name>> ] [ id>> ] bi <dbref> ;
@@ -69,11 +68,11 @@ CONSTRUCTOR: cond-value ( value quot -- cond-value ) ;
    } cond ;
 
 : write-tuple-fields ( mirror tuple assoc quot: ( tuple -- assoc ) -- )
-   swap ! m t q q a 
+   swap ! m t q q a
    '[ _ 2over write-field?
       [ _ write-field swap _ set-at ]
       [ 2drop ] if
-   ] assoc-each ; 
+   ] assoc-each ;
 
 : prepare-assoc ( tuple -- assoc mirror tuple assoc )
    H{ } clone swap [ <mirror> ] keep pick ; inline
@@ -105,9 +104,6 @@ M: tuple tuple>selector ( tuple -- assoc )
     prepare-assoc [ tuple>selector ] write-tuple-fields ;
 
 : assoc>tuple ( assoc -- tuple )
-   dup assoc?
-   [ [ dup tuple-info?
-       [ make-tuple ]
-       [ ] if ] [ drop ] recover
-   ] [ ] if ; inline recursive
-
+   dup assoc? [
+        [ dup tuple-info? [ make-tuple ] when ] ignore-errors
+   ] when ; inline recursive

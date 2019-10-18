@@ -1,7 +1,8 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel locals math math.functions math.vectors
-rosetta-code.bitmap rosetta-code.bitmap-line sequences ;
+USING: arrays assocs kernel locals math math.functions
+math.vectors rosetta-code.bitmap rosetta-code.bitmap-line
+sequences ;
 IN: rosetta-code.bitmap-bezier
 
 ! http://rosettacode.org/wiki/Bitmap/Bézier_curves/Cubic
@@ -20,13 +21,13 @@ IN: rosetta-code.bitmap-bezier
 
 ! gives an interval of x from 0 to 1 to map the bezier function
 : t-interval ( x -- interval )
-    [ iota ] keep 1 - [ / ] curry map ;
+    [ <iota> ] keep 1 - [ / ] curry map ;
 
 ! turns a list of points into the list of lines between them
 : points-to-lines ( seq -- seq )
-    dup rest [ 2array ] 2map ;
+    dup rest zip ;
 
-: draw-lines ( {R,G,B} points image -- ) 
+: draw-lines ( {R,G,B} points image -- )
     [ [ first2 ] dip draw-line ] curry with each ;
 
 :: bezier-lines ( {R,G,B} P0 P1 P2 P3 image -- )

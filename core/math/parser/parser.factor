@@ -1,9 +1,12 @@
 ! Copyright (C) 2009 Joe Groff, 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays combinators kernel kernel.private
-layouts make math math.private namespaces sbufs sequences
-sequences.private splitting strings ;
+USING: accessors byte-arrays combinators kernel kernel.private layouts
+make math math.private sbufs sequences sequences.private strings ;
 IN: math.parser
+
+<PRIVATE
+PRIMITIVE: (format-float) ( n fill width precision format locale -- byte-array )
+PRIVATE>
 
 : digit> ( ch -- n )
     {
@@ -12,24 +15,33 @@ IN: math.parser
                              [ CHAR: a 10 - - dup 10 < [ drop 255 ] when ]
     } cond ; inline
 
+: string>digits ( str -- digits )
+    [ digit> ] B{ } map-as ; inline
+
+: >digit ( n -- ch )
+    dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] if ; inline
+
 ERROR: invalid-radix radix ;
 
 <PRIVATE
 
+! magnitude is used only for floats to avoid
+! expensive computations when we know that
+! the result will overflow/underflow.
+! The computation of magnitude starts in
+! number-parse and continues in float-parse.
 TUPLE: number-parse
     { str read-only }
     { length fixnum read-only }
-    { radix fixnum read-only } ;
+    { radix fixnum }
+    { magnitude fixnum } ;
 
 : <number-parse> ( str radix -- i number-parse n )
-    [ 0 ] 2dip
-    [ dup length ] dip
-    number-parse boa
-    0 ; inline
+    [ 0 ] 2dip [ dup length ] dip 0 number-parse boa 0 ; inline
 
 : (next-digit) ( i number-parse n digit-quot end-quot -- n/f )
     [ 2over length>> < ] 2dip
-    [ [ 2over str>> nth-unsafe >fixnum [ 1 + >fixnum ] 3dip ] prepose ] dip if ; inline
+    [ [ 2over str>> nth-unsafe >fixnum [ 1 fixnum+fast ] 3dip ] prepose ] dip if ; inline
 
 : require-next-digit ( i number-parse n quot -- n/f )
     [ 3drop f ] (next-digit) ; inline
@@ -37,51 +49,115 @@ TUPLE: number-parse
 : next-digit ( i number-parse n quot -- n/f )
     [ 2nip ] (next-digit) ; inline
 
+: inc-magnitude ( number-parse -- number-parse' )
+    [ 1 fixnum+fast ] change-magnitude ; inline
+
+: ?inc-magnitude ( number-parse n -- number-parse' )
+    zero? [ inc-magnitude ] unless ; inline
+
+: (add-digit) ( number-parse n digit -- number-parse n' )
+    [ dup radix>> ] [ * ] [ + ] tri* ; inline
+
 : add-digit ( i number-parse n digit quot -- n/f )
-    [ [ dup radix>> ] [ * ] [ + ] tri* ] dip next-digit ; inline
+    [ (add-digit) [ ?inc-magnitude ] keep ] dip next-digit ; inline
+
+: add-exponent-digit ( i number-parse n digit quot -- n/f )
+    [ (add-digit) ] dip next-digit ; inline
 
 : digit-in-radix ( number-parse n char -- number-parse n digit ? )
     digit> pick radix>> over > ; inline
 
 : ?make-ratio ( num denom/f -- ratio/f )
-    [ / ] [ drop f ] if* ; inline
+    ! don't use number= to allow 0. for "1/0."
+    [ dup 0 = [ 2drop f ] [ / ] if ] [ drop f ] if* ; inline
 
 TUPLE: float-parse
-    { radix fixnum read-only }
-    { point read-only }
-    { exponent read-only } ;
+    { radix fixnum }
+    { point fixnum }
+    { exponent }
+    { magnitude } ;
 
-: inc-point ( float-parse -- float-parse' )
-    [ radix>> ] [ point>> 1 + ] [ exponent>> ] tri float-parse boa ; inline
+: inc-point-?dec-magnitude ( float-parse n -- float-parse' )
+    zero? [ [ 1 fixnum-fast ] change-magnitude ] when
+    [ 1 fixnum+fast ] change-point ; inline
 
 : store-exponent ( float-parse n expt -- float-parse' n )
-    swap [ [ drop radix>> ] [ drop point>> ] [ nip ] 2tri float-parse boa ] dip ; inline
+    swap [ >>exponent ] dip ; inline
 
 : ?store-exponent ( float-parse n expt/f -- float-parse' n/f )
     [ store-exponent ] [ drop f ] if* ; inline
 
-: ((pow)) ( base x -- base^x )
-    iota 1 rot [ nip * ] curry reduce ; inline
+: pow-until ( base x -- base^x )
+    [ 1 ] 2dip
+    [ dup zero? ] [
+        dup odd? [ [ [ * ] keep ] [ 1 - ] bi* ] when
+        [ sq ] [ 2/ ] bi*
+    ] until 2drop ; inline
 
 : (pow) ( base x -- base^x )
-    dup 0 >= [ ((pow)) ] [ [ recip ] [ neg ] bi* ((pow)) ] if ; inline
+    integer>fixnum-strict
+    dup 0 >= [ pow-until ] [ [ recip ] [ neg ] bi* pow-until ] if ; inline
 
 : add-mantissa-digit ( float-parse i number-parse n digit quot -- float-parse' n/f )
-    [ [ inc-point ] 4dip ] dip add-digit ; inline
+    [ (add-digit)
+        dup [ inc-point-?dec-magnitude ] curry 3dip
+    ] dip next-digit ; inline
+
+! IEE754 doubles are in the range ]10^309,10^-324[,
+! or expressed in base 2, ]2^1024, 2^-1074].
+! We don't need those ranges to be accurate as long as we are
+! excluding all the floats because they are used only to
+! optimize when we know there will be an overflow/underflow
+! We compare these numbers to the magnitude slot of float-parse,
+! which has the following behavior:
+! ... ; 0.0xxx -> -1; 0.xxx -> 0; x.xxx -> 1; xx.xxx -> 2; ...;
+! Also, take some margin as the current float parsing algorithm
+! does some rounding; For example,
+! 0x1.0p-1074 is the smallest IE754 double, but floats down to
+! 0x0.8p-1074 (excluded) are parsed as 0x1.0p-1074
+CONSTANT: max-magnitude-10 309
+CONSTANT: min-magnitude-10 -323
+CONSTANT: max-magnitude-2 1027
+CONSTANT: min-magnitude-2 -1074
 
 : make-float-dec-exponent ( float-parse n/f -- float/f )
-    [ [ radix>> ] [ point>> ] [ exponent>> ] tri - (pow) ] [ swap /f ] bi* ; inline
+    over [ exponent>> ] [ magnitude>> ] bi +
+    {
+        { [ dup max-magnitude-10 > ] [ 3drop 1/0. ] }
+        { [ dup min-magnitude-10 < ] [ 3drop 0.0 ] }
+        [ drop
+            [ [ radix>> ] [ point>> ] [ exponent>> ] tri - (pow) ]
+            [ swap /f ] bi*
+        ]
+    } cond ; inline
+
+: base2-digits ( digits radix -- digits' )
+    {
+        { 16 [ 4 * ] }
+        { 8  [ 3 * ] }
+        { 2  [ ] }
+    } case ; inline
+
+: base2-point ( float-parse -- point )
+    [ point>> ] [ radix>> ] bi base2-digits ; inline
+
+: base2-magnitude ( float-parse -- point )
+    [ magnitude>> ] [ radix>> ] bi base2-digits ; inline
 
 : make-float-bin-exponent ( float-parse n/f -- float/f )
-    [ drop [ radix>> ] [ point>> ] bi (pow) ]
-    [ nip swap /f ]
-    [ drop 2.0 swap exponent>> (pow) * ] 2tri ; inline
+    over [ exponent>> ] [ base2-magnitude ] bi +
+    {
+        { [ dup max-magnitude-2 > ] [ 3drop 1/0. ] }
+        { [ dup min-magnitude-2 < ] [ 3drop 0.0 ] }
+        [ drop
+            [ [ drop 2 ] [ base2-point ] [ exponent>> ] tri - (pow) ]
+            [ swap /f ] bi*
+        ]
+    } cond ; inline
 
 : ?default-exponent ( float-parse n/f -- float-parse' n/f' )
     over exponent>> [
-        over radix>> 10 =
-        [ [ [ radix>> ] [ point>> ] bi 0 float-parse boa ] dip ]
-        [ drop f ] if
+        over radix>> 10 = [ 0 store-exponent ] [ drop f ] if
     ] unless ; inline
 
 : ?make-float ( float-parse n/f -- float/f )
@@ -94,7 +170,12 @@ TUPLE: float-parse
     } cond ;
 
 : ?neg ( n/f -- -n/f )
-    [ neg ] [ f ] if* ; inline
+    [
+        dup bignum? [
+            dup first-bignum bignum=
+            [ drop most-negative-fixnum ] [ neg ] if
+        ] [ neg ] if
+    ] [ f ] if* ; inline
 
 : ?add-ratio ( m n/f -- m+n/f )
     dup ratio? [ + ] [ 2drop f ] if ; inline
@@ -102,14 +183,14 @@ TUPLE: float-parse
 : @abort ( i number-parse n x -- f )
     4drop f ; inline
 
-: @split ( i number-parse n -- n i number-parse n' )
-    -rot 0 ; inline
+: @split ( i number-parse n -- n i number-parse' n' )
+    -rot 0 >>magnitude 0 ; inline
 
 : @split-exponent ( i number-parse n -- n i number-parse' n' )
-    -rot [ str>> ] [ length>> ] bi 10 number-parse boa 0 ; inline
+    -rot 10 >>radix 0 ; inline
 
 : <float-parse> ( i number-parse n -- float-parse i number-parse n )
-     [ drop nip radix>> 0 f float-parse boa ] 3keep ; inline
+     [ drop nip [ radix>> ] [ magnitude>> ] bi [ 0 f ] dip float-parse boa ] 3keep ; inline
 
 DEFER: @exponent-digit
 DEFER: @mantissa-digit
@@ -126,7 +207,7 @@ DEFER: @neg-digit
 
 : @exponent-digit ( float-parse i number-parse n char -- float-parse n/f )
     { float-parse fixnum number-parse integer fixnum } declare
-    digit-in-radix [ [ @exponent-digit-or-punc ] add-digit ] [ @abort ] if ;
+    digit-in-radix [ [ @exponent-digit-or-punc ] add-exponent-digit ] [ @abort ] if ;
 
 : @exponent-first-char ( float-parse i number-parse n char -- float-parse n/f )
     {
@@ -139,9 +220,9 @@ DEFER: @neg-digit
     @split-exponent [ @exponent-first-char ] require-next-digit ?store-exponent ; inline
 
 : exponent-char? ( number-parse n char -- number-parse n char ? )
-    3dup nip swap radix>> {
-        { 10 [ [ CHAR: e CHAR: E ] dip [ = ] curry either? ] }
-        [ drop [ CHAR: p CHAR: P ] dip [ = ] curry either? ]
+    pick radix>> {
+        { 10 [ dup "eE" member-eq? ] }
+        [ drop dup "pP" member-eq? ]
     } case ; inline
 
 : or-exponent ( i number-parse n char quot -- n/f )
@@ -219,21 +300,17 @@ DEFER: @neg-digit
     { fixnum number-parse integer fixnum } declare
     digit-in-radix [ [ @pos-digit-or-punc ] add-digit ] [ @abort ] if ;
 
-: (->radix) ( number-parse radix -- number-parse' )
-    [ [ str>> ] [ length>> ] bi ] dip number-parse boa ; inline
-
 : ->radix ( i number-parse n quot radix -- i number-parse n quot )
-    [ (->radix) ] curry 2dip ; inline
+    [ >>radix ] curry 2dip ; inline
 
 : with-radix-char ( i number-parse n radix-quot nonradix-quot -- n/f )
     [
         rot {
-            { CHAR: b [ drop  2 ->radix require-next-digit ] }
-            { CHAR: o [ drop  8 ->radix require-next-digit ] }
-            { CHAR: x [ drop 16 ->radix require-next-digit ] }
-            { f       [ 3drop 2drop 0 ] }
-            [ [ drop ] 2dip swap call ]
-        } case
+            { [ dup "bB" member-eq? ] [ 2drop  2 ->radix require-next-digit ] }
+            { [ dup "oO" member-eq? ] [ 2drop  8 ->radix require-next-digit ] }
+            { [ dup "xX" member-eq? ] [ 2drop 16 ->radix require-next-digit ] }
+            [ nipd swap call ]
+        } cond
     ] 2curry next-digit ; inline
 
 : @pos-first-digit ( i number-parse n char -- n/f )
@@ -270,11 +347,23 @@ DEFER: @neg-digit
         [ @pos-first-digit ]
     } case ; inline
 
+: @neg-first-digit-no-radix ( i number-parse n char -- n/f )
+    {
+        { CHAR: . [ ->required-mantissa ] }
+        [ @neg-digit ]
+    } case ; inline
+
+: @pos-first-digit-no-radix ( i number-parse n char -- n/f )
+    {
+        { CHAR: . [ ->required-mantissa ] }
+        [ @pos-digit ]
+    } case ; inline
+
 : @first-char-no-radix ( i number-parse n char -- n/f )
     {
-        { CHAR: - [ [ @neg-digit ] require-next-digit ?neg ] }
-        { CHAR: + [ [ @pos-digit ] require-next-digit ] }
-        [ @pos-digit ]
+        { CHAR: - [ [ @neg-first-digit-no-radix ] require-next-digit ?neg ] }
+        { CHAR: + [ [ @pos-first-digit-no-radix ] require-next-digit ] }
+        [ @pos-first-digit-no-radix ]
     } case ; inline
 
 PRIVATE>
@@ -289,25 +378,6 @@ PRIVATE>
 : oct> ( str -- n/f )  8 base> ; inline
 : dec> ( str -- n/f ) 10 base> ; inline
 : hex> ( str -- n/f ) 16 base> ; inline
-
-: string>digits ( str -- digits )
-    [ digit> ] B{ } map-as ; inline
-
-<PRIVATE
-
-: (digits>integer) ( valid? accum digit radix -- valid? accum )
-    2dup < [ swapd * + ] [ 4drop f 0 ] if ; inline
-
-: each-digit ( seq radix quot -- n/f )
-    [ t 0 ] 3dip curry each swap [ drop f ] unless ; inline
-
-PRIVATE>
-
-: digits>integer ( seq radix -- n/f )
-    [ (digits>integer) ] each-digit ; inline
-
-: >digit ( n -- ch )
-    dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] if ; inline
 
 <PRIVATE
 
@@ -394,7 +464,7 @@ M: fixnum (positive>dec)
 
 PRIVATE>
 
-GENERIC# >base 1 ( n radix -- str )
+GENERIC#: >base 1 ( n radix -- str )
 
 : number>string ( n -- str ) 10 >base ; inline
 
@@ -403,38 +473,29 @@ GENERIC# >base 1 ( n radix -- str )
 : >hex ( n -- str ) 16 >base ; inline
 
 M: integer >base
-    over 0 = [
-        2drop "0"
-    ] [
-        over 0 > [
-            positive>base
-        ] [
-            [ neg ] dip positive>base CHAR: - prefix
-        ] if
-    ] if ;
-
-M: ratio >base
-    [ [ 0 < ] [ abs 1 /mod ] bi ]
-    [ [ positive>base ] curry ] bi*
-    [
-        [ [ numerator ] [ denominator ] bi ] dip bi@ "/" glue
-    ] keep rot [ drop ] [
-        swap call pick "-" "+" ? rot 3append
-    ] if-zero swap [ CHAR: - prefix ] when ;
-
-: fix-float ( str -- newstr )
     {
-        {
-            [ CHAR: e over member? ]
-            [ "e" split1 [ fix-float "e" ] dip 3append ]
-        } {
-            [ CHAR: . over member? ]
-            [ ]
-        }
-        [ ".0" append ]
+        { [ over 0 = ] [ 2drop "0" ] }
+        { [ over 0 > ] [ positive>base ] }
+        [ [ neg ] dip positive>base CHAR: - prefix ]
     } cond ;
 
+M: ratio >base
+    [ >fraction [ /mod ] keep ] [ [ >base ] curry tri@ ] bi*
+    "/" glue over first-unsafe {
+        { CHAR: 0 [ nip ] }
+        { CHAR: - [ append ] }
+        [ drop "+" glue ]
+    } case ;
+
 <PRIVATE
+
+: (fix-float) ( str-no-exponent -- newstr )
+    CHAR: . over member? [ ".0" append ] unless ; inline
+
+: fix-float ( str exponent-char -- newstr )
+    over index [
+        cut [ (fix-float) ] dip append
+    ] [ (fix-float) ] if* ; inline
 
 : mantissa-expt-normalize ( mantissa expt -- mantissa' expt' )
     [ dup log2 52 swap - [ shift 52 2^ 1 - bitand ] [ 1022 + neg ] bi ]
@@ -445,38 +506,58 @@ M: ratio >base
     [ -0.0 double>bits bitnot bitand -52 shift ] bi
     mantissa-expt-normalize ;
 
-: float>hex-sign ( bits -- str )
+: bin-float-sign ( bits -- str )
     -0.0 double>bits bitand zero? "" "-" ? ;
 
-: float>hex-value ( mantissa -- str )
-    >hex 13 CHAR: 0 pad-head [ CHAR: 0 = ] trim-tail
+: bin-float-value ( str size -- str' )
+    CHAR: 0 pad-head [ CHAR: 0 = ] trim-tail
     [ "0" ] when-empty "1." prepend ;
 
-: float>hex-expt ( mantissa -- str )
+: float>hex-value ( mantissa -- str )
+    >hex 13 bin-float-value ;
+
+: float>oct-value ( mantissa -- str )
+    4 * >oct 18 bin-float-value ;
+
+: float>bin-value ( mantissa -- str )
+    >bin 52 bin-float-value ;
+
+: bin-float-expt ( mantissa -- str )
     10 >base "p" prepend ;
 
-: float>hex ( n -- str )
+: (bin-float>base) ( value-quot n -- str )
     double>bits
-    [ float>hex-sign ] [
-        mantissa-expt [ float>hex-value ] [ float>hex-expt ] bi*
-    ] bi 3append ;
+    [ bin-float-sign swap ] [
+        mantissa-expt rot [ bin-float-expt ] bi*
+    ] bi 3append ; inline
 
-: format-float ( n format -- string )
-    0 suffix >byte-array (format-float)
-    dup [ 0 = ] find drop head >string
-    fix-float ;
+: bin-float>base ( n base -- str )
+    {
+        { 16 [ [ float>hex-value ] swap (bin-float>base) ] }
+        { 8  [ [ float>oct-value ] swap (bin-float>base) ] }
+        { 2  [ [ float>bin-value ] swap (bin-float>base) ] }
+        [ invalid-radix ]
+    } case ;
+
+: format-string ( format -- format )
+    0 suffix >byte-array ; foldable
+
+: format-float ( n fill width precision format locale -- string )
+    [
+        [ format-string ] 4dip [ format-string ] bi@ (format-float)
+        >string
+    ] [
+        "C" = [ [ "G" = ] [ "E" = ] bi or CHAR: E CHAR: e ? fix-float ]
+        [ drop ] if
+    ] 2bi ; inline
 
 : float>base ( n radix -- str )
     {
-        { 16 [ float>hex ] }
-        { 10 [ "%.16g" format-float ] }
-        [ invalid-radix ]
+        { 10 [ "" -1 16 "" "C" format-float ] }
+        [ bin-float>base ]
     } case ; inline
 
 PRIVATE>
-
-: float>string ( n -- str )
-    10 float>base ; inline
 
 M: float >base
     {
@@ -489,3 +570,23 @@ M: float >base
     } cond ;
 
 : # ( n -- ) number>string % ; inline
+
+: hex-string>bytes ( hex-string -- bytes )
+    dup length 2/ <byte-array> [
+        [
+            [ digit> ] 2dip over even? [
+                [ 16 * ] [ 2/ ] [ set-nth ] tri*
+            ] [
+                [ 2/ ] [ [ + ] change-nth ] bi*
+            ] if
+        ] curry each-index
+    ] keep ;
+
+: bytes>hex-string ( bytes -- hex-string )
+    dup length 2 * CHAR: 0 <string> [
+        [
+            [ 16 /mod [ >digit ] bi@ ]
+            [ 2 * dup 1 + ]
+            [ [ set-nth ] curry bi-curry@ bi* ] tri*
+        ] curry each-index
+    ] keep ;

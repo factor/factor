@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 USING: byte-arrays calendar checksums checksums.md5
 checksums.sha io.binary kernel math math.parser math.ranges
-random sequences strings system unicode.case ;
+random sequences strings system unicode ;
 IN: uuid
 
 <PRIVATE
@@ -48,7 +48,7 @@ IN: uuid
     [ CHAR: - 8 ] dip insert-nth ;
 
 : string>uuid ( string -- n )
-    [ CHAR: - = not ] filter hex> ;
+    [ CHAR: - = ] reject hex> ;
 
 PRIVATE>
 

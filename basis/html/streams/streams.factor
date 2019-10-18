@@ -77,11 +77,11 @@ MACRO: make-css ( pairs -- str )
 : emit-html ( stream quot -- )
     dip data>> push ; inline
 
-: image-path ( path -- images-path )
+: icon-path ( path -- icons-path )
     "vocab:definitions/icons/" ?head [ "/icons/" prepend ] when ;
 
 : img-tag ( xml style -- xml )
-    image of [ nip image-path simple-image ] when* ;
+    image-style of [ nip icon-path simple-image ] when* ;
 
 : format-html-span ( string style stream -- )
     [
@@ -111,7 +111,7 @@ M: html-span-stream dispose
 : padding-css, ( padding -- )
     first2 (padding-css,) ;
 
-CONSTANT: pre-css "white-space: pre; font-family: monospace;"
+CONSTANT: pre-css "white-space: pre; font-family: monospace; "
 
 : div-css-style ( style -- str )
     [
@@ -121,7 +121,7 @@ CONSTANT: pre-css "white-space: pre; font-family: monospace;"
             { inset padding-css, }
         } make-css
     ] [ wrap-margin of [ pre-css append ] unless ] bi
-    " display: inline-block;" append ;
+    "display: inline-block; " append ;
 
 : div-tag ( xml style -- xml' )
     div-css-style

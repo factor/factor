@@ -1,25 +1,15 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays combinators
-disjoint-sets fry kernel locals math math.functions
-namespaces sequences sets
-compiler.cfg
-compiler.cfg.instructions
-compiler.cfg.loop-detection
-compiler.cfg.registers
-compiler.cfg.representations.preferred
+compiler.cfg compiler.cfg.instructions
+compiler.cfg.loop-detection compiler.cfg.registers
 compiler.cfg.representations.coalescing
-compiler.cfg.rpo
-compiler.cfg.utilities
-compiler.utilities
-cpu.architecture ;
-FROM: assocs => change-at ;
-FROM: namespaces => set ;
+compiler.cfg.representations.preferred compiler.cfg.rpo
+compiler.cfg.utilities compiler.utilities cpu.architecture
+disjoint-sets fry kernel locals math math.functions namespaces
+sequences sets ;
 IN: compiler.cfg.representations.selection
 
-! vregs which must be tagged at the definition site because
-! there is at least one usage that is not int-rep. If all usages
-! are int-rep it is safe to untag at the definition site.
 SYMBOL: tagged-vregs
 
 SYMBOL: vreg-reps
@@ -49,8 +39,8 @@ M: vreg-insn (collect-vreg-reps)
 M: insn (collect-vreg-reps) drop ;
 
 : collect-vreg-reps ( cfg -- )
-    H{ } clone vreg-reps set
-    HS{ } clone tagged-vregs set
+    H{ } clone vreg-reps namespaces:set
+    HS{ } clone tagged-vregs namespaces:set
     [ [ (collect-vreg-reps) ] each-non-phi ] each-basic-block ;
 
 SYMBOL: possibilities
@@ -62,22 +52,17 @@ SYMBOL: possibilities
 
 : compute-possibilities ( cfg -- )
     collect-vreg-reps
-    vreg-reps get [ possible-reps ] assoc-map possibilities set ;
+    vreg-reps get [ possible-reps ] assoc-map possibilities namespaces:set ;
 
 ! For every vreg, compute the cost of keeping it in every possible
 ! representation.
 
-! Cost map maps vreg to representation to cost.
 SYMBOL: costs
 
 : init-costs ( -- )
-    ! Initialize cost as 0 for each possibility.
-    possibilities get [ [ 0 ] H{ } map>assoc ] assoc-map costs set ;
+    possibilities get [ [ 0 ] H{ } map>assoc ] assoc-map costs namespaces:set ;
 
 : increase-cost ( rep scc factor -- )
-    ! Increase cost of keeping vreg in rep, making a choice of rep less
-    ! likely. If the rep is not in the cost alist, it means this
-    ! representation is prohibited.
     [ costs get at 2dup key? ] dip
     '[ [ current-loop-nesting 10^ _ * + ] change-at ] [ 2drop ] if ;
 
@@ -88,67 +73,65 @@ SYMBOL: costs
     ] each ; inline
 
 UNION: inert-tag-untag-insn
-##add
-##sub
-##and
-##or
-##xor
-##min
-##max ;
+    ##add
+    ##sub
+    ##and
+    ##or
+    ##xor
+    ##min
+    ##max ;
 
 UNION: inert-arithmetic-tag-untag-insn
-##add-imm
-##sub-imm ;
+    ##add-imm
+    ##sub-imm ;
 
 UNION: inert-bitwise-tag-untag-insn
-##and-imm
-##or-imm
-##xor-imm ;
+    ##and-imm
+    ##or-imm
+    ##xor-imm ;
 
-GENERIC: has-peephole-opts? ( insn -- ? )
-
-M: insn has-peephole-opts? drop f ;
-M: ##load-integer has-peephole-opts? drop t ;
-M: ##load-reference has-peephole-opts? drop t ;
-M: ##neg has-peephole-opts? drop t ;
-M: ##not has-peephole-opts? drop t ;
-M: inert-tag-untag-insn has-peephole-opts? drop t ;
-M: inert-arithmetic-tag-untag-insn has-peephole-opts? drop t ;
-M: inert-bitwise-tag-untag-insn has-peephole-opts? drop t ;
-M: ##mul-imm has-peephole-opts? drop t ;
-M: ##shl-imm has-peephole-opts? drop t ;
-M: ##shr-imm has-peephole-opts? drop t ;
-M: ##sar-imm has-peephole-opts? drop t ;
-M: ##compare-integer-imm has-peephole-opts? drop t ;
-M: ##compare-integer has-peephole-opts? drop t ;
-M: ##compare-integer-imm-branch has-peephole-opts? drop t ;
-M: ##compare-integer-branch has-peephole-opts? drop t ;
-M: ##test-imm has-peephole-opts? drop t ;
-M: ##test has-peephole-opts? drop t ;
-M: ##test-imm-branch has-peephole-opts? drop t ;
-M: ##test-branch has-peephole-opts? drop t ;
+UNION: peephole-optimizable
+    ##load-integer
+    ##load-reference
+    ##neg
+    ##not
+    inert-tag-untag-insn
+    inert-arithmetic-tag-untag-insn
+    inert-bitwise-tag-untag-insn
+    ##mul-imm
+    ##shl-imm
+    ##shr-imm
+    ##sar-imm
+    ##compare-integer-imm
+    ##compare-integer
+    ##compare-integer-imm-branch
+    ##compare-integer-branch
+    ##test-imm
+    ##test
+    ##test-imm-branch
+    ##test-branch
+    ##bit-count ;
 
 GENERIC: compute-insn-costs ( insn -- )
 
 M: insn compute-insn-costs drop ;
 
 M: vreg-insn compute-insn-costs
-    dup has-peephole-opts? 2 5 ? '[ _ increase-costs ] each-rep ;
+    dup peephole-optimizable? 2 5 ? '[ _ increase-costs ] each-rep ;
 
 : compute-costs ( cfg -- )
     init-costs
     [
-        [ basic-block set ]
+        [ basic-block namespaces:set ]
         [ [ compute-insn-costs ] each-non-phi ] bi
     ] each-basic-block ;
 
-! For every vreg, compute preferred representation, that minimizes costs.
 : minimize-costs ( costs -- representations )
-    [ nip assoc-empty? not ] assoc-filter
+    [ nip assoc-empty? ] assoc-reject
     [ >alist alist-min first ] assoc-map ;
 
 : compute-representations ( cfg -- )
     compute-costs costs get minimize-costs
     [ components get [ disjoint-set-members ] keep ] dip
     '[ dup _ representative _ at ] H{ } map>assoc
-    representations set ;
+    representations namespaces:set ;

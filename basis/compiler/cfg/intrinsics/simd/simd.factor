@@ -1,72 +1,82 @@
 ! Copyright (C) 2009 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types byte-arrays fry
-classes.algebra cpu.architecture kernel layouts math sequences
-math.vectors math.vectors.simd.intrinsics
-macros generalizations combinators combinators.short-circuit
-arrays locals compiler.tree.propagation.info
-compiler.cfg.builder.blocks
-compiler.cfg.comparisons
-compiler.cfg.stacks compiler.cfg.stacks.local compiler.cfg.hats
-compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.intrinsics
-compiler.cfg.intrinsics.alien
-compiler.cfg.intrinsics.simd.backend
-specialized-arrays ;
+USING: accessors alien.c-types arrays assocs byte-arrays combinators
+combinators.short-circuit compiler.cfg.comparisons
+compiler.cfg.hats compiler.cfg.instructions
+compiler.cfg.intrinsics compiler.cfg.intrinsics.alien
+compiler.cfg.intrinsics.simd.backend compiler.cfg.stacks
+cpu.architecture fry kernel layouts locals math math.vectors
+math.vectors.simd.intrinsics sequences specialized-arrays ;
 FROM: alien.c-types => heap-size char short int longlong float double ;
 SPECIALIZED-ARRAYS: char uchar short ushort int uint longlong ulonglong float double ;
 IN: compiler.cfg.intrinsics.simd
 
 ! compound vector ops
 
+CONSTANT: rep>bit-mask {
+    {
+        char-16-rep uchar-array{
+            0x80 0x80 0x80 0x80
+            0x80 0x80 0x80 0x80
+            0x80 0x80 0x80 0x80
+            0x80 0x80 0x80 0x80
+        }
+    }
+    {
+        short-8-rep ushort-array{
+            0x8000 0x8000 0x8000 0x8000
+            0x8000 0x8000 0x8000 0x8000
+        }
+    }
+    {
+        int-4-rep uint-array{
+            0x8000,0000 0x8000,0000
+            0x8000,0000 0x8000,0000
+        }
+    }
+    {
+        longlong-2-rep ulonglong-array{
+            0x8000,0000,0000,0000
+            0x8000,0000,0000,0000
+        }
+    }
+}
+
 : sign-bit-mask ( rep -- byte-array )
-    signed-rep {
-        { char-16-rep [ uchar-array{
-            0x80 0x80 0x80 0x80
-            0x80 0x80 0x80 0x80
-            0x80 0x80 0x80 0x80
-            0x80 0x80 0x80 0x80
-        } underlying>> ] }
-        { short-8-rep [ ushort-array{
-            0x8000 0x8000 0x8000 0x8000
-            0x8000 0x8000 0x8000 0x8000
-        } underlying>> ] }
-        { int-4-rep [ uint-array{
-            0x8000,0000 0x8000,0000
-            0x8000,0000 0x8000,0000
-        } underlying>> ] }
-        { longlong-2-rep [ ulonglong-array{
-            0x8000,0000,0000,0000
-            0x8000,0000,0000,0000
-        } underlying>> ] }
-    } case ;
+    signed-rep rep>bit-mask at underlying>> ;
+
+CONSTANT: rep>neg-zero {
+    { float-4-rep float-array{ -0.0 -0.0 -0.0 -0.0 } }
+    { double-2-rep double-array{ -0.0 -0.0 } }
+}
 
 : ^load-neg-zero-vector ( rep -- dst )
-    {
-        { float-4-rep [ float-array{ -0.0 -0.0 -0.0 -0.0 } underlying>> ^^load-literal ] }
-        { double-2-rep [ double-array{ -0.0 -0.0 } underlying>> ^^load-literal ] }
-    } case ;
+    rep>neg-zero at underlying>> ^^load-literal ;
+
+CONSTANT: rep>add-sub {
+    { float-4-rep float-array{ -0.0  0.0 -0.0  0.0 } }
+    { double-2-rep double-array{ -0.0  0.0 } }
+    { char-16-rep char-array{ -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 } }
+    { short-8-rep short-array{ -1 0 -1 0 -1 0 -1 0 } }
+    { int-4-rep int-array{ -1 0 -1 0 } }
+    { longlong-2-rep longlong-array{ -1 0 } }
+}
 
 : ^load-add-sub-vector ( rep -- dst )
-    signed-rep {
-        { float-4-rep    [ float-array{ -0.0  0.0 -0.0  0.0 } underlying>> ^^load-literal ] }
-        { double-2-rep   [ double-array{ -0.0  0.0 } underlying>> ^^load-literal ] }
-        { char-16-rep    [ char-array{ -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 } underlying>> ^^load-literal ] }
-        { short-8-rep    [ short-array{ -1 0 -1 0 -1 0 -1 0 } underlying>> ^^load-literal ] }
-        { int-4-rep      [ int-array{ -1 0 -1 0 } underlying>> ^^load-literal ] }
-        { longlong-2-rep [ longlong-array{ -1 0 } underlying>> ^^load-literal ] }
-    } case ;
+    signed-rep rep>add-sub at underlying>> ^^load-literal ;
+
+CONSTANT: rep>half {
+    { float-4-rep float-array{  0.5 0.5 0.5 0.5 } }
+    { double-2-rep double-array{ 0.5 0.5 } }
+}
 
 : ^load-half-vector ( rep -- dst )
-    {
-        { float-4-rep  [ float-array{  0.5 0.5 0.5 0.5 } underlying>> ^^load-literal ] }
-        { double-2-rep [ double-array{ 0.5 0.5 }         underlying>> ^^load-literal ] }
-    } case ;
+    rep>half at underlying>> ^^load-literal ;
 
 : >variable-shuffle ( shuffle rep -- shuffle' )
     rep-component-type heap-size
     [ dup <repetition> >byte-array ]
-    [ iota >byte-array ] bi
+    [ <iota> >byte-array ] bi
     '[ _ n*v _ v+ ] map concat ;
 
 : ^load-immediate-shuffle ( shuffle rep -- dst )
@@ -83,7 +93,7 @@ IN: compiler.cfg.intrinsics.simd
         [ [ ^^fill-vector ] [ ^^xor-vector ] bi ]
     } v-vector-op ;
 
-:: ^((compare-vector)) ( src1 src2 rep {cc,swap} -- dst )
+:: ^swap-compare-vector ( src1 src2 rep {cc,swap} -- dst )
     {cc,swap} first2 :> ( cc swap? )
     swap?
     [ src2 src1 rep cc ^^compare-vector ]
@@ -96,10 +106,10 @@ IN: compiler.cfg.intrinsics.simd
     [ rep not? [ ^^fill-vector ] [ ^^zero-vector ] if ]
     [
         ccs unclip :> ( rest-ccs first-cc )
-        src1 src2 rep first-cc ^((compare-vector)) :> first-dst
+        src1 src2 rep first-cc ^swap-compare-vector :> first-dst
 
         rest-ccs first-dst
-        [ [ src1 src2 rep ] dip ^((compare-vector)) rep ^^or-vector ]
+        [ [ src1 src2 rep ] dip ^swap-compare-vector rep ^^or-vector ]
         reduce
 
         not? [ rep ^not-vector ] when
@@ -623,7 +633,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         { float-vector-rep  [ ^select-vector ] }
     } [ integer? ] emit-vl-vector-op ;
 
-: emit-alien-vector ( node -- )
+: emit-alien-vector ( block node -- block' )
     dup [
         '[
             ds-drop prepare-load-memory
@@ -632,14 +642,13 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         [ inline-load-memory? ] inline-accessor
     ] with { [ %alien-vector-reps member? ] } if-literals-match ;
 
-: emit-set-alien-vector ( node -- )
+: emit-set-alien-vector ( block node -- block' )
     dup [
         '[
             ds-drop prepare-store-memory
             _ f ##store-memory-imm,
         ]
-        [ byte-array inline-store-memory? ]
-        inline-accessor
+        [ byte-array inline-store-memory? ] inline-accessor
     ] with { [ %alien-vector-reps member? ] } if-literals-match ;
 
 : enable-simd ( -- )

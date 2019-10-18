@@ -1,9 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs byte-arrays combinators compiler.cfg.builder
-continuations fry sequences compiler.tree.propagation.info
-compiler.tree.propagation.nodes cpu.architecture kernel layouts words
-make math math.intervals math.vectors.simd.intrinsics namespaces ;
+USING: accessors byte-arrays combinators compiler.cfg.builder
+compiler.tree.propagation.info compiler.tree.propagation.nodes
+continuations cpu.architecture fry kernel layouts math
+math.intervals math.vectors.simd.intrinsics namespaces sequences
+words ;
 IN: compiler.tree.propagation.simd
 
 CONSTANT: vector>vector-intrinsics
@@ -123,7 +124,7 @@ vector>vector-intrinsics [ { byte-array } "default-output-classes" set-word-prop
 
 : inline-unless-intrinsic ( word -- )
     dup '[
-        _ swap over "intrinsic" word-prop
+        _ tuck "intrinsic" word-prop
         "always-inline-simd-intrinsics" get not swap and
         ! word node intrinsic
         [ try-intrinsic [ drop f ] [ def>> ] if ]

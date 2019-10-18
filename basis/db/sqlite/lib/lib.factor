@@ -1,17 +1,15 @@
 ! Copyright (C) 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.data arrays assocs kernel math math.parser
-namespaces sequences db.sqlite.ffi db combinators
-continuations db.types calendar.format serialize
-io.streams.byte-array byte-arrays io.encodings.binary
-io.backend db.errors present urls io.encodings.utf8
-io.encodings.string accessors shuffle io db.private ;
+USING: accessors alien.c-types alien.data arrays calendar.format
+calendar.parser combinators db db.errors db.sqlite.ffi db.types
+io.backend io.encodings.string io.encodings.utf8 kernel math
+namespaces present sequences serialize urls ;
 IN: db.sqlite.lib
 
 ERROR: sqlite-error < db-error n string ;
 ERROR: sqlite-sql-error < sql-error n string ;
 
-: throw-sqlite-error ( n -- * )
+: sqlite-other-error ( n -- * )
     dup sqlite-error-messages nth sqlite-error ;
 
 : sqlite-statement-error ( -- * )
@@ -22,7 +20,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
     {
         { SQLITE_OK [ ] }
         { SQLITE_ERROR [ sqlite-statement-error ] }
-        [ throw-sqlite-error ]
+        [ sqlite-other-error ]
     } case ;
 
 : sqlite-open ( path -- db )
@@ -104,7 +102,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
         { VARCHAR [ sqlite-bind-text-by-name ] }
         { DOUBLE [ sqlite-bind-double-by-name ] }
         { DATE [ timestamp>ymd sqlite-bind-text-by-name ] }
-        { TIME [ timestamp>hms sqlite-bind-text-by-name ] }
+        { TIME [ duration>hms sqlite-bind-text-by-name ] }
         { DATETIME [ timestamp>ymdhms sqlite-bind-text-by-name ] }
         { TIMESTAMP [ timestamp>ymdhms sqlite-bind-text-by-name ] }
         { BLOB [ sqlite-bind-blob-by-name ] }
@@ -117,11 +115,11 @@ ERROR: sqlite-sql-error < sql-error n string ;
     } case ;
 
 : sqlite-bind-type ( handle key value type -- )
-    #! null and empty values need to be set by sqlite-bind-null-by-name
+    ! null and empty values need to be set by sqlite-bind-null-by-name
     over [
         NULL = [ 2drop NULL NULL ] when
     ] [
-        drop NULL 
+        drop NULL
     ] if* (sqlite-bind-type) ;
 
 : sqlite-finalize ( handle -- ) sqlite3_finalize sqlite-check-result ;
@@ -132,6 +130,24 @@ ERROR: sqlite-sql-error < sql-error n string ;
 : sqlite-column ( handle index -- string ) sqlite3_column_text ;
 : sqlite-column-name ( handle index -- string ) sqlite3_column_name ;
 : sqlite-column-type ( handle index -- string ) sqlite3_column_type ;
+
+
+: sqlite3-column-null ( sqlite n obj -- obj/f )
+    [ sqlite3_column_type SQLITE_NULL = f ] dip ? ; inline
+
+! sqlite_column_int returns 0 for both a ``0`` and for ``NULL``
+! so call sqlite3_column_type if it's 0
+: sqlite3-column-int ( handle index -- int/f )
+    2dup sqlite3_column_int dup 0 = [ sqlite3-column-null ] [ 2nip ] if ;
+
+: sqlite3-column-int64 ( handle index -- int/f )
+    2dup sqlite3_column_int64 dup 0 = [ sqlite3-column-null ] [ 2nip ] if ;
+
+: sqlite3-column-uint64 ( handle index -- int/f )
+    2dup sqlite3_column_uint64 dup 0 = [ sqlite3-column-null ] [ 2nip ] if ;
+
+: sqlite3-column-double ( handle index -- int/f )
+    2dup sqlite3_column_double dup 0.0 = [ sqlite3-column-null ] [ 2nip ] if ;
 
 : sqlite-column-blob ( handle index -- byte-array/f )
     [ sqlite3_column_bytes ] 2keep
@@ -146,16 +162,16 @@ ERROR: sqlite-sql-error < sql-error n string ;
     {
         { +db-assigned-id+ [ sqlite3_column_int64  ] }
         { +random-id+ [ sqlite3-column-uint64 ] }
-        { INTEGER [ sqlite3_column_int ] }
-        { BIG-INTEGER [ sqlite3_column_int64 ] }
-        { SIGNED-BIG-INTEGER [ sqlite3_column_int64 ] }
+        { INTEGER [ sqlite3-column-int ] }
+        { BIG-INTEGER [ sqlite3-column-int64 ] }
+        { SIGNED-BIG-INTEGER [ sqlite3-column-int64 ] }
         { UNSIGNED-BIG-INTEGER [ sqlite3-column-uint64 ] }
-        { BOOLEAN [ sqlite3_column_int 1 = ] }
-        { DOUBLE [ sqlite3_column_double ] }
+        { BOOLEAN [ sqlite3-column-int 1 = ] }
+        { DOUBLE [ sqlite3-column-double ] }
         { TEXT [ sqlite3_column_text ] }
         { VARCHAR [ sqlite3_column_text ] }
         { DATE [ sqlite3_column_text dup [ ymd>timestamp ] when ] }
-        { TIME [ sqlite3_column_text dup [ hms>timestamp ] when ] }
+        { TIME [ sqlite3_column_text dup [ hms>duration ] when ] }
         { TIMESTAMP [ sqlite3_column_text dup [ ymdhms>timestamp ] when ] }
         { DATETIME [ sqlite3_column_text dup [ ymdhms>timestamp ] when ] }
         { BLOB [ sqlite-column-blob ] }

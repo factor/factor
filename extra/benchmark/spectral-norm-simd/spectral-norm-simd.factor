@@ -8,8 +8,8 @@ SPECIALIZED-ARRAYS: double double-4 ;
 IN: benchmark.spectral-norm-simd
 
 :: inner-loop ( u n quot -- seq )
-    n 4 /i iota [| i |
-        n iota [| j | u i j quot call ] [ v+ ] map-reduce
+    n 4 /i <iota> [| i |
+        n <iota> [| j | u i j quot call ] [ v+ ] map-reduce
     ] double-4-array{ } map-as ; inline
 
 : eval-A ( i j -- n )
@@ -31,7 +31,7 @@ IN: benchmark.spectral-norm-simd
 
 : eval-A-times-u ( n u -- seq )
     [ (eval-A-times-u) ] inner-loop ; inline
-    
+
 :: eval4-A' ( i j -- n )
     j i 4 * 0 + eval-A
     j i 4 * 1 + eval-A

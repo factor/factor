@@ -33,7 +33,7 @@ IN: rosetta-code.one-d-cellular
     index [ 1 - ] [ 1 + ] bi [ world ?nth ] bi@ bool-sum ;
 
 : count-neighbours ( world -- neighbours )
-    [ length iota ] keep [ neighbours ] curry map ;
+    [ length <iota> ] keep [ neighbours ] curry map ;
 
 : life-law ( alive? neighbours -- alive? )
     swap [ 1 = ] [ 2 = ] if ;
@@ -49,4 +49,3 @@ IN: rosetta-code.one-d-cellular
     10 [ dup print-cellular step ] times print-cellular ;
 
 MAIN: main-cellular
-

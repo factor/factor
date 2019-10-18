@@ -10,12 +10,13 @@ IN: vocabs.parser
 ERROR: no-word-error name ;
 
 : word-restarts ( possibilities -- restarts )
-    natural-sort
-    [ [ vocabulary>> "Use the " " vocabulary" surround ] keep ] { } map>assoc ;
+    natural-sort [
+        [ vocabulary>> "Use the " " vocabulary" surround ] keep
+    ] { } map>assoc ;
 
 : word-restarts-with-defer ( name possibilities -- restarts )
     word-restarts
-    swap "Defer word in current vocabulary" swap 2array
+    "Defer word in current vocabulary" rot 2array
     suffix ;
 
 : <no-word-error> ( name possibilities -- error restarts )
@@ -53,9 +54,6 @@ ERROR: no-word-in-vocab word vocab ;
 
 <PRIVATE
 
-: (add-qualified) ( qualified -- )
-    manifest get qualified-vocabs>> push ;
-
 : (from) ( vocab words -- vocab words words' vocab )
     2dup swap load-vocab ;
 
@@ -72,14 +70,15 @@ ERROR: no-word-in-vocab word vocab ;
 : (lookup) ( name assoc -- word/f )
     at* [ dup forward-reference? [ drop f ] when ] when ;
 
-: (use-words) ( assoc -- extra-words seq )
-    <extra-words> manifest get qualified-vocabs>> ;
-
 PRIVATE>
+
+: qualified-vocabs ( -- qualified-vocabs )
+    manifest get qualified-vocabs>> ;
 
 : set-current-vocab ( name -- )
     create-vocab
-    [ manifest get current-vocab<< ] [ (add-qualified) ] bi ;
+    [ manifest get current-vocab<< ]
+    [ qualified-vocabs push ] bi ;
 
 : with-current-vocab ( name quot -- )
     manifest get clone manifest [
@@ -89,27 +88,32 @@ PRIVATE>
 TUPLE: no-current-vocab-error ;
 
 : no-current-vocab ( -- vocab )
-    \ no-current-vocab-error boa
+    no-current-vocab-error boa
     { { "Define words in scratchpad vocabulary" "scratchpad" } }
     throw-restarts dup set-current-vocab ;
 
 : current-vocab ( -- vocab )
     manifest get current-vocab>> [ no-current-vocab ] unless* ;
 
+ERROR: unbalanced-private-declaration vocab ;
+
 : begin-private ( -- )
     current-vocab name>> ".private" ?tail
-    [ drop ] [ ".private" append set-current-vocab ] if ;
+    [ unbalanced-private-declaration ]
+    [ ".private" append set-current-vocab ] if ;
 
 : end-private ( -- )
     current-vocab name>> ".private" ?tail
-    [ set-current-vocab ] [ drop ] if ;
+    [ set-current-vocab ]
+    [ unbalanced-private-declaration ] if ;
 
 : using-vocab? ( vocab -- ? )
     vocab-name manifest get search-vocab-names>> in? ;
 
 : use-vocab ( vocab -- )
-    dup using-vocab?
-    [ vocab-name "Already using ``" "'' vocabulary" surround note. ] [
+    dup using-vocab? [
+        vocab-name "Already using ``" "'' vocabulary" surround note.
+    ] [
         manifest get
         [ [ load-vocab ] dip search-vocabs>> push ]
         [ [ vocab-name ] dip search-vocab-names>> adjoin ]
@@ -119,7 +123,8 @@ TUPLE: no-current-vocab-error ;
 : auto-use-vocab ( vocab -- )
     [ use-vocab ] [ manifest get auto-used>> push ] bi ;
 
-: auto-used? ( -- ? ) manifest get auto-used>> length 0 > ;
+: auto-used? ( -- ? )
+    manifest get auto-used>> length 0 > ;
 
 : unuse-vocab ( vocab -- )
     dup using-vocab? [
@@ -135,7 +140,7 @@ TUPLE: qualified vocab prefix words ;
     (from) qualified-words qualified boa ;
 
 : add-qualified ( vocab prefix -- )
-    <qualified> (add-qualified) ;
+    <qualified> qualified-vocabs push ;
 
 TUPLE: from vocab names words ;
 
@@ -143,7 +148,7 @@ TUPLE: from vocab names words ;
     (from) extract-words from boa ;
 
 : add-words-from ( vocab words -- )
-    <from> (add-qualified) ;
+    <from> qualified-vocabs push ;
 
 TUPLE: exclude vocab names words ;
 
@@ -151,37 +156,45 @@ TUPLE: exclude vocab names words ;
     (from) excluding-words exclude boa ;
 
 : add-words-excluding ( vocab words -- )
-    <exclude> (add-qualified) ;
+    <exclude> qualified-vocabs push ;
 
 TUPLE: rename word vocab words ;
 
 : <rename> ( word vocab new-name -- rename )
-    [ 2dup load-vocab words>> dupd at [ ] [ swap no-word-in-vocab ] ?if ] dip
-    associate rename boa ;
+    [
+        2dup load-vocab words>> dupd at
+        [ ] [ swap no-word-in-vocab ] ?if
+    ] dip associate rename boa ;
 
 : add-renamed-word ( word vocab new-name -- )
-    <rename> (add-qualified) ;
+    <rename> qualified-vocabs push ;
 
-: use-words ( assoc -- ) (use-words) push ;
+: use-words ( assoc -- )
+    <extra-words> qualified-vocabs push ;
 
-: unuse-words ( assoc -- ) (use-words) remove! drop ;
+: unuse-words ( assoc -- )
+    <extra-words> qualified-vocabs remove! drop ;
 
-TUPLE: ambiguous-use-error words ;
+TUPLE: ambiguous-use-error name words ;
 
-: <ambiguous-use-error> ( words -- error restarts )
-    [ \ ambiguous-use-error boa ] [ word-restarts ] bi ;
+: <ambiguous-use-error> ( name words -- error restarts )
+    [ ambiguous-use-error boa ] [ word-restarts ] bi ;
 
 <PRIVATE
 
-: (vocab-search) ( name assocs -- words n )
-    [ words>> (lookup) ] with map
-    sift dup length ;
+: (vocab-search) ( name assocs -- words )
+    [ words>> (lookup) ] with map sift ;
+
+: (vocab-search-qualified) ( name assocs -- words )
+    [ ":" split1 swap ] dip [ name>> = ] with filter (vocab-search) ;
+
+: (vocab-search-full) ( name assocs -- words )
+    [ (vocab-search-qualified) ] [ (vocab-search) ] 2bi append ;
 
 : vocab-search ( name manifest -- word/f )
-    search-vocabs>>
-    (vocab-search) {
-        { 0 [ drop f ] }
-        { 1 [ first ] }
+    dupd search-vocabs>> sift (vocab-search-full) dup length {
+        { 0 [ 2drop f ] }
+        { 1 [ first nip ] }
         [
             drop <ambiguous-use-error> throw-restarts
             dup [ vocabulary>> ] [ name>> 1array ] bi add-words-from
@@ -189,13 +202,12 @@ TUPLE: ambiguous-use-error words ;
     } case ;
 
 : qualified-search ( name manifest -- word/f )
-    qualified-vocabs>>
-    (vocab-search) 0 = [ drop f ] [ last ] if ;
+    qualified-vocabs>> (vocab-search) ?last ;
 
 PRIVATE>
 
 : search-manifest ( name manifest -- word/f )
-    2dup qualified-search dup [ 2nip ] [ drop vocab-search ] if ;
+    2dup qualified-search [ 2nip ] [ vocab-search ] if* ;
 
 : search ( name -- word/f )
     manifest get search-manifest ;
@@ -205,7 +217,7 @@ PRIVATE>
 GENERIC: update ( search-path-elt -- valid? )
 
 : trim-forgotten ( qualified-vocab -- valid? )
-    [ [ nip "forgotten" word-prop not ] assoc-filter ] change-words
+    [ [ nip "forgotten" word-prop ] assoc-reject ] change-words
     words>> assoc-empty? not ;
 
 M: from update trim-forgotten ;
@@ -221,14 +233,29 @@ M: qualified update
 
 M: vocab update dup name>> lookup-vocab eq? ;
 
-: update-manifest ( manifest -- )
-    [ dup [ name>> lookup-vocab ] when ] change-current-vocab
-    [ members [ lookup-vocab ] filter dup fast-set ] change-search-vocab-names
-    swap [ lookup-vocab ] V{ } map-as >>search-vocabs
-    qualified-vocabs>> [ update ] filter! drop ;
+: update-current-vocab ( manifest -- manifest )
+    [ dup [ name>> lookup-vocab ] when ] change-current-vocab ; inline
+
+: compute-search-vocabs ( manifest -- search-vocab-names search-vocabs )
+    search-vocab-names>> members dup length <vector> [
+        [ push ] curry [ when* ] curry
+        [ lookup-vocab dup ] prepose filter fast-set
+    ] keep ; inline
+
+: update-search-vocabs ( manifest -- manifest )
+    dup compute-search-vocabs
+    [ >>search-vocab-names ] [ >>search-vocabs ] bi* ; inline
+
+: update-qualified-vocabs ( manifest -- manifest )
+    dup qualified-vocabs>> [ update ] filter! drop ; inline
+
+: update-manifest ( manifest -- manifest )
+    update-current-vocab
+    update-search-vocabs
+    update-qualified-vocabs ; inline
 
 M: manifest definitions-changed
-    nip update-manifest ;
+    nip update-manifest drop ;
 
 PRIVATE>
 

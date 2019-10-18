@@ -1,25 +1,12 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences words memoize combinators
-classes classes.builtin classes.tuple classes.singleton
-math.partial-dispatch fry assocs combinators.short-circuit
-stack-checker.dependencies
-compiler.tree
-compiler.tree.combinators
-compiler.tree.propagation.info
-compiler.tree.late-optimizations ;
+USING: accessors assocs classes classes.builtin
+classes.singleton classes.tuple combinators
+combinators.short-circuit compiler.tree
+compiler.tree.combinators compiler.tree.late-optimizations fry
+kernel math.partial-dispatch memoize sequences
+stack-checker.dependencies words ;
 IN: compiler.tree.finalization
-
-! This is a late-stage optimization.
-! See the comment in compiler.tree.late-optimizations.
-
-! This pass runs after propagation, so that it can expand
-! type predicates; these cannot be expanded before
-! propagation since we need to see 'fixnum?' instead of
-! 'tag 0 eq?' and so on, for semantic reasoning.
-
-! We also delete empty stack shuffles and copies to facilitate
-! tail call optimization in the code generator.
 
 GENERIC: finalize* ( node -- nodes )
 
@@ -28,7 +15,7 @@ GENERIC: finalize* ( node -- nodes )
 : splice-final ( quot -- nodes ) splice-quot finalize ;
 
 : splice-predicate ( word -- nodes )
-    [ add-depends-on-definition ] [ def>> splice-final ] bi ;
+    [ +definition+ depends-on ] [ def>> splice-final ] bi ;
 
 M: #copy finalize* drop f ;
 

@@ -3,8 +3,8 @@
 USING: accessors assocs cache colors combinators
 combinators.short-circuit concurrency.promises continuations
 destructors fry kernel literals math models namespaces opengl
-opengl.capabilities opengl.textures sequences strings ui.backend
-ui.gadgets ui.gadgets.tracks ui.gestures ui.pixel-formats
+opengl.capabilities opengl.gl opengl.textures sequences strings
+ui.backend ui.gadgets ui.gadgets.tracks ui.gestures ui.pixel-formats
 ui.render ;
 IN: ui.gadgets.worlds
 
@@ -54,7 +54,9 @@ TUPLE: world-attributes
     gadgets
     { pixel-format-attributes initial: $ default-world-pixel-format-attributes }
     { window-controls initial: $ default-world-window-controls }
-    pref-dim ;
+    pref-dim
+    { fill initial: 1 }
+    { orientation initial: $ vertical } ;
 
 : <world-attributes> ( -- world-attributes )
     world-attributes new ; inline
@@ -74,7 +76,7 @@ TUPLE: world-attributes
         f >>grab-input?
         dup focused?>> [ handle>> (ungrab-input) ] [ drop ] if
     ] [ drop ] if ;
-    
+
 : show-status ( string/f gadget -- )
     dup find-world dup [
         dup status>> [
@@ -102,8 +104,7 @@ TUPLE: world-attributes
 ERROR: no-world-found ;
 
 : find-gl-context ( gadget -- )
-    find-world dup
-    [ set-gl-context ] [ no-world-found ] if ;
+    find-world [ set-gl-context ] [ no-world-found ] if* ;
 
 : (request-focus) ( child world ? -- )
     pick parent>> pick eq? [
@@ -129,7 +130,7 @@ M: world request-focus-on ( child gadget -- )
     [ T{ rgba f 0.0 0.0 0.0 0.0 } ]
     [ T{ rgba f 1.0 1.0 1.0 1.0 } ] if ;
 
-GENERIC# apply-world-attributes 1 ( world attributes -- world )
+GENERIC#: apply-world-attributes 1 ( world attributes -- world )
 
 M: world apply-world-attributes
     {
@@ -141,6 +142,8 @@ M: world apply-world-attributes
         [ grab-input?>> >>grab-input? ]
         [ gadgets>> dup sequence? [ [ 1 track-add ] each ] [ 1 track-add ] if ]
         [ pref-dim>> >>pref-dim ]
+        [ fill>> >>fill ]
+        [ orientation>> >>orientation ]
     } cleave ;
 
 : <world> ( world-attributes -- world )
@@ -187,25 +190,23 @@ M: world dim<<
 GENERIC: draw-world* ( world -- )
 
 M: world draw-world*
-    check-extensions
-    "1.0" require-gl-version
     {
-        [ init-gl ]
+        [ gl-draw-init ]
         [ draw-gadget ]
         [ text-handle>> [ purge-cache ] when* ]
         [ images>> [ purge-cache ] when* ]
     } cleave ;
 
 : draw-world? ( world -- ? )
-    #! We don't draw deactivated worlds, or those with 0 size.
-    #! On Windows, the latter case results in GL errors.
+    ! We don't draw deactivated worlds, or those with 0 size.
+    ! On Windows, the latter case results in GL errors.
     { [ active?>> ] [ handle>> ] [ dim>> [ 0 > ] all? ] } 1&& ;
 
 TUPLE: world-error error world ;
 
 C: <world-error> world-error
 
-SYMBOL: ui-error-hook
+SYMBOL: ui-error-hook ! ( error -- )
 
 : ui-error ( error -- )
     ui-error-hook get [ call( error -- ) ] [ die drop ] if* ;
@@ -214,14 +215,12 @@ ui-error-hook [ [ rethrow ] ] initialize
 
 : draw-world ( world -- )
     dup draw-world? [
-        dup world [
-            [
-                dup [ draw-world* ] with-gl-context
-                flush-layout-cache-hook get call( -- )
-            ] [
-                swap f >>active? <world-error> ui-error
-            ] recover
-        ] with-variable
+        [
+            dup [ draw-world* ] with-gl-context
+            flush-layout-cache-hook get call( -- )
+        ] [
+            swap f >>active? <world-error> rethrow
+        ] recover
     ] [ drop ] if ;
 
 world

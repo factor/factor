@@ -54,4 +54,3 @@ IN: math.floating-point
     [ (double-mantissa-bits) 52 2^ / ]
     [ (double-exponent-bits) ] tri
     [ 1 ] [ [ 1 + ] dip ] if-zero 1023 - 2 swap ^ * * ;
-

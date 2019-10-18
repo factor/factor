@@ -1,29 +1,13 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: byte-arrays namespaces make math math.order math.parser
-sequences accessors kernel layouts assocs words summary arrays
-combinators sets continuations.private fry
-cpu.architecture classes classes.struct locals slots parser
-generic.parser strings quotations hashtables
-sequences.generalizations
-compiler.constants
-compiler.cfg
-compiler.cfg.linearization
-compiler.cfg.instructions
-compiler.cfg.comparisons
-compiler.cfg.stack-frame
-compiler.cfg.registers
-compiler.cfg.builder
-compiler.codegen.gc-maps
-compiler.codegen.labels
-compiler.codegen.relocation
-compiler.utilities ;
-FROM: namespaces => set ;
+USING: accessors arrays assocs byte-arrays combinators compiler.cfg
+compiler.cfg.comparisons compiler.cfg.instructions
+compiler.cfg.linearization compiler.codegen.gc-maps
+compiler.codegen.labels compiler.codegen.relocation compiler.constants
+cpu.architecture fry generic.parser kernel layouts locals make math
+namespaces parser quotations sequences sequences.generalizations slots
+words ;
 IN: compiler.codegen
-
-SYMBOL: insn-counts
-
-H{ } clone insn-counts set-global
 
 GENERIC: generate-insn ( insn -- )
 
@@ -34,9 +18,7 @@ SYMBOL: labels
     labels get [ drop <label> ] cache ;
 
 : useless-branch? ( bb successor -- ? )
-    ! If our successor immediately follows us in linearization
-    ! order then we don't need to branch.
-    [ block-number ] bi@ 1 - = ; inline
+    [ number>> ] bi@ 1 - = ; inline
 
 : emit-branch ( bb successor -- )
     2dup useless-branch?
@@ -77,16 +59,8 @@ M: ##dispatch generate-insn
     [ basic-block set ]
     [ lookup-label resolve-label ]
     [
-        instructions>> [
-            [ class-of insn-counts get-global inc-at ]
-            [ generate-insn ]
-            bi
-        ] each
+        instructions>> [ generate-insn ] each
     ] tri ;
-
-: init-fixup ( -- )
-    V{ } clone label-table set
-    V{ } clone binary-literal-table set ;
 
 : check-fixup ( seq -- )
     length data-alignment get mod 0 assert= ;
@@ -94,8 +68,10 @@ M: ##dispatch generate-insn
 : with-fixup ( quot -- code )
     '[
         init-relocation
-        init-gc-maps
-        init-fixup
+        V{ } clone return-addresses set
+        V{ } clone gc-maps set
+        V{ } clone label-table set
+        V{ } clone binary-literal-table set
         [
             @
             emit-binary-literals
@@ -122,8 +98,7 @@ M: ##no-tco generate-insn drop ;
 
 M: ##prologue generate-insn
     drop
-    cfg get stack-frame>>
-    [ [ stack-frame set ] [ total-size>> %prologue ] bi ] when* ;
+    cfg get stack-frame>> [ total-size>> %prologue ] when* ;
 
 M: ##epilogue generate-insn
     drop
@@ -157,8 +132,8 @@ CODEGEN: ##load-vector %load-vector
 CODEGEN: ##peek %peek
 CODEGEN: ##replace %replace
 CODEGEN: ##replace-imm %replace-imm
-CODEGEN: ##inc-d %inc-d
-CODEGEN: ##inc-r %inc-r
+CODEGEN: ##clear %clear
+CODEGEN: ##inc %inc
 CODEGEN: ##call %call
 CODEGEN: ##jump %jump
 CODEGEN: ##return %return
@@ -191,6 +166,7 @@ CODEGEN: ##not %not
 CODEGEN: ##neg %neg
 CODEGEN: ##log2 %log2
 CODEGEN: ##bit-count %bit-count
+CODEGEN: ##bit-test %bit-test
 CODEGEN: ##copy %copy
 CODEGEN: ##tagged>integer %tagged>integer
 CODEGEN: ##add-float %add-float

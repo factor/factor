@@ -33,7 +33,7 @@ CONSTANT: units-per-full-roll 50
 
 : jamshred-roll ( jamshred n -- )
     [ jamshred-player ] dip 2 pi * * units-per-full-roll / roll-player ;
-        
+
 : mouse-scroll-x ( jamshred x -- ) jamshred-roll ;
 
 : mouse-scroll-y ( jamshred y -- )

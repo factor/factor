@@ -2,15 +2,15 @@
 
 namespace factor {
 
-/* Simple code generator used by:
-- quotation compiler (quotations.cpp),
-- megamorphic caches (dispatch.cpp),
-- polymorphic inline caches (inline_cache.cpp) */
+// Simple code generator used by:
+// - quotation compiler (quotations.cpp),
+// - megamorphic caches (dispatch.cpp),
+// - polymorphic inline caches (inline_cache.cpp)
 
-/* Allocates memory (`code` and `relocation` initializers create growable_byte_array) */
-jit::jit(code_block_type type, cell owner, factor_vm* vm)
-    : type(type),
-      owner(owner, vm),
+// Allocates memory (`code` and `relocation` initializers create
+// growable_byte_array)
+jit::jit(cell owner, factor_vm* vm)
+    : owner(owner, vm),
       code(vm),
       relocation(vm),
       parameters(vm),
@@ -30,7 +30,7 @@ jit::~jit() {
   (void)old_count;
 }
 
-/* Allocates memory */
+// Allocates memory
 void jit::emit_relocation(cell relocation_template_) {
   data_root<byte_array> relocation_template(relocation_template_, parent);
   cell capacity =
@@ -38,13 +38,13 @@ void jit::emit_relocation(cell relocation_template_) {
   relocation_entry* relocations = relocation_template->data<relocation_entry>();
   for (cell i = 0; i < capacity; i++) {
     relocation_entry entry = relocations[i];
-    relocation_entry new_entry(entry.rel_type(), entry.rel_class(),
-                               entry.rel_offset() + code.count);
+    relocation_entry new_entry(entry.type(), entry.klass(),
+                               entry.offset() + code.count);
     relocation.append_bytes(&new_entry, sizeof(relocation_entry));
   }
 }
 
-/* Allocates memory */
+// Allocates memory
 void jit::emit(cell code_template_) {
   data_root<array> code_template(code_template_, parent);
 
@@ -68,7 +68,7 @@ void jit::emit(cell code_template_) {
   code.append_byte_array(insns.value());
 }
 
-/* Allocates memory */
+// Allocates memory
 void jit::emit_with_literal(cell code_template_, cell argument_) {
   data_root<array> code_template(code_template_, parent);
   data_root<object> argument(argument_, parent);
@@ -76,7 +76,7 @@ void jit::emit_with_literal(cell code_template_, cell argument_) {
   emit(code_template.value());
 }
 
-/* Allocates memory */
+// Allocates memory
 void jit::emit_with_parameter(cell code_template_, cell argument_) {
   data_root<array> code_template(code_template_, parent);
   data_root<object> argument(argument_, parent);
@@ -84,7 +84,7 @@ void jit::emit_with_parameter(cell code_template_, cell argument_) {
   emit(code_template.value());
 }
 
-/* Allocates memory */
+// Allocates memory
 bool jit::emit_subprimitive(cell word_, bool tail_call_p, bool stack_frame_p) {
   data_root<word> word(word_, parent);
   data_root<array> code_template(word->subprimitive, parent);
@@ -104,18 +104,18 @@ bool jit::emit_subprimitive(cell word_, bool tail_call_p, bool stack_frame_p) {
   return false;
 }
 
-/* Facility to convert compiled code offsets to quotation offsets.
-Call jit_compute_offset() with the compiled code offset, then emit
-code, and at the end jit->position is the quotation position. */
+// Facility to convert compiled code offsets to quotation offsets.
+// Call jit_compute_offset() with the compiled code offset, then emit
+// code, and at the end jit->position is the quotation position.
 void jit::compute_position(cell offset_) {
   computing_offset_p = true;
   position = 0;
   offset = offset_;
 }
 
-/* Allocates memory */
-code_block* jit::to_code_block(cell frame_size) {
-  /* Emit dummy GC info */
+// Allocates memory (trim(), add_code_block)
+code_block* jit::to_code_block(code_block_type type, cell frame_size) {
+  // Emit dummy GC info
   code.grow_bytes(alignment_for(code.count + 4, data_alignment));
   uint32_t dummy_gc_info = 0;
   code.append_bytes(&dummy_gc_info, sizeof(uint32_t));
@@ -126,7 +126,7 @@ code_block* jit::to_code_block(cell frame_size) {
   literals.trim();
 
   return parent->add_code_block(
-      type, code.elements.value(), false_object, /* no labels */
+      type, code.elements.value(), false_object, // no labels
       owner.value(), relocation.elements.value(), parameters.elements.value(),
       literals.elements.value(), frame_size);
 }

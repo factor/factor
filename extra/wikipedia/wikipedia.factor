@@ -1,10 +1,9 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors ascii assocs calendar colors.constants
-formatting html.entities html.parser html.parser.analyzer
-html.parser.printer http.client io io.streams.string io.styles
-kernel make namespaces regexp sequences splitting urls
+USING: accessors ascii assocs colors.constants formatting
+html.entities html.parser html.parser.analyzer html.parser.printer
+http.client io io.styles kernel namespaces sequences splitting urls
 wrap.strings xml xml.data xml.traversal ;
 FROM: xml.data => tag? ;
 
@@ -45,7 +44,7 @@ SYMBOL: language
     children-tags [ item. ] each nl ;
 
 : historical-url ( timestamp -- url )
-    [ month-name ] [ day>> ] bi "%s_%s" sprintf wikipedia-url ;
+    "%B_%d" strftime wikipedia-url ;
 
 : (historical-events) ( timestamp -- seq )
     historical-url http-get nip string>xml "ul" deep-tags-named ;
@@ -76,7 +75,7 @@ PRIVATE>
 : article. ( name -- )
     wikipedia-url http-get nip parse-html
     "content" find-by-id-between
-    [ html-text. ] with-string-writer string-lines
+    html-text string-lines
     [ [ blank? ] trim ] map harvest [
         html-unescape 72 wrap-string print nl
     ] each ;

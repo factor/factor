@@ -61,19 +61,21 @@ IN: webapps.mason.package
         [
             validate-os/cpu
             "os" value "cpu" value (platform) "platform" set-value
-            current-builder {
-                [ package-link "package" set-value ]
-                [ release-git-id>> git-link "git-id" set-value ]
-                [ requirements "requirements" set-value ]
-                [ host-name>> "host-name" set-value ]
-                [ heartbeat-timestamp>> "heartbeat-timestamp" set-value ]
-                [ current-status "status" set-value ]
-                [ last-build-status "last-build" set-value ]
-                [ clean-build-status "last-clean-build" set-value ]
-                [ current-timestamp>> "current-timestamp" set-value ]
-                [ packages-link "binaries" set-value ]
-                [ clean-image-link "clean-images" set-value ]
-                [ report-link "last-report" set-value ]
-            } cleave
+            current-builder [
+                {
+                    [ package-link "package" set-value ]
+                    [ release-git-id>> git-link "git-id" set-value ]
+                    [ requirements "requirements" set-value ]
+                    [ host-name>> "host-name" set-value ]
+                    [ heartbeat-timestamp>> "heartbeat-timestamp" set-value ]
+                    [ current-status "status" set-value ]
+                    [ last-build-status "last-build" set-value ]
+                    [ clean-build-status "last-clean-build" set-value ]
+                    [ current-timestamp>> "current-timestamp" set-value ]
+                    [ packages-link "binaries" set-value ]
+                    [ clean-image-link "clean-images" set-value ]
+                    [ report-link "last-report" set-value ]
+                } cleave
+            ] when*
         ] with-mason-db
     ] >>init ;

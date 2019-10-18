@@ -1,4 +1,5 @@
-! (c)Joe Groff bsd license
+! Copyright (C) 2009, 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.parser arrays
 byte-arrays combinators effects.parser fry generalizations grouping kernel
 lexer locals macros make math math.ranges parser sequences
@@ -28,7 +29,7 @@ M: data-map-param nth-unsafe
         [ iter-length>> * >fixnum ]
         [ bytes>> ]
         [ count>> ]
-        [ c-type>> ] 
+        [ c-type>> ]
     } cleave <displaced-direct-array> ; inline
 
 INSTANCE: data-map-param immutable-sequence
@@ -55,7 +56,7 @@ INSTANCE: data-map-param immutable-sequence
 
 : [>param] ( type -- quot )
     c-type-count over c-type-name?
-    [ [>c-type-param] ] [ [>object-param] ] if ; 
+    [ [>c-type-param] ] [ [>object-param] ] if ;
 
 MACRO: >param ( in -- quot: ( array -- param ) )
     [>param] ;
@@ -75,15 +76,15 @@ MACRO: >param ( in -- quot: ( array -- param ) )
 
 : [alloc-param] ( type -- quot )
     c-type-count over c-type-name?
-    [ [alloc-c-type-param] ] [ [alloc-object-param] ] if ; 
+    [ [alloc-c-type-param] ] [ [alloc-object-param] ] if ;
 
 MACRO: alloc-param ( out -- quot: ( len -- param ) )
     [alloc-param] ;
 
-MACRO: unpack-params ( ins -- )
+MACRO: unpack-params ( ins -- quot )
     [ c-type-count nip '[ _ firstn-unsafe ] ] map '[ _ spread ] ;
 
-MACRO: pack-params ( outs -- )
+MACRO: pack-params ( outs -- quot )
     [ ] [ c-type-count nip dup [ [ ndip _ ] dip set-firstn ] 3curry ] reduce
     fry [ call ] compose ;
 
@@ -104,7 +105,7 @@ MACRO: pack-params ( outs -- )
         [ orig>> ] , #outs , \ napply ,
     ] [ ] make fry \ call suffix ;
 
-MACRO: data-map ( ins outs -- )
+MACRO: data-map ( ins outs -- quot )
     2dup
     [
         [ [ '[ _ >param ] ] map '[ _ spread ] ]
@@ -113,7 +114,7 @@ MACRO: data-map ( ins outs -- )
     [ [ '[ _ alloc-param ] ] map '[ _ cleave ] ] bi* compose
     [data-map] ;
 
-MACRO: data-map! ( ins outs -- )
+MACRO: data-map! ( ins outs -- quot )
     2dup append [ '[ _ >param ] ] map '[ _ spread ] [data-map] ;
 
 : parse-data-map-effect ( accum -- accum )
@@ -128,4 +129,3 @@ SYNTAX: data-map(
 
 SYNTAX: data-map!(
     parse-data-map-effect \ data-map! suffix! ;
-

@@ -108,11 +108,11 @@ HELP: set-query-param
 }
 { $examples
     { $code
-        """USING: kernel http.client urls ;
-URL" http://search.yahooapis.com/WebSearchService/V1/webSearch" clone
-    "concatenative programming (NSFW)" "query" set-query-param
-    "1" "adult_ok" set-query-param
-http-get"""
+        "USING: kernel http.client urls ;
+URL\" http://search.yahooapis.com/WebSearchService/V1/webSearch\" clone
+    \"concatenative programming (NSFW)\" \"query\" set-query-param
+    \"1\" \"adult_ok\" set-query-param
+http-get"
     }
     "(For a complete Yahoo! search web service implementation, see the " { $vocab-link "yahoo" } " vocabulary.)"
 }
@@ -159,7 +159,7 @@ HELP: url-addr
     { $example
         "USING: io.sockets.secure prettyprint urls ;"
         "URL\" https://google.com/\" url-addr ."
-        "T{ secure\n    { addrspec T{ inet { host \"google.com\" } { port 443 } } }\n}"
+        "T{ secure\n    { addrspec T{ inet { host \"google.com\" } { port 443 } } }\n    { hostname \"google.com\" }\n}"
     }
 } ;
 

@@ -22,7 +22,7 @@ PRIVATE>
 
 ! Image Decode
 
-GENERIC# load-image* 1 ( obj class -- image )
+GENERIC#: load-image* 1 ( obj class -- image )
 
 GENERIC: stream>image* ( stream class -- image )
 

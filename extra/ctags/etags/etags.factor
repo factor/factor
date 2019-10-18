@@ -3,70 +3,49 @@
 
 ! Emacs Etags generator
 ! Alfredo Beaumont <alfredo.beaumont@gmail.com>
-USING: kernel sequences sorting assocs words prettyprint ctags
-io.encodings.ascii io.files math math.parser namespaces make
-strings shuffle io.backend arrays present ;
+USING: arrays assocs ctags.private fry io.backend
+io.encodings.ascii io.files kernel make math math.parser present
+sequences sorting strings vocabs ;
 IN: ctags.etags
 
-: etag-at ( key hash -- vector )
-  at [ V{ } clone ] unless* ;
+<PRIVATE
 
-: etag-vector ( alist hash -- vector )
-  [ ctag-path ] dip etag-at ;
+: etag-hash ( alist -- hash )
+    H{ } clone [
+        '[ first2 swap [ 2array ] dip _ push-at ] assoc-each
+    ] keep ;
 
-: etag-pair ( ctag -- seq )
-  dup [
-    first ,
-    second second ,
-  ] { } make ;
+: lines>bytes ( lines -- bytes )
+    0 [ length 1 + + ] accumulate nip ;
 
-: etag-add ( ctag hash -- )
-  [ etag-vector ] 2keep [
-    [ etag-pair ] [ ctag-path ] bi [ suffix ] dip
-  ] dip set-at ;
-    
-: etag-hash ( seq -- hash )
-  H{ } clone swap [ swap [ etag-add ] keep ] each ;
-
-: lines>bytes ( seq n -- bytes )
-  head 0 [ length 1 + + ] reduce ;
-
-: file>lines ( path -- lines )
-  ascii file-lines ;
-
-: etag ( lines seq -- str )
-  [
-    dup first present %
-    1 0x7f <string> %
-    second dup number>string %
-    1 CHAR: , <string> %
-    1 - lines>bytes number>string %
-  ] "" make ;
-
-: (etag-header) ( n path -- str )
-  [
-    %
-    1 CHAR: , <string> %
-    number>string %
-  ] "" make ;
-
-: etag-header ( vec1 n resource -- vec2 )
-  normalize-path (etag-header) prefix
-  1 0x0c <string> prefix ;
-
-: etag-strings ( alist -- seq )
-  { } swap [
+: etag ( bytes seq -- str )
     [
-      [ first file>lines ]
-      [ second ] bi
-      [ etag ] with map
-      dup sum-lengths
-    ] keep first
-    etag-header append
-  ] each ;
+        dup first present %
+        0x7f ,
+        second dup number>string %
+        "," %
+        1 - swap nth number>string %
+    ] "" make ;
 
-: etags-write ( alist path -- )
-  [ etag-strings ] dip ascii set-file-lines ; 
+: etag-header ( vec1 resource -- vec2 )
+    [
+        normalize-path %
+        "," %
+        dup sum-lengths number>string %
+    ] "" make prefix "\f" prefix ;
 
-: etags ( path -- )
-  [ (ctags) sort-values etag-hash >alist ] dip etags-write ;
+: make-etags ( alist -- seq )
+    V{ } clone swap [
+        over [
+            [ ascii file-lines lines>bytes ] dip
+            [ etag ] with map
+        ] dip etag-header append!
+    ] assoc-each ;
+
+PRIVATE>
+
+: etags ( -- etags )
+    all-words locations etag-hash sort-keys make-etags ;
+
+: write-etags ( path -- )
+    [ etags ] dip ascii set-file-lines ;

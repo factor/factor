@@ -44,7 +44,7 @@ ARTICLE: "prettyprint-variables" "Prettyprint control variables"
 ARTICLE: "prettyprint-limitations" "Prettyprinter limitations"
 "When using the prettyprinter as a serialization mechanism, keep the following points in mind:"
 { $list
-    { "When printing words, " { $link POSTPONE: USING: } " declarations are only output if the " { $link pprint-use } " or " { $link unparse-use } "  words are used." }
+    { "When printing words, " { $link POSTPONE: USING: } " declarations are only output if the " { $link pprint-use } " or " { $link unparse-use } " words are used." }
     { "Long output will be truncated if certain " { $link "prettyprint-variables" } " are set." }
     "Shared structure is not reflected in the printed output; if the output is parsed back in, fresh objects are created for all literal denotations."
     { "Circular structure is not printed in a readable way. For example, try this:"
@@ -249,7 +249,7 @@ HELP: stack.
 
 HELP: callstack.
 { $values { "callstack" callstack } }
-{ $description "Displays a sequence output by " { $link callstack } " in a nice way, by highlighting the current execution point in every call frame with " { $link -> } "." } ;
+{ $description "Displays the " { $link callstack } " in a user friendly fashion with outermost stack frames first and innermost frames at the bottom. The current execution point in every call frame is highlighted with " { $link => } "." } ;
 
 HELP: .c
 { $description "Displays the contents of the call stack, with the top of the stack printed first." } ;

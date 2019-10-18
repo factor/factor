@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup kernel math strings ;
+USING: help.syntax help.markup kernel math strings unicode ;
 IN: unicode.data
 
 ABOUT: "unicode.data"

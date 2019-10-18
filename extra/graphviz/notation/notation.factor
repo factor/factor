@@ -11,7 +11,7 @@ IN: graphviz.notation
 
 <PRIVATE
 
-! GENERIC# =attr 1 ( graphviz-obj val -- graphviz-obj' )
+! GENERIC#: =attr 1 ( graphviz-obj val -- graphviz-obj' )
 ! M: edge/node =attr
 !   present over attributes>> attr<< ;
 ! M: sub/graph =attr
@@ -22,7 +22,7 @@ IN: graphviz.notation
 : =attr-generic ( name -- generic )
     "=" prepend "graphviz.notation" 2dup lookup-word
     [ 2nip ] [
-        create dup
+        create-word dup
         1 <standard-combination>
         ( graphviz-obj val -- graphviz-obj' )
         define-generic
@@ -74,14 +74,14 @@ ALIAS: -- add-edge
 ALIAS: ~-> add-path
 ALIAS: ~-- add-path
 
-ALIAS: graph[ <graph-attributes>
-ALIAS: node[ <node-attributes>
-ALIAS: edge[ <edge-attributes>
+ALIAS: [graph <graph-attributes>
+ALIAS: [node <node-attributes>
+ALIAS: [edge <edge-attributes>
 
-ALIAS: add-node[ <node>
-ALIAS: add-edge[ <edge>
-ALIAS: ->[ <edge>
-ALIAS: --[ <edge>
+ALIAS: [add-node <node>
+ALIAS: [add-edge <edge>
+ALIAS: [-> <edge>
+ALIAS: [-- <edge>
 
 ALIAS: ]; add
 

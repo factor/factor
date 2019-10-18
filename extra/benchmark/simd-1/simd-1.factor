@@ -11,19 +11,16 @@ IN: benchmark.simd-1
     0.0 float-4-boa ; inline
 
 : make-points ( len -- points )
-    iota [ <point> ] float-4-array{ } map-as ; inline
+    <iota> [ <point> ] float-4-array{ } map-as ; inline
 
 : normalize-points ( points -- )
     [ normalize ] map! drop ; inline
-
-: max-points ( points -- point )
-    [ ] [ vmax ] map-reduce ; inline
 
 : print-point ( point -- )
     [ number>string ] { } map-as ", " join print ; inline
 
 : simd-benchmark ( len -- )
-    >fixnum make-points [ normalize-points ] [ max-points ] bi print-point ;
+    >fixnum make-points [ normalize-points ] [ vsupremum ] bi print-point ;
 
 : simd-1-benchmark ( -- )
     10 [ 500000 simd-benchmark ] times ;

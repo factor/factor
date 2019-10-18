@@ -1,13 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.strings libc destructors
-locals kernel math assocs namespaces make continuations sequences
-hashtables sorting arrays combinators math.bitwise strings
-system accessors threads splitting io.backend
-io.files.windows io.monitors io.ports
-io.buffers io.files io.timeouts io.encodings.string literals
-io.encodings.utf16n io windows.errors windows.kernel32 windows.types
-io.pathnames classes.struct ;
+USING: accessors alien alien.data arrays classes.struct
+combinators continuations destructors fry io.backend
+io.encodings.string io.encodings.utf16n io.files.windows
+io.monitors io.pathnames io.ports kernel literals locals make
+math sequences system threads windows.errors windows.kernel32
+windows.types ;
 IN: io.monitors.windows
 
 : open-directory ( path -- handle )
@@ -32,7 +30,7 @@ TUPLE: win32-monitor < monitor port ;
         [ recursive>> 1 0 ? ]
     } cleave
     FILE_NOTIFY_CHANGE_ALL
-    0 uint <ref>
+    0 DWORD <ref>
     (make-overlapped)
     [ f ReadDirectoryChangesW win32-error=0/f ] keep ;
 
@@ -55,8 +53,9 @@ TUPLE: win32-monitor < monitor port ;
     memory>byte-array utf16n decode ;
 
 : parse-notify-record ( buffer -- path changed )
-    [ [ FileName>> ] [ FileNameLength>> ] bi memory>u16-string ]
-    [ Action>> parse-action ] bi ;
+    [
+        [ FileName>> ] [ FileNameLength>> ] bi memory>u16-string
+    ] [ Action>> parse-action ] bi ;
 
 : (file-notify-records) ( buffer -- buffer )
     FILE_NOTIFY_INFORMATION memory>struct
@@ -77,7 +76,7 @@ TUPLE: win32-monitor < monitor port ;
     ] each ;
 
 : fill-queue ( monitor -- )
-    dup port>> dup check-disposed
+    dup port>> check-disposed
     [ buffer>> ptr>> ] [ read-changes zero? ] bi
     [ 2dup parse-notify-records ] unless
     2drop ;
@@ -86,8 +85,8 @@ TUPLE: win32-monitor < monitor port ;
     dup fill-queue (fill-queue-thread) ;
 
 : fill-queue-thread ( monitor -- )
-    [ dup fill-queue (fill-queue-thread) ]
-    [ dup already-disposed? [ 2drop ] [ rethrow ] if ] recover ;
+    '[ _ dup fill-queue (fill-queue-thread) ]
+    [ already-disposed? ] ignore-error ;
 
 M:: windows (monitor) ( path recursive? mailbox -- monitor )
     [

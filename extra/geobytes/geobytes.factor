@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators combinators.smart csv io.encodings.8-bit
-math.parser memoize sequences kernel unicode.categories money
-io.encodings.8-bit.latin1 ;
+USING: combinators combinators.smart csv io.encodings.latin1
+kernel math.parser memoize money sequences unicode ;
 IN: geobytes
 
 ! GeoBytes is not free software.
@@ -47,7 +46,7 @@ MEMO: load-countries ( -- seq )
                 [ ]
                 [ ]
             } spread country boa
-        ] input<sequence 
+        ] input<sequence
     ] map ;
 
 MEMO: load-regions ( -- seq )
@@ -60,7 +59,7 @@ MEMO: load-regions ( -- seq )
                 [ ]
                 [ [ blank? ] trim ]
             } spread region boa
-        ] input<sequence 
+        ] input<sequence
     ] map ;
 
 MEMO: load-cities ( -- seq )
@@ -76,7 +75,7 @@ MEMO: load-cities ( -- seq )
                 [ ]
                 [ string>number ]
             } spread city boa
-        ] input<sequence 
+        ] input<sequence
     ] map ;
 
 MEMO: load-version ( -- seq )
@@ -87,5 +86,5 @@ MEMO: load-version ( -- seq )
                 [ ]
                 [ string>number ]
             } spread version boa
-        ] input<sequence 
+        ] input<sequence
     ] map ;

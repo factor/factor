@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors io.files.info io.pathnames kernel math
-math.parser namespaces sequences mason.config ;
+USING: accessors io.files.info io.pathnames kernel mason.config
+math math.parser namespaces sequences ;
 IN: mason.disk
 
 : gb ( -- n ) 30 2^ ; inline
@@ -9,8 +9,7 @@ IN: mason.disk
 : sufficient-disk-space? ( -- ? )
     ! We want at least 300Mb to be available before starting
     ! a build.
-    current-directory get file-system-info available-space>>
-    gb > ;
+    "." file-system-info available-space>> gb > ;
 
 : check-disk-space ( -- )
     sufficient-disk-space? [

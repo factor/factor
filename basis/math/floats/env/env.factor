@@ -1,4 +1,5 @@
-! (c)Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien.syntax arrays assocs biassocs combinators
 combinators.short-circuit continuations generalizations kernel
 literals locals math math.bitwise sequences sets system
@@ -55,7 +56,7 @@ HOOK: (fp-env-registers) cpu ( -- registers )
 : fp-env-register ( -- register ) (fp-env-registers) first ;
 
 :: mask> ( bits assoc -- symbols )
-    assoc [| k v | bits v mask zero? not ] assoc-filter keys ;
+    assoc [| k v | bits v mask zero? ] assoc-reject keys ;
 : >mask ( symbols assoc -- bits )
     over empty?
     [ 2drop 0 ]
@@ -67,16 +68,16 @@ HOOK: (fp-env-registers) cpu ( -- registers )
 GENERIC: (set-fp-env-register) ( fp-env -- )
 
 GENERIC: (get-exception-flags) ( fp-env -- exceptions )
-GENERIC# (set-exception-flags) 1 ( fp-env exceptions -- fp-env )
+GENERIC#: (set-exception-flags) 1 ( fp-env exceptions -- fp-env )
 
 GENERIC: (get-fp-traps) ( fp-env -- exceptions )
-GENERIC# (set-fp-traps) 1 ( fp-env exceptions -- fp-env )
+GENERIC#: (set-fp-traps) 1 ( fp-env exceptions -- fp-env )
 
 GENERIC: (get-rounding-mode) ( fp-env -- mode )
-GENERIC# (set-rounding-mode) 1 ( fp-env mode -- fp-env )
+GENERIC#: (set-rounding-mode) 1 ( fp-env mode -- fp-env )
 
 GENERIC: (get-denormal-mode) ( fp-env -- mode )
-GENERIC# (set-denormal-mode) 1 ( fp-env mode -- fp-env )
+GENERIC#: (set-denormal-mode) 1 ( fp-env mode -- fp-env )
 
 : change-fp-env-registers ( quot -- )
     (fp-env-registers) swap [ (set-fp-env-register) ] compose each ; inline
@@ -154,9 +155,8 @@ PRIVATE>
 : without-fp-traps ( quot -- )
     { } swap with-fp-traps ; inline
 
-<< {
+{
     { [ cpu x86? ] [ "math.floats.env.x86" require ] }
     { [ cpu ppc? ] [ "math.floats.env.ppc" require ] }
     [ "CPU architecture unsupported by math.floats.env" throw ]
-} cond >>
-
+} cond

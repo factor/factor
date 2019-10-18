@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Dmitry Shubin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.destructors
-alien.enums alien.syntax classes.struct combinators destructors
-fry gdbm.ffi io.backend kernel libc locals math namespaces
+alien.enums alien.syntax classes.struct combinators continuations
+destructors fry gdbm.ffi io.backend kernel libc locals math namespaces
 sequences serialize strings ;
 IN: gdbm
 
@@ -41,10 +41,12 @@ ENUM: gdbm-error
     gdbm-option-already-set
     gdbm-illegal-option ;
 
-
 <PRIVATE
 
-: gdbm-throw ( -- * ) gdbm_errno gdbm-error number>enum throw ;
+: gdbm-errno ( -- n )
+    [ gdbm_errno ] [ drop gdbm_errno_location int deref ] recover ;
+
+: gdbm-throw ( -- * ) gdbm-errno gdbm-error number>enum throw ;
 
 : check-error ( ret -- ) 0 = [ gdbm-throw ] unless ;
 
@@ -160,4 +162,3 @@ PRIVATE>
 
 : with-gdbm-writer ( name quot -- )
     writer swap with-gdbm-role ; inline
-

@@ -1,20 +1,19 @@
 ! Copyright (C) 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays assocs definitions help.topics io.pathnames
-kernel math math.order memoize namespaces sequences sets sorting
-tools.completion tools.crossref vocabs vocabs.parser vocabs.hierarchy
-words ;
+USING: accessors arrays assocs definitions help.topics
+io.pathnames kernel memoize namespaces sequences sets sorting
+tools.completion tools.crossref vocabs vocabs.hierarchy
+vocabs.parser words ;
 
 IN: fuel.xref
 
 <PRIVATE
 
-: normalize-loc ( seq -- path line )
-    [ dup length 0 > [ first absolute-path ] [ drop f ] if ]
-    [ dup length 1 > [ second ] [ drop 1 ] if ] bi ;
+: normalize-loc ( pair/f -- path line )
+    [ first2 [ absolute-path ] dip ] [ f f ] if* ;
 
-: get-loc ( object -- loc ) normalize-loc 2array ;
+: get-loc ( pair/f -- loc ) normalize-loc 2array ;
 
 : word>xref ( word -- xref )
     [ name>> ] [ vocabulary>> ] [ where normalize-loc ] tri 4array ;
@@ -22,17 +21,20 @@ IN: fuel.xref
 : vocab>xref ( vocab -- xref )
     dup dup >vocab-link where normalize-loc 4array ;
 
-: sort-xrefs ( seq -- seq' )
-    [ first ] sort-with ;
-
 : format-xrefs ( seq -- seq' )
     [ word? ] filter [ word>xref ] map ;
 
+: group-xrefs ( xrefs -- xrefs' )
+    natural-sort [ second ] collect-by
+    ! Change key from 'name' to { name path }
+    [ [ [ third ] map-find drop 2array ] keep ] assoc-map
+    >alist natural-sort ;
+
 : filter-prefix ( seq prefix -- seq )
-    [ drop-prefix nip length 0 = ] curry filter members ;
+    [ drop-prefix nip empty? ] curry filter members ;
 
 MEMO: (vocab-words) ( name -- seq )
-    >vocab-link words [ name>> ] map ;
+    >vocab-link vocab-words [ name>> ] map ;
 
 : current-words ( -- seq )
     manifest get
@@ -44,13 +46,15 @@ MEMO: (vocab-words) ( name -- seq )
 
 PRIVATE>
 
-: callers-xref ( word -- seq ) usage format-xrefs sort-xrefs ;
+: callers-xref ( word -- seq ) usage format-xrefs group-xrefs ;
 
-: callees-xref ( word -- seq ) uses format-xrefs sort-xrefs ;
+: callees-xref ( word -- seq ) uses format-xrefs group-xrefs ;
 
-: apropos-xref ( str -- seq ) words-matching format-xrefs ;
+: apropos-xref ( str -- seq ) words-matching keys format-xrefs group-xrefs ;
 
-: vocab-xref ( vocab -- seq ) words format-xrefs ;
+: vocab-xref ( vocab -- seq )
+    dup ".private" append [ vocab-words ] bi@ append
+    format-xrefs group-xrefs ;
 
 : word-location ( word -- loc ) where get-loc ;
 
@@ -64,9 +68,7 @@ PRIVATE>
 
 : article-location ( name -- loc ) lookup-article loc>> get-loc ;
 
-: get-vocabs ( -- seq ) all-vocab-names ;
-
-: get-vocabs/prefix ( prefix -- seq ) get-vocabs swap filter-prefix ;
+: get-vocabs/prefix ( prefix -- seq ) all-disk-vocab-names swap filter-prefix ;
 
 : get-vocabs-words/prefix ( prefix names/f -- seq )
     [ vocabs-words ] [ current-words ] if* natural-sort swap filter-prefix ;

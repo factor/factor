@@ -1,7 +1,8 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: kernel math math.statistics math.vectors sequences ;
+USING: kernel math math.functions math.statistics math.vectors
+sequences sequences.extras ;
 
 IN: math.similarity
 
@@ -12,4 +13,18 @@ IN: math.similarity
     over length 3 < [ 2drop 1.0 ] [ population-corr 0.5 * 0.5 + ] if ;
 
 : cosine-similarity ( a b -- n )
-    [ v* sum ] [ [ norm ] bi@ * ] 2bi / 0.5 * 0.5 + ;
+    [ v. ] [ [ norm ] bi@ * ] 2bi / ;
+
+<PRIVATE
+
+: weighted-v. ( w a b -- n )
+    [ * * ] [ + ] 3map-reduce ;
+
+: weighted-norm ( w a -- n )
+    [ absq * ] [ + ] 2map-reduce ;
+
+PRIVATE>
+
+: weighted-cosine-similarity ( w a b -- n )
+    [ weighted-v. ]
+    [ overd [ weighted-norm ] 2bi@ * ] 3bi / ;

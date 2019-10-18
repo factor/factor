@@ -9,12 +9,12 @@ IN: command-line
 SYMBOL: user-init-errors
 SYMBOL: +user-init-error+
 
-TUPLE: user-init-error error file line# asset ;
+TUPLE: user-init-error error path line# asset ;
 
 : <user-init-error> ( error -- error' )
     [ ] [ error-file ] [ error-line ] tri
     f user-init-error boa ; inline
-M: user-init-error error-file file>> ;
+M: user-init-error error-file path>> ;
 M: user-init-error error-line line#>> ;
 M: user-init-error error-type drop +user-init-error+ ;
 
@@ -47,6 +47,10 @@ SYMBOL: command-line
         ".factor-roots" rc-path dup exists? [
             utf8 file-lines harvest [ add-vocab-root ] each
         ] [ drop ] if
+        "roots" get [
+            os windows? ";" ":" ?
+            split [ add-vocab-root ] each
+        ] when*
     ] when ;
 
 : var-param ( name value -- ) swap set-global ;
@@ -59,7 +63,7 @@ SYMBOL: command-line
 : run-script ( file -- )
     t parser-quiet? [
         [ run-file ]
-        [ source-file main>> [ execute( -- ) ] when* ] bi
+        [ path>source-file main>> [ execute( -- ) ] when* ] bi
     ] with-variable ;
 
 : (parse-command-line) ( args -- )
@@ -76,7 +80,7 @@ SYMBOL: command-line
 : parse-command-line ( args -- )
     command-line off
     script off
-    (parse-command-line) ;
+    rest (parse-command-line) ;
 
 SYMBOL: main-vocab-hook
 

@@ -21,9 +21,9 @@ H{ } clone params set
     "rewritten-param" >>param
 "rewrite" set
 
-[ { { } "DEFAULT!" } ] [ { } "rewrite" get call-responder ] unit-test
-[ { { } "xxx" } ] [ { "xxx" } "rewrite" get call-responder ] unit-test
-[ { { "blah" } "xxx" } ] [ { "xxx" "blah" } "rewrite" get call-responder ] unit-test
+{ { { } "DEFAULT!" } } [ { } "rewrite" get call-responder ] unit-test
+{ { { } "xxx" } } [ { "xxx" } "rewrite" get call-responder ] unit-test
+{ { { "blah" } "xxx" } } [ { "xxx" "blah" } "rewrite" get call-responder ] unit-test
 
 <vhost-rewrite>
     rewrite-test-child new >>child
@@ -32,17 +32,17 @@ H{ } clone params set
     "blogs.vegan.net" >>suffix
 "rewrite" set
 
-[ { { } "DEFAULT!" } ] [
+{ { { } "DEFAULT!" } } [
     URL" http://blogs.vegan.net" url set
     { } "rewrite" get call-responder
 ] unit-test
 
-[ { { } "DEFAULT!" } ] [
+{ { { } "DEFAULT!" } } [
     URL" http://www.blogs.vegan.net" url set
     { } "rewrite" get call-responder
 ] unit-test
 
-[ { { } "erg" } ] [
+{ { { } "erg" } } [
     URL" http://erg.blogs.vegan.net" url set
     { } "rewrite" get call-responder
 ] unit-test

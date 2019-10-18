@@ -12,9 +12,9 @@ HELP: >py
 { $values { "obj" "a factor object" } { "py-obj" "a python object" } }
 { $description "Converts a factor objects to its most fitting python representation." }
 { $examples
-  { $example
+  { $unchecked-example
     "USING: arrays prettyprint python sequences ;"
-    "10 iota >array >py py> ."
+    "10 <iota> >array >py py> ."
     "{ 0 1 2 3 4 5 6 7 8 9 }"
   }
 }
@@ -53,3 +53,5 @@ $nl
 { $notes "Sometimes the embedded python interpreter can't find or finds the wrong load path to it's module library. To counteract that problem it is recommended that the " { $snippet "PYTHONHOME" } " environment variable is set before " { $link py-initialize } " is called. E.g:" }
 { $code "\"C:/python27-64bit/\" \"PYTHONHOME\" set-os-env" }
 { $warning "All code that calls Python words should always be wrapped in a " { $link with-destructors } " context. The reason is that the words add references to Pythons internal memory heap which are removed when the destructors trigger." } ;
+
+ABOUT: "python"

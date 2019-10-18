@@ -27,7 +27,7 @@ $nl
 ABOUT: "strings"
 
 HELP: string
-{ $description "The class of fixed-length character strings. See " { $link "syntax-strings" } " for syntax and " { $link "strings" } " for general information." } ;
+{ $class-description "The class of fixed-length character strings. See " { $link "syntax-strings" } " for syntax and " { $link "strings" } " for general information." } ;
 
 HELP: string-nth
 { $values { "n" fixnum } { "string" string } { "ch" "the character at the " { $snippet "n" } "th index" } }
@@ -35,7 +35,7 @@ HELP: string-nth
 { $warning "This word is in the " { $vocab-link "strings.private" } " vocabulary because it does not perform type or bounds checking. User code should call " { $link nth } " instead." } ;
 
 HELP: set-string-nth
-{ $values { "ch" "a character" } { "n" fixnum } { "string" string }  }
+{ $values { "ch" "a character" } { "n" fixnum } { "string" string } }
 { $description "Unsafe string mutator, used to define " { $link set-nth } " on strings." }
 { $warning "This word is in the " { $vocab-link "strings.private" } " vocabulary because it does not perform type or bounds checking. User code should call " { $link set-nth } " instead." } ;
 
@@ -44,11 +44,11 @@ HELP: <string>
 { $description "Creates a new string with the given length and all characters initially set to " { $snippet "ch" } "." } ;
 
 HELP: 1string
-{ $values { "ch" "a character"} { "str" string } }
+{ $values { "ch" "a character" } { "str" string } }
 { $description "Outputs a string of one character." } ;
 
 HELP: >string
-{ $values { "seq" "a sequence of characters" } { "str" string } }
+{ $values { "seq" { $sequence "characters" } } { "str" string } }
 { $description "Outputs a freshly-allocated string with the same elements as a given sequence, by interpreting the sequence elements as Unicode code points." }
 { $notes "This operation is only appropriate if the underlying sequence holds Unicode code points, which is rare unless it is a " { $link slice } " of another string. To convert a sequence of bytes to a string, use the words documented in " { $link "io.encodings.string" } "." }
 { $errors "Throws an error if the sequence contains elements other than integers." } ;

@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays fry images kernel
 locals math math.functions math.order math.vectors namespaces
 sequences sorting ;
@@ -10,7 +11,7 @@ IN: images.atlas
 !   place first rect at x 0
 !   place rects that fit in remaining stripe
 !   pack stripes(y + height)
-! if height > max height 
+! if height > max height
 
 TUPLE: image-placement
     { image read-only }
@@ -76,7 +77,7 @@ ERROR: atlas-image-formats-dont-match images ;
     image dim>> first2 :> ( w h )
     image-placement loc>> first2 :> ( x y )
 
-    h iota [| row |
+    h <iota> [| row |
         0  row      w  image pixel-row-slice-at
         x  y row +  w  atlas set-pixel-row-at
     ] each ; inline
@@ -108,7 +109,7 @@ PRIVATE>
     image-placement image>> :> image
     image-placement loc>> first2 :> ( x y )
     image dim>> first2 :> ( w h )
-    
+
     x     aw /f :> left-u
     y     ah /f :> top-v
     x w + aw /f :> right-u

@@ -17,6 +17,8 @@ IN: io.directories
 ! Creating directories
 HOOK: make-directory io-backend ( path -- )
 
+DEFER: make-parent-directories
+
 : make-directories ( path -- )
     normalize-path trim-tail-separators dup {
         [ "." = ]
@@ -24,9 +26,15 @@ HOOK: make-directory io-backend ( path -- )
         [ empty? ]
         [ exists? ]
     } 1|| [
-        dup parent-directory make-directories
+        make-parent-directories
         dup make-directory
     ] unless drop ;
+
+: make-parent-directories ( filename -- filename )
+    dup parent-directory make-directories ;
+
+: with-ensure-directory ( path quot -- )
+    [ absolute-path dup make-directories current-directory ] dip with-variable ; inline
 
 ! Listing directories
 TUPLE: directory-entry name type ;
@@ -38,7 +46,7 @@ HOOK: (directory-entries) os ( path -- seq )
 : directory-entries ( path -- seq )
     normalize-path
     (directory-entries)
-    [ name>> { "." ".." } member? not ] filter ;
+    [ name>> { "." ".." } member? ] reject ;
 
 : directory-files ( path -- seq )
     directory-entries [ name>> ] map! ;
@@ -48,6 +56,20 @@ HOOK: (directory-entries) os ( path -- seq )
 
 : with-directory-files ( path quot -- )
     '[ "" directory-files @ ] with-directory ; inline
+
+: qualified-directory-entries ( path -- seq )
+    absolute-path
+    dup directory-entries [ [ append-path ] change-name ] with map! ;
+
+: qualified-directory-files ( path -- seq )
+    absolute-path
+    dup directory-files [ append-path ] with map! ;
+
+: with-qualified-directory-files ( path quot -- )
+    '[ "" qualified-directory-files @ ] with-directory ; inline
+
+: with-qualified-directory-entries ( path quot -- )
+    '[ "" qualified-directory-entries @ ] with-directory ; inline
 
 ! Touching files
 HOOK: touch-file io-backend ( path -- )
@@ -65,6 +87,7 @@ HOOK: delete-directory io-backend ( path -- )
 
 ! Moving and renaming files
 HOOK: move-file io-backend ( from to -- )
+HOOK: move-file-atomically io-backend ( from to -- )
 
 : move-file-into ( from to -- )
     to-directory move-file ;
@@ -76,8 +99,7 @@ HOOK: move-file io-backend ( from to -- )
 HOOK: copy-file io-backend ( from to -- )
 
 M: object copy-file
-    dup parent-directory make-directories
-    binary <file-writer> [
+    make-parent-directories binary <file-writer> [
         swap binary <file-reader> [
             swap stream-copy
         ] with-disposal

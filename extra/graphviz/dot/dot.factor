@@ -1,8 +1,8 @@
 ! Copyright (C) 2012 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes classes.tuple combinators formatting
-graphviz graphviz.attributes io io.files kernel namespaces
-sequences splitting strings words ;
+USING: accessors classes classes.tuple combinators formatting graphviz
+graphviz.attributes io io.files kernel namespaces sequences splitting
+strings words ;
 IN: graphviz.dot
 
 <PRIVATE
@@ -14,11 +14,14 @@ GENERIC: dot. ( obj -- )
 ! option in case there's a keyword clash, spaces in the ID,
 ! etc.  This does mean that HTML labels aren't supported, but
 ! they don't seem to work using the Graphviz API anyway.
-: escape ( str -- str' )
-    "\"" split "\\\"" join
-    "\0" split "" join ;
+!
+! Special escaping logic is required here because of the \l escape
+! sequence.
+: quote-string ( str -- str' )
+    { { "\"" "\\\"" } { "\0" "" } } [ first2 replace ] each
+    "\"" "\"" surround ;
 
-M: string dot. escape "\"%s\" " printf ;
+M: string dot. quote-string "%s " printf ;
 
 : id. ( obj -- ) id>> dot. ;
 
@@ -47,7 +50,7 @@ M: subgraph dot.
     "subgraph " write [ id. ] [ statements. ] bi ;
 
 : attribute, ( attr value -- )
-    dup [ "%s=\"%s\"," printf ] [ 2drop ] if ;
+    [ quote-string "%s=%s," printf ] [ drop ] if* ;
 
 : attributes. ( attrs -- )
     "[" write

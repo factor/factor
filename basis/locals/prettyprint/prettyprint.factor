@@ -1,15 +1,12 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel locals locals.types
-prettyprint.backend prettyprint.sections prettyprint.custom
-sequences words ;
+USING: accessors kernel locals locals.types prettyprint.backend
+prettyprint.custom prettyprint.sections sequences words ;
 IN: locals.prettyprint
 
-SYMBOL: |
-
 : pprint-var ( var -- )
-    #! Prettyprint a read/write local as its writer, just like
-    #! in the input syntax: [| x! | ... x 3 + x! ]
+    ! Prettyprint a read/write local as its writer, just like
+    ! in the input syntax: [| x! | ... x 3 + x! ]
     dup local-reader? [
         "local-writer" word-prop
     ] when pprint-word ;
@@ -20,7 +17,7 @@ M: lambda pprint*
     <flow
     \ [| pprint-word
     dup vars>> pprint-vars
-    \ | pprint-word
+    "|" text
     f <inset body>> pprint-elements block>
     \ ] pprint-word
     block> ;

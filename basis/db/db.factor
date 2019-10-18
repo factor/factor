@@ -27,7 +27,7 @@ HOOK: parse-db-error db-connection ( error -- error' )
 
 : dispose-statements ( assoc -- ) values dispose-each ;
 
-M: db-connection dispose ( db-connection -- ) 
+M: db-connection dispose ( db-connection -- )
     dup db-connection [
         [ dispose-statements H{ } clone ] change-insert-statements
         [ dispose-statements H{ } clone ] change-update-statements
@@ -41,8 +41,8 @@ TUPLE: result-set sql in-params out-params handle n max ;
 GENERIC: query-results ( query -- result-set )
 GENERIC: #rows ( result-set -- n )
 GENERIC: #columns ( result-set -- n )
-GENERIC# row-column 1 ( result-set column -- obj )
-GENERIC# row-column-typed 1 ( result-set column -- sql )
+GENERIC#: row-column 1 ( result-set column -- obj )
+GENERIC#: row-column-typed 1 ( result-set column -- sql )
 GENERIC: advance-row ( result-set -- )
 GENERIC: more-rows? ( result-set -- ? )
 
@@ -105,14 +105,14 @@ M: object execute-statement* ( statement type -- )
 : sql-row-typed ( result-set -- seq )
     dup #columns [ row-column-typed ] with { } map-integers ;
 
-: query-each ( statement quot: ( statement -- ) -- )
+: query-each ( result-set quot: ( row -- ) -- )
     over more-rows? [
         [ call ] 2keep over advance-row query-each
     ] [
         2drop
     ] if ; inline recursive
 
-: query-map ( statement quot -- seq )
+: query-map ( result-set quot: ( row -- row' ) -- seq )
     collector [ query-each ] dip { } like ; inline
 
 : with-db ( db quot -- )

@@ -5,7 +5,7 @@ IN: hashtables
 ARTICLE: "hashtables.private" "Hashtable implementation details"
 "This hashtable implementation uses only one auxiliary array in addition to the hashtable tuple itself. The array stores keys in even slots and values in odd slots. Values are looked up with a hashing strategy that uses quadratic probing to resolve collisions."
 $nl
-"There are two special objects: the " { $link ((tombstone)) } " marker and the " { $link ((empty)) } " marker. Neither of these markers can be used as hashtable keys."
+"There are two special objects: the " { $link +tombstone+ } " marker and the " { $link +empty+ } " marker. Neither of these markers can be used as hashtable keys."
 $nl
 "The " { $snippet "count" } " slot is the number of entries including deleted entries, and " { $snippet "deleted" } " is the number of deleted entries."
 { $subsections
@@ -58,7 +58,7 @@ ARTICLE: "hashtables.utilities" "Hashtable utilities"
 ABOUT: "hashtables"
 
 HELP: hashtable
-{ $description "The class of hashtables. See " { $link "syntax-hashtables" } " for syntax and " { $link "hashtables" } " for general information." } ;
+{ $class-description "The class of hashtables. See " { $link "syntax-hashtables" } " for syntax and " { $link "hashtables" } " for general information." } ;
 
 HELP: hash@
 { $values { "key" "a key" } { "array" "the underlying array of a hashtable" } { "i" "the index to begin hashtable search" } }
@@ -70,7 +70,7 @@ HELP: probe
 
 HELP: key@
 { $values { "key" "a key" } { "hash" hashtable } { "array" "the underlying array of the hashtable" } { "n" "the index of the key" } { "?" "a boolean indicating whether the key was present" } }
-{ $description "Searches the hashtable for the key using a quadratic probing strategy. Searches stop if either the key or an " { $link ((empty)) } " sentinel is found. Searches skip the " { $link ((tombstone)) } " sentinel." } ;
+{ $description "Searches the hashtable for the key using a quadratic probing strategy. Searches stop if either the key or an " { $link +empty+ } " sentinel is found. Searches skip the " { $link +tombstone+ } " sentinel." } ;
 
 { key@ new-key@ } related-words
 
@@ -79,7 +79,7 @@ HELP: new-key@
 { $description "Searches the hashtable for the key using a quadratic probing strategy. If the key is not present in the hashtable, outputs the index where it should be stored." } ;
 
 HELP: set-nth-pair
-{ $values { "value" "the second element of the pair" } { "key" "the first element of the pair" } { "seq" sequence } { "n" "an index in the sequence" } }
+{ $values { "value" "the second element of the pair" } { "key" "the first element of the pair" } { "array" "the underlying array of the hashtable" } { "n" "an index in the sequence" } }
 { $description "Stores a pair of values into the elements with index " { $snippet "n" } " and " { $snippet "n+1" } ", respectively." }
 { $warning "This word is in the " { $vocab-link "hashtables.private" } " vocabulary because it does not perform bounds checks." }
 { $side-effects "seq" } ;

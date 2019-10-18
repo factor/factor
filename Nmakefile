@@ -1,28 +1,63 @@
-!IF !DEFINED(BOOTIMAGE_VERSION)
-BOOTIMAGE_VERSION = latest
+VERSION = 0.98
+
+# Crazy hack to do shell commands
+# We do it in Nmakefile because that way we don't have to invoke build through build.cmd
+# and we can just do ``nmake /f Nmakefile x86-64-vista`` or similar
+# and we still get the git branch, id, etc
+
+!IF [git describe --all > git-describe.tmp] == 0
+GIT_DESCRIBE = \
+!INCLUDE <git-describe.tmp>
+!IF [rm git-describe.tmp] == 0
 !ENDIF
+!ENDIF
+
+!IF [git rev-parse HEAD > git-id.tmp] == 0
+GIT_ID = \
+!INCLUDE <git-id.tmp>
+!IF [rm git-id.tmp] == 0
+!ENDIF
+!ENDIF
+
+!IF [git rev-parse --abbrev-ref HEAD > git-branch.tmp] == 0
+GIT_BRANCH = \
+!INCLUDE <git-branch.tmp>
+!IF [rm git-branch.tmp] == 0
+!ENDIF
+!ENDIF
+
+GIT_LABEL = $(GIT_DESCRIBE)-$(GIT_ID)
 
 !IF DEFINED(PLATFORM)
 
-LINK_FLAGS = /nologo shell32.lib
-CL_FLAGS = /nologo /O2 /WX /W3 /D_CRT_SECURE_NO_WARNINGS
+LINK_FLAGS = /nologo shell32.lib user32.lib
+CL_FLAGS = /nologo /O2 /WX /W3 /D_CRT_SECURE_NO_WARNINGS /DFACTOR_VERSION=$(VERSION) /DFACTOR_GIT_LABEL=$(GIT_LABEL)
 CL_FLAGS_VISTA = /D_WIN32_WINNT=0x0600
 
 !IF "$(PLATFORM)" == "x86-32"
-LINK_FLAGS = $(LINK_FLAGS) /safeseh
+LINK_FLAGS = $(LINK_FLAGS) /safeseh /largeaddressaware
 PLAF_DLL_OBJS = vm\os-windows-x86.32.obj vm\safeseh.obj vm\cpu-x86.obj
+SUBSYSTEM_COM_FLAGS = console,"5.01"
+SUBSYSTEM_EXE_FLAGS = windows,"5.01"
 
 !ELSEIF "$(PLATFORM)" == "x86-32-vista"
-LINK_FLAGS = $(LINK_FLAGS) /safeseh
+LINK_FLAGS = $(LINK_FLAGS) /safeseh /largeaddressaware
 CL_FLAGS = $(CL_FLAGS) $(CL_FLAGS_VISTA)
 PLAF_DLL_OBJS = vm\os-windows-x86.32.obj vm\safeseh.obj vm\cpu-x86.obj
+SUBSYSTEM_COM_FLAGS = console
+SUBSYSTEM_EXE_FLAGS = windows
 
 !ELSEIF "$(PLATFORM)" == "x86-64"
 PLAF_DLL_OBJS = vm\os-windows-x86.64.obj vm\cpu-x86.obj
+SUBSYSTEM_COM_FLAGS = console,"5.02"
+SUBSYSTEM_EXE_FLAGS = windows,"5.02"
+
 
 !ELSEIF "$(PLATFORM)" == "x86-64-vista"
 CL_FLAGS = $(CL_FLAGS) $(CL_FLAGS_VISTA)
 PLAF_DLL_OBJS = vm\os-windows-x86.64.obj vm\cpu-x86.obj
+SUBSYSTEM_COM_FLAGS = console
+SUBSYSTEM_EXE_FLAGS = windows
 !ENDIF
 
 !IF DEFINED(DEBUG)
@@ -54,10 +89,8 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm\entry_points.obj \
 	vm\errors.obj \
 	vm\factor.obj \
-	vm\free_list.obj \
 	vm\full_collector.obj \
 	vm\gc.obj \
-	vm/gc_info.obj \
 	vm\image.obj \
 	vm\inline_cache.obj \
 	vm\instruction_operands.obj \
@@ -81,11 +114,12 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm\vm.obj \
 	vm\words.obj
 
-.cpp.obj:
-	cl /EHsc $(CL_FLAGS) /Fo$@ /c $<
+# batch mode has ::
+.cpp.obj::
+	cl /EHsc $(CL_FLAGS) /MP /Fovm/ /c $<
 
-.c.obj:
-	cl $(CL_FLAGS) /Fo$@ /c $<
+.c.obj::
+	cl /EHsc $(CL_FLAGS) /MP /Fovm/ /c $<
 
 .asm.obj:
 	ml $(ML_FLAGS) /Fo$@ /c $<
@@ -94,16 +128,16 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	rc $<
 
 libfactor-ffi-test.dll: vm/ffi_test.obj
-	link $(LINK_FLAGS) /out:libfactor-ffi-test.dll /dll vm/ffi_test.obj
+	link $(LINK_FLAGS) /out:libfactor-ffi-test.dll /dll /def:vm\ffi_test.def vm/ffi_test.obj
 
 factor.dll.lib: $(DLL_OBJS)
 	link $(LINK_FLAGS) /implib:factor.dll.lib /out:factor.dll /dll $(DLL_OBJS)
 
 factor.com: $(EXE_OBJS) $(DLL_OBJS)
-	link $(LINK_FLAGS) /out:factor.com /SUBSYSTEM:console $(EXE_OBJS) $(DLL_OBJS)
+	link $(LINK_FLAGS) /out:factor.com /SUBSYSTEM:$(SUBSYSTEM_COM_FLAGS) $(EXE_OBJS) $(DLL_OBJS)
 
 factor.exe: $(EXE_OBJS) $(DLL_OBJS)
-	link $(LINK_FLAGS) /out:factor.exe /SUBSYSTEM:windows $(EXE_OBJS) $(DLL_OBJS)
+	link $(LINK_FLAGS) /out:factor.exe /SUBSYSTEM:$(SUBSYSTEM_EXE_FLAGS) $(EXE_OBJS) $(DLL_OBJS)
 
 all: factor.com factor.exe factor.dll.lib libfactor-ffi-test.dll
 
@@ -132,12 +166,15 @@ x86-64-vista:
 
 clean:
 	del vm\*.obj
+	if exist vm\factor.res del vm\factor.res
 	if exist factor.lib del factor.lib
-	if exist factor.res del factor.res
 	if exist factor.com del factor.com
 	if exist factor.exe del factor.exe
 	if exist factor.dll del factor.dll
 	if exist factor.dll.lib del factor.dll.lib
+	if exist libfactor-ffi-test.dll del libfactor-ffi-test.dll
+	if exist libfactor-ffi-test.exp del libfactor-ffi-test.exp
+	if exist libfactor-ffi-test.lib del libfactor-ffi-test.lib
 
 .PHONY: all default x86-32 x86-64 x86-32-vista x86-64-vista clean
 

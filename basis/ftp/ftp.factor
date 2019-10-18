@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators io io.files kernel
-math.parser sequences strings ;
+USING: accessors io io.crlf kernel sequences ;
 IN: ftp
 
 SYMBOLS: +active+ +passive+ ;
@@ -15,4 +14,4 @@ TUPLE: ftp-response n strings parsed ;
 : add-response-line ( ftp-response string -- ftp-response )
     over strings>> push ;
 
-: ftp-send ( string -- ) write "\r\n" write flush ;
+: ftp-send ( string -- ) write crlf flush ;

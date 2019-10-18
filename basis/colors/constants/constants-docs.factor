@@ -3,9 +3,9 @@ USING: help.markup help.syntax strings colors ;
 
 HELP: named-color
 { $values { "name" string } { "color" color } }
-{ $description "Outputs a named color from the " { $snippet "rgb.txt" } " database." }
+{ $description "Outputs a named color from the color database." }
 { $notes "In most cases, " { $link POSTPONE: COLOR: } " should be used instead." }
-{ $errors "Throws an error if the color is not listed in " { $snippet "rgb.txt" } "." } ;
+{ $errors "Throws an error if the color is not listed in " { $snippet "rgb.txt" } ", " { $snippet "factor-colors.txt" } " or " { $snippet "solarized-colors.txt" } "." } ;
 
 HELP: named-colors
 { $values { "keys" "a sequence of strings" } }
@@ -30,4 +30,4 @@ ARTICLE: "colors.constants" "Standard color database"
     POSTPONE: COLOR:
 } ;
 
-ABOUT: "colors.constants" 
+ABOUT: "colors.constants"

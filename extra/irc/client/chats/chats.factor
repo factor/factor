@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors concurrency.mailboxes kernel calendar io.sockets
-destructors arrays sequences io.encodings.8-bit.latin1 ;
+USING: accessors calendar concurrency.mailboxes
+io.encodings.utf8 io.sockets kernel ;
 IN: irc.client.chats
 
 CONSTANT: irc-port 6667 ! Default irc port
@@ -47,6 +47,6 @@ TUPLE: irc-client profile stream in-messages out-messages
         30 seconds >>reconnect-time
         10         >>reconnect-attempts
         V{ } clone >>exceptions
-        [ <inet> latin1 <client> drop ] >>connect ;
+        [ <inet> utf8 <client> drop ] >>connect ;
 
 SINGLETONS: irc-chat-end irc-end irc-disconnected irc-connected ;

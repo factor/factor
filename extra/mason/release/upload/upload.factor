@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2011 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces make sequences arrays io io.files
-io.launcher mason.common mason.platform
-mason.release.archive mason.config ;
+USING: kernel mason.common mason.config mason.platform
+namespaces sequences ;
 IN: mason.release.upload
 
 : remote-location ( -- dest )

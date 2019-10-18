@@ -2,16 +2,16 @@
 
 namespace factor {
 
-/* Fault handler information.  MacOSX version.
-Copyright (C) 1993-1999, 2002-2003  Bruno Haible <clisp.org at bruno>
-Copyright (C) 2003  Paolo Bonzini <gnu.org at bonzini>
+// Fault handler information.  MacOSX version.
+// Copyright (C) 1993-1999, 2002-2003  Bruno Haible <clisp.org at bruno>
+// Copyright (C) 2003  Paolo Bonzini <gnu.org at bonzini>
 
-Used under BSD license with permission from Paolo Bonzini and Bruno Haible,
-2005-03-10:
+// Used under BSD license with permission from Paolo Bonzini and Bruno Haible,
+// 2005-03-10:
 
-http://sourceforge.net/mailarchive/message.php?msg_name=200503102200.32002.bruno%40clisp.org
+// http://sourceforge.net/mailarchive/message.php?msg_name=200503102200.32002.bruno%40clisp.org
 
-Modified for Factor by Slava Pestov and Daniel Ehrenberg */
+// Modified for Factor by Slava Pestov and Daniel Ehrenberg
 #define MACH_EXC_STATE_TYPE x86_exception_state64_t
 #define MACH_EXC_STATE_FLAVOR x86_EXCEPTION_STATE64
 #define MACH_EXC_STATE_COUNT x86_EXCEPTION_STATE64_COUNT
@@ -67,10 +67,8 @@ inline static void uap_clear_fpu_status(void* uap) {
   mach_clear_fpu_status(UAP_FS(uap));
 }
 
-/* Must match the leaf-stack-frame-size, signal-handler-stack-frame-size,
-and stack-frame-size constants in basis/cpu/x86/64/unix/bootstrap.factor */
-static const unsigned LEAF_FRAME_SIZE = 16;
-static const unsigned SIGNAL_HANDLER_STACK_FRAME_SIZE = 160;
+// Must match the stack-frame-size constant in
+// basis/bootstrap/assembler/x86.64.unix.factor
 static const unsigned JIT_FRAME_SIZE = 32;
 
 }

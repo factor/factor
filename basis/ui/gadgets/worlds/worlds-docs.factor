@@ -1,6 +1,5 @@
-USING: ui.gadgets ui.render ui.text ui.text.private
-ui.gestures ui.backend help.markup help.syntax
-models opengl sequences strings destructors ;
+USING: destructors help.markup help.syntax math models strings
+ui.backend ui.gadgets ui.gestures ui.render ;
 IN: ui.gadgets.worlds
 
 HELP: user-input
@@ -47,19 +46,52 @@ HELP: focus-path
 
 HELP: world
 { $class-description "A gadget which appears at the top of the gadget hieararchy, and in turn may be displayed in a native window. Worlds have the following slots:"
-    { $list
-        { { $slot "active?" } " - if set to " { $link f } ", the world will not be drawn. This slot is set to " { $link f } " if an error is thrown while drawing the world; this prevents multiple debugger windows from being shown." }
-        { { $slot "layers" } " - a sequence of glass panes in front of the primary gadget, used to implement behaviors such as popup menus which are hidden when the mouse is clicked outside the menu. See " { $link "ui.gadgets.glass" } "." }
-        { { $slot "title" } " - a string to be displayed in the title bar of the native window containing the world." }
-        { { $slot "status" } " - a " { $link model } " holding a string to be displayed in the world's status bar." }
-        { { $slot "status-owner" } " - the gadget that displayed the most recent status message." }
-        { { $slot "focus" } " - the current owner of the keyboard focus in the world." }
-        { { $slot "focused?" } " - a boolean indicating if the native window containing the world has keyboard focus." }
-        { { $slot "grab-input?" } " - if set to " { $link t } ", the world will hide the mouse cursor and disable normal mouse input while focused. Use " { $link grab-input } " and " { $link ungrab-input } " to change this setting." }
-        { { $slot "handle" } " - a backend-specific native handle representing the native window containing the world, or " { $link f } " if the world is not grafted." }
-        { { $slot "window-loc" } " - the on-screen location of the native window containing the world. The co-ordinate system here is backend-specific." }
-        { { $slot "window-controls" } " - the set of " { $link "ui.gadgets.worlds-window-controls" } " with which the world window was created." }
+  { $table
+    {
+        { $slot "active?" }
+        { "an " { $link integer } " initially set to 0. The active " { $link ui-backend } " increases the value in steps up to 100 while the native window containing the world is being initialized but not yet visible on the screen. The world is only redrawn when the value is 100 which prevents redundant redraws from happening during initialization. The slot is set to 0 if an error is thrown while drawing the world; this prevents multiple debugger windows from being shown." }
     }
+    {
+        { $slot "layers" }
+        { "a sequence of glass panes in front of the primary gadget, used to implement behaviors such as popup menus which are hidden when the mouse is clicked outside the menu. See " { $link "ui.gadgets.glass" } "." }
+    }
+    {
+        { $slot "title" }
+        { "a string to be displayed in the title bar of the native window containing the world." }
+    }
+    {
+        { $slot "status" }
+        { "a " { $link model } " holding a string to be displayed in the world's status bar." }
+    }
+    {
+        { $slot "status-owner" }
+        { "the gadget that displayed the most recent status message." }
+    }
+    {
+        { $slot "focus" }
+        { "the current owner of the keyboard focus in the world." }
+    }
+    {
+        { $slot "focused?" }
+        { "a boolean indicating if the native window containing the world has keyboard focus." }
+    }
+    {
+        { $slot "grab-input?" }
+        { "if set to " { $link t } ", the world will hide the mouse cursor and disable normal mouse input while focused. Use " { $link grab-input } " and " { $link ungrab-input } " to change this setting." }
+    }
+    {
+        { $slot "handle" }
+        { "a backend-specific native handle representing the native window containing the world, or " { $link f } " if the world is not grafted." }
+    }
+    {
+        { $slot "window-loc" }
+        { "the on-screen location of the native window containing the world. The co-ordinate system here is backend-specific." }
+    }
+    {
+        { $slot "window-controls" }
+        { "the set of " { $link "ui.gadgets.worlds-window-controls" } " with which the world window was created." }
+    }
+  }
 } ;
 
 HELP: <world>
@@ -96,6 +128,10 @@ HELP: draw-world*
 { $values { "world" world } }
 { $description "Called when " { $snippet "world" } " needs to be redrawn. The world's OpenGL context is current when this method is called." } ;
 
+HELP: ui-error-hook
+{ $var-description "A quotation that is called if an error occurs in the UI updating thread." }
+{ $see-also ui-error } ;
+
 ARTICLE: "ui.gadgets.worlds-subclassing" "Subclassing worlds"
 "The " { $link world } " gadget can be subclassed, giving Factor code full control of the window's OpenGL context. The following generic words can be overridden to replace standard UI behavior:"
 { $subsections
@@ -120,4 +156,3 @@ $nl
     "gl-utilities"
     "text-rendering"
 } ;
-

@@ -1,11 +1,9 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: memory system kernel vocabs.refresh ui.tools.operations
-ui.tools.listener ui.tools.browser ui.tools.common ui.tools.error-list
-ui.tools.walker ui.commands ui.gestures ui ui.private ;
+USING: memory namespaces system ui ui.backend ui.commands
+ui.gestures ui.tools.browser ui.tools.common
+ui.tools.error-list ui.tools.listener vocabs.refresh ;
 IN: ui.tools
-
-MAIN: listener-window
 
 \ refresh-all H{ { +nullary+ t } { +listener+ t } } define-command
 
@@ -29,3 +27,9 @@ tool "common" f {
     { T{ key-down f f "F2" } refresh-all }
     { T{ key-down f f "F3" } show-error-list }
 } define-command-map
+
+: ui-tools-main ( -- )
+    f ui-stop-after-last-window? set-global
+    listener-window ;
+
+MAIN: ui-tools-main

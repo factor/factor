@@ -2,16 +2,16 @@
 
 namespace factor {
 
-/* Fault handler information.  MacOSX version.
-Copyright (C) 1993-1999, 2002-2003  Bruno Haible <clisp.org at bruno>
-Copyright (C) 2003  Paolo Bonzini <gnu.org at bonzini>
+// Fault handler information.  MacOSX version.
+// Copyright (C) 1993-1999, 2002-2003  Bruno Haible <clisp.org at bruno>
+// Copyright (C) 2003  Paolo Bonzini <gnu.org at bonzini>
 
-Used under BSD license with permission from Paolo Bonzini and Bruno Haible,
-2005-03-10:
+// Used under BSD license with permission from Paolo Bonzini and Bruno Haible,
+// 2005-03-10:
 
-http://sourceforge.net/mailarchive/message.php?msg_name=200503102200.32002.bruno%40clisp.org
+// http://sourceforge.net/mailarchive/message.php?msg_name=200503102200.32002.bruno%40clisp.org
 
-Modified for Factor by Slava Pestov */
+// Modified for Factor by Slava Pestov
 #define MACH_EXC_STATE_TYPE i386_exception_state_t
 #define MACH_EXC_STATE_FLAVOR i386_EXCEPTION_STATE
 #define MACH_EXC_STATE_COUNT i386_EXCEPTION_STATE_COUNT

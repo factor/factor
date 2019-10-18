@@ -1,10 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel namespaces sequences
-compiler.cfg.instructions compiler.cfg.def-use
-compiler.cfg.rpo compiler.cfg.predecessors hash-sets sets ;
-FROM: assocs => change-at ;
-FROM: namespaces => set ;
+USING: accessors arrays assocs combinators compiler.cfg.def-use
+compiler.cfg.instructions compiler.cfg.predecessors
+compiler.cfg.rpo kernel namespaces sequences sets ;
 IN: compiler.cfg.dce
 
 ! Maps vregs to sequences of vregs
@@ -23,9 +21,9 @@ SYMBOL: allocations
     allocations get in? ;
 
 : init-dead-code ( -- )
-    H{ } clone liveness-graph set
-    HS{ } clone live-vregs set
-    HS{ } clone allocations set ;
+    H{ } clone liveness-graph namespaces:set
+    HS{ } clone live-vregs namespaces:set
+    HS{ } clone allocations namespaces:set ;
 
 GENERIC: build-liveness-graph ( insn -- )
 
@@ -115,15 +113,11 @@ M: flushable-insn live-insn? defs-vregs [ live-vreg? ] any? ;
 
 M: insn live-insn? drop t ;
 
-: eliminate-dead-code ( cfg -- cfg' )
-    ! Even though we don't use predecessors directly, we depend
-    ! on the predecessors pass updating phi nodes to remove dead
-    ! inputs.
-    needs-predecessors
-
+: eliminate-dead-code ( cfg -- )
     init-dead-code
-    dup
-    [ [ [ build-liveness-graph ] each ] simple-analysis ]
-    [ [ [ compute-live-vregs ] each ] simple-analysis ]
-    [ [ [ live-insn? ] filter! ] simple-optimization ]
-    tri ;
+    {
+        [ needs-predecessors ]
+        [ [ [ build-liveness-graph ] each ] simple-analysis ]
+        [ [ [ compute-live-vregs ] each ] simple-analysis ]
+        [ [ [ live-insn? ] filter! ] simple-optimization ]
+    } cleave ;

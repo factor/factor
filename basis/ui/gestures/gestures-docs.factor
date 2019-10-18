@@ -1,5 +1,5 @@
-USING: ui.gadgets help.markup help.syntax
-hashtables strings kernel system ;
+USING: hashtables help.markup help.syntax kernel strings system
+ui.gadgets ui.gadgets.worlds ;
 IN: ui.gestures
 
 HELP: set-gestures
@@ -30,7 +30,7 @@ HELP: parents-handle-gesture?
 
 HELP: propagate-gesture
 { $values { "gesture" "a gesture" } { "gadget" gadget } }
-{ $description "Calls " { $link handle-gesture } " on every parent of " { $snippet "gadget" } "." } ;
+{ $description "Calls " { $link handle-gesture } " on every parent of the " { $snippet "gadget" } ", starting with the " { $snippet "gadget" } " itself." } ;
 
 HELP: motion
 { $class-description "Mouse motion gesture." }
@@ -128,7 +128,7 @@ HELP: A+
 { $description "Alt key modifier." } ;
 
 HELP: M+
-{ $description "Meta key modifier. This is the Command key on Mac OS X." } ;
+{ $description "Meta key modifier. This is the Command key on Mac OS X and the Windows key on other Unices and Windows." } ;
 
 HELP: S+
 { $description "Shift key modifier." } ;
@@ -234,6 +234,10 @@ HELP: up-action
 HELP: down-action
 { $class-description "Gesture sent when the user performs a multi-touch three-finger swipe down." } ;
 
+HELP: world-focus
+{ $values { "world" world } { "gadget" gadget } }
+{ $description "Gets the gadget that is in focus for the world." } ;
+
 HELP: zoom-in-action
 { $class-description "Gesture sent when the user performs a multi-touch two-finger pinch in." } ;
 
@@ -253,11 +257,13 @@ ARTICLE: "gesture-differences" "Gesture handling differences between platforms"
     { { $link S+ } "Shift" }
     { { $link A+ } "Alt" }
     { { $link C+ } "Control" }
-    { { $link M+ } "Windows key" }
+    { { $link M+ } "Windows key (often called Super on Unix)" }
 }
 "On Windows, " { $link key-up } " gestures are not reported for all keyboard events."
 $nl
-{ $link "multitouch-gestures" } " are only supported on Mac OS X." ;
+{ $link "multitouch-gestures" } " are only supported on Mac OS X."
+$nl
+{ $link "filedrop-gestures" } " are only supported on Windows." ;
 
 ARTICLE: "ui-gestures" "UI gestures"
 "User actions such as keyboard input and mouse button clicks deliver " { $emphasis "gestures" } " to gadgets. If the direct receiver of the gesture does not handle it, the gesture is passed on to the receiver's parent, and this way it travels up the gadget hierarchy. Gestures which are not handled at some point are ignored."
@@ -279,6 +285,7 @@ $nl
 { $subsections
     "mouse-gestures"
     "multitouch-gestures"
+    "filedrop-gestures"
 }
 "Guidelines for cross-platform applications:"
 { $subsections "gesture-differences" }
@@ -338,6 +345,10 @@ ARTICLE: "keyboard-gestures" "Keyboard gestures"
   { $snippet "F6" }
   { $snippet "F7" }
   { $snippet "F8" }
+  { $snippet "F9" }
+  { $snippet "F10" }
+  { $snippet "F11" }
+  { $snippet "F12" }
   { $snippet "LEFT" }
   { $snippet "RIGHT" }
   { $snippet "DOWN" }
@@ -347,7 +358,7 @@ ARTICLE: "keyboard-gestures" "Keyboard gestures"
 }
 "The " { $link S+ } " modifier is only ever used with the above action keys; alphanumeric input input with the shift key is delivered without the " { $link S+ } " modifier set, instead the input itself is upper case. For example, the gesture corresponding to " { $snippet "s" } " with the Control and Shift keys pressed is presented as "
 { $code "T{ key-down f { C+ } \"S\" }" }
-"The " { $snippet "RET" } ", " { $snippet "TAB" } " and " { $snippet "SPACE" } " keys are never delivered in their literal form (" { $snippet "\"\\n\"" } ", " { $snippet "\"\\t\"" } " or "  { $snippet "\" \"" } ")." ;
+"The " { $snippet "RET" } " and " { $snippet "TAB" } " keys are never delivered in their literal form (" { $snippet "\"\\n\"" } " and " { $snippet "\"\\t\"" } ")." ;
 
 ARTICLE: "ui-user-input" "Free-form keyboard input"
 "Whereas keyboard gestures are intended to be used for keyboard shortcuts, certain gadgets such as text fields need to accept free-form keyboard input. This can be done by implementing a generic word:"
@@ -410,6 +421,18 @@ $nl
     zoom-out-action
 } ;
 
+ARTICLE: "filedrop-gestures" "File drop gestures"
+"File drop gestures are only supported on Windows. When user drags-and-drops a file or a group of files from another application, the following gesture can be handled:"
+{ $subsections file-drop } ;
+
+HELP: file-drop
+{ $class-description "File drop gesture. The " { $slot "mods" } " slot contains the keyboard modifiers active at the time of the drop (see " { $link "keyboard-gestures" } "). The " { $link dropped-files } " global variable contains an array of full paths of the files that were dropped."
+$nl
+"The " { $link hand-loc } " global variable contains the drop location. If the user dropped files onto the non-client area of a window (the caption or the border), the gesture will not be triggered, but the contents of the " { $link dropped-files } " will be updated." } ;
+
+HELP: dropped-files
+{ $var-description "The global variable holds an array of full paths of the files that were dropped by the last " { $link file-drop } " gesture." } ;
+
 ARTICLE: "action-gestures" "Action gestures"
 "Action gestures exist to keep keyboard shortcuts for common application operations consistent."
 { $subsections
@@ -427,7 +450,7 @@ ARTICLE: "action-gestures" "Action gestures"
     revert-action
     close-action
 }
-"The following keyboard gestures, if not handled directly, send action gestures:"
+"The following keyboard gestures, if not handled directly by any gadget in the hierarchy until reaching the world, are re-sent as action gestures to the first gadget:"
 { $table
     { { $strong "Keyboard gesture" } { $strong "Action gesture" } }
     { { $snippet "T{ key-down f { C+ } \"z\" }" } { $snippet "undo-action" } }

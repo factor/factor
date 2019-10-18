@@ -11,8 +11,6 @@
 
 #if defined(__APPLE__)
 #define FACTOR_EXPORT __attribute__((visibility("default")))
-#elif defined(WIN32) || defined(_MSC_VER)
-#define FACTOR_EXPORT __declspec(dllexport)
 #else
 #define FACTOR_EXPORT
 #endif
@@ -163,7 +161,7 @@ struct test_struct_16 {
 
 FACTOR_EXPORT struct test_struct_16 ffi_test_43(float x, int a);
 
-FACTOR_EXPORT struct test_struct_14 ffi_test_44();
+FACTOR_EXPORT struct test_struct_14 ffi_test_44(void);
 
 /* C99 features */
 #ifndef _MSC_VER
@@ -203,3 +201,37 @@ FACTOR_EXPORT FACTOR_FASTCALL(struct test_struct_11)
 FACTOR_EXPORT signed long long ffi_test_59(signed long long x);
 FACTOR_EXPORT unsigned long long ffi_test_60(unsigned long long x);
 
+/* C99 features */
+#ifndef _MSC_VER
+
+#include <stdbool.h>
+
+struct bool_and_ptr {
+    bool b;
+    void* ptr;
+};
+
+FACTOR_EXPORT struct bool_and_ptr ffi_test_61(void);
+
+#endif
+
+struct uint_pair {
+	unsigned int a;
+	unsigned int b;
+};
+
+FACTOR_EXPORT struct uint_pair ffi_test_62(void);
+
+struct ulonglong_pair {
+	unsigned long long a;
+	unsigned long long b;
+};
+
+FACTOR_EXPORT struct ulonglong_pair ffi_test_63(void);
+
+FACTOR_EXPORT int ffi_test_64(int n, ...);
+FACTOR_EXPORT double ffi_test_65(int n, ...);
+
+FACTOR_EXPORT void* bug1021_test_1(void* x, int y);
+FACTOR_EXPORT int bug1021_test_2(int x, char* y, void *z);
+FACTOR_EXPORT void* bug1021_test_3(int x);

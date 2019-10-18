@@ -1,5 +1,5 @@
-USING: system vocabs vocabs.loader kernel combinators
-namespaces sequences io.backend accessors ;
+USING: accessors combinators namespaces sequences system vocabs
+;
 IN: bootstrap.io
 
 "bootstrap.compiler" require

@@ -1,14 +1,19 @@
 ! Copyright (C) 2005, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs binary-search classes
-classes.struct combinators combinators.smart continuations fry
-generalizations generic grouping io io.styles kernel make math
-math.order math.parser math.statistics memory layouts namespaces
-parser prettyprint sequences sequences.generalizations sorting
-splitting strings system vm words hints hashtables ;
+USING: accessors arrays assocs binary-search classes classes.struct
+combinators combinators.smart continuations fry grouping hashtables
+hints io io.styles kernel layouts literals math math.order math.parser
+math.statistics memory namespaces prettyprint sequences
+sequences.generalizations sorting vm ;
 IN: tools.memory
 
 <PRIVATE
+PRIMITIVE: (callback-room) ( -- allocator-room )
+PRIMITIVE: (code-blocks) ( -- array )
+PRIMITIVE: (code-room) ( -- allocator-room )
+PRIMITIVE: (data-room) ( -- data-room )
+PRIMITIVE: disable-gc-events ( -- events )
+PRIMITIVE: enable-gc-events ( -- )
 
 : commas ( n -- str )
     dup 0 < [ neg commas "-" prepend ] [
@@ -95,19 +100,19 @@ PRIVATE>
 
 : collect-gc-events ( quot -- gc-events )
     enable-gc-events
-    [ ] [ disable-gc-events drop ] cleanup
-    disable-gc-events [ gc-event memory>struct ] map ; inline
+    [ disable-gc-events ] [ drop ] cleanup
+    [ gc-event memory>struct ] map ; inline
 
 <PRIVATE
 
 : gc-op-string ( op -- string )
     {
-        { collect-nursery-op      [ "Copying from nursery" ] }
-        { collect-aging-op        [ "Copying from aging"   ] }
-        { collect-to-tenured-op   [ "Copying to tenured"   ] }
-        { collect-full-op         [ "Mark and sweep"       ] }
-        { collect-compact-op      [ "Mark and compact"     ] }
-        { collect-growing-heap-op [ "Grow heap"            ] }
+        { COLLECT-NURSERY-OP           [ "Copying from nursery" ] }
+        { COLLECT-AGING-OP             [ "Copying from aging"   ] }
+        { COLLECT-TO-TENURED-OP        [ "Copying to tenured"   ] }
+        { COLLECT-FULL-OP              [ "Mark and sweep"       ] }
+        { COLLECT-COMPACT-OP           [ "Mark and compact"     ] }
+        { COLLECT-GROWING-DATA-HEAP-OP [ "Grow heap"            ] }
     } case ;
 
 : (space-occupied) ( data-heap-room code-heap-room -- n )
@@ -180,6 +185,9 @@ SYMBOL: gc-events
 : gc-stats. ( -- )
     gc-events get compute-gc-stats gc-stats-table simple-table. ;
 
+: sum-phase-times ( events phase -- n )
+    '[ times>> _ swap nth ] map-sum nanos>string ; inline
+
 : gc-summary. ( -- )
     gc-events get {
         { "Collections:" [ length commas ] }
@@ -187,36 +195,32 @@ SYMBOL: gc-events
         { "Decks scanned:" [ [ decks-scanned>> ] map-sum commas ] }
         { "Code blocks scanned:" [ [ code-blocks-scanned>> ] map-sum commas ] }
         { "Total time:" [ [ total-time>> ] map-sum nanos>string ] }
-        { "Card scan time:" [ [ card-scan-time>> ] map-sum nanos>string ] }
-        { "Code block scan time:" [ [ code-scan-time>> ] map-sum nanos>string ] }
-        { "Data heap sweep time:" [ [ data-sweep-time>> ] map-sum nanos>string ] }
-        { "Code heap sweep time:" [ [ code-sweep-time>> ] map-sum nanos>string ] }
-        { "Compaction time:" [ [ compaction-time>> ] map-sum nanos>string ] }
+        { "Card scan time:" [ PHASE-CARD-SCAN sum-phase-times ] }
+        { "Code block scan time:" [ PHASE-CODE-SCAN sum-phase-times ] }
+        { "Marking time:" [ PHASE-MARKING sum-phase-times ] }
+        { "Data heap sweep time:" [ PHASE-DATA-SWEEP sum-phase-times ] }
+        { "Code heap sweep time:" [ PHASE-CODE-SWEEP sum-phase-times ] }
+        { "Data compaction time:" [ PHASE-DATA-COMPACTION sum-phase-times ] }
     } object-table. ;
 
-SINGLETONS: +unoptimized+ +optimized+ +profiling+ +pic+ ;
-
 TUPLE: code-block
-{ owner read-only }
-{ parameters read-only }
-{ relocation read-only }
-{ type read-only }
-{ size read-only }
-{ entry-point read-only } ;
+    { owner read-only }
+    { parameters read-only }
+    { relocation read-only }
+    { type read-only }
+    { size read-only }
+    { entry-point read-only } ;
 
 TUPLE: code-blocks { blocks groups } { cache hashtable } ;
 
 <PRIVATE
-
-: code-block-type ( n -- type )
-    { +unoptimized+ +optimized+ +profiling+ +pic+ } nth ;
 
 : <code-block> ( seq -- code-block )
     6 firstn-unsafe {
         [ ]
         [ ]
         [ ]
-        [ code-block-type ]
+        [ ]
         [ ]
         [ tag-bits get shift ]
     } spread code-block boa ; inline
@@ -278,10 +282,9 @@ INSTANCE: code-blocks immutable-sequence
 : code-block-table. ( counts sizes -- )
     [
         {
-            { "Optimized code:" +optimized+ }
-            { "Unoptimized code:" +unoptimized+ }
-            { "Inline caches:" +pic+ }
-            { "Profiling stubs:" +profiling+ }
+            ${ "Optimized code:" CODE-BLOCK-OPTIMIZED }
+            ${ "Unoptimized code:" CODE-BLOCK-UNOPTIMIZED }
+            ${ "Inline caches:" CODE-BLOCK-PIC }
         }
     ] 2dip '[ _ _ code-block-table-row ] { } assoc>map
     simple-table. ;

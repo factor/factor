@@ -11,7 +11,7 @@ IN: ui.debugger
 ! ( error -- )
 [ error-alert ] ui-error-hook set-global
 
-! ( error -- )
+! ( error -- * )
 [
     ui-running? [ dup error-alert ] [ dup print-error ] if die
 ] callback-error-hook set-global

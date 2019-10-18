@@ -32,7 +32,7 @@ SLOT: terminated?
     ! Don't use fancy combinators here, since this word always
     ! runs unoptimized
     2dup [
-        [ [ datastack ] dip dip ] dip
+        [ [ get-datastack ] dip dip ] dip
         dup terminated?>> [ 2drop f ] [
             dup in>> length swap out>> length
             check-datastack
@@ -123,7 +123,7 @@ ERROR: no-case object ;
     [
         [ 1quotation \ dup prefix \ = suffix ]
         [ \ drop prefix ] bi*
-    ] assoc-map alist>quot ;
+    ] assoc-map reverse! alist>quot ;
 
 <PRIVATE
 
@@ -137,7 +137,7 @@ ERROR: no-case object ;
     ] if ;
 
 : <buckets> ( initial length -- array )
-    next-power-of-2 iota swap [ nip clone ] curry map ;
+    next-power-of-2 <iota> swap [ nip clone ] curry map ;
 
 : distribute-buckets ( alist initial quot -- buckets )
     swapd [ [ dup first ] dip call 2array ] curry map
@@ -145,8 +145,9 @@ ERROR: no-case object ;
     [ first2 (distribute-buckets) ] with each ; inline
 
 : hash-case-table ( default assoc -- array )
-    V{ } [ 1array ] distribute-buckets
-    [ [ [ literalize ] dip ] assoc-map linear-case-quot ] with map ;
+    V{ } [ 1array ] distribute-buckets [
+        [ [ literalize ] dip ] assoc-map linear-case-quot
+    ] with map ;
 
 : hash-dispatch-quot ( table -- quot )
     [ length 1 - [ fixnum-bitand ] curry ] keep
@@ -159,31 +160,31 @@ ERROR: no-case object ;
 : contiguous-range? ( keys -- ? )
     dup [ fixnum? ] all? [
         dup all-unique? [
-            [ length ]
-            [ [ supremum ] [ infimum ] bi - ]
-            bi - 1 =
+            [ length ] [ supremum ] [ infimum ] tri - - 1 =
         ] [ drop f ] if
     ] [ drop f ] if ;
 
 : dispatch-case-quot ( default assoc -- quot )
     [
-        \ dup ,
-        dup keys [ infimum , ] [ supremum , ] bi \ between? ,
-        [
-            dup keys infimum , [ - >fixnum ] %
-            sort-keys values [ >quotation ] map ,
-            \ dispatch ,
+        \ dup , \ integer? , [
+            \ integer>fixnum-strict , \ dup ,
+            dup keys [ infimum , ] [ supremum , ] bi \ between? ,
+            [
+                dup keys infimum , \ - ,
+                sort-keys values [ >quotation ] map ,
+                \ dispatch ,
+            ] [ ] make , dup , \ if ,
         ] [ ] make , , \ if ,
     ] [ ] make ;
 
 PRIVATE>
 
 : case>quot ( default assoc -- quot )
-    <reversed> dup keys {
+    dup keys {
         { [ dup empty? ] [ 2drop ] }
         { [ dup [ length 4 <= ] [ [ word? ] any? ] bi or ] [ drop linear-case-quot ] }
         { [ dup contiguous-range? ] [ drop dispatch-case-quot ] }
-        { [ dup [ wrapper? ] any? not ] [ drop hash-case-quot ] }
+        { [ dup [ wrapper? ] none? ] [ drop hash-case-quot ] }
         { [ dup [ wrapper? ] all? ] [ drop [ [ wrapped>> ] dip ] assoc-map hash-case-quot ] }
         [ drop linear-case-quot ]
     } cond ;
@@ -201,7 +202,7 @@ M: reversed hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
 M: slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
-M: iota-tuple hashcode*
+M: iota hashcode*
     over 0 <= [ 2drop 0 ] [
         nip length 0 swap [ sequence-hashcode-step ] each-integer
     ] if ;

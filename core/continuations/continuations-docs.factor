@@ -71,15 +71,15 @@ ARTICLE: "continuations.private" "Continuation implementation details"
 }
 "The five stacks can be read and written:"
 { $subsections
-    datastack
+    get-datastack
     set-datastack
-    retainstack
+    get-retainstack
     set-retainstack
-    callstack
+    get-callstack
     set-callstack
-    namestack
+    get-namestack
     set-namestack
-    catchstack
+    get-catchstack
     set-catchstack
 } ;
 
@@ -108,21 +108,24 @@ $nl
 
 ABOUT: "continuations"
 
-HELP: catchstack*
+HELP: (get-catchstack)
 { $values { "catchstack" "a vector of continuations" } }
 { $description "Outputs the current catchstack." } ;
 
-HELP: catchstack
+HELP: get-catchstack
 { $values { "catchstack" "a vector of continuations" } }
 { $description "Outputs a copy of the current catchstack." } ;
+
+HELP: current-continuation
+{ $values { "continuation" continuation } }
+{ $description "Creates a continuation object from the current execution context." } ;
 
 HELP: set-catchstack
 { $values { "catchstack" "a vector of continuations" } }
 { $description "Replaces the catchstack with a copy of the given vector." } ;
 
 HELP: continuation
-{ $values { "continuation" continuation } }
-{ $description "Reifies the current continuation from the point immediately after which the caller returns." } ;
+{ $class-description "Reifies the current continuation from the point immediately after which the caller returns." } ;
 
 HELP: >continuation<
 { $values { "continuation" continuation } { "data" vector } { "call" vector } { "retain" vector } { "name" vector } { "catch" vector } }
@@ -176,12 +179,21 @@ HELP: recover
 { $values { "try" { $quotation ( ..a -- ..b ) } } { "recovery" { $quotation ( ..a error -- ..b ) } } }
 { $description "Calls the " { $snippet "try" } " quotation. If an exception is thrown in the dynamic extent of the " { $snippet "try" } " quotation, restores the data stack and calls the " { $snippet "recovery" } " quotation to handle the error." } ;
 
+HELP: ignore-error
+{ $values { "quot" quotation } { "check" quotation } }
+{ $description "Calls the quotation. If an exception is thrown which is matched by the 'check' quotation it is ignored. Otherwise the error is rethrown." } ;
+
+HELP: ignore-error/f
+{ $values { "quot" quotation } { "check" quotation } }
+{ $description "Like " { $link ignore-error } ", but if a matched exception is thrown " { $link f } " is put on the stack." } ;
+
 HELP: ignore-errors
 { $values { "quot" quotation } }
-{ $description "Calls the quotation. If an exception is thrown in the dynamic extent of the quotation, restores the data stack and returns." } ;
+{ $description "Calls the quotation. If an exception is thrown in the dynamic extent of the quotation, restores the data stack and returns." }
+{ $notes "For safer alternatives to this word see " { $link ignore-error } " and " { $link ignore-error/f } "." } ;
 
 HELP: in-callback?
-{ $values { "?" "a boolean" } }
+{ $values { "?" boolean } }
 { $description "t if Factor is currently executing a callback." } ;
 
 HELP: rethrow
@@ -196,7 +208,7 @@ HELP: rethrow
 } ;
 
 HELP: throw-restarts
-{ $values { "error" object } { "restarts" "a sequence of " { $snippet "{ string object }" } " pairs" } { "restart" object } }
+{ $values { "error" object } { "restarts" { $sequence { { $snippet "{ string object }" } " pairs" } } } { "restart" object } }
 { $description "Throws a restartable error using " { $link throw } ". The " { $snippet "restarts" } " parameter is a sequence of pairs where the first element in each pair is a human-readable description and the second is an arbitrary object. If the error reaches the top-level error handler, the user will be presented with the list of possible restarts, and upon invoking one, execution will continue after the call to " { $link throw-restarts } " with the object associated to the chosen restart on the stack." }
 { $examples
     "Try invoking one of the two restarts which are offered after the below code throws an error:"
@@ -209,7 +221,7 @@ HELP: throw-restarts
 } ;
 
 HELP: rethrow-restarts
-{ $values { "error" object } { "restarts" "a sequence of " { $snippet "{ string object }" } " pairs" } { "restart" object } }
+{ $values { "error" object } { "restarts" { $sequence { { $snippet "{ string object }" } " pairs" } } } { "restart" object } }
 { $description "Throws a restartable error using " { $link rethrow } ". Otherwise, this word is identical to " { $link throw-restarts } "." } ;
 
 { throw rethrow throw-restarts rethrow-restarts throw-continue } related-words

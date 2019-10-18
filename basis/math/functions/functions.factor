@@ -1,18 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel math.constants math.private math.bits
-math.libm combinators fry math.order sequences ;
+USING: combinators fry kernel math math.bits math.constants
+math.libm math.order math.private sequences ;
 IN: math.functions
-
-GENERIC: >fraction ( a/b -- a b )
-
-M: integer >fraction 1 ; inline
-
-M: ratio >fraction [ numerator ] [ denominator ] bi ; inline
-
-: rect> ( x y -- z )
-    ! Note: an imaginary 0.0 should still create a complex
-    dup 0 = [ drop ] [ complex boa ] if ; inline
 
 GENERIC: sqrt ( x -- y ) foldable
 
@@ -21,7 +11,7 @@ M: real sqrt
     [ neg fsqrt [ 0.0 ] dip rect> ] [ fsqrt ] if ; inline
 
 : factor-2s ( n -- r s )
-    #! factor an integer into 2^r * s
+    ! factor an integer into 2^r * s
     dup 0 = [ 1 ] [
         [ 0 ] dip [ dup even? ] [ [ 1 + ] [ 2/ ] bi* ] while
     ] if ; inline
@@ -42,7 +32,7 @@ M: real sqrt
 : (^n) ( z w -- z^w )
     dup fixnum? [ (^fixnum) ] [ (^bignum) ] if ; inline
 
-GENERIC# ^n 1 ( z w -- z^w ) foldable
+GENERIC#: ^n 1 ( z w -- z^w ) foldable
 
 M: fixnum ^n (^n) ;
 
@@ -61,12 +51,6 @@ M: complex ^n (^n) ;
 
 PRIVATE>
 
-GENERIC: >rect ( z -- x y )
-
-M: real >rect 0 ; inline
-
-M: complex >rect [ real-part ] [ imaginary-part ] bi ; inline
-
 : >float-rect ( z -- x y )
     >rect [ >float ] bi@ ; inline
 
@@ -77,7 +61,7 @@ M: complex >rect [ real-part ] [ imaginary-part ] bi ; inline
 
 : polar> ( abs arg -- z ) cis * ; inline
 
-GENERIC: e^ ( x -- y )
+GENERIC: e^ ( x -- e^x )
 
 M: float e^ fexp ; inline
 
@@ -109,16 +93,9 @@ M: complex e^ >rect [ e^ ] dip polar> ; inline
     [ make-bits 1 ] dip dup
     '[ [ over * _ mod ] when [ sq _ mod ] dip ] reduce nip ; inline
 
-: (gcd) ( b a x y -- a d )
-    over zero? [
-        2nip
-    ] [
-        swap [ /mod [ over * swapd - ] dip ] keep (gcd)
-    ] if ; inline recursive
-
 PRIVATE>
 
-: ^ ( x y -- z )
+: ^ ( x y -- x^y )
     {
         { [ over zero? ] [ 0^ ] }
         { [ dup integer? ] [ integer^ ] }
@@ -128,23 +105,8 @@ PRIVATE>
 
 : nth-root ( n x -- y ) swap recip ^ ; inline
 
-: gcd ( x y -- a d )
-    [ 0 1 ] 2dip (gcd) dup 0 < [ neg ] when ; inline
-
-MATH: fast-gcd ( x y -- d ) foldable
-
-<PRIVATE
-
-: simple-gcd ( x y -- d ) gcd nip ; inline
-
-PRIVATE>
-
-M: real fast-gcd simple-gcd ; inline
-
-M: bignum fast-gcd bignum-gcd ; inline
-
 : lcm ( a b -- c )
-    [ * ] 2keep fast-gcd /i ; foldable
+    [ * ] 2keep simple-gcd /i ; foldable
 
 : divisor? ( m n -- ? )
     mod 0 = ; inline
@@ -206,7 +168,7 @@ M: integer frexp
 
 DEFER: copysign
 
-GENERIC# ldexp 1 ( x exp -- y )
+GENERIC#: ldexp 1 ( x exp -- y )
 
 M: float ldexp
     over fp-special? [ over zero? ] unless* [ drop ] [
@@ -234,23 +196,27 @@ M: real log >float log ; inline
 
 M: complex log >polar [ flog ] dip rect> ; inline
 
+: logn ( x n -- y ) [ log ] bi@ / ;
+
 <PRIVATE
 
 : most-negative-finite-float ( -- x )
     -0x1.ffff,ffff,ffff,fp1023 >integer ; inline
+
 : most-positive-finite-float ( -- x )
     0x1.ffff,ffff,ffff,fp1023 >integer ; inline
+
 CONSTANT: log-2   0x1.62e42fefa39efp-1
 CONSTANT: log10-2 0x1.34413509f79ffp-2
 
-: (representable-as-float?) ( x -- ? )
+: representable-as-float? ( x -- ? )
     most-negative-finite-float
     most-positive-finite-float between? ; inline
 
 : (bignum-log) ( n log-quot: ( x -- y ) log-2 -- log )
     [ dup ] dip '[
-        dup (representable-as-float?)
-        [ >float @ ] [ frexp [ @ ] [ _ * ] bi* + ] if
+        dup representable-as-float?
+        [ >float @ ] [ frexp _ [ _ * ] bi* + ] if
     ] call ; inline
 
 PRIVATE>
@@ -263,7 +229,7 @@ M: object log1+ 1 + log ; inline
 
 M: float log1+ dup -1.0 >= [ flog1+ ] [ 1.0 + 0.0 rect> log ] if ; inline
 
-: 10^ ( x -- y ) 10 swap ^ ; inline
+: 10^ ( x -- 10^x ) 10 swap ^ ; inline
 
 GENERIC: log10 ( x -- y ) foldable
 
@@ -368,8 +334,7 @@ M: real tanh >float tanh ; inline
     dup [-1,1]? [ >float fasin ] [ i* asinh -i* ] if ; inline
 
 : acos ( x -- y )
-    dup [-1,1]? [ >float facos ] [ asin pi 2 / swap - ] if ;
-    inline
+    dup [-1,1]? [ >float facos ] [ asin pi 2 / swap - ] if ; inline
 
 GENERIC: atan ( x -- y ) foldable
 
@@ -385,16 +350,73 @@ M: real atan >float atan ; inline
 
 : acot ( x -- y ) recip atan ; inline
 
-: truncate ( x -- y ) dup 1 mod - ; inline
+GENERIC: truncate ( x -- y )
+
+M: real truncate dup 1 mod - ;
+
+M: float truncate
+    dup double>bits
+    dup -52 shift 0x7ff bitand 0x3ff -
+    ! check for floats without fractional part (>= 2^52)
+    dup 52 < [
+        nipd
+        dup 0 < [
+            ! the float is between -1.0 and 1.0,
+            ! the result could be +/-0.0, but we will
+            ! return 0.0 instead similar to other
+            ! languages
+            2drop 0.0 ! -63 shift zero? 0.0 -0.0 ?
+        ] [
+            ! Put zeroes in the correct part of the mantissa
+            0x000fffffffffffff swap neg shift bitnot bitand
+            bits>double
+        ] if
+    ] [
+        ! check for nans and infinities and do an operation on them
+        ! to trigger fp exceptions if necessary
+        nip 0x400 = [ dup + ] when
+    ] if ; inline
 
 GENERIC: round ( x -- y )
 
+GENERIC: round-to-even ( x -- y )
+
+GENERIC: round-to-odd ( x -- y )
+
 M: integer round ; inline
 
-M: ratio round
-    >fraction [ /mod abs 2 * ] keep >= [ dup 0 < -1 1 ? + ] when ;
+M: integer round-to-even ; inline
+
+M: integer round-to-odd ; inline
+
+: (round-tiebreak?) ( quotient rem denom tiebreak-quot -- q ? )
+    [ [ > ] ] dip [ 2dip = and ] curry 3bi or ; inline
+
+: (round-to-even?) ( quotient rem denom -- quotient ? )
+    [ >integer odd? ] (round-tiebreak?) ; inline
+
+: (round-to-odd?) ( quotient rem denom -- quotient ? )
+    [ >integer even? ] (round-tiebreak?) ; inline
+
+: (ratio-round) ( x round-quot -- y )
+    [ >fraction [ /mod dup swapd abs 2 * ] keep ] [ call ] bi*
+    [ swap 0 < -1 1 ? + ] [ nip ] if ; inline
+
+: (float-round) ( x round-quot -- y )
+    [ dup 1 mod [ - ] keep dup swapd abs 0.5 ] [ call ] bi*
+    [ swap 0.0 < -1.0 1.0 ? + ] [ nip ] if ; inline
+
+M: ratio round [ >= ] (ratio-round) ;
+
+M: ratio round-to-even [ (round-to-even?) ] (ratio-round) ;
+
+M: ratio round-to-odd [ (round-to-odd?) ] (ratio-round) ;
 
 M: float round dup sgn 2 /f + truncate ;
+
+M: float round-to-even [ (round-to-even?) ] (float-round) ;
+
+M: float round-to-odd [ (round-to-odd?) ] (float-round) ;
 
 : floor ( x -- y )
     dup 1 mod
@@ -410,7 +432,7 @@ M: float round dup sgn 2 /f + truncate ;
 : roots ( x t -- seq )
     [ [ log ] [ recip ] bi* * e^ ]
     [ recip 2pi * 0 swap complex boa e^ ]
-    [ iota [ ^ * ] 2with map ] tri ;
+    [ <iota> [ ^ * ] 2with map ] tri ;
 
 : sigmoid ( x -- y ) neg e^ 1 + recip ; inline
 

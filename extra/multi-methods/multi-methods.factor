@@ -22,7 +22,7 @@ SYMBOL: total
 : canonicalize-specializer-1 ( specializer -- specializer' )
     [
         [ class? ] filter
-        [ length iota <reversed> [ 1 + neg ] map ] keep zip
+        [ length <iota> <reversed> [ 1 + neg ] map ] keep zip
         [ length args [ max ] change ] keep
     ]
     [
@@ -41,7 +41,7 @@ SYMBOL: total
     ] assoc-map ;
 
 : canonicalize-specializer-3 ( specializer -- specializer' )
-    [ total get object <array> <enum> ] dip assoc-union! seq>> ;
+    [ total get object <array> <enumerated> ] dip assoc-union! seq>> ;
 
 : canonicalize-specializers ( methods -- methods' hooks )
     [
@@ -76,7 +76,7 @@ SYMBOL: total
 ! Part II: Topologically sorting specializers
 : maximal-element ( seq quot -- n elt )
     dupd [
-        swapd [ call +lt+ = ] 2curry any? not
+        swapd [ call +lt+ = ] 2curry none?
     ] 2curry find [ "Topological sort failed" throw ] unless* ;
     inline
 
@@ -112,9 +112,9 @@ SYMBOL: total
     swap predicate-def append ;
 
 : multi-predicate ( classes -- quot )
-    dup length iota <reversed>
+    dup length <iota> <reversed>
     [ picker 2array ] 2map
-    [ drop object eq? not ] assoc-filter
+    [ drop object eq? ] assoc-reject
     [ [ t ] ] [
         [ (multi-predicate) ] { } assoc>map
         unclip [ swap [ f ] \ if 3array append [ ] like ] reduce
@@ -216,7 +216,7 @@ M: no-method error.
     [ "multi-method-generic" word-prop ] bi prefix ;
 
 : define-generic ( word effect -- )
-    over set-stack-effect
+    [ set-stack-effect ] keepd
     dup "multi-methods" word-prop [ drop ] [
         [ H{ } clone "multi-methods" set-word-prop ]
         [ update-generic ]

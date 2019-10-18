@@ -1,38 +1,37 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs bootstrap.image.syntax
-byte-arrays classes classes.builtin classes.private
-classes.tuple classes.tuple.private combinators
+USING: accessors arrays assocs byte-arrays classes classes.builtin
+classes.private classes.tuple classes.tuple.private combinators
 combinators.short-circuit combinators.smart
 compiler.codegen.relocation compiler.units fry generic
-generic.single.private grouping hashtables hashtables.private
-io io.binary io.encodings.binary io.files io.pathnames kernel
+generic.single.private grouping hashtables hashtables.private io
+io.binary io.encodings.binary io.files io.pathnames kernel
 kernel.private layouts locals make math math.order namespaces
 namespaces.private parser parser.notes prettyprint quotations
 sequences sequences.private source-files strings system vectors
 vocabs words ;
 IN: bootstrap.image
 
-: arch ( os cpu -- arch )
+: arch-name ( os cpu -- arch )
     2dup [ windows? ] [ ppc? ] bi* or [
       [ drop unix ] dip
     ] unless
-    [ name>> ] [ name>> ] bi* "-" glue ;
+    [ name>> ] bi@ "-" glue ;
 
-: my-arch ( -- arch )
-    os cpu arch ;
+: my-arch-name ( -- arch )
+    os cpu arch-name ;
 
 : boot-image-name ( arch -- string )
     "boot." ".image" surround ;
 
 : my-boot-image-name ( -- string )
-    my-arch boot-image-name ;
+    my-arch-name boot-image-name ;
 
-: images ( -- seq )
+CONSTANT: image-names
     {
         "windows-x86.32" "unix-x86.32"
         "windows-x86.64" "unix-x86.64"
-    } ;
+    }
 
 <PRIVATE
 
@@ -87,24 +86,20 @@ SYMBOL: objects
 : put-object ( n obj -- )
     <eq-wrapper> objects get set-at ;
 
-! Constants
-
+! Constants need to be synced with
+!   vm/image.hpp
 CONSTANT: image-magic 0x0f0e0d0c
 CONSTANT: image-version 4
 
 CONSTANT: data-base 1024
 
-CONSTANT: special-objects-size 80
-
 CONSTANT: header-size 10
 
 CONSTANT: data-heap-size-offset 3
-CONSTANT: t-offset              6
-CONSTANT: 0-offset              7
-CONSTANT: 1-offset              8
-CONSTANT: -1-offset             9
 
 SYMBOL: sub-primitives
+
+SYMBOL: special-objects
 
 :: jit-conditional ( test-quot false-quot -- )
     [ 0 test-quot call ] B{ } make length :> len
@@ -113,7 +108,6 @@ SYMBOL: sub-primitives
     [ length test-quot call ] [ % ] bi ; inline
 
 : make-jit ( quot -- parameters literals code )
-    #! code is a { relocation insns } pair
     [
         0 extra-offset set
         init-relocation
@@ -126,11 +120,14 @@ SYMBOL: sub-primitives
 : make-jit-no-params ( quot -- code )
     make-jit 2nip ;
 
-: jit-define ( quot name -- )
-    [ make-jit-no-params ] dip set ;
+: jit-define ( quot n -- )
+    [ make-jit-no-params ] dip special-objects get set-at ;
 
 : define-sub-primitive ( quot word -- )
     [ make-jit 3array ] dip sub-primitives get set-at ;
+
+: define-sub-primitives ( assoc -- )
+    [ swap define-sub-primitive ] assoc-each ;
 
 : define-combinator-primitive ( quot non-tail-quot tail-quot word -- )
     [
@@ -143,79 +140,14 @@ SYMBOL: sub-primitives
     ] dip
     sub-primitives get set-at ;
 
-! The image being constructed; a vector of word-size integers
-SYMBOL: image
+SYMBOL: bootstrapping-image
 
 ! Image output format
 SYMBOL: big-endian
 
-! Bootstrap architecture name
 SYMBOL: architecture
 
-RESET
-
-! Boot quotation, set in stage1.factor
-SPECIAL-OBJECT: bootstrap-startup-quot 20
-
-! Bootstrap global namesapce
-SPECIAL-OBJECT: bootstrap-global 21
-
-! JIT parameters
-SPECIAL-OBJECT: jit-prolog 23
-SPECIAL-OBJECT: jit-primitive-word 24
-SPECIAL-OBJECT: jit-primitive 25
-SPECIAL-OBJECT: jit-word-jump 26
-SPECIAL-OBJECT: jit-word-call 27
-SPECIAL-OBJECT: jit-if-word 28
-SPECIAL-OBJECT: jit-if 29
-SPECIAL-OBJECT: jit-safepoint 30
-SPECIAL-OBJECT: jit-epilog 31
-SPECIAL-OBJECT: jit-return 32
-SPECIAL-OBJECT: jit-profiling 33
-SPECIAL-OBJECT: jit-push 34
-SPECIAL-OBJECT: jit-dip-word 35
-SPECIAL-OBJECT: jit-dip 36
-SPECIAL-OBJECT: jit-2dip-word 37
-SPECIAL-OBJECT: jit-2dip 38
-SPECIAL-OBJECT: jit-3dip-word 39
-SPECIAL-OBJECT: jit-3dip 40
-SPECIAL-OBJECT: jit-execute 41
-SPECIAL-OBJECT: jit-declare-word 42
-
-SPECIAL-OBJECT: c-to-factor-word 43
-SPECIAL-OBJECT: lazy-jit-compile-word 44
-SPECIAL-OBJECT: unwind-native-frames-word 45
-SPECIAL-OBJECT: fpu-state-word 46
-SPECIAL-OBJECT: set-fpu-state-word 47
-SPECIAL-OBJECT: signal-handler-word 48
-SPECIAL-OBJECT: leaf-signal-handler-word 49
-SPECIAL-OBJECT: ffi-signal-handler-word 50
-SPECIAL-OBJECT: ffi-leaf-signal-handler-word 51
-
-SPECIAL-OBJECT: callback-stub 53
-
-! PIC stubs
-SPECIAL-OBJECT: pic-load 54
-SPECIAL-OBJECT: pic-tag 55
-SPECIAL-OBJECT: pic-tuple 56
-SPECIAL-OBJECT: pic-check-tag 57
-SPECIAL-OBJECT: pic-check-tuple 58
-SPECIAL-OBJECT: pic-hit 59
-SPECIAL-OBJECT: pic-miss-word 60
-SPECIAL-OBJECT: pic-miss-tail-word 61
-
-! Megamorphic dispatch
-SPECIAL-OBJECT: mega-lookup 62
-SPECIAL-OBJECT: mega-lookup-word 63
-SPECIAL-OBJECT: mega-miss-word 64
-
-! Default definition for undefined words
-SPECIAL-OBJECT: undefined-quot 65
-
-: special-object-offset ( symbol -- n )
-    special-objects get at header-size + ;
-
-: emit ( cell -- ) image get push ;
+: emit ( cell -- ) bootstrapping-image get push ;
 
 : emit-64 ( cell -- )
     bootstrap-cell 8 = [
@@ -224,12 +156,12 @@ SPECIAL-OBJECT: undefined-quot 65
         d>w/w big-endian get [ swap ] unless emit emit
     ] if ;
 
-: emit-seq ( seq -- ) image get push-all ;
+: emit-seq ( seq -- ) bootstrapping-image get push-all ;
 
-: fixup ( value offset -- ) image get set-nth ;
+: fixup ( value offset -- ) bootstrapping-image get set-nth ;
 
 : heap-size ( -- size )
-    image get length header-size - special-objects-size -
+    bootstrapping-image get length header-size - special-object-count -
     bootstrap-cells ;
 
 : here ( -- size ) heap-size data-base + ;
@@ -249,11 +181,10 @@ SPECIAL-OBJECT: undefined-quot 65
 
 : emit-object ( class quot -- addr )
     [ type-number ] dip over here-as
-    [ swap emit-header call align-here ] dip ;
-    inline
+    [ swap emit-header call align-here ] dip ; inline
 
-! Write an object to the image.
-GENERIC: ' ( obj -- ptr )
+! Read any object for emitting.
+GENERIC: prepare-object ( obj -- ptr )
 
 ! Image header
 
@@ -264,14 +195,11 @@ GENERIC: ' ( obj -- ptr )
     0 emit ! size of data heap set later
     0 emit ! reloc base of code heap is 0
     0 emit ! size of code heap is 0
-    0 emit ! pointer to t object
-    0 emit ! pointer to bignum 0
-    0 emit ! pointer to bignum 1
-    0 emit ! pointer to bignum -1
-    special-objects-size [ f ' emit ] times ;
-
-: emit-special-object ( symbol -- )
-    [ get ' ] [ special-object-offset ] bi fixup ;
+    0 emit ! reserved
+    0 emit ! reserved
+    0 emit ! reserved
+    0 emit ! reserved
+    special-object-count [ f prepare-object emit ] times ;
 
 ! Bignums
 
@@ -280,7 +208,7 @@ GENERIC: ' ( obj -- ptr )
 : bignum-radix ( -- n ) bignum-bits 2^ 1 - ;
 
 : bignum>sequence ( n -- seq )
-    #! n is positive or zero.
+    ! n is positive or zero.
     [ dup 0 > ]
     [ [ bignum-bits neg shift ] [ bignum-radix bitand ] bi ]
     produce nip ;
@@ -292,30 +220,30 @@ GENERIC: ' ( obj -- ptr )
     [ nip emit-seq ]
     2tri ;
 
-M: bignum '
+M: bignum prepare-object
     [
         bignum [ emit-bignum ] emit-object
     ] cache-eql-object ;
 
 ! Fixnums
 
-M: fixnum '
-    #! When generating a 32-bit image on a 64-bit system,
-    #! some fixnums should be bignums.
+M: fixnum prepare-object
+    ! When generating a 32-bit image on a 64-bit system,
+    ! some fixnums should be bignums.
     dup
     bootstrap-most-negative-fixnum
     bootstrap-most-positive-fixnum between?
-    [ tag-fixnum ] [ >bignum ' ] if ;
+    [ tag-fixnum ] [ >bignum prepare-object ] if ;
 
 TUPLE: fake-bignum n ;
 
 C: <fake-bignum> fake-bignum
 
-M: fake-bignum ' n>> tag-fixnum ;
+M: fake-bignum prepare-object n>> tag-fixnum ;
 
 ! Floats
 
-M: float '
+M: float prepare-object
     [
         float [
             8 (align-here) double>bits emit-64
@@ -325,14 +253,7 @@ M: float '
 ! Special objects
 
 ! Padded with fixnums for 8-byte alignment
-
-: t, ( -- ) t t-offset fixup ;
-
-M: f ' drop \ f type-number ;
-
-:  0, ( -- )  0 >bignum '  0-offset fixup ;
-:  1, ( -- )  1 >bignum '  1-offset fixup ;
-: -1, ( -- ) -1 >bignum ' -1-offset fixup ;
+M: f prepare-object drop \ f type-number ;
 
 ! Words
 
@@ -355,7 +276,7 @@ M: f ' drop \ f type-number ;
                     [ word-sub-primitive ]
                     [ drop 0 ] ! entry point
                 } cleave
-            ] output>array [ ' ] map!
+            ] output>array [ prepare-object ] map!
         ] bi
         \ word [ emit-seq ] emit-object
     ] keep put-object ;
@@ -370,14 +291,14 @@ ERROR: not-in-image vocabulary word ;
     [ ] [ [ vocabulary>> ] [ name>> ] bi not-in-image ] ?if ;
 
 : fixup-words ( -- )
-    image get [ dup word? [ fixup-word ] when ] map! drop ;
+    bootstrapping-image get [ dup word? [ fixup-word ] when ] map! drop ;
 
-M: word ' ;
+M: word prepare-object ;
 
 ! Wrappers
 
-M: wrapper '
-    [ wrapped>> ' wrapper [ emit ] emit-object ] cache-eql-object ;
+M: wrapper prepare-object
+    [ wrapped>> prepare-object wrapper [ emit ] emit-object ] cache-eql-object ;
 
 ! Strings
 : native> ( object -- object )
@@ -405,17 +326,17 @@ M: wrapper '
     ] B{ } map-as ;
 
 : emit-string ( string -- ptr )
-    [ length ] [ extended-part ' ] [ ] tri
+    [ length ] [ extended-part prepare-object ] [ ] tri
     string [
         [ emit-fixnum ]
         [ emit ]
-        [ f ' emit ascii-part pad-bytes emit-bytes ]
+        [ f prepare-object emit ascii-part pad-bytes emit-bytes ]
         tri*
     ] emit-object ;
 
-M: string '
-    #! We pool strings so that each string is only written once
-    #! to the image
+M: string prepare-object
+    ! We pool strings so that each string is only written once
+    ! to the image
     [ emit-string ] cache-eql-object ;
 
 : assert-empty ( seq -- )
@@ -426,7 +347,7 @@ M: string '
         [ 0 emit-fixnum ] emit-object
     ] bi* ;
 
-M: byte-array '
+M: byte-array prepare-object
     [
         byte-array [
             dup length emit-fixnum
@@ -443,7 +364,7 @@ ERROR: tuple-removed class ;
 
 : (emit-tuple) ( tuple -- pointer )
     [ tuple-slots ]
-    [ class-of transfer-word require-tuple-layout ] bi prefix [ ' ] map
+    [ class-of transfer-word require-tuple-layout ] bi prefix [ prepare-object ] map
     tuple [ emit-seq ] emit-object ;
 
 : emit-tuple ( tuple -- pointer )
@@ -452,18 +373,18 @@ ERROR: tuple-removed class ;
     [ [ (emit-tuple) ] cache-eq-object ]
     if ;
 
-M: tuple ' emit-tuple ;
+M: tuple prepare-object emit-tuple ;
 
-M: tombstone '
-    state>> "((tombstone))" "((empty))" ?
+M: tombstone prepare-object
+    state>> "+tombstone+" "+empty+" ?
     "hashtables.private" lookup-word def>> first
     [ emit-tuple ] cache-eql-object ;
 
 ! Arrays
 : emit-array ( array -- offset )
-    [ ' ] map array [ [ length emit-fixnum ] [ emit-seq ] bi ] emit-object ;
+    [ prepare-object ] map array [ [ length emit-fixnum ] [ emit-seq ] bi ] emit-object ;
 
-M: array ' [ emit-array ] cache-eq-object ;
+M: array prepare-object [ emit-array ] cache-eq-object ;
 
 ! This is a hack. We need to detect arrays which are tuple
 ! layout arrays so that they can be internalized, but making
@@ -477,7 +398,7 @@ PREDICATE: tuple-layout-array < array
         } 1&&
     ] [ drop f ] if ;
 
-M: tuple-layout-array '
+M: tuple-layout-array prepare-object
     [
         [ dup integer? [ <fake-bignum> ] when ] map
         emit-array
@@ -485,13 +406,13 @@ M: tuple-layout-array '
 
 ! Quotations
 
-M: quotation '
+M: quotation prepare-object
     [
-        array>> '
+        array>> prepare-object
         quotation [
             emit ! array
-            f ' emit ! cached-effect
-            f ' emit ! cache-counter
+            f prepare-object emit ! cached-effect
+            f prepare-object emit ! cache-counter
             0 emit ! entry point
         ] emit-object
     ] cache-eql-object ;
@@ -501,7 +422,13 @@ M: quotation '
 : emit-words ( -- )
     all-words [ emit-word ] each ;
 
-: emit-global ( -- )
+: emit-singletons ( -- )
+    t OBJ-CANONICAL-TRUE special-objects get set-at
+    0 >bignum OBJ-BIGNUM-ZERO special-objects get set-at
+    1 >bignum OBJ-BIGNUM-POS-ONE special-objects get set-at
+    -1 >bignum OBJ-BIGNUM-NEG-ONE special-objects get set-at ;
+
+: create-global-hashtable ( -- global-hashtable )
     {
         dictionary source-files builtins
         update-map implementors-map
@@ -510,33 +437,41 @@ M: quotation '
         class<=-cache class-not-cache classes-intersect-cache
         class-and-cache class-or-cache next-method-quot-cache
     } [ H{ } clone global-box boa ] H{ } map>assoc assoc-union
-    global-hashtable boa
-    bootstrap-global set ;
+    global-hashtable boa ;
+
+: emit-global ( -- )
+    create-global-hashtable
+    OBJ-GLOBAL special-objects get set-at ;
 
 : emit-jit-data ( -- )
-    \ if jit-if-word set
-    \ do-primitive jit-primitive-word set
-    \ dip jit-dip-word set
-    \ 2dip jit-2dip-word set
-    \ 3dip jit-3dip-word set
-    \ inline-cache-miss pic-miss-word set
-    \ inline-cache-miss-tail pic-miss-tail-word set
-    \ mega-cache-lookup mega-lookup-word set
-    \ mega-cache-miss mega-miss-word set
-    \ declare jit-declare-word set
-    \ c-to-factor c-to-factor-word set
-    \ lazy-jit-compile lazy-jit-compile-word set
-    \ unwind-native-frames unwind-native-frames-word set
-    \ fpu-state fpu-state-word set
-    \ set-fpu-state set-fpu-state-word set
-    \ signal-handler signal-handler-word set
-    \ leaf-signal-handler leaf-signal-handler-word set
-    \ ffi-signal-handler ffi-signal-handler-word set
-    \ ffi-leaf-signal-handler ffi-leaf-signal-handler-word set
-    undefined-def undefined-quot set ;
+    {
+        { JIT-IF-WORD if }
+        { JIT-PRIMITIVE-WORD do-primitive }
+        { JIT-DIP-WORD dip }
+        { JIT-2DIP-WORD 2dip }
+        { JIT-3DIP-WORD 3dip }
+        { PIC-MISS-WORD inline-cache-miss }
+        { PIC-MISS-TAIL-WORD inline-cache-miss-tail }
+        { MEGA-LOOKUP-WORD mega-cache-lookup }
+        { MEGA-MISS-WORD mega-cache-miss }
+        { JIT-DECLARE-WORD declare }
+        { C-TO-FACTOR-WORD c-to-factor }
+        { LAZY-JIT-COMPILE-WORD lazy-jit-compile }
+        { UNWIND-NATIVE-FRAMES-WORD unwind-native-frames }
+        { GET-FPU-STATE-WORD fpu-state }
+        { SET-FPU-STATE-WORD set-fpu-state }
+        { SIGNAL-HANDLER-WORD signal-handler }
+        { LEAF-SIGNAL-HANDLER-WORD leaf-signal-handler }
+    }
+    \ OBJ-UNDEFINED undefined-def 2array suffix [
+        swap execute( -- x ) special-objects get set-at
+    ] assoc-each ;
+
+: emit-special-object ( obj idx -- )
+    [ prepare-object ] [ header-size + ] bi* fixup ;
 
 : emit-special-objects ( -- )
-    special-objects get keys [ emit-special-object ] each ;
+    special-objects get [ swap emit-special-object ] assoc-each ;
 
 : fixup-header ( -- )
     heap-size data-heap-size-offset fixup ;
@@ -549,9 +484,9 @@ M: quotation '
     ] with-compilation-unit ;
 
 : build-image ( -- image )
-    600,000 <vector> image set
+    600,000 <vector> bootstrapping-image set
     60,000 <hashtable> objects set
-    emit-image-header t, 0, 1, -1,
+    emit-image-header
     "Building generic words..." print flush
     build-generics
     "Serializing words..." print flush
@@ -560,16 +495,18 @@ M: quotation '
     emit-jit-data
     "Serializing global namespace..." print flush
     emit-global
+    "Serializing singletons..." print flush
+    emit-singletons
     "Serializing special object table..." print flush
     emit-special-objects
     "Performing word fixups..." print flush
     fixup-words
     "Performing header fixups..." print flush
     fixup-header
-    "Image length: " write image get length .
+    "Image length: " write bootstrapping-image get length .
     "Object cache size: " write objects get assoc-size .
-    \ last-word-symbol global delete-at
-    image get ;
+    \ last-word global delete-at
+    bootstrapping-image get ;
 
 ! Image output
 
@@ -592,13 +529,14 @@ PRIVATE>
         { parser-quiet? f }
         { auto-use? f }
     } assoc-union! [
+        H{ } clone special-objects set
         "resource:/core/bootstrap/stage1.factor" run-file
         build-image
         write-image
     ] with-variables ;
 
 : make-images ( -- )
-    images [ make-image ] each ;
+    image-names [ make-image ] each ;
 
 : make-my-image ( -- )
-    my-arch make-image ;
+    my-arch-name make-image ;

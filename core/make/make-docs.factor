@@ -7,9 +7,9 @@ ARTICLE: "make-philosophy" "Make philosophy"
 "Make is useful for complex sequence construction which is hard to express with sequence combinators and various combinations of utility words."
 $nl
 "For example, this example uses " { $link make } " and reads better than a version using utility words:"
-{ $code "[ [ left>> , ] [ \"+\" % center>> % \"-\" % ] [ right , ] tri ] { } make" }
+{ $code "[ [ left>> , ] [ \"+\" % center>> % \"-\" % ] [ right>> , ] tri ] { } make" }
 "compare the above to"
-{ $code "[ center>> \"+\" \"-\" surround ] [ left>> prefix ] [ right suffix ] tri" }
+{ $code "[ center>> \"+\" \"-\" surround ] [ left>> prefix ] [ right>> suffix ] tri" }
 "The first one has a similar shape to the eventual output array. The second one has an arbitrary structure and uses three different utilities. Furthermore, the second version also constructs two redundant intermediate sequences, and for longer sequences, this extra copying will outweigh any overhead " { $link make } " has due to its use of a dynamic variable to store the sequence being built."
 $nl
 "On the other hand, using " { $link make } " instead of a single call to " { $link surround } " is overkill. The below headings summarize the most important cases where other idioms are more appropriate than " { $link make } "."

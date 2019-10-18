@@ -1,1 +1,0 @@
-Syntax for modifying gadget fonts

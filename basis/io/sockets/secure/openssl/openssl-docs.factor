@@ -7,7 +7,7 @@ HELP: subject-name
 { $description "The subject name of a certificate." } ;
 
 HELP: subject-names-match?
-{ $values { "host" "a host name" } { "subject" "a subject name" } { "?" boolean } }
+{ $values { "name" "a host name" } { "pattern" "a subject name" } { "?" boolean } }
 { $description "True if the host name matches the subject name." }
 { $examples
     { $code
@@ -46,3 +46,8 @@ HELP: check-ssl-error
   { "event/f" "f or a symbol indicating the desired operation" }
 }
 { $description "Checks if the last SSL function returned successfully or not. If so, returns " { $link f } " or a symbol, " { $link +input+ } " or " { $link +output+ } ", that indicates the socket operation required by libssl." } ;
+
+HELP: maybe-handshake
+{ $values
+  { "ssl-handle" ssl-handle }
+} { $description "Performs SSL handshaking (using " { $link SSL_accept } ") if the handle isn't connected. Then sets its state to connected." } ;

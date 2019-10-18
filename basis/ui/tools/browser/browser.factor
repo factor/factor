@@ -1,20 +1,20 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes combinators
-combinators.short-circuit compiler.units debugger fry help
-help.apropos help.crossref help.home help.stylesheet help.topics
-kernel models sequences sets ui ui.commands ui.gadgets
-ui.gadgets.borders ui.gadgets.buttons ui.gadgets.editors
-ui.gadgets.glass ui.gadgets.labels ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tracks
-ui.gadgets.viewports ui.gadgets.worlds ui.gestures
-ui.tools.browser.history ui.tools.browser.popups ui.tools.common
-vocabs ;
+USING: accessors arrays assocs classes combinators
+combinators.short-circuit compiler.units debugger fonts fry help
+help.apropos help.crossref help.home help.markup help.stylesheet
+help.topics io.styles kernel locals make math.vectors models
+namespaces sequences sets ui ui.commands ui.gadgets ui.gadgets.borders
+ui.gadgets.editors ui.gadgets.glass ui.gadgets.panes
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.toolbar
+ui.gadgets.tracks ui.gadgets.viewports ui.gadgets.worlds ui.gestures
+ui.pens.solid ui.theme ui.tools.browser.history
+ui.tools.browser.popups ui.tools.common unicode vocabs ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < tool history scroller search-field popup ;
 
-{ 650 700 } browser-gadget set-tool-dim
+browser-gadget default-font-size { 54 58 } n*v set-tool-dim
 
 M: browser-gadget history-value
     [ control-value ] [ scroller>> scroll-position ]
@@ -28,40 +28,102 @@ M: browser-gadget set-history-value
 : show-help ( link browser-gadget -- )
     [ >link ] dip
     [
-        2dup model>> value>> =
+        2dup control-value =
         [ 2drop ] [ [ add-recent ] [ history>> add-history ] bi* ] if
     ]
-    [ model>> set-model ]
+    [ set-control-value ]
     2bi ;
+
+CONSTANT: prev -1
+CONSTANT: next 1
+
+: add-navigation-arrow ( str direction -- str )
+    prev = [ "<" prefix ] [ ">" suffix ] if ;
+
+: $navigation-arrow ( content element direction -- )
+    [ prefix 1array ] dip add-navigation-arrow , ;
+
+:: ($navigation) ( topic direction -- )
+    help-path-style get [
+        topic [
+            direction prev/next-article
+            [ 1array \ $long-link direction $navigation-arrow ] when*
+        ] { } make [ ($navigation-table) ] unless-empty
+    ] with-style ;
+
+: $navigation ( topic direction -- )
+    title-style get [ ($navigation) ] with-style ;
+
+: $title ( topic -- )
+    title-style get clone page-color over delete-at dup
+    [
+        [
+            [ ($title) ]
+            [ ($navigation-path) ] bi
+        ] with-nesting
+    ] with-style ;
+
+: <help-header> ( browser-gadget -- gadget )
+    model>> [ '[ _ $title ] try ] <pane-control> ;
+
+: add-help-header ( track -- track )
+    dup <help-header> { 3 3 } <border>
+    help-header-background <solid> >>interior 
+    { 1 0 } >>fill f track-add ;
+
+: <help-footer> ( browser-gadget direction -- gadget )
+    [ model>> ] dip '[ [ _ $navigation ] try ] <pane-control>
+    { 0 0 } <border> { 1/2 1/2 } >>align
+    toolbar-background <solid> >>interior ;
+
+: add-help-footer ( track -- track )
+    horizontal <track> with-lines
+    dupd swap prev <help-footer> 1 track-add
+    dupd swap next <help-footer> 1 track-add
+    f track-add ;
+
+: print-topic ( topic -- )
+    >link
+    last-element off
+    article-content print-content ;
 
 : <help-pane> ( browser-gadget -- gadget )
     model>> [ '[ _ print-topic ] try ] <pane-control> ;
 
+: add-help-pane ( track -- track )
+    dup dup <help-pane> margins
+    <scroller> >>scroller scroller>> white-interior 1 track-add ;
+
 : search-browser ( string browser -- )
-    '[ <apropos-search> _ show-help ] unless-empty ;
+    '[ [ blank? ] trim <apropos-search> _ show-help ] unless-empty ;
 
 : <search-field> ( browser -- field )
     '[ _ search-browser ] <action-field>
+        "Search" >>default-text
         10 >>min-cols
-        10 >>max-cols ;
+        10 >>max-cols
+        white-interior ;
 
 : <browser-toolbar> ( browser -- toolbar )
-    horizontal <track>
-        0 >>fill
-        1/2 >>align
-        { 5 5 } >>gap
-        over <toolbar> f track-add
-        swap search-field>> "Search:" label-on-left 1 track-add ;
+    [ <toolbar> ] [
+        search-field>> horizontal <track>
+            0 >>fill swap 1 track-add
+        1 track-add
+    ] bi ;
+
+: add-browser-toolbar ( track -- track )
+    dup <browser-toolbar> format-toolbar f track-add ;
 
 : <browser-gadget> ( link -- gadget )
-    vertical browser-gadget new-track
+    vertical browser-gadget new-track with-lines
         1 >>fill
         swap >link <model> >>model
         dup <history> >>history
         dup <search-field> >>search-field
-        dup <browser-toolbar> { 3 3 } <border> { 1 0 } >>fill f track-add
-        dup dup <help-pane> { 10 0 } <border> { 1 1 } >>fill
-        <scroller> >>scroller scroller>> 1 track-add ;
+        add-browser-toolbar
+        add-help-header
+        add-help-pane
+        add-help-footer ;
 
 M: browser-gadget graft*
     [ add-definition-observer ] [ call-next-method ] bi ;
@@ -84,7 +146,7 @@ M: browser-gadget handle-gesture
     } 2|| ;
 
 M: browser-gadget definitions-changed ( set browser -- )
-    [ model>> value>> swap showing-definition? ] keep
+    [ control-value swap showing-definition? ] keep
     '[ _ [ history-value ] keep set-history-value ] when ;
 
 M: browser-gadget focusable-child* search-field>> ;
@@ -161,6 +223,14 @@ browser-gadget "navigation" "Commands for navigating in the article hierarchy" {
 browser-gadget "multi-touch" f {
     { left-action com-back }
     { right-action com-forward }
+} define-command-map
+
+browser-gadget "touchbar" f {
+    { f com-back }
+    { f com-forward }
+    { f com-home }
+    { f browser-help }
+    { f glossary }
 } define-command-map
 
 browser-gadget "scrolling"

@@ -30,10 +30,10 @@ GENERIC: model-activated ( model -- )
 M: model model-activated drop ;
 
 : ref-model ( model -- n )
-    [ 1 + ] change-ref ref>> ;
+    [ 1 + dup ] change-ref drop ;
 
 : unref-model ( model -- n )
-    [ 1 - ] change-ref ref>> ;
+    [ 1 - dup ] change-ref drop ;
 
 : activate-model ( model -- )
     dup ref-model 1 = [
@@ -57,17 +57,17 @@ DEFER: remove-connection
 GENERIC: model-changed ( model observer -- )
 
 : add-connection ( observer model -- )
-    dup connections>> empty? [ dup activate-model ] when
-    connections>> push ;
+    dup connections>>
+    [ empty? [ activate-model ] [ drop ] if ]
+    [ push ] bi ;
 
 : remove-connection ( observer model -- )
-    [ connections>> remove! drop ] keep
-    dup connections>> empty? [ dup deactivate-model ] when
-    drop ;
+    [ connections>> remove! ] keep swap
+    empty? [ deactivate-model ] [ drop ] if ;
 
 : with-locked-model ( model quot -- )
     [ '[ _ t >>locked? @ ] ]
-    [ drop '[ _ f >>locked? drop ] ]
+    [ drop '[ f _ locked?<< ] ]
     2bi [ ] cleanup ; inline
 
 GENERIC: update-model ( model -- )
@@ -90,14 +90,14 @@ M: model update-model drop ;
 : ?set-model ( value model -- )
     2dup value>> = [ 2drop ] [ set-model ] if ;
 
-: ((change-model)) ( model quot -- newvalue model )
+: call-change-model ( model quot -- newvalue model )
     over [ [ value>> ] dip call ] dip ; inline
 
 : change-model ( ..a model quot: ( ..a obj -- ..b newobj ) -- ..b )
-    ((change-model)) set-model ; inline
+    call-change-model set-model ; inline
 
 : (change-model) ( ..a model quot: ( ..a obj -- ..b newobj ) -- ..b )
-    ((change-model)) value<< ; inline
+    call-change-model value<< ; inline
 
 GENERIC: range-value ( model -- value )
 GENERIC: range-page-value ( model -- value )
@@ -120,4 +120,3 @@ GENERIC: set-range-max-value ( value model -- )
 
 : pop-model ( model -- value )
     [ pop ] change-model* ;
-

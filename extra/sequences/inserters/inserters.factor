@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors fry growable kernel locals math sequences ;
 IN: sequences.inserters
 
@@ -41,4 +42,3 @@ INSTANCE: replacer inserter
 
 M: replacer new-sequence
     underlying>> [ set-length ] keep ; inline
-

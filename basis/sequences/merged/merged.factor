@@ -14,10 +14,10 @@ C: <merged> merged
     [ <merged> ] keep first like ;
 
 : 2merge ( seq1 seq2 -- seq )
-    [ <2merged> ] 2keep drop like ;
+    [ <2merged> ] keepd like ;
 
 : 3merge ( seq1 seq2 seq3 -- seq )
-    [ <3merged> ] 3keep 2drop like ;
+    [ <3merged> ] keepdd like ;
 
 M: merged length
     seqs>> [ [ length ] [ min ] map-reduce ] [ length ] bi * ; inline

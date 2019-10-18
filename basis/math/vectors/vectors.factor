@@ -6,28 +6,28 @@ fry combinators byte-arrays accessors locals ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors
 
-GENERIC: vneg ( u -- v )
+GENERIC: vneg ( v -- w )
 M: object vneg [ neg ] map ; inline
 
-GENERIC# v+n 1 ( u n -- w )
+GENERIC#: v+n 1 ( v n -- w )
 M: object v+n [ + ] curry map ; inline
 
 GENERIC: n+v ( n v -- w )
 M: object n+v [ + ] with map ; inline
 
-GENERIC# v-n 1 ( u n -- w )
+GENERIC#: v-n 1 ( v n -- w )
 M: object v-n [ - ] curry map ; inline
 
 GENERIC: n-v ( n v -- w )
 M: object n-v [ - ] with map ; inline
 
-GENERIC# v*n 1 ( u n -- w )
+GENERIC#: v*n 1 ( v n -- w )
 M: object v*n [ * ] curry map ; inline
 
 GENERIC: n*v ( n v -- w )
 M: object n*v [ * ] with map ; inline
 
-GENERIC# v/n 1 ( u n -- w )
+GENERIC#: v/n 1 ( v n -- w )
 M: object v/n [ / ] curry map ; inline
 
 GENERIC: n/v ( n v -- w )
@@ -48,7 +48,7 @@ M: object v* [ * ] 2map ; inline
 GENERIC: v*high ( u v -- w )
 
 <PRIVATE
-: (h+) ( u -- w ) 2 <groups> [ first2 + ] map ;
+: (h+) ( v -- w ) 2 <groups> [ first2 + ] map ;
 PRIVATE>
 
 GENERIC: v*hs+ ( u v -- w )
@@ -60,7 +60,7 @@ M: object v/ [ / ] 2map ; inline
 GENERIC: v^ ( u v -- w )
 M: object v^ [ ^ ] 2map ; inline
 
-GENERIC: v^n ( u n -- w )
+GENERIC: v^n ( v n -- w )
 M: object v^n [ ^ ] curry map ; inline
 
 GENERIC: n^v ( n v -- w )
@@ -90,10 +90,10 @@ M: object vs- [ - ] 2map ; inline
 GENERIC: vs* ( u v -- w )
 M: object vs* [ * ] 2map ; inline
 
-GENERIC: vabs ( u -- v )
+GENERIC: vabs ( v -- w )
 M: object vabs [ abs ] map ; inline
 
-GENERIC: vsqrt ( u -- v )
+GENERIC: vsqrt ( v -- w )
 M: object vsqrt [ >float fsqrt ] map ; inline
 
 GENERIC: vsad ( u v -- n )
@@ -113,34 +113,34 @@ GENERIC: vbitor ( u v -- w )
 M: object vbitor [ bitor ] 2map ; inline
 GENERIC: vbitxor ( u v -- w )
 M: object vbitxor [ bitxor ] 2map ; inline
-GENERIC: vbitnot ( u -- w )
+GENERIC: vbitnot ( v -- w )
 M: object vbitnot [ bitnot ] map ; inline
 
-GENERIC# vbroadcast 1 ( u n -- v )
+GENERIC#: vbroadcast 1 ( u n -- v )
 M:: object vbroadcast ( u n -- v ) u length n u nth <repetition> u like ; inline
 
-GENERIC# vshuffle-elements 1 ( u perm -- v )
+GENERIC#: vshuffle-elements 1 ( v perm -- w )
 M: object vshuffle-elements
     over length 0 pad-tail
     swap [ '[ _ nth ] ] keep map-as ; inline
 
-GENERIC# vshuffle2-elements 1 ( u v perm -- w )
+GENERIC#: vshuffle2-elements 1 ( u v perm -- w )
 M: object vshuffle2-elements
     [ append ] dip vshuffle-elements ; inline
 
-GENERIC# vshuffle-bytes 1 ( u perm -- v )
+GENERIC#: vshuffle-bytes 1 ( v perm -- w )
 
-GENERIC: vshuffle ( u perm -- v )
-M: array vshuffle ( u perm -- v )
+GENERIC: vshuffle ( v perm -- w )
+M: array vshuffle ( v perm -- w )
     vshuffle-elements ; inline
 
-GENERIC# vlshift 1 ( u n -- w )
+GENERIC#: vlshift 1 ( v n -- w )
 M: object vlshift '[ _ shift ] map ; inline
-GENERIC# vrshift 1 ( u n -- w )
+GENERIC#: vrshift 1 ( v n -- w )
 M: object vrshift neg '[ _ shift ] map ; inline
 
-GENERIC# hlshift 1 ( u n -- w )
-GENERIC# hrshift 1 ( u n -- w )
+GENERIC#: hlshift 1 ( v n -- w )
+GENERIC#: hrshift 1 ( v n -- w )
 
 GENERIC: (vmerge-head) ( u v -- h )
 M: object (vmerge-head) over length 2 /i '[ _ head-slice ] bi@ [ zip ] keep concat-as ; inline
@@ -165,7 +165,7 @@ M: object vor [ or ] 2map ; inline
 GENERIC: vxor ( u v -- w )
 M: object vxor [ xor ] 2map ; inline
 
-GENERIC: vnot ( u -- w )
+GENERIC: vnot ( v -- w )
 M: object vnot [ not ] map ; inline
 
 GENERIC: vall? ( v -- ? )
@@ -199,7 +199,7 @@ GENERIC: v= ( u v -- w )
 M: object v= [ = ] 2map ; inline
 
 GENERIC: v? ( mask true false -- result )
-M: object v? 
+M: object v?
     [ vand ] [ vandn ] bi-curry* bi vor ; inline
 
 : vif ( mask true-quot: ( -- vector ) false-quot: ( -- vector ) -- result )
@@ -209,9 +209,10 @@ M: object v?
         [ [ call ] dip call v? ]
     } cond ; inline
 
-: vfloor ( u -- v ) [ floor ] map ;
-: vceiling ( u -- v ) [ ceiling ] map ;
-: vtruncate ( u -- v ) [ truncate ] map ;
+: v>integer ( v -- w ) [ >integer ] map ;
+: vfloor ( v -- w ) [ floor ] map ;
+: vceiling ( v -- w ) [ ceiling ] map ;
+: vtruncate ( v -- w ) [ truncate ] map ;
 
 : vsupremum ( seq -- vmax ) [ ] [ vmax ] map-reduce ; inline
 : vinfimum ( seq -- vmin ) [ ] [ vmin ] map-reduce ; inline
@@ -240,7 +241,7 @@ M: object norm-sq [ absq ] [ + ] map-reduce ; inline
         [ p-norm-default ]
     } cond ;
 
-: normalize ( u -- v ) dup norm v/n ; inline
+: normalize ( v -- w ) dup norm v/n ; inline
 
 GENERIC: distance ( u v -- x )
 M: object distance [ - absq ] [ + ] 2map-reduce sqrt ; inline
@@ -275,3 +276,6 @@ PRIVATE>
 
 : v~ ( a b epsilon -- ? )
     [ ~ ] curry 2all? ; inline
+
+: vclamp ( v min max -- w )
+    rot vmin vmax ; inline

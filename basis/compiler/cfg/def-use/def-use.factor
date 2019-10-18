@@ -1,17 +1,13 @@
 ! Copyright (C) 2008, 2011 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs arrays classes combinators
-compiler.units fry generalizations sequences.generalizations
-generic kernel locals namespaces quotations sequences sets slots
-words compiler.cfg.instructions compiler.cfg.instructions.syntax
-compiler.cfg.rpo compiler.cfg ;
-FROM: namespaces => set ;
-FROM: sets => members ;
+USING: accessors arrays assocs combinators compiler.cfg
+compiler.cfg.instructions compiler.cfg.instructions.syntax
+compiler.cfg.rpo compiler.units fry generic kernel namespaces
+quotations sequences sequences.generalizations sets slots words ;
 IN: compiler.cfg.def-use
 
 ! Utilities for iterating over instruction operands
 
-! Def-use protocol
 GENERIC: defs-vregs ( insn -- seq )
 GENERIC: temp-vregs ( insn -- seq )
 GENERIC: uses-vregs ( insn -- seq )
@@ -20,10 +16,6 @@ M: insn defs-vregs drop { } ;
 M: insn temp-vregs drop { } ;
 M: insn uses-vregs drop { } ;
 
-! Instructions with unusual operands, also see these passes
-! for special behavior:
-! - compiler.cfg.renaming.functor
-! - compiler.cfg.representations.preferred
 CONSTANT: special-vreg-insns {
     ##parallel-copy
     ##phi
@@ -118,7 +110,7 @@ SYMBOLS: defs insns ;
                 _ set-def-of
             ] with each
         ] simple-analysis
-    ] keep defs set ;
+    ] keep defs namespaces:set ;
 
 : compute-insns ( cfg -- )
     H{ } clone [
@@ -127,4 +119,4 @@ SYMBOLS: defs insns ;
                 dup _ set-def-of
             ] each
         ] simple-analysis
-    ] keep insns set ;
+    ] keep insns namespaces:set ;

@@ -1,5 +1,4 @@
-USING: checksums kernel sequences tools.test ;
-IN: checksums.fletcher
+USING: checksums checksums.fletcher kernel sequences tools.test ;
 
 {
     { 51440 3948201259 14034561336514601929 }
@@ -7,4 +6,3 @@ IN: checksums.fletcher
     "abcde" { fletcher-16 fletcher-32 fletcher-64 }
     [ checksum-bytes ] with map
 ] unit-test
-

@@ -1,32 +1,32 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private math
 combinators macros math.order math.ranges quotations fry effects
 memoize.private generalizations ;
 IN: sequences.generalizations
 
-MACRO: nsequence ( n seq -- )
-    [ [nsequence] ] keep
-    '[ @ _ like ] ;
+MACRO: nsequence ( n seq -- quot )
+    [ [nsequence] ] keep '[ @ _ like ] ;
 
-MACRO: narray ( n -- )
+MACRO: narray ( n -- quot )
     '[ _ { } nsequence ] ;
 
-MACRO: firstn-unsafe ( n -- )
+MACRO: firstn-unsafe ( n -- quot )
     [firstn] ;
 
-MACRO: firstn ( n -- )
+MACRO: firstn ( n -- quot )
     [ [ drop ] ] [
         [ 1 - swap bounds-check 2drop ]
         [ firstn-unsafe ]
         bi-curry '[ _ _ bi ]
     ] if-zero ;
 
-MACRO: set-firstn-unsafe ( n -- )
+MACRO: set-firstn-unsafe ( n -- quot )
     [ 1 + ]
-    [ iota [ '[ _ rot [ set-nth-unsafe ] keep ] ] map ] bi
+    [ <iota> [ '[ _ rot [ set-nth-unsafe ] keep ] ] map ] bi
     '[ _ -nrot _ spread drop ] ;
 
-MACRO: set-firstn ( n -- )
+MACRO: set-firstn ( n -- quot )
     [ [ drop ] ] [
         [ 1 - swap bounds-check 2drop ]
         [ set-firstn-unsafe ]
@@ -36,9 +36,9 @@ MACRO: set-firstn ( n -- )
 : nappend ( n -- seq ) narray concat ; inline
 
 : nappend-as ( n exemplar -- seq )
-    [ nappend ] dip like ; inline
+    [ narray ] [ concat-as ] bi* ; inline
 
-MACRO: nmin-length ( n -- )
+MACRO: nmin-length ( n -- quot )
     dup 1 - [ min ] n*quot
     '[ [ length ] _ napply @ ] ;
 
@@ -48,7 +48,7 @@ MACRO: nmin-length ( n -- )
 : nnth-unsafe ( n seq... n -- )
     [ nth-unsafe ] swap [ apply-curry ] [ cleave* ] bi ; inline
 
-MACRO: nset-nth-unsafe ( n -- )
+MACRO: nset-nth-unsafe ( n -- quot )
     [ [ drop ] ]
     [ '[ [ set-nth-unsafe ] _ [ apply-curry ] [ cleave-curry ] [ spread* ] tri ] ]
     if-zero ;
@@ -66,7 +66,7 @@ MACRO: nset-nth-unsafe ( n -- )
 : nmap ( seq... quot n -- result )
     dup '[ [ _ npick ] dip swap ] dip nmap-as ; inline
 
-MACRO: nnew-sequence ( n -- )
+MACRO: nnew-sequence ( n -- quot )
     [ [ drop ] ]
     [ dup '[ [ new-sequence ] _ apply-curry _ cleave* ] ] if-zero ;
 
@@ -79,7 +79,7 @@ MACRO: nnew-sequence ( n -- )
         _ spread*
     ] call ; inline
 
-MACRO: (ncollect) ( n -- )
+MACRO: (ncollect) ( n -- quot )
     3 dupn 1 +
     '[ [ [ keep ] _ ndip _ nset-nth-unsafe ] _ ncurry ] ;
 
@@ -96,19 +96,19 @@ MACRO: (ncollect) ( n -- )
 : mnmap ( m*seq quot m n -- result*n )
     2dup '[ [ _ npick ] dip swap _ dupn ] 2dip mnmap-as ; inline
 
-: ncollector-for ( quot exemplar... n -- quot' vec... )
+: ncollector-as ( quot exemplar... n -- quot' vec... )
     5 dupn '[
         [ [ length ] keep new-resizable ] _ napply
         [ [ [ push ] _ apply-curry _ spread* ] _ ncurry compose ] _ nkeep
     ] call ; inline
 
 : ncollector ( quot n -- quot' vec... )
-    [ V{ } swap dupn ] keep ncollector-for ; inline
+    [ V{ } swap dupn ] keep ncollector-as ; inline
 
 : nproduce-as ( pred quot exemplar... n -- seq... )
     7 dupn '[
         _ ndup
-        [ _ ncollector-for [ while ] _ ndip ]
+        [ _ ncollector-as [ while ] _ ndip ]
         _ ncurry _ ndip
         [ like ] _ apply-curry _ spread*
     ] call ; inline
@@ -117,7 +117,7 @@ MACRO: (ncollect) ( n -- )
     [ { } swap dupn ] keep nproduce-as ; inline
 
 MACRO: nmap-reduce ( map-quot reduce-quot n -- quot )
-    -rot dupd compose [ over ] dip over '[
+    -rot dupd compose overd over '[
         [ [ first ] _ napply @ 1 ] _ nkeep
         _ _ (neach) (each-integer)
     ] ;

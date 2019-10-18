@@ -5,11 +5,10 @@ compiler.units continuations definitions effects io
 io.encodings.utf8 io.files kernel lexer math.parser namespaces
 parser.notes quotations sequences sets slots source-files
 vectors vocabs vocabs.parser words words.symbol ;
-FROM: sets => members ;
 IN: parser
 
 : location ( -- loc )
-    file get lexer get line>> 2dup and
+    current-source-file get lexer get line>> 2dup and
     [ [ path>> ] dip 2array ] [ 2drop f ] if ;
 
 : save-location ( definition -- )
@@ -17,8 +16,8 @@ IN: parser
 
 M: parsing-word stack-effect drop ( parsed -- parsed ) ;
 
-: create-in ( str -- word )
-    current-vocab create dup set-last-word dup save-location ;
+: create-word-in ( str -- word )
+    current-vocab create-word dup set-last-word dup save-location ;
 
 SYMBOL: auto-use?
 
@@ -29,24 +28,24 @@ SYMBOL: auto-use?
         dup vocabulary>>
         [ auto-use-vocab ]
         [ "Added \"" "\" vocabulary to search path" surround note. ] bi
-    ] [ create-in ] if ;
+    ] [ create-word-in ] if ;
 
 : ignore-forwards ( seq -- seq' )
-    [ forward-reference? not ] filter ;
+    [ forward-reference? ] reject ;
 
 : private? ( word -- ? ) vocabulary>> ".private" tail? ;
+
+: use-first-word? ( words -- ? )
+    [ length 1 = ] [ ?first dup [ private? not ] [ ] ?if ] bi and
+    auto-use? get and ;
 
 ! True branch is a singleton public word with no name conflicts
 ! False branch, singleton private words need confirmation regardless
 ! of name conflicts
 : no-word ( name -- newword )
     dup words-named ignore-forwards
-    dup [ length 1 = ]
-    [ [ f ] [ first private? not ] if-empty ] bi and
-    auto-use? get and
-    [ nip first no-word-restarted ]
-    [ <no-word-error> throw-restarts no-word-restarted ]
-    if ;
+    dup use-first-word? [ nip first ] [ <no-word-error> throw-restarts ] if
+    no-word-restarted ;
 
 : parse-word ( string -- word )
     dup search [ ] [ no-word ] ?if ;
@@ -75,13 +74,15 @@ ERROR: number-expected ;
 
 ERROR: invalid-word-name string ;
 
-: scan-word-name ( -- string )
-    scan-token
+: check-word-name ( string -- string )
     dup "\"" = [ t ] [ dup string>number ] if
     [ invalid-word-name ] when ;
 
+: scan-word-name ( -- string )
+    scan-token check-word-name ;
+
 : scan-new ( -- word )
-    scan-word-name create-in ;
+    scan-word-name create-word-in ;
 
 : scan-new-word ( -- word )
     scan-new dup reset-generic ;
@@ -97,14 +98,21 @@ ERROR: staging-violation word ;
     dup changed-definitions get in? [ staging-violation ] when
     (execute-parsing) ;
 
+: ?execute-parsing ( word/number -- seq )
+    dup parsing-word?
+    [ V{ } clone swap execute-parsing ] [ 1array ] if ;
+
 : scan-object ( -- object )
     scan-datum
     dup parsing-word? [
         V{ } clone swap execute-parsing first
     ] when ;
 
+ERROR: classoid-expected object ;
+
 : scan-class ( -- class )
-    scan-object \ f or ;
+    scan-object \ f or
+    dup classoid? [ classoid-expected ] unless ;
 
 : parse-until-step ( accum end -- accum ? )
     ?scan-datum {
@@ -139,6 +147,9 @@ M: f parse-quotation \ ] parse-until >quotation ;
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;
 
+: parse-array-def ( -- array )
+    \ ; parse-until >array ;
+
 ERROR: bad-number ;
 
 : scan-base ( base -- n )
@@ -163,13 +174,13 @@ print-use-hook [ [ ] ] initialize
         auto-used? [ print-use-hook get call( -- ) ] when
     ] with-file-vocabs ;
 
-: parsing-file ( file -- )
+: parsing-file ( path -- )
     parser-quiet? get [ drop ] [ "Loading " write print flush ] if ;
 
 : filter-moved ( set1 set2 -- seq )
     swap diff members [
         {
-            { [ dup where dup [ first ] when file get path>> = not ] [ f ] }
+            { [ dup where dup [ first ] when current-source-file get path>> = not ] [ f ] }
             { [ dup reader-method? ] [ f ] }
             { [ dup writer-method? ] [ f ] }
             [ t ]
@@ -192,8 +203,8 @@ print-use-hook [ [ ] ] initialize
     filter-moved [ class? ] filter [ forget-class ] each ;
 
 : fix-class-words ( -- )
-    #! If a class word had a compound definition which was
-    #! removed, it must go back to being a symbol.
+    ! If a class word had a compound definition which was
+    ! removed, it must go back to being a symbol.
     new-definitions get first2
     filter-moved [ [ reset-generic ] [ define-symbol ] bi ] each ;
 
@@ -203,7 +214,7 @@ print-use-hook [ [ ] ] initialize
     fix-class-words ;
 
 : finish-parsing ( lines quot -- )
-    file get
+    current-source-file get
     [ record-top-level-form ]
     [ record-definitions ]
     [ record-checksum ]
@@ -218,10 +229,10 @@ print-use-hook [ [ ] ] initialize
         ] with-source-file
     ] with-compilation-unit ;
 
-: parse-file-restarts ( file -- restarts )
+: parse-file-restarts ( path -- restarts )
     "Load " " again" surround t 2array 1array ;
 
-: parse-file ( file -- quot )
+: parse-file ( path -- quot )
     [
         [ parsing-file ] keep
         [ utf8 <file-reader> ] keep
@@ -231,7 +242,7 @@ print-use-hook [ [ ] ] initialize
         drop parse-file
     ] recover ;
 
-: run-file ( file -- )
+: run-file ( path -- )
     parse-file call( -- ) ;
 
 : ?run-file ( path -- )

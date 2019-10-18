@@ -1,12 +1,16 @@
 ! (c)2009 Joe Groff, see BSD license
-USING: accessors arrays combinators combinators.short-circuit kernel math math.vectors
-math.functions sequences ;
+USING: accessors arrays combinators combinators.short-circuit kernel
+math math.functions math.vectors sequences ;
 IN: math.affine-transforms
 
-TUPLE: affine-transform { x read-only } { y read-only } { origin read-only } ;
+TUPLE: affine-transform
+    { x read-only }
+    { y read-only }
+    { origin read-only } ;
 C: <affine-transform> affine-transform
 
-CONSTANT: identity-transform T{ affine-transform f { 1.0 0.0 } { 0.0 1.0 } { 0.0 0.0 } }
+CONSTANT: identity-transform T{ affine-transform f
+                                { 1.0 0.0 } { 0.0 1.0 } { 0.0 0.0 } }
 
 : axes ( a -- a' )
      [ x>> ] [ y>> ] bi { 0.0 0.0 } <affine-transform> ;
@@ -28,8 +32,9 @@ CONSTANT: identity-transform T{ affine-transform f { 1.0 0.0 } { 0.0 1.0 } { 0.0
     [ 0.0 2array ] [ 0.0 swap 2array ] bi* { 0.0 0.0 } <affine-transform> ;
 
 : center-rotation ( transform center -- transform )
-    [ [ x>> ] [ y>> ] [ ] tri ] dip [ vneg a.v ] [ v+ ] bi <affine-transform> ;
-    
+    [ [ x>> ] [ y>> ] [ ] tri ] dip [ vneg a.v ] [ v+ ] bi
+    <affine-transform> ;
+
 : flatten-transform ( transform -- array )
     [ x>> ] [ y>> ] [ origin>> ] tri 3append ;
 

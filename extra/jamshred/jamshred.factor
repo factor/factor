@@ -26,7 +26,7 @@ M: jamshred-gadget draw-gadget* ( gadget -- )
     ] [
         [ jamshred>> jamshred-update ]
         [ relayout-1 ]
-        [ 100 milliseconds sleep jamshred-loop ] tri 
+        [ 100 milliseconds sleep jamshred-loop ] tri
     ] if ;
 
 M: jamshred-gadget graft* ( gadget -- )
@@ -43,11 +43,11 @@ M: jamshred-gadget ungraft* ( gadget -- )
     / pi 4 * * ; ! 2 / / pi 2 * * ;
 
 : x>radians ( x gadget -- theta )
-    #! translate motion of x pixels to an angle
+    ! translate motion of x pixels to an angle
     dim>> first pix>radians neg ;
 
 : y>radians ( y gadget -- theta )
-    #! translate motion of y pixels to an angle
+    ! translate motion of y pixels to an angle
     dim>> second pix>radians ;
 
 : (handle-mouse-motion) ( jamshred-gadget mouse-motion -- )
@@ -57,8 +57,8 @@ M: jamshred-gadget ungraft* ( gadget -- )
 : handle-mouse-motion ( jamshred-gadget -- )
     hand-loc get [
         over last-hand-loc>> [
-            v- (handle-mouse-motion) 
-        ] [ 2drop ] if* 
+            v- (handle-mouse-motion)
+        ] [ 2drop ] if*
     ] 2keep >>last-hand-loc drop ;
 
 : handle-mouse-scroll ( jamshred-gadget -- )

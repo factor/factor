@@ -3,5 +3,5 @@
 USING: tools.test db.tester ;
 IN: db.tester.tests
 
-[ ] [ sqlite-test-db db-tester ] unit-test
-[ ] [ sqlite-test-db db-tester2 ] unit-test
+{ } [ sqlite-test-db db-tester ] unit-test
+{ } [ sqlite-test-db db-tester2 ] unit-test

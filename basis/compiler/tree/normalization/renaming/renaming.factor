@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs kernel accessors sequences fry
-compiler.tree compiler.tree.combinators ;
+USING: accessors assocs compiler.tree compiler.tree.combinators
+fry kernel namespaces sequences ;
 IN: compiler.tree.normalization.renaming
 
 SYMBOL: rename-map

@@ -1,6 +1,6 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays assocs combinators
+USING: alien alien.c-types alien.data arrays assocs combinators
 compiler.codegen.labels cpu.architecture cpu.x86.assembler
 cpu.x86.assembler.operands init kernel math math.order
 math.parser memoize namespaces sequences
@@ -89,7 +89,7 @@ HOOK: (cpuid) cpu ( rax rcx regs -- )
 
 
 : cpuid-extended ( rax rcx -- 4array )
-   4 <uint-array> [ (cpuid) ] keep >array ;
+   4 uint <c-array> [ (cpuid) ] keep >array ;
 
 : cpuid ( rax -- 4array ) 0 cpuid-extended ;
 

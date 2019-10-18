@@ -6,4 +6,4 @@ IN: unix.getfsstat.macosx
 CONSTANT: MNT_WAIT    1   ! synchronously wait for I/O to complete
 CONSTANT: MNT_NOWAIT  2   ! start all I/O, but do not wait for it
 
-FUNCTION: int getfsstat64 ( statfs64* buf, int bufsize, int flags ) ;
+FUNCTION: int getfsstat64 ( statfs64* buf, int bufsize, int flags )

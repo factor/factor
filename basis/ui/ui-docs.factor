@@ -3,21 +3,40 @@ math.rectangles namespaces quotations sequences strings ui.backend
 ui.gadgets ui.gadgets.books ui.gadgets.grids ui.gadgets.packs
 ui.gadgets.private ui.gadgets.tracks ui.gadgets.worlds ui.private ui.text
 vocabs.loader ;
-
 IN: ui
 
-HELP: windows
-{ $var-description "Global variable holding an association list mapping native window handles to " { $link world } " instances." } ;
-
-{ windows open-window find-window world-attributes } related-words
+HELP: close-window
+{ $values { "gadget" gadget } }
+{ $description "Close the native window containing " { $snippet "gadget" } "." } ;
 
 HELP: open-window
 { $values { "gadget" gadget } { "title/attributes" { "a " { $link string } " or a " { $link world-attributes } " tuple" } } }
 { $description "Opens a native window containing " { $snippet "gadget" } " with the specified attributes. If a string is provided, it is used as the window title; otherwise, the window attributes are specified in a " { $link world-attributes } " tuple." } ;
 
-HELP: close-window
-{ $values { "gadget" gadget } }
-{ $description "Close the native window containing " { $snippet "gadget" } "." } ;
+HELP: resize-window
+{ $values { "world" world } { "dim" "a pair of integers: width and height" } }
+{ $description "Resize the native window so that its contents area (called the \"client area\" in Windows) has the specified dimensions." } ;
+
+HELP: set-fullscreen
+{ $values { "gadget" gadget } { "?" boolean } }
+{ $description "Sets and unsets fullscreen mode for the gadget's world." } ;
+
+HELP: set-up-window
+{ $values { "world" world } }
+{ $description "Initializes the window that shows the world." } ;
+
+HELP: ui-thread
+{ $var-description "Holds a reference to the running UI thread. This variable is used to ensure that there can only be one UI thread running at the same time." }
+{ $see-also start-ui-thread } ;
+
+HELP: ui-running?
+{ $values { "?" boolean } }
+{ $description "Whether the UI is running or not." } ;
+
+HELP: worlds
+{ $var-description "Global variable holding an association list mapping native window handles to " { $link world } " instances." } ;
+
+{ worlds open-window find-window world-attributes } related-words
 
 HELP: world-attributes
 { $values { "world-class" class } { "title" string } { "status" gadget } { "gadgets" sequence } { "pixel-format-attributes" sequence } { "window-controls" sequence } }
@@ -31,28 +50,28 @@ HELP: world-attributes
     { { $snippet "window-controls" } " is a sequence of " { $link "ui.gadgets.worlds-window-controls" } " that will be placed in the window." }
 } ;
 
-HELP: set-fullscreen
-{ $values { "gadget" gadget } { "?" boolean } }
-{ $description "Sets and unsets fullscreen mode for the gadget's world." } ;
-
 HELP: fullscreen?
 { $values { "gadget" gadget } { "?" boolean } }
 { $description "Queries the gadget's world to see if it is running in fullscreen mode." } ;
 
 { fullscreen? set-fullscreen } related-words
 
+HELP: find-windows
+{ $values { "quot" { $quotation ( world -- ? ) } } { "seq" sequence } }
+{ $description "Finds all native windows such that the gadget passed to " { $link open-window } " satisfies the quotation, outputting an empty sequence if no such gadget could be found. The front-most native window is the last in the " { $snippet "seq" } "." } ;
+
 HELP: find-window
-{ $values { "quot" { $quotation ( world -- ? ) } } { "world" { $maybe world } } }
+{ $values { "quot" { $quotation ( world -- ? ) } } { "world/f" { $maybe world } } }
 { $description "Finds a native window such that the gadget passed to " { $link open-window } " satisfies the quotation, outputting " { $link f } " if no such gadget could be found. The front-most native window is checked first." } ;
 
 HELP: register-window
 { $values { "world" world } { "handle" "a backend-specific handle" } }
-{ $description "Adds a window to the global " { $link windows } " variable." }
+{ $description "Adds a window to the global " { $link worlds } " variable." }
 { $notes "This word should only be called by the UI backend. User code can open new windows with " { $link open-window } "." } ;
 
 HELP: unregister-window
 { $values { "handle" "a backend-specific handle" } }
-{ $description "Removes a window from the global " { $link windows } " variable." }
+{ $description "Removes a window from the global " { $link worlds } " variable." }
 { $notes "This word should only be called only by the UI backend, and not user code." } ;
 
 HELP: (with-ui)
@@ -75,7 +94,10 @@ HELP: raise-window
 
 HELP: with-ui
 { $values { "quot" { $quotation ( -- ) } } }
-{ $description "Calls the quotation, starting the UI if necessary. If starting the UI is necessary, this word does not return and the UI will start after the quotation returns." }
+{ $description
+  "Calls the quotation, starting the UI if necessary. If starting the UI is necessary, this word does not return and the UI will start after the quotation returns." $nl
+  "While the combinator is running, " { $link ui-running? } " can be used by user code to determine whether it is running in a UI context or not."
+}
 { $notes "This word should be used in the " { $link POSTPONE: MAIN: } " word of an application that uses the UI in order for the vocabulary to work when run from either the UI listener (" { $snippet "\"my-app\" run" } ") and the command line (" { $snippet "./factor -run=my-app" } ")." }
 { $examples "The " { $vocab-link "hello-ui" } " vocabulary implements a simple UI application which uses this word." } ;
 
@@ -110,7 +132,7 @@ ARTICLE: "building-ui" "Building user interfaces"
     "ui-geometry"
     "ui-layouts"
     "gadgets"
-    "ui-windows"
+    "ui-worlds"
     "ui.gadgets.status-bar"
 }
 { $see-also "models" } ;
@@ -144,21 +166,24 @@ ARTICLE: "ui-geometry" "Gadget geometry"
     children-on
 } ;
 
-ARTICLE: "ui-windows" "Top-level windows"
+ARTICLE: "ui-worlds" "Top-level windows"
 "Opening a top-level window:"
 { $subsections open-window }
 "Finding top-level windows:"
 { $subsections find-window }
 "Top-level windows are stored in a global variable:"
-{ $subsections windows }
+{ $subsections worlds }
 "When a gadget is displayed in a top-level window, or added to a parent which is already showing in a top-level window, a generic word is called allowing the gadget to perform initialization tasks:"
 { $subsections graft* }
 "When the gadget is removed from a parent shown in a top-level window, or when the top-level window is closed, a corresponding generic word is called to clean up:"
 { $subsections ungraft* }
 "The root of the gadget hierarchy in a window is a special gadget which is rarely operated on directly, but it is helpful to know it exists:"
 { $subsections world }
-"There is also syntax for defining a main window as the entry point for a vocabulary:"
-{ $subsections POSTPONE: MAIN-WINDOW: } ;
+"There is also syntax for defining window words, including a main window that is the entry point for a vocabulary:"
+{ $subsections
+    POSTPONE: WINDOW:
+    POSTPONE: MAIN-WINDOW:
+} ;
 
 ARTICLE: "ui-backend" "Developing UI backends"
 "None of the words documented in this section should be called directly by user code. They are only of interest when developing new UI backends."
@@ -284,7 +309,7 @@ ARTICLE: "new-gadgets" "Implementing new gadgets"
 $nl
 "Bare gadgets can be constructed directly, which is useful if all you need is a custom appearance with no further behavior (see " { $link "ui-pen-protocol" } "):"
 { $subsections <gadget> }
-"New gadgets are defined as subclasses of an existing gadget type, perhaps even " { $link gadget } " itself. Direct subclasses of " { $link gadget } " can be constructed using " { $link new } ", however some subclasses may define their own parametrized constructors (see " { $link "parametrized-constructors" } ")."
+"New gadgets are defined as subclasses of an existing gadget type, perhaps even " { $link gadget } " itself. Direct subclasses of " { $link gadget } " can be constructed using " { $link new } ", however some subclasses may define their own parameterized constructors (see " { $link "parameterized-constructors" } ")."
 $nl
 "Further topics:"
 { $subsections
@@ -336,6 +361,20 @@ HELP: textured-background
 HELP: dialog-window
 { $description "Provides a hint to the window manager to create a floating, dialog-style window. Currently, this is only implemented for the GTK backend." } ;
 
+HELP: WINDOW:
+{ $syntax "WINDOW: window-word { attributes }
+    attribute-code ;" }
+{ $description "Defines a word for the current vocabulary named " { $snippet "window-word" } " that opens a UI window when run. The " { $snippet "attributes" } " specify the key-value pairs of the window's " { $link world-attributes } ". The " { $snippet "attribute-code" } " is run with the " { $snippet "world-attributes" } " on the stack; this allows the word to construct gadget objects to place in the " { $snippet "gadget" } " slot or set other runtime-dependent world attributes." }
+{ $examples
+"From the " { $vocab-link "hello-ui" } " vocabulary. Creates a window with the title \"Hi\" containing a label reading \"Hello world\":"
+{ $code
+"USING: accessors ui ui.gadgets.labels ;
+IN: hello-ui
+
+WINDOW: hello { { title \"Hi\" } }
+    \"Hello world\" <label> >>gadgets ;"
+} } ;
+
 HELP: MAIN-WINDOW:
 { $syntax "MAIN-WINDOW: window-word { attributes }
     attribute-code ;" }
@@ -343,12 +382,14 @@ HELP: MAIN-WINDOW:
 { $examples
 "From the " { $vocab-link "hello-ui" } " vocabulary. Creates a window with the title \"Hi\" containing a label reading \"Hello world\":"
 { $code
-"""USING: accessors ui ui.gadgets.labels ;
+"USING: accessors ui ui.gadgets.labels ;
 IN: hello-ui
 
-MAIN-WINDOW: hello { { title "Hi" } }
-    "Hello world" <label> >>gadgets ;"""
+MAIN-WINDOW: hello { { title \"Hi\" } }
+    \"Hello world\" <label> >>gadgets ;"
 } } ;
+
+{ POSTPONE: WINDOW: POSTPONE: MAIN-WINDOW: } related-words
 
 ARTICLE: "ui.gadgets.worlds-window-controls" "Window controls"
 "The following window controls can be placed in a " { $link world } " window:"

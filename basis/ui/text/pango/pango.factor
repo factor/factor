@@ -67,13 +67,13 @@ SYMBOL: dpi
     layout>> 0 pango_layout_get_line_readonly ;
 
 : line-offset>x ( layout n -- x )
-    #! n is an index into the UTF8 encoding of the text
+    ! n is an index into the UTF8 encoding of the text
     [ drop first-line ] [ swap string>> >utf8-index ] 2bi
     f { int } [ pango_layout_line_index_to_x ] with-out-parameters
     pango>float ;
 
 : x>line-offset ( layout x -- n )
-    #! n is an index into the UTF8 encoding of the text
+    ! n is an index into the UTF8 encoding of the text
     [
         [ first-line ] dip
         float>pango
@@ -118,8 +118,8 @@ SYMBOL: dpi
     ] make-bitmap-image ;
 
 : escape-nulls ( str -- str' )
-    #! Replace nulls with something else since Pango uses null-terminated
-    #! strings
+    ! Replace nulls with something else since Pango uses null-terminated
+    ! strings
     H{ { 0 CHAR: zero-width-no-break-space } } substitute ;
 
 : unpack-selection ( layout string/selection -- layout )
@@ -140,8 +140,8 @@ SYMBOL: dpi
     swap <PangoLayout> &g_object_unref layout-extents drop dim>> second ;
 
 MEMO: missing-font-metrics ( font -- metrics )
-    #! Pango doesn't provide x-height and cap-height but Core Text does, so we
-    #! simulate them on Pango.
+    ! Pango doesn't provide x-height and cap-height but Core Text does, so we
+    ! simulate them on Pango.
     [
         [ metrics new ] dip
         [ "x" glyph-height >>x-height ]
@@ -182,7 +182,7 @@ SINGLETON: pango-renderer
 
 M: pango-renderer string-dim
     [ " " string-dim { 0 1 } v* ]
-    [ cached-layout logical-rect>> dim>> [ >integer ] map ] if-empty ;
+    [ cached-layout logical-rect>> dim>> v>integer ] if-empty ;
 
 M: pango-renderer flush-layout-cache
     cached-layouts get-global purge-cache ;
@@ -210,4 +210,3 @@ M: pango-renderer line-metrics ( font string -- metrics )
 ] "ui.text.pango" add-startup-hook
 
 pango-renderer font-renderer set-global
-

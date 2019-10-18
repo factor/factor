@@ -10,7 +10,7 @@ IN: zeromq.examples.hwclient
         "Connecting to hello world server…" print
         ZMQ_REQ <zmq-socket> &dispose
         dup "tcp://localhost:5555" zmq-connect
-        10 iota [
+        10 <iota> [
             [ "Hello" dup rot "Sending %s %d...\n" printf
               dupd >byte-array 0 zmq-send ]
             [ [ dup 0 zmq-recv >string ] dip

@@ -1,13 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences kernel sets namespaces accessors assocs
-arrays combinators continuations columns math vectors
-grouping stack-checker.branches
-compiler.tree
-compiler.tree.def-use
-compiler.tree.recursive
-compiler.tree.combinators ;
-FROM: namespaces => set ;
+USING: accessors arrays assocs columns combinators compiler.tree
+compiler.tree.combinators compiler.tree.def-use
+compiler.tree.recursive continuations grouping kernel math
+namespaces sequences sets vectors ;
 IN: compiler.tree.checker
 
 ! Check some invariants; this can help catch compiler bugs.
@@ -16,7 +12,11 @@ ERROR: check-use-error value message ;
 
 : check-use ( value uses -- )
     [ empty? [ "No use" check-use-error ] [ drop ] if ]
-    [ all-unique? [ drop ] [ "Uses not all unique" check-use-error ] if ] 2bi ;
+    [
+        all-unique?
+        [ drop ]
+        [ "Uses not all unique" check-use-error ] if
+    ] 2bi ;
 
 : check-def-use ( -- )
     def-use get [ uses>> check-use ] assoc-each ;
@@ -74,8 +74,8 @@ GENERIC: check-stack-flow* ( node -- )
     [ check-stack-flow* terminated? get not ] all? drop ;
 
 : init-stack-flow ( -- )
-    V{ } clone datastack set
-    V{ } clone retainstack set ;
+    V{ } clone datastack namespaces:set
+    V{ } clone retainstack namespaces:set ;
 
 : check-stack-flow ( nodes -- )
     [
@@ -149,7 +149,7 @@ SYMBOL: branch-out
 : check-branch ( nodes -- stack )
     [
         datastack [ clone ] change
-        V{ } clone retainstack set
+        V{ } clone retainstack namespaces:set
         (check-stack-flow)
         terminated? get [ assert-retainstack-empty ] unless
         terminated? get f datastack get ?
@@ -157,7 +157,7 @@ SYMBOL: branch-out
 
 M: #branch check-stack-flow*
     [ check-in-d ]
-    [ children>> [ check-branch ] map branch-out set ]
+    [ children>> [ check-branch ] map branch-out namespaces:set ]
     bi ;
 
 : check-phi-in ( #phi -- )
@@ -174,7 +174,7 @@ M: #branch check-stack-flow*
 
 : set-phi-datastack ( #phi -- )
     phi-in-d>> first length
-    branch-out get [ ] find nip swap head* >vector datastack set ;
+    branch-out get [ ] find nip swap head* >vector datastack namespaces:set ;
 
 M: #phi check-stack-flow*
     branch-out get [ ] any? [

@@ -1100,7 +1100,7 @@ TYPEDEF: int D3D11_FILTER
 
 CONSTANT: D3D11_FILTER_TYPE_POINT  0
 CONSTANT: D3D11_FILTER_TYPE_LINEAR 1
-TYPEDEF: int D3D11_FILTER_TYPE;
+TYPEDEF: int D3D11_FILTER_TYPE
 
 CONSTANT: D3D11_FILTER_TYPE_MASK 3
 CONSTANT: D3D11_MIN_FILTER_SHIFT 4
@@ -1461,7 +1461,7 @@ CONSTANT: D3D11_CREATE_DEVICE_DEBUG                                       2
 CONSTANT: D3D11_CREATE_DEVICE_SWITCH_TO_REF                               4
 CONSTANT: D3D11_CREATE_DEVICE_PREVENT_INTERNAL_THREADING_OPTIMIZATIONS    8
 CONSTANT: D3D11_CREATE_DEVICE_BGRA_SUPPORT                                32
-TYPEDEF: int D3D11_CREATE_DEVICE_FLAG;
+TYPEDEF: int D3D11_CREATE_DEVICE_FLAG
 
 CONSTANT: D3D11_SDK_VERSION 7
 
@@ -1475,7 +1475,7 @@ FUNCTION: HRESULT D3D11CreateDevice (
     UINT                  SDKVersion,
     ID3D11Device**        ppDevice,
     D3D_FEATURE_LEVEL*    pFeatureLevel,
-    ID3D11DeviceContext** ppImmediateContext ) ;
+    ID3D11DeviceContext** ppImmediateContext )
 
 FUNCTION: HRESULT D3D11CreateDeviceAndSwapChain (
     IDXGIAdapter*         pAdapter,
@@ -1489,4 +1489,4 @@ FUNCTION: HRESULT D3D11CreateDeviceAndSwapChain (
     IDXGISwapChain**      ppSwapChain,
     ID3D11Device**        ppDevice,
     D3D_FEATURE_LEVEL*    pFeatureLevel,
-    ID3D11DeviceContext** ppImmediateContext ) ;
+    ID3D11DeviceContext** ppImmediateContext )

@@ -65,7 +65,7 @@ TUPLE: x30 ;
 INSTANCE: x30 g
 
 : my-classes ( -- seq )
-    "benchmark.dispatch5" words [ tuple-class? ] filter ;
+    "benchmark.dispatch5" vocab-words [ tuple-class? ] filter ;
 
 : a-bunch-of-objects ( -- seq )
     my-classes [ new ] map ;

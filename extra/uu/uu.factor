@@ -1,8 +1,8 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: combinators.short-circuit io io.streams.string kernel
-locals make math math.bitwise namespaces sequences ;
+USING: io io.streams.string kernel locals make math math.bitwise
+math.order namespaces sequences ;
 
 IN: uu
 
@@ -40,15 +40,13 @@ ERROR: bad-length seq ;
 ERROR: illegal-character ch ;
 
 : check-illegal-character ( ch -- ch )
-    dup { [ CHAR: \s < ] [ CHAR: \s 64 + > ] } 1||
-    [ illegal-character ] when ;
+    dup CHAR: \s dup 64 + between? [ illegal-character ] unless ;
 
 :: ascii>binary ( seq -- seq' )
     0 :> char!
     0 :> bits!
 
-    seq unclip-slice dup CHAR: \s =
-    [ drop 0 ] [ CHAR: \s - ] if :> len!
+    seq unclip-slice CHAR: \s - :> len!
 
     [
         [ dup empty? not len 0 > and ] [

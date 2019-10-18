@@ -2,47 +2,35 @@
 
 namespace factor {
 
-to_tenured_collector::to_tenured_collector(factor_vm* parent)
-    : collector<tenured_space, to_tenured_policy>(parent,
-                                                  parent->data->tenured,
-                                                  to_tenured_policy(parent)) {}
-
-void to_tenured_collector::tenure_reachable_objects() {
-  std::vector<cell>* mark_stack = &parent->mark_stack;
-  while (!mark_stack->empty()) {
-    cell ptr = mark_stack->back();
-    mark_stack->pop_back();
-    this->trace_object((object*)ptr);
-  }
-}
-
 void factor_vm::collect_to_tenured() {
-  /* Copy live objects from aging space to tenured space. */
-  to_tenured_collector collector(this);
-
+  // Copy live objects from aging space to tenured space.
   mark_stack.clear();
+  slot_visitor<from_tenured_refs_copier>
+      visitor(this, from_tenured_refs_copier(data->tenured, &mark_stack));
 
-  collector.trace_roots();
-  collector.trace_contexts();
-
+  visitor.visit_all_roots();
   gc_event* event = current_gc->event;
 
   if (event)
-    event->started_card_scan();
-  collector.trace_cards(data->tenured, card_points_to_aging, full_unmarker());
-  if (event)
-    event->ended_card_scan(collector.cards_scanned, collector.decks_scanned);
+    event->reset_timer();
+  visitor.visit_cards(data->tenured, card_points_to_aging, 0xff);
+  if (event) {
+    event->ended_phase(PHASE_CARD_SCAN);
+    event->cards_scanned += visitor.cards_scanned;
+    event->decks_scanned += visitor.decks_scanned;
+  }
 
   if (event)
-    event->started_code_scan();
-  collector.trace_code_heap_roots(&code->points_to_aging);
-  if (event)
-    event->ended_code_scan(collector.code_blocks_scanned);
+    event->reset_timer();
+  visitor.visit_code_heap_roots(&code->points_to_aging);
+  if (event) {
+    event->ended_phase(PHASE_CODE_SCAN);
+    event->code_blocks_scanned += code->points_to_aging.size();
+  }
+  visitor.visit_mark_stack(&mark_stack);
 
-  collector.tenure_reachable_objects();
-
-  data->reset_generation(&nursery);
-  data->reset_generation(data->aging);
+  data->reset_nursery();
+  data->reset_aging();
   code->clear_remembered_set();
 }
 

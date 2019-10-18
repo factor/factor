@@ -12,7 +12,7 @@ IN: help.pdf
 : next-articles ( str -- seq )
     lookup-article content>> [ array? ] filter
     [ first \ $subsections eq? ] filter
-    [ rest [ string? ] filter ] map concat members ;
+    [ rest [ string? ] filter ] gather ;
 
 : topic>pdf ( str -- pdf )
     [

@@ -1,7 +1,8 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors kernel io io.encodings.binary io.servers ;
+USING: accessors command-line io io.encodings.binary io.servers
+kernel math.parser namespaces sequences ;
 
 IN: echo-server
 
@@ -14,10 +15,8 @@ IN: echo-server
         "echo.server" >>name
         [ echo-loop ] >>handler ;
 
-: echod ( port -- server )
-    <echo-server> start-server ;
+: echo-server-main ( -- )
+    command-line get [ 1234 ] [ first string>number ] if-empty
+    <echo-server> start-server wait-for-server ;
 
-: echod-main ( -- ) 1234 echod drop ;
-
-MAIN: echod-main
-
+MAIN: echo-server-main

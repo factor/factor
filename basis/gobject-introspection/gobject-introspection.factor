@@ -1,11 +1,10 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators environment gobject-introspection.common
-gobject-introspection.ffi gobject-introspection.loader
-gobject-introspection.types io io.files io.pathnames kernel lexer
-locals make namespaces parser sequences splitting summary vocabs
-vocabs.parser xml ;
-FROM: namespaces => change-global ;
+USING: accessors combinators environment
+gobject-introspection.common gobject-introspection.ffi
+gobject-introspection.loader gobject-introspection.types io
+io.files io.pathnames kernel lexer locals make namespaces parser
+sequences splitting summary vocabs vocabs.parser xdg xml ;
 IN: gobject-introspection
 
 ERROR: gir-not-found name paths ;
@@ -19,8 +18,7 @@ M: gir-not-found summary
 <PRIVATE
 
 : system-gir-dirs ( -- dirs )
-    "XDG_DATA_DIRS" os-env "/usr/local/share/:/usr/share/" or
-    ":" split [ "gir-1.0" append-path ] map ;
+    xdg-data-dirs [ "gir-1.0" append-path ] map ;
 
 : custom-gir-dirs ( -- dirs )
     "GIR_DIRS" os-env ":" split ;

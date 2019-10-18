@@ -22,7 +22,7 @@ M: alien (>address) alien-address ;
 
 PRIVATE>
 
-M: byte-array disassemble 
+M: byte-array disassemble
     [
         [ malloc-byte-array &free alien-address dup ]
         [ length + ] bi
@@ -35,7 +35,7 @@ M: pair disassemble
 
 M: word disassemble word-code 2array disassemble ;
 
-M: quotation disassemble
+M: callable disassemble
     [ dup infer define-temp ] with-compilation-unit disassemble ;
 
 cpu x86?

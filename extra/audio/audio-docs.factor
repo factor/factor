@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien byte-arrays help.markup help.syntax kernel math
 memory ;
 IN: audio
@@ -37,7 +38,7 @@ ARTICLE: "audio" "Audio framework"
 { $list
 { { $vocab-link "audio.engine" } " provides a high-level OpenAL-based engine for playing audio clips." }
 { { $vocab-link "audio.loader" } " reads PCM data from files on disk into " { $link audio } " objects. " { $vocab-link "audio.wav" } " and " { $vocab-link "audio.aiff" } " support specific audio file formats." }
-{ { $vocab-link "audio.vorbis" } " implements an " { $snippet "audio.engine" } " compatible generator object for decoding Ogg Vorbis audio data from a stream." } 
+{ { $vocab-link "audio.vorbis" } " implements an " { $snippet "audio.engine" } " compatible generator object for decoding Ogg Vorbis audio data from a stream." }
 } ;
 
 ABOUT: "audio"

@@ -27,11 +27,11 @@ CONSTANT: kCFNumberNSIntegerType 15
 CONSTANT: kCFNumberCGFloatType 16
 CONSTANT: kCFNumberMaxType 16
 
-FUNCTION: CFNumberRef CFNumberCreate ( CFAllocatorRef allocator, CFNumberType theType, void* valuePtr ) ;
+FUNCTION: CFNumberRef CFNumberCreate ( CFAllocatorRef allocator, CFNumberType theType, void* valuePtr )
 
-FUNCTION: CFNumberType CFNumberGetType ( CFNumberRef number ) ;
+FUNCTION: CFNumberType CFNumberGetType ( CFNumberRef number )
 
-FUNCTION: Boolean CFNumberGetValue ( CFNumberRef number, CFNumberType theType, void* valuePtr ) ;
+FUNCTION: Boolean CFNumberGetValue ( CFNumberRef number, CFNumberType theType, void* valuePtr )
 
 GENERIC: <CFNumber> ( number -- alien )
 

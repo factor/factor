@@ -23,69 +23,69 @@ SINGLETONS: float-rep double-rep ;
 
 ! On x86, floating point registers are really vector registers
 SINGLETONS:
-char-16-rep
-uchar-16-rep
-short-8-rep
-ushort-8-rep
-int-4-rep
-uint-4-rep
-longlong-2-rep
-ulonglong-2-rep ;
+    char-16-rep
+    uchar-16-rep
+    short-8-rep
+    ushort-8-rep
+    int-4-rep
+    uint-4-rep
+    longlong-2-rep
+    ulonglong-2-rep ;
 
 ! Scalar values in the high component of a vector register
 SINGLETONS:
-char-scalar-rep
-uchar-scalar-rep
-short-scalar-rep
-ushort-scalar-rep
-int-scalar-rep
-uint-scalar-rep
-longlong-scalar-rep
-ulonglong-scalar-rep ;
+    char-scalar-rep
+    uchar-scalar-rep
+    short-scalar-rep
+    ushort-scalar-rep
+    int-scalar-rep
+    uint-scalar-rep
+    longlong-scalar-rep
+    ulonglong-scalar-rep ;
 
 SINGLETONS:
-float-4-rep
-double-2-rep ;
+    float-4-rep
+    double-2-rep ;
 
 UNION: int-vector-rep
-char-16-rep
-uchar-16-rep
-short-8-rep
-ushort-8-rep
-int-4-rep
-uint-4-rep
-longlong-2-rep
-ulonglong-2-rep ;
+    char-16-rep
+    uchar-16-rep
+    short-8-rep
+    ushort-8-rep
+    int-4-rep
+    uint-4-rep
+    longlong-2-rep
+    ulonglong-2-rep ;
 
 UNION: signed-int-vector-rep
-char-16-rep
-short-8-rep
-int-4-rep
-longlong-2-rep ;
+    char-16-rep
+    short-8-rep
+    int-4-rep
+    longlong-2-rep ;
 
 UNION: unsigned-int-vector-rep
-uchar-16-rep
-ushort-8-rep
-uint-4-rep
-ulonglong-2-rep ;
+    uchar-16-rep
+    ushort-8-rep
+    uint-4-rep
+    ulonglong-2-rep ;
 
 UNION: scalar-rep
-char-scalar-rep
-uchar-scalar-rep
-short-scalar-rep
-ushort-scalar-rep
-int-scalar-rep
-uint-scalar-rep
-longlong-scalar-rep
-ulonglong-scalar-rep ;
+    char-scalar-rep
+    uchar-scalar-rep
+    short-scalar-rep
+    ushort-scalar-rep
+    int-scalar-rep
+    uint-scalar-rep
+    longlong-scalar-rep
+    ulonglong-scalar-rep ;
 
 UNION: float-vector-rep
-float-4-rep
-double-2-rep ;
+    float-4-rep
+    double-2-rep ;
 
 UNION: vector-rep
-int-vector-rep
-float-vector-rep ;
+    int-vector-rep
+    float-vector-rep ;
 
 CONSTANT: vector-reps
     {
@@ -102,13 +102,13 @@ CONSTANT: vector-reps
     }
 
 UNION: representation
-any-rep
-tagged-rep
-int-rep
-float-rep
-double-rep
-vector-rep
-scalar-rep ;
+    any-rep
+    tagged-rep
+    int-rep
+    float-rep
+    double-rep
+    vector-rep
+    scalar-rep ;
 
 : signed-rep ( rep -- rep' )
     {
@@ -150,18 +150,17 @@ SINGLETONS: int-regs float-regs ;
 UNION: reg-class int-regs float-regs ;
 CONSTANT: reg-classes { int-regs float-regs }
 
-! On x86, vectors and floats are stored in the same register bank
-! On PowerPC they are distinct
-HOOK: vector-regs cpu ( -- reg-class )
-
 GENERIC: reg-class-of ( rep -- reg-class )
 
 M: tagged-rep reg-class-of drop int-regs ;
 M: int-rep reg-class-of drop int-regs ;
 M: float-rep reg-class-of drop float-regs ;
 M: double-rep reg-class-of drop float-regs ;
-M: vector-rep reg-class-of drop vector-regs ;
-M: scalar-rep reg-class-of drop vector-regs ;
+
+! Note that on PowerPC, vectors and floats are stored in different
+! register banks. But Factor doesn't support SIMD on that platform.
+M: vector-rep reg-class-of drop float-regs ;
+M: scalar-rep reg-class-of drop float-regs ;
 
 GENERIC: rep-size ( rep -- n ) foldable
 
@@ -231,8 +230,8 @@ HOOK: %load-vector cpu ( reg val rep -- )
 HOOK: %peek cpu ( vreg loc -- )
 HOOK: %replace cpu ( vreg loc -- )
 HOOK: %replace-imm cpu ( src loc -- )
-HOOK: %inc-d cpu ( n -- )
-HOOK: %inc-r cpu ( n -- )
+HOOK: %clear cpu ( loc -- )
+HOOK: %inc cpu ( loc -- )
 
 HOOK: stack-frame-size cpu ( stack-frame -- n )
 HOOK: %call cpu ( word -- )
@@ -271,6 +270,7 @@ HOOK: %not     cpu ( dst src -- )
 HOOK: %neg     cpu ( dst src -- )
 HOOK: %log2    cpu ( dst src -- )
 HOOK: %bit-count cpu ( dst src -- )
+HOOK: %bit-test cpu ( dst src1 src2 temp -- )
 
 HOOK: %copy cpu ( dst src rep -- )
 
@@ -517,22 +517,12 @@ HOOK: %compare-float-unordered-branch cpu ( label cc src1 src2 -- )
 HOOK: %spill cpu ( src rep dst -- )
 HOOK: %reload cpu ( dst rep src -- )
 
-HOOK: %loop-entry cpu ( -- )
-
 HOOK: fused-unboxing? cpu ( -- ? )
 
 HOOK: immediate-arithmetic? cpu ( n -- ? )
-
-! Can this value be an immediate operand for %and-imm, %or-imm,
-! or %xor-imm?
 HOOK: immediate-bitwise? cpu ( n -- ? )
-
-! Can this value be an immediate operand for %compare-imm or
-! %compare-imm-branch?
 HOOK: immediate-comparand? cpu ( n -- ? )
-
-! Can this value be an immediate operand for %replace-imm?
-HOOK: immediate-store? cpu ( obj -- ? )
+HOOK: immediate-store? cpu ( n -- ? )
 
 M: object immediate-comparand? ( n -- ? )
     {
@@ -548,10 +538,8 @@ M: object immediate-comparand? ( n -- ? )
 
 HOOK: return-regs cpu ( -- regs )
 
-! Registers used for parameter passing
 HOOK: param-regs cpu ( abi -- regs )
 
-! Is this structure small enough to be returned in registers?
 HOOK: return-struct-in-registers? cpu ( c-type -- ? )
 
 ! Do we pass this struct by value or hidden reference?
@@ -560,10 +548,7 @@ HOOK: value-struct? cpu ( c-type -- ? )
 ! If t, all parameters are shadowed by dummy stack parameters
 HOOK: dummy-stack-params? cpu ( -- ? )
 
-! If t, all FP parameters are shadowed by dummy int parameters
 HOOK: dummy-int-params? cpu ( -- ? )
-
-! If t, all int parameters are shadowed by dummy FP parameters
 HOOK: dummy-fp-params? cpu ( -- ? )
 
 ! If t, long longs are never passed in param regs
@@ -575,26 +560,18 @@ HOOK: long-long-on-stack? cpu ( -- ? )
 ! (r3, r5, etc) register.
 HOOK: long-long-odd-register? cpu ( -- ? )
 
-! If t, floats are never passed in param regs
-HOOK: float-on-stack? cpu ( -- ? )
-
 ! If t, put floats in the second word of a double word on the stack
 HOOK: float-right-align-on-stack? cpu ( -- ? )
 
 ! If t, the struct return pointer is never passed in a param reg
 HOOK: struct-return-on-stack? cpu ( -- ? )
 
-! Call a function to convert a tagged pointer into a value that
-! can be passed to a C function, or returned from a callback
 HOOK: %unbox cpu ( dst src func rep -- )
 
 HOOK: %unbox-long-long cpu ( dst1 dst2 src func -- )
 
 HOOK: %local-allot cpu ( dst size align offset -- )
 
-! Call a function to convert a value into a tagged pointer,
-! possibly allocating a bignum, float, or alien instance,
-! which is then pushed on the data stack
 HOOK: %box cpu ( dst src func rep gc-map -- )
 
 HOOK: %box-long-long cpu ( dst src1 src2 func gc-map -- )
@@ -603,14 +580,26 @@ HOOK: %save-context cpu ( temp1 temp2 -- )
 
 HOOK: %c-invoke cpu ( symbols dll gc-map -- )
 
-HOOK: %alien-invoke cpu ( reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size symbols dll gc-map -- )
+HOOK: %alien-invoke cpu ( varargs? reg-inputs stack-inputs
+                          reg-outputs dead-outputs
+                          cleanup stack-size
+                          symbols dll gc-map -- )
 
-HOOK: %alien-indirect cpu ( src reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size gc-map -- )
+HOOK: %alien-indirect cpu ( src
+                            varargs? reg-inputs stack-inputs
+                            reg-outputs dead-outputs
+                            cleanup stack-size
+                            gc-map -- )
 
-HOOK: %alien-assembly cpu ( reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot gc-map -- )
+HOOK: %alien-assembly cpu ( varargs? reg-inputs stack-inputs
+                            reg-outputs dead-outputs
+                            cleanup stack-size
+                            quot -- )
 
 HOOK: %callback-inputs cpu ( reg-outputs stack-outputs -- )
 
 HOOK: %callback-outputs cpu ( reg-inputs -- )
 
 HOOK: stack-cleanup cpu ( stack-size return abi -- n )
+
+HOOK: enable-cpu-features cpu ( -- )

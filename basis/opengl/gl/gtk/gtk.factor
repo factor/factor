@@ -9,6 +9,3 @@ IN: opengl.gl.gtk
 
 : gl-function-address ( name -- address )
     ascii string>alien gdk_gl_get_proc_address ; inline
-
-: gl-function-calling-convention ( -- str ) cdecl ; inline
-

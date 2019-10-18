@@ -1,9 +1,9 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays assocs combinators combinators.short-circuit
-environment io.backend io.files io.files.info io.pathnames
-kernel sequences sets splitting system unicode.case ;
+USING: arrays assocs combinators.short-circuit command-line
+environment io io.backend io.files io.files.info io.pathnames
+kernel namespaces sequences sets splitting system unicode ;
 
 IN: tools.which
 
@@ -25,7 +25,7 @@ IN: tools.which
         [ drop 1array ] [ [ append ] with map ] if
     ] [ 1array ] if* ;
 
-: ((which)) ( commands paths -- file/f )
+: find-which ( commands paths -- file/f )
     [ normalize-path ] map members
     cartesian-product flip concat
     [ prepend-path ] { } assoc>map
@@ -34,9 +34,17 @@ IN: tools.which
 : (which) ( command path -- file/f )
     split-path os windows? [
         [ path-extensions ] [ "." prefix ] bi*
-    ] [ [ 1array ] dip ] if ((which)) ;
+    ] [ [ 1array ] dip ] if find-which ;
 
 PRIVATE>
 
 : which ( command -- file/f )
     "PATH" os-env (which) ;
+
+: ?which ( command -- file/command )
+    [ which ] [ or ] bi ;
+
+: run-which ( -- )
+    command-line get [ which [ print ] when* ] each ;
+
+MAIN: run-which

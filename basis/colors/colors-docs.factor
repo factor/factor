@@ -14,7 +14,7 @@ HELP: >rgba
 ARTICLE: "colors.protocol" "Color protocol"
 "Abstract superclass for colors:"
 { $subsections color }
-"All color objects must are required to implement a method on the " { $link >rgba } " generic word."
+"All color objects are required to implement a method on the " { $link >rgba } " generic word."
 $nl
 "Optionally, they can provide methods on the accessors " { $link red>> } ", " { $link green>> } ", " { $link blue>> } " and " { $link alpha>> } ", either by defining slots with the appropriate names, or with methods which calculate the color component values. The accessors should return color components which are real numbers in the range between 0 and 1."
 $nl
@@ -37,7 +37,17 @@ $nl
     "colors.protocol"
     "colors.constants"
 }
+"Color implementations:"
+{ $vocab-subsection "CIE 1931 XYZ colors" "colors.xyz" }
+{ $vocab-subsection "CIE 1931 xyY colors" "colors.xyy" }
+{ $vocab-subsection "CIE 1976 LAB colors" "colors.lab" }
+{ $vocab-subsection "CIE 1976 LUV colors" "colors.luv" }
+{ $vocab-subsection "CMYK colors" "colors.cmyk" }
 { $vocab-subsection "Grayscale colors" "colors.gray" }
-{ $vocab-subsection "HSV colors" "colors.hsv" } ;
+{ $vocab-subsection "HSL colors" "colors.hsl" }
+{ $vocab-subsection "HSV colors" "colors.hsv" }
+{ $vocab-subsection "RYB colors" "colors.ryb" }
+{ $vocab-subsection "YIQ colors" "colors.yiq" }
+{ $vocab-subsection "YUV colors" "colors.yuv" } ;
 
 ABOUT: "colors"

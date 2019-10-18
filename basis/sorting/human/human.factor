@@ -1,8 +1,7 @@
 ! Copyright (C) 2008, 2010 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors fry kernel make math math.order math.parser
-sequences sorting.functor strings unicode.case
-unicode.categories unicode.collation ;
+sequences sorting.functor strings unicode ;
 IN: sorting.human
 
 : cut-find ( sequence pred -- before after )

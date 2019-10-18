@@ -17,6 +17,9 @@ HELP: +keyboard+
 HELP: +primary+
 { $description "A key which may be set in the hashtable passed to " { $link define-operation } ". If set to a true value, this operation becomes the default operation performed when a presentation matching the operation's predicate is clicked with the mouse." } ;
 
+HELP: +secondary+
+{ $description "A key which may be set in the hashtable passed to " { $link define-operation } ". If set to a true value, this operation becomes the default operation performed when " { $snippet "RET" } " is pressed while a presentation matching the operation's predicate is selected in a list." } ;
+
 HELP: operation
 { $description "An abstraction for an operation which may be performed on a presentation."
 $nl
@@ -30,7 +33,7 @@ $nl
 } } ;
 
 HELP: operation-gesture
-{ $values { "operation" operation } { "gesture" "a gesture or " { $link f } } }
+{ $values { "operation" operation } { "gesture" { $maybe "a gesture" } } }
 { $description "Outputs the keyboard gesture associated with the operation." } ;
 
 HELP: operations

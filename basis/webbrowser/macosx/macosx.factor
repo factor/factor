@@ -5,5 +5,5 @@ USING: arrays io.launcher kernel present system webbrowser ;
 
 IN: webbrowser.macosx
 
-M: macosx open-file ( path -- )
-    present "open" swap 2array try-process ;
+M: macosx open-item ( item -- )
+    present "open" swap 2array run-detached drop ;

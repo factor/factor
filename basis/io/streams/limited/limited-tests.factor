@@ -1,68 +1,64 @@
-USING: accessors continuations destructors io io.encodings
-io.encodings.ascii io.encodings.binary
-io.encodings.string io.encodings.utf8 io.files io.pipes
-io.streams.byte-array io.streams.duplex io.streams.limited io.streams.string
-kernel namespaces strings tools.test system
-io.encodings.8-bit.latin1 ;
-IN: io.streams.limited.tests
+USING: destructors io io.encodings io.encodings.latin1
+io.encodings.ascii io.encodings.binary io.encodings.string
+io.encodings.utf8 io.files io.pipes io.streams.byte-array
+io.streams.duplex io.streams.limited io.streams.string kernel
+namespaces strings tools.test ;
 
-[ ] [
+{ } [
     "hello world\nhow are you today\nthis is a very long line indeed"
     ascii encode binary <byte-reader> "data" set
 ] unit-test
 
-[ ] [ "data" get 24 <limited-stream> "limited" set ] unit-test
+{ } [ "data" get 24 <limited-stream> "limited" set ] unit-test
 
-[ CHAR: h ] [ "limited" get stream-read1 ] unit-test
+{ CHAR: h } [ "limited" get stream-read1 ] unit-test
 
-[ ] [ "limited" get ascii <decoder> "decoded" set ] unit-test
+{ } [ "limited" get ascii <decoder> "decoded" set ] unit-test
 
-[ "ello world" ] [ "decoded" get stream-readln ] unit-test
+{ "ello world" } [ "decoded" get stream-readln ] unit-test
 
-[ "how " ] [ 4 "decoded" get stream-read ] unit-test
+{ "how " } [ 4 "decoded" get stream-read ] unit-test
 
-[ "are you " ] [ "decoded" get stream-readln ] unit-test
+{ "are you " } [ "decoded" get stream-readln ] unit-test
 
-[ f ] [ "decoded" get stream-readln ] unit-test
+{ f } [ "decoded" get stream-readln ] unit-test
 
-
-[ ] [
+{ } [
     "abc\ndef\nghi"
     ascii encode binary <byte-reader> "data" set
 ] unit-test
 
-[ ] [ "data" get 4 <limited-stream> "limited" set ] unit-test
+{ } [ "data" get 4 <limited-stream> "limited" set ] unit-test
 
-[ "abc" CHAR: \n ]
+{ "abc" CHAR: \n }
 [ "\n" "limited" get stream-read-until [ >string ] dip ] unit-test
 
-[ "" f ] [ "\n" "limited" get stream-read-until [ >string ] dip ] unit-test
+{ "" f } [ "\n" "limited" get stream-read-until [ >string ] dip ] unit-test
 
-
-[ CHAR: a ]
+{ CHAR: a }
 [ "a" <string-reader> 1 <limited-stream> stream-read1 ] unit-test
 
-[ "abc" ]
+{ "abc" }
 [
     "abc" <string-reader> 3 <limited-stream>
     4 swap stream-read
 ] unit-test
 
-[ f ]
+{ f }
 [
     "abc" <string-reader> 3 <limited-stream>
     4 over stream-read drop 10 swap stream-read
 ] unit-test
 
 ! pipes are duplex and not seekable
-[ "as" ] [
+{ "as" } [
     latin1 <pipe> [
         input-stream [ 2 <limited-stream> ] change
         "asdf" write flush 2 read
     ] with-stream
 ] unit-test
 
-[ "as" ] [
+{ "as" } [
     latin1 <pipe> [
         input-stream [ 2 <limited-stream> ] change
         "asdf" write flush 3 read
@@ -70,55 +66,55 @@ IN: io.streams.limited.tests
 ] unit-test
 
 ! test seeking on limited unseekable streams
-[ "as" ] [
+{ "as" } [
     latin1 <pipe> [
         input-stream [ 2 <limited-stream> ] change
         "asdf" write flush 2 read
     ] with-stream
 ] unit-test
 
-[ "as" ] [
+{ "as" } [
     latin1 <pipe> [
         input-stream [ 2 <limited-stream> ] change
         "asdf" write flush 3 read
     ] with-stream
 ] unit-test
 
-[ t ]
+{ t }
 [
     "abc" <string-reader> 3 limit-stream unlimit-stream
     "abc" <string-reader> =
 ] unit-test
 
-[ t ]
+{ t }
 [
     "abc" <string-reader> 3 limit-stream unlimit-stream
     "abc" <string-reader> =
 ] unit-test
 
-[ t ]
+{ t }
 [
     [
-        "resource:license.txt" utf8 <file-reader> &dispose
+        "resource:LICENSE.txt" utf8 <file-reader> &dispose
         3 limit-stream unlimit-stream
-        "resource:license.txt" utf8 <file-reader> &dispose
+        "resource:LICENSE.txt" utf8 <file-reader> &dispose
         [ decoder? ] both?
     ] with-destructors
 ] unit-test
 
-[ "asdf" ] [
+{ "asdf" } [
     "asdf" <string-reader> 2 <limited-stream> [
         unlimited-input contents
     ] with-input-stream
 ] unit-test
 
-[ "asdf" ] [
+{ "asdf" } [
     "asdf" <string-reader> 2 <limited-stream> [
         [ contents ] with-unlimited-input
     ] with-input-stream
 ] unit-test
 
-[ "gh" ] [
+{ "gh" } [
     "asdfgh" <string-reader> 4 <limited-stream> [
         2 [
             [ contents drop ] with-unlimited-input

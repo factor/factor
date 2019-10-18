@@ -32,11 +32,11 @@ ALIAS: n*p n*v
     2dup [ length ] bi@ + 1 - 2pad-tail ;
 
 : p* ( p q -- r )
-    2unempty pextend-conv 
-    [ drop length [ iota ] keep ]
+    2unempty pextend-conv
+    [ drop length [ <iota> ] keep ]
     [ nip <reversed> ]
     [ drop ] 2tri
-    '[ _ _ <slice> _ v* sum ] map reverse! ;
+    '[ _ _ <slice> _ v. ] map reverse! ;
 
 : p-sq ( p -- p^2 ) dup p* ; inline
 
@@ -86,7 +86,7 @@ PRIVATE>
     [ V{ 0 } clone V{ 1 } clone ] 2dip swap (pgcd) [ >array ] bi@ ;
 
 : pdiff ( p -- p' )
-    dup length iota v* rest ;
+    dup length <iota> v* rest ;
 
 : polyval ( x p -- p[x] )
     ! Horner scheme
@@ -94,9 +94,8 @@ PRIVATE>
     [ drop ] 2bi
     '[ [ _ * ] dip + ] each ;
 
-MACRO: polyval* ( p -- )
+MACRO: polyval* ( p -- quot )
     reverse
     [ rest [ \ * swap \ + [ ] 3sequence ] map ]
     [ first \ drop swap [ ] 2sequence ] bi
     prefix \ cleave [ ] 2sequence ;
-

@@ -1,12 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs fry kernel namespaces sequences math
-arrays compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.liveness compiler.cfg.rpo
-compiler.cfg.dominance compiler.cfg ;
+USING: assocs compiler.cfg compiler.cfg.def-use
+compiler.cfg.dominance compiler.cfg.instructions
+compiler.cfg.liveness compiler.cfg.rpo kernel math namespaces
+sequences ;
 IN: compiler.cfg.ssa.interference.live-ranges
-
-! Live ranges for interference testing
 
 <PRIVATE
 
@@ -16,9 +14,6 @@ SYMBOLS: local-def-indices local-kill-indices ;
     defs-vregs [ local-def-indices get set-at ] with each ;
 
 : record-uses ( n insn -- )
-    ! Record live intervals so that all but the first input interfere
-    ! with the output. This lets us coalesce the output with the
-    ! first input.
     dup uses-vregs [ 2drop ] [
         swap def-is-use-insn?
         [ [ first local-kill-indices get set-at ] [ rest-slice ] 2bi ] unless
@@ -54,11 +49,10 @@ SYMBOLS: def-indices kill-indices ;
 PRIVATE>
 
 : compute-live-ranges ( cfg -- )
-    needs-dominance
-
     H{ } clone def-indices set
     H{ } clone kill-indices set
-    [ compute-local-live-ranges ] simple-analysis ;
+    [ needs-dominance ]
+    [ [ compute-local-live-ranges ] simple-analysis ] bi ;
 
 : def-index ( vreg bb -- n )
     def-indices get at at ;

@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.vectors sequences ;
 IN: math.vectors.homogeneous
 
@@ -10,14 +11,14 @@ IN: math.vectors.homogeneous
 
 : h+ ( a b -- c )
     2dup [ (homogeneous-w) ] bi@ over =
-    [ [ [ (homogeneous-xyz) ] bi@ v+ ] dip suffix ] [ 
+    [ [ [ (homogeneous-xyz) ] bi@ v+ ] dip suffix ] [
         drop
         [ [ (homogeneous-xyz) ] [ (homogeneous-w)   ] bi* v*n    ]
         [ [ (homogeneous-w)   ] [ (homogeneous-xyz) ] bi* n*v v+ ]
         [ [ (homogeneous-w)   ] [ (homogeneous-w)   ] bi* * suffix ] 2tri
     ] if ;
 
-: n*h ( n h -- nh ) 
+: n*h ( n h -- nh )
     [ (homogeneous-xyz) n*v ] [ (homogeneous-w) suffix ] bi ;
 
 : h*n ( h n -- nh )
@@ -34,4 +35,3 @@ IN: math.vectors.homogeneous
 
 : h>v ( h -- v )
     [ (homogeneous-xyz) ] [ (homogeneous-w) ] bi v/n ;
-

@@ -28,7 +28,7 @@ IN: xmode.code2html
     [ "" ] [ path over first find-mode htmlize-lines ]
     if-empty :> input
     default-stylesheet :> stylesheet
-    <XML <html>
+    <XML <!DOCTYPE html> <html>
         <head>
             <-stylesheet->
             <title><-path-></title>

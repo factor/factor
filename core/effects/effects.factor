@@ -21,7 +21,7 @@ TUPLE: effect
     f f effect boa ; inline
 
 : <variable-effect> ( in-var in out-var out -- effect )
-    swap [ rot ] dip [ ?terminated ] 2dip effect boa ;
+    swap rotd [ ?terminated ] 2dip effect boa ;
 
 : effect-height ( effect -- n )
     [ out>> length ] [ in>> length ] bi - ; inline
@@ -54,7 +54,12 @@ M: string effect>string ;
 M: object effect>string drop "object" ;
 M: word effect>string name>> ;
 M: integer effect>string number>string ;
-M: pair effect>string first2-unsafe [ effect>string ] bi@ ": " glue ;
+M: pair effect>string
+    first2-unsafe over [
+        [ effect>string ] bi@ ": " glue
+    ] [
+        nip effect>string ":" prepend
+    ] if ;
 
 : stack-picture ( seq -- string )
     [ [ effect>string % CHAR: \s , ] each ] "" make ;
@@ -128,7 +133,7 @@ M: effect clone
     pick 0 = [ [ 1 + ] dip ] [ [ 1 - ] 2dip ] if
     [ [ "x" <array> ] bi@ ] dip <terminated-effect> ;
 
-ERROR: bad-stack-effect word expected got ;
+ERROR: bad-stack-effect word got expected ;
 
 : check-stack-effect ( word effect -- )
     over stack-effect 2dup effect=

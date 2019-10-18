@@ -2,14 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! Based on pattern matching code from Paul Graham's book 'On Lisp'.
-USING: parser lexer kernel words namespaces make sequences
-classes.tuple combinators macros assocs math effects ;
+USING: assocs classes classes.tuple combinators kernel lexer
+macros make namespaces parser quotations sequences summary words
+;
 IN: match
 
 SYMBOL: _
 
 : define-match-var ( name -- )
-    create-in
+    create-word-in
     dup t "match-var" set-word-prop
     dup [ get ] curry ( -- value ) define-declared ;
 
@@ -19,8 +20,7 @@ SYMBOL: _
 SYNTAX: MATCH-VARS: ! vars ...
     ";" [ define-match-var ] each-token ;
 
-: match-var? ( symbol -- bool )
-    dup word? [ "match-var" word-prop ] [ drop f ] if ;
+PREDICATE: match-var < word "match-var" word-prop ;
 
 : set-match-var ( value var -- ? )
     building get ?at [ = ] [ ,, t ] if ;
@@ -32,19 +32,26 @@ SYNTAX: MATCH-VARS: ! vars ...
         { [ 2dup = ] [ 2drop t ] }
         { [ 2dup [ _ eq? ] either? ] [ 2drop t ] }
         { [ 2dup [ sequence? ] both? ] [
-            2dup [ length ] same?
-            [ [ (match) ] 2all? ] [ 2drop f ] if ] }
-        { [ 2dup [ tuple? ] both? ]
-          [ [ tuple>array ] bi@ [ (match) ] 2all? ] }
-        { [ t ] [ 2drop f ] }
+            2dup [ length ] same? [
+                [ (match) ] 2all?
+            ] [ 2drop f ] if ] }
+        { [ 2dup [ tuple? ] both? ] [
+            2dup [ class-of ] same? [
+                [ tuple-slots ] bi@ [ (match) ] 2all?
+            ] [ 2drop f ] if ] }
+        [ 2drop f ]
     } cond ;
 
 : match ( value1 value2 -- bindings )
     [ (match) ] H{ } make swap [ drop f ] unless ;
 
-MACRO: match-cond ( assoc -- )
+ERROR: no-match-cond ;
+
+M: no-match-cond summary drop "Fall-through in match-cond" ;
+
+MACRO: match-cond ( assoc -- quot )
     <reversed>
-    [ "Fall-through in match-cond" throw ]
+    dup ?first callable? [ unclip ] [ [ no-match-cond ] ] if
     [
         first2
         [ [ dupd match ] curry ] dip
@@ -52,33 +59,32 @@ MACRO: match-cond ( assoc -- )
         [ ?if ] 2curry append
     ] reduce ;
 
-: replace-patterns ( object -- result )
-    {
-        { [ dup number? ] [ ] }
-        { [ dup match-var? ] [ get ] }
-        { [ dup sequence? ] [ [ replace-patterns ] map ] }
-        { [ dup tuple? ] [ tuple>array replace-patterns >tuple ] }
-        [ ]
-    } cond ;
+GENERIC: replace-patterns ( object -- result )
+M: object replace-patterns ;
+M: match-var replace-patterns get ;
+M: sequence replace-patterns [ replace-patterns ] map ;
+M: tuple replace-patterns tuple>array replace-patterns >tuple ;
 
 : match-replace ( object pattern1 pattern2 -- result )
     [ match [ "Pattern does not match" throw ] unless* ] dip swap
     [ replace-patterns ] with-variables ;
 
-: ?1-tail ( seq -- tail/f )
-    dup length zero? not [ rest ] [ drop f ] if ;
+: ?rest ( seq -- tailseq/f )
+    [ f ] [ rest ] if-empty ;
 
 : (match-first) ( seq pattern-seq -- bindings leftover/f )
-    2dup shorter? [ 2drop f f ] [
+    2dup shorter? [
+        2drop f f
+    ] [
         2dup length head over match
-        [ swap ?1-tail ] [ [ rest ] dip (match-first) ] ?if
+        [ swap ?rest ] [ [ rest ] dip (match-first) ] ?if
     ] if ;
 
 : match-first ( seq pattern-seq -- bindings )
     (match-first) drop ;
 
 : (match-all) ( seq pattern-seq -- )
-    [ nip ] [ (match-first) swap ] 2bi
+    [ (match-first) ] keep
     [ , [ swap (match-all) ] [ drop ] if* ] [ 2drop ] if* ;
 
 : match-all ( seq pattern-seq -- bindings-seq )

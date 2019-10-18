@@ -1,0 +1,1 @@
+Adobe Brackets editor integration

@@ -4,6 +4,11 @@ USING: accessors kernel namespaces prettyprint classes.struct
 vm tools.dispatch.private ;
 IN: tools.dispatch
 
+<PRIVATE
+PRIMITIVE: dispatch-stats ( -- stats )
+PRIMITIVE: reset-dispatch-stats ( -- )
+PRIVATE>
+
 SYMBOL: last-dispatch-stats
 
 : dispatch-stats. ( -- )

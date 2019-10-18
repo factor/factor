@@ -32,7 +32,7 @@ IN: project-euler.041
 
 : euler041 ( -- answer )
     { 7 6 5 4 3 2 1 } all-permutations
-    [ 10 digits>integer ] map [ prime? ] find nip ;
+    [ digits>number ] map [ prime? ] find nip ;
 
 ! [ euler041 ] 100 ave-time
 ! 64 ms ave run time - 4.22 SD (100 trials)

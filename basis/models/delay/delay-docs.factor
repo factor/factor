@@ -28,11 +28,11 @@ HELP: <delay>
 { $description "Creates a new instance of " { $link delay } ". The timeout must elapse from the time the underlying model last changed to when the delay model value is changed and its connections are notified." }
 { $examples "See the example in the documentation for " { $link delay } "." } ;
 
-ARTICLE: "models-delay" "Delay models"
+ARTICLE: "models.delay" "Delay models"
 "Delay models are used to implement delayed updating of gadgets in response to user input."
 { $subsections
     delay
     <delay>
 } ;
 
-ABOUT: "models-delay"
+ABOUT: "models.delay"

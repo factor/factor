@@ -4,34 +4,28 @@ namespace factor {
 
 object_start_map::object_start_map(cell size, cell start)
     : size(size), start(start) {
-  object_start_offsets = new card[addr_to_card(size)];
-  object_start_offsets_end = object_start_offsets + addr_to_card(size);
+  cell card_count = size / card_size;
+  object_start_offsets = new card[card_count];
+  object_start_offsets_end = object_start_offsets + card_count;
   clear_object_start_offsets();
 }
 
 object_start_map::~object_start_map() { delete[] object_start_offsets; }
 
-cell object_start_map::first_object_in_card(cell card_index) {
-  return object_start_offsets[card_index];
-}
-
 cell object_start_map::find_object_containing_card(cell card_index) {
   if (card_index == 0)
     return start;
-  else {
+  card_index--;
+
+  while (object_start_offsets[card_index] == card_starts_inside_object) {
+    // First card should start with an object
+    FACTOR_ASSERT(card_index > 0);
     card_index--;
-
-    while (first_object_in_card(card_index) == card_starts_inside_object) {
-      /* First card should start with an object */
-      FACTOR_ASSERT(card_index > 0);
-      card_index--;
-    }
-
-    return start + (card_index << card_bits) + first_object_in_card(card_index);
   }
+  return start + card_index * card_size + object_start_offsets[card_index];
 }
 
-/* we need to remember the first object allocated in the card */
+// we need to remember the first object allocated in the card
 void object_start_map::record_object_start_offset(object* obj) {
   cell idx = addr_to_card((cell)obj - start);
   card obj_start = ((cell)obj & addr_card_mask);
@@ -48,17 +42,17 @@ void object_start_map::update_card_for_sweep(cell index, uint16_t mask) {
     mask >>= (offset / data_alignment);
 
     if (mask == 0) {
-      /* The rest of the block after the old object start is free */
+      // The rest of the block after the old object start is free
       object_start_offsets[index] = card_starts_inside_object;
     } else {
-      /* Move the object start forward if necessary */
+      // Move the object start forward if necessary
       object_start_offsets[index] =
           (card)(offset + (rightmost_set_bit(mask) * data_alignment));
     }
   }
 }
 
-void object_start_map::update_for_sweep(mark_bits<object>* state) {
+void object_start_map::update_for_sweep(mark_bits* state) {
   for (cell index = 0; index < state->bits_size; index++) {
     cell mask = state->marked[index];
 #ifdef FACTOR_64

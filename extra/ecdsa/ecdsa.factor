@@ -19,7 +19,7 @@ M: ec-key dispose
     EC_KEY_new_by_curve_name dup ssl-error ec-key boa ;
 
 : ec-key-handle ( -- handle )
-    ec-key get dup handle>> [ nip ] [ already-disposed ] if* ;
+    ec-key get dup handle>> [ ] [ already-disposed ] ?if ;
 
 DESTRUCTOR: BN_clear_free
 
@@ -54,7 +54,7 @@ PRIVATE>
 
 :: get-public-key ( -- bin/f )
     ec-key-handle :> KEY
-    KEY EC_KEY_get0_public_key dup 
+    KEY EC_KEY_get0_public_key dup
     [| PUB |
         KEY EC_KEY_get0_group :> GROUP
         GROUP EC_GROUP_get_degree bits>bytes 1 + :> LEN

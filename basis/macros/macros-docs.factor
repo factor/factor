@@ -3,7 +3,7 @@ stack-checker.transforms sequences combinators ;
 IN: macros
 
 HELP: MACRO:
-{ $syntax "MACRO: word ( inputs... -- ) definition... ;" }
+{ $syntax "MACRO: word ( inputs... -- quot ) definition... ;" }
 { $description "Defines a macro word. The definition must have stack effect " { $snippet "( inputs... -- quot )" } "." }
 { $notes
   "A call of a macro inside a word definition is replaced with the quotation expansion at compile-time. The following two conditions must hold:"
@@ -17,7 +17,7 @@ HELP: MACRO:
   "A macro that calls a quotation but preserves any values it consumes off the stack:"
   { $code
     "USING: fry generalizations kernel macros stack-checker ;"
-    "MACRO: preserving ( quot -- )"
+    "MACRO: preserving ( quot -- quot' )"
     "    [ inputs ] keep '[ _ ndup @ ] ;"
   }
   "Using this macro, we can define a variant of " { $link if } " which takes a predicate quotation instead of a boolean; any values consumed by the predicate quotation are restored immediately after:"

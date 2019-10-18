@@ -6,7 +6,7 @@ taxes.usa.medicare taxes.usa taxes.usa.w4 ;
 IN: taxes.usa.federal
 
 ! http://www.irs.gov/pub/irs-pdf/p15.pdf
-! Table 7 ANNUAL Payroll Period 
+! Table 7 ANNUAL Payroll Period
 
 : federal-single ( -- triples )
     {
@@ -42,13 +42,13 @@ M: federal adjust-allowances* ( salary w4 collector entity -- newsalary )
 
 M: federal withholding* ( salary w4 tax-table entity -- x )
     drop
-    [ federal-tax ] 3keep drop
+    [ federal-tax ] 2keepd
     [ fica-tax ] 2keep
     medicare-tax + + ;
 
 : total-withholding ( salary w4 tax-table -- x )
     dup entity>> dup federal = [
-        withholding* 
+        withholding*
     ] [
         drop
         [ drop <federal> federal withholding* ]

@@ -54,7 +54,6 @@ TUPLE: concatenative-website < dispatcher ;
 
 : <login-config> ( responder -- responder' )
     "Factor website" <login-realm>
-        "Factor website" >>name
         allow-registration
         allow-password-recovery
         allow-edit-profile
@@ -110,6 +109,7 @@ SYMBOLS: key-password key-file dh-file ;
         <mason-app> <login-config> <factor-boilerplate> website-db <alloy> "builds.factorcode.org" add-responder
         home "docs" append-path <help-webapp> "docs.factorcode.org" add-responder
         home "cgi" append-path <gitweb> "gitweb.factorcode.org" add-responder
+        home "irclogs" append-path <static> t >>allow-listings "irclogs.factorcode.org" add-responder
     main-responder set-global ;
 
 : <factor-secure-config> ( -- config )

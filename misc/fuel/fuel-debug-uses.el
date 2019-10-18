@@ -109,7 +109,7 @@
   (let* ((lines (fuel-debug--file-lines file))
          (old-usings (fuel-debug--current-usings file))
          (cmd `(:fuel ((V{ ,@old-usings }
-                           [ V{ ,@lines } fuel-get-uses ]
+                           [ ,file V{ ,@lines } fuel-get-uses ]
                            fuel-use-suggested-vocabs)) t t)))
     (fuel-debug--uses-prepare file)
     (with-current-buffer (fuel-debug--uses-buffer)
@@ -121,8 +121,9 @@
 (defun fuel-debug--uses-cont (retort)
   (let ((uses (fuel-debug--uses retort))
         (err (fuel-eval--retort-error retort)))
-    (if uses (fuel-debug--uses-display uses)
-      (fuel-debug--uses-display-err retort))))
+    (if err
+        (fuel-debug--uses-display-err retort)
+      (fuel-debug--uses-display uses))))
 
 (defun fuel-debug--uses-display (uses)
   (let* ((inhibit-read-only t)
@@ -164,7 +165,7 @@
   (let ((inhibit-read-only t)
         (file fuel-debug--uses-file)
         (uses fuel-debug--uses))
-    (when (and uses file)
+    (when file
       (insert "\nDone!")
       (fuel-debug--uses-clean)
       (fuel-popup--quit)

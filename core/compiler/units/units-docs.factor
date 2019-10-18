@@ -1,5 +1,6 @@
-USING: definitions help.markup help.syntax kernel parser
-quotations source-files stack-checker.errors words ;
+USING: classes.tuple.private compiler.units.private definitions
+help.markup help.syntax kernel kernel.private parser quotations
+sequences source-files stack-checker.errors words ;
 IN: compiler.units
 
 ARTICLE: "compilation-units-internals" "Compilation units internals"
@@ -17,7 +18,14 @@ $nl
 "A hook to be called at the end of the compilation unit. If the optimizing compiler is loaded, this compiles new words with the " { $link "compiler" } ":"
 { $subsections recompile }
 "Low-level compiler interface exported by the Factor VM:"
-{ $subsections modify-code-heap } ;
+{ $subsections modify-code-heap }
+"Variables maintaining state within a compilation unit."
+{ $subsections
+  changed-definitions
+  maybe-changed
+  outdated-generics
+  outdated-tuples
+} ;
 
 ARTICLE: "compilation-units" "Compilation units"
 "A " { $emphasis "compilation unit" } " scopes a group of related definitions. They are compiled and entered into the system in one atomic operation."
@@ -40,6 +48,19 @@ $nl
 
 ABOUT: "compilation-units"
 
+HELP: bump-effect-counter?
+{ $values { "?" boolean } }
+{ $description "Whether the " { $link REDEFINITION-COUNTER } " should be increased." } ;
+
+HELP: new-definitions
+{ $var-description "Stores a pair of sets where the members form the set of definitions which were defined so far by the current parsing of " { $link current-source-file } "." } ;
+
+HELP: forgotten-definitions
+{ $var-description "All definitions (words and vocabs) that have been forgotten in the current compilation unit." } ;
+
+HELP: old-definitions
+{ $var-description "Stores a pair of sets where the members form the set of definitions which were defined by " { $link current-source-file } " the most recent time it was loaded." } ;
+
 HELP: redefine-error
 { $values { "definition" "a definition specifier" } }
 { $description "Throws a " { $link redefine-error } "." }
@@ -48,12 +69,6 @@ HELP: redefine-error
 HELP: remember-definition
 { $values { "definition" "a definition specifier" } { "loc" "a " { $snippet "{ path line# }" } " pair" } }
 { $description "Saves the location of a definition and associates this definition with the current source file." } ;
-
-HELP: old-definitions
-{ $var-description "Stores a pair of sets where the members form the set of definitions which were defined by " { $link file } " the most recent time it was loaded." } ;
-
-HELP: new-definitions
-{ $var-description "Stores a pair of sets where the members form the set of definitions which were defined so far by the current parsing of " { $link file } "." } ;
 
 HELP: with-compilation-unit
 { $values { "quot" quotation } }
@@ -70,8 +85,12 @@ HELP: with-nested-compilation-unit
 { $notes "This word is used by " { $link "syntax-immediate" } " to ensure that definitions in nested blocks are correctly recorded. User code should not depend on parser internals in such a way that calling this combinator is required." } ;
 
 HELP: recompile
-{ $values { "words" "a sequence of words" } { "alist" "an association list mapping words to compiled definitions" } }
+{ $values { "words" { $sequence word } } { "alist" "an association list mapping words to compiled definitions" } }
 { $contract "Internal word which compiles words. Called at the end of " { $link with-compilation-unit } "." } ;
+
+HELP: to-recompile
+{ $values { "words" sequence } }
+{ $description "Sequence of words that will be recompiled by the compilation unit. The non-optimizing compiler only recompiles words whose definitions has changed. But the optimizing compiler, which can perform optimizations such as inlining, recompiles words that depends on the changed words." } ;
 
 HELP: no-compilation-unit
 { $values { "word" word } }
@@ -95,7 +114,8 @@ $nl
   "Manually creating a word using the non-optimizing compiler:"
   { $example
     "USING: compiler.units io ;"
-    "IN: test SYMBOL: foo"
+    "IN: scratchpad"
+    ": foo ( -- ) ;"
     "{ { foo [ \"hello!\" write nl ] } } t t modify-code-heap foo"
     "hello!"
   }
@@ -103,5 +123,5 @@ $nl
 { $notes "This word is called at the end of " { $link with-compilation-unit } "." } ;
 
 HELP: compile
-{ $values { "words" "a sequence of words" } }
+{ $values { "words" { $sequence word } } }
 { $description "Compiles a set of words." } ;

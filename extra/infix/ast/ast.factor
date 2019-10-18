@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: infix.ast
 
-TUPLE: ast-number value ;
+TUPLE: ast-value value ;
 TUPLE: ast-local name ;
 TUPLE: ast-array name index ;
 TUPLE: ast-slice name from to step ;

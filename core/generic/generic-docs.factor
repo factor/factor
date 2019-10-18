@@ -61,7 +61,7 @@ ARTICLE: "method-combination" "Custom method combination"
 "A table of built-in method combination defining words, and the method combinations themselves:"
 { $table
     { { $link POSTPONE: GENERIC: } { $link standard-combination } }
-    { { $link POSTPONE: GENERIC# } { $link standard-combination } }
+    { { $link POSTPONE: GENERIC#: } { $link standard-combination } }
     { { $link POSTPONE: HOOK: } { $link hook-combination } }
     { { $link POSTPONE: MATH: } { $link math-combination } }
 }
@@ -93,7 +93,7 @@ $nl
 "Generic words which dispatch on the object at the top of the stack:"
 { $subsections POSTPONE: GENERIC: }
 "A method combination which dispatches on a specified stack position:"
-{ $subsections POSTPONE: GENERIC# }
+{ $subsections POSTPONE: GENERIC#: }
 "A method combination which dispatches on the value of a variable at the time the generic word is called:"
 { $subsections POSTPONE: HOOK: }
 "A method combination which dispatches on a pair of stack values, which must be numbers, and upgrades both to the same type of number:"
@@ -114,7 +114,7 @@ ABOUT: "generic"
 HELP: generic
 { $class-description "The class of generic words, documented in " { $link "generic" } "." } ;
 
-{ generic define-generic define-simple-generic POSTPONE: GENERIC: POSTPONE: GENERIC# POSTPONE: MATH: POSTPONE: HOOK: } related-words
+{ generic define-generic define-simple-generic POSTPONE: GENERIC: POSTPONE: GENERIC#: POSTPONE: MATH: POSTPONE: HOOK: } related-words
 
 HELP: make-generic
 { $values { "word" generic } }
@@ -150,7 +150,7 @@ HELP: <method>
 { $description "Creates a new method." } ;
 
 HELP: order
-{ $values { "generic" generic } { "seq" "a sequence of classes" } }
+{ $values { "generic" generic } { "seq" { $sequence class } } }
 { $description "Outputs a sequence of classes for which methods have been defined on this generic word. The sequence is sorted in method dispatch order." } ;
 
 HELP: check-method

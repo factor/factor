@@ -1,10 +1,18 @@
-USING: alien.accessors alien.c-types alien.libraries
+USING: alien.accessors alien.c-types alien.libraries alien.strings
 alien.syntax byte-arrays cpu.x86 eval help.markup help.syntax io
-io.backend kernel math quotations sequences system ;
+io.backend io.encodings.utf16n io.encodings.utf8 kernel math
+quotations sequences system ;
 IN: alien
+
+HELP: callee-cleanup?
+{ $values { "abi" abi } { "?" boolean } }
+{ $description { $link t } " if the calling convention is callee cleanup." } ;
 
 HELP: cdecl
 { $description "This symbol is passed as the " { $snippet "abi" } " argument to " { $link alien-indirect } ", " { $link alien-callback } ", " { $link alien-assembly } ", and " { $link add-library } " to indicate that the standard C calling convention should be used, where the caller cleans up the stack frame after calling the function. This symbol only has meaning on 32-bit x86 platforms." } ;
+
+HELP: callsite-not-compiled
+{ $error-description "Thrown if the word calling the given word was not compiled with the optimizing compiler. This can happen when experimenting with the word in this listener. To fix the problem, place the word call in a word; word definitions are automatically compiled with the optimizing compiler. Only a few words relating to calling FFI functions throws this error." } ;
 
 HELP: stdcall
 { $description "This symbol is passed as the " { $snippet "abi" } " argument to " { $link alien-indirect } ", " { $link alien-callback } ", " { $link alien-assembly } ", and " { $link add-library } " to indicate that the Windows API calling convention should be used, where the called function cleans up its own stack frame before returning to the caller. This symbol only has meaning on 32-bit x86 platforms." } ;
@@ -37,7 +45,9 @@ HELP: alien
 { $class-description "The class of alien pointers. See " { $link "syntax-aliens" } " for syntax and " { $link "c-data" } " for general information." } ;
 
 HELP: dll
-{ $class-description "The class of native library handles. See " { $link "syntax-aliens" } " for syntax and " { $link "dll.private" } " for general information." } ;
+{ $class-description "The class of native library handles. See " { $link "syntax-aliens" } " for syntax and " { $link "dll.private" } " for general information."
+$nl
+"The dll tuple has one slot 'path' which holds the filesystem path to the library being loaded in the systems " { $link native-string-encoding } ", usually " { $link utf8 } " on unices and " { $link utf16n } " on windows." } ;
 
 HELP: dll-valid?
 { $values { "dll" dll } { "?" boolean } }
@@ -48,7 +58,7 @@ HELP: expired?
 { $description "Tests if the alien is a relic from an earlier session. A byte array is never considered to have expired, whereas passing " { $link f } " always yields true." } ;
 
 HELP: <bad-alien>
-{ $values  { "alien" c-ptr } }
+{ $values { "alien" c-ptr } }
 { $description "Constructs an invalid alien pointer that has expired." } ;
 
 HELP: <displaced-alien>
@@ -84,29 +94,11 @@ HELP: <alien>
 HELP: c-ptr
 { $class-description "Class of objects consisting of aliens, byte arrays and " { $link f } ". These objects all can be used as values of " { $link pointer } " C types." } ;
 
-HELP: alien-invoke-error
-{ $error-description "Thrown if the word calling " { $link alien-invoke } " was not compiled with the optimizing compiler. This may be a result of one of several failure conditions:"
-    { $list
-        { "This can happen when experimenting with " { $link alien-invoke } " in this listener. To fix the problem, place the " { $link alien-invoke } " call in a word; word definitions are automatically compiled with the optimizing compiler." }
-        { "The return type or parameter list references an unknown C type." }
-        { "The symbol or library could not be found." }
-        { "One of the four inputs to " { $link alien-invoke } " is not a literal value. To call functions which are not known at compile-time, use " { $link alien-indirect } "." }
-    }
-} ;
-
 HELP: alien-invoke
-{ $values { "args..." "zero or more objects passed to the C function" } { "return" "a C return type" } { "library" "a logical library name" } { "function" "a C function name" } { "parameters" "a sequence of C parameter types" } { "return..." "the return value of the function, if not " { $link void } } }
+{ $values { "args..." "zero or more objects passed to the C function" } { "return" "a C return type" } { "library" "a logical library name" } { "function" "a C function name" } { "parameters" "a sequence of C parameter types" } { "varargs?" boolean } { "return..." "the return value of the function, if not " { $link void } } }
 { $description "Calls a C library function with the given name. Input parameters are taken from the data stack, and the return value is pushed on the data stack after the function returns. A return type of " { $link void } " indicates that no value is to be expected." }
 { $notes "C type names are documented in " { $link "c-types-specs" } "." }
-{ $errors "Throws an " { $link alien-invoke-error } " if the word calling " { $link alien-invoke } " was not compiled with the optimizing compiler." } ;
-
-HELP: alien-indirect-error
-{ $error-description "Thrown if the word calling " { $link alien-indirect } " was not compiled with the optimizing compiler. This may be a result of one of two failure conditions:"
-    { $list
-        { "This can happen when experimenting with " { $link alien-indirect } " in this listener. To fix the problem, place the " { $link alien-indirect } " call in a word; word definitions are automatically compiled with the optimizing compiler." }
-        { "One of the three inputs to " { $link alien-indirect } " is not a literal value." }
-    }
-} ;
+{ $errors "Throws an " { $link callsite-not-compiled } " if the word calling " { $link alien-invoke } " was not compiled with the optimizing compiler." } ;
 
 HELP: alien-indirect
 { $values { "args..." "zero or more objects passed to the C function" } { "funcptr" "a C function pointer" } { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $link cdecl } " or " { $link stdcall } } { "return..." "the return value of the function, if not " { $link void } } }
@@ -114,15 +106,7 @@ HELP: alien-indirect
     "Invokes a C function pointer passed on the data stack. Input parameters are taken from the data stack following the function pointer, and the return value is pushed on the data stack after the function returns. A return type of " { $link void } " indicates that no value is to be expected."
 }
 { $notes "C type names are documented in " { $link "c-types-specs" } "." }
-{ $errors "Throws an " { $link alien-indirect-error } " if the word calling " { $link alien-indirect } " is not compiled." } ;
-
-HELP: alien-callback-error
-{ $error-description "Thrown if the word calling " { $link alien-callback } " was not compiled with the optimizing compiler. This may be a result of one of two failure conditions:"
-    { $list
-        { "This can happen when experimenting with " { $link alien-callback } " in this listener. To fix the problem, place the " { $link alien-callback } " call in a word; word definitions are automatically compiled with the optimizing compiler." }
-        { "One of the four inputs to " { $link alien-callback } " is not a literal value." }
-    }
-} ;
+{ $errors "Throws an " { $link callsite-not-compiled } " if the word calling " { $link alien-indirect } " is not compiled." } ;
 
 HELP: alien-callback
 { $values { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $link cdecl } " or " { $link stdcall } } { "quot" quotation } { "alien" alien } }
@@ -141,15 +125,7 @@ HELP: alien-callback
         "    int { int int } cdecl [ - ] alien-callback ;"
     }
 }
-{ $errors "Throws an " { $link alien-callback-error } " if the word calling " { $link alien-callback } " is not compiled." } ;
-
-HELP: alien-assembly-error
-{ $error-description "Thrown if the word calling " { $link alien-assembly } " was not compiled with the optimizing compiler. This may be a result of one of two failure conditions:"
-    { $list
-        { "This can happen when experimenting with " { $link alien-assembly } " in this listener. To fix the problem, place the " { $link alien-assembly } " call in a word; word definitions are automatically compiled with the optimizing compiler." }
-        { "One of the four inputs to " { $link alien-assembly } " is not a literal value." }
-    }
-} ;
+{ $errors "Throws an " { $link callsite-not-compiled } " if the word calling " { $link alien-callback } " is not compiled." } ;
 
 HELP: alien-assembly
 { $values { "args..." "zero or more objects passed to the C function" } { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $link cdecl } " or " { $link stdcall } } { "quot" quotation } { "return..." "the return value of the function, if not " { $link void } } }
@@ -166,7 +142,7 @@ HELP: alien-assembly
     $nl
 }
 { $notes "C type names are documented in " { $link "c-types-specs" } "." }
-{ $errors "Throws an " { $link alien-assembly-error } " if the word calling " { $link alien-assembly } " is not compiled." } ;
+{ $errors "Throws an " { $link callsite-not-compiled } " if the word calling " { $link alien-assembly } " is not compiled." } ;
 
 { alien-invoke alien-indirect alien-assembly alien-callback } related-words
 
@@ -183,9 +159,9 @@ ARTICLE: "aliens" "Alien addresses"
     <displaced-alien>
     alien-address
 }
-"Anywhere that a " { $link alien } " instance is accepted, the " { $link f } " singleton may be passed in to denote a null pointer."
+"Anywhere that an " { $link alien } " instance is accepted, the " { $link f } " singleton may be passed in to denote a null pointer."
 $nl
-"Usually alien objects do not have to created and dereferenced directly; instead declaring C function parameters and return values as having a " { $link pointer } " type such as " { $snippet "void*" } " takes care of the details."
+"Usually alien objects do not have to be created and dereferenced directly; instead declaring C function parameters and return values as having a " { $link pointer } " type such as " { $snippet "void*" } " takes care of the details."
 { $subsections
     "syntax-aliens"
     "alien-expiry"

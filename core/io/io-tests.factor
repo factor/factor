@@ -1,5 +1,5 @@
-USING: accessors io io.streams.string kernel math parser sbufs
-sequences tools.test words namespaces strings ;
+USING: accessors io io.streams.string kernel math namespaces
+parser sbufs sequences strings tools.test words ;
 IN: io.tests
 
 { f } [
@@ -64,13 +64,13 @@ M: dumb-writer stream-element-type drop +byte+ ; inline
 M: dumb-writer stream-write1 vector>> push ; inline
 
 { BV{ 11 22 33 } } [
-    <dumb-writer> 
+    <dumb-writer>
     [ B{ 11 22 33 } swap stream-write ]
     [ vector>> ] bi
 ] unit-test
 
 { BV{ 11 22 33 10 } } [
-    <dumb-writer> 
+    <dumb-writer>
     [ B{ 11 22 33 } swap stream-write ]
     [ stream-nl ]
     [ vector>> ] tri
@@ -79,14 +79,14 @@ M: dumb-writer stream-write1 vector>> push ; inline
 { SBUF" asdf" }
 [ "asdf" <string-reader> 4 <sbuf> [ stream-copy ] keep ] unit-test
 
-[ "asdf" ]
+{ "asdf" }
 [
     [
         [ "asdf" error-stream get stream-write ] with-error>output
     ] with-string-writer
 ] unit-test
 
-[ "asdf" ]
+{ "asdf" }
 [
     <string-writer> [
         [

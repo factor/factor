@@ -60,7 +60,7 @@ PRIVATE>
 :: next-match ( i string regexp quot: ( i string regexp -- j ) reverse? -- start end ? )
     f f f
     i string reverse? search-range
-    [ [ 3drop ] dip string regexp quot reverse? (next-match) dup ] find 2drop ; inline
+    [ 3nip string regexp quot reverse? (next-match) dup ] find 2drop ; inline
 
 : do-next-match ( i string regexp -- start end ? )
     dup next-match>>
@@ -130,7 +130,7 @@ PRIVATE>
     ] [ 2drop f ] if ;
 
 : re-contains? ( string regexp -- ? )
-    prepare-match-iterator do-next-match [ 2drop ] dip >boolean ;
+    prepare-match-iterator do-next-match 2nip >boolean ;
 
 : re-split ( string regexp -- seq )
     [ <slice-unsafe> ] (re-split) ;
@@ -197,50 +197,26 @@ PRIVATE>
 
 <PRIVATE
 
-! The following two should do some caching
-
-: find-regexp-syntax ( string -- prefix suffix )
-    {
-        { "R/ "  "/"  }
-        { "R! "  "!"  }
-        { "R\" " "\"" }
-        { "R# "  "#"  }
-        { "R' "  "'"  }
-        { "R( "  ")"  }
-        { "R@ "  "@"  }
-        { "R[ "  "]"  }
-        { "R` "  "`"  }
-        { "R{ "  "}"  }
-        { "R| "  "|"  }
-    } swap [ subseq? not nip ] curry assoc-find drop ;
-
-: take-until ( end lexer -- string )
+: take-until ( lexer -- string )
     dup skip-blank [
-        [ index-from ] 2keep
-        [ swapd subseq ]
-        [ 2drop 1 + ] 3bi
+        dupd [
+            [ CHAR: / -rot index-from ] keep
+            over [ "Unterminated regexp" throw ] unless
+            2dup [ 1 - ] dip nth CHAR: \\ =
+            [ [ [ 1 + ] dip ] when ] keep
+        ] loop over [ subseq ] dip 1 +
     ] change-lexer-column ;
 
 : parse-noblank-token ( lexer -- str/f )
-    dup still-parsing-line? [ (parse-token) ] [ drop f ] if ;
+    dup still-parsing-line? [ (parse-raw) ] [ drop f ] if ;
 
-: parsing-regexp ( accum end -- accum )
-    lexer get [ take-until ] [ parse-noblank-token ] bi
+: parse-regexp ( accum -- accum )
+    lexer get [ take-until "\\/" "/" replace ] [ parse-noblank-token ] bi
     <optioned-regexp> compile-next-match suffix! ;
 
 PRIVATE>
 
-SYNTAX: R! CHAR: ! parsing-regexp ;
-SYNTAX: R" CHAR: " parsing-regexp ;
-SYNTAX: R# CHAR: # parsing-regexp ;
-SYNTAX: R' CHAR: ' parsing-regexp ;
-SYNTAX: R( CHAR: ) parsing-regexp ;
-SYNTAX: R/ CHAR: / parsing-regexp ;
-SYNTAX: R@ CHAR: @ parsing-regexp ;
-SYNTAX: R[ CHAR: ] parsing-regexp ;
-SYNTAX: R` CHAR: ` parsing-regexp ;
-SYNTAX: R{ CHAR: } parsing-regexp ;
-SYNTAX: R| CHAR: | parsing-regexp ;
+SYNTAX: R/ parse-regexp ;
 
 USE: vocabs.loader
 

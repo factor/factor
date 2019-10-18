@@ -20,19 +20,20 @@ STRUCT: termios
     { ispeed speed_t }
     { ospeed speed_t } ;
 
-FUNCTION: speed_t cfgetispeed ( termios* t ) ;
-FUNCTION: speed_t cfgetospeed ( termios* t ) ;
-FUNCTION: int cfsetispeed ( termios* t, speed_t s ) ;
-FUNCTION: int cfsetospeed ( termios* t, speed_t s ) ;
-FUNCTION: int tcgetattr ( int i1, termios* t ) ;
-FUNCTION: int tcsetattr ( int i1, int i2, termios* t ) ;
-FUNCTION: int tcdrain ( int i1 ) ;
-FUNCTION: int tcflow ( int i1, int i2 ) ;
-FUNCTION: int tcflush ( int i1, int i2 ) ;
-FUNCTION: int tcsendbreak ( int i1, int i2 ) ;
-FUNCTION: void cfmakeraw ( termios* t ) ;
-FUNCTION: int cfsetspeed ( termios* t, speed_t s ) ;
+FUNCTION: speed_t cfgetispeed ( termios* t )
+FUNCTION: speed_t cfgetospeed ( termios* t )
+FUNCTION: int cfsetispeed ( termios* t, speed_t s )
+FUNCTION: int cfsetospeed ( termios* t, speed_t s )
+FUNCTION: int tcgetattr ( int i1, termios* t )
+FUNCTION: int tcsetattr ( int i1, int i2, termios* t )
+FUNCTION: int tcdrain ( int i1 )
+FUNCTION: int tcflow ( int i1, int i2 )
+FUNCTION: int tcflush ( int i1, int i2 )
+FUNCTION: int tcsendbreak ( int i1, int i2 )
+FUNCTION: void cfmakeraw ( termios* t )
+FUNCTION: int cfsetspeed ( termios* t, speed_t s )
 
+! See /usr/include/bits/termios.h
 CONSTANT: TCSANOW     0
 CONSTANT: TCSADRAIN   1
 CONSTANT: TCSAFLUSH   2
@@ -110,7 +111,7 @@ CONSTANT: CRTSCTS 0o020000000000
 ! lflags
 CONSTANT: ISIG    0o0000001
 CONSTANT: ICANON  0o0000002
-CONSTANT: XCASE  0o0000004
+CONSTANT: XCASE   0o0000004
 CONSTANT: ECHO    0o0000010
 CONSTANT: ECHOE   0o0000020
 CONSTANT: ECHOK   0o0000040
@@ -123,6 +124,25 @@ CONSTANT: ECHOKE  0o0004000
 CONSTANT: FLUSHO  0o0010000
 CONSTANT: PENDIN  0o0040000
 CONSTANT: IEXTEN  0o0100000
+
+! c_cc characters
+CONSTANT: VINTR 0
+CONSTANT: VQUIT 1
+CONSTANT: VERASE 2
+CONSTANT: VKILL 3
+CONSTANT: VEOF 4
+CONSTANT: VTIME 5
+CONSTANT: VMIN 6
+CONSTANT: VSWTC 7
+CONSTANT: VSTART 8
+CONSTANT: VSTOP 9
+CONSTANT: VSUSP 10
+CONSTANT: VEOL 11
+CONSTANT: VREPRINT 12
+CONSTANT: VDISCARD 13
+CONSTANT: VWERASE 14
+CONSTANT: VLNEXT 15
+CONSTANT: VEOL2 16
 
 M: linux lookup-baud ( n -- n )
     H{
@@ -158,4 +178,3 @@ M: linux lookup-baud ( n -- n )
         { 3500000 0o0010016 }
         { 4000000 0o0010017 }
     } ?at [ invalid-baud ] unless ;
-

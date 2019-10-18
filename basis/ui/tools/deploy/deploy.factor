@@ -1,12 +1,12 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: colors kernel models tools.deploy.config
-tools.deploy.config.editor tools.deploy vocabs namespaces
-models.mapping sequences system accessors fry ui.gadgets ui.render
-ui.gadgets.buttons ui.gadgets.packs ui.gadgets.labels
-ui.gadgets.editors ui.gadgets.borders ui.gestures ui.commands assocs
-ui.gadgets.tracks ui ui.tools.listener ui.tools.browser
-ui.gadgets.worlds ;
+USING: accessors assocs fry kernel models models.mapping
+namespaces sequences tools.deploy tools.deploy.config
+tools.deploy.config.editor ui ui.commands ui.gadgets
+ui.gadgets.borders ui.gadgets.buttons ui.gadgets.editors
+ui.gadgets.labels ui.gadgets.packs ui.gadgets.toolbar
+ui.gadgets.worlds ui.gestures ui.tools.browser ui.tools.common
+ui.tools.listener vocabs ;
 IN: ui.tools.deploy
 
 TUPLE: deploy-gadget < pack vocab settings ;
@@ -108,10 +108,10 @@ deploy-gadget "toolbar" f {
       dup <toolbar> { 10 10 } >>gap add-gadget
     deploy-settings-theme
     dup com-revert ;
-    
+
 : deploy-tool ( vocab -- )
     vocab-name
-    [ <deploy-gadget> { 10 10 } <border> ]
+    [ <deploy-gadget> { 10 10 } <border> white-interior ]
     [
         <world-attributes>
             swap "Deploying “" "”" surround >>title

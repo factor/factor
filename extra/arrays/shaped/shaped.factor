@@ -1,11 +1,11 @@
 ! Copyright (C) 2012 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators.short-circuit constructors
-fry grouping kernel math math.vectors sequences sequences.deep
-math.order parser assocs math.combinatorics ;
+USING: accessors arrays assocs combinators.short-circuit fry
+grouping kernel math math.functions math.order math.vectors
+parser prettyprint.custom sequences sequences.deep ;
 IN: arrays.shaped
 
-: flat? ( array -- ? ) [ sequence? ] any? not ; inline
+: flat? ( array -- ? ) [ sequence? ] none? ; inline
 
 GENERIC: array-replace ( object -- shape )
 
@@ -79,7 +79,10 @@ M: sequence check-underlying-shape
 
 ERROR: shape-mismatch shaped0 shaped1 ;
 
+DEFER: >shaped-array
+
 : check-shape ( shaped-array shaped-array -- shaped-array shaped-array )
+    [ >shaped-array ] bi@
     2dup [ shape>> ] bi@
     sequence= [ shape-mismatch ] unless ;
 
@@ -123,10 +126,25 @@ M: shaped-array >col-array
 M: sequence >col-array
     [ flatten ] [ shape ] bi <col-array> ;
 
-: shaped+ ( a b -- c )
-    check-shape
-    [ [ underlying>> ] bi@ v+ ]
-    [ drop shape>> clone ] 2bi shaped-array boa ;
+: shaped-unary-op ( shaped quot -- )
+    [ >shaped-array ] dip
+    [ underlying>> ] prepose
+    [ shape>> clone ] bi shaped-array boa ; inline
+
+: shaped-shaped-binary-op ( shaped0 shaped1 quot -- c )
+    [ check-shape ] dip
+    [ [ underlying>> ] bi@ ] prepose
+    [ drop shape>> clone ] 2bi shaped-array boa ; inline
+
+: shaped+ ( a b -- c ) [ v+ ] shaped-shaped-binary-op ;
+: shaped- ( a b -- c ) [ v- ] shaped-shaped-binary-op ;
+: shaped*. ( a b -- c ) [ v* ] shaped-shaped-binary-op ;
+
+: shaped*n ( a b -- c ) [ v*n ] curry shaped-unary-op ;
+: n*shaped ( a b -- c ) swap shaped*n ;
+
+: shaped-cos ( a -- b ) [ [ cos ] map ] shaped-unary-op ;
+: shaped-sin ( a -- b ) [ [ sin ] map ] shaped-unary-op ;
 
 : shaped-array>array ( shaped-array -- array )
     [ underlying>> ] [ shape>> ] bi
@@ -137,7 +155,8 @@ M: sequence >col-array
     ] if ;
 
 : reshape ( shaped-array shape -- array )
-    check-underlying-shape >>shape ;
+    check-underlying-shape
+    [ >shaped-array ] dip >>shape ;
 
 : shaped-like ( shaped-array shape -- array )
     [ underlying>> clone ] dip <shaped-array> ;
@@ -151,10 +170,10 @@ M: sequence >col-array
 : ones ( shape -- shaped-array ) 1 repeated-shaped ;
 
 : increasing ( shape -- shaped-array )
-    [ shape-capacity iota >array ] [ ] bi <shaped-array> ;
+    [ shape-capacity <iota> >array ] [ ] bi <shaped-array> ;
 
 : decreasing ( shape -- shaped-array )
-    [ shape-capacity iota <reversed> >array ] [ ] bi <shaped-array> ;
+    [ shape-capacity <iota> <reversed> >array ] [ ] bi <shaped-array> ;
 
 : row-length ( shape -- n ) rest-slice product ; inline
 
@@ -175,7 +194,6 @@ GENERIC: next-index ( object -- index )
 
 SYNTAX: sa{ \ } [ >shaped-array ] parse-literal ;
 
-USE: prettyprint.custom
 ! M: row-array pprint* shaped-array>array pprint* ;
 ! M: col-array pprint* shaped-array>array flip pprint* ;
 M: shaped-array pprint-delims drop \ sa{ \ } ;
@@ -190,10 +208,10 @@ ERROR: shaped-bounds-error seq shape ;
 
 ! Inefficient
 : calculate-row-major-index ( seq shape -- i )
-    1 [ * ] accumulate nip reverse v* sum ;
+    1 [ * ] accumulate nip reverse v. ;
 
 : calculate-column-major-index ( seq shape -- i )
-    1 [ * ] accumulate nip v* sum ;
+    1 [ * ] accumulate nip v. ;
 
 : set-shaped-row-major ( obj seq shaped -- )
     shaped-bounds-check [ shape calculate-row-major-index ] [ underlying>> ] bi set-nth ;
@@ -215,7 +233,7 @@ ERROR: 2d-expected shaped ;
 
 ! : set-shaped-where ( .. elt sa quot -- )
     ! [
-        ! [ underlying>> [ length iota ] keep zip ]
+        ! [ underlying>> [ length <iota> ] keep zip ]
         ! [ ] bi
     ! ] dip '[ _ [ _ set- ] @ ] assoc-each ; inline
 
@@ -251,7 +269,7 @@ TUPLE: block-array shaped shape ;
     block-array boa ;
 
 : iteration-indices ( shaped -- seq )
-    [ iota ] [
+    [ <iota> ] [
         cartesian-product concat
         [ dup first array? [ first2 suffix ] when ] map
     ] map-reduce ;

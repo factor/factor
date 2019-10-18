@@ -1,4 +1,5 @@
-! (c) 2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators euler.b-rep fry
 game.models.half-edge grouping io kernel locals math
 math.parser math.vectors.simd.cords sequences splitting ;
@@ -45,7 +46,7 @@ PRIVATE>
     V{ } clone :> edges
     faces-vertices [ vertices reconstruct-face edges push-all ] { } map-as :> faces
 
-    b-rep new 
+    b-rep new
         faces >>faces
         edges >>edges
         vertices >>vertices

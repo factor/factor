@@ -28,7 +28,7 @@ IN: project-euler.265
 CONSTANT: N 5
 
 : decompose ( n -- seq )
-    N iota [ drop [ 2/ ] [ 1 bitand ] bi ] map nip reverse ;
+    N <iota> [ drop [ 2/ ] [ 1 bitand ] bi ] map nip reverse ;
 
 : bits ( seq -- n )
     0 [ [ 2 * ] [ + ] bi* ] reduce ;
@@ -37,7 +37,7 @@ CONSTANT: N 5
     unclip decompose append [ 1 bitand ] map ;
 
 : rotate-bits ( seq -- seq' )
-    dup length iota [ cut prepend bits ] with map ;
+    dup length <iota> [ cut prepend bits ] with map ;
 
 : ?register ( acc seq -- )
     complete rotate-bits

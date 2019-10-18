@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel linked-assocs math sequences
 tools.test ;
-IN: linked-assocs.test
 
 { { 1 2 3 } } [
     <linked-hash> 1 "b" pick set-at
@@ -24,14 +23,14 @@ IN: linked-assocs.test
                   3 "a" pick set-at
                   4 "d" pick set-at
     [ values ] [ keys ] [ assoc-size ] tri
-] unit-test 
+] unit-test
 
 { f 1 } [
     <linked-hash> 1 "c" pick set-at
                   2 "b" pick set-at
     "c" over delete-at
     "c" over at swap assoc-size
-] unit-test 
+] unit-test
 
 { { } 0 } [
     <linked-hash> 1 "a" pick set-at

@@ -5,10 +5,9 @@ combinators compiler.cfg.builder.alien.boxing
 compiler.codegen.gc-maps compiler.codegen.labels
 compiler.codegen.relocation compiler.constants cpu.architecture
 cpu.x86 cpu.x86.assembler cpu.x86.assembler.operands
-cpu.x86.features kernel locals make math namespaces sequences
-specialized-arrays system vocabs ;
+cpu.x86.features kernel layouts locals make math namespaces
+sequences specialized-arrays system vocabs ;
 SPECIALIZED-ARRAY: uint
-FROM: layouts => cell ;
 IN: cpu.x86.32
 
 : x86-float-regs ( -- seq )
@@ -31,9 +30,6 @@ M: x86.32 immediate-comparand? ( obj -- ? ) drop t ;
 
 M:: x86.32 %load-vector ( dst val rep -- )
     dst 0 [] rep copy-memory* val rc-absolute rel-binary-literal ;
-
-M: x86.32 %mov-vm-ptr ( reg -- )
-    0 MOV 0 rc-absolute-cell rel-vm ;
 
 M: x86.32 %vm-field ( dst field -- )
     [ 0 [] MOV ] dip rc-absolute-cell rel-vm ;
@@ -101,7 +97,7 @@ M: x86.32 %load-stack-param ( dst rep n -- )
     ] if ;
 
 M: x86.32 %store-stack-param ( src rep n -- )
-    stack@ swap pick register? [ [ swap ] dip %copy ] [
+    stack@ swap pick register? [ swapd %copy ] [
         {
             { int-rep [ [ [ EAX ] dip ?spill-slot MOV ] [ EAX MOV ] bi* ] }
             { float-rep [ [ ?spill-slot FLDS ] [ FSTPS ] bi* ] }
@@ -193,16 +189,16 @@ M: x86.32 %end-callback ( -- )
     "end_callback" f f %c-invoke ;
 
 : funny-large-struct-return? ( return abi -- ? )
-    #! MINGW ABI incompatibility disaster
+    ! MINGW ABI incompatibility disaster
     [ large-struct? ] [ mingw eq? os windows? not or ] bi* and ;
 
-M: x86.32 %prepare-var-args ( -- ) ;
+M: x86.32 %prepare-var-args ( reg-inputs -- ) drop ;
 
 M:: x86.32 stack-cleanup ( stack-size return abi -- n )
-    #! a) Functions which are stdcall/fastcall/thiscall have to
-    #! clean up the caller's stack frame.
-    #! b) Functions returning large structs on MINGW have to
-    #! fix ESP.
+    ! a) Functions which are stdcall/fastcall/thiscall have to
+    ! clean up the caller's stack frame.
+    ! b) Functions returning large structs on MINGW have to
+    ! fix ESP.
     {
         { [ abi callee-cleanup? ] [ stack-size ] }
         { [ return abi funny-large-struct-return? ] [ 4 ] }
@@ -223,8 +219,6 @@ M: x86.32 dummy-fp-params? f ;
 
 M: x86.32 long-long-on-stack? t ;
 
-M: x86.32 float-on-stack? t ;
-
 M: x86.32 flatten-struct-type
     call-next-method [ first t f 3array ] map ;
 
@@ -244,5 +238,3 @@ M: x86.32 (cpuid) ( eax ecx regs -- )
         EDI 12 [+] EDX MOV
         EDI POP
     ] alien-assembly ;
-
-check-cpu-features

@@ -24,7 +24,7 @@ ABOUT: "tools.crossref"
 
 HELP: uses
 { $values { "defspec" "a definition specifier" } { "seq" "a sequence of definition specifiers" } }
-{ $description "Outputs a sequence of definitions directory called by the given definition." }
+{ $description "Outputs a sequence of definitions called by the given definition." }
 { $notes "The sequence might include the definition itself, if it is a recursive word." }
 { $examples
     "We can ask the " { $link sq } " word to produce a list of words it calls:"

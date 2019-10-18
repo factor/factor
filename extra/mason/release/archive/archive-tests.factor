@@ -1,6 +1,4 @@
-USING: system tools.test ;
-
-IN: mason.release.archive
+USING: mason.release.archive system tools.test ;
 
 { ".dmg" } [ macosx extension ] unit-test
 { ".dmg" } [ "macosx" extension ] unit-test

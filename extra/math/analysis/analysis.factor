@@ -21,16 +21,16 @@ CONSTANT: gamma-p6
     [ + recip ] with { } map-integers 1.0 0 pick set-nth ;
 
 : (gamma-lanczos6) ( x -- log[gamma[x+1]] )
-    #! log(gamma(x+1)
+    ! log(gamma(x+1)
     [ 0.5 + dup gamma-g6 + [ log * ] keep - ]
     [ 6 gamma-z gamma-p6 v. log ] bi + ;
 
 : gamma-lanczos6 ( x -- gamma[x] )
-    #! gamma(x) = gamma(x+1) / x
+    ! gamma(x) = gamma(x+1) / x
     [ (gamma-lanczos6) e^ ] keep / ;
 
 : gammaln-lanczos6 ( x -- gammaln[x] )
-    #! log(gamma(x)) = log(gamma(x+1)) - log(x)
+    ! log(gamma(x)) = log(gamma(x+1)) - log(x)
     [ (gamma-lanczos6) ] keep log - ;
 
 : gamma-neg ( gamma[abs[x]] x -- gamma[x] )
@@ -39,8 +39,8 @@ CONSTANT: gamma-p6
 PRIVATE>
 
 : gamma ( x -- y )
-    #! gamma(x) = integral 0..inf [ t^(x-1) exp(-t) ] dt
-    #! gamma(n+1) = n! for n > 0
+    ! gamma(x) = integral 0..inf [ t^(x-1) exp(-t) ] dt
+    ! gamma(n+1) = n! for n > 0
     dup { [ 0.0 <= ] [ 1.0 mod zero? ] } 1&& [
         drop 1/0.
     ] [
@@ -48,8 +48,8 @@ PRIVATE>
     ] if ;
 
 : gammaln ( x -- gamma[x] )
-    #! gammaln(x) is an alternative when gamma(x)'s range
-    #! varies too widely
+    ! gammaln(x) is an alternative when gamma(x)'s range
+    ! varies too widely
     dup 0 < [
         drop 1/0.
     ] [
@@ -71,7 +71,7 @@ PRIVATE>
 ! copyright notice is preserved.
 
 : exp-int ( x -- y )
-    #! For real values of x only. Accurate to 7 decimals.
+    ! For real values of x only. Accurate to 7 decimals.
     dup 1.0 < [
         dup 0.00107857 * 0.00976004 -
         over *
@@ -115,4 +115,3 @@ PRIVATE>
     [ pi 2 * * sqrt ]
     [ [ e / ] keep ^ ]
     [ 12 * recip 1 + ] tri * * ;
-

@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: calendar help.markup help.syntax io io.files kernel literals math
-quotations sequences ;
+USING: assocs calendar help.markup help.syntax io io.files
+io.launcher.private kernel literals quotations sequences ;
 IN: io.launcher
 
 ARTICLE: "io.launcher.command" "Specifying a command"
@@ -10,6 +10,11 @@ ARTICLE: "io.launcher.command" "Specifying a command"
 ARTICLE: "io.launcher.detached" "Running processes in the background"
 "By default, " { $link run-process } " waits for the process to complete. To run a process without waiting for it to finish, set the " { $snippet "detached" } " slot of a " { $link process } ", or use the following word:"
 { $subsections run-detached } ;
+
+ARTICLE: "io.launcher.hidden" "Running hidden processes"
+"By default, child processes can create and display their own (console and other) windows. To signal to a process that it should stay hidden, set the " { $slot "hidden" } " slot of the " { $link process } " before running it. The processes are free to ignore this signal."
+$nl
+"The " { $link <process-stream> } " and " { $link with-process-stream } " words set this flag. On Windows this helps to run console applications without flashing their windows in the foreground." ;
 
 ARTICLE: "io.launcher.environment" "Setting environment variables"
 "The " { $snippet "environment" } " slot of a " { $link process } " contains an association mapping environment variable names to values. The interpretation of environment variables is operating system-specific."
@@ -28,10 +33,10 @@ $nl
 "To specify redirection, set the " { $snippet "stdin" } ", " { $snippet "stdout" } " and " { $snippet "stderr" } " slots of a " { $link process } " to one of the following values:"
 { $list
     { { $link f } " - default value; the stream is either inherited from the current process, or is a " { $link <process-stream> } " pipe" }
-    { { $link +closed+ } " - the stream is closed; reads will return end of file and writes will fails" }
+    { { $link +closed+ } " - the stream is closed; reads will return end of file and writes will fail" }
     { { $link +stdout+ } " - a special value for the " { $snippet "stderr" } " slot only, indicating that the standard output and standard error streams should be merged" }
     { "a path name - the stream is sent to the given file, which must exist for input and is created automatically on output" }
-    { "an " { $link appender } " wrapping a path name - output is sent to the end given file, as with " { $link <file-appender> } }
+    { "an " { $link appender } " wrapping a path name - output is sent to the end of the given file, as with " { $link <file-appender> } }
     { "a file stream or a socket - the stream is connected to the given Factor stream, which cannot be used again from within Factor and must be closed after the process has been started" }
 } ;
 
@@ -93,21 +98,21 @@ ARTICLE: "io.launcher.timeouts" "Process run-time timeouts"
 "The " { $snippet "timeout" } " slot of a " { $link process } " can be set to a " { $link duration } " specifying a maximum running time for the process. If " { $link wait-for-process } " is called and the process does not exit before the duration expires, it will be killed." ;
 
 HELP: get-environment
-{ $values { "process" process } { "env" "an association" } }
+{ $values { "process" process } { "env" assoc } }
 { $description "Combines the current environment with the value of the " { $snippet "environment" } " slot of the " { $link process } " using the " { $snippet "environment-mode" } " slot." } ;
 
-HELP: current-process-handle
+HELP: (current-process)
 { $values { "handle" "a process handle" } }
 { $description "Returns the handle of the current process." }
 { $examples
   { $example
     "USING: io.launcher math prettyprint ;"
-    "current-process-handle number? ."
+    "(current-process) number? ."
     "t"
   }
 } ;
 
-HELP: run-process*
+HELP: (run-process)
 { $values { "process" process } { "handle" "a process handle" } }
 { $contract "Launches a process." }
 { $notes "User code should call " { $link run-process } " instead." } ;
@@ -176,7 +181,7 @@ HELP: kill-process
   }
 } ;
 
-HELP: kill-process*
+HELP: (kill-process)
 { $values { "process" "process" } }
 { $contract "Kills a running process." }
 { $notes "User code should call " { $link kill-process } " instead." } ;
@@ -193,7 +198,9 @@ HELP: <process-stream>
   { "desc" "a launch descriptor" }
   { "encoding" "an encoding descriptor" }
   { "stream" "a bidirectional stream" } }
-{ $description "Launches a process and redirects its input and output via a pair of pipes which may be read and written as a stream with the given encoding." } ;
+{ $description "Launches a process and redirects its input and output via a pair of pipes which may be read and written as a stream with the given encoding." }
+{ $notes "The process is started with the " { $slot "hidden" } " slot set to " { $link t } "." }
+{ $see-also "io.launcher.hidden" } ;
 
 HELP: <process-reader>
 { $values
@@ -216,7 +223,9 @@ HELP: with-process-stream
   { "encoding" "an encoding descriptor" }
   { "quot" quotation }
 }
-{ $description "Launches a process and redirects its input and output via a pair of pipes. The quotation is called with " { $link input-stream } " and " { $link output-stream } " rebound to these pipes." } ;
+{ $description "Launches a process and redirects its input and output via a pair of pipes. The quotation is called with " { $link input-stream } " and " { $link output-stream } " rebound to these pipes." }
+{ $notes "The process is started with the " { $slot "hidden" } " slot set to " { $link t } "." }
+{ $see-also "io.launcher.hidden" } ;
 
 HELP: with-process-reader
 { $values
@@ -224,7 +233,7 @@ HELP: with-process-reader
   { "encoding" "an encoding descriptor" }
   { "quot" quotation }
 }
-{ $description "Launches a process and redirects its output via a pipe. The quotation is called with " { $link input-stream } " and " { $link output-stream } " rebound to this pipe." }
+{ $description "Launches a process and redirects its output via a pipe. The quotation is called with " { $link input-stream } " rebound to this pipe." }
 { $examples
   { $unchecked-example
     "USING: io.launcher prettyprint ;"
@@ -239,7 +248,7 @@ HELP: with-process-writer
   { "encoding" "an encoding descriptor" }
   { "quot" quotation }
 }
-{ $description "Launches a process and redirects its input via a pipe. The quotation is called with " { $link input-stream } " and " { $link output-stream } " rebound to this pipe." } ;
+{ $description "Launches a process and redirects its input via a pipe. The quotation is called with " { $link output-stream } " rebound to this pipe." } ;
 
 HELP: wait-for-process
 { $values { "process" process } { "status" object } }
@@ -338,6 +347,7 @@ ARTICLE: "io.launcher" "Operating system processes"
     "io.launcher.lifecycle"
     "io.launcher.command"
     "io.launcher.detached"
+    "io.launcher.hidden"
     "io.launcher.environment"
     "io.launcher.redirection"
     "io.launcher.priority"

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel prettyprint io debugger
-sequences assocs stack-checker.errors summary effects ;
+USING: accessors arrays debugger io kernel prettyprint sequences
+stack-checker.errors summary ;
 IN: stack-checker.errors.prettyprint
 
 M: unknown-macro-input summary

@@ -24,4 +24,5 @@ CONSTANT: MAX_UNICODE_PATH 32768
     { "psapi"       "psapi.dll"          stdcall }
     { "winmm"       "winmm.dll"          stdcall }
     { "ntdll"       "ntdll.dll"          stdcall }
+    { "crypt32"     "crypt32.dll"        stdcall }
 } [ first3 add-library ] each

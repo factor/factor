@@ -12,7 +12,7 @@ CONSTANT: IC 29573
 CONSTANT: initial-seed 42
 CONSTANT: line-length 60
 
-: random ( seed -- seed n )
+: next-fasta-random ( seed -- seed n )
     IA * IC + IM mod dup IM /f ; inline
 
 CONSTANT: ALU "GGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGATCACCTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACTAAAAATACAAAAATTAGCCGGGCGTGGTGGCGCGCGCCTGTAATCCCAGCTACTCGGGAGGCTGAGGCAGGAGAATCGCTTGAACCCGGGAGGCGGAGGTTGCAGTGAGCCGAGATCGCGCCACTGCACTCCAGCCTGGGCGACAGAGCGAGACTCCGTCTCAAAAA"
@@ -47,10 +47,10 @@ CONSTANT: homo-sapiens
 
 TYPED: make-cumulative ( freq -- chars: byte-array floats: double-array )
     [ keys >byte-array ]
-    [ values c:double >c-array unclip [ + ] accumulate swap suffix ] bi ;
+    [ values c:double >c-array 0.0 [ + ] accumulate* ] bi ;
 
 :: select-random ( seed chars floats -- seed elt )
-    seed random floats [ <= ] with find drop chars nth-unsafe ; inline
+    seed next-fasta-random floats [ <= ] with find drop chars nth-unsafe ; inline
 
 TYPED: make-random-fasta ( seed: float len: fixnum chars: byte-array floats: double-array -- seed: float )
     '[ _ _ select-random ] "" replicate-as print ;
@@ -69,7 +69,7 @@ TYPED: write-random-fasta ( seed: float n: fixnum chars: byte-array floats: doub
 
 TYPED:: make-repeat-fasta ( k: fixnum len: fixnum alu: string -- k': fixnum )
     alu length :> kn
-    len iota [ k + kn mod alu nth-unsafe ] "" map-as print
+    len <iota> [ k + kn mod alu nth-unsafe ] "" map-as print
     k len + ;
 
 : write-repeat-fasta ( n alu desc id -- )

@@ -4,8 +4,8 @@
 USING: arrays assocs combinators combinators.short-circuit fry
 help help.apropos help.markup help.stylesheet help.topics io
 io.streams.string io.styles kernel math memoize namespaces
-sequences sequences.deep sorting splitting strings unicode.case
-unicode.categories words ;
+sequences sequences.deep sorting splitting strings unicode
+words ;
 
 IN: help.search
 
@@ -31,7 +31,7 @@ IN: help.search
 
 MEMO: article-words ( name -- words )
     article-content [ element-value ] map " " join search-words
-    [ [ digit? ] all? not ] filter
+    [ [ digit? ] all? ] reject
     [ [ { [ letter? ] [ digit? ] } 1|| not ] trim ] map! harvest  ;
 
 : (search-articles) ( string -- seq' )

@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators hashtables http
 http.client json.reader kernel macros make namespaces sequences
-io.sockets.secure fry oauth urls ;
-FROM: assocs => change-at ;
+io.sockets.secure fry oauth1 urls ;
 IN: twitter
 
 ! Configuration
@@ -20,9 +19,9 @@ twitter-source [ "factor" ] initialize
         call
     ] with-scope ; inline
 
-: twitter-url ( string -- string' )
+: twitter-url ( string -- url )
     ssl-supported?
-    "https://api.twitter.com/" "http://api.twitter.com/" ? prepend ;
+    "https://api.twitter.com/" "http://api.twitter.com/" ? prepend >url ;
 
 PRIVATE>
 
@@ -34,7 +33,7 @@ PRIVATE>
     ] with-twitter-oauth ;
 
 : twitter-authorize-url ( token -- url )
-    "oauth/authorize" twitter-url >url
+    "oauth/authorize" twitter-url
         swap key>> "oauth_token" set-query-param ;
 
 : obtain-twitter-access-token ( request-token verifier -- access-token )
@@ -49,7 +48,7 @@ PRIVATE>
 <PRIVATE
 
 ! Utilities
-MACRO: keys-boa ( keys class -- )
+MACRO: keys-boa ( keys class -- quot )
     [ [ '[ _ of ] ] map ] dip '[ _ cleave _ boa ] ;
 
 ! Twitter requests
@@ -83,7 +82,7 @@ TUPLE: twitter-user
     screen-name
     description
     location
-    profile-image-url 
+    profile-image-url
     url
     protected?
     followers-count ;
@@ -104,7 +103,7 @@ TUPLE: twitter-user
     } twitter-user keys-boa ;
 
 : <twitter-status> ( assoc -- tweet )
-    clone "user" over [ <twitter-user> ] change-at 
+    clone "user" over [ <twitter-user> ] change-at
     {
         "created_at"
         "id"

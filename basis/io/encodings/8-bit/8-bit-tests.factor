@@ -1,15 +1,13 @@
-USING: io.encodings.string io.encodings.8-bit
-io.encodings.8-bit.private tools.test strings arrays
-io.encodings.8-bit.latin1 io.encodings.8-bit.windows-1252 ;
-IN: io.encodings.8-bit.tests
+USING: arrays io.encodings.8-bit io.encodings.string strings
+tools.test ;
 
-[ B{ CHAR: f CHAR: o CHAR: o } ] [ "foo" latin1 encode ] unit-test
-[ { 256 } >string latin1 encode ] must-fail
-[ B{ 255 } ] [ { 255 } >string latin1 encode ] unit-test
+{ B{ CHAR: f CHAR: o CHAR: o } } [ "foo" latin2 encode ] unit-test
+[ { 256 } >string latin2 encode ] must-fail
+{ "bar" } [ "bar" latin2 decode ] unit-test
+{ { CHAR: b 233 CHAR: r } } [ B{ CHAR: b 233 CHAR: r } latin2 decode >array ] unit-test
 
-[ "bar" ] [ "bar" latin1 decode ] unit-test
-[ { CHAR: b 233 CHAR: r } ] [ B{ CHAR: b 233 CHAR: r } latin1 decode >array ] unit-test
-[ { 0xfffd 0x20AC } ] [ B{ 0x81 0x80 } windows-1252 decode >array ] unit-test
+{ { 0xfffd 0x20AC } } [ B{ 0x81 0x80 } windows-1252 decode >array ] unit-test
 
-[ t ] [ \ latin1 8-bit-encoding? ] unit-test
-[ "bar" ] [ "bar" \ latin1 decode ] unit-test
+{ B{ 255 } } [ { 255 } >string windows-1254 encode ] unit-test
+
+{ { 0x221a 0x00b1 0x0040 } } [ B{ 0xfb 0xf1 0x40 } cp437 decode >array ] unit-test

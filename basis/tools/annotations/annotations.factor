@@ -4,8 +4,6 @@ USING: accessors arrays assocs compiler.units effects fry
 generalizations generic inspector io kernel locals macros math
 namespaces prettyprint quotations sequences sequences.deep
 sequences.generalizations sorting summary tools.time words ;
-FROM: sequences => change-nth ;
-FROM: assocs => change-at ;
 IN: tools.annotations
 
 <PRIVATE
@@ -44,7 +42,7 @@ PREDICATE: annotated < word "unannotated-def" word-prop >boolean ;
     [ check-annotate-twice ] dip
     [ dup def>> 2dup "unannotated-def" set-word-prop ] dip ;
 
-GENERIC# (annotate) 1 ( word quot -- )
+GENERIC#: (annotate) 1 ( word quot -- )
 
 M: generic (annotate)
     '[ _ (annotate) ] annotate-generic ;
@@ -53,7 +51,7 @@ M: word (annotate)
     prepare-annotate
     call( old -- new ) define ;
 
-GENERIC# (deep-annotate) 1 ( word quot -- )
+GENERIC#: (deep-annotate) 1 ( word quot -- )
 
 M: generic (deep-annotate)
     '[ _ (deep-annotate) ] annotate-generic ;

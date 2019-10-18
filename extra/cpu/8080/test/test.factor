@@ -1,4 +1,4 @@
-USING: 
+USING:
     accessors
     combinators
     cpu.8080
@@ -6,7 +6,7 @@ USING:
     io
     io.files
     io.encodings.ascii
-    kernel 
+    kernel
     math
     math.bits
     sequences
@@ -15,12 +15,12 @@ USING:
 IN: cpu.8080.test
 
 : step ( cpu -- )
-  #! Run a single 8080 instruction
+  ! Run a single 8080 instruction
   [ read-instruction ] keep ! n cpu
   over get-cycles over inc-cycles
   [ swap instructions nth call( cpu -- ) ] keep
-  [ pc>> 0xFFFF bitand ] keep 
-  [ pc<< ] keep 
+  [ pc>> 0xFFFF bitand ] keep
+  [ pc<< ] keep
   process-interrupts ;
 
 : test-step ( cpu -- cpu )
@@ -47,7 +47,7 @@ IN: cpu.8080.test
   [ 8 <bits> ] dip each ; inline
 
 : >ppm ( cpu filename -- cpu )
-  #! Dump the current screen image to a ppm image file with the given name.
+  ! Dump the current screen image to a ppm image file with the given name.
   ascii [
     "P3" print
     "256 224" print
@@ -55,7 +55,7 @@ IN: cpu.8080.test
     224 [
       32 [
         over 32 * over +  0x2400 + ! cpu h w addr
-        [ pick ] dip swap ram>> nth [
+        reach ram>> nth [
           [
             " 0 0 0" write
           ] [

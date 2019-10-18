@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data audio
 audio.chunked-file classes.struct combinators
 combinators.short-circuit endian io io.binary
@@ -43,7 +44,7 @@ STRUCT: sound-data-chunk
 : verify-aiff ( chunk -- )
     {
         [ FORM-MAGIC id= ]
-        [ form-chunk memory>struct form-type>> 4 memory>byte-array AIFF-MAGIC id= ] 
+        [ form-chunk memory>struct form-type>> 4 memory>byte-array AIFF-MAGIC id= ]
     } 1&&
     [ invalid-audio-file ] unless ;
 

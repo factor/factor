@@ -91,19 +91,19 @@ ERROR: bad-slot-name class slot ;
 : parse-slot-values ( class slots -- values )
     [ (parse-slot-values) ] { } make ;
 
-GENERIC# boa>object 1 ( class slots -- tuple )
+GENERIC#: boa>object 1 ( class slots -- tuple )
 
 M: tuple-class boa>object
-    swap prefix >tuple ;
+    swap slots>tuple ;
 
 : check-slot-exists ( class initials slot-spec/f index/f name -- class initials slot-spec index )
-    over [ drop ] [ nip nip nip bad-slot-name ] if ;
+    over [ drop ] [ 3nip bad-slot-name ] if ;
 
 : slot-named-checked ( class initials name slots -- class initials slot-spec )
     over [ slot-named* ] dip check-slot-exists drop ;
 
 : assoc>object ( class slots values -- tuple )
-    [ [ [ initial>> ] map <enum> ] keep ] dip
+    [ [ [ initial>> ] map <enumerated> ] keep ] dip
     swap [ [ slot-named-checked ] curry dip ] curry assoc-map
     assoc-union! seq>> boa>object ;
 
@@ -115,5 +115,15 @@ M: tuple-class boa>object
         [ bad-literal-tuple ]
     } case ;
 
+: parse-tuple-hash-literal-slots ( class slots -- tuple )
+    scan-token {
+        { "{" [ 2dup parse-slot-values assoc>object ] }
+        { "}" [ drop new ] }
+        [ bad-literal-tuple ]
+    } case ;
+
 : parse-tuple-literal ( -- tuple )
     scan-word dup all-slots parse-tuple-literal-slots ;
+
+: parse-tuple-hash-literal ( -- tuple )
+    scan-word dup all-slots parse-tuple-hash-literal-slots ;

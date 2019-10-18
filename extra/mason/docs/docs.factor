@@ -1,10 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: arrays hashtables help.html http.client io.directories
-io.files io.files.temp io.launcher io.pathnames kernel make
+USING: hashtables http.client io.files.temp io.pathnames kernel
 mason.common mason.config namespaces sequences ;
-
 IN: mason.docs
 
 : make-docs-archive ( -- )

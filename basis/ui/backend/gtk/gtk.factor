@@ -1,28 +1,23 @@
 ! Copyright (C) 2010, 2011 Anton Gorenko, Philipp Bruschweiler.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors alien.c-types alien.data
-alien.strings arrays assocs classes.struct command-line
-continuations destructors environment gdk.ffi gdk.gl.ffi
-gdk.pixbuf.ffi glib.ffi gobject-introspection.standard-types
-gobject.ffi gtk.ffi gtk.gl.ffi io io.encodings.binary
-io.encodings.utf8 io.files kernel libc literals locals math
-math.bitwise math.order math.vectors namespaces sequences
-strings system threads ui ui.backend
-ui.backend.gtk.input-methods ui.backend.gtk.io ui.clipboards
-ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.pixel-formats ui.pixel-formats.private ui.private
-vocabs.loader combinators ;
+USING: accessors alien.accessors alien.c-types alien.strings arrays
+assocs classes.struct combinators continuations destructors
+environment gdk.ffi gdk.gl.ffi gdk.pixbuf.ffi glib.ffi gobject.ffi
+gtk.ffi gtk.gl.ffi io.encodings.binary io.encodings.utf8 io.files
+io.pathnames kernel libc literals locals math math.bitwise
+math.vectors namespaces sequences strings system threads ui ui.backend
+ui.backend.gtk.input-methods ui.backend.gtk.io ui.backend.x11.keys
+ui.clipboards ui.event-loop ui.gadgets ui.gadgets.private
+ui.gadgets.worlds ui.gestures ui.pixel-formats
+ui.pixel-formats.private ui.private vocabs.loader ;
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
 
-TUPLE: handle ;
-TUPLE: window-handle < handle window fullscreen? im-context ;
+TUPLE: window-handle window drawable im-context fullscreen? ;
 
-: <window-handle> ( window im-context -- window-handle )
-    window-handle new
-        swap >>im-context
-        swap >>window ;
+: <window-handle> ( window drawable im-context -- window-handle )
+    f window-handle boa ;
 
 : connect-signal-with-data ( object signal-name callback data -- )
     [ utf8 string>alien ] 2dip g_signal_connect drop ;
@@ -82,6 +77,7 @@ M: gtk-clipboard set-clipboard-contents
 :: with-timer ( quot -- )
     <timer-funcs> &free
     GSource heap-size g_source_new &g_source_unref :> source
+    source G_PRIORITY_DEFAULT_IDLE g_source_set_priority
     source f g_source_attach drop
     [ quot call( -- ) ]
     [ source g_source_destroy ] [ ] cleanup ;
@@ -100,48 +96,6 @@ CONSTANT: events-mask
         GDK_KEY_RELEASE_MASK
         GDK_FOCUS_CHANGE_MASK
     }
-
-CONSTANT: modifiers
-    {
-        { S+ $ GDK_SHIFT_MASK }
-        { C+ $ GDK_CONTROL_MASK }
-        { A+ $ GDK_MOD1_MASK }
-    }
-
-CONSTANT: action-key-codes
-    H{
-        { $ GDK_KEY_BackSpace "BACKSPACE" }
-        { $ GDK_KEY_Tab "TAB" }
-        { $ GDK_KEY_ISO_Left_Tab "TAB" }
-        { $ GDK_KEY_Return "RET" }
-        { $ GDK_KEY_KP_Enter "ENTER" }
-        { $ GDK_KEY_Escape "ESC" }
-        { $ GDK_KEY_Delete "DELETE" }
-        { $ GDK_KEY_Home "HOME" }
-        { $ GDK_KEY_Left "LEFT" }
-        { $ GDK_KEY_Up "UP" }
-        { $ GDK_KEY_Right "RIGHT" }
-        { $ GDK_KEY_Down "DOWN" }
-        { $ GDK_KEY_Page_Up "PAGE_UP" }
-        { $ GDK_KEY_Page_Down "PAGE_DOWN" }
-        { $ GDK_KEY_End "END" }
-        { $ GDK_KEY_Begin "BEGIN" }
-        { $ GDK_KEY_F1 "F1" }
-        { $ GDK_KEY_F2 "F2" }
-        { $ GDK_KEY_F3 "F3" }
-        { $ GDK_KEY_F4 "F4" }
-        { $ GDK_KEY_F5 "F5" }
-        { $ GDK_KEY_F6 "F6" }
-        { $ GDK_KEY_F7 "F7" }
-        { $ GDK_KEY_F8 "F8" }
-        { $ GDK_KEY_F9 "F9" }
-        { $ GDK_KEY_F10 "F10" }
-        { $ GDK_KEY_F11 "F11" }
-        { $ GDK_KEY_F12 "F12" }
-    }
-
-: event-modifiers ( event -- seq )
-    state>> modifiers modifier ;
 
 : event-loc ( event -- loc )
     [ x>> ] [ y>> ] bi [ >fixnum ] bi@ 2array ;
@@ -200,20 +154,16 @@ CONSTANT: action-key-codes
         [ scroll-direction ] [ event-loc ] bi
     ] dip window send-scroll t ;
 
-: key-sym ( event -- sym/f action? )
-    keyval>> dup action-key-codes at [ t ]
-    [ gdk_keyval_to_unicode [ f ] [ 1string ] if-zero f ] ?if ;
+: key-sym ( keyval -- string/f action? )
+    code>sym [ dup integer? [ gdk_keyval_to_unicode 1string ] when ] dip ;
 
-: key-event>gesture ( event -- mods sym/f action? )
-    [ event-modifiers ] [ key-sym ] bi ;
+: key-event>gesture ( event -- key-gesture )
+    [ event-modifiers ] [ keyval>> key-sym ] [
+        type>> GDK_KEY_PRESS = [ <key-down> ] [ <key-up> ] if
+    ] tri ;
 
-: on-key-press ( win event user-data -- ? )
-    drop swap [ key-event>gesture <key-down> ] [ window ] bi*
-    propagate-key-gesture t ;
-
-: on-key-release ( win event user-data -- ? )
-    drop swap [ key-event>gesture <key-up> ] [ window ] bi*
-    propagate-key-gesture t ;
+: on-key-press/release ( win event user-data -- ? )
+    drop swap [ key-event>gesture ] [ window ] bi* propagate-key-gesture t ;
 
 : on-focus-in ( win event user-data -- ? )
     2drop window focus-world t ;
@@ -221,15 +171,25 @@ CONSTANT: action-key-codes
 : on-focus-out ( win event user-data -- ? )
     2drop window unfocus-world t ;
 
-! This word gets replaced when deploying. See 'Vocabulary icons'
-! in the docs and tools.deploy.shaker.gtk-icon
-: get-icon-data ( -- byte-array/f )
+CONSTANT: default-icon-path "resource:misc/icons/Factor_128x128.png"
+
+: default-icon-data ( -- byte-array/f )
     [
-        "resource:misc/icons/Factor_48x48.png" binary file-contents
+        default-icon-path binary file-contents
     ] [ drop f ] recover ;
 
+SYMBOL: icon-data
+
+icon-data [ default-icon-data ] initialize
+
+: vocab-icon-data ( vocab-name -- byte-array )
+    dup vocab-dir { "icon.png" "icon.ico" } [
+        append-path vocab-append-path
+    ] 2with map default-icon-path suffix
+    [ exists? ] find nip binary file-contents ;
+
 : load-icon ( -- )
-    get-icon-data [
+    icon-data get [
         [
             data>GInputStream &g_object_unref
             GInputStream>GdkPixbuf gtk_window_set_default_icon
@@ -237,7 +197,6 @@ CONSTANT: action-key-codes
     ] when* ;
 
 :: connect-user-input-signals ( win -- )
-    win events-mask gtk_widget_add_events
     win "motion-notify-event" [ on-motion yield ]
     GtkWidget:motion-notify-event connect-signal
     win "leave-notify-event" [ on-leave yield ]
@@ -248,9 +207,9 @@ CONSTANT: action-key-codes
     GtkWidget:button-release-event connect-signal
     win "scroll-event" [ on-scroll yield ]
     GtkWidget:scroll-event connect-signal
-    win "key-press-event" [ on-key-press yield ]
+    win "key-press-event" [ on-key-press/release yield ]
     GtkWidget:key-press-event connect-signal
-    win "key-release-event" [ on-key-release yield ]
+    win "key-release-event" [ on-key-press/release yield ]
     GtkWidget:key-release-event connect-signal
     win "focus-in-event" [ on-focus-in yield ]
     GtkWidget:focus-in-event connect-signal
@@ -260,23 +219,35 @@ CONSTANT: action-key-codes
 ! Window state events
 
 : on-expose ( win event user-data -- ? )
-    2drop window relayout t ;
+    2drop gtk_widget_get_toplevel window relayout t ;
 
-: on-configure ( win event user-data -- ? )
-    drop [ window ] [ GdkEventConfigure memory>struct ] bi*
-    [ event-loc >>window-loc ] [ event-dim >>dim ] bi
-    relayout-1 f ;
+: on-configure ( window event user-data -- ? )
+    drop swap dup gtk_widget_get_toplevel [ = ] keep window dup active?>> [
+        swap [ swap GdkEventConfigure memory>struct ] dip
+        [ event-loc >>window-loc drop ]
+        [ event-dim >>dim relayout-1 ] if
+    ] [ 3drop ] if f ;
+
+: on-map ( win event user-data -- ? )
+    2drop window t >>active? drop t ;
 
 : on-delete ( win event user-data -- ? )
     2drop window ungraft t ;
 
+: connect-configure-signal ( winhandle -- )
+    [ window>> ] [ drawable>> ] bi "configure-event"
+    [ on-configure yield ] GtkWidget:configure-event
+    [ connect-signal ] 2curry bi@ ;
+
+: connect-expose-sigal ( drawable -- )
+    "expose-event" [ on-expose yield ]
+    GtkWidget:expose-event connect-signal ;
+
 :: connect-win-state-signals ( win -- )
-    win "expose-event" [ on-expose yield ]
-    GtkWidget:expose-event connect-signal
-    win "configure-event" [ on-configure yield ]
-    GtkWidget:configure-event connect-signal
     win "delete-event" [ on-delete yield ]
-    GtkWidget:delete-event connect-signal ;
+    GtkWidget:delete-event connect-signal
+    win "map-event" [ on-map yield ]
+    GtkWidget:map-event connect-signal ;
 
 ! Input methods
 
@@ -392,56 +363,48 @@ CONSTANT: window-controls>func-flags
     ] 2tri ;
 
 ! OpenGL and Pixel formats
+CONSTANT: perm-attribs ${ GDK_GL_USE_GL GDK_GL_RGBA }
 
-PIXEL-FORMAT-ATTRIBUTE-TABLE: gl-config-attribs
-    ${ GDK_GL_USE_GL GDK_GL_RGBA }
-    H{
-        { double-buffered ${ GDK_GL_DOUBLEBUFFER } }
-        { stereo ${ GDK_GL_STEREO } }
-        ! { offscreen ${ GDK_GL_DRAWABLE_TYPE 2 } }
-        ! { fullscreen ${ GDK_GL_DRAWABLE_TYPE 1 } }
-        ! { windowed ${ GDK_GL_DRAWABLE_TYPE 1 } }
-        { color-bits ${ GDK_GL_BUFFER_SIZE } }
-        { red-bits ${ GDK_GL_RED_SIZE } }
-        { green-bits ${ GDK_GL_GREEN_SIZE } }
-        { blue-bits ${ GDK_GL_BLUE_SIZE } }
-        { alpha-bits ${ GDK_GL_ALPHA_SIZE } }
-        { accum-red-bits ${ GDK_GL_ACCUM_RED_SIZE } }
-        { accum-green-bits ${ GDK_GL_ACCUM_GREEN_SIZE } }
-        { accum-blue-bits ${ GDK_GL_ACCUM_BLUE_SIZE } }
-        { accum-alpha-bits ${ GDK_GL_ACCUM_ALPHA_SIZE } }
-        { depth-bits ${ GDK_GL_DEPTH_SIZE } }
-        { stencil-bits ${ GDK_GL_STENCIL_SIZE } }
-        { aux-buffers ${ GDK_GL_AUX_BUFFERS } }
-        { sample-buffers ${ GDK_GL_SAMPLE_BUFFERS } }
-        { samples ${ GDK_GL_SAMPLES } }
-    }
+CONSTANT: attrib-table H{
+    { double-buffered ${ GDK_GL_DOUBLEBUFFER } }
+    { stereo ${ GDK_GL_STEREO } }
+    { color-bits ${ GDK_GL_BUFFER_SIZE } }
+    { red-bits ${ GDK_GL_RED_SIZE } }
+    { green-bits ${ GDK_GL_GREEN_SIZE } }
+    { blue-bits ${ GDK_GL_BLUE_SIZE } }
+    { alpha-bits ${ GDK_GL_ALPHA_SIZE } }
+    { accum-red-bits ${ GDK_GL_ACCUM_RED_SIZE } }
+    { accum-green-bits ${ GDK_GL_ACCUM_GREEN_SIZE } }
+    { accum-blue-bits ${ GDK_GL_ACCUM_BLUE_SIZE } }
+    { accum-alpha-bits ${ GDK_GL_ACCUM_ALPHA_SIZE } }
+    { depth-bits ${ GDK_GL_DEPTH_SIZE } }
+    { stencil-bits ${ GDK_GL_STENCIL_SIZE } }
+    { aux-buffers ${ GDK_GL_AUX_BUFFERS } }
+    { sample-buffers ${ GDK_GL_SAMPLE_BUFFERS } }
+    { samples ${ GDK_GL_SAMPLES } }
+}
 
 M: gtk-ui-backend (make-pixel-format)
-    nip >gl-config-attribs-int-array gdk_gl_config_new ;
+    nip perm-attribs attrib-table
+    pixel-format-attributes>int-array gdk_gl_config_new ;
 
 M: gtk-ui-backend (free-pixel-format)
     handle>> g_object_unref ;
 
-M: gtk-ui-backend (pixel-format-attribute)
-    [ handle>> ] [ >gl-config-attribs ] bi*
-    { gint } [ gdk_gl_config_get_attrib drop ]
-    with-out-parameters ;
-
 M: window-handle select-gl-context ( handle -- )
-    window>>
+    drawable>>
     [ gtk_widget_get_gl_window ] [ gtk_widget_get_gl_context ] bi
     gdk_gl_drawable_make_current drop ;
 
 M: window-handle flush-gl-context ( handle -- )
-    window>> gtk_widget_get_gl_window
+    drawable>> gtk_widget_get_gl_window
     gdk_gl_drawable_swap_buffers ;
 
 ! Window
 
 : configure-gl ( world -- )
     [
-        [ handle>> window>> ] [ handle>> ] bi*
+        [ handle>> drawable>> ] [ handle>> ] bi*
         f t GDK_GL_RGBA_TYPE gtk_widget_set_gl_capability drop
     ] with-world-pixel-format ;
 
@@ -454,9 +417,11 @@ M: window-handle flush-gl-context ( handle -- )
 
 M:: gtk-ui-backend (open-window) ( world -- )
     GTK_WINDOW_TOPLEVEL gtk_window_new :> win
+    gtk_drawing_area_new :> drawable
+    win drawable gtk_container_add
     gtk_im_multicontext_new :> im
 
-    win im <window-handle> world handle<<
+    win drawable im <window-handle> world handle<<
 
     world win register-window
 
@@ -467,20 +432,28 @@ M:: gtk-ui-backend (open-window) ( world -- )
     gtk_window_set_wmclass
 
     world configure-gl
+
+    ! This must be done before realize due to #776.
+    win events-mask gtk_widget_add_events
+
+    win gtk_widget_realize
+
+    ! And this must be done after and in this order due to #1307
     win im configure-im
     win connect-user-input-signals
     win connect-win-state-signals
+    world handle>> connect-configure-signal
+    drawable connect-expose-sigal
 
-    win gtk_widget_realize
     win world window-controls>> configure-window-controls
-
     win gtk_widget_show_all ;
 
 M: gtk-ui-backend (close-window) ( handle -- )
     window>> [ gtk_widget_destroy ] [ unregister-window ] bi
     event-loop? [ gtk_main_quit ] unless ;
 
-M: gtk-ui-backend resize-window [ handle>> window>> ] [ first2 ] bi* gtk_window_resize ;
+M: gtk-ui-backend resize-window
+    [ handle>> window>> ] [ first2 ] bi* gtk_window_resize ;
 
 M: gtk-ui-backend set-title
     swap [ handle>> window>> ] [ utf8 string>alien ] bi*
@@ -530,23 +503,21 @@ M:: gtk-ui-backend system-alert ( caption text -- )
     ] with-destructors ;
 
 M: gtk-ui-backend (with-ui)
+    f f gtk_init_check [ "Unable to initialize GTK" throw ] unless
+    f f gtk_gl_init
+    load-icon
+    init-clipboard
+    start-ui
     [
-        0 gint <ref> f void* <ref> gtk_init
-        0 gint <ref> f void* <ref> gtk_gl_init
-        load-icon
-        init-clipboard
-        start-ui
-        [
-            [ [ gtk_main ] with-timer ] with-event-loop
-        ] with-destructors
-    ] ui-running ;
+        [ [ gtk_main ] with-timer ] with-event-loop
+    ] with-destructors ;
 
-os unix? os macosx? not and [
+M: gtk-ui-backend stop-event-loop
+    gtk_main_quit ;
+
+os linux? [
     gtk-ui-backend ui-backend set-global
 ] when
-
-{ "ui.backend.gtk" "io.backend.unix" }
-"ui.backend.gtk.io.unix" require-when
 
 { "ui.backend.gtk" "ui.gadgets.editors" }
 "ui.backend.gtk.input-methods.editors" require-when

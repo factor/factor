@@ -33,14 +33,14 @@ IDENTITY-MEMO: inputs/outputs ( quot -- in out )
     ] if*
 ] "special" set-word-prop
 
-M: curried infer-known*
+M: curried-effect infer-known*
     quot>> infer-known dup [
         curry-effect
     ] [
         drop f
     ] if ;
 
-M: composed infer-known*
+M: composed-effect infer-known*
     [ quot1>> ] [ quot2>> ] bi
     [ infer-known ] bi@
     2dup and [ compose-effects ] [ 2drop f ] if ;
@@ -66,7 +66,14 @@ M: object infer-known* drop f ;
 
 : output>array ( quot -- array )
     { } output>sequence ; inline
-    
+
+MACRO: output>sequence-n ( quot exemplar n -- quot )
+    3dup nip [ outputs ] dip - -rot
+    '[ @ [ _ _ nsequence ] _ ndip ] ;
+
+MACRO: output>array-n ( quot n -- array )
+    '[ _ { } _ output>sequence-n ] ;
+
 : cleave>array ( obj quots -- array )
     '[ _ cleave ] output>array ; inline
 
@@ -132,19 +139,19 @@ MACRO: map-reduce-outputs ( quot mapper reducer -- quot )
 
 MACRO: smart-reduce ( reduce-quots -- quot )
     unzip [ [ ] like ] bi@ dup length dup '[
-        [ @ ] dip [ @ _ cleave-curry _ spread* ] each
+        _ dip [ @ _ cleave-curry _ spread* ] each
     ] ;
 
 MACRO: smart-map-reduce ( map-reduce-quots -- quot )
     [ keys ] [ [ [ ] concat-as ] [ ] map-as ] bi dup length dup '[
         [ first _ cleave ] keep
         [ @ _ cleave-curry _ spread* ]
-        [ 1 ] 2dip (each) (each-integer)
+        1 each-from
     ] ;
 
 MACRO: smart-2reduce ( 2reduce-quots -- quot )
     unzip [ [ ] like ] bi@ dup length dup '[
-        [ @ ] 2dip
+        _ 2dip
         [ @ _ [ cleave-curry ] [ cleave-curry ] bi _ spread* ] 2each
     ] ;
 
@@ -152,5 +159,5 @@ MACRO: smart-2map-reduce ( 2map-reduce-quots -- quot )
     [ keys ] [ [ [ ] concat-as ] [ ] map-as ] bi dup length dup '[
         [ [ first ] bi@ _ 2cleave ] 2keep
         [ @ _ [ cleave-curry ] [ cleave-curry ] bi _ spread* ]
-        [ 1 ] 3dip (2each) (each-integer)
+        1 2each-from
     ] ;

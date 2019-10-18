@@ -23,7 +23,7 @@ CONSTANT: XAPO_FLAG_INPLACE_REQUIRED         0x00000020
 
 CONSTANT: XAPO_FLAG_INPLACE_SUPPORTED        0x00000010
 
-STRUCT: XAPO_REGISTRATION_PROPERTIES 
+STRUCT: XAPO_REGISTRATION_PROPERTIES
     { clsid                GUID       }
     { FriendlyName         WCHAR[256] }
     { CopyrightInfo        WCHAR[256] }
@@ -63,5 +63,3 @@ COM-INTERFACE: IXAPO IUnknown {A90BC001-E897-E897-55E4-9E4700000000}
 COM-INTERFACE: IXAPOParameters IUnknown {A90BC001-E897-E897-55E4-9E4700000001}
     void SetParameters ( void* pParameters, UINT32 ParameterByteSize )
     void GetParameters ( void* pParameters, UINT32 ParameterByteSize ) ;
-
-

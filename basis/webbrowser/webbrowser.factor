@@ -1,27 +1,17 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-
-USING: combinators combinators.short-circuit io.pathnames
-present sequences strings system ui.operations urls vocabs ;
-
+USING: accessors io.pathnames kernel sequences strings system
+ui.operations urls vocabs ;
 IN: webbrowser
 
-HOOK: open-file os ( path -- )
+HOOK: open-item os ( item -- )
 
-{
-    { [ os macosx?  ] [ "webbrowser.macosx"  ] }
-    { [ os linux?   ] [ "webbrowser.linux"   ] }
-    { [ os windows? ] [ "webbrowser.windows" ] }
-} cond require
+"webbrowser." os name>> append require
 
 : open-url ( url -- )
-    >url open-file ;
+    >url open-item ;
 
-[ pathname? ] \ open-file H{ } define-operation
+PREDICATE: url-string < string >url protocol>> >boolean ;
 
-[ url? ] \ open-url H{ } define-operation
-
-PREDICATE: url-string < string
-    { [ "http://" head? ] [ "https://" head? ] } 1|| ;
-
-[ url-string? ] \ open-url H{ } define-operation
+[ pathname? ] \ open-item H{ } define-operation
+[ [ url? ] [ url-string? ] bi or ] \ open-url H{ } define-operation

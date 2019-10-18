@@ -9,16 +9,24 @@ IN: vocabs.cache
     vocab-name
     [ root-cache get delete-at ]
     [
-        \ vocab-file-contents "memoize" word-prop swap
-        '[ drop first vocab-name _ = not ] assoc-filter! drop
+        \ vocab-file-lines "memoize" word-prop swap
+        '[ drop first vocab-name _ = ] assoc-reject! drop
     ] bi
-    \ all-vocabs-recursive reset-memoized
+    \ all-disk-vocabs-recursive reset-memoized
     \ all-authors reset-memoized
     \ all-tags reset-memoized ;
 
 SINGLETON: cache-observer
 
-M: cache-observer vocab-changed drop reset-cache ;
+<PRIVATE
+
+: forgot-vocab? ( vocab -- ? )
+    vocab-name dictionary get key? not ;
+
+PRIVATE>
+
+M: cache-observer vocab-changed
+    drop dup forgot-vocab? [ reset-cache ] [ drop ] if ;
 
 [
     f changed-vocabs set-global

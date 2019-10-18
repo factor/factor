@@ -47,7 +47,8 @@ TUPLE: processor-info
     { cache-alignment integer }
     { address-sizes array }
     { power-management string }
-    { tlb-size string } ;
+    { tlb-size string }
+    { bugs string } ;
 
 
 ERROR: unknown-cpuinfo-line string ;
@@ -92,6 +93,7 @@ ERROR: unknown-cpuinfo-line string ;
         { "vendor_id" [ >>vendor-id ] }
         { "wp" [ "yes" = >>wp? ] }
         { "TLB size" [ >>tlb-size ] }
+        { "bugs" [ >>bugs ] }
         [ unknown-cpuinfo-line ]
     } case ;
 
@@ -276,7 +278,7 @@ TUPLE: proc-uptime up idle ;
 
 ! /proc/pid/*
 
-GENERIC# proc-pid-path 1 ( object string -- path )
+GENERIC#: proc-pid-path 1 ( object string -- path )
 
 M: integer proc-pid-path ( pid string -- path )
     [ "/proc/" ] 2dip

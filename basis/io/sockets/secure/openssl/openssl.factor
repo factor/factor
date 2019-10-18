@@ -1,24 +1,63 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data alien.strings
-assocs byte-arrays classes.struct combinators destructors fry io
-io.backend io.buffers io.encodings.8-bit.latin1
-io.encodings.utf8 io.files io.pathnames io.ports io.sockets
-io.sockets.secure io.timeouts kernel libc
-
-locals math math.order math.parser namespaces openssl
-openssl.libcrypto openssl.libssl random sequences splitting
-unicode.case ;
+USING: accessors alien alien.c-types alien.data alien.enums
+alien.strings assocs byte-arrays classes.struct combinators
+combinators.short-circuit destructors fry io io.backend
+io.binary io.buffers io.encodings.latin1 io.encodings.utf8
+io.files io.pathnames io.ports io.sockets io.sockets.secure
+io.timeouts kernel libc locals math math.functions math.order
+math.parser memoize namespaces openssl openssl.libcrypto
+openssl.libssl random sequences sets splitting unicode ;
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )
+M: TLSv1 ssl-method drop TLSv1_method ;
+M: TLSv1.1 ssl-method drop TLSv1_1_method ;
+M: TLSv1.2 ssl-method drop TLSv1_2_method ;
 
-M: SSLv2  ssl-method drop SSLv2_client_method ;
-M: SSLv23 ssl-method drop SSLv23_method ;
-M: SSLv3  ssl-method drop SSLv3_method ;
-M: TLSv1  ssl-method drop TLSv1_method ;
+MEMO: make-cipher-list ( -- string )
+    {
+        "ECDHE-ECDSA-AES256-GCM-SHA384"
+        "ECDHE-ECDSA-AES256-SHA384"
+        "ECDHE-ECDSA-AES128-GCM-SHA256"
+        "ECDHE-ECDSA-AES128-SHA256"
+        "ECDHE-RSA-AES256-GCM-SHA384"
+        "ECDHE-RSA-AES256-SHA384"
+        "ECDHE-RSA-AES128-GCM-SHA256"
+        "ECDHE-RSA-AES128-SHA256"
+        "ECDHE-ECDSA-AES256-CCM8"
+        "ECDHE-ECDSA-AES256-CCM"
+        "ECDHE-ECDSA-AES128-CCM8"
+        "ECDHE-ECDSA-AES128-CCM"
+        "ECDHE-ECDSA-CAMELLIA256-SHA384"
+        "ECDHE-RSA-CAMELLIA256-SHA384"
+        "ECDHE-ECDSA-CAMELLIA128-SHA256"
+        "ECDHE-RSA-CAMELLIA128-SHA256"
+        "ECDHE-RSA-CHACHA20-POLY1305"
+        "ECDHE-ECDSA-CHACHA20-POLY1305"
+        "ECDHE-PSK-CHACHA20-POLY1305"
+        "AES256-SHA"
+        "AES128-SHA256"
+        "AES128-SHA"
+        "CAMELLIA256-SHA"
+        "CAMELLIA128-SHA"
+        "IDEA-CBC-SHA"
+        "DES-CBC3-SHA"
+    } ":" join ;
 
 TUPLE: openssl-context < secure-context aliens sessions ;
+
+<PRIVATE
+
+: bn-bytes-needed ( num -- bytes-required )
+    log2 1 + 8 / ceiling ;
+
+PRIVATE>
+
+: number>bn ( num -- bn )
+    dup bn-bytes-needed >be
+    dup length
+    f BN_bin2bn ; inline
 
 : set-session-cache ( ctx -- )
     handle>>
@@ -105,19 +144,9 @@ M: bio dispose* handle>> BIO_free ssl-error ;
         SSL_CTX_set_tmp_dh ssl-error
     ] [ drop ] if ;
 
-TUPLE: rsa < disposable handle ;
-
-: <rsa> ( handle -- rsa ) rsa new-disposable swap >>handle ;
-
-M: rsa dispose* handle>> RSA_free ;
-
-: generate-eph-rsa-key ( ctx -- )
-    [ handle>> ]
-    [
-        config>> ephemeral-key-bits>> RSA_F4 f f RSA_generate_key
-        dup ssl-error <rsa> &dispose handle>>
-    ] bi
-    SSL_CTX_set_tmp_rsa ssl-error ;
+! Attempt to set ecdh. If it fails, ignore...?
+: set-ecdh-params ( ctx -- )
+    handle>> SSL_CTRL_SET_ECDH_AUTO 1 f SSL_CTX_ctrl drop ;
 
 : <openssl-context> ( config ctx -- context )
     openssl-context new-disposable
@@ -139,7 +168,7 @@ M: openssl <secure-context> ( config -- context )
             [ load-verify-locations ]
             [ set-verify-depth ]
             [ load-dh-params ]
-            [ generate-eph-rsa-key ]
+            [ set-ecdh-params ]
             [ ]
         } cleave
     ] with-destructors ;
@@ -169,25 +198,37 @@ SYMBOL: default-secure-context
 : save-session ( session addrspec -- )
     current-secure-context sessions>> set-at ;
 
+: set-secure-cipher-list-only ( ssl -- ssl )
+    dup handle>> make-cipher-list SSL_set_cipher_list ssl-error ;
+
 : <ssl-handle> ( fd -- ssl )
     [
         ssl-handle new-disposable |dispose
         current-secure-context handle>> SSL_new
         dup ssl-error >>handle
         swap >>file
+        set-secure-cipher-list-only
     ] with-destructors ;
 
-: <ssl-socket> ( winsock -- ssl )
-    [
-        socket-handle BIO_NOCLOSE BIO_new_socket dup ssl-error
-    ] keep <ssl-handle>
-    [ handle>> swap dup SSL_set_bio ] keep ;
+:: <ssl-socket> ( winsock hostname -- ssl )
+    winsock socket-handle BIO_NOCLOSE BIO_new_socket dup ssl-error :> bio
+    winsock <ssl-handle> :> handle
+    handle handle>> :> native-handle
+    hostname [
+        utf8 string>alien
+        native-handle swap SSL_set_tlsext_host_name ssl-error
+    ] when*
+    native-handle bio bio SSL_set_bio
+    handle ;
 
 ! Error handling
 : syscall-error ( r -- event )
     ERR_get_error [
         {
-            { -1 [ errno ECONNRESET = [ premature-close ] [ (io-error) ] if ] }
+            { -1 [
+                errno ECONNRESET = [ premature-close ]
+                [ throw-errno ] if
+            ] }
             ! OpenSSL docs say this it is an error condition for
             ! a server to not send a close notify, but web
             ! servers in the wild don't seem to do this, for
@@ -197,7 +238,7 @@ SYMBOL: default-secure-context
     ] [ nip (ssl-error) ] if-zero ;
 
 : check-ssl-error ( ssl ret exra-cases/f -- event/f )
-    [ swap over SSL_get_error ] dip
+    [ tuck SSL_get_error ] dip
     {
         { SSL_ERROR_NONE [ drop f ] }
         { SSL_ERROR_WANT_READ [ drop +input+ ] }
@@ -220,15 +261,15 @@ SYMBOL: default-secure-context
 
 : maybe-handshake ( ssl-handle -- )
     dup connected>> [ drop ] [
-        t >>connected
-        [ do-ssl-accept ] with-timeout
+        [ [ do-ssl-accept ] with-timeout ]
+        [ t swap connected<< ] bi
     ] if ;
 
 ! Input ports
 : do-ssl-read ( buffer ssl -- event/f )
     2dup swap [ buffer-end ] [ buffer-capacity ] bi SSL_read [
         { { SSL_ERROR_ZERO_RETURN [ drop f ] } } check-ssl-error
-    ] keep swap [ 2nip ] [ swap n>buffer f ] if* ;
+    ] keep swap [ 2nip ] [ swap buffer+ f ] if* ;
 
 M: ssl-handle refill ( port handle -- event/f )
     dup maybe-handshake [ buffer>> ] [ handle>> ] bi* do-ssl-read ;
@@ -282,8 +323,8 @@ M: ssl-handle dispose*
     ] with-destructors ;
 
 : check-verify-result ( ssl-handle -- )
-    SSL_get_verify_result dup X509_V_OK =
-    [ drop ] [ verify-message certificate-verify-error ] if ;
+    SSL_get_verify_result X509_V_ERROR number>enum dup X509_V_ERR_OK =
+    [ drop ] [ certificate-verify-error ] if ;
 
 : x509name>string ( x509name -- string )
     NID_commonName 256 <byte-array>
@@ -296,8 +337,16 @@ M: ssl-handle dispose*
 : issuer-name ( certificate -- issuer )
     X509_get_issuer_name x509name>string ;
 
+: sk-value ( stack v -- obj )
+    ssl-new-api? get-global [ OPENSSL_sk_value ] [ sk_value ] if ;
+
+: sk-num ( stack -- num )
+    ssl-new-api? get-global [ OPENSSL_sk_num ] [ sk_num ] if ;
+
 : name-stack>sequence ( name-stack -- seq )
-    dup sk_num iota [ sk_value GENERAL_NAME_st memory>struct ] with map ;
+    dup sk-num <iota> [
+        sk-value GENERAL_NAME_st memory>struct
+    ] with map ;
 
 : alternative-dns-names ( certificate -- dns-names )
     NID_subject_alt_name f f X509_get_ext_d2i
@@ -305,12 +354,23 @@ M: ssl-handle dispose*
     [ type>> GEN_DNS = ] filter
     [ d>> dNSName>> data>> utf8 alien>string ] map ;
 
-: subject-names-match? ( host subject -- ? )
-    [ >lower ] bi@ "*." ?head [ tail? ] [ = ] if ;
+! *.foo.com matches: foo.com, www.foo.com, a.foo.com
+! *.bar.foo.com matches: bar.foo.com, www.bar.foo.com, b.bar.foo.com
+: subject-names-match? ( name pattern -- ? )
+    [ >lower ] bi@
+    "*." ?head [
+        {
+            [ tail? ]
+            [ [ [ CHAR: . = ] count ] bi@ - 1 <= ]
+        } 2&&
+    ] [
+        =
+    ] if ;
 
 : check-subject-name ( host ssl-handle -- )
     SSL_get_peer_certificate [
-        [ alternative-dns-names ] [ subject-name ] bi suffix
+        [ alternative-dns-names ]
+        [ subject-name ] bi suffix members
         2dup [ subject-names-match? ] with any?
         [ 2drop ] [ subject-name-verify-error ] if
     ] [ certificate-missing-error ] if* ;
@@ -333,7 +393,7 @@ M: openssl check-certificate ( host ssl -- )
 
 : make-input/output-secure ( input output -- )
     dup handle>> non-ssl-socket? [ upgrade-on-non-socket ] unless
-    [ <ssl-socket> ] change-handle
+    [ f <ssl-socket> ] change-handle
     handle>> >>handle drop ;
 
 : (send-secure-handshake) ( output -- )

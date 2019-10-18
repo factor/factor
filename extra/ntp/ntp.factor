@@ -87,7 +87,7 @@ orig-timestamp recv-timestamp tx-timestamp ;
         [ [ { 7 8 } ] dip nths (time) ]   ! ref-timestamp
         [ [ { 9 10 } ] dip nths (time) ]  ! orig-timestamp
         [ [ { 11 12 } ] dip nths (time) ] ! recv-timestamp
-        [ [ { 13 14 } ] dip nths (time) ] ! tx-timestamp 
+        [ [ { 13 14 } ] dip nths (time) ] ! tx-timestamp
     } cleave ntp boa
     dup stratum>> '[ _ (ref-id) ] change-ref-id
     [ dup (leap) 2array ] change-leap
@@ -103,14 +103,13 @@ PRIVATE>
 ! - why does <inet4> resolve-host not work?
 
 : <ntp> ( host -- ntp )
-    123 <inet> resolve-host [ inet4? ] filter random
-    f 0 <inet4> <datagram> [
+    123 <inet> resolve-host
+    [ inet4? ] filter random [
         [ REQUEST ] 2dip [ send ] [ receive drop ] bi (ntp)
-    ] with-disposal ;
+    ] with-any-port-local-datagram ;
 
 : default-ntp ( -- ntp )
     "pool.ntp.org" <ntp> ;
 
 : local-ntp ( -- ntp )
     "localhost" <ntp> ;
-

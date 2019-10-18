@@ -1,9 +1,12 @@
 ! Copyright (C) 2004, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.strings init io io.backend io.encodings
-io.encodings.utf8 io.files.private io.pathnames kernel
-kernel.private namespaces sequences splitting system ;
+USING: alien.strings init io io.backend io.encodings io.pathnames
+kernel kernel.private namespaces sequences splitting system ;
 IN: io.files
+
+<PRIVATE
+PRIMITIVE: (exists?) ( path -- ? )
+PRIVATE>
 
 SYMBOL: +retry+ ! just try the operation again without blocking
 SYMBOL: +input+
@@ -52,8 +55,16 @@ HOOK: (file-appender) io-backend ( path -- stream )
 : set-file-lines ( seq path encoding -- )
     [ [ print ] each ] with-file-writer ;
 
+: change-file-lines ( path encoding quot -- )
+    [ [ file-lines ] dip call ]
+    [ drop set-file-lines ] 3bi ; inline
+
 : set-file-contents ( seq path encoding -- )
     [ write ] with-file-writer ;
+
+: change-file-contents ( path encoding quot -- )
+    [ [ file-contents ] dip call ]
+    [ drop set-file-contents ] 3bi ; inline
 
 : with-file-appender ( path encoding quot -- )
     [ <file-appender> ] dip with-output-stream ; inline
@@ -73,13 +84,14 @@ M: object cwd ( -- path ) "." ;
 PRIVATE>
 
 : init-resource-path ( -- )
-    OBJ-ARGS special-object
-    [ utf8 alien>string "-resource-path=" ?head [ drop f ] unless ] map-find drop
-    [ image parent-directory ] unless* "resource-path" set-global ;
+    OBJ-ARGS special-object [
+        alien>native-string "-resource-path=" ?head [ drop f ] unless
+    ] map-find drop
+    [ image-path parent-directory ] unless* "resource-path" set-global ;
 
 [
     cwd current-directory set-global
-    OBJ-IMAGE special-object alien>native-string cwd prepend-path \ image set-global
-    OBJ-EXECUTABLE special-object alien>native-string cwd prepend-path \ vm set-global
+    OBJ-IMAGE special-object alien>native-string \ image-path set-global
+    OBJ-EXECUTABLE special-object alien>native-string \ vm-path set-global
     init-resource-path
 ] "io.files" add-startup-hook

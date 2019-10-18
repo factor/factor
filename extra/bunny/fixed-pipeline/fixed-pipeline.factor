@@ -23,4 +23,3 @@ M: bunny-fixed-pipeline draw-bunny
 
 M: bunny-fixed-pipeline dispose
     drop ;
-

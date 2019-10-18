@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test compression.inflate ;
-IN: compression.inflate.tests
 
-[
+{
 B{
     1 255 255 255 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
     0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 122 121 94 119
@@ -58,7 +57,7 @@ B{
     255 255 255 0 255 255 255 0 255 255 255 0 255 255 255 0 255
     255 255 0
 }
-] [
+} [
 B{
     56 141 99 252 255 255 63 3 41 160 170 50 174 252 253 219
     199 17 2 2 92 172 2 130 82 107 152 69 132 191 138 153 153

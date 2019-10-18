@@ -1,9 +1,9 @@
-! (c)2009 Joe Groff bsd license
-USING: accessors alien.c-types arrays grouping kernel locals
-math math.order math.ranges math.vectors
-math.vectors.homogeneous sequences specialized-arrays ;
-FROM: alien.c-types => float ;
-SPECIALIZED-ARRAY: float
+! Copyright (C) 2009 Joe Groff
+! See http://factorcode.org/license.txt for BSD license
+USING: accessors alien.c-types grouping kernel locals math
+math.order math.ranges math.vectors math.vectors.homogeneous
+sequences specialized-arrays ;
+SPECIALIZED-ARRAY: alien.c-types:float
 IN: nurbs
 
 TUPLE: nurbs-curve
@@ -31,7 +31,7 @@ TUPLE: nurbs-curve
     c1 c2 c3 c4 float-array{ } 4sequence ;
 
 : order-knot-constants ( curve order -- knot-constants )
-    2dup [ knots>> length ] dip - iota
+    2dup [ knots>> length ] dip - <iota>
     [ order-index-knot-constants ] 2with map ;
 
 : knot-constants ( curve -- knot-constants )
@@ -55,10 +55,10 @@ TUPLE: nurbs-curve
     knot-constants second t * knot-constants fourth + bases second *
     + ;
 
-: (eval-curve) ( base-values control-points -- value )
+: eval-curve ( base-values control-points -- value )
     [ n*v ] 2map { 0.0 0.0 0.0 } [ v+ ] binary-reduce h>v ;
 
-:: (eval-bases) ( curve t interval values order -- values' )
+:: eval-bases ( curve t interval values order -- values' )
     order 2 - curve (knot-constants)>> nth :> all-knot-constants
     interval order interval + all-knot-constants clip-range :> ( from to )
     from to all-knot-constants subseq :> knot-constants
@@ -66,8 +66,8 @@ TUPLE: nurbs-curve
 
     knot-constants bases [ t eval-base ] 2map :> values'
     order curve order>> =
-    [ values' from to curve control-points>> subseq (eval-curve) ]
-    [ curve t interval 1 - values' order 1 + (eval-bases) ] if ;
+    [ values' from to curve control-points>> subseq eval-curve ]
+    [ curve t interval 1 - values' order 1 + eval-bases ] if ;
 
 : eval-nurbs ( nurbs-curve t -- value )
-    2dup knot-interval 1 - { 1.0 } 2 (eval-bases) ;
+    2dup knot-interval 1 - { 1.0 } 2 eval-bases ;

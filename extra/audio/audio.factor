@@ -1,4 +1,5 @@
-! (c)2010 Joe Groff bsd license
+! Copyright (C) 2010 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays combinators kernel math openal ;
 IN: audio
 
@@ -21,4 +22,3 @@ ERROR: format-unsupported-by-openal audio ;
         { { 2 16 } [ drop AL_FORMAT_STEREO16 ] }
         [ drop format-unsupported-by-openal ]
     } case ;
-

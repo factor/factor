@@ -1,15 +1,34 @@
-USING: help.markup help.syntax math ;
+USING: compiler.cfg.registers cpu.x86.assembler
+cpu.x86.assembler.operands cpu.x86.assembler.operands.private
+help.markup help.syntax layouts math sequences system ;
 IN: cpu.x86
+
+HELP: %boolean
+{ $values
+  { "dst" "register" }
+  { "cc" "comparision symbol" }
+  { "temp" "temporary register" }
+}
+{ $description "Helper word for emitting conditional move instructions." }
+{ $see-also CMOVL CMOVLE CMOVG CMOVGE CMOVE CMOVNE } ;
+
+HELP: %prepare-var-args
+{ $values { "reg-inputs" sequence } }
+{ $description "Emits code needed for calling variadic functions. On " { $link unix } " " { $link x86.64 } ", the " { $link AL } " register must contain the number of float registers used. " } ;
+
+HELP: JLE
+{ $values { "dst" "destination offset (relative to the instruction pointer register)" } }
+{ $description "Emits a 'jle' instruction." } ;
+
+HELP: reserved-stack-space
+{ $values { "n" integer } }
+{ $description "Size in bytes of the register parameter area. It only exists on the windows " { $link x86.64 } " architecture, where it is 32 bytes and allocated by the caller. On all other platforms it is 0." } ;
 
 HELP: stack-reg
 { $values { "reg" "a register symbol" } }
 { $description
   "Symbol of the machine register that holds the (cpu) stack address."
 } ;
-
-HELP: reserved-stack-space
-{ $values { "n" integer } }
-{ $description "Size in bytes of the register parameter area. It only exists on the windows x86.64 architecture, where it is 32 bytes and allocated by the caller. On all other platforms it is 0." } ;
 
 HELP: ds-reg
 { $values { "reg" "a register symbol" } }
@@ -30,9 +49,30 @@ HELP: (%inc)
   }
 } ;
 
+HELP: (%slot)
+{ $values
+  { "obj" "a register symbol" }
+  { "slot" "a register symbol" }
+  { "scale" "number of bits required to address all bytes in a " { $link cell } "." }
+  { "tag" integer }
+  { "op" indirect }
+}
+{ $description "Creates an indirect operand for addressing a slot in a container." }
+{ $examples
+  { $unchecked-example
+    "USING: cpu.x86 ;"
+    "[ RAX RBX 3 -14 (%slot) EDI MOV ] B{ } make disassemble"
+    "0000000001dd0990: 897cd80e  mov [rax+rbx*8+0xe], edi"
+  }
+} ;
+
 HELP: decr-stack-reg
 { $values { "n" number } }
-{ $description "Emits an instruction for decrementing the stack register the given number of bytes." } ;
+{ $description "Emits an instruction for decrementing the stack register the given number of bytes. If n is equal to the " { $link cell } " size, then a " { $link PUSH } " instruction is emitted instead because it has a shorter encoding." } ;
+
+HELP: incr-stack-reg
+{ $values { "n" number } }
+{ $description "Emits an instruction for incrementing the stack register the given number of bytes. If n is equal to the " { $link cell } " size, then a " { $link POP } " instruction is emitted instead because it has a shorter encoding." } ;
 
 HELP: load-zone-offset
 { $values { "nursery-ptr" "a register symbol" } }
@@ -46,6 +86,10 @@ HELP: load-zone-offset
     "0000000001b48f80: 498d4d10  lea rcx, [r13+0x10]"
   }
 } ;
+
+HELP: loc>operand
+{ $values { "loc" loc } { "operand" indirect } }
+{ $description "Converts a stack location to an operand passable to the " { $link MOV } " instruction." } ;
 
 HELP: store-tagged
 { $values { "dst" "a register symbol" } { "tag" "a builtin class" } }
@@ -75,14 +119,10 @@ HELP: copy-register*
   }
 } ;
 
-HELP: %mov-vm-ptr
-{ $values { "reg" "a register symbol" } }
-{ $description
-  "Emits machine code for moving the vm pointer to a register." }
-{ $examples
-  { $unchecked-example
-    "USING: cpu.x86.64 make ;"
-    "[ RAX %mov-vm-ptr ] B{ } make disassemble"
-    "0000000002290b30: 4c89e8  mov rax, r13"
-  }
-} ;
+ARTICLE: "cpu.x86" "CPU x86 compiler backend"
+"Implementation of " { $vocab-link "cpu.architecture" } " for x86 machines."
+$nl
+{ $link ADD } " and " { $link SUB } " variants:"
+{ $subsections (%inc) decr-stack-reg incr-stack-reg } ;
+
+ABOUT: "cpu.x86"

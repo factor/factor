@@ -116,9 +116,9 @@ STRUCT: XINPUT_STATE
     { Gamepad XINPUT_GAMEPAD } ;
 TYPEDEF: XINPUT_STATE* PXINPUT_STATE
 
-FUNCTION: DWORD XInputGetCapabilities ( DWORD dwUserIndex, DWORD dwFlags, XINPUT_CAPABILITIES* pCapabilities ) ;
-FUNCTION: DWORD XInputGetKeystroke ( DWORD dwUserIndex, DWORD dwReserved, PXINPUT_KEYSTROKE pKeystroke ) ;
-FUNCTION: DWORD XInputGetState ( DWORD dwUserIndex, XINPUT_STATE* pState ) ;
-FUNCTION: DWORD XInputSetState ( DWORD dwUserIndex, XINPUT_VIBRATION* pVibration ) ;
-FUNCTION: DWORD XInputGetDSoundAudioDeviceGuids ( DWORD dwUserIndex, GUID* pDSoundRenderGuid, GUID* pDSoundCaptureGuid ) ;
-FUNCTION: void XInputEnable ( BOOL enable ) ;
+FUNCTION: DWORD XInputGetCapabilities ( DWORD dwUserIndex, DWORD dwFlags, XINPUT_CAPABILITIES* pCapabilities )
+FUNCTION: DWORD XInputGetKeystroke ( DWORD dwUserIndex, DWORD dwReserved, PXINPUT_KEYSTROKE pKeystroke )
+FUNCTION: DWORD XInputGetState ( DWORD dwUserIndex, XINPUT_STATE* pState )
+FUNCTION: DWORD XInputSetState ( DWORD dwUserIndex, XINPUT_VIBRATION* pVibration )
+FUNCTION: DWORD XInputGetDSoundAudioDeviceGuids ( DWORD dwUserIndex, GUID* pDSoundRenderGuid, GUID* pDSoundCaptureGuid )
+FUNCTION: void XInputEnable ( BOOL enable )

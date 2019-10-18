@@ -7,7 +7,7 @@ IN: io.pools
 TUPLE: pool connections disposed expired ;
 
 : check-pool ( pool -- )
-    dup check-disposed
+    check-disposed
     dup expired>> expired? [
         31337 <alien> >>expired
         connections>> delete-all

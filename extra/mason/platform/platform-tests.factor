@@ -1,21 +1,20 @@
 USING: mason.config mason.platform namespaces tools.test
 strings system ;
-IN: mason.platform.tests
 
-[ t ] [ platform string? ] unit-test
+{ t } [ platform string? ] unit-test
 
-[
-    linux target-os set
-    x86.32 target-cpu set
-    f target-variant set
-    
-    [ "linux-x86-32" ] [ platform ] unit-test
-] with-scope
+{ "linux-x86-32" } [
+    H{
+        { target-os linux }
+        { target-cpu x86.32 }
+        { target-variant f }
+    } [ platform ] with-variables
+] unit-test
 
-[
-    windows target-os set
-    x86.32 target-cpu set
-    "xp" target-variant set
-
-    [ "windows-x86-32-xp" ] [ platform ] unit-test
-] with-scope
+{ "windows-x86-32-xp" } [
+    H{
+        { target-os windows }
+        { target-cpu x86.32 }
+        { target-variant "xp" }
+    } [ platform ] with-variables
+] unit-test

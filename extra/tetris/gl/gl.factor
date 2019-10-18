@@ -5,7 +5,7 @@ namespaces opengl opengl.gl sequences tetris.board tetris.game
 tetris.piece ui.render tetris.tetromino ui.gadgets colors ;
 IN: tetris.gl
 
-#! OpenGL rendering for tetris
+! OpenGL rendering for tetris
 
 : draw-block ( block -- )
     { 1 1 } gl-fill-rect ;
@@ -22,21 +22,21 @@ IN: tetris.gl
 
 ! TODO: move implementation specific stuff into tetris-board
 : (draw-row) ( x y row -- )
-    [ over ] dip nth dup
+    overd nth dup
     [ gl-color 2array draw-block ] [ 3drop ] if ;
 
 : draw-row ( y row -- )
-    [ length iota swap ] keep [ (draw-row) ] 2curry each ;
+    [ length <iota> swap ] keep [ (draw-row) ] 2curry each ;
 
 : draw-board ( board -- )
-    rows>> [ length iota ] keep
+    rows>> [ length <iota> ] keep
     [ dupd nth draw-row ] curry each ;
 
 : scale-board ( width height board -- )
     [ width>> ] [ height>> ] bi swapd [ / ] dup 2bi* 1 glScalef ;
 
 : draw-tetris ( width height tetris -- )
-    #! width and height are in pixels
+    ! width and height are in pixels
     [
         {
             [ board>> scale-board ]

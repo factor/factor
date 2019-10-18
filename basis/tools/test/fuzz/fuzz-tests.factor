@@ -1,4 +1,5 @@
-! (c)2011 Joe Groff bsd license
+! Copyright (C) 2011 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors fry kernel macros math namespaces sequences
 source-files.errors tools.test tools.test.fuzz
 tools.test.fuzz.private tools.test.private ;
@@ -50,4 +51,3 @@ SYMBOL: generator-stack
 ] with-variable
 
 notify-error-observers
-

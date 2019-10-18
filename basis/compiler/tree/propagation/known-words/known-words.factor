@@ -1,24 +1,15 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: effects accessors kernel kernel.private layouts math
-math.private math.integers.private math.floats.private
-math.partial-dispatch math.intervals math.parser math.order
-math.functions math.libm math.ratios namespaces words sequences
-sequences.private arrays assocs classes classes.algebra
-combinators generic.math splitting fry locals classes.tuple
-alien.accessors classes.tuple.private slots.private definitions
-strings.private vectors hashtables generic quotations alien
-alien.data alien.data.private
-strings sbufs byte-arrays byte-vectors
-stack-checker.dependencies
-compiler.tree.comparisons
-compiler.tree.propagation.info
-compiler.tree.propagation.nodes
-compiler.tree.propagation.slots
-compiler.tree.propagation.simple
-compiler.tree.propagation.constraints
-compiler.tree.propagation.call-effect
-compiler.tree.propagation.transforms ;
+USING: accessors alien alien.accessors alien.data.private arrays
+assocs byte-arrays byte-vectors classes classes.algebra classes.tuple
+classes.tuple.private combinators compiler.tree.comparisons
+compiler.tree.propagation.constraints compiler.tree.propagation.info
+compiler.tree.propagation.simple compiler.tree.propagation.slots fry
+generic.math hashtables kernel kernel.private layouts locals math
+math.floats.private math.functions math.integers.private
+math.intervals math.libm math.parser math.partial-dispatch
+math.private namespaces sbufs sequences slots.private splitting
+stack-checker.dependencies strings strings.private vectors words ;
 FROM: alien.c-types => (signed-interval) (unsigned-interval) ;
 IN: compiler.tree.propagation.known-words
 
@@ -102,11 +93,13 @@ IN: compiler.tree.propagation.known-words
 
 \ absq [ interval-absq ] [ may-overflow real-valued ] unary-op
 
-: binary-op-class ( info1 info2 -- newclass )
-    [ class>> ] bi@
+: merge-classes ( class1 class2 -- class3 )
     2dup [ null-class? ] either? [ 2drop null ] [
         [ math-closure ] bi@ math-class-max
     ] if ;
+
+: binary-op-class ( info1 info2 -- newclass )
+    [ class>> ] bi@ merge-classes ;
 
 : binary-op-interval ( info1 info2 quot -- newinterval )
     [ [ interval>> ] bi@ ] dip call ; inline
@@ -131,14 +124,41 @@ IN: compiler.tree.propagation.known-words
 \ /i [ [ interval/i ] [ may-overflow integer-valued ] binary-op ] each-derived-op
 \ /f [ [ interval/f ] [ float-valued ] binary-op ] each-derived-op
 
-\ mod [ [ interval-mod ] [ real-valued ] binary-op ] each-derived-op
+: mod-merge-classes/intervals ( c1 c2 i1 i2 -- c3 i3 )
+    [ merge-classes dup bignum = [ drop integer ] when ]
+    [ interval-mod ] 2bi*
+    over integer class<= [
+        integral-closure dup fixnum-interval interval-subset? [
+            nip fixnum swap
+        ] when
+    ] when ;
+
+: mod-outputs-info ( info1 info2 fixer-word -- info3 )
+    [
+        [ [ class>> ] bi@ ] [ [ interval>> ] bi@ ] 2bi
+        mod-merge-classes/intervals
+    ] dip execute( cls int -- cls' int' ) <class/interval-info> ;
+
+{
+    { mod real-valued }
+    { fmod real-valued }
+    { mod-integer-integer integer-valued }
+    { mod-fixnum-integer integer-valued }
+    { mod-integer-fixnum integer-valued }
+    { bignum-mod integer-valued }
+    { fixnum-mod fixnum-valued }
+} [ '[ _ mod-outputs-info ] "outputs" set-word-prop ] assoc-each
+
 \ rem [ [ interval-rem ] [ may-overflow real-valued ] binary-op ] each-derived-op
 
-{ /mod fixnum/mod } [
-    \ /i \ mod
-    [ "outputs" word-prop ] bi@
-    '[ _ _ 2bi ] "outputs" set-word-prop
-] each
+! /mod is the combination of /i and mod, fixnum/mod of /i and fixnum-mod
+\ /mod
+\ /i \ mod [ "outputs" word-prop ] bi@
+'[ _ _ 2bi ] "outputs" set-word-prop
+
+\ fixnum/mod
+\ /i \ fixnum-mod [ "outputs" word-prop ] bi@
+'[ _ _ 2bi ] "outputs" set-word-prop
 
 : shift-op-class ( info1 info2 -- newclass )
     [ class>> ] bi@
@@ -163,11 +183,11 @@ IN: compiler.tree.propagation.known-words
     in2 value-info interval>> :> i2
     in1 i1 i2 op assumption is-in-interval
     in2 i2 i1 op swap-comparison assumption is-in-interval
-    /\ ;
+    2array ;
 
 :: comparison-constraints ( in1 in2 out op -- constraint )
     in1 in2 op (comparison-constraints) out t-->
-    in1 in2 op negate-comparison (comparison-constraints) out f--> /\ ;
+    in1 in2 op negate-comparison (comparison-constraints) out f--> 2array ;
 
 : define-comparison-constraints ( word op -- )
     '[ _ comparison-constraints ] "constraints" set-word-prop ;
@@ -230,16 +250,25 @@ generic-comparison-ops [
     { integer>fixnum-strict fixnum }
 
     { >bignum bignum }
-    { fixnum>bignum bignum }
     { float>bignum bignum }
 
     { >float float }
-    { fixnum>float float }
     { bignum>float float }
 
     { >integer integer }
 } [
     '[ _ swap interval>> <class/interval-info> ] "outputs" set-word-prop
+] assoc-each
+
+! For these we limit the outputted interval
+{
+    { fixnum>bignum bignum }
+    { fixnum>float float }
+} [
+    '[
+        _ swap interval>> fixnum-interval interval-intersect
+        <class/interval-info>
+    ] "outputs" set-word-prop
 ] assoc-each
 
 {

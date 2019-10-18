@@ -1,20 +1,16 @@
 ! Copyright (C) 2009, 2011 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors assocs combinators combinators.short-circuit
-dlists deques kernel locals math math.order sequences
-sets vectors fry splitting compiler.cfg.def-use compiler.cfg
-compiler.cfg.rpo compiler.cfg.predecessors compiler.cfg.renaming
-compiler.cfg.instructions compiler.cfg.utilities ;
-FROM: namespaces => get set ;
+USING: accessors arrays combinators combinators.short-circuit
+compiler.cfg compiler.cfg.instructions compiler.cfg.predecessors
+compiler.cfg.renaming compiler.cfg.rpo compiler.cfg.utilities
+deques dlists fry kernel locals math namespaces sequences sets
+vectors ;
 IN: compiler.cfg.branch-splitting
 
 : clone-instructions ( insns -- insns' )
     [ clone dup rename-insn-temps ] map ;
 
 : clone-basic-block ( bb -- bb' )
-    ! The new block temporarily gets the same RPO number as the
-    ! old one, until the next time RPO is computed. This is just
-    ! to make 'back-edge?' work.
     <basic-block>
         swap
         {
@@ -52,7 +48,7 @@ IN: compiler.cfg.branch-splitting
     [ update-successor-predecessors ]
     2bi ;
 
-UNION: irrelevant ##peek ##replace ##inc-d ##inc-r ;
+UNION: irrelevant ##peek ##replace ##inc ;
 
 : split-instructions? ( insns -- ? ) [ irrelevant? not ] count 5 <= ;
 
@@ -89,19 +85,21 @@ SYMBOL: visited
     [ worklist get push-front ] [ drop ] if ;
 
 : init-worklist ( cfg -- )
-    <dlist> worklist set
-    HS{ } clone visited set
+    <dlist> worklist namespaces:set
+    HS{ } clone visited namespaces:set
     entry>> add-to-worklist ;
 
-: split-branches ( cfg -- cfg' )
-    needs-predecessors
-    dup init-worklist
-    ! For back-edge?
-    dup post-order drop
-
-    worklist get [
-        dup split-branch? [ dup split-branch ] when
-        successors>> [ add-to-worklist ] each
-    ] slurp-deque
-
-    cfg-changed ;
+: split-branches ( cfg -- )
+    {
+        [ needs-predecessors ]
+        [ init-worklist ]
+        [
+            ! For back-edge?
+            post-order drop
+            worklist get [
+                dup split-branch? [ dup split-branch ] when
+                successors>> [ add-to-worklist ] each
+            ] slurp-deque
+        ]
+        [ cfg-changed ]
+    } cleave ;

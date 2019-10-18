@@ -5,7 +5,6 @@ USING: arrays ascii assocs combinators fry kernel lexer locals
 math math.bitwise math.combinatorics math.order math.statistics
 poker.arrays random sequences sequences.extras
 sequences.product splitting strings ;
-FROM: sequences => change-nth ;
 IN: poker
 
 ! The algorithm used is based on Cactus Kev's Poker Hand Evaluator with
@@ -32,25 +31,6 @@ IN: poker
 ! b = bit turned on depending on rank of card
 ! x = bit turned off, not used
 
-CONSTANT: CLUB     8
-CONSTANT: DIAMOND  4
-CONSTANT: HEART    2
-CONSTANT: SPADE    1
-
-CONSTANT: DEUCE  0
-CONSTANT: TREY   1
-CONSTANT: FOUR   2
-CONSTANT: FIVE   3
-CONSTANT: SIX    4
-CONSTANT: SEVEN  5
-CONSTANT: EIGHT  6
-CONSTANT: NINE   7
-CONSTANT: TEN    8
-CONSTANT: JACK   9
-CONSTANT: QUEEN  10
-CONSTANT: KING   11
-CONSTANT: ACE    12
-
 CONSTANT: STRAIGHT_FLUSH   0
 CONSTANT: FOUR_OF_A_KIND   1
 CONSTANT: FULL_HOUSE       2
@@ -61,43 +41,24 @@ CONSTANT: TWO_PAIR         6
 CONSTANT: ONE_PAIR         7
 CONSTANT: HIGH_CARD        8
 
-CONSTANT: SUIT_STR { "C" "D" "H" "S" }
+CONSTANT: SUITS { "C" "D" "H" "S" }
 
-CONSTANT: RANK_STR { "2" "3" "4" "5" "6" "7" "8" "9" "T" "J" "Q" "K" "A" }
+CONSTANT: RANKS { "2" "3" "4" "5" "6" "7" "8" "9" "T" "J" "Q" "K" "A" }
 
-CONSTANT: VALUE_STR { "Straight Flush" "Four of a Kind" "Full House" "Flush"
+CONSTANT: VALUES { "Straight Flush" "Four of a Kind" "Full House" "Flush"
     "Straight" "Three of a Kind" "Two Pair" "One Pair" "High Card" }
 
-: card-rank-prime ( rank -- n )
-    RANK_STR index { 2 3 5 7 11 13 17 19 23 29 31 37 41 } nth ;
+: card-suit ( suit -- n )
+    SUITS index 3 swap - 2^ ;
 
 : card-rank ( rank -- n )
-    {
-        { "2" [ DEUCE ] }
-        { "3" [ TREY  ] }
-        { "4" [ FOUR  ] }
-        { "5" [ FIVE  ] }
-        { "6" [ SIX   ] }
-        { "7" [ SEVEN ] }
-        { "8" [ EIGHT ] }
-        { "9" [ NINE  ] }
-        { "T" [ TEN   ] }
-        { "J" [ JACK  ] }
-        { "Q" [ QUEEN ] }
-        { "K" [ KING  ] }
-        { "A" [ ACE   ] }
-    } case ;
+    RANKS index ;
 
-: card-suit ( suit -- n )
-    {
-        { "C" [ CLUB    ] }
-        { "D" [ DIAMOND ] }
-        { "H" [ HEART   ] }
-        { "S" [ SPADE   ] }
-    } case ;
+: card-rank-prime ( rank -- n )
+    card-rank { 2 3 5 7 11 13 17 19 23 29 31 37 41 } nth ;
 
 : card-rank-bit ( rank -- n )
-    RANK_STR index 1 swap shift ;
+    card-rank 2^ ;
 
 : card-bitfield ( rank rank suit rank -- n )
     {
@@ -110,10 +71,11 @@ CONSTANT: VALUE_STR { "Straight Flush" "Four of a Kind" "Full House" "Flush"
 :: (>ckf) ( rank suit -- n )
     rank rank suit rank card-bitfield ;
 
-#! Cactus Kev Format
+! Cactus Kev Format
 GENERIC: >ckf ( string -- n )
 
 M: string >ckf >upper 1 cut (>ckf) ;
+
 M: integer >ckf ;
 
 : parse-cards ( string -- seq )
@@ -132,8 +94,8 @@ M: integer >ckf ;
     [ 0xFF bitand ] map-product ;
 
 : perfect-hash-find ( q -- value )
-    #! magic to convert a hand's unique identifying bits to the
-    #! proper index for fast lookup in a table of hand values
+    ! magic to convert a hand's unique identifying bits to the
+    ! proper index for fast lookup in a table of hand values
     0xE91AAA35 +
     dup -16 shift bitxor
     dup   8 shift w+
@@ -143,14 +105,18 @@ M: integer >ckf ;
     bitxor values-table nth ;
 
 : hand-value ( cards -- value )
-    dup flush? [ flushes-table lookup ] [
-        dup unique5-table lookup dup 0 > [ nip ] [
+    dup flush? [
+        flushes-table lookup
+    ] [
+        dup unique5-table lookup dup 0 > [
+            nip
+        ] [
             drop prime-bits perfect-hash-find
         ] if
     ] if ;
 
 : >card-rank ( card -- string )
-    -8 shift 0xF bitand RANK_STR nth ;
+    -8 shift 0xF bitand RANKS nth ;
 
 : >card-suit ( card -- string )
     {
@@ -179,7 +145,7 @@ M: integer >ckf ;
 PRIVATE>
 
 : <deck> ( -- deck )
-    RANK_STR SUIT_STR 2array
+    RANKS SUITS 2array
     [ concat >ckf ] V{ } product-map-as randomize ;
 
 : best-holdem-hand ( hand -- n cards )
@@ -187,7 +153,7 @@ PRIVATE>
     infimum first2 ;
 
 : value>string ( n -- string )
-    value>rank VALUE_STR nth ;
+    value>rank VALUES nth ;
 
 : hand>card-names ( hand -- string )
     [ card>string ] map ;
@@ -239,8 +205,7 @@ ERROR: no-card card deck ;
 ERROR: bad-suit-symbol ch ;
 
 : symbol>suit ( ch -- ch' )
-    ch>upper
-    H{
+    ch>upper H{
         { CHAR: ♠ CHAR: S }
         { CHAR: ♦ CHAR: D }
         { CHAR: ♥ CHAR: H }
@@ -255,7 +220,7 @@ ERROR: bad-suit-symbol ch ;
     1 over [ symbol>suit ] change-nth >ckf ;
 
 : value>hand-name ( value -- string )
-    value>rank VALUE_STR nth ;
+    value>rank VALUES nth ;
 
 : string>hand-name ( string -- string' )
     string>value value>hand-name ;

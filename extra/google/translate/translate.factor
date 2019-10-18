@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs combinators fry grouping http.client io
-io.encodings.binary io.files io.files.unique json.reader kernel
-locals make namespaces sequences urls ;
+io.encodings.binary io.files io.files.temp io.files.unique
+json.reader kernel locals make namespaces sequences urls ;
 IN: google.translate
 
 CONSTANT: google-translate-url "http://ajax.googleapis.com/ajax/services/language/translate"
@@ -18,10 +18,10 @@ CONSTANT: maximum-translation-size 5120
 : assoc>query-response ( assoc -- response )
     google-translate-url http-post nip ;
 
-ERROR: response-error response error ;
+TUPLE: response-error response error ;
 
 : throw-response-error ( response -- * )
-    "responseDetails" over at response-error ;
+    [ ] [ "responseDetails" of ] bi response-error boa throw ;
 
 : check-response ( response -- response )
     "responseStatus" over at {
@@ -53,8 +53,9 @@ ERROR: response-error response error ;
 
 : translate-tts ( text -- file )
     "http://translate.google.com/translate_tts?tl=en" >url
-    swap "q" set-query-param "" ".mp3" make-unique-file
-    [ download-to ] keep ;
+    swap "q" set-query-param [
+        "" ".mp3" unique-file [ download-to ] keep
+    ] with-temp-directory ;
 
 ! Example:
 ! "dog" "en" "de" translate .

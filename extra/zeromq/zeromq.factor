@@ -1,16 +1,15 @@
 ! Copyright (C) 2011-2013 Eungju PARK, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-
 USING: accessors alien.c-types alien.data arrays byte-arrays
-classes.struct combinators continuations destructors fry io
-kernel libc math namespaces sequences zeromq.ffi ;
+classes.struct combinators destructors fry kernel libc math math.order
+memoize sequences zeromq.ffi ;
 
 IN: zeromq
 
-ERROR: zmq-error n string ;
+TUPLE: zmq-error n string ;
 
 : throw-zmq-error ( -- )
-    zmq_errno dup zmq_strerror zmq-error ; inline
+    zmq_errno dup zmq_strerror zmq-error boa throw ; inline
 
 : check-zmq-error ( retval -- )
     [ throw-zmq-error ] unless-zero ; inline
@@ -18,13 +17,30 @@ ERROR: zmq-error n string ;
 : zmq-version ( -- version )
     { int int int } [ zmq_version ] with-out-parameters 3array ;
 
-GENERIC# zmq-setopt 2 ( obj name value -- )
-GENERIC# zmq-getopt 1 ( obj name -- value )
+: zmq-version-numeric ( -- n )
+    zmq-version first3 [ 100 * ] [ 10 * ] [ 1 * ] tri* + + ;
+
+! See
+! https://github.com/chuckremes/ffi-rzmq-core/blob/master/lib/ffi-rzmq-core/structures.rb
+MEMO: zmq-msg-size ( -- x )
+    zmq-version-numeric 410 <=> {
+        { +lt+ [ 32 ] }
+        { +eq+ [ 48 ] }
+        { +gt+ [ 64 ] }
+    } case ;
+
+! This word should be used to allocate the zmq_msg_t struct because
+! the size of it varies between versions.
+: <zmq_msg_t> ( -- byte-array )
+    zmq-msg-size (byte-array) ;
+
+GENERIC#: zmq-setopt 2 ( obj name value -- )
+GENERIC#: zmq-getopt 1 ( obj name -- value )
 
 TUPLE: zmq-message underlying ;
 
 : <zmq-message> ( -- msg )
-    zmq_msg_t <struct>
+    <zmq_msg_t>
     [ zmq_msg_init check-zmq-error ]
     [ zmq-message boa ] bi ;
 
@@ -32,7 +48,7 @@ M: zmq-message dispose
     underlying>> zmq_msg_close check-zmq-error ;
 
 : byte-array>zmq-message ( byte-array -- msg )
-    zmq_msg_t <struct>
+    <zmq_msg_t>
     [ over length zmq_msg_init_size check-zmq-error ]
     [ zmq_msg_data swap dup length memcpy ]
     [ zmq-message boa ] tri ;

@@ -1,81 +1,61 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math sequences kernel namespaces accessors biassocs compiler.cfg
-compiler.cfg.instructions compiler.cfg.registers compiler.cfg.hats
-compiler.cfg.predecessors compiler.cfg.stacks.local
-compiler.cfg.stacks.height compiler.cfg.stacks.global
-compiler.cfg.stacks.finalize ;
+USING: accessors biassocs compiler.cfg.registers
+compiler.cfg.stacks.finalize compiler.cfg.stacks.global
+compiler.cfg.stacks.local compiler.cfg.utilities kernel math
+namespaces sequences ;
 IN: compiler.cfg.stacks
 
 : begin-stack-analysis ( -- )
     <bihash> locs>vregs set
-    H{ } clone ds-heights set
-    H{ } clone rs-heights set
-    H{ } clone peek-sets set
-    H{ } clone replace-sets set
-    H{ } clone kill-sets set
-    current-height new current-height set ;
+    0 0 0 0 height-state boa height-state set ;
 
-: end-stack-analysis ( -- )
-    cfg get
-    compute-global-sets
-    finalize-stack-shuffling
-    drop ;
+: end-stack-analysis ( cfg -- )
+    {
+        compute-anticip-sets
+        compute-live-sets
+        compute-pending-sets
+        compute-dead-sets
+        compute-avail-sets
+        finalize-stack-shuffling
+    } apply-passes ;
 
-: ds-drop ( -- ) -1 inc-d ;
+: create-locs ( loc-class seq -- locs )
+    [ [ new ] dip >>n ] with map <reversed> ;
 
-: ds-peek ( -- vreg ) D 0 peek-loc ;
+: stack-locs ( loc-class n -- locs )
+    <iota> create-locs ;
+
+: (load-vregs) ( n loc-class -- vregs )
+    swap stack-locs [ peek-loc ] map ;
+
+: load-vregs ( n loc-class -- vregs )
+    [ (load-vregs) ] [ new swap neg >>n inc-stack ] 2bi ;
+
+: store-vregs ( vregs loc-class -- )
+    over length stack-locs [ replace-loc ] 2each ;
+
+! Utility
+: ds-drop ( -- ) D: -1 inc-stack ;
+
+: ds-peek ( -- vreg ) D: 0 peek-loc ;
 
 : ds-pop ( -- vreg ) ds-peek ds-drop ;
 
-: ds-push ( vreg -- ) 1 inc-d D 0 replace-loc ;
-
-: ds-load ( n -- vregs )
-    dup 0 =
-    [ drop f ]
-    [ [ iota <reversed> [ <ds-loc> peek-loc ] map ] [ neg inc-d ] bi ] if ;
-
-: ds-store ( vregs -- )
-    [
-        <reversed>
-        [ length inc-d ]
-        [ [ <ds-loc> replace-loc ] each-index ] bi
-    ] unless-empty ;
-
-: rs-drop ( -- ) -1 inc-r ;
-
-: rs-load ( n -- vregs )
-    dup 0 =
-    [ drop f ]
-    [ [ <reversed> [ <rs-loc> peek-loc ] map ] [ neg inc-r ] bi ] if ;
-
-: rs-store ( vregs -- )
-    [
-        <reversed>
-        [ length inc-r ]
-        [ [ <rs-loc> replace-loc ] each-index ] bi
-    ] unless-empty ;
+: ds-push ( vreg -- )
+    D: 1 inc-stack D: 0 replace-loc ;
 
 : (2inputs) ( -- vreg1 vreg2 )
-    D 1 peek-loc D 0 peek-loc ;
+    2 ds-loc (load-vregs) first2 ;
 
 : 2inputs ( -- vreg1 vreg2 )
-    (2inputs) -2 inc-d ;
-
-: (3inputs) ( -- vreg1 vreg2 vreg3 )
-    D 2 peek-loc D 1 peek-loc D 0 peek-loc ;
+    2 ds-loc load-vregs first2 ;
 
 : 3inputs ( -- vreg1 vreg2 vreg3 )
-    (3inputs) -3 inc-d ;
+    3 ds-loc load-vregs first3 ;
 
 : binary-op ( quot -- )
     [ 2inputs ] dip call ds-push ; inline
 
 : unary-op ( quot -- )
     [ ds-pop ] dip call ds-push ; inline
-
-! adjust-d/adjust-r: these are called when other instructions which
-! internally adjust the stack height are emitted, such as ##call and
-! ##alien-invoke
-: adjust-d ( n -- ) current-height get [ + ] change-d drop ;
-: adjust-r ( n -- ) current-height get [ + ] change-r drop ;

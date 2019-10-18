@@ -1,10 +1,10 @@
-! (c)Joe Groff bsd license
-USING: accessors arrays classes classes.tuple combinators
-combinators.short-circuit definitions effects fry generalizations
-hints math kernel kernel.private namespaces parser quotations
-sequences slots words locals effects.parser
-locals.parser macros stack-checker.dependencies
-classes.maybe classes.algebra ;
+! Copyright (C) 2009, 2010, 2011 Joe Groff, Slava Pestov, Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors arrays classes classes.algebra classes.tuple
+combinators combinators.short-circuit definitions effects
+effects.parser fry generalizations kernel kernel.private locals
+locals.parser macros quotations sequences slots
+stack-checker.dependencies words ;
 FROM: classes.tuple.private => tuple-layout ;
 IN: typed
 
@@ -98,7 +98,7 @@ DEFER: make-boxer
 ! defining typed words
 
 MACRO: (typed) ( word def effect -- quot )
-    [ swap ] dip
+    swapd
     [
         nip effect-in-types swap
         [ [ unboxed-types ] [ make-boxer ] bi ] dip
@@ -139,11 +139,15 @@ MACRO: typed ( quot word effect -- quot' )
     [ drop [ swap "typed-word" set-word-prop ] [ [ 1quotation ] dip ] 2bi ] dip
     [ typed ] 3curry ;
 
-: typed-def ( word def effect -- quot )
-    dup {
+: typed-def? ( effect -- quot )
+    {
         [ effect-in-types typed-stack-effect? ]
         [ effect-out-types typed-stack-effect? ]
-    } 1|| [ (typed-def) ] [ nip no-types-specified ] if ;
+    } 1|| ;
+
+: typed-def ( word def effect -- quot )
+    dup typed-def?
+    [ (typed-def) ] [ nip no-types-specified ] if ;
 
 M: typed-word subwords
     [ call-next-method ]

@@ -1,16 +1,18 @@
 ! Copyright (C) 2008 Doug Coleman, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.syntax arrays byte-arrays fry images
-images.normalization images.viewer kernel math math.vectors
-models namespaces opengl opengl.gl sequences ui ui.gadgets
-ui.gadgets.worlds ;
+USING: accessors byte-arrays images images.normalization
+images.viewer kernel math namespaces opengl opengl.gl sequences
+ui ui.backend ui.gadgets.worlds ;
 IN: cap
+
+<PRIVATE
 
 : screenshot-array ( world -- byte-array )
     dim>> [ first 4 * ] [ second ] bi
     [ gl-scale ] bi@ * >fixnum <byte-array> ;
 
 : gl-screenshot ( gadget -- byte-array )
+    [ find-gl-context ]
     [
         [
             GL_BACK glReadBuffer
@@ -20,11 +22,15 @@ IN: cap
         dim>> first2 [ gl-scale >fixnum ] bi@
         GL_RGBA GL_UNSIGNED_BYTE
     ]
-    [ screenshot-array ] bi
+    [ screenshot-array ] tri
     [ glReadPixels ] keep ;
 
+PRIVATE>
+
 : screenshot ( window -- bitmap )
-    [ <image> t >>2x? ] dip
+    [ <image>
+        gl-scale-factor get-global [ 2.0 = >>2x? ] when*
+    ] dip
     [ gl-screenshot >>bitmap ]
     [ dim>> [ gl-scale >fixnum ] map >>dim ] bi
     ubyte-components >>component-type
@@ -33,4 +39,4 @@ IN: cap
     normalize-image ;
 
 : screenshot. ( window -- )
-    [ screenshot <image-gadget> ] [ title>> ] bi open-window ; 
+    [ screenshot <image-gadget> ] [ title>> ] bi open-window ;

@@ -14,7 +14,7 @@ TUPLE: promise mailbox ;
 ERROR: promise-already-fulfilled promise ;
 
 : fulfill ( value promise -- )
-    dup promise-fulfilled? [ 
+    dup promise-fulfilled? [
         promise-already-fulfilled
     ] [
         mailbox>> mailbox-put

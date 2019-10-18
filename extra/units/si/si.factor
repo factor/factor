@@ -57,6 +57,7 @@ IN: units.si
 : T ( n -- tesla ) { kg } { s s A } <dimensioned> ;
 : H ( n -- henry ) { m m kg } { s s A A } <dimensioned> ;
 : deg-C ( n -- Celsius ) 27315/100 + { K } { } <dimensioned> ;
+ALIAS: °C deg-C
 : lm ( n -- lumen ) { m m cd } { m m } <dimensioned> ;
 : lx ( n -- lux ) { m m cd } { m m m m  } <dimensioned> ;
 : Bq ( n -- becquerel ) { } { s } <dimensioned> ;
@@ -73,7 +74,7 @@ IN: units.si
 : Np ( n -- neper ) { } { } <dimensioned> ;
 : B ( n -- bel ) 1.151292546497023 * Np ;
 : eV ( n -- electronvolt ) 1.60218e-19 * J ;
-: u ( n -- unified-atomic-mass-unit ) 1.66054e-27 * kg ;
+: u ( n -- unified-atomic-mass-unit ) 1.660539040e-27 * kg ;
 
 ! au has error of 30m, according to wikipedia
 : au ( n -- astronomical-unit ) 149597870691 * m ;

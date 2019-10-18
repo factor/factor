@@ -111,7 +111,7 @@ M: unix stat>type ( stat -- type )
     [ dup stat-mode ] 2dip
     [ bitor ] [ unmask ] if [ chmod ] unix-system-call drop ;
 
-GENERIC# file-mode? 1 ( obj mask -- ? )
+GENERIC#: file-mode? 1 ( obj mask -- ? )
 
 M: integer file-mode? mask? ;
 M: string file-mode? [ stat-mode ] dip mask? ;
@@ -197,7 +197,7 @@ CONSTANT: ALL-EXECUTE   0o0000111
 PRIVATE>
 
 : set-file-times ( path timestamps -- )
-    #! set access, write
+    ! set access, write
     [ normalize-path ] dip
     timestamps>byte-array [ utimes ] unix-system-call drop ;
 
@@ -288,7 +288,7 @@ PRIVATE>
 
 : access? ( path mode -- ? )
     [ normalize-path ] [ access ] bi* 0 < [
-        errno EACCES = [ f ] [ (io-error) ] if
+        errno EACCES = [ f ] [ throw-errno ] if
     ] [ t ] if ;
 
 PRIVATE>

@@ -1,9 +1,9 @@
 ! Copyright (C) 2009, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs fry functors generic.parser
-kernel lexer namespaces parser sequences slots words sets
-compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.instructions.syntax ;
+USING: accessors arrays assocs compiler.cfg.def-use
+compiler.cfg.instructions compiler.cfg.instructions.syntax fry
+functors generic.parser kernel lexer namespaces parser sequences
+sets slots words ;
 IN: compiler.cfg.renaming.functor
 
 ! Like compiler.cfg.def-use, but for changing operands
@@ -12,7 +12,7 @@ IN: compiler.cfg.renaming.functor
     '[ [ _ ] dip changer-word [ ] 2sequence ] map [ ] join
     [ drop ] append ;
 
-FUNCTOR: define-renaming ( NAME DEF-QUOT USE-QUOT TEMP-QUOT -- )
+<FUNCTOR: define-renaming ( NAME DEF-QUOT USE-QUOT TEMP-QUOT -- )
 
 rename-insn-defs DEFINES ${NAME}-insn-defs
 rename-insn-uses DEFINES ${NAME}-insn-uses
@@ -65,24 +65,24 @@ M: ##callback-outputs rename-insn-uses
     drop ;
 
 ! Generate methods for everything else
-insn-classes get special-vreg-insns diff [ insn-def-slots empty? not ] filter [
+insn-classes get special-vreg-insns diff [ insn-def-slots empty? ] reject [
     [ \ rename-insn-defs create-method-in ]
     [ insn-def-slots [ name>> ] map DEF-QUOT slot-change-quot ] bi
     define
 ] each
 
-insn-classes get special-vreg-insns diff [ insn-use-slots empty? not ] filter [
+insn-classes get special-vreg-insns diff [ insn-use-slots empty? ] reject [
     [ \ rename-insn-uses create-method-in ]
     [ insn-use-slots [ name>> ] map USE-QUOT slot-change-quot ] bi
     define
 ] each
 
-insn-classes get [ insn-temp-slots empty? not ] filter [
+insn-classes get [ insn-temp-slots empty? ] reject [
     [ \ rename-insn-temps create-method-in ]
     [ insn-temp-slots [ name>> ] map TEMP-QUOT slot-change-quot ] bi
     define
 ] each
 
-;FUNCTOR
+;FUNCTOR>
 
 SYNTAX: RENAMING: scan-token scan-object scan-object scan-object define-renaming ;

@@ -26,4 +26,3 @@ HELP: utf32
 { $see-also "encodings-introduction" } ;
 
 { utf32 utf32le utf32be } related-words
-

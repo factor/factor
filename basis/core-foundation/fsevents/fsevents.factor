@@ -1,32 +1,47 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.strings alien.syntax
-kernel math sequences namespaces make assocs init accessors
-continuations combinators io.encodings.utf8 destructors locals
-arrays specialized-arrays classes.struct core-foundation
-core-foundation.arrays core-foundation.run-loop
-core-foundation.strings core-foundation.time unix.types ;
-FROM: namespaces => change-global ;
+USING: accessors alien alien.c-types alien.data alien.strings
+alien.syntax arrays assocs classes.struct combinators
+core-foundation core-foundation.arrays core-foundation.run-loop
+core-foundation.strings core-foundation.time destructors init
+io.encodings.utf8 kernel locals namespaces sequences
+specialized-arrays unix.types ;
 IN: core-foundation.fsevents
 
 SPECIALIZED-ARRAY: void*
-SPECIALIZED-ARRAY: int
-SPECIALIZED-ARRAY: longlong
+SPECIALIZED-ARRAY: uint
+SPECIALIZED-ARRAY: ulonglong
 
-CONSTANT: kFSEventStreamCreateFlagUseCFTypes 2
-CONSTANT: kFSEventStreamCreateFlagWatchRoot 4
+CONSTANT: kFSEventStreamCreateFlagNone 0x00000000
+CONSTANT: kFSEventStreamCreateFlagUseCFTypes 0x00000001
+CONSTANT: kFSEventStreamCreateFlagNoDefer 0x00000002
+CONSTANT: kFSEventStreamCreateFlagWatchRoot 0x00000004
+CONSTANT: kFSEventStreamCreateFlagIgnoreSelf 0x00000008
+CONSTANT: kFSEventStreamCreateFlagFileEvents 0x00000010
 
-CONSTANT: kFSEventStreamEventFlagMustScanSubDirs 1
-CONSTANT: kFSEventStreamEventFlagUserDropped 2
-CONSTANT: kFSEventStreamEventFlagKernelDropped 4
-CONSTANT: kFSEventStreamEventFlagEventIdsWrapped 8
-CONSTANT: kFSEventStreamEventFlagHistoryDone 16
-CONSTANT: kFSEventStreamEventFlagRootChanged 32
-CONSTANT: kFSEventStreamEventFlagMount 64
-CONSTANT: kFSEventStreamEventFlagUnmount 128
+CONSTANT: kFSEventStreamEventFlagMustScanSubDirs 0x00000001
+CONSTANT: kFSEventStreamEventFlagUserDropped 0x00000002
+CONSTANT: kFSEventStreamEventFlagKernelDropped 0x00000004
+CONSTANT: kFSEventStreamEventFlagEventIdsWrapped 0x00000008
+CONSTANT: kFSEventStreamEventFlagHistoryDone 0x00000010
+CONSTANT: kFSEventStreamEventFlagRootChanged 0x00000020
+CONSTANT: kFSEventStreamEventFlagMount 0x00000040
+CONSTANT: kFSEventStreamEventFlagUnmount 0x00000080
 
-TYPEDEF: int FSEventStreamCreateFlags
-TYPEDEF: int FSEventStreamEventFlags
+CONSTANT: kFSEventStreamEventFlagItemCreated 0x00000100
+CONSTANT: kFSEventStreamEventFlagItemRemoved 0x00000200
+CONSTANT: kFSEventStreamEventFlagItemInodeMetaMod 0x00000400
+CONSTANT: kFSEventStreamEventFlagItemRenamed 0x00000800
+CONSTANT: kFSEventStreamEventFlagItemModified 0x00001000
+CONSTANT: kFSEventStreamEventFlagItemFinderInfoMod 0x00002000
+CONSTANT: kFSEventStreamEventFlagItemChangeOwner 0x00004000
+CONSTANT: kFSEventStreamEventFlagItemXattrMod 0x00008000
+CONSTANT: kFSEventStreamEventFlagItemIsFile 0x00010000
+CONSTANT: kFSEventStreamEventFlagItemIsDir 0x00020000
+CONSTANT: kFSEventStreamEventFlagItemIsSymlink 0x00040000
+
+TYPEDEF: uint FSEventStreamCreateFlags
+TYPEDEF: uint FSEventStreamEventFlags
 TYPEDEF: ulonglong FSEventStreamEventId
 TYPEDEF: void* FSEventStreamRef
 
@@ -37,7 +52,7 @@ STRUCT: FSEventStreamContext
     { release void* }
     { copyDescription void* } ;
 
-CALLBACK: void FSEventStreamCallback ( FSEventStreamRef streamRef, void* clientCallBackInfo, size_t numEvents, void* eventPaths, FSEventStreamEventFlags* eventFlags, FSEventStreamEventId* eventIds ) ;
+CALLBACK: void FSEventStreamCallback ( FSEventStreamRef streamRef, void* clientCallBackInfo, size_t numEvents, void* eventPaths, FSEventStreamEventFlags* eventFlags, FSEventStreamEventId* eventIds )
 
 CONSTANT: FSEventStreamEventIdSinceNow 0xFFFFFFFFFFFFFFFF
 
@@ -48,7 +63,7 @@ FUNCTION: FSEventStreamRef FSEventStreamCreate (
     CFArrayRef               pathsToWatch,
     FSEventStreamEventId     sinceWhen,
     CFTimeInterval           latency,
-    FSEventStreamCreateFlags flags ) ;
+    FSEventStreamCreateFlags flags )
 
 FUNCTION: FSEventStreamRef FSEventStreamCreateRelativeToDevice (
     CFAllocatorRef           allocator,
@@ -58,53 +73,53 @@ FUNCTION: FSEventStreamRef FSEventStreamCreateRelativeToDevice (
     CFArrayRef               pathsToWatchRelativeToDevice,
     FSEventStreamEventId     sinceWhen,
     CFTimeInterval           latency,
-    FSEventStreamCreateFlags flags ) ;
+    FSEventStreamCreateFlags flags )
 
-FUNCTION: FSEventStreamEventId FSEventStreamGetLatestEventId ( FSEventStreamRef streamRef ) ;
+FUNCTION: FSEventStreamEventId FSEventStreamGetLatestEventId ( FSEventStreamRef streamRef )
 
-FUNCTION: dev_t FSEventStreamGetDeviceBeingWatched ( FSEventStreamRef streamRef ) ;
+FUNCTION: dev_t FSEventStreamGetDeviceBeingWatched ( FSEventStreamRef streamRef )
 
-FUNCTION: CFArrayRef FSEventStreamCopyPathsBeingWatched ( FSEventStreamRef streamRef ) ;
+FUNCTION: CFArrayRef FSEventStreamCopyPathsBeingWatched ( FSEventStreamRef streamRef )
 
-FUNCTION: FSEventStreamEventId FSEventsGetCurrentEventId ( ) ;
+FUNCTION: FSEventStreamEventId FSEventsGetCurrentEventId ( )
 
-FUNCTION: CFUUIDRef FSEventsCopyUUIDForDevice ( dev_t dev ) ;
+FUNCTION: CFUUIDRef FSEventsCopyUUIDForDevice ( dev_t dev )
 
 FUNCTION: FSEventStreamEventId FSEventsGetLastEventIdForDeviceBeforeTime (
     dev_t          dev,
-    CFAbsoluteTime time ) ;
+    CFAbsoluteTime time )
 
 FUNCTION: Boolean FSEventsPurgeEventsForDeviceUpToEventId (
     dev_t                dev,
-    FSEventStreamEventId eventId ) ;
+    FSEventStreamEventId eventId )
 
-FUNCTION: void FSEventStreamRetain ( FSEventStreamRef streamRef ) ;
+FUNCTION: void FSEventStreamRetain ( FSEventStreamRef streamRef )
 
-FUNCTION: void FSEventStreamRelease ( FSEventStreamRef streamRef ) ;
+FUNCTION: void FSEventStreamRelease ( FSEventStreamRef streamRef )
 
 FUNCTION: void FSEventStreamScheduleWithRunLoop (
     FSEventStreamRef streamRef,
     CFRunLoopRef     runLoop,
-    CFStringRef      runLoopMode ) ;
+    CFStringRef      runLoopMode )
 
 FUNCTION: void FSEventStreamUnscheduleFromRunLoop (
     FSEventStreamRef streamRef,
     CFRunLoopRef     runLoop,
-    CFStringRef      runLoopMode ) ;
+    CFStringRef      runLoopMode )
 
-FUNCTION: void FSEventStreamInvalidate ( FSEventStreamRef streamRef ) ;
+FUNCTION: void FSEventStreamInvalidate ( FSEventStreamRef streamRef )
 
-FUNCTION: Boolean FSEventStreamStart ( FSEventStreamRef streamRef ) ;
+FUNCTION: Boolean FSEventStreamStart ( FSEventStreamRef streamRef )
 
-FUNCTION: FSEventStreamEventId FSEventStreamFlushAsync ( FSEventStreamRef streamRef ) ;
+FUNCTION: FSEventStreamEventId FSEventStreamFlushAsync ( FSEventStreamRef streamRef )
 
-FUNCTION: void FSEventStreamFlushSync ( FSEventStreamRef streamRef ) ;
+FUNCTION: void FSEventStreamFlushSync ( FSEventStreamRef streamRef )
 
-FUNCTION: void FSEventStreamStop ( FSEventStreamRef streamRef ) ;
+FUNCTION: void FSEventStreamStop ( FSEventStreamRef streamRef )
 
-FUNCTION: void FSEventStreamShow ( FSEventStreamRef streamRef ) ;
+FUNCTION: void FSEventStreamShow ( FSEventStreamRef streamRef )
 
-FUNCTION: CFStringRef FSEventStreamCopyDescription ( FSEventStreamRef streamRef ) ;
+FUNCTION: CFStringRef FSEventStreamCopyDescription ( FSEventStreamRef streamRef )
 
 : make-FSEventStreamContext ( info -- alien )
     FSEventStreamContext <struct>
@@ -154,7 +169,7 @@ SYMBOL: event-stream-callbacks
 
 [
     event-stream-callbacks
-    [ [ drop expired? not ] assoc-filter H{ } assoc-like ] change-global
+    [ [ drop expired? ] H{ } assoc-reject-as ] change-global
 ] "core-foundation" add-startup-hook
 
 : add-event-source-callback ( quot -- id )
@@ -166,8 +181,8 @@ SYMBOL: event-stream-callbacks
 
 :: (master-event-source-callback) ( eventStream info numEvents eventPaths eventFlags eventIds -- )
     eventPaths numEvents void* <c-direct-array> [ utf8 alien>string ] { } map-as
-    eventFlags numEvents int <c-direct-array>
-    eventIds numEvents longlong <c-direct-array>
+    eventFlags numEvents uint <c-direct-array>
+    eventIds numEvents ulonglong <c-direct-array>
     3array flip
     info event-stream-callbacks get at [ drop ] or call( changes -- ) ;
 

@@ -1,35 +1,38 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors assocs combinators cpu.architecture fry
-heaps kernel math math.order namespaces layouts sequences vectors
-linked-assocs compiler.cfg compiler.cfg.registers
-compiler.cfg.instructions
-compiler.cfg.linear-scan.live-intervals ;
-FROM: assocs => change-at ;
+USING: accessors arrays assocs combinators compiler.cfg
+compiler.cfg.instructions compiler.cfg.linear-scan.live-intervals
+compiler.cfg.linear-scan.ranges compiler.cfg.registers cpu.architecture fry
+heaps kernel math math.order namespaces sequences ;
 IN: compiler.cfg.linear-scan.allocation.state
 
-! Start index of current live interval. We ensure that all
-! live intervals added to the unhandled set have a start index
-! strictly greater than this one. This ensures that we can catch
-! infinite loop situations. We also ensure that all live
-! intervals added to the handled set have an end index strictly
-! smaller than this one. This helps catch bugs.
 SYMBOL: progress
 
 : check-unhandled ( live-interval -- )
-    start>> progress get <= [ "check-unhandled" throw ] when ; inline
+    live-interval-start progress get <= [ "check-unhandled" throw ] when ; inline
 
 : check-handled ( live-interval -- )
-    end>> progress get > [ "check-handled" throw ] when ; inline
+    live-interval-end progress get > [ "check-handled" throw ] when ; inline
 
-! Mapping from register classes to sequences of machine registers
+SYMBOL: unhandled-min-heap
+
+GENERIC: interval/sync-point-key ( interval/sync-point -- key )
+
+M: live-interval-state interval/sync-point-key
+    [ ranges>> ranges-endpoints ] [ vreg>> ] bi 3array ;
+
+M: sync-point interval/sync-point-key
+    n>> 1/0. 1/0. 3array ;
+
+: >unhandled-min-heap ( intervals/sync-points -- min-heap )
+    [ [ interval/sync-point-key ] keep 2array ] map >min-heap ;
+
 SYMBOL: registers
 
-! Vector of active live intervals
 SYMBOL: active-intervals
 
 : active-intervals-for ( live-interval -- seq )
-    reg-class>> active-intervals get at ;
+    interval-reg-class active-intervals get at ;
 
 : add-active ( live-interval -- )
     dup active-intervals-for push ;
@@ -40,11 +43,10 @@ SYMBOL: active-intervals
 : assign-free-register ( new registers -- )
     pop >>reg add-active ;
 
-! Vector of inactive live intervals
 SYMBOL: inactive-intervals
 
 : inactive-intervals-for ( live-interval -- seq )
-    reg-class>> inactive-intervals get at ;
+    interval-reg-class inactive-intervals get at ;
 
 : add-inactive ( live-interval -- )
     dup inactive-intervals-for push ;
@@ -52,13 +54,12 @@ SYMBOL: inactive-intervals
 : delete-inactive ( live-interval -- )
     dup inactive-intervals-for remove-eq! drop ;
 
-! Vector of handled live intervals
 SYMBOL: handled-intervals
 
 : add-handled ( live-interval -- )
     [ check-handled ] [ handled-intervals get push ] bi ;
 
-: finished? ( n live-interval -- ? ) end>> swap < ;
+: finished? ( n live-interval -- ? ) live-interval-end swap < ;
 
 : finish ( n live-interval -- keep? )
     nip add-handled f ;
@@ -87,10 +88,10 @@ ERROR: register-already-used live-interval ;
     ! symbol stores an alist mapping register classes to vectors
     [ get values ] dip '[ [ _ cond ] with filter! drop ] with each ; inline
 
+: covers? ( n live-interval -- ? )
+    ranges>> ranges-cover? ;
+
 : deactivate-intervals ( n -- )
-    ! Any active intervals which have ended are moved to handled
-    ! Any active intervals which cover the current position
-    ! are moved to inactive
     dup progress set
     active-intervals {
         { [ 2dup finished? ] [ finish ] }
@@ -99,74 +100,50 @@ ERROR: register-already-used live-interval ;
     } process-intervals ;
 
 : activate-intervals ( n -- )
-    ! Any inactive intervals which have ended are moved to handled
-    ! Any inactive intervals which do not cover the current position
-    ! are moved to active
     inactive-intervals {
         { [ 2dup finished? ] [ finish ] }
         { [ 2dup covers? ] [ activate ] }
         [ don't-change ]
     } process-intervals ;
 
-! Minheap of live intervals which still need a register allocation
-SYMBOL: unhandled-intervals
-
 : add-unhandled ( live-interval -- )
-    [ check-unhandled ]
-    [ dup start>> unhandled-intervals get heap-push ]
-    bi ;
+    dup check-unhandled
+    dup interval/sync-point-key unhandled-min-heap get heap-push ;
 
 : reg-class-assoc ( quot -- assoc )
     [ reg-classes ] dip { } map>assoc ; inline
 
-: next-spill-slot ( size -- spill-slot )
-    cfg get
-    [ swap [ align dup ] [ + ] bi ] change-spill-area-size drop
-    <spill-slot> ;
+: align-spill-area ( align stack-frame -- )
+    [ max ] change-spill-area-align drop ;
 
-: align-spill-area ( align -- )
-    cfg get [ max ] change-spill-area-align drop ;
+: next-spill-slot ( size stack-frame -- spill-slot )
+    [ swap [ align dup ] [ + ] bi ] change-spill-area-size drop <spill-slot> ;
 
-! Minheap of sync points which still need to be processed
-SYMBOL: unhandled-sync-points
-
-! Mapping from vregs to spill slots
 SYMBOL: spill-slots
 
 : assign-spill-slot ( coalesced-vreg rep -- spill-slot )
-    rep-size
-    [ align-spill-area ]
-    [ spill-slots get [ nip next-spill-slot ] 2cache ]
-    bi ;
+    rep-size spill-slots get [
+        nip cfg get stack-frame>>
+        [ align-spill-area ] [ next-spill-slot ] 2bi
+    ] 2cache ;
 
 : lookup-spill-slot ( coalesced-vreg rep -- spill-slot )
     rep-size 2array spill-slots get ?at [ ] [ bad-vreg ] if ;
 
-: init-allocator ( registers -- )
+: init-allocator ( intervals/sync-points registers -- )
     registers set
-    <min-heap> unhandled-intervals set
-    <min-heap> unhandled-sync-points set
+    >unhandled-min-heap unhandled-min-heap set
     [ V{ } clone ] reg-class-assoc active-intervals set
     [ V{ } clone ] reg-class-assoc inactive-intervals set
     V{ } clone handled-intervals set
-    cfg get 0 >>spill-area-size cell >>spill-area-align drop
     H{ } clone spill-slots set
     -1 progress set ;
 
-: init-unhandled ( live-intervals sync-points -- )
-    [ [ [ start>> ] keep ] { } map>assoc unhandled-intervals get heap-push-all ]
-    [ [ [ n>> ] keep ] { } map>assoc unhandled-sync-points get heap-push-all ]
-    bi* ;
-
-! A utility used by register-status and spill-status words
-: free-positions ( new -- assoc )
-    reg-class>> registers get at
-    [ 1/0. ] H{ } <linked-assoc> map>assoc ;
-
-: add-use-position ( n reg assoc -- ) [ [ min ] when* ] change-at ;
+: add-use-position ( n reg assoc -- )
+    [ [ min ] when* ] change-at ;
 
 : register-available? ( new result -- ? )
-    [ end>> ] [ second ] bi* < ; inline
+    [ live-interval-end ] [ second ] bi* < ; inline
 
 : register-available ( new result -- )
     first >>reg add-active ;

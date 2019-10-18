@@ -1,4 +1,5 @@
-! (c)2009 Joe Groff bsd license
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes classes.tuple fry kernel sequences slots ;
 IN: classes.tuple.change-tracking
 
@@ -20,4 +21,3 @@ M: change-tracking-tuple-class writer-quot ( class slot-spec -- quot )
     [ name>> "changed?" = [ '[ _ [ t >>changed? drop ] bi ] ] unless ] bi ;
 
 PRIVATE>
-

@@ -49,50 +49,53 @@ CONSTANT: ALUT_WAVEFORM_IMPULSE 0x104
 CONSTANT: ALUT_LOADER_BUFFER 0x300
 CONSTANT: ALUT_LOADER_MEMORY 0x301
 
-FUNCTION: ALboolean alutInit ( int* argcp, c-string* argv ) ;
-FUNCTION: ALboolean alutInitWithoutContext ( int* argcp, c-string* argv ) ;
-FUNCTION: ALboolean alutExit ( ) ;
-FUNCTION: ALenum alutGetError ( ) ;
-FUNCTION: c-string alutGetErrorString ( ALenum error ) ;
-FUNCTION: ALuint alutCreateBufferFromFile ( c-string fileName ) ;
-FUNCTION: ALuint alutCreateBufferFromFileImage ( void* data, ALsizei length ) ;
-FUNCTION: ALuint alutCreateBufferHelloWorld ( ) ;
-FUNCTION: ALuint alutCreateBufferWaveform ( ALenum waveshape, ALfloat frequency, ALfloat phase, ALfloat duration ) ;
-FUNCTION: void* alutLoadMemoryFromFile ( c-string fileName, ALenum* format, ALsizei* size, ALfloat* frequency ) ;
-FUNCTION: void* alutLoadMemoryFromFileImage ( void* data, ALsizei length, ALenum* format, ALsizei* size, ALfloat* frequency ) ;
-FUNCTION: void* alutLoadMemoryHelloWorld ( ALenum* format, ALsizei* size, ALfloat* frequency ) ;
-FUNCTION: void* alutLoadMemoryWaveform ( ALenum waveshape, ALfloat frequency, ALfloat phase, ALfloat duration, ALenum* format, ALsizei* size, ALfloat* freq ) ;
-FUNCTION: c-string alutGetMIMETypes ( ALenum loader ) ;
-FUNCTION: ALint alutGetMajorVersion ( ) ;
-FUNCTION: ALint alutGetMinorVersion ( ) ;
-FUNCTION: ALboolean alutSleep ( ALfloat duration ) ;
+FUNCTION: ALboolean alutInit ( int* argcp, c-string* argv )
+FUNCTION: ALboolean alutInitWithoutContext ( int* argcp, c-string* argv )
+FUNCTION: ALboolean alutExit ( )
+FUNCTION: ALenum alutGetError ( )
+FUNCTION: c-string alutGetErrorString ( ALenum error )
+FUNCTION: ALuint alutCreateBufferFromFile ( c-string fileName )
+FUNCTION: ALuint alutCreateBufferFromFileImage ( void* data, ALsizei length )
+FUNCTION: ALuint alutCreateBufferHelloWorld ( )
+FUNCTION: ALuint alutCreateBufferWaveform ( ALenum waveshape, ALfloat frequency, ALfloat phase, ALfloat duration )
+FUNCTION: void* alutLoadMemoryFromFile ( c-string fileName, ALenum* format, ALsizei* size, ALfloat* frequency )
+FUNCTION: void* alutLoadMemoryFromFileImage ( void* data, ALsizei length, ALenum* format, ALsizei* size, ALfloat* frequency )
+FUNCTION: void* alutLoadMemoryHelloWorld ( ALenum* format, ALsizei* size, ALfloat* frequency )
+FUNCTION: void* alutLoadMemoryWaveform ( ALenum waveshape, ALfloat frequency, ALfloat phase, ALfloat duration, ALenum* format, ALsizei* size, ALfloat* freq )
+FUNCTION: c-string alutGetMIMETypes ( ALenum loader )
+FUNCTION: ALint alutGetMajorVersion ( )
+FUNCTION: ALint alutGetMinorVersion ( )
+FUNCTION: ALboolean alutSleep ( ALfloat duration )
 
-FUNCTION: void alutUnloadWAV ( ALenum format, void* data, ALsizei size, ALsizei frequency ) ;
+FUNCTION: void alutUnloadWAV ( ALenum format, void* data, ALsizei size, ALsizei frequency )
 
 SYMBOL: init
 
+: throw-alut-error ( -- )
+    alutGetError alutGetErrorString throw ;
+
 : init-openal ( -- )
     init get-global expired? [
-        f f alutInit 0 = [ "Could not initialize OpenAL" throw ] when
+        f f alutInit 0 = [ throw-alut-error ] when
         1337 <alien> init set-global
     ] when ;
 
 : exit-openal ( -- )
     init get-global expired? [
-        alutExit 0 = [ "Could not close OpenAL" throw ] when
+        alutExit 0 = [ throw-alut-error ] when
         f init set-global
     ] unless ;
 
 : create-buffer-from-file ( filename -- buffer )
     alutCreateBufferFromFile dup AL_NONE = [
-        "create-buffer-from-file failed" throw
+        throw-alut-error
     ] when ;
 
 os macosx? "openal.alut.macosx" "openal.alut.other" ? require
 
 : create-buffer-from-wav ( filename -- buffer )
     gen-buffer dup rot load-wav-file
-    [ alBufferData ] 4 nkeep alutUnloadWAV ;
+    [ alBufferData ] 4keep alutUnloadWAV ;
 
 : check-error ( -- )
     alGetError dup ALUT_ERROR_NO_ERROR = [
@@ -100,4 +103,3 @@ os macosx? "openal.alut.macosx" "openal.alut.other" ? require
     ] [
         alGetString throw
     ] if ;
-

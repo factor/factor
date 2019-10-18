@@ -1,8 +1,7 @@
 ! Copyright (C) 2009 Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data alien.syntax
-destructors kernel llvm.core llvm.engine llvm.jit llvm.wrappers
-;
+USING: accessors alien.c-types alien.data destructors kernel llvm.ffi
+llvm.wrappers ;
 
 IN: llvm.reader
 
@@ -16,6 +15,3 @@ IN: llvm.reader
 
 : load-module ( path -- module )
     <buffer> buffer>module ;
-
-: load-into-jit ( path name -- )
-    [ load-module ] dip add-module ;

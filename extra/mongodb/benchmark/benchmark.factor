@@ -26,7 +26,7 @@ TUPLE: result doc collection index batch lasterror ;
 : <result> ( -- ) result new result set ; inline
 
 
-CONSTANT: CHECK-KEY f 
+CONSTANT: CHECK-KEY f
 
 CONSTANT: DOC-SMALL H{ }
 
@@ -38,72 +38,72 @@ CONSTANT: DOC-MEDIUM H{ { "integer" 5 }
 
 CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
                        { "total_word_count" 6743 }
-                       { "access_time" f } 
+                       { "access_time" f }
                        { "meta_tags" H{ { "description" "i am a long description string" }
                                         { "author" "Holly Man" }
                                         { "dynamically_created_meta_tag" "who know\n what" } } }
                        { "page_structure" H{ { "counted_tags" 3450 }
                                              { "no_of_js_attached" 10 }
                                              { "no_of_images" 6 } } }
-                       { "harvested_words" { "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                       { "harvested_words" { "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo"
-                                             "10gen" "web" "open" "source" "application" "paas" 
-                                             "platform-as-a-service" "technology" "helps" 
+                                             "10gen" "web" "open" "source" "application" "paas"
+                                             "platform-as-a-service" "technology" "helps"
                                              "developers" "focus" "building" "mongodb" "mongo" } } }
 
 : set-doc ( name -- )
@@ -120,51 +120,51 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
 
 : small-doc-prepare ( -- quot: ( i -- doc ) )
     small-doc drop
-    '[ "x" DOC-SMALL clone [ set-at ] keep ] ; 
+    '[ "x" DOC-SMALL clone [ set-at ] keep ] ;
 
 : medium-doc-prepare ( -- quot: ( i -- doc ) )
     medium-doc drop
-    '[ "x" DOC-MEDIUM clone [ set-at ] keep ] ; 
+    '[ "x" DOC-MEDIUM clone [ set-at ] keep ] ;
 
 : large-doc-prepare ( -- quot: ( i -- doc ) )
     large-doc drop
-    [ "x" DOC-LARGE clone [ set-at ] keep 
+    [ "x" DOC-LARGE clone [ set-at ] keep
        [ now "access-time" ] dip
        [ set-at ] keep ] ;
 
 : (insert) ( quot: ( i -- doc ) collection -- )
     [ trial-size ] 2dip
     '[ _ call( i -- doc ) [ _ ] dip
-       result get lasterror>> [ save ] [ save-unsafe ] if ] each-integer ; 
+       result get lasterror>> [ save ] [ save-unsafe ] if ] each-integer ;
 
 : (prepare-batch) ( i b quot: ( i -- doc ) -- batch-seq )
     [ [ * ] keep 1 range boa ] dip
-    '[ _ call( i -- doc ) ] map ; 
+    '[ _ call( i -- doc ) ] map ;
 
 : (insert-batch) ( quot: ( i -- doc ) collection -- )
     [ trial-size batch-size [ / ] keep ] 2dip
     '[ _ _ (prepare-batch) [ _ ] dip
        result get lasterror>> [ save ] [ save-unsafe ] if
-    ] each-integer ; 
+    ] each-integer ;
 
 : bchar ( boolean -- char )
-    [ "t" ] [ "f" ] if ; inline 
+    [ "t" ] [ "f" ] if ; inline
 
 : collection-name ( -- collection )
     collection "benchmark" get*
     result get doc>>
     result get index>> bchar
     "%s-%s-%s" sprintf
-    [ [ result get ] dip >>collection drop ] keep ; 
-    
+    [ [ result get ] dip >>collection drop ] keep ;
+
 : prepare-collection ( -- collection )
     collection-name
     [ "_x_idx" drop-index ] keep
     [ drop-collection ] keep
-    [ create-collection ] keep ; 
+    [ create-collection ] keep ;
 
 : prepare-index ( collection -- )
-    "_x_idx" [ "x" asc ] key-spec <index-spec> t >>unique? ensure-index ; 
+    "_x_idx" [ "x" asc ] key-spec <index-spec> t >>unique? ensure-index ;
 
 : insert ( doc-quot: ( i -- doc ) -- quot: ( -- ) )
     prepare-collection
@@ -173,14 +173,14 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     [ '[ _ _ (insert-batch) ] ] [ '[ _ _ (insert) ] ] if ;
 
 : serialize ( doc-quot: ( i -- doc ) -- quot: ( -- ) )
-    '[ trial-size [ _ call( i -- doc ) assoc>bv drop ] each-integer ] ; 
+    '[ trial-size [ _ call( i -- doc ) assoc>bv drop ] each-integer ] ;
 
 : deserialize ( doc-quot: ( i -- doc ) -- quot: ( -- ) )
     [ 0 ] dip call( i -- doc ) assoc>bv
-    '[ trial-size [  _ binary [ H{ } stream>assoc drop ] with-byte-reader ] times ] ; 
+    '[ trial-size [  _ binary [ H{ } stream>assoc drop ] with-byte-reader ] times ] ;
 
 : check-for-key ( assoc key -- )
-    CHECK-KEY [ swap key? [ "ups... where's the key" throw ] unless ] [ 2drop ] if ; 
+    CHECK-KEY [ swap key? [ "ups... where's the key" throw ] unless ] [ 2drop ] if ;
 
 : (check-find-result) ( result -- )
     "x" check-for-key ; inline
@@ -227,7 +227,7 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
       trial-size ] dip
       1000000000 / [ /i ] [ result get batch>> [ [ batch-size /i ] dip ] when /i ] 2bi
     "%-18s: {batch:%s,index:%s;errchk:%s} %10s docs/s %10s ops/s"
-    sprintf print flush ; 
+    sprintf print flush ;
 
 : print-separator ( -- )
     "---------------------------------------------------------------------------------" print flush ; inline
@@ -243,44 +243,44 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     print-separator-bold ;
 
 : with-result ( options quot -- )
-    '[ <result> _ call( options -- time ) print-result ] with-scope ; 
+    '[ <result> _ call( options -- time ) print-result ] with-scope ;
 
 : [bench-quot] ( feat-seq op-word -- quot: ( doc-word -- ) )
     '[ _ swap _
        '[ [ [ _ execute( -- quot ) ] dip
           [ execute( -- ) ] each _ execute( quot -- quot ) gc
             benchmark ] with-result ] each
-       print-separator ] ; 
+       print-separator ] ;
 
 : run-serialization-bench ( doc-word-seq feat-seq -- )
     "Serialization Tests" print
     print-separator-bold
-    \ serialize [bench-quot] '[ _ call( doc-word -- ) ] each ; 
+    \ serialize [bench-quot] '[ _ call( doc-word -- ) ] each ;
 
 : run-deserialization-bench ( doc-word-seq feat-seq -- )
     "Deserialization Tests" print
     print-separator-bold
-    \ deserialize [bench-quot] '[ _ call( doc-word -- ) ] each ; 
+    \ deserialize [bench-quot] '[ _ call( doc-word -- ) ] each ;
 
 : run-insert-bench ( doc-word-seq feat-seq -- )
     "Insert Tests" print
-    print-separator-bold 
-    \ insert [bench-quot] '[ _ call( doc-word -- ) ] each ; 
+    print-separator-bold
+    \ insert [bench-quot] '[ _ call( doc-word -- ) ] each ;
 
 : run-find-one-bench ( doc-word-seq feat-seq -- )
     "Query Tests - Find-One" print
     print-separator-bold
-    \ find-one [bench-quot] '[ _ call( doc-word -- ) ] each ; 
+    \ find-one [bench-quot] '[ _ call( doc-word -- ) ] each ;
 
 : run-find-all-bench ( doc-word-seq feat-seq -- )
     "Query Tests - Find-All" print
     print-separator-bold
-    \ find-all [bench-quot] '[ _ call( doc-word -- ) ] each ; 
+    \ find-all [bench-quot] '[ _ call( doc-word -- ) ] each ;
 
 : run-find-range-bench ( doc-word-seq feat-seq -- )
     "Query Tests - Find-Range" print
     print-separator-bold
-    \ find-range [bench-quot] '[ _ call( doc-word -- ) ] each ; 
+    \ find-range [bench-quot] '[ _ call( doc-word -- ) ] each ;
 
 
 : run-benchmarks ( -- )
@@ -312,4 +312,3 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     ] with-db ;
 
 MAIN: run-benchmarks
-

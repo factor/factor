@@ -11,5 +11,5 @@ IN: lists.lazy.examples
 : odds ( -- list ) 1 lfrom [ 2 mod 1 = ] lfilter ;
 : powers-of-2 ( -- list ) 1 [ 2 * ] lfrom-by ;
 : ones ( -- list ) 1 [ ] lfrom-by ;
-: squares ( -- list ) naturals [ dup * ] lazy-map ;
+: squares ( -- list ) naturals [ dup * ] lmap-lazy ;
 : first-five-squares ( -- list ) 5 squares ltake list>array ;
