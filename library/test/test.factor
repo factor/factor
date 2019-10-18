@@ -4,7 +4,6 @@
 
 IN: test
 USE: combinators
-USE: compiler
 USE: errors
 USE: kernel
 USE: lists
@@ -31,8 +30,9 @@ USE: unparser
 : time ( code -- )
     #! Evaluates the given code and prints the time taken to
     #! execute it.
-    millis >r call millis r> -
-    unparse write " milliseconds" print ;
+    millis >r gc-time >r call gc-time r> - millis r> -
+    unparse write " milliseconds run time" print
+    unparse write " milliseconds GC time" print ;
 
 : unit-test ( output input -- )
     [
@@ -71,12 +71,14 @@ USE: unparser
         "lists/lists"
         "lists/assoc"
         "lists/namespaces"
+        "lists/combinators"
         "combinators"
         "continuations"
         "errors"
         "hashtables"
         "strings"
-        "namespaces/namespaces"
+        "namespaces"
+        "generic"
         "files"
         "format"
         "parser"
@@ -105,55 +107,40 @@ USE: unparser
         "httpd/url-encoding"
         "httpd/html"
         "httpd/httpd"
+        "crashes"
+        "sbuf"
+        "threads"
+        "parsing-word"
+        "inference"
+        "dataflow"
+        "interpreter"
     ] [
         test
     ] each
     
-    native? [
-        "crashes" test
-        "sbuf" test
-        "threads" test
-        "parsing-word" test
-        "inference" test
-        "interpreter" test
-
-        cpu "x86" = [
-            [
-                "hsv"
-                "x86-compiler/simple"
-                "x86-compiler/stack"
-                "x86-compiler/ifte"
-                "x86-compiler/generic"
-                "x86-compiler/bail-out"
-            ] [
-                test
-            ] each
-        ] when
-    ] when
-
-    java? [
+    cpu "x86" = [
         [
-            "lists/java"
-            "namespaces/java"
-            "jvm-compiler/auxiliary"
-            "jvm-compiler/compiler"
-            "jvm-compiler/compiler-types"
-            "jvm-compiler/inference"
-            "jvm-compiler/primitives"
-            "jvm-compiler/tail"
-            "jvm-compiler/types"
-            "jvm-compiler/miscellaneous"
+            "hsv"
+            "x86-compiler/simple"
+            "x86-compiler/stack"
+            "x86-compiler/ifte"
+            "x86-compiler/generic"
+            "x86-compiler/bail-out"
         ] [
             test
         ] each
     ] when
 
-    "benchmark/empty-loop" test
-    "benchmark/fac" test
-    "benchmark/fib" test
-    "benchmark/sort" test 
-    "benchmark/continuations" test
-    "benchmark/ack" test 
-    "benchmark/hashtables" test
-    "benchmark/strings" test
-    "benchmark/vectors" test ;
+    [
+        "benchmark/empty-loop"
+        "benchmark/fac"
+        "benchmark/fib"
+        "benchmark/sort" 
+        "benchmark/continuations"
+        "benchmark/ack" 
+        "benchmark/hashtables"
+        "benchmark/strings"
+        "benchmark/vectors"
+    ] [
+        test
+    ] each ;

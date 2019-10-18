@@ -38,6 +38,8 @@ USE: streams
 USE: strings
 USE: unparser
 USE: url-encoding
+USE: presentation
+USE: generic
 
 : html-entities ( -- alist )
     [
@@ -58,33 +60,35 @@ USE: url-encoding
 : >hex-color ( triplet -- hex )
     [ >hex 2 digits ] map "#" swons cat ;
 
-: fg-css% ( color -- )
-    "color: " % >hex-color % "; " % ;
+: fg-css, ( color -- )
+    "color: " , >hex-color , "; " , ;
 
-: bold-css% ( flag -- )
-    [ "font-weight: bold; " % ] when ;
+: bold-css, ( flag -- )
+    [ "font-weight: bold; " , ] when ;
 
-: italics-css% ( flag -- )
-    [ "font-style: italic; " % ] when ;
+: italics-css, ( flag -- )
+    [ "font-style: italic; " , ] when ;
 
-: underline-css% ( flag -- )
-    [ "text-decoration: underline; " % ] when ;
+: underline-css, ( flag -- )
+    [ "text-decoration: underline; " , ] when ;
 
-: size-css% ( size -- )
-    "font-size: " % unparse % "; " % ;
+: size-css, ( size -- )
+    "font-size: " , unparse , "; " , ;
 
-: font-css% ( font -- )
-    "font-family: " % % "; " % ;
+: font-css, ( font -- )
+    "font-family: " , , "; " , ;
 
 : css-style ( style -- )
-    <% [
-        [ "fg"        fg-css% ]
-        [ "bold"      bold-css% ]
-        [ "italics"   italics-css% ]
-        [ "underline" underline-css% ]
-        [ "size"      size-css% ]
-        [ "font"      font-css% ]
-    ] assoc-apply %> ;
+    [
+        [
+            [ "fg"        fg-css, ]
+            [ "bold"      bold-css, ]
+            [ "italics"   italics-css, ]
+            [ "underline" underline-css, ]
+            [ "size"      size-css, ]
+            [ "font"      font-css, ]
+        ] assoc-apply
+    ] make-string ;
 
 : span-tag ( style quot -- )
     over css-style dup "" = [
@@ -101,7 +105,7 @@ USE: url-encoding
     ] when* "/" ?str-tail drop ;
 
 : file-link-href ( path -- href )
-    <% "/" % resolve-file-link url-encode % %> ;
+    [ "/" , resolve-file-link url-encode , ] make-string ;
 
 : file-link-tag ( style quot -- )
     over "file-link" swap assoc [
@@ -131,16 +135,20 @@ USE: url-encoding
         drop call
     ] ifte ;
 
-: html-write-attr ( string style -- )
+TRAITS: html-stream
+
+M: html-stream fwrite-attr ( str style stream -- )
     [
         [
             [
-                [ drop chars>entities write ] span-tag
-            ] file-link-tag
-        ] object-link-tag
-    ] icon-tag ;
+                [
+                    [ drop chars>entities write ] span-tag
+                ] file-link-tag
+            ] object-link-tag
+        ] icon-tag
+    ] bind ;M
 
-: <html-stream> ( stream -- stream )
+C: html-stream ( stream -- stream )
     #! Wraps the given stream in an HTML stream. An HTML stream
     #! converts special characters to entities when being
     #! written, and supports writing attributed strings with
@@ -154,11 +162,7 @@ USE: url-encoding
     #! underline
     #! size
     #! link - an object path
-    <extend-stream> [
-        [ chars>entities write ] "fwrite" set
-        [ chars>entities print ] "fprint" set
-        [ html-write-attr ] "fwrite-attr" set
-    ] extend ;
+    [ dup delegate set "stdio" set ] extend ;
 
 : with-html-stream ( quot -- )
     [ "stdio" get <html-stream> "stdio" set call ] with-scope ;

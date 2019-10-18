@@ -24,13 +24,17 @@ void primitive_eq(void)
 	box_boolean(dpop() == dpop());
 }
 
-void primitive_millis(void)
+long long current_millis(void)
 {
 	struct timeval t;
 	gettimeofday(&t,NULL);
+	return (long long)t.tv_sec * 1000 + t.tv_usec/1000;
+}
+
+void primitive_millis(void)
+{
 	maybe_garbage_collection();
-	dpush(tag_object(s48_long_long_to_bignum(
-		(long long)t.tv_sec * 1000 + t.tv_usec/1000)));
+	dpush(tag_object(s48_long_long_to_bignum(current_millis())));
 }
 
 void primitive_init_random(void)

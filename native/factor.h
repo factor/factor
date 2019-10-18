@@ -76,8 +76,8 @@ typedef unsigned char BYTE;
 
 #include "memory.h"
 #include "error.h"
-#include "gc.h"
 #include "types.h"
+#include "gc.h"
 #include "boolean.h"
 #include "word.h"
 #include "run.h"

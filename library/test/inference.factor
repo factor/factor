@@ -7,12 +7,30 @@ USE: combinators
 USE: vectors
 USE: kernel
 USE: lists
+USE: namespaces
 
+[
+    [ 1 | 2 ]
+    [ 2 | 1 ]
+    [ 0 | 3 ]
+    [ 4 | 2 ]
+    [ 3 | 3 ]
+    [ 0 | 0 ]
+    [ 1 | 5 ]
+    [ 3 | 4 ]
+] "effects" set
+
+! [ t ] [
+!     "effects" get [
+!         dup [ 7 | 7 ] decompose compose [ 7 | 7 ] =
+!     ] all?
+! ] unit-test
 [ 6 ] [ 6 gensym-vector vector-length ] unit-test
 
+[ 3 ] [ [ { 1 2 } { 1 2 3 } ] max-vector-length ] unit-test
+
 [ t ] [
-    { 1 2 } { 1 2 3 } 
-    unify-lengths swap vector-length swap vector-length =
+    [ { 1 2 } { 1 2 3 } ] unify-lengths [ vector-length ] map all=?
 ] unit-test
 
 [ [ sq ] ] [ [ sq ] [ sq ] unify-result ] unit-test
@@ -83,6 +101,59 @@ USE: lists
 
 [ [ bad-recursion-2 ] infer ] unit-test-fails
 
+! Simple combinators
+[ [ 1 | 2 ] ] [ [ [ car ] keep cdr ] infer ] unit-test
+
+! Mutual recursion
+DEFER: foe
+
+: fie ( element obj -- ? )
+    dup cons? [ foe ] [ eq? ] ifte ;
+
+: foe ( element tree -- ? )
+    dup [
+        2dup car fie [
+            nip
+        ] [
+            cdr dup cons? [
+                foe
+            ] [
+                fie
+            ] ifte
+        ] ifte
+    ] [
+        2drop f
+    ] ifte ;
+
+! This form should not have a stack effect
+: bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] ifte ;
+[ [ bad-bin ] infer ] unit-test-fails
+
+: nested-when ( -- )
+    t [
+        t [
+            5 drop
+        ] when
+    ] when ;
+
+[ [ 0 | 0 ] ] [ [ nested-when ] infer ] unit-test
+
+: nested-when* ( -- )
+    [
+        [
+            drop
+        ] when*
+    ] when* ;
+
+[ [ 1 | 0 ] ] [ [ nested-when* ] infer ] unit-test
+
+SYMBOL: sym-test
+
+[ [ 0 | 1 ] ] [ [ sym-test ] infer ] unit-test
+
+[ [ 2 | 1 ] ] [ [ fie ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ foe ] infer ] unit-test
+
 [ [ 2 | 1 ] ] [ [ 2list ] infer ] unit-test
 [ [ 3 | 1 ] ] [ [ 3list ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ append ] infer ] unit-test
@@ -93,3 +164,34 @@ USE: lists
 ! [ [ 1 | 1 ] ] [ [ last* ] infer ] unit-test
 ! [ [ 1 | 1 ] ] [ [ last ] infer ] unit-test
 ! [ [ 1 | 1 ] ] [ [ list? ] infer ] unit-test
+
+[ [ 1 | 1 ] ] [ [ length ] infer ] unit-test
+[ [ 1 | 1 ] ] [ [ reverse ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ contains? ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ tree-contains? ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ remove ] infer ] unit-test
+! [ [ 1 | 1 ] ] [ [ prune ] infer ] unit-test
+
+[ [ 2 | 1 ] ] [ [ bitor ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ bitand ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ bitxor ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ mod ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ /i ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ /f ] infer ] unit-test
+[ [ 2 | 2 ] ] [ [ /mod ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ + ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ - ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ * ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ / ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ < ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ <= ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ > ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ >= ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ number= ] infer ] unit-test
+
+[ [ 2 | 1 ] ] [ [ = ] infer ] unit-test
+
+[ [ 1 | 0 ] ] [ [ >n ] infer ] unit-test
+[ [ 0 | 1 ] ] [ [ n> ] infer ] unit-test
+
+[ [ 1 | 1 ] ] [ [ get ] infer ] unit-test

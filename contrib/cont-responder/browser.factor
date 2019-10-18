@@ -25,7 +25,7 @@
 ! cont-responder facilities.
 !
 IN: browser
-USE: cont-html
+USE: html
 USE: cont-responder
 USE: cont-utils
 USE: stack
@@ -45,6 +45,7 @@ USE: parser
 USE: errors
 USE: unparser
 USE: logging
+USE: listener
 
 : <browser> ( allow-edit? vocab word -- )
   #! An object for storing the current browser
@@ -107,18 +108,8 @@ USE: logging
   ] bind drop ;
 
 : write-vm-statistics ( -- )
-  #! Display statistics about the JVM in use.
-  room swap unparse >r unparse r> 
-  <table> 
-    <tr>  
-      <td> "Free Memory" write </td>
-      <td> write </td> 
-    </tr>
-    <tr> 
-      <td> "Total Memory" write </td>
-      <td> write </td> 
-    </tr>
-  </table> ;
+  #! Display statistics about the vm.
+  <pre> room. </pre> ;
 
 : write-browser-body ( -- )
   #! Write out the HTML for the body of the main browser page.
@@ -170,9 +161,9 @@ USE: logging
   #! Build a string that can evaluate the string 'to-eval'
   #! by first doing an 'IN: vocab' and a 'USE:' of all
   #! necessary vocabs for existing words in that vocab.
-  <% >r "IN: " % dup % "\n" %
-     vocabulary-uses [ "USE: " % % "\n" % ] each
-     r> % "\n" % %> ;
+  [ >r "IN: " , dup , "\n" ,
+     vocabulary-uses [ "USE: " , , "\n" , ] each
+     r> , "\n" , ] make-string ;
 
 : show-parse-error ( error -- )
   #! Show an error page describing the parse error.

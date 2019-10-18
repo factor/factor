@@ -60,6 +60,9 @@ USE: unparser
 [ -1/2 ] [ 1/2 1 >bignum - ] unit-test
 [ 41/20 ] [ 5/4 4/5 + ] unit-test
 
+[ 1 ] [ 1/2 2 * ] unit-test
+[ 1/3 ] [ 1/2 2/3 * ] unit-test
+
 [ 1 ] [ 1/2 1/2 / ] unit-test
 [ 27/4 ] [ 3/2 2/9 / ] unit-test
 
@@ -82,6 +85,8 @@ unit-test
 
 [ -3 ] [ -3 10 mod ] unit-test
 [ 7 ] [ -3 10 rem ] unit-test
+[ 7 ] [ -13 10 rem ] unit-test
+[ 0 ] [ 37 37 rem ] unit-test
 
 [ -1 ] [ -12.55 sgn ] unit-test
 [ 1 ] [ 100000000000000000000000000000000 sgn ] unit-test

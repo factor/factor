@@ -38,12 +38,11 @@ public class Def extends FactorParsingDefinition
 	 * A new definition.
 	 */
 	public Def(FactorWord word)
-		throws Exception
 	{
 		super(word);
 	} //}}}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
+	public void eval(FactorReader reader)
 		throws Exception
 	{
 		FactorWord newWord = reader.nextWord(true);

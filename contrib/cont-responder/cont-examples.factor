@@ -24,7 +24,7 @@
 ! Simple test applications
 IN: cont-examples
 USE: cont-responder
-USE: cont-html
+USE: html
 USE: stack
 USE: stdio
 USE: html

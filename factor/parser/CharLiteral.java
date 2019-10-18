@@ -39,12 +39,11 @@ public class CharLiteral extends FactorParsingDefinition
 	 * A new definition.
 	 */
 	public CharLiteral(FactorWord word)
-		throws Exception
 	{
 		super(word);
 	} //}}}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
+	public void eval(FactorReader reader)
 		throws IOException, FactorParseException
 	{
 		FactorScanner scanner = reader.getScanner();

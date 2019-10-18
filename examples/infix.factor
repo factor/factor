@@ -21,7 +21,7 @@ DEFER: infix
 : infix ( list -- quot )
     #! Convert an infix expression (passed in as a list) to
     #! postfix.
-    [, 10 <vector> exprs set (infix) end ,] ;
+    [ 10 <vector> exprs set (infix) end ] make-list ;
 
 [ [ ] ] [ [ ] infix ] unit-test
 [ [ 1 ] ] [ [ 1 ] infix ] unit-test

@@ -47,10 +47,10 @@ USE: unparser
     f>"" "doc-root" get swap cat2 ;
 
 : file-response ( mime-type length -- )
-    [,
+    [
         unparse "Content-Length" swons ,
         "Content-Type" swons ,
-    ,] "200 OK" response terpri ;
+    ] make-list "200 OK" response terpri ;
 
 : serve-static ( filename mime-type -- )
     over file-length file-response  "method" get "head" = [

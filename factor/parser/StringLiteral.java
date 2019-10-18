@@ -41,14 +41,13 @@ public class StringLiteral extends FactorParsingDefinition
 	 * A new definition.
 	 */
 	public StringLiteral(FactorWord word, boolean escapes)
-		throws Exception
 	{
 		super(word);
 		this.escapes = escapes;
 	} //}}}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
-		throws IOException, FactorParseException
+	public void eval(FactorReader reader)
+		throws Exception
 	{
 		String literal = reader.getScanner()
 			.readUntil('"','"',escapes);

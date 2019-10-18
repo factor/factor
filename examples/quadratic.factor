@@ -25,24 +25,22 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: math
-USE: combinators
+IN: quadratic
 USE: math
 USE: stack
 
-: quadratic-complete ( a b c -- a b c a b )
-    >r 2dup r> -rot ;
+: quadratic-e ( b a -- -b/2a )
+    2 * / neg ;
 
-: quadratic-d ( c a b -- sqrt[b^2 - 4*a*c] )
-    sq -rot 4 * * - sqrt ;
+: quadratic-d ( a b c -- d )
+    pick 4 * * swap sq swap - swap sq 4 * / sqrt ;
 
-: quadratic-root ( x y -- -y/x/2 )
-    neg swap / 2 / ;
-
-: quadratic-roots ( a b d -- alpha beta )
-    3dup - quadratic-root >r + quadratic-root r> ;
+: quadratic-roots ( d e -- alpha beta )
+    2dup + -rot - ;
 
 : quadratic ( a b c -- alpha beta )
-    #! Finds both roots of the polynomial a*x^2 + b*x + c using
-    #! the quadratic formula.
-    quadratic-complete quadratic-d quadratic-roots ;
+    #! Finds both roots of the polynomial a*x^2 + b*x + c
+    #! using the quadratic formula.
+    3dup quadratic-d
+    nip swap rot quadratic-e
+    swap quadratic-roots ;

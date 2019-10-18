@@ -38,12 +38,11 @@ public class Bra extends FactorParsingDefinition
 	 * A new definition.
 	 */
 	public Bra(FactorWord word)
-		throws Exception
 	{
 		super(word);
 	} //}}}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
+	public void eval(FactorReader reader)
 	{
 		reader.pushState(word,null);
 	}

@@ -41,17 +41,16 @@ public class LineComment extends FactorParsingDefinition
 	 * A new definition.
 	 */
 	public LineComment(FactorWord word, boolean doc)
-		throws Exception
 	{
 		super(word);
 		this.doc = doc;
 	} //}}}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
+	public void eval(FactorReader reader)
 		throws IOException, FactorParseException
 	{
 		String comment = reader.getScanner().readUntilEOL();
 		if(doc)
-			reader.append(new FactorDocComment(comment,false));
+			reader.addDocComment(comment);
 	}
 }

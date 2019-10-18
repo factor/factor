@@ -32,6 +32,31 @@ USE: lists
 USE: math
 USE: stack
 
+: power-of-2? ( n -- ? )
+    dup dup neg bitand = ;
+
+: (random-int-0) ( n bits val -- n )
+    3dup - + pred 0 < [
+        2drop (random-int) 2dup swap mod (random-int-0)
+    ] [
+        nip nip
+    ] ifte ;
+
+: random-int-0 ( max -- n )
+    succ dup power-of-2? [
+        (random-int) * -31 shift
+    ] [
+        (random-int) 2dup swap mod (random-int-0)
+    ] ifte ;
+
+: random-int ( min max -- n )
+    dupd swap - random-int-0 + ;
+
+: random-boolean ( -- ? )
+    0 1 random-int 0 = ;
+
+! TODO: : random-float ... ;
+
 : random-digit ( -- digit )
     0 9 random-int ;
 
@@ -84,7 +109,7 @@ USE: stack
     #! Returns a random subset of the given list of comma pairs.
     #! The car of each pair is a probability, the cdr is the
     #! item itself. Only the cdr of the comma pair is returned.
-    [,
+    [
         [ car+ ] keep ( probabilitySum list )
         [
             >r 1 over random-int r> ( probabilitySum probability elem )
@@ -93,4 +118,4 @@ USE: stack
             > ( probabilitySum elemd boolean )
             [ drop ] [ , ] ifte
         ] each drop
-    ,] ;
+    ] make-list ;

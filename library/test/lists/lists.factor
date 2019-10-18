@@ -60,7 +60,3 @@ USE: strings
 [ [ ]         ] [ 0   count ] unit-test
 [ [ ]         ] [ -10 count ] unit-test
 [ [ 0 1 2 3 ] ] [ 4   count ] unit-test
-
-[ [ 1 2 3 ] ] [ [ 1 4 2 5 3 6 ] [ 4 < ] subset ] unit-test
-
-[ [ 43 "a" [ ] ] ] [ [ "a" 43 43 43 [ ] 43 "a" [ ] ] prune ] unit-test

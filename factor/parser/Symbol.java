@@ -38,18 +38,15 @@ public class Symbol extends FactorParsingDefinition
 	 * A new definition.
 	 */
 	public Symbol(FactorWord word)
-		throws Exception
 	{
 		super(word);
 	} //}}}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
+	public void eval(FactorReader reader)
 		throws Exception
 	{
 		FactorWord w = reader.nextWord(true);
-		reader.append(w.vocabulary);
-		reader.append(w.name);
-		reader.append(new FactorSymbolDefinition(w,w));
-		reader.append(reader.intern("define",false));
+		w.def = new FactorSymbolDefinition(w,w);
+		reader.append(w.def);
 	}
 }

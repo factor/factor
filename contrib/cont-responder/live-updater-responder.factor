@@ -27,7 +27,6 @@
 IN: live-updater-responder
 USE: live-updater
 USE: namespaces
-USE: cont-html
 USE: html
 USE: words
 USE: stdio

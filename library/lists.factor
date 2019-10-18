@@ -43,6 +43,8 @@ USE: vectors
     over [ >r uncons r> append cons ] [ nip ] ifte ;
 
 : contains? ( element list -- remainder )
+    #! Push remainder of list from first occurrence of element,
+    #! or f.
     dup [
         2dup car = [ nip ] [ cdr contains? ] ifte
     ] [
@@ -50,66 +52,57 @@ USE: vectors
     ] ifte ;
 
 : nth ( n list -- list[n] )
-    #! Push the nth element of a proper list.
+    #! nth element of a proper list.
     #! Supplying n <= 0 pushes the first element of the list.
     #! Supplying an argument beyond the end of the list raises
     #! an error.
     swap [ cdr ] times car ;
 
 : last* ( list -- last )
-    #! Pushes last cons of a list.
+    #! Last cons of a list.
     dup cdr cons? [ cdr last* ] when ;
 
 : last ( list -- last )
+    #! Last element of a list.
     last* car ;
 
-: list? ( list -- boolean )
+: tail ( list -- tail )
+    #! Return the cdr of the last cons cell, or f.
+    dup [ last* cdr ] when ;
+
+: list? ( list -- ? )
     #! Proper list test. A proper list is either f, or a cons
     #! cell whose cdr is a proper list.
-    [ dup cons? [ cdr list? ] [ drop f ] ifte ] [ t ] ifte* ;
+    dup cons? [ tail ] when not ;
 
 : partition-add ( obj ? ret1 ret2 -- ret1 ret2 )
-    >r >r [ r> cons r> ] [ r> r> swapd cons ] ifte ; inline
+    rot [ swapd cons ] [ >r cons r> ] ifte ;
 
-: partition-step ( ret1 ret2 ref combinator car -- ret1 ret2 )
-    >r rot >r rot r> r> -rot >r >r dup >r swap call r> swap r> r>
-    partition-add ; inline
+: partition-step ( ref list combinator -- ref cdr combinator car ? )
+    pick pick car pick call >r >r unswons r> swap r> ; inline
 
-: partition-iter ( ret1 ret2 ref combinator list -- ret1 ret2 )
-    dup [
-        3dup cdr >r >r >r
-        car partition-step
-        r> r> r> partition-iter
+: (partition) ( ref list combinator ret1 ret2 -- ret1 ret2 )
+    >r >r  over [
+        partition-step  r> r> partition-add  (partition)
     ] [
-        3drop
-    ] ifte ; inline interpret-only
+        3drop  r> r>
+    ] ifte ; inline
 
 : partition ( ref list combinator -- list1 list2 )
-    #! Compare each element in a proper list against a
-    #! reference element using a combinator. The combinator's
-    #! return value determines if the element is prepended to
-    #! the first or second list.
     #! The combinator must have stack effect:
     #! ( ref element -- ? )
-    swap >r >r >r [ ] [ ] r> r> r> partition-iter ;
-    inline interpret-only
+    [ ] [ ] (partition) ; inline
 
 : sort ( list comparator -- sorted )
-    #! Sort the elements in a proper list using a comparator.
-    #! The comparator must have stack effect:
-    #! ( x y -- ? )
-    #! To sort elements in descending order, return t if x < y.
-    #! To sort elements in ascending order, return t if x > y.
+    #! To sort in ascending order, comparator must have stack
+    #! effect ( x y -- x>y ).
     over [
-        ! Partition
-        dup >r >r uncons dupd r> partition r>
-        ! Recurse
-        tuck sort >r sort r>
-        ! Combine
-        swapd cons append
+        ( Partition ) [ >r uncons dupd r> partition ] keep
+        ( Recurse ) [ sort swap ] keep sort
+        ( Combine ) swapd cons append
     ] [
         drop
-    ] ifte ; inline interpret-only
+    ] ifte ; inline
 
 : num-sort ( list -- sorted )
     #! Sorts the list into ascending numerical order.
@@ -138,18 +131,17 @@ DEFER: tree-contains?
     ] ifte ;
 
 : unique ( elem list -- list )
-    #! Prepend an element to a proper list if it is not
-    #! already contained in the list.
+    #! Prepend an element to a list if it does not occur in the
+    #! list.
     2dup contains? [ nip ] [ cons ] ifte ;
 
 : (each) ( list quot -- list quot )
-    >r uncons r> tuck 2slip ; inline interpret-only
+    >r uncons r> tuck 2slip ; inline
 
 : each ( list quot -- )
     #! Push each element of a proper list in turn, and apply a
     #! quotation with effect ( X -- ) to each element.
-    over [ (each) each ] [ 2drop ] ifte ;
-    inline interpret-only
+    over [ (each) each ] [ 2drop ] ifte ; inline
 
 : reverse ( list -- list )
     [ ] swap [ swons ] each ;
@@ -158,8 +150,7 @@ DEFER: tree-contains?
     #! Push each element of a proper list in turn, and collect
     #! return values of applying a quotation with effect
     #! ( X -- Y ) to each element into a new list.
-    over [ (each) rot >r map r> swons ] [ drop ] ifte ;
-    inline interpret-only
+    over [ (each) rot >r map r> swons ] [ drop ] ifte ; inline
 
 : subset ( list quot -- list )
     #! Applies a quotation with effect ( X -- ? ) to each
@@ -171,7 +162,7 @@ DEFER: tree-contains?
         rot >r subset r> [ r> swons ] [ r> drop ] ifte
     ] [
         drop
-    ] ifte ; inline interpret-only
+    ] ifte ; inline
 
 : remove ( obj list -- list )
     #! Remove all occurrences of the object from the list.
@@ -198,6 +189,24 @@ DEFER: tree-contains?
     ] [
         2drop t
     ] ifte ;
+
+: all=? ( list -- ? )
+    #! Check if all elements of a list are equal.
+    dup [ uncons [ over = ] all? nip ] [ drop t ] ifte ;
+
+: maximize ( pred o1 o2 -- o1/o2 )
+    #! Return o1 if pred returns true, o2 otherwise.
+    [ rot call ] 2keep ? ;
+
+: (top) ( list maximizer -- elt )
+    #! Return the highest element in the list, where maximizer
+    #! has stack effect ( o1 o2 -- max(o1,o2) ).
+    >r uncons r> each ;
+
+: top ( list pred -- elt )
+    #! Return the highest element in the list, where pred is a
+    #! partial order with stack effect ( o1 o2 -- ? ).
+    swap [ pick >r maximize r> swap ] (top) nip ;
 
 : (count) ( n list -- list )
     >r pred dup 0 < [ drop r> ] [ dup r> cons (count) ] ifte ;

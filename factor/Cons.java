@@ -32,10 +32,8 @@ package factor;
 /**
  * Used to build up linked lists.
  */
-public class Cons implements PublicCloneable, FactorExternalizable
+public class Cons implements FactorExternalizable
 {
-	public static int COUNT;
-
 	public Object car;
 	public Object cdr;
 
@@ -44,44 +42,12 @@ public class Cons implements PublicCloneable, FactorExternalizable
 	{
 		this.car = car;
 		this.cdr = cdr;
-
-		COUNT++;
-	} //}}}
-
-	//{{{ car() method
-	public Object car(Class clas) throws Exception
-	{
-		return FactorJava.convertToJavaType(car,clas);
-	} //}}}
-
-	//{{{ cdr() method
-	public Object cdr(Class clas) throws Exception
-	{
-		return FactorJava.convertToJavaType(cdr,clas);
 	} //}}}
 
 	//{{{ next() method
 	public Cons next()
 	{
 		return (Cons)cdr;
-	} //}}}
-
-	//{{{ get() method
-	public Object get(int index)
-	{
-		return _get(index).car;
-	} //}}}
-
-	//{{{ _get() method
-	public Cons _get(int index)
-	{
-		Cons iter = this;
-		while(index != 0)
-		{
-			iter = (Cons)iter.cdr;
-			index--;
-		}
-		return iter;
 	} //}}}
 
 	//{{{ contains() method
@@ -117,47 +83,6 @@ public class Cons implements PublicCloneable, FactorExternalizable
 			size++;
 		}
 		return size;
-	} //}}}
-
-	//{{{ nappend() method
-	public static Cons nappend(Cons l1, Cons l2)
-	{
-		if(l1 == null)
-			return l2;
-		if(l2 == null)
-			return l1;
-		Cons last = l1;
-		while(last.cdr != null)
-			last = last.next();
-		last.cdr = l2;
-		return l1;
-	} //}}}
-
-	//{{{ reverse() method
-	public static Cons reverse(Cons list)
-	{
-		Cons reversed = null;
-		while(list != null)
-		{
-			reversed = new Cons(list.car,reversed);
-			list = list.next();
-		}
-		return reversed;
-	} //}}}
-
-	//{{{ assoc() method
-	public static Object assoc(Cons assoc, Object key)
-	{
-		if(assoc == null)
-			return null;
-		else
-		{
-			Cons first = (Cons)assoc.car;
-			if(FactorLib.equal(first.car,key))
-				return first.cdr;
-			else
-				return assoc(assoc.next(),key);
-		}
 	} //}}}
 
 	//{{{ elementsToString() method
@@ -256,44 +181,5 @@ public class Cons implements PublicCloneable, FactorExternalizable
 			return 0;
 		else
 			return car.hashCode();
-	} //}}}
-
-	//{{{ clone() method
-	public Object clone()
-	{
-		if(cdr instanceof Cons)
-			return new Cons(car,((Cons)cdr).clone());
-		else
-			return new Cons(car,cdr);
-	} //}}}
-
-	//{{{ deepClone() method
-	public static Cons deepClone(Cons list)
-	{
-		if(list == null)
-			return null;
-
-		Object ccar;
-		if(list.car instanceof PublicCloneable)
-			ccar = ((PublicCloneable)list.car).clone();
-		else
-			ccar = list.car;
-		if(list.cdr instanceof Cons)
-		{
-			return new Cons(ccar,deepClone(list.next()));
-		}
-		else if(list.cdr == null)
-		{
-			return new Cons(ccar,null);
-		}
-		else
-		{
-			Object ccdr;
-			if(list.cdr instanceof PublicCloneable)
-				ccdr = ((PublicCloneable)list.cdr).clone();
-			else
-				ccdr = list.cdr;
-			return new Cons(ccar,ccdr);
-		}
 	} //}}}
 }

@@ -30,7 +30,7 @@
 package factor.jedit;
 
 import factor.*;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 import org.gjt.sp.jedit.gui.*;
 import org.gjt.sp.jedit.textarea.*;
@@ -40,45 +40,82 @@ import sidekick.*;
 
 public class FactorPlugin extends EditPlugin
 {
-	private static FactorInterpreter interp;
+	private static ExternalFactor external;
 
+	//{{{ getPluginPath() method
+	private String getPluginPath()
+	{
+		return MiscUtilities.getParentOfPath(
+			jEdit.getPlugin("factor.jedit.FactorPlugin")
+			.getPluginJAR().getPath())
+			+ "Factor";
+	} //}}}
+	
 	//{{{ start() method
 	public void start()
 	{
 		BeanShell.eval(null,BeanShell.getNameSpace(),
 			"import factor.*;\nimport factor.jedit.*;\n");
+		String program = jEdit.getProperty("factor.external.program");
+		String image = jEdit.getProperty("factor.external.image");
+		if(program == null || image == null
+			|| program.length() == 0 || image.length() == 0)
+		{
+			jEdit.setProperty("factor.external.program",
+				MiscUtilities.constructPath(getPluginPath(),"f"));
+			jEdit.setProperty("factor.external.image",
+				MiscUtilities.constructPath(getPluginPath(),"factor.image"));
+		}
+	} //}}}
+
+	//{{{ stop() method
+	public void stop()
+	{
+		stopExternalInstance();
 	} //}}}
 	
-	//{{{ newInterpreter() method
-	private static FactorInterpreter newInterpreter(String[] args)
+	//{{{ getExternalInstance() method
+	/**
+	 * Returns the object representing a connection to an external Factor instance.
+	 * It will start the interpreter if it's not already running.
+	 */
+	public synchronized static ExternalFactor getExternalInstance()
+		throws IOException, UnsupportedEncodingException
 	{
-		try
+		if(external == null)
 		{
-			FactorInterpreter interp = new FactorInterpreter();
-			interp.interactive = false;
-			interp.init(args);
-			return interp;
+			String[] args = jEdit.getProperty("factor.external.args","-jedit")
+				.split(" ");
+			String[] nargs = new String[args.length + 3];
+			nargs[0] = jEdit.getProperty("factor.external.program");
+			nargs[1] = jEdit.getProperty("factor.external.image");
+			nargs[2] = "-no-ansi";
+			System.arraycopy(args,0,nargs,3,args.length);
+			Process p = Runtime.getRuntime().exec(nargs);
+			p.getErrorStream().close();
+
+			external = new ExternalFactor(
+				p.getInputStream(),
+				p.getOutputStream());
 		}
-		catch(Exception e)
-		{
-			System.err.println("Failed to initialize interpreter:");
-			e.printStackTrace();
-			return null;
-		}
+
+		return external;
 	} //}}}
 
-	//{{{ getInterpreter() method
+	//{{{ stopExternalInstance() method
 	/**
-	 * This can be called from the SideKick thread and must be thread safe.
+	 * Stops the external interpreter. It will probably be restarted soon after.
 	 */
-	public static synchronized FactorInterpreter getInterpreter()
+	public static void stopExternalInstance()
 	{
-		if(interp == null)
-		{
-			interp = newInterpreter(new String[] { "-jedit" });
-		}
+		((FactorShell)ServiceManager.getService("console.Shell","Factor"))
+			.closeStreams();
 
-		return interp;
+		if(external != null)
+		{
+			external.close();
+			external = null;
+		}
 	} //}}}
 	
 	//{{{ getSideKickParser() method
@@ -88,13 +125,19 @@ public class FactorPlugin extends EditPlugin
 			"sidekick.SideKickParser","factor");
 	} //}}}
 	
-	//{{{ eval() method
-	public static void eval(View view, String cmd)
+	//{{{ evalInListener() method
+	public static void evalInListener(View view, String cmd)
 	{
 		DockableWindowManager wm = view.getDockableWindowManager();
 		wm.addDockableWindow("console");
 		Console console = (Console)wm.getDockableWindow("console");
 		console.run(Shell.getShell("Factor"),console,cmd);
+	} //}}}
+
+	//{{{ evalInWire() method
+	public static void evalInWire(String cmd) throws IOException
+	{
+		getExternalInstance().eval(cmd);
 	} //}}}
 
 	//{{{ factorWord() method
@@ -132,19 +175,42 @@ public class FactorPlugin extends EditPlugin
 			return null;
 	} //}}}
 	
-	//{{{ factorWordOperation() method
+	//{{{ factorWordOutputOp() method
 	/**
 	 * Apply a Factor word to the selected word.
 	 */
-	public static void factorWordOperation(View view, String op)
+	public static void factorWordOutputOp(View view, String op)
 	{
 		String word = factorWord(view);
 		if(word == null)
 			view.getToolkit().beep();
 		else
-			eval(view,word + " " + op);
+			evalInListener(view,word + " " + op);
 	} //}}}
 
+	//{{{ factorWordWireOp() method
+	/**
+	 * Apply a Factor word to the selected word.
+	 */
+	public static void factorWordWireOp(View view, String op) throws IOException
+	{
+		String word = factorWord(view);
+		if(word == null)
+			view.getToolkit().beep();
+		else
+			evalInWire(word + " " + op);
+	} //}}}
+
+	//{{{ toWordArray() method
+	public static FactorWord[] toWordArray(Set completions)
+	{
+		FactorWord[] w = (FactorWord[])completions.toArray(new FactorWord[
+			completions.size()]);
+		Arrays.sort(w,new MiscUtilities.StringICaseCompare());
+
+		return w;
+	} //}}}
+	
 	//{{{ getCompletions() method
 	/**
 	 * Returns all words in all vocabularies.
@@ -152,10 +218,17 @@ public class FactorPlugin extends EditPlugin
 	 * @param anywhere If true, matches anywhere in the word name are
 	 * returned; otherwise, only matches from beginning.
 	 */
-	public static List getCompletions(String word, boolean anywhere)
+	public static Set getCompletions(String word, boolean anywhere)
 	{
-		return getCompletions(interp.vocabularies.toVarList(),word,
-			anywhere);
+		try
+		{
+			return getCompletions(getExternalInstance().getVocabularies(),word,
+				anywhere);
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
 	} //}}}
 	
 	//{{{ getCompletions() method
@@ -163,53 +236,25 @@ public class FactorPlugin extends EditPlugin
 	 * @param anywhere If true, matches anywhere in the word name are
 	 * returned; otherwise, only matches from beginning.
 	 */
-	public static List getCompletions(Cons use,
-		String word, boolean anywhere)
+	public static Set getCompletions(Cons use, String word, boolean anywhere)
 	{
-		List completions = new ArrayList();
-		FactorInterpreter interp = FactorPlugin.getInterpreter();
-
-		while(use != null)
+		try
 		{
-			String vocab = (String)use.car;
-			getCompletions(interp,vocab,word,completions,anywhere);
-			use = use.next();
-		}
-		
-		Collections.sort(completions,
-			new MiscUtilities.StringICaseCompare());
-
-		return completions;
-	} //}}}
-
-	//{{{ getCompletions() method
-	private static void getCompletions(FactorInterpreter interp,
-		String vocab, String word, List completions, boolean anywhere)
-	{
-		FactorNamespace v = interp.getVocabulary(vocab);
-		if(v == null)
-			return;
-
-		Cons words = v.toValueList();
-
-		while(words != null)
-		{
-			FactorWord w = (FactorWord)words.car;
-			if(w != null && w.name != null)
+			Set completions = new HashSet();
+	
+			while(use != null)
 			{
-				if(anywhere)
-				{
-					if(w.name.indexOf(word) != -1)
-						completions.add(w);
-				}
-				else
-				{
-					if(w.name.startsWith(word))
-						completions.add(w);
-				}
+				String vocab = (String)use.car;
+				getExternalInstance().getCompletions(
+					vocab,word,completions,anywhere);
+				use = use.next();
 			}
 
-			words = words.next();
+			return completions;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
 		}
 	} //}}}
 	
@@ -290,31 +335,42 @@ public class FactorPlugin extends EditPlugin
 
 	//{{{ findAllWordsNamed() method
 	private static FactorWord[] findAllWordsNamed(View view, String word)
+		throws Exception
 	{
+		ExternalFactor external = getExternalInstance();
+
 		ArrayList words = new ArrayList();
-		Cons vocabs = getInterpreter().vocabularies.toValueList();
+
+		Cons vocabs = external.getVocabularies();
 		while(vocabs != null)
 		{
-			FactorNamespace vocab = (FactorNamespace)vocabs.car;
-			FactorWord w = (FactorWord)vocab.getVariable(word);
+			String vocab = (String)vocabs.car;
+			FactorWord w = (FactorWord)external.searchVocabulary(
+				new Cons(vocab,null),word);
 			if(w != null)
 				words.add(w);
 			vocabs = vocabs.next();
 		}
-		return (FactorWord[])words.toArray(
-			new FactorWord[words.size()]);
+		return (FactorWord[])words.toArray(new FactorWord[words.size()]);
 	} //}}}
 
 	//{{{ insertUseDialog() method
 	public static void insertUseDialog(View view, String word)
 	{
-		FactorWord[] words = findAllWordsNamed(view,word);
-		if(words.length == 0)
-			view.getToolkit().beep();
-		else if(words.length == 1)
-			insertUse(view,words[0].vocabulary);
-		else
-			new InsertUseDialog(view,getSideKickParser(),words);
+		try
+		{
+			FactorWord[] words = findAllWordsNamed(view,word);
+			if(words.length == 0)
+				view.getToolkit().beep();
+			else if(words.length == 1)
+				insertUse(view,words[0].vocabulary);
+			else
+				new InsertUseDialog(view,getSideKickParser(),words);
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
 	} //}}}
 
 	//{{{ insertUse() method

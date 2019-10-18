@@ -10,15 +10,6 @@ INLINE void gc_debug(char* msg, CELL x) {
 #endif
 }
 
-/* Given a pointer to oldspace, copy it to newspace. */
-void* copy_untagged_object(void* pointer, CELL size)
-{
-	void* newpointer = allot(size);
-	memcpy(newpointer,pointer,size);
-
-	return newpointer;
-}
-
 /*
 Given a pointer to a tagged pointer to oldspace, copy it to newspace.
 If the object has already been copied, return the forwarding
@@ -33,7 +24,7 @@ void copy_object(CELL* handle)
 
 	if(tag == FIXNUM_TYPE || pointer == F)
 		return;
-	
+
 	if(in_zone(&active,pointer))
 		critical_error("copy_object given newspace ptr",pointer);
 
@@ -132,6 +123,8 @@ void collect_roots(void)
 
 void primitive_gc(void)
 {
+	long long start = current_millis();
+
 	gc_in_progress = true;
 
 	flip_zones();
@@ -148,6 +141,8 @@ void primitive_gc(void)
 	gc_debug("gc done",0);
 
 	gc_in_progress = false;
+
+	gc_time += (current_millis() - start);
 }
 
 /* WARNING: only call this from a context where all local variables
@@ -156,4 +151,10 @@ void maybe_garbage_collection(void)
 {
 	if(active.here > active.alarm)
 		primitive_gc();
+}
+
+void primitive_gc_time(void)
+{
+	maybe_garbage_collection();
+	dpush(tag_object(s48_long_long_to_bignum(gc_time)));
 }

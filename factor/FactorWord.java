@@ -29,23 +29,17 @@
 
 package factor;
 
-import factor.compiler.*;
 import java.util.*;
 
 /**
  * An internalized symbol.
  */
-public class FactorWord implements FactorExternalizable, FactorObject
+public class FactorWord implements FactorExternalizable
 {
-	private static int gensymCount = 0;
-
 	public String vocabulary;
 	public String name;
-
-	/**
-	 * Interpreted/compiled word definition.
-	 */
-	public FactorWordDefinition def;
+	public String stackEffect;
+	public String documentation;
 
 	/**
 	 * Parsing word definition.
@@ -53,25 +47,14 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	public FactorParsingDefinition parsing;
 
 	/**
-	 * Is this word referenced from a compiled word?
+	 * Stub for interpreter definitin.
 	 */
-	public boolean compileRef;
+	public FactorWordDefinition def;
 
 	/**
-	 * Should this word be inlined when compiling?
+	 * Should the parser keep doc comments?
 	 */
-	public boolean inline;
-
-	/**
-	 * Raise an error if an attempt is made to compile this word?
-	 */
-	public boolean interpretOnly;
-
-	/**
-	 * Only compiled words have this.
-	 */
-	public FactorClassLoader loader;
-	public String className;
+	public boolean docComment;
 
 	/**
 	 * For text editor integration.
@@ -80,119 +63,11 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	public int line;
 	public int col;
 
-	private FactorNamespace namespace;
-
 	//{{{ FactorWord constructor
-	/**
-	 * Do not use this constructor unless you're writing a packages
-	 * implementation or something. Use an FactorDictionary's
-	 * intern() method instead.
-	 */
-	public FactorWord(String vocabulary, String name,
-		FactorWordDefinition def)
-	{
-		this.vocabulary = vocabulary;
-		this.name = name;
-		this.def = def;
-	} //}}}
-
-	//{{{ FactorWord constructor
-	/**
-	 * Do not use this constructor unless you're writing a packages
-	 * implementation or something. Use an FactorDictionary's
-	 * intern() method instead.
-	 */
 	public FactorWord(String vocabulary, String name)
 	{
 		this.vocabulary = vocabulary;
 		this.name = name;
-	} //}}}
-
-	//{{{ getNamespace() method
-	public FactorNamespace getNamespace()
-		throws Exception
-	{
-		if(namespace == null)
-			namespace = new FactorNamespace(this);
-		return namespace;
-	} //}}}
-	
-	//{{{ gensym() method
-	/**
-	 * Returns an un-internalized word with a unique name.
-	 */
-	public synchronized static FactorWord gensym()
-	{
-		return new FactorWord(null,"#:GENSYM:" + (gensymCount++));
-	} //}}}
-
-	//{{{ define() method
-	public synchronized void define(FactorWordDefinition def)
-	{
-		if(compileRef)
-		{
-			System.err.println("WARNING: " + this
-				+ " is used in one or more compiled words; old definition will remain until full recompile");
-		}
-		else if(this.def != null)
-			System.err.println("WARNING: redefining " + this);
-
-		this.def = def;
-
-		loader = null;
-		className = null;
-	} //}}}
-
-	//{{{ setCompiledInfo() method
-	synchronized void setCompiledInfo(FactorClassLoader loader,
-		String className)
-	{
-		this.loader = loader;
-		this.className = className;
-	} //}}}
-
-	//{{{ compile() method
-	public synchronized void compile(FactorInterpreter interp)
-	{
-		RecursiveState recursiveCheck = new RecursiveState();
-		recursiveCheck.add(this,new StackEffect(),null,null,null);
-		compile(interp,recursiveCheck);
-		recursiveCheck.remove(this);
-	} //}}}
-
-	//{{{ compile() method
-	public synchronized void compile(FactorInterpreter interp,
-		RecursiveState recursiveCheck)
-	{
-		if(def == null)
-			return;
-
-		if(interpretOnly)
-		{
-			if(interp.verboseCompile)
-				System.err.println(this + " is interpret-only");
-			return;
-		}
-
-		//if(def.compileFailed)
-		//	return;
-
-		if(interp.verboseCompile)
-			System.err.println("Compiling " + this);
-
-		try
-		{
-			def = def.compile(interp,recursiveCheck);
-		}
-		catch(Throwable t)
-		{
-			def.compileFailed = true;
-			if(interp.verboseCompile)
-			{
-				System.err.println("WARNING: cannot compile " + this);
-				t.printStackTrace();
-			}
-		}
 	} //}}}
 
 	//{{{ toString() method

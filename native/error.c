@@ -29,20 +29,25 @@ void throw_error(CELL error, bool keep_stacks)
 	siglongjmp(toplevel,1);
 }
 
-void primitive_throw(void)
-{
-	throw_error(dpop(),true);
-}
-
 void early_error(CELL error)
 {
 	if(userenv[BREAK_ENV] == F)
 	{
 		/* Crash at startup */
-		fprintf(stderr,"Error %ld thrown before BREAK_ENV set\n",to_fixnum(error));
+		if(type_of(error) == FIXNUM_TYPE)
+			fprintf(stderr,"Error: %ld\n",to_fixnum(error));
+		else if(type_of(error) == STRING_TYPE)
+			fprintf(stderr,"Error: %s\n",to_c_string(untag_string(error)));
 		fflush(stderr);
 		exit(1);
 	}
+}
+
+void primitive_throw(void)
+{
+	CELL error = dpop();
+	early_error(error);
+	throw_error(error,true);
 }
 
 void general_error(CELL error, CELL tagged)

@@ -86,18 +86,28 @@ void box_c_string(const BYTE* c_string)
 /* untagged */
 BYTE* to_c_string(STRING* s)
 {
+	CELL i;
+
+	for(i = 0; i < s->capacity; i++)
+	{
+		CHAR ch = string_nth(s,i);
+		if(ch == '\0' || ch > 255)
+			general_error(ERROR_C_STRING,tag_object(s));
+	}
+
+	return to_c_string_unchecked(s);
+}
+
+/* untagged */
+BYTE* to_c_string_unchecked(STRING* s)
+{
 	STRING* _c_str = allot_string(s->capacity / CHARS + 1);
 	CELL i;
 
 	BYTE* c_str = (BYTE*)(_c_str + 1);
 	
 	for(i = 0; i < s->capacity; i++)
-	{
-		CHAR ch = string_nth(s,i);
-		if(ch == '\0' || ch > 255)
-			general_error(ERROR_C_STRING,tag_object(s));
 		c_str[i] = string_nth(s,i);
-	}
 
 	c_str[s->capacity] = '\0';
 
@@ -319,14 +329,4 @@ void primitive_string_reverse(void)
 	string_reverse(s,s->capacity);
 	rehash_string(s);
 	drepl(tag_object(s));
-}
-
-STRING* fixup_untagged_string(STRING* str)
-{
-	return (STRING*)((CELL)str + (active.base - relocation_base));
-}
-
-STRING* copy_untagged_string(STRING* str)
-{
-	return copy_untagged_object(str,SSIZE(str));
 }

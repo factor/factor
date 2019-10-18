@@ -221,4 +221,23 @@ SYMBOL: compile-callstack
 : compile ( word -- )
     [ postpone-word compile-postponed ] with-compiler ;
 
-: compiled word compile ; parsing
+: compiled
+    #! Compile the most recently defined word.
+    word compile ; parsing
+
+: cannot-compile ( word -- )
+    "verbose-compile" get [
+        "Cannot compile " write .
+    ] [
+        drop
+    ] ifte ;
+
+: compile-all ( -- )
+    #! Compile all words.
+    [
+        dup "infer-effect" word-property [
+            [ compile ] [ [ cannot-compile ] when ] catch
+        ] [
+            drop
+        ] ifte
+    ] each-word ;

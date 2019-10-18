@@ -1,4 +1,4 @@
-! cont-responder v0.6
+! cont-responder 
 !
 ! Copyright (C) 2004 Chris Double.
 ! 
@@ -29,7 +29,6 @@ USE: httpd-responder
 USE: math
 USE: random
 USE: continuations
-USE: format
 USE: namespaces
 USE: stack
 USE: combinators
@@ -39,11 +38,14 @@ USE: strings
 USE: html
 USE: kernel
 USE: logic
-USE: cont-html
+USE: html
 USE: logging
 USE: url-encoding
 USE: unparser
 USE: hashtables
+
+USE: prettyprint
+USE: inspector
 
 : expiry-timeout ( -- timeout-seconds )
   #! Number of seconds to timeout continuations in
@@ -60,7 +62,7 @@ USE: hashtables
 
 : get-random-id ( -- id ) 
   #! Generate a random id to use for continuation URL's
-  <% 16 [ random-digit unparse % ] times %> ;
+  [ 16 [ random-digit unparse , ] times ] make-string ;
 
 : continuation-table ( -- <namespace> ) 
   #! Return the global table of continuations
@@ -98,7 +100,7 @@ USE: hashtables
 : continuation-items ( -- alist )
   #! Return an alist of all continuation items in the continuation
   #! table with the car as the id and the cdr as the item.
-  continuation-table [ vars-values ] bind ;
+  continuation-table hash>alist ;
 
 : expire-continuations ( timeout-seconds -- )
   #! Expire all continuations in the continuation table
@@ -195,9 +197,7 @@ DEFER: show
 : with-string-stream ( quot -- string ) 
   #! Call the quotation with standard output bound to a string output
   #! stream. Return the string on exit.
-  <namespace> [ 
-    "stdio" 1024 <string-output-stream> put call "stdio" get stream>str 
-  ] bind ;
+  1024 <string-output-stream> dup >r swap with-stream r> stream>str ;
 
 : redirect-to-here ( -- )
   #! Force a redirect to the client browser so that the browser
@@ -212,8 +212,8 @@ DEFER: show
   ] [
     [ 
       t swap register-continuation 
-      <% "HTTP/1.1 302 Document Moved\nLocation: " % % "\n" % 
-        "Content-Length: 0\nContent-Type: text/plain\n\n" % %>
+      [ "HTTP/1.1 302 Document Moved\nLocation: " , , "\n" , 
+        "Content-Length: 0\nContent-Type: text/plain\n\n" , ] make-string
       call-exit-continuation 
     ] callcc1 drop 
   ] ifte ;
@@ -235,8 +235,7 @@ DEFER: show
     call-exit-continuation 
   ] callcc1 
   nip ;
-USE: prettyprint
-USE: inspector
+
 
 : cont-get-responder ( id-or-f -- ) 
   #! httpd responder that retrieves a continuation and calls it.
@@ -255,17 +254,12 @@ USE: inspector
   ] ifte 
   [ write flush ] when* drop ;
 
-: post-request>namespace ( post-request -- namespace )
-  #! Return a namespace containing the name/value's from the 
-  #! post data.
-  alist>hash ;
-
 : cont-post-responder ( id -- )    
   #! httpd responder that retrieves a continuation for the given
-  #! id and calls it with the POST data as an alist on the top
+  #! id and calls it with the POST data as a hashtable on the top
   #! of the stack.
   [ 
-    "response" get post-request>namespace swap resume-continuation 
+    "response" get alist>hash swap resume-continuation 
   ] with-exit-continuation
   print drop ;
 

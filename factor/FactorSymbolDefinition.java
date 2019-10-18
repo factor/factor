@@ -29,9 +29,6 @@
 
 package factor;
 
-import factor.compiler.*;
-import org.objectweb.asm.*;
-
 /**
  * SYMBOL: name
  *
@@ -51,45 +48,8 @@ public class FactorSymbolDefinition extends FactorWordDefinition
 		this.symbol = symbol;
 	} //}}}
 
-	//{{{ eval() method
-	public void eval(FactorInterpreter interp)
-		throws Exception
-	{
-		interp.datastack.push(symbol);
-	} //}}}
-
-	//{{{ getStackEffect() method
-	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler compiler) throws Exception
-	{
-		compiler.pushLiteral(symbol,recursiveCheck);
-	} //}}}
-
-	//{{{ compile() method
-	/**
-	 * Compile the given word, returning a new word definition.
-	 */
-	FactorWordDefinition compile(FactorInterpreter interp,
-		RecursiveState recursiveCheck) throws Exception
-	{
-		return this;
-	} //}}}
-
-	//{{{ compileCallTo() method
-	public void compileCallTo(CodeVisitor mw, FactorCompiler compiler,
-		RecursiveState recursiveCheck) throws FactorStackException
-	{
-		compiler.pushLiteral(symbol,recursiveCheck);
-	} //}}}
-
-	//{{{ fromList() method
-	public void fromList(Cons definition, FactorInterpreter interp)
-	{
-		this.symbol = definition.car;
-	} //}}}
-
 	//{{{ toList() method
-	public Cons toList(FactorInterpreter interp)
+	public Cons toList()
 	{
 		return new Cons(symbol,null);
 	} //}}}

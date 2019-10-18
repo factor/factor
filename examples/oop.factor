@@ -14,13 +14,13 @@ USE: words
 
 SYMBOL: traits
 
-: traits-map ( word -- hash )
+: traits-map ( type -- hash )
     #! The method map word property maps selector words to
     #! definitions.
     "traits-map" word-property ;
 
 : object-map ( obj -- hash )
-    dup has-namespace? [ traits swap get* ] [ drop f ] ifte ;
+    dup hashtable? [ traits swap hash ] [ drop f ] ifte ;
 
 : init-traits-map ( word -- )
     <namespace> "traits-map" set-word-property ;
@@ -39,7 +39,7 @@ SYMBOL: traits
     #! <foo> where foo is a traits type creates a new instance
     #! of foo.
     [ constructor-word [ <namespace> ] ] keep
-    traits-map [ traits pick set* ] cons append
+    traits-map [ traits pick set-hash ] cons append
     define-compound ;
 
 : predicate-word ( word -- word )
@@ -69,11 +69,11 @@ SYMBOL: traits
     dup unit [ car method call ] cons
     define-compound ; parsing
 
-: M:
+: M: ( -- type generic [ ] )
     #! M: foo bar begins a definition of the bar generic word
     #! specialized to the foo type.
     scan-word scan-word f ; parsing
 
-: ;M
+: ;M ( type generic def -- )
     #! ;M ends a method definition.
-    reverse transp traits-map set* ; parsing
+    rot traits-map [ reverse put ] bind ; parsing

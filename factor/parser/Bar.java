@@ -38,12 +38,11 @@ public class Bar extends FactorParsingDefinition
 	 * A new definition.
 	 */
 	public Bar(FactorWord word)
-		throws Exception
 	{
 		super(word);
 	} //}}}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
+	public void eval(FactorReader reader)
 		throws Exception
 	{
 		FactorReader.ParseState state = reader.getCurrentState();

@@ -43,52 +43,78 @@ USE: words
 USE: unparser
 USE: vectors
 
-: print-banner ( -- )
-    <% "This is " % java? [ "JVM " % ] when
-    native? [ "native " % ] when "Factor " % version % %> print
-    "Copyright (C) 2003, 2004 Slava Pestov" print
-    "Copyright (C) 2004 Chris Double" print
-    "Type ``exit'' to exit, ``help'' for help." print ;
+SYMBOL: cont-prompt
+SYMBOL: listener-prompt
+SYMBOL: quit-flag
 
-: print-prompt ( -- )
-    "ok" "prompt" style write-attr
+global [
+    "..." cont-prompt set
+    "ok" listener-prompt set
+] bind
+
+: prompt. ( text -- )
+    "prompt" style write-attr
     ! Print the space without a style, to workaround a bug in
     ! the GUI listener where the style from the prompt carries
     ! over to the input
     " " write flush ;
 
 : exit ( -- )
-    "quit-flag" on ;
+    #! Exit the current listener.
+    quit-flag on ;
 
-: eval-catch ( str -- )
-    [ eval ] [ [ default-error-handler drop ] when* ] catch ;
-
-: listener-step ( -- )
-    print-prompt read [ eval-catch ] [ exit ] ifte* ;
-
-: listener-loop ( -- )
-    "quit-flag" get [
-        "quit-flag" off
+: (read-multiline) ( quot depth -- quot ? )
+    #! Flag indicates EOF.
+    >r read dup [
+        (parse) depth r> dup >r = [
+            ( we're done ) r> drop t
+        ] [
+            ( more input needed ) r> cont-prompt get prompt.
+            (read-multiline)
+        ] ifte
     ] [
-        listener-step listener-loop
+        ( EOF ) r> 2drop f
     ] ifte ;
+
+: read-multiline ( -- quot ? )
+    #! Keep parsing until the end is reached. Flag indicates
+    #! EOF.
+    f depth (read-multiline) >r reverse r> ;
+
+: listen ( -- )
+    #! Wait for user input, and execute.
+    listener-prompt get prompt.
+    [ read-multiline [ call ] [ exit ] ifte ] print-error ;
+
+: listener ( -- )
+    #! Run a listener loop that executes user input.
+    quit-flag get [ quit-flag off ] [ listen listener ] ifte ;
+
+: kb. 1024 /i unparse write " KB" write ;
+
+: (room.) ( free total -- )
+    2dup swap - swap ( free used total )
+    kb. " total " write
+    kb. " used " write
+    kb. " free" print ;
 
 : room. ( -- )
     room
-    1024 /i unparse write " KB total, " write
-    1024 /i unparse write " KB free" print ;
+    "Data space: " write (room.)
+    "Code space: " write (room.) ;
 
-: init-listener ( -- )
-    print-banner
+: print-banner ( -- )
+    "Factor " write version print
+    "Copyright (C) 2003, 2004 Slava Pestov" print
+    "Copyright (C) 2004 Chris Double" print
+    "Type ``exit'' to exit, ``help'' for help." print
+    terpri
     room.
-
-    listener-loop ;
+    terpri ;
 
 : help ( -- )
     "SESSION:" print
-    native? [
-        "\"foo.image\" save-image   -- save heap to a file" print
-    ] when
+    "\"foo.image\" save-image   -- save heap to a file" print
     "room.                    -- show memory usage" print
     "heap-stats.              -- memory allocation breakdown" print
     "garbage-collection       -- force a GC" print
@@ -113,7 +139,7 @@ USE: vectors
     "PROFILER:                [ ... ] call-profile" print
     "                         [ ... ] allot-profile" print
     "TRACE:                   [ ... ] trace" print
-    "SINGLE STEP:             [ ... ] step" print
+    "SINGLE STEP:             [ ... ] walk" print
     terpri
     "HTTP SERVER:             USE: httpd 8888 httpd" print
     "TELNET SERVER:           USE: telnetd 9999 telnetd" print ;

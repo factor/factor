@@ -39,15 +39,14 @@ public class StackComment extends FactorParsingDefinition
 	 * A new definition.
 	 */
 	public StackComment(FactorWord word)
-		throws Exception
 	{
 		super(word);
 	} //}}}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
-		throws IOException, FactorParseException
+	public void eval(FactorReader reader)
+		throws Exception
 	{
 		String comment = reader.getScanner().readUntil( '(',')',false);
-		reader.append(new FactorDocComment(comment,true));
+		reader.setStackComment(comment);
 	}
 }

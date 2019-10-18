@@ -38,17 +38,16 @@ public class PushWord extends FactorParsingDefinition
 	 * A new definition.
 	 */
 	public PushWord(FactorWord word)
-		throws Exception
 	{
 		super(word);
 	} //}}}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
+	public void eval(FactorReader reader)
 		throws Exception
 	{
 		FactorWord word = reader.nextWord(false);
 		reader.append(new Cons(word,null));
-		reader.append(interp.searchVocabulary(
+		reader.append(reader.searchVocabulary(
 			new Cons("lists",null),"car"));
 	}
 }

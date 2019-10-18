@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2003, 2004 Slava Pestov.
+! Copyright (C) 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -27,67 +27,49 @@
 
 IN: words
 USE: combinators
-USE: kernel
+USE: hashtables
 USE: lists
 USE: namespaces
 USE: stack
-USE: strings
 
-: vocabs ( -- list )
-    #! Push a list of vocabularies.
-    global [ "vocabularies" get [ vars ] bind ] bind ;
+: (search) ( name vocab -- word )
+    vocab dup [ hash ] [ 2drop f ] ifte ;
 
-: vocab ( name -- vocab )
-    #! Get a vocabulary.
-    global [ "vocabularies" get get* ] bind ;
+: search ( name list -- word )
+    #! Search for a word in a list of vocabularies.
+    dup [
+        2dup car (search) dup [
+            nip nip ( found )
+        ] [
+            drop cdr search ( check next )
+        ] ifte
+    ] [
+        2drop f ( not found )
+    ] ifte ;
 
-: words ( vocab -- list )
-    #! Push a list of all words in a vocabulary.
-    #! Filter empty slots.
-    vocab [ values ] bind [ ] subset ;
+: <plist> ( name vocab -- plist )
+    "vocabulary" swons swap "name" swons 2list ;
 
-: init-search-path ( -- )
-    ! For files
-    "scratchpad" "file-in" set
-    [ "builtins" "syntax" "scratchpad" ] "file-use" set
-    ! For interactive
-    "scratchpad" "in" set
-    [
-        "user"
-        "arithmetic"
-        "builtins"
-        "combinators"
-        "compiler"
-        "continuations"
-        "debugger"
-        "errors"
-        "files"
-        "hashtables"
-        "inference"
-        "inferior"
-        "interpreter"
-        "inspector"
-        "jedit"
-        "kernel"
-        "listener"
-        "lists"
-        "logic"
-        "math"
-        "namespaces"
-        "parser"
-        "prettyprint"
-        "processes"
-        "profiler"
-        "stack"
-        "streams"
-        "stdio"
-        "strings"
-        "syntax"
-        "test"
-        "threads"
-        "unparser"
-        "vectors"
-        "vocabularies"
-        "words"
-        "scratchpad"
-    ] "use" set ;
+: (create) ( name vocab -- word )
+    #! Create an undefined word without adding to a vocabulary.
+    <plist> 0 f rot <word> ;
+
+: reveal ( word -- )
+    #! Add a new word to its vocabulary.
+    global [
+        "vocabularies" get [
+            dup word-vocabulary
+            over word-name
+            2list set-object-path
+        ] bind
+    ] bind ;
+
+: create ( name vocab -- word )
+    #! Create a new word in a vocabulary. If the vocabulary
+    #! already contains the word, the existing instance is
+    #! returned.
+    2dup (search) [ nip nip ] [ (create) dup reveal ] ifte* ;
+
+: forget ( word -- )
+    #! Remove a word definition.
+    dup word-vocabulary vocab [ word-name off ] bind ;

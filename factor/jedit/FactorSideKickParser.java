@@ -40,8 +40,6 @@ import sidekick.*;
 
 public class FactorSideKickParser extends SideKickParser
 {
-	private FactorInterpreter interp;
-	private WordPreview wordPreview;
 	private Map previewMap;
 
 	/**
@@ -55,30 +53,7 @@ public class FactorSideKickParser extends SideKickParser
 	public FactorSideKickParser()
 	{
 		super("factor");
-		interp = FactorPlugin.getInterpreter();
 		previewMap = new HashMap();
-		worddefs = new HashMap();
-	} //}}}
-
-	//{{{ getInterpreter() method
-	public FactorInterpreter getInterpreter()
-	{
-		return interp;
-	} //}}}
-
-	//{{{ getWordDefinition() method
-	/**
-	 * Check for a word definition from a parsed source file. If one is
-	 * found, return it, otherwise return interpreter's definition.
-	 */
-	public FactorWordDefinition getWordDefinition(FactorWord word)
-	{
-		FactorWordDefinition def = (FactorWordDefinition)
-			worddefs.get(word);
-		if(def != null)
-			return def;
-		else
-			return word.def;
 	} //}}}
 
 	//{{{ activate() method
@@ -135,7 +110,14 @@ public class FactorSideKickParser extends SideKickParser
 			buffer.readLock();
 
 			text = buffer.getText(0,buffer.getLength());
+		}
+		finally
+		{
+			buffer.readUnlock();
+		}
 
+		try
+		{
 			/* of course wrapping a string reader in a buffered
 			reader is dumb, but the FactorReader uses readLine() */
 			FactorScanner scanner = new RestartableFactorScanner(
@@ -143,13 +125,13 @@ public class FactorSideKickParser extends SideKickParser
 				new BufferedReader(new StringReader(text)),
 				errorSource);
 			FactorReader r = new FactorReader(scanner,
-				false,false,interp);
-
+				false,FactorPlugin.getExternalInstance());
+	
 			Cons parsed = r.parse();
-
+	
 			d.in = r.getIn();
 			d.use = r.getUse();
-
+	
 			addWordDefNodes(d,parsed,buffer);
 		}
 		catch(FactorParseException pe)
@@ -164,10 +146,6 @@ public class FactorSideKickParser extends SideKickParser
 				buffer.getPath(),
 				0,0,0,e.toString());
 			Log.log(Log.DEBUG,this,e);
-		}
-		finally
-		{
-			buffer.readUnlock();
 		}
 
 		return d;
@@ -188,7 +166,6 @@ public class FactorSideKickParser extends SideKickParser
 					parsed.car;
 
 				FactorWord word = def.word;
-				worddefs.put(word,def);
 
 				/* word lines are indexed from 1 */
 				int startLine = Math.min(
@@ -205,8 +182,7 @@ public class FactorSideKickParser extends SideKickParser
 				if(last != null)
 					last.end = buffer.createPosition(start - 1);
 
-				last = new FactorAsset(word,def,
-					buffer.createPosition(start));
+				last = new FactorAsset(word,buffer.createPosition(start));
 				d.root.add(new DefaultMutableTreeNode(last));
 			}
 
@@ -298,10 +274,11 @@ public class FactorSideKickParser extends SideKickParser
 		if(word.length() == 0)
 			return null;
 
-		List completions = FactorPlugin.getCompletions(
-			data.use,word,false);
+		FactorWord[] completions = FactorPlugin.toWordArray(
+			FactorPlugin.getCompletions(
+			data.use,word,false));
 
-		if(completions.size() == 0)
+		if(completions.length == 0)
 			return null;
 		else
 		{

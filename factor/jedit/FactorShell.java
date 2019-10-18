@@ -32,29 +32,32 @@ package factor.jedit;
 import console.*;
 import factor.*;
 import javax.swing.text.AttributeSet;
-import java.util.WeakHashMap;
+import java.io.*;
+import java.util.Iterator;
+import java.util.HashMap;
+import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.ServiceManager;
+import org.gjt.sp.util.Log;
 
 public class FactorShell extends Shell
 {
-	//{{{ readLine() method
-	/**
-	 * Helper static method to simplify Factor code.
-	 */
-	public static void readLine(Cons continuation, Console console)
-	{
-		FactorShell shell = (FactorShell)ServiceManager.getService(
-			"console.Shell","Factor");
-		ConsoleState state = shell.getConsoleState(console);
-		state.readLineContinuation = continuation;
-	} //}}}
-	
 	//{{{ FactorShell constructor
 	public FactorShell()
 	{
 		super("Factor");
-		interp = FactorPlugin.getInterpreter();
-		consoles = new WeakHashMap();
+		consoles = new HashMap();
+	} //}}}
+
+	//{{{ closeConsole() method
+	/**
+	 * Called when a Console dockable is closed.
+	 * @since Console 4.0.2
+	 */
+	public void closeConsole(Console console)
+	{
+		ConsoleState state = (ConsoleState)consoles.get(console);
+		if(state != null)
+			state.closeStream();
 	} //}}}
 
 	//{{{ printInfoMessage() method
@@ -75,7 +78,15 @@ public class FactorShell extends Shell
 	 */
 	public void printPrompt(Console console, Output output)
 	{
-		getConsoleState(console);
+		try
+		{
+			getConsoleState(console).packetLoop(output);
+		}
+		catch(Exception e)
+		{
+			output.print(console.getErrorColor(),e.toString());
+			Log.log(Log.ERROR,this,e);
+		}
 	} //}}}
 
 	//{{{ execute() method
@@ -91,11 +102,20 @@ public class FactorShell extends Shell
 	public void execute(Console console, String input,
 		Output output, Output error, String command)
 	{
-		ConsoleState state = getConsoleState(console);
-		Cons quot = new Cons(command,state.readLineContinuation);
-		eval(quot);
-		output.commandDone();
-		error.commandDone();
+		try
+		{
+			getConsoleState(console).readResponse(output,command);
+		}
+		catch(Exception e)
+		{
+			output.print(console.getErrorColor(),e.toString());
+			Log.log(Log.ERROR,this,e);
+		}
+		finally
+		{
+			output.commandDone();
+			error.commandDone();
+		}
 	} //}}}
 	
 	//{{{ stop() method
@@ -105,41 +125,35 @@ public class FactorShell extends Shell
 	public void stop(Console console)
 	{
 	} //}}}
-	
+
+	//{{{ closeStreams() method
+	/**
+	 * Close all listener connections. Should be called before Factor is restarted.
+	 */
+	public void closeStreams()
+	{
+		Iterator iter = consoles.values().iterator();
+		while(iter.hasNext())
+		{
+			ConsoleState state = (ConsoleState)iter.next();
+			state.closeStream();
+		}
+	} //}}}
+
 	//{{{ Private members
-	private FactorInterpreter interp;
-	private WeakHashMap consoles;
+	private HashMap consoles;
 	
 	//{{{ getConsoleState() method
 	private ConsoleState getConsoleState(Console console)
+		throws IOException
 	{
 		ConsoleState state = (ConsoleState)consoles.get(console);
 		if(state == null)
 		{
 			state = new ConsoleState(console);
 			consoles.put(console,state);
-
-			eval(new Cons(console,
-				new Cons(interp.searchVocabulary(
-					"console","console-hook"),
-					null)));
 		}
 		return state;
-	} //}}}
-
-	//{{{ eval() method
-	private void eval(Cons cmd)
-	{
-		try
-		{
-			interp.call(cmd);
-			interp.run();
-		}
-		catch(Exception e)
-		{
-			System.err.println("Failed to eval " + cmd + ":");
-			e.printStackTrace();
-		}
 	} //}}}
 
 	//}}}
@@ -148,11 +162,98 @@ public class FactorShell extends Shell
 	class ConsoleState
 	{
 		private Console console;
-		Cons readLineContinuation;
+		private FactorStream stream;
+		private boolean waitingForInput;
 		
 		ConsoleState(Console console)
 		{
 			this.console = console;
+		}
+
+		void openStream(Output output) throws Exception
+		{
+			if(stream == null)
+			{
+				output.print(console.getInfoColor(),
+					jEdit.getProperty("factor.shell.opening"));
+				stream = FactorPlugin.getExternalInstance().openStream();
+			}
+		}
+
+		void closeStream()
+		{
+			try
+			{
+				if(stream != null)
+				{
+					waitingForInput = false;
+					console.print(console.getInfoColor(),
+						jEdit.getProperty("factor.shell.closing"));
+					stream.close();
+				}
+			}
+			catch(IOException e)
+			{
+				throw new RuntimeException(e);
+			}
+
+			stream = null;
+		}
+		
+		private void handleWritePacket(FactorStream.WritePacket w, Output output)
+			throws Exception
+		{
+			Cons pair = FactorPlugin.getExternalInstance()
+				.parseObject(w.getText());
+
+			String write = (String)pair.car;
+			AttributeSet attrs = new ListenerAttributeSet(
+				(Cons)pair.next().car);
+
+			output.writeAttrs(attrs,write);
+		}
+		
+		void packetLoop(Output output) throws Exception
+		{
+			if(waitingForInput)
+				return;
+
+			openStream(output);
+
+			for(;;)
+			{
+				FactorStream.Packet p = stream.nextPacket();
+				if(p == null)
+				{
+					/* EOF */
+					closeStream();
+					break;
+				}
+				else if(p instanceof FactorStream.ReadLinePacket)
+				{
+					waitingForInput = true;
+					break;
+				}
+				else if(p instanceof FactorStream.WritePacket)
+					handleWritePacket((FactorStream.WritePacket)p,output);
+			}
+		}
+
+		void readResponse(Output output, String command) throws Exception
+		{
+			if(waitingForInput)
+			{
+				openStream(output);
+
+				stream.readResponse(command);
+				waitingForInput = false;
+				packetLoop(output);
+			}
+			else
+			{
+				console.print(console.getErrorColor(),
+					jEdit.getProperty("factor.shell.not-waiting"));
+			}
 		}
 	} //}}}
 }

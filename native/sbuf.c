@@ -4,7 +4,7 @@ SBUF* sbuf(FIXNUM capacity)
 {
 	SBUF* sbuf = allot_object(SBUF_TYPE,sizeof(SBUF));
 	sbuf->top = 0;
-	sbuf->string = string(capacity,'\0');
+	sbuf->string = tag_object(string(capacity,'\0'));
 	return sbuf;
 }
 
@@ -23,16 +23,18 @@ void primitive_set_sbuf_length(void)
 {
 	SBUF* sbuf;
 	FIXNUM length;
+	STRING* str;
 
 	maybe_garbage_collection();
 
 	sbuf = untag_sbuf(dpop());
+	str = untag_string(sbuf->string);
 	length = to_fixnum(dpop());
 	if(length < 0)
 		range_error(tag_object(sbuf),length,sbuf->top);
 	sbuf->top = length;
-	if(length > sbuf->string->capacity)
-		sbuf->string = grow_string(sbuf->string,length,F);
+	if(length > str->capacity)
+		sbuf->string = tag_object(grow_string(str,length,F));
 }
 
 void primitive_sbuf_nth(void)
@@ -42,15 +44,15 @@ void primitive_sbuf_nth(void)
 
 	if(index < 0 || index >= sbuf->top)
 		range_error(tag_object(sbuf),index,sbuf->top);
-	dpush(string_nth(sbuf->string,index));
+	dpush(string_nth(untag_string(sbuf->string),index));
 }
 
 void sbuf_ensure_capacity(SBUF* sbuf, FIXNUM top)
 {
-	STRING* string = sbuf->string;
+	STRING* string = untag_string(sbuf->string);
 	CELL capacity = string->capacity;
 	if(top >= capacity)
-		sbuf->string = grow_string(string,top * 2 + 1,F);
+		sbuf->string = tag_object(grow_string(string,top * 2 + 1,F));
 	sbuf->top = top;
 }
 
@@ -62,7 +64,7 @@ void set_sbuf_nth(SBUF* sbuf, CELL index, CHAR value)
 		sbuf_ensure_capacity(sbuf,index + 1);
 
 	/* the following does not check bounds! */
-	set_string_nth(sbuf->string,index,value);
+	set_string_nth(untag_string(sbuf->string),index,value);
 }
 
 void primitive_set_sbuf_nth(void)
@@ -84,8 +86,10 @@ void sbuf_append_string(SBUF* sbuf, STRING* string)
 {
 	CELL top = sbuf->top;
 	CELL strlen = string->capacity;
+	STRING* str;
 	sbuf_ensure_capacity(sbuf,top + strlen);
-	memcpy((void*)((CELL)sbuf->string + sizeof(STRING) + top * CHARS),
+	str = untag_string(sbuf->string);
+	memcpy((void*)((CELL)str + sizeof(STRING) + top * CHARS),
 		(void*)((CELL)string + sizeof(STRING)),strlen * CHARS);
 }
 
@@ -122,7 +126,7 @@ void primitive_sbuf_to_string(void)
 	maybe_garbage_collection();
 
 	sbuf = untag_sbuf(dpeek());
-	s = string_clone(sbuf->string,sbuf->top);
+	s = string_clone(untag_string(sbuf->string),sbuf->top);
 	rehash_string(s);
 	drepl(tag_object(s));
 }
@@ -130,7 +134,7 @@ void primitive_sbuf_to_string(void)
 void primitive_sbuf_reverse(void)
 {
 	SBUF* sbuf = untag_sbuf(dpop());
-	string_reverse(sbuf->string,sbuf->top);
+	string_reverse(untag_string(sbuf->string),sbuf->top);
 }
 
 void primitive_sbuf_clone(void)
@@ -143,7 +147,7 @@ void primitive_sbuf_clone(void)
 	s = untag_sbuf(dpeek());
 	new_s = sbuf(s->top);
 
-	sbuf_append_string(new_s,s->string);
+	sbuf_append_string(new_s,untag_string(s->string));
 	drepl(tag_object(new_s));
 }
 
@@ -152,7 +156,10 @@ bool sbuf_eq(SBUF* s1, SBUF* s2)
 	if(s1 == s2)
 		return true;
 	else if(s1->top == s2->top)
-		return (string_compare_head(s1->string,s2->string,s1->top) == 0);
+	{
+		return (string_compare_head(untag_string(s1->string),
+			untag_string(s2->string),s1->top) == 0);
+	}
 	else
 		return false;
 }
@@ -170,15 +177,15 @@ void primitive_sbuf_eq(void)
 void primitive_sbuf_hashcode(void)
 {
 	SBUF* sbuf = untag_sbuf(dpop());
-	dpush(tag_fixnum(hash_string(sbuf->string,sbuf->top)));
+	dpush(tag_fixnum(hash_string(untag_string(sbuf->string),sbuf->top)));
 }
 
 void fixup_sbuf(SBUF* sbuf)
 {
-	sbuf->string = fixup_untagged_string(sbuf->string);
+	fixup(&sbuf->string);
 }
 
 void collect_sbuf(SBUF* sbuf)
 {
-	sbuf->string = copy_untagged_string(sbuf->string);
+	copy_object(&sbuf->string);
 }

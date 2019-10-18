@@ -71,7 +71,8 @@ bool in_zone(ZONE* z, CELL pointer)
 
 void primitive_room(void)
 {
-	/* push: free total */
+	box_integer(compiling.limit - compiling.here);
+	box_integer(compiling.limit - compiling.base);
 	box_integer(active.limit - active.here);
 	box_integer(active.limit - active.base);
 }

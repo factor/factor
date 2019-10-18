@@ -40,24 +40,22 @@ public class Ine extends FactorParsingDefinition
 	 * A new definition.
 	 */
 	public Ine(FactorWord start, FactorWord end)
-		throws Exception
 	{
 		super(end);
 		this.start = start;
 	} //}}}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
+	public void eval(FactorReader reader)
 		throws Exception
 	{
 		FactorReader.ParseState state = reader.popState(start,word);
-		FactorWord w = (FactorWord)state.arg;
+		FactorWord w = state.defining;
+		/* Only ever null with restartable scanner;
+		error already logged, so give up */
 		if(w == null)
 			return;
 
-		reader.append(w.vocabulary);
-		reader.append(w.name);
-		reader.append(new FactorCompoundDefinition(
-			w,state.first,interp));
-		reader.append(reader.intern("define",false));
+		w.def = new FactorCompoundDefinition(w,state.first);
+		reader.append(w.def);
 	}
 }

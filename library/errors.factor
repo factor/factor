@@ -36,8 +36,13 @@ USE: stack
 USE: strings
 USE: vectors
 
-: >c ( catch -- ) catchstack* vector-push ;
-: c> ( catch -- ) catchstack* vector-pop ;
+! This is a very lightweight exception handling system.
+
+: catchstack ( -- cs ) 6 getenv ;
+: set-catchstack ( cs -- ) 6 setenv ;
+
+: >c ( catch -- ) catchstack cons set-catchstack ;
+: c> ( catch -- ) catchstack uncons set-catchstack ;
 
 : save-error ( error -- )
     #! Save the stacks and parser state for post-mortem

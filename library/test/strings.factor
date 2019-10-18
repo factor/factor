@@ -29,13 +29,13 @@ USE: test
 [ -1 ] [ "hola" "amigo" index-of ] unit-test
 [ -1 ] [ "hola" "holaa" index-of ] unit-test
 
-[ "Beginning" ] [ "Beginning and end" 9 str-head ] unit-test
+[ "Beginning" ] [ 9 "Beginning and end" str-head ] unit-test
 
 [ f ] [ "I" "team" str-contains? ] unit-test
 [ t ] [ "ea" "team" str-contains? ] unit-test
 [ f ] [ "actore" "Factor" str-contains? ] unit-test
 
-[ "end" ] [ "Beginning and end" 14 str-tail ] unit-test
+[ "end" ] [ 14 "Beginning and end" str-tail ] unit-test
 
 [ "Beginning" " and end" ] [ "Beginning and end" 9 str/ ] unit-test
 

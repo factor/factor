@@ -6,7 +6,7 @@ USE: stdio
 [ "ab\0\0" ] [ 4 "ab" align-string ] unit-test
 
 [ { 0 } ] [
-    [ "\0\0\0\0" emit-string ] with-minimal-image
+    [ "\0\0\0\0" emit-chars ] with-minimal-image
 ] unit-test
 
 [ { 6815845 7077996 7274528 7798895 7471212 6553600 } ]

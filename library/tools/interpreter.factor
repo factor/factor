@@ -44,11 +44,13 @@ USE: stdio
 ! partial evaluation, also for trace and step.
 
 ! Meta-stacks
+USE: listener
 SYMBOL: meta-r
 : push-r meta-r get vector-push ;
 : pop-r meta-r get vector-pop ;
 SYMBOL: meta-d
 : push-d meta-d get vector-push ;
+: peek-d meta-d get vector-peek ;
 : pop-d meta-d get vector-pop ;
 SYMBOL: meta-n
 SYMBOL: meta-c
@@ -59,16 +61,16 @@ SYMBOL: meta-cf
 : init-interpreter ( -- )
     10 <vector> meta-r set
     10 <vector> meta-d set
-    10 <vector> meta-n set
-    10 <vector> meta-c set
+    namestack meta-n set
+    f meta-c set
     f meta-cf set ;
 
 : copy-interpreter ( -- )
     #! Copy interpreter state from containing namespaces.
     meta-r get vector-clone meta-r set
     meta-d get vector-clone meta-d set
-    meta-n get vector-clone meta-n set
-    meta-c get vector-clone meta-c set ;
+    meta-n get meta-n set
+    meta-c get meta-c set ;
 
 : done-cf? ( -- ? )
     meta-cf get not ;
@@ -134,10 +136,10 @@ SYMBOL: meta-cf
 \ r>   [ pop-r push-d ] set-meta-word
 \ callstack [ meta-r get vector-clone push-d ] set-meta-word
 \ set-callstack [ pop-d vector-clone meta-r set ] set-meta-word
-\ namestack* [ meta-n get push-d ] set-meta-word
-\ set-namestack* [ pop-d meta-n set ] set-meta-word
-\ catchstack* [ meta-c get push-d ] set-meta-word
-\ set-catchstack* [ pop-d meta-c set ] set-meta-word
+\ namestack [ meta-n get push-d ] set-meta-word
+\ set-namestack [ pop-d meta-n set ] set-meta-word
+\ catchstack [ meta-c get push-d ] set-meta-word
+\ set-catchstack [ pop-d meta-c set ] set-meta-word
 \ call [ pop-d meta-call ] set-meta-word
 \ execute [ pop-d meta-word ] set-meta-word
 \ ifte [ pop-d pop-d pop-d [ nip ] [ drop ] ifte meta-call ] set-meta-word
@@ -161,22 +163,6 @@ SYMBOL: meta-cf
         meta-d get set-datastack
     ] with-scope ;
 
-: walk-banner ( -- )
-    "The following words control the single-stepper:" print
-    "&s      -- print stepper data stack" print
-    "&r      -- print stepper call stack" print
-    "&n      -- print stepper name stack" print
-    "&c      -- print stepper catch stack" print
-    "step    -- single step" print
-    "(trace) -- trace until end" print
-    "(run)   -- run until end" print ;
-
-: walk ( quot -- )
-    #! Single-step through execution of a quotation.
-    init-interpreter
-    meta-cf set
-    walk-banner ;
-
 : &s
     #! Print stepper data stack.
     meta-d get {.} ;
@@ -187,11 +173,15 @@ SYMBOL: meta-cf
 
 : &n
     #! Print stepper name stack.
-    meta-n get {.} ;
+    meta-n get [.] ;
 
 : &c
     #! Print stepper catch stack.
-    meta-c get {.} ;
+    meta-c get [.] ;
+
+: &get ( var -- value )
+    #! Print stepper variable value.
+    meta-n get (get) ;
 
 : not-done ( quot -- )
     done? [ "Stepper is done." print drop ] [ call ] ifte ;
@@ -199,3 +189,24 @@ SYMBOL: meta-cf
 : step
     #! Step into current word.
     [ next dup report do ] not-done ;
+
+: walk-banner ( -- )
+    "The following words control the single-stepper:" print
+    [ &s &r &n &c ] [ prettyprint-word " " write ] each
+    "show stepper stacks." print
+    \ &get prettyprint-word
+    " ( var -- value ) inspects the stepper namestack." print
+    \ step prettyprint-word " -- single step" print
+    \ (trace) prettyprint-word " -- trace until end" print
+    \ (run) prettyprint-word " -- run until end" print
+    \ exit prettyprint-word " -- exit single-stepper" print ;
+
+: walk ( quot -- )
+    #! Single-step through execution of a quotation.
+    [
+        "walk" listener-prompt set
+        init-interpreter
+        meta-cf set
+        walk-banner
+        listener
+    ] with-scope ;

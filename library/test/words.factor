@@ -52,3 +52,6 @@ word word-name "last-word-test" set
 [ "test-scope" ] [
     "test-scope" [ "scratchpad" ] search word-name
 ] unit-test
+
+[ t ] [ vocabs list? ] unit-test
+[ t ] [ vocabs [ words [ word? ] all? ] all? ] unit-test

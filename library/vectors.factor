@@ -30,6 +30,7 @@ USE: kernel
 USE: lists
 USE: math
 USE: stack
+USE: combinators
 
 : 2vector-nth ( n vec vec -- obj obj )
     >r over >r vector-nth r> r> vector-nth ;
@@ -68,3 +69,60 @@ DEFER: vector-map
 : vector-clone ( vector -- vector )
     #! Shallow copy of a vector.
     [ ] vector-map ;
+
+: ?vector= ( n vec vec -- ? )
+    #! Reached end?
+    drop vector-length number= ;
+
+: (vector=) ( n vec vec -- ? )
+    3dup ?vector= [
+        3drop t ( reached end without any unequal elts )
+    ] [
+        3dup 2vector-nth = [
+            >r >r succ r> r> (vector=)
+        ] [
+            3drop f
+        ] ifte
+    ] ifte ;
+
+: vector-length= ( vec vec -- ? )
+    vector-length swap vector-length number= ;
+
+: vector= ( obj vec -- ? )
+    #! Check if two vectors are equal. Two vectors are
+    #! considered equal if they have the same length and contain
+    #! equal elements.
+    2dup eq? [
+        2drop t
+    ] [
+        over vector? [
+            2dup vector-length= [
+                0 -rot (vector=)
+            ] [
+                2drop f
+            ] ifte
+        ] [
+            2drop f
+        ] ifte
+    ] ifte ;
+
+: ?vector-nth ( n vec -- obj/f )
+    2dup vector-length >= [ 2drop f ] [ vector-nth ] ifte ;
+
+: vector-hashcode ( vec -- n )
+    0 swap 4 [
+        over ?vector-nth hashcode rot bitxor swap
+    ] times* drop ;
+
+: vector-tail ( n vector -- vector )
+    #! Return a new vector, with all elements from the nth
+    #! index upwards.
+    2dup vector-length swap - [
+        pick + over vector-nth
+    ] vector-project nip nip ;
+
+: vector-tail* ( n vector -- vector )
+    #! Unlike vector-tail, n is an index from the end of the
+    #! vector. For example, if n=1, this returns a vector of
+    #! one element.
+    [ vector-length swap - ] keep vector-tail ;

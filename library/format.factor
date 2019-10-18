@@ -37,9 +37,9 @@ USE: stack
     #! Split a string before and after the decimal point.
     dup "." index-of dup -1 = [ drop f ] [ str// ] ifte ;
 
-: decimal-tail ( str count -- string )
+: decimal-tail ( count str -- string )
     #! Given a decimal, trims all but a count of decimal places.
-    over str-length min str-head ;
+    [ str-length min ] keep str-head ;
 
 : decimal-cat ( before after -- string )
     #! If after is of zero length, return before, otherwise
@@ -52,10 +52,10 @@ USE: stack
 
 : decimal-places ( num count -- string )
     #! Trims the number to a count of decimal places.
-    swap decimal-split dup [
-        rot decimal-tail decimal-cat
+    >r decimal-split dup [
+        r> swap decimal-tail decimal-cat
     ] [
-        drop nip
+        r> 2drop
     ] ifte ;
 
 : digits ( string count -- string )

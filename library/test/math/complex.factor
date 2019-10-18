@@ -46,3 +46,14 @@ USE: test
 
 [ 5 ] [ #{ 3 4 } abs ] unit-test
 [ 5 ] [ -5.0 abs ] unit-test
+
+! Make sure arguments are sane
+[ 0 ] [ 0 arg ] unit-test
+[ 0 ] [ 1 arg ] unit-test
+[ t ] [ -1 arg 3.14 3.15 between? ] unit-test
+[ t ] [ i arg 1.57 1.58 between? ] unit-test
+[ t ] [ -i arg -1.58 -1.57 between? ] unit-test
+
+[ 1 0 ] [ 1 >polar ] unit-test
+[ 1 ] [ -1 >polar drop ] unit-test
+[ t ] [ -1 >polar nip 3.14 3.15 between? ] unit-test

@@ -1,11 +1,11 @@
 ! Graphical mandelbrot fractal renderer.
 ! To run this code, start your interpreter like so:
 !
-! ./f -library:sdl=libSDL.so -library:sdl-gfx=libSDL_gfx.so
+! ./f -libraries:sdl=libSDL.so -libraries:sdl-gfx=libSDL_gfx.so
 !
 ! Then, enter this at the interpreter prompt:
 !
-! "contrib/mandel.factor" run-file
+! "examples/mandel.factor" run-file
 
 IN: mandel
 
@@ -39,12 +39,12 @@ USE: test
 : val 0.85 ;
 
 : <color-map> ( nb-cols -- map )
-    [,
+    [
         dup [
             360 * over succ / 360 / sat val
             hsv>rgb 1.0 scale-rgba ,
         ] times*
-    ,] list>vector nip ;
+    ] make-list list>vector nip ;
 
 : absq >rect swap sq swap sq + ;
 

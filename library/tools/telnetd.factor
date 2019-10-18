@@ -42,34 +42,16 @@ USE: threads
     dup [
         "client" set
         log-client
-        listener-loop
+        listener
     ] with-stream ;
 
 : telnet-connection ( socket -- )
-    #! We don't do multitasking in JFactor.
-    java? [
-        telnet-client
-    ] [
-        [ telnet-client ] in-thread drop
-    ] ifte ;
-
-: quit-flag ( -- ? )
-    global [ "telnetd-quit-flag" get ] bind ;
-
-: clear-quit-flag ( --  )
-    global [ f "telnetd-quit-flag" set ] bind ;
+    [ telnet-client ] in-thread drop ;
 
 : telnetd-loop ( server -- server )
-    quit-flag [
-        dup >r accept telnet-connection r>
-        telnetd-loop
-    ] unless ;
+    [ [ accept telnet-connection ] keep ] forever ;
 
 : telnetd ( port -- )
     [
-        <server> [
-            telnetd-loop
-        ] [
-            clear-quit-flag swap fclose rethrow
-        ] catch
+        <server> [ telnetd-loop ] [ swap fclose rethrow ] catch
     ] with-logging ;

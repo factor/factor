@@ -50,11 +50,9 @@ USE: url-encoding
     ] ifte ;
 
 : url>path ( uri -- path )
-    url-decode dup "http://" str-head? dup [
-        "/" split1 f "" replace nip nip
-    ] [
-        drop
-    ] ifte ;
+    url-decode "http://" ?str-head [
+        "/" split1 f "" replace nip
+    ] when ;
 
 : secure-path ( path -- path )
     ".." over str-contains? [ drop f ] when ;
@@ -91,9 +89,7 @@ USE: url-encoding
             "stdio" get "client" set log-client
             read [ parse-request ] when*
         ] with-stream
-    ] [
-        [ default-error-handler drop ] when*
-    ] catch ;
+    ] print-error ;
 
 : httpd-connection ( socket -- )
     "http-server" get accept [ httpd-client ] in-thread drop ;

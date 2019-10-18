@@ -36,14 +36,14 @@ USE: stack
     #! In order to compile, the code must produce as many values
     #! as it consumes.
     tuck >r dup 0 <= [ r> 3drop ] [ pred slip r> times ] ifte ;
-    inline interpret-only
+    inline
 
 : (times) ( limit n quot -- )
     pick pick <= [
         3drop
     ] [
         rot pick succ pick 3slip (times)
-    ] ifte ; inline interpret-only
+    ] ifte ; inline
 
 : times* ( n quot -- )
     #! Evaluate a quotation n times, pushing the index at each
@@ -51,7 +51,7 @@ USE: stack
     #!
     #! In order to compile, the code must consume one more value
     #! than it produces.
-    0 swap (times) ; inline interpret-only
+    0 swap (times) ; inline
 
 : 2times-succ ( #{ a b } #{ c d } -- z )
     #! Lexicographically add #{ 0 1 } to a complex number.

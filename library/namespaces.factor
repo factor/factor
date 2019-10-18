@@ -27,6 +27,7 @@
 
 IN: namespaces
 USE: combinators
+USE: hashtables
 USE: kernel
 USE: lists
 USE: logic
@@ -53,9 +54,56 @@ USE: vectors
 ! bind ( namespace quot -- ) executes a quotation with a
 ! namespace pushed on the namespace stack.
 
+: namestack ( -- ns ) 3 getenv ;
+: set-namestack ( ns -- ) 3 setenv ;
+
 : namespace ( -- namespace )
     #! Push the current namespace.
-    namestack* vector-peek ; inline
+    namestack car ; inline
+
+: >n ( namespace -- n:namespace )
+    #! Push a namespace on the namespace stack.
+    namestack cons set-namestack ; inline
+
+: n> ( n:namespace -- namespace )
+    #! Pop the top of the namespace stack.
+    namestack uncons set-namestack ; inline
+
+: global ( -- g ) 4 getenv ;
+: set-global ( g -- ) 4 setenv ;
+
+: init-namespaces ( -- )
+    global >n  global "global" set ;
+
+: namespace-buckets 23 ;
+
+: <namespace> ( -- n )
+    #! Create a new namespace.
+    namespace-buckets <hashtable> ;
+
+: (get) ( var ns -- value )
+    #! Internal word for searching the namestack.
+    dup [
+        2dup car hash* dup [
+            nip nip cdr ( found )
+        ] [
+            drop cdr (get) ( keep looking )
+        ] ifte
+    ] [
+        2drop f
+    ] ifte ;
+
+: get ( variable -- value )
+    #! Push the value of a variable by searching the namestack
+    #! from the top down.
+    namestack (get) ;
+
+: set ( value variable -- ) namespace set-hash ;
+: put ( variable value -- ) swap set ;
+
+: bind ( namespace quot -- )
+    #! Execute a quotation with a namespace on the namestack.
+    swap >n call n> drop ; inline
 
 : with-scope ( quot -- )
     #! Execute a quotation with a new namespace on the
@@ -76,7 +124,7 @@ USE: vectors
     over get [ drop get ] [ swap >r call dup r> set ] ifte ;
 
 : traverse-path ( name object -- object )
-    dup has-namespace? [ get* ] [ 2drop f ] ifte ;
+    dup hashtable? [ hash ] [ 2drop f ] ifte ;
 
 : (object-path) ( object list -- object )
     [ uncons >r swap traverse-path r> (object-path) ] when* ;
@@ -88,7 +136,7 @@ USE: vectors
     namespace swap (object-path) ;
 
 : (set-object-path) ( name -- namespace )
-    dup namespace get* dup [
+    dup namespace hash dup [
         nip
     ] [
         drop <namespace> tuck put

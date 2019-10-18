@@ -35,19 +35,18 @@ USE: stdio
 USE: parser
 
 : l1  
-  "../parser-combinators/lazy.factor" run-file
-  "../parser-combinators/parser-combinators.factor" run-file
-  "cont-html.factor" run-file  
   "cont-responder.factor" run-file 
   "cont-utils.factor" run-file ;
 : l2 
-  "cont-examples.factor" run-file ;
+  "cont-examples.factor" run-file 
+  "cont-numbers-game.factor" run-file ;
 : l3 "todo.factor" run-file ;
 : l4 "todo-example.factor" run-file ;
 : l5 "live-updater.factor" run-file ;
-! : l6 "eval-responder.factor" run-file ;
+: l6 "eval-responder.factor" run-file ;
 : l7 "live-updater-responder.factor" run-file ;
 : l8 "browser.factor" run-file ;
+: l9 "cont-testing.factor" run-file ;
 : la ;
 : la [ 8888 httpd ] [ dup . flush [ la ] when* ] catch ;
 : lb [ la "httpd thread exited.\n" write flush ] in-thread  ;

@@ -38,12 +38,11 @@ public class Defer extends FactorParsingDefinition
 	 * A new definition.
 	 */
 	public Defer(FactorWord word)
-		throws Exception
 	{
 		super(word);
 	} //}}}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
+	public void eval(FactorReader reader)
 		throws Exception
 	{
 		reader.nextWord(true);

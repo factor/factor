@@ -93,7 +93,7 @@ USE: words
     #! allocates a Factor heap-local instance of this structure.
     #! Used for C functions that expect you to pass in a struct.
     [ <local-alien> ] cons
-    <% "<" % "struct-name" get % ">" % %>
+    [ "<" , "struct-name" get , ">" , ] make-string
     "in" get create swap
     define-compound ;
 
@@ -101,7 +101,7 @@ USE: words
     #! Define inline and pointer type for the struct. Pointer
     #! type is exactly like void*.
     [ "width" set ] "struct-name" get define-c-type
-    "void*" c-type "struct-name" get "*" cat2 c-types set* ;
+    "void*" c-type "struct-name" get "*" cat2 c-types set-hash ;
 
 : BEGIN-STRUCT: ( -- offset )
     scan "struct-name" set  0 ; parsing
