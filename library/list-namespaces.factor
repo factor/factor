@@ -26,39 +26,25 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: lists
-USE: combinators
 USE: kernel
 USE: namespaces
-USE: stack
 
 : cons@ ( x var -- )
     #! Prepend x to the list stored in var.
-    tuck get cons put ;
-
-: acons@ ( value key var -- )
-    #! Prepend [ key | value ] to the alist stored in var.
-    [ get acons ] keep set ;
-
-: uncons@ ( var -- car )
-    #! Push the car of the list in var, and set the var to the
-    #! cdr.
-    dup get uncons rot set ;
-
-: remove@ ( obj var -- )
-    #! Remove all occurrences of the object from the list
-    #! stored in the variable.
-    tuck get remove put ;
+    [ cons ] change ;
 
 : unique@ ( elem var -- )
     #! Prepend an element to the proper list stored in a
     #! variable if it is not already contained in the list.
-    tuck get unique put ;
+    [ unique ] change ;
+
+SYMBOL: list-buffer
 
 : make-rlist ( quot -- list )
     #! Call a quotation. The quotation can call , to prepend
     #! objects to the list that is returned when the quotation
     #! is done.
-    [ "list-buffer" off call "list-buffer" get ] with-scope ;
+    [ list-buffer off call list-buffer get ] with-scope ;
     inline
 
 : make-list ( quot -- list )
@@ -68,9 +54,9 @@ USE: stack
 
 : , ( obj -- )
     #! Append an object to the currently constructing list.
-    "list-buffer" cons@ ;
+    list-buffer cons@ ;
 
 : unique, ( obj -- )
     #! Append an object to the currently constructing list, only
     #! if the object does not already occur in the list.
-    "list-buffer" unique@ ;
+    list-buffer unique@ ;

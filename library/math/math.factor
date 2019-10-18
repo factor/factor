@@ -26,12 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: math
-USE: combinators
 USE: kernel
-USE: logic
 USE: math
-USE: real-math
-USE: stack
+USE: math-internals
 
 : fac ( n -- n! )
     ! This is the naive implementation, for benchmarking purposes.

@@ -1,9 +1,9 @@
 IN: scratchpad
-USE: combinators
 USE: parser
 USE: test
 USE: unparser
 USE: lists
+USE: kernel
 
 [ [ 1 [ 2 [ 3 ] 4 ] 5 ] ]
 [ "1\n[\n2\n[\n3\n]\n4\n]\n5" ]

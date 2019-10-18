@@ -2,7 +2,6 @@ IN: scratchpad
 USE: kernel
 USE: namespaces
 USE: test
-USE: stack
 USE: words
 
 <namespace> "test-namespace" set
@@ -30,7 +29,7 @@ unit-test
 [ t ]
 [
     \ test-word
-    global [ [ "vocabularies" "test" "test-word" ] object-path ] bind
+    global [ [ vocabularies "test" "test-word" ] object-path ] bind
     =
 ] unit-test
 

@@ -26,12 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: namespaces
-USE: combinators
 USE: hashtables
 USE: kernel
 USE: lists
-USE: logic
-USE: stack
 USE: strings
 USE: vectors
 
@@ -73,7 +70,7 @@ USE: vectors
 : set-global ( g -- ) 4 setenv ;
 
 : init-namespaces ( -- )
-    global >n  global "global" set ;
+    global >n ;
 
 : namespace-buckets 23 ;
 
@@ -101,6 +98,12 @@ USE: vectors
 : set ( value variable -- ) namespace set-hash ;
 : put ( variable value -- ) swap set ;
 
+: change ( var quot -- )
+    #! Execute the quotation with the variable value on the
+    #! stack. The set the variable to the return value of the
+    #! quotation.
+    >r dup get r> rot slip set ; inline
+
 : bind ( namespace quot -- )
     #! Execute a quotation with a namespace on the namestack.
     swap >n call n> drop ; inline
@@ -108,7 +111,7 @@ USE: vectors
 : with-scope ( quot -- )
     #! Execute a quotation with a new namespace on the
     #! namestack.
-    <namespace> >n call n> drop ;
+    <namespace> >n call n> drop ; inline
 
 : extend ( object code -- object )
     #! Used in code like this:
@@ -117,11 +120,6 @@ USE: vectors
     #!          ....
     #!      ] extend ;
     over >r bind r> ; inline
-
-: lazy ( var [ a ] -- value )
-    #! If the value of the variable is f, set the value to the
-    #! result of evaluating [ a ].
-    over get [ drop get ] [ swap >r call dup r> set ] ifte ;
 
 : traverse-path ( name object -- object )
     dup hashtable? [ hash ] [ 2drop f ] ifte ;
@@ -151,4 +149,3 @@ USE: vectors
 
 : on ( var -- ) t put ;
 : off ( var -- ) f put ;
-: toggle ( var -- ) dup get not put ;

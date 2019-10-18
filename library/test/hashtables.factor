@@ -1,12 +1,9 @@
 IN: scratchpad
-USE: combinators
 USE: hashtables
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
-USE: stack
 USE: test
 USE: vectors
 
@@ -37,3 +34,27 @@ unit-test
 [ t ] [ 12 hashcode 12 hashcode = ] unit-test
 [ t ] [ 12 >bignum hashcode 12 hashcode = ] unit-test
 [ t ] [ 12.0 hashcode 12 >bignum hashcode = ] unit-test
+
+! Test various odd keys to see if they work.
+
+16 <hashtable> "testhash" set
+
+t #{ 2 3 } "testhash" get set-hash
+f 100 fac "testhash" get set-hash
+{ } { [ { } ] } "testhash" get set-hash
+
+[ t ] [ #{ 2 3 } "testhash" get hash ] unit-test
+[ f ] [ 100 fac "testhash" get hash* cdr ] unit-test
+[ { } ] [ { [ { } ] } vector-clone "testhash" get hash* cdr ] unit-test
+
+[
+    [ "salmon" | "fish" ]
+    [ "crocodile" | "reptile" ]
+    [ "cow" | "mammal" ]
+    [ "visual basic" | "language" ]
+] alist>hash "testhash" set
+
+[ f ] [
+    "visual basic" "testhash" get remove-hash
+    "visual basic" "testhash" get hash*
+] unit-test

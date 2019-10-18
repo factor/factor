@@ -1,7 +1,6 @@
 IN: scratchpad
 USE: namespaces
 USE: parser
-USE: stack
 USE: streams
 USE: test
 USE: stdio

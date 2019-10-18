@@ -26,15 +26,17 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: words
-USE: combinators
+USE: generic
 USE: hashtables
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
-USE: stack
 USE: strings
+
+BUILTIN: word 1
+
+SYMBOL: vocabularies
 
 : word-property ( word pname -- pvalue )
     swap word-plist assoc ;
@@ -44,26 +46,15 @@ USE: strings
     pick [ set-assoc ] [ remove-assoc nip ] ifte
     swap set-word-plist ;
 
-: ?word-primitive ( obj -- prim/0 )
-    dup word? [ word-primitive ] [ drop 0 ] ifte ;
+PREDICATE: word compound  ( obj -- ? ) word-primitive 1 = ;
+PREDICATE: word primitive ( obj -- ? ) word-primitive 2 > ;
+PREDICATE: word symbol    ( obj -- ? ) word-primitive 2 = ;
+PREDICATE: word undefined ( obj -- ? ) word-primitive 0 = ;
 
-: defined?   ( obj -- ? ) ?word-primitive 0 = not ;
-: compound?  ( obj -- ? ) ?word-primitive 1 = ;
-: primitive? ( obj -- ? ) ?word-primitive 2 > ;
-: symbol?    ( obj -- ? ) ?word-primitive 2 = ;
-
-: word ( -- word ) global [ "last-word" get ] bind ;
-: set-word ( word -- ) global [ "last-word" set ] bind ;
-
-: (define) ( word primitive parameter -- )
-    #! Define a word in the current Factor instance.
+: define ( word primitive parameter -- )
     pick set-word-parameter
     over set-word-primitive
     f "parsing" set-word-property ;
-
-: define ( word primitive parameter -- )
-    #! The define-hook is set by the image bootstrapping code.
-    "define-hook" get [ call ] [ (define) ] ifte* ;
 
 : define-compound ( word def -- ) 1 swap define ;
 : define-symbol   ( word -- ) 2 over define ;
@@ -72,70 +63,3 @@ USE: strings
 : word-vocabulary ( word -- str ) "vocabulary" word-property ;
 : stack-effect    ( word -- str ) "stack-effect" word-property ;
 : documentation   ( word -- str ) "documentation" word-property ;
-
-: vocabs ( -- list )
-    #! Push a list of vocabularies.
-    global [ "vocabularies" get hash-keys str-sort ] bind ;
-
-: vocab ( name -- vocab )
-    #! Get a vocabulary.
-    global [ "vocabularies" get hash ] bind ;
-
-: word-sort ( list -- list )
-    #! Sort a list of words by name.
-    [ swap word-name swap word-name str-lexi> ] sort ;
-
-: words ( vocab -- list )
-    #! Push a list of all words in a vocabulary.
-    #! Filter empty slots.
-    vocab hash-values [ ] subset word-sort ;
-
-: each-word ( quot -- )
-    #! Apply a quotation to each word in the image.
-    vocabs [ words [ swap dup >r call r> ] each ] each drop ;
-
-: init-search-path ( -- )
-    ! For files
-    "scratchpad" "file-in" set
-    [ "builtins" "syntax" "scratchpad" ] "file-use" set
-    ! For interactive
-    "scratchpad" "in" set
-    [
-        "user"
-        "arithmetic"
-        "builtins"
-        "combinators"
-        "compiler"
-        "continuations"
-        "debugger"
-        "errors"
-        "files"
-        "hashtables"
-        "inference"
-        "inferior"
-        "interpreter"
-        "inspector"
-        "jedit"
-        "kernel"
-        "listener"
-        "lists"
-        "logic"
-        "math"
-        "namespaces"
-        "parser"
-        "prettyprint"
-        "processes"
-        "profiler"
-        "stack"
-        "streams"
-        "stdio"
-        "strings"
-        "syntax"
-        "test"
-        "threads"
-        "unparser"
-        "vectors"
-        "vocabularies"
-        "words"
-        "scratchpad"
-    ] "use" set ;

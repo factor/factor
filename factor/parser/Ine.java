@@ -35,15 +35,11 @@ public class Ine extends FactorParsingDefinition
 {
 	public FactorWord start;
 
-	//{{{ Ine constructor
-	/**
-	 * A new definition.
-	 */
 	public Ine(FactorWord start, FactorWord end)
 	{
 		super(end);
 		this.start = start;
-	} //}}}
+	}
 
 	public void eval(FactorReader reader)
 		throws Exception

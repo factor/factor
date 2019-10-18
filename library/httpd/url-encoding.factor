@@ -26,15 +26,12 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: url-encoding
-USE: combinators
 USE: errors
 USE: kernel
 USE: lists
-USE: logic
 USE: format
 USE: math
 USE: parser
-USE: stack
 USE: strings
 USE: unparser
 

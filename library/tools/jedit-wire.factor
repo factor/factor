@@ -26,13 +26,12 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: jedit
-USE: combinators
+USE: kernel
 USE: lists
 USE: namespaces
 USE: parser
 USE: presentation
 USE: prettyprint
-USE: stack
 USE: stdio
 USE: streams
 USE: strings
@@ -81,21 +80,20 @@ USE: listener
 TRAITS: jedit-stream
 
 M: jedit-stream freadln ( stream -- str )
-    [ CHAR: r write flush read-big-endian-32 read# ] bind ;M
+    [ CHAR: r write flush read-big-endian-32 read# ] bind ;
 
 M: jedit-stream fwrite-attr ( str style stream -- )
-    [ [ default-style ] unless* jedit-write-attr ] bind ;M
+    [ [ default-style ] unless* jedit-write-attr ] bind ;
 
 M: jedit-stream fflush ( stream -- )
-    [ CHAR: f write flush ] bind ;M
+    [ CHAR: f write flush ] bind ;
 
 C: jedit-stream ( stream -- stream )
-    [ dup delegate set "stdio" set ] extend ;C
+    [ dup delegate set stdio set ] extend ;
 
 : stream-server ( -- )
     #! Execute this in the inferior Factor.
-    "stdio" get <jedit-stream> "stdio" set
-    print-banner ;
+    stdio [ <jedit-stream> ] change  print-banner ;
 
 : jedit-lookup ( word vocabs -- )
     #! A utility word called by the Factor plugin to get some

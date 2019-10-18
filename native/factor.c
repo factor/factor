@@ -7,6 +7,7 @@ void init_factor(char* image)
 	init_stacks();
 	init_io();
 	init_signals();
+
 	init_compiler();
 	init_errors();
 	gc_time = 0;
@@ -15,6 +16,12 @@ void init_factor(char* image)
 	userenv[CPU_ENV] = tag_object(from_c_string("x86"));
 #else
 	userenv[CPU_ENV] = tag_object(from_c_string("unknown"));
+#endif
+
+#ifdef WIN32
+	userenv[OS_ENV] = tag_object(from_c_string("win32"));
+#else
+	userenv[OS_ENV] = tag_object(from_c_string("unix"));
 #endif
 }
 

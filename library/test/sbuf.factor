@@ -1,11 +1,8 @@
 IN: scratchpad
-USE: combinators
 USE: errors
 USE: kernel
-USE: logic
 USE: math
 USE: namespaces
-USE: stack
 USE: strings
 USE: test
 

@@ -25,10 +25,8 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: combinators
-USE: kernel
+IN: kernel
 USE: lists
-USE: stack
 
 : slip ( quot x -- x )
     >r call r> ; inline
@@ -53,6 +51,7 @@ USE: stack
     #! Apply code to input.
     swap dup >r call r> swap ; inline
 
+IN: lists DEFER: uncons IN: kernel
 : cond ( x list -- )
     #! The list is of this form:
     #!

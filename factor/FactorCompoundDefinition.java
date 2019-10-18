@@ -29,9 +29,6 @@
 
 package factor;
 
-import java.lang.reflect.*;
-import java.util.*;
-
 /**
  * : name ... ;
  */

@@ -26,51 +26,52 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: init
-USE: combinators
 USE: kernel
 USE: lists
 USE: parser
-USE: stack
 USE: stdio
 
 "Cold boot in progress..." print
+
 [
+    "/library/generic/generic.factor"
+    "/library/generic/object.factor"
+    "/library/generic/builtin.factor"
+    "/library/generic/predicate.factor"
+    "/library/generic/traits.factor"
+
     "/version.factor"
-    "/library/kernel.factor"
     "/library/stack.factor"
-    "/library/types.factor"
-    "/library/math/math.factor"
-    "/library/cons.factor"
     "/library/combinators.factor"
+    "/library/kernel.factor"
     "/library/logic.factor"
-    "/library/vector-combinators.factor"
-    "/library/lists.factor"
+    "/library/cons.factor"
     "/library/assoc.factor"
+    "/library/math/generic.factor"
+    "/library/words.factor"
     "/library/math/arithmetic.factor"
     "/library/math/math-combinators.factor"
+    "/library/math/math.factor"
+    "/library/lists.factor"
     "/library/vectors.factor"
     "/library/strings.factor"
     "/library/hashtables.factor"
     "/library/namespaces.factor"
-    "/library/generic.factor"
-    "/library/math/namespace-math.factor"
     "/library/list-namespaces.factor"
     "/library/sbuf.factor"
-    "/library/continuations.factor"
     "/library/errors.factor"
+    "/library/continuations.factor"
     "/library/threads.factor"
     "/library/io/stream.factor"
+    "/library/io/stdio.factor"
     "/library/io/io-internals.factor"
     "/library/io/stream-impl.factor"
-    "/library/io/stdio.factor"
-    "/library/words.factor"
     "/library/vocabularies.factor"
     "/library/syntax/parse-numbers.factor"
     "/library/syntax/parser.factor"
-    "/library/syntax/parse-syntax.factor"
     "/library/syntax/parse-stream.factor"
-    "/library/math/generic.factor"
     "/library/bootstrap/init.factor"
+!    "/library/syntax/parse-syntax.factor"
 
     "/library/format.factor"
     "/library/syntax/unparser.factor"
@@ -113,8 +114,25 @@ USE: stdio
     "/library/inference/branches.factor"
     "/library/inference/stack.factor"
 
+    "/library/compiler/assembler.factor"
+    "/library/compiler/xt.factor"
+    "/library/compiler/optimizer.factor"
+    "/library/compiler/linearizer.factor"
+    "/library/compiler/simplifier.factor"
+    "/library/compiler/generator.factor"
+    "/library/compiler/compiler.factor"
+    "/library/compiler/alien-types.factor"
+    "/library/compiler/alien.factor"
+
+    "/library/sdl/sdl.factor"
+    "/library/sdl/sdl-video.factor"
+    "/library/sdl/sdl-event.factor"
+    "/library/sdl/sdl-gfx.factor"
+    "/library/sdl/sdl-keysym.factor"
+    "/library/sdl/sdl-utils.factor"
+    "/library/sdl/hsv.factor"
+
     "/library/bootstrap/image.factor"
-    "/library/bootstrap/cross-compiler.factor"
 
     "/library/httpd/url-encoding.factor"
     "/library/httpd/html-tags.factor"
@@ -139,31 +157,12 @@ USE: stdio
 
 cpu "x86" = [
     [
-        "/library/compiler/assembler.factor"
-        "/library/compiler/assembly-x86.factor"
-        "/library/compiler/compiler-macros.factor"
-        "/library/compiler/compiler.factor"
-        "/library/compiler/ifte.factor"
-        "/library/compiler/generic.factor"
-        "/library/compiler/stack.factor"
-        "/library/compiler/interpret-only.factor"
-        "/library/compiler/alien-types.factor"
-        "/library/compiler/alien-macros.factor"
-        "/library/compiler/alien.factor"
-        
-        "/library/sdl/sdl.factor"
-        "/library/sdl/sdl-video.factor"
-        "/library/sdl/sdl-event.factor"
-        "/library/sdl/sdl-gfx.factor"
-        "/library/sdl/sdl-keysym.factor"
-        "/library/sdl/sdl-utils.factor"
-        "/library/sdl/hsv.factor"
+         "/library/compiler/assembly-x86.factor"
+         "/library/compiler/generator-x86.factor"
     ] [
         dup print
         run-resource
     ] each
-] [
-    "/library/compiler/dummy-compiler.factor" dup print run-resource
-] ifte
+] when
 
 "/library/bootstrap/init-stage2.factor" dup print run-resource

@@ -26,16 +26,12 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: listener
-USE: combinators
-USE: continuations
 USE: errors
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
 USE: parser
-USE: stack
 USE: stdio
 USE: strings
 USE: presentation
@@ -104,9 +100,13 @@ global [
     "Code space: " write (room.) ;
 
 : print-banner ( -- )
-    "Factor " write version print
+    "Factor " write version write
+    " (OS: " write os write
+    " CPU: " write cpu write
+    ")" print
     "Copyright (C) 2003, 2004 Slava Pestov" print
     "Copyright (C) 2004 Chris Double" print
+    "Copyright (C) 2004 Mackenzie Straight" print
     "Type ``exit'' to exit, ``help'' for help." print
     terpri
     room.

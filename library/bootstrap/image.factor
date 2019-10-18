@@ -39,17 +39,15 @@
 ! run platform/native/boot-stage2.factor.
 
 IN: image
-USE: combinators
 USE: errors
+USE: generic
 USE: hashtables
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
 USE: prettyprint
 USE: random
-USE: stack
 USE: stdio
 USE: streams
 USE: strings
@@ -57,6 +55,7 @@ USE: test
 USE: vectors
 USE: unparser
 USE: words
+USE: parser
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
@@ -76,28 +75,31 @@ SYMBOL: boot-quot
 : cell "64-bits" get 8 4 ? ;
 : char "64-bits" get 4 2 ? ;
 
-: tag-mask BIN: 111 ;
-: tag-bits 3 ;
+: tag-mask BIN: 111 ; inline
+: tag-bits 3 ; inline
 
 : untag ( cell tag -- ) tag-mask bitnot bitand ;
 : tag ( cell -- tag ) tag-mask bitand ;
 
-: fixnum-tag  BIN: 000 ;
-: word-tag    BIN: 001 ;
-: cons-tag    BIN: 010 ;
-: object-tag  BIN: 011 ;
-: ratio-tag   BIN: 100 ;
-: complex-tag BIN: 101 ;
-: header-tag  BIN: 110 ;
-: gc-fwd-ptr  BIN: 111 ; ( we don't output these )
+: fixnum-tag  BIN: 000 ; inline
+: word-tag    BIN: 001 ; inline
+: cons-tag    BIN: 010 ; inline
+: object-tag  BIN: 011 ; inline
+: ratio-tag   BIN: 100 ; inline
+: complex-tag BIN: 101 ; inline
+: header-tag  BIN: 110 ; inline
 
-: f-type      6 ;
-: t-type      7 ;
-: array-type  8 ;
-: bignum-type 9 ;
-: float-type  10 ;
-: vector-type 11 ;
-: string-type 12 ;
+: f-type      6  ; inline
+: t-type      7  ; inline
+: array-type  8  ; inline
+: bignum-type 9  ; inline
+: float-type  10 ; inline
+: vector-type 11 ; inline
+: string-type 12 ; inline
+: sbuf-type   13 ; inline
+: port-type   14 ; inline
+: dll-type    15 ; inline
+: alien-type  16 ; inline
 
 : immediate ( x tag -- tagged ) swap tag-bits shift bitor ;
 : >header ( id -- tagged ) header-tag immediate ;
@@ -124,6 +126,9 @@ SYMBOL: boot-quot
 : heap-size-offset 5 ;
 : header-size      6 ;
 
+GENERIC: ' ( obj -- ptr )
+#! Write an object to the image.
+
 ( Allocator )
 
 : here ( -- size ) 
@@ -145,19 +150,19 @@ SYMBOL: boot-quot
 
 ( Fixnums )
 
-: emit-fixnum ( n -- tagged ) fixnum-tag immediate ;
+M: fixnum ' ( n -- tagged ) fixnum-tag immediate ;
 
 ( Bignums )
 
-: emit-bignum ( bignum -- tagged )
+M: bignum ' ( bignum -- tagged )
+    #! This can only emit 0, -1 and 1.
     object-tag here-as >r
     bignum-type >header emit
-    dup 0 = 1 2 ? emit ( capacity )
     [
-        [ 0 = ] [ emit pad ]
-        [ 0 < ] [ 1 emit neg emit ]
-        [ 0 > ] [ 0 emit     emit ]
-    ] cond r> ;
+        [ 0  | [ 1 0   ] ]
+        [ -1 | [ 2 1 1 ] ]
+        [ 1  | [ 2 0 1 ] ]
+    ] assoc [ emit ] each pad r> ;
 
 ( Special objects )
 
@@ -166,11 +171,16 @@ SYMBOL: boot-quot
 : t,
     object-tag here-as "t" set
     t-type >header emit
-    0 emit-fixnum emit ;
+    0 ' emit ;
 
-:  0,  0 emit-bignum drop ;
-:  1,  1 emit-bignum drop ;
-: -1, -1 emit-bignum drop ;
+M: t ' ( obj -- ptr ) drop "t" get ;
+M: f ' ( obj -- ptr )
+    #! f is #define F RETAG(0,OBJECT_TYPE)
+    drop object-tag ;
+
+:  0,  0 >bignum ' drop ;
+:  1,  1 >bignum ' drop ;
+: -1, -1 >bignum ' drop ;
 
 ( Beginning of the image )
 ! The image proper begins with the header, then T,
@@ -180,18 +190,49 @@ SYMBOL: boot-quot
 
 ( Words )
 
-: word, ( word -- pointer )
-    word-tag here-as >r word-tag >header emit
-    hashcode emit ( hashcode )
-    0 emit r> ;
+: make-plist ( word -- plist )
+    [
+        dup word-name "name" swons ,
+        dup word-vocabulary "vocabulary" swons ,
+        parsing? [ t "parsing" swons , ] when
+    ] make-list ;
 
-! This is to handle mutually recursive words
+: word, ( word -- )
+    [
+        word-tag >header ,
+        dup hashcode ,
+        0 ,
+        dup word-primitive ,
+        dup word-parameter ' ,
+        dup make-plist ' ,
+        0 ,
+        0 ,
+    ] make-list
+    swap word-tag here-as pool-object
+    [ emit ] each ;
+
+: word-error ( word msg -- )
+    [
+        ,
+        dup word-vocabulary ,
+        " " ,
+        word-name ,
+    ] make-string throw ;
+
+: transfer-word ( word -- word )
+    #! This is a hack. See doc/bootstrap.txt.
+    dup dup word-name swap word-vocabulary unit search
+    dup [
+        nip
+    ] [
+        drop "Missing DEFER: " word-error
+    ] ifte ;
 
 : fixup-word ( word -- offset )
     dup pooled-object dup [
         nip
     ] [
-        drop "Not in image: " swap word-name cat2 throw
+        drop "Not in image: " word-error
     ] ifte ;
 
 : fixup-words ( -- )
@@ -199,14 +240,12 @@ SYMBOL: boot-quot
         dup word? [ fixup-word ] when
     ] vector-map image set ;
 
-: emit-word ( word -- pointer )
-    dup pooled-object dup [ nip ] [ drop ] ifte ;
+M: word ' ( word -- pointer )
+    transfer-word dup pooled-object dup [ nip ] [ drop ] ifte ;
 
 ( Conses )
 
-DEFER: '
-
-: emit-cons ( c -- tagged )
+M: cons ' ( c -- tagged )
     uncons ' swap '
     cons-tag here-as
     -rot emit emit ;
@@ -229,7 +268,7 @@ DEFER: '
 : pack-string ( string -- )
     char tuck swap split-n (pack-string) ;
 
-: (emit-string) ( string -- )
+: emit-string ( string -- )
     object-tag here-as swap
     string-type >header emit
     dup str-length emit
@@ -237,48 +276,14 @@ DEFER: '
     pack-string
     pad ;
 
-: emit-string ( string -- pointer )
+M: string ' ( string -- pointer )
     #! We pool strings so that each string is only written once
     #! to the image
     dup pooled-object dup [
         nip
     ] [
-        drop dup (emit-string) dup >r pool-object r>
+        drop dup emit-string dup >r pool-object r>
     ] ifte ;
-
-( Word definitions )
-
-: (vocabulary) ( name -- vocab )
-    #! Vocabulary for target image.
-    dup "vocabularies" get hash dup [
-        nip
-    ] [
-        drop >r namespace-buckets <hashtable> dup r>
-        "vocabularies" get set-hash
-    ] ifte ;
-
-: (word+) ( word -- )
-    #! Add the word to a vocabulary in the target image.
-    dup word-name over word-vocabulary 
-    (vocabulary) set-hash ;
-
-: emit-plist ( word -- plist )
-    [
-        dup word-name "name" swons ,
-        dup word-vocabulary "vocabulary" swons ,
-        "parsing" word-property [ t "parsing" swons , ] when
-    ] make-list ' ;
-
-: define, ( word primitive parameter -- )
-    #! Write a word definition to the image.
-    ' >r >r dup (word+) dup emit-plist >r
-    dup word, pool-object
-    r> ( -- plist )
-    r> ( primitive -- ) emit
-    r> ( parameter -- ) emit
-    ( plist -- ) emit
-    0 emit ( padding )
-    0 emit ;
 
 ( Arrays and vectors )
 
@@ -290,7 +295,7 @@ DEFER: '
     ( elements -- ) [ emit ] each
     pad r> ;
 
-: emit-vector ( vector -- pointer )
+M: vector ' ( vector -- pointer )
     dup vector>list emit-array swap vector-length
     object-tag here-as >r
     vector-type >header emit
@@ -298,53 +303,31 @@ DEFER: '
     emit ( array ptr )
     pad r> ;
 
-( Cross-compile a reference to an object )
-
-: ' ( obj -- pointer )
-    [
-        [ fixnum?  ] [ emit-fixnum      ]
-        [ bignum?  ] [ emit-bignum      ]
-        [ word?    ] [ emit-word        ]
-        [ cons?    ] [ emit-cons        ]
-        [ string?  ] [ emit-string      ]
-        [ vector?  ] [ emit-vector      ]
-        [ t =      ] [ drop "t" get     ]
-        ! f is #define F RETAG(0,OBJECT_TYPE)
-        [ f =      ] [ drop object-tag  ]
-        [ drop t   ] [ "Cannot cross-compile: " swap cat2 throw ]
-    ] cond ;
-
 ( End of the image )
 
-: vocabularies, ( -- )
-    #! Produces code with stack effect ( -- vocabularies ).
-    #! This code sets up vocabulary hash tables.
-    \ <namespace> ,
+: vocabularies, ( vocabularies -- )
     [
-        "vocabularies" get [
-            uncons hash>alist , \ alist>hash , , \ set ,
-        ] hash-each
-    ] make-list ,
-    \ extend , ;
+        cdr dup vector? [
+            [
+                cdr dup word? [ word, ] [ drop ] ifte
+            ] hash-each
+        ] [
+            drop
+        ] ifte
+    ] hash-each ;
 
 : global, ( -- )
-    #! Produces code with stack effect ( vocabularies -- ).
-    <namespace> ' global-offset fixup
-    "vocabularies" ,
-    \ global ,
-    \ set-hash , ;
-
-: hash-quot ( -- quot )
-    #! Generate a quotation to generate vocabulary and global
-    #! namespace hashtables.
-    [ vocabularies, global, ] make-list ;
+    vocabularies get
+    dup vocabularies,
+    <namespace> [ vocabularies set ] extend '
+    global-offset fixup ;
 
 : boot, ( quot -- )
-    boot-quot get append ' boot-quot-offset fixup ;
+    boot-quot get ' boot-quot-offset fixup ;
 
 : end ( -- )
-    hash-quot
     boot,
+    global,
     fixup-words
     here base - heap-size-offset fixup ;
 
@@ -372,7 +355,6 @@ DEFER: '
     [
         300000 <vector> image set
         521 <hashtable> "objects" set
-        namespace-buckets <hashtable> "vocabularies" set
         ! Note that this is a vector that we can side-effect,
         ! since ; ends up using this variable from nested
         ! parser namespaces.
@@ -385,3 +367,21 @@ DEFER: '
     [ begin call end ] with-minimal-image ;
 
 : test-image ( quot -- ) with-image vector>list . ;
+
+: make-image ( name -- )
+    #! Make an image for the C interpreter.
+    [
+        "/library/bootstrap/boot.factor" run-resource
+        boot-quot set
+    ] with-image
+
+    swap write-image ;
+
+: make-images ( -- )
+    "64-bits" off
+    "big-endian" off "boot.image.le32" make-image
+    "big-endian" on  "boot.image.be32" make-image
+    "64-bits" on
+    "big-endian" off "boot.image.le64" make-image
+    "big-endian" on  "boot.image.be64" make-image
+    "64-bits" off ;

@@ -26,35 +26,33 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: inference
-USE: combinators
-USE: dataflow
 USE: errors
 USE: interpreter
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
-USE: stack
 USE: strings
 USE: vectors
 USE: words
 USE: hashtables
 USE: prettyprint
 
-: with-dataflow ( word [ in | out ] quot -- )
+: with-dataflow ( param op [ in | out ] quot -- )
     #! Take input parameters, execute quotation, take output
     #! parameters, add node. The quotation is called with the
     #! stack effect.
-    over car ensure-d
-    rot CALL dataflow,
+    >r dup car ensure-d >r dataflow, r> r> rot
     [ pick swap dataflow-inputs ] keep
     pick 2slip swap dataflow-outputs ; inline
+
+: (consume/produce) ( param op effect -- )
+    [ unswons consume-d produce-d ] with-dataflow ;
 
 : consume/produce ( word [ in | out ] -- )
     #! Add a node to the dataflow graph that consumes and
     #! produces a number of values.
-    [ unswons consume-d produce-d ] with-dataflow ;
+    #call swap (consume/produce) ;
 
 : apply-effect ( word [ in | out ] -- )
     #! If a word does not have special inference behavior, we
@@ -70,10 +68,32 @@ USE: prettyprint
 : no-effect ( word -- )
     "Unknown stack effect: " swap word-name cat2 throw ;
 
+: with-recursive-state ( word label quot -- )
+    >r
+    <recursive-state> [ recursive-label set ] extend dupd cons
+    recursive-state cons@
+    r> call ;
+
+: (with-block) ( label quot -- )
+    #! Call a quotation in a new namespace, and transfer
+    #! inference state from the outer scope.
+    swap >r [
+        dataflow-graph off
+        call
+        d-in get meta-d get meta-r get get-dataflow
+    ] with-scope
+    r> swap #label dataflow, [ node-label set ] bind
+    meta-r set meta-d set d-in set ;
+
+: with-block ( word label quot -- )
+    #! Execute a quotation with the word on the stack, and add
+    #! its dataflow contribution to a new block node in the IR.
+    over [ with-recursive-state ] (with-block) ;
+
 : inline-compound ( word -- effect )
     #! Infer the stack effect of a compound word in the current
     #! inferencer instance.
-    [ word-parameter (infer) effect ] with-recursive-state ;
+    gensym [ word-parameter infer-quot effect ] with-block ;
 
 : (infer-compound) ( word -- effect )
     #! Infer a word's stack effect in a separate inferencer
@@ -91,7 +111,11 @@ USE: prettyprint
         dup (infer-compound) consume/produce
     ] [
         [
-            swap t "no-effect" set-word-property rethrow
+            swap save-effect get [
+                t "no-effect" set-word-property
+            ] [
+                drop
+            ] ifte rethrow
         ] when*
     ] catch ;
 
@@ -120,11 +144,17 @@ USE: prettyprint
 
 : recursive-word ( word state -- )
     #! Handle a recursive call, by either applying a previously
-    #! inferred base case, or raising an error.
-    base-case swap hash dup [
-        consume/produce
+    #! inferred base case, or raising an error. If the recursive
+    #! call is to a local block, emit a label call node.
+    base-case over hash dup [
+        swap [ recursive-label get ] bind ( word effect label )
+        dup [
+            rot drop #call-label rot
+        ] [
+            drop #call swap
+        ] ifte (consume/produce)
     ] [
-        drop no-base-case
+        2drop no-base-case
     ] ifte ;
 
 : no-effect? ( word -- ? )
@@ -149,17 +179,14 @@ USE: prettyprint
     ] ifte ;
 
 : infer-call ( [ rstate | quot ] -- )
-    \ drop CALL dataflow, drop
-    [
-        dataflow-graph off
-        pop-d uncons recursive-state set (infer)
-        d-in get meta-d get get-dataflow
-    ] with-scope
-    [ dataflow-graph cons@ ] each meta-d set d-in set ;
+    1 ensure-d
+    dataflow-drop,
+    gensym dup [
+        drop pop-d uncons recursive-state set infer-quot
+    ] with-block ;
 
 \ call [ infer-call ] "infer" set-word-property
 
-\ + [ 2 | 1 ] "infer-effect" set-word-property
 \ - [ 2 | 1 ] "infer-effect" set-word-property
 \ * [ 2 | 1 ] "infer-effect" set-word-property
 \ / [ 2 | 1 ] "infer-effect" set-word-property

@@ -26,12 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: format
-USE: combinators
 USE: kernel
 USE: math
 USE: namespaces
 USE: strings
-USE: stack
 
 : decimal-split ( string -- string string )
     #! Split a string before and after the decimal point.

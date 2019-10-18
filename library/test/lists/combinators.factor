@@ -1,10 +1,8 @@
 IN: scratchpad
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
-USE: stack
 USE: test
 USE: strings
 
@@ -19,10 +17,10 @@ USE: strings
 
 [ [ 43 "a" [ ] ] ] [ [ "a" 43 43 43 [ ] 43 "a" [ ] ] prune ] unit-test
 
-[ "fdsfs" num-sort ] unit-test-fails
-[ [ ] ] [ [ ] num-sort ] unit-test
+[ "fdsfs" [ > ] sort ] unit-test-fails
+[ [ ] ] [ [ ] [ > ] sort ] unit-test
 [ [ "2 + 2" ] ] [ [ "2 + 2" ] [ str-lexi> ] sort ] unit-test
-[ [ 1 2 3 4 5 6 7 ] ] [ [ 6 4 5 7 2 1 3 ] num-sort ] unit-test
+[ [ 1 2 3 4 5 6 7 ] ] [ [ 6 4 5 7 2 1 3 ] [ > ] sort ] unit-test
 
 [ f ] [ [ { } { } "Hello" ] all=? ] unit-test
 [ f ] [ [ { 2 } { } { } ] all=? ] unit-test
@@ -35,3 +33,8 @@ USE: strings
 [ 6 ] [ [ 5 6 ] [ > ] top ] unit-test
 [ 99 ] [ 100 count [ > ] top ] unit-test
 [ 0 ] [ 100 count [ < ] top ] unit-test
+
+[ f ] [ [ ] [ ] some? ] unit-test
+[ t ] [ [ 1 ] [ ] some? >boolean ] unit-test
+[ t ] [ [ 1 2 3 ] [ 2 > ] some? >boolean ] unit-test
+[ f ] [ [ 1 2 3 ] [ 10 > ] some? ] unit-test

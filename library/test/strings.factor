@@ -1,13 +1,13 @@
 IN: scratchpad
-USE: combinators
 USE: errors
 USE: kernel
-USE: logic
 USE: math
 USE: namespaces
-USE: stack
 USE: strings
 USE: test
+
+[ f ] [ "a" "b" "c" =? ] unit-test
+[ "c" ] [ "a" "a" "c" =? ] unit-test
 
 [ f ] [ "A string." f-or-"" ] unit-test
 [ t ] [ "" f-or-"" ] unit-test
@@ -17,8 +17,6 @@ USE: test
 
 [ "abc" ] [ "ab" "c" cat2 ] unit-test
 [ "abc" ] [ "a" "b" "c" cat3 ] unit-test
-[ "abcd" ] [ "a" "b" "c" "d" cat4 ] unit-test
-[ "abcde" ] [ "a" "b" "c" "d" "e" cat5 ] unit-test
 
 [ 3 ] [ "hola" "a" index-of ] unit-test
 [ -1 ] [ "hola" "x" index-of ] unit-test
@@ -70,10 +68,10 @@ unit-test
     max-str-length
 ] unit-test
 
-[ "Hello world" ] [ "Hello world\n" ends-with-newline? ] unit-test
-[ f ] [ "Hello world" ends-with-newline? ] unit-test
-[ "" ] [ "\n" ends-with-newline? ] unit-test
-[ f ] [ "" ends-with-newline? ] unit-test
+[ "Hello world" ] [ "Hello world\n" "\n" str-tail? ] unit-test
+[ f ] [ "Hello world" "\n" str-tail? ] unit-test
+[ "" ] [ "\n" "\n" str-tail? ] unit-test
+[ f ] [ "" "\n" str-tail? ] unit-test
 
 [ t ] [ CHAR: a letter? ] unit-test
 [ f ] [ CHAR: A letter? ] unit-test

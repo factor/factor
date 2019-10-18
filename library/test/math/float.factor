@@ -1,7 +1,6 @@
 IN: scratchpad
 USE: kernel
 USE: math
-USE: stack
 USE: test
 
 [ t ] [ 0.0 float? ] unit-test

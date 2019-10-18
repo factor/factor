@@ -26,10 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: lists
-USE: logic
-USE: combinators
 USE: kernel
-USE: stack
 
 ! An association list is a list of conses where the car of each
 ! cons is a key, and the cdr is a value. See the Factor
@@ -79,9 +76,3 @@ USE: stack
             2drop
         ] ifte r>
     ] each drop ;
-
-: unzip ( assoc -- keys values )
-    #! Split an association list into two lists of keys and
-    #! values.
-    [ ] [ ] rot [ uncons 2swons ] each
-    swap reverse swap reverse ;

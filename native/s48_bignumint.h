@@ -58,7 +58,7 @@ typedef long bignum_length_type;
    space when a bignum's length is reduced from its original value. */
 #define BIGNUM_REDUCE_LENGTH(target, source, length)            \
      target = shrink_array(source, length + 1)
-/* extern ARRAY* shrink_array(ARRAY* array, CELL capacity); */
+/* extern F_ARRAY* shrink_array(F_ARRAY* array, CELL capacity); */
 
 /* BIGNUM_DEALLOCATE is called when disposing of bignums which are
    created as intermediate temporaries; Scheme doesn't need this. */
@@ -102,9 +102,9 @@ typedef long bignum_length_type;
 
 /* These definitions are here to facilitate caching of the constants
    0, 1, and -1. */
-#define BIGNUM_ZERO() (ARRAY*)UNTAG(bignum_zero)
+#define BIGNUM_ZERO() (F_ARRAY*)UNTAG(bignum_zero)
 #define BIGNUM_ONE(neg_p) \
-   (ARRAY*)UNTAG(neg_p ? bignum_neg_one : bignum_pos_one)
+   (F_ARRAY*)UNTAG(neg_p ? bignum_neg_one : bignum_pos_one)
 
 #define BIGNUM_ONE_P(bignum,negative_p) ((bignum) == BIGNUM_ONE(negative_p))
 
@@ -119,7 +119,7 @@ typedef long bignum_length_type;
   (BIGNUM_BITS_TO_DIGITS ((sizeof (long)) * CHAR_BIT))
 
 #define BIGNUM_DIGITS_FOR_LONG_LONG					\
-  (BIGNUM_BITS_TO_DIGITS ((sizeof (long long)) * CHAR_BIT))
+  (BIGNUM_BITS_TO_DIGITS ((sizeof (int64_t)) * CHAR_BIT))
 
 #ifndef BIGNUM_DISABLE_ASSERTION_CHECKS
 

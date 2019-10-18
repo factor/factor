@@ -37,11 +37,11 @@ CELL T;
 #define TYPE_COUNT 17
 
 /* Pseudo-types. For error reporting only. */
-#define INTEGER_TYPE 100 /* FIXNUM or BIGNUM */
-#define RATIONAL_TYPE 101 /* INTEGER or RATIO */
-#define REAL_TYPE 102 /* RATIONAL or FLOAT */
-#define NUMBER_TYPE 103 /* COMPLEX or REAL */
-#define TEXT_TYPE 104 /* FIXNUM or STRING */
+#define INTEGER_TYPE 100 /* F_FIXNUM or BIGNUM */
+#define RATIONAL_TYPE 101 /* INTEGER or F_RATIO */
+#define REAL_TYPE 102 /* RATIONAL or F_FLOAT */
+#define NUMBER_TYPE 103 /* F_COMPLEX or REAL */
+#define TEXT_TYPE 104 /* F_FIXNUM or F_STRING */
 
 CELL type_of(CELL tagged);
 bool typep(CELL type, CELL tagged);
@@ -51,13 +51,17 @@ INLINE CELL tag_header(CELL cell)
 	return RETAG(cell << TAG_BITS,HEADER_TYPE);
 }
 
+/* #define HEADER_DEBUG */
+
 INLINE CELL untag_header(CELL cell)
 {
 	CELL type = cell >> TAG_BITS;
+#ifdef HEADER_DEBUG
 	if(TAG(cell) != HEADER_TYPE)
 		critical_error("header type check",cell);
 	if(type <= HEADER_TYPE && type != WORD_TYPE)
 		critical_error("header invariant check",cell);
+#endif
 	return type;
 }
 
@@ -75,6 +79,10 @@ INLINE void type_check(CELL type, CELL tagged)
 {
 	if(type < HEADER_TYPE)
 	{
+#ifdef HEADER_DEBUG
+		if(TAG(tagged) == WORD_TYPE && object_type(tagged) != WORD_TYPE)
+			critical_error("word header check",tagged);
+#endif
 		if(TAG(tagged) == type)
 			return;
 	}

@@ -26,48 +26,27 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: inference
-USE: combinators
-USE: dataflow
 USE: errors
+USE: generic
 USE: interpreter
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
-USE: stack
 USE: strings
 USE: vectors
 USE: words
 USE: hashtables
 
-: infer-branch ( quot -- [ in-d | datastack ] dataflow )
-    #! Infer the quotation's effect, restoring the meta
-    #! interpreter state afterwards.
-    [
-        copy-interpreter
-        dataflow-graph off
-        (infer)
-        d-in get meta-d get cons
-        get-dataflow
-    ] with-scope ;
-
-: difference ( [ in | stack ] -- diff )
-    #! Stack height difference of infer-branch return value.
-    uncons vector-length - ;
+: unify-d-in ( list -- d-in )
+    0 swap [ [ d-in get ] bind [ max ] when* ] each ;
 
 : balanced? ( list -- ? )
-    #! Check if a list of [ in | stack ] pairs has the same
-    #! stack height.
-    [ difference ] map all=? ;
+    [ [ d-in get meta-d get and ] bind ] subset
+    [ [ d-in get meta-d get vector-length - ] bind ] map all=? ;
 
-: max-vector-length ( list -- length )
+: longest-vector ( list -- length )
     [ vector-length ] map [ > ] top ;
-
-: unify-lengths ( list -- list )
-    #! Pad all vectors to the same length. If one vector is
-    #! shorter, pad it with unknown results at the bottom.
-    dup max-vector-length swap [ dupd ensure nip ] map nip ;
 
 : unify-result ( obj obj -- obj )
     #! Replace values with unknown result if they differ,
@@ -79,73 +58,111 @@ USE: hashtables
     #! results.
     uncons [ [ unify-result ] vector-2map ] each ;
 
+: unify-lengths ( list -- list )
+    #! Pad all vectors to the same length. If one vector is
+    #! shorter, pad it with unknown results at the bottom.
+    dup longest-vector swap [ dupd ensure nip ] map nip ;
+
+: unify-datastacks ( list -- datastack )
+    [ [ meta-d get ] bind ] map [ ] subset
+    unify-lengths unify-stacks ;
+
+: check-lengths ( list -- )
+    [ vector-length ] map all=? [
+        "Unbalanced return stack effect" throw
+    ] unless ;
+
+: unify-callstacks ( list -- datastack )
+    [ [ meta-r get ] bind ] map [ ] subset
+    dup check-lengths unify-stacks ;
+
 : unify ( list -- )
-    #! Unify meta-interpreter state from two branches.
     dup balanced? [
-        unzip
-        unify-lengths unify-stacks meta-d set
-        [ > ] top d-in set
+        dup unify-d-in d-in set
+        dup unify-datastacks meta-d set
+        unify-callstacks meta-r set
     ] [
         "Unbalanced branches" throw
     ] ifte ;
 
-: recursive-branch ( quot -- ? )
+: infer-branch ( rstate quot save-effect -- namespace )
+    <namespace> [
+        save-effect set
+        swap recursive-state set
+        copy-interpreter
+        dataflow-graph off
+        infer-quot
+        #values values-node
+    ] extend ;
+
+: terminator? ( quot -- ? )
+    #! This is a hack. undefined-method has a stack effect that
+    #! probably does not match any other branch of the generic,
+    #! so we handle it specially.
+    \ undefined-method swap tree-contains? ;
+
+: recursive-branch ( rstate quot -- )
     #! Set base case if inference didn't fail.
     [
-        car infer-branch drop recursive-state get set-base t
+        f infer-branch [
+            d-in get meta-d get vector-length cons
+            recursive-state get set-base
+        ] bind
     ] [
-        [ drop f ] when
+        [ 2drop ] when
     ] catch ;
 
-: infer-branches ( branchlist instruction -- )
+: infer-base-case ( branchlist -- )
+    [
+        unswons dup terminator? [
+            2drop
+        ] [
+            recursive-branch
+        ] ifte
+    ] each ;
+
+: (infer-branches) ( branchlist -- list )
+    dup infer-base-case [
+        unswons dup terminator? [
+            t infer-branch [
+                meta-d off meta-r off d-in off
+            ] extend
+        ] [
+            t infer-branch
+        ] ifte
+    ] map ;
+
+: infer-branches ( inputs instruction branchlist -- )
     #! Recursive stack effect inference is done here. If one of
     #! the branches has an undecidable stack effect, we set the
-    #! base case to this stack effect and try again.
-    swap f over [ recursive-branch or ] each [
-        [ [ car infer-branch , ] map ] make-list swap
-        >r dataflow, drop r> unify
-    ] [
-        current-word no-base-case
-    ] ifte ;
+    #! base case to this stack effect and try again. The inputs
+    #! parameter is a vector.
+    (infer-branches) [
+        [ [ get-dataflow ] bind ] map
+        swap dataflow, [ node-consume-d set ] bind
+    ] keep unify ;
 
 : infer-ifte ( -- )
     #! Infer effects for both branches, unify.
     3 ensure-d
     dataflow-drop, pop-d
-    dataflow-drop, pop-d 2list
-    IFTE
+    dataflow-drop, pop-d swap 2list
+    >r 1 meta-d get vector-tail* #ifte r>
     pop-d drop ( condition )
-    infer-branches ;
-
-: vtable>list ( [ vtable | rstate ] -- list )
-    #! generic and 2generic use vectors of words, we need lists
-    #! of quotations. Filter out no-method. Dirty workaround;
-    #! later properly handle throw.
-    unswons vector>list [
-        dup \ no-method = [ drop f ] [ unit over cons ] ifte
-    ] map [ ] subset nip ;
-
-: infer-generic ( -- )
-    #! Infer effects for all branches, unify.
-    2 ensure-d
-    dataflow-drop, pop-d vtable>list
-    GENERIC
-    peek-d drop ( dispatch )
-    infer-branches ;
-
-: infer-2generic ( -- )
-    #! Infer effects for all branches, unify.
-    3 ensure-d
-    dataflow-drop, pop-d vtable>list
-    2GENERIC
-    peek-d drop ( dispatch )
-    peek-d drop ( dispatch )
     infer-branches ;
 
 \ ifte [ infer-ifte ] "infer" set-word-property
 
-\ generic [ infer-generic ] "infer" set-word-property
-\ generic [ 2 | 0 ] "infer-effect" set-word-property
+: vtable>list ( [ vtable | rstate ] -- list )
+    unswons vector>list [ over cons ] map nip ;
 
-\ 2generic [ infer-2generic ] "infer" set-word-property
-\ 2generic [ 3 | 0 ] "infer-effect" set-word-property
+: infer-dispatch ( -- )
+    #! Infer effects for all branches, unify.
+    2 ensure-d
+    dataflow-drop, pop-d vtable>list
+    >r 1 meta-d get vector-tail* #dispatch r>
+    pop-d drop ( n )
+    infer-branches ;
+
+\ dispatch [ infer-dispatch ] "infer" set-word-property
+\ dispatch [ 2 | 0 ] "infer-effect" set-word-property

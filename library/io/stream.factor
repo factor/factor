@@ -26,11 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: streams
-USE: combinators
 USE: errors
 USE: kernel
 USE: namespaces
-USE: stack
 USE: strings
 USE: generic
 
@@ -44,25 +42,25 @@ GENERIC: fclose      ( stream -- )
 : fread1 ( stream -- string )
     1 swap fread# dup f-or-"" [ 0 swap str-nth ] unless ;
 
-: fprint ( string stream -- )
-    tuck fwrite "\n" over fwrite fauto-flush ;
-
 : fwrite ( string stream -- )
     f swap fwrite-attr ;
+
+: fprint ( string stream -- )
+    tuck fwrite "\n" over fwrite fauto-flush ;
 
 TRAITS: string-output-stream
 
 M: string-output-stream fwrite-attr ( string style stream -- )
-    [ drop "buf" get sbuf-append ] bind ;M
+    [ drop "buf" get sbuf-append ] bind ;
 
 M: string-output-stream fclose ( stream -- )
-    drop ;M
+    drop ;
 
 M: string-output-stream fflush ( stream -- )
-    drop ;M
+    drop ;
 
 M: string-output-stream fauto-flush ( stream -- )
-    drop ;M
+    drop ;
 
 : stream>str ( stream -- string )
     #! Returns the string written to the given string output
@@ -71,4 +69,4 @@ M: string-output-stream fauto-flush ( stream -- )
 
 C: string-output-stream ( size -- stream )
     #! Creates a new stream for writing to a string buffer.
-    [ <sbuf> "buf" set ] extend ;C
+    [ <sbuf> "buf" set ] extend ;

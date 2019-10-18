@@ -29,15 +29,12 @@ IN: sdl
 USE: alien
 USE: math
 USE: namespaces
-USE: stack
 USE: compiler
 USE: words
 USE: parser
 USE: kernel
 USE: errors
-USE: combinators
 USE: lists
-USE: logic
 USE: prettyprint
 USE: sdl-event
 USE: sdl-gfx

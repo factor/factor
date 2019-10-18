@@ -29,8 +29,6 @@ IN: compiler
 USE: kernel
 USE: compiler
 USE: math
-USE: stack
-USE: combinators
 
 : EAX 0 ;
 : ECX 1 ;
@@ -46,7 +44,7 @@ USE: combinators
 : eax/other ( reg quot quot -- )
     #! Execute first quotation if reg is EAX, second quotation
     #! otherwise, leaving reg on the stack.
-    pick EAX = [ drop nip call ] [ nip call ] ifte ;
+    pick EAX = [ drop nip call ] [ nip call ] ifte ; inline
 
 : byte/eax/cell ( imm reg byte eax cell -- )
     #! Assemble an instruction with 3 forms; byte operand, any
@@ -60,7 +58,7 @@ USE: combinators
         ] [
             r> drop r> drop r> call compile-cell
         ] ifte
-    ] ifte ;
+    ] ifte ; inline
 
 : MOD-R/M ( r/m reg/opcode mod -- )
     #! MOD-R/M is MOD REG/OPCODE R/M
@@ -74,6 +72,14 @@ USE: combinators
 
 : PUSH-I ( imm -- )
     HEX: 68 compile-byte compile-cell ;
+
+: PUSH-I/PARTIAL ( -- fixup )
+    #! This is potentially bad. In the compilation of
+    #! #return-to, we need to push something which is
+    #! only known later.
+    #!
+    #! Returns address of 32-bit immediate.
+    HEX: 68 compile-byte  compiled-offset  0 compile-cell ;
 
 : POP-R ( reg -- )
     HEX: 58 + compile-byte ;
@@ -162,6 +168,12 @@ USE: combinators
     #! SHIFT <reg> BY <imm>, STORE RESULT IN <reg>
     HEX: c1 compile-byte
     BIN: 100 BIN: 11 MOD-R/M
+    compile-byte ;
+
+: R>>I ( imm reg -- )
+    #! SHIFT <reg> BY <imm>, STORE RESULT IN <reg>
+    HEX: c1 compile-byte
+    BIN: 111 BIN: 11 MOD-R/M
     compile-byte ;
 
 : CMP-I-R ( imm reg -- )

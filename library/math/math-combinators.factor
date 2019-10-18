@@ -26,9 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: math
-USE: combinators
 USE: kernel
-USE: stack
 
 : times ( n quot -- )
     #! Evaluate a quotation n times.

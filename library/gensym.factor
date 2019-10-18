@@ -26,9 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: words
+USE: kernel
 USE: math
 USE: namespaces
-USE: stack
 USE: strings
 USE: unparser
 
@@ -36,7 +36,7 @@ SYMBOL: gensym-count
 
 : (gensym) ( -- name )
     "G:" global [
-        gensym-count get succ dup gensym-count set
+        gensym-count [ succ dup ] change
     ] bind unparse cat2 ;
 
 : gensym ( -- word )

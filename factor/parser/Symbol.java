@@ -33,14 +33,10 @@ import factor.*;
 
 public class Symbol extends FactorParsingDefinition
 {
-	//{{{ Symbol constructor
-	/**
-	 * A new definition.
-	 */
 	public Symbol(FactorWord word)
 	{
 		super(word);
-	} //}}}
+	}
 
 	public void eval(FactorReader reader)
 		throws Exception

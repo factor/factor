@@ -26,11 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: math
-USE: combinators
 USE: kernel
 USE: math
-USE: real-math
-USE: stack
+USE: math-internals
 
 ! Trigonometric functions:
 !    cos sec sin cosec tan cot

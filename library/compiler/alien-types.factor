@@ -26,21 +26,37 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: alien
-USE: combinators
 USE: compiler
 USE: errors
 USE: hashtables
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
 USE: parser
-USE: stack
 USE: strings
 USE: words
 
 ! Some code for interfacing with C structures.
+
+: BEGIN-ENUM:
+    #! C-style enumerations. Their use is not encouraged unless
+    #! it is for C library interfaces. Used like this:
+    #!
+    #! BEGIN-ENUM 0
+    #!     ENUM: x
+    #!     ENUM: y
+    #!     ENUM: z
+    #! END-ENUM
+    #!
+    #! This is the same as : x 0 ; : y 1 ; : z 2 ;.
+    scan str>number ; parsing
+
+: ENUM:
+    dup CREATE swap unit define-compound succ ; parsing
+
+: END-ENUM
+    drop ; parsing
 
 : <c-type> ( -- type )
     <namespace> [

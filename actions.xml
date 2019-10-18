@@ -11,8 +11,7 @@
 	</ACTION>
 	<ACTION NAME="factor-restart">
 		<CODE>
-			FactorPlugin.stopExternalInstance();
-			FactorPlugin.getExternalInstance();
+			FactorPlugin.restartExternalInstance();
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-eval-selection">

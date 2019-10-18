@@ -25,20 +25,18 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: init
+IN: kernel
 USE: ansi
-USE: combinators
 USE: compiler
 USE: errors
 USE: inference
-USE: kernel
+USE: command-line
 USE: listener
 USE: lists
 USE: math
 USE: namespaces
 USE: parser
 USE: random
-USE: stack
 USE: streams
 USE: stdio
 USE: presentation
@@ -60,28 +58,38 @@ USE: unparser
     ! -no-<flag> CLI switch
     t "user-init" set
     t "interactive" set
-    t "ansi" set
+    ! We don't want ANSI escape codes on Windows
+    os "unix" = "ansi" set
     t "compile" set
 
     ! The first CLI arg is the image name.
     cli-args uncons parse-command-line "image" set
 
-    "ansi" get [ "stdio" get <ansi-stream> "stdio" set ] when
+    "ansi" get [ stdio [ <ansi-stream> ] change ] when
 
     "compile" get [ compile-all ] when
 
     run-user-init ;
 
+: auto-inline-count 5 ;
 [
     warm-boot
     garbage-collection
     "interactive" get [ print-banner listener ] when
-    0 exit*
+    0 exit* 
 ] set-boot
 
 init-error-handler
 
 0 [ drop succ ] each-word unparse write " words" print 
+
+! "Counting word usages..." print
+! tally-usages
+! 
+! "Automatically inlining words called " write
+! auto-inline-count unparse write
+! " or less times..." print
+! auto-inline-count auto-inline
 
 "Inferring stack effects..." print
 0 [ unit try-infer [ succ ] when ] each-word
@@ -91,7 +99,7 @@ unparse write " words have a stack effect" print
 "Now, you can run ./f factor.image" print
 
 ! Save a bit of space
-global [ "stdio" off ] bind
+global [ stdio off ] bind
 
 garbage-collection
 "factor.image" save-image

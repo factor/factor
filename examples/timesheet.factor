@@ -1,14 +1,12 @@
 ! Contractor timesheet example
 
 IN: timesheet
-USE: combinators
 USE: errors
 USE: format
 USE: kernel
 USE: lists
 USE: math
 USE: parser
-USE: stack
 USE: stdio
 USE: strings
 USE: unparser

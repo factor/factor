@@ -26,39 +26,36 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: inference
-USE: dataflow
 USE: interpreter
-USE: stack
-USE: words
+USE: kernel
 USE: lists
 USE: namespaces
+USE: words
 
 \ >r [
-    \ >r CALL dataflow, [ 1 0 node-inputs ] extend
+    f #>r dataflow, [ 1 0 node-inputs ] extend
     pop-d push-r
     [ 0 1 node-outputs ] bind
 ] "infer" set-word-property
 
 \ r> [
-    \ r> CALL dataflow, [ 0 1 node-inputs ] extend
+    f #r> dataflow, [ 0 1 node-inputs ] extend
     pop-r push-d
     [ 1 0 node-outputs ] bind
 ] "infer" set-word-property
 
-: meta-infer ( word -- )
+: meta-infer ( word op -- )
     #! Mark a word as being partially evaluated.
-    dup [
-       dup unit , \ car , \ dup ,
-       "infer-effect" word-property ,
-       [ drop host-word ] ,
-       \ with-dataflow ,
+    dupd [
+        over unit , \ car ,
+        f , ,
+        "infer-effect" word-property ,
+        [ drop host-word ] ,
+        \ with-dataflow ,
     ] make-list "infer" set-word-property ;
 
-\ drop meta-infer
-\ dup meta-infer
-\ swap meta-infer
-\ over meta-infer
-\ pick meta-infer
-\ nip meta-infer
-\ tuck meta-infer
-\ rot meta-infer
+\ drop #drop meta-infer
+\ dup #dup meta-infer
+\ swap #swap meta-infer
+\ over #over meta-infer
+\ pick #pick meta-infer

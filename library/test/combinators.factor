@@ -1,8 +1,6 @@
 IN: scratchpad
-USE: combinators
 USE: kernel
 USE: math
-USE: stack
 USE: test
 
 [ slip ] unit-test-fails

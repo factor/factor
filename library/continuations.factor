@@ -25,13 +25,11 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: continuations
-USE: combinators
+IN: kernel
 USE: errors
 USE: kernel
 USE: lists
 USE: namespaces
-USE: stack
 USE: vectors
 
 : reify ( quot -- )

@@ -31,7 +31,8 @@ the following:
 
 When entering code at the interactive interpreter loop, most
 vocabularies are already in the search path, and the USE: declarations
-can be omitted. However, in a source file they must all be specified, by convention at the beginning of the file.
+can be omitted. However, in a source file they must all be specified,
+by convention at the beginning of the file.
 
 * Control flow
 

@@ -26,11 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: quit-responder
-USE: combinators
 USE: httpd
 USE: httpd-responder
 USE: namespaces
-USE: stack
+USE: kernel
 USE: stdio
 USE: streams
 

@@ -28,14 +28,10 @@
 IN: interpreter
 USE: vectors
 USE: namespaces
-USE: logic
 USE: kernel
-USE: combinators
 USE: lists
 USE: words
-USE: stack
 USE: errors
-USE: continuations
 USE: strings
 USE: prettyprint
 USE: stdio
@@ -50,7 +46,6 @@ SYMBOL: meta-r
 : pop-r meta-r get vector-pop ;
 SYMBOL: meta-d
 : push-d meta-d get vector-push ;
-: peek-d meta-d get vector-peek ;
 : pop-d meta-d get vector-pop ;
 SYMBOL: meta-n
 SYMBOL: meta-c
@@ -67,10 +62,10 @@ SYMBOL: meta-cf
 
 : copy-interpreter ( -- )
     #! Copy interpreter state from containing namespaces.
-    meta-r get vector-clone meta-r set
-    meta-d get vector-clone meta-d set
-    meta-n get meta-n set
-    meta-c get meta-c set ;
+    meta-r [ vector-clone ] change
+    meta-d [ vector-clone ] change
+    meta-n [ ] change
+    meta-c [ ] change ;
 
 : done-cf? ( -- ? )
     meta-cf get not ;
@@ -83,7 +78,7 @@ SYMBOL: meta-cf
     pop-r meta-cf set ;
 
 : next ( -- obj )
-    meta-cf get [ meta-cf uncons@ ] [ up next ] ifte ;
+    meta-cf get [ meta-cf [ uncons ] change ] [ up next ] ifte ;
 
 : host-word ( word -- )
     #! Swap in the meta-interpreter's stacks, execute the word,
@@ -95,7 +90,7 @@ SYMBOL: meta-cf
 
 : meta-call ( quot -- )
     #! Note we do tail call optimization here.
-    meta-cf get [ push-r ] when* meta-cf set ;
+    meta-cf [ [ push-r ] when* ] change ;
 
 : meta-word ( word -- )
     dup "meta-word" word-property dup [
@@ -110,6 +105,16 @@ SYMBOL: meta-cf
 
 : do ( obj -- )
     dup word? [ meta-word ] [ push-d ] ifte ;
+
+: meta-word-1 ( word -- )
+    dup "meta-word" word-property dup [
+        nip call
+    ] [
+        drop host-word
+    ] ifte ;
+
+: do-1 ( obj -- )
+    dup word? [ meta-word-1 ] [ push-d ] ifte ;
 
 : (interpret) ( quot -- )
     #! The quotation is called with each word as its executed.
@@ -188,18 +193,23 @@ SYMBOL: meta-cf
 
 : step
     #! Step into current word.
+    [ next dup report do-1 ] not-done ;
+
+: into
+    #! Step into current word.
     [ next dup report do ] not-done ;
 
 : walk-banner ( -- )
     "The following words control the single-stepper:" print
-    [ &s &r &n &c ] [ prettyprint-word " " write ] each
+    [ &s &r &n &c ] [ prettyprint-1 " " write ] each
     "show stepper stacks." print
-    \ &get prettyprint-word
+    \ &get prettyprint-1
     " ( var -- value ) inspects the stepper namestack." print
-    \ step prettyprint-word " -- single step" print
-    \ (trace) prettyprint-word " -- trace until end" print
-    \ (run) prettyprint-word " -- run until end" print
-    \ exit prettyprint-word " -- exit single-stepper" print ;
+    \ step prettyprint-1 " -- single step over" print
+    \ into prettyprint-1 " -- single step into" print
+    \ (trace) prettyprint-1 " -- trace until end" print
+    \ (run) prettyprint-1 " -- run until end" print
+    \ exit prettyprint-1 " -- exit single-stepper" print ;
 
 : walk ( quot -- )
     #! Single-step through execution of a quotation.

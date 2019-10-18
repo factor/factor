@@ -26,14 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: errors
-USE: combinators
-USE: continuations
 USE: kernel
 USE: lists
-USE: logic
 USE: namespaces
 USE: prettyprint
-USE: stack
 USE: stdio
 USE: strings
 USE: unparser
@@ -160,9 +156,9 @@ USE: math
     [
         in-parser? [ parse-dump ] [ standard-dump ] ifte
 
-        [ :s :r :n :c ] [ prettyprint-word " " write ] each
+        [ :s :r :n :c ] [ prettyprint-1 " " write ] each
         "show stacks at time of error." print
-        \ :get prettyprint-word
+        \ :get prettyprint-1
         " ( var -- value ) inspects the error namestack." print
     ] [
         flush-error-handler

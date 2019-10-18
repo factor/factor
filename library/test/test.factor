@@ -3,19 +3,17 @@
 ! Some of these words should be moved to the standard library.
 
 IN: test
-USE: combinators
 USE: errors
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
 USE: parser
 USE: prettyprint
-USE: stack
 USE: stdio
 USE: strings
 USE: words
+USE: vectors
 USE: unparser
 
 : assert ( t -- )
@@ -65,7 +63,7 @@ USE: unparser
 
 : all-tests ( -- )
     "Running Factor test suite..." print
-    "vocabularies" get [ f "scratchpad" set ] bind
+    vocabularies get [ "scratchpad" off ] bind
     [
         "lists/cons"
         "lists/lists"
@@ -103,7 +101,6 @@ USE: unparser
         "math/float"
         "math/complex"
         "math/irrational"
-        "math/namespaces"
         "httpd/url-encoding"
         "httpd/html"
         "httpd/httpd"
@@ -114,18 +111,20 @@ USE: unparser
         "inference"
         "dataflow"
         "interpreter"
+        "hsv"
     ] [
         test
     ] each
     
     cpu "x86" = [
         [
-            "hsv"
-            "x86-compiler/simple"
-            "x86-compiler/stack"
-            "x86-compiler/ifte"
-            "x86-compiler/generic"
-            "x86-compiler/bail-out"
+            "compiler/optimizer"
+            "compiler/simplifier"
+            "compiler/simple"
+            "compiler/stack"
+            "compiler/ifte"
+            "compiler/generic"
+            "compiler/bail-out"
         ] [
             test
         ] each

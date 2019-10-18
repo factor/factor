@@ -8,7 +8,6 @@ USE: stdio
 USE: test
 USE: url-encoding
 USE: strings
-USE: stack
 USE: lists
 
 [ "HTTP/1.0 200 OK\nContent-Length: 12\nContent-Type: text/html\n\n" ]

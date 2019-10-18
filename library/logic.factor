@@ -25,10 +25,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: logic
-USE: combinators
-USE: kernel
-USE: stack
+IN: kernel
 
 : ? ( cond t f -- t/f )
     #! Push t if cond is true, otherwise push f.

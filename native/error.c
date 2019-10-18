@@ -26,7 +26,11 @@ void throw_error(CELL error, bool keep_stacks)
 	thrown_cs = cs;
 
 	/* Return to run() method */
+#ifdef WIN32
+	longjmp(toplevel,1);
+#else
 	siglongjmp(toplevel,1);
+#endif
 }
 
 void early_error(CELL error)
@@ -70,7 +74,7 @@ void type_error(CELL type, CELL tagged)
 	general_error(ERROR_TYPE,c);
 }
 
-void range_error(CELL tagged, FIXNUM index, CELL max)
+void range_error(CELL tagged, F_FIXNUM index, CELL max)
 {
 	CELL c = cons(tagged,cons(tag_integer(index),cons(tag_cell(max),F)));
 	general_error(ERROR_RANGE,c);

@@ -25,14 +25,12 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: kernel
-USE: combinators
+IN: listener
 USE: kernel
 USE: lists
 USE: math
 USE: namespaces
 USE: prettyprint
-USE: stack
 USE: stdio
 USE: words
 USE: vectors

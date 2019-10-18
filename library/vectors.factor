@@ -26,14 +26,12 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: vectors
+USE: generic
 USE: kernel
 USE: lists
 USE: math
-USE: stack
-USE: combinators
 
-: 2vector-nth ( n vec vec -- obj obj )
-    >r over >r vector-nth r> r> vector-nth ;
+BUILTIN: vector  11
 
 : empty-vector ( len -- vec )
     #! Creates a vector with 'len' elements set to f. Unlike
@@ -44,17 +42,9 @@ USE: combinators
 : vector-empty? ( obj -- ? )
     vector-length 0 = ;
 
-: vector-clear ( vector -- )
-    #! Clears a vector.
-    0 swap set-vector-length ;
-
 : vector-push ( obj vector -- )
     #! Push a value on the end of a vector.
     dup vector-length swap set-vector-nth ;
-
-: vector-peek ( vector -- obj )
-    #! Get value at end of vector without removing it.
-    dup vector-length pred swap vector-nth ;
 
 : vector-pop ( vector -- obj )
     #! Get value at end of vector and remove it.
@@ -64,26 +54,68 @@ USE: combinators
 : >pop> ( stack -- stack )
     dup vector-pop drop ;
 
-DEFER: vector-map
+: vector-each ( vector code -- )
+    #! Execute the code, with each element of the vector
+    #! pushed onto the stack.
+    over vector-length [
+        -rot 2dup >r >r >r vector-nth r> call r> r>
+    ] times* 2drop ; inline
+
+: vector-map ( vector code -- vector )
+    #! Applies code to each element of the vector, return a new
+    #! vector with the results. The code must have stack effect
+    #! ( obj -- obj ).
+    over vector-length <vector> rot [
+        swap >r apply r> tuck vector-push
+    ] vector-each nip ; inline
+
+: vector-and ( vector -- ? )
+    #! Logical and of all elements in the vector.
+    t swap [ and ] vector-each ;
+
+: vector-all? ( vector pred -- ? )
+    vector-map vector-and ; inline
+
+: vector-append ( v1 v2 -- )
+    #! Destructively append v2 to v1.
+    [ over vector-push ] vector-each drop ;
+
+: vector-project ( n quot -- accum )
+    #! Execute the quotation n times, passing the loop counter
+    #! the quotation as it ranges from 0..n-1. Collect results
+    #! in a new vector.
+    over <vector> rot [
+        -rot 2dup >r >r slip vector-push r> r>
+    ] times* nip ; inline
+
+: vector-zip ( v1 v2 -- v )
+    #! Make a new vector with each pair of elements from the
+    #! first two in a pair.
+    over vector-length [
+        pick pick >r over >r vector-nth r> r> vector-nth cons
+    ] vector-project nip nip ;
+
+: vector-2map ( v1 v2 quot -- v )
+    #! Apply a quotation with stack effect ( obj obj -- obj ) to
+    #! each pair of elements from v1 and v2, collecting them
+    #! into a new list. Behavior is undefined if vector lengths
+    #! differ.
+    -rot vector-zip [
+        swap dup >r >r uncons r> call r> swap
+    ] vector-map nip ; inline
 
 : vector-clone ( vector -- vector )
     #! Shallow copy of a vector.
     [ ] vector-map ;
 
-: ?vector= ( n vec vec -- ? )
-    #! Reached end?
-    drop vector-length number= ;
+: list>vector ( list -- vector )
+    dup length <vector> swap [ over vector-push ] each ;
 
-: (vector=) ( n vec vec -- ? )
-    3dup ?vector= [
-        3drop t ( reached end without any unequal elts )
-    ] [
-        3dup 2vector-nth = [
-            >r >r succ r> r> (vector=)
-        ] [
-            3drop f
-        ] ifte
-    ] ifte ;
+: stack>list ( vector -- list )
+    [ ] swap [ swons ] vector-each ;
+
+: vector>list ( vector -- list )
+    stack>list reverse ;
 
 : vector-length= ( vec vec -- ? )
     vector-length swap vector-length number= ;
@@ -97,7 +129,7 @@ DEFER: vector-map
     ] [
         over vector? [
             2dup vector-length= [
-                0 -rot (vector=)
+                swap vector>list swap vector>list =
             ] [
                 2drop f
             ] ifte
@@ -114,14 +146,14 @@ DEFER: vector-map
         over ?vector-nth hashcode rot bitxor swap
     ] times* drop ;
 
-: vector-tail ( n vector -- vector )
+: vector-tail ( n vector -- list )
     #! Return a new vector, with all elements from the nth
     #! index upwards.
     2dup vector-length swap - [
         pick + over vector-nth
-    ] vector-project nip nip ;
+    ] project nip nip ;
 
-: vector-tail* ( n vector -- vector )
+: vector-tail* ( n vector -- list )
     #! Unlike vector-tail, n is an index from the end of the
     #! vector. For example, if n=1, this returns a vector of
     #! one element.

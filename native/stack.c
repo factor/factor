@@ -59,31 +59,6 @@ void primitive_pick(void)
 	dpush(get(ds - CELLS * 2));
 }
 
-void primitive_nip(void)
-{
-	CELL top = dpop();
-	put(ds,top);
-}
-
-void primitive_tuck(void)
-{
-	CELL top = dpeek();
-	CELL next = get(ds - CELLS);
-	put(ds - CELLS,top);
-	put(ds,next);
-	dpush(top);
-}
-
-void primitive_rot(void)
-{
-	CELL top = dpeek();
-	CELL next = get(ds - CELLS);
-	CELL next_next = get(ds - CELLS * 2);
-	put(ds - CELLS * 2,next);
-	put(ds - CELLS,top);
-	put(ds,next_next);
-}
-
 void primitive_to_r(void)
 {
 	cpush(dpop());
@@ -94,11 +69,11 @@ void primitive_from_r(void)
 	dpush(cpop());
 }
 
-VECTOR* stack_to_vector(CELL bottom, CELL top)
+F_VECTOR* stack_to_vector(CELL bottom, CELL top)
 {
 	CELL depth = (top - bottom + CELLS) / CELLS;
-	VECTOR* v = vector(depth);
-	ARRAY* a = untag_array(v->array);
+	F_VECTOR* v = vector(depth);
+	F_ARRAY* a = untag_array(v->array);
 	memcpy(a + 1,(void*)bottom,depth * CELLS);
 	v->top = depth;
 	return v;
@@ -117,7 +92,7 @@ void primitive_callstack(void)
 }
 
 /* Returns top of stack */
-CELL vector_to_stack(VECTOR* vector, CELL bottom)
+CELL vector_to_stack(F_VECTOR* vector, CELL bottom)
 {
 	CELL start = bottom;
 	CELL len = vector->top * CELLS;

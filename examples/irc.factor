@@ -1,148 +1,105 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+! A simple IRC client written in Factor.
 
 IN: irc
-USE: combinators
-USE: errors
-USE: inspector
-USE: listener
-USE: kernel
-USE: lists
-USE: logic
-USE: math
-USE: namespaces
-USE: parser
-USE: prettyprint
-USE: stack
+USE: generic
 USE: stdio
+USE: namespaces
 USE: streams
+USE: kernel
+USE: threads
+USE: lists
 USE: strings
 USE: words
-USE: unparser
+USE: math
 
-: irc-register ( -- )
-    "USER " write
-    "user" get write " " write
-    "host" get write " " write
-    "server" get write " " write
-    "realname" get write " " print
+SYMBOL: irc-stream
+SYMBOL: channels
+SYMBOL: channel
+SYMBOL: nickname
 
-    "NICK " write
-    "nick" get print ;
+: irc-write ( s -- ) irc-stream get fwrite ;
+: irc-print ( s -- ) irc-stream get fprint irc-stream get fflush ;
 
-: irc-join ( channel -- )
-    "JOIN " write print ;
+: nick ( nick -- )
+    dup nickname set  "NICK " irc-write irc-print ;
 
-: irc-message ( message recepients -- )
-    "PRIVMSG " write write " :" write print ;
+: login ( nick -- )
+    dup nick
+    "USER " irc-write irc-write
+    " hostname servername :irc.factor" irc-print ;
 
-: irc-action ( message recepients -- )
-    "ACTION " write write " :" write print ;
+: connect ( server -- ) 6667 <client> irc-stream set ;
 
-: keep-datastack ( quot -- )
-    datastack slip set-datastack drop ;
+: write-highlighted ( line -- )
+    dup nickname get index-of -1 =
+    f [ [ "ansi-fg" | "3" ] ] ? write-attr ;
 
-: irc-stream-write ( string -- )
-    dup "buf" get sbuf-append
-    ends-with-newline? [
-        "buf" get sbuf>str
-        0 "buf" get set-sbuf-length
-        "\n" split [ dup f-or-"" [ drop ] [ "recepient" get irc-message ] ifte ] each
-    ] when ;
+: extract-nick ( line -- nick )
+    "!" split1 drop ;
 
-: <irc-stream> ( stream recepient -- stream )
-    <stream> [
-        "recepient" set
-        "stdio" set
-        100 <sbuf> "buf" set
-        [
-            irc-stream-write
-        ] "fwrite" set
-    ] extend ;
+: write-nick ( line -- )
+    "!" split1 drop [ [ "bold" | t ] ] write-attr ;
 
-: irc-eval ( line -- )
+GENERIC: irc-display
+PREDICATE: string privmsg "PRIVMSG" index-of -1 > ;
+PREDICATE: string action  "ACTION" index-of -1 > ;
+
+M: string irc-display ( line -- )
+    print ;
+
+M: privmsg irc-display ( line -- )
+    "PRIVMSG" split1 >r write-nick r>
+    write-highlighted terpri flush ;
+
+! Doesn't look good
+! M: action irc-display ( line -- )
+!     " * " write
+!     "ACTION" split1 >r write-nick r>
+!     write-highlighted terpri flush ;
+
+: in-loop ( -- )
+    irc-stream get freadln [ irc-display in-loop ] when* ;
+
+: input-thread ( -- ) [ in-loop ] in-thread ;
+: disconnect ( -- ) irc-stream get fclose ;
+
+: command ( line -- )
+    #! IRC /commands are just words.
+    " " split1 swap [
+        "irc" "listener" "parser" "scratchpad"
+    ] search execute ;
+
+: (msg) ( line nick -- )
+    "PRIVMSG " irc-write irc-write " :" irc-write irc-print ;
+
+: say ( line -- )
+    channel get [ (msg) ] [ "No channel." print ] ifte* ;
+
+: talk ( input -- ) "/" ?str-head [ command ] [ say ] ifte ;
+: talk-loop ( -- ) read [ talk talk-loop ] when* ;
+
+: irc ( nick server -- )
     [
-        [
-            eval
-        ] print-error
-    ] keep-datastack drop ;
-
-: with-irc-stream ( recepient quot -- )
-    [
-        >r "stdio" get swap <irc-stream> "stdio" set r> call
+        channels off
+        channel off
+        connect
+        login
+        input-thread
+        talk-loop
+        disconnect
     ] with-scope ;
 
-: irc-action-quot ( action -- quot )
-    [
-        [ "eval" swap [ irc-eval ] with-irc-stream ]
-        [ "see" swap [ see terpri ] with-irc-stream ]
-        [ "join" nip irc-join ]
-        [ "quit" 2drop global [ "irc-quit-flag" on ] bind ]
-    ] assoc [ [ 2drop ] ] unless* ;
+! /commands
+: join ( chan -- )
+    dup channels [ cons ] change
+    dup channel set
+    "JOIN " irc-write irc-print ;
 
-: irc-action-handler ( recepient message -- )
-    " " split1 swap irc-action-quot call ;
+: leave ( chan -- )
+    dup channels [ remove ] change
+    channels get dup [ car ] when channel set
+    "PART " irc-write irc-print ;
 
-: irc-input ( line -- )
-    #! Handle a line of IRC input.
-    dup
-    " PRIVMSG " split1 nip [
-        ":" split1 dup [
-            irc-action-handler
-        ] [
-            drop
-        ] ifte
-    ] when*
-
-    global [ print ] bind ;
-
-: irc-quit-flag ( -- ? )
-    global [ "irc-quit-flag" get ] bind ;
-
-: clear-irc-quit-flag ( -- ? )
-    global [ "irc-quit-flag" off ] bind ;
-
-: irc-loop ( -- )
-    irc-quit-flag [
-        read [ irc-input irc-loop ] when*
-    ] unless clear-irc-quit-flag ;
-
-: irc ( channels -- )
-    irc-register
-    "identify foobar" "NickServ" irc-message
-    [ irc-join ] each
-    irc-loop ;
-
-: irc-test
-    "factorbot" "user" set
-    "emu" "host" set
-    "irc.freenode.net" "server" set
-    "Factor" "realname" set
-    "factorbot" "nick" set
-    "irc.freenode.net" 6667 <client> [
-        [ "#concatenative" ] irc
-    ] with-stream ;
+: msg ( line -- ) " " split1 swap (msg) ;
+: me ( line -- ) "\u0001ACTION " swap "\u0001" cat3 say ;
+: quit ( line -- ) drop disconnect ;

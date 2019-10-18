@@ -26,13 +26,11 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: inspector
-USE: combinators
 USE: format
 USE: kernel
 USE: hashtables
 USE: lists
 USE: namespaces
-USE: stack
 USE: stdio
 USE: strings
 USE: presentation
@@ -61,9 +59,6 @@ USE: vectors
     t "underline" swons
     3list
     default-style append ;
-
-: var. ( [ name | value ] -- )
-    uncons unparse swap link-style write-attr ;
 
 : var-name. ( max name -- )
     tuck unparse pad-string write dup link-style

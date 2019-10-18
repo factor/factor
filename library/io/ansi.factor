@@ -26,12 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: ansi
-USE: combinators
 USE: lists
 USE: kernel
 USE: format
 USE: namespaces
-USE: stack
 USE: stdio
 USE: streams
 USE: strings
@@ -40,14 +38,14 @@ USE: generic
 
 ! Some words for outputting ANSI colors.
 
-: black   0 ; inline
-: red     1 ; inline
-: green   2 ; inline
-: yellow  3 ; inline
-: blue    4 ; inline
-: magenta 5 ; inline
-: cyan    6 ; inline
-: white   7 ; inline
+! black   0
+! red     1
+! green   2
+! yellow  3
+! blue    4
+! magenta 5
+! cyan    6
+! white   7
 
 : clear ( -- code )
     #! Clear screen
@@ -84,7 +82,7 @@ M: ansi-stream fwrite-attr ( string style stream -- )
     [
         [ default-style ] unless* ansi-attr-string
         delegate get fwrite
-    ] bind ;M
+    ] bind ;
 
 C: ansi-stream ( stream -- stream )
     #! Wraps the given stream in an ANSI stream. ANSI streams

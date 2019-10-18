@@ -106,9 +106,9 @@ bool zerop(CELL tagged)
 	case FIXNUM_TYPE:
 		return tagged == 0;
 	case BIGNUM_TYPE:
-		return BIGNUM_ZERO_P((ARRAY*)UNTAG(tagged));
+		return BIGNUM_ZERO_P((F_ARRAY*)UNTAG(tagged));
 	case FLOAT_TYPE:
-		return ((FLOAT*)UNTAG(tagged))->n == 0.0;
+		return ((F_FLOAT*)UNTAG(tagged))->n == 0.0;
 	case RATIO_TYPE:
 	case COMPLEX_TYPE:
 		return false;
@@ -125,9 +125,9 @@ bool onep(CELL tagged)
 	case FIXNUM_TYPE:
 		return tagged == tag_fixnum(1);
 	case BIGNUM_TYPE:
-		return BIGNUM_ONE_P((ARRAY*)UNTAG(tagged),0);
+		return BIGNUM_ONE_P((F_ARRAY*)UNTAG(tagged),0);
 	case FLOAT_TYPE:
-		return ((FLOAT*)UNTAG(tagged))->n == 1.0;
+		return ((F_FLOAT*)UNTAG(tagged))->n == 1.0;
 	case RATIO_TYPE:
 	case COMPLEX_TYPE:
 		return false;

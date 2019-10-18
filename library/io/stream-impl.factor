@@ -25,15 +25,14 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+IN: stdio
+DEFER: stdio
+
 IN: streams
-USE: combinators
-USE: continuations
 USE: io-internals
 USE: errors
 USE: hashtables
 USE: kernel
-USE: logic
-USE: stack
 USE: stdio
 USE: strings
 USE: namespaces
@@ -42,28 +41,28 @@ USE: generic
 TRAITS: fd-stream
 
 M: fd-stream fwrite-attr ( str style stream -- )
-    [ drop "out" get blocking-write ] bind ;M
+    [ drop "out" get blocking-write ] bind ;
 
 M: fd-stream freadln ( stream -- str )
-    [ "in" get dup [ blocking-read-line ] when ] bind ;M
+    [ "in" get dup [ blocking-read-line ] when ] bind ;
 
 M: fd-stream fread# ( count stream -- str )
-    [ "in" get dup [ blocking-read# ] [ nip ] ifte ] bind ;M
+    [ "in" get dup [ blocking-read# ] [ nip ] ifte ] bind ;
 
 M: fd-stream fflush ( stream -- )
-    [ "out" get [ blocking-flush ] when* ] bind ;M
+    [ "out" get [ blocking-flush ] when* ] bind ;
 
 M: fd-stream fauto-flush ( stream -- )
-    drop ;M
+    drop ;
 
 M: fd-stream fclose ( -- )
     [
         "out" get [ dup blocking-flush close-port ] when*
         "in" get [ close-port ] when*
-    ] bind ;M
+    ] bind ;
 
 C: fd-stream ( in out -- stream )
-    [ "out" set "in" set ] extend ;C
+    [ "out" set "in" set ] extend ;
 
 : <filecr> ( path -- stream )
     t f open-file <fd-stream> ;
@@ -78,7 +77,7 @@ C: fd-stream ( in out -- stream )
     <filecw> ;
 
 : init-stdio ( -- )
-    stdin stdout <fd-stream> <stdio-stream> "stdio" set ;
+    stdin stdout <fd-stream> <stdio-stream> stdio set ;
 
 : (fcopy) ( from to -- )
     #! Copy the contents of the fd-stream 'from' to the

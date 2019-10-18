@@ -26,11 +26,8 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: lists
-USE: combinators
 USE: kernel
-USE: logic
 USE: math
-USE: stack
 USE: vectors
 
 : 2list ( a b -- [ a b ] )
@@ -42,38 +39,22 @@ USE: vectors
 : append ( [ list1 ] [ list2 ] -- [ list1 list2 ] )
     over [ >r uncons r> append cons ] [ nip ] ifte ;
 
-: contains? ( element list -- remainder )
-    #! Push remainder of list from first occurrence of element,
-    #! or f.
-    dup [
-        2dup car = [ nip ] [ cdr contains? ] ifte
+: some? ( list pred -- ? )
+    #! Apply predicate to each element ,return remainder of list
+    #! from first occurrence where it is true, or return f.
+    over [
+        dup >r over >r >r car r> call [
+            r> r> drop
+        ] [
+            r> cdr r> some?
+        ] ifte
     ] [
         2drop f
-    ] ifte ;
+    ] ifte ; inline
 
-: nth ( n list -- list[n] )
-    #! nth element of a proper list.
-    #! Supplying n <= 0 pushes the first element of the list.
-    #! Supplying an argument beyond the end of the list raises
-    #! an error.
-    swap [ cdr ] times car ;
-
-: last* ( list -- last )
-    #! Last cons of a list.
-    dup cdr cons? [ cdr last* ] when ;
-
-: last ( list -- last )
-    #! Last element of a list.
-    last* car ;
-
-: tail ( list -- tail )
-    #! Return the cdr of the last cons cell, or f.
-    dup [ last* cdr ] when ;
-
-: list? ( list -- ? )
-    #! Proper list test. A proper list is either f, or a cons
-    #! cell whose cdr is a proper list.
-    dup cons? [ tail ] when not ;
+: contains? ( element list -- ? )
+    #! Test if a list contains an element.
+    [ over = ] some? >boolean nip ;
 
 : partition-add ( obj ? ret1 ret2 -- ret1 ret2 )
     rot [ swapd cons ] [ >r cons r> ] ifte ;
@@ -104,10 +85,6 @@ USE: vectors
         drop
     ] ifte ; inline
 
-: num-sort ( list -- sorted )
-    #! Sorts the list into ascending numerical order.
-    [ > ] sort ;
-
 ! Redefined below
 DEFER: tree-contains?
 
@@ -135,14 +112,6 @@ DEFER: tree-contains?
     #! list.
     2dup contains? [ nip ] [ cons ] ifte ;
 
-: (each) ( list quot -- list quot )
-    >r uncons r> tuck 2slip ; inline
-
-: each ( list quot -- )
-    #! Push each element of a proper list in turn, and apply a
-    #! quotation with effect ( X -- ) to each element.
-    over [ (each) each ] [ 2drop ] ifte ; inline
-
 : reverse ( list -- list )
     [ ] swap [ swons ] each ;
 
@@ -151,18 +120,6 @@ DEFER: tree-contains?
     #! return values of applying a quotation with effect
     #! ( X -- Y ) to each element into a new list.
     over [ (each) rot >r map r> swons ] [ drop ] ifte ; inline
-
-: subset ( list quot -- list )
-    #! Applies a quotation with effect ( X -- ? ) to each
-    #! element of a list; all elements for which the quotation
-    #! returned a value other than f are collected in a new
-    #! list.
-    over [
-        over car >r (each)
-        rot >r subset r> [ r> swons ] [ r> drop ] ifte
-    ] [
-        drop
-    ] ifte ; inline
 
 : remove ( obj list -- list )
     #! Remove all occurrences of the object from the list.
@@ -177,42 +134,23 @@ DEFER: tree-contains?
         uncons prune 2dup contains? [ nip ] [ cons ] ifte
     ] when ;
 
-: all? ( list pred -- ? )
-    #! Push if the predicate returns true for each element of
-    #! the list.
-    over [
-        dup >r swap uncons >r swap call [
-            r> r> all?
-        ] [
-            r> drop r> drop f
-        ] ifte
-    ] [
-        2drop t
-    ] ifte ;
-
 : all=? ( list -- ? )
     #! Check if all elements of a list are equal.
     dup [ uncons [ over = ] all? nip ] [ drop t ] ifte ;
 
 : maximize ( pred o1 o2 -- o1/o2 )
     #! Return o1 if pred returns true, o2 otherwise.
-    [ rot call ] 2keep ? ;
+    [ rot call ] 2keep ? ; inline
 
 : (top) ( list maximizer -- elt )
     #! Return the highest element in the list, where maximizer
     #! has stack effect ( o1 o2 -- max(o1,o2) ).
-    >r uncons r> each ;
+    >r uncons r> each ; inline
 
 : top ( list pred -- elt )
     #! Return the highest element in the list, where pred is a
     #! partial order with stack effect ( o1 o2 -- ? ).
-    swap [ pick >r maximize r> swap ] (top) nip ;
-
-: (count) ( n list -- list )
-    >r pred dup 0 < [ drop r> ] [ dup r> cons (count) ] ifte ;
-
-: count ( n -- [ 0 ... n-1 ] )
-    [ ] (count) ;
+    swap [ pick >r maximize r> swap ] (top) nip ; inline
 
 : cons= ( obj cons -- ? )
     2dup eq? [
@@ -242,11 +180,12 @@ DEFER: tree-contains?
 : cons-hashcode ( cons -- hash )
     4 (cons-hashcode) ;
 
-: list>vector ( list -- vector )
-    dup length <vector> swap [ over vector-push ] each ;
+: project ( n quot -- list )
+    #! Execute the quotation n times, passing the loop counter
+    #! the quotation as it ranges from 0..n-1. Collect results
+    #! in a new list.
+    [ ] rot [ -rot over >r >r call r> cons r> swap ] times*
+    nip reverse ; inline
 
-: stack>list ( vector -- list )
-    [ ] swap [ swons ] vector-each ;
-
-: vector>list ( vector -- list )
-    stack>list reverse ;
+: count ( n -- [ 0 ... n-1 ] )
+    [ ] project ;

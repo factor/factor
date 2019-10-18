@@ -4,12 +4,10 @@
 !
 ! ./f factor.image -libraries:sdl=libSDL.so -libraries:sdl-gfx=libSDL_gfx.so
 !
-! "examples/oop.factor" run-file
 ! "examples/factoroids.factor" run-file
 
 IN: factoroids
 
-USE: combinators
 USE: errors
 USE: hashtables
 USE: kernel
@@ -17,14 +15,13 @@ USE: lists
 USE: logic
 USE: math
 USE: namespaces
-USE: oop
+USE: generic
 USE: random
 USE: sdl
 USE: sdl-event
 USE: sdl-gfx
 USE: sdl-keysym
 USE: sdl-video
-USE: stack
 
 ! Game objects
 GENERIC: draw ( actor -- )
@@ -66,7 +63,7 @@ SYMBOL: enemy-shots
 
 : move ( -- )
     #! Add velocity vector to current actor's position vector.
-    velocity get position +@ ;
+    velocity get position [ + ] change ;
 
 : active? ( actor -- ? )
     #! Push f if the actor should be removed.
@@ -118,18 +115,18 @@ M: ship draw ( actor -- )
     [
         surface get screen-xy radius get color get
         filledCircleColor
-    ] bind ;M
+    ] bind ;
 
-M: ship tick ( actor -- ? ) dup [ move ] bind active? ;M
+M: ship tick ( actor -- ? ) dup [ move ] bind active? ;
 
-: make-ship ( -- ship )
-    <ship> [
+C: ship ( -- ship )
+    [
         width get 2 /i  height get 50 - rect> position set
         white color set
         10 radius set
         0 velocity set
         active on
-    ] extend unit ;
+    ] extend ;
 
 ! Projectiles
 TRAITS: plasma
@@ -137,17 +134,17 @@ M: plasma draw ( actor -- )
     [
         surface get screen-xy dup len get + color get
         vlineColor
-    ] bind ;M
+    ] bind ;
 
 M: plasma tick ( actor -- ? )
-    dup [ move ] bind dup in-screen? swap active? and ;M
+    dup [ move ] bind dup in-screen? swap active? and ;
 
 M: plasma collide ( actor1 actor2 -- )
     #! Remove the other actor.
-    deactivate deactivate ;M
+    deactivate deactivate ;
 
-: make-plasma ( actor dy -- plasma )
-    <plasma> [
+C: plasma ( actor dy -- plasma )
+    [
         velocity set
         actor-xy
         blue color set
@@ -159,17 +156,17 @@ M: plasma collide ( actor1 actor2 -- )
 : player-fire ( -- )
     #! Do nothing if player is dead.
     player-actor [
-        #{ 0 -6 } make-plasma player-shots cons@
+        #{ 0 -6 } <plasma> player-shots cons@
     ] when* ;
 
 : enemy-fire ( actor -- )
-    #{ 0 5 } make-plasma enemy-shots cons@ ;
+    #{ 0 5 } <plasma> enemy-shots cons@ ;
 
 ! Background of stars
 TRAITS: particle
 
 M: particle draw ( actor -- )
-    [ surface get screen-xy color get pixelColor ] bind ;M
+    [ surface get screen-xy color get pixelColor ] bind ;
 
 : wrap ( -- )
     #! If current actor has gone beyond screen bounds, move it
@@ -180,7 +177,9 @@ M: particle draw ( actor -- )
     rect> position set ;
 
 M: particle tick ( actor -- )
-    [ move wrap t ] bind ;M
+    [ move wrap t ] bind ;
+
+C: particle ;
 
 SYMBOL: stars
 : star-count 100 ;
@@ -218,9 +217,14 @@ M: enemy draw ( actor -- )
     [
         surface get screen-xy radius get color get
         filledCircleColor
-    ] bind ;M
+    ] bind ;
 
 : attack-chance 30 ;
+
+: chance ( n -- boolean )
+    #! Returns true with a 1/n probability, false with a (n-1)/n
+    #! probability.
+    1 swap random-int 1 = ;
 
 : attack ( actor -- )
     #! Fire a shot some of the time.
@@ -230,13 +234,15 @@ SYMBOL: wiggle-x
 
 : wiggle ( -- )
     #! Wiggle from left to right.
-    -3 3 random-int wiggle-x +@
+    -3 3 random-int wiggle-x [ + ] change
     wiggle-x get sgn 1 rect> velocity set ;
 
 M: enemy tick ( actor -- )
     dup attack
     dup [ wiggle move position get imaginary ] bind
-    y-in-screen? swap active? and ;M
+    y-in-screen? swap active? and ;
+
+C: enemy ;
 
 : spawn-enemy ( -- )
     <enemy> [
@@ -286,7 +292,7 @@ SYMBOL: event
 : init-game ( -- )
     #! Init game objects.
     init-stars
-    make-ship player set
+    <ship> unit player set
     <event> event set ;
 
 : each-layer ( quot -- )
@@ -321,6 +327,3 @@ SYMBOL: event
     ] with-screen ;
 
 factoroids
-
-! Currently the plugin doesn't handle GENERIC: and M:, so we
-! disable the parser. too many errors :sidekick.parser=none:

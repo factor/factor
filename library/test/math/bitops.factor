@@ -1,9 +1,7 @@
 IN: scratchpad
 USE: kernel
 USE: math
-USE: stack
 USE: test
-USE: logic
 USE: lists
 
 [ -2 ] [ 1 bitnot ] unit-test

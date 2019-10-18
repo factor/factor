@@ -27,12 +27,10 @@ IN: html
 USE: strings
 USE: lists
 USE: format
-USE: stack
-USE: combinators
+USE: kernel
 USE: stdio
 USE: namespaces
 USE: words
-USE: logic
 
 ! These words are used to provide a means of writing
 ! formatted HTML to standard output with a familiar 'html' look

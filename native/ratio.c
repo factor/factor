@@ -16,7 +16,7 @@ void primitive_from_fraction(void)
 		dpush(numerator);
 	else
 	{
-		RATIO* ratio = allot(sizeof(RATIO));
+		F_RATIO* ratio = allot(sizeof(F_RATIO));
 		ratio->numerator = numerator;
 		ratio->denominator = denominator;
 		dpush(tag_ratio(ratio));

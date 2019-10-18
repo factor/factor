@@ -11,18 +11,25 @@
 #define BOOT_ENV       8
 #define RUNQUEUE_ENV   9 /* used by library only */
 #define ARGS_ENV       10
+#define OS_ENV         11
 
 /* Profiling timer */
+#ifndef WIN32
 struct itimerval prof_timer;
+#endif
 
 /* Error handlers restore this */
+#ifdef WIN32
+jmp_buf toplevel;
+#else
 sigjmp_buf toplevel;
+#endif
 
 /* TAGGED currently executing quotation */
 CELL callframe;
 
 /* raw pointer to currently executing word */
-WORD* executing;
+F_WORD* executing;
 
 /* TAGGED user environment data; see getenv/setenv prims */
 CELL userenv[USER_ENV];
@@ -65,11 +72,6 @@ INLINE void cpush(CELL top)
 {
 	cs += CELLS;
 	put(cs,top);
-}
-
-INLINE CELL cpeek(void)
-{
-	return get(cs);
 }
 
 INLINE void call(CELL quot)

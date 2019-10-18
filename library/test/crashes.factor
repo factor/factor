@@ -4,7 +4,6 @@ USE: kernel
 USE: math
 USE: namespaces
 USE: parser
-USE: stack
 USE: strings
 USE: test
 USE: vectors
@@ -55,3 +54,5 @@ USE: lists
 ! See how well callstack overflow is handled
 : callstack-overflow callstack-overflow f ;
 [ callstack-overflow ] unit-test-fails
+
+[ [ cdr cons ] word-plist ] unit-test-fails

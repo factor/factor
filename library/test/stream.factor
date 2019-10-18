@@ -3,8 +3,8 @@ USE: namespaces
 USE: streams
 USE: stdio
 USE: test
-USE: stack
 USE: generic
+USE: kernel
 
 [ "xyzzy" ] [ [ "xyzzy" write ] with-string ] unit-test
 
@@ -15,25 +15,25 @@ M: xyzzy-stream fwrite-attr ( str style stream -- )
         drop "<" delegate get fwrite
         delegate get fwrite
         ">" delegate get fwrite
-    ] bind ;M
+    ] bind ;
 
 M: xyzzy-stream fclose ( stream -- )
-    drop ;M
+    drop ;
 
 M: xyzzy-stream fflush ( stream -- )
-    drop ;M
+    drop ;
 
 M: xyzzy-stream fauto-flush ( stream -- )
-    drop ;M
+    drop ;
 
 C: xyzzy-stream ( stream -- stream )
-    [ delegate set ] extend ;C
+    [ delegate set ] extend ;
 
 [
     "<xyzzy>"
 ] [
     [
-        "stdio" get <xyzzy-stream> [
+        stdio get <xyzzy-stream> [
             "xyzzy" write
         ] with-stream
     ] with-string

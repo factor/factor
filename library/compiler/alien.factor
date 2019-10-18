@@ -26,60 +26,111 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: alien
-USE: combinators
 USE: compiler
 USE: errors
+USE: generic
+USE: inference
+USE: interpreter
+USE: kernel
 USE: lists
 USE: math
 USE: namespaces
 USE: parser
-USE: stack
 USE: words
+USE: hashtables
 
-: BEGIN-ENUM:
-    #! C-style enumerations. Their use is not encouraged unless
-    #! it is for C library interfaces. Used like this:
-    #!
-    #! BEGIN-ENUM 0
-    #!     ENUM: x
-    #!     ENUM: y
-    #!     ENUM: z
-    #! END-ENUM
-    #!
-    #! This is the same as : x 0 ; : y 1 ; : z 2 ;.
-    scan str>number ; parsing
+BUILTIN: dll   15
+BUILTIN: alien 16
 
-: ENUM:
-    dup CREATE swap unit define-compound succ ; parsing
+: (library) ( name -- object )
+    "libraries" get hash ;
 
-: END-ENUM
-    drop ; parsing
+: load-dll ( library -- dll )
+    "dll" get dup [
+        drop "name" get dlopen dup "dll" set
+    ] unless ;
 
-: alien-call ( ... returns library function parameters -- ... )
+SYMBOL: #c-invoke ( C ABI -- Unix and most Windows libs )
+SYMBOL: #cleanup ( unwind stack by parameter )
+
+SYMBOL: #c-call ( jump to raw address )
+
+SYMBOL: #unbox ( move top of datastack to C stack )
+SYMBOL: #box ( move EAX to datastack )
+
+SYMBOL: #std-invoke ( stdcall ABI -- Win32 )
+
+: abi ( -- abi )
+    "abi" get "stdcall" = #std-invoke #c-invoke ? ;
+
+: alien-function ( function library -- address abi )
+    [
+        (library) [ load-dll dlsym abi ] bind
+    ] [
+        dlsym-self #c-invoke
+    ] ifte* ;
+
+! These are set in the #c-invoke and #std-invoke dataflow IR
+! nodes.
+SYMBOL: alien-returns
+SYMBOL: alien-parameters
+
+: infer-alien ( -- )
+    4 ensure-d
+    dataflow-drop, pop-d car
+    dataflow-drop, pop-d car
+    dataflow-drop, pop-d car alien-function >r
+    dataflow-drop, pop-d car swap
+    r> dataflow, [
+        alien-returns set
+        alien-parameters set
+    ] bind ;
+
+: unbox-parameter ( function -- )
+    dlsym-self #unbox swons , ;
+
+: linearize-parameters ( params -- count )
+    #! Generate code for boxing a list of C types.
+    #! Return amount stack must be unwound by.
+    [ alien-parameters get reverse ] bind 0 swap [
+        c-type [
+            "width" get cell align +
+            "unboxer" get
+        ] bind unbox-parameter
+    ] each ;
+
+: box-parameter ( function -- )
+    dlsym-self #box swons , ;
+
+: linearize-returns ( returns -- )
+    [ alien-returns get ] bind dup "void" = [
+        drop
+    ] [
+        c-type [ "boxer" get ] bind box-parameter
+    ] ifte ;
+
+: linearize-alien ( node -- )
+    dup linearize-parameters >r
+    dup [ node-param get ] bind #c-call swons ,
+    dup [ node-op get #c-invoke = ] bind
+    r> swap [ #cleanup swons , ] [ drop ] ifte
+    linearize-returns ;
+
+#c-invoke [ linearize-alien ] "linearizer" set-word-property
+
+#std-invoke [ linearize-alien ] "linearizer" set-word-property
+
+: alien-invoke ( ... returns library function parameters -- ... )
     #! Call a C library function.
     #! 'returns' is a type spec, and 'parameters' is a list of
     #! type specs. 'library' is an entry in the "libraries"
     #! namespace.
-    "alien-call cannot be interpreted." throw ;
+    "alien-invoke cannot be interpreted." throw ;
 
-: library ( name -- handle )
-    "libraries" get [
-        dup get dup dll? [
-            nip
-        ] [
-            dlopen tuck put
-        ] ifte
-    ] bind ;
+\ alien-invoke [ 4 | 0 ] "infer-effect" set-word-property
 
-: alien-function ( function library -- )
-    [ library dlsym ] [ dlsym-self ] ifte* ;
+\ alien-invoke [ infer-alien ] "infer" set-word-property
 
-: compile-alien-call
-    pop-literal reverse PARAMETERS >r
-    pop-literal pop-literal alien-function CALL JUMP-FIXUP
-    r> CLEANUP
-    pop-literal RETURNS ;
-
-global [ <namespace> "libraries" set ] bind
-
-\ alien-call [ compile-alien-call ] "compiling" set-word-property
+global [
+    "libraries" get [ <namespace> "libraries" set ] unless
+] bind

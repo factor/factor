@@ -25,7 +25,6 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-USE: combinators
 USE: alien
 USE: compiler
 USE: errors
@@ -34,11 +33,10 @@ USE: io-internals
 USE: kernel
 USE: lists
 USE: math
+USE: math-internals
 USE: parser
 USE: profiler
 USE: random
-USE: real-math
-USE: stack
 USE: strings
 USE: unparser
 USE: vectors
@@ -69,7 +67,7 @@ USE: words
     [ set-sbuf-length        " n sbuf -- "                        [ 2 | 1 ] ]
     [ sbuf-nth               " n sbuf -- ch "                     [ 2 | 1 ] ]
     [ set-sbuf-nth           " ch n sbuf -- "                     [ 3 | 0 ] ]
-    [ sbuf-append            " ch/str sbuf -- "                   [ 2 | 1 ] ]
+    [ sbuf-append            " ch/str sbuf -- "                   [ 2 | 0 ] ]
     [ sbuf>str               " sbuf -- str "                      [ 1 | 1 ] ]
     [ sbuf-reverse           " sbuf -- "                          [ 1 | 0 ] ]
     [ sbuf-clone             " sbuf -- sbuf "                     [ 1 | 1 ] ]
@@ -82,9 +80,9 @@ USE: words
     [ >float                 " n -- float "                       [ 1 | 1 ] ]
     [ numerator              " a/b -- a "                         [ 1 | 1 ] ]
     [ denominator            " a/b -- b "                         [ 1 | 1 ] ]
-    [ fraction>              " a b -- a/b "                       [ 1 | 1 ] ]
+    [ fraction>              " a b -- a/b "                       [ 2 | 1 ] ]
     [ str>float              " str -- float "                     [ 1 | 1 ] ]
-    [ unparse-float          " float -- str "                     [ 1 | 1 ] ]
+    [ (unparse-float)        " float -- str "                     [ 1 | 1 ] ]
     [ float>bits             " float -- n "                       [ 1 | 1 ] ]
     [ real                   " #{ re im } -- re "                 [ 1 | 1 ] ]
     [ imaginary              " #{ re im } -- im "                 [ 1 | 1 ] ]
@@ -159,9 +157,6 @@ USE: words
     [ swap                   " x y -- y x "                       [ 2 | 2 ] ]
     [ over                   " x y -- x y x "                     [ 2 | 3 ] ]
     [ pick                   " x y z -- x y z x "                 [ 3 | 4 ] ]
-    [ nip                    " x y -- y "                         [ 2 | 1 ] ]
-    [ tuck                   " x y -- y x y "                     [ 2 | 3 ] ]
-    [ rot                    " x y z -- y z x "                   [ 3 | 3 ] ]
     [ >r                     " x -- r:x "                         [ 1 | 0 ] ]
     [ r>                     " r:x -- x "                         [ 0 | 1 ] ]
     [ eq?                    " x y -- ? "                         [ 2 | 1 ] ]

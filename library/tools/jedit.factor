@@ -26,12 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: jedit
-USE: combinators
+USE: kernel
 USE: lists
-USE: logic
 USE: namespaces
 USE: parser
-USE: stack
 USE: streams
 USE: stdio
 USE: strings

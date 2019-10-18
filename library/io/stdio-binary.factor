@@ -26,8 +26,8 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: stdio
+USE: kernel
 USE: math
-USE: stack
 USE: streams
 USE: strings
 

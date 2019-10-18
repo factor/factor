@@ -1,18 +1,18 @@
 typedef struct {
 	CELL header;
 	double n;
-} FLOAT;
+} F_FLOAT;
 
-INLINE FLOAT* make_float(double n)
+INLINE F_FLOAT* make_float(double n)
 {
-	FLOAT* flo = allot_object(FLOAT_TYPE,sizeof(FLOAT));
+	F_FLOAT* flo = allot_object(FLOAT_TYPE,sizeof(F_FLOAT));
 	flo->n = n;
 	return flo;
 }
 
 INLINE double untag_float_fast(CELL tagged)
 {
-	return ((FLOAT*)UNTAG(tagged))->n;
+	return ((F_FLOAT*)UNTAG(tagged))->n;
 }
 
 INLINE double untag_float(CELL tagged)

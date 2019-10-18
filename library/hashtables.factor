@@ -26,19 +26,18 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: hashtables
-USE: combinators
+USE: generic
 USE: kernel
 USE: lists
 USE: math
-USE: stack
 USE: vectors
 
 ! Note that the length of a hashtable vector must not change
 ! for the lifetime of the hashtable, otherwise problems will
 ! occur. Do not use vector words with hashtables.
 
-: hashtable? ( obj -- ? )
-    dup vector? [ [ assoc? ] vector-all? ] [ drop f ] ifte ;
+PREDICATE: vector hashtable ( obj -- ? )
+    [ assoc? ] vector-all? ;
 
 : <hashtable> ( buckets -- )
     #! A hashtable is implemented as an array of buckets. The
@@ -62,13 +61,25 @@ USE: vectors
     #! undefined value, or a value set to f.
     hash* dup [ cdr ] when ;
 
+: set-hash* ( key table quot -- )
+    #! Apply the quotation to yield a new association list.
+    >r
+        2dup (hashcode)
+    r> pick >r
+        over >r
+            >r swap vector-nth r> call
+        r>
+    r> set-vector-nth ; inline
+    
 : set-hash ( value key table -- )
     #! Store the value in the hashtable. Either replaces an
     #! existing value in the appropriate bucket, or adds a new
-    #! key/value pair,
-    dup >r 2dup (hashcode) dup >r swap
-    vector-nth set-assoc
-    r> r> set-vector-nth ;
+    #! key/value pair.
+    [ set-assoc ] set-hash* ;
+
+: remove-hash ( key table -- )
+    #! Remove a value from a hashtable.
+    [ remove-assoc ] set-hash* ;
 
 : hash-each ( hash code -- )
     #! Apply the code to each key/value pair of the hashtable.

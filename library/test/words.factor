@@ -3,9 +3,7 @@ USE: math
 USE: test
 USE: words
 USE: namespaces
-USE: logic
 USE: lists
-USE: stack
 USE: kernel
 
 [ 4 ] [
@@ -30,10 +28,6 @@ DEFER: plist-test
     \ plist-test "sample-property" word-property
 ] unit-test
 
-: test-last ( -- ) ;
-word word-name "last-word-test" set
-
-[ "test-last" ] [ ] [ "last-word-test" get ] test-word
 [ f ] [ 5 ] [ compound? ] test-word
 
 "create-test" "scratchpad" create { 1 2 } "testing" set-word-property
@@ -42,8 +36,6 @@ word word-name "last-word-test" set
 ] unit-test
 
 [
-    <namespace> "vocabularies" set
-    
     [ t ] [ \ car "car" [ "lists" ] search = ] unit-test
 
     "test-scope" "scratchpad" create drop
@@ -55,3 +47,19 @@ word word-name "last-word-test" set
 
 [ t ] [ vocabs list? ] unit-test
 [ t ] [ vocabs [ words [ word? ] all? ] all? ] unit-test
+
+[ f ] [ gensym gensym = ] unit-test
+
+[ f ] [ 123 compound? ] unit-test
+
+: colon-def ;
+[ t ] [ \ colon-def compound? ] unit-test
+
+SYMBOL: a-symbol
+[ f ] [ \ a-symbol compound? ] unit-test
+[ t ] [ \ a-symbol symbol? ] unit-test
+
+: test-last ( -- ) ;
+word word-name "last-word-test" set
+
+[ "test-last" ] [ ] [ "last-word-test" get ] test-word

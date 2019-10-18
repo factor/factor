@@ -27,7 +27,6 @@
 
 IN: httpd-responder
 
-USE: combinators
 USE: hashtables
 USE: httpd
 USE: kernel
@@ -35,7 +34,6 @@ USE: lists
 USE: logging
 USE: namespaces
 USE: stdio
-USE: stack
 USE: streams
 USE: strings
 

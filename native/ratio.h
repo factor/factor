@@ -1,15 +1,15 @@
 typedef struct {
 	CELL numerator;
 	CELL denominator;
-} RATIO;
+} F_RATIO;
 
-INLINE RATIO* untag_ratio(CELL tagged)
+INLINE F_RATIO* untag_ratio(CELL tagged)
 {
 	type_check(RATIO_TYPE,tagged);
-	return (RATIO*)UNTAG(tagged);
+	return (F_RATIO*)UNTAG(tagged);
 }
 
-INLINE CELL tag_ratio(RATIO* ratio)
+INLINE CELL tag_ratio(F_RATIO* ratio)
 {
 	return RETAG(ratio,RATIO_TYPE);
 }

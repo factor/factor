@@ -26,13 +26,11 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: parser
-USE: combinators
 USE: errors
 USE: kernel
 USE: lists
 USE: math
 USE: namespaces
-USE: stack
 USE: stdio
 USE: streams
 USE: strings
@@ -44,7 +42,7 @@ USE: strings
 
 : next-line ( -- str )
     "parse-stream" get freadln
-    "line-number" succ@ ;
+    "line-number" [ succ ] change ;
 
 : (read-lines) ( quot -- )
     next-line dup [

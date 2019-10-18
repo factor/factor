@@ -2,11 +2,14 @@ IN: scratchpad
 USE: hashtables
 USE: namespaces
 USE: generic
-USE: stack
 USE: test
+USE: kernel
+USE: math
+USE: words
+USE: lists
 
 TRAITS: test-traits
-C: test-traits ;C
+C: test-traits ;
 
 [ t ] [ <test-traits> test-traits? ] unit-test
 [ f ] [ "hello" test-traits? ] unit-test
@@ -14,20 +17,20 @@ C: test-traits ;C
 
 GENERIC: foo
 
-M: test-traits foo drop 12 ;M
+M: test-traits foo drop 12 ;
 
 TRAITS: another-test
-C: another-test ;C
+C: another-test ;
 
-M: another-test foo drop 13 ;M
+M: another-test foo drop 13 ;
 
 [ 12 ] [ <test-traits> foo ] unit-test
 [ 13 ] [ <another-test> foo ] unit-test
 
 TRAITS: quux
-C: quux ;C
+C: quux ;
 
-M: quux foo "foo" swap hash ;M
+M: quux foo "foo" swap hash ;
 
 [
     "Hi"
@@ -38,7 +41,7 @@ M: quux foo "foo" swap hash ;M
 ] unit-test
 
 TRAITS: ctr-test
-C: ctr-test [ 5 "x" set ] extend ;C
+C: ctr-test [ 5 "x" set ] extend ;
 
 [
     5
@@ -47,12 +50,53 @@ C: ctr-test [ 5 "x" set ] extend ;C
 ] unit-test
 
 TRAITS: del1
-C: del1 ;C
+C: del1 ;
 
 GENERIC: super
-M: del1 super drop 5 ;M
+M: del1 super drop 5 ;
 
 TRAITS: del2
-C: del2 ( delegate -- del2 ) [ delegate set ] extend ;C
+C: del2 ( delegate -- del2 ) [ delegate set ] extend ;
 
 [ 5 ] [ <del1> <del2> super ] unit-test
+
+GENERIC: class-of
+
+M: fixnum class-of drop "fixnum" ;
+M: word   class-of drop "word"   ;
+M: cons   class-of drop "cons"   ;
+
+[ "fixnum" ] [ 5 class-of ] unit-test
+[ "cons" ] [ [ 1 2 3 ] class-of ] unit-test
+[ "word" ] [ \ class-of class-of ] unit-test
+[ 3.4 class-of ] unit-test-fails
+
+GENERIC: foobar
+M: object foobar drop "Hello world" ;
+M: fixnum foobar drop "Goodbye cruel world" ;
+
+[ "Hello world" ] [ 4 foobar foobar ] unit-test
+[ "Goodbye cruel world" ] [ 4 foobar ] unit-test
+
+GENERIC: bool>str
+M: t bool>str drop "true" ;
+M: f bool>str drop "false" ;
+
+: str>bool
+    [
+        [ "true" | t ]
+        [ "false" | f ]
+    ] assoc ;
+
+[ t ] [ t bool>str str>bool ] unit-test
+[ f ] [ f bool>str str>bool ] unit-test
+
+PREDICATE: cons nonempty-list list? ;
+
+GENERIC: funny-length
+M: cons funny-length drop 0 ;
+M: nonempty-list funny-length length ;
+
+[ 0 ] [ [ 1 2 | 3 ] funny-length ] unit-test
+[ 3 ] [ [ 1 2 3 ] funny-length ] unit-test
+[ "hello" funny-length ] unit-test-fails

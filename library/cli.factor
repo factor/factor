@@ -25,10 +25,8 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: init
-USE: combinators
+IN: command-line
 USE: compiler
-USE: continuations
 USE: errors
 USE: files
 USE: listener
@@ -38,7 +36,6 @@ USE: namespaces
 USE: parser
 USE: prettyprint
 USE: random
-USE: stack
 USE: stdio
 USE: streams
 USE: strings
@@ -53,7 +50,7 @@ USE: words
 : run-user-init ( -- )
     #! Run user init file if it exists
     "user-init" get [
-        [ "~" get , "/" get , ".factor-" , "rc" , ] make-string
+        [ "~" get , "/" , ".factor-" , "rc" , ] make-string
         ?run-file
     ] when ;
 

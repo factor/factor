@@ -113,6 +113,16 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 
 		FactorWord pushWord = define("syntax","\\");
 		pushWord.parsing = new PushWord(pushWord);
+
+		/* OOP */
+		FactorWord generic = define("generic","GENERIC:");
+		generic.parsing = new Generic(generic);
+		FactorWord traits = define("generic","TRAITS:");
+		traits.parsing = new Traits(traits);
+		FactorWord beginMethod = define("generic","M:");
+		beginMethod.parsing = new BeginMethod(beginMethod,def);
+		FactorWord beginConstructor = define("generic","C:");
+		beginConstructor.parsing = new BeginConstructor(beginConstructor,def);
 	} //}}}
 
 	//{{{ getVocabulary() method

@@ -1,6 +1,5 @@
 IN: scratchpad
-USE: combinators
-USE: continuations
+USE: kernel
 USE: math
 USE: test
 

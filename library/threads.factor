@@ -26,12 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: threads
-USE: combinators
-USE: continuations
 USE: io-internals
 USE: kernel
 USE: lists
-USE: stack
 
 ! Core of the multitasker. Used by io-internals.factor and
 ! in-thread.factor.

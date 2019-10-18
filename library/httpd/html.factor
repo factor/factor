@@ -26,13 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: html
-USE: combinators
 USE: format
 USE: lists
-USE: logic
 USE: kernel
 USE: namespaces
-USE: stack
 USE: stdio
 USE: streams
 USE: strings
@@ -146,7 +143,7 @@ M: html-stream fwrite-attr ( str style stream -- )
                 ] file-link-tag
             ] object-link-tag
         ] icon-tag
-    ] bind ;M
+    ] bind ;
 
 C: html-stream ( stream -- stream )
     #! Wraps the given stream in an HTML stream. An HTML stream
@@ -162,10 +159,10 @@ C: html-stream ( stream -- stream )
     #! underline
     #! size
     #! link - an object path
-    [ dup delegate set "stdio" set ] extend ;
+    [ dup delegate set stdio set ] extend ;
 
 : with-html-stream ( quot -- )
-    [ "stdio" get <html-stream> "stdio" set call ] with-scope ;
+    [ stdio [ <html-stream> ] change  call ] with-scope ;
 
 : html-document ( title quot -- )
     swap chars>entities dup

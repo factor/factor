@@ -5,7 +5,7 @@ USE: stdio
 USE: streams
 USE: strings
 USE: test
-USE: stack
+USE: kernel
 
 [
     "&lt;html&gt;&amp;&apos;sgml&apos;"

@@ -29,7 +29,7 @@ IN: test-responder
 USE: html
 USE: httpd
 USE: httpd-responder
-USE: stack
+USE: kernel
 USE: test
 
 : test-responder ( argument -- )

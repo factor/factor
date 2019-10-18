@@ -25,46 +25,68 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: dataflow
-USE: inference
+IN: inference
 USE: interpreter
+USE: kernel
 USE: lists
 USE: math
 USE: namespaces
-USE: stack
 USE: words
-USE: combinators
 USE: vectors
 
 ! We build a dataflow graph for the compiler.
 SYMBOL: dataflow-graph
 
-SYMBOL: CALL ( non-tail call )
-SYMBOL: JUMP ( tail-call )
-SYMBOL: PUSH ( literal )
+! Label nodes have the node-label variable set.
+SYMBOL: #label
 
-SYMBOL: IFTE
-SYMBOL: GENERIC
-SYMBOL: 2GENERIC
+! A label that is not called recursively at all, or only tail
+! recursively. The optimizer changes some #labels to
+! #simple-labels.
+SYMBOL: #simple-label
+
+SYMBOL: #call ( non-tail call )
+SYMBOL: #call-label
+SYMBOL: #push ( literal )
+
+SYMBOL: #ifte
+SYMBOL: #dispatch
+
+! This is purely a marker for values we retain after a
+! conditional. It does not generate code, but merely alerts the
+! dataflow optimizer to the fact these values must be retained.
+SYMBOL: #values
+
+SYMBOL: #return
+
+SYMBOL: #drop
+SYMBOL: #dup
+SYMBOL: #swap
+SYMBOL: #over
+SYMBOL: #pick
+
+SYMBOL: #>r
+SYMBOL: #r>
 
 SYMBOL: node-consume-d
 SYMBOL: node-produce-d
 SYMBOL: node-consume-r
 SYMBOL: node-produce-r
 SYMBOL: node-op
+SYMBOL: node-label
 
-! PUSH nodes have this field set to the value being pushed.
-! CALL nodes have this as the word being called
+! #push nodes have this field set to the value being pushed.
+! #call nodes have this as the word being called
 SYMBOL: node-param
 
 : <dataflow-node> ( param op -- node )
     <namespace> [
         node-op set
         node-param set
-        { } node-consume-d set
-        { } node-produce-d set
-        { } node-consume-r set
-        { } node-produce-r set
+        [ ] node-consume-d set
+        [ ] node-produce-d set
+        [ ] node-consume-r set
+        [ ] node-produce-r set
     ] extend ;
 
 : node-inputs ( d-count r-count -- )
@@ -93,4 +115,15 @@ SYMBOL: node-param
 : dataflow-drop, ( -- )
     #! Remove the top stack element and add a dataflow node
     #! noting this.
-    \ drop CALL dataflow, [ 1 0 node-inputs ] bind ;
+    f #drop dataflow, [ 1 0 node-inputs ] bind ;
+
+: apply-dataflow ( dataflow name default -- )
+    #! For the dataflow node, look up named word property,
+    #! if its not defined, apply default quotation to
+    #! ( node ) otherwise apply property quotation to
+    #! ( node ).
+    >r >r dup [ node-op get ] bind r> word-property dup [
+        call r> drop
+    ] [
+        drop r> call
+    ] ifte ;

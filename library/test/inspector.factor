@@ -6,4 +6,4 @@ USE: words
 "httpd" apropos.
 "car" usages.
 global describe
-"vocabularies" get describe
+vocabularies get describe

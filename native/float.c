@@ -2,7 +2,7 @@
 
 double to_float(CELL tagged)
 {
-	RATIO* r;
+	F_RATIO* r;
 	double x;
 	double y;
 
@@ -11,14 +11,14 @@ double to_float(CELL tagged)
 	case FIXNUM_TYPE:
 		return (double)untag_fixnum_fast(tagged);
 	case BIGNUM_TYPE:
-		return s48_bignum_to_double((ARRAY*)UNTAG(tagged));
+		return s48_bignum_to_double((F_ARRAY*)UNTAG(tagged));
 	case RATIO_TYPE:
-		r = (RATIO*)UNTAG(tagged);
+		r = (F_RATIO*)UNTAG(tagged);
 		x = to_float(r->numerator);
 		y = to_float(r->denominator);
 		return x / y;
 	case FLOAT_TYPE:
-		return ((FLOAT*)UNTAG(tagged))->n;
+		return ((F_FLOAT*)UNTAG(tagged))->n;
 	default:
 		type_error(FLOAT_TYPE,tagged);
 		return 0.0; /* can't happen */
@@ -33,7 +33,7 @@ void primitive_to_float(void)
 
 void primitive_str_to_float(void)
 {
-	STRING* str;
+	F_STRING* str;
 	char *c_str, *end;
 	double f;
 
@@ -62,12 +62,12 @@ void primitive_float_to_str(void)
 void primitive_float_to_bits(void)
 {
 	double f;
-	long long f_raw;
+	int64_t f_raw;
 
 	maybe_garbage_collection();
 
 	f = untag_float(dpeek());
-	f_raw = *(long long*)&f;
+	f_raw = *(int64_t*)&f;
 	drepl(tag_object(s48_long_long_to_bignum(f_raw)));
 }
 

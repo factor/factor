@@ -1,8 +1,8 @@
 #include "factor.h"
 
-VECTOR* vector(FIXNUM capacity)
+F_VECTOR* vector(F_FIXNUM capacity)
 {
-	VECTOR* vector = allot_object(VECTOR_TYPE,sizeof(VECTOR));
+	F_VECTOR* vector = allot_object(VECTOR_TYPE,sizeof(F_VECTOR));
 	vector->top = 0;
 	vector->array = tag_object(array(capacity,F));
 	return vector;
@@ -21,9 +21,9 @@ void primitive_vector_length(void)
 
 void primitive_set_vector_length(void)
 {
-	VECTOR* vector;
-	FIXNUM length;
-	ARRAY* array;
+	F_VECTOR* vector;
+	F_FIXNUM length;
+	F_ARRAY* array;
 
 	maybe_garbage_collection();
 
@@ -40,7 +40,7 @@ void primitive_set_vector_length(void)
 
 void primitive_vector_nth(void)
 {
-	VECTOR* vector = untag_vector(dpop());
+	F_VECTOR* vector = untag_vector(dpop());
 	CELL index = to_fixnum(dpop());
 
 	if(index < 0 || index >= vector->top)
@@ -48,9 +48,9 @@ void primitive_vector_nth(void)
 	dpush(array_nth(untag_array(vector->array),index));
 }
 
-void vector_ensure_capacity(VECTOR* vector, CELL index)
+void vector_ensure_capacity(F_VECTOR* vector, CELL index)
 {
-	ARRAY* array = untag_array(vector->array);
+	F_ARRAY* array = untag_array(vector->array);
 	CELL capacity = array->capacity;
 	if(index >= capacity)
 		array = grow_array(array,index * 2 + 1,F);
@@ -60,8 +60,8 @@ void vector_ensure_capacity(VECTOR* vector, CELL index)
 
 void primitive_set_vector_nth(void)
 {
-	VECTOR* vector;
-	FIXNUM index;
+	F_VECTOR* vector;
+	F_FIXNUM index;
 	CELL value;
 
 	maybe_garbage_collection();
@@ -79,12 +79,12 @@ void primitive_set_vector_nth(void)
 	set_array_nth(untag_array(vector->array),index,value);
 }
 
-void fixup_vector(VECTOR* vector)
+void fixup_vector(F_VECTOR* vector)
 {
 	fixup(&vector->array);
 }
 
-void collect_vector(VECTOR* vector)
+void collect_vector(F_VECTOR* vector)
 {
 	copy_object(&vector->array);
 }

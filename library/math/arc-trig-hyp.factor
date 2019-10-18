@@ -26,10 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: math
-USE: combinators
+USE: kernel
 USE: math
-USE: real-math
-USE: stack
+USE: math-internals
 
 ! Inverse trigonometric functions:
 !    acos asec asin acosec atan acot

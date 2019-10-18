@@ -2,12 +2,12 @@ IN: scratchpad
 USE: test
 USE: inference
 USE: math
-USE: stack
-USE: combinators
 USE: vectors
 USE: kernel
 USE: lists
 USE: namespaces
+USE: kernel
+USE: math-internals
 
 [
     [ 1 | 2 ]
@@ -27,7 +27,7 @@ USE: namespaces
 ! ] unit-test
 [ 6 ] [ 6 gensym-vector vector-length ] unit-test
 
-[ 3 ] [ [ { 1 2 } { 1 2 3 } ] max-vector-length ] unit-test
+[ 3 ] [ [ { 1 2 } { 1 2 3 } ] longest-vector ] unit-test
 
 [ t ] [
     [ { 1 2 } { 1 2 3 } ] unify-lengths [ vector-length ] map all=?
@@ -43,7 +43,6 @@ USE: namespaces
 
 [ [ 2 | 4 ] ] [ [ 2dup ] infer ] unit-test
 [ [ 2 | 0 ] ] [ [ set-vector-length ] infer ] unit-test
-[ [ 1 | 0 ] ] [ [ vector-clear ] infer ] unit-test
 [ [ 2 | 0 ] ] [ [ vector-push ] infer ] unit-test
 
 [ [ 1 | 0 ] ] [ [ [ ] [ ] ifte ] infer ] unit-test

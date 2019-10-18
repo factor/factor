@@ -26,16 +26,13 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: resource-responder
-USE: combinators
 USE: files
 USE: httpd
 USE: httpd-responder
 USE: kernel
 USE: lists
-USE: logic
 USE: namespaces
 USE: parser
-USE: stack
 USE: stdio
 USE: streams
 USE: strings
@@ -47,7 +44,7 @@ USE: strings
     dup mime-type resource-response  "method" get "head" = [
         drop
     ] [
-        <resource-stream> "stdio" get fcopy
+        <resource-stream> stdio get fcopy
     ] ifte ;
 
 : resource-responder ( filename -- )

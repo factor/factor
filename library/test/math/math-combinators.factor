@@ -1,8 +1,6 @@
 IN: scratchpad
-USE: combinators
 USE: kernel
 USE: math
-USE: stack
 USE: test
 
 [ 0 1 2 3 4 ] [ 5 [ ] times* ] unit-test

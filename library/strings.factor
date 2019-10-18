@@ -26,12 +26,13 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: strings
-USE: combinators
+USE: generic
 USE: kernel
 USE: lists
-USE: logic
 USE: math
-USE: stack
+
+BUILTIN: string 12
+BUILTIN: sbuf   13
 
 : f-or-"" ( obj -- ? )
     dup not swap "" = or ;
@@ -57,12 +58,6 @@ USE: stack
 
 : cat3 ( "a" "b" "c" -- "abc" )
     [ ] cons cons cons cat ;
-
-: cat4 ( "a" "b" "c" "d" -- "abcd" )
-    [ ] cons cons cons cons cat ;
-
-: cat5 ( "a" "b" "c" "d" "e" -- "abcde" )
-    [ ] cons cons cons cons cons cat ;
 
 : index-of ( string substring -- index )
     0 -rot index-of* ;
@@ -100,7 +95,7 @@ USE: stack
 
 : =? ( x y z -- z/f )
     #! Push z if x = y, otherwise f.
-    -rot = [ drop f ] unless ;
+    >r = r> f ? ;
 
 : str-head? ( str begin -- str )
     #! If the string starts with begin, return the rest of the
@@ -134,21 +129,12 @@ USE: stack
     #! list.
     0 swap [ str-length max ] each ;
 
-: ends-with-newline? ( string -- string )
-    #! Test if the string ends with a newline or not.
-    "\n" str-tail? ;
-
 : str-each ( str [ code ] -- )
     #! Execute the code, with each character of the string
     #! pushed onto the stack.
     over str-length [
         -rot 2dup >r >r >r str-nth r> call r> r>
     ] times* 2drop ; inline
-
-: str-sort ( list -- sorted )
-    #! Sorts the list into ascending lexicographical string
-    #! order.
-    [ str-lexi> ] sort ;
 
 : blank? ( ch -- ? ) " \t\n\r" str-contains? ;
 : letter? ( ch -- ? ) CHAR: a CHAR: z between? ;
@@ -164,10 +150,7 @@ USE: stack
 : url-quotable? ( ch -- ? )
     #! In a URL, can this character be used without
     #! URL-encoding?
-    [
-        [ letter?              ] [ drop t ]
-        [ LETTER?              ] [ drop t ]
-        [ digit?               ] [ drop t ]
-        [ "/_?." str-contains? ] [ drop t ]
-        [                      ] [ drop f ]
-    ] cond ;
+    dup letter?
+    over LETTER? or
+    over digit? or
+    swap "/_?." str-contains? or ;

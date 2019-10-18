@@ -57,7 +57,7 @@ void primitive_from_rect(void)
 		dpush(real);
 	else
 	{
-		COMPLEX* complex = allot(sizeof(COMPLEX));
+		F_COMPLEX* complex = allot(sizeof(F_COMPLEX));
 		complex->real = real;
 		complex->imaginary = imaginary;
 		dpush(tag_complex(complex));

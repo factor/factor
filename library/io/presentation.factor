@@ -26,12 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: presentation
-USE: combinators
 USE: hashtables
 USE: kernel
 USE: lists
 USE: namespaces
-USE: stack
 USE: strings
 USE: unparser
 

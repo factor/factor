@@ -25,14 +25,14 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+IN: kernel
+DEFER: callcc1
+
 IN: errors
-USE: combinators
-USE: continuations
 USE: kernel
 USE: lists
 USE: math
 USE: namespaces
-USE: stack
 USE: strings
 USE: vectors
 

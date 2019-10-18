@@ -26,7 +26,6 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: file-responder
-USE: combinators
 USE: errors
 USE: files
 USE: html
@@ -37,7 +36,6 @@ USE: lists
 USE: logging
 USE: namespaces
 USE: parser
-USE: stack
 USE: stdio
 USE: streams
 USE: strings
@@ -56,7 +54,7 @@ USE: unparser
     over file-length file-response  "method" get "head" = [
         drop
     ] [
-        <filebr> "stdio" get fcopy
+        <filebr> stdio get fcopy
     ] ifte ;
 
 : serve-file ( filename -- )

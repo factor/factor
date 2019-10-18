@@ -26,15 +26,12 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: httpd
-USE: combinators
 USE: errors
 USE: httpd-responder
 USE: kernel
 USE: lists
 USE: logging
-USE: logic
 USE: namespaces
-USE: stack
 USE: stdio
 USE: streams
 USE: strings
@@ -46,7 +43,7 @@ USE: url-encoding
     "httpd-log-file" get dup [
         <filecr>
     ] [
-        drop "stdio" get
+        drop stdio get
     ] ifte ;
 
 : url>path ( uri -- path )
@@ -86,7 +83,7 @@ USE: url-encoding
 : httpd-client ( socket -- )
     [
         [
-            "stdio" get "client" set log-client
+            stdio get "client" set log-client
             read [ parse-request ] when*
         ] with-stream
     ] print-error ;

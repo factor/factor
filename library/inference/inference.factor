@@ -26,16 +26,12 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: inference
-USE: combinators
-USE: dataflow
 USE: errors
 USE: interpreter
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
-USE: stack
 USE: strings
 USE: vectors
 USE: words
@@ -55,6 +51,16 @@ SYMBOL: recursive-state
 ! ... with keys:
 SYMBOL: base-case
 SYMBOL: entry-effect
+! When a call to a combinator is compiled, recursion cannot
+! simply jump to the definition of the combinator. Instead, it
+! makes a local jump to this label.
+SYMBOL: recursive-label
+
+! When inferring stack effects of mutually recursive words, we
+! don't want to save the fact that one word does not have a
+! stack effect before the base case of its mutual pair is
+! inferred.
+SYMBOL: save-effect
 
 : gensym-vector ( n --  vector )
     dup <vector> swap [ gensym over vector-push ] times ;
@@ -74,7 +80,7 @@ SYMBOL: entry-effect
 
 : ensure-d ( count -- )
     #! Ensure count of unknown results are on the stack.
-    meta-d get ensure meta-d set d-in +@ ;
+    meta-d [ ensure ] change d-in [ + ] change ;
 
 : consume-d ( count -- )
     #! Remove count of elements.
@@ -97,12 +103,8 @@ SYMBOL: entry-effect
     init-interpreter
     0 d-in set
     recursive-state set
-    dataflow-graph off ;
-
-: with-recursive-state ( word quot -- )
-    over <recursive-state> cons recursive-state cons@
-    call
-    recursive-state uncons@ drop ;
+    dataflow-graph off
+    save-effect on ;
 
 DEFER: apply-word
 
@@ -110,13 +112,13 @@ DEFER: apply-word
     #! Literals are annotated with the current recursive
     #! state.
     dup recursive-state get cons push-d
-    PUSH dataflow, [ 1 0 node-outputs ] bind ;
+    #push dataflow, [ 1 0 node-outputs ] bind ;
 
 : apply-object ( obj -- )
     #! Apply the object's stack effect to the inferencer state.
     dup word? [ apply-word ] [ apply-literal ] ifte ;
 
-: (infer) ( quot -- )
+: infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested
     #! quotations.
     [ apply-object ] each ;
@@ -135,24 +137,41 @@ DEFER: apply-word
     2dup > [ "No solution to decomposition" throw ] when
     swap - -rot 2cdr >r + r> cons raise ;
 
-: set-base ( [ in | stack ] rstate -- )
+: set-base ( [ in | out ] rstate -- )
     #! Set the base case of the current word.
     dup [
-        >r uncons vector-length cons r>  car cdr [
+        car cdr [
             entry-effect get swap decompose base-case set
         ] bind
     ] [
         2drop
     ] ifte ;
 
+: check-return ( -- )
+    #! Raise an error if word leaves values on return stack.
+    meta-r get vector-length 0 = [
+        "Word leaves elements on return stack" throw
+    ] unless ;
+
+: values-node ( op -- )
+    #! Add a #values or #return node to the graph.
+    f swap dataflow, [
+        meta-d get vector>list node-consume-d set
+    ] bind ;
+
+: (infer) ( quot -- )
+    f init-inference
+    infer-quot
+    #return values-node check-return ;
+
 : infer ( quot -- [ in | out ] )
     #! Stack effect of a quotation.
-    [ f init-inference (infer)  effect ] with-scope ;
-
-: dataflow ( quot -- dataflow )
-    #! Data flow of a quotation.
-    [ f init-inference (infer)  get-dataflow ] with-scope ;
+    [ (infer) effect ] with-scope ;
 
 : try-infer ( quot -- effect/f )
     #! Push f if inference fails.
     [ infer ] [ [ drop f ] when ] catch ;
+
+: dataflow ( quot -- dataflow )
+    #! Data flow of a quotation.
+    [ (infer) get-dataflow ] with-scope ;

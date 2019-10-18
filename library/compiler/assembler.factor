@@ -26,10 +26,8 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: compiler
-USE: combinators
 USE: math
 USE: kernel
-USE: stack
 
 : cell 4 ;
 : literal-table 1024 cell * ;

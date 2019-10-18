@@ -26,14 +26,11 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: telnetd
-USE: combinators
 USE: errors
 USE: listener
 USE: kernel
 USE: logging
-USE: logic
 USE: namespaces
-USE: stack
 USE: stdio
 USE: streams
 USE: threads
