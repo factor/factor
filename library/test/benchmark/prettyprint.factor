@@ -1,5 +1,4 @@
 IN: temporary
-USE: lists
 USE: prettyprint
 USE: test
 USE: words

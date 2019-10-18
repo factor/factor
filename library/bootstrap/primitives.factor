@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: image
 USING: alien arrays generic hashtables help io kernel
-kernel-internals lists math namespaces parser sequences strings
+kernel-internals math namespaces parser sequences strings
 vectors words ;
 
 ! Some very tricky code creating a bootstrap embryo in the
@@ -13,25 +13,17 @@ vectors words ;
 H{ } clone c-types set
 "/library/compiler/alien/primitive-types.factor" parse-resource
 
-! These symbols need the same hashcode in the target as in the
-! host. They must be symbols -- colon definitions are not
-! permitted to be carried over
-{
-    vocabularies typemap builtins c-types
-    crossref articles terms
-}
-
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab
 
 H{ } clone vocabularies set
-crossref off
 
-vocabularies get [ "syntax" set [ reveal ] each ] bind
+vocabularies get [ "syntax" set ] bind
 
 H{ } clone articles set
-H{ } clone terms set
-help-graph off
+parent-graph off
+term-index off
+crossref off
 
 ! Call the quotation parsed from primitive-types.factor
 call
@@ -44,7 +36,6 @@ call
     { "call" "kernel"                       }
     { "if" "kernel"                         }
     { "dispatch" "kernel-internals"         }
-    { "cons" "lists"                        }
     { "<vector>" "vectors"                  }
     { "rehash-string" "strings"             }
     { "<sbuf>" "strings"                    }
@@ -115,7 +106,7 @@ call
     { "fsin" "math-internals"               }
     { "fsinh" "math-internals"              }
     { "fsqrt" "math-internals"              }
-    { "<word>" "words"                      }
+    { "(word)" "kernel-internals"           }
     { "update-xt" "words"                   }
     { "compiled?" "words"                   }
     { "drop" "kernel"                       }
@@ -145,8 +136,10 @@ call
     { "gc-time" "memory"                    }
     { "save-image" "memory"                 }
     { "datastack" "kernel"                  }
+    { "retainstack" "kernel"                }
     { "callstack" "kernel"                  }
     { "set-datastack" "kernel"              }
+    { "set-retainstack" "kernel"            }
     { "set-callstack" "kernel"              }
     { "exit" "kernel"                       }
     { "room" "memory"                       }
@@ -158,8 +151,7 @@ call
     { "cd" "io"                             }
     { "compiled-offset" "assembler"         }
     { "set-compiled-offset" "assembler"     }
-    { "literal-top" "assembler"             }
-    { "set-literal-top" "assembler"         }
+    { "add-literal" "assembler"             }
     { "address" "memory"                    }
     { "dlopen" "alien"                      }
     { "dlsym" "alien"                       }
@@ -190,8 +182,10 @@ call
     { "set-alien-float" "alien"             }
     { "alien-double" "alien"                }
     { "set-alien-double" "alien"            }
-    { "alien>string" "alien"                }
-    { "string>alien" "alien"                }
+    { "alien>char-string" "alien"           }
+    { "string>char-alien" "alien"           }
+    { "alien>u16-string" "alien"            }
+    { "string>u16-alien" "alien"            }
     { "throw" "errors"                      }
     { "string>memory" "kernel-internals"    }
     { "memory>string" "kernel-internals"    }
@@ -225,6 +219,7 @@ call
     { "tuple>array" "generic"               }
     { "array>vector" "vectors"              }
     { "<string>" "strings"                  }
+    { "<quotation>" "kernel"                }
 } dup length 3 swap [ + ] map-with [ make-primitive ] 2each
 
 FORGET: make-primitive
@@ -265,18 +260,47 @@ num-types f <array> builtins set
 "bignum" "math" create 1 "bignum?" "math" create { } define-builtin
 "bignum" "math" create ">bignum" "math" lookup unit "coercer" set-word-prop
 
-"cons?" "lists" create t "inline" set-word-prop
-"cons" "lists" create 2 "cons?" "lists" create
+"word?" "words" create t "inline" set-word-prop
+"word" "words" create 2 "word?" "words" create
 {
-    { 0 object { "car" "lists" } f }
-    { 1 object { "cdr" "lists" } f }
+    { 1 fixnum { "hashcode" "kernel" } f }
+    {
+        2
+        object
+        { "word-name" "words" }
+        { "set-word-name" "words" }
+    }
+    {
+        3
+        object
+        { "word-vocabulary" "words" }
+        { "set-word-vocabulary" "words" }
+    }
+    {
+        4
+        object
+        { "word-primitive" "words" }
+        { "set-word-primitive" "words" }
+    }
+    {
+        5
+        object
+        { "word-def" "words" }
+        { "set-word-def" "words" }
+    }
+    {
+        6
+        object
+        { "word-props" "words" }
+        { "set-word-props" "words" }
+    }
 } define-builtin
 
 "ratio?" "math" create t "inline" set-word-prop
 "ratio" "math" create 4 "ratio?" "math" create
 {
-    { 0 integer { "numerator" "math" } f }
-    { 1 integer { "denominator" "math" } f }
+    { 1 integer { "numerator" "math" } f }
+    { 2 integer { "denominator" "math" } f }
 } define-builtin
 
 "float?" "math" create t "inline" set-word-prop
@@ -286,18 +310,19 @@ num-types f <array> builtins set
 "complex?" "math" create t "inline" set-word-prop
 "complex" "math" create 6 "complex?" "math" create
 {
-    { 0 real { "real" "math" } f }
-    { 1 real { "imaginary" "math" } f }
+    { 1 real { "real" "math" } f }
+    { 2 real { "imaginary" "math" } f }
 } define-builtin
 
-"alien" "alien" create 7 "alien?" "alien" create
-{ { 1 object { "underlying-alien" "alien" } f } } define-builtin
+"wrapper?" "kernel" create t "inline" set-word-prop
+"wrapper" "kernel" create 7 "wrapper?" "kernel" create
+{ { 1 object { "wrapped" "kernel" } f } } define-builtin
 
 "array?" "arrays" create t "inline" set-word-prop
 "array" "arrays" create 8 "array?" "arrays" create
 { } define-builtin
 
-"f" "!syntax" create 9 "not" "kernel" create
+"!f" "!syntax" create 9 "not" "kernel" create
 { } define-builtin
 
 "hashtable?" "hashtables" create t "inline" set-word-prop
@@ -370,49 +395,16 @@ num-types f <array> builtins set
     }
 } define-builtin
 
-"wrapper?" "kernel" create t "inline" set-word-prop
-"wrapper" "kernel" create 14 "wrapper?" "kernel" create
-{ { 1 object { "wrapped" "kernel" } f } } define-builtin
+"quotation?" "kernel" create t "inline" set-word-prop
+"quotation" "kernel" create 14 "quotation?" "kernel" create
+{ } define-builtin
 
 "dll?" "alien" create t "inline" set-word-prop
 "dll" "alien" create 15 "dll?" "alien" create
 { { 1 object { "dll-path" "alien" } f } } define-builtin
 
-"word?" "words" create t "inline" set-word-prop
-"word" "words" create 16 "word?" "words" create
-{
-    { 1 fixnum { "hashcode" "kernel" } f }
-    {
-        2
-        object
-        { "word-name" "words" }
-        f
-    }
-    {
-        3
-        object
-        { "word-vocabulary" "words" }
-        { "set-word-vocabulary" "words" }
-    }
-    {
-        4
-        object
-        { "word-primitive" "words" }
-        { "set-word-primitive" "words" }
-    }
-    {
-        5
-        object
-        { "word-def" "words" }
-        { "set-word-def" "words" }
-    }
-    {
-        6
-        object
-        { "word-props" "words" }
-        { "set-word-props" "words" }
-    }
-} define-builtin
+"alien" "alien" create 16 "alien?" "alien" create
+{ { 1 object { "underlying-alien" "alien" } f } } define-builtin
 
 "tuple?" "kernel" create t "inline" set-word-prop
 "tuple" "kernel" create 17 "tuple?" "kernel" create
@@ -425,7 +417,7 @@ num-types f <array> builtins set
 
 ! Define general-t type, which is any object that is not f.
 "general-t" "kernel" create dup define-symbol
-f "f" "!syntax" lookup builtins get remove [ ] subset
+f "!f" "!syntax" lookup builtins get remove [ ] subset
 define-union
 
 ! Catch-all class for providing a default method.

@@ -1,0 +1,56 @@
+IN: help
+USING: io prettyprint ;
+
+HELP: $title "( topic -- )"
+{ $values { "topic" "a help article name or a word" } }
+{ $description "Prints a help article's title, or a word's " { $link synopsis } ", depending on the type of " { $snippet "topic" } "." } ;
+
+HELP: print-content "( element -- )"
+{ $values { "element" "a markup element" } }
+{ $description "Prints a top-level markup element to the " { $link stdio } " stream." } ;
+
+HELP: (help) "( topic -- )"
+{ $values { "topic" "an article name or a word" } }
+{ $description
+    "Displays a help article or documentation associated to a word on the " { $link stdio } " stream. This word does not print the article title, so it is intended for use by outliners and in other contexts where the title is already visible to the user."
+}
+{ $see-also help see-help } ;
+
+HELP: help "( topic -- )"
+{ $values { "topic" "an article name or a word" } }
+{ $description
+    "Displays a help article or documentation associated to a word on the " { $link stdio } " stream."
+}
+{ $see-also (help) see-help } ;
+
+HELP: see-help "( word -- )"
+{ $values { "word" "a word" } }
+{ $description
+    "Display the documentation and definition of a word on the " { $link stdio } " stream."
+}
+{ $see-also (help) help see } ;
+
+HELP: handbook "( -- )"
+{ $description "Displays the Factor developer's handbook." }
+{ $see-also help } ;
+
+HELP: $subsection "( element -- )"
+{ $values { "element" "a markup element of the form " { $snippet "{ topic }" } } }
+{ $description "Prints an expandable outliner containing the body of the help topic named by the first string element of " { $snippet "element" } "." }
+{ $examples
+    { $markup-example { $subsection "sequences" } }
+} ;
+
+HELP: $subtopic "( element -- )"
+{ $values { "element" "a markup element of the form " { $snippet "{ title content }" } } }
+{ $description "Prints an expandable outliner with the given title containing an arbitrary markup element." }
+{ $examples
+    { $markup-example { $subtopic "Subtopic example"
+    "Subtopics are useful for short notes, sidebars "
+    "and other bits of info which don't really deserve "
+    "their own help article." } }
+} ;
+
+HELP: $outliner "( element -- )"
+{ $values { "element" "a markup element of the form " { $snippet "( quot -- )" } } }
+{ $description "Calls the quotation to generate a sequence of help topics, and outputs an outliner for each one. Expanding a help topic shows the article body." } ;

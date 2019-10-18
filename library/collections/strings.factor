@@ -1,8 +1,16 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: strings
-USING: generic kernel kernel-internals lists math sequences
+USING: generic kernel kernel-internals math sequences
 sequences-internals ;
+
+M: string = ( obj str -- ? )
+    over string? [
+        over hashcode over hashcode number=
+        [ sequence= ] [ 2drop f ] if
+    ] [
+        2drop f
+    ] if ;
 
 M: string hashcode
     dup string-hashcode [ ] [
@@ -20,6 +28,8 @@ M: string set-nth-unsafe
     >r >fixnum >r >fixnum r> r> set-char-slot ;
 
 M: string clone (clone) ;
+
+M: string resize resize-string ;
 
 ! Characters
 PREDICATE: integer blank     " \t\n\r" member? ;
@@ -40,17 +50,18 @@ PREDICATE: integer control   "\0\e\r\n\t\u0008\u007f" member? ;
     dup printable? swap "\"\\" member? not and ; foldable
 
 : padding ( string count char -- string )
-    >r swap length - 0 max r> <string> ; flushable
+    >r swap length [-] r> <string> ;
 
 : pad-left ( string count char -- string )
-    pick >r padding r> append ; flushable
+    pick >r padding r> append ;
 
 : pad-right ( string count char -- string )
-    pick >r padding r> swap append ; flushable
+    pick >r padding r> swap append ;
 
-: ch>string ( ch -- str ) 1 swap <string> ; flushable
+: ch>string ( ch -- str ) 1 swap <string> ;
 
-: >string ( seq -- array ) [ 0 <string> ] >sequence ; inline
+: >string ( seq -- array )
+    [ string? ] [ 0 <string> ] >sequence ; inline
 
 M: string thaw drop SBUF" " clone ;
 

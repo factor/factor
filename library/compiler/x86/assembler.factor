@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 USING: arrays compiler errors generic kernel kernel-internals
-lists math namespaces parser sequences words ;
+math namespaces parser sequences words ;
 IN: assembler
 
 ! A postfix assembler for x86 and AMD64.
@@ -190,8 +190,16 @@ M: register displacement drop f ;
 ( Utilities                                                    )
 UNION: operand register indirect ;
 
-: rex.w? ( reg mod-r/m rex.w -- ? )
-    [ register-64? ] 2apply or and ;
+: operand-64? ( operand -- ? )
+    dup indirect? [
+        dup indirect-base register-64?
+        swap indirect-index register-64? or
+    ] [
+        register-64?
+    ] if ;
+
+: rex.w? ( rex.w reg mod-r/m -- ? )
+    [ operand-64? ] [ operand-64? ] ?if and ;
 
 : lhs-prefix
     extended? [ BIN: 00000100 bitor ] when ;
@@ -351,6 +359,9 @@ M: operand CMP OCT: 071 2-operand ;
 : IMUL ( src -- ) BIN: 101 t HEX: f7 1-operand ;
 : DIV  ( dst -- ) BIN: 110 t HEX: f7 1-operand ;
 : IDIV ( src -- ) BIN: 111 t HEX: f7 1-operand ;
+
+GENERIC: IMUL2 ( dst src -- )
+M: integer IMUL2 swap dup reg-code t HEX: 69 immediate-1/4 ;
 
 : CDQ HEX: 99 assemble-1 ;
 : CQO HEX: 48 assemble-1 CDQ ;

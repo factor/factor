@@ -1,6 +1,7 @@
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: dlists USING: generic kernel math ;
+IN: dlists
+USING: generic kernel math modules ;
 
 ! Double-linked lists.
 
@@ -60,3 +61,5 @@ C: dlist-node
 
 : dlist-length ( dlist -- length )
     0 swap [ drop 1 + ] dlist-each ;
+
+PROVIDE: dlists ;

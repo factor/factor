@@ -12,6 +12,7 @@ USING: arrays generic kernel sequences ;
 
 : v+   ( v v -- v ) [ + ] 2map ;
 : v-   ( v v -- v ) [ - ] 2map ;
+: [v-] ( v v -- v ) [ [-] ] 2map ;
 : v*   ( v v -- v ) [ * ] 2map ;
 : v/   ( v v -- v ) [ / ] 2map ;
 : vmax ( v v -- v ) [ max ] 2map ;
@@ -24,3 +25,6 @@ USING: arrays generic kernel sequences ;
 
 : set-axis ( x y axis -- v )
     dup length [ >r zero? pick pick ? r> swap nth ] 2map 2nip ;
+
+: sum ( seq -- n ) 0 [ + ] reduce ;
+: product ( seq -- n ) 1 [ * ] reduce ;

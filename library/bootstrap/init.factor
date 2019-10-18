@@ -5,14 +5,13 @@ USING: assembler errors io io-internals kernel math namespaces
 parser threads words ;
 
 : boot ( -- )
-    #! Initialize an interpreter with the basic services.
     init-namespaces
     cell \ cell set
     millis init-random
-    init-threads
     init-io
     "HOME" os-env [ "." ] unless* "~" set
     init-error-handler
+    init-threads
     default-cli-args
     parse-command-line
     "null-stdio" get [ stdio off ] when ;

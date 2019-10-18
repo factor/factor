@@ -1,5 +1,5 @@
 IN: temporary
-USING: arrays kernel lists math namespaces sequences
+USING: arrays kernel math namespaces sequences
 sequences-internals strings test vectors ;
 
 [ V{ 1 2 3 4 } ] [ 1 5 dup <slice> >vector ] unit-test
@@ -91,9 +91,9 @@ unit-test
 [ [ 3 2 1 ] ] [ [ 1 2 3 ] reverse ] unit-test
 
 [ f ] [ 0 f head ] unit-test
-[ f ] [ 0 [ 1 ] head ] unit-test
+[ [ ] ] [ 0 [ 1 ] head ] unit-test
 [ [ 1 2 3 ] ] [ 3 [ 1 2 3 4 ] head ] unit-test
-[ f ] [ 3 [ 1 2 3 ] tail ] unit-test
+[ [ ] ] [ 3 [ 1 2 3 ] tail ] unit-test
 [ [ 3 ] ] [ 2 [ 1 2 3 ] tail ] unit-test
 
 [ t ] [ [ 1 2 3 ] [ 1 2 3 ] sequence= ] unit-test
@@ -155,8 +155,6 @@ unit-test
 
 [ { 1 4 9 } ] [ { 1 2 3 } clone dup [ sq ] inject ] unit-test
 
-[ { 3 4 5 } ] [ 2 { 1 2 3 } clone [ [ + ] inject-with ] keep ] unit-test
-
 [ { "one" "two" "three" 4 5 6 } ]
 [
     { "one" "two" "three" }
@@ -207,6 +205,14 @@ unit-test
 [ { } ] [ 0 { } group ] unit-test
 
 ! Pathological case
-[ "ihbye" ] [ "hi" reverse-slice "bye" append ] unit-test
+[ "ihbye" ] [ "hi" <reversed> "bye" append ] unit-test
 
 [ 10 "hi" "bye" copy-into ] unit-test-fails
+
+[ { 1 2 3 5 6 } ] [ 3 { 1 2 3 4 5 6 } remove-nth ] unit-test
+
+[ V{ 1 2 3 } ]
+[ 3 V{ 1 2 } clone [ push-new ] keep ] unit-test
+
+[ V{ 1 2 3 } ]
+[ 3 V{ 1 3 2 } clone [ push-new ] keep ] unit-test

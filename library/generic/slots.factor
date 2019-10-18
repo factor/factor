@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 
 IN: generic
-USING: arrays kernel kernel-internals lists math namespaces
+USING: arrays kernel kernel-internals math namespaces
 parser sequences strings words ;
 
 : define-typecheck ( class generic def -- )

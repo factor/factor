@@ -1,22 +1,22 @@
 ! Copyright (C) 2003, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: kernel-internals
-USING: vectors ;
+USING: vectors sequences ;
 
 : namestack* ( -- ns ) 3 getenv { vector } declare ; inline
+: >n ( namespace -- n:namespace ) namestack* push ;
+: n> ( n:namespace -- namespace ) namestack* pop ;
 
 IN: namespaces
-USING: arrays hashtables kernel kernel-internals lists math
-sequences strings words ;
+USING: arrays hashtables kernel kernel-internals math strings
+words ;
 
 : namestack ( -- ns ) namestack* clone ; inline
 : set-namestack ( ns -- ) >vector 3 setenv ; inline
 : namespace ( -- namespace ) namestack* peek ;
-: >n ( namespace -- n:namespace ) namestack* push ;
-: n> ( n:namespace -- namespace ) namestack* pop ;
 : ndrop ( n:namespace -- ) namestack* pop* ;
 : global ( -- g ) 4 getenv { hashtable } declare ; inline
-: get ( variable -- value ) namestack* hash-stack ; flushable
+: get ( variable -- value ) namestack* hash-stack ;
 : set ( value variable -- ) namespace set-hash ; inline
 : on ( var -- ) t swap set ; inline
 : off ( var -- ) f swap set ; inline
@@ -57,16 +57,12 @@ SYMBOL: building
 
 : # ( n -- ) number>string % ;
 
-IN: lists
-
-: alist>quot ( default alist -- quot )
-    [ [ first2 swap % , , \ if , ] [ ] make ] each ;
+: init-namespaces ( -- ) global 1array >vector set-namestack ;
 
 IN: sequences
 
-: prune ( seq -- seq )
-    [ [ dup set ] each ] make-hash hash-keys ;
+: concat ( seq -- seq )
+    dup empty? [ [ [ % ] each ] over first make ] unless ;
 
-IN: kernel-internals
-
-: init-namespaces ( -- ) global 1array >vector set-namestack ;
+: join ( seq glue -- seq )
+    [ swap [ % ] [ dup % ] interleave drop ] over make ;

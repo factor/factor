@@ -1,19 +1,18 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays freetype gadgets-layouts generic hashtables
-io kernel lists math namespaces opengl sequences strings
-styles vectors ;
+USING: alien arrays freetype generic hashtables io kernel
+math namespaces opengl sequences strings styles
+vectors ;
 IN: gadgets
 
 SYMBOL: clip
 
 : init-gl ( dim -- )
-    { 1.0 0.0 0.0 1.0 } gl-color
     GL_PROJECTION glMatrixMode
     glLoadIdentity
     GL_MODELVIEW glMatrixMode
     glLoadIdentity
-    { 0 0 0 } over <rect> clip set
+    { 0 0 } over <rect> clip set
     dup first2 0 0 2swap glViewport
     0 over first2 0 gluOrtho2D
     first2 0 0 2swap glScissor
@@ -21,7 +20,6 @@ SYMBOL: clip
     GL_BLEND glEnable
     GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
     GL_SCISSOR_TEST glEnable
-    GL_MODELVIEW glMatrixMode
     1.0 1.0 1.0 1.0 glClearColor
     GL_COLOR_BUFFER_BIT glClear ;
 
@@ -37,38 +35,47 @@ GENERIC: draw-boundary ( gadget boundary -- )
 
 DEFER: draw-gadget
 
+: with-translation ( loc quot -- )
+    over translate over gl-translate
+    swap slip
+    vneg dup translate gl-translate ; inline
+
 : (draw-gadget) ( gadget -- )
-    dup rect-loc translate [
-        gl-translate
+    dup rect-loc [
         dup dup gadget-interior draw-interior
-        dup dup gadget-boundary draw-boundary
-        draw-gadget*
-    ] keep vneg gl-translate ;
+        dup draw-gadget*
+        dup visible-children [ draw-gadget ] each
+        dup gadget-boundary draw-boundary
+    ] with-translation ;
+
+: change-clip ( gadget -- )
+    >absolute clip [ rect-intersect ] change ;
+
+: clip-x/y ( loc dim -- x y )
+    >r [ first ] keep r>
+    [ second ] 2apply + world get rect-dim second swap - ;
 
 : gl-set-clip ( loc dim -- )
-    dup first2 1+ >r >r
-    over second swap second + world get rect-dim second
-    swap - >r first r> r> r> glScissor ;
+    [ clip-x/y ] keep first2 glScissor ;
 
-: do-clip ( gadget -- )
-    >absolute clip [ rect-intersect dup ] change
-    dup rect-loc swap rect-dim gl-set-clip ;
+: do-clip ( -- ) clip get rect-bounds gl-set-clip ;
+
+: with-clipping ( gadget quot -- )
+    clip get >r
+    over change-clip do-clip call
+    r> clip set do-clip ; inline
 
 : draw-gadget ( gadget -- )
-    clip get over inside? [
-        [
-            dup do-clip
-            dup (draw-gadget)
-            dup visible-children [ draw-gadget ] each
-        ] with-scope
-    ] when drop ;
+    {
+        { [ dup gadget-visible? not ] [ drop ] }
+        { [ dup gadget-clipped? not ] [ (draw-gadget) ] }
+        { [ t ] [ [ (draw-gadget) ] with-clipping ] }
+    } cond ;
 
-: draw-world ( world -- )
-    [
-        dup world-handle [
-            dup rect-dim init-gl dup world set draw-gadget
-        ] with-gl-context
-    ] with-scope ;
+: (draw-world) ( world -- )
+    dup world-handle [
+        dup rect-dim init-gl draw-gadget
+    ] with-gl-context ;
 
 ! Pen paint properties
 M: f draw-interior 2drop ;
@@ -103,18 +110,17 @@ M: polygon draw-boundary ( gadget polygon -- )
 M: polygon draw-interior ( gadget polygon -- )
     [ gl-fill-poly ] draw-polygon drop ;
 
-: arrow-up    { { { 3 0 0 } { 6 6 0 } { 0 6 0 } } } ;
-: arrow-right { { { 0 0 0 } { 6 3 0 } { 0 6 0 } } } ;
-: arrow-down  { { { 0 0 0 } { 6 0 0 } { 3 6 0 } } } ;
-: arrow-left  { { { 0 3 0 } { 6 0 0 } { 6 6 0 } } } ;
-
-: arrow-right|
-    { { { 6 0 0 } { 6 6 0 } } } arrow-right append ;
-
-: arrow-|left
-    { { { 1 0 0 } { 1 6 0 } } } arrow-left append ;
+: arrow-up    { { { 3 0 } { 6 6 } { 0 6 } } } ;
+: arrow-right { { { 0 0 } { 6 3 } { 0 6 } } } ;
+: arrow-down  { { { 0 0 } { 6 0 } { 3 6 } } } ;
+: arrow-left  { { { 0 3 } { 6 0 } { 6 6 } } } ;
+: close-box
+    {
+        { { 0 0 } { 6 6 } }
+        { { 0 6 } { 6 0 } }
+    } ;
 
 : <polygon-gadget> ( color points -- gadget )
-    dup { 0 0 0 } [ max-dim vmax ] reduce
+    dup { 0 0 } [ max-dim vmax ] reduce
     >r <polygon> <gadget> r> over set-rect-dim
     [ set-gadget-interior ] keep ;

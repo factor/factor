@@ -10,7 +10,7 @@ kernel-internals math namespaces sequences words ;
     node-classes ?hash [ object ] unless* ;
 
 : node-class# ( node n -- class )
-    swap [ node-in-d reverse-slice ?nth ] keep node-class ;
+    swap [ node-in-d <reversed> ?nth ] keep node-class ;
 
 ! Variables used by the class inferencer
 
@@ -109,7 +109,7 @@ M: node child-ties ( node -- seq )
         ] if
     ] if ;
 
-\ make-tuple [
+\ <tuple> [
     node-in-d first value-literal 1array
 ] "output-classes" set-word-prop
 

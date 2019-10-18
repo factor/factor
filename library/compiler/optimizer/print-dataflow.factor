@@ -1,6 +1,6 @@
 IN: optimizer
 USING: generic hashtables inference io kernel kernel-internals
-lists math namespaces prettyprint sequences styles vectors words ;
+math namespaces prettyprint sequences styles vectors words ;
 
 ! A simple tool for turning dataflow IR into quotations, for
 ! debugging purposes.
@@ -11,7 +11,8 @@ TUPLE: comment node text ;
 
 M: comment pprint* ( ann -- )
     "( " over comment-text " )" append3
-    swap comment-node presented associate text ;
+    swap comment-node presented associate
+    [ text ] with-style ;
 
 : comment, ( ? node text -- )
     rot [ <comment> , ] [ 2drop ] if ;

@@ -1,5 +1,9 @@
 USING: generic help sequences ;
 
+HELP: no-method "( object generic -- )"
+{ $values { "object" "an object" } { "generic" "a generic word" } }
+{ $description "Throws an error indicating that " { $snippet "object" } " does not respond to the " { $snippet "generic" } " word." } ;
+
 HELP: standard-combination "( word dispatch# -- quot )"
 { $values { "word" "a generic word" } { "dispatch#" "a dispatch position" } { "quot" "a new quotation" } }
 { $description

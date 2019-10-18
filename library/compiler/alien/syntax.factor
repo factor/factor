@@ -1,40 +1,40 @@
-! Copyright (C) 2005 Alex Chapman.
+! Copyright (C) 2005, 2006 Slava Pestov, Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: !syntax
-USING: alien compiler kernel lists math namespaces parser
+USING: alien compiler kernel math namespaces parser
 sequences syntax words ;
 
-: DLL" skip-blank parse-string dlopen swons ; parsing
+: !DLL" skip-blank parse-string dlopen parsed ; parsing
 
-: ALIEN: scan-word <alien> swons ; parsing
+: !ALIEN: scan-word <alien> parsed ; parsing
 
-: LIBRARY: scan "c-library" set ; parsing
+: !LIBRARY: scan "c-library" set ; parsing
 
-: FUNCTION:
+: !FUNCTION:
     scan "c-library" get scan string-mode on
-    [ string-mode off define-c-word ] [ ] ; parsing
+    [ string-mode off define-c-word ] f ; parsing
 
-: TYPEDEF: scan scan typedef ; parsing
+: !TYPEDEF: scan scan typedef ; parsing
 
-: BEGIN-STRUCT: ( -- offset )
+: !BEGIN-STRUCT: ( -- offset )
     scan "struct-name" set  0 ; parsing
 
-: FIELD: ( offset -- offset )
+: !FIELD: ( offset -- offset )
     scan scan define-field ; parsing
 
-: END-STRUCT ( length -- )
+: !END-STRUCT ( length -- )
     define-struct-type ; parsing
 
-: C-UNION:
+: !C-UNION:
     scan "struct-name" set
     string-mode on [
         string-mode off
         0 [ define-member ] reduce define-struct-type
-    ] [ ] ; parsing
+    ] f ; parsing
 
-: C-ENUM:
+: !C-ENUM:
     string-mode on [
         string-mode off 0 [
             create-in swap [ unit define-compound ] keep 1+
         ] reduce drop
-    ] [ ] ; parsing
+    ] f ; parsing

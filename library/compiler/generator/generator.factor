@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
 USING: arrays assembler errors generic hashtables inference
-kernel kernel-internals lists math namespaces queues sequences
+kernel kernel-internals math namespaces queues sequences
 words ;
 
 GENERIC: stack-reserve*
@@ -130,7 +130,7 @@ M: #if generate-node ( node -- next )
 
 ! #call
 : [with-template] ( quot template -- quot )
-    2array >list [ with-template ] append ;
+    2array >quotation [ with-template ] append ;
 
 : define-intrinsic ( word quot template -- | quot: -- )
     [with-template] "intrinsic" set-word-prop ;

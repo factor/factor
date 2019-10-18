@@ -1,4 +1,5 @@
-USING: generic help kernel kernel-internals memory sequences ;
+USING: generic help kernel kernel-internals math memory
+namespaces sequences ;
 
 HELP: eq? "( obj1 obj2 -- ? )"
 { $values { "obj1" "an object" } { "obj2" "an object" } }
@@ -27,36 +28,47 @@ HELP: r> "( r: x -- x )" $shuffle ;
 
 HELP: datastack "( -- ds )"
 { $values { "ds" "a vector" } }
-{ $description "Outputs the a vector containing a copy of the datastack contents right before the call to this word, with the top of the stack at the end of the vector." } ;
+{ $description "Outputs the a vector containing a copy of the data stack contents right before the call to this word, with the top of the stack at the end of the vector." } ;
 
 HELP: set-datastack "( ds -- )"
 { $values { "ds" "a vector" } }
-{ $description "Replaces the datastack contents with a copy of a vector. The end of the vector becomes the top of the stack." } ;
+{ $description "Replaces the data stack contents with a copy of a vector. The end of the vector becomes the top of the stack." } ;
+
+HELP: retainstack "( -- rs )"
+{ $values { "rs" "a vector" } }
+{ $description "Outputs the a vector containing a copy of the retain stack contents right before the call to this word, with the top of the stack at the end of the vector." } ;
+
+HELP: set-retainstack "( rs -- )"
+{ $values { "rs" "a vector" } }
+{ $description "Replaces the retain stack contents with a copy of a vector. The end of the vector becomes the top of the stack." } ;
 
 HELP: callstack "( -- cs )"
 { $values { "cs" "a vector" } }
-{ $description "Outputs the a vector containing a copy of the callstack contents right before the call to this word, with the top of the stack at the end of the vector. The call frame of the caller word is " { $emphasis "not" } " included." } ;
+{ $description "Outputs the a vector containing a copy of the call stack contents right before the call to this word, with the top of the stack at the end of the vector. The call frame of the caller word is " { $emphasis "not" } " included." } ;
 
 HELP: set-callstack "( cs -- )"
 { $values { "cs" "a vector" } }
-{ $description "Replaces the callstack contents with a copy of a vector. The end of the vector becomes the top of the stack. The current quotation continues executing. The new callstack takes effect when the current quotation returns, resulting in a callframe being popped." } ;
+{ $description "Replaces the call stack contents with a copy of a vector. The end of the vector becomes the top of the stack. The current quotation continues executing. The new callstack takes effect when the current quotation returns, resulting in a callframe being popped." } ;
+
+HELP: (clone) "( obj -- newobj )"
+{ $values { "obj" "an object" } { "newobj" "a shallow copy" } }
+{ $description "Outputs a byte-by-byte copy of the given object. User code should call " { $link clone } " instead." } ;
 
 HELP: clear "( -- )"
-{ $description "Clears the datastack." } ;
+{ $description "Clears the data stack." } ;
 
 HELP: hashcode "( obj -- n )"
 { $values { "obj" "an object" } { "n" "a fixnum" } }
 { $contract "Outputs the hashcode of the object. The hashcode operation must satisfy the following properties:"
 { $list
-    "the hashcode must be a fixnum. Returning a bignum will not cause any problems other than potential performance degradation. Returning other types will result in type errors."
+    "the hashcode should be a fixnum, however returning a bignum will not cause any problems other than potential performance degradation."
     { "if two objects are equal under " { $link = } ", they must have equal hashcodes" }
     "the hashcode is only permitted to change if the object is mutated in some way"
-    { "the word must satisfy the " { $link POSTPONE: flushable } " contract" }
 }
 "If mutable objects are used as hashtable keys, they must not be mutated in such a way that their hashcode changes. Doing so will violate bucket sorting invariants and result in undefined behavior." } ;
 
 HELP: = "( obj1 obj2 -- ? )"
-{ $values { "obj1" "an object" } { "obj2" "an object" } }
+{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
 { $contract
     "Tests if two objects are equal. If two objects are equal, they should the same printed representation, although the converse is not always true."
     $terpri
@@ -68,8 +80,7 @@ HELP: = "( obj1 obj2 -- ? )"
     }
     "The precise contract is as follows:"
     { $list
-        { "methods must satisfy the " { $link POSTPONE: flushable } " contract" }
-        { "if no more specific method is defined, " { $link = } "  calls " { $link eq? } }
+        { "if no more specific method is defined, " { $link = } " calls " { $link eq? } }
         { "two numbers are equal if they have the same numerical value after being upgraded to the highest type of the two (see " { $link "number-protocol" } ")" }
         "two sequences are equal if they have the same type and elements"
         "two tuples are equal if their classes and slot values are equal"
@@ -93,9 +104,7 @@ HELP: <=> "( obj1 obj2 -- n )"
 
 HELP: clone "( obj -- cloned )"
 { $values { "obj" "an object" } { "cloned" "a new object" } }
-{ $contract "Outputs a new object equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a shallow copy of the original."
-$terpri
-"Methods must satisfy the " { $link POSTPONE: flushable } " contract." } ;
+{ $contract "Outputs a new object equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a shallow copy of the original." } ;
 
 HELP: set-boot "( quot -- )"
 { $values { "quot" "a quotation" } }
@@ -107,8 +116,13 @@ HELP: num-types "( -- n )"
 
 HELP: type "( object -- n )"
 { $values { "object" "an object" } { "n" "a type number" } }
-{ $description "Outputs an object's type number. Often, the " { $link class } " word is more useful." }
-{ $see-also type>class } ;
+{ $description "Outputs an object's type number, between zero and one less than " { $link num-types } ". This is implementation detail and user code should call " { $link class } " instead." }
+{ $see-also type>class tag } ;
+
+HELP: tag "( object -- n )"
+{ $values { "object" "an object" } { "n" "a tag number" } }
+{ $description "Outputs an object's tag number, between zero and one less than " { $link num-tags } ". This is implementation detail and user code should call " { $link class } " instead." }
+{ $see-also type } ;
 
 HELP: ? "( cond true false -- true/false )"
 { $values { "cond" "a generalized boolean" } { "true" "an object" } { "false" "an object" } { "true/false" "one two input objects" } }
@@ -143,6 +157,14 @@ HELP: os "( -- os )"
     "Outputs a string descriptor of the current operating system family. Currently, this set of descriptors is:"
     { $code "freebsd" "linux" "macosx" "solaris" "win32" "unix" }
 } ;
+
+HELP: windows? "( -- ? )"
+{ $values { "?" "a boolean" } }
+{ $description "Tests if Factor is running on Windows." } ;
+
+HELP: macosx? "( -- ? )"
+{ $values { "?" "a boolean" } }
+{ $description "Tests if Factor is running on Mac OS X." } ;
 
 HELP: call "( quot -- )"
 { $values { "quot" "a quotation" } }
@@ -218,11 +240,11 @@ $terpri
 { $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" } } ;
 
 HELP: ?if "( default cond true false -- )"
-{ $values { "cond" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } { "false" "a quotation with stack effect " { $snippet "( default -- )" } } }
+{ $values { "default" "an object" } { "cond" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } { "false" "a quotation with stack effect " { $snippet "( default -- )" } } }
 { $description "If the condition is " { $link f } ", the " { $snippet "false" } " quotation is called with the " { $snippet "default" } " value on the stack. Otherwise, the " { $snippet "true" } " quotation is called with the condition on the stack."
 $terpri
 "The following two lines are equivalent:"
-{ $code "X [ Y ] [ Z ] ?if" "X dup [ nip Y ] [ drop Z ] if" } } ;
+{ $code "[ X ] [ Y ] ?if" "dup [ nip X ] [ drop Y ] if" } } ;
 
 HELP: keep-datastack "( quot -- )"
 { $values { "quot" "a quotation" } }
@@ -232,20 +254,43 @@ HELP: literalize "( obj -- wrapper )"
 { $values { "obj" "an object" } { "wrapper" "a wrapper or the original object" } }
 { $description "Turns non-self-evaluating objects (words and wrappers) into wrappers that push those objects, and is a no-op on everything else." } ;
 
+HELP: declare "( spec -- )"
+{ $values { "spec" "an array of classes" } }
+{ $description "Declares that the elements at the top of the stack are instances of the classes in " { $snippet "spec" } "." }
+{ $warning "The compiler blindly trusts declarations, and false declarations can lead to crashes, memory corruption and other undesirable behavior." }
+{ $examples
+    "The optimizer cannot do anything with the below quotation:"
+    { $example "[ 2 + 10 * ] f dataflow." "[ 2 + 10 * ]" }
+    "However, if we declare that the top of the stack is a " { $link float } ", then type checks and generic dispatch are eliminated, and the compiler can use unsafe intrinsics:"
+    { $example "[ { float } declare 2 + 10 * ] f dataflow." "[ 2.0 float+ 10.0 float* ]" }
+} ;
+
 HELP: array-capacity "( array -- n )"
 { $values { "array" "an array" } { "n" "a non-negative fixnum" } }
 { $description "Low-level array length accessor." }
-{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." } ;
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." } ;
 
 HELP: array-nth "( n array -- elt )"
 { $values { "n" "a non-negative fixnum" } { "array" "an array" }  { "elt" "an object" } }
 { $description "Low-level array element accessor." }
-{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
 
 HELP: set-array-nth "( elt n array -- )"
 { $values { "elt" "an object" } { "n" "a non-negative fixnum" } { "array" "an array" }  }
 { $description "Low-level array element mutator." }
-{ $warning "This word is in the " { $snippet "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
+
+HELP: cell "( -- n )"
+{ $values { "n" "a positive integer" } }
+{ $description "Outputs the pointer size in bytes of the current CPU architecture." } ;
+
+HELP: win32? "( -- ? )"
+{ $values { "?" "a boolean" } }
+{ $description "Tests if Factor is running on 32-bit Windows." } ;
+
+HELP: win64? "( -- ? )"
+{ $values { "?" "a boolean" } }
+{ $description "Tests if Factor is running on 64-bit Windows." } ;
 
 HELP: generations "( -- n )"
 { $values { "n" "a positive integer" } }
@@ -261,3 +306,55 @@ HELP: save-image "( path -- )"
 
 HELP: save "( -- )"
 { $description "Saves a snapshot of the heap to the current image file." } ;
+
+HELP: die "( -- )"
+{ $description "Starts the front-end processor (FEP), which is a low-level debugger which can inspect memory addresses and the like. The FEP is also entered when a critical error occurs." } ;
+
+HELP: exit "( n -- )"
+{ $values { "n" "an integer exit code" } }
+{ $description "Exits the Factor process." } ;
+
+HELP: getenv "( n -- obj )"
+{ $values { "n" "a non-negative integer" } { "obj" "an object" } }
+{ $description "Reads an object from the Factor runtime's environment table. User code never has to read the environment table directly; instead, use one of the callers of this word." } ;
+
+HELP: setenv "( obj n -- )"
+{ $values { "n" "a non-negative integer" } { "obj" "an object" } }
+{ $description "Writes an object to the Factor runtime's environment table. User code never has to write to the environment table directly; instead, use one of the callers of this word." } ;
+
+HELP: integer-slot "( obj m -- n )"
+{ $values { "obj" "an object" } { "m" "a non-negative fixnum" } { "n" "an integer" } }
+{ $description "Reads the untagged integer stored at the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
+
+HELP: set-integer-slot "( m obj n -- )"
+{ $values { "n" "an integer" }  { "obj" "an object" } { "m" "a non-negative fixnum" } }
+{ $description "Writes an untagged integer to the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
+
+HELP: slot "( obj m -- value )"
+{ $values { "obj" "an object" } { "m" "a non-negative fixnum" } { "value" "an object" } }
+{ $description "Reads the object stored at the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
+
+HELP: set-slot "( value obj n -- )"
+{ $values { "value" "an object" } { "obj" "an object" } { "m" "a non-negative fixnum" } }
+{ $description "Writes " { $snippet "value" } " to the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
+
+HELP: millis "( -- n )"
+{ $values { "n" "an integer" } }
+{ $description "Outputs the number of milliseconds ellapsed since midnight January 1, 1970." } ;
+
+HELP: os-env "( key -- value )"
+{ $values { "key" "a string" } { "value" "a string" } }
+{ $description "Looks up the value of a shell environment variable." }
+{ $examples 
+    "This is an operating system-specific feature. On Unix, you can do:"
+    { $example "\"USER\" os-env print" "slava" }
+} ;
+
+HELP: dispatch "( n array -- )"
+{ $values { "n" "a fixnum" } { "array" "an array of quotations" } }
+{ $description "Calls the " { $snippet "n" } "th quotation in the array." }
+{ $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it is an implementation detail used by the generic word system to accelerate method dispatch. It does not perform type or bounds checks, and user code should not need to call it directly." } ;

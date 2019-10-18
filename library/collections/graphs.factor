@@ -11,7 +11,7 @@ USING: hashtables kernel namespaces sequences ;
 : add-vertex ( vertex edges graph -- | edges: vertex -- seq )
     [ (add-vertex) ] if-graph ; inline
 
-: add-vertices ( seq edges graph -- | edges: vertex -- seq )
+: build-graph ( seq edges graph -- | edges: vertex -- seq )
     [
         namespace clear-hash
         swap [ swap (add-vertex) ] each-with
@@ -21,31 +21,25 @@ USING: hashtables kernel namespaces sequences ;
 
 : remove-vertex ( vertex edges graph -- )
     [
-        >r dup dup r> call [ nest remove-hash ] each-with
-        namespace remove-hash
+        dupd call [ namespace hash ?remove-hash ] each-with
     ] if-graph ; inline
 
 : in-edges ( vertex graph -- seq )
     ?hash dup [ hash-keys ] when ;
 
-SYMBOL: hash-buffer
+SYMBOL: previous
 
-: closure, ( value key -- old )
-    hash-buffer get [ hash swap ] 2keep set-hash ;
-
-: (closure) ( key hash -- )
-    tuck ?hash dup [
-        [
-            drop dup dup closure,
-            [ 2drop ] [ swap (closure) ] if
-        ] hash-each-with
-    ] [
+: (closure) ( obj quot -- )
+    over previous get hash-member? [
         2drop
-    ] if ;
+    ] [
+        over dup previous get set-hash
+        [ call ] keep swap [ swap (closure) ] each-with
+    ] if ; inline
 
-: closure ( vertex graph -- seq )
+: closure ( obj quot -- seq | quot: obj -- seq )
     [
-        H{ } clone hash-buffer set
+        H{ } clone previous set
         (closure)
-        hash-buffer get hash-keys
-    ] with-scope ;
+        previous get hash-keys
+    ] with-scope ; inline

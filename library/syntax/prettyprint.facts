@@ -1,4 +1,4 @@
-USING: help kernel prettyprint words ;
+USING: help io kernel prettyprint words ;
 
 IN: help
 
@@ -86,12 +86,8 @@ HELP: add-section "( section -- )"
 { $description "Adds a section to the current block." }
 $prettyprinting-note ;
 
-HELP: text "( text style -- )"
-{ $description "Adds a section consisting of a single string with style information to the current block." }
-$prettyprinting-note ;
-
-HELP: plain-text "( text -- )"
-{ $description "Adds a section consisting of a single string to the current block." }
+HELP: text "( text -- )"
+{ $description "Adds a section consisting of a single string to the current block. The current style on the style stack is used; see " { $link with-style } "." }
 $prettyprinting-note ;
 
 HELP: <indent "( section -- )"

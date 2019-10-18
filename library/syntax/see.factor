@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: prettyprint
-USING: arrays generic hashtables io kernel lists math namespaces
+USING: arrays generic hashtables io kernel math namespaces
 sequences strings styles words ;
 
 : declaration. ( word prop -- )
@@ -12,17 +12,21 @@ sequences strings styles words ;
         POSTPONE: parsing
         POSTPONE: inline
         POSTPONE: foldable
-        POSTPONE: flushable
     } [ declaration. ] each-with ;
 
+: write-vocab ( vocab -- )
+    dup <vocab-link> presented associate styled-text ;
+
 : in. ( word -- )
-    <block \ IN: pprint-word word-vocabulary plain-text block; ;
+    word-vocabulary [
+        <block \ IN: pprint-word write-vocab block;
+    ] when* ;
 
 : (synopsis) ( word -- )
     dup in. dup definer pprint-word pprint-word ;
 
 : comment. ( comment -- )
-    [ H{ { font-style italic } } text ] when* ;
+    [ H{ { font-style italic } } [ text ] with-style ] when* ;
 
 : stack-picture ( seq -- string )
     [ [ % CHAR: \s , ] each ] "" make ;
@@ -81,7 +85,7 @@ GENERIC: class. ( word -- )
     dup class? [
         dup implementors [
             newline
-            dup in. tuck dupd "methods" word-prop hash method.
+            tuck dupd "methods" word-prop hash method.
         ] each-with
     ] [
         drop
@@ -106,7 +110,7 @@ M: tuple-class class.
     newline
     \ TUPLE: pprint-word
     dup pprint-word
-    "slot-names" word-prop [ plain-text ] each
+    "slot-names" word-prop [ text ] each
     pprint-; ;
 
 M: word class. drop ;
@@ -119,7 +123,3 @@ M: word class. drop ;
         methods.
         newline
     ] with-pprint ;
-
-: apropos ( substring -- )
-    all-words completions natural-sort
-    [ [ synopsis ] keep simple-object terpri ] each ;

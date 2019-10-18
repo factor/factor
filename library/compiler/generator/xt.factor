@@ -1,8 +1,8 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
-USING: assembler errors generic hashtables kernel
-kernel-internals lists math namespaces prettyprint queues
+USING: arrays assembler errors generic hashtables kernel
+kernel-internals math namespaces prettyprint queues
 sequences strings vectors words ;
 
 : <label> ( -- label )
@@ -57,7 +57,7 @@ SYMBOL: relocation-table
     compiled-offset r> rel-absolute-cell = cell 4 ? - rel, ;
 
 : rel-dlsym ( name dll class -- )
-    >r cons add-literal compiled-base - cell / r>
+    >r 2array add-literal compiled-base - cell / r>
     1 rel-type, ;
 
 : rel-address ( class -- )
@@ -71,9 +71,7 @@ SYMBOL: relocation-table
         rel-address drop
     ] if ;
 
-: rel-userenv ( n class -- ) 3 rel-type, ;
-
-: rel-cards ( class -- ) 0 swap 4 rel-type, ;
+: rel-cards ( class -- ) 0 swap 3 rel-type, ;
 
 ! This is for fixing up forward references
 GENERIC: resolve ( fixup -- addr )

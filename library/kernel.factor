@@ -7,29 +7,20 @@ USING: generic kernel-internals math math-internals ;
 
 : clear V{ } set-datastack ;
 
-GENERIC: hashcode ( obj -- n ) flushable
+GENERIC: hashcode ( obj -- n )
 M: object hashcode drop 0 ;
 
-GENERIC: hashcode* ( n obj -- n ) flushable
-M: object hashcode* nip hashcode ;
-
-GENERIC: = ( obj obj -- ? ) flushable
+GENERIC: = ( obj obj -- ? )
 M: object = eq? ;
 
-GENERIC: <=> ( obj1 obj2 -- n ) flushable
+GENERIC: <=> ( obj1 obj2 -- n )
 
-GENERIC: clone ( obj -- obj ) flushable
+GENERIC: clone ( obj -- obj )
 M: object clone ;
 
 : set-boot ( quot -- ) 8 setenv ;
 
-: num-types ( -- n ) 19 ; inline
-
 : ? ( cond t f -- t/f ) rot [ drop ] [ nip ] if ; inline
-
-: >boolean t f ? ; inline
-: and ( a b -- a&b ) f ? ; inline
-: or ( a b -- a|b ) t swap ? ; inline
 
 : cpu ( -- arch ) 7 getenv ; foldable
 : os ( -- os ) 11 getenv ; foldable
@@ -62,19 +53,15 @@ inline
 
 : when* dupd [ drop ] if ; inline
 
+: >boolean t f ? ; inline
+: and ( a b -- a&b ) f ? ; inline
+: or ( a b -- a|b ) t swap ? ; inline
+: xor ( a b -- a^b ) [ not ] when ; inline
+
 : with ( obj quot elt -- obj quot )
     pick pick >r >r swap call r> r> ; inline
 
 : keep-datastack datastack slip set-datastack drop ; inline
-
-M: wrapper =
-    over wrapper? [ [ wrapped ] 2apply = ] [ 2drop f ] if ;
-
-GENERIC: literalize ( obj -- obj )
-
-M: object literalize ;
-
-M: wrapper literalize <wrapper> ;
 
 IN: kernel-internals
 
@@ -85,20 +72,20 @@ IN: kernel-internals
 : array-nth swap 2 fixnum+fast slot ; inline
 : set-array-nth swap 2 fixnum+fast set-slot ; inline
 
-: make-tuple <tuple> [ 2 set-slot ] keep ; flushable
-
 ! Some runtime implementation details
+: num-types 19 ; inline
 : tag-mask BIN: 111 ; inline
 : num-tags 8 ; inline
 : tag-bits 3 ; inline
 
 : fixnum-tag  BIN: 000 ; inline
 : bignum-tag  BIN: 001 ; inline
-: cons-tag    BIN: 010 ; inline
+: word-tag    BIN: 010 ; inline
 : object-tag  BIN: 011 ; inline
 : ratio-tag   BIN: 100 ; inline
 : float-tag   BIN: 101 ; inline
 : complex-tag BIN: 110 ; inline
+: wrapper-tag BIN: 111 ; inline
 
 : cell 17 getenv ; foldable
 

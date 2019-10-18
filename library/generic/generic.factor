@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: generic
-USING: arrays errors hashtables kernel kernel-internals lists
+USING: arrays errors hashtables kernel kernel-internals
 namespaces parser sequences strings words vectors math
 math-internals ;
 
@@ -71,11 +71,13 @@ SYMBOL: class<cache
 : class< ( cls1 cls2 -- ? )
     class<cache get [ hash hash-member? ] [ (class<) ] if* ;
 
-: smaller-classes ( class -- )
-    classes [ swap (class<) ] subset-with ;
+: smaller-classes ( class seq -- )
+    [ swap (class<) ] subset-with ;
 
 : make-class<cache ( -- hash )
-    classes [ dup smaller-classes [ dup ] map>hash ] map>hash ;
+    classes dup [
+        2dup swap smaller-classes [ dup ] map>hash
+    ] map>hash nip ;
 
 : with-class<cache ( quot -- )
     [ make-class<cache class<cache set call ] with-scope ;
@@ -161,10 +163,16 @@ M: generic definer drop \ G: ;
         tuck [ class< ] all-with? [ peek ] [ drop f ] if
     ] if ;
 
+: class-forget-hook ( class flattened -- )
+    [ typemap get remove-hash ] curry
+    "forget-hook" set-word-prop ;
+
 : define-class ( class -- )
     dup t "class" set-word-prop
     dup H{ } clone "class<" set-word-prop
-    dup flatten-class typemap get set-hash ;
+    dup flatten-class
+    2dup class-forget-hook
+    typemap get set-hash ;
 
 : implementors ( class -- list )
     [ "methods" word-prop ?hash* nip ] word-subset-with ;

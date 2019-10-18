@@ -2,11 +2,9 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: generic
 USING: arrays errors generic hashtables kernel kernel-internals
-lists math namespaces sequences words ;
+math namespaces sequences words ;
 
 ! Math combination for generic dyadic upgrading arithmetic.
-
-: last/first ( seq -- pair ) dup peek swap first 2array ;
 
 : math-class? ( object -- ? )
     dup word? [ number bootstrap-word class< ] [ drop f ] if ;
@@ -21,12 +19,17 @@ lists math namespaces sequences words ;
     [ math-class-compare 0 > ] 2keep ? ;
 
 : (math-upgrade) ( max class -- quot )
-    dupd = [ drop [ ] ] [ "coercer" word-prop ] if ;
+    dupd = [
+        drop [ ]
+    ] [
+        "coercer" word-prop [ [ ] ] unless*
+    ] if ;
 
 : math-upgrade ( left right -- quot )
     [ math-class-max ] 2keep
     >r over r> (math-upgrade)
-    >r (math-upgrade) dup [ 1 make-dip ] when r> append ;
+    >r (math-upgrade) dup empty? [ 1 make-dip ] unless
+    r> append ;
 
 TUPLE: no-math-method left right generic ;
 

@@ -1,55 +1,85 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: interpreter
-USING: errors generic io kernel kernel-internals lists math
+USING: errors generic io kernel kernel-internals math
 namespaces prettyprint sequences strings vectors words ;
 
 ! A Factor interpreter written in Factor. It can transfer the
 ! continuation to and from the primary interpreter. Used by
 ! compiler for partial evaluation, also by the walker. 
 
-! Meta-stacks
-SYMBOL: meta-r
-: push-r meta-r get push ;
-: pop-r meta-r get pop ;
-: peek-r meta-r get peek ;
+! Meta-stacks;
 SYMBOL: meta-d
 : push-d meta-d get push ;
 : pop-d meta-d get pop ;
 : peek-d meta-d get peek ;
-SYMBOL: meta-n
+SYMBOL: meta-r
+: push-r meta-r get push ;
+: pop-r meta-r get pop ;
+: peek-r meta-r get peek ;
 SYMBOL: meta-c
+: push-c meta-c get push ;
+: pop-c meta-c get pop ;
+: peek-c meta-c get peek ;
+SYMBOL: meta-name
+SYMBOL: meta-catch
 
 ! Call frame
-SYMBOL: meta-cf
+SYMBOL: callframe
+SYMBOL: callframe-scan
+SYMBOL: callframe-end
 
-! Currently executing word.
-SYMBOL: meta-executing
+: meta-callframe ( -- seq )
+    { callframe callframe-scan callframe-end } [ get ] map ;
 
 ! Callframe.
-: up ( -- ) pop-r meta-cf set  pop-r drop ;
+: up ( -- )
+    pop-c callframe-end set
+    pop-c callframe-scan set
+    pop-c callframe set ;
+
+: done? ( -- ? ) callframe-scan get callframe-end get >= ;
 
 : next ( -- obj )
-    meta-cf get [ meta-cf [ uncons ] change ] [ up next ] if ;
+    done? [
+        up next
+    ] [
+        callframe-scan get callframe get nth callframe-scan inc
+    ] if ;
 
 : meta-interp ( -- interp )
-    meta-d get meta-r get meta-n get meta-c get <continuation> ;
+    meta-d get meta-r get meta-c get
+    meta-name get meta-catch get <continuation> ;
 
 : set-meta-interp ( interp -- )
-    >continuation< meta-c set meta-n set meta-r set meta-d set ;
+    >continuation<
+    meta-catch set
+    meta-name set
+    meta-c set
+    meta-r set
+    meta-d set ;
 
-: host-word ( word -- )
-    [
-        \ call push-r
-        [ continuation swap continue-with ] cons cons push-r
-        meta-interp continue
-    ] callcc1 set-meta-interp pop-d 2drop ;
+: save-callframe ( -- )
+    callframe get push-c
+    callframe-scan get push-c
+    callframe-end get push-c ;
+
+: (meta-call) ( quot -- )
+    dup callframe set
+    length callframe-end set
+    0 callframe-scan set ;
 
 : meta-call ( quot -- )
     #! Note we do tail call optimization here.
-    meta-cf [
-        [ meta-executing get push-r  push-r ] when*
-    ] change ;
+    done? [ save-callframe ] unless (meta-call) ;
+
+: host-word ( word -- )
+    [
+        [
+            swap , \ continuation , , \ continue-with ,
+        ] [ ] make dup push-c 0 push-c length push-c
+        meta-interp continue
+    ] callcc1 set-meta-interp drop ;
 
 GENERIC: do-1 ( object -- )
 
@@ -66,18 +96,14 @@ M: word do ( word -- )
     dup "meta-word" word-prop [
         call
     ] [
-        dup compound? [
-            dup word-def meta-call  meta-executing set
-        ] [
-            host-word
-        ] if
+        dup compound? [ word-def meta-call ] [ host-word ] if
     ] ?if ;
 
 M: object do ( object -- ) do-1 ;
 
 ! The interpreter loses object identity of the name and catch
 ! stacks -- they are copied after each step -- so we execute
-! them atomically and don't allow stepping into these words
+! these atomically and don't allow stepping into these words
 \ >n [ \ >n host-word ] "meta-word" set-word-prop
 \ n> [ \ n> host-word ] "meta-word" set-word-prop
 \ >c [ \ >c host-word ] "meta-word" set-word-prop

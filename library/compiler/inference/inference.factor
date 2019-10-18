@@ -1,12 +1,9 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: inference
 USING: arrays errors generic inspector interpreter io kernel
-lists math namespaces parser prettyprint sequences strings
+math namespaces parser prettyprint sequences strings
 vectors words ;
-
-! This variable takes a boolean value.
-SYMBOL: inferring-base-case
 
 ! Called when a recursive call during base case inference is
 ! found. Either tries to infer another branch, or gives up.
@@ -25,20 +22,15 @@ M: inference-error error. ( error -- )
     inference-error-rstate describe ;
 
 M: object value-literal ( value -- )
-    {
-        "A literal value was expected where a computed value was found.\n"
-        "This means the word you are inferring applies 'call' or 'execute'\n"
-        "to a value that is not known at compile time.\n"
-        "See the handbook for details."
-    } concat inference-error ;
+    "A literal value was expected where a computed value was found" inference-error ;
 
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
 ! expected, and number of outputs produced.
-! - infer - quotation with custom inference behavior; if uses
+! - infer - quotation with custom inference behavior; 'if' uses
 ! this. Word is passed on the stack.
 
-! Vector of results we had to add to the datastack. Ie, the
+! Number of values we had to add to the datastack. Ie, the
 ! inputs.
 SYMBOL: d-in
 
@@ -48,18 +40,20 @@ SYMBOL: d-in
 
 : value-vector ( n -- vector ) [ drop <computed> ] map >vector ;
 
-: add-inputs ( n stack -- stack )
+: add-inputs ( n stack -- n stack )
     tuck length - dup 0 >
-    [ value-vector swap append ] [ drop ] if ;
+    [ dup value-vector [ rot nappend ] keep ]
+    [ drop 0 swap ] if ;
 
 : ensure-values ( n -- )
-    dup meta-d get length - 0 max d-in [ + ] change
-    meta-d [ add-inputs ] change ;
+    meta-d [ add-inputs ] change d-in [ + ] change ;
 
 : effect ( -- { in# out# } )
     #! After inference is finished, collect information.
     d-in get meta-d get length 2array ;
 
+! Does this control flow path throw an exception, therefore its
+! stack height is irrelevant and the branch will always unify?
 SYMBOL: terminated?
 
 : init-inference ( recursive-state -- )
@@ -88,10 +82,12 @@ M: wrapper apply-object wrapped apply-literal ;
 
 GENERIC: infer-quot
 
-M: general-list infer-quot ( quot -- )
+M: f infer-quot ( f -- ) drop ;
+
+M: quotation infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested
     #! quotations.
-    [ terminated? get [ drop f ] [ apply-object t ] if ] all? drop ;
+    [ apply-object terminated? get not ] all? drop ;
 
 : infer-quot-value ( rstate quot -- )
     recursive-state get >r swap recursive-state set
@@ -101,14 +97,14 @@ M: general-list infer-quot ( quot -- )
     #! Raise an error if word leaves values on return stack.
     meta-r get empty? [
         "Word leaves " meta-r get length number>string
-        " element(s) on return stack. Check >r/r> usage." append3
+        " element(s) on retain stack. Check >r/r> usage." append3
         inference-error
     ] unless ;
 
 : with-infer ( quot -- )
     [
-        inferring-base-case off
         base-case-continuation off
+        { } recursive-state set
         f init-inference
         call
         check-return

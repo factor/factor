@@ -1,0 +1,5 @@
+IN: kernel-internals
+USING: help kernel ;
+
+HELP: boot "( -- )"
+{ $description "Called on startup as part of the boot quotation (see " { $link set-boot } ") to initialize the runtime and get ready to run user code." } ;

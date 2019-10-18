@@ -1,16 +1,18 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
-IN: inference
-USING: arrays errors generic hashtables interpreter kernel lists
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: arrays errors generic hashtables interpreter kernel
 math math-internals namespaces parser prettyprint sequences
 strings vectors words ;
+IN: inference
 
 : consume-values ( n node -- )
     over ensure-values
-    over 0 rot node-inputs [ pop-d 2drop ] each ;
+    over 0 rot node-inputs
+    meta-d get [ length swap - ] keep set-length ;
 
 : produce-values ( n node -- )
-    over [ drop <computed> push-d ] each 0 swap node-outputs ;
+    >r [ drop <computed> ] map dup r> set-node-out-d
+    meta-d get swap nappend ;
 
 : consume/produce ( word effect -- )
     #! Add a node to the dataflow graph that consumes and
@@ -37,7 +39,7 @@ TUPLE: rstate label base-case? ;
     r> current-node set ;
 
 : with-recursive-state ( word label base-case quot -- )
-    >r <rstate> 2array recursive-state [ cons ] change r>
+    >r <rstate> 2array recursive-state [ swap add ] change r>
     nest-node 2slip unnest-node ; inline
 
 : inline-block ( word base-case -- node-block variables )
@@ -68,18 +70,13 @@ M: #call-label collect-recursion* ( label node -- )
     dup node-param swap
     [ [ collect-recursion* ] each-node-with ] { } make ;
 
-: amend-d-in ( new old -- )
-    [ length ] 2apply - d-in [ + ] change ;
-
 : join-values ( node -- )
     #! We have to infer recursive labels twice to determine
     #! which literals survive the recursion (eg, quotations)
     #! and which don't (loop indices, etc). The latter cannot
     #! be folded.
-    meta-d get [
-        >r collect-recursion r> add unify-lengths
-        flip [ unify-values ] map dup meta-d set
-    ] keep amend-d-in ;
+    collect-recursion meta-d get add unify-stacks
+    meta-d [ length swap tail* ] change ;
 
 : splice-node ( node -- )
     #! Labels which do not call themselves are just spliced into
@@ -108,7 +105,6 @@ M: #call-label collect-recursion* ( label node -- )
     #! control flow by throwing an exception or restoring a
     #! continuation.
     [
-        dup inferring-base-case set
         recursive-state get init-inference
         over >r inline-block nip
         [ terminated? get effect ] bind r>
@@ -120,37 +116,28 @@ M: object apply-word ( word -- )
     #! A primitive with an unknown stack effect.
     no-effect ;
 
-: save-effect ( word terminates effect -- )
-    inferring-base-case get [
-        3drop
-    ] [
-        >r dupd "terminates" set-word-prop r>
-        "infer-effect" set-word-prop
-    ] if ;
+: save-effect ( word terminates effect prop -- )
+    rot [ 3drop ] [ set-word-prop ] if ;
 
 M: compound apply-word ( word -- )
     #! Infer a compound word's stack effect.
     [
-        dup f infer-compound save-effect
+        dup f infer-compound "infer-effect" save-effect
     ] [
         swap t "no-effect" set-word-prop rethrow
     ] recover ;
 
 : apply-default ( word -- )
-    dup "no-effect" word-prop [
-        no-effect
-    ] [
-        dup "infer-effect" word-prop [
-            over "infer" word-prop [
-                swap first length ensure-values call drop
-            ] [
-                dupd consume/produce
-                "terminates" word-prop [ terminate ] when
-            ] if*
+    dup "no-effect" word-prop [ no-effect ] when
+    dup "infer-effect" word-prop [
+        over "infer" word-prop [
+            swap first length ensure-values call drop
         ] [
-            apply-word
+            consume/produce
         ] if*
-    ] if ;
+    ] [
+        apply-word
+    ] if* ;
 
 M: word apply-object ( word -- )
     apply-default ;
@@ -166,20 +153,8 @@ M: symbol apply-object ( word -- )
     over "inline" word-prop [
         inline-base-case
     ] [
-        drop dup t infer-compound swap
-        [ 2drop ] [ "base-case" set-word-prop ] if
+        drop dup t infer-compound "base-case" save-effect
     ] if ;
-
-: no-base-case ( word -- )
-    {
-        "The base case of a recursive word could not be inferred.\n"
-        "This means the word calls itself in every control flow path.\n"
-        "See the handbook for details."
-    } concat inference-error ;
-
-: notify-base-case ( -- )
-    base-case-continuation get
-    [ t swap continue-with ] [ no-base-case ] if* ;
 
 : recursive-word ( word rstate -- )
     #! Handle a recursive call, by either applying a previously
@@ -201,7 +176,7 @@ M: symbol apply-object ( word -- )
 
 M: compound apply-object ( word -- )
     #! Apply the word's stack effect to the inferencer state.
-    dup recursive-state get assoc [
+    dup recursive-state get <reversed> assoc [
         recursive-word
     ] [
         dup "inline" word-prop

@@ -1,24 +1,21 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: gadgets-labels gadgets-layouts hashtables kernel math
-namespaces queues sequences threads ;
+USING: generic hashtables kernel math models namespaces queues
+sequences words ;
 
-: action ( gadget gesture -- quot )
-    swap gadget-gestures ?hash ;
+: (gestures) ( gadget -- )
+    [
+        dup delegate (gestures)
+        class "gestures" word-prop [ , ] when*
+    ] when* ;
 
-: init-gestures ( gadget -- gestures )
-    dup gadget-gestures
-    [ ] [ H{ } clone dup rot set-gadget-gestures ] ?if ;
+: gestures ( gadget -- seq ) [ (gestures) ] { } make ;
 
-: set-action ( gadget quot gesture -- )
-    rot init-gestures set-hash ;
+: set-gestures ( class hash -- ) "gestures" set-word-prop ;
 
-: add-actions ( gadget hash -- )
-    dup [ >r init-gestures r> hash-update ] [ 2drop ] if ;
-
-: handle-gesture* ( gesture gadget -- ? )
-    tuck gadget-gestures ?hash dup [ call f ] [ 2drop t ] if ;
+: handle-gesture* ( gesture gadget -- )
+    tuck gestures hash-stack [ call f ] [ drop t ] if* ;
 
 : handle-gesture ( gesture gadget -- ? )
     #! If a gadget's handle-gesture* generic returns t, the
@@ -30,18 +27,42 @@ namespaces queues sequences threads ;
 : user-input ( str gadget -- )
     [ dupd user-input* ] each-parent 2drop ;
 
-! Mouse gestures are lists where the first element is one of:
-SYMBOL: motion
-SYMBOL: drag
-SYMBOL: button-up
-SYMBOL: button-down
-SYMBOL: wheel-up
-SYMBOL: wheel-down
-SYMBOL: mouse-enter
-SYMBOL: mouse-leave
+! Gesture objects
+TUPLE: motion ;
+TUPLE: drag # ;
+TUPLE: button-up # ;
+TUPLE: button-down # ;
+TUPLE: wheel-up ;
+TUPLE: wheel-down ;
+TUPLE: mouse-enter ;
+TUPLE: mouse-leave ;
+TUPLE: lose-focus ;
+TUPLE: gain-focus ;
 
-SYMBOL: lose-focus
-SYMBOL: gain-focus
+! Higher-level actions
+TUPLE: cut-action ;
+TUPLE: copy-action ;
+TUPLE: paste-action ;
+TUPLE: delete-action ;
+TUPLE: select-all-action ;
+
+: handle-action ( gadget constructor -- )
+    execute swap handle-gesture drop ; inline
+
+GENERIC: with-button ( button# tuple -- tuple )
+
+M: drag with-button drop <drag> ;
+M: button-up with-button drop <button-up> ;
+M: button-down with-button drop <button-down> ;
+
+! Modifiers
+SYMBOL: C+
+SYMBOL: A+
+SYMBOL: M+
+SYMBOL: S+
+
+TUPLE: key-down mods sym ;
+TUPLE: key-up mods sym ;
 
 ! Hand state
 
@@ -51,7 +72,7 @@ SYMBOL: gain-focus
 ! the gadget in question.
 SYMBOL: hand-gadget
 SYMBOL: hand-loc
-{ 0 0 0 } hand-loc set-global
+{ 0 0 } hand-loc set-global
 
 SYMBOL: hand-clicked
 SYMBOL: hand-click-loc
@@ -60,51 +81,69 @@ SYMBOL: hand-buttons
 V{ } clone hand-buttons set-global
 
 : button-gesture ( button gesture -- )
-    #! Send a gesture like [ button-down 2 ]; if nobody
-    #! handles it, send [ button-down ].
-    swap hand-clicked get-global 3dup >r add r> handle-gesture
-    [ nip handle-gesture drop ] [ 3drop ] if ;
+    #! Send a gesture like T{ button-down f 2 }; if nobody
+    #! handles it, send T{ button-down }.
+    hand-clicked get-global
+    3dup >r with-button r> handle-gesture
+    [ handle-gesture 2drop ] [ 3drop ] if ;
 
 : drag-gesture ( -- )
-    #! Send a gesture like [ drag 2 ]; if nobody handles it,
-    #! send [ drag ].
-    hand-buttons get-global first [ drag ] button-gesture ;
+    #! Send a gesture like T{ drag f 2 }; if nobody handles it,
+    #! send T{ drag }.
+    hand-buttons get-global first T{ drag } button-gesture ;
 
 : fire-motion ( -- )
     #! Fire a motion gesture to the gadget underneath the hand,
     #! and if a mouse button is down, fire a drag gesture to the
     #! gadget that was clicked.
-    [ motion ] hand-gadget get-global handle-gesture drop
-    hand-buttons get-global empty? [ drag-gesture ] unless ;
+    hand-buttons get-global empty? [
+        T{ motion } hand-gadget get-global handle-gesture drop
+    ] [
+        drag-gesture
+    ] if ;
 
 : each-gesture ( gesture seq -- )
     [ handle-gesture* drop ] each-with ;
 
 : hand-gestures ( new old -- )
-    drop-prefix reverse-slice
-    [ mouse-leave ] swap each-gesture
-    fire-motion
-    [ mouse-enter ] swap each-gesture ;
+    drop-prefix <reversed>
+    T{ mouse-leave } swap each-gesture
+    T{ mouse-enter } swap each-gesture ;
+
+: forget-rollover ( -- )
+    #! After we restore the UI, send mouse leave events to all
+    #! gadgets that were under the mouse at the time of the
+    #! save, since the mouse is in a different location now.
+    f hand-gadget [ get-global ] 2keep set-global
+    parents hand-gestures ;
 
 : focus-gestures ( new old -- )
-    drop-prefix reverse-slice
-    [ lose-focus ] swap each-gesture
-    [ gain-focus ] swap each-gesture ;
+    drop-prefix <reversed>
+    T{ lose-focus } swap each-gesture
+    T{ gain-focus } swap each-gesture ;
+
+: focus-receiver ( world -- seq )
+    #! If the world is not focused, we want focus-gestures to
+    #! only send focus-lost and not focus-gained.
+    dup world-focused? [ focused-ancestors ] [ drop f ] if ;
 
 : request-focus* ( gadget world -- )
     dup focused-ancestors >r
     [ set-world-focus ] keep
-    focused-ancestors r> focus-gestures ;
+    focus-receiver r> focus-gestures ;
 
 : request-focus ( gadget -- )
     dup focusable-child swap find-world request-focus* ;
 
 : modifier ( mod modifiers -- seq )
     [ second swap bitand 0 > ] subset-with
-    [ first ] map ;
+    [ first ] map f like ;
 
 : drag-loc ( -- loc )
     hand-loc get-global hand-click-loc get-global v- ;
+
+: hand-rel ( gadget -- loc )
+    hand-loc get-global relative-loc ;
 
 : hand-click-rel ( gadget -- loc )
     hand-click-loc get-global relative-loc ;
@@ -112,9 +151,9 @@ V{ } clone hand-buttons set-global
 : relevant-help ( seq -- help )
     [ gadget-help ] map [ ] find nip ;
 
-: show-message ( string/f -- )
+: show-message ( string/f world -- )
     #! Show a message in the status bar.
-    world-status [ set-label-text* ] [ drop ] if* ;
+    world-status set-model* ;
 
 : update-help ( -- )
     #! Update mouse-over help message.
@@ -124,7 +163,7 @@ V{ } clone hand-buttons set-global
 : under-hand ( -- seq )
     #! A sequence whose first element is the world and last is
     #! the current gadget, with all parents in between.
-    hand-gadget get-global parents reverse-slice ;
+    hand-gadget get-global parents <reversed> ;
 
 : move-hand ( loc world -- )
     under-hand >r over hand-loc set-global
@@ -139,14 +178,24 @@ V{ } clone hand-buttons set-global
 : send-button-down ( button# loc world -- )
     update-clicked
     dup hand-buttons get-global push
-    [ button-down ] button-gesture ;
+    T{ button-down } button-gesture ;
 
 : send-button-up ( button# loc world -- )
     move-hand
     dup hand-buttons get-global delete
-    [ button-up ] button-gesture ;
+    T{ button-up } button-gesture ;
 
 : send-wheel ( up/down loc world -- )
     move-hand
-    [ wheel-up ] [ wheel-down ] ?
+    T{ wheel-up } T{ wheel-down } ?
     hand-gadget get-global handle-gesture drop ;
+
+: send-action ( world gesture -- )
+    swap world-focus handle-gesture drop ;
+
+world H{
+    { T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }
+    { T{ key-down f { C+ } "c" } [ T{ copy-action } send-action ] }
+    { T{ key-down f { C+ } "v" } [ T{ paste-action } send-action ] }
+    { T{ key-down f { C+ } "a" } [ T{ select-all-action } send-action ] }
+} set-gestures

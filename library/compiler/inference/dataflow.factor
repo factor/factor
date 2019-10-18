@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference
-USING: arrays generic hashtables interpreter kernel lists math
+USING: arrays generic hashtables interpreter kernel math
 namespaces parser sequences words ;
 
 ! The dataflow IR is the first of the two intermediate
@@ -33,8 +33,11 @@ M: node = eq? ;
 : out-node ( outputs) >r f { } r> { } { } ;
 : meta-d-node meta-d get clone in-node ;
 
-: d-tail ( n -- list ) meta-d get tail* ;
-: r-tail ( n -- list ) meta-r get tail* ;
+: d-tail ( n -- list )
+    dup zero? [ drop f ] [ meta-d get tail* ] if ;
+
+: r-tail ( n -- list )
+    dup zero? [ drop f ] [ meta-r get tail* ] if ;
 
 : node-child node-children first ;
 
@@ -263,5 +266,5 @@ DEFER: (map-nodes)
 
 : subst-values ( new old node -- )
     #! Mutates nodes.
-    1 node-stack get head* swap add
+    1 node-stack get head-slice* swap add
     [ >r 2dup r> node-successor (subst-values) ] each 2drop ;

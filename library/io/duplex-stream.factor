@@ -46,8 +46,14 @@ M: duplex-stream stream-terpri
 M: duplex-stream stream-format
     duplex-stream-out+ stream-format ;
 
+M: duplex-stream with-stream-style
+    duplex-stream-out+ with-stream-style ;
+
 M: duplex-stream with-nested-stream
     duplex-stream-out+ with-nested-stream ;
+
+M: duplex-stream with-stream-table
+    duplex-stream-out+ with-stream-table ;
 
 M: duplex-stream stream-close
     #! The output stream is closed first, in case both streams

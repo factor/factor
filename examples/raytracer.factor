@@ -1,7 +1,7 @@
 ! Factor port of the raytracer benchmark from
 ! http://www.ffconsultancy.com/free/ray_tracer/languages.html
 
-USING: arrays compiler generic io kernel lists math namespaces
+USING: arrays compiler generic io kernel math namespaces
 sequences test words ;
 IN: ray
 

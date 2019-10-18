@@ -27,7 +27,7 @@ namespaces sequences vectors words ;
 
 : specialized-def ( word -- quot )
     dup word-def swap "specializer" word-prop [
-        reverse-slice { dup over pick } [
+        <reversed> { dup over pick } [
             make-specializer
         ] 2each
     ] when* ;

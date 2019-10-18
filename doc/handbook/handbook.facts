@@ -1,18 +1,27 @@
-USING: help inspector parser prettyprint ;
+USING: generic hashtables help inspector modules namespaces
+parser prettyprint sequences words ;
 
 ARTICLE: "handbook" "Factor documentation"
-{ $subheading "Factor UI basics" }
-"The Factor user interface centers on the concept of a " { $emphasis "presentation" } ". A presentation is a graphical view of a live object."
-$terpri
-"Placing the mouse over a presentation highlights it with a border. Presentations are everywhere; help links, words, and code examples are all presentations. Clicking a presentation displays a browser window looking at the underlying object."
-$terpri
-"A left click will reuse the current browser window; a right click always opens a new window."
 { $subsection "changes" }
-"The environment:"
-{ $subsection "quickref" }
-{ $subsection "tools" }
-"The language:"
-{ $subsection "tutorial" }
+{ $heading "Survival guide" }
+{ $list
+    { "Load source files using " { $link run-file } ":"
+    { $code "\"examples/lcd.factor\" run-file" } }
+    { { "Load modules from " { $snippet "contrib/" } " using " { $link require } ":" }
+    { $code "\"httpd\" require" } }
+    { { $link .s } " prints the contents of the stack." }
+    { { $link . } " prints the object at the top of the stack." }
+}
+{ $heading "Cookbook" }
+{ $subsection "cookbook-syntax" }
+{ $subsection "cookbook-colon-defs" }
+{ $subsection "cookbook-combinators" }
+{ $subsection "cookbook-variables" }
+{ $subsection "cookbook-vocabs" }
+{ $subsection "cookbook-sources" }
+{ $subsection "cookbook-io" }
+{ $heading "Language reference" }
+{ $subsection "conventions" }
 { $subsection "syntax" }
 { $subsection "dataflow" }
 { $subsection "words" }
@@ -22,27 +31,25 @@ $terpri
 { $subsection "streams" }
 { $subsection "parser" }
 { $subsection "prettyprint" }
-{ $subsection "alien" } ;
+{ $subsection "alien" }
+{ $heading "Environment reference" }
+{ $subsection "cli" }
+{ $subsection "tools" }
+{ $subsection "help" }
+{ $heading "Index" }
+{ $subsection "article-index" }
+{ $subsection "primitive-index" }
+{ $subsection "type-index" }
+{ $subsection "class-index" } ;
 
-ARTICLE: "quickref" "Quick reference"
-"Loading source files:"
-{ $subsection run-file }
-"Displaying word documentation:"
-{ $subsection help }
-"Printing the top of the stack, and displaying the stack without popping:"
-{ $subsection . }
-{ $subsection .s }
-"If you enter an invalid word name, you will get a \"not a number\" error:"
-{ $example
-    "fdafasfa"
-    "An unhandled error was caught:\n\nParsing <interactive>:1\nfdafasfa\n        ^\n\"Not a number\"\n\n:s :r show stacks at time of error.\n:get ( var -- value ) inspects the error namestack."
-}
-"Sometimes, the word " { $emphasis "does" } " exist, but you might need to " { $link POSTPONE: USE: } " its vocabulary first. The " { $link apropos } " word can help locate the correct vocabulary:"
-{ $example "\"<label>\" apropos" "IN: gadgets-labels : <label>\nIN: compiler-backend : <label>" }
-$terpri
-"A simple program:"
-{ $code
-    "USING: kernel math ;"
-    ": factorial ( n -- n! )"
-    "    dup zero? [ drop 1 ] [ dup 1- factorial * ] if ;"
-} ;
+ARTICLE: "article-index" "Article index"
+{ $outliner [ articles get hash-keys ] } ;
+
+ARTICLE: "primitive-index" "Primitive index"
+{ $outliner [ all-words [ primitive? ] subset ] } ;
+
+ARTICLE: "type-index" "Type index"
+{ $outliner [ builtins get [ ] subset ] } ;
+
+ARTICLE: "class-index" "Class index"
+{ $outliner [ classes ] } ;

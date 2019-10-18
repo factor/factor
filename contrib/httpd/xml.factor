@@ -1,74 +1,12 @@
-USING: arrays errors generic hashtables io kernel lists math
+USING: arrays errors generic hashtables io kernel math
 namespaces parser prettyprint sequences strings vectors words ;
 IN: xml
-
-! * Simple SAX-ish parser
-
-!   -- Basic utility words
 
 SYMBOL: code #! Source code
 SYMBOL: spot #! Current index of string
 SYMBOL: version
 SYMBOL: line
 SYMBOL: column
-
-: set-code ( string -- ) ! for debugging
-    code set [ spot line column ] [ 0 swap set ] each ;
-
-: more? ( -- ? )
-    #! Return t if spot is not at the end of code
-    code get length spot get = not ;
-
-: char ( -- char/f )
-    more? [ spot get code get nth ] [ f ] if ;
-
-: incr-spot ( -- )
-    #! Increment spot.
-    spot [ 1 + ] change
-    char "\n\r" member? [
-        0 column set
-        line
-    ] [
-        column
-    ] if [ 1 + ] change ;
-
-: skip-until ( quot -- | quot: char -- ? )
-    more? [
-        char swap [ call ] keep swap [ drop ] [
-             incr-spot skip-until
-        ] if
-    ] [ drop ] if ; inline
-
-: take-until ( quot -- string | quot: char -- ? )
-    #! Take the substring of a string starting at spot
-    #! from code until the quotation given is true and
-    #! advance spot to after the substring.
-    spot get >r skip-until r>
-    spot get code get subseq ; inline
-
-: pass-blank ( -- )
-    #! Advance code past any whitespace, including newlines
-    [ blank? not ] skip-until ;
-
-: string-matches? ( string -- ? )
-    spot get dup pick length + code get subseq = ;
-
-DEFER: <xml-string-error>
-: (take-until-string) ( string -- n )
-    more? [
-        dup string-matches? [
-            drop spot get
-        ] [
-            incr-spot (take-until-string)
-        ] if
-    ] [ "Missing closing token" <xml-string-error> throw ] if ;
-
-: take-until-string ( string -- string )
-    [ >r spot get r> (take-until-string) code get subseq ] keep
-    length spot [ + ] change ;
-
-: in-range-seq? ( number { [[ min max ]] ... } -- ? )
-    [ uncons between? not ] all-with? not ;
 
 !   -- Error reporting
 
@@ -111,6 +49,58 @@ M: xml-string-error error.
     dup xml-error.
     xml-string-error-string print ;
 
+!   -- Basic utility words
+
+: set-code ( string -- ) ! for debugging
+    code set [ spot line column ] [ 0 swap set ] each ;
+
+: more? ( -- ? )
+    #! Return t if spot is not at the end of code
+    code get length spot get = not ;
+
+: char ( -- char/f )
+    more? [ spot get code get nth ] [ f ] if ;
+
+: incr-spot ( -- )
+    #! Increment spot.
+    spot inc
+    char "\n\r" member? [ 0 column set line ] [ column ] if
+    inc ;
+
+: skip-until ( quot -- | quot: char -- ? )
+    more? [
+        char swap [ call ] keep swap [ drop ] [
+             incr-spot skip-until
+        ] if
+    ] [ drop ] if ; inline
+
+: take-until ( quot -- string | quot: char -- ? )
+    #! Take the substring of a string starting at spot
+    #! from code until the quotation given is true and
+    #! advance spot to after the substring.
+    spot get >r skip-until r>
+    spot get code get subseq ; inline
+
+: pass-blank ( -- )
+    #! Advance code past any whitespace, including newlines
+    [ blank? not ] skip-until ;
+
+: string-matches? ( string -- ? )
+    spot get dup pick length + code get subseq = ;
+
+: (take-until-string) ( string -- n )
+    more? [
+        dup string-matches? [
+            drop spot get
+        ] [
+            incr-spot (take-until-string)
+        ] if
+    ] [ "Missing closing token" <xml-string-error> throw ] if ;
+
+: take-until-string ( string -- string )
+    [ >r spot get r> (take-until-string) code get subseq ] keep
+    length spot [ + ] change ;
+
 !   -- Parsing strings
 
 : expect ( ch -- )
@@ -119,18 +109,20 @@ M: xml-string-error error.
     ] if incr-spot ;
 
 : expect-string ( string -- )
-    >r spot get r> t over [ char incr-spot = and ] each [ 2drop ] [
+    >r spot get r> t over [ char incr-spot = and ] each [
+        2drop
+    ] [
         swap spot get code get subseq <expected> throw
     ] if ;
 
 : entities
     #! We have both directions here as a shortcut.
     H{
-        { "lt" CHAR: < }
-        { "gt" CHAR: > }
-        { "amp" CHAR: & }
-        { "apos" CHAR: ' }
-        { "quot" CHAR: " }
+        { "lt"    CHAR: <  }
+        { "gt"    CHAR: >  }
+        { "amp"   CHAR: &  }
+        { "apos"  CHAR: '  }
+        { "quot"  CHAR: "  }
         { CHAR: < "&lt;"   }
         { CHAR: > "&gt;"   }
         { CHAR: & "&amp;"  }
@@ -139,43 +131,59 @@ M: xml-string-error error.
     } ;
 
 : parse-entity ( -- ch )
-    incr-spot [ CHAR: ; = ] take-until incr-spot
-    dup first CHAR: # = [
-        1 swap tail "x" ?head 16 10 ? base>
+    incr-spot [ CHAR: ; = ] take-until "#" ?head [
+        "x" ?head 16 10 ? base>
     ] [
-        dup entities hash [ nip ] [ <no-entity> throw ] if*
+        dup entities hash [ ] [ <no-entity> throw ] ?if
     ] if ;
 
-: (parse-text) ( vector -- vector )
-    [ CHAR: & = ] take-until over push
-    char CHAR: & = [
-        parse-entity ch>string over push (parse-text)
-    ] when ;
+: parsed-ch ( buf ch -- buf ) over push incr-spot ;
 
-: parse-text ( string -- string )
-    [
-        code set 0 spot set
-        100 <vector> (parse-text) concat
-    ] with-scope ;
+: (parse-text) ( buf -- buf )
+    {
+        { [ more? not ] [ ] }
+        { [ char CHAR: < = ] [ ] }
+        { [ char CHAR: & = ] [ parse-entity parsed-ch (parse-text) ] }
+        { [ t ] [ char parsed-ch (parse-text) ] }
+    } cond ;
 
-: get-text ( -- string )
-    [ CHAR: < = ] take-until parse-text ;
+: parse-text ( -- string )
+    SBUF" " clone (parse-text) >string ;
 
 !   -- Parsing tags
 
+: in-range-seq? ( number { { min max } ... } -- ? )
+    [ first2 between? ] contains-with? ;
+
 : name-start-char? ( ch -- ? )
-    dup ":_" member? swap {
-        [[ CHAR: A CHAR: Z ]] [[ CHAR: a CHAR: z ]] [[ HEX: C0 HEX: D6 ]]
-        [[ HEX: D8 HEX: F6 ]] [[ HEX: F8 HEX: 2FF ]] [[ HEX: 370 HEX: 37D ]]
-        [[ HEX: 37F HEX: 1FFF ]] [[ HEX: 200C HEX: 200D ]] [[ HEX: 2070 HEX: 218F ]]
-        [[ HEX: 2C00 HEX: 2FEF ]] [[ HEX: 3001 HEX: D7FF ]] [[ HEX: F900 HEX: FDCF ]]
-        [[ HEX: FDF0 HEX: FFFD ]] [[ HEX: 10000 HEX: EFFFF ]]
-    } in-range-seq? or ;
+    {
+        { CHAR: :    CHAR: :    }
+        { CHAR: _    CHAR: _    }
+        { CHAR: A    CHAR: Z    }
+        { CHAR: a    CHAR: z    }
+        { HEX: C0    HEX: D6    }
+        { HEX: D8    HEX: F6    }
+        { HEX: F8    HEX: 2FF   }
+        { HEX: 370   HEX: 37D   }
+        { HEX: 37F   HEX: 1FFF  }
+        { HEX: 200C  HEX: 200D  }
+        { HEX: 2070  HEX: 218F  }
+        { HEX: 2C00  HEX: 2FEF  }
+        { HEX: 3001  HEX: D7FF  }
+        { HEX: F900  HEX: FDCF  }
+        { HEX: FDF0  HEX: FFFD  }
+        { HEX: 10000 HEX: EFFFF }
+    } in-range-seq? ;
 
 : name-char? ( ch -- ? )
-    dup name-start-char? over "-." member? or over HEX: B7 = or swap
-    { [[ CHAR: 0 CHAR: 9 ]] [[ HEX: 300 HEX: 36F ]] [[ HEX: 203F HEX: 2040 ]] }
-    in-range-seq? or ;
+    dup name-start-char? swap {
+        { CHAR: -   CHAR: -   }
+        { CHAR: .   CHAR: .   }
+        { CHAR: 0   CHAR: 9   }
+        { HEX: b7   HEX: b7   }
+        { HEX: 300  HEX: 36F  }
+        { HEX: 203F HEX: 2040 }
+    } in-range-seq? or ;
 
 : parse-name ( -- name )
     char dup name-start-char? [
@@ -184,56 +192,70 @@ M: xml-string-error error.
         "Malformed name" <xml-string-error> throw
     ] if ;
 
-: parse-quot ( ch -- str )
-    incr-spot [ dupd = ] take-until parse-text nip incr-spot ;
-
-: parse-prop-value ( -- str )
-    char dup "'\"" member? [
-        parse-quot
-    ] [
-        "Attribute lacks quote" <xml-string-error> throw
-    ] if ;
-
-: parse-prop ( -- { name value } )
-    parse-name pass-blank CHAR: = expect pass-blank
-    parse-prop-value 2array pass-blank ;
-
 TUPLE: opener name props ;
 TUPLE: closer name ;
 TUPLE: contained name props ;
 TUPLE: comment text ;
+TUPLE: directive text ;
 
 : start-tag ( -- string ? )
     #! Outputs the name and whether this is a closing tag
     char CHAR: / = dup [ incr-spot ] when
     parse-name swap ;
 
-: (middle-tag) ( list -- list )
-    pass-blank char name-char? [ parse-prop swons (middle-tag) ] when ;
+: (parse-quot) ( ch buf -- buf )
+    {
+        { [ more? not ] [ nip ] }
+        { [ char pick = ] [ incr-spot nip ] }
+        { [ char CHAR: & = ] [ parse-entity parsed-ch (parse-quot) ] }
+        { [ t ] [ char parsed-ch (parse-quot) ] }
+    } cond ;
 
-: middle-tag ( -- hash )
-    f (middle-tag) alist>hash ;
+: parse-quot ( ch -- str )
+    SBUF" " clone (parse-quot) >string ;
 
-: end-tag ( string hash -- tag )
-    pass-blank char CHAR: / = [
-        <contained> incr-spot
+: parse-prop-value ( -- str )
+    char dup "'\"" member? [
+        incr-spot parse-quot
     ] [
-        <opener>
+        "Attribute lacks quote" <xml-string-error> throw
     ] if ;
 
+: parse-prop ( -- name value )
+    parse-name pass-blank CHAR: = expect pass-blank
+    parse-prop-value 2array ;
+
+: (middle-tag) ( seq -- seq )
+    pass-blank char name-char?
+    [ parse-prop over push (middle-tag) ] when ;
+
+: middle-tag ( -- hash )
+    V{ } clone (middle-tag) alist>hash pass-blank ;
+
+: end-tag ( string hash -- tag )
+    pass-blank char CHAR: / =
+    [ <contained> incr-spot ] [ <opener> ] if ;
+
 : skip-comment ( -- comment )
-    "--" expect-string "--" take-until-string <comment> CHAR: > expect ;
+    "--" expect-string
+    "--" take-until-string
+    <comment>
+    CHAR: > expect ;
 
 : cdata ( -- string )
     "[CDATA[" expect-string "]]>" take-until-string ;
 
-: cdata/comment ( -- object )
-    incr-spot char CHAR: - = [ skip-comment ] [ cdata ] if ;
+: directive ( -- object )
+    {
+        { [ "--" string-matches? ] [ skip-comment ] }
+        { [ "[CDATA[" string-matches? ] [ cdata ] }
+        { [ t ] [ ">" take-until-string <directive> ] }
+    } cond ;
 
 : make-tag ( -- tag/f )
     CHAR: < expect
     char CHAR: ! = [
-        cdata/comment
+        incr-spot directive
     ] [
         start-tag [
             <closer>
@@ -251,30 +273,11 @@ TUPLE: comment text ;
         "version" swap hash [ version set ] when*
     ] when ;
 
-: dip-ns ( quot -- )
-    n> slip >n ; inline
-
-: (xml-each) ( quot -- )
-    get-text swap [ dip-ns ] keep
-    more? [
-        make-tag [ swap [ dip-ns ] keep ] when* (xml-each)
-    ] [ drop ] if ; inline
-
-: xml-each ( string quot -- | quot: node -- )
-    #! Quotation is called with each node: an opener, closer, contained,
-    #! comment, or string
-    #! Somewhat like SAX but vastly simplified.
-    [
-        swap code set
-        [ spot line column ] [ 0 swap set ] each
-        "1.0" version set
-        get-version (xml-each)
-    ] with-scope ; inline
-
 ! * Data tree
 
 TUPLE: tag name props children ;
 
+! A stack of { tag children } pairs
 SYMBOL: xml-stack
 
 TUPLE: mismatched open close ;
@@ -285,47 +288,62 @@ M: mismatched error.
 
 TUPLE: unclosed tags ;
 C: unclosed ( -- unclosed )
-    1 xml-stack get tail-slice [ car opener-name ] map
+    1 xml-stack get tail-slice [ first opener-name ] map
     swap [ set-unclosed-tags  ] keep ;
 M: unclosed error.
     "Unclosed tags" print
     "Tags: " print
     unclosed-tags [ "  <" write write ">" print ] each ;
 
-: push-datum ( object -- )
-    xml-stack get peek cdr push ;
+: add-child ( object -- )
+    xml-stack get peek second push ;
+
+: push-xml-stack ( object -- )
+    V{ } clone 2array xml-stack get push ;
 
 GENERIC: process ( object -- )
 
-M: string process push-datum ;
-M: comment process push-datum ;
+M: f process drop ;
+
+M: string process add-child ;
+M: comment process add-child ;
+M: directive process add-child ;
 
 M: contained process
-    [ contained-name ] keep contained-props 0 <vector> <tag> push-datum ;
+    [ contained-name ] keep contained-props
+    V{ } clone <tag> add-child ;
 
 M: opener process
-    V{ } clone cons
-    xml-stack get push ;
+    push-xml-stack ;
 
 M: closer process
-    closer-name xml-stack get pop uncons
-    >r [ 
+    closer-name xml-stack get pop first2 >r [ 
         opener-name [
             2dup = [ 2drop ] [ swap <mismatched> throw ] if
         ] keep
-    ] keep opener-props r> <tag> push-datum ;
+    ] keep opener-props r> <tag> add-child ;
 
-: initialize-xml-stack ( -- )
-    f V{ } clone cons unit >vector xml-stack set ;
+: init-xml-stack ( -- )
+    V{ } clone xml-stack set f push-xml-stack ;
 
-: xml ( string -- tag )
+: init-xml ( string -- )
+    code set
+    [ spot line column ] [ 0 swap set ] each
+    "1.0" version set
+    init-xml-stack ;
+
+: (string>xml) ( -- )
+    parse-text process
+    more? [ make-tag process (string>xml) ] when ; inline
+
+: string>xml ( string -- tag )
     #! Produces a tree of XML nodes
     [
-        initialize-xml-stack
-        [ process ] xml-each
+        init-xml
+        get-version (string>xml)
         xml-stack get
         dup length 1 = [ <unclosed> throw ] unless
-        first cdr second
+        first second
     ] with-scope ;
 
 ! * Printer
@@ -356,16 +374,14 @@ M: tag (xml>string)
     CHAR: < ,
     dup tag-name %
     dup tag-props print-props
-    dup tag-children [ "" = not ] subset empty? [
-        drop "/>" %
-    ] [
-        print-open/close
-    ] if ;
+    dup tag-children [ empty? not ] contains?
+    [ print-open/close ] [ drop "/>" % ] if ;
 
 M: comment (xml>string)
-    "<!--" %
-    comment-text %
-    "-->" % ;
+    "<!--" % comment-text % "-->" % ;
+
+M: object (xml>string)
+    [ (xml>string) ] each ;
 
 : xml-preamble
     "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" ;
@@ -374,13 +390,13 @@ M: comment (xml>string)
     [ xml-preamble % (xml>string) ] "" make ;
 
 : xml-reprint ( string -- string )
-    xml xml>string ;
+    string>xml xml>string ;
 
 ! * Easy XML generation for more literal things
 ! should this be rewritten?
 
 : text ( string -- )
-    chars>entities push-datum ;
+    chars>entities add-child ;
 
 : tag ( string attr-quot contents-quot -- )
     >r swap >r make-hash r> swap r> 
@@ -391,15 +407,15 @@ M: comment (xml>string)
 : text-tag ( content name attr-quot -- ) [ text ] tag ; inline
 
 : comment ( string -- )
-    <comment> push-datum ;
+    <comment> add-child ;
 
 : make-xml ( quot -- vector )
     #! Produces a tree of XML from a quotation to generate it
     [
-        initialize-xml-stack
+        init-xml-stack
         call
         xml-stack get
-        first cdr first
+        first second first
     ] with-scope ; inline
 
 ! * System for words specialized on tag names
@@ -416,14 +432,3 @@ M: process-missing error.
     >r dup tag-name r> hash* [ 2nip call ] [
         drop <process-missing> throw
     ] if ;
-
-: PROCESS:
-    CREATE
-    dup H{ } clone "xtable" set-word-prop
-    dup literalize [ run-process ] cons define-compound ; parsing
-
-: TAG:
-    scan scan-word [
-        swap "xtable" word-prop
-        rot "/" split [ >r 2dup r> swap set-hash ] each 2drop
-    ] f ; parsing

@@ -1,5 +1,5 @@
 
-USING: kernel namespaces sequences io xlib x concurrency concurrent-widgets ;
+USING: kernel namespaces sequences io x concurrency concurrent-widgets ;
 
 SYMBOL: win-a
 SYMBOL: button-a

@@ -1,6 +1,6 @@
 USING: kernel alien compiler namespaces generic math sequences hashtables io
-arrays words prettyprint lists concurrency
-process rectangle xlib x concurrent-widgets ;
+arrays words prettyprint concurrency process
+vars rectangle x11 x concurrent-widgets ;
 
 IN: factory
 
@@ -15,6 +15,8 @@ DEFER: layout-frame
 DEFER: mapped-windows
 DEFER: workspace-1 DEFER: workspace-2 DEFER: workspace-3 DEFER: workspace-4
 DEFER: switch-to
+DEFER: update-title
+DEFER: delete-frame
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -47,62 +49,91 @@ create-gc dup
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: MouseMask
-  [ ButtonPressMask
-    ButtonReleaseMask
-    PointerMotionMask ] 0 [ execute bitor ] reduce ;
+VARS: event frame push position ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: drag-mouse-loop ( push last quot -- push release )
-MouseMask mask-event XAnyEvent-type		! push last quot type
-{ { [ dup MotionNotify = ]
-    [ drop 3dup call nip mouse-sensor swap drag-mouse-loop ] }
-{ [ dup ButtonRelease = ]
-  [ drop 3dup nip f swap call 2drop
-    mouse-sensor ungrab-server CurrentTime ungrab-pointer flush-dpy ] }
-{ [ t ]
-  [ drop "drag-mouse-loop ignoring event" print flush drag-mouse-loop ] }
-} cond ;
-
-: drag-mouse ( quot -- push release )
-MouseMask grab-pointer grab-server mouse-sensor f rot drag-mouse-loop ;
-
-: drag-mouse% [ drag-mouse ] with-window-object ;
+: event-type ( -- type ) event> XAnyEvent-type ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: ((draw-move-outline)) ( a b - )
-swap v- window-position v+ window-size <rect> root get draw-rect+ ;
-
-: (draw-move-outline) ( push last -- )
-dupd dup [ ((draw-move-outline)) ] [ 2drop ] if
-mouse-sensor ((draw-move-outline)) flush-dpy ;
-
-: draw-move-outline ( push last -- )
-drag-gc get [ (draw-move-outline) ] with-gcontext ;
-
-: drag-move-window ( -- )
-[ draw-move-outline ] drag-mouse swap v- window-position v+ move-window ;
-
-: drag-move-window% [ drag-move-window raise-window ] with-window-object ;
+: drag-offset ( -- offset ) position> push> v- ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: ((draw-resize-outline)) ( bottom-right -- )
-window-position v- window-position swap <rect> root get draw-rect+ ;
+: draw-rubber-band ( <rect> -- )
+root get [ drag-gc get [ draw-rect ] with-gcontext ] with-win ;
 
-: (draw-resize-outline) ( push last -- )
-nip dup [ ((draw-resize-outline)) ] [ drop ] if
-mouse-sensor ((draw-resize-outline)) flush-dpy ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! drag-move-frame
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: draw-resize-outline ( push last -- )
-drag-gc get [ (draw-resize-outline) ] with-gcontext ;
+: draw-frame-outline ( -- )
+drag-offset frame> window-position% v+ frame> window-size% <rect>
+draw-rubber-band ;
 
-: drag-resize-window ( -- )
-[ draw-resize-outline ] drag-mouse nip window-position v- resize-window ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: drag-resize-window% [ drag-resize-window ] with-window-object ;
+: drag-move-frame-loop ( -- )
+next-event >event
+{ { [ event-type MotionNotify = ]
+    [ draw-frame-outline
+      event> XMotionEvent-root-position >position
+      draw-frame-outline
+      drag-move-frame-loop ] }
+  { [ event-type ButtonRelease = ]
+    [ draw-frame-outline
+      drag-offset frame> window-position% v+   frame> move-window% ] }
+  { [ t ]
+    [ "[drag-move-frame-loop] Ignoring event type: " write
+      event-type event-type>name write terpri flush
+      drag-move-frame-loop ] } }
+cond ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: drag-move-frame ( event <wm-frame> -- )
+[ >frame >event
+  event> XButtonEvent-root-position >push
+  event> XButtonEvent-root-position >position
+  draw-frame-outline
+  drag-move-frame-loop
+  frame> raise-window% ]
+with-scope ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! drag-size-frame
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: draw-size-outline ( -- )
+frame> window-position% position> over v- <rect> draw-rubber-band ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: drag-size-frame-loop ( -- )
+next-event >event
+{ { [ event-type MotionNotify = ]
+    [ draw-size-outline
+      event> XMotionEvent-root-position >position
+      draw-size-outline
+      drag-size-frame-loop ] }
+  { [ event-type ButtonRelease = ]
+    [ draw-size-outline
+      position> frame> window-position% v- frame> resize-window%
+      frame> layout-frame ] }
+  { [ t ]
+    [ "[drag-size-frame-loop] ignoring event" print flush
+      drag-size-frame-loop ] } }
+cond ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: drag-size-frame ( event <wm-frame> -- )
+[ >frame >event
+  event> XButtonEvent-root-position >position
+  draw-size-outline
+  drag-size-frame-loop ]
+with-scope ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -121,32 +152,24 @@ GENERIC: execute-size-request
 
 TUPLE: wm-root ;
 
-: create-wm-root ( window -- )
-  >r dpy get r> <window>			! <window>
-  <wm-root>					! <window> <wm-root>
-  [ set-delegate ] keep				! <wm-root>
-  [ add-to-window-table ] keep			! <wm-root>
+: wm-root-mask ( -- mask )
+[ SubstructureRedirectMask
+  SubstructureNotifyMask
+  ButtonPressMask
+  ButtonReleaseMask
+  KeyPressMask
+  KeyReleaseMask ] bitmask ;
 
-  [ SubstructureRedirectMask
-    SubstructureNotifyMask
-    ButtonPressMask
-    ButtonReleaseMask
-    KeyPressMask
-    KeyReleaseMask ] 0 [ execute bitor ] reduce	! <wm-frame> mask
-
-  over select-input% ;				! <wm-frame>
+: create-wm-root ( window-id -- <wm-root> )
+dpy get swap <window> <wm-root> tuck set-delegate dup add-to-window-table
+wm-root-mask over select-input% ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! M: wm-root handle-map-request-event
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : id>obj ( id -- obj )
-  dup			! id id
-  window-table get hash	! id obj-or-f
-  dup
-  [ swap drop ]
-  [ drop >r dpy get r> <window> ]
-  if ;
+dup window-table get hash dup [ nip ] [ drop dpy get swap <window> ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -253,6 +276,12 @@ M: wm-root handle-configure-request-event ( event wm-root -- )
 ! M: wm-root handle-button-press-event
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: XButtonEvent-position ( event -- { x y } )
+  dup XButtonEvent-x swap XButtonEvent-y 2array ;
+
+: XButtonEvent-root-position ( event -- { x y } )
+  dup XButtonEvent-x_root swap XButtonEvent-y_root 2array ;
+
 M: wm-root handle-button-press-event ( event wm-root -- )
   drop						! event
 
@@ -281,36 +310,39 @@ M: wm-root handle-button-press-event ( event wm-root -- )
 ! M: wm-root handle-key-press-event
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: f1-keycode   67 f1-keycode set-global
-SYMBOL: f2-keycode   68 f2-keycode set-global
-SYMBOL: f3-keycode   69 f3-keycode set-global
-SYMBOL: f4-keycode   70 f4-keycode set-global
+: True 1 ;
+: False 0 ;
+
+: f1-keycode ( -- code ) 67 ;
+: f2-keycode ( -- code ) 68 ;
+: f3-keycode ( -- code ) 69 ;
+: f4-keycode ( -- code ) 70 ;
 
 : grab-keys ( -- )
-f1-keycode get Mod1Mask False GrabModeAsync GrabModeAsync grab-key
-f2-keycode get Mod1Mask False GrabModeAsync GrabModeAsync grab-key
-f3-keycode get Mod1Mask False GrabModeAsync GrabModeAsync grab-key
-f4-keycode get Mod1Mask False GrabModeAsync GrabModeAsync grab-key ;
+f1-keycode Mod1Mask False GrabModeAsync GrabModeAsync grab-key
+f2-keycode Mod1Mask False GrabModeAsync GrabModeAsync grab-key
+f3-keycode Mod1Mask False GrabModeAsync GrabModeAsync grab-key
+f4-keycode Mod1Mask False GrabModeAsync GrabModeAsync grab-key ;
 
 M: wm-root handle-key-press-event ( event wm-root -- )
 drop
-{ { [ dup XKeyEvent-keycode f1-keycode get = ] [ workspace-1 get switch-to ] }
-  { [ dup XKeyEvent-keycode f2-keycode get = ] [ workspace-2 get switch-to ] }
-  { [ dup XKeyEvent-keycode f3-keycode get = ] [ workspace-3 get switch-to ] }
-  { [ dup XKeyEvent-keycode f4-keycode get = ] [ workspace-4 get switch-to ] }
+{ { [ dup XKeyEvent-keycode f1-keycode = ] [ workspace-1 get switch-to ] }
+  { [ dup XKeyEvent-keycode f2-keycode = ] [ workspace-2 get switch-to ] }
+  { [ dup XKeyEvent-keycode f3-keycode = ] [ workspace-3 get switch-to ] }
+  { [ dup XKeyEvent-keycode f4-keycode = ] [ workspace-4 get switch-to ] }
   { [ t ] [ "wm-root ignoring key press" print drop ] } } cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 TUPLE: wm-child ;
 
-: create-wm-child ( id -- <wm-child> )
-  >r dpy get r> <window> <wm-child>		! <window> <wm-child>
-  [ set-delegate ] keep
-  [ add-to-window-table ] keep ;
+: create-wm-child ( window-id -- <wm-child> )
+dpy get swap <window> <wm-child> tuck set-delegate dup add-to-window-table ;
 
-M: wm-child handle-property-event ( child event -- )
-  "A <wm-child> received a property event" print flush drop drop ;
+M: wm-child handle-property-event ( event <wm-child> -- )
+  "A <wm-child> received a property event" print flush
+  nip
+  window-parent% window-table get hash dup [ update-title ] [ drop ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -318,68 +350,62 @@ TUPLE: wm-frame child ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: create-wm-frame ( child -- <wm-frame> )
-  >r create-window-object r>			! <window> child
-  <wm-frame>					! <window> <wm-frame>
-  [ set-delegate ] keep				! <wm-frame>
-  [ add-to-window-table ] keep			! <wm-frame>
-  
-  [ SubstructureRedirectMask
-    SubstructureNotifyMask
-    ExposureMask
-    ButtonPressMask
-    ButtonReleaseMask
-    EnterWindowMask ] 0 [ execute bitor ] reduce	! <wm-frame> mask
+: wm-frame-mask ( -- mask )
+[ SubstructureRedirectMask
+  SubstructureNotifyMask
+  ExposureMask
+  ButtonPressMask
+  ButtonReleaseMask
+  PointerMotionMask
+  EnterWindowMask ] bitmask ;
 
-  over select-input% ;				! <wm-frame>
+: create-wm-frame ( <wm-child> -- <wm-frame> )
+<wm-frame> create-window-object over set-delegate dup add-to-window-table
+wm-frame-mask over select-input% ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: update-title ( <wm-frame> -- )
+dup clear-window%
+{ 5 1 } swap dup wm-frame-child fetch-name% swap draw-string-top-left% ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+VARS: child frame button ;
+
 : manage-window ( window -- )
-  flush-dpy
-  grab-server
-  flush-dpy
-
-  create-wm-child				! child
-  create-wm-frame				! frame
-
-  dup "cornflowerblue" lookup-color swap set-window-background%
-
-  dup wm-frame-child add-to-save-set%		! frame
-
-  dup wm-frame-child window-position%		! frame position
-  over						! frame position frame
-  move-window%
-  
-  dup wm-frame-child 0 swap set-window-border-width%
-  dup dup wm-frame-child			! frame frame child
-  reparent-window%
-
-  dup wm-frame-child window-size%		! frame child-size
-  { 20 20 } v+					! frame child-size+
-  over						! frame child-size+ frame
-  resize-window%
-
-  dup wm-frame-child { 10 10 } swap move-window%
-
-  dup map-window%
-  dup map-subwindows%
-
-  dup wm-frame-child PropertyChangeMask swap select-input%
-
-  flush-dpy
-  0 sync-dpy
-  ungrab-server
-  flush-dpy ;
+flush-dpy grab-server flush-dpy
+create-wm-child dup create-wm-frame
+[ child frame ]
+[ "cornflowerblue" lookup-color frame> set-window-background%
+  child> add-to-save-set%
+  child> window-position% frame> move-window%
+  0 child> set-window-border-width%
+  frame> child> reparent-window%
+  child> window-size% { 10 20 } v+ frame> resize-window%
+  { 5 15 } child> move-window%
+  "" frame> [ delete-frame ] curry create-button
+  [ button ]
+  [ frame> button> reparent-window%
+    { 9 9 } button> resize-window%
+    frame> window-width% 9 - 5 - 3 2array button> move-window%
+    NorthEastGravity button> set-window-gravity%
+    black-pixel get button> set-window-background% ]
+  let
+  PropertyChangeMask child> select-input%
+  frame> map-subwindows%
+  frame> map-window%
+  frame> update-title
+  flush-dpy 0 sync-dpy ungrab-server flush-dpy ]
+let ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : destroy-window-event-match? ( event <wm-frame> -- ? )
-  window-id swap XDestroyWindowEvent-window = ;
+window-id swap XDestroyWindowEvent-window = ;
 
 M: wm-frame handle-destroy-window-event ( event <wm-frame> -- )
-  2dup destroy-window-event-match?
-  [ destroy-window% drop ] [ drop drop ] if ;
+2dup destroy-window-event-match? [ destroy-window% drop ] [ 2drop ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -393,7 +419,7 @@ M: wm-frame handle-map-request-event ( event <wm-frame> -- )
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : map-event-match? ( event <wm-frame> -- ? )
-  window-id swap XMapEvent-window = ;
+window-id swap XMapEvent-window = ;
 
 M: wm-frame handle-map-event ( event <wm-frame> -- )
   2dup map-event-match?
@@ -442,7 +468,7 @@ M: wm-frame size-request-size ( event frame -- size )
   dup wm-frame-child -rot size-request-size swap resize-window% ;
 
 : execute-size-request/frame ( event frame )
-  dup -rot size-request-size { 20 20 } v+ swap resize-window% ;
+  dup -rot size-request-size { 10 20 } v+ swap resize-window% ;
 
 M: wm-frame execute-size-request ( event frame )
   2dup execute-size-request/child execute-size-request/frame ;
@@ -464,14 +490,10 @@ M: wm-frame handle-unmap-event ( event frame )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: drag-move-frame ( frame -- ) drag-move-window% ;
-
-: drag-resize-frame ( frame -- ) dup drag-resize-window% layout-frame ;
-
 M: wm-frame handle-button-press-event ( event frame )
   over XButtonEvent-button				! event frame button
-  { { [ dup Button1 = ] [ drop nip drag-move-frame ] }
-    { [ dup Button2 = ] [ drop nip drag-resize-frame ] }
+  { { [ dup Button1 = ] [ drop drag-move-frame ] }
+    { [ dup Button2 = ] [ drop drag-size-frame ] }
     { [ dup Button3 = ] [ drop nip unmap-window% ] }
     { [ t ] [ drop drop drop ] } }
   cond ;
@@ -486,18 +508,30 @@ M: wm-frame handle-enter-window-event ( event frame )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-M: wm-frame handle-property-event ( event frame )
-  "Inside handle-property-event" print flush drop drop ;
+M: wm-frame handle-property-event ( event frame -- )
+"Inside handle-property-event" print flush 2drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: layout-frame ( frame -- )
-  dup wm-frame-child { 10 10 } swap move-window%
-  dup wm-frame-child				! frame child
-  over window-size%				! frame child size
-  { 20 20 } v-					! frame child child-size
-  swap resize-window%				! frame
-  drop ;
+M: wm-frame handle-expose-event ( event frame -- )
+nip dup clear-window% update-title ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: frame-position-child ( frame -- ) wm-frame-child { 5 15 } swap move-window% ;
+
+: frame-fit-child ( frame -- )
+dup window-size% { 10 20 } v- swap wm-frame-child resize-window% ;
+
+: layout-frame ( frame -- ) dup frame-position-child frame-fit-child ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: WM_PROTOCOLS
+SYMBOL: WM_DELETE_WINDOW
+
+: delete-frame ( frame -- ) wm-frame-child window-id
+[ WM_PROTOCOLS get WM_DELETE_WINDOW get send-client-message ] with-win ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Workspaces
@@ -562,7 +596,8 @@ SYMBOL: window-list
 
 : setup-window-list ( -- )
   create-menu window-list set-global
-  "black" lookup-color window-list get set-window-background% ;
+  "black" lookup-color window-list get set-window-background%
+  300 window-list get set-menu-item-width ;
 
 : not-transient? ( frame -- ? ) wm-frame-child get-transient-for-hint% not ;
 
@@ -574,7 +609,7 @@ SYMBOL: window-list
   [ ] [ drop "*untitled*" ] if	! window-list frame name
   swap				! window-list name frame
   [ map-window% ]		! window-list name frame [ map-window% ]
-  cons				! window-list name action
+  curry				! window-list name action
   pick				! window-list name action window-list
   add-popup-menu-item ;
 
@@ -607,8 +642,16 @@ SYMBOL: window-list
   root get [ black-pixel get set-window-background clear-window ] with-win
   root get create-wm-root
   root get [ grab-keys ] with-win
+  "WM_PROTOCOLS" False intern-atom WM_PROTOCOLS set
+  "WM_DELETE_WINDOW" False intern-atom WM_DELETE_WINDOW set
+  "cornflowerblue" lookup-color menu-enter-color set
+  "white" lookup-color menu-leave-color set
   setup-root-menu
   setup-window-list
   setup-workspace-menu
   manage-existing-windows
   [ concurrent-event-loop ] spawn ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+IN: shells USE: listener : factory f start-factory listener ;

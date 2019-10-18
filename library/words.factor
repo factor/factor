@@ -1,10 +1,14 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+IN: help
+DEFER: remove-word-help
+
 IN: words
-USING: errors graphs hashtables kernel kernel-internals lists
+USING: arrays errors graphs hashtables kernel kernel-internals
 math namespaces sequences strings vectors ;
 
-M: word <=> [ word-name ] 2apply <=> ;
+M: word <=>
+    [ dup word-name swap word-vocabulary 2array ] 2apply <=> ;
 
 GENERIC: definer ( word -- word )
 
@@ -38,25 +42,40 @@ M: word word-xt ( w -- xt ) 7 integer-slot ;
 GENERIC: set-word-xt
 M: word set-word-xt ( xt w -- ) 7 set-integer-slot ;
 
+SYMBOL: vocabularies
+
+: vocab ( name -- vocab ) vocabularies get hash ;
+
+: lookup ( name vocab -- word ) vocab ?hash ;
+
+: target-word ( word -- word )
+    dup word-name swap word-vocabulary lookup ;
+
+: interned? ( word -- ? ) dup target-word eq? ;
+
 : uses ( word -- uses )
-    word-def flatten [ word? ] subset prune ;
+    word-def flatten
+    [ word? ] subset
+    [ global [ interned? ] bind ] subset
+    prune ;
 
 SYMBOL: crossref
 
 : xref-word ( word -- )
-    dup word-vocabulary
-    [ [ uses ] crossref get add-vertex ] [ drop ] if ;
+    dup word-vocabulary [
+        [ uses ] crossref get add-vertex
+    ] [
+        drop
+    ] if ;
 
 : usage ( word -- seq ) crossref get in-edges ;
-
-: usages ( word -- deps ) crossref get closure ;
 
 GENERIC: unxref-word* ( word -- )
 
 M: word unxref-word* drop ;
 
 : unxref-word ( word -- )
-    dup unxref-word* dup usages [ unxref-word* ] each
+    dup [ usage ] closure [ unxref-word* ] each
     [ uses ] crossref get remove-vertex ;
 
 : define ( word parameter primitive -- )
@@ -76,32 +95,29 @@ M: word unxref-word* drop ;
 : reset-props ( word seq -- ) [ remove-word-prop ] each-with ;
 
 : reset-word ( word -- )
-    { "parsing" "inline" "foldable" "flushable" "predicating" }
-    reset-props ;
+    { "parsing" "inline" "foldable" "predicating" } reset-props ;
 
 : reset-generic ( word -- )
     dup reset-word { "methods" "combination" } reset-props ;
 
-M: word literalize <wrapper> ;
+: <word> ( name vocab -- word ) (word) dup init-word ;
 
 : gensym ( -- word )
-    [ "G:" % \ gensym counter # ] "" make
-    f <word> dup init-word ;
+    "G:" \ gensym counter number>string append f <word> ;
+
+: define-temp ( quot -- word )
+    gensym [ swap define-compound ] keep ;
 
 : completions ( substring words -- seq )
     [ word-name subseq? ] subset-with ;
 
 SYMBOL: bootstrapping?
 
-SYMBOL: vocabularies
-
 : word ( -- word ) \ word get-global ;
 
 : set-word ( word -- ) \ word set-global ;
 
 : vocabs ( -- seq ) vocabularies get hash-keys natural-sort ;
-
-: vocab ( name -- vocab ) vocabularies get hash ;
 
 : ensure-vocab ( name -- ) vocabularies get [ nest drop ] bind ;
 
@@ -116,9 +132,7 @@ SYMBOL: vocabularies
     all-words swap subset-with ; inline
 
 : xref-words ( -- )
-    all-words [ uses ] crossref get add-vertices ;
-
-: lookup ( name vocab -- word ) vocab ?hash ;
+    all-words [ uses ] crossref get build-graph ;
 
 : reveal ( word -- )
     vocabularies get [
@@ -131,25 +145,25 @@ SYMBOL: vocabularies
 
 : create ( name vocab -- word )
     2dup check-create 2dup lookup dup
-    [ 2nip ] [ drop <word> dup init-word dup reveal ] if ;
+    [ 2nip ] [ drop <word> dup reveal ] if ;
 
 : constructor-word ( string vocab -- word )
     >r "<" swap ">" append3 r> create ;
 
 : forget ( word -- )
     dup unxref-word
+    dup remove-word-help
+    dup "forget-hook" word-prop call
+    crossref get [ dupd remove-hash ] when*
     dup word-name swap word-vocabulary vocab remove-hash ;
 
 : forget-vocab ( vocab -- )
-    vocabularies get remove-hash xref-words ;
-
-: target-word ( word -- word )
-    dup word-name swap word-vocabulary lookup ;
-
-: interned? ( word -- ? ) dup target-word eq? ;
+    words [ forget ] each ;
 
 : bootstrap-word ( word -- word )
-    dup word-name swap word-vocabulary
     bootstrapping? get [
-        dup "syntax" = [ drop "!syntax" ] when
-    ] when lookup ;
+        dup word-name swap word-vocabulary
+        dup "syntax" = [
+            drop "!syntax" >r "!" swap append r>
+        ] when lookup
+    ] when ;

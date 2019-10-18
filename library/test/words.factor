@@ -1,5 +1,5 @@
 IN: temporary
-USING: arrays generic hashtables kernel lists math namespaces
+USING: arrays errors generic hashtables kernel math namespaces
 sequences test words ;
 
 [ 4 ] [
@@ -29,7 +29,7 @@ DEFER: plist-test
 ] unit-test
 
 [
-    [ t ] [ \ car "car" "lists" lookup = ] unit-test
+    [ t ] [ \ array? "array?" "arrays" lookup = ] unit-test
 
     "test-scope" "scratchpad" create drop
 ] with-scope
@@ -73,7 +73,7 @@ FORGET: forgotten
 FORGET: another-forgotten
 : another-forgotten ;
 
-[ t ] [ \ car interned? ] unit-test
+[ t ] [ \ + interned? ] unit-test
 
 ! I forgot remove-crossref calls!
 : fee ;
@@ -85,12 +85,34 @@ FORGET: another-forgotten
 
 FORGET: foe
 
-! This has to be the last test in the file.
-: test-last ( -- ) ;
-word word-name "last-word-test" set
-
-[ "test-last" ] [ "last-word-test" get ] unit-test
-
 ! xref should not retain references to gensyms
 gensym [ * ] define-compound
 [ t ] [ \ * usage [ interned? not ] subset empty? ] unit-test
+
+DEFER: calls-a-gensym
+\ calls-a-gensym gensym dup "x" set unit define-compound
+[ f ] [ "x" get crossref get hash ] unit-test
+
+! more xref buggery
+[ f ] [
+    GENERIC: xyzzle
+    : a ; \ a
+    M: integer xyzzle a ;
+    FORGET: a
+    M: object xyzzle ;
+    crossref get hash
+] unit-test
+
+! regression
+GENERIC: freakish
+: bar freakish ;
+M: array freakish ;
+[ t ] [ \ bar \ freakish usage member? ] unit-test
+
+DEFER: x
+[ t ] [ [ x ] catch third \ x eq? ] unit-test
+
+! This has to be the last test in the file.
+: test-last ( -- ) ;
+
+[ "test-last" ] [ word word-name ] unit-test

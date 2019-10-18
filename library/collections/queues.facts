@@ -1,13 +1,6 @@
 IN: queues
 USING: help ;
 
-ARTICLE: "queues" "Queues"
-"Last-in-first-out queues can be found in the " { $snippet "queues" } " vocabulary."
-{ $subsection <queue> }
-{ $subsection queue-empty? }
-{ $subsection deque }
-{ $subsection enque } ;
-
 HELP: <queue> "( -- queue )"
 { $values { "queue" "a new queue" } }
 { $description "Makes a new queue with no elements." } ;

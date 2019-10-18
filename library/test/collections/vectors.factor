@@ -1,5 +1,5 @@
 IN: temporary
-USING: errors kernel kernel-internals lists math namespaces
+USING: arrays errors kernel kernel-internals math namespaces
 sequences sequences-internals strings test vectors ;
 
 [ ] [ 10 [ [ -1000000 <vector> ] catch drop ] times ] unit-test
@@ -26,7 +26,7 @@ sequences sequences-internals strings test vectors ;
 
 [ t ] [
     100 [ drop 100 random-int ] map >vector
-    dup >list >vector =
+    dup >array >vector =
 ] unit-test
 
 [ f ] [ V{ } V{ 1 2 3 } = ] unit-test
@@ -34,10 +34,10 @@ sequences sequences-internals strings test vectors ;
 [ f ] [ [ 1 2 ] V{ 1 2 3 } = ] unit-test
 [ f ] [ V{ 1 2 } [ 1 2 3 ] = ] unit-test
 
-[ [ 1 4 9 16 ] ]
+[ { 1 4 9 16 } ]
 [
     [ 1 2 3 4 ]
-    >vector [ dup * ] map >list
+    >vector [ dup * ] map >array
 ] unit-test
 
 [ t ] [ V{ } hashcode V{ } hashcode = ] unit-test
@@ -91,5 +91,5 @@ sequences sequences-internals strings test vectors ;
 [ 4 ] [ 5 V{ 1 2 3 4 5 } index ] unit-test
 
 [ t ] [
-    100 >list dup >vector <reversed> >list >r reverse r> =
+    100 >array dup >vector <reversed> >array >r reverse r> =
 ] unit-test

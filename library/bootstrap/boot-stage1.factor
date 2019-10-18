@@ -1,20 +1,19 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: image
-USING: errors generic hashtables io kernel kernel-internals
-lists math memory namespaces parser prettyprint sequences
-vectors words ;
+USING: arrays errors generic hashtables io kernel
+kernel-internals math memory namespaces parser prettyprint
+sequences vectors words ;
 
 "Bootstrap stage 1..." print flush
 
 "/library/bootstrap/primitives.factor" run-resource
 
 : parse-resource* ( path -- )
-    [ parse-resource ] catch [
-        dup error.
-        "Try again? [yn]" print flush readln "yY" subseq?
-        [ drop parse-resource* ] [ rethrow ] if
-    ] when* ;
+    [ parse-resource ] [
+        { { "Parse file again" t } } condition drop
+        parse-resource*
+    ] recover ;
 
 : if-arch ( arch seq -- )
     architecture get rot member?
@@ -41,20 +40,20 @@ vectors words ;
         "/library/collections/growable.factor"
         "/library/collections/virtual-sequences.factor"
         "/library/collections/sequence-combinators.factor"
-        "/library/collections/sequences-epilogue.factor"
         "/library/collections/arrays.factor"
+        "/library/collections/sequences-epilogue.factor"
         "/library/collections/strings.factor"
         "/library/collections/sbuf.factor"
         "/library/collections/vectors.factor"
         "/library/collections/hashtables.factor"
         "/library/collections/namespaces.factor"
-        "/library/collections/sequence-eq.factor"
         "/library/collections/slicing.factor"
         "/library/collections/sequence-sort.factor"
-        "/library/collections/lists.factor"
         "/library/collections/flatten.factor"
         "/library/collections/queues.factor"
         "/library/collections/graphs.factor"
+
+        "/library/quotations.factor"
 
         "/library/math/random.factor"
         "/library/math/constants.factor"
@@ -73,14 +72,15 @@ vectors words ;
         "/library/io/duplex-stream.factor"
         "/library/io/stdio.factor"
         "/library/io/null-stream.factor"
-        "/library/io/plain-stream.factor"
+        "/library/io/nested-style.factor"
         "/library/io/lines.factor"
+        "/library/io/plain-stream.factor"
         "/library/io/string-streams.factor"
         "/library/io/c-streams.factor"
         "/library/io/files.factor"
         "/library/io/binary.factor"
 
-        "/library/syntax/parser.factor"
+        "/library/syntax/early-parser.factor"
 
         "/library/generic/generic.factor"
         "/library/generic/standard-combination.factor"
@@ -92,26 +92,27 @@ vectors words ;
         
         "/library/syntax/prettyprint.factor"
         "/library/syntax/see.factor"
+        "/library/syntax/parser.factor"
 
         "/library/tools/interpreter.factor"
-        
-        "/library/help/stylesheet.factor"
-        "/library/help/help.factor"
-        "/library/help/markup.factor"
-        "/library/help/word-help.factor"
-        "/library/help/crossref.factor"
-        "/library/help/syntax.factor"
-        
         "/library/tools/describe.factor"
         "/library/tools/debugger.factor"
+        
+        "/library/help/stylesheet.factor"
+        "/library/help/topics.factor"
+        "/library/help/markup.factor"
+        "/library/help/help.factor"
+        "/library/help/porter-stemmer.factor"
+        "/library/help/search.factor"
+        "/library/help/syntax.factor"
 
         "/library/syntax/parse-stream.factor"
-        
+
         "/library/tools/memory.factor"
         "/library/tools/listener.factor"
+        "/library/tools/inspector.factor"
         "/library/tools/walker.factor"
-
-        "/library/tools/annotations.factor"
+        "/library/tools/word-tools.factor"
         
         "/library/test/test.factor"
 
@@ -155,6 +156,7 @@ vectors words ;
         "/library/io/buffer.factor"
 
         "/library/cli.factor"
+        "/library/modules.factor"
         
         "/library/bootstrap/init.factor"
         "/library/bootstrap/image.factor"
@@ -162,55 +164,71 @@ vectors words ;
         ! This must be the last file of parsing words loaded
         "/library/syntax/parse-syntax.factor"
 
-        "/library/opengl/gl.factor"
-        "/library/opengl/glu.factor"
-        "/library/opengl/opengl-utils.factor"
+        "/library/ui/opengl/gl.factor"
+        "/library/ui/opengl/glu.factor"
+        "/library/ui/opengl/opengl-utils.factor"
 
-        "/library/freetype/freetype.factor"
-        "/library/freetype/freetype-gl.factor"
+        "/library/ui/freetype/freetype.factor"
+        "/library/ui/freetype/freetype-gl.factor"
 
+        "/library/ui/models.factor"
         "/library/ui/backend.factor"
         "/library/ui/timers.factor"
         "/library/ui/gadgets.factor"
         "/library/ui/layouts.factor"
         "/library/ui/hierarchy.factor"
-        "/library/ui/frames.factor"
+        "/library/ui/gadgets/grids.factor"
+        "/library/ui/gadgets/frames.factor"
         "/library/ui/world.factor"
         "/library/ui/paint.factor"
-        "/library/ui/theme.factor"
-        "/library/ui/labels.factor"
         "/library/ui/gestures.factor"
-        "/library/ui/borders.factor"
-        "/library/ui/buttons.factor"
-        "/library/ui/line-editor.factor"
-        "/library/ui/sliders.factor"
-        "/library/ui/scrolling.factor"
-        "/library/ui/editors.factor"
-        "/library/ui/splitters.factor"
-        "/library/ui/incremental.factor"
-        "/library/ui/paragraphs.factor"
-        "/library/ui/panes.factor"
-        "/library/ui/outliner.factor"
-        "/library/ui/environment.factor"
-        "/library/ui/listener.factor"
-        "/library/ui/browser.factor"
-        "/library/ui/launchpad.factor"
-        "/library/ui/presentations.factor"
+        "/library/ui/gadgets/controls.factor"
+        "/library/ui/gadgets/grid-lines.factor"
+        "/library/ui/gadgets/theme.factor"
+        "/library/ui/gadgets/labels.factor"
+        "/library/ui/gadgets/borders.factor"
+        "/library/ui/gadgets/buttons.factor"
+        "/library/ui/gadgets/tiles.factor"
+        "/library/ui/gadgets/sliders.factor"
+        "/library/ui/gadgets/viewports.factor"
+        "/library/ui/gadgets/scrolling.factor"
+        "/library/ui/gadgets/tracks.factor"
+        "/library/ui/gadgets/incremental.factor"
+        "/library/ui/gadgets/paragraphs.factor"
+        "/library/ui/gadgets/panes.factor"
+        "/library/ui/gadgets/books.factor"
+        "/library/ui/gadgets/outliner.factor"
+        "/library/ui/text/document.factor"
+        "/library/ui/text/elements.factor"
+        "/library/ui/text/editor.factor"
+        "/library/ui/text/commands.factor"
+        "/library/ui/text/field.factor"
+        "/library/ui/text/interactor.factor"
+        "/library/ui/ui.factor"
+        "/library/ui/gadgets/presentations.factor"
+        "/library/ui/tools/listener.factor"
+        "/library/ui/tools/search.factor"
+        "/library/ui/tools/browser.factor"
+        "/library/ui/tools/help.factor"
+        "/library/ui/tools/launchpad.factor"
 
         "/library/continuations.facts"
         "/library/errors.facts"
         "/library/kernel.facts"
+        "/library/modules.facts"
+        "/library/quotations.facts"
         "/library/threads.facts"
         "/library/words.facts"
         "/library/bootstrap/image.facts"
+        "/library/bootstrap/init.facts"
         "/library/collections/growable.facts"
         "/library/collections/arrays.facts"
+        "/library/collections/graphs.facts"
         "/library/collections/hashtables.facts"
         "/library/collections/namespaces.facts"
         "/library/collections/queues.facts"
         "/library/collections/sbuf.facts"
         "/library/collections/sequence-combinators.facts"
-        "/library/collections/sequence-eq.facts"
         "/library/collections/sequence-sort.facts"
         "/library/collections/sequences-epilogue.facts"
         "/library/collections/sequences.facts"
@@ -226,6 +244,7 @@ vectors words ;
         "/library/compiler/alien/malloc.facts"
         "/library/compiler/alien/structs.facts"
         "/library/compiler/alien/syntax.facts"
+        "/library/compiler/generator/assembler.facts"
         "/library/compiler/inference/inference.facts"
         "/library/compiler/compiler.facts"
         "/library/generic/early-generic.facts"
@@ -234,6 +253,11 @@ vectors words ;
         "/library/generic/slots.facts"
         "/library/generic/standard-combination.facts"
         "/library/generic/tuple.facts"
+        "/library/help/help.facts"
+        "/library/help/markup.facts"
+        "/library/help/search.facts"
+        "/library/help/syntax.facts"
+        "/library/help/topics.facts"
         "/library/io/binary.facts"
         "/library/io/buffer.facts"
         "/library/io/c-streams.facts"
@@ -258,24 +282,31 @@ vectors words ;
         "/library/math/ratio.facts"
         "/library/math/trig-hyp.facts"
         "/library/math/vectors.facts"
+        "/library/syntax/early-parser.facts"
         "/library/syntax/parse-stream.facts"
         "/library/syntax/parser.facts"
         "/library/syntax/parse-syntax.facts"
         "/library/syntax/prettyprint.facts"
         "/library/syntax/see.facts"
         "/library/test/test.facts"
-        "/library/tools/annotations.facts"
+        "/library/tools/word-tools.facts"
         "/library/tools/debugger.facts"
         "/library/tools/describe.facts"
+        "/library/tools/inspector.facts"
         "/library/tools/listener.facts"
         "/library/tools/memory.facts"
         "/library/tools/walker.facts"
 
         "/doc/handbook/alien.facts"
         "/doc/handbook/changes.facts"
+        "/doc/handbook/cli.facts"
         "/doc/handbook/collections.facts"
+        "/doc/handbook/conventions.facts"
+        "/doc/handbook/cookbook.facts"
         "/doc/handbook/dataflow.facts"
         "/doc/handbook/handbook.facts"
+        "/doc/handbook/hashtables.facts"
+        "/doc/handbook/help.facts"
         "/doc/handbook/math.facts"
         "/doc/handbook/objects.facts"
         "/doc/handbook/parser.facts"
@@ -284,14 +315,12 @@ vectors words ;
         "/doc/handbook/streams.facts"
         "/doc/handbook/syntax.facts"
         "/doc/handbook/tools.facts"
-        "/doc/handbook/tutorial.facts"
         "/doc/handbook/words.facts"
     } [ parse-resource* % ] each
     
     { "x86" "pentium4" } {
         "/library/compiler/x86/assembler.factor"
         "/library/compiler/x86/architecture.factor"
-        "/library/compiler/x86/alien.factor"
         "/library/compiler/x86/intrinsics.factor"
     } if-arch
     
@@ -322,10 +351,12 @@ vectors words ;
 ] [ ] make
 
 vocabularies get [
-    "!syntax" get "syntax" set
-
-    "syntax" get hash-values [ word? ] subset
-    [ "syntax" swap set-word-vocabulary ] each
+    "!syntax" get hash>alist [
+        first2
+        "syntax" over set-word-vocabulary
+        >r "!" ?head drop r> 2dup set-word-name
+        2array
+    ] map alist>hash "syntax" set
 ] bind
 
 "!syntax" vocabularies get remove-hash

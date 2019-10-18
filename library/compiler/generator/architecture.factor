@@ -88,11 +88,11 @@ DEFER: %move-int>float ( dst src -- )
 ! FFI stuff
 DEFER: %unbox ( n reg-class func -- )
 
-DEFER: %unbox-struct ( n reg-class size -- )
+DEFER: %unbox-struct ( n size -- )
 
 DEFER: %box ( n reg-class func -- )
 
-DEFER: %box-struct ( n reg-class size -- )
+DEFER: %box-struct ( n size -- )
 
 GENERIC: %freg>stack ( stack reg reg-class -- )
 

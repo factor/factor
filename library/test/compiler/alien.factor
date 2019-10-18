@@ -67,3 +67,10 @@ FUNCTION: int ffi_test_12 int a int b rect c int d int e int f ; compiled
 FUNCTION: int ffi_test_13 int a int b int c int d int e int f int g int h int i int j int k ; compiled
 
 [ 66 ] [ 1 2 3 4 5 6 7 8 9 10 11 ffi_test_13 ] unit-test
+
+FUNCTION: foo ffi_test_14 int x int y ;
+
+cpu "x86" = macosx? and [
+    \ ffi_test_14 compile
+    [ 11 6 ] [ 11 6 ffi_test_14 dup foo-x swap foo-y ] unit-test
+] when

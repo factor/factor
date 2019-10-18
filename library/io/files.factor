@@ -1,7 +1,7 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: io
-USING: hashtables kernel lists math memory namespaces sequences
+USING: hashtables kernel math memory namespaces sequences
 strings styles ;
 
 ! Words for accessing filesystem meta-data.
@@ -11,7 +11,7 @@ strings styles ;
 
 : exists? ( file -- ? ) stat >boolean ;
 
-: directory? ( file -- ? ) stat car ;
+: directory? ( file -- ? ) stat first ;
 
 : directory ( dir -- list )
     (directory)
@@ -26,18 +26,19 @@ strings styles ;
 : resource-path ( path -- path )
     image parent-dir swap path+ ;
 
-: <resource-stream> ( path -- stream )
-    #! Open a file path relative to the Factor source code root.
+: <resource-reader> ( path -- stream )
     resource-path <file-reader> ;
 
+TUPLE: pathname string ;
+
 : (file.) ( name path -- )
-    file associate [ format* ] with-style ;
+    <pathname> write-object ;
 
 DEFER: directory.
 
 : (directory.) ( name path -- )
-    dup [ directory. ] curry
-    [ "/" append (file.) ] write-outliner terpri ;
+    >r "/" append r> dup <pathname> swap [ directory. ] curry
+    write-outliner terpri ;
 
 : file. ( dir name -- )
     tuck path+

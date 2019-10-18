@@ -1,4 +1,4 @@
-USING: alien io kernel lists math prettyprint sequences
+USING: alien io kernel math prettyprint sequences
 test words inference namespaces vectors ;
 IN: temporary
 
@@ -83,4 +83,10 @@ TUPLE: cat gender declawed? castrated? ;
         10 margin set
         T{ cat f "m" t f } unparse
     ] with-scope
+] unit-test
+
+[ "[ 1 2 >> + << ]" ]
+[
+    [ 1 2 + ] dup hilite-quotation set 2 hilite-index set
+    [ pprint ] string-out
 ] unit-test

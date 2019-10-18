@@ -1,14 +1,11 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: generic
-USING: arrays errors hashtables kernel kernel-internals lists
+USING: arrays errors hashtables kernel kernel-internals
 math namespaces parser sequences sequences-internals strings
 vectors words ;
 
 IN: kernel-internals
-
-: class-tuple ( object -- class )
-    dup tuple? [ 2 slot ] [ drop f ] if ; inline
 
 : tuple= ( tuple tuple -- ? )
     2dup [ array-capacity ] 2apply number= [
@@ -18,19 +15,17 @@ IN: kernel-internals
         2drop f
     ] if ;
 
-: tuple-hashcode ( n tuple -- n )
-    dup class-tuple hashcode >r >r 1-
-    r> 4 slot hashcode* r> bitxor ;
-
 IN: generic
 
 : class ( object -- class )
     dup tuple? [ 2 slot ] [ type type>class ] if ; inline
 
 : tuple-predicate ( word -- )
-    dup predicate-word
-    [ \ class-tuple , over literalize , \ eq? , ] [ ] make
-    define-predicate ;
+    dup predicate-word [
+        [ dup tuple? ] %
+        [ [ 2 slot ] % over literalize , \ eq? , ] [ ] make ,
+        [ [ drop f ] if ] %
+    ] [ ] make define-predicate ;
 
 : forget-tuple ( class -- )
     dup forget "predicate" word-prop first [ forget ] when* ;
@@ -58,15 +53,18 @@ PREDICATE: word tuple-class "tuple-size" word-prop ;
     tuple-class? [ "Not a tuple class" throw ] unless ;
 
 : define-constructor ( word class def -- )
-    over check-tuple-class >r [
-        dup literalize , "tuple-size" word-prop , \ make-tuple ,
-    ] [ ] make r> append define-compound ;
+    pick reset-generic
+    swap dup check-tuple-class [
+        dup literalize ,
+        "tuple-size" word-prop ,
+        \ <tuple> , %
+    ] [ ] make define-compound ;
 
 : default-constructor ( tuple -- )
-    [ create-constructor ] keep dup [
-        "slots" word-prop 1 swap tail-slice reverse-slice
-        [ peek unit , \ keep , ] each
-    ] [ ] make define-constructor ;
+    [ create-constructor ] keep
+    dup "slots" word-prop unclip drop <reversed>
+    [ [ tuck ] swap peek add ] map concat >quotation
+    define-constructor ;
 
 : define-tuple ( tuple slots -- )
     2dup check-shape
@@ -81,14 +79,7 @@ PREDICATE: word tuple-class "tuple-size" word-prop ;
 M: tuple clone ( tuple -- tuple )
     (clone) dup delegate clone over set-delegate ;
 
-M: tuple hashcode* ( n tuple -- n )
-    {
-        { [ over 0 <= ] [ 2drop 0 ] }
-        { [ dup array-capacity 2 <= ] [ nip class hashcode ] }
-        { [ t ] [ tuple-hashcode ] }
-    } cond ;
-
-M: tuple hashcode ( tuple -- n ) 2 swap hashcode* ;
+M: tuple hashcode ( tuple -- n ) class hashcode ;
 
 M: tuple = ( obj tuple -- ? )
     2dup eq?

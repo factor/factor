@@ -1,18 +1,18 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays generic hashtables kernel lists math
+USING: arrays generic hashtables kernel models math
 namespaces sequences styles ;
 
 SYMBOL: origin
 
-{ 0 0 0 } origin set-global
+{ 0 0 } origin set-global
 
 TUPLE: rect loc dim ;
 
 M: array rect-loc ;
 
-M: array rect-dim drop { 0 0 0 } ;
+M: array rect-dim drop { 0 0 } ;
 
 : rect-bounds ( rect -- loc dim ) dup rect-loc swap rect-dim ;
 
@@ -21,9 +21,7 @@ M: array rect-dim drop { 0 0 0 } ;
 : 2rect-extent ( rect rect -- loc1 loc2 ext1 ext2 )
     [ rect-extent ] 2apply swapd ;
 
-: |v-| ( vec vec -- vec ) v- [ 0 max ] map ;
-
-: <extent-rect> ( loc ext -- rect ) dupd swap |v-| <rect> ;
+: <extent-rect> ( loc ext -- rect ) dupd swap [v-] <rect> ;
 
 : >absolute ( rect -- rect )
     rect-bounds >r origin get v+ r> <rect> ;
@@ -35,27 +33,28 @@ M: array rect-dim drop { 0 0 0 } ;
     (rect-intersect) <extent-rect> ;
 
 : intersects? ( rect/point rect -- ? )
-    (rect-intersect) v- [ 0 <= ] all? ;
+    (rect-intersect) [v-] { 0 0 } = ;
 
-: rect-union ( rect rect -- rect )
-    2rect-extent vmax >r vmin r> <extent-rect> ;
-
+! gadget-pref-dim is a cached value; call pref-dim instead
+! gadget-children is a vector
+! gadget-orientation is { 1 0 } or { 0 1 }
+! gadget-state is f, relayout or relayout-1
+! gadget-root? relayout requests do not propogate higher
+! gadget-grafted? are we part of a live world's gadget hierarchy
+! gadget-interior, gadget-boundary: see paint.factor
 TUPLE: gadget
-    pref-dim parent children orientation
-    gestures visible? relayout? root?
-    interior boundary ;
-
-: show-gadget t swap set-gadget-visible? ;
-
-: hide-gadget f swap set-gadget-visible? ;
+pref-dim parent children orientation state
+visible? root? clipped? grafted?
+interior boundary ;
 
 M: gadget = eq? ;
 
 : gadget-child gadget-children first ;
 
 C: gadget ( -- gadget )
-    { 0 0 0 } dup <rect> over set-delegate dup show-gadget
-    { 0 1 0 } over set-gadget-orientation ;
+    { 0 0 } dup <rect> over set-delegate
+    { 0 1 } over set-gadget-orientation
+    t over set-gadget-visible? ;
 
 : delegate>gadget ( tuple -- ) <gadget> swap set-delegate ;
 
@@ -73,20 +72,20 @@ M: gadget children-on ( rect/point gadget -- list )
     [ >absolute intersects? ] [ 2drop f ] if ;
 
 : pick-up-list ( rect/point gadget -- gadget/f )
-    dupd children-on reverse-slice [ inside? ] find-with nip ;
+    dupd children-on <reversed> [ inside? ] find-with nip ;
 
 : translate ( rect/point -- new-origin )
-    rect-loc origin [ v+ dup ] change ;
+    rect-loc origin [ v+ ] change ;
 
 : pick-up ( rect/point gadget -- gadget )
     [
         2dup inside? [
-            dup translate drop 2dup pick-up-list dup
+            dup translate 2dup pick-up-list dup
             [ nip pick-up ] [ rot 2drop ] if
         ] [ 2drop f ] if
     ] with-scope ;
 
-: max-dim ( dims -- dim ) { 0 0 0 } [ vmax ] reduce ;
+: max-dim ( dims -- dim ) { 0 0 } [ vmax ] reduce ;
 
 : each-child ( gadget quot -- )
     >r gadget-children r> each ; inline
@@ -101,3 +100,11 @@ M: gadget children-on ( rect/point gadget -- list )
 GENERIC: gadget-help
 
 M: gadget gadget-help drop f ;
+
+: with-gadget ( gadget quot -- )
+    [ swap gadget set call ] with-scope ; inline
+
+! Title bar protocol
+GENERIC: gadget-title ( gadget -- string )
+
+M: gadget gadget-title drop "Factor" <model> ;

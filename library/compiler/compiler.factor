@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
-USING: errors hashtables inference io kernel lists math
-namespaces optimizer prettyprint sequences test words ;
+USING: errors hashtables inference io kernel math namespaces
+optimizer prettyprint sequences test threads words ;
 
 : (compile) ( word -- )
     dup specialized-def dataflow optimize generate ;
@@ -34,7 +34,6 @@ namespaces optimizer prettyprint sequences test words ;
 : recompile ( word -- ) dup update-xt compile ;
 
 : compile-quot ( quot -- word )
-    gensym [ swap define-compound ] keep
-    "compile" get [ dup compile ] when ;
+    define-temp "compile" get [ dup compile ] when ;
 
 : compile-1 ( quot -- ) compile-quot execute ;

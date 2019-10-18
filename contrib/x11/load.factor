@@ -1,8 +1,5 @@
-USING: kernel parser words compiler sequences ;
+REQUIRES: concurrency ;
 
-{
-    "rectangle" "xlib" "x" "draw-string"
-    "concurrent-widgets" "glx"  "gl"
-} [ "/contrib/x11/" swap ".factor" append3 run-resource ] each
-
-{ "xlib" "x11" } [ words [ try-compile ] each ] each
+PROVIDE: x11 {
+    "rectangle.factor" "x.factor" "draw-string.factor" "concurrent-widgets.factor" "gl.factor"
+} ;

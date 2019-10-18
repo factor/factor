@@ -42,7 +42,7 @@ kernel-internals math namespaces sequences words ;
 
 : reverse-each-parameter ( parameters quot -- )
     >r [ parameter-sizes ] keep
-    [ reverse-slice ] 2apply r> 2each ; inline
+    [ <reversed> ] 2apply r> 2each ; inline
 
 : reset-freg-counts ( -- )
     0 { int-regs float-regs stack-params } [ set ] each-with ;

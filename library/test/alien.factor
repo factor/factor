@@ -49,7 +49,16 @@ cell 8 = [
     ] unit-test
 ] when
 
+[ "\u00ff" ]
+[ "\u00ff" string>char-alien alien>char-string ]
+unit-test
+
 [ "hello world" ]
-[ "hello world" string>alien alien>string ] unit-test
+[ "hello world" string>char-alien alien>char-string ]
+unit-test
+
+[ "hello\uabcdworld" ]
+[ "hello\uabcdworld" string>u16-alien alien>u16-string ]
+unit-test
 
 [ t ] [ f expired? ] unit-test

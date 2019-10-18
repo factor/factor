@@ -13,7 +13,6 @@ implementation. It is not an introduction to the language itself.
 - Running Factor on Mac OS X
 - Running Factor on Windows
 - Source organization
-- Learning Factor
 - Community
 - Credits
 
@@ -23,19 +22,21 @@ Factor is fully supported on the following platforms:
 
   Linux/x86
   Linux/AMD64
+  Mac OS X/x86
   Mac OS X/PowerPC
-  Solaris/x86
-  Microsoft Windows 2000 or later
+  MS Windows XP
 
 The following platforms should work, but are not tested on a
 regular basis:
 
   FreeBSD/x86
   FreeBSD/AMD64
-  Linux/PowerPC
+  Solaris/x86
   Solaris/AMD64
+  Linux/PowerPC
 
-Other platforms are not supported.
+Please donate time or hardware if you wish to see Factor running on
+other platforms.
 
 * Compiling Factor
 
@@ -47,12 +48,13 @@ Factor requires gcc 3.4 or later. On x86, it /will not/ build using gcc
 Run 'make' (or 'gmake' on non-Linux platforms) with one of the following
 parameters to build the Factor runtime:
 
-  bsd
-  linux
+  freebsd
+  linux-x86
+  linux-amd64
   linux-ppc
-  macosx
+  macosx-x86
+  macosx-ppc
   solaris
-  windows
 
 The following options can be given to make:
 
@@ -76,9 +78,10 @@ Compilation will yield an executable named 'f'.
 
 * Building Factor
 
-The Factor source distribution ships with three boot image files:
+The Factor source distribution ships with four boot image files:
 
   boot.image.x86
+  boot.image.pentium4 -- uses SSE2, only for Pentium 4 and later
   boot.image.ppc
   boot.image.amd64
 
@@ -88,9 +91,6 @@ system using the image that corresponds to your CPU architecture.
 The system is bootstrapped with the following command line:
 
 ./f boot.image.<foo>
-
-Additional options may be specified to load external C libraries; see
-the next section for details.
 
 Bootstrap can take a while, depending on your system. When the process
 completes, a 'factor.image' file will be generated. Note that this image
@@ -141,29 +141,22 @@ between PowerPC Macs.
 
 * Running Factor on Windows
 
-On Windows, double-clicking f.exe will start running the Win32-based UI
-with the factor.image in the same directory as the executable.
+If you did not download the binary package, you can bootstrap Factor in
+the command prompt:
 
-Bootstrap runs in a Windows command prompt, however after bootstrapping
-only the UI can be used.
+  f.exe boot.image.pentium4 (or boot.image.x86)
+
+Once bootstrapped, double-clicking f.exe starts the Factor UI. There is
+no option to run the listener in the command prompt on Windows.
 
 * Source organization
 
   doc/ - the developer's handbook, and various other bits and pieces
-  native/ - sources for the Factor runtime, written in C
-  library/ - sources for the library, written in Factor
   contrib/ - various handy libraries not part of the core
   examples/ - small examples illustrating various language features
   fonts/ - TrueType fonts used by UI
-
-* Learning Factor
-
-The UI has a tutorial and defailed reference documentation. You can
-browse it in the UI or by running the HTTP server (contrib/httpd).
-
-You can browse the source code; it is organized into small,
-well-commented files and should be easy to follow once you have a good
-grasp of the language.
+  library/ - sources for the library, written in Factor
+  vm/ - sources for the Factor runtime, written in C
 
 * Community
 
@@ -179,7 +172,9 @@ The following people have contributed code to the Factor core:
 
 Slava Pestov:       Lead developer
 Alex Chapman:       OpenGL binding
-Doug Coleman:       Mersenne Twister random number generator
+Doug Coleman:       Mersenne Twister RNG, Windows port
+Eduardo Cavazos:    X11 binding
+Joshua Grams:       PowerPC instruction cache flush code
 Mackenzie Straight: Windows port
 Trent Buck:         Debian package
 

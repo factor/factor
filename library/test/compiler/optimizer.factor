@@ -1,5 +1,5 @@
 USING: arrays assembler compiler generic
-hashtables inference kernel kernel-internals lists math
+hashtables inference kernel kernel-internals math
 optimizer prettyprint sequences strings test vectors words
 sequences-internals ;
 IN: temporary
@@ -107,7 +107,7 @@ USE: optimizer
 [ string ] [
     \ string
     [ integer string array reversed sbuf
-    slice vector general-list ]
+    slice vector quotation ]
     [ class-compare ] sort min-class
 ] unit-test
 
@@ -136,48 +136,39 @@ USE: optimizer
 ] unit-test
 
 GENERIC: xyz
-M: cons xyz xyz ;
+M: array xyz xyz ;
 
 [ ] [ \ xyz compile ] unit-test
 
 ! Test predicate inlining
 : pred-test-1
-    dup cons? [
-        dup general-list? [ "general-list" ] [ "nope" ] if
-    ] [
-        "not a cons"
-    ] if ; compiled
-
-[ [[ 1 2 ]] "general-list" ] [ [[ 1 2 ]] pred-test-1 ] unit-test
-
-: pred-test-2
     dup fixnum? [
         dup integer? [ "integer" ] [ "nope" ] if
     ] [
         "not a fixnum"
     ] if ; compiled
 
-[ 1 "integer" ] [ 1 pred-test-2 ] unit-test
+[ 1 "integer" ] [ 1 pred-test-1 ] unit-test
 
 TUPLE: pred-test ;
 
-: pred-test-3
+: pred-test-2
     dup tuple? [
         dup pred-test? [ "pred-test" ] [ "nope" ] if
     ] [
         "not a tuple"
     ] if ; compiled
 
-[ T{ pred-test } "pred-test" ] [ T{ pred-test } pred-test-3 ] unit-test
+[ T{ pred-test } "pred-test" ] [ T{ pred-test } pred-test-2 ] unit-test
 
-: pred-test-4
+: pred-test-3
     dup pred-test? [
         dup tuple? [ "pred-test" ] [ "nope" ] if
     ] [
         "not a tuple"
     ] if ; compiled
 
-[ T{ pred-test } "pred-test" ] [ T{ pred-test } pred-test-4 ] unit-test
+[ T{ pred-test } "pred-test" ] [ T{ pred-test } pred-test-3 ] unit-test
 
 ! : inline-test
 !     "nom" = ; compiled
@@ -204,12 +195,6 @@ TUPLE: pred-test ;
 [ 3 ] [ t bad-kill-2 ] unit-test
 
 ! regression
-: bleh 3 ;
-: blah over cons? [ bleh >r 2cdr r> ] [ 2drop f f f ] if ; compiled
-
-[ f ] [ [ 1 2 3 ] [ 1 3 2 ] blah drop 2car = ] unit-test
-
-! regression
 : (the-test) dup 0 > [ 1- (the-test) ] when ; inline
 : the-test 2 dup (the-test) ; compiled
 
@@ -230,7 +215,7 @@ TUPLE: pred-test ;
 : double-label-1
     [ f double-label-1 ] [ swap nth-unsafe ] if ; inline
 : double-label-2
-    dup general-list? [ ] [ ] if 0 t double-label-1 ; compiled
+    dup array? [ ] [ ] if 0 t double-label-1 ; compiled
 
 [ 0 ] [ 10 double-label-2 ] unit-test
 

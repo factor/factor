@@ -31,12 +31,10 @@
 IN: sqlite
 USE: kernel
 USE: alien
-USE: compiler
 USE: errors
 USE: strings
 USE: namespaces
 USE: sequences
-USE: lists
 USE: compiler
 
 BEGIN-STRUCT: sqlite3
@@ -254,12 +252,8 @@ END-STRUCT
   pick sqlite3_step step-complete? [ 
     2nip
   ] [
-    >r 2dup call r> cons (sqlite-map)
+    >r 2dup call r> curry (sqlite-map)
   ] if ;
 
 : sqlite-map ( statement quot -- )
   [ ] (sqlite-map) ;
-
-
-USE: words
-"sqlite" words [ try-compile ] each

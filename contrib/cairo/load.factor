@@ -1,13 +1,3 @@
-IN: scratchpad
-USING: alien kernel parser compiler words sequences ;
+USING: alien ;
 
-{ 
-    { "cairo" "libcairo" }
-    { "sdl-gfx" "libSDL_gfx" }
-    { "sdl" "libSDL" }
-} [ first2 add-simple-library ] each
-
-{ 
-    "cairo"
-    "cairo_sdl"
-} [ "/contrib/cairo/" swap ".factor" append3 run-resource ] each
+PROVIDE: cairo { "cairo.factor" } ;

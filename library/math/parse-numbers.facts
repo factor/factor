@@ -1,33 +1,38 @@
-USING: help math prettyprint ;
+USING: help math math-internals prettyprint ;
 
-HELP: base> "( str radix -- n )"
-{ $values { "str" "a string" } { "radix" "an integer between 2 and 36" } { "n" "a real number" } }
-{ $description "Creates a real number from a string representation with the given radix. The radix is ignored for floating point literals; they are always taken to be in base 10." }
-{ $errors "Throws an error if the string cannot be interpreted as a number in the given base." }
+HELP: base> "( str radix -- n/f )"
+{ $values { "str" "a string" } { "radix" "an integer between 2 and 36" } { "n/f" "a real number or " { $link f } } }
+{ $description "Creates a real number from a string representation with the given radix. The radix is ignored for floating point literals; they are always taken to be in base 10."
+$terpri
+"Outputs " { $link f } " if the string does not represent a number." }
 { $see-also >base } ;
 
 HELP: string>number "( str -- n )"
-{ $values { "str" "a string" } { "n" "a real number" } }
-{ $description "Creates a real number from a string representation of a number in base 10." }
-{ $errors "Throws an error if the string cannot be interpreted as a number in base 10." }
+{ $values { "str" "a string" } { "n/f" "a real number or " { $link f } } }
+{ $description "Creates a real number from a string representation of a number in base 10."
+$terpri
+"Outputs " { $link f } " if the string does not represent a number." }
 { $see-also number>string } ;
 
 HELP: bin> "( str -- n )"
-{ $values { "str" "a string" } { "n" "a real number" } }
-{ $description "Creates a real number from a string representation of a number in base 2." }
-{ $errors "Throws an error if the string cannot be interpreted as a number in base 2." }
+{ $values { "str" "a string" } { "n/f" "a real number or " { $link f } } }
+{ $description "Creates a real number from a string representation of a number in base 2."
+$terpri
+"Outputs " { $link f } " if the string does not represent a number." }
 { $see-also POSTPONE: BIN: } ;
 
 HELP: oct> "( str -- n )"
-{ $values { "str" "a string" } { "n" "a real number" } }
-{ $description "Creates a real number from a string representation of a number in base 8." }
-{ $errors "Throws an error if the string cannot be interpreted as a number in base 8." }
+{ $values { "str" "a string" } { "n/f" "a real number or " { $link f } } }
+{ $description "Creates a real number from a string representation of a number in base 8."
+$terpri
+"Outputs " { $link f } " if the string does not represent a number." }
 { $see-also POSTPONE: OCT: } ;
 
 HELP: hex> "( str -- n )"
 { $values { "str" "a string" } { "n" "a real number" } }
-{ $description "Creates a real number from a string representation of a number in base 16." }
-{ $errors "Throws an error if the string cannot be interpreted as a number in base 16." }
+{ $description "Creates a real number from a string representation of a number in base 16."
+$terpri
+"Outputs " { $link f } " if the string does not represent a number." }
 { $see-also POSTPONE: HEX: } ;
 
 HELP: >base "( n radix -- str )"
@@ -53,3 +58,13 @@ HELP: >hex "( n -- str )"
 { $values { "n" "a real number" } { "str" "a string" } }
 { $description "Outputs a string representation of a number using base 16." } 
 { $see-also .h } ;
+
+HELP: string>float "( n -- str )"
+{ $values { "str" "a string" } { "n/f" "a real number or " { $link f } } }
+{ $description "Primitive for creating a float from a string representation. User code should call " { $link string>number } " instead, since it is polymorphic and can handle other types of numbers."
+$terpri
+"Outputs " { $link f } " if the string does not represent a float." } ;
+
+HELP: float>string "( n -- str )"
+{ $values { "n" "a real number" } { "str" "a string" } }
+{ $description "Primitive for getting a string representation of a float. User code should call " { $link number>string } " instead, since it is polymorphic and can handle other types of numbers." } ;

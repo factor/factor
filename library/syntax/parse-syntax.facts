@@ -1,4 +1,4 @@
-USING: generic help kernel math words ;
+USING: generic help kernel math modules parser words ;
 
 HELP: parsing ""
 { $description "Declares the most recently defined word as a parsing word." }
@@ -11,54 +11,35 @@ HELP: inline ""
     "The compiler copies the definitions of inline words directly into the word being compiled. Combinators must be inlined in order to compile. For any other word, inlining is merely an optimization. Inlining does not affect the execution of the word in the interpreter."
 } ;
 
-HELP: flushable ""
-{ $description
-    "Declares that the most recently defined word may be removed if the value it computes is unused."
-    $terpri
-    "Flushable words must be side-effect-free; that is, their outputs must solely depend on inputs, and they must not modify their inputs, or any other object visible outside the dynamic extent of the flushable word. A pathological case of is when a word with no outputs is declared flushable, in which case calls to this word will " { $emphasis "never" } " be compiled in."
-} ;
-
 HELP: foldable ""
 { $description
-    "Declares that the most recently defined word can be evaluated at compile-time. Foldable words are always " { $link POSTPONE: flushable } "."
-    $terpri
-    "Foldable words are evaluated at compile time if all inputs are literal. Foldable words must satisfy a very strong contract:"
+    "Declares that the most recently defined word may be evaluated at compile-time if all inputs are literal. Foldable words must satisfy a very strong contract:"
     { $list
-        { "foldable words must satisfy the contract of " { $link POSTPONE: flushable } " words," }
-        { "foldable words must halt - for example, a word computing a series until it coverges should not be foldable, since compilation will not halt in the event the series does not converge." }
-        { "both inputs and outputs of foldable words must be immutable." }
+        "foldable words must not have any observable side effects,"
+        "foldable words must halt - for example, a word computing a series until it coverges should not be foldable, since compilation will not halt in the event the series does not converge."
+        "both inputs and outputs of foldable words must be immutable."
     }
-    "The last restriction ensures that words such as " { $link clone } " do not satisfy the foldable word contract. Indeed, " { $link clone } " is " { $link POSTPONE: flushable } ", however it may output a mutable object if its input is mutable, and so it is undesirable to evaluate it at compile-time, since doing so would give incorrect semantics for code that clones mutable objects."
-    $terpri
-    "Most operations on numbers are foldable. For example, " { $snippet "2 2 +" } " compiles to a literal 4, since " { $link + } " is declared foldable."
-} ;
+    "The last restriction ensures that words such as " { $link clone } " do not satisfy the foldable word contract. Indeed, " { $link clone } " will output a mutable object if its input is mutable, and so it is undesirable to evaluate it at compile-time, since doing so would give incorrect semantics for code that clones mutable objects and proceeds to mutate them."
+}
+{ $examples "Most operations on numbers are foldable. For example, " { $snippet "2 2 +" } " compiles to a literal 4, since " { $link + } " is declared foldable." } ;
 
-HELP: t "( -- t )"
+HELP: t ""
 { $values { "t" "the canonical truth value" } }
 { $description "The canonical instance of " { $link general-t } ". It is just a symbol." } ;
 
-HELP: f "( -- f )"
+HELP: f ""
 { $values { "f" "the singleton false value" } }
 { $description "The " { $link f } " parsing word adds the " { $link f } " object to the parse tree, and is also the class whose sole instance is the " { $link f } " object. The " { $link f } " object is the singleton false value, the only object that is not true. The " { $link f } " object is not equal to the " { $link f } " class word, which can be pushed on the stack using word wrapper syntax:"
 { $code "f    ! the singleton f object denoting falsity\n\\ f  ! the f class word" } } ;
 
 HELP: [ ""
-{ $description "Marks the beginning of a literal list." }
+{ $description "Marks the beginning of a literal quotation." }
 { $examples { $code "[ 1 2 3 ]" } }
 { $see-also POSTPONE: ] } ;
 
 HELP: ] ""
-{ $description "Marks the end of a literal list." }
+{ $description "Marks the end of a literal quotation." }
 { $see-also POSTPONE: [ } ;
-
-HELP: [[ "car cdr ]]"
-{ $description "Parses two components making up a cons cell." }
-{ $notes "The lists parsed with " { $link POSTPONE: [ } " and " { $link POSTPONE: ] } " are just a special case of " { $link POSTPONE: [[ } " and " { $link POSTPONE: ]] } ". The following two lines are equivalent:" { $code "[ 1 2 3 ]\n[[ 1 [[ 2 [[ 3 f ]] ]] ]]" } }
-{ $see-also POSTPONE: ]] } ;
-
-HELP: ]] ""
-{ $description "Marks the end of a literal cons cell." }
-{ $see-also POSTPONE: [[ } ;
 
 HELP: } ""
 { $description "Marks the end of an array, vector, hashtable, complex number, tuple, or wrapper." }
@@ -86,6 +67,11 @@ HELP: C{ "real imaginary }"
 HELP: T{ "class delegate slots... }"
 { $values { "class" "a tuple class word" } { "delegate" "a delegate" } { "slots" "list of objects" } }
 { $description "Marks the beginning of a literal tuple. The class word must always be specified. If an insufficient number of values is given after the class word, the remaining slots of the tuple are set to " { $link f } ". If too many values are given, an error is thrown." } ;
+
+HELP: W{ "object }"
+{ $values { "object" "an object" } }
+{ $description "Marks the beginning of a literal wrapper." }
+{ $see-also POSTPONE: \ <wrapper> literalize } ;
 
 HELP: POSTPONE: "word"
 { $values { "word" "a word" } }
@@ -240,10 +226,18 @@ $terpri
 { $see-also define-tuple } ;
 
 HELP: C: "class definition... ;"
-{ $values { "class" "a class word" } { "generic" "a generic word" } { "definition" "a constructor definition" } }
+{ $values { "class" "a class word" } { "definition" "a constructor definition" } }
 { $description "Define a constructor word for a tuple class. The constructor definition receives a new instance of the class on the stack, with all slots initially set to " { $link f } "."
 $terpri
-"Constructors are named after the tuple class surrounded in angle brackets: " { $snippet "<" } " and " { $snippet ">" } "."  }
+"Constructors are named after the tuple class surrounded in angle brackets: " { $snippet "<" } " and " { $snippet ">" } ". Constructor words are defined in the same vocabulary as the tuple class, and the current value of the " { $link in } " variable has no effect."  }
 { $contract "The definition must only have one output, the new tuple itself." }
 { $notes "Each tuple class defines a default constructor that reads slot values from the stack. This parsing word redefines the default constructor." }
 { $see-also define-constructor } ;
+
+HELP: REQUIRES: "modules... ;"
+{ $values { "modules" "module name strings" } }
+{ $description "Loads a list of modules by calling " { $link (require) } " on each one." } ;
+
+HELP: PROVIDE: "name files tests ;"
+{ $values { "name" "a string" } { "files" "a sequence of strings" } { "tests" "a sequence of strings" } }
+{ $description "Registers a module definition and loads its source files by calling " { $link provide } "." } ;

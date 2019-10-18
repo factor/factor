@@ -1,50 +1,74 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: errors freetype gadgets-layouts generic hashtables kernel
-math namespaces opengl sequences ;
+USING: arrays errors freetype gadgets-frames generic hashtables
+kernel math models namespaces opengl sequences ;
 
 ! The world gadget is the top level gadget that all (visible)
-! gadgets are contained in.
+! gadgets are contained in. There is one world per top-level
+! native window.
 
 ! fonts: mapping font tuples to sprite vectors
 ! handle: native resource
-TUPLE: world status focus fonts handle ;
+! loc: location of native window on the screen.
+!   we don't store this in the world's rect-loc, since the
+!   co-ordinate system might be different, and generally the
+!   UI code assumes that everything starts at { 0 0 }.
+TUPLE: world
+active?
+gadget
+title status
+focus focused?
+fonts handle
+loc ;
 
 : free-fonts ( world -- )
     dup world-handle select-gl-context
-    world-fonts dup hash-values [ free-sprites ] each
-    clear-hash ;
-
-: font-sprites ( font world -- sprites )
-    world-fonts [ drop V{ } clone ] cache ;
-
-: add-status ( status world -- )
-    [ set-world-status ] 2keep @bottom frame-add ;
+    world-fonts hash-values [ second free-sprites ] each ;
 
 DEFER: request-focus
 
-C: world ( gadget status -- world )
-    dup delegate>frame
+C: world ( gadget -- world )
+    f <model> over set-world-status
+    [ >r dup gadget-title r> set-world-title ] keep
+    { { f set-world-gadget f @center } } make-frame*
     t over set-gadget-root?
+    t over set-world-active?
     H{ } clone over set-world-fonts
-    [ add-status ] keep
-    [ @center frame-add ] 2keep
-    swap request-focus ;
+    { 0 0 } over set-world-loc
+    dup world-gadget request-focus ;
 
-GENERIC: find-world ( gadget -- world )
-
-M: f find-world ;
-
-M: gadget find-world gadget-parent find-world ;
-
-M: world find-world ;
+: find-world [ world? ] find-parent ;
 
 M: world pref-dim* ( world -- dim )
-    delegate pref-dim* { 1024 768 0 } vmin ;
+    delegate pref-dim* { 1024 768 } vmin ;
+
+: activate-world-model ( world model -- )
+    [ add-connection ] keep activate-model ;
+
+M: world graft* ( world -- )
+    dup dup world-title activate-world-model
+    dup dup world-status activate-world-model
+    model-changed ;
+
+: deactivate-world-model ( world model -- )
+    [ remove-connection ] keep deactivate-model ;
+
+M: world ungraft* ( world -- )
+    dup
+    dup world-title deactivate-world-model
+    dup world-status deactivate-world-model ;
+
+M: world model-changed ( world -- )
+    dup world-title model-value swap set-title ;
 
 : focused-ancestors ( world -- seq )
-    world-focus parents reverse-slice ;
+    world-focus parents <reversed> ;
 
-: draw-string ( open-fonts string -- )
-    >r dup world get font-sprites r> (draw-string) ;
+: font-sprites ( font world -- { open-font sprites } )
+    world-fonts [ lookup-font V{ } clone 2array ] cache ;
+
+: draw-string ( font string -- )
+    >r world get font-sprites first2 r> (draw-string) ;
+
+M: world gadget-title world-gadget gadget-title ;

@@ -1,4 +1,4 @@
-USING: cont-responder io kernel namespaces sequences xml ;
+USING: httpd io kernel namespaces sequences xml ;
 
 SYMBOL: darcs-directory
 
@@ -53,4 +53,4 @@ SYMBOL: rss-feed-description
 
 : darcs-rss-feed darcs-changelog changelog>rss-feed print ;
 
-"darcs" [ darcs-rss-feed ] install-cont-responder
+"darcs" [ darcs-rss-feed ] add-simple-responder

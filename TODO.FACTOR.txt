@@ -1,78 +1,129 @@
-should fix in 0.82:
-
-- another i/o bug: on factorcode eventually all i/o times out
-- get factor running on mac intel
-
 + io:
 
+- unix i/o: problems with passing f to syscalls
+- factorcode httpd started using 99% CPU, but still received connections;
+  closing read-fds solved it
+- sometimes darcs get fails with the httpd
 - gdb triggers 'mutliple i/o ops on port' error
-- stream server can hang because of exception handler limitations
-- better i/o scheduler
-- yield in a loop starves i/o
 - "localhost" 50 <client> won't fail
 
-+ ui/help:
++ ui:
 
-- clicks sent twice
-- speed up ideas:
-  - only do clipping for certain gadgets
-  - use glRect
-- polish OS X menu bar code
-- help search
-- reimplement clicking input
-- reimplement tab completion
-- x11 input methods
+- "benchmark/help" runs out of memory
+- shortcuts:
+  - find a listener
+  - find a browser
+  - find a help window
+  - they'll either focus such a window, or if the current window is of
+    that type, cycle
+- thumb min size
+- support x11's large selections, if needed
+- own-selection violates ICCCM
+- one-column table doesn't need borders...?
+- make-frame should compile
+- editor:
+  - undo and redo
+  - transpose char/word/line
+  - autoscroll
+  - page up/down
+  - search and replace
+  - only redraw visible lines
+  - more efficient multi-line inserts
+  - editor should support stream output protocol
+  - scroll to caret
+  - better listener multi-line expression handling
+  - history doesn't work in a good way if you ^K the input
+  - history: move caret to end
+- finish gui stepper
+- cocoa: windows are not updated while resizing
+- graphical module manager tool
+- add some handy services:
+  - base conversion
+  - search help for selection
+- make factor a services client
+- services do not launch if factor not running
+- grid slows down with 2000 lines
+- integrated error documentation
+- roundoff is still not quite right with tracks
+- 'show' doesn't work if invoked from a listener on an object which is
+  itself inspected in the listener
+- ui uses too much cpu time idling
+- see if its possible to only repaint dirty regions
 - x11 title bars are funny
-- cocoa:
-  - don't multiplex in the event loop if there is no pending i/o
-  - horizontal scrolling
-- fix mouse-overs...
-- display lists
-- saving the image should save window configuration
-- make the UI look better, something like this:
-  http://twb.ath.cx/~twb/darcs/OBSOLETE/factor/final.html
-- fix remaining HTML stream issues
-- fix up the min thumb size hack
-- automatically update help graph when adding/removing articles/words
-- document conventions
-- new turtle graphics tutorial
-- better line spacing in ui and html
-- tabular formatting - for inspector, changes and $values in help
-- grid layout
-- variable width word wrap
 - fix top level window positioning
-- changing window titles
+- prettyprinter's highlighting of non-leaves doesn't really work
+- rollover is not updated on window focus changes
+- x11 input methods
+- cocoa:
+  - horizontal wheel scrolling
+  - polish OS X menu bar code
+- variable width word wrap
+- slider needs to be modelized
+
++ module system:
+
+- 'see' should show tuple constructors
+- forgetting a class should remove its methods from all generic words
+  - offer to remove generic words which are not called and have no
+    methods
+- forgetting a tuple class should forget the constructor
+- seeing a tuple class should show the constructor
+- C types should be words
+  - TYPEDEF: float { ... } { ... } ;   ==> \ float T{ c-type ... } "c-type" swp
+  - TYPEDEF: float FTFloat ;  ==> \ float \ FTFloat "c-type" swp
+  - make typedef aliasing explicit
+- seeing a C struct word should show its def
+- see by itself only shows the G: def
+- { class generic } see supports forms:
+  { f generic } to show all methods
+  { class f } to show all methods
+- modularize core
+- TUPLE: module files tests articles article main ;
+- methods: remember their file/line
+- { class generic } jedit, reload DTRT
+- requesting a list of assets loaded from a specific file
+- T{ link f "foo" "bar" } see
+- T{ link f "foo" "bar" } jedit
+- T{ link f "foo" "bar" } reload
+- generic 'define ( asset def -- )'
+- file out
+- make 'forget' generic
 
 + compiler/ffi:
 
-- free up r11, r12 as a vreg on ppc
-- float= on powerpc doesn't consider nans equal
-- intrinsic fixnum>float float>fixnum
-- win64 port
-- amd64 %unbox-struct
-- constant branch folding
-- core foundation should use unicode strings
-- alien>utf16-string, utf16-string>alien words
-- can <void*> only be called with an alien?
-- remove <char*>, <ushort*>, set-char*-nth, set-ushort*-nth since they
-  have incorrect semantics
-- complex float type
-- complex float intrinsics
-- remove literal table
-- C functions returning structs by value
-- FIELD: char key_vector[32];
-- FIELD: union { char b[20]; short s[10]; long l[5]; } data;
-- MEMBER: long pad[24];
-- C structs: use new-style string mode parsing
+- nasty inference regressions
 - [ [ dup call ] dup call ] infer hangs
 - the invalid recursion form case needs to be fixed, for inlines too
-- code gc
+- instead of decompiling words, add them to a 'recompile' set; compiler
+  treats words in the recompile set as if they were not compiled
+- mac intel: struct returns from objc methods
+- see if alien calls can be made faster
+- faster sequence= for UI
 - fix compiled gc check
+  - there was a performance hit, investigate
+  - float boxing and overflow checks need a gc check too
+- constant branch folding
+- type inference at branch merge points
+- float= doesn't consider nans equal
+- intrinsic fixnum>float float>fixnum
+- remove literal table
+- C functions returning structs by value
+- code gc
+- infer which variables are read, written in a quotation
 
 + misc:
 
-- 3 >n fep
-- code walker & exceptions
+- consider: swap tail --> tail, swap head --> head
+- mach_signal: fault address reporting is not reliable
 - slice: if sequence or seq start is changed, abstraction violation
-- make 3.4 bits>double an error
-- code walker and callbacks is broken?
+- hashed generic method dispatch
+- fix this:
+
+  [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
+[ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
+]
+
+- code walker & exceptions -- test and debug problems
+- break: perhaps use current stdio to run break listener
+- httpd search tools
+- remaining HTML issues need fixing

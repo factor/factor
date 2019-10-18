@@ -1,57 +1,58 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
-USING: arrays hashtables io kernel namespaces strings ;
+USING: arrays io kernel namespaces prettyprint sequences words ;
 
-! Markup
-GENERIC: print-element
+M: word article-title
+    dup word-name swap stack-effect [ " " swap append3 ] when* ;
 
-! Help articles
-SYMBOL: articles
+M: word article-content
+    [
+        \ $vocabulary over 2array ,
+        dup word-help [
+            %
+        ] [
+            "predicating" word-prop [
+                \ $predicate swap 2array ,
+            ] when*
+        ] ?if
+    ] { } make ;
 
-TUPLE: article title content ;
+: $title ( article -- )
+    title-style [
+        title-style [
+            dup [ 1array $link ] ($block) $where
+        ] with-nesting
+    ] with-style terpri ;
 
-: article ( name -- article ) articles get hash ;
+: (help) ( topic -- ) article-content print-content ;
 
-: add-article ( name title element -- )
-    <article> swap articles get set-hash ;
+: help ( topic -- ) dup $title (help) terpri ;
 
-M: string article-title article article-title ;
-
-M: string article-content article article-content ;
-
-! Special case: f help
-M: f article-title drop \ f article-title ;
-M: f article-content drop \ f article-content ;
-
-! Glossary of terms
-SYMBOL: terms
-
-TUPLE: term entry ;
-
-M: term article-title term-entry ;
-
-M: term article-content
-    term-entry terms get hash
-    [ "No such glossary entry" ] unless* ;
-
-: add-term ( term element -- ) swap terms get set-hash ;
-
-SYMBOL: last-block
-
-: (help) ( topic -- )
-    default-style [
-        last-block on article-content print-element
-    ] with-nesting* terpri ;
-
-DEFER: $heading
-
-: help ( topic -- )
-    default-style [ dup article-title $heading ] with-style
-    (help) ;
-
-: glossary ( name -- ) <term> help ;
+: see-help ( word -- )
+    dup help terpri $definition terpri ;
 
 : handbook ( -- ) "handbook" help ;
-    
-: tutorial ( -- ) "tutorial" help ;
+
+: $subtopic ( object -- )
+    [
+        subtopic-style [
+            unclip f rot [ print-content ] curry write-outliner
+        ] with-style
+    ] ($block) ;
+
+: ($subsection) ( object -- )
+    [ article-title ] keep >link
+    dup [ (help) ] curry
+    write-outliner ;
+
+: $subsection ( object -- )
+    [
+        subsection-style [ first ($subsection) ] with-style
+    ] ($block) ;
+
+: help-outliner ( seq  -- | quot: obj -- )
+    sort-articles [ ($subsection) terpri ] each ;
+
+: $outliner ( content -- )
+    subsection-style [ first call help-outliner ] with-style ;

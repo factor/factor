@@ -1,6 +1,5 @@
 IN: temporary
 USE: kernel
-USE: lists
 USE: math
 USE: namespaces
 USE: test
@@ -26,13 +25,12 @@ unit-test
 unit-test
 
 [ f ]
-[ [[ 1 [[ 2 3 ]] ]] hashtable? ]
+[ { 1 { 2 3 } } hashtable? ]
 unit-test
 
 ! Test some hashcodes.
 
 [ t ] [ [ 1 2 3 ] hashcode [ 1 2 3 ] hashcode = ] unit-test
-[ t ] [ [[ f t ]] hashcode [[ f t ]] hashcode = ] unit-test
 [ t ] [ [ 1 [ 2 3 ] 4 ] hashcode [ 1 [ 2 3 ] 4 ] hashcode = ] unit-test
 
 [ t ] [ 12 hashcode 12 hashcode = ] unit-test
@@ -50,6 +48,14 @@ f 100000000000000000000000000 "testhash" get set-hash
 [ t ] [ C{ 2 3 } "testhash" get hash ] unit-test
 [ f ] [ 100000000000000000000000000 "testhash" get hash* drop ] unit-test
 [ { } ] [ { [ { } ] } clone "testhash" get hash* drop ] unit-test
+
+! Regression
+3 <hashtable> "broken-remove" set
+1 W{ \ + } dup "x" set "broken-remove" get set-hash
+2 W{ \ = } dup "y" set "broken-remove" get set-hash
+"x" get "broken-remove" get remove-hash
+2 "y" get "broken-remove" get set-hash
+[ 1 ] [ "broken-remove" get hash-keys length ] unit-test
 
 {
     { "salmon" "fish" }

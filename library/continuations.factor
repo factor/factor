@@ -5,41 +5,43 @@ USING: vectors ;
 
 : catchstack* ( -- cs ) 6 getenv { vector } declare ; inline
 
+: (continue-with) 9 getenv ;
+
 IN: errors
 USING: kernel kernel-internals ;
 
 : catchstack ( -- cs ) catchstack* clone ; inline
-: set-catchstack ( cs -- ) clone 6 setenv ; inline
+: set-catchstack ( cs -- ) >vector 6 setenv ; inline
 
 IN: kernel
 USING: namespaces sequences ;
 
-TUPLE: continuation data call name catch ;
+TUPLE: continuation data retain call name catch ;
 
 : continuation ( -- interp )
-    datastack callstack dup pop* dup pop*
-    namestack catchstack <continuation> ; inline
+    datastack retainstack callstack namestack catchstack
+    <continuation> ; inline
 
-: >continuation< ( continuation -- data call name catch )
+: >continuation< ( continuation -- data retain call name catch )
     [ continuation-data ] keep
+    [ continuation-retain ] keep
     [ continuation-call ] keep
     [ continuation-name ] keep
     continuation-catch ; inline
 
 : ifcc ( terminator balance -- | quot: continuation -- )
-    [
-        continuation
-        dup continuation-data f over push f swap push dup
-    ] call 2swap if ; inline
+    [ f f continuation 2nip dup ] call 2swap if ; inline
 
 : callcc0 [ drop ] ifcc ; inline
 
 : continue ( continuation -- )
     >continuation<
-    set-catchstack set-namestack set-callstack set-datastack ;
+    set-catchstack
+    set-namestack
+    set-callstack
+    set-retainstack
+    set-datastack ;
     inline
-
-: (continue-with) 9 getenv ;
 
 : callcc1 [ drop (continue-with) ] ifcc ; inline
 

@@ -23,8 +23,7 @@
 !
 IN: concurrency
 USING: kernel concurrency concurrency-examples threads vectors 
-       sequences lists namespaces test errors dlists strings 
-       math words ;
+       sequences namespaces test errors dlists strings math words ;
 
 [ "junk" ] [ 
   <dlist> 
@@ -81,9 +80,9 @@ USING: kernel concurrency concurrency-examples threads vectors
 [ V{ 1 2 3 } ] [
   0 <vector>
   make-mailbox
-  2dup [ mailbox-get swap push ] cons cons in-thread
-  2dup [ mailbox-get swap push ] cons cons in-thread
-  2dup [ mailbox-get swap push ] cons cons in-thread
+  2dup [ mailbox-get swap push ] curry curry in-thread
+  2dup [ mailbox-get swap push ] curry curry in-thread
+  2dup [ mailbox-get swap push ] curry curry in-thread
   1 over mailbox-put
   2 over mailbox-put
   3 swap mailbox-put
@@ -92,9 +91,9 @@ USING: kernel concurrency concurrency-examples threads vectors
 [ V{ 1 2 3 } ] [
   0 <vector>
   make-mailbox
-  2dup [ [ integer? ] swap mailbox-get? swap push ] cons cons in-thread
-  2dup [ [ integer? ] swap mailbox-get? swap push ] cons cons in-thread
-  2dup [ [ integer? ] swap mailbox-get? swap push ] cons cons in-thread
+  2dup [ [ integer? ] swap mailbox-get? swap push ] curry curry in-thread
+  2dup [ [ integer? ] swap mailbox-get? swap push ] curry curry in-thread
+  2dup [ [ integer? ] swap mailbox-get? swap push ] curry curry in-thread
   1 over mailbox-put
   2 over mailbox-put
   3 swap mailbox-put
@@ -103,10 +102,10 @@ USING: kernel concurrency concurrency-examples threads vectors
 [ V{ 1 "junk" 3 "junk2" } [ 456 ] ] [
   0 <vector>
   make-mailbox
-  2dup [ [ integer? ] swap mailbox-get? swap push ] cons cons in-thread
-  2dup [ [ integer? ] swap mailbox-get? swap push ] cons cons in-thread
-  2dup [ [ string? ] swap mailbox-get? swap push ] cons cons in-thread
-  2dup [ [ string? ] swap mailbox-get? swap push ] cons cons in-thread
+  2dup [ [ integer? ] swap mailbox-get? swap push ] curry curry in-thread
+  2dup [ [ integer? ] swap mailbox-get? swap push ] curry curry in-thread
+  2dup [ [ string? ] swap mailbox-get? swap push ] curry curry in-thread
+  2dup [ [ string? ] swap mailbox-get? swap push ] curry curry in-thread
   1 over mailbox-put
   "junk" over mailbox-put
   [ 456 ] over mailbox-put
@@ -174,8 +173,8 @@ USING: kernel concurrency concurrency-examples threads vectors
 [ V{ 50 50 50 } ] [
   0 <vector>
   <promise>
-  2dup [ ?promise swap push ] cons cons spawn drop
-  2dup [ ?promise swap push ] cons cons spawn drop
-  2dup [ ?promise swap push ] cons cons spawn drop
+  2dup [ ?promise swap push ] curry curry spawn drop
+  2dup [ ?promise swap push ] curry curry spawn drop
+  2dup [ ?promise swap push ] curry curry spawn drop
   50 swap fulfill
 ] unit-test  

@@ -6,7 +6,6 @@ USE: namespaces
 USE: strings
 USE: test
 USE: sequences
-USE: lists
 USE: vectors
 
 [ ] [ 10 [ [ -1000000 <sbuf> ] catch drop ] times ] unit-test
@@ -54,7 +53,13 @@ unit-test
 unit-test
 
 [ { "a" "b" "c" "d" "e" "f" } ]
-[ "aXXbXXcXXdXXeXXf" "XX" split ] unit-test
+[ "aXbYcXdYeXf" "XY" split ] unit-test
+
+[ { "" "" } ]
+[ " " " " split ] unit-test
+
+[ { "hey" } ]
+[ "hey" " " split ] unit-test
 
 [ "Hello world" t ] [ "Hello world\n" "\n" ?tail ] unit-test
 [ "Hello world" f ] [ "Hello world" "\n" ?tail ] unit-test
@@ -94,3 +99,6 @@ unit-test
 [ -6 "hello" nth ] unit-test-fails
 
 [ t ] [ "hello world" dup >vector >string = ] unit-test 
+
+[ "ab" ] [ 2 "abc" resize-string ] unit-test
+[ "abc\0\0\0" ] [ 6 "abc" resize-string ] unit-test

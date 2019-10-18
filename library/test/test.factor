@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: test
-USING: arrays errors hashtables inspector io kernel lists math
+USING: arrays errors hashtables inspector io kernel math
 memory namespaces parser prettyprint sequences strings words
 vectors ;
 
@@ -11,7 +11,9 @@ M: assert summary drop "Assertion failed" ;
 
 : assert= ( a b -- ) 2dup = [ 2drop ] [ <assert> throw ] if ;
 
-: print-test ( input output -- ) "--> " write 2array . flush ;
+: print-test ( input output -- )
+    "----> Quotation: " write .
+    "Expected output: " write . flush ;
 
 : benchmark ( quot -- gctime runtime )
     millis >r gc-time >r call gc-time r> - millis r> - ;
@@ -33,7 +35,7 @@ M: assert summary drop "Assertion failed" ;
     [ f ] swap [ [ call t ] [ 2drop f ] recover ]
     curry unit-test ;
 
-: assert-depth ( quot -- ) depth slip depth assert= ;
+: assert-depth ( quot -- ) depth slip depth swap assert= ;
 
 SYMBOL: failures
 
@@ -68,25 +70,55 @@ SYMBOL: failures
 
 : tests
     {
-        "lists/cons" "lists/lists"
-        "lists/namespaces"
+        "alien"
+        "annotate"
+        "binary"
+        "collections/hashtables"
+        "collections/namespaces"
+        "collections/queues"
+        "collections/sbuf"
+        "collections/sequences"
+        "collections/strings"
+        "collections/vectors"
         "combinators"
-        "continuations" "errors"
-        "collections/hashtables" "collections/sbuf"
-        "collections/strings" "collections/namespaces"
-        "collections/vectors" "collections/sequences"
-        "collections/queues" "generic" "tuple" "parser"
-        "parse-number" "init" "io/io"
-        "words" "prettyprint" "random" "stream" "math/bitops"
-        "math/math-combinators" "math/rational" "math/float"
-        "math/complex" "math/irrational"
-        "math/integer" "math/random" "threads" "parsing-word"
-        "inference" "interpreter" "alien"
-        "gadgets/line-editor" "gadgets/rectangles"
-        "gadgets/frames" "memory"
-        "redefine" "annotate" "binary" "inspector"
+        "continuations"
+        "errors"
+        "gadgets/models"
+        "gadgets/document"
+        "gadgets/rectangles"
+        "gadgets/fields"
+        "generic"
+        "help/porter-stemmer"
+        "help/topics"
+        "inference"
+        "init"
+        "inspector"
+        "interpreter"
+        "io/io"
+        "io/nested-style"
         "kernel"
-    } run-tests ;
+        "math/bitops"
+        "math/complex"
+        "math/float"
+        "math/integer"
+        "math/irrational"
+        "math/math-combinators"
+        "math/random"
+        "math/rational"
+        "memory"
+        "parse-number"
+        "parser"
+        "parsing-word"
+        "prettyprint"
+        "random"
+        "redefine"
+        "stream"
+        "threads"
+        "tuple"
+        "words"
+    }
+    macosx? [ "cocoa" add ] when
+    run-tests ;
 
 : benchmarks
     {
@@ -101,10 +133,16 @@ SYMBOL: failures
 : compiler-tests
     {
         "io/buffer"
-        "compiler/simple" "compiler/templates"
-        "compiler/stack" "compiler/ifte"
-        "compiler/generic" "compiler/bail-out"
-        "compiler/intrinsics" "compiler/float"
-        "compiler/identities" "compiler/optimizer"
-        "compiler/alien" "compiler/callbacks"
+        "compiler/simple"
+        "compiler/templates"
+        "compiler/stack"
+        "compiler/ifte"
+        "compiler/generic"
+        "compiler/bail-out"
+        "compiler/intrinsics"
+        "compiler/float"
+        "compiler/identities" 
+        "compiler/optimizer"
+        "compiler/alien"
+        "compiler/callbacks"
     } run-tests ;

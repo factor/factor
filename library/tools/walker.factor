@@ -2,29 +2,30 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: walker
 USING: errors hashtables inspector interpreter io kernel
-listener lists math namespaces prettyprint sequences strings
+listener math namespaces prettyprint sequences strings
 vectors words ;
 
 : &s ( -- ) meta-d get stack. ;
 
-: meta-r*
-    [ meta-r get % meta-executing get , meta-cf get , ] { } make ;
+: &r ( -- ) meta-r get stack. ;
 
-: &r ( -- ) meta-r* stack. ;
+: meta-c* ( -- seq ) meta-c get meta-callframe append ;
 
-: &get ( var -- value ) meta-n get hash-stack ;
+: &c ( -- ) meta-c* callstack. ;
 
-: report ( -- ) meta-cf get . ;
+: &get ( var -- value ) meta-name get hash-stack ;
+
+: report ( -- ) callframe get callframe-scan get callframe. ;
 
 : step ( -- ) next do-1 report ;
 
 : into ( -- ) next do report ;
 
 : end-walk ( -- )
-    \ call push-r meta-cf get push-r meta-interp continue ;
+    save-callframe meta-interp continue ;
 
 : walk-banner ( -- )
-    "&s &r show stepper stacks" print
+    "&s &r &c show stepper stacks" print
     "&get ( var -- value ) get stepper variable value" print
     "step -- single step over" print
     "into -- single step into" print
@@ -36,11 +37,7 @@ vectors words ;
     "walk " listener-prompt set ;
 
 : walk ( quot -- )
-    datastack dup pop* callstack namestack catchstack [
-        meta-c set meta-n set meta-r set meta-d set
-        meta-cf set
-        meta-executing off
-        set-walk-hooks
-        walk-banner
-        listener end-walk
+    continuation [
+        set-meta-interp pop-d drop (meta-call)
+        set-walk-hooks walk-banner (listener) end-walk
     ] with-scope ;

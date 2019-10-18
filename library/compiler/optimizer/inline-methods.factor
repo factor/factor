@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer
 USING: arrays generic hashtables inference kernel
-kernel-internals lists math namespaces prettyprint sequences
+kernel-internals math namespaces prettyprint sequences
 words ;
 
 ! Some utilities for splicing in dataflow IR subtrees
@@ -119,8 +119,8 @@ words ;
 : inline-literals ( node literals -- node )
     #! Make #shuffle -> #push -> #return -> successor
     over drop-inputs [
-        >r >list [ literalize ] map dataflow [ subst-node ] keep
-        r> set-node-successor
+        >r >quotation [ literalize ] map dataflow
+        [ subst-node ] keep r> set-node-successor
     ] keep ;
 
 : optimize-predicate ( #call -- node )

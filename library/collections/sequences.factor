@@ -3,14 +3,12 @@
 IN: sequences
 USING: errors generic kernel math math-internals strings vectors ;
 
-GENERIC: length ( sequence -- n ) flushable
+GENERIC: length ( sequence -- n )
 GENERIC: set-length ( n sequence -- )
-GENERIC: nth ( n sequence -- obj ) flushable
+GENERIC: nth ( n sequence -- obj )
 GENERIC: set-nth ( value n sequence -- obj )
-GENERIC: thaw ( seq -- mutable-seq ) flushable
-GENERIC: like ( seq seq -- seq ) flushable
-GENERIC: reverse ( seq -- seq ) flushable
-GENERIC: reverse-slice ( seq -- seq ) flushable
+GENERIC: thaw ( seq -- mutable-seq )
+GENERIC: like ( seq seq -- seq )
 
 : empty? ( seq -- ? ) length zero? ; inline
 
@@ -45,9 +43,11 @@ M: object set-nth-unsafe set-nth ;
 : 2nth-unsafe ( s s n -- x x )
     tuck swap nth-unsafe >r swap nth-unsafe r> ; inline
 
-: change-nth-unsafe ( seq i quot -- )
-    pick pick >r >r >r swap nth-unsafe
-    r> call r> r> swap set-nth-unsafe ; inline
+! The f object supports the sequence protocol trivially
+M: f length drop 0 ;
+M: f nth nip ;
+M: f nth-unsafe nip ;
+M: f like drop dup empty? [ drop f ] when ;
 
 ! Integers support the sequence protocol
 M: integer length ;

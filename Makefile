@@ -3,82 +3,51 @@ CC = gcc
 BINARY = f
 IMAGE = factor.image
 BUNDLE = Factor.app
-DISK_IMAGE_DIR = Factor-0.82
-DISK_IMAGE = Factor-0.82.dmg
+DISK_IMAGE_DIR = Factor-0.83
+DISK_IMAGE = Factor-0.83.dmg
 
 ifdef DEBUG
-	DEFAULT_CFLAGS = -g
+	CFLAGS = -g
 	STRIP = touch
 else
-	DEFAULT_CFLAGS = -Wall -O3 -ffast-math -fomit-frame-pointer $(SITE_CFLAGS)
+	CFLAGS = -Wall -O3 -ffast-math -fomit-frame-pointer $(SITE_CFLAGS)
 	STRIP = strip
 endif
 
-DEFAULT_LIBS = -lm
-
 ifdef NO_UI
-	UNIX_UI_LIBS =
+	X11_UI_LIBS =
 else
-	UNIX_UI_LIBS = -lfreetype -lGL -lGLU -L/usr/X11R6/lib -lX11
+	X11_UI_LIBS = -lfreetype -lGL -lGLU -L/usr/X11R6/lib -lX11
 endif
 
-WINDOWS_OBJS = native/windows/ffi.o \
-	native/windows/file.o \
-	native/windows/misc.o \
-	native/windows/run.o \
-	native/windows/memory.o
-
-UNIX_OBJS = native/unix/file.o \
-	native/unix/signal.o \
-	native/unix/ffi.o \
-	native/unix/memory.o \
-	native/unix/icache.o
-
-MACOSX_OBJS = $(UNIX_OBJS) \
-	native/macosx/run.o \
-	native/macosx/mach_signal.o
-
-GENERIC_UNIX_OBJS = $(UNIX_OBJS) \
-	native/unix/run.o
-
-ifdef WINDOWS
- 	PLAF_OBJS = $(WINDOWS_OBJS)
- 	PLAF_SUFFIX = .exe
-else
-	ifdef MACOSX
-		PLAF_OBJS = $(MACOSX_OBJS)
-	else
-		PLAF_OBJS = $(GENERIC_UNIX_OBJS)
-	endif
+ifdef CONFIG
+	include $(CONFIG)
 endif
 
-OBJS = $(PLAF_OBJS) native/array.o native/bignum.o \
-	native/s48_bignum.o \
-	native/complex.o native/cons.o native/error.o \
-	native/factor.o native/fixnum.o \
-	native/float.o native/gc.o \
-	native/image.o native/memory.o \
-	native/misc.o native/primitives.o \
-	native/ratio.o native/relocate.o \
-	native/run.o \
-	native/sbuf.o native/stack.o \
-	native/string.o native/cards.o native/vector.o \
-	native/word.o native/compiler.o \
-	native/alien.o native/dll.o \
-	native/boolean.o \
-	native/debug.o \
-	native/hashtable.o \
-	native/io.o \
-	native/wrapper.o \
-	native/ffi_test.o
+OBJS = $(PLAF_OBJS) \
+	vm/alien.o \
+	vm/bignum.o \
+	vm/debug.o \
+	vm/factor.o \
+	vm/ffi_test.o \
+	vm/image.o \
+	vm/io.o \
+	vm/math.o \
+	vm/memory.o \
+	vm/primitives.o \
+	vm/run.o \
+	vm/stack.o \
+	vm/types.o
 
 default:
 	@echo "Run 'make' with one of the following parameters:"
 	@echo ""
-	@echo "bsd"
-	@echo "linux"
+	@echo "freebsd"
+	@echo "linux-x86"
+	@echo "linux-amd64"
 	@echo "linux-ppc"
-	@echo "macosx"
+	@echo "macosx-x86"
+	@echo "macosx-ppc"
 	@echo "solaris"
 	@echo "windows"
 	@echo ""
@@ -91,30 +60,46 @@ default:
 	@echo ""
 	@echo "export SITE_CFLAGS=\"-march=pentium4 -ffast-math\""
 
-bsd:
-	$(MAKE) $(BINARY) \
-		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic -pthread" \
-		LIBS="$(DEFAULT_LIBS) $(UI_LIBS)" 
+freebsd:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.freebsd
+
+macosx-freetype:
+	ln -sf libfreetype.6.dylib \
+		Factor.app/Contents/Frameworks/libfreetype.dylib
+
+macosx-ppc: macosx-freetype
+	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx.ppc
+
+macosx-x86: macosx-freetype
+	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx
+
+linux-x86 linux-amd64:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.linux
 	$(STRIP) $(BINARY)
 
-macosx:
-	$(MAKE) $(BINARY) \
-		CFLAGS="$(DEFAULT_CFLAGS)" \
-		LIBS="$(DEFAULT_LIBS) -framework Cocoa -framework OpenGL -lfreetype" \
-		MACOSX=y
+linux-ppc:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.ppc
+	$(STRIP) $(BINARY)
+
+solaris solaris-x86 solaris-amd64:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.solaris
+	$(STRIP) $(BINARY)
+
+windows:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.windows
 
 macosx.app:
 	cp $(BINARY) $(BUNDLE)/Contents/MacOS/Factor
 
 	rm -rf $(BUNDLE)/Contents/Resources/
 	mkdir -p $(BUNDLE)/Contents/Resources/fonts/
-	cp -R fonts/*.ttf $(BUNDLE)/Contents/Resources/fonts/
 
 	chmod +x cp_dir
-	find doc library contrib examples \( -name '*.factor' \
+	find doc library contrib examples fonts \( -name '*.factor' \
 		-o -name '*.facts' \
 		-o -name '*.txt' \
 		-o -name '*.html' \
+		-o -name '*.ttf' \
 		-o -name '*.js' \) \
 		-exec ./cp_dir {} $(BUNDLE)/Contents/Resources/{} \;
 
@@ -131,41 +116,20 @@ macosx.app:
 		Factor.app/Contents/MacOS/Factor
 
 macosx.dmg:
-	rm -f $(DISK_IMAGE)
+	rm $(DISK_IMAGE)
 	rm -rf $(DISK_IMAGE_DIR)
 	mkdir $(DISK_IMAGE_DIR)
 	cp -R $(BUNDLE) $(DISK_IMAGE_DIR)/$(BUNDLE)
 	hdiutil create -srcfolder "$(DISK_IMAGE_DIR)" -fs HFS+ \
 		-volname "$(DISK_IMAGE_DIR)" "$(DISK_IMAGE)"
 
-linux linux-x86 linux-amd64:
-	$(MAKE) $(BINARY) \
-		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic" \
-		LIBS="-ldl $(DEFAULT_LIBS) $(UNIX_UI_LIBS)"
-	$(STRIP) $(BINARY)
-
-linux-ppc:
-	$(MAKE) $(BINARY) \
-		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic -mregnames" \
-		LIBS="-ldl $(DEFAULT_LIBS) $(UNIX_UI_LIBS)"
-	$(STRIP) $(BINARY)
-
-solaris solaris-x86:
-	$(MAKE) $(BINARY) \
-		CFLAGS="$(DEFAULT_CFLAGS) -D_STDC_C99 -Drestrict=\"\" " \
-		LIBS="-ldl -lsocket -lnsl $(DEFAULT_LIBS) -R/opt/PM/lib -R/opt/csw/lib -R/usr/local/lib -R/usr/sfw/lib -R/usr/X11R6/lib -R/opt/sfw/lib $(UNIX_UI_LIBS)"
-	$(STRIP) $(BINARY)
-
-windows:
-	$(MAKE) $(BINARY) \
-		CFLAGS="$(DEFAULT_CFLAGS) -DWINDOWS" \
-		LIBS="$(DEFAULT_LIBS)" WINDOWS=y
-
 f: $(OBJS)
 	$(CC) $(LIBS) $(CFLAGS) -o $@$(PLAF_SUFFIX) $(OBJS)
 
 clean:
-	rm -f $(OBJS)
+	rm -f $(OBJS) $(UNIX_OBJS) $(WINDOWS_OBJS) $(MACOSX_OBJS)
+	rm -rf $(BUNDLE)/Contents/Resources/
+	rm -f $(BUNDLE)/Contents/MacOS/Factor
 
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
@@ -175,8 +139,3 @@ clean:
 
 .m.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
-
-boot:
-	echo "USE: image \"$(ARCH)\" make-image bye" | ./f factor.image
-	./f boot.image.$(ARCH) $(BOOTSTRAP_FLAGS)
-	

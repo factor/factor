@@ -7,22 +7,41 @@ USING: styles ;
     H{
         { font "sans-serif" }
         { font-size 12 }
+        { font-style plain }
         { wrap-margin 500 }
     } ;
 
 : link-style
-    H{ { foreground { 0.3 0 0 1 } } { font-style bold } } ;
+    H{
+        { foreground { 0 0 0.3 1 } }
+        { font-style bold }
+    } ;
 
 : emphasis-style
     H{ { font-style italic } } ;
 
-: heading-style H{ { font "serif" } { font-size 16 } } ;
+: title-style
+    H{
+        { font "sans-serif" }
+        { font-size 16 }
+        { font-style bold }
+        { wrap-margin 500 }
+        { page-color { 0.8 0.8 1 1 } }
+        { border-width 5 }
+    } ;
 
-: subheading-style H{ { font "sans-serif" } { font-style bold } } ;
+: where-style
+    H{ { font-size 10 } } ;
+
+: heading-style
+    H{
+        { font "sans-serif" }
+        { font-size 14 }
+        { font-style bold }
+    } ;
 
 : subsection-style
     H{
-        { font "sans-serif" }
         { font-size 14 }
         { font-style bold }
     } ;
@@ -39,7 +58,8 @@ USING: styles ;
 : code-style
     H{
         { font "monospace" }
-        { page-color { 0.9 0.9 1 0.5 } }
+        { font-size 12 }
+        { page-color { 0.8 0.8 0.8 0.5 } }
         { border-width 5 }
         { wrap-margin f }
     } ;
@@ -60,5 +80,16 @@ USING: styles ;
         { border-width 5 }
     } ;
 
-: list-element-style
-    H{ { border-color { 0.8 0.8 0.8 1 } } { border-width 5 } } ;
+: table-content-style
+    H{
+        { wrap-margin 350 }
+    } ;
+
+: table-style
+    H{
+        { table-gap { 5 5 0 } }
+        { table-border { 0.8 0.8 0.8 1.0 } }
+    } ;
+
+: list-style
+    H{ { table-gap { 10 2 0 } } } ;

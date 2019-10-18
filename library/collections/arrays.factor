@@ -12,7 +12,8 @@ M: array nth-unsafe >r >fixnum r> array-nth ;
 M: array set-nth-unsafe >r >fixnum r> set-array-nth ;
 M: array resize resize-array ;
 
-: >array ( seq -- array ) [ f <array> ] >sequence ; inline
+: >array ( seq -- array )
+    [ array? ] [ f <array> ] >sequence ; inline
 
 M: array like drop dup array? [ >array ] unless ;
 
@@ -20,12 +21,12 @@ M: byte-array clone (clone) ;
 M: byte-array length array-capacity ;
 M: byte-array resize resize-array ;
 
-: 1array ( x -- { x } ) 1 swap <array> ; flushable
+: 1array ( x -- { x } ) 1 swap <array> ;
 
 : 2array ( x y -- { x y } )
-    2 swap <array> [ 0 swap set-array-nth ] keep ; flushable
+    2 swap <array> [ 0 swap set-array-nth ] keep ;
 
 : 3array ( x y z -- { x y z } )
     3 swap <array>
     [ 1 swap set-array-nth ] keep
-    [ 0 swap set-array-nth ] keep ; flushable
+    [ 0 swap set-array-nth ] keep ;

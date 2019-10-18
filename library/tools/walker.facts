@@ -6,8 +6,12 @@ HELP: &s "( -- )"
 { $notes "This is analogous to " { $link .s } "." } ;
 
 HELP: &r "( -- )"
-{ $description "Prints the single stepper return stack and the currently executing quotation." }
+{ $description "Prints the single stepper retain stack." }
 { $notes "This is analogous to " { $link .r } "." } ;
+
+HELP: &c "( -- )"
+{ $description "Prints the single stepper call stack and the currently executing quotation." }
+{ $notes "This is analogous to " { $link .c } "." } ;
 
 HELP: &get "( var -- value )"
 { $values { "var" "an object" } { "value" "an object" } }
@@ -28,4 +32,4 @@ HELP: end-walk "( -- )"
 { $description "Continue normal execution of the single-stepped quotation." } ;
 
 HELP: walk "( quot -- )"
-{ $description "Spawn a new listener, customized for single-stepping through a quotation using the " { $link step } " and " { $link into } " words. The state of the single stepper stacks can be displayed using " { $link &s } " and " { $link &r } ", while variable values can be inspected with " { $link &get  } "." } ;
+{ $description "Spawn a new listener, customized for single-stepping through a quotation using the " { $link step } " and " { $link into } " words. The state of the single stepper stacks can be displayed using " { $link &s } ", " { $link &r } " and " { $link &c } ", while variable values can be inspected with " { $link &get  } "." } ;

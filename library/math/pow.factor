@@ -11,7 +11,15 @@ GENERIC: sqrt ( n -- n ) foldable
 M: complex sqrt >polar swap fsqrt swap 2 / polar> ;
 M: real sqrt dup 0 < [ neg fsqrt 0 swap rect> ] [ fsqrt ] if ;
 
-GENERIC: ^ ( z w -- z^w ) foldable
+GENERIC: (^) ( z w -- z^w ) foldable
+
+: ^ ( z w -- z^w )
+    over zero? [
+        dup zero?
+        [ 2drop 0.0/0.0 ] [ 0 < [ drop 1.0/0.0 ] when ] if
+     ] [
+         (^)
+     ] if ; inline
 
 : ^mag ( w abs arg -- magnitude )
     >r >r >rect swap r> swap fpow r> rot * fexp / ; inline
@@ -19,31 +27,18 @@ GENERIC: ^ ( z w -- z^w ) foldable
 : ^theta ( w abs arg -- theta )
     >r >r >rect r> flog * swap r> * + ; inline
 
-: 0^ ( z w -- )
-    dup zero? [
-        2drop 0.0/0.0
-    ] [
-        0 < [ drop 1.0/0.0 ] when
-    ] if ;
+M: number (^) ( z w -- z^w )
+    swap >polar 3dup ^theta >r ^mag r> polar> ;
 
-M: number ^ ( z w -- z^w )
-    over zero?
-    [ 0^ ] [ swap >polar 3dup ^theta >r ^mag r> polar> ] if ;
+: ^n ( z w -- z^w )
+    {
+        { [ dup zero? ] [ 2drop 1 ] }
+        { [ dup 1 number= ] [ drop ] }
+        { [ t ] [ over sq over 2 /i ^n -rot 2 mod ^n * ] }
+    } cond ; inline
 
-: each-bit ( n quot -- | quot: 0/1 -- )
-    over zero? pick -1 number= or [
-        2drop
-    ] [
-        2dup >r >r >r 1 bitand r> call r> -1 shift r> each-bit
-    ] if ; inline
-
-: (integer^) ( z w -- z^w )
-    1 swap [ 1 number= [ dupd * ] when >r sq r> ] each-bit nip ;
-    inline
-
-M: integer ^ ( z w -- z^w )
-    over zero?
-    [ 0^ ] [ dup 0 < [ neg ^ recip ] [ (integer^) ] if ] if ;
+M: integer (^) ( z w -- z^w )
+    dup 0 < [ neg ^n recip ] [ ^n ] if ;
 
 : power-of-2? ( n -- ? )
     dup 0 > [

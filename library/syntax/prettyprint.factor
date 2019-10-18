@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2006 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: prettyprint
-USING: alien arrays generic hashtables io kernel lists math
+USING: alien arrays generic hashtables io kernel math
 namespaces parser sequences strings styles vectors words ;
 
 ! State
@@ -20,6 +20,11 @@ SYMBOL: nesting-limit
 SYMBOL: length-limit
 SYMBOL: line-limit
 SYMBOL: string-limit
+
+! Special trick to highlight a word in a quotation
+SYMBOL: hilite-quotation
+SYMBOL: hilite-index
+SYMBOL: hilite-next?
 
 global [
     4 tab-size set
@@ -83,9 +88,9 @@ C: block ( -- block )
     dup block-empty?
     [ drop ] [ pprinter-block block-sections push ] if ;
 
-: text ( string style -- ) <text> add-section ;
+: styled-text ( string style -- ) <text> add-section ;
 
-: plain-text ( string -- ) H{ } text ;
+: text ( string -- ) H{ } styled-text ;
 
 : <indent ( section -- ) section-indent indent [ + ] change ;
 
@@ -157,22 +162,22 @@ GENERIC: pprint* ( obj -- )
 
 : word-style ( word -- style )
     [
+        hilite-next? get [
+            { 0.9 0.9 0.9 1 } background set
+            highlight on
+        ] when
         dup presented set
-        parsing? [
-            bold font-style
-        ] [
-            { 0 0 0.3 1 } foreground
-        ] if set
+        parsing? [ bold font-style set ] when
     ] make-hash ;
 
 : pprint-word ( obj -- )
-    dup word-name [ "( ? )" ] unless* swap word-style text ;
+    dup word-name swap word-style styled-text ;
 
 M: object pprint* ( obj -- )
     "( unprintable object: " swap class word-name " )" append3
-    plain-text ;
+    text ;
 
-M: real pprint* ( obj -- ) number>string plain-text ;
+M: real pprint* ( obj -- ) number>string text ;
 
 : ch>ascii-escape ( ch -- esc )
     H{
@@ -204,7 +209,7 @@ M: real pprint* ( obj -- ) number>string plain-text ;
 
 : pprint-string ( string prefix -- )
     [ % [ unparse-ch ] each CHAR: " , ] "" make
-    do-string-limit plain-text ;
+    do-string-limit text ;
 
 M: string pprint* ( str -- str ) "\"" pprint-string ;
 
@@ -215,7 +220,7 @@ M: word pprint* ( word -- )
     dup pprint-word
     "pprint-open" word-prop [ <block ] when ;
 
-M: f pprint* drop "f" plain-text ;
+M: f pprint* drop \ f pprint-word ;
 
 M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 
@@ -224,10 +229,10 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 
 : check-recursion ( obj quot -- )
     nesting-limit? [
-        2drop "#" plain-text
+        2drop "#" text
     ] [
         over recursion-check get memq? [
-            2drop "&" plain-text
+            2drop "&" text
         ] [
             over recursion-check get push
             call
@@ -243,10 +248,17 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 : pprint-element ( object -- )
     dup parsing? [ \ POSTPONE: pprint-word ] when pprint* ;
 
+: pprint-hilite ( object n -- )
+    hilite-index get = hilite-next? set
+    pprint-element
+    hilite-next? off ;
+
 : pprint-elements ( seq -- )
-    length-limit? >r
-    [ pprint-element ] each
-    r> [ "..." plain-text ] when ;
+    length-limit? >r dup hilite-quotation get eq? [
+        dup length [ pprint-hilite ] 2each
+    ] [
+        [ pprint-element ] each
+    ] if r> [ "..." text ] when ;
 
 : pprint-sequence ( seq start end -- )
     swap pprint* swap pprint-elements pprint* ;
@@ -254,11 +266,8 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 M: complex pprint* ( num -- )
     >rect 2array \ C{ \ } pprint-sequence ;
 
-M: cons pprint* ( list -- )
-   [
-       dup list? [ \ [ \ ] ] [ uncons 2array \ [[ \ ]] ] if
-       pprint-sequence
-   ] check-recursion ;
+M: quotation pprint* ( list -- )
+    [ \ [ \ ] pprint-sequence ] check-recursion ;
 
 M: array pprint* ( vector -- )
     [ \ { \ } pprint-sequence ] check-recursion ;
@@ -282,7 +291,7 @@ M: alien pprint* ( alien -- )
         drop "( alien expired )"
     ] [
         \ ALIEN: pprint-word alien-address number>string
-    ] if plain-text ;
+    ] if text ;
 
 M: wrapper pprint* ( wrapper -- )
     dup wrapped word? [
@@ -328,11 +337,11 @@ M: wrapper pprint* ( wrapper -- )
 : define-close t "pprint-close" set-word-prop ;
 
 { 
-    POSTPONE: [ POSTPONE: [[
+    POSTPONE: [
     POSTPONE: { POSTPONE: V{ POSTPONE: H{
     POSTPONE: W{
 } [ define-open ] each
 
 {
-    POSTPONE: ] POSTPONE: } POSTPONE: ]]
+    POSTPONE: ] POSTPONE: }
 } [ define-close ] each

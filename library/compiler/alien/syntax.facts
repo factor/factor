@@ -20,7 +20,7 @@ HELP: FUNCTION: "return name ( parameters )"
 { $values { "return" "a C return type" } { "name" "a C function name" "parameters" "a comma-separated sequence of type/name pairs; " { $snippet "type1 arg1, type2 arg2, ..." } } }
 { $description "Defines a new word " { $snippet "name" } " which calls a C library function with the same name, in the logical library given by the most recent " { $link POSTPONE: LIBRARY: } " declaration."
 $terpri
-"The new word must be compiled before being executed; see " { $link "compiler" } "." }
+"The new word must be compiled before being executed." }
 { $examples
 "For example, suppose the " { $snippet "foo" } " library exports the following function:"
 { $code

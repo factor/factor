@@ -102,31 +102,28 @@ USING: alien compiler kernel kernel-internals math namespaces ;
 ] "uchar" define-primitive-type
 
 [
-    [ alien-unsigned-cell <alien> alien>string ] "getter" set
-    [
-        >r >r string>alien alien-address r> r>
-        set-alien-unsigned-cell
-    ] "setter" set
+    [ alien-unsigned-cell <alien> alien>char-string ] "getter" set
+    [ >r >r alien-address r> r> set-alien-unsigned-cell ] "setter" set
     bootstrap-cell "width" set
     bootstrap-cell "align" set
-    "box_c_string" "boxer-function" set
-    "unbox_c_string" "unboxer-function" set
-] "char*" define-primitive-type
+    "box_char_string" "boxer-function" set
+    "unbox_char_string" "unboxer-function" set
+] "char*" (define-primitive-type)
 
 [
-    [ alien-unsigned-4 ] "getter" set
-    [ set-alien-unsigned-4 ] "setter" set
-    bootstrap-cell "width" set
-    bootstrap-cell "align" set
-    "box_utf16_string" "boxer-function" set
-    "unbox_utf16_string" "unboxer-function" set
-] "ushort*" define-primitive-type
+    [ alien-unsigned-cell <alien> alien>u16-string ] "getter" set
+    [ >r >r alien-address r> r> set-alien-unsigned-cell ] "setter" set
+    4 "width" set
+    4 "align" set
+    "box_u16_string" "boxer-function" set
+    "unbox_u16_string" "unboxer-function" set
+] "ushort*" (define-primitive-type)
 
 [
     [ alien-unsigned-4 zero? not ] "getter" set
     [ 1 0 ? set-alien-unsigned-4 ] "setter" set
-    bootstrap-cell "width" set
-    bootstrap-cell "align" set
+    4 "width" set
+    4 "align" set
     "box_boolean" "boxer-function" set
     "unbox_boolean" "unboxer-function" set
 ] "bool" define-primitive-type

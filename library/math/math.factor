@@ -53,6 +53,8 @@ M: object zero? drop f ;
 
 : ceiling ( x -- y ) neg floor neg ; foldable
 
+: [-] - 0 max ; inline
+
 : (repeat) ( i n quot -- )
     pick pick >= [
         3drop

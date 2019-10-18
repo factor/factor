@@ -1,5 +1,5 @@
-USING: namespaces kernel compiler math arrays strings alien sequences io
-prettyprint xlib rectangle ;
+USING: namespaces kernel words compiler math arrays strings alien sequences io
+prettyprint x11 rectangle ;
 
 IN: x 
 
@@ -26,9 +26,14 @@ SYMBOL: font
 : *Window *XID ;
 : *Drawable *XID ;
 
+: True 1 ;
+: False 0 ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 3 - Window Functions
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 ! 3.3 - Creating Windows
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! create-window is radically simple. It takes no arguments but you get
 ! a window back! After you create-window you should modify it's
@@ -52,7 +57,7 @@ SYMBOL: font
 
 ! 3.7 - Configuring Windows
 
-: move-window ( { x y } -- ) >r dpy get win get r> [ ] each XMoveWindow drop ;
+: move-window ( { x y } -- ) dpy get win get rot first2 XMoveWindow drop ;
 
 DEFER: window-position
 DEFER: window-width
@@ -71,7 +76,7 @@ DEFER: with-win
   2 / set-window-center-x ;
 
 : resize-window ( { width height } -- )
-  >r dpy get win get r> [ ] each XResizeWindow drop ;
+dpy get win get rot first2 XResizeWindow drop ;
 
 : set-window-width ( width -- )
   window-height 2array resize-window ;
@@ -89,8 +94,17 @@ DEFER: with-win
 
 ! 3.9 - Changing Window Attributes
 
+: change-window-attributes ( valuemask attr -- )
+>r >r dpy get win get r> r> XChangeWindowAttributes drop ;
+
 : set-window-background ( pixel -- )
   >r dpy get win get r> XSetWindowBackground drop ;
+
+: set-window-gravity ( gravity -- )
+CWWinGravity swap
+"XSetWindowAttributes" <c-object> tuck
+set-XSetWindowAttributes-win_gravity
+change-window-attributes ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 4 - Window Information Functions
@@ -131,6 +145,8 @@ DEFER: with-win
 : window-x 0 window-position nth ;
 : window-y 1 window-position nth ;
 
+: window-rect ( -- <rect> ) window-position window-size <rect> ;
+
 : get-window-attributes ( -- <XWindowAttributes> )
   dpy get win get "XWindowAttributes" <c-object> dup >r XGetWindowAttributes drop r> ;
 
@@ -147,6 +163,13 @@ get-window-attributes XWindowAttributes-all_event_masks ;
 
 : window-override-redirect
   get-window-attributes XWindowAttributes-override_redirect ;
+
+! 4.3 - Properties and Atoms
+
+: intern-atom ( atom-name only-if-exists? -- atom )
+>r >r dpy get r> r> XInternAtom ;
+
+: get-atom-name ( atom -- name ) dpy get swap XGetAtomName ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -181,7 +204,7 @@ SYMBOL: event-masks
 } event-masks set-global
 
 : bit-test ( a b -- t-or-f ) bitand 0 = not ;
-  
+
 : name>event-mask ( str -- i )
 event-masks get [ first over = ] find 2nip second ;
 
@@ -199,8 +222,6 @@ event-mask-names [ name>event-mask bit-test ] subset-with ;
 
 : print-field ( name value -- ) swap "=" append write pprint ;
 
-: spc ( -- ) " " write ;
-
 : print-window-geometry ( -- )
 window-width pprint "x" write window-height pprint "+" write
 window-x pprint "+" write window-y pprint ;
@@ -214,12 +235,12 @@ window-map-state
 } cond ;
 
 : print-window-info ( -- )
-"id" win get print-field spc
-"parent" window-parent print-field spc
-"root" window-root print-field spc
+"id" win get print-field bl
+"parent" window-parent print-field bl
+"root" window-root print-field bl
 print-window-geometry terpri
 "children" window-children print-field terpri
-"override-redirect" window-override-redirect print-field spc
+"override-redirect" window-override-redirect print-field bl
 print-map-state terpri
 "event-mask" window-event-mask event-mask>names print-field terpri
 "all-event-masks" window-all-event-masks event-mask>names print-field
@@ -232,9 +253,9 @@ terpri ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : lookup-color ( name -- pixel )
-  >r dpy get colormap get r> "XColor" <c-object> dup >r "XColor" <c-object> XLookupColor drop
-  dpy get colormap get r> dup >r XAllocColor drop
-  r> XColor-pixel ;
+>r dpy get colormap get r> "XColor" <c-object> dup >r "XColor" <c-object>
+XLookupColor drop
+dpy get colormap get r> dup >r XAllocColor drop r> XColor-pixel ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 7 - Graphics Context Functions
@@ -260,10 +281,10 @@ dpy get gcontext get rot XSetSubwindowMode drop ;
 : clear-window ( -- ) dpy get win get XClearWindow drop ;
 
 : draw-point ( { x y } -- )
-  >r dpy get win get gcontext get r> [ ] each XDrawPoint drop ;
+>r dpy get win get gcontext get r> first2 XDrawPoint drop ;
 
 : draw-line ( { x1 y1 } { x2 y2 } -- )
-  >r >r dpy get win get gcontext get r> [ ] each r> [ ] each XDrawLine drop ;
+>r >r dpy get win get gcontext get r> first2 r> first2 XDrawLine drop ;
 
 : 2nth ( i seq -- item-i item-i+1 ) 2dup nth -rot swap 1 + swap nth ;
 
@@ -294,7 +315,7 @@ dup length 1 - [ swap 2nth draw-line ] each-with ;
 ! 8.6 - Drawing Text
 
 : draw-string ( { x y } string -- ) >r >r
-dpy get win get gcontext get r> [ ] each r> dup length XDrawString drop ;
+dpy get win get gcontext get r> first2 r> dup length XDrawString drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 9 - Window and Session Manager Functions
@@ -310,10 +331,73 @@ dpy get win get r> 0 0 XReparentWindow drop ;
 : ungrab-server ( -- ) dpy get XUngrabServer drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 10 - Events
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: event-types ( -- seq )
+{ f
+  f
+  "KeyPress"
+  "KeyRelease"
+  "ButtonPress"
+  "ButtonRelease"
+  "MotionNotify"
+  "EnterNotify"
+  "LeaveNotify"
+  "FocusIn"
+  "FocusOut"
+  "KeymapNotify"
+  "Expose"
+  "GraphicsExpose"
+  "NoExpose"
+  "VisibilityNotify"
+  "CreateNotify"
+  "DestroyNotify"
+  "UnmapNotify"
+  "MapNotify"
+  "MapRequest"
+  "ReparentNotify"
+  "ConfigureNotify"
+  "ConfigureRequest"
+  "GravityNotify"
+  "ResizeRequest"
+  "CirculateNotify"
+  "CirculateRequest"
+  "PropertyNotify"
+  "SelectionClear"
+  "SelectionRequest"
+  "SelectionNotify"
+  "ColormapNotify"
+  "ClientMessage"
+  "MappingNotify"
+  "LASTEvent" } ;
+
+: event-type>name ( i -- str ) event-types nth ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: XButtonEvent-position ( event -- { x y } )
+dup XButtonEvent-x swap XButtonEvent-y 2array ;
+
+: XButtonEvent-root-position ( event -- { x y } )
+dup XButtonEvent-x_root swap XButtonEvent-y_root 2array ;
+
+: XMotionEvent-position ( event -- { x y } )
+dup XMotionEvent-x swap XMotionEvent-y 2array ;
+
+: XMotionEvent-root-position ( event -- { x y } )
+dup XMotionEvent-x_root swap XMotionEvent-y_root 2array ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 11 - Event Handling Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: bitmask ( seq -- mask ) 0 [ execute bitor ] reduce ;
+  
 : select-input ( mask -- ) >r dpy get win get r> XSelectInput drop ;
+
+: add-input ( mask -- )
+window-event-mask bitor dpy get win get rot XSelectInput drop ;
 
 : flush-dpy ( -- ) dpy get XFlush drop ;
 
@@ -341,18 +425,27 @@ error-handler-quot set error-handler-callback XSetErrorHandler drop ;
 ! 12 - Input Device Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: set-input-focus ( revert-to time -- )
-  >r >r dpy get win get r> r> XSetInputFocus drop ;
+! 12.1 - Pointer Grabbing
 
 : grab-pointer ( mask -- )
->r dpy get win get False r> GrabModeAsync GrabModeAsync None None CurrentTime
+>r dpy get win get 0 r> GrabModeAsync GrabModeAsync None None CurrentTime
 XGrabPointer drop ;
 
 : ungrab-pointer ( time -- )
   >r dpy get r> XUngrabPointer drop ;
 
+: change-active-pointer-grab ( mask -- )
+dpy get swap None CurrentTime XChangeActivePointerGrab drop ;
+
+! 12.2 -  Keyboard Grabbing
+
 : grab-key ( keycode modifiers owner-events pointer-mode keyboard-mode -- )
 >r >r >r >r >r dpy get r> r> win get r> r> r> XGrabKey drop ;
+
+! 12.5 - Controlling Input Focus
+
+: set-input-focus ( revert-to time -- )
+  >r >r dpy get win get r> r> XSetInputFocus drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 14 - Inter-Client Communication Functions
@@ -365,6 +458,18 @@ XGrabPointer drop ;
 : get-transient-for-hint ( -- win-or-f )
   dpy get win get 0 <Window> dup >r XGetTransientForHint r>
   swap 0 = [ drop f ] [ *Window ] if ;
+
+! 14.1.10.  Setting and Reading the WM_PROTOCOLS Property
+
+: <Atom**> ( value -- address ) <Atom> <void*> ;
+
+: get-wm-protocols ( -- protocols )
+dpy get win get 0 <Atom**> 0 <int> 2dup >r >r XGetWMProtocols drop
+r> r>				! protocols-return count-return
+swap *void* swap *int		! protocols count
+[ over int-nth ] map
+nip ;
+
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Not Categorized Yet
@@ -384,6 +489,7 @@ XGrabPointer drop ;
 : map-window+			[ map-window ] with-win ;
 : unmap-window+			[ unmap-window ] with-win ;
 : window-parent+		[ window-parent ] with-win ;
+: fetch-name+			[ fetch-name ] with-win ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -485,3 +591,16 @@ swap >array [ swap char-nth ] map-with >string ;
 : lookup-string ( event -- string )
 10 "char" <c-array> dup >r 10 0 <alien> 0 <alien> XLookupString r>
 char-array>string ;
+
+: send-client-message ( atom x -- )
+
+"XClientMessageEvent" <c-object>			! atom x event
+
+ClientMessage over set-XClientMessageEvent-type
+win get over set-XClientMessageEvent-window
+rot over set-XClientMessageEvent-message_type		! x event
+32 over set-XClientMessageEvent-format
+swap over set-XClientMessageEvent-data0			! event
+CurrentTime over set-XClientMessageEvent-data1		! event
+
+>r dpy get win get False NoEventMask r> XSendEvent drop ;

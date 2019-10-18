@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: inference
 USING: arrays errors generic hashtables interpreter kernel math
 namespaces parser prettyprint sequences strings vectors words ;
@@ -7,7 +7,8 @@ namespaces parser prettyprint sequences strings vectors words ;
 : unify-lengths ( seq -- seq )
     #! Pad all vectors to the same length. If one vector is
     #! shorter, pad it with unknown results at the bottom.
-    dup 0 [ length max ] reduce swap [ add-inputs ] map-with ;
+    dup 0 [ length max ] reduce
+    swap [ add-inputs nip ] map-with ;
 
 : unify-values ( seq -- value )
     #! If all values in list are equal, return the value.
@@ -30,12 +31,12 @@ namespaces parser prettyprint sequences strings vectors words ;
     0 [ [ max ] when* ] reduce ;
 
 : unbalanced-branches ( in out -- )
-    { "Unbalanced branches:" } -rot [
-        swap unparse " " rot length unparse append3
-    ] 2map append "\n" join inference-error ;
+    [ swap unparse " " rot length unparse append3 ] 2map
+    "Unbalanced branches:" add* "\n" join inference-error ;
 
 : unify-effect ( in out -- in out )
-    #! In is a sequence of integers; out is a sequence of stacks.
+    #! in is a sequence of integers, out is a sequence of
+    #! stacks.
     2dup balanced? [
         unify-stacks >r unify-in-d r>
     ] [
@@ -48,7 +49,7 @@ namespaces parser prettyprint sequences strings vectors words ;
     ] map-with ;
 
 : datastack-effect ( seq -- )
-    dup d-in active-variable
+    d-in over [ hash ] map-with
     swap meta-d active-variable
     unify-effect meta-d set d-in set ;
 
@@ -62,7 +63,7 @@ namespaces parser prettyprint sequences strings vectors words ;
     [ terminated? swap hash ] all? terminated? set ;
 
 : unify-dataflow ( effects -- nodes )
-    [ [ dataflow-graph get ] bind ] map ;
+    [ dataflow-graph swap hash ] map ;
 
 : copy-inference ( -- )
     meta-r [ clone ] change
@@ -70,6 +71,19 @@ namespaces parser prettyprint sequences strings vectors words ;
     d-in [ ] change
     dataflow-graph off
     current-node off ;
+
+: no-base-case ( -- )
+    "Cannot infer base case" inference-error ;
+
+: recursive-branch ( hash ? -- obj )
+    #! If the branch made an unresolved recursive call, and we
+    #! are inferring the base case, ignore the branch (the base
+    #! case being the stack effect of the branches not making
+    #! recursive calls). Otherwise, raise an error.
+    [
+        base-case-continuation get
+        [ drop f ] [ no-base-case ] if
+    ] when ;
 
 : infer-branch ( value -- namespace )
     #! Return a namespace with inferencer variables:
@@ -83,11 +97,17 @@ namespaces parser prettyprint sequences strings vectors words ;
             dup value-literal infer-quot
             terminated? get [ #values node, ] unless
             f
-        ] callcc1 [ terminate ] when drop
-    ] make-hash ;
+        ] callcc1 nip
+    ] make-hash swap recursive-branch ;
+
+: notify-base-case ( -- )
+    base-case-continuation get
+    [ t swap continue-with ] [ no-base-case ] if* ;
 
 : (infer-branches) ( branchlist -- list )
-    [ infer-branch ] map dup unify-effects unify-dataflow ;
+    [ infer-branch ] map [ ] subset
+    dup empty? [ notify-base-case ] when
+    dup unify-effects unify-dataflow ;
 
 : infer-branches ( branches node -- )
     #! Recursive stack effect inference is done here. If one of

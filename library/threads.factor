@@ -17,18 +17,9 @@ namespaces queues sequences vectors ;
     sleep-queue dup [ [ first ] 2apply swap - ] nsort ;
 
 : sleep-time ( sorted-queue -- ms )
-    dup empty? [ drop 1000 ] [ peek first millis - 0 max ] if ;
+    dup empty? [ drop 1000 ] [ peek first millis [-] ] if ;
 
-DEFER: next-thread
-
-: do-sleep ( -- continuation )
-    sleep-queue* dup sleep-time dup zero?
-    [ drop pop second ] [ nip io-multiplex next-thread ] if ;
-
-: next-thread ( -- continuation )
-    run-queue dup queue-empty? [ drop do-sleep ] [ deque ] if ;
-
-: stop ( -- ) next-thread continue ;
+: stop ( -- ) run-queue deque continue ;
 
 : yield ( -- ) [ schedule-thread stop ] callcc0 ;
 
@@ -38,12 +29,24 @@ DEFER: next-thread
 : in-thread ( quot -- )
     [
         schedule-thread
-        V{ } set-catchstack V{ } set-callstack
+        V{ } set-catchstack
+        V{ } set-callstack
+        V{ } set-retainstack
         try stop
     ] callcc0 drop ;
 
+: (idle-thread) ( fast? -- )
+    #! If fast, then we don't sleep, just select()
+    sleep-queue* dup sleep-time dup zero?
+    [ drop pop second schedule-thread drop ]
+    [ nip 0 ? io-multiplex ] if ;
+
+: idle-thread ( -- )
+    #! This thread is always running.
+    #! If run queue is not empty, we don't sleep.
+    run-queue queue-empty? (idle-thread) yield idle-thread ;
+
 : init-threads ( -- )
-    global [
-        <queue> \ run-queue set
-        V{ } clone \ sleep-queue set
-    ] bind ;
+    <queue> \ run-queue set-global
+    V{ } clone \ sleep-queue set-global
+    [ idle-thread ] in-thread ;

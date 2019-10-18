@@ -1,5 +1,5 @@
 USING: kernel sequences namespaces math threads io opengl concurrency
-x xlib x11 gl concurrent-widgets ;
+x11 x gl concurrent-widgets ;
 
 SYMBOL: pval
 

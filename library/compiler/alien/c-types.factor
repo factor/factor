@@ -2,13 +2,11 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
 USING: arrays compiler errors generic
-hashtables kernel kernel-internals libc lists math namespaces
+hashtables kernel kernel-internals libc math namespaces
 parser sequences strings words ;
 
 : <c-type> ( -- type )
     H{
-        { "setter" [ "Cannot read struct fields with type" throw ] }
-        { "getter" [ "Cannot write struct fields with type" throw ] }
         { "boxer" [ "boxer-function" get %box ] }
         { "unboxer" [ "unboxer-function" get %unbox ] }
         { "reg-class" T{ int-regs f } }
@@ -73,12 +71,15 @@ SYMBOL: c-types
 : init-c-type ( name vocab -- )
     over define-pointer define-nth ;
 
-: define-primitive-type ( quot name -- )
+: (define-primitive-type) ( quot name -- )
     [ define-c-type ] keep "alien"
     2dup init-c-type
     2dup define-deref
-    2dup define-set-nth
-    define-out ;
+    over c-setter [ 2dup define-set-nth define-out ] when ;
+
+: define-primitive-type ( quot name -- )
+    [ (define-primitive-type) ] keep dup c-setter
+    [ "alien" 2dup define-set-nth define-out ] [ drop ] if ;
 
 : typedef ( old new -- )
     over "*" append over "*" append (typedef) (typedef) ;

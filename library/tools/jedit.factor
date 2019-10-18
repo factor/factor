@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: jedit
-USING: arrays errors io kernel listener lists math namespaces
+USING: arrays errors io kernel listener math namespaces
 parser prettyprint sequences strings words ;
 
 ! Some words to send requests to a running jEdit instance to
@@ -54,9 +54,6 @@ parser prettyprint sequences strings words ;
 : write-packet ( string -- ) dup write-len write flush ;
 
 : read-packet ( -- string ) 4 read be> read ;
-
-: eval>string ( str -- )
-    [ [ [ eval ] keep ] try drop ] string-out ;
 
 : wire-server ( -- )
     #! Repeatedly read jEdit requests and execute them. Return

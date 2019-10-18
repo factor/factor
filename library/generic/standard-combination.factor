@@ -1,12 +1,18 @@
-IN: generic
-USING: arrays errors hashtables kernel kernel-internals lists
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: arrays errors hashtables kernel kernel-internals
 math namespaces sequences vectors words ;
+IN: generic
 
 : picker ( dispatch# -- quot )
     { [ dup ] [ over ] [ pick ] } nth ;
 
 : unpicker ( dispatch# -- quot )
     { [ nip ] [ >r nip r> swap ] [ >r >r nip r> r> -rot ] } nth ;
+
+TUPLE: no-method object generic ;
+
+: no-method ( object generic -- ) <no-method> throw ;
 
 : error-method ( dispatch# word -- method )
     >r picker r> [ no-method ] curry append ;
@@ -70,12 +76,16 @@ math namespaces sequences vectors words ;
 : big-generic ( dispatch# word n dispatcher -- def )
     [ >r pick picker % r> , <vtable> , \ dispatch , ] [ ] make ;
 
-: tag-generic? ( word -- ? )
-    "methods" word-prop hash-keys [ types ] map concat
-    [ tag-mask < ] all? ;
+: generic-tags ( word -- seq )
+    "methods" word-prop hash-keys [ types ] map concat prune ;
 
-: small-generic? ( word -- ? )
-    "methods" word-prop hash-size 3 <= ;
+: tag-generic? ( word -- ? )
+    #! If all the types we dispatch upon can be identified
+    #! based on tag alone, we change the dispatcher primitive
+    #! from 'type' to 'tag'.
+    generic-tags [ tag-mask < ] all? ;
+
+: small-generic? ( word -- ? ) generic-tags length 3 <= ;
 
 : standard-combination ( word dispatch# -- quot )
     swap {

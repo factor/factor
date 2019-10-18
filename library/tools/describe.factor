@@ -1,8 +1,9 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: inspector
-USING: arrays generic hashtables help io kernel kernel-internals
-lists math prettyprint sequences strings vectors words ;
+USING: arrays generic hashtables io kernel kernel-internals
+math namespaces prettyprint sequences strings styles vectors
+words ;
 
 GENERIC: summary ( object -- string )
 
@@ -38,14 +39,9 @@ M: object summary
 M: object sheet ( obj -- sheet ) slot-sheet ;
 
 M: sequence summary
-    dup length 1 = [
-        drop "a sequence containing 1 element"
-    ] [
-        "a sequence containing " swap length number>string
-        " elements" append3
-    ] if ;
+    [ dup length # " element " % class word-name % ] "" make ;
 
-M: list sheet 1array ;
+M: quotation sheet 1array ;
 
 M: vector sheet 1array ;
 
@@ -66,46 +62,39 @@ M: word summary ( word -- )
         drop "a uniquely generated symbol"
     ] if ;
 
-: format-column ( list ? -- list )
-    >r [ unparse-short ] map r> [
-        [ 0 [ length max ] reduce ] keep
-        [ swap CHAR: \s pad-right ] map-with
-    ] unless ;
+M: input summary ( input -- )
+    "Input: " swap input-string
+    dup string? [ unparse-short ] unless append ;
 
-: format-sheet ( sheet -- list )
-    #! We use an idiom to notify format-column if it is
-    #! formatting the last column.
-    dup length reverse-slice [ zero? format-column ] 2map
-    flip [ " " join ] map ;
+M: vocab-link summary ( vocab-link -- )
+    [
+        vocab-link-name dup %
+        " vocabulary (" %
+        words length #
+        " words)" %
+    ] "" make ;
 
 DEFER: describe
 
 : sheet. ( sheet -- )
-    dup empty? [
-        drop
-    ] [
-        dup format-sheet swap peek
-        [ dup [ describe ] curry simple-outliner terpri ] 2each
-    ] if ;
+    flip
+    H{ { table-gap { 10 0 0 } } }
+    [ dup unparse-short swap write-object ]
+    tabular-output ;
 
 : describe ( object -- ) dup summary print sheet sheet. ;
 
-: sequence-outliner ( seq quot -- | quot: obj -- )
-    swap [
-        [ unparse-short ] keep rot dupd curry
-        simple-outliner terpri
-    ] each-with ;
-
-: words. ( vocab -- )
-    words natural-sort [ (help) ] sequence-outliner ;
-
-: vocabs. ( -- ) vocabs [ words. ] sequence-outliner ;
-
-: usage. ( word -- ) usage [ usage. ] sequence-outliner ;
-
-: uses. ( word -- ) uses [ uses. ] sequence-outliner ;
-
-: stack. ( seq -- seq ) reverse-slice >array describe ;
+: stack. ( seq -- seq ) <reversed> >array sheet sheet. ;
 
 : .s datastack stack. ;
-: .r callstack stack. ;
+: .r retainstack stack. ;
+
+: callframe. ( seq pos -- )
+    [
+        hilite-index set dup hilite-quotation set .
+    ] with-scope ;
+
+: callstack. ( seq -- seq )
+    3 swap group <reversed> [ first2 1- callframe. ] each ;
+
+: .c callstack callstack. ;

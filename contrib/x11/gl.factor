@@ -1,4 +1,4 @@
-IN: gl USING: kernel words sequences alien arrays namespaces x xlib x11 ;
+USING: kernel words sequences alien arrays namespaces x11 x ; IN: gl
 
 : >int-array ( seq -- <int-array> )
 dup length "int" <c-array> swap dup length >array [ pick set-int-nth ] 2each ;
@@ -10,7 +10,7 @@ dup length "int" <c-array> swap dup length >array [ pick set-int-nth ] 2each ;
 >attributes >int-array dpy get scr get rot glXChooseVisual ;
 
 : create-context ( XVisualInfo* -- GLXContext )
->r dpy get r> 0 <alien> True glXCreateContext ;
+>r dpy get r> 0 <alien> 1 glXCreateContext ;
 
 : make-current ( GLXContext -- ) >r dpy get win get r> glXMakeCurrent drop ;
 

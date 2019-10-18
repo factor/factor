@@ -14,7 +14,9 @@ SYMBOL: font
 SYMBOL: font-size
 SYMBOL: font-style
 SYMBOL: presented
-SYMBOL: file
+
+! Only for plain-stream
+SYMBOL: highlight
 
 ! Paragraph styles
 SYMBOL: page-color
@@ -23,5 +25,12 @@ SYMBOL: border-width
 SYMBOL: wrap-margin
 SYMBOL: outline
 
+! Table styles
+SYMBOL: table-gap
+SYMBOL: table-border
+
 ! Input history
 TUPLE: input string ;
+
+! Vocabulary links
+TUPLE: vocab-link name ;

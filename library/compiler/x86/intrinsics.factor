@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays assembler kernel kernel-internals lists math
+USING: alien arrays assembler kernel kernel-internals math
 math-internals namespaces sequences words ;
 IN: compiler
 
@@ -88,15 +88,18 @@ IN: compiler
     { +clobber { "obj" "slot" } }
 } define-intrinsic
 
+: char-reg cell 8 = RBX EBX ? ; inline
+: char-reg-16 BX ; inline
+
 \ char-slot [
-    EBX PUSH
+    char-reg PUSH
     "n" operand 2 SHR
-    EBX dup XOR
+    char-reg dup XOR
     "obj" operand "n" operand ADD
-    BX "obj" operand string-offset [+] MOV
-    EBX tag-bits SHL
-    "obj" operand EBX MOV
-    EBX POP
+    char-reg-16 "obj" operand string-offset [+] MOV
+    char-reg tag-bits SHL
+    "obj" operand char-reg MOV
+    char-reg POP
 ] H{
     { +input { { f "n" } { f "obj" } } }
     { +output { "obj" } }
@@ -104,13 +107,13 @@ IN: compiler
 } define-intrinsic
 
 \ set-char-slot [
-    EBX PUSH
+    char-reg PUSH
     "val" operand tag-bits SHR
     "slot" operand 2 SHR
     "obj" operand "slot" operand ADD
-    EBX "val" operand MOV
-    "obj" operand string-offset [+] BX MOV
-    EBX POP
+    char-reg "val" operand MOV
+    "obj" operand string-offset [+] char-reg-16 MOV
+    char-reg POP
 ] H{
     { +input { { f "val" } { f "slot" } { f "obj" } } }
     { +clobber { "val" "slot" "obj" } }
@@ -216,16 +219,20 @@ IN: compiler
     "y" operand "x" operand MOV
     ! Tag the value, since division cancelled tags from both
     ! inputs
-    "x" operand tag-bits SHL
+    "x" operand 1 tag-bits shift IMUL2
     ! Did it overflow?
     "end" get JNO
     ! There was an overflow, so make ECX into a bignum. we must
     ! save EDX since its volatile.
     remainder-reg PUSH
+    ! Align the stack -- only needed on Mac OS X
+    stack-reg 16 cell - SUB
     "s48_long_to_bignum" f
     "y" operand 1array compile-c-call*
     ! An untagged pointer to the bignum is now in EAX; tag it
     T{ int-regs } return-reg bignum-tag OR
+    ! Align the stack -- only needed on Mac OS X
+    stack-reg 16 cell - ADD
     ! the remainder is now in EDX
     remainder-reg POP
     "end" get save-xt ;
@@ -260,8 +267,8 @@ IN: compiler
 
 ! User environment
 : %userenv ( -- )
-    "x" operand "userenv" f dlsym MOV
-    0 rel-absolute-cell rel-userenv
+    "x" operand "userenv" f [ dlsym MOV ] 2keep
+    rel-absolute-cell rel-dlsym
     "n" operand fixnum>slot@
     "n" operand "x" operand ADD ;
 

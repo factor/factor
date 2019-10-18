@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: assembler
-USING: alien generic hashtables kernel kernel-internals lists
+USING: alien generic hashtables kernel kernel-internals
 math memory namespaces ;
 
 : compiled-base 18 getenv ; inline
@@ -15,10 +15,6 @@ math memory namespaces ;
 
 : compile-aligned ( n -- )
     compiled-offset 8 align set-compiled-offset ; inline
-
-: add-literal ( obj -- lit# )
-    address literal-top [ set-compiled-cell ] keep
-    dup cell + set-literal-top ;
 
 : assemble-1 ( n -- )
     compiled-offset set-compiled-1

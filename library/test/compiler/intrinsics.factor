@@ -1,19 +1,19 @@
 IN: temporary
-USING: arrays compiler kernel kernel-internals lists math
+USING: arrays compiler kernel kernel-internals math
 math-internals sequences strings test words ;
 
 ! Make sure that intrinsic ops compile to correct code.
-[ 1 ] [ [[ 1 2 ]] [ 0 slot ] compile-1 ] unit-test
-[ 1 ] [ [ [[ 1 2 ]] 0 slot ] compile-1 ] unit-test
-[ 3 ] [ 3 1 2 cons [ [ 0 set-slot ] keep ] compile-1 car ] unit-test
-[ 3 ] [ 3 1 2 [ cons [ 0 set-slot ] keep ] compile-1 car ] unit-test
-[ 3 ] [ [ 3 1 2 cons [ 0 set-slot ] keep ] compile-1 car ] unit-test
-[ 3 ] [ 3 1 2 cons [ [ 1 set-slot ] keep ] compile-1 cdr ] unit-test
-[ 3 ] [ 3 1 2 [ cons [ 1 set-slot ] keep ] compile-1 cdr ] unit-test
-[ 3 ] [ [ 3 1 2 cons [ 1 set-slot ] keep ] compile-1 cdr ] unit-test
+[ 1 ] [ { 1 2 } [ 2 slot ] compile-1 ] unit-test
+[ 1 ] [ [ { 1 2 } 2 slot ] compile-1 ] unit-test
+[ 3 ] [ 3 1 2 2array [ [ 2 set-slot ] keep ] compile-1 first ] unit-test
+[ 3 ] [ 3 1 2 [ 2array [ 2 set-slot ] keep ] compile-1 first ] unit-test
+[ 3 ] [ [ 3 1 2 2array [ 2 set-slot ] keep ] compile-1 first ] unit-test
+[ 3 ] [ 3 1 2 2array [ [ 3 set-slot ] keep ] compile-1 second ] unit-test
+[ 3 ] [ 3 1 2 [ 2array [ 3 set-slot ] keep ] compile-1 second ] unit-test
+[ 3 ] [ [ 3 1 2 2array [ 3 set-slot ] keep ] compile-1 second ] unit-test
 
 ! Write barrier hits on the wrong value were causing segfaults
-[ -3 ] [ -3 1 2 [ cons [ 1 set-slot ] keep ] compile-1 cdr ] unit-test
+[ -3 ] [ -3 1 2 [ 2array [ 3 set-slot ] keep ] compile-1 second ] unit-test
 
 [ CHAR: b ] [ 1 "abc" [ char-slot ] compile-1 ] unit-test
 [ CHAR: b ] [ 1 [ "abc" char-slot ] compile-1 ] unit-test

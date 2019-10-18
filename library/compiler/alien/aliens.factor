@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
-USING: arrays hashtables io kernel lists math namespaces parser
+USING: arrays hashtables io kernel math namespaces parser
 sequences ;
 
 : <alien> ( address -- alien ) f <displaced-alien> ; inline
@@ -36,10 +36,6 @@ global [ "libraries" nest drop ] bind
     "libraries" get [
         [ "abi" set "name" set ] make-hash swap set
     ] bind ;
-
-: add-simple-library ( name file -- ) 
-    windows? ".dll" ".so" ? append
-    windows? "stdcall" "cdecl" ? add-library ;
 
 : library-abi ( library -- abi )
     library "abi" swap ?hash [ "cdecl" ] unless* ;

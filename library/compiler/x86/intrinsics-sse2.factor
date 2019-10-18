@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays assembler generic kernel kernel-internals
-lists math math-internals memory namespaces sequences words ;
+math math-internals memory namespaces sequences words ;
 IN: compiler
 
 M: float-regs (%peek) ( vreg loc reg-class -- )

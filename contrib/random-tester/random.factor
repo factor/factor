@@ -1,11 +1,10 @@
-USING: kernel math sequences namespaces errors hashtables words arrays parser
-       compiler syntax lists io ;
-USING: inspector prettyprint ;
-USING: optimizer compiler-frontend compiler-backend inference ;
+USING: kernel math sequences namespaces errors hashtables words
+arrays parser compiler syntax io inspector prettyprint optimizer
+inference ;
 IN: random-tester
 
 ! Tweak me
-: max-length 7 ; inline
+: max-length 15 ; inline
 : max-value 1000000000 ; inline
 
 : 10% ( -- bool ) 10 random-int 8 > ;
@@ -31,11 +30,11 @@ IN: random-tester
 
 SYMBOL: special-integers
 [ { -1 0 1 } % most-negative-fixnum , most-positive-fixnum , first-bignum , ] 
-{ } make \ special-integers set
+{ } make \ special-integers set-global
 : special-integers ( -- seq ) \ special-integers get ;
 SYMBOL: special-floats
 [ { 0.0 -0.0 } % e , pi , 1./0. , -1./0. , 0./0. , epsilon , epsilon neg , ]
-{ } make \ special-floats set
+{ } make \ special-floats set-global
 : special-floats ( -- seq ) \ special-floats get ;
 SYMBOL: special-complexes
 [ 
@@ -44,7 +43,7 @@ SYMBOL: special-complexes
     0 pi rect> , 0 pi neg rect> , pi neg 0 rect> , pi pi rect> ,
     pi pi neg rect> , pi neg pi rect> , pi neg pi neg rect> ,
     e neg e neg rect> , e e rect> ,
-] { } make \ special-complexes set
+] { } make \ special-complexes set-global
 : special-complexes ( -- seq ) \ special-complexes get ;
 
 : random-fixnum ( -- fixnum )
@@ -53,12 +52,12 @@ SYMBOL: special-complexes
 : random-bignum ( -- bignum )
      400 random-bits first-bignum + coin-flip [ neg ] when ;
     
-: random-integer
+: random-integer ( -- n )
     coin-flip [
-            random-fixnum
-        ] [
-            coin-flip [ random-bignum ] [ special-integers nth-rand ] if
-        ] if ;
+        random-fixnum
+    ] [
+        coin-flip [ random-bignum ] [ special-integers nth-rand ] if
+    ] if ;
 
 : random-positive-integer ( -- int )
     random-integer dup 0 < [

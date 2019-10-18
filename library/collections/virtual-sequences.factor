@@ -4,11 +4,11 @@ IN: sequences
 USING: errors generic kernel math sequences-internals vectors ;
 
 ! A reversal of an underlying sequence.
-TUPLE: reversed ;
+TUPLE: reversed seq ;
 
-C: reversed [ set-delegate ] keep ;
+: reversed@ reversed-seq [ length swap - 1- ] keep ; inline
 
-: reversed@ delegate [ length swap - 1- ] keep ; inline
+M: reversed length ( seq -- n ) reversed-seq length ;
 
 M: reversed nth ( n seq -- elt ) reversed@ nth ;
 
@@ -19,9 +19,11 @@ M: reversed set-nth ( elt n seq -- ) reversed@ set-nth ;
 M: reversed set-nth-unsafe ( elt n seq -- )
     reversed@ set-nth-unsafe ;
 
-M: reversed like ( seq reversed -- seq ) delegate like ;
+M: reversed like ( seq reversed -- seq ) reversed-seq like ;
 
-M: reversed thaw ( seq -- seq ) delegate thaw ;
+M: reversed thaw ( seq -- seq ) reversed-seq thaw ;
+
+: reverse ( seq -- seq ) [ <reversed> ] keep like ;
 
 ! A slice of another sequence.
 TUPLE: slice seq from to ;

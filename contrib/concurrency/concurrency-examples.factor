@@ -23,8 +23,9 @@
 !
 ! Examples of using the concurrency library.
 IN: concurrency-examples
-USING: concurrency dlists errors gadgets-theme gadgets-panes io kernel lists
-math math-contrib namespaces opengl prettyprint sequences threads ;
+USING: concurrency dlists errors gadgets gadgets-labels
+gadgets-panes gadgets-theme io kernel math namespaces opengl
+prettyprint sequences threads ;
 
 : (logger) ( mailbox -- )
   #! Using the given mailbox, start a thread which
@@ -34,10 +35,10 @@ math math-contrib namespaces opengl prettyprint sequences threads ;
 : logger ( -- mailbox )
   #! Start a logging thread, which will log messages to the
   #! console that are put in the returned mailbox.
-  make-mailbox dup [ (logger) ] cons in-thread ;
+  make-mailbox dup [ (logger) ] curry in-thread ;
 
 : (pong-server0) ( -- )
-  receive uncons "ping" = [
+  receive second "ping" = [
     "pong" swap send (pong-server0)
   ] [
     "Pong server shutting down" swap send
@@ -146,28 +147,23 @@ M: crash-command run-rpc-command ( command -- shutdown? result )
 : test-add ( process -- )
   [ 
     "add" [ 1 2 3 ] <rpc-command> swap send-synchronous .
-  ] cons spawn drop ;
+  ] curry spawn drop ;
 
 : test-crash ( process -- )
   [ 
     "crash" f <rpc-command> swap send-synchronous .
-  ] cons spawn drop ;
+  ] curry spawn drop ;
   
 ! ******************************
 ! Experimental code below
 ! ******************************
-USE: gadgets
-USE: gadgets-labels
-USE: gadgets-presentations
-USE: gadgets-layouts
-USE: generic
 
 TUPLE: promised-label promise font color ;
 
 C: promised-label ( promise -- promised-label )
   dup delegate>gadget dup label-theme
   [ set-promised-label-promise ] keep 
-  [ [ dup promised-label-promise ?promise drop relayout ] cons spawn drop ] keep ;
+  [ [ dup promised-label-promise ?promise drop relayout ] curry spawn drop ] keep ;
 
 : promised-label-text ( promised-label -- text )
   promised-label-promise dup promise-fulfilled? [
@@ -196,4 +192,4 @@ M: promised-label set-label-font set-promised-label-font ;
   1 sleep dup 2 < [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] if ;
   
 : test-promise-ui ( -- )
-  <promise> dup <promised-label> gadget. [ 15 fib unparse swap fulfill ] cons spawn drop ;
+  <promise> dup <promised-label> gadget. [ 15 fib unparse swap fulfill ] curry spawn drop ;

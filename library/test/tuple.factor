@@ -92,7 +92,6 @@ TUPLE: delegate-clone ;
 ! Compiler regression
 [ t ] [ [ t length ] catch no-method-object ] unit-test
 
-! This must be the last test in the file!
 [ "<constructor-test>" ]
 [ "TUPLE: constructor-test ; C: constructor-test ;" eval word word-name ] unit-test
 
@@ -111,3 +110,9 @@ TUPLE: size-test a b c d ;
     T{ size-test } array-capacity
     size-test "tuple-size" word-prop =
 ] unit-test
+
+GENERIC: <yo-momma>
+
+TUPLE: yo-momma ;
+
+[ f ] [ \ <yo-momma> generic? ] unit-test

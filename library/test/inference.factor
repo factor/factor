@@ -1,6 +1,6 @@
 IN: temporary
-USING: arrays errors generic inference kernel lists math
-math-internals namespaces parser sequences test vectors ;
+USING: arrays errors generic inference kernel kernel-internals
+math math-internals namespaces parser sequences test vectors ;
 
 [ f ] [ f [ [ ] map-nodes ] with-node-iterator ] unit-test
 
@@ -10,6 +10,7 @@ math-internals namespaces parser sequences test vectors ;
 
 [ t ] [ [ [ ] [ ] if ] dataflow dup [ [ ] map-nodes ] with-node-iterator = ] unit-test
 
+[ { 0 0 } ] [ f infer ] unit-test
 [ { 0 2 } ] [ [ 2 "Hello" ] infer ] unit-test
 [ { 1 2 } ] [ [ dup ] infer ] unit-test
 
@@ -59,6 +60,11 @@ math-internals namespaces parser sequences test vectors ;
 
 : infinite-loop infinite-loop ;
 
+[ [ infinite-loop ] infer ] unit-test-fails
+
+: no-base-case-1 dup [ no-base-case-1 ] [ no-base-case-1 ] if ;
+[ [ no-base-case-1 ] infer ] unit-test-fails
+
 : simple-recursion-1
     dup [ simple-recursion-1 ] [ ] if ;
 
@@ -70,11 +76,9 @@ math-internals namespaces parser sequences test vectors ;
 [ { 1 1 } ] [ [ simple-recursion-2 ] infer ] unit-test
 
 : bad-recursion-2
-    dup [ uncons bad-recursion-2 ] [ ] if ;
+    dup [ dup first swap second bad-recursion-2 ] [ ] if ;
 
 [ [ bad-recursion-2 ] infer ] unit-test-fails
-
-! Not sure how to fix this one
 
 : funny-recursion
     dup [ funny-recursion 1 ] [ 2 ] if drop ;
@@ -82,20 +86,20 @@ math-internals namespaces parser sequences test vectors ;
 [ { 1 1 } ] [ [ funny-recursion ] infer ] unit-test
 
 ! Simple combinators
-[ { 1 2 } ] [ [ [ car ] keep cdr ] infer ] unit-test
+[ { 1 2 } ] [ [ [ first ] keep second ] infer ] unit-test
 
 ! Mutual recursion
 DEFER: foe
 
 : fie ( element obj -- ? )
-    dup cons? [ foe ] [ eq? ] if ;
+    dup array? [ foe ] [ eq? ] if ;
 
 : foe ( element tree -- ? )
     dup [
-        2dup car fie [
+        2dup first fie [
             nip
         ] [
-            cdr dup cons? [
+            second dup array? [
                 foe
             ] [
                 fie
@@ -132,21 +136,21 @@ SYMBOL: sym-test
 
 : terminator-branch
     dup [
-        car
+        length
     ] [
-        not-a-number
+        "foo" throw
     ] if ;
 
 [ { 1 1 } ] [ [ terminator-branch ] infer ] unit-test
 
-! : recursive-terminator
-!     dup [
-!         recursive-terminator
-!     ] [
-!         not-a-number
-!     ] if ;
-! 
-! [ { 1 0 } ] [ [ recursive-terminator ] infer ] unit-test
+: recursive-terminator
+    dup [
+        recursive-terminator
+    ] [
+        "Hi" throw
+    ] if ;
+
+[ { 1 0 } ] [ [ recursive-terminator ] infer ] unit-test
 
 GENERIC: potential-hang
 M: fixnum potential-hang dup [ potential-hang ] when ;
@@ -204,10 +208,22 @@ DEFER: blah4
 [ [ [ 1 ] [ ] bad-combinator ] infer ] unit-test-fails
 
 ! Regression
+
+! This order of branches works
 DEFER: do-crap
 : more-crap dup [ drop ] [ dup do-crap call ] if ;
-: do-crap dup [ do-crap ] [ more-crap ] if ;
+: do-crap dup [ more-crap ] [ do-crap ] if ;
 [ [ do-crap ] infer ] unit-test-fails
+
+! This one does not
+DEFER: do-crap*
+: more-crap* dup [ drop ] [ dup do-crap* call ] if ;
+: do-crap* dup [ do-crap* ] [ more-crap* ] if ;
+[ [ do-crap* ] infer ] unit-test-fails
+
+! Regression
+: too-deep dup [ drop ] [ 2dup too-deep too-deep * ] if ; inline
+[ { 2 1 } ] [ [ too-deep ] infer ] unit-test
 
 ! Error reporting is wrong
 G: xyz math-combination ;
@@ -217,10 +233,73 @@ M: ratio xyz
 
 [ t ] [ [ [ xyz ] infer ] catch inference-error? ] unit-test
 
-[ { 2 1 } ] [ [ swons ] infer ] unit-test
-[ { 1 2 } ] [ [ uncons ] infer ] unit-test
+! Doug Coleman discovered this one while working on the
+! calendar library
+DEFER: A
+DEFER: B
+DEFER: C
+
+: A
+    dup {
+        [ drop ]
+        [ A ]
+        [ \ A no-method ]
+        [ dup C A ]
+    } dispatch ;
+
+: B
+    dup {
+        [ C ]
+        [ B ]
+        [ \ B no-method ]
+        [ dup B B ]
+    } dispatch ;
+
+: C
+    dup {
+        [ A ]
+        [ C ]
+        [ \ C no-method ]
+        [ dup B C ]
+    } dispatch ;
+
+[ { 1 0 } ] [ [ A ] infer ] unit-test
+[ { 1 0 } ] [ [ B ] infer ] unit-test
+[ { 1 0 } ] [ [ C ] infer ] unit-test
+
+! I found this bug by thinking hard about the previous one
+DEFER: Y
+: X dup [ swap Y ] [ ] if ;
+: Y X ;
+
+[ { 2 2 } ] [ [ X ] infer ] unit-test
+[ { 2 2 } ] [ [ Y ] infer ] unit-test
+
+! Similar
+DEFER: bar
+: foo dup [ 2drop f f bar ] [ ] if ;
+: bar [ 2 2 + ] t foo drop call drop ;
+
+[ [ foo ] infer ] unit-test-fails
+
+[ 1234 infer ] unit-test-fails
+
+! This used to hang
+[ [ [ dup call ] dup call ] infer ] unit-test-fails
+
+! This form should not have a stack effect
+
+: bad-recursion-1
+    dup [ drop bad-recursion-1 5 ] [ ] if ;
+
+[ [ bad-recursion-1 ] infer ] unit-test-fails
+
+: bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] if ;
+[ [ bad-bin ] infer ] unit-test-fails
+
+! Test some random library words
+
 [ { 1 1 } ] [ [ unit ] infer ] unit-test
-[ { 1 1 } ] [ [ list? ] infer ] unit-test
 
 [ { 1 0 } ] [ [ >n ] infer ] unit-test
 [ { 0 1 } ] [ [ n> ] infer ] unit-test
@@ -255,27 +334,3 @@ M: ratio xyz
 [ { 1 1 } ] [ [ reverse ] infer ] unit-test
 [ { 2 1 } ] [ [ member? ] infer ] unit-test
 [ { 2 1 } ] [ [ remove ] infer ] unit-test
-
-: bad-code "1234" car ;
-
-[ { 0 1 } ] [ [ bad-code ] infer ] unit-test
-
-[ 1234 infer ] unit-test-fails
-
-! This form should not have a stack effect
-! : bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] if ;
-! [ [ bad-bin ] infer ] unit-test-fails
-
-! [ [ infinite-loop ] infer ] unit-test-fails
-
-! : bad-recursion-1
-!     dup [ drop bad-recursion-1 5 ] [ ] if ;
-! 
-! [ [ bad-recursion-1 ] infer ] unit-test-fails
-
-! This hangs
-
-! [ ] [ [ [ dup call ] dup call ] infer ] unit-test-fails
-
-! : no-base-case-1 dup [ no-base-case-1 ] [ no-base-case-1 ] if ;
-! [ [ no-base-case-1 ] infer ] unit-test-fails

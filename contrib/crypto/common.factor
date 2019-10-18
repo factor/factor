@@ -1,5 +1,5 @@
 IN: crypto-internals
-USING: kernel io strings sequences namespaces math parser lists ;
+USING: kernel io strings sequences namespaces math parser ;
 
 : w+ ( int -- int ) + HEX: ffffffff bitand ; inline
 : nth-int ( string n -- int ) 2 shift dup 4 + rot <slice> le> ; inline

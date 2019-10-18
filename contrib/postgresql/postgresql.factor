@@ -4,7 +4,7 @@
 ! tested on debian linux with postgresql 7.4.7
 
 IN: postgresql
-USING: kernel alien errors io prettyprint sequences lists namespaces arrays math ;
+USING: kernel alien errors io prettyprint sequences namespaces arrays math ;
 SYMBOL: postgres-conn
 SYMBOL: query-res
 
@@ -59,5 +59,3 @@ SYMBOL: query-res
 
 : print-table ( seq -- )
     [ [ "\t" append write ] each "\n" write ] each ;
-
-

@@ -1,11 +1,9 @@
 USING: help io prettyprint ;
 
-GLOSSARY: "prettyprinter" "a set of words for printing objects in readable form" ;
-
 ARTICLE: "prettyprint" "The prettyprinter"
 "One of Factor's key features is the ability to print almost any object as a valid source literal expression. This greatly aids debugging and provides the building blocks for light-weight object serialization facilities."
 $terpri
-"Prettyprinter words are found in the " { $snippet "prettyprint" } " vocabulary."
+"Prettyprinter words are found in the " { $vocab-link "prettyprint" } " vocabulary."
 $terpri
 "The key words to print an object to the " { $link stdio } " stream; the first two emit a trailing newline, the second two do not:"
 { $subsection . }
@@ -15,7 +13,7 @@ $terpri
 "The string representation of an object can be requested:"
 { $subsection unparse }
 { $subsection unparse-short }
-"The prettyprinter is flexible and extensible."
+"Advanced topics:"
 { $subsection "prettyprint-limitations" }
 { $subsection "prettyprint-variables" }
 { $subsection "prettyprint-extension" }

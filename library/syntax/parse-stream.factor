@@ -1,18 +1,19 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USING: errors generic io kernel lists math namespaces sequences
+USING: errors generic io kernel math namespaces sequences
 words ;
 
 : file-vocabs ( -- )
     "scratchpad" set-in { "syntax" "scratchpad" } set-use ;
 
-: with-parser ( quot -- ) [ <parse-error> rethrow ] recover ;
+: with-parser ( quot -- )
+    [ [ <parse-error> rethrow ] recover ] with-scope ;
 
 : parse-lines ( lines -- quot )
     [
-        dup length [ ] [ 1+ line-number set (parse) ] 2reduce
-        reverse
+        dup length f [ 1+ line-number set (parse) ] 2reduce
+        >quotation
     ] with-parser ;
 
 : parse ( str -- code ) <string-reader> lines parse-lines ;
@@ -31,9 +32,12 @@ words ;
 
 : try-run-file ( file -- ) [ [ run-file ] keep ] try drop ;
 
+: eval>string ( str -- str )
+    [ [ [ eval ] keep ] try drop ] string-out ;
+
 : parse-resource ( path -- quot )
     dup parsing-file
-    [ <resource-stream> "resource:" ] keep append parse-stream ;
+    [ <resource-reader> "resource:" ] keep append parse-stream ;
 
 : run-resource ( file -- ) parse-resource call ;
 

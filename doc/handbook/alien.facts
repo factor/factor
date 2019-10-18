@@ -1,10 +1,11 @@
 USING: alien arrays help libc math ;
-ARTICLE: "alien" "The C library interface"
+
+ARTICLE: "alien" "C library interface"
 "Factor can directly call C functions in native libraries. It is also possible to compile callbacks which run Factor code, and pass them to native libraries as function pointers."
 $terpri
 "The C library interface is entirely self-contained; there is no C code which one must write in order to wrap a library."
 $terpri
-"C library interface words are found in the " { $snippet "alien" } " vocabulary."
+"C library interface words are found in the " { $vocab-link "alien" } " vocabulary."
 { $warning "Since C does not retain runtime type information or do any kind of runtime type checking, any C library interface is not pointer safe. Improper use of C functions can crash the runtime or corrupt memory in unpredictible ways." }
 { $subsection "loading-libs" }
 { $subsection "alien-invoke" }
@@ -15,14 +16,7 @@ $terpri
 { $subsection "dll-internals" } ;
 
 ARTICLE: "loading-libs" "Loading native libraries"
-"Factor must be aware of what native libraries are in use. This is done by associating a logical library name with an operating system path name, and then referring to the library by its logical name. There are two ways to define libraries in this manner; you can either use command line parameters or the " { $link add-library } " word."
-$terpri
-"The following two command line parameters can be specified for each library to load; the second parameter is optional:"
-{ $list
-    { { $snippet "-libraries:" { $emphasis "logical" } ":name=" { $emphasis "name" } } " associates a logical name with a system-specific native library name," }
-    { { $snippet "-libraries:" { $emphasis "logical" } ":abi=" { $emphasis "type" } } " specifies the application binary interface (ABI) used by the library. On nearly all platforms, the default value of " { $snippet "cdecl" } " is correct. On Windows/x86, system DLLs use the " { $snippet "stdcall" } " ABI." }
-}
-"You can also define a logical library interactively:"
+"Before calling a C library, you must associate its path name on disk with a logical name which Factor uses to identify the library:"
 { $subsection add-library }
 "Once a library has been defined, you can try loading it to see if the path name is correct:"
 { $subsection load-library } ;
@@ -57,22 +51,22 @@ $terpri
 { $subsection "c-structs" }
 { $subsection "c-unions" } ;
 
-
 ARTICLE: "c-types-numeric" "Integer and floating point C types"
 "The following numerical types are available; a " { $snippet "u" } " prefix denotes an unsigned type:"
-{ $list
-    { { $snippet "char" } " - always 1 byte" }
+{ $table
+    { "C type" "Notes" }
+    { { $snippet "char" } "always 1 byte" }
     { $snippet "uchar" }
-    { { $snippet "short" } " - always 2 bytes" }
+    { { $snippet "short" } "always 2 bytes" }
     { $snippet "ushort" }
-    { { $snippet "int" } " - always 4 bytes" }
+    { { $snippet "int" } "always 4 bytes" }
     { $snippet "uint" }
-    { { $snippet "long" } " - same size as CPU word size and " { $snippet "void*" } ", except on 64-bit Windows, where it is 4 bytes" }
-    { $snippet "ulong" }
-    { { $snippet "longlong" } " - always 8 bytes" }
-    { $snippet "ulonglong" }
-    { $snippet "float" }
-    { { $snippet "double" } " - same format as " { $link float } " objects" }
+    { { $snippet "long" } { "same size as CPU word size and " { $snippet "void*" } ", except on 64-bit Windows, where it is 4 bytes" } }
+    { { $snippet "ulong" } { } }
+    { { $snippet "longlong" } "always 8 bytes" }
+    { { $snippet "ulonglong" } { } }
+    { { $snippet "float" } { } }
+    { { $snippet "double" } "same format as " { $link float } " objects" }
 }
 "When making alien calls, Factor numbers are converted to and from the above types in a canonical way. Converting a Factor number to a C value may result in a loss of precision."
 $terpri
@@ -113,17 +107,20 @@ $terpri
 
 ARTICLE: "c-types-strings" "C string types"
 "The C library interface defines two types of C strings:"
-{ $list
-    { { $snippet "char*" } " - 8-bit per character null-terminated ASCII" }
-    { { $snippet "ushort*" } " - 16-bit per character null-terminated UTF16" }
+{ $table
+    { "C type" "Notes" }
+    { { $snippet "char*" } "8-bit per character null-terminated ASCII" }
+    { { $snippet "ushort*" } "16-bit per character null-terminated UTF16" }
 }
 "Passing an instance of " { $link c-ptr } " to a C function expecting a C string will simply pass in the address of the " { $link c-ptr } "."
 $terpri
 "Passing a Factor string to a C function expecting a C string allocates a byte array in the Factor heap; the string is then converted to the requested format and a raw pointer is passed to the function. The function must not retain such pointers after it returns, since byte arrays in the Factor heap can be moved by the garbage collector. To allocate a string which will not move, use " { $link <malloc-string> } " and then " { $link free } "."
 $terpri
-"A couple of words can be used to read and write " { $snippet "char*" } " strings from arbitrary addresses:"
-{ $subsection alien>string }
-{ $subsection string>alien } ;
+"A couple of words can be used to read and write " { $snippet "char*" } " and " { $snippet "ushort*" } " strings from arbitrary addresses:"
+{ $subsection alien>char-string }
+{ $subsection alien>u16-string }
+{ $subsection string>char-alien }
+{ $subsection string>u16-alien } ;
 
 ARTICLE: "c-structs" "C structure types"
 "A " { $snippet "struct" } " in C is essentially a block of memory with the value of each structure field stored at a fixed offset. The C library interface provides some utilities to define words which read and write structure fields given a base address."
@@ -252,11 +249,11 @@ $terpri
 ARTICLE: "malloc" "Manual memory management"
 "Sometimes data passed to C functions must be allocated at a fixed address so that C code can safely store pointers."
 $terpri
-"The following words mirror " { $link <c-object> } ", " { $link <c-array> } " and " { $link string>alien } ":"
+"The following words mirror " { $link <c-object> } ", " { $link <c-array> } " and " { $link string>char-alien } ":"
 { $subsection <malloc-object> }
 { $subsection <malloc-array> }
 { $subsection <malloc-string> }
-"These words are built on some words in the " { $snippet "libc" } " vocabulary, which themselves use the C library interface to call C standard library functions:"
+"These words are built on some words in the " { $vocab-link "libc" } " vocabulary, which themselves use the C library interface to call C standard library functions:"
 { $subsection malloc }
 { $subsection calloc }
 { $subsection realloc }
