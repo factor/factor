@@ -2,6 +2,7 @@ IN: temporary
 USE: lists
 USE: namespaces
 USE: test
+USE: sequences
 
 : cons@ [ cons ] change ;
 : unique@ [ unique ] change ;

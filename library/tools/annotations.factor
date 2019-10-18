@@ -7,7 +7,7 @@ IN: words
 ! annotated words cannot be compiled; and annotating a word has
 ! no effect of compiled calls to that word.
 USING: interpreter kernel lists prettyprint sequences
-stdio strings test ;
+io strings test ;
 
 : annotate ( word quot -- | quot: word def -- def )
     over >r >r dup word-def r> call r> swap (define-compound) ;

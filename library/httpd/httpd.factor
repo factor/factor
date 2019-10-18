@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd
-USING: errors kernel lists namespaces
-stdio streams strings threads http sequences ;
+USING: errors kernel lists namespaces io strings threads http
+sequences ;
 
 : (url>path) ( uri -- path )
     url-decode "http://" ?head [
@@ -50,12 +50,10 @@ stdio streams strings threads http sequences ;
     ] ifte ;
 
 : httpd-client ( socket -- )
-    [
-        dup log-client [
-            60000 stdio get set-timeout
-            read-line [ parse-request ] when*
-        ] with-stream
-    ] try ;
+    dup log-client [
+        60000 stdio get set-timeout
+        readln [ parse-request ] when*
+    ] with-stream ;
 
 : httpd-connection ( socket -- )
     "http-server" get accept [ httpd-client ] in-thread drop ;

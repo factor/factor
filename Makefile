@@ -51,9 +51,8 @@ default:
 	@echo "Run 'make' with one of the following parameters:"
 	@echo ""
 	@echo "bsd"
-	@echo "bsd-nopthread - on FreeBSD 4, if you want to use profiling"
 	@echo "linux"
-	@echo "linux-ppc - to compile Factor on Linux/PowerPC"
+	@echo "linux-ppc"
 	@echo "macosx"
 	@echo "windows"
 	@echo ""
@@ -67,12 +66,6 @@ bsd:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic -pthread" \
 		LIBS="$(DEFAULT_LIBS)" 
-	$(STRIP) f
-
-bsd-nopthread:
-	$(MAKE) f \
-		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic" \
-		LIBS="$(DEFAULT_LIBS)"
 	$(STRIP) f
 
 macosx:

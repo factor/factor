@@ -45,7 +45,7 @@ public class WordPreview implements ActionListener, CaretListener
 {
 	private FactorSideKickParser parser;
 	private Timer timer;
-	private JEditTextArea textArea;
+	private EditPane editPane;
 
 	private static String[] IGNORED_RULESETS = {
 		"factor::LITERAL",
@@ -54,11 +54,10 @@ public class WordPreview implements ActionListener, CaretListener
 	};
 
 	//{{{ WordPreview constructor
-	public WordPreview(FactorSideKickParser parser,
-		JEditTextArea textArea)
+	public WordPreview(FactorSideKickParser parser, EditPane editPane)
 	{
 		this.parser = parser;
-		this.textArea = textArea;
+		this.editPane = editPane;
 		this.timer = new Timer(0,this);
 		timer.setRepeats(false);
 	} //}}}
@@ -91,7 +90,9 @@ public class WordPreview implements ActionListener, CaretListener
 	private FactorWord getWordAtCaret(FactorParsedData fdata)
 		throws IOException
 	{
-		String name = FactorPlugin.getRulesetAtOffset(textArea,
+		JEditTextArea textArea = editPane.getTextArea();
+		
+		String name = FactorPlugin.getRulesetAtOffset(editPane,
 			textArea.getCaretPosition());
 		if(name == null)
 			return null;
@@ -114,7 +115,7 @@ public class WordPreview implements ActionListener, CaretListener
 	private void showPreview()
 		throws IOException
 	{
-		View view = textArea.getView();
+		View view = editPane.getView();
 
 		if(SideKickPlugin.isParsingBuffer(view.getBuffer()))
 			return;

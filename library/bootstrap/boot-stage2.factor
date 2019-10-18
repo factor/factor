@@ -1,8 +1,10 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 USING: alien assembler command-line compiler generic hashtables
-kernel lists memory namespaces parser sequences stdio unparser
+kernel lists memory namespaces parser sequences io unparser
 words ;
+
+\ fiber? t "inline" set-word-prop
 
 : pull-in ( ? list -- )
     swap [

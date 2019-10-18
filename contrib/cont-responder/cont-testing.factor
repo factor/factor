@@ -88,7 +88,7 @@ IN: cont-responder
 USE: namespaces
 USE: kernel
 USE: combinators
-USE: stdio
+USE: io
 
 : <cont-test-state> ( -- <state> )
   #! Create a namespace holding data required

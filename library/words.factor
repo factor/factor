@@ -33,7 +33,7 @@ M: word set-word-primitive ( n w -- )
 
 : word-sort ( list -- list )
     #! Sort a list of words by name.
-    [ swap word-name swap word-name string> ] sort ;
+    [ swap word-name swap word-name lexi> ] sort ;
 
 ! The cross-referencer keeps track of word dependencies, so that
 ! words can be recompiled when redefined.
@@ -121,3 +121,7 @@ M: compound definer drop \ : ;
     over f "picker" set-word-prop
     over f "dispatcher" set-word-prop
     (define-compound) ;
+
+: literalize ( word/obj -- quot )
+    #! Produce a quotation that pushes this object.
+    dup word? [ unit [ car ] ] [ f ] ifte cons ;

@@ -1,11 +1,5 @@
 IN: temporary
-USE: html
-USE: namespaces
-USE: stdio
-USE: streams
-USE: strings
-USE: test
-USE: kernel
+USING: html io kernel namespaces styles test ;
 
 [
     "&lt;html&gt;&amp;&apos;sgml&apos;"
@@ -23,42 +17,42 @@ USE: kernel
 [
     [
         ""
-        [ [[ "icon" "library/icons/File.png" ]] ]
+        [ [[ icon "library/icons/File.png" ]] ]
         [ drop ] icon-tag
-    ] with-string
+    ] string-out
 ] unit-test
 
 [ "" ]
 [
     [
         [ ] [ drop ] span-tag
-    ] with-string
+    ] string-out
 ] unit-test
 
 [ "<span style='color: #ff00ff; font-family: Monospaced; '>car</span>" ]
 [
     [
-        [ [ "fg" 255 0 255 ] [[ "font" "Monospaced" ]] ]
+        [ [ foreground 255 0 255 ] [[ font "Monospaced" ]] ]
         [ drop "car" write ]
         span-tag
-    ] with-string
+    ] string-out
 ] unit-test
 
-: html-write-attr ( string style -- string )
-    [ write-attr ] with-html-stream ;
+: html-format ( string style -- string )
+    [ format ] with-html-stream ;
 
 [ "hello world" ]
 [
-    [ "hello world" [ ] html-write-attr ] with-string
+    [ "hello world" [ ] html-format ] string-out
 ] unit-test
 
 [ "<span style='color: #ff00ff; font-family: Monospaced; '>car</span>" ]
 [
     [
         "car"
-        [ [ "fg" 255 0 255 ] [[ "font" "Monospaced" ]] ]
-        html-write-attr
-    ] with-string
+        [ [ foreground 255 0 255 ] [[ font "Monospaced" ]] ]
+        html-format
+    ] string-out
 ] unit-test
 
 [
@@ -66,7 +60,7 @@ USE: kernel
 ] [
     [
         "Foo" [ ] html-document
-    ] with-string
+    ] string-out
 ] unit-test
 
 [
@@ -74,5 +68,5 @@ USE: kernel
 ] [
     [
         "Foo" [ "Hi" write ] simple-html-document
-    ] with-string
+    ] string-out
 ] unit-test

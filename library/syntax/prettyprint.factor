@@ -1,9 +1,9 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USING: alien errors generic hashtables kernel lists math
-matrices memory namespaces parser presentation sequences stdio
-streams strings unparser vectors words ;
+USING: alien errors generic hashtables io kernel lists math
+matrices memory namespaces parser presentation sequences strings
+styles unparser vectors words ;
 
 SYMBOL: prettyprint-limit
 SYMBOL: one-line
@@ -12,51 +12,14 @@ SYMBOL: recursion-check
 
 GENERIC: prettyprint* ( indent obj -- indent )
 
+: unparse. ( obj -- )
+    dup unparse swap presented swons unit format ;
+
 M: object prettyprint* ( indent obj -- indent )
-    unparse write ;
-
-: word-link ( word -- link )
-    [
-        dup word-name unparse ,
-        " [ " ,
-        word-vocabulary unparse ,
-        " ] search" ,
-    ] make-string ;
-
-: word-actions ( -- list )
-    [
-        [[ "See"        "see"          ]]
-        [[ "Push"       ""             ]]
-        [[ "Execute"    "execute"      ]]
-        [[ "jEdit"      "jedit"        ]]
-        [[ "Usages"     "usages ."     ]]
-        [[ "Implements" "implements ." ]]
-    ] ;
-
-: browser-attrs ( word -- style )
-    #! Return the style values for the HTML word browser
-    dup word-vocabulary [ 
-        swap word-name "word" swons 
-        swap "vocab" swons 
-        2list
-    ] [
-        drop [ ]  
-    ] ifte* ;
-
-: word-attrs ( word -- attrs )
-    #! Words without a vocabulary do not get a link or an action
-    #! popup.
-    dup word-vocabulary [
-         dup word-link word-actions <actions> "actions" swons unit
-         swap browser-attrs append
-    ] [
-        drop [ ]
-    ] ifte ;
-
-: word. ( word -- ) dup word-name swap word-attrs write-attr ;
+    unparse. ;
 
 M: word prettyprint* ( indent word -- indent )
-    dup parsing? [ \ POSTPONE: word. bl ] when word. ;
+    dup parsing? [ \ POSTPONE: unparse. bl ] when unparse. ;
 
 : indent ( indent -- )
     #! Print the given number of spaces.
@@ -80,8 +43,8 @@ M: word prettyprint* ( indent word -- indent )
 : prettyprint-elements ( indent list -- indent )
     [
         dup \? [
-            \ \ word. bl
-            uncons >r car word. bl
+            \ \ unparse. bl
+            uncons >r car unparse. bl
             r> cdr prettyprint-elements
         ] [
             uncons >r prettyprint* bl
@@ -122,11 +85,11 @@ M: word prettyprint* ( indent word -- indent )
     #! or { }, or << >>. The body of the list is indented,
     #! unless the list is empty.
     over [
-        >r >r word. <prettyprint
+        >r >r unparse. <prettyprint
         r> prettyprint-elements
-        prettyprint> r> word.
+        prettyprint> r> unparse.
     ] [
-        >r >r word. bl r> drop r> word.
+        >r >r unparse. bl r> drop r> unparse.
     ] ifte ;
 
 M: list prettyprint* ( indent list -- indent )
@@ -152,29 +115,26 @@ M: hashtable prettyprint* ( indent hashtable -- indent )
 
 M: tuple prettyprint* ( indent tuple -- indent )
     [
-        \ << swap tuple>list \ >> prettyprint-sequence
+        \ << swap <mirror> >list \ >> prettyprint-sequence
     ] check-recursion ;
 
 M: alien prettyprint* ( alien -- str )
-    \ ALIEN: word. bl alien-address unparse write ;
+    \ ALIEN: unparse. bl alien-address unparse write ;
 
 : matrix-rows. ( indent list -- indent )
     uncons >r [ one-line on prettyprint* ] with-scope r>
     [ over ?prettyprint-newline matrix-rows. ] when* ;
 
 M: matrix prettyprint* ( indent obj -- indent )
-    \ M[ word. bl >r 3 + r>
+    \ M[ unparse. bl >r 3 + r>
     row-list matrix-rows.
-    bl \ ]M word. 3 - ;
+    bl \ ]M unparse. 3 - ;
 
 : prettyprint ( obj -- )
     [
         recursion-check off
         0 swap prettyprint* drop terpri
     ] with-scope ;
-
-: vocab-link ( vocab -- link )
-    "vocabularies'" swap append ;
 
 : . ( obj -- )
     [

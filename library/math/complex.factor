@@ -46,14 +46,6 @@ M: number = ( n n -- ? ) number= ;
 
 : absq >rect swap sq swap sq + ;
 
-: dot ( #{ x1 x2 }# #{ y1 y2 }# -- x1*y1+x2*y2 )
-    over real over real * >r
-    swap imaginary swap imaginary * r> + ;
-
-: proj ( u v -- w )
-    #! Orthogonal projection of u onto v.
-    [ [ dot ] keep absq /f ] keep * ;
-
 IN: math-internals
 
 : 2>rect ( x y -- xr yr xi yi )

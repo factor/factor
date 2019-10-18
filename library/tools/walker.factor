@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: interpreter
 USING: errors kernel listener lists math namespaces prettyprint
-sequences stdio strings vectors words ;
+sequences io strings vectors words ;
 
 ! The single-stepper simulates Factor in Factor to allow
 ! single-stepping through the execution of a quotation. It can
@@ -50,17 +50,17 @@ sequences stdio strings vectors words ;
     set-callstack call ;
 
 : walk-banner ( -- )
-    [ &s &r &n &c ] [ word. bl ] each
+    [ &s &r &n &c ] [ unparse. bl ] each
     "show stepper stacks." print
-    \ &get word.
+    \ &get unparse.
     " ( var -- value ) inspects the stepper namestack." print
-    \ step word. " -- single step over" print
-    \ into word. " -- single step into" print
-    \ continue word. " -- continue execution" print
-    \ bye word. " -- exit single-stepper" print
+    \ step unparse. " -- single step over" print
+    \ into unparse. " -- single step into" print
+    \ continue unparse. " -- continue execution" print
+    \ bye unparse. " -- exit single-stepper" print
     report ;
 
-: walk-listener walk-banner "walk" listener-prompt set listener ;
+: walk-listener walk-banner "walk " listener-prompt set listener ;
 
 : init-walk ( quot callstack namestack -- )
     init-interpreter

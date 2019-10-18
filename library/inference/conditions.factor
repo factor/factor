@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
 USING: errors interpreter kernel lists namespaces prettyprint
-sequences stdio ;
+sequences io ;
 
 DEFER: recursive-state
 

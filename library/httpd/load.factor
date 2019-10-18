@@ -1,4 +1,4 @@
-USING: kernel parser sequences stdio ;
+USING: kernel parser sequences io ;
 [
     "/library/httpd/http-common.factor"
     "/library/httpd/mime.factor"

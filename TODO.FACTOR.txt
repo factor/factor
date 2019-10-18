@@ -1,50 +1,53 @@
-<magnus--> http://developer.apple.com/technotes/tn2004/tn2123.html#SECLIMITATIONS
-<magnus--> http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4742.html
-<magnus--> not *too* long
-<magnus--> but we'd need to longjmp the main thread from the exception handler thread
-<magnus--> or cause a signal in the main thread
-<magnus--> http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4764.html
-<magnus--> http://clozure.com/cgi-bin/viewcvs.cgi/ccl/lisp-kernel/lisp-exceptions.c?rev=1.9&content-type=text/vnd.viewcvs-markup
-
-- there is a problem with hashcodes of words and bootstrapping
-<erg> if write returns -1  and errno == EINTR then it's not a real error, you can try again
-- http keep alive, and range get
-- sleep word
-- fix i/o on generic x86/ppc unix
-- code walker & exceptions
-- if two tasks write to a unix stream, the buffer can overflow
-- rename prettyprint* to pprint, prettyprint to pp
-- reader syntax for arrays, byte arrays, displaced aliens
-- images saved from plugin do not work
-- investigate orphans
-
-+ plugin:
-
-- word preview for parsing words
-- plugin: supportsBackspace
-- if external factor is down, don't add tons of random shit to the       
-  dictionary
-
 + ui:
 
-- faster layout
-- tiled window manager
-- faster repaint
-- console with presentations
-- ui browser
-- auto-updating inspector, mirrors abstraction
-- mouse enter onto overlapping with interior, but not child, gadget
-- rollovers broken in inspector
+- fix listener prompt display after presentation commands invoked
+- theme abstraction in ui
 - menu dragging
 - fix up the min thumb size hack
-- frame gap
+- gaps in pack layout
+- find out why so many small bignums get consed
+- faster mouse tracking
+- binary search to locate visible children of packs
+- rewrite frame layout for new style
+- an interior paint that is only painted on rollover and mouse press;
+  use it for menu items. give menus a gradient background
+- scroll bar: more intuitive behavior when clicking inside the elevator
+- timers
+- nicer scrollbars with up/down buttons
+- icons
+- use incremental strategy for all pack layouts where possible
+- multiline editing in listener
+- sort out clipping off-by-one flaw when filling rectangles
+- better menu positioning
+- only redraw dirty gadgets
+- get stuff in examples dir running in the ui
+- opengl rendering
+- text selection
+- clipboard support
+
++ tutorial:
+
+- multiline code snippets
+- s-expression text styling language
+- word wrap
+
++ misc
+
+- sigsegv handling on OS X:
+
+  http://developer.apple.com/technotes/tn2004/tn2123.html#SECLIMITATIONS
+  http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4742.html
+  http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4764.html
+  http://clozure.com/cgi-bin/viewcvs.cgi/ccl/lisp-kernel/lisp-exceptions.c?rev=1.9&content-type=text/vnd.viewcvs-markup
+
+- http keep alive, and range get
+- code walker & exceptions
+- sleep word
 
 + ffi:
 
-- alien primitives need a more general input type
 - smarter out parameter handling
 - clarify powerpc passing of value struct parameters
-- box/unbox_signed/unsigned_8
 - ffi unicode strings: null char security hole
 - utf16 string boxing
 - value type structs
@@ -59,7 +62,6 @@
 - simplifier:
   - kill replace after a peek
   - merge inc-d's across VOPs that don't touch the stack
-- [ EAX 0 ] --> [ EAX ]
 - intrinsic char-slot set-char-slot integer-slot set-integer-slot
 - [ [ dup call ] dup call ] infer hangs
 - more accurate types for various words
@@ -74,21 +76,15 @@
 
 + sequences
 
-- generic skip
 - dipping 2nmap, 2each
 - array sort
-- 2map slow with lists
 - nappend: instead of using push, enlarge the sequence with set-length
   then add set the elements with set-nth
-- faster sequence operations
-- generic some? all? memq? fiber?
-- index and index* are very slow with lists
 - specialized arrays
-- list map, subset: not tail recursive
-- phase out sbuf-append
 
 + kernel:
 
+- there is a problem with hashcodes of words and bootstrapping
 - delegating generic words with a non-standard picker
 - powerpc has weird callstack residue
 - instances: do not use make-list
@@ -99,23 +95,21 @@
 - code gc
 - doc comments of generics
 - M: object should not inhibit delegation
-- renumber types appopriately
 
 + i/o:
 
 - faster stream-copy
 - reading and writing byte arrays
-- merge unix and win32 io where appropriate
 - unix io: handle \n\r and \n\0
-- separate words for writing characters and strings
-- perhaps:
-  GENERIC: set-style ( style stream -- )
-  GENERIC: stream-write
-  GENERIC: stream-write-char
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - unify unparse and prettyprint
 - utf16, utf8 encoding
+- fix i/o on generic x86/ppc unix
+- if two tasks write to a unix stream, the buffer can overflow
+- rename prettyprint* to pprint, prettyprint to pp
+- reader syntax for arrays, byte arrays, displaced aliens
+- print parsing words in bold
 
 + nice to have libraries:
 

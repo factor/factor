@@ -1,32 +1,51 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic hashtables kernel lists math namespaces
-sequences ;
+USING: generic hashtables kernel lists math matrices namespaces
+sequences styles vectors ;
 
-! A gadget is a shape, a paint, a mapping of gestures to
-! actions, and a reference to the gadget's parent. A gadget
-! delegates to its shape.
-TUPLE: gadget paint gestures relayout? redraw? parent children ;
+SYMBOL: origin
 
-C: gadget ( shape -- gadget )
-    [ set-delegate ] keep
-    [ <namespace> swap set-gadget-paint ] keep
-    [ <namespace> swap set-gadget-gestures ] keep
-    [ t swap set-gadget-relayout? ] keep
-    [ t swap set-gadget-redraw? ] keep ;
+global [ { 0 0 0 } origin set ] bind
 
-: <empty-gadget> ( -- gadget ) 0 0 0 0 <rectangle> <gadget> ;
+TUPLE: rectangle loc dim ;
 
-: redraw ( gadget -- )
-    #! Redraw a gadget before the next iteration of the event
-    #! loop.
-    dup gadget-redraw? [
-        drop
-    ] [
-        t over set-gadget-redraw?
-        gadget-parent [ redraw ] when*
-    ] ifte ;
+GENERIC: inside? ( loc shape -- ? )
+
+: shape-bounds ( shape -- loc dim )
+    dup rectangle-loc swap rectangle-dim ;
+
+: shape-extent ( shape -- loc dim )
+    dup rectangle-loc dup rot rectangle-dim v+ ;
+
+: screen-bounds ( shape -- rect )
+    shape-bounds >r origin get v+ r> <rectangle> ;
+
+M: rectangle inside? ( loc rect -- ? )
+    screen-bounds shape-bounds { 1 1 1 } v- { 0 0 0 } vmax
+    >r v- { 0 0 0 } r> vbetween? conj ;
+
+: intersect ( shape shape -- rect )
+    >r shape-extent r> shape-extent
+    swapd vmin >r vmax dup r> swap v- { 0 0 0 } vmax
+    <rectangle> ;
+
+! A gadget is a rectangle, a paint, a mapping of gestures to
+! actions, and a reference to the gadget's parent.
+TUPLE: gadget
+    paint gestures visible? relayout? root?
+    parent children ;
+
+: gadget-child gadget-children first ;
+
+C: gadget ( -- gadget )
+    { 0 0 0 } dup <rectangle> over set-delegate
+    t over set-gadget-visible? ;
+
+DEFER: add-invalid
+
+: invalidate ( gadget -- )
+    t swap set-gadget-relayout? ;
 
 : relayout ( gadget -- )
     #! Relayout and redraw a gadget and its parent before the
@@ -34,55 +53,41 @@ C: gadget ( shape -- gadget )
     dup gadget-relayout? [
         drop
     ] [
-        t over set-gadget-redraw?
-        t over set-gadget-relayout?
-        gadget-parent [ relayout ] when*
+        dup invalidate
+        dup gadget-root?
+        [ add-invalid ]
+        [ gadget-parent [ relayout ] when* ] ifte
     ] ifte ;
 
-: relayout* ( gadget -- )
+: (relayout-down)
+    dup invalidate gadget-children [ (relayout-down) ] each ;
+
+: relayout-down ( gadget -- )
     #! Relayout a gadget and its children.
-    dup relayout gadget-children [ relayout* ] each ;
+    dup add-invalid (relayout-down) ;
 
-: ?move ( x y gadget quot -- )
-    >r 3dup shape-pos >r rect> r> = [
-        3drop
-    ] r> ifte ; inline
+: set-gadget-dim ( dim gadget -- )
+    2dup rectangle-dim =
+    [ 2drop ] [ [ set-rectangle-dim ] keep relayout-down ] ifte ;
 
-: move-gadget ( x y gadget -- )
-    [ [ move-shape ] keep redraw ] ?move ;
+GENERIC: pref-dim ( gadget -- dim )
 
-: ?resize ( w h gadget quot -- )
-    >r 3dup shape-size rect> >r rect> r> = [
-        3drop
-    ] r> ifte ; inline
-
-: resize-gadget ( w h gadget -- )
-    [ [ resize-shape ] keep relayout* ] ?resize ;
-
-: paint-prop ( gadget key -- value )
-    over [
-        dup pick gadget-paint hash* dup [
-            2nip cdr
-        ] [
-            drop >r gadget-parent r> paint-prop
-        ] ?ifte
-    ] [
-        2drop f
-    ] ifte ;
-
-: set-paint-prop ( gadget value key -- )
-    rot gadget-paint set-hash ;
-
-GENERIC: pref-size ( gadget -- w h )
-M: gadget pref-size shape-size ;
+M: gadget pref-dim rectangle-dim ;
 
 GENERIC: layout* ( gadget -- )
 
-: prefer ( gadget -- ) [ pref-size ] keep resize-gadget ;
+: prefer ( gadget -- ) dup pref-dim swap set-gadget-dim ;
 
-M: gadget layout*
-    #! Trivial layout gives each child its preferred size.
-    gadget-children [ prefer ] each ;
+M: gadget layout* drop ;
 
 GENERIC: user-input* ( ch gadget -- ? )
+
 M: gadget user-input* 2drop t ;
+
+GENERIC: focusable-child* ( gadget -- gadget/t )
+
+M: gadget focusable-child* drop t ;
+
+: focusable-child ( gadget -- gadget )
+    dup focusable-child*
+    dup t = [ drop ] [ nip focusable-child ] ifte ;

@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: stdio
+IN: io
 USING: kernel lists math sequences strings ;
 
 : be> ( seq -- x ) 0 swap [ >r 8 shift r> bitor ] each ;

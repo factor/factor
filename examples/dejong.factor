@@ -17,16 +17,7 @@
 ! http://www.complexification.net/gallery/machines/peterdejong/
 
 IN: dejong
-
-USE: sdl
-USE: sdl-event
-USE: sdl-gfx
-USE: sdl-video
-USE: namespaces
-USE: math
-USE: kernel
-USE: test
-USE: compiler
+USING: compiler kernel math namespaces sdl styles test ;
 
 SYMBOL: a
 SYMBOL: b

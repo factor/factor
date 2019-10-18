@@ -1,16 +1,16 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: words USING: hashtables kernel lists namespaces strings
-sequences ;
+IN: words
+USING: hashtables kernel lists namespaces strings sequences ;
 
 SYMBOL: vocabularies
 
-: word ( -- word ) global [ "last-word" get ] bind ;
-: set-word ( word -- ) global [ "last-word" set ] bind ;
+: word ( -- word ) "last-word" global hash ;
+: set-word ( word -- ) "last-word" global set-hash ;
 
 : vocabs ( -- list )
     #! Push a list of vocabularies.
-    vocabularies get hash-keys [ string> ] sort ;
+    vocabularies get hash-keys [ lexi> ] sort ;
 
 : vocab ( name -- vocab )
     #! Get a vocabulary.
@@ -22,7 +22,7 @@ SYMBOL: vocabularies
     vocab dup [ hash-values [ ] subset word-sort ] when ;
 
 : all-words ( -- list )
-    [ vocabs [ words % ] each ] make-list ;
+    vocabs [ words ] map concat ;
 
 : each-word ( quot -- )
     #! Apply a quotation to each word in the image.
@@ -33,26 +33,18 @@ SYMBOL: vocabularies
     all-words swap subset word-sort ; inline
 
 : word-subset-with ( obj pred -- list | pred: obj word -- ? )
-    all-words swap subset-with ; inline
+    all-words swap subset-with word-sort ; inline
 
 : recrossref ( -- )
     #! Update word cross referencing information.
     global [ <namespace> crossref set ] bind
     [ add-crossref ] each-word ;
 
-: (search) ( name vocab -- word )
-    vocab dup [ hash ] [ 2drop f ] ifte ;
-
-: search ( name list -- word )
-    #! Search for a word in a list of vocabularies.
-    dup [
-        2dup car (search) [ nip ] [ cdr search ] ?ifte
-    ] [
-        2drop f
-    ] ifte ;
+: search ( name vocabs -- word )
+    [ vocab ?hash ] map-with [ ] find nip ;
 
 : <props> ( name vocab -- plist )
-    "vocabulary" swons swap "name" swons 2list alist>hash ;
+    <namespace> [ "vocabulary" set "name" set ] extend ;
 
 : (create) ( name vocab -- word )
     #! Create an undefined word without adding to a vocabulary.
@@ -61,16 +53,14 @@ SYMBOL: vocabularies
 : reveal ( word -- )
     #! Add a new word to its vocabulary.
     vocabularies get [
-        dup word-vocabulary nest [
-            dup word-name set
-        ] bind
+        dup word-name over word-vocabulary nest set-hash
     ] bind ;
 
 : create ( name vocab -- word )
     #! Create a new word in a vocabulary. If the vocabulary
     #! already contains the word, the existing instance is
     #! returned.
-    2dup (search) [
+    2dup vocab ?hash [
         nip
         dup f "documentation" set-word-prop
         dup f "stack-effect" set-word-prop
@@ -86,6 +76,10 @@ SYMBOL: vocabularies
     dup uncrossref
     dup word-vocabulary vocab [ word-name off ] bind ;
 
+: interned? ( word -- ? )
+    #! Test if the word is a member of its vocabulary.
+    dup word-name over word-vocabulary vocab ?hash eq? ;
+
 : init-search-path ( -- )
     ! For files
     "scratchpad" "file-in" set
@@ -93,10 +87,10 @@ SYMBOL: vocabularies
     ! For interactive
     "scratchpad" "in" set
     [
-        "compiler" "debugger" "errors" "files" "generic"
-        "hashtables" "inference" "interpreter" "jedit" "kernel"
-        "listener" "lists" "math" "memory" "namespaces" "parser"
-        "prettyprint" "processes" "profiler" "sequences"
-        "streams" "stdio" "strings" "syntax" "test" "threads"
-        "unparser" "vectors" "words" "scratchpad"
+        "compiler" "errors" "gadgets" "generic"
+        "hashtables" "help" "inference" "inspector" "interpreter"
+        "jedit" "kernel" "listener" "lists" "math" "matrices"
+        "memory" "namespaces" "parser" "prettyprint"
+        "sequences" "io" "strings" "styles" "syntax" "test"
+        "threads" "unparser" "vectors" "words" "scratchpad"
     ] "use" set ;

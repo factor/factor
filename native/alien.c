@@ -1,5 +1,18 @@
 #include "factor.h"
 
+void primitive_expired(void)
+{
+	CELL object = dpeek();
+
+	if(type_of(object) == ALIEN_TYPE)
+	{
+		ALIEN *alien = untag_alien_fast(object);
+		drepl(tag_boolean(alien->expired));
+	}
+	else
+		drepl(F);
+}
+
 INLINE void* alien_offset(CELL object)
 {
 	ALIEN *alien;

@@ -27,14 +27,12 @@
 IN: todo
 USE: parser
 USE: strings
-USE: streams
+USE: io
 USE: namespaces
 USE: lists
 USE: math
-USE: stdio
 USE: kernel
 USE: prettyprint
-USE: files
 USE: hashtables
 USE: sequences
 USE: http
@@ -58,7 +56,7 @@ USE: http
 : add-todo-item ( <todo> <item> -- )
   #! Add the item to the todo list
   swap [
-    "items" get swap unit append "items" set
+    "items" get swap add "items" set
   ] bind ;
 
 : >yes/no ( bool -- str )

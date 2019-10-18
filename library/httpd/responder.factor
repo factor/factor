@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd
 USING: hashtables http kernel lists namespaces parser sequences
-stdio streams strings ;
+io strings ;
 
 ! Variables
 SYMBOL: vhosts
@@ -47,8 +47,8 @@ SYMBOL: responders
 
 : directory-no/ ( -- )
     [
-        "request" get , CHAR: / ,
-        "raw-query" get [ CHAR: ? , , ] when*
+        "request" get % CHAR: / ,
+        "raw-query" get [ CHAR: ? , % ] when*
     ] make-string redirect ;
 
 : content-length ( alist -- length )
@@ -68,7 +68,7 @@ SYMBOL: responders
 
 : log-user-agent ( alist -- )
     "User-Agent" swap assoc* [
-        unswons [ , ": " , , ] make-string log
+        unswons [ % ": " % % ] make-string log
     ] when* ;
 
 : prepare-url ( url -- url )

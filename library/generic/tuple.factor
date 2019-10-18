@@ -174,10 +174,6 @@ M: mirror set-nth ( n mirror -- elt )
 M: mirror length ( mirror -- len )
     mirror-tuple array-capacity ;
 
-: tuple>list ( tuple -- list )
-    #! We have to type check here, since <mirror> is unsafe.
-    <mirror> >list ;
-
 : clone-tuple ( tuple -- tuple )
     #! Make a shallow copy of a tuple, without cloning its
     #! delegate.
@@ -221,3 +217,12 @@ tuple 10 "priority" set-word-prop
 tuple [ 2drop t ] "class<" set-word-prop
 
 PREDICATE: word tuple-class metaclass tuple = ;
+
+: is? ( obj pred -- ? | pred: obj -- ? )
+    #! Tests if the object satisfies the predicate, or if
+    #! it delegates to an object satisfying it.
+    [ call ] 2keep rot [
+        2drop t
+    ] [
+        over [ >r delegate r> is? ] [ 2drop f ] ifte
+    ] ifte ; inline

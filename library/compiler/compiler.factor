@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 IN: compiler
 USING: compiler-backend compiler-frontend errors inference
-kernel lists math namespaces prettyprint stdio words ;
+kernel lists math namespaces prettyprint io words ;
 
 : supported-cpu? ( -- ? )
     cpu "unknown" = not ;
@@ -13,7 +13,7 @@ kernel lists math namespaces prettyprint stdio words ;
 
 : compiling ( word -- word parameter )
     check-architecture
-    "Compiling " write dup word. terpri flush
+    "Compiling " write dup unparse. terpri flush
     dup word-def ;
 
 GENERIC: (compile) ( word -- )
@@ -43,7 +43,7 @@ M: compound (compile) ( word -- )
     "compile" get [ word compile ] when ; parsing
 
 : cannot-compile ( word error -- )
-    "Cannot compile " write swap word. terpri print-error ;
+    "Cannot compile " write swap unparse. terpri print-error ;
 
 : try-compile ( word -- )
     [ compile ] [ [ cannot-compile ] when* ] catch ;
@@ -52,7 +52,7 @@ M: compound (compile) ( word -- )
 
 : decompile ( word -- )
     dup compiled? [
-        "Decompiling " write dup word. terpri flush
+        "Decompiling " write dup unparse. terpri flush
         [ word-primitive ] keep set-word-primitive
     ] [
         drop

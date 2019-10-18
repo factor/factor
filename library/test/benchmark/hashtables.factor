@@ -1,20 +1,14 @@
-USE: strings
-USE: kernel
-USE: math
-USE: test
-USE: unparser
-USE: hashtables
-USE: compiler
-
-! http://inferno.bell-labs.com/cm/cs/who/bwk/interps/pap.html
+USING: compiler hashtables kernel math namespaces test ;
 
 : store-hash ( hashtable n -- )
-    [ [ dup >hex swap pick set-hash ] keep ] repeat drop ; compiled
+    [ [ >float dup pick set-hash ] keep ] repeat drop ;
 
 : lookup-hash ( hashtable n -- )
-    [ [ unparse over hash drop ] keep ] repeat drop ; compiled
+    [ [ >float over hash drop ] keep ] repeat drop ;
 
-: hashtable-benchmark ( n -- )
-    60000 <hashtable> swap 2dup store-hash lookup-hash ; compiled
+: hashtable-benchmark ( -- )
+    100 [
+        80000 1000 <hashtable> swap 2dup store-hash lookup-hash
+    ] times ; compiled
 
-[ ] [ 80000 hashtable-benchmark ] unit-test
+[ ] [ hashtable-benchmark ] unit-test

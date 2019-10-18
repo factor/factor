@@ -25,8 +25,8 @@
 ! cont-responder facilities.
 !
 IN: browser-responder
-USING: html cont-responder kernel stdio namespaces words lists
-streams strings inspector kernel prettyprint words http parser
+USING: html cont-responder kernel io namespaces words lists
+io strings inspector kernel prettyprint words http parser
 errors unparser listener hashtables memory
 sequences ;
 
@@ -57,7 +57,7 @@ sequences ;
   #! Write out the HTML for the list of words in a vocabulary.
   <select name= "words" style= "width: 200" size= "20" onchange= "document.forms.main.submit()" select> 
     words [ 
-      word-name dup "current-word" get [ "" ] unless* string-compare 0 = [
+      word-name dup "current-word" get [ "" ] unless* = [
       "<option selected>" write
      ] [
         "<option>" write
@@ -72,7 +72,7 @@ sequences ;
   <textarea name= "eval" rows= "30" cols= "80" textarea> 
     [
       >r words r> swap [ over swap dup word-name rot = [ see ] [ drop ] ifte ] each drop    
-    ] with-string chars>entities write
+    ] string-out chars>entities write
   </textarea> <br/>
   "Accept" button ;
 
@@ -137,9 +137,9 @@ sequences ;
   #! Build a string that can evaluate the string 'to-eval'
   #! by first doing an 'IN: vocab' and a 'USE:' of all
   #! necessary vocabs for existing words in that vocab.
-  [ >r "IN: " , dup , "\n" ,
-     vocabulary-uses [ "USE: " , , "\n" , ] each
-     r> , "\n" , ] make-string ;
+  [ >r "IN: " % dup % "\n" %
+     vocabulary-uses [ "USE: " % % "\n" % ] each
+     r> % "\n" % ] make-string ;
 
 : show-parse-error ( error -- )
   #! Show an error page describing the parse error.
@@ -169,8 +169,8 @@ sequences ;
   #! URL which, when requested, will display the source to that
   #! word.
   [ 
-    ".?word=" , url-encode ,
-    "&vocab=" , url-encode ,
+    ".?word=" % url-encode %
+    "&vocab=" % url-encode %
   ] make-string ;
 
 : browse ( <browser> -- )

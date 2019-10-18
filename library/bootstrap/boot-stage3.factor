@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 USING: alien assembler command-line compiler compiler-backend
 compiler-frontend io-internals kernel lists math namespaces
-parser sequences stdio unparser words ;
+parser sequences io unparser words ;
 
 "Compiling base..." print
 
@@ -30,6 +30,8 @@ init-assembler
 
 : compile? "compile" get supported-cpu? and ;
 
+"library/inference/branches.factor" run-file
+
 compile? [
     \ car compile
     \ * compile
@@ -42,7 +44,6 @@ compile? [
 ] when
 
 "Loading more library code..." print
-
 
 t [
     "/library/alien/malloc.factor"
@@ -62,24 +63,24 @@ t [
     
     "/library/eval-catch.factor"
     "/library/tools/listener.factor"
-    "/library/io/ansi.factor"
     "/library/tools/word-tools.factor"
     "/library/syntax/see.factor"
     "/library/test/test.factor"
     "/library/inference/test.factor"
     "/library/tools/walker.factor"
     "/library/tools/annotations.factor"
+    "/library/tools/inspector.factor"
     "/library/bootstrap/image.factor"
     
     "/library/io/logging.factor"
 
     "/library/tools/telnetd.factor"
-    "/library/tools/jedit-wire.factor"
     "/library/tools/jedit.factor"
 
     "/library/httpd/load.factor"
     "/library/sdl/load.factor"
     "/library/ui/load.factor"
+    "/library/help/tutorial.factor"
 ] pull-in
 
 compile? [

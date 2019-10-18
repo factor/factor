@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: errors
 USING: generic kernel kernel-internals lists math namespaces
-parser prettyprint sequences stdio streams strings unparser
+parser prettyprint sequences io strings unparser
 vectors words ;
 
 : expired-error. ( obj -- )
@@ -17,8 +17,8 @@ vectors words ;
 : type-check-error. ( list -- )
     "Type check error" print
     uncons car dup "Object: " write .
-    "Object type: " write class word. terpri
-    "Expected type: " write builtin-type word. terpri ;
+    "Object type: " write class unparse. terpri
+    "Expected type: " write builtin-type unparse. terpri ;
 
 : float-format-error. ( list -- )
     "Invalid floating point literal format: " write . ;
@@ -86,9 +86,9 @@ M: object error. ( error -- ) . ;
 : :get ( var -- value ) "error-namestack" get (get) ;
 
 : debug-help ( -- )
-    [ :s :r :n :c ] [ word. bl ] each
+    [ :s :r :n :c ] [ unparse. bl ] each
     "show stacks at time of error." print
-    \ :get word.
+    \ :get unparse.
     " ( var -- value ) inspects the error namestack." print ;
 
 : flush-error-handler ( error -- )

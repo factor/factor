@@ -1,7 +1,8 @@
+IN: temporary
 USE: test
 USE: image
 USE: namespaces
-USE: stdio
+USE: io
 USE: parser
 USE: kernel
 USE: generic
@@ -23,12 +24,5 @@ USE: math
 
 [ "\0\0\0\0\u000f\u000e\r\u000c" ]
 [
-    [ image-magic 8 >be write ] with-string
+    [ image-magic 8 >be write ] string-out
 ] unit-test
-
-[
-    boot-quot off
-    "/library/bootstrap/boot-stage1.factor" run-resource
-] with-image drop
-
-[ fixnum ] [ 4 class ] unit-test

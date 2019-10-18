@@ -27,8 +27,8 @@ M: computed value= ( literal value -- ? )
 : failing-class-and ( class class -- class )
     2dup class-and dup null = [
         -rot [
-            word-name , " and " , word-name ,
-            " do not intersect" ,
+            word-name % " and " % word-name %
+            " do not intersect" %
         ] make-string inference-warning
     ] [
         2nip

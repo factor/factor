@@ -2,9 +2,10 @@
 
 IN: test
 USING: errors kernel lists math memory namespaces parser
-prettyprint sequences stdio strings unparser vectors words ;
+prettyprint sequences io strings unparser vectors words ;
 
 TUPLE: assert got expect ;
+
 M: assert error.
     "Assertion failed" print
     "Expected: " write dup assert-expect .
@@ -23,7 +24,7 @@ M: assert error.
     #! execute it.
     millis >r gc-time >r call gc-time r> - millis r> -
     [
-        unparse , " ms run / " , unparse , " ms GC time" ,
+        unparse % " ms run / " % unparse % " ms GC time" %
     ] make-string print ;
 
 : unit-test ( output input -- )
@@ -75,7 +76,8 @@ SYMBOL: failures
 : tests
     [
         "lists/cons" "lists/lists" "lists/assoc"
-        "lists/namespaces" "lists/combinators" "combinators"
+        "lists/namespaces" "lists/combinators" "lists/queues"
+        "combinators"
         "continuations" "errors" "hashtables" "strings"
         "namespaces" "generic" "tuple" "files" "parser"
         "parse-number" "image" "init" "io/io"
@@ -89,8 +91,9 @@ SYMBOL: failures
         "crashes" "sbuf" "threads" "parsing-word"
         "inference" "interpreter"
         "alien"
-        "line-editor" "gadgets" "memory" "redefine"
-        "annotate" "sequences" "binary"
+        "gadgets/line-editor" "gadgets/rectangles"
+        "gadgets/gradients" "memory"
+        "redefine" "annotate" "sequences" "binary" "inspector"
     ] run-tests ;
 
 : benchmarks
@@ -100,6 +103,7 @@ SYMBOL: failures
         "benchmark/continuations" "benchmark/ack"
         "benchmark/hashtables" "benchmark/strings"
         "benchmark/vectors" "benchmark/prettyprint"
+        "benchmark/image"
     ] run-tests ;
 
 : compiler-tests

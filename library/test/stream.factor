@@ -1,9 +1,8 @@
 IN: temporary
 USE: namespaces
-USE: streams
-USE: stdio
+USE: io
 USE: test
 USE: generic
 USE: kernel
 
-[ "xyzzy" ] [ [ "xyzzy" write ] with-string ] unit-test
+[ "xyzzy" ] [ [ "xyzzy" write ] string-out ] unit-test

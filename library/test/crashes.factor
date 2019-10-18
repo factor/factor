@@ -29,3 +29,5 @@ prettyprint sequences strings test vectors words ;
     full-gc
     full-gc
 ] unit-test
+
+[ 0 ] [ f size ] unit-test

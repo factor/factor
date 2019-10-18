@@ -1,19 +1,25 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel line-editor lists math namespaces sdl
-sequences strings ;
+USING: generic kernel line-editor math matrices namespaces
+sdl sequences strings styles vectors ;
 
 ! An editor gadget wraps a line editor object and passes
 ! gestures to the line editor.
 
 TUPLE: editor line caret ;
 
+: with-editor ( editor quot -- )
+    #! Execute a quotation in the line editor scope, then
+    #! update the display.
+    swap [ editor-line swap bind ] keep
+    dup relayout scroll>bottom ; inline
+
 : editor-text ( editor -- text )
     editor-line [ line-text get ] bind ;
 
 : set-editor-text ( text editor -- )
-    editor-line [ set-line-text ] bind ;
+    [ set-line-text ] with-editor ;
 
 : focus-editor ( editor -- )
     dup editor-caret swap add-gadget ;
@@ -21,38 +27,22 @@ TUPLE: editor line caret ;
 : unfocus-editor ( editor -- )
     editor-caret unparent ;
 
-: with-editor ( editor quot -- )
-    #! Execute a quotation in the line editor scope, then
-    #! update the display.
-    swap [ editor-line swap bind ] keep relayout ; inline
-
-: run-char-widths ( str -- wlist )
+: run-char-widths ( font str -- wlist )
     #! List of x co-ordinates of each character.
-    0 swap >list
-    [ ch>string shape-w [ + dup ] keep 2 /i - ] map nip ;
+    >vector [ ch>string size-string drop ] map-with
+    dup 0 [ + ] accumulate swap 2 v/n v+ ;
 
-: (x>offset) ( n x wlist -- offset )
-    dup [
-        uncons >r over > [
-            r> 2drop
-        ] [
-            >r 1 + r> r> (x>offset)
-        ] ifte
-    ] [
-        2drop
-    ] ifte ;
-
-: x>offset ( x str -- offset )
-    0 -rot run-char-widths (x>offset) ;
+: x>offset ( x font str -- offset )
+    run-char-widths [ <= ] find-with drop ;
 
 : set-caret-x ( x editor -- )
     #! Move the caret to a clicked location.
-    [ line-text get x>offset caret set ] with-editor ;
+    dup [
+        gadget-font line-text get x>offset caret set
+    ] with-editor ;
 
 : click-editor ( editor -- )
-    hand
-    2dup relative shape-x pick set-caret-x
-    request-focus ;
+    dup hand relative first over set-caret-x request-focus ;
 
 : editor-actions ( editor -- )
     [
@@ -66,35 +56,35 @@ TUPLE: editor line caret ;
     ] swap add-actions ;
 
 : <caret> ( -- caret )
-    0 0 0 0 <plain-rect> <gadget>
-    dup red background set-paint-prop ;
+    <plain-gadget> dup red background set-paint-prop ;
 
 C: editor ( text -- )
-    <empty-gadget> over set-delegate
+    <gadget> over set-delegate
     [ <line-editor> swap set-editor-line ] keep
     [ <caret> swap set-editor-caret ] keep
     [ set-editor-text ] keep
     dup editor-actions ;
 
-: offset>x ( offset str -- x )
-    head font get swap size-string drop ;
+: offset>x ( gadget offset str -- x )
+    head >r gadget-font r> size-string drop ;
 
-: caret-pos ( editor -- x y )
-    editor-line [ caret get line-text get ] bind offset>x 0 ;
+: caret-loc ( editor -- x y )
+    dup editor-line [ caret get line-text get ] bind offset>x
+    0 0 3vector ;
 
-: caret-size ( editor -- w h )
-    1 swap shape-h ;
+: caret-dim ( editor -- w h )
+    rectangle-dim { 0 1 1 } v* { 1 0 0 } v+ ;
 
 M: editor user-input* ( ch editor -- ? )
-    [ [ insert-char ] with-editor ] keep
-    scroll>bottom  t ;
+    [ insert-char ] with-editor  t ;
 
-M: editor pref-size ( editor -- w h )
-    dup editor-text label-size >r 1 + r> ;
+M: editor pref-dim ( editor -- dim )
+    dup editor-text label-size { 1 0 0 } v+ ;
 
 M: editor layout* ( editor -- )
-    dup editor-caret over caret-size rot resize-gadget
-    dup editor-caret swap caret-pos rot move-gadget ;
+    dup editor-caret over caret-dim swap set-gadget-dim
+    dup editor-caret swap caret-loc swap set-rectangle-loc ;
 
-M: editor draw-shape ( editor -- )
-    [ editor-text ] keep [ draw-string ] with-trans ;
+M: editor draw-gadget* ( editor -- )
+    dup delegate draw-gadget*
+    dup editor-text draw-string ;

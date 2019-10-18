@@ -7,30 +7,14 @@ USING: generic kernel kernel-internals lists math sequences ;
 DEFER: string?
 BUILTIN: string 12 string? [ 1 length f ] [ 2 hashcode f ] ;
 
-M: string =
-    over string? [
-        over hashcode over hashcode number= [
-            string-compare 0 eq?
-        ] [
-            2drop f
-        ] ifte
-    ] [
-        2drop f
-    ] ifte ;
-
-M: string nth ( n str -- ch )
-    bounds-check char-slot ;
+M: string nth ( n str -- ch ) bounds-check char-slot ;
 
 GENERIC: >string ( seq -- string )
 
 M: string >string ;
 
-: string> ( str1 str2 -- ? )
-    ! Returns if the first string lexicographically follows str2
-    string-compare 0 > ;
-
 ! Characters
-PREDICATE: integer blank     " \t\n\r" contains? ;
+PREDICATE: integer blank     " \t\n\r" member? ;
 PREDICATE: integer letter    CHAR: a CHAR: z between? ;
 PREDICATE: integer LETTER    CHAR: A CHAR: Z between? ;
 PREDICATE: integer digit     CHAR: 0 CHAR: 9 between? ;
@@ -39,7 +23,7 @@ PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
 : quotable? ( ch -- ? )
     #! In a string literal, can this character be used without
     #! escaping?
-    dup printable? swap "\"\\" contains? not and ;
+    dup printable? swap "\"\\" member? not and ;
 
 : url-quotable? ( ch -- ? )
     #! In a URL, can this character be used without
@@ -47,4 +31,4 @@ PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
     dup letter?
     over LETTER? or
     over digit? or
-    swap "/_?." contains? or ;
+    swap "/_?." member? or ;

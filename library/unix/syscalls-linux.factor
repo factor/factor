@@ -23,7 +23,7 @@ USING: alien ;
 : INADDR_ANY 0 ;
 
 : F_SETFL 4 ;    ! set file status flags
-: O_NONBLOCK 4 ; ! no delay
+: O_NONBLOCK HEX: 800 ; ! no delay
 
 BEGIN-STRUCT: sockaddr-in
     FIELD: ushort family
@@ -31,3 +31,7 @@ BEGIN-STRUCT: sockaddr-in
     FIELD: in_addr_t addr
     FIELD: longlong unused
 END-STRUCT
+
+: EINTR HEX: 4 ;
+: EAGAIN HEX: b ;
+: EINPROGRESS HEX: 73 ;

@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: kernel
+USING: kernel-internals lists ;
 DEFER: callcc1
 IN: errors
-USING: kernel-internals lists namespaces streams ;
 
 TUPLE: no-method object generic ;
 

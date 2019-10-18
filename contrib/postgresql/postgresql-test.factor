@@ -2,7 +2,7 @@
 ! Set username and password in  the 'connect' word.
 
 IN: postgresql-test
-USING: kernel postgresql alien errors stdio ;
+USING: kernel postgresql alien errors io ;
 
 
 : connect ( -- PGconn )

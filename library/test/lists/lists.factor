@@ -10,11 +10,6 @@ USING: kernel lists sequences test ;
 [ [ 1 2 3 4 ]   ] [ [ 1 2 3 ] [ 4 ] append ] unit-test
 [ [ 1 2 3 4 ]   ] [ [ 1 2 3 ] { 4 } append ] unit-test
 
-[ f         ] [ 3 [ ]     contains? ] unit-test
-[ f         ] [ 3 [ 1 2 ] contains? ] unit-test
-[ t ] [ 1 [ 1 2 ] contains? >boolean ] unit-test
-[ t ] [ 2 [ 1 2 ] contains? >boolean ] unit-test
-
 [ [ 3 ]     ] [ [ 3 ]         last ] unit-test
 [ [ 3 ]     ] [ [ 1 2 3 ]     last ] unit-test
 [ [[ 3 4 ]] ] [ [[ 1 [[ 2 [[ 3 4 ]] ]] ]] last ] unit-test
@@ -52,7 +47,7 @@ USING: kernel lists sequences test ;
 [ f ] [ 3 [ 1 2 3 ] tail ] unit-test
 [ [ 3 ] ] [ 2 [ 1 2 3 ] tail ] unit-test
 
-[ [ 1 3 ] ] [ [ 2 ] [ 1 2 3 ] difference ] unit-test
+[ [ 1 3 ] ] [ [ 2 ] [ 1 2 3 ] seq-diff ] unit-test
 
 [ t ] [ [ 1 2 3 ] [ 1 2 3 4 5 ] contained? ] unit-test
 [ f ] [ [ 1 2 3 6 ] [ 1 2 3 4 5 ] contained? ] unit-test

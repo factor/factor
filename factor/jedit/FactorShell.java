@@ -33,6 +33,7 @@ import console.*;
 import factor.*;
 import javax.swing.text.AttributeSet;
 import java.io.*;
+import java.net.Socket;
 import java.util.Iterator;
 import java.util.HashMap;
 import org.gjt.sp.jedit.jEdit;
@@ -79,11 +80,11 @@ public class FactorShell extends Shell
 	public void printPrompt(Console console, Output output)
 	{
 		ConsoleState state = null;
+
 		try
 		{
 			state = getConsoleState(console);
 			state.openStream();
-			state.packetLoop(output);
 		}
 		catch(Exception e)
 		{
@@ -111,7 +112,7 @@ public class FactorShell extends Shell
 		try
 		{
 			state = getConsoleState(console);
-			state.readResponse(command,output);
+			state.userInput(command);
 		}
 		catch(Exception e)
 		{
@@ -181,13 +182,58 @@ public class FactorShell extends Shell
 
 	//}}}
 
+	//{{{ StreamThread class
+	static class StreamThread extends Thread
+	{
+		private Reader in;
+		private Output output;
+
+		StreamThread(Reader in, Output output)
+		{
+			this.in = in;
+			this.output = output;
+		}
+		
+		public void run()
+		{
+			try
+			{
+				char[] buf = new char[4096];
+				
+				for(;;)
+				{
+					int count = in.read(buf);
+					if(count <= 0)
+						break;
+					output.writeAttrs(null, new String(buf,0,count));
+				}
+			}
+			catch(IOException io)
+			{
+				Log.log(Log.ERROR,this,io);
+			}
+			finally
+			{
+				try
+				{
+					in.close();
+				}
+				catch(IOException io2)
+				{
+					Log.log(Log.ERROR,this,io2);
+				}
+			}
+		}
+	} //}}}
+
 	//{{{ ConsoleState class
 	class ConsoleState
 	{
 		private Console console;
 		private Output output;
-		private FactorStream stream;
-		private boolean waitingForInput;
+		private Reader in;
+		private Writer out;
+		private StreamThread thread;
 		
 		ConsoleState(Console console)
 		{
@@ -197,18 +243,19 @@ public class FactorShell extends Shell
 
 		void openStream()
 		{
-			if(stream != null)
+			if(thread != null)
 				return;
 
 			output.print(console.getInfoColor(),
 				jEdit.getProperty("factor.shell.opening"));
 
-			stream = null;
+			Socket socket = null;
+			
 			ExternalFactor external = FactorPlugin.getExternalInstance();
 			if(external != null)
-				stream = external.openStream();
+				socket = external.openStream();
 
-			if(stream == null)
+			if(socket == null)
 			{
 				output.print(console.getInfoColor(),
 					jEdit.getProperty("factor.shell.no-connection"));
@@ -217,98 +264,53 @@ public class FactorShell extends Shell
 			{
 				try
 				{
-					packetLoop(output);
+					in = new InputStreamReader(socket.getInputStream());
+					out = new OutputStreamWriter(socket.getOutputStream());
+					thread = new StreamThread(in,output);
+					thread.start();
 				}
-				catch(Exception e)
+				catch(IOException io)
 				{
-					Log.log(Log.ERROR,this,e);
+					Log.log(Log.ERROR,this,io);
+					in = null;
+					out = null;
+					thread = null;
+					try
+					{
+						socket.close();
+					}
+					catch(IOException io2)
+					{
+						Log.log(Log.ERROR,this,io2);
+					}
 				}
 			}
 		}
 
 		void closeStream()
 		{
-			try
+			if(thread != null)
 			{
-				if(stream != null)
-				{
-					waitingForInput = false;
-					output.print(console.getInfoColor(),
-						jEdit.getProperty("factor.shell.closing"));
-					stream.close();
-				}
-			}
-			catch(IOException e)
-			{
-				throw new RuntimeException(e);
+				output.print(console.getInfoColor(),
+					jEdit.getProperty("factor.shell.closing"));
+				thread.interrupt();
 			}
 
-			stream = null;
+			in = null;
+			out = null;
+			thread = null;
 		}
-		
-		private void handleWritePacket(FactorStream.WritePacket w, Output output)
-			throws Exception
-		{
-			Cons pair = FactorPlugin.getExternalInstance()
-				.parseObject(w.getText());
 
-			String write;
-			if(pair.car instanceof String)
-				write = (String)pair.car;
-			else if(pair.car instanceof Integer)
-				write = String.valueOf((char)((Integer)pair.car).intValue());
-			else
-				write = "MALFORMED WRITE PACKET: " + pair;
-			AttributeSet attrs = new ListenerAttributeSet(
-				(Cons)pair.next().car);
-			output.writeAttrs(attrs,write);
-		}
-		
-		void packetLoop(Output output) throws Exception
+		void userInput(String command) throws Exception
 		{
-			if(waitingForInput)
+			openStream();
+
+			if(thread == null)
 				return;
 
-			if(stream == null)
-				return;
-
-			for(;;)
-			{
-				FactorStream.Packet p = stream.nextPacket();
-				if(p == null)
-				{
-					/* EOF */
-					closeStream();
-					break;
-				}
-				else if(p instanceof FactorStream.ReadLinePacket)
-				{
-					waitingForInput = true;
-					break;
-				}
-				else if(p instanceof FactorStream.WritePacket)
-					handleWritePacket((FactorStream.WritePacket)p,output);
-			}
-		}
-
-		void readResponse(String command, Output output) throws Exception
-		{
-			if(waitingForInput)
-			{
-				openStream();
-
-				if(stream == null)
-					return;
-
-				stream.readResponse(command);
-				waitingForInput = false;
-				packetLoop(output);
-			}
-			else
-			{
-				output.print(console.getErrorColor(),
-					jEdit.getProperty("factor.shell.not-waiting"));
-			}
+			out.write(command);
+			out.write("\n");
+			out.flush();
 		}
 	} //}}}
 }

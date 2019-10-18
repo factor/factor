@@ -161,9 +161,6 @@ SYMBOL: typemap
 
 SYMBOL: object
 
-: type-union ( list list -- list )
-    append prune ;
-
 : lookup-union ( typelist -- class )
     [ > ] sort typemap get hash [ object ] unless* ;
 
@@ -171,7 +168,7 @@ SYMBOL: object
     #! Return a class that both classes are subclasses of.
     swap builtin-supertypes
     swap builtin-supertypes
-    type-union lookup-union ;
+    seq-union lookup-union ;
 
 : class-or-list ( list -- class )
     #! Return a class that every class in the list is a
@@ -184,7 +181,7 @@ SYMBOL: object
     #! Return a class that is a subclass of both, or null in
     #! the degenerate case.
     swap builtin-supertypes swap builtin-supertypes
-    intersection lookup-union ;
+    seq-intersect lookup-union ;
 
 : define-class ( class metaclass -- )
     dupd "metaclass" set-word-prop

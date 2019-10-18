@@ -21,7 +21,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 IN: cont-responder
-USING: stdio http httpd math random namespaces streams
+USING: http httpd math random namespaces io
        lists strings kernel html unparser hashtables
        parser generic sequences ;
 
@@ -40,7 +40,7 @@ SYMBOL: post-refresh-get?
 
 : get-random-id ( -- id ) 
   #! Generate a random id to use for continuation URL's
-  [ 32 [ 0 9 random-int unparse , ] times ] make-string str>number 36 >base ;
+  [ 32 [ 0 9 random-int unparse % ] times ] make-string str>number 36 >base ;
 
 #! Name of variable holding the table of continuations.
 SYMBOL: table 
@@ -199,8 +199,8 @@ SYMBOL: callback-cc
   #! HTTP 302 to occur to instruct the browser to forward to
   #! the request URL.
   [ 
-    "HTTP/1.1 302 Document Moved\nLocation: " , ,
-    "\nContent-Length: 0\nContent-Type: text/plain\n\n" , 
+    "HTTP/1.1 302 Document Moved\nLocation: " % %
+    "\nContent-Length: 0\nContent-Type: text/plain\n\n" %
   ] make-string call-exit-continuation ;
 
 : redirect-to-here ( -- )
@@ -232,7 +232,7 @@ SYMBOL: callback-cc
   store-callback-cc  redirect-to-here 
   [ 
     expirable register-continuation id>url swap 
-    \ serving-html swons with-string call-exit-continuation
+    \ serving-html swons string-out call-exit-continuation
   ] callcc1 
   nip ;
 
@@ -244,7 +244,7 @@ SYMBOL: callback-cc
   #! use is an optimisation to save having to generate and save a continuation
   #! in that special case.
   store-callback-cc  redirect-to-here 
-  \ serving-html swons with-string call-exit-continuation ;
+  \ serving-html swons string-out call-exit-continuation ;
 
 #! Name of variable for holding initial continuation id that starts
 #! the responder.

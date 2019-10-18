@@ -28,7 +28,7 @@ USE: sequences
 
 [ t ] [
     3 [ 3 over [ ] [ ] ifte drop ] dataflow
-    kill-set [ value= ] some-with? >boolean
+    kill-set [ value= ] contains-with?
 ] unit-test
 
 : literal-kill-test-1 4 compiled-offset cell 2 * - ; compiled

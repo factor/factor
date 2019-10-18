@@ -1,5 +1,5 @@
 IN: temporary
-USE: files
+USE: io
 USE: httpd
 USE: lists
 USE: test

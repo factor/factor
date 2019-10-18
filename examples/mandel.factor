@@ -28,7 +28,7 @@ USE: sdl-video
 USE: vectors
 USE: prettyprint
 USE: sequences
-USE: stdio
+USE: io
 USE: test
 
 : f_ ( h s v i -- f ) >r swap rot >r 2dup r> 6 * r> - ;
@@ -93,8 +93,6 @@ USE: test
             hsv>rgb 1.0 scale-rgb ,
         ] repeat
     ] make-vector nip ;
-
-: absq >rect swap sq swap sq + ; inline
 
 : iter ( c z nb-iter -- x )
     over absq 4 >= over 0 = or [

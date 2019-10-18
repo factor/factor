@@ -1,8 +1,11 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
+IN: words
+DEFER: literalize
+
 IN: namespaces
 USING: hashtables kernel kernel-internals lists math sequences
-strings vectors ;
+strings vectors words ;
 
 ! Variables in Factor:
 !
@@ -106,27 +109,21 @@ SYMBOL: building
 
 : , ( obj -- )
     #! Add to the sequence being built with make-seq.
-    ! The behavior where a string can be passed is deprecated;
-    ! use % instead!
-    building get dup sbuf? [
-        over string? [ swap nappend ] [ push ] ifte
-    ] [
-        push
-    ] ifte ;
-
-: literal, ( word -- )
-    #! Append some code that pushes the word on the stack. Used
-    #! when building quotations.
-    unit , \ car , ;
+    building get push ;
 
 : unique, ( obj -- )
     #! Add the object to the sequence being built with make-seq
     #! unless an equal object has already been added.
-    building get 2dup index -1 = [ push ] [ 2drop ] ifte ;
+    building get 2dup member? [ 2drop ] [ push ] ifte ;
 
 : % ( seq -- )
     #! Append to the sequence being built with make-seq.
     building get swap nappend ;
+
+: literal, ( word -- )
+    #! Append some code that pushes the word on the stack. Used
+    #! when building quotations.
+    literalize % ;
 
 : make-vector ( quot -- vector )
     100 <vector> make-seq ; inline
@@ -141,7 +138,7 @@ SYMBOL: building
     make-sbuf >string ; inline
 
 : make-rstring ( quot -- string )
-    make-sbuf dup nreverse >string ; inline
+    make-sbuf <reversed> >string ; inline
 
 ! Building hashtables, and computing a transitive closure.
 SYMBOL: hash-buffer

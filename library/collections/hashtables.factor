@@ -133,7 +133,7 @@ IN: hashtables
     swap [ with ] hash-each 2drop ; inline
 
 : hash-subset ( hash quot -- hash | quot: [[ k v ]] -- ? )
-    >r hash>alist r> subset alist>hash ;
+    >r hash>alist r> subset alist>hash ; inline
 
 M: hashtable clone ( hash -- hash )
     dup bucket-count <hashtable>
@@ -158,3 +158,16 @@ M: hashtable hashcode ( hash -- n )
     ] [
         0 swap hash-bucket hashcode
     ] ifte ;
+
+: cache ( key hash quot -- value | quot: key -- value )
+    pick pick hash [
+        >r 3drop r>
+    ] [
+        pick rot >r >r call dup r> r> set-hash
+    ] ifte* ; inline
+
+: ?hash ( key hash/f -- value/f )
+    dup [ hash ] [ 2drop f ] ifte ;
+
+: ?set-hash ( value key hash/f -- hash )
+    [ 1 <hashtable> ] unless* [ set-hash ] keep ;

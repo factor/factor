@@ -2,7 +2,10 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: gadgets generic kernel lists math namespaces sdl
-sequences words ;
+sequences vectors words ;
+
+SYMBOL: x
+SYMBOL: y
 
 ! A frame arranges left/right/top/bottom gadgets around a
 ! center gadget, which gets any leftover space.
@@ -20,12 +23,12 @@ TUPLE: frame left right top bottom center ;
     dup frame-bottom unparent 2dup set-frame-bottom add-gadget ;
 
 C: frame ( -- frame )
-    [ <empty-gadget> swap set-delegate ] keep
-    [ <empty-gadget> swap set-frame-center ] keep
-    [ <empty-gadget> swap set-frame-left ] keep
-    [ <empty-gadget> swap set-frame-right ] keep
-    [ <empty-gadget> swap set-frame-top ] keep
-    [ <empty-gadget> swap set-frame-bottom ] keep ;
+    [ <gadget> swap set-delegate ] keep
+    [ <gadget> swap set-frame-center ] keep
+    [ <gadget> swap set-frame-left ] keep
+    [ <gadget> swap set-frame-right ] keep
+    [ <gadget> swap set-frame-top ] keep
+    [ <gadget> swap set-frame-bottom ] keep ;
 
 : frame-major ( frame -- list )
     [
@@ -37,13 +40,20 @@ C: frame ( -- frame )
         dup frame-left , dup frame-center , frame-right ,
     ] make-list ;
 
+: pref-size pref-dim 3unseq drop ;
+
 : max-h pref-size nip height [ max ] change ;
 : max-w pref-size drop width [ max ] change ;
 
 : add-h pref-size nip height [ + ] change ;
 : add-w pref-size drop width [ + ] change ;
 
-M: frame pref-size ( glue -- w h )
+: with-pref-size ( quot -- )
+    [
+        0 width set 0 height set call width get height get
+    ] with-scope ; inline
+
+M: frame pref-dim ( glue -- dim )
     [
         dup frame-major [ max-w ] each
         dup frame-minor [ max-h ] each
@@ -51,7 +61,7 @@ M: frame pref-size ( glue -- w h )
         dup frame-right add-w
         dup frame-top add-h
         frame-bottom add-h
-    ] with-pref-size ;
+    ] with-pref-size 0 3vector ;
 
 SYMBOL: frame-right-run
 SYMBOL: frame-bottom-run
@@ -62,11 +72,11 @@ SYMBOL: frame-bottom-run
 : var-frame-top \ frame-top var-frame-y ;
 : var-frame-right
     dup \ frame-right var-frame-x
-    swap shape-w \ frame-right [ - ] change
+    swap rectangle-dim first \ frame-right [ - ] change
     \ frame-right get \ frame-left get - frame-right-run set ;
 : var-frame-bottom
     dup \ frame-bottom var-frame-y
-    swap shape-h \ frame-bottom [ - ] change
+    swap rectangle-dim second \ frame-bottom [ - ] change
     \ frame-bottom get \ frame-top get - frame-bottom-run set ;
 
 : setup-frame ( frame -- )
@@ -75,8 +85,11 @@ SYMBOL: frame-bottom-run
     dup var-frame-right
     var-frame-bottom ;
 
+: move-gadget ( x y gadget -- )
+    >r 0 3vector r> set-rectangle-loc ;
+
 : reshape-gadget ( x y w h gadget -- )
-    [ resize-gadget ] keep move-gadget ;
+    [ >r 0 3vector r> set-gadget-dim ] keep move-gadget ;
 
 : pos-frame-center
     >r \ frame-left get \ frame-top get
@@ -113,4 +126,4 @@ SYMBOL: frame-bottom-run
     frame-bottom pos-frame-bottom ;
 
 M: frame layout* ( frame -- )
-    [ dup setup-frame  layout-frame ] with-layout ;
+    [ 0 x set 0 y set dup setup-frame layout-frame ] with-scope ;

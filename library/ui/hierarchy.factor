@@ -1,65 +1,65 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic hashtables kernel lists math namespaces
-sequences ;
+USING: generic hashtables kernel lists math matrices namespaces
+sequences vectors ;
 
-: remove-gadget ( gadget box -- )
+: remove-gadget ( gadget parent -- )
     [ 2dup gadget-children remq swap set-gadget-children ] keep
     relayout
     f swap set-gadget-parent ;
 
-: (add-gadget) ( gadget box -- )
-    #! This is inefficient.
-    [ gadget-children swap unit append ] keep
-    set-gadget-children ;
-
 : unparent ( gadget -- )
-    dup gadget-parent dup [ remove-gadget ] [ 2drop ] ifte ;
+    [
+        dup gadget-parent dup
+        [ remove-gadget ] [ 2drop ] ifte
+    ] when* ;
 
-: add-gadget ( gadget box -- )
-    #! Add a gadget to a box.
+: (clear-gadget) ( gadget -- )
+    gadget-children [
+        dup [ f swap set-gadget-parent ] each 0 swap set-length
+    ] when* ;
+
+: clear-gadget ( gadget -- )
+    dup (clear-gadget) relayout ;
+
+: ?push ( elt seq/f -- seq )
+    [ [ push ] keep ] [ 1vector ] ifte* ;
+
+: (add-gadget) ( gadget box -- )
     over unparent
     dup pick set-gadget-parent
-    tuck (add-gadget)
-    relayout ;
+    [ gadget-children ?push ] keep set-gadget-children ;
 
-: (parent-list) ( gadget -- )
-    [ dup gadget-parent (parent-list) , ] when* ;
+: add-gadget ( gadget parent -- )
+    #! Add a gadget to a parent gadget.
+    [ (add-gadget) ] keep relayout ;
 
-: parent-list ( gadget -- list )
-    #! A list of all parents of the gadget, including the
-    #! gadget itself.
-    [ (parent-list) ] make-list ;
+: (parents-down) ( list gadget -- list )
+    [ [ swons ] keep gadget-parent (parents-down) ] when* ;
 
-: (each-parent) ( list quot -- ? )
-    over [
-        over car gadget-paint [
-            2dup >r >r >r cdr r> (each-parent) [
-                r> car r> call
-            ] [
-                r> r> 2drop f
-            ] ifte
-        ] bind
-    ] [
-        2drop t
-    ] ifte ; inline
+: parents-down ( gadget -- list )
+    #! A list of all parents of the gadget, the last element
+    #! is the gadget itself.
+    f swap (parents-down) ;
+
+: parents-up ( gadget -- list )
+    #! A list of all parents of the gadget, the first element
+    #! is the gadget itself.
+    dup [ dup gadget-parent parents-up cons ] when ;
 
 : each-parent ( gadget quot -- ? )
-    #! Keep executing the quotation on higher and higher
-    #! parents until it returns f.
-    >r parent-list r> (each-parent) ; inline
+    >r parents-up r> all? ; inline
 
-: screen-pos ( gadget -- point )
+: find-parent ( gadget quot -- ? )
+    >r parents-up r> find nip ; inline
+
+: screen-loc ( gadget -- point )
     #! The position of the gadget on the screen.
-    0 swap [ shape-pos + t ] each-parent drop ;
+    parents-up { 0 0 0 } [ rectangle-loc v+ ] reduce ;
 
 : relative ( g1 g2 -- g2-g1 )
-    screen-pos swap screen-pos - ;
+    screen-loc swap screen-loc v- ;
 
 : child? ( parent child -- ? )
-    dup [
-        2dup eq? [ 2drop t ] [ gadget-parent child? ] ifte
-    ] [
-        2drop f
-    ] ifte ;
+    parents-down memq? ;

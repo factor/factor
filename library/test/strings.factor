@@ -1,4 +1,5 @@
 IN: temporary
+USING: vectors ;
 USE: errors
 USE: kernel
 USE: math
@@ -24,7 +25,7 @@ USE: lists
 
 [ "Beginning" ] [ 9 "Beginning and end" head ] unit-test
 
-[ f ] [ CHAR: I "team" contains? ] unit-test
+[ f ] [ CHAR: I "team" member? ] unit-test
 [ t ] [ "ea" "team" subseq? ] unit-test
 [ f ] [ "actore" "Factor" subseq? ] unit-test
 
@@ -71,8 +72,8 @@ unit-test
 [ t ] [ CHAR: 0 digit? ] unit-test
 [ f ] [ CHAR: x digit? ] unit-test
 
-[ t ] [ "abc" "abd" string-compare 0 < ] unit-test
-[ t ] [ "z" "abd" string-compare 0 > ] unit-test
+[ t ] [ "abc" "abd" lexi 0 < ] unit-test
+[ t ] [ "z" "abd" lexi 0 > ] unit-test
 
 [ f ] [ [ 0 10 "hello" subseq ] [ not ] catch ] unit-test
 
@@ -96,4 +97,4 @@ unit-test
 [ 1 "" nth ] unit-test-fails
 [ -6 "hello" nth ] unit-test-fails
 
-[ t ] [ "hello world" dup >list >string = ] unit-test 
+[ t ] [ "hello world" dup >vector >string = ] unit-test 

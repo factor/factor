@@ -29,8 +29,7 @@
 IN: todo-example
 USE: cont-responder
 USE: html
-USE: html
-USE: stdio
+USE: io
 USE: strings
 USE: namespaces
 USE: inspector
@@ -115,7 +114,7 @@ USE: sequences
 
 : show-stack-page ( -- )
   #! Debug function to show a page containing the current call stack.
-  [ .s ] with-string chars>entities show-message-page ;
+  [ .s ] string-out chars>entities show-message-page ;
 
 : row ( list -- )
   #! Output an html TR row with each element of the list

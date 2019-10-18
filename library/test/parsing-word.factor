@@ -14,5 +14,5 @@ DEFER: foo
 ! Test > 1 ( ) comment; only the first one should be used.
 [ t ] [
     CHAR: a "IN: temporary : foo ( a ) ( b ) ;" parse drop word
-    "stack-effect" word-prop contains?
+    "stack-effect" word-prop member?
 ] unit-test

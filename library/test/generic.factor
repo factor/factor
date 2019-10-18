@@ -1,5 +1,5 @@
 IN: temporary
-USING: parser prettyprint sequences stdio strings unparser ;
+USING: parser prettyprint sequences io strings unparser ;
 
 USE: hashtables
 USE: namespaces
@@ -123,13 +123,13 @@ TUPLE: another-one ;
 
 ! Test generic see and parsing
 [ "IN: temporary\nSYMBOL: bah \nUNION: bah fixnum alien ;\n" ]
-[ [ \ bah see ] with-string ] unit-test
+[ [ \ bah see ] string-out ] unit-test
 
 [ t ] [
     DEFER: not-fixnum
     "IN: temporary\nSYMBOL: not-fixnum \nCOMPLEMENT: not-fixnum fixnum\n"
     dup eval
-    [ \ not-fixnum see ] with-string =
+    [ \ not-fixnum see ] string-out =
 ] unit-test
 
 ! Weird bug

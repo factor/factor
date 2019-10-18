@@ -1,5 +1,25 @@
 #include "factor.h"
 
+F_FIXNUM string_compare(F_STRING* s1, F_STRING* s2)
+{
+	CELL len1 = string_capacity(s1);
+	CELL len2 = string_capacity(s2);
+
+	CELL limit = (len1 < len2 ? len1 : len2);
+
+	CELL i = 0;
+	while(i < limit)
+	{
+		u16 c1 = string_nth(s1,i);
+		u16 c2 = string_nth(s2,i);
+		if(c1 != c2)
+			return c1 - c2;
+		i++;
+	}
+
+	return len1 - len2;
+}
+
 /* Implements some Factor library words in C, to dump a stack in a semi-human-readable
 form without any Factor code executing.. This is not used during normal execution, only
 when the runtime dies. */
@@ -203,7 +223,7 @@ void dump_generation(ZONE *z)
 void dump_generations(void)
 {
 	int i;
-	for(i = 0; i < GC_GENERATIONS; i++)
+	for(i = 0; i < gen_count; i++)
 	{
 		fprintf(stderr,"Generation %d: ",i);
 		dump_generation(&generations[i]);

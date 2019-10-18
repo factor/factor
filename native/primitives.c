@@ -10,7 +10,6 @@ void* primitives[] = {
 	primitive_dispatch,
 	primitive_cons,
 	primitive_vector,
-	primitive_string_compare,
 	primitive_rehash_string,
 	primitive_sbuf,
 	primitive_sbuf_to_string,
@@ -169,10 +168,11 @@ void* primitives[] = {
 	primitive_die,
 	primitive_flush_icache,
 	primitive_fopen,
-	primitive_fgets,
+	primitive_fgetc,
 	primitive_fwrite,
 	primitive_fflush,
-	primitive_fclose
+	primitive_fclose,
+	primitive_expired
 };
 
 CELL primitive_to_xt(CELL primitive)

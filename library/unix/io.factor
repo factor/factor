@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
 USING: alien assembler errors generic hashtables kernel
-kernel-internals lists math sequences streams strings threads
-unix-internals vectors ;
+kernel-internals lists math sequences io strings threads
+unix-internals unparser vectors ;
 
 ! We want namespaces::bind to shadow the bind system call from
 ! unix-internals
@@ -13,8 +13,10 @@ USING: namespaces ;
 : byte-bit ( n alien -- byte bit )
     over -5 shift alien-unsigned-4 swap 31 bitand ;
 
+: bit-length ( n -- n ) cell / ceiling ;
+
 : <bit-array> ( n -- array )
-    cell / ceiling <byte-array> ;
+    bit-length <byte-array> ;
 
 : bit-nth ( n alien -- ? )
     byte-bit 1 swap shift bitand 0 > ;
@@ -25,6 +27,11 @@ USING: namespaces ;
 : set-bit-nth ( ? n alien -- )
     [ byte-bit set-bit ] 2keep
     swap -5 shift set-alien-unsigned-4 ;
+
+: clear-bits ( alien len -- )
+    bit-length [
+        0 pick pick set-alien-unsigned-cell
+    ] repeat drop ;
 
 ! Global variables
 SYMBOL: read-fdset
@@ -44,7 +51,7 @@ SYMBOL: write-tasks
 : init-handle ( fd -- ) F_SETFL O_NONBLOCK fcntl io-error ;
 
 ! Common delegate of native stream readers and writers
-TUPLE: port handle buffer error timeout cutoff ;
+TUPLE: port handle buffer error timeout cutoff output? sbuf eof? ;
 
 : make-buffer ( n -- buffer/f )
     dup 0 > [ <buffer> ] [ drop f ] ifte ;
@@ -53,18 +60,13 @@ C: port ( handle buffer -- port )
     [ 0 swap set-port-timeout ] keep
     [ 0 swap set-port-cutoff ] keep
     [ >r make-buffer r> set-delegate ] keep
-    [ >r dup init-handle r> set-port-handle ] keep ;
-
-M: port stream-close ( port -- )
-    dup port-handle close
-    delegate [ buffer-free ] when* ;
+    [ >r dup init-handle r> set-port-handle ] keep
+    80 <sbuf> over set-port-sbuf ;
 
 : touch-port ( port -- )
-    dup port-timeout dup 0 = [
-        2drop
-    ] [
-        millis + swap set-port-cutoff
-    ] ifte ;
+    ! "touch-port called\n" 14 getenv fwrite 14 getenv fflush
+    dup port-timeout dup 0 =
+    [ 2drop ] [ millis + swap set-port-cutoff ] ifte ;
 
 M: port set-timeout ( timeout port -- )
     [ set-port-timeout ] keep touch-port ;
@@ -73,10 +75,20 @@ M: port set-timeout ( timeout port -- )
 
 : >port< dup port-handle swap delegate ;
 
-: pending-error ( reader -- ) port-error throw ;
+: pending-error ( port -- )
+    dup port-error f rot set-port-error throw ;
 
-: postpone-error ( reader -- )
-    err_no strerror swap set-port-error ;
+: report-error ( error port -- )
+    [
+        "Error on fd " %
+        dup port-handle unparse %
+        ": " % swap %
+    ] make-string swap set-port-error ;
+
+: defer-error ( port -- ? )
+    #! Return t if it is an unrecoverable error.
+    err_no dup EAGAIN = over EINTR = or
+    [ 2drop f ] [ strerror swap report-error ] ifte ;
 
 ! Associates a port with a list of continuations waiting on the
 ! port to finish I/O
@@ -107,7 +119,7 @@ GENERIC: task-container ( task -- vector )
 
 : handle-fd ( task -- )
     dup do-io-task [
-        dup io-task-port touch-port pop-callback [ call ] when*
+        dup io-task-port touch-port pop-callback call
     ] [
         drop
     ] ifte ;
@@ -115,21 +127,19 @@ GENERIC: task-container ( task -- vector )
 : timeout? ( port -- ? )
     port-cutoff dup 0 = not swap millis < and ;
 
-: handle-fd? ( fdset task -- ? )
-    dup io-task-port timeout?
-    [
-        2drop t
-    ] [
-        io-task-fd swap 2dup bit-nth
-        >r f -rot set-bit-nth r>
-    ] ifte ;
-
 : handle-fdset ( fdset tasks -- )
     [
-        cdr tuck handle-fd? [ handle-fd ] [ drop ] ifte
+        cdr dup io-task-port timeout? [
+            dup io-task-port "Timeout" swap report-error
+            nip pop-callback call
+        ] [
+            tuck io-task-fd swap bit-nth
+            [ handle-fd ] [ drop ] ifte
+        ] ifte
     ] hash-each-with ;
 
 : init-fdset ( fdset tasks -- )
+    >r dup FD_SETSIZE clear-bits r>
     [ car t swap rot set-bit-nth ] hash-each-with ;
 
 : init-fdsets ( -- read write except )
@@ -144,141 +154,41 @@ GENERIC: task-container ( task -- vector )
 
 ! Readers
 
+: <reader> ( fd -- stream )
+    buffered-port <line-reader> ;
+
 : open-read ( path -- fd )
     O_RDONLY file-mode open dup io-error ;
 
-! The cr slot is set to true by read-line-loop if the last
-! character read was \r.
-TUPLE: reader line ready? cr ;
-
-C: reader ( handle -- reader )
-    [ >r buffered-port r> set-delegate ] keep ;
-
-: pop-line ( reader -- str )
-    dup reader-line dup [ >string ] when >r
-    f over set-reader-line
-    f swap set-reader-ready? r> ;
-
-: read-fin ( reader -- str )
-    dup pending-error  dup reader-ready? [
-        pop-line
-    ] [
-        "reader not ready" throw
-    ] ifte ;
-
-: reader-cr> ( reader -- ? )
-    dup reader-cr >r f swap set-reader-cr r> ;
-
-! Reading lines
-: read-line-char ( reader ch -- )
-    f pick set-reader-cr  swap reader-line push ;
-
-: read-line-loop ( reader -- ? )
-    dup buffer-length 0 = [
-        drop f
-    ] [
-        dup buffer-pop
-        dup CHAR: \r = [
-            drop t swap set-reader-cr t
-        ] [
-            dup CHAR: \n = [
-                drop dup reader-cr> [
-                    read-line-loop
-                ] [
-                    drop t
-                ] ifte
-            ] [
-                dupd read-line-char read-line-loop
-            ] ifte
-        ] ifte
-    ] ifte ;
-
-: read-line-step ( reader -- ? )
-    [ read-line-loop dup ] keep set-reader-ready? ;
-
-: init-reader ( count reader -- ) >r <sbuf> r> set-reader-line ;
-
-: prepare-line ( reader -- ? )
-    80 over init-reader read-line-step ;
-
-: can-read-line? ( reader -- ? )
-    dup pending-error
-    dup reader-ready? [ drop t ] [ prepare-line ] ifte ;
-
 : reader-eof ( reader -- )
-    dup reader-line dup [
-        length 0 = [ f over set-reader-line ] when
-    ] [
-        drop
-    ] ifte  t swap set-reader-ready? ;
+    dup port-sbuf empty? [ t swap set-port-eof? ] [ drop ] ifte ;
 
-: refill ( port -- )
+: (refill) ( port -- n )
+    >port< dup buffer-end swap buffer-capacity read ;
+
+: refill ( port -- ? )
+    #! Return f if there is a recoverable error
     dup buffer-length 0 = [
-        >port<
-        tuck dup buffer-end swap buffer-capacity read
-        dup 0 >= [ swap n>buffer ] [ drop postpone-error ] ifte
-    ] [
-        drop
-    ] ifte ;
-
-TUPLE: read-line-task ;
-
-C: read-line-task ( port -- task )
-    [ >r <io-task> r> set-delegate ] keep ;
-
-M: read-line-task do-io-task ( task -- ? )
-    io-task-port dup refill dup eof? [
-        reader-eof t
-    ] [
-        read-line-step
-    ] ifte ;
-
-M: read-line-task task-container drop read-tasks get ;
-
-: wait-to-read-line ( port -- )
-    dup can-read-line? [
-        [ swap <read-line-task> add-io-task stop ] callcc0
-    ] unless drop ;
-
-M: reader stream-readln ( stream -- line )
-    dup wait-to-read-line read-fin ;
-
-: trailing-cr ( reader -- )
-    #! Handle a corner case. If the previous request was a line
-    #! read and the line ends with \r\n, the reader stopped
-    #! reading at \r and set the reader-cr flag to true. But we
-    #! must ignore the \n.
-    dup buffer-length 1 >= over reader-cr and [
-        dup buffer-peek CHAR: \n = [
-            1 swap buffer-consume
+        dup (refill)  dup 0 >= [
+            swap n>buffer t
         ] [
-            drop
+            drop defer-error
         ] ifte
     ] [
-        drop
+        drop t
     ] ifte ;
 
 ! Reading character counts
-: read-loop ( count reader -- ? )
-    dup trailing-cr
-    dup reader-line -rot >r over length - ( remaining) r>
+: read-step ( count reader -- ? )
+    dup port-sbuf -rot >r over length - ( remaining) r>
     2dup buffer-length <= [
         buffer> nappend t
     ] [
         buffer>> nip nappend f
     ] ifte ;
 
-: read-step ( count reader -- ? )
-    [ read-loop dup ] keep set-reader-ready? ;
-
 : can-read-count? ( count reader -- ? )
-    dup pending-error
-    2dup init-reader
-    2dup reader-line length <= [
-        t swap set-reader-ready? drop t
-    ] [
-        read-step
-    ] ifte ;
+    dup pending-error 0 over port-sbuf set-length read-step ;
 
 TUPLE: read-task count ;
 
@@ -289,10 +199,14 @@ C: read-task ( count port -- task )
 : >read-task< dup read-task-count swap io-task-port ;
 
 M: read-task do-io-task ( task -- ? )
-    >read-task< dup refill dup eof? [
-        nip reader-eof t
+    >read-task< dup refill [
+        dup buffer-empty? [
+            reader-eof drop t
+        ] [
+            read-step
+        ] ifte
     ] [
-        read-step
+        2drop f
     ] ifte ;
 
 M: read-task task-container drop read-tasks get ;
@@ -302,8 +216,13 @@ M: read-task task-container drop read-tasks get ;
         [ -rot <read-task> add-io-task stop ] callcc0 
     ] unless 2drop ;
 
-M: reader stream-read ( count stream -- string )
-    [ wait-to-read ] keep read-fin ;
+M: port stream-read ( count stream -- string )
+    [ wait-to-read ] keep dup port-eof?
+    [ drop f ] [ port-sbuf >string ] ifte ;
+
+M: port stream-read1 ( stream -- char/f )
+    1 over wait-to-read dup port-eof?
+    [ drop f ] [ port-sbuf first ] ifte ;
 
 ! Writers
 
@@ -311,23 +230,21 @@ M: reader stream-read ( count stream -- string )
     O_WRONLY O_CREAT bitor O_TRUNC bitor file-mode open
     dup io-error ;
 
-TUPLE: writer ;
+: <writer> ( fd -- writer )
+    buffered-port t over set-port-output? ;
 
-C: writer ( fd -- writer )
-    [ >r buffered-port r> set-delegate ] keep ;
-
-: write-step ( fd buffer -- )
-    tuck dup buffer@ swap buffer-length write dup 0 >= [
+: write-step ( port -- )
+    dup >port< dup buffer@ swap buffer-length write dup 0 >= [
         swap buffer-consume
     ] [
-        drop postpone-error
+        drop defer-error drop
     ] ifte ;
 
 : can-write? ( len writer -- ? )
     #! If the buffer is empty and the string is too long,
     #! extend the buffer.
     dup pending-error
-    dup eof? [
+    dup buffer-empty? [
         2drop t
     ] [
         [ buffer-fill + ] keep buffer-capacity <=
@@ -342,13 +259,10 @@ M: write-task do-io-task
     io-task-port dup buffer-length 0 = over port-error or [
         0 swap buffer-reset t
     ] [
-        >port< write-step f
+        write-step f
     ] ifte ;
 
 M: write-task task-container drop write-tasks get ;
-
-: write-fin ( str writer -- )
-    dup pending-error >buffer ;
 
 : add-write-io-task ( callback task -- )
     dup io-task-fd write-tasks get hash [
@@ -362,24 +276,29 @@ M: write-task task-container drop write-tasks get ;
         add-io-task
     ] ifte* ;
 
-M: writer stream-flush ( stream -- )
-    [ swap <write-task> add-write-io-task stop ] callcc0 drop ;
+M: port stream-flush ( stream -- )
+    dup port-output? [
+        [ swap <write-task> add-write-io-task stop ] callcc0
+    ] when drop ;
 
-M: writer stream-auto-flush ( stream -- ) drop ;
+M: port stream-finish ( stream -- ) drop ;
 
 : wait-to-write ( len port -- )
-    tuck can-write? [ drop ] [ stream-flush ] ifte ;
+    tuck can-write? [ dup stream-flush ] unless pending-error ;
 
-: blocking-write ( str writer -- )
-    over length over wait-to-write write-fin ;
+M: port stream-write1 ( char writer -- )
+    1 over wait-to-write ch>buffer ;
 
-M: writer stream-write-attr ( string style writer -- )
-    nip >r dup string? [ ch>string ] unless r> blocking-write ;
+M: port stream-format ( string style writer -- )
+    nip over length over wait-to-write >buffer ;
 
-M: writer stream-close ( stream -- )
-    dup stream-flush delegate stream-close ;
+M: port stream-close ( stream -- )
+    dup stream-flush
+    dup port-handle close
+    delegate [ buffer-free ] when* ;
 
 ! Make a duplex stream for reading/writing a pair of fds
+
 : <fd-stream> ( infd outfd flush? -- stream )
     >r >r <reader> r> <writer> r> <duplex-stream> ;
 
@@ -387,7 +306,7 @@ M: writer stream-close ( stream -- )
     [ schedule-thread 10 io-multiplex stop ] callcc0
     idle-io-task ;
 
-USE: stdio
+USE: io
 
 : init-io ( -- )
     #! Should only be called on startup. Calling this at any

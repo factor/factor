@@ -5,10 +5,10 @@ USING: errors generic interpreter kernel lists math namespaces
 sequences strings vectors words hashtables prettyprint ;
 
 : longest ( list -- length )
-    0 swap [ length max ] each ;
+    [ length ] map 0 [ max ] reduce ;
 
 : computed-value-vector ( n -- vector )
-    [ drop object <computed> ] project >vector ;
+    empty-vector [ drop object <computed> ] map ;
 
 : add-inputs ( count stack -- stack )
     #! Add this many inputs to the given stack.
@@ -28,13 +28,10 @@ sequences strings vectors words hashtables prettyprint ;
         [ value-class ] map class-or-list <computed>
     ] ifte ;
 
-: dual ( list -- list )
-    0 over nth length [ swap [ nth ] map-with ] project-with ;
-
 : unify-stacks ( list -- stack )
     #! Replace differing literals in stacks with unknown
     #! results.
-    unify-lengths dual [ unify-results ] map >vector ; 
+    unify-lengths seq-transpose [ unify-results ] map >vector ; 
 
 : balanced? ( list -- ? )
     #! Check if a list of [[ instack outstack ]] pairs is

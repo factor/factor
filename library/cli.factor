@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2004 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: command-line
-USING: files kernel kernel-internals lists namespaces parser
+USING: io kernel kernel-internals lists namespaces parser
 sequences strings ;
 
 ! This file is run as the last stage of boot.factor; it relies
@@ -12,10 +12,8 @@ sequences strings ;
 
 : run-user-init ( -- )
     #! Run user init file if it exists
-    "user-init" get [
-        [ "~" get , "/" , ".factor-" , "rc" , ] make-string
-        ?run-file
-    ] when ;
+    "user-init" get
+    [ "~" get "/.factor-rc" append ?run-file ] when ;
 
 : set-path ( value list -- )
     unswons over [ nest [ set-path ] bind ] [ nip set ] ifte ;
@@ -55,7 +53,8 @@ sequences strings ;
     #! -no-<flag> CLI switch
     "user-init" on
     "compile" on
-    os "win32" = "ui" "ansi" ? "shell" set ;
+    "null-stdio" off
+    os "win32" = "ui" "tty" ? "shell" set ;
 
 : parse-command-line ( -- )
     #! Parse command line arguments.

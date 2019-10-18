@@ -25,10 +25,9 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: streams
+IN: io
 USE: compiler
 USE: namespaces
-USE: stdio
 USE: kernel
 USE: win32-io-internals
 USE: win32-stream

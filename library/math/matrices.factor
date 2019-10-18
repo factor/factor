@@ -4,20 +4,48 @@ IN: matrices
 USING: errors generic kernel lists math namespaces sequences
 vectors ;
 
-: n*v ( n vec -- vec ) [ * ] map-with ;
-
 ! Vector operations
+: vneg ( v -- v ) [ neg ] map ;
+
+: n*v ( n vec -- vec ) [ * ] map-with ;
+: v*n ( vec n -- vec ) swap n*v ;
+: n/v ( n vec -- vec ) [ / ] map-with ;
+: v/n ( vec n -- vec ) swap [ swap / ] map-with ;
+
 : v+ ( v v -- v ) [ + ] 2map ;
 : v- ( v v -- v ) [ - ] 2map ;
 : v* ( v v -- v ) [ * ] 2map ;
-: v** ( v v -- v ) [ conjugate * ] 2map ;
+: v/ ( v v -- v ) [ / ] 2map ;
+: vmax ( v v -- v ) [ max ] 2map ;
+: vmin ( v v -- v ) [ min ] 2map ;
+: vand ( v v -- v ) [ and ] 2map ;
+: vor ( v v -- v ) [ or ] 2map ;
+: v< ( v v -- v ) [ < ] 2map ;
+: v<= ( v v -- v ) [ <= ] 2map ;
+: v> ( v v -- v ) [ > ] 2map ;
+: v>= ( v v -- v ) [ >= ] 2map ;
 
-: sum ( v -- n ) 0 swap [ + ] each ;
-: product 1 swap [ * ] each ;
+: vbetween? ( v from to -- v )
+    >r over >r v>= r> r> v<= vand ;
+
+: sum ( v -- n ) 0 [ + ] reduce ;
+: product 1 [ * ] reduce ;
+: conj ( v -- ? ) [ ] all? ;
+: disj ( v -- ? ) [ ] contains? ;
+
+: set-axis ( x y axis -- v )
+    2dup v* >r >r drop dup r> v* v- r> v+ ;
 
 ! Later, this will fixed when 2each works properly
 ! : v. ( v v -- x ) 0 swap [ conjugate * + ] 2each ;
+: v** ( v v -- v ) [ conjugate * ] 2map ;
 : v. ( v v -- x ) v** sum ;
+
+: norm-sq ( v -- n ) 0 [ absq + ] reduce ;
+
+: proj ( u v -- w )
+    #! Orthogonal projection of u onto v.
+    [ [ v. ] keep norm-sq v/n ] keep n*v ;
 
 : cross-trace ( v1 v2 i1 i2 -- v1 v2 n )
     pick nth >r pick nth r> * ;
@@ -36,6 +64,7 @@ vectors ;
 ! Matrices
 ! The major dimension is the number of elements per row.
 TUPLE: matrix rows cols sequence ;
+
 : >matrix<
     [ matrix-rows ] keep
     [ matrix-cols ] keep

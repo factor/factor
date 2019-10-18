@@ -15,11 +15,9 @@ BUILTIN: sbuf 13 sbuf?
     [ 1 length set-capacity ]
     [ 2 underlying set-underlying ] ;
 
-M: sbuf set-length ( n sbuf -- )
-    growable-check 2dup expand set-capacity ;
+M: sbuf set-length ( n sbuf -- ) grow-length ;
 
-M: sbuf nth ( n sbuf -- ch )
-    bounds-check underlying char-slot ;
+M: sbuf nth ( n sbuf -- ch ) bounds-check underlying char-slot ;
 
 M: sbuf set-nth ( ch n sbuf -- )
     growable-check 2dup ensure underlying

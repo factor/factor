@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: memory
 USING: errors generic hashtables kernel kernel-internals lists
-math namespaces prettyprint sequences stdio strings unparser
+math namespaces prettyprint sequences io strings unparser
 vectors words ;
 
 : generations 15 getenv ;
@@ -106,14 +106,6 @@ M: object (each-slot) ( quot obj -- )
     #! Print heap allocation breakdown.
     0 heap-stats [ dupd uncons heap-stat. 1 + ] each drop ;
 
-: orphan? ( word -- ? )
-    #! Test if the word is not a member of its vocabulary.
-    dup dup word-name swap word-vocabulary dup [
-        vocab dup [ hash eq? not ] [ 3drop t ] ifte
-    ] [
-        3drop t
-    ] ifte ;
-
 : orphans ( word -- list )
     #! Orphans are forgotten but still referenced.
-    [ word? ] instances [ orphan? ] subset ;
+    [ word? ] instances [ interned? not ] subset ;

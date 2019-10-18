@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: http-client
 USING: errors http kernel lists namespaces parser sequences
-stdio streams strings unparser ;
+io strings unparser ;
 
 : parse-host ( url -- host port )
     #! Extract the host name and port number from an HTTP URL.
@@ -21,7 +21,7 @@ stdio streams strings unparser ;
 : read-response ( -- code header )
     #! After sending a GET oR POST we read a response line and
     #! header.
-    flush read-line parse-response read-header ;
+    flush readln parse-response read-header ;
 
 : http-request ( host resource method -- )
     write CHAR: \s write write " HTTP/1.0" write crlf

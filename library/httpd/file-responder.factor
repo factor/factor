@@ -1,8 +1,8 @@
 ! Copyright (C) 2004,2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: file-responder
-USING: files html httpd kernel lists namespaces parser sequences
-stdio streams strings unparser ;
+USING: html httpd kernel lists namespaces parser sequences
+io strings unparser ;
 
 : serving-path ( filename -- filename )
     [ "" ] unless* "doc-root" get swap append ;
@@ -38,7 +38,7 @@ stdio streams strings unparser ;
 : serve-directory ( filename -- )
     "/" ?tail [
         dup "/index.html" append dup exists? [
-            serve-file
+            nip serve-file
         ] [
             drop list-directory
         ] ifte

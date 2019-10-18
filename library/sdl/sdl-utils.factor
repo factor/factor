@@ -7,7 +7,6 @@ SYMBOL: surface
 SYMBOL: width
 SYMBOL: height
 SYMBOL: bpp
-SYMBOL: surface
 
 : init-screen ( width height bpp flags -- )
     >r 3dup bpp set height set width set r>
@@ -15,7 +14,7 @@ SYMBOL: surface
 
 : with-screen ( width height bpp flags quot -- )
     #! Set up SDL graphics and call the quotation.
-    SDL_INIT_EVERYTHING SDL_Init drop  TTF_Init
+    SDL_INIT_EVERYTHING SDL_Init drop
     1 SDL_EnableUNICODE drop
     SDL_DEFAULT_REPEAT_DELAY SDL_DEFAULT_REPEAT_INTERVAL
     SDL_EnableKeyRepeat drop
@@ -24,9 +23,9 @@ SYMBOL: surface
 : rgb ( [ r g b ] -- n )
     3unlist
     255
-    swap 8 shift bitor
-    swap 16 shift bitor
-    swap 24 shift bitor ;
+    swap >fixnum 8 shift bitor
+    swap >fixnum 16 shift bitor
+    swap >fixnum 24 shift bitor ;
 
 : make-color ( r g b -- color )
     #! Make an SDL_Color struct. This will go away soon in favor
@@ -42,13 +41,6 @@ SYMBOL: surface
     [ set-rect-w ] keep
     [ set-rect-y ] keep
     [ set-rect-x ] keep ;
-
-: black [ 0   0   0   ] ;
-: gray  [ 128 128 128 ] ;
-: white [ 255 255 255 ] ;
-: red   [ 255 0   0   ] ;
-: green [ 0   255 0   ] ;
-: blue  [ 0   0   255 ] ;
 
 : with-pixels ( quot -- )
     width get [

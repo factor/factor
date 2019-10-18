@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: streams
-USING: kernel namespaces stdio sequences strings unparser ;
+IN: io
+USING: kernel namespaces io sequences strings unparser ;
 
 ! A simple logging framework.
 SYMBOL: log-stream

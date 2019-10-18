@@ -402,7 +402,7 @@ DEFER: <*>
 USE: prettyprint 
 USE: parser
 USE: unparser
-USE: stdio
+USE: io
 
 ! Testing <&>
 : test1 "abcd" "a" token "b" token <&> call [ . ] leach ;

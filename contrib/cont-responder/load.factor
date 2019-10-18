@@ -28,7 +28,7 @@ USE: httpd
 USE: threads
 USE: prettyprint
 USE: errors
-USE: stdio
+USE: io
 
 USE: parser
 

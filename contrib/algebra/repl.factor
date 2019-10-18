@@ -1,4 +1,4 @@
-IN: algebra USING: prettyprint stdio kernel parser ;
+IN: algebra USING: prettyprint io kernel parser ;
 
 : algebra-repl ( -- )
     "ok " write flush

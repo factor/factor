@@ -1,5 +1,17 @@
 IN: temporary
-USING: kernel io-internals test ;
+USING: io-internals kernel kernel-internals sequences test ;
+
+: buffer-append ( buffer buffer -- )
+    #! Append first buffer to second buffer.
+    2dup buffer-end over buffer-ptr rot buffer-fill memcpy
+    >r buffer-fill r> n>buffer ;
+
+: buffer-set ( string buffer -- )
+    2dup buffer-ptr string>memory
+    >r length r> buffer-reset ;
+
+: string>buffer ( string -- buffer )
+    dup length <buffer> tuck buffer-set ;
 
 [ "" 65536 ] [
     65536 <buffer>

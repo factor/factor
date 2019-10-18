@@ -1,5 +1,5 @@
 IN: algebra
-USING: kernel lists math namespaces test stdio words parser
+USING: kernel lists math namespaces test io words parser
     generic errors prettyprint vectors kernel-internals ;
 
 SYMBOL: variable?
@@ -90,7 +90,7 @@ M: list3 (eval-infix)
     swap-in-infix \ dup swons swap append ;
 
 M: list2 (eval-infix)
-    2unlist swapd (eval-infix) swap arith-1 word-prop unit append ;
+    2unlist swapd (eval-infix) swap arith-1 word-prop add ;
 
 : build-prefix ( num-of-vars -- quote )
     #! What needs to be placed in front of the eval-infix quote
@@ -175,8 +175,8 @@ M: infix-word see
 : || ;
 
 ! Install arithmetic operators into words
-[ + - / * ^ and or xor mod +- min gcd max bitand polar> align shift /mod /i /f rect> bitor proj
-  bitxor dot rem || ] [
+[ + - / * ^ and or xor mod +- min gcd max bitand polar> align shift /mod /i /f rect> bitor
+  bitxor rem || ] [
     dup arith-2 set-word-prop
 ] each
 [ [[ = new= ]] [[ > new> ]] [[ < new< ]] [[ >= new>= ]] [[ <= new<= ]] ] [

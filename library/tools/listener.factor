@@ -1,24 +1,14 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: listener
-USING: errors kernel lists math memory namespaces parser
-sequences stdio strings presentation words unparser vectors ansi ;
+USING: errors io kernel lists math memory namespaces parser
+presentation sequences strings styles unparser vectors words ;
 
-SYMBOL: cont-prompt
 SYMBOL: listener-prompt
 SYMBOL: quit-flag
+SYMBOL: listener-hook
 
-global [
-    "..." cont-prompt set
-    "ok" listener-prompt set
-] bind
-
-: prompt. ( text -- )
-    [ [[ "bold" t ]] ] write-attr
-    ! Print the space without a style, to workaround a bug in
-    ! the GUI listener where the style from the prompt carries
-    ! over to the input
-    bl flush ;
+global [ "  " listener-prompt set ] bind
 
 : bye ( -- )
     #! Exit the current listener.
@@ -26,12 +16,11 @@ global [
 
 : (read-multiline) ( quot depth -- quot ? )
     #! Flag indicates EOF.
-    >r read-line dup [
+    >r readln dup [
         (parse) depth r> dup >r <= [
             ( we're done ) r> drop t
         ] [
-            ( more input needed ) r> cont-prompt get prompt.
-            (read-multiline)
+            ( more input needed ) r> (read-multiline)
         ] ifte
     ] [
         ( EOF ) r> 2drop f
@@ -44,8 +33,10 @@ global [
 
 : listen ( -- )
     #! Wait for user input, and execute.
-    listener-prompt get prompt.
-    [ read-multiline [ call ] [ bye ] ifte ] try ;
+    listener-prompt get write flush [
+        read-multiline
+        [ call listener-hook get call ] [ bye ] ifte
+    ] try ;
 
 : listener ( -- )
     #! Run a listener loop that executes user input.

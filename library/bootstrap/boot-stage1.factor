@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: image
 USING: generic hashtables kernel lists math memory namespaces
-parser prettyprint sequences stdio vectors words ;
+parser prettyprint sequences io vectors words ;
 
 "Bootstrap stage 1..." print
 
@@ -29,18 +29,21 @@ parser prettyprint sequences stdio vectors words ;
         "/library/math/float.factor"
         "/library/math/complex.factor"
 
+        "/library/collections/growable.factor"
         "/library/collections/cons.factor"
-        "/library/collections/assoc.factor"
-        "/library/collections/lists.factor"
         "/library/collections/vectors.factor"
+        "/library/collections/sequences-epilogue.factor"
         "/library/collections/strings.factor"
         "/library/collections/sbuf.factor"
-        "/library/collections/sequences-epilogue.factor"
+        "/library/collections/assoc.factor"
+        "/library/collections/lists.factor"
         "/library/collections/hashtables.factor"
         "/library/collections/namespaces.factor"
         "/library/collections/vectors-epilogue.factor"
+        "/library/collections/sequence-eq.factor"
         "/library/collections/slicing.factor"
         "/library/collections/strings-epilogue.factor"
+        "/library/collections/tree-each.factor"
 
         "/library/math/matrices.factor"
 
@@ -48,9 +51,13 @@ parser prettyprint sequences stdio vectors words ;
         "/library/vocabularies.factor"
         "/library/errors.factor"
         "/library/continuations.factor"
+        "/library/styles.factor"
 
         "/library/io/stream.factor"
+        "/library/io/duplex-stream.factor"
         "/library/io/stdio.factor"
+        "/library/io/lines.factor"
+        "/library/io/string-streams.factor"
         "/library/io/c-streams.factor"
         "/library/io/files.factor"
 

@@ -3,7 +3,7 @@ USE: kernel
 USE: lists
 USE: math
 USE: namespaces
-USE: stdio
+USE: io
 USE: test
 
 : (callcc1-test)

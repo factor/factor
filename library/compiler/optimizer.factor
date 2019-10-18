@@ -108,7 +108,7 @@ M: #push can-kill* ( literal node -- ? )
     2drop t ;
 
 M: #push kill-node* ( literals node -- )
-    [ node-out-d diffq ] keep set-node-out-d ;
+    [ node-out-d seq-diffq ] keep set-node-out-d ;
 
 M: #push useless-node? ( node -- ? )
     node-out-d empty? ;
@@ -118,7 +118,7 @@ M: #drop can-kill* ( literal node -- ? )
      2drop t ;
 
 M: #drop kill-node* ( literals node -- )
-    [ node-in-d diffq ] keep set-node-in-d ;
+    [ node-in-d seq-diffq ] keep set-node-in-d ;
 
 M: #drop useless-node? ( node -- ? )
     node-in-d empty? ;
@@ -196,8 +196,8 @@ M: #values can-kill* ( literal node -- ? )
     ] ifte ;
 
 : branch-values ( branches -- )
-    [ last-node node-in-d >list ] map
-    unify-lengths dual branch-returns set ;
+    [ last-node node-in-d ] map
+    unify-lengths seq-transpose branch-returns set ;
 
 : can-kill-branches? ( literal node -- ? )
     #! Check if the literal appears in either branch. This
