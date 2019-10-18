@@ -18,6 +18,7 @@ void run()
 	for(;;)
 	{
 NS_DURING
+		stack_chain->native_stack_pointer = native_stack_pointer();
 		SETJMP(stack_chain->toplevel);
 		handle_error();
 
@@ -25,7 +26,7 @@ NS_DURING
 		{
 			CELL e = error;
 			error = F;
-			general_error(ERROR_OBJECTIVE_C,e,F,true);
+			simple_error(ERROR_OBJECTIVE_C,e,F);
 		}
 
 		interpreter_loop();
@@ -38,7 +39,7 @@ NS_ENDHANDLER
 
 void run_toplevel(void)
 {
-	interpreter();
+	run();
 }
 
 void early_init(void)

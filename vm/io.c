@@ -21,7 +21,7 @@ void init_c_io(void)
 void io_error(void)
 {
 	CELL error = tag_object(from_char_string(strerror(errno)));
-	general_error(ERROR_IO,error,F,true);
+	simple_error(ERROR_IO,error,F);
 }
 
 void primitive_fopen(void)

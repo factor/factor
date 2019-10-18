@@ -1,0 +1,35 @@
+IN: gadgets
+USING: help strings ;
+
+HELP: windows
+{ $var-description "Global variable holding an association list mapping native window handles to " { $link world } " instances." }
+{ $see-also open-window find-window } ;
+
+HELP: open-window
+{ $values { "gadget" gadget } { "title" string } }
+{ $description "Opens a native window with the specified title bar string." }
+{ $see-also open-window } ;
+
+HELP: find-window
+{ $values { "quot" "a quotation with stack effect " { $snippet "( world -- ? )" } } { "world" "a " { $link world } " or " { $link f } } }
+{ $description "Finds a native window whose world satisfies the quotation, outputting " { $link f } " if no such world could be found. The front-most native window is checked first." } ;
+
+HELP: start-world
+{ $values { "world" world } }
+{ $description "Starts a world." }
+{ $notes "This word should be called by the UI backend after " { $link register-window } ", but before making the world's containing window visible on the screen." } ;
+
+HELP: register-window
+{ $values { "world" world } { "handle" "a baackend-specific handle" } }
+{ $description "Adds a window to the global " { $link windows } " variable." }
+{ $notes "This word should only be called by the UI backend.  User code can open new windows with " { $link open-window } "." } ;
+
+HELP: unregister-window
+{ $values { "handle" "a baackend-specific handle" } }
+{ $description "Removes a window from the global " { $link windows } " variable." }
+{ $notes "This word should only be called only by the UI backend, and not user code." } ;
+
+HELP: stop-world
+{ $values { "world" world } }
+{ $description "Stops a world." }
+{ $notes "This word should only be called by the UI backend, and not user code." } ;

@@ -1,0 +1,30 @@
+PROVIDE: core/tools
+{ +files+ {
+    "definitions.factor"
+    "completion.factor"
+    "memory.factor"
+    "inspector.factor"
+    "word-tools.factor"
+    "test.factor"
+    "modules.factor"
+    "image.factor"
+    "interpreter.factor"
+    "errors.factor"
+    "debugger.factor"
+    "image.facts"
+    "definitions.facts"
+    "word-tools.facts"
+    "inspector.facts"
+    "memory.facts"
+    "test.facts"
+    "modules.facts"
+    "image.facts"
+    "debugger.facts"
+} }
+{ +tests+ {
+    "test/annotate.factor"
+    "test/inspector.factor"
+    "test/interpreter.factor"
+    "test/memory.factor"
+    "test/tools.factor"
+} } ;

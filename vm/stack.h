@@ -1,4 +1,4 @@
-typedef struct _F_STACKS {
+typedef struct _F_CONTEXT {
 	/* current datastack top pointer */
 	CELL data;
 	/* saved contents of ds register on entry to callback */
@@ -25,8 +25,9 @@ typedef struct _F_STACKS {
 	CELL callframe_scan;
 	CELL callframe_end;
 
-	/* saved catchstack on entry to callback */
-	CELL catch_save;
+	/* saved userenv slots on entry to callback */
+	CELL catchstack_save;
+	CELL current_callback_save;
 
 	/* saved cards_offset register on entry to callback */
 	CELL cards_offset;
@@ -34,13 +35,16 @@ typedef struct _F_STACKS {
 	/* saved extra_roots pointer on entry to callback */
 	CELL extra_roots;
 
+	/* C stack pointer on entry */
+	F_STACK_FRAME *native_stack_pointer;
+
 	/* error handler longjmp buffer */
 	JMP_BUF toplevel;
 
-	struct _F_STACKS *next;
-} F_STACKS;
+	struct _F_CONTEXT *next;
+} F_CONTEXT;
 
-F_STACKS *stack_chain;
+F_CONTEXT *stack_chain;
 
 CELL ds_size, rs_size, cs_size;
 

@@ -42,6 +42,7 @@ void handle_error(void)
 {
 	if(throwing)
 	{
+		gc_off = false;
 		extra_roots = stack_chain->extra_roots;
 
 		if(thrown_keep_stacks)
@@ -53,6 +54,7 @@ void handle_error(void)
 			fix_stacks();
 
 		dpush(thrown_error);
+		dpush(thrown_native_stack_trace);
 		/* Notify any 'catch' blocks */
 		push_callframe();
 		set_callframe(userenv[BREAK_ENV]);
@@ -69,7 +71,12 @@ void interpreter_loop(void)
 		if(callframe_scan == callframe_end)
 		{
 			if(cs_bot - cs == CELLS)
-				return;
+			{
+				if(stack_chain->next)
+					return;
+
+				simple_error(ERROR_CS_UNDERFLOW,F,F);
+			}
 
 			callframe_end = get(cs);
 			callframe_scan = get(cs - CELLS);
@@ -98,6 +105,7 @@ void interpreter_loop(void)
 
 void interpreter(void)
 {
+	stack_chain->native_stack_pointer = native_stack_pointer();
 	SETJMP(stack_chain->toplevel);
 	handle_error();
 	interpreter_loop();
@@ -113,7 +121,7 @@ void run_callback(CELL quot)
 /* XT of deferred words */
 void undefined(F_WORD* word)
 {
-	general_error(ERROR_UNDEFINED_WORD,tag_word(word),F,true);
+	simple_error(ERROR_UNDEFINED_WORD,tag_word(word),F);
 }
 
 /* XT of compound definitions */
@@ -249,9 +257,48 @@ void early_error(CELL error)
 	}
 }
 
-void throw_error(CELL error, bool keep_stacks)
+/* allocates memory */
+CELL allot_native_stack_trace(F_STACK_FRAME *stack)
+{
+	GROWABLE_ARRAY(array);
+
+	while(stack < stack_chain->native_stack_pointer)
+	{
+		CELL return_address = RETURN_ADDRESS(stack);
+
+		if(return_address >= compiling.base
+			&& return_address <= compiling.limit)
+		{
+			REGISTER_ARRAY(array);
+			CELL cell = allot_cell(return_address);
+			UNREGISTER_ARRAY(array);
+			GROWABLE_ADD(array,cell);
+		}
+
+		F_STACK_FRAME *prev = PREVIOUS_FRAME(stack);
+
+		if(prev <= stack)
+		{
+			fprintf(stderr,"*** Unusual C stack layout (why?)\n");
+			fflush(stderr);
+			break;
+		}
+
+		stack = prev;
+	}
+
+	GROWABLE_TRIM(array);
+
+	return tag_object(array);
+}
+
+void throw_error(CELL error, bool keep_stacks, F_STACK_FRAME *native_stack)
 {
 	early_error(error);
+
+	REGISTER_ROOT(error);
+	thrown_native_stack_trace = allot_native_stack_trace(native_stack);
+	UNREGISTER_ROOT(error);
 
 	throwing = true;
 	thrown_error = error;
@@ -265,7 +312,7 @@ void throw_error(CELL error, bool keep_stacks)
 
 void primitive_throw(void)
 {
-	throw_error(dpop(),true);
+	throw_error(dpop(),true,native_stack_pointer());
 }
 
 void primitive_die(void)
@@ -273,43 +320,57 @@ void primitive_die(void)
 	factorbug();
 }
 
-void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, bool keep_stacks)
+void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2,
+	bool keep_stacks, F_STACK_FRAME *native_stack)
 {
 	throw_error(allot_array_4(userenv[ERROR_ENV],
-		tag_fixnum(error),arg1,arg2),keep_stacks);
+		tag_fixnum(error),arg1,arg2),keep_stacks,native_stack);
 }
 
-void memory_protection_error(CELL addr, int signal)
+void simple_error(F_ERRORTYPE error, CELL arg1, CELL arg2)
 {
-	/* this is here to catch GC bugs; see the comment in push_callframe()
-	above */
-	garbage_collection(NURSERY,false);
+	general_error(error,arg1,arg2,true,native_stack_pointer());
+}
+
+void memory_protection_error(CELL addr, int signal, F_STACK_FRAME *native_stack)
+{
+	gc_off = true;
 
 	if(in_page(addr, ds_bot, 0, -1))
-		general_error(ERROR_DS_UNDERFLOW,F,F,false);
+		general_error(ERROR_DS_UNDERFLOW,F,F,false,native_stack);
 	else if(in_page(addr, ds_bot, ds_size, 0))
-		general_error(ERROR_DS_OVERFLOW,F,F,false);
+		general_error(ERROR_DS_OVERFLOW,F,F,false,native_stack);
 	else if(in_page(addr, rs_bot, 0, -1))
-		general_error(ERROR_RS_UNDERFLOW,F,F,false);
+		general_error(ERROR_RS_UNDERFLOW,F,F,false,native_stack);
 	else if(in_page(addr, rs_bot, rs_size, 0))
-		general_error(ERROR_RS_OVERFLOW,F,F,false);
+		general_error(ERROR_RS_OVERFLOW,F,F,false,native_stack);
 	else if(in_page(addr, cs_bot, 0, -1))
-		general_error(ERROR_CS_UNDERFLOW,F,F,false);
+		general_error(ERROR_CS_UNDERFLOW,F,F,false,native_stack);
 	else if(in_page(addr, cs_bot, cs_size, 0))
-		general_error(ERROR_CS_OVERFLOW,F,F,false);
+		general_error(ERROR_CS_OVERFLOW,F,F,false,native_stack);
 	else if(in_page(addr, nursery.limit, 0, 0))
 		critical_error("Out of memory in allot",0);
-		signal_error(signal);
+
+	signal_error(signal,native_stack);
 }
 
-/* It is not safe to access 'ds' from a signal handler, so we just not
-touch it */
-void signal_error(int signal)
+void signal_error(int signal, F_STACK_FRAME *native_stack)
 {
-	general_error(ERROR_SIGNAL,tag_fixnum(signal),F,false);
+	gc_off = true;
+	general_error(ERROR_SIGNAL,tag_fixnum(signal),F,false,native_stack);
 }
 
 void type_error(CELL type, CELL tagged)
 {
-	general_error(ERROR_TYPE,tag_fixnum(type),tagged,true);
+	simple_error(ERROR_TYPE,tag_fixnum(type),tagged);
+}
+
+void divide_by_zero_error(void)
+{
+	simple_error(ERROR_DIVIDE_BY_ZERO,F,F);
+}
+
+void memory_error(void)
+{
+	simple_error(ERROR_MEMORY,F,F);
 }

@@ -1,3 +1,9 @@
+#ifdef __APPLE__
+	#define MANGLE(sym) _##sym
+#else
+	#define MANGLE(sym) sym
+#endif
+
 /* Thanks to Joshua Grams for this code.
 
 On PowerPC processors, we must flush the instruction cache manually
@@ -5,12 +11,6 @@ after writing to the code heap.
 
 Callable from C as
 void flush_icache(void *start, int len) */
-
-#ifdef __APPLE__
-	#define MANGLE(sym) _##sym
-#else
-	#define MANGLE(sym) sym
-#endif
 
 	.globl MANGLE(flush_icache)
 MANGLE(flush_icache):
@@ -29,4 +29,11 @@ MANGLE(flush_icache):
 	bdnz 0b
 	sync              /* finish up */
 	isync
+	blr
+
+/* Callable from C as
+void *native_stack_pointer(void) */
+	.globl MANGLE(native_stack_pointer)
+MANGLE(native_stack_pointer):
+	mr r3,r1          /* native stack pointer is in r1 */
 	blr

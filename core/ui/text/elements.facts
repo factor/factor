@@ -1,0 +1,34 @@
+IN: gadgets-text
+USING: help ;
+
+HELP: prev-elt
+{ $values { "loc" "a pair of integers" } { "document" document } { "elt" "an element" } { "newloc" "a pair of integers" } }
+{ $contract "Outputs the location of the first occurrence of the element prior to " { $snippet "loc" } "." }
+{ $see-also next-elt } ;
+
+HELP: next-elt
+{ $values { "loc" "a pair of integers" } { "document" document } { "elt" "an element" } { "newloc" "a pair of integers" } }
+{ $contract "Outputs the location of the first occurrence of the element following " { $snippet "loc" } "." }
+{ $see-also prev-elt } ;
+
+HELP: char-elt
+{ $class-description "An element representing a single character." } ;
+
+HELP: one-word-elt
+{ $class-description "An element representing a single word. The " { $link prev-elt } " and " { $link next-elt } " words return the location of the beginning and the end of the word at the current location." }
+{ $see-also word-elt } ;
+
+HELP: word-elt
+{ $class-description "An element representing a single word. The " { $link prev-elt } " and " { $link next-elt } " words return the location of the previous and next word from the current location." }
+{ $see-also one-word-elt } ;
+
+HELP: one-line-elt
+{ $class-description "An element representing a single line. The " { $link prev-elt } " and " { $link next-elt } " words return the location of the beginning and the end of the line at the current location." }
+{ $see-also line-elt } ;
+
+HELP: line-elt
+{ $class-description "An element representing a single line. The " { $link prev-elt } " and " { $link next-elt } " words return the location of the previous and next line from the current location." }
+{ $see-also one-line-elt } ;
+
+HELP: doc-elt
+{ $class-description "An element representing the entire document. The " { $link prev-elt } " word outputs the start of the document and the " { $link next-elt } " word outputs the end of the document." } ;

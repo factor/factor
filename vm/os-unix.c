@@ -22,8 +22,8 @@ void ffi_dlopen(F_DLL *dll, bool error)
 	{
 		if(error)
 		{
-			general_error(ERROR_FFI,F,
-				tag_object(from_char_string(dlerror())),true);
+			simple_error(ERROR_FFI,F,
+				tag_object(from_char_string(dlerror())));
 		}
 		else
 			dll->dll = NULL;
@@ -42,9 +42,9 @@ void *ffi_dlsym(F_DLL *dll, char *symbol, bool error)
 	{
 		if(error)
 		{
-			general_error(ERROR_FFI,
+			simple_error(ERROR_FFI,
 				tag_object(from_char_string(symbol)),
-				tag_object(from_char_string(dlerror())),true);
+				tag_object(from_char_string(dlerror())));
 		}
 
 		return NULL;
@@ -56,8 +56,8 @@ void ffi_dlclose(F_DLL *dll)
 {
 	if(dlclose(dll->dll))
 	{
-		general_error(ERROR_FFI,tag_object(
-			from_char_string(dlerror())),F,true);
+		simple_error(ERROR_FFI,tag_object(
+			from_char_string(dlerror())),F);
 	}
 	dll->dll = NULL;
 }
@@ -85,8 +85,7 @@ void primitive_stat(void)
 void primitive_read_dir(void)
 {
 	DIR* dir = opendir(unbox_char_string());
-	CELL result_count = 0;
-	F_ARRAY *result = allot_array(ARRAY_TYPE,100,F);
+	GROWABLE_ARRAY(result);
 
 	if(dir != NULL)
 	{
@@ -94,24 +93,16 @@ void primitive_read_dir(void)
 
 		while((file = readdir(dir)) != NULL)
 		{
-			if(result_count == array_capacity(result))
-			{
-				result = reallot_array(result,
-					result_count * 2,F);
-			}
-
 			REGISTER_ARRAY(result);
 			CELL name = tag_object(from_char_string(file->d_name));
 			UNREGISTER_ARRAY(result);
-
-			set_array_nth(result,result_count,name);
-			result_count++;
+			GROWABLE_ADD(result,name);
 		}
 
 		closedir(dir);
 	}
 
-	result = reallot_array(result,result_count,F);
+	GROWABLE_TRIM(result);
 
 	dpush(tag_object(result));
 }
@@ -167,9 +158,25 @@ void dealloc_segment(F_SEGMENT *block)
 	free(block);
 }
 
-void signal_handler(int signal, siginfo_t* siginfo, void* uap)
+INLINE F_STACK_FRAME *uap_stack_pointer(void *uap)
 {
-	memory_protection_error((CELL)siginfo->si_addr, signal);
+	ucontext_t *ucontext = (ucontext_t *)uap;
+	F_STACK_FRAME *ptr = (F_STACK_FRAME *)ucontext->uc_stack.ss_sp;
+	if(ptr)
+		return ptr;
+	else
+		return native_stack_pointer();
+}
+
+void memory_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+{
+	memory_protection_error((CELL)siginfo->si_addr,signal,
+		uap_stack_pointer(uap));
+}
+
+void misc_signal_handler(int signal, siginfo_t *siginfo, void *uap)
+{
+	signal_error(signal,uap_stack_pointer(uap));
 }
 
 static void sigaction_safe(int signum, const struct sigaction *act, struct sigaction *oldact)
@@ -178,23 +185,31 @@ static void sigaction_safe(int signum, const struct sigaction *act, struct sigac
 	do
 	{
 		ret = sigaction(signum, act, oldact);
-	} while(ret == -1 && errno == EINTR);
+	}
+	while(ret == -1 && errno == EINTR);
 }
 
 void unix_init_signals(void)
 {
-	struct sigaction custom_sigaction;
+	struct sigaction memory_sigaction;
+	struct sigaction misc_sigaction;
 	struct sigaction ign_sigaction;
 	
-	sigemptyset(&custom_sigaction.sa_mask);
-	custom_sigaction.sa_sigaction = signal_handler;
-	custom_sigaction.sa_flags = SA_SIGINFO;
-	sigaction_safe(SIGABRT,&custom_sigaction,NULL);
-	sigaction_safe(SIGFPE,&custom_sigaction,NULL);
-	sigaction_safe(SIGBUS,&custom_sigaction,NULL);
-	sigaction_safe(SIGQUIT,&custom_sigaction,NULL);
-	sigaction_safe(SIGSEGV,&custom_sigaction,NULL);
-	sigaction_safe(SIGILL,&custom_sigaction,NULL);
+	sigemptyset(&memory_sigaction.sa_mask);
+	memory_sigaction.sa_sigaction = memory_signal_handler;
+	memory_sigaction.sa_flags = SA_SIGINFO;
+
+	sigaction_safe(SIGBUS,&memory_sigaction,NULL);
+	sigaction_safe(SIGSEGV,&memory_sigaction,NULL);
+
+	sigemptyset(&misc_sigaction.sa_mask);
+	misc_sigaction.sa_sigaction = misc_signal_handler;
+	misc_sigaction.sa_flags = SA_SIGINFO;
+
+	sigaction_safe(SIGABRT,&misc_sigaction,NULL);
+	sigaction_safe(SIGFPE,&misc_sigaction,NULL);
+	sigaction_safe(SIGQUIT,&misc_sigaction,NULL);
+	sigaction_safe(SIGILL,&misc_sigaction,NULL);
 	
 	sigemptyset(&ign_sigaction.sa_mask);
 	ign_sigaction.sa_handler = SIG_IGN;

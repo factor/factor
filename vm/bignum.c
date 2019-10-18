@@ -169,7 +169,7 @@ s48_bignum_divide(bignum_type numerator, bignum_type denominator,
 {
   if (BIGNUM_ZERO_P (denominator))
     {
-      raise(SIGFPE);
+      divide_by_zero_error();
       return;
     }
   if (BIGNUM_ZERO_P (numerator))
@@ -241,7 +241,7 @@ s48_bignum_quotient(bignum_type numerator, bignum_type denominator)
 {
   if (BIGNUM_ZERO_P (denominator))
     {
-      raise(SIGFPE);
+      divide_by_zero_error();
       return (BIGNUM_OUT_OF_BAND);
     }
   if (BIGNUM_ZERO_P (numerator))
@@ -294,7 +294,7 @@ s48_bignum_remainder(bignum_type numerator, bignum_type denominator)
 {
   if (BIGNUM_ZERO_P (denominator))
     {
-      raise(SIGFPE);
+      divide_by_zero_error();
       return (BIGNUM_OUT_OF_BAND);
     }
   if (BIGNUM_ZERO_P (numerator))
@@ -371,18 +371,6 @@ FOO_TO_BIGNUM(ulong,unsigned long,unsigned long)
 FOO_TO_BIGNUM(long_long,s64,u64)
 FOO_TO_BIGNUM(ulong_long,u64,u64)
 
-/* this is inefficient; its only used for fixnum multiplication overflow so
-it probaly does not matter */
-bignum_type s48_fixnum_pair_to_bignum(CELL x, F_FIXNUM y)
-{
-  bignum_type hiword = s48_bignum_arithmetic_shift(
-      s48_fixnum_to_bignum(y),sizeof(unsigned long) * 8);
-  REGISTER_BIGNUM(hiword);
-  bignum_type loword = s48_cell_to_bignum(x);
-  UNREGISTER_BIGNUM(hiword);
-  return s48_bignum_add(hiword,loword);
-}
-
 #define BIGNUM_TO_FOO(name,type,utype) \
   type s48_bignum_to_##name(bignum_type bignum) \
   { \
@@ -433,6 +421,7 @@ s48_bignum_to_double(bignum_type bignum)
 bignum_type
 s48_double_to_bignum(double x)
 {
+  if (!isnormal(x)) return (BIGNUM_ZERO ());
   int exponent;
   double significand = (frexp (x, (&exponent)));
   if (exponent <= 0) return (BIGNUM_ZERO ());
@@ -585,7 +574,7 @@ bignum_add_unsigned(bignum_type x, bignum_type y, int negative_p)
 bignum_type
 bignum_subtract_unsigned(bignum_type x, bignum_type y)
 {
-  int negative_p;
+  int negative_p = 0;
   switch (bignum_compare_unsigned (x, y))
     {
     case bignum_comparison_equal:
@@ -1380,7 +1369,7 @@ allot_bignum_zeroed(bignum_length_type length, int negative_p)
 }
 
 #define BIGNUM_REDUCE_LENGTH(source, length) \
-     source = reallot_array(source,length + 1,69)
+     source = reallot_array(source,length + 1,0)
 
 /* allocates memory */
 bignum_type

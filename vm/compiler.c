@@ -4,7 +4,7 @@
 image load */
 void undefined_symbol(void)
 {
-	general_error(ERROR_UNDEFINED_SYMBOL,F,F,true);
+	simple_error(ERROR_UNDEFINED_SYMBOL,F,F);
 }
 
 #define CREF(array,i) ((CELL)(array) + CELLS * (i))
@@ -136,6 +136,9 @@ void finalize_code_block(F_COMPILED *relocating, CELL code_start,
 {
 	CELL scan;
 
+	if(relocating->finalized != false)
+		critical_error("Finalizing a finalized block",(CELL)relocating);
+
 	for(scan = words_start; scan < words_end; scan += CELLS)
 		put(scan,untag_word(get(scan))->xt);
 
@@ -193,8 +196,6 @@ void primitive_add_compiled_block(void)
 	{
 		/* Read parameters from stack, leaving them on the stack */
 		FROB
-		if(code->header != tag_header(VECTOR_TYPE))
-			critical_error("FUCKUP 1",0);
 
 		/* Try allocating a new code block */
 		CELL total_length = sizeof(F_COMPILED) + code_length
@@ -252,7 +253,10 @@ void primitive_add_compiled_block(void)
 	here += words_length;
 
 	/* push the XT of the new word on the stack */
-	box_unsigned_cell(start + sizeof(F_COMPILED));
+	F_WORD *word = allot_word(F,F);
+	word->xt = start + sizeof(F_COMPILED);
+	word->compiledp = T;
+	dpush(tag_word(word));
 }
 
 #undef FROB
@@ -270,7 +274,12 @@ void primitive_finalize_compile(void)
 	{
 		F_ARRAY *pair = untag_array(get(AREF(array,i)));
 		F_WORD *word = untag_word(get(AREF(pair,0)));
-		word->xt = to_cell(get(AREF(pair,1)));
+		CELL xt = untag_word(get(AREF(pair,1)))->xt;
+		F_BLOCK *block = xt_to_block(xt);
+		if(block->status != B_ALLOCATED)
+			critical_error("bad XT",xt);
+
+		word->xt = xt;
 		word->compiledp = T;
 	}
 
@@ -278,7 +287,39 @@ void primitive_finalize_compile(void)
 	for(i = 0; i < count; i++)
 	{
 		F_ARRAY *pair = untag_array(get(AREF(array,i)));
-		CELL xt = to_cell(get(AREF(pair,1)));
+		F_WORD *word = untag_word(get(AREF(pair,0)));
+		CELL xt = word->xt;
 		iterate_code_heap_step(xt_to_compiled(xt),finalize_code_block);
 	}
+}
+
+void primitive_xt_map(void)
+{
+	GROWABLE_ARRAY(array);
+	F_BLOCK *scan = (F_BLOCK *)compiling.base;
+
+	while(scan)
+	{
+		if(scan->status != B_FREE)
+		{
+			F_COMPILED *compiled = (F_COMPILED *)(scan + 1);
+			CELL code_start = (CELL)(compiled + 1);
+			CELL literal_start = code_start
+				+ compiled->code_length
+				+ compiled->reloc_length;
+
+			CELL word = get_literal(literal_start,0);
+			GROWABLE_ADD(array,word);
+			REGISTER_ARRAY(array);
+			CELL xt = allot_cell(code_start);
+			UNREGISTER_ARRAY(array);
+			GROWABLE_ADD(array,xt);
+		}
+
+		scan = next_block(&compiling,scan);
+	}
+
+	GROWABLE_TRIM(array);
+
+	dpush(tag_object(array));
 }

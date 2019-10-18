@@ -46,7 +46,7 @@ typedef F_FIXNUM bignum_digit_type;
 typedef F_FIXNUM bignum_length_type;
 
 /* BIGNUM_TO_POINTER casts a bignum object to a digit array pointer. */
-#define BIGNUM_TO_POINTER(bignum) ((CELL*)AREF(bignum,0))
+#define BIGNUM_TO_POINTER(bignum) ((bignum_digit_type *)AREF(bignum,0))
 
 /* BIGNUM_EXCEPTION is invoked to handle assertion violations. */
 #define BIGNUM_EXCEPTION abort

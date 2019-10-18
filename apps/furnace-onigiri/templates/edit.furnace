@@ -1,0 +1,9 @@
+<% USING: namespaces io kernel sequences furnace:onigiri ; %>
+
+<form method="post" action="entry-update">
+    <% "stub" get [ %><input type="hidden" name="stub" value="<% "stub" get write %>"/><% ] when %>
+    <table><tr><td>Title:</td><td><input type="text" name="title" value="<% "title" get write %>"/></td></tr>
+    <tr><td>Body:</td><td><textarea rows="15" cols="80" name="body"><% "body" get write %></textarea></td></tr>
+    <tr><td><input type="submit" name="post" value="<% "stub" get "update" "post" ? write %>"/></td><% "stub" get [ %><td><a href="<% "entry-delete?entry=" "stub" get append action>url write %>">Delete</a></td><% ] when %></tr>
+    </table>
+</form>

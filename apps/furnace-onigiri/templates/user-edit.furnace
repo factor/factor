@@ -1,0 +1,15 @@
+<% USING: furnace:onigiri namespaces io kernel ; %>
+
+<form action="<% "user-update" action>url write %>" method=post>
+<table>
+<tr><td>Name:</td><td><input type="text" name="name" value="<% "name" get write %>"/></td></tr>
+<tr><td>Password:</td><td><input type="password" name="password"/></td></tr>
+
+<tr><td>Level:</td>
+    <td><select name="level">
+        <option value="user" <% "level" get "user" = [ "selected" write ] when %>>User</option>
+        <option value="admin" <% "level" get "admin" = [ "selected" write ] when %>>Admin</option></select></td></tr>
+
+<tr><td><input type="submit" name="submit" value="submit"/></td></tr>
+</table>
+</form>

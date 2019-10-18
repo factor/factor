@@ -1,0 +1,139 @@
+USING: help gadgets gadgets-buttons ;
+
+ARTICLE: "ui-gestures" "UI gestures"
+"User actions such as keyboard input and mouse button clicks deliver " { $emphasis "gestures" } " to gadgets. If the direct receiver of the gesture does not handle it, the gesture is passed on to the receiver's parent, and this way it travels up the gadget hierarchy. Gestures which are not handled at some point are ignored."
+$terpri
+"There are two ways to define gesture handling logic. The simplest way is to associate a fixed set of gestures with a class:"
+{ $subsection set-gestures }
+"Another way is to define a generic word on a class which handles all gestures sent to gadgets of that class:"
+{ $subsection handle-gesture* }
+"Sometimes a gesture needs to be presented to the user:"
+{ $subsection gesture>string }
+"Keyboard input:"
+{ $subsection "ui-focus" }
+{ $subsection "keyboard-gestures" }
+{ $subsection "action-gestures" }
+{ $subsection "ui-user-input" }
+"Mouse input:"
+{ $subsection "mouse-gestures" }
+"An abstraction built on top of gestures:"
+{ $subsection "ui-commands" } ;
+
+ARTICLE: "ui-focus" "Keyboard focus"
+"The gadget with keyboard focus is the current receiver of keyboard gestures and user input. Gadgets that wish to receive keyboard input should request focus when clicked:"
+{ $subsection request-focus }
+"The following example demonstrates defining a handler for a mouse click gesture which requests focus:"
+{ $code
+    "my-gadget H{"
+    "    { T{ button-down } [ request-focus ] }"
+    "} set-gestures"
+}
+"When a gadget is displayed in a window by " { $link open-window } ", focus is requested on the gadget. To nominate a single child as the default focusable child, implement a method on a generic word:"
+{ $subsection focusable-child* }
+"Gestures are sent to a gadget when it gains or loses focus; this can be used to change the gadget's appearance, for example by displaying a border:"
+{ $subsection gain-focus }
+{ $subsection lose-focus } ;
+
+ARTICLE: "keyboard-gestures" "Keyboard gestures"
+"There are two types of keyboard gestures:"
+{ $subsection key-down }
+{ $subsection key-up }
+"Each keyboard gesture has a set of modifiers and a key symbol. The set modifiers is denoted by an array which must either be " { $link f } ", or an order-preserving subsequence of the following:"
+{ $code "{ S+ C+ A+ M+ }" }
+{ $subsection S+ }
+{ $subsection C+ }
+{ $subsection A+ }
+{ $subsection M+ }
+"A key symbol is either a single-character string denoting literal input, or one of the following strings:"
+{ $list
+  { $snippet "CLEAR" }
+  { $snippet "RETURN" }
+  { $snippet "ENTER" }
+  { $snippet "ESCAPE" }
+  { $snippet "TAB" }
+  { $snippet "BACKSPACE" }
+  { $snippet "HOME" }
+  { $snippet "DELETE" }
+  { $snippet "END" }
+  { $snippet "F1" }
+  { $snippet "F2" }
+  { $snippet "F3" }
+  { $snippet "F4" }
+  { $snippet "F5" }
+  { $snippet "F6" }
+  { $snippet "F7" }
+  { $snippet "F8" }
+  { $snippet "LEFT" }
+  { $snippet "RIGHT" }
+  { $snippet "DOWN" }
+  { $snippet "UP" }
+  { $snippet "PAGE_UP" }
+  { $snippet "PAGE_DOWN" }
+}
+"Note that " { $snippet "RETURN" } ", " { $snippet "TAB" } " and " { $snippet "SPACE" } " are never delivered in their literal form, as " { $snippet "\"\\n\"" } ", " { $snippet "\"\\t\"" } " or "  { $snippet "\" \"" } "." ;
+
+ARTICLE: "ui-user-input" "Free-form keyboard input"
+"Whereas keyboard gestures are intended to be used for keyboard shortcuts, certain gadgets such as text fields need to accept free-form keyboard input. This can be done by implementing a generic word:"
+{ $subsection user-input* } ;
+
+ARTICLE: "mouse-gestures" "Mouse gestures"
+"There are two types of mouse gestures indicating button clicks:"
+{ $subsection button-down }
+{ $subsection button-up }
+"When a mouse button is pressed or released, two gestures are sent. The first gesture indicates the specific button number, and if this gesture is not handled, the second has a button number set to " { $link f } ":"
+{ $code "T{ button-down f 1 }" "T{ button-down f f }" }
+"Because tuple literals fill unspecified slots with " { $link f } ", the last gesture can be written as " { $snippet "T{ button-down }" } "."
+$terpri
+"Gestures to indicate mouse motion, depending on whenever a button is held down or not:"
+{ $subsection motion }
+{ $subsection drag }
+"Gestures to indicate that the mouse has crossed gadget boundaries:"
+{ $subsection mouse-enter }
+{ $subsection mouse-leave }
+"A number of global variables are set after a mouse gesture is sent. These variables can be read to obtain additional information about the gesture."
+{ $subsection hand-gadget }
+{ $subsection hand-world }
+{ $subsection hand-loc }
+{ $subsection hand-buttons }
+{ $subsection hand-clicked }
+{ $subsection hand-click-loc }
+{ $subsection hand-click# }
+"There are some utility words for working with click locations:"
+{ $subsection hand-rel }
+{ $subsection hand-click-rel }
+{ $subsection drag-loc }
+"Mouse scroll wheel gesture:"
+{ $subsection mouse-scroll }
+"Global variable set when a mouse scroll wheel gesture is sent:"
+{ $subsection scroll-direction } ;
+
+ARTICLE: "action-gestures" "Action gestures"
+"Action gestures exist to keep keyboard shortcuts for common clipboard operations consistent."
+{ $subsection cut-action }
+{ $subsection copy-action }
+{ $subsection paste-action }
+{ $subsection delete-action }
+{ $subsection select-all-action }
+"The following keyboard gestures, if not handled directly, send action gestures:"
+{ $table
+    { { $strong "Keyboard gesture" } { $strong "Action gesture" } }
+    { { $snippet "T{ key-down f { C+ } \"x\" }" } { $snippet "T{ cut-action }" } }
+    { { $snippet "T{ key-down f { C+ } \"c\" }" } { $snippet "T{ copy-action }" } }
+    { { $snippet "T{ key-down f { C+ } \"v\" }" } { $snippet "T{ paste-action }" } }
+    { { $snippet "T{ key-down f { C+ } \"a\" }" } { $snippet "T{ select-all }" } }
+}
+"Action gestures should be used in place of the above keyboard gestures if possible. For example, on Mac OS X, the standard " { $strong "Edit" } " menu items send action gestures." ;
+
+ARTICLE: "ui-commands" "Commands"
+"Commands are layered on top of gestures. Their main advantage is that they are named by strings and can be organized into groups. This allows easy construction of buttons and tool bars for invoking commands."
+{ $subsection command }
+"Command groups are defined on gadget classes:"
+{ $subsection define-commands }
+"Commands can be introspected and invoked:"
+{ $subsection commands }
+{ $subsection invoke-command }
+"Gadgets for invoking commands:"
+{ $subsection <command-button> }
+{ $subsection <toolbar> }
+"When writing gadget documentation, a table of command names and keyboard shortcuts can be inserted with a markup element:"
+{ $subsection $commands } ;

@@ -114,7 +114,7 @@ void primitive_next_object(void)
 	CELL type;
 
 	if(!gc_off)
-		general_error(ERROR_HEAP_SCAN,F,F,true);
+		simple_error(ERROR_HEAP_SCAN,F,F);
 
 	if(heap_scan_ptr >= tenured.here)
 	{
@@ -311,7 +311,7 @@ the user environment and extra roots registered with REGISTER_ROOT */
 void collect_roots(void)
 {
 	int i;
-	F_STACKS *stacks;
+	F_CONTEXT *stacks;
 
 	copy_handle(&T);
 	copy_handle(&bignum_zero);
@@ -338,7 +338,8 @@ void collect_roots(void)
 				&stacks->callframe_scan,&stacks->callframe_end);
 		}
 
-		copy_handle(&stacks->catch_save);
+		copy_handle(&stacks->catchstack_save);
+		copy_handle(&stacks->current_callback_save);
 
 		stacks = stacks->next;
 	}

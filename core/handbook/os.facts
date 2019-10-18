@@ -1,0 +1,21 @@
+USING: help kernel io ;
+
+ARTICLE: "os" "System interface"
+"Collecting information:"
+{ $subsection os }
+{ $subsection cpu }
+{ $subsection unix? }
+{ $subsection macosx? }
+{ $subsection win32? }
+{ $subsection win64? }
+"Getting and setting the current working directory:"
+{ $subsection cwd }
+{ $subsection cd }
+"Reading environment variables:"
+{ $subsection os-env }
+"Getting the user's home directory:"
+{ $subsection home }
+"Exiting the Factor runtime:"
+{ $subsection exit }
+"Operating system processes can be run using the " { $module-link "libs/process" } " module."
+{ $see-also "file-streams" "network-streams" } ;

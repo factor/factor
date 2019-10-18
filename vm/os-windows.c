@@ -48,7 +48,8 @@ void ffi_dlopen (F_DLL *dll, bool error)
 	{
 		dll->dll = NULL;
 		if(error)
-			general_error(ERROR_FFI, F, tag_object(get_error_message()),true);
+			simple_error(ERROR_FFI,F,
+				tag_object(get_error_message()));
 		else
 			return;
 	}
@@ -65,9 +66,9 @@ void *ffi_dlsym (F_DLL *dll, char *symbol, bool error)
 	if (!sym)
 	{
 		if(error)
-			general_error(ERROR_FFI,
+			simple_error(ERROR_FFI,
 				tag_object(from_char_string(symbol)),
-				tag_object(get_error_message()),true);
+				tag_object(get_error_message()));
 		else
 			return NULL;
 	}
@@ -110,36 +111,27 @@ void primitive_read_dir(void)
 {
 	HANDLE dir;
 	WIN32_FIND_DATA find_data;
-	CELL result_count = 0;
 	char path[MAX_PATH + 4];
 
 	sprintf(path, "%s\\*", unbox_char_string());
 
-	F_ARRAY *result = allot_array(ARRAY_TYPE,100,F);
+	GROWABLE_ARRAY(result);
 
 	if(INVALID_HANDLE_VALUE != (dir = FindFirstFile(path, &find_data)))
 	{
 		do
 		{
-			if(result_count == array_capacity(result))
-			{
-				result = reallot_array(result,
-					result_count * 2,F);
-			}
-
 			REGISTER_ARRAY(result);
 			CELL name = tag_object(from_char_string(
 				find_data.cFileName));
 			UNREGISTER_ARRAY(result);
-
-			set_array_nth(result,result_count,name);
-			result_count++;
+			GROWABLE_ADD(result,name);
 		}
 		while (FindNextFile(dir, &find_data));
 		CloseHandle(dir);
 	}
 
-	result = reallot_array(result,result_count,F);
+	GROWABLE_TRIM(result);
 
 	dpush(tag_object(result));
 }
@@ -231,7 +223,8 @@ void seh_call(void (*func)(), exception_handler_t *handler)
 
 static long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)
 {
-	memory_protection_error(rec->ExceptionInformation[1], SIGSEGV);
+	memory_protection_error(rec->ExceptionInformation[1],
+		SIGSEGV,native_stack_pointer());
 	return -1; /* unreachable */
 }
 

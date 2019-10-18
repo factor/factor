@@ -28,43 +28,62 @@ INLINE void update_free_list(F_HEAP *heap, F_BLOCK *prev, F_BLOCK *next_free)
 		heap->free_list = next_free;
 }
 
-/* Called after reading the code heap from the image file. We must build the
-free list, and add a large free block from compiling.base + size to
+/* Called after reading the code heap from the image file, and after code GC.
+
+In the former case, we must add a large free block from compiling.base + size to
 compiling.limit. */
 void build_free_list(F_HEAP *heap, CELL size)
 {
 	F_BLOCK *prev = NULL;
+	F_BLOCK *prev_free = NULL;
 	F_BLOCK *scan = (F_BLOCK *)heap->base;
 	F_BLOCK *end = (F_BLOCK *)(heap->base + size);
 
 	/* Add all free blocks to the free list */
 	while(scan && scan < end)
 	{
-		if(scan->status == B_FREE)
+		switch(scan->status)
 		{
-			update_free_list(heap,prev,scan);
-			prev = scan;
+		case B_FREE:
+			update_free_list(heap,prev_free,scan);
+			prev_free = scan;
+			break;
+		case B_ALLOCATED:
+			break;
+		default:
+			critical_error("Invalid scan->status",(CELL)scan);
+			break;
 		}
 
+		prev = scan;
 		scan = next_block(heap,scan);
 	}
 
-	/* If there is room at the end of the heap, add a free block */
+	/* If there is room at the end of the heap, add a free block. This
+	branch is only taken after loading a new image, not after code GC */
 	if((CELL)(end + 1) <= heap->limit)
 	{
 		end->status = B_FREE;
 		end->next_free = NULL;
 		end->size = heap->limit - (CELL)end;
+
+		/* add final free block */
+		update_free_list(heap,prev_free,end);
 	}
+	/* This branch is taken if the newly loaded image fits exactly, or
+	after code GC */
 	else
 	{
-		end = NULL;
-
+		/* even if there's no room at the end of the heap for a new
+		free block, we might have to jigger it up by a few bytes in
+		case prev + prev->size */
 		if(prev)
 			prev->size = heap->limit - (CELL)prev;
+
+		/* this is the last free block */
+		update_free_list(heap,prev_free,NULL);
 	}
 
-	update_free_list(heap,prev,end);
 }
 
 /* Allocate a block of memory from the mark and sweep GC heap */
@@ -149,6 +168,8 @@ void free_unmarked(F_HEAP *heap)
 			scan->status = B_ALLOCATED;
 			prev = scan;
 			break;
+		default:
+			critical_error("Invalid scan->status",(CELL)scan);
 		}
 
 		scan = next_block(heap,scan);
@@ -203,22 +224,28 @@ void iterate_code_heap(CODE_HEAP_ITERATOR iter)
 }
 
 /* Copy all literals referenced from a code block to newspace */
-void collect_literals_step(F_COMPILED *relocating, CELL code_start,
+void collect_literals_step(F_COMPILED *compiled, CELL code_start,
 	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end)
 {
 	CELL scan;
 
-	CELL literal_end = literal_start + relocating->literal_length;
+	CELL literal_end = literal_start + compiled->literal_length;
 
 	for(scan = literal_start; scan < literal_end; scan += CELLS)
 		copy_handle((CELL*)scan);
 
 	/* If the block is not finalized, the words area contains pointers to
 	words in the data heap rather than XTs in the code heap */
-	if(!relocating->finalized)
+	switch(compiled->finalized)
 	{
+	case false:
 		for(scan = words_start; scan < words_end; scan += CELLS)
 			copy_handle((CELL*)scan);
+		break;
+	case true:
+		break;
+	default:
+		critical_error("Invalid compiled->finalized",(CELL)compiled);
 	}
 }
 
@@ -234,11 +261,8 @@ void mark_sweep_step(F_COMPILED *compiled, CELL code_start,
 {
 	CELL scan;
 
-	if(compiled->finalized)
-	{
-		for(scan = words_start; scan < words_end; scan += CELLS)
-			recursive_mark(get(scan));
-	}
+	for(scan = words_start; scan < words_end; scan += CELLS)
+		recursive_mark(get(scan));
 }
 
 /* Mark all XTs and literals referenced from a word XT */
@@ -247,18 +271,32 @@ void recursive_mark(CELL xt)
 	F_BLOCK *block = xt_to_block(xt);
 
 	/* If already marked, do nothing */
-	if(block->status == B_MARKED)
+	switch(block->status)
+	{
+	case B_MARKED:
 		return;
-	/* Mark it */
-	else if(block->status == B_ALLOCATED)
+	case B_ALLOCATED:
 		block->status = B_MARKED;
-	/* We should never be asked to mark a free block */
-	else
+		break;
+	default:
 		critical_error("Marking the wrong block",(CELL)block);
+		break;
+	}
 
 	F_COMPILED *compiled = xt_to_compiled(xt);
 	iterate_code_heap_step(compiled,collect_literals_step);
-	iterate_code_heap_step(compiled,mark_sweep_step);
+
+	switch(compiled->finalized)
+	{
+	case false:
+		break;
+	case true:
+		iterate_code_heap_step(compiled,mark_sweep_step);
+		break;
+	default:
+		critical_error("Invalid compiled->finalized",(CELL)compiled);
+		break;
+	}
 }
 
 /* Push the free space and total size of the code heap */

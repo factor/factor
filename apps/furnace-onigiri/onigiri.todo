@@ -1,0 +1,38 @@
+Better xhtml structure
+Adsense
+*UI for metadata
+Plugins
+Themes
+Recent posts sidebar
+Links sidebar
+Widgets (Onigirihouse feels ...)
+Tagging
+Pretty URL's
+Develop protocol for metadata and their defaults
+Use wiky to do client-side wikistyle
+Change furnace to /controller/action/argument1/argument2/.../ style
+Have posts correlated with users
+Figure out which user is logged in from inside an action
+
+----DONE-----
+
+by 12/31/2006
+Atom
+Individual post pages
+Timestamping and ordering
+Rename onigirihouse => onigiri
+Store blog metadata in db
+Markdown for entries
+Make Atom feed validate (Add id, updated to atom)
+Store URL
+UI for posting
+Posting interface
+Switch to plug-in CSS
+
+1/1/07
+Stopped using farkup (for now)
+Moved to controller-action naming convention
+
+1/2/07
+Added Users
+Added CRUD for Users, multiple levels of users

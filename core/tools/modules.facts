@@ -1,0 +1,17 @@
+IN: modules
+USING: help ;
+
+HELP: test-module
+{ $values { "name" "a module name string" } }
+{ $description "Runs the unit test files associated to the module by a previous call to " { $link provide } " or " { $link POSTPONE: PROVIDE: } "." } ;
+
+HELP: test-modules
+{ $description "Runs unit test files for all loaded modules." } ;
+
+HELP: run-module
+{ $values { "name" "a module name string" } }
+{ $description "Runs the main entry point of the module, first loading the module if necessary using " { $link require } ". Entry points can be defined with the " { $link POSTPONE: MAIN: } " word." } ;
+
+HELP: modules-help
+{ $values { "seq" "a new sequence" } }
+{ $description "Outputs a sequence of help articles which are the main entry points into the documentation of loaded modules. Modules can define documentation entry points with the " { $link +help+ } " key of the association list given in " { $link POSTPONE: PROVIDE: } "." } ;

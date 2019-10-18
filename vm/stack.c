@@ -43,7 +43,7 @@ void save_stacks(void)
 /* called on entry into a compiled callback */
 void nest_stacks(void)
 {
-	F_STACKS *new_stacks = safe_malloc(sizeof(F_STACKS));
+	F_CONTEXT *new_stacks = safe_malloc(sizeof(F_CONTEXT));
 	
 	/* note that these register values are not necessarily valid stack
 	pointers. they are merely saved non-volatile registers, and are
@@ -63,7 +63,10 @@ void nest_stacks(void)
 	new_stacks->callframe = callframe;
 	new_stacks->callframe_scan = callframe_scan;
 	new_stacks->callframe_end = callframe_end;
-	new_stacks->catch_save = userenv[CATCHSTACK_ENV];
+
+	/* save per-callback userenv */
+	new_stacks->current_callback_save = userenv[CURRENT_CALLBACK_ENV];
+	new_stacks->catchstack_save = userenv[CATCHSTACK_ENV];
 
 	new_stacks->data_region = alloc_segment(ds_size);
 	new_stacks->retain_region = alloc_segment(rs_size);
@@ -97,11 +100,14 @@ void unnest_stacks(void)
 	callframe = stack_chain->callframe;
 	callframe_scan = stack_chain->callframe_scan;
 	callframe_end = stack_chain->callframe_end;
-	userenv[CATCHSTACK_ENV] = stack_chain->catch_save;
+
+	/* restore per-callback userenv */
+	userenv[CURRENT_CALLBACK_ENV] = stack_chain->current_callback_save;
+	userenv[CATCHSTACK_ENV] = stack_chain->catchstack_save;
 
 	extra_roots = stack_chain->extra_roots;
 
-	F_STACKS *old_stacks = stack_chain;
+	F_CONTEXT *old_stacks = stack_chain;
 	stack_chain = old_stacks->next;
 	free(old_stacks);
 }
@@ -245,7 +251,9 @@ void primitive_from_r(void)
 
 void stack_to_vector(CELL bottom, CELL top)
 {
-	CELL depth = (top - bottom + CELLS) / CELLS;
+	F_FIXNUM depth = (F_FIXNUM)(top - bottom + CELLS) / CELLS;
+	if(depth < 0)
+		depth = 0;
 	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,depth);
 	memcpy(a + 1,(void*)bottom,depth * CELLS);
 	dpush(tag_object(a));

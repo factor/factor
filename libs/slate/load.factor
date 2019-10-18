@@ -1,0 +1,1 @@
+PROVIDE: libs/slate { +files+ { "slate.factor" } } ;

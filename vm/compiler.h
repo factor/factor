@@ -42,3 +42,4 @@ void relocate_code_block(F_COMPILED *relocating, CELL code_start,
 	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end);
 void primitive_add_compiled_block(void);
 void primitive_finalize_compile(void);
+void primitive_xt_map(void);

@@ -1,0 +1,1 @@
+PLAF_OBJS += vm/cpu-x86.o

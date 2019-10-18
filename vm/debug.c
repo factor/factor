@@ -1,13 +1,13 @@
 #include "factor.h"
 
-void print_word(F_WORD* word)
+void print_word(F_WORD* word, CELL nesting)
 {
 	if(type_of(word->name) == STRING_TYPE)
 		fprintf(stderr,"%s",to_char_string(untag_string(word->name),true));
 	else
 	{
 		fprintf(stderr,"#<not a string: ");
-		print_obj(word->name);
+		print_nested_obj(word->name,nesting - 1);
 		fprintf(stderr,">");
 	}
 
@@ -19,7 +19,7 @@ void print_string(F_STRING* str)
 	fprintf(stderr,"\"%s\"",to_char_string(str,true));
 }
 
-void print_array(F_ARRAY* array)
+void print_array(F_ARRAY* array, CELL nesting)
 {
 	CELL length = array_capacity(array);
 	CELL i;
@@ -27,19 +27,25 @@ void print_array(F_ARRAY* array)
 	for(i = 0; i < length; i++)
 	{
 		fprintf(stderr," ");
-		print_obj(get(AREF(array,i)));
+		print_nested_obj(get(AREF(array,i)),nesting - 1);
 	}
 }
 
-void print_obj(CELL obj)
+void print_nested_obj(CELL obj, CELL nesting)
 {
+	if(nesting == 0)
+	{
+		fprintf(stderr," ... ");
+		return;
+	}
+
 	switch(type_of(obj))
 	{
 	case FIXNUM_TYPE:
 		fprintf(stderr,"%ld",untag_fixnum_fast(obj));
 		break;
 	case WORD_TYPE:
-		print_word(untag_word(obj));
+		print_word(untag_word(obj),nesting - 1);
 		break;
 	case STRING_TYPE:
 		print_string(untag_string(obj));
@@ -49,23 +55,28 @@ void print_obj(CELL obj)
 		break;
 	case TUPLE_TYPE:
 		fprintf(stderr,"T{");
-		print_array((F_ARRAY*)UNTAG(obj));
+		print_array((F_ARRAY*)UNTAG(obj),nesting - 1);
 		fprintf(stderr," }");
 		break;
 	case ARRAY_TYPE:
 		fprintf(stderr,"{");
-		print_array((F_ARRAY*)UNTAG(obj));
+		print_array((F_ARRAY*)UNTAG(obj),nesting - 1);
 		fprintf(stderr," }");
 		break;
 	case QUOTATION_TYPE:
 		fprintf(stderr,"[");
-		print_array((F_ARRAY*)UNTAG(obj));
+		print_array((F_ARRAY*)UNTAG(obj),nesting - 1);
 		fprintf(stderr," ]");
 		break;
 	default:
 		fprintf(stderr,"#<type %ld @ %lx>",type_of(obj),obj);
 		break;
 	}
+}
+
+void print_obj(CELL obj)
+{
+	print_nested_obj(obj,10);
 }
 
 void print_objects(CELL start, CELL end)
@@ -149,7 +160,6 @@ void factorbug(void)
 	fprintf(stderr,"A fatal error has occurred and Factor cannot continue.\n");
 	fprintf(stderr,"The low-level debugger has been started to help diagnose the problem.\n");
 	fprintf(stderr,"  Basic commands:\n");
-	fprintf(stderr,"t                -- throw exception in Factor\n");
 	fprintf(stderr,"q                -- continue executing Factor\n");
 	fprintf(stderr,"im               -- save image to fep.image\n");
 	fprintf(stderr,"x                -- exit Factor\n");
@@ -171,7 +181,7 @@ void factorbug(void)
 		char cmd[1024];
 
 		fprintf(stderr,"READY\n");
-		fflush(stdout);
+		fflush(stderr);
 
 		if(scanf("%1000s",cmd) <= 0)
 			exit(1);
@@ -234,8 +244,6 @@ void factorbug(void)
 			scanf("%lx",&card);
 			fprintf(stderr,"%lx\n",(CELL)CARD_TO_ADDR(card));
 		}
-		else if(strcmp(cmd,"t") == 0)
-			general_error(ERROR_USER_INTERRUPT,F,F,true);
 		else if(strcmp(cmd,"q") == 0)
 			return;
 		else if(strcmp(cmd,"x") == 0)

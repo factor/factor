@@ -12,22 +12,25 @@ CELL callframe_end;
 
 #define USER_ENV 32
 
-#define CELL_SIZE_ENV     1 /* sizeof(CELL) */
-#define NLX_VECTOR_ENV    2 /* non-local exit hook, used by library only */
-#define NAMESTACK_ENV     3 /* used by library only */
-#define GLOBAL_ENV        4
-#define BREAK_ENV         5
-#define CATCHSTACK_ENV    6 /* used by library only */
-#define CPU_ENV           7
-#define BOOT_ENV          8
-#define CALLCC_1_ENV      9 /* used by library only */
-#define ARGS_ENV          10
-#define OS_ENV            11
-#define ERROR_ENV         12 /* a marker consed onto kernel errors */
-#define IN_ENV            13
-#define OUT_ENV           14
-#define GEN_ENV           15 /* set to gen_count */
-#define IMAGE_ENV         16 /* image name */
+typedef enum {
+	CURRENT_CALLBACK_ENV,   /* used by library only, per-callback */
+	CELL_SIZE_ENV,          /* sizeof(CELL) */
+	NLX_VECTOR_ENV,         /* non-local exit hook, used by library only */
+	NAMESTACK_ENV,          /* used by library only */
+	GLOBAL_ENV,             
+	BREAK_ENV,              
+	CATCHSTACK_ENV,         /* used by library only, per-callback */
+	CPU_ENV,                
+	BOOT_ENV,               
+	CALLCC_1_ENV,           /* used by library only */
+	ARGS_ENV,               
+	OS_ENV,                 
+	ERROR_ENV,              /* a marker consed onto kernel errors */
+	IN_ENV,                 
+	OUT_ENV,                
+	GEN_ENV,                /* set to gen_count */
+	IMAGE_ENV               /* image name */
+} F_ENVTYPE;
 
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];
@@ -149,23 +152,24 @@ void primitive_clone(void);
 /* Runtime errors */
 typedef enum
 {
-	ERROR_EXPIRED,
+	ERROR_EXPIRED = 0,
 	ERROR_IO,
 	ERROR_UNDEFINED_WORD,
 	ERROR_TYPE,
+	ERROR_DIVIDE_BY_ZERO,
 	ERROR_SIGNAL,
 	ERROR_NEGATIVE_ARRAY_SIZE,
 	ERROR_C_STRING,
 	ERROR_FFI,
 	ERROR_HEAP_SCAN,
 	ERROR_UNDEFINED_SYMBOL,
-	ERROR_USER_INTERRUPT,
 	ERROR_DS_UNDERFLOW,
 	ERROR_DS_OVERFLOW,
 	ERROR_RS_UNDERFLOW,
 	ERROR_RS_OVERFLOW,
 	ERROR_CS_UNDERFLOW,
 	ERROR_CS_OVERFLOW,
+	ERROR_MEMORY,
 	ERROR_OBJECTIVE_C
 } F_ERRORTYPE;
 
@@ -176,6 +180,7 @@ volatile bool throwing;
 /* When throw_error throws an error, it sets this global and
 longjmps back to the top-level. */
 CELL thrown_error;
+CELL thrown_native_stack_trace;
 CELL thrown_keep_stacks;
 /* Since longjmp restores registers, we must save all these values. */
 CELL thrown_ds;
@@ -183,12 +188,16 @@ CELL thrown_rs;
 
 void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);
-void throw_error(CELL error, bool keep_stacks);
+void throw_error(CELL error, bool keep_stacks, F_STACK_FRAME *native_stack);
 void early_error(CELL error);
-void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2, bool keep_stacks);
-void memory_protection_error(CELL addr, int signal);
-void signal_error(int signal);
+void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2,
+	bool keep_stacks, F_STACK_FRAME *native_stack);
+void simple_error(F_ERRORTYPE error, CELL arg1, CELL arg2);
+void memory_protection_error(CELL addr, int signal, F_STACK_FRAME *native_stacks);
+void signal_error(int signal, F_STACK_FRAME *native_stack);
 void type_error(CELL type, CELL tagged);
+void divide_by_zero_error(void);
+void memory_error(void);
 void primitive_throw(void);
 void primitive_die(void);
 

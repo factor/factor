@@ -20,7 +20,7 @@ F_ARRAY *allot_array_internal(CELL type, F_FIXNUM capacity)
 
 	if(capacity < 0)
 	{
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,allot_integer(capacity),F,true);
+		simple_error(ERROR_NEGATIVE_ARRAY_SIZE,allot_integer(capacity),F);
 		return NULL;
 	}
 	else
@@ -46,7 +46,13 @@ F_ARRAY *allot_array(CELL type, F_FIXNUM capacity, CELL fill)
 /* size is in bytes this time */
 F_ARRAY *allot_byte_array(F_FIXNUM size)
 {
-	F_FIXNUM byte_size = (size + sizeof(CELL) - 1) / sizeof(CELL);
+	if(size < 0)
+	{
+		simple_error(ERROR_NEGATIVE_ARRAY_SIZE,allot_integer(size),F);
+		return NULL;
+	}
+
+	CELL byte_size = (size + sizeof(CELL) - 1) / sizeof(CELL);
 	return allot_array(BYTE_ARRAY_TYPE,byte_size,0);
 }
 
@@ -138,7 +144,7 @@ F_STRING* allot_string_internal(F_FIXNUM capacity)
 
 	if(capacity < 0)
 	{
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,allot_integer(capacity),F,true);
+		simple_error(ERROR_NEGATIVE_ARRAY_SIZE,allot_integer(capacity),F);
 		return NULL;
 	}
 	else
@@ -219,7 +225,7 @@ F_STRING* reallot_string(F_STRING* string, F_FIXNUM capacity, u16 fill)
 
 void primitive_resize_string(void)
 {
-	F_STRING* string = untag_string_fast(dpop());
+	F_STRING* string = untag_string(dpop());
 	F_FIXNUM capacity = unbox_signed_cell();
 	dpush(tag_object(reallot_string(string,capacity,0)));
 }
@@ -244,15 +250,15 @@ void primitive_resize_string(void)
 	void primitive_memory_to_##type##_string(void) \
 	{ \
 		CELL length = unbox_unsigned_cell(); \
-		type *string = (type*)unbox_unsigned_cell(); \
+		const type *string = (const type*)unbox_unsigned_cell(); \
 		dpush(tag_object(memory_to_##type##_string(string,length))); \
 	} \
 	F_STRING *from_##type##_string(const type *str) \
 	{ \
 		CELL length = 0; \
-		type *scan = str; \
+		const type *scan = str; \
 		while(*scan++) length++; \
-		return memory_to_##type##_string((type*)str,length); \
+		return memory_to_##type##_string(str,length); \
 	} \
 	void box_##type##_string(const type *str) \
 	{ \
@@ -303,7 +309,7 @@ F_ARRAY *allot_c_string(CELL capacity, CELL size)
 		CELL capacity = string_capacity(s); \
 		F_ARRAY *_c_str; \
 		if(check && !check_string(s,sizeof(type))) \
-			general_error(ERROR_C_STRING,tag_object(s),F,true); \
+			simple_error(ERROR_C_STRING,tag_object(s),F); \
 		REGISTER_STRING(s); \
 		_c_str = allot_c_string(capacity,sizeof(type)); \
 		UNREGISTER_STRING(s); \
@@ -317,7 +323,7 @@ F_ARRAY *allot_c_string(CELL capacity, CELL size)
 		if(sizeof(type) == sizeof(u16)) \
 		{ \
 			if(check && !check_string(s,sizeof(type))) \
-				general_error(ERROR_C_STRING,tag_object(s),F,true); \
+				simple_error(ERROR_C_STRING,tag_object(s),F); \
 			return (type*)(s + 1); \
 		} \
 		else \
@@ -379,17 +385,28 @@ void update_xt(F_WORD* word)
 }
 
 /* <word> ( name vocabulary -- word ) */
-void primitive_word(void)
+F_WORD *allot_word(CELL vocab, CELL name)
 {
+	REGISTER_ROOT(vocab);
+	REGISTER_ROOT(name);
 	F_WORD *word = allot_object(WORD_TYPE,sizeof(F_WORD));
+	UNREGISTER_ROOT(name);
+	UNREGISTER_ROOT(vocab);
 	word->hashcode = tag_fixnum(rand());
-	word->vocabulary = dpop();
-	word->name = dpop();
+	word->vocabulary = vocab;
+	word->name = name;
 	word->primitive = tag_fixnum(0);
 	word->def = F;
 	word->props = F;
 	update_xt(word);
-	dpush(tag_word(word));
+	return word;
+}
+
+void primitive_word(void)
+{
+	CELL vocab = dpop();
+	CELL name = dpop();
+	dpush(tag_word(allot_word(vocab,name)));
 }
 
 void primitive_update_xt(void)

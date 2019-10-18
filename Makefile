@@ -3,16 +3,16 @@ CC = gcc
 BINARY = f
 IMAGE = factor.image
 BUNDLE = Factor.app
-VERSION = 0.86
+VERSION = 0.87
 DISK_IMAGE_DIR = Factor-$(VERSION)
 DISK_IMAGE = Factor-$(VERSION).dmg
 LIBPATH = -L/usr/X11R6/lib
 
 ifdef DEBUG
-	CFLAGS = -pg -O1
+	CFLAGS = -g -std=gnu99
 	STRIP = touch
 else
-	CFLAGS = -Wall -O3 -ffast-math -fomit-frame-pointer $(SITE_CFLAGS)
+	CFLAGS = -Wall -O3 -ffast-math -std=gnu99 $(SITE_CFLAGS)
 	STRIP = strip
 endif
 
@@ -40,7 +40,8 @@ OBJS = $(PLAF_OBJS) \
 default:
 	@echo "Run 'make' with one of the following parameters:"
 	@echo ""
-	@echo "freebsd"
+	@echo "freebsd-x86"
+	@echo "freebsd-amd64"
 	@echo "linux-x86"
 	@echo "linux-amd64"
 	@echo "linux-ppc"
@@ -62,8 +63,11 @@ default:
 	@echo ""
 	@echo "export SITE_CFLAGS=\"-march=pentium4 -ffast-math\""
 
-freebsd:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.freebsd
+freebsd-x86:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.freebsd.x86
+
+freebsd-amd64:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.freebsd.amd64
 
 macosx-freetype:
 	ln -sf libfreetype.6.dylib \
@@ -73,10 +77,10 @@ macosx-ppc: macosx-freetype
 	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx.ppc
 
 macosx-x86: macosx-freetype
-	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx
+	$(MAKE) $(BINARY) CONFIG=vm/Config.macosx.x86
 
 linux-x86:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.linux
+	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.x86
 	$(STRIP) $(BINARY)
 
 linux-amd64:
@@ -124,6 +128,7 @@ macosx.dmg:
 		-o -name '*.fgen' \
 		-o -name '*.tex' \
 		-o -name '*.fhtml' \
+		-o -name '*.furnace' \
 		-o -name '*.xml' \
 		-o -name '*.js' \) \
 		-exec ./cp_dir {} $(DISK_IMAGE_DIR)/Factor/{} \;
@@ -140,7 +145,6 @@ clean:
 	rm -f vm/*.o
 
 clean.app:
-	rm -rf $(BUNDLE)/Contents/Resources/
 	rm -f $(BUNDLE)/Contents/MacOS/Factor
 
 .c.o:
