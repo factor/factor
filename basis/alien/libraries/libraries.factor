@@ -17,16 +17,20 @@ SYMBOL: libraries
 
 libraries [ H{ } clone ] initialize
 
-TUPLE: library { path string } { abi abi initial: cdecl } dll dlerror ;
+TUPLE: library { path string } dll dlerror { abi abi initial: cdecl } ;
+
+C: <library> library
 
 ERROR: no-library name ;
 
 : lookup-library ( name -- library ) libraries get at ;
 
-: <library> ( path abi -- library )
-    over dup
-    [ dlopen dup dll-valid? [ f ] [ dlerror ] if ] [ f ] if
-    \ library boa ;
+: open-dll ( path -- dll dll-error/f )
+    [ dlopen dup dll-valid? [ f ] [ dlerror ] if ]
+    [ f f ] if* ;
+
+: make-library ( path abi -- library )
+    [ dup open-dll ] dip <library> ;
 
 : library-dll ( library -- dll )
     dup [ dll>> ] when ;
@@ -48,7 +52,8 @@ M: library dispose dll>> [ dispose ] when* ;
 : add-library ( name path abi -- )
     3dup add-library? [
         [ 2drop remove-library ]
-        [ <library> swap libraries get set-at ] 3bi
+        [ [ nip ] dip make-library ]
+        [ 2drop libraries get set-at ] 3tri
     ] [ 3drop ] if ;
 
 : library-abi ( library -- abi )

@@ -1,5 +1,4 @@
-USING: help.markup help.syntax libc kernel continuations io
-sequences classes ;
+USING: classes help.markup help.syntax io quotations sequences ;
 IN: destructors
 
 HELP: debug-leaks?
@@ -7,10 +6,9 @@ HELP: debug-leaks?
 { $see-also "tools.destructors" } ;
 
 HELP: disposable
-{ $class-description "Parent class for disposable resources. This class has three slots:"
+{ $class-description "Parent class for disposable resources. This class has two slots:"
     { $list
         { { $slot "disposed" } " - boolean. Set to true by " { $link dispose } ". Assert that it is false with " { $link check-disposed } "." }
-        { { $slot "id" } " - unique identifier. Set by " { $link new-disposable } "." }
         { { $slot "continuation" } " - current continuation at construction time, for debugging. Set by " { $link new-disposable } " if " { $link debug-leaks? } " is on." }
     }
 "New instances must be constructed with " { $link new-disposable } " and subclasses must implement " { $link dispose* } "." } ;
@@ -38,11 +36,11 @@ HELP: dispose*
 } ;
 
 HELP: with-disposal
-{ $values { "object" "a disposable object" } { "quot" { $quotation "( object -- )" } } }
+{ $values { "object" "a disposable object" } { "quot" { $quotation ( object -- ) } } }
 { $description "Calls the quotation, disposing the object with " { $link dispose } " after the quotation returns or if it throws an error." } ;
 
 HELP: with-destructors
-{ $values { "quot" "a quotation" } }
+{ $values { "quot" quotation } }
 { $description "Calls a quotation within a new dynamic scope. This quotation may register destructors using " { $link &dispose } " or " { $link |dispose } ". The former registers a destructor that will always run whether or not the quotation threw an error, and the latter registers a destructor that only runs if the quotation throws an error. Destructors are run in reverse order from the order in which they were registered." }
 { $notes
     "Destructors generalize " { $link with-disposal } ". The following two lines are equivalent, except that the second line establishes a new dynamic scope:"

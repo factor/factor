@@ -6,7 +6,7 @@ IN: compiler.cfg.builder.alien.params
 
 SYMBOL: stack-params
 
-GENERIC: alloc-stack-param ( reg -- n )
+GENERIC: alloc-stack-param ( rep -- n )
 
 M: object alloc-stack-param ( rep -- n )
     stack-params get

@@ -43,22 +43,20 @@
       (let ((fill-column width))
         (insert str)
         (fill-region (point-min) (point-max))
-        (mapcar '(lambda (s) (fuel-table--pad-str s width))
+        (mapcar #'(lambda (s) (fuel-table--pad-str s width))
                 (split-string (buffer-string) "\n"))))))
+
+(defun fuel-table--pad-cell (lines max-ln)
+  (let* ((ln (length lines))
+         (blank (make-string (length (car lines)) ?\ ))
+         (n-extra (max (- max-ln ln) 0)))
+    (append lines (make-list n-extra blank))))
 
 (defun fuel-table--pad-row (row)
   (let* ((max-ln (apply 'max (mapcar 'length row)))
          (result))
     (dolist (lines row)
-      (let ((ln (length lines)))
-        (if (= ln max-ln) (push lines result)
-          (let ((lines (reverse lines))
-                (l 0)
-                (blank (make-string (length (car lines)) ?\ )))
-            (while (< l ln)
-              (push blank lines)
-              (setq l (1+ l)))
-            (push (reverse lines) result)))))
+      (push (fuel-table--pad-cell lines max-ln) result))
     (reverse result)))
 
 (defun fuel-table--format-rows (rows widths)
@@ -72,17 +70,19 @@
         (push (fuel-table--pad-row (reverse frow)) frows)))
     (reverse frows)))
 
-(defvar fuel-table-corner-lt "┌")
-(defvar fuel-table-corner-lb "└")
-(defvar fuel-table-corner-rt "┐")
-(defvar fuel-table-corner-rb "┘")
-(defvar fuel-table-line "─")
-(defvar fuel-table-tee-t "┬")
-(defvar fuel-table-tee-b "┴")
-(defvar fuel-table-tee-l "├")
-(defvar fuel-table-tee-r "┤")
-(defvar fuel-table-crux "┼")
-(defvar fuel-table-sep "│")
+;; These all need to be ascii to ensure the tables get rendered
+;; properly no matter the font.
+(defvar fuel-table-corner-lt "+")
+(defvar fuel-table-corner-lb "+")
+(defvar fuel-table-corner-rt "+")
+(defvar fuel-table-corner-rb "+")
+(defvar fuel-table-line "-")
+(defvar fuel-table-tee-t "+")
+(defvar fuel-table-tee-b "+")
+(defvar fuel-table-tee-l "|")
+(defvar fuel-table-tee-r "|")
+(defvar fuel-table-crux "+")
+(defvar fuel-table-sep "|")
 
 (defun fuel-table--insert-line (widths first last sep)
   (insert first fuel-table-line)
@@ -136,4 +136,5 @@
 
 
 (provide 'fuel-table)
+
 ;;; fuel-table.el ends here

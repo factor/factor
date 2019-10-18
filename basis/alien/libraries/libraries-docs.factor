@@ -4,7 +4,7 @@ USING: accessors alien alien.syntax assocs help.markup
 help.syntax io.backend kernel namespaces strings ;
 IN: alien.libraries
 
-HELP: <library>
+HELP: make-library
 { $values
      { "path" "a pathname string" } { "abi" "the ABI used by the library, either " { $link cdecl } " or " { $link stdcall } }
      { "library" library } }

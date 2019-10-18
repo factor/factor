@@ -250,7 +250,9 @@ M: struct-bit-slot-spec compute-slot-offset
 
 PRIVATE>
 
-M: struct byte-length class-of "struct-size" word-prop ; inline foldable
+: struct-size ( class -- n ) "struct-size" word-prop ; inline
+
+M: struct byte-length class-of struct-size ; inline foldable
 M: struct binary-zero? binary-object uchar <c-direct-array> [ 0 = ] all? ; inline
 
 ! class definition

@@ -59,7 +59,7 @@ TUPLE: <entry> time data ;
      {
        { [ ENT f =      ] [ T{ <entry> f TIME V{ RDATA } } RR cache-set-at ] }
        { [ ENT expired? ] [ RR cache-delete RR cache-add                   ] }
-       { [ t            ] [ TIME ENT (>>time) RDATA ENT data>> adjoin      ] }
+       { [ t            ] [ TIME ENT time<< RDATA ENT data>> adjoin      ] }
      }
      cond
    ] ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs definitions kernel namespaces sequences
-sorting splitting strings ;
+USING: accessors assocs definitions kernel namespaces
+sequences sorting splitting strings ;
 IN: vocabs
 
 SYMBOL: dictionary
@@ -111,8 +111,13 @@ ERROR: no-vocab name ;
     sift ;
 
 : child-vocab? ( prefix name -- ? )
-    2dup = pick empty? or
-    [ 2drop t ] [ swap CHAR: . suffix head? ] if ;
+    swap [ drop t ] [
+        2dup = [ 2drop t ] [
+            2dup head? [
+                length swap ?nth CHAR: . =
+            ] [ 2drop f ] if
+        ] if
+    ] if-empty ;
 
 : child-vocabs ( vocab -- seq )
     vocab-name vocabs [ child-vocab? ] with filter ;

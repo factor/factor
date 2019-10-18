@@ -2,11 +2,11 @@
 ! Copyright (C) 2011 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays boids.simulation calendar classes kernel
-literals locals math math.functions math.trig models namespaces
-opengl opengl.demo-support opengl.gl sequences threads ui
-ui.gadgets ui.gadgets.borders ui.gadgets.buttons
-ui.gadgets.frames ui.gadgets.grids ui.gadgets.labeled
-ui.gadgets.labels ui.gadgets.packs ui.gadgets.sliders ui.render ;
+literals locals math math.functions math.trig models opengl
+opengl.demo-support opengl.gl sequences threads ui ui.gadgets
+ui.gadgets.borders ui.gadgets.buttons ui.gadgets.frames
+ui.gadgets.grids ui.gadgets.labeled ui.gadgets.labels
+ui.gadgets.packs ui.gadgets.sliders ui.render ;
 QUALIFIED-WITH: models.range mr
 IN: boids
 
@@ -49,9 +49,8 @@ M:  boids-gadget ungraft*
     0.0 0.0 0.0 0.5 glColor4f
     [ draw-boid ] each ;
 
-M:: boids-gadget draw-gadget* ( boids-gadget -- )
-    origin get
-    [ boids-gadget boids>> draw-boids ] with-translation ;
+M: boids-gadget draw-gadget* ( boids-gadget -- )
+    boids>> draw-boids ;
 
 : iterate-system ( boids-gadget -- )
     dup [ boids>> ] [ behaviours>> ] [ dt>> ] tri

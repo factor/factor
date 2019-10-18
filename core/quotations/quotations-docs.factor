@@ -1,5 +1,4 @@
-USING: arrays help.markup help.syntax strings sbufs
-vectors kernel combinators ;
+USING: help.markup help.syntax kernel sequences ;
 IN: quotations
 
 ARTICLE: "quotations" "Quotations"
@@ -49,7 +48,7 @@ HELP: quotation
 { $description "The class of quotations. See " { $link "syntax-quots" } " for syntax and " { $link "quotations" } " for general information." } ;
 
 HELP: >quotation
-{ $values { "seq" "a sequence" } { "quot" quotation } }
+{ $values { "seq" sequence } { "quot" quotation } }
 { $description "Outputs a freshly-allocated quotation with the same elements as a given sequence." } ;
 
 HELP: 1quotation

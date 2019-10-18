@@ -14,7 +14,7 @@ IN: images.bitmap
 ! http://www.digicamsoft.com/bmp/bmp.html
 
 SINGLETON: bmp-image
-"bmp" bmp-image register-image-class
+"bmp" bmp-image ?register-image-class
 
 : write2 ( n -- ) 2 >le write ;
 : write4 ( n -- ) 4 >le write ;
@@ -428,5 +428,4 @@ M: bmp-image stream>image* ( stream bmp-image -- bitmap )
     ] bi ;
 
 M: bmp-image image>stream
-    drop BGR reorder-components output-bmp ;
-
+    2drop BGR reorder-components output-bmp ;

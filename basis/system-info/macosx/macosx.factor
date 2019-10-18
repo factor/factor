@@ -3,8 +3,9 @@
 
 USING: alien alien.c-types alien.data alien.strings alien.syntax
 arrays assocs byte-arrays combinators core-foundation io.binary
-io.encodings.utf8 kernel math namespaces sequences system
-system-info unix ;
+io.encodings.utf8 libc kernel math namespaces sequences
+specialized-arrays system system-info unix ;
+SPECIALIZED-ARRAY: int
 
 IN: system-info.macosx
 
@@ -15,8 +16,7 @@ TYPEDEF: UInt32 OSType
 FUNCTION: OSErr Gestalt ( OSType selector, SInt32* response ) ;
 
 : gestalt ( selector -- response )
-    0 SInt32 <ref> [ Gestalt ] keep
-    swap [ throw ] unless-zero le> ;
+    { SInt32 } [ Gestalt 0 assert= ] with-out-parameters ;
 
 : system-version ( -- n ) "sysv" be> gestalt ;
 : system-version-major ( -- n ) "sys1" be> gestalt ;
@@ -24,19 +24,22 @@ FUNCTION: OSErr Gestalt ( OSType selector, SInt32* response ) ;
 : system-version-bugfix ( -- n ) "sys3" be> gestalt ;
 
 CONSTANT: system-code-names H{
-    { 0x1080 "Mountain Lion" }
-    { 0x1070 "Lion" }
-    { 0x1060 "Snow Leopard" }
-    { 0x1050 "Leopard" }
-    { 0x1040 "Tiger" }
-    { 0x1030 "Panther" }
-    { 0x1020 "Jaguar" }
-    { 0x1010 "Puma" }
-    { 0x1000 "Cheetah" }
+    { { 10 10 } "Yosemite" }
+    { { 10 9 } "Mavericks" }
+    { { 10 8 } "Mountain Lion" }
+    { { 10 7 } "Lion" }
+    { { 10 6 } "Snow Leopard" }
+    { { 10 5 } "Leopard" }
+    { { 10 4 } "Tiger" }
+    { { 10 3 } "Panther" }
+    { { 10 2 } "Jaguar" }
+    { { 10 1 } "Puma" }
+    { { 10 0 } "Cheetah" }
 }
 
 : system-code-name ( -- str/f )
-    system-version 0xFFF0 bitand system-code-names at ;
+    system-version-major system-version-minor 2array
+    system-code-names at ;
 
 PRIVATE>
 
@@ -50,14 +53,11 @@ M: macosx os-version
 LIBRARY: libc
 FUNCTION: int sysctl ( int* name, uint namelen, void* oldp, size_t* oldlenp, void* newp, size_t newlen ) ;
 
-: make-int-array ( seq -- byte-array )
-    [ int <ref> ] map concat ;
-
 : (sysctl-query) ( name namelen oldp oldlenp -- oldp )
     over [ f 0 sysctl io-error ] dip ;
 
 : sysctl-query ( seq n -- byte-array )
-    [ [ make-int-array ] [ length ] bi ] dip
+    [ [ int >c-array ] [ length ] bi ] dip
     [ <byte-array> ] [ uint <ref> ] bi (sysctl-query) ;
 
 : sysctl-query-string ( seq -- n )
@@ -73,8 +73,11 @@ FUNCTION: int sysctl ( int* name, uint namelen, void* oldp, size_t* oldlenp, voi
 : model ( -- str ) { 6 2 } sysctl-query-string ;
 M: macosx cpus ( -- n ) { 6 3 } sysctl-query-uint ;
 : byte-order ( -- n ) { 6 4 } sysctl-query-uint ;
-M: macosx physical-mem ( -- n ) { 6 5 } sysctl-query-uint ;
-: user-mem ( -- n ) { 6 6 } sysctl-query-uint ;
+
+! Only an int, not large enough. Deprecated.
+! M: macosx physical-mem ( -- n ) { 6 5 } sysctl-query-int ;
+! : user-mem ( -- n ) { 6 6 } sysctl-query-uint ;
+
 : page-size ( -- n ) { 6 7 } sysctl-query-uint ;
 : disknames ( -- n ) { 6 8 } 8 sysctl-query ;
 : diskstats ( -- n ) { 6 9 } 8 sysctl-query ;
@@ -92,5 +95,5 @@ M: macosx cpu-mhz ( -- n ) { 6 15 } sysctl-query-uint ;
 : l3-cache-settings ( -- n ) { 6 21 } sysctl-query-uint ;
 : l3-cache-size ( -- n ) { 6 22 } sysctl-query-uint ;
 : tb-frequency ( -- n ) { 6 23 } sysctl-query-uint ;
-: mem-size ( -- n ) { 6 24 } sysctl-query-ulonglong ;
+M: macosx physical-mem ( -- n ) { 6 24 } sysctl-query-ulonglong ;
 : available-cpus ( -- n ) { 6 25 } sysctl-query-uint ;

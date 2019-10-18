@@ -36,7 +36,7 @@ HELP: encode-password
 HELP: have-capabilities?
 { $values
      { "capabilities" "a sequence of capabilities" }
-     { "?" "a boolean" }
+     { "?" boolean }
 }
 { $description "Tests if the currently logged-in user possesses the given capabilities." } ;
 
@@ -63,7 +63,7 @@ HELP: realm
 { $class-description "The class of authentication realms. See " { $link "furnace.auth.realms" } " for details." } ;
 
 HELP: uchange
-{ $values { "quot" { $quotation "( old -- new )" } } { "key" symbol } }
+{ $values { "quot" { $quotation ( old -- new ) } } { "key" symbol } }
 { $description "Applies the quotation to the old value of the user profile variable, and assigns the resulting value back to the variable." } ;
 
 HELP: uget
@@ -196,7 +196,7 @@ $nl
 "Authentication realms can be adorned with additional functionality."
 { $subsections "furnace.auth.features" }
 "An administration tool."
-{ $subsections "furnace.auth.user-admin" }
+{ $subsections "webapps.user-admin" }
 "A concrete example."
 { $subsections "furnace.auth.example" } ;
 

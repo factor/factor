@@ -1,7 +1,8 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit grouping kernel math math.parser
-math.text.utils namespaces sequences ;
+USING: combinators.short-circuit grouping kernel math
+math.functions math.parser math.text.utils namespaces sequences
+splitting ;
 IN: math.text.english
 
 <PRIVATE
@@ -91,6 +92,25 @@ SYMBOL: and-needed?
 
 PRIVATE>
 
-: number>text ( n -- str )
-    dup zero? [ small-numbers ] [ [ (number>text) ] with-scope ] if ;
+GENERIC: number>text ( n -- str )
 
+M: integer number>text
+    [ "zero" ] [ [ (number>text) ] with-scope ] if-zero ;
+
+M: ratio number>text
+    >fraction [ number>text ] bi@ " divided by " glue ;
+
+M: float number>text
+    number>string "." split1 [
+        "-" ?head
+        [ string>number number>text ]
+        [ [ "negative " prepend ] when ] bi*
+    ] [
+        [ CHAR: 0 - small-numbers ] { } map-as " " join
+    ] bi* " point " glue ;
+
+M: complex number>text
+    >rect [ number>text ] [
+        [ 0 < " minus " " plus " ? ]
+        [ abs number>text " i" append ] bi
+    ] bi* 3append ;

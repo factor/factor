@@ -433,11 +433,7 @@ TUPLE: fo { a intersection{ integer fixnum } initial: 0 } ;
 ] unit-test
 
 [
-"""union{
-    intersection{ string hashtable }
-    union{ integer float }
-}
-"""
+"""union{ intersection{ string hashtable } union{ integer float } }\n"""
 ] [ [ union{ union{ float integer } intersection{ string hashtable } } . ] with-string-writer ] unit-test
 
 [
@@ -469,3 +465,21 @@ TUPLE: fo { a intersection{ integer fixnum } initial: 0 } ;
     [ 5 length-limit [ 6 iota >array pprint ] with-variable ]
     with-string-writer
 ] unit-test
+
+: margin-test ( number-of-'a's -- str )
+    [
+        [ CHAR: a <string> text "b" text ] with-pprint
+    ] with-string-writer ;
+
+[
+"""aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa b"""
+] [ margin get 3 - margin-test ] unit-test
+
+[
+"""aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa b"""
+] [ margin get 2 - margin-test ] unit-test
+
+[
+"""aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+b"""
+] [ margin get 1 - margin-test ] unit-test

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data calendar calendar.private
-classes.struct kernel math system unix unix.time unix.types ;
+classes.struct kernel math system libc unix unix.time unix.types ;
 IN: calendar.unix
 
 : timeval>seconds ( timeval -- seconds )
@@ -35,7 +35,7 @@ M: unix gmt-offset ( -- hours minutes seconds )
     get-time gmtoff>> 3600 /mod 60 /mod ;
 
 : current-timeval ( -- timeval )
-    timeval <struct> f [ gettimeofday io-error ] 2keep drop ; inline
+    timeval <struct> [ f gettimeofday io-error ] keep ; inline
 
 : system-micros ( -- n )
     current-timeval timeval>micros ;

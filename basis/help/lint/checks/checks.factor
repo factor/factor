@@ -1,11 +1,12 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes combinators
-combinators.short-circuit definitions effects eval fry grouping
-help help.markup help.topics io.streams.string kernel macros
-namespaces sequences sequences.deep sets sorting splitting
-strings unicode.categories vocabs vocabs.loader words
-words.symbol summary debugger io ;
+USING: accessors arrays assocs classes classes.struct
+classes.tuple combinators combinators.short-circuit debugger
+definitions effects eval formatting fry grouping help
+help.markup help.topics io io.streams.string kernel macros
+namespaces sequences sequences.deep sets splitting strings
+summary unicode.categories vocabs vocabs.loader words
+words.constant words.symbol ;
 FROM: sets => members ;
 IN: help.lint.checks
 
@@ -20,31 +21,34 @@ SYMBOL: all-vocabs
 SYMBOL: vocab-articles
 
 : check-example ( element -- )
-    '[
-        _ rest [
-            but-last "\n" join
-            [ (eval>string) ] call( code -- output )
-            "\n" ?tail drop
-        ] keep
-        last assert=
-    ] vocabs-quot get call( quot -- ) ;
+    ! [
+        '[
+            _ rest [
+                but-last "\n" join
+                [ (eval>string) ] call( code -- output )
+                "\n" ?tail drop
+            ] keep
+            last assert=
+        ] vocabs-quot get call( quot -- ) ;
+    ! ] leaks members length [
+    !     "%d disposable(s) leaked in example" sprintf simple-lint-error
+    ! ] unless-zero ;
 
 : check-examples ( element -- )
     \ $example swap elements [ check-example ] each ;
 
 : extract-values ( element -- seq )
-    \ $values swap elements dup empty? [
-        first rest keys
-    ] unless ;
+    \ $values swap elements
+    [ f ] [ first rest keys ] if-empty ;
 
 : extract-value-effects ( element -- seq )
-    \ $values swap elements dup empty? [
-        first rest [ 
-            \ $quotation swap elements dup empty? [ drop f ] [
-                first second
-            ] if
+    \ $values swap elements [ f ] [
+        first rest [
+            \ $quotation swap elements [ f ] [
+                first second dup effect? [ effect>string ] when
+            ] if-empty
         ] map
-    ] unless ;
+    ] if-empty ;
 
 : effect-values ( word -- seq )
     stack-effect
@@ -74,27 +78,27 @@ SYMBOL: vocab-articles
         [ symbol? ]
         [ parsing-word? ]
         [ "declared-effect" word-prop not ]
+        [ constant? ]
     } 1|| ;
 
+: skip-check-values? ( word element -- ? )
+    [ don't-check-word? ] [ contains-funky-elements? ] bi* or ;
+
 : check-values ( word element -- )
-    {
-        [
-            [ don't-check-word? ]
-            [ contains-funky-elements? ]
-            bi* or
-        ] [
-            [ effect-values ]
-            [ extract-values ]
-            bi* sequence=
-        ] 
-    } 2|| [ "$values don't match stack effect" simple-lint-error ] unless ;
+    2dup skip-check-values? [ 2drop ] [
+        [ effect-values ] [ extract-values ] bi* 2dup
+        sequence= [ 2drop ] [
+            "$values don't match stack effect; expected %u, got %u" sprintf
+            simple-lint-error
+        ] if
+    ] if ;
 
 : check-value-effects ( word element -- )
-    [ effect-effects ]
-    [ extract-value-effects ]
-    bi* [ 2dup and [ = ] [ 2drop t ] if ] 2all?
-    [ "$quotation documentation in $values don't match stack effect" simple-lint-error ]
-    unless ;
+    [ effect-effects ] [ extract-value-effects ] bi*
+    [ 2dup and [ = ] [ 2drop t ] if ] 2all? [
+        "$quotation stack effects in $values don't match"
+        simple-lint-error
+    ] unless ;
 
 : check-nulls ( element -- )
     \ $values swap elements
@@ -102,9 +106,8 @@ SYMBOL: vocab-articles
     [ "$values should not contain null" simple-lint-error ] when ;
 
 : check-see-also ( element -- )
-    \ $see-also swap elements [
-        rest all-unique? t assert=
-    ] each ;
+    \ $see-also swap elements [ rest all-unique? ] all?
+    [ "$see-also are not unique" simple-lint-error ] unless ;
 
 : vocab-exists? ( name -- ? )
     [ lookup-vocab ] [ all-vocabs get member? ] bi or ;
@@ -144,10 +147,26 @@ SYMBOL: vocab-articles
         simple-lint-error
     ] when ;
 
+: extract-slots ( elements -- seq )
+    [ dup pair? [ first \ $slot = ] [ drop f ] if ] deep-filter
+    [ second ] map ;
+
 : check-class-description ( word element -- )
-    [ class? not ]
-    [ { $class-description } swap elements empty? not ] bi* and
-    [ "A word that is not a class has a $class-description" simple-lint-error ] when ;
+    \ $class-description swap elements over class? [
+        [
+            dup struct-class? [ struct-slots ] [ all-slots ] if
+            [ name>> ] map
+        ] [ extract-slots ] bi*
+        [ swap member? not ] with filter [
+            ", " join "Described $slot does not exist: " prepend
+            simple-lint-error
+        ] unless-empty
+    ] [
+        nip empty? not [
+            "A word that is not a class has a $class-description"
+            simple-lint-error
+        ] when
+    ] if ;
 
 : check-article-title ( article -- )
     article-title first LETTER?

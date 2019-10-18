@@ -7,14 +7,22 @@ HELP: timeout
 
 HELP: set-timeout
 { $values { "dt/f" { $maybe duration } } { "obj" object } }
-{ $contract "Sets an object's timeout." } ;
+{ $contract "Sets an object's timeout." }
+{ $examples "Waits five seconds for a process that sleeps for ten seconds:"
+  { $unchecked-example
+    "USING: calendar io.launcher io.timeouts kernel ;"
+    "\"sleep 10\" >process 5 seconds over set-timeout run-process"
+    "Process was killed as a result of a call to"
+    "kill-process, or a timeout"
+  }
+} ;
 
 HELP: cancel-operation
 { $values { "obj" object } }
 { $contract "Handles a timeout, usually by waking up all threads waiting on the object." } ;
 
 HELP: with-timeout
-{ $values { "obj" object } { "quot" { $quotation "( obj -- )" } } }
+{ $values { "obj" object } { "quot" { $quotation ( obj -- ) } } }
 { $description "Applies the quotation to the object. If the object's timeout expires before the quotation returns, " { $link cancel-operation } " is called on the object." } ;
 
 ARTICLE: "io.timeouts" "I/O timeout protocol"

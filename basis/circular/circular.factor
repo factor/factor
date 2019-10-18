@@ -60,14 +60,14 @@ TUPLE: circular-iterator
     { circular read-only } { n integer } { last-start integer } ;
 
 : <circular-iterator> ( circular -- obj )
-    0 0 circular-iterator boa ; inline
+    0 -1 circular-iterator boa ; inline
 
 <PRIVATE
 
 : (circular-while) ( ... iterator quot: ( ... obj -- ... ? ) -- ... )
     [ [ [ n>> ] [ circular>> ] bi nth ] dip call ] 2keep
     rot [ [ dup n>> >>last-start ] dip ] when
-    over [ n>> ] [ [ last-start>> ] [ circular>> length ] bi + 1 - ] bi = [
+    over [ n>> ] [ [ last-start>> ] [ circular>> length ] bi + ] bi = [
         2drop
     ] [
         [ [ 1 + ] change-n ] dip (circular-while)
@@ -77,3 +77,6 @@ PRIVATE>
 
 : circular-while ( ... circular quot: ( ... obj -- ... ? ) -- ... )
     [ clone ] dip [ <circular-iterator> ] dip (circular-while) ; inline
+
+: circular-loop ( ... circular quot: ( ... obj -- ... ? ) -- ... )
+    [ clone ] dip '[ [ first @ ] [ rotate-circular ] bi ] curry loop ; inline

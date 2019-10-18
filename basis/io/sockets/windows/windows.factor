@@ -2,17 +2,20 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data classes.struct
 combinators destructors io.backend io.files.windows io.ports
-io.sockets io.sockets.icmp io.sockets.private kernel libc math
-sequences system windows.handles windows.kernel32 windows.types
-windows.winsock locals ;
+io.sockets io.sockets.icmp io.sockets.private kernel libc locals
+math sequences system windows.errors windows.handles
+windows.kernel32 windows.types windows.winsock ;
 FROM: namespaces => get ;
 IN: io.sockets.windows
 
 : set-socket-option ( handle level opt -- )
     [ handle>> ] 2dip 1 int <ref> dup byte-length setsockopt socket-error ;
 
-M: windows addrinfo-error ( n -- )
-    winsock-return-check ;
+: set-ioctl-socket ( handle cmd arg -- )
+    [ handle>> ] 2dip ulong <ref> ioctlsocket socket-error ;
+
+M: windows addrinfo-error-string ( n -- string )
+    n>win32-error-string ;
 
 M: windows sockaddr-of-family ( alien af -- addrspec )
     {

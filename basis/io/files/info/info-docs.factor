@@ -13,15 +13,15 @@ HELP: link-info
 { file-info link-info } related-words
 
 HELP: directory?
-{ $values { "file-info" file-info } { "?" "a boolean" } }
+{ $values { "file-info" file-info } { "?" boolean } }
 { $description "Tests if " { $snippet "file-info" } " is a directory." } ;
 
 HELP: regular-file?
-{ $values { "file-info" file-info } { "?" "a boolean" } }
+{ $values { "file-info" file-info } { "?" boolean } }
 { $description "Tests if " { $snippet "file-info" } " is a normal file." } ;
 
 HELP: symbolic-link?
-{ $values { "file-info" file-info } { "?" "a boolean" } }
+{ $values { "file-info" file-info } { "?" boolean } }
 { $description "Tests if " { $snippet "file-info" } " is a symbolic link." } ;
 
 HELP: file-systems

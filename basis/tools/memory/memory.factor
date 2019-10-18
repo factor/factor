@@ -291,10 +291,17 @@ PRIVATE>
 : code-room ( -- mark-sweep-sizes )
     (code-room) mark-sweep-sizes memory>struct ;
 
+: callback-room ( -- mark-sweep-sizes )
+    (callback-room) mark-sweep-sizes memory>struct ;
+
 : code-room. ( -- )
     "== Code heap ==" print nl
     code-room mark-sweep-table. nl
     get-code-blocks code-block-stats code-block-table. ;
 
+: callback-room. ( -- )
+    "== Callback heap ==" print nl
+    callback-room mark-sweep-table. ;
+
 : room. ( -- )
-    data-room. nl code-room. ;
+    data-room. nl code-room. nl callback-room. ;

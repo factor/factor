@@ -7,3 +7,4 @@ IN: tools.memory.tests
 [ ] [ gc-events. ] unit-test
 [ ] [ gc-stats. ] unit-test
 [ ] [ gc-summary. ] unit-test
+[ ] [ callback-room. ] unit-test

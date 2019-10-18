@@ -74,9 +74,17 @@ M: #declare propagate-before
         ] [ 2drop ] if
     ] if* ;
 
+ERROR: invalid-outputs #call infos ;
+
+: check-outputs ( #call infos -- infos )
+    over out-d>> over [ length ] bi@ =
+    [ nip ] [ invalid-outputs ] if ;
+
 : call-outputs-quot ( #call word -- infos )
-    [ in-d>> [ value-info ] map ] [ "outputs" word-prop ] bi*
-    with-datastack ;
+    dupd
+    [ in-d>> [ value-info ] map ]
+    [ "outputs" word-prop ] bi*
+    with-datastack check-outputs ;
 
 : literal-inputs? ( #call -- ? )
     in-d>> [ value-info literal?>> ] all? ;

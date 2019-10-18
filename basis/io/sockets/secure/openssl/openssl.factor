@@ -1,11 +1,14 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays kernel sequences namespaces math
-math.order combinators init alien alien.c-types alien.data
-alien.strings libc continuations destructors summary splitting
-assocs random math.parser locals unicode.case openssl
-openssl.libcrypto openssl.libssl io.backend io.ports io.pathnames
-io.encodings.8-bit.latin1 io.timeouts io.sockets.secure ;
+USING: accessors alien alien.c-types alien.data alien.strings
+assocs byte-arrays classes.struct combinators destructors fry io
+io.backend io.buffers io.encodings.8-bit.latin1
+io.encodings.utf8 io.files io.pathnames io.ports io.sockets
+io.sockets.secure io.timeouts kernel libc
+
+locals math math.order math.parser namespaces openssl
+openssl.libcrypto openssl.libssl random sequences splitting
+unicode.case ;
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )
@@ -23,9 +26,17 @@ TUPLE: openssl-context < secure-context aliens sessions ;
     [ 32 random-bits >hex dup length SSL_CTX_set_session_id_context ssl-error ]
     bi ;
 
+ERROR: file-expected path ;
+
+: ensure-exists ( path -- path )
+    dup exists? [ file-expected ] unless ; inline
+
+: ssl-file-path ( path -- path' )
+    absolute-path ensure-exists ;
+
 : load-certificate-chain ( ctx -- )
     dup config>> key-file>> [
-        [ handle>> ] [ config>> key-file>> absolute-path ] bi
+        [ handle>> ] [ config>> key-file>> ssl-file-path ] bi
         SSL_CTX_use_certificate_chain_file
         ssl-error
     ] [ drop ] if ;
@@ -55,7 +66,8 @@ TUPLE: openssl-context < secure-context aliens sessions ;
 
 : use-private-key-file ( ctx -- )
     dup config>> key-file>> [
-        [ handle>> ] [ config>> key-file>> absolute-path ] bi
+        [ handle>> ]
+        [ config>> key-file>> ssl-file-path ] bi
         SSL_FILETYPE_PEM SSL_CTX_use_PrivateKey_file
         ssl-error
     ] [ drop ] if ;
@@ -65,8 +77,8 @@ TUPLE: openssl-context < secure-context aliens sessions ;
         [ handle>> ]
         [
             config>>
-            [ ca-file>> dup [ absolute-path ] when ]
-            [ ca-path>> dup [ absolute-path ] when ] bi
+            [ ca-file>> dup [ ssl-file-path ] when ]
+            [ ca-path>> dup [ ssl-file-path ] when ] bi
         ] bi
         SSL_CTX_load_verify_locations
     ] [ handle>> SSL_CTX_set_default_verify_paths ] if ssl-error ;
@@ -151,6 +163,12 @@ SYMBOL: default-secure-context
         ] initialize-alien
     ] unless* ;
 
+: get-session ( addrspec -- session/f )
+    current-secure-context sessions>> at ;
+
+: save-session ( session addrspec -- )
+    current-secure-context sessions>> set-at ;
+
 : <ssl-handle> ( fd -- ssl )
     [
         ssl-handle new-disposable |dispose
@@ -158,6 +176,103 @@ SYMBOL: default-secure-context
         dup ssl-error >>handle
         swap >>file
     ] with-destructors ;
+
+: <ssl-socket> ( winsock -- ssl )
+    [
+        socket-handle BIO_NOCLOSE BIO_new_socket dup ssl-error
+    ] keep <ssl-handle>
+    [ handle>> swap dup SSL_set_bio ] keep ;
+
+! Error handling
+: syscall-error ( r -- event )
+    ERR_get_error [
+        {
+            { -1 [ errno ECONNRESET = [ premature-close ] [ (io-error) ] if ] }
+            ! OpenSSL docs say this it is an error condition for
+            ! a server to not send a close notify, but web
+            ! servers in the wild don't seem to do this, for
+            ! example https://www.google.com.
+            { 0 [ f ] }
+        } case
+    ] [ nip (ssl-error) ] if-zero ;
+
+: check-ssl-error ( ssl ret exra-cases/f -- event/f )
+    [ swap over SSL_get_error ] dip
+    {
+        { SSL_ERROR_NONE [ drop f ] }
+        { SSL_ERROR_WANT_READ [ drop +input+ ] }
+        { SSL_ERROR_WANT_WRITE [ drop +output+ ] }
+        { SSL_ERROR_SYSCALL [ syscall-error ] }
+        { SSL_ERROR_SSL [ drop (ssl-error) ] }
+    } append [ [ execute( -- n ) ] dip ] assoc-map
+    at [ call( x -- y ) ] [ no-cond ] if* ;
+
+! Accept
+: do-ssl-accept-once ( ssl -- event/f )
+    dup SSL_accept {
+        { SSL_ERROR_ZERO_RETURN [ (ssl-error) ] }
+        { SSL_ERROR_WANT_ACCEPT [ drop +input+ ] }
+    } check-ssl-error ;
+
+: do-ssl-accept ( ssl-handle -- )
+    dup handle>> do-ssl-accept-once
+    [ [ dup file>> ] dip wait-for-fd do-ssl-accept ] [ drop ] if* ;
+
+: maybe-handshake ( ssl-handle -- )
+    dup connected>> [ drop ] [
+        t >>connected
+        [ do-ssl-accept ] with-timeout
+    ] if ;
+
+! Input ports
+: do-ssl-read ( buffer ssl -- event/f )
+    2dup swap [ buffer-end ] [ buffer-capacity ] bi SSL_read [
+        { { SSL_ERROR_ZERO_RETURN [ drop f ] } } check-ssl-error
+    ] keep swap [ 2nip ] [ swap n>buffer f ] if* ;
+
+M: ssl-handle refill ( port handle -- event/f )
+    dup maybe-handshake [ buffer>> ] [ handle>> ] bi* do-ssl-read ;
+
+! Output ports
+: do-ssl-write ( buffer ssl -- event/f )
+    2dup swap [ buffer@ ] [ buffer-length ] bi SSL_write
+    [ f check-ssl-error ] keep swap [ 2nip ] [ swap buffer-consume f ] if* ;
+
+M: ssl-handle drain ( port handle -- event/f )
+    dup maybe-handshake [ buffer>> ] [ handle>> ] bi* do-ssl-write ;
+
+! Connect
+: do-ssl-connect-once ( ssl -- event/f )
+    dup SSL_connect f check-ssl-error ;
+
+: do-ssl-connect ( ssl-handle -- )
+    dup handle>> do-ssl-connect-once
+    [ dupd wait-for-fd do-ssl-connect ] [ drop ] if* ;
+
+: resume-session ( ssl-handle ssl-session -- )
+    [ [ handle>> ] dip SSL_set_session ssl-error ]
+    [ drop do-ssl-connect ]
+    2bi ;
+
+: begin-session ( ssl-handle addrspec -- )
+    [ drop do-ssl-connect ]
+    [ [ handle>> SSL_get1_session ] dip save-session ]
+    2bi ;
+
+: secure-connection ( client-out addrspec -- )
+    [ handle>> ] dip
+    [
+        '[
+            _ dup get-session
+            [ resume-session ] [ begin-session ] ?if
+        ] with-timeout
+    ] [ drop t >>connected drop ] 2bi ;
+
+M: ssl-handle timeout
+    drop secure-socket-timeout get ;
+
+M: ssl-handle cancel-operation
+    file>> cancel-operation ;
 
 M: ssl-handle dispose*
     [
@@ -170,32 +285,71 @@ M: ssl-handle dispose*
     SSL_get_verify_result dup X509_V_OK =
     [ drop ] [ verify-message certificate-verify-error ] if ;
 
-: common-name ( certificate -- host )
-    X509_get_subject_name
+: x509name>string ( x509name -- string )
     NID_commonName 256 <byte-array>
     [ 256 X509_NAME_get_text_by_NID ] keep
     swap -1 = [ drop f ] [ latin1 alien>string ] if ;
 
-: common-names-match? ( expected actual -- ? )
+: subject-name ( certificate -- host )
+    X509_get_subject_name x509name>string ;
+
+: issuer-name ( certificate -- issuer )
+    X509_get_issuer_name x509name>string ;
+
+: name-stack>sequence ( name-stack -- seq )
+    dup sk_num iota [ sk_value GENERAL_NAME_st memory>struct ] with map ;
+
+: alternative-dns-names ( certificate -- dns-names )
+    NID_subject_alt_name f f X509_get_ext_d2i
+    [ name-stack>sequence ] [ f ] if*
+    [ type>> GEN_DNS = ] filter
+    [ d>> dNSName>> data>> utf8 alien>string ] map ;
+
+: subject-names-match? ( host subject -- ? )
     [ >lower ] bi@ "*." ?head [ tail? ] [ = ] if ;
 
-: check-common-name ( host ssl-handle -- )
-    SSL_get_peer_certificate common-name
-    2dup common-names-match?
-    [ 2drop ] [ common-name-verify-error ] if ;
+: check-subject-name ( host ssl-handle -- )
+    SSL_get_peer_certificate [
+        [ alternative-dns-names ] [ subject-name ] bi suffix
+        2dup [ subject-names-match? ] with any?
+        [ 2drop ] [ subject-name-verify-error ] if
+    ] [ certificate-missing-error ] if* ;
 
 M: openssl check-certificate ( host ssl -- )
     current-secure-context config>> verify>> [
         handle>>
         [ nip check-verify-result ]
-        [ check-common-name ]
+        [ check-subject-name ]
         2bi
     ] [ 2drop ] if ;
 
-: get-session ( addrspec -- session/f )
-    current-secure-context sessions>> at ;
+: check-buffer ( port -- port )
+    dup buffer>> buffer-empty? [ upgrade-buffers-full ] unless ;
 
-: save-session ( session addrspec -- )
-    current-secure-context sessions>> set-at ;
+: input/output-ports ( -- input output )
+    input-stream output-stream
+    [ get underlying-port check-buffer ] bi@
+    2dup [ handle>> ] bi@ eq? [ upgrade-on-non-socket ] unless ;
+
+: make-input/output-secure ( input output -- )
+    dup handle>> non-ssl-socket? [ upgrade-on-non-socket ] unless
+    [ <ssl-socket> ] change-handle
+    handle>> >>handle drop ;
+
+: (send-secure-handshake) ( output -- )
+    remote-address get [ upgrade-on-non-socket ] unless*
+    secure-connection ;
+
+M: openssl send-secure-handshake
+    input/output-ports
+    [ make-input/output-secure ] keep
+    [ (send-secure-handshake) ] keep
+    remote-address get dup inet? [
+        host>> swap handle>> check-certificate
+    ] [ 2drop ] if ;
+
+M: openssl accept-secure-handshake ( -- )
+    input/output-ports
+    make-input/output-secure ;
 
 openssl secure-socket-backend set-global

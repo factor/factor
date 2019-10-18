@@ -14,7 +14,7 @@ IN: tools.deploy.unix
     deploy-name get ;
 
 M: unix deploy* ( vocab -- )
-    "resource:" [
+    deploy-directory get [
         dup deploy-config [
             [ bundle-name create-app-dir ] keep
             [ deployed-image-name ] keep

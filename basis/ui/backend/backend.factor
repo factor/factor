@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: command-line kernel namespaces opengl opengl.gl fry ;
+USING: command-line kernel namespaces ;
 IN: ui.backend
 
 SYMBOL: ui-backend

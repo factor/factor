@@ -1,6 +1,6 @@
 IN: libc.tests
-USING: libc libc.private tools.test namespaces assocs
-destructors kernel ;
+USING: destructors kernel libc libc.private namespaces
+tools.test ;
 
 100 malloc "block" set
 
@@ -9,3 +9,5 @@ destructors kernel ;
 [ ] [ [ "block" get &free drop ] with-destructors ] unit-test
 
 [ f ] [ "block" get malloc-exists? ] unit-test
+
+[ "Operation not permitted" ] [ 1 strerror ] unit-test

@@ -5,8 +5,9 @@ USING: accessors arrays assocs assocs.extras byte-arrays
 combinators combinators.short-circuit compression.zlib fry
 grouping kernel locals math math.combinatorics math.constants
 math.functions math.order math.primes math.ranges
-math.ranges.private math.statistics math.vectors memoize random
-sequences sequences.extras sets sorting ;
+math.ranges.private math.statistics math.vectors memoize parser
+random sequences sequences.extras sequences.private sets sorting
+sorting.extras ;
 
 IN: math.extras
 
@@ -96,10 +97,10 @@ PRIVATE>
     <clumps> [ mean ] map ;
 
 : exponential-moving-average ( seq a -- newseq )
-    [ 1 ] 2dip [ [ dupd swap - ] dip * + dup ] curry map nip ;
+    [ 1 ] 2dip '[ dupd swap - _ * + dup ] map nip ;
 
 : moving-median ( u n -- v )
-    clump [ median ] map ;
+    <clumps> [ median ] map ;
 
 : moving-supremum ( u n -- v )
     <clumps> [ supremum ] map ;
@@ -111,7 +112,7 @@ PRIVATE>
     <clumps> [ sum ] map ;
 
 : moving-count ( ... u n quot: ( ... elt -- ... ? ) -- ... v )
-    [ <clumps> ] [ [ count ] curry map ] bi* ; inline
+    [ <clumps> ] [ '[ _ count ] map ] bi* ; inline
 
 : nonzero ( seq -- seq' )
     [ zero? not ] filter ;
@@ -123,23 +124,24 @@ PRIVATE>
         ] curry map
     ] if ;
 
+: [0,2pi] ( n -- seq )
+    [ iota ] [ 1 - 2pi swap / ] bi v*n ;
+
 : hanning ( n -- seq )
     dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
-        [ iota ] [ 1 - 2pi swap / ] bi v*n
-        [ cos -0.5 * 0.5 + ] map!
+        [0,2pi] [ cos -0.5 * 0.5 + ] map!
     ] if ;
 
 : hamming ( n -- seq )
     dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
-        [ iota ] [ 1 - 2pi swap / ] bi v*n
-        [ cos -0.46 * 0.54 + ] map!
+        [0,2pi] [ cos -0.46 * 0.54 + ] map!
     ] if ;
 
 : blackman ( n -- seq )
     dup 1 <= [ 1 = [ 1 1array ] [ { } ] if ] [
-        [ iota ] [ 1 - 2pi swap / ] bi v*n
-        [ [ cos -0.5 * ] map ] [ [ 2 * cos 0.08 * ] map ] bi
-        v+ 0.42 v+n
+        [0,2pi] [
+            [ cos -0.5 * ] [ 2 * cos 0.08 * ] bi + 0.42 +
+        ] map
     ] if ;
 
 : nan-sum ( seq -- n )
@@ -150,6 +152,11 @@ PRIVATE>
 
 : nan-max ( seq -- n )
     [ fp-nan? not ] filter supremum ;
+
+: fill-nans ( seq -- newseq )
+    [ first ] keep [
+        dup fp-nan? [ drop dup ] [ nip dup ] if
+    ] map nip ;
 
 : sinc ( x -- y )
     [ 1 ] [ pi * [ sin ] [ / ] bi ] if-zero ;
@@ -191,14 +198,17 @@ PRIVATE>
 : exponential-index ( seq -- x )
     dup sum '[ _ / dup ^ ] map-product ;
 
-: search-sorted ( obj seq -- i )
-    swap '[ [ _ >= ] find drop dup ] [ length ] bi ? ;
-
 : weighted-random ( histogram -- obj )
-    unzip cum-sum [ last random ] [ search-sorted ] bi swap nth ;
+    unzip cum-sum [ last random ] [ bisect-left ] bi swap nth ;
 
 : unique-indices ( seq -- unique indices )
     [ members ] keep over dup length iota H{ } zip-as '[ _ at ] map ;
+
+: digitize] ( seq bins -- seq' )
+    '[ _ bisect-left ] map ;
+
+: digitize) ( seq bins -- seq' )
+    '[ _ bisect-right ] map ;
 
 <PRIVATE
 
@@ -258,3 +268,51 @@ M: float round-to-even
 
 : round-to-step ( x step -- y )
     [ [ / round ] [ * ] bi ] unless-zero ;
+
+GENERIC: round-away-from-zero ( x -- y )
+
+M: integer round-away-from-zero ; inline
+
+M: real round-away-from-zero
+    dup 0 < [ floor ] [ ceiling ] if ;
+
+: monotonic-count ( seq quot: ( elt1 elt2 -- ? ) -- newseq )
+    over empty? [ 2drop { } ] [
+        [ 0 swap unclip-slice swap ] dip '[
+            [ @ [ 1 + ] [ drop 0 ] if ] keep over
+        ] { } map-as 2nip 0 prefix
+    ] if ; inline
+
+: max-monotonic-count ( seq quot: ( elt1 elt2 -- ? ) -- n )
+    over empty? [ 2drop 0 ] [
+        [ 0 swap unclip-slice swap 0 ] dip '[
+            [ swapd @ [ 1 + ] [ max 0 ] if ] keep swap
+        ] reduce nip max
+    ] if ; inline
+
+<PRIVATE
+
+: kahan+ ( c sum elt -- c' sum' )
+    rot - 2dup + [ -rot [ - ] bi@ ] keep ; inline
+
+PRIVATE>
+
+: kahan-sum ( seq -- n )
+    [ 0.0 0.0 ] dip [ kahan+ ] each nip ;
+
+: map-kahan-sum ( ... seq quot: ( ... elt -- ... n ) -- ... n )
+    [ 0.0 0.0 ] 2dip [ 2dip rot kahan+ ] curry
+    [ -rot ] prepose each nip ; inline
+
+SYNTAX: .. dup pop scan-object [a,b) suffix! ;
+
+SYNTAX: ... dup pop scan-object [a,b] suffix! ;
+
+GENERIC: sum-squares ( seq -- n )
+M: object sum-squares [ sq ] map-sum ;
+M: iota-tuple sum-squares
+    length 1 - [ ] [ 1 + ] [ 1/2 + ] tri * * 3 / ;
+
+GENERIC: sum-cubes ( seq -- n )
+M: object sum-cubes [ 3 ^ ] map-sum ;
+M: iota-tuple sum-cubes sum sq ;

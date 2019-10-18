@@ -18,16 +18,10 @@ DEFER: commit-literals
 SYMBOL: (meta-d)
 SYMBOL: (meta-r)
 
-! Compile-time data stack
 : meta-d ( -- stack ) commit-literals (meta-d) get ;
 
-! Compile-time retain stack
 : meta-r ( -- stack ) (meta-r) get ;
 
-! Uncommitted literals. This is a form of local dead-code
-! elimination; the goal is to reduce the number of IR nodes
-! which get constructed. Technically it is redundant since
-! we do global DCE later, but it speeds up compile time.
 SYMBOL: literals
 
 : (push-literal) ( obj -- )

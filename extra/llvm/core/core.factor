@@ -1,24 +1,14 @@
 ! Copyright (C) 2009 Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.libraries alien.syntax system sequences combinators kernel alien.c-types ;
+
+USING: alien alien.c-types alien.libraries
+alien.libraries.finder alien.syntax kernel sequences ;
 
 IN: llvm.core
 
 <<
-
-: add-llvm-library ( name -- )
-    dup
-    {
-        { [ os macosx? ] [ "/usr/local/lib/lib" ".dylib" surround ] }
-        { [ os windows? ] [ ".dll" append ] }
-        { [ os unix? ] [ "lib" ".so" surround ] }
-    } cond cdecl add-library ;
-
-"LLVMSystem" add-llvm-library
-"LLVMSupport" add-llvm-library
-"LLVMCore" add-llvm-library
-"LLVMBitReader" add-llvm-library
-
+{ "LLVMSystem" "LLVMSupport" "LLVMCore" "LLVMBitReader" }
+[ dup find-library cdecl add-library ] each
 >>
 
 ! llvm-c/Core.h

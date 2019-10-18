@@ -5,7 +5,7 @@ http.client.post-data.private io.encodings.8-bit.latin1 ;
 IN: http.client
 
 HELP: download-failed
-{ $error-description "Thrown by " { $link http-request } " if the server returns a status code other than 200. The " { $slot "response" } " and " { $slot "body" } " slots can be inspected for the underlying cause of the problem." } ;
+{ $error-description "Thrown by " { $link http-request } " if the server returns a status code other than 200. The " { $slot "response" } " slot can be inspected for the underlying cause of the problem." } ;
 
 HELP: too-many-redirects
 { $error-description "Thrown by " { $link http-request } " if the server returns a chain of than " { $link max-redirects } " redirections." } ;
@@ -50,72 +50,129 @@ HELP: download-to
 { $description "Downloads the contents of the URL to a file with the given pathname." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
+HELP: ?download-to
+{ $values { "url" "a " { $link url } " or " { $link string } } { "file" "a pathname string" } }
+{ $description "Version of " { $link download-to } " that only downloads if " { $snippet "file" } " does not exist." }
+{ $errors "Throws an error if the HTTP request fails." } ;
+
 HELP: http-get
 { $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
 { $description "Downloads the contents of a URL." }
 { $errors "Throws an error if the HTTP request fails." } ;
+
+HELP: http-get*
+{ $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $description "Downloads the contents of a URL, but does not check the HTTP response code for success." } ;
+
+{ http-get http-get* } related-words
 
 HELP: http-post
 { $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP POST request." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
+HELP: http-post*
+{ $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $description "Submits an HTTP POST request, but does not check the HTTP response code for success." } ;
+
+{ http-post http-post* } related-words
+
 HELP: http-put
 { $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP PUT request." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
+HELP: http-put*
+{ $values { "post-data" object } { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $description "Submits an HTTP PUT request, but does not check the HTTP response code for success." } ;
+
+{ http-put http-put* } related-words
+
 HELP: http-head
 { $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
 { $description "Same as " { $link http-get } " except that the server is not supposed to return a message-body in the response, as per RFC2616. However in practise, most web servers respond to GET and HEAD method calls with identical responses." }
 { $errors "Throws an error if the HTTP request fails." } ;
- 
+
+HELP: http-head*
+{ $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $description "Same as " { $link http-get* } " except that the server is not supposed to return a message-body in the response, as per RFC2616. However in practise, most web servers respond to GET and HEAD method calls with identical responses." } ;
+
+{ http-head http-head* } related-words
+
 HELP: http-delete
 { $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
 { $description "Requests that the origin server delete the resource identified by the URL." }
 { $errors "Throws an error if the HTTP request fails." } ;
+
+HELP: http-delete*
+{ $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $description "Requests that the origin server delete the resource identified by the URL, but does not check the HTTP response code for success." } ;
+
+{ http-delete http-delete* } related-words
 
 HELP: http-options
 { $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP OPTIONS request." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
+HELP: http-options*
+{ $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $description "Submits an HTTP OPTIONS request, but does not check the HTTP response code for success." } ;
+
+{ http-options http-options* } related-words
+
 HELP: http-trace
 { $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP TRACE request." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
-HELP: with-http-get
-{ $values { "url" "a " { $link url } " or " { $link string } } { "quot" { $quotation "( chunk -- )" } } { "response" response } }
-{ $description "Downloads the contents of a URL. Chunks of data are passed to the quotation as they are read." }
-{ $errors "Throws an error if the HTTP request fails." } ;
+HELP: http-trace*
+{ $values { "url" "a " { $link url } " or " { $link string } } { "response" response } { "data" sequence } }
+{ $description "Submits an HTTP TRACE request, but does not check the HTTP response code for success." } ;
+
+{ http-trace http-trace* } related-words
 
 HELP: http-request
 { $values { "request" request } { "response" response } { "data" sequence } }
-{ $description "Sends an HTTP request to an HTTP server, and reads the response." }
+{ $description "A variant of " { $link http-request* } " that checks that the response was successful." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
+HELP: http-request*
+{ $values { "request" request } { "response" response } { "data" sequence } }
+{ $description "Sends an HTTP request to an HTTP server, and reads the response." } ;
+
 HELP: with-http-request
-{ $values { "request" request } { "quot" { $quotation "( chunk -- )" } } { "response" response } }
+{ $values { "request" request } { "quot" { $quotation ( chunk -- ) } } { "response" response } }
+{ $description "A variant of " { $link with-http-request* } " that checks that the response was successful." } ;
+
+HELP: with-http-request*
+{ $values { "request" request } { "quot" { $quotation ( chunk -- ) } } { "response" response } }
 { $description "Sends an HTTP request to an HTTP server, and reads the response incrementally. Chunks of data are passed to the quotation as they are read. Does not throw an error if the HTTP request fails; to do so, call " { $link check-response } " on the " { $snippet "response" } "." } ;
+
+{ http-request http-request* with-http-request with-http-request* } related-words
 
 ARTICLE: "http.client.get" "GET requests with the HTTP client"
 "Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"
-{ $subsections http-get }
+{ $subsections
+    http-get
+    http-get*
+}
 "Utilities to retrieve a " { $link url } " and save the contents to a file:"
 { $subsections
     download
     download-to
+    ?download-to
 }
 "Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
 { $subsections
     <get-request>
     http-request
+    http-request*
 }
-"The " { $link http-get } " and " { $link http-request } " words output sequences. This is undesirable if the response data may be large. Another pair of words take a quotation instead, and pass the quotation chunks of data incrementally:"
+"The " { $link http-request } " and " { $link http-request* } " words output sequences. This is undesirable if the response data may be large. Another pair of words take a quotation instead, and pass the quotation chunks of data incrementally:"
 { $subsections
-    with-http-get
     with-http-request
+    with-http-request*
 } ;
 
 ARTICLE: "http.client.post-data" "HTTP client post data"
@@ -138,21 +195,21 @@ ARTICLE: "http.client.post-data" "HTTP client post data"
 
 ARTICLE: "http.client.post" "POST requests with the HTTP client"
 "Basic usage involves passing post data and a " { $link url } ", and getting a " { $link response } " and data back:"
-{ $subsections http-post }
+{ $subsections http-post http-post* }
 "Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
 { $subsections <post-request> }
 "Both words take a post data parameter; see " { $link "http.client.post-data" } "." ;
 
 ARTICLE: "http.client.put" "PUT requests with the HTTP client"
 "Basic usage involves passing post data and a " { $link url } ", and getting a " { $link response } " and data back:"
-{ $subsections http-put }
+{ $subsections http-put http-put* }
 "Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
 { $subsections <put-request> }
 "Both words take a post data parameter; see " { $link "http.client.post-data" } "." ;
 
 ARTICLE: "http.client.head" "HEAD requests with the HTTP client"
 "Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"
-{ $subsections http-head }
+{ $subsections http-head http-head* }
 "Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
 { $subsections
     <head-request>
@@ -160,7 +217,7 @@ ARTICLE: "http.client.head" "HEAD requests with the HTTP client"
 
 ARTICLE: "http.client.delete" "DELETE requests with the HTTP client"
 "Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"
-{ $subsections http-delete }
+{ $subsections http-delete http-delete* }
 "Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
 { $subsections
     <delete-request>
@@ -168,7 +225,7 @@ ARTICLE: "http.client.delete" "DELETE requests with the HTTP client"
 
 ARTICLE: "http.client.options" "OPTIONS requests with the HTTP client"
 "Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"
-{ $subsections http-options }
+{ $subsections http-options http-options* }
 "Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
 { $subsections
     <options-request>
@@ -177,7 +234,7 @@ ARTICLE: "http.client.options" "OPTIONS requests with the HTTP client"
 
 ARTICLE: "http.client.trace" "TRACE requests with the HTTP client"
 "Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"
-{ $subsections http-trace }
+{ $subsections http-trace http-trace* }
 "Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
 { $subsections
     <trace-request>

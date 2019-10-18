@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences kernel math grouping fry columns locals accessors
-images math.vectors arrays ;
+USING: accessors arrays fry grouping images kernel locals math
+math.vectors sequences ;
 IN: images.tessellation
 
 : group-rows ( bitmap bitmap-dim -- rows )

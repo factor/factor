@@ -1,9 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs circular combinators continuations hashtables
-hashtables.private io kernel math namespaces prettyprint
-quotations sequences splitting strings quoting
-combinators.short-circuit ;
+USING: kernel quoting sequences splitting ;
 IN: html.parser.utils
 
 : trim1 ( seq ch -- newseq )

@@ -182,7 +182,7 @@ ARTICLE: "regexp-operations" "Matching operations with regular expressions"
 "Splitting a string into tokens delimited by a regular expression:"
 { $subsections re-split }
 "Replacing occurrences of a regular expression with a string:"
-{ $subsections re-replace } ;
+{ $subsections re-replace re-replace-with } ;
 
 ARTICLE: "regexp-deploy" "Regular expressions and the deploy tool"
 "The " { $link "tools.deploy" } " tool has the option to strip out the optimizing compiler from the resulting image. Since regular expressions compile to Factor code, this creates a minor performance-related caveat."
@@ -210,7 +210,7 @@ HELP: regexp
 { $class-description "The class of regular expressions. To construct these, see " { $link "regexp-construction" } "." } ;
 
 HELP: matches?
-{ $values { "string" string } { "regexp" regexp } { "?" "a boolean" } }
+{ $values { "string" string } { "regexp" regexp } { "?" boolean } }
 { $description "Tests if the string as a whole matches the given regular expression." } ;
 
 HELP: all-matching-slices
@@ -227,12 +227,30 @@ HELP: re-split
 
 HELP: re-replace
 { $values { "string" string } { "regexp" regexp } { "replacement" string } { "result" string } }
-{ $description "Replaces substrings which match the input regexp with the given replacement text. The boundaries of the substring are chosen by the strategy used by " { $link all-matching-slices } "." } ;
+{ $description "Replaces substrings which match the input regexp with the given replacement text. The boundaries of the substring are chosen by the strategy used by " { $link all-matching-slices } "." }
+{ $examples
+    { $example
+        "USING: prettyprint regexp ;"
+        "\"python is pythonic\" R/ python/ \"factor\" re-replace ."
+        "\"factor is factoric\"" }
+} ;
+
+HELP: re-replace-with
+{ $values { "string" string } { "regexp" regexp } { "quot" { $quotation ( slice -- replacement ) } } { "result" string } }
+{ $description "Replaces substrings which match the input regexp with the result of calling " { $snippet "quot" } " on each matching slice. The boundaries of the substring are chosen by the strategy used by " { $link all-matching-slices } "." }
+{ $examples
+    { $example
+        "USING: ascii prettyprint regexp ;"
+        "\"abcdefghi\" R/ [aeiou]/ [ >upper ] re-replace-with ."
+        "\"AbcdEfghI\"" }
+} ;
+
+{ re-replace re-replace-with } related-words
 
 HELP: first-match
 { $values { "string" string } { "regexp" regexp } { "slice/f" "the match, if one exists" } }
 { $description "Finds the first match of the regular expression in the string, and returns it as a slice. If there is no match, then " { $link f } " is returned." } ;
 
 HELP: re-contains?
-{ $values { "string" string } { "regexp" regexp } { "?" "a boolean" } }
+{ $values { "string" string } { "regexp" regexp } { "?" boolean } }
 { $description "Determines whether the string has a substring which matches the regular expression given." } ;

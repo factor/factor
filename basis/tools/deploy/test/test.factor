@@ -9,10 +9,10 @@ IN: tools.deploy.test
 
 : shake-and-bake ( vocab -- )
     [ test-image temp-file delete-file ] ignore-errors
-    "resource:" [
+    [
         [ vm test-image temp-file ] dip
         dup deploy-config make-deploy-image drop
-    ] with-directory ;
+    ] with-resource-directory ;
 
 ERROR: image-too-big actual-size max-size ;
 
@@ -21,7 +21,7 @@ ERROR: image-too-big actual-size max-size ;
     [
         cell 4 / *
         cpu ppc? [ 100000 + ] when
-        os windows? [ 150000 + ] when
+        os windows? [ 160000 + ] when
     ] bi*
     2dup <= [ 2drop ] [ image-too-big ] if ;
 

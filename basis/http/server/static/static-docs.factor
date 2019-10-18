@@ -1,10 +1,10 @@
-! Copyright (C) 2008 Your name.
+! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax io.streams.string ;
 IN: http.server.static
 
 HELP: <file-responder>
-{ $values { "root" "a pathname string" } { "hook" { $quotation "( path mime-type -- response )" } } { "responder" file-responder } }
+{ $values { "root" "a pathname string" } { "hook" { $quotation ( path mime-type -- response ) } } { "responder" file-responder } }
 { $description "Creates a file responder which serves content from " { $snippet "path" } " by using the hook to generate a response." } ;
 
 HELP: <static>

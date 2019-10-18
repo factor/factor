@@ -566,7 +566,7 @@ TUPLE: segment elf-header program-header data ;
 TUPLE: symbol name elf-header sym data ;
 
 GENERIC: sections ( obj -- sections )
-    
+
 : <elf> ( c-ptr -- elf )
     elf-header elf boa ;
 
@@ -604,7 +604,7 @@ M:: segment sections ( segment -- sections )
         first2 :> ( name sym )
         name section elf-header>> sym f symbol boa
     ] { } map-as ;
-    
+
 :: symbol-data ( symbol -- data )
     symbol [ elf-header>> ] [ sym>> st_value>> ] bi virtual-address-segment :> segment
     symbol sym>> st_value>> segment p_vaddr>> - segment p_offset>> + :> faddress
@@ -624,4 +624,4 @@ M:: segment sections ( segment -- sections )
 : with-mapped-elf ( path quot -- )
     '[
         address>> <elf> @
-    ] with-mapped-file ; inline
+    ] with-mapped-file-reader ; inline

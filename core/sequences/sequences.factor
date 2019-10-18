@@ -268,7 +268,9 @@ INSTANCE: slice virtual-sequence
 ! One element repeated many times
 TUPLE: repetition { len read-only } { elt read-only } ;
 
-C: <repetition> repetition
+: <repetition> ( len elt -- repetition )
+    over 0 < [ non-negative-integer-expected ] when
+    repetition boa ; inline
 
 M: repetition length len>> ; inline
 M: repetition nth-unsafe nip elt>> ; inline
@@ -331,8 +333,7 @@ PRIVATE>
 
 : but-last ( seq -- headseq ) 1 head* ;
 
-: copy ( src i dst -- )
-    check-copy copy-unsafe ; inline
+: copy ( src i dst -- ) check-copy copy-unsafe ; inline
 
 M: sequence clone-like
     [ dup length ] dip new-sequence [ 0 swap copy-unsafe ] keep ; inline
@@ -524,14 +525,21 @@ PRIVATE>
 : push-if ( ..a elt quot: ( ..a elt -- ..b ? ) accum -- ..b )
     [ keep ] dip rot [ push ] [ 2drop ] if ; inline
 
+<PRIVATE
+
+: (selector-for) ( quot length exemplar -- selector accum )
+    new-resizable [ [ push-if ] 2curry ] keep ; inline
+
+PRIVATE>
+
 : selector-for ( quot exemplar -- selector accum )
-    [ length ] keep new-resizable [ [ push-if ] 2curry ] keep ; inline
+    [ length ] keep (selector-for) ; inline
 
 : selector ( quot -- selector accum )
     V{ } selector-for ; inline
 
 : filter-as ( ... seq quot: ( ... elt -- ... ? ) exemplar -- ... subseq )
-    dup [ selector-for [ each ] dip ] curry dip like ; inline
+    pick length over [ (selector-for) [ each ] dip ] 2curry dip like ; inline
 
 : filter ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
     over filter-as ; inline
@@ -566,7 +574,7 @@ PRIVATE>
 : interleave ( ... seq between quot: ( ... elt -- ... ) -- ... )
     pick empty? [ 3drop ] [
         [ [ drop first-unsafe ] dip call ]
-        [ [ rest-slice ] 2dip [ bi* ] 2curry each ]
+        [ [ bi* ] 2curry [ 1 ] 2dip (each) (each-integer) ]
         3bi
     ] if ; inline
 
@@ -811,8 +819,13 @@ PRIVATE>
         [ 0 swap copy-unsafe ] keep reverse!
     ] keep like ;
 
-: sum-lengths ( seq -- n )
+GENERIC: sum-lengths ( seq -- n )
+
+M: object sum-lengths
     0 [ length + ] reduce ;
+
+M: repetition sum-lengths
+    [ len>> ] [ elt>> length ] bi * ;
 
 : concat-as ( seq exemplar -- newseq )
     swap [ { } ] [
@@ -856,8 +869,8 @@ PRIVATE>
 : pad-tail ( seq n elt -- padded )
     [ append ] padding ;
 
-: shorter? ( seq1 seq2 -- ? ) [ length ] bi@ < ;
-: longer? ( seq1 seq2 -- ? ) [ length ] bi@ > ;
+: shorter? ( seq1 seq2 -- ? ) [ length ] bi@ < ; inline
+: longer? ( seq1 seq2 -- ? ) [ length ] bi@ > ; inline
 : shorter ( seq1 seq2 -- seq ) [ [ length ] bi@ <= ] 2keep ? ; inline
 : longer ( seq1 seq2 -- seq ) [ [ length ] bi@ >= ] 2keep ? ; inline
 
@@ -865,14 +878,16 @@ PRIVATE>
     2dup shorter? [
         2drop f
     ] [
-        [ nip ] [ length head-slice ] 2bi sequence=
+        [ length [ head-slice ] keep swap ] keep
+        mismatch-unsafe not
     ] if ;
 
 : tail? ( seq end -- ? )
     2dup shorter? [
         2drop f
     ] [
-        [ nip ] [ length tail-slice* ] 2bi sequence=
+        [ length [ tail-slice* ] keep swap ] keep
+        mismatch-unsafe not
     ] if ;
 
 : cut-slice ( seq n -- before-slice after-slice )
@@ -892,7 +907,7 @@ PRIVATE>
 : nth3-unsafe ( n seq -- a b c )
     [ nth2-unsafe ] [ [ 2 + ] dip nth-unsafe ] 2bi ; inline
 
-: (binary-reduce) ( ... seq start quot: ( ... elt1 elt2 -- ... newelt ) from length -- ... value )
+: (binary-reduce) ( seq start quot: ( elt1 elt2 -- newelt ) from length -- value )
     #! We can't use case here since combinators depends on
     #! sequences
     dup 4 < [
@@ -910,7 +925,7 @@ PRIVATE>
 
 PRIVATE>
 
-: binary-reduce ( ... seq start quot: ( ... elt1 elt2 -- ... newelt ) -- ... value )
+: binary-reduce ( seq start quot: ( elt1 elt2 -- newelt ) -- value )
     pick length 0 max 0 swap (binary-reduce) ; inline
 
 : cut ( seq n -- before after )
@@ -977,8 +992,8 @@ PRIVATE>
 <PRIVATE
 
 : (trim-head) ( seq quot -- seq n )
-    over [ [ not ] compose find drop ] dip
-    [ length or ] keep swap ; inline
+    over [ [ not ] compose find drop ] dip swap
+    [ dup length ] unless* ; inline
 
 : (trim-tail) ( seq quot -- seq n )
     over [ [ not ] compose find-last drop ?1+ ] dip
@@ -1006,6 +1021,8 @@ PRIVATE>
 
 GENERIC: sum ( seq -- n )
 M: object sum 0 [ + ] binary-reduce ; inline
+M: iota-tuple sum length dup 1 - * 2/ ; inline
+M: repetition sum [ elt>> ] [ len>> ] bi * ; inline
 
 : product ( seq -- n ) 1 [ * ] binary-reduce ;
 

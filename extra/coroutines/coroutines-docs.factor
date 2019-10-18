@@ -3,7 +3,7 @@ USING: help.markup help.syntax kernel ;
 IN: coroutines
 
 HELP: cocreate
-{ $values { "quot" { $quotation "( value -- )" } } { "co" coroutine } }
+{ $values { "quot" { $quotation ( value -- ) } } { "co" coroutine } }
 { $description "Create a new coroutine which will execute the quotation when resumed. The quotation will have an initial value (received from " { $link coresume } ") on the stack when first resumed.\n\nCoroutines should never terminate normally by \"falling off\" the end of the quotation; instead, they should call " { $link coterminate } "." }
 ;
 

@@ -1,4 +1,4 @@
-USING: assocs compiler.cfg.builder compiler.cfg.optimizer
+USING: assocs compiler.cfg compiler.cfg.builder compiler.cfg.optimizer
 compiler.errors compiler.tree.builder compiler.tree.optimizer
 compiler.units compiler.codegen help.markup help.syntax io
 parser quotations sequences words ;
@@ -19,7 +19,7 @@ ARTICLE: "compiler-usage" "Calling the optimizing compiler"
 "More words can be found in " { $link "compilation-units" } "." ;
 
 ARTICLE: "compiler-impl" "Compiler implementation"
-"The " { $vocab-link "compiler" } "vocabulary, in addition to providing the user-visible words of the compiler, implements the main compilation loop."
+"The " { $vocab-link "compiler" } " vocabulary, in addition to providing the user-visible words of the compiler, implements the main compilation loop."
 $nl
 "Once compiled, a word is added to the assoc stored in the " { $link compiled } " variable. When compilation is complete, this assoc is passed to " { $link modify-code-heap } "."
 $nl
@@ -53,6 +53,18 @@ $nl
 } ;
 
 ABOUT: "compiler"
+
+HELP: frontend
+{ $values { "word" word } { "tree" sequence } }
+{ $description "First step of the compilation process. It outputs a high-level tree in SSA form." } ;
+
+HELP: backend
+{ $values { "tree" "a " { $link sequence } " of SSA nodes" } { "word" word } }
+{ $description "The second last step of the compilation process. A word and its SSA tree is taken as input and a " { $link cfg } " is built from which assembly code is generated." }
+{ $see-also generate } ;
+
+HELP: compiled
+{ $var-description { "An " { $link assoc } " used by the optimizing compiler for intermediate storage of generated code. The keys are the labels to the CFG:s and the values the generated code as given by the " { $link generate } " word." } } ;
 
 HELP: compile-word
 { $values { "word" word } }

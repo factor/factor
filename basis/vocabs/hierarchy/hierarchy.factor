@@ -15,15 +15,16 @@ M: vocab-prefix vocab-name name>> ;
 
 <PRIVATE
 
-: vocab-subdirs ( dir -- dirs )
+: visible-dirs ( seq -- seq' )
     [
-        [
-            {
-                [ type>> +directory+ = ]
-                [ name>> "." head? not ]
-            } 1&&
-        ] filter [ name>> ] map!
-    ] with-directory-entries natural-sort ;
+        {
+            [ type>> +directory+ = ]
+            [ name>> "." head? not ]
+        } 1&&
+    ] filter ;
+
+: vocab-subdirs ( dir -- dirs )
+    directory-entries visible-dirs [ name>> ] map! natural-sort ;
 
 : vocab-dir? ( root name -- ? )
     over
@@ -72,7 +73,7 @@ PRIVATE>
 : no-prefixes ( seq -- seq' ) [ vocab-prefix? not ] filter ;
 
 : convert-prefixes ( seq -- seq' )
-    [ dup vocab-prefix? [ name>> vocab-link boa ] when ] map ;
+    [ dup vocab-prefix? [ name>> <vocab-link> ] when ] map ;
 
 : remove-redundant-prefixes ( seq -- seq' )
     #! Hack.

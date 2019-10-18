@@ -1,6 +1,5 @@
-USING: definitions help.markup help.syntax kernel parser
-kernel.private vocabs classes quotations
-strings effects compiler.units ;
+USING: classes compiler.units definitions effects help.markup
+help.syntax kernel parser quotations sequences strings vocabs ;
 IN: words
 
 ARTICLE: "interned-words" "Looking up and creating words"
@@ -270,7 +269,9 @@ HELP: bootstrapping?
 
 HELP: last-word
 { $values { "word" word } }
-{ $description "Outputs the most recently defined word." }
+{ $description "Outputs the most recently defined word." } ;
+
+HELP: word
 { $class-description "The class of words. One notable subclass is " { $link class } ", the class of class words." } ;
 
 { last-word set-last-word save-location } related-words
@@ -314,7 +315,7 @@ HELP: bootstrap-word
 { $description "Looks up a word with the same name and vocabulary as the given word, performing a transformation to handle parsing words in the target dictionary. Used during bootstrap to transfer host words to the target dictionary." } ;
 
 HELP: parsing-word?
-{ $values { "object" object } { "?" "a boolean" } }
+{ $values { "object" object } { "?" boolean } }
 { $description "Tests if an object is a parsing word declared by " { $link POSTPONE: SYNTAX: } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
 
@@ -335,14 +336,31 @@ HELP: define-temp
 } ;
 
 HELP: delimiter?
-{ $values { "obj" object } { "?" "a boolean" } }
+{ $values { "obj" object } { "?" boolean } }
 { $description "Tests if an object is a delimiter word declared by " { $link POSTPONE: delimiter } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
 
 HELP: deprecated?
-{ $values { "obj" object } { "?" "a boolean" } }
+{ $values { "obj" object } { "?" boolean } }
 { $description "Tests if an object is " { $link POSTPONE: deprecated } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
+
+HELP: inline?
+{ $values { "obj" object } { "?" "a boolean" } }
+{ $description "Tests if an object is " { $link POSTPONE: inline } "." }
+{ $notes "Outputs " { $link f } " if the object is not a word." } ;
+
+HELP: subwords
+{ $values { "word" word } { "seq" sequence } }
+{ $description "Lists all specializations for the given word." }
+{ $examples
+  { $example
+    "USING: math.functions prettyprint words ;"
+    "\\ sin subwords ."
+    "{ M\\ object sin M\\ complex sin M\\ real sin M\\ float sin }"
+  }
+}
+{ $notes "Outputs " { $link f } " if the word isn't generic." } ;
 
 HELP: make-deprecated
 { $values { "word" word } }

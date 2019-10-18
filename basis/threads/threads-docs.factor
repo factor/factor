@@ -95,7 +95,7 @@ HELP: run-queue
 { $values { "dlist" dlist } }
 { $var-description "Global variable holding the queue of runnable threads. Calls to " { $link yield } " switch to the thread which has been in the queue for the longest period of time."
 $nl
-"By convention, threads are queued with " { $link push-front } 
+"By convention, threads are queued with " { $link push-front }
 " and dequed with " { $link pop-back } "." } ;
 
 HELP: resume
@@ -154,11 +154,28 @@ $nl
      "The recommended way to pass data to the new thread is to explicitly construct a quotation containing the data, for example using " { $link curry } " or " { $link compose } "."
 }
 { $examples
+    "A simple thread that adds two numbers:"
     { $code "1 2 [ + . ] 2curry \"Addition thread\" spawn" }
+    "A thread that counts to 10:"
+    { $code
+      "USING: math.parser threads ;"
+      "[ 10 iota [ number>string write nl yield ] each ] \"test\" spawn"
+      "10 [ yield ] times"
+      "0"
+      "1"
+      "2"
+      "3"
+      "4"
+      "5"
+      "6"
+      "7"
+      "8"
+      "9"
+    }
 } ;
 
 HELP: spawn-server
-{ $values { "quot" { $quotation "( -- ? )" } } { "name" string } { "thread" thread } }
+{ $values { "quot" { $quotation ( -- ? ) } } { "name" string } { "thread" thread } }
 { $description "Convenience wrapper around " { $link spawn } " which repeatedly calls the quotation in a new thread until it outputs " { $link f } "." }
 { $examples
     "A thread that runs forever:"
@@ -181,5 +198,5 @@ HELP: tset
 { $description "Sets the value of a thread-local variable." } ;
 
 HELP: tchange
-{ $values { "key" object } { "quot" { $quotation "( ..a value -- ..b newvalue )" } } }
+{ $values { "key" object } { "quot" { $quotation ( ..a value -- ..b newvalue ) } } }
 { $description "Applies the quotation to the current value of a thread-local variable, storing the result back to the same variable." } ;

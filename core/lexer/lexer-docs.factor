@@ -1,6 +1,6 @@
-IN: lexer
 USING: help.markup help.syntax kernel math sequences strings
 words quotations ;
+IN: lexer
 
 HELP: lexer
 { $var-description "Stores the current " { $link lexer } " instance." }
@@ -28,11 +28,11 @@ HELP: <lexer-error>
 { $description "Creates a new " { $link lexer-error } ", filling in the location information from the current " { $link lexer } "." } ;
 
 HELP: skip
-{ $values { "i" "a starting index" } { "seq" sequence } { "?" "a boolean" } { "n" integer } }
+{ $values { "i" "a starting index" } { "seq" sequence } { "?" boolean } { "n" integer } }
 { $description "Skips to the first space character (if " { $snippet "boolean" } " is " { $link f } ") or the first non-space character (otherwise). Tabulations used as separators instead of spaces will be flagged as an error." } ;
 
 HELP: change-lexer-column
-{ $values { "lexer" lexer } { "quot" { $quotation "( col line -- newcol )" } } }
+{ $values { "lexer" lexer } { "quot" { $quotation ( col line -- newcol ) } } }
 { $description "Applies a quotation to the current column and line text to produce a new column, and moves the lexer position." } ;
 
 HELP: skip-blank
@@ -50,35 +50,35 @@ HELP: skip-word
 { $notes "Custom lexers can implement this generic word." } ;
 
 HELP: still-parsing-line?
-{ $values { "lexer" lexer } { "?" "a boolean" } }
+{ $values { "lexer" lexer } { "?" boolean } }
 { $description "Outputs " { $link f } " if the end of the current line has been reached, " { $link t } " otherwise." } ;
 
 HELP: parse-token
 { $values { "lexer" lexer } { "str/f" { $maybe string } } }
 { $description "Reads the next token from the lexer. Tokens are delimited by whitespace, with the exception that " { $snippet "\"" } " is treated like a single token even when not followed by whitespace." } ;
 
-HELP: (scan-token)
+HELP: ?scan-token
 { $values { "str/f" { $maybe string } } }
 { $description "Reads the next token from the lexer. Tokens are delimited by whitespace, with the exception that " { $snippet "\"" } " is treated like a single token even when not followed by whitespace. This word outputs " { $link f } " on end of input. To throw an error on end of input, use " { $link scan-token } " instead." }
 $parsing-note ;
 
 HELP: scan-token
 { $values { "str" string } }
-{ $description "Reads the next token from the lexer. Tokens are delimited by whitespace, with the exception that " { $snippet "\"" } " is treated like a single token even when not followed by whitespace. This word throws " { $link unexpected-eof } " on end of input. To output " { $link f } " on end of input, use " { $link (scan-token) } " instead." }
+{ $description "Reads the next token from the lexer. Tokens are delimited by whitespace, with the exception that " { $snippet "\"" } " is treated like a single token even when not followed by whitespace. This word throws " { $link unexpected-eof } " on end of input. To output " { $link f } " on end of input, use " { $link ?scan-token } " instead." }
 $parsing-note ;
 
 HELP: still-parsing?
-{ $values { "lexer" lexer } { "?" "a boolean" } }
+{ $values { "lexer" lexer } { "?" boolean } }
 { $description "Outputs " { $link f } " if end of input has been reached, " { $link t } " otherwise." } ;
 
 HELP: each-token
-{ $values { "end" string } { "quot" { $quotation "( ... token -- ... )" } } }
+{ $values { "end" string } { "quot" { $quotation ( ... token -- ... ) } } }
 { $description "Reads a sequence of tokens until the first occurrence of " { $snippet "end" } ". " { $snippet "quot" } " is called on each token as it is read." }
 { $examples "This word is used to implement " { $link POSTPONE: USING: } "." }
 $parsing-note ;
 
 HELP: map-tokens
-{ $values { "end" string } { "quot" { $quotation "( ... token -- ... elt )" } } { "seq" "a new sequence of " { $snippet "object" } "s" } }
+{ $values { "end" string } { "quot" { $quotation ( ... token -- ... elt ) } } { "seq" "a new sequence of " { $snippet "object" } "s" } }
 { $description "Reads a sequence of tokens until the first occurrence of " { $snippet "end" } ". " { $snippet "quot" } " is called on each token as it is read, and the results are collected into a new output sequence." }
 $parsing-note ;
 

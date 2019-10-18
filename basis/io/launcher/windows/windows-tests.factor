@@ -1,6 +1,6 @@
 USING: accessors arrays assocs calendar continuations
 environment eval hashtables io io.directories
-io.encodings.ascii io.files io.files.temp io.launcher
+io.encodings.ascii io.encodings.utf8 io.files io.files.temp io.launcher
 io.launcher.windows io.pathnames kernel math namespaces parser
 sequences splitting system tools.test combinators.short-circuit ;
 IN: io.launcher.windows.tests
@@ -92,7 +92,7 @@ IN: io.launcher.windows.tests
         console-vm "-run=listener" 2array >>command
         +closed+ >>stdin
         +stdout+ >>stderr
-    ascii [ lines last ] with-process-reader
+    utf8 [ lines last ] with-process-reader
 ] unit-test
 
 : launcher-test-path ( -- str )
@@ -135,7 +135,7 @@ IN: io.launcher.windows.tests
         <process>
             console-vm "-script" "stderr.factor" 3array >>command
             "err2.txt" temp-file >>stderr
-        ascii <process-reader> stream-lines first
+        utf8 <process-reader> stream-lines first
     ] with-directory
 ] unit-test
 
@@ -143,11 +143,13 @@ IN: io.launcher.windows.tests
     "err2.txt" temp-file ascii file-lines first
 ] unit-test
 
+
+
 [ t ] [
     launcher-test-path [
         <process>
             console-vm "-script" "env.factor" 3array >>command
-        ascii <process-reader> stream-contents
+        utf8 [ contents ] with-process-reader
     ] with-directory eval( -- alist )
 
     os-envs =
@@ -159,9 +161,9 @@ IN: io.launcher.windows.tests
             console-vm "-script" "env.factor" 3array >>command
             +replace-environment+ >>environment-mode
             os-envs >>environment
-        ascii <process-reader> stream-contents
+        utf8 [ contents ] with-process-reader
     ] with-directory eval( -- alist )
-    
+
     os-envs =
 ] unit-test
 
@@ -170,7 +172,7 @@ IN: io.launcher.windows.tests
         <process>
             console-vm "-script" "env.factor" 3array >>command
             { { "A" "B" } } >>environment
-        ascii <process-reader> stream-contents
+        utf8 [ contents ] with-process-reader
     ] with-directory eval( -- alist )
 
     "A" of
@@ -182,7 +184,7 @@ IN: io.launcher.windows.tests
             console-vm "-script" "env.factor" 3array >>command
             { { "USERPROFILE" "XXX" } } >>environment
             +prepend-environment+ >>environment-mode
-        ascii <process-reader> stream-contents
+        utf8 [ contents ] with-process-reader
     ] with-directory eval( -- alist )
 
     "USERPROFILE" of "XXX" =
@@ -201,7 +203,7 @@ IN: io.launcher.windows.tests
 
 [ "append-test" temp-file delete-file ] ignore-errors
 
-[ "Hello appender\r\nHello appender\r\n" ] [
+{ "Hello appender\r\nÖrjan ågren är åter\r\nHello appender\r\nÖrjan ågren är åter\r\n" } [
     2 [
         launcher-test-path [
             <process>
@@ -210,8 +212,8 @@ IN: io.launcher.windows.tests
             try-process
         ] with-directory
     ] times
-   
-    "append-test" temp-file ascii file-contents
+
+    "append-test" temp-file utf8 file-contents
 ] unit-test
 
 [ "IN: scratchpad " ] [

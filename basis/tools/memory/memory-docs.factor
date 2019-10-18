@@ -51,8 +51,12 @@ HELP: gc-events
 
 HELP: data-room
 { $values { "data-heap-room" data-heap-room } }
-{ $description "Queries the VM for memory usage information." } ;
+{ $description "Queries the VM for memory usage in the data heap." } ;
 
 HELP: code-room
 { $values { "mark-sweep-sizes" mark-sweep-sizes } }
-{ $description "Queries the VM for memory usage information." } ;
+{ $description "Queries the VM for memory usage in the code heap." } ;
+
+HELP: callback-room
+{ $values { "mark-sweep-sizes" mark-sweep-sizes } }
+{ $description "Queries the VM for memory usage in the callback heap." } ;

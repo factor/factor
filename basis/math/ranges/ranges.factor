@@ -32,6 +32,8 @@ M: range hashcode* tuple-hashcode ;
 
 INSTANCE: range immutable-sequence
 
+M: range sum [ length ] [ first ] [ last ] tri + * 2 / ;
+
 <PRIVATE
 
 : twiddle ( a b -- a b step ) 2dup > -1 1 ? ; inline

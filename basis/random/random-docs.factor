@@ -1,21 +1,21 @@
-USING: help.markup help.syntax math kernel sequences arrays ;
+USING: arrays help.markup help.syntax kernel math quotations
+sequences ;
 IN: random
 
 HELP: seed-random
 { $values
-    { "tuple" "a random number generator" }
+    { "obj" "a random number generator" }
     { "seed" "a seed specific to the random number generator" }
-    { "tuple'" "a random number generator" }
 }
 { $description "Seed the random number generator. Repeatedly seeding the random number generator should provide the same sequence of random numbers." }
 { $notes "Not supported on all random number generators." } ;
 
 HELP: random-32*
-{ $values { "tuple" "a random number generator" } { "r" "an integer between 0 and 2^32-1" } }
+{ $values { "obj" "a random number generator" } { "n" "an integer between 0 and 2^32-1" } }
 { $description "Generates a random 32-bit unsigned integer." } ;
 
 HELP: random-bytes*
-{ $values { "n" "an integer" } { "tuple" "a random number generator" } { "byte-array" "a sequence of random bytes" } }
+{ $values { "n" integer } { "obj" "a random number generator" } { "byte-array" "a sequence of random bytes" } }
 { $description "Generates a byte-array of random bytes." } ;
 
 HELP: random
@@ -37,7 +37,7 @@ HELP: random-32
 { $description "Outputs 32 random bits. This word is more efficient than calling " { $link random } " because no scaling is done on the output." } ;
 
 HELP: random-bytes
-{ $values { "n" "an integer" } { "byte-array" "a random integer" } }
+{ $values { "n" integer } { "byte-array" "a random integer" } }
 { $description "Outputs an integer with n bytes worth of bits." }
 { $examples 
     { $unchecked-example "USING: prettyprint random ;"
@@ -55,6 +55,10 @@ HELP: random-integers
                "{ 32 62 71 89 54 12 57 57 10 19 }"
     }
 } ;
+
+HELP: random-unit
+{ $values { "n" float } }
+{ $description "Outputs a random uniform float from [0,1]." } ;
 
 HELP: random-units
 { $values { "length" integer } { "sequence" array } }
@@ -75,28 +79,24 @@ HELP: random-units
 } ;
 
 HELP: random-bits
-{ $values { "numbits" integer } { "r" "a random integer" } }
+{ $values { "numbits" integer } { "n" "a random integer" } }
 { $description "Outputs an random integer n bits in length." } ;
 
 HELP: random-bits*
-{ $values
-    { "numbits" integer }
-    { "n" integer }
-}
+{ $values { "numbits" integer } { "n" "a random integer" } }
 { $description "Returns an integer exactly " { $snippet "numbits" } " in length, with the topmost bit set to one." } ;
 
-
 HELP: with-random
-{ $values { "tuple" "a random generator" } { "quot" "a quotation" } }
-{ $description "Calls the quotation with the random generator in a dynamic variable.  All random numbers will be generated using this random generator." } ;
+{ $values { "obj" "a random number generator" } { "quot" quotation } }
+{ $description "Calls the quotation with the random number generator in a dynamic variable.  All random numbers will be generated using this random number generator." } ;
 
 HELP: with-secure-random
-{ $values { "quot" "a quotation" } }
-{ $description "Calls the quotation with the secure random generator in a dynamic variable.  All random numbers will be generated using this random generator." } ;
+{ $values { "quot" quotation } }
+{ $description "Calls the quotation with the secure random number generator in a dynamic variable.  All random numbers will be generated using this random number generator." } ;
 
 HELP: with-system-random
-{ $values { "quot" "a quotation" } }
-{ $description "Calls the quotation with the system's random generator in a dynamic variable.  All random numbers will be generated using this random generator." } ;
+{ $values { "quot" quotation } }
+{ $description "Calls the quotation with the system's random number generator in a dynamic variable.  All random numbers will be generated using this random number generator." } ;
 
 { with-random with-secure-random with-system-random } related-words
 

@@ -1,5 +1,5 @@
 USING: accessors arrays classes deques dlists kernel locals
-math tools.test ;
+math sequences tools.test ;
 IN: dlists.tests
 
 [ t ] [ <dlist> deque-empty? ] unit-test
@@ -148,3 +148,8 @@ TUPLE: my-node < dlist-link { obj fixnum } ;
 ] unit-test
 
 
+{ DL{ 0 1 2 3 4 } } [
+    <dlist> [
+        { 3 2 4 1 0 } [ swap push-sorted drop ] with each
+    ] keep
+] unit-test

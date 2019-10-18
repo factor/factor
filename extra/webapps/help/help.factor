@@ -1,18 +1,16 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors db.sqlite furnace.actions furnace.alloy
-furnace.redirection help.html help.topics html.components
-html.forms html.templates.chloe http.server
+USING: accessors assocs furnace.actions furnace.redirection
+help.html help.topics html.components html.forms http.server
 http.server.dispatchers http.server.static io.directories
-io.files io.files.temp kernel locals namespaces sequences
+io.files.temp kernel locals namespaces sequences
 unicode.categories urls ;
 IN: webapps.help
 
 TUPLE: help-webapp < dispatcher ;
 
-M: result link-title title>> ;
-
-M: result link-href href>> ;
+: links ( seq -- seq' )
+    [ swap <simple-link> ] { } assoc>map ;
 
 :: <search-action> ( help-dir -- action )
     <page-action>
@@ -20,9 +18,9 @@ M: result link-href href>> ;
         [
             "search" param [ blank? ] trim [
                 help-dir [
-                    [ article-apropos "articles" set-value ]
-                    [ word-apropos "words" set-value ]
-                    [ vocab-apropos "vocabs" set-value ] tri
+                    [ article-apropos links "articles" set-value ]
+                    [ word-apropos links "words" set-value ]
+                    [ vocab-apropos links "vocabs" set-value ] tri
                 ] with-directory
             ] unless-empty
             help-navbar "navbar" set-value

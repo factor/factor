@@ -22,8 +22,7 @@ IN: xkcd
     "transcript" "id" deep-tag-with-attr children>string ;
 
 : comic-text. ( url -- )
-    comic-image
-    80 wrap-lines [ print ] each ;
+    comic-image 80 wrap-lines [ print ] each ;
 
 : comic. ( url -- )
     ui-running? [ comic-image. ] [ comic-text. ] if ;

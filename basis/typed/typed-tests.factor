@@ -13,8 +13,12 @@ TYPED: f+ ( a: float b: float -- c: float )
 TYPED: fix+ ( a: fixnum b: fixnum -- c: fixnum )
     + ;
 
-most-positive-fixnum neg 1 - 1quotation
-[ most-positive-fixnum 1 fix+ ] unit-test
+! XXX: As of .97, we don't require that the output is a fixnum.
+! most-positive-fixnum neg 1 - 1quotation
+! [ most-positive-fixnum 1 fix+ ] unit-test
+
+! XXX: Check that we throw an error. This used to underflow to the least-positive-fixnum.
+[ most-positive-fixnum 1 fix+ ] [ { "kernel-error" 7 } head? ] must-fail-with
 
 TUPLE: tweedle-dee ; final
 TUPLE: tweedle-dum ; final

@@ -20,35 +20,41 @@ cache-directory [
 
 [ "no such vocab, fool!" deploy ] [ bad-vocab-name? ] must-fail-with
 
-[ ] [ "hello-world" shake-and-bake 500000 small-enough? ] unit-test
+[ ] [ "hello-world" shake-and-bake 550000 small-enough? ] unit-test
 
 [ ] [ "sudoku" shake-and-bake 800000 small-enough? ] unit-test
 
-[ ] [ "hello-ui" shake-and-bake 1300000 small-enough? ] unit-test
+! [ ] [ "hello-ui" shake-and-bake 1605000 small-enough? ] unit-test
+[ ] [ "hello-ui" shake-and-bake 2069160 small-enough? ] unit-test
 
-[ "math-threads-compiler-ui" ] [
+[ "math-threads-compiler-io-ui" ] [
     "hello-ui" deploy-config [
         bootstrap-profile staging-image-name file-name
         "." split second
     ] with-variables
 ] unit-test
 
-[ ] [ "maze" shake-and-bake 1200000 small-enough? ] unit-test
+! [ ] [ "maze" shake-and-bake 1520000 small-enough? ] unit-test
+[ ] [ "maze" shake-and-bake 2000000 small-enough? ] unit-test
 
-[ ] [ "tetris" shake-and-bake 1500000 small-enough? ] unit-test
+! [ ] [ "tetris" shake-and-bake 1734000 small-enough? ] unit-test
+[ ] [ "tetris" shake-and-bake 2186392 small-enough? ] unit-test
 
-[ ] [ "spheres" shake-and-bake 1500000 small-enough? ] unit-test
+! [ ] [ "spheres" shake-and-bake 1557000 small-enough? ] unit-test
+[ ] [ "spheres" shake-and-bake 2031096 small-enough? ] unit-test
 
-[ ] [ "terrain" shake-and-bake 1700000 small-enough? ] unit-test
+! [ ] [ "terrain" shake-and-bake 2053000 small-enough? ] unit-test
+[ ] [ "terrain" shake-and-bake 2671928 small-enough? ] unit-test
 
-[ ] [ "gpu.demos.raytrace" shake-and-bake 2500000 small-enough? ] unit-test
+! [ ] [ "gpu.demos.raytrace" shake-and-bake 2764000 small-enough? ] unit-test
+[ ] [ "gpu.demos.raytrace" shake-and-bake 3307816 small-enough? ] unit-test
 
 [ ] [ "bunny" shake-and-bake 2500000 small-enough? ] unit-test
 
 [ ] [ "gpu.demos.bunny" shake-and-bake 3500000 small-enough? ] unit-test
 
 os macosx? [
-    [ ] [ "webkit-demo" shake-and-bake 500000 small-enough? ] unit-test
+    [ ] [ "webkit-demo" shake-and-bake 600000 small-enough? ] unit-test
 ] when
 
 [ ] [ "benchmark.regex-dna" shake-and-bake 900000 small-enough? ] unit-test
@@ -71,7 +77,7 @@ http.server.responses http.server.static io.servers ;
 SINGLETON: quit-responder
 
 M: quit-responder call-responder*
-    2drop stop-this-server "Goodbye" "text/html" <content> ;
+    2drop stop-this-server "Goodbye" <html-content> ;
 
 : add-quot-responder ( responder -- responder )
     quit-responder "quit" add-responder ;
@@ -154,13 +160,14 @@ os macosx? [
 [ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><foo>Factor</foo>" ]
 [ deploy-test-command ascii [ readln ] with-process-reader ] unit-test
 
-[ ] [ "tools.deploy.test.20" drop 870000 small-enough? ] unit-test
+! [ ] [ "tools.deploy.test.20" drop 1353000 small-enough? ] unit-test
+[ ] [ "tools.deploy.test.20" drop 1363000 small-enough? ] unit-test
 
 [ ] [ "tools.deploy.test.21" shake-and-bake ] unit-test
 
 [ "1 2 3" ]
 [ deploy-test-command ascii [ readln ] with-process-reader ] unit-test
 
-[ ] [ "tools.deploy.test.21" drop 800000 small-enough? ] unit-test
+[ ] [ "tools.deploy.test.21" drop 1260000 small-enough? ] unit-test
 
 [ ] [ "benchmark.ui-panes" shake-and-bake run-temp-image ] unit-test

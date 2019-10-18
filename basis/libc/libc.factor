@@ -2,10 +2,12 @@
 ! Copyright (C) 2007, 2010 Slava Pestov
 ! Copyright (C) 2007, 2008 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax assocs continuations
-alien.destructors kernel namespaces accessors sets summary
-destructors destructors.private ;
+USING: accessors alien alien.c-types alien.destructors
+alien.syntax destructors destructors.private kernel math
+namespaces sequences sets summary system vocabs ;
 IN: libc
+
+HOOK: strerror os ( errno -- str )
 
 LIBRARY: factor
 
@@ -34,6 +36,18 @@ FUNCTION-ALIAS: (free)
 
 FUNCTION-ALIAS: (realloc)
     void* realloc ( void* alien, size_t size ) ;
+
+FUNCTION-ALIAS: strerror_unsafe
+    char* strerror ( int errno ) ;
+
+! Add a default strerror even though it's not threadsafe
+M: object strerror strerror_unsafe ;
+
+ERROR: libc-error errno message ;
+
+: (io-error) ( -- * ) errno dup strerror libc-error ;
+
+: io-error ( n -- ) 0 < [ (io-error) ] when ;
 
 <PRIVATE
 
@@ -105,3 +119,6 @@ FUNCTION: int system ( c-string command ) ;
 
 DESTRUCTOR: free
 DESTRUCTOR: (free)
+
+! For libc.linux, libc.windows, libc.macosx...
+<< "libc." os name>> append require >>

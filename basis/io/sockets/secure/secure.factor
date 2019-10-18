@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel namespaces continuations destructors io
-debugger io.sockets io.sockets.private sequences summary
-calendar delegate system vocabs combinators present ;
+USING: accessors calendar combinators delegate destructors io
+io.sockets io.sockets.private kernel namespaces present
+sequences summary system vocabs ;
 IN: io.sockets.secure
 
 SYMBOL: secure-socket-timeout
@@ -12,8 +12,10 @@ SYMBOL: secure-socket-timeout
 SYMBOL: secure-socket-backend
 
 HOOK: ssl-supported? secure-socket-backend ( -- ? )
+HOOK: ssl-certificate-verification-supported? secure-socket-backend ( -- ? )
 
 M: object ssl-supported? f ;
+M: object ssl-certificate-verification-supported? f ;
 
 SINGLETONS: SSLv2 SSLv23 SSLv3 TLSv1 ;
 
@@ -30,7 +32,7 @@ ephemeral-key-bits ;
     secure-config new
         SSLv23 >>method
         1024 >>ephemeral-key-bits
-        t >>verify ;
+        ssl-certificate-verification-supported? >>verify ;
 
 TUPLE: secure-context < disposable config handle ;
 
@@ -77,10 +79,15 @@ ERROR: certificate-verify-error result ;
 M: certificate-verify-error summary
     drop "Certificate verification failed" ;
 
-ERROR: common-name-verify-error expected got ;
+ERROR: subject-name-verify-error expected got ;
 
-M: common-name-verify-error summary
-    drop "Common name verification failed" ;
+M: subject-name-verify-error summary
+    drop "Subject name verification failed" ;
+
+ERROR: certificate-missing-error ;
+
+M: certificate-missing-error summary
+    drop "Host did not present any certificate" ;
 
 ERROR: upgrade-on-non-socket ;
 
@@ -95,11 +102,15 @@ M: upgrade-buffers-full summary
     drop
     "send-secure-handshake can only be used if buffers are empty" ;
 
+HOOK: non-ssl-socket? os ( obj -- ? )
+
+HOOK: socket-handle os ( obj -- ? )
+
 HOOK: send-secure-handshake secure-socket-backend ( -- )
 
 HOOK: accept-secure-handshake secure-socket-backend ( -- )
 
 {
     { [ os unix? ] [ "io.sockets.secure.unix" require ] }
-    { [ os windows? ] [ "openssl" require ] }
+    { [ os windows? ] [ "io.sockets.secure.windows" require ] }
 } cond

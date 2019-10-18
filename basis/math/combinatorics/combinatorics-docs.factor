@@ -40,6 +40,10 @@ HELP: <permutations>
 { $values { "seq" sequence } { "permutations" sequence } }
 { $description "An efficient sequence containing the lexicographical permutations of " { $snippet "seq" } "." } ;
 
+HELP: <k-permutations>
+{ $values { "seq" sequence } { "k" integer } { "permutations" sequence } }
+{ $description "An efficient sequence containing the " { $snippet "k" } " lexicographical permutations of " { $snippet "seq" } "." } ;
+
 HELP: all-permutations
 { $values { "seq" sequence } { "seq'" sequence } }
 { $description "Outputs a sequence containing all permutations of " { $snippet "seq" } " in lexicographical order." }
@@ -49,7 +53,7 @@ HELP: all-permutations
 } ;
 
 HELP: each-permutation
-{ $values { "seq" sequence } { "quot" { $quotation "( ... elt -- ... )" } } }
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... ) } } }
 { $description "Applies the quotation to each permutation of " { $snippet "seq" } " in order." } ;
 
 HELP: inverse-permutation
@@ -94,7 +98,7 @@ HELP: all-combinations
 }""" } } ;
 
 HELP: each-combination
-{ $values { "seq" sequence } { "k" "a non-negative integer" } { "quot" { $quotation "( ... elt -- ... )" } } }
+{ $values { "seq" sequence } { "k" "a non-negative integer" } { "quot" { $quotation ( ... elt -- ... ) } } }
 { $description "Applies the quotation to each combination of " { $snippet "seq" } " choosing " { $snippet "k" } " elements, in order." } ;
 
 

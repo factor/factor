@@ -1,9 +1,10 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! Copyright (C) 2005, 2011 John Benediktsson, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays hash-sets hashtables.private kernel
-kernel.private math math.private sequences sequences.private
-sets sets.private slots.private vectors ;
+USING: accessors arrays growable.private hash-sets
+hashtables.private kernel kernel.private math math.private
+sequences sequences.private sets sets.private slots.private
+vectors ;
 IN: hash-sets
 
 TUPLE: hash-set
@@ -68,10 +69,10 @@ TUPLE: hash-set
     [ (adjoin) drop ] curry each ; inline
 
 : hash-large? ( hash -- ? )
-    [ count>> 3 fixnum*fast 1 fixnum+fast ]
-    [ array>> length>> 1 fixnum-shift-fast ] bi fixnum> ; inline
+    [ count>> 3 fixnum*fast ]
+    [ array>> length>> 1 fixnum-shift-fast ] bi fixnum>= ; inline
 
-: each-member ( array quot: ( elt -- ) -- )
+: each-member ( ... array quot: ( ... elt -- ... ) -- ... )
     [ if ] curry [ dup tombstone? [ drop ] ] prepose each ; inline
 
 : grow-hash ( hash -- )
@@ -87,7 +88,7 @@ TUPLE: hash-set
 PRIVATE>
 
 : <hash-set> ( capacity -- hash-set )
-    hash-set new [ reset-hash ] keep ; inline
+    [ 0 0 ] dip <hash-array> hash-set boa ; inline
 
 M: hash-set in?
      key@ 2nip ;
@@ -116,9 +117,9 @@ M: hash-set ?adjoin
     dup ?grow-hash (adjoin) ;
 
 M: hash-set members
-    [ array>> ] [ cardinality <vector> ] bi [
-        [ push-unsafe ] curry each-member
-    ] keep { } like ;
+    [ array>> 0 swap ] [ cardinality f <array> ] bi [
+        [ [ over ] dip set-nth-unsafe 1 + ] curry each-member
+    ] keep nip ;
 
 M: hash-set clone
     (clone) [ clone ] change-array ; inline

@@ -44,8 +44,8 @@ init-caches
 
 bootstrapping? on
 
-call( -- )
-call( -- )
+call( -- ) ! layouts quot
+call( -- ) ! arch quot
 
 ! Vocabulary for slot accessors
 "accessors" create-vocab drop
@@ -55,7 +55,7 @@ num-types get f <array> builtins set
 
 [
 
-call( -- )
+call( -- ) ! syntax-quot
 
 ! Create some empty vocabs where the below primitives and
 ! classes will go
@@ -398,7 +398,7 @@ tuple
     ] dip define-declared ;
 
 {
-    { "<callback>" "alien" "primitive_callback" ( return-rewind word -- alien ) }
+    { "<callback>" "alien" "primitive_callback" ( word return-rewind -- alien ) }
     { "<displaced-alien>" "alien" "primitive_displaced_alien" ( displacement c-ptr -- alien ) }
     { "alien-address" "alien" "primitive_alien_address" ( c-ptr -- addr ) }
     { "alien-cell" "alien.accessors" "primitive_alien_cell" ( c-ptr n -- value ) }
@@ -450,6 +450,7 @@ tuple
     { "fgetc" "io.streams.c" "primitive_fgetc" ( alien -- byte/f ) }
     { "fputc" "io.streams.c" "primitive_fputc" ( byte alien -- ) }
     { "fread-unsafe" "io.streams.c" "primitive_fread" ( n buf alien -- count ) }
+    { "free-callback" "alien" "primitive_free_callback" ( alien -- ) }
     { "fseek" "io.streams.c" "primitive_fseek" ( alien offset whence -- ) }
     { "ftell" "io.streams.c" "primitive_ftell" ( alien -- n ) }
     { "fwrite" "io.streams.c" "primitive_fwrite" ( data length alien -- ) }
@@ -502,6 +503,7 @@ tuple
     { "bignum>" "math.private" "primitive_bignum_greater" ( x y -- ? ) }
     { "bignum>=" "math.private" "primitive_bignum_greatereq" ( x y -- ? ) }
     { "bignum>fixnum" "math.private" "primitive_bignum_to_fixnum" ( x -- y ) }
+    { "bignum>fixnum-strict" "math.private" "primitive_bignum_to_fixnum_strict" ( x -- y ) }
     { "fixnum-shift" "math.private" "primitive_fixnum_shift" ( x y -- z ) }
     { "fixnum/i" "math.private" "primitive_fixnum_divint" ( x y -- z ) }
     { "fixnum/mod" "math.private" "primitive_fixnum_divmod" ( x y -- z w ) }
@@ -524,8 +526,9 @@ tuple
     { "float>fixnum" "math.private" "primitive_float_to_fixnum" ( x -- y ) }
     { "all-instances" "memory" "primitive_all_instances" ( -- array ) }
     { "(code-blocks)" "tools.memory.private" "primitive_code_blocks" ( -- array ) }
-    { "(code-room)" "tools.memory.private" "primitive_code_room" ( -- code-room ) }
+    { "(code-room)" "tools.memory.private" "primitive_code_room" ( -- allocator-room ) }
     { "compact-gc" "memory" "primitive_compact_gc" ( -- ) }
+    { "(callback-room)" "tools.memory.private" "primitive_callback_room" ( -- allocator-room ) }
     { "(data-room)" "tools.memory.private" "primitive_data_room" ( -- data-room ) }
     { "disable-gc-events" "tools.memory.private" "primitive_disable_gc_events" ( -- events ) }
     { "enable-gc-events" "tools.memory.private" "primitive_enable_gc_events" ( -- ) }

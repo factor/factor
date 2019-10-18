@@ -1,4 +1,4 @@
-USING: help.markup help.syntax ui.gadgets models models.range
+USING: help.markup help.syntax math math.ranges ui.gadgets
 ui.gadgets.sliders.private ;
 IN: ui.gadgets.sliders
 
@@ -18,15 +18,15 @@ HELP: thumb
 { $class-description "A thumb is the gadget contained in a " { $link slider } "'s " { $link elevator } " which indicates the current scroll position and can be dragged up and down with the mouse." } ;
 
 HELP: slide-by
-{ $values { "amount" "an integer" } { "slider" slider } }
+{ $values { "amount" integer } { "slider" slider } }
 { $description "Adds the amount (which may be positive or negative) to the slider's current position." } ;
 
 HELP: slide-by-page
-{ $values { "amount" "an integer" } { "slider" slider } }
+{ $values { "amount" integer } { "slider" slider } }
 { $description "Adds the amount multiplied by " { $link slider-page } " to the slider's current position." } ;
 
 HELP: slide-by-line
-{ $values { "amount" "an integer" } { "slider" slider } }
+{ $values { "amount" integer } { "slider" slider } }
 { $description "Adds the amount multiplied by the " { $snippet "line" } " slot to the slider's current position." } ;
 
 HELP: <slider>

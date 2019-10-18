@@ -1,4 +1,4 @@
-USING: assocs kernel math math.functions math.statistics sequences
+USING: arrays assocs kernel math math.functions math.statistics sequences
 math.order tools.test math.vectors ;
 FROM: math.ranges => [a,b] ;
 IN: math.statistics.tests
@@ -8,9 +8,11 @@ IN: math.statistics.tests
 [ 1 ] [ { 1 } mean ] unit-test
 [ 0 ] [ { } mean ] unit-test
 [ 3/2 ] [ { 1 2 } mean ] unit-test
-[ 0 ] [ { 0 0 0 } geometric-mean ] unit-test
+[ 0.0 ] [ { 0 0 0 } geometric-mean ] unit-test
 [ t ] [ { 2 2 2 2 } geometric-mean 2.0 .0001 ~ ] unit-test
 [ 1.0 ] [ { 1 1 1 } geometric-mean ] unit-test
+[ t ] [ 1000 1000 <array> geometric-mean 1000 .01 ~ ] unit-test
+[ t ] [ 100000 100000 <array> geometric-mean 100000 .01 ~ ] unit-test
 [ 1/3 ] [ { 1 1 1 } harmonic-mean ] unit-test
 [ 5+1/4 ] [ { 1 3 5 7 } contraharmonic-mean ] unit-test
 [ 18 ] [ { 4 8 15 16 23 42 } 0 trimmed-mean ] unit-test
@@ -117,6 +119,7 @@ IN: math.statistics.tests
 [ { 1 1 2 6 } ] [ { 1 1 2 3 } cum-product ] unit-test
 [ { 5 3 3 1 } ] [ { 5 3 4 1 } cum-min ] unit-test
 [ { 1 3 3 5 } ] [ { 1 3 1 5 } cum-max ] unit-test
+[ { 1.0 1.5 2.0 } ] [ { 1.0 2.0 3.0 } cum-mean ] unit-test
 
 { t }
 [
@@ -223,3 +226,11 @@ IN: math.statistics.tests
     H{ { 0 V{ 0 3 6 9 } } { 1 V{ 1 4 7 10 } } { 2 V{ 2 5 8 } } }
 }
 [ 600 610 [a,b] [ 3 mod ] collect-index-by ] unit-test
+
+
+{ { 1 } } [
+    { 1 2 3 4 5 10 21 12 12 12 12203 3403 030 3022 2 2 }
+    { 1/1000 } quantile5
+] unit-test
+
+{ 15+1/2 } [ { 4 8 15 16 23 42 } trimean ] unit-test

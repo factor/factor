@@ -1,5 +1,4 @@
-USING: help.markup help.syntax io kernel math quotations
-opengl.gl multiline assocs ;
+USING: help.markup help.syntax math opengl.gl quotations ;
 IN: opengl.framebuffers
 
 HELP: gen-framebuffer
@@ -29,7 +28,7 @@ HELP: check-framebuffer
 { $description "Checks the framebuffer currently bound by " { $link glBindFramebuffer } " or " { $link with-framebuffer } " with " { $link framebuffer-incomplete? } ", and throws a descriptive error if the framebuffer is incomplete." } ;
 
 HELP: with-framebuffer
-{ $values { "id" "The id of a framebuffer object." } { "quot" "a quotation" } }
+{ $values { "id" "The id of a framebuffer object." } { "quot" quotation } }
 { $description "Binds framebuffer " { $snippet "id" } " for drawing in the dynamic extent of " { $snippet "quot" } ", restoring the window framebuffer when finished." } ;
 
 ABOUT: "gl-utilities"

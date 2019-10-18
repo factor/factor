@@ -283,6 +283,14 @@ HELP: with-input-stream*
 HELP: with-output-stream*
 { $values { "stream" "an output stream" } { "quot" quotation } }
 { $description "Calls the quotation in a new dynamic scope, with " { $link output-stream } " rebound to " { $snippet "stream" } "." }
+{ $examples
+  { $unchecked-example
+    "USING: destructors io io.encodings.utf8 io.files prettyprint ;"
+    "\"/tmp/test.txt\" utf8 <file-writer> dup [ \"Hello!\" write ] with-output-stream* dispose"
+    "\"/tmp/test.txt\" utf8 file-contents ."
+    "\"Hello!\""
+  }
+}
 { $notes "This word does not close the stream. Compare with " { $link with-output-stream } "." } ;
 
 HELP: bl
@@ -298,11 +306,11 @@ HELP: lines
 { $description "Reads lines of text until from the " { $link input-stream } " until it is exhausted, collecting them in a sequence of strings." } ;
 
 HELP: each-line
-{ $values { "quot" { $quotation "( ... line -- ... )" } } }
+{ $values { "quot" { $quotation ( ... line -- ... ) } } }
 { $description "Calls the quotation with successive lines of text, until the current " { $link input-stream } " is exhausted." } ;
 
 HELP: each-block
-{ $values { "quot" { $quotation "( ... block -- ... )" } } }
+{ $values { "quot" { $quotation ( ... block -- ... ) } } }
 { $description "Calls the quotation with successive blocks of data, until the current " { $link input-stream } " is exhausted." } ;
 
 HELP: stream-contents

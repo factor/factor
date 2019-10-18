@@ -1,16 +1,16 @@
-USING: help.syntax help.markup ;
+USING: help.syntax help.markup sequences ;
 IN: lcs
 
 HELP: levenshtein
-{ $values { "old" "a sequence" } { "new" "a sequence" } { "n" "the Levenshtein distance" } }
+{ $values { "old" sequence } { "new" sequence } { "n" "the Levenshtein distance" } }
 { $description "Calculates the Levenshtein distance between old and new, that is, the minimal number of changes from the old sequence to the new one, in terms of deleting, inserting and replacing characters." } ;
 
 HELP: lcs
-{ $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "lcs" "a longest common subsequence" } }
+{ $values { "seq1" sequence } { "seq2" sequence } { "lcs" "a longest common subsequence" } }
 { $description "Given two sequences, calculates a longest common subsequence between them. Note two things: this is only one of the many possible LCSs, and the LCS may not be contiguous." } ;
 
 HELP: diff
-{ $values { "old" "a sequence" } { "new" "a sequence" } { "diff" "an edit script" } }
+{ $values { "old" sequence } { "new" sequence } { "diff" "an edit script" } }
 { $description "Given two sequences, find a minimal edit script from the old to the new. There may be more than one minimal edit script, and this chooses one arbitrarily. This script is in the form of an array of the tuples of the classes " { $link retain } ", " { $link delete } " and " { $link insert } " which have their information stored in the 'item' slot." } ;
 
 HELP: retain

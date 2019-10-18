@@ -114,8 +114,6 @@ PRIVATE>
 
 : fuel-word-help ( name -- ) (fuel-word-help) fuel-eval-set-result ;
 
-: fuel-word-see ( name -- ) (fuel-word-see) fuel-eval-set-result ;
-
 : fuel-word-def ( name -- ) (fuel-word-def) fuel-eval-set-result ;
 
 : fuel-vocab-help ( name -- ) (fuel-vocab-help) fuel-eval-set-result ;

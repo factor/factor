@@ -237,6 +237,7 @@ CONSTANT: window-control>style
         { resize-handles $ WS_THICKFRAME }
         { small-title-bar $ WS_CAPTION }
         { normal-title-bar $ WS_CAPTION }
+        { dialog-window 0 }
     }
 
 CONSTANT: window-control>ex-style
@@ -248,6 +249,7 @@ CONSTANT: window-control>ex-style
         { resize-handles $ WS_EX_WINDOWEDGE }
         { small-title-bar $[ WS_EX_TOOLWINDOW WS_EX_TOPMOST bitor ] }
         { normal-title-bar $ WS_EX_APPWINDOW }
+        { dialog-window 0 }
     }
 
 : needs-sysmenu? ( controls -- ? )
@@ -611,7 +613,7 @@ SYMBOL: trace-messages?
 
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
-    c:uint { c:void* c:uint c:long c:long } stdcall [
+    c:uint { c:void* c:uint WPARAM LPARAM } stdcall [
         pick
 
         trace-messages? get-global

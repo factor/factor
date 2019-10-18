@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors assocs sequences threads destructors ;
+USING: accessors assocs destructors kernel sequences threads ;
 IN: io.backend.unix.multiplexers
 
 TUPLE: mx < disposable fd reads writes ;

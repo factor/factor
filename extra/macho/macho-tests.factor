@@ -23,9 +23,9 @@ STRING: validation-output
 
 cpu ppc? [
     { $ validation-output }
-    [ <string-writer> dup [ "resource:extra/macho/a.macho" macho-nm ] with-output-stream >string ]
+    [ [ "resource:extra/macho/a.macho" macho-nm ] with-string-writer ]
     unit-test
-    
+
     { t } [
         "resource:extra/macho/a2.macho" [
             >c-ptr fat-binary-members first data>> >c-ptr macho-header 64-bit?

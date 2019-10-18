@@ -1,13 +1,13 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.libraries
+USING: accessors alien alien.c-types alien.libraries alien.libraries.finder
 alien.syntax classes.struct combinators kernel math system unix.types ;
 IN: curses.ffi
 
 << "curses" {
     { [ os windows? ]  [ "libcurses.dll" ] }
     { [ os macosx? ] [ "libcurses.dylib" ] }
-    { [ os unix?  ]  [ "libncursesw.so" ] }
+    { [ os unix?  ]  [ "ncursesw" find-library ] }
 } cond cdecl add-library >>
 
 C-TYPE: SCREEN
@@ -280,3 +280,7 @@ FUNCTION: int wborder ( WINDOW* win, chtype ls, chtype rs, chtype ts, chtype bs,
 FUNCTION: int box ( WINDOW* win, chtype verch, chtype horch ) ;
 FUNCTION: int whline ( WINDOW* win, chtype ch, int n ) ;
 FUNCTION: int wvline ( WINDOW* win, chtype ch, int n ) ;
+
+FUNCTION: bool is_term_resized ( int lines, int columns ) ;
+FUNCTION: int resize_term ( int lines, int columns ) ;
+FUNCTION: int resizeterm ( int lines, int columns ) ;

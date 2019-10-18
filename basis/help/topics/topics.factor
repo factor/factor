@@ -17,6 +17,7 @@ INSTANCE: word topic
 
 GENERIC: >link ( obj -- obj )
 M: link >link ;
+M: wrapper >link wrapped>> >link ;
 M: vocab-spec >link ;
 M: object >link link boa ;
 M: f >link drop \ f >link ;
@@ -33,7 +34,7 @@ M: link summary
 SYMBOL: articles
 
 articles [ H{ } clone ] initialize
-    
+
 SYMBOL: article-xref
 
 article-xref [ H{ } clone ] initialize

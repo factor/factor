@@ -1,9 +1,9 @@
 <%
-USING: kernel io prettyprint vocabs sequences multiline ;
+USING: accessors io kernel multiline prettyprint sequences sorting vocabs ;
 IN: factor.vim.fgen
 
 : print-keywords ( vocab -- )
-    words [
+    words [ name>> ] sort-with [
         "syn keyword factorKeyword " write
         [ bl ] [ pprint ] interleave nl
     ] when* ;
@@ -50,7 +50,7 @@ syn region factorGenericN matchgroup=factorGenericNDelims start=/\<GENERIC#\s\+\
 syn region factorPrivateDefn matchgroup=factorPrivateDefnDelims start=/\<\(SYNTAX\|\(MACRO\|MEMO\|TYPED\)\?:\?\):\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents contained
 syn region factorPrivateMethod matchgroup=factorPrivateMethodDelims start=/\<M::\?\s\+\S\+\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents contained
 syn region factorPGeneric matchgroup=factorPGenericDelims start=/\<\(GENERIC\|MATH\):\s\+\S\+\>/ end=/$/ contains=factorStackEffect contained
-syn region factorPGenericN matchgroup=factorPGenericNDelims start=/\<GENERIC#\s\+\S\+\s\+\d\+\>/ end=/$/ contains=factorStackEffect
+syn region factorPGenericN matchgroup=factorPGenericNDelims start=/\<GENERIC#\s\+\S\+\s\+\d\+\>/ end=/$/ contains=factorStackEffect contained
 
 syn region None matchgroup=factorPrivate start=/\<<PRIVATE\>/ end=/\<PRIVATE>\>/ contains=@factorDefnContents,factorPrivateDefn,factorPrivateMethod,factorPGeneric,factorPGenericN
 
@@ -116,7 +116,7 @@ syn match   factorSymbol        /\<SYMBOL:\s\+\S\+\>/
 syn region  factorSymbols       start=/\<SYMBOLS:\>/     end=/;/
 syn region  factorConstructor2  start=/\<CONSTRUCTOR:\?/ end=/;/
 syn region  factorIntersection  start=/\<INTERSECTION:\>/ end=/\<;\>/
-syn region  factorTuple         start=/\<TUPLE:\>/ end=/\<;\>/
+syn region  factorTuple         start=/\<\(TUPLE\|BUILTIN\):\>/ end=/\<;\>/
 syn region  factorError         start=/\<ERROR:\>/ end=/\<;\>/
 syn region  factorUnion         start=/\<UNION:\>/ end=/\<;\>/
 syn region  factorStruct        start=/\<\(UNION-STRUCT:\|STRUCT:\)\>/ end=/\<;\>/
@@ -151,7 +151,7 @@ syn cluster factorWordOps       contains=factorConstant,factorAlias,factorSingle
 " LIBRARY:
 "#\ "
 
-syn match factorEscape /\\\([\\astnr0e\"]\|u\x\{6}\|u{\S\+}\|x\x\{2}\)/ contained display
+syn match factorEscape /\\\([\\astnrbvf0e\"]\|u\x\{6}\|u{\S\+}\|x\x\{2}\)/ contained display
 syn region factorString start=/\<"/ skip=/\\"/ end=/"/ contains=factorEscape
 syn region factorTriString start=/\<"""/ skip=/\\"/ end=/"""/ contains=factorEscape
 syn region factorSbuf start=/\<[-a-zA-Z0-9]\+"\>/ skip=/\\"/ end=/"/

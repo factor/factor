@@ -1,23 +1,16 @@
 ! Copyright (C) 2009 Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.libraries alien.syntax llvm.core ;
+USING: alien alien.c-types alien.libraries
+alien.libraries.finder alien.syntax kernel llvm.core sequences ;
 IN: llvm.engine
 
 <<
-
-"LLVMExecutionEngine" add-llvm-library
-"LLVMTarget" add-llvm-library
-"LLVMAnalysis" add-llvm-library
-"LLVMipa" add-llvm-library
-"LLVMTransformUtils" add-llvm-library
-"LLVMScalarOpts" add-llvm-library
-"LLVMCodeGen" add-llvm-library
-"LLVMAsmPrinter" add-llvm-library
-"LLVMSelectionDAG" add-llvm-library
-"LLVMX86CodeGen" add-llvm-library
-"LLVMJIT" add-llvm-library
-"LLVMInterpreter" add-llvm-library
-
+{
+    "LLVMExecutionEngine" "LLVMTarget" "LLVMAnalysis" "LLVMipa"
+    "LLVMTransformUtils" "LLVMScalarOpts" "LLVMCodeGen"
+    "LLVMAsmPrinter" "LLVMSelectionDAG" "LLVMX86CodeGen"
+    "LLVMJIT" "LLVMInterpreter"
+} [ dup find-library cdecl add-library ] each
 >>
 
 ! llvm-c/ExecutionEngine.h

@@ -11,13 +11,6 @@ TUPLE: interval-set { array uint-array read-only } ;
 
 <PRIVATE
 
-ALIAS: start first-unsafe
-ALIAS: end second-unsafe
-
-: find-interval ( key interval-set -- slice )
-    array>> 2 <groups>
-    [ start <=> ] with search nip ; inline
-
 ERROR: not-an-interval-set obj ;
 
 : check-interval-set ( map -- map )
@@ -26,14 +19,18 @@ ERROR: not-an-interval-set obj ;
 PRIVATE>
 
 : in? ( key set -- ? )
-    check-interval-set dupd find-interval
-    [ [ start ] [ end 1 - ] bi between? ]
-    [ drop f ] if* ;
+    check-interval-set array>>
+    dupd [ <=> ] with search swap [
+        even? [ >= ] [ 1 - <= ] if
+    ] [ 2drop f ] if* ;
 
 <PRIVATE
 
 : spec>pairs ( sequence -- intervals )
     [ dup number? [ dup 2array ] when ] map ;
+
+ALIAS: start first-unsafe
+ALIAS: end second-unsafe
 
 : disjoint? ( node1 node2 -- ? )
     [ end ] [ start ] bi* < ;
@@ -46,7 +43,7 @@ PRIVATE>
             drop dup first2 <
             [ unclip-slice , ]
             [ 2 tail-slice ] if
-            (delete-redundancies) 
+            (delete-redundancies)
         ]
     } case ;
 

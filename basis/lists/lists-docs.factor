@@ -87,7 +87,7 @@ HELP: nil
 { $description "Returns a symbol representing the empty list" } ;
 
 HELP: nil?
-{ $values { "object" object } { "?" "a boolean" } }
+{ $values { "object" object } { "?" boolean } }
 { $description "Return true if the cons object is the nil cons." } ;
 
 { nil nil? } related-words
@@ -95,15 +95,15 @@ HELP: nil?
 { 1list 2list 3list } related-words
 
 HELP: 1list
-{ $values { "obj" "an object" } { "cons" list } }
+{ $values { "obj" object } { "cons" list } }
 { $description "Create a list with 1 element." } ;
 
 HELP: 2list
-{ $values { "a" "an object" } { "b" "an object" } { "cons" list } }
+{ $values { "a" object } { "b" object } { "cons" list } }
 { $description "Create a list with 2 elements." } ;
 
 HELP: 3list
-{ $values { "a" "an object" } { "b" "an object" } { "c" "an object" } { "cons" list } }
+{ $values { "a" object } { "b" object } { "c" object } { "cons" list } }
 { $description "Create a list with 3 elements." } ;
 
 HELP: lnth
@@ -127,19 +127,19 @@ HELP: unswons
 { leach foldl lmap>array } related-words
 
 HELP: leach
-{ $values { "list" list } { "quot" { $quotation "( ... elt -- ... )" } } }
+{ $values { "list" list } { "quot" { $quotation ( ... elt -- ... ) } } }
 { $description "Call the quotation for each item in the list." } ;
 
 HELP: foldl
-{ $values { "list" list } { "identity" "an object" } { "quot" { $quotation "( ... prev elt -- ... next )" } } { "result" "the final result" } }
+{ $values { "list" list } { "identity" object } { "quot" { $quotation ( ... prev elt -- ... next ) } } { "result" "the final result" } }
 { $description "Combines successive elements of the list (in a left-associative order) using a binary operation and outputs the final result." } ;
 
 HELP: foldr
-{ $values { "list" list } { "identity" "an object" } { "quot" { $quotation "( ... prev elt -- ... next )" } } { "result" "the final result" } }
+{ $values { "list" list } { "identity" object } { "quot" { $quotation ( ... prev elt -- ... next ) } } { "result" "the final result" } }
 { $description "Combines successive elements of the list (in a right-associative order) using a binary operation, and outputs the final result." } ;
 
 HELP: lmap
-{ $values { "list" list } { "quot" { $quotation "( ... elt -- ... newelt )" } } { "result" "the final result" } }
+{ $values { "list" list } { "quot" { $quotation ( ... elt -- ... newelt ) } } { "result" "the final result" } }
 { $description "Applies the quotation to each element of the list in order, collecting the new elements into a new list." } ;
 
 HELP: lreverse
@@ -169,3 +169,6 @@ HELP: lmap>array
 { $values { "list" list } { "quot" quotation } { "array" array } }
 { $description "Executes the quotation on each element of the list, collecting the results in an array." } ;
 
+HELP: >list
+{ $values { "object" object } { "list" "a list" } }
+{ $description "Converts the object into a list." } ;

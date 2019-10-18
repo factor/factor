@@ -11,9 +11,8 @@ IN: math.bits.tests
 [ 6 ] [ 0b111111 make-bits length ] unit-test
 [ 0 ] [ 0 make-bits length ] unit-test
 [ 2 ] [ 3 make-bits length ] unit-test
-[ 2 ] [ -3 make-bits length ] unit-test
 [ 1 ] [ 1 make-bits length ] unit-test
-[ 1 ] [ -1 make-bits length ] unit-test
+[ -3 make-bits length ] [ non-negative-integer-expected? ] must-fail-with
 
 ! Odd bug
 [ t ] [
@@ -30,5 +29,5 @@ IN: math.bits.tests
     1067811677921310779 >bignum make-bits last
 ] unit-test
 
-[ 6 ] [ 6 make-bits unbits ] unit-test
-[ 6 ] [ 6 3 <bits> >array unbits ] unit-test
+[ 6 ] [ 6 make-bits bits>number ] unit-test
+[ 6 ] [ 6 3 <bits> >array bits>number ] unit-test

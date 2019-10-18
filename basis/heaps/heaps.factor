@@ -64,14 +64,15 @@ M: heap heap-size ( heap -- n )
     [ right ] dip data-nth ; inline
 
 : data-set-nth ( entry n heap -- )
-    [ [ >>index drop ] [ ] 2bi ] dip
+    [ [ swap index<< ] 2keep ] dip
     data>> set-nth-unsafe ; inline
 
 : data-push ( entry heap -- n )
     dup heap-size [
-        swap 2dup data>> ensure 2drop data-set-nth
-    ] [
-    ] bi ; inline
+        swap
+        [ data>> ensure 2drop ]
+        [ data-set-nth ] 2bi
+    ] keep ; inline
 
 : data-first ( heap -- entry )
     data>> first ; inline
@@ -82,12 +83,11 @@ M: heap heap-size ( heap -- n )
 
 GENERIC: heap-compare ( entry1 entry2 heap -- ? )
 
-: (heap-compare) ( entry1 entry2 heap -- <=> )
-    drop [ key>> ] compare ; inline
+M: min-heap heap-compare
+    drop { entry entry } declare [ key>> ] bi@ after? ; inline
 
-M: min-heap heap-compare (heap-compare) +gt+ eq? ;
-
-M: max-heap heap-compare (heap-compare) +lt+ eq? ;
+M: max-heap heap-compare
+    drop { entry entry } declare [ key>> ] bi@ before? ; inline
 
 : heap-bounds-check? ( m heap -- ? )
     heap-size >= ; inline
@@ -135,12 +135,13 @@ DEFER: down-heap
     ] if ; inline recursive
 
 : down-heap ( m heap -- )
-    2dup left-bounds-check? [ 2drop ] [ (down-heap) ] if ; inline recursive
+    2dup left-bounds-check?
+    [ 2drop ] [ (down-heap) ] if ; inline recursive
 
 PRIVATE>
 
 M: heap heap-push* ( value key heap -- entry )
-    [ <entry> dup ] [ data-push ] [ ] tri up-heap ;
+    [ <entry> dup ] [ data-push ] [ up-heap ] tri ;
 
 : heap-push ( value key heap -- ) heap-push* drop ;
 
@@ -163,22 +164,20 @@ M: bad-heap-delete summary
     index>> { fixnum } declare ; inline
 
 M: heap heap-delete ( entry heap -- )
-    [ entry>index ] [ ] bi
+    [ entry>index ] keep
     2dup heap-size 1 - = [
         nip data>> pop*
     ] [
         [ nip data>> pop ]
         [ data-set-nth ]
-        [ ] 2tri
-        down-heap
+        [ down-heap ] 2tri
     ] if ;
 
 M: heap heap-pop* ( heap -- )
     [ data-first ] keep heap-delete ;
 
 M: heap heap-pop ( heap -- value key )
-    [ data-first ] keep
-    [ heap-delete ] [ drop ] 2bi >entry< ;
+    [ data-first dup ] keep heap-delete >entry< ;
 
 : heap-pop-all ( heap -- alist )
     [ dup heap-empty? not ]
@@ -198,5 +197,5 @@ ERROR: not-a-heap obj ;
 : >min-heap ( assoc -- min-heap )
     <min-heap> [ heap-push-all ] keep ;
 
-: >max-heap ( assoc -- min-heap )
+: >max-heap ( assoc -- max-heap )
     <max-heap> [ heap-push-all ] keep ;

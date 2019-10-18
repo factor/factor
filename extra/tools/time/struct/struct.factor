@@ -7,7 +7,8 @@ IN: tools.time.struct
 STRUCT: benchmark-data
     { time ulonglong }
     { data-room data-heap-room }
-    { code-room mark-sweep-sizes } ;
+    { code-room mark-sweep-sizes }
+    { callback-room mark-sweep-sizes } ;
 
 STRUCT: benchmark-data-pair
     { start benchmark-data }
@@ -16,8 +17,9 @@ STRUCT: benchmark-data-pair
 : <benchmark-data> ( -- benchmark-data )
     \ benchmark-data <struct>
         nano-count >>time
+        data-room >>data-room
         code-room >>code-room
-        data-room >>data-room ; inline
+        callback-room >>callback-room ; inline
 
 : <benchmark-data-pair> ( start stop -- benchmark-data-pair )
     \ benchmark-data-pair <struct>
@@ -28,4 +30,3 @@ STRUCT: benchmark-data-pair
     <benchmark-data>
     [ call ] dip
     <benchmark-data> <benchmark-data-pair> ; inline
-

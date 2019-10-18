@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: ascii assocs byte-arrays destructors fry
 io.encodings.binary io.files io.pathnames io.streams.byte-array
-kernel namespaces sequences strings ;
+kernel namespaces strings ;
 IN: images.loader
 
 ERROR: unknown-image-extension extension ;
@@ -32,8 +32,11 @@ GENERIC: stream>image* ( stream class -- image )
 : register-image-class ( extension class -- )
     swap types get set-at ;
 
+: ?register-image-class ( extension class -- )
+    over types get key? [ 2drop ] [ register-image-class ] if ;
+
 : load-image ( path -- image )
-    [ binary <file-reader> ] [ image-class ] bi load-image* ;
+    dup image-class load-image* ;
 
 M: object load-image* stream>image ;
 
@@ -47,9 +50,8 @@ M: pathname load-image*
     [ binary <file-reader> ] dip stream>image ;
 
 ! Image Encode
-
-GENERIC: image>stream ( image class -- )
+GENERIC: image>stream ( image extension class -- )
 
 : save-graphic-image ( image path -- )
-    [ image-class ] [ ] bi
+    dup file-extension dup (image-class) rot
     binary [ image>stream ] with-file-writer ;

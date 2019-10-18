@@ -35,3 +35,9 @@ os unix? [
 
 ! Issue #794, setting something to ``f`` is a memory protection fault on mac
 [ ] [ f "dummy-env-variable-for-factor-test" set-os-env ] unit-test
+
+{ f "value" f } [
+    "factor-test-key" os-env
+    "value" "factor-test-key" [ "factor-test-key" os-env ] with-os-env
+    "factor-test-key" os-env
+] unit-test

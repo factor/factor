@@ -4,34 +4,41 @@ USING: accessors kernel quotations help.syntax help.markup
 io.sockets strings calendar io.encodings.utf8 ;
 IN: smtp
 
-HELP: smtp-domain
-{ $var-description "The name of the machine that is sending the email.  This variable will be filled in by the " { $link host-name } " word if not set by the user." } ;
+HELP: smtp-config
+{ $class-description "An SMTP configuration object, with the following slots:"
+    { $table
+        { { $slot "domain" } { "Name of the machine sending the email, or " { $link host-name } " if empty." } }
+        { { $slot "server" } { "An " { $link <inet> } " of the SMTP server." } }
+        { { $slot "tls?" } { "Secure socket after connecting to server, server must support " { $snippet "STARTTLS" } } }
+        { { $slot "read-timeout" } { "Length of time after which we give up waiting for a response." } }
+        { { $slot "auth" } { "Either " { $link no-auth } " or an instance of " { $link plain-auth } } }
+    }
+} ;
 
-HELP: smtp-server
-{ $var-description "Holds an " { $link inet } " object with the address of an SMTP server." } ;
+HELP: default-smtp-config
+{ $values { "smtp-config" smtp-config } }
+{ $description "Creates a new " { $link smtp-config } " with defaults of a one minute " { $snippet "read-timeout" } ", " { $link no-auth } " for authentication, and " { $snippet "localhost" } " port " { $snippet "25" } " as the server." } ;
 
-HELP: smtp-tls?
-{ $var-description "If set to true, secure socket communication will be established after connecting to the SMTP server. The server must support the " { $snippet "STARTTLS" } " command. Off by default." } ;
-
-HELP: smtp-read-timeout
-{ $var-description "Holds a " { $link duration } " object that specifies how long to wait for a response from the SMTP server." } ;
-
-HELP: smtp-auth
-{ $var-description "Holds either " { $link no-auth } " or an instance of " { $link plain-auth } ", specifying how to authenticate with the SMTP server. Set to " { $link no-auth } " by default." } ;
+{ smtp-config default-smtp-config } related-words
 
 HELP: no-auth
-{ $class-description "If the " { $link smtp-auth } " variable is set to this value, no authentication will be performed." } ;
+{ $class-description "If the " { $snippet "auth" } " slot is set to this value, no authentication will be performed." } ;
 
 HELP: plain-auth
-{ $class-description "If the " { $link smtp-auth } " variable is set to this value, plain authentication will be performed, with the username and password stored in the " { $slot "username" } " and " { $slot "password" } " slots of the tuple sent to the server as plain-text." } ;
+{ $class-description "If the " { $snippet "auth" } " slot is set to this value, plain authentication will be performed, with the username and password stored in the " { $slot "username" } " and " { $slot "password" } " slots of the tuple sent to the server as plain-text." } ;
 
 HELP: <plain-auth>
 { $values { "username" string } { "password" string } { "plain-auth" plain-auth } }
 { $description "Creates a new " { $link plain-auth } " instance." } ;
 
+HELP: with-smtp-config
+{ $values { "quot" quotation } }
+{ $description "Connects to an SMTP server using credentials and settings stored in " { $link smtp-config } " and calls the " { $link with-smtp-connection } " combinator." }
+{ $notes "This word is used to implement " { $link send-email } " and there is probably no reason to call it directly." } ;
+
 HELP: with-smtp-connection
 { $values { "quot" quotation } }
-{ $description "Connects to an SMTP server stored in " { $link smtp-server } " and calls the quotation." }
+{ $description "Connects to an SMTP server using credentials and settings stored in " { $link smtp-config } " and calls the quotation." }
 { $notes "This word is used to implement " { $link send-email } " and there is probably no reason to call it directly." } ;
 
 HELP: email
@@ -76,31 +83,29 @@ HELP: send-email
 } ;
 
 ARTICLE: "smtp-gmail" "Setting up SMTP with gmail"
-"If you plan to send all email from the same address, then setting variables in the global namespace is the best option. The code example below does this approach and is meant to go in your " { $link ".factor-boot-rc" } "." $nl
-"Several variables need to be set for sending outgoing mail through gmail. First, we set the login and password to a " { $link <plain-auth> } " tuple with our login. Next, we set the gmail server address with an " { $link <inet> } " object. Finally, we tell the SMTP library to use a secure connection."
+"If you plan to send all email from the same address, then setting the config variable in the global namespace is the best option. The code example below does this approach and is meant to go in your " { $link ".factor-boot-rc" } "." $nl
+"First, we set the login and password to a " { $link <plain-auth> } " tuple with our login. Next, we set the gmail server address with an " { $link <inet> } " object. Finally, we tell the SMTP library to use a secure connection."
+{ $notes "Gmail requires the use of application-specific passwords when accessed from anywhere but their website. Visit " { $url "https://support.google.com/accounts/answer/185833?hl=en" } " to create a password for use with Factor." }
 { $code
     "USING: smtp namespaces io.sockets ;"
     ""
-    "\"my.gmail.address@gmail.com\" \"secret-password\" <plain-auth> smtp-auth set-global"
-    ""
-    "\"smtp.gmail.com\" 587 <inet> smtp-server set-global"
-    ""
-    "t smtp-tls? set-global"
+    """default-smtp-config
+    "smtp.gmail.com" 587 <inet> >>server
+    t >>tls?
+    "my.gmail.address@gmail.com" "qwertyuiasdfghjk" <plain-auth> >>auth
+    \\ smtp-config set-global"""
 } ;
 
 
 ARTICLE: "smtp" "SMTP client library"
 "The " { $vocab-link "smtp" } " vocabulary sends e-mail via an SMTP server."
 $nl
-"This library is configured by a set of dynamically-scoped variables:"
+"This library is configured by a globally scoped config tuple:"
 { $subsections
-    smtp-server
-    smtp-tls?
-    smtp-read-timeout
-    smtp-domain
-    smtp-auth
+    smtp-config
+    default-smtp-config
 }
-"The latter is set to an instance of one of the following:"
+"The auth slot is set to an instance of one of the following:"
 { $subsections
     no-auth
     plain-auth

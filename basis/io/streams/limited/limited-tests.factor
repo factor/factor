@@ -1,7 +1,7 @@
 USING: accessors continuations destructors io io.encodings
 io.encodings.ascii io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files io.pipes
-io.streams.byte-array io.streams.limited io.streams.string
+io.streams.byte-array io.streams.duplex io.streams.limited io.streams.string
 kernel namespaces strings tools.test system
 io.encodings.8-bit.latin1 ;
 IN: io.streams.limited.tests
@@ -56,28 +56,32 @@ IN: io.streams.limited.tests
 
 ! pipes are duplex and not seekable
 [ "as" ] [
-    latin1 <pipe> [ 2 <limited-stream> ] change-in
-    "asdf" over stream-write dup stream-flush
-    2 swap stream-read
+    latin1 <pipe> [
+        input-stream [ 2 <limited-stream> ] change
+        "asdf" write flush 2 read
+    ] with-stream
 ] unit-test
 
 [ "as" ] [
-    latin1 <pipe> [ 2 <limited-stream> ] change-in
-    "asdf" over stream-write dup stream-flush
-    3 swap stream-read
+    latin1 <pipe> [
+        input-stream [ 2 <limited-stream> ] change
+        "asdf" write flush 3 read
+    ] with-stream
 ] unit-test
 
 ! test seeking on limited unseekable streams
 [ "as" ] [
-    latin1 <pipe> [ 2 <limited-stream> ] change-in
-    "asdf" over stream-write dup stream-flush
-    2 swap stream-read
+    latin1 <pipe> [
+        input-stream [ 2 <limited-stream> ] change
+        "asdf" write flush 2 read
+    ] with-stream
 ] unit-test
 
 [ "as" ] [
-    latin1 <pipe> [ 2 <limited-stream> ] change-in
-    "asdf" over stream-write dup stream-flush
-    3 swap stream-read
+    latin1 <pipe> [
+        input-stream [ 2 <limited-stream> ] change
+        "asdf" write flush 3 read
+    ] with-stream
 ] unit-test
 
 [ t ]
@@ -125,4 +129,3 @@ IN: io.streams.limited.tests
 
 { 4 } [ B{ 0 1 2 3 4 5 } binary <byte-reader> 4 <limited-stream> stream-length ] unit-test
 { 6 } [ B{ 0 1 2 3 4 5 } binary <byte-reader> 8 <limited-stream> stream-length ] unit-test
-

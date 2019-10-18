@@ -1,5 +1,5 @@
-USING: help.markup help.syntax words math source-files
-parser quotations definitions stack-checker.errors ;
+USING: definitions help.markup help.syntax kernel parser
+quotations source-files stack-checker.errors words ;
 IN: compiler.units
 
 ARTICLE: "compilation-units-internals" "Compilation units internals"
@@ -79,17 +79,26 @@ HELP: no-compilation-unit
 { $error-description "Thrown when an attempt is made to define a word outside of a " { $link with-compilation-unit } " combinator." } ;
 
 HELP: modify-code-heap
-{ $values { "alist" "an association list with words as keys" } { "update-existing?" "a boolean" } { "reset-pics?" "a boolean" } }
+{ $values { "alist" "an association list with words as keys" } { "update-existing?" boolean } { "reset-pics?" boolean } }
 { $description "Lowest-level primitive for defining words. Associates words with code blocks in the code heap."
 $nl
-"The alist maps words to the following:"
+"The alist maps words to one of the following:"
 { $list
     { "a quotation - in this case, the quotation is compiled with the non-optimizing compiler and the word will call the quotation when executed." }
-    { "a 5-element array " { $snippet "{ parameters literals relocation labels code }" } " - in this case, a code heap block is allocated with the given data and the word will call the code block when executed. This is used by the optimizing compiler." }
+    { "a 6-element array " { $snippet "{ parameters literals relocation labels code stack-frame-size }" } " - in this case, a code heap block is allocated with the given data and the word will call the code block when executed. This is used by the optimizing compiler." }
 }
 "If any of the redefined words may already be referenced by other words in the code heap, from outside of the compilation unit, then a scan of the code heap must be performed to update all word call sites. Passing " { $link t } " as the " { $snippet "update-existing?" } " parameter enables this code path."
 $nl
 "If classes, methods or generic words were redefined, then inline cache call sites need to be updated as well. Passing " { $link t } " as the " { $snippet "reset-pics?" } " parameter enables this code path."
+}
+{ $examples
+  "Manually creating a word using the non-optimizing compiler:"
+  { $example
+    "USING: compiler.units io ;"
+    "IN: test SYMBOL: foo"
+    "{ { foo [ \"hello!\" write nl ] } } t t modify-code-heap foo"
+    "hello!"
+  }
 }
 { $notes "This word is called at the end of " { $link with-compilation-unit } "." } ;
 

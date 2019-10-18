@@ -1,12 +1,11 @@
 USING: accessors continuations fry http.client images.loader
 images.loader.private images.viewer io io.styles kernel memoize
-prettyprint sequences twitter ;
+prettyprint sequences twitter assocs ;
 IN: twitter.prettyprint
 
 MEMO: load-http-image ( url -- image/f )
     '[ _
-        [ http-get [ check-response drop ] dip ]
-        [ image-class ] bi load-image*
+        [ http-get nip ] [ image-class ] bi load-image*
     ] [ drop f ] recover ;
 
 : user-image ( user -- image/f )
@@ -32,6 +31,20 @@ CONSTANT: tweet-metadata-style
         { font-size 10 }
     } 
 
+: profile. ( user -- )
+    tweet-table-style [
+        [
+            [ dup "profile_image_url" of load-http-image image. ] with-cell
+            [
+                tweet-username-style [
+                    dup "name" of write nl
+                    dup "screen_name" of write
+                ] with-style
+            ] with-cell
+        ] with-row
+    ] tabular-output nl
+    drop ;
+
 : tweet. ( status -- )
     tweet-table-style [
         [
@@ -56,6 +69,9 @@ CONSTANT: tweet-metadata-style
     ] tabular-output nl
     drop ;
 
-: friends-timeline. ( -- )      friends-timeline [ tweet. ] each ;
-: public-timeline.  ( -- )      public-timeline  [ tweet. ] each ;
-: user-timeline.    ( user -- ) user-timeline    [ tweet. ] each ;
+: user-profile.      ( user -- ) user-profile      profile. ;
+: friends-timeline.  ( -- )      friends-timeline  [ tweet. ] each ;
+: public-timeline.   ( -- )      public-timeline   [ tweet. ] each ;
+: user-timeline.     ( user -- ) user-timeline     [ tweet. ] each ;
+: home-timeline.     ( -- )      home-timeline     [ tweet. ] each ;
+: mentions-timeline. ( -- )      mentions-timeline [ tweet. ] each ;

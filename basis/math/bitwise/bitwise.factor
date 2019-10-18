@@ -10,19 +10,17 @@ IN: math.bitwise
 ! utilities
 : clear-bit ( x n -- y ) 2^ bitnot bitand ; inline
 : set-bit ( x n -- y ) 2^ bitor ; inline
-: bit-clear? ( x n -- ? ) 2^ bitand zero? ; inline
-: unmask ( x n -- ? ) bitnot bitand ; inline
+: unmask ( x n -- y ) bitnot bitand ; inline
 : unmask? ( x n -- ? ) unmask zero? not ; inline
-: mask ( x n -- ? ) bitand ; inline
-: mask? ( x n -- ? ) mask zero? not ; inline
+: mask ( x n -- y ) bitand ; inline
+: mask? ( x n -- ? ) [ mask ] [ = ] bi ; inline
 : wrap ( m n -- m' ) 1 - bitand ; inline
 : on-bits ( m -- n ) dup 0 <= [ drop 0 ] [ 2^ 1 - ] if ; inline
 : bits ( m n -- m' ) on-bits mask ; inline
 : mask-bit ( m n -- m' ) 2^ mask ; inline
 : toggle-bit ( m n -- m' ) 2^ bitxor ; inline
 : >signed ( x n -- y )
-    [ bits ] keep 2dup neg 1 + shift
-    1 number= [ 2^ - ] [ drop ] if ;
+    [ bits ] keep 2dup 1 - bit? [ 2^ - ] [ drop ] if ; inline
 : >odd ( m -- n ) 0 set-bit ; foldable
 : >even ( m -- n ) 0 clear-bit ; foldable
 : next-even ( m -- n ) >even 2 + ; foldable
@@ -120,22 +118,25 @@ M: bignum (bit-count)
     ] if-zero ;
 
 : byte-array-bit-count ( byte-array -- n )
-    0 [ byte-bit-count + ] reduce ; inline
+    [ byte-bit-count ] map-sum ; inline
 
 PRIVATE>
-
-ERROR: invalid-bit-count-target object ;
 
 GENERIC: bit-count ( obj -- n )
 
 M: integer bit-count
-    dup 0 < [ invalid-bit-count-target ] when (bit-count) ; inline
+    dup 0 < [ non-negative-integer-expected ] when (bit-count) ; inline
 
 M: byte-array bit-count
     byte-array-bit-count ;
 
 M: object bit-count
     binary-object uchar <c-direct-array> byte-array-bit-count ;
+
+: bit-length ( x -- n )
+    dup 0 < [ non-negative-integer-expected ] [
+        dup 1 > [ log2 1 + ] when
+    ] if ;
 
 : even-parity? ( obj -- ? ) bit-count even? ;
 

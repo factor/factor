@@ -62,8 +62,6 @@ GENERIC: (log2) ( x -- n ) foldable
 
 PRIVATE>
 
-ERROR: out-of-fixnum-range n ;
-
 ERROR: log2-expects-positive x ;
 
 : log2 ( x -- n )
@@ -87,7 +85,7 @@ GENERIC: neg? ( x -- -x )
 
 : when-zero ( ..a n quot: ( ..a -- ..b ) -- ..b ) [ ] if-zero ; inline
 
-: unless-zero ( ..a n quot: ( ..a -- ..b ) -- ..b ) [ ] swap if-zero ; inline
+: unless-zero ( ..a n quot: ( ..a n -- ..b ) -- ..b ) [ ] swap if-zero ; inline
 
 UNION: integer fixnum bignum ;
 

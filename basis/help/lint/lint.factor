@@ -67,7 +67,7 @@ PRIVATE>
     ] check-something ;
 
 : check-about ( vocab -- )
-    vocab-link boa dup
+    <vocab-link> dup
     '[ _ vocab-help [ lookup-article drop ] when* ] check-something ;
 
 : check-vocab ( vocab -- )
@@ -100,5 +100,3 @@ PRIVATE>
     [ word-help not ] filter
     [ article-parent ] filter
     [ predicate? not ] filter ;
-
-MAIN: help-lint

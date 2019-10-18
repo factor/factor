@@ -7,7 +7,7 @@ sequences io.streams.throwing ;
 IN: images.pbm
 
 SINGLETON: pbm-image
-"pbm" pbm-image register-image-class
+"pbm" pbm-image ?register-image-class
 
 <PRIVATE
 : read-token ( -- token )
@@ -76,7 +76,7 @@ M: pbm-image stream>image*
     drop [ [ read-pbm ] throw-on-eof ] with-input-stream ;
 
 M: pbm-image image>stream
-    drop {
+    2drop {
         [ drop "P4\n" ascii encode write ]
         [ dim>> first number>string " " append ascii encode write ]
         [ dim>> second number>string "\n" append ascii encode write ]

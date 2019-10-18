@@ -4,11 +4,11 @@ io.directories ;
 IN: csv.tests
 
 ! I like to name my unit tests
-: named-unit-test ( name output input -- ) 
-  unit-test drop ; inline
+: named-unit-test ( name output input -- )
+    unit-test drop ; inline
 
 "Fields are separated by commas"
-[ { { "1997" "Ford" "E350" } } ] 
+[ { { "1997" "Ford" "E350" } } ]
 [ "1997,Ford,E350" string>csv ] named-unit-test
 
 "ignores whitespace before and after elements. n.b.specifically prohibited by RFC 4180, which states, 'Spaces are considered part of a field and should not be ignored.'"
@@ -21,29 +21,29 @@ IN: csv.tests
 
 "double quotes mean escaped in quotes"
 [ { { "1997" "Ford" "E350" "Super \"luxurious\" truck" } } ]
-[ "1997,Ford,E350,\"Super \"\"luxurious\"\" truck\"" 
-  string>csv ] named-unit-test
+[ "1997,Ford,E350,\"Super \"\"luxurious\"\" truck\""
+    string>csv ] named-unit-test
 
 "Fields with embedded line breaks must be delimited by double-quote characters."
 [ { { "1997" "Ford" "E350" "Go get one now\nthey are going fast" } } ]
 [ "1997,Ford,E350,\"Go get one now\nthey are going fast\""
-  string>csv ] named-unit-test
+    string>csv ] named-unit-test
 
 "Fields with leading or trailing spaces must be delimited by double-quote characters. (See comment about leading and trailing spaces above)"
 [ { { "1997" "Ford" "E350" "  Super luxurious truck    " } } ]
 [ "1997,Ford,E350,\"  Super luxurious truck    \""
-  string>csv ] named-unit-test
+    string>csv ] named-unit-test
 
 "Fields may always be delimited by double-quote characters, whether necessary or not."
 [ { { "1997" "Ford" "E350" } } ]
 [ "\"1997\",\"Ford\",\"E350\"" string>csv ] named-unit-test
 
 "The first record in a csv file may contain column names in each of the fields."
-[ { { "Year" "Make" "Model" } 
+[ { { "Year" "Make" "Model" }
     { "1997" "Ford" "E350" }
     { "2000" "Mercury" "Cougar" } } ]
-[ "Year,Make,Model\n1997,Ford,E350\n2000,Mercury,Cougar" 
-   string>csv ] named-unit-test
+[ "Year,Make,Model\n1997,Ford,E350\n2000,Mercury,Cougar"
+    string>csv ] named-unit-test
 
 
 ! !!!!!!!!  other tests
@@ -100,3 +100,12 @@ IN: csv.tests
 ! FIXME: { { { "as,df" "asdf" } } } [ "\"as,\"df  ,asdf" string>csv ] unit-test
 ! FIXME: { { { "asd\"f\"" "asdf" } } } [ "\"asd\"\"\"f\",asdf" string>csv ] unit-test
 { { { "as,d\"f" "asdf" } } } [ "\"as,\"d\"\"\"\"f,asdf" string>csv ] unit-test
+
+[ { } ] [ "" string>csv ] unit-test
+
+[
+    { { "Year" "Make" "Model" }
+      { "1997" "Ford" "E350" }
+    }
+]
+[ "Year,Make,\"Model\"\r\n1997,Ford,E350" string>csv ] unit-test

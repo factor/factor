@@ -1,5 +1,4 @@
-USING: help.markup help.syntax kernel math quotations
-math.private words words.symbol ;
+USING: help.markup help.syntax kernel math ;
 IN: math.order
 
 HELP: <=>
@@ -37,7 +36,7 @@ HELP: invert-comparison
     { $example "USING: math.order prettyprint ;" "+lt+ invert-comparison ." "+gt+" } } ;
 
 HELP: compare
-{ $values { "obj1" object } { "obj2" object } { "quot" { $quotation "( obj -- newobj )" } } { "<=>" "an ordering specifier" } }
+{ $values { "obj1" object } { "obj2" object } { "quot" { $quotation ( obj -- newobj ) } } { "<=>" "an ordering specifier" } }
 { $description "Compares the results of applying the quotation to both objects via " { $link <=> } "." }
 { $examples { $example "USING: kernel math.order prettyprint sequences ;" "\"hello\" \"hi\" [ length ] compare ." "+gt+" }
 } ;
@@ -57,27 +56,27 @@ HELP: clamp
 { $description "Outputs " { $snippet "x" } " if contained in the interval " { $snippet "[min,max]" } " or else outputs one of the endpoints." } ;
 
 HELP: between?
-{ $values { "x" object } { "y" object } { "z" object } { "?" "a boolean" } }
+{ $values { "x" object } { "y" object } { "z" object } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is in the interval " { $snippet "[y,z]" } "." }
 { $notes "As per the closed interval notation, the end-points are included in the interval." } ;
 
 HELP: before?
-{ $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
+{ $values { "obj1" object } { "obj2" object } { "?" boolean } }
 { $description "Tests if " { $snippet "obj1" } " comes before " { $snippet "obj2" } " using an intrinsic total order." }
 { $notes "Implemented using " { $link <=> } "." } ;
 
 HELP: after?
-{ $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
+{ $values { "obj1" object } { "obj2" object } { "?" boolean } }
 { $description "Tests if " { $snippet "obj1" } " comes after " { $snippet "obj2" } " using an intrinsic total order." }
 { $notes "Implemented using " { $link <=> } "." } ;
 
 HELP: before=?
-{ $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
+{ $values { "obj1" object } { "obj2" object } { "?" boolean } }
 { $description "Tests if " { $snippet "obj1" } " comes before or equals " { $snippet "obj2" } " using an intrinsic total order." }
 { $notes "Implemented using " { $link <=> } "." } ;
 
 HELP: after=?
-{ $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
+{ $values { "obj1" object } { "obj2" object } { "?" boolean } }
 { $description "Tests if " { $snippet "obj1" } " comes after or equals " { $snippet "obj2" } " using an intrinsic total order." }
 { $notes "Implemented using " { $link <=> } "." } ;
 

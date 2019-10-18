@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io io.backend threads
-strings byte-arrays continuations destructors quotations ;
+strings byte-arrays continuations destructors quotations math ;
 IN: io.sockets
 
 ARTICLE: "network-addressing" "Address specifiers"
@@ -154,7 +154,16 @@ HELP: <client>
 HELP: with-client
 { $values { "remote" "an address specifier" } { "encoding" "an encoding descriptor" } { "quot" quotation } }
 { $description "Opens a network connection and calls the quotation in a new dynamic scope with " { $link input-stream } " and " { $link output-stream } " rebound to the network streams. The local address the socket is connected to is stored in the " { $link local-address } " variable, and the remote address is stored in the " { $link remote-address } " variable." }
-{ $errors "Throws an error if the connection cannot be established." } ;
+{ $errors "Throws an error if the connection cannot be established." }
+{ $examples
+    { $code
+        "T{ inet f \"www.factorcode.org\" 80 } ascii"
+        "["
+        "    \"GET / HTTP/1.1\\r\\nhost: www.factorcode.org\\r\\n\\r\\n\" write flush"
+        "    read-?crlf"
+        "] with-client"
+    }
+} ;
 
 HELP: <server>
 { $values { "addrspec" "an address specifier" } { "encoding" "an encoding descriptor" } { "server" "a handle" } }
@@ -218,7 +227,14 @@ HELP: send
 
 HELP: resolve-host
 { $values { "addrspec" "an address specifier" } { "seq" "a sequence of address specifiers" } }
-{ $description "Resolves host names to IP addresses." } ;
+{ $description "Resolves host names to IP addresses." }
+{ $errors "Throws an " { $link addrinfo-error } " if the host name cannot be resolved." }
+{ $examples
+    { $code
+      "\"www.facebook.com\" resolve-host . "
+      "{ T{ ipv4 { host \"31.13.64.32\" } } }"
+    }
+} ;
 
 HELP: with-local-address
 { $values { "addr" "an " { $link inet4 } " or " { $link inet6 } " address specifier" } { "quot" quotation } }
@@ -233,3 +249,7 @@ HELP: with-local-address
   }
   { $code "\"192.168.0.1\" 23000 <inet4> [ ] with-local-address" }
 } ;
+
+HELP: protocol-port
+{ $values { "protocol" "a protocol string" } { "port" { $maybe integer } } }
+{ $description "Outputs the port number associated with a protocol, or " { $link f } " if the protocol is unknown." } ;

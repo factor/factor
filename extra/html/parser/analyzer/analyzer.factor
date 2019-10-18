@@ -1,22 +1,22 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
-fry html.parser http.client io kernel locals math sequences
-sets splitting unicode.case unicode.categories urls
+fry html.parser http.client io kernel locals math math.statistics
+sequences sets splitting unicode.case unicode.categories urls
 urls.encoding shuffle ;
 IN: html.parser.analyzer
 
-: scrape-html ( url -- headers vector )
+: scrape-html ( url -- response vector )
     http-get parse-html ;
 
 : attribute ( tag string -- obj/f )
-    swap attributes>> [ at ] [ drop f ] if* ;
+    swap attributes>> at ;
 
 : attribute* ( tag string -- obj ? )
-    swap attributes>> [ at* ] [ drop f f ] if* ;
+    swap attributes>> at* ;
 
-: attribute? ( tag string -- obj )
-    swap attributes>> [ key? ] [ drop f ] if* ;
+: attribute? ( tag string -- ? )
+    swap attributes>> key? ;
 
 : find-all ( seq quot -- alist )
    [ <enum> >alist ] [ '[ second @ ] ] bi* filter ; inline
@@ -26,6 +26,12 @@ IN: html.parser.analyzer
 
 : loopn ( n quot -- )
     [ drop ] prepose loopn-index ; inline
+
+: html-class? ( tag string -- ? )
+    swap "class" attribute [ blank? ] split-when member? ;
+
+: html-id? ( tag string -- ? )
+    swap "id" attribute = ;
 
 ERROR: undefined-find-nth m n seq quot ;
 
@@ -51,14 +57,17 @@ ERROR: undefined-find-nth m n seq quot ;
 : find-first-name ( vector string -- i/f tag/f )
     >lower '[ name>> _ = ] find ; inline
 
-: find-matching-close ( vector string -- i/f tag/f )
+: stack-find ( seq quot: ( elt -- 1/0/-1 ) -- i/f )
+    map cum-sum [ 0 = ] find drop ; inline
+
+: tag-classifier ( string -- quot )
     >lower
-    '[ [ name>> _ = ] [ closing?>> ] bi and ] find ; inline
+    '[ dup name>> _ = [ closing?>> -1 1  ? ] [ drop 0 ] if ] ; inline
 
 : find-between* ( vector i/f tag/f -- vector )
     over integer? [
         [ tail-slice ] [ name>> ] bi*
-        dupd find-matching-close drop [ 1 + ] [ 1 ] if*
+        dupd tag-classifier stack-find [ 1 + ] [ 1 ] if*
         head
     ] [
         3drop V{ } clone
@@ -90,58 +99,41 @@ ERROR: undefined-find-nth m n seq quot ;
     ] map ;
 
 : find-by-id ( vector id -- vector' elt/f )
-    '[ "id" attribute _ = ] find ;
-    
+    '[ _ html-id? ] find ;
+
 : find-by-class ( vector id -- vector' elt/f )
-    '[ "class" attribute _ = ] find ;
+    '[ _ html-class? ] find ;
 
 : find-by-name ( vector string -- vector elt/f )
     >lower '[ name>> _ = ] find ;
 
 : find-by-id-between ( vector string -- vector' )
-    dupd
-    '[ "id" attribute _ = ] find find-between* ;
-    
-: find-by-class-between ( vector string -- vector' )
-    dupd
-    '[ "class" attribute _ = ] find find-between* ;
-    
-: find-by-class-id-between ( vector class id -- vector' )
-    [
-        '[
-            [ "class" attribute _ = ]
-            [ "id" attribute _ = ] bi and
-        ] find
-    ] [
-        2drop find-between*
-    ] 3bi ;
+    '[ _ html-id? ] dupd find find-between* ;
 
-: find-by-attribute-key ( vector key -- vector' elt/? )
-    >lower
-    [ attributes>> at _ = ] filter sift ;
+: find-by-class-between ( vector string -- vector' )
+    '[ _ html-class? ] dupd find find-between* ;
+
+: find-by-class-id-between ( vector class id -- vector' )
+    '[
+        [ _ html-class? ] [ _ html-id? ] bi and
+    ] dupd find find-between* ;
+
+: find-by-attribute-key ( vector key -- vector' )
+    >lower '[ _ attribute? ] filter sift ;
 
 : find-by-attribute-key-value ( vector value key -- vector' )
-    >lower
-    [ attributes>> at over = ] with filter nip sift ;
+    >lower swap '[ _ attribute _ = ] filter sift ;
 
 : find-first-attribute-key-value ( vector value key -- i/f tag/f )
-    >lower
-    [ attributes>> at over = ] with find rot drop ;
-
-: tag-link ( tag -- link/f ) "href" attribute ;
+    >lower swap '[ _ attribute _ = ] find ;
 
 : find-links ( vector -- vector' )
     [ { [ name>> "a" = ] [ "href" attribute ] } 1&& ]
     find-between-all ;
 
 : find-images ( vector -- vector' )
-    [
-        {
-            [ name>> "img" = ]
-            [ "src" attribute ]
-        } 1&&
-    ] find-all
-    values [ "src" attribute ] map ;
+    [ { [ name>> "img" = ] [ "src" attribute ] } 1&& ] filter sift
+    [ "src" attribute ] map ;
 
 : find-by-text ( seq quot -- tag )
     [ dup name>> text = ] prepose find drop ; inline
@@ -153,17 +145,19 @@ ERROR: undefined-find-nth m n seq quot ;
     "href" attribute* [ subseq? ] [ 2drop f ] if ;
 
 : find-hrefs ( vector -- vector' )
-    find-links
-    [ [ { [ name>> "a" = ] [ "href" attribute? ] } 1&& ] filter ] map sift
-    [ [ "href" attribute ] map ] map concat [ >url ] map ;
+    [ { [ name>> "a" = ] [ "href" attribute? ] } 1&& ] filter sift
+    [ "href" attribute >url ] map ;
 
 : find-frame-links ( vector -- vector' )
-    [ name>> "frame" = ] find-between-all
-    [ [ "src" attribute ] map sift ] map concat sift
-    [ >url ] map ;
+    [ { [ name>> "frame" = ] [ "src" attribute? ] } 1&& ] filter sift
+    [ "src" attribute >url ] map ;
+
+: find-script-links ( vector -- vector' )
+    [ { [ name>> "script" = ] [ "src" attribute? ] } 1&& ] filter sift
+    [ "src" attribute >url ] map ;
 
 : find-all-links ( vector -- vector' )
-    [ find-hrefs ] [ find-frame-links ] bi union ;
+    [ find-hrefs ] [ find-frame-links ] [ find-script-links ] tri union union ;
 
 : find-forms ( vector -- vector' )
     "form" over find-opening-tags-by-name
@@ -181,8 +175,7 @@ ERROR: undefined-find-nth m n seq quot ;
     [ "type" attribute "hidden" = ] filter ;
 
 : input. ( tag -- )
-    dup name>> print
-    attributes>>
+    [ name>> print ] [ attributes>> ] bi
     [ bl bl bl bl [ write "=" write ] [ write bl ] bi* nl ] assoc-each ;
 
 : form. ( vector -- )
@@ -198,12 +191,6 @@ ERROR: undefined-find-nth m n seq quot ;
 
 : query>assoc* ( str -- hash )
     "?" split1 nip query>assoc ;
-    
-: html-class? ( tag string -- ? )
-    swap "class" attribute = ;
-    
-: html-id? ( tag string -- ? )
-    swap "id" attribute = ;
 
 : opening-tag? ( tag -- ? )
     closing?>> not ;

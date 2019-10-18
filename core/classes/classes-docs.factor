@@ -1,7 +1,5 @@
-USING: help.markup help.syntax kernel kernel.private
-namespaces sequences words arrays effects math
-classes.private classes.union classes.mixin
-classes.predicate quotations ;
+USING: classes.private help.markup help.syntax kernel quotations
+sequences words ;
 IN: classes
 
 ARTICLE: "class-predicates" "Class predicate words"
@@ -71,10 +69,12 @@ $nl
 
 ABOUT: "classes"
 
+HELP: class
+{ $class-description "The class of all class words." } ;
+
 HELP: class-of
 { $values { "object" object } { "class" class } }
 { $description "Outputs an object's canonical class. While an object may be an instance of more than one class, the canonical class is either its built-in class, or if the object is a tuple, its tuple class." }
-{ $class-description "The class of all class words." }
 { $examples { $example "USING: classes prettyprint ;" "1.0 class-of ." "float" } { $example "USING: classes prettyprint ;" "IN: scratchpad" "TUPLE: point x y z ;\nT{ point f 1 2 3 } class-of ." "point" } } ;
 
 HELP: classes
@@ -85,7 +85,7 @@ HELP: update-map
 { $var-description "Assoc mapping each class to a set of classes defined in terms of this class. The " { $link define-class } " word uses this information to update generic words when classes are redefined." } ;
 
 HELP: predicate-word
-{ $values { "word" "a word" } { "predicate" "a predicate word" } }
+{ $values { "word" word } { "predicate" "a predicate word" } }
 { $description "Suffixes the word's name with \"?\" and creates a word with that name in the same vocabulary as the word itself." } ;
 
 HELP: define-predicate
@@ -151,7 +151,7 @@ HELP: implementors
 HELP: instance?
 { $values
      { "object" object } { "class" class }
-     { "?" "a boolean" } }
+     { "?" boolean } }
 { $description "Tests whether the input object is a member of the class." } ;
 
 HELP: reset-class

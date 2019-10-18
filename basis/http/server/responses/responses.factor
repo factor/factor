@@ -11,7 +11,13 @@ IN: http.server.responses
         utf8 >>content-encoding
         swap >>content-type
         swap >>body ;
-    
+
+: <text-content> ( body -- response )
+    "text/plain" <content> ;
+
+: <html-content> ( body -- response )
+    "text/html" <content> ;
+
 : trivial-response-body ( code message -- )
     <XML
         <html>
@@ -23,7 +29,7 @@ IN: http.server.responses
 
 : <trivial-response> ( code message -- response )
     2dup [ trivial-response-body ] with-string-writer
-    "text/html" <content>
+    <html-content>
         swap >>message
         swap >>code ;
 

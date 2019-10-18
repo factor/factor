@@ -64,6 +64,8 @@ SPECIALIZED-ARRAY: uint-4
 [ 3 ] [ 3 >odd ] unit-test
 [ 5 ] [ 4 >odd ] unit-test
 
+[ t ] [ 0b111 0b110 mask? ] unit-test
+[ f ] [ 0b101 0b110 mask? ] unit-test
 [ t ] [ 0xff 1 mask? ] unit-test
 [ f ] [ 0x0 1 mask? ] unit-test
 
@@ -73,10 +75,8 @@ SPECIALIZED-ARRAY: uint-4
 [ 6 ] [ 5 next-even ] unit-test
 [ 8 ] [ 6 next-even ] unit-test
 
-[ f ] [ 0x1 0 bit-clear? ] unit-test
-[ t ] [ 0x0 1 bit-clear? ] unit-test
-
-[ -1 bit-count ] [ invalid-bit-count-target? ] must-fail-with
+[ -1 bit-count ] [ non-negative-integer-expected? ] must-fail-with
+[ -1 bit-length ] [ non-negative-integer-expected? ] must-fail-with
 
 { 0b1111 } [ 4 on-bits ] unit-test
 { 0 } [ 0 on-bits ] unit-test
@@ -101,10 +101,18 @@ SPECIALIZED-ARRAY: uint-4
 { 0 } [ 0 0 toggle-bit 0 toggle-bit ] unit-test
 { 0 } [ 0 1 toggle-bit 1 toggle-bit ] unit-test
 
-
 { 0 } [ 0b1111 33 33 bit-range ] unit-test
 { 0 } [ 0b1111 33 20 bit-range ] unit-test
 { 0b11 } [ 0b1111 3 2 bit-range ] unit-test
 [ 0b1111 2 3 bit-range ] [ T{ bit-range-error f 0b1111 2 3 } = ] must-fail-with
 [ 0b1111 -2 -4 bit-range ] [ T{ bit-range-error f 0b1111 -2 -4 } = ] must-fail-with
 
+{ 0 } [ 0b0 bit-length ] unit-test
+{ 1 } [ 0b1 bit-length ] unit-test
+{ 1 } [ 0b01 bit-length ] unit-test
+{ 2 } [ 0b10 bit-length ] unit-test
+{ 2 } [ 0b11 bit-length ] unit-test
+{ 3 } [ 0b100 bit-length ] unit-test
+{ 3 } [ 0b101 bit-length ] unit-test
+{ 3 } [ 0b110 bit-length ] unit-test
+{ 3 } [ 0b111 bit-length ] unit-test

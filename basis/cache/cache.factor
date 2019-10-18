@@ -38,9 +38,9 @@ M: cache-assoc dispose* clear-assoc ;
 PRIVATE>
 
 : purge-cache ( cache -- )
-    [ assoc>> ] [ max-age>> ] bi '[
-        [
+    [ assoc>> ] [ max-age>> ] bi V{ } clone [
+        '[
             nip dup age>> 1 + [ >>age ] keep
-            _ < [ drop t ] [ dispose, f ] if
+            _ < [ drop t ] [ _ dispose-to f ] if
         ] assoc-filter! drop
-    ] { } make [ last rethrow ] unless-empty ;
+    ] keep [ last rethrow ] unless-empty ;

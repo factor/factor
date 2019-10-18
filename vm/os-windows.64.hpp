@@ -1,7 +1,6 @@
 #include "atomic-cl-64.hpp"
 
-namespace factor
-{
+namespace factor {
 
 #define ESP Rsp
 #define EIP Rip

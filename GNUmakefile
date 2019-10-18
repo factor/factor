@@ -1,8 +1,5 @@
 ifdef CONFIG
-	CC = gcc
-	CPP = g++
-
-	VERSION = 0.96
+	VERSION = 0.97
 
 	BUNDLE = Factor.app
 	LIBPATH = -L/usr/X11R6/lib
@@ -14,7 +11,7 @@ ifdef CONFIG
 	ifdef DEBUG
 		CFLAGS += -g -DFACTOR_DEBUG
 	else
-		CFLAGS += -O3
+		CFLAGS += -O3 -g
 	endif
 
 	ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
@@ -26,7 +23,6 @@ ifdef CONFIG
 		vm/alien.o \
 		vm/arrays.o \
 		vm/bignum.o \
-		vm/booleans.o \
 		vm/byte_arrays.o \
 		vm/callbacks.o \
 		vm/callstack.o \
@@ -99,13 +95,10 @@ ifdef CONFIG
 		vm/data_heap.hpp \
 		vm/code_heap.hpp \
 		vm/gc.hpp \
-		vm/debug.hpp \
 		vm/strings.hpp \
-		vm/words.hpp \
 		vm/float_bits.hpp \
 		vm/io.hpp \
 		vm/image.hpp \
-		vm/alien.hpp \
 		vm/callbacks.hpp \
 		vm/dispatch.hpp \
 		vm/entry_points.hpp \
@@ -124,7 +117,6 @@ ifdef CONFIG
 		vm/aging_collector.hpp \
 		vm/to_tenured_collector.hpp \
 		vm/code_block_visitor.hpp \
-		vm/compaction.hpp \
 		vm/full_collector.hpp \
 		vm/arrays.hpp \
 		vm/math.hpp \
@@ -215,11 +207,11 @@ $(ENGINE): $(DLL_OBJS)
 factor-lib: $(ENGINE)
 
 factor: $(EXE_OBJS) $(DLL_OBJS)
-	$(TOOLCHAIN_PREFIX)$(CPP) $(LIBPATH) -L. $(DLL_OBJS) \
+	$(TOOLCHAIN_PREFIX)$(CXX) $(LIBPATH) -L. $(DLL_OBJS) \
 		$(CFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
 factor-console: $(EXE_OBJS) $(DLL_OBJS)
-	$(TOOLCHAIN_PREFIX)$(CPP) $(LIBPATH) -L. $(DLL_OBJS) \
+	$(TOOLCHAIN_PREFIX)$(CXX) $(LIBPATH) -L. $(DLL_OBJS) \
 		$(CFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
 factor-ffi-test: $(FFI_TEST_LIBRARY)
@@ -234,16 +226,16 @@ vm/ffi_test.o: vm/ffi_test.c
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -o $@ $<
 
 vm/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS)
-	$(TOOLCHAIN_PREFIX)$(CPP) -c -x c++-header $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -c -x c++-header $(CFLAGS) -o $@ $<
 
 %.o: %.cpp vm/master.hpp.gch
-	$(TOOLCHAIN_PREFIX)$(CPP) -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) -o $@ $<
 
 %.o: %.S
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) -o $@ $<
 
 %.o: %.mm vm/master.hpp.gch
-	$(TOOLCHAIN_PREFIX)$(CPP) -c $(CFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) -o $@ $<
 
 .SUFFIXES: .mm
 

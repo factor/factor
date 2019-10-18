@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays byte-vectors continuations.private
-init kernel kernel.private math namespaces sequences ;
+USING: accessors assocs byte-arrays byte-vectors continuations
+continuations.private init kernel kernel.private math namespaces
+sequences ;
 IN: alien
 
 BUILTIN: alien { underlying c-ptr read-only initial: f } expired ;
@@ -118,7 +119,16 @@ TUPLE: expiry-check object alien ;
 : recompute-value? ( check -- ? )
     dup [ alien>> expired? ] [ drop t ] if ;
 
+: delete-values ( value assoc -- )
+    [ rot drop = not ] with assoc-filter! drop ;
+
 PRIVATE>
+
+: unregister-and-free-callback ( alien -- )
+    [ callbacks get delete-values ] [ free-callback ] bi ;
+
+: with-callback ( alien quot -- )
+    over [ unregister-and-free-callback ] curry [ ] cleanup ; inline
 
 : initialize-alien ( symbol quot -- )
     swap dup get-global dup recompute-value?

@@ -8,7 +8,7 @@ H{
     { deploy-reflection 1 }
     { deploy-ui? t }
     { deploy-math? t }
-    { deploy-io 1 }
+    { deploy-io 3 }
     { deploy-word-props? f }
     { deploy-threads? t }
 }

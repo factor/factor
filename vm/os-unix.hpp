@@ -13,8 +13,7 @@
 
 #include "atomic-gcc.hpp"
 
-namespace factor
-{
+namespace factor {
 
 typedef char vm_char;
 typedef char symbol_char;
@@ -30,24 +29,30 @@ typedef char symbol_char;
 #define FTELL ftello
 #define FSEEK fseeko
 
-#define OPEN_READ(path) fopen(path,"rb")
-#define OPEN_WRITE(path) fopen(path,"wb")
+#define OPEN_READ(path) fopen(path, "rb")
+#define OPEN_WRITE(path) fopen(path, "wb")
+
+#ifdef _GNU_SOURCE
+extern "C" {
+  extern int __xpg_strerror_r (int __errnum, char *__buf, size_t __buflen) __THROW __nonnull ((2));
+}
+#define strerror_r __xpg_strerror_r
+#endif
+
+#define THREADSAFE_STRERROR(errnum, buf, buflen) strerror_r(errnum, buf, buflen)
 
 #define print_native_string(string) print_string(string)
 
 typedef pthread_t THREADHANDLE;
 
-THREADHANDLE start_thread(void *(*start_routine)(void *),void *args);
+THREADHANDLE start_thread(void* (*start_routine)(void*), void* args);
 inline static THREADHANDLE thread_id() { return pthread_self(); }
 
-u64 nano_count();
-void sleep_nanos(u64 nsec);
+uint64_t nano_count();
+void sleep_nanos(uint64_t nsec);
 
-void move_file(const vm_char *path1, const vm_char *path2);
+void move_file(const vm_char* path1, const vm_char* path2);
 
-static inline void breakpoint()
-{
-    __builtin_trap();
-}
+static inline void breakpoint() { __builtin_trap(); }
 
 }

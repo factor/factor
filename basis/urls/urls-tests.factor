@@ -1,5 +1,5 @@
 IN: urls.tests
-USING: urls urls.private tools.test prettyprint
+USING: io.sockets io.sockets.secure urls urls.private tools.test prettyprint
 arrays kernel assocs present accessors ;
 
 CONSTANT: urls
@@ -225,6 +225,13 @@ urls [
     derive-url
 ] unit-test
 
+! Support //foo.com, which has the same protocol as the url we derive from
+[ URL" http://foo.com" ]
+[ URL" http://google.com" URL" //foo.com" derive-url ] unit-test
+
+[ URL" https://foo.com" ]
+[ URL" https://google.com" URL" //foo.com" derive-url ] unit-test
+
 [ "a" ] [
     <url> "a" "b" set-query-param "b" query-param
 ] unit-test
@@ -258,3 +265,13 @@ urls [
 [ "/" ] [ "http://www.jedit.org" >url path>> ] unit-test
 
 [ "USING: urls ;\nURL\" foo\"" ] [ URL" foo" unparse-use ] unit-test
+
+[ T{ inet { host "google.com" } { port 80 } } ]
+[ URL" http://google.com/" url-addr ] unit-test
+
+[
+    T{ secure
+       { addrspec T{ inet { host "google.com" } { port 443 } } }
+    }
+]
+[ URL" https://google.com/" url-addr ] unit-test

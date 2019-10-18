@@ -31,6 +31,8 @@ IN: tools.deploy.macosx
         [ "org.factor." prepend "CFBundleIdentifier" ,, ] bi
 
         [ "Icon.icns" "CFBundleIconFile" ,, ] when
+
+        t "NSHighResolutionCapable" ,,
     ] H{ } make ;
 
 : create-app-plist ( icon? executable bundle-name -- )
@@ -74,7 +76,7 @@ IN: tools.deploy.macosx
     [ % "/Contents/Resources/" % % ".image" % ] "" make ;
 
 : deploy-app-bundle ( vocab -- )
-    "resource:" [
+    deploy-directory get [
         dup deploy-config [
             bundle-name dup exists? [ delete-tree ] [ drop ] if
             [ bundle-name create-app-dir ] keep

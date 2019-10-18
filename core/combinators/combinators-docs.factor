@@ -296,7 +296,7 @@ HELP: spread
 { bi* tri* spread } related-words
 
 HELP: to-fixed-point
-{ $values { "object" object } { "quot" { $quotation "( ... object(n) -- ... object(n+1) )" } } { "object(n)" object } }
+{ $values { "object" object } { "quot" { $quotation ( ... object(n) -- ... object(n+1) ) } } { "object(n)" object } }
 { $description "Applies the quotation repeatedly with " { $snippet "object" } " as the initial input until the output of the quotation equals the input." }
 { $examples
     { $example
@@ -312,7 +312,7 @@ HELP: to-fixed-point
 } ;
 
 HELP: alist>quot
-{ $values { "default" "a quotation" } { "assoc" "a sequence of quotation pairs" } { "quot" "a new quotation" } }
+{ $values { "default" quotation } { "assoc" "a sequence of quotation pairs" } { "quot" "a new quotation" } }
 { $description "Constructs a quotation which calls the first quotation in each pair of " { $snippet "assoc" } " until one of them outputs a true value, and then calls the second quotation in the corresponding pair. Quotations are called in reverse order, and if no quotation outputs a true value then " { $snippet "default" } " is called." }
 { $notes "This word is used to implement compile-time behavior for " { $link cond } ", and it is also used by the generic word system. Note that unlike " { $link cond } ", the constructed quotation performs the tests starting from the end and not the beginning." } ;
 
@@ -373,8 +373,13 @@ HELP: no-case
 { $error-description "Thrown by " { $link case } " if the object at the top of the stack does not match any case, and no default case is given." } ;
 
 HELP: recursive-hashcode
-{ $values { "n" integer } { "obj" object } { "quot" { $quotation "( n obj -- code )" } } { "code" integer } }
+{ $values { "n" integer } { "obj" object } { "quot" { $quotation ( n obj -- code ) } } { "code" integer } }
 { $description "A combinator used to implement methods for the " { $link hashcode* } " generic word. If " { $snippet "n" } " is less than or equal to zero, outputs 0, otherwise calls the quotation." } ;
+
+HELP: deep-spread>quot
+{ $values { "seq" sequence } { "quot" quotation } }
+{ $description "Creates a new quotation from a sequence of quotations that applies each quotation to a stack element in turn." }
+{ $see-also spread } ;
 
 HELP: cond>quot
 { $values { "assoc" "a sequence of pairs of quotations" } { "quot" quotation } }
@@ -395,11 +400,11 @@ $nl
 } } ;
 
 HELP: distribute-buckets
-{ $values { "alist" "an alist" } { "initial" object } { "quot" { $quotation "( obj -- assoc )" } } { "buckets" "a new array" } }
+{ $values { "alist" "an alist" } { "initial" object } { "quot" { $quotation ( obj -- assoc ) } } { "buckets" "a new array" } }
 { $description "Sorts the entries of " { $snippet "assoc" } " into buckets, using the quotation to yield a set of keys for each entry. The hashcode of each key is computed, and the entry is placed in all corresponding buckets. Each bucket is initially cloned from " { $snippet "initial" } "; this should either be an empty vector or a one-element vector containing a pair." }
 { $notes "This word is used in the implementation of " { $link hash-case-quot } " and " { $link standard-combination } "." } ;
 
 HELP: dispatch
 { $values { "n" "a fixnum" } { "array" "an array of quotations" } }
 { $description "Calls the " { $snippet "n" } "th quotation in the array." }
-{ $warning "This word is in the " { $vocab-link "kernel.private" } " vocabulary because it is an implementation detail used by the generic word system to accelerate method dispatch. It does not perform type or bounds checks, and user code should not need to call it directly." } ;
+{ $warning "This word is an implementation detail used by the generic word system to accelerate method dispatch. It does not perform type or bounds checks, and user code should not need to call it directly." } ;

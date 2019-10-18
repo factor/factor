@@ -46,7 +46,7 @@ ERROR: unsupported-rotation degrees ;
 :  normalize-degree ( n -- n' ) 360 rem ;
 
 : processing-effect ( image quot -- image' )
-    '[ image>pixel-rows @ flatten-table ] [ (>>bitmap) ] [ ] tri ; inline
+    '[ image>pixel-rows @ flatten-table ] [ bitmap<< ] [ ] tri ; inline
 
 :: rotate' ( image n -- image )
     n normalize-degree :> n'

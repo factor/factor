@@ -6,7 +6,7 @@ IN: formatting
 HELP: printf
 { $values { "format-string" string } }
 { $description
-    "Writes the arguments (specified on the stack) formatted according to the format string." 
+    "Writes the arguments (specified on the stack) formatted according to the format string."
     $nl
     "Several format specifications exist for handling arguments of different types, and "
     "specifying attributes for the result string, including such things as maximum width, "
@@ -16,14 +16,17 @@ HELP: printf
         { { $snippet "%%" }          "Single %"                   "" }
         { { $snippet "%P.Ds" }       "String format"              "string" }
         { { $snippet "%P.DS" }       "String format uppercase"    "string" }
-        { { $snippet "%c" }          "Character format"           "char" } 
-        { { $snippet "%C" }          "Character format uppercase" "char" } 
-        { { $snippet "%+Pd" }        "Integer format"             "fixnum" }
-        { { $snippet "%+P.De" }      "Scientific notation"        "fixnum, float" }
-        { { $snippet "%+P.DE" }      "Scientific notation"        "fixnum, float" }
-        { { $snippet "%+P.Df" }      "Fixed format"               "fixnum, float" }
-        { { $snippet "%+Px" }        "Hexadecimal"                "hex" }
-        { { $snippet "%+PX" }        "Hexadecimal uppercase"      "hex" }
+        { { $snippet "%P.Du" }       "Unparsed format"            "object" }
+        { { $snippet "%c" }          "Character format"           "char" }
+        { { $snippet "%C" }          "Character format uppercase" "char" }
+        { { $snippet "%+Pd" }        "Integer format (base 10)"   "integer" }
+        { { $snippet "%+Po" }        "Octal format (base 8)"      "integer" }
+        { { $snippet "%+Pb" }        "Binary format (base 2)"     "integer" }
+        { { $snippet "%+P.De" }      "Scientific notation"        "integer, float" }
+        { { $snippet "%+P.DE" }      "Scientific notation"        "integer, float" }
+        { { $snippet "%+P.Df" }      "Fixed format"               "integer, float" }
+        { { $snippet "%+Px" }        "Hexadecimal (base 16)"      "integer" }
+        { { $snippet "%+PX" }        "Hexadecimal (base 16) uppercase" "integer" }
         { { $snippet "%[%?, %]" }    "Sequence format"            "sequence" }
         { { $snippet "%[%?: %? %]" } "Assocs format"              "assocs" }
     }
@@ -63,6 +66,10 @@ HELP: printf
         "00FF" }
     { $example
         "USING: formatting ;"
+        "12 \"%b\" printf"
+        "1100" }
+    { $example
+        "USING: formatting ;"
         "1.23456789 \"%.3f\" printf"
         "1.235" }
     { $example
@@ -81,11 +88,15 @@ HELP: printf
         "USING: formatting ;"
         "H{ { 1 2 } { 3 4 } } \"%[%d: %d %]\" printf"
         "{ 1:2, 3:4 }" }
+    { $example
+      "USING: calendar formatting ;"
+      "3 years \"%u\" printf"
+      "T{ duration { year 3 } }" }
 } ;
 
 HELP: sprintf
 { $values { "format-string" string } { "result" string } }
-{ $description "Returns the arguments (specified on the stack) formatted according to the format string as a result string." } 
+{ $description "Returns the arguments (specified on the stack) formatted according to the format string as a result string." }
 { $see-also printf } ;
 
 HELP: strftime
@@ -136,5 +147,3 @@ ARTICLE: "formatting" "Formatted printing"
 } ;
 
 ABOUT: "formatting"
-
-

@@ -40,4 +40,4 @@ IN: syndication.tests
         }
     }
 } ] [ "vocab:syndication/test/atom.xml" load-news-file ] unit-test
-[ ] [ "vocab:syndication/test/atom.xml" load-news-file feed>xml xml>string drop ] unit-test
+[ t ] [ "vocab:syndication/test/atom.xml" load-news-file dup feed>xml xml>feed = ] unit-test

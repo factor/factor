@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar calendar.format.macros
 combinators io io.streams.string kernel math math.functions
-math.order math.parser present sequences typed ;
+math.order math.parser math.parser.private present sequences
+typed ;
 IN: calendar.format
 
 : pad-00 ( n -- str ) number>string 2 CHAR: 0 pad-head ;
@@ -132,10 +133,15 @@ M: timestamp year. ( timestamp -- )
         { +lt+ [ "-" write before (write-rfc3339-gmt-offset) ] }
         { +gt+ [ "+" write (write-rfc3339-gmt-offset) ] }
     } case ;
-    
+
+! Should be enough for anyone, allows to not do a fancy
+! algorithm to detect infinite decimals (e.g 1/3)
+: ss.SSSSSS ( timestamp -- )
+    second>> >float "%.6f" format-float 9 CHAR: 0 pad-head write ;
+
 : (timestamp>rfc3339) ( timestamp -- )
     {
-        YYYY "-" MM "-" DD "T" hh ":" mm ":" ss
+        YYYY "-" MM "-" DD "T" hh ":" mm ":" ss.SSSSSS
         [ gmt-offset>> write-rfc3339-gmt-offset ]
     } formatted ;
 
@@ -146,13 +152,17 @@ M: timestamp year. ( timestamp -- )
     { { CHAR: + [ 1 ] } { CHAR: - [ -1 ] } } case time* ;
 
 : read-rfc3339-gmt-offset ( ch -- dt )
-    dup CHAR: Z = [ drop instant ] [
+    {
+        { f [ instant ] }
+        { CHAR: Z [ instant ] }
         [
-            read-00 hours
-            read1 { { CHAR: : [ read-00 ] } { f [ 0 ] } } case minutes
-            time+
-        ] dip signed-gmt-offset
-    ] if ;
+            [
+                read-00 hours
+                read1 { { CHAR: : [ read-00 ] } { f [ 0 ] } } case minutes
+                time+
+            ] dip signed-gmt-offset
+        ]
+    } case ;
 
 : read-ymd ( -- y m d )
     read-0000 "-" expect read-00 "-" expect read-00 ;
@@ -167,7 +177,7 @@ M: timestamp year. ( timestamp -- )
 
 : (rfc3339>timestamp) ( -- timestamp )
     read-ymd
-    "Tt" expect
+    "Tt \t" expect
     read-hms
     read1 { { CHAR: . [ read-rfc3339-seconds ] } [ ] } case
     read-rfc3339-gmt-offset
@@ -191,7 +201,7 @@ ERROR: invalid-timestamp-format ;
 
 : parse-rfc822-gmt-offset ( string -- dt )
     dup "GMT" = [ drop instant ] [
-        unclip [ 
+        unclip [
             2 cut [ string>number ] bi@ [ hours ] [ minutes ] bi* time+
         ] dip signed-gmt-offset
     ] if ;

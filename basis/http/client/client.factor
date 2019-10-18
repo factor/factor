@@ -1,14 +1,12 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators.short-circuit kernel math math.parser
-namespaces make sequences strings splitting calendar
-continuations accessors vectors math.order hashtables
-byte-arrays destructors io io.sockets io.streams.string io.files
-io.timeouts io.pathnames io.encodings io.encodings.string
-io.encodings.ascii io.encodings.utf8 io.encodings.binary
-io.encodings.iana io.crlf io.streams.duplex fry ascii urls
-urls.encoding present locals http http.parsers
-http.client.post-data mime.types ;
+USING: accessors ascii assocs calendar combinators.short-circuit
+destructors fry hashtables http http.client.post-data
+http.parsers io io.crlf io.encodings io.encodings.ascii
+io.encodings.binary io.encodings.iana io.encodings.string
+io.files io.pathnames io.sockets io.timeouts kernel locals math
+math.order math.parser mime.types namespaces present sequences
+splitting urls vocabs.loader ;
 IN: http.client
 
 ERROR: too-many-redirects ;
@@ -140,10 +138,16 @@ SYMBOL: redirects
         [ do-redirect ] [ nip ] if
     ] with-variable ; inline recursive
 
+: request-url ( url -- url' )
+    dup >url dup protocol>> [ nip ] [
+        drop dup url? [ present ] when
+        "http://" prepend >url
+    ] if ensure-port ;
+
 : <client-request> ( url method -- request )
     <request>
         swap >>method
-        swap >url ensure-port >>url ; inline
+        swap request-url >>url ; inline
 
 PRIVATE>
 
@@ -154,15 +158,18 @@ ERROR: download-failed response ;
 : check-response ( response -- response )
     dup code>> success? [ download-failed ] unless ;
 
-: check-response-with-body ( response body -- response body )
-    [ >>body check-response ] keep ;
-
-: with-http-request ( request quot -- response )
+: with-http-request* ( request quot: ( chunk -- ) -- response )
     [ (with-http-request) ] with-destructors ; inline
 
+: with-http-request ( request quot: ( chunk -- ) -- response )
+    with-http-request* check-response ; inline
+
+: http-request* ( request -- response data )
+    BV{ } clone [ '[ _ push-all ] with-http-request* ] keep
+    B{ } like over content-encoding>> decode [ >>body ] keep ;
+
 : http-request ( request -- response data )
-    [ [ % ] with-http-request ] B{ } make
-    over content-encoding>> decode check-response-with-body ;
+    http-request* [ check-response ] dip ;
 
 : <get-request> ( url -- request )
     "GET" <client-request> ;
@@ -170,14 +177,19 @@ ERROR: download-failed response ;
 : http-get ( url -- response data )
     <get-request> http-request ;
 
-: with-http-get ( url quot -- response )
-    [ <get-request> ] dip with-http-request ; inline
+: http-get* ( url -- response data )
+    <get-request> http-request* ;
 
 : download-name ( url -- name )
     present file-name "?" split1 drop "/" ?tail drop ;
 
 : download-to ( url file -- )
-    binary [ [ write ] with-http-get check-response drop ] with-file-writer ;
+    binary [
+        <get-request> [ write ] with-http-request drop
+    ] with-file-writer ;
+
+: ?download-to ( url file -- )
+    dup exists? [ 2drop ] [ download-to ] if ;
 
 : download ( url -- )
     dup download-name download-to ;
@@ -189,6 +201,9 @@ ERROR: download-failed response ;
 : http-post ( post-data url -- response data )
     <post-request> http-request ;
 
+: http-post* ( post-data url -- response data )
+    <post-request> http-request* ;
+
 : <put-request> ( post-data url -- request )
     "PUT" <client-request>
         swap >>post-data ;
@@ -196,11 +211,17 @@ ERROR: download-failed response ;
 : http-put ( post-data url -- response data )
     <put-request> http-request ;
 
+: http-put* ( post-data url -- response data )
+    <put-request> http-request* ;
+
 : <delete-request> ( url -- request )
     "DELETE" <client-request> ;
 
 : http-delete ( url -- response data )
     <delete-request> http-request ;
+
+: http-delete* ( url -- response data )
+    <delete-request> http-request* ;
 
 : <head-request> ( url -- request )
     "HEAD" <client-request> ;
@@ -208,11 +229,17 @@ ERROR: download-failed response ;
 : http-head ( url -- response data )
     <head-request> http-request ;
 
+: http-head* ( url -- response data )
+    <head-request> http-request* ;
+
 : <options-request> ( url -- request )
     "OPTIONS" <client-request> ;
 
 : http-options ( url -- response data )
     <options-request> http-request ;
+
+: http-options* ( url -- response data )
+    <options-request> http-request* ;
 
 : <trace-request> ( url -- request )
     "TRACE" <client-request> ;
@@ -220,6 +247,7 @@ ERROR: download-failed response ;
 : http-trace ( url -- response data )
     <trace-request> http-request ;
 
-USE: vocabs.loader
+: http-trace* ( url -- response data )
+    <trace-request> http-request* ;
 
 { "http.client" "debugger" } "http.client.debugger" require-when

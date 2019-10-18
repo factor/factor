@@ -74,7 +74,11 @@ IN: math.extras.test
 { 17/160 } [ { 80 60 10 20 30 } normalized-herfindahl ] unit-test
 
 { { 0 5 1 2 2 } } [
-    { -10 10 2 2.5 3 } [ { 1 2 3 4 5 } search-sorted ] map
+    { -10 10 2 2.5 3 } { 1 2 3 4 5 } digitize]
+] unit-test
+
+{ { 0 5 2 2 3 } } [
+    { -10 10 2 2.5 3 } { 1 2 3 4 5 } digitize)
 ] unit-test
 
 {
@@ -129,3 +133,18 @@ IN: math.extras.test
 { 5 } [ 3 5 round-to-step ] unit-test
 { 10 } [ 12 5 round-to-step ] unit-test
 { 15 } [ 13 5 round-to-step ] unit-test
+
+{ 0 } [ 0 round-away-from-zero ] unit-test
+{ -1.0 } [ -0.1 round-away-from-zero ] unit-test
+{ 1.0 } [ 0.1 round-away-from-zero ] unit-test
+{ -2.0 } [ -1.9 round-away-from-zero ] unit-test
+{ 2.0 } [ 1.9 round-away-from-zero ] unit-test
+
+{ { 0 1 2 3 0 0 1 } } [ { 1 2 3 3 2 1 2 } [ <= ] monotonic-count ] unit-test
+{ 4 } [ { 1 2 3 1 2 3 4 5 } [ < ] max-monotonic-count ] unit-test
+
+{ 2470 } [ 20 iota sum-squares ] unit-test
+{ 2470 } [ 20 iota >array sum-squares ] unit-test
+
+{ 36100 } [ 20 iota sum-cubes ] unit-test
+{ 36100 } [ 20 iota >array sum-cubes ] unit-test

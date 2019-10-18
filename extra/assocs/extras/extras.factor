@@ -5,6 +5,9 @@ USING: arrays assocs assocs.private kernel math sequences ;
 
 IN: assocs.extras
 
+: assoc-sift ( assoc -- assoc' )
+    [ nip ] assoc-filter ; inline
+
 : assoc-harvest ( assoc -- assoc' )
     [ nip empty? not ] assoc-filter ; inline
 
@@ -49,3 +52,8 @@ IN: assocs.extras
 
 : assoc-merge ( seq -- merge )
     H{ } clone [ (assoc-merge) ] reduce ;
+
+GENERIC: delete-value-at ( value assoc -- )
+
+M: assoc delete-value-at
+    [ value-at* ] keep swap [ delete-at ] [ 2drop ] if ;

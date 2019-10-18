@@ -1,7 +1,8 @@
-USING: generic help.syntax help.markup kernel math parser words
-effects classes classes.tuple generic.math generic.single arrays
-io.pathnames vocabs.loader io sequences assocs words.symbol
-words.alias words.constant combinators vocabs.parser command-line ;
+USING: arrays assocs classes.tuple combinators command-line
+effects generic generic.math generic.single help.markup
+help.syntax io.pathnames kernel math parser sequences
+vocabs.loader vocabs.parser words words.alias words.constant
+words.symbol ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
@@ -157,9 +158,13 @@ ARTICLE: "escape" "Character escape codes"
     { { $snippet "\\t" } "a tab" }
     { { $snippet "\\n" } "a newline" }
     { { $snippet "\\r" } "a carriage return" }
+    { { $snippet "\\b" } "a backspace (ASCII 8)" }
+    { { $snippet "\\v" } "a vertical tab (ASCII 11)" }
+    { { $snippet "\\f" } "a form feed (ASCII 12)" }
     { { $snippet "\\0" } "a null byte (ASCII 0)" }
     { { $snippet "\\e" } "escape (ASCII 27)" }
     { { $snippet "\\\"" } { $snippet "\"" } }
+    { { $snippet "\\x" { $emphasis "xx" } } { "The Unicode code point with hexadecimal number " { $snippet { $emphasis "xx" } } } }
     { { $snippet "\\u" { $emphasis "xxxxxx" } } { "The Unicode code point with hexadecimal number " { $snippet { $emphasis "xxxxxx" } } } }
     { { $snippet "\\u{" { $emphasis "name" } "}" } { "The Unicode code point named " { $snippet { $emphasis "name" } } } }
 } ;
@@ -360,7 +365,7 @@ HELP: B{
 
 HELP: H{
 { $syntax "H{ { key value }... }" }
-{ $values { "key" "an object" } { "value" "an object" } }
+{ $values { "key" object } { "value" object } }
 { $description "Marks the beginning of a literal hashtable, given as a list of two-element arrays holding key/value pairs. Literal hashtables are terminated by " { $link POSTPONE: } } "." }
 { $examples { $code "H{ { \"tuna\" \"fish\" } { \"jalapeno\" \"vegetable\" } }" } } ;
 
@@ -405,12 +410,12 @@ $nl
 
 HELP: W{
 { $syntax "W{ object }" }
-{ $values { "object" "an object" } }
+{ $values { "object" object } }
 { $description "Marks the beginning of a literal wrapper. Literal wrappers are terminated by " { $link POSTPONE: } } "." }  ;
 
 HELP: POSTPONE:
 { $syntax "POSTPONE: word" }
-{ $values { "word" "a word" } }
+{ $values { "word" word } }
 { $description "Reads the next word from the input string and appends the word to the parse tree, even if it is a parsing word." }
 { $examples "For an ordinary word " { $snippet "foo" } ", " { $snippet "foo" } " and " { $snippet "POSTPONE: foo" } " are equivalent; however, if " { $snippet "foo" } " is a parsing word, the former will execute it at parse time, while the latter will execute it at runtime." }
 { $notes "This word is used inside parsing words to delegate further action to another parsing word, and to refer to parsing words literally from literal arrays and such." } ;
@@ -487,7 +492,7 @@ HELP: CONSTANT:
 
 HELP: \
 { $syntax "\\ word" }
-{ $values { "word" "a word" } }
+{ $values { "word" word } }
 { $description "Reads the next word from the input and appends a wrapper holding the word to the parse tree. When the evaluator encounters a wrapper, it pushes the wrapped word literally on the data stack." }
 { $examples "The following two lines are equivalent:" { $code "0 \\ <vector> execute\n0 <vector>" } "If " { $snippet "foo" } " is a symbol, the following two lines are equivalent:" { $code "foo" "\\ foo" } } ;
 
@@ -500,7 +505,7 @@ HELP: DEFER:
 
 HELP: FORGET:
 { $syntax "FORGET: word" }
-{ $values { "word" "a word" } }
+{ $values { "word" word } }
 { $description "Removes the word from its vocabulary, or does nothing if no such word exists. Existing definitions that reference forgotten words will continue to work, but new occurrences of the word will not parse." } ;
 
 HELP: USE:

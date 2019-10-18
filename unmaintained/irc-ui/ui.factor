@@ -235,7 +235,7 @@ M: irc-tab pref-dim*
     <irc-client>
     { [ [ <irc-server-chat> ] dip attach-chat ]
       [ chats>> +server-chat+ swap at <irc-server-tab> dup
-        "Server" associate ui-window new-tabbed [ swap (>>window) ] keep ]
+        "Server" associate ui-window new-tabbed [ swap window<< ] keep ]
       [ >>client ]
       [ connect-irc ] } cleave ;
 

@@ -1,5 +1,4 @@
-USING: help.markup help.syntax io strings arrays io.backend
-io.files.private quotations sequences ;
+USING: help.markup help.syntax io kernel quotations sequences ;
 IN: io.files
 
 ARTICLE: "io.files.examples" "Examples of reading and writing files"
@@ -57,17 +56,17 @@ HELP: <file-appender>
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: with-file-reader
-{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" "a quotation" } }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" quotation } }
 { $description "Opens a file for reading and calls the quotation using " { $link with-input-stream } "." }
 { $errors "Throws an error if the file is unreadable." } ;
 
 HELP: with-file-writer
-{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" "a quotation" } }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" quotation } }
 { $description "Opens a file for writing using the given encoding and calls the quotation using " { $link with-output-stream } "." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: with-file-appender
-{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" "a quotation" } }
+{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" quotation } }
 { $description "Opens a file for appending using the given encoding and calls the quotation using " { $link with-output-stream } "." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
@@ -79,6 +78,13 @@ HELP: set-file-lines
 HELP: file-lines
 { $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "seq" "an array of strings" } }
 { $description "Opens the file at the given path using the given encoding, and returns a list of the lines in that file." }
+{ $examples
+  { $example
+    "USING: io.files io.encodings.utf8 prettyprint sequences ;"
+    "\"resource:core/kernel/kernel.factor\" utf8 file-lines first ."
+    "\"! Copyright (C) 2004, 2009 Slava Pestov.\""
+  }
+}
 { $errors "Throws an error if the file cannot be opened for reading." } ;
 
 HELP: set-file-contents
@@ -94,5 +100,5 @@ HELP: file-contents
 { set-file-lines file-lines set-file-contents file-contents } related-words
 
 HELP: exists?
-{ $values { "path" "a pathname string" } { "?" "a boolean" } }
+{ $values { "path" "a pathname string" } { "?" boolean } }
 { $description "Tests if the file named by " { $snippet "path" } " exists." } ;

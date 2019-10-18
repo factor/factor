@@ -119,13 +119,17 @@ set-specializer
 
 \ member? { { array } { string } } set-specializer
 
-\ member-eq? { array } set-specializer
+\ member-eq? { { array } { string } } set-specializer
 
 \ assoc-stack { vector } set-specializer
 
 { >le >be } [
     { { fixnum fixnum } { bignum fixnum } }
     set-specializer
+] each
+
+{ le> be> } [
+    { byte-array } set-specializer
 ] each
 
 \ base> { string fixnum } set-specializer

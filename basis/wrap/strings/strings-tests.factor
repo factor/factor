@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg, Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: wrap.strings tools.test ;
+USING: kernel tools.test wrap.strings ;
 IN: wrap.strings.tests
 
 [
@@ -14,7 +14,7 @@ word wrap."""
     """This is a long piece of text that we wish to word wrap.""" 10
     wrap-string
 ] unit-test
-    
+
 [
     """  This is a
   long piece
@@ -25,6 +25,11 @@ word wrap."""
 ] [
     """This is a long piece of text that we wish to word wrap.""" 12
     "  " wrap-indented-string
+] unit-test
+
+{ t } [
+    """This is a long piece of text that we wish to word wrap.""" 12
+    [ "  " wrap-indented-string ] [ 2 wrap-indented-string ] 2bi =
 ] unit-test
 
 [ "this text\nhas lots of\nspaces" ]
@@ -42,3 +47,5 @@ word wrap."""
 
 [ "" ] [ "" 10 wrap-string ] unit-test
 [ "Hello" ] [ "\nHello\n" 10 wrap-string ] unit-test
+
+{ " > > > " } [ "" 70 " > > > " wrap-indented-string ] unit-test

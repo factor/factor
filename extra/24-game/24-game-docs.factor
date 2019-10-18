@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math kernel arrays ;
+USING: arrays help.markup help.syntax kernel math ;
 IN: 24-game
 
 HELP: 24-game
@@ -48,7 +48,7 @@ HELP: makes-24?
     { "b" integer }
     { "c" integer }
     { "d" integer }
-    { "?" "a boolean" }
+    { "?" boolean }
 }
 { $description
     "Tells if it is possible to win 24-game with these integers."

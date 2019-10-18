@@ -66,45 +66,45 @@ M: picky-depth-buffered-world check-world-pixel-format
 ;
 
 HELP: double-buffered
-{ $class-description "Requests a double-buffered pixel format." } ;
+{ $description "Requests a double-buffered pixel format." } ;
 HELP: stereo
-{ $class-description "Requests a stereoscopic pixel format." } ;
+{ $description "Requests a stereoscopic pixel format." } ;
 
 HELP: offscreen
-{ $class-description "Requests a pixel format suitable for offscreen rendering." } ;
+{ $description "Requests a pixel format suitable for offscreen rendering." } ;
 HELP: fullscreen
-{ $class-description "Requests a pixel format suitable for fullscreen rendering." }
+{ $description "Requests a pixel format suitable for fullscreen rendering." }
 { $notes "On some window systems this is not distinct from " { $link windowed } "." } ;
 HELP: windowed
-{ $class-description "Requests a pixel format suitable for rendering to a window." } ;
+{ $description "Requests a pixel format suitable for rendering to a window." } ;
 
 { offscreen fullscreen windowed } related-words
 
 HELP: accelerated
-{ $class-description "Requests a pixel format supported by GPU hardware acceleration." } ;
+{ $description "Requests a pixel format supported by GPU hardware acceleration." } ;
 HELP: software-rendered
-{ $class-description "Requests a pixel format only supported by the window system's default software renderer." } ;
+{ $description "Requests a pixel format only supported by the window system's default software renderer." } ;
 
 { accelerated software-rendered } related-words
 
 HELP: backing-store
-{ $class-description "Used with " { $link double-buffered } " to request a double-buffered pixel format where the back buffer contents are preserved and copied to the front when buffers are swapped." } ;
+{ $description "Used with " { $link double-buffered } " to request a double-buffered pixel format where the back buffer contents are preserved and copied to the front when buffers are swapped." } ;
 
 { double-buffered backing-store } related-words
 
 HELP: multisampled
-{ $class-description "Requests a pixel format with multisampled antialiasing enabled. The " { $link sample-buffers } " and " { $link samples } " attributes must also be provided to specify the level of multisampling." }
+{ $description "Requests a pixel format with multisampled antialiasing enabled. The " { $link sample-buffers } " and " { $link samples } " attributes must also be provided to specify the level of multisampling." }
 { $notes "On some window systems this is not distinct from " { $link supersampled } "." } ;
 
 HELP: supersampled
-{ $class-description "Requests a pixel format with supersampled antialiasing enabled. The " { $link sample-buffers } " and " { $link samples } " attributes must also be provided to specify the level of supersampling." }
+{ $description "Requests a pixel format with supersampled antialiasing enabled. The " { $link sample-buffers } " and " { $link samples } " attributes must also be provided to specify the level of supersampling." }
 { $notes "On some window systems this is not distinct from " { $link multisampled } "." } ;
 
 HELP: sample-alpha
-{ $class-description "Used with " { $link multisampled } " or " { $link supersampled } " to request more accurate multisampling of alpha values." } ;
+{ $description "Used with " { $link multisampled } " or " { $link supersampled } " to request more accurate multisampling of alpha values." } ;
 
 HELP: color-float
-{ $class-description "Requests a pixel format where the color buffer is stored in floating-point format." } ;
+{ $description "Requests a pixel format where the color buffer is stored in floating-point format." } ;
 
 HELP: color-bits
 { $class-description "Requests a pixel format with a color buffer of at least " { $snippet "value" } " bits per pixel." } ;

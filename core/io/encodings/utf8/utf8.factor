@@ -1,15 +1,14 @@
 ! Copyright (C) 2006, 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays math math.order kernel sequences
-sbufs vectors growable io continuations namespaces io.encodings
-combinators strings ;
+USING: accessors combinators io io.encodings
+io.encodings.private kernel math math.order sequences ;
 IN: io.encodings.utf8
 
 ! Decoding UTF-8
 
 SINGLETON: utf8
 
-<PRIVATE 
+<PRIVATE
 
 : starts-2? ( char -- ? )
     dup [ -6 shift 0b10 number= ] when ; inline
@@ -89,7 +88,7 @@ M: utf8 encode-string
     drop
     over aux>>
     [ [ char>utf8 ] curry each ]
-    [ [ >byte-array ] dip stream-write ] if ;
+    [ [ string>byte-array-fast ] dip stream-write ] if ;
 
 PRIVATE>
 

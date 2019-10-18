@@ -302,7 +302,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ (word) { object object object } { word } define-primitive \ (word) make-flushable
 \ <array> { integer object } { array } define-primitive \ <array> make-flushable
 \ <byte-array> { integer } { byte-array } define-primitive \ <byte-array> make-flushable
-\ <callback> { integer word } { alien } define-primitive
+\ <callback> { word integer } { alien } define-primitive
 \ <displaced-alien> { integer c-ptr } { c-ptr } define-primitive \ <displaced-alien> make-flushable
 \ <string> { integer integer } { string } define-primitive \ <string> make-flushable
 \ <tuple> { array } { tuple } define-primitive \ <tuple> make-flushable
@@ -344,6 +344,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ bignum> { bignum bignum } { object } define-primitive \ bignum> make-foldable
 \ bignum>= { bignum bignum } { object } define-primitive \ bignum>= make-foldable
 \ bignum>fixnum { bignum } { fixnum } define-primitive \ bignum>fixnum make-foldable
+\ bignum>fixnum-strict { bignum } { fixnum } define-primitive \ bignum>fixnum-strict make-foldable
 \ bits>double { integer } { float } define-primitive \ bits>double make-foldable
 \ bits>float { integer } { float } define-primitive \ bits>float make-foldable
 \ both-fixnums? { object object } { object } define-primitive
@@ -358,6 +359,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ context-object { fixnum } { object } define-primitive \ context-object make-flushable
 \ context-object-for { fixnum c-ptr } { object } define-primitive \ context-object-for make-flushable
 \ current-callback { } { fixnum } define-primitive \ current-callback make-flushable
+\ (callback-room) { } { byte-array } define-primitive \ (callback-room) make-flushable
 \ (data-room) { } { byte-array } define-primitive \ (data-room) make-flushable
 \ datastack { } { array } define-primitive \ datastack make-flushable
 \ datastack-for { c-ptr } { array } define-primitive \ datastack-for make-flushable
@@ -416,6 +418,7 @@ M: object infer-call* \ call bad-macro-input ;
 \ fpu-state { } { } define-primitive
 \ fputc { object alien } { } define-primitive
 \ fread-unsafe { integer c-ptr alien } { integer } define-primitive
+\ free-callback { alien } { } define-primitive
 \ fseek { integer integer alien } { } define-primitive
 \ ftell { alien } { integer } define-primitive
 \ fwrite { c-ptr integer alien } { } define-primitive

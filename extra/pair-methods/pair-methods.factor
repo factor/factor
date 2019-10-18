@@ -43,7 +43,7 @@ SYNTAX: PAIR-GENERIC: (PAIR-GENERIC:) ;
 
 : define-pair-method ( a b pair-generic definition -- )
     [ 2array ] 2dip swap
-    [ "pair-generic-methods" word-prop [ swap ] dip set-at ] 
+    [ "pair-generic-methods" word-prop swapd set-at ]
     [ make-pair-generic ] bi ;
 
 : ?prefix-swap ( quot ? -- quot' )

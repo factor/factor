@@ -1,11 +1,9 @@
-USING: help.markup help.syntax kernel kernel.private
-sequences words namespaces.private quotations vectors
-math.parser math words.symbol assocs ;
+USING: assocs help.markup help.syntax kernel math
+namespaces.private quotations words words.symbol ;
 IN: namespaces
 
 ARTICLE: "namespaces-combinators" "Namespace combinators"
 { $subsections
-    make-assoc
     with-scope
     with-variable
     with-variables
@@ -86,12 +84,12 @@ HELP: on
 { $side-effects "variable" } ;
 
 HELP: change
-{ $values { "variable" "a variable, by convention a symbol" } { "quot" { $quotation "( old -- new )" } } }
+{ $values { "variable" "a variable, by convention a symbol" } { "quot" { $quotation ( old -- new ) } } }
 { $description "Applies the quotation to the old value of the variable, and assigns the resulting value to the variable." }
 { $side-effects "variable" } ;
 
 HELP: change-global
-{ $values { "variable" "a variable, by convention a symbol" } { "quot" { $quotation "( old -- new )" } } }
+{ $values { "variable" "a variable, by convention a symbol" } { "quot" { $quotation ( old -- new ) } } }
 { $description "Applies the quotation to the old value of the global variable, and assigns the resulting value to the global variable." }
 { $side-effects "variable" } ;
 
@@ -108,7 +106,7 @@ HELP: with-global
 { $description "Runs the quotation in the global namespace." } ;
 
 HELP: +@
-{ $values { "n" "a number" } { "variable" "a variable, by convention a symbol" } }
+{ $values { "n" number } { "variable" "a variable, by convention a symbol" } }
 { $description "Adds " { $snippet "n" } " to the value of the variable. A variable value of " { $link f } " is interpreted as being zero." }
 { $side-effects "variable" }
 { $examples
@@ -145,10 +143,6 @@ HELP: with-variable
     { $code "[ 3 x set foo ] with-scope" }
     { $code "3 x [ foo ] with-variable" }
 } ;
-
-HELP: make-assoc
-{ $values { "quot" quotation } { "exemplar" assoc } { "hash" "a new assoc" } }
-{ $description "Calls the quotation in a new namespace of the same type as " { $snippet "exemplar" } ", and outputs this namespace when the quotation returns. Useful for quickly building assocs." } ;
 
 HELP: with-variables
 { $values { "ns" assoc } { "quot" quotation } }

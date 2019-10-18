@@ -1,5 +1,5 @@
-USING: io.sockets io.sockets.private sequences math tools.test
-namespaces accessors kernel destructors calendar io.timeouts
+USING: continuations io.sockets io.sockets.private sequences math
+tools.test namespaces accessors kernel destructors calendar io.timeouts
 io.encodings.utf8 io concurrency.promises threads
 io.streams.string present system ;
 IN: io.sockets.tests
@@ -169,3 +169,8 @@ os unix? [
 ! Binding to all interfaces should work
 [ ] [ f 0 <inet4> <datagram> dispose ] unit-test
 [ ] [ f 0 <inet6> <datagram> dispose ] unit-test
+
+[ 80 ] [ "http" protocol-port ] unit-test
+[ f ] [ f protocol-port ] unit-test
+
+[ "you-cant-resolve-me!" resolve-host ] [ addrinfo-error? ] must-fail-with

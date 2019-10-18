@@ -45,11 +45,11 @@ PRIVATE>
     [ snip-slice ] (split1) ;
 
 : split-subseq ( seq subseq -- seqs )
-    dup empty? [
-        drop 1array
+    [
+        1array
     ] [
         [ dup ] swap [ split1-slice swap ] curry produce nip
-    ] if ;
+    ] if-empty ;
 
 : replace ( seq old new -- new-seq )
     pick [ [ split-subseq ] dip ] dip join-as ;
@@ -77,8 +77,8 @@ PRIVATE>
 
 <PRIVATE
 
-: (split) ( n seq quot: ( ... elt -- ... ? ) slice-quot -- pieces )
-    pick [
+: (split) ( seq quot: ( ... elt -- ... ? ) slice-quot -- pieces )
+    [ 0 ] 3dip pick [
         swap curry [ keep 1 + swap ] curry [
             [ find-from drop dup ] 2curry [ keep -rot ] curry
         ] dip produce nip
@@ -89,10 +89,10 @@ PRIVATE>
 PRIVATE>
 
 : split-when ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
-    [ 0 ] 2dip [ subseq ] (split) ; inline
+    [ subseq ] (split) ; inline
 
 : split-when-slice ( ... seq quot: ( ... elt -- ... ? ) -- ... pieces )
-    [ 0 ] 2dip [ <slice> ] (split) ; inline
+    [ <slice> ] (split) ; inline
 
 : split ( seq separators -- pieces )
     [ member? ] curry split-when ; inline
@@ -107,12 +107,10 @@ M: string string-lines
         "\n" split
         [
             but-last-slice [
-                dup ?last CHAR: \r = [ but-last ] when
-                [ CHAR: \r = ] split-when
+                "\r" ?tail drop "\r" split
             ] map! drop
         ] [
-            [ length 1 - ] keep
-            [ [ CHAR: \r = ] split-when ] change-nth
+            [ length 1 - ] keep [ "\r" split ] change-nth
         ]
         [ concat ]
         tri

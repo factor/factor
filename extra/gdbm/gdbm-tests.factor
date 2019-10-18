@@ -12,53 +12,49 @@ IN: gdbm.tests
 
 : with-test.db ( quot -- ) test.db swap with-gdbm ; inline
 
-os windows? cpu x86.64? and [
-    CLEANUP
+CLEANUP
 
+[
+    test.db reader >>role [ ] with-gdbm
+] [ gdbm-file-open-error = ] must-fail-with
 
+[ f ] [ [ "foo" exists? ] with-test.db ] unit-test
+
+[ ] [ [ "foo" 41 insert ] with-test.db ] unit-test
+
+[
+    db-path [ "foo" 42 insert ] with-gdbm-writer
+] [ gdbm-cannot-replace = ] must-fail-with
+
+[ ]
+[
     [
-        test.db reader >>role [ ] with-gdbm
-    ] [ gdbm-file-open-error = ] must-fail-with
+        "foo" 42 replace
+        "bar" 43 replace
+        "baz" 44 replace
+    ] with-test.db
+] unit-test
 
-    [ f ] [ [ "foo" exists? ] with-test.db ] unit-test
+[ 42 t ] [ db-path [ "foo" fetch* ] with-gdbm-reader ] unit-test
 
-    [ ] [ [ "foo" 41 insert ] with-test.db ] unit-test
+[ f f ] [ [ "unknown" fetch* ] with-test.db ] unit-test
 
+[
     [
-        db-path [ "foo" 42 insert ] with-gdbm-writer
-    ] [ gdbm-cannot-replace = ] must-fail-with
+        300 set-cache-size 300 set-cache-size
+    ] with-test.db
+] [ gdbm-option-already-set = ] must-fail-with
 
-    [ ]
-    [
-        [
-            "foo" 42 replace
-            "bar" 43 replace
-            "baz" 44 replace
-        ] with-test.db
-    ] unit-test
+[ t ]
+[
+    V{ } [ [ 2array append ] each-record ] with-test.db
+    V{ "foo" "bar" "baz" 42 43 44 } set=
 
-    [ 42 t ] [ db-path [ "foo" fetch* ] with-gdbm-reader ] unit-test
+] unit-test
 
-    [ f f ] [ [ "unknown" fetch* ] with-test.db ] unit-test
+[ f ]
+[
+    test.db newdb >>role [ "foo" exists? ] with-gdbm
+] unit-test
 
-    [
-        [
-            300 set-cache-size 300 set-cache-size
-        ] with-test.db
-    ] [ gdbm-option-already-set = ] must-fail-with
-
-    [ t ]
-    [
-        V{ } [ [ 2array append ] each-record ] with-test.db
-        V{ "foo" "bar" "baz" 42 43 44 } set=
-
-    ] unit-test
-
-    [ f ]
-    [
-        test.db newdb >>role [ "foo" exists? ] with-gdbm
-    ] unit-test
-
-
-    CLEANUP
-] unless
+CLEANUP

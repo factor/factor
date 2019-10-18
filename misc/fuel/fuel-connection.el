@@ -23,8 +23,7 @@
 
 ;;; Default connection:
 
-(make-variable-buffer-local
- (defvar fuel-con--connection nil))
+(defvar-local fuel-con--connection nil)
 
 (defun fuel-con--get-connection (buffer/proc)
   (if (processp buffer/proc)
@@ -34,6 +33,7 @@
 
 ;;; Request and connection datatypes:
 
+;;; TODO Replace with a defstruct
 (defun fuel-con--connection-queue-request (c r)
   (let ((reqs (assoc :requests c)))
     (setcdr reqs (append (cdr reqs) (list r)))))
@@ -66,6 +66,7 @@
 (defsubst fuel-con--request-deactivated-p (req)
   (null (cdr (assoc :continuation req))))
 
+;;; TODO Replace with a defstruct
 (defsubst fuel-con--make-connection (buffer)
   (list :fuel-connection
         (cons :requests (list))
@@ -138,7 +139,7 @@
 (defvar fuel-con--comint-finished-regex fuel-con--prompt-regex)
 
 (defun fuel-con--setup-comint ()
-  (set (make-local-variable 'comint-redirect-insert-matching-regexp) t)
+  (setq-local comint-redirect-insert-matching-regexp t)
   (add-hook 'comint-redirect-filter-functions
             'fuel-con--comint-preoutput-filter nil t)
   (add-hook 'comint-redirect-hook
@@ -173,7 +174,7 @@
         (progn
           (setq fuel-con--comint-finished-regex
                 fuel-con--comint-finished-regex-connected)
-          (fuel-con--connection-start-timer conn)
+          (fuel-con--connection-start-timer fuel-con--connection)
           (message "FUEL listener up and running!"))
       (fuel-con--connection-clean-current-request fuel-con--connection)
       (setq fuel-con--connection nil)
@@ -187,13 +188,15 @@
   (get-buffer-create " *fuel connection retort*"))
 
 (defun fuel-con--comint-buffer-form ()
+  "Parse the text in the comint buffer into a
+sexp. fuel-con-error is thrown if the sexp is malformed."
   (with-current-buffer (fuel-con--comint-buffer)
     (goto-char (point-min))
-    (condition-case nil
+    (condition-case cerr
         (let ((form (read (current-buffer))))
           (if (listp form) form
             (list 'fuel-con-error (buffer-string))))
-      (error (list 'fuel-con-error (buffer-string))))))
+      (error (list 'fuel-con-error (format "%s" cerr))))))
 
 (defun fuel-con--process-next (con)
   (when (not (fuel-con--connection-current-request con))
@@ -272,4 +275,5 @@
 
 
 (provide 'fuel-connection)
+
 ;;; fuel-connection.el ends here

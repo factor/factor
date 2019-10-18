@@ -23,7 +23,11 @@ TUPLE: declared-fixnum { x fixnum } ;
 
 [ t ] [
     [ { declared-fixnum } declare [ 1 + ] change-x ]
-    { + fixnum+ >fixnum } inlined?
+    { + } inlined?
+    ! XXX: As of .97, we do a bounds check and throw an error on
+    ! overflow, so we no longer convert fixnum+ to fixnum+fast.
+    ! If this is too big a regression, we can revert it.
+    ! { + fixnum+ >fixnum } inlined?
 ] unit-test
 
 [ t ] [

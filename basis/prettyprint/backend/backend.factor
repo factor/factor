@@ -99,17 +99,20 @@ M: f pprint* drop \ f pprint-word ;
 : ch>ascii-escape ( ch -- ch' ? )
     H{
         { CHAR: \a CHAR: a  }
+        { CHAR: \b CHAR: b  }
         { CHAR: \e CHAR: e  }
+        { CHAR: \f CHAR: f  }
         { CHAR: \n CHAR: n  }
         { CHAR: \r CHAR: r  }
         { CHAR: \t CHAR: t  }
+        { CHAR: \v CHAR: v  }
         { CHAR: \0 CHAR: 0  }
         { CHAR: \\ CHAR: \\ }
         { CHAR: \" CHAR: \" }
     } ?at ; inline
 
 : unparse-ch ( ch -- )
-    ch>ascii-escape [ "\\" % , ] [
+    ch>ascii-escape [ CHAR: \\ , , ] [
         dup 32 < [ dup 16 < "\\x0" "\\x" ? % >hex % ] [ , ] if
     ] if ;
 

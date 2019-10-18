@@ -21,7 +21,50 @@ HELP: scaffold-undocumented
     { "string" string } }
 { $description "Prints scaffolding documentation for undocumented words in a vocabulary except for automatically generated class predicates." } ;
 
-{ scaffold-docs scaffold-undocumented } related-words
+{ scaffold-docs scaffold-undocumented scaffold-examples } related-words
+
+HELP: scaffold-examples
+{ $values
+    { "word" word }
+}
+{ $description "Create some examples for a word with a using list that includes vocabularies the word is in and the " { $vocab-link "prettyprint" } " vocabulary. You are then expected to change the header " { $snippet "Example:" } " to something more descriptive." }
+{ $examples
+    "Create docs for the + word:"
+    { $example "USING: math tools.scaffold prettyprint ;"
+        "\\ + scaffold-examples"
+        """{ $examples
+    "Example:"
+    { $example "USING: math prettyprint ;"
+        ""
+        ""
+    }
+    "Example:"
+    { $example "USING: math prettyprint ;"
+        ""
+        ""
+    }
+}"""
+    }
+} ;
+
+HELP: scaffold-core
+{ $values
+    { "string" string }
+}
+{ $description "Create a placeholder vocabulary in the core vocabulary root." } ;
+
+HELP: scaffold-basis
+{ $values
+    { "string" string }
+}
+{ $description "Create a placeholder vocabulary in the basis vocabulary root." } ;
+
+HELP: scaffold-extra
+{ $values
+    { "string" string }
+}
+{ $description "Create a placeholder vocabulary in the extra vocabulary root." } ;
+
 
 HELP: scaffold-authors
 { $values
@@ -77,11 +120,13 @@ ARTICLE: "tools.scaffold" "Scaffold tool"
 "Scaffold setup:"
 { $subsections developer-name }
 "Generate new vocabs:"
-{ $subsections scaffold-vocab }
+{ $subsections scaffold-vocab scaffold-core scaffold-basis scaffold-extra }
 "Generate help scaffolding:"
 { $subsections
     scaffold-docs
     scaffold-undocumented
+    scaffold-examples
+    scaffold-n-examples
     help.
 }
 "Types that are unrecognized by the scaffold generator will be of type " { $link null } ". The developer should change these to strings that describe the stack effect names instead." $nl

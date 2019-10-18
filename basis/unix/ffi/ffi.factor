@@ -45,8 +45,6 @@ CONSTANT: DT_WHT      14
 
 LIBRARY: libc
 
-FUNCTION: c-string strerror ( int errno ) ;
-
 STRUCT: group
     { gr_name c-string }
     { gr_passwd c-string }
@@ -61,6 +59,12 @@ STRUCT: protoent
 STRUCT: iovec
     { iov_base void* }
     { iov_len size_t } ;
+
+STRUCT: servent
+    { name c-string }
+    { aliases void* }
+    { port int }
+    { proto c-string } ;
 
 CONSTANT: F_OK 0 ! test for existence of file
 CONSTANT: X_OK 1 ! test for execute or search permission
@@ -121,6 +125,8 @@ FUNCTION: int gethostname ( c-string name, int len ) ;
 FUNCTION: int getsockname ( int socket, sockaddr* address, socklen_t* address_len ) ;
 FUNCTION: int getpeername ( int socket, sockaddr* address, socklen_t* address_len ) ;
 FUNCTION: protoent* getprotobyname ( c-string name ) ;
+FUNCTION: servent* getservbyname ( c-string name, c-string prot ) ;
+FUNCTION: servent* getservbyport ( int port, c-string prot ) ;
 FUNCTION: uid_t getuid ;
 FUNCTION: uint htonl ( uint n ) ;
 FUNCTION: ushort htons ( ushort n ) ;

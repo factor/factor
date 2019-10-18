@@ -1,29 +1,21 @@
-namespace factor
-{
+namespace factor {
 
 struct code_root {
-	cell value;
-	bool valid;
-	factor_vm *parent;
+  cell value;
+  bool valid;
+  factor_vm* parent;
 
-	void push()
-	{
-		parent->code_roots.push_back(this);
-	}
+  void push() { parent->code_roots.push_back(this); }
 
-	explicit code_root(cell value_, factor_vm *parent_) :
-		value(value_), valid(true), parent(parent_)
-	{
-		push();
-	}
+  code_root(cell value, factor_vm* parent)
+      : value(value), valid(true), parent(parent) {
+    push();
+  }
 
-	~code_root()
-	{
-#ifdef FACTOR_DEBUG
-		FACTOR_ASSERT(parent->code_roots.back() == this);
-#endif
-		parent->code_roots.pop_back();
-	}
+  ~code_root() {
+    FACTOR_ASSERT(parent->code_roots.back() == this);
+    parent->code_roots.pop_back();
+  }
 };
 
 }

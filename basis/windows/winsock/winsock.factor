@@ -3,10 +3,15 @@
 USING: accessors alien alien.c-types alien.data alien.strings
 alien.syntax arrays byte-arrays classes.struct grouping init
 io.encodings.utf16n kernel literals math math.bitwise
-math.parser sequences windows.com.syntax windows.errors
-windows.kernel32 windows.types ;
+math.parser sequences system vocabs.parser windows.com.syntax
+windows.errors windows.kernel32 windows.types ;
 FROM: alien.c-types => short ;
 IN: windows.winsock
+
+<<
+! Some differences between Win32 and Win64
+cpu x86.64? "windows.winsock.64" "windows.winsock.32" ? use-vocab
+>>
 
 TYPEDEF: int* SOCKET
 
@@ -83,6 +88,10 @@ CONSTANT: IPPROTO_TCP    6
 CONSTANT: IPPROTO_UDP   17
 CONSTANT: IPPROTO_RM   113
 
+CONSTANT: FIOASYNC      0x8004667d
+CONSTANT: FIONBIO       0x8004667e
+CONSTANT: FIONREAD      0x4004667f
+
 CONSTANT: WSA_FLAG_OVERLAPPED 1
 ALIAS: WSA_WAIT_EVENT_0 WAIT_OBJECT_0
 ALIAS: WSA_MAXIMUM_WAIT_EVENTS MAXIMUM_WAIT_OBJECTS
@@ -97,7 +106,7 @@ CONSTANT: INADDR_ANY 0
 
 : INVALID_SOCKET ( -- n ) -1 <alien> ; inline
 
-: SOCKET_ERROR ( -- n ) -1 <alien> ; inline
+: SOCKET_ERROR ( -- n ) -1 ; inline
 
 CONSTANT: SD_RECV 0
 CONSTANT: SD_SEND 1
@@ -154,16 +163,19 @@ M: sockaddr-in sockaddr>ip ( sockaddr -- string )
 M: sockaddr-in6 sockaddr>ip ( uchar-array -- string )
     addr>> [ >hex ] { } map-as 2 group [ concat ] map ":" join ;
 
-C-TYPE: fd_set
+STRUCT: fd_set
+    { fd_count uint }
+    { fd_array SOCKET[64] } ;
 
 LIBRARY: winsock
 
 FUNCTION: int setsockopt ( SOCKET s, int level, int optname, c-string optval, int optlen ) ;
+FUNCTION: int ioctlsocket ( SOCKET s, long cmd, ulong* *argp ) ;
 
 FUNCTION: ushort htons ( ushort n ) ;
 FUNCTION: ushort ntohs ( ushort n ) ;
-FUNCTION: int bind ( void* socket, sockaddr-in* sockaddr, int len ) ;
-FUNCTION: int listen ( void* socket, int backlog ) ;
+FUNCTION: int bind ( SOCKET socket, sockaddr-in* sockaddr, int len ) ;
+FUNCTION: int listen ( SOCKET socket, int backlog ) ;
 FUNCTION: c-string inet_ntoa ( int in-addr ) ;
 FUNCTION: int getaddrinfo ( c-string nodename,
                             c-string servername,
@@ -175,7 +187,8 @@ FUNCTION: void freeaddrinfo ( addrinfo* ai ) ;
 
 FUNCTION: hostent* gethostbyname ( c-string name ) ;
 FUNCTION: int gethostname ( c-string name, int len ) ;
-FUNCTION: int connect ( void* socket, sockaddr-in* sockaddr, int addrlen ) ;
+FUNCTION: SOCKET socket ( int domain, int type, int protocol ) ;
+FUNCTION: int connect ( SOCKET socket, sockaddr-in* sockaddr, int addrlen ) ;
 FUNCTION: int select ( int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, timeval* timeout ) ;
 FUNCTION: int closesocket ( SOCKET s ) ;
 FUNCTION: int shutdown ( SOCKET s, int how ) ;
@@ -187,7 +200,11 @@ FUNCTION: int getpeername ( SOCKET s, sockaddr-in* address, int* addrlen ) ;
 
 FUNCTION: protoent* getprotobyname ( c-string name ) ;
 
+FUNCTION: servent* getservbyname ( c-string name, c-string prot ) ;
+FUNCTION: servent* getservbyport ( int port, c-string prot ) ;
+
 TYPEDEF: uint SERVICETYPE
+TYPEDEF: void* LPWSADATA
 TYPEDEF: OVERLAPPED WSAOVERLAPPED
 TYPEDEF: WSAOVERLAPPED* LPWSAOVERLAPPED
 TYPEDEF: uint GROUP
@@ -322,6 +339,7 @@ FUNCTION: BOOL WSAGetOverlappedResult ( SOCKET s,
                                         BOOL fWait,
                                         LPDWORD lpdwFlags ) ;
 
+TYPEDEF: void* LPWSAOVERLAPPED_COMPLETION_ROUTINE
 FUNCTION: int WSAIoctl ( SOCKET s,
                          DWORD dwIoControlCode,
                          LPVOID lpvInBuffer,
@@ -329,27 +347,26 @@ FUNCTION: int WSAIoctl ( SOCKET s,
                          LPVOID lpvOutBuffer,
                          DWORD cbOutBuffer,
                          LPDWORD lpcbBytesReturned,
-                         void* lpOverlapped,
-                         void* lpCompletionRoutine ) ;
+                         LPWSAOVERLAPPED lpOverlapped,
+                         LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine ) ;
 
-TYPEDEF: void* LPWSAOVERLAPPED_COMPLETION_ROUTINE
 FUNCTION: int WSARecv ( SOCKET s,
                         LPWSABUF lpBuffers,
                         DWORD dwBufferCount,
                         LPDWORD lpNumberOfBytesRecvd,
                         LPDWORD lpFlags,
                         LPWSAOVERLAPPED lpOverlapped,
-                    LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine ) ;
+                        LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine ) ;
 
 FUNCTION: int WSARecvFrom ( SOCKET s,
-                    LPWSABUF lpBuffers,
-                    DWORD dwBufferCount,
-                    LPDWORD lpNumberOfBytesRecvd,
-                    LPDWORD lpFlags,
-                    sockaddr* lpFrom,
-                    LPINT lpFromlen,
-                    LPWSAOVERLAPPED lpOverlapped,
-                    LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine ) ;
+                            LPWSABUF lpBuffers,
+                            DWORD dwBufferCount,
+                            LPDWORD lpNumberOfBytesRecvd,
+                            LPDWORD lpFlags,
+                            sockaddr* lpFrom,
+                            LPINT lpFromlen,
+                            LPWSAOVERLAPPED lpOverlapped,
+                            LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine ) ;
 
 FUNCTION: BOOL WSAResetEvent ( WSAEVENT hEvent ) ;
 FUNCTION: int WSASend ( SOCKET s,
@@ -370,10 +387,7 @@ FUNCTION: int WSASendTo ( SOCKET s,
                           LPWSAOVERLAPPED lpOverlapped,
   LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine ) ;
 
-
-FUNCTION: int WSAStartup ( short version, void* out-data ) ;
-
-
+FUNCTION: int WSAStartup ( WORD version,  LPWSADATA out-data ) ;
 
 FUNCTION: SOCKET WSASocketW ( int af,
                              int type,
@@ -392,7 +406,14 @@ FUNCTION: DWORD WSAWaitForMultipleEvents ( DWORD cEvents,
 
 LIBRARY: mswsock
 
-FUNCTION: int AcceptEx ( void* listen, void* accept, void* out-buf, int recv-len, int addr-len, int remote-len, void* out-len, void* overlapped ) ;
+FUNCTION: int AcceptEx ( SOCKET listen,
+                         SOCKET accept,
+                         PVOID out-buf,
+                         DWORD recv-len,
+                         DWORD addr-len,
+                         DWORD remote-len,
+                         LPDWORD out-len,
+                         LPOVERLAPPED overlapped ) ;
 
 FUNCTION: void GetAcceptExSockaddrs (
   PVOID lpOutputBuffer,
@@ -430,7 +451,7 @@ ERROR: winsock-exception n string ;
 
 : throw-winsock-error ( -- * )
     WSAGetLastError (throw-winsock-error) ;
-    
+
 : winsock-error=0/f ( n/f -- )
     { 0 f } member? [ throw-winsock-error ] when ;
 

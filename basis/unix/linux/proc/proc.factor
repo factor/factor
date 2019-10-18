@@ -3,7 +3,7 @@
 USING: accessors arrays combinators combinators.smart
 io.encodings.utf8 io.files kernel math math.order math.parser
 memoize sequences sorting.slots splitting splitting.monotonic
-strings io.pathnames calendar ;
+strings io.pathnames calendar words ;
 IN: unix.linux.proc
 
 ! /proc/*
@@ -27,56 +27,81 @@ TUPLE: processor-info
     { microcode integer }
     { cpu-mhz number }
     { cache-size integer }
+    { fdiv-bug? boolean }
+    { hlt-bug? boolean }
+    { f00f-bug? boolean }
+    { coma-bug? boolean }
     { physical-id integer }
     { siblings integer }
     { core-id integer }
     { cpu-cores integer }
     { apicid integer }
     { initial-apicid integer }
-    { fpu string }
-    { fpu-expception string }
+    { fpu? boolean }
+    { fpu-exception? boolean }
     { cpuid-level integer }
-    { wp string }
+    { wp? boolean }
     { flags array }
     { bogomips number }
     { clflush-size integer }
-    { cache-alignent integer }
+    { cache-alignment integer }
     { address-sizes array }
-    { power-management string } ;
+    { power-management string }
+    { tlb-size string } ;
 
+
+ERROR: unknown-cpuinfo-line string ;
+
+: line>processor-info ( processor-info string -- processor-info )
+    ":" split first2 swap
+    [ CHAR: \t = ] trim-tail [ [ CHAR: \s = ] trim ] bi@
+    {
+        { "address sizes" [
+            "," split [ [ CHAR: \s = ] trim " " split first string>number ] map
+            >>address-sizes
+        ] }
+        { "apicid" [ string>number >>apicid ] }
+        { "bogomips" [ string>number >>bogomips ] }
+        { "cache size" [
+            " " split first [ CHAR: \s = ] trim
+            string>number 1024 * >>cache-size
+        ] }
+        { "cache_alignment" [ string>number >>cache-alignment ] }
+        { "clflush size" [ string>number >>clflush-size ] }
+        { "coma_bug" [ "yes" = >>coma-bug? ] }
+        { "core id" [ string>number >>core-id ] }
+        { "cpu MHz" [ string>number >>cpu-mhz ] }
+        { "cpu cores" [ string>number >>cpu-cores ] }
+        { "cpu family" [ string>number >>cpu-family ] }
+        { "cpuid level" [ string>number >>cpuid-level ] }
+        { "f00f_bug" [ "yes" = >>f00f-bug? ] }
+        { "fdiv_bug" [ "yes" = >>fdiv-bug? ] }
+        { "flags" [ " " split harvest >>flags ] }
+        { "fpu" [ "yes" = >>fpu? ] }
+        { "fpu_exception" [ "yes" = >>fpu-exception? ] }
+        { "hlt_bug" [ "yes" = >>hlt-bug? ] }
+        { "initial apicid" [ string>number >>initial-apicid ] }
+        { "microcode" [ string>number >>microcode ] }
+        { "model" [ string>number >>model ] }
+        { "model name" [ >>model-name ] }
+        { "physical id" [ string>number >>physical-id ] }
+        { "power management" [ >>power-management ] }
+        { "processor" [ string>number >>processor ] }
+        { "siblings" [ string>number >>siblings ] }
+        { "stepping" [ string>number >>stepping ] }
+        { "vendor_id" [ >>vendor-id ] }
+        { "wp" [ "yes" = >>wp? ] }
+        { "TLB size" [ >>tlb-size ] }
+        [ unknown-cpuinfo-line ]
+    } case ;
+
+
+! Linux 2.6 has fewer values than new kernels
 : lines>processor-info ( strings -- processor-info )
-    [ ":" split second [ CHAR: \s = ] trim ] map
-    [
-        {
-            [ string>number ]
-            [ ]
-            [ string>number ]
-            [ string>number ]
-            [ ]
-            [ string>number ]
-            [ string>number ]
-            [ string>number ]
-            [ " " split first [ CHAR: \s = ] trim string>number 1024 * ]
-            [ string>number ]
-            [ string>number ]
-            [ string>number ]
-            [ string>number ]
-            [ string>number ]
-            [ string>number ]
-            [ ]
-            [ ]
-            [ string>number ]
-            [ ]
-            [ " " split harvest ]
-            [ string>number ]
-            [ string>number ]
-            [ string>number ]
-            [ "," split [ [ CHAR: \s = ] trim " " split first string>number ] map ]
-            [ ]
-        } spread
-    ] input<sequence processor-info boa ;
+    [ processor-info new ] dip
+    [ line>processor-info ] each ;
 
-MEMO: parse-proc-cpuinfo ( -- seq )
+: parse-proc-cpuinfo ( -- seq )
     "/proc/cpuinfo" utf8 file-lines
     { "" } split harvest [ lines>processor-info ] map ;
 
@@ -157,10 +182,12 @@ TUPLE: proc-meminfo
     direct-map-4k
     direct-map-2m ;
 
+! Different kernels have fewer fields. Make sure we have enough.
 : parse-proc-meminfo ( -- meminfo )
-    "/proc/meminfo" utf8 file-lines [
-        " " split harvest second string>number 1024 *
-    ] map [ proc-meminfo boa ] input<sequence ;
+    "/proc/meminfo" utf8 file-lines
+    [ " " split harvest second string>number 1024 * ] map
+    proc-meminfo "slots" word-prop length f pad-tail
+    [ proc-meminfo boa ] input<sequence ;
 
 ! All cpu-stat fields are measured in jiffies.
 TUPLE: proc-stat
@@ -304,6 +331,6 @@ TUPLE: pid-stat pid filename state parent-pid group-id session-id terminal#
     "stat" proc-pid-path
     proc-first-line
     " " split harvest
-    52 "0" pad-tail  ! XXX: Kernel 3.2 doesn't have enough entries
+    pid-stat "slots" word-prop length "0" pad-tail
     [ dup string>number [ nip ] when* ] map
     [ pid-stat boa ] input<sequence ;

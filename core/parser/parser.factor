@@ -36,14 +36,16 @@ SYMBOL: auto-use?
 
 : private? ( word -- ? ) vocabulary>> ".private" tail? ;
 
-: ignore-privates ( seq -- seq' )
-    dup [ private? ] all? [ [ private? not ] filter ] unless ;
-
+! True branch is a singleton public word with no name conflicts
+! False branch, singleton private words need confirmation regardless
+! of name conflicts
 : no-word ( name -- newword )
     dup words-named ignore-forwards
-    dup ignore-privates dup length 1 = auto-use? get and
-    [ 2nip first no-word-restarted ]
-    [ drop <no-word-error> throw-restarts no-word-restarted ]
+    dup [ length 1 = ]
+    [ [ f ] [ first private? not ] if-empty ] bi and
+    auto-use? get and
+    [ nip first no-word-restarted ]
+    [ <no-word-error> throw-restarts no-word-restarted ]
     if ;
 
 : parse-word ( string -- word )
@@ -59,23 +61,24 @@ ERROR: number-expected ;
         dup string>number [ ] [ no-word ] ?if
     ] ?if ;
 
-: (scan-datum) ( -- word/number/f )
-    (scan-token) dup [ parse-datum ] when ;
+: ?scan-datum ( -- word/number/f )
+    ?scan-token dup [ parse-datum ] when ;
 
 : scan-datum ( -- word/number )
-    (scan-datum) [ \ word throw-unexpected-eof ] unless* ;
+    ?scan-datum [ \ word throw-unexpected-eof ] unless* ;
 
 : scan-word ( -- word )
-    (scan-token) parse-word ;
+    ?scan-token parse-word ;
 
 : scan-number ( -- number )
-    (scan-token) parse-number ;
+    ?scan-token parse-number ;
+
+ERROR: invalid-word-name string ;
 
 : scan-word-name ( -- string )
     scan-token
-    dup string>number [
-        "Word names cannot be numbers" throw
-    ] when ;
+    dup "\"" = [ t ] [ dup string>number ] if
+    [ invalid-word-name ] when ;
 
 : scan-new ( -- word )
     scan-word-name create-in ;
@@ -104,7 +107,7 @@ ERROR: staging-violation word ;
     scan-object \ f or ;
 
 : parse-until-step ( accum end -- accum ? )
-    (scan-datum) {
+    ?scan-datum {
         { [ 2dup eq? ] [ 2drop f ] }
         { [ dup not ] [ drop throw-unexpected-eof t ] }
         { [ dup delimiter? ] [ unexpected t ] }

@@ -4,10 +4,10 @@ USING: kernel accessors continuations namespaces destructors
 db db.private db.pools io.pools http.server http.server.filters ;
 IN: furnace.db
 
-TUPLE: db-persistence < filter-responder pool ;
+TUPLE: db-persistence < filter-responder pool disposed ;
 
 : <db-persistence> ( responder db -- responder' )
-    <db-pool> db-persistence boa ;
+    <db-pool> f db-persistence boa ;
 
 M: db-persistence call-responder*
     [
@@ -15,3 +15,5 @@ M: db-persistence call-responder*
         [ return-connection-later ] [ drop db-connection set ] 2bi
     ]
     [ call-next-method ] bi ;
+
+M: db-persistence dispose* pool>> dispose ;

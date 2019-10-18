@@ -1,7 +1,7 @@
 USING: tools.deploy.config ;
 H{
     { deploy-name "joystick-demo" }
-    { deploy-io 2 }
+    { deploy-io 3 }
     { deploy-word-defs? f }
     { deploy-c-types? t }
     { deploy-word-props? f }

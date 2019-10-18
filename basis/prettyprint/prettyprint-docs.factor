@@ -1,7 +1,6 @@
-USING: prettyprint.backend prettyprint.config prettyprint.custom
-prettyprint.sections help.markup help.syntax
-io kernel words definitions quotations strings generic classes
-prettyprint.private ;
+USING: help.markup help.syntax io kernel math
+prettyprint.backend prettyprint.config prettyprint.custom
+prettyprint.private prettyprint.sections sequences ;
 IN: prettyprint
 
 ARTICLE: "prettyprint-numbers" "Prettyprinting numbers"
@@ -160,9 +159,10 @@ ARTICLE: "prettyprint" "The prettyprinter"
 $nl
 "Prettyprinter words are found in the " { $vocab-link "prettyprint" } " vocabulary."
 $nl
-"The key words to print an object to " { $link output-stream } "; the first two emit a trailing newline, the second two do not:"
+"The key words to print an object to " { $link output-stream } "; the first three emit a trailing newline, the second three do not:"
 { $subsections
     .
+    ...
     short.
     pprint
     pprint-short
@@ -206,6 +206,15 @@ HELP: .
     "Printing a large object can take a long time and consume a lot of memory. If you need to print large objects, use " { $link short. } " or set some " { $link "prettyprint-variables" } " to limit output size."
 } ;
 
+HELP: ...
+{ $values { "obj" object } }
+{ $description "Prettyprints an object to " { $link output-stream } " with a trailing line break. Output is unlimited in length." }
+{ $warning
+    "Printing a large object can take a long time and consume a lot of memory. If you need to print large objects, use " { $link short. } " or set some " { $link "prettyprint-variables" } " to limit output size."
+} ;
+
+{ . ... } related-words
+
 HELP: unparse
 { $values { "obj" object } { "str" "Factor source string" } }
 { $description "Outputs a prettyprinted string representation of an object. Output is influenced by many variables; see " { $link "prettyprint-variables" } "." }
@@ -222,11 +231,11 @@ HELP: short.
 { $description "Prettyprints an object to " { $link output-stream } " with a trailing line break. This word rebinds printer control variables to enforce “shorter” output." } ;
 
 HELP: .b
-{ $values { "n" "an integer" } }
+{ $values { "n" integer } }
 { $description "Outputs an integer in binary." } ;
 
 HELP: .o
-{ $values { "n" "an integer" } }
+{ $values { "n" integer } }
 { $description "Outputs an integer in octal." } ;
 
 HELP: .h
@@ -234,7 +243,7 @@ HELP: .h
 { $description "Outputs an integer or floating-point value in hexadecimal." } ;
 
 HELP: stack.
-{ $values { "seq" "a sequence" } }
+{ $values { "seq" sequence } }
 { $description "Prints a the elements of the sequence, one per line." }
 { $notes "This word is used in the implementation of " { $link .s } " and " { $link .r } "." } ;
 

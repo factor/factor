@@ -26,3 +26,16 @@ IN: splitting.extras
     [ [ blank? ] find drop ] split-find
     [ >string ] map
 ] unit-test
+
+{ { } } [ "" " " split-harvest ] unit-test
+{ { "a" } } [ "a" " " split-harvest ] unit-test
+{ { "a" } } [ " a" " " split-harvest ] unit-test
+{ { "a" } } [ " a " " " split-harvest ] unit-test
+{ { "a" "b" } } [ "a b" " " split-harvest ] unit-test
+{ { "a" "b" } } [ " a b" " " split-harvest ] unit-test
+{ { "a" "b" } } [ " a b " " " split-harvest ] unit-test
+{ { "a" "b" "c" } } [ "a b c" " " split-harvest ] unit-test
+{ { "a" "b" "c" } } [ "a  b c" " " split-harvest ] unit-test
+{ { "a" "b" "c" } } [ "a  b  c" " " split-harvest ] unit-test
+{ { "a" "b" "c" } } [ " a  b  c" " " split-harvest ] unit-test
+{ { "a" "b" "c" } } [ " a  b  c " " " split-harvest ] unit-test

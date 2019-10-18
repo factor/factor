@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs continuations deques dlists fry
 io.backend io.directories io.files.info io.pathnames kernel
-locals math sequences sorting system unicode.case vocabs
-vocabs.loader ;
+kernel.private locals math sequences sorting strings system
+unicode.case vocabs vocabs.loader ;
 IN: io.directories.search
 
 : qualified-directory-entries ( path -- seq )
@@ -22,9 +22,13 @@ IN: io.directories.search
 
 <PRIVATE
 
-TUPLE: directory-iterator path bfs queue ;
+TUPLE: directory-iterator
+{ path string }
+{ bfs boolean }
+{ queue dlist } ;
 
 : push-directory-entries ( path iter -- )
+    { directory-iterator } declare
     [ [ qualified-directory-entries ] [ 2drop f ] recover ] dip '[
         _ [ queue>> ] [ bfs>> ] bi
         [ push-front ] [ push-back ] if
@@ -35,6 +39,7 @@ TUPLE: directory-iterator path bfs queue ;
     dup path>> over push-directory-entries ;
 
 : next-directory-entry ( iter -- directory-entry/f )
+    { directory-iterator } declare
     dup queue>> deque-empty? [ drop f ] [
         dup queue>> pop-back
         dup directory?
@@ -58,25 +63,24 @@ TUPLE: directory-iterator path bfs queue ;
 
 PRIVATE>
 
-: each-file ( path bfs? quot -- )
+: each-file ( path bfs? quot: ( ... name -- ... ) -- )
     setup-traversal iterate-directory drop ; inline
 
-: each-directory-entry ( path bfs? quot -- )
+: each-directory-entry ( path bfs? quot: ( ... entry -- ... ) -- )
     setup-traversal iterate-directory-entries drop ; inline
 
 : recursive-directory-files ( path bfs? -- paths )
-    [ ] collector [ each-file ] dip ; inline
+    [ ] collector [ each-file ] dip ;
 
 : recursive-directory-entries ( path bfs? -- directory-entries )
-    [ ] collector [ each-directory-entry ] dip ; inline
+    [ ] collector [ each-directory-entry ] dip ;
 
-: find-file ( path bfs? quot -- path/f )
+: find-file ( path bfs? quot: ( ... name -- ... ? ) -- path/f )
     [ <directory-iterator> ] dip
     [ keep and ] curry iterate-directory ; inline
 
-: find-all-files ( path quot -- paths/f )
-    [ f <directory-iterator> ] dip selector
-    [ [ f ] compose iterate-directory drop ] dip ; inline
+: find-all-files ( path quot: ( ... name -- ... ? ) -- paths )
+    f swap selector [ each-file ] dip ; inline
 
 ERROR: file-not-found path bfs? quot ;
 
@@ -96,14 +100,11 @@ ERROR: file-not-found path bfs? quot ;
 : directory-size ( path -- n )
     0 swap t [ link-size/0 + ] each-file ;
 
-: path>usage ( directory-entry -- name size )
-    [ name>> dup ] [ directory? ] bi
-    [ directory-size ] [ link-size/0 ] if ;
-
 : directory-usage ( path -- assoc )
     [
         [
-            [ path>usage ] [ drop name>> 0 ] recover
+            [ name>> dup ] [ directory? ] bi
+            [ directory-size ] [ link-size/0 ] if
         ] { } map>assoc
     ] with-qualified-directory-entries sort-values ;
 

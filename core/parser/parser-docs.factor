@@ -1,8 +1,6 @@
-USING: help.markup help.syntax kernel sequences words
-math strings vectors quotations generic effects classes
-vocabs.loader definitions io vocabs source-files
-namespaces compiler.units assocs lexer
-words.symbol words.alias words.constant vocabs.parser ;
+USING: compiler.units definitions help.markup help.syntax kernel
+lexer math namespaces quotations sequences source-files strings
+vectors vocabs vocabs.parser words words.symbol ;
 IN: parser
 
 ARTICLE: "reading-ahead" "Reading ahead"
@@ -18,8 +16,8 @@ ARTICLE: "reading-ahead" "Reading ahead"
 }
 "Parsing words that return " { $link f } " on end of file:"
 { $subsections
-    (scan-token)
-    (scan-datum)
+    ?scan-token
+    ?scan-datum
 }
 "A simple example is the " { $link POSTPONE: \ } " word:"
 { $see POSTPONE: \ } ;
@@ -151,19 +149,19 @@ HELP: no-word
 { $description "Throws a " { $link no-word-error } "." } ;
 
 HELP: parse-word
-{ $values { "string" string } { "word" "a number" } }
+{ $values { "string" string } { "word" word } }
 { $description "If " { $snippet "string" } " is a valid number literal, it is converted to a number, otherwise the current vocabulary search path is searched for a word named by the string." }
 { $errors "Throws an error if the token does not name a word, and does not parse as a number." }
 { $notes "This word is used to implement " { $link scan-word } "." } ;
 
 HELP: parse-datum
-{ $values { "string" string } { "word/number" "a word or number" } }
+{ $values { "string" string } { "word/number" { $or word number } } }
 { $description "If " { $snippet "string" } " is a valid number literal, it is converted to a number, otherwise the current vocabulary search path is searched for a word named by the string." }
 { $errors "Throws an error if the token does not name a word, and does not parse as a number." }
-{ $notes "This word is used to implement " { $link (scan-datum) } " and " { $link scan-datum } "." } ;
+{ $notes "This word is used to implement " { $link ?scan-datum } " and " { $link scan-datum } "." } ;
 
 HELP: scan-word
-{ $values { "word" "a word" } }
+{ $values { "word" word } }
 { $description "Reads the next token from parser input. If the token is a valid number literal, it is converted to a number, otherwise the vocabulary search path is searched for a word named by the token." }
 { $errors "Throws an error if the token does not name a word or end of file is reached." }
 $parsing-note ;
@@ -176,25 +174,25 @@ HELP: scan-word-name
 { $errors "Throws an error if the scanned token is a number or upon finding end of file." }
 $parsing-note ;
 
-HELP: (scan-datum)
-{ $values { "word/number/f" "a word, a number, or " { $link f } } }
+HELP: ?scan-datum
+{ $values { "word/number/f" { $maybe word number } } }
 { $description "Reads the next token from parser input. If the token is found in the vocabulary search path, returns the word named by the token. If the token does not find a word, it is next converted to a number. If this conversion fails, too, this word returns " { $link f } "." }
 $parsing-note ;
 
 HELP: scan-datum
-{ $values { "word/number" "a word or a number" } }
+{ $values { "word/number" { $or word number } } }
 { $description "Reads the next token from parser input. If the token is found in the vocabulary search path, returns the word named be the token. If the token is not found in the vocabulary search path, it is converted to a number. If this conversion fails, an error is thrown." }
 { $errors "Throws an error if the token is not a number or end of file is reached." }
 $parsing-note ;
 
 HELP: scan-number
-{ $values { "number" "a number" } }
+{ $values { "number" number } }
 { $description "Reads the next token from parser input. If the token is a number literal, it is converted to a number. Otherwise, it throws an error." }
 { $errors "Throws an error if the token is not a number or end of file is reached." }
 $parsing-note ;
 
 HELP: parse-until-step
-{ $values { "accum" vector } { "end" word } { "?" "a boolean" } }
+{ $values { "accum" vector } { "end" word } { "?" boolean } }
 { $description "Parses a token. If the token is a number or an ordinary word, it is added to the accumulator. If it is a parsing word, calls the parsing word with the accumulator on the stack. Outputs " { $link f } " if " { $snippet "end" } " is encountered, " { $link t } " otherwise." }
 $parsing-note ;
 
@@ -222,7 +220,7 @@ HELP: parse-lines
 { $errors "Throws a " { $link lexer-error } " if the input is malformed." } ;
 
 HELP: parse-literal
-{ $values { "accum" vector } { "end" word } { "quot" { $quotation "( seq -- obj )" } } }
+{ $values { "accum" vector } { "end" word } { "quot" { $quotation ( seq -- obj ) } } }
 { $description "Parses objects from parser input until " { $snippet "end" } ", applies the quotation to the resulting sequence, and adds the output value to the accumulator." }
 { $examples "This word is used to implement " { $link POSTPONE: [ } "." }
 $parsing-note ;

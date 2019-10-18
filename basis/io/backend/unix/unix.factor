@@ -1,15 +1,15 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.syntax generic
-assocs kernel kernel.private math io.ports sequences strings
-sbufs threads unix unix.ffi unix.stat vectors io.buffers io.backend
-io.encodings math.parser continuations system libc namespaces
-make io.timeouts io.encodings.utf8 destructors
-destructors.private accessors summary combinators locals
-unix.time unix.types fry io.backend.unix.multiplexers
-classes.struct hints ;
+USING: accessors alien.c-types alien.data alien.syntax
+classes.struct combinators destructors destructors.private fry
+hints io.backend io.backend.unix.multiplexers io.buffers
+io.files io.ports io.timeouts kernel kernel.private libc locals
+make math namespaces sequences summary system threads unix
+unix.ffi unix.stat unix.types ;
 QUALIFIED: io
 IN: io.backend.unix
+
+CONSTANT: file-mode 0o0666
 
 GENERIC: handle-fd ( handle -- fd )
 
@@ -65,15 +65,11 @@ M: unix handle-length ( handle -- n/f )
     fd>> \ stat <struct> [ fstat -1 = not ] keep
     swap [ st_size>> ] [ drop f ] if ;
 
-SYMBOL: +retry+ ! just try the operation again without blocking
-SYMBOL: +input+
-SYMBOL: +output+
-
 ERROR: io-timeout ;
 
 M: io-timeout summary drop "I/O operation timed out" ;
 
-: wait-for-fd ( handle event -- )
+M: unix wait-for-fd ( handle event -- )
     dup +retry+ eq? [ 2drop ] [
         [ [ self ] dip handle-fd mx get-global ] dip {
             { +input+ [ add-input-callback ] }
@@ -86,11 +82,6 @@ M: io-timeout summary drop "I/O operation timed out" ;
     '[ handle>> _ wait-for-fd ] with-timeout ;
 
 ! Some general stuff
-CONSTANT: file-mode 0o0666
- 
-! Returns an event to wait for which will ensure completion of
-! this request
-GENERIC: refill ( port handle -- event/f )
 
 M: fd refill
     fd>> over buffer>> [ buffer-end ] [ buffer-capacity ] bi read
@@ -110,8 +101,6 @@ M: unix (wait-to-read) ( port -- )
     [ dupd wait-for-port (wait-to-read) ] [ 2drop ] if ;
 
 ! Writers
-GENERIC: drain ( port handle -- event/f )
-
 M: fd drain
     fd>> over buffer>> [ buffer@ ] [ buffer-length ] bi write
     {

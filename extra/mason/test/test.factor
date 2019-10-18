@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs benchmark bootstrap.stage2
+USING: accessors assocs benchmark bootstrap.stage2 command-line
 compiler.errors generic help.html help.lint io io.directories
-io.encodings.utf8 io.files kernel locals mason.common
-namespaces sequences sets sorting source-files.errors system
+io.encodings.utf8 io.files kernel locals mason.common namespaces
+parser.notes sequences sets sorting source-files.errors system
 tools.errors tools.test tools.time vocabs.errors
-vocabs.hierarchy vocabs.refresh words parser.notes ;
+vocabs.hierarchy vocabs.refresh words ;
 IN: mason.test
 
 : do-load ( -- )
@@ -63,9 +63,19 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
 : check-boot-image ( -- ? )
     outdated-core-vocabs [ outdated-boot-image. t ] [ 2drop f ] if ;
 
+: run-mason-rc ( -- )
+    t "user-init" [
+        ".factor-mason-rc" rc-path try-user-init
+    ] with-variable ;
+
+: check-user-init-errors ( -- ? )
+    user-init-errors get-global assoc-empty?
+    [ f ] [ :user-init-errors t ] if ;
+
 : do-all ( -- )
     f parser-quiet? set-global
     ".." [
+        run-mason-rc check-user-init-errors [ 1 exit ] when
         bootstrap-time get boot-time-file to-file
         check-boot-image [ 1 exit ] when
         [ do-load ] benchmark load-time-file to-file

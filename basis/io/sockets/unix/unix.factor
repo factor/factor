@@ -1,9 +1,10 @@
-! Copyright (C) 2004, 2008 Slava Pestov, Ivan Tikhonov. 
+! Copyright (C) 2004, 2008 Slava Pestov, Ivan Tikhonov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-classes.struct combinators destructors io.backend.unix
-io.encodings.utf8 io.pathnames io.sockets.private kernel libc
-locals math namespaces sequences system unix unix.ffi vocabs ;
+arrays classes.struct combinators destructors io.backend.unix
+io.encodings.utf8 io.files io.pathnames io.sockets.private kernel
+libc locals math namespaces sequences system unix
+unix.ffi vocabs ;
 EXCLUDE: io => read write ;
 EXCLUDE: io.sockets => accept ;
 IN: io.sockets.unix
@@ -14,8 +15,8 @@ IN: io.sockets.unix
 : set-socket-option ( fd level opt -- )
     [ handle-fd ] 2dip 1 int <ref> dup byte-length setsockopt io-error ;
 
-M: unix addrinfo-error ( n -- )
-    [ gai_strerror throw ] unless-zero ;
+M: unix addrinfo-error-string ( n -- string )
+    gai_strerror ;
 
 M: unix sockaddr-of-family ( alien af -- addrspec )
     {

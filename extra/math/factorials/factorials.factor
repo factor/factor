@@ -11,6 +11,9 @@ MEMO: factorial ( n -- n! )
 
 ALIAS: n! factorial
 
+: factorials ( n -- seq )
+    1 swap [0,b] [ dup 1 > [ * ] [ drop ] if dup ] map nip ;
+
 MEMO: double-factorial ( n -- n!! )
     dup [ even? ] [ 0 < ] bi [
         [ drop 1/0. ] [

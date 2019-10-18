@@ -32,10 +32,10 @@ TUPLE: observer < turtle projection-mode collision-mode ;
 
 
 : turtle-pos> ( -- val ) self> pos>> ;
-: >turtle-pos ( val -- ) self> (>>pos) ;
+: >turtle-pos ( val -- ) self> pos<< ;
 
 : turtle-ori> ( -- val ) self> ori>> ;
-: >turtle-ori ( val -- ) self> (>>ori) ;
+: >turtle-ori ( val -- ) self> ori<< ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

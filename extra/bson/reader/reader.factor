@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs bson.constants calendar combinators
 combinators.short-circuit io io.binary kernel math locals
-io.encodings.utf8 io.encodings
+io.encodings.utf8 io.encodings io.files sequences.extras
 namespaces sequences serialize strings vectors byte-arrays ;
 
 FROM: io.encodings.binary => binary ;
@@ -52,8 +52,8 @@ DEFER: read-elements
         [ clear-assoc ] [ ] [ ] tri state
     ] dip with-variable ; inline
 
-: bson-object-data-read ( -- )
-    read-int32 drop read-elements ; inline recursive
+: bson-object-data-read ( -- ? )
+    read-int32 [ f ] [ drop read-elements t ] if-zero ; inline recursive
 
 : bson-binary-read ( -- binary )
    read-int32 read-byte 
@@ -84,8 +84,8 @@ TYPED: element-data-read ( type: integer -- object )
         { T_Integer     [ read-int32 ] }
         { T_Integer64   [ read-longlong ] }
         { T_Binary      [ bson-binary-read ] }
-        { T_Object      [ [ bson-object-data-read ] object-result check-object ] }
-        { T_Array       [ [ bson-object-data-read ] object-result values ] }
+        { T_Object      [ [ bson-object-data-read drop ] object-result check-object ] }
+        { T_Array       [ [ bson-object-data-read drop ] object-result values ] }
         { T_Double      [ read-double ] }
         { T_Boolean     [ read-byte 1 = ] }
         { T_Date        [ read-longlong millis>timestamp ] }
@@ -111,7 +111,12 @@ TYPED: (element-read) ( type: integer -- cont?: boolean )
 
 PRIVATE>
 
-: stream>assoc ( exemplar -- assoc )
+: stream>assoc ( exemplar -- assoc/f )
     clone [
         state [ bson-object-data-read ] with-variable
-    ] keep ;
+    ] keep swap [ drop f ] unless ;
+
+: path>bson-sequence ( path -- assoc )
+    binary [
+        [ H{ } stream>assoc ] loop>array
+    ] with-file-reader ;

@@ -1,7 +1,7 @@
-! Copyright (C) 2008 Doug Coleman, Michael Judge.
+! Copyright (C) 2008 Doug Coleman, Michael Judge, Loryn Jenkins.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs combinators generalizations kernel locals math
-math.functions math.order math.vectors sequences
+math.functions math.order math.vectors math.ranges sequences
 sequences.private sorting fry arrays grouping sets
 splitting.monotonic ;
 IN: math.statistics
@@ -12,7 +12,7 @@ IN: math.statistics
 ! Delta in degrees-of-freedom
 : mean-ddof ( seq ddof -- x )
     [ [ sum ] [ length ] bi ] dip -
-    dup zero? [ 2drop 0 ] [ / ] if ; inline
+    [ drop 0 ] [ / ] if-zero ; inline
 
 : mean ( seq -- x )
     0 mean-ddof ; inline
@@ -33,7 +33,7 @@ IN: math.statistics
     [ sum-of-squares ] [ length ] bi / sqrt ; inline
 
 : geometric-mean ( seq -- x )
-    [ length ] [ product ] bi nth-root ; inline
+    [ [ log ] map-sum ] [ length ] bi /f e^ ; inline
 
 : harmonic-mean ( seq -- x )
     [ recip ] map-sum recip ; inline
@@ -70,7 +70,7 @@ PRIVATE>
     seq length 1 - :> m!
     [ l m < ]
     [
-        k seq nth x!
+        k seq nth-unsafe x!
         l i!
         m j!
         [ i j <= ]
@@ -87,18 +87,17 @@ PRIVATE>
         j k < [ i l! ] when
         k i < [ j m! ] when
     ] while
-    k seq nth ; inline
+    k seq nth-unsafe ; inline
 
 : (kth-object) ( seq k nth-quot exchange-quot quot: ( x y -- ? ) -- elt )
     #! The algorithm modifiers seq, so we clone it
-    [ clone ] 4dip ((kth-object)) ; inline
+    [ >array ] 4dip ((kth-object)) ; inline
 
 : kth-object-unsafe ( seq k quot: ( x y -- ? ) -- elt )
     [ [ nth-unsafe ] [ exchange-unsafe ] ] dip (kth-object) ; inline
 
 : kth-objects-unsafe ( seq kths quot: ( x y -- ? ) -- elts )
-    [ clone ] 2dip
-    '[ [ nth-unsafe ] [ exchange-unsafe ]  _ ((kth-object)) ] with map ; inline
+    '[ _ kth-object-unsafe ] with map ; inline
 
 PRIVATE>
 
@@ -106,8 +105,7 @@ PRIVATE>
     [ [ nth ] [ exchange ] ] dip (kth-object) ; inline
 
 : kth-objects ( seq kths quot: ( x y -- ? ) -- elts )
-    [ clone ] 2dip
-    '[ [ nth ] [ exchange ]  _ ((kth-object)) ] with map ; inline
+    '[ _ kth-object ] with map ; inline
 
 : kth-smallests ( seq kths -- elts ) [ < ] kth-objects-unsafe ;
 
@@ -166,15 +164,15 @@ PRIVATE>
 : frac ( x -- x' )
     >fraction [ /mod nip ] keep / ; inline
 
-:: quantile-indices ( seq qs a b c d -- seq )
+:: quantile-indices ( seq qs a b -- seq )
     qs [ [ a b seq length ] dip quantile-x ] map ;
 
 :: qabcd ( y-floor y-ceiling x c d -- qabcd )
     y-floor y-ceiling y-floor - c d x frac * + * + ;
 
 :: quantile-abcd ( seq qs a b c d -- quantile )
-    seq qs a b c d quantile-indices :> indices
-    indices [ [ floor ] [ ceiling ] bi 2array ] map
+    seq qs a b quantile-indices :> indices
+    indices [ [ floor 0 max ] [ ceiling seq length 1 - min ] bi 2array ] map
     concat :> index-pairs
 
     seq index-pairs kth-smallests
@@ -206,6 +204,9 @@ PRIVATE>
 
 : quartile ( seq -- seq' )
     { 1/4 1/2 3/4 } quantile5 ;
+
+: trimean ( seq -- x )
+    quartile first3 [ 2 * ] dip + + 4 / ;
 
 <PRIVATE
 
@@ -247,18 +248,17 @@ PRIVATE>
 : normalized-histogram ( seq -- alist )
     [ histogram ] [ length ] bi '[ _ / ] assoc-map ;
 
-: collect-index-by ( seq quot -- hashtable )
-    [ swap ] prepose [ push-at ] sequence-index>hashtable ; inline
+: collect-index-by ( ... seq quot: ( ... obj -- ... key ) -- ... hashtable )
+    [ dip swap ] curry [ push-at ] sequence-index>hashtable ; inline
 
-: collect-by ( seq quot -- hashtable )
-    [ dup ] prepose [ push-at ] sequence>hashtable ; inline
+: collect-by ( ... seq quot: ( ... obj -- ... key ) -- ... hashtable )
+    [ keep swap ] curry [ push-at ] sequence>hashtable ; inline
 
 : equal-probabilities ( n -- array )
     dup recip <array> ; inline
 
 : mode ( seq -- x )
-    histogram >alist
-    [ ] [ [ [ second ] bi@ > ] most ] map-reduce first ;
+    histogram >alist [ second ] supremum-by first ;
 
 : minmax ( seq -- min max )
     [ first dup ] keep [ [ min ] [ max ] bi-curry bi* ] each ;
@@ -340,7 +340,7 @@ ALIAS: std sample-std
 
 : sample-corr ( {x} {y} -- corr ) 1 corr-ddof ; inline
 
-: cum-map ( seq identity quot -- seq' )
+: cum-map ( seq identity quot: ( prev elt -- next ) -- seq' )
     swapd [ dup ] compose map nip ; inline
 
 : cum-sum ( seq -- seq' )
@@ -351,6 +351,9 @@ ALIAS: std sample-std
 
 : cum-product ( seq -- seq' )
     1 [ * ] cum-map ;
+
+: cum-mean ( seq -- seq' )
+    0 swap [ [ + dup ] dip 1 + / ] map-index nip ;
 
 : cum-count ( seq quot -- seq' )
     [ 0 ] dip '[ _ call [ 1 + ] when ] cum-map ; inline
@@ -380,18 +383,16 @@ ALIAS: std sample-std
     flip [ standardize ] map flip ;
 
 : differences ( u -- v )
-    [ 1 tail-slice ] keep v- ;
+    [ rest-slice ] keep v- ;
 
 : rescale ( u -- v )
     dup minmax over - [ v-n ] [ v/n ] bi* ;
 
+: rankings ( histogram -- assoc )
+    sort-keys 0 swap [ rot [ + ] keep swapd ] H{ } assoc-map-as nip ;
+
 : rank-values ( seq -- seq' )
-    [
-        [ ] [ length iota ] bi zip sort-keys
-        [ [ first ] bi@ = ] monotonic-split
-        [ values ] map [ 0 [ length + ] accumulate nip ] [ ] bi zip
-    ] [ length f <array> ] bi
-    [ '[ first2 [ _ set-nth ] with each ] each ] keep ;
+    dup histogram rankings '[ _ at ] map ;
 
 : z-score ( seq -- n )
     [ demean ] [ sample-std ] bi v/n ;

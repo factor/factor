@@ -87,10 +87,6 @@ HELP: parse-host
     }
 } ;
 
-HELP: protocol-port
-{ $values { "protocol" "a protocol string" } { "port" { $maybe integer } } }
-{ $description "Outputs the port number associated with a protocol, or " { $link f } " if the protocol is unknown." } ;
-
 HELP: query-param
 { $values
      { "url" url } { "key" string }
@@ -137,11 +133,11 @@ HELP: relative-url
 HELP: relative-url?
 { $values
      { "url" url }
-     { "?" "a boolean" } }
+     { "?" boolean } }
 { $description "Tests whether a URL is relative." } ;
 
 HELP: secure-protocol?
-{ $values { "protocol" string } { "?" "a boolean" } }
+{ $values { "protocol" string } { "?" boolean } }
 { $description "Tests if protocol connections must be made with secure sockets (SSL/TLS)." }
 { $examples
     { $example
@@ -159,6 +155,11 @@ HELP: url-addr
         "USING: prettyprint urls ;"
         "URL\" ftp://ftp.cdrom.com\" url-addr ."
         "T{ inet { host \"ftp.cdrom.com\" } { port 21 } }"
+    }
+    { $example
+        "USING: io.sockets.secure prettyprint urls ;"
+        "URL\" https://google.com/\" url-addr ."
+        "T{ secure\n    { addrspec T{ inet { host \"google.com\" } { port 443 } } }\n}"
     }
 } ;
 

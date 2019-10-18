@@ -20,7 +20,7 @@ HELP: close-window
 { $description "Close the native window containing " { $snippet "gadget" } "." } ;
 
 HELP: world-attributes
-{ $values { "world-class" class } { "title" string } { "status" gadget } { "gadgets" sequence } { "pixel-format-attributes" sequence } }
+{ $values { "world-class" class } { "title" string } { "status" gadget } { "gadgets" sequence } { "pixel-format-attributes" sequence } { "window-controls" sequence } }
 { $class-description "Tuples of this class can be passed to " { $link open-window } " to control attributes of the window opened. The following attributes can be set:" }
 { $list
     { { $snippet "world-class" } " specifies the class of world to construct. " { $link world } " is the default." }
@@ -32,17 +32,17 @@ HELP: world-attributes
 } ;
 
 HELP: set-fullscreen
-{ $values { "gadget" gadget } { "?" "a boolean" } }
+{ $values { "gadget" gadget } { "?" boolean } }
 { $description "Sets and unsets fullscreen mode for the gadget's world." } ;
 
 HELP: fullscreen?
-{ $values { "gadget" gadget } { "?" "a boolean" } }
+{ $values { "gadget" gadget } { "?" boolean } }
 { $description "Queries the gadget's world to see if it is running in fullscreen mode." } ;
 
 { fullscreen? set-fullscreen } related-words
 
 HELP: find-window
-{ $values { "quot" { $quotation "( world -- ? )" } } { "world" { $maybe world } } }
+{ $values { "quot" { $quotation ( world -- ? ) } } { "world" { $maybe world } } }
 { $description "Finds a native window such that the gadget passed to " { $link open-window } " satisfies the quotation, outputting " { $link f } " if no such gadget could be found. The front-most native window is checked first." } ;
 
 HELP: register-window
@@ -74,8 +74,8 @@ HELP: raise-window
 { $description "Makes the native window containing the given gadget the front-most window." } ;
 
 HELP: with-ui
-{ $values { "quot" { $quotation "( -- )" } } }
-{ $description "Calls the quotation, starting the UI first if necessary. If the UI is started, this word does not return." }
+{ $values { "quot" { $quotation ( -- ) } } }
+{ $description "Calls the quotation, starting the UI if necessary. If starting the UI is necessary, this word does not return and the UI will start after the quotation returns." }
 { $notes "This word should be used in the " { $link POSTPONE: MAIN: } " word of an application that uses the UI in order for the vocabulary to work when run from either the UI listener (" { $snippet "\"my-app\" run" } ") and the command line (" { $snippet "./factor -run=my-app" } ")." }
 { $examples "The " { $vocab-link "hello-ui" } " vocabulary implements a simple UI application which uses this word." } ;
 
@@ -333,6 +333,9 @@ HELP: normal-title-bar
 HELP: textured-background
 { $description "Asks for a window to have a background that blends seamlessly with the window frame. Factor will leave the window background transparent and pass mouse button gestures not handled directly by a gadget through to the window system so that the window can be dragged from anywhere on its background." } ;
 
+HELP: dialog-window
+{ $description "Provides a hint to the window manager to create a floating, dialog-style window. Currently, this is only implemented for the GTK backend." } ;
+
 HELP: MAIN-WINDOW:
 { $syntax "MAIN-WINDOW: window-word { attributes }
     attribute-code ;" }
@@ -357,5 +360,6 @@ ARTICLE: "ui.gadgets.worlds-window-controls" "Window controls"
     small-title-bar
     normal-title-bar
     textured-background
+    dialog-window
 }
 "Provide a sequence of these values in the " { $snippet "window-controls" } " slot of the " { $link world-attributes } " tuple you pass to " { $link open-window } "." ;

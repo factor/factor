@@ -1,19 +1,15 @@
 USING: arrays ascii io io.streams.string kernel make math
 math.vectors random sequences sequences.extras strings
-tools.test ;
+tools.test vectors ;
 
 IN: sequences.extras.tests
-
-{ V{ 0 1 2 3 4 5 6 7 8 9 } } [
-    V{ } clone
-    10 iota >array randomize
-    [ swap insert-sorted ] each
-] unit-test
 
 [ { "a" "b" "c" "d" "ab" "bc" "cd" "abc" "bcd" "abcd" } ] [ "abcd" all-subseqs ] unit-test
 
 [ { "a" "ab" "abc" "abcd" "b" "bc" "bcd" "c" "cd" "d" } ]
 [ [ "abcd" [ , ] each-subseq ] { } make ] unit-test
+
+{ B{ 115 } } [ 1 2 "asdf" B{ } subseq-as ] unit-test
 
 [ "" ] [ "abc" "def" longest-subseq ] unit-test
 [ "abcd" ] [ "abcd" "abcde" longest-subseq ] unit-test
@@ -57,6 +53,8 @@ IN: sequences.extras.tests
 { "abc" } [ "abc" [ 1string ] map-concat ] unit-test
 { "abc" } [ { 97 98 99 } [ 1string ] map-concat ] unit-test
 { { 97 98 99 } } [ "abc" [ 1string ] { } map-concat-as ] unit-test
+{ "baz" { "foobaz" "barbaz" } }
+[ "baz" { { "foo" } { "bar" } } [ [ over append ] map ] map-concat ] unit-test
 
 { { } } [ { } [ ] [ even? ] map-filter ] unit-test
 { "bcde" } [ "abcd" [ 1 + ] [ drop t ] map-filter ] unit-test
@@ -106,7 +104,7 @@ IN: sequences.extras.tests
 
 { 1 } [ { 1 7 3 7 6 3 7 } arg-max ] unit-test
 { 0 } [ { 1 7 3 7 6 3 7 } arg-min ] unit-test
-{ { 0 4 } } [ { 5 3 2 10 5 } [ 5 = ] arg-where ] unit-test
+{ V{ 0 4 } } [ { 5 3 2 10 5 } [ 5 = ] arg-where ] unit-test
 { { 2 1 0 4 3 } } [ { 5 3 2 10 5 } arg-sort ] unit-test
 
 { t } [ { 1 2 3 4 5 } 1 first= ] unit-test
@@ -154,3 +152,25 @@ IN: sequences.extras.tests
 
 { t 3 3 } [ 10 iota [ [ odd? ] [ 1 > ] bi* and ] map-find-index ] unit-test
 { f f f } [ 10 iota [ [ odd? ] [ 9 > ] bi* and ] map-find-index ] unit-test
+
+{ "abcdef" } [ f f "abcdef" subseq* ] unit-test
+{ "abcdef" } [ 0 f "abcdef" subseq* ] unit-test
+{ "ab" } [ f 2 "abcdef" subseq* ] unit-test
+{ "cdef" } [ 2 f "abcdef" subseq* ] unit-test
+{ "cd" } [ -4 -2 "abcdef" subseq* ] unit-test
+
+{ "foo" "" } [ "foo" [ blank? ] cut-when ] unit-test
+{ "foo" " " } [ "foo " [ blank? ] cut-when ] unit-test
+{ "" " foo" } [ " foo" [ blank? ] cut-when ] unit-test
+{ "foo" " bar" } [ "foo bar" [ blank? ] cut-when ] unit-test
+
+{ { 4 0 3 1 2 } } [ { 0 4 1 3 2 } 5 iota [ nth* ] curry map ] unit-test
+
+{ 1 "beef" } [ { "chicken" "beef" "moose" } [ length ] infimum-by* ] unit-test
+{ 0 "chicken" } [ { "chicken" "beef" "moose" } [ length ] supremum-by* ] unit-test
+{ 2 "moose" } [ { "chicken" "beef" "moose" } [ first ] supremum-by* ] unit-test
+
+{ "0123456789" } [ 58 iota [ 48 < ] "" reject-as ] unit-test
+{ V{ 1 3 5 7 9 } } [ 10 iota >vector [ even? ] reject! ] unit-test
+
+{ 3/10 } [ 10 iota [ 3 < ] count* ] unit-test

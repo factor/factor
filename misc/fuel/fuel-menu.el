@@ -82,6 +82,7 @@
              :button (:toggle . (and (boundp ',mode) ,mode)))))
 
 (defmacro fuel-menu--defmenu (name keymap &rest keys)
+  (declare (indent 2))
   (let ((mmap (make-symbol "mmap")))
     `(progn
        (let ((,mmap (make-sparse-keymap "FUEL")))
@@ -93,10 +94,7 @@
          (fuel-menu--add-items ,keymap ,mmap ,keys)
          ,mmap))))
 
-(put 'fuel-menu--defmenu 'lisp-indent-function 2)
-
-
 
 (provide 'fuel-menu)
-;;; fuel-menu.el ends here
 
+;;; fuel-menu.el ends here

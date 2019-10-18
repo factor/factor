@@ -24,8 +24,6 @@ SYMBOL: last-word-symbol
 
 M: word execute (execute) ;
 
-M: word ?execute execute( -- value ) ; inline
-
 M: word <=>
     [ [ name>> ] [ vocabulary>> ] bi 2array ] compare ;
 

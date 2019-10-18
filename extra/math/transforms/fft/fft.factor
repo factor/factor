@@ -6,41 +6,43 @@ IN: math.transforms.fft
 
 <PRIVATE
 
+DEFER: (fft)
+
 ! Discrete Fourier Transform
 :: (slow-fft) ( seq inverse? -- seq' )
     seq length :> N
-    inverse? 1 -1 ? 2pi * i* N / N iota n*v :> omega
+    inverse? 1 -1 ? 2pi * N / N iota n*v :> omega
     N iota [| k |
-        0 seq omega [ k * e^ * + ] 2each
+        0 seq omega [ k * cis * + ] 2each
         inverse? [ N / ] when
     ] map ; inline
 
 ! Cooley–Tukey Algorithm
-:: (fft) ( seq inverse? -- seq' )
+:: (fast-fft) ( seq inverse? -- seq' )
     seq length :> N
     N 1 = [ seq ] [
-        seq even-indices inverse? (fft)
-        seq odd-indices inverse? (fft)
-        inverse? 1 -1 ? 2pi * i* N /
-        [ * e^ * ] curry map-index!
+        seq even-indices inverse? (fast-fft)
+        seq odd-indices inverse? (fast-fft)
+        inverse? 1 -1 ? 2pi * N /
+        [ * cis * ] curry map-index!
         [ [ + inverse? [ 2 / ] when ] 2map ]
         [ [ - inverse? [ 2 / ] when ] 2map ]
         2bi append
     ] if ; inline recursive
+
+: (fft) ( seq inverse? -- seq' )
+    over length power-of-2?
+    [ (fast-fft) ] [ (slow-fft) ] if ; inline
 
 PRIVATE>
 
 ERROR: not-enough-data ;
 
 : fft ( seq -- seq' )
-    [ not-enough-data ] [
-        f over length even? [ (fft) ] [ (slow-fft) ] if
-    ] if-empty ;
+    [ not-enough-data ] [ f (fft) ] if-empty ;
 
 : ifft ( seq -- seq' )
-    [ not-enough-data ] [
-        t over length even? [ (fft) ] [ (slow-fft) ] if
-    ] if-empty ;
+    [ not-enough-data ] [ t (fft) ] if-empty ;
 
 : correlate ( x y -- z )
     [ fft ] [ reverse fft ] bi* v* ifft ;

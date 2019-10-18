@@ -25,7 +25,7 @@ IN: io.ports.tests
 [ ] [ "test.txt" temp-file delete-file ] unit-test
 
 ! Getting the stream-element-type of an output-port was broken
-[ +byte+ ] [ binary <pipe> [ stream-element-type ] [ dispose ] bi ] unit-test
-[ +byte+ ] [ binary <pipe> [ out>> stream-element-type ] [ dispose ] bi ] unit-test
-[ +character+ ] [ ascii <pipe> [ stream-element-type ] [ dispose ] bi ] unit-test
-[ +character+ ] [ ascii <pipe> [ out>> stream-element-type ] [ dispose ] bi ] unit-test
+[ +byte+ ] [ binary <pipe> [ stream-element-type ] with-disposal ] unit-test
+[ +byte+ ] [ binary <pipe> [ out>> stream-element-type ] with-disposal ] unit-test
+[ +character+ ] [ ascii <pipe> [ stream-element-type ] with-disposal ] unit-test
+[ +character+ ] [ ascii <pipe> [ out>> stream-element-type ] with-disposal ] unit-test

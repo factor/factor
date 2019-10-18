@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io kernel macros make multiline namespaces vocabs.parser
-present sequences strings splitting fry accessors ;
+USING: accessors arrays fry hashtables io kernel macros make
+math.parser multiline namespaces present sequences
+sequences.generalizations splitting strings vocabs.parser ;
 IN: interpolate
 
 <PRIVATE
@@ -41,3 +42,9 @@ MACRO: interpolate ( string -- )
 SYNTAX: I[
     "]I" parse-multiline-string
     interpolate-locals append! ;
+
+MACRO: ninterpolate ( str n -- quot )
+    swap '[
+        _ narray [ number>string swap 2array ] map-index
+        >hashtable [ _ interpolate ] with-variables
+    ] ;

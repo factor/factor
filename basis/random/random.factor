@@ -14,21 +14,20 @@ SYMBOL: system-random-generator
 SYMBOL: secure-random-generator
 SYMBOL: random-generator
 
-GENERIC# seed-random 1 ( tuple seed -- tuple' )
-GENERIC: random-32* ( tuple -- r )
-GENERIC: random-bytes* ( n tuple -- byte-array )
+GENERIC# seed-random 1 ( obj seed -- obj )
+GENERIC: random-32* ( obj -- n )
+GENERIC: random-bytes* ( n obj -- byte-array )
 
-M: object random-bytes* ( n tuple -- byte-array )
-    [ [ <byte-vector> ] keep 4 /mod ] dip
-    [ pick '[ _ random-32* c:int <ref> _ push-all ] times ]
-    [
-        over zero?
-        [ 2drop ] [ random-32* c:int <ref> swap head append! ] if
-    ] bi-curry bi* B{ } like ;
+M: object random-bytes*
+    [ integer>fixnum-strict [ <byte-array> ] keep ] dip
+    [ over 4 >= ] [
+        [ 4 - ] dip
+        [ random-32* 2over c:int c:set-alien-value ] keep
+    ] while over zero? [ 2drop ] [
+        random-32* c:int <ref> swap head 0 pick copy-unsafe
+    ] if ;
 
-HINTS: M\ object random-bytes* { fixnum object } ;
-
-M: object random-32* ( tuple -- r )
+M: object random-32*
     4 swap random-bytes* c:uint deref ;
 
 ERROR: no-random-number-generator ;
@@ -40,42 +39,56 @@ M: f random-bytes* ( n obj -- * ) no-random-number-generator ;
 
 M: f random-32* ( obj -- * ) no-random-number-generator ;
 
-: random-32 ( -- n ) random-generator get random-32* ;
+: random-32 ( -- n )
+    random-generator get random-32* ;
 
-TYPED: random-bytes ( n: fixnum -- byte-array: byte-array )
-    random-generator get random-bytes* ; inline
+: random-bytes ( n -- byte-array )
+    random-generator get random-bytes* ;
 
 <PRIVATE
 
-: #bits ( n -- bits )
-    dup 2 <= [ drop 1 ] [ 1 - log2 1 + ] if ; inline
-
-:: (random-bits) ( n bits obj -- n' )
-    obj random-32* 32 bits 32 - [ dup 0 > ] [
-        [ 32 shift obj random-32* + ] [ 32 + ] [ 32 - ] tri*
-    ] while drop [ n * ] [ neg shift ] bi* ; inline
-
-: ((random-integer)) ( n obj -- n' )
-    [ dup #bits ] dip (random-bits) ; inline
-
-GENERIC# (random-integer) 1 ( n obj -- n )
-M: fixnum (random-integer) ( n obj -- n' ) ((random-integer)) ;
-M: bignum (random-integer) ( n obj -- n' ) ((random-integer)) ;
-
-: random-integer ( n -- n' )
-    random-generator get (random-integer) ;
+:: (random-bits) ( numbits obj -- n )
+    numbits 32 > [
+        obj random-32* numbits 32 - [ dup 32 > ] [
+            [ 32 shift obj random-32* + ] [ 32 - ] bi*
+        ] while [
+            [ shift ] keep obj random-32* swap bits +
+        ] unless-zero
+    ] [
+        obj random-32* numbits bits
+    ] if ; inline
 
 PRIVATE>
 
-: random-bits ( numbits -- r )
-    [ 2^ ] keep random-generator get (random-bits) ;
+: random-bits ( numbits -- n )
+    random-generator get (random-bits) ;
 
 : random-bits* ( numbits -- n )
     1 - [ random-bits ] keep set-bit ;
 
+<PRIVATE
+
+: next-power-of-2-bits ( m -- numbits )
+    dup 2 <= [ drop 1 ] [ 1 - log2 1 + ] if ; inline
+
+:: ((random-integer)) ( m obj -- n )
+    obj random-32* 32 m next-power-of-2-bits 32 - [ dup 0 > ] [
+        [ 32 shift obj random-32* + ] [ 32 + ] [ 32 - ] tri*
+    ] while drop [ m * ] [ neg shift ] bi* ; inline
+
+GENERIC# (random-integer) 1 ( m obj -- n )
+M: fixnum (random-integer) ( m obj -- n ) ((random-integer)) ;
+M: bignum (random-integer) ( m obj -- n ) ((random-integer)) ;
+
+: random-integer ( m -- n )
+    random-generator get (random-integer) ;
+
+PRIVATE>
+
 GENERIC: random ( obj -- elt )
 
-M: integer random [ f ] [ random-integer ] if-zero ;
+M: integer random
+    [ f ] [ random-integer ] if-zero ;
 
 M: sequence random
     [ f ] [
@@ -122,7 +135,7 @@ ERROR: too-many-samples seq n ;
     [ length random-integer ] keep
     [ nth ] 2keep remove-nth! drop ;
 
-: with-random ( tuple quot -- )
+: with-random ( obj quot -- )
     random-generator swap with-variable ; inline
 
 : with-system-random ( quot -- )
@@ -162,11 +175,15 @@ PRIVATE>
 : random-integers ( length n -- sequence )
     random-generator get '[ _ _ (random-integer) ] replicate ;
 
+<PRIVATE
+
 : (cos-random-float) ( -- n )
     0. 2pi uniform-random-float cos ;
 
 : (log-sqrt-random-float) ( -- n )
     random-unit log -2. * sqrt ;
+
+PRIVATE>
 
 : normal-random-float ( mean sigma -- n )
     (cos-random-float) (log-sqrt-random-float) * * + ;
@@ -185,6 +202,8 @@ PRIVATE>
 
 : pareto-random-float ( k alpha -- n )
     [ random-unit ] dip recip ^ /f ;
+
+<PRIVATE
 
 :: (gamma-random-float>1) ( alpha beta -- n )
     ! Uses R.C.H. Cheng, "The generation of Gamma
@@ -237,6 +256,8 @@ PRIVATE>
         ] if x!
     ] do while x beta * ;
 
+PRIVATE>
+
 : gamma-random-float ( alpha beta -- n )
     {
         { [ over 1 > ] [ (gamma-random-float>1) ] }
@@ -275,12 +296,16 @@ PRIVATE>
         rnd (random-unit) 0.5 > [ + ] [ - ] if
     ] if ;
 
+<PRIVATE
+
 :: (triangular-random-float) ( low high mode -- n )
     mode low - high low - / :> c!
     random-unit :> u!
     high low
     u c > [ 1. u - u! 1. c - c! swap ] when
     [ - u c * sqrt * ] keep + ;
+
+PRIVATE>
 
 : triangular-random-float ( low high -- n )
     2dup + 2 /f (triangular-random-float) ;

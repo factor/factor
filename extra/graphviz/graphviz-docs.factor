@@ -200,7 +200,7 @@ $nl
 
 $nl
 
-"In " { $emphasis "strict" } " " { $link graph } "s, there is at most one "  { $link edge } " between any two " { $link node } "s, so duplicates are ignored while rendering. See " { $vocab-link "graphviz.render" } " for more information."
+"In " { $emphasis "strict" } " " { $link graph } "s, there is at most one "  { $link edge } " between any two " { $link node } "s, so duplicates are ignored by Graphviz."
 }
 { $examples
     { $example "USING: graphviz prettyprint ;" "<strict-digraph> graph? ." "t" }
@@ -230,7 +230,7 @@ $nl
 
 $nl
 
-"In " { $emphasis "strict" } " " { $link graph } "s, there is at most one "  { $link edge } " between any two " { $link node } "s, so duplicates are ignored while rendering. See " { $vocab-link "graphviz.render" } " for more information."
+"In " { $emphasis "strict" } " " { $link graph } "s, there is at most one "  { $link edge } " between any two " { $link node } "s, so duplicates are ignored by Graphviz."
 }
 { $examples
     { $example "USING: graphviz prettyprint ;" "<strict-graph> graph? ." "t" }
@@ -483,7 +483,7 @@ HELP: edge
 { $class-description
 "Represents a Graphviz edge. Each " { $link edge } " is defined by its " { $slot "tail" } " slot and its " { $slot "head" } " slot. Each slot must be either"
 { $list
-    { { $instance string } " representing the " { $slot "id" } " of a " { $link node } " or" }
+    { { $instance string } " representing the " { $snippet "id" } " of a " { $link node } " or" }
     { { $instance subgraph } ", which is a convenient way to represent multiple Graphviz edges." }
 }
 
@@ -507,7 +507,6 @@ HELP: edge
         { "edge from each node in " { $slot "tail" } "\nto each node in " { $slot "head" } }
     }
 }
-"For more details, see " { $vocab-link "graphviz.render" } "."
 $nl
 "In addition, an " { $link edge } " may store local attributes in its " { $slot "attributes" } " slot (" { $instance edge-attributes } " tuple)."
 }
@@ -560,14 +559,14 @@ $nl
 
 HELP: node
 { $class-description
-"Represents a single Graphviz node. Each " { $link node } " is uniquely determined by an " { $slot "id" } " (" { $instance string } ") and may have per-node attributes stored in its " { $slot "attributes" } " slot (" { $instance node-attributes } " tuple)." ! TODO see graphviz.attributes
+"Represents a single Graphviz node. Each " { $link node } " is uniquely determined by an " { $slot "id" } " (" { $instance string } ") and may have per-node attributes stored in its " { $slot "attributes" } " slot (" { $instance node-attributes } " tuple)."
 } ;
 
 HELP: subgraph
 { $class-description
 "Represents a logical grouping of nodes and edges within a Graphviz graph. See " { $url "http://graphviz.org/Documentation.php" } " for more information."
 $nl
-"Its structure is largely similar to " { $link graph } ", except " { $link subgraph } " only has two slots: " { $slot "id" } " (" { $instance string } ") and " { $slot "statements" } " (" { $instance sequence } "). The " { $slot "strict?" } " and " { $slot "directed?" } " slots of the parent " { $link graph } " are implicitly inherited by a " { $link subgraph } "."
+"Its structure is largely similar to " { $link graph } ", except " { $link subgraph } " only has two slots: " { $slot "id" } " (" { $instance string } ") and " { $slot "statements" } " (" { $instance sequence } "). The " { $snippet "strict?" } " and " { $snippet "directed?" } " slots of the parent " { $link graph } " are implicitly inherited by a " { $link subgraph } "."
 $nl
 { $slot "id" } " and " { $slot "statements" } " correspond to the name and defining \"body\" of a subgraph in the DOT language, as in " { $strong "subgraph" } " " { $slot "id" } " " { $strong "{" } " ... " { $slot "statements" } " ... " { $strong "}" } "."
 $nl
@@ -583,7 +582,7 @@ $nl
 } ;
 
 ARTICLE: { "graphviz" "data" } "Graphviz data structures"
-"To use the " { $vocab-link "graphviz" } " vocabulary, we construct Factor objects that can be converted to data understood by Graphviz (specifically, that " { $emphasis "libgraph" } " and " { $emphasis "libgvc" } " can understand; see " { $vocab-link "graphviz.ffi" } ")."
+"To use the " { $vocab-link "graphviz" } " vocabulary, we construct Factor objects that can be converted to data understood by Graphviz (see " { $vocab-link "graphviz.dot" } ")."
 $nl
 "The following classes are used to represent their equivalent Graphviz structures:"
 { $subsections node edge subgraph graph }

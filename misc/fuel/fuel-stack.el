@@ -15,22 +15,25 @@
 ;;; Code:
 
 (require 'fuel-autodoc)
-(require 'fuel-syntax)
 (require 'fuel-eval)
-(require 'fuel-font-lock)
 (require 'fuel-base)
+(require 'factor-mode)
 
 
 ;;; Customization
 
+;;;###autoload
 (defgroup fuel-stack nil
   "Customization for FUEL's stack inference engine."
   :group 'fuel)
 
-(fuel-font-lock--defface fuel-font-lock-stack-region
-  'highlight fuel-stack "highlighting the stack effect region")
+(defface fuel-stack-region-face '((t (:inherit highlight)))
+  "Highlights the region being stack inferenced."
+  :group 'fuel-stack
+  :group 'fuel-faces
+  :group 'fuel)
 
-(defcustom fuel-stack-highlight-period 2.0
+(defcustom fuel-stack-highlight-period 1.0
   "Time, in seconds, the region is highlighted when showing its
 stack effect.
 
@@ -60,7 +63,7 @@ Set it to 0 to disable highlighting."
 
 (defvar fuel-stack--overlay
   (let ((overlay (make-overlay 0 0)))
-    (overlay-put overlay 'face 'fuel-font-lock-stack-region)
+    (overlay-put overlay 'face 'fuel-stack-region-face)
     (delete-overlay overlay)
     overlay))
 
@@ -70,11 +73,11 @@ Set it to 0 to disable highlighting."
   (when (> fuel-stack-highlight-period 0)
     (move-overlay fuel-stack--overlay begin end))
   (condition-case nil
-      (let* ((str (fuel--region-to-string begin end))
+      (let* ((str (fuel-region-to-string begin end))
              (effect (fuel-stack--infer-effect/prop str)))
         (if effect (message "%s" effect)
           (message "Couldn't infer effect for '%s'"
-                   (fuel--shorten-region begin end 60)))
+                   (fuel-shorten-region begin end 60)))
         (sit-for fuel-stack-highlight-period))
     (error))
   (delete-overlay fuel-stack--overlay))
@@ -85,21 +88,21 @@ With prefix argument, use current region instead"
   (interactive "P")
   (if arg
       (call-interactively 'fuel-stack-effect-region)
-    (fuel-stack-effect-region (1+ (fuel-syntax--beginning-of-sexp-pos))
-                              (if (looking-at-p ";") (point)
-                                (fuel-syntax--end-of-symbol-pos)))))
+    (fuel-stack-effect-region (1+ (factor-beginning-of-sexp-pos))
+                              (if (looking-at-p ";")
+                                  (point)
+                                (save-excursion
+                                  (factor-end-of-symbol) (point))))))
 
 
 ;;; Stack mode:
 
-(make-variable-buffer-local
- (defvar fuel-stack-mode-string " S"
-   "Modeline indicator for fuel-stack-mode"))
+(defvar-local fuel-stack-mode-string " S"
+  "Modeline indicator for fuel-stack-mode")
 
-(make-variable-buffer-local
- (defvar fuel-stack--region-function
-   '(lambda ()
-      (fuel--region-to-string (1+ (fuel-syntax--beginning-of-sexp-pos))))))
+(defvar-local fuel-stack--region-function
+  '(lambda ()
+     (fuel-region-to-string (1+ (factor-beginning-of-sexp-pos)))))
 
 (defun fuel-stack--eldoc ()
   (when (looking-at-p " \\|$")
@@ -109,9 +112,10 @@ With prefix argument, use current region instead"
                    (fuel-stack--infer-effect/prop r))))
       (when e
         (if fuel-stack-mode-show-sexp-p
-            (concat (fuel--shorten-str r 30) " -> " e)
+            (concat (fuel-shorten-str r 30) " -> " e)
           e)))))
 
+;;;###autoload
 (define-minor-mode fuel-stack-mode
   "Toggle Fuel's Stack mode.
 With no argument, this command toggles the mode.
@@ -126,10 +130,10 @@ sexp are automatically displayed in the echo area."
 
   (setq fuel-autodoc--fallback-function
         (when fuel-stack-mode 'fuel-stack--eldoc))
-  (set (make-local-variable 'eldoc-minor-mode-string) nil)
+  (setq-local eldoc-minor-mode-string nil)
   (unless fuel-autodoc-mode
-    (set (make-local-variable 'eldoc-documentation-function)
-         (when fuel-stack-mode 'fuel-stack--eldoc))
+    (setq-local eldoc-documentation-function
+                (when fuel-stack-mode 'fuel-stack--eldoc))
     (eldoc-mode fuel-stack-mode)
     (message "Fuel Stack Autodoc %s" (if fuel-stack-mode "enabled" "disabled"))))
 

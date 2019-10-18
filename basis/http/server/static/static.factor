@@ -71,7 +71,7 @@ TUPLE: file-responder root hook special index-names allow-listings ;
 
 : list-directory ( directory -- response )
     file-responder get allow-listings>> [
-        directory>html "text/html" <content>
+        directory>html <html-content>
     ] [
         drop <403>
     ] if ;
@@ -105,7 +105,7 @@ M: file-responder call-responder* ( path responder -- response )
     index-names>> adjoin ;
 
 : serve-fhtml ( path -- response )
-    <fhtml> "text/html" <content> ;
+    <fhtml> <html-content> ;
 
 : enable-fhtml ( responder -- responder )
     [ serve-fhtml ] "application/x-factor-server-page" pick special>> set-at

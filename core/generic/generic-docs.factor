@@ -128,19 +128,20 @@ HELP: define-generic
 
 HELP: M\
 { $syntax "M\\ class generic" }
-{ $class-description "Pushes a method on the stack." }
+{ $description "Pushes a method on the stack." }
 { $examples { $code "M\\ fixnum + see" } { $code "USING: ui.gadgets.editors ui.render ;" "M\\ editor draw-gadget* edit" } } ;
+
+HELP: method
+{ $class-description "The class of method bodies, which are words with special word properties set." } ;
 
 HELP: lookup-method
 { $values { "class" class } { "generic" generic } { "method" method } }
 { $description "Looks up a method definition." }
-{ $class-description "The class of method bodies, which are words with special word properties set." }
 { $errors "Throws an error if the method does not exist." } ;
 
 HELP: ?lookup-method
 { $values { "class" class } { "generic" generic } { "method/f" { $maybe method } } }
-{ $description "Looks up a method definition." }
-{ $class-description "The class of method bodies, which are words with special word properties set." } ;
+{ $description "Looks up a method definition." } ;
 
 { lookup-method ?lookup-method create-method POSTPONE: M: } related-words
 
@@ -158,7 +159,7 @@ HELP: check-method
 { $error-description "Thrown if " { $link POSTPONE: M: } " or " { $link create-method } " is given an invalid class or generic word." } ;
 
 HELP: with-methods
-{ $values { "class" class } { "generic" generic } { "quot" { $quotation "( methods -- )" } } }
+{ $values { "class" class } { "generic" generic } { "quot" { $quotation ( methods -- ) } } }
 { $description "Applies a quotation to the generic word's methods hashtable, and regenerates the generic word's definition when the quotation returns." }
 $low-level-note ;
 

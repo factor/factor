@@ -12,5 +12,5 @@ IN: xmode.code2html.responder
             _ utf8 [
                 _ file-name input-stream get htmlize-stream
             ] with-file-reader
-        ] "text/html" <content>
+        ] <html-content>
     ] <file-responder> ;

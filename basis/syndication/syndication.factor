@@ -80,7 +80,7 @@ TUPLE: entry title url description date ;
             [ children>string ] if >>description
         ]
         [
-            { "published" "updated" "issued" "modified" } 
+            { "published" "updated" "issued" "modified" }
             any-tag-named children>string try-parsing-timestamp
             >>date
         ]
@@ -122,7 +122,7 @@ M: byte-array parse-feed [ bytes>xml xml>feed ] with-html-entities ;
     [XML
         <entry>
             <title type="html"><-></title>
-            <link href=<-> />
+            <link rel="alternate" href=<-> />
             <published><-></published>
             <content type="html"><-></content>
         </entry>
@@ -135,7 +135,7 @@ M: byte-array parse-feed [ bytes>xml xml>feed ] with-html-entities ;
     <XML
         <feed xmlns="http://www.w3.org/2005/Atom">
             <title><-></title>
-            <link href=<-> />
+            <link rel="alternate" href=<-> />
             <->
         </feed>
     XML> ;

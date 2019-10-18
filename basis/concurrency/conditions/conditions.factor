@@ -20,7 +20,7 @@ IN: concurrency.conditions
         ]
     ] dip later ;
 
-ERROR: wait-timeout ;
+ERROR: timed-out-error timer ;
 
 : queue ( queue -- )
     [ self ] dip push-front ; inline
@@ -28,7 +28,7 @@ ERROR: wait-timeout ;
 : wait ( queue timeout status -- )
     over [
         [ queue-timeout ] dip suspend
-        [ wait-timeout ] [ stop-timer ] if
+        [ timed-out-error ] [ stop-timer ] if
     ] [
         [ drop queue ] dip suspend drop
     ] if ; inline

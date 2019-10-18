@@ -263,14 +263,14 @@ DEFER: @neg-digit
         [ @neg-digit ]
     } case ; inline
 
-: @first-char ( i number-parse n char -- n/f ) 
+: @first-char ( i number-parse n char -- n/f )
     {
         { CHAR: - [ [ @neg-first-digit ] require-next-digit ?neg ] }
         { CHAR: + [ [ @pos-first-digit ] require-next-digit ] }
         [ @pos-first-digit ]
     } case ; inline
 
-: @first-char-no-radix ( i number-parse n char -- n/f ) 
+: @first-char-no-radix ( i number-parse n char -- n/f )
     {
         { CHAR: - [ [ @neg-digit ] require-next-digit ?neg ] }
         { CHAR: + [ [ @pos-digit ] require-next-digit ] }

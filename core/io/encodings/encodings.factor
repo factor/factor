@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Daniel Ehrenberg, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators destructors io io.streams.plain
-kernel math namespaces sbufs sequences sequences.private
-splitting strings ;
+USING: accessors byte-arrays combinators destructors io
+io.streams.plain kernel kernel.private math namespaces sbufs
+sequences sequences.private splitting strings strings.private ;
 IN: io.encodings
 
 ! The encoding descriptor protocol
@@ -36,6 +36,35 @@ PRIVATE>
 
 M: object decode-until (decode-until) ;
 
+CONSTANT: replacement-char 0xfffd
+
+<PRIVATE
+
+: string>byte-array-fast ( string -- byte-array )
+    { string } declare ! aux>> must be f
+    [ length ] keep over (byte-array) [
+        [
+            [ [ string-nth-fast ] 2keep drop ]
+            [ set-nth-unsafe ] bi*
+        ] 2curry each-integer
+    ] keep ; inline
+
+: byte-array>string-fast ( byte-array -- string )
+    { byte-array } declare
+    [ length ] keep over 0 <string> [
+        [
+            [ [ nth-unsafe ] 2keep drop ]
+            [
+                pick 127 <=
+                [ set-string-nth-fast ]
+                [ [ drop replacement-char ] 2dip set-string-nth-slow ]
+                if
+            ] bi*
+        ] 2curry each-integer
+    ] keep dup reset-string-hashcode ;
+
+PRIVATE>
+
 GENERIC: encode-char ( char stream encoding -- )
 
 GENERIC: encode-string ( string stream encoding -- )
@@ -43,8 +72,6 @@ GENERIC: encode-string ( string stream encoding -- )
 M: object encode-string [ encode-char ] 2curry each ; inline
 
 GENERIC: <decoder> ( stream encoding -- newstream )
-
-CONSTANT: replacement-char 0xfffd
 
 TUPLE: decoder { stream read-only } { code read-only } { cr boolean } ;
 INSTANCE: decoder input-stream
@@ -79,12 +106,13 @@ M: decoder stream-element-type
 
 : fix-cr ( decoder c -- c' )
     over cr>> [
-        over cr-
-        dup CHAR: \n eq? [ drop (read1) ] [ nip ] if
+        over cr- dup CHAR: \n eq? [ drop (read1) ] [ nip ] if
     ] [ nip ] if ; inline
 
 M: decoder stream-read1 ( decoder -- ch )
     dup (read1) fix-cr ; inline
+
+M: decoder stream-tell stream>> stream-tell ;
 
 : (read-first) ( n buf decoder -- buf stream encoding n c )
     [ rot [ >decoder< ] dip 2over decode-char ]
@@ -122,8 +150,9 @@ M: decoder stream-contents*
 : line-ends\r ( stream str -- str ) swap cr+ ; inline
 
 : line-ends\n ( stream str -- str )
-    over cr>> over empty? and
-    [ drop dup cr- stream-readln ] [ swap cr- ] if ; inline
+    over cr>> [
+        over cr- [ stream-readln ] [ nip ] if-empty
+    ] [ nip ] if ; inline
 
 : handle-readln ( stream str ch -- str )
     {
@@ -132,7 +161,23 @@ M: decoder stream-contents*
         { CHAR: \n [ line-ends\n ] }
     } case ; inline
 
-M: decoder stream-read-until >decoder< decode-until ;
+M: decoder stream-read-until
+    dup cr>> [
+        dup cr- 2dup
+        >decoder< decode-until
+        over [
+            dup CHAR: \n = [
+                2drop stream-read-until
+            ] [
+                [ 2drop ] 2dip
+            ] if
+        ] [
+            first-unsafe CHAR: \n = [ [ rest ] dip ] when
+            [ 2drop ] 2dip
+        ] if-empty
+    ] [
+        >decoder< decode-until
+    ] if ;
 
 M: decoder stream-readln
     "\r\n" over >decoder< decode-until handle-readln ;
@@ -159,6 +204,7 @@ M: encoder dispose stream>> dispose ; inline
 M: encoder stream-flush stream>> stream-flush ; inline
 
 INSTANCE: encoder plain-writer
+
 PRIVATE>
 
 GENERIC# re-encode 1 ( stream encoding -- newstream )

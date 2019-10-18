@@ -60,7 +60,7 @@ CONSTANT: cpus
     [
         [
             package-grid xml>string
-            "text/html" <content>
+            <html-content>
         ] with-mason-db
     ] >>display ;
 
@@ -82,6 +82,6 @@ CONSTANT: cpus
     [
         [
             release-grid xml>string
-            "text/html" <content>
+            <html-content>
         ] with-mason-db
     ] >>display ;

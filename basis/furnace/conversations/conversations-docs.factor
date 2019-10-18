@@ -28,7 +28,7 @@ HELP: cset
 { $description "Sets the value of a conversation variable." } ;
 
 HELP: cchange
-{ $values { "key" symbol } { "quot" { $quotation "( old -- new )" } } }
+{ $values { "key" symbol } { "quot" { $quotation ( old -- new ) } } }
 { $description "Applies the quotation to the old value of the conversation variable, and assigns the resulting value back to the variable." } ;
 
 ARTICLE: "furnace.conversations" "Furnace conversation scope"

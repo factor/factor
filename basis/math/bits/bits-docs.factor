@@ -5,29 +5,32 @@ IN: math.bits
 
 ABOUT: "math.bits"
 
-ARTICLE: "math.bits" "Number bits virtual sequence"
-"The " { $vocab-link "math.bits" } " vocabulary implements a virtual sequence which presents an integer as a sequence of bits, with the first element of the sequence being the least significant bit of the integer."
+ARTICLE: "math.bits" "Integer virtual sequences"
+"The " { $vocab-link "math.bits" } " vocabulary implements words that represent a positive integer as a virtual sequence of bits in order of ascending significance, e.g. " { $snippet "{ f f f t }" } " is " { $snippet "8" } "."
 { $subsections
     bits
     <bits>
     make-bits
+    bits>number
 } ;
 
 HELP: bits
-{ $class-description "Virtual sequence class of bits of a number. The first bit is the least significant bit. This can be constructed with " { $link <bits> } " or " { $link make-bits } "." } ;
+{ $class-description "Tuple representing a number as a virtual sequence of booleans. The first bit is the least significant bit. Constructors are " { $link <bits> } " or " { $link make-bits } "." } ;
 
 HELP: <bits>
 { $values { "number" integer } { "length" integer } { "bits" bits } }
-{ $description "Creates a virtual sequence of bits of a number in little endian order, with the given length." } ;
+{ $description "Constructor for a " { $link bits } " tuple." } ;
 
 HELP: make-bits
 { $values { "number" integer } { "bits" bits } }
-{ $description "Creates a " { $link bits } " object out of the given number, using its log base 2 as the length. This implies that the last element, corresponding to the most significant bit, will be 1." }
+{ $description "Creates a sequence of " { $link bits } " in ascending significance. Throws an error on negative numbers." }
 { $examples
     { $example "USING: math.bits prettyprint arrays ;" "0b1101 make-bits >array ." "{ t f t t }" }
-    { $example "USING: math.bits prettyprint arrays ;" "-3 make-bits >array ." "{ t f }" }
+    { $example "USING: math.bits prettyprint arrays ;" "64 make-bits >array ." "{ f f f f f f t }" }
 } ;
+{ <bits> make-bits } related-words
 
-HELP: unbits
+HELP: bits>number
 { $values { "seq" sequence } { "number" integer } }
-{ $description "Turns a sequence of booleans, of the same format made by the " { $link bits } " class, and calculates the number that it represents as little-endian." } ;
+{ $description "Converts a sequence of booleans in ascending significance into a number." } ;
+{ make-bits bits>number } related-words

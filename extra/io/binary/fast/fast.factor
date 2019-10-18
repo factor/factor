@@ -1,8 +1,13 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators combinators.smart fry kernel macros math
-math.ranges sequences sequences.generalizations io.binary
-locals ;
+USING: alien.data byte-arrays combinators combinators.smart
+endian fry io.binary kernel locals macros math math.ranges
+sequences sequences.generalizations ;
+QUALIFIED-WITH: alien.c-types c
+RENAME: be> io.binary => slow-be>
+RENAME: le> io.binary => slow-le>
+RENAME: >be io.binary => >slow-be
+RENAME: >le io.binary => >slow-le
 IN: io.binary.fast
 
 ERROR: bad-length bytes n ;
@@ -32,11 +37,64 @@ MACRO: reassemble-le ( n -- quot ) le-range reassemble-bytes ;
 :: n-le> ( bytes n -- x )
     bytes n check-length drop n firstn-unsafe n reassemble-le ; inline
 
-: 2be> ( bytes -- x ) 2 n-be> ;
-: 4be> ( bytes -- x ) 4 n-be> ;
-: 8be> ( bytes -- x ) 8 n-be> ;
+<PRIVATE
+: if-endian ( endian bytes seq -- )
+    [
+        compute-native-endianness =
+        [ dup byte-array? ] [ f ] if
+    ] 2dip if ; inline
+PRIVATE>
 
-: 2le> ( bytes -- x ) 2 n-le> ;
-: 4le> ( bytes -- x ) 4 n-le> ;
-: 8le> ( bytes -- x ) 8 n-le> ;
+: 2be> ( bytes -- x )
+    big-endian [ c:ushort deref ] [ 2 n-be> ] if-endian ;
 
+: 4be> ( bytes -- x )
+    big-endian [ c:uint deref ] [ 4 n-be> ] if-endian ;
+
+: 8be> ( bytes -- x )
+    big-endian [ c:ulonglong deref ] [ 8 n-be> ] if-endian ;
+
+: be> ( bytes -- x )
+    dup length {
+        { 2 [ 2be> ] }
+        { 4 [ 4be> ] }
+        { 8 [ 8be> ] }
+        [ drop slow-be> ]
+    } case ;
+
+: 2le> ( bytes -- x )
+    little-endian [ c:ushort deref ] [ 2 n-le> ] if-endian ;
+
+: 4le> ( bytes -- x )
+    little-endian [ c:uint deref ] [ 4 n-le> ] if-endian ;
+
+: 8le> ( bytes -- x )
+    little-endian [ c:ulonglong deref ] [ 8 n-le> ] if-endian ;
+
+: le> ( bytes -- x )
+    dup length {
+        { 2 [ 2le> ] }
+        { 4 [ 4le> ] }
+        { 8 [ 8le> ] }
+        [ drop slow-le> ]
+    } case ;
+
+: >le ( x n -- bytes )
+    compute-native-endianness little-endian = [
+        {
+            { 2 [ c:short <ref> ] }
+            { 4 [ c:int <ref> ] }
+            { 8 [ c:longlong <ref> ] }
+            [ >slow-le ]
+        } case
+    ] [ >slow-le ] if ;
+
+: >be ( x n -- bytes )
+    compute-native-endianness big-endian = [
+        {
+            { 2 [ c:short <ref> ] }
+            { 4 [ c:int <ref> ] }
+            { 8 [ c:longlong <ref> ] }
+            [ >slow-be ]
+        } case
+    ] [ >slow-be ] if ;

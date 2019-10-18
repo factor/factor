@@ -46,7 +46,7 @@ M: fold-model model-activated drop ;
 TUPLE: updater-model < multi-model values updates ;
 M: updater-model (model-changed) [ tuck updates>> =
    [ [ values>> value>> ] keep set-model ]
-   [ drop ] if ] keep f swap (>>value) ;
+   [ drop ] if ] keep f swap value<< ;
 : updates ( values updates -- model ) [ 2array updater-model <multi-model> ] 2keep
    [ >>values ] [ >>updates ] bi* ;
 

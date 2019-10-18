@@ -1,12 +1,18 @@
-USING: io kernel accessors math.parser sequences prettyprint
-debugger peg ;
+USING: accessors debugger io kernel math.parser peg prettyprint
+sequences ;
 IN: peg.debugger
 
+
 M: parse-error error.
-  "Peg parsing error at character position " write dup position>> number>string write 
-  "." print "Expected " write messages>> [ " or " write ] [ write ] interleave nl ;
+    [
+        "Peg parsing error at character position " write
+        position>> number>string write
+    ] [
+        ".\nExpected " write messages>> " or " join write
+    ] [
+        "\nGot '" write got>> write "'" print
+    ] tri ;
 
 M: parse-failed error.
-  "The " write dup word>> pprint " word could not parse the following input:" print nl
-  input>> . ;
-
+    "The " write dup word>> pprint " word could not parse the following input:" print nl
+    input>> . ;

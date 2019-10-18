@@ -1,7 +1,7 @@
 USING: kernel math math.floats.env math.floats.env.private
-math.functions math.libm sequences tools.test locals
+math.functions math.libm literals sequences tools.test locals
 compiler.units kernel.private fry compiler.test math.private
-words system memory ;
+words system memory kernel.private ;
 IN: math.floats.env.tests
 
 : set-default-fp-env ( -- )
@@ -111,7 +111,7 @@ os linux? cpu x86.64? and [
 ] unit-test
 
 : fp-trap-error? ( error -- ? )
-    2 head { "kernel-error" 17 } = ;
+    2 head ${ "kernel-error" ERROR-FP-TRAP } = ;
 
 : test-traps ( traps inputs quot -- quot' fail-quot )
     append '[ _ _ with-fp-traps ] [ fp-trap-error? ] ;

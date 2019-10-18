@@ -414,5 +414,8 @@ HOOK: initial-dns-servers os ( -- sequence )
     { [ os windows? ] [ "dns.windows" ] }
     { [ os unix? ] [ "dns.unix" ] }
 } cond require
+
+: with-dns-servers ( servers quot -- )
+    [ dns-servers ] dip with-variable ; inline
     
 dns-servers [ initial-dns-servers >vector ] initialize

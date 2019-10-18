@@ -1,17 +1,17 @@
 ! Copyright (C) 2007 Elie CHAFTARI
 ! Portions copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax combinators kernel
-system namespaces assocs parser lexer sequences words
+USING: alien alien.c-types alien.parser alien.syntax classes.struct combinators
+kernel openssl.libcrypto system namespaces assocs parser lexer sequences words
 quotations math.bitwise alien.libraries literals ;
 
 IN: openssl.libssl
 
-<< {
-    { [ os windows? ] [ "libssl" "ssleay32.dll" cdecl add-library ] }
-    { [ os macosx? ] [ "libssl" "libssl.dylib" cdecl add-library ] }
-    { [ os unix? ] [ "libssl" "libssl.so" cdecl add-library ] }
-} cond >>
+<< "libssl" {
+    { [ os windows? ] [ "ssleay32.dll" ] }
+    { [ os macosx? ] [ "libssl.dylib" ] }
+    { [ os unix? ] [ "libssl.so" ] }
+} cond cdecl add-library >>
 
 CONSTANT: X509_FILETYPE_PEM       1
 CONSTANT: X509_FILETYPE_ASN1      2
@@ -26,10 +26,10 @@ CONSTANT: SSL_CTRL_SET_TMP_DH     3
 CONSTANT: SSL_CTRL_SET_TMP_RSA_CB 4
 CONSTANT: SSL_CTRL_SET_TMP_DH_CB  5
 
-CONSTANT: SSL_CTRL_GET_SESSION_REUSED       6 
-CONSTANT: SSL_CTRL_GET_CLIENT_CERT_REQUEST  7 
-CONSTANT: SSL_CTRL_GET_NUM_RENEGOTIATIONS   8 
-CONSTANT: SSL_CTRL_CLEAR_NUM_RENEGOTIATIONS 9 
+CONSTANT: SSL_CTRL_GET_SESSION_REUSED       6
+CONSTANT: SSL_CTRL_GET_CLIENT_CERT_REQUEST  7
+CONSTANT: SSL_CTRL_GET_NUM_RENEGOTIATIONS   8
+CONSTANT: SSL_CTRL_CLEAR_NUM_RENEGOTIATIONS 9
 CONSTANT: SSL_CTRL_GET_TOTAL_RENEGOTIATIONS 10
 CONSTANT: SSL_CTRL_GET_FLAGS                11
 CONSTANT: SSL_CTRL_EXTRA_CHAIN_CERT         12
@@ -62,6 +62,12 @@ CONSTANT: SSL_CTRL_GET_SESS_CACHE_MODE      45
 CONSTANT: SSL_CTRL_GET_MAX_CERT_LIST        50
 CONSTANT: SSL_CTRL_SET_MAX_CERT_LIST        51
 
+CONSTANT: SSL_OP_NO_SSLv2 0x01000000
+CONSTANT: SSL_OP_NO_SSLv3 0x02000000
+CONSTANT: SSL_OP_NO_TLSv1 0x04000000
+CONSTANT: SSL_OP_NO_TLSv1_2 0x08000000
+CONSTANT: SSL_OP_NO_TLSv1_1 0x10000000
+
 CONSTANT: SSL_ERROR_NONE             0
 CONSTANT: SSL_ERROR_SSL              1
 CONSTANT: SSL_ERROR_WANT_READ        2
@@ -86,31 +92,191 @@ CONSTANT: SSL_ERROR_WANT_ACCEPT      8
         { 8  "SSL_ERROR_WANT_ACCEPT" }
     } ;
 
-TYPEDEF: void* ssl-method
 C-TYPE: SSL_CTX
 C-TYPE: SSL_SESSION
-C-TYPE: SSL
 
 LIBRARY: libssl
+
+! ===============================================
+! stack.h
+! ===============================================
+
+STRUCT: stack_st
+    { num int }
+    { data char** }
+    { sorted int }
+    { num_alloc int }
+    { comp void* } ;
+TYPEDEF: stack_st _STACK
+
+! ===============================================
+! asn1t.h
+! ===============================================
+
+C-TYPE: ASN1_ITEM
+
+! ===============================================
+! asn1.h
+! ===============================================
+C-TYPE: ASN1_VALUE
+TYPEDEF: ASN1_ITEM ASN1_ITEM_EXP
+
+STRUCT: ASN1_STRING
+    { length int }
+    { type int }
+    { data uchar* }
+    { flags long } ;
+
+FUNCTION: int ASN1_STRING_cmp ( ASN1_STRING *a, ASN1_STRING *b ) ;
+
+FUNCTION: ASN1_VALUE* ASN1_item_d2i ( ASN1_VALUE** val, uchar **in, long len, ASN1_ITEM *it ) ;
+
+! ===============================================
+! ossl_typ.h
+! ===============================================
+TYPEDEF: ASN1_STRING ASN1_OCTET_STRING
 
 ! ===============================================
 ! x509.h
 ! ===============================================
 
+STRUCT: X509_EXTENSION
+    { object void* }
+    { critical void* }
+    { value ASN1_OCTET_STRING* } ;
+
 C-TYPE: X509_NAME
 C-TYPE: X509
 
-FUNCTION: int X509_NAME_get_text_by_NID ( X509_NAME* name, int nid, void* buf, int len ) ;
-FUNCTION: X509_NAME* X509_get_subject_name ( X509* a ) ;
+! ===============================================
+! x509v3.h
+! ===============================================
+STRUCT: X509V3_EXT_METHOD
+    { ext_nid int }
+    { ext_flags int }
+    { it void* } ;
+
+FUNCTION: X509V3_EXT_METHOD* X509V3_EXT_get ( X509_EXTENSION* ext ) ;
+
+UNION-STRUCT: GENERAL_NAME_st_d
+    { ptr char* }
+    { otherName void* }
+    { rfc822Name void* }
+    { dNSName ASN1_STRING* } ;
+
+STRUCT: GENERAL_NAME_st
+    { type int }
+    { d GENERAL_NAME_st_d } ;
+
+CONSTANT: GEN_OTHERNAME 0
+CONSTANT: GEN_EMAIL     1
+CONSTANT: GEN_DNS       2
+CONSTANT: GEN_X400      3
+CONSTANT: GEN_DIRNAME   4
+CONSTANT: GEN_EDIPARTY  5
+CONSTANT: GEN_URI       6
+CONSTANT: GEN_IPADD     7
+CONSTANT: GEN_RID       8
 
 ! ===============================================
 ! ssl.h
 ! ===============================================
 
+STRUCT: ssl_method_st
+    { version int }
+    { ssl_new void* }
+    { ssl_clear void* }
+    { ssl_free void* }
+    { ssl_accept void* }
+    { ssl_connect void* }
+    { ssl_read void* }
+    { ssl_peek void* }
+    { ssl_write void* }
+    { ssl_shutdown void* }
+    { ssl_renegotiate void* }
+    { ssl_renegotiate_check void* }
+    { ssl_get_message void* }
+    { ssl_read_bytes void* }
+    { ssl_write_bytes void* }
+    { ssl_dispatch_alert void* }
+    { ssl_ctrl void* }
+    { ssl_ctx_ctrl void* }
+    { get_cipher_by_char void* }
+    { put_cipher_by_char void* }
+    { ssl_pending void* }
+    { num_ciphers void* }
+    { get_cipher void* }
+    { get_ssl_method void* }
+    { get_timeout void* }
+    { ssl3_enc void* }
+    { ssl_version void* }
+    { ssl_callback_ctrl void* }
+    { ssl_ctx_callback_ctrl void* } ;
+TYPEDEF: ssl_method_st* ssl-method
+
+STRUCT: ssl_st
+    { version int }
+    { type int }
+    { method ssl_method_st* }
+    { rbio BIO* }
+    { wbio BIO* }
+    { bbio BIO* }
+    { rwstate int }
+    { in_handshake int }
+    { handshake_func void* }
+    { server int }
+    { new_session int }
+    { quiet_shutdown int }
+    { shutdown int }
+    { state int }
+    { rstate int }
+    { init_buf void* }
+    { init_msg void* }
+    { init_num int }
+    { init_off int }
+    { packet void* }
+    { packet_length int }
+    { s2 void* }
+    { s3 void* }
+    { d1 void* }
+    { read_ahead int }
+    { msg_callback void* }
+    { msg_callback_arg void* }
+    { hit int }
+    { param void* }
+    { cipher_list void* }
+    { cipher_list_by_id void* }
+    { mac_flags int }
+    { enc_read_ctx void* }
+    { read_hash void* }
+    { expand void* }
+    { enc_write_ctx void* }
+    { write_hash void* }
+    { compress void* }
+    { cert void* }
+    { sid_ctx_length uint }
+    { sid_ctx void* }
+    { session SSL_SESSION* }
+    { generate_session_id void* }
+    { verify_mode int }
+    { verify_callback void* }
+    { info_callback void* }
+    { error int }
+    { error_code int }
+    { kssl_ctx void* }
+    { psk_client_callback void* }
+    { psk_server_callback void* }
+    { ctx SSL_CTX* } ;
+TYPEDEF: ssl_st SSL
+
 FUNCTION: c-string SSL_get_version ( SSL* ssl ) ;
 
 ! Maps OpenSSL errors to strings
 FUNCTION: void SSL_load_error_strings (  ) ;
+FUNCTION: c-string SSL_state_string ( SSL* ssl ) ;
+FUNCTION: c-string SSL_rstate_string ( SSL* ssl ) ;
+FUNCTION: c-string SSL_state_string_long ( SSL* ssl ) ;
+FUNCTION: c-string SSL_rstate_string_long ( SSL* ssl ) ;
 
 ! Must be called before any other action takes place
 FUNCTION: int SSL_library_init (  ) ;
@@ -150,6 +316,8 @@ FUNCTION: int SSL_set_fd ( SSL* ssl, int fd ) ;
 FUNCTION: void SSL_set_bio ( SSL* ssl, void* rbio, void* wbio ) ;
 
 FUNCTION: int SSL_set_session ( SSL* to, SSL_SESSION* session ) ;
+FUNCTION: SSL_SESSION* SSL_get_session ( SSL* to ) ;
+FUNCTION: SSL_SESSION* SSL_get1_session ( SSL* ssl ) ;
 
 FUNCTION: int SSL_get_error ( SSL* ssl, int ret ) ;
 
@@ -173,8 +341,6 @@ CONSTANT: SSL_RECEIVED_SHUTDOWN 2
 FUNCTION: int SSL_get_shutdown ( SSL* ssl ) ;
 
 FUNCTION: int SSL_CTX_set_session_id_context ( SSL_CTX* ctx, c-string sid_ctx, uint len ) ;
-
-FUNCTION: SSL_SESSION* SSL_get1_session ( SSL* ssl ) ;
 
 FUNCTION: void SSL_free ( SSL* ssl ) ;
 
@@ -332,4 +498,29 @@ X509_V_: ERR_APPLICATION_VERIFICATION 50
 ! obj_mac.h
 ! ===============================================
 
-CONSTANT: NID_commonName 13
+CONSTANT: NID_commonName        13
+CONSTANT: NID_subject_alt_name  85
+CONSTANT: NID_issuer_alt_name   86
+
+! ===============================================
+! On Windows, some of the functions making up libssl are placed in the
+! libeay32.dll and not in the similarily named ssleay32.dll file.
+! ===============================================
+
+<< os windows? [
+    "libssl-windows"
+    [ "libeay32.dll" cdecl add-library ] [ current-library set ] bi
+] when >>
+
+! x509.h
+FUNCTION: int X509_NAME_get_text_by_NID ( X509_NAME* name, int nid, void* buf, int len ) ;
+FUNCTION: int X509_get_ext_by_NID ( X509* a, int nid, int lastpos ) ;
+FUNCTION: void* X509_get_ext_d2i ( X509 *a, int nid, int* crit, int* idx ) ;
+FUNCTION: X509_NAME* X509_get_issuer_name ( X509* a ) ;
+FUNCTION: X509_NAME* X509_get_subject_name ( X509* a ) ;
+FUNCTION: int X509_check_trust ( X509* a, int id, int flags ) ;
+FUNCTION: X509_EXTENSION* X509_get_ext ( X509* a, int loc ) ;
+
+! stack.h
+FUNCTION: int sk_num ( _STACK *s ) ;
+FUNCTION: void* sk_value ( _STACK *s, int ) ;

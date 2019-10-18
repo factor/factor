@@ -473,7 +473,7 @@ M:: <bubble-chamber> update-frame-buffer ( BUBBLE-CHAMBER -- )
   v-
   first2
   fatan2
-  BUBBLE-CHAMBER (>>collision-theta)
+  BUBBLE-CHAMBER collision-theta<<
   BUBBLE-CHAMBER ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

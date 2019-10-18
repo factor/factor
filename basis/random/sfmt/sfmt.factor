@@ -116,8 +116,8 @@ M:: sfmt generate ( sfmt -- )
     [
         [
             [ -30 shift ] [ ] bi bitxor
-            state-multiplier * 32 bits
-        ] dip + 32 bits
+            state-multiplier w*
+        ] dip w+
     ] uint-array{ } accumulate-as nip
     dup uint-4 cast-array ;
 

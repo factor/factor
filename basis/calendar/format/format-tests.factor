@@ -83,3 +83,38 @@ IN: calendar.format.tests
 
 [ ]
 [ { 2008 2009 } [ year. ] each ] unit-test
+
+[
+    T{ timestamp
+        { year 2013 }
+        { month 4 }
+        { day 23 }
+        { hour 13 }
+        { minute 50 }
+        { second 24 }
+    }
+] [ "2013-04-23T13:50:24" rfc3339>timestamp ] unit-test
+
+{ "2001-12-14T21:59:43.100000-05:00" } [ "2001-12-14T21:59:43.1-05:00" rfc3339>timestamp timestamp>rfc3339 ] unit-test
+
+[
+    T{ timestamp
+        { year 2001 }
+        { month 12 }
+        { day 15 }
+        { hour 02 }
+        { minute 59 }
+        { second 43+1/10 }
+    }
+] [ "2001-12-15 02:59:43.1Z" rfc3339>timestamp ] unit-test
+
+[
+    T{ timestamp
+        { year 2001 }
+        { month 12 }
+        { day 15 }
+        { hour 02 }
+        { minute 59 }
+        { second 43+1/10 }
+    }
+] [ "2001-12-15	02:59:43.1Z" rfc3339>timestamp ] unit-test

@@ -1,13 +1,25 @@
 ! Copyright (c) 2007-2010 Slava Pestov, Doug Coleman, Aaron Schaefer, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays assocs binary-search classes.tuple fry
-kernel locals math math.order math.ranges memoize namespaces
-sequences sequences.private sorting ;
+USING: accessors arrays assocs binary-search classes.tuple
+combinators fry hints kernel kernel.private locals math
+math.order math.ranges memoize namespaces sequences
+sequences.private sorting strings vectors ;
 FROM: sequences => change-nth ;
 IN: math.combinatorics
 
 <PRIVATE
+
+! Specialized version of nths-unsafe for performance
+: (nths-unsafe) ( indices seq -- seq' )
+    [ { array } declare ] dip
+    [ [ nth-unsafe ] curry ] keep map-as ; inline
+GENERIC: nths-unsafe ( indices seq -- seq' )
+M: string nths-unsafe (nths-unsafe) ;
+M: array nths-unsafe (nths-unsafe) ;
+M: vector nths-unsafe (nths-unsafe) ;
+M: iota-tuple nths-unsafe (nths-unsafe) ;
+M: object nths-unsafe (nths-unsafe) ;
 
 : possible? ( n m -- ? )
     0 rot between? ; inline
@@ -65,6 +77,26 @@ M: permutations hashcode* tuple-hashcode ;
 
 INSTANCE: permutations immutable-sequence
 
+TUPLE: k-permutations length skip k seq ;
+
+:: <k-permutations> ( seq k -- permutations )
+    seq length :> n
+    n k nPk :> len
+    {
+        { [ len k [ zero? ] either? ] [ { } ] }
+        { [ n k = ] [ seq <permutations> ] }
+        [ len n factorial over /i k seq k-permutations boa ]
+    } cond ;
+
+M: k-permutations length length>> ; inline
+M: k-permutations nth-unsafe
+    [ skip>> * ]
+    [ seq>> [ permutation-indices ] keep ]
+    [ k>> swap [ head ] dip nths-unsafe ] tri ;
+M: k-permutations hashcode* tuple-hashcode ;
+
+INSTANCE: k-permutations immutable-sequence
+
 DEFER: next-permutation
 
 <PRIVATE
@@ -87,6 +119,9 @@ PRIVATE>
 : all-permutations ( seq -- seq' )
     [ ] map-permutations ;
 
+: all-permutations? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
+    permutations-quot all? ; inline
+
 : find-permutation ( ... seq quot: ( ... elt -- ... ? ) -- ... elt/f )
     [ permutations-quot find drop ]
     [ drop over [ permutation ] [ 2drop f ] if ] 2bi ; inline
@@ -100,19 +135,21 @@ PRIVATE>
 <PRIVATE
 
 : cut-point ( seq -- n )
-    [ last ] keep [ [ > ] keep swap ] find-last drop nip ;
+    [ last ] keep [ [ > ] keep swap ] find-last drop nip ; inline
 
 : greater-from-last ( n seq -- i )
-    [ nip ] [ nth ] 2bi [ > ] curry find-last drop ;
+    [ nip ] [ nth ] 2bi [ > ] curry find-last drop ; inline
 
 : reverse-tail! ( n seq -- seq )
-    [ swap 1 + tail-slice reverse! drop ] keep ;
+    [ swap 1 + tail-slice reverse! drop ] keep ; inline
 
 : (next-permutation) ( seq -- seq )
     dup cut-point [
         swap [ greater-from-last ] 2keep
         [ exchange ] [ reverse-tail! nip ] 3bi
     ] [ reverse! ] if* ;
+
+HINTS: (next-permutation) array ;
 
 PRIVATE>
 
@@ -162,21 +199,21 @@ INSTANCE: combinations immutable-sequence
 <PRIVATE
 
 : find-max-index ( seq n -- i )
-    over length - '[ _ + >= ] find-index drop ;
+    over length - '[ _ + >= ] find-index drop ; inline
 
 : increment-rest ( i seq -- )
     [ nth ] [ swap tail-slice ] 2bi
-    [ drop 1 + dup ] map! 2drop ;
+    [ drop 1 + dup ] map! 2drop ; inline
 
 : increment-last ( seq -- )
-    [ [ length 1 - ] keep [ 1 + ] change-nth ] unless-empty ;
+    [ [ length 1 - ] keep [ 1 + ] change-nth ] unless-empty ; inline
 
 :: next-combination ( seq n -- seq )
     seq n find-max-index [
         1 [-] seq increment-rest
     ] [
         seq increment-last
-    ] if* seq ;
+    ] if* seq ; inline
 
 :: combinations-quot ( seq k quot -- seq quot' )
     seq length :> n
@@ -200,6 +237,9 @@ PRIVATE>
 : all-combinations ( seq k -- seq' )
     [ ] map-combinations ;
 
+: all-combinations? ( ... seq k quot: ( ... elt -- ... ? ) -- ... ? )
+    combinations-quot all? ; inline
+
 : find-combination ( ... seq k quot: ( ... elt -- ... ? ) -- ... elt/f )
     [ combinations-quot find drop ]
     [ drop pick [ combination ] [ 3drop f ] if ] 3bi ; inline
@@ -221,4 +261,3 @@ PRIVATE>
 
 : selections ( seq n -- selections )
     dup 0 > [ (selections) ] [ 2drop { } ] if ;
-

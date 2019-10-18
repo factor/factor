@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.syntax combinators gobject-introspection
+alien.libraries.finder alien.syntax assocs gobject-introspection
 gobject-introspection.standard-types kernel pango.ffi system
 vocabs ;
 IN: gtk.ffi
@@ -15,9 +15,9 @@ LIBRARY: gtk
 
 <<
 "gtk" {
-    { [ os windows? ] [ "libgtk-win32-2.0-0.dll" cdecl add-library ] }
-    { [ os unix? ] [ drop ] }
-} cond
+    { linux "gtk-x11-2.0" }
+    { windows "libgtk-win32-2.0-0" }
+} os of [ find-library cdecl add-library ] [ drop ] if*
 >>
 
 IMPLEMENT-STRUCTS: GtkTreeIter ;

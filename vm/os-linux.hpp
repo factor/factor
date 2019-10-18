@@ -1,6 +1,3 @@
 #include <sys/syscall.h>
 
-namespace factor
-{
-
-}
+namespace factor {}

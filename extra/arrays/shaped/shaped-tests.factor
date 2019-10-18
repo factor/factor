@@ -1,6 +1,6 @@
 ! Copyright (C) 2012 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays.shaped kernel tools.test ;
+USING: accessors arrays.shaped kernel tools.test math ;
 IN: arrays.shaped.tests
 
 [ t ] [
@@ -41,3 +41,12 @@ IN: arrays.shaped.tests
 { sa{ 0 } } [ { 1 } zeros ] unit-test
 
 ! Error on 0, negative shapes
+
+[
+    sa{ { 1 3 3 } { 4 1 3 } { 4 4 1 } }
+] [
+    { 3 3 } 2 strict-lower
+    [ drop 3 ] map-strict-upper
+    [ drop 1 ] map-diagonal
+    [ sq ] map-strict-lower
+] unit-test

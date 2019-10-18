@@ -1,5 +1,4 @@
-USING: help.syntax help.markup kernel prettyprint sequences
-io.pathnames strings ;
+USING: help.markup help.syntax io.pathnames quotations strings ;
 IN: csv
 
 HELP: read-row
@@ -48,7 +47,7 @@ HELP: write-csv
 
 HELP: with-delimiter
 { $values { "ch" "field delimiter (e.g. CHAR: \\t)" }
-          { "quot" "a quotation" } }
+          { "quot" quotation } }
 { $description "Sets the field delimiter for read-csv, read-row, write-csv, or write-row words." } ;
 
 ARTICLE: "csv" "Comma-separated-values parsing and writing"

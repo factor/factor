@@ -116,6 +116,11 @@ HELP: frexp
 { $values { "x" number } { "y" float } { "exp" integer } }
 { $description "Break the number " { $snippet "x" } " into a normalized fraction " { $snippet "y" } " and an integral power of 2 " { $snippet "e^" } "." $nl "The function returns a number " { $snippet "y" } " in the interval [1/2, 1) or 0, and a number " { $snippet "exp" } " such that " { $snippet "x = y*(2**exp)" } "." } ;
 
+HELP: ldexp
+{ $values { "x" number } { "exp" number } { "y" number } }
+{ $description "Multiply " { $snippet "x" } " by " { $snippet "2^exp" } "." }
+{ $notes { $link ldexp } " is the inverse of " { $link frexp } "." } ;
+
 HELP: log
 { $values { "x" number } { "y" number } }
 { $description "Natural logarithm function. Outputs negative infinity if " { $snippet "x" } " is 0." } ;
@@ -251,7 +256,7 @@ HELP: polar>
 { $description "Converts an absolute value and argument (polar form) to a complex number." } ;
 
 HELP: [-1,1]?
-{ $values { "x" number } { "?" "a boolean" } }
+{ $values { "x" number } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " is a real number between -1 and 1, inclusive." } ;
 
 HELP: abs
@@ -281,7 +286,7 @@ HELP: gcd
 { $notes "If " { $snippet "d" } " is 1, then " { $snippet "a" } " is the inverse of " { $snippet "y" } " modulo " { $snippet "x" } "." } ;
 
 HELP: divisor?
-{ $values { "m" integer } { "n" integer } { "?" "a boolean" } }
+{ $values { "m" integer } { "n" integer } { "?" boolean } }
 { $description "Tests if " { $snippet "n" } " is a divisor of " { $snippet "m" } ". This is the same thing as asking if " { $snippet "m" } " is divisible by " { $snippet "n" } "." }
 { $notes "Returns t for both negative and positive divisors, as well as for trivial and non-trivial divisors." } ;
 
@@ -299,7 +304,7 @@ HELP: ^mod
 { $description "Outputs the result of computing " { $snippet "x^y mod n" } "." } ;
 
 HELP: ~
-{ $values { "x" real } { "y" real } { "epsilon" real } { "?" "a boolean" } }
+{ $values { "x" real } { "y" real } { "epsilon" real } { "?" boolean } }
 { $description "Tests if " { $snippet "x" } " and " { $snippet "y" } " are approximately equal to each other. There are three possible comparison tests, chosen based on the sign of " { $snippet "epsilon" } ":"
     { $list
         { { $snippet "epsilon" } " is zero: exact comparison." }

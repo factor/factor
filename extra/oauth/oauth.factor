@@ -3,7 +3,7 @@
 USING: accessors assocs base64 calendar checksums.hmac
 checksums.sha combinators fry http http.client kernel locals
 make math namespaces present random sequences sorting strings
-urls urls.encoding ;
+urls urls.encoding urls.private checksums ;
 IN: oauth
 
 SYMBOL: consumer-token
@@ -26,13 +26,20 @@ nonce ;
     new
         consumer-token get >>consumer-token
         now timestamp>unix-time >integer >>timestamp
-        random-32 >>nonce ; inline
+        16 random-bytes hex-string >>nonce ; inline
+
+: present-base-url ( url -- string )
+    [
+        [ unparse-protocol ]
+        [ path>> url-encode % ] bi
+    ] "" make ;
 
 :: signature-base-string ( url request-method params -- string )
     [
         request-method % "&" %
-        url present url-encode-full % "&" %
+        url present-base-url url-encode-full % "&" %
         params assoc>query url-encode-full %
+        url query>> [ assoc>query "&" prepend url-encode-full % ] when*
     ] "" make ;
 
 : hmac-key ( consumer-secret token-secret -- key )

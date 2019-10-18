@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alien.c-types alien.parser alien.syntax
-tools.test vocabs.parser parser eval debugger kernel
-continuations words ;
+continuations debugger eval parser tools.test vocabs.parser
+words ;
 IN: alien.parser.tests
 
 TYPEDEF: char char2

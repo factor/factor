@@ -1,7 +1,8 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax sequences strings lists ;
-IN: lists.lazy 
+USING: help.markup help.syntax kernel lists math sequences
+strings ;
+IN: lists.lazy
 
 ABOUT: "lists.lazy"
 
@@ -58,33 +59,33 @@ ARTICLE: { "lists.lazy" "manipulation" } "Manipulating lazy lists"
 } ;
 
 HELP: lazy-cons
-{ $values { "car" { $quotation "( -- elt )" } } { "cdr" { $quotation "( -- cons )" } } { "promise" "the resulting cons object" } }
-{ $description "Constructs a cons object for a lazy list from two quotations. The " { $snippet "car" } " quotation should return the head of the list, and the " { $snippet "cons" } " quotation the tail when called. When " { $link cons } " or " { $link cdr } " are called on the lazy-cons object then the appropriate quotation is called." } 
+{ $values { "car" { $quotation ( -- elt ) } } { "cdr" { $quotation ( -- cons ) } } { "promise" "the resulting cons object" } }
+{ $description "Constructs a cons object for a lazy list from two quotations. The " { $snippet "car" } " quotation should return the head of the list, and the " { $snippet "cons" } " quotation the tail when called. When " { $link cons } " or " { $link cdr } " are called on the lazy-cons object then the appropriate quotation is called." }
 { $see-also cons car cdr nil nil? } ;
 
 { 1lazy-list 2lazy-list 3lazy-list } related-words
 
 HELP: 1lazy-list
-{ $values { "a" { $quotation "( -- X )" } } { "lazy-cons" "a lazy-cons object" } }
+{ $values { "a" { $quotation ( -- X ) } } { "lazy-cons" "a lazy-cons object" } }
 { $description "Create a lazy list with 1 element. The element is the result of calling the quotation. The quotation is only called when the list element is requested." } ;
 
 HELP: 2lazy-list
-{ $values { "a" { $quotation "( -- X )" } } { "b" { $quotation "( -- X )" } } { "lazy-cons" "a lazy-cons object" } }
+{ $values { "a" { $quotation ( -- X ) } } { "b" { $quotation ( -- X ) } } { "lazy-cons" "a lazy-cons object" } }
 { $description "Create a lazy list with 2 elements. The elements are the result of calling the quotations. The quotations are only called when the list elements are requested." } ;
 
 HELP: 3lazy-list
-{ $values { "a" { $quotation "( -- X )" } } { "b" { $quotation "( -- X )" } } { "c" { $quotation "( -- X )" } } { "lazy-cons" "a lazy-cons object" } }
+{ $values { "a" { $quotation ( -- X ) } } { "b" { $quotation ( -- X ) } } { "c" { $quotation ( -- X ) } } { "lazy-cons" "a lazy-cons object" } }
 { $description "Create a lazy list with 3 elements. The elements are the result of calling the quotations. The quotations are only called when the list elements are requested." } ;
 
 HELP: <memoized-cons>
 { $values { "cons" "a cons object" } { "memoized-cons" "the resulting memoized-cons object" } }
-{ $description "Constructs a cons object that wraps an existing cons object. Requests for the car, cdr and nil? will be remembered after the first call, and the previous result returned on subsequent calls." } 
+{ $description "Constructs a cons object that wraps an existing cons object. Requests for the car, cdr and nil? will be remembered after the first call, and the previous result returned on subsequent calls." }
 { $see-also cons car cdr nil nil? } ;
 
 { lazy-map ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
 
 HELP: lazy-map
-{ $values { "list" "a cons object" } { "quot" { $quotation "( obj -- X )" } } { "result" "resulting cons object" } }
+{ $values { "list" "a cons object" } { "quot" { $quotation ( obj -- X ) } } { "result" "resulting cons object" } }
 { $description "Perform a similar functionality to that of the " { $link map } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-map-state> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
 HELP: ltake
@@ -92,15 +93,15 @@ HELP: ltake
 { $description "Outputs a lazy list containing the first n items in the list. This is done a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-take> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
 HELP: lfilter
-{ $values { "list" "a cons object" } { "quot" { $quotation "( -- X )" } } { "result" "resulting cons object" } }
+{ $values { "list" "a cons object" } { "quot" { $quotation ( -- X ) } } { "result" "resulting cons object" } }
 { $description "Perform a similar functionality to that of the " { $link filter } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-filter> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
 HELP: lwhile
-{ $values { "list" "a cons object" } { "quot" { $quotation "( X -- ? )" } } { "result" "resulting cons object" } }
+{ $values { "list" "a cons object" } { "quot" { $quotation ( x -- ? ) } } { "result" "resulting cons object" } }
 { $description "Outputs a lazy list containing the first items in the list as long as " { $snippet "quot" } " evaluates to t. No evaluation of the list elements occurs initially but a " { $link <lazy-while> } " object is returned with conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
 HELP: luntil
-{ $values { "list" "a cons object" } { "quot" { $quotation "( X -- ? )" } } { "result" "resulting cons object" } }
+{ $values { "list" "a cons object" } { "quot" { $quotation ( x -- ? ) } } { "result" "resulting cons object" } }
 { $description "Outputs a lazy list containing the first items in the list until after " { $snippet "quot" } " evaluates to t. No evaluation of the list elements occurs initially but a " { $link <lazy-while> } " object is returned with conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
 HELP: lappend
@@ -108,23 +109,18 @@ HELP: lappend
 { $description "Perform a similar functionality to that of the " { $link append } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-append> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required. Successive calls to " { $link cdr } " will iterate through list1, followed by list2." } ;
 
 HELP: lfrom-by
-{ $values { "n" "an integer" } { "quot" { $quotation "( n -- o )" } } { "lazy-from-by" "a lazy list of integers" } }
+{ $values { "n" integer } { "quot" { $quotation ( n -- o ) } } { "lazy-from-by" "a lazy list of integers" } }
 { $description "Return an infinite lazy list of values starting from n, with each successive value being the result of applying quot to the previous value." } ;
 
 HELP: lfrom
-{ $values { "n" "an integer" } { "list" "a lazy list of integers" } }
+{ $values { "n" integer } { "list" "a lazy list of integers" } }
 { $description "Return an infinite lazy list of incrementing integers starting from n." } ;
 
 HELP: sequence-tail>list
-{ $values { "index" "an integer 0 or greater" } { "seq" "a sequence" } { "list" "a list" } }
+{ $values { "index" "an integer 0 or greater" } { "seq" sequence } { "list" "a list" } }
 { $description "Convert the sequence into a list, starting from " { $snippet "index" } "." }
 { $see-also >list } ;
 
-HELP: >list
-{ $values { "object" "an object" } { "list" "a list" } }
-{ $description "Convert the object into a list. Existing lists are passed through intact, sequences are converted using " { $link sequence-tail>list } " and other objects cause an error to be thrown." } 
-{ $see-also sequence-tail>list } ;
-    
 { leach foldl lazy-map ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
 
 HELP: lconcat
@@ -140,11 +136,11 @@ HELP: lcartesian-product*
 { $description "Given a list of lists, return a list containing the cartesian product of those lists." } ;
 
 HELP: lcomp
-{ $values { "list" "a list of lists" } { "quot" { $quotation "( seq -- X )" } } { "result" "the resulting list" } }
+{ $values { "list" "a list of lists" } { "quot" { $quotation ( seq -- X ) } } { "result" "the resulting list" } }
 { $description "Get the cartesian product of the lists in " { $snippet "list" } " and call " { $snippet "quot" } " call with each element from the cartesian product on the stack, the result of which is returned in the final " { $snippet "list" } "." } ;
 
 HELP: lcomp*
-{ $values { "list" "a list of lists" } { "guards" "a sequence of quotations with stack effect ( seq -- bool )" } { "quot" { $quotation "( seq -- X )" } } { "result" "a list" } }
+{ $values { "list" "a list of lists" } { "guards" "a sequence of quotations with stack effect ( seq -- bool )" } { "quot" { $quotation ( seq -- X ) } } { "result" "a list" } }
 { $description "Get the cartesian product of the lists in " { $snippet "list" } ", filter it by applying each guard quotation to it and call " { $snippet "quot" } " call with each element from the remaining cartesian product items on the stack, the result of which is returned in the final " { $snippet "list" } "." }
 { $examples
   { $code "{ 1 2 3 } >list { 4 5 6 } >list 2list { [ first odd? ] } [ first2 + ] lcomp*" }
@@ -152,17 +148,17 @@ HELP: lcomp*
 
 HELP: lmerge
 { $values { "list1" "a list" } { "list2" "a list" } { "result" "lazy list merging list1 and list2" } }
-{ $description "Return the result of merging the two lists in a lazy manner." } 
+{ $description "Return the result of merging the two lists in a lazy manner." }
 { $examples
   { $example "USING: lists lists.lazy prettyprint ;" "{ 1 2 3 } >list { 4 5 6 } >list lmerge list>array ." "{ 1 4 2 5 3 6 }" }
 } ;
 
 HELP: lcontents
 { $values { "stream" "a stream" } { "result" string } }
-{ $description "Returns a lazy list of all characters in the file. " { $link car } " returns the next character in the file, " { $link cdr } " returns the remaining characters as a lazy list. " { $link nil? } " indicates end of file." } 
+{ $description "Returns a lazy list of all characters in the file. " { $link car } " returns the next character in the file, " { $link cdr } " returns the remaining characters as a lazy list. " { $link nil? } " indicates end of file." }
 { $see-also llines } ;
 
 HELP: llines
 { $values { "stream" "a stream" } { "result" "a list" } }
-{ $description "Returns a lazy list of all lines in the file. " { $link car } " returns the next lines in the file, " { $link cdr } " returns the remaining lines as a lazy list. " { $link nil? } " indicates end of file." } 
+{ $description "Returns a lazy list of all lines in the file. " { $link car } " returns the next lines in the file, " { $link cdr } " returns the remaining lines as a lazy list. " { $link nil? } " indicates end of file." }
 { $see-also lcontents } ;

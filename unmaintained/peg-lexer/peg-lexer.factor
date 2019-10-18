@@ -14,10 +14,10 @@ CONSULT: assoc-protocol lex-hash hash>> ;
            v CHAR: \n n last-index -1 or 1 + -
            n [ CHAR: \n = ] count 1 +
     ] ;
-      
+
 : store-pos ( v a -- )
-    input swap at prepare-pos
-    lexer get [ (>>line) ] keep (>>column) ;
+    input of prepare-pos
+    lexer get [ line<< ] keep column<< ;
 
 M: lex-hash set-at
     swap {
@@ -53,7 +53,7 @@ M: lex-hash at*
     
 SYNTAX: ON-BNF:
     scan-new-word reset-tokenizer ";ON-BNF" parse-multiline-string parse-ebnf
-    main swap at create-bnf ;
+    main of create-bnf ;
 
 ! Tokenizer like standard factor lexer
 EBNF: factor

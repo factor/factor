@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes hashtables help.markup help.syntax io.streams.string
-kernel sequences strings math ;
+USING: help.markup help.syntax kernel strings ;
 IN: db.types
 
 HELP: +db-assigned-id+
@@ -90,7 +89,7 @@ HELP: VARCHAR
 HELP: user-assigned-id-spec?
 { $values
      { "specs" "a sequence of SQL specs" }
-     { "?" "a boolean" } }
+     { "?" boolean } }
 { $description "Tests if any of the SQL specs has the type " { $link +user-assigned-id+ } "." } ;
 
 HELP: bind#
@@ -106,7 +105,7 @@ HELP: bind%
 HELP: db-assigned-id-spec?
 { $values
      { "specs" "a sequence of SQL specs" }
-     { "?" "a boolean" } }
+     { "?" boolean } }
 { $description "Tests if any of the SQL specs has the type " { $link +db-assigned-id+ } "." } ;
 
 HELP: find-primary-key
@@ -129,13 +128,13 @@ HELP: normalize-spec
 HELP: primary-key?
 { $values
      { "spec" "a SQL spec" }
-     { "?" "a boolean" } }
+     { "?" boolean } }
 { $description "Returns true if a SQL spec is a primary key." } ;
 
 HELP: relation?
 { $values
      { "spec" "a SQL spec" }
-     { "?" "a boolean" } }
+     { "?" boolean } }
 { $description "Returns true if a SQL spec is a relation." } ;
 
 HELP: unknown-modifier

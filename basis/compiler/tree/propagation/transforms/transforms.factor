@@ -9,7 +9,7 @@ math.integers.private layouts math.order vectors hashtables
 combinators effects generalizations sequences.generalizations
 assocs sets combinators.short-circuit sequences.private locals
 growable stack-checker namespaces compiler.tree.propagation.info
-hash-sets ;
+hash-sets arrays hashtables.private ;
 FROM: math => float ;
 FROM: sets => set members ;
 IN: compiler.tree.propagation.transforms
@@ -45,11 +45,11 @@ IN: compiler.tree.propagation.transforms
     in-d>> rem-custom-inlining
 ] "custom-inlining" set-word-prop
 
-: positive-fixnum? ( obj -- ? )
+: non-negative-fixnum? ( obj -- ? )
     { [ fixnum? ] [ 0 >= ] } 1&& ;
 
 : simplify-bitand? ( value1 value2 -- ? )
-    [ literal>> positive-fixnum? ]
+    [ literal>> non-negative-fixnum? ]
     [ class>> fixnum swap class<= ]
     bi* and ;
 
@@ -318,7 +318,7 @@ M\ set intersects? [ intersects?-quot ] 1 define-partial-eval
 
 : bit-quot ( #call -- quot/f )
     in-d>> second value-info interval>> 0 fixnum-bits [a,b] interval-subset?
-    [ [ >fixnum ] dip fixnum-bit? ] f ? ;
+    [ [ integer>fixnum ] dip fixnum-bit? ] f ? ;
 
 \ bit? [ bit-quot ] "custom-inlining" set-word-prop
 

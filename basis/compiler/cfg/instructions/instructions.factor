@@ -13,18 +13,12 @@ V{ } clone insn-classes set-global
 
 : new-insn ( ... class -- insn ) f swap boa ; inline
 
-! Virtual CPU instructions, used by CFG IR
 TUPLE: insn ;
 
-! Instructions which use vregs
 TUPLE: vreg-insn < insn ;
 
-! Instructions which do not have side effects; used for
-! dead code elimination
 TUPLE: flushable-insn < vreg-insn ;
 
-! Instructions which are referentially transparent; used for
-! value numbering
 TUPLE: foldable-insn < flushable-insn ;
 
 ! Constants
@@ -86,7 +80,6 @@ INSN: ##return ;
 
 INSN: ##safepoint ;
 
-! Dummy instruction that simply inhibits TCO
 INSN: ##no-tco ;
 
 ! Jump tables
@@ -862,7 +855,7 @@ factor-call-insn ;
 M: gc-map-insn clone call-next-method [ clone ] change-gc-map ;
 
 ! Each one has a gc-map slot
-TUPLE: gc-map scrub-d scrub-r gc-roots derived-roots ;
+TUPLE: gc-map scrub-d check-d scrub-r check-r gc-roots derived-roots ;
 
 : <gc-map> ( -- gc-map ) gc-map new ;
 
