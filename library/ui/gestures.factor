@@ -1,13 +1,16 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien generic hashtables kernel lists math sdl-event ;
+USING: alien generic hashtables kernel lists math sdl ;
 
 : action ( gadget gesture -- quot )
     swap gadget-gestures hash ;
 
 : set-action ( gadget quot gesture -- )
     rot gadget-gestures set-hash ;
+
+: add-actions ( alist gadget -- )
+    swap [ unswons set-action ] each-with ;
 
 : handle-gesture* ( gesture gadget -- ? )
     tuck gadget-gestures hash* dup [
@@ -23,14 +26,16 @@ USING: alien generic hashtables kernel lists math sdl-event ;
     #! gesture, otherwise returns f.
     [ dupd handle-gesture* ] each-parent nip ;
 
-GENERIC: user-input* ( ch gadget -- ? )
-M: gadget user-input* 2drop f ;
+: link-action ( gadget to from -- )
+    #! When gadget receives 'from' gesture, send a 'to' gesture.
+    >r [ swap handle-gesture drop ] cons r> set-action ;
 
 : user-input ( ch gadget -- ? )
     [ dupd user-input* ] each-parent nip ;
 
 ! Mouse gestures are lists where the first element is one of:
 SYMBOL: motion
+SYMBOL: drag
 SYMBOL: button-up
 SYMBOL: button-down
 

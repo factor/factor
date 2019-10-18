@@ -18,7 +18,7 @@ url-encoding presentation generic ;
 
 : chars>entities ( str -- str )
     #! Convert <, >, &, ' and " to HTML entities.
-    [ dup html-entities assoc dup rot ? ] str-map ;
+    [ dup html-entities assoc dup rot ? ] string-map ;
 
 : >hex-color ( triplet -- hex )
     [ >hex 2 "0" pad ] map "#" swons cat ;
@@ -64,8 +64,8 @@ url-encoding presentation generic ;
     #! The file responder needs relative links not absolute
     #! links.
     "doc-root" get [
-        ?str-head [ "/" ?str-head drop ] when
-    ] when* "/" ?str-tail drop ;
+        ?string-head [ "/" ?string-head drop ] when
+    ] when* "/" ?string-tail drop ;
 
 : file-link-href ( path -- href )
     [ "/" , resolve-file-link url-encode , ] make-string ;
@@ -100,7 +100,7 @@ url-encoding presentation generic ;
         drop call
     ] ifte ;
 
-TUPLE: html-stream delegate ;
+TUPLE: html-stream ;
 
 M: html-stream stream-write-attr ( str style stream -- )
     wrapper-stream-scope [
@@ -127,7 +127,7 @@ C: html-stream ( stream -- stream )
     #! underline
     #! size
     #! link - an object path
-    [ >r <wrapper-stream> r> set-html-stream-delegate ] keep ;
+    [ >r <wrapper-stream> r> set-delegate ] keep ;
 
 : with-html-stream ( quot -- )
     [ stdio [ <html-stream> ] change  call ] with-scope ;

@@ -27,4 +27,3 @@ INLINE CELL cdr(CELL cons)
 }
 
 void primitive_cons(void);
-void primitive_to_cons(void);

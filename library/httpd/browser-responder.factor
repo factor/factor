@@ -56,7 +56,7 @@ errors unparser logging listener url-encoding hashtables memory ;
   #! Write out the HTML for the list of words in a vocabulary.
   <select name= "words" style= "width: 200" size= "20" onchange= "document.forms.main.submit()" select> 
     words [ 
-      word-name dup "current-word" get [ "" ] unless* str-compare 0 = [
+      word-name dup "current-word" get [ "" ] unless* string-compare 0 = [
       "<option selected>" write
      ] [
         "<option>" write
@@ -78,7 +78,6 @@ errors unparser logging listener url-encoding hashtables memory ;
 : write-word-source ( vocab word -- )
   #! Write the source for the given word from the vocab as HTML.
   <namespace> [
-    "responder" "browser" put
     "allow-edit?" get [ "Edit" [ "edit-state" t put ] quot-href <br/> ] when
     "edit-state" get [
       write-editable-word-source 
@@ -124,7 +123,7 @@ errors unparser logging listener url-encoding hashtables memory ;
 
 : word-uses ( word -- list )
   #! Return a list of vocabularies that the given word uses.
-  word-parameter flatten [ word? ] subset [
+  word-def flatten [ word? ] subset [
     word-vocabulary
   ] map ;
 
@@ -187,7 +186,12 @@ errors unparser logging listener url-encoding hashtables memory ;
       [
         <html> 
           <head> 
-            <title> "Factor Browser" write </title>
+            <title> 
+              "Factor Browser - " write 
+              "current-vocab" get write
+              " - " write
+              "current-word" get write
+            </title>
           </head>
           <body> 
             <form name= "main" action= method= "post" form> 
@@ -212,7 +216,7 @@ errors unparser logging listener url-encoding hashtables memory ;
       [
 	"vocabs" get dup [ ] [ drop "unknown" ] ifte "words" get dup [ ] [ drop "unknown" ] ifte browser-url 
 	forward-to-url
-      ] show
+      ] show-final
     ] bind <browser> ;
 
 : browser-responder ( allow-edit? -- )

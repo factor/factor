@@ -110,6 +110,17 @@ void relocate_dlsym(F_REL* rel, bool relative)
 		- (relative ? rel->offset + CELLS : 0));
 }
 
+void relocate_primitive_16_16(F_REL* rel)
+{
+	reloc_set_16_16((CELL*)rel->offset,primitive_to_xt(rel->argument));
+}
+
+INLINE void code_fixup_16_16(CELL* cell)
+{
+	CELL difference = (compiling.base - code_relocation_base);
+	reloc_set_16_16(cell,reloc_get_16_16(cell) + difference);
+}
+
 INLINE CELL relocate_code_next(CELL relocating)
 {
 	F_COMPILED* compiled = (F_COMPILED*)relocating;
@@ -151,6 +162,12 @@ INLINE CELL relocate_code_next(CELL relocating)
 			break;
 		case F_ABSOLUTE:
 			code_fixup((CELL*)rel->offset);
+			break;
+		case F_ABSOLUTE_PRIMITIVE_16_16:
+			relocate_primitive_16_16(rel);
+			break;
+		case F_ABSOLUTE_16_16:
+			code_fixup_16_16((CELL*)rel->offset);
 			break;
 		default:
 			fatal_error("Unsupported rel",rel->type);

@@ -3,13 +3,11 @@
 IN: math
 USING: generic kernel kernel-internals math math-internals ;
 
-GENERIC: numerator ( a/b -- a )
-M: integer numerator ;
-M: ratio numerator 0 slot %integer ;
+BUILTIN: ratio 4 [ 0 "numerator" f ] [ 1 "denominator" f ] ;
+UNION: rational integer ratio ;
 
-GENERIC: denominator ( a/b -- b )
+M: integer numerator ;
 M: integer denominator drop 1 ;
-M: ratio denominator 1 slot %integer ;
 
 IN: math-internals
 

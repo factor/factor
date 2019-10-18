@@ -1,19 +1,10 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: kernel
-USING: alien compiler errors inference command-line listener
-lists math namespaces parser random streams stdio presentation
-words unparser kernel-internals console assembler memory ;
-
-: default-cli-args
-    #! Some flags are *on* by default, unless user specifies
-    #! -no-<flag> CLI switch
-    "user-init" on
-    "interactive" on
-    "smart-terminal" on
-    "verbose-compile" on
-    "compile" on
-    os "win32" = "sdl" "ansi" ? "shell" set ;
+USING: alien assembler command-line compiler console errors
+generic inference kernel-internals listener lists math memory
+namespaces parser presentation random stdio streams unparser
+words ;
 
 : warm-boot ( -- )
     #! A fully bootstrapped image has this as the boot
@@ -22,7 +13,8 @@ words unparser kernel-internals console assembler memory ;
     init-error-handler
     init-random
     default-cli-args
-    parse-command-line ;
+    parse-command-line
+    "null-stdio" get [ << null-stream f >> stdio set ] when ;
 
 : shell ( str -- )
     #! This handles the -shell:<foo> cli argument.
@@ -34,7 +26,7 @@ words unparser kernel-internals console assembler memory ;
     garbage-collection
     run-user-init
     "shell" get shell
-    0 exit* 
+    0 exit
 ] set-boot
 
 warm-boot
@@ -74,4 +66,4 @@ unparse write " words total" print
 global [ stdio off ] bind
 
 "factor.image" save-image
-0 exit*
+0 exit

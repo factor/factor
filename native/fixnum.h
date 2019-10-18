@@ -11,7 +11,6 @@ INLINE CELL tag_fixnum(F_FIXNUM untagged)
 F_FIXNUM to_fixnum(CELL tagged);
 void primitive_to_fixnum(void);
 
-void primitive_fixnum_eq(void);
 void primitive_fixnum_add(void);
 void primitive_fixnum_subtract(void);
 void primitive_fixnum_multiply(void);

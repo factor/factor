@@ -1,39 +1,8 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
 ! Copyright (C) 2004, 2005 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler
-USE: kernel
-USE: lists
-USE: namespaces
-USE: words
-USE: inference
-USE: strings
-USE: strings
-USE: prettyprint
+USING: inference kernel lists math namespaces prettyprint
+strings words ;
 
 ! The linear IR being simplified is stored in this variable.
 SYMBOL: simplifying
@@ -42,7 +11,7 @@ SYMBOL: simplifying
     #! A list of quotations with stack effect
     #! ( linear -- linear ? ) that can simplify the first node
     #! in the linear IR.
-    car car "simplifiers" word-property ;
+    car car "simplifiers" word-prop ;
 
 : simplify-node ( linear list -- linear ? )
     dup [
@@ -57,7 +26,8 @@ SYMBOL: simplifying
     #! Return a new linear IR.
     dup [
         dup simplifiers simplify-node
-        [ uncons simplify-1 >r cons r> ] unless*
+        [ uncons simplify-1 drop cons t ]
+        [ uncons simplify-1 >r cons r> ] ifte
     ] [
         f
     ] ifte ;
@@ -65,8 +35,8 @@ SYMBOL: simplifying
 : simplify ( linear -- linear )
     #! Keep simplifying until simplify-1 returns f.
     [
-        dup simplifying set  simplify-1 [ simplify ] when
-    ] with-scope ;
+        dup simplifying set  simplify-1
+    ] with-scope  [ simplify ] when ;
 
 : label-called? ( label linear -- ? )
     [ uncons pick = swap #label = not and ] some? nip ;
@@ -76,7 +46,7 @@ SYMBOL: simplifying
         dup car cdr simplifying get label-called?
         [ f ] [ cdr t ] ifte
     ]
-] "simplifiers" set-word-property
+] "simplifiers" set-word-prop
 
 : next-physical? ( op linear -- ? )
     cdr dup [ car car = ] [ 2drop f ] ifte ;
@@ -86,10 +56,10 @@ SYMBOL: simplifying
     #! its param.
     over next-physical? [ cdr unswons cdr t ] [ f f ] ifte ;
 
-\ >r [ [ \ r> cancel nip ] ] "simplifiers" set-word-property
-\ r> [ [ \ >r cancel nip ] ] "simplifiers" set-word-property
-\ dup [ [ \ drop cancel nip ] ] "simplifiers" set-word-property
-\ swap [ [ \ swap cancel nip ] ] "simplifiers" set-word-property
+\ >r [ [ \ r> cancel nip ] ] "simplifiers" set-word-prop
+\ r> [ [ \ >r cancel nip ] ] "simplifiers" set-word-prop
+\ dup [ [ \ drop cancel nip ] ] "simplifiers" set-word-prop
+\ swap [ [ \ swap cancel nip ] ] "simplifiers" set-word-prop
 
 \ drop [
     [
@@ -101,7 +71,7 @@ SYMBOL: simplifying
             #replace-indirect swons swons t
         ] when
     ]
-] "simplifiers" set-word-property
+] "simplifiers" set-word-prop
 
 : find-label ( label -- rest )
     simplifying get [
@@ -109,19 +79,19 @@ SYMBOL: simplifying
     ] some? nip ;
 
 : next-logical ( linear -- linear )
-    dup car car "next-logical" word-property call ;
+    dup car car "next-logical" word-prop call ;
 
 #label [
     cdr next-logical
-] "next-logical" set-word-property
+] "next-logical" set-word-prop
 
 #jump-label [
     car cdr find-label cdr
-] "next-logical" set-word-property
+] "next-logical" set-word-prop
 
 #target-label [
     car cdr find-label cdr
-] "next-logical" set-word-property
+] "next-logical" set-word-prop
 
 : next-logical? ( op linear -- ? )
     next-logical dup [ car car = ] [ 2drop f ] ifte ;
@@ -135,16 +105,16 @@ SYMBOL: simplifying
 
 #call [
     [ #return #jump reduce ]
-] "simplifiers" set-word-property
+] "simplifiers" set-word-prop
 
 #call-label [
     [ #return #jump-label reduce ]
-] "simplifiers" set-word-property
+] "simplifiers" set-word-prop
 
 : double-jump ( linear op1 op2 -- linear ? )
     #! A jump to a jump is just a jump. If the next logical node
     #! is a jump of type op1, replace the jump at the car of the
-    #! list with a just of type op2.
+    #! list with a jump of type op2.
     swap pick next-logical? [
         over next-logical car cdr cons swap cdr cons t
     ] [
@@ -176,13 +146,13 @@ SYMBOL: simplifying
     [ #jump #jump double-jump ]
     [ useless-jump ]
     [ dead-code ]
-] "simplifiers" set-word-property
+] "simplifiers" set-word-prop
 
 #target-label [
     [ #jump-label #target-label double-jump ]
-    [ #jump #target double-jump ]
-] "simplifiers" set-word-property
+!   [ #jump #target double-jump ]
+] "simplifiers" set-word-prop
 
-#jump [ [ dead-code ] ] "simplifiers" set-word-property
-#return [ [ dead-code ] ] "simplifiers" set-word-property
-#end-dispatch [ [ dead-code ] ] "simplifiers" set-word-property
+#jump [ [ dead-code ] ] "simplifiers" set-word-prop
+#return [ [ dead-code ] ] "simplifiers" set-word-prop
+#end-dispatch [ [ dead-code ] ] "simplifiers" set-word-prop

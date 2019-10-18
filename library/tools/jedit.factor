@@ -26,7 +26,7 @@ strings unparser words ;
 : send-jedit-request ( request -- )
     jedit-server-info swap "localhost" swap <client> [
         write-big-endian-32
-        dup str-length write-big-endian-16
+        dup string-length write-big-endian-16
         write flush
     ] with-stream ;
 
@@ -40,7 +40,7 @@ strings unparser words ;
 : jedit ( word -- )
     #! Note that line numbers here start from 1
     dup word-file dup [
-        swap "line" word-property jedit-line/file
+        swap "line" word-prop jedit-line/file
     ] [
         2drop "Unknown source" print
     ] ifte ;

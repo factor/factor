@@ -84,3 +84,38 @@ f 100000000000000000000000000 "testhash" get set-hash
 [ f ] [ {{ }} {{ [[ 1 3 ]] }} = ] unit-test
 [ t ] [ {{ [[ 1 3 ]] }} {{ [[ 1 3 ]] }} = ] unit-test
 [ f ] [ {{ [[ 1 3 ]] }} {{ [[ 1 "hey" ]] }} = ] unit-test
+
+! Test rehashing
+
+2 <hashtable> "rehash" set
+
+1 1 "rehash" get set-hash
+2 2 "rehash" get set-hash
+3 3 "rehash" get set-hash
+4 4 "rehash" get set-hash
+5 5 "rehash" get set-hash
+6 6 "rehash" get set-hash
+
+[ 6 ] [ "rehash" get hash-size ] unit-test
+
+[ 6 ] [ "rehash" get clone hash-size ] unit-test
+
+"rehash" get hash-clear
+
+[ 0 ] [ "rehash" get hash-size ] unit-test
+
+[
+    3
+] [
+    2 {{
+            [[ 1 2 ]] 
+            [[ 2 3 ]]
+    }} clone hash
+] unit-test
+
+! There was an assoc in place of assoc* somewhere
+3 <hashtable> "f-hash-test" set
+
+10 [ f f "f-hash-test" get set-hash ] times
+
+[ 1 ] [ "f-hash-test" get hash-size ] unit-test

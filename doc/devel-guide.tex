@@ -87,7 +87,7 @@ This chapter will cover the basics of interactive development using the listener
 \chapkeywords{print write read}
 \index{\texttt{print}}
 \index{\texttt{write}}
-\index{\texttt{read}}
+\index{\texttt{read-line}}
 
 Factor is an \emph{image-based environment}. When you compiled Factor, you also generated a file named \texttt{factor.image}. You will learn more about images later, but for now it suffices to understand that to start Factor, you must pass the image file name on the command line:
 
@@ -143,15 +143,15 @@ A frequent beginner's error is to leave out whitespace between words. When you a
 \index{\texttt{;}}
 \index{\texttt{see}}
 
-Factor words are similar to functions and procedures in other languages. Words are defined using \emph{colon definitino} syntax. Some words, like \texttt{print}, \texttt{write} and  \texttt{read}, along with dozens of others we will see, are part of Factor. Other words will be created by you.
+Factor words are similar to functions and procedures in other languages. Words are defined using \emph{colon definition} syntax. Some words, like \texttt{print}, \texttt{write} and  \texttt{read-line}, along with dozens of others we will see, are part of Factor. Other words will be created by you.
 
 When you create a new word, you are associating a name with a particular sequence of \emph{already-existing} words. Enter the following colon definition in the listener:
 
 \begin{alltt}
-\textbf{ok} : ask-name "What is your name? " write read ;
+\textbf{ok} : ask-name "What is your name? " write read-line ;
 \end{alltt}
 
-What did we do above? We created a new word named \texttt{ask-name}, and associated with it the definition \texttt{"What is your name? " write read}. Now, lets type in two more colon definitions. The first one prints a personalized greeting. The second colon definition puts the first two together into a complete program.
+What did we do above? We created a new word named \texttt{ask-name}, and associated with it the definition \texttt{"What is your name? " write read-line}. Now, lets type in two more colon definitions. The first one prints a personalized greeting. The second colon definition puts the first two together into a complete program.
 
 \begin{alltt}
 \textbf{ok} : greet "Greetings, " write print ;
@@ -212,10 +212,10 @@ Recall our \texttt{friend} definition from the previous section. In this definit
 The first thing done by \texttt{friend} is calling \texttt{ask-name}, which was defined as follows:
 
 \begin{alltt}
-: ask-name "What is your name? " write read ;
+: ask-name "What is your name? " write read-line ;
 \end{alltt}
 
-Read this definition from left to right, and visualize the data flow. First, the string \texttt{"What is your name?~"} is pushed on the stack. The \texttt{write} word is called; it removes the string from the stack and writes it, without returning any values. Next, the \texttt{read} word is called. It waits for a line of input from the user, then pushes the entered string on the stack.
+Read this definition from left to right, and visualize the data flow. First, the string \texttt{"What is your name?~"} is pushed on the stack. The \texttt{write} word is called; it removes the string from the stack and writes it, without returning any values. Next, the \texttt{read-line} word is called. It waits for a line of input from the user, then pushes the entered string on the stack.
 
 After \texttt{ask-name}, the \texttt{friend} word calls \texttt{greet}, which was defined as follows:
 
@@ -223,9 +223,9 @@ After \texttt{ask-name}, the \texttt{friend} word calls \texttt{greet}, which wa
 : greet "Greetings, " write print ;
 \end{alltt}
 
-This word pushes the string  \texttt{"Greetings, "} and calls \texttt{write}, which writes this string. Next, \texttt{print} is called. Recall that the \texttt{read} call inside \texttt{ask-name} left the user's input on the stack; well, it is still there, and \texttt{print} prints it. In case you haven't already guessed, the difference between \texttt{write} and \texttt{print} is that the latter outputs a terminating new line.
+This word pushes the string  \texttt{"Greetings, "} and calls \texttt{write}, which writes this string. Next, \texttt{print} is called. Recall that the \texttt{read-line} call inside \texttt{ask-name} left the user's input on the stack; well, it is still there, and \texttt{print} prints it. In case you haven't already guessed, the difference between \texttt{write} and \texttt{print} is that the latter outputs a terminating new line.
 
-How did we know that \texttt{write} and \texttt{print} take one value from the stack each, or that \texttt{read} leaves one value on the stack? The answer is, you don't always know, however, you can use \texttt{see} to look up the \emph{stack effect comment} of any library word:
+How did we know that \texttt{write} and \texttt{print} take one value from the stack each, or that \texttt{read-line} leaves one value on the stack? The answer is, you don't always know, however, you can use \texttt{see} to look up the \emph{stack effect comment} of any library word:
 
 \begin{alltt}
 \textbf{ok} \ttbackslash print see
@@ -234,12 +234,12 @@ How did we know that \texttt{write} and \texttt{print} take one value from the s
     "stdio" get fprint ;}
 \end{alltt}
 
-You can see that the stack effect of \texttt{print} is \texttt{( string -{}- )}. This is a mnemonic indicating that this word pops a string from the stack, and pushes no values back on the stack. As you can verify using \texttt{see}, the stack effect of \texttt{read} is \texttt{( -{}- string )}.
+You can see that the stack effect of \texttt{print} is \texttt{( string -{}- )}. This is a mnemonic indicating that this word pops a string from the stack, and pushes no values back on the stack. As you can verify using \texttt{see}, the stack effect of \texttt{read-line} is \texttt{( -{}- string )}.
 
 All words you write should have a stack effect. So our \texttt{friend} example should have been written as follows:
 
 \begin{verbatim}
-: ask-name ( -- name ) "What is your name? " write read ;
+: ask-name ( -- name ) "What is your name? " write read-line ;
 : greet ( name -- ) "Greetings, " write print ;
 : friend ( -- ) ask-name greet ;
 \end{verbatim}
@@ -292,7 +292,7 @@ Write a string to the console, with a new line.\\
 \texttt{write}&
 \texttt{( string -{}- )}&
 Write a string to the console, without a new line.\\
-\texttt{read}&
+\texttt{read-line}&
 \texttt{( -{}- string )}&
 Read a line of input from the console.\\
 \tabvocab{prettyprint}
@@ -2061,69 +2061,38 @@ The name stack is really just a vector. The words \texttt{>n} and \texttt{n>} ar
 : n> ( n:namespace -- namespace ) namestack* vector-pop ;
 \end{alltt}
 
-\section{\label{sub:List-constructors}List constructors}
+\section{\label{sub:List-constructors}List construction}
 
-The list construction words provide an alternative way to build up a list. Instead of passing a partial list around on the stack as it is built, they store the partial list in a variable. This reduces the number
+The \texttt{make-list} word provides an alternative way to build a list. Instead of passing a partial list around on the stack, it is kept in a variable. This reduces the number
 of stack elements that have to be juggled.
 
-The word \texttt{{[}, ( -{}- )} begins list construction. This also pushes a new namespace on the name stack, so any variable values that are set between calls to \texttt{[,} and \texttt{,]} will be lost.
-
-The word \texttt{, ( obj -{}- )} appends an object to the partial
-list.
-
-The word \texttt{,{]} ( -{}- list )} pushes the complete list, and pops the corresponding namespace from the name stack.
+The word \texttt{make-list ( quot -{}- )} executes a quotation in a new dynamic scope. Calls to \texttt{, ( obj -{}- )} in the quotation appends objects to the partial
+list. When the quotation returns, \texttt{make-list} pushes the complete list.
 
 The fact that a new
-scope is created between \texttt{{[},} and \texttt{,{]}} is very important.
+scope is created inside \texttt{make-list} is very important.
 This means
-that list constructions can be nested. There is no
-requirement that \texttt{{[},} and \texttt{,{]}} appear in the same
-word, however, debugging becomes prohibitively difficult when a list
-construction begins in one word and ends with another.
+that list constructions can be nested.
 
 Here is an example of list construction using this technique:
 
 \begin{alltt}
-{[}, 1 10 {[} 2 {*} dup , {]} times drop ,{]} .
+[ 1 10 {[} 2 {*} dup , {]} times drop ] make-list .
 \emph{{[} 2 4 8 16 32 64 128 256 512 1024 {]}}
 \end{alltt}
 
-\section{String constructors}
+\section{String construction}
 
-The string construction words provide an alternative way to build up a string. Instead of passing a string buffer around on the stack, they store the string buffer in a variable. This reduces the number
-of stack elements that have to be juggled.
-
-The word \texttt{<\% ( -{}- )} begins string construction. The word
-definition creates a string buffer. Instead of leaving the string
-buffer on the stack, the word creates and pushes a scope on the name
-stack.
-
-The word \texttt{\% ( str/ch -{}- )} appends a string or a character
-to the partial list. The word definition calls \texttt{sbuf-append}
-on a string buffer located by searching the name stack.
-
-The word \texttt{\%> ( -{}- str )} pushes the complete list. The word
-definition pops the name stack and calls \texttt{sbuf>str} on the
-appropriate string buffer.
+The \texttt{make-string} word is similar to \texttt{make-list}, except inside the quotation, only strings and integers may be passed to the \texttt{,} word, and when the quotation finishes executing, everything is concatenated into a single string.
 
 Compare the following two examples -- both define a word that concatenates together all elements of a list of strings. The first one uses a string buffer stored on the stack, the second uses string construction words:
 
 \begin{alltt}
-: cat ( list -- str )
+: list>string ( list -- str )
     100 <sbuf> swap {[} over sbuf-append {]} each sbuf>str ;
 
-: cat ( list -- str )
-    <\% {[} \% {]} each \%> ;
-\end{alltt}
-
-The scope created by \texttt{<\%} and \texttt{\%>} is \emph{dynamic}; that is, all code executed between two words is part of the scope. This allows the call to \texttt{\%} to occur in a nested word. For example, here is a pair of definitions that turn an association list of strings into a string of the form \texttt{key1=value1 key2=value2 ...}:
-
-\begin{alltt}
-: pair\% ( pair -{}- )
-    unswons \% "=" \% \% ;
-
-: assoc>string ( alist -{}- )
-    <\% [ pair\% " " \% ] each \%> ;
+: list>string ( list -- str )
+    [ [ , ] each ] make-list ;
 \end{alltt}
 
 \chapter{Practical: a contractor timesheet}
@@ -2282,7 +2251,7 @@ values of \texttt{hh} and \texttt{mm} into a single string using string
 construction:
 
 \begin{alltt}
-: hh:mm ( millis -{}- str ) <\% dup hh \% ":" \% mm \% \%> ;
+: hh:mm ( millis -{}- str ) [ dup hh , ":" , mm , ] make-string ;
 \end{alltt}
 However, so far, these three definitions do not produce ideal output.
 Try a few examples:
@@ -2486,7 +2455,7 @@ USE: vectors
 
 : hh ( duration -- str ) 60 /i ;
 : mm ( duration -- str ) 60 mod unparse 2 digits ;
-: hh:mm ( millis -- str ) <% dup hh % ":" % mm % %> ;
+: hh:mm ( millis -- str ) [ dup hh , ":" , mm , ] make-string ;
 
 : print-entry ( duration description -- )
     dup write
@@ -2555,7 +2524,7 @@ The following terminology is used in this guide:
 
 \begin{itemize}
 \item \emph{Class} -- a class is a set of objects given by a predicate
-that distinglishes elements of the class from other objects, along with
+that distingluishes elements of the class from other objects, along with
 some associated meta-information.
 
 \item \emph{Type} -- a type is a concrete representation of an object
@@ -2662,7 +2631,7 @@ holding a list.
 \end{itemize}
 
 The building blocks of classes are the various built-in types, and
-user-defined tupes. Tuples are covered later in this chapter.
+user-defined tuples. Tuples are covered later in this chapter.
 The built-in types each get their own class whose members are precisely
 the objects having that type. The following built-in classes are
 defined:
@@ -2696,7 +2665,7 @@ exceptions:
 \begin{itemize}
 \item \texttt{object} -- there is no need for a predicate word, since
 every object is an instance of this class.
-\item \texttt{f} -- the only instance of this class is the sigleton
+\item \texttt{f} -- the only instance of this class is the singleton
 \texttt{f} signifying falsity, missing value, and empty list, and the predicate testing for this is the built-in library word \texttt{not}.
 \item \texttt{t} -- the only instance of this class is the canonical truth value
 \texttt{t}. You can write \texttt{t =} to test for this object, however usually

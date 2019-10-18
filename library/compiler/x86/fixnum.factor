@@ -43,15 +43,15 @@ USE: math-internals
 ! prototype to test the assembler.
 
 : self ( word -- )
-    f swap dup "infer-effect" word-property (consume/produce) ;
+    f swap dup "infer-effect" word-prop (consume/produce) ;
 
 : fixnum-insn ( overflow opcode -- )
     #! This needs to be factored.
     EAX [ ESI -4 ] MOV
     EAX [ ESI ] rot execute
-    0 JNO fixup
+    0 JNO just-compiled
     swap compile-call
-    0 JMP fixup >r
+    0 JMP just-compiled >r
     compiled-offset swap patch
     ESI 4 SUB
     [ ESI ] EAX MOV
@@ -59,31 +59,31 @@ USE: math-internals
 
 \ fixnum+ [
     drop \ fixnum+ \ ADD fixnum-insn
-] "generator" set-word-property
+] "generator" set-word-prop
 
-\ fixnum+ [ \ fixnum+ self ] "infer" set-word-property
+\ fixnum+ [ \ fixnum+ self ] "infer" set-word-prop
 
 \ fixnum- [
     drop \ fixnum- \ SUB fixnum-insn
-] "generator" set-word-property
+] "generator" set-word-prop
 
-\ fixnum- [ \ fixnum- self ] "infer" set-word-property
+\ fixnum- [ \ fixnum- self ] "infer" set-word-prop
 
 \ fixnum* [
     drop
     EAX [ ESI -4 ] MOV
     EAX 3 SHR
     EAX [ ESI ] IMUL
-    0 JNO fixup
+    0 JNO just-compiled
     \ fixnum* compile-call
-    0 JMP fixup >r
+    0 JMP just-compiled >r
     compiled-offset swap patch
     ESI 4 SUB
     [ ESI ] EAX MOV
     r> compiled-offset swap patch
-] "generator" set-word-property
+] "generator" set-word-prop
 
-\ fixnum* [ \ fixnum* self ] "infer" set-word-property
+\ fixnum* [ \ fixnum* self ] "infer" set-word-prop
 
 \ fixnum/i [
     drop
@@ -91,16 +91,16 @@ USE: math-internals
     CDQ
     [ ESI ] IDIV
     EAX 3 SHL
-    0 JNO fixup
+    0 JNO just-compiled
     \ fixnum/i compile-call
-    0 JMP fixup >r
+    0 JMP just-compiled >r
     compiled-offset swap patch
     ESI 4 SUB
     [ ESI ] EAX MOV
     r> compiled-offset swap patch
-] "generator" set-word-property
+] "generator" set-word-prop
 
-\ fixnum/i [ \ fixnum/i self ] "infer" set-word-property
+\ fixnum/i [ \ fixnum/i self ] "infer" set-word-prop
 
 \ fixnum-mod [
     drop
@@ -108,16 +108,16 @@ USE: math-internals
     CDQ
     [ ESI ] IDIV
     EAX 3 SHL
-    0 JNO fixup
+    0 JNO just-compiled
     \ fixnum/i compile-call
-    0 JMP fixup >r
+    0 JMP just-compiled >r
     compiled-offset swap patch
     ESI 4 SUB
     [ ESI ] EDX MOV
     r> compiled-offset swap patch
-] "generator" set-word-property
+] "generator" set-word-prop
 
-\ fixnum-mod [ \ fixnum-mod self ] "infer" set-word-property
+\ fixnum-mod [ \ fixnum-mod self ] "infer" set-word-prop
 
 \ fixnum/mod [
     drop
@@ -125,16 +125,16 @@ USE: math-internals
     CDQ
     [ ESI ] IDIV
     EAX 3 SHL
-    0 JNO fixup
+    0 JNO just-compiled
     \ fixnum/mod compile-call
-    0 JMP fixup >r
+    0 JMP just-compiled >r
     compiled-offset swap patch
     [ ESI -4 ] EAX MOV
     [ ESI ] EDX MOV
     r> compiled-offset swap patch
-] "generator" set-word-property
+] "generator" set-word-prop
 
-\ fixnum/mod [ \ fixnum/mod self ] "infer" set-word-property
+\ fixnum/mod [ \ fixnum/mod self ] "infer" set-word-prop
 
 \ arithmetic-type [
     drop
@@ -143,13 +143,13 @@ USE: math-internals
     EDX [ ESI ] MOV
     EDX BIN: 111 AND
     EAX EDX CMP
-    0 JE fixup >r
+    0 JE just-compiled >r
     \ arithmetic-type compile-call
-    0 JMP fixup
+    0 JMP just-compiled
     compiled-offset r> patch
     EAX 3 SHL
     PUSH-DS
     compiled-offset swap patch
-] "generator" set-word-property
+] "generator" set-word-prop
 
-\ arithmetic-type [ \ arithmetic-type self ] "infer" set-word-property
+\ arithmetic-type [ \ arithmetic-type self ] "infer" set-word-prop

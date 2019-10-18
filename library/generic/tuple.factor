@@ -1,16 +1,48 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
+IN: kernel-internals
+USING: words parser kernel namespaces lists strings math
+hashtables errors vectors ;
+
+! Tuples are really arrays in the runtime, but with a different
+! type number. The layout is as follows:
+
+! slot 0 - object header with type number (as usual)
+! slot 1 - length, including class/delegate slots
+! slot 2 - the class, a word
+! slot 3 - the delegate tuple, or f
+
+: make-tuple ( class size -- tuple )
+    #! Internal allocation function. Do not call it directly,
+    #! since you can fool the runtime and corrupt memory by
+    #! specifying an incorrect size.
+    <tuple> [ 0 swap set-array-nth ] keep ;
+
+: tuple-class 2 slot ; inline
+
 IN: generic
-USING: words parser kernel namespaces lists strings
-kernel-internals math hashtables errors vectors ;
+
+BUILTIN: tuple 18 [ 1 array-capacity f ] ;
+
+! So far, only tuples can have delegates, which also must be
+! tuples (the UI uses numbers as delegates in a couple of places
+! but this is Unsupported(tm)).
+GENERIC: delegate
+GENERIC: set-delegate
+
+M: object delegate drop f ;
+M: tuple delegate 3 slot ;
+
+M: object set-delegate 2drop ;
+M: tuple set-delegate 3 set-slot ;
+
+#! arrayed objects can be passed to array-capacity,
+#! array-nth, and set-array-nth.
+UNION: arrayed array tuple ;
 
 : class ( obj -- class )
     #! The class of an object.
-    dup tuple? [ 2 slot ] [ type builtin-type ] ifte ;
-
-: make-tuple ( class -- tuple )
-    dup "tuple-size" word-property <tuple>
-    [ 0 swap set-array-nth ] keep ;
+    dup tuple? [ tuple-class ] [ type builtin-type ] ifte ;
 
 : (literal-tuple) ( list size -- tuple )
     dup <tuple> swap [
@@ -20,44 +52,11 @@ kernel-internals math hashtables errors vectors ;
     ] repeat nip ;
 
 : literal-tuple ( list -- tuple )
-    dup car "tuple-size" word-property over length over = [
+    dup car "tuple-size" word-prop over length over = [
         (literal-tuple)
     ] [
         "Incorrect tuple length" throw
     ] ifte ;
-
-: tuple>list ( tuple -- list )
-    >tuple array>list ;
-
-: define-tuple-generic ( tuple word def -- )
-    over >r [ single-combination ] \ GENERIC: r> define-generic
-    define-method ;
-
-: accessor-word ( name tuple -- word )
-    [ word-name , "-" , , ] make-string
-    create-in ;
-
-: define-accessor ( tuple name n -- accessor )
-    #! Generic word with a method specializing on the tuple's
-    #! class that reads the right slot.
-    >r over accessor-word tuck r> [ slot ] cons
-    define-tuple-generic ;
-
-: mutator-word ( name tuple -- word )
-    [ "set-" , word-name , "-" , , ] make-string
-    create-in ;
-
-: define-mutator ( word name n -- mutator )
-    #! Generic word with a method specializing on the tuple's
-    #! class that writes to the right slot.
-    >r over mutator-word tuck r> [ set-slot ] cons
-    define-tuple-generic ;
-
-: define-slot ( word name n -- [ n accessor mutator ] )
-    over "delegate" = [
-        pick over "delegate-field" set-word-property
-    ] when
-    3dup define-mutator >r define-accessor r> cons ;
 
 : tuple-predicate ( word -- )
     #! Make a foo? word for testing the tuple class at the top
@@ -69,57 +68,39 @@ kernel-internals math hashtables errors vectors ;
     #! If the new list of slots is different from the previous,
     #! forget the old definition.
     >r "use" get search dup [
-        dup "slots" word-property r> = [
-            drop
-        ] [
-            forget
-        ] ifte
+        dup "tuple-size" word-prop r> length 2 + =
+        [ drop ] [ forget ] ifte
     ] [
         r> 2drop
     ] ifte ;
 
-: define-slots ( tuple slots -- words )
-    2dup "slots" set-word-property
-    2dup length 1 + "tuple-size" set-word-property
-    dup length [ 3 + ] project zip
-    [ uncons define-slot ] map-with ;
+: tuple-slots ( tuple slots -- )
+    2dup length 2 + "tuple-size" set-word-prop
+    4 -rot simple-slots ;
 
 : constructor-word ( word -- word )
     word-name "<" swap ">" cat3 create-in ;
 
 : define-constructor ( word def -- )
-    over constructor-word >r
-    [ swap literal, \ make-tuple , append, ] make-list
-    r> swap define-compound ;
+    >r [ constructor-word ] keep [
+        dup literal, "tuple-size" word-prop , \ make-tuple ,
+    ] make-list r> append define-compound ;
 
 : default-constructor ( tuple -- )
     dup [
-        "slot-words" word-property
-        reverse [ cdr unit , \ keep , ] each
+        "slots" word-prop
+        reverse [ last unit , \ keep , ] each
     ] make-list define-constructor ;
 
 : define-tuple ( tuple slots -- )
     2dup check-shape
-    >r
-    create-in
+    >r create-in
     dup save-location
     dup intern-symbol
     dup tuple-predicate
-    dup tuple "metaclass" set-word-property
-    dup
-    dup r> define-slots "slot-words" set-word-property
+    dup tuple "metaclass" set-word-prop
+    dup r> tuple-slots
     default-constructor ;
-
-: tuple-delegate ( tuple -- obj )
-    dup tuple? [
-        dup class "delegate-field" word-property dup [
-            >fixnum slot
-        ] [
-            2drop f
-        ] ifte
-    ] [
-        drop f
-    ] ifte ;
 
 : alist>quot ( default alist -- quot )
     #! Turn an association list that maps values to quotations
@@ -128,7 +109,7 @@ kernel-internals math hashtables errors vectors ;
     [
         [
             unswons
-            \ dup , unswons literal, \ = , \ drop swons ,
+            \ dup , unswons literal, \ eq? , \ drop swons ,
             alist>quot , \ ifte ,
         ] make-list
     ] when* ;
@@ -153,16 +134,16 @@ kernel-internals math hashtables errors vectors ;
 : default-tuple-method ( generic -- quot )
     #! If the generic does not define a specific method for a
     #! tuple, execute the return value of this.
-    dup "methods" word-property
-    tuple over hash dup [
-        2nip
+    dup "methods" word-prop
+    tuple over hash* dup [
+        2nip cdr
     ] [
-        drop object over hash dup [
-            2nip
+        drop object over hash* dup [
+            2nip cdr
         ] [
-            2drop [ dup tuple-delegate ] swap
+            2drop [ dup delegate ] swap
             dup unit swap
-            unit [ car ] cons [ undefined-method ] append
+            unit [ car ] cons [ no-method ] append
             \ ?ifte 3list append
         ] ifte
     ] ifte ;
@@ -171,8 +152,8 @@ kernel-internals math hashtables errors vectors ;
     #! Generate a quotation that performs tuple class dispatch
     #! for methods defined on the given generic.
     dup default-tuple-method \ drop swons
-    swap "methods" word-property hash>quot
-    [ dup class ] swap append ;
+    swap "methods" word-prop hash>quot
+    [ dup tuple-class ] swap append ;
 
 : add-tuple-dispatch ( word vtable -- )
     >r tuple-dispatch-quot tuple r> set-vtable ;
@@ -182,19 +163,12 @@ kernel-internals math hashtables errors vectors ;
     #! delegate.
     dup array-capacity dup <tuple> [ -rot copy-array ] keep ;
 
-: clone-delegate ( tuple -- )
-    dup class "delegate-field" word-property dup [
-        [ >fixnum slot clone ] 2keep set-slot
-    ] [
-        2drop
-    ] ifte ;
-
 M: tuple clone ( tuple -- tuple )
     #! Clone a tuple and its delegate.
-    clone-tuple dup clone-delegate ;
+    clone-tuple dup delegate clone over set-delegate ;
 
 : tuple>list ( tuple -- list )
-    >tuple dup array-capacity swap array>list ;
+    dup array-capacity swap array>list ;
 
 M: tuple = ( obj tuple -- ? )
     over tuple? [
@@ -208,21 +182,23 @@ M: tuple = ( obj tuple -- ? )
     ] ifte ;
 
 M: tuple hashcode ( vec -- n )
-    dup array-capacity 1 number= [
+    #! If the capacity is two, then all we have is the class
+    #! slot and delegate.
+    dup array-capacity 2 number= [
         drop 0
     ] [
-        1 swap array-nth hashcode
+        2 swap array-nth hashcode
     ] ifte ;
 
 tuple [
     ( generic vtable definition class -- )
     2drop add-tuple-dispatch
-] "add-method" set-word-property
+] "add-method" set-word-prop
 
 tuple [
-    drop tuple "builtin-type" word-property unit
-] "builtin-supertypes" set-word-property
+    drop tuple "builtin-type" word-prop unit
+] "builtin-supertypes" set-word-prop
 
-tuple 10 "priority" set-word-property
+tuple 10 "priority" set-word-prop
 
-tuple [ 2drop t ] "class<" set-word-property
+tuple [ 2drop t ] "class<" set-word-prop

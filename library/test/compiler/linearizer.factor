@@ -7,4 +7,4 @@ USE: words
 
 : foo [ drop ] each-word ;
 
-[ ] [ \ foo word-parameter dataflow linearize drop ] unit-test
+[ ] [ \ foo word-def dataflow linearize drop ] unit-test

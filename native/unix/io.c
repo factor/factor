@@ -83,7 +83,7 @@ bool perform_copy_from_io_task(F_PORT* port, F_PORT* other_port)
 	if(can_write(other_port,port->buf_fill))
 	{
 		write_string_raw(other_port,
-			(BYTE*)(untag_string(port->buffer) + 1),
+			(char*)(untag_string(port->buffer) + 1),
 			port->buf_fill);
 		port->buf_pos = port->buf_fill = 0;
 	}
@@ -291,13 +291,15 @@ void collect_io_tasks(void)
 
 	for(i = 0; i < FD_SETSIZE; i++)
 	{
-		copy_object(&read_io_tasks[i].port);
-		copy_object(&read_io_tasks[i].callbacks);
+		COPY_OBJECT(read_io_tasks[i].port);
+		COPY_OBJECT(read_io_tasks[i].other_port);
+		COPY_OBJECT(read_io_tasks[i].callbacks);
 	}
 
 	for(i = 0; i < FD_SETSIZE; i++)
 	{
-		copy_object(&write_io_tasks[i].port);
-		copy_object(&write_io_tasks[i].callbacks);
+		COPY_OBJECT(write_io_tasks[i].port);
+		COPY_OBJECT(write_io_tasks[i].other_port);
+		COPY_OBJECT(write_io_tasks[i].callbacks);
 	}
 }

@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: sdl-ttf
+IN: sdl
 USE: alien
 
 : UNICODE_BOM_NATIVE  HEX: FEFF ;

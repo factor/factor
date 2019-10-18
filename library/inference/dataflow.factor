@@ -110,7 +110,7 @@ SYMBOL: node-param
     #! if its not defined, apply default quotation to
     #! ( node ) otherwise apply property quotation to
     #! ( node ).
-    >r >r dup [ node-op get ] bind r> word-property dup [
+    >r >r dup [ node-op get ] bind r> word-prop dup [
         call r> drop
     ] [
         drop r> call

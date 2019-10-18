@@ -14,12 +14,16 @@ DEFER: stdio
 
 IN: streams
 
+! fd-streams read/write port objects, which are elaborated in
+! io-internals.factor.
+
 TUPLE: fd-stream in out ;
 
 M: fd-stream stream-write-attr ( str style stream -- )
     nip fd-stream-out blocking-write ;
 
 M: fd-stream stream-readln ( stream -- str )
+    dup fd-stream-out [ blocking-flush ] when*
     fd-stream-in dup [ blocking-read-line ] when ;
 
 M: fd-stream stream-read ( count stream -- str )
@@ -41,9 +45,6 @@ M: fd-stream stream-close ( stream -- )
 : <file-writer> ( path -- stream )
     f t open-file <fd-stream> ;
 
-: init-stdio ( -- )
-    stdin stdout <fd-stream> <stdio-stream> stdio set ;
-
 : (fcopy) ( from to -- )
     #! Copy the contents of the fd-stream 'from' to the
     #! fd-stream 'to'. Use fcopy; this word does not close
@@ -63,4 +64,19 @@ M: fd-stream stream-close ( stream -- )
     "resource-path" get [ "." ] unless* ;
 
 : <resource-stream> ( path -- stream )
+    #! Open a file path relative to the Factor source code root.
     resource-path swap path+ <file-reader> ;
+
+! Think '/dev/null'.
+
+TUPLE: null-stream ;
+M: null-stream stream-flush drop ;
+M: null-stream stream-auto-flush drop ;
+M: null-stream stream-read 2drop f ;
+M: null-stream stream-readln drop f ;
+M: null-stream stream-write-attr 3drop ;
+M: null-stream stream-close drop ;
+
+: init-stdio ( -- )
+    #! Opens file descriptors 0, 1.
+    stdin stdout <fd-stream> <stdio-stream> stdio set ;

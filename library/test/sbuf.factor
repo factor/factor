@@ -11,5 +11,5 @@ USE: test
     "Hello" "buf" get sbuf-append
     "buf" get sbuf-clone "buf-clone" set
     "World" "buf-clone" get sbuf-append
-    "buf" get sbuf>str
+    "buf" get sbuf>string
 ] unit-test

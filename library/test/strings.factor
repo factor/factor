@@ -24,29 +24,29 @@ USE: test
 [ -1 ] [ "hola" "amigo" index-of ] unit-test
 [ -1 ] [ "hola" "holaa" index-of ] unit-test
 
-[ "Beginning" ] [ 9 "Beginning and end" str-head ] unit-test
+[ "Beginning" ] [ 9 "Beginning and end" string-head ] unit-test
 
-[ f ] [ "I" "team" str-contains? ] unit-test
-[ t ] [ "ea" "team" str-contains? ] unit-test
-[ f ] [ "actore" "Factor" str-contains? ] unit-test
+[ f ] [ "I" "team" string-contains? ] unit-test
+[ t ] [ "ea" "team" string-contains? ] unit-test
+[ f ] [ "actore" "Factor" string-contains? ] unit-test
 
-[ "end" ] [ 14 "Beginning and end" str-tail ] unit-test
+[ "end" ] [ 14 "Beginning and end" string-tail ] unit-test
 
-[ "Beginning" " and end" ] [ "Beginning and end" 9 str/ ] unit-test
+[ "Beginning" " and end" ] [ "Beginning and end" 9 string/ ] unit-test
 
-[ "Beginning" "and end" ] [ "Beginning and end" 9 str// ] unit-test
+[ "Beginning" "and end" ] [ "Beginning and end" 9 string// ] unit-test
 
 [ "hello" "world" ] [ "hello world" " " split1 ] unit-test
 [ "goodbye" f ] [ "goodbye" " " split1 ] unit-test
 [ "" "" ] [ "great" "great" split1 ] unit-test
 
-[ "and end" t ] [ "Beginning and end" "Beginning " ?str-head ] unit-test
-[ "Beginning and end" f ] [ "Beginning and end" "Beginning x" ?str-head ] unit-test
-[ "Beginning and end" f ] [ "Beginning and end" "eginning " ?str-head ] unit-test
+[ "and end" t ] [ "Beginning and end" "Beginning " ?string-head ] unit-test
+[ "Beginning and end" f ] [ "Beginning and end" "Beginning x" ?string-head ] unit-test
+[ "Beginning and end" f ] [ "Beginning and end" "eginning " ?string-head ] unit-test
 
-[ "Beginning" t ] [ "Beginning and end" " and end" ?str-tail ] unit-test
-[ "Beginning and end" f ] [ "Beginning and end" "Beginning x" ?str-tail ] unit-test
-[ "Beginning and end" f ] [ "Beginning and end" "eginning " ?str-tail ] unit-test
+[ "Beginning" t ] [ "Beginning and end" " and end" ?string-tail ] unit-test
+[ "Beginning and end" f ] [ "Beginning and end" "Beginning x" ?string-tail ] unit-test
+[ "Beginning and end" f ] [ "Beginning and end" "eginning " ?string-tail ] unit-test
 
 [ [ "This" "is" "a" "split" "sentence" ] ]
 [ "This is a split sentence" " " split ]
@@ -59,10 +59,10 @@ unit-test
 [ [ "a" "b" "c" "d" "e" "f" ] ]
 [ "aXXbXXcXXdXXeXXf" "XX" split ] unit-test
 
-[ "Hello world" t ] [ "Hello world\n" "\n" ?str-tail ] unit-test
-[ "Hello world" f ] [ "Hello world" "\n" ?str-tail ] unit-test
-[ "" t ] [ "\n" "\n" ?str-tail ] unit-test
-[ "" f ] [ "" "\n" ?str-tail ] unit-test
+[ "Hello world" t ] [ "Hello world\n" "\n" ?string-tail ] unit-test
+[ "Hello world" f ] [ "Hello world" "\n" ?string-tail ] unit-test
+[ "" t ] [ "\n" "\n" ?string-tail ] unit-test
+[ "" f ] [ "" "\n" ?string-tail ] unit-test
 
 [ t ] [ CHAR: a letter? ] unit-test
 [ f ] [ CHAR: A letter? ] unit-test
@@ -71,11 +71,8 @@ unit-test
 [ t ] [ CHAR: 0 digit? ] unit-test
 [ f ] [ CHAR: x digit? ] unit-test
 
-[ t ] [ "abc" "abd" str-compare 0 < ] unit-test
-[ t ] [ "z" "abd" str-compare 0 > ] unit-test
-
-[ "fedcba" ] [ "abcdef" str-reverse ] unit-test
-[ "edcba" ] [ "abcde" str-reverse ] unit-test
+[ t ] [ "abc" "abd" string-compare 0 < ] unit-test
+[ t ] [ "z" "abd" string-compare 0 > ] unit-test
 
 [ f ] [ [ 0 10 "hello" substring ] [ not ] catch ] unit-test
 
@@ -83,13 +80,13 @@ unit-test
 
 [ 4 ] [
     0 "There are Four Upper Case characters"
-    [ LETTER? [ 1 + ] when ] str-each
+    [ LETTER? [ 1 + ] when ] string-each
 ] unit-test
 
 [ "Replacing+spaces+with+plus" ]
 [
     "Replacing spaces with plus"
-    [ dup CHAR: \s = [ drop CHAR: + ] when ] str-map
+    [ dup CHAR: \s = [ drop CHAR: + ] when ] string-map
 ]
 unit-test
 

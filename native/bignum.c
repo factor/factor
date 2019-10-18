@@ -240,7 +240,7 @@ void primitive_bignum_not(void)
 
 void copy_bignum_constants(void)
 {
-	copy_object(&bignum_zero);
-	copy_object(&bignum_pos_one);
-	copy_object(&bignum_neg_one);
+	COPY_OBJECT(bignum_zero);
+	COPY_OBJECT(bignum_pos_one);
+	COPY_OBJECT(bignum_neg_one);
 }

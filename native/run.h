@@ -26,9 +26,6 @@ jmp_buf toplevel;
 sigjmp_buf toplevel;
 #endif
 
-/* TAGGED pointer to currently executing word */
-CELL executing;
-
 /* TAGGED user environment data; see getenv/setenv prims */
 CELL userenv[USER_ENV];
 

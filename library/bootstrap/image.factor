@@ -191,7 +191,7 @@ M: f ' ( obj -- ptr )
         dup hashcode fixnum-tag immediate ,
         0 ,
         dup word-primitive ,
-        dup word-parameter ' ,
+        dup word-def ' ,
         dup word-props ' ,
         0 ,
         0 ,
@@ -210,10 +210,10 @@ M: f ' ( obj -- ptr )
 : transfer-word ( word -- word )
     #! This is a hack. See doc/bootstrap.txt.
     dup dup word-name swap word-vocabulary unit search
-    [ dup "Missing DEFER: " word-error ] ?unless ;
+    [ ] [ dup "Missing DEFER: " word-error ] ?ifte ;
 
 : fixup-word ( word -- offset )
-    dup pooled-object [ "Not in image: " word-error ] ?unless ;
+    dup pooled-object [ ] [ "Not in image: " word-error ] ?ifte ;
 
 : fixup-words ( -- )
     image get [
@@ -233,16 +233,17 @@ M: cons ' ( c -- tagged )
 ( Strings )
 
 : align-string ( n str -- )
-    tuck str-length - CHAR: \0 fill cat2 ;
+    tuck string-length - CHAR: \0 fill cat2 ;
 
 : emit-chars ( str -- )
-    "big-endian" get [ str-reverse ] unless
-    0 swap [ swap 16 shift + ] str-each emit ;
+    string>list "big-endian" get [ reverse ] unless
+    0 swap [ swap 16 shift + ] each emit ;
 
 : (pack-string) ( n list -- )
     #! Emit bytes for a string, with n characters per word.
     [
-        2dup str-length > [ dupd align-string ] when  emit-chars
+        2dup string-length > [ dupd align-string ] when
+        emit-chars
     ] each drop ;
 
 : pack-string ( string -- )
@@ -251,7 +252,7 @@ M: cons ' ( c -- tagged )
 : emit-string ( string -- )
     object-tag here-as swap
     string-type >header emit
-    dup str-length emit
+    dup string-length emit-fixnum
     dup hashcode emit-fixnum
     "\0" cat2 pack-string
     align-here ;
@@ -259,9 +260,9 @@ M: cons ' ( c -- tagged )
 M: string ' ( string -- pointer )
     #! We pool strings so that each string is only written once
     #! to the image
-    dup pooled-object [
+    dup pooled-object [ ] [
         dup emit-string dup >r pool-object r>
-    ] ?unless ;
+    ] ?ifte ;
 
 ( Arrays and vectors )
 
@@ -302,9 +303,9 @@ M: vector ' ( vector -- pointer )
 
 M: hashtable ' ( hashtable -- pointer )
     #! Only hashtables are pooled, not vectors!
-    dup pooled-object [
+    dup pooled-object [ ] [
         dup emit-hashtable [ pool-object ] keep
-    ] ?unless ;
+    ] ?ifte ;
 
 ( End of the image )
 
@@ -322,7 +323,9 @@ M: hashtable ' ( hashtable -- pointer )
 : global, ( -- )
     vocabularies get
     dup vocabularies,
-    <namespace> [ vocabularies set ] extend '
+    <namespace> [
+        classes [ ] change  vocabularies set
+    ] extend '
     global-offset fixup ;
 
 : boot, ( quot -- )

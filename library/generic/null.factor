@@ -5,9 +5,9 @@ USING: kernel words ;
 
 ! Null metaclass with no instances.
 SYMBOL: null
-null [ drop [ ] ] "builtin-supertypes" set-word-property
-null [ 2drop 2drop ] "add-method" set-word-property
-null [ drop f ] "predicate" set-word-property
-null 100 "priority" set-word-property
-null [ 2drop t ] "class<" set-word-property
+null [ drop [ ] ] "builtin-supertypes" set-word-prop
+null [ 2drop 2drop ] "add-method" set-word-prop
+null [ drop f ] "predicate" set-word-prop
+null 100 "priority" set-word-prop
+null [ 2drop t ] "class<" set-word-prop
 null null define-class

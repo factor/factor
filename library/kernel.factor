@@ -1,15 +1,10 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: kernel-internals USING: generic kernel vectors ;
-
-: dispatch ( n vtable -- )
-    #! This word is unsafe since n is not bounds-checked. Do not
-    #! call it directly.
-    vector-array array-nth call ;
-
-BUILTIN: tuple 18
-
 IN: kernel
+USING: generic kernel-internals vectors ;
+
+UNION: boolean f t ;
+COMPLEMENT: general-t f
 
 GENERIC: hashcode ( obj -- n )
 M: object hashcode drop 0 ;
@@ -21,7 +16,7 @@ GENERIC: clone ( obj -- obj )
 M: object clone ;
 
 : cpu ( -- arch )
-    #! Returns one of "x86" or "unknown".
+    #! Returns one of "x86", "ppc", or "unknown".
     7 getenv ;
 
 : os ( -- arch )
@@ -47,24 +42,9 @@ M: object clone ;
 : or ( a b -- a|b ) t swap ? ; inline
 : xor ( a b -- a^b ) dup not swap ? ; inline
 
-IN: syntax
-
-! The canonical t is a heap-allocated dummy object. It is always
-! the first in the image.
-BUILTIN: t 7
-
-! In the runtime, the canonical f is represented as a null
-! pointer with tag 3. So
-! f address . ==> 3
-BUILTIN: f 9
-
-IN: kernel
-UNION: boolean f t ;
-COMPLEMENT: general-t f
-
 IN: alien
 
 ! See compiler/alien.factor for the rest; this needs to be here
 ! since primitive stack effects involve alien inputs/outputs.
-BUILTIN: dll   15
-BUILTIN: alien 16
+BUILTIN: dll   15 ;
+BUILTIN: alien 16 ;

@@ -1,43 +1,8 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! Copyright (C) 2004, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: jedit
-USE: kernel
-USE: lists
-USE: namespaces
-USE: parser
-USE: presentation
-USE: prettyprint
-USE: stdio
-USE: streams
-USE: strings
-USE: words
-USE: generic
-USE: listener
+USING: generic kernel listener lists namespaces parser
+prettyprint stdio streams strings words ;
 
 ! Wire protocol for jEdit to evaluate Factor code.
 ! Packets are of the form:
@@ -49,7 +14,7 @@ USE: listener
 ! captured with with-string.
 
 : write-packet ( string -- )
-    dup str-length write-big-endian-32 write flush ;
+    dup string-length write-big-endian-32 write flush ;
 
 : read-packet ( -- string )
     read-big-endian-32 read ;
@@ -75,25 +40,24 @@ USE: listener
 : jedit-write-attr ( str style -- )
     CHAR: w write
     [ swap . . ] with-string
-    dup str-length write-big-endian-32
+    dup string-length write-big-endian-32
     write ;
 
-TUPLE: jedit-stream delegate ;
+TUPLE: jedit-stream ;
 
 M: jedit-stream stream-readln ( stream -- str )
     wrapper-stream-scope
     [ CHAR: r write flush read-big-endian-32 read ] bind ;
 
 M: jedit-stream stream-write-attr ( str style stream -- )
-    wrapper-stream-scope
-    [ [ default-style ] unless* jedit-write-attr ] bind ;
+    wrapper-stream-scope [ jedit-write-attr ] bind ;
 
 M: jedit-stream stream-flush ( stream -- )
     wrapper-stream-scope
     [ CHAR: f write flush ] bind ;
 
 C: jedit-stream ( stream -- stream )
-    [ >r <wrapper-stream> r> set-jedit-stream-delegate ] keep ;
+    [ >r <wrapper-stream> r> set-delegate ] keep ;
 
 : stream-server ( -- )
     #! Execute this in the inferior Factor.
@@ -108,7 +72,7 @@ C: jedit-stream ( stream -- stream )
             "name"
             "stack-effect"
         ] [
-            word-property
+            word-prop
         ] map-with
     ] when ;
 

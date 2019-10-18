@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
 USING: generic kernel lists math namespaces stdio strings
-presentation unparser words ;
+presentation streams unparser words ;
 
 ! Prettyprinting words
 : vocab-actions ( search -- list )
@@ -33,7 +33,7 @@ presentation unparser words ;
     tab-size get - ;
 
 : prettyprint-prop ( word prop -- )
-    tuck word-name word-property [
+    tuck word-name word-prop [
         " " write prettyprint-word
     ] [
         drop
@@ -44,7 +44,15 @@ presentation unparser words ;
     \ parsing prettyprint-prop
     \ inline prettyprint-prop ;
 
-: comment. ( comment -- ) "comments" style write-attr ;
+: comment-style
+    #! Feel free to redefine this!
+    [
+        [[ "ansi-fg" "0" ]]
+        [[ "ansi-bg" "2" ]]
+        [[ "fg" [ 255 0 0 ] ]]
+    ] ;
+
+: comment. ( comment -- ) comment-style write-attr ;
 
 : infer-effect. ( indent effect -- indent )
     " " write
@@ -57,12 +65,12 @@ presentation unparser words ;
     ] make-string comment. ;
 
 : stack-effect. ( indent word -- indent )
-    dup "stack-effect" word-property [
+    dup "stack-effect" word-prop [
         " " write
         [ CHAR: ( , , CHAR: ) , ] make-string
         comment.
     ] [
-        "infer-effect" word-property dup [
+        "infer-effect" word-prop dup [
             infer-effect.
         ] [
             drop
@@ -70,7 +78,7 @@ presentation unparser words ;
     ] ?ifte ;
 
 : documentation. ( indent word -- indent )
-    "documentation" word-property [
+    "documentation" word-prop [
         "\n" split [
             "#!" swap cat2 comment.
             dup prettyprint-newline
@@ -92,10 +100,7 @@ M: compound see ( word -- )
     0 prettyprint-: swap
     [ prettyprint-word ] keep
     [ prettyprint-docs ] keep
-    [
-        word-parameter prettyprint-elements
-        prettyprint-;
-    ] keep
+    [ word-def prettyprint-elements prettyprint-; ] keep
     prettyprint-plist prettyprint-newline ;
 
 : see-method ( indent word class method -- indent )
@@ -107,12 +112,18 @@ M: compound see ( word -- )
     prettyprint-;
     terpri ;
 
-M: generic see ( word -- )
-    dup prettyprint-IN:
+: see-generic ( word definer -- )
+    >r dup prettyprint-IN:
     0 swap
-    dup "definer" word-property prettyprint-word " " write
+    r> prettyprint-word " " write
     dup prettyprint-word terpri
     dup methods [ over >r uncons see-method r> ] each 2drop ;
+
+M: generic see ( word -- )
+    \ GENERIC: see-generic ;
+
+M: 2generic see ( word -- )
+    \ 2GENERIC: see-generic ;
 
 M: primitive see ( word -- )
     dup prettyprint-IN:

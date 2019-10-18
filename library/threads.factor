@@ -2,23 +2,23 @@
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: threads
-USING: io-internals kernel kernel-internals lists dlists
-namespaces ;
+USING: io-internals kernel kernel-internals lists namespaces ;
  
 ! Core of the multitasker. Used by io-internals.factor and
 ! in-thread.factor.
 
 : run-queue ( -- queue ) 9 getenv ;
 : set-run-queue ( queue -- ) 9 setenv ;
-
-: init-threads ( -- )
-    <dlist> set-run-queue ;
+: init-threads ( -- ) <queue> set-run-queue ;
 
 : next-thread ( -- quot )
-    run-queue dlist-pop-front ;
+    run-queue dup queue-empty? [
+        drop f
+    ] [
+        deque set-run-queue
+    ] ifte ;
 
-: schedule-thread ( quot -- )
-    run-queue dlist-push-end ;
+: schedule-thread ( quot -- ) run-queue enque set-run-queue ;
 
 : (yield) ( -- )
     #! If there is a quotation in the run queue, call it,

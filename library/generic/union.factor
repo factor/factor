@@ -8,25 +8,25 @@ words vectors ;
 SYMBOL: union
 
 union [
-    [ ] swap "members" word-property [
+    [ ] swap "members" word-prop [
         builtin-supertypes append
     ] each
-] "builtin-supertypes" set-word-property
+] "builtin-supertypes" set-word-prop
 
 union [
     ( generic vtable definition class -- )
-    "members" word-property [ >r 3dup r> add-method ] each 3drop
-] "add-method" set-word-property
+    "members" word-prop [ >r 3dup r> add-method ] each 3drop
+] "add-method" set-word-prop
 
-union 30 "priority" set-word-property
+union 30 "priority" set-word-prop
 
-union [ 2drop t ] "class<" set-word-property
+union [ 2drop t ] "class<" set-word-prop
 
 : union-predicate ( definition -- list )
     [
         [
             \ dup ,
-            unswons "predicate" word-property append,
+            unswons "predicate" word-prop append,
             [ drop t ] ,
             union-predicate ,
             \ ifte ,
@@ -46,5 +46,5 @@ union [ 2drop t ] "class<" set-word-property
         ] keep ?
     ] map
     [ union-predicate define-compound ] keep
-    dupd "members" set-word-property
+    dupd "members" set-word-prop
     union define-class ;

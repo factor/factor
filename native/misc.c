@@ -25,19 +25,19 @@ void primitive_eq(void)
 }
 
 #ifdef WIN32
-int64_t current_millis(void)
+s64 current_millis(void)
 {
 	FILETIME t;
 	GetSystemTimeAsFileTime(&t);
-	return (((int64_t)t.dwLowDateTime | (int64_t)t.dwHighDateTime<<32) - EPOCH_OFFSET) 
+	return (((s64)t.dwLowDateTime | (s64)t.dwHighDateTime<<32) - EPOCH_OFFSET) 
 		/ 10000;
 }
 #else
-int64_t current_millis(void)
+s64 current_millis(void)
 {
 	struct timeval t;
 	gettimeofday(&t,NULL);
-	return (int64_t)t.tv_sec * 1000 + t.tv_usec/1000;
+	return (s64)t.tv_sec * 1000 + t.tv_usec/1000;
 }
 #endif
 

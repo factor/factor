@@ -50,7 +50,7 @@ strings vectors words hashtables prettyprint ;
     dup balanced? [
         unzip unify-stacks >r unify-stacks r>
     ] [
-        "Unbalanced branches" throw
+        "Unbalanced branches" inference-error
     ] ifte ;
 
 : datastack-effect ( list -- )
@@ -79,9 +79,9 @@ SYMBOL: cloned
 : deep-clone ( obj -- obj )
     #! Clone an object if it hasn't already been cloned in this
     #! with-deep-clone scope.
-    dup cloned get assoc [
-        clone [ dup cloned [ acons ] change ] keep
-    ] ?unless ;
+    dup cloned get assq [ ] [
+        dup clone [ swap cloned [ acons ] change ] keep
+    ] ?ifte ;
 
 : deep-clone-vector ( vector -- vector )
     #! Clone a vector of vectors.
@@ -96,19 +96,12 @@ SYMBOL: cloned
     d-in [ deep-clone-vector ] change
     dataflow-graph off ;
 
-: propagate-type ( [[ value class ]] -- )
-    #! Type propagation is chained.
-    [
-        unswons 2dup set-value-class
-        value-type-prop assoc propagate-type
-    ] when* ;
-
 : infer-branch ( value -- namespace )
     #! Return a namespace with inferencer variables:
     #! meta-d, meta-r, d-in. They are set to f if
     #! terminate was called.
     <namespace> [
-        uncons propagate-type
+        uncons pull-tie
         dup value-recursion recursive-state set
         copy-inference
         literal-value dup infer-quot
@@ -146,16 +139,33 @@ SYMBOL: cloned
     #! parameter is a vector.
     (infer-branches) dup unify-effects unify-dataflow ;
 
-: (with-block) ( label quot -- node )
+: (with-block) ( [[ label quot ]] quot -- node )
     #! Call a quotation in a new namespace, and transfer
     #! inference state from the outer scope.
-    swap >r [
+    swap car >r [
         dataflow-graph off
         call
         d-in get meta-d get meta-r get get-dataflow
     ] with-scope
     r> swap #label dataflow, [ node-label set ] extend >r
     meta-r set meta-d set d-in set r> ;
+
+: with-block ( word [[ label quot ]] quot -- node )
+    #! Execute a quotation with the word on the stack, and add
+    #! its dataflow contribution to a new block node in the IR.
+    over [
+        >r
+        dupd cons
+        recursive-state cons@
+        r> call
+    ] (with-block) ;
+
+: infer-quot-value ( value -- )
+    gensym dup pick literal-value cons [
+        drop
+        dup value-recursion recursive-state set
+        literal-value dup infer-quot
+    ] with-block drop handle-terminator ;
 
 : boolean-value? ( value -- ? )
     #! Return if the value's boolean valuation is known.
@@ -177,18 +187,15 @@ SYMBOL: cloned
     #! If the branch taken is statically known, just infer
     #! along that branch.
     dataflow-drop, pop-d boolean-value [ drop ] [ nip ] ifte
-    gensym [
-        dup value-recursion recursive-state set
-        literal-value infer-quot
-    ] (with-block) drop ;
+    infer-quot-value ;
 
 : dynamic-ifte ( true false -- )
     #! If branch taken is computed, infer along both paths and
     #! unify.
     2list >r 1 meta-d get vector-tail* \ ifte r>
     pop-d [
-        dup \ general-t cons ,
-        \ f cons ,
+        dup \ general-t <class-tie> ,
+        \ f <class-tie> ,
     ] make-list zip ( condition )
     infer-branches ;
 
@@ -203,20 +210,43 @@ SYMBOL: cloned
         dynamic-ifte
     ] ifte ;
 
-\ ifte [ infer-ifte ] "infer" set-word-property
+\ ifte [ infer-ifte ] "infer" set-word-prop
 
 : vtable>list ( value -- list )
     dup value-recursion swap literal-value vector>list
     [ over <literal> ] map nip ;
 
+: <dispatch-index> ( value -- value )
+    value-literal-ties
+    0 recursive-state get <literal>
+    [ set-value-literal-ties ] keep ;
+
+: static-dispatch? ( -- )
+    peek-d literal? branches-can-fail? not and ;
+
 USE: kernel-internals
+
+: static-dispatch ( vtable -- )
+    >r dataflow-drop, pop-d literal-value r>
+    dup literal-value swap value-recursion
+    >r vector-nth r> <literal> infer-quot-value ;
+
+: dynamic-dispatch ( vtable -- )
+    >r 1 meta-d get vector-tail* \ dispatch r>
+    vtable>list 
+    pop-d <dispatch-index>
+    over length [ <literal-tie> ] project-with
+    zip infer-branches ;
+
 : infer-dispatch ( -- )
     #! Infer effects for all branches, unify.
     [ object vector ] ensure-d
-    dataflow-drop, pop-d vtable>list
-    >r 1 meta-d get vector-tail* \ dispatch r>
-    pop-d drop [ unit ] map infer-branches ;
+    dataflow-drop, pop-d  static-dispatch? [
+        static-dispatch
+    ] [
+        dynamic-dispatch
+    ] ifte ;
 
-\ dispatch [ infer-dispatch ] "infer" set-word-property
+\ dispatch [ infer-dispatch ] "infer" set-word-prop
 \ dispatch [ [ fixnum vector ] [ ] ]
-"infer-effect" set-word-property
+"infer-effect" set-word-prop

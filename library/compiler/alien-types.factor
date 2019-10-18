@@ -39,9 +39,9 @@ namespaces parser strings words ;
 
 : c-type ( name -- type )
     global [
-        dup "c-types" get hash [
+        dup "c-types" get hash [ ] [
             "No such C type: " swap cat2 throw f
-        ] ?unless
+        ] ?ifte
     ] bind ;
 
 : size ( name -- size )

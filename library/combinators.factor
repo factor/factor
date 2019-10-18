@@ -2,39 +2,33 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: kernel
 
-: slip ( quot x -- x )
+: slip ( quot x -- x | quot: -- )
     >r call r> ; inline
 
-: 2slip ( quot x y -- x y )
+: 2slip ( quot x y -- x y : quot: -- )
     >r >r call r> r> ; inline
 
-: 3slip ( quot x y z -- x y z )
-    >r >r >r call r> r> r> ; inline
-
-: keep ( a quot -- a )
-    #! Execute the quotation with a on the stack, and restore a
-    #! after the quotation returns.
+: keep ( a quot -- a | quot: a -- )
     over >r call r> ; inline
 
-: 2keep ( a b quot -- a b )
-    #! Execute the quotation with a and b on the stack, and
-    #! restore a and b after the quotation returns.
+: 2keep ( a b quot -- a b | quot: a b -- )
     over >r pick >r call r> r> ; inline
 
-: apply ( code input -- code output )
-    #! Apply code to input.
-    swap dup >r call r> swap ; inline
+: while ( quot generator -- )
+    #! Keep applying the quotation to the value produced by
+    #! calling the generator until the generator returns f.
+    2dup >r >r swap >r call dup [
+        r> call r> r> while
+    ] [
+        r> 2drop r> r> 2drop
+    ] ifte ; inline
 
 : ifte* ( cond true false -- )
-    #! If the condition is not f, execute the 'true' quotation,
-    #! with the condition on the stack. Otherwise, pop the
-    #! condition and execute the 'false' quotation.
+    #! [ X ] [ Y ] ifte* ==> dup [ X ] [ drop Y ] ifte
     pick [ drop call ] [ 2nip call ] ifte ; inline
 
 : ?ifte ( default cond true false -- )
-    #! If cond is true, drop default and apply true
-    #! quotation to cond. Otherwise, drop cond, and apply false
-    #! to default.
+    #! [ X ] [ Y ] ?ifte ==> dup [ nip X ] [ drop Y ] ifte
     >r >r dup [
         nip r> r> drop call
     ] [
@@ -57,12 +51,6 @@ IN: kernel
     #! value than it produces.
     over [ drop ] [ nip call ] ifte ; inline
 
-: ?unless ( default cond false -- )
-    #! If cond is true, drop default and leave cond on the
-    #! stack. Otherwise, drop default, and apply false
-    #! quotation to default.
-    >r dup [ nip r> drop ] [ drop r> call ] ifte ; inline
-
 : when ( cond quot -- )
     #! Execute a quotation only when the condition is not f. The
     #! condition is popped off the stack.
@@ -79,16 +67,3 @@ IN: kernel
     #! In order to compile, the quotation must consume one more
     #! value than it produces.
     dupd [ drop ] ifte ; inline
-
-: ?when ( default cond true -- )
-    #! If cond is true, drop default and apply true
-    #! quotation to cond. Otherwise, drop cond, and leave
-    #! default on the stack.
-    >r dup [ nip r> call ] [ r> 2drop ] ifte ; inline
-
-: forever ( quot -- )
-    #! The code is evaluated in an infinite loop. Typically, a
-    #! continuation is used to escape the infinite loop.
-    #!
-    #! This combinator will not compile.
-    dup slip forever ;

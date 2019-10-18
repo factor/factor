@@ -6,8 +6,7 @@ namespaces parser strings words vectors math math-internals ;
 
 ! A simple single-dispatch generic word system.
 
-: predicate-word ( word -- word )
-    word-name "?" cat2 create-in ;
+: predicate-word ( word -- word ) word-name "?" cat2 create-in ;
 
 ! Terminology:
 ! - type: a datatype built in to the runtime, eg fixnum, word
@@ -23,39 +22,39 @@ namespaces parser strings words vectors math math-internals ;
 ! methods are added to the vtable.
 
 : metaclass ( class -- metaclass )
-    "metaclass" word-property ;
+    "metaclass" word-prop ;
 
 : builtin-supertypes ( class -- list )
     #! A list of builtin supertypes of the class.
-    dup metaclass "builtin-supertypes" word-property call ;
+    dup metaclass "builtin-supertypes" word-prop call ;
 
 : set-vtable ( definition class vtable -- )
-    >r "builtin-type" word-property r> set-vector-nth ;
+    >r "builtin-type" word-prop r> set-vector-nth ;
 
-: class-ord ( class -- n ) metaclass "priority" word-property ;
+: class-ord ( class -- n ) metaclass "priority" word-prop ;
 
 : class< ( cls1 cls2 -- ? )
     #! Test if class1 is a subclass of class2.
     over metaclass over metaclass = [
-        dup metaclass "class<" word-property call
+        dup metaclass "class<" word-prop call
     ] [
         swap class-ord swap class-ord <
     ] ifte ;
 
 : methods ( generic -- alist )
-    "methods" word-property hash>alist [ 2car class< ] sort ;
+    "methods" word-prop hash>alist [ 2car class< ] sort ;
 
 : add-method ( generic vtable definition class -- )
     #! Add the method entry to the vtable. Unlike define-method,
     #! this is called at vtable build time, and in the sorted
     #! order.
-    dup metaclass "add-method" word-property [
+    dup metaclass "add-method" word-prop [
         [ "Metaclass is missing add-method" throw ]
     ] unless* call ;
 
 : <empty-vtable> ( generic -- vtable )
     unit num-types
-    [ drop dup [ car undefined-method ] cons ] vector-project
+    [ drop dup [ car no-method ] cons ] vector-project
     nip ;
 
 : <vtable> ( generic -- vtable )
@@ -65,18 +64,20 @@ namespaces parser strings words vectors math math-internals ;
     ] each nip ;
 
 : make-generic ( word vtable -- )
-    over "combination" word-property cons define-compound ;
+    #! (define-compound) is used to avoid resetting generic
+    #! word properties.
+    over "combination" word-prop cons (define-compound) ;
 
 : define-method ( class generic definition -- )
     -rot
-    [ "methods" word-property set-hash ] keep dup <vtable>
+    [ "methods" word-prop set-hash ] keep dup <vtable>
     make-generic ;
 
 : init-methods ( word -- )
-     dup "methods" word-property [
+     dup "methods" word-prop [
          drop
      ] [
-        <namespace> "methods" set-word-property
+        <namespace> "methods" set-word-prop
      ] ifte ;
 
 ! Defining generic words
@@ -84,18 +85,24 @@ namespaces parser strings words vectors math math-internals ;
     #! Takes a combination parameter. A combination is a
     #! quotation that takes some objects and a vtable from the
     #! stack, and calls the appropriate row of the vtable.
-    [ swap "definer" set-word-property ] keep
-    [ swap "combination" set-word-property ] keep
+    [ swap "definer" set-word-prop ] keep
+    [ swap "combination" set-word-prop ] keep
     dup init-methods
     dup <vtable> make-generic ;
 
 : single-combination ( obj vtable -- )
     >r dup type r> dispatch ; inline
 
+PREDICATE: compound generic ( word -- ? )
+    "combination" word-prop [ single-combination ] = ;
+
 : arithmetic-combination ( n n vtable -- )
     #! Note that the numbers remain on the stack, possibly after
     #! being coerced to a maximal type.
     >r arithmetic-type r> dispatch ; inline
+
+PREDICATE: compound 2generic ( word -- ? )
+    "combination" word-prop [ arithmetic-combination ] = ;
 
 ! Maps lists of builtin type numbers to class objects.
 SYMBOL: classes
@@ -122,23 +129,13 @@ SYMBOL: object
     ] make-list lookup-union ;
 
 : class-and ( class class -- class )
-    #! Return a class that is a subclass of both, or raise an
-    #! error if this is impossible.
+    #! Return a class that is a subclass of both, or null in
+    #! the degenerate case.
     swap builtin-supertypes swap builtin-supertypes
     intersection lookup-union ;
 
-: define-promise ( class -- )
-    #! A promise is a word that has no effect during
-    #! interpretation, but instructs the compiler that the value
-    #! at the top of the stack is statically-known to be of the
-    #! given type. Promises should only be used by kernel code.
-    dup word-name "%" swap cat2 "kernel-internals" create
-    dup [ ] define-compound
-    swap "promise" set-word-property ;
-
 : define-class ( class metaclass -- )
-    dupd "metaclass" set-word-property
-    dup define-promise
+    dupd "metaclass" set-word-prop
     dup builtin-supertypes [ > ] sort
     classes get set-hash ;
 

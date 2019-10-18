@@ -1,17 +1,19 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: errors
-DEFER: throw
+IN: math
+BUILTIN: fixnum 0 ;
+BUILTIN: bignum 1 ;
+UNION: integer fixnum bignum ;
 
 IN: math-internals
-USING: generic kernel math ;
+USING: errors generic kernel math ;
 
 : fraction> ( a b -- a/b )
     dup 1 number= [
         drop
     ] [
         (fraction>)
-    ] ifte ; inline
+    ] ifte ;
 
 : division-by-zero ( x y -- )
     "Division by zero" throw drop ;
@@ -26,7 +28,11 @@ USING: generic kernel math ;
         2dup gcd tuck /i >r /i r> fraction>
     ] ifte ; inline
 
-M: fixnum number= fixnum= ;
+M: fixnum number=
+    #! Fixnums are immediate values, so equality testing is
+    #! trivial.
+    eq? ;
+
 M: fixnum < fixnum< ;
 M: fixnum <= fixnum<= ;
 M: fixnum > fixnum> ;

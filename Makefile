@@ -22,7 +22,8 @@ OBJS = $(UNIX_OBJS) native/arithmetic.o native/array.o native/bignum.o \
 	native/word.o native/compiler.o \
 	native/ffi.o native/boolean.o \
 	native/debug.o \
-	native/hashtable.o
+	native/hashtable.o \
+	native/icache.o
 
 default:
 	@echo "Run 'make' with one of the following parameters:"
@@ -30,6 +31,7 @@ default:
 	@echo "bsd"
 	@echo "bsd-nopthread - on FreeBSD 4, if you want to use profiling"
 	@echo "linux"
+	@echo "linux-ppc - to compile Factor on Linux/PowerPC"
 	@echo "macosx"
 	@echo "solaris"
 	@echo "windows"
@@ -60,6 +62,11 @@ linux:
 		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -export-dynamic" \
 		LIBS="$(DEFAULT_LIBS) -ldl" 
 
+linux-ppc:
+	$(MAKE) f \
+		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -export-dynamic -mregnames" \
+		LIBS="$(DEFAULT_LIBS) -ldl" 
+
 solaris:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS)" \
@@ -75,3 +82,5 @@ clean:
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
 
+.S.o:
+	$(CC) -c $(CFLAGS) -o $@ $<

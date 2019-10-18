@@ -43,7 +43,7 @@ void primitive_str_to_float(void)
 	c_str = to_c_string(str);
 	end = c_str;
 	f = strtod(c_str,&end);
-	if(end != c_str + str->capacity)
+	if(end != c_str + string_capacity(str))
 		general_error(ERROR_FLOAT_FORMAT,tag_object(str));
 	drepl(tag_float(f));
 }

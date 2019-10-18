@@ -24,7 +24,8 @@ void write_char_8 (F_PORT *port, F_FIXNUM ch)
 void write_string_8 (F_PORT *port, F_STRING *str)
 {
 	DWORD ignore;
-	WriteFile((HANDLE)port->fd, to_c_string_unchecked(str), str->capacity, &ignore, NULL);
+	WriteFile((HANDLE)port->fd, to_c_string_unchecked(str),
+		string_capacity(str), &ignore, NULL);
 }
 
 void primitive_write_8 (void)

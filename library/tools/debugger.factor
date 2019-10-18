@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: errors USING: kernel kernel-internals lists namespaces
-prettyprint stdio strings unparser vectors words math generic ;
+IN: errors USING: generic kernel kernel-internals lists math namespaces
+parser prettyprint stdio streams strings unparser vectors words ;
 
 : expired-error ( obj -- )
     "Object did not survive image save/load: " write . ;
@@ -135,21 +135,44 @@ M: object error. ( error -- )
     #! and return to the caller.
     [ [ print-error debug-help ] when* ] catch ;
 
+: save-error ( error ds rs ns cs -- )
+    #! Save the stacks and parser state for post-mortem
+    #! inspection after an error.
+    namespace [
+        "col" get
+        "line" get
+        line-number get
+        file get
+        global [
+            "error-file" set
+            "error-line-number" set
+            "error-line" set
+            "error-col" set
+            "error-catchstack" set
+            "error-namestack" set
+            "error-callstack" set
+            "error-datastack" set
+            "error" set
+        ] bind
+    ] when ;
+
 : init-error-handler ( -- )
-    [ 1 exit* ] >c ( last resort )
-    [ print-error 1 exit* ] >c
-    [ dup save-error rethrow ] 5 setenv ( kernel calls on error )
+    [ die ] >c ( last resort )
+    [ print-error die ] >c
+    ( kernel calls on error )
+    [
+        datastack dupd callstack namestack catchstack
+        save-error rethrow
+    ] 5 setenv
     kernel-error 12 setenv ;
 
-: undefined-method ( object generic -- )
-    #! We 2dup here to leave both values on the stack, for
-    #! post-mortem inspection.
-    2dup [
+M: no-method error. ( error -- )
+    [
         "The generic word " ,
-        unparse ,
+        dup no-method-generic unparse ,
         " does not have a suitable method for " ,
-        unparse ,
-    ] make-string throw ;
+        no-method-object unparse ,
+    ] make-string print ;
 
 ! So that stage 2 boot gives a useful error message if something
 ! fails after this file is loaded.

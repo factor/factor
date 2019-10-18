@@ -19,8 +19,8 @@ void primitive_word(void)
 	word->hashcode = tag_fixnum((CELL)word); /* initial address */
 	word->xt = (CELL)undefined;
 	word->primitive = 0;
-	word->parameter = F;
-	word->plist = F;
+	word->def = F;
+	word->props = F;
 	word->call_count = 0;
 	word->allot_count = 0;
 	dpush(tag_object(word));
@@ -37,11 +37,6 @@ void primitive_word_compiledp(void)
 	box_boolean(word->xt != (CELL)docol && word->xt != (CELL)dosym);
 }
 
-void primitive_to_word(void)
-{
-	type_check(WORD_TYPE,dpeek());
-}
-
 void fixup_word(F_WORD* word)
 {
 	if(word->xt >= code_relocation_base
@@ -51,12 +46,12 @@ void fixup_word(F_WORD* word)
 	else
 		update_xt(word);
 
-	data_fixup(&word->parameter);
-	data_fixup(&word->plist);
+	data_fixup(&word->def);
+	data_fixup(&word->props);
 }
 
 void collect_word(F_WORD* word)
 {
-	copy_object(&word->parameter);
-	copy_object(&word->plist);
+	COPY_OBJECT(word->def);
+	COPY_OBJECT(word->props);
 }

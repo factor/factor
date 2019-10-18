@@ -1,73 +1,12 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! Copyright (C) 2004, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler
-USE: assembler
-USE: inference
-USE: errors
-USE: kernel
-USE: lists
-USE: math
-USE: namespaces
-USE: strings
-USE: words
-USE: vectors
-
-! To support saving compiled code to disk, generator words
-! append relocation instructions to this vector.
-SYMBOL: relocation-table
-
-: rel, ( n -- ) relocation-table get vector-push ;
-
-: relocating compiled-offset cell - rel, ;
-
-: rel-primitive ( word rel/abs -- )
-    #! If flag is true; relative.
-    0 1 ? rel, relocating word-primitive rel, ;
-
-: rel-dlsym ( name dll rel/abs -- )
-    #! If flag is true; relative.
-    2 3 ? rel, relocating cons intern-literal rel, ;
-
-: rel-address ( -- )
-    #! Relocate address just compiled.
-    4 rel, relocating 0 rel, ;
-
-: rel-word ( word rel/abs -- )
-    #! If flag is true; relative.
-    over primitive? [
-        rel-primitive
-    ] [
-        nip [ rel-address ] unless
-    ] ifte ;
+USING: assembler inference errors kernel lists math namespaces
+strings words vectors ;
 
 : generate-node ( [[ op params ]] -- )
     #! Generate machine code for a node.
-    unswons dup "generator" word-property [
+    unswons dup "generator" word-prop [
         call
     ] [
         "No generator" throw
@@ -109,10 +48,44 @@ SYMBOL: previous-offset
         ] when*
     ] catch ;
 
-#label [ save-xt ] "generator" set-word-property
+#label [ save-xt ] "generator" set-word-prop
 
-#end-dispatch [ drop ] "generator" set-word-property
+#end-dispatch [ drop ] "generator" set-word-prop
 
 : type-tag ( type -- tag )
     #! Given a type number, return the tag number.
     dup 6 > [ drop 3 ] when ;
+
+DEFER: compile-call-label ( label -- )
+DEFER: compile-jump-label ( label -- )
+
+: compile-call ( word -- ) dup postpone-word compile-call-label ;
+
+#call [
+    compile-call
+] "generator" set-word-prop
+
+#jump-label [
+    compile-jump-label
+] "generator" set-word-prop
+
+DEFER: compile-jump-t ( label -- )
+DEFER: compile-jump-f ( label -- )
+
+#jump-t-label [ compile-jump-t ] "generator" set-word-prop
+#jump-t [ compile-jump-t ] "generator" set-word-prop
+
+#jump-f-label [ compile-jump-f ] "generator" set-word-prop
+#jump-f [ compile-jump-f ] "generator" set-word-prop
+
+: compile-target ( word -- ) 0 compile-cell absolute ;
+
+#target-label [
+    #! Jump table entries are absolute addresses.
+    compile-target
+] "generator" set-word-prop
+
+#target [
+    #! Jump table entries are absolute addresses.
+    dup postpone-word  compile-target
+] "generator" set-word-prop

@@ -40,14 +40,14 @@ USE: unparser
         dup url-quotable? [
             "%" swap >hex 2 "0" pad cat2
         ] unless
-    ] str-map ;
+    ] string-map ;
 
 : catch-hex> ( str -- n )
     #! Push f if string is not a valid hex literal.
     [ hex> ] [ [ drop f ] when ] catch ;
 
 : url-decode-hex ( index str -- )
-    2dup str-length 2 - >= [
+    2dup string-length 2 - >= [
         2drop
     ] [
         >r 1 + dup 2 + r> substring  catch-hex> [ , ] when*
@@ -60,10 +60,10 @@ USE: unparser
     dup CHAR: + = [ drop CHAR: \s ] when , >r 1 + r> ;
 
 : url-decode-iter ( index str -- )
-    2dup str-length >= [
+    2dup string-length >= [
         2drop
     ] [
-        2dup str-nth dup CHAR: % = [
+        2dup string-nth dup CHAR: % = [
             drop url-decode-%
         ] [
             url-decode-+-or-other

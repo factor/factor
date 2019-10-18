@@ -8,21 +8,28 @@ parser profiler random strings unparser vectors words
 hashtables ;
 
 ! Bring up a bare cross-compiling vocabulary.
-"syntax" vocab
-"generic" vocab
+"syntax" vocab clone
+"generic" vocab clone
 
-! This symbol needs the same hashcode in the target as in the
+! These symbol needs the same hashcode in the target as in the
 ! host.
 vocabularies
+classes
 
 <namespace> vocabularies set
+<namespace> classes set
+
 vocabularies get [
+    reveal
     reveal
     "generic" set
     "syntax" set
 ] bind
 
-<namespace> classes set
+! We cannot simply copy the delegate generic with all its
+! methods. Rather we must create a new empty generic.
+"delegate" [ "generic" ] search forget
+[ single-combination ] \ GENERIC: "delegate" "generic" create define-generic
 
 2 [
     [ "execute" "words"                       " word -- " ]
@@ -30,23 +37,20 @@ vocabularies get [
     [ "ifte" "kernel"                         [ [ object general-list general-list ] [ ] ] ]
     [ "cons" "lists"                          [ [ object object ] [ cons ] ] ]
     [ "<vector>" "vectors"                    [ [ integer ] [ vector ] ] ]
-    [ "str-nth" "strings"                     [ [ integer string ] [ integer ] ] ]
-    [ "str-compare" "strings"                 [ [ string string ] [ integer ] ] ]
-    [ "str=" "strings"                        [ [ string string ] [ boolean ] ] ]
+    [ "string-nth" "strings"                  [ [ integer string ] [ integer ] ] ]
+    [ "string-compare" "strings"              [ [ string string ] [ integer ] ] ]
+    [ "string=" "strings"                     [ [ string string ] [ boolean ] ] ]
     [ "index-of*" "strings"                   [ [ integer string text ] [ integer ] ] ]
     [ "substring" "strings"                   [ [ integer integer string ] [ string ] ] ]
-    [ "str-reverse" "strings"                 [ [ string ] [ string ] ] ]
     [ "<sbuf>" "strings"                      [ [ integer ] [ sbuf ] ] ]
     [ "sbuf-length" "strings"                 [ [ sbuf ] [ integer ] ] ]
     [ "set-sbuf-length" "strings"             [ [ integer sbuf ] [ ] ] ]
     [ "sbuf-nth" "strings"                    [ [ integer sbuf ] [ integer ] ] ]
     [ "set-sbuf-nth" "strings"                [ [ integer integer sbuf ] [ ] ] ]
     [ "sbuf-append" "strings"                 [ [ text sbuf ] [ ] ] ]
-    [ "sbuf>str" "strings"                    [ [ sbuf ] [ string ] ] ]
-    [ "sbuf-reverse" "strings"                [ [ sbuf ] [ ] ] ]
+    [ "sbuf>string" "strings"                 [ [ sbuf ] [ string ] ] ]
     [ "sbuf-clone" "strings"                  [ [ sbuf ] [ sbuf ] ] ]
     [ "sbuf=" "strings"                       [ [ sbuf sbuf ] [ boolean ] ] ]
-    [ "sbuf-hashcode" "strings"               [ [ sbuf ] [ fixnum ] ] ]
     [ "arithmetic-type" "math-internals"      [ [ object object ] [ object object fixnum ] ] ]
     [ ">fixnum" "math"                        [ [ number ] [ fixnum ] ] ]
     [ ">bignum" "math"                        [ [ number ] [ bignum ] ] ]
@@ -55,7 +59,6 @@ vocabularies get [
     [ "str>float" "parser"                    [ [ string ] [ float ] ] ]
     [ "(unparse-float)" "unparser"            [ [ float ] [ string ] ] ]
     [ "<complex>" "math-internals"            [ [ real real ] [ number ] ] ]
-    [ "fixnum=" "math-internals"              [ [ fixnum fixnum ] [ boolean ] ] ]
     [ "fixnum+" "math-internals"              [ [ fixnum fixnum ] [ integer ] ] ]
     [ "fixnum-" "math-internals"              [ [ fixnum fixnum ] [ integer ] ] ]
     [ "fixnum*" "math-internals"              [ [ fixnum fixnum ] [ integer ] ] ]
@@ -135,7 +138,7 @@ vocabularies get [
     [ "callstack" "kernel"                    " -- cs "          ]
     [ "set-datastack" "kernel"                " ds -- "          ]
     [ "set-callstack" "kernel"                " cs -- "          ]
-    [ "exit*" "kernel"                        [ [ integer ] [ ] ] ]
+    [ "exit" "kernel"                         [ [ integer ] [ ] ] ]
     [ "client-socket" "io-internals"          [ [ string integer ] [ port port ] ] ]
     [ "server-socket" "io-internals"          [ [ integer ] [ port ] ] ]
     [ "close-port" "io-internals"             [ [ port ] [ ] ] ]
@@ -184,11 +187,6 @@ vocabularies get [
     [ "memory>string" "kernel-internals"      [ [ integer integer ] [ string ] ] ]
     [ "local-alien?" "alien"                  [ [ alien ] [ object ] ] ]
     [ "alien-address" "alien"                 [ [ alien ] [ integer ] ] ]
-    [ ">cons" "lists"                         [ [ object ] [ cons ] ] ]
-    [ ">vector" "vectors"                     [ [ object ] [ vector ] ] ]
-    [ ">string" "strings"                     [ [ object ] [ string ] ] ]
-    [ ">word" "words"                         [ [ object ] [ word ] ] ]
-    [ ">hashtable" "hashtables"               [ [ object ] [ hashtable ] ] ]
     [ "slot" "kernel-internals"               [ [ object fixnum ] [ object ] ] ]
     [ "set-slot" "kernel-internals"           [ [ object object fixnum ] [ ] ] ]
     [ "integer-slot" "kernel-internals"       [ [ object fixnum ] [ integer ] ] ]
@@ -197,17 +195,17 @@ vocabularies get [
     [ "<hashtable>" "hashtables"              [ [ number ] [ hashtable ] ] ]
     [ "<array>" "kernel-internals"            [ [ number ] [ array ] ] ]
     [ "<tuple>" "kernel-internals"            [ [ number ] [ tuple ] ] ]
-    [ ">array" "kernel-internals"             [ [ object ] [ array ] ] ]
-    [ ">tuple" "kernel-internals"             [ [ object ] [ tuple ] ] ]
     [ "begin-scan" "memory"                   [ [ ] [ ] ] ]
     [ "next-object" "memory"                  [ [ ] [ object ] ] ]
-    [ "end-scan" "memory"                     [ [ ] [ object ] ] ]       
-    [ "size" "memory"                         [ [ ] [ object ] ] ]                       
-] [                                           
+    [ "end-scan" "memory"                     [ [ ] [ ] ] ]
+    [ "size" "memory"                         [ [ object ] [ fixnum ] ] ]
+    [ "die" "kernel"                          [ [ ] [ ] ] ]
+    [ "flush-icache" "assembler"              f ]
+] [
     3unlist >r create >r 1 + r> 2dup swap f define r>
     dup string? [
-        "stack-effect" set-word-property
+        "stack-effect" set-word-prop
     ] [
-        "infer-effect" set-word-property
+        "infer-effect" set-word-prop
     ] ifte
 ] each drop

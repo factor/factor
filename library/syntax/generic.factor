@@ -20,16 +20,13 @@ USING: syntax generic kernel lists namespaces parser words ;
     \ 2GENERIC: CREATE define-generic ; parsing
 
 : BUILTIN:
-    #! Followed by type name and type number. Define a built-in
-    #! type predicate with this number.
-    CREATE scan-word swap builtin-class ; parsing
+    #! Syntax: BUILTIN: <class> <type#> <slots> ;
+    CREATE scan-word [ builtin-class ] [ ] ; parsing
 
-: COMPLEMENT: ( -- class predicate definition )
+: COMPLEMENT: ( -- )
     #! Followed by a class name, then a complemented class.
     CREATE
     dup intern-symbol
-    dup predicate-word
-    [ dupd unit "predicate" set-word-property ] keep
     scan-word define-complement ; parsing
 
 : UNION: ( -- class predicate definition )
@@ -37,16 +34,16 @@ USING: syntax generic kernel lists namespaces parser words ;
     CREATE
     dup intern-symbol
     dup predicate-word
-    [ dupd unit "predicate" set-word-property ] keep
+    [ dupd unit "predicate" set-word-prop ] keep
     [ define-union ] [ ] ; parsing
 
 : PREDICATE: ( -- class predicate definition )
     #! Followed by a superclass name, then a class name.
     scan-word
     CREATE dup intern-symbol
-    dup rot "superclass" set-word-property
+    dup rot "superclass" set-word-prop
     dup predicate-word
-    [ dupd unit "predicate" set-word-property ] keep
+    [ dupd unit "predicate" set-word-prop ] keep
     [ define-predicate ] [ ] ; parsing
 
 : TUPLE:

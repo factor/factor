@@ -1,5 +1,3 @@
-#define F_DEBUG 1
-
 CELL assoc(CELL alist, CELL key);
 void print_cons(CELL cons);
 void print_word(F_WORD* word);

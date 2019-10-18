@@ -106,7 +106,7 @@ USE: kernel
 
 : todo-stylesheet-url ( -- url )
   #! Generate an URL for the stylesheet.
-  t [ [ drop todo-stylesheet write ] show ] register-continuation id>url ;
+  t [ [ todo-stylesheet write ] show-final ] register-continuation id>url ;
 
 : include-todo-stylesheet ( -- )  
   #! Generate HTML to include the todo stylesheet
@@ -208,7 +208,7 @@ USE: kernel
     ] [ 
       drop CHAR: _ 
     ] ifte 
-  ] str-map ;
+  ] string-map ;
 
 : is-valid-username? ( username -- bool )
   #! Return true if the username parses correctly
@@ -334,11 +334,11 @@ USE: kernel
 : priority-valid? ( string -- bool )
   #! Test the string containing a priority to see if it is 
   #! valid. It should be a single digit from 0-9.
-  dup str-length 1 = [ 0 swap str-nth digit? ] [ drop f ] ifte ;
+  dup string-length 1 = [ 0 swap string-nth digit? ] [ drop f ] ifte ;
 
 : todo-details-valid? ( priority description -- bool )
   #! Return true if a valid priority and description were entered.
-  str-length 0 > [ priority-valid? ] [ drop f ] ifte ;
+  string-length 0 > [ priority-valid? ] [ drop f ] ifte ;
 
 : get-new-todo-item ( -- <todo-item> )
   #! Enter a new item to the current todo list.
@@ -476,14 +476,13 @@ USE: kernel
     [ "todo" get todo-username , "'s To Do list" , ] make-string
     [ include-todo-stylesheet ]
     [
-      drop
       "todo" get write-item-table
       [
         [ "Add Item" [ do-add-new-item ] quot-href ]
         [ "Change Password" [ do-change-password ] quot-href ]
       ] horizontal-layout
     ] styled-page 
-  ] show drop ;
+  ] show-final ;
 
 : todo-example ( path -- )
   #! Startup the todo list example using the given path as the 

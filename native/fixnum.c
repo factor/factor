@@ -32,13 +32,6 @@ void primitive_to_fixnum(void)
 	drepl(tag_fixnum(to_fixnum(dpeek())));
 }
 
-void primitive_fixnum_eq(void)
-{
-	F_FIXNUM y = untag_fixnum_fast(dpop());
-	F_FIXNUM x = untag_fixnum_fast(dpop());
-	box_boolean(x == y);
-}
-
 void primitive_fixnum_add(void)
 {
 	F_FIXNUM y = untag_fixnum_fast(dpop());

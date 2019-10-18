@@ -4,29 +4,6 @@ IN: inference
 USING: errors generic interpreter kernel kernel-internals
 lists math namespaces strings vectors words stdio prettyprint ;
 
-! Enhanced inference of primitives relating to data types.
-! Optimizes type checks and slot access.
-
-: infer-check ( assert class -- )
-    peek-d dup value-class pick = [
-        3drop
-    ] [
-        value-class-and
-        dup "infer-effect" word-property consume/produce
-    ] ifte ;
-
-\ >cons [
-    \ >cons \ cons infer-check
-] "infer" set-word-property
-
-\ >vector [
-    \ >vector \ vector infer-check
-] "infer" set-word-property
-
-\ >string [
-    \ >string \ string infer-check
-] "infer" set-word-property
-
 : fast-slot? ( -- ? )
     #! If the slot number is literal and the object's type is
     #! known, we can compile a slot access into a single
@@ -40,25 +17,34 @@ lists math namespaces strings vectors words stdio prettyprint ;
     \ slot [ [ object ] [ object ] ] (consume/produce) ;
 
 : computed-slot ( -- )
-    \ slot dup "infer-effect" word-property consume/produce ;
+    "Computed slot access is slower" inference-warning
+    \ slot dup "infer-effect" word-prop consume/produce ;
 
 \ slot [
     [ object fixnum ] ensure-d
     fast-slot? [ fast-slot ] [ computed-slot ] ifte
-] "infer" set-word-property
+] "infer" set-word-prop
 
 : type-value-map ( value -- )
-    num-types [ dup builtin-type pick swons cons ] project
-    [ cdr cdr ] subset nip ;
+    num-types
+    [ tuck builtin-type <class-tie> cons ] project-with
+    [ cdr class-tie-class ] subset ;
 
-\ type [
-    [ object ] ensure-d
+: literal-type ( -- )
+    dataflow-drop, pop-d value-class builtin-supertypes car
+    apply-literal ;
+
+: computed-type ( -- )
     \ type #call dataflow, [
         peek-d type-value-map >r
         1 0 node-inputs
         [ object ] consume-d
         [ fixnum ] produce-d
-        r> peek-d set-value-type-prop
+        r> peek-d set-value-literal-ties
         1 0 node-outputs
-    ] bind
-] "infer" set-word-property
+    ] bind ;
+
+\ type [
+    [ object ] ensure-d
+    literal-type? [ literal-type ] [ computed-type ] ifte
+] "infer" set-word-prop

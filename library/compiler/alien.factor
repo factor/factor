@@ -15,6 +15,8 @@ unparser ;
 ! parameter, or a missing abi parameter indicates the cdecl ABI
 ! should be used, which is common on Unix.
 
+: null? ( alien -- ? ) dup [ alien-address 0 = ] when ;
+
 M: alien hashcode ( obj -- n )
     alien-address >fixnum ;
 
@@ -87,12 +89,16 @@ SYMBOL: alien-parameters
     length 0 node-inputs consume-d ;
 
 : alien-node ( returns params function library -- )
+    #! We should fail if the library does not exist, so that
+    #! compilation does not keep trying to compile FFI words
+    #! over and over again if the library is not loaded.
+    2dup load-dll dlsym drop
     cons #alien-invoke dataflow,
     [ set-alien-parameters ] keep
     set-alien-returns ;
 
 : infer-alien ( -- )
-    [ object object object object ] ensure-d
+    [ string string string general-list ] ensure-d
     dataflow-drop, pop-d literal-value
     dataflow-drop, pop-d literal-value >r
     dataflow-drop, pop-d literal-value
@@ -126,7 +132,7 @@ SYMBOL: alien-parameters
     r> swap [ drop ] [ #cleanup swons , ] ifte
     linearize-returns ;
 
-#alien-invoke [ linearize-alien ] "linearizer" set-word-property
+#alien-invoke [ linearize-alien ] "linearizer" set-word-prop
 
 : alien-invoke ( ... returns library function parameters -- ... )
     #! Call a C library function.
@@ -140,9 +146,9 @@ SYMBOL: alien-parameters
     ] make-string throw ;
 
 \ alien-invoke [ [ object object object object ] [ ] ]
-"infer-effect" set-word-property
+"infer-effect" set-word-prop
 
-\ alien-invoke [ infer-alien ] "infer" set-word-property
+\ alien-invoke [ infer-alien ] "infer" set-word-prop
 
 global [
     "libraries" get [ <namespace> "libraries" set ] unless

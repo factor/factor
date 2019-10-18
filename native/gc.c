@@ -17,20 +17,20 @@ void collect_roots(void)
 	CELL ptr;
 
 	/*T must be the first in the heap */
-	copy_object(&T);
+	COPY_OBJECT(T);
 	/* the bignum 0 1 -1 constants must be the next three */
 	copy_bignum_constants();
-	copy_object(&callframe);
-	copy_object(&executing);
+	COPY_OBJECT(callframe);
+	COPY_OBJECT(executing);
 
 	for(ptr = ds_bot; ptr <= ds; ptr += CELLS)
-		copy_object((void*)ptr);
+		copy_handle((CELL*)ptr);
 
 	for(ptr = cs_bot; ptr <= cs; ptr += CELLS)
-		copy_object((void*)ptr);
+		copy_handle((CELL*)ptr);
 
 	for(i = 0; i < USER_ENV; i++)
-		copy_object(&userenv[i]);
+		copy_handle(&userenv[i]);
 }
 
 /*
@@ -52,11 +52,6 @@ CELL copy_object_impl(CELL pointer)
 	newpointer = (CELL)copy_untagged_object((void*)UNTAG(pointer),
 		object_size(pointer));
 	put(UNTAG(pointer),RETAG(newpointer,GC_COLLECTED));
-
-#ifdef GC_DEBUG
-	if(tag == GC_COLLECTED)
-		critical_error("installing forwarding pointer in newspace",newpointer);
-#endif
 
 	return newpointer;
 }
@@ -106,7 +101,7 @@ INLINE CELL collect_next(CELL scan)
 	else
 	{
 		size = CELLS;
-		copy_object((CELL*)scan);
+		copy_handle((CELL*)scan);
 	}
 
 	return scan + size;
@@ -114,7 +109,7 @@ INLINE CELL collect_next(CELL scan)
 
 void primitive_gc(void)
 {
-	int64_t start = current_millis();
+	s64 start = current_millis();
 	CELL scan;
 
 	if(heap_scan)
@@ -125,9 +120,6 @@ void primitive_gc(void)
 	}
 
 	gc_in_progress = true;
-
-	fprintf(stderr,"GC\n");
-	fflush(stderr);
 
 	flip_zones();
 	scan = active.base;

@@ -6,12 +6,14 @@ USE: namespaces
 USE: stdio
 USE: test
 
+: (callcc1-test)
+    swap 1 - tuck swons
+    over 0 = [ "test-cc" get call ] when
+    (callcc1-test) ;
+
 : callcc1-test ( x -- list )
     [
-        "test-cc" set [ ] [
-            swap 1 - tuck swons
-            over 0 = [ "test-cc" get call ] when
-        ] forever
+        "test-cc" set [ ] (callcc1-test)
     ] callcc1 nip ;
 
 : callcc-namespace-test ( -- ? )

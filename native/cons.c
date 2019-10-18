@@ -16,8 +16,3 @@ void primitive_cons(void)
 	car = dpop();
 	dpush(cons(car,cdr));
 }
-
-void primitive_to_cons(void)
-{
-	type_check(CONS_TYPE,dpeek());
-}

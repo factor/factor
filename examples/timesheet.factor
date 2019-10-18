@@ -5,6 +5,7 @@ USE: errors
 USE: kernel
 USE: lists
 USE: math
+USE: namespaces
 USE: parser
 USE: stdio
 USE: strings
@@ -31,7 +32,7 @@ USE: vectors
 
 : hh ( duration -- str ) 60 /i ;
 : mm ( duration -- str ) 60 mod unparse 2 "0" pad ;
-: hh:mm ( millis -- str ) [ dup hh , ":" , mm , ] make-list ;
+: hh:mm ( millis -- str ) [ dup hh , ":" , mm , ] make-string ;
 
 : print-entry ( duration description -- )
     dup write

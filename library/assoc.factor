@@ -11,13 +11,16 @@ IN: lists USING: kernel ;
     dup list? [ [ cons? ] all? ] [ drop f ] ifte ;
 
 : assoc* ( key alist -- [[ key value ]] )
-    #! Looks up the key in an alist. Push the key/value pair.
-    #! Most of the time you want to use assoc not assoc*.
-    [ car = ] some-with?  dup [ car ] when ;
+    #! Look up a key/value pair.
+    [ car = ] some-with?  car ;
 
-: assoc ( key alist -- value )
-    #! Looks up the key in an alist.
-    assoc*  dup [ cdr ] when ;
+: assoc ( key alist -- value ) assoc* cdr ;
+
+: assq* ( key alist -- [[ key value ]] )
+    #! Looks up a key/value pair using identity comparison.
+    [ car eq? ] some-with?  car ;
+
+: assq ( key alist -- value ) assq* cdr ;
 
 : remove-assoc ( key alist -- alist )
     #! Remove all key/value pairs with this key.
@@ -49,7 +52,7 @@ IN: lists USING: kernel ;
 : zip ( list list -- list )
     #! Make a new list containing pairs of corresponding
     #! elements from the two given lists.
-    dup [ 2uncons zip >r cons r> cons ] [ 2drop [ ] ] ifte ;
+    2dup and [ 2uncons zip >r cons r> cons ] [ 2drop [ ] ] ifte ;
 
 : unzip ( assoc -- keys values )
     #! Split an association list into two lists of keys and

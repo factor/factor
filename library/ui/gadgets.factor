@@ -6,23 +6,21 @@ USING: generic hashtables kernel lists math namespaces ;
 ! A gadget is a shape, a paint, a mapping of gestures to
 ! actions, and a reference to the gadget's parent. A gadget
 ! delegates to its shape.
-TUPLE: gadget
-    paint gestures
-    relayout? redraw?
-    parent children delegate ;
+TUPLE: gadget paint gestures relayout? redraw? parent children ;
 
 C: gadget ( shape -- gadget )
-    [ set-gadget-delegate ] keep
+    [ set-delegate ] keep
     [ <namespace> swap set-gadget-paint ] keep
     [ <namespace> swap set-gadget-gestures ] keep
     [ t swap set-gadget-relayout? ] keep
     [ t swap set-gadget-redraw? ] keep ;
 
+: <empty-gadget> ( -- gadget ) 0 0 0 0 <rectangle> <gadget> ;
+
 : redraw ( gadget -- )
     #! Redraw a gadget before the next iteration of the event
     #! loop.
-    t over set-gadget-redraw?
-    gadget-parent [ redraw ] when* ;
+    t over set-gadget-redraw?  gadget-parent [ redraw ] when* ;
 
 : relayout ( gadget -- )
     #! Relayout a gadget before the next iteration of the event
@@ -32,52 +30,22 @@ C: gadget ( shape -- gadget )
     t over set-gadget-relayout?
     gadget-parent [ relayout ] when* ;
 
-: move-gadget ( x y gadget -- )
-    [ move-shape ] keep redraw ;
+: move-gadget ( x y gadget -- ) [ move-shape ] keep redraw ;
+: resize-gadget ( w h gadget -- ) [ resize-shape ] keep relayout ;
 
-: resize-gadget ( w h gadget -- )
-    [ resize-shape ] keep redraw ;
+: paint-prop ( gadget key -- value ) swap gadget-paint hash ;
+: set-paint-prop ( gadget value key -- ) rot gadget-paint set-hash ;
 
-: remove-gadget ( gadget box -- )
-    [ 2dup gadget-children remq swap set-gadget-children ] keep
-    relayout
-    f swap set-gadget-parent ;
+GENERIC: pref-size ( gadget -- w h )
+M: gadget pref-size shape-size ;
 
-: (add-gadget) ( gadget box -- )
-    [ gadget-children cons ] keep set-gadget-children ;
+GENERIC: layout* ( gadget -- )
 
-: unparent ( gadget -- )
-    dup gadget-parent dup [ remove-gadget ] [ 2drop ] ifte ;
+: prefer ( gadget -- ) [ pref-size ] keep resize-gadget ;
 
-: add-gadget ( gadget box -- )
-    #! Add a gadget to a box.
-    over unparent
-    dup pick set-gadget-parent
-    tuck (add-gadget)
-    relayout ;
+M: gadget layout*
+    #! Trivial layout gives each child its preferred size.
+    gadget-children [ prefer ] each ;
 
-: each-parent ( gadget quot -- ? )
-    #! Apply quotation to each parent of the gadget in turn,
-    #! stopping when the quotation returns f. Return f if a
-    #! quotation somewhere returned f; if the search bottoms
-    #! out, return t.
-    over [
-        [ call ] 2keep rot [
-            >r gadget-parent r> each-parent
-        ] [
-            2drop f ( quotation returns f )
-        ] ifte
-    ] [ 
-        2drop t ( search bottomed out )
-    ] ifte ; inline
-
-: screen-pos ( gadget -- point )
-    #! The position of the gadget on the screen.
-    0 swap [ shape-pos + t ] each-parent drop ;
-
-: child? ( parent child -- ? )
-    dup [
-        2dup eq? [ 2drop t ] [ gadget-parent child? ] ifte
-    ] [
-        2drop f
-    ] ifte ;
+GENERIC: user-input* ( ch gadget -- ? )
+M: gadget user-input* 2drop t ;

@@ -1,8 +1,19 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: hashtables USING: generic kernel lists math vectors ;
+IN: kernel-internals
 
+DEFER: hash-array
+DEFER: set-hash-array
+DEFER: set-hash-size
+
+IN: hashtables
+USING: generic kernel lists math vectors ;
+
+! We put hash-size in the hashtables vocabulary, and
+! the other words in kernel-internals.
 BUILTIN: hashtable 10
+    [ 1 "hash-size" set-hash-size ]
+    [ 2 hash-array set-hash-array ] ;
 
 ! A hashtable is implemented as an array of buckets. The
 ! array index is determined using a hash function, and the
@@ -15,50 +26,33 @@ BUILTIN: hashtable 10
 
 IN: kernel-internals
 
-: hash-array >hashtable 2 slot ( promise ) %array ; inline
-: set-hash-array swap >array swap >hashtable 2 set-slot ; inline
-
 : hash-bucket ( n hash -- alist )
-    swap >fixnum swap >hashtable hash-array array-nth ; inline
+    >r >fixnum r> hash-array array-nth ;
 
 : set-hash-bucket ( obj n hash -- )
-    swap >fixnum swap >hashtable hash-array set-array-nth ;
-    inline
+    >r >fixnum r> hash-array set-array-nth ;
 
 : change-bucket ( n hash quot -- )
     -rot hash-array
     [ array-nth swap call ] 2keep
     set-array-nth ; inline
 
+: hash-size+ ( hash -- ) dup hash-size 1 + swap set-hash-size ;
+: hash-size- ( hash -- ) dup hash-size 1 - swap set-hash-size ;
+
 IN: hashtables
 
-: hash-size+ ( hash -- )
-    >hashtable dup 1 slot 1 + swap 1 set-slot ; inline
-
-: hash-size- ( hash -- )
-    >hashtable dup 1 slot 1 - swap 1 set-slot ; inline
-
-: hash-size ( hash -- n )
-    #! Number of elements in the hashtable.
-    >hashtable 1 slot ;
-
-: bucket-count ( hash -- n )
-    >hashtable hash-array array-capacity ; inline
+: bucket-count ( hash -- n ) hash-array array-capacity ;
 
 : (hashcode) ( key table -- index )
     #! Compute the index of the bucket for a key.
     >r hashcode r> bucket-count rem ; inline
 
 : hash* ( key table -- [[ key value ]] )
-    #! Look up a value in the hashtable. First the bucket is
-    #! determined using the hash function, then the association
-    #! list therein is searched linearly.
+    #! Look up a value in the hashtable.
     2dup (hashcode) swap hash-bucket assoc* ;
 
-: hash ( key table -- value )
-    #! Unlike hash*, this word cannot distinglish between an
-    #! undefined value, or a value set to f.
-    hash* dup [ cdr ] when ;
+: hash ( key table -- value ) hash* cdr ;
 
 : set-hash* ( key hash quot -- )
     #! Apply the quotation to yield a new association list.
@@ -67,7 +61,7 @@ IN: hashtables
     -rot 2dup (hashcode) over [
         ( quot key hash assoc -- )
         swapd 2dup
-        assoc [ rot hash-size- ] [ rot drop ] ifte
+        assoc* [ rot hash-size- ] [ rot drop ] ifte
         rot call
     ] change-bucket ; inline
 
@@ -96,7 +90,9 @@ IN: hashtables
 : rehash ( hash -- )
     #! Increase the hashtable size if its too small.
     dup rehash? [
-        dup hash>alist over grow-hash
+        dup hash>alist
+        over grow-hash
+        0 pick set-hash-size
         [ unswons rot (set-hash) ] each-with
     ] [
         drop
@@ -114,6 +110,7 @@ IN: hashtables
 
 : hash-clear ( hash -- )
     #! Remove all entries from a hashtable.
+    0 over set-hash-size
     dup bucket-count [
         [ f swap pick set-hash-bucket ] keep
     ] repeat drop ;
@@ -139,8 +136,9 @@ IN: hashtables
     >r hash>alist r> each ; inline
 
 M: hashtable clone ( hash -- hash )
-    dup bucket-count dup <hashtable> [
-        hash-array rot hash-array rot copy-array
+    dup bucket-count <hashtable>
+    over hash-size over set-hash-size [
+        hash-array swap hash-array dup array-capacity copy-array
     ] keep ;
 
 : hash-subset? ( subset of -- ? )

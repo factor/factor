@@ -3,7 +3,7 @@
 IN: stdio
 DEFER: stdio
 IN: streams
-USING: errors kernel namespaces strings generic lists ;
+USING: errors generic kernel lists math namespaces strings ;
 
 GENERIC: stream-flush      ( stream -- )
 GENERIC: stream-auto-flush ( stream -- )
@@ -14,7 +14,7 @@ GENERIC: stream-close      ( stream -- )
 
 : stream-read1 ( stream -- char/f )
     1 swap stream-read
-    dup f-or-"" [ drop f ] [ 0 swap str-nth ] ifte ;
+    dup f-or-"" [ drop f ] [ 0 swap string-nth ] ifte ;
 
 : stream-write ( string stream -- )
     f swap stream-write-attr ;
@@ -37,7 +37,7 @@ M: string-output stream-auto-flush ( stream -- ) drop ;
 : stream>str ( stream -- string )
     #! Returns the string written to the given string output
     #! stream.
-    string-output-buf sbuf>str ;
+    string-output-buf sbuf>string ;
 
 C: string-output ( size -- stream )
     #! Creates a new stream for writing to a string buffer.
@@ -45,11 +45,34 @@ C: string-output ( size -- stream )
 
 ! Sometimes, we want to have a delegating stream that uses stdio
 ! words.
-TUPLE: wrapper-stream delegate scope ;
+TUPLE: wrapper-stream scope ;
 
 C: wrapper-stream ( stream -- stream )
-    2dup set-wrapper-stream-delegate
+    2dup set-delegate
     [
         >r <namespace> [ stdio set ] extend r>
         set-wrapper-stream-scope
     ] keep ;
+
+SYMBOL: line-number
+SYMBOL: parser-stream
+
+: next-line ( -- str )
+    parser-stream get stream-readln
+    line-number [ 1 + ] change ;
+
+: read-lines ( stream quot -- )
+    #! Apply a quotation to each line as its read. Close the
+    #! stream.
+    swap [
+        parser-stream set 0 line-number set [ next-line ] while
+    ] [
+        parser-stream get stream-close rethrow
+    ] catch ;
+
+! Standard actions protocol for presentations output to
+! attributed streams.
+: <actions> ( path alist -- alist )
+    #! For each element of the alist, change the value to
+    #! path " " value
+    [ uncons >r over " " r> cat3 cons ] map nip ;

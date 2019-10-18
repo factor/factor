@@ -1,41 +1,8 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! Copyright (C) 2004, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler
-USE: inference
-USE: kernel
-USE: lists
-USE: math
-USE: namespaces
-USE: words
-USE: strings
-USE: errors
-USE: prettyprint
-USE: kernel-internals
+USING: inference kernel lists math namespaces words strings
+errors prettyprint kernel-internals ;
 
 ! The linear IR is close to assembly language. It also resembles
 ! Forth code in some sense. It exists so that pattern matching
@@ -49,6 +16,9 @@ SYMBOL: #push-indirect
 SYMBOL: #replace-immediate
 SYMBOL: #replace-indirect
 SYMBOL: #jump-t ( branch if top of stack is true )
+SYMBOL: #jump-t-label ( branch if top of stack is true )
+SYMBOL: #jump-f ( branch if top of stack is false )
+SYMBOL: #jump-f-label ( branch if top of stack is false )
 SYMBOL: #jump ( tail-call )
 SYMBOL: #jump-label ( tail-call )
 SYMBOL: #return-to ( push addr on C stack )
@@ -60,6 +30,11 @@ SYMBOL: #return-to ( push addr on C stack )
 SYMBOL: #target ( part of jump table )
 SYMBOL: #target-label
 SYMBOL: #end-dispatch
+
+! on PowerPC, compiled definitions that make subroutine calls
+! must have a prologue and epilogue to set up and tear down the
+! link register. The epilogue is compiled as part of #return.
+SYMBOL: #prologue
 
 : linear, ( node -- )
     #! Add a node to the linear IR.
@@ -80,7 +55,7 @@ SYMBOL: #end-dispatch
     #! jumps and labels, and turns dataflow IR nodes into
     #! lists where the first element is an operation, and the
     #! rest is arguments.
-    [ (linearize) ] make-list ;
+    [ [ #prologue ] , (linearize) ] make-list ;
 
 : immediate? ( obj -- ? )
     #! fixnums and f have a pointerless representation, and
@@ -92,13 +67,13 @@ SYMBOL: #end-dispatch
     [ node-param get ] bind
     dup immediate? #push-immediate #push-indirect ?
     swons ,
-] "linearizer" set-word-property
+] "linearizer" set-word-prop
 
 : <label> ( -- label )
-    gensym  dup t "label" set-word-property ;
+    gensym  dup t "label" set-word-prop ;
 
 : label? ( obj -- ? )
-    dup word? [ "label" word-property ] [ drop f ] ifte ;
+    dup word? [ "label" word-prop ] [ drop f ] ifte ;
 
 : label, ( label -- )
     #label swons , ;
@@ -111,7 +86,7 @@ SYMBOL: #end-dispatch
 
 #simple-label [
     linearize-simple-label
-] "linearizer" set-word-property
+] "linearizer" set-word-prop
 
 : linearize-label ( node -- )
     #! Labels are tricky, because they might contain non-tail
@@ -127,13 +102,13 @@ SYMBOL: #end-dispatch
 
 #label [
     linearize-label
-] "linearizer" set-word-property
+] "linearizer" set-word-prop
 
 : linearize-ifte ( param -- )
     #! The parameter is a list of two lists, each one a dataflow
     #! IR.
     2unlist  <label> [
-        #jump-t swons ,
+        #jump-t-label swons ,
         (linearize) ( false branch )
         <label> dup #jump-label swons ,
     ] keep label, ( branch target of BRANCH-T )
@@ -142,7 +117,7 @@ SYMBOL: #end-dispatch
 
 \ ifte [
     [ node-param get ] bind linearize-ifte
-] "linearizer" set-word-property
+] "linearizer" set-word-prop
 
 : dispatch-head ( vtable -- end label/code )
     #! Output the jump table insn and return a list of
@@ -163,6 +138,8 @@ SYMBOL: #end-dispatch
 
 \ dispatch [
     [ node-param get ] bind linearize-dispatch
-] "linearizer" set-word-property
+] "linearizer" set-word-prop
 
-#values [ drop ] "linearizer" set-word-property
+#values [ drop ] "linearizer" set-word-prop
+
+#return [ drop [ #return ] , ] "linearizer" set-word-prop

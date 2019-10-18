@@ -29,7 +29,9 @@
 
 package factor;
 
-public class FactorWord implements FactorExternalizable
+import factor.jedit.FactorWordRenderer;
+
+public class FactorWord extends FactorArtifact implements FactorExternalizable
 {
 	public String vocabulary;
 	public String name;
@@ -41,26 +43,18 @@ public class FactorWord implements FactorExternalizable
 	 */
 	public FactorParsingDefinition parsing;
 
+	private VocabularyLookup lookup;
+	
 	/**
 	 * For browsing, the parsing word that was used to define this word.
 	 */
 	private FactorWord definer;
 
-	/**
-	 * Should the parser keep doc comments?
-	 */
-	public boolean docComment;
-
-	/**
-	 * For text editor integration.
-	 */
-	public String file;
-	public int line;
-	public int col;
-
 	//{{{ FactorWord constructor
-	public FactorWord(String vocabulary, String name)
+	public FactorWord(VocabularyLookup lookup,
+		String vocabulary, String name)
 	{
+		this.lookup = lookup;
 		this.vocabulary = vocabulary;
 		this.name = name;
 	} //}}}
@@ -75,7 +69,7 @@ public class FactorWord implements FactorExternalizable
 	public FactorWord getDefiner()
 	{
 		if(definer == null)
-			return new FactorWord(null,"DEFER:");
+			return new FactorWord(lookup,null,"DEFER:");
 		else
 			return definer;
 	} //}}}
@@ -84,5 +78,28 @@ public class FactorWord implements FactorExternalizable
 	public void setDefiner(FactorWord definer)
 	{
 		this.definer = definer;
+	} //}}}
+	
+	//{{{ getShortString() method
+	public String getShortString()
+	{
+		return name;
+	} //}}}
+	
+	//{{{ getLongString() method
+	public String getLongString()
+	{
+		return FactorWordRenderer.getWordHTMLString(this,false);
+	} //}}}
+
+	//{{{ forget() method
+	public void forget()
+	{
+		/* Not allowed to forget parsing words, since that confuses our
+		parser */
+		if(parsing != null)
+			return;
+		
+		lookup.forget(this);
 	} //}}}
 }

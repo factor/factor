@@ -57,8 +57,6 @@ USE: strings
 
 [ f ] [ f 0 head ] unit-test
 [ f ] [ [ 1 ] 0 head ] unit-test
-[ [ 1 ] ] [ [ 1 ] 1 head ] unit-test
-[ [ 1 ] 2 head ] unit-test-fails
 [ [ 1 2 3 ] ] [ [ 1 2 3 4 ] 3 head ] unit-test
 
 [ [ 1 3 ] ] [ [ 2 ] [ 1 2 3 ] difference ] unit-test

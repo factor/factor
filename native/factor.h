@@ -1,9 +1,7 @@
 #ifndef __FACTOR_H__
 #define __FACTOR_H__
 
-#if defined(i386) || defined(__i386) || defined(__i386__) || defined(WIN32)
-    #define FACTOR_X86
-#endif
+#include "platform.h"
 
 #if defined(WIN32)
 	#define DLLEXPORT __declspec(dllexport)
@@ -19,8 +17,10 @@ typedef unsigned long int CELL;
 CELL ds_bot;
 
 /* raw pointer to datastack top */
-#ifdef FACTOR_X86
+#if defined(FACTOR_X86)
 	register CELL ds asm("esi");
+#elif defined(FACTOR_PPC)
+	register CELL ds asm("r14");
 #else
 	CELL ds;
 #endif
@@ -29,10 +29,25 @@ CELL ds_bot;
 CELL cs_bot;
 
 /* raw pointer to callstack top */
-DLLEXPORT CELL cs;
+#if defined(FACTOR_PPC)
+	register CELL cs asm("r15");
+#else
+	DLLEXPORT CELL cs;
+#endif
 
 /* TAGGED currently executing quotation */
-CELL callframe;
+#if defined(FACTOR_PPC)
+	register CELL callframe asm("r16");
+#else
+	CELL callframe;
+#endif
+
+/* TAGGED pointer to currently executing word */
+#if defined(FACTOR_PPC)
+	register CELL executing asm("r17");
+#else
+	CELL executing;
+#endif
 
 #include <errno.h>
 #include <fcntl.h>
@@ -45,6 +60,15 @@ CELL callframe;
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
+typedef unsigned char u8; 	 
+typedef unsigned short u16; 	 
+typedef unsigned int u32; 	 
+typedef unsigned long long u64; 	 
+typedef signed char s8; 	 
+typedef signed short s16; 	 
+typedef signed int s32; 	 
+typedef signed long long s64;
 
 #ifdef WIN32
 	#include <windows.h>
@@ -81,7 +105,7 @@ CELL callframe;
 #define HALF_WORD_MASK (((unsigned long)1<<HALF_WORD_SIZE)-1)
 
 /* must always be 16 bits */
-#define CHARS ((signed)sizeof(uint16_t))
+#define CHARS ((signed)sizeof(u16))
 
 /* must always be 8 bits */
 typedef unsigned char BYTE;

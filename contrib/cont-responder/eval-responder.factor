@@ -72,7 +72,7 @@ USE: logging
 : escape-quotes ( string -- string )
   #! Replace occurrences of single quotes with
   #! backslash quote.
-  [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc dup rot ? ] str-map ;
+  [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc dup rot ? ] string-map ;
  
 : make-eval-javascript ( string -- string )
   #! Give a string return some javascript that when
@@ -190,6 +190,13 @@ USE: logging
       do-eval 
     ] with-stream r> stream>str 
   ] bind ;
+
+: forever ( quot -- )
+  #! The code is evaluated in an infinite loop. Typically, a
+  #! continuation is used to escape the infinite loop.
+  #!
+  #! This combinator will not compile.
+  dup slip forever ;
 
 : run-eval-requester ( evaluator -- )
   #! Enter a loop request an expression to

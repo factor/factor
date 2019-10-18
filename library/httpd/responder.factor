@@ -103,13 +103,13 @@ USE: strings
 
 : trim-/ ( url -- url )
     #! Trim a leading /, if there is one.
-    "/" ?str-head drop ;
+    "/" ?string-head drop ;
 
 : serve-responder ( method url -- )
     #! Responder URLs come in two forms:
     #! /foo/bar... - default-responder used
     #! /responder/foo/bar - responder foo, argument bar
-    dup log-responder trim-/ "responder/" ?str-head [
+    dup log-responder trim-/ "responder/" ?string-head [
         serve-explicit-responder
     ] [
         serve-default-responder

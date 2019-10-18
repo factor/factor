@@ -10,19 +10,26 @@ math namespaces parser strings words vectors unparse ;
     #! Mark the most recently defined word to execute at parse
     #! time, rather than run time. The word can use 'scan' to
     #! read ahead in the input stream.
-    word t "parsing" set-word-property ; parsing
+    word t "parsing" set-word-prop ; parsing
 
 : inline ( -- )
     #! Mark the last word to be inlined.
-    word  t "inline" set-word-property ; parsing
+    word  t "inline" set-word-prop ; parsing
 
 ! The variable "in-definition" is set inside a : ... ;.
 ! ( and #! then add "stack-effect" and "documentation"
 ! properties to the current word if it is set.
 
 ! Booleans
-: t t swons ; parsing
-: f f swons ; parsing
+
+! The canonical t is a heap-allocated dummy object. It is always
+! the first in the image.
+BUILTIN: t 7 ;  : t t swons ; parsing
+
+! In the runtime, the canonical f is represented as a null
+! pointer with tag 3. So
+! f address . ==> 3
+BUILTIN: f 9 ;  : f f swons ; parsing
 
 ! Lists
 : [ f ; parsing
@@ -96,7 +103,7 @@ math namespaces parser strings words vectors unparse ;
 
 ! String literal
 : parse-string ( n str -- n )
-    2dup str-nth CHAR: " = [
+    2dup string-nth CHAR: " = [
         drop 1 +
     ] [
         [ next-char swap , ] keep parse-string

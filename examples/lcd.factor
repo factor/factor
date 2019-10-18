@@ -8,7 +8,7 @@ USING: vectors kernel math stdio strings ;
     } vector-nth >r 4 * dup 4 + r> substring ;
 
 : lcd-row ( num row -- )
-    swap [ CHAR: 0 - over lcd-digit write ] str-each drop ;
+    swap [ CHAR: 0 - over lcd-digit write ] string-each drop ;
 
 : lcd ( num -- str )
     3 [ 2dup lcd-row terpri ] repeat drop ;

@@ -34,23 +34,18 @@ import java.io.IOException;
 
 public class LineComment extends FactorParsingDefinition
 {
-	public boolean doc;
-
 	//{{{ LineComment constructor
 	/**
 	 * A new definition.
 	 */
-	public LineComment(FactorWord word, boolean doc)
+	public LineComment(FactorWord word)
 	{
 		super(word);
-		this.doc = doc;
 	} //}}}
 
 	public void eval(FactorReader reader)
 		throws IOException, FactorParseException
 	{
 		String comment = reader.getScanner().readUntilEOL();
-		if(doc)
-			reader.addDocComment(comment);
 	}
 }

@@ -1,46 +1,41 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! Copyright (C) 2004, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler
-USE: assembler
-USE: inference
-USE: errors
-USE: hashtables
-USE: kernel
-USE: lists
-USE: math
-USE: namespaces
-USE: parser
-USE: prettyprint
-USE: stdio
-USE: strings
-USE: unparser
-USE: vectors
-USE: words
+USING: assembler errors generic kernel lists math namespaces
+prettyprint strings vectors words ;
+
+! To support saving compiled code to disk, generator words
+! append relocation instructions to this vector.
+SYMBOL: relocation-table
+
+: rel, ( n -- ) relocation-table get vector-push ;
+
+: relocating compiled-offset cell - rel, ;
+
+: rel-primitive ( word rel/abs -- )
+    #! If flag is true; relative.
+    0 1 ? rel, relocating word-primitive rel, ;
+
+: rel-dlsym ( name dll rel/abs -- )
+    #! If flag is true; relative.
+    2 3 ? rel, relocating cons intern-literal rel, ;
+
+: rel-address ( rel/abs -- )
+    #! Relocate address just compiled. If flag is true,
+    #! relative, and there is nothing to do.
+    [ 4 rel, relocating 0 rel, ] unless ;
+
+: rel-word ( word rel/abs -- )
+    #! If flag is true; relative.
+    over primitive? [ rel-primitive ] [ nip rel-address ] ifte ;
+
+! PowerPC relocations
+
+: rel-primitive-16/16 ( word -- )
+    5 rel, relocating word-primitive rel, ;
+
+: rel-address-16/16 ( -- )
+    6 rel, relocating 0 rel, ;
 
 ! We use a hashtable "compiled-xts" that maps words to
 ! xt's that are currently being compiled. The commit-xt's word
@@ -57,20 +52,16 @@ SYMBOL: compiled-xts
     compiled-offset swap compiled-xts [ acons ] change ;
 
 : commit-xt ( xt word -- )
-    dup t "compiled" set-word-property  set-word-xt ;
+    dup t "compiled" set-word-prop  set-word-xt ;
 
 : commit-xts ( -- )
+    #! We must flush the instruction cache on PowerPC.
+    flush-icache
     compiled-xts get [ unswons commit-xt ] each
     compiled-xts off ;
 
 : compiled-xt ( word -- xt )
-    dup compiled-xts get assoc [ word-xt ] ?unless ;
-
-! "deferred-xts" is a list of [ where word relative ] pairs; the
-! xt of word when its done compiling will be written to the
-! offset, relative to the offset.
-
-SYMBOL: deferred-xts
+    dup compiled-xts get assoc [ ] [ word-xt ] ?ifte ;
 
 ! Words being compiled are consed onto this list. When a word
 ! is encountered that has not been previously compiled, it is
@@ -79,9 +70,84 @@ SYMBOL: deferred-xts
 
 SYMBOL: compile-words
 
-: defer-xt ( word where relative -- )
-    #! After word is compiled, put its XT at where, relative.
-    3list deferred-xts cons@ ;
+! deferred-xts is a list of objects responding to the fixup
+! generic.
+SYMBOL: deferred-xts
+
+! Some machinery to allow forward references
+GENERIC: fixup ( object -- )
+
+TUPLE: relative word where to ;
+
+: just-compiled compiled-offset 4 - ;
+
+C: relative ( word -- )
+    over t rel-word
+    [ set-relative-word ] keep
+    [ just-compiled swap set-relative-where ] keep
+    [ compiled-offset swap set-relative-to ] keep ;
+
+: relative ( word -- ) <relative> deferred-xts cons@ ;
+
+: relative-fixup ( relative -- addr )
+    dup relative-word compiled-xt swap relative-to - ;
+
+M: relative fixup ( relative -- )
+    dup relative-fixup swap relative-where set-compiled-cell ;
+
+TUPLE: absolute word where ;
+
+C: absolute ( word -- )
+    [ set-absolute-word ] keep
+    [ just-compiled swap set-absolute-where ] keep ;
+
+: absolute ( word -- )
+    dup f rel-word <absolute> deferred-xts cons@ ;
+
+: >absolute dup absolute-word compiled-xt swap absolute-where ;
+
+M: absolute fixup ( absolute -- )
+    >absolute set-compiled-cell ;
+
+! Fixups where the address is inside a bitfield in the
+! instruction.
+TUPLE: relative-bitfld mask ;
+
+C: relative-bitfld ( word mask -- )
+    [ set-relative-bitfld-mask ] keep
+    [ >r <relative> r> set-delegate ] keep
+    [ just-compiled swap set-relative-to ] keep ;
+
+: relative-24 ( word -- )
+    BIN: 11111111111111111111111100 <relative-bitfld>
+    deferred-xts cons@ ;
+
+: relative-14 ( word -- )
+    BIN: 1111111111111100 <relative-bitfld>
+    deferred-xts cons@ ;
+
+: or-compiled ( n off -- )
+    [ compiled-cell bitor ] keep set-compiled-cell ;
+
+M: relative-bitfld fixup
+    dup relative-fixup over relative-bitfld-mask bitand
+    swap relative-where
+    or-compiled ;
+
+! Fixup where the address is split between two PowerPC D-form
+! instructions (low 16 bits of each instruction is the literal).
+TUPLE: absolute-16/16 ;
+
+C: absolute-16/16 ( word -- )
+    [ >r <absolute> r> set-delegate ] keep ;
+
+: fixup-16/16 ( xt where -- )
+    >r w>h/h r> tuck 4 - or-compiled or-compiled ;
+
+M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
+
+: absolute-16/16 ( word -- )
+    <absolute-16/16> deferred-xts cons@ ;
 
 : compiling? ( word -- ? )
     #! A word that is compiling or already compiled will not be
@@ -96,21 +162,11 @@ SYMBOL: compile-words
         ] ifte
     ] ifte ;
 
-: fixup-deferred-xt ( word where relative -- )
-    rot dup compiling? [
-        compiled-xt swap - swap set-compiled-cell
-    ] [
-        "Not compiled: " swap word-name cat2 throw
-    ] ifte ;
-
-: fixup-deferred-xts ( -- )
-    deferred-xts get [
-        uncons uncons car fixup-deferred-xt
-    ] each
-    deferred-xts off ;
+: fixup-xts ( -- )
+    deferred-xts get [ fixup ] each  deferred-xts off ;
 
 : with-compiler ( quot -- )
-    [ call  fixup-deferred-xts  commit-xts ] with-scope ;
+    [ call  fixup-xts  commit-xts ] with-scope ;
 
 : postpone-word ( word -- )
     dup compiling? [ drop ] [ compile-words unique@ ] ifte ;

@@ -60,7 +60,7 @@ SYMBOL: history-index
 
 : set-line-text ( text -- )
     #! Call this in the line editor scope.
-    dup line-text set str-length caret set ;
+    dup line-text set string-length caret set ;
 
 : goto-history ( n -- )
     #! Call this in the line editor scope.
@@ -99,7 +99,7 @@ SYMBOL: history-index
 : caret-insert ( str offset -- )
     #! Call this in the line editor scope.
     caret get <= [
-        str-length caret [ + ] change
+        string-length caret [ + ] change
     ] [
         drop
     ] ifte ;
@@ -108,12 +108,12 @@ SYMBOL: history-index
     #! Call this in the line editor scope.
     reset-history
     2dup caret-insert
-    line-text get swap str/
+    line-text get swap string/
     swapd cat3 line-text set ;
 
 : insert-char ( ch -- )
     #! Call this in the line editor scope.
-    ch>str caret get line-insert ;
+    ch>string caret get line-insert ;
 
 : caret-remove ( offset length -- )
     #! Call this in the line editor scope.
@@ -131,8 +131,8 @@ SYMBOL: history-index
     #! Call this in the line editor scope.
     reset-history
     2dup caret-remove
-    dupd + line-text get str-tail
-    >r line-text get str-head r> cat2
+    dupd + line-text get string-tail
+    >r line-text get string-head r> cat2
     line-text set ;
 
 : backspace ( -- )
@@ -145,4 +145,4 @@ SYMBOL: history-index
 
 : right ( -- )
     #! Call this in the line editor scope.
-    caret [ 1 + line-text get str-length min ] change ;
+    caret [ 1 + line-text get string-length min ] change ;

@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien generic kernel lists math namespaces sdl sdl-event
-sdl-video ;
+USING: alien generic kernel lists math namespaces prettyprint
+sdl stdio ;
 
 DEFER: pick-up
 
@@ -24,7 +24,7 @@ DEFER: pick-up
     #! box delegate.
     2dup inside? [
         2dup [ translate ] keep
-        gadget-children pick-up-list dup [
+        gadget-children reverse pick-up-list dup [
             2nip
         ] [
             3drop t
@@ -45,21 +45,21 @@ DEFER: pick-up
 ! - hand-gadget is the gadget under the mouse position
 ! - hand-clicked is the most recently clicked gadget
 ! - hand-focus is the gadget holding keyboard focus
-TUPLE: hand
-    world
-    click-pos clicked buttons
-    gadget focus delegate ;
+TUPLE: hand world
+    click-pos click-rel clicked buttons
+    gadget focus ;
 
 C: hand ( world -- hand )
-    0 0 0 0 <rectangle> <gadget>
-    over set-hand-delegate
+    <empty-gadget>
+    over set-delegate
     [ set-hand-world ] 2keep
     [ set-gadget-parent ] 2keep
     [ set-hand-gadget ] keep ;
 
 : button/ ( n hand -- )
     dup hand-gadget over set-hand-clicked
-    dup shape-pos over set-hand-click-pos
+    dup screen-pos over set-hand-click-pos
+    dup hand-gadget over relative over set-hand-click-rel
     [ hand-buttons unique ] keep set-hand-buttons ;
 
 : button\ ( n hand -- )
@@ -72,11 +72,22 @@ C: hand ( world -- hand )
     hand-gadget [ screen-pos - ] keep mouse-enter ;
 
 : update-hand-gadget ( hand -- )
-    #! The hand gadget is the gadget under the hand right now.
     dup dup hand-world pick-up swap set-hand-gadget ;
 
+: motion-gesture ( hand gadget gesture -- )
+    #! Send a gesture like [ drag 2 ].
+    rot hand-buttons car unit append swap handle-gesture drop ;
+
 : fire-motion ( hand -- )
-    [ motion ] swap hand-gadget handle-gesture drop ;
+    #! Fire a motion gesture to the gadget underneath the hand,
+    #! and if a mouse button is down, fire a drag gesture to the
+    #! gadget that was clicked.
+    [ motion ] over hand-gadget handle-gesture drop
+    dup hand-buttons [
+        dup hand-clicked [ drag ] motion-gesture
+    ] [
+        drop
+    ] ifte ;
 
 : move-hand ( x y hand -- )
     dup shape-pos >r

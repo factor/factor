@@ -41,14 +41,14 @@ INLINE void put(CELL where, CELL what)
 	*((CELL*)where) = what;
 }
 
-INLINE uint16_t cget(CELL where)
+INLINE u16 cget(CELL where)
 {
-	return *((uint16_t*)where);
+	return *((u16*)where);
 }
 
-INLINE void cput(CELL where, uint16_t what)
+INLINE void cput(CELL where, u16 what)
 {
-	*((uint16_t*)where) = what;
+	*((u16*)where) = what;
 }
 
 INLINE BYTE bget(CELL where)

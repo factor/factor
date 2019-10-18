@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USING: errors kernel lists math namespaces strings words
+USING: errors kernel lists math namespaces streams strings words
 unparser ;
 
 ! The parser uses a number of variables:
@@ -14,20 +14,22 @@ unparser ;
 ! of vocabularies. If it is a parsing word, it is executed
 ! immediately. Otherwise it is appended to the parse tree.
 
+SYMBOL: file
+
 : parsing? ( word -- ? )
-    dup word? [ "parsing" word-property ] [ drop f ] ifte ;
+    dup word? [ "parsing" word-prop ] [ drop f ] ifte ;
 
 : skip ( n line quot -- n )
     #! Find the next character that satisfies the quotation,
     #! which should have stack effect ( ch -- ? ).
-    >r 2dup str-length < [
-        2dup str-nth r> dup >r call [
+    >r 2dup string-length < [
+        2dup string-nth r> dup >r call [
             r> 2drop
         ] [
             >r 1 + r> r> skip
         ] ifte
     ] [
-        r> drop nip str-length
+        r> drop nip string-length
     ] ifte ; inline
 
 : skip-blank ( n line -- n )
@@ -41,10 +43,10 @@ unparser ;
     #! "hello world"
     #!
     #! Will call the parsing word ".
-    "\"" str-contains? ;
+    "\"" string-contains? ;
 
 : skip-word ( n line -- n )
-    2dup str-nth denotation? [
+    2dup string-nth denotation? [
         drop 1 +
     ] [
         [ blank? ] skip
@@ -52,7 +54,7 @@ unparser ;
 
 : (scan) ( n line -- start end )
     [ skip-blank dup ] keep
-    2dup str-length < [ skip-word ] [ drop ] ifte ;
+    2dup string-length < [ skip-word ] [ drop ] ifte ;
 
 : scan ( -- token )
     "col" get "line" get dup >r (scan) dup "col" set
@@ -66,7 +68,7 @@ global [ string-mode off ] bind
 : scan-word ( -- obj )
     scan dup [
         dup ";" = not string-mode get and [
-            dup "use" get search [ str>number ] ?unless
+            dup "use" get search [ ] [ str>number ] ?ifte
         ] unless
     ] when ;
 
@@ -98,7 +100,7 @@ global [ string-mode off ] bind
     ch-search (until) ;
 
 : (until-eol) ( -- index ) 
-    "\n" ch-search dup -1 = [ drop "line" get str-length ] when ;
+    "\n" ch-search dup -1 = [ drop "line" get string-length ] when ;
 
 : until-eol ( -- str )
     #! This is just a hack to get "eval" to work with multiline
@@ -109,9 +111,9 @@ global [ string-mode off ] bind
 : save-location ( word -- )
     #! Remember where this word was defined.
     dup set-word
-    dup "line-number" get "line" set-word-property
-    dup "col" get "col"  set-word-property
-    "file" get "file" set-word-property ;
+    dup line-number get "line" set-word-prop
+    dup "col" get "col"  set-word-prop
+    file get "file" set-word-prop ;
 
 : create-in "in" get create ;
 
@@ -132,17 +134,17 @@ global [ string-mode off ] bind
     ] assoc dup [ "Bad escape" throw ] unless ;
 
 : next-escape ( n str -- ch n )
-    2dup str-nth CHAR: u = [
+    2dup string-nth CHAR: u = [
         swap 1 + dup 4 + [ rot substring hex> ] keep
     ] [
-        over 1 + >r str-nth escape r>
+        over 1 + >r string-nth escape r>
     ] ifte ;
 
 : next-char ( n str -- ch n )
-    2dup str-nth CHAR: \\ = [
+    2dup string-nth CHAR: \\ = [
         >r 1 + r> next-escape
     ] [
-        over 1 + >r str-nth r>
+        over 1 + >r string-nth r>
     ] ifte ;
 
 : doc-comment-here? ( parsed -- ? )
@@ -150,20 +152,20 @@ global [ string-mode off ] bind
 
 : parsed-stack-effect ( parsed str -- parsed )
     over doc-comment-here? [
-        word "stack-effect" word-property [
+        word "stack-effect" word-prop [
             drop
         ] [
-            word swap "stack-effect" set-word-property
+            word swap "stack-effect" set-word-prop
         ] ifte
     ] [
         drop
     ] ifte ;
 
 : documentation+ ( word str -- )
-    over "documentation" word-property [
+    over "documentation" word-prop [
         swap "\n" swap cat3
     ] when*
-    "documentation" set-word-property ;
+    "documentation" set-word-prop ;
 
 : parsed-documentation ( parsed str -- parsed )
     over doc-comment-here? [

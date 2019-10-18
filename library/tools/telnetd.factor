@@ -11,11 +11,15 @@ threads parser ;
     [ telnet-client ] in-thread drop ;
 
 : telnetd-loop ( server -- server )
-    [ [ accept telnet-connection ] keep ] forever ;
+    [ accept telnet-connection ] keep telnetd-loop ;
 
 : telnetd ( port -- )
     [
-        <server> [ telnetd-loop ] [ swap stream-close rethrow ] catch
+        <server> [
+            telnetd-loop
+        ] [
+            swap stream-close rethrow
+        ] catch
     ] with-logging ;
 
 IN: shells
@@ -23,4 +27,5 @@ IN: shells
 : telnet
     "telnetd-port" get str>number telnetd ;
 
-global [ 9999 "telnetd-port" set ] bind
+! This is a string since we str>number it above.
+global [ "9999" "telnetd-port" set ] bind

@@ -51,6 +51,17 @@ SYMBOL: d
         iterate-dejong 2dup scale-dejong rect> white rgb pixel
     ] times 2drop ; compiled
 
+: event-loop ( event -- )
+    dup SDL_WaitEvent [
+        dup event-type SDL_QUIT = [
+            drop
+        ] [
+            event-loop
+        ] ifte
+    ] [
+        drop
+    ] ifte ; compiled
+
 : dejong ( -- )
     ! Fiddle with these four values!
     1.0 a set

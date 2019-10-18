@@ -16,7 +16,7 @@ USE: math-internals
 [ 9227465 ] [ 34 fixnum-fib ] unit-test
 
 : fib ( n -- nth fibonacci number )
-    dup 1 <= [ drop 1 ] [ 1 - dup fib swap 1 - fib + ] ifte ;
+    dup 1 <= [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] ifte ;
     compiled
 
 [ 9227465 ] [ 34 fib ] unit-test

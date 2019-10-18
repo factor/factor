@@ -36,7 +36,7 @@ void primitive_set_sbuf_length(void)
 	if(length < 0)
 		range_error(tag_object(sbuf),0,to_fixnum(length),sbuf->top);
 	sbuf->top = length;
-	if(length > str->capacity)
+	if(length > string_capacity(str))
 		sbuf->string = tag_object(grow_string(str,length,F));
 }
 
@@ -53,13 +53,12 @@ void primitive_sbuf_nth(void)
 void sbuf_ensure_capacity(F_SBUF* sbuf, F_FIXNUM top)
 {
 	F_STRING* string = untag_string(sbuf->string);
-	CELL capacity = string->capacity;
-	if(top >= capacity)
+	if(top >= string_capacity(string))
 		sbuf->string = tag_object(grow_string(string,top * 2 + 1,F));
 	sbuf->top = top;
 }
 
-void set_sbuf_nth(F_SBUF* sbuf, CELL index, uint16_t value)
+void set_sbuf_nth(F_SBUF* sbuf, CELL index, u16 value)
 {
 	if(index < 0)
 		range_error(tag_object(sbuf),0,tag_fixnum(index),sbuf->top);
@@ -88,7 +87,7 @@ void primitive_set_sbuf_nth(void)
 void sbuf_append_string(F_SBUF* sbuf, F_STRING* string)
 {
 	CELL top = sbuf->top;
-	CELL strlen = string->capacity;
+	CELL strlen = string_capacity(string);
 	F_STRING* str;
 	sbuf_ensure_capacity(sbuf,top + strlen);
 	str = untag_string(sbuf->string);
@@ -134,12 +133,6 @@ void primitive_sbuf_to_string(void)
 	drepl(tag_object(s));
 }
 
-void primitive_sbuf_reverse(void)
-{
-	F_SBUF* sbuf = untag_sbuf(dpop());
-	string_reverse(untag_string(sbuf->string),sbuf->top);
-}
-
 void primitive_sbuf_clone(void)
 {
 	F_SBUF* s;
@@ -177,12 +170,6 @@ void primitive_sbuf_eq(void)
 		dpush(F);
 }
 
-void primitive_sbuf_hashcode(void)
-{
-	F_SBUF* sbuf = untag_sbuf(dpop());
-	dpush(tag_fixnum(hash_string(untag_string(sbuf->string),sbuf->top)));
-}
-
 void fixup_sbuf(F_SBUF* sbuf)
 {
 	data_fixup(&sbuf->string);
@@ -190,5 +177,5 @@ void fixup_sbuf(F_SBUF* sbuf)
 
 void collect_sbuf(F_SBUF* sbuf)
 {
-	copy_object(&sbuf->string);
+	COPY_OBJECT(sbuf->string);
 }

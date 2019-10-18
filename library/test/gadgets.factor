@@ -39,7 +39,7 @@ USING: gadgets kernel lists math namespaces test ;
 
 : funny-rect ( x -- rect )
     10 10 30 <rectangle> <gadget>
-    dup [ 255 0 0 ] foreground set-paint-property ;
+    dup [ 255 0 0 ] foreground set-paint-prop ;
     
 [ f ] [
     [
@@ -51,23 +51,30 @@ USING: gadgets kernel lists math namespaces test ;
     ] with-scope
 ] unit-test
 
-[ 1 3 2 ] [ #{ 1 2 }# #{ 3 4 }# x1/x2/y1 ] unit-test
-[ 1 3 4 ] [ #{ 1 2 }# #{ 3 4 }# x1/x2/y2 ] unit-test
-[ 1 2 4 ] [ #{ 1 2 }# #{ 3 4 }# x1/y1/y2 ] unit-test
-[ 3 2 4 ] [ #{ 1 2 }# #{ 3 4 }# x2/y1/y2 ] unit-test
-
 [ -90 ] [ 10 10 -100 -200 <line> shape-x ] unit-test
 [ 20 ] [ 10 10 100 200 <line> [ 20 30 rot move-shape ] keep shape-x ] unit-test
 [ 30 ] [ 10 10 100 200 <line> [ 20 30 rot move-shape ] keep shape-y ] unit-test
 [ 20 ] [ 110 110 -100 -200 <line> [ 20 30 rot move-shape ] keep shape-x ] unit-test
 [ 30 ] [ 110 110 -100 -200 <line> [ 20 30 rot move-shape ] keep shape-y ] unit-test
 [ 10 ] [ 110 110 -100 -200 <line> [ 400 400 rot resize-shape ] keep shape-x ] unit-test
-[ 400 ] [ 110 110 -100 -200 <line> [ 400 400 rot resize-shape ] keep shape-w ] unit-test
+[ 401 ] [ 110 110 -100 -200 <line> [ 400 400 rot resize-shape ] keep shape-w ] unit-test
 
 [ t ] [
     [
         100 x set
         100 y set
-        #{ 110 115 }# << line 0 0 100 150 >> inside?
+        #{ 110 115 }# << line f 0 0 100 150 >> inside?
     ] with-scope
 ] unit-test
+
+[
+    300 620
+] [
+    0 10 0 <pile> "pile" set
+    0 0 100 100 <rectangle> <gadget> "pile" get add-gadget
+    0 0 200 200 <rectangle> <gadget> "pile" get add-gadget
+    0 0 300 300 <rectangle> <gadget> "pile" get add-gadget
+    "pile" get pref-size
+] unit-test
+
+[ ] [ "pile" get layout* ] unit-test

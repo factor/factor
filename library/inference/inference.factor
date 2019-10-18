@@ -1,43 +1,8 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
 ! Copyright (C) 2004, 2005 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USE: errors
-USE: interpreter
-USE: kernel
-USE: lists
-USE: math
-USE: namespaces
-USE: strings
-USE: vectors
-USE: words
-USE: hashtables
-USE: generic
-USE: prettyprint
+USING: errors generic interpreter kernel lists math namespaces
+prettyprint strings unparser vectors words ;
 
 : max-recursion 0 ;
 
@@ -63,29 +28,41 @@ SYMBOL: recursive-state
 GENERIC: value= ( literal value -- ? )
 GENERIC: value-class-and ( class value -- )
 
-TUPLE: value class type-prop recursion ;
+TUPLE: value class recursion class-ties literal-ties ;
 
 C: value ( recursion -- value )
     [ set-value-recursion ] keep ;
 
-TUPLE: computed delegate ;
+TUPLE: computed ;
 
 C: computed ( class -- value )
     swap recursive-state get <value> [ set-value-class ] keep
-    over set-computed-delegate ;
+    over set-delegate ;
 
 M: computed value= ( literal value -- ? )
     2drop f ;
 
-M: computed value-class-and ( class value -- )
-    [ value-class class-and ] keep set-value-class ;
+: failing-class-and ( class class -- class )
+    2dup class-and dup null = [
+        -rot [
+            word-name , " and " , word-name ,
+            " do not intersect" ,
+        ] make-string inference-warning
+    ] [
+        2nip
+    ] ifte ;
 
-TUPLE: literal value delegate ;
+M: computed value-class-and ( class value -- )
+    [
+        value-class  failing-class-and
+    ] keep set-value-class ;
+
+TUPLE: literal value ;
 
 C: literal ( obj rstate -- value )
     [
         >r <value> [ >r dup class r> set-value-class ] keep
-        r> set-literal-delegate
+        r> set-delegate
     ] keep
     [ set-literal-value ] keep ;
 
@@ -97,6 +74,10 @@ M: literal value-class-and ( class value -- )
 
 M: literal set-value-class ( class value -- )
     2drop ;
+
+M: computed literal-value ( value -- )
+    "A literal value was expected where a computed value was"
+    " found: " rot unparse cat3 inference-error ;
 
 : (ensure-types) ( typelist n stack -- )
     pick [
@@ -130,7 +111,7 @@ M: literal set-value-class ( class value -- )
     d-in [ vector-prepend ] change ;
 
 : (present-effect) ( vector -- list )
-    [ value-class ] vector-map vector>list ;
+    vector>list [ value-class ] map ;
 
 : present-effect ( [[ d-in meta-d ]] -- [ in-types out-types ] )
     #! After inference is finished, collect information.
@@ -140,9 +121,6 @@ M: literal set-value-class ( class value -- )
     #! After inference is finished, collect information.
     uncons vector-length >r vector-length r> cons ;
 
-: effect ( -- [[ d-in meta-d ]] )
-    d-in get meta-d get cons ;
-
 : init-inference ( recursive-state -- )
     init-interpreter
     0 <vector> d-in set
@@ -150,7 +128,7 @@ M: literal set-value-class ( class value -- )
     dataflow-graph off
     0 inferring-base-case set ;
 
-DEFER: apply-word
+GENERIC: apply-object
 
 : apply-literal ( obj -- )
     #! Literals are annotated with the current recursive
@@ -158,13 +136,19 @@ DEFER: apply-word
     dup recursive-state get <literal> push-d
     #push dataflow, [ 1 0 node-outputs ] bind ;
 
-: apply-object ( obj -- )
-    #! Apply the object's stack effect to the inferencer state.
-    dup word? [ apply-word ] [ apply-literal ] ifte ;
+M: object apply-object apply-literal ;
 
 : active? ( -- ? )
     #! Is this branch not terminated?
     d-in get meta-d get and ;
+
+: check-active ( -- )
+    active? [
+         "Provable runtime error" inference-error
+    ] unless ;
+
+: effect ( -- [[ d-in meta-d ]] )
+    d-in get meta-d get cons ;
 
 : terminate ( -- )
     #! Ignore this branch's stack effect.
@@ -172,7 +156,7 @@ DEFER: apply-word
 
 : terminator? ( obj -- ? )
     #! Does it throw an error?
-    dup word? [ "terminator" word-property ] [ drop f ] ifte ;
+    dup word? [ "terminator" word-prop ] [ drop f ] ifte ;
 
 : handle-terminator ( quot -- )
     #! If the quotation throws an error, do not count its stack
@@ -191,7 +175,7 @@ DEFER: apply-word
 : check-return ( -- )
     #! Raise an error if word leaves values on return stack.
     meta-r get vector-length 0 = [
-        "Word leaves elements on return stack" throw
+        "Word leaves elements on return stack" inference-error
     ] unless ;
 
 : values-node ( op -- )
@@ -203,6 +187,7 @@ DEFER: apply-word
 : (infer) ( quot -- )
     f init-inference
     infer-quot
+    check-active
     #return values-node check-return ;
 
 : infer ( quot -- [[ in out ]] )

@@ -50,11 +50,11 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 
 		/* comments */
 		FactorWord lineComment = define("syntax","!");
-		lineComment.parsing = new LineComment(lineComment,false);
+		lineComment.parsing = new LineComment(lineComment);
 		FactorWord stackComment = define("syntax","(");
 		stackComment.parsing = new StackComment(stackComment);
 		FactorWord docComment = define("syntax","#!");
-		docComment.parsing = new LineComment(docComment,true);
+		docComment.parsing = new LineComment(docComment);
 
 		/* strings */
 		FactorWord str = define("syntax","\"");
@@ -91,7 +91,6 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		/* word defs */
 		FactorWord def = define("syntax",":");
 		def.parsing = new Def(def);
-		def.docComment = true;
 		FactorWord ine = define("syntax",";");
 		ine.parsing = new Ine(ine);
 		FactorWord symbol = define("syntax","SYMBOL:");
@@ -121,19 +120,19 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		pushWord.parsing = new PushWord(pushWord);
 
 		/* OOP */
-		FactorWord generic = define("generic","GENERIC:");
+		FactorWord generic = define("syntax","GENERIC:");
 		generic.parsing = new Definer(generic);
-		FactorWord traits = define("generic","TRAITS:");
-		traits.parsing = new Definer(traits);
-		FactorWord beginMethod = define("generic","M:");
+		FactorWord beginMethod = define("syntax","M:");
 		beginMethod.parsing = new BeginMethod(beginMethod);
-		FactorWord beginConstructor = define("generic","C:");
+		FactorWord beginConstructor = define("syntax","C:");
 		beginConstructor.parsing = new BeginConstructor(beginConstructor);
-		FactorWord beginPredicate = define("generic","PREDICATE:");
+		FactorWord beginPredicate = define("syntax","PREDICATE:");
 		beginPredicate.parsing = new BeginPredicate(beginPredicate);
-		FactorWord beginUnion = define("generic","UNION:");
-		beginUnion.parsing = new BeginUnion(beginUnion);
-		FactorWord tuple = define("generic","TUPLE:");
+		FactorWord beginUnion = define("syntax","UNION:");
+		beginUnion.parsing = new ClassDefinition(beginUnion);
+		FactorWord beginBuiltin = define("syntax","BUILTIN:");
+		beginBuiltin.parsing = new ClassDefinition(beginBuiltin);
+		FactorWord tuple = define("syntax","TUPLE:");
 		tuple.parsing = new Tuple(tuple);
 	} //}}}
 
@@ -194,7 +193,7 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		{
 			// save to same workspace as vocabulary,
 			// or no workspace if vocabulary is builtins
-			FactorWord word = new FactorWord(vocabulary,name);
+			FactorWord word = new FactorWord(this,vocabulary,name);
 			v.put(name,word);
 			return word;
 		}

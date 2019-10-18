@@ -15,7 +15,7 @@ USE: prettyprint
 
 [ t ] [
     "editor" get [ caret get ] bind
-    "Hello world" str-length =
+    "Hello world" string-length =
 ] unit-test
 
 [ "Hello, crazy world" ] [
@@ -33,7 +33,7 @@ USE: prettyprint
 ] unit-test
 
 [ "Hello, crazy" ] [
-    "editor" get [ caret get line-text get str-head ] bind
+    "editor" get [ caret get line-text get string-head ] bind
 ] unit-test
 
 [ 0 ]

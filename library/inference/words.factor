@@ -29,38 +29,16 @@ strings vectors words hashtables parser prettyprint ;
     #! produces a number of values.
     #call swap (consume/produce) ;
 
-: apply-effect ( word [ in-types out-types ] -- )
-    #! If a word does not have special inference behavior, we
-    #! either execute the word in the meta interpreter (if it is
-    #! side-effect-free and all parameters are literal), or
-    #! simply apply its stack effect to the meta-interpreter.
-    over "infer" word-property [
-        swap car ensure-d call drop
-    ] [
-        consume/produce
-    ] ifte* ;
-
 : no-effect ( word -- )
-    "Unknown stack effect: " swap word-name cat2 throw ;
-
-: with-block ( word label quot -- node )
-    #! Execute a quotation with the word on the stack, and add
-    #! its dataflow contribution to a new block node in the IR.
-    over [
-        >r
-        dupd cons
-        recursive-state cons@
-        r> call
-    ] (with-block) ;
-
-: recursive? ( word -- ? )
-    dup word-parameter tree-contains? ;
+    "Unknown stack effect: " swap word-name cat2 inference-error ;
 
 : inline-compound ( word -- effect node )
     #! Infer the stack effect of a compound word in the current
     #! inferencer instance. If the word in question is recursive
     #! we infer its stack effect inside a new block.
-    gensym [ word-parameter infer-quot effect ] with-block ;
+    gensym over word-def cons [
+        word-def infer-quot effect
+    ] with-block ;
 
 : infer-compound ( word -- )
     #! Infer a word's stack effect in a separate inferencer
@@ -69,37 +47,75 @@ strings vectors words hashtables parser prettyprint ;
         [
             recursive-state get init-inference
             dup dup inline-compound drop present-effect
-            [ "infer-effect" set-word-property ] keep
+            [ "infer-effect" set-word-prop ] keep
         ] with-scope consume/produce
     ] [
         [
             >r branches-can-fail? [
                 drop
             ] [
-                t "no-effect" set-word-property
+                t "no-effect" set-word-prop
             ] ifte r> rethrow
         ] when*
     ] catch ;
 
 GENERIC: (apply-word)
 
+M: object (apply-word) ( word -- )
+    #! A primitive with an unknown stack effect.
+    no-effect ;
+
 M: compound (apply-word) ( word -- )
     #! Infer a compound word's stack effect.
-    dup "no-effect" word-property [
+    dup "no-effect" word-prop [
         no-effect
     ] [
-        dup "inline" word-property [
-            inline-compound 2drop
-        ] [
-            infer-compound
-        ] ifte
+        infer-compound
     ] ifte ;
-
-M: promise (apply-word) ( word -- )
-    "promise" word-property unit ensure-d ;
 
 M: symbol (apply-word) ( word -- )
     apply-literal ;
+
+GENERIC: apply-word
+
+: apply-default ( word -- )
+    dup "infer-effect" word-prop [
+        over "infer" word-prop [
+            swap car ensure-d call drop
+        ] [
+            consume/produce
+        ] ifte*
+    ] [
+        (apply-word)
+    ] ifte* ;
+
+M: word apply-word ( word -- )
+    apply-default ;
+
+M: compound apply-word ( word -- )
+    dup "inline" word-prop [
+        inline-compound 2drop
+    ] [
+        apply-default
+    ] ifte ;
+
+: literal-type? ( -- ? )
+    peek-d value-class builtin-supertypes
+    dup length 1 = >r [ tuple ] = not r> and ;
+
+: dynamic-dispatch-warning ( word -- )
+    "Dynamic dispatch for " swap word-name cat2
+    inference-warning ;
+
+M: generic apply-word ( word -- )
+    #! If the type of the value at the top of the stack is
+    #! known, inline the method body.
+    [ object ] ensure-d
+!    literal-type? branches-can-fail? not and [
+!        inline-compound 2drop
+!    ] [
+        dup dynamic-dispatch-warning apply-default ;
+!    ] ifte ;
 
 : with-recursion ( quot -- )
     [
@@ -110,9 +126,9 @@ M: symbol (apply-word) ( word -- )
         rethrow
     ] catch ;
 
-: base-case ( word label -- )
+: base-case ( word [ label quot ] -- )
     [
-        over inline-compound [
+        car over inline-compound [
             drop
             [ #call-label ] [ #call ] ?ifte
             node-op set
@@ -121,9 +137,9 @@ M: symbol (apply-word) ( word -- )
     ] with-recursion ;
 
 : no-base-case ( word -- )
-    word-name " does not have a base case." cat2 throw ;
+    word-name " does not have a base case." cat2 inference-error ;
 
-: recursive-word ( word label -- )
+: recursive-word ( word [ label quot ] -- )
     #! Handle a recursive call, by either applying a previously
     #! inferred base case, or raising an error. If the recursive
     #! call is to a local block, emit a label call node.
@@ -137,36 +153,27 @@ M: symbol (apply-word) ( word -- )
         ] ifte
     ] ifte ;
 
-: apply-word ( word -- )
+M: word apply-object ( word -- )
     #! Apply the word's stack effect to the inferencer state.
     dup recursive-state get assoc [
         recursive-word
     ] [
-        dup "infer-effect" word-property [
-            apply-effect
-        ] [
-            (apply-word)
-        ] ifte*
+        apply-word
     ] ifte* ;
 
 : infer-call ( -- )
     [ general-list ] ensure-d
-    dataflow-drop,
-    gensym dup [
-        drop pop-d dup
-        value-recursion recursive-state set
-        literal-value
-        dup infer-quot
-    ] with-block drop handle-terminator ;
+    dataflow-drop, pop-d infer-quot-value ;
 
-\ call [ infer-call ] "infer" set-word-property
+\ call [ infer-call ] "infer" set-word-prop
 
 ! These hacks will go away soon
-\ * [ [ number number ] [ number ] ] "infer-effect" set-word-property
-\ - [ [ number number ] [ number ] ] "infer-effect" set-word-property
-\ = [ [ object object ] [ object ] ] "infer-effect" set-word-property
+\ * [ [ number number ] [ number ] ] "infer-effect" set-word-prop
+\ - [ [ number number ] [ number ] ] "infer-effect" set-word-prop
+\ + [ [ number number ] [ number ] ] "infer-effect" set-word-prop
+\ = [ [ object object ] [ object ] ] "infer-effect" set-word-prop
 
-\ undefined-method t "terminator" set-word-property
-\ undefined-method [ [ object word ] [ ] ] "infer-effect" set-word-property
-\ not-a-number t "terminator" set-word-property
-\ throw t "terminator" set-word-property
+\ no-method t "terminator" set-word-prop
+\ no-method [ [ object word ] [ ] ] "infer-effect" set-word-prop
+\ not-a-number t "terminator" set-word-prop
+\ throw t "terminator" set-word-prop

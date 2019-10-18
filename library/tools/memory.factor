@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: memory
-USING: errors generic kernel lists math namespaces prettyprint
-stdio unparser vectors words ;
+USING: kernel-internals errors generic kernel lists math
+namespaces prettyprint stdio unparser vectors words ;
 
 ! Printing an overview of heap usage.
 
@@ -21,29 +21,50 @@ stdio unparser vectors words ;
 
 ! Some words for iterating through the heap.
 
-: (each-object) ( quot -- )
-    next-object dup [
-        swap dup slip (each-object)
-    ] [
-        2drop
-    ] ifte ; inline
-
 : each-object ( quot -- )
     #! Applies the quotation to each object in the image.
     [
-        begin-scan (each-object)
+        begin-scan
+        [ next-object ] while
     ] [
         end-scan rethrow
-    ] catch ; inline
+    ] catch ;
 
-: instances ( class -- list )
-    #! Return a list of all instances of a built-in or tuple
-    #! class in the image.
+: instances ( quot -- list )
+    #! Return a list of all object that return true when the
+    #! quotation is applied to them.
     [
         [
-            dup class pick = [ , ] [ drop ] ifte
+            [ swap call ] 2keep rot [ , ] [ drop ] ifte
         ] each-object drop
     ] make-list ;
+
+GENERIC: (each-slot) ( quot obj -- ) inline
+
+M: arrayed (each-slot) ( quot array -- )
+    dup array-capacity [
+        [
+            ( quot obj n -- )
+            swap array-nth swap dup slip
+        ] 2keep
+    ] repeat 2drop ;
+
+M: object (each-slot) ( quot obj -- )
+    dup class "slots" word-prop [
+        pick pick >r >r car slot swap call r> r>
+    ] each 2drop ;
+
+: each-slot ( obj quot -- )
+    #! Apply the quotation to each slot value of the object.
+    swap (each-slot) ; inline
+
+: refers? ( to obj -- ? )
+    f swap [ pick eq? or ] each-slot nip ;
+
+: references ( obj -- list )
+    #! Return a list of all objects that refer to a given object
+    #! in the image.
+    [ dupd refers? ] instances nip ;
 
 : vector+ ( n index vector -- )
     [ vector-nth + ] 2keep set-vector-nth ;

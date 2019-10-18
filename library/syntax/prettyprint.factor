@@ -1,13 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-
-! This using kernel-internals is pretty bad. Remove the
-! kernel-internals usage as soon as the tuple class is moved
-! to the generic vocabulary.
-USING: errors generic kernel kernel-internals lists math
-namespaces stdio strings presentation unparser vectors words
-hashtables parser ;
+USING: errors generic hashtables kernel lists math namespaces
+parser presentation stdio streams strings unparser vectors words ;
 
 SYMBOL: prettyprint-limit
 SYMBOL: one-line
@@ -27,7 +22,7 @@ M: object prettyprint* ( indent obj -- indent )
         " ] search" ,
     ] make-string ;
 
-: word-actions ( search -- list )
+: word-actions ( -- list )
     [
         [[ "See"     "see"     ]]
         [[ "Push"    ""        ]]
@@ -36,19 +31,28 @@ M: object prettyprint* ( indent obj -- indent )
         [[ "Usages"  "usages." ]]
     ] ;
 
+: browser-attrs ( word -- style )
+    #! Return the style values for the HTML word browser
+    dup word-vocabulary [ 
+        swap word-name "browser-link-word" swons 
+        swap "browser-link-vocab" swons 
+        2list
+    ] [
+        drop [ ]  
+    ] ifte* ;
+
 : word-attrs ( word -- attrs )
     #! Words without a vocabulary do not get a link or an action
     #! popup.
     dup word-vocabulary [
-        word-link word-actions <actions> "actions" swons unit
+         dup word-link word-actions <actions> "actions" swons unit
+         swap browser-attrs append
     ] [
         drop [ ]
     ] ifte ;
 
 : prettyprint-word ( word -- )
-    dup word-name
-    swap dup word-attrs swap word-style append
-    write-attr ;
+    dup word-name swap word-attrs write-attr ;
 
 M: word prettyprint* ( indent word -- indent )
     dup parsing? [

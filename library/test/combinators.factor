@@ -12,7 +12,6 @@ USE: prettyprint
 
 [ 5 ] [ [ 2 2 + ] 1 slip + ] unit-test
 [ 6 ] [ [ 2 2 + ] 1 1 2slip + + ] unit-test
-[ 6 ] [ [ 2 1 + ] 1 1 1 3slip + + + ] unit-test
 
 [ [ ] keep ] unit-test-fails
 
@@ -30,6 +29,3 @@ USE: prettyprint
 
 [ "2\n" ] [ [ 1 2 [ . ] [ sq . ] ?ifte ] with-string ] unit-test
 [ "9\n" ] [ [ 3 f [ . ] [ sq . ] ?ifte ] with-string ] unit-test
-[ "4\n" ] [ [ 3 4 [ . ] ?when ] with-string ] unit-test
-[ 3 ] [ 3 f [ . ] ?when ] unit-test
-[ t ] [ 3 t [ . ] ?unless ] unit-test

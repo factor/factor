@@ -1,7 +1,5 @@
 #include "factor.h"
 
-#ifdef F_DEBUG
-
 bool equals(CELL obj1, CELL obj2)
 {
 	if(type_of(obj1) == STRING_TYPE
@@ -61,7 +59,7 @@ CELL hash(CELL hash, CELL key)
 
 		a = untag_array(array);
 
-		for(i = 0; i < untag_fixnum_fast(a->capacity); i++)
+		for(i = 0; i < array_capacity(a); i++)
 		{
 			CELL value = assoc(get(AREF(a,i)),key);
 			if(value != F)
@@ -94,7 +92,7 @@ void print_cons(CELL cons)
 
 void print_word(F_WORD* word)
 {
-	CELL name = hash(word->plist,tag_object(from_c_string("name")));
+	CELL name = hash(word->props,tag_object(from_c_string("name")));
 	if(type_of(name) == STRING_TYPE)
 		fprintf(stderr,"%s",to_c_string(untag_string(name)));
 	else
@@ -163,12 +161,3 @@ void dump_stacks(void)
 	fprintf(stderr,"\n");
 	fflush(stderr);
 }
-
-#else
-
-void dump_stacks(void)
-{
-	fprintf(stderr,"Stack dumping disabled -- recompile with F_DEBUG\n");
-}
-
-#endif

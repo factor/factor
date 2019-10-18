@@ -1,79 +1,61 @@
-./library/compiler/simplifier.factor:! $Id: simplifier.factor,v 1.9 2005/01/19 02:42:21 spestov Exp $
-./library/compiler/xt.factor:! $Id: xt.factor,v 1.8 2005/01/07 02:42:07 spestov Exp $
-./library/compiler/assembler.factor:! $Id: assembler.factor,v 1.12 2005/02/15 02:58:05 spestov Exp $
-./library/compiler/generator.factor:! $Id: generator.factor,v 1.13 2005/01/17 20:32:56 spestov Exp $
-./library/compiler/x86/assembler.factor:! $Id: assembler.factor,v 1.3 2005/01/16 22:57:59 spestov Exp $
-./library/compiler/x86/fixnum.factor:! $Id: fixnum.factor,v 1.6 2005/02/17 04:24:35 spestov Exp $
-./library/compiler/optimizer.factor:! $Id: optimizer.factor,v 1.19 2005/01/20 02:01:46 spestov Exp $
-./library/compiler/compiler.factor:! $Id: compiler.factor,v 1.33 2005/01/07 00:10:00 spestov Exp $
-./library/compiler/linearizer.factor:! $Id: linearizer.factor,v 1.22 2005/02/18 00:01:10 spestov Exp $
-./library/ui/line-editor.factor:! $Id: line-editor.factor,v 1.3 2005/01/04 05:41:14 spestov Exp $
-./library/ui/console.factor:! $Id: console.factor,v 1.17 2005/02/15 03:15:02 spestov Exp $
+./library/compiler/x86/assembler.factor:! $Id: assembler.factor,v 1.5 2005/03/16 03:23:52 spestov Exp $
+./library/compiler/x86/fixnum.factor:! $Id: fixnum.factor,v 1.8 2005/03/16 03:23:52 spestov Exp $
+./library/compiler/optimizer.factor:! $Id: optimizer.factor,v 1.20 2005/03/05 19:45:21 spestov Exp $
+./library/ui/line-editor.factor:! $Id: line-editor.factor,v 1.4 2005/03/05 21:33:40 spestov Exp $
 ./library/win32/win32-io.factor:! $Id: win32-io.factor,v 1.3 2004/12/29 07:16:03 eiz Exp $
 ./library/win32/win32-errors.factor:! $Id: win32-errors.factor,v 1.5 2005/02/07 23:04:49 eiz Exp $
 ./library/win32/winsock.factor:! $Id: winsock.factor,v 1.3 2005/02/18 04:01:29 eiz Exp $
-./library/httpd/file-responder.factor:! $Id: file-responder.factor,v 1.17 2005/01/29 05:07:55 spestov Exp $
+./library/httpd/file-responder.factor:! $Id: file-responder.factor,v 1.18 2005/03/05 21:33:38 spestov Exp $
 ./library/httpd/http-common.factor:! $Id: http-common.factor,v 1.19 2005/02/15 03:15:00 spestov Exp $
 ./library/httpd/quit-responder.factor:! $Id: quit-responder.factor,v 1.7 2005/02/15 03:15:00 spestov Exp $
-./library/httpd/responder.factor:! $Id: responder.factor,v 1.19 2005/01/14 00:49:44 spestov Exp $
+./library/httpd/responder.factor:! $Id: responder.factor,v 1.20 2005/03/05 21:33:38 spestov Exp $
 ./library/httpd/resource-responder.factor:! $Id: resource-responder.factor,v 1.4 2004/12/11 00:29:03 spestov Exp $
 ./library/httpd/default-responders.factor:! $Id: default-responders.factor,v 1.13 2005/02/14 21:44:15 doublec Exp $
 ./library/httpd/test-responder.factor:! $Id: test-responder.factor,v 1.5 2004/12/11 00:29:03 spestov Exp $
-./library/httpd/url-encoding.factor:! $Id: url-encoding.factor,v 1.14 2005/01/13 22:28:27 spestov Exp $
-./library/inference/dataflow.factor:! $Id: dataflow.factor,v 1.23 2005/01/14 19:56:13 spestov Exp $
+./library/httpd/url-encoding.factor:! $Id: url-encoding.factor,v 1.15 2005/03/05 21:33:38 spestov Exp $
+./library/inference/dataflow.factor:! $Id: dataflow.factor,v 1.24 2005/03/05 19:45:22 spestov Exp $
 ./library/inference/test.factor:! $Id: test.factor,v 1.2 2005/01/13 22:28:28 spestov Exp $
-./library/inference/stack.factor:! $Id: stack.factor,v 1.12 2005/01/16 22:58:25 spestov Exp $
-./library/inference/inference.factor:! $Id: inference.factor,v 1.35 2005/02/09 03:02:41 spestov Exp $
+./library/inference/stack.factor:! $Id: stack.factor,v 1.13 2005/03/05 19:45:22 spestov Exp $
 ./library/bootstrap/win32-io.factor:! $Id: win32-io.factor,v 1.4 2005/02/07 14:46:56 eiz Exp $
-./library/bootstrap/image.factor:! $Id: image.factor,v 1.25 2005/02/10 00:58:52 spestov Exp $
+./library/bootstrap/image.factor:! $Id: image.factor,v 1.30 2005/03/21 19:39:43 spestov Exp $
 ./library/bootstrap/init.factor:! $Id: init.factor,v 1.8 2005/02/07 23:04:34 eiz Exp $
-./library/sdl/sdl-video.factor:! $Id: sdl-video.factor,v 1.14 2005/01/23 21:47:28 spestov Exp $
-./library/sdl/sdl.factor:! $Id: sdl.factor,v 1.5 2004/12/18 05:38:51 spestov Exp $
-./library/sdl/sdl-gfx.factor:! $Id: sdl-gfx.factor,v 1.5 2004/12/18 04:02:19 spestov Exp $
-./library/sdl/sdl-keysym.factor:! $Id: sdl-keysym.factor,v 1.3 2005/01/14 00:49:45 spestov Exp $
-./library/sdl/sdl-event.factor:! $Id: sdl-event.factor,v 1.11 2005/02/04 03:21:51 spestov Exp $
-./library/tools/jedit-wire.factor:! $Id: jedit-wire.factor,v 1.12 2005/02/15 03:15:02 spestov Exp $
 ./library/tools/profiler.factor:! $Id: profiler.factor,v 1.2 2004/12/11 00:29:07 spestov Exp $
-./library/syntax/parse-numbers.factor:! $Id: parse-numbers.factor,v 1.4 2004/12/19 04:18:32 spestov Exp $
-./library/syntax/parse-stream.factor:! $Id: parse-stream.factor,v 1.6 2005/02/15 03:15:01 spestov Exp $
-./library/io/vocabulary-style.factor:! $Id: vocabulary-style.factor,v 1.4 2005/02/14 21:44:15 doublec Exp $
-./library/io/win32-io-internals.factor:! $Id: win32-io-internals.factor,v 1.8 2005/02/15 03:15:01 spestov Exp $
-./library/io/win32-stream.factor:! $Id: win32-stream.factor,v 1.10 2005/02/18 08:48:56 eiz Exp $
-./library/io/stdio-binary.factor:! $Id: stdio-binary.factor,v 1.2 2004/12/11 00:29:04 spestov Exp $
-./library/io/io-internals.factor:! $Id: io-internals.factor,v 1.7 2005/02/15 03:15:01 spestov Exp $
-./library/io/presentation.factor:! $Id: presentation.factor,v 1.5 2005/02/15 03:15:01 spestov Exp $
-./library/io/buffer.factor:! $Id: buffer.factor,v 1.5 2005/02/12 07:23:38 eiz Exp $
-./library/io/logging.factor:! $Id: logging.factor,v 1.6 2005/02/15 03:15:01 spestov Exp $
-./library/io/win32-server.factor:! $Id: win32-server.factor,v 1.8 2005/02/18 08:48:56 eiz Exp $
-./factor/ExternalFactor.java: * $Id: ExternalFactor.java,v 1.16 2005/02/17 02:54:35 spestov Exp $
+./library/syntax/parse-numbers.factor:! $Id: parse-numbers.factor,v 1.5 2005/03/05 21:33:39 spestov Exp $
+./library/io/win32-io-internals.factor:! $Id: win32-io-internals.factor,v 1.10 2005/03/09 03:54:03 spestov Exp $
+./library/io/win32-stream.factor:! $Id: win32-stream.factor,v 1.11 2005/03/05 21:33:38 spestov Exp $
+./library/io/buffer.factor:! $Id: buffer.factor,v 1.6 2005/03/05 21:33:38 spestov Exp $
+./library/io/win32-server.factor:! $Id: win32-server.factor,v 1.9 2005/03/09 03:54:03 spestov Exp $
+./factor/ExternalFactor.java: * $Id: ExternalFactor.java,v 1.17 2005/02/23 04:07:46 spestov Exp $
+./factor/ConstructorArtifact.java: * $Id: ConstructorArtifact.java,v 1.1 2005/03/01 23:55:59 spestov Exp $
 ./factor/math/Complex.java: * $Id: Complex.java,v 1.1.1.1 2004/07/16 06:26:13 spestov Exp $
 ./factor/math/FactorNumber.java: * $Id: FactorNumber.java,v 1.1.1.1 2004/07/16 06:26:12 spestov Exp $
 ./factor/math/NumberParser.java: * $Id: NumberParser.java,v 1.2 2004/08/07 22:45:47 spestov Exp $
 ./factor/math/Ratio.java: * $Id: Ratio.java,v 1.1.1.1 2004/07/16 06:26:13 spestov Exp $
 ./factor/math/FactorMath.java: * $Id: FactorMath.java,v 1.2 2004/08/26 23:37:16 spestov Exp $
+./factor/FactorArtifact.java: * $Id: FactorArtifact.java,v 1.2 2005/02/23 04:07:46 spestov Exp $
 ./factor/FactorExternalizable.java: * $Id: FactorExternalizable.java,v 1.1.1.1 2004/07/16 06:26:06 spestov Exp $
 ./factor/FactorArray.java: * $Id: FactorArray.java,v 1.8 2005/01/07 19:37:20 spestov Exp $
 ./factor/FactorLib.java: * $Id: FactorLib.java,v 1.8 2004/11/17 04:04:50 spestov Exp $
 ./factor/ReadTable.java: * $Id: ReadTable.java,v 1.4 2004/09/06 00:14:36 spestov Exp $
-./factor/FactorReader.java: * $Id: FactorReader.java,v 1.17 2005/01/21 04:10:37 spestov Exp $
+./factor/FactorReader.java: * $Id: FactorReader.java,v 1.20 2005/02/23 04:07:46 spestov Exp $
 ./factor/FactorParsingDefinition.java: * $Id: FactorParsingDefinition.java,v 1.3 2004/11/17 04:04:50 spestov Exp $
 ./factor/Cons.java: * $Id: Cons.java,v 1.5 2005/01/14 00:49:42 spestov Exp $
-./factor/DefaultVocabularyLookup.java: * $Id: DefaultVocabularyLookup.java,v 1.11 2005/02/17 02:54:35 spestov Exp $
+./factor/DefaultVocabularyLookup.java: * $Id: DefaultVocabularyLookup.java,v 1.15 2005/03/19 02:41:12 spestov Exp $
 ./factor/parser/ComplexLiteral.java: * $Id: ComplexLiteral.java,v 1.4 2004/11/17 04:04:50 spestov Exp $
 ./factor/parser/Base.java: * $Id: Base.java,v 1.3 2004/11/17 04:04:50 spestov Exp $
 ./factor/parser/NoParsing.java: * $Id: NoParsing.java,v 1.3 2004/11/17 04:04:50 spestov Exp $
 ./factor/parser/StringLiteral.java: * $Id: StringLiteral.java,v 1.3 2004/11/17 04:04:50 spestov Exp $
-./factor/parser/BeginMethod.java: * $Id: BeginMethod.java,v 1.4 2005/01/07 19:37:21 spestov Exp $
+./factor/parser/BeginMethod.java: * $Id: BeginMethod.java,v 1.5 2005/02/22 02:26:19 spestov Exp $
 ./factor/parser/Tuple.java: * $Id: Tuple.java,v 1.2 2005/02/06 03:51:40 spestov Exp $
 ./factor/parser/Def.java: * $Id: Def.java,v 1.9 2005/01/07 19:37:21 spestov Exp $
 ./factor/parser/F.java: * $Id: F.java,v 1.3 2004/11/17 04:04:50 spestov Exp $
 ./factor/parser/CharLiteral.java: * $Id: CharLiteral.java,v 1.6 2004/11/17 04:04:50 spestov Exp $
-./factor/parser/LineComment.java: * $Id: LineComment.java,v 1.4 2004/11/19 22:28:23 spestov Exp $
+./factor/parser/LineComment.java: * $Id: LineComment.java,v 1.5 2005/02/22 02:26:19 spestov Exp $
 ./factor/parser/BeginUnion.java: * $Id: BeginUnion.java,v 1.1 2005/01/07 19:37:21 spestov Exp $
 ./factor/parser/Using.java: * $Id: Using.java,v 1.2 2005/01/29 21:39:29 spestov Exp $
 ./factor/parser/T.java: * $Id: T.java,v 1.3 2004/11/17 04:04:50 spestov Exp $
 ./factor/parser/StackComment.java: * $Id: StackComment.java,v 1.4 2004/11/19 22:28:23 spestov Exp $
-./factor/parser/BeginConstructor.java: * $Id: BeginConstructor.java,v 1.2 2005/01/07 19:37:21 spestov Exp $
+./factor/parser/BeginConstructor.java: * $Id: BeginConstructor.java,v 1.4 2005/02/23 04:14:56 spestov Exp $
 ./factor/parser/Definer.java: * $Id: Definer.java,v 1.1 2005/01/07 00:10:00 spestov Exp $
 ./factor/parser/PushWord.java: * $Id: PushWord.java,v 1.2 2004/11/17 04:04:50 spestov Exp $
 ./factor/parser/BeginPredicate.java: * $Id: BeginPredicate.java,v 1.1 2005/01/07 19:37:21 spestov Exp $
@@ -81,28 +63,30 @@
 ./factor/parser/Use.java: * $Id: Use.java,v 1.4 2004/11/17 04:04:50 spestov Exp $
 ./factor/parser/EndVector.java: * $Id: EndVector.java,v 1.2 2004/11/17 04:04:50 spestov Exp $
 ./factor/parser/Ket.java: * $Id: Ket.java,v 1.3 2004/11/17 04:04:50 spestov Exp $
+./factor/parser/ClassDefinition.java: * $Id: ClassDefinition.java,v 1.1 2005/03/19 02:49:14 spestov Exp $
 ./factor/parser/Ine.java: * $Id: Ine.java,v 1.10 2005/01/07 19:37:21 spestov Exp $
 ./factor/parser/EndCons.java: * $Id: EndCons.java,v 1.1 2005/01/14 00:49:43 spestov Exp $
 ./factor/parser/Bra.java: * $Id: Bra.java,v 1.3 2004/11/17 04:04:50 spestov Exp $
 ./factor/parser/In.java: * $Id: In.java,v 1.5 2004/12/12 21:32:46 spestov Exp $
 ./factor/parser/BeginVector.java: * $Id: BeginVector.java,v 1.2 2004/11/17 04:04:50 spestov Exp $
-./factor/FactorWord.java: * $Id: FactorWord.java,v 1.11 2005/01/07 00:09:59 spestov Exp $
+./factor/MethodArtifact.java: * $Id: MethodArtifact.java,v 1.1 2005/02/22 02:26:18 spestov Exp $
+./factor/FactorWord.java: * $Id: FactorWord.java,v 1.13 2005/02/23 04:07:46 spestov Exp $
 ./factor/VocabularyLookup.java: * $Id: VocabularyLookup.java,v 1.4 2005/02/17 02:54:35 spestov Exp $
 ./factor/jedit/AbstractCompletion.java: * $Id: AbstractCompletion.java,v 1.1 2005/02/17 02:54:36 spestov Exp $
 ./factor/jedit/FactorVocabCompletion.java: * $Id: FactorVocabCompletion.java,v 1.1 2005/02/17 02:54:36 spestov Exp $
-./factor/jedit/FactorAsset.java: * $Id: FactorAsset.java,v 1.6 2005/01/07 00:09:59 spestov Exp $
+./factor/jedit/FactorAsset.java: * $Id: FactorAsset.java,v 1.7 2005/02/22 02:26:18 spestov Exp $
 ./factor/jedit/InferBufferProcessor.java: * $Id: InferBufferProcessor.java,v 1.3 2005/01/24 02:53:55 spestov Exp $
 ./factor/jedit/FactorParsedData.java: * $Id: FactorParsedData.java,v 1.4 2004/12/19 06:48:31 spestov Exp $
 ./factor/jedit/RestartableFactorScanner.java: * $Id: RestartableFactorScanner.java,v 1.3 2004/12/12 21:32:46 spestov Exp $
-./factor/jedit/FactorSideKickParser.java: * $Id: FactorSideKickParser.java,v 1.26 2005/02/17 02:54:36 spestov Exp $
+./factor/jedit/FactorSideKickParser.java: * $Id: FactorSideKickParser.java,v 1.28 2005/02/23 04:07:46 spestov Exp $
 ./factor/jedit/EditWordDialog.java: * $Id: EditWordDialog.java,v 1.7 2005/02/17 02:54:36 spestov Exp $
-./factor/jedit/FactorPlugin.java: * $Id: FactorPlugin.java,v 1.45 2005/02/18 02:19:26 spestov Exp $
+./factor/jedit/FactorPlugin.java: * $Id: FactorPlugin.java,v 1.47 2005/02/22 02:26:19 spestov Exp $
 ./factor/jedit/FactorOptionPane.java: * $Id: FactorOptionPane.java,v 1.2 2004/11/27 03:23:55 spestov Exp $
 ./factor/jedit/FactorShell.java: * $Id: FactorShell.java,v 1.11 2005/02/10 22:36:19 spestov Exp $
 ./factor/jedit/WordPreview.java: * $Id: WordPreview.java,v 1.12 2005/02/17 02:54:36 spestov Exp $
 ./factor/jedit/WordListDialog.java: * $Id: WordListDialog.java,v 1.4 2004/12/20 02:06:55 spestov Exp $
 ./factor/jedit/ListenerAttributeSet.java: * $Id: ListenerAttributeSet.java,v 1.5 2005/01/07 19:37:21 spestov Exp $
-./factor/jedit/FactorBufferProcessor.java: * $Id: FactorBufferProcessor.java,v 1.4 2005/01/24 02:53:55 spestov Exp $
+./factor/jedit/FactorBufferProcessor.java: * $Id: FactorBufferProcessor.java,v 1.5 2005/02/22 02:26:19 spestov Exp $
 ./factor/jedit/CompileBufferProcessor.java: * $Id: CompileBufferProcessor.java,v 1.2 2005/01/24 02:53:55 spestov Exp $
 ./factor/jedit/FactorWordRenderer.java: * $Id: FactorWordRenderer.java,v 1.14 2005/01/07 00:10:00 spestov Exp $
 ./factor/jedit/TextAreaPopup.java: * $Id: TextAreaPopup.java,v 1.1 2005/01/08 05:15:35 spestov Exp $
@@ -114,6 +98,6 @@
 ./factor/FactorParseException.java: * $Id: FactorParseException.java,v 1.3 2004/08/13 22:43:03 spestov Exp $
 ./factor/FactorException.java: * $Id: FactorException.java,v 1.1.1.1 2004/07/16 06:26:06 spestov Exp $
 ./examples/quadratic.factor:! $Id: quadratic.factor,v 1.3 2004/12/11 02:39:27 spestov Exp $
-./native/s48_bignum.c:$Id: s48_bignum.c,v 1.7 2004/12/11 02:39:45 spestov Exp $
-./native/s48_bignumint.h:$Id: s48_bignumint.h,v 1.10 2005/01/28 01:06:10 spestov Exp $
-./native/s48_bignum.h:$Id: s48_bignum.h,v 1.7 2004/12/11 02:46:41 spestov Exp $
+./native/s48_bignum.c:$Id: s48_bignum.c,v 1.8 2005/03/22 01:59:30 eiz Exp $
+./native/s48_bignumint.h:$Id: s48_bignumint.h,v 1.11 2005/03/22 01:59:30 eiz Exp $
+./native/s48_bignum.h:$Id: s48_bignum.h,v 1.8 2005/03/22 01:59:30 eiz Exp $
