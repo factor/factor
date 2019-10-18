@@ -237,6 +237,8 @@ M: list pdrop ( n object -- object )
   >r uncons r> ( x1 xs2 x )
   swap cons cons ;
 
+: unswons uncons swap ;
+
 : <&>-do-parser2 ( [[ x xs ]] parser2 -- result )
   #! Called by the <&>-parser on each result of the
   #! successfull parse of parser1. It's input is the

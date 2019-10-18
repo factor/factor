@@ -52,7 +52,6 @@ SYMBOL: help-graph
     [ links-out ] help-graph get remove-vertex ;
 
 : xref-articles ( -- )
-    H{ } clone help-graph set
     all-articles [ links-out ] help-graph get add-vertices ;
 
 : help-outliner ( seq quot -- | quot: obj -- )

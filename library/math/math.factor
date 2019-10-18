@@ -28,17 +28,17 @@ G: shift  ( x n -- y ) math-combination ; foldable
 
 GENERIC: bitnot ( n -- n ) foldable
 
-GENERIC: 1+ ( x -- x+1 ) foldable
-GENERIC: 1- ( x -- x-1 ) foldable
 GENERIC: abs ( z -- |z| ) foldable
 GENERIC: absq ( n -- |n|^2 ) foldable
 
 GENERIC: zero? ( x -- ? ) foldable
 M: object zero? drop f ;
 
-: sq dup * ; inline
-: neg 0 swap - ; inline
-: recip 1 swap / ; inline
+: 1+ 1 + ; foldable
+: 1- 1 - ; foldable
+: sq dup * ; foldable
+: neg 0 swap - ; foldable
+: recip 1 swap / ; foldable
 : max ( x y -- z ) [ > ] 2keep ? ; foldable
 : min ( x y -- z ) [ < ] 2keep ? ; foldable
 : between? ( x min max -- ? ) pick >= >r >= r> and ; foldable
@@ -48,17 +48,19 @@ M: object zero? drop f ;
 : truncate ( x -- y ) dup 1 mod - ; foldable
 
 : floor ( x -- y )
-    dup 1 mod dup 0 =
+    dup 1 mod dup zero?
     [ drop ] [ dup 0 < [ - 1- ] [ - ] if ] if ; foldable
 
 : ceiling ( x -- y ) neg floor neg ; foldable
 
 : (repeat) ( i n quot -- )
-    pick pick >=
-    [ 3drop ] [ [ swap >r call 1+ r> ] keep (repeat) ] if ;
-    inline
+    pick pick >= [
+        3drop
+    ] [
+        [ swap >r call 1+ r> ] keep (repeat)
+    ] if ; inline
 
-: repeat ( n quot -- | quot: n -- n ) 0 -rot (repeat) ; inline
+: repeat 0 -rot (repeat) ; inline
 
 : times ( n quot -- | quot: -- )
     swap [ >r dup slip r> ] repeat drop ; inline

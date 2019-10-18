@@ -27,9 +27,6 @@ USE: sequences
 [ 1 2     ] [ [[ 1 2 ]] uncons ] unit-test
 [ 1 [ 2 ] ] [ [ 1 2 ]   uncons ] unit-test
 
-[ 1 2     ] [ [[ 2 1 ]] unswons ] unit-test
-[ [ 2 ] 1 ] [ [ 1 2 ]   unswons ] unit-test
-
 [ 1 3 ] [ [[ 1 2 ]] [[ 3 4 ]] 2car ] unit-test
 [ 2 4 ] [ [[ 1 2 ]] [[ 3 4 ]] 2cdr ] unit-test
 

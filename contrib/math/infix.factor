@@ -89,6 +89,8 @@ UNION: value number string ;
     #! The semicolon token
     T{ tok f CHAR: ; } ;
 
+: unswons uncons swap ;
+
 : nest-apply ( [ ast ] -- apply )
     unswons unit swap [
         swap <apply> unit

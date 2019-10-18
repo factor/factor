@@ -1,4 +1,4 @@
-USING: errors help kernel ;
+USING: errors help kernel kernel-internals ;
 
 HELP: catchstack* "( -- catchstack )"
 { $values { "catchstack" "a vector" } }

@@ -3,8 +3,8 @@ CC = gcc
 BINARY = f
 IMAGE = factor.image
 BUNDLE = Factor.app
-DISK_IMAGE_DIR = Factor-0.81
-DISK_IMAGE = Factor-0.81.dmg
+DISK_IMAGE_DIR = Factor-0.82
+DISK_IMAGE = Factor-0.82.dmg
 
 ifdef DEBUG
 	DEFAULT_CFLAGS = -g
@@ -110,12 +110,15 @@ macosx.app:
 	mkdir -p $(BUNDLE)/Contents/Resources/fonts/
 	cp -R fonts/*.ttf $(BUNDLE)/Contents/Resources/fonts/
 
-	find doc library contrib \( -name '*.factor' \
+	chmod +x cp_dir
+	find doc library contrib examples \( -name '*.factor' \
 		-o -name '*.facts' \
 		-o -name '*.txt' \
 		-o -name '*.html' \
 		-o -name '*.js' \) \
 		-exec ./cp_dir {} $(BUNDLE)/Contents/Resources/{} \;
+
+	cp version.factor $(BUNDLE)/Contents/Resources/
 
 	cp $(IMAGE) $(BUNDLE)/Contents/Resources/factor.image
 
@@ -128,7 +131,7 @@ macosx.app:
 		Factor.app/Contents/MacOS/Factor
 
 macosx.dmg:
-	rm $(DISK_IMAGE)
+	rm -f $(DISK_IMAGE)
 	rm -rf $(DISK_IMAGE_DIR)
 	mkdir $(DISK_IMAGE_DIR)
 	cp -R $(BUNDLE) $(DISK_IMAGE_DIR)/$(BUNDLE)

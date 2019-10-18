@@ -42,7 +42,6 @@ void early_init(void)
 const char *default_image_path(void)
 {
 	NSBundle *bundle = [NSBundle mainBundle];
-	NSString *path = [bundle bundlePath];
-	NSString *image = [path stringByAppendingString:@"/Contents/Resources/factor.image"];
+	NSString *image = [[bundle resourcePath] stringByAppendingString:@"/factor.image"];
 	return [image cString];
 }

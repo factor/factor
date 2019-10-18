@@ -10,8 +10,11 @@ GENERIC: summary ( object -- string )
     0 > "a positive " "a negative " ? ;
 
 M: integer summary
-    dup sign-string over 2 mod zero? "even " "odd " ?
-    rot class word-name append3 ;
+    dup zero? [
+        "a " "zero "
+    ] [
+        dup sign-string over 2 mod zero? "even " "odd " ?
+    ] if rot class word-name append3 ;
 
 M: real summary
     dup sign-string swap class word-name append ;
@@ -28,7 +31,7 @@ M: object summary
 
 : slot-sheet ( obj -- sheet )
     dup class "slots" word-prop
-    dup [ second ] map -rot
+    dup [ third ] map -rot
     [ first slot ] map-with
     2array ;
 

@@ -197,3 +197,7 @@ H{ } clone "cache-test" set
 [ H{ } ] [ { H{ } } hash-concat ] unit-test
 [ H{ { 1 2 } } ] [ { H{ { 1 2 } } } hash-concat ] unit-test
 [ H{ { 1 2 } { 3 4 } } ] [ { H{ { 1 2 } } H{ { 3 4 } } } hash-concat ] unit-test
+
+! Resource leak...
+H{ } "x" set
+100 [ drop "x" get clear-hash ] each

@@ -111,5 +111,5 @@ DEFER: (splay)
 USING: namespaces words ;
 
 <splay-tree> "foo" set
-[ dup word-name "foo" get set-splay ] each-word
-[ dup word-name "foo" get get-splay drop ] each-word
+all-words [ dup word-name "foo" get set-splay ] each
+all-words [ dup word-name "foo" get get-splay drop ] each

@@ -58,21 +58,21 @@ GENERIC: handle-property-event
 
 : handle-event ( event obj -- )
   over XAnyEvent-type
-  { { [ dup Expose = ]			[ drop handle-expose-event ] }
-    { [ dup KeyPress = ]		[ drop handle-key-press-event ] }
-    { [ dup KeyRelease = ]		[ drop handle-key-release-event ] }
-    { [ dup ButtonPress = ]		[ drop handle-button-press-event ] }
-    { [ dup ButtonRelease = ]		[ drop handle-button-release-event ] }
-    { [ dup ConfigureNotify = ]		[ drop handle-configure-event ] }
-    { [ dup EnterNotify = ]		[ drop handle-enter-window-event ] }
-    { [ dup LeaveNotify = ]		[ drop handle-leave-window-event ] }
-    { [ dup DestroyNotify = ]		[ drop handle-destroy-window-event ] }
-    { [ dup MapRequest = ]		[ drop handle-map-request-event ] }
-    { [ dup MapNotify = ]		[ drop handle-map-event ] }
-    { [ dup ConfigureRequest = ]	[ drop handle-configure-request-event ] }
-    { [ dup UnmapNotify = ]		[ drop handle-unmap-event ] }
-    { [ dup PropertyNotify = ]		[ drop handle-property-event ] }
-    { [ t ]                [ "handle-event ignoring event" print flush 3drop ] } }
+  { { [ dup Expose = ]		 [ drop handle-expose-event ] }
+    { [ dup KeyPress = ]	 [ drop handle-key-press-event ] }
+    { [ dup KeyRelease = ]	 [ drop handle-key-release-event ] }
+    { [ dup ButtonPress = ]	 [ drop handle-button-press-event ] }
+    { [ dup ButtonRelease = ]	 [ drop handle-button-release-event ] }
+    { [ dup ConfigureNotify = ]	 [ drop handle-configure-event ] }
+    { [ dup EnterNotify = ]	 [ drop handle-enter-window-event ] }
+    { [ dup LeaveNotify = ]	 [ drop handle-leave-window-event ] }
+    { [ dup DestroyNotify = ]	 [ drop handle-destroy-window-event ] }
+    { [ dup MapRequest = ]	 [ drop handle-map-request-event ] }
+    { [ dup MapNotify = ]	 [ drop handle-map-event ] }
+    { [ dup ConfigureRequest = ] [ drop handle-configure-request-event ] }
+    { [ dup UnmapNotify = ]      [ drop handle-unmap-event ] }
+    { [ dup PropertyNotify = ]   [ drop handle-property-event ] }
+    { [ t ] [ "handle-event ignoring event" print flush 3drop ] } }
   cond ;
 
 M: window handle-configure-event ( event obj -- )

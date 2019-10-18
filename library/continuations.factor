@@ -1,9 +1,13 @@
-! Copyright (C) 2003, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2003, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+IN: kernel-internals
+USING: vectors ;
+
+: catchstack* ( -- cs ) 6 getenv { vector } declare ; inline
+
 IN: errors
 USING: kernel kernel-internals ;
 
-: catchstack* ( -- cs ) 6 getenv ; inline
 : catchstack ( -- cs ) catchstack* clone ; inline
 : set-catchstack ( cs -- ) clone 6 setenv ; inline
 

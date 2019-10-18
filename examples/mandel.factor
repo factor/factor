@@ -70,7 +70,7 @@ strings test ;
     ] map-with ;
 
 : iter ( c z nb-iter -- x )
-    over absq 4.0 >= over 0 = or
+    over absq 4.0 >= over zero? or
     [ 2nip ] [ 1- >r sq dupd + r> iter ] if ; inline
 
 SYMBOL: cols
@@ -88,7 +88,7 @@ SYMBOL: cols
 : render ( -- )
     height [
         width [
-            2dup swap c 0 nb-iter iter dup 0 = [
+            2dup swap c 0 nb-iter iter dup zero? [
                 drop "\0\0\0"
             ] [
                 cols get [ length mod ] keep nth

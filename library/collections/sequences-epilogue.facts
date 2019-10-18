@@ -40,8 +40,8 @@ HELP: memq? "( obj seq -- ? )"
 }
 { $see-also index index* member? } ;
 
-HELP: remove "( elt seq -- ? )"
-{ $values { "elt" "an object" } { "seq" "a sequence" } }
+HELP: remove "( elt seq -- newseq )"
+{ $values { "elt" "an object" } { "seq" "a sequence" } { "newseq" "a new sequence" } }
 { $description "Outputs a new sequence containing all elements of the input sequence except those equal to the given element." } ;
 
 HELP: subst "( newseq oldseq seq -- )"

@@ -38,7 +38,7 @@ SYMBOL: position
 SYMBOL: tape
 
 ! Initial tape
-20 zero-array >vector tape set
+20 0 <array> >vector tape set
 
 : sym ( -- sym )
     #! Symbol at head position.

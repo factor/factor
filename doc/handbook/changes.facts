@@ -1,6 +1,16 @@
 USING: generic help inspector memory sequences ;
 
 ARTICLE: "changes" "Changes in the latest release"
+{ $subheading "Factor 0.82" }
+{ $list
+    "New code generator framework in compiler"
+    "Floating point operations are now open-coded, resulting in a performance gain"
+    { "Remove " { $snippet "unswons" } " word" }
+    "Implement value type struct inputs to callbacks on AMD64"
+    "Fix some Unix I/O bugs"
+    "Standard OS X-style menu bar in the Cocoa UI (Kevin Reid)"
+    "Objective C methods defined in Factor can now return C structures by value"
+}
 { $subheading "Factor 0.81" }
 { $subtopic "UI"
     { $list

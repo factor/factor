@@ -13,6 +13,8 @@ void primitive_to_fixnum(void);
 
 void primitive_fixnum_add(void);
 void primitive_fixnum_subtract(void);
+void primitive_fixnum_add_fast(void);
+void primitive_fixnum_subtract_fast(void);
 void primitive_fixnum_multiply(void);
 void primitive_fixnum_divint(void);
 void primitive_fixnum_divfloat(void);

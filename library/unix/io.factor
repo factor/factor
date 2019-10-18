@@ -1,5 +1,5 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2004, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: io-internals
 USING: alien arrays errors generic hashtables io kernel
 kernel-internals lists math parser queues sequences strings
@@ -66,7 +66,7 @@ C: port ( handle buffer -- port )
     80 <sbuf> over set-port-sbuf ;
 
 : touch-port ( port -- )
-    dup port-timeout dup 0 =
+    dup port-timeout dup zero?
     [ 2drop ] [ millis + swap set-port-cutoff ] if ;
 
 M: port set-timeout ( timeout port -- )
@@ -104,7 +104,7 @@ GENERIC: task-container ( task -- vector )
 : add-io-task ( callback task -- )
     [ >r <queue> [ enque ] keep r> set-io-task-callbacks ] keep
     dup io-task-fd over task-container 2dup hash [
-        "Cannot perform multiple I/O ops on the same port" throw
+        "Cannot perform multiple reads from the same port" throw
     ] when set-hash ;
 
 : remove-io-task ( task -- )
@@ -115,11 +115,8 @@ GENERIC: task-container ( task -- vector )
     queue-empty? [ remove-io-task ] [ drop ] if r> ;
 
 : handle-fd ( task -- )
-    dup do-io-task [
-        dup io-task-port touch-port pop-callback continue
-    ] [
-        drop
-    ] if ;
+    dup io-task-port touch-port dup do-io-task
+    [ pop-callback continue ] [ drop ] if ;
 
 : timeout? ( port -- ? )
     port-cutoff dup zero? not swap millis < and ;
@@ -136,18 +133,23 @@ GENERIC: task-container ( task -- vector )
     ] hash-each-with ;
 
 : init-fdset ( fdset tasks -- )
-    >r dup FD_SETSIZE clear-bits r>
+    >r dup dup FD_SETSIZE clear-bits r>
     [ drop t swap rot set-bit-nth ] hash-each-with ;
 
+: read-fdset/tasks
+    read-fdset get-global read-tasks get-global ;
+
+: write-fdset/tasks
+    write-fdset get-global write-tasks get-global ;
+
 : init-fdsets ( -- read write except )
-    read-fdset get [ read-tasks get init-fdset ] keep
-    write-fdset get [ write-tasks get init-fdset ] keep
-    f ;
+    read-fdset/tasks init-fdset
+    write-fdset/tasks init-fdset f ;
 
 : io-multiplex ( timeout -- )
-    >r FD_SETSIZE init-fdsets r> make-timeval select ( io-error ) drop
-    read-fdset get read-tasks get handle-fdset
-    write-fdset get write-tasks get handle-fdset ;
+    >r FD_SETSIZE init-fdsets r> make-timeval select io-error
+    read-fdset/tasks handle-fdset
+    write-fdset/tasks handle-fdset ;
 
 ! Readers
 
@@ -206,12 +208,12 @@ M: read-task do-io-task ( task -- ? )
         2drop f
     ] if ;
 
-M: read-task task-container drop read-tasks get ;
+M: read-task task-container drop read-tasks get-global ;
 
 : wait-to-read ( count port -- )
     2dup can-read-count? [
         [ -rot <read-task> add-io-task stop ] callcc0
-    ] unless 2drop ;
+    ] unless pending-error drop ;
 
 M: port stream-read ( count stream -- string )
     dup input check-port
@@ -255,24 +257,14 @@ C: write-task ( port -- task )
     [ >r <io-task> r> set-delegate ] keep ;
 
 M: write-task do-io-task
-    io-task-port dup buffer-length zero? over port-error or [
-        0 swap buffer-reset t
-    ] [
-        write-step f
-    ] if ;
+    io-task-port dup buffer-length zero? over port-error or
+    [ 0 swap buffer-reset t ] [ write-step f ] if ;
 
-M: write-task task-container drop write-tasks get ;
+M: write-task task-container drop write-tasks get-global ;
 
 : add-write-io-task ( callback task -- )
-    dup io-task-fd write-tasks get hash [
-        dup write-task? [
-            nip io-task-callbacks enque
-        ] [
-            drop add-io-task
-        ] if
-    ] [
-        add-io-task
-    ] if* ;
+    dup io-task-fd write-tasks get-global hash
+    [ io-task-callbacks enque ] [ add-io-task ] ?if ;
 
 : port-flush ( port -- )
     [ swap <write-task> add-write-io-task stop ] callcc0 drop ;
@@ -292,8 +284,8 @@ M: port stream-write ( string writer -- )
 
 M: port stream-close ( stream -- )
     dup port-type closed eq? [
-        dup port-type output eq? >r closed over set-port-type r>
-        [ dup port-flush ] when dup port-handle close
+        dup port-type >r closed over set-port-type r>
+        output eq? [ dup port-flush ] when dup port-handle close
         dup delegate [ buffer-free ] when* f over set-delegate
     ] unless drop ;
 

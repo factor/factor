@@ -9,9 +9,10 @@ TUPLE: tombstone ;
 : ((empty)) T{ tombstone f } ; inline
 : ((tombstone)) T{ tombstone t } ; inline
 
-: hash@ ( key keys -- n ) >r hashcode r> length 2 /i rem 2 * ;
+: hash@ ( key keys -- n )
+    >r hashcode r> length 2 /i rem 2 * ; inline
 
-: probe ( heys i -- hash i ) 2 + over length mod ;
+: probe ( heys i -- hash i ) 2 + over length mod ; inline
 
 : (key@) ( key keys i -- n )
     3dup swap nth-unsafe {
@@ -21,51 +22,58 @@ TUPLE: tombstone ;
         { [ t ] [ probe (key@) ] }
     } cond ;
 
-: key@ ( key hash -- n ) hash-array 2dup hash@ (key@) ;
+: key@ ( key hash -- n )
+    hash-array 2dup hash@ (key@) ; inline
 
 : if-key ( key hash true false -- | true: index key hash -- )
     >r >r [ key@ ] 2keep pick -1 > r> r> if ; inline
 
-: <hash-array> ( n -- array ) 1+ 4 * ((empty)) <array> ;
+: <hash-array> ( n -- array )
+    1+ 4 * ((empty)) <array> ; inline
+
+: init-hash ( hash -- )
+    0 over set-hash-count 0 swap set-hash-deleted ;
 
 : reset-hash ( n hash -- )
-    swap <hash-array> over set-hash-array
-    0 over set-hash-count 0 swap set-hash-deleted ;
+    swap <hash-array> over set-hash-array init-hash ;
 
 : (new-key@) ( key keys i -- n )
     3dup swap nth-unsafe dup tombstone? [
         2drop 2nip
     ] [
         = [ 2nip ] [ probe (new-key@) ] if
-    ] if ;
+    ] if ; inline
 
 : new-key@ ( key hash -- n )
-    hash-array 2dup hash@ (new-key@) ;
+    hash-array 2dup hash@ (new-key@) ; inline
 
 : nth-pair ( n seq -- key value )
-    [ nth-unsafe ] 2keep >r 1+ r> nth-unsafe ;
+    [ nth-unsafe ] 2keep >r 1+ r> nth-unsafe ; inline
 
 : set-nth-pair ( value key n seq -- )
-    [ set-nth-unsafe ] 2keep >r 1+ r> set-nth-unsafe ;
+    [ set-nth-unsafe ] 2keep >r 1+ r> set-nth-unsafe ; inline
 
-: hash-count+ dup hash-count 1+ swap set-hash-count ;
+: hash-count+
+    dup hash-count 1+ swap set-hash-count ; inline
 
-: hash-deleted+ dup hash-deleted 1+ swap set-hash-deleted ;
+: hash-deleted+
+    dup hash-deleted 1+ swap set-hash-deleted ; inline
 
-: hash-deleted- dup hash-deleted 1- swap set-hash-deleted ;
+: hash-deleted-
+    dup hash-deleted 1- swap set-hash-deleted ; inline
 
 : change-size ( hash old -- )
     dup ((tombstone)) eq? [
         drop hash-deleted-
     ] [
         ((empty)) eq? [ hash-count+ ] [ drop ] if
-    ] if ;
+    ] if ; inline
 
 : (set-hash) ( value key hash -- )
     2dup new-key@ swap
     [ hash-array 2dup nth-unsafe ] keep
     ( value key n hash-array old hash )
-    swap change-size set-nth-pair ;
+    swap change-size set-nth-pair ; inline
 
 : (each-pair) ( quot array i -- | quot: k v -- )
     over length over number= [
@@ -124,7 +132,7 @@ IN: hashtables
     dup [ hash ] [ 2drop f ] if ;
 
 : clear-hash ( hash -- )
-    [ hash-array length ] keep reset-hash ;
+    dup init-hash hash-array [ drop ((empty)) ] inject ;
 
 : remove-hash ( key hash -- )
     [
@@ -135,7 +143,8 @@ IN: hashtables
         3drop
     ] if-key ;
 
-: hash-size ( hash -- n ) dup hash-count swap hash-deleted - ;
+: hash-size ( hash -- n )
+    dup hash-count swap hash-deleted - ; inline
 
 : hash-empty? ( hash -- ? ) hash-size zero? ;
 
@@ -146,7 +155,7 @@ IN: hashtables
 
 : ?grow-hash ( hash -- )
     dup hash-count 3 * over hash-array length >
-    [ dup grow-hash ] when drop ;
+    [ dup grow-hash ] when drop ; inline
 
 : set-hash ( value key hash -- )
     [ (set-hash) ] keep ?grow-hash ;
@@ -234,9 +243,6 @@ M: hashtable hashcode ( hash -- n )
 
 : ?hash* ( key hash/f -- value/f )
     dup [ hash* ] [ 2drop f f ] if ; flushable
-
-: ?set-hash ( value key hash/f -- hash )
-    [ [ set-hash ] keep ] [ associate ] if ;
 
 : hash-stack ( key seq -- value )
     [ dupd hash-member? ] find-last nip ?hash ; flushable

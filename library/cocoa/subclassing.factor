@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: objc
 USING: alien arrays compiler hashtables kernel kernel-internals
-libc math namespaces sequences strings words ;
+libc lists math namespaces sequences strings words ;
 
 : init-method ( method alien -- )
     >r first3 r>
@@ -64,13 +64,19 @@ libc math namespaces sequences strings words ;
     >r 1array r> append
     [ [ alien>objc-types get hash % CHAR: 0 , ] each ] "" make ;
 
-: prepare-method ( { name ret types quot } -- { name type imp  } )
-    [ first3 encode-types ] keep
-    [ 1 swap tail % \ alien-callback , ] [ ] make compile-quot
-    3array ;
+: struct-return ( ret types quot -- ret types quot )
+    pick c-struct? [
+        pick c-size [ memcpy ] curry append
+        >r { "void*" } swap append >r drop "void" r> r>
+    ] when ;
+
+: prepare-method ( ret types quot -- type imp )
+    >r [ encode-types ] 2keep r>
+    [ struct-return 3array % \ alien-callback , ] [ ] make
+    compile-quot ;
 
 : prepare-methods ( methods -- methods )
-    [ prepare-method ] map ;
+    [ first4 prepare-method 3array ] map ;
 
 : define-objc-class ( superclass name imeth cmeth -- )
     pick >r

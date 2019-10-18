@@ -1,7 +1,11 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+IN: generic
+USING: arrays errors hashtables kernel kernel-internals lists
+math namespaces parser sequences sequences-internals strings
+vectors words ;
+
 IN: kernel-internals
-USING: arrays errors hashtables kernel lists math namespaces parser sequences sequences-internals strings vectors words ;
 
 : class-tuple ( object -- class )
     dup tuple? [ 2 slot ] [ drop f ] if ; inline
@@ -12,11 +16,11 @@ USING: arrays errors hashtables kernel lists math namespaces parser sequences se
         [ 2dup swap array-nth >r pick array-nth r> = ] all? 2nip
     ] [
         2drop f
-    ] if ; inline
+    ] if ;
 
 : tuple-hashcode ( n tuple -- n )
-    dup class-tuple hashcode >r >r 1- r>
-    4 slot hashcode* r> bitxor ;
+    dup class-tuple hashcode >r >r 1-
+    r> 4 slot hashcode* r> bitxor ;
 
 IN: generic
 
@@ -29,7 +33,7 @@ IN: generic
     define-predicate ;
 
 : forget-tuple ( class -- )
-    dup forget "predicate" word-prop car [ forget ] when* ;
+    dup forget "predicate" word-prop first [ forget ] when* ;
 
 : check-shape ( word slots -- )
     >r in get lookup dup [
@@ -39,7 +43,7 @@ IN: generic
         r> 2drop
     ] if ;
 
-: delegate-slots { { 3 delegate set-delegate } } ;
+: delegate-slots { { 3 object delegate set-delegate } } ;
 
 : tuple-slots ( tuple slots -- )
     2dup "slot-names" set-word-prop
@@ -80,7 +84,7 @@ M: tuple clone ( tuple -- tuple )
 M: tuple hashcode* ( n tuple -- n )
     {
         { [ over 0 <= ] [ 2drop 0 ] }
-        { [ dup array-capacity 2 <= ] [ nip class-tuple hashcode ] }
+        { [ dup array-capacity 2 <= ] [ nip class hashcode ] }
         { [ t ] [ tuple-hashcode ] }
     } cond ;
 

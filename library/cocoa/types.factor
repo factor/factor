@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: cocoa
-USING: alien kernel ;
+USING: alien kernel math ;
 
 BEGIN-STRUCT: NSRect
     FIELD: float x
@@ -19,6 +19,15 @@ TYPEDEF: NSRect CGRect
     [ set-NSRect-w ] keep
     [ set-NSRect-y ] keep
     [ set-NSRect-x ] keep ;
+
+: NSRect-x-y ( rect -- origin-x origin-y )
+    [ NSRect-x ] keep NSRect-y ;
+
+: NSRect-x-far-y ( rect -- origin-x far-y )
+    [ NSRect-x-y ] keep NSRect-h + ;
+  
+: <far-y-NSRect> ( x y w h -- rect )
+    rot dupd swap - -rot <NSRect> ;
 
 BEGIN-STRUCT: NSPoint
     FIELD: float x

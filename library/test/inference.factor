@@ -10,22 +10,6 @@ math-internals namespaces parser sequences test vectors ;
 
 [ t ] [ [ [ ] [ ] if ] dataflow dup [ [ ] map-nodes ] with-node-iterator = ] unit-test
 
-[
-    T{ shuffle f { "a" } { } { "a" } { "a" } }
-] [
-    T{ shuffle f { "a" } { } { "a" "a" } { } }
-    T{ shuffle f { "b" } { } { } { "b" } }
-    compose-shuffle
-] unit-test
-
-[
-    T{ shuffle f { "b" "a" } { } { "b" "b" } { } }
-] [
-    T{ shuffle f { "a" } { } { } { } }
-    T{ shuffle f { "b" } { } { "b" "b" } { } }
-    compose-shuffle
-] unit-test
-
 [ { 0 2 } ] [ [ 2 "Hello" ] infer ] unit-test
 [ { 1 2 } ] [ [ dup ] infer ] unit-test
 
@@ -225,10 +209,17 @@ DEFER: do-crap
 : do-crap dup [ do-crap ] [ more-crap ] if ;
 [ [ do-crap ] infer ] unit-test-fails
 
+! Error reporting is wrong
+G: xyz math-combination ;
+M: fixnum xyz 2array ;
+M: ratio xyz 
+    [ >fraction ] 2apply swapd >r 2array swap r> 2array swap ;
+
+[ t ] [ [ [ xyz ] infer ] catch inference-error? ] unit-test
+
 [ { 2 1 } ] [ [ swons ] infer ] unit-test
 [ { 1 2 } ] [ [ uncons ] infer ] unit-test
 [ { 1 1 } ] [ [ unit ] infer ] unit-test
-[ { 1 2 } ] [ [ unswons ] infer ] unit-test
 [ { 1 1 } ] [ [ list? ] infer ] unit-test
 
 [ { 1 0 } ] [ [ >n ] infer ] unit-test

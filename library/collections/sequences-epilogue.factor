@@ -1,17 +1,17 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: sequences
-USING: errors generic kernel kernel-internals math
+USING: arrays errors generic kernel kernel-internals math
 sequences-internals strings vectors words ;
 
 : first2 ( { x y } -- x y )
-    1 swap bounds-check nip first2-unsafe ; inline
+    1 swap bounds-check nip first2-unsafe ; flushable
 
 : first3 ( { x y z } -- x y z )
-    2 swap bounds-check nip first3-unsafe ; inline
+    2 swap bounds-check nip first3-unsafe ; flushable
 
 : first4 ( { x y z w } -- x y z w )
-    3 swap bounds-check nip first4-unsafe ; inline
+    3 swap bounds-check nip first4-unsafe ; flushable
 
 M: object like drop ;
 
@@ -82,6 +82,11 @@ M: object like drop ;
 : add ( seq elt -- seq )
     swap [ push ] immutable ; flushable
 
+: add* ( seq elt -- seq )
+    over >r
+    over thaw [ push ] keep [ swap nappend ] keep
+    r> like ; flushable
+
 : diff ( seq1 seq2 -- seq2-seq1 )
     [ swap member? not ] subset-with ; flushable
 
@@ -93,10 +98,10 @@ M: object like drop ;
 : pop* ( sequence -- )
     [ length 1- ] keep
     [ 0 -rot set-nth ] 2keep
-    set-length ; inline
+    set-length ;
 
 : pop ( sequence -- element )
-    dup peek swap pop* ; inline
+    dup peek swap pop* ;
 
 M: object reverse-slice ( seq -- seq ) <reversed> ;
 

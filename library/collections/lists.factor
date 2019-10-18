@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: lists USING: errors generic kernel math sequences ;
+IN: lists USING: arrays errors generic kernel math sequences ;
 
 M: f car ;
 M: f cdr ;
@@ -16,7 +16,6 @@ PREDICATE: general-list list ( list -- ? )
     [ cdr list? ] [ t ] if* ;
 
 : uncons ( [[ car cdr ]] -- car cdr ) dup car swap cdr ; inline
-: unswons ( [[ car cdr ]] -- cdr car ) dup cdr swap car ; inline
 
 : swons ( cdr car -- [[ car cdr ]] ) swap cons ; inline
 : unit ( a -- [ a ] ) f cons ; inline
@@ -78,6 +77,9 @@ M: cons = ( obj cons -- ? )
     } cond ;
 
 : curry ( obj quot -- quot ) >r literalize r> cons ;
+
+: make-dip ( quot n -- quot )
+    dup \ >r <array> -rot \ r> <array> append3 >list ;
 
 : (>list) ( n i seq -- list )
     pick pick <= [

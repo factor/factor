@@ -1,20 +1,20 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: compiler compiler-backend help io io-internals kernel
+USING: compiler generic help io io-internals kernel
 kernel-internals lists math memory namespaces optimizer parser
 sequences sequences-internals words ;
 
-"Cross-referencing..." print
-xref-words
-xref-articles
+"Cross-referencing..." print flush
+H{ } clone crossref set-global xref-words
+H{ } clone help-graph set-global xref-articles
 
 "compile" get [
     "native-io" get [
         unix? [
             "/library/unix/load.factor" run-resource
         ] when
-
     ] when
+
     windows? [
         "/library/windows/load.factor" run-resource
     ] when
@@ -23,15 +23,14 @@ xref-articles
 
     "Compiling base..." print flush
 
-    {
-        uncons 1+ 1- + <= > >= mod length
-        nth-unsafe set-nth-unsafe
-        = string>number number>string scan
-        kill-values (generate)
-    } [ compile ] each
-
-    "Compiling system..." print flush
-    compile-all
+    [
+        \ + compile
+        \ = compile
+        { "kernel" "sequences" "assembler" } compile-vocabs
+    
+        "Compiling system..." print flush
+        compile-all
+    ] with-class<cache
     
     terpri
     "Unless you're working on the compiler, ignore the errors above." print
@@ -78,5 +77,5 @@ number>string write " ms" print
 "Bootstrapping is complete." print
 "Now, you can run ./f factor.image" print flush
 
-"factor.image" save-image
+"factor.image" resource-path save-image
 0 exit

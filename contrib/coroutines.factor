@@ -56,8 +56,8 @@ TUPLE: coroutine resumecc exitcc ;
 USE: prettyprint
 USE: sequences
 
-: test1 ( -- co )
-  [ swap [ over coyield 2drop ] tree-each f swap coyield ] cocreate ; 
+: test1 ( list -- co )
+  [ swap [ over coyield 2drop ] each f swap coyield ] cocreate ; 
   
 : test2 ( -- co )
   [ 1 over coyield drop 2 over coyield drop 3 over coyield ] cocreate ;

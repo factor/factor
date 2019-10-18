@@ -9,6 +9,17 @@ vectors words ;
 
 "/library/bootstrap/primitives.factor" run-resource
 
+: parse-resource* ( path -- )
+    [ parse-resource ] catch [
+        dup error.
+        "Try again? [yn]" print flush readln "yY" subseq?
+        [ drop parse-resource* ] [ rethrow ] if
+    ] when* ;
+
+: if-arch ( arch seq -- )
+    architecture get rot member?
+    [ [ parse-resource* % ] each ] [ drop ] if ;
+
 ! The [ ] make form creates a boot quotation
 [
     \ boot ,
@@ -77,7 +88,7 @@ vectors words ;
         "/library/generic/math-combination.factor"
         "/library/generic/tuple.factor"
         
-        "/library/alien/aliens.factor"
+        "/library/compiler/alien/aliens.factor"
         
         "/library/syntax/prettyprint.factor"
         "/library/syntax/see.factor"
@@ -109,39 +120,37 @@ vectors words ;
         "/library/io/server.factor"
         "/library/tools/jedit.factor"
 
-        "/library/compiler/architecture.factor"
+        "/library/compiler/inference/shuffle.factor"
+        "/library/compiler/inference/dataflow.factor"
+        "/library/compiler/inference/inference.factor"
+        "/library/compiler/inference/branches.factor"
+        "/library/compiler/inference/words.factor"
+        "/library/compiler/inference/stack.factor"
+        "/library/compiler/inference/known-words.factor"
 
-        "/library/inference/shuffle.factor"
-        "/library/inference/dataflow.factor"
-        "/library/inference/inference.factor"
-        "/library/inference/branches.factor"
-        "/library/inference/words.factor"
-        "/library/inference/class-infer.factor"
-        "/library/inference/kill-literals.factor"
-        "/library/inference/optimizer.factor"
-        "/library/inference/inline-methods.factor"
-        "/library/inference/known-words.factor"
-        "/library/inference/stack.factor"
-        "/library/inference/call-optimizers.factor"
-        "/library/inference/print-dataflow.factor"
+        "/library/compiler/optimizer/specializers.factor"
+        "/library/compiler/optimizer/class-infer.factor"
+        "/library/compiler/optimizer/kill-literals.factor"
+        "/library/compiler/optimizer/optimizer.factor"
+        "/library/compiler/optimizer/inline-methods.factor"
+        "/library/compiler/optimizer/call-optimizers.factor"
+        "/library/compiler/optimizer/print-dataflow.factor"
 
-        "/library/compiler/assembler.factor"
-        "/library/compiler/vops.factor"
-        "/library/compiler/linearizer.factor"
-        "/library/compiler/xt.factor"
-        "/library/compiler/stack.factor"
-        "/library/compiler/intrinsics.factor"
-        "/library/compiler/generator.factor"
-        "/library/compiler/basic-blocks.factor"
+        "/library/compiler/generator/architecture.factor"
+        "/library/compiler/generator/assembler.factor"
+        "/library/compiler/generator/templates.factor"
+        "/library/compiler/generator/xt.factor"
+        "/library/compiler/generator/generator.factor"
+
         "/library/compiler/compiler.factor"
 
-        "/library/alien/malloc.factor"
-        "/library/alien/c-types.factor"
-        "/library/alien/structs.factor"
-        "/library/alien/compiler.factor"
-        "/library/alien/alien-invoke.factor"
-        "/library/alien/alien-callback.factor"
-        "/library/alien/syntax.factor"
+        "/library/compiler/alien/malloc.factor"
+        "/library/compiler/alien/c-types.factor"
+        "/library/compiler/alien/structs.factor"
+        "/library/compiler/alien/compiler.factor"
+        "/library/compiler/alien/alien-invoke.factor"
+        "/library/compiler/alien/alien-callback.factor"
+        "/library/compiler/alien/syntax.factor"
         
         "/library/io/buffer.factor"
 
@@ -193,13 +202,6 @@ vectors words ;
         "/library/kernel.facts"
         "/library/threads.facts"
         "/library/words.facts"
-        "/library/alien/alien-callback.facts"
-        "/library/alien/alien-invoke.facts"
-        "/library/alien/aliens.facts"
-        "/library/alien/c-types.facts"
-        "/library/alien/malloc.facts"
-        "/library/alien/structs.facts"
-        "/library/alien/syntax.facts"
         "/library/bootstrap/image.facts"
         "/library/collections/growable.facts"
         "/library/collections/arrays.facts"
@@ -217,6 +219,14 @@ vectors words ;
         "/library/collections/flatten.facts"
         "/library/collections/vectors.facts"
         "/library/collections/virtual-sequences.facts"
+        "/library/compiler/alien/alien-callback.facts"
+        "/library/compiler/alien/alien-invoke.facts"
+        "/library/compiler/alien/aliens.facts"
+        "/library/compiler/alien/c-types.facts"
+        "/library/compiler/alien/malloc.facts"
+        "/library/compiler/alien/structs.facts"
+        "/library/compiler/alien/syntax.facts"
+        "/library/compiler/inference/inference.facts"
         "/library/compiler/compiler.facts"
         "/library/generic/early-generic.facts"
         "/library/generic/generic.facts"
@@ -224,7 +234,6 @@ vectors words ;
         "/library/generic/slots.facts"
         "/library/generic/standard-combination.facts"
         "/library/generic/tuple.facts"
-        "/library/inference/inference.facts"
         "/library/io/binary.facts"
         "/library/io/buffer.facts"
         "/library/io/c-streams.facts"
@@ -277,49 +286,34 @@ vectors words ;
         "/doc/handbook/tools.facts"
         "/doc/handbook/tutorial.facts"
         "/doc/handbook/words.facts"
-    } [ parse-resource % ] each
+    } [ parse-resource* % ] each
     
-    architecture get {
-        {
-            [ dup "x86" = ] [
-                {
-                    "/library/compiler/x86/assembler.factor"
-                    "/library/compiler/x86/architecture.factor"
-                    "/library/compiler/x86/generator.factor"
-                    "/library/compiler/x86/slots.factor"
-                    "/library/compiler/x86/stack.factor"
-                    "/library/compiler/x86/fixnum.factor"
-                    "/library/compiler/x86/alien.factor"
-                }
-            ]
-        } {
-            [ dup "ppc" = ] [
-                {
-                    "/library/compiler/ppc/assembler.factor"
-                    "/library/compiler/ppc/architecture.factor"
-                    "/library/compiler/ppc/generator.factor"
-                    "/library/compiler/ppc/slots.factor"
-                    "/library/compiler/ppc/stack.factor"
-                    "/library/compiler/ppc/fixnum.factor"
-                    "/library/compiler/ppc/alien.factor"
-                }
-            ]
-        } {
-            [ dup "amd64" = ] [
-                {
-                    "/library/compiler/x86/assembler.factor"
-                    "/library/compiler/amd64/architecture.factor"
-                    "/library/compiler/x86/generator.factor"
-                    "/library/compiler/amd64/generator.factor"
-                    "/library/compiler/x86/slots.factor"
-                    "/library/compiler/amd64/slots.factor"
-                    "/library/compiler/x86/stack.factor"
-                    "/library/compiler/x86/fixnum.factor"
-                    "/library/compiler/amd64/alien.factor"
-                }
-            ]
-        }
-    } cond [ parse-resource % ] each drop
+    { "x86" "pentium4" } {
+        "/library/compiler/x86/assembler.factor"
+        "/library/compiler/x86/architecture.factor"
+        "/library/compiler/x86/alien.factor"
+        "/library/compiler/x86/intrinsics.factor"
+    } if-arch
+    
+    { "pentium4" } {
+        "/library/compiler/x86/intrinsics-sse2.factor"
+    } if-arch
+
+    { "ppc" } {
+        "/library/compiler/ppc/assembler.factor"
+        "/library/compiler/ppc/architecture.factor"
+        "/library/compiler/ppc/intrinsics.factor"
+    } if-arch
+
+    { "amd64" } {
+        "/library/compiler/x86/assembler.factor"
+        "/library/compiler/x86/architecture.factor"
+        "/library/compiler/amd64/architecture.factor"
+        "/library/compiler/amd64/alien.factor"
+        "/library/compiler/x86/intrinsics.factor"
+        "/library/compiler/x86/intrinsics-sse2.factor"
+        "/library/compiler/amd64/intrinsics.factor"
+    } if-arch
     
     [
         "/library/bootstrap/boot-stage2.factor" run-resource
@@ -339,3 +333,6 @@ vocabularies get [
 "Building generic words..." print flush
 
 all-words [ generic? ] subset [ make-generic ] each
+
+FORGET: if-arch
+FORGET: parse-resource*

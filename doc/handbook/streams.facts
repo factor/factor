@@ -24,7 +24,7 @@ GLOSSARY: "output stream" "an object responding to the output words of the " { $
 GLOSSARY: "bidirectional stream" "an object that is both an input and output stream" ;
 
 ARTICLE: "stream-protocol" "Stream protocol"
-"The stream protocol consits of a large number of generic words, many of which are optional."
+"The stream protocol consists of a large number of generic words, many of which are optional."
 $terpri
 "A word required to be implemented for all streams:"
 { $subsection stream-close }
@@ -84,8 +84,6 @@ $terpri
 
 ARTICLE: "character-styles" "Character styles"
 "Character styles for " { $link stream-format } ":"
-{ $subsection foreground }
-{ $subsection background }
 { $subsection foreground }
 { $subsection background }
 { $subsection font }

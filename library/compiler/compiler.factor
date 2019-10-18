@@ -1,28 +1,20 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
-USING: compiler-backend compiler-frontend errors hashtables
-inference io kernel lists math namespaces optimizer prettyprint
-sequences test words ;
+USING: errors hashtables inference io kernel lists math
+namespaces optimizer prettyprint sequences test words ;
 
 : (compile) ( word -- )
-    #! Should be called inside the with-compiler scope.
-    dup word-def dataflow optimize linearize
-    [ split-blocks simplify generate ] hash-each ;
-
-: benchmark-compile
-    [ [ (compile) ] keep ] benchmark nip
-    "compile-time" set-word-prop ;
+    dup specialized-def dataflow optimize generate ;
 
 : inform-compile ( word -- ) "Compiling " write . flush ;
 
 : compile-postponed ( -- )
     compile-words get dup empty? [
-        dup pop
-        dup inform-compile
-        benchmark-compile
-        compile-postponed
-    ] unless drop ;
+        drop
+    ] [
+        pop dup inform-compile (compile) compile-postponed
+    ] if ;
 
 : compile ( word -- )
     [ postpone-word compile-postponed ] with-compiler ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: kernel
-USING: generic kernel-internals math-internals ;
+USING: generic kernel-internals math math-internals ;
 
 : 2swap ( x y z t -- z t x y ) rot >r rot r> ; inline
 
@@ -79,10 +79,11 @@ M: wrapper literalize <wrapper> ;
 IN: kernel-internals
 
 ! These words are unsafe. Don't use them.
+: declare ( types -- ) drop ;
 
-: array-capacity 1 slot ; inline
-: array-nth swap 2 fixnum+ slot ; inline
-: set-array-nth swap 2 fixnum+ set-slot ; inline
+: array-capacity 1 slot { fixnum } declare ; inline
+: array-nth swap 2 fixnum+fast slot ; inline
+: set-array-nth swap 2 fixnum+fast set-slot ; inline
 
 : make-tuple <tuple> [ 2 set-slot ] keep ; flushable
 
@@ -109,7 +110,5 @@ IN: kernel
 IN: memory
 
 : generations ( -- n ) 15 getenv ;
-
 : image ( -- path ) 16 getenv ;
-
 : save ( -- ) image save-image ;

@@ -18,7 +18,7 @@ CELL gen_count;
 /* the oldest generation */
 #define TENURED (gen_count-1)
 
-ZONE *generations;
+DLLEXPORT ZONE *generations;
 
 /* used during garbage collection only */
 ZONE *newspace;

@@ -1,7 +1,13 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+IN: math-internals
+USING: math kernel ;
+
+: float= ( n n -- ? )
+    #! The compiler replaces this with a better intrinsic.
+    [ double>bits ] 2apply number= ; foldable
+
 IN: math
-USING: generic kernel math-internals ;
 
 UNION: real rational float ;
 
@@ -14,15 +20,14 @@ M: real <=> - ;
 : fp-nan? ( float -- ? )
     double>bits -51 shift BIN: 111111111111 [ bitand ] keep = ;
 
-M: float zero?
-    double>bits HEX: 8000000000000000 [ bitor ] keep number= ;
-
-M: float number= [ double>bits ] 2apply number= ;
+M: float zero? ( float -- ? )
+    dup 0.0 float= swap -0.0 float= or ;
 
 M: float < float< ;
 M: float <= float<= ;
 M: float > float> ;
 M: float >= float>= ;
+M: float number= float= ;
 
 M: float + float+ ;
 M: float - float- ;
@@ -30,6 +35,3 @@ M: float * float* ;
 M: float / float/f ;
 M: float /f float/f ;
 M: float mod float-mod ;
-
-M: float 1+ 1.0 float+ ;
-M: float 1- 1.0 float- ;

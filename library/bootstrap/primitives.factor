@@ -11,13 +11,14 @@ vectors words ;
 "Creating primitives and basic runtime structures..." print flush
 
 H{ } clone c-types set
-"/library/alien/primitive-types.factor" parse-resource
+"/library/compiler/alien/primitive-types.factor" parse-resource
 
 ! These symbols need the same hashcode in the target as in the
-! host.
+! host. They must be symbols -- colon definitions are not
+! permitted to be carried over
 {
     vocabularies typemap builtins c-types
-    cell crossref articles terms
+    crossref articles terms
 }
 
 ! Bring up a bare cross-compiling vocabulary.
@@ -59,7 +60,9 @@ call
     { "bits>double" "math"                  }
     { "<complex>" "math-internals"          }
     { "fixnum+" "math-internals"            }
+    { "fixnum+fast" "math-internals"        }
     { "fixnum-" "math-internals"            }
+    { "fixnum-fast" "math-internals"        }
     { "fixnum*" "math-internals"            }
     { "fixnum/i" "math-internals"           }
     { "fixnum/f" "math-internals"           }
@@ -256,35 +259,39 @@ num-types f <array> builtins set
 
 "fixnum?" "math" create t "inline" set-word-prop
 "fixnum" "math" create 0 "fixnum?" "math" create { } define-builtin
-"fixnum" "math" create 0 "math-priority" set-word-prop
 "fixnum" "math" create ">fixnum" "math" lookup unit "coercer" set-word-prop
 
 "bignum?" "math" create t "inline" set-word-prop
 "bignum" "math" create 1 "bignum?" "math" create { } define-builtin
-"bignum" "math" create 1 "math-priority" set-word-prop
 "bignum" "math" create ">bignum" "math" lookup unit "coercer" set-word-prop
 
 "cons?" "lists" create t "inline" set-word-prop
 "cons" "lists" create 2 "cons?" "lists" create
-{ { 0 { "car" "lists" } f } { 1 { "cdr" "lists" } f } } define-builtin
+{
+    { 0 object { "car" "lists" } f }
+    { 1 object { "cdr" "lists" } f }
+} define-builtin
 
 "ratio?" "math" create t "inline" set-word-prop
 "ratio" "math" create 4 "ratio?" "math" create
-{ { 0 { "numerator" "math" } f } { 1 { "denominator" "math" } f } } define-builtin
-"ratio" "math" create 2 "math-priority" set-word-prop
+{
+    { 0 integer { "numerator" "math" } f }
+    { 1 integer { "denominator" "math" } f }
+} define-builtin
 
 "float?" "math" create t "inline" set-word-prop
 "float" "math" create 5 "float?" "math" create { } define-builtin
-"float" "math" create 3 "math-priority" set-word-prop
 "float" "math" create ">float" "math" lookup unit "coercer" set-word-prop
 
 "complex?" "math" create t "inline" set-word-prop
 "complex" "math" create 6 "complex?" "math" create
-{ { 0 { "real" "math" } f } { 1 { "imaginary" "math" } f } } define-builtin
-"complex" "math" create 4 "math-priority" set-word-prop
+{
+    { 0 real { "real" "math" } f }
+    { 1 real { "imaginary" "math" } f }
+} define-builtin
 
 "alien" "alien" create 7 "alien?" "alien" create
-{ { 1 { "underlying-alien" "alien" } f } } define-builtin
+{ { 1 object { "underlying-alien" "alien" } f } } define-builtin
 
 "array?" "arrays" create t "inline" set-word-prop
 "array" "arrays" create 8 "array?" "arrays" create
@@ -296,49 +303,115 @@ num-types f <array> builtins set
 "hashtable?" "hashtables" create t "inline" set-word-prop
 "hashtable" "hashtables" create 10 "hashtable?" "hashtables" create
 {
-    { 1 { "hash-count" "hashtables" } { "set-hash-count" "hashtables-internals" } }
-    { 2 { "hash-deleted" "hashtables" } { "set-hash-deleted" "hashtables-internals" } }
-    { 3 { "hash-array" "hashtables-internals" } { "set-hash-array" "hashtables-internals" } }
+    {
+        1
+        fixnum
+        { "hash-count" "hashtables" }
+        { "set-hash-count" "hashtables-internals" }
+    } {
+        2
+        fixnum
+        { "hash-deleted" "hashtables" }
+        { "set-hash-deleted" "hashtables-internals" }
+    } {
+        3
+        array
+        { "hash-array" "hashtables-internals" }
+        { "set-hash-array" "hashtables-internals" }
+    }
 } define-builtin
 
 "vector?" "vectors" create t "inline" set-word-prop
 "vector" "vectors" create 11 "vector?" "vectors" create
 {
-    { 1 { "length" "sequences" } { "set-fill" "sequences-internals" } }
-    { 2 { "underlying" "sequences-internals" } { "set-underlying" "sequences-internals" } }
+    {
+        1
+        fixnum
+        { "length" "sequences" }
+        { "set-fill" "sequences-internals" }
+    } {
+        2
+        array
+        { "underlying" "sequences-internals" }
+        { "set-underlying" "sequences-internals" }
+    }
 } define-builtin
 
 "string?" "strings" create t "inline" set-word-prop
 "string" "strings" create 12 "string?" "strings" create
 {
-    { 1 { "length" "sequences" } f }
-    { 2 { "string-hashcode" "kernel-internals" } { "set-string-hashcode" "kernel-internals" } }
+    {
+        1
+        fixnum
+        { "length" "sequences" }
+        f
+    } {
+        2
+        fixnum
+        { "string-hashcode" "kernel-internals" }
+        { "set-string-hashcode" "kernel-internals" }
+    }
 } define-builtin
 
 "sbuf?" "strings" create t "inline" set-word-prop 
 "sbuf" "strings" create 13 "sbuf?" "strings" create
 {
-    { 1 { "length" "sequences" } { "set-fill" "sequences-internals" } }
-    { 2 { "underlying" "sequences-internals" } { "set-underlying" "sequences-internals" } }
+    {
+        1
+        fixnum
+        { "length" "sequences" }
+        { "set-fill" "sequences-internals" }
+    }
+    {
+        2
+        string
+        { "underlying" "sequences-internals" }
+        { "set-underlying" "sequences-internals" }
+    }
 } define-builtin
 
 "wrapper?" "kernel" create t "inline" set-word-prop
 "wrapper" "kernel" create 14 "wrapper?" "kernel" create
-{ { 1 { "wrapped" "kernel" } f } } define-builtin
+{ { 1 object { "wrapped" "kernel" } f } } define-builtin
 
 "dll?" "alien" create t "inline" set-word-prop
 "dll" "alien" create 15 "dll?" "alien" create
-{ { 1 { "dll-path" "alien" } f } } define-builtin
+{ { 1 object { "dll-path" "alien" } f } } define-builtin
 
 "word?" "words" create t "inline" set-word-prop
 "word" "words" create 16 "word?" "words" create
 {
-    { 1 { "hashcode" "kernel" } f }
-    { 2 { "word-name" "words" } f }
-    { 3 { "word-vocabulary" "words" } { "set-word-vocabulary" "words" } }
-    { 4 { "word-primitive" "words" } { "set-word-primitive" "words" } }
-    { 5 { "word-def" "words" } { "set-word-def" "words" } }
-    { 6 { "word-props" "words" } { "set-word-props" "words" } }
+    { 1 fixnum { "hashcode" "kernel" } f }
+    {
+        2
+        object
+        { "word-name" "words" }
+        f
+    }
+    {
+        3
+        object
+        { "word-vocabulary" "words" }
+        { "set-word-vocabulary" "words" }
+    }
+    {
+        4
+        object
+        { "word-primitive" "words" }
+        { "set-word-primitive" "words" }
+    }
+    {
+        5
+        object
+        { "word-def" "words" }
+        { "set-word-def" "words" }
+    }
+    {
+        6
+        object
+        { "word-props" "words" }
+        { "set-word-props" "words" }
+    }
 } define-builtin
 
 "tuple?" "kernel" create t "inline" set-word-prop

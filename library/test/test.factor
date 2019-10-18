@@ -1,18 +1,17 @@
-! Factor test suite.
-
+! Copyright (C) 2003, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: test
-USING: arrays errors inspector io kernel lists math memory
-namespaces parser prettyprint sequences strings words ;
+USING: arrays errors hashtables inspector io kernel lists math
+memory namespaces parser prettyprint sequences strings words
+vectors ;
 
 TUPLE: assert got expect ;
 
 M: assert summary drop "Assertion failed" ;
 
-: assert= ( a b -- )
-    2dup = [ 2drop ] [ <assert> throw ] if ;
+: assert= ( a b -- ) 2dup = [ 2drop ] [ <assert> throw ] if ;
 
-: print-test ( input output -- )
-    "--> " write 2array . flush ;
+: print-test ( input output -- ) "--> " write 2array . flush ;
 
 : benchmark ( quot -- gctime runtime )
     millis >r gc-time >r call gc-time r> - millis r> - ;
@@ -26,7 +25,7 @@ M: assert summary drop "Assertion failed" ;
         [
             2dup print-test
             swap >r >r clear r> call
-            datastack >list r> assert=
+            datastack r> >vector assert=
         ] keep-datastack 2drop
     ] time ;
 
@@ -38,10 +37,10 @@ M: assert summary drop "Assertion failed" ;
 
 SYMBOL: failures
 
-: failure failures [ cons ] change ;
+: failure failures [ ?push ] change ;
 
 : test-handler ( name quot -- ? )
-    catch [ dup error. cons failure f ] [ t ] if* ;
+    catch [ dup error. 2array failure f ] [ t ] if* ;
 
 : test-path ( name -- path )
     "/library/test/" swap ".factor" append3 ;
@@ -55,15 +54,14 @@ SYMBOL: failures
     ] test-handler ;
 
 : prepare-tests ( -- )
-    failures off
-    vocabularies get [ "temporary" off ] bind ;
+    failures off "temporary" forget-vocab ;
 
 : passed.
     "Tests passed:" print . ;
 
 : failed.
     "Tests failed:" print
-    failures get [ unswons write ": " write error. ] each ;
+    failures get [ first2 swap write ": " write error. ] each ;
 
 : run-tests ( list -- )
     prepare-tests [ test ] subset terpri passed. failed. ;
@@ -103,10 +101,10 @@ SYMBOL: failures
 : compiler-tests
     {
         "io/buffer"
-        "compiler/simple"
+        "compiler/simple" "compiler/templates"
         "compiler/stack" "compiler/ifte"
         "compiler/generic" "compiler/bail-out"
-        "compiler/linearizer" "compiler/intrinsics"
+        "compiler/intrinsics" "compiler/float"
         "compiler/identities" "compiler/optimizer"
         "compiler/alien" "compiler/callbacks"
     } run-tests ;

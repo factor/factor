@@ -88,7 +88,17 @@ M: kernel-error error. ( error -- )
         [ objc-error. ]
     } dispatch ;
 
-M: no-method summary drop "No suitable method" ;
+M: no-method summary
+    "No suitable method" ;
+
+M: no-method error. ( error -- )
+    "Generic word " write
+    dup no-method-generic pprint
+    " does not define a method for the " write
+    dup no-method-object class pprint
+    " class." print
+    "Allowed classes: " write dup no-method-generic order .
+    "Dispatching on object: " write no-method-object short. ;
 
 M: no-math-method summary drop "No suitable arithmetic method" ;
 

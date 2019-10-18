@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: assembler
 USING: arrays compiler errors generic kernel kernel-internals
 lists math namespaces parser sequences words ;
+IN: assembler
 
 ! A postfix assembler for x86 and AMD64.
 
@@ -286,28 +286,28 @@ M: integer CALL HEX: e8 assemble-1 from assemble-4 ;
 M: callable CALL 0 CALL relative-4 ;
 M: operand CALL BIN: 010 t HEX: ff 1-operand ;
 
-GENERIC: JUMPcc ( opcode addr -- )
-M: integer JUMPcc ( opcode addr -- )
-    HEX: 0f assemble-1  swap assemble-1  from assemble-4 ;
-M: callable JUMPcc ( opcode addr -- )
-    >r 0 JUMPcc r> relative-4 ;
+G: JUMPcc ( addr opcode -- ) 1 standard-combination ;
+M: integer JUMPcc ( addr opcode -- )
+    swap HEX: 0f assemble-1  swap assemble-1  from assemble-4 ;
+M: callable JUMPcc ( addr opcode -- )
+    swap >r 0 swap JUMPcc r> relative-4 ;
 
-: JO  HEX: 80 swap JUMPcc ;
-: JNO HEX: 81 swap JUMPcc ;
-: JB  HEX: 82 swap JUMPcc ;
-: JAE HEX: 83 swap JUMPcc ;
-: JE  HEX: 84 swap JUMPcc ; ! aka JZ
-: JNE HEX: 85 swap JUMPcc ;
-: JBE HEX: 86 swap JUMPcc ;
-: JA  HEX: 87 swap JUMPcc ;
-: JS  HEX: 88 swap JUMPcc ;
-: JNS HEX: 89 swap JUMPcc ;
-: JP  HEX: 8a swap JUMPcc ;
-: JNP HEX: 8b swap JUMPcc ;
-: JL  HEX: 8c swap JUMPcc ;
-: JGE HEX: 8d swap JUMPcc ;
-: JLE HEX: 8e swap JUMPcc ;
-: JG  HEX: 8f swap JUMPcc ;
+: JO  HEX: 80 JUMPcc ;
+: JNO HEX: 81 JUMPcc ;
+: JB  HEX: 82 JUMPcc ;
+: JAE HEX: 83 JUMPcc ;
+: JE  HEX: 84 JUMPcc ; ! aka JZ
+: JNE HEX: 85 JUMPcc ;
+: JBE HEX: 86 JUMPcc ;
+: JA  HEX: 87 JUMPcc ;
+: JS  HEX: 88 JUMPcc ;
+: JNS HEX: 89 JUMPcc ;
+: JP  HEX: 8a JUMPcc ;
+: JNP HEX: 8b JUMPcc ;
+: JL  HEX: 8c JUMPcc ;
+: JGE HEX: 8d JUMPcc ;
+: JLE HEX: 8e JUMPcc ;
+: JG  HEX: 8f JUMPcc ;
 
 : RET ( -- ) HEX: c3 assemble-1 ;
 
@@ -374,12 +374,20 @@ M: operand CMP OCT: 071 2-operand ;
 ( SSE multimedia instructions )
 
 : 2-operand-sse ( dst src op1 op2 -- )
-    pick register-128? [ nip ] [ drop swapd ] if
+    #! We swap the operands here to make everything consistent
+    #! with the integer instructions.
+    swap assemble-1 pick register-128? [ swapd ] [ 1 bitor ] if
     >r 2dup t prefix HEX: 0f assemble-1 r>
     assemble-1 reg-code swap addressing ;
 
-: MOVLPD ( dest src -- )
-    HEX: 66 assemble-1 HEX: 12 HEX: 13 2-operand-sse ;
-
-: MOVSS ( dest src -- )
-    HEX: f3 assemble-1 HEX: 10 HEX: 11 2-operand-sse ;
+: MOVSS ( dest src -- ) HEX: f3 HEX: 10 2-operand-sse ;
+: MOVSD ( dest src -- ) HEX: f2 HEX: 10 2-operand-sse ;
+: ADDSD ( dest src -- ) HEX: f2 HEX: 58 2-operand-sse ;
+: MULSD ( dest src -- ) HEX: f2 HEX: 59 2-operand-sse ;
+: SUBSD ( dest src -- ) HEX: f2 HEX: 5c 2-operand-sse ;
+: DIVSD ( dest src -- ) HEX: f2 HEX: 5e 2-operand-sse ;
+: SQRTSD ( dest src -- ) HEX: f2 HEX: 51 2-operand-sse ;
+: UCOMISD ( dest src -- ) HEX: 66 HEX: 2e 2-operand-sse ;
+: COMISD ( dest src -- ) HEX: 66 HEX: 2f 2-operand-sse ;
+: CVTSI2SD ( dest src -- ) HEX: f2 HEX: 2a 2-operand-sse ;
+: CVTSD2SI ( dest src -- ) HEX: f2 HEX: 2d 2-operand-sse ;

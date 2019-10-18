@@ -12,7 +12,7 @@ parser sequences strings ;
     ] when ;
 
 : set-path ( value seq -- )
-    unswons over [ nest [ set-path ] bind ] [ nip set ] if ;
+    uncons swap over [ nest [ set-path ] bind ] [ nip set ] if ;
 
 : cli-var-param ( name value -- )
     swap ":" split >list set-path ;

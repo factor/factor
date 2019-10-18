@@ -16,6 +16,10 @@ USING: compiler errors generic kernel math memory words ;
 
 : insn ( operand opcode -- ) 26 shift bitor assemble-cell ;
 
+: a-form ( d a b c xo rc -- n )
+    >r 1 shift >r 6 shift >r 11 shift >r 16 shift >r 21 shift
+    r> bitor r> bitor r> bitor r> bitor r> bitor ;
+
 : b-form ( bo bi bd aa lk -- n )
     >r 1 shift >r 2 shift >r 16 shift >r 21 shift
     r> bitor r> bitor r> bitor r> bitor ;
@@ -25,10 +29,6 @@ USING: compiler errors generic kernel math memory words ;
 
 : i-form ( li aa lk -- n )
     >r 1 shift bitor r> bitor ;
-
-: m-form ( s a b mb me -- n )
-    >r 1 shift >r 6 shift >r 11 shift >r 16 shift >r 21 shift
-    r> bitor r> bitor r> bitor r> bitor r> bitor ;
 
 : x-form ( a s b xo rc -- n )
     swap
@@ -144,7 +144,7 @@ USING: compiler errors generic kernel math memory words ;
 : CMP 0 0 x-form 31 insn ;
 : CMPL 0 32 x-form 31 insn ;
 
-: (RLWINM) m-form 21 insn ;
+: (RLWINM) a-form 21 insn ;
 : RLWINM 0 (RLWINM) ;  : RLWINM. 1 (RLWINM) ;
 
 : SLWI 0 31 pick - RLWINM ;  : SLWI. 0 31 pick - RLWINM. ;
@@ -193,10 +193,31 @@ M: word BC >r 0 BC r> relative-2 ;
    >r dup -32768 32767 between? [ r> LI ] [ r> LOAD32 ] if ;
 
 ! Floating point
-: (FMR) >r 0 -rot 72 r> x-form 63 insn ;
-: FMR 0 (FMR) ;  : FMR. 1 (FMR) ;
-
 : LFS d-form 48 insn ;  : LFSU d-form 49 insn ;
 : LFD d-form 50 insn ;  : LFDU d-form 51 insn ;
 : STFS d-form 52 insn ; : STFSU d-form 53 insn ;
 : STFD d-form 54 insn ; : STFDU d-form 55 insn ;
+
+: (FMR) >r 0 -rot 72 r> x-form 63 insn ;
+: FMR 0 (FMR) ;  : FMR. 1 (FMR) ;
+
+: (FCTIWZ) >r 0 -rot 15 r> x-form 63 insn ;
+: FCTIWZ 0 (FCTIWZ) ;  : FCTIWZ. 1 (FCTIWZ) ;
+
+: (FADD) >r 0 21 r> a-form 63 insn ;
+: FADD 0 (FADD) ;  : FADD. 1 (FADD) ;
+
+: (FSUB) >r 0 20 r> a-form 63 insn ;
+: FSUB 0 (FSUB) ;  : FSUB. 1 (FSUB) ;
+
+: (FMUL) >r 0 swap 25 r> a-form 63 insn ;
+: FMUL 0 (FMUL) ;  : FMUL. 1 (FMUL) ;
+
+: (FDIV) >r 0 18 r> a-form 63 insn ;
+: FDIV 0 (FDIV) ;  : FDIV. 1 (FDIV) ;
+
+: (FSQRT) >r 0 swap 0 22 r> a-form 63 insn ;
+: FSQRT 0 (FSQRT) ;  : FSQRT. 1 (FSQRT) ;
+
+: FCMPU 0 0 x-form 63 insn ;
+: FCMPO 0 32 x-form 63 insn ;
