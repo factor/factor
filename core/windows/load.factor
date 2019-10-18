@@ -3,6 +3,7 @@ PROVIDE: core/windows
 { +files+ { 
     "windows-messages.factor"
     "types.factor"
+    "advapi32.factor"
     "gdi32-constants.factor"
     "gdi32.factor"
     "kernel32-constants.factor"

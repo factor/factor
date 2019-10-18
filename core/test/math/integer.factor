@@ -55,6 +55,26 @@ errors ;
     gcd nip
 ] unit-test
 
+[ -10000000001981284352 ] [
+    -10000000000000000000
+    HEX: -100000000 bitand
+] unit-test
+
+[ 9999999997686317056 ] [
+    10000000000000000000
+    HEX: -100000000 bitand
+] unit-test
+
+[ 4294967296 ] [
+    -10000000000000000000
+    HEX: 100000000 bitand
+] unit-test
+
+[ 0 ] [
+    10000000000000000000
+    HEX: 100000000 bitand
+] unit-test
+
 : verify-gcd
     2dup swap gcd
     >r rot * swap rem r> = ; 
@@ -118,3 +138,10 @@ unit-test
 ! as long as it doesn't crash
 [ ] [ [ 0 0 /i ] catch clear ] unit-test
 [ ] [ [ 100000000000000000 0 /i ] catch clear ] unit-test
+
+[ f ] [ most-positive-fixnum >fixnum small? ] unit-test
+[ t ] [ most-positive-fixnum 1- >fixnum small? ] unit-test
+[ t ] [ 134 small? ] unit-test
+[ t ] [ most-negative-fixnum >fixnum small? ] unit-test
+[ t ] [ most-negative-fixnum 1+ >fixnum small? ] unit-test
+[ t ] [ -134 small? ] unit-test

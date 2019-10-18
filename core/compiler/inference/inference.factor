@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference
 USING: arrays errors generic io kernel
@@ -30,8 +30,8 @@ M: object value-literal
 : value-vector ( n -- vector ) [ drop <computed> ] map >vector ;
 
 : add-inputs ( seq stack -- n stack )
-    tuck [ length ] 2apply - dup 0 >
-    [ dup value-vector [ rot nappend ] keep ]
+    tuck [ length ] compare dup 0 >
+    [ dup value-vector [ swapd nappend ] keep ]
     [ drop 0 swap ] if ;
 
 : ensure-values ( seq -- )
@@ -100,7 +100,7 @@ TUPLE: too-many-r> ;
     ] when ;
 
 : undo-infer ( -- )
-    recorded get [ custom-infer? not ] subset [
+    recorded get [
         dup
         f "inferred-vars" set-word-prop
         f "inferred-effect" set-word-prop
@@ -141,4 +141,4 @@ TUPLE: too-many-r> ;
     [ (dataflow) ] with-infer ;
 
 : dataflow-with ( quot stack -- dataflow )
-    [ meta-d set (dataflow) ] with-infer ;
+    [ V{ } like meta-d set (dataflow) ] with-infer ;

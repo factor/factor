@@ -19,9 +19,9 @@ GENERIC: (^) ( x y -- z ) foldable
     over zero? [
         dup zero?
         [ 2drop 0.0/0.0 ] [ 0 < [ drop 1.0/0.0 ] when ] if
-     ] [
-         (^)
-     ] if ; inline
+    ] [
+        (^)
+    ] if ; inline
 
 : ^mag ( w abs arg -- magnitude )
     >r >r >float-rect swap r> swap fpow r> rot * fexp /f ;

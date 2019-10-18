@@ -31,9 +31,9 @@ IN: generic
     ] [ ] make define-predicate ;
 
 : forget-tuple ( class -- )
-    dup forget "predicate" word-prop first [ forget ] when* ;
-
-: tuple-size ( class -- size ) "tuple-size" word-prop ;
+    dup forget
+    "predicate" word-prop
+    dup empty? [ drop ] [ first forget ] if ;
 
 : check-shape ( class slots -- )
     >r in get lookup dup [
@@ -52,33 +52,34 @@ IN: generic
     2dup delegate-slots swap append "slots" set-word-prop
     define-slots ;
 
-PREDICATE: class tuple-class tuple-size >boolean ;
-
 TUPLE: check-tuple class ;
-: check-tuple ( class -- class )
-    dup tuple-class? [ <check-tuple> throw ] unless ;
+
+: check-tuple ( class -- )
+    dup tuple-class? [ drop ] [ <check-tuple> throw ] if ;
 
 : define-constructor ( word class def -- )
-    swap check-tuple [
-        dup literalize ,
-        tuple-size ,
-        \ <tuple> , %
-    ] [ ] make define-compound ;
+    over check-tuple [
+        >r dup literalize , tuple-size , \ <tuple> , r> %
+    ] [ ] make
+    define-compound ;
+
+: default-constructor-quot ( class -- quot )
+    "slots" word-prop 1 tail <reversed> [ fourth ] map
+    [ length \ tuck <array> ] keep 2array
+    flip concat >quotation ;
 
 : default-constructor ( class -- )
     dup create-constructor
-    2dup "constructor" set-word-prop
     dup reset-generic
-    swap dup "slots" word-prop unclip drop <reversed>
-    [ [ tuck ] swap peek add ] map concat >quotation
-    define-constructor ;
+    2dup "constructor" set-word-prop
+    dup rot dup default-constructor-quot define-constructor
+    t "inline" set-word-prop ;
 
-: define-tuple ( class slots -- )
+: define-tuple-class ( class slots -- )
     2dup check-shape
     >r create-in
-    dup intern-symbol
     dup tuple-predicate
-    dup \ tuple bootstrap-word "superclass" set-word-prop
+    \ tuple bootstrap-word over set-superclass
     dup define-class
     dup r> define-tuple-slots
     default-constructor ;

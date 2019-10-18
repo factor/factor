@@ -25,7 +25,7 @@ sequences sequences-internals strings test vectors ;
 [ V{ 1 2 } ] [ [ 1 2 ] >vector ] unit-test
 
 [ t ] [
-    100 [ drop 100 random-int ] map >vector
+    100 [ drop 100 random ] map >vector
     dup >array >vector =
 ] unit-test
 

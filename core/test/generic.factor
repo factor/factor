@@ -65,6 +65,13 @@ M: very-funny gooey sq ;
 [ null ] [ vector fixnum class-and ] unit-test
 [ number ] [ number object class-and ] unit-test
 [ number ] [ object number class-and ] unit-test
+[ null ] [ slice reversed class-and ] unit-test
+
+TUPLE: first-one ;
+TUPLE: second-one ;
+UNION: both first-one union-class ;
+
+[ t ] [ both tuple classes-intersect? ] unit-test
 
 [ t ] [ \ fixnum \ integer class< ] unit-test
 [ t ] [ \ fixnum \ fixnum class< ] unit-test
@@ -136,9 +143,11 @@ M: number union-containment drop 2 ;
 [ 2 ] [ 1.0 union-containment ] unit-test
 
 ! Testing recovery from bad method definitions
-"GENERIC: unhappy" eval
-[ "M: vocabularies unhappy ;" eval ] unit-test-fails
-[ ] [ "GENERIC: unhappy" eval ] unit-test
+"IN: temporary GENERIC: unhappy" eval
+[
+    "IN: temporary M: vocabularies unhappy ;" eval
+] unit-test-fails
+[ ] [ "IN: temporary GENERIC: unhappy" eval ] unit-test
 
 G: complex-combination 1 standard-combination ;
 M: string complex-combination drop ;
@@ -177,6 +186,7 @@ TUPLE: delegating ;
 [ [ >float ] ] [ \ float \ integer math-upgrade ] unit-test
 [ number ] [ \ number \ float math-class-max ] unit-test
 [ float ] [ \ real \ float math-class-max ] unit-test
+[ fixnum ] [ \ fixnum \ null math-class-max ] unit-test
 
 TUPLE: forget-class-test ;
 [ t ] [ forget-class-test tuple class<map get hash hash-member? ] unit-test
@@ -187,3 +197,12 @@ TUPLE: forget-class-test ;
 [ t ] [ { hashtable equal? } method-spec? ] unit-test
 [ f ] [ { word = } method-spec? ] unit-test
 [ f ] [ { word + } method-spec? ] unit-test
+
+! Regression
+GENERIC: wii
+M: both wii drop 3 ;
+M: second-one wii drop 4 ;
+M: tuple-class wii drop 5 ;
+M: integer wii drop 6 ;
+
+[ 3 ] [ T{ first-one } wii ] unit-test

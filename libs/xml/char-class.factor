@@ -1,11 +1,17 @@
+! Copyright (C) 2005, 2006 Daniel Ehrenberg
+! See http://factorcode.org/license.txt for BSD license.
 IN: char-classes
-USING: kernel sequences math ;
+USING: kernel sequences math bit-arrays words namespaces
+memoize ;
 
-: in-range-seq? ( number seq -- ? )
-    #! seq: { { min max } { min max }* }
-    [ first2 between? ] contains-with? ;
+: set-range-true ( seq {start,end} -- )
+    first2 1+ rot <slice> [ drop t ] inject ;
 
-PREDICATE: integer 1.1name-start-char
+: ranges>bit-array ( ranges max -- bit-array )
+    <bit-array>
+    dup rot [ set-range-true ] each-with ;
+
+MEMO: 1.1name-start-char ( -- bit-array )
     {
         { CHAR: _    CHAR: _    }
         { CHAR: A    CHAR: Z    }
@@ -22,22 +28,30 @@ PREDICATE: integer 1.1name-start-char
         { HEX: F900  HEX: FDCF  }
         { HEX: FDF0  HEX: FFFD  }
         { HEX: 10000 HEX: EFFFF }
-    } in-range-seq? ;
+    } HEX: F0000 ranges>bit-array ;
 
-PREDICATE: integer 1.1name-char
-    dup 1.1name-start-char? swap {
+: 1.1name-start-char? ( char -- ? )
+    1.1name-start-char ?nth ;
+
+MEMO: 1.1name-char ( -- bit-array )
+    {
         { CHAR: -   CHAR: -   }
         { CHAR: .   CHAR: .   }
         { CHAR: 0   CHAR: 9   }
         { HEX: b7   HEX: b7   }
         { HEX: 300  HEX: 36F  }
         { HEX: 203F HEX: 2040 }
-    } in-range-seq? or ;
+     } HEX: F0000 ranges>bit-array
+     1.1name-start-char [ or ] 2map ;
+
+: 1.1name-char?
+    1.1name-char ?nth ;
 
 ! The following 335 lines were automatically generated
 ! from Appendix B of the XML 1.0 standard, version 3
 
-PREDICATE: integer base-char {
+MEMO: base-char ( -- bit-array )
+{
     { HEX: 0041 HEX: 005A } 
     { HEX: 0061 HEX: 007A } 
     { HEX: 00C0 HEX: 00D6 } 
@@ -239,14 +253,16 @@ PREDICATE: integer base-char {
     { HEX: 3041 HEX: 3094 } 
     { HEX: 30A1 HEX: 30FA } 
     { HEX: 3105 HEX: 312C } 
-    { HEX: AC00 HEX: D7A3 } } in-range-seq? ;
+    { HEX: AC00 HEX: D7A3 } } HEX: D7A4 ranges>bit-array ;
 
-PREDICATE: integer ideographic {
+MEMO: ideographic ( -- bit-array )
+{
     { HEX: 4E00 HEX: 9FA5 } 
     { HEX: 3007 HEX: 3007 } 
-    { HEX: 3021 HEX: 3029 } } in-range-seq? ;
+    { HEX: 3021 HEX: 3029 } } HEX: D7A4 ranges>bit-array ;
 
-PREDICATE: integer combining-char {
+MEMO: combining-char ( -- bit-array )
+{
     { HEX: 0300 HEX: 0345 } 
     { HEX: 0360 HEX: 0361 } 
     { HEX: 0483 HEX: 0486 } 
@@ -341,9 +357,10 @@ PREDICATE: integer combining-char {
     { HEX: 20E1 HEX: 20E1 } 
     { HEX: 302A HEX: 302F } 
     { HEX: 3099 HEX: 3099 } 
-    { HEX: 309A HEX: 309A } } in-range-seq? ;
+    { HEX: 309A HEX: 309A } } HEX: D7A4 ranges>bit-array ;
 
-PREDICATE: integer unicode-digit {
+MEMO: unicode-digit ( -- bit-array )
+{
     { HEX: 0030 HEX: 0039 } 
     { HEX: 0660 HEX: 0669 } 
     { HEX: 06F0 HEX: 06F9 } 
@@ -358,9 +375,10 @@ PREDICATE: integer unicode-digit {
     { HEX: 0D66 HEX: 0D6F } 
     { HEX: 0E50 HEX: 0E59 } 
     { HEX: 0ED0 HEX: 0ED9 } 
-    { HEX: 0F20 HEX: 0F29 } } in-range-seq? ;
+    { HEX: 0F20 HEX: 0F29 } } HEX: D7A4 ranges>bit-array ;
 
-PREDICATE: integer extender {
+MEMO: extender ( -- bit-array )
+{
     { HEX: 00B7 HEX: 00B7 }
     { HEX: 02D0 HEX: 02D0 } 
     { HEX: 02D1 HEX: 02D1 } 
@@ -371,17 +389,25 @@ PREDICATE: integer extender {
     { HEX: 3005 HEX: 3005 } 
     { HEX: 3031 HEX: 3035 } 
     { HEX: 309D HEX: 309E } 
-    { HEX: 30FC HEX: 30FE } } in-range-seq? ;
+    { HEX: 30FC HEX: 30FE } } HEX: D7A4 ranges>bit-array ;
 
 ! end automatically generated code
 
-UNION: 1.0letter base-char ideographic ;
+MEMO: 1.0letter ( -- bit-array )
+    base-char ideographic [ or ] 2map
+    t CHAR: _ pick set-nth ;
 
-PREDICATE: integer 1.0name-start-char
-    dup 1.0letter? swap CHAR: _ = or ;
+: 1.0name-start-char?
+    1.0letter ?nth ;
 
-PREDICATE: integer 1.0other-name-chars
-    { CHAR: . CHAR: - CHAR: _ } member? ;
-UNION: 1.0name-char
-    1.0letter unicode-digit 1.0other-name-chars
-    combining-char extender ;
+: merge ( victim injected-truth -- )
+    dup length [ swap [ t swap pick set-nth ] [ drop ] if ] 2each drop ;
+
+MEMO: 1.0name-char ( -- bit-array )
+    1.0letter clone dup
+    [ unicode-digit , combining-char , extender , ] { } make
+    [ merge ] each-with
+    ".-" [ t swap pick set-nth ] each ;
+
+: 1.0name-char? ( ch -- ? )
+    1.0name-char ?nth ;

@@ -15,7 +15,8 @@ ARTICLE: "compiler-usage" "Compiler usage"
 "The compiler can also compile a single quotation:"
 { $subsection compile-quot }
 { $subsection compile-1 }
-"Two utility words for bulk compilation:"
+"Three utility words for bulk compilation:"
+{ $subsection compile-batch }
 { $subsection compile-vocabs }
 { $subsection compile-all } ;
 

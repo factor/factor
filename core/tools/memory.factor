@@ -1,11 +1,9 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: memory
 USING: arrays errors generic hashtables io kernel
 kernel-internals math namespaces parser prettyprint sequences
 strings styles vectors words ;
-
-: full-gc ( -- ) generations 1- data-gc ;
 
 ! Printing an overview of heap usage.
 
@@ -28,7 +26,7 @@ strings styles vectors words ;
 : room. ( -- )
     [
         { "" "Total" "Used" "Free" } ,
-        data-room 2 group 0 [
+        data-room 2 <groups> 0 [
             "Generation " pick number>string append
             >r first2 r> total/used/free, 1+
         ] reduce drop
@@ -44,8 +42,7 @@ strings styles vectors words ;
     [ swap [ call ] keep (each-object) ] [ 2drop ] if ; inline
 
 : each-object ( quot -- )
-    [ begin-scan [ (each-object) ] keep ]
-    [ end-scan ] cleanup drop ; inline
+    begin-scan (each-object) end-scan ; inline
 
 : (instances) ( obj quot seq -- )
     >r over >r call [ r> r> push ] [ r> r> 2drop ] if ; inline

@@ -1,6 +1,6 @@
 ! Simple IRC bot written in Factor.
 
-REQUIRES: libs/httpd ;
+REQUIRES: apps/http-server ;
 
 USING: errors generic hashtables help html http io kernel math
 memory namespaces parser prettyprint sequences strings threads

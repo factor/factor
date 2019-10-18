@@ -1,4 +1,4 @@
-! Copyright (C) 2006 Alex Chapman
+! Copyright (C) 2006, 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 
 REQUIRES: libs/lazy-lists ;

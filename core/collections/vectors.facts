@@ -1,12 +1,13 @@
 IN: vectors
-USING: arrays help kernel strings ;
+USING: arrays byte-arrays bit-arrays help kernel sbufs strings ;
 
 HELP: vector
 { $description "The class of resizable vectors. See " { $link "syntax-vectors" } " for syntax and " { $link "vectors" } " for general information." } ;
 
 HELP: >vector
 { $values { "seq" "a sequence" } { "vector" "a new vector" } }
-{ $description "Outputs a freshly-allocated vector with the same elements as a given sequence." } ;
+{ $description "Outputs a freshly-allocated vector with the same elements as a given sequence." }
+{ $see-also >array >string >sbuf >quotation >byte-array >bit-array } ;
 
 HELP: array>vector ( array -- vector )
 { $values { "array" "an array" } { "vector" "a new vector" } }

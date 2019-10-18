@@ -14,7 +14,7 @@ M: f json-print ( f -- )
   "false" write ;
 
 M: string json-print ( obj -- )
-  CHAR: " write1 write CHAR: " write1 ;
+  CHAR: " write1 "\"" split "\\\"" join CHAR: \r swap remove "\n" split "\\r\\n" join write CHAR: " write1 ;
 
 M: number json-print ( num -- )  
   number>string write ;

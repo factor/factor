@@ -25,8 +25,8 @@ C: list ( hook presenter model -- gadget )
 : list-presentation-hook ( list -- quot )
     list-hook [ [ [ list? ] is? ] find-parent ] swap append ;
 
-: <list-presentation> ( hook presenter elt -- gadget )
-    [ swap call ] keep <presentation>
+: <list-presentation> ( hook elt presenter -- gadget )
+    keep <presentation>
     [ set-presentation-hook ] keep
     [ text-theme ] keep ;
 
@@ -34,7 +34,7 @@ C: list ( hook presenter model -- gadget )
     dup list-presentation-hook
     over list-presenter
     rot control-value [
-        >r 2dup r> <list-presentation>
+        >r 2dup r> swap <list-presentation>
     ] map 2nip ;
 
 M: list model-changed

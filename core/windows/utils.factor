@@ -6,17 +6,21 @@ IN: win32-api
 ! You must LocalFree the return value!
 FUNCTION: void* error_message ( DWORD id ) ;
 
-: win32-error ( -- )
-    GetLastError dup zero? [
+: (win32-error) ( n -- )
+    dup zero? [
         drop
     ] [
         error_message
-        dup alien>char-string
+        dup alien>u16-string
         swap LocalFree drop
         throw
     ] if ;
+    
 
-: win32-error=0 zero? [ win32-error ] when ;
+: win32-error ( -- )
+    GetLastError (win32-error) ;
+
+: win32-error=0/f dup zero? swap f = or [ win32-error ] when ;
 : win32-error>0 0 > [ win32-error ] when ;
 : win32-error<0 0 < [ win32-error ] when ;
 : win32-error<>0 zero? [ win32-error ] unless ;

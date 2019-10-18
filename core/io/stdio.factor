@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2006 Slava Pestov.
+! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io
 USING: errors generic hashtables kernel namespaces sequences
@@ -12,6 +12,7 @@ SYMBOL: stdio
 : readln ( -- str/f ) stdio get stream-readln ;
 : read1 ( -- ch/f ) stdio get stream-read1 ;
 : read ( n -- str/f ) stdio get stream-read ;
+: read-until ( seps -- str/f sep/f ) stdio get stream-read-until ;
 
 : write1 ( ch -- ) stdio get stream-write1 ;
 : write ( str -- ) stdio get stream-write ;

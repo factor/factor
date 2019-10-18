@@ -78,7 +78,7 @@ SYMBOL: md5-sin-table
 : S43 15 ; inline
 : S44 21 ; inline
 
-: process-md5-block ( block -- )
+: (process-md5-block) ( block -- )
     S11 1 pick 0 nth-int   [ F ] ABCD
     S12 2 pick 1 nth-int   [ F ] DABC
     S13 3 pick 2 nth-int   [ F ] CDAB
@@ -148,15 +148,20 @@ SYMBOL: md5-sin-table
     S44 64 rot 9 nth-int  [ I ] BCDA
     update-md ;
 
+: process-md5-block ( str -- )
+    dup length [ bytes-read [ + ] change ] keep 64 = [
+        (process-md5-block)
+    ] [
+        f bytes-read get pad-last-block
+        [ (process-md5-block) ] each
+    ] if ;
+    
+: (stream>md5) ( -- )
+    64 read [ process-md5-block ] keep
+    length 64 = [ (stream>md5) ] when ;
+
 : get-md5 ( -- str )
     [ [ a b c d ] [ get 4 >le % ] each ] "" make ;
-
-: (stream>md5) ( -- )
-    64 read dup length dup bytes-read [ + ] change 64 = [
-        process-md5-block (stream>md5)
-    ] [
-        f bytes-read get pad-last-block [ process-md5-block ] each
-    ] if ;
 
 IN: crypto
 

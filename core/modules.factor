@@ -1,4 +1,4 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: modules
 USING: hashtables io kernel namespaces parser sequences
@@ -35,7 +35,9 @@ TUPLE: module name loc directory files tests help main ;
     ] if ;
 
 : load-module ( name -- )
-    [ dup loading-module module-def run-file ] no-parse-hook ;
+    [
+        dup loading-module module-def bootstrap-file
+    ] no-parse-hook ;
 
 : reload-module ( module -- )
     dup module-name module-def source-modified? [
@@ -44,8 +46,16 @@ TUPLE: module name loc directory files tests help main ;
         module-files* [ source-modified? ] subset run-files
     ] if ;
 
-: reload-modules ( -- )
-    modules get [ reload-module ] each do-parse-hook ;
+: reload-modules ( seq -- )
+    [ reload-module ] each do-parse-hook ;
+
+: reload-core ( -- )
+    modules get [ module-name "core" head? ] subset
+    reload-modules ;
+
+: reload-libs ( -- )
+    modules get [ module-name "core" head? not ] subset
+    reload-modules ;
 
 : require ( name -- )
     dup module [ drop ] [ load-module ] if do-parse-hook ;
@@ -72,7 +82,7 @@ TUPLE: module name loc directory files tests help main ;
 : provide ( name loc hash -- )
     pick remove-module
     alist>module
-    [ module-files* run-files ] keep
+    [ module-files* bootstrap-files ] keep
     modules get push ;
 
 ! For presentations

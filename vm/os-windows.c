@@ -3,16 +3,16 @@
 F_STRING *get_error_message()
 {
 	DWORD id = GetLastError();
-	char *msg = error_message(id);
-	F_STRING *string = from_char_string(msg);
+	F_CHAR *msg = error_message(id);
+	F_STRING *string = from_u16_string(msg);
 	LocalFree(msg);
 	return string;
 }
 
 /* You must LocalFree() the return value! */
-char *error_message(DWORD id)
+F_CHAR *error_message(DWORD id)
 {
-	char *buffer;
+	F_CHAR *buffer;
 	int index;
 
 	FormatMessage(
@@ -21,11 +21,11 @@ char *error_message(DWORD id)
 		NULL,
 		id,
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPTSTR) &buffer,
+		(LPTSTR)(void *) &buffer,
 		0, NULL);
 
 	/* strip whitespace from end */
-	index = strlen(buffer) - 1;
+	index = wcslen(buffer) - 1;
 	while(index >= 0 && isspace(buffer[index]))
 		buffer[index--] = 0;
 
@@ -57,7 +57,7 @@ void ffi_dlopen (F_DLL *dll, bool error)
 	dll->dll = module;
 }
 
-void *ffi_dlsym (F_DLL *dll, char *symbol, bool error)
+void *ffi_dlsym (F_DLL *dll, F_SYMBOL *symbol, bool error)
 {
 	void *sym = GetProcAddress(
 		dll ? (HMODULE)dll->dll : GetModuleHandle(NULL),
@@ -67,7 +67,7 @@ void *ffi_dlsym (F_DLL *dll, char *symbol, bool error)
 	{
 		if(error)
 			simple_error(ERROR_FFI,
-				tag_object(from_char_string(symbol)),
+				tag_object(from_symbol_string(symbol)),
 				tag_object(get_error_message()));
 		else
 			return NULL;
@@ -76,7 +76,7 @@ void *ffi_dlsym (F_DLL *dll, char *symbol, bool error)
 	return sym;
 }
 
-void ffi_dlclose (F_DLL *dll)
+void ffi_dlclose(F_DLL *dll)
 {
 	FreeLibrary((HMODULE)dll->dll);
 	dll->dll = NULL;
@@ -87,7 +87,7 @@ void primitive_stat(void)
 	WIN32_FILE_ATTRIBUTE_DATA st;
 
 	if(!GetFileAttributesEx(
-		unbox_char_string(),
+		unbox_u16_string(),
 		GetFileExInfoStandard,
 		&st))
 	{
@@ -111,9 +111,9 @@ void primitive_read_dir(void)
 {
 	HANDLE dir;
 	WIN32_FIND_DATA find_data;
-	char path[MAX_PATH + 4];
+	F_CHAR path[MAX_PATH + 4];
 
-	sprintf(path, "%s\\*", unbox_char_string());
+	snwprintf(path, MAX_PATH + 4, STR_FORMAT "\\*", unbox_u16_string());
 
 	GROWABLE_ARRAY(result);
 
@@ -122,7 +122,7 @@ void primitive_read_dir(void)
 		do
 		{
 			REGISTER_ARRAY(result);
-			CELL name = tag_object(from_char_string(
+			CELL name = tag_object(from_u16_string(
 				find_data.cFileName));
 			UNREGISTER_ARRAY(result);
 			GROWABLE_ADD(result,name);
@@ -138,39 +138,40 @@ void primitive_read_dir(void)
 
 void primitive_cwd(void)
 {
-	char buf[MAX_PATH];
+	F_CHAR buf[MAX_PATH];
 
 	if(!GetCurrentDirectory(MAX_PATH, buf))
 		io_error();
 
-	box_char_string(buf);
+	box_u16_string(buf);
 }
 
 void primitive_cd(void)
 {
-	SetCurrentDirectory(unbox_char_string());
+	SetCurrentDirectory(unbox_u16_string());
 }
 
 F_SEGMENT *alloc_segment(CELL size)
 {
-	SYSTEM_INFO si;
 	char *mem;
 	DWORD ignore;
 
-	GetSystemInfo(&si);
-	if((mem = (char *)VirtualAlloc(NULL, si.dwPageSize*2 + size, MEM_COMMIT, PAGE_EXECUTE_READWRITE)) == 0)
-		fatal_error("VirtualAlloc() failed in alloc_segment()",0);
+	if((mem = (char *)VirtualAlloc(NULL, getpagesize() * 2 + size,
+		MEM_COMMIT, PAGE_EXECUTE_READWRITE)) == 0)
+		fatal_error("Out of memory in alloc_segment",0);
 
-	if (!VirtualProtect(mem, si.dwPageSize, PAGE_NOACCESS, &ignore))
+	if (!VirtualProtect(mem, getpagesize(), PAGE_NOACCESS, &ignore))
 		fatal_error("Cannot allocate low guard page", (CELL)mem);
 
-	if (!VirtualProtect(mem+size+si.dwPageSize, si.dwPageSize, PAGE_NOACCESS, &ignore))
+	if (!VirtualProtect(mem + size + getpagesize(),
+		getpagesize(), PAGE_NOACCESS, &ignore))
 		fatal_error("Cannot allocate high guard page", (CELL)mem);
 
 	F_SEGMENT *block = safe_malloc(sizeof(F_SEGMENT));
 
-	block->start = (int)mem + si.dwPageSize;
+	block->start = (CELL)mem + getpagesize();
 	block->size = size;
+	block->end = block->start + size;
 
 	return block;
 }
@@ -180,7 +181,7 @@ void dealloc_segment(F_SEGMENT *block)
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
 	if(!VirtualFree((void*)(block->start - si.dwPageSize), 0, MEM_RELEASE))
-		fatal_error("VirtualFree() failed",0);
+		fatal_error("dealloc_segment failed",0);
 	free(block);
 }
 
@@ -214,11 +215,11 @@ typedef struct exception_record
 void seh_call(void (*func)(), exception_handler_t *handler)
 {
 	exception_record_t record;
-	asm("mov %%fs:0, %0" : "=r" (record.next_handler));
-	asm("mov %0, %%fs:0" : : "r" (&record));
+	asm volatile("mov %%fs:0, %0" : "=r" (record.next_handler));
+	asm volatile("mov %0, %%fs:0" : : "r" (&record));
 	record.handler_func = handler;
 	func();
-	asm("mov %0, %%fs:0" : "=r" (record.next_handler));
+	asm volatile("mov %0, %%fs:0" : "=r" (record.next_handler));
 }
 
 static long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)

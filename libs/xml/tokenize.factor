@@ -1,5 +1,7 @@
-USING: xml-errors xml-data kernel state-parser kernel namespaces
-    errors strings math sequences hashtables char-classes arrays ;
+! Copyright (C) 2005, 2006 Daniel Ehrenberg
+! See http://factorcode.org/license.txt for BSD license.
+USING: xml-errors xml-data kernel state-parser kernel namespaces xml-utils
+    errors strings math sequences hashtables char-classes arrays entities ;
 IN: xml-tokenize
 
 ! -- Parsing names
@@ -16,9 +18,8 @@ IN: xml-tokenize
 
 : (parse-name) ( -- str )
     version=1.0? dup
-    new-record get-char name-start-char? [
-        [ dup get-char name-char? not ] skip-until
-        drop end-record
+    get-char name-start-char? [
+        [ dup get-char name-char? not ] take-until nip
     ] [
         "Malformed name" <xml-string-error> throw
     ] if ;
@@ -29,84 +30,37 @@ IN: xml-tokenize
 
 !   -- Parsing strings
 
-: expect ( ch -- )
-    get-char 2dup = [ 2drop ] [
-        >r ch>string r> ch>string <expected> throw
-    ] if next ;
-
-: expect-string* ( num -- )
-    #! only skips string, and only for when you're sure the string is there
-    [ next ] times ;
-
-: expect-string ( string -- )
-    ! TODO: add error if this isn't long enough
-    new-record dup length [ next ] times
-    end-record 2dup = [ 2drop ]
-    [ <expected> throw ] if ;
-
-: entities
-    #! We have both directions here as a shortcut.
-    H{
-        { "lt"    CHAR: <  }
-        { "gt"    CHAR: >  }
-        { "amp"   CHAR: &  }
-        { "apos"  CHAR: '  }
-        { "quot"  CHAR: "  }
-        { CHAR: < "&lt;"   }
-        { CHAR: > "&gt;"   }
-        { CHAR: & "&amp;"  }
-        { CHAR: ' "&apos;" }
-        { CHAR: " "&quot;" }
-    } ;
-
-
-: ?bad-name [ <bad-name> throw ] when ;
-: assert-name ( string -- string/* )
-    dup "" = ?bad-name
-    version=1.0? over first name-start-char?
-    not ?bad-name
-    version=1.0? over [ name-char? ] all-with?
-    not ?bad-name ;
-
 : (parse-entity) ( string -- )
-    dup entities hash [ push-record ] [ 
+    dup entities hash [ , ] [ 
         prolog-data get prolog-standalone
         [ <no-entity> throw ] [
-            0 end-record* , assert-name
-            <entity> , next new-record
+            dup extra-entities get ?hash
+            [ , ] [ <no-entity> throw ] ?if
         ] if
     ] ?if ;
 
 : parse-entity ( -- )
-    next unrecord unrecord 
-    ! the following line is in a scope to shield this
-    ! word from the record-altering side effects of
-    ! take-until.
-    [ CHAR: ; take-char ] with-scope
+    next CHAR: ; take-char next
     "#" ?head [
-        "x" ?head 16 10 ? base>
-        push-record
+        "x" ?head 16 10 ? base> ,
     ] [ (parse-entity) ] if ;
 
 : (parse-char) ( ch -- )
     get-char {
-        { [ dup not ]
-          [ 2drop 0 end-record* , ] }
-        { [ 2dup = ]
-          [ 2drop end-record , next ] }
-        { [ CHAR: & = ]
-          [ parse-entity (parse-char) ] }
-        { [ t ] [ next (parse-char) ] }
+        { [ dup not ] [ 2drop ] }
+        { [ 2dup = ] [ 2drop next ] }
+        { [ dup CHAR: & = ] [ drop parse-entity (parse-char) ] }
+        { [ t ] [ , next (parse-char) ] }
     } cond ;
 
-: parse-char ( ch -- array )
-    [ new-record (parse-char) ] { } make ;
+: parse-char ( ch -- string )
+    [ (parse-char) ] "" make ;
 
-: parse-quot ( ch -- array )
+: parse-quot ( ch -- string )
     parse-char get-char
     [ "XML file ends in a quote" <xml-string-error> throw ] unless ;
 
-: parse-text ( -- array )
+: parse-text ( -- string )
     CHAR: < parse-char ;
 
 ! -- Parsing tags
@@ -116,25 +70,25 @@ IN: xml-tokenize
     get-char CHAR: / = dup [ next ] when
     parse-name swap ;
 
-: parse-prop-value ( -- seq )
+: parse-attr-value ( -- seq )
     get-char dup "'\"" member? [
         next parse-quot
     ] [
         "Attribute lacks quote" <xml-string-error> throw
     ] if ;
 
-: parse-prop ( -- )
+: parse-attr ( -- )
     [ parse-name ] with-scope
     pass-blank CHAR: = expect pass-blank
-    [ parse-prop-value ] with-scope
-    swap set ;
+    [ parse-attr-value ] with-scope
+    2array , ;
 
 : (middle-tag) ( -- )
     pass-blank version=1.0? get-char name-start-char?
-    [ parse-prop (middle-tag) ] when ;
+    [ parse-attr (middle-tag) ] when ;
 
 : middle-tag ( -- hash )
-    [ (middle-tag) ] make-hash pass-blank ;
+    [ (middle-tag) ] V{ } make pass-blank ;
 
 : end-tag ( string hash -- tag )
     pass-blank get-char CHAR: / =
@@ -150,20 +104,50 @@ IN: xml-tokenize
     "[CDATA[" expect-string "]]>" take-string next ;
 
 : direct ( -- object )
-    {
-        { [ "--" string-matches? ] [ skip-comment ] }
-        { [ "[CDATA[" string-matches? ] [ cdata ] }
+    get-char {
+        { [ dup CHAR: - = ] [ drop skip-comment ] }
+        { [ CHAR: [ = ] [ cdata ] }
         { [ t ] [ CHAR: > take-char <directive> next ] }
     } cond ;
 
+: yes/no>bool ( string -- t/f )
+    dup "yes" = [ drop t ] [
+        dup "no" = [ drop f ] [
+            <not-yes/no> throw
+        ] if
+    ] if ;
+
+: assure-no-extra ( seq -- )
+    [ first ] map {
+        T{ name f "" "version" f }
+        T{ name f "" "encoding" f }
+        T{ name f "" "standalone" f }
+    } swap diff dup empty? [ drop ] [ <extra-attrs> throw ] if ; 
+
+: good-version ( version -- version )
+    dup { "1.0" "1.1" } member? [ <bad-version> throw ] unless ;
+
+: prolog-attrs ( alist -- prolog )
+    [ T{ name f "" "version" f } swap get-attr
+      [ good-version ] [ <versionless-prolog> throw ] if* ] keep
+    [ T{ name f "" "encoding" f } swap get-attr
+      [ "iso-8859-1" ] unless* ] keep
+    T{ name f "" "standalone" f } swap get-attr
+    [ yes/no>bool ] [ f ] if*
+    <prolog> ;
+
+: parse-prolog ( -- prolog )
+    pass-blank middle-tag "?>" expect-string
+    dup assure-no-extra prolog-attrs
+    dup prolog-data set ;
+
 : instruct ( -- instruction )
-    "?>" take-string 
-    dup length 3 >= [
-        dup 3 head-slice >lower "xml" = [
-            <bad-prolog> throw
-        ] when
-    ] when
-    <instruction> ;
+    (parse-name) dup "xml" =
+    [ drop parse-prolog ] [
+        dup >lower "xml" =
+        [ <capitalized-prolog> throw ]
+        [ "?>" take-string append <instruction> ] if
+    ] if ;
 
 : make-tag ( -- tag )
     {

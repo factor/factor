@@ -21,9 +21,62 @@ Word.prototype.toString = function() {
   return html.join("");
 }
 
+function Hashtable() {
+  this.table = { }
+}
+
+Hashtable.prototype.fromAlist = function(alist) {
+  var obj = { }
+  for(var i=0;i<alist.length;++i) {  
+    var item = alist[i];
+    obj[item[0]] = item[1];
+  }
+  this.table = obj;
+  return this;
+}
+
+Hashtable.prototype.toAlist = function() {
+  var table = this.table;
+  var alist = [ ];
+  for(k in table) {
+    var v = table[k];
+    alist.push([k,v]);
+  }
+  return alist;
+}
+
+Hashtable.prototype.get = function(key) {
+  var table = this.table;
+  if(table.hasOwnProperty(key)) {
+    return table[key];
+  }
+  return false;
+}
+
+Hashtable.prototype.set = function(key, value) {
+  this.table[key] = value;
+}
+
+Hashtable.prototype.toString = function() {
+  var table = this.table;
+  var result = [];
+  result.push("H{")
+  for(k in table) {
+    var v = table[k];
+    result.push(" { ");
+    result.push(k);
+    result.push(" ");
+    result.push(v);
+    result.push(" }");
+  }
+  result.push("}");
+  return result.join("");    
+}
+
 function Continuation() {
   this.data_stack = [ ];
   this.retain_stack = [ ];
+  this.name_stack = [ ];
   this.next = false;
   this.nesting = 0;
 }
@@ -32,15 +85,16 @@ Continuation.prototype.clone = function() {
   var c = new Continuation();
   c.data_stack = this.data_stack.slice(0);
   c.retain_stack = this.retain_stack.slice(0);
+  c.name_stack = this.name_stack.slice(0);
   c.nesting = this.nesting;
   c.next = this.next;
   return c;
 }
 
 function Factor() {
-  this.vocabs = { scratchpad: { } };
+  this.vocabs = { scratchpad: { }, io: { } };
   this.in_vocab = "scratchpad";
-  this.using_vocabs = [ "scratchpad", "kernel","math","sequences","parser","alien","browser-dom", "words" ];
+  this.using_vocabs = [ "scratchpad", "kernel","math","sequences","parser","alien","browser-dom", "words", "io", "hashtables" ];
   this.cont = new Continuation();
 }
 
@@ -61,6 +115,21 @@ Factor.prototype.call_next = function(next) {
 Factor.prototype.push_data = function(v, next) {
   factor.cont.data_stack.push(v);
   factor.call_next(next);
+}
+
+Factor.prototype.use = function(v, next) {
+  factor.cont.data_stack.push(v);
+  factor.get_word("kernel", "use+").execute(next);
+}
+
+Factor.prototype.using = function(v, next) {
+  factor.cont.data_stack.push(v);
+  factor.get_word("kernel", "using").execute(next);
+}
+
+Factor.prototype.set_in = function(v, next) {
+  factor.cont.data_stack.push(v);
+  factor.get_word("kernel", "set-in").execute(next);
 }
 
 Factor.prototype.get_word = function(vocab,name) {
@@ -117,30 +186,42 @@ Factor.prototype.make_quotation = function(source, func) {
   });
 }
 
-Factor.prototype.server_eval = function(text, next) {
+Factor.prototype.server_eval = function(text, handler, next) {
    var self = this;
    $.post("/responder/fjsc/compile", { code: text }, function(result) {
-     document.getElementById('compiled').value=result;
-     document.getElementById('code').value="";
-     var func = eval(result);
-     factor.cont.next = function() { self.display_datastack(); } 
-     func(factor);
-     if(next) 
-       factor.call_next(next);
+     factor.run_eval = function(func) {
+       factor.cont.next = function() { handler(text,result); } 
+       try {
+         func(factor);
+       } catch(ex) {
+         alert("Error Parsing Javascript: " + ex); 
+         handler(text, result);
+       }
+       if(next) 
+         factor.call_next(next);
+     }
+     try {
+       eval("factor.run_eval" + result);
+     } catch(e) {
+       factor.run_eval(function() { alert("Error Parsing Javascript: " + e); });
+     }
    });
 }
 
-Factor.prototype.display_datastack = function() {
-   var html=[];
-   html.push("<table border='1'>")
-   for(var i = 0; i < this.cont.data_stack.length; ++i) {
-      html.push("<tr><td>")
-      html.push(this.cont.data_stack[i])
-      html.push("</td></tr>")
-   }
-   html.push("</table>")
-   document.getElementById('stack').innerHTML=html.join("");
-}
+/* kernel-internals vocabulary */
+factor.add_word("kernel-internals", ">n", "primitive", function(next) {
+  var data_stack = factor.cont.data_stack;
+  var name_stack = factor.cont.name_stack;
+  name_stack.push(data_stack.pop());
+  factor.call_next(next);
+});
+
+factor.add_word("kernel-internals", "n>", "primitive", function(next) {
+  var data_stack = factor.cont.data_stack;
+  var name_stack = factor.cont.name_stack;
+  data_stack.push(name_stack.pop());
+  factor.call_next(next);
+});
 
 /* Kernel Vocabulary */
 factor.add_word("kernel","dup", "primitive", function(next) {
@@ -164,6 +245,12 @@ factor.add_word("kernel", "nip", "primitive", function(next) {
 factor.add_word("kernel", "over", "primitive", function(next) {
   var stack = factor.cont.data_stack;
   stack[stack.length] = stack[stack.length-2];
+  factor.call_next(next);
+});
+
+factor.add_word("kernel", "pick", "primitive", function(next) {
+  var stack = factor.cont.data_stack;
+  stack[stack.length] = stack[stack.length-3];
   factor.call_next(next);
 });
 
@@ -272,7 +359,7 @@ factor.add_word("kernel", "continue-with", "primitive", function(next) {
   factor.call_next(cont.next);
 });
 
-factor.add_word("kernel", "in", "primitive", function(next) {   
+factor.add_word("kernel", "set-in", "primitive", function(next) {   
   var stack = factor.cont.data_stack;
   var vocab = stack.pop();
   var v = factor.vocabs[vocab];
@@ -290,7 +377,7 @@ factor.add_word("kernel", "current-vocab", "primitive", function(next) {
   factor.call_next(next);  
 });
 
-factor.add_word("kernel", "use", "primitive", function(next) {   
+factor.add_word("kernel", "use+", "primitive", function(next) {   
   var stack = factor.cont.data_stack;
   var vocab = stack.pop();
   var v = factor.vocabs[vocab];
@@ -305,15 +392,15 @@ factor.add_word("kernel", "use", "primitive", function(next) {
 factor.add_word("kernel", "using", "primitive", function(next) {   
   var stack = factor.cont.data_stack;
   var vocabs = stack.pop();
-  factor.using_vocabs = [];
+
   for(var i=0;i<vocabs.length;++i) {  
     var v = factor.vocabs[vocabs[i]];
     if(!v) {
       v = { };
       factor.vocabs[vocabs[i]] = v;
     }
+    factor.using_vocabs.push(vocabs[i]);
   }
-  factor.using_vocabs = vocabs;
   factor.call_next(next);  
 });
 
@@ -378,16 +465,11 @@ factor.add_word("math", "/", "primitive", function(next) {
   factor.call_next(next);
 });
 
-factor.add_word("prettyprint", ".", "primitive", function(next) {
-  alert(factor.cont.data_stack.pop());
-  factor.call_next(next);
-});
-
 factor.add_word("parser", "run-file", "primitive", function(next) {  
   var stack = factor.cont.data_stack;
   var url = stack.pop();
   $.get(url, function(result) {
-    factor.server_eval(result, next);
+    factor.server_eval(result, function() { }, next);
   });
 });
 
@@ -403,7 +485,11 @@ factor.add_word("alien", "alien-invoke", "primitive", function(next) {
   for(var i = 0; i < arg_types.length; ++i) {
     args[i] = stack.pop();
   }
-  var v = obj[method_name].apply(obj, args.reverse());
+  var func = obj[method_name];
+  if(method_name=="alert") {
+    func = function(a) { alert(a); }
+  }
+  var v = func.apply(obj, args.reverse());
   if(return_values.length > 0)
     stack.push(v);
   factor.call_next(next);
@@ -552,9 +638,68 @@ factor.add_word("sequences", "reduce", "primitive", function(next) {
     stack.push(prev);
     stack.push(seq[i]);
     quot.execute();
-    prev=stack.pop();
+    prev=stack.pop();Al
   }
   stack.push(prev);
+  factor.call_next(next);
+});
+
+/* hashtables vocabulary */
+factor.add_word("hashtables", "alist>hash", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var alist = stack.pop();
+  stack.push(new Hashtable().fromAlist(alist));
+  factor.call_next(next);
+});
+
+factor.add_word("hashtables", "hash>alist", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var hashtable = stack.pop();
+  stack.push(hashtable.toAlist());
+  factor.call_next(next);
+});
+
+factor.add_word("hashtables", "hash", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var hashtable = stack.pop();
+  var key = stack.pop();
+  stack.push(hashtable.get(key));
+  factor.call_next(next);
+});
+
+factor.add_word("hashtables", "set-hash", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var hashtable = stack.pop();
+  var key = stack.pop();
+  var value = stack.pop();
+  hashtable.set(key, value);
+  factor.call_next(next);
+});
+
+factor.add_word("sequences", "hash-each", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var quot = stack.pop();
+  var hashtable = stack.pop().table;
+  for(k in hashtable) {  
+    var v = hashtable[k]; 
+    stack.push(k, v);
+    quot.execute();
+  }
+  factor.call_next(next);
+});
+
+factor.add_word("sequences", "hash-map", "primitive", function(next) {   
+  var stack = factor.cont.data_stack;
+  var quot = stack.pop();
+  var hashtable = stack.pop().table;
+  var result = [ ];
+  for(k in hashtable) {  
+    var v = hashtable[k];
+    stack.push(k,v);
+    quot.execute();
+    result.push(stack.pop());
+  }
+  stack.push(result);
   factor.call_next(next);
 });
 
@@ -590,10 +735,3 @@ factor.add_word("browser-dom", "json-request", "primitive", function(next) {
   factor.get_word("browser-dom", "load-script").execute();
 });
 
-
-/* Run initial factor code */
-$(document).ready(function() {
-  $.get("/responder/fjsc-resources/bootstrap.factor", function(result) {
-    factor.server_eval(result, function() { });
-  });
-});

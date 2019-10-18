@@ -1,7 +1,7 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: gadgets-text
-USING: arrays definitions gadgets gadgets-panes
+IN: gadgets-interactor
+USING: arrays definitions gadgets gadgets-panes gadgets-text
 generic hashtables help io kernel namespaces prettyprint styles
 threads sequences vectors definitions parser words strings
 math listener models errors ;
@@ -30,7 +30,7 @@ C: caret-help ( interactor -- caret-help )
 M: caret-help model-changed
     dup caret-help-gadget
     swap caret-help-model model-value over word-at-loc
-    swap show-status ;
+    swap show-summary ;
 
 : init-caret-help ( interactor -- )
     dup <caret-help> swap set-interactor-help ;

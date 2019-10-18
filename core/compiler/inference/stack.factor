@@ -12,13 +12,13 @@ sequences words parser words ;
     >r effect-out length 0 r> node-outputs ;
 
 : infer-shuffle ( shuffle -- )
+    dup effect-in ensure-values
     #shuffle dup node,
     2dup infer-shuffle-inputs
     over shuffle-stacks
     infer-shuffle-outputs ;
 
 : define-shuffle ( word shuffle -- )
-    [ "inferred-effect" set-word-prop ] 2keep
     [ infer-shuffle ] curry "infer" set-word-prop ;
 
 {
@@ -41,13 +41,12 @@ sequences words parser words ;
 } [ first2 define-shuffle ] each
 
 \ >r [
+    1 ensure-values
     #>r dup node,
     1 0 pick node-inputs
     pop-d push-r
     0 1 rot node-outputs
 ] "infer" set-word-prop
-
-\ >r { object } { } <effect> "inferred-effect" set-word-prop
 
 \ r> [
     check-r>
@@ -56,5 +55,3 @@ sequences words parser words ;
     pop-r push-d
     1 0 rot node-outputs
 ] "infer" set-word-prop
-
-\ r> { } { object } <effect> "inferred-effect" set-word-prop

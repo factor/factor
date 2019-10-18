@@ -129,7 +129,7 @@ SYMBOL: double-click-timeout
 
 : modifier ( mod modifiers -- seq )
     [ second swap bitand 0 > ] subset-with
-    0 <column> prune f like ;
+    0 <column> prune dup empty? [ drop f ] [ >array ] if ;
 
 : drag-loc ( -- loc )
     hand-loc get-global hand-click-loc get-global v- ;

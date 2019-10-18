@@ -1,47 +1,25 @@
-IN: temporary
-USING: compiler hashtables io kernel math math namespaces
-sequences strings vectors words words ;
+REQUIRES: libs/memoize ;
+USING: io kernel sequences strings vectors words memoize tools ;
+IN: reverse-complement
 
-DEFER: trans-map
+MEMO: trans-map ( -- str )
+    256 >string
+    "TGCAAKYRMBDHV" "ACGTUMRYKVHDB"
+    [ pick set-nth ] 2each ;
 
-: add-translation \ trans-map get set-nth ;
+: do-trans-map ( str -- ) [ ch>upper trans-map nth ] inject ;
 
-[
-    256 0 <string> \ trans-map set
-    26 [ CHAR: A + dup add-translation ] each
-    26 [ dup CHAR: A + swap CHAR: a + add-translation ] each
+\ do-trans-map { string } "specializer" set-word-prop
 
-    "TGCAAKYRMBDHV"
-    "ACGTUMRYKVHDB"
-    2dup
-    [ add-translation ] 2each
-    [ ch>lower add-translation ] 2each
-    
-    \ trans-map get
-] with-scope
-
-\ trans-map swap unit define-compound
-\ trans-map t "inline" set-word-prop
-
-: translate-seq ( seq -- sbuf )
-    [
-        30000000 <sbuf> building set
-        <reversed> [ <reversed> % ] each
-        building get dup [ trans-map nth ] inject
-    ] with-scope ;
-
-SYMBOL: out
-
-: seg ( sbuf n -- str )
-    60 * dup 60 + pick length min rot <slice> >string ;
+: translate-seq ( seq -- str )
+    concat dup nreverse dup do-trans-map ;
 
 : show-seq ( seq -- )
-    translate-seq dup length 59 + 60 /i
-    [ seg out get stream-print ] each-with ;
+    translate-seq 60 <groups> [ print ] each ;
 
 : do-line ( seq line -- seq )
     dup first ">;" memq? [
-        over show-seq out get stream-print dup delete-all
+        over show-seq print dup delete-all
     ] [
         over push
     ] if ;
@@ -50,9 +28,13 @@ SYMBOL: out
     readln [ do-line (reverse-complement) ] [ show-seq ] if* ;
 
 : reverse-complement ( infile outfile -- )
-    <file-writer> [
-        stdio get out set
-        <file-reader> [
-            500000 <vector> (reverse-complement)
-        ] with-stream
+    <file-writer> >r <file-reader> r> <duplex-stream> [
+        500000 <vector> (reverse-complement)
     ] with-stream ;
+
+USE: test
+
+: run
+    "/Users/slava/reverse-complement-in.txt"
+    "/Users/slava/reverse-complement-out.txt" 
+    [ reverse-complement ] time ;

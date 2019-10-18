@@ -1,14 +1,16 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays errors hashtables kernel kernel-internals
 math namespaces sequences vectors words ;
 IN: generic
 
-: picker ( dispatch# -- quot )
-    { [ dup ] [ over ] [ pick ] } nth ;
+: pickers { [ dup ] [ over ] [ pick ] } ; inline
 
-: unpicker ( dispatch# -- quot )
-    { [ nip ] [ >r nip r> swap ] [ >r >r nip r> r> -rot ] } nth ;
+: picker ( dispatch# -- quot ) pickers nth ;
+
+: unpickers { [ nip ] [ >r nip r> swap ] [ >r >r nip r> r> -rot ] } ; inline
+
+: unpicker ( dispatch# -- quot ) unpickers nth ;
 
 TUPLE: no-method object generic ;
 
@@ -91,8 +93,11 @@ TUPLE: no-method object generic ;
 
 : small-generic? ( word -- ? ) generic-tags length 3 <= ;
 
+: empty-generic? ( word -- ? ) "methods" word-prop hash-empty? ;
+
 : standard-combination ( word dispatch# -- quot )
     swap {
+        { [ dup empty-generic? ] [ empty-method ] }
         { [ dup tag-generic? ] [ num-tags \ tag type-generic ] }
         { [ dup small-generic? ] [ small-generic ] }
         { [ t ] [ num-types \ type type-generic ] }

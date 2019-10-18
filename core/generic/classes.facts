@@ -4,7 +4,7 @@ HELP: classes
 { $values { "seq" "a sequence of class words" } }
 { $description "Finds all class words in the dictionary." } ;
 
-HELP: builtin
+HELP: builtin-class
 { $class-description "The class of built-in classes." } ;
 
 HELP: typemap
@@ -84,10 +84,6 @@ HELP: lookup-union
 { $description "Given a set of classes represented as a hashtable with equal keys and values, looks up a previously-defined union class having those members. If no union is defined, outputs " { $link object } "." }
 { $see-also "unions" class-and class-or } ;
 
-HELP: types*
-{ $values { "class" "a class word" } { "classes" "a hashtable mapping class words to themselves" } }
-{ $description "Outputs a sequence of builtin classes whose instances can possibly be instances of the given class." } ;
-
 HELP: class-or
 { $values { "class1" "a class word" } { "class2" "a class word" } { "class" "a class word" } }
 { $description "Outputs a class whose instances are instances of either one of the two input classes. If the union is non-empty but no class with those members is defined, outputs " { $link object } "." } ;
@@ -110,23 +106,19 @@ HELP: define-class
 $low-level-note ;
 
 HELP: define-predicate-class
-{ $values { "class" "a class word" } { "predicate" "a predicate word" } { "definition" "a quotation with stack effect " { $snippet "( superclass -- ? )" } } }
+{ $values { "superclass" "a class word" } { "class" "a class word" } { "definition" "a quotation with stack effect " { $snippet "( superclass -- ? )" } } }
 { $description "Defines a predicate class. The superclass of " { $snippet "class" } " must already be set." }
 { $see-also POSTPONE: PREDICATE: } ;
 
-HELP: predicate
+HELP: predicate-class
 { $class-description "The class of predicate class words." }
 { $see-also "predicates" POSTPONE: PREDICATE: } ;
 
-HELP: union-predicate
-{ $values { "seq" "a sequence of class words" } { "quot" "a quotation with stack effect " { $snippet "( object -- ? )" } } }
-{ $description "Outputs a quotation for testing of an object is an instance of one of the given classes." } ;
-
-HELP: define-union
-{ $values { "class" "a class word" } { "predicate" "a predicate word" } { "members" "a sequence of class words" } }
+HELP: define-union-class
+{ $values { "class" "a class word" } { "members" "a sequence of class words" } }
 { $description "Defines a union class with specified members." }
 { $see-also POSTPONE: UNION: } ;
 
-HELP: union
+HELP: union-class
 { $class-description "The class of union class words." } 
 { $see-also "unions" POSTPONE: UNION: } ;

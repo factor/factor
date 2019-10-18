@@ -1,9 +1,5 @@
 IN: analysis-internals
-USING: kernel sequences errors namespaces math ;
-
-: Z:(-inf,0]? ( n -- bool )
-    #! nonpositive integer
-    dup 0 <= [ integer? ] [ drop f ] if ;
+USING: kernel math-contrib sequences errors namespaces math ;
 
 ! http://www.rskey.org/gamma.htm  "Lanczos Approximation"
 ! n=6: error ~ 3 x 10^-11

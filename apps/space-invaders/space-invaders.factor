@@ -1,40 +1,12 @@
 ! Copyright (C) 2006 Chris Double.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+! See http://factorcode.org/license.txt for BSD license.
+!
 USING: alien cpu-8080 errors generic io kernel kernel-internals
 math namespaces sequences styles threads gadgets gadgets opengl arrays 
-concurrency ;
+concurrency openal shuffle ;
 IN: space-invaders
 
-TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o bitmap ;
-
-: dip ( x y quot -- y )
-  #! Showing my Joy roots...
-  swap >r call r> ; inline
-
-: dipd ( x y z quot -- y z )
-  #! Showing my Joy roots...
-  -rot >r >r call r> r> ; inline  
-
+TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o bitmap sounds looping? ;
 : game-width 224  ; inline
 : game-height 256 ; inline
 
@@ -59,10 +31,46 @@ TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o bitmap ;
   [ [ 1 + ] dip uchar-nth ] 2keep
   [ 2 + ] dip uchar-nth 3array ;
   
+: SOUND-SHOT         ( -- number ) 0 ;
+: SOUND-UFO          ( -- number ) 1 ;
+: SOUND-BASE-HIT     ( -- number ) 2 ;
+: SOUND-INVADER-HIT  ( -- number ) 3 ;
+: SOUND-WALK1        ( -- number ) 4 ;
+: SOUND-WALK2        ( -- number ) 5 ;
+: SOUND-WALK3        ( -- number ) 6 ;
+: SOUND-WALK4        ( -- number ) 7 ;
+: SOUND-UFO-HIT      ( -- number ) 8 ;
+
+: init-sound ( index cpu filename  -- )
+  swapd >r space-invaders-sounds nth AL_BUFFER r> 
+  resource-path create-buffer-from-wav set-source-param ; 
+
+: init-sounds ( cpu -- )
+  init-openal
+  [ 9 gen-sources swap set-space-invaders-sounds ] keep
+  [ SOUND-SHOT        "apps/space-invaders/resources/Shot.wav" init-sound ] keep 
+  [ SOUND-UFO         "apps/space-invaders/resources/Ufo.wav" init-sound ] keep 
+  [ space-invaders-sounds SOUND-UFO swap nth AL_LOOPING AL_TRUE set-source-param ] keep
+  [ SOUND-BASE-HIT    "apps/space-invaders/resources/BaseHit.wav" init-sound ] keep 
+  [ SOUND-INVADER-HIT "apps/space-invaders/resources/InvHit.wav" init-sound ] keep 
+  [ SOUND-WALK1       "apps/space-invaders/resources/Walk1.wav" init-sound ] keep 
+  [ SOUND-WALK2       "apps/space-invaders/resources/Walk2.wav" init-sound ] keep 
+  [ SOUND-WALK3       "apps/space-invaders/resources/Walk3.wav" init-sound ] keep 
+  [ SOUND-WALK4       "apps/space-invaders/resources/Walk4.wav" init-sound ] keep 
+  [ SOUND-UFO-HIT    "apps/space-invaders/resources/UfoHit.wav" init-sound ] keep
+  f swap set-space-invaders-looping? ;
+
 C: space-invaders ( -- cpu )
   [ <cpu> swap set-delegate ] keep
   [ make-opengl-bitmap swap set-space-invaders-bitmap ] keep
+  [ init-sounds ] keep
   [ reset ] keep ;
+
+: play-invaders-sound ( cpu sound -- )
+  swap space-invaders-sounds nth source-play ;
+
+: stop-invaders-sound ( cpu sound -- )
+  swap space-invaders-sounds nth source-stop ;
 
 : read-port1 ( cpu -- byte )
   #! Port 1 maps the keys for space invaders
@@ -106,6 +114,21 @@ M: space-invaders read-port ( port cpu -- byte )
   #! Setting this value affects the value read from port 3
   set-space-invaders-port2o ;
 
+: bit-set? ( value bit -- bool )
+  1 swap shift bitand 0 = not ;
+
+: bit-clear? ( value bit -- bool )
+  1 swap shift bitand 0 = ;
+
+: bit-newly-set? ( old-value new-value bit -- bool )
+  [ bit-set? ] keep swapd bit-clear? and ;
+
+: port3-newly-set? ( new-value cpu bit -- bool )
+  >r space-invaders-port3o swap r> bit-newly-set? ;
+
+: port5-newly-set? ( new-value cpu bit -- bool )
+  >r space-invaders-port5o swap r> bit-newly-set? ;
+
 : write-port3 ( value cpu -- )
   #! Connected to the sound hardware
   #! Bit 0 = spaceship sound (looped)
@@ -113,6 +136,18 @@ M: space-invaders read-port ( port cpu -- byte )
   #! Bit 2 = Your ship hit
   #! Bit 3 = Invader hit
   #! Bit 4 = Extended play sound
+  over 0 bit-set? over space-invaders-looping? not and [ 
+    dup SOUND-UFO play-invaders-sound 
+    t over set-space-invaders-looping?
+  ] when 
+  over 0 bit-clear? over space-invaders-looping? and [ 
+    dup SOUND-UFO stop-invaders-sound 
+    f over set-space-invaders-looping?
+  ] when 
+  2dup 0 port3-newly-set? [ dup SOUND-UFO  play-invaders-sound ] when
+  2dup 1 port3-newly-set? [ dup SOUND-SHOT play-invaders-sound ] when
+  2dup 2 port3-newly-set? [ dup SOUND-BASE-HIT play-invaders-sound ] when
+  2dup 3 port3-newly-set? [ dup SOUND-INVADER-HIT play-invaders-sound ] when
   set-space-invaders-port3o ;
 
 : write-port4 ( value cpu -- )
@@ -129,6 +164,11 @@ M: space-invaders read-port ( port cpu -- byte )
   #! Bit 3 = invaders sound 4
   #! Bit 4 = spaceship hit 
   #! Bit 5 = amplifier enabled/disabled
+  2dup 0 port5-newly-set? [ dup SOUND-WALK1 play-invaders-sound ] when
+  2dup 1 port5-newly-set? [ dup SOUND-WALK2 play-invaders-sound ] when
+  2dup 2 port5-newly-set? [ dup SOUND-WALK3 play-invaders-sound ] when
+  2dup 3 port5-newly-set? [ dup SOUND-WALK4 play-invaders-sound ] when
+  2dup 4 port5-newly-set? [ dup SOUND-UFO-HIT play-invaders-sound ] when
   set-space-invaders-port5o ;
 
 M: space-invaders write-port ( value port cpu -- )
@@ -316,12 +356,20 @@ M: space-invaders update-video ( value addr cpu -- )
   ] unless ;
 
 M: invaders-gadget graft* ( gadget -- )
+ dup invaders-gadget-cpu init-sounds
  [ f swap set-invaders-gadget-quit? ] keep
  [ millis swap invaders-process ] spawn 2drop ;
 
 M: invaders-gadget ungraft* ( gadget -- )
  t swap set-invaders-gadget-quit? ;
 
+: (run) ( title cpu rom-info -- )
+  over load-rom* <invaders-gadget> swap open-window ;
 : run ( -- )  
-  <space-invaders> "apps/space-invaders/invaders.rom" resource-path over load-rom <invaders-gadget> 
-  "Space Invaders" open-window ;
+  "Space Invaders" <space-invaders> {
+    { HEX: 0000 "invaders/invaders.h" }
+    { HEX: 0800 "invaders/invaders.g" }
+    { HEX: 1000 "invaders/invaders.f" }
+    { HEX: 1800 "invaders/invaders.e" }
+  } (run) ;
+

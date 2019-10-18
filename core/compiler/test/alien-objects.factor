@@ -1,6 +1,6 @@
 IN: temporary
-USING: alien arrays kernel kernel-internals namespaces test
-errors sequences ;
+USING: alien byte-arrays arrays kernel kernel-internals
+namespaces test errors sequences libc ;
 
 [ t ] [ 0 <alien> 0 <alien> = ] unit-test
 [ f ] [ 0 <alien> 1024 <alien> = ] unit-test
@@ -67,3 +67,13 @@ unit-test
 [ t ] [ f expired? ] unit-test
 
 [ "fdasfds" ] [ [ "fdasfds" f dlsym ] catch third ] unit-test
+
+[ "hello world" ] [
+    "hello world" malloc-char-string
+    dup alien>char-string swap free
+] unit-test
+
+[ "hello world" ] [
+    "hello world" malloc-u16-string
+    dup alien>u16-string swap free
+] unit-test

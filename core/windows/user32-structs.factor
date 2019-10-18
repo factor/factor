@@ -487,6 +487,7 @@ windows? [
 
 : TME_HOVER 1 ; inline
 : TME_LEAVE 2 ; inline
+: TME_NONCLIENT 16 ; inline
 : TME_QUERY HEX: 40000000 ; inline
 : TME_CANCEL HEX: 80000000 ; inline
 : HOVER_DEFAULT HEX: ffffffff ; inline

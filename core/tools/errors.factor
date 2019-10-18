@@ -1,9 +1,9 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: errors
 USING: generic help tools io kernel math math-internals parser
 prettyprint queues sequences sequences-internals strings test
-words definitions ;
+words definitions libc ;
 
 : expired-error. ( obj -- )
     "Object did not survive image save/load: " write third . ;
@@ -26,8 +26,9 @@ words definitions ;
 : signal-error. ( obj -- )
     "Operating system signal " write third . ;
 
-: negative-array-size-error. ( obj -- )
-    "Cannot allocate array with negative size " write third . ;
+: array-size-error. ( obj -- )
+    "Invalid array size: " write dup third .
+    "Maximum: " write fourth 1- . ;
 
 : c-string-error. ( obj -- )
     "Cannot convert to C string: " write third . ;
@@ -61,7 +62,7 @@ DEFER: objc-error. ( alien -- )
 : callstack-overflow. "Call" stack-overflow. ;
 
 : memory-error.
-    "Data heap allocation request failed" print ;
+    drop "Data heap allocation request failed" print ;
 
 : kernel-error ( error -- word )
     #! Kernel errors are indexed by integers.
@@ -72,7 +73,7 @@ DEFER: objc-error. ( alien -- )
         type-check-error.
         divide-by-zero-error.
         signal-error.
-        negative-array-size-error.
+        array-size-error.
         c-string-error.
         ffi-error.
         heap-scan-error.
@@ -133,6 +134,9 @@ M: no-article summary
 M: no-cond summary
     drop "Fall-through in cond" ;
 
+M: no-case summary
+    drop "Fall-through in case" ;
+
 M: slice-error error.
     "Cannot create slice because " write
     slice-error-reason print ;
@@ -165,3 +169,5 @@ M: condition error-help drop f ;
 M: assert summary drop "Assertion failed" ;
 
 M: no-edit-hook summary drop "No edit hook is set" ;
+
+M: check-ptr summary drop "Memory allocation failed" ;

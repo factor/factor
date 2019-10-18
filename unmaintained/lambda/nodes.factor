@@ -13,7 +13,7 @@ TUPLE: var-node name ; #! var is either a var, name, or pointer to a lambda-node
 TUPLE: beta-node expr lambdas ; #! a namespace node
 TUPLE: alien-node word ;
 
-M: lambda-node equal? eq? ;
+M: lambda-node equal? 2drop f ;
 
 GENERIC: bind-var
 M: lambda-node bind-var ( binding lambda -- ) 

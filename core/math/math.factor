@@ -44,11 +44,15 @@ M: object zero? drop f ;
 : recip ( x -- y ) 1 swap / ; foldable
 : max ( x y -- z ) [ > ] 2keep ? ; foldable
 : min ( x y -- z ) [ < ] 2keep ? ; foldable
-: between? ( x y z -- ? ) pick >= >r >= r> and ; foldable
+
+: between? ( x y z -- ? )
+    pick >= [ >= ] [ 2drop f ] if ; foldable
+
 : rem ( x y -- z ) tuck mod over + swap mod ; foldable
 : sgn ( x -- n ) dup 0 < -1 0 ? swap 0 > 1 0 ? bitor ; foldable
 : align ( m w -- n ) 1- [ + ] keep bitnot bitand ; inline
 : truncate ( x -- y ) dup 1 mod - ; foldable
+: round ( x -- y ) dup sgn 2 / + truncate ; foldable
 
 : floor ( x -- y )
     dup 1 mod dup zero?
@@ -56,7 +60,9 @@ M: object zero? drop f ;
 
 : ceiling ( x -- y ) neg floor neg ; foldable
 
-: [-] - 0 max ; inline
+: [-] ( a b -- c ) - 0 max ; inline
+
+: 2^ ( n -- 2^n ) 1 swap shift ; inline
 
 : (repeat) ( i n quot -- )
     pick pick >= [

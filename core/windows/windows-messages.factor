@@ -10,7 +10,7 @@ SYMBOL: windows-messages
     [ H{ } clone global [ windows-messages set ] bind ] unless ;
 
 : add-windows-message ( -- )
-    word [ unparse ] keep execute maybe-create-windows-messages
+    word [ word-name ] keep execute maybe-create-windows-messages
     windows-messages get set-hash ; parsing
 
 : get-windows-message-name ( n -- name )

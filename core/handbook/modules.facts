@@ -34,8 +34,9 @@ $terpri
 "Finally, it can define a main entry point for use with " { $link run-module } ":"
 { $subsection POSTPONE: MAIN: }
 "When working on a module, you can automatically reload any changed source files, in the correct order, without having to call " { $link run-file } " manually:"
-{ $subsection reload-modules }
-{ $subsection reset-modified }
+{ $subsection reload-core }
+{ $subsection reload-libs }
+{ $subsection reset-checksums }
 { $heading "Example " { $snippet "load.factor" } }
 "Here is a simple module definition taken from " { $snippet "apps/tetris/load.factor" } "; it demonstrates all of the above features:"
 { $code "REQUIRES: libs/lazy-lists ;"

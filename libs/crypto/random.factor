@@ -4,34 +4,37 @@ IN: crypto
 : make-bits ( quot numbits -- n | quot: -- 0/1 )
     0 -rot [ drop dup call rot 1 shift bitor swap ] each drop ;
 
+: random-bytes ( m -- n )
+    >r [ 2 random ] r> 8 * make-bits ;
+
 DEFER: random-bits
 : add-bit ( bit integer -- integer ) 1 shift bitor ;
 : append-bits ( inta intb nbits -- int ) swapd shift bitor ;
 : large-random-bits ( n -- int )
     #! random number with high bit and low bit enabled (odd)
-    2 swap ^ [ random-int ] keep -1 shift 1 bitor bitor ;
+    2 swap ^ [ random ] keep -1 shift 1 bitor bitor ;
 : next-double ( -- f ) 53 random-bits 9007199254740992 /f ;
 
 
 SYMBOL: last-keyboard
-: crypto-random-int ( numbits -- integer )
+: crypto-random ( numbits -- integer )
     [ 
         millis last-keyboard set
         2 /  ! how many bits for repeat?
         0 swap
         [
-            readln 2drop 100 random-int sleep 
+            readln 2drop 100 random sleep 
             millis [ last-keyboard get - HEX: 3 bitand 2 append-bits ] keep
             last-keyboard set
         ] each
     ] with-scope ;
 
-: auto-crypto-random-int ( numbits -- integer )
+: auto-crypto-random ( numbits -- integer )
     [ 
         millis last-keyboard set
         0 swap
         [
-            drop 10 random-int sleep 
+            drop 10 random sleep 
             millis [ last-keyboard get - HEX: 1 bitand swap add-bit ] keep
             last-keyboard set
         ] each

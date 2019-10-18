@@ -12,15 +12,15 @@ IN: lambda
 
 LAZY: <letter> 
     #! parses an uppercase or lowercase letter
-	[ letter? ] satisfy [ ch>string ] <@ ;
+	[ letter? ] satisfy [ 1string ] <@ ;
 
 LAZY: <LETTER> 
     #! parses an uppercase or lowercase letter
-    [ LETTER? ] satisfy [ ch>string ] <@ ;
+    [ LETTER? ] satisfy [ 1string ] <@ ;
 
 LAZY: <number>
     #! parses a number
-    [ digit? ] satisfy [ ch>string ] <@ ;
+    [ digit? ] satisfy [ 1string ] <@ ;
 
 LAZY: <alphanumeric>
     #! parses an alphanumeral

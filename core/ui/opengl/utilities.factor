@@ -123,8 +123,10 @@ C: sprite ( loc dim dim2 -- sprite )
     [ set-sprite-texture ] keep
     [ make-sprite-dlist ] keep set-sprite-dlist ;
 
+: delete-dlist ( id -- ) 1 glDeleteLists ;
+
 : free-sprite ( sprite -- )
-    dup sprite-dlist 1 glDeleteLists
+    dup sprite-dlist delete-dlist
     sprite-texture <uint> 1 swap glDeleteTextures ;
 
 : free-sprites ( sprites -- ) [ [ free-sprite ] when* ] each ;

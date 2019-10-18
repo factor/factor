@@ -3,11 +3,7 @@ USING: help parser shells modules ;
 ARTICLE: "cli" "Command line usage"
 "Unless the " { $snippet "-no-user-init" } " command line switch is specified, The startup routine runs the " { $snippet ".factor-rc" } " file in the user's home directory, if it exists. This file can contain initialization and customization for your development environment."
 $terpri
-"Zero or more command line arguments may be passed to the Factor runtime. Command line arguments starting with a dash (" { $snippet "-" } ") is interpreted as a switch. All other arguments are taken to be file names."
-$terpri
-"If any file names are specified at all, the first one must be the image name; otherwise, the default image file is used, which is usually a file named " { $snippet "factor.image" } " in the same directory as the runtime executable (on Windows and Mac OS X) or the current directory (on Unix)."
-$terpri
-"All file names other than the first one are source file names which will be run with " { $link run-file } " when Factor starts up."
+"Zero or more command line arguments may be passed to the Factor runtime. Command line arguments starting with a dash (" { $snippet "-" } ") is interpreted as a switch. All other arguments are taken to be file names to be run by " { $link run-file } "."
 $terpri
 "Finally, switches can take one of the following three forms:"
 { $list
@@ -22,14 +18,17 @@ $terpri
 ARTICLE: "runtime-cli-args" "Runtime command line switches"
 "A handful of command line switches are processed by the runtime and not the library. They control low-level features."
 { $table
-    { { $snippet "-D=" { $emphasis "n" } } "Data stack size, kilobytes" }
-    { { $snippet "-R=" { $emphasis "n" } } "Retain stack size, kilobytes" }
-    { { $snippet "-C=" { $emphasis "n" } } "Call stack size, kilobytes" }
-    { { $snippet "-G=" { $emphasis "n" } } "Number of generations, must be >= 2" }
-    { { $snippet "-Y=" { $emphasis "n" } } { "Size of " { $snippet { $emphasis "n" } "-1" } " youngest generations, megabytes" } }
-    { { $snippet "-A=" { $emphasis "n" } } "Size of tenured and semi-spaces, megabytes" }
-    { { $snippet "-X=" { $emphasis "n" } } "Code heap size, megabytes" }
-} ;
+    { { $snippet "-i=" { $emphasis "image" } } "Specifies the image file to use" }
+    { { $snippet "-datastack=" { $emphasis "n" } } "Data stack size, kilobytes" }
+    { { $snippet "-retainstack=" { $emphasis "n" } } "Retain stack size, kilobytes" }
+    { { $snippet "-callstack=" { $emphasis "n" } } "Call stack size, kilobytes" }
+    { { $snippet "-generations=" { $emphasis "n" } } "Number of generations, must be >= 2" }
+    { { $snippet "-young=" { $emphasis "n" } } { "Size of " { $snippet { $emphasis "n" } "-1" } " youngest generations, megabytes" } }
+    { { $snippet "-aging=" { $emphasis "n" } } "Size of tenured and semi-spaces, megabytes" }
+    { { $snippet "-codeheap=" { $emphasis "n" } } "Code heap size, megabytes" }
+    { { $snippet "securegc" } "If specified, unused portions of the data heap will be zeroed out after every garbage collection" }
+}
+"If an " { $snippet "-i=" } " switch is not present, the default image file is used, which is usually a file named " { $snippet "factor.image" } " in the same directory as the runtime executable (on Windows and Mac OS X) or the current directory (on Unix)." ;
 
 ARTICLE: "bootstrap-cli-args" "Switches available when bootstrapping"
 "A number of command line switches can be passed to a bootstrap image to modify the behavior of the resulting " { $snippet "factor.image" } ":"

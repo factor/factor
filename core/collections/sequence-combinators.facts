@@ -47,10 +47,6 @@ HELP: inject
 { $errors "Throws an error if the sequence is immutable, or the sequence cannot hold elements of the type output by " { $snippet "quot" } "." }
 { $side-effects "seq" } ;
 
-HELP: inject-with
-{ $values { "obj" "an object" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj elt -- new )" } } }
-{ $description "Variant of " { $link inject } " which pushes a retained object on each invocation of the quotation." } ;
-
 HELP: min-length
 { $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "n" "a non-negative integer" } }
 { $description "Outputs the minimum of the lengths of the two sequences." } ;
@@ -143,13 +139,6 @@ HELP: all-with?
 { $values { "obj" "an object" } { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj elt -- ? )" } } { "?" "a boolean" } }
 { $description "Variant of " { $link all? } " which pushes a retained object on each invocation of the quotation." } ;
 
-HELP: subset*
-{ $values { "flags" "a sequence" } { "seq" "a sequence" } { "subseq" "a new sequence" } }
-{ $description "Outputs a new sequence containing all elements of " { $snippet "seq" } " such that the corresponding element of " { $snippet "flags" } " is not equal to " { $link f } "." }
-{ $examples
-    { $example "{ t f t f } { 1 2 3 4 } subset* ." "{ 1 3 }" }
-} ;
-
 HELP: subset
 { $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "subseq" "a new sequence" } }
 { $description "Applies the quotation to each element in turn, and outputs a new sequence containing the elements of the original sequence for which the quotation output a true value." } ;
@@ -179,12 +168,40 @@ HELP: cache-nth
 { $description "If the sequence does not contain at least " { $snippet "i" } " elements or if the " { $snippet "i" } "th element of the sequence is " { $link f } ", calls the quotation to produce a new value, and stores it back into the sequence. Otherwise, this word outputs the " { $snippet "i" } "th element of the sequence." }
 { $side-effects "seq" } ;
 
-HELP: copy-into
-{ $values { "n" "an index in " { $snippet "dest" } } { "dest" "a mutable sequence" } { "src" "a sequence" } }
-{ $description "Copies all elements of " { $snippet "src" } " to " { $snippet "dest" } ", with destination indices starting from " { $snippet "n" } ". Grows " { $snippet "to" } " first if necessary." }
-{ $errors "An error is thrown if " { $snippet "to" } " is not resizable, and not large enough to hold the copied elements." } ;
+HELP: index
+{ $values { "obj" "an object" } { "seq" "a sequence" } }
+{ $description "Outputs the index of the first element in the sequence equal to " { $snippet "obj" } ". If no element is found, outputs -1." }
+{ $see-also index* member? } ;
 
-HELP: >sequence
-{ $values { "seq" "a sequence" } { "pred" "a quotation with stack effect " { $snippet "( seq -- ? )" } } { "quot" "a quotation with stack effect " { $snippet "( n -- newseq )" } } { "newseq" "a new sequence" } }
-{ $description "If " { $snippet "pred" } " answers a true value given " { $snippet "seq" } ", clones " { $snippet "seq" } ". Otherwise, calls " { $snippet "quot" } " with the length of " { $snippet "seq" } ", creating a new sequence, and copies the contents of " { $snippet "seq" } " into the new sequence." }
-{ $notes "This word is used to implement words which convert one type of sequence into another, for example " { $link >array } "." } ;
+HELP: index*
+{ $values { "obj" "an object" } { "i" "a start index" } { "seq" "a sequence" } }
+{ $description "Outputs the index of the first element in the sequence equal to " { $snippet "obj" } ", starting the search from the " { $snippet "i" } "th element. If no element is found, outputs -1." }
+{ $see-also index member? } ;
+
+HELP: last-index
+{ $values { "obj" "an object" } { "seq" "a sequence" } }
+{ $description "Outputs the index of the last element in the sequence equal to " { $snippet "obj" } "; the sequence is traversed back to front. If no element is found, outputs -1." }
+{ $see-also index* member? } ;
+
+HELP: last-index*
+{ $values { "obj" "an object" } { "i" "a start index" } { "seq" "a sequence" } }
+{ $description "Outputs the index of the last element in the sequence equal to " { $snippet "obj" } ", traversing the sequence backwards starting from the " { $snippet "i" } "th element and finishing at the first. If no element is found, outputs -1." }
+{ $see-also index member? } ;
+
+HELP: member?
+{ $values { "obj" "an object" } { "seq" "a sequence" } }
+{ $description "Tests if the sequence contains an element equal to the object." }
+{ $see-also index index* memq? } ;
+
+HELP: memq?
+{ $values { "obj" "an object" } { "seq" "a sequence" } }
+{ $description "Tests if the sequence contains the object." }
+{ $examples
+    "This word uses identity comparison, so the following will most likely print " { $link f } ":"
+    { $example "\"hello\" { \"hello\" } memq? ." "f" }
+}
+{ $see-also index index* member? } ;
+
+HELP: remove
+{ $values { "elt" "an object" } { "seq" "a sequence" } { "newseq" "a new sequence" } }
+{ $description "Outputs a new sequence containing all elements of the input sequence except those equal to the given element." } ;

@@ -10,7 +10,7 @@ namespaces hashtables ;
 
 { "test" "a" } remove-article
 
-[ t ] [ { "test" "b" } parents empty? ] unit-test
+[ f ] [ { "test" "b" } parent ] unit-test
 
 SYMBOL: foo
 

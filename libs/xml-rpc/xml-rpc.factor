@@ -53,15 +53,15 @@ M: base64 item>xml
 
 : method-call ( name seq -- xml )
     params >r "methodName" build-tag r>
-    2array "methodCall" build-tag* build-xml-doc ;
+    2array "methodCall" build-tag* build-xml ;
 
 : return-params ( seq -- xml )
-    params "methodResponse" build-tag build-xml-doc ;
+    params "methodResponse" build-tag build-xml ;
 
 : return-fault ( fault-code fault-string -- xml )
     [ "faultString" set "faultCode" set ] make-hash item>xml
     "value" build-tag "fault" build-tag "methodResponse" build-tag
-    build-xml-doc ;
+    build-xml ;
 
 TUPLE: rpc-method name params ;
 TUPLE: rpc-response params ;
@@ -120,18 +120,18 @@ TAG: array xml>item
     children-tags
     [ first-child-tag first-child-tag xml>item ] map ;
 
-: parse-rpc-response ( xml-doc -- array )
+: parse-rpc-response ( xml -- array )
     first-child-tag params>array ;
 
-: parse-method ( xml-doc -- string array )
+: parse-method ( xml -- string array )
     children-tags dup first children>string
     swap second params>array ;
 
-: parse-fault ( xml-doc -- fault-code fault-string )
+: parse-fault ( xml -- fault-code fault-string )
     first-child-tag first-child-tag first-child-tag
     xml>item [ "faultCode" get "faultString" get ] bind ;
 
-: receive-rpc ( xml-doc -- rpc )
+: receive-rpc ( xml -- rpc )
     dup name-tag dup "methodCall" =
     [ drop parse-method <rpc-method> ] [
         "methodResponse" = [

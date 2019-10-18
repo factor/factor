@@ -1,59 +1,51 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables kernel math namespaces sequences strings
-    io generic xml-data xml-tokenize xml-errors errors ;
+    io generic xml-data errors ;
 IN: xml-writer
 
-GENERIC: write-str-elem ( elem -- )
+: write-entities
+    H{
+        { CHAR: < "&lt;"   }
+        { CHAR: > "&gt;"   }
+        { CHAR: & "&amp;"  }
+        { CHAR: ' "&apos;" }
+        { CHAR: " "&quot;" }
+    } ;
 
 : chars>entities ( str -- str )
     #! Convert <, >, &, ' and " to HTML entities.
-    [ [ dup entities hash [ % ] [ , ] ?if ] each ] "" make ;
-
-M: string write-str-elem
-    chars>entities write ;
-
-M: entity write-str-elem
-    CHAR: & write1 entity-name write CHAR: ; write1 ;
-
-UNION: str-elem string entity ;
+    [ [ dup write-entities hash [ % ] [ , ] ?if ] each ] "" make ;
 
 : print-name ( name -- )
     dup name-space dup "" = [ drop ]
     [ write CHAR: : write1 ] if
     name-tag write ;
 
-M: mismatched error.
-    dup xml-error.
-    "Mismatched tags" print
-    "Opening tag: <" write dup mismatched-open print-name ">" print
-    "Closing tag: </" write mismatched-close print-name ">" print ;
-M: unclosed error.
-    "Unclosed tags" print
-    "Tags: " print
-    unclosed-tags [ "  <" write print-name ">" print ] each ;
-
-: print-props ( hash -- )
+: print-attrs ( hash -- )
     [
-        " " write swap print-name "=\"" write
-        [ write-str-elem ] each "\"" write
-    ] hash-each ;
+        first2 " " write
+        swap print-name
+        "=\"" write
+        chars>entities write
+        "\"" write
+    ] each ;
 
 GENERIC: write-item ( object -- )
 
-M: str-elem write-item ! string element
-    write-str-elem ;
+M: string write-item
+    chars>entities write ;
 
 M: contained-tag write-item
     CHAR: < write1
     dup print-name
-    tag-props print-props
+    tag-attrs print-attrs
     "/>" write ;
 
 M: open-tag write-item
     CHAR: < write1
     dup print-name
-    dup tag-props print-props
+    dup tag-attrs print-attrs
     CHAR: > write1
     dup tag-children [ write-item ] each
     "</" write print-name CHAR: > write1 ;
@@ -77,15 +69,15 @@ M: instruction write-item
 : write-chunk ( seq -- )
     [ write-item ] each ;
 
-: write-xml ( xml-doc -- )
-    dup xml-doc-prolog xml-preamble
-    dup xml-doc-before write-chunk
-    dup delegate write-item
-    xml-doc-after write-chunk ;
+: write-xml ( xml -- )
+    dup xml-prolog xml-preamble
+    dup xml-before write-chunk
+    dup write-item
+    xml-after write-chunk ;
 
-: print-xml ( xml-doc -- )
+: print-xml ( xml -- )
     write-xml terpri ;
 
-: xml>string ( xml-doc -- string )
+: xml>string ( xml -- string )
     [ write-xml ] string-out ;
 

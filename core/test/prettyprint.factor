@@ -1,5 +1,5 @@
-USING: alien definitions inference io kernel math namespaces
-parser prettyprint sequences test vectors words ;
+USING: arrays alien definitions inference io kernel math
+namespaces parser prettyprint sequences test vectors words ;
 IN: temporary
 
 [ "4" ] [ 4 unparse ] unit-test
@@ -81,3 +81,8 @@ unit-test
 
 [ "[ \\ + ]" ] [ [ \ + ] unparse ] unit-test
 [ "[ \\ [ ]" ] [ [ \ [ ] unparse ] unit-test
+    
+[ t ] [
+    100 \ dup <array> [ pprint-short ] string-out
+    "{" head?
+] unit-test

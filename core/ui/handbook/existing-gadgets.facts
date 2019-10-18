@@ -25,15 +25,14 @@ ARTICLE: "gadgets-labels" "Label gadgets"
 
 ARTICLE: "gadgets-polygons" "Polygon gadgets"
 "A polygon gadget renders a simple shaded polygon."
-{ $subsection polygon }
-{ $subsection <polygon> }
 { $subsection <polygon-gadget> }
 "Some pre-made polygons:"
 { $subsection arrow-up }
 { $subsection arrow-right }
 { $subsection arrow-down }
 { $subsection arrow-left }
-{ $subsection close-box } ;
+{ $subsection close-box }
+"Polygon gadgets are rendered by the " { $link polygon } " pen protocol implementation." ;
 
 ARTICLE: "gadgets-borders" "Border gadgets"
 "Border gadgets add empty space around a child gadget."
@@ -54,14 +53,14 @@ ARTICLE: "gadgets-buttons" "Button gadgets"
 { $subsection <button> }
 { $subsection <roll-button> }
 { $subsection <bevel-button> }
-{ $subsection <command-button> }
 { $subsection <repeat-button> }
 "A radio box is a row of buttons for choosing amongst several distinct possibilities:"
 { $subsection <radio-box> }
 "Button appearance can be customized:"
 { $subsection button-paint }
 "A generic word used by button constructor words to convert label specifiers to gadgets:"
-{ $subsection >label } ;
+{ $subsection >label }
+{ $see-also <command-button> "ui-commands" } ;
 
 ARTICLE: "gadgets-sliders" "Slider gadgets"
 "A slider allows the user to graphically manipulate a value by moving a thumb back and forth."
@@ -97,14 +96,14 @@ ARTICLE: "gadgets-editors-selection" "The caret and mark"
 { $subsection change-caret }
 { $subsection change-caret&mark }
 { $subsection mark>caret }
-"Getting and setting the selected text:"
+"Getting the selected text:"
 { $subsection gadget-selection? }
 { $subsection gadget-selection }
-{ $subsection user-input* }
 "Removing selected text:"
 { $subsection remove-editor-selection }
 "Scrolling to the caret location:"
-{ $subsection scroll>caret } ;
+{ $subsection scroll>caret }
+"Use " { $link user-input* } " to change selected text." ;
 
 ARTICLE: "documents" "Documents"
 "The " { $link control-model } " of an " { $link editor } " is a " { $link document } "."
@@ -183,9 +182,7 @@ $terpri
 ARTICLE: "gadgets-presentations" "Presentation gadgets"
 "Outliner gadgets are usually not constructed directly, and instead are written to " { $link "gadgets-panes" } " with formatted stream output words (" { $link "presentations" } ")."
 { $subsection presentation }
-{ $subsection <presentation> }
-"If you want to display your own windows with mouse-over help for presentations, add this gadget to the window:"
-{ $subsection <presentation-help> } ;
+{ $subsection <presentation> } ;
 
 ARTICLE: "gadgets-lists" "List gadgets"
 "A list displays a list of presentations."

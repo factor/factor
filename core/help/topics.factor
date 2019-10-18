@@ -1,7 +1,7 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
-USING: arrays definitions errors generic graphs hashtables
+USING: arrays definitions errors generic hashtables
 io kernel namespaces prettyprint prettyprint-internals
 sequences words ;
 
@@ -60,32 +60,34 @@ GENERIC: elements* ( elt-type element -- )
         ] each-with
     ] make-hash hash-keys ;
 
-SYMBOL: parent-graph
+SYMBOL: help-tree
 
 DEFER: $subsection
 
 : children ( topic -- seq )
     article-content { $subsection } collect-elements ;
 
-: parents ( topic -- seq )
-    dup link? [
-        link-name parents
-    ] [
-        parent-graph get in-edges
-    ] if ;
+: parent ( topic -- topic )
+    dup link? [ link-name ] when help-tree get hash ;
 
-: (doc-path) ( topic -- )
-    dup , parents [ word? not ] subset dup empty?
-    [ drop ] [ [ (doc-path) ] each ] if ;
+: (help-path) ( topic -- )
+    parent [ dup , (help-path) ] when* ;
 
-: doc-path ( topic -- seq )
-    [ (doc-path) ] { } make 1 tail prune ;
+: help-path ( topic -- seq )
+    [ (help-path) ] { } make ;
+
+: if-help-tree ( topic quot -- )
+    help-tree get swap [ drop ] if ; inline
 
 : xref-article ( topic -- )
-    [ children ] parent-graph get add-vertex ;
+    [
+        dup children [ help-tree get set-hash ] each-with
+    ] if-help-tree ;
 
 : unxref-article ( topic -- )
-    [ children ] parent-graph get remove-vertex ;
+    [
+        children [ help-tree get remove-hash ] each
+    ] if-help-tree ;
 
 : xref-help ( -- )
-    all-articles [ children ] parent-graph get build-graph ;
+    all-articles [ xref-article ] each ;

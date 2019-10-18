@@ -28,18 +28,3 @@ HELP: comment.
 { $values { "string" "a string" } }
 { $description "Prettyprints some text with the comment style." }
 $prettyprinting-note ;
-
-HELP: edit
-{ $values { "defspec" "a definition specifier" } }
-{ $description "Opens the source file containing the definition using the current " { $link edit-hook } ". See " { $link "editor" } "." } ;
-
-HELP: edit-location
-{ $values { "file" "a path name string" } { "line" "a positive integer" } }
-{ $description "Opens a source file at the specified line number containing using the current " { $link edit-hook } ". Line numbers are indexed starting from 1. See " { $link "editor" } "." } ;
-
-HELP: edit-file
-{ $values { "file" "a path name string" } }
-{ $description "Opens a source file containing using the current " { $link edit-hook } ". See " { $link "editor" } "." } ;
-
-HELP: no-edit-hook
-{ $error-description "Thrown when " { $link edit } " is called when the " { $link edit-hook } " variable is not set. See " { $link "editor" } "." } ;

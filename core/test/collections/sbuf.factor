@@ -1,13 +1,13 @@
 IN: temporary
-USING: kernel math namespaces sequences strings test ;
+USING: kernel math namespaces sequences sbufs strings test ;
 
 [ 5 ] [ "Hello" >sbuf length ] unit-test
 
 [ "Hello" ] [
     100 <sbuf> "buf" set
-    "Hello" "buf" get swap nappend
+    "Hello" "buf" get nappend
     "buf" get clone "buf-clone" set
-    "World" "buf-clone" get swap nappend
+    "World" "buf-clone" get nappend
     "buf" get >string
 ] unit-test
 

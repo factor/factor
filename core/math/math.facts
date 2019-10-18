@@ -124,7 +124,8 @@ HELP: bitand
 { $examples
     { $example "BIN: 101 BIN: 10 bitand .b" "0" }
     { $example "BIN: 110 BIN: 10 bitand .b" "10" }
-} ;
+}
+{ $notes "This word implements bitwise and, so applying it to booleans will throw an error. Boolean and is the " { $link and } " word." } ;
 
 HELP: bitor
 { $values { "x" "an integer" } { "y" "an integer" } { "z" "an integer" } }
@@ -132,7 +133,8 @@ HELP: bitor
 { $examples
     { $example "BIN: 101 BIN: 10 bitor .b" "111" }
     { $example "BIN: 110 BIN: 10 bitor .b" "110" }
-} ;
+}
+{ $notes "This word implements bitwise inclusive or, so applying it to booleans will throw an error. Boolean inclusive or is the " { $link and } " word." } ;
 
 HELP: bitxor
 { $values { "x" "an integer" } { "y" "an integer" } { "z" "an integer" } }
@@ -140,7 +142,8 @@ HELP: bitxor
 { $examples
     { $example "BIN: 101 BIN: 10 bitxor .b" "111" }
     { $example "BIN: 110 BIN: 10 bitxor .b" "100" }
-} ;
+}
+{ $notes "This word implements bitwise exclusive or, so applying it to booleans will throw an error. Boolean exclusive or is the " { $link xor } " word." } ;
 
 HELP: shift
 { $values { "x" "an integer" } { "n" "an integer" } { "y" "an integer" } }
@@ -150,7 +153,9 @@ HELP: shift
 HELP: bitnot
 { $values { "x" "an integer" } { "y" "an integer" } }
 { $description "Computes the bitwise complement of the input; that is, each bit in the input number is flipped." }
-{ $notes "Due to the two's complement representation of signed integers, the following two lines are equivalent:" { $code "bitnot" "neg 1-" } } ;
+{ $notes "This word implements bitwise not, so applying it to booleans will throw an error. Boolean not is the " { $link not } " word."
+$terpri
+"Due to the two's complement representation of signed integers, the following two lines are equivalent:" { $code "bitnot" "neg 1-" } } ;
 
 HELP: 1+
 { $values { "x" "a number" } { "y" "a number" } }

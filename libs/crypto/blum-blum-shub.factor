@@ -30,7 +30,7 @@ IN: crypto
 : random-bbs-bits* ( numbits bbs -- n ) (bbs-bits) ;
 : random-bits ( numbits -- n ) blum-blum-shub get (bbs-bits) ;
 : random-bytes ( numbits -- n ) 8 * random-bits ;
-: random-int ( n -- n )
+: random ( n -- n )
     ! #! Cryptographically secure random number using Blum-Blum-Shub 256
     [ log2 1+ random-bits ] keep dupd >= [ -1 shift ] when ;
 

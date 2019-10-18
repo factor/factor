@@ -1,0 +1,33 @@
+! Copyright (C) 2007 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+IN: optimizer
+USING: kernel sequences inference namespaces generic ;
+
+! Funny pattern matching
+SYMBOL: @
+SYMBOL: @literal
+
+: match-@ ( value -- ? )
+    #! All @ must be eq
+    @ get [ eq? ] [ @ set t ] if* ;
+
+: match-class ( value spec -- ? )
+    >r node get swap node-class r> class< ;
+
+: value-match? ( value spec -- ? )
+    {
+        { [ dup @literal eq? ] [ drop value? ] }
+        { [ dup @ eq? ] [ drop match-@ ] }
+        { [ dup class? ] [ match-class ] }
+        { [ over value? not ] [ 2drop f ] }
+        { [ t ] [ swap value-literal = ] }
+    } cond ;
+
+: node-match? ( node values pattern -- ? )
+    [
+        rot node set @ off
+        [ value-match? ] 2map [ ] all?
+    ] with-scope ;
+
+: in-d-match? ( node pattern -- ? )
+    >r dup node-in-d r> node-match? ;

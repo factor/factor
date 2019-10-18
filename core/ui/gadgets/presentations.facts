@@ -33,8 +33,3 @@ HELP: <presentation>
 { $values { "label" "a label" } { "object" object } { "button" "a new " { $link button } } }
 { $description "Creates a new " { $link presentation } " derived from " { $link <roll-button> } "." }
 { $see-also "presentations" } ;
-
-HELP: <presentation-help>
-{ $values { "model" model } { "gadget" "a new " { $link gadget } } }
-{ $description "Creates a new " { $link gadget } " displaying a " { $link summary } " of the model value." }
-{ $notes "If the " { $snippet "model" } " is " { $link world-status } ", this gadget will display " { $link presentation } " mouse over help." } ; 

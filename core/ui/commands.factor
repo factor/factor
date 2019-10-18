@@ -6,7 +6,7 @@ IN: gadgets
 
 TUPLE: command name gesture quot ;
 
-M: command equal? eq? ;
+M: command equal? 2drop f ;
 
 GENERIC: invoke-command ( target command -- )
 

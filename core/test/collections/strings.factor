@@ -4,6 +4,7 @@ USE: kernel
 USE: math
 USE: namespaces
 USE: strings
+USE: sbufs
 USE: test
 USE: sequences
 USE: vectors

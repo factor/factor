@@ -37,9 +37,7 @@ M: unbalanced-namestacks error.
     "Make sure occurrences of >n/n> are consistent across branches." print ;
 
 M: no-effect error.
-    "The word " write
-    no-effect-word pprint
-    " does not have a stack effect" print ;
+    "Unable to infer stack effect of " write no-effect-word . ;
 
 M: recursive-declare-error error.
     "The recursive word " write

@@ -88,6 +88,16 @@ void print_objects(CELL start, CELL end)
 	}
 }
 
+void print_callstack(void)
+{
+	F_INTERP_FRAME *frame;
+	for(frame = cs_bot; frame < cs; frame++)
+	{
+		print_obj(frame->quot);
+		fprintf(stderr,"\n");
+	}
+}
+
 void dump_cell(CELL cell)
 {
 	fprintf(stderr,"%08lx: ",cell);
@@ -105,7 +115,8 @@ void dump_cell(CELL cell)
 			fprintf(stderr," -- F");
 		else if(cell < TYPE_COUNT<<TAG_BITS)
 			fprintf(stderr," -- header: %ld",cell>>TAG_BITS);
-		else if(cell >= data_heap_start && cell < data_heap_end)
+		else if(cell >= data_heap->segment->start
+			&& cell < data_heap->segment->end)
 		{
 			CELL header = get(UNTAG(cell));
 			CELL type = header>>TAG_BITS;
@@ -129,45 +140,43 @@ void dump_memory(CELL from, CELL to)
 		dump_cell(from);
 }
 
-void dump_generation(F_ZONE *z)
+void dump_generation(F_ZONE z)
 {
 	fprintf(stderr,"base=%lx, size=%lx, here=%lx\n",
-		z->base,
-		z->limit - z->base,
-		z->here - z->base);
+		z.start,z.size,z.here - z.start);
 }
 
 void dump_generations(void)
 {
 	int i;
-	for(i = 0; i < gen_count; i++)
+	for(i = 0; i < data_heap->gen_count; i++)
 	{
 		fprintf(stderr,"Generation %d: ",i);
-		dump_generation(&generations[i]);
+		dump_generation(data_heap->generations[i]);
 	}
 
 	fprintf(stderr,"Semispace: ");
-	dump_generation(&prior);
+	dump_generation(data_heap->prior);
 
-	fprintf(stderr,"Cards: base=%lx, size=%lx\n",(CELL)cards,
-		(CELL)(cards_end - cards));
+	fprintf(stderr,"Cards: base=%lx, size=%lx\n",
+		(CELL)data_heap->cards,
+		(CELL)(data_heap->cards_end - data_heap->cards));
 }
 
 void factorbug(void)
 {
 	reset_stdio();
 
-	fprintf(stderr,"A fatal error has occurred and Factor cannot continue.\n");
-	fprintf(stderr,"The low-level debugger has been started to help diagnose the problem.\n");
+	fprintf(stderr,"Starting low level debugger...\n");
 	fprintf(stderr,"  Basic commands:\n");
-	fprintf(stderr,"q                -- continue executing Factor\n");
+	fprintf(stderr,"q                -- continue executing Factor - NOT SAFE\n");
 	fprintf(stderr,"im               -- save image to fep.image\n");
 	fprintf(stderr,"x                -- exit Factor\n");
 	fprintf(stderr,"  Advanced commands:\n");
 	fprintf(stderr,"d <addr> <count> -- dump memory\n");
 	fprintf(stderr,"u <addr>         -- dump object at tagged <addr>\n");
 	fprintf(stderr,". <addr>         -- print object at tagged <addr>\n");
-	fprintf(stderr,"s r c            -- dump data, retain, call stacks\n");
+	fprintf(stderr,"s r              -- dump data, retain stacks\n");
 	fprintf(stderr,".s .r .c         -- print data, retain, call stacks\n");
 	fprintf(stderr,"i                -- dump interpreter state\n");
 	fprintf(stderr,"e                -- dump environment\n");
@@ -210,18 +219,16 @@ void factorbug(void)
 			dump_memory(ds_bot,ds);
 		else if(strcmp(cmd,"r") == 0)
 			dump_memory(rs_bot,rs);
-		else if(strcmp(cmd,"c") == 0)
-			dump_memory(cs_bot,cs);
 		else if(strcmp(cmd,".s") == 0)
 			print_objects(ds_bot,ds);
 		else if(strcmp(cmd,".r") == 0)
 			print_objects(rs_bot,rs);
 		else if(strcmp(cmd,".c") == 0)
-			print_objects(cs_bot,cs);
+			print_callstack();
 		else if(strcmp(cmd,"i") == 0)
 		{
 			fprintf(stderr,"Call frame:\n");
-			print_obj(callframe);
+			print_obj(callframe.quot);
 			fprintf(stderr,"\n");
 		}
 		else if(strcmp(cmd,"e") == 0)
@@ -251,7 +258,7 @@ void factorbug(void)
 		else if(strcmp(cmd,"im") == 0)
 			save_image("fep.image");
 		else if(strcmp(cmd,"code") == 0)
-			dump_heap(&compiling);
+			dump_heap(&code_heap);
 		else
 			fprintf(stderr,"unknown command\n");
 	}

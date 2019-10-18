@@ -1,0 +1,21 @@
+<% USING: namespaces io kernel furnace words prettyprint
+generic sequences parser ; %>
+
+<% "model" get %>
+
+<form action="<% dup class dup word-vocabulary use+ unparse write %>-update" method="post">
+
+<% dup crud-index [ %>
+
+<input type="hidden" name="crud-index" value="<% write %>"/>
+
+<% ] when* %>
+
+<table>
+
+<% dup tuple-slots swap class "slot-names" word-prop [ %> <tr><td><% dup write %>:</td>
+    <td><input type="text" name="<% write %>" value="<% write %>"/></td></tr><% ] 2each %>
+    
+</table>
+<input type="submit" name="submit" value="submit"/>
+</form>

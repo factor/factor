@@ -1,11 +1,11 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 
 ! We need to fiddle with the exact search order here, since
 ! unix-internals::accept shadows streams::accept.
 IN: io-internals
-USING: alien errors generic io kernel math namespaces parser
-threads unix-internals ;
+USING: alien errors generic io kernel math namespaces
+nonblocking-io parser threads unix-internals ;
 
 : init-sockaddr ( port -- sockaddr )
     "sockaddr-in" <c-object>
@@ -25,7 +25,7 @@ threads unix-internals ;
     PF_INET SOCK_STREAM 0 socket dup io-error dup init-handle ;
 
 : with-socket-fd ( quot -- fd )
-    socket-fd [ swap call ] keep  swap 0 < [
+    socket-fd swap keep  swap 0 < [
         err_no EINPROGRESS = [ dup close (io-error) ] unless
     ] when ; inline
 
@@ -33,12 +33,12 @@ threads unix-internals ;
     init-sockaddr  INADDR_ANY htonl over set-sockaddr-in-addr ;
 
 : sockopt ( fd level opt -- )
-    1 <int> "int" c-size setsockopt io-error ;
+    1 <int> "int" heap-size setsockopt io-error ;
 
 : server-socket ( port -- fd )
     server-sockaddr [
         dup SOL_SOCKET SO_REUSEADDR sockopt
-        swap dupd "sockaddr-in" c-size bind
+        swap dupd "sockaddr-in" heap-size bind
         dup 0 >= [ drop 1 listen ] [ nip ] if
     ] with-socket-fd ;
 
@@ -48,14 +48,14 @@ C: connect-task ( port -- task )
     [ >r <io-task> r> set-delegate ] keep ;
 
 M: connect-task do-io-task
-    io-task-port dup port-handle 0 0 write
+    io-task-port dup port-handle f 0 write
     0 < [ defer-error ] [ drop t ] if ;
 
 M: connect-task task-container drop write-tasks get-global ;
 
 : client-socket ( host port -- fd )
     client-sockaddr [
-        swap "sockaddr-in" c-size connect
+        swap "sockaddr-in" heap-size connect
     ] with-socket-fd ;
 
 : wait-to-connect ( port -- )
@@ -106,7 +106,7 @@ C: accept-task ( port -- task )
 
 M: accept-task do-io-task
     io-task-port "sockaddr-in" <c-object>
-    over port-handle over "sockaddr-in" c-size <int> accept
+    over port-handle over "sockaddr-in" heap-size <int> accept
     dup 0 >= [
         do-accept t
     ] [
@@ -119,7 +119,7 @@ M: accept-task task-container drop read-tasks get ;
     [ swap <accept-task> add-io-task stop ] callcc0 drop ;
 
 : timeout-opt ( fd level opt value -- )
-    "timeval" c-size setsockopt io-error ;
+    "timeval" heap-size setsockopt io-error ;
 
 IN: io
 

@@ -29,15 +29,8 @@ GENERIC: set-fill ( n seq -- )
         2dup set-fill
     ] when 2drop ; inline
 
-TUPLE: bounds-error index seq ;
-
-: bounds-error ( n seq -- * ) <bounds-error> throw ;
-
 : growable-check ( n seq -- n seq )
     over 0 < [ bounds-error ] when ; inline
-
-: bounds-check ( n seq -- n seq )
-    2dup bounds-check? [ bounds-error ] unless ; inline
 
 : grow-length ( n seq -- )
     growable-check

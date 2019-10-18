@@ -54,7 +54,11 @@ LAZY: 'quot' ( -- parser )
 
 LAZY: 'string' ( -- parser )
   'quot' 
-  [ dup quotable? CHAR: \\ = or ] satisfy <+> &> 
+  [ 
+    [ quotable? ] keep
+    [ CHAR: \\ = or ] keep 
+    CHAR: " = not and 
+  ] satisfy <*> &> 
   'quot' <& [ >string ] <@  ;
 
 DEFER: 'value'
@@ -71,14 +75,12 @@ LAZY: 'member' ( -- parser )
 USE: prettyprint 
 LAZY: 'object' ( -- parser )
   'begin-object' 
-  'member' 
-  'value-separator' 'member' &> <*> <&:> <?> &>
-  'end-object' <& [ first object>hashtable ] <@ ;
+  'member' 'value-separator' list-of &>
+  'end-object' <& [ object>hashtable ] <@ ;
 
 LAZY: 'array' ( -- parser )
   'begin-array' 
-  'value' &>
-  'value-separator' 'value' &> <*> <&:> 
+  'value' 'value-separator' list-of &>
   'end-array' <&  ;
   
 LAZY: 'minus' ( -- parser )

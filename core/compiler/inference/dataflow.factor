@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference
 USING: arrays generic hashtables kernel math
@@ -21,7 +21,7 @@ in-d out-d in-r out-r
 classes literals history
 successor children ;
 
-M: node equal? eq? ;
+M: node equal? 2drop f ;
 
 : node-shuffle ( node -- shuffle )
     dup node-in-d swap node-out-d <effect> ;
@@ -33,7 +33,8 @@ M: node equal? eq? ;
 : param-node { } { } { } { } ;
 : in-node >r f r> { } { } { } ;
 : out-node >r f { } r> { } { } ;
-: meta-d-node f meta-d get clone dup { } { } ;
+: all-in-node f meta-d get clone { } { } { } ;
+: all-out-node f { } meta-d get clone { } { } ;
 
 : d-tail ( n -- seq )
     dup zero? [ drop f ] [ meta-d get swap tail* ] if ;
@@ -43,14 +44,15 @@ M: node equal? eq? ;
 
 : node-child node-children first ;
 
-TUPLE: #label ;
+TUPLE: #label word ;
 C: #label make-node ;
-: #label ( label -- node ) param-node <#label> ;
+: #label ( word label -- node )
+    param-node <#label> [ set-#label-word ] keep ;
 
 TUPLE: #entry ;
 C: #entry make-node ;
 
-: #entry ( -- node ) meta-d-node <#entry> ;
+: #entry ( -- node ) all-out-node <#entry> ;
 
 TUPLE: #call ;
 C: #call make-node ;
@@ -63,7 +65,6 @@ C: #call-label make-node ;
 TUPLE: #push ;
 C: #push make-node ;
 : #push ( -- node ) empty-node <#push> ;
-: >#push< ( node -- seq ) node-out-d [ value-literal ] map ;
 
 TUPLE: #shuffle ;
 C: #shuffle make-node ;
@@ -79,12 +80,12 @@ C: #r> make-node ;
 
 TUPLE: #values ;
 C: #values make-node ;
-: #values ( -- node ) meta-d-node <#values> ;
+: #values ( -- node ) all-in-node <#values> ;
 
 TUPLE: #return ;
 C: #return make-node ;
 : #return ( label -- node )
-    meta-d-node <#return> [ set-node-param ] keep ;
+    all-in-node <#return> [ set-node-param ] keep ;
 
 TUPLE: #if ;
 C: #if make-node ;
@@ -96,7 +97,7 @@ C: #dispatch make-node ;
 
 TUPLE: #merge ;
 C: #merge make-node ;
-: #merge ( -- node ) meta-d-node <#merge> ;
+: #merge ( -- node ) all-out-node <#merge> ;
 
 TUPLE: #terminate ;
 C: #terminate make-node ;
@@ -105,6 +106,8 @@ C: #terminate make-node ;
 TUPLE: #declare ;
 C: #declare make-node ;
 : #declare ( classes -- node ) param-node <#declare> ;
+
+UNION: #branch #if #dispatch ;
 
 : node-inputs ( d-count r-count node -- )
     tuck
@@ -143,23 +146,8 @@ SYMBOL: current-node
         2drop f
     ] if ;
 
-: drop-inputs ( node -- #shuffle )
-    node-in-d clone in-node <#shuffle> ;
-
 : #drop ( n -- #shuffle )
     d-tail in-node <#shuffle> ;
-
-: each-node ( node quot -- )
-    over [
-        [ call ] 2keep swap
-        [ node-children [ swap each-node ] each-with ] 2keep
-        node-successor swap each-node
-    ] [
-        2drop
-    ] if ; inline
-
-: each-node-with ( obj node quot -- )
-    swap [ with ] each-node 2drop ; inline
 
 : all-nodes? ( node quot -- ? )
     over [
@@ -180,13 +168,6 @@ SYMBOL: current-node
 
 : all-nodes-with? ( obj node quot -- ? )
     swap [ with rot ] all-nodes? 2nip ; inline
-
-: remember-node ( word node -- )
-    [
-        dup #call?
-        [ [ node-history ?push ] keep set-node-history ]
-        [ 2drop ] if
-    ] each-node-with ;
 
 GENERIC: calls-label* ( label node -- ? )
 
@@ -216,8 +197,7 @@ DEFER: iterate-nodes
 
 : iterate-nodes ( node quot -- )
     over [
-        [ swap >node call node> drop ] keep
-        over [ iterate-nodes ] [ 2drop ] if
+        [ swap >node call node> drop ] keep iterate-nodes
     ] [
         2drop
     ] if ; inline
@@ -259,6 +239,21 @@ DEFER: (map-nodes)
 
 : with-node-iterator ( quot -- )
     [ V{ } clone node-stack set call ] with-scope ; inline
+
+: (each-node) ( quot -- quot next )
+    [ node@ swap call ] keep
+    [ (each-node) ] iterate-children
+    iterate-next ; inline
+
+: each-node ( node quot -- )
+    [
+        swap [
+            (each-node)
+        ] iterate-nodes drop
+    ] with-node-iterator ; inline
+
+: each-node-with ( obj node quot -- )
+    swap [ with ] each-node 2drop ; inline
 
 : (subst-values) ( new old node -- )
     [

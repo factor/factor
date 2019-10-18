@@ -8,6 +8,8 @@ $terpri
 { $subsection <gadget> }
 "You can define a new tuple which delegates to a bare gadget:"
 { $subsection delegate>gadget }
+"You can also delegate a tuple to an existing gadget:"
+{ $subsection set-gadget-delegate }
 "Further topics:"
 { $subsection "ui-gestures" }
 { $subsection "ui-paint" }
@@ -37,8 +39,9 @@ $terpri
 "Some other pre-defined implementations:"
 { $subsection solid }
 { $subsection gradient }
-{ $subsection button-paint }
-{ $subsection polygon } 
+{ $subsection polygon }
+"A special implementation for " { $link "gadgets-buttons" } " only is " { $link button-paint } "."
+$terpri
 "Custom implementations must follow the guidelines set forth in " { $link "ui-paint-custom" } "." ;
 
 ARTICLE: "ui-paint-custom" "Implementing custom drawing logic"

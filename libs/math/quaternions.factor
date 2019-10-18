@@ -53,11 +53,6 @@ IN: math-contrib
     #! part.
     first2 >r imaginary r> >rect 3array ;
 
-: cross ( u v -- u*v )
-    #! Cross product of two 3-vectors can be computed using
-    #! quaternion multiplication.
-    [ v>q ] 2apply q* q>v ;
-
 ! Zero
 : q0 { 0 0 } ;
 

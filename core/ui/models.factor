@@ -11,7 +11,7 @@ C: model ( value -- model )
     V{ } clone over set-model-dependencies
     0 over set-model-ref ;
 
-M: model equal? eq? ;
+M: model equal? 2drop f ;
 
 : add-dependency ( dep model -- )
     model-dependencies push ;

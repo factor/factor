@@ -1,6 +1,6 @@
 IN: errors
 USING: alien arrays generic help kernel math memory
-strings vectors io ;
+strings sbufs vectors io ;
 
 HELP: :s
 { $description "Prints the data stack at the time of the most recent error. Used for interactive debugging." } ;
@@ -64,8 +64,8 @@ HELP: signal-error.
     "The Windows equivalent of a signal 11 is a SEH fault. When one occurs, the runtime throws a singal error, even though it does not correspond to a Unix signal."
 } ;
 
-HELP: negative-array-size-error.
-{ $error-description "Thrown by " { $link <array> } ", " { $link <string> } ", " { $link <vector> } " and " { $link <sbuf> } " if a negative capacity is specified." } ;
+HELP: array-size-error.
+{ $error-description "Thrown by " { $link <array> } ", " { $link <string> } ", " { $link <vector> } " and " { $link <sbuf> } " if the specified capacity is negative or too large." } ;
 
 HELP: c-string-error.
 { $error-description "Thrown by " { $link alien-invoke } " and various primitives if a string containing null bytes, or characters with values higher than 255 is passed in where a C string is expected. See " { $link "c-strings" } "." } ;

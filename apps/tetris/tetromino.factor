@@ -1,4 +1,4 @@
-! Copyright (C) 2006 Alex Chapman
+! Copyright (C) 2006, 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays namespaces sequences math tetris-colours ;
 IN: tetromino
@@ -10,7 +10,7 @@ SYMBOL: tetrominoes
 {
   [
     { {
-	{ 0 0 } { 1 0 } { 2 0 } { 3 0 }
+        { 0 0 } { 1 0 } { 2 0 } { 3 0 }
       } 
       { { 0 0 }
         { 0 1 }
@@ -21,18 +21,18 @@ SYMBOL: tetrominoes
   ] [
     {
       {         { 1 0 }
-	{ 0 1 } { 1 1 } { 2 1 }
+        { 0 1 } { 1 1 } { 2 1 }
       } {
-	{ 0 0 }
-	{ 0 1 } { 1 1 }
-	{ 0 2 }
+        { 0 0 }
+        { 0 1 } { 1 1 }
+        { 0 2 }
       } {
-	{ 0 0 } { 1 0 } { 2 0 }
-		{ 1 1 }
+        { 0 0 } { 1 0 } { 2 0 }
+                { 1 1 }
       } {
-		{ 1 0 }
-	{ 0 1 } { 1 1 }
-		{ 1 2 }
+                { 1 0 }
+        { 0 1 } { 1 1 }
+                { 1 2 }
       }
     } purple
   ] [
@@ -42,63 +42,62 @@ SYMBOL: tetrominoes
   ] [
     {
       { { 0 0 } { 1 0 } { 2 0 }
-	{ 0 1 }
+        { 0 1 }
       } {
-	{ 0 0 } { 1 0 }
-	        { 1 1 }
-		{ 1 2 }
+        { 0 0 } { 1 0 }
+                { 1 1 }
+                { 1 2 }
       } {
-	                { 2 0 }
-	{ 0 1 } { 1 1 } { 2 1 }
+                        { 2 0 }
+        { 0 1 } { 1 1 } { 2 1 }
       } {
-	{ 0 0 }
-	{ 0 1 }
-	{ 0 2 } { 1 2 }
+        { 0 0 }
+        { 0 1 }
+        { 0 2 } { 1 2 }
       }
     } orange
   ] [
     { 
       { { 0 0 } { 1 0 } { 2 0 }
-			{ 2 1 }
+                        { 2 1 }
       } {
-	        { 1 0 }
-	        { 1 1 }
-	{ 0 2 } { 1 2 }
+                { 1 0 }
+                { 1 1 }
+        { 0 2 } { 1 2 }
       } {
-	{ 0 0 }
-	{ 0 1 } { 1 1 } { 2 1 }
+        { 0 0 }
+        { 0 1 } { 1 1 } { 2 1 }
       } {
-	{ 0 0 } { 1 0 }
-	{ 0 1 }
-	{ 0 2 }
+        { 0 0 } { 1 0 }
+        { 0 1 }
+        { 0 2 }
       }
     } blue
   ] [
     {
       {          { 1 0 } { 2 0 }
-	{ 0 1 } { 1 1 }
+        { 0 1 } { 1 1 }
       } {
-	{ 0 0 }
-	{ 0 1 } { 1 1 }
-		{ 1 2 }
+        { 0 0 }
+        { 0 1 } { 1 1 }
+                { 1 2 }
       }
     } green
   ] [
     {
       {
-	{ 0 0 } { 1 0 }
-		{ 1 1 } { 2 1 }
+        { 0 0 } { 1 0 }
+                { 1 1 } { 2 1 }
       } {
-		{ 1 0 }
-	{ 0 1 } { 1 1 }
-	{ 0 2 }
+                { 1 0 }
+        { 0 1 } { 1 1 }
+        { 0 2 }
       }
     } red
   ]
 } [ call <tetromino> ] map tetrominoes set-global
 
-: random-tetromino ( -- tetromino )
-  tetrominoes get dup length random-int swap nth ;
+: random-tetromino ( -- tetromino ) tetrominoes get random ;
 
 : blocks-max ( blocks quot -- max )
     ! add 1 to each block since they are 0 indexed

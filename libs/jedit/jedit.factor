@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: jedit
 USING: arrays definitions errors io kernel listener math
-namespaces parser prettyprint sequences strings words shells ;
+namespaces parser prettyprint sequences strings words shells
+tools ;
 
 : jedit-server-info ( -- port auth )
     home "/.jedit/server" path+ <file-reader> [

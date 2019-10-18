@@ -10,7 +10,7 @@ USING: kernel alien math namespaces sequences parser ;
     >r swapd align r> r> 
     "struct-name" get swap "-" swap 3append
     3dup define-getter 3dup define-setter
-    drop c-size rot * + ;
+    drop heap-size rot * + ;
 
 : PACKED-FIELD: ( offset -- offset )
   scan scan define-packed-field ; parsing

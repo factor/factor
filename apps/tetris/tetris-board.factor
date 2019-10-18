@@ -1,4 +1,4 @@
-! Copyright (C) 2006 Alex Chapman
+! Copyright (C) 2006, 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences arrays tetris-piece math ;
 IN: tetris-board
@@ -44,9 +44,9 @@ C: board ( width height -- board )
 
 : top-up-rows ( board -- )
     dup board-height over board-rows length = [
-	drop
+        drop
     ] [
-	dup add-row top-up-rows
+        dup add-row top-up-rows
     ] if ;
 
 : remove-full-rows ( board -- )

@@ -1,13 +1,8 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: hashtables-internals
 USING: arrays hashtables kernel kernel-internals math
 math-internals sequences sequences-internals vectors ;
-
-TUPLE: tombstone ;
-
-: ((empty)) T{ tombstone f } ; inline
-: ((tombstone)) T{ tombstone t } ; inline
 
 : hash@ ( key array -- i )
     >r hashcode r> array-capacity 2 /i rem 2 * >fixnum ; inline
@@ -113,6 +108,9 @@ TUPLE: tombstone ;
     hash-array [ length 2 /i <vector> ] keep
     r> each-pair { } like ; inline
 
+: (rehash) ( hash array -- )
+    [ swap pick (set-hash) ] each-pair drop ;
+
 IN: hashtables
 
 : <hashtable> ( n -- hash )
@@ -148,35 +146,53 @@ IN: hashtables
         3drop
     ] if-key ;
 
+: ?remove-hash ( key hash/f -- )
+    dup [ remove-hash ] [ 2drop ] if ;
+
 : remove-hash* ( key hash -- old )
     [ hash ] 2keep remove-hash ;
-
-: ?remove-hash ( key hash -- )
-    [ remove-hash ] [ drop ] if* ;
 
 : hash-size ( hash -- n )
     dup hash-count swap hash-deleted - ; inline
 
 : hash-empty? ( hash -- ? ) hash-size zero? ;
 
+: rehash ( hash -- )
+    dup hash-array
+    dup length ((empty)) <array> pick set-hash-array
+    (rehash) ;
+
 : grow-hash ( hash -- )
     [ dup hash-array swap hash-size 1+ ] keep
-    [ reset-hash ] keep swap [ swap pick (set-hash) ] each-pair
-    drop ;
+    [ reset-hash ] keep
+    swap (rehash) ;
+
+: hash-large? ( hash -- ? )
+    dup hash-count 1 fixnum+fast 3 fixnum*
+    swap hash-array array-capacity > ;
+
+: hash-stale? ( hash -- ? )
+    dup hash-deleted 10 * swap hash-count > ;
 
 : ?grow-hash ( hash -- )
-    dup hash-count 1 fixnum+fast 3 fixnum*
-    over hash-array array-capacity >
-    [ grow-hash ] [ drop ] if ; inline
+    dup hash-large? [
+        grow-hash
+    ] [
+        dup hash-stale? [
+            grow-hash
+        ] [
+            drop
+        ] if
+    ] if ; inline
 
 : set-hash ( value key hash -- )
     dup ?grow-hash (set-hash) ;
 
-: hash+ ( n key hash -- )
-    [ hash [ 0 ] unless* + ] 2keep set-hash ;
-
 : associate ( value key -- hash )
     2 <hashtable> [ set-hash ] keep ;
+
+: ?set-hash ( value key hash/f -- hash )
+    [ [ set-hash ] keep ] [ associate ] if* ;
 
 : hash-keys ( hash -- seq )
     [ drop over push ] (hash-keys/values) ;
@@ -226,6 +242,11 @@ IN: hashtables
     swap
     [ 2swap [ >r -rot r> call ] 2keep rot ] hash-subset 2nip ;
     inline
+
+: hash-map ( hash quot -- newhash )
+    swap hash>alist [
+        first2 rot call 2array
+    ] map-with alist>hash ; inline
 
 M: hashtable clone
     (clone) dup hash-array clone over set-hash-array ;
@@ -280,9 +301,6 @@ IN: hashtables
 : hash-intersect ( hash1 hash2 -- intersection )
     [ drop swap hash ] hash-subset-with ;
 
-: hash-diff ( hash1 hash2 -- difference )
-    [ drop swap hash not ] hash-subset-with ;
-
 : hash-update ( hash1 hash2 -- )
     [ swap rot set-hash ] hash-each-with ;
 
@@ -298,6 +316,12 @@ IN: hashtables
     ] [
         pick rot >r >r call dup r> r> set-hash
     ] if* ; inline
+
+: change-hash ( key hash quot -- )
+    [ >r hash r> call ] 3keep drop set-hash ; inline
+
+: hash+ ( n key hash -- )
+    [ [ 0 ] unless* + ] change-hash ;
 
 : map>hash ( seq quot -- hash )
     over length <hashtable> rot

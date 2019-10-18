@@ -37,7 +37,7 @@ DEFER: http-get
 : do-redirect ( code headers string -- code headers string )
     #! Should this support Location: headers that are
     #! relative URLs?
-    pick 302 = [
+    pick 100 /i 3 = [
         drop "Location" swap hash nip http-get
     ] when ;
 

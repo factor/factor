@@ -163,11 +163,11 @@ M: gb set-nth-unsafe ( elt n seq -- ) gb@ set-nth-unsafe ;
 : copy-after-gap ( array gb -- )
     #! copy everything after the gap in 'gb' into the end of 'array',
     #! and change 'gb's gap-end to reflect the gap-end in 'array'
-    dup after-gap >r 2dup set-new-gap-end gb-gap-end swap r> copy-into ;
+    dup after-gap >r 2dup set-new-gap-end gb-gap-end swap r> -rot copy ;
 
 : copy-before-gap ( array gb -- )
     #! copy everything before the gap in 'gb' into the start of 'array'
-    before-gap 0 -rot copy-into ; ! gap start doesn't change
+    before-gap 0 rot copy ; ! gap start doesn't change
 
 : resize-buffer ( gb new-size -- )
     f <array> swap 2dup copy-before-gap 2dup copy-after-gap
@@ -205,7 +205,7 @@ G: insert* ( seq position gb -- ) 2 standard-combination ;
     tuck move-gap over length over ensure-room ;
 
 : insert-elements ( seq gb -- )
-    dup gb-gap-start swap delegate rot copy-into ;
+    dup gb-gap-start swap delegate copy ;
 
 : increment-gap-start ( gb n -- )
     over gb-gap-start + swap set-gb-gap-start ;

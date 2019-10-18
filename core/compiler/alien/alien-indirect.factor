@@ -1,15 +1,16 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
-USING: compiler errors generic hashtables inference
-kernel namespaces sequences strings words parser prettyprint ;
+USING: generator errors generic hashtables inference
+kernel namespaces sequences strings words parser prettyprint
+kernel-internals math ;
 
 TUPLE: alien-indirect return parameters abi ;
 C: alien-indirect make-node ;
 
-M: alien-indirect alien-invoke-parameters alien-indirect-parameters ;
-M: alien-indirect alien-invoke-return alien-indirect-return ;
-M: alien-indirect alien-invoke-abi alien-indirect-abi ;
+M: alien-indirect alien-node-parameters alien-indirect-parameters ;
+M: alien-indirect alien-node-return alien-indirect-return ;
+M: alien-indirect alien-node-abi alien-indirect-abi ;
 
 TUPLE: alien-indirect-error ;
 
@@ -19,32 +20,31 @@ TUPLE: alien-indirect-error ;
 M: alien-indirect-error summary
     drop "Words calling ``alien-indirect'' cannot run in the interpreter. Compile the caller word and try again." ;
 
-\ alien-indirect [ string object string ] [ ] <effect>
-"inferred-effect" set-word-prop
-
-: alien-indirect-stack ( node -- )
-    1 over consume-values
-    alien-invoke-stack ;
-
 \ alien-indirect [
+    ! Three literals and function pointer
+    4 ensure-values
     empty-node <alien-indirect>
+    ! Compile-time parameters
     pop-literal nip over set-alien-indirect-abi
     pop-literal nip over set-alien-indirect-parameters
     pop-literal nip over set-alien-indirect-return
-    dup alien-indirect-parameters
-    make-prep-quot 1 make-dip infer-quot
+    ! Quotation which coerces parameters to required types
+    dup make-prep-quot 1 make-dip infer-quot
+    ! Add node to IR
     dup node,
-    alien-indirect-stack
+    ! Magic #: consume the function pointer, too
+    1 alien-invoke-stack
 ] "infer" set-word-prop
 
 M: alien-indirect generate-node
     end-basic-block
+    ! Save alien at top of stack to temporary storage
     %prepare-alien-indirect
-    dup alien-indirect-parameters objects>registers
+    dup objects>registers
+    ! Call alien in temporary storage
     %alien-indirect
-    dup generate-invoke-cleanup
-    alien-indirect-return box-return
+    dup %cleanup
+    box-return*
     iterate-next ;
 
-M: alien-indirect stack-reserve*
-    alien-indirect-parameters stack-space ;
+M: alien-indirect stack-frame-size* alien-invoke-frame ;

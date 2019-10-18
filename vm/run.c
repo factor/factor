@@ -1,104 +1,104 @@
 #include "factor.h"
 
-INLINE void execute(F_WORD* word)
+void init_interpreter(void)
 {
-	((XT)(word->xt))(word);
+	callframe.quot = F;
+	callframe.scan = 0;
+	callframe.end = 0;
+	thrown_error = F;
 }
 
 INLINE void push_callframe(void)
 {
-	put(cs + CELLS,callframe);
-	put(cs + CELLS * 2,callframe_scan);
-	put(cs + CELLS * 3,callframe_end);
-
-	/* update the pointer last, so that if we have a memory protection error
-	above, we don't have garbage stored as live data */
-	cs += CELLS * 3;
+	*(cs++) = callframe;
 }
 
 INLINE void set_callframe(CELL quot)
 {
-	F_ARRAY *untagged = (F_ARRAY*)UNTAG(quot);
 	type_check(QUOTATION_TYPE,quot);
-	callframe = quot;
-	callframe_scan = AREF(untagged,0);
-	callframe_end = AREF(untagged,array_capacity(untagged));
+	F_ARRAY *untagged = untag_array_fast(quot);
+	callframe.quot = quot;
+	callframe.scan = AREF(untagged,0);
+	callframe.end = AREF(untagged,array_capacity(untagged));
 }
+
+#define TAIL_CALL_P (callframe.scan == callframe.end)
 
 void call(CELL quot)
 {
-	if(quot == F)
-		return;
-
-	/* tail call optimization */
-	if(callframe_scan < callframe_end)
-		push_callframe();
-
+	if(quot == F) return;
+	if(!TAIL_CALL_P) push_callframe();
 	set_callframe(quot);
 }
 
 /* Called from interpreter() */
 void handle_error(void)
 {
-	if(throwing)
+	if(!throwing) return;
+
+	throwing = false;
+	gc_off = false;
+	extra_roots = stack_chain->extra_roots;
+
+	if(thrown_keep_stacks)
 	{
-		gc_off = false;
-		extra_roots = stack_chain->extra_roots;
-
-		if(thrown_keep_stacks)
-		{
-			ds = thrown_ds;
-			rs = thrown_rs;
-		}
-		else
-			fix_stacks();
-
-		dpush(thrown_error);
-		dpush(thrown_native_stack_trace);
-		/* Notify any 'catch' blocks */
-		push_callframe();
-		set_callframe(userenv[BREAK_ENV]);
-		throwing = false;
+		ds = thrown_ds;
+		rs = thrown_rs;
 	}
+	else
+		fix_stacks();
+
+	dpush(thrown_error);
+	dpush(thrown_native_stack_trace);
+
+	/* Push the callframe if the error was thrown by a tail call,
+	so that we don't lose it */
+	if(TAIL_CALL_P) push_callframe();
+
+	/* Notify any 'catch' blocks */
+	set_callframe(userenv[BREAK_ENV]);
 }
 
 void interpreter_loop(void)
 {
-	CELL next;
-
 	for(;;)
 	{
-		if(callframe_scan == callframe_end)
+		/* done current quotation? */
+		if(callframe.scan == callframe.end)
 		{
-			if(cs_bot - cs == CELLS)
+			/* done with the whole stack? */
+			if(cs_bot == cs)
 			{
+				/* if we don't have a callback to return to,
+				throw an error */
 				if(stack_chain->next)
 					return;
-
-				simple_error(ERROR_CS_UNDERFLOW,F,F);
+				else
+					simple_error(ERROR_CS_UNDERFLOW,F,F);
 			}
-
-			callframe_end = get(cs);
-			callframe_scan = get(cs - CELLS);
-			callframe = get(cs - CELLS * 2);
-			cs -= CELLS * 3;
-			continue;
+			/* return to caller quotation */
+			else
+				callframe = *(--cs);
 		}
-
-		next = get(callframe_scan);
-		callframe_scan += CELLS;
-
-		switch(TAG(next))
+		else
 		{
-		case WORD_TYPE:
-			execute(untag_word_fast(next));
-			break;
-		case WRAPPER_TYPE:
-			dpush(untag_wrapper_fast(next)->object);
-			break;
-		default:
-			dpush(next);
-			break;
+			/* look at current object */
+			CELL next = get(callframe.scan);
+			callframe.scan += CELLS;
+
+			/* execute words, push literals on data stack */
+			switch(TAG(next))
+			{
+			case WORD_TYPE:
+				execute(untag_word_fast(next));
+				break;
+			case WRAPPER_TYPE:
+				dpush(untag_wrapper_fast(next)->object);
+				break;
+			default:
+				dpush(next);
+				break;
+			}
 		}
 	}
 }
@@ -174,7 +174,7 @@ void primitive_setenv(void)
 
 void primitive_exit(void)
 {
-	exit(unbox_signed_cell());
+	exit(to_fixnum(dpop()));
 }
 
 void primitive_os_env(void)
@@ -235,13 +235,14 @@ void primitive_clone(void)
 
 void fatal_error(char* msg, CELL tagged)
 {
-	fprintf(stderr,"Fatal error: %s %lx\n",msg,tagged);
+	fprintf(stderr,"fatal_error: %s %lx\n",msg,tagged);
 	exit(1);
 }
 
 void critical_error(char* msg, CELL tagged)
 {
-	fprintf(stderr,"Critical error: %s %lx\n",msg,tagged);
+	fprintf(stderr,"You have triggered a bug in Factor. Please report.\n");
+	fprintf(stderr,"critical_error: %s %lx\n",msg,tagged);
 	factorbug();
 }
 
@@ -250,7 +251,8 @@ void early_error(CELL error)
 	if(userenv[BREAK_ENV] == F)
 	{
 		/* Crash at startup */
-		fprintf(stderr,"Error during startup: ");
+		fprintf(stderr,"You have triggered a bug in Factor. Please report.\n");
+		fprintf(stderr,"early_error: ");
 		print_obj(error);
 		fprintf(stderr,"\n");
 		factorbug();
@@ -258,7 +260,7 @@ void early_error(CELL error)
 }
 
 /* allocates memory */
-CELL allot_native_stack_trace(F_STACK_FRAME *stack)
+CELL allot_native_stack_trace(F_COMPILED_FRAME *stack)
 {
 	GROWABLE_ARRAY(array);
 
@@ -266,8 +268,8 @@ CELL allot_native_stack_trace(F_STACK_FRAME *stack)
 	{
 		CELL return_address = RETURN_ADDRESS(stack);
 
-		if(return_address >= compiling.base
-			&& return_address <= compiling.limit)
+		if(return_address >= code_heap.segment->start
+			&& return_address <= code_heap.segment->end)
 		{
 			REGISTER_ARRAY(array);
 			CELL cell = allot_cell(return_address);
@@ -275,12 +277,11 @@ CELL allot_native_stack_trace(F_STACK_FRAME *stack)
 			GROWABLE_ADD(array,cell);
 		}
 
-		F_STACK_FRAME *prev = PREVIOUS_FRAME(stack);
+		F_COMPILED_FRAME *prev = PREVIOUS_FRAME(stack);
 
 		if(prev <= stack)
 		{
-			fprintf(stderr,"*** Unusual C stack layout (why?)\n");
-			fflush(stderr);
+			critical_error("C stack walk failed in allot_native_stack_trace",0);
 			break;
 		}
 
@@ -292,7 +293,7 @@ CELL allot_native_stack_trace(F_STACK_FRAME *stack)
 	return tag_object(array);
 }
 
-void throw_error(CELL error, bool keep_stacks, F_STACK_FRAME *native_stack)
+void throw_error(CELL error, bool keep_stacks, F_COMPILED_FRAME *native_stack)
 {
 	early_error(error);
 
@@ -317,11 +318,13 @@ void primitive_throw(void)
 
 void primitive_die(void)
 {
+	fprintf(stderr,"The die word was called by the library. Unless you called it yourself,\n");
+	fprintf(stderr,"you have triggered a bug in Factor. Please report.\n");
 	factorbug();
 }
 
 void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2,
-	bool keep_stacks, F_STACK_FRAME *native_stack)
+	bool keep_stacks, F_COMPILED_FRAME *native_stack)
 {
 	throw_error(allot_array_4(userenv[ERROR_ENV],
 		tag_fixnum(error),arg1,arg2),keep_stacks,native_stack);
@@ -332,7 +335,18 @@ void simple_error(F_ERRORTYPE error, CELL arg1, CELL arg2)
 	general_error(error,arg1,arg2,true,native_stack_pointer());
 }
 
-void memory_protection_error(CELL addr, int signal, F_STACK_FRAME *native_stack)
+/* Test if 'fault' is in the guard page at the top or bottom (depending on
+offset being 0 or -1) of area+area_size */
+bool in_page(CELL fault, CELL area, CELL area_size, int offset)
+{
+	int pagesize = getpagesize();
+	area += area_size;
+	area += offset * pagesize;
+
+	return fault >= area && fault <= area + pagesize;
+}
+
+void memory_protection_error(CELL addr, int signal, F_COMPILED_FRAME *native_stack)
 {
 	gc_off = true;
 
@@ -344,17 +358,21 @@ void memory_protection_error(CELL addr, int signal, F_STACK_FRAME *native_stack)
 		general_error(ERROR_RS_UNDERFLOW,F,F,false,native_stack);
 	else if(in_page(addr, rs_bot, rs_size, 0))
 		general_error(ERROR_RS_OVERFLOW,F,F,false,native_stack);
-	else if(in_page(addr, cs_bot, 0, -1))
+	else if(in_page(addr, (CELL)cs_bot, 0, -1))
 		general_error(ERROR_CS_UNDERFLOW,F,F,false,native_stack);
-	else if(in_page(addr, cs_bot, cs_size, 0))
+	else if(in_page(addr, (CELL)cs_bot, cs_size, 0))
 		general_error(ERROR_CS_OVERFLOW,F,F,false,native_stack);
-	else if(in_page(addr, nursery.limit, 0, 0))
-		critical_error("Out of memory in allot",0);
-
-	signal_error(signal,native_stack);
+	else if(in_page(addr, nursery->end, 0, 0))
+		critical_error("allot() missed GC check",0);
+	else if(in_page(addr, extra_roots_region->start, 0, -1))
+		critical_error("local root underflow",0);
+	else if(in_page(addr, extra_roots_region->end, 0, 0))
+		critical_error("local root overflow",0);
+	else
+		signal_error(signal,native_stack);
 }
 
-void signal_error(int signal, F_STACK_FRAME *native_stack)
+void signal_error(int signal, F_COMPILED_FRAME *native_stack)
 {
 	gc_off = true;
 	general_error(ERROR_SIGNAL,tag_fixnum(signal),F,false,native_stack);

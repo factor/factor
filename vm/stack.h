@@ -14,29 +14,27 @@ typedef struct _F_CONTEXT {
 	F_SEGMENT *retain_region;
 
 	/* current callstack top pointer */
-	CELL call;
+	F_INTERP_FRAME *call;
 	/* saved contents of cs register on entry to callback */
-	CELL call_save;
+	F_INTERP_FRAME *call_save;
 	/* memory region holding current callstack */
 	F_SEGMENT *call_region;
 
 	/* saved callframe on entry to callback */
-	CELL callframe;
-	CELL callframe_scan;
-	CELL callframe_end;
+	F_INTERP_FRAME callframe;
 
 	/* saved userenv slots on entry to callback */
 	CELL catchstack_save;
 	CELL current_callback_save;
 
-	/* saved cards_offset register on entry to callback */
-	CELL cards_offset;
+	/* saved primitives register on entry to callback */
+	void **primitives;
 
 	/* saved extra_roots pointer on entry to callback */
 	CELL extra_roots;
 
 	/* C stack pointer on entry */
-	F_STACK_FRAME *native_stack_pointer;
+	F_COMPILED_FRAME *native_stack_pointer;
 
 	/* error handler longjmp buffer */
 	JMP_BUF toplevel;
@@ -48,12 +46,12 @@ F_CONTEXT *stack_chain;
 
 CELL ds_size, rs_size, cs_size;
 
-#define ds_bot ((CELL)(stack_chain->data_region->start))
-#define rs_bot ((CELL)(stack_chain->retain_region->start))
-#define cs_bot ((CELL)(stack_chain->call_region->start))
-
-#define STACK_UNDERFLOW(stack,region) ((stack) + 3 * CELLS < (region)->start)
-#define STACK_OVERFLOW(stack,region) ((stack) + 3 * CELLS >= (region)->start + (region)->size)
+#define ds_bot (stack_chain->data_region->start)
+#define ds_top (stack_chain->data_region->end)
+#define rs_bot (stack_chain->retain_region->start)
+#define rs_top (stack_chain->retain_region->end)
+#define cs_bot ((F_INTERP_FRAME *)(stack_chain->call_region->start))
+#define cs_top ((F_INTERP_FRAME *)(stack_chain->call_region->end))
 
 void reset_datastack(void);
 void reset_retainstack(void);

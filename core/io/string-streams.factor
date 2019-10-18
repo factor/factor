@@ -1,10 +1,10 @@
-! Copyright (C) 2003, 2005 Slava Pestov.
+! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io
-USING: io kernel math namespaces sequences strings ;
+USING: io kernel math namespaces sequences sbufs strings ;
 
 M: sbuf stream-write1 push ;
-M: sbuf stream-write swap nappend ;
+M: sbuf stream-write nappend ;
 M: sbuf stream-close drop ;
 M: sbuf stream-flush drop ;
 
@@ -34,19 +34,33 @@ M: plain-writer with-stream-table
         [ print ] each
     ] with-stream* ;
 
-M: sbuf stream-read1
-    dup empty? [ drop f ] [ pop ] if ;
+M: sbuf stream-read1 dup empty? [ drop f ] [ pop ] if ;
+
+: sbuf-read-until ( sbuf n -- str )
+    tail-slice >string dup nreverse ;
+
+: find-last-sep [ swap memq? ] find-last-with drop ;
+
+M: sbuf stream-read-until
+    [ find-last-sep ] keep over -1 = [
+        [ swap 1+ sbuf-read-until f like f ] keep
+        delete-all
+    ] [
+        [ swap 1+ sbuf-read-until ] 2keep [ nth ] 2keep
+        set-length
+    ] if ;
 
 M: sbuf stream-read
     dup empty? [
         2drop f
     ] [
-        swap over length min 0 <string>
-        [ [ drop pop ] inject-with ] keep
+        [ length swap - 0 max ] keep
+        [ swap sbuf-read-until ] 2keep
+        set-length
     ] if ;
 
 : <string-reader> ( str -- stream )
-    <reversed> >sbuf <line-reader> ;
+    >sbuf dup nreverse <line-reader> ;
 
 : string-in ( str quot -- )
     >r <string-reader> r> with-stream ; inline
@@ -55,4 +69,4 @@ M: sbuf stream-read
     <string-writer> [ stream-copy ] keep >string ;
 
 : string-lines ( string -- seq )
-    CHAR: \n add <string-reader> lines ;
+    "\r\n" append <string-reader> [ (lines) ] with-stream* ;

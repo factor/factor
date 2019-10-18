@@ -26,19 +26,23 @@ namespaces prettyprint sequences strings vectors words ;
 
 SYMBOL: string-mode
 
-: do-what-i-mean ( string -- restarts )
-    words-named natural-sort [
-        [ "Use the word " swap summary append ] keep 2array
-    ] map ;
+: word-restarts ( string -- restarts )
+    words-named natural-sort
+    [ [ "Use the word " swap summary append ] keep 2array ] map
+    { "Defer this word in the 'scratchpad' vocabulary" f } add ;
 
 TUPLE: no-word name ;
 
-: no-word ( name -- word )
-    dup <no-word> swap do-what-i-mean condition ;
+: no-word ( name -- word/f )
+    dup <no-word> swap word-restarts condition ;
 
 : search ( str -- word )
     dup use get hash-stack [ ] [
-        no-word dup word-vocabulary use+
+        dup no-word [
+            dup word-vocabulary use+
+        ] [
+            "scratchpad" create
+        ] ?if
     ] ?if ;
 
 : scan-word ( -- obj )
@@ -52,7 +56,9 @@ TUPLE: no-word name ;
 
 : parse-loop ( -- )
     scan-word [
-        dup parsing? [ execute ] [ parsed ] if  parse-loop
+        dup parsing?
+        [ execute ] [ parsed ] if
+        parse-loop
     ] when* ;
 
 : (parse) ( str -- )
@@ -114,15 +120,17 @@ TUPLE: bad-escape ;
     swap column-number set
     string>effect ;
 
-: parse-base ( parsed base -- parsed ) scan swap base> parsed ;
+: parse-base ( parsed base -- parsed )
+    scan swap base> [ "Bad number" throw ] unless* parsed ;
 
 global [
     {
-        "scratchpad" "syntax" "arrays" "definitions"
-        "errors" "generic" "hashtables" "help" "inference"
-        "io" "kernel" "listener" "math" "memory" "modules"
-        "namespaces" "parser" "prettyprint" "sequences" "shells"
-        "strings" "styles" "tools" "vectors" "words"
+        "scratchpad" "syntax" "arrays" "bit-arrays"
+        "byte-arrays" "definitions" "errors" "generic"
+        "hashtables" "help" "inference" "io" "kernel" "listener"
+        "math" "memory" "modules" "namespaces" "parser"
+        "prettyprint" "sbufs" "sequences" "shells" "strings"
+        "styles" "tools" "vectors" "words"
     } set-use
     "scratchpad" set-in
 ] bind

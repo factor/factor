@@ -8,29 +8,12 @@ styles words help ;
 : reload ( defspec -- )
     where first [ run-file ] when* ;
 
-TUPLE: no-edit-hook ;
-
-SYMBOL: edit-hook
-
-: edit-location ( file line -- )
-    >r ?resource-path r>
-    edit-hook get [ call ] [ <no-edit-hook> throw ] if* ;
-
-: edit-file ( file -- ) ?resource-path 0 edit-location ;
-
-: edit ( defspec -- )
-    where [
-        first2 edit-location
-    ] [
-        "Not from a source file" throw
-    ] if* ;
-
 : write-vocab ( vocab -- )
-    dup <vocab-link> presented associate styled-text ;
+    dup <vocab-link> presentation-text ;
 
 : in. ( word -- )
     word-vocabulary [
-        H{ } clone <flow \ IN: pprint-word write-vocab block>
+        <flow \ IN: pprint-word write-vocab block>
     ] when* ;
 
 : comment. ( string -- )
@@ -40,13 +23,17 @@ M: word synopsis*
     dup in.
     dup definer pprint-word
     dup pprint-word
-    stack-effect [ effect>string comment. ] when* ;
+    dup parsing? not swap stack-effect and
+    [ effect>string comment. ] when* ;
 
 M: method-spec synopsis*
     \ M: pprint-word [ pprint-word ] each ;
 
 : synopsis ( defspec -- str )
-    [ 0 margin set [ synopsis* ] with-pprint ] string-out ;
+    [
+        0 margin set
+        [ synopsis* ] with-pprint
+    ] string-out ;
 
 M: word summary synopsis ;
 
@@ -80,28 +67,28 @@ M: word declarations.
     [
         dup synopsis*
         dup definition [
-            H{ } <defblock
+            <defblock
             pprint-elements pprint-; declarations.
             block>
         ] [
             2drop
-        ] if newline
-    ] with-pprint ;
+        ] if
+    ] with-pprint terpri ;
 
 M: object see (see) ;
 
 GENERIC: see-class* ( word -- )
 
-M: union see-class*
+M: union-class see-class*
     \ UNION: pprint-word
     dup pprint-word
     members pprint-elements pprint-; ;
 
-M: predicate see-class*
+M: predicate-class see-class*
     \ PREDICATE: pprint-word
     dup superclass pprint-word
     dup pprint-word
-    H{ } <defblock
+    <defblock
     "definition" word-prop pprint-elements
     pprint-; block> ;
 
@@ -114,7 +101,7 @@ M: tuple-class see-class*
 M: word see-class* drop ;
 
 : see-class ( word -- )
-    dup class? over builtin? not and [
+    dup class? over builtin-class? not and [
         terpri [ see-class* ] with-pprint terpri
     ] [
         drop

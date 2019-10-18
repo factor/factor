@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: tools
 USING: arrays definitions hashtables help tools io kernel
@@ -13,7 +13,7 @@ generic completion ;
 
 : method-usage ( word generic -- methods )
     tuck methods
-    [ second flatten memq? ] subset-with
+    [ second quot-uses memq? ] subset-with
     0 <column>
     [ swap 2array ] map-with ;
 

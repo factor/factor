@@ -1,4 +1,4 @@
-REQUIRES: libs/httpd ;
+REQUIRES: apps/http-server libs/basic-authentication ;
 
 PROVIDE: libs/furnace
 { +files+ { 
@@ -6,6 +6,7 @@ PROVIDE: libs/furnace
     "responder.factor"
     "tools/help.factor"
     "tools/browser.factor"
+    "scaffold.factor"
 } }
 { +tests+ { 
     "test/validator.factor"

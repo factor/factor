@@ -1,5 +1,5 @@
 USING: graphs hashtables hashtables-internals help io-internals
-kernel kernel-internals namespaces queues ;
+kernel kernel-internals namespaces queues buffers ;
 
 ARTICLE: "collections" "Collections"
 "Classical data structures:"
@@ -42,7 +42,8 @@ $terpri
 { $subsection build-graph }
 "To remove vertices from the graph:"
 { $subsection remove-vertex }
-{ $subsection clear-hash }
+"Since graphs are represented as hashtables, they can be cleared out by calling " { $link clear-hash } "."
+$terpri
 "You can perform queries on the graph:"
 { $subsection in-edges }
 { $subsection closure }
@@ -51,7 +52,7 @@ $terpri
 ARTICLE: "buffers" "Locked I/O buffers"
 "I/O buffers are a circular ring structure, a fixed-size queue of characters. Their key feature is that they are backed by manually allocated storage that does not get moved by the garbage collector. They are typically used for asynchronous I/O in conjunction with the C library interface in Factor's implementation."
 $terpri
-"Buffer words are in the " { $vocab-link "io-internals" } " vocabulary."
+"Buffer words are found in the " { $vocab-link "buffers" } " vocabulary."
 { $subsection buffer }
 { $subsection <buffer> }
 "Buffers must be manually deallocated:"
@@ -66,7 +67,7 @@ $terpri
 { $subsection buffer-pop }
 { $subsection buffer> }
 { $subsection buffer>> }
-{ $subsection buffer-contents }
+{ $subsection buffer-until }
 "Writing to the buffer:"
 { $subsection extend-buffer }
 { $subsection ch>buffer }

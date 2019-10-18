@@ -1,9 +1,15 @@
 IN: gadgets
-USING: help strings ;
+USING: help strings models gadgets-presentations ;
 
 HELP: windows
 { $var-description "Global variable holding an association list mapping native window handles to " { $link world } " instances." }
 { $see-also open-window find-window } ;
+
+HELP: <status-bar>
+{ $values { "model" model } { "gadget" "a new " { $link gadget } } }
+{ $description "Creates a new " { $link gadget } " displaying the model value, which must be a string or " { $link f } "." }
+{ $notes "If the " { $snippet "model" } " is " { $link world-status } ", this gadget will display " { $link presentation } " mouse over help." }
+{ $see-also show-status show-summary } ; 
 
 HELP: open-window
 { $values { "gadget" gadget } { "title" string } }

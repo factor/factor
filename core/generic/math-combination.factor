@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: generic
 USING: arrays errors generic hashtables kernel kernel-internals
@@ -11,14 +11,15 @@ PREDICATE: class math-class ( object -- ? )
         number bootstrap-word class<
     ] if ;
 
-: math-class-compare ( class class -- n )
-    [
-        dup math-class?
-        [ types last/first ] [ drop { 100 100 } ] if
-    ] 2apply <=> ;
-
+: math-precedence ( class -- n )
+    {
+        { [ dup class-empty? ] [ drop { -1 -1 } ] }
+        { [ dup math-class? ] [ types last/first ] }
+        { [ t ] [ drop { 100 100 } ] }
+    } cond ;
+    
 : math-class-max ( class class -- class )
-    [ math-class-compare 0 > ] 2keep ? ;
+    [ [ math-precedence ] compare 0 > ] 2keep ? ;
 
 : (math-upgrade) ( max class -- quot )
     dupd = [

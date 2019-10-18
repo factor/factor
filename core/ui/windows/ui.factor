@@ -13,13 +13,13 @@ SYMBOL: msg-obj
 SYMBOL: class-name
 SYMBOL: track-mouse-state
 
-: random-class-name "Factor" (random-int) number>string append ;
+: random-class-name "Factor" (random) number>string append ;
 
 : style ( -- n ) WS_OVERLAPPEDWINDOW ; inline
 : ex-style ( -- n ) WS_EX_APPWINDOW WS_EX_WINDOWEDGE bitor ; inline
 
 : adjust-RECT ( RECT -- )
-    style 0 ex-style AdjustWindowRectEx win32-error=0 ;
+    style 0 ex-style AdjustWindowRectEx win32-error=0/f ;
 
 : make-RECT ( width height -- RECT )
     "RECT" <c-object> [ set-RECT-bottom ] keep [ set-RECT-right ] keep ;
@@ -31,10 +31,13 @@ SYMBOL: track-mouse-state
     [ RECT-right ] keep [ RECT-left - ] keep
     [ RECT-bottom ] keep RECT-top - ;
 
+: get-RECT-top-left ( RECT -- x y )
+    [ RECT-left ] keep RECT-top ;
+
 : handle-wm-paint ( hWnd uMsg wParam lParam -- )
     #! wParam and lParam are unused
     #! only paint if width/height both > 0
-    3drop window dup rect-dim first2 [ 0 > ] 2apply and
+    3drop window dup rect-dim [ 0 > ] all?
     [ draw-world ] [ drop ] if ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
@@ -116,7 +119,7 @@ SYMBOL: track-mouse-state
  
 : keystroke>gesture ( n -- sym mods )
     dup wm-keydown-codes hash*
-    [ nip ] [ drop ch>string lower-case? [ >lower ] when ] if
+    [ nip ] [ drop 1string lower-case? [ >lower ] when ] if
     key-modifiers swap ;
 
 SYMBOL: lParam
@@ -134,7 +137,7 @@ SYMBOL: hWnd
 : handle-wm-char ( hWnd uMsg wParam lParam -- )
     lParam set wParam set uMsg set hWnd set
     wParam get exclude-key-wm-char? ctrl? alt? xor or [
-        wParam get ch>string
+        wParam get 1string
         hWnd get window-focus user-input
     ] unless ;
 
@@ -145,8 +148,8 @@ SYMBOL: hWnd
     drop ;
 
 : cleanup-window ( handle -- )
-    [ win-hRC wglDeleteContext win32-error=0 ] keep
-    [ win-hWnd ] keep win-hDC ReleaseDC win32-error=0 ;
+    [ win-hRC wglDeleteContext win32-error=0/f ] keep
+    [ win-hWnd ] keep win-hDC ReleaseDC win32-error=0/f ;
 
 : handle-wm-close ( hWnd uMsg wParam lParam -- )
     3drop
@@ -154,7 +157,7 @@ SYMBOL: hWnd
     stop-world
     dup win-hWnd unregister-window
     dup cleanup-window
-    win-hWnd DestroyWindow win32-error=0 ;
+    win-hWnd DestroyWindow win32-error=0/f ;
 
 : handle-wm-set-focus ( hWnd uMsg wParam lParam -- )
     3drop window [ focus-world ] when* ;
@@ -162,8 +165,13 @@ SYMBOL: hWnd
 : handle-wm-kill-focus ( hWnd uMsg wParam lParam -- )
     3drop window [ unfocus-world ] when* ;
 
-: mouse-lparam ( lParam -- seq ) [ lo-word ] keep hi-word 2array ;
-: mouse-wheel ( lParam -- n ) mouse-lparam [ sgn neg ] map ;
+: >lo-hi ( WORD -- array ) [ lo-word ] keep hi-word 2array ;
+: mouse-wheel ( lParam -- array ) >lo-hi [ sgn neg ] map ;
+
+: mouse-absolute>relative ( lparam handle -- array )
+    >r >lo-hi r>
+    0 0 make-RECT [ GetWindowRect win32-error=0/f ] keep
+    get-RECT-top-left 2array v- ;
 
 : mouse-event>gesture ( uMsg -- button )
     key-modifiers swap
@@ -181,7 +189,7 @@ SYMBOL: hWnd
     { WM_LBUTTONDOWN WM_RBUTTONDOWN } member? ;
 
 : prepare-mouse ( hWnd uMsg wParam lParam -- button coordinate world )
-    nip >r mouse-event>gesture r> mouse-lparam rot window ;
+    nip >r mouse-event>gesture r> >lo-hi rot window ;
 
 : handle-wm-buttondown ( hWnd uMsg wParam lParam -- )
     >r over capture-mouse? [ pick SetCapture drop ] when r>
@@ -195,16 +203,17 @@ SYMBOL: hWnd
     2nip
     track-mouse-state get [
         over "TRACKMOUSEEVENT" <c-object> [ set-TRACKMOUSEEVENT-hwndTrack ] keep
-        "TRACKMOUSEEVENT" c-size over set-TRACKMOUSEEVENT-cbSize
+        "TRACKMOUSEEVENT" heap-size over set-TRACKMOUSEEVENT-cbSize
         TME_LEAVE over set-TRACKMOUSEEVENT-dwFlags
         0 over set-TRACKMOUSEEVENT-dwHoverTime
         TrackMouseEvent drop
         track-mouse-state on
     ] unless
-    mouse-lparam swap window move-hand fire-motion ;
+    >lo-hi swap window move-hand fire-motion ;
 
 : handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
-    mouse-lparam >r mouse-wheel nip r> rot window send-wheel ;
+    >r nip r>
+    pick mouse-absolute>relative >r mouse-wheel r> rot window send-wheel ;
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
     #! message sent if windows needs application to stop dragging
@@ -219,7 +228,7 @@ SYMBOL: hWnd
 
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
-    "uint" { "void*" "uint" "long" "long" } [
+    "uint" { "void*" "uint" "long" "long" } "stdcall" [
         [
         pick
         ! "Message: " write dup get-windows-message-name write
@@ -274,7 +283,7 @@ SYMBOL: hWnd
 
 : register-wndclassex ( classname wndproc -- class )
     "WNDCLASSEX" <c-object>
-    "WNDCLASSEX" c-size over set-WNDCLASSEX-cbSize
+    "WNDCLASSEX" heap-size over set-WNDCLASSEX-cbSize
     CS_HREDRAW CS_VREDRAW bitor CS_OWNDC bitor over set-WNDCLASSEX-style
     [ set-WNDCLASSEX-lpfnWndProc ] keep
     0 over set-WNDCLASSEX-cbClsExtra
@@ -283,16 +292,16 @@ SYMBOL: hWnd
     f IDI_APPLICATION LoadIcon over set-WNDCLASSEX-hIcon
     f IDC_ARROW LoadCursor over set-WNDCLASSEX-hCursor
     [ set-WNDCLASSEX-lpszClassName ] keep
-    RegisterClassEx dup win32-error=0 ;
+    RegisterClassEx dup win32-error=0/f ;
 
 : create-window ( width height -- hwnd )
     make-adjusted-RECT
-    >r class-name get <malloc-string> f r>
+    >r class-name get malloc-u16-string f r>
     >r >r >r ex-style r> r>
         WS_CLIPSIBLINGS WS_CLIPCHILDREN bitor style bitor
         0 0 r>
     get-RECT-dimensions
-    f f f GetModuleHandle f CreateWindowEx dup win32-error=0 ;
+    f f f GetModuleHandle f CreateWindowEx dup win32-error=0/f ;
 
 : show-window ( hWnd -- )
     dup SW_SHOW ShowWindow drop ! always succeeds
@@ -302,22 +311,22 @@ SYMBOL: hWnd
 : init-win32-ui
     "MSG" <c-object> msg-obj set
     random-class-name class-name set
-    class-name get <malloc-string> ui-wndproc
-    register-wndclassex win32-error=0
+    class-name get malloc-u16-string ui-wndproc
+    register-wndclassex win32-error=0/f
     GetDoubleClickTime double-click-timeout set-global ;
 
 : cleanup-win32-ui ( -- )
     class-name get string>char-alien f UnregisterClass drop ;
 
 : setup-pixel-format ( hdc -- )
-    16 make-pfd [ ChoosePixelFormat dup win32-error=0 ] 2keep
-    swapd SetPixelFormat win32-error=0 ;
+    16 make-pfd [ ChoosePixelFormat dup win32-error=0/f ] 2keep
+    swapd SetPixelFormat win32-error=0/f ;
 
-: get-dc ( hWnd -- hDC ) GetDC dup win32-error=0 ;
+: get-dc ( hWnd -- hDC ) GetDC dup win32-error=0/f ;
 
 : get-rc ( hDC -- hRC )
-    dup wglCreateContext dup win32-error=0
-    [ wglMakeCurrent win32-error=0 ] keep ;
+    dup wglCreateContext dup win32-error=0/f
+    [ wglMakeCurrent win32-error=0/f ] keep ;
 
 : setup-gl ( hwnd -- hDC hRC )
     get-dc
@@ -334,10 +343,10 @@ IN: gadgets
     start-world win-hWnd show-window ;
 
 : select-gl-context ( handle -- )
-    [ win-hDC ] keep win-hRC wglMakeCurrent win32-error=0 ;
+    [ win-hDC ] keep win-hRC wglMakeCurrent win32-error=0/f ;
 
 : flush-gl-context ( handle -- )
-    win-hDC SwapBuffers win32-error=0 ;
+    win-hDC SwapBuffers win32-error=0/f ;
 
 ! Move window to front
 : raise-window ( world -- )
@@ -345,7 +354,7 @@ IN: gadgets
 
 : set-title ( string world -- )
     world-handle win-hWnd
-    swap <malloc-string> alien-address >r WM_SETTEXT 0 r> SendMessage drop ;
+    swap malloc-u16-string alien-address >r WM_SETTEXT 0 r> SendMessage drop ;
 
 IN: shells
 : ui

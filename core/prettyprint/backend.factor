@@ -1,15 +1,13 @@
-! Copyright (C) 2003, 2006 Slava Pestov.
+! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: prettyprint-internals
-USING: arrays generic hashtables io kernel math
-namespaces parser sequences strings styles vectors words
-prettyprint ;
+USING: arrays byte-arrays bit-arrays generic hashtables io
+kernel math namespaces parser sequences strings sbufs styles
+vectors words prettyprint ;
 
 GENERIC: pprint* ( obj -- )
 
 ! Atoms
-M: byte-array pprint* drop "( byte array )" text ;
-
 : word-style ( word -- style )
     [
         dup presented set
@@ -22,7 +20,7 @@ M: byte-array pprint* drop "( byte array )" text ;
 
 M: word pprint*
     dup parsing? [
-        H{ } <flow \ POSTPONE: pprint-word pprint-word block>
+        <flow \ POSTPONE: pprint-word pprint-word block>
     ] [
         pprint-word
     ] if ;
@@ -60,9 +58,13 @@ M: f pprint* drop \ f pprint-word ;
         ] when
     ] when ;
 
+: string-style
+    H{ { foreground { 0.3 0.3 0.3 1.0 } } } ;
+
 : pprint-string ( str prefix -- )
+    >r do-string-limit r>
     [ % [ unparse-ch ] each CHAR: " , ] "" make
-    do-string-limit text ;
+    string-style styled-text ;
 
 M: string pprint* "\"" pprint-string ;
 
@@ -72,15 +74,15 @@ M: sbuf pprint* "SBUF\" " pprint-string ;
 : nesting-limit? ( -- ? )
     nesting-limit get dup [ pprinter-stack get length < ] when ;
 
-: truncated-nesting ( obj str -- )
-    swap presented associate styled-text ;
+: presentation-text ( str obj -- )
+    presented associate styled-text ;
 
 : check-recursion ( obj quot -- )
     nesting-limit? [
-        drop "#" truncated-nesting
+        drop "#" swap presentation-text
     ] [
         over recursion-check get memq? [
-            drop "&" truncated-nesting
+            drop "&" swap presentation-text
         ] [
             over recursion-check get push
             call
@@ -93,15 +95,9 @@ M: sbuf pprint* "SBUF\" " pprint-string ;
     [ over length over > [ head t ] [ drop f ] if ]
     [ drop f ] if ;
 
-: hilite-style ( -- hash )
-    H{
-        { background { 0.9 0.9 0.9 1 } }
-        { highlight t }
-    } ;
-
 : pprint-hilite ( object n -- )
     hilite-index get = [
-        hilite-style <flow pprint* block>
+        <hilite pprint* block>
     ] [
         pprint*
     ] if ;
@@ -113,36 +109,51 @@ M: sbuf pprint* "SBUF\" " pprint-string ;
         [ pprint* ] each
     ] if r> [ "..." text ] when ;
 
-GENERIC: >pprint-sequence ( obj -- seq start end narrow? )
+GENERIC: pprint-delims ( obj -- start end )
 
-M: complex >pprint-sequence >rect 2array \ C{ \ } f ;
+M: complex pprint-delims drop \ C{ \ } ;
+M: quotation pprint-delims drop \ [ \ ] ;
+M: array pprint-delims drop \ { \ } ;
+M: byte-array pprint-delims drop \ B{ \ } ;
+M: bit-array pprint-delims drop \ ?{ \ } ;
+M: vector pprint-delims drop \ V{ \ } ;
+M: hashtable pprint-delims drop \ H{ \ } ;
+M: tuple pprint-delims drop \ T{ \ } ;
+M: wrapper pprint-delims drop \ W{ \ } ;
 
-M: quotation >pprint-sequence \ [ \ ] f ;
+GENERIC: >pprint-sequence ( obj -- seq )
 
-M: array >pprint-sequence \ { \ } t ;
+M: object >pprint-sequence ;
 
-M: vector >pprint-sequence \ V{ \ } t ;
+M: bit-array >pprint-sequence ;
+M: complex >pprint-sequence >rect 2array ;
+M: hashtable >pprint-sequence hash>alist ;
+M: tuple >pprint-sequence tuple>array ;
+M: wrapper >pprint-sequence wrapped 1array ;
 
-M: hashtable >pprint-sequence hash>alist \ H{ \ } t ;
+GENERIC: pprint-narrow? ( obj -- ? )
 
-M: tuple >pprint-sequence tuple>array \ T{ \ } t ;
+M: object pprint-narrow? drop f ;
 
-M: wrapper >pprint-sequence wrapped 1array \ W{ \ } f ;
+M: array pprint-narrow? drop t ;
+M: vector pprint-narrow? drop t ;
+M: hashtable pprint-narrow? drop t ;
+M: tuple pprint-narrow? drop t ;
 
 : pprint-object ( obj -- )
     [
-        >pprint-sequence H{ } <flow
-        rot [ pprint-word ] when*
-        [ H{ } <narrow ] [ H{ } <inset ] if
-        swap pprint-elements
-        block> [ pprint-word ] when* block>
+        <flow
+        dup pprint-delims >r pprint-word
+        dup pprint-narrow? [ <narrow ] [ <inset ] if
+        >pprint-sequence pprint-elements
+        block> r> pprint-word block>
     ] check-recursion ;
     
 M: object pprint* pprint-object ;
 
 M: wrapper pprint*
     dup wrapped word? [
-        \ \ pprint-word wrapped pprint-word
+        <flow \ \ pprint-word wrapped pprint-word block>
     ] [
         pprint-object
     ] if ;

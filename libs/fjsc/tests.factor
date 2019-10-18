@@ -40,3 +40,16 @@ IN: temporary
 { T{ ast-expression f { T{ ast-string f "abcd" } } } } [ 
   "\"abcd\"" 'statement' parse car parse-result-parsed 
 ] unit-test 
+
+{ T{ ast-expression f { T{ ast-use f "foo" } } } } [
+  "USE: foo" 'statement' parse car parse-result-parsed
+] unit-test
+
+{ T{ ast-expression f { T{ ast-in f "foo" } } } } [
+  "IN: foo" 'statement' parse car parse-result-parsed
+] unit-test
+
+{ T{ ast-expression f { T{ ast-using f { "foo" "bar" }  } } } } [
+  "USING: foo bar ;" 'statement' parse car parse-result-parsed
+] unit-test
+

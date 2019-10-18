@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: assembler
-USING: compiler errors generic kernel math memory namespaces
+IN: assembler-ppc
+USING: generator errors generic kernel math memory namespaces
 words ;
 
 ! See the Motorola or IBM documentation for details. The opcode
@@ -15,34 +15,16 @@ words ;
 !
 ! 14 15 10 STW
 
-: insn ( operand opcode -- ) 26 shift bitor , ;
-
-: a-form ( d a b c xo rc -- n )
-    >r 1 shift >r 6 shift >r 11 shift >r 16 shift >r 21 shift
-    r> bitor r> bitor r> bitor r> bitor r> bitor ;
-
-: b-form ( bo bi bd aa lk -- n )
-    >r 1 shift >r 2 shift >r 16 shift >r 21 shift
-    r> bitor r> bitor r> bitor r> bitor ;
-
-: d-form ( d a simm -- n )
-    HEX: ffff bitand >r 16 shift >r 21 shift r> bitor r> bitor ;
-
-: i-form ( li aa lk -- n )
-    >r 1 shift bitor r> bitor ;
-
-: x-form ( a s b xo rc -- n )
-    swap
-    >r 1 shift >r 11 shift >r swap 16 shift >r 21 shift
-    r> bitor r> bitor r> bitor r> bitor ;
-
-: xfx-form ( d spr xo -- n )
-    1 shift >r 11 shift >r 21 shift r> bitor r> bitor ;
-
-: xo-form ( d a b oe rc xo -- n )
-    swap
-    >r 1 shift >r 10 shift >r 11 shift >r 16 shift >r 21 shift
-    r> bitor r> bitor r> bitor r> bitor r> bitor ;
+: insn ( operand opcode -- ) { 26 0 } bitfield , ;
+: a-form ( d a b c xo rc -- n ) { 0 1 6 11 16 21 } bitfield ;
+: b-form ( bo bi bd aa lk -- n ) { 0 1 2 16 21 } bitfield ;
+: s>u16 ( s -- u ) HEX: ffff bitand ;
+: d-form ( d a simm -- n ) s>u16 { 0 16 21 } bitfield ;
+: sd-form ( d a simm -- n ) s>u16 { 0 21 16 } bitfield ;
+: i-form ( li aa lk -- n ) { 0 1 0 } bitfield ;
+: x-form ( a s b xo rc -- n ) { 1 0 11 21 16 } bitfield ;
+: xfx-form ( d spr xo -- n ) { 1 11 21 } bitfield ;
+: xo-form ( d a b oe rc xo -- n ) { 1 0 10 11 16 21 } bitfield ;
 
 : ADDI d-form 14 insn ;   : LI 0 rot ADDI ;   : SUBI neg ADDI ;
 : ADDIS d-form 15 insn ;  : LIS 0 rot ADDIS ;
@@ -65,8 +47,8 @@ words ;
 : ADDE 0 0 (ADDE) ;  : ADDE. 0 1 (ADDE) ;
 : ADDEO 1 0 (ADDE) ; : ADDEO. 1 1 (ADDE) ;
 
-: ANDI d-form 28 insn ;
-: ANDIS d-form 29 insn ;
+: ANDI sd-form 28 insn ;
+: ANDIS sd-form 29 insn ;
 
 : (AND) 28 x-form 31 insn ;
 : AND 0 (AND) ;  : AND. 0 (AND) ;
@@ -90,7 +72,7 @@ words ;
 
 : NOT dup NOR ;   : NOT. dup NOR. ;
 
-: ORI d-form 24 insn ;  : ORIS d-form 25 insn ;
+: ORI sd-form 24 insn ;  : ORIS sd-form 25 insn ;
 
 : (OR) 444 x-form 31 insn ;
 : OR 0 (OR) ;  : OR. 1 (OR) ;
@@ -135,8 +117,7 @@ words ;
 : SUBFE 0 0 (SUBFE) ;  : SUBFE. 0 1 (SUBFE) ;
 : SUBFEO 1 0 (SUBFE) ; : SUBFEO. 1 1 (SUBFE) ;
 
-: XORI d-form 26 insn ;
-: XORIS d-form 27 insn ;
+: XORI sd-form 26 insn ;  : XORIS sd-form 27 insn ;
 
 : (XOR) 316 x-form 31 insn ;
 : XOR 0 (XOR) ;  : XOR. 1 (XOR) ;
@@ -163,15 +144,15 @@ words ;
 
 G: (B) ( dest aa lk -- ) 2 standard-combination ;
 M: integer (B) i-form 18 insn ;
-M: word (B) 0 -rot (B) rel-relative-3 rel-word ;
-M: label (B) 0 -rot (B) rel-relative-3 rel-label ;
+M: word (B) 0 -rot (B) rc-relative-ppc-3 rel-word ;
+M: label (B) 0 -rot (B) rc-relative-ppc-3 rel-label ;
 
 : B 0 0 (B) ; : BL 0 1 (B) ;
 
 GENERIC: BC ( a b c -- )
 M: integer BC 0 0 b-form 16 insn ;
-M: word BC >r 0 BC r> rel-relative-2 rel-word ;
-M: label BC >r 0 BC r> rel-relative-2 rel-label ;
+M: word BC >r 0 BC r> rc-relative-ppc-2 rel-word ;
+M: label BC >r 0 BC r> rc-relative-ppc-2 rel-label ;
 
 : BLT 12 0 rot BC ;  : BGE 4 0 rot BC ;
 : BGT 12 1 rot BC ;  : BLE 4 1 rot BC ;

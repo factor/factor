@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: kernel-internals
-USING: assembler command-line errors io io-internals kernel math
+USING: command-line errors io io-internals kernel math
 namespaces parser words threads ;
 
 : boot ( -- )

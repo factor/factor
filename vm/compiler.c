@@ -15,43 +15,42 @@ INLINE CELL get_literal(CELL literal_start, CELL num)
 }
 
 /* Look up an external library symbol referenced by a compiled code block */
-CELL get_rel_symbol(F_REL *rel, CELL literal_start)
+void *get_rel_symbol(F_REL *rel, CELL literal_start)
 {
 	CELL arg = REL_ARGUMENT(rel);
 	F_ARRAY *pair = untag_array(get_literal(literal_start,arg));
-	char *symbol = alien_offset(get(AREF(pair,0)));
+	F_SYMBOL *symbol = alien_offset(get(AREF(pair,0)));
 	CELL library = get(AREF(pair,1));
 	F_DLL *dll = (library == F ? NULL : untag_dll(library));
 
 	if(dll != NULL && !dll->dll)
-		return (CELL)undefined_symbol;
+		return undefined_symbol;
 
-	CELL sym = (CELL)ffi_dlsym(dll,symbol,false);
+	if(!symbol)
+		return undefined_symbol;
 
-	if(!sym)
-		return (CELL)undefined_symbol;
+	void *sym = ffi_dlsym(dll,symbol,false);
 
-	return sym;
+	if(sym)
+		return sym;
+	else
+		return undefined_symbol;
 }
 
 /* Compute an address to store at a relocation */
 INLINE CELL compute_code_rel(F_REL *rel,
 	CELL code_start, CELL literal_start, CELL words_start)
 {
-	CELL offset = code_start + rel->offset;
-
 	switch(REL_TYPE(rel))
 	{
 	case RT_PRIMITIVE:
-		return primitive_to_xt(REL_ARGUMENT(rel));
+		return (CELL)primitive_to_xt(REL_ARGUMENT(rel));
 	case RT_DLSYM:
-		return get_rel_symbol(rel,literal_start);
-	case RT_HERE:
-		return offset;
-	case RT_CARDS:
-		return cards_offset;
+		return (CELL)get_rel_symbol(rel,literal_start);
 	case RT_LITERAL:
 		return CREF(literal_start,REL_ARGUMENT(rel));
+	case RT_DISPATCH:
+		return CREF(words_start,REL_ARGUMENT(rel));
 	case RT_XT:
 		return get(CREF(words_start,REL_ARGUMENT(rel)));
 	case RT_LABEL:
@@ -62,7 +61,7 @@ INLINE CELL compute_code_rel(F_REL *rel,
 	}
 }
 
-/* Store a 32-bit value into two consecutive PowerPC LI/LIS instructions */
+/* Store a 32-bit value into a PowerPC LIS/ORI sequence */
 INLINE void reloc_set_2_2(CELL cell, CELL value)
 {
 	put(cell - CELLS,((get(cell - CELLS) & ~0xffff) | ((value >> 16) & 0xffff)));
@@ -70,47 +69,53 @@ INLINE void reloc_set_2_2(CELL cell, CELL value)
 }
 
 /* Store a value into a bitfield of a PowerPC instruction */
-INLINE void reloc_set_masked(CELL cell, CELL value, CELL mask)
+INLINE void reloc_set_masked(CELL cell, F_FIXNUM value, CELL mask, F_FIXNUM shift)
 {
 	u32 original = *(u32*)cell;
 	original &= ~mask;
-	*(u32*)cell = (original | (value & mask));
+	*(u32*)cell = (original | ((value >> shift) & mask));
 }
 
 /* Perform a fixup on a code block */
 void apply_relocation(F_REL *rel,
 	CELL code_start, CELL literal_start, CELL words_start)
 {
-	CELL absolute_value;
-	CELL relative_value;
 	CELL offset = rel->offset + code_start;
-
-	absolute_value = compute_code_rel(rel,
+	F_FIXNUM absolute_value = compute_code_rel(rel,
 		code_start,literal_start,words_start);
-	relative_value = absolute_value - offset;
+	F_FIXNUM relative_value = absolute_value - offset;
 
 	switch(REL_CLASS(rel))
 	{
-	case REL_ABSOLUTE_CELL:
+	case RC_ABSOLUTE_CELL:
 		put(offset,absolute_value);
 		break;
-	case REL_ABSOLUTE:
+	case RC_ABSOLUTE:
 		*(u32*)offset = absolute_value;
 		break;
-	case REL_RELATIVE:
+	case RC_RELATIVE:
 		*(u32*)offset = relative_value - sizeof(u32);
 		break;
-	case REL_ABSOLUTE_2_2:
+	case RC_ABSOLUTE_PPC_2_2:
 		reloc_set_2_2(offset,absolute_value);
 		break;
-	case REL_RELATIVE_2_2:
-		reloc_set_2_2(offset,relative_value);
+	case RC_RELATIVE_PPC_2:
+		reloc_set_masked(offset,relative_value,REL_RELATIVE_PPC_2_MASK,0);
 		break;
-	case REL_RELATIVE_2:
-		reloc_set_masked(offset,relative_value,REL_RELATIVE_2_MASK);
+	case RC_RELATIVE_PPC_3:
+		reloc_set_masked(offset,relative_value,REL_RELATIVE_PPC_3_MASK,0);
 		break;
-	case REL_RELATIVE_3:
-		reloc_set_masked(offset,relative_value,REL_RELATIVE_3_MASK);
+	case RC_RELATIVE_ARM_3:
+		reloc_set_masked(offset,relative_value - CELLS * 2,
+			REL_RELATIVE_ARM_3_MASK,2);
+		break;
+	case RC_INDIRECT_ARM:
+		reloc_set_masked(offset,relative_value - CELLS,
+			REL_INDIRECT_ARM_MASK,0);
+		break;
+	case RC_INDIRECT_ARM_PC:
+		reloc_set_masked(offset,relative_value - CELLS * 2,
+			REL_INDIRECT_ARM_MASK,0);
 		break;
 	default:
 		critical_error("Bad rel class",REL_CLASS(rel));
@@ -140,7 +145,7 @@ void finalize_code_block(F_COMPILED *relocating, CELL code_start,
 		critical_error("Finalizing a finalized block",(CELL)relocating);
 
 	for(scan = words_start; scan < words_end; scan += CELLS)
-		put(scan,untag_word(get(scan))->xt);
+		put(scan,(CELL)(untag_word(get(scan))->xt));
 
 	relocating->finalized = true;
 
@@ -201,13 +206,13 @@ void primitive_add_compiled_block(void)
 		CELL total_length = sizeof(F_COMPILED) + code_length
 			+ rel_length + literal_length + words_length;
 
-		start = heap_allot(&compiling,total_length);
+		start = heap_allot(&code_heap,total_length);
 
 		/* If allocation failed, do a code GC */
 		if(start == 0)
 		{
-			garbage_collection(TENURED,true);
-			start = heap_allot(&compiling,total_length);
+			primitive_code_gc();
+			start = heap_allot(&code_heap,total_length);
 
 			/* Insufficient room even after code GC, give up */
 			if(start == 0)
@@ -254,7 +259,7 @@ void primitive_add_compiled_block(void)
 
 	/* push the XT of the new word on the stack */
 	F_WORD *word = allot_word(F,F);
-	word->xt = start + sizeof(F_COMPILED);
+	word->xt = (XT)(start + sizeof(F_COMPILED));
 	word->compiledp = T;
 	dpush(tag_word(word));
 }
@@ -274,10 +279,10 @@ void primitive_finalize_compile(void)
 	{
 		F_ARRAY *pair = untag_array(get(AREF(array,i)));
 		F_WORD *word = untag_word(get(AREF(pair,0)));
-		CELL xt = untag_word(get(AREF(pair,1)))->xt;
+		XT xt = untag_word(get(AREF(pair,1)))->xt;
 		F_BLOCK *block = xt_to_block(xt);
 		if(block->status != B_ALLOCATED)
-			critical_error("bad XT",xt);
+			critical_error("bad XT",(CELL)xt);
 
 		word->xt = xt;
 		word->compiledp = T;
@@ -288,7 +293,7 @@ void primitive_finalize_compile(void)
 	{
 		F_ARRAY *pair = untag_array(get(AREF(array,i)));
 		F_WORD *word = untag_word(get(AREF(pair,0)));
-		CELL xt = word->xt;
+		XT xt = word->xt;
 		iterate_code_heap_step(xt_to_compiled(xt),finalize_code_block);
 	}
 }
@@ -296,7 +301,7 @@ void primitive_finalize_compile(void)
 void primitive_xt_map(void)
 {
 	GROWABLE_ARRAY(array);
-	F_BLOCK *scan = (F_BLOCK *)compiling.base;
+	F_BLOCK *scan = first_block(&code_heap);
 
 	while(scan)
 	{
@@ -316,7 +321,7 @@ void primitive_xt_map(void)
 			GROWABLE_ADD(array,xt);
 		}
 
-		scan = next_block(&compiling,scan);
+		scan = next_block(&code_heap,scan);
 	}
 
 	GROWABLE_TRIM(array);

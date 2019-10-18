@@ -1,6 +1,6 @@
 IN: vim
 USING: definitions io kernel namespaces parser prettyprint
-process sequences ;
+process sequences tools ;
 
 SYMBOL: vim-path
 SYMBOL: vim-detach

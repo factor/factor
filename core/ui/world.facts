@@ -29,4 +29,4 @@ HELP: find-world
 HELP: show-mouse-help
 { $values { "presentation" presentation } }
 { $description "Displays a " { $link summary } " of the " { $link presentation-object } "in the status bar of the " { $link world } " containing this presentation. This word is executed when the mouse enters the presentation." }
-{ $see-also show-status hide-status } ;
+{ $see-also show-status show-summary hide-status } ;

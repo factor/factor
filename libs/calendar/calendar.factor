@@ -29,9 +29,6 @@ TUPLE: dt year month day hour minute second ;
     #! length of average month in days
     30.41666666666667 ;
 
-: compare-timestamps ( tuple tuple -- n )
-    [ tuple-slots ] 2apply <=> ;
-
 SYMBOL: a
 SYMBOL: b
 SYMBOL: c
@@ -205,6 +202,9 @@ M: number +second ( timestamp n -- timestamp )
     #! GMT time, right now
     unix-1970 millis 1000 /f seconds +dt ; 
 
+: compare-timestamps ( tuple tuple -- n )
+    [ >gmt tuple-slots ] compare ;
+
 : timestamp- ( timestamp timestamp -- dt )
     [ >gmt tuple-slots ] 2apply v- array>dt ;
 
@@ -286,8 +286,8 @@ M: number +second ( timestamp n -- timestamp )
 
 : (timestamp>rfc3339) ( timestamp -- )
     dup timestamp-year unparse write CHAR: - write1
-    dup timestamp-month unparse write CHAR: - write1
-    dup timestamp-day unparse write CHAR: T write1
+    dup timestamp-month unparse 2 CHAR: 0 pad-left write CHAR: - write1
+    dup timestamp-day unparse 2 CHAR: 0 pad-left write CHAR: T write1
     dup timestamp-hour unparse 2 CHAR: 0 pad-left write CHAR: : write1
     dup timestamp-minute unparse 2 CHAR: 0 pad-left write CHAR: : write1
     timestamp-second >fixnum unparse 2 CHAR: 0 pad-left write CHAR: Z write1 ;

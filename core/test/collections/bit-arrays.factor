@@ -1,0 +1,37 @@
+IN: temporary
+USING: sequences arrays bit-arrays kernel test math ;
+
+[ 100 ] [ 100 <bit-array> length ] unit-test
+
+[
+    { t f t }
+] [
+    3 <bit-array> t 0 pick set-nth t 2 pick set-nth
+    >array
+] unit-test
+
+[
+    { t f t }
+] [
+    { t f t } >bit-array >array
+] unit-test
+
+[
+    { t f t } { f t f }
+] [
+    { t f t } >bit-array dup clone dup [ not ] inject
+    [ >array ] 2apply
+] unit-test
+
+[
+    { f f f f f }
+] [
+    { t f t t f } >bit-array dup clear-bits >array
+] unit-test
+
+[ t ] [
+    100 [
+        drop 100 [ drop 2 random zero? ] map
+        dup >bit-array >array =
+    ] all?
+] unit-test

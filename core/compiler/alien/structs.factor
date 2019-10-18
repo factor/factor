@@ -1,31 +1,21 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
-USING: assembler compiler errors generic
-hashtables kernel kernel-internals math namespaces parser
-sequences strings words ;
+USING: generator errors generic hashtables kernel
+kernel-internals math namespaces parser sequences strings words
+;
 
 ! Some code for interfacing with C structures.
-
-: c-getter* ( name -- quot )
-    c-getter [
-        [ "Cannot read struct fields with type" throw ]
-    ] unless* ;
 
 : define-getter ( offset type name -- )
     #! Define a word with stack effect ( alien -- obj ) in the
     #! current 'in' vocabulary.
-    create-in >r c-getter* swap add* r> swap define-compound ;
-
-: c-setter* ( name -- quot )
-    c-setter [
-        [ "Cannot write struct fields with type" throw ]
-    ] unless* ;
+    create-in >r c-getter swap add* r> swap define-compound ;
 
 : define-setter ( offset type name -- )
     #! Define a word with stack effect ( obj alien -- ) in the
     #! current 'in' vocabulary.
-    "set-" swap append create-in >r c-setter* swap add* r>
+    "set-" swap append create-in >r c-setter swap add* r>
     swap define-compound ;
 
 : parse-c-decl ( string -- count name )
@@ -39,16 +29,33 @@ sequences strings words ;
     >r swapd align r> r> 
     "struct-name" get swap "-" swap 3append
     3dup define-getter 3dup define-setter
-    drop c-size rot * + ;
+    drop heap-size rot * + ;
 
 : define-member ( max type -- max )
-    c-size max ;
+    heap-size max ;
 
 TUPLE: struct-type ;
 
-M: struct-type c-type-unbox c-type-size %unbox-struct ;
+: if-value-structs? ( ctype true false -- )
+    value-structs?
+    [ drop call ] [ >r 2drop "void*" r> call ] if ; inline
 
-M: struct-type c-type-box c-type-size %box-struct ;
+M: struct-type unbox-parameter
+    [ c-type-size %unbox-struct ]
+    [ unbox-parameter ]
+    if-value-structs? ;
+
+M: struct-type unbox-return f swap c-type-size %unbox-struct ;
+
+M: struct-type box-parameter
+    [ c-type-size %box-struct ]
+    [ box-parameter ]
+    if-value-structs? ;
+
+M: struct-type box-return f swap c-type-size %box-struct ;
+
+M: struct-type stack-size
+    [ c-type-size ] [ stack-size ] if-value-structs? ;
 
 C: struct-type ( width -- type )
     <c-type> over set-delegate

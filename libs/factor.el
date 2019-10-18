@@ -1,5 +1,6 @@
 ;; Eduardo Cavazos - wayo.cavazos@gmail.com
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Add these lines to your .emacs file:
 
 ;; (load-file "/scratch/repos/Factor/contrib/factor.el")
@@ -12,10 +13,11 @@
 ;; That's all you have to do to "install" factor.el on your
 ;; system. Whenever you edit a factor file, Emacs will know to switch
 ;; to Factor mode.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; M-x factor-listener === Start a new factor listener inside Emacs
-;; M-x factor-listener-restart === Restart a factor listener whose
-;;                                 session has ended.
+;; M-x run-factor === Start a Factor listener inside Emacs
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; BUG: A double quote character on a commented line will break the
 ;; syntax highlighting for that line.
@@ -66,6 +68,8 @@
     (modify-syntax-entry ?\( "()")
     (modify-syntax-entry ?\) ")(")
     (modify-syntax-entry ?\" "\"    ")))
+
+(defvar factor-mode-map (make-sparse-keymap))
     
 (defcustom factor-mode-hook nil
   "Hook run when entering Factor mode."
@@ -78,12 +82,13 @@
     ("( .* )" . font-lock-comment-face)
     "IN:" "USING:" "TUPLE:" "^C:" "^M:" "USE:" "REQUIRE:" "PROVIDE:"
     "REQUIRES:"
-    "GENERIC:" "SYMBOL:" "PREDICATE:" "VAR:"))
+    "GENERIC:" "SYMBOL:" "PREDICATE:" "VAR:" "VARS:"))
 
 (defun factor-mode ()
   "A mode for editing programs written in the Factor programming language."
   (interactive)
   (kill-all-local-variables)
+  (use-local-map factor-mode-map)
   (setq major-mode 'factor-mode)
   (setq mode-name "Factor")
   (make-local-variable 'comment-start)
@@ -100,72 +105,64 @@
 
 (require 'comint)
 
-(define-derived-mode factor-listener-mode comint-mode "Factor listener"
-  (setq comint-prompt-regexp "ok "))
+(defvar factor-binary "/scratch/repos/Factor/f")
+(defvar factor-image "-i=/scratch/repos/Factor/factor.image")
 
-(defvar factor-binary "/scratch/factor-darcs/repos/Factor/f")
-(defvar factor-image "/scratch/factor-darcs/repos/Factor/factor.image")
-
-(defun factor-server ()
+(defun run-factor ()
   (interactive)
-  (make-comint "factor-server" factor-binary nil factor-image "-shell=tty")
-  (comint-send-string "*factor-server*" "USE: shells telnet\n"))
+  (switch-to-buffer
+   (make-comint-in-buffer
+    "factor" nil factor-binary nil factor-image "-shell=tty")))
 
-;; (defun factor-listener ()
-;;   (interactive)
-;;   (factor-server)
-;;   (sleep-for 0 500)
-;;   (switch-to-buffer (make-comint "factor-listener" '("localhost" . 9999)))
-;;   (rename-uniquely)
-;;   (factor-listener-mode))
+(defun factor-telnet-to-port (port)
+  (interactive "nPort: ")
+  (switch-to-buffer
+   (make-comint-in-buffer "factor-telnet" nil (cons "localhost" port))))
 
-(defun factor-listener ()
+(defun factor-telnet ()
   (interactive)
-  (factor-server)
-  (sleep-for 0 1000)
-  (if (get-buffer "*factor-listener*")
-      (save-excursion
-	(set-buffer "*factor-listener*")
-	(rename-uniquely)))
-  (switch-to-buffer (make-comint "factor-listener" '("localhost" . 9999)))
-  (factor-listener-mode))
+  (factor-telnet-to-port 9000))
 
-(defun factor-listener-restart ()
+(defun factor-telnet-factory ()
   (interactive)
-  (factor-server)
-  (sleep-for 0 1000)
-  (make-comint-in-buffer
-   "factor-listener" (current-buffer) '("localhost" . 9999)))
+  (factor-telnet-to-port 9010))
 
-(defun factor-run-file (file-name)
-  (interactive "fRun Factor file: ")
-  (comint-send-string nil (format "\"%s\" run-file\n" file-name)))
-
-(defun factor-update-stack-buffer (&optional string)
+(defun factor-run-file ()
   (interactive)
-  (save-excursion
-    (set-buffer (get-buffer-create "*factor-stack*"))
-    (erase-buffer)
-    (comint-redirect-send-command-to-process
-     ".s" "*factor-stack*" "*factor-listener*" nil)))
+  (comint-send-string "*factor*" (format "\"%s\"" (buffer-file-name)))
+  (comint-send-string "*factor*" " run-file\n"))
 
-(defvar factor-update-stackp nil "*")
+(defun factor-send-region (start end)
+  (interactive "r")
+  (comint-send-region "*factor*" start end)
+  (comint-send-string "*factor*" "\n"))
 
-(defun factor-send-input ()
+(defun factor-see ()
   (interactive)
-  (comint-send-input)
-  (if factor-update-stackp
-      (progn (sleep-for 0 250) (factor-update-stack-buffer))))
+  (comint-send-string "*factor*" "\\ ")
+  (comint-send-string "*factor*" (thing-at-point 'sexp))
+  (comint-send-string "*factor*" " see\n"))
 
-(defun factor-synopsis ()
+(defun factor-help ()
   (interactive)
-  (message
-   (first
-    (comint-redirect-results-list-from-process 
-     (get-buffer-process "*factor-listener*")
-     (format "\\ %s summary print" (thing-at-point 'symbol))
-     ;; "[ ]*\\(.*\\)\n"
-     "\\(.*\\)\n"
-     1))))
+  (comint-send-string "*factor*" "\\ ")
+  (comint-send-string "*factor*" (thing-at-point 'sexp))
+  (comint-send-string "*factor*" " help\n"))
 
-(fset 'factor-comment-line "\C-a! ")
+(defun factor-edit ()
+  (interactive)
+  (comint-send-string "*factor*" "\\ ")
+  (comint-send-string "*factor*" (thing-at-point 'sexp))
+  (comint-send-string "*factor*" " edit\n"))
+  
+(defun factor-comment-line ()
+  (interactive)
+  (beginning-of-line)
+  (insert "! "))
+
+
+(define-key factor-mode-map "\C-c\C-f" 'factor-run-file)
+(define-key factor-mode-map "\C-c\C-r" 'factor-send-region)
+(define-key factor-mode-map "\C-c\C-s" 'factor-see)
+(define-key factor-mode-map "\C-ce" 'factor-edit)
+(define-key factor-mode-map "\C-c\C-h" 'factor-help)

@@ -3,15 +3,19 @@
 IN: furnace
 USING: embedded generic arrays namespaces prettyprint io
 sequences words kernel httpd html errors hashtables http
-callback-responder vectors strings math ;
+callback-responder vectors strings math basic-authentication ;
 
 SYMBOL: default-action
 
 SYMBOL: template-path
 
-: define-action ( word params -- )
+: define-authenticated-action ( word params realm -- )
+    pick swap "action-realm" set-word-prop
     over t "action" set-word-prop
     "action-params" set-word-prop ;
+
+: define-action ( word params -- )
+    f define-authenticated-action ;
 
 : define-redirect ( word quot -- )
     "action-redirect" set-word-prop ;
@@ -73,10 +77,15 @@ SYMBOL: request-params
     [ dup string? [ request-params get hash ] when ] map
     [ quot-link permanent-redirect ] when* ;
 
-: call-action ( params action -- )
+: (call-action) ( params action -- )
     over request-params set
     [ query>quot ] keep [ add >quotation call ] keep
     perform-redirect ;
+
+: call-action ( params action -- )
+    dup "action-realm" word-prop [
+        [ (call-action) ] with-basic-authentication
+    ] [ (call-action) ] if* ;
 
 : service-request ( params url -- )
     current-action [
@@ -104,12 +113,15 @@ SYMBOL: model
 : render-template ( model template -- )
     template-path get swap path+ call-template ;
 
+: render-page* ( model body-template head-template -- )
+    [
+        [ render-template ] [ f rot render-template ] html-document* 
+    ] serve-html ;
+
 : render-page ( model template title -- )
-    serving-html [
-        [
-            render-template
-        ] html-document
-    ] with-html-stream ;
+    [
+        [ render-template ] html-document
+    ] serve-html ;
 
 : web-app ( name default path -- )
     [

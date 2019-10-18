@@ -10,7 +10,6 @@ USING: kernel tetris tetris-board tetris-piece test sequences ;
 [ 0 ] [ 3 0 rows-score ] unit-test
 [ 80 ] [ 1 1 rows-score ] unit-test
 [ 4800 ] [ 3 4 rows-score ] unit-test
-[ 1 5 rows-score ] unit-test-fails
 [ 1 ] [ <default-tetris> dup 3 score-rows dup 3 score-rows dup 3 score-rows tetris-level ] unit-test
 [ 2 ] [ <default-tetris> dup 4 score-rows dup 4 score-rows dup 2 score-rows tetris-level ] unit-test
 

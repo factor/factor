@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Mackenzie Straight, Doug Coleman.
 
 IN: win32-api
-USING: alien arrays kernel ;
+USING: alien arrays byte-arrays kernel ;
 
 : <wsadata> ( -- byte-array )
     HEX: 190 <byte-array> ;

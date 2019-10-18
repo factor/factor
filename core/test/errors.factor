@@ -7,6 +7,7 @@ USE: test
 USE: parser
 USE: io
 USE: memory
+USE: sbufs
 
 [ clear drop ] unit-test-fails
 
@@ -37,9 +38,21 @@ USE: memory
 ! Weird PowerPC bug.
 [ ] [
     [ "4" throw ] catch drop
-    full-gc
-    full-gc
+    data-gc
+    data-gc
 ] unit-test
 
 [ f ] [ { } kernel-error? ] unit-test
 [ f ] [ { "A" "B" } kernel-error? ] unit-test
+
+[ [ 3 throw ] ] [
+    [ 3 throw ] catch drop
+    error-continuation get continuation-call 3 tail* first
+] unit-test
+
+[ f [ 5 call 2 ] ] [
+    [ 5 call 2 ] catch drop
+    error-continuation get continuation-call 6 tail*
+    dup first over fourth eq?
+    swap fourth
+] unit-test

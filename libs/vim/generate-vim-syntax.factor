@@ -1,5 +1,5 @@
 ! Generate a new factor.vim file for syntax highlighting
-REQUIRES: libs/httpd ;
+REQUIRES: apps/http-server ;
 
 IN: vim
 

@@ -67,7 +67,7 @@ M: world configure-event
     lookup-string drop dup ignored-key? [
         drop f
     ] [
-        dup key-codes hash [ ] [ ch>string ] ?if
+        dup key-codes hash [ ] [ 1string ] ?if
     ] if ;
 
 : event-modifiers XKeyEvent-state modifiers modifier ;

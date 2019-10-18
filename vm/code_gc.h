@@ -13,8 +13,7 @@ typedef struct _F_BLOCK
 } F_BLOCK;
 
 typedef struct {
-	CELL base;
-	CELL limit;
+	F_SEGMENT *segment;
 	F_BLOCK *free_list;
 } F_HEAP;
 
@@ -28,14 +27,14 @@ CELL heap_size(F_HEAP *heap);
 INLINE F_BLOCK *next_block(F_HEAP *heap, F_BLOCK *block)
 {
 	CELL next = ((CELL)block + block->size);
-	if(next == heap->limit)
+	if(next == heap->segment->end)
 		return NULL;
 	else
 		return (F_BLOCK *)next;
 }
 
 /* compiled code */
-F_HEAP compiling;
+F_HEAP code_heap;
 
 /* The compiled code heap is structured into blocks. */
 typedef struct
@@ -61,20 +60,30 @@ INLINE void iterate_code_heap_step(F_COMPILED *compiled, CODE_HEAP_ITERATOR iter
 	iter(compiled,code_start,reloc_start,literal_start,words_start,words_end);
 }
 
-INLINE F_BLOCK *xt_to_block(CELL xt)
+INLINE F_BLOCK *xt_to_block(XT xt)
 {
-	return (F_BLOCK *)(xt - sizeof(F_BLOCK) - sizeof(F_COMPILED));
+	return (F_BLOCK *)((CELL)xt - sizeof(F_BLOCK) - sizeof(F_COMPILED));
 }
 
-INLINE F_COMPILED *xt_to_compiled(CELL xt)
+INLINE F_COMPILED *xt_to_compiled(XT xt)
 {
-	return (F_COMPILED *)(xt - sizeof(F_COMPILED));
+	return (F_COMPILED *)((CELL)xt - sizeof(F_COMPILED));
+}
+
+INLINE F_BLOCK *first_block(F_HEAP *heap)
+{
+	return (F_BLOCK *)heap->segment->start;
+}
+
+INLINE F_BLOCK *last_block(F_HEAP *heap)
+{
+	return (F_BLOCK *)heap->segment->end;
 }
 
 void init_code_heap(CELL size);
 void iterate_code_heap(CODE_HEAP_ITERATOR iter);
 void collect_literals(void);
-void recursive_mark(CELL xt);
+void recursive_mark(XT xt);
 void primitive_code_room(void);
 void primitive_code_gc(void);
 void dump_heap(F_HEAP *heap);

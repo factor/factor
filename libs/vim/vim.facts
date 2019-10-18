@@ -1,5 +1,5 @@
 IN: vim
-USING: definitions help io words ;
+USING: definitions help io words tools ;
 
 ARTICLE: { "vim" "vim" } "Vim support"
 "This module makes the " { $link edit } " word work with Vim by setting the " { $link edit-hook } " global variable to call " { $link vim-location } ". The " { $link vim-path } " variable contains the name of the vim executable.  The default " { $link vim-path } " is " { $snippet "\"vim\"" } "."

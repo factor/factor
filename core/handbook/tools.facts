@@ -51,14 +51,11 @@ $terpri
 }
 "These modules store a quotation in a global variable when loaded:"
 { $subsection edit-hook }
-"To jump to a definition:"
-{ $subsection edit }
 "To jump to a source file:"
 { $subsection edit-file }
 "To jump to a source file and line number:"
 { $subsection edit-location }
-"To jump to the most recent syntax error:"
-{ $subsection :edit } ;
+{ $see-also edit "definitions" :edit "debugger" } ;
 
 ARTICLE: "sources" "Source files"
 "The simplest way to distribute a piece of Factor code is in the form of a source file. Source files can be loaded in the listener:"
@@ -108,7 +105,6 @@ ARTICLE: "memory" "Object memory"
 { $subsection size }
 "The garbage collector can be invoked manually:"
 { $subsection data-gc }
-{ $subsection full-gc }
 { $subsection code-gc } ;
 
 ARTICLE: "word-introspection" "Word introspection"
@@ -137,7 +133,8 @@ $terpri
 { $subsection edit }
 { $subsection reload }
 "Removing definitions:"
-{ $subsection forget } ;
+{ $subsection forget }
+{ $link POSTPONE: FORGET: } ;
 
 ARTICLE: "timing" "Timing code"
 "You can time the execution of a quotation in the listener:"
@@ -163,6 +160,8 @@ $terpri
 { $subsection save-image }
 "A new image can also be built from sources; this is known as " { $emphasis "bootstrap" } ". Bootstrap is a two-step process. The first stage is the creation of a bootstrap image inside a running Factor instance:"
 { $subsection make-image }
-"The second stage is initiated by running the resulting bootstrap image. This stage loads any additional platform-specific code, compiles all words, and dumps a new, final image."
+"The second bootstrapping stage is initiated by running the resulting bootstrap image:"
+{ $code "f -i=boot.image.pentium4" }
+"This stage loads any additional platform-specific code, compiles all words, and dumps a final " { $snippet "factor.image" } "."
 $terpri
 "The bootstrap image supports a number of command line arguments; see " { $link "bootstrap-cli-args" } "." ;

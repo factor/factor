@@ -22,27 +22,16 @@ parser sequences strings ;
 : cli-bool-param ( name -- ) "no-" ?head not cli-var-param ;
 
 : cli-param ( param -- )
-    #! Handle a command-line argument starting with '-' by
-    #! setting that variable to t, or if the argument is
-    #! prefixed with 'no-', setting the variable to f.
-    #!
-    #! Arguments containing = are handled differently; they
-    #! set the object path.
     "=" split1 [ cli-var-param ] [ cli-bool-param ] if* ;
 
 : cli-arg ( argument -- argument )
-    #! Handle a command-line argument. If the argument was
-    #! consumed, returns f. Otherwise returns the argument.
-    #! Parameters that start with + are runtime parameters.
     "-" ?head [ cli-param f ] when ;
 
 : cli-args ( -- args ) 10 getenv ;
 
-: default-shell "tty" ;
+: default-shell ( -- shell ) "tty" ;
 
 : default-cli-args
-    #! Some flags are *on* by default, unless user specifies
-    #! -no-<flag> CLI switch
     "e" off
     "user-init" on
     "compile" on
@@ -53,8 +42,6 @@ parser sequences strings ;
     default-shell "shell" set ;
 
 : ignore-cli-args? ( -- ? )
-    #! On Mac OS X, files to run are given to us via a Cocoa API
-    #! so we ignore any command line switches which name files.
     macosx? "shell" get "ui" = and ;
 
 : parse-command-line ( -- )

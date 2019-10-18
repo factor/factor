@@ -1,105 +1,8 @@
-USING: arrays assembler compiler generic
+USING: arrays compiler generic
 hashtables inference kernel kernel-internals math
-optimizer prettyprint sequences strings test vectors words
+optimizer prettyprint sequences sbufs strings test vectors words
 sequences-internals ;
 IN: temporary
-
-: kill-1
-    [ 1 2 3 ] [ + ] over drop drop ;
-
-[ [ 1 2 3 ] ] [ kill-1 ] unit-test
-
-: kill-2
-    [ + ] [ 1 2 3 ] over drop nip ;
-
-[ [ 1 2 3 ] ] [ kill-2 ] unit-test
-
-: kill-3
-    [ + ] dup over 3drop ;
-
-[ ] [ kill-3 ] unit-test
-
-: kill-4
-    [ 1 2 3 ] [ + ] [ - ] pick >r 2drop r> ;
-
-[ [ 1 2 3 ] [ 1 2 3 ] ] [ kill-4 ] unit-test
-
-: kill-5
-    [ + ] [ - ] [ 1 2 3 ] pick pick 2drop >r 2drop r> ;
-
-[ [ 1 2 3 ] ] [ kill-5 ] unit-test
-
-: kill-6
-    [ 1 2 3 ] [ 4 5 6 ] [ + ] pick >r drop r> ;
-
-[ [ 1 2 3 ] [ 4 5 6 ] [ 1 2 3 ] ] [ kill-6 ] unit-test
-
-: subset? swap [ swap member? ] all-with? ;
-
-: set= 2dup subset? >r swap subset? r> and ;
-
-USE: optimizer
-
-: kill-set dup live-values swap literals hash-diff ;
-
-: kill-set=
-    dataflow kill-set hash-keys [ value-literal ] map set= ;
-
-: foo 1 2 3 ;
-
-[ H{ } ] [ \ foo word-def dataflow kill-set ] unit-test
-
-[ t ] [ [ [ 1 ] [ 2 ] ] [ [ 1 ] [ 2 ] if ] kill-set= ] unit-test
-
-[ t ] [ [ [ 1 ] [ 2 ] ] [ [ 1 ] [ 2 ] if ] kill-set= ] unit-test
-
-
-: literal-kill-test-1 4 cell 2 cells - ;
-
-[ 4 ] [ literal-kill-test-1 drop ] unit-test
-
-: literal-kill-test-2 3 cell 2 cells - ;
-
-[ 3 ] [ literal-kill-test-2 drop ] unit-test
-
-: literal-kill-test-3 10 3 /mod drop ;
-
-[ 3 ] [ literal-kill-test-3 ] unit-test
-
-: literal-kill-test-4
-    5 swap [ 3 ] [ dup ] if 2drop ;
-
-[ ] [ t literal-kill-test-4 ] unit-test
-[ ] [ f literal-kill-test-4 ] unit-test
-
-: literal-kill-test-5
-    5 swap [ 5 ] [ dup ] if 2drop ;
-
-[ ] [ t literal-kill-test-5 ] unit-test
-[ ] [ f literal-kill-test-5 ] unit-test
-
-: literal-kill-test-6
-    5 swap [ dup ] [ dup ] if 2drop ;
-
-[ ] [ t literal-kill-test-6 ] unit-test
-[ ] [ f literal-kill-test-6 ] unit-test
-
-[ t ] [ [
-    5 [ dup ] [ dup ] ] \ literal-kill-test-6 word-def kill-set=
-] unit-test
-
-: literal-kill-test-7
-    [ 1 2 3 ] >r + r> drop ;
-
-[ 4 ] [ 2 2 literal-kill-test-7 ] unit-test
-
-: literal-kill-test-8 ( a b -- )
-    dup [ >r dup slip r> literal-kill-test-8 ] [ 2drop ] if ; inline
-
-[ t ] [
-    [ [ ] swap literal-kill-test-8 ] dataflow
-    live-values hash-values [ value? ] subset empty?
-] unit-test
 
 ! Test method inlining
 [ f ] [ fixnum { } min-class ] unit-test
@@ -108,12 +11,6 @@ USE: optimizer
     \ string
     [ integer string array reversed sbuf
     slice vector quotation ]
-    [ class-compare ] sort min-class
-] unit-test
-
-[ f ] [
-    \ fixnum
-    [ fixnum integer letter ]
     [ class-compare ] sort min-class
 ] unit-test
 
@@ -132,6 +29,12 @@ USE: optimizer
 [ object ] [
     \ word
     [ integer float object ]
+    [ class-compare ] sort min-class
+] unit-test
+
+[ reversed ] [
+    \ reversed
+    [ integer reversed slice ]
     [ class-compare ] sort min-class
 ] unit-test
 
@@ -171,12 +74,12 @@ TUPLE: pred-test ;
 
 [ T{ pred-test } "pred-test" ] [ T{ pred-test } pred-test-3 ] unit-test
 
-! : inline-test
-!     "nom" = ;
-! 
-! [ t ] [ "nom" inline-test ] unit-test
-! [ f ] [ "shayin" inline-test ] unit-test
-! [ f ] [ 3 inline-test ] unit-test
+: inline-test
+    "nom" = ;
+
+[ t ] [ "nom" inline-test ] unit-test
+[ f ] [ "shayin" inline-test ] unit-test
+[ f ] [ 3 inline-test ] unit-test
 
 : fixnum-declarations >fixnum 24 shift 1234 bitxor ;
 
@@ -250,3 +153,18 @@ GENERIC: void-generic ( obj -- * )
 : foo f ;
 : bar foo 4 4 = and ;
 [ f ] [ bar ] unit-test
+
+! ensure identities are working in some form
+[ t ] [
+    [ 0 + ] dataflow optimize [ #push? not ] all-nodes?
+] unit-test
+
+! compiling <tuple> with a non-literal class failed
+[ t ] [ [ <tuple> ] compile-quot word? ] unit-test
+
+GENERIC: foozul
+M: reversed foozul ;
+M: integer foozul ;
+M: slice foozul ;
+
+[ reversed ] [ reversed \ foozul specific-method ] unit-test

@@ -15,12 +15,12 @@ HELP: c-type
 { $description "Looks up a C type by name." }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
-HELP: c-size
+HELP: heap-size
 { $values { "name" "a string" } { "size" "an integer" } }
 { $description "Outputs the number of bytes taken up by this C type." }
 { $examples
     "On a 32-bit system, you will get the following output:"
-    { $example "USE: alien\n\"void*\" c-size ." "4" }
+    { $unchecked-example "USE: alien\n\"void*\" heap-size ." "4" }
 }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
@@ -38,19 +38,19 @@ HELP: <c-array>
 { $values { "n" "a non-negative integer" } { "type" "a string" } { "array" "a byte array" } }
 { $description "Creates a byte array large enough to hold " { $snippet "n" } " values of a C type." }
 { $errors "Throws an error if the type does not exist or the requested size is negative." } 
-{ $see-also <malloc-array> } ;
+{ $see-also malloc-array } ;
 
 HELP: <c-object>
 { $values { "type" "a string" } { "array" "a byte array" } }
 { $description "Creates a byte array suitable for holding a value with the given C type." }
 { $errors "Throws an error if the type does not exist." }
-{ $see-also <malloc-object> } ;
+{ $see-also malloc-object } ;
 
 HELP: string>char-alien ( string -- array )
 { $values { "string" "a string" } { "array" "a byte array" } }
 { $description "Copies the string to a new byte array, converting it to 8-bit ASCII and adding a trailing null byte." }
 { $errors "Throws an error if the string contains null characters, or characters beyond the 8-bit range." } 
-{ $see-also alien>char-string <malloc-string> } ;
+{ $see-also alien>char-string malloc-char-string } ;
 
 HELP: alien>char-string ( c-ptr -- string )
 { $values { "c-ptr" "an alien, byte array or " { $link f } } { "string" "a string" } }
@@ -59,13 +59,13 @@ HELP: alien>char-string ( c-ptr -- string )
 
 HELP: string>u16-alien ( string -- array )
 { $values { "string" "a string" } { "array" "a byte array" } }
-{ $description "Copies the string to a new byte array in UTF16 format with a trailing null byte." }
+{ $description "Copies the string to a new byte array in UCS-2 format with a trailing null byte." }
 { $errors "Throws an error if the string contains null characters." }
-{ $see-also alien>u16-string } ;
+{ $see-also alien>u16-string malloc-u16-string } ;
 
 HELP: alien>u16-string ( c-ptr -- string )
 { $values { "c-ptr" "an alien, byte array or " { $link f } } { "string" "a string" } }
-{ $description "Reads a null-terminated UTF16 string from the specified address." }
+{ $description "Reads a null-terminated UCS-2 string from the specified address." }
 { $see-also string>u16-alien } ;
 
 HELP: memory>string ( base len -- string )
@@ -77,26 +77,33 @@ HELP: string>memory ( string base -- )
 { $description "Writes the string to memory starting from the " { $snippet "base" } " address." }
 { $warning "This word is in the " { $vocab-link "kernel-internals" } " vocabulary because it is unsafe. Improper use can corrupt memory." } ;
 
-HELP: <malloc-array>
+HELP: malloc-array
 { $values { "n" "a non-negative integer" } { "type" "a string" } { "alien" "an alien address" } }
 { $description "Allocates an unmanaged memory block large enough to hold " { $snippet "n" } " values of a C type." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
 { $errors "Throws an error if the type does not exist, if the requested size is negative, or if memory allocation fails." }
 { $see-also <c-array> } ;
 
-HELP: <malloc-object>
+HELP: malloc-object
 { $values { "type" "a string" } { "alien" "an alien address" } }
 { $description "Allocates an unmanaged memory block large enough to hold a value of a C type." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
 { $errors "Throws an error if the type does not exist or if memory allocation fails." } 
 { $see-also <c-object> } ;
 
-HELP: <malloc-string>
+HELP: malloc-char-string
 { $values { "string" "a string" } { "alien" "an alien address" } }
 { $description "Copies a string to an unmanaged memory block large enough to hold a copy of the string in 8-bit ASCII encoding, with a trailing null byte." }
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
 { $errors "Throws an error if memory allocation fails." }
 { $see-also string>char-alien } ;
+
+HELP: malloc-u16-string
+{ $values { "string" "a string" } { "alien" "an alien address" } }
+{ $description "Copies a string to an unmanaged memory block large enough to hold a copy of the string in UCS2 encoding, with a trailing null character." }
+{ $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
+{ $errors "Throws an error if memory allocation fails." }
+{ $see-also string>u16-alien } ;
 
 HELP: (typedef)
 { $values { "old" "a string" } { "new" "a string" } }

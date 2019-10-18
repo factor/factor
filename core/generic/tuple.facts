@@ -60,7 +60,7 @@ HELP: default-constructor
 { $description "Defines the default constructor for a tuple class. The default constructor fills slot values in from the stack." }
 { $examples { $example "TUPLE: account type balance ;\n\"savings\" 100 <account> ." "T{ account f \"savings\" 100 }" } } ;
 
-HELP: define-tuple
+HELP: define-tuple-class
 { $values { "class" "a new word" } { "slots" "a sequence of strings" } }
 { $description "Defines a tuple class with slots named by " { $snippet "slots" } "." }
 { $see-also POSTPONE: TUPLE: } ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: sequences
-USING: errors generic kernel math sequences-internals vectors ;
+USING: errors generic kernel math sequences-internals ;
 
 ! A reversal of an underlying sequence.
 TUPLE: reversed seq ;
@@ -30,7 +30,9 @@ M: reversed new reversed-seq new ;
 TUPLE: slice seq from to ;
 
 : collapse-slice ( from to slice -- from to seq )
-    dup slice-from swap slice-seq >r tuck + >r + r> r> ;
+    dup slice? [
+        dup slice-from swap slice-seq >r tuck + >r + r> r>
+    ] when ; inline
 
 TUPLE: slice-error reason ;
 : slice-error ( str -- * ) <slice-error> throw ;
@@ -42,8 +44,7 @@ TUPLE: slice-error reason ;
 
 C: slice ( m n seq -- slice )
     #! A slice of a slice collapses.
-    >r dup slice? [ collapse-slice ] when r>
-    >r 3dup check-slice r>
+    >r collapse-slice 3dup check-slice r>
     [ set-slice-seq ] keep
     [ set-slice-to ] keep
     [ set-slice-from ] keep ;

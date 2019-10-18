@@ -6,7 +6,6 @@ PROVIDE: libs/math
     "analysis.factor"
     "polynomials.factor"
     "quaternions.factor"
-    "matrices.factor"
     "statistics.factor"
     "numerical-integration.factor"
 } }

@@ -1,14 +1,8 @@
 /* Callstack top pointer */
-CELL cs;
+F_INTERP_FRAME *cs;
 
-/* TAGGED currently executing quotation */
-CELL callframe;
-
-/* UNTAGGED currently executing word in quotation */
-CELL callframe_scan;
-
-/* UNTAGGED end of quotation */
-CELL callframe_end;
+/* Currently executing quotation */
+F_INTERP_FRAME callframe;
 
 #define USER_ENV 32
 
@@ -28,8 +22,9 @@ typedef enum {
 	ERROR_ENV,              /* a marker consed onto kernel errors */
 	IN_ENV,                 
 	OUT_ENV,                
-	GEN_ENV,                /* set to gen_count */
-	IMAGE_ENV               /* image name */
+	UNUSED_ENV,
+	IMAGE_ENV,              /* image path name */
+	EXECUTABLE_ENV		/* runtime executable path name */
 } F_ENVTYPE;
 
 /* TAGGED user environment data; see getenv/setenv prims */
@@ -57,10 +52,13 @@ INLINE void cput(CELL where, u16 what)
 	*((u16*)where) = what;
 }
 
-INLINE CELL align8(CELL a)
+INLINE CELL align(CELL a, CELL b)
 {
-	return (a + 7) & ~7;
+	return (a + b) & ~b;
 }
+
+#define align8(a) align(a,7)
+#define align_page(a) align(a,getpagesize() - 1)
 
 /* Canonical T object. It's just a word */
 CELL T;
@@ -72,9 +70,6 @@ INLINE CELL tag_header(CELL cell)
 
 INLINE CELL untag_header(CELL cell)
 {
-	/* if((cell & TAG_MASK) != OBJECT_TYPE)
-		critical_error("Corrupt object header",cell); */
-
 	return cell >> TAG_BITS;
 }
 
@@ -122,12 +117,12 @@ INLINE CELL type_of(CELL tagged)
 DEFPUSHPOP(d,ds)
 DEFPUSHPOP(r,rs)
 
-void call(CELL quot);
+void init_interpreter(void);
 
+void call(CELL quot);
 void handle_error();
 void interpreter_loop(void);
 void interpreter(void);
-DLLEXPORT void run_callback(CELL quot);
 void run(void);
 void run_toplevel(void);
 void undefined(F_WORD *word);
@@ -149,6 +144,8 @@ void primitive_slot(void);
 void primitive_set_slot(void);
 void primitive_clone(void);
 
+DLLEXPORT void run_callback(CELL quot);
+
 /* Runtime errors */
 typedef enum
 {
@@ -158,7 +155,7 @@ typedef enum
 	ERROR_TYPE,
 	ERROR_DIVIDE_BY_ZERO,
 	ERROR_SIGNAL,
-	ERROR_NEGATIVE_ARRAY_SIZE,
+	ERROR_ARRAY_SIZE,
 	ERROR_C_STRING,
 	ERROR_FFI,
 	ERROR_HEAP_SCAN,
@@ -188,13 +185,13 @@ CELL thrown_rs;
 
 void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);
-void throw_error(CELL error, bool keep_stacks, F_STACK_FRAME *native_stack);
+void throw_error(CELL error, bool keep_stacks, F_COMPILED_FRAME *native_stack);
 void early_error(CELL error);
 void general_error(F_ERRORTYPE error, CELL arg1, CELL arg2,
-	bool keep_stacks, F_STACK_FRAME *native_stack);
+	bool keep_stacks, F_COMPILED_FRAME *native_stack);
 void simple_error(F_ERRORTYPE error, CELL arg1, CELL arg2);
-void memory_protection_error(CELL addr, int signal, F_STACK_FRAME *native_stacks);
-void signal_error(int signal, F_STACK_FRAME *native_stack);
+void memory_protection_error(CELL addr, int signal, F_COMPILED_FRAME *native_stacks);
+void signal_error(int signal, F_COMPILED_FRAME *native_stack);
 void type_error(CELL type, CELL tagged);
 void divide_by_zero_error(void);
 void memory_error(void);
@@ -203,6 +200,5 @@ void primitive_die(void);
 
 INLINE void type_check(CELL type, CELL tagged)
 {
-	if(type_of(tagged) != type)
-		type_error(type,tagged);
+	if(type_of(tagged) != type) type_error(type,tagged);
 }

@@ -1,5 +1,5 @@
 IN: compiler
-USING: assembler help words io ;
+USING: help words io ;
 
 HELP: compiled? ( word -- ? )
 { $values { "word" "a word" } { "?" "a boolean" } }
@@ -17,10 +17,7 @@ HELP: try-compile
 
 HELP: compile-vocabs
 { $values { "seq" "a sequence of strings" } }
-{ $description "Compiles all words in the vocabularies named by elements of a sequence, skipping compiled words. Compile errors are logged to the " { $link stdio } " stream." } ;
-
-HELP: compile-all
-{ $description "Compile all words in the dictionary which have not already been compiled. Compile errors are logged to the " { $link stdio } " stream." } ;
+{ $description "Compiles all words which have not been compiled yet from the given vocabularies." } ;
 
 HELP: compile-quot
 { $values { "quot" "a quotation" } { "word" "a new, uninterned word" } }
@@ -35,7 +32,10 @@ HELP: compile-1
 HELP: recompile
 { $description "Recompiles words whose compiled definitions have become out of date as a result of dependent words being redefined." } ;
 
-IN: assembler
+HELP: compile-all
+{ $description "Compiles all words which have not been compiled yet." } ;
+
+IN: generator
 
 HELP: finalize-compile ( xts -- )
 { $values { "xts" "an array of pairs mapping words to XTs" } }

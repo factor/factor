@@ -5,7 +5,7 @@
 <a:b xmlns:a='http://www.hello.com' xmlns='http://d.de'
      this='that' that="this">
    <b xmlns='http://b.nu' feeling='sombre'/>
-           Here's a new, undefined &entity;
+           Here's a new, undefined &euro;
  and here's a to go along with it!
         isn't this fun?
    <a:c><d mood="happy"></d>

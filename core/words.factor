@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
 DEFER: remove-word-help
@@ -6,7 +6,7 @@ DEFER: remove-word-help
 IN: words
 USING: arrays definitions errors generic graphs hashtables
 kernel kernel-internals math namespaces sequences strings
-vectors ;
+vectors sbufs ;
 
 ! Used by the compiler
 SYMBOL: changed-words
@@ -37,16 +37,14 @@ M: primitive definer drop \ PRIMITIVE: ;
 PREDICATE: word symbol    ( obj -- ? ) word-primitive 2 = ;
 M: symbol definer drop \ SYMBOL: ;
 
-: init-word ( word -- ) H{ } clone swap set-word-props ;
-
-: word-prop ( word name -- value ) swap word-props hash ;
+: word-prop ( word name -- value ) swap word-props ?hash ;
 
 : remove-word-prop ( word name -- )
-    swap word-props remove-hash ;
+    swap word-props ?remove-hash ;
 
 : set-word-prop ( word value name -- )
     over
-    [ rot word-props set-hash ]
+    [ pick word-props ?set-hash swap set-word-props ]
     [ nip remove-word-prop ] if ;
 
 SYMBOL: vocabularies
@@ -60,11 +58,28 @@ SYMBOL: vocabularies
 
 : interned? ( word -- ? ) dup target-word eq? ;
 
+GENERIC: (quot-uses) ( hash obj -- )
+
+M: object (quot-uses) 2drop ;
+
+: seq-quot-uses [ (quot-uses) ] each-with ;
+
+M: word (quot-uses)
+    dup interned? [ dup rot set-hash ] [ 2drop ] if ;
+
+M: array (quot-uses) seq-quot-uses ;
+
+M: quotation (quot-uses) seq-quot-uses ;
+
+M: wrapper (quot-uses) wrapped (quot-uses) ;
+
+: quot-uses ( quot -- seq )
+    global [
+        H{ } clone [ swap (quot-uses) ] keep hash-keys
+    ] bind ;
+
 : uses ( word -- seq )
-    word-def flatten
-    [ word? ] subset
-    [ global [ interned? ] bind ] subset
-    prune ;
+    word-def quot-uses ;
 
 SYMBOL: crossref
 
@@ -79,21 +94,14 @@ SYMBOL: crossref
 
 : reset-props ( word seq -- ) [ remove-word-prop ] each-with ;
 
-: custom-infer? ( word -- ? )
-    dup "infer" word-prop swap "infer-vars" word-prop or ;
-
 : unxref-word* ( word -- )
-    {
-        { [ dup compound? not ] [ drop ] }
-        { [ dup custom-infer? ] [ drop ] }
-        { [ t ] [
-            dup changed-word
-            {
-                "inferred-effect" "inferred-vars"
-                "base-case" "no-effect"
-            } reset-props
-        ] }
-    } cond ;
+    dup compound? [
+        dup changed-word
+        dup {
+            "inferred-effect" "inferred-vars"
+            "base-case" "no-effect"
+        } reset-props
+    ] when drop ;
 
 : unxref-word ( word -- )
     dup [ usage ] closure [ unxref-word* ] each
@@ -123,8 +131,6 @@ SYMBOL: crossref
 
 : reset-generic ( word -- )
     dup reset-word { "methods" "combination" } reset-props ;
-
-: <word> ( name vocab -- word ) (word) dup init-word ;
 
 : gensym ( -- word )
     "G:" \ gensym counter number>string append f <word> ;

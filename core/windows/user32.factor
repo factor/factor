@@ -555,7 +555,7 @@ FUNCTION: HDC BeginPaint ( HWND hwnd, LPPAINTSTRUCT lpPaint ) ;
 ! FUNCTION: CheckMenuItem
 ! FUNCTION: CheckMenuRadioItem
 ! FUNCTION: CheckRadioButton
-! FUNCTION: ChildWindowFromPoint
+FUNCTION: HWND ChildWindowFromPoint ( HWND hWndParent, POINT point ) ;
 ! FUNCTION: ChildWindowFromPointEx
 ! FUNCTION: ClientThreadSetup
 ! FUNCTION: ClientToScreen
@@ -592,24 +592,10 @@ FUNCTION: BOOL CloseClipboard ( ) ;
 ! FUNCTION: CreatePopupMenu
 ! FUNCTION: CreateSystemThreads
 
-FUNCTION: HWND CreateWindowExA (
-                DWORD dwExStyle,
-                LPCSTR lpClassName,
-                LPCSTR lpWindowName,
-                DWORD dwStyle,
-                uint X,
-                uint Y,
-                uint nWidth,
-                uint nHeight,
-                HWND hWndParent,
-                HMENU hMenu,
-                HINSTANCE hInstance,
-                LPVOID lpParam ) ;
-
 FUNCTION: HWND CreateWindowExW (
                 DWORD dwExStyle,
-                LPCWSTR lpClassName,
-                LPCWSTR lpWindowName,
+                LPCTSTR lpClassName,
+                LPCTSTR lpWindowName,
                 DWORD dwStyle,
                 uint X,
                 uint Y,
@@ -620,7 +606,7 @@ FUNCTION: HWND CreateWindowExW (
                 HINSTANCE hInstance,
                 LPVOID lpParam ) ;
 
-: CreateWindowEx \ CreateWindowExW \ CreateWindowExA unicode-exec ;
+: CreateWindowEx CreateWindowExW ; inline
 
 ! 11 >r <r
 : CreateWindow >r >r >r >r >r >r >r >r >r >r >r 0 r> r> r> r> r> r> r> r> r> r> r> CreateWindowEx ;
@@ -671,9 +657,8 @@ FUNCTION: HWND CreateWindowExW (
 ! FUNCTION: DefMDIChildProcA
 ! FUNCTION: DefMDIChildProcW
 ! FUNCTION: DefRawInputProc
-FUNCTION: LRESULT DefWindowProcA ( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam ) ;
 FUNCTION: LRESULT DefWindowProcW ( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam ) ;
-: DefWindowProc \ DefWindowProcW \ DefWindowProcA unicode-exec ;
+: DefWindowProc DefWindowProcW ; inline
 ! FUNCTION: DeleteMenu
 ! FUNCTION: DeregisterShellHookWindow
 ! FUNCTION: DestroyAcceleratorTable
@@ -691,9 +676,8 @@ FUNCTION: BOOL DestroyWindow ( HWND hWnd ) ;
 ! FUNCTION: DialogBoxParamW
 ! FUNCTION: DisableProcessWindowsGhosting
 
-FUNCTION: LONG DispatchMessageA ( MSG* lpMsg ) ;
 FUNCTION: LONG DispatchMessageW ( MSG* lpMsg ) ;
-: DispatchMessage \ DispatchMessageW \ DispatchMessageA unicode-exec ;
+: DispatchMessage DispatchMessageW ; inline
 
 ! FUNCTION: DisplayExitWindowsWarnings
 ! FUNCTION: DlgDirListA
@@ -762,8 +746,8 @@ FUNCTION: UINT EnumClipboardFormats ( UINT format ) ;
 ! FUNCTION: ExcludeUpdateRgn
 ! FUNCTION: ExitWindowsEx
 ! FUNCTION: FillRect
-! FUNCTION: FindWindowA
-! FUNCTION: FindWindowExA
+FUNCTION: HWND FindWindowA ( char* lpClassName, char* lpWindowName ) ;
+FUNCTION: HWND FindWindowExA ( HWND hwndParent, HWND childAfter, char* lpClassName, char* lpWindowName ) ;
 ! FUNCTION: FindWindowExW
 ! FUNCTION: FindWindowW
 ! FUNCTION: FlashWindow
@@ -781,24 +765,21 @@ FUNCTION: UINT EnumClipboardFormats ( UINT format ) ;
 FUNCTION: HWND GetCapture ( ) ;
 ! FUNCTION: GetCaretBlinkTime
 ! FUNCTION: GetCaretPos
-FUNCTION: BOOL GetClassInfoA ( HINSTANCE hInst, LPCTSTR lpszClass, LPWNDCLASS lpwcx ) ;
 FUNCTION: BOOL GetClassInfoW ( HINSTANCE hInst, LPCWSTR lpszClass, LPWNDCLASS lpwcx ) ;
-: GetClassInfo \ GetClassInfoW \ GetClassInfoA unicode-exec ;
+: GetClassInfo GetClassInfoW ;
 
-FUNCTION: BOOL GetClassInfoExA ( HINSTANCE hInst, LPCTSTR lpszClass, LPWNDCLASSEX lpwcx ) ;
 FUNCTION: BOOL GetClassInfoExW ( HINSTANCE hInst, LPCWSTR lpszClass, LPWNDCLASSEX lpwcx ) ;
-: GetClassInfoEx \ GetClassInfoExW \ GetClassInfoExA unicode-exec ;
+: GetClassInfoEx GetClassInfoExW ; inline
 
-FUNCTION: ULONG_PTR GetClassLongA ( HWND hWnd, int nIndex ) ;
 FUNCTION: ULONG_PTR GetClassLongW ( HWND hWnd, int nIndex ) ;
-: GetClassLong \ GetClassLongW \ GetClassLongA unicode-exec ;
-: GetClassLongPtr \ GetClassLongW \ GetClassLongA unicode-exec ;
+: GetClassLong GetClassLongW ; inline
+: GetClassLongPtr GetClassLongW ; inline
 
 
 ! FUNCTION: GetClassNameA
 ! FUNCTION: GetClassNameW
 ! FUNCTION: GetClassWord
-! FUNCTION: BOOL GetClientRect ( HWND hWnd, LPRECT lpRect ) ;
+FUNCTION: BOOL GetClientRect ( HWND hWnd, LPRECT lpRect ) ;
 
 FUNCTION: HANDLE GetClipboardData ( UINT uFormat ) ;
 
@@ -860,9 +841,8 @@ FUNCTION: SHORT GetKeyState ( int nVirtKey ) ;
 ! FUNCTION: GetMenuStringA
 ! FUNCTION: GetMenuStringW
 
-FUNCTION: BOOL GetMessageA ( LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax ) ;
 FUNCTION: BOOL GetMessageW ( LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax ) ;
-: GetMessage \ GetMessageW \ GetMessageA unicode-exec ;
+: GetMessage GetMessageW ; inline
 
 ! FUNCTION: GetMessageExtraInfo
 ! FUNCTION: GetMessagePos
@@ -923,14 +903,14 @@ FUNCTION: HWND GetWindow ( HWND hWnd, UINT uCmd ) ;
 ! FUNCTION: GetWindowModuleFileNameA
 ! FUNCTION: GetWindowModuleFileNameW
 ! FUNCTION: GetWindowPlacement
-! FUNCTION: BOOL GetWindowRect ( HWND hWnd, LPRECT lpRect ) ;
+FUNCTION: BOOL GetWindowRect ( HWND hWnd, LPRECT lpRect ) ;
 ! FUNCTION: GetWindowRgn
 ! FUNCTION: GetWindowRgnBox
-! FUNCTION: GetWindowTextA
+FUNCTION: int GetWindowTextA ( HWND hWnd, char* lpString, int nMaxCount ) ;
 ! FUNCTION: GetWindowTextLengthA
 ! FUNCTION: GetWindowTextLengthW
 ! FUNCTION: GetWindowTextW
-! FUNCTION: GetWindowThreadProcessId
+FUNCTION: DWORD GetWindowThreadProcessId ( HWND hWnd, void* lpdwProcessId ) ;
 ! FUNCTION: GetWindowWord
 ! FUNCTION: GetWinStationInfo
 ! FUNCTION: GrayStringA
@@ -996,17 +976,13 @@ FUNCTION: BOOL IsZoomed ( HWND hWnd ) ;
 ! FUNCTION: LoadCursorFromFileW
 
 
-! FUNCTION: HCURSOR LoadCursorA ( HINSTANCE hInstance, LPCTSTR lpCursorName ) ;
 ! FUNCTION: HCURSOR LoadCursorW ( HINSTANCE hInstance, LPCWSTR lpCursorName ) ;
-FUNCTION: HCURSOR LoadCursorA ( HINSTANCE hInstance, ushort lpCursorName ) ;
 FUNCTION: HCURSOR LoadCursorW ( HINSTANCE hInstance, ushort lpCursorName ) ;
-: LoadCursor \ LoadCursorW \ LoadCursorA unicode-exec ;
+: LoadCursor LoadCursorW ; inline
 
 ! FUNCTION: HICON LoadIconA ( HINSTANCE hInstance, LPCTSTR lpIconName ) ;
-! FUNCTION: HICON LoadIconW ( HINSTANCE hInstance, LPCWSTR lpIconName ) ;
-FUNCTION: HICON LoadIconA ( HINSTANCE hInstance, ushort lpIconName ) ;
-FUNCTION: HICON LoadIconW ( HINSTANCE hInstance, ushort lpIconName ) ;
-: LoadIcon \ LoadIconW \ LoadIconA unicode-exec ;
+FUNCTION: HICON LoadIconW ( HINSTANCE hInstance, int lpIconName ) ;
+: LoadIcon LoadIconW ; inline
 
 ! FUNCTION: LoadImageA
 ! FUNCTION: LoadImageW
@@ -1078,11 +1054,9 @@ FUNCTION: int MessageBoxExW (
 ! FUNCTION: int MessageBoxIndirectW ( MSGBOXPARAMSW* params ) ;
 
 
-: MessageBox
-    \ MessageBoxW \ MessageBoxA unicode-exec ;
+: MessageBox MessageBoxW ;
 
-: MessageBoxEx
-    \ MessageBoxExW \ MessageBoxExA unicode-exec ;
+: MessageBoxEx MessageBoxExW ;
 
 ! : MessageBoxIndirect
     ! \ MessageBoxIndirectW \ MessageBoxIndirectA unicode-exec ;
@@ -1129,7 +1103,7 @@ FUNCTION: BOOL OpenClipboard ( HWND hWndNewOwner ) ;
 ! FUNCTION: PaintMenuBar
 FUNCTION: BOOL PeekMessageA ( LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg ) ;
 FUNCTION: BOOL PeekMessageW ( LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg ) ;
-: PeekMessage \ PeekMessageW \ PeekMessageA unicode-exec ;
+: PeekMessage PeekMessageW ;
 
 ! FUNCTION: PostMessageA
 ! FUNCTION: PostMessageW
@@ -1160,8 +1134,8 @@ FUNCTION: ATOM RegisterClassW ( WNDCLASS* lpWndClass ) ;
 FUNCTION: ATOM RegisterClassExA ( WNDCLASSEX* lpwcx ) ;
 FUNCTION: ATOM RegisterClassExW ( WNDCLASSEX* lpwcx ) ;
 
-: RegisterClass \ RegisterClassW \ RegisterClassA unicode-exec ;
-: RegisterClassEx \ RegisterClassExW \ RegisterClassExA unicode-exec ;
+: RegisterClass RegisterClassW ;
+: RegisterClassEx RegisterClassExW ;
 
 ! FUNCTION: RegisterClipboardFormatA
 ! FUNCTION: RegisterClipboardFormatW
@@ -1196,9 +1170,8 @@ FUNCTION: int ReleaseDC ( HWND hWnd, HDC hDC ) ;
 ! FUNCTION: SendIMEMessageExA
 ! FUNCTION: SendIMEMessageExW
 ! FUNCTION: UINT SendInput ( UINT nInputs, LPINPUT pInputs, int cbSize ) ;
-FUNCTION: LRESULT SendMessageA ( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) ;
 FUNCTION: LRESULT SendMessageW ( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) ;
-: SendMessage \ SendMessageW \ SendMessageA unicode-exec ;
+: SendMessage SendMessageW ;
 ! FUNCTION: SendMessageCallbackA
 ! FUNCTION: SendMessageCallbackW
 ! FUNCTION: SendMessageTimeoutA
@@ -1211,9 +1184,8 @@ FUNCTION: HWND SetCapture ( HWND hWnd ) ;
 ! FUNCTION: SetCaretPos
 
 FUNCTION: ULONG_PTR SetClassLongW ( HWND hWnd, int nIndex, LONG_PTR dwNewLong ) ;
-FUNCTION: ULONG_PTR SetClassLongA ( HWND hWnd, int nIndex, LONG_PTR dwNewLong ) ;
-: SetClassLongPtr \ SetClassLongW \ SetClassLongA unicode-exec ;
-: SetClassLong \ SetClassLongW \ SetClassLongA unicode-exec ;
+: SetClassLongPtr SetClassLongW ;
+: SetClassLong SetClassLongW ;
 
 ! FUNCTION: SetClassWord
 FUNCTION: HANDLE SetClipboardData ( UINT uFormat, HANDLE hMem ) ;
@@ -1325,9 +1297,8 @@ FUNCTION: BOOL TranslateMessage ( MSG* lpMsg ) ;
 ! FUNCTION: UnloadKeyboardLayout
 ! FUNCTION: UnlockWindowStation
 ! FUNCTION: UnpackDDElParam
-FUNCTION: BOOL UnregisterClassA ( LPCTSTR lpClassName, HINSTANCE hInstance ) ;
 FUNCTION: BOOL UnregisterClassW ( LPCWSTR lpClassName, HINSTANCE hInstance ) ;
-: UnregisterClass \ UnregisterClassW \ UnregisterClassA unicode-exec ;
+: UnregisterClass UnregisterClassW ;
 ! FUNCTION: UnregisterDeviceNotification
 ! FUNCTION: UnregisterHotKey
 ! FUNCTION: UnregisterMessagePumpHook

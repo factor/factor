@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: math
 USING: errors generic kernel math-internals namespaces sequences
@@ -10,11 +10,13 @@ DEFER: base>
     >r "/" split1 r> tuck base> >r base> r>
     2dup and [ / ] [ 2drop f ] if ;
 
-GENERIC: digit> ( ch -- n )
-M: digit  digit> CHAR: 0 - ;
-M: letter digit> CHAR: a - 10 + ;
-M: LETTER digit> CHAR: A - 10 + ;
-M: object digit> drop f ;
+: digit> ( ch -- n )
+    {
+        { [ dup digit?  ] [ CHAR: 0 - ] }
+        { [ dup letter? ] [ CHAR: a - 10 + ] }
+        { [ dup LETTER? ] [ CHAR: A - 10 + ] }
+        { [ t ] [ drop f ] }
+    } cond ;
 
 : digit+ ( num digit base -- num )
     pick pick and

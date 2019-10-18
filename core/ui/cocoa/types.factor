@@ -23,12 +23,6 @@ TYPEDEF: NSRect CGRect
 : NSRect-x-y ( alien -- origin-x origin-y )
     [ NSRect-x ] keep NSRect-y ;
 
-: NSRect-x-far-y ( alien -- origin-x far-y )
-    [ NSRect-x-y ] keep NSRect-h + ;
-  
-: <far-y-NSRect> ( x y w h -- alien )
-    tuck >r >r - r> r> <NSRect> ;
-
 BEGIN-STRUCT: NSPoint
     FIELD: float x
     FIELD: float y

@@ -1,5 +1,5 @@
 IN: errors
-USING: errors help kernel kernel-internals ;
+USING: errors help kernel kernel-internals parser ;
 
 HELP: error
 { $description "Global variable holding most recently thrown error." }
@@ -45,12 +45,12 @@ HELP: recover
 HELP: rethrow
 { $values { "error" "an object" } }
 { $description "Throws an error without saving the current continuation in the " { $link error-continuation } " global variable. This is done so that inspecting the error stacks sheds light on the original cause of the exception, rather than the point where it was rethrown." }
+{ $notes
+    "This word is intended to be used in conjunction with " { $link recover } " or " { $link catch } " to implement error handlers which perform an action and pass the error to the next outermost error handler."
+}
 { $examples
-    "This word definition attempts to convert a hexadecimal literal string to an integer, and outputs " { $link f } " if there is an error:"
-    { $code
-        ": catch-hex> ( str -- n/f )"
-        "    [ hex> ] [ [ drop f ] when ] catch ;"
-    }
+    "The " { $link with-parser } " catches errors, annotates them with file name and line number information, and rethrows them:"
+    { $see with-parser }
 } ;
 
 HELP: condition

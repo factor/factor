@@ -30,7 +30,7 @@ words strings arrays math help errors prettyprint-internals styles test definiti
 
 M: module synopsis*
     \ PROVIDE: pprint-word
-    [ module-name ] keep presented associate styled-text ;
+    [ module-name ] keep presentation-text ;
 
 M: module definition module>alist t ;
 
@@ -39,13 +39,17 @@ M: module where module-loc ;
 : module-dir? ( path -- ? )
     "load.factor" path+ resource-path exists? ;
 
+: resource-directory ( path -- newpath )
+    dup resource-path directory [ path+ ] map-with ;
+
 : (available-modules) ( path -- )
-    dup resource-path directory [ path+ ] map-with
+    resource-directory
+    [ resource-path directory? ] subset
     dup [ module-dir? ] subset %
     [ (available-modules) ] each ;
 
 : small-modules ( path -- seq )
-    dup resource-path directory [ path+ ] map-with
+    resource-directory
     [ ".factor" tail? ] subset
     [ ".factor" ?tail drop ] map ;
 

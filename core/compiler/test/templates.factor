@@ -108,7 +108,7 @@ unit-test
 
 [ { t t } ] [
     { t } { t } [
-        dup array-capacity [
+        dup dup array-capacity [
             2dup swap swap 2 fixnum+fast slot
             >r pick swap 2 fixnum+fast slot r> 2array
         ] collect 2nip
@@ -117,9 +117,45 @@ unit-test
 
 [ { t t } ] [
     { t } { t } [
-        dup array-capacity [
+        dup dup array-capacity [
             2dup swap swap 2 fixnum+ slot
             >r pick swap 2 fixnum+ slot r> 2array
         ] collect 2nip
     ] compile-1 first
+] unit-test
+
+[ 2 ] [
+    SBUF" " [ 2 slot 2 [ slot ] keep ] compile-1 nip
+] unit-test
+
+! Test slow shuffles
+[ 3 1 2 3 4 5 6 7 8 9 ] [
+    1 2 3 4 5 6 7 8 9
+    [ >r >r >r >r >r >r >r >r >r 3 r> r> r> r> r> r> r> r> r> ]
+    compile-1
+] unit-test
+
+[ 2 2 2 2 2 2 2 2 2 2 1 ] [
+    1 2
+    [ swap >r dup dup dup dup dup dup dup dup dup r> ] compile-1
+] unit-test
+
+[ ] [ [ 9 [ ] repeat ] compile-1 ] unit-test
+
+[ ] [
+    [
+        [ 200 dup [ 200 3array ] map-with drop ] repeat
+    ] compile-quot drop
+] unit-test
+
+
+! Test how dispatch handles the end of a basic block
+: try-breaking-dispatch
+    float+ swap { [ "hey" ] [ "bye" ] } dispatch ;
+
+: try-breaking-dispatch-2
+    1 1.0 2.5 try-breaking-dispatch "bye" = >r 3.5 = r> and ;
+
+[ t ] [
+    10000000 [ drop try-breaking-dispatch-2 ] all?
 ] unit-test

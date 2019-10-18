@@ -3,28 +3,6 @@
 USING: alien namespaces kernel words ;
 IN: win32-api
 
-! http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winprog/winprog/windows_data_types.asp
-
-SYMBOL: unicode f unicode set
-: unicode-exec ( unicode-func ascii-func -- func )
-	unicode get [
-		drop execute
-	] [
-		nip execute
-	] if ; inline
-
-: unicode? unicode get ; inline
-
-: win64? f ;
-
-! win64
-! char uchar short ushort int uint long ulong longlong ulonglong
-! 1    1     2     2      *   *    ?
-! win32
-! char uchar short ushort int uint long ulong longlong ulonglong
-! 1    1     2     2      *   *    4    4     8        8
-
-
 TYPEDEF: char                CHAR
 TYPEDEF: uchar               UCHAR
 TYPEDEF: uchar               BYTE
@@ -138,19 +116,12 @@ TYPEDEF: BOOL*               LPBOOL
 TYPEDEF: BYTE*               LPBYTE
 TYPEDEF: DWORD*              LPCOLORREF
 TYPEDEF: WCHAR*              LPCWSTR
-TYPEDEF: WCHAR*              LPWSTR
+! TYPEDEF: WCHAR*              LPWSTR
 
-! TYPEDEF: LPCWSTR     LPCTSTR
-! TYPEDEF: LPWSTR      LPTSTR
-! TYPEDEF: LPCWSTR     PCTSTR
-! TYPEDEF: LPWSTR      PTSTR
+TYPEDEF: WCHAR*               LPSTR
+TYPEDEF: ushort* LPCTSTR
+TYPEDEF: ushort* LPWTSTR
 
-TYPEDEF: WCHAR*              LPWSTR
-TYPEDEF: CHAR*               LPSTR
-! TYPEDEF: CHAR*               LPCSTR
-TYPEDEF: VOID*               LPCSTR
-
-TYPEDEF: LPCSTR      LPCTSTR
 TYPEDEF: LPSTR       LPTSTR
 TYPEDEF: LPCSTR      PCTSTR
 TYPEDEF: LPSTR       PTSTR
@@ -326,3 +297,29 @@ TYPEDEF: PIXELFORMATDESCRIPTOR PFD
 TYPEDEF: PFD* LPPFD
 TYPEDEF: HANDLE HGLRC
 TYPEDEF: HANDLE HRGN
+
+BEGIN-STRUCT: LVITEM
+  FIELD: uint mask
+  FIELD: int  iItem
+  FIELD: int  iSubItem
+  FIELD: uint state
+  FIELD: uint stateMask
+  FIELD: void* pszText
+  FIELD: int cchTextMax
+  FIELD: int iImage
+  FIELD: long lParam
+  FIELD: int iIndent
+  FIELD: int iGroupId
+  FIELD: uint cColumns
+  FIELD: uint* puColumns
+  FIELD: int* piColFmt
+  FIELD: int iGroup
+END-STRUCT
+
+BEGIN-STRUCT: LVFINDINFO
+  FIELD: uint flags
+  FIELD: char* psz
+  FIELD: long lParam
+  FIELD: POINT pt
+  FIELD: uint vkDirection
+END-STRUCT

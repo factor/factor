@@ -1,5 +1,5 @@
 IN: help
-USING: io ;
+USING: io hashtables ;
 
 HELP: articles
 { $var-description "Hashtable mapping article names to " { $link article } " instances." } ;
@@ -34,37 +34,37 @@ HELP: collect-elements
 { $description "Collects the arguments of all sub-elements of " { $snippet "element" } " whose markup element type occurs in " { $snippet "seq" } "." }
 { $notes "Used to implement " { $link children } "." } ;
 
-HELP: parent-graph
-{ $var-description "A graph whose vertices are help articles and edges are subsections. See " { $link "graphs" } "." }
-{ $see-also children parents xref-help } ;
+HELP: help-tree
+{ $var-description "A " { $link hashtable } " mapping help topics to their parents." }
+{ $see-also children parent xref-help } ;
 
 HELP: children
 { $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
 { $description "Outputs a sequence of all subsections of " { $snippet "topic" } "." } ;
 
-HELP: parents
-{ $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
-{ $description "Outputs a sequence of all help articles which contain " { $snippet "topic" } " as a subsection." } ;
+HELP: parent
+{ $values { "topic" "an article name or a word" } { "parent" "an article name or a word" } }
+{ $description "Outputs a help topic which contains " { $snippet "topic" } " as a subsection, or " { $link f } "." } ;
 
-HELP: doc-path
+HELP: help-path
 { $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
 { $description "Outputs a sequence of all help articles which contain " { $snippet "topic" } " as a subsection, traversing all the way up to the root." }
 { $examples
-    { $example "\"sequences\" doc-path ." "{ \"collections\" \"handbook\" }" }
+    { $example "\"sequences\" help-path ." "{ \"collections\" \"handbook\" }" }
 } ;
 
 HELP: xref-article
 { $values { "topic" "an article name or a word" } }
-{ $description "Adds an article to the " { $link parent-graph } " graph." }
+{ $description "Adds an article to the " { $link help-tree } "." }
 $low-level-note ;
 
 HELP: unxref-article
 { $values { "topic" "an article name or a word" } }
-{ $description "Removes an article to the " { $link parent-graph } " graph." }
+{ $description "Removes an article from the " { $link help-tree } "." }
 $low-level-note ;
 
 HELP: xref-help
-{ $description "Update the " { $link parent-graph } ". Usually this is done automatically." } ;
+{ $description "Update the " { $link help-tree } ". Usually this is done automatically." } ;
 
 HELP: link
 { $class-description "Class of help article presentations. Instances can be passed to " { $link write-object } " to output a clickable hyperlink. Also, instances of this class are valid definition specifiers; see " { $link "definitions" } "." } ;

@@ -103,3 +103,8 @@ unit-test
         ] callcc1
     ] unit-test
 ] with-scope
+
+! These should throw numbers
+[ "HEX: zzz" parse ] unit-test-fails
+[ "OCT: 999" parse ] unit-test-fails
+[ "BIN: --0" parse ] unit-test-fails

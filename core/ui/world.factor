@@ -1,8 +1,8 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: arrays errors freetype generic hashtables
-kernel math models namespaces opengl sequences ;
+kernel math models namespaces opengl sequences prettyprint ;
 
 TUPLE: world
 active?
@@ -18,7 +18,7 @@ loc ;
 
 DEFER: request-focus
 
-C: world ( gadget status status-model title-model -- world )
+C: world ( gadget status status-model title -- world )
     [ set-world-title ] keep
     [ set-world-status ] keep
     {
@@ -33,28 +33,16 @@ C: world ( gadget status status-model title-model -- world )
 
 : find-world [ world? ] find-parent ;
 
-: show-status ( object gadget -- )
+: show-status ( string/f gadget -- )
     find-world [ world-status set-model ] [ drop ] if* ;
+
+: show-summary ( object gadget -- )
+    >r [ summary ] [ "" ] if* r> show-status ;
 
 : hide-status ( gadget -- ) f swap show-status ;
 
 M: world pref-dim*
     delegate pref-dim* [ >fixnum ] map { 1024 768 } vmin ;
-
-M: world graft*
-    dup dup world-title add-connection
-    dup dup world-status add-connection
-    model-changed ;
-
-M: world ungraft*
-    dup
-    dup world-title remove-connection
-    dup world-status remove-connection ;
-
-M: world model-changed
-    dup world-handle [
-        dup world-title model-value over set-title
-    ] when drop ;
 
 : focused-ancestors ( world -- seq )
     world-focus parents <reversed> ;

@@ -1,3 +1,2 @@
-extern void* primitives[];
-
-CELL primitive_to_xt(CELL primitive);
+void init_primitives(void);
+XT primitive_to_xt(CELL primitive);

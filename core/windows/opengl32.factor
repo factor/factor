@@ -77,7 +77,7 @@ IN: win32-api
 ! TODO: compare to http://www.nullterminator.net/opengl32.html
 : make-pfd ( bits -- pfd )
     "PIXELFORMATDESCRIPTOR" <c-object>
-    "PIXELFORMATDESCRIPTOR" c-size over set-PIXELFORMATDESCRIPTOR-nSize
+    "PIXELFORMATDESCRIPTOR" heap-size over set-PIXELFORMATDESCRIPTOR-nSize
     1 over set-PIXELFORMATDESCRIPTOR-nVersion
     pfd-dwFlags over set-PIXELFORMATDESCRIPTOR-dwFlags
     PFD_TYPE_RGBA over set-PIXELFORMATDESCRIPTOR-iPixelType

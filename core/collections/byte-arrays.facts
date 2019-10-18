@@ -1,0 +1,15 @@
+IN: byte-arrays
+USING: arrays bit-arrays vectors strings sbufs kernel help ;
+
+HELP: byte-array
+{ $description "The class of byte arrays. See " { $link "syntax-byte-arrays" } " for syntax and " { $link "byte-arrays" } " for general information." } ;
+
+HELP: <byte-array> ( n -- byte-array )
+{ $values { "n" "a non-negative integer" } { "byte-array" "a new byte array" } }
+{ $description "Creates a new byte array holding " { $snippet "n" } " bytes." } ;
+
+HELP: >byte-array
+{ $values { "seq" "a sequence" } { "byte-array" byte-array } }
+{ $description "Outputs a freshly-allocated byte array whose elements have the same boolean values as a given sequence." }
+{ $errors "Throws an error if the sequence contains elements other than integers." }
+{ $see-also >array >string >sbuf >vector >quotation >bit-array } ;

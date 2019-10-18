@@ -28,6 +28,13 @@ HELP: $heading
     { $markup-example { $heading "What remains to be discovered" } }
 } ;
 
+HELP: $subheading
+{ $values { "element" "a markup element of the form " { $snippet "{ title content }" } } }
+{ $description "Prints an expandable outliner with the given title containing an arbitrary markup element." }
+{ $examples
+    { $markup-example { $heading "Developers, developers, developers! - or how I learned to stop worrying and love Steve Ballmer" } }
+} ;
+
 HELP: $code
 { $values { "element" "a markup element of the form " { $snippet "{ string... }" } } }
 { $description "Prints code examples, as seen in many help articles. The markup element must be an array of strings." }

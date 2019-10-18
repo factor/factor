@@ -74,7 +74,7 @@ HELP: end-block
 { $values { "block" "a block" } }
 { $description "Save the current position as the end position of the block." } ;
 
-HELP: (block>)
+HELP: block>
 { $description "Adds the current block to its containing block." }
 $prettyprinting-note ;
 
@@ -84,12 +84,8 @@ HELP: last-block?
 $prettyprinting-note ;
 
 HELP: block>
-{ $description "Adds the current block to its containing block, unless the current block is the top-level block in which case it does nothing." }
+{ $description "Adds the current block to its containing block." }
 { $notes "This word is used to end blocks in order for the prettyprinter to be forgiving in the case of mismatched begin/end pairs (this can happen when printing parsing words)." }
-$prettyprinting-note ;
-
-HELP: end-blocks
-{ $description "Unwind all prettyprinter state to the top level block." }
 $prettyprinting-note ;
 
 HELP: do-pprint

@@ -1,22 +1,14 @@
 ! Copyright (C) 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: generic hashtables help html httpd
-io kernel math namespaces prettyprint sequences strings ;
+io kernel math namespaces prettyprint sequences store strings ;
 IN: wee-url-responder
 
-: fstore-name "wee-url.fstore" ;
-
 SYMBOL: wee-shortcuts
+SYMBOL: wee-store
 
-SYMBOL: wee-fstore
-
-wee-fstore fstore-name load-fstore
-
-H{ } clone wee-shortcuts wee-fstore fstore-get
-
-: save-shortcuts ( -- )
-    wee-shortcuts wee-fstore fstore-set
-    wee-fstore fstore-name save-fstore ;
+"wee-url.store" load-store wee-store set-global
+H{ } clone wee-shortcuts wee-store get store-variable
 
 : responder-url "responder-url" get ;
 
@@ -31,10 +23,10 @@ H{ } clone wee-shortcuts wee-fstore fstore-get
 : letter-bank
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890" ;
 
-: random-letter letter-bank length random-int letter-bank nth ;
+: random-letter letter-bank length random letter-bank nth ;
 
 : random-url ( -- string )
-    6 random-int 1+ [ drop random-letter ] map >string
+    6 random 1+ [ drop random-letter ] map >string
     dup wee-shortcuts get hash-member? [ drop random-url ] when ;
 
 : prepare-wee-url ( url -- url )
@@ -49,7 +41,7 @@ H{ } clone wee-shortcuts wee-fstore fstore-get
     ] [
         drop
         random-url [ wee-shortcuts get set-symmetric-hash ] keep
-        save-shortcuts
+        wee-store get save-store
     ] if ;
 
 : url-prompt ( -- )
@@ -93,7 +85,7 @@ H{ } clone wee-shortcuts wee-fstore fstore-get
         ] if
     ] if* ;
 
- [
+[
     "wee-url" "responder" set
     [ wee-url-responder ] "get" set
 ] make-responder

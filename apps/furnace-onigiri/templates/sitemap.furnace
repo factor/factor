@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <urlset xmlns="http://www.google.com/schemas/sitemap/0.84">
+    <% USING: namespaces furnace:onigiri sequences io ; %>
+    <url>
+      <loc><% base-url write "" action>url write %></loc>
+    </url>
+    <% entry get [ %>
+    <url>
+      <loc><% entry-stub base-url write stub>url write %></loc>
+    </url>
+    <% ] each %> 
+  </urlset>

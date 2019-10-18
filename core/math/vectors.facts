@@ -64,9 +64,8 @@ HELP: norm
 { $description "Computes the length of a mathematical vector." } ;
 
 HELP: normalize
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } }
-{ $description "Computes a mathematical vector with the same direction but length 1." }
-{ $errors "Throws an error if " { $snippet "v" } " has zero length." } ;
+{ $values { "u" "a sequence of numbers, not all zero" } { "v" "a sequence of numbers" } }
+{ $description "Outputs a vector with the same direction as " { $snippet "u" } " but length 1." } ;
 
 HELP: set-axis
 { $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
@@ -83,8 +82,10 @@ HELP: product
 
 HELP: infimum
 { $values { "seq" "a sequence of real numbers" } { "n" "a number" } }
-{ $description "Outputs the least element of " { $snippet "seq" } ". Outputs positive infinity given an empty sequence." } ;
+{ $description "Outputs the least element of " { $snippet "seq" } "." }
+{ $errors "Throws an error if the sequence is empty." } ;
 
 HELP: supremum
 { $values { "seq" "a sequence of real numbers" } { "n" "a number" } }
-{ $description "Outputs the greatest element of " { $snippet "seq" } ". Outputs negative infinity given an empty sequence." } ;
+{ $description "Outputs the greatest element of " { $snippet "seq" } "." }
+{ $errors "Throws an error if the sequence is empty." } ;

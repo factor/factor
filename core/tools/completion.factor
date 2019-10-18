@@ -1,38 +1,38 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: completion
-USING: kernel arrays sequences math namespaces strings io ;
+USING: kernel arrays sequences math namespaces strings io
+vectors ;
 
 ! Simple fuzzy search.
 
-: fuzzy ( full short -- indices )
-    0 swap >array [ swap pick index* [ 1+ ] keep ] map 2nip
-    -1 over member? [ drop f ] when ;
-
-: (runs) ( n i seq -- )
-    2dup length < [
-        3dup nth [
-            number= [
-                >r >r 1+ r> r>
-            ] [
-                split-next,
-                rot drop [ nth 1+ ] 2keep
-            ] if >r 1+ r>
-        ] keep split, (runs)
+: (fuzzy) ( accum ch i full -- accum i ? )
+    index* dup 0 < [
+        2drop f -1 f
     ] [
-        3drop
+        [ swap push ] 2keep 1+ t
     ] if ;
 
-: runs ( seq -- seq )
+: fuzzy ( full short -- indices )
+    dup length <vector> 0 2swap
+    [ -rot [ (fuzzy) ] keep swap ] all? 3drop ;
+
+: (runs) ( runs n seq -- runs n )
     [
-        split-next,
-        dup first 0 rot (runs)
-    ] { } make ;
+        [
+            2dup number=
+            [ drop ] [ nip V{ } clone pick push ] if
+            1+
+        ] keep pick peek push
+    ] each ;
+
+: runs ( seq -- seq )
+    V{ V{ } } [ clone ] map over first rot (runs) drop ;
 
 : score-1 ( i full -- n )
     {
         { [ over zero? ] [ 2drop 10 ] }
-        { [ 2dup length 1- = ] [ 2drop 4 ] }
+        { [ 2dup length 1- number= ] [ 2drop 4 ] }
         { [ 2dup >r 1- r> nth Letter? not ] [ 2drop 10 ] }
         { [ 2dup >r 1+ r> nth Letter? not ] [ 2drop 4 ] }
         { [ t ] [ 2drop 1 ] }
@@ -42,8 +42,9 @@ USING: kernel arrays sequences math namespaces strings io ;
     dup [
         [ [ length ] 2apply - 15 swap [-] 3 / ] 2keep
         runs [
-            [ swap score-1 ] map-with dup supremum swap length *
-        ] map-with sum +
+            [ 0 [ pick score-1 max ] reduce nip ] keep
+            length * +
+        ] each-with
     ] [
         2drop 0
     ] if ;
@@ -63,7 +64,7 @@ USING: kernel arrays sequences math namespaces strings io ;
     dupd fuzzy score max ;
 
 : completion ( str quot obj -- pair )
-    #! pair is { obj score }
+    #! pair is { score obj }
     [ swap call swap complete ] keep 2array ; inline
 
 : completions ( str quot candidates -- seq )

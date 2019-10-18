@@ -74,7 +74,8 @@ DEFER: check-help
     dup delegate error.
     word-help-error-word <link> edit
     "Press ENTER when done." print flush readln drop
-    reload-modules
+    reload-core
+    reload-libs
     check-help ;
 
 : check-1 ( word -- )
@@ -102,12 +103,12 @@ DEFER: check-help
     ] recover ;
 
 : unlinked-words ( -- seq )
-    all-word-help [ parents empty? ] subset ;
+    all-word-help [ parent not ] subset ;
 
 : linked-undocumented-words ( -- seq )
     all-words
     [ word-help not ] subset
-    [ parents empty? not ] subset
+    [ parent ] subset
     [ "predicating" word-prop not ] subset ;
 
 PROVIDE: apps/help-lint ;

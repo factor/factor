@@ -7,8 +7,11 @@ PROVIDE: apps/benchmarks
     "continuations.factor"
     "ack.factor"
     "hashtables.factor"
+    "mandel.factor"
+    "raytracer.factor"
     "strings.factor"
     "vectors.factor"
     "prettyprint.factor"
     "iteration.factor"
+    "spectral-norm.factor"
 } } ;

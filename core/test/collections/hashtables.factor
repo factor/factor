@@ -184,14 +184,6 @@ H{ } clone "cache-test" set
 ] unit-test
 
 [
-    H{ { 1 2 } { 2 3 } }
-] [
-    H{ { "factor" "rocks" } { "dup" "sq" } { 3 4 } }
-    H{ { "factor" "rocks" } { 1 2 } { 2 3 } { 3 4 } }
-    hash-diff
-] unit-test
-
-[
     H{ { 1 2 } { 2 3 } { 6 5 } }
 ] [
     H{ { 2 4 } { 6 5 } } H{ { 1 2 } { 2 3 } }
@@ -214,4 +206,9 @@ H{ } "x" set
     [ 2 swap set-hash ] catch drop
     [ 3 swap set-hash ] catch drop
     drop
+] unit-test
+
+[ H{ { -1 4 } { -3 16 } { -5 36 } } ] [
+    H{ { 1 2 } { 3 4 } { 5 6 } }
+    [ >r neg r> sq ] hash-map
 ] unit-test

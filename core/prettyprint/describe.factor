@@ -38,13 +38,13 @@ M: hashtable sheet hash>alist ;
     ] [
         dup first length 1 =
         { 0 0 } { 10 0 } ? table-gap associate
-        [ dup unparse-short swap write-object ]
+        [ pprint-short ]
         tabular-output
     ] if ;
 
 : describe ( object -- ) dup summary print sheet sheet. ;
 
-: stack. ( seq -- ) >array sheet sheet. ;
+: stack. ( seq -- ) [ short. ] each ;
 
 : .s ( -- ) datastack stack. ;
 : .r ( -- ) retainstack stack. ;
@@ -58,6 +58,6 @@ M: hashtable sheet hash>alist ;
     ] with-scope ;
 
 : callstack. ( seq -- )
-    3 group [ first2 1- callframe. ] each ;
+    3 <groups> [ first2 1- callframe. ] each ;
 
 : .c ( -- ) callstack callstack. ;

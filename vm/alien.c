@@ -10,23 +10,21 @@ void primitive_expired(void)
 		F_ALIEN *alien = untag_alien_fast(object);
 		drepl(tag_boolean(alien->expired));
 	}
-	else if(object == F)
-		drepl(T);
 	else
-		drepl(F);
+		drepl(object == F ? T : F);
 }
 
 /* gets the address of an object representing a C pointer */
 void *alien_offset(CELL object)
 {
 	F_ALIEN *alien;
-	F_ARRAY *array;
+	F_BYTE_ARRAY *byte_array;
 
 	switch(type_of(object))
 	{
 	case BYTE_ARRAY_TYPE:
-		array = untag_array_fast(object);
-		return array + 1;
+		byte_array = untag_byte_array_fast(object);
+		return byte_array + 1;
 	case ALIEN_TYPE:
 		alien = untag_alien_fast(object);
 		if(alien->expired)
@@ -36,7 +34,7 @@ void *alien_offset(CELL object)
 		return NULL;
 	default:
 		type_error(ALIEN_TYPE,object);
-		return (void*)-1; /* can't happen */
+		return NULL; /* can't happen */
 	}
 }
 
@@ -59,7 +57,7 @@ CELL allot_alien(CELL delegate, CELL displacement)
 }
 
 /* make an alien and push */
-void box_alien(void* ptr)
+void box_alien(void *ptr)
 {
 	if(ptr == NULL)
 		dpush(F);
@@ -71,7 +69,7 @@ void box_alien(void* ptr)
 void primitive_displaced_alien(void)
 {
 	CELL alien = dpop();
-	CELL displacement = unbox_unsigned_cell();
+	CELL displacement = to_cell(dpop());
 	if(alien == F && displacement == 0)
 		dpush(F);
 	else
@@ -98,64 +96,70 @@ void fixup_alien(F_ALIEN *d)
 /* pop ( alien n ) from datastack, return alien's address plus n */
 INLINE void *alien_pointer(void)
 {
-	F_FIXNUM offset = unbox_signed_cell();
+	F_FIXNUM offset = to_fixnum(dpop());
 	return unbox_alien() + offset;
 }
 
 /* define words to read/write values at an alien address */
-#define DEF_ALIEN_SLOT(name,type,boxer) \
+#define DEF_ALIEN_SLOT(name,type,boxer,to) \
 void primitive_alien_##name (void) \
 { \
-	box_##boxer (*(type*)alien_pointer()); \
+	boxer (*(type*)alien_pointer()); \
 } \
 void primitive_set_alien_##name (void) \
 { \
 	type* ptr = alien_pointer(); \
-	type value = unbox_##boxer(); \
+	type value = to(dpop()); \
 	*ptr = value; \
 }
 
-DEF_ALIEN_SLOT(signed_cell,F_FIXNUM,signed_cell)
-DEF_ALIEN_SLOT(unsigned_cell,CELL,unsigned_cell)
-DEF_ALIEN_SLOT(signed_8,s64,signed_8)
-DEF_ALIEN_SLOT(unsigned_8,u64,unsigned_8)
-DEF_ALIEN_SLOT(signed_4,s32,signed_4)
-DEF_ALIEN_SLOT(unsigned_4,u32,unsigned_4)
-DEF_ALIEN_SLOT(signed_2,s16,signed_2)
-DEF_ALIEN_SLOT(unsigned_2,u16,unsigned_2)
-DEF_ALIEN_SLOT(signed_1,u8,signed_1)
-DEF_ALIEN_SLOT(unsigned_1,u8,unsigned_1)
-DEF_ALIEN_SLOT(float,float,float)
-DEF_ALIEN_SLOT(double,double,double)
+DEF_ALIEN_SLOT(signed_cell,F_FIXNUM,box_signed_cell,to_fixnum)
+DEF_ALIEN_SLOT(unsigned_cell,CELL,box_unsigned_cell,to_cell)
+DEF_ALIEN_SLOT(signed_8,s64,box_signed_8,to_signed_8)
+DEF_ALIEN_SLOT(unsigned_8,u64,box_unsigned_8,to_unsigned_8)
+DEF_ALIEN_SLOT(signed_4,s32,box_signed_cell,to_fixnum)
+DEF_ALIEN_SLOT(unsigned_4,u32,box_unsigned_cell,to_cell)
+DEF_ALIEN_SLOT(signed_2,s16,box_signed_cell,to_fixnum)
+DEF_ALIEN_SLOT(unsigned_2,u16,box_unsigned_cell,to_cell)
+DEF_ALIEN_SLOT(signed_1,u8,box_signed_cell,to_fixnum)
+DEF_ALIEN_SLOT(unsigned_1,u8,box_unsigned_cell,to_cell)
+DEF_ALIEN_SLOT(float,float,box_float,untag_float)
+DEF_ALIEN_SLOT(double,double,box_float,untag_float)
 
 /* for FFI calls passing structs by value */
-void unbox_value_struct(void *dest, CELL size)
+void to_value_struct(CELL src, void *dest, CELL size)
 {
-	memcpy(dest,unbox_alien(),size);
+	memcpy(dest,alien_offset(src),size);
 }
 
 /* for FFI callbacks receiving structs by value */
 void box_value_struct(void *src, CELL size)
 {
-	F_ARRAY *array = allot_byte_array(size);
+	F_BYTE_ARRAY *array = allot_byte_array(size);
 	memcpy(array + 1,src,size);
 	dpush(tag_object(array));
 }
 
-/* for FFI calls returning an 8-byte struct. This only
-happens on Intel Mac OS X */
-void box_value_pair(CELL x, CELL y)
+/* On OS X, structs <= 8 bytes are returned in registers. */
+void box_struct_1(CELL x)
 {
-	F_ARRAY *array = allot_byte_array(2 * sizeof(CELL));
-	set_array_nth(array,0,x);
-	set_array_nth(array,1,y);
+	F_BYTE_ARRAY *array = allot_byte_array(2 * CELLS);
+	put(AREF(array,0),x);
+	dpush(tag_object(array));
+}
+
+void box_struct_2(CELL x, CELL y)
+{
+	F_BYTE_ARRAY *array = allot_byte_array(2 * CELLS);
+	put(AREF(array,0),x);
+	put(AREF(array,1),y);
 	dpush(tag_object(array));
 }
 
 /* open a native library and push a handle */
 void primitive_dlopen(void)
 {
-	primitive_string_to_char_alien();
+	primitive_string_to_native_alien();
 	F_DLL* dll = allot_object(DLL_TYPE,sizeof(F_DLL));
 	dll->path = dpop();
 	ffi_dlopen(dll,true);
@@ -167,7 +171,7 @@ void primitive_dlsym(void)
 {
 	CELL dll = dpop();
 	REGISTER_ROOT(dll);
-	char *sym = unbox_char_string();
+	F_SYMBOL *sym = unbox_symbol_string();
 	UNREGISTER_ROOT(dll);
 
 	F_DLL *d;

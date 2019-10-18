@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic hashtables io kernel
 namespaces parser prettyprint sequences strings styles vectors
@@ -83,12 +83,17 @@ M: f print-element drop ;
 : $heading ( element -- )
     [ heading-style get print-element* ] ($heading) ;
 
+: $subheading ( element -- )
+    [ strong-style get print-element* ] ($heading) ;
+
+: ($code-style) ( presentation -- hash )
+    presented associate code-style get hash-union ;
+
 : ($code) ( presentation quot -- )
     [
-        code-style get [
+        snippet-style get [
             last-element off
-            >r presented associate code-style get hash-union r>
-            with-nesting
+            >r ($code-style) r> with-nesting
         ] with-style
     ] ($block) ; inline
 
@@ -159,6 +164,7 @@ M: f print-element drop ;
     [ "Vocabulary" $heading terpri $vocab-link ] when* ;
 
 : textual-list ( seq quot -- )
+    last-element off
     [ ", " print-element ] interleave ; inline
 
 : $links ( topics -- )
@@ -168,11 +174,11 @@ M: f print-element drop ;
     "See also" $heading $links ;
 
 : $doc-path ( article -- )
-    doc-path dup empty? [
+    help-path dup empty? [
         drop
     ] [
         [
-            doc-path-style get [
+            help-path-style get [
                 "Parent topics: " write $links
             ] with-style
         ] ($block)
@@ -225,7 +231,7 @@ M: f print-element drop ;
 
 : ($see) ( word -- )
     [
-        code-style get [
+        snippet-style get [
             code-style get [ see ] with-nesting
         ] with-style
     ] ($block) ;
@@ -265,9 +271,7 @@ M: f print-element drop ;
     } $notes ;
 
 : sort-articles ( seq -- newseq )
-    [ dup article-title 2array ] map
-    [ [ second ] 2apply <=> ] sort
-    0 <column> ;
+    [ dup article-title 2array ] map sort-values 0 <column> ;
 
 : error? ( word -- ? )
     \ $error-description swap word-help elements empty? not ;

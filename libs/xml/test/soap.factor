@@ -3,13 +3,13 @@ IN: soap-script
 
 : assemble-data ( tag -- 3array )
     { "URL" "snippet" "title" }
-    [ find-tag children>string ] map-with ;
+    [ tag-named children>string ] map-with ;
 
 : parse-result ( xml -- seq )
-    "resultElements" get-tag "item" find-tags
+    "resultElements" tag-named* "item" tags-named
     [ assemble-data ] map ;
 
 [ "http://www.foxnews.com/oreilly/" ] [
-    "libs/xml/test/soap.xml" resource-path <file-reader> read-xml
+    "libs/xml/test/soap.xml" resource-path file>xml
     parse-result first first
 ] unit-test

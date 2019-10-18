@@ -2,13 +2,18 @@
 
 register CELL ds asm("r14");
 register CELL rs asm("r15");
-register CELL cards_offset asm("r13");
+void **primitives;
 
 INLINE void flush_icache(CELL start, CELL len) {}
 
 void *native_stack_pointer(void);
 
-typedef CELL F_STACK_FRAME;
+typedef CELL F_COMPILED_FRAME;
 
 #define PREVIOUS_FRAME(frame) (frame + 1)
 #define RETURN_ADDRESS(frame) (*(frame))
+
+INLINE void execute(F_WORD* word)
+{
+	word->xt(word);
+}

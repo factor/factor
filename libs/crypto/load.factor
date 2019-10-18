@@ -1,4 +1,4 @@
-REQUIRES: libs/math ;
+REQUIRES: libs/math libs/memoize libs/shuffle libs/sequences ;
 
 PROVIDE: libs/crypto
 { +files+ {
@@ -19,11 +19,17 @@ PROVIDE: libs/crypto
     "sha1.factor"
     "sha2.factor"
 
+    "hmac.factor"
+
+
 ! Block ciphers
     "rc4.factor"
 
 ! Public key
     "rsa.factor"
+
+! Other
+    "xor.factor"
 
 } }
 { +tests+ {
@@ -31,10 +37,12 @@ PROVIDE: libs/crypto
     "test/md5.factor"
     "test/sha1.factor"
     "test/sha2.factor"
+    "test/hmac.factor"
     "test/miller-rabin.factor"
     "test/crc32.factor"
     "test/rsa.factor"
     "test/barrett.factor"
     "test/montgomery.factor"
     "test/blum-blum-shub.factor"
+    "test/xor.factor"
 } } ;

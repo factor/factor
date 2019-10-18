@@ -1,8 +1,8 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer
 USING: arrays generic hashtables inference io kernel math
-namespaces sequences test vectors ;
+namespaces sequences vectors class-inference words errors ;
 
 SYMBOL: optimizer-changed
 
@@ -18,7 +18,10 @@ GENERIC: optimize-node* ( node -- node/t )
     ] map-nodes ;
 
 : optimize-1 ( node -- node ? )
-    dup kill-values dup infer-classes [
+    [
+        dup compute-def-use
+        dup kill-values
+        dup infer-classes
         optimizer-changed off
         optimize-node
         optimizer-changed get
@@ -40,28 +43,16 @@ M: node optimize-node* drop t ;
 M: #shuffle optimize-node* 
     [ node-values empty? ] prune-if ;
 
-! #>r
-M: #>r optimize-node*
-    dup node-successor #r>? [
-        node-successor node-successor
-    ] [
-        [ node-in-d empty? ] prune-if
-    ] if ;
-
-! #r>
-M: #r> optimize-node*
-    dup node-successor #>r? [
-        node-successor node-successor
-    ] [
-        [ node-in-r empty? ] prune-if
-    ] if ;
-
 ! #push
 M: #push optimize-node* 
     [ node-out-d empty? ] prune-if ;
 
 ! #return
 M: #return optimize-node*
+    node-successor [ node-successor ] [ t ] if* ;
+
+! #values
+M: #values optimize-node*
     node-successor [ node-successor ] [ t ] if* ;
 
 ! Some utilities for splicing in dataflow IR subtrees
@@ -97,11 +88,36 @@ M: #return optimize-node*
     last-node 2dup swap 2dup post-inline subst-classes
     set-node-successor ;
 
+GENERIC: remember-method* ( method-spec node -- )
+
+M: #call remember-method*
+    [ node-history ?push ] keep set-node-history ;
+
+M: node remember-method*
+    2drop ;
+
+: remember-method ( method-spec node -- )
+    over [ [ remember-method* ] each-node-with ] [ 2drop ] if ;
+
+: (splice-method) ( #call method-spec quot -- node )
+    #! Must remember the method before splicing in, otherwise
+    #! the rest of the IR will also remember the method
+    pick node-in-d dataflow-with
+    [ remember-method ] keep
+    [ infer-classes/node ] 2keep
+    [ subst-node ] keep ;
+
+: splice-quot ( #call quot -- node ) f swap (splice-method) ;
+
+: drop-inputs ( node -- #shuffle )
+    node-in-d clone in-node <#shuffle> ;
+
 ! Constant branch folding
 : fold-branch ( node branch# -- node )
     over drop-inputs >r
-    >r dup node-successor r> rot node-children nth
-    [ subst-node ] keep r> [ set-node-successor ] keep ;
+    over node-children nth
+    swap node-successor over subst-node
+    r> [ set-node-successor ] keep ;
 
 ! #if
 : known-boolean-value? ( node value -- value ? )
@@ -127,3 +143,139 @@ M: #dispatch optimize-node*
     ] [
         3drop t
     ] if ;
+
+! #call
+: splice-method ( #call method-spec/t quot/t -- node/t )
+    #! t indicates failure
+    {
+        { [ dup t eq? ] [ 3drop t ] }
+        { [ pick pick swap node-history member? ] [ 3drop t ] }
+        { [ t ] [ (splice-method) ] }
+    } cond ;
+
+! Single dispatch method inlining optimization
+: already-inlined? ( node -- ? )
+    #! Was this node inlined from definition of 'word'?
+    dup node-param swap node-history memq? ;
+
+: specific-method ( class word -- class ) order min-class ;
+
+: dispatch# ( word -- n ) "combination" word-prop first ;
+
+: dispatching-class ( node word -- class )
+    [ dispatch# node-class# ] keep specific-method ;
+
+: will-inline-method ( node word -- method-spec/t quot/t )
+    #! t indicates failure
+    tuck dispatching-class dup [
+        swap [ 2array ] 2keep
+        method method-def
+    ] [
+        2drop t t
+    ] if ;
+
+: inline-standard-method ( node word -- node )
+    dupd will-inline-method splice-method ;
+
+! Partial dispatch of 2generic words
+: math-both-known? ( word left right -- ? )
+    math-class-max swap specific-method ;
+
+: will-inline-math-method ( word left right -- method-spec/t quot/t )
+    #! t indicates failure
+    3dup math-both-known?
+    [ [ 3array ] 3keep math-method ] [ 3drop t t ] if ;
+
+: inline-math-method ( #call word -- node )
+    over 1 node-class# pick 0 node-class#
+    will-inline-math-method splice-method ;
+
+: inline-method ( #call -- node )
+    dup node-param {
+        { [ dup standard-generic? ] [ inline-standard-method ] }
+        { [ dup 2generic? ] [ inline-math-method ] }
+        { [ t ] [ 2drop t ] }
+    } cond ;
+
+! Resolve type checks at compile time where possible
+: comparable? ( actual testing -- ? )
+    #! If actual is a subset of testing or if the two classes
+    #! are disjoint, return t.
+    2dup class< >r classes-intersect? not r> or ;
+
+: optimize-predicate? ( #call -- ? )
+    dup node-param "predicating" word-prop dup [
+        >r 0 node-class# r> comparable?
+    ] [
+        2drop f
+    ] if ;
+
+: literal-quot ( node literals -- quot )
+    #! Outputs a quotation which drops the node's inputs, and
+    #! pushes some literals.
+    >r node-in-d length \ drop <array>
+    r> [ literalize ] map append >quotation ;
+
+: inline-literals ( node literals -- node )
+    #! Make #shuffle -> #push -> #return -> successor
+    dupd literal-quot splice-quot ;
+
+: optimize-predicate ( #call -- node )
+    dup node-param "predicating" word-prop >r
+    dup 0 node-class# r> class< 1array inline-literals ;
+
+: optimizer-hooks ( node -- conditions )
+    node-param "optimizer-hooks" word-prop ;
+
+: optimize-hooks ( node -- node/t )
+    dup optimizer-hooks cond ;
+
+: define-optimizers ( word optimizers -- )
+    { [ t ] [ drop t ] } add "optimizer-hooks" set-word-prop ;
+
+: partial-eval? ( #call -- ? )
+    dup node-param "foldable" word-prop [
+        dup node-in-d [ node-literal? ] all-with?
+    ] [
+        drop f
+    ] if ;
+
+: literal-in-d ( #call -- inputs )
+    dup node-in-d [ node-literal ] map-with ;
+
+: partial-eval ( #call -- node )
+    dup literal-in-d over node-param
+    [ with-datastack ] catch
+    [ 3drop t ] [ inline-literals ] if ;
+
+: define-identities ( words identities -- )
+    swap [ swap "identities" set-word-prop ] each-with ;
+
+: find-identity ( node -- quot )
+    dup node-param "identities" word-prop
+    [ first in-d-match? ] assoc* ;
+
+: apply-identities ( node -- node/f )
+    dup find-identity dup [ splice-quot ] [ 2drop f ] if ;
+
+: optimistic-inline? ( #call -- ? )
+    dup node-param "specializer" word-prop [
+        dup node-in-d [
+            node-class types length 1 number=
+        ] all-with?
+    ] [
+        drop f
+    ] if ;
+
+: optimistic-inline ( #call -- node )
+    dup node-param word-def splice-quot ;
+
+M: #call optimize-node*
+    {
+        { [ dup partial-eval? ] [ partial-eval ] }
+        { [ dup find-identity ] [ apply-identities ] }
+        { [ dup optimizer-hooks ] [ optimize-hooks ] }
+        { [ dup optimize-predicate? ] [ optimize-predicate ] }
+        { [ dup optimistic-inline? ] [ optimistic-inline ] }
+        { [ t ] [ inline-method ] }
+    } cond ;

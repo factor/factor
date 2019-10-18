@@ -35,19 +35,19 @@ M: process-missing error.
 
 : build-tag* ( items name -- tag )
     "" swap "" <name>
-    swap >r H{ } r> <tag> ;
+    swap >r { } r> <tag> ;
 
 : build-tag ( item name -- tag )
     >r 1array r> build-tag* ;
 
-: build-xml-doc ( tag -- xml-doc )
-    T{ prolog f "1.0" "iso-8859-1" f } { } rot { } <xml-doc> ;
+: build-xml ( tag -- xml )
+    T{ prolog f "1.0" "iso-8859-1" f } { } rot { } <xml> ;
 
 : children>string ( tag -- string )
     tag-children
-    dup [ str-elem? ] all?
+    dup [ string? ] all?
     [ "XML tag unexpectedly contains non-text children" throw ] unless
-    [ [ write-str-elem ] each ] string-out ;
+    concat ;
 
 : children-tags ( tag -- sequence )
     tag-children [ tag? ] subset ;
@@ -68,7 +68,7 @@ M: tag (xml-each)
     tag-children [ (xml-each) ] each-with ;
 M: object (xml-each)
     swap call ;
-M: xml-doc (xml-each)
+M: xml (xml-each)
     delegate (xml-each) ;
 : xml-each ( tag quot -- ) ! quot: tag --
     swap (xml-each) ; inline
@@ -80,7 +80,7 @@ M: tag (xml-map)
     [ set-tag-children ] keep ;
 M: object (xml-map)
     swap call ;
-M: xml-doc (xml-map)
+M: xml (xml-map)
     [ (xml-map) ] with-delegate ;
 : xml-map ( tag quot -- tag ) ! quot: tag -- tag
     swap (xml-map) ; inline
@@ -99,8 +99,8 @@ M: tag (xml-find)
         2drop ! leaves result of quot
     ] unless nip ;
 M: object (xml-find)
-    [ swap call ] keep f ? ;
-M: xml-doc (xml-find)
+    swap keep f ? ;
+M: xml (xml-find)
     delegate (xml-find) ;
 : xml-find ( tag quot -- tag ) ! quot: tag -- ?
     swap (xml-find) ; inline
@@ -112,55 +112,61 @@ M: tag (xml-inject)
         swap [ (xml-inject) ] keep
     ] inject ;
 M: object (xml-inject) 2drop ;
-M: xml-doc (xml-inject) delegate (xml-inject) ;
+M: xml (xml-inject) delegate (xml-inject) ;
 : xml-inject ( tag quot -- ) ! quot: tag -- tag
     swap (xml-inject) ; inline
 
-! * Accessing part of an XML document
+! * Manipulating tag attribute
 
-: prop-name ( tag name -- seq/f )
-    #! gets the property with the first matching name
-    swap tag-props [
-        hash-keys [ over names-match? ] find
-    ] keep hash 2nip ;
+: find-attr ( key alist -- {key,value} )
+    [ first names-match? ] find-with nip ;
+: get-attr ( key alist -- value )
+    find-attr [ second ] [ f ] if* ;
+: set-attr ( value key alist -- )
+    2dup find-attr [
+        2nip 1 swap set-nth
+    ] [
+        >r swap 2array r> push
+    ] if* ;
 
 : <name-tag> ( string -- name )
     f swap f <name> ;
 
-: prop-name-tag ( hash string -- seq/f )
-    <name-tag> prop-name ;
+GENERIC: assure-name ( string/name -- name )
+M: name assure-name ;
+M: string assure-name <name-tag> ;
+
+: tag-attr ( tag name/string -- string/f )
+    #! gets the attribute with the first matching name
+    assure-name swap tag-attrs get-attr ;
+
+! * Accessing part of an XML document
 
 : get-id ( tag id -- elem ) ! elem=tag.getElementById(id)
     swap [
-        dup tag? [
-            "id" prop-name-tag
-            [ string? ] subset concat
-            over =
-        ] [ drop f ] if
+        dup tag?
+        [ "id" tag-attr over = ]
+        [ drop f ] if
     ] xml-find nip ;
 
 : (get-tag) ( name elem -- name ? )
     dup tag? [ dupd names-match? ] [ drop f ] if ;
 
-: get-name-tag ( tag name -- matching-tag )
-    swap [ (get-tag) ] xml-find nip ;
+: tag-named* ( tag name/string -- matching-tag )
+    assure-name swap [ (get-tag) ] xml-find nip ;
 
-: get-name-tags ( tag name -- seq )
-    swap [ (get-tag) ] xml-subset nip ;
+: tags-named* ( tag name/string -- tags-seq )
+    assure-name swap [ (get-tag) ] xml-subset nip ;
 
-: get-tag ( tag string -- matching-tag ) <name-tag> get-name-tag ;
-: get-tags ( tag string -- seq ) <name-tag> get-name-tags ;
-
-: find-name-tag ( tag name -- matching-tag )
+: tag-named ( tag name/string -- matching-tag )
     ! like get-name-tag but only looks at direct children,
     ! not all the children down the tree.
-    swap tag-children [ (get-tag) nip ] find-with nip ;
+    assure-name swap tag-children
+    [ (get-tag) nip ] find-with nip ;
 
-: find-name-tags ( tag name -- seq )
-    swap tag-children [ (get-tag) nip ] subset-with ;
-
-: find-tag ( tag string -- matching-tag ) <name-tag> find-name-tag ;
-: find-tags ( tag string -- seq ) <name-tag> find-name-tags ;
+: tags-named ( tag name/string -- tags-seq )
+    assure-name swap tag-children
+    [ (get-tag) nip ] subset-with ;
 
 : assert-tag ( name name -- )
     names-match? [ "Unexpected XML tag found" throw ] unless ;

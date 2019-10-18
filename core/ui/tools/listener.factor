@@ -1,12 +1,12 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-listener
-USING: arrays compiler gadgets gadgets-labels
-gadgets-panes gadgets-scrolling gadgets-text
-gadgets-theme gadgets-tracks gadgets-workspace
-generic hashtables tools io kernel listener math models
-namespaces parser prettyprint sequences shells strings styles
-threads words definitions help errors ;
+USING: arrays compiler gadgets gadgets-labels gadgets-panes
+gadgets-scrolling gadgets-text gadgets-theme gadgets-tracks
+gadgets-workspace gadgets-interactor generic hashtables tools io
+kernel listener math models namespaces parser prettyprint
+sequences shells strings styles threads words definitions help
+errors ;
 
 TUPLE: listener-gadget input output stack ;
 
@@ -136,11 +136,9 @@ listener-gadget "toolbar" {
 } define-commands
 
 debugger "toolbar" {
-    { "Data stack" T{ key-down f f "s" } [ :s ] }
-    { "Retain stack" T{ key-down f f "r" } [ :r ] }
-    { "Call stack" T{ key-down f f "c" } [ :c ] }
-    { "Help" T{ key-down f f "h" } [ :help ] }
-    { "Edit" T{ key-down f f "e" } [ :edit ] }
-} [
-    first3 [ call-listener drop ] curry 3array
-] map define-commands
+    { "Data stack" T{ key-down f f "s" } [ drop [ :s ] call-listener ] }
+    { "Retain stack" T{ key-down f f "r" } [ drop [ :r ] call-listener ] }
+    { "Call stack" T{ key-down f f "c" } [ drop [ :c ] call-listener ] }
+    { "Help" T{ key-down f f "h" } [ drop [ :help ] call-listener ] }
+    { "Edit" T{ key-down f f "e" } [ drop :edit ] }
+} define-commands

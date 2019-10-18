@@ -2,7 +2,7 @@ IN: temporary
 USING: compiler kernel kernel-internals memory math
 math-internals test ;
 
-[ 5.0 ] [ [ 5.0 ] compile-1 full-gc full-gc full-gc ] unit-test
+[ 5.0 ] [ [ 5.0 ] compile-1 data-gc data-gc data-gc ] unit-test
 [ 2.0 3.0 ] [ 3.0 [ 2.0 swap ] compile-1 ] unit-test
 
 [ 1 2 3 4.0 ] [ [ 1 2 3 4.0 ] compile-1 ] unit-test

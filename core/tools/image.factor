@@ -1,12 +1,9 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: alien
-SYMBOL: c-types
-
-USING: arrays errors generic hashtables hashtables-internals
-help io kernel kernel-internals math namespaces parser
-prettyprint sequences sequences-internals strings vectors words
-modules ;
+USING: alien arrays byte-arrays errors generic hashtables
+hashtables-internals help io kernel kernel-internals math
+namespaces parser prettyprint sequences sequences-internals
+strings sbufs vectors words modules ;
 IN: image
 
 ! Constants
@@ -56,12 +53,14 @@ SYMBOL: boot-quot
         d>w/w big-endian get [ swap ] unless emit emit
     ] if ;
 
-: emit-seq ( seq -- ) image get swap nappend ;
+: emit-seq ( seq -- ) image get nappend ;
 
 : fixup ( value offset -- ) image get set-nth ;
 
-: here ( -- size ) 
-    image get length header-size - bootstrap-cells data-base + ;
+: heap-size ( -- size )
+    image get length header-size - bootstrap-cells ;
+
+: here ( -- size ) heap-size data-base + ;
 
 : here-as ( tag -- pointer ) here swap bitor ;
 
@@ -97,7 +96,7 @@ GENERIC: ' ( obj -- ptr )
 
 : bignum-bits bootstrap-cell-bits 2 - ;
 
-: bignum-radix bignum-bits 1 swap shift 1- ;
+: bignum-radix bignum-bits 2^ 1- ;
 
 : (bignum>seq) ( n -- )
     dup zero? [
@@ -204,12 +203,16 @@ M: complex '
 
 ! Strings
 
-: emit-chars ( seq -- )
-    big-endian get [ [ <reversed> ] map ] unless
-    [ 0 [ swap 16 shift + ] reduce emit ] each ;
+: 16be> 0 [ swap 16 shift bitor ] reduce ;
+: 16le> <reversed> 16be> ;
 
-: pack-string ( string -- seq )
-    dup length 1+ char align CHAR: \0 pad-right char group ;
+: emit-chars ( seq -- )
+    char <groups>
+    big-endian get [ [ 16be> ] map ] [ [ 16le> ] map ] if
+    emit-seq ;
+
+: pack-string ( string -- newstr )
+    dup length 1+ char align 0 pad-right ;
 
 : emit-string ( string -- ptr )
     string-type object-tag [
@@ -222,6 +225,25 @@ M: string '
     #! We pool strings so that each string is only written once
     #! to the image
     objects get [ emit-string ] cache ;
+
+! Byte arrays
+
+: emit-bytes ( seq -- )
+    cell <groups>
+    big-endian get [ [ be> ] map ] [ [ le> ] map ] if
+    emit-seq ;
+
+: pack-bytes ( string -- newstr )
+    dup length cell align 0 pad-right ;
+
+: emit-byte-array ( string -- ptr )
+    byte-array-type object-tag [
+        dup length emit-fixnum
+        pack-bytes emit-bytes
+    ] emit-object ;
+
+M: byte-array '
+    objects get [ emit-byte-array ] cache ;
 
 ! Arrays and vectors
 
@@ -246,6 +268,15 @@ M: method '
         f ,
         dup method-loc ,
         method-def ,
+    ] { } make tuple-type emit-array ;
+
+M: source-file '
+    [
+        \ source-file transfer-word ,
+        f ,
+        dup source-file-path ,
+        dup source-file-modified ,
+        source-file-checksum ,
     ] { } make tuple-type emit-array ;
 
 M: array '
@@ -287,7 +318,7 @@ M: hashtable '
     [
         {
             vocabularies typemap builtins c-types crossref
-            articles parent-graph changed-words
+            articles help-tree changed-words
             modules class<map source-files
         } [ dup get swap bootstrap-word set ] each
     ] make-hash '
@@ -295,14 +326,14 @@ M: hashtable '
 
 : boot, ( -- ) boot-quot get ' boot-quot-offset fixup ;
 
-: heap-size image get length header-size - bootstrap-cells ;
-
 : end-image ( -- )
-    "Generating words..." print flush
+    "Building generic words..." print flush
+    all-words [ generic? ] subset [ make-generic ] each
+    "Serializing words..." print flush
     words,
-    "Generating global namespace..." print flush
+    "Serializing global namespace..." print flush
     global,
-    "Generating boot quotation..." print flush
+    "Serializing boot quotation..." print flush
     boot,
     "Performing some word fixups..." print flush
     fixup-words
@@ -347,4 +378,4 @@ M: hashtable '
     ] with-scope ;
 
 : make-images ( -- )
-    { "x86" "pentium4" "ppc" "amd64" } [ make-image ] each ;
+    { "x86" "ppc" "amd64" "arm" } [ make-image ] each ;

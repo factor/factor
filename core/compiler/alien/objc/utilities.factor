@@ -1,36 +1,15 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: objc
 USING: alien arrays compiler errors generic hashtables inference
 kernel libc math namespaces parser sequences strings words ;
 
-: make-alien-invoke [ ] make \ alien-invoke add ; inline
-
 : make-sender ( method function -- quot )
-    [ over first , f , , second , ] make-alien-invoke ;
+    [ over first , f , , second , \ alien-invoke , ] [ ] make ;
 
-: make-sender-stret ( method function -- quot )
-    [
-        [ "void" f ] %
-        "_stret" append ,
-        { "void*" } swap second append ,
-    ] make-alien-invoke \ (post-stret) add ;
-
-: use-stret? ( type -- ? )
-    #! We use the objc_msgSend_stret form in either of the
-    #! following two cases:
-    #! - type is a struct, and we're on PowerPC
-    #! - type is a struct <= 8 bytes, and we're on x86
-    {
-        { [ dup c-struct? not ] [ drop f ] }
-        { [ cpu "ppc" = ] [ drop t ] }
-        { [ cpu "x86" = ] [ c-size 8 > ] }
-    } cond ;
-    
 : sender-stub ( method function -- word )
-    over first use-stret?
-    [ make-sender-stret ] [ make-sender ] if
-    define-temp ;
+    over first large-struct? [ "_stret" append ] when
+    make-sender define-temp ;
 
 SYMBOL: msg-senders
 H{ } clone msg-senders set-global
@@ -75,7 +54,8 @@ SYMBOL: selectors
 
 H{ } clone selectors set-global
 
-: cache-selector selectors get-global [ <selector> ] cache ;
+: cache-selector ( string -- selector )
+    selectors get-global [ <selector> ] cache ;
 
 SYMBOL: objc-methods
 H{ } clone objc-methods set-global
@@ -84,44 +64,24 @@ H{ } clone objc-methods set-global
     dup objc-methods get hash
     [ ] [ "No such method: " swap append throw ] ?if ;
 
-: make-stret-quot ( method -- quot )
-    first [ <c-object> dup ] curry 1 make-dip ;
-
-: stret-prolog ( type -- )
-    dup use-stret?
-    [ [ >r ] % , [ <malloc-object> dup r> ] % ] [ drop ] if ;
-
 : make-prepare-send ( selector method super? -- quot )
-    over second length 2 - >r [
+    [
         [ \ <super> , ] when
-        first stret-prolog
-        cache-selector , \ selector ,
-    ] [ ] make r> make-dip ;
-
-: block>byte-array ( block size -- byte-array )
-    dup <byte-array> -rot >r 2dup r> memcpy free ;
-
-: stret-epilog ( type -- )
-    dup use-stret?
-    [ c-size , \ block>byte-array , ] [ drop ] if ;
+        swap cache-selector , \ selector ,
+    ] [ ] make
+    swap second length 2 - make-dip ;
 
 : make-objc-send ( selector super? -- quot )
     [
-        over lookup-method [
-            swap [ make-prepare-send % ] 2keep cache-stub ,
-        ] keep first stret-epilog
+        >r dup lookup-method r>
+        [ make-prepare-send % ] 2keep
+        cache-stub ,
     ] [ ] make ;
-
-: infer-send ( super? -- )
-    pop-literal rot make-objc-send infer-quot-value ;
 
 : (send) ( ... selector super? -- ... )
     make-objc-send dup peek compile call ;
 
-\ (send) [ pop-literal nip infer-send ] "infer" set-word-prop
-
-\ (send) [ object object ] [ ] <effect>
-"inferred-effect" set-word-prop
+\ (send) 2 [ make-objc-send ] define-transform
 
 : send ( ... selector -- ... ) f (send) ; inline
 
@@ -173,7 +133,7 @@ H{
 ! The transpose of the above map
 SYMBOL: alien>objc-types
 
-objc>alien-types get hash>alist [ reverse ] map alist>hash
+objc>alien-types get [ swap ] hash-map
 ! A hack...
 H{
     { "NSPoint" "{_NSPoint=ff}" }
@@ -190,7 +150,7 @@ H{
         { [ dup CHAR: ^ = ] [ 3drop "void*" ] }
         { [ dup CHAR: { = ] [ drop objc-struct-type ] }
         { [ dup CHAR: [ = ] [ 3drop "void*" ] }
-        { [ t ] [ 2nip ch>string objc>alien-types get hash ] }
+        { [ t ] [ 2nip 1string objc>alien-types get hash ] }
     } cond ;
 
 : parse-objc-type ( string -- ctype ) 0 swap (parse-objc-type) ;
@@ -209,7 +169,7 @@ H{
     objc-methods get set-hash ;
 
 : method-list@ ( ptr -- ptr )
-    "objc-method-list" c-size swap <displaced-alien> ;
+    "objc-method-list" heap-size swap <displaced-alien> ;
 
 : (register-objc-methods) ( objc-class iterator -- )
     2dup class_nextMethodList [

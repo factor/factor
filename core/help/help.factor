@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: help
 USING: arrays io kernel namespaces parser prettyprint sequences
@@ -42,13 +42,6 @@ M: word article-content
 : help ( topic -- ) dup $title (help) terpri ;
 
 : handbook ( -- ) "handbook" help ;
-
-: $subtopic ( element -- )
-    [
-        subtopic-style get [
-            unclip f rot [ print-content ] curry write-outliner
-        ] with-style
-    ] ($block) ;
 
 : ($subsection) ( object -- )
     [ article-title ] keep >link

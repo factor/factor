@@ -25,10 +25,6 @@ HELP: short.
 { $values { "obj" "an object" } }
 { $description "Prettyprints an object to the " { $link stdio } " stream with a trailing line break. This word rebinds printer control variables to enforce ``shorter'' output." } ;
 
-HELP: unparse-short
-{ $values { "obj" "an object" } { "str" "Factor source string" } }
-{ $description "Outputs a prettyprinted string representation of an object. This word rebinds printer control variables to enforce ``shorter'' output. See " { $link "prettyprint-variables" } "." } ;
-
 HELP: .b
 { $values { "n" "an integer" } }
 { $description "Outputs an integer in binary." } ;

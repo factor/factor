@@ -32,15 +32,11 @@ sequences strings ;
         ] each
     ] "" make ;
 
-: catch-hex> ( str -- n/f )
-    #! Push f if string is not a valid hex literal.
-    [ hex> ] catch [ drop f ] when ;
-
 : url-decode-hex ( index str -- )
     2dup length 2 - >= [
         2drop
     ] [
-        >r 1+ dup 2 + r> subseq  catch-hex> [ , ] when*
+        >r 1+ dup 2 + r> subseq  hex> [ , ] when*
     ] if ;
 
 : url-decode-% ( index str -- index str )

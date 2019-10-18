@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays assembler kernel kernel-internals math
+USING: alien arrays assembler-x86 kernel kernel-internals math
 math-internals namespaces sequences words ;
-IN: compiler
+IN: generator
 
 ! Type checks
 \ tag [
@@ -52,42 +52,79 @@ IN: compiler
 ! Slots
 : %untag ( reg -- ) tag-mask bitnot AND ;
 
-\ slot [
-    "obj" operand %untag
-    ! turn tagged fixnum slot # into an offset, multiple of 4
-    "n" operand fixnum>slot@
-    ! compute slot address
-    "obj" operand "n" operand ADD
-    ! load slot value
-    "obj" operand dup [] MOV
-] H{
-    { +input+ { { f "obj" } { f "n" } } }
-    { +output+ { "obj" } }
-    { +clobber+ { "n" } }
-} define-intrinsic
+: %untag-fixnum ( reg -- ) tag-bits SAR ;
+
+\ slot {
+    ! Slot number is literal
+    {
+        [
+            "obj" operand %untag
+            ! load slot value
+            "obj" operand dup "n" get cells [+] MOV
+        ] H{
+            { +input+ { { f "obj" } { [ cells ] "n" } } }
+            { +output+ { "obj" } }
+            { +clobber+ { "obj" "n" } }
+        }
+    }
+    ! Slot number in a register
+    {
+        [
+            "obj" operand %untag
+            ! turn tagged fixnum slot # into an offset,
+            ! multiple of 4
+            "n" operand fixnum>slot@
+            ! load slot value
+            "obj" operand dup "n" operand [+] MOV
+        ] H{
+            { +input+ { { f "obj" } { f "n" } } }
+            { +output+ { "obj" } }
+            { +clobber+ { "obj" "n" } }
+        }
+    }
+} define-intrinsics
 
 : generate-write-barrier ( -- )
     #! Mark the card pointed to by vreg.
     "obj" operand card-bits SHR
-    "obj" operand HEX: ffff ADD rel-absolute-cell rel-cards
-    "obj" operand [] card-mark OR ;
+    "scratch" operand HEX: ffffffff MOV
+    "cards_offset" f rc-absolute-cell rel-dlsym
+    "scratch" operand dup [] MOV
+    "scratch" operand "obj" operand [+] card-mark OR ;
 
-\ set-slot [
-    "obj" operand %untag
-    ! turn tagged fixnum slot # into an offset
-    "slot" operand fixnum>slot@
-    ! compute slot address
-    "slot" operand "obj" operand ADD
-    ! store new slot value
-    "slot" operand [] "val" operand MOV
-    generate-write-barrier
-] H{
-    { +input+ { { f "val" } { f "obj" } { f "slot" } } }
-    { +clobber+ { "obj" "slot" } }
-} define-intrinsic
+\ set-slot {
+    ! Slot number is literal
+    {
+        [
+            "obj" operand %untag
+            ! store new slot value
+            "obj" operand "n" get cells [+] "val" operand MOV
+            generate-write-barrier
+        ] H{
+            { +input+ { { f "val" } { f "obj" } { [ cells ] "n" } } }
+            { +scratch+ { { f "scratch" } } }
+            { +clobber+ { "obj" } }
+        }
+    }
+    ! Slot number in a register
+    {
+        [
+            ! turn tagged fixnum slot # into an offset
+            "n" operand fixnum>slot@
+            "obj" operand %untag
+            ! store new slot value
+            "obj" operand "n" operand [+] "val" operand MOV
+            generate-write-barrier
+        ] H{
+            { +input+ { { f "val" } { f "obj" } { f "n" } } }
+            { +scratch+ { { f "scratch" } } }
+            { +clobber+ { "obj" "n" } }
+        }
+    }
+} define-intrinsics
 
-: char-reg cell 8 = RBX EBX ? ; inline
-: char-reg-16 BX ; inline
+: char-reg cell 8 = RDI EDI ? ; inline
+: char-reg-16 DI ; inline
 
 \ char-slot [
     char-reg PUSH
@@ -101,7 +138,7 @@ IN: compiler
 ] H{
     { +input+ { { f "n" } { f "obj" } } }
     { +output+ { "obj" } }
-    { +clobber+ { "n" } }
+    { +clobber+ { "obj" "n" } }
 } define-intrinsic
 
 \ set-char-slot [
@@ -118,11 +155,24 @@ IN: compiler
 } define-intrinsic
 
 ! Fixnums
-: define-fixnum-op ( word op -- )
-    [ [ "x" operand "y" operand ] % , ] [ ] make H{
+: fixnum-op ( op hash -- pair )
+    >r [ "x" operand "y" operand ] swap add r> 2array ;
+
+: fixnum-value-op ( op -- pair )
+    H{
+        { +input+ { { f "x" } { [ v>operand ] "y" } } }
+        { +output+ { "x" } }
+    } fixnum-op ;
+
+: fixnum-register-op ( op -- pair )
+    H{
         { +input+ { { f "x" } { f "y" } } }
         { +output+ { "x" } }
-    } define-intrinsic ;
+    } fixnum-op ;
+
+: define-fixnum-op ( word op -- )
+    [ fixnum-value-op ] keep fixnum-register-op
+    2array define-intrinsics ;
 
 {
     { fixnum+fast ADD }
@@ -154,7 +204,7 @@ IN: compiler
 } define-intrinsic
 
 : %untag-fixnums ( seq -- )
-    [ tag-bits SAR ] unique-operands ;
+    [ %untag-fixnum ] unique-operands ;
 
 : simple-overflow ( word -- )
     "end" define-label
@@ -189,25 +239,6 @@ IN: compiler
     "x" operand "y" operand %allot-bignum-signed-1 ! Yes, box bignum
     ;
 
-! \ fixnum* [
-!     "overflow-1" define-label
-!     "overflow-2" define-label
-!     "end" define-label
-!     { "y" "x" } %untag-fixnums
-!     "y" operand IMUL
-!     "overflow-1" get JNO
-!     "x" operand "r" operand %allot-bignum-signed-2
-!     "end" get JMP
-!     "overflow-1" resolve-label
-!     %tag-overflow
-!     "end" resolve-label
-! ] H{
-!     { +input+ { { 0 "x" } { 1 "y" } } }
-!     { +output+ { "x" } }
-!     { +scratch+ { { 2 "r" } } }
-!     { +clobber+ { "y" } }
-! } define-intrinsic
-
 : generate-fixnum/mod
     #! The same code is used for fixnum/i and fixnum/mod.
     #! This has specific register
@@ -232,9 +263,18 @@ IN: compiler
     { +clobber+ { "x" "y" } }
 } define-intrinsic
 
+: fixnum-jump ( op inputs -- pair )
+    >r [ "x" operand "y" operand CMP ] swap add r> 2array ;
+
+: fixnum-value-jump ( op -- pair )
+    { { f "x" } { [ v>operand ] "y" } } fixnum-jump ;
+
+: fixnum-register-jump ( op -- pair )
+    { { f "x" } { f "y" } } fixnum-jump ;
+
 : define-fixnum-jump ( word op -- )
-    [ "x" operand "y" operand CMP ] swap add
-    { { f "x" } { f "y" } } define-if-intrinsic ;
+    [ fixnum-value-jump ] keep fixnum-register-jump
+    2array define-if-intrinsics ;
 
 {
     { fixnum< JL }
@@ -251,11 +291,11 @@ IN: compiler
     "end" define-label
     "x" operand 0 CMP ! is it zero?
     "nonzero" get JNE
-    0 >bignum "x" get load-literal
+    0 >bignum "x" get load-literal ! this is our result
     "end" get JMP
     "nonzero" resolve-label
-    "x" operand tag-bits SAR
-    "x" operand dup %allot-bignum-signed-1
+    "x" operand %untag-fixnum
+    "x" operand dup %allot-bignum-signed-1 ! copy it to a bignum
     "end" resolve-label
 ] H{
     { +input+ { { f "x" } } }
@@ -296,7 +336,7 @@ IN: compiler
 ! User environment
 : %userenv ( -- )
     "x" operand 0 MOV
-    "userenv" f rel-absolute-cell rel-dlsym
+    "userenv" f rc-absolute-cell rel-dlsym
     "n" operand fixnum>slot@
     "n" operand "x" operand ADD ;
 

@@ -10,15 +10,23 @@ M: wrapper equal?
     over wrapper? [ [ wrapped ] 2apply = ] [ 2drop f ] if ;
 
 M: quotation clone (clone) ;
+
 M: quotation length array-capacity ;
+
 M: quotation nth bounds-check nth-unsafe ;
+
 M: quotation set-nth bounds-check set-nth-unsafe ;
+
 M: quotation nth-unsafe >r >fixnum r> array-nth ;
+
 M: quotation set-nth-unsafe >r >fixnum r> set-array-nth ;
+
 M: quotation new drop <quotation> ;
 
-: >quotation ( seq -- quot )
-    [ quotation? ] [ <quotation> ] >sequence ; inline
+M: quotation equal?
+    over quotation? [ sequence= ] [ 2drop f ] if ;
+
+: >quotation ( seq -- quot ) [ ] clone-like ; inline
 
 M: quotation like drop dup quotation? [ >quotation ] unless ;
 

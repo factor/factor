@@ -1,6 +1,6 @@
 #include "factor.h"
 
-void* primitives[] = {
+static void *_primitives[] = {
 	undefined,
 	docol,
 	dosym,
@@ -165,6 +165,7 @@ void* primitives[] = {
 	primitive_finalize_compile,
 	primitive_fopen,
 	primitive_fgetc,
+	primitive_fread,
 	primitive_fwrite,
 	primitive_fflush,
 	primitive_fclose,
@@ -177,7 +178,12 @@ void* primitives[] = {
 	primitive_xt_map
 };
 
-CELL primitive_to_xt(CELL primitive)
+void init_primitives(void)
 {
-	return (CELL)primitives[primitive];
+	primitives = _primitives;
+}
+
+XT primitive_to_xt(CELL primitive)
+{
+	return primitives[primitive];
 }

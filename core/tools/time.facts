@@ -1,0 +1,14 @@
+IN: tools
+USING: help ;
+
+HELP: benchmark
+{ $values { "quot" "a quotation" } { "gctime" "an integer denoting milliseconds" } { "runtime" "an integer denoting milliseconds" } }
+{ $description "Runs a quotation, measuring the total wall clock time and the total time spent in the garbage collector." }
+{ $notes "A nicer word for interactive use is " { $link time } "." } ;
+
+HELP: time
+{ $values { "quot" "a quotation" } }
+{ $description "Runs a quotation and then prints the total run time and time spent in the garbage collector." }
+{ $examples
+    { $unchecked-example "[ 1000000 0 [ + ] reduce drop ] time" "1116 ms run / 6 ms GC time" }
+} ;

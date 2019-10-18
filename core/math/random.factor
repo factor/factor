@@ -56,10 +56,15 @@ IN: math
         generate-mt
     ] bind ;
 
-: (random-int) ( -- rand )
+: (random) ( -- rand )
     global [
         mti get dup mt-n < [ drop generate-mt 0 ] unless
         mt-nth mt-temper mti inc
     ] bind ;
 
-: random-int ( n -- rand ) (random-int) * -32 shift ;
+: random ( seq -- elt )
+    dup empty? [
+        drop f
+    ] [
+        [ length (random) * -32 shift ] keep nth
+    ] if ;

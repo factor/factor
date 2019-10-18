@@ -1,4 +1,4 @@
-USING: alien arrays compiler generic help kernel math sequences
+USING: alien arrays generator generic help kernel math sequences
 strings vectors words ;
 
 ARTICLE: "objects" "Objects"
@@ -14,24 +14,26 @@ ARTICLE: "equality" "Equality and comparison testing"
 { $subsection = }
 "Some types of objects also have an intrinsic order allowing sorting using " { $link natural-sort } ":"
 { $subsection <=> }
+{ $subsection compare }
 "An object can be cloned; the clone has distinct identity but equal value:"
 { $subsection clone } ;
 
 ARTICLE: "generic" "Generic words and methods"
-"A generic word's behavior depends on the class of the object at the top of the stack, although this can be generalized using custom method combination. A specific behavior of a generic word on a class is called a " { $emphasis "method" } "."
+"A generic word consists of zero or more methods, where each method associates a class with a definition; when executed, the generic word picks the method most appropriate for the object at the top of the stack."
 $terpri
-"The key advantage of a generic word over a set of conditional tests is that methods are defined in a decentralized manner, thus adding new methods does not force unnecessary coupling between code."
+"A generic word behaves roughly like a long series of class predicate conditionals in a " { $link cond } " form, however methods can be defined in independent source files, reducing coupling and increasing extensibility."
 $terpri
-"In the overwhelming majority of cases, your interaction with the generic word system centers on two parsing words:"
+"The most straightforward way to define generic words and methods is to use a pair of parsing words:"
 { $subsection POSTPONE: GENERIC: }
 { $subsection POSTPONE: M: }
 "Generic words must declare their stack effect in order to compile. See " { $link "effect-declaration" } "."
 { $subsection "method-order" }
+"The generic word system supports meta-programming:"
 { $subsection "method-combination" }
 { $subsection "generic-introspection" } ;
 
 ARTICLE: "method-order" "Method ordering"
-"It is possible that two classes have a non-empty intersectionand neither is a subclass of the other. This means there is no canonical linear ordering of classes."
+"It is possible that two classes have a non-empty intersection and neither is a subclass of the other. This means there is no canonical linear ordering of classes."
 $terpri
 "Consider the following set of definitions:"
 { $code
@@ -69,20 +71,15 @@ ARTICLE: "custom-combination" "Custom method combination"
 $terpri
 "A method combination quotation has stack effect " { $snippet "( word -- quot )" } "."
 $terpri
-"A method combination will need to get a list of methods on a generic word:"
-{ $subsection methods }
-"Code generation utilities:"
-{ $subsection alist>quot }
-{ $subsection curry }
 "Generic word generation utilities:"
 { $subsection class-predicates }
 { $subsection simplify-alist }
 { $subsection math-upgrade }
 { $subsection object-method }
-{ $see-also "generic-introspection" } ;
+{ $see-also "quotations" "generic-introspection" } ;
 
 ARTICLE: "generic-introspection" "Generic word introspection"
-"In most cases, generic words and methods are defined at parse time with " { $link POSTPONE: GENERIC: } ", " { $link POSTPONE: G: } " and " { $link POSTPONE: M: } ". However various metaprogramming techniques can be implemented by defining generic words at runtime, with computed definitions:"
+"In most cases, generic words and methods are defined at parse time with " { $link POSTPONE: GENERIC: } ", " { $link POSTPONE: G: } " and " { $link POSTPONE: M: } ". However various advanced techniques can be implemented by defining generic words at runtime, with computed definitions:"
 { $subsection define-generic }
 { $subsection define-generic* }
 "Methods can be added to existing generic words at runtime:"
@@ -114,39 +111,22 @@ $terpri
 { $subsection "class-operations" } ;
 
 ARTICLE: "builtin-classes" "Built-in classes"
-"Every object is an instance of to exactly one canonical " { $emphasis "built-in class" } " which defines its layout in memory and basic behavior:"
-{ $subsection alien }
-{ $subsection array }
-{ $subsection bignum }
-{ $subsection byte-array }
-{ $subsection complex }
-{ $subsection dll }
-{ $subsection f }
-{ $subsection fixnum }
-{ $subsection float }
-{ $subsection ratio }
-{ $subsection quotation }
-{ $subsection sbuf }
-{ $subsection string }
-{ $subsection t }
-{ $subsection tuple }
-{ $subsection vector }
-{ $subsection word }
-{ $subsection wrapper }
+"Every object is an instance of to exactly one canonical " { $emphasis "built-in class" } " which defines its layout in memory and basic behavior; see " { $link "type-index" } " for a list."
+$terpri
 "There is a class of built-in classes:"
-{ $subsection builtin } ;
+{ $subsection builtin-class } ;
 
 ARTICLE: "unions" "Union classes"
 "An object is an instance of a union class if it is an instance of one of its members. Union classes are used to associate the same method with several different classes, as well as to conveniently define predicates."
 { $subsection POSTPONE: UNION: }
-{ $subsection define-union }
-{ $subsection union } ;
+{ $subsection define-union-class }
+{ $subsection union-class } ;
 
 ARTICLE: "predicates" "Predicate classes"
 "Predicate classes allow fine-grained control over method dispatch."
 { $subsection POSTPONE: PREDICATE: }
 { $subsection define-predicate-class }
-{ $subsection predicate } ;
+{ $subsection predicate-class } ;
 
 ARTICLE: "class-operations" "Class operations"
 { $subsection class< }
@@ -168,7 +148,7 @@ ARTICLE: "tuples" "Tuples"
 "A parsing word defines tuple classes:"
 { $subsection POSTPONE: TUPLE: }
 "Tuple classes can also be defined at run time:"
-{ $subsection define-tuple }
+{ $subsection define-tuple-class }
 "Further topics:"
 { $subsection "tuple-constructors" }
 { $subsection "tuple-delegation" }

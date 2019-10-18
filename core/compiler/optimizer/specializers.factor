@@ -1,61 +1,36 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: compiler
+IN: optimizer
 USING: arrays generic hashtables kernel kernel-internals math
-namespaces sequences vectors words ;
+namespaces sequences vectors words strings ;
 
-: make-standard-specializer ( quot class picker -- quot )
-    over \ object eq? [
-        2drop
-    ] [
-        [
-            , "predicate" word-prop % dup , , \ if ,
-        ] [ ] make
-    ] if ;
+! Do stuff like dup foo? [ blah ] [ blah ] if
+! So that in the common case where foo? holds, blah compiles
+! more efficiently
 
-: make-math-specializer ( quot picker -- quot )
-    [
-        , \ tag , num-tags swap <array> , \ dispatch ,
-    ] [ ] make ;
+: simple-specializer ( quot dispatch# classes -- quot )
+    object add* swapd [ swap 2array ] map-with object
+    method-alist>quot ;
 
-: make-specializer ( quot class picker -- quot )
-    over number eq? [
-        nip make-math-specializer
-    ] [
-        make-standard-specializer
-    ] if ;
+: dispatch-specializer ( quot dispatch# n dispatcher -- quot )
+    [ rot picker % , swap <array> , \ dispatch , ] [ ] make ;
+
+: tag-specializer ( quot dispatch# -- quot )
+    num-tags \ tag dispatch-specializer ;
+
+: type-specializer ( quot dispatch# -- quot )
+    num-types \ type dispatch-specializer ;
+
+: make-specializer ( quot dispatch# spec -- quot )
+    {
+        { [ dup number eq? ] [ drop tag-specializer ] }
+        { [ dup object eq? ] [ drop type-specializer ] }
+        { [ dup \ * eq? ] [ 2drop ] }
+        { [ dup array? ] [ simple-specializer ] }
+        { [ t ] [ 1array simple-specializer ] }
+    } cond ;
 
 : specialized-def ( word -- quot )
     dup word-def swap "specializer" word-prop [
-        <reversed> { dup over pick } [
-            make-specializer
-        ] 2each
+        [ length ] keep <reversed> [ make-specializer ] 2each
     ] when* ;
-
-{ 1+ 1- sq neg recip sgn truncate } [
-    { number } "specializer" set-word-prop
-] each
-
-{ vneg norm-sq norm normalize } [
-    { array } "specializer" set-word-prop
-] each
-
-\ n*v { object array } "specializer" set-word-prop
-\ v*n { array object } "specializer" set-word-prop
-\ n/v { object array } "specializer" set-word-prop
-\ v/n { array object } "specializer" set-word-prop
-
-{ v+ v- v* v/ vmax vmin v. } [
-    { array array } "specializer" set-word-prop
-] each
-
-{ hash* remove-hash set-hash } [
-    { hashtable } "specializer" set-word-prop
-] each
-
-{ first first2 first3 first4 }
-[ { array } "specializer" set-word-prop ] each
-
-{ peek pop* pop push } [
-    { vector } "specializer" set-word-prop
-] each

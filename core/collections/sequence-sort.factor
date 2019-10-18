@@ -1,3 +1,5 @@
+! Copyright (C) 2005, 2007 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: sequences-internals
 USING: arrays generic kernel math sequences ;
 
@@ -16,14 +18,19 @@ C: sorter ( seq start end -- sorter )
 : s*/e* dup sorter-start swap sorter-end ; inline
 : s*/e dup sorter-start swap sorter-seq length 1- ; inline
 : s/e* 0 swap sorter-end ; inline
-: sorter-exchange dup s*/e* rot sorter-seq exchange-unsafe ; inline
-: compare over sorter-seq nth-unsafe swap sorter-mid rot call ; inline
+
+: sorter-exchange
+    dup s*/e* rot sorter-seq exchange-unsafe ; inline
+
+: sorter-compare
+    over sorter-seq nth-unsafe swap sorter-mid rot call ; inline
+
 : >start> dup sorter-start 1+ swap set-sorter-start ; inline
 : <end< dup sorter-end 1- swap set-sorter-end ; inline
 
 : sort-up ( quot sorter -- )
     dup s*/e < [
-        [ dup sorter-start compare 0 < ] 2keep rot
+        [ dup sorter-start sorter-compare 0 < ] 2keep rot
         [ dup >start> sort-up ] [ 2drop ] if
     ] [
         2drop
@@ -31,7 +38,7 @@ C: sorter ( seq start end -- sorter )
 
 : sort-down ( quot sorter -- )
     dup s/e* < [
-        [ dup sorter-end compare 0 > ] 2keep rot
+        [ dup sorter-end sorter-compare 0 > ] 2keep rot
         [ dup <end< sort-down ] [ 2drop ] if
     ] [
         2drop
@@ -57,19 +64,17 @@ C: sorter ( seq start end -- sorter )
         2drop
     ] if 2drop ; inline
 
-: partition ( -1/1 seq -- seq )
-    dup midpoint@ rot 1 < [ head-slice ] [ tail-slice ] if ;
+: partition ( seq -1/1 -- seq )
+    >r dup midpoint@ r> 1 < [ head-slice ] [ tail-slice ] if ;
     inline
 
-: (binsearch) ( elt quot seq -- i )
+: (binsearch) ( elt quot seq -- elt quot i )
     dup length 1 <= [
-        2nip slice-from
+        slice-from
     ] [
-        3dup >r >r >r midpoint swap call dup zero? [
-            r> r> 3drop r> dup slice-from swap slice-to + 2 /i
-        ] [
-            r> swap r> swap r> partition (binsearch)
-        ] if
+        [ midpoint swap call ] 3keep roll dup zero?
+        [ drop dup slice-from swap midpoint@ + ]
+        [ partition (binsearch) ] if
     ] if ; inline
 
 : flatten-slice ( seq -- slice )
@@ -90,16 +95,13 @@ IN: sequences
 
 : natural-sort ( seq -- sortedseq ) [ <=> ] sort ;
 
-: sort-keys ( alist -- alist )
-    [ [ first ] 2apply <=> ] sort ;
+: sort-keys ( alist -- alist ) [ [ first ] compare ] sort ;
 
-: sort-values ( alist -- alist )
-    [ [ second ] 2apply <=> ] sort ;
+: sort-values ( alist -- alist ) [ [ second ] compare ] sort ;
 
 : binsearch ( elt seq quot -- i )
     swap dup empty?
-    [ 3drop -1 ] [ flatten-slice (binsearch) ] if ; inline
+    [ 3drop -1 ] [ flatten-slice (binsearch) 2nip ] if ; inline
 
 : binsearch* ( elt seq quot -- result )
-    over >r binsearch dup -1 = [ r> 2drop f ] [ r> nth ] if ;
-    inline
+    over >r binsearch r> ?nth ; inline

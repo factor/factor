@@ -2,13 +2,12 @@ IN: win32-api
 
 USING: alien kernel ;
 
-BEGIN-STRUCT: overlapped-ext
+BEGIN-STRUCT: OVERLAPPED
     FIELD: int internal
     FIELD: int internal-high
     FIELD: int offset
     FIELD: int offset-high
     FIELD: void* event
-    FIELD: int user-data
 END-STRUCT
 
 BEGIN-STRUCT: SYSTEMTIME
@@ -148,6 +147,6 @@ BEGIN-STRUCT: OSVERSIONINFO
     FIELD: DWORD dwMinorVersion
     FIELD: DWORD dwBuildNumber
     FIELD: DWORD dwPlatformId
-    ! FIELD: char[128] szCSDVersion
+    FIELD: char[128] szCSDVersion
 END-STRUCT
 TYPEDEF: void* LPOSVERSIONINFO

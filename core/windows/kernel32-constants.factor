@@ -59,3 +59,22 @@ USING: alien kernel errors ;
 : CREATE_DEFAULT_ERROR_MODE HEX: 4000000 ; inline
 : DETACHED_PROCESS 8 ; inline
 : PF_XMMI64_INSTRUCTIONS_AVAILABLE 10 ; inline
+: PF_SSE3_INSTRUCTIONS_AVAILABLE 13 ; inline
+
+: MAX_COMPUTERNAME_LENGTH 15 ; inline
+: UNLEN 256 ; inline
+
+: PROCESS_TERMINATE ( -- number ) HEX: 1 ; inline
+: PROCESS_CREATE_THREAD ( -- number ) HEX: 2 ; inline
+: PROCESS_VM_OPERATION ( -- number ) HEX: 8 ; inline
+: PROCESS_VM_READ ( -- number ) HEX: 10 ; inline
+: PROCESS_VM_WRITE ( -- number ) HEX: 20 ; inline
+: PROCESS_DUP_HANDLE ( -- number ) HEX: 40 ; inline
+: PROCESS_CREATE_PROCESS ( -- number ) HEX: 80 ; inline
+: PROCESS_SET_QUOTA ( -- number ) HEX: 100 ; inline
+: PROCESS_SET_INFORMATION ( -- number ) HEX: 200 ; inline
+: PROCESS_QUERY_INFORMATION ( -- number ) HEX: 400 ; inline
+
+: PAGE_READWRITE ( -- number ) HEX: 4 ; inline
+: MEM_COMMIT ( -- number ) HEX: 1000 ; inline
+: MEM_RELEASE ( -- number ) HEX: 8000 ; inline

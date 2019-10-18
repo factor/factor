@@ -1,7 +1,7 @@
 USING: help io parser definitions modules ;
 
-HELP: reset-modified
-{ $description "Resets recorded modification times for all loaded source files, creating a checkpoint for " { $link reload-modules } "." } ;
+HELP: reset-checksums
+{ $description "Resets recorded modification times and CRC32 checksums for all loaded source files, creating a checkpoint for " { $link reload-modules } "." } ;
 
 HELP: file-vocabs
 { $description "Installs the initial the vocabulary search path for parsing a file." } ;

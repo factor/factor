@@ -6,7 +6,7 @@ IN: temporary
 USING: cocoa compiler kernel objc namespaces objc-classes test memory ;
 
 "NSObject" "Foo"
-{ { "foo:" "void" { "id" "SEL" "NSRect" } [ full-gc "x" set 2drop ] } }
+{ { "foo:" "void" { "id" "SEL" "NSRect" } [ data-gc "x" set 2drop ] } }
 define-objc-class
 
 : test-foo

@@ -38,8 +38,7 @@ $terpri
 { $subsection relayout-1 }
 "Gadgets implement a generic word to inform their parents of their preferred size:"
 { $subsection pref-dim* }
-"To get a gadget's preferred size, do not call the above word, instead use a variant which caches the result:"
-{ $subsection pref-dim } ;
+"To get a gadget's preferred size, do not call the above word, instead use " { $link pref-dim  } ",  which caches the result." ;
 
 ARTICLE: "ui-pack-layout" "Pack layouts"
 "Pack gadgets layout their children along a single axis."

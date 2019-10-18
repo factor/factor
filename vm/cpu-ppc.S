@@ -1,8 +1,4 @@
-#ifdef __APPLE__
-	#define MANGLE(sym) _##sym
-#else
-	#define MANGLE(sym) sym
-#endif
+#include "asm.h"
 
 /* Thanks to Joshua Grams for this code.
 

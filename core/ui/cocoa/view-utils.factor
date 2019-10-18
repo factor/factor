@@ -1,15 +1,55 @@
-! Copyright (C) 2006 Slava Pestov
+! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: objc-classes
 DEFER: FactorView
 
 IN: cocoa
-USING: arrays gadgets hashtables kernel math namespaces objc
-opengl sequences ;
+USING: alien arrays gadgets hashtables kernel math namespaces
+objc opengl sequences ;
+
+: NSOpenGLPFAAllRenderers 1 ;
+: NSOpenGLPFADoubleBuffer 5 ;
+: NSOpenGLPFAStereo 6 ;
+: NSOpenGLPFAAuxBuffers 7 ;
+: NSOpenGLPFAColorSize 8 ;
+: NSOpenGLPFAAlphaSize 11 ;
+: NSOpenGLPFADepthSize 12 ;
+: NSOpenGLPFAStencilSize 13 ;
+: NSOpenGLPFAAccumSize 14 ;
+: NSOpenGLPFAMinimumPolicy 51 ;
+: NSOpenGLPFAMaximumPolicy 52 ;
+: NSOpenGLPFAOffScreen 53 ;
+: NSOpenGLPFAFullScreen 54 ;
+: NSOpenGLPFASampleBuffers 55 ;
+: NSOpenGLPFASamples 56 ;
+: NSOpenGLPFAAuxDepthStencil 57 ;
+: NSOpenGLPFARendererID 70 ;
+: NSOpenGLPFASingleRenderer 71 ;
+: NSOpenGLPFANoRecovery 72 ;
+: NSOpenGLPFAAccelerated 73 ;
+: NSOpenGLPFAClosestPolicy 74 ;
+: NSOpenGLPFARobust 75 ;
+: NSOpenGLPFABackingStore 76 ;
+: NSOpenGLPFAMPSafe 78 ;
+: NSOpenGLPFAWindow 80 ;
+: NSOpenGLPFAMultiScreen 81 ;
+: NSOpenGLPFACompliant 83 ;
+: NSOpenGLPFAScreenMask 84 ;
+: NSOpenGLPFAPixelBuffer 90 ;
+: NSOpenGLPFAVirtualScreenCount 128 ;
+
+: <PixelFormat> ( -- pixelfmt )
+    NSOpenGLPixelFormat -> alloc [
+        NSOpenGLPFAWindow ,
+        NSOpenGLPFADoubleBuffer ,
+        NSOpenGLPFADepthSize , 16 ,
+        0 ,
+    ] { } make >int-array
+    -> initWithAttributes:
+    -> autorelease ;
 
 : <GLView> ( class dim -- view )
-    >r -> alloc 0 0 r> first2 <NSRect>
-    NSOpenGLView -> defaultPixelFormat
+    >r -> alloc 0 0 r> first2 <NSRect> <PixelFormat>
     -> initWithFrame:pixelFormat:
     dup 1 -> setPostsBoundsChangedNotifications:
     dup 1 -> setPostsFrameChangedNotifications: ;

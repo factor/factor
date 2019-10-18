@@ -21,8 +21,7 @@ M: real <=> - ;
     double>bits -51 shift BIN: 111111111111 [ bitand ] keep
     number= ;
 
-M: float zero?
-    dup 0.0 float= swap -0.0 float= or ;
+M: float zero? dup 0.0 float= swap -0.0 float= or ;
 
 M: float >fixnum float>fixnum ;
 M: float >bignum float>bignum ;

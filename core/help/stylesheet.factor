@@ -33,8 +33,8 @@ H{
     { border-width 5 }
 } title-style set-global
 
-SYMBOL: doc-path-style
-H{ { font-size 10 } } doc-path-style set-global
+SYMBOL: help-path-style
+H{ { font-size 10 } } help-path-style set-global
 
 SYMBOL: heading-style
 H{
@@ -50,19 +50,15 @@ H{
     { font-style bold }
 } subsection-style set-global
 
-SYMBOL: subtopic-style
-H{ { font-style bold } } subtopic-style set-global
-
 SYMBOL: snippet-style
 H{
     { font "monospace" }
-    { foreground { 0.3 0.3 0.3 1 } }
+    { font-size 12 }
+    { foreground { 0.1 0.1 0.4 1 } }
 } snippet-style set-global
 
 SYMBOL: code-style
 H{
-    { font "monospace" }
-    { font-size 12 }
     { page-color { 0.8 0.8 0.8 0.5 } }
     { border-width 5 }
     { wrap-margin f }

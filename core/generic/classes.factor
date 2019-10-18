@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: generic
 USING: arrays definitions errors hashtables kernel
@@ -11,7 +11,11 @@ SYMBOL: typemap
 SYMBOL: class<map
 SYMBOL: builtins
 
-PREDICATE: word builtin ( obj -- ? ) builtins get memq? ;
+PREDICATE: word builtin-class ( obj -- ? ) builtins get memq? ;
+
+: tuple-size ( class -- size ) "tuple-size" word-prop ;
+
+PREDICATE: class tuple-class tuple-size >boolean ;
 
 : classes ( -- seq ) class<map get hash-keys ;
 
@@ -34,19 +38,32 @@ PREDICATE: word builtin ( obj -- ? ) builtins get memq? ;
 
 : superclass ( class -- super ) "superclass" word-prop ;
 
+: set-superclass ( superclass class -- )
+    swap "superclass" set-word-prop ;
+
 : members ( class -- seq ) "members" word-prop ;
+
+PREDICATE: class union-class members >boolean ;
 
 : (flatten-class) ( class -- )
     dup members [ [ (flatten-class) ] each ] [ dup set ] ?if ;
 
-: flatten-class ( class -- seq )
+: flatten-class ( class -- hash )
     [ (flatten-class) ] make-hash ;
 
+: (explode-class) ( class -- )
+    dup superclass [
+        (explode-class)
+    ] [
+        dup members
+        [ [ (explode-class) ] each ] [ dup set ] ?if
+    ] ?if ;
+
+: explode-class ( class -- seq )
+    [ (explode-class) ] make-hash ;
+
 : (types) ( class -- )
-    flatten-class [
-        drop dup superclass
-        [ (types) ] [ "type" word-prop dup set ] ?if
-    ] hash-each ;
+    explode-class [ drop "type" word-prop dup set ] hash-each ;
 
 : types ( class -- seq )
     [ (types) ] make-hash hash-keys natural-sort ;
@@ -60,15 +77,14 @@ DEFER: (class<)
     [ flatten-class ] 2apply hash-keys swap
     [ drop swap [ (class<) ] contains-with? ] hash-all-with? ;
 
-: class-empty? ( class -- ? )
-    members dup [ empty? ] when ;
+: class-empty? ( class -- ? ) members dup [ empty? ] when ;
 
 : (class<) ( class1 class2 -- ? )
     {
         { [ 2dup eq? ] [ 2drop t ] }
         { [ over class-empty? ] [ 2drop t ] }
         { [ 2dup superclass< ] [ 2drop t ] }
-        { [ 2dup [ members ] 2apply or not ] [ 2drop f ] }
+        { [ 2dup [ union-class? not ] both? ] [ 2drop f ] }
         { [ t ] [ union-class< ] }
     } cond ;
 
@@ -81,11 +97,8 @@ DEFER: (class<)
 : lookup-union ( classes -- class )
     typemap get hash [ object ] unless* ;
 
-: types* ( class -- classes )
-    types [ type>class dup ] map>hash ;
-
 : (class-or) ( class class -- class )
-    [ types* ] 2apply hash-union lookup-union ;
+    [ explode-class ] 2apply hash-union lookup-union ;
 
 : class-or ( class1 class2 -- class )
     {
@@ -95,12 +108,16 @@ DEFER: (class<)
     } cond ;
 
 : (class-and) ( class class -- class )
-    [ types* ] 2apply hash-intersect lookup-union ;
+    [ explode-class ] 2apply hash-intersect lookup-union ;
+
+: tuple-class-and ( class1 class2 -- class )
+    dupd eq? [ drop null ] unless ;
 
 : class-and ( class1 class2 -- class )
     {
         { [ 2dup class< ] [ drop ] }
         { [ 2dup swap class< ] [ nip ] }
+        { [ 2dup [ tuple-class? ] both? ] [ tuple-class-and ] }
         { [ t ] [ (class-and) ] }
     } cond ;
 
@@ -129,33 +146,41 @@ DEFER: (class<)
     [ dupd class<map get hash set-hash ] each-with ;
 
 : define-class ( class -- )
+    dup intern-symbol
     dup t "class" set-word-prop
     dup dup flatten-class typemap get set-hash
     dup smaller-classes+ bigger-classes+ ;
 
 ! Predicate classes for generalized predicate dispatch.
-: define-predicate-class ( class predicate definition -- )
-    pick define-class
-    3dup nip "definition" set-word-prop
-    pick superclass "predicate" word-prop
-    [ \ dup , % , [ drop f ] , \ if , ] [ ] make
-    define-predicate ;
+: predicate-quot ( class -- quot )
+    [
+        \ dup ,
+        dup superclass "predicate" word-prop %
+        "definition" word-prop , [ drop f ] , \ if ,
+    ] [ ] make ;
 
-PREDICATE: class predicate "definition" word-prop ;
+: define-predicate-class ( superclass class definition -- )
+    >r tuck set-superclass dup r> "definition" set-word-prop
+    dup dup predicate-word over predicate-quot define-predicate
+    define-class ;
+
+PREDICATE: class predicate-class "definition" word-prop ;
 
 ! Union classes for dispatch on multiple classes.
-: union-predicate ( seq -- quot )
-    [ dup ] swap [ "predicate" word-prop append ] map-with
-    [ [ drop t ] 2array ] map [ drop f ] swap alist>quot ;
+: union-predicate-quot ( seq -- quot )
+    [ "predicate" word-prop \ dup add* [ drop t ] 2array ] map
+    [ drop f ] swap alist>quot ;
 
 : set-members ( class members -- )
     [ bootstrap-word ] map "members" set-word-prop ;
 
-: define-union ( class predicate members -- )
-    3dup nip set-members pick define-class
-    union-predicate define-predicate ;
+: (define-union-class) ( class members -- )
+    dupd set-members define-class ;
 
-PREDICATE: class union members ;
+: define-union-class ( class members -- )
+    2dup (define-union-class)
+    >r dup predicate-word r>
+    union-predicate-quot define-predicate ;
 
 ! Definition protocol
 : smaller-classes- ( class -- )

@@ -17,7 +17,7 @@ TUPLE: mapping tuple table fields one-to-one one-to-many   ;
 
 : sanitize ( string -- string ) 
     #! Convert a string so it can be used as a table or field name.
-    "_p" "-?" pick subst ;
+    clone "_p" "-?" pick subst ;
 
 : tuple-fields ( class -- seq )
   #! Given a tuple class return a list of the fields

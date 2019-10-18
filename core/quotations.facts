@@ -1,5 +1,5 @@
 IN: kernel
-USING: arrays help strings vectors ;
+USING: arrays help strings sbufs vectors ;
 
 HELP: quotation
 { $description "The class of quotations. See " { $link "syntax-quots" } " for syntax and " { $link "quotations" } " for general information." } ;

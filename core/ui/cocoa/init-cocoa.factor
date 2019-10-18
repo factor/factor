@@ -21,6 +21,7 @@ USING: cocoa compiler io kernel objc sequences words ;
     "NSNotificationCenter"
     "NSObject"
     "NSOpenGLContext"
+    "NSOpenGLPixelFormat"
     "NSOpenGLView"
     "NSOpenPanel"
     "NSPasteboard"

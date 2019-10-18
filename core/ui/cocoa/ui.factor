@@ -9,9 +9,7 @@ gadgets-workspace hashtables kernel memory namespaces objc
 sequences errors freetype help timers ;
 
 : finder-run-files ( alien -- )
-    #! We filter out the image name since that might be there on
-    #! first launch.
-    CF>string-array [ image = not ] subset listener-run-files
+    CF>string-array listener-run-files
     NSApp NSApplicationDelegateReplySuccess
     -> replyToOpenOrPrint: ;
 

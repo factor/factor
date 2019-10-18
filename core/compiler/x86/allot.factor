@@ -1,12 +1,12 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: compiler
-USING: kernel assembler kernel-internals namespaces math ;
+IN: generator
+USING: kernel assembler-x86 kernel-internals namespaces math ;
 
 : load-zone-ptr ( -- )
     #! Load pointer to start of zone array
     allot-tmp-reg 0 MOV
-    "generations" f rel-absolute-cell rel-dlsym
+    "nursery" f rc-absolute-cell rel-dlsym
     allot-tmp-reg allot-tmp-reg [] MOV ;
 
 : load-allot-ptr ( -- )
@@ -30,8 +30,9 @@ USING: kernel assembler kernel-internals namespaces math ;
     r> inc-allot-ptr
     allot-tmp-reg POP ; inline
 
-: %allot-float ( loc vreg -- )
+: %move-float>int ( dst src -- )
     #! Only called by pentium4 backend, uses SSE2 instruction
+    #! dest is a loc or a vreg
     float-tag 16 [
         allot-tmp-reg 8 [+] swap v>operand MOVSD
         allot-tmp-reg float-tag OR
@@ -64,39 +65,6 @@ USING: kernel assembler kernel-internals namespaces math ;
             allot-tmp-reg 2 cells [+] 0 MOV ! positive sign
             "end" resolve-label
             allot-tmp-reg 3 cells [+] swap MOV
-            allot-tmp-reg bignum-tag OR
-            allot-tmp-reg MOV
-        ] %allot-bignum
-    ] with-scope ;
-
-: bignum-radix-mask 1 cell 2 - shift 1- ;
-
-: %allot-bignum-signed-2 ( reg1 reg2 -- )
-    #! this word has some hairy restrictions; its really only
-    #! intended to be used by fixnum*.
-    #! - reg1 and reg2 together form a 60-bit signed quantity
-    #!   (product of two 29-bit fixnums cannot exceed this)
-    #! - the quantity must be non-zero
-    #!   (if the product of two fixnums is zero, there's no
-    #!   overflow so this word won't be called in that case)
-    #! exits with tagged ptr to bignum in reg1
-    [
-        "positive" define-label
-        "end" define-label
-        2 [
-            0 pick CMP
-            "positive" get JGE
-            allot-tmp-reg 2 cells [+] 1 MOV
-            over NOT
-            dup -1 IMUL2
-            "end" get JMP
-            "positive" resolve-label
-            allot-tmp-reg 2 cells [+] 0 MOV
-            "end" resolve-label
-            dup bignum-radix-mask AND
-            allot-tmp-reg 3 cells [+] swap MOV
-            dup bignum-radix-mask AND
-            allot-tmp-reg 4 cells [+] over MOV
             allot-tmp-reg bignum-tag OR
             allot-tmp-reg MOV
         ] %allot-bignum

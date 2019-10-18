@@ -1,4 +1,4 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
 USING: kernel math namespaces opengl sequences ;
@@ -15,11 +15,12 @@ SYMBOL: grid-dim
     grid-dim get swap rot set-axis ;
 
 : draw-grid-lines ( gaps orientation -- )
-    swap grid-positions grid get rect-dim { 1 0 } v- add
-    [ grid-line-from/to gl-line ] each-with ;
+    swap grid-positions grid get rect-dim add
+    [ grid-line-from/to { 0.5 0.5 } v+ gl-line ] each-with ;
 
 M: grid-lines draw-boundary
     origin get [
+        -0.5 -0.5 0.0 glTranslated
         grid-lines-color gl-color [
             grid get rect-dim half-gap v- grid-dim set
             { 0 1 } draw-grid-lines

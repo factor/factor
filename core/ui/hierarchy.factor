@@ -74,9 +74,8 @@ M: gadget ungraft* drop ;
 : build-spec ( spec quot -- )
     swap (build-spec) call ;
 
-\ build-spec 2 0 <effect> "inferred-effect" set-word-prop
-
 \ build-spec [
+    2 ensure-values
     pop-literal pop-literal nip (build-spec) infer-quot-value
 ] "infer" set-word-prop
 

@@ -2,7 +2,7 @@ USING: hashtables hashtables-internals help io-internals kernel
 kernel-internals namespaces queues ;
 
 ARTICLE: "hashtables" "Hashtables"
-"A hashtable provides efficient (expected constant time) lookup and storage of key/value pairs. Keys are compared for equality, and a hashing function is used to reduce the number of comparisons made."
+"A hashtable provides efficient (expected constant time) lookup and storage of key/value pairs. Keys are compared for equality, and a hashing function is used to reduce the number of comparisons made. The literal syntax is covered in " { $link "syntax-hashtables" } "."
 $terpri
 "Hashtable words are in the " { $vocab-link "hashtables" } " vocabulary. Unsafe implementation words are in the " { $vocab-link "hashtables-internals" } " vocabulary."
 $terpri
@@ -49,6 +49,7 @@ ARTICLE: "hashtables-query" "Querying hashtables"
 ARTICLE: "hashtables-combinators" "Hashtable combinators"
 "We have the standard functional programming idioms."
 { $subsection hash-each }
+{ $subsection hash-map }
 { $subsection hash-all? }
 { $subsection hash-subset }
 "There are curried forms of the above."
@@ -64,13 +65,12 @@ ARTICLE: "hashtables-combinators" "Hashtable combinators"
 ARTICLE: "hashtables-sets" "Set-theoretic operations on hashtables"
 "Set-theoretic operations exploit the expected constant lookup time of a hashtable."
 { $subsection hash-intersect }
-{ $subsection hash-diff }
 { $subsection hash-union }
 { $subsection hash-update }
 { $subsection remove-all } ;
 
 ARTICLE: "hashtables-assoc" "Hashtables and association lists"
-"Hashtables can be convertedd to " { $link "sequences-assoc" } ", and vice versa:"
+"Hashtables can be converted to " { $link "sequences-assoc" } ", and vice versa:"
 { $subsection hash>alist }
 { $subsection alist>hash } ;
 

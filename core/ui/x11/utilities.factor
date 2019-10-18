@@ -4,10 +4,6 @@ IN: x11
 USING: alien arrays errors gadgets hashtables io kernel math
 namespaces prettyprint sequences threads ;
 
-: >int-array ( seq -- <int-array> )
-    dup length dup "int" <c-array> -rot
-    [ pick set-int-nth ] 2each ;
-
 SYMBOL: dpy
 SYMBOL: scr
 SYMBOL: root

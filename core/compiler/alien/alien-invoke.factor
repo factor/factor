@@ -1,22 +1,17 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
-USING: arrays assembler compiler errors generic hashtables
+USING: arrays generator errors generic hashtables
 inference io kernel kernel-internals math namespaces parser
 prettyprint sequences strings words ;
 
 TUPLE: alien-invoke library function return parameters ;
 
-GENERIC: alien-invoke-abi ( node -- string )
-
-M: alien-invoke alien-invoke-abi
-    alien-invoke-library library-abi ;
+M: alien-invoke alien-node-parameters alien-invoke-parameters ;
+M: alien-invoke alien-node-return alien-invoke-return ;
+M: alien-invoke alien-node-abi alien-invoke-library library-abi ;
 
 C: alien-invoke make-node ;
-
-: alien-invoke-stack ( node -- )
-    dup alien-invoke-parameters over consume-values
-    dup alien-invoke-return "void" = 0 1 ? swap produce-values ;
 
 : alien-invoke-dlsym ( node -- symbol dll )
     dup alien-invoke-function swap alien-invoke-library
@@ -34,56 +29,37 @@ M: alien-invoke-error summary
     [ alien-invoke-dlsym dlsym drop ]
     [ inference-warning ] recover ;
 
-\ alien-invoke [ string object string object ] [ ] <effect>
-"inferred-effect" set-word-prop
-
 \ alien-invoke [
+    ! Four literals
+    4 ensure-values
     empty-node <alien-invoke>
+    ! Compile-time parameters
     pop-literal nip over set-alien-invoke-parameters
     pop-literal nip over set-alien-invoke-function
     pop-literal nip over set-alien-invoke-library
     pop-literal nip over set-alien-invoke-return
-    dup alien-invoke-parameters make-prep-quot infer-quot
+    ! Quotation which coerces parameters to required types
+    dup make-prep-quot infer-quot
+    ! If symbol doesn't resolve, no stack effect, no compile
     dup ensure-dlsym
+    ! Add node to IR
     dup node,
-    alien-invoke-stack
+    ! Magic #: consume exactly the number of inputs
+    0 alien-invoke-stack
 ] "infer" set-word-prop
-
-: unbox-parameters ( parameters -- )
-    [ c-type c-type-unbox ] reverse-each-parameter ;
-
-: objects>registers ( parameters -- )
-    #! Generate code for boxing a list of C types, then generate
-    #! code for moving these parameters to register on
-    #! architectures where parameters are passed in registers
-    #! (PowerPC, AMD64).
-    dup unbox-parameters
-    "save_stacks" f %alien-invoke
-    \ %stack>freg move-parameters ;
-
-: box-return ( ctype -- )
-    [ ] [ f swap c-type c-type-box ] if-void ;
-
-: generate-invoke-cleanup ( node -- )
-    dup alien-invoke-abi "stdcall" = [
-        drop
-    ] [
-        alien-invoke-parameters stack-space %cleanup
-    ] if ;
 
 M: alien-invoke generate-node
     end-basic-block
-    dup alien-invoke-parameters objects>registers
+    dup objects>registers
     dup alien-invoke-dlsym %alien-invoke
-    dup generate-invoke-cleanup
-    alien-invoke-return box-return
+    dup %cleanup
+    box-return*
     iterate-next ;
 
-M: alien-invoke stack-reserve*
-    alien-invoke-parameters stack-space ;
+M: alien-invoke stack-frame-size* alien-invoke-frame ;
 
 : parse-arglist ( return seq -- types effect )
-    2 group unpair
+    2 <groups> unpair
     rot dup "void" = [ drop { } ] [ 1array ] if <effect> ;
 
 : (define-c-word) ( type lib func types stack-effect -- )

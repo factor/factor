@@ -3,7 +3,7 @@ USING: compiler hashtables kernel math memory namespaces
 sequences strings test ;
 
 : hash-bench-step ( hash elt -- )
-    3 random-int {
+    3 random {
         { [ dup 0 = ] [ drop dup rot set-hash ] }
         { [ dup 1 = ] [ drop swap remove-hash ] }
         { [ dup 2 = ] [ drop swap hash drop ] }

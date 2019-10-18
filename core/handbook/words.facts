@@ -28,7 +28,9 @@ $terpri
 { $subsection lookup }
 "Words can output their name and vocabulary:"
 { $subsection word-name }
-{ $subsection word-vocabulary } ;
+{ $subsection word-vocabulary }
+"Testing if a word object is part of a vocabulary:"
+{ $subsection interned? } ;
 
 ARTICLE: "word-definition" "Defining words"
 "There are two approaches to creating word definitions:"
@@ -41,12 +43,13 @@ ARTICLE: "word-definition" "Defining words"
 { $subsection "symbols" }
 { $subsection "primitives" }
 { $subsection "deferred" }
-{ $subsection "undefining" }
-{ $subsection "declarations" } ;
+{ $subsection "declarations" }
+"Words implement the definition protocol; see " { $link "definitions" } "." ;
 
 ARTICLE: "colon-definition" "Compound definitions"
 "A compound definition associates a word name with a quotation that is called when the word is executed."
 { $subsection POSTPONE: : }
+{ $subsection POSTPONE: ; }
 { $subsection define-compound }
 { $subsection compound? }
 { $subsection compound }
@@ -67,11 +70,6 @@ ARTICLE: "deferred" "Deferred words and mutual recursion"
 { $subsection POSTPONE: DEFER: }
 { $subsection undefined? }
 { $subsection undefined } ;
-
-ARTICLE: "undefining" "Undefining words"
-{ $subsection POSTPONE: FORGET: }
-{ $subsection forget }
-{ $subsection interned? } ;
 
 ARTICLE: "declarations" "Declarations"
 "Declarations give special behavior to a word. Declarations are parsing words that set a word property in the most recently defined word."

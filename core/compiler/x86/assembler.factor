@@ -1,8 +1,8 @@
-! Copyright (C) 2005 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays compiler errors generic io kernel kernel-internals
-math namespaces parser sequences words ;
-IN: assembler
+USING: arrays generator errors generic io kernel
+kernel-internals math namespaces parser sequences words ;
+IN: assembler-x86
 
 ! A postfix assembler for x86 and AMD64.
 
@@ -10,8 +10,10 @@ IN: assembler
 ! In 64-bit mode, { 1234 } is RIP-relative.
 ! Beware!
 
-: 4, 4 >le % ; inline
-: cell, cell >le % ; inline
+: n, >le % ; inline
+: 4, 4 n, ; inline
+: 2, 2 n, ; inline
+: cell, cell n, ; inline
 
 #! Extended AMD64 registers (R8-R15) return true.
 GENERIC: extended? ( op -- ? )
@@ -227,7 +229,7 @@ UNION: operand register indirect ;
     dup BIN: 01000000 = [ drop ] [ , ] if ;
 
 : 16-prefix ( reg r/m -- )
-    [ register-16? ] 2apply or [ HEX: 66 , ] when ;
+    [ register-16? ] either? [ HEX: 66 , ] when ;
 
 : prefix ( reg r/m rex.w -- ) pick pick 16-prefix rex-prefix ;
 
@@ -263,14 +265,10 @@ UNION: operand register indirect ;
     pick register? [ BIN: 10 bitor swapd ] when
     >r 2dup t prefix r> , reg-code swap addressing ;
 
-PREDICATE: word callable register? not ;
-
 ! Moving stuff
 GENERIC: PUSH ( op -- )
 M: register PUSH f HEX: 50 short-operand ;
 M: integer PUSH HEX: 68 , 4, ;
-M: callable PUSH 0 PUSH rel-absolute rel-word ;
-M: label PUSH 0 PUSH rel-absolute rel-label ;
 M: operand PUSH BIN: 110 f HEX: ff 1-operand ;
 
 GENERIC: POP ( op -- )
@@ -282,27 +280,30 @@ GENERIC: (MOV-I) ( src dst -- )
 M: register (MOV-I) t HEX: b8 short-operand cell, ;
 M: operand (MOV-I) BIN: 000 t HEX: c7 1-operand 4, ;
 
+PREDICATE: word callable register? not ;
+
 GENERIC: MOV ( dst src -- )
 M: integer MOV swap (MOV-I) ;
-M: callable MOV 0 rot (MOV-I) rel-absolute-cell rel-word ;
-M: label MOV 0 rot (MOV-I) rel-absolute-cell rel-label ;
+M: callable MOV 0 rot (MOV-I) rc-absolute-cell rel-word ;
 M: operand MOV HEX: 89 2-operand ;
+
+: LEA ( dst src -- ) swap HEX: 8d 2-operand ;
 
 ! Control flow
 GENERIC: JMP ( op -- )
-: (JMP) HEX: e9 , 0 4, rel-relative ;
+: (JMP) HEX: e9 , 0 4, rc-relative ;
 M: callable JMP (JMP) rel-word ;
 M: label JMP (JMP) rel-label ;
 M: operand JMP BIN: 100 t HEX: ff 1-operand ;
 
 GENERIC: CALL ( op -- )
-: (CALL) HEX: e8 , 0 4, rel-relative ;
+: (CALL) HEX: e8 , 0 4, rc-relative ;
 M: callable CALL (CALL) rel-word ;
 M: label CALL (CALL) rel-label ;
 M: operand CALL BIN: 010 t HEX: ff 1-operand ;
 
 G: JUMPcc ( addr opcode -- ) 1 standard-combination ;
-: (JUMPcc) HEX: 0f , , 0 4, rel-relative ;
+: (JUMPcc) HEX: 0f , , 0 4, rc-relative ;
 M: callable JUMPcc (JUMPcc) rel-word ;
 M: label JUMPcc (JUMPcc) rel-label ;
 
@@ -324,7 +325,11 @@ M: label JUMPcc (JUMPcc) rel-label ;
 : JG  HEX: 8f JUMPcc ;
 
 : LEAVE ( -- ) HEX: c9 , ;
-: RET ( -- ) HEX: c3 , ;
+
+: RET ( n -- )
+    dup zero? [ drop HEX: c3 , ] [ HEX: C2 , 2, ] if ;
+
+: CPUID ( -- ) HEX: 0f , HEX: a2 , ;
 
 ! Arithmetic
 
@@ -380,6 +385,10 @@ M: integer IMUL2 swap dup reg-code t HEX: 69 immediate-1/4 ;
 : SHL ( dst n -- ) swap BIN: 100 t HEX: c1 immediate-1 ;
 : SHR ( dst n -- ) swap BIN: 101 t HEX: c1 immediate-1 ;
 : SAR ( dst n -- ) swap BIN: 111 t HEX: c1 immediate-1 ;
+
+! CPU Identification
+
+: CPUID HEX: 0f , HEX: a2 ,  ;
 
 ! x87 Floating Point Unit
 

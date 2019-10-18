@@ -1,8 +1,8 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: definitions gadgets gadgets-browser
-gadgets-help gadgets-listener gadgets-search gadgets-text
+USING: definitions gadgets gadgets-browser gadgets-help
+gadgets-listener gadgets-search gadgets-text gadgets-interactor
 gadgets-workspace hashtables help inference kernel namespaces
 parser prettyprint scratchpad sequences strings styles syntax
 test tools words generic models io modules errors ;
@@ -72,6 +72,11 @@ M: operation invoke-command
     { +listener+ t }
 } define-operation
 
+[ drop t ] H{
+    { +name+ "Edit object" }
+    { +quot+ [ unparse <input> listener-gadget call-tool ] }
+} define-operation
+
 ! Input
 [ input? ] H{
     { +primary+ t }
@@ -104,13 +109,30 @@ M: operation invoke-command
     { +listener+ t }
 } define-operation
 
+: definition-operations ( pred -- )
+    {
+        H{
+            { +primary+ t }
+            { +name+ "Browse" }
+            { +keyboard+ T{ key-down f { A+ } "b" } }
+            { +quot+ [ browser call-tool ] }
+        } H{
+            { +name+ "Edit" }
+            { +keyboard+ T{ key-down f { A+ } "e" } }
+            { +quot+ [ edit ] }
+        } H{
+            { +name+ "Reload" }
+            { +keyboard+ T{ key-down f { A+ } "r" } }
+            { +quot+ [ reload ] }
+            { +listener+ t }
+        } H{
+            { +name+ "Forget" }
+            { +quot+ [ forget ] }
+        }
+    } [ define-operation ] each-with ;
+
 ! Words
-[ word? ] H{
-    { +primary+ t }
-    { +name+ "Browse" }
-    { +keyboard+ T{ key-down f { A+ } "b" } }
-    { +quot+ [ browser call-tool ] }
-} define-operation
+[ word? ] definition-operations
 
 : word-completion-string ( word listener -- string )
     >r dup word-name swap word-vocabulary dup vocab r>
@@ -128,12 +150,6 @@ M: operation invoke-command
 } define-operation
 
 [ word? ] H{
-    { +name+ "Edit" }
-    { +keyboard+ T{ key-down f { A+ } "e" } }
-    { +quot+ [ edit ] }
-} define-operation
-
-[ word? ] H{
     { +name+ "Documentation" }
     { +keyboard+ T{ key-down f { A+ } "h" } }
     { +quot+ [ help-gadget call-tool ] }
@@ -147,20 +163,8 @@ M: operation invoke-command
 } define-operation
 
 [ word? ] H{
-    { +name+ "Reload" }
-    { +keyboard+ T{ key-down f { A+ } "r" } }
-    { +quot+ [ reload ] }
-    { +listener+ t }
-} define-operation
-
-[ word? ] H{
     { +name+ "Watch" }
     { +quot+ [ watch ] }
-} define-operation
-
-[ word? ] H{
-    { +name+ "Forget" }
-    { +quot+ [ forget ] }
 } define-operation
 
 [ compound? ] H{
@@ -168,6 +172,9 @@ M: operation invoke-command
     { +quot+ [ word-def infer. ] }
     { +listener+ t }
 } define-operation
+
+! Methods
+[ method-spec? ] definition-operations
 
 ! Vocabularies
 [ vocab-link? ] H{
@@ -222,11 +229,14 @@ M: operation invoke-command
     { +quot+ [ edit ] }
 } define-operation
 
+: browse-module ( module -- )
+    get-workspace swap show-module-files ;
+
 [ module? ] H{
     { +primary+ t }
     { +name+ "Browse" }
     { +keyboard+ T{ key-down f { A+ } "b" } }
-    { +quot+ [ get-workspace swap show-module-files ] }
+    { +quot+ [ browse-module ] }
 } define-operation
 
 [ module? ] H{
@@ -237,12 +247,12 @@ M: operation invoke-command
 [ module? ] H{
     { +name+ "Test" }
     { +quot+ [ module-name test-module ] }
+    { +keyboard+ T{ key-down f { A+ } "t" } }
     { +listener+ t }
 } define-operation
 
 ! Module links
 [ module-link? ] H{
-    { +primary+ t }
     { +secondary+ t }
     { +name+ "Run" }
     { +quot+ [ module-name run-module ] }
@@ -252,6 +262,14 @@ M: operation invoke-command
 [ module-link? ] H{
     { +name+ "Load" }
     { +quot+ [ module-name require ] }
+    { +listener+ t }
+} define-operation
+
+[ module-link? ] H{
+    { +primary+ t }
+    { +name+ "Browse" }
+    { +keyboard+ T{ key-down f { A+ } "b" } }
+    { +quot+ [ module-name dup require module browse-module ] }
     { +listener+ t }
 } define-operation
 
@@ -307,7 +325,9 @@ M: operation invoke-command
 
 ! Interactor commands
 : quot-action ( interactor -- quot )
-    dup editor-string swap select-all ;
+    dup editor-string swap
+    2dup add-interactor-history
+    select-all ;
 
 interactor "words"
 { word compound } [ class-operations ] map concat

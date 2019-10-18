@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: math
 USING: arrays generic kernel sequences ;
@@ -6,7 +6,7 @@ USING: arrays generic kernel sequences ;
 : vneg ( u -- v ) [ neg ] map ;
 
 : n*v ( n u -- v ) [ * ] map-with ;
-: v*n ( n u -- v ) swap n*v ;
+: v*n ( u n -- v ) swap n*v ;
 : n/v ( n u -- v ) [ / ] map-with ;
 : v/n ( u n -- v ) swap [ swap / ] map-with ;
 
@@ -29,5 +29,5 @@ USING: arrays generic kernel sequences ;
 : sum ( seq -- n ) 0 [ + ] reduce ;
 : product ( seq -- n ) 1 [ * ] reduce ;
 
-: infimum ( seq -- n ) 1./0. [ min ] reduce ;
-: supremum ( seq -- n ) -1./0. [ max ] reduce ;
+: infimum ( seq -- n ) dup first [ min ] reduce ;
+: supremum ( seq -- n ) dup second [ max ] reduce ;

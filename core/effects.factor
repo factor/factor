@@ -21,16 +21,13 @@ C: effect
     2dup [ effect-in length ] 2apply <= >r
     [ effect-height ] 2apply number= r> and r> and ;
 
+GENERIC: (stack-picture) ( obj -- str )
+M: string (stack-picture) ;
+M: word (stack-picture) word-name ;
+M: integer (stack-picture) drop "object" ;
+
 : stack-picture ( seq -- string )
-    [
-        [
-            {
-                { [ dup string? ] [ ] }
-                { [ dup word? ] [ word-name ] }
-                { [ dup integer? ] [ drop "object" ] }
-            } cond % CHAR: \s ,
-        ] each
-    ] "" make ;
+    [ [ (stack-picture) % CHAR: \s , ] each ] "" make ;
 
 : effect>string ( effect -- string )
     [

@@ -1,19 +1,22 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays errors generic hashtables kernel
 math math-internals namespaces parser prettyprint sequences
 strings vectors words ;
 IN: inference
 
+: (consume-values) ( n -- )
+    meta-d get [ length swap - ] keep set-length ;
+
 : consume-values ( seq node -- )
     >r length r>
     over ensure-values
     over 0 rot node-inputs
-    meta-d get [ length swap - ] keep set-length ;
+    (consume-values) ;
 
 : produce-values ( seq node -- )
     >r [ drop <computed> ] map dup r> set-node-out-d
-    meta-d get swap nappend ;
+    meta-d get nappend ;
 
 : recursing? ( word -- label/f )
     recursive-state get <reversed> assoc ;
@@ -48,14 +51,11 @@ TUPLE: no-effect word ;
 : add-recursive-state ( word label -- )
     2array recursive-state [ swap add ] change ;
 
-: block-label ( word -- newword )
-    word-name " - inlined" append f <word> ;
-
 : inline-block ( word -- node-block data )
     [
         copy-inference nest-node
-        dup block-label 2dup add-recursive-state
-        #label >r word-def infer-quot r>
+        gensym 2dup add-recursive-state
+        over >r #label r> word-def infer-quot
         unnest-node
     ] make-hash ;
 
@@ -68,14 +68,15 @@ GENERIC: collect-recursion* ( label node -- )
 M: node collect-recursion* 2drop ;
 
 M: #call-label collect-recursion*
-    tuck node-param eq? [ node-in-d , ] [ drop ] if ;
+    tuck node-param eq? [ , ] [ drop ] if ;
 
 : collect-recursion ( #label -- seq )
     dup node-param swap
     [ [ collect-recursion* ] each-node-with ] { } make ;
 
 : join-values ( node -- )
-    collect-recursion meta-d get add unify-lengths unify-stacks
+    collect-recursion [ node-in-d ] map meta-d get add
+    unify-lengths unify-stacks
     meta-d [ length tail* >vector ] change ;
 
 : splice-node ( node -- )
@@ -88,7 +89,7 @@ M: #call-label collect-recursion*
     dup inline-block over recursive-label? [
         meta-d get >r
         drop join-values inline-block apply-infer
-        r> over 2dup set-node-out-d set-node-in-d node,
+        r> over set-node-in-d node,
     ] [
         apply-infer node-child node-successor splice-node drop
     ] if ;
@@ -121,13 +122,8 @@ TUPLE: effect-error word effect ;
     "inferred-effect" set-word-prop ;
 
 : finish-word ( word -- effect vars )
-    current-effect inferred-vars get
-    pick custom-infer? [
-        rot drop
-    ] [
-        >r 2dup check-effect r>
-        [ save-inferred-data ] 2keep
-    ] if ;
+    current-effect 2dup check-effect
+    inferred-vars get [ save-inferred-data ] 2keep ;
 
 M: compound infer-word
     [ dup infer-compound [ finish-word ] bind ]
@@ -136,7 +132,6 @@ M: compound infer-word
 : custom-infer ( word -- )
     #! Customized inference behavior
     dup "inferred-vars" word-prop apply-vars
-    dup "inferred-effect" word-prop effect-in ensure-values
     "infer" word-prop call ;
 
 : apply-effect/vars ( word effect vars -- )
@@ -149,8 +144,8 @@ M: compound infer-word
 
 : default-apply-word ( word -- )
     {
-        { [ dup "no-effect" word-prop ] [ no-effect ] }
         { [ dup "infer" word-prop ] [ custom-infer ] }
+        { [ dup "no-effect" word-prop ] [ no-effect ] }
         { [ dup "inferred-effect" word-prop ] [ cached-infer ] }
         { [ t ] [ dup infer-word apply-effect/vars ] }
     } cond ;
@@ -168,22 +163,18 @@ TUPLE: recursive-declare-error word ;
         <recursive-declare-error> inference-error
     ] if* ;
 
+: recursive-inline? ( word -- ? )
+    recursive-state get dup empty?
+    [ 2drop f ] [ peek first eq? ] if ;
+
 : apply-inline ( word -- )
-    dup recursive-state get peek first eq?
+    dup recursive-inline?
     [ declared-infer ] [ inline-closure ] if ;
 
 : apply-compound ( word -- )
     dup recursing?
     [ declared-infer ] [ default-apply-word ] if ;
 
-: custom-infer-vars ( word -- )
-    dup "infer-vars" word-prop dup [
-        swap "inferred-effect" word-prop effect-in ensure-values
-        call
-    ] [
-        2drop
-    ] if ;
-
 M: compound apply-word
-    dup custom-infer-vars
+    dup "infer-vars" word-prop call
     [ apply-inline ] [ apply-compound ] if-inline ;

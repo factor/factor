@@ -3,10 +3,10 @@
 IN: io
 USING: kernel math sequences strings ;
 
-: be> ( seq -- x ) 0 [ >r 8 shift r> bitor ] reduce ;
+: be> ( seq -- x ) 0 [ swap 8 shift bitor ] reduce ;
 : le> ( seq -- x ) <reversed> be> ;
 
 : nth-byte ( x n -- b ) -8 * shift HEX: ff bitand ;
 
 : >le ( x n -- str ) [ nth-byte ] map-with >string ;
-: >be ( x n -- str ) >le reverse ;
+: >be ( x n -- str ) >le dup nreverse ;

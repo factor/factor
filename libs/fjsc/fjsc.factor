@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel lazy-lists parser-combinators strings math sequences namespaces io words arrays ;
+USING: kernel lazy-lists parser-combinators strings math sequences namespaces io words arrays hashtables ;
 IN: fjsc
 
 TUPLE: ast-number value ;
@@ -14,6 +14,10 @@ TUPLE: ast-expression values ;
 TUPLE: ast-word value vocab ;
 TUPLE: ast-comment ;
 TUPLE: ast-stack-effect in out ;
+TUPLE: ast-use name ;
+TUPLE: ast-using names ;
+TUPLE: ast-in name ;
+TUPLE: ast-hashtable elements ;
 
 : identifier-middle? ( ch -- bool )
   [ blank? not ] keep
@@ -91,11 +95,36 @@ LAZY: 'comment' ( -- parser )
     dup CHAR: \n = swap CHAR: \r = or not
   ] satisfy <*> <&> [ drop <ast-comment> ] <@ ;
 
+LAZY: 'USE:' ( -- parser )
+  "USE:" token sp
+  'identifier' sp &> [ ast-identifier-value <ast-use> ] <@ ;
+
+LAZY: 'IN:' ( -- parser )
+  "IN:" token sp
+  'identifier' sp &> [ ast-identifier-value <ast-in> ] <@ ;
+
+LAZY: 'USING:' ( -- parser )
+  "USING:" token sp
+  'identifier' sp [ ast-identifier-value ] <@ <+> &>
+  ";" token sp <& [ <ast-using> ] <@ ;
+
+LAZY: 'hashtable' ( -- parser )
+  "H{" token sp 
+  'expression' [ ast-expression-values ] <@ &>
+  "}" token sp <& [ <ast-hashtable> ] <@ ;
+
+LAZY: 'parsing-word' ( -- parser )
+  'USE:'
+  'USING:' <|>
+  'IN:' <|> ;
+
 LAZY: 'expression' ( -- parser )
   'comment' 
+  'parsing-word' sp <|> 
   'quotation' sp <|> 
   'define' sp <|>
   'array' sp <|>
+  'hashtable' sp <|>
   'word' sp <|>
   'atom' sp <|> 
   <*> [ <ast-expression> ] <@ ;
@@ -178,6 +207,14 @@ M: ast-array (literal)
 M: ast-array (compile)   
   "factor.push_data(" , (literal) "," , ;
 
+M: ast-hashtable (literal)   
+  "new Hashtable().fromAlist([" ,  
+  ast-hashtable-elements [ (literal) ] [ "," , ] interleave
+  "])" , ;
+
+M: ast-hashtable (compile)   
+  "factor.push_data(" , (literal) "," , ;
+
 
 M: ast-expression (literal)
   ast-expression-values [
@@ -209,6 +246,25 @@ M: ast-comment (compile)
 M: ast-stack-effect (compile)
   drop ;
 
+M: ast-use (compile) 
+  "factor.use(\"" ,
+  ast-use-name , 
+  "\"," , ;
+
+M: ast-in (compile) 
+  "factor.set_in(\"" ,
+  ast-in-name , 
+  "\"," , ;
+
+M: ast-using (compile) 
+  "factor.using([" ,
+  ast-using-names [
+    "\"" , , "\"" ,
+  ] [
+    "," ,
+  ] interleave
+  "]," , ;
+
 GENERIC: (parse-factor-quotation) ( object -- ast )
 
 M: number (parse-factor-quotation) ( object -- ast )
@@ -232,6 +288,11 @@ M: array (parse-factor-quotation) ( object -- ast )
   [ 
     [ (parse-factor-quotation) , ] each
   ] { } make <ast-array> ;
+
+M: hashtable (parse-factor-quotation) ( object -- ast )
+  hash>alist [ 
+    [ (parse-factor-quotation) , ] each
+  ] { } make <ast-hashtable> ;
 
 M: wrapper (parse-factor-quotation) ( object -- ast )
   wrapped dup word-name swap word-vocabulary <ast-word> ;

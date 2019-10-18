@@ -1,6 +1,6 @@
 IN: alien
-USING: arrays errors help libc math words definitions
-kernel-internals ;
+USING: byte-arrays arrays errors help libc math words
+definitions kernel-internals ;
 
 ARTICLE: "c-types-numeric" "Integer and floating point C types"
 "The following numerical types are available; a " { $snippet "u" } " prefix denotes an unsigned type:"
@@ -47,7 +47,7 @@ ARTICLE: "malloc" "Manual memory management"
 "Sometimes data passed to C functions must be allocated at a fixed address, and so garbage collector managed byte arrays cannot be used. See the warning at the bottom of " { $link "byte-arrays" } " for a description of when this is the case."
 $terpri
 "Allocating a C datum with a fixed address:"
-{ $subsection <malloc-object> }
+{ $subsection malloc-object }
 "There is a set of words in the " { $vocab-link "libc" } " vocabulary which directly call C standard library memory management functions:"
 { $subsection malloc }
 { $subsection calloc }
@@ -66,15 +66,16 @@ ARTICLE: "c-strings" "C strings"
 { $table
     { "C type" "Notes" }
     { { $snippet "char*" } "8-bit per character null-terminated ASCII" }
-    { { $snippet "ushort*" } "16-bit per character null-terminated UTF16" }
+    { { $snippet "ushort*" } "16-bit per character null-terminated UCS-2" }
 }
 "Passing a Factor string to a C function expecting a C string allocates a " { $link byte-array } " in the Factor heap; the string is then converted to the requested format and a raw pointer is passed to the function. If the conversion fails, for example if the string contains null bytes or characters with values higher than 255, a " { $link c-string-error. } " is thrown."
 "Sometimes a C function has a parameter type of " { $snippet "void*" } ", and various data types, among them strings, can be passed in. In this case, strings are not automatically converted to aliens, and instead you must call one of these words:"
 { $subsection string>char-alien }
 { $subsection string>u16-alien }
-{ $subsection <malloc-string> }
-"The first two allocate " { $link byte-array } "s, and the latter allocates manually-managed memory which is not moved by the garbage collector and has to be explicitly freed:"
-{ $subsection free }
+{ $subsection malloc-char-string }
+{ $subsection malloc-u16-string }
+"The first two allocate " { $link byte-array } "s, and the latter allocates manually-managed memory which is not moved by the garbage collector and has to be explicitly freed by calling " { $link free } "."
+$terpri
 "Finally, a set of words can be used to read and write " { $snippet "char*" } " and " { $snippet "ushort*" } " strings at arbitrary addresses:"
 { $subsection alien>char-string }
 { $subsection alien>u16-string }
@@ -109,7 +110,9 @@ $terpri
     "    FIELD: uint    format_version"
     "    FIELD: int     refcount"
     "END-STRUCT"
-} ;
+}
+"C structure objects can be allocated by calling " { $link <c-object> } " or " { $link malloc-object } "."
+{ $see-also <c-array> malloc-array } ;
 
 ARTICLE: "c-unions" "C unions"
 "A " { $snippet "union" } " in C defines a type large enough to hold its largest member. This is usually used to allocate a block of memory which can hold one of several types of values."
@@ -153,9 +156,9 @@ $terpri
 ARTICLE: "c-arrays" "C arrays"
 "When calling a C function expecting an array as input, use a utility word to allocate a block of memory of the required size:"
 { $subsection <c-array> }
-{ $subsection <malloc-array> }
-"The first one allocates " { $link byte-array } "s, and the latter allocates manually-managed memory which is not moved by the garbage collector and has to be explicitly freed:"
-{ $subsection free }
+{ $subsection malloc-array }
+"The first one allocates " { $link byte-array } "s, and the latter allocates manually-managed memory which is not moved by the garbage collector and has to be explicitly freed by calling " { $link free } "."
+$terpri
 "Each C type has a pair of words, " { $snippet { $emphasis "type" } "-nth" } " and " { $snippet "set-" { $emphasis "type" } "-nth" } ", for reading and writing values of this type stored in an array. This set of words includes but is not limited to:"
 { $subsection char-nth }
 { $subsection set-char-nth }

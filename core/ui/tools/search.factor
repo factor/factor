@@ -1,8 +1,8 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-search
 USING: arrays gadgets gadgets-labels gadgets-panes
-gadgets-scrolling gadgets-text gadgets-theme
+gadgets-scrolling gadgets-text gadgets-theme gadgets-interactor
 generic help tools kernel models sequences words
 gadgets-borders gadgets-lists gadgets-workspace gadgets-listener
 namespaces parser hashtables io completion styles strings

@@ -110,7 +110,8 @@ M: workspace layout*
 
 M: workspace children-on nip gadget-children ;
 
-M: workspace focusable-child* workspace-book ;
+M: workspace focusable-child*
+    dup workspace-popup [ ] [ workspace-book ] ?if ;
 
 : workspace-window ( -- workspace )
     <workspace> dup "Factor workspace" open-window
@@ -150,6 +151,7 @@ workspace "tool-window" {
 } define-commands
 
 workspace "workflow" {
-    { "Reload changed sources" T{ key-down f f "F8" } [ drop [ reload-modules ] call-listener ] }
+    { "Reload contributed sources" T{ key-down f f "F8" } [ drop [ reload-libs ] call-listener ] }
+    { "Reload core sources" T{ key-down f { A+ } "F8" } [ drop [ reload-core ] call-listener ] }
     { "Recompile changed words" T{ key-down f { S+ } "F8" } [ drop [ recompile ] call-listener ] }
 } define-commands

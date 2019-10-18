@@ -189,27 +189,6 @@ void primitive_fixnum_not(void)
 	drepl(tag_fixnum(~untag_fixnum_fast(dpeek())));
 }
 
-#define INT_DEFBOX(name,type) \
-void name(type integer)                                                        \
-{                                                                              \
-	dpush(tag_fixnum(integer));                                            \
-}
-
-#define INT_DEFUNBOX(name,type) \
-type name(void)                                                                \
-{                                                                              \
-	return to_fixnum(dpop());                                              \
-}
-
-INT_DEFBOX(box_signed_1, signed char)
-INT_DEFBOX(box_signed_2, signed short)
-INT_DEFBOX(box_unsigned_1, unsigned char)
-INT_DEFBOX(box_unsigned_2, unsigned short)
-INT_DEFUNBOX(unbox_signed_1, signed char)
-INT_DEFUNBOX(unbox_signed_2, signed short)
-INT_DEFUNBOX(unbox_unsigned_1, unsigned char)
-INT_DEFUNBOX(unbox_unsigned_2, unsigned short) 
-
 /* Bignums */
 void primitive_fixnum_to_bignum(void)
 {
@@ -325,24 +304,24 @@ void primitive_bignum_not(void)
 		untag_bignum_fast(dpeek()))));
 }
 
-void box_signed_cell(F_FIXNUM integer)
+void box_signed_1(s8 n)
 {
-	dpush(allot_integer(integer));
+	dpush(tag_fixnum(n));
 }
 
-F_FIXNUM unbox_signed_cell(void)
+void box_unsigned_1(u8 n)
 {
-	return to_fixnum(dpop());
+	dpush(tag_fixnum(n));
 }
 
-void box_unsigned_cell(CELL cell)
+void box_signed_2(s16 n)
 {
-	dpush(allot_cell(cell));
+	dpush(tag_fixnum(n));
 }
 
-F_FIXNUM unbox_unsigned_cell(void)
+void box_unsigned_2(u16 n)
 {
-	return to_cell(dpop());
+	dpush(tag_fixnum(n));
 }
 
 void box_signed_4(s32 n)
@@ -350,19 +329,19 @@ void box_signed_4(s32 n)
 	dpush(allot_integer(n));
 }
 
-s32 unbox_signed_4(void)
-{
-	return to_fixnum(dpop());
-}
-
 void box_unsigned_4(u32 n)
 {
 	dpush(allot_cell(n));
 }
 
-u32 unbox_unsigned_4(void)
+void box_signed_cell(F_FIXNUM integer)
 {
-	return to_cell(dpop());
+	dpush(allot_integer(integer));
+}
+
+void box_unsigned_cell(CELL cell)
+{
+	dpush(allot_cell(cell));
 }
 
 void box_signed_8(s64 n)
@@ -373,10 +352,8 @@ void box_signed_8(s64 n)
 		dpush(tag_fixnum(n));
 }
 
-s64 unbox_signed_8(void)
+s64 to_signed_8(CELL obj)
 {
-	CELL obj = dpop();
-
 	switch(type_of(obj))
 	{
 	case FIXNUM_TYPE:
@@ -397,10 +374,8 @@ void box_unsigned_8(u64 n)
 		dpush(tag_fixnum(n));
 }
 
-u64 unbox_unsigned_8(void)
+u64 to_unsigned_8(CELL obj)
 {
-	CELL obj = dpop();
-
 	switch(type_of(obj))
 	{
 	case FIXNUM_TYPE:
@@ -411,6 +386,39 @@ u64 unbox_unsigned_8(void)
 		type_error(BIGNUM_TYPE,obj);
 		return -1;
 	}
+}
+
+CELL unbox_array_size(void)
+{
+	switch(type_of(dpeek()))
+	{
+	case FIXNUM_TYPE:
+		{
+			F_FIXNUM n = untag_fixnum_fast(dpeek());
+			if(n >= 0 && n < ARRAY_SIZE_MAX)
+			{
+				dpop();
+				return n;
+			}
+			break;
+		}
+	case BIGNUM_TYPE:
+		{
+			bignum_type zero = untag_bignum_fast(bignum_zero);
+			bignum_type max = s48_ulong_to_bignum(ARRAY_SIZE_MAX);
+			bignum_type n = untag_bignum_fast(dpeek());
+			if(s48_bignum_compare(n,zero) != bignum_comparison_less
+				&& s48_bignum_compare(n,max) == bignum_comparison_less)
+			{
+				dpop();
+				return s48_bignum_to_ulong(n);
+			}
+			break;
+		}
+	}
+
+	simple_error(ERROR_ARRAY_SIZE,dpop(),tag_fixnum(ARRAY_SIZE_MAX));
+	return 0; /* can't happen */
 }
 
 /* Ratios */
@@ -461,7 +469,7 @@ void primitive_str_to_float(void)
 void primitive_float_to_str(void)
 {
 	char tmp[33];
-	snprintf(tmp,32,"%.16g",unbox_double());
+	snprintf(tmp,32,"%.16g",untag_float(dpop()));
 	tmp[32] = '\0';
 	box_char_string(tmp);
 }
@@ -526,48 +534,43 @@ void primitive_float_greatereq(void)
 
 void primitive_float_bits(void)
 {
-	F_FLOAT_BITS b;
-	b.x = unbox_float();
-	box_unsigned_4(b.y);
+	box_unsigned_4(float_bits(untag_float(dpop())));
 }
 
 void primitive_bits_float(void)
 {
-	F_FLOAT_BITS b;
-	b.y = unbox_unsigned_4();
-	box_float(b.x);
+	box_float(bits_float(to_cell(dpop())));
 }
 
 void primitive_double_bits(void)
 {
-	F_DOUBLE_BITS b;
-	b.x = unbox_double();
-	box_unsigned_8(b.y);
+	box_unsigned_8(double_bits(untag_float(dpop())));
 }
 
 void primitive_bits_double(void)
 {
-	F_DOUBLE_BITS b;
-	b.y = unbox_unsigned_8();
-	box_double(b.x);
+	box_double(bits_double(to_unsigned_8(dpop())));
 }
 
-#define FLO_DEFBOX(name,type) \
-void name (type flo)                                                       \
-{                                                                              \
-	dpush(allot_float(flo));                                               \
+float to_float(CELL value)
+{
+	return untag_float(value);
 }
 
-#define FLO_DEFUNBOX(name,type) \
-type name(void)                                                                \
-{                                                                              \
-	return untag_float(dpop());                                            \
+double to_double(CELL value)
+{
+	return untag_float(value);
 }
 
-FLO_DEFBOX(box_float,float)
-FLO_DEFUNBOX(unbox_float,float)  
-FLO_DEFBOX(box_double,double)
-FLO_DEFUNBOX(unbox_double,double)
+void box_float(float flo)
+{
+        dpush(allot_float(flo));
+}
+
+void box_double(double flo)
+{
+        dpush(allot_float(flo));
+}
 
 /* Complex numbers */
 

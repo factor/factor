@@ -34,7 +34,7 @@ void ffi_dlopen(F_DLL *dll, bool error)
 	dll->dll = dllptr;
 }
 
-void *ffi_dlsym(F_DLL *dll, char *symbol, bool error)
+void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol, bool error)
 {
 	void *handle = (dll == NULL ? null_dll : dll->dll);
 	void *sym = dlsym(handle,symbol);
@@ -124,12 +124,12 @@ F_SEGMENT *alloc_segment(CELL size)
 {
 	int pagesize = getpagesize();
 
-	char *array = mmap((void*)0,pagesize + size + pagesize,
+	char *array = mmap(NULL,pagesize + size + pagesize,
 		PROT_READ | PROT_WRITE | PROT_EXEC,
 		MAP_ANON | MAP_PRIVATE,-1,0);
 
-	if(array == NULL)
-		fatal_error("Cannot allocate memory region",0);
+	if(array == (char*)-1)
+		fatal_error("Out of memory in alloc_segment",0);
 
 	if(mprotect(array,pagesize,PROT_NONE) == -1)
 		fatal_error("Cannot protect low guard page",(CELL)array);
@@ -138,9 +138,10 @@ F_SEGMENT *alloc_segment(CELL size)
 		fatal_error("Cannot protect high guard page",(CELL)array);
 
 	F_SEGMENT *retval = safe_malloc(sizeof(F_SEGMENT));
-	
+
 	retval->start = (CELL)(array + pagesize);
 	retval->size = size;
+	retval->end = retval->start + size;
 
 	return retval;
 }
@@ -153,15 +154,14 @@ void dealloc_segment(F_SEGMENT *block)
 		pagesize + block->size + pagesize);
 	
 	if(retval)
-		fatal_error("Failed to unmap region",0);
+		fatal_error("dealloc_segment failed",0);
 
 	free(block);
 }
-
-INLINE F_STACK_FRAME *uap_stack_pointer(void *uap)
+  
+INLINE F_COMPILED_FRAME *uap_stack_pointer(void *uap)
 {
-	ucontext_t *ucontext = (ucontext_t *)uap;
-	F_STACK_FRAME *ptr = (F_STACK_FRAME *)ucontext->uc_stack.ss_sp;
+	F_COMPILED_FRAME *ptr = ucontext_stack_pointer(uap);
 	if(ptr)
 		return ptr;
 	else
@@ -194,7 +194,8 @@ void unix_init_signals(void)
 	struct sigaction memory_sigaction;
 	struct sigaction misc_sigaction;
 	struct sigaction ign_sigaction;
-	
+
+	memset(&memory_sigaction,0,sizeof(struct sigaction));
 	sigemptyset(&memory_sigaction.sa_mask);
 	memory_sigaction.sa_sigaction = memory_signal_handler;
 	memory_sigaction.sa_flags = SA_SIGINFO;
@@ -202,6 +203,7 @@ void unix_init_signals(void)
 	sigaction_safe(SIGBUS,&memory_sigaction,NULL);
 	sigaction_safe(SIGSEGV,&memory_sigaction,NULL);
 
+	memset(&misc_sigaction,0,sizeof(struct sigaction));
 	sigemptyset(&misc_sigaction.sa_mask);
 	misc_sigaction.sa_sigaction = misc_signal_handler;
 	misc_sigaction.sa_flags = SA_SIGINFO;
@@ -211,6 +213,7 @@ void unix_init_signals(void)
 	sigaction_safe(SIGQUIT,&misc_sigaction,NULL);
 	sigaction_safe(SIGILL,&misc_sigaction,NULL);
 	
+	memset(&ign_sigaction,0,sizeof(struct sigaction));
 	sigemptyset(&ign_sigaction.sa_mask);
 	ign_sigaction.sa_handler = SIG_IGN;
 	sigaction_safe(SIGPIPE,&ign_sigaction,NULL);

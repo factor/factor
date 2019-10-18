@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
-USING: compiler errors generic hashtables inference
+USING: generator errors generic hashtables inference
 kernel namespaces sequences strings words parser prettyprint
-kernel-internals threads ;
+kernel-internals threads libc math ;
 
 ! Callbacks are registered in a global hashtable. If you clear
 ! this hashtable, they will all be blown away by code GC, beware
@@ -13,12 +13,17 @@ H{ } clone callbacks set-global
 
 : register-callback ( word -- ) dup callbacks get set-hash ;
 
-TUPLE: alien-callback return parameters quot xt ;
+TUPLE: alien-callback return parameters abi quot xt ;
+
 C: alien-callback make-node ;
+
+M: alien-callback alien-node-parameters alien-callback-parameters ;
+M: alien-callback alien-node-return alien-callback-return ;
+M: alien-callback alien-node-abi alien-callback-abi ;
 
 TUPLE: alien-callback-error ;
 
-: alien-callback ( return parameters quot -- alien )
+: alien-callback ( return parameters abi quot -- alien )
     <alien-callback-error> throw ;
 
 M: alien-callback-error summary
@@ -27,33 +32,26 @@ M: alien-callback-error summary
 : callback-bottom ( node -- )
     alien-callback-xt [ word-xt <alien> ] curry infer-quot ;
 
-\ alien-callback [ string object quotation ] [ alien ] <effect>
-"inferred-effect" set-word-prop
-
 \ alien-callback [
+    4 ensure-values
     empty-node <alien-callback> dup node,
     pop-literal nip over set-alien-callback-quot
+    pop-literal nip over set-alien-callback-abi
     pop-literal nip over set-alien-callback-parameters
     pop-literal nip over set-alien-callback-return
     gensym dup register-callback over set-alien-callback-xt
     callback-bottom
 ] "infer" set-word-prop
 
-: box-parameters ( parameters -- )
-    [ c-type c-type-box ] each-parameter ;
+: box-parameters ( node -- )
+    alien-node-parameters* [ box-parameter ] each-parameter ;
 
-: registers>objects ( parameters -- )
-    dup \ %freg>stack move-parameters
-    "nest_stacks" f %alien-invoke box-parameters ;
-
-: unbox-return ( node -- )
-    alien-callback-return [
-        "unnest_stacks" f %alien-invoke
-    ] [
-        c-type dup c-type-reg-class
-        swap c-type-unboxer
-        %callback-value
-    ] if-void ;
+: registers>objects ( node -- )
+    [
+        dup \ %save-param-reg move-parameters
+        "nest_stacks" f %alien-invoke
+        box-parameters
+    ] with-param-regs ;
 
 TUPLE: callback-context ;
 
@@ -72,25 +70,45 @@ TUPLE: callback-context ;
     slip
     wait-to-return ; inline
 
-: alien-callback-quot* ( node -- quot )
+: prepare-callback-return ( ctype -- quot )
+    alien-node-return {
+        { [ dup "void" = ] [ drop [ ] ] }
+        { [ dup large-struct? ] [ heap-size [ memcpy ] curry ] }
+        { [ t ] [ c-type c-type-prep ] }
+    } cond ;
+
+: wrap-callback-quot ( node -- quot )
     [
-        dup alien-callback-quot ,
-        \ <callback-context> ,
-        \ do-callback ,
-        alien-callback-return
-        [ ] [ c-type c-type-prep % ] if-void
+        dup alien-callback-quot
+        swap prepare-callback-return append ,
+        [ <callback-context> do-callback ] %
     ] [ ] make ;
 
+: %unnest-stacks ( -- ) "unnest_stacks" f %alien-invoke ;
+
+: callback-unwind ( node -- n )
+    {
+        { [ dup alien-node-abi "stdcall" = ] [ alien-stack-frame ] }
+        { [ dup alien-node-return large-struct? ] [ drop 4 ] }
+        { [ t ] [ drop 0 ] }
+    } cond ;
+
+: %callback-return ( node -- )
+    #! All the extra book-keeping for %unwind is only for x86.
+    #! On other platforms its an alias for %return.
+    dup alien-node-return*
+    [ %unnest-stacks ] [ %callback-value ] if-void
+    callback-unwind %unwind ;
+
 : generate-callback ( node -- )
-    [ alien-callback-xt ] keep [
-        dup alien-callback-parameters registers>objects
-        dup alien-callback-quot* %alien-callback
-        unbox-return
-        %return
+    dup alien-callback-xt dup rot [
+        init-templates
+        dup registers>objects
+        dup wrap-callback-quot %alien-callback
+        %callback-return
     ] generate-1 ;
 
 M: alien-callback generate-node
     end-basic-block generate-callback iterate-next ;
 
-M: alien-callback stack-reserve*
-    alien-callback-parameters stack-space ;
+M: alien-callback stack-frame-size* alien-stack-frame ;

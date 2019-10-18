@@ -1,9 +1,9 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: compiler
 USING: errors generic hashtables inference io kernel math
-namespaces optimizer parser prettyprint sequences test threads
-words ;
+namespaces generator optimizer parser prettyprint sequences
+threads words ;
 
 SYMBOL: print-warnings
 
@@ -45,7 +45,7 @@ M: f batch-ends drop ;
 : (compile) ( word -- )
     dup compiling? not over compound? and [
         dup batch-errors get compile-begins
-        dup word-dataflow optimize generate
+        dup dup word-dataflow optimize generate
     ] [
         drop
     ] if ;
@@ -53,22 +53,34 @@ M: f batch-ends drop ;
 : compile ( word -- )
     [ (compile) ] with-compiler ;
 
+: compile-failed ( word error -- )
+    batch-errors get compile-error
+    dup update-xt unchanged-word ;
+
 : try-compile ( word -- )
-    [ compile ]
-    [ batch-errors get compile-error update-xt ] recover ;
+    [ compile ] [ compile-failed ] recover ;
+
+: with-batch ( quot -- )
+    batch-errors get dup batch-begins slip batch-ends ; inline
+
+: forget-errors ( seq -- )
+    [ f "no-effect" set-word-prop ] each ;
+
+: compiling-batch ( n -- )
+    "Compiling " write length pprint " words..." print flush ;
 
 : compile-batch ( seq -- )
-    batch-errors get batch-begins
-    dup
-    [ f "no-effect" set-word-prop ] each
-    [ try-compile ] each
-    batch-errors get batch-ends ;
+    dup empty? [
+        drop
+    ] [
+        dup compiling-batch
+        [ dup forget-errors [ try-compile ] each ] with-batch
+    ] if ;
 
 : compile-vocabs ( seq -- )
     [ words ] map concat compile-batch ;
 
-: compile-all ( -- )
-    vocabs compile-vocabs changed-words get clear-hash ;
+: compile-all ( -- ) vocabs compile-vocabs ;
 
 : compile-quot ( quot -- word )
     define-temp dup compile ;

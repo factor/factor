@@ -1,4 +1,5 @@
-USING: definitions kernel parser process namespaces prettyprint ;
+USING: definitions kernel parser process namespaces prettyprint
+tools ;
 
 IN: textmate
 

@@ -1,13 +1,12 @@
 USE: kernel
 
-REQUIRES: core/io/buffer ;
-
 PROVIDE: core/io/unix
 { +files+ {
     "types.factor"
-    { "syscalls-freebsd.factor" [ os "freebsd" = ] }
     { "syscalls-linux.factor" [ os "linux" = ] }
-    { "syscalls-macosx.factor" [ os "macosx" = ] }
+    { "syscalls-bsd.factor" [ os "macosx" = ] }
+    { "syscalls-bsd.factor" [ os "freebsd" = ] }
+    { "syscalls-bsd.factor" [ os "openbsd" = ] }
     { "syscalls-solaris.factor" [ os "solaris" = ] }
     "syscalls.factor"
     "io.factor"

@@ -21,7 +21,7 @@ TUPLE: presentation object hook ;
     invoke-presentation ;
 
 : show-mouse-help ( presentation -- )
-    dup presentation-object over show-status button-update ;
+    dup presentation-object over show-summary button-update ;
 
 C: presentation ( label object -- button )
     [ drop ] over set-presentation-hook
@@ -50,8 +50,3 @@ presentation H{
     ! parent doesn't receive a mouse-enter
     { T{ motion } [ show-mouse-help ] }
 } set-gestures
-
-! Presentation help bar
-: <presentation-help> ( model -- gadget )
-    [ [ summary ] [ "" ] if* ] <filter> <label-control>
-    dup reverse-video-theme ;

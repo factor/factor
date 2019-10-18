@@ -14,53 +14,62 @@ void init_objects(F_HEADER *h)
 	bignum_neg_one = h->bignum_neg_one;
 }
 
-/* Read an image file from disk, only done once during startup */
-void load_image(const char* filename)
+INLINE void load_data_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
 {
-	FILE* file;
-	F_HEADER h;
+	CELL good_size = h->data_size * 2;
 
-	file = fopen(filename,"rb");
+	if(good_size > p->aging_size)
+		p->aging_size = good_size;
+
+	init_data_heap(p->gen_count,p->young_size,p->aging_size,p->secure_gc);
+
+	if(fread((void*)tenured.start,h->data_size,1,file) != 1)
+		fatal_error("load_data_heap failed",0);
+
+	tenured.here = tenured.start + h->data_size;
+	data_relocation_base = h->data_relocation_base;
+}
+
+INLINE void load_code_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
+{
+	CELL good_size = h->code_size * 2;
+
+	if(good_size > p->code_size)
+		p->code_size = good_size;
+
+	init_code_heap(p->code_size);
+
+	if(h->code_size != 0
+		&& fread(first_block(&code_heap),h->code_size,1,file) != 1)
+		fatal_error("load_code_heap failed",0);
+
+	code_relocation_base = h->code_relocation_base;
+	build_free_list(&code_heap,h->code_size);
+}
+
+/* Read an image file from disk, only done once during startup */
+/* This function also initializes the data and code heaps */
+void load_image(F_PARAMETERS *p)
+{
+	FILE *file = fopen(p->image,"rb");
 	if(file == NULL)
 	{
-		fprintf(stderr,"Cannot open image file: %s\n",filename);
+		fprintf(stderr,"Cannot open image file: %s\n",p->image);
 		fprintf(stderr,"%s\n",strerror(errno));
 		exit(1);
 	}
 
-	/* read it in native byte order */
-	fread(&h,sizeof(F_HEADER)/sizeof(CELL),sizeof(CELL),file);
+	F_HEADER h;
+	fread(&h,sizeof(F_HEADER),1,file);
 
 	if(h.magic != IMAGE_MAGIC)
-		fatal_error("Bad magic number",h.magic);
+		fatal_error("Bad image: magic number check failed",h.magic);
 
 	if(h.version != IMAGE_VERSION)
-		fatal_error("Bad version number",h.version);
+		fatal_error("Bad image: version number check failed",h.version);
 	
-	/* read data heap */
-	{
-		CELL size = h.data_size;
-		if(size + tenured.base >= tenured.limit)
-			fatal_error("Data heap too large",h.code_size);
-
-		fread((void*)tenured.base,size,1,file);
-
-		tenured.here = tenured.base + h.data_size;
-		data_relocation_base = h.data_relocation_base;
-	}
-
-	/* read code heap */
-	{
-		CELL size = h.code_size;
-		if(size + compiling.base > compiling.limit)
-			fatal_error("Code heap too large",h.code_size);
-
-		fread((void*)compiling.base,size,1,file);
-
-		code_relocation_base = h.code_relocation_base;
-
-		build_free_list(&compiling,size);
-	}
+	load_data_heap(file,&h,p);
+	load_code_heap(file,&h,p);
 
 	fclose(file);
 
@@ -68,6 +77,9 @@ void load_image(const char* filename)
 
 	relocate_data();
 	relocate_code();
+
+	/* Store image path name */
+	userenv[IMAGE_ENV] = tag_object(from_char_string(p->image));
 }
 
 /* Save the current image to disk */
@@ -76,7 +88,7 @@ bool save_image(const char* filename)
 	FILE* file;
 	F_HEADER h;
 
-	fprintf(stderr,"Saving %s...\n",filename);
+	fprintf(stderr,"*** Saving %s...\n",filename);
 
 	file = fopen(filename,"wb");
 	if(file == NULL)
@@ -84,21 +96,21 @@ bool save_image(const char* filename)
 
 	h.magic = IMAGE_MAGIC;
 	h.version = IMAGE_VERSION;
-	h.data_relocation_base = tenured.base;
+	h.data_relocation_base = tenured.start;
 	h.boot = userenv[BOOT_ENV];
-	h.data_size = tenured.here - tenured.base;
+	h.data_size = tenured.here - tenured.start;
 	h.global = userenv[GLOBAL_ENV];
 	h.t = T;
 	h.bignum_zero = bignum_zero;
 	h.bignum_pos_one = bignum_pos_one;
 	h.bignum_neg_one = bignum_neg_one;
 	
-	h.code_size = heap_size(&compiling);
-	h.code_relocation_base = compiling.base;
+	h.code_size = heap_size(&code_heap);
+	h.code_relocation_base = code_heap.segment->start;
 	fwrite(&h,sizeof(F_HEADER),1,file);
 
-	fwrite((void*)tenured.base,h.data_size,1,file);
-	fwrite((void*)compiling.base,h.code_size,1,file);
+	fwrite((void*)tenured.start,h.data_size,1,file);
+	fwrite(first_block(&code_heap),h.code_size,1,file);
 
 	fclose(file);
 
@@ -107,10 +119,10 @@ bool save_image(const char* filename)
 
 void primitive_save_image(void)
 {
-	F_STRING* filename;
 	/* do a full GC to push everything into tenured space */
-	garbage_collection(TENURED,true);
-	filename = untag_string(dpop());
+	primitive_code_gc();
+
+	F_STRING* filename = untag_string(dpop());
 	save_image(to_char_string(filename,true));
 }
 
@@ -159,7 +171,7 @@ void relocate_data()
 	data_fixup(&bignum_pos_one);
 	data_fixup(&bignum_neg_one);
 
-	for(relocating = tenured.base;
+	for(relocating = tenured.start;
 		relocating < tenured.here;
 		relocating += untagged_object_size(relocating))
 	{
@@ -181,7 +193,7 @@ void fixup_code_block(F_COMPILED *relocating, CELL code_start,
 	for(scan = words_start; scan < words_end; scan += CELLS)
 	{
 		if(relocating->finalized)
-			code_fixup((CELL*)scan);
+			code_fixup((XT*)scan);
 		else
 			data_fixup((CELL*)scan);
 	}

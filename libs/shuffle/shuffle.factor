@@ -1,36 +1,35 @@
 USING: kernel sequences ;
 IN: shuffle
 
-: reach ( a b c d -- a b c d a )
-    >r pick r> swap ; inline
-
-: roll ( a b c d -- b c d a )
-    >r rot r> swap ; inline
-
-: -roll ( a b c d -- d a b c )
-    -rot >r >r swap r> r> ; inline
+! Don't use these words unless you really have to (eg, calling
+! crappy Win32 APIs taking 11 arguments)
 
 : 2over ( a b c -- a b c a b )
     pick pick ; inline
-
-: 2pick ( a b c d -- a b c d a b )
-    reach reach ; inline
 
 : nipd ( a b c -- b c )
     rot drop ; inline
 
 : 3nip ( a b c d -- d )
-    2nip nip ; inline
+    3 nnip ; inline
 
-: keepd ( obj obj quot -- obj )
-    pick >r call r> ; inline
+: 4dup ( a b c d -- a b c d a b c d )
+    4 ndup ; inline
 
-: with2 ( obj obj quot elt -- obj obj quot )
-    >r 3dup r> -rot >r >r swap >r swap call r> r> r> ; inline
+: 4slip ( quot a b c d -- a b c d )
+    4 nslip ; inline
+
+: 4keep ( w x y z quot -- w x y z )
+    4 nkeep ; inline 
 
 : map-with2 ( obj obj list quot -- newseq )
-    swap [ with2 roll ] map 3nip ; inline
+    2 map-withn ; inline
 
 : each-with2 ( obj obj list quot -- )
-    swap [ with2 roll ] map 3drop ;
+    2 each-withn ; inline
 
+: dip ( x y quot -- y )
+    1 ndip ; inline
+
+: dipd ( x y quot -- y )
+    2 ndip ; inline

@@ -1,7 +1,4 @@
-REQUIRES: core/compiler/x86 core/compiler/pentium4 ;
+REQUIRES: core/compiler/x86/sse2 ;
+
 PROVIDE: core/compiler/amd64
-{ +files+ {
-    "architecture.factor"
-    "alien.factor"
-    "intrinsics.factor"
-} } ;
+{ +files+ { "architecture.factor" } } ;

@@ -54,3 +54,13 @@ TUPLE: foo a b ;
     ?a ?b
   ] bind
 ] unit-test
+
+{ H{ { ?a ?a } } } [ 
+  \ ?a \ ?a match 
+] unit-test
+
+[ "match" ] [ 
+  "abcd" {
+    { ?a [ "match" ] }
+  } match-cond
+] unit-test

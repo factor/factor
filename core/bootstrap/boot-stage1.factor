@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: image
 USING: arrays errors generic hashtables io kernel
@@ -11,14 +11,16 @@ prettyprint sequences vectors words ;
 
 ! Create a boot quotation
 [
+    ! Rehash hashtables, since core/tools/image creates them
+    ! using the host image's hashing algorithms
+    [ [ hashtable? ] instances [ rehash ] each ] %
     \ boot ,
 
     "core" require
     "core/help" require
-    "core/tools" require
     "core/compiler" require
+    "core/tools" require
     "core/documentation" require
-    "core/io/buffer" require
     "core/ui" require
     "core/ui/tools" require
     "core/ui/handbook" require
@@ -26,21 +28,23 @@ prettyprint sequences vectors words ;
     "core/handbook" require
 
     [
-        "resource:/core/bootstrap/boot-stage2.factor"
-        run-file
+        "resource:core/bootstrap/boot-stage2.factor"
+        dup ?resource-path exists? [
+            run-file
+        ] [
+            "Cannot find " write write "." print
+            "Please move " write image write " to the same directory as the Factor sources," print
+            "and try again." print
+            1 exit
+        ] if
     ] %
 ] [ ] make boot-quot set
 
 vocabularies get [
-    "!syntax" get hash>alist [
-        first2
+    "!syntax" get [
         "syntax" over set-word-vocabulary
         >r "!" ?head drop r> 2dup set-word-name
-        2array
-    ] map alist>hash "syntax" set
+    ] hash-map "syntax" set
 ] bind
 
 "!syntax" vocabularies get remove-hash
-
-"Building generic words..." print flush
-all-words [ generic? ] subset [ make-generic ] each

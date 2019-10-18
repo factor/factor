@@ -1,10 +1,10 @@
-USING: arrays help sequences sequences-internals vectors
-strings kernel ;
+USING: arrays bit-arrays help sequences sequences-internals
+vectors strings sbufs kernel ;
 
 HELP: <vector>
 { $values { "n" "a positive integer specifying initial capacity" } { "vector" "a new vector" } }
 { $description "Creates a new vector that can hold " { $snippet "n" } " elements before resizing." }
-{ $see-also <array> <string> <sbuf> } ;
+{ $see-also <array> <string> <sbuf> <bit-array> } ;
 
 HELP: length
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } }
@@ -34,26 +34,11 @@ HELP: new
 { $contract "Outputs a mutable sequence of length " { $snippet "n" } " which can hold the elements of " { $snippet "seq" } "." } ;
 
 HELP: like
-{ $values { "seq" "a sequence" } { "prototype" "a sequence" } { "newseq" "a sequence" } }
-{ $contract "Outputs a sequence with the same elements as the input sequence, but " { $emphasis "like" } " the template sequence, in the sense that it either has the same class as the template sequence, or if the template sequence is a virtual sequence, the same class as the template sequence's underlying sequence."
+{ $values { "seq" "a sequence" } { "exemplar" "a sequence" } { "newseq" "a new sequence" } }
+{ $contract "Outputs a sequence with the same elements as " { $snippet "seq" } ", but " { $emphasis "like" } " the template sequence, in the sense that it either has the same class as the template sequence, or if the template sequence is a virtual sequence, the same class as the template sequence's underlying sequence."
 $terpri
 "The default implementation does nothing." }
-{ $notes "The output sequence might share storage with the input sequence, for example:"
-{ $example
-    "{ 1 2 3 } \"array\" set"
-    "\"array\" get V{ } like \"vector\" set"
-    "t 0 \"array\" get set-nth"
-    "\"vector\" get ."
-    "V{ t 2 3 }"
-}
-"If this behavior is undesirable, you can use one of the following words instead, which always output a fresh sequence:"
-{ $list
-    { $link >array }
-    { $link >quotation }
-    { $link >string }
-    { $link >sbuf }
-    { $link >vector }
-} } ;
+{ $notes "Unlike " { $link clone-like } ", the output sequence might share storage with the input sequence." } ;
 
 HELP: empty?
 { $values { "seq" "a sequence" } { "?" "a boolean" } }
@@ -107,6 +92,15 @@ HELP: bounds-check?
 { $values { "n" "an integer" } { "seq" "a sequence" } { "?" "a boolean" } }
 { $description "Tests if the index is within the bounds of the sequence." } ;
 
+HELP: bounds-error
+{ $values { "n" "a positive integer" } { "seq" "a sequence" } }
+{ $description "Throws a " { $link bounds-error } "." }
+{ $error-description "Thrown by " { $link nth } ", " { $link set-nth } " and " { $link set-length } " if the given index lies beyond the bounds of the sequence." } ;
+
+HELP: bounds-check
+{ $values { "n" "a positive integer" } { "seq" "a sequence" } }
+{ $description "Throws an error if " { $snippet "n" } " is negative or if it is greater than or equal to the length of " { $snippet "seq" } ". Otherwise the two inputs remain on the stack." } ;
+
 HELP: ?nth
 { $values { "n" "an integer" } { "seq" "a sequence" } { "elt/f" "an object or " { $link f } } }
 { $description "A forgiving version of " { $link nth } ". If the index is out of bounds, or if the sequence is " { $link f } ", simply outputs " { $link f } "." } ;
@@ -134,3 +128,18 @@ HELP: first3-unsafe
 HELP: first4-unsafe
 { $values { "seq" "a sequence" } { "first" "the first element" } { "second" "the second element" } { "third" "the third element" } { "fourth" "the fourth element" } }
 { $contract "Unsafe variant of " { $link first4 } " that does not perform bounds checks." } ;
+
+HELP: first2
+{ $values { "seq" "a sequence" } { "first" "the first element" } { "second" "the second element" } }
+{ $description "Pushes the first two elements of a sequence." }
+{ $errors "Throws an error if the sequence has less than two elements." } ;
+
+HELP: first3
+{ $values { "seq" "a sequence" } { "first" "the first element" } { "second" "the second element" } { "third" "the third element" } }
+{ $description "Pushes the first three elements of a sequence." }
+{ $errors "Throws an error if the sequence has less than three elements." } ;
+
+HELP: first4
+{ $values { "seq" "a sequence" } { "first" "the first element" } { "second" "the second element" } { "third" "the third element" } { "fourth" "the fourth element" } }
+{ $description "Pushes the first four elements of a sequence." }
+{ $errors "Throws an error if the sequence has less than four elements." } ;

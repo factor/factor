@@ -1,6 +1,6 @@
 IN: temporary
 USING: arrays compiler kernel kernel-internals math
-sequences strings test vectors sequences-internals ;
+sequences strings sbufs test vectors sequences-internals ;
 
 : <range> ( from to -- seq ) dup <slice> ; inline
 

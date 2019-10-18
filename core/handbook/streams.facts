@@ -1,18 +1,25 @@
-USING:
-help
-io
-styles ;
+USING: help io styles ;
 
 ARTICLE: "streams" "Streams"
 "Input and output centers on the concept of a " { $emphasis "stream" } ", which is a source or sink of characters. Streams also support formatted output, which may be used to present styled text in a manner independent of output medium."
 $terpri
 "Stream words are in the " { $vocab-link "io" } " vocabulary."
 { $subsection "stream-protocol" }
+"External resource streams communicate with the outside world:"
+{ $subsection "file-streams" }
+{ $subsection "network-streams" }
+"Virtual streams serve as glue:"
+{ $subsection "string-streams" }
+"Wrapper streams convert partial implementations of the stream protocol into full-fledged streams:"
+{ $subsection <line-reader> }
+{ $subsection <plain-writer> }
+"A utility to combine a complementary input and output stream pair into a single stream:"
+{ $subsection <duplex-stream> }
+"Further topics:"
 { $subsection "stream-utils" }
 { $subsection "stdio" }
 { $subsection "styles" }
-{ $subsection "stream-binary" }
-{ $subsection "stream-impls" } ;
+{ $subsection "stream-binary" } ;
 
 ARTICLE: "stream-protocol" "Stream protocol"
 "The stream protocol consists of a large number of generic words, many of which are optional."
@@ -22,6 +29,7 @@ $terpri
 "Three words are required for input streams:"
 { $subsection stream-read1 }
 { $subsection stream-read }
+{ $subsection stream-read-until }
 { $subsection stream-readln }
 "If your stream supports the first two but not the last one, wrap it in a " { $link <line-reader> } " to get a default implementation."
 $terpri
@@ -126,19 +134,6 @@ $terpri
 { $subsection >be }
 { $subsection >le } ;
 
-ARTICLE: "stream-impls" "Stream implementations"
-"External resource streams communicate with the outside world:"
-{ $subsection "file-streams" }
-{ $subsection "network-streams" }
-"Virtual streams serve as glue:"
-{ $subsection "string-streams" }
-"Wrapper streams convert partial implementations of the stream protocol into full-fledged streams:"
-{ $subsection <line-reader> }
-{ $subsection <plain-writer> }
-"A utility to combine a complementary input and output stream pair into a single stream:"
-{ $subsection <duplex-stream> }
-"As a final note, the " { $link f } " object implements the stream protocol, by yielding end-of-file on input and discarding all output." ;
-
 ARTICLE: "file-streams" "Reading and writing files"
 { $subsection <file-reader> }
 { $subsection <file-writer> }
@@ -161,8 +156,7 @@ ARTICLE: "network-streams" "TCP/IP networking"
 "Some information can be obtained about incoming client connections:"
 { $subsection client-stream-host }
 { $subsection client-stream-port }
-"A utility word to take care of some common boilerplate found in simple network servers:"
-{ $subsection with-server } ;
+"The " { $module-link "libs/server" } " library defines a nice wrapper around the above words." ;
 
 ARTICLE: "string-streams" "String streams"
 "Streams:"

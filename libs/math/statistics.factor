@@ -37,3 +37,26 @@ USING: kernel math sequences ;
 : std ( seq -- x )
     #! standard deviation, sqrt of variance
     var sqrt ;
+
+: ((r)) ( mean(x) mean(y) {x} {y} -- (r) )
+    ! finds sigma((xi-mean(x))(yi-mean(y)) 
+    0 [ [ >r pick r> swap - ] 2apply * + ] 2reduce 2nip ;
+
+: (r) ( mean(x) mean(y) {x} {y} sx sy -- r )
+    * recip >r [ ((r)) ] keep length 1- / r> * ;
+
+: [r] ( {{x,y}...} -- mean(x) mean(y) {x} {y} sx sy )
+    unpair [ [ [ mean ] 2apply ] 2keep ] 2keep [ std ] 2apply ;
+
+: r ( {{x,y}...} -- r )
+    [r] (r) ;
+
+: r^2 ( {{x,y}...} -- r )
+    r sq ;
+
+: least-squares ( {{x,y}...} -- alpha beta )
+    [r] >r >r >r >r 2dup r> r> r> r>
+    ! stack is mean(x) mean(y) mean(x) mean(y) {x} {y} sx sy
+    [ (r) ] 2keep ! stack is mean(x) mean(y) r sx sy
+    swap / * ! stack is mean(x) mean(y) beta
+    [ swapd * - ] keep ;

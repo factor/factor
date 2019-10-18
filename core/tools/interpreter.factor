@@ -95,9 +95,8 @@ SYMBOL: break-hook
     >r cut [ break ] swap 3append r> <callframe> ;
 
 : step-to ( n -- )
-    >r meta-c r>
     callframe get callframe-scan get <breakpoint>
-    nappend
+    meta-c nappend
     [ set-walker-hook meta-interp get (continue) ] callcc1
     restore-harness ;
 

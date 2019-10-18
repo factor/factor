@@ -1,5 +1,5 @@
 USING: arrays kernel io strings sequences namespaces math parser
-vectors hashtables math-contrib crypto ;
+sequences-contrib vectors hashtables math-contrib crypto ;
 IN: crypto-internals
 
 ! Implemented according to RFC 3174.
@@ -98,18 +98,23 @@ SYMBOL: K
     D h3 update-old-new
     E h4 update-old-new ;
 
-: process-sha1-block ( str -- )
+: (process-sha1-block) ( str -- )
     80 <vector> w set make-w init-letters calculate-letters update-hs ;
+
+: process-sha1-block ( str -- )
+    dup length [ bytes-read [ + ] change ] keep 64 = [
+        (process-sha1-block)
+    ] [
+        t bytes-read get pad-last-block
+        [ (process-sha1-block) ] each
+    ] if ;
+
+: (stream>sha1) ( -- )
+    64 read [ process-sha1-block ] keep
+    length 64 = [ (stream>sha1) ] when ;
 
 : get-sha1 ( -- str )
     [ [ h0 h1 h2 h3 h4 ] [ get 4 >be % ] each ] "" make ;
-
-: (stream>sha1) ( -- )
-    64 read dup length dup bytes-read [ + ] change 64 = [
-        process-sha1-block (stream>sha1)
-    ] [
-        t bytes-read get pad-last-block [ process-sha1-block ] each
-    ] if ;
 
 IN: crypto
 
@@ -118,5 +123,11 @@ IN: crypto
 
 : string>sha1 ( string -- sha1 ) <string-reader> stream>sha1 ;
 : string>sha1str ( string -- str ) string>sha1 hex-string ;
+: string>sha1-bignum ( string -- n ) string>sha1 be> ;
 : file>sha1 ( file -- sha1 ) <file-reader> stream>sha1 ;
 
+: string>sha1-interleave ( string -- )
+    [ zero? ] ltrim*
+    dup length odd? [ 1 tail ] when
+    seq>2seq [ string>sha1 ] 2apply
+    swap 2seq>seq ;

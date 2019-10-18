@@ -1,15 +1,17 @@
-! Copyright (C) 2003, 2006 Slava Pestov.
+! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: prettyprint
 USING: alien arrays generic hashtables io kernel math
 namespaces parser sequences strings styles vectors words
 prettyprint-internals ;
 
-: with-pprint ( quot -- )
+: with-pprint ( obj quot -- )
     [
         V{ } clone recursion-check set
-        H{ } <flow> f ?push pprinter-stack set
-        call end-blocks do-pprint
+        V{ } clone pprinter-stack set
+        over <object
+        call
+        do-pprint
     ] with-scope ; inline
 
 : pprint ( obj -- ) [ pprint* ] with-pprint ;
@@ -32,8 +34,6 @@ prettyprint-internals ;
 
 : short. ( obj -- ) pprint-short terpri ;
 
-: unparse-short ( obj -- str ) [ pprint-short ] string-out ;
-
 : .b ( n -- ) >bin print ;
 : .o ( n -- ) >oct print ;
 : .h ( n -- ) >hex print ;
@@ -44,9 +44,11 @@ M: object summary
     "an instance of the " swap class word-name " class" 3append ;
 
 M: input summary
-    "Input: " swap input-string dup string?
-    [ "\n" split1 "..." "" ? append ] [ unparse-short ] if
-    append ;
+    [
+        "Input: " %
+        input-string "\n" split1 swap %
+        "..." "" ? %
+    ] "" make ;
 
 M: vocab-link summary
     [

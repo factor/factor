@@ -56,7 +56,7 @@ M: block section-fits? ( section -- ? )
 
 : (<block) pprinter-stack get push ;
 
-: <style section-style stdio [ <nested-style-stream> ] change ;
+: <style section-style stdio [ <style-stream> ] change ;
 
 : style> stdio [ delegate ] change ;
 
@@ -103,8 +103,8 @@ M: newline short-section section-start fresh-line ;
 ! Inset section
 TUPLE: inset ;
 
-C: inset ( style -- block )
-    swap <block> over set-delegate ;
+C: inset ( -- block )
+    H{ } clone <block> over set-delegate ;
 
 M: inset section-fits? ( section -- ? )
     line-limit? [
@@ -121,10 +121,8 @@ M: inset section-fits? ( section -- ? )
     ] if ;
 
 M: block short-section ( block -- )
-    dup <style
     block-sections unclip pprint-section
-    [ dup advance pprint-section ] each
-    style> ;
+    [ dup advance pprint-section ] each ;
 
 M: inset long-section
     <indent
@@ -132,7 +130,7 @@ M: inset long-section
     indent>
     section-end fresh-line ;
 
-: <inset ( style -- ) <inset> (<block) ;
+: <inset ( -- ) <inset> (<block) ;
 
 ! Flow section
 TUPLE: flow ;
@@ -150,13 +148,32 @@ M: flow section-fits? ( section -- ? )
 M: flow long-section
     dup section-start fresh-line short-section ;
 
-: <flow ( style -- ) <flow> (<block) ;
+: <flow ( -- ) H{ } clone <flow> (<block) ;
+
+: <object ( obj -- ) presented associate <flow> (<block) ;
+
+! Hilite section
+TUPLE: hilite ;
+
+: hilite-style ( -- hash )
+    H{
+        { background { 0.9 0.9 0.9 1 } }
+        { highlight t }
+    } ;
+
+C: hilite ( -- block )
+    hilite-style <flow> over set-delegate ;
+
+: <hilite ( -- ) <hilite> (<block) ;
+
+M: hilite short-section ( block -- )
+    dup <style delegate short-section style> ;
 
 ! Narrow section
 TUPLE: narrow ;
 
-C: narrow ( style -- block )
-    swap <block> over set-delegate ;
+C: narrow ( -- block )
+    H{ } clone <block> over set-delegate ;
 
 M: narrow section-fits? ( section -- ? )
     line-limit? [
@@ -177,34 +194,31 @@ M: narrow long-section
     indent>
     section-end fresh-line ;
 
-: <narrow ( style -- ) <narrow> (<block) ;
+: <narrow ( -- ) <narrow> (<block) ;
 
 ! Defblock section
 TUPLE: defblock ;
 
-C: defblock ( style -- block )
-    swap <block> over set-delegate ;
+C: defblock ( -- block )
+    H{ } clone <block> over set-delegate ;
 
 M: defblock long-section
     <indent
     dup section-start fresh-line short-section
     indent> ;
 
-: <defblock ( style -- ) <defblock> (<block) ;
+: <defblock ( -- ) <defblock> (<block) ;
 
 : end-block ( block -- ) position get swap set-section-end ;
 
-: (block>) ( -- )
+: block> ( -- )
     pprinter-stack get pop dup end-block add-section ;
 
-: last-block? ( -- ? ) pprinter-stack get length 1 = ;
-
-: block> ( -- ) last-block? [ (block>) ] unless ;
-
-: end-blocks ( -- ) last-block? [ (block>) end-blocks ] unless ;
-
 : do-pprint ( -- )
-    [
-        end-printing set pprinter-block
-        dup block-empty? [ drop ] [ pprint-section ] if
-    ] callcc0 ;
+    pprinter-block dup block-empty? [
+        drop
+    ] [
+        dup section-style [
+            [ end-printing set dup pprint-section ] callcc0 drop
+        ] with-nesting
+    ] if ;

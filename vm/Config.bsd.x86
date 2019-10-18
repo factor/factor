@@ -1,0 +1,2 @@
+include vm/Config.bsd
+include vm/Config.x86

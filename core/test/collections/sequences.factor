@@ -1,6 +1,6 @@
 IN: temporary
-USING: arrays kernel math namespaces sequences
-sequences-internals strings test vectors ;
+USING: arrays kernel math namespaces sequences kernel-internals
+sequences-internals strings sbufs test vectors ;
 
 [ V{ 1 2 3 4 } ] [ 1 5 dup <slice> >vector ] unit-test
 [ 3 ] [ 1 4 dup <slice> length ] unit-test
@@ -121,7 +121,7 @@ unit-test
 [ { 4 2 3 1 } ]
 [ { 1 2 3 4 } clone dup seq-sorter sorter-exchange ] unit-test
 
-[ -1 ] [ [ - ] { 1 2 3 4 } seq-sorter 1 compare ] unit-test
+[ -1 ] [ [ - ] { 1 2 3 4 } seq-sorter 1 sorter-compare ] unit-test
 
 [ 1 ] [ [ - ] { -5 4 -3 5 } seq-sorter 2dup sort-up sorter-start nip ] unit-test
 
@@ -142,7 +142,7 @@ unit-test
 [ t ] [
     100 [
         drop
-        100 [ drop 20 random-int [ drop 1000 random-int ] map ] map natural-sort [ <=> 0 <= ] monotonic?
+        100 [ drop 20 random [ drop 1000 random ] map ] map natural-sort [ <=> 0 <= ] monotonic?
     ] all?
 ] unit-test
 
@@ -208,7 +208,8 @@ unit-test
 ! Pathological case
 [ "ihbye" ] [ "hi" <reversed> "bye" append ] unit-test
 
-[ 10 "hi" "bye" copy-into ] unit-test-fails
+[ -10 "hi" "bye" copy ] unit-test-fails
+[ 10 "hi" "bye" copy ] unit-test-fails
 
 [ { 1 2 3 5 6 } ] [ 3 { 1 2 3 4 5 6 } remove-nth ] unit-test
 
@@ -229,5 +230,22 @@ unit-test
 
 ! erg's random tester found this one
 [ SBUF" 12341234" ] [
-    9 <sbuf> dup "1234" nappend dup dup nappend
+    9 <sbuf> dup "1234" swap nappend dup dup swap nappend
 ] unit-test
+
+[ f ] [ f V{ } like f V{ } like eq? ] unit-test
+
+[ ?{ f t } ] [ 0 2 ?{ f t f } subseq ] unit-test
+
+[ V{ f f f } ] [ 3 V{ } new ] unit-test
+[ SBUF" \0\0\0" ] [ 3 SBUF" " new ] unit-test
+
+[ 0 ] [ f length ] unit-test
+[ f first ] unit-test-fails
+[ 3 ] [ 3 10 nth ] unit-test
+[ 3 ] [ 3 10 nth-unsafe ] unit-test
+[ -3 10 nth ] unit-test-fails
+[ 11 10 nth ] unit-test-fails
+
+[ -1 f <array> ] unit-test-fails
+[ cell-bits cell log2 - 2^ f <array> ] unit-test-fails

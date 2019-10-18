@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: errors hashtables io kernel math namespaces prettyprint sequences
     arrays generic strings vectors char-classes xml-data xml-errors
-    state-parser xml-tokenize xml-writer ;
+    state-parser xml-tokenize xml-writer xml-utils ;
 IN: xml
 
 !   -- Overall parser with data tree
@@ -23,20 +23,17 @@ SYMBOL: namespace-stack
 : push-xml-stack ( object -- )
     V{ } clone 2array xml-stack get push ;
 
-: xml-string>uri ( seq -- string )
-    dup length 1 = [ <bad-uri> throw ] unless
-    first ;
-
 : process-ns ( hash -- hash )
-    ! This should assure all namespaces are URIs by replacing first
+    ! this should check to make sure URIs are valid
     [
-        dup [
-            swap dup name-space "xmlns" =
-            [ >r xml-string>uri r> name-tag set ]
-            [ 2drop ] if
-        ] hash-each
-        T{ name f "" "xmlns" } swap hash
-        [ xml-string>uri "" set ] when*
+        [
+            first2 swap dup name-space "xmlns" =
+            [ name-tag set ]
+            [
+                T{ name f "" "xmlns" f } names-match?
+                [ "" set ] [ drop ] if
+            ] if
+        ] each
     ] make-hash ;
 
 : add-ns2name ( name -- )
@@ -45,7 +42,7 @@ SYMBOL: namespace-stack
 
 : push-ns-stack ( hash -- )
     dup process-ns namespace-stack get push
-    [ drop add-ns2name ] hash-each ;
+    [ first add-ns2name ] each ;
 
 : pop-ns-stack ( -- )
     namespace-stack get pop drop ;
@@ -54,13 +51,28 @@ GENERIC: process ( object -- )
 
 M: object process add-child ;
 
+M: prolog process
+    xml-stack get V{ { f V{ "" } } } =
+    [ <bad-prolog> throw ] unless drop ;
+
+M: instruction process
+    xml-stack get length 1 =
+    [ <bad-instruction> throw ] unless
+    add-child ;
+
+M: directive process
+    xml-stack get dup length 1 =
+    swap first second [ tag? ] contains? not and
+    [ <bad-directive> throw ] unless
+    add-child ;
+
 M: contained process
-    [ contained-name ] keep contained-props
+    [ contained-name ] keep contained-attrs
     dup push-ns-stack >r dup add-ns2name r>
     pop-ns-stack <contained-tag> add-child ;
 
 M: opener process ! move add-ns2name on name to closer and fix mismatched
-    dup opener-props push-ns-stack push-xml-stack ;
+    dup opener-attrs push-ns-stack push-xml-stack ;
 
 M: closer process
     closer-name xml-stack get pop first2 >r [ 
@@ -69,7 +81,7 @@ M: closer process
             2dup = [ nip add-ns2name ]
             [ swap <mismatched> throw ] if
         ] keep
-    ] keep opener-props r> <tag> add-child pop-ns-stack ;
+    ] keep opener-attrs r> <tag> add-child pop-ns-stack ;
 
 : init-ns-stack ( -- )
     V{ H{
@@ -82,61 +94,11 @@ M: closer process
 : init-xml-stack ( -- )
     V{ } clone xml-stack set f push-xml-stack ;
 
-: yes/no>bool ( string -- t/f )
-    dup "yes" = [ drop t ] [
-        dup "no" = [ drop f ] [
-            <not-yes/no> throw
-        ] if
-    ] if ;
-
-: assure-no-extra ( hash -- )
-    hash-keys {
-        T{ name f "" "version" f }
-        T{ name f "" "encoding" f }
-        T{ name f "" "standalone" f }
-    } swap diff dup empty? [ drop ] [ <extra-attrs> throw ] if ; 
-
-: concat-strings ( xml-string -- string )
-    dup [ string? ] all?
-    [ "XML prolog attributes contain undefined entities"
-      <xml-string-error> throw ] unless
-    concat ;
-
-: good-version ( version -- version )
-    dup { "1.0" "1.1" } member? [ <bad-version> throw ] unless ;
-
-: prolog-attrs ( hash -- )
-    T{ name f "" "version" f } over hash [
-        concat-strings good-version
-        prolog-data get set-prolog-version
-    ] when*
-    T{ name f "" "encoding" f } over hash [
-        concat-strings prolog-data get set-prolog-encoding
-    ] when*
-    T{ name f "" "standalone" f } swap hash [
-        concat-strings yes/no>bool
-        prolog-data get set-prolog-standalone
-    ] when* ;
-
-: parse-prolog ( -- )
-    "<?xml" string-matches? [
-        5 expect-string*
-        pass-blank middle-tag "?>" expect-string
-         dup assure-no-extra prolog-attrs
-    ] when ;
-
-: basic-init ( stream -- )
-    stdio set
-    { 0 0 0 "" } clone spot set
-    f record set f now-recording? set
-    next
+: basic-init ( -- )
     "1.0" "iso-8859-1" f <prolog> prolog-data set ;
 
-: init-xml ( stream -- )
+: init-xml ( -- )
     basic-init init-xml-stack init-ns-stack ;
-
-: init-xml-string ( string -- ) ! for debugging
-    <string-reader> init-xml ;
 
 : assert-blanks ( seq pre? -- )
     swap [ string? ] subset
@@ -158,11 +120,11 @@ M: closer process
     ! this does *not* affect the contents of the stack
     dup -1 = [ <notags> throw ] when ;
 
-: make-xml-doc ( seq -- xml-doc )
-    prolog-data get swap dup [ tag? ] find
+: make-xml-doc ( prolog seq -- xml-doc )
+    dup [ tag? ] find
     >r assure-tags swap cut 1 tail
     no-pre/post no-post-tags
-    r> swap <xml-doc> ;
+    r> swap <xml> ;
 
 ! * Views of XML
 
@@ -171,10 +133,10 @@ SYMBOL: text-now?
 TUPLE: pull-xml scope ;
 C: pull-xml ( stream -- pull-xml )
     [
-        swap basic-init parse-prolog
+        swap basic-init
         t text-now? set
         [ namestack pop swap set-pull-xml-scope ] keep
-    ] with-scope ;
+    ] state-parse ;
 
 : pull-next ( pull -- xml-elem/f )
     pull-xml-scope [
@@ -187,35 +149,41 @@ C: pull-xml ( stream -- pull-xml )
     swap dup slip ; inline
 
 : sax-loop ( quot -- ) ! quot: xml-elem --
-    parse-text [ call-under ] each
+    parse-text call-under
     get-char [ make-tag call-under sax-loop ]
     [ drop ] if ; inline
 
 : sax ( stream quot -- ) ! quot: xml-elem --
     swap [
-        basic-init parse-prolog
+        basic-init
         prolog-data get call-under
         sax-loop
-    ] with-scope ; inline
+    ] state-parse ; inline
 
 : (read-xml) ( -- )
     [ process ] sax-loop ; inline
 
-: (xml-chunk) ( stream -- seq )
-    init-xml parse-prolog (read-xml)
-    xml-stack get
-    dup length 1 = [ <unclosed> throw ] unless
-    first second ;
+: (xml-chunk) ( stream -- prolog seq )
+    [
+        init-xml (read-xml)
+        xml-stack get
+        dup length 1 = [ <unclosed> throw ] unless
+        first second
+        prolog-data get swap
+    ] state-parse ;
 
-: read-xml ( stream -- xml-doc )
+: read-xml ( stream -- xml )
     #! Produces a tree of XML nodes
-    [ (xml-chunk) make-xml-doc ] with-scope ;
+    (xml-chunk) make-xml-doc ;
 
 : xml-chunk ( stream -- seq )
-    [ (xml-chunk) ] with-scope ;
+    (xml-chunk) nip ;
 
-: string>xml ( string -- xml-doc )
+: string>xml ( string -- xml )
     <string-reader> read-xml ;
+
+: file>xml ( filename -- xml )
+    <file-reader> read-xml ;
 
 : xml-reprint ( string -- )
     string>xml print-xml ;

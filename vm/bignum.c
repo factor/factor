@@ -421,7 +421,7 @@ s48_bignum_to_double(bignum_type bignum)
 bignum_type
 s48_double_to_bignum(double x)
 {
-  if (!isnormal(x)) return (BIGNUM_ZERO ());
+  if (x == 1.0/0.0 || x == -1.0/0.0 || x != x) return (BIGNUM_ZERO ());
   int exponent;
   double significand = (frexp (x, (&exponent)));
   if (exponent <= 0) return (BIGNUM_ZERO ());
@@ -1696,8 +1696,8 @@ bignum_negneg_bitwise_op(int op, bignum_type arg1, bignum_type arg2)
   max_length =  (BIGNUM_LENGTH(arg1) > BIGNUM_LENGTH(arg2))
                ? BIGNUM_LENGTH(arg1) + 1 : BIGNUM_LENGTH(arg2) + 1;
 
-  UNREGISTER_BIGNUM(arg1);
-  UNREGISTER_BIGNUM(arg2);
+  REGISTER_BIGNUM(arg1);
+  REGISTER_BIGNUM(arg2);
   result = allot_bignum(max_length, neg_p);
   UNREGISTER_BIGNUM(arg2);
   UNREGISTER_BIGNUM(arg1);

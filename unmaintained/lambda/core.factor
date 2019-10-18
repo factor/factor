@@ -16,7 +16,7 @@ IN: lambda
     
     0 lfrom 26 swap ltake list>array
     [
-        [ ":" , 65 + dup ch>string , " " , number>string , ] { } make concat
+        [ ":" , 65 + dup 1string , " " , number>string , ] { } make concat
     ] map append
     
     {
@@ -70,7 +70,7 @@ IN: lambda
 
 : PRINTCHAR ( node -- node )
     #! takes a base one num and prints its char equivalent
-    var-node-name length "alienbaseonenum" length - ch>string print-return ;
+    var-node-name length "alienbaseonenum" length - 1string print-return ;
 
 : READCHAR ( node -- node )
     #! reads one character of input and stores it as a base one num

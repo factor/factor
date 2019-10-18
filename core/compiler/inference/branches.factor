@@ -50,7 +50,7 @@ TUPLE: unbalanced-branches-error in out ;
     swap meta-d active-variable
     unify-effect meta-d set d-in set ;
 
-: callstack-effect ( seq -- )
+: retainstack-effect ( seq -- )
     dup length 0 <array>
     swap meta-r active-variable
     unify-effect meta-r set drop ;
@@ -77,7 +77,7 @@ TUPLE: unbalanced-namestacks ;
 
 : unify-effects ( seq -- )
     dup datastack-effect
-    dup callstack-effect
+    dup retainstack-effect
     dup namestack-effect
     dup unify-vars
     [ terminated? swap hash ] all? terminated? set ;
@@ -94,18 +94,19 @@ TUPLE: unbalanced-namestacks ;
     dataflow-graph off
     current-node off ;
 
-: infer-branch ( value -- namespace )
+: infer-branch ( last value -- namespace )
     [
         copy-inference
         dup value-recursion recursive-state set
         value-literal infer-quot
-        terminated? get [ #values node, ] unless
-    ] make-hash ;
+        terminated? get [ drop ] [ call node, ] if
+    ] make-hash ; inline
 
-: (infer-branches) ( branchlist -- list )
-    [ infer-branch ] map dup unify-effects unify-dataflow ;
+: (infer-branches) ( last branchlist -- list )
+    [ infer-branch ] map-with
+    dup unify-effects unify-dataflow ; inline
 
-: infer-branches ( branches node -- )
+: infer-branches ( last branches node -- )
     dup node,
     >r (infer-branches) r> set-node-children
-    #merge node, ;
+    #merge node, ; inline

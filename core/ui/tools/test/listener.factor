@@ -1,7 +1,7 @@
 IN: temporary
 USING: gadgets-listener words arrays namespaces test kernel
-freetype timers gadgets-workspace sequences gadgets-text
-gadgets ;
+freetype timers gadgets-interactor gadgets-workspace sequences
+gadgets-text gadgets ;
 
 timers [ init-timers ] unless
 

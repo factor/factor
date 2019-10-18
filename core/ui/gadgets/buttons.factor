@@ -1,25 +1,26 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-buttons
 USING: gadgets gadgets-borders gadgets-labels
 gadgets-theme generic io kernel math models namespaces sequences
 strings styles threads words hashtables ;
 
-TUPLE: button rollover? pressed? selected? quot ;
+TUPLE: button pressed? selected? quot ;
 
 : buttons-down? ( -- ? )
     hand-buttons get-global empty? not ;
 
-: mouse-over? ( gadget -- ? )
-    hand-gadget get-global child? ;
+: button-rollover? ( button -- ? )
+    hand-gadget get parents [ [ button? ] is? ] find nip eq? ;
 
 : mouse-clicked? ( gadget -- ? )
     hand-clicked get-global child? ;
 
 : button-update ( button -- )
-    dup mouse-over? over set-button-rollover?
-    dup mouse-clicked? buttons-down? and
-    over button-rollover? and over set-button-pressed?
+    dup mouse-clicked?
+    over button-rollover? and
+    buttons-down? and
+    over set-button-pressed?
     relayout-1 ;
 
 : if-clicked ( button quot -- )

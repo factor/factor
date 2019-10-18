@@ -1,5 +1,7 @@
+#define CELL_MAX (CELL)(-1)
 #define FIXNUM_MAX (((F_FIXNUM)1 << (WORD_SIZE - TAG_BITS - 1)) - 1)
 #define FIXNUM_MIN (-((F_FIXNUM)1 << (WORD_SIZE - TAG_BITS - 1)))
+#define ARRAY_SIZE_MAX ((CELL)1 << (WORD_SIZE - TAG_BITS - 2))
 
 INLINE F_FIXNUM untag_fixnum_fast(CELL tagged)
 {
@@ -16,8 +18,8 @@ INLINE F_FIXNUM bignum_to_fixnum(CELL tagged)
 	return (F_FIXNUM)s48_bignum_to_fixnum(untag_array_fast(tagged));
 }
 
-F_FIXNUM to_fixnum(CELL tagged);
-CELL to_cell(CELL tagged);
+DLLEXPORT F_FIXNUM to_fixnum(CELL tagged);
+DLLEXPORT CELL to_cell(CELL tagged);
 
 void primitive_bignum_to_fixnum(void);
 void primitive_float_to_fixnum(void);
@@ -39,14 +41,6 @@ void primitive_fixnum_lesseq(void);
 void primitive_fixnum_greater(void);
 void primitive_fixnum_greatereq(void);
 void primitive_fixnum_not(void);
-DLLEXPORT void box_signed_1(signed char integer);
-DLLEXPORT void box_signed_2(signed short integer);
-DLLEXPORT void box_unsigned_1(unsigned char integer);
-DLLEXPORT void box_unsigned_2(unsigned short integer);
-DLLEXPORT signed char unbox_signed_1(void);
-DLLEXPORT signed short unbox_signed_2(void);
-DLLEXPORT unsigned char unbox_unsigned_1(void);
-DLLEXPORT unsigned short unbox_unsigned_2(void);
 
 CELL bignum_zero;
 CELL bignum_pos_one;
@@ -103,36 +97,23 @@ INLINE CELL allot_cell(CELL x)
 }
 
 /* FFI calls this */
-DLLEXPORT void box_signed_cell(F_FIXNUM integer);
-DLLEXPORT F_FIXNUM unbox_signed_cell(void);
-
-DLLEXPORT void box_unsigned_cell(CELL cell);
-DLLEXPORT F_FIXNUM unbox_unsigned_cell(void);
-
+DLLEXPORT void box_signed_1(s8 n);
+DLLEXPORT void box_unsigned_1(u8 n);
+DLLEXPORT void box_signed_2(s16 n);
+DLLEXPORT void box_unsigned_2(u16 n);
 DLLEXPORT void box_signed_4(s32 n);
-DLLEXPORT s32 unbox_signed_4(void);
-
 DLLEXPORT void box_unsigned_4(u32 n);
-DLLEXPORT u32 unbox_unsigned_4(void);
-
+DLLEXPORT void box_signed_cell(F_FIXNUM integer);
+DLLEXPORT void box_unsigned_cell(CELL cell);
 DLLEXPORT void box_signed_8(s64 n);
-DLLEXPORT s64 unbox_signed_8(void);
+DLLEXPORT s64 to_signed_8(CELL obj);
 
 DLLEXPORT void box_unsigned_8(u64 n);
-DLLEXPORT u64 unbox_unsigned_8(void);
+DLLEXPORT u64 to_unsigned_8(CELL obj);
+
+CELL unbox_array_size(void);
 
 void primitive_from_fraction(void);
-
-/* for punning */
-typedef union {
-    double x;
-    u64 y;
-} F_DOUBLE_BITS;
-
-typedef union {
-    float x;
-    u32 y;
-} F_FLOAT_BITS;
 
 INLINE double untag_float_fast(CELL tagged)
 {
@@ -194,8 +175,8 @@ void primitive_double_bits(void);
 void primitive_bits_double(void);
 
 DLLEXPORT void box_float(float flo);
-DLLEXPORT float unbox_float(void);
+DLLEXPORT float to_float(CELL value);
 DLLEXPORT void box_double(double flo);
-DLLEXPORT double unbox_double(void);
+DLLEXPORT double to_double(CELL value);
 
 void primitive_from_rect(void);

@@ -4,6 +4,7 @@
 <dict>
 	<key>fileTypes</key>
 	<array>
+		<string>furnace</string>
 		<string>fhtml</string>
 	</array>
 	<key>foldingStartMarker</key>

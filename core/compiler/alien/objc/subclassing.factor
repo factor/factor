@@ -1,4 +1,4 @@
-! Copyright (C) 2006 Slava Pestov
+! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 IN: objc
 USING: alien arrays compiler hashtables kernel kernel-internals
@@ -7,12 +7,12 @@ libc math namespaces sequences strings words ;
 : init-method ( method alien -- )
     >r first3 r>
     [ >r execute r> set-objc-method-imp ] keep
-    [ >r <malloc-string> r> set-objc-method-types ] keep
+    [ >r malloc-char-string r> set-objc-method-types ] keep
     >r sel_registerName r> set-objc-method-name ;
 
 : <empty-method-list> ( n -- alien )
-    "objc-method-list" c-size
-    "objc-method" c-size pick * + 1 calloc
+    "objc-method-list" heap-size
+    "objc-method" heap-size pick * + 1 calloc
     [ set-objc-method-list-count ] keep ;
 
 : <method-list> ( methods -- alien )
@@ -23,9 +23,9 @@ libc math namespaces sequences strings words ;
     <method-list> class_addMethods ;
 
 : <objc-class> ( name info -- class )
-    "objc-class" <malloc-object>
+    "objc-class" malloc-object
     [ set-objc-class-info ] keep
-    [ >r <malloc-string> r> set-objc-class-name ] keep ;
+    [ >r malloc-char-string r> set-objc-class-name ] keep ;
 
 ! The Objective C object model is a bit funny.
 ! Every class has a metaclass.
@@ -60,19 +60,14 @@ libc math namespaces sequences strings words ;
     r> <method-list> class_addMethods ;
 
 : encode-types ( return types -- encoding )
-    >r 1array r> append
-    [ [ alien>objc-types get hash % CHAR: 0 , ] each ] "" make ;
-
-: struct-return ( ret types quot -- ret types quot )
-    pick c-struct? [
-        pick c-size [ memcpy ] curry append
-        >r { "void*" } swap append >r drop "void" r> r>
-    ] when ;
+    swap add* [
+        alien>objc-types get hash "0" append
+    ] map concat ;
 
 : prepare-method ( ret types quot -- type imp )
-    >r [ encode-types ] 2keep r>
-    [ struct-return 3array % \ alien-callback , ] [ ] make
-    compile-quot ;
+    >r [ encode-types ] 2keep r> [
+        "cdecl" swap 4array % \ alien-callback ,
+    ] [ ] make compile-quot ;
 
 : prepare-methods ( methods -- methods )
     [ first4 prepare-method 3array ] map ;

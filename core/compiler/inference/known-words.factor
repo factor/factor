@@ -1,12 +1,13 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference
-USING: arrays alien assembler errors generic hashtables
-hashtables-internals io io-internals kernel
-kernel-internals math math-internals memory parser
-sequences strings vectors words prettyprint namespaces ;
+USING: arrays byte-arrays alien generator errors generic
+hashtables hashtables-internals io io-internals c-streams kernel
+kernel-internals math math-internals memory parser sequences
+strings sbufs vectors words prettyprint namespaces ;
 
 \ declare [
+    1 ensure-values
     pop-literal nip
     dup ensure-values
     dup length d-tail
@@ -14,7 +15,6 @@ sequences strings vectors words prettyprint namespaces ;
     [ 2dup set-node-in-d set-node-out-d ] keep
     node,
 ] "infer" set-word-prop
-\ declare { object } { } <effect> "inferred-effect" set-word-prop
 
 \ fixnum< { fixnum fixnum } { object } <effect> "inferred-effect" set-word-prop
 \ fixnum< t "foldable" set-word-prop
@@ -32,31 +32,26 @@ sequences strings vectors words prettyprint namespaces ;
 \ eq? t "foldable" set-word-prop
 
 ! Primitive combinators
-\ call { object } { } <effect> "inferred-effect" set-word-prop
+\ call [
+    1 ensure-values
+    pop-literal infer-quot-value
+] "infer" set-word-prop
 
-\ call [ pop-literal infer-quot-value ] "infer" set-word-prop
-
-\ execute { word } { } <effect> "inferred-effect" set-word-prop
-
-\ execute [ pop-literal nip apply-word ] "infer" set-word-prop
-
-\ if { object object object } { } <effect> "inferred-effect" set-word-prop
+\ execute [
+    1 ensure-values
+    pop-literal nip apply-word
+] "infer" set-word-prop
 
 \ if [
+    3 ensure-values
+    [ #values ]
     2 #drop node, pop-d pop-d swap 2array
     #if pop-d drop infer-branches
 ] "infer" set-word-prop
 
-\ cond { object } { } <effect> "inferred-effect" set-word-prop
-
-\ cond [
-    pop-literal <reversed>
-    [ no-cond ] swap alist>quot infer-quot-value
-] "infer" set-word-prop
-
-\ dispatch { fixnum array } { } <effect> "inferred-effect" set-word-prop
-
 \ dispatch [
+    2 ensure-values
+    [ gensym #return ]
     pop-literal nip [ <value> ] map
     #dispatch pop-d drop infer-branches
 ] "infer" set-word-prop
@@ -227,7 +222,7 @@ t over set-effect-terminated?
 \ float>= { float float } { object } <effect> "inferred-effect" set-word-prop
 \ float>= t "foldable" set-word-prop
 
-\ (word) { object object } { word } <effect> "inferred-effect" set-word-prop
+\ <word> { object object } { word } <effect> "inferred-effect" set-word-prop
 
 \ update-xt { word } { } <effect> "inferred-effect" set-word-prop
 
@@ -237,7 +232,7 @@ t over set-effect-terminated?
 \ setenv { object fixnum } { } <effect> "inferred-effect" set-word-prop
 \ stat { string } { object object object object } <effect> "inferred-effect" set-word-prop
 \ (directory) { string } { array } <effect> "inferred-effect" set-word-prop
-\ data-gc { integer } { } <effect> "inferred-effect" set-word-prop
+\ data-gc { } { } <effect> "inferred-effect" set-word-prop
 
 ! code-gc does not declare a stack effect since it might be
 ! called from a compiled word which becomes unreachable during
@@ -314,8 +309,8 @@ t over set-effect-terminated?
 
 \ string>u16-alien { string } { byte-array } <effect> "inferred-effect" set-word-prop
 
-\ string>memory { string integer } { } <effect> "inferred-effect" set-word-prop
-\ memory>string { integer integer } { string } <effect> "inferred-effect" set-word-prop
+\ string>memory { string c-ptr } { } <effect> "inferred-effect" set-word-prop
+\ memory>string { c-ptr integer } { string } <effect> "inferred-effect" set-word-prop
 
 \ alien-address { alien } { integer } <effect> "inferred-effect" set-word-prop
 
@@ -365,13 +360,7 @@ t over set-effect-terminated?
 \ xt-map { } { array } <effect> "inferred-effect" set-word-prop
 
 ! Dynamic scope inference
-: if-tos-literal ( quot -- )
-    peek-d dup value? [ value-literal swap call ] [ 2drop ] if ;
-    inline
-
 \ >n [ H{ } clone push-n ] "infer-vars" set-word-prop
-
-\ >n { object } { } <effect> "inferred-effect" set-word-prop
 
 TUPLE: too-many-n> ;
 
@@ -384,34 +373,27 @@ TUPLE: too-many-n> ;
 
 \ n> [ apply-n> ] "infer-vars" set-word-prop
 
-\ n> { } { object } <effect> "inferred-effect" set-word-prop
-
 \ ndrop [ apply-n> ] "infer-vars" set-word-prop
 
-\ ndrop { } { } <effect> "inferred-effect" set-word-prop
+: if-tos-literal ( quot -- )
+    1 ensure-values peek-d dup value? [
+        value-literal swap call
+    ] [
+        2drop
+    ] if ; inline
 
 \ get [
     [ apply-var-read ] if-tos-literal
 ] "infer-vars" set-word-prop
 
-\ get { object } { object } <effect> "inferred-effect" set-word-prop
-
 \ set [
     [ apply-var-write ] if-tos-literal
 ] "infer-vars" set-word-prop
 
-\ set { object object } { } <effect> "inferred-effect" set-word-prop
-
 \ get-global [
-    [ apply-global-read ]
-    if-tos-literal
+    [ apply-global-read ] if-tos-literal
 ] "infer-vars" set-word-prop
-
-\ get-global { object } { object } <effect> "inferred-effect" set-word-prop
 
 \ set-global [
-    [ apply-global-write ]
-    if-tos-literal
+    [ apply-global-write ] if-tos-literal
 ] "infer-vars" set-word-prop
-
-\ set-global { object object } { } <effect> "inferred-effect" set-word-prop

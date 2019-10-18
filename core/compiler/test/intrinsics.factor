@@ -132,6 +132,12 @@ math-internals sequences strings test words errors ;
 [ 4 ] [ 1 [ 3 fixnum+ ] compile-1 ] unit-test
 [ 4 ] [ [ 1 3 fixnum+ ] compile-1 ] unit-test
 
+[ 4 ] [ 1 3 [ fixnum+fast ] compile-1 ] unit-test
+[ 4 ] [ 1 [ 3 fixnum+fast ] compile-1 ] unit-test
+[ 4 ] [ [ 1 3 fixnum+fast ] compile-1 ] unit-test
+
+[ 30001 ] [ 1 [ 30000 fixnum+fast ] compile-1 ] unit-test
+
 [ 6 ] [ 2 3 [ fixnum* ] compile-1 ] unit-test
 [ 6 ] [ 2 [ 3 fixnum* ] compile-1 ] unit-test
 [ 6 ] [ [ 2 3 fixnum* ] compile-1 ] unit-test
@@ -225,7 +231,7 @@ cell 8 = [
 \ compiled-fixnum* compile
 
 : test-fixnum*
-    (random-int) >fixnum (random-int) >fixnum
+    (random) >fixnum (random) >fixnum
     2dup
     [ fixnum* ] 2keep compiled-fixnum* =
     [ 2drop ] [ "Oops" throw ] if ;
@@ -236,7 +242,7 @@ cell 8 = [
 \ compiled-fixnum>bignum compile
 
 : test-fixnum>bignum
-    (random-int) >fixnum
+    (random) >fixnum
     dup [ fixnum>bignum ] keep compiled-fixnum>bignum =
     [ drop ] [ "Oops" throw ] if ;
 
@@ -246,8 +252,33 @@ cell 8 = [
 \ compiled-bignum>fixnum compile
 
 : test-bignum>fixnum
-    5 random-int [ drop (random-int) ] map product >bignum
+    5 random [ drop (random) ] map product >bignum
     dup [ bignum>fixnum ] keep compiled-bignum>fixnum =
     [ drop ] [ "Oops" throw ] if ;
 
 [ ] [ 10000 [ test-bignum>fixnum ] times ] unit-test
+
+! Test overflow check removal
+[ t ] [
+    most-positive-fixnum 100 - >fixnum
+    200
+    [ [ fixnum+ ] compile-1 [ bignum>fixnum ] compile-1 ] 2keep
+    [ fixnum+ >fixnum ] compile-1
+    =
+] unit-test
+
+[ t ] [
+    most-negative-fixnum 100 + >fixnum
+    -200
+    [ [ fixnum+ ] compile-1 [ bignum>fixnum ] compile-1 ] 2keep
+    [ fixnum+ >fixnum ] compile-1
+    =
+] unit-test
+
+[ t ] [
+    most-negative-fixnum 100 + >fixnum
+    200
+    [ [ fixnum- ] compile-1 [ bignum>fixnum ] compile-1 ] 2keep
+    [ fixnum- >fixnum ] compile-1
+    =
+] unit-test

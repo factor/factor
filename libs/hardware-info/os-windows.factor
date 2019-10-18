@@ -1,9 +1,9 @@
 IN: cpuinfo
-USING: alien kernel math win32-api ;
+USING: alien kernel libc math win32-api ;
 
 : memory-status ( -- MEMORYSTATUSEX )
     "MEMORYSTATUSEX" <c-object>
-    "MEMORYSTATUSEX" c-size over set-MEMORYSTATUSEX-dwLength
+    "MEMORYSTATUSEX" heap-size over set-MEMORYSTATUSEX-dwLength
     [ GlobalMemoryStatusEx ] keep swap zero? [ win32-error ] when ;
 
 : physical-ram ( -- n )
@@ -31,7 +31,7 @@ USING: alien kernel math win32-api ;
 
 : os-version
     "OSVERSIONINFO" <c-object>
-    "OSVERSIONINFO" c-size over set-OSVERSIONINFO-dwOSVersionInfoSize
+    "OSVERSIONINFO" heap-size over set-OSVERSIONINFO-dwOSVersionInfoSize
     [ GetVersionEx ] keep swap zero? [ win32-error ] when ;
 
 : windows-major ( -- n )
@@ -49,6 +49,27 @@ USING: alien kernel math win32-api ;
 : windows-service-pack ( -- string )
     os-version OSVERSIONINFO-szCSDVersion ;
 
-: sse2? ( -- ? )
-    PF_XMMI64_INSTRUCTIONS_AVAILABLE IsProcessorFeaturePresent zero? not ;
+: feature-present? ( n -- ? )
+    IsProcessorFeaturePresent zero? not ;
 
+: sse2? ( -- ? )
+    PF_XMMI64_INSTRUCTIONS_AVAILABLE feature-present? ;
+
+: sse3? ( -- ? )
+    PF_SSE3_INSTRUCTIONS_AVAILABLE feature-present? ;
+
+: computer-name ( -- string )
+    MAX_COMPUTERNAME_LENGTH 1+ [ malloc ] keep
+    <int> dupd GetComputerName zero? [
+        free win32-error f
+    ] [
+        [ alien>u16-string ] keep free
+    ] if ;
+ 
+: username ( -- string )
+    UNLEN 1+ [ malloc ] keep
+    <int> dupd GetUserName zero? [
+        free win32-error f
+    ] [
+        [ alien>u16-string ] keep free
+    ] if ;

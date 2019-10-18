@@ -7,7 +7,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 IN: serialize
-USING: kernel kernel-internals math hashtables namespaces io strings sequences generic words errors arrays vectors alien ;
+USING: kernel kernel-internals math hashtables namespaces 
+io sbufs strings sequences generic words errors arrays 
+vectors alien byte-arrays ;
 
 ! Variable holding a sequence of objects already serialized
 SYMBOL: serialized
@@ -98,6 +100,9 @@ M: array serialize ( obj -- )
 M: vector serialize ( obj -- )
   "v" serialize-seq ;
 
+M: byte-array serialize ( obj -- )
+  "A" serialize-seq ;
+
 M: quotation serialize ( obj -- )
   "q" serialize-seq ;
 
@@ -116,16 +121,6 @@ M: word serialize ( obj -- )
 M: wrapper serialize ( obj -- )
   "W" write
   wrapped serialize ;
-
-M: byte-array serialize ( obj -- )
-  [
-    "A" write
-    dup add-object serialize
-    dup length cells dup serialize
-    [
-      2dup alien-unsigned-1 serialize
-    ] repeat    
-  ] serialize-shared drop ;
 
 DEFER: deserialize ( -- obj )
 
@@ -162,29 +157,25 @@ DEFER: deserialize ( -- obj )
 : deserialize-wrapper ( -- wrapper )
   deserialize <wrapper> ;
 
-: deserialize-array ( -- array )
-  deserialize     
+: deserialize-seq ( seq -- array )
   [ 
+    deserialize     
     deserialize 
     [ deserialize , ] repeat 
-  ] { } make 
+  ] swap make 
   [ intern-object ] keep ;
+
+: deserialize-array ( -- array )
+  { } deserialize-seq ;
 
 : deserialize-vector ( -- array )
-  deserialize     
-  [ 
-    deserialize 
-    [ deserialize , ] repeat 
-  ] V{ } make 
-  [ intern-object ] keep ;
+  V{ } deserialize-seq ;
 
 : deserialize-quotation ( -- array )
-  deserialize     
-  [ 
-    deserialize 
-    [ deserialize , ] repeat 
-  ] [ ] make 
-  [ intern-object ] keep ;
+  [ ] deserialize-seq ;
+
+: deserialize-byte-array ( -- byte-array )
+  B{ } deserialize-seq ;
 
 : deserialize-hashtable ( -- array )
   deserialize 
@@ -196,19 +187,11 @@ DEFER: deserialize ( -- obj )
   deserialize >tuple
   [ intern-object ] keep ;
 
-: deserialize-byte-array ( -- byte-array )
-  deserialize 
-  deserialize dup <byte-array> swap 
-  [
-    deserialize pick pick set-alien-unsigned-1
-  ] repeat
-  [ intern-object ] keep ;
-
 : deserialize-unknown ( -- object )
   deserialize serialized get nth ;
 
 : deserialize ( -- object )
-  read1 ch>string dup
+  1 read dup
   H{ { "s" deserialize-string }
      { "r" deserialize-ratio }
      { "c" deserialize-complex }

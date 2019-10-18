@@ -64,7 +64,8 @@ $terpri
 "Some mathematical operations are only supported on integers."
 { $subsection "modular-arithmetic" }
 { $subsection "bitwise-arithmetic" }
-{ $subsection "random-numbers" } ;
+{ $subsection "random-numbers" }
+{ $see-also "syntax-integers" } ;
 
 ARTICLE: "modular-arithmetic" "Modular arithmetic"
 { $subsection mod }
@@ -82,11 +83,12 @@ ARTICLE: "bitwise-arithmetic" "Bitwise arithmetic"
 { $subsection shift }
 { $subsection log2 }
 { $subsection power-of-2? }
-{ $subsection next-power-of-2 } ;
+{ $subsection next-power-of-2 }
+{ $see-also "conditionals" } ;
 
 ARTICLE: "random-numbers" "Generating random integers"
-{ $subsection (random-int) }
-{ $subsection random-int } ;
+{ $subsection (random) }
+{ $subsection random } ;
 
 ARTICLE: "rationals" "Rational numbers"
 { $subsection ratio }
@@ -101,13 +103,13 @@ $terpri
 "Ratios can be taken apart:"
 { $subsection numerator }
 { $subsection denominator }
-{ $subsection >fraction } ;
+{ $subsection >fraction }
+{ $see-also "syntax-ratios" } ;
 
 ARTICLE: "floats" "Floats"
+{ $subsection float }
 "Rational numbers represent " { $emphasis "exact" } " quantities. On the other hand, a floating point number is an " { $emphasis "approximation" } ". While rationals can grow to any required precision, floating point numbers are fixed-width, and manipulating them is usually faster than manipulating ratios or bignums (but slower than manipulating fixnums). Floating point numbers are often used to represent irrational numbers, which have no exact representation as a ratio of two integers."
 $terpri
-"Floating point literals are input with a decimal point."
-{ $example "1.23 1.5 + ." "1.73" }
 "Introducing a floating point number in a computation forces the result to be expressed in floating point."
 { $example "5/4 1/2 + ." "7/4" }
 { $example "5/4 0.5 + ." "1.75" }
@@ -119,7 +121,8 @@ $terpri
 { $subsection float>bits }
 { $subsection double>bits }
 { $subsection bits>float }
-{ $subsection bits>double } ;
+{ $subsection bits>double }
+{ $see-also "syntax-floats" } ;
 
 ARTICLE: "complex-numbers" "Complex numbers"
 { $subsection complex }
@@ -140,7 +143,8 @@ $terpri
 { $subsection >polar }
 { $subsection polar> }
 "Reflection in the " { $snippet "x" } " axis:"
-{ $subsection conjugate } ;
+{ $subsection conjugate }
+{ $see-also "syntax-complex-numbers" } ;
 
 ARTICLE: "math-functions" "Mathematical functions"
 { $subsection "arithmetic-functions" }
@@ -166,7 +170,8 @@ ARTICLE: "arithmetic-functions" "Arithmetic functions"
 "Rounding:"
 { $subsection ceiling }
 { $subsection floor }
-{ $subsection truncate } ;
+{ $subsection truncate }
+{ $subsection round } ;
 
 ARTICLE: "power-functions" "Powers and logarithms"
 "Squares:"

@@ -90,6 +90,7 @@ int ffi_test_13(int a, int b, int c, int d, int e, int f, int g, int h, int i, i
 struct foo ffi_test_14(int x, int y)
 {
 	struct foo r;
+	printf("ffi_test_14(%d,%d)\n",x,y);
 	r.x = x; r.y = y;
 	return r;
 }
@@ -100,4 +101,39 @@ char *ffi_test_15(char *x, char *y)
 		return "foo";
 	else
 		return "bar";
+}
+
+struct bar ffi_test_16(long x, long y, long z)
+{
+	struct bar r;
+	r.x = x; r.y = y; r.z = z;
+	return r;
+}
+
+struct tiny ffi_test_17(int x)
+{
+	struct tiny r;
+	r.x = x;
+	return r;
+}
+
+STDCALL int ffi_test_18(int x, int y, int z, int t)
+{
+	printf("ffi_test_18(%d,%d,%d,%d)\n",x,y,z,t);
+	return x + y + z * t;
+}
+
+STDCALL struct bar ffi_test_19(long x, long y, long z)
+{
+	struct bar r;
+	r.x = x; r.y = y; r.z = z;
+	return r;
+}
+
+void ffi_test_20(double x1, double x2, double x3,
+	double y1, double y2, double y3,
+	double z1, double z2, double z3)
+{
+	printf("ffi_test_20(%f,%f,%f,%f,%f,%f,%f,%f,%f)\n",
+		x1, x2, x3, y1, y2, y3, z1, z2, z3);
 }

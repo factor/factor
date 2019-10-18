@@ -1,3 +1,5 @@
+! Copyright (C) 2005, 2006 Daniel Ehrenberg
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel generic ;
 IN: xml-data
 
@@ -11,30 +13,29 @@ TUPLE: name space tag url ;
     [ name-url swap name-url ?= ] 2keep
     name-tag swap name-tag ?= and and ;
 
-TUPLE: entity name ;
-TUPLE: opener name props ;
+TUPLE: opener name attrs ;
 TUPLE: closer name ;
-TUPLE: contained name props ;
+TUPLE: contained name attrs ;
 TUPLE: comment text ;
 TUPLE: directive text ;
 TUPLE: instruction text ;
 TUPLE: prolog version encoding standalone ;
 
-TUPLE: xml-doc prolog before after ;
-C: xml-doc ( prolog before main after -- xml-doc )
-    [ set-xml-doc-after ] keep
+TUPLE: xml prolog before after ;
+C: xml ( prolog before main after -- xml )
+    [ set-xml-after ] keep
     [ set-delegate ] keep
-    [ set-xml-doc-before ] keep
-    [ set-xml-doc-prolog ] keep ;
+    [ set-xml-before ] keep
+    [ set-xml-prolog ] keep ;
 
-TUPLE: tag props children ;
-C: tag ( name props children -- tag )
+TUPLE: tag attrs children ;
+C: tag ( name attrs children -- tag )
     [ set-tag-children ] keep
-    [ set-tag-props ] keep
+    [ set-tag-attrs ] keep
     [ set-delegate ] keep ;
 
 ! tag with children=f is contained
-: <contained-tag> ( name props -- tag )
+: <contained-tag> ( name attrs -- tag )
     f <tag> ;
 
 PREDICATE: tag contained-tag tag-children not ;

@@ -5,7 +5,12 @@ USING: alien arrays errors kernel namespaces sequences ;
 
 : choose-visual ( -- XVisualInfo* )
     dpy get scr get
-    GLX_RGBA GLX_DOUBLEBUFFER 0 3array >int-array
+    [
+        GLX_RGBA ,
+        GLX_DOUBLEBUFFER ,
+        GLX_DEPTH_SIZE , 16 ,
+        0 ,
+    ] { } make >int-array
     glXChooseVisual
     [ "Could not get a double-buffered GLX RGBA visual" throw ] unless* ;
 

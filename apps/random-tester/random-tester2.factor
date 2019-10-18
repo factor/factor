@@ -1,7 +1,6 @@
-USING: compiler errors inference interpreter io
-kernel math memory namespaces prettyprint random-tester
-sequences tools words ;
-USING: arrays definitions generic graphs hashtables ;
+USING: compiler errors inference interpreter io kernel math
+memory namespaces prettyprint random-tester sequences tools
+words arrays definitions generic graphs hashtables byte-arrays ;
 IN: random-tester2
 
 SYMBOL: wordbank
@@ -13,11 +12,11 @@ SYMBOL: wordbank
         xref-words
 
         times repeat (repeat)
-        supremum infimum assoc rassoc norm-sq
+        supremum infimum assoc norm-sq
         product sum curry remove-all member? subseq?
 
         (next-power-of-2) (^) d>w/w w>h/h millis
-        (random-int) ^n integer, first-bignum
+        (random) ^n integer, first-bignum
         most-positive-fixnum ^ init-random next-power-of-2
         most-negative-fixnum
 
@@ -33,7 +32,6 @@ SYMBOL: wordbank
         set-no-math-method-right
         set-check-method-class
         set-check-create-name
-        set-nested-style-stream-style
         set-pathname-string
         set-check-create-vocab
         <check-create> check-create?
@@ -44,10 +42,10 @@ SYMBOL: wordbank
 
         define-compound define make-generic
         define-method define-predicate-class
-        define-tuple define-temp define-tuple-slots
+        define-tuple-class define-temp define-tuple-slots
         define-writer define-predicate define-generic
         ?make-generic define-reader define-slot define-slots
-        define-typecheck define-slot-word define-union
+        define-typecheck define-slot-word define-union-class
         define-generic* with-methods define-constructor
         predicate-word condition-continuation define-symbol
 
@@ -57,9 +55,10 @@ SYMBOL: wordbank
         set-word-props set-word-primitive
 
         stdio
-        close readln (readln) read1 read with-server
+        close readln read1 read read-until
         stream-read stream-readln stream-read1 lines (lines)
         contents stream-copy stream-flush
+        lines-loop
         stream-format set-line-reader-cr
 
         double>bits float>bits >bignum
@@ -69,7 +68,7 @@ SYMBOL: wordbank
 
         bin> oct> le> be> hex> string>number
 
-        gensym random-int counter <byte-array>
+        gensym random counter <byte-array>
         <word> <client-stream> <server> <client>
         <duplex-stream> <file-writer> <file-reader> ! <file-r/w>
         init-namespaces unxref-word set-global set off on
@@ -77,21 +76,24 @@ SYMBOL: wordbank
         set-restart-obj
         +@ inc dec
 
-        changed-words
+        changed-words changed-word
+
         callstack namespace namestack global vocabularies
 
         path+ parent-dir
 
-        .s . word-xt.
+        .s . 
 
-        <continuation> continue-with
-        set-delegate
+        with-datastack <quotation>
+        (delegates) simple-slot , # % split-next,
+        <continuation> continue-with set-delegate
 
         closure
         
-        tabular-output simple-slots
+        tabular-output simple-slots set-axis
 
-        join concat (group)
+        join concat group
+        hash+
     }
     { "arrays" "errors" "generic" "graphs" "hashtables" "io"
     "kernel" "math" "namespaces"
@@ -152,12 +154,12 @@ err off
 ! A worthwhile test that has not been run extensively
 1000 [ drop gensym ] map "syms" set
 
-: pick-one [ length random-int ] keep nth ;
+: pick-one [ length random ] keep nth ;
 
 : fooify-test
     "syms" get pick-one
-    2000 random-int >quotation
+    2000 random >quotation
     over set-word-def
-    100 random-int zero? [ code-gc ] when
+    100 random zero? [ code-gc ] when
     compile fooify-test ;
 

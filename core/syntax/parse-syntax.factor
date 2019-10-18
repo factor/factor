@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 
 ! We define these words in !syntax with ! prefixes to avoid
@@ -7,9 +7,9 @@
 ! !syntax vocab to syntax, and removes the ! prefix from each
 ! word name.
 IN: !syntax
-USING: alien arrays definitions errors generic
-hashtables kernel math modules namespaces parser sequences
-strings vectors words ;
+USING: alien arrays bit-arrays byte-arrays definitions errors
+generic hashtables kernel math modules namespaces parser
+sequences strings sbufs vectors words ;
 
 : !! line-text get length column-number set ; parsing
 : !#! POSTPONE: ! ; parsing
@@ -30,6 +30,8 @@ SYMBOL: !t
 : !} swap call parsed ; parsing
 : !{ [ >array ] f ; parsing
 : !V{ [ >vector ] f ; parsing
+: !B{ [ >byte-array ] f ; parsing
+: !?{ [ >bit-array ] f ; parsing
 : !H{ [ alist>hash ] f ; parsing
 : !C{ [ first2 rect> ] f ; parsing
 : !T{ [ >tuple ] f ; parsing
@@ -51,19 +53,14 @@ DEFER: !PRIMITIVE: parsing
     scan-word scan-word location
     [ <method> -rot define-method ] f ; parsing
 
-: !UNION:
-    CREATE dup intern-symbol dup predicate-word
-    [ dupd unit "predicate" set-word-prop ] keep
-    [ define-union ] f ; parsing
+: !UNION: CREATE [ define-union-class ] f ; parsing
 
 : !PREDICATE:
-    scan-word CREATE dup intern-symbol
-    dup rot "superclass" set-word-prop dup predicate-word
-    [ define-predicate-class ] f ; parsing
+    scan-word CREATE [ define-predicate-class ] f ; parsing
 
 : !TUPLE:
-    scan string-mode on [ string-mode off define-tuple ] f ;
-    parsing
+    scan string-mode on
+    [ string-mode off define-tuple-class ] f ; parsing
 
 : !C:
     scan-word

@@ -29,6 +29,8 @@ $terpri
 { $subsection swap }
 { $subsection rot }
 { $subsection -rot }
+{ $subsection roll }
+{ $subsection -roll }
 { $subsection 2swap }
 { $subsection swapd }
 "Sometimes an additional storage area is needed to hold objects. The " { $emphasis "retain stack" } " is an auxilliary stack for this purpose. Objects can be moved between the data and retain stacks using the following two words:"
@@ -73,6 +75,9 @@ $terpri
 { $subsection 2keep }
 { $subsection 3keep }
 { $subsection 2apply }
+"A pair of utility words built from " { $link 2apply } ":"
+{ $subsection both? }
+{ $subsection either? }
 "Some combinators which save and restore the entire data stack:"
 { $subsection keep-datastack }
 { $subsection with-datastack } ;
@@ -84,22 +89,24 @@ $terpri
 { $subsection if }
 { $subsection when }
 { $subsection unless }
-"A form encapsulating a common stack shuffle pattern:"
+"Forms abstracting a common stack shuffle pattern:"
 { $subsection if* }
 { $subsection when* }
 { $subsection unless* }
-"Another form encapsulating a common stack shuffle pattern:"
+"Another form abstracting a common stack shuffle pattern:"
 { $subsection ?if }
-"A form used when multiple conditional tests are to be performed:"
-{ $subsection cond }
-"Sometimes instead of executing one of two quotations, you just need to pick one of two values:"
+"Sometimes instead of branching, you just need to pick one of two values:"
 { $subsection ? }
+"Forms which abstract away common patterns involving multiple nested branches:"
+{ $subsection cond }
+{ $subsection case }
 "There are some logical operations on booleans:"
 { $subsection >boolean }
 { $subsection not }
 { $subsection and }
 { $subsection or }
-{ $subsection xor } ;
+{ $subsection xor }
+{ $see-also "bitwise-arithmetic" both? either? } ;
 
 ARTICLE: "interpreter" "The interpreter"
 "The interpreter runs in a loop which repeatedly performs the following steps:"

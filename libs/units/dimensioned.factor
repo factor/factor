@@ -14,7 +14,6 @@ C: dimensioned
 
 : remove-one ( obj seq -- seq )
     tuck index dup -1 = [ drop ] [ swap remove-nth ] if ;
-    [ index ] keep over -1 = [ 2drop ] [ remove-nth ] if ;
 
 : dimensions ( dimensioned -- top bot )
     dup >r dimensioned-top r> dimensioned-bot ;

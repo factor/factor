@@ -1,8 +1,10 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: math
 USING: errors generic kernel kernel-internals sequences
 sequences-internals ;
+
+PREDICATE: fixnum small 1+ fixnum? ;
 
 UNION: integer fixnum bignum ;
 

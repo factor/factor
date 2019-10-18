@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io
 USING: errors generic io kernel math namespaces sequences
@@ -8,39 +8,37 @@ TUPLE: line-reader cr ;
 
 C: line-reader ( stream -- new-stream ) [ set-delegate ] keep ;
 
-: cr> dup line-reader-cr f rot set-line-reader-cr ;
+: cr+ t swap set-line-reader-cr ; inline
 
-: (readln) ( ? line -- ? )
-    #! The flag is set after the first character is read.
-    dup delegate stream-read1 dup [
-        >r >r drop t r> r> dup CHAR: \r number= [
-            drop t swap set-line-reader-cr
-        ] [
-            dup CHAR: \n number= [
-                drop dup cr> [ (readln) ] [ drop ] if
-            ] [
-                , (readln)
-            ] if
-        ] if
-    ] [
-        2drop
-    ] if ;
+: cr- f swap set-line-reader-cr ; inline
 
-M: line-reader stream-readln
-    [ f swap (readln) ] "" make
-    dup empty? [ f ? ] [ nip ] if ;
+: line-ends/eof ( stream str -- str ) f like swap cr- ; inline
+
+: line-ends\r ( stream str -- str ) swap cr+ ; inline
+
+: line-ends\n ( stream str -- str )
+    over line-reader-cr over empty? and
+    [ drop dup cr- stream-readln ] [ swap cr- ] if ; inline
+
+: handle-readln ( stream str ch -- str )
+    {
+        { f [ line-ends/eof ] }
+        { CHAR: \r [ line-ends\r ] }
+        { CHAR: \n [ line-ends\n ] }
+    } case ;
+
+M: line-reader stream-readln ( stream -- str )
+    "\r\n" over delegate stream-read-until handle-readln ;
+
+: fix\r ( stream string -- string )
+    "\n" ?head [ swap stream-read1 [ add ] when* ] [ nip ] if ;
 
 M: line-reader stream-read
-    [ delegate stream-read ] keep dup cr> [
-        over empty? [
-            drop
-        ] [
-            >r 1 tail r> stream-read1 [ add ] when*
-        ] if
-    ] [
-        drop
-    ] if ;
+    tuck delegate stream-read over line-reader-cr
+    [ over cr- fix\r ] [ nip ] if ;
 
-: (lines) ( -- ) readln [ , (lines) ] when* ;
+: lines-loop ( -- ) readln [ , lines-loop ] when* ;
 
-: lines ( stream -- seq ) [ [ (lines) ] { } make ] with-stream ;
+: (lines) ( -- seq ) [ lines-loop ] { } make ;
+
+: lines ( stream -- seq ) [ (lines) ] with-stream ;

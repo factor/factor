@@ -1,0 +1,2 @@
+include vm/Config.solaris
+include vm/Config.x86

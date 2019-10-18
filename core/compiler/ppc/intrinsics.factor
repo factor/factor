@@ -1,7 +1,7 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: compiler
-USING: alien assembler kernel kernel-internals math
+IN: generator
+USING: alien arrays assembler-ppc kernel kernel-internals math
 math-internals namespaces sequences words ;
 
 : generate-slot ( size quot -- )
@@ -9,24 +9,45 @@ math-internals namespaces sequences words ;
     ! turn tagged fixnum slot # into an offset, multiple of 4
     "n" operand dup tag-bits r> - SRAWI
     ! compute slot address
-    "obj" operand dup "n" operand ADD
+    "out" operand dup "n" operand ADD
     ! load slot value
-    "obj" operand dup r> call ; inline
+    "out" operand dup r> call ; inline
 
-\ slot [
-    "obj" operand dup %untag
-    cell log2 [ 0 LWZ ] generate-slot
-] H{
-    { +input+ { { f "obj" } { f "n" } } }
-    { +output+ { "obj" } }
-} define-intrinsic
+\ slot {
+    ! Slot number is literal
+    {
+        [
+            "obj" operand "out" operand %untag
+            "out" operand dup "n" get cells LWZ
+        ] H{
+            { +input+ { { f "obj" } { [ cells ] "n" } } }
+            { +scratch+ { { f "out" } } }
+            { +output+ { "out" } }
+        }
+    }
+    ! Slot number in a register
+    {
+        [
+            "obj" operand "out" operand %untag
+            cell log2 [ 0 LWZ ] generate-slot
+        ] H{
+            { +input+ { { f "obj" } { f "n" } } }
+            { +scratch+ { { f "out" } } }
+            { +output+ { "out" } }
+            { +clobber+ { "n" } }
+        }
+    }
+} define-intrinsics
 
 \ char-slot [
+    "out" operand "obj" operand MR
     1 [ string-offset LHZ ] generate-slot
-    "obj" operand dup %tag-fixnum
+    "out" operand dup %tag-fixnum
 ] H{
     { +input+ { { f "n" } { f "obj" } } }
-    { +output+ { "obj" } }
+    { +scratch+ { { f "out" } } }
+    { +output+ { "out" } }
+    { +clobber+ { "n" } }
 } define-intrinsic
 
 : generate-set-slot ( size quot -- )
@@ -38,22 +59,43 @@ math-internals namespaces sequences words ;
     ! store new slot value
     "val" operand "slot" operand r> call ; inline
 
+: load-cards-offset ( dest -- )
+    "cards_offset" f pick compile-dlsym  dup 0 LWZ ;
+
 : generate-write-barrier ( -- )
-    #! Mark the card pointed to by vreg.
     "obj" operand dup card-bits SRAWI
-    "obj" operand dup 16 ADD
+    "x" operand load-cards-offset
+    "obj" operand dup "x" operand ADD
     "x" operand "obj" operand 0 LBZ
     "x" operand dup card-mark ORI
     "x" operand "obj" operand 0 STB ;
 
-\ set-slot [
-    "obj" operand dup %untag
-    cell log2 [ 0 STW ] generate-set-slot generate-write-barrier
-] H{
-    { +input+ { { f "val" } { f "obj" } { f "slot" } } }
-    { +scratch+ { { f "x" } } }
-    { +clobber+ { "obj" "slot" } }
-} define-intrinsic
+\ set-slot {
+    ! Slot number is literal
+    {
+        [
+            "obj" operand dup %untag
+            "val" operand "obj" operand "n" get cells STW
+            generate-write-barrier
+        ] H{
+            { +input+ { { f "val" } { f "obj" } { [ cells ] "n" } } }
+            { +scratch+ { { f "x" } } }
+            { +clobber+ { "obj" } }
+        }
+    }
+    ! Slot number is in a register
+    {
+        [
+            "obj" operand dup %untag
+            cell log2 [ 0 STW ] generate-set-slot
+            generate-write-barrier
+        ] H{
+            { +input+ { { f "val" } { f "obj" } { f "slot" } } }
+            { +scratch+ { { f "x" } } }
+            { +clobber+ { "obj" "slot" } }
+        }
+    }
+} define-intrinsics
 
 \ set-char-slot [
     ! untag the new value in 0th input
@@ -65,20 +107,32 @@ math-internals namespaces sequences words ;
     { +clobber+ { "val" "slot" "obj" } }
 } define-intrinsic
 
-: define-fixnum-op ( word op -- )
-    [ [ "x" operand "y" operand "x" operand ] % , ] [ ] make H{
+: fixnum-register-op ( op -- pair )
+    [ "out" operand "y" operand "x" operand ] swap add H{
         { +input+ { { f "x" } { f "y" } } }
-        { +output+ { "x" } }
-    } define-intrinsic ;
+        { +scratch+ { { f "out" } } }
+        { +output+ { "out" } }
+    } 2array ;
+
+: fixnum-value-op ( op -- pair )
+    [ "out" operand "x" operand "y" operand ] swap add H{
+        { +input+ { { f "x" } { [ v>operand ] "y" } } }
+        { +scratch+ { { f "out" } } }
+        { +output+ { "out" } }
+    } 2array ;
+
+: define-fixnum-op ( word imm-op reg-op -- )
+    >r fixnum-value-op r> fixnum-register-op 2array
+    define-intrinsics ;
 
 {
-    { fixnum+fast ADD }
-    { fixnum-fast SUBF }
-    { fixnum-bitand AND }
-    { fixnum-bitor OR }
-    { fixnum-bitxor XOR }
+    { fixnum+fast ADDI ADD }
+    { fixnum-fast SUBI SUBF }
+    { fixnum-bitand ANDI AND }
+    { fixnum-bitor ORI OR }
+    { fixnum-bitxor XORI XOR }
 } [
-    first2 define-fixnum-op
+    first3 define-fixnum-op
 ] each
 
 : generate-fixnum-mod
@@ -105,9 +159,17 @@ math-internals namespaces sequences words ;
     { +output+ { "x" } }
 } define-intrinsic
 
-: define-fixnum-jump ( word op -- )
+: fixnum-register-jump ( op -- pair )
     [ "x" operand 0 "y" operand CMP ] swap add
-    { { f "x" } { f "y" } } define-if-intrinsic ;
+    { { f "x" } { f "y" } } 2array ;
+
+: fixnum-value-jump ( op -- pair )
+    [ 0 "x" operand "y" operand CMPI ] swap add
+    { { f "x" } { [ v>operand ] "y" } } 2array ;
+
+: define-fixnum-jump ( word op -- )
+    [ fixnum-value-jump ] keep fixnum-register-jump
+    2array define-if-intrinsics ;
 
 {
     { fixnum< BLT }
@@ -119,8 +181,11 @@ math-internals namespaces sequences words ;
     first2 define-fixnum-jump
 ] each
 
-: simple-overflow ( word -- )
+: simple-overflow ( insn1 insn2 -- )
     [
+        >r 0 0 LI
+        0 MTXER
+        "r" operand "y" operand "x" operand r> execute
         >r
         "end" define-label
         "end" get BNO
@@ -131,9 +196,7 @@ math-internals namespaces sequences words ;
     ] with-scope ; inline
 
 \ fixnum+ [
-    0 MTXER
-    "r" operand "y" operand "x" operand ADDO.
-    \ ADD simple-overflow
+    \ ADD \ ADDO. simple-overflow
 ] H{
     { +input+ { { f "x" } { f "y" } } }
     { +scratch+ { { f "r" } } }
@@ -142,34 +205,13 @@ math-internals namespaces sequences words ;
 } define-intrinsic
 
 \ fixnum- [
-    0 MTXER
-    "r" operand "y" operand "x" operand SUBFO.
-    \ SUBF simple-overflow
+    \ SUBF \ SUBFO. simple-overflow
 ] H{
     { +input+ { { f "x" } { f "y" } } }
     { +scratch+ { { f "r" } } }
     { +output+ { "r" } }
     { +clobber+ { "x" "y" } }
 } define-intrinsic
-
-! \ fixnum* [
-!     "end" define-label
-!     "r" operand "x" operand %untag-fixnum
-!     0 MTXER
-!     "s" operand "y" operand "r" operand MULLWO.
-!     "end" get BNO
-!     "s" operand "y" operand 1 SRAWI
-!     "x" operand "s" operand "r" operand MULLWO.
-!     "x" operand dup 2 SRAWI
-!     "s" operand "s" operand "r" operand MULHW
-!     "s" operand "x" operand %allot-bignum-signed-2
-!     "end" resolve-label
-! ] H{
-!     { +input+ { { f "x" } { f "y" } } }
-!     { +scratch+ { { f "r" } { f "s" } } }
-!     { +output+ { "s" } }
-!     { +clobber+ { "x" "y" } }
-! } define-intrinsic
 
 : generate-fixnum/i
     #! This VOP is funny. If there is an overflow, it falls
@@ -264,7 +306,7 @@ math-internals namespaces sequences words ;
 } define-intrinsic
 
 : define-float-op ( word op -- )
-    [ [ "x" operand "x" operand "y" operand ] % , ] [ ] make H{
+    [ "x" operand "x" operand "y" operand ] swap add H{
         { +input+ { { float "x" } { float "y" } } }
         { +output+ { "x" } }
     } define-intrinsic ;
@@ -294,8 +336,8 @@ math-internals namespaces sequences words ;
 
 \ float>fixnum [
     "scratch" operand "in" operand FCTIWZ
-    "scratch" operand 1 0 stack@ STFD
-    "out" operand 1 cell stack@ LWZ
+    "scratch" operand 1 0 param@ STFD
+    "out" operand 1 cell param@ LWZ
     "out" operand dup %tag-fixnum
 ] H{
     { +input+ { { float "in" } } }
@@ -304,7 +346,7 @@ math-internals namespaces sequences words ;
 } define-intrinsic
 
 \ tag [
-    "in" operand "out" operand tag-mask ANDI
+    "out" operand "in" operand tag-mask ANDI
     "out" operand dup %tag-fixnum
 ] H{
     { +input+ { { f "in" } } }
@@ -316,7 +358,7 @@ math-internals namespaces sequences words ;
     "f" define-label
     "end" define-label
     ! Get the tag
-    "obj" operand "y" operand tag-mask ANDI
+    "y" operand "obj" operand tag-mask ANDI
     ! Tag the tag
     "y" operand "x" operand %tag-fixnum
     ! Compare with object tag number (3).

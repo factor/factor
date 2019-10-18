@@ -1,23 +1,29 @@
-USING: kernel math sequences namespaces errors hashtables words
-arrays parser compiler syntax io optimizer inference shuffle
-tools prettyprint ;
+USING: generic kernel math sequences namespaces errors
+hashtables words arrays parser compiler syntax io
+optimizer inference shuffle tools prettyprint ;
 IN: random-tester
 
 : pick-one ( seq -- elt )
-    [ length random-int ] keep nth ;
+    [ length random ] keep nth ;
+    
+: word-input-count ( word -- n )
+    [ stack-effect effect-in length ] [ 2drop 0 ] recover ;
+    
+: type-error? ( exception -- ? )
+    [ swap execute or ] curry
+    >r { no-method? no-math-method? } f r> reduce ;
 
 ! HASHTABLES
 : random-hash-entry ( hash -- key value )
-    hash>alist pick-one first2 ;
+    [ hash-keys pick-one dup ] keep hash ;
 
-: coin-flip ( -- bool ) 2 random-int zero? ;
+: coin-flip ( -- bool ) 2 random zero? ;
 : do-one ( seq -- ) pick-one call ; inline
 
 : nzero-array ( seq -- )
     dup length >r 0 r> [ pick set-nth ] each-with drop ;
     
-: zero-array
-    [ drop 0 ] map ;
+: zero-array ( n -- seq ) [ drop 0 ] map ;
 
 TUPLE: p-list seq max count count-vec ;
 : make-p-list ( seq n -- tuple )
@@ -55,10 +61,7 @@ TUPLE: p-list seq max count count-vec ;
     dup p-list-next [ , (permutations) ] [ drop ] if* ;
 
 : permutations ( seq n -- seq )
-    make-p-list
-    [
-        (permutations)
-    ] { } make ;
+    make-p-list [ (permutations) ] { } make ;
 
 : (each-permutation) ( tuple quot -- )
     over p-list-next [
@@ -71,3 +74,7 @@ TUPLE: p-list seq max count count-vec ;
 : each-permutation ( seq n quot -- )
     >r make-p-list r> (each-permutation) ;
 
+SYMBOL: saved-datastack
+: with-saved-datastack
+    >r datastack saved-datastack set r> call
+    saved-datastack get set-datastack ; inline

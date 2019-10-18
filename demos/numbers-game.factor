@@ -16,7 +16,7 @@ USING: kernel math parser io ;
 : judge-guess ( actual guess -- ? )
     2dup = [ 2drop correct f ] [ inexact-guess t ] if ;
 
-: number-to-guess ( -- n ) 100 random-int ;
+: number-to-guess ( -- n ) 100 random ;
 
 : numbers-game-loop ( actual -- )
     dup guess-prompt read-number judge-guess

@@ -14,12 +14,11 @@ HELP: describe
 { $description "Print a tabular overview of the object."
 $terpri
 "For sequences and hashtables, this outputs the entries of the collection. For all other object types, slot names and values are shown." }
-{ $notes "Slot values are converted to strings using " { $link unparse-short } "." }
 { $examples { $code "global describe" } } ;
 
 HELP: stack.
 { $values { "seq" "a sequence" } }
-{ $description "Prints an outliner listing elements of a sequence in reverse order. Elements are coverted to strings using " { $link unparse-short } "." }
+{ $description "Prints an outliner listing elements of a sequence in reverse order." }
 { $notes "This word is used in the implementation of " { $link .s } " and " { $link .r } "." } ;
 
 HELP: callstack.

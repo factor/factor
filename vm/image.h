@@ -27,8 +27,8 @@ typedef struct {
 	CELL code_relocation_base;
 } F_HEADER;
 
+void load_image(F_PARAMETERS *p);
 void init_objects(F_HEADER *h);
-void load_image(const char* file);
 bool save_image(const char* file);
 void primitive_save_image(void);
 
@@ -38,14 +38,16 @@ CELL data_relocation_base;
 INLINE void data_fixup(CELL *cell)
 {
 	if(TAG(*cell) != FIXNUM_TYPE && *cell != F)
-		*cell += (tenured.base - data_relocation_base);
+		*cell += (tenured.start - data_relocation_base);
 }
 
 CELL code_relocation_base;
 
-INLINE void code_fixup(CELL *cell)
+INLINE void code_fixup(XT *cell)
 {
-	*cell += (compiling.base - code_relocation_base);
+	CELL value = (CELL)*cell;
+	value += (code_heap.segment->start - code_relocation_base);
+	*cell = (XT)value;
 }
 
 void relocate_data();

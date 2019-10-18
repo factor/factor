@@ -43,10 +43,6 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
     #! Complex inner product.
     0 [ ** + ] 2reduce ;
 
-: proj ( u v -- w )
-    #! Orthogonal projection of u onto v.
-    [ [ v. ] keep norm-sq v/n ] keep n*v ;
-
 : minmax ( seq -- min max )
     #! find the min and max of a seq in one pass
     1./0. -1./0. rot [ dup pick max -rot nip pick min -rot nip ] each ;
@@ -56,8 +52,12 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
     minmax 2dup [ abs ] 2apply > [ swap ] when ;
 
 SYMBOL: almost=-precision .000001 almost=-precision set-global
+
 : almost= ( a b -- bool )
     - abs almost=-precision get < ;
+
+: m-almost= ( m n -- ? )
+    t -rot [ [ almost= and ] 2each ] 2each ;
 
 TUPLE: frange from step length ;
 
@@ -87,6 +87,3 @@ SYMBOL: step-size .01 step-size set-global  ! TODO: base on arguments
 : limit ( quot -- x )
     .1 step-size set [ call ] keep
     step-size [ 2 / ] change 0 -rot (limit) 2drop ;
-
-: nth-rand ( seq -- elem ) [ length random-int ] keep nth ;
-

@@ -13,8 +13,8 @@ FUNCTION: char* strerror ( int errno ) ;
 FUNCTION: int open ( char* path, int flags, int prot ) ;
 FUNCTION: void close ( int fd ) ;
 FUNCTION: int fcntl ( int fd, int cmd, int arg ) ;
-FUNCTION: ssize_t read ( int fd, ulong buf, size_t nbytes ) ;
-FUNCTION: ssize_t write ( int fd, ulong buf, size_t nbytes ) ;
+FUNCTION: ssize_t read ( int fd, void* buf, size_t nbytes ) ;
+FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
 
 BEGIN-STRUCT: timeval
     FIELD: long sec

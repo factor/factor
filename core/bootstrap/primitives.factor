@@ -1,9 +1,9 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: image
-USING: alien arrays generic hashtables help io kernel
-kernel-internals math modules namespaces parser sequences
-strings vectors words ;
+USING: alien arrays byte-arrays generic hashtables
+hashtables-internals help io kernel kernel-internals math
+modules namespaces parser sequences strings vectors words ;
 
 ! Some very tricky code creating a bootstrap embryo in the
 ! host image.
@@ -25,15 +25,14 @@ V{ } clone modules set
 vocabularies get [ "syntax" set ] bind
 
 H{ } clone articles set
-parent-graph off
+help-tree off
 crossref off
 changed-words off
 
 ! Call the quotation parsed from primitive-types.factor
 call
 
-: make-primitive ( { vocab word } n -- )
-    >r first2 create f r> define ;
+: make-primitive ( word vocab n -- ) >r create f r> define ;
 
 {
     { "execute" "words"                     }
@@ -41,7 +40,7 @@ call
     { "if" "kernel"                         }
     { "dispatch" "kernel-internals"         }
     { "rehash-string" "kernel-internals"    }
-    { "string>sbuf" "strings"               }
+    { "string>sbuf" "sbufs"                 }
     { "bignum>fixnum" "math-internals"      }
     { "float>fixnum" "math-internals"       }
     { "fixnum>bignum" "math-internals"      }
@@ -98,7 +97,7 @@ call
     { "float<=" "math-internals"            }
     { "float>" "math-internals"             }
     { "float>=" "math-internals"            }
-    { "(word)" "kernel-internals"           }
+    { "<word>" "words"                      }
     { "update-xt" "words"                   }
     { "word-xt" "words"                     }
     { "drop" "kernel"                       }
@@ -143,11 +142,11 @@ call
     { "tag" "kernel-internals"              }
     { "cwd" "io"                            }
     { "cd" "io"                             }
-    { "add-compiled-block" "assembler"      }
+    { "add-compiled-block" "generator"      }
     { "dlopen" "alien"                      }
     { "dlsym" "alien"                       }
     { "dlclose" "alien"                     }
-    { "<byte-array>" "arrays"               }
+    { "<byte-array>" "byte-arrays"          }
     { "<displaced-alien>" "alien"           }
     { "alien-signed-cell" "alien"           }
     { "set-alien-signed-cell" "alien"       }
@@ -194,12 +193,13 @@ call
     { "end-scan" "memory"                   }
     { "size" "memory"                       }
     { "die" "kernel"                        }
-    { "finalize-compile" "assembler"        }
-    { "fopen"  "io-internals"               }
-    { "fgetc" "io-internals"                }
-    { "fwrite" "io-internals"               }
-    { "fflush" "io-internals"               }
-    { "fclose" "io-internals"               }
+    { "finalize-compile" "generator"        }
+    { "fopen"  "c-streams"                  }
+    { "fgetc" "c-streams"                   }
+    { "fread" "c-streams"                   }
+    { "fwrite" "c-streams"                  }
+    { "fflush" "c-streams"                  }
+    { "fclose" "c-streams"                  }
     { "expired?" "alien"                    }
     { "<wrapper>" "kernel"                  }
     { "(clone)" "kernel-internals"          }
@@ -207,7 +207,9 @@ call
     { "array>vector" "vectors"              }
     { "<string>" "strings"                  }
     { "xt-map" "kernel-internals"           }
-} dup length 3 swap [ + ] map-with [ make-primitive ] 2each
+}
+dup length [ 3 + ] map
+[ >r first2 r> make-primitive ] 2each
 
 FORGET: make-primitive
 
@@ -224,7 +226,6 @@ FORGET: make-primitive
 
 : define-builtin ( symbol type# predicate slotspec -- )
     >r >r >r
-    dup intern-symbol
     dup r> "type" set-word-prop
     dup define-class
     dup r> builtin-predicate
@@ -324,12 +325,12 @@ num-types f <array> builtins set
     {
         1
         fixnum
-        { "hash-count" "hashtables" }
+        { "hash-count" "hashtables-internals" }
         { "set-hash-count" "hashtables-internals" }
     } {
         2
         fixnum
-        { "hash-deleted" "hashtables" }
+        { "hash-deleted" "hashtables-internals" }
         { "set-hash-deleted" "hashtables-internals" }
     } {
         3
@@ -371,8 +372,8 @@ num-types f <array> builtins set
     }
 } define-builtin
 
-"sbuf?" "strings" create t "inline" set-word-prop 
-"sbuf" "strings" create 13 "sbuf?" "strings" create
+"sbuf?" "sbufs" create t "inline" set-word-prop 
+"sbuf" "sbufs" create 13 "sbuf?" "sbufs" create
 {
     {
         1
@@ -394,7 +395,7 @@ num-types f <array> builtins set
 
 "dll?" "alien" create t "inline" set-word-prop
 "dll" "alien" create 15 "dll?" "alien" create
-{ { 1 byte-array { "dll-path" "alien" } f } } define-builtin
+{ { 1 byte-array { "(dll-path)" "alien" } f } } define-builtin
 
 "alien" "alien" create 16 "alien?" "alien" create
 { { 1 c-ptr { "underlying-alien" "alien" } f } } define-builtin
@@ -403,24 +404,41 @@ num-types f <array> builtins set
 "tuple" "kernel" create 17 "tuple?" "kernel" create
 { } define-builtin
 
-"byte-array?" "arrays" create t "inline" set-word-prop
-"byte-array" "arrays" create 18
-"byte-array?" "arrays" create
+"byte-array?" "byte-arrays" create t "inline" set-word-prop
+"byte-array" "byte-arrays" create 18
+"byte-array?" "byte-arrays" create
 { } define-builtin
 
 ! Define general-t type, which is any object that is not f.
-"general-t" "kernel" create dup define-symbol
-f "!f" "!syntax" lookup builtins get remove [ ] subset
-define-union
+"general-t" "kernel" create
+"!f" "!syntax" lookup builtins get remove [ ] subset
+(define-union-class)
 
 ! Catch-all class for providing a default method.
 "object" "generic" create [ drop t ] "predicate" set-word-prop
-"object" "generic" create dup define-symbol
-f builtins get [ ] subset define-union
+"object" "generic" create
+builtins get [ ] subset (define-union-class)
 
 ! Null class with no instances.
 "null" "generic" create [ drop f ] "predicate" set-word-prop
-"null" "generic" create dup define-symbol f { } define-union
+"null" "generic" create { } (define-union-class)
+
+! Create special tombstone values
+"hashtables-internals" in set
+
+"tombstone" f define-tuple-class
+
+"((empty))" "hashtables-internals" create
+T{ tombstone f } unit define-compound
+
+"((empty))" "hashtables-internals" lookup
+t "inline" set-word-prop
+
+"((tombstone))" "hashtables-internals" create
+T{ tombstone t } unit define-compound
+
+"((tombstone))" "hashtables-internals" lookup
+t "inline" set-word-prop
 
 FORGET: builtin-predicate
 FORGET: register-builtin

@@ -89,18 +89,17 @@ FUNCTION: BOOL CloseHandle ( HANDLE h ) ;
 ! FUNCTION: CreateFiber
 ! FUNCTION: CreateFiberEx
 
-FUNCTION: HANDLE CreateFileA ( char* lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttribures, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile ) ;
 
-FUNCTION: HANDLE CreateFileW ( char* lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttribures, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile ) ;
-: CreateFile \ CreateFileW \ CreateFileA unicode-exec ;
+FUNCTION: HANDLE CreateFileW ( LPCTSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttribures, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile ) ;
+: CreateFile CreateFileW ; inline
 
-FUNCTION: HANDLE  CreateFileMappingA ( HANDLE hFile,
-                                       LPSECURITY_ATTRIBUTES lpAttributes,
-                                       DWORD flProtect,
-                                       DWORD dwMaximumSizeHigh,
-                                       DWORD dwMaximumSizeLow,
-                                       LPCTSTR lpName ) ;
-: CreateFileMapping CreateFileMappingA ;
+! FUNCTION: HANDLE  CreateFileMappingA ( HANDLE hFile,
+                                       ! LPSECURITY_ATTRIBUTES lpAttributes,
+                                       ! DWORD flProtect,
+                                       ! DWORD dwMaximumSizeHigh,
+                                       ! DWORD dwMaximumSizeLow,
+                                       ! LPCTSTR lpName ) ;
+! : CreateFileMapping CreateFileMappingA ;
 
 ! FUNCTION: CreateHardLinkA
 ! FUNCTION: CreateHardLinkW
@@ -118,7 +117,7 @@ FUNCTION: HANDLE CreateIoCompletionPort ( HANDLE hFileHandle, HANDLE hExistingCo
 ! FUNCTION: CreateNamedPipeW
 ! FUNCTION: CreateNlsSecurityDescriptor
 ! FUNCTION: CreatePipe
-FUNCTION: BOOL CreateProcessA ( LPCTSTR lpApplicationname,
+FUNCTION: BOOL CreateProcessW ( LPCTSTR lpApplicationname,
                                 LPTSTR lpCommandLine,
                                 LPSECURITY_ATTRIBUTES lpProcessAttributes,
                                 LPSECURITY_ATTRIBUTES lpThreadAttributes,
@@ -128,7 +127,7 @@ FUNCTION: BOOL CreateProcessA ( LPCTSTR lpApplicationname,
                                 LPCTSTR lpCurrentDirectory,
                                 LPSTARTUPINFO lpStartupInfo,
                                 LPPROCESS_INFORMATION lpProcessInformation ) ;
-: CreateProcess CreateProcessA ;
+: CreateProcess CreateProcessW ;
 ! FUNCTION: CreateProcessInternalA
 ! FUNCTION: CreateProcessInternalW
 ! FUNCTION: CreateProcessInternalWSecure
@@ -294,10 +293,10 @@ FUNCTION: BOOL CreateProcessA ( LPCTSTR lpApplicationname,
 ! FUNCTION: GetComPlusPackageInstallStatus
 ! FUNCTION: GetCompressedFileSizeA
 ! FUNCTION: GetCompressedFileSizeW
-! FUNCTION: GetComputerNameA
-! FUNCTION: GetComputerNameExA
+FUNCTION: BOOL GetComputerNameW ( LPTSTR lpBuffer, LPDWORD lpnSize ) ;
 ! FUNCTION: GetComputerNameExW
 ! FUNCTION: GetComputerNameW
+: GetComputerName GetComputerNameW ;
 ! FUNCTION: GetConsoleAliasA
 ! FUNCTION: GetConsoleAliasesA
 ! FUNCTION: GetConsoleAliasesLengthA
@@ -331,9 +330,8 @@ FUNCTION: BOOL CreateProcessA ( LPCTSTR lpApplicationname,
 ! FUNCTION: GetConsoleProcessList
 ! FUNCTION: GetConsoleScreenBufferInfo
 ! FUNCTION: GetConsoleSelectionInfo
-FUNCTION: DWORD GetConsoleTitleA ( LPCTSTR lpConsoleTitle, DWORD nSize ) ;
 FUNCTION: DWORD GetConsoleTitleW ( LPWSTR lpConsoleTitle, DWORD nSize ) ;
-: GetConsoleTitle \ GetConsoleTitleW \ GetConsoleTitleA unicode-exec ;
+: GetConsoleTitle GetConsoleTitleW ; inline
 ! FUNCTION: GetConsoleWindow
 ! FUNCTION: GetCPFileNameFromRegistry
 ! FUNCTION: GetCPInfo
@@ -403,9 +401,8 @@ FUNCTION: DWORD GetLastError ( ) ;
 ! FUNCTION: GetMailslotInfo
 ! FUNCTION: GetModuleFileNameA
 ! FUNCTION: GetModuleFileNameW
-FUNCTION: HMODULE GetModuleHandleA ( LPCTSTR lpModuleName ) ;
 FUNCTION: HMODULE GetModuleHandleW ( LPCWSTR lpModuleName ) ;
-: GetModuleHandle \ GetModuleHandleW \ GetModuleHandleA unicode-exec ;
+: GetModuleHandle GetModuleHandleW ; inline
 ! FUNCTION: GetModuleHandleExA
 ! FUNCTION: GetModuleHandleExW
 ! FUNCTION: GetNamedPipeHandleStateA
@@ -426,7 +423,7 @@ FUNCTION: HMODULE GetModuleHandleW ( LPCWSTR lpModuleName ) ;
 ! FUNCTION: GetNumberOfConsoleInputEvents
 ! FUNCTION: GetNumberOfConsoleMouseButtons
 ! FUNCTION: GetOEMCP
-! FUNCTION: GetOverlappedResult
+FUNCTION: BOOL GetOverlappedResult ( HANDLE hFile, LPOVERLAPPED lpOverlapped, LPDWORD lpNumberOfBytesTransferred, BOOL bWait ) ;
 ! FUNCTION: GetPriorityClass
 ! FUNCTION: GetPrivateProfileIntA
 ! FUNCTION: GetPrivateProfileIntW
@@ -506,9 +503,8 @@ FUNCTION: DWORD GetTimeZoneInformation ( LPTIME_ZONE_INFORMATION lpTimeZoneInfor
 ! FUNCTION: GetUserGeoID
 ! FUNCTION: GetVDMCurrentDirectories
 FUNCTION: DWORD GetVersion ( ) ;
-FUNCTION: BOOL GetVersionExA ( LPOSVERSIONINFO lpVersionInfo ) ;
 FUNCTION: BOOL GetVersionExW ( LPOSVERSIONINFO lpVersionInfo ) ;
-: GetVersionEx GetVersionExA ;
+: GetVersionEx GetVersionExW ;
 ! FUNCTION: GetVolumeInformationA
 ! FUNCTION: GetVolumeInformationW
 ! FUNCTION: GetVolumeNameForVolumeMountPointA
@@ -683,15 +679,15 @@ FUNCTION: LPVOID MapViewOfFileEx ( HANDLE hFileMappingObject,
 ! FUNCTION: OpenEventA
 ! FUNCTION: OpenEventW
 ! FUNCTION: OpenFile
-FUNCTION: HANDLE OpenFileMappingA ( DWORD dwDesiredAccess,
+FUNCTION: HANDLE OpenFileMappingW ( DWORD dwDesiredAccess,
                                     BOOL bInheritHandle,
                                     LPCTSTR lpName ) ;
-: OpenFileMapping OpenFileMappingA ;
+: OpenFileMapping OpenFileMappingW ;
 ! FUNCTION: OpenJobObjectA
 ! FUNCTION: OpenJobObjectW
 ! FUNCTION: OpenMutexA
 ! FUNCTION: OpenMutexW
-! FUNCTION: OpenProcess
+FUNCTION: HANDLE OpenProcess ( DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dwProcessId ) ;
 ! FUNCTION: OpenProfileUserMapping
 ! FUNCTION: OpenSemaphoreA
 ! FUNCTION: OpenSemaphoreW
@@ -742,7 +738,7 @@ FUNCTION: BOOL ReadFile ( HANDLE hFile, int lpBuffer, DWORD nNumberOfBytesToRead
 ! FUNCTION: BOOL ReadFile ( HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToRead, LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped ) ;
 ! FUNCTION: ReadFileEx
 ! FUNCTION: ReadFileScatter
-! FUNCTION: ReadProcessMemory
+FUNCTION: BOOL ReadProcessMemory ( HANDLE hProcess, void* lpBaseAddress, void* lpBuffer, long nSize, long* lpNumberOfBytesRead )  ;
 ! FUNCTION: RegisterConsoleIME
 ! FUNCTION: RegisterConsoleOS2
 ! FUNCTION: RegisterConsoleVDM
@@ -818,9 +814,8 @@ FUNCTION: BOOL ReadFile ( HANDLE hFile, int lpBuffer, DWORD nNumberOfBytesToRead
 ! FUNCTION: SetConsolePalette
 ! FUNCTION: SetConsoleScreenBufferSize
 FUNCTION: BOOL SetConsoleTextAttribute ( HANDLE hConsoleOutput, WORD wAttributes ) ;
-FUNCTION: BOOL SetConsoleTitleA ( LPCTSTR lpConsoleTitle ) ;
 FUNCTION: BOOL SetConsoleTitleW ( LPCWSTR lpConsoleTitle ) ;
-: SetConsoleTitle \ SetConsoleTitleW \ SetConsoleTitleA unicode-exec ;
+: SetConsoleTitle SetConsoleTitleW ;
 ! FUNCTION: SetConsoleWindowInfo
 ! FUNCTION: SetCPGlobal
 ! FUNCTION: SetCriticalSectionSpinCount
@@ -940,10 +935,10 @@ FUNCTION: BOOL SystemTimeToFileTime ( SYSTEMTIME* lpSystemTime, LPFILETIME lpFil
 ! FUNCTION: VerLanguageNameW
 ! FUNCTION: VerSetConditionMask
 ! FUNCTION: VirtualAlloc
-! FUNCTION: VirtualAllocEx
+FUNCTION: HANDLE VirtualAllocEx ( HANDLE hProcess, void* lpAddress, long dwSize, DWORD flAllocationType, DWORD flProtect ) ;
 ! FUNCTION: VirtualBufferExceptionHandler
 ! FUNCTION: VirtualFree
-! FUNCTION: VirtualFreeEx
+FUNCTION: BOOL VirtualFreeEx ( HANDLE hProcess, void* lpAddress, long dwSize, DWORD dwFreeType ) ;
 ! FUNCTION: VirtualLock
 ! FUNCTION: VirtualProtect
 ! FUNCTION: VirtualProtectEx
@@ -980,7 +975,7 @@ FUNCTION: BOOL WriteFile ( HANDLE hFile, int lpBuffer, DWORD nNumberOfBytesToWri
 ! FUNCTION: WritePrivateProfileStringW
 ! FUNCTION: WritePrivateProfileStructA
 ! FUNCTION: WritePrivateProfileStructW
-! FUNCTION: WriteProcessMemory
+FUNCTION: BOOL WriteProcessMemory ( HANDLE hProcess, void* lpBaseAddress, void* lpBuffer, long nSize, long* lpNumberOfBytesWritten )  ;
 ! FUNCTION: WriteProfileSectionA
 ! FUNCTION: WriteProfileSectionW
 ! FUNCTION: WriteProfileStringA

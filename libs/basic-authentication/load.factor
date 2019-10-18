@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 USING: io ;
 
-REQUIRES: libs/base64 libs/crypto libs/httpd ;
+REQUIRES: libs/base64 libs/crypto apps/http-server ;
 
 PROVIDE: libs/basic-authentication
 { +files+ {
@@ -17,4 +17,4 @@ PROVIDE: libs/basic-authentication
 } ;
 
 USE: httpd
-MAIN: libs/httpd 8888 httpd ;
+MAIN: apps/http-server 8888 httpd ;

@@ -32,6 +32,9 @@ M: duplex-stream stream-readln
 M: duplex-stream stream-read1
     duplex-stream-in+ stream-read1 ;
 
+M: duplex-stream stream-read-until
+    duplex-stream-in+ stream-read-until ;
+
 M: duplex-stream stream-read
     duplex-stream-in+ stream-read ;
 
@@ -62,8 +65,8 @@ M: duplex-stream stream-close
     #! buffer needs to be flushed before we close the fd.
     dup duplex-stream-closed? [
         t over set-duplex-stream-closed?
-        dup duplex-stream-out stream-close
-        dup duplex-stream-in stream-close
+        [ dup duplex-stream-out stream-close ]
+        [ dup duplex-stream-in stream-close ] cleanup
     ] unless drop ;
 
 M: duplex-stream set-timeout

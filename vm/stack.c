@@ -12,23 +12,14 @@ void reset_retainstack(void)
 
 void reset_callstack(void)
 {
-	cs = cs_bot - CELLS;
+	cs = cs_bot;
 }
 
 void fix_stacks(void)
 {
-	if(STACK_UNDERFLOW(ds,stack_chain->data_region))
-		reset_datastack();
-	if(STACK_OVERFLOW(ds,stack_chain->data_region))
-		reset_datastack();
-	if(STACK_UNDERFLOW(rs,stack_chain->retain_region))
-		reset_retainstack();
-	if(STACK_OVERFLOW(rs,stack_chain->retain_region))
-		reset_retainstack();
-	if(STACK_UNDERFLOW(cs,stack_chain->call_region))
-		reset_callstack();
-	if(STACK_OVERFLOW(cs,stack_chain->call_region))
-		reset_callstack();
+	if(ds + CELLS < ds_bot || ds >= ds_top) reset_datastack();
+	if(rs + CELLS < rs_bot || rs >= rs_top) reset_retainstack();
+	if(cs < cs_bot || cs + 1 >= cs_top) reset_callstack();
 }
 
 /* called before entry into foreign C code. Note that ds, rs and cs might
@@ -58,11 +49,9 @@ void nest_stacks(void)
 	new_stacks->data_save = ds;
 	new_stacks->retain_save = rs;
 	new_stacks->call_save = cs;
-	new_stacks->cards_offset = cards_offset;
+	new_stacks->primitives = primitives;
 
 	new_stacks->callframe = callframe;
-	new_stacks->callframe_scan = callframe_scan;
-	new_stacks->callframe_end = callframe_end;
 
 	/* save per-callback userenv */
 	new_stacks->current_callback_save = userenv[CURRENT_CALLBACK_ENV];
@@ -77,12 +66,11 @@ void nest_stacks(void)
 	new_stacks->next = stack_chain;
 	stack_chain = new_stacks;
 
-	callframe = F;
-	callframe_scan = callframe_end = 0;
 	reset_datastack();
 	reset_retainstack();
 	reset_callstack();
-	update_cards_offset();
+	init_primitives();
+	init_interpreter();
 }
 
 /* called when leaving a compiled callback */
@@ -95,11 +83,9 @@ void unnest_stacks(void)
 	ds = stack_chain->data_save;
 	rs = stack_chain->retain_save;
 	cs = stack_chain->call_save;
-	cards_offset = stack_chain->cards_offset;
+	primitives = stack_chain->primitives;
 
 	callframe = stack_chain->callframe;
-	callframe_scan = stack_chain->callframe_scan;
-	callframe_end = stack_chain->callframe_end;
 
 	/* restore per-callback userenv */
 	userenv[CURRENT_CALLBACK_ENV] = stack_chain->current_callback_save;
@@ -119,7 +105,6 @@ void init_stacks(CELL ds_size_, CELL rs_size_, CELL cs_size_)
 	rs_size = rs_size_;
 	cs_size = cs_size_;
 	stack_chain = NULL;
-	nest_stacks();
 }
 
 void primitive_drop(void)
@@ -272,20 +257,21 @@ void primitive_retainstack(void)
 
 void primitive_callstack(void)
 {
-	CELL depth = (cs - cs_bot + CELLS) / CELLS - 3;
-	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,depth);
+	F_FIXNUM depth = (F_FIXNUM)(cs - cs_bot) - 1;
+	if(depth < 0)
+		depth = 0;
+	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,depth * 3);
+
 	CELL i;
-	CELL ptr = cs_bot;
-	
-	for(i = 0; i < depth; i += 3, ptr += 3 * CELLS)
+	for(i = 0; i < depth; i++)
 	{
-		CELL quot = get(ptr);
-		CELL untagged = UNTAG(quot);
-		CELL position = UNAREF(untagged,get(ptr + CELLS));
-		CELL end = UNAREF(untagged,get(ptr + CELLS * 2));
-		set_array_nth(a,i,quot);
-		set_array_nth(a,i + 1,tag_fixnum(position));
-		set_array_nth(a,i + 2,tag_fixnum(end));
+		F_INTERP_FRAME *frame = cs_bot + i;
+		CELL untagged = UNTAG(frame->quot);
+		CELL scan = tag_fixnum(UNAREF(untagged,frame->scan));
+		CELL end = tag_fixnum(UNAREF(untagged,frame->end));
+		set_array_nth(a,3 * i,frame->quot);
+		set_array_nth(a,3 * i + 1,scan);
+		set_array_nth(a,3 * i + 2,end);
 	}
 
 	dpush(tag_object(a));
@@ -315,31 +301,29 @@ void primitive_set_callstack(void)
 {
 	F_VECTOR *v = untag_vector(dpop());
 	F_ARRAY *a = untag_array_fast(v->array);
+	CELL depth = untag_fixnum_fast(v->top) / 3;
 
-	CELL depth = untag_fixnum_fast(v->top);
-	depth -= (depth % 3);
-
-	CELL i, ptr;
-	for(i = 0, ptr = cs_bot; i < depth; i += 3, ptr += 3 * CELLS)
+	CELL i;
+	for(i = 0; i < depth; i++)
 	{
-		CELL quot = get(AREF(a,i));
+		CELL quot = get(AREF(a,3 * i));
 		type_check(QUOTATION_TYPE,quot);
 
-		F_ARRAY *untagged = (F_ARRAY*)UNTAG(quot);
+		F_ARRAY *untagged = untag_array_fast(quot);
 		CELL length = array_capacity(untagged);
 
-		F_FIXNUM position = to_fixnum(get(AREF(a,i + 1)));
-		F_FIXNUM end = to_fixnum(get(AREF(a,i + 2)));
+		F_FIXNUM position = to_fixnum(get(AREF(a,3 * i + 1)));
+		F_FIXNUM end = to_fixnum(get(AREF(a,3 * i + 2)));
 
 		if(end < 0) end = 0;
 		if(end > length) end = length;
 		if(position < 0) position = 0;
 		if(position > end) position = end;
 
-		put(ptr,quot);
-		put(ptr + CELLS,AREF(untagged,position));
-		put(ptr + CELLS * 2,AREF(untagged,end));
+		cs_bot[i].quot = quot;
+		cs_bot[i].scan = AREF(untagged,position);
+		cs_bot[i].end = AREF(untagged,end);
 	}
 
-	cs = cs_bot + depth * CELLS - CELLS;
+	cs = cs_bot + depth;
 }

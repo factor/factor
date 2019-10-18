@@ -225,7 +225,7 @@ M: editor user-input*
     control-model set-doc-string ;
 
 ! Editors support the stream output protocol
-M: editor stream-write1 >r ch>string r> stream-write ;
+M: editor stream-write1 >r 1string r> stream-write ;
 
 M: editor stream-write control-self user-input ;
 

@@ -15,7 +15,10 @@ ARTICLE: "os" "System interface"
 { $subsection os-env }
 "Getting the user's home directory:"
 { $subsection home }
-"Exiting the Factor runtime:"
+"Getting the path to the Factor VM and image:"
+{ $subsection vm }
+{ $subsection image }
+"Exiting the Factor VM:"
 { $subsection exit }
 "Operating system processes can be run using the " { $module-link "libs/process" } " module."
 { $see-also "file-streams" "network-streams" } ;

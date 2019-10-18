@@ -1,17 +1,17 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help kernel xml xml-data xml-errors xml-writer state-parser
-    xml-tokenize xml-utils ;
+    xml-tokenize xml-utils entities ;
 
 HELP: string>xml
-{ $values { "string" "a string" } { "xml-doc" "an xml document" } }
-{ $description "converts a string into an " { $link xml-doc }
+{ $values { "string" "a string" } { "xml" "an xml document" } }
+{ $description "converts a string into an " { $link xml }
     " datatype for further processing" }
 { $see-also xml>string xml-reprint } ;
 
 HELP: xml>string
-{ $values { "xml-doc" "an xml document" } { "string" "a string" } }
-{ $description "converts an xml document (" { $link xml-doc } ") into a string" }
+{ $values { "xml" "an xml document" } { "string" "a string" } }
+{ $description "converts an xml document (" { $link xml } ") into a string" }
 { $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" }
 { $see-also string>xml xml-reprint write-xml } ;
 
@@ -25,14 +25,14 @@ HELP: xml-reprint
 { $see-also write-xml xml>string string>xml } ;
 
 HELP: write-xml
-{ $values { "xml-doc" "an XML document" } }
-{ $description "prints the contents of an XML document (" { $link xml-doc } ") to stdio" }
+{ $values { "xml" "an XML document" } }
+{ $description "prints the contents of an XML document (" { $link xml } ") to stdio" }
 { $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" }
 { $see-also xml>string xml-reprint read-xml } ;
 
 HELP: read-xml
 { $values { "stream" "a stream that supports readln" }
-    { "xml-doc" "an XML document" } }
+    { "xml" "an XML document" } }
 { $description "exausts the given stream, reading an XML document from it" }
 { $see-also write-xml string>xml } ;
 
@@ -70,27 +70,28 @@ HELP: build-tag*
 { $values { "items" "sequence of elements" } { "name" "string" }
     { "tag" "an XML tag" } }
 { $description "builds a " { $link tag } " with the specified name, in the namespace \"\" and URL \"\" containing the children listed in item" }
-{ $see-also build-tag build-xml-doc } ;
+{ $see-also build-tag build-xml } ;
 
 HELP: build-tag
 { $values { "item" "an element" } { "name" "string" } { "tag" "XML tag" } }
 { $description "builds a " { $link tag } " with the specified name containing the single child item" }
-{ $see-also build-tag* build-xml-doc } ;
+{ $see-also build-tag* build-xml } ;
 
-HELP: build-xml-doc
-{ $values { "tag" "an XML tag" } { "xml-doc" "an XML document" } }
+HELP: build-xml
+{ $values { "tag" "an XML tag" } { "xml" "an XML document" } }
 { $description "builds an XML document out of a tag" }
 { $see-also build-tag* build-tag } ;
 
 HELP: tag
-{ $class-description "tuple representing an XML tag, delegating to a " { $link name } ", containing the slots props (a hashtable) and children (a sequence)" }
-{ $see-also <tag> name contained-tag xml-doc } ;
+{ $class-description "tuple representing an XML tag, delegating to a " { $link
+name } ", containing the slots attrs (an alist of names to strings) and children (a sequence)" }
+{ $see-also <tag> name contained-tag xml } ;
 
 HELP: <tag>
 { $values { "name" "an XML tag name" }
-    { "props" "a hashtable of XML properties" }
+    { "attrs" "an alist of names to strings" }
     { "children" "a sequence" } }
-{ $description "constructs an XML " { $link tag } ", with the name (not a string) and tag properties specified in props, and children specified" }
+{ $description "constructs an XML " { $link tag } " with the name (not a string) and tag attributes specified in attrs and children specified" }
 { $see-also tag <contained-tag> build-tag build-tag* } ;
 
 HELP: name
@@ -104,44 +105,35 @@ HELP: <name> ( space tag url -- name )
 { $see-also name <tag> } ;
 
 HELP: contained-tag
-{ $class-description "delegates to tag representing a tag like <a/> with no contents. The tag properties are accessed with tag-props" }
+{ $class-description "delegates to tag representing a tag like <a/> with no contents. The tag attributes are accessed with tag-attrs" }
 { $see-also tag <contained-tag> } ;
 
 HELP: <contained-tag>
 { $values { "name" "an XML tag name" }
-    { "props" "a hashtable of XML properties" }
+    { "attrs" "an alist from names to strings" }
     { "contained-tag" "an XML tag" } }
-{ $description "creates an empty tag (like <a/>) with the specified name and tag properties. This delegates to tag" }
+{ $description "creates an empty tag (like <a/>) with the specified name and tag attributes. This delegates to tag" }
 { $see-also contained-tag <tag> } ;
 
-HELP: entity
-{ $class-description "represents an XML entity like &foo;" }
-{ $see-also <entity> } ;
-
-HELP: <entity> ( name -- entity )
-{ $values { "name" "a string" } { "entity" "an XML entity" } }
-{ $description "creates an XML entity like &foo; with the specified name" }
-{ $see-also entity } ;
-
-HELP: xml-doc
+HELP: xml
 { $class-description "tuple representing an XML document, delegating to the main tag, containing the fields prolog (the header <?xml...?>), before (whatever comes between the prolog and the main tag) and after (whatever comes after the main tag)" }
-{ $see-also <xml-doc> tag prolog } ;
+{ $see-also <xml> tag prolog } ;
 
-HELP: <xml-doc>
+HELP: <xml>
 { $values { "prolog" "an XML prolog" } { "before" "a sequence of XML elements" }
     { "main" "an XML tag" } { "after" "a sequence of XML elements" } }
 { $description "creates an XML document, delegating to the main tag, with the specified prolog, before, and after" }
-{ $see-also xml-doc <tag> } ;
+{ $see-also xml <tag> } ;
 
 HELP: prolog
 { $class-description "represents an XML prolog, with the tuple fields version (containing \"1.0\" or \"1.1\"), encoding (a string representing the encoding type), and standalone (t or f, whether the document is standalone without external entities)" }
-{ $see-also <prolog> xml-doc } ;
+{ $see-also <prolog> xml } ;
 
 HELP: <prolog> ( version encoding standalone -- prolog )
 { $values { "version" "a string, 1.0 or 1.1" }
     { "encoding" "a string" } { "standalone" "a boolean" } }
 { $description "creates an XML prolog tuple" }
-{ $see-also prolog <xml-doc> } ;
+{ $see-also prolog <xml> } ;
 
 HELP: comment
 { $class-description "represents a comment in XML. Has one slot, text, which contains the string of the comment" }
@@ -182,41 +174,6 @@ HELP: get-id
 { $description "finds the XML tag with the specified id, ignoring the namespace" }
 { $see-also xml-find } ;
 
-HELP: spot
-{ $var-description "This variable represents the location in the program. It is in the format { char line column line-str } where char is the current character, line is the line number, column is the column number, and line-str is the full contents of the line, as a string. The contents shouldn't be accessed directly but rather with the proxy words get-char set-char get-line etc." } ;
-
-HELP: new-record
-{ $description "puts the parser into recording mode, where all characters encountered are pushed into a string buffer to be extracted later" }
-{ $see-also end-record } ;
-
-HELP: end-record
-{ $values { "string" "a string" } }
-{ $description "takes the parser out of recording mode and outputs the string recorded" }
-{ $see-also new-record } ;
-
-HELP: skip-until
-{ $values { "quot" "a quotation ( -- ? )" } }
-{ $description "executes " { $link next } " until the quotation yields false. Usually, the quotation will call " { $link get-char } " in its test, but not always." }
-{ $see-also take-until } ;
-
-HELP: take-until
-{ $values { "quot" "a quotation ( -- ? )" } { "string" "a string" } }
-{ $description "like " { $link skip-until } " but records what it passes over and outputs the string." }
-{ $see-also skip-until take-char take-string } ;
-
-HELP: take-char
-{ $values { "char" "a character" } { "string" "a string" } }
-{ $description "records the document from the current spot to the first instance of the given character. Outputs the content between those two points." }
-{ $see-also take-until take-string } ;
-
-HELP: take-string
-{ $values { "match" "a string to match" } { "string" "the portion of the XML document" } }
-{ $description "records the document from the current spot to the first instance of the given character. Outputs the content between those two points." }
-{ $notes "match may not contain a newline" } ;
-
-HELP: next
-{ $description "originally written as " { $code "spot inc" } ", code that would no longer run, this word moves the state of the XML parser to the next place in the source file, keeping track of appropriate debugging information." } ;
-
 HELP: process
 { $values { "object" "an opener, closer, contained or text element" } }
 { $description  "takes an XML event and, using the XML stack, processes it and adds it to the tree"  } ;
@@ -228,7 +185,7 @@ HELP: sax
 { $see-also read-xml } ;
 
 HELP: opener
-{ $class-description "describes an opening tag, like <a>. Contains two slots, name and props, containing, respectively, the name of the tag and its attributes. Usually, the name-url will be f." }
+{ $class-description "describes an opening tag, like <a>. Contains two slots, name and attrs containing, respectively, the name of the tag and its attributes. Usually, the name-url will be f." }
 { $see-also closer contained } ;
 
 HELP: closer
@@ -236,7 +193,7 @@ HELP: closer
 { $see-also opener contained } ;
 
 HELP: contained
-{ $class-description "represents a self-closing tag, like <a/>. Contains two slots, name and props, containing, respectively, the name of the tag and its attributes. Usually, the name-url will be f." }
+{ $class-description "represents a self-closing tag, like <a/>. Contains two slots, name and attrs containing, respectively, the name of the tag and its attributes. Usually, the name-url will be f." }
 { $see-also opener closer } ;
 
 HELP: parse-text
@@ -278,25 +235,15 @@ HELP: write-chunk
 { $description "writes an XML document fragment, ie a sequence of XML elements, to stdio" }
 { $see-also write-item write-xml } ;
 
-HELP: get-name-tag
-{ $values { "tag" "an XML tag or document" } { "name" "an XML name" } { "matching-tag" "an XML tag" } }
-{ $description "finds an XML tag with a matching name" }
-{ $see-also get-tags get-name-tag } ;
+HELP: tag-named*
+{ $values { "tag" "an XML tag or document" } { "name/string" "an XML name or string representing a name" } { "matching-tag" "an XML tag" } }
+{ $description "finds an XML tag with a matching name, recursively searching children and children of children" }
+{ $see-also tags-named tag-named tags-named* } ;
 
-HELP: get-name-tags
-{ $values { "tag" "an XML tag or document" } { "name" "an XML name" } { "seq" "a sequence of tags" } }
-{ $description "returns a sequence of all tags of a matching name" }
-{ $see-also get-tags get-name-tag } ;
-
-HELP: get-tag
-{ $values { "tag" "an XML tag or document" } { "string" "a string representing a tag name" } { "matching-tag" "an XML tag" } }
-{ $description "finds an XML tag with a matching name, ignoring the namespace" }
-{ $see-also get-tags get-name-tag } ;
-
-HELP: get-tags
-{ $values { "tag" "an XML tag or document" } { "string" "a string representing a tag name" } { "seq" "a sequence of tags" } }
-{ $description "returns a sequence of all tags of matching name, ignoring the namespace" }
-{ $see-also get-tag get-name-tags } ;
+HELP: tags-named*
+{ $values { "tag" "an XML tag or document" } { "name/string" "an XML name or string representing a name" } { "seq" "a sequence of tags" } }
+{ $description "returns a sequence of all tags of a matching name, recursively searching children and children of children" }
+{ $see-also tag-named tag-named* tags-named } ;
 
 HELP: children>string
 { $values { "tag" "an XML tag or document" } { "string" "a string" } }
@@ -318,68 +265,86 @@ HELP: multitags
 HELP: notags
 { $class-description "XML parsing error describing the case where an XML document contains no main tag, or any tags at all" } ;
 
-HELP: xml-error
-{ $class-description "class to which most XML parsing errors delegate, containing information about which line and column the error occured on, and what the line was. Contains three slots, line, an integer, column, another integer, and line-str, a string" } ;
-
 HELP: extra-attrs
-{ $class-description "XML parsing error describing the case where the XML prelude (<?xml ...?>) contains attributes other than the three allowed ones, standalone, version and encoding. Contains one slot, attrs, which is a hashtable of all the extra attributes' names. Delegates to " { $link xml-error } "." } ;
+{ $class-description "XML parsing error describing the case where the XML prolog (<?xml ...?>) contains attributes other than the three allowed ones, standalone, version and encoding. Contains one slot, attrs, which is a hashtable of all the extra attributes' names. Delegates to " { $link parsing-error } "." } ;
 
 HELP: nonexist-ns
-{ $class-description "XML parsing error describing the case where a namespace doesn't exist but it is used in a tag. Contains one slot, name, which contains the name of the undeclared namespace, and delegates to " { $link xml-error } "." } ;
+{ $class-description "XML parsing error describing the case where a namespace doesn't exist but it is used in a tag. Contains one slot, name, which contains the name of the undeclared namespace, and delegates to " { $link parsing-error } "." } ;
 
 HELP: not-yes/no
-{ $class-description "XML parsing error used to describe the case where standalone is set in the XML prelude to something other than 'yes' or 'no'. Delegates to " { $link xml-error } " and contains one slot, text, which contains offending value." } ;
+{ $class-description "XML parsing error used to describe the case where standalone is set in the XML prolog to something other than 'yes' or 'no'. Delegates to " { $link parsing-error } " and contains one slot, text, which contains offending value." } ;
 
 HELP: unclosed
 { $class-description "XML parsing error used to describe the case where the XML document contains classes which are not closed by the end of the document. Contains one slot, tags, a sequence of names." } ;
 
 HELP: mismatched
-{ $class-description "XML parsing error describing mismatched tags, eg <a></c>. Contains two slots: open is the name of the opening tag and close is the name of the closing tag. Delegates to " { $link xml-error } " showing the location of the closing tag" } ;
+{ $class-description "XML parsing error describing mismatched tags, eg <a></c>. Contains two slots: open is the name of the opening tag and close is the name of the closing tag. Delegates to " { $link parsing-error } " showing the location of the closing tag" } ;
 
 HELP: expected
-{ $class-description "XML parsing error describing when an expected token was not present. Delegates to " { $link xml-error } ". Contains two slots, should-be, which has the expected string, and was, which has the actual string." } ;
+{ $class-description "XML parsing error describing when an expected token was not present. Delegates to " { $link parsing-error } ". Contains two slots, should-be, which has the expected string, and was, which has the actual string." } ;
 
 HELP: no-entity
-{ $class-description "XML parsing error describing the use of an undefined entity in a case where standalone is marked yes. Delegates to " { $link xml-error } ". Contains one slot, thing, containing a string representing the entity." } ;
+{ $class-description "XML parsing error describing the use of an undefined entity in a case where standalone is marked yes. Delegates to " { $link parsing-error } ". Contains one slot, thing, containing a string representing the entity." } ;
 
 HELP: xml-string-error
-{ $class-description "XML parsing error that delegates to " { $link xml-error } " and represents an other, unspecified error, which is represented by the slot string, containing a string describing the error." } ;
-
-HELP: bad-name
-{ $class-description "XML parsing error thrown when an invalid name is used. Contains one slot, string, which has the invalid name. Delegates to " { $link xml-error } "." } ;
+{ $class-description "XML parsing error that delegates to " { $link parsing-error } " and represents an other, unspecified error, which is represented by the slot string, containing a string describing the error." } ;
 
 HELP: open-tag
 { $class-description "represents a tag that does have children, ie is not a contained tag" }
 { $notes "the constructor used for this class is simply " { $link <tag> } "." }
 { $see-also tag contained-tag } ;
 
-HELP: find-name-tag
-{ $values { "tag" "an XML tag or document" } { "name" "an XML name" } { "matching tag" " an XML tag" } }
-{ $description "finds the first tag with matching name which is the child of the given tag" }
-{ $see-also find-name-tags find-tag } ;
+HELP: tag-named
+{ $values { "tag" "an XML tag or document" }
+    { "name/string" "an XML name or string representing the name" }
+    { "matching tag" " an XML tag" } }
+{ $description "finds the first tag with matching name which is the direct child of the given tag" }
+{ $see-also tags-named* tag-named* tags-named } ;
 
-HELP: find-name-tags
-{ $values { "tag" "an XML tag or document" } { "name" "an XML name" }
+HELP: tags-named
+{ $values { "tag" "an XML tag or document" }
+    { "name/string" "an XML name or string representing the name" }
     { "seq" "a sequence of tags" } }
-{ $description "finds all tags with matching name that are the child of the given tag" }
-{ $see-also find-tags find-name-tag get-name-tags } ;
+{ $description "finds all tags with matching name that are the direct children of the given tag" }
+{ $see-also tag-named* tags-named* tag-named } ;
 
-HELP: find-tag
-{ $values { "tag" "an XML tag or document" }
-    { "string" "a string representing the name of a tag" }
-    { "matching-tag" "an XML tag" } }
-{ $description "finds the first tag with matching name, ignoring the namespace, that is a child of the given tag" }
-{ $see-also find-name-tag find-tags get-tag } ;
-
-HELP: find-tags
-{ $values { "tag" "an XML tag or document" }
-    { "string" "a string representing the name of a tag" }
-    { "seq" "a sequence of XML tags" } }
-{ $description "finds all tags with matching name ingoring the namespace, that are children of the given tag" }
-{ $see-also find-name-tags find-tag get-tags } ;
+HELP: state-parse
+{ $values { "stream" "an input stream" } { "quot" "a quotation ( -- )" } }
+{ $description "takes a stream and runs an imperative parser on it, allowing words like " { $link next } " to be used within the context of the stream." } ;
 
 HELP: pre/post-content
 { $class-description "describes the error where a non-whitespace string is used before or after the main tag in an XML document. Contains two slots: string contains the offending string, and pre? is t if it occured before the main tag and f if it occured after" } ;
+
+HELP: tag-attr
+{ $values { "tag" "an XML tag or document" }
+    { "name/string" "an XML name or a string representing the name" }
+    { "string/f" "a string or f" } }
+{ $description "gets the given attribute from the tag, returning f if the tag does not have that attribute" } ;
+
+HELP: entities
+{ $description "a hash table from default XML entity names (like &amp; and &lt;) to the characters they represent. This is automatically included when parsing any XML document." }
+{ $see-also html-entities } ;
+
+HELP: html-entities
+{ $description "a hash table from HTML entity names to their character values" }
+{ $see-also entities with-html-entities } ;
+
+HELP: with-entities
+{ $values { "entities" "a hash table of strings to chars" }
+    { "quot" "a quotation ( -- )" } }
+{ $description "calls the quotation using the given table of entity values (symbolizing, eg, that &foo; represents CHAR: a) on top of the default XML entities" }
+{ $see-also with-html-entities } ;
+
+HELP: with-html-entities
+{ $values { "quot" "a quotation ( -- )" } }
+{ $description "calls the given quotation using HTML entity values" }
+{ $see-also html-entities with-entities } ;
+
+HELP: file>xml
+{ $values { "filename" "a string representing a filename" }
+    { "xml" "an XML document" } }
+{ $description "opens the given file, reads it in as XML, closes the file and returns the corresponding XML tree" }
+{ $see-also string>xml read-xml } ;
 
 ARTICLE: { "xml" "intro" } "XML"
     "The XML module attempts to implement the XML 1.1 standard, converting strings of text into XML and vice versa. It currently is a work in progress."
@@ -391,7 +356,8 @@ ARTICLE: { "xml" "intro" } "XML"
     { $subsection { "xml" "utils" } }
     { $subsection { "xml" "internal" } }
     { $subsection { "xml" "events" } }
-    { $subsection { "xml" "errors" } } ;
+    { $subsection { "xml" "errors" } }
+    { $subsection { "xml" "entities" } } ;
 
 ARTICLE: { "xml" "basic" } "Basic words for XML processing"
     "These are the most basic words needed for processing an XML document"
@@ -400,6 +366,7 @@ ARTICLE: { "xml" "basic" } "Basic words for XML processing"
     { $subsection string>xml }
     { $subsection read-xml }
     { $subsection xml-chunk }
+    { $subsection file>xml }
     "Printing XML"
     { $subsection xml>string }
     { $subsection write-xml }
@@ -414,8 +381,7 @@ ARTICLE: { "xml" "classes" } "XML data classes"
     { $subsection tag }
     { $subsection contained-tag }
     { $subsection open-tag }
-    { $subsection entity }
-    { $subsection xml-doc }
+    { $subsection xml }
     { $subsection prolog }
     { $subsection comment }
     { $subsection instruction } ;
@@ -425,8 +391,7 @@ ARTICLE: { "xml" "construct" } "XML data constructors"
     { $subsection <name> }
     { $subsection <tag> }
     { $subsection <contained-tag> }
-    { $subsection <entity> }
-    { $subsection <xml-doc> }
+    { $subsection <xml> }
     { $subsection <prolog> }
     { $subsection <comment> }
     { $subsection <instruction> } ;
@@ -443,45 +408,35 @@ ARTICLE: { "xml" "utils" } "XML processing utilities"
     { $subsection xml-subset }
     { $subsection xml-find }
     "Getting parts of an XML document or tag:"
-    { $subsection get-tag }
-    { $subsection get-tags }
-    { $subsection get-name-tag }
-    { $subsection get-name-tags }
-    { $subsection get-id }
-    { $subsection find-tag }
-    { $subsection find-tags }
-    { $subsection find-name-tag }
-    { $subsection find-name-tags }
-    "note: the difference between get-* and find* (except for the case of get-id) is that get-* searches among all tags that are the direct and indirect children, including children of children, whereas find-* only looks at the children directly, ignoring children of children"
     $terpri
+    "Note: the difference between tag-named* and tag-named is that the former searches recursively among all children and children of children of the tag, while the latter only looks at the direct children, and is therefore more efficient."
+    { $subsection tag-named }
+    { $subsection tags-named }
+    { $subsection tag-named* }
+    { $subsection tags-named* }
+    { $subsection get-id }
     "Words for simplified generation of XML:"
     { $subsection build-tag* }
     { $subsection build-tag }
-    { $subsection build-xml-doc }
+    { $subsection build-xml }
     "Other relevant words:"
     { $subsection children>string }
     { $subsection children-tags }
     { $subsection first-child-tag }
     { $subsection names-match? }
-    { $subsection assert-tag } ;
+    { $subsection assert-tag }
+    { $subsection tag-attr } ;
 
 ARTICLE: { "xml" "internal" } "Internals of the XML parser"
     "The XML parser creates its own parsing framework to process XML documents. The parser operates on streams. Important words involved in processing are:"
-    { $subsection spot }
-    { $subsection new-record }
-    { $subsection end-record }
-    { $subsection skip-until }
-    { $subsection take-until }
-    { $subsection take-char }
-    { $subsection take-string }
-    { $subsection next }
     { $subsection parse-text }
     { $subsection make-tag }
     { $subsection parse-name }
-    { $subsection process } ; ! should I have more? less?
+    { $subsection process }
+    "The XML parser is implemented using the libs/state-parser module. For more information, see " { $link { "state-parser" "main" } } ;
 
 ARTICLE: { "xml" "events" } "Event-based XML parsing"
-    "In addition to DOM-style parsing based around " { $link read-xml } ", the XML module also provides SAX-style event-based parsing. This uses much of the same data structures as normal XML, with the exception of the classes " { $link xml-doc } " and " { $link tag } " and as such, the articles " { $link { "xml" "classes" } } " and " { $link { "xml" "construct" } } " may be useful in learning how to process documents in this way. Other useful words are:"
+    "In addition to DOM-style parsing based around " { $link read-xml } ", the XML module also provides SAX-style event-based parsing. This uses much of the same data structures as normal XML, with the exception of the classes " { $link xml } " and " { $link tag } " and as such, the articles " { $link { "xml" "classes" } } " and " { $link { "xml" "construct" } } " may be useful in learning how to process documents in this way. Other useful words are:"
     { $subsection sax }
     { $subsection opener }
     { $subsection closer }
@@ -500,11 +455,16 @@ ARTICLE: { "xml" "errors" } "XML parsing errors"
     { $subsection not-yes/no }
     { $subsection unclosed }
     { $subsection mismatched }
-    { $subsection xml-string-error }
     { $subsection expected }
     { $subsection no-entity }
-    { $subsection bad-name }
     { $subsection pre/post-content }
-    "Additionally, most of these errors delegate to " { $link xml-error } " in order to provide more information"
+    "Additionally, most of these errors delegate to " { $link parsing-error } " in order to provide more information"
     $terpri
     "Note that, in parsing an XML document, only the first error is reported." ;
+
+ARTICLE: { "xml" "entities" } "XML entities"
+    "When XML is parsed, entities like &foo; are replaced with the characters they represent. A few entities like &amp; and &lt; are defined by default, but more are available, and the set of entities can be customized. Below are some words involved in XML entities, defined in the vocabulary 'entities':"
+    { $subsection entities }
+    { $subsection html-entities }
+    { $subsection with-entities }
+    { $subsection with-html-entities } ;

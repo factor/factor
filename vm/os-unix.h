@@ -5,7 +5,14 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <dlfcn.h>
-#include <ucontext.h>
+
+typedef char F_CHAR;
+typedef char F_SYMBOL;
+
+#define unbox_symbol_string unbox_char_string
+#define primitive_string_to_native_alien primitive_string_to_char_alien
+
+#define STR_FORMAT "%s"
 
 #define DLLEXPORT
 #define SETJMP(jmpbuf) sigsetjmp(jmpbuf,1)
@@ -14,7 +21,7 @@
 
 void init_ffi(void);
 void ffi_dlopen(F_DLL *dll, bool error);
-void *ffi_dlsym(F_DLL *dll, char *symbol, bool error);
+void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol, bool error);
 void ffi_dlclose(F_DLL *dll);
 
 void unix_init_signals(void);

@@ -1,58 +1,5 @@
 IN: sequences
-USING: help kernel ;
-
-HELP: first2
-{ $values { "seq" "a sequence" } { "first" "the first element" } { "second" "the second element" } }
-{ $description "Pushes the first two elements of a sequence." }
-{ $errors "Throws an error if the sequence has less than two elements." } ;
-
-HELP: first3
-{ $values { "seq" "a sequence" } { "first" "the first element" } { "second" "the second element" } { "third" "the third element" } }
-{ $description "Pushes the first three elements of a sequence." }
-{ $errors "Throws an error if the sequence has less than three elements." } ;
-
-HELP: first4
-{ $values { "seq" "a sequence" } { "first" "the first element" } { "second" "the second element" } { "third" "the third element" } { "fourth" "the fourth element" } }
-{ $description "Pushes the first four elements of a sequence." }
-{ $errors "Throws an error if the sequence has less than four elements." } ;
-
-HELP: index
-{ $values { "obj" "an object" } { "seq" "a sequence" } }
-{ $description "Outputs the index of the first element in the sequence equal to " { $snippet "obj" } ". If no element is found, outputs -1." }
-{ $see-also index* member? } ;
-
-HELP: index*
-{ $values { "obj" "an object" } { "i" "a start index" } { "seq" "a sequence" } }
-{ $description "Outputs the index of the first element in the sequence equal to " { $snippet "obj" } ", starting the search from the " { $snippet "i" } "th element. If no element is found, outputs -1." }
-{ $see-also index member? } ;
-
-HELP: last-index
-{ $values { "obj" "an object" } { "seq" "a sequence" } }
-{ $description "Outputs the index of the last element in the sequence equal to " { $snippet "obj" } "; the sequence is traversed back to front. If no element is found, outputs -1." }
-{ $see-also index* member? } ;
-
-HELP: last-index*
-{ $values { "obj" "an object" } { "i" "a start index" } { "seq" "a sequence" } }
-{ $description "Outputs the index of the last element in the sequence equal to " { $snippet "obj" } ", traversing the sequence backwards starting from the " { $snippet "i" } "th element and finishing at the first. If no element is found, outputs -1." }
-{ $see-also index member? } ;
-
-HELP: member?
-{ $values { "obj" "an object" } { "seq" "a sequence" } }
-{ $description "Tests if the sequence contains an element equal to the object." }
-{ $see-also index index* memq? } ;
-
-HELP: memq?
-{ $values { "obj" "an object" } { "seq" "a sequence" } }
-{ $description "Tests if the sequence contains the object." }
-{ $examples
-    "This word uses identity comparison, so the following will most likely print " { $link f } ":"
-    { $example "\"hello\" { \"hello\" } memq? ." "f" }
-}
-{ $see-also index index* member? } ;
-
-HELP: remove
-{ $values { "elt" "an object" } { "seq" "a sequence" } { "newseq" "a new sequence" } }
-{ $description "Outputs a new sequence containing all elements of the input sequence except those equal to the given element." } ;
+USING: help kernel generic ;
 
 HELP: subst
 { $values { "newseq" "a sequence" } { "oldseq" "a mutable sequence" } { "seq" "a sequence" } }
@@ -84,16 +31,6 @@ HELP: push-new
 { $side-effects "seq" }
 { $see-also push } ;
 
-HELP: prune
-{ $values { "seq" "a sequence" } { "newseq" "a sequence" } }
-{ $description "Outputs a new sequence with each distinct element of " { $snippet "seq" } " appearing only once. Elements are compared for equality using " { $link = } " and elements are ordered according to their position in " { $snippet "seq" } "." } ;
-
-HELP: nappend
-{ $values { "dest" "a resizable mutable sequence" } { "src" "a sequence" } }
-{ $description "Appends " { $snippet "src" } " to the end of " { $snippet "dest" } "." }
-{ $side-effects "dest" }
-{ $errors "Throws an error if " { $snippet "src" } " contains elements not permitted in " { $snippet "dest" } "." } ;
-
 HELP: add
 { $values { "seq" "a sequence" } { "elt" "an object" } { "newseq" "a sequence" } }
 { $description "Outputs a new sequence obtained by adding " { $snippet "elt" } " at the end of " { $snippet "seq" } "." }
@@ -113,16 +50,6 @@ HELP: add*
 HELP: diff
 { $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "newseq" "a sequence" } }
 { $description "Outputs a sequence consisting of elements present in " { $snippet "seq2" } " but not " { $snippet "seq1" } ", comparing elements for equality." } ;
-
-HELP: append
-{ $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "newseq" "a sequence" } }
-{ $description "Outputs a new sequence of the same type as " { $snippet "seq1" } " consisting of the elements of " { $snippet "seq1" } " followed by " { $snippet "seq2" } "." }
-{ $errors "Throws an error if " { $snippet "seq2" } " contains elements not permitted in sequences of the same class as " { $snippet "seq1" } "." } ;
-
-HELP: 3append
-{ $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "seq3" "a sequence" } { "newseq" "a sequence" } }
-{ $description "Outputs a new sequence consisting of the elements of " { $snippet "seq1" } ", " { $snippet "seq2" } " and " { $snippet "seq3" } " in turn." }
-{ $errors "Throws an error if " { $snippet "seq2" } " or " { $snippet "seq3" } " contain elements not permitted in sequences of the same class as " { $snippet "seq1" } "." } ;
 
 HELP: concat
 { $values { "seq" "a sequence" } { "newseq" "a sequence" } }
@@ -175,15 +102,14 @@ HELP: exchange
 { $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "seq" "a mutable sequence" } }
 { $description "Exchanges the " { $snippet "m" } "th and " { $snippet "n" } "th elements of " { $snippet "seq" } "." } ;
 
+HELP: nreverse
+{ $values { "seq" "a mutable sequence" } }
+{ $description "Reverses a sequence in-place." }
+{ $side-effects "seq" } ;
+
 HELP: assoc
 { $values { "key" "an object" } { "assoc" "a sequence of pairs" } { "value" "the associated value, or " { $link f } } }
-{ $description "Searches for a pair whose first element is equal to the key and outputs the second element of the pair. Keys are compared for equality using " { $link = } ". Outputs " { $link f } " if no matching key is found." }
-{ $see-also rassoc } ;
-
-HELP: rassoc
-{ $values { "value" "an object" } { "assoc" "a sequence of pairs" } { "key" "the associated key, or " { $link f } } }
-{ $description "Searches for a pair whose second element is equal to the value and outputs the first element of the pair. Values are compared for equality using " { $link = } ". Outputs " { $link f } " if no matching value is found." } 
-{ $see-also rassoc } ;
+{ $description "Searches for a pair whose first element is equal to the key and outputs the second element of the pair. Keys are compared for equality using " { $link = } ". Outputs " { $link f } " if no matching key is found." } ;
 
 HELP: last/first
 { $values { "seq" "a sequence" } { "pair" "a two-element array" } }
@@ -206,6 +132,11 @@ HELP: pad-right
 HELP: sequence=
 { $values { "seq1" "a sequence" } { "seq2" "a sequence" } { "?" "a boolean" } }
 { $description "Tests if the two sequences have the same length and elements. This is weaker than " { $link = } ", since it does not ensure that the sequences are instances of the same class." } ;
+
+HELP: group
+{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "groups" "a sequence of sequences" } }
+{ $description "Splits the sequence into groups of " { $snippet "n" } " elements and collects the groups into a new array." }
+{ $notes "If the sequence length is not a multiple of " { $snippet "n" } ", the final subsequence in the list will be shorter than " { $snippet "n" } " elements." } ;
 
 HELP: depth
 { $values { "n" "a non-negative integer" } }
@@ -234,6 +165,31 @@ HELP: cond
 HELP: no-cond
 { $description "Throws a " { $link no-cond } " error." }
 { $error-description "Thrown by " { $link cond } " if none of the test quotations yield a true value. Most uses of " { $link cond } " include a default case where the test quotation is " { $snippet "[ t ]" } "; such a " { $link cond } " form will never throw this error. If you wish to assert that certain conditions are true, and fail otherwise, you can use " { $link cond } " without a default case." } ;
+
+HELP: case
+{ $values { "obj" object } { "assoc" "a sequence of object/quotation pairs" } }
+{ $description
+    "Calls the second quotation in the first pair whose first element is equal to " { $snippet "obj" } ", dropping the object from the stack first."
+    $terpri
+    "The following two phrases are equivalent:"
+    { $code "{ { X [ Y ] } { Y [ T ] } } cond" }
+    { $code "dup X = [ drop Y ] [ dup Z = [ drop T ] [ no-case ] if ] if" }
+}
+{ $errors "Throws a " { $link no-case } " error if none of the test quotations yield a true value." }
+{ $examples
+    { $code
+        "SYMBOL: yes  SYMBOL: no  SYMBOL: maybe"
+        "maybe {"
+        "    { yes [ ] } ! Do nothing"
+        "    { no [ \"No way!\" throw ] }"
+        "    { maybe [ \"Make up your mind!\" print ] }"
+        "} case"
+    }
+} ;
+
+HELP: no-case
+{ $description "Throws a " { $link no-case } " error." }
+{ $error-description "Thrown by " { $link case } " if the object at the top of the stack is not equal to any key in the association list." } ;
 
 HELP: unix?
 { $values { "?" "a boolean" } }

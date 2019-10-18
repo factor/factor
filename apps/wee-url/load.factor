@@ -1,4 +1,4 @@
-REQUIRES: libs/httpd libs/serialize ;
+REQUIRES: apps/http-server libs/store ;
 
 PROVIDE: apps/wee-url
-{ +files+ { "store.factor" "responder.factor" } } ;
+{ +files+ { "responder.factor" } } ;

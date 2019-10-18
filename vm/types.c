@@ -7,32 +7,22 @@ void box_boolean(bool value)
 }
 
 /* FFI calls this */
-bool unbox_boolean(void)
+bool to_boolean(CELL value)
 {
-	return (dpop() != F);
+	return value != F;
 }
 
 /* the array is full of undefined data, and must be correctly filled before the
 next GC. size is in cells */
-F_ARRAY *allot_array_internal(CELL type, F_FIXNUM capacity)
+F_ARRAY *allot_array_internal(CELL type, CELL capacity)
 {
-	F_ARRAY *array;
-
-	if(capacity < 0)
-	{
-		simple_error(ERROR_NEGATIVE_ARRAY_SIZE,allot_integer(capacity),F);
-		return NULL;
-	}
-	else
-	{
-		array = allot_object(type,array_size(capacity));
-		array->capacity = tag_fixnum(capacity);
-		return array;
-	}
+	F_ARRAY *array = allot_object(type,array_size(capacity));
+	array->capacity = tag_fixnum(capacity);
+	return array;
 }
 
 /* make a new array with an initial element */
-F_ARRAY *allot_array(CELL type, F_FIXNUM capacity, CELL fill)
+F_ARRAY *allot_array(CELL type, CELL capacity, CELL fill)
 {
 	int i;
 	REGISTER_ROOT(fill);
@@ -44,30 +34,27 @@ F_ARRAY *allot_array(CELL type, F_FIXNUM capacity, CELL fill)
 }
 
 /* size is in bytes this time */
-F_ARRAY *allot_byte_array(F_FIXNUM size)
+F_BYTE_ARRAY *allot_byte_array(CELL size)
 {
-	if(size < 0)
-	{
-		simple_error(ERROR_NEGATIVE_ARRAY_SIZE,allot_integer(size),F);
-		return NULL;
-	}
-
-	CELL byte_size = (size + sizeof(CELL) - 1) / sizeof(CELL);
-	return allot_array(BYTE_ARRAY_TYPE,byte_size,0);
+	F_BYTE_ARRAY *array = allot_object(BYTE_ARRAY_TYPE,
+		byte_array_size(size));
+	array->capacity = tag_fixnum(size);
+	memset(array + 1,0,size);
+	return array;
 }
 
 /* push a new array on the stack */
 void primitive_array(void)
 {
 	CELL initial = dpop();
-	F_FIXNUM size = unbox_signed_cell();
+	CELL size = unbox_array_size();
 	dpush(tag_object(allot_array(ARRAY_TYPE,size,initial)));
 }
 
 /* push a new byte on the stack */
 void primitive_byte_array(void)
 {
-	F_FIXNUM size = unbox_signed_cell();
+	CELL size = unbox_array_size();
 	dpush(tag_object(allot_byte_array(size)));
 }
 
@@ -89,7 +76,7 @@ CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
 	return tag_object(a);
 }
 
-F_ARRAY *reallot_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill)
+F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill)
 {
 	int i;
 	F_ARRAY* new_array;
@@ -117,13 +104,13 @@ F_ARRAY *reallot_array(F_ARRAY* array, F_FIXNUM capacity, CELL fill)
 void primitive_resize_array(void)
 {
 	F_ARRAY* array = untag_array(dpop());
-	F_FIXNUM capacity = unbox_signed_cell();
+	CELL capacity = unbox_array_size();
 	dpush(tag_object(reallot_array(array,capacity,F)));
 }
 
 void primitive_become(void)
 {
-	CELL type = unbox_signed_cell();
+	CELL type = to_fixnum(dpop());
 	CELL obj = dpeek();
 	put(SLOT(UNTAG(obj),0),tag_header(type));
 }
@@ -138,28 +125,19 @@ void primitive_array_to_vector(void)
 }
 
 /* untagged */
-F_STRING* allot_string_internal(F_FIXNUM capacity)
+F_STRING* allot_string_internal(CELL capacity)
 {
-	F_STRING* string;
+	F_STRING* string = allot_object(STRING_TYPE,
+		sizeof(F_STRING) + (capacity + 1) * CHARS);
 
-	if(capacity < 0)
-	{
-		simple_error(ERROR_NEGATIVE_ARRAY_SIZE,allot_integer(capacity),F);
-		return NULL;
-	}
-	else
-	{
-		string = allot_object(STRING_TYPE,
-			sizeof(F_STRING) + (capacity + 1) * CHARS);
-		/* strings are null-terminated in memory, even though they also
-		have a length field. The null termination allows us to add
-		the sizeof(F_STRING) to a Factor string to get a C-style
-		UTF16 string for C library calls. */
-		cput(SREF(string,capacity),(u16)'\0');
-		string->length = tag_fixnum(capacity);
-		string->hashcode = F;
-		return string;
-	}
+	/* strings are null-terminated in memory, even though they also
+	have a length field. The null termination allows us to add
+	the sizeof(F_STRING) to a Factor string to get a C-style
+	UCS-2 string for C library calls. */
+	cput(SREF(string,capacity),(u16)'\0');
+	string->length = tag_fixnum(capacity);
+	string->hashcode = F;
+	return string;
 }
 
 /* call this after constructing a string */
@@ -179,7 +157,7 @@ void primitive_rehash_string(void)
 }
 
 /* untagged */
-F_STRING *allot_string(F_FIXNUM capacity, CELL fill)
+F_STRING *allot_string(CELL capacity, CELL fill)
 {
 	CELL i;
 
@@ -195,12 +173,12 @@ F_STRING *allot_string(F_FIXNUM capacity, CELL fill)
 
 void primitive_string(void)
 {
-	CELL initial = unbox_unsigned_cell();
-	F_FIXNUM length = unbox_signed_cell();
+	CELL initial = to_cell(dpop());
+	CELL length = unbox_array_size();
 	dpush(tag_object(allot_string(length,initial)));
 }
 
-F_STRING* reallot_string(F_STRING* string, F_FIXNUM capacity, u16 fill)
+F_STRING* reallot_string(F_STRING* string, CELL capacity, u16 fill)
 {
 	/* later on, do an optimization: if end of array is here, just grow */
 	CELL i;
@@ -226,7 +204,7 @@ F_STRING* reallot_string(F_STRING* string, F_FIXNUM capacity, u16 fill)
 void primitive_resize_string(void)
 {
 	F_STRING* string = untag_string(dpop());
-	F_FIXNUM capacity = unbox_signed_cell();
+	CELL capacity = unbox_array_size();
 	dpush(tag_object(reallot_string(string,capacity,0)));
 }
 
@@ -249,8 +227,8 @@ void primitive_resize_string(void)
 	} \
 	void primitive_memory_to_##type##_string(void) \
 	{ \
-		CELL length = unbox_unsigned_cell(); \
-		const type *string = (const type*)unbox_unsigned_cell(); \
+		CELL length = to_cell(dpop()); \
+		const type *string = unbox_alien(); \
 		dpush(tag_object(memory_to_##type##_string(string,length))); \
 	} \
 	F_STRING *from_##type##_string(const type *str) \
@@ -285,9 +263,9 @@ bool check_string(F_STRING *s, CELL max)
 	return true;
 }
 
-F_ARRAY *allot_c_string(CELL capacity, CELL size)
+F_BYTE_ARRAY *allot_c_string(CELL capacity, CELL size)
 {
-	return allot_array_internal(BYTE_ARRAY_TYPE,capacity * size / CELLS + 1);
+	return allot_byte_array((capacity + 1) * size);
 }
 
 #define STRING_TO_MEMORY(type) \
@@ -300,14 +278,14 @@ F_ARRAY *allot_c_string(CELL capacity, CELL size)
 	} \
 	void primitive_##type##_string_to_memory(void) \
 	{ \
-		type *address = (type*)unbox_unsigned_cell(); \
+		type *address = unbox_alien(); \
 		F_STRING *str = untag_string(dpop()); \
 		type##_string_to_memory(str,address); \
 	} \
-	F_ARRAY *string_to_##type##_alien(F_STRING *s, bool check) \
+	F_BYTE_ARRAY *string_to_##type##_alien(F_STRING *s, bool check) \
 	{ \
 		CELL capacity = string_capacity(s); \
-		F_ARRAY *_c_str; \
+		F_BYTE_ARRAY *_c_str; \
 		if(check && !check_string(s,sizeof(type))) \
 			simple_error(ERROR_C_STRING,tag_object(s),F); \
 		REGISTER_STRING(s); \
@@ -417,7 +395,7 @@ void primitive_update_xt(void)
 void primitive_word_xt(void)
 {
 	F_WORD *word = untag_word(dpeek());
-	drepl(allot_cell(word->xt));
+	drepl(allot_cell((CELL)word->xt));
 }
 
 void fixup_word(F_WORD* word)

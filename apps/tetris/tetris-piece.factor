@@ -1,4 +1,4 @@
-! Copyright (C) 2006 Alex Chapman
+! Copyright (C) 2006, 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel generic arrays tetromino math sequences lazy-lists ;
 IN: tetris-piece
@@ -16,7 +16,7 @@ C: piece ( tetromino -- piece )
 
 : (piece-blocks) ( piece -- blocks )
     #! rotates the tetromino
-    dup tetromino-states swap piece-rotation swap nth ;
+    dup piece-rotation swap tetromino-states nth ;
 
 : piece-blocks ( piece -- blocks )
     #! rotates and positions the tetromino
@@ -26,7 +26,7 @@ C: piece ( tetromino -- piece )
     piece-blocks blocks-width ;
 
 : set-start-location ( piece board-width -- )
-    2 / floor over piece-width 2 / floor - 0 2array swap set-piece-location ;
+    2 /i over piece-width 2 /i - 0 2array swap set-piece-location ;
 
 : <random-piece> ( board-width -- piece )
     random-tetromino <piece> [ swap set-start-location ] keep ;

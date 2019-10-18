@@ -53,7 +53,7 @@ TUPLE: pane-stream pane ;
     [ dup pane-terpri ] interleave 2drop ;
 
 : do-pane-stream ( pane-stream quot -- )
-    >r pane-stream-pane r> over slip scroll-pane ; inline
+    >r pane-stream-pane r> keep scroll-pane ; inline
 
 M: pane-stream stream-terpri
     [ pane-terpri ] do-pane-stream ;
@@ -220,7 +220,7 @@ M: paragraph stream-write
     drop ;
 
 : gadget-write1 ( char gadget -- )
-    >r ch>string r> stream-write ;
+    >r 1string r> stream-write ;
 
 M: pack stream-write1 gadget-write1 ;
 

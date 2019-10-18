@@ -17,7 +17,7 @@ namespaces queues sequences vectors ;
 : sleep-queue ( -- vector ) \ sleep-queue get-global ;
 
 : sleep-queue* ( -- vector )
-    sleep-queue dup [ [ first ] 2apply swap - ] nsort ;
+    sleep-queue dup [ [ first ] compare neg ] nsort ;
 
 : sleep-time ( vector -- ms )
     dup empty? [ drop 1000 ] [ peek first millis [-] ] if ;
@@ -48,8 +48,7 @@ namespaces queues sequences vectors ;
 
 IN: kernel-internals
 
-: (idle-thread) ( fast? -- )
-    #! If fast, then we don't sleep, just select()
+: (idle-thread) ( slow? -- )
     sleep-queue* dup sleep-time dup zero?
     [ drop pop second schedule-thread drop ]
     [ nip 0 ? io-multiplex ] if ;

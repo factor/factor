@@ -1,20 +1,27 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: alien
-USING: arrays hashtables io kernel math namespaces parser
+USING: byte-arrays hashtables io kernel math namespaces parser
 sequences ;
 
 : <alien> ( address -- alien ) f <displaced-alien> ; inline
+
+: alien>native-string ( alien -- string )
+    os { "windows" "wince" } member?
+    [ alien>u16-string ] [ alien>char-string ] if ;
+
+: dll-path ( dll -- string )
+    (dll-path) alien>native-string ;
 
 UNION: c-ptr byte-array alien POSTPONE: f ;
 
 M: alien equal?
     over alien? [
-        2dup [ expired? ] 2apply 2dup or [
-            2swap 2drop
+        2dup [ expired? ] either? [
+            [ expired? ] both?
         ] [
-            2drop [ alien-address ] 2apply
-        ] if =
+            [ alien-address ] 2apply =
+        ] if
     ] [
         2drop f
     ] if ;

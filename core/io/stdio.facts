@@ -22,6 +22,11 @@ HELP: read
 { $contract "Reads " { $snippet "n" } " characters of input from the " { $link stdio } " stream. Outputs a truncated string or " { $link f } " on stream exhaustion." }
 $io-error ;
 
+HELP: read-until
+{ $values { "seps" "a string" } { "str/f" "a string or " { $link f } } { "sep/f" "a character or " { $link f } } }
+{ $contract "Reads characters from the " { $link stdio } " stream. until the first occurrence of a separator character, or stream exhaustion. In the former case, the separator character is pushed on the stack, and is not part of the output string. In the latter case, the entire stream contents are output, along with " { $link f } "." }
+$io-error ;
+
 HELP: write1
 { $values { "ch" "a character" } }
 { $contract "Writes a character of output to the " { $link stdio } " stream. If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }

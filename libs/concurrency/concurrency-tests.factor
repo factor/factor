@@ -10,7 +10,7 @@ IN: temporary
   5 over dlist-push-end 
   "junk" over dlist-push-end 
   20 over dlist-push-end 
-  [ string? ] swap dlist-pop? 
+  [ string? ] swap dlist-remove 
 ] unit-test
 
 [ 5 20 ] [ 
@@ -18,7 +18,7 @@ IN: temporary
   5 over dlist-push-end 
   "junk" over dlist-push-end 
   20 over dlist-push-end 
-  [ string? ] over dlist-pop? drop
+  [ string? ] over dlist-remove drop
   [ ] dlist-each
 ] unit-test
 
@@ -27,8 +27,8 @@ IN: temporary
   5 over dlist-push-end 
   "junk" over dlist-push-end 
   20 over dlist-push-end 
-  [ integer? ] over dlist-pop? drop
-  [ integer? ] over dlist-pop? drop
+  [ integer? ] over dlist-remove drop
+  [ integer? ] over dlist-remove drop
   [ ] dlist-each
 ] unit-test
 
@@ -37,7 +37,7 @@ IN: temporary
   5 over dlist-push-end 
   "junk" over dlist-push-end 
   20 over dlist-push-end 
-  [ string? ] swap dlist-pred?
+  [ string? ] swap dlist-contains?
 ] unit-test
 
 [ t ] [ 
@@ -45,7 +45,7 @@ IN: temporary
   5 over dlist-push-end 
   "junk" over dlist-push-end 
   20 over dlist-push-end 
-  [ integer? ] swap dlist-pred?
+  [ integer? ] swap dlist-contains?
 ] unit-test
 
 [ f ] [ 
@@ -53,8 +53,8 @@ IN: temporary
   5 over dlist-push-end 
   "junk" over dlist-push-end 
   20 over dlist-push-end 
-  [ string? ] over dlist-pop? drop
-  [ string? ] swap dlist-pred?
+  [ string? ] over dlist-remove drop
+  [ string? ] swap dlist-contains?
 ] unit-test
 
 [ V{ 1 2 3 } ] [

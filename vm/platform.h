@@ -6,6 +6,10 @@
 	#define FACTOR_PPC
 #elif defined(__amd64__) || defined(__x86_64__)
 	#define FACTOR_AMD64
+#elif defined(__arm__)
+	#define FACTOR_ARM
+#else
+	#error "Unsupported architecture"
 #endif
 
 #ifdef WINDOWS
@@ -14,6 +18,7 @@
 	#include "os-unix.h"
 
 	#ifdef __APPLE__
+		#include "os-unix-ucontext.h"
 		#include "os-macosx.h"
 		#include "mach_signal.h"
 		
@@ -21,31 +26,50 @@
 			#include "os-macosx-x86.h"
 		#elif defined(FACTOR_PPC)
 			#include "os-macosx-ppc.h"
+		#else
+			#error "Unsupported architecture"
 		#endif
 	#else
 		#include "os-genunix.h"
-		#ifdef __FreeBSD__
-			#include "os-freebsd.h"
-		#elif defined(linux)
-			#ifdef FACTOR_PPC
-				#include "os-linux-ppc.h"
-			#endif
 
-			#include "os-linux.h"
-		#elif defined(__sun)
-			#include "os-solaris.h"
+		#ifdef __FreeBSD__
+			#define FACTOR_OS_STRING "freebsd"
+			#include "os-unix-ucontext.h"
+		#elif defined(__OpenBSD__)
+			#define FACTOR_OS_STRING "openbsd"
+
+			#ifdef FACTOR_X86
+				#include "os-openbsd-x86.h"
+			#else
+				#error "Unsupported architecture"
+			#endif
+		#elif defined(linux)
+			#define FACTOR_OS_STRING "linux"
+
+			#include "os-unix-ucontext.h"
+
+			#if defined(FACTOR_PPC)
+				#include "os-linux-ppc.h"
+			#elif defined(FACTOR_ARM)
+				#include "os-linux-arm.h"
+			#endif
+		#elif defined(__SVR4) && defined(sun)
+			#define FACTOR_OS_STRING "solaris"
+			#include "os-unix-ucontext.h"
 		#else
 			#error "Unsupported OS"
 		#endif
 	#endif
 #endif
 
-#ifdef FACTOR_X86
+#if defined(FACTOR_X86)
 	#include "cpu-x86.h"
 #elif defined(FACTOR_PPC)
 	#include "cpu-ppc.h"
 #elif defined(FACTOR_AMD64)
 	#include "cpu-amd64.h"
+#elif defined(FACTOR_ARM)
+	#include "cpu-arm.h"
 #else
 	#error "Unsupported CPU"
 #endif

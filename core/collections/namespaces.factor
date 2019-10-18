@@ -1,24 +1,32 @@
-! Copyright (C) 2003, 2006 Slava Pestov.
+! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+IN: namespaces
+TUPLE: namespace-error object ;
+
 IN: kernel-internals
-USING: vectors sequences ;
+USING: kernel vectors sequences hashtables errors ;
 
 : namestack* ( -- namestack )
     3 getenv { vector } declare ; inline
-: >n ( namespace -- ) namestack* push ;
+
+: >n ( namespace -- )
+    dup hashtable? [ <namespace-error> throw ] unless
+    namestack* push ;
+
 : n> ( -- namespace ) namestack* pop ;
 
 IN: namespaces
-USING: arrays hashtables kernel kernel-internals math strings
-words ;
+USING: arrays kernel-internals math strings words ;
+
+: namespace ( -- namespace )
+    namestack* peek { hashtable } declare ;
 
 : namestack ( -- namestack ) namestack* clone ; inline
 : set-namestack ( namestack -- ) >vector 3 setenv ; inline
-: namespace ( -- namespace ) namestack* peek ;
 : ndrop ( -- ) namestack* pop* ;
 : global ( -- g ) 4 getenv { hashtable } declare ; inline
 : get ( variable -- value ) namestack* hash-stack ;
-: set ( value variable -- ) namespace set-hash ; inline
+: set ( value variable -- ) namespace set-hash ;
 : on ( variable -- ) t swap set ; inline
 : off ( variable -- ) f swap set ; inline
 : get-global ( variable -- value ) global hash ; inline
@@ -48,13 +56,17 @@ words ;
 SYMBOL: building
 
 : make ( quot exemplar -- seq )
-    >r
-    [ V{ } clone building set call building get ] with-scope
-    r> like ; inline
+    [
+        [
+            1024 swap new-resizable [
+                building set call
+            ] keep
+        ] keep like
+    ] with-scope ; inline
 
 : , ( elt -- ) building get push ;
 
-: % ( seq -- ) building get swap nappend ;
+: % ( seq -- ) building get nappend ;
 
 : init-namespaces ( -- ) global 1array set-namestack ;
 
@@ -62,3 +74,11 @@ IN: sequences
 
 : join ( seq glue -- newseq )
     [ swap [ % ] [ dup % ] interleave drop ] over make ;
+
+: (prune) ( hash vec elt -- )
+    rot 2dup hash-member?
+    [ 3drop ] [ dupd dupd set-hash swap push ] if ; inline
+
+: prune ( seq -- newseq )
+    dup length <hashtable> over length <vector>
+    rot [ >r 2dup r> (prune) ] each nip ;

@@ -1,5 +1,16 @@
+#define UNICODE
+
 #include <windows.h>
 #include <ctype.h>
+
+typedef wchar_t F_CHAR;
+typedef char F_SYMBOL;
+
+#define unbox_symbol_string unbox_char_string
+#define from_symbol_string from_char_string
+#define primitive_string_to_native_alien primitive_string_to_u16_alien
+
+#define STR_FORMAT L"%ls"
 
 #define FACTOR_OS_STRING "windows"
 
@@ -11,13 +22,12 @@
 /* Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970 */
 #define EPOCH_OFFSET 0x019db1ded53e8000LL
 
-char *buffer_to_c_string(char *buffer);
 F_STRING *get_error_message(void);
-DLLEXPORT char *error_message(DWORD id);
+DLLEXPORT F_CHAR *error_message(DWORD id);
 
 INLINE void init_ffi(void) {}
 void ffi_dlopen(F_DLL *dll, bool error);
-void *ffi_dlsym(F_DLL *dll, char *symbol, bool error);
+void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol, bool error);
 void ffi_dlclose(F_DLL *dll);
 
 void primitive_open_file(void);

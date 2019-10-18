@@ -1,5 +1,5 @@
 IN: inference
-USING: help interpreter kernel kernel-internals ;
+USING: help kernel kernel-internals ;
 
 HELP: unify-lengths
 { $values { "seq" "a sequence" } { "newseq" "a new sequence" } }

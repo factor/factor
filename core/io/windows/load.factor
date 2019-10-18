@@ -1,10 +1,8 @@
-REQUIRES: core/windows core/io/buffer ;
+USE: kernel
 
 PROVIDE: core/io/windows
 { +files+ {
-    "errors.factor"
-    "io-internals.factor"
-    "stream.factor"
-    "server.factor"
     "io.factor"
+    "sockets.factor"
+    "files.factor"
 } } ;

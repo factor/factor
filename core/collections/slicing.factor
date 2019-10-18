@@ -1,28 +1,28 @@
-! Copyright (C) 2005 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+IN: sequences-internals
+USING: generic kernel math namespaces strings vectors errors
+sequences ;
+
+: (start) ( subseq seq n -- subseq seq ? )
+    pick length [
+        >r 3dup r> [ + swap nth-unsafe ] keep rot nth-unsafe =
+    ] all? nip ; inline
+
+: (head) 0 swap rot ; inline
+: (tail) over length rot ; inline
+: from-end >r dup length r> - ; inline
+
 IN: sequences
-USING: generic kernel kernel-internals math namespaces
-strings vectors errors ;
 
-: head-slice ( seq n -- slice ) 0 swap rot <slice> ;
-
-: tail-slice ( seq n -- slice ) over length rot <slice> ;
-
-: (slice*) >r dup length r> - ;
-
-: head-slice* ( seq n -- slice ) (slice*) head-slice ;
-
-: tail-slice* ( seq n -- slice ) (slice*) tail-slice ;
-
-: subseq ( from to seq -- subseq ) [ <slice> ] keep like ;
-
-: head ( seq n -- headseq ) dupd head-slice swap like ;
-
-: head* ( seq n -- headseq ) dupd head-slice* swap like ;
-
-: tail ( seq n -- tailseq ) dupd tail-slice swap like ;
-
-: tail* ( seq n -- tailseq ) dupd tail-slice* swap like ;
+: head-slice ( seq n -- slice ) (head) <slice> ;
+: tail-slice ( seq n -- slice ) (tail) <slice> ;
+: head-slice* ( seq n -- slice ) from-end head-slice ;
+: tail-slice* ( seq n -- slice ) from-end tail-slice ;
+: head ( seq n -- headseq ) (head) subseq ;
+: tail ( seq n -- tailseq ) (tail) subseq ;
+: head* ( seq n -- headseq ) from-end head ;
+: tail* ( seq n -- tailseq ) from-end tail ;
 
 : head? ( seq begin -- ? )
     2dup [ length ] 2apply < [
@@ -50,7 +50,7 @@ strings vectors errors ;
 : remove-nth ( n seq -- newseq )
     >r f swap dup 1+ r> replace-slice ;
 
-: (cut) ( n seq -- before after )
+: cut-slice ( n seq -- before after )
     swap [ head ] 2keep tail-slice ;
 
 : cut ( n seq -- before after )
@@ -59,48 +59,31 @@ strings vectors errors ;
 : cut* ( n seq -- before after )
     swap [ head* ] 2keep tail* ;
 
-: (group) ( n seq -- )
-    2dup length >= [
-        dup empty? [ 2drop ] [ dup like , drop ] if
-    ] [
-        dupd (cut) >r , r> (group)
-    ] if ;
+: start* ( subseq seq n -- i )
+    pick length pick length swap - 1+
+    [ (start) ] find*
+    swap >r 3drop r> ;
 
-: group ( seq n -- groups )
-    dup 0 <= [ "Invalid group count" throw ] when
-    [ swap (group) ] { } make ;
-
-: start-step ( subseq seq n -- subseq slice )
-    pick length dupd + rot <slice> ;
-
-: start* ( subseq seq i -- n )
-    pick length pick length pick - > [
-        3drop -1
-    ] [
-        2dup >r >r start-step dupd sequence= [
-            r> 2drop r>
-        ] [
-            r> r> 1+ start*
-        ] if
-    ] if ;
-
-: start ( subseq seq -- n ) 0 start* ;
+: start ( subseq seq -- i ) 0 start* ; inline
 
 : subseq? ( subseq seq -- ? ) start -1 > ;
 
-: split1 ( seq subseq -- before after )
+: split1-slice ( seq subseq -- before after )
     dup pick start dup -1 = [
         2drop dup like f
     ] [
-        [ >r over r> head -rot length ] keep + tail
+        [ >r over r> head -rot length ] keep + tail-slice
     ] if ;
+
+: split1 ( seq subseq -- before after )
+    over >r split1-slice dup [ r> like ] [ r> drop ] if ;
 
 : split, building get peek push ;
 
 : split-next, V{ } clone , ;
 
 : (split) ( quot elt -- )
-    [ swap call ] keep swap
+    swap keep swap
     [ drop split-next, ] [ split, ] if ; inline
 
 : split* ( seq quot -- pieces )

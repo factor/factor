@@ -1,9 +1,9 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: compiler kernel gadgets-tracks gadgets-scrolling
 gadgets-workspace gadgets-panes gadgets-presentations
 gadgets-buttons inference errors io math gadgets namespaces
-generic ;
+generic threads ;
 IN: gadgets-messages
 
 TUPLE: messages counter errors errors# warnings warnings# ;
@@ -15,7 +15,7 @@ M: messages batch-begins
     messages-warnings pane-clear ;
 
 M: messages compile-begins
-    2drop ;
+    2drop yield ;
 
 : messages-errors+
     dup messages-errors# 1+ swap set-messages-errors# ;

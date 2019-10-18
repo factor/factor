@@ -1,0 +1,20 @@
+<% USING: namespaces io kernel words generic sequences 
+prettyprint furnace parser ; %>
+
+<% "model" get [ %>
+
+<% dup tuple-slots over class dup
+    word-vocabulary use+ "slot-names" word-prop %>
+
+<table>
+    
+<% [ %><tr><td><% write %>:</td><td><% write %></td></tr><% ] 2each %>
+
+</table>
+
+<% dup crud-index swap class dup "crud-index" word-prop swap unparse %>
+<p><a href="<% 3dup write %>-edit?<% write %>=<% write %>">Edit</a> |
+    <a href="<% [ write %>-delete?<% write %>=<% write  ] keep %>">Delete</a> |
+    <a href="<% dup write %>-new">New</a> | <a href="<% write %>-list">List</a></p>
+
+<% ] [ %><p>No such tuple</p><% ] if* %>

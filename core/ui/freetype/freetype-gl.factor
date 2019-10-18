@@ -20,7 +20,7 @@ SYMBOL: open-fonts
 
 TUPLE: font ascent descent height handle widths ;
 
-M: font equal? eq? ;
+M: font equal? 2drop f ;
 
 : close-font ( font -- ) font-handle FT_Done_Face ;
 

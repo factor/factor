@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 ! 
-USING: test kernel serialize io math alien arrays ;
+USING: test kernel serialize io math alien arrays byte-arrays sequences ;
 IN: temporary
 
 [ f  ] [
@@ -151,8 +151,7 @@ TUPLE: serialize-test a b ;
   [ [ deserialize deserialize ] with-serialized ] string-in eq?
 ] unit-test
 
-[ 50 ] [
-  [ [ 5 <byte-array> 50 over 0 set-alien-unsigned-1 serialize ] with-serialized ] string-out
+[ B{ 50 } ] [
+  [ [ B{ 50 }  serialize ] with-serialized ] string-out
   [ [ deserialize ] with-serialized ] string-in
-  0 alien-unsigned-1
 ] unit-test 

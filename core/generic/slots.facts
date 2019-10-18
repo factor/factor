@@ -56,4 +56,4 @@ $low-level-note ;
 HELP: simple-slots
 { $values { "class" "a class word" } { "slots" "a sequence of strings" } { "base" "a slot number" } { "spec" "a slot specification for " { $link define-slots } } }
 { $description "Constructs a slot specification for " { $link define-slots } " where each slot is named by an element of " { $snippet "slots" } " prefixed by the name of the class. Slots are numbered consecutively starting from " { $snippet "base" } ". Reader and writer words are defined in the current vocabulary, with the reader word having the same name as the slot, and the writer word name prefixed by " { $snippet "\"set-\"" } "." }
-{ $notes "This word is used by " { $link define-tuple } " and " { $link POSTPONE: TUPLE: } "." } ;
+{ $notes "This word is used by " { $link define-tuple-class } " and " { $link POSTPONE: TUPLE: } "." } ;

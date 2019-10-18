@@ -27,17 +27,7 @@ HELP: $subsection
 { $values { "element" "a markup element of the form " { $snippet "{ topic }" } } }
 { $description "Prints an expandable outliner containing the body of the help topic named by the first string element of " { $snippet "element" } "." }
 { $examples
-    { $markup-example { $subsection "sequences" } }
-} ;
-
-HELP: $subtopic
-{ $values { "element" "a markup element of the form " { $snippet "{ title content }" } } }
-{ $description "Prints an expandable outliner with the given title containing an arbitrary markup element." }
-{ $examples
-    { $markup-example { $subtopic "Subtopic example"
-    "Subtopics are useful for short notes, sidebars "
-    "and other bits of info which don't really deserve "
-    "their own help article." } }
+    { $code "{ $subsection \"sequences\" }" }
 } ;
 
 HELP: $outliner

@@ -1,8 +1,8 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets
-USING: arrays errors gadgets gadgets-presentations generic
-hashtables io kernel math models namespaces prettyprint
+USING: arrays errors gadgets gadgets-labels gadgets-theme
+generic hashtables io kernel math models namespaces prettyprint
 sequences test threads sequences words timers ;
 
 ! Assoc mapping aliens to gadgets
@@ -24,8 +24,14 @@ SYMBOL: windows
     windows get-global [ second eq? ] find-with drop
     windows get-global [ length 1- ] keep exchange ;
 
+! Presentation help bar
+: <status-bar> ( model -- gadget )
+    [ "" like ] <filter>
+    <label-control>
+    dup reverse-video-theme ;
+
 : open-window ( gadget title -- )
-    >r f <model> [ <presentation-help> ] keep r> <model> <world>
+    >r f <model> [ <status-bar> ] keep r> <world>
     dup pref-dim over set-gadget-dim
     dup open-window* draw-world ;
 
@@ -36,6 +42,7 @@ SYMBOL: windows
 : start-world ( world -- )
     dup graft
     dup relayout
+    dup world-title over set-title
     world-gadget request-focus ;
 
 : close-global ( world global -- )
@@ -55,10 +62,10 @@ SYMBOL: windows
     dup world-fonts clear-hash
     dup unfocus-world
     f over set-world-focus
-    f over set-world-handle
-    ungraft ;
+    f swap set-world-handle ;
 
 : stop-world ( world -- )
+    dup ungraft
     dup hand-clicked close-global
     dup hand-gadget close-global
     dup free-fonts

@@ -1,5 +1,5 @@
 IN: process
-USING: compiler io io-internals kernel parser generic
+USING: c-streams compiler io io-internals kernel parser generic
 sequences ;
 
 LIBRARY: libc

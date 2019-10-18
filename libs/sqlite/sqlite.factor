@@ -113,11 +113,11 @@ DEFER: (sqlite-map)
   pick sqlite3_step step-complete? [ 
     2nip
   ] [
-    >r 2dup call r> curry (sqlite-map)
+    >r 2dup call r> swap add (sqlite-map)
   ] if ; 
 
 : sqlite-map ( statement quot -- seq )
-  [ ] (sqlite-map) ;
+  { } (sqlite-map) ;
 
 : with-sqlite ( path quot -- )
     [

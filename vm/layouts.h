@@ -24,6 +24,14 @@ typedef signed long long s64;
 #define HALF_WORD_SIZE (CELLS*4)
 #define HALF_WORD_MASK (((unsigned long)1<<HALF_WORD_SIZE)-1)
 
+typedef struct {
+	const char* image;
+	CELL ds_size, rs_size, cs_size;
+	CELL gen_count, young_size, aging_size;
+	CELL code_size;
+	bool secure_gc;
+} F_PARAMETERS;
+
 #define TAG_MASK 7
 #define TAG_BITS 3
 #define TAG(cell) ((CELL)(cell) & TAG_MASK)
@@ -105,6 +113,8 @@ typedef struct {
 	CELL array;
 } F_HASHTABLE;
 
+typedef void (*XT)(void *word);
+
 /* When a word is executed we jump to the value of the XT field. However this
 value is an unportable function pointer. Interpreted and primitive words will
 have their XT set to a value in the 'primitives' global (see primitives.c).
@@ -128,7 +138,7 @@ typedef struct {
 	/* TAGGED t or f, depending on if the word is compiled or not */
 	CELL compiledp;
 	/* UNTAGGED execution token: jump here to execute word */
-	CELL xt;
+	XT xt;
 } F_WORD;
 
 typedef struct {
@@ -174,3 +184,15 @@ typedef struct {
 	/* OS-specific handle */
 	void* dll;
 } F_DLL;
+
+typedef struct {
+	CELL header;
+	/* tagged */
+	CELL capacity;
+} F_BYTE_ARRAY;
+
+typedef struct {
+	CELL quot;
+	CELL scan;
+	CELL end;
+} F_INTERP_FRAME;

@@ -23,12 +23,13 @@
 #include "data_gc.h"
 #include "types.h"
 #include "math.h"
+#include "float_bits.h"
 #include "io.h"
 #include "code_gc.h"
 #include "compiler.h"
 #include "image.h"
-#include "primitives.h"
 #include "stack.h"
 #include "alien.h"
+#include "primitives.h"
 
 #endif /* __FACTOR_H__ */

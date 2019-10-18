@@ -9,7 +9,7 @@ SYMBOL: composite
 SYMBOL: count
 SYMBOL: trials
 
-: rand[1..n-1] ( m -- n ) 1- random-int 1+ ;
+: rand[1..n-1] ( m -- n ) 1- random 1+ ;
 
 : (factor-2s) ( s n -- s n )
     dup 2 mod 0 = [ -1 shift >r 1+ r> (factor-2s) ] when ;
@@ -85,7 +85,7 @@ IN: crypto
     dup even? [ 1+ ] when (find-relative-prime) ;
 
 : find-relative-prime ( m -- p )
-    dup random-int dup even? [ 1+ ] when (find-relative-prime) ;
+    dup random dup even? [ 1+ ] when (find-relative-prime) ;
 
 : generate-two-unique-primes ( n -- p q )
     #! generate two primes

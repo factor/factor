@@ -1,22 +1,11 @@
-IN: compiler
+! Copyright (C) 2006, 2007 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+IN: generator
 USING: arrays generic kernel kernel-internals math memory
 namespaces sequences ;
 
 ! Does the assembler emit bytes or cells?
 DEFER: code-format ( -- byte# )
-
-! A scratch register for computations
-TUPLE: vreg n ;
-
-C: vreg ( n reg-class -- vreg )
-    [ set-delegate ] keep [ set-vreg-n ] keep ;
-
-! Register classes
-TUPLE: int-regs ;
-TUPLE: float-regs size ;
-
-: <int-vreg> ( n -- vreg ) T{ int-regs } <vreg> ;
-: <float-vreg> ( n -- vreg ) T{ float-regs f 8 } <vreg> ;
 
 ! A pseudo-register class for parameters spilled on the stack
 TUPLE: stack-params ;
@@ -25,19 +14,20 @@ TUPLE: stack-params ;
 GENERIC: return-reg ( register-class -- reg )
 
 ! Sequence of registers used for parameter passing in class
-GENERIC: fastcall-regs ( register-class -- regs )
+GENERIC: param-regs ( register-class -- regs )
+
+GENERIC: param-reg ( n register-class -- reg )
+
+M: object param-reg param-regs nth ;
 
 ! Sequence mapping vreg-n to native assembler registers
 GENERIC: vregs ( register-class -- regs )
-
-! Map a sequence of literals to f or float
-DEFER: literal-template ( literals -- template )
 
 ! Load a literal (immediate or indirect)
 G: load-literal ( obj vreg -- ) 1 standard-combination ;
 
 ! Set up caller stack frame
-DEFER: %prologue ( n -- )
+DEFER: %prologue ( -- )
 
 ! Tear down stack frame
 DEFER: %epilogue ( -- )
@@ -48,17 +38,16 @@ DEFER: %jump ( label -- )
 ! Call another word
 DEFER: %call ( label -- )
 
-! Local jump for branches or tail calls in nested #label
+! Local jump for branches
 DEFER: %jump-label ( label -- )
 
 ! Test if vreg is 'f' or not
 DEFER: %jump-t ( label vreg -- )
 
-! Jump table of addresses (one cell each) is right after this
-DEFER: %dispatch ( -- )
+! We pass the offset of the jump table start in the world table
+DEFER: %call-dispatch ( word-table# -- )
 
-! Jump table entry
-DEFER: %target ( label -- )
+DEFER: %jump-dispatch ( word-table# -- )
 
 ! Return to caller
 DEFER: %return ( -- )
@@ -80,64 +69,81 @@ GENERIC: (%replace) ( vreg loc reg-class -- )
 ! Move one vreg to another
 DEFER: %move-int>int ( dst src -- )
 DEFER: %move-int>float ( dst src -- )
-
-: %move ( dst src -- )
-    2dup = [
-        2drop
-    ] [
-        2dup [ delegate class ] 2apply 2array {
-            { [ dup { int-regs int-regs } = ] [ drop %move-int>int ] }
-            { [ dup { float-regs int-regs } = ] [ drop %move-int>float ] }
-        } cond
-    ] if ;
+DEFER: %move-float>int ( dst src -- )
 
 ! FFI stuff
+
+! Is this integer small enough to appear in value template
+! slots?
+DEFER: small-enough? ( n -- ? )
+
+! Is this structure small enough to be returned in registers?
+DEFER: struct-small-enough? ( size -- ? )
+
+! Do we pass explode value structs?
+DEFER: value-structs? ( -- ? )
+
+DEFER: %prepare-unbox ( -- )
+
 DEFER: %unbox ( n reg-class func -- )
 
-DEFER: %unbox-struct ( n size -- )
+DEFER: %unbox-small-struct ( size -- )
+
+DEFER: %unbox-large-struct ( n size -- )
 
 DEFER: %box ( n reg-class func -- )
 
-DEFER: %box-struct ( n size -- )
+DEFER: %prepare-box-struct ( size -- )
 
-GENERIC: %freg>stack ( stack reg reg-class -- )
+DEFER: %box-small-struct ( size -- )
 
-GENERIC: %stack>freg ( stack reg reg-class -- )
+DEFER: %box-large-struct ( n size -- )
+
+GENERIC: %save-param-reg ( stack reg reg-class -- )
+
+GENERIC: %load-param-reg ( stack reg reg-class -- )
 
 DEFER: %alien-invoke ( library function -- )
 
-DEFER: %cleanup ( n -- )
+DEFER: %cleanup ( alien-node -- )
 
 DEFER: %alien-callback ( quot -- )
 
-DEFER: %callback-value ( reg-class func -- )
+DEFER: %callback-value ( ctype -- )
+
+! Return to caller with stdcall unwinding (only for x86)
+: %unwind ( n -- ) drop %return ;
 
 DEFER: %prepare-alien-indirect ( -- )
 
 DEFER: %alien-indirect ( -- )
 
-M: stack-params fastcall-regs drop 0 ;
-
-GENERIC: reg-size ( register-class -- n )
-
-GENERIC: inc-reg-class ( register-class -- )
-
-M: int-regs reg-size drop cell ;
-
-: (inc-reg-class)
-    dup class inc
-    macosx? [ reg-size stack-params +@ ] [ drop ] if ;
-
-M: int-regs inc-reg-class
-    (inc-reg-class) ;
-
-M: float-regs reg-size float-regs-size ;
-
-M: float-regs inc-reg-class
-    dup (inc-reg-class)
-    macosx? [ reg-size 4 / int-regs +@ ] [ drop ] if ;
+M: stack-params param-reg drop ;
 
 GENERIC: v>operand ( obj -- operand )
 M: integer v>operand tag-bits shift ;
-M: vreg v>operand dup vreg-n swap vregs nth ;
 M: f v>operand drop object-tag ;
+
+: if-small-struct ( n size true false -- ? )
+    >r >r over not over struct-small-enough? and
+    [ nip r> call r> drop ] [ r> drop r> call ] if ;
+    inline
+
+: %unbox-struct ( n size -- )
+    [
+        %unbox-small-struct
+    ] [
+        %unbox-large-struct
+    ] if-small-struct ;
+
+: %box-struct ( n size -- )
+    [
+        %box-small-struct
+    ] [
+        %box-large-struct
+    ] if-small-struct ;
+
+: operand ( var -- op ) get v>operand ; inline
+
+: unique-operands ( operands quot -- )
+    >r [ operand ] map prune r> each ; inline

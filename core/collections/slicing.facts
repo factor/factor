@@ -20,11 +20,6 @@ HELP: tail-slice*
 { $description "Outputs a virtual sequence sharing storage with the last " { $snippet "n" } " elements of the input sequence." }
 { $errors "Throws an error if the index is out of bounds." } ;
 
-HELP: subseq
-{ $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "seq" "a sequence" } { "subseq" "a new sequence" } }
-{ $description "Outputs a new sequence consisting of all elements starting from and including " { $snippet "m" } ", and up to but not including " { $snippet "n" } "." }
-{ $errors "Throws an error if " { $snippet "m" } " or " { $snippet "n" } " is out of bounds." } ;
-
 HELP: head
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "headseq" "a new sequence" } }
 { $description "Outputs a new sequence consisting of the first " { $snippet "n" } " elements of the input sequence." }
@@ -73,7 +68,7 @@ HELP: remove-nth
     { $example "2 { + - = * / } remove-nth ." "{ + - * / }" }
 } ;
 
-HELP: (cut)
+HELP: cut-slice
 { $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "before" "a sequence" } { "after" "a slice" } }
 { $description "Outputs a pair of sequences, where " { $snippet "before" } " consists of the first " { $snippet "n" } " elements of " { $snippet "seq" } " and has the same type, while " { $snippet "after" } " is a slice of the remaining elements." }
 { $notes "Unlike " { $link cut } ", the run time of this word is proportional to the length of " { $snippet "before" } ", not " { $snippet "after" } ", so it is suitable for use in an iterative algorithm which cuts successive pieces off a sequence." } ;
@@ -81,20 +76,15 @@ HELP: (cut)
 HELP: cut
 { $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "before" "a sequence" } { "after" "a sequence" } }
 { $description "Outputs a pair of sequences, where " { $snippet "before" } " consists of the first " { $snippet "n" } " elements of " { $snippet "seq" } ", while " { $snippet "after" } " holds the remaining elements. Both output sequences have the same type as " { $snippet "seq" } "." }
-{ $notes "Since this word copies the entire tail of the sequence, it should not be used in a loop. If this is important, consider using " { $link (cut) } " instead, since it returns a slice for the tail instead of copying." } ;
+{ $notes "Since this word copies the entire tail of the sequence, it should not be used in a loop. If this is important, consider using " { $link cut-slice } " instead, since it returns a slice for the tail instead of copying." } ;
 
 HELP: cut*
 { $values { "n" "a non-negative integer" } { "seq" "a sequence" } { "before" "a sequence" } { "after" "a sequence" } }
 { $description "Outputs a pair of sequences, where " { $snippet "after" } " consists of the last " { $snippet "n" } " elements of " { $snippet "seq" } ", while " { $snippet "before" } " holds the remaining elements. Both output sequences have the same type as " { $snippet "seq" } "." } ;
 
-HELP: group
-{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "groups" "a sequence of sequences" } }
-{ $description "Splits the sequence into groups of " { $snippet "n" } " elements and collects the groups into a new array." }
-{ $notes "If the sequence length is not a multiple of " { $snippet "n" } ", the final subsequence in the list will be shorter than " { $snippet "n" } " elements." } ;
-
 HELP: start*
-{ $values { "subseq" "a sequence" } { "seq" "a sequence" } { "i" "a start index" } { "n" "a start index" } }
-{ $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", starting the search from the " { $snippet "i" } "th element. If no matching subsequence is found, outputs -1." } ;
+{ $values { "subseq" "a sequence" } { "seq" "a sequence" } { "n" "a start index" } { "i" "a start index" } }
+{ $description "Outputs the start index of the first contiguous subsequence equal to " { $snippet "subseq" } ", starting the search from the " { $snippet "n" } "th element. If no matching subsequence is found, outputs -1." } ;
 
 HELP: start
 { $values { "subseq" "a sequence" } { "seq" "a sequence" } { "n" "a start index" } }

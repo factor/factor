@@ -13,3 +13,5 @@ TUPLE: testing x y z ;
         ] when*
     ] each
 ] unit-test
+
+[ ] [ heap-stats. ] unit-test

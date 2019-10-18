@@ -38,5 +38,14 @@ HELP: reload-module
 { $description "Reloads any source files making up a module if they have been modified on disk since last being loaded. Most of the time " { $link reload-modules } " should be called instead." } ;
 
 HELP: reload-modules
-{ $description "Reloads all source files in all loaded modules which have been modified on disk since last being loaded." }
-{ $notes "If modification times become invalid after moving sources or images between machines, and this word ends up trying to reload all library sources, call " { $link reset-modified } " from the listener." } ;
+{ $values { "seq" "a sequence of " { $link module } " instances" } }
+{ $description "Reloads all source files in all specified modules which have been modified on disk since last being loaded." }
+{ $see-also reload-core reload-libs reset-checksums } ;
+
+HELP: reload-core
+{ $description "Reloads all source files from core modules which have been modified on disk since last being loaded." }
+{ $see-also reload-modules reload-libs reset-checksums } ;
+
+HELP: reload-libs
+{ $description "Reloads all source files from non-core modules which have been modified on disk since last being loaded." }
+{ $see-also reload-modules reload-core reset-checksums } ;

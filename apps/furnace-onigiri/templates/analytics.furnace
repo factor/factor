@@ -1,8 +1,0 @@
-<% USING: io namespaces hashtables furnace:onigiri ; %>
-
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
-</script>
-<script type="text/javascript">
-_uacct = "<% "analytics" \ onigiri get hash write %>";
-urchinTracker();
-</script>

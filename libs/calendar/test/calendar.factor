@@ -124,3 +124,14 @@ USING: arrays calendar errors kernel math sequences test ;
 [ t ] [ 2004 1 1 23 0 0 9.5 make-timestamp 0 convert-timezone
         2004 1 1 13 30 0 0 make-timestamp = ] unit-test
 
+[ 0 ] [ 2004 1 1 13 30 0 0 make-timestamp
+        2004 1 1 12 30 0 -1 make-timestamp compare-timestamps ] unit-test
+
+[ 1 ] [ 2004 1 1 13 30 0 0 make-timestamp
+        2004 1 1 12 30 0 0 make-timestamp compare-timestamps ] unit-test
+
+[ -1 ] [ 2004 1 1 12 30 0 0 make-timestamp
+        2004 1 1 13 30 0 0 make-timestamp compare-timestamps ] unit-test
+
+[ 1 ] [ 2005 1 1 12 30 0 0 make-timestamp
+        2004 1 1 13 30 0 0 make-timestamp compare-timestamps ] unit-test

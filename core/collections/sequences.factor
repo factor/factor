@@ -1,19 +1,15 @@
-! Copyright (C) 2005 Slava Pestov.
+! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: vectors
-USING: arrays kernel sequences-internals ;
-
-: <vector> ( n -- vector )
-    f <array> array>vector 0 over set-fill ;
-
 IN: sequences
-USING: errors generic math math-internals strings ;
+USING: arrays kernel kernel-internals errors generic math
+math-internals strings ;
 
 GENERIC: length ( seq -- n )
 GENERIC: set-length ( n seq -- )
 GENERIC: nth ( n seq -- elt )
 GENERIC: set-nth ( elt n seq -- )
 GENERIC: new ( len seq -- newseq )
+GENERIC: new-resizable ( len seq -- newseq )
 GENERIC: like ( seq prototype -- newseq )
 
 M: object new drop f <array> ;
@@ -24,6 +20,9 @@ M: object like drop ;
 
 : delete-all ( seq -- ) 0 swap set-length ;
 
+: lengthen ( n seq -- )
+    2dup length > [ set-length ] [ 2drop ] if ; inline
+
 : first ( seq -- first ) 0 swap nth ; inline
 : second ( seq -- second ) 1 swap nth ; inline
 : third ( seq -- third ) 2 swap nth ; inline
@@ -32,10 +31,17 @@ M: object like drop ;
 : push ( elt seq -- ) dup length swap set-nth ;
 
 : ?push ( elt seq/f -- seq )
-    [ 1 <vector> ] unless* [ push ] keep ;
+    [ 1 f new-resizable ] unless* [ push ] keep ;
 
 : bounds-check? ( n seq -- ? )
     over 0 >= [ length < ] [ 2drop f ] if ; inline
+
+TUPLE: bounds-error index seq ;
+
+: bounds-error ( n seq -- * ) <bounds-error> throw ;
+
+: bounds-check ( n seq -- n seq )
+    2dup bounds-check? [ bounds-error ] unless ; inline
 
 IN: sequences-internals
 
@@ -53,13 +59,14 @@ M: object set-nth-unsafe set-nth ;
 
 ! The f object supports the sequence protocol trivially
 M: f length drop 0 ;
-M: f nth nip ;
-M: f nth-unsafe nip ;
+M: f nth bounds-error ;
+! M: f nth-unsafe nip ;
 M: f like drop dup empty? [ drop f ] when ;
+M: f new drop dup zero? [ drop f ] [ f <array> ] if ;
 
 ! Integers support the sequence protocol
 M: integer length ;
-M: integer nth drop ;
+M: integer nth bounds-check drop ;
 M: integer nth-unsafe drop ;
 
 : first2-unsafe
@@ -76,6 +83,15 @@ M: integer nth-unsafe drop ;
     >r >r set-nth-unsafe r> r> set-nth-unsafe ; inline
 
 IN: sequences
+
+: first2 ( seq -- first second )
+    1 swap bounds-check nip first2-unsafe ;
+
+: first3 ( seq -- first second third )
+    2 swap bounds-check nip first3-unsafe ;
+
+: first4 ( seq -- first second third fourth )
+    3 swap bounds-check nip first4-unsafe ;
 
 : ?nth ( n seq/f -- elt/f )
     2dup bounds-check? [ nth-unsafe ] [ 2drop f ] if ;

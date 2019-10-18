@@ -1,5 +1,0 @@
-<% USING: furnace:onigiri io hashtables namespaces ; %>
-
-<p>The entry you are searching for could not be found.</p>
-
-<p><a href="<% "" action>url write %>">Back to <% "title" \ onigiri get hash write %></a></p>

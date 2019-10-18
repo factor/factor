@@ -1,8 +1,13 @@
+IN: namespaces
+USE: kernel-internals
+: bind ( ns quot -- )
+  swap >n call n> drop ;
+
 : alert ( string -- )
   #! Display the string in an alert box
   window { } "" "alert" { "string" } alien-invoke ;
 
-"browser-dom" in
+"browser-dom" set-in
 
 : elements ( string -- result )
   #! Call JQuery's $ function
@@ -15,7 +20,7 @@
 : bind-event ( name element quot -- )
   >function swap { } "" "bind" { "string" "function" } alien-invoke ;
 
-"scratchpad" in
+"scratchpad" set-in
 
 : example1 ( -- )
   "<button id='test'>Press Me</button>" "#playground" elements html ;

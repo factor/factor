@@ -1,4 +1,4 @@
-! Copyright (C) 2006 Alex Chapman
+! Copyright (C) 2006, 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel generic sequences math tetris-board tetris-piece tetromino errors lazy-lists ;
 IN: tetris
@@ -41,24 +41,23 @@ C: tetris ( width height -- tetris )
     over tetris-current-piece tetromino-colour board-set-block ;
 
 : game-over? ( tetris -- ? )
-    dup dup tetris-next-piece piece-valid? ;
+    dup tetris-next-piece piece-valid? not ;
 
 : new-current-piece ( tetris -- )
-    game-over? [
-        dup tetris-pieces cdr swap set-tetris-pieces
-    ] [
+    dup game-over? [
         f swap set-tetris-running?
+    ] [
+        dup tetris-pieces cdr swap set-tetris-pieces
     ] if ;
 
 : rows-score ( level n -- score )
     {
-	{ [ dup 0 = ] [ drop 0 ]    }
-	{ [ dup 1 = ] [ drop 40 ]   }
-	{ [ dup 2 = ] [ drop 100 ]  }
-	{ [ dup 3 = ] [ drop 300 ]  }
-	{ [ dup 4 = ] [ drop 1200 ] }
-	{ [ t ] [ "how did you clear that many rows?" throw ] }
-    } cond swap 1+ * ;
+        { 0 [ 0 ] }
+        { 1 [ 40 ] }
+        { 2 [ 100 ] }
+        { 3 [ 300 ] }
+        { 4 [ 1200 ] }
+    } case swap 1+ * ;
 
 : add-score ( tetris score -- )
     over tetris-score + swap set-tetris-score ;
@@ -77,7 +76,9 @@ C: tetris ( width height -- tetris )
 : (rotate) ( inc tetris -- )
     dup can-rotate? [ tetris-current-piece swap rotate-piece ] [ 2drop ] if ;
 
-: rotate ( tetris -- ) 1 swap (rotate) ;
+: rotate-left ( tetris -- ) -1 swap (rotate) ;
+
+: rotate-right ( tetris -- ) 1 swap (rotate) ;
 
 : can-move? ( tetris move -- ? )
     >r dup tetris-current-piece clone dup r> move-piece piece-valid? ;
@@ -85,9 +86,9 @@ C: tetris ( width height -- tetris )
 : tetris-move ( tetris move -- ? )
     #! moves the piece if possible, returns whether the piece was moved
     2dup can-move? [
-	>r tetris-current-piece r> move-piece t
+        >r tetris-current-piece r> move-piece t
     ] [
-	2drop f
+        2drop f
     ] if ;
 
 : move-left ( tetris -- ) { -1 0 } tetris-move drop ;
@@ -106,8 +107,8 @@ C: tetris ( width height -- tetris )
 : update ( tetris -- )
     millis over tetris-last-update -
     over tetris-update-interval > [
-	dup move-down
-	millis swap set-tetris-last-update
+        dup move-down
+        millis swap set-tetris-last-update
     ] [ drop ] if ;
 
 : maybe-update ( tetris -- )

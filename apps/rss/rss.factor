@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: rss
 USING: kernel http-client xml xml-utils xml-data errors io strings
-    sequences xml-writer parser-combinators lazy-lists ;
+    sequences xml-writer parser-combinators lazy-lists entities ;
 
 : ?children>string ( tag/f -- string/f )
     [ children>string ] [ f ] if* ;
@@ -20,46 +20,46 @@ TUPLE: entry title link description pub-date ;
 
 : rss1.0 ( xml -- feed )
     [
-        "channel" find-tag
-        [ "title" find-tag children>string ] keep
-        "link" find-tag children>string
+        "channel" tag-named
+        [ "title" tag-named children>string ] keep
+        "link" tag-named children>string
     ] keep
-    "item" find-tags [
-        [ "title" find-tag children>string ] keep   
-        [ "link" find-tag children>string ] keep
-        [ "description" find-tag children>string ] keep
+    "item" tags-named [
+        [ "title" tag-named children>string ] keep   
+        [ "link" tag-named children>string ] keep
+        [ "description" tag-named children>string ] keep
         f "date" "http://purl.org/dc/elements/1.1/" <name>
-        find-name-tag ?children>string
+        tag-named ?children>string
         <entry>
     ] map <feed> ;
 
 : rss2.0 ( xml -- feed )
-    "channel" find-tag 
-    [ "title" find-tag children>string ] keep
-    [ "link" find-tag children>string ] keep
-    "item" find-tags [
-        [ "title" find-tag children>string ] keep
-        [ "link" find-tag ] keep
-        [ "guid" find-tag dupd ? children>string ] keep
-        [ "description" find-tag children>string ] keep
-        "pubDate" find-tag children>string <entry>
+    "channel" tag-named 
+    [ "title" tag-named children>string ] keep
+    [ "link" tag-named children>string ] keep
+    "item" tags-named [
+        [ "title" tag-named children>string ] keep
+        [ "link" tag-named ] keep
+        [ "guid" tag-named dupd ? children>string ] keep
+        [ "description" tag-named children>string ] keep
+        "pubDate" tag-named children>string <entry>
     ] map <feed> ;
 
 : atom1.0 ( xml -- feed )
-    [ "title" find-tag children>string ] keep
-    [ "link" find-tag "href" prop-name-tag first ] keep
-    "entry" find-tags [
-        [ "title" find-tag children>string ] keep
-        [ "link" find-tag "href" prop-name-tag first ] keep
+    [ "title" tag-named children>string ] keep
+    [ "link" tag-named "href" tag-attr ] keep
+    "entry" tags-named [
+        [ "title" tag-named children>string ] keep
+        [ "link" tag-named "href" tag-attr ] keep
         [
-            dup "content" find-tag
-            [ nip ] [ "summary" find-tag ] if*
+            dup "content" tag-named
+            [ nip ] [ "summary" tag-named ] if*
             dup tag-children [ tag? ] contains?
             [ tag-children [ write-chunk ] string-out ]
             [ children>string ] if
         ] keep
-        dup "published" find-tag
-        [ nip ] [ "updated" find-tag ] if*
+        dup "published" tag-named
+        [ nip ] [ "updated" tag-named ] if*
         children>string <entry>
     ] map <feed> ;
 
@@ -73,7 +73,7 @@ TUPLE: entry title link description pub-date ;
 
 : read-feed ( string -- feed )
     ! &>&amp; ! this will be uncommented when parser-combinators are fixed
-    string>xml feed ;
+    [ string>xml ] with-html-entities feed ;
 
 : load-news-file ( filename -- feed )
     #! Load an news syndication file and process it, returning

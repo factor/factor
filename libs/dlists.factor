@@ -1,18 +1,14 @@
 ! Copyright (C) 2005 Mackenzie Straight.
-! See http://factor.sf.net/license.txt for BSD license.
+! See http://factorcode.org/license.txt for BSD license.
 IN: dlists
 USING: generic kernel math modules ;
 
 ! Double-linked lists.
 
 TUPLE: dlist first last ;
-TUPLE: dlist-node next prev data ;
+TUPLE: dlist-node data prev next ;
 
 C: dlist ;
-C: dlist-node
-    [ set-dlist-node-next ] keep
-    [ set-dlist-node-prev ] keep
-    [ set-dlist-node-data ] keep ;
 
 : dlist-push-end ( data dlist -- )
     [ dlist-last f <dlist-node> ] keep
@@ -48,6 +44,43 @@ C: dlist-node
 : dlist-pop-front ( dlist -- data )
     dup dlist-empty? [ drop f ] [ (dlist-pop-front) ] if ;
 
+: (dlist-remove) ( dlist quot dnode -- obj/f )
+    [
+        [ dlist-node-data swap call ] 2keep rot [
+            swapd [ (dlist-unlink) ] keep dlist-node-data nip
+        ] [
+            dlist-node-next (dlist-remove)
+        ] if
+    ] [
+        2drop f
+    ] if* ;
+
+: dlist-remove ( quot dlist -- obj/f )
+    #! Return first item in the dlist that when passed to the
+    #! predicate quotation, true is left on the stack. The
+    #! item is removed from the dlist. The quotation
+    #! must have stack effect ( obj -- bool ).
+    #! TODO: needs a better name.
+    dup dlist-first swapd (dlist-remove) ;
+
+: (dlist-contains?) ( pred dnode -- bool )
+    [
+        [ dlist-node-data swap call ] 2keep rot [
+            2drop t
+        ] [
+            dlist-node-next (dlist-contains?)
+        ] if
+    ] [
+        drop f
+    ] if* ;
+
+: dlist-contains? ( quot dlist -- obj/f )
+    #! Return true if any item in the dlist that when passed to the
+    #! predicate quotation, true is left on the stack.
+    #! The 'pred' quotation must have stack effect ( obj -- bool ).
+    #! TODO: needs a better name.
+    dlist-first (dlist-contains?) ;
+
 : (dlist-each) ( quot dnode -- )
     [
         [ dlist-node-data swap call ] 2keep 
@@ -60,6 +93,6 @@ C: dlist-node
     swap dlist-first (dlist-each) ; inline
 
 : dlist-length ( dlist -- length )
-    0 swap [ drop 1 + ] dlist-each ;
+    0 swap [ drop 1+ ] dlist-each ;
 
 PROVIDE: libs/dlists ;

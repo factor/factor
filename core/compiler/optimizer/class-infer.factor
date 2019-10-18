@@ -1,10 +1,51 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: optimizer
+IN: class-inference
 USING: arrays generic hashtables inference kernel
-kernel-internals math namespaces sequences words parser ;
+math namespaces sequences words parser ;
 
-! Infer possible classes of values in a dataflow IR.
+! A constraint is a statement about a value.
+
+! We need a notion of equality which doesn't recurse so cannot
+! infinite loop on circular data
+GENERIC: eql? ( obj1 obj2 -- ? )
+M: object eql? eq? ;
+M: number eql? number= ;
+
+! Maps constraints to constraints
+SYMBOL: constraints
+
+TUPLE: literal-constraint literal value ;
+
+M: literal-constraint equal?
+    over literal-constraint? [
+        2dup
+        [ literal-constraint-literal ] 2apply eql? >r
+        [ literal-constraint-value ] 2apply = r> and
+    ] [
+        2drop f
+    ] if ;
+
+TUPLE: class-constraint class value ;
+
+GENERIC: apply-constraint ( constraint -- )
+GENERIC: constraint-satisfied? ( constraint -- ? )
+
+: `input pick node-in-d nth ;
+: `output pick node-out-d nth ;
+: class, <class-constraint> , ;
+: literal, <literal-constraint> , ;
+
+M: f apply-constraint drop ;
+
+: make-constraints ( node quot -- constraint )
+    { } make nip ; inline
+
+: set-constraints ( node quot -- )
+    make-constraints
+    unclip [ 2array ] reduce
+    apply-constraint ; inline
+
 : node-class# ( node n -- class )
     over node-in-d <reversed> ?nth node-class ;
 
@@ -16,49 +57,56 @@ SYMBOL: value-classes
 ! Current value --> literal mapping
 SYMBOL: value-literals
 
-! Maps ties to ties
-SYMBOL: ties
-
-GENERIC: apply-tie ( tie -- )
-
-M: f apply-tie drop ;
-
-TUPLE: class-tie value class ;
-
 : set-value-class* ( class value -- )
-    2dup swap <class-tie> ties get hash [ apply-tie ] when*
+    2dup <class-constraint> constraints get hash
+    [ apply-constraint ] when*
     value-classes get set-hash ;
 
-M: class-tie apply-tie
-    dup class-tie-class swap class-tie-value
-    set-value-class* ;
-
-TUPLE: literal-tie value literal ;
+M: class-constraint apply-constraint
+    dup class-constraint-class
+    swap class-constraint-value set-value-class* ;
 
 : set-value-literal* ( literal value -- )
     over class over set-value-class*
-    2dup swap <literal-tie> ties get hash [ apply-tie ] when*
+    2dup <literal-constraint> constraints get hash
+    [ apply-constraint ] when*
     value-literals get set-hash ;
 
-M: literal-tie apply-tie
-    dup literal-tie-literal swap literal-tie-value
-    set-value-literal* ;
+M: literal-constraint apply-constraint
+    dup literal-constraint-literal
+    swap literal-constraint-value set-value-literal* ;
 
-GENERIC: infer-classes* ( node -- )
+! For conditionals, an assoc of child node # --> constraint
+GENERIC: child-constraints ( node -- seq )
 
-M: node infer-classes* drop ;
+GENERIC: infer-classes-before ( node -- )
 
-! For conditionals, a map of child node # --> possibility
-GENERIC: child-ties ( node -- seq )
+GENERIC: infer-classes-around ( node -- )
 
-M: node child-ties
-    node-children length f <array> ;
+M: node infer-classes-before drop ;
+
+M: node child-constraints node-children length f <array> ;
 
 : value-class* ( value -- class )
     value-classes get hash [ object ] unless* ;
 
-: value-literal* ( value -- class )
-    value-literals get hash ;
+M: class-constraint constraint-satisfied?
+    dup class-constraint-value value-class*
+    swap class-constraint-class class< ;
+
+: value-literal* ( value -- obj ? )
+    value-literals get hash* ;
+
+M: literal-constraint constraint-satisfied?
+    dup literal-constraint-value value-literal*
+    [ swap literal-constraint-literal eql? ] [ 2drop f ] if ;
+
+M: pair apply-constraint
+    first2 2dup constraints get set-hash
+    constraint-satisfied? [ apply-constraint ] [ drop ] if ;
+
+M: pair constraint-satisfied?
+    first constraint-satisfied? ;
 
 : annotate-node ( node -- )
     #! Annotate the node with the currently-inferred set of
@@ -71,49 +119,22 @@ M: node child-ties
         [ value-class* class-and ] keep set-value-class*
     ] 2each ;
 
-: set-tie ( tie tie -- ) ties get set-hash ;
+: predicate-constraints ( #call class -- )
+    [
+        0 `input class,
+        general-t 0 `output class,
+    ] set-constraints ;
 
-: type/tag-ties ( node n -- )
-    over node-out-d first over [ <literal-tie> ] map-with
-    >r swap node-in-d first swap [ type>class <class-tie> ] map-with r>
-    [ set-tie ] 2each ;
-
-\ type [ num-types type/tag-ties ] "create-ties" set-word-prop
-
-\ tag [ num-tags type/tag-ties ] "create-ties" set-word-prop
-
-\ eq? [
-    dup node-in-d second value? [
-        dup node-in-d first2 value-literal* <literal-tie>
-        over node-out-d first general-t <class-tie>
-        set-tie
-    ] when drop
-] "create-ties" set-word-prop
-
-: create-ties ( #call -- )
-    #! If the node is calling a class test predicate, create a
-    #! tie.
-    dup node-param "create-ties" word-prop dup [
+: compute-constraints ( #call -- )
+    dup node-param "constraints" word-prop dup [
         call
     ] [
         drop dup node-param "predicating" word-prop dup [
-            >r dup node-in-d first r> <class-tie>
-            swap node-out-d first general-t <class-tie>
-            set-tie
+            predicate-constraints
         ] [
             2drop
         ] if
     ] if ;
-
-\ <tuple> [
-    node-in-d first value-literal 1array
-] "output-classes" set-word-prop
-
-{ clone (clone) } [
-    [
-        node-in-d [ value-class* ] map
-    ] "output-classes" set-word-prop
-] each
 
 : output-classes ( node -- seq )
     dup node-param "output-classes" word-prop [
@@ -123,43 +144,49 @@ M: node child-ties
         dup [ word? ] all? [ drop f ] unless
     ] if* ;
 
-M: #call infer-classes*
-    dup create-ties dup output-classes
+M: #call infer-classes-before
+    dup compute-constraints
+    dup output-classes
     [ swap node-out-d intersect-classes ] [ drop ] if* ;
 
-M: #push infer-classes*
+M: #push infer-classes-before
     node-out-d
     [ [ value-literal ] keep set-value-literal* ] each ;
 
-M: #if child-ties
-    node-in-d first dup general-t <class-tie>
-    swap f <literal-tie> 2array ;
+M: #if child-constraints
+    [
+        general-t 0 `input class,
+        f 0 `input literal,
+    ] make-constraints ;
 
-M: #dispatch child-ties
-    dup node-in-d first
-    swap node-children length [ <literal-tie> ] map-with ;
+M: #dispatch child-constraints
+    [
+        dup node-children length [
+            0 `input literal,
+        ] each
+    ] make-constraints ;
 
-M: #declare infer-classes*
+M: #declare infer-classes-before
     dup node-param swap node-in-d [ set-value-class* ] 2each ;
 
 DEFER: (infer-classes)
 
 : infer-children ( node -- )
-    dup node-children swap child-ties [
+    dup node-children swap child-constraints [
         [
             value-classes [ clone ] change
-            ties [ clone ] change
-            apply-tie
+            value-literals [ clone ] change
+            constraints [ clone ] change
+            apply-constraint
             (infer-classes)
         ] with-scope
     ] 2each ;
 
-: merge-value-class ( # nodes -- class )
-    [ swap node-class# ] map-with
-    null [ class-or ] reduce ;
+: merge-value-class ( n nodes -- class )
+    null [ pick node-class# class-or ] reduce nip ;
 
-: annotate-merge ( nodes values -- )
-    dup length
+: annotate-merge ( nodes #merge/#entry -- )
+    node-out-d <reversed> dup length
     [ pick merge-value-class swap set-value-class* ] 2each
     drop ;
 
@@ -170,21 +197,40 @@ DEFER: (infer-classes)
 
 : merge-children ( node -- )
     dup node-successor dup #merge? [
-        swap active-children dup empty? [
-            2drop
-        ] [
-            swap node-out-d <reversed> annotate-merge
-        ] if
+        swap active-children dup empty?
+        [ 2drop ] [ swap annotate-merge ] if
     ] [
         2drop
     ] if ;
 
+: annotate-entry ( nodes #label -- )
+    node-child annotate-merge ;
+
+M: #label infer-classes-before ( #label -- )
+    #! First, infer types under the hypothesis which hold on
+    #! entry to the recursive label.
+    dup 1array swap annotate-entry ;
+
+M: #label infer-classes-around ( #label -- )
+    #! Now merge the types at every recursion point with the
+    #! entry types.
+    dup annotate-node
+    dup infer-classes-before
+    dup infer-children
+    dup collect-recursion over add
+    pick annotate-entry
+    dup infer-children
+    merge-children ;
+
+M: object infer-classes-around
+    dup infer-classes-before
+    dup annotate-node
+    dup infer-children
+    merge-children ;
+
 : (infer-classes) ( node -- )
     [
-        dup infer-classes*
-        dup annotate-node
-        dup infer-children
-        dup merge-children
+        dup infer-classes-around
         node-successor (infer-classes)
     ] when* ;
 
@@ -194,7 +240,7 @@ DEFER: (infer-classes)
     [
         ?<hashtable> value-literals set
         ?<hashtable> value-classes set
-        H{ } clone ties set
+        H{ } clone constraints set
         (infer-classes)
     ] with-scope ;
 

@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: command-line compiler errors generic help io io-internals
 kernel kernel-internals listener math memory modules namespaces
@@ -20,18 +20,12 @@ optimizer parser sequences sequences-internals words prettyprint
         H{ } clone crossref set-global xref-words
 
         cpu "x86" = [
-            macosx?
-            "resource:/core/compiler/x86/alien-macosx.factor"
-            "resource:/core/compiler/x86/alien.factor"
-            ? run-file
+            "core/compiler/x86/cpuid" require
         ] when
 
-        "compile" get [
-            windows? [
-                "resource:/core/windows/dlls.factor"
-                run-file
-            ] when
+        windows? [ "core/windows/dlls" require ] when
 
+        "compile" get [
             \ number= compile
             \ + compile
             \ nth compile
@@ -39,26 +33,14 @@ optimizer parser sequences sequences-internals words prettyprint
             \ = compile
 
             ! Load UI backend
-            "cocoa" get [
-                "core/ui/cocoa" require
-            ] when
-
-            "x11" get [
-                "core/ui/x11" require
-            ] when
-
-            windows? [
-                "core/ui/windows" require
-            ] when
+            "cocoa" get [ "core/ui/cocoa" require ] when
+            "x11" get [ "core/ui/x11" require ] when
+            windows? [ "core/ui/windows" require ] when
 
             ! Load native I/O code
             "native-io" get [
-                unix? [
-                    "core/io/unix" require
-                ] when
-                windows? [
-                    "core/io/windows" require
-                ] when
+                unix? [ "core/io/unix" require ] when
+                windows? [ "core/io/windows" require ] when
             ] when
 
             parse-command-line
@@ -68,6 +50,7 @@ optimizer parser sequences sequences-internals words prettyprint
             "Initializing native I/O..." print flush
             "native-io" get [ init-io ] when
 
+            [ recompile ] parse-hook set-global
         ] when
 
         [
@@ -78,13 +61,9 @@ optimizer parser sequences sequences-internals words prettyprint
             0 exit
         ] set-boot
 
-        "compile" get [ 
-            [ recompile ] parse-hook set-global
-        ] when
-
         "Building online help search index..." print
         flush
-        H{ } clone parent-graph set-global xref-help
+        H{ } clone help-tree set-global xref-help
 
         [ run-bootstrap-init ] try
 
@@ -103,7 +82,7 @@ optimizer parser sequences sequences-internals words prettyprint
         number>string write " ms" print
 
         "Bootstrapping is complete." print
-        "Now, you can run ./f factor.image" print flush
+        "Now, you can run ./f -i=factor.image" print flush
 
         "factor.image" resource-path save-image
     ] [ print-error :c ] recover

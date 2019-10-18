@@ -1,18 +1,19 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic hashtables tools io
 kernel math namespaces parser prettyprint sequences
 sequences-internals strings styles vectors words errors ;
 IN: kernel-internals
 
-: save-error ( error trace continuation -- )
-    error-continuation set-global
+: save-error ( error trace -- )
     error-stack-trace set-global
-    dup error set-global
-    compute-restarts restarts set-global ;
+    error set-global
+    error get compute-restarts restarts set-global ;
 
 : error-handler ( error trace -- )
-    dupd continuation save-error rethrow ;
+    save-error
+    continuation error-continuation set-global
+    error get rethrow ;
 
 : init-error-handler ( -- )
     V{ } clone set-catchstack
@@ -23,8 +24,9 @@ IN: kernel-internals
 : find-xt ( xt xtmap -- word )
     [ second - ] binsearch* first ;
 
-: symbolic-stack-trace ( seq -- seq )
-    xt-map 2 group swap [ dup rot find-xt 2array ] map-with ;
+: symbolic-stack-trace ( -- newseq )
+    error-stack-trace get
+    xt-map 2 group swap [ swap find-xt ] map-with ;
 
 IN: errors
 
@@ -48,16 +50,9 @@ M: string error. print ;
 : xt. ( xt -- )
     >hex cell 2 * CHAR: 0 pad-left write ;
 
-: word-xt. ( xt word -- )
-    "Compiled: " write dup pprint bl
-    "(offset " write word-xt - >hex write ")" print ;
-
-: :trace
-    error-stack-trace get symbolic-stack-trace <reversed>
-    [ first2 word-xt. ] each ;
-
 : :c ( -- )
-    error-continuation get continuation-call callstack. :trace ;
+    error-continuation get continuation-call callstack.
+    symbolic-stack-trace <reversed> stack. ;
 
 : :get ( variable -- value )
     error-continuation get continuation-name hash-stack ;

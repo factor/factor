@@ -1,4 +1,4 @@
-REQUIRES: libs/http-client libs/httpd libs/sqlite libs/xml
+REQUIRES: libs/http-client apps/http-server libs/sqlite libs/xml
     libs/parser-combinators ;
 PROVIDE: apps/rss
 { +files+ {

@@ -3,16 +3,16 @@ CC = gcc
 BINARY = f
 IMAGE = factor.image
 BUNDLE = Factor.app
-VERSION = 0.87
+VERSION = 0.88
 DISK_IMAGE_DIR = Factor-$(VERSION)
 DISK_IMAGE = Factor-$(VERSION).dmg
 LIBPATH = -L/usr/X11R6/lib
 
 ifdef DEBUG
-	CFLAGS = -g -std=gnu99
+	CFLAGS = -g -Wall
 	STRIP = touch
 else
-	CFLAGS = -Wall -O3 -ffast-math -std=gnu99 $(SITE_CFLAGS)
+	CFLAGS = -O3 -Wall $(SITE_CFLAGS)
 	STRIP = strip
 endif
 
@@ -40,14 +40,16 @@ OBJS = $(PLAF_OBJS) \
 default:
 	@echo "Run 'make' with one of the following parameters:"
 	@echo ""
-	@echo "freebsd-x86"
-	@echo "freebsd-amd64"
+	@echo "bsd-x86"
+	@echo "bsd-amd64"
 	@echo "linux-x86"
 	@echo "linux-amd64"
 	@echo "linux-ppc"
+	@echo "linux-arm"
+	@echo "solaris-x86"
+	@echo "solaris-amd64"
 	@echo "macosx-x86"
 	@echo "macosx-ppc"
-	@echo "solaris"
 	@echo "windows"
 	@echo ""
 	@echo "On Unix, pass NO_UI=1 if you don't want to link with the"
@@ -63,11 +65,11 @@ default:
 	@echo ""
 	@echo "export SITE_CFLAGS=\"-march=pentium4 -ffast-math\""
 
-freebsd-x86:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.freebsd.x86
+bsd-x86:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.bsd.x86
 
-freebsd-amd64:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.freebsd.amd64
+bsd-amd64:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.bsd.amd64
 
 macosx-freetype:
 	ln -sf libfreetype.6.dylib \
@@ -91,12 +93,23 @@ linux-ppc:
 	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.ppc
 	$(STRIP) $(BINARY)
 
-solaris solaris-x86 solaris-amd64:
-	$(MAKE) $(BINARY) CONFIG=vm/Config.solaris
+linux-arm:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.linux.arm
+	$(STRIP) $(BINARY)
+
+solaris-x86:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.solaris.x86
+	$(STRIP) $(BINARY)
+
+solaris-amd64:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.solaris.amd64
 	$(STRIP) $(BINARY)
 
 windows:
 	$(MAKE) $(BINARY) CONFIG=vm/Config.windows
+
+windows-arm:
+	$(MAKE) $(BINARY) CONFIG=vm/Config.windows.arm
 
 macosx.app:
 	cp $(BINARY) $(BUNDLE)/Contents/MacOS/Factor
@@ -116,21 +129,9 @@ macosx.dmg:
 	mkdir -p $(DISK_IMAGE_DIR)/Factor/
 	cp -R $(BUNDLE) $(DISK_IMAGE_DIR)/Factor/$(BUNDLE)
 	chmod +x cp_dir
-	cp factor.image license.txt README.txt TODO.FACTOR.txt \
+	cp factor.image license.txt README.txt TODO.txt \
 		$(DISK_IMAGE_DIR)/Factor/
-	find doc library contrib examples fonts \( -name '*.factor' \
-		-o -name '*.facts' \
-		-o -name '*.txt' \
-		-o -name '*.html' \
-		-o -name '*.ttf' \
-		-o -name '*.el' \
-		-o -name '*.vim' \
-		-o -name '*.fgen' \
-		-o -name '*.tex' \
-		-o -name '*.fhtml' \
-		-o -name '*.furnace' \
-		-o -name '*.xml' \
-		-o -name '*.js' \) \
+	find core apps libs demos unmaintained fonts -type f \
 		-exec ./cp_dir {} $(DISK_IMAGE_DIR)/Factor/{} \;
 	hdiutil create -srcfolder "$(DISK_IMAGE_DIR)" -fs HFS+ \
 		-volname "$(DISK_IMAGE_DIR)" "$(DISK_IMAGE)"

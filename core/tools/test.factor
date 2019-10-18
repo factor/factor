@@ -9,13 +9,6 @@ vectors ;
     "----> Quotation: " write .
     "Expected output: " write . flush ;
 
-: benchmark ( quot -- gctime runtime )
-    millis >r gc-time >r call gc-time r> - millis r> - ;
-
-: time ( quot -- )
-    benchmark
-    [ # " ms run / " % # " ms GC time" % ] "" make print flush ;
-
 : unit-test ( output input -- )
     [
         [
@@ -34,6 +27,7 @@ SYMBOL: failures
 : failure failures [ ?push ] change ;
 
 : test-handler ( name quot -- ? )
+    "temporary" forget-vocab
     catch [ dup error. 2array failure f ] [ t ] if* ;
 
 : run-test ( path -- ? )
@@ -43,9 +37,6 @@ SYMBOL: failures
             [ [ run-file ] with-scope ] keep
         ] assert-depth drop
     ] test-handler ;
-
-: prepare-tests ( -- )
-    failures off "temporary" forget-vocab ;
 
 : passed.
     "Tests passed:" print . ;
@@ -57,4 +48,4 @@ SYMBOL: failures
     ] each ;
 
 : run-tests ( seq -- )
-    prepare-tests [ run-test ] subset terpri passed. failed. ;
+    failures off [ run-test ] subset terpri passed. failed. ;

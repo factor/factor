@@ -1,5 +1,5 @@
 IN: errors
-USING: help parser definitions ;
+USING: help parser definitions tools ;
 
 HELP: :help
 { $description "Displays documentation for the most recent error." } ;
