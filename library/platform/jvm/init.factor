@@ -31,14 +31,14 @@ USE: compiler
 USE: continuations
 USE: kernel
 USE: lists
-USE: interpreter
+USE: listener
 USE: namespaces
 USE: parser
 USE: stack
 USE: stdio
 USE: streams
 USE: strings
-USE: styles
+USE: presentation
 USE: words
 
 : stdin ( -- stdin )
@@ -78,4 +78,4 @@ USE: words
 
     t "startup-done" set
     
-    "interactive" get [ init-interpreter 1 exit* ] when ;
+    "interactive" get [ init-listener 1 exit* ] when ;

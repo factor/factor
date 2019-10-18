@@ -25,6 +25,19 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+! This library allows one to generate a new set of bootstrap
+! images (boot.image.{le32,le64,be32,be64}.
+!
+! It does this by parsing the set of source files needed to
+! generate the minimal image, and writing the cons cells, words,
+! strings etc to the image file in the CFactor object memory
+! format.
+!
+! What is a bootstrap image? It basically contains enough code
+! to parse a source file. See platform/native/boot.factor --
+! It initializes the core interpreter services, and proceeds to
+! run platform/native/boot-stage2.factor.
+
 IN: namespaces
 
 ( Java Factor doesn't have this )
@@ -81,12 +94,10 @@ USE: words
 : f-type      6 ;
 : t-type      7 ;
 : array-type  8 ;
-: vector-type 9 ;
-: string-type 10 ;
-: sbuf-type   11 ;
-: handle-type 12 ;
-: bignum-type 13 ;
-: float-type  14 ;
+: bignum-type 9 ;
+: float-type  10 ;
+: vector-type 11 ;
+: string-type 12 ;
 
 : immediate ( x tag -- tagged ) swap tag-bits shift bitor ;
 : >header ( id -- tagged ) header-tag immediate ;

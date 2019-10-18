@@ -113,7 +113,7 @@ USE: combinators
 
 : [R]>R ( reg reg -- )
     #! MOV INDIRECT <reg> TO <reg>.
-    HEX: 8b compile-byte  swap 0 MOD-R/M ;
+    HEX: 8b compile-byte  0 MOD-R/M ;
 
 : R>[R] ( reg reg -- )
     #! MOV <reg> TO INDIRECT <reg>.
@@ -164,19 +164,20 @@ USE: combinators
     BIN: 100 BIN: 11 MOD-R/M
     compile-byte ;
 
-: CMP-I-[R] ( imm reg -- )
-    #! There are two forms of CMP we assemble
-    #! 83 38 03                cmpl   $0x3,(%eax)
-    #! 81 38 33 33 33 00       cmpl   $0x333333,(%eax)
-    over byte? [
+: CMP-I-R ( imm reg -- )
+    #! There are three forms of CMP we assemble
+    #! 83 f8 03                cmpl   $0x3,%eax
+    #! 81 fa 33 33 33 00       cmpl   $0x333333,%edx
+    #! 3d 33 33 33 00          cmpl   $0x333333,%eax
+    [
         HEX: 83 compile-byte
-        BIN: 111 0 MOD-R/M
-        compile-byte
+        BIN: 111 BIN: 11 MOD-R/M
+    ] [
+        HEX: 3d compile-byte
     ] [
         HEX: 81 compile-byte
-        BIN: 111 0 MOD-R/M
-        compile-cell
-    ] ifte ;
+        BIN: 111 BIN: 11 MOD-R/M
+    ] byte/eax/cell ;
 
 : JUMP-FIXUP ( addr where -- )
     #! Encode a relative offset to addr from where at where.

@@ -15,7 +15,7 @@ compilation behavior. This means it can only be used in compiled words.
 Here is an example from sdl-video.factor:
 
 : SDL_LockSurface ( surface -- )
-    "int" "sdl" "SDL_LockSurface" [ "surface*" ] alien-call ; compiled
+    "int" "sdl" "SDL_LockSurface" [ "surface*" ] alien-call ;
 
 The parameters are:
 
@@ -23,9 +23,6 @@ The parameters are:
 "sdl" - library
 "SDL_LockSurface" - function
 [ "surface*" ] - parameters
-
-Note the word ends with 'compiled'. This is a hack and won't be needed
-later.
 
 Parameters and return values are C type names. C types include the
 following:
@@ -42,8 +39,7 @@ BEGIN-STRUCT: point
     FIELD: int y
 END-STRUCT
 
-And then referred to in parameter type specifiers as "point*". Struct
-return values are not yet supported.
+And then referred to in parameter type specifiers as "point*".
 
 Enumerations can be defined; they simply become words that push
 integers:

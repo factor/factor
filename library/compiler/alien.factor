@@ -72,7 +72,7 @@ USE: words
     ] bind ;
 
 : alien-function ( function library -- )
-    library dlsym ;
+    [ library dlsym ] [ dlsym-self ] ifte* ;
 
 : compile-alien-call
     pop-literal reverse PARAMETERS >r

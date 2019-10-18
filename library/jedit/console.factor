@@ -25,17 +25,17 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: listener
+IN: console
 USE: combinators
 USE: continuations
 USE: init
-USE: interpreter
+USE: listener
 USE: kernel
 USE: lists
 USE: namespaces
 USE: stack
 USE: stdio
-USE: styles
+USE: presentation
 USE: streams
 USE: strings
 USE: unparser
@@ -77,48 +77,26 @@ USE: unparser
     jnew ;
 
 : actions-key ( -- attr )
-    "factor.listener.FactorListener" "Actions" jvar-static-get
-    ; inline
+    "console.ConsolePane" "Actions" jvar-static-get ; inline
 
-: <action-menu-item> ( path pair -- pair )
-    uncons >r " " swap cat3 r> cons ;
+: <eval-action> ( label cmd -- action )
+    "console" get [
+        "java.lang.String"
+        "java.lang.String"
+        "console.Console"
+    ] "console.Console$EvalAction" jnew ;
 
-: <actions-menu> ( path actions -- alist )
-    [ dupd <action-menu-item> ] map nip ;
+: >action-array ( list -- array )
+    [ "javax.swing.Action" ] coerce ;
 
-: object-actions ( -- list )
-    [
-        [ "describe-path"  | "Describe" ]
-        [ "lookup"         | "Push" ]
-        [ "lookup execute" | "Execute" ]
-        [ "lookup jedit"   | "jEdit" ]
-        [ "lookup usages." | "Usages" ]
-    ] ;
-
-: <object-actions-menu> ( path -- alist )
-    unparse object-actions <actions-menu> ;
-
-: file-actions ( -- list )
-    [
-        [ ""           | "Push" ]
-        [ "run-file"   | "Run file" ]
-        [ "directory." | "List directory" ]
-        [ "cd"         | "Change directory" ]
-    ] ;
-
-: <file-actions-menu> ( path -- alist )
-    unparse file-actions <actions-menu> ;
+: <actions-menu> ( actions -- array )
+    [ uncons <eval-action> ] map >action-array ;
 
 : underline-attribute ( attribute-set -- )
     t "Underline" swing-attribute+ ;
 
-: object-link-attribute ( attribute-set target -- )
-    over underline-attribute
-    <object-actions-menu> actions-key attribute+ ;
-
-: file-link-attribute ( attribute-set target -- )
-    over underline-attribute
-    <file-actions-menu> actions-key attribute+ ;
+: actions-attribute ( attribute-set actions -- )
+    <actions-menu> actions-key attribute+ ;
 
 : icon-attribute ( string style value -- )
     dupd <icon> set-icon-style
@@ -128,8 +106,7 @@ USE: unparser
     #! We need the string, since outputting an icon changes the
     #! string to " ".
     <attribute-set> swap [
-        [ "object-link" dupd object-link-attribute ]
-        [ "file-link"   dupd file-link-attribute ]
+        [ "actions"     dupd actions-attribute ]
         [ "bold"        drop dup t "Bold" swing-attribute+ ]
         [ "italics"     drop dup t "Italic" swing-attribute+ ]
         [ "underline"   drop dup t "Underline" swing-attribute+ ]
@@ -140,59 +117,29 @@ USE: unparser
         [ "icon"        icon-attribute ]
     ] assoc-apply ;
 
-: set-character-attrs ( attrs -- )
-    t "listener" get
-    [ "javax.swing.text.AttributeSet" "boolean" ]
-    "javax.swing.JTextPane"
-    "setCharacterAttributes"
-    jinvoke ;
+: console-readln* ( continuation -- )
+    "console" get [ "factor.Cons" "console.Console" ]
+	"factor.jedit.FactorShell" "readLine" jinvoke-static ;
 
-: set-paragraph-attrs ( attrs -- )
-    t "listener" get
-    [ "javax.swing.text.AttributeSet" "boolean" ]
-    "javax.swing.JTextPane"
-    "setCharacterAttributes"
-    jinvoke ;
+: console-readln ( -- line )
+    [ console-readln* toplevel ] callcc1 ;
 
-: reset-attrs ( -- )
-    f default-style style>attribute-set set-character-attrs
-    drop ;
+: console-write-attr ( string style -- )
+    style>attribute-set swap "console" get
+    [ "javax.swing.text.AttributeSet" "java.lang.String" ]
+    "console.Output" "writeAttrs" jinvoke ;
 
-: listener-readln* ( continuation -- )
-    "listener" get
-	[ "factor.Cons" ]
-	"factor.listener.FactorListener"
-	"readLine" jinvoke ;
-
-: listener-readln ( -- line )
-    reset-attrs [ listener-readln* toplevel ] callcc1 ;
-
-: listener-write-attr ( string style -- )
-    style>attribute-set "listener" get
-    [ "java.lang.String" "javax.swing.text.AttributeSet" ]
-    "factor.listener.FactorListener"
-    "insertWithAttrs"
-    jinvoke ;
-
-!: listener-edit ( string -- )
-!    "listener" get
-!    [ "java.lang.String" ]
-!    "factor.listener.FactorListener"
-!    "editLine" jinvoke ;
-
-: <listener-stream> ( listener -- stream )
+: <console-stream> ( console -- stream )
     #! Creates a stream for reading/writing to the given
-    #! listener instance.
+    #! console instance.
     <stream> [
-        "listener" set
+        "console" set
         ( -- string )
-        [ listener-readln ] "freadln" set
+        [ console-readln ] "freadln" set
         ( string -- )
-        [ default-style listener-write-attr ] "fwrite" set
+        [ default-style console-write-attr ] "fwrite" set
         ( string style -- )
-        [ listener-write-attr ] "fwrite-attr" set
-        ( string -- )
-        ![ listener-edit ] "fedit" set
+        [ console-write-attr ] "fwrite-attr" set
         ( -- )
         [ ] "fflush" set
         ( -- )
@@ -201,10 +148,9 @@ USE: unparser
         [ this fwrite "\n" this fwrite ] "fprint" set
     ] extend ;
 
-: new-listener-hook ( listener -- )
-    #! Called when user opens a new listener
+: console-hook ( console -- )
     [
-        dup "listener" set
-        <listener-stream> "stdio" set
-        init-interpreter
+        dup "console" set
+        <console-stream> "stdio" set
+        init-listener
     ] with-scope ;

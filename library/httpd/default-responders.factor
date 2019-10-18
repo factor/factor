@@ -36,7 +36,6 @@ USE: inspect-responder
 USE: quit-responder
 USE: file-responder
 USE: resource-responder
-USE: wiki-responder
 
 #! Remove all existing responders, and create a blank
 #! responder table.
@@ -76,11 +75,3 @@ global [ <namespace> "httpd-responders" set ] bind
 ] extend add-responder
 
 "file" set-default-responder
-
-!        <responder> [
-!            "wiki" "responder" set
-!            [ wiki-get-responder ] "get" set
-!            [ wiki-post-responder ] "post" set
-!            <namespace> "wiki" set
-!            "WikiHome" "default-argument" set
-!        ] extend add-responder

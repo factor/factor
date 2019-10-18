@@ -18,6 +18,9 @@ USE: logic
 USE: math
 USE: namespaces
 USE: sdl
+USE: sdl-event
+USE: sdl-gfx
+USE: sdl-video
 USE: stack
 USE: vectors
 USE: prettyprint
@@ -84,17 +87,17 @@ SYMBOL: center
     ] with-pixels ;
 
 : mandel ( -- )
-    640 480 32 SDL_HWSURFACE SDL_SetVideoMode drop
+    640 480 32 SDL_HWSURFACE [
+        [
+            0.8 zoom-fact set
+            -0.65 center set
+            100 nb-iter set
+            [ render ] time
+            "Done." print flush
+        ] with-surface
 
-    [
-        1 zoom-fact set
-        -0.65 center set
-        50 nb-iter set
-        [ render ] time
-        "Done." print flush
-    ] with-surface
-
-    <event> event-loop
-    SDL_Quit ;
+        <event> event-loop
+        SDL_Quit
+    ] with-screen ;
 
 mandel

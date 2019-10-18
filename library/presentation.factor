@@ -4,7 +4,7 @@
 !
 ! Copyright (C) 2004 Slava Pestov.
 ! 
-! Redistribution and use in source and binary forms, with or wxithout
+! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
 ! 
 ! 1. Redistributions of source code must retain the above copyright notice,
@@ -25,53 +25,42 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: errors
+IN: presentation
 USE: combinators
-USE: continuations
 USE: kernel
-USE: logic
+USE: lists
 USE: namespaces
-USE: prettyprint
 USE: stack
-USE: stdio
 USE: strings
 USE: unparser
 
-: standard-dump ( error -- )
-    "ERROR: " write error. ;
+: <actions> ( path alist -- alist )
+    #! For each element of the alist, change the value to
+    #! path " " value
+    >r unparse r>
+    [ uncons >r over " " r> cat3 cons ] map nip ;
 
-: parse-dump ( error -- )
-    <%
-    "error-file" get [ "<interactive>" ] unless* % ":" %
-    "error-line-number" get [ 1 ] unless* unparse % ": " %
-    %> write
-    error.
-    
-    "error-line" get print
-    
-    <% "error-col" get " " fill % "^" % %> print ;
+! A style is an alist whose key/value pairs hold
+! significance to the 'fwrite-attr' word when applied to a
+! stream that supports attributed string output.
 
-: in-parser? ( -- ? )
-    "error-line" get "error-col" get and ;
+: (style) ( name -- style ) "styles" get get* ;
+: default-style ( -- style ) "default" (style) ;
+: style ( name -- style ) (style) [ default-style ] unless* ;
+: set-style ( style name -- ) "styles" get set* ;
 
-: error-handler-hook
-    #! The game overrides this.
-    ;
+<namespace> "styles" set
 
-: default-error-handler ( error -- )
-    #! Print the error and return to the top level.
-    [
-        in-parser? [ parse-dump ] [ standard-dump ] ifte terpri
+[
+    [ "font" | "Monospaced" ]
+] "default" set-style
 
-        "Stacks have been reset." print
-        ":s :r :n :c show stacks at time of error." print
+[
+    [ "bold" | t ]
+] default-style append "prompt" set-style
 
-        java? [ ":j shows Java stack trace." print ] when
-        error-handler-hook
-
-    ] when* ;
-
-: :s ( -- ) "error-datastack"  get . ;
-: :r ( -- ) "error-callstack"  get . ;
-: :n ( -- ) "error-namestack"  get . ;
-: :c ( -- ) "error-catchstack" get . ;
+[
+    [ "ansi-fg" | "0" ]
+    [ "ansi-bg" | "2" ]
+    [ "fg" | [ 255 0 0 ] ]
+] default-style append "comments" set-style

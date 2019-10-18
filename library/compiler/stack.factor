@@ -1,4 +1,4 @@
-! :folding=indent:collapseFolds=0:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -25,48 +25,19 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: wiki-responder
-USE: combinators
-USE: format
-USE: html
-USE: lists
-USE: logic
-USE: kernel
-USE: math
-USE: namespaces
-USE: parser
-USE: regexp
-USE: stdio
+IN: compiler
 USE: stack
-USE: strings
 USE: words
 
-USE: httpd
-USE: httpd-responder
+: compile-drop ( -- )
+    commit-literals
+    4 ESI R-I ;
 
-! : wiki-word? ( word -- ? )
-!     #! A WikiWord starts with a capital and contains more than
-!     #! one capital letter.
-!     dup str-length 0 > [
-!         0 over str-nth LETTER? [
-!             0 swap [ LETTER? [ succ ] when ] str-each 1 = not
-!         ] [
-!             drop f
-!         ] ifte
-!     ] [
-!         drop f
-!     ] ifte ;
-! 
-! : wiki-formatting ( str -- )
-!     #! If a word with this name exists in the wiki-formatting
-!     #! vocabulary, its a special text style sequence.
-!     [ "wiki-formatting" ] search ;
-! 
-! : (wiki-parser) ( text -- )
-!     [
-!         scan dup wiki-word? [
-!             <a href= dup a> write </a>
-!         ] [
-!             write
-!         ] ifte " " write
-!     ] with-parser ;
+: compile-dup ( -- )
+    commit-literals
+    ESI EAX [R]>R
+    4 ESI R+I
+    EAX ESI R>[R] ;
+
+\ drop [ compile-drop ] "compiling" set-word-property
+\ dup  [ compile-dup ] "compiling" set-word-property

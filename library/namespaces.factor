@@ -53,14 +53,6 @@ USE: vectors
 ! bind ( namespace quot -- ) executes a quotation with a
 ! namespace pushed on the namespace stack.
 
-: >n ( namespace -- n:namespace )
-    #! Push a namespace on the namespace stack.
-    namestack* vector-push ; inline
-
-: n> ( n:namespace -- namespace )
-    #! Pop the top of the namespace stack.
-    namestack* vector-pop ; inline
-
 : namespace ( -- namespace )
     #! Push the current namespace.
     namestack* vector-peek ; inline

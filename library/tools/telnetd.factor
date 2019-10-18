@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2003, 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -25,35 +25,51 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: styles
+IN: telnetd
 USE: combinators
+USE: errors
+USE: listener
 USE: kernel
-USE: lists
+USE: logging
+USE: logic
 USE: namespaces
 USE: stack
+USE: stdio
+USE: streams
+USE: threads
 
-! A style is an alist whose key/value pairs hold
-! significance to the 'fwrite-attr' word when applied to a
-! stream that supports attributed string output.
+: telnet-client ( socket -- )
+    dup [
+        "client" set
+        log-client
+        listener-loop
+    ] with-stream ;
 
-: (get-style) ( name -- style ) "styles" get get* ;
-: default-style ( -- style ) "default" (get-style) ;
-: get-style ( name -- style )
-    (get-style) [ default-style ] unless* ;
-: set-style ( style name -- ) "styles" get set* ;
+: telnet-connection ( socket -- )
+    #! We don't do multitasking in JFactor.
+    java? [
+        telnet-client
+    ] [
+        [ telnet-client ] in-thread drop
+    ] ifte ;
 
-<namespace> "styles" set
+: quit-flag ( -- ? )
+    global [ "telnetd-quit-flag" get ] bind ;
 
-[
-    [ "font" | "Monospaced" ]
-] "default" set-style
+: clear-quit-flag ( --  )
+    global [ f "telnetd-quit-flag" set ] bind ;
 
-[
-    [ "bold" | t ]
-] default-style append "prompt" set-style
+: telnetd-loop ( server -- server )
+    quit-flag [
+        dup >r accept telnet-connection r>
+        telnetd-loop
+    ] unless ;
 
-[
-    [ "ansi-fg" | "0" ]
-    [ "ansi-bg" | "2" ]
-    [ "fg" | [ 255 0 0 ] ]
-] default-style append "comments" set-style
+: telnetd ( port -- )
+    [
+        <server> [
+            telnetd-loop
+        ] [
+            clear-quit-flag swap fclose rethrow
+        ] catch
+    ] with-logging ;

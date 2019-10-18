@@ -30,7 +30,9 @@ USE: combinators
 USE: compiler
 USE: errors
 USE: hashtables
+USE: kernel
 USE: lists
+USE: logic
 USE: math
 USE: namespaces
 USE: parser
@@ -83,7 +85,10 @@ USE: words
     3dup define-getter 3dup define-setter
     drop [ "width" get ] bind + ;
 
-: define-constructor ( len -- )
+: define-member ( max type -- max )
+    c-type [ "width" get ] bind max ;
+
+: define-constructor ( width -- )
     #! Make a word <foo> where foo is the structure name that
     #! allocates a Factor heap-local instance of this structure.
     #! Used for C functions that expect you to pass in a struct.
@@ -92,14 +97,11 @@ USE: words
     "in" get create swap
     define-compound ;
 
-: define-struct-type ( -- )
-    #! The setter just throws an error for now.
-    [
-        [ alien-cell <alien> ] "getter" set
-        "unbox_alien" "unboxer" set
-        "box_alien" "boxer" set
-        cell "width" set
-    ] "struct-name" get "*" cat2 define-c-type ;
+: define-struct-type ( width -- )
+    #! Define inline and pointer type for the struct. Pointer
+    #! type is exactly like void*.
+    [ "width" set ] "struct-name" get define-c-type
+    "void*" c-type "struct-name" get "*" cat2 c-types set* ;
 
 : BEGIN-STRUCT: ( -- offset )
     scan "struct-name" set  0 ; parsing
@@ -108,7 +110,20 @@ USE: words
     scan scan define-field ; parsing
 
 : END-STRUCT ( length -- )
-    define-constructor define-struct-type ; parsing
+    dup define-constructor define-struct-type ; parsing
+
+: BEGIN-UNION: ( -- max )
+    scan "struct-name" set  0 ; parsing
+
+: MEMBER: ( max -- max )
+    scan define-member ; parsing
+
+: END-UNION ( max -- )
+    dup define-constructor define-struct-type ; parsing
+
+: NULL ( -- null )
+    #! C null value.
+    0 <alien> ;
 
 global [ <namespace> "c-types" set ] bind
 
@@ -132,40 +147,40 @@ global [ <namespace> "c-types" set ] bind
     [ alien-4 ] "getter" set
     [ set-alien-4 ] "setter" set
     4 "width" set
-    "box_integer" "boxer" set
-    "unbox_integer" "unboxer" set
+    "box_cell" "boxer" set
+    "unbox_cell" "unboxer" set
 ] "uint" define-c-type
 
 [
     [ alien-2 ] "getter" set
     [ set-alien-2 ] "setter" set
     2 "width" set
-    "box_integer" "boxer" set
-    "unbox_integer" "unboxer" set
+    "box_signed_2" "boxer" set
+    "unbox_signed_2" "unboxer" set
 ] "short" define-c-type
 
 [
     [ alien-2 ] "getter" set
     [ set-alien-2 ] "setter" set
     2 "width" set
-    "box_integer" "boxer" set
-    "unbox_integer" "unboxer" set
+    "box_cell" "boxer" set
+    "unbox_cell" "unboxer" set
 ] "ushort" define-c-type
 
 [
     [ alien-1 ] "getter" set
     [ set-alien-1 ] "setter" set
     1 "width" set
-    "box_integer" "boxer" set
-    "unbox_integer" "unboxer" set
+    "box_signed_1" "boxer" set
+    "unbox_signed_1" "unboxer" set
 ] "char" define-c-type
 
 [
     [ alien-1 ] "getter" set
     [ set-alien-1 ] "setter" set
     1 "width" set
-    "box_integer" "boxer" set
-    "unbox_integer" "unboxer" set
+    "box_cell" "boxer" set
+    "unbox_cell" "unboxer" set
 ] "uchar" define-c-type
 
 [
@@ -175,3 +190,11 @@ global [ <namespace> "c-types" set ] bind
     "box_c_string" "boxer" set
     "unbox_c_string" "unboxer" set
 ] "char*" define-c-type
+
+[
+    [ alien-4 0 = not ] "getter" set
+    [ 1 0 ? set-alien-4 ] "setter" set
+    cell "width" set
+    "box_boolean" "boxer" set
+    "unbox_boolean" "unboxer" set
+] "bool" define-c-type

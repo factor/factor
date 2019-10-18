@@ -25,7 +25,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: interpreter
+IN: listener
 USE: combinators
 USE: continuations
 USE: errors
@@ -38,7 +38,7 @@ USE: parser
 USE: stack
 USE: stdio
 USE: strings
-USE: styles
+USE: presentation
 USE: words
 USE: unparser
 USE: vectors
@@ -50,43 +50,12 @@ USE: vectors
     "Copyright (C) 2004 Chris Double" print
     "Type ``exit'' to exit, ``help'' for help." print ;
 
-: init-history ( -- )
-    64 <vector> "history" set ;
-
-: history+ ( cmd -- )
-    "history" get vector-push ;
-
-: print-numbered-entry ( index vector -- )
-    <% over unparse % ": " % vector-nth % %> print ;
-
-: print-numbered-vector ( list -- )
-    dup vector-length [ over print-numbered-entry ] times* drop ;
-
-: history. ( -- )
-    "X redo    -- evaluate the expression with number X." print
-    "X re-edit -- edit the expression with number X." print
-    "history" get print-numbered-vector ;
-
-: get-history ( index -- str )
-    "history" get vector-nth ;
-
-: redo ( index -- )
-    get-history dup "  ( " write write " )" print eval ;
-
-: re-edit ( index -- )
-    get-history edit ;
-
-: history# ( -- number )
-    "history" get vector-length ;
-
 : print-prompt ( -- )
-    <% "  ( " % history# unparse % " )" % %>
-    "prompt" get-style write-attr
+    "ok" "prompt" style write-attr
     ! Print the space without a style, to workaround a bug in
     ! the GUI listener where the style from the prompt carries
     ! over to the input
-    " " write
-    flush ;
+    " " write flush ;
 
 : exit ( -- )
     "quit-flag" on ;
@@ -94,18 +63,14 @@ USE: vectors
 : eval-catch ( str -- )
     [ eval ] [ [ default-error-handler drop ] when* ] catch ;
 
-: interpret ( -- )
-    print-prompt read dup [
-        dup history+ eval-catch
-    ] [
-        drop exit
-    ] ifte ;
+: listener-step ( -- )
+    print-prompt read [ eval-catch ] [ exit ] ifte* ;
 
-: interpreter-loop ( -- )
+: listener-loop ( -- )
     "quit-flag" get [
         "quit-flag" off
     ] [
-        interpret interpreter-loop
+        listener-step listener-loop
     ] ifte ;
 
 : room. ( -- )
@@ -113,22 +78,28 @@ USE: vectors
     1024 /i unparse write " KB total, " write
     1024 /i unparse write " KB free" print ;
 
+: init-listener ( -- )
+    print-banner
+    room.
+
+    listener-loop ;
+
 : help ( -- )
     "SESSION:" print
     native? [
         "\"foo.image\" save-image   -- save heap to a file" print
     ] when
-    "history.                 -- show previous commands" print
     "room.                    -- show memory usage" print
+    "heap-stats.              -- memory allocation breakdown" print
     "garbage-collection       -- force a GC" print
     "exit                     -- exit interpreter" print
     terpri
     "WORDS:" print
     "vocabs.                  -- list vocabularies" print 
     "\"math\" words.            -- list the math vocabulary" print
-    "\"neg\" see                -- show word definition" print
     "\"str\" apropos.           -- list all words containing str" print
-    "\"car\" usages.            -- list all words invoking car" print
+    "\\ neg see                -- show word definition" print
+    "\\ car usages.            -- list all words invoking car" print
     terpri
     "STACKS:" print
     ".s .r .n .c              -- show contents of the 4 stacks" print
@@ -138,6 +109,11 @@ USE: vectors
     "global describe          -- list global variables." print
     "\"foo\" get .              -- print a variable value." print
     ".                        -- print top of stack." print
+    terpri
+    "PROFILER:                [ ... ] call-profile" print
+    "                         [ ... ] allot-profile" print
+    "TRACE:                   [ ... ] trace" print
+    "SINGLE STEP:             [ ... ] step" print
     terpri
     "HTTP SERVER:             USE: httpd 8888 httpd" print
     "TELNET SERVER:           USE: telnetd 9999 telnetd" print ;

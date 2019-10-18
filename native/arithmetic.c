@@ -4,6 +4,7 @@ CELL arithmetic_type(CELL obj1, CELL obj2)
 {
 	CELL type1 = type_of(obj1);
 	CELL type2 = type_of(obj2);
+
 	CELL type;
 
 	switch(type1)
@@ -94,8 +95,8 @@ bool realp(CELL tagged)
 
 void primitive_numberp(void)
 {
-	CELL tagged = dpeek();
-	drepl(tag_boolean(realp(tagged) || type_of(tagged) == COMPLEX_TYPE));
+	CELL tagged = dpop();
+	box_boolean(realp(tagged) || type_of(tagged) == COMPLEX_TYPE);
 }
 
 bool zerop(CELL tagged)

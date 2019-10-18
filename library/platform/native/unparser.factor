@@ -133,12 +133,12 @@ DEFER: unparse
         unparse-f
         unparse-t
         unparse-unknown
+        >dec
+        unparse-float
         unparse-unknown
         unparse-str
         unparse-unknown
         unparse-unknown
-        >dec
-        unparse-float
         unparse-unknown
         unparse-unknown
     } generic ;

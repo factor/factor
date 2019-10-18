@@ -85,8 +85,8 @@ USE: unparser
         "image"
         "init"
         "inspector"
-        "interpreter"
         "io/io"
+        "listener"
         "vectors"
         "words"
         "unparser"
@@ -113,12 +113,18 @@ USE: unparser
         "crashes" test
         "sbuf" test
         "threads" test
+        "parsing-word" test
+        "inference" test
+        "interpreter" test
 
         cpu "x86" = [
             [
+                "hsv"
                 "x86-compiler/simple"
+                "x86-compiler/stack"
                 "x86-compiler/ifte"
                 "x86-compiler/generic"
+                "x86-compiler/bail-out"
             ] [
                 test
             ] each
@@ -146,4 +152,8 @@ USE: unparser
     "benchmark/fac" test
     "benchmark/fib" test
     "benchmark/sort" test 
-    "benchmark/continuations" test ;
+    "benchmark/continuations" test
+    "benchmark/ack" test 
+    "benchmark/hashtables" test
+    "benchmark/strings" test
+    "benchmark/vectors" test ;

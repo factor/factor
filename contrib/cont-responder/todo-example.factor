@@ -191,16 +191,29 @@ USE: parser-combinators
     "Register" login-form
   ] simple-page ;
 
-: username-parser ( -- parser )
-  #! Return a parser which parses a valid todo username.
-  #! That is, it contains only lowercase, uppercase and digits.
-  [ letter? ] satisfy 
-  [ LETTER? ] satisfy <|> 
-  [ digit? ] satisfy <|> <!+> just ;
+: valid-username-char ( ch -- b ) 
+  #! Return true if the character is valid to appear in a username.
+  [ 
+    [ letter? ] [ drop t ] 
+    [ LETTER? ] [ drop t ] 
+    [ digit?  ] [ drop t ] 
+    [         ] [ drop f ] 
+  ] cond ;
 
-: is-valid-username? ( password -- bool )
+: replace-invalid-username-chars ( str -- str ) 
+  #! Return a string with invalid username characters mapped to underscores.
+  [ 
+    dup valid-username-char [ 
+    ] [ 
+      drop CHAR: _ 
+    ] ifte 
+  ] str-map ;
+
+: testx ( string -- b ) dup replace-invalid-username-chars = ;
+
+: is-valid-username? ( username -- bool )
   #! Return true if the username parses correctly
-  username-parser call ;
+  dup replace-invalid-username-chars = ;
 
 : login-details-valid? ( name password -- )
   #! Ensure that a valid username and password were

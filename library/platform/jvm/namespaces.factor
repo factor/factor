@@ -32,10 +32,9 @@ USE: lists
 USE: logic
 USE: stack
 USE: strings
+USE: vectors
 
 DEFER: namespace
-DEFER: >n
-DEFER: n>
 
 : namestack* ( -- stack )
     #! Push the namespace stack.
@@ -46,6 +45,14 @@ DEFER: n>
     #! Set the namespace stack.
     interpreter
     "factor.FactorInterpreter" "namestack" jvar-set ; inline
+
+: >n ( namespace -- n:namespace )
+    #! Push a namespace on the namespace stack.
+    namestack* vector-push ; inline
+
+: n> ( n:namespace -- namespace )
+    #! Pop the top of the namespace stack.
+    namestack* vector-pop ; inline
 
 : namestack ( -- stack )
     namestack* clone ; inline

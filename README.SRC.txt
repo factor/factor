@@ -31,8 +31,10 @@ Makefile - Makefile for building C interpreter.
 native/ - source code for Factor interpreter written in C.
 library/platform/native - C interpreter-specific code
 f - compiled C interpreter - needs image to run
-boot.image.le - image for x86
-boot.image.be - image for 32-bit SPARC and 32-bit PowerPC
+boot.image.le32 - image for x86
+boot.image.le64 - image for AMD64
+boot.image.be32 - image for 32-bit SPARC and 32-bit PowerPC
+boot.image.be64 - iamge for 64-bit SPARC and 64-bit PowerPC
 
 Notes on the C interpreter
 --------------------------
@@ -40,20 +42,3 @@ Notes on the C interpreter
 When you run the interpreter with a boot image, it loads a
 bunch of files and saves a 'factor.image'. Run the
 interpreter again with this image.
-
-At the moment it assumes a 32-bit architecture. Your C
-compiler's types must be as follows:
-
-short - signed 16 bits
-long - signed 32 bits
-long long - signed 64 bits
-double -IEEE double precision 64-bit float
-
-Moving to 64-bits would require a few changes in the image
-cross-compiler, namely in the way it packs strings.
-
-Not everything has been implemented yet. However, a lot
-already works. Compare the output of this in the C and
-Java interpreters to see how they differ:
-
-"vocabularies" get describe

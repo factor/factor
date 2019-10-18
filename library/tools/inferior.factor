@@ -28,7 +28,7 @@
 IN: inferior
 USE: combinators
 USE: errors
-USE: interpreter
+USE: listener
 USE: kernel
 USE: lists
 USE: logic
@@ -39,8 +39,23 @@ USE: stack
 USE: stdio
 USE: streams
 USE: strings
-USE: styles
+USE: presentation
 
+! The purpose of this library is to allow CFactor to be embedded
+! inside the Java Factor listener in jEdit.
+!
+! Eg, in Java Factor, you could evaluate this after fixing the
+! paths accordingly:
+!
+! : (inf
+!     [
+!         "/home/slava/Factor/f"
+!         "/home/slava/Factor/factor.image"
+!         "-no-ansi"
+!     ] pipe inferior-client ;
+!
+! Details:
+!
 ! Packets have the following form:
 ! 1 byte -- type. CHAR: w: write, CHAR: r: read
 ! 4 bytes -- for write only -- length of write request

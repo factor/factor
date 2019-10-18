@@ -56,8 +56,12 @@ USE: stack
 
 : reveal ( word -- )
     #! Add a new word to its vocabulary.
-    "vocabularies" get [
-        dup word-vocabulary over word-name 2list set-object-path
+    global [
+        "vocabularies" get [
+            dup word-vocabulary
+            over word-name
+            2list set-object-path
+        ] bind
     ] bind ;
 
 : create ( name vocab -- word )

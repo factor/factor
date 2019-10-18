@@ -23,6 +23,7 @@
 	<path id="jedit-classpath">
 		<pathelement location="${user.home}/.jedit/jars/ErrorList.jar" />
 		<pathelement location="${user.home}/.jedit/jars/SideKick.jar" />
+		<pathelement location="${user.home}/.jedit/jars/Console.jar" />
 	</path>
 
 	<target name="compile-jedit" depends="init" if="jedit">

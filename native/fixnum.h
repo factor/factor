@@ -28,3 +28,7 @@ void primitive_fixnum_lesseq(void);
 void primitive_fixnum_greater(void);
 void primitive_fixnum_greatereq(void);
 void primitive_fixnum_not(void);
+void box_signed_1(signed char integer);
+void box_signed_2(signed short integer);
+signed char unbox_signed_1(void);
+signed short unbox_signed_2(void);

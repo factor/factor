@@ -71,7 +71,7 @@ USE: unparser
      "method" get "head" = [
         drop
     ] [
-        dup [ directory. ] simple-html-document
+        "request" get [ directory. ] simple-html-document
     ] ifte ;
 
 : serve-directory ( filename -- )

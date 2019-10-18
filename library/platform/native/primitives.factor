@@ -180,7 +180,7 @@ USE: words
     [ client-socket          | " host port -- in out " ]
     [ server-socket          | " port -- server " ]
     [ close-port             | " port -- " ]
-    [ add-accept-io-task     | " callback server -- " ]
+    [ add-accept-io-task     | " server callback -- " ]
     [ accept-fd              | " server -- host port in out " ]
     [ can-read-line?         | " port -- ? " ]
     [ add-read-line-io-task  | " port callback -- " ]

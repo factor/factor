@@ -25,7 +25,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: sdl
+IN: sdl-video
 USE: alien
 USE: combinators
 USE: compiler
@@ -83,6 +83,13 @@ BEGIN-STRUCT: format
     FIELD: uchar  alpha
 END-STRUCT
 
+BEGIN-STRUCT: rect
+    FIELD: short   clip-x
+    FIELD: short   clip-y
+    FIELD: ushort   clip-w
+    FIELD: ushort   clip-h
+END-STRUCT
+
 BEGIN-STRUCT: surface
     FIELD: uint    flags
     FIELD: format* format
@@ -94,8 +101,8 @@ BEGIN-STRUCT: surface
     FIELD: void*   hwdata
     FIELD: short   clip-x
     FIELD: short   clip-y
-    FIELD: short   clip-w
-    FIELD: short   clip-h
+    FIELD: ushort   clip-w
+    FIELD: ushort   clip-h
     FIELD: uint    unused1
     FIELD: uint    locked
     FIELD: int     map
@@ -140,16 +147,25 @@ END-STRUCT
 ! UpdateRects, UpdateRect
 
 : SDL_Flip ( surface -- )
-    "void" "sdl" "SDL_Flip" [ "surface*" ] alien-call ;
+    "bool" "sdl" "SDL_Flip" [ "surface*" ] alien-call ;
 
 ! SDL_SetGamma: float types
 
+: SDL_FillRect ( surface rect color -- n )
+    #! If rect is null, fills entire surface.
+    "bool" "sdl" "SDL_FillRect"
+    [ "surface*" "rect*" "uint" ] alien-call ;
+
 : SDL_LockSurface ( surface -- )
-    "int" "sdl" "SDL_LockSurface" [ "surface*" ] alien-call ;
+    "bool" "sdl" "SDL_LockSurface" [ "surface*" ] alien-call ;
 
 : SDL_UnlockSurface ( surface -- )
     "void" "sdl" "SDL_UnlockSurface" [ "surface*" ] alien-call ;
 
 : SDL_MapRGB ( surface r g b -- )
-    "int" "sdl" "SDL_MapRGB"
-    [ "surface*" "char" "char" "char" ] alien-call ;
+    "uint" "sdl" "SDL_MapRGB"
+    [ "surface*" "uchar" "uchar" "uchar" ] alien-call ;
+
+: SDL_WM_SetCaption ( title icon -- )
+    "void" "sdl" "SDL_WM_SetCaption"
+    [ "char*" "char*" ] alien-call ;

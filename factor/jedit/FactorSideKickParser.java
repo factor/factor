@@ -42,6 +42,7 @@ public class FactorSideKickParser extends SideKickParser
 {
 	private FactorInterpreter interp;
 	private WordPreview wordPreview;
+	private Map previewMap;
 
 	/**
 	 * When we parse a file, we store the <word,worddef> pairs in this
@@ -55,7 +56,7 @@ public class FactorSideKickParser extends SideKickParser
 	{
 		super("factor");
 		interp = FactorPlugin.getInterpreter();
-		wordPreview = new WordPreview(this);
+		previewMap = new HashMap();
 		worddefs = new HashMap();
 	} //}}}
 
@@ -90,7 +91,10 @@ public class FactorSideKickParser extends SideKickParser
 	public void activate(EditPane editPane)
 	{
 		super.activate(editPane);
-		editPane.getTextArea().addCaretListener(wordPreview);
+		WordPreview preview = new WordPreview(this,
+			editPane.getTextArea());
+		previewMap.put(editPane,preview);
+		editPane.getTextArea().addCaretListener(preview);
 	} //}}}
 
 	//{{{ deactivate() method
@@ -103,7 +107,10 @@ public class FactorSideKickParser extends SideKickParser
 	public void deactivate(EditPane editPane)
 	{
 		super.deactivate(editPane);
-		editPane.getTextArea().removeCaretListener(wordPreview);
+		WordPreview preview = (WordPreview)previewMap
+			.remove(editPane);
+		if(preview != null)
+			editPane.getTextArea().removeCaretListener(preview);
 	} //}}}
 
 	//{{{ parse() method

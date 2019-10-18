@@ -21,7 +21,7 @@ void primitive_os_env(void)
 
 void primitive_eq(void)
 {
-	dpush(tag_boolean(dpop() == dpop()));
+	box_boolean(dpop() == dpop());
 }
 
 void primitive_millis(void)

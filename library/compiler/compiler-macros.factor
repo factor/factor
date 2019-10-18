@@ -28,48 +28,27 @@
 IN: compiler
 USE: alien
 
-: DATASTACK ( -- ptr )
-    #! A pointer to a pointer to the datastack top.
-    "ds" dlsym-self ;
-
-: CALLSTACK ( -- ptr )
-    #! A pointer to a pointer to the callstack top.
-    "cs" dlsym-self ;
-
 : LITERAL ( cell -- )
     #! Push literal on data stack.
-    #! Assume that it is ok to clobber EAX without saving.
-    DATASTACK EAX [I]>R
-    EAX I>[R]
-    4 DATASTACK I+[I] ;
+    4 ESI R+I
+    ESI I>[R] ;
 
 : [LITERAL] ( cell -- )
     #! Push complex literal on data stack by following an
     #! indirect pointer.
-    ECX PUSH-R
-    ( cell -- ) ECX [I]>R
-    DATASTACK EAX [I]>R
-    ECX EAX R>[R]
-    4 DATASTACK I+[I]
-    ECX POP-R ;
+    4 ESI R+I
+    EAX [I]>R
+    EAX ESI R>[R] ;
 
 : PUSH-DS ( -- )
     #! Push contents of EAX onto datastack.
-    ECX PUSH-R
-    DATASTACK ECX [I]>R
-    EAX ECX R>[R]
-    4 DATASTACK I+[I]
-    ECX POP-R ;
-
-: PEEK-DS ( -- )
-    #! Peek datastack, store pointer to datastack top in EAX.
-    DATASTACK EAX [I]>R
-    4 EAX R-I ;
+    4 ESI R+I
+    EAX ESI R>[R] ;
 
 : POP-DS ( -- )
     #! Pop datastack, store pointer to datastack top in EAX.
-    PEEK-DS
-    EAX DATASTACK R>[I] ;
+    ESI EAX [R]>R
+    4 ESI R-I ;
 
 : SELF-CALL ( name -- )
     #! Call named C function in Factor interpreter executable.
@@ -77,14 +56,13 @@ USE: alien
 
 : TYPE ( -- )
     #! Peek datastack, store type # in EAX.
-    PEEK-DS
-    EAX PUSH-[R]
+    ESI PUSH-[R]
     "type_of" SELF-CALL
     4 ESP R+I ;
 
 : ARITHMETIC-TYPE ( -- )
     #! Peek top two on datastack, store arithmetic type # in EAX.
-    PEEK-DS
+    ESI EAX R>R
     EAX PUSH-[R]
     4 EAX R-I
     EAX PUSH-[R]

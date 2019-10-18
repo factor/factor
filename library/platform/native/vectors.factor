@@ -32,9 +32,6 @@ USE: lists
 USE: math
 USE: stack
 
-: 2vector-nth ( n vec vec -- obj obj )
-    >r over >r vector-nth r> r> vector-nth ;
-
 : ?vector= ( n vec vec -- ? )
     #! Reached end?
     drop vector-length = ;

@@ -34,20 +34,15 @@ USE: stack
 USE: vectors
 
 : 2list ( a b -- [ a b ] )
-    #! Construct a proper list of 2 elements.
     unit cons ;
 
 : 3list ( a b c -- [ a b c ] )
-    #! Construct a proper list of 3 elements.
     2list cons ;
 
 : append ( [ list1 ] [ list2 ] -- [ list1 list2 ] )
     over [ >r uncons r> append cons ] [ nip ] ifte ;
 
 : contains? ( element list -- remainder )
-    #! If the proper list contains the element, push the
-    #! remainder of the list, starting from the cell whose car
-    #! is elem. Otherwise push f.
     dup [
         2dup car = [ nip ] [ cdr contains? ] ifte
     ] [
@@ -66,7 +61,6 @@ USE: vectors
     dup cdr cons? [ cdr last* ] when ;
 
 : last ( list -- last )
-    #! Pushes last element of a list.
     last* car ;
 
 : list? ( list -- boolean )
@@ -78,7 +72,7 @@ USE: vectors
     >r >r [ r> cons r> ] [ r> r> swapd cons ] ifte ; inline
 
 : partition-step ( ret1 ret2 ref combinator car -- ret1 ret2 )
-    >r 2swap r> -rot >r >r dup >r swap call r> swap r> r>
+    >r rot >r rot r> r> -rot >r >r dup >r swap call r> swap r> r>
     partition-add ; inline
 
 : partition-iter ( ret1 ret2 ref combinator list -- ret1 ret2 )
@@ -148,83 +142,49 @@ DEFER: tree-contains?
     #! already contained in the list.
     2dup contains? [ nip ] [ cons ] ifte ;
 
-: each-step ( list quot -- list quot )
+: (each) ( list quot -- list quot )
     >r uncons r> tuck 2slip ; inline interpret-only
 
 : each ( list quot -- )
     #! Push each element of a proper list in turn, and apply a
     #! quotation with effect ( X -- ) to each element.
-    over [ each-step each ] [ 2drop ] ifte ;
+    over [ (each) each ] [ 2drop ] ifte ;
     inline interpret-only
 
 : reverse ( list -- list )
-    #! Push a new list that is the reverse of a proper list.
     [ ] swap [ swons ] each ;
 
 : map ( list quot -- list )
     #! Push each element of a proper list in turn, and collect
     #! return values of applying a quotation with effect
     #! ( X -- Y ) to each element into a new list.
-    over [ each-step rot >r map r> swons ] [ drop ] ifte ;
+    over [ (each) rot >r map r> swons ] [ drop ] ifte ;
     inline interpret-only
 
-: 2uncons ( list1 list2 -- car1 car2 cdr1 cdr2 )
-    uncons >r >r uncons r> swap r> ;
-
-: 2each-step ( list list quot -- cdr cdr )
-    >r 2uncons r> -rot 2slip ; inline interpret-only
-
-: 2each ( list list quot -- )
-    #! Apply the quotation to each pair of elements from the
-    #! two lists in turn. The quotation must have stack effect
-    #! ( x y -- ).
-    >r 2dup and [
-        r> dup >r 2each-step r> 2each
-    ] [
-        r> 3drop
-    ] ifte ; inline interpret-only
-
-: 2map-step ( accum quot elt elt -- accum )
-    2swap swap slip cons ;
-
-: <2map ( list list quot -- accum quot list list )
-    >r f -rot r> -rot ;
-
-: 2map ( list list quot -- list )
-    #! Apply the quotation to each pair of elements from the
-    #! two lists in turn, collecting the return value into a
-    #! new list. The quotation must have stack effect
-    #! ( x y -- z ).
-    <2map [ pick >r 2map-step r> ] 2each drop reverse ;
-    inline interpret-only
-
-: subset-add ( car pred accum -- accum )
-    >r over >r call r> r> rot [ cons ] [ nip ] ifte ;
-
-: subset-iter ( accum list pred -- accum )
+: subset ( list quot -- list )
+    #! Applies a quotation with effect ( X -- ? ) to each
+    #! element of a list; all elements for which the quotation
+    #! returned a value other than f are collected in a new
+    #! list.
     over [
-        >r unswons r> 2swap pick
-        >r >r subset-add r> r> subset-iter
-	] [
-        2drop
-    ] ifte ;
-
-: subset ( list pred -- list )
-    #! Applies a quotation to each element of a list; all
-    #! elements for which the quotation returned a value other
-    #! than f are collected in a new list.
-    #!
-    #! In order to compile, the quotation must consume as many
-    #! values as it produces.
-    f -rot subset-iter reverse ; inline interpret-only
+        over car >r (each)
+        rot >r subset r> [ r> swons ] [ r> drop ] ifte
+    ] [
+        drop
+    ] ifte ; inline interpret-only
 
 : remove ( obj list -- list )
     #! Remove all occurrences of the object from the list.
     [ dupd = not ] subset nip ;
 
 : length ( list -- length )
-    #! Pushes the length of the given proper list.
     0 swap [ drop succ ] each ;
+
+: prune ( list -- list )
+    #! Remove duplicate elements.
+    dup [
+        uncons prune 2dup contains? [ nip ] [ cons ] ifte
+    ] when ;
 
 : all? ( list pred -- ? )
     #! Push if the predicate returns true for each element of
@@ -245,14 +205,15 @@ DEFER: tree-contains?
 : count ( n -- [ 0 ... n-1 ] )
     [ ] (count) ;
 
-: car= swap car swap car = ;
-: cdr= swap cdr swap cdr = ;
-
 : cons= ( obj cons -- ? )
     2dup eq? [
         2drop t
     ] [
-        over cons? [ 2dup car= >r cdr= r> and ] [ 2drop f ] ifte
+        over cons? [
+            2dup 2car = >r 2cdr = r> and
+        ] [
+            2drop f
+        ] ifte
     ] ifte ;
 
 : (cons-hashcode) ( cons count -- hash )

@@ -70,30 +70,7 @@ public class FactorJava
 		int i = 0;
 		while(classes != null)
 		{
-			Object car = classes.car;
-			if(car instanceof Cons)
-			{
-				Cons classSpec = (Cons)car;
-				if(classSpec.cdr != null)
-				{
-					throw new FactorRuntimeException(
-						"Bad class spec: " + car);
-				}
-				Class clazz = (Class)classSpec.car(Class.class);
-				if(clazz.isPrimitive())
-				{
-					_classes[i] = getClass("["
-						+ javaClassToVMClass(clazz));
-				}
-				else
-				{
-					_classes[i] = getClass("[L"
-						+ clazz.getName() + ";");
-				}
-			}
-			else
-				_classes[i] = (Class)classes.car(Class.class);
-
+			_classes[i] = toClass(classes.car);
 			i++;
 			classes = classes.next();
 		}
@@ -278,6 +255,24 @@ public class FactorJava
 	{
 		if(arg instanceof Class)
 			return (Class)arg;
+		else if(arg instanceof Cons)
+		{
+			Cons classSpec = (Cons)arg;
+			if(classSpec.cdr != null)
+			{
+				throw new FactorException(
+					"Bad class spec: " + classSpec);
+			}
+			Class clazz = toClass(classSpec.car);
+			if(clazz.isPrimitive())
+			{
+				return getClass("[" + javaClassToVMClass(clazz));
+			}
+			else
+			{
+				return getClass("[L" + clazz.getName() + ";");
+			}
+		}
 		else
 		{
 			return getClass((String)

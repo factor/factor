@@ -2,9 +2,9 @@
 
 ! $Id$
 !
-! Copyright (C) 2003, 2004 Slava Pestov.
+! Copyright (C) 2004 Slava Pestov.
 ! 
-! Redistribution and use in source and binary forms, with or without
+! Redistribution and use in source and binary forms, with or wxithout
 ! modification, are permitted provided that the following conditions are met:
 ! 
 ! 1. Redistributions of source code must retain the above copyright notice,
@@ -25,52 +25,52 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: telnetd
+IN: errors
 USE: combinators
-USE: errors
-USE: interpreter
+USE: continuations
 USE: kernel
-USE: logging
 USE: logic
 USE: namespaces
+USE: prettyprint
 USE: stack
 USE: stdio
-USE: streams
-USE: threads
+USE: strings
+USE: unparser
 
-: telnet-client ( socket -- )
-    dup [
-        "client" set
-        log-client
-        init-history
-        interpreter-loop
-    ] with-stream ;
+: standard-dump ( error -- )
+    "ERROR: " write error. ;
 
-: telnet-connection ( socket -- )
-    #! We don't do multitasking in JFactor.
-    java? [
-        telnet-client
-    ] [
-        [ telnet-client ] in-thread drop
-    ] ifte ;
+: parse-dump ( error -- )
+    <%
+    "error-file" get [ "<interactive>" ] unless* % ":" %
+    "error-line-number" get [ 1 ] unless* unparse % ": " %
+    %> write
+    error.
+    
+    "error-line" get print
+    
+    <% "error-col" get " " fill % "^" % %> print ;
 
-: quit-flag ( -- ? )
-    global [ "telnetd-quit-flag" get ] bind ;
+: in-parser? ( -- ? )
+    "error-line" get "error-col" get and ;
 
-: clear-quit-flag ( --  )
-    global [ f "telnetd-quit-flag" set ] bind ;
+: error-handler-hook
+    #! The game overrides this.
+    ;
 
-: telnetd-loop ( server -- server )
-    quit-flag [
-        dup >r accept telnet-connection r>
-        telnetd-loop
-    ] unless ;
-
-: telnetd ( port -- )
+: default-error-handler ( error -- )
+    #! Print the error and return to the top level.
     [
-        <server> [
-            telnetd-loop
-        ] [
-            clear-quit-flag swap fclose rethrow
-        ] catch
-    ] with-logging ;
+        in-parser? [ parse-dump ] [ standard-dump ] ifte
+
+        ":s :r :n :c show stacks at time of error." print
+
+        java? [ ":j shows Java stack trace." print ] when
+        error-handler-hook
+
+    ] when* ;
+
+: :s ( -- ) "error-datastack"  get {.} ;
+: :r ( -- ) "error-callstack"  get {.} ;
+: :n ( -- ) "error-namestack"  get {.} ;
+: :c ( -- ) "error-catchstack" get {.} ;

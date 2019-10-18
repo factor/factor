@@ -2,8 +2,8 @@
 
 void primitive_open_file(void)
 {
-	bool write = untag_boolean(dpop());
-	bool read = untag_boolean(dpop());
+	bool write = unbox_boolean();
+	bool read = unbox_boolean();
 
 	char* path;
 	int mode, fd;

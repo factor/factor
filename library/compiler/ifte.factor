@@ -35,8 +35,8 @@ USE: lists
 
 : compile-test ( -- )
     POP-DS
-    ! ptr to condition is now in EAX
-    f address EAX CMP-I-[R] ;
+    ! condition is now in EAX
+    f address EAX CMP-I-R ;
 
 : compile-f-test ( -- fixup )
     #! Push addr where we write the branch target address.

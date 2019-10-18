@@ -1,8 +1,8 @@
-! :folding=indent:collapseFolds=0:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
-! Copyright (C) 2003, 2004 Slava Pestov.
+! Copyright (C) 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -25,28 +25,23 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: math
-USE: lists
+IN: words
 USE: math
+USE: namespaces
 USE: stack
+USE: strings
+USE: unparser
 
-: |+ ( list -- sum )
-    #! sum all elements in a list.
-    0 swap [ + ] each ;
+SYMBOL: gensym-count
 
-: +| ( list list -- list )
-    [ + ] 2map ;
+: (gensym) ( -- name )
+    "G:" global [
+        gensym-count get succ dup gensym-count set
+    ] bind unparse cat2 ;
 
-: |* ( list -- sum )
-    #! multiply all elements in a list.
-    1 swap [ * ] each ;
+: gensym ( -- word )
+    #! Return a word that is distinct from every other word, and
+    #! is not contained in any vocabulary.
+    (gensym) f (create) ;
 
-: *| ( list list -- list )
-    [ * ] 2map ;
-
-: *|+ ( list list -- dot )
-    #! Dot product
-    *| |+ ;
-
-: average ( list -- avg )
-    dup |+ swap length / ;
+global [ 0 gensym-count set ] bind

@@ -46,7 +46,7 @@ void primitive_can_write(void)
 	port = untag_port(dpop());
 	len = to_fixnum(dpop());
 	pending_io_error(port);
-	dpush(tag_boolean(can_write(port,len)));
+	box_boolean(can_write(port,len));
 }
 
 void primitive_add_write_io_task(void)

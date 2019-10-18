@@ -25,21 +25,21 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: words
+IN: presentation
 USE: combinators
 USE: lists
 USE: kernel
 USE: namespaces
 USE: stack
-USE: styles
+USE: words
 
 : vocab-style ( vocab -- style )
     #! Each vocab has a style object specifying how words are
     #! to be printed.
-    "vocabularies" get-style get* ;
+    "vocabularies" style get* ;
 
 : set-vocab-style ( style vocab -- )
-    >r default-style append r> "vocabularies" get-style set* ;
+    >r default-style append r> "vocabularies" style set* ;
 
 : word-style ( word -- style )
     word-vocabulary [ vocab-style ] [ default-style ] ifte* ;

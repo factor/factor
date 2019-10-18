@@ -96,33 +96,16 @@ USE: url-encoding
     ] catch ;
 
 : httpd-connection ( socket -- )
-    #! We're single-threaded in Java Factor, and
-    #! multi-threaded in CFactor.
-    java? [
-        httpd-client
-    ] [
-        [
-            httpd-client
-        ] in-thread drop
-    ] ifte ;
+    "http-server" get accept [ httpd-client ] in-thread drop ;
 
-: quit-flag ( -- ? )
-    global [ "httpd-quit" get ] bind ;
-
-: clear-quit-flag ( -- )
-    global [ "httpd-quit" off ] bind ;
-
-: httpd-loop ( server -- server )
-    quit-flag [
-        dup dup accept httpd-connection
-        httpd-loop
-    ] unless ;
+: httpd-loop ( -- )
+    [ httpd-connection ] forever ;
 
 : (httpd) ( port -- )
-    <server> [
+    <server> "http-server" set [
         httpd-loop
     ] [
-        swap fclose clear-quit-flag rethrow
+        "http-server" get fclose rethrow
     ] catch ;
 
 : httpd ( port -- )

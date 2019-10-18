@@ -36,7 +36,7 @@ void primitive_fixnum_eq(void)
 {
 	FIXNUM y = to_fixnum(dpop());
 	FIXNUM x = to_fixnum(dpop());
-	dpush(tag_boolean(x == y));
+	box_boolean(x == y);
 }
 
 void primitive_fixnum_add(void)
@@ -174,31 +174,55 @@ void primitive_fixnum_less(void)
 {
 	FIXNUM y = to_fixnum(dpop());
 	FIXNUM x = to_fixnum(dpop());
-	dpush(tag_boolean(x < y));
+	box_boolean(x < y);
 }
 
 void primitive_fixnum_lesseq(void)
 {
 	FIXNUM y = to_fixnum(dpop());
 	FIXNUM x = to_fixnum(dpop());
-	dpush(tag_boolean(x <= y));
+	box_boolean(x <= y);
 }
 
 void primitive_fixnum_greater(void)
 {
 	FIXNUM y = to_fixnum(dpop());
 	FIXNUM x = to_fixnum(dpop());
-	dpush(tag_boolean(x > y));
+	box_boolean(x > y);
 }
 
 void primitive_fixnum_greatereq(void)
 {
 	FIXNUM y = to_fixnum(dpop());
 	FIXNUM x = to_fixnum(dpop());
-	dpush(tag_boolean(x >= y));
+	box_boolean(x >= y);
 }
 
 void primitive_fixnum_not(void)
 {
 	drepl(tag_fixnum(~to_fixnum(dpeek())));
+}
+
+/* FFI calls this */
+void box_signed_1(signed char integer)
+{
+	dpush(tag_integer(integer));
+}
+
+/* FFI calls this */
+void box_signed_2(signed short integer)
+{
+	dpush(tag_integer(integer));
+}
+
+/* FFI calls this */
+signed char unbox_signed_1(void)
+{
+	return to_integer(dpop());
+}
+
+/* FFI calls this */
+signed short unbox_signed_2(void)
+{
+	return to_integer(dpop());
 }

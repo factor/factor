@@ -30,9 +30,18 @@ USE: combinators
 USE: lists
 USE: logic
 USE: namespaces
+USE: presentation
 USE: stack
 USE: stdio
 USE: strings
+
+: file-actions ( -- list )
+    [
+        [ "Push"             | ""           ]
+        [ "Run file"         | "run-file"   ]
+        [ "List directory"   | "directory." ]
+        [ "Change directory" | "cd"         ]
+    ] ;
 
 : set-mime-types ( assoc -- )
     "mime-types" global set* ;
@@ -56,7 +65,10 @@ USE: strings
     directory? dir-icon file-icon ? write-icon ;
 
 : file-link. ( dir name -- )
-    tuck "/" swap cat3 "file-link" swons unit write-attr ;
+    tuck "/" swap cat3 dup "file-link" swons swap
+    file-actions <actions> "actions" swons
+    t "underline" swons
+    3list write-attr ;
 
 : file. ( dir name -- )
     #! If "doc-root" set, create links relative to it.

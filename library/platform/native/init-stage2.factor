@@ -38,7 +38,7 @@ USE: parser
 USE: random
 USE: stack
 USE: streams
-USE: styles
+USE: presentation
 USE: words
 
 : cli-args ( -- args ) 10 getenv ;
@@ -64,10 +64,10 @@ USE: words
     t "ansi" set
     t "compile" set
 
-    "ansi" get [ "stdio" get <ansi-stream> "stdio" set ] when
-
     ! The first CLI arg is the image name.
     cli-args uncons parse-command-line "image" set
+
+    "ansi" get [ "stdio" get <ansi-stream> "stdio" set ] when
 
     "compile" get [ init-compiler ] when
 

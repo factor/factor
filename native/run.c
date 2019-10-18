@@ -4,7 +4,7 @@ void clear_environment(void)
 {
 	int i;
 	for(i = 0; i < USER_ENV; i++)
-		userenv[i] = 0;
+		userenv[i] = F;
 	profile_depth = 0;
 }
 
@@ -16,7 +16,22 @@ void run(void)
 
 	/* Error handling. */
 	sigsetjmp(toplevel, 1);
-	
+	if(thrown_error != F)
+	{
+		if(thrown_keep_stacks)
+		{
+			ds = thrown_ds;
+			cs = thrown_cs;
+		}
+		else
+			fix_stacks();
+
+		dpush(thrown_error);
+		/* Notify any 'catch' blocks */
+		call(userenv[BREAK_ENV]);
+		thrown_error = F;
+	}
+
 	for(;;)
 	{
 		if(callframe == F)

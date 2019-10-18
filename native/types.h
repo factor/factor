@@ -25,12 +25,12 @@
 CELL T;
 
 #define ARRAY_TYPE 8
-#define VECTOR_TYPE 9
-#define STRING_TYPE 10
-#define SBUF_TYPE 11
-#define PORT_TYPE 12
-#define BIGNUM_TYPE 13
-#define FLOAT_TYPE 14
+#define BIGNUM_TYPE 9
+#define FLOAT_TYPE 10
+#define VECTOR_TYPE 11
+#define STRING_TYPE 12
+#define SBUF_TYPE 13
+#define PORT_TYPE 14
 #define DLL_TYPE 15
 #define ALIEN_TYPE 16
 
@@ -45,16 +45,6 @@ CELL T;
 
 CELL type_of(CELL tagged);
 bool typep(CELL type, CELL tagged);
-
-INLINE CELL tag_boolean(CELL untagged)
-{
-	return (untagged == false ? F : T);
-}
-
-INLINE bool untag_boolean(CELL tagged)
-{
-	return (tagged == F ? false : true);
-}
 
 INLINE CELL tag_header(CELL cell)
 {

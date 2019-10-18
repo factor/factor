@@ -38,7 +38,7 @@ USE: prettyprint
 USE: stack
 USE: stdio
 USE: strings
-USE: styles
+USE: presentation
 USE: unparser
 USE: vectors
 USE: words
@@ -141,7 +141,7 @@ DEFER: prettyprint*
     dup ends-with-newline? dup [ nip ] [ drop ] ifte ;
 
 : prettyprint-comment ( comment -- )
-    trim-newline "comments" get-style write-attr ;
+    trim-newline "comments" style write-attr ;
 
 : word-link ( word -- link )
     <%
@@ -151,15 +151,31 @@ DEFER: prettyprint*
     word-name %
     %> ;
 
+: word-actions ( -- list )
+    [
+        [ "Describe" | "describe-path"  ]
+        [ "Push"     | "lookup"         ]
+        [ "Execute"  | "lookup execute" ]
+        [ "jEdit"    | "lookup jedit"   ]
+        [ "Usages"   | "lookup usages." ]
+    ] ;
+
 : word-attrs ( word -- attrs )
-    dup defined? [
-        dup >r word-link "object-link" r> word-style acons
+    #! Words without a vocabulary do not get a link or an action
+    #! popup.
+    dup word-vocabulary [
+        word-link [ "object-link" swons ] keep
+        word-actions <actions> "actions" swons
+        t "underline" swons
+        3list
     ] [
-        word-style
+        drop [ ]
     ] ifte ;
 
 : prettyprint-word ( word -- )
-    dup word-name swap word-attrs write-attr ;
+    dup word-name
+    swap dup word-attrs swap word-style append
+    write-attr ;
 
 : prettyprint-object ( indent obj -- indent )
     unparse write ;
@@ -213,10 +229,14 @@ DEFER: prettyprint*
     #! Unparse each element on its own line.
     [ . ] each ;
 
-: .n namestack  . ;
-: .s datastack  . ;
-: .r callstack  . ;
-: .c catchstack . ;
+: {.} ( vector -- )
+    #! Unparse each element on its own line.
+    [ . ] vector-each ;
+
+: .n namestack  {.} ;
+: .s datastack  {.} ;
+: .r callstack  {.} ;
+: .c catchstack {.} ;
 
 ! For integers only
 : .b >bin print ;

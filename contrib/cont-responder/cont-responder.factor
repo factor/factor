@@ -43,6 +43,7 @@ USE: cont-html
 USE: logging
 USE: url-encoding
 USE: unparser
+USE: hashtables
 
 : expiry-timeout ( -- timeout-seconds )
   #! Number of seconds to timeout continuations in
@@ -104,7 +105,7 @@ USE: unparser
   #! if they are 'timeout-seconds' old (ie. were added
   #! more than 'timeout-seconds' ago.
   continuation-items [ cdr dupd expired? not ] subset nip
-  alist>namespace "continuation-table" set ;
+  alist>hash "continuation-table" set ;
 
 : register-continuation ( expire? quot -- id ) 
   #! Store a continuation in the table and associate it with
@@ -257,7 +258,7 @@ USE: inspector
 : post-request>namespace ( post-request -- namespace )
   #! Return a namespace containing the name/value's from the 
   #! post data.
-  alist>namespace ;
+  alist>hash ;
 
 : cont-post-responder ( id -- )    
   #! httpd responder that retrieves a continuation for the given

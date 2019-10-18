@@ -8,6 +8,8 @@ PORT* untag_port(CELL tagged)
 	/* after image load & save, ports are no longer valid */
 	if(p->fd == -1)
 		general_error(ERROR_EXPIRED,tagged);
+	/* if(p->closed)
+		general_error(ERROR_CLOSED,tagged); */
 	return p;
 }
 
@@ -15,6 +17,7 @@ PORT* port(PORT_MODE type, CELL fd)
 {
 	PORT* port = allot_object(PORT_TYPE,sizeof(PORT));
 	port->type = type;
+	port->closed = false;
 	port->fd = fd;
 	port->buffer = NULL;
 	port->line = F;
@@ -91,6 +94,8 @@ void pending_io_error(PORT* port)
 		port->io_error = F;
 		general_error(ERROR_IO,io_error);
 	}
+	else if(port->closed)
+		general_error(ERROR_CLOSED,tag_object(port));
 }
 
 void primitive_pending_io_error(void)

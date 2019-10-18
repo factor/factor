@@ -94,17 +94,8 @@ USE: words
 : ffi-error ( obj -- )
     "FFI: " write print ;
 
-: datastack-underflow-error ( obj -- )
-    drop "Datastack underflow" print ;
-
-: datastack-overflow-error ( obj -- )
-    drop "Datastack overflow" print ;
-
-: callstack-underflow-error ( obj -- )
-    drop "Callstack underflow" print ;
-
-: callstack-overflow-error ( obj -- )
-    drop "Callstack overflow" print ;
+: port-closed-error ( obj -- )
+    "Port closed: " write . ;
 
 : kernel-error. ( obj n -- str )
     {
@@ -123,10 +114,7 @@ USE: words
         c-string-error
         ffi-disabled-error
         ffi-error
-        datastack-underflow-error
-        datastack-overflow-error
-        callstack-underflow-error
-        callstack-overflow-error
+        port-closed-error
     } vector-nth execute ;
 
 : kernel-error? ( obj -- ? )
