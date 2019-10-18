@@ -1,6 +1,7 @@
 IN: temporary
 USE: lists
 USE: test
+USE: sequences
 
 [ f ] [ f car ] unit-test
 [ f ] [ f cdr ] unit-test
@@ -31,3 +32,5 @@ USE: test
 
 [ 1 3 ] [ [[ 1 2 ]] [[ 3 4 ]] 2car ] unit-test
 [ 2 4 ] [ [[ 1 2 ]] [[ 3 4 ]] 2cdr ] unit-test
+
+[ f ] [ f peek ] unit-test

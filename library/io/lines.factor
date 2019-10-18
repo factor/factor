@@ -17,18 +17,18 @@ C: line-reader ( stream -- line ) [ set-delegate ] keep ;
             drop t swap set-line-reader-cr
         ] [
             dup CHAR: \n = [
-                drop dup cr> [ (readln) ] [ drop ] ifte
+                drop dup cr> [ (readln) ] [ drop ] if
             ] [
                 , (readln)
-            ] ifte
-        ] ifte
+            ] if
+        ] if
     ] [
         2drop
-    ] ifte ;
+    ] if ;
 
 M: line-reader stream-readln ( line -- string )
     [ f swap (readln) ] "" make
-    dup empty? [ f ? ] [ nip ] ifte ;
+    dup empty? [ f ? ] [ nip ] if ;
 
 M: line-reader stream-read ( count line -- string )
     [ delegate stream-read ] keep dup cr> [
@@ -36,14 +36,14 @@ M: line-reader stream-read ( count line -- string )
             drop
         ] [
             >r 1 swap tail r> stream-read1 [ add ] when*
-        ] ifte
+        ] if
     ] [
         drop
-    ] ifte ;
+    ] if ;
 
 : (lines) ( seq -- seq )
     readln [ over push (lines) ] when* ;
 
 : lines ( stream -- seq )
     #! Read all lines from the stream into a sequence.
-    [ { } clone (lines) ] with-stream ;
+    [ V{ } clone (lines) ] with-stream ;

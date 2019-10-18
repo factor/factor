@@ -1,7 +1,7 @@
-IN: inference
-USING: kernel sequences words ;
+IN: optimizer
+USING: inference kernel lists sequences words ;
 
-! #ifte --> X
+! #if --> X
 !   |
 !   +--> Y
 !   |
@@ -9,7 +9,7 @@ USING: kernel sequences words ;
 
 ! Becomes:
 
-! #ifte
+! #if
 !   |
 !   +--> Y --> X
 !   |
@@ -28,7 +28,7 @@ M: node split-node* ( node -- ) drop ;
         node-successor subst-values
     ] [
         2drop
-    ] ifte ;
+    ] if ;
 
 : subst-node ( old new -- )
     #! The last node of 'new' becomes 'old', then values are
@@ -37,12 +37,19 @@ M: node split-node* ( node -- ) drop ;
     [ last-node 2dup swap post-inline set-node-successor ] keep
     split-node ;
 
+: inline-literals ( node literals -- node )
+    #! Make #push -> #return -> successor
+    over drop-inputs [
+        >r >list [ literalize ] map dataflow [ subst-node ] keep
+        r> set-node-successor
+    ] keep ;
+
 : split-branch ( node -- )
     dup node-successor over node-children
     [ >r clone-node r> subst-node ] each-with
     f swap set-node-successor ;
 
-M: #ifte split-node* ( node -- )
+M: #if split-node* ( node -- )
     split-branch ;
 
 M: #dispatch split-node* ( node -- )
@@ -51,10 +58,3 @@ M: #dispatch split-node* ( node -- )
 ! #label
 M: #label split-node* ( node -- )
     node-child split-node ;
-
-: inline-literals ( node literals -- node )
-    #! Make #push -> #return -> successor
-    over drop-inputs [
-        >r [ literalize ] map dataflow [ subst-node ] keep
-        r> set-node-successor
-    ] keep ;

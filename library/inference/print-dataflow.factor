@@ -1,4 +1,4 @@
-IN: inference
+IN: optimizer
 USING: generic hashtables inference io kernel kernel-internals
 lists math namespaces prettyprint sequences styles vectors words ;
 
@@ -14,22 +14,23 @@ M: comment pprint* ( ann -- )
     swap comment-node presented swons unit text ;
 
 : comment, ( ? node text -- )
-    rot [ <comment> , ] [ 2drop ] ifte ;
+    rot [ <comment> , ] [ 2drop ] if ;
 
-: value-str ( prefix values -- str )
-    [ value-uid word-name append ] map-with concat ;
+: values% ( prefix values -- )
+    [
+        swap %
+        dup literal? [ literal-value ] [ value-uid ] if
+        unparse %
+    ] each-with ;
 
 : effect-str ( node -- str )
     [
-        " " over node-in-d value-str %
-        " r: " over node-in-r value-str %
+        " " over node-in-d values%
+        " r: " over node-in-r values%
         " --" %
-        " " over node-out-d value-str %
-        " r: " swap node-out-r value-str %
+        " " over node-out-d values%
+        " r: " swap node-out-r values%
     ] "" make 1 swap tail ;
-
-M: #push node>quot ( ? node -- )
-    node-out-d [ literal-value literalize ] map % drop ;
 
 M: #shuffle node>quot ( ? node -- )
     >r drop t r> dup effect-str "#shuffle: " swap append comment, ;
@@ -38,7 +39,7 @@ DEFER: dataflow>quot
 
 : #call>quot ( ? node -- )
     dup node-param dup
-    [ , dup effect-str comment, ] [ 3drop ] ifte ;
+    [ , dup effect-str comment, ] [ 3drop ] if ;
 
 M: #call node>quot ( ? node -- ) #call>quot ;
 
@@ -48,15 +49,16 @@ M: #label node>quot ( ? node -- )
     [ "#label: " over node-param word-name append comment, ] 2keep
     node-child swap dataflow>quot , \ call ,  ;
 
-M: #ifte node>quot ( ? node -- )
-    [ "#ifte" comment, ] 2keep
-    node-children [ swap dataflow>quot ] map-with % \ ifte , ;
+M: #if node>quot ( ? node -- )
+    [ "#if" comment, ] 2keep
+    node-children [ swap dataflow>quot ] map-with % \ if , ;
 
 M: #dispatch node>quot ( ? node -- )
     [ "#dispatch" comment, ] 2keep
     node-children [ swap dataflow>quot ] map-with , \ dispatch , ;
 
-M: #return node>quot ( ? node -- ) "#return" comment, ;
+M: #return node>quot ( ? node -- )
+    dup node-param unparse "#return " swap append comment, ;
 
 M: #values node>quot ( ? node -- ) "#values" comment, ;
 
@@ -64,12 +66,14 @@ M: #merge node>quot ( ? node -- ) "#merge" comment, ;
 
 M: #entry node>quot ( ? node -- ) "#entry" comment, ;
 
+M: #terminate node>quot ( ? node -- ) "#terminate" comment, ;
+
 : (dataflow>quot) ( ? node -- )
     dup [
         2dup node>quot node-successor (dataflow>quot)
     ] [
         2drop
-    ] ifte ;
+    ] if ;
 
 : dataflow>quot ( node ? -- quot )
     [ swap (dataflow>quot) ] [ ] make ;

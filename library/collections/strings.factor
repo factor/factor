@@ -1,9 +1,12 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: strings
-USING: generic kernel kernel-internals lists math sequences ;
+USING: generic kernel kernel-internals lists math sequences
+sequences-internals ;
 
 M: string nth ( n str -- ch ) bounds-check char-slot ;
+
+M: string nth-unsafe ( n str -- ch ) >r >fixnum r> char-slot ;
 
 GENERIC: >string ( seq -- string ) flushable
 
@@ -15,6 +18,12 @@ PREDICATE: integer letter    CHAR: a CHAR: z between? ;
 PREDICATE: integer LETTER    CHAR: A CHAR: Z between? ;
 PREDICATE: integer digit     CHAR: 0 CHAR: 9 between? ;
 PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
+PREDICATE: integer control   "\0\e\r\n\t\u0008\u007f" member? ;
+
+: ch>lower ( n -- n ) dup LETTER? [ HEX: 20 + ] when ;
+: ch>upper ( n -- n ) dup letter? [ HEX: 20 - ] when ;
+: >lower ( str -- str ) [ ch>lower ] map ;
+: >upper ( str -- str ) [ ch>upper ] map ;
 
 : quotable? ( ch -- ? )
     #! In a string literal, can this character be used without

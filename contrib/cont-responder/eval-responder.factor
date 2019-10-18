@@ -55,15 +55,15 @@ USE: sequences
 : display-eval-form ( url -- )
   #! Display the components for allowing entry of 
   #! factor words to be evaluated.
-  <form name= "main" method= "post" action= form>     
+  <form "main" =name "post" =method =action form>     
     [
       [
-        <textarea name= "eval" rows= "10" cols= "40" textarea> 
+        <textarea "eval" =name "10" =rows "40" =cols textarea> 
           "" write 
         </textarea>
       ]
       [
-        <input type= "submit" value= "Evaluate" accesskey= "e" input/>  
+        <input "submit" =type "Evaluate" =value "e" =accesskey input/>  
       ]
     ] vertical-layout
   </form> 
@@ -73,7 +73,7 @@ USE: sequences
   #! Replace occurrences of single quotes with
   #! backslash quote.
   [
-    [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc [ % ] [ % ] ?ifte ] each
+    [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc [ % ] [ % ] ?if ] each
   ] "" make ;
  
 : make-eval-javascript ( string -- string )
@@ -83,11 +83,11 @@ USE: sequences
 : write-eval-link ( string -- )
   #! Given text to evaluate, create an A HREF link which when
   #! clicked sets the eval textarea to that value.
-  <a href= "#" onclick= dup make-eval-javascript a> write </a> ;
+  <a "#" =href dup make-eval-javascript =onclick a> write </a> ;
 
 : display-stack ( list -- )
   #! Write out html to display the stack.
-  <table border= "1" table> 
+  <table "1" =border table> 
     <tr> <th> "Callstack" write </th> </tr>
     [ <tr> <td> [ unparse write ] string-out write-eval-link </td> </tr> ] each
   </table> ;
@@ -101,7 +101,7 @@ USE: sequences
 
 : display-history ( list -- )
   #! Write out html to display the history.
-  <table border= "1" table> 
+  <table "1" =border table> 
     <tr> <th> "History" write display-clear-history-link </th> </tr>
     [ <tr> <td> write-eval-link </td> </tr> ] each
   </table> ;
@@ -115,17 +115,17 @@ USE: sequences
   #! Return an html fragment dispaying the source
   #! of the given word.
   dup dup
-  {{ }} clone [
+  [
     "browser" "responder" set
-    <table border= "1" table> 
-      <tr> <th colspan= "2" th> "Source" write </th> </tr>
-      <tr> <td colspan= "2" td> [ [ parse ] [ [ "No such word" write ] [ car see ] ifte ] catch ] with-simple-html-output </td> </tr>
+    <table "1" =border table> 
+      <tr> <th "2" =colspan th> "Source" write </th> </tr>
+      <tr> <td "2" =colspan td> [ [ parse ] catch [ "No such word" write ] [ car see ] if ] with-simple-html-output </td> </tr>
       <tr> <th> "Apropos" write </th> <th> "Usages" write </th> </tr>
-      <tr> <td valign= "top" td> [ apropos ] with-simple-html-output </td> 
-           <td valign= "top" td> [ [ parse ] [ [ "No such word" write ] [ car usages. ] ifte ] catch ] with-simple-html-output </td>
+      <tr> <td "top" =valign td> [ apropos ] with-simple-html-output </td> 
+           <td "top" =valign td> [ [ parse ] catch [ "No such word" write ] [ car usages. ] if ] with-simple-html-output </td>
       </tr>
     </table>
-  ] bind ;
+  ] make-hash ;
 
 : display-word-see-form ( url -- )
   #! Write out the html for code that accepts
@@ -137,13 +137,13 @@ USE: sequences
       "see" [ html-for-word-source ] live-search
     ]
     [
-      <div id= "see" div> "" write </div>
+      <div "see" =id div> "" write </div>
     ]
   ] vertical-layout ;
 
 : display-last-output ( string -- )
   #! Write out html to display the last output.
-  <table border= "1" table> 
+  <table "1" =border table> 
     <tr> <th> "Last Output" write </th> </tr>
     <tr> <td> <pre> write </pre> </td> </tr>
   </table> ;
@@ -174,6 +174,8 @@ USE: sequences
     "eval" get
   ] bind ;
    
+: >pop> dup pop* ;
+
 : infra ( list quot -- list )
   #! Call the quotation using 'list' as the datastack
   #! return the result datastack as a list.
@@ -227,9 +229,8 @@ USE: sequences
   [
     [ 
       run-eval-requester 
-    ] [
-      dup [ show-message-page ] [ drop ] ifte
     ] catch 
+    dup [ show-message-page ] [ drop ] if
   ] forever ;
 
 "eval" [ [ ] "None" [ ] <evaluator> eval-responder ] install-cont-responder

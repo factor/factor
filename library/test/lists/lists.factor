@@ -17,9 +17,5 @@ USING: kernel lists sequences test ;
 [ t ] [ [ 1 2 ]   list? ] unit-test
 [ f ] [ [[ 1 2 ]] list? ] unit-test
 
-[ [ 1 2 3 ] ] [ 1 [ 2 3 ]   unique ] unit-test
-[ [ 1 2 3 ] ] [ 1 [ 1 2 3 ] unique ] unit-test
-[ [ 1 2 3 ] ] [ 2 [ 1 2 3 ] unique ] unit-test
-
 [ [ ]         ] [ 0   >list ] unit-test
 [ [ 0 1 2 3 ] ] [ 4   >list ] unit-test

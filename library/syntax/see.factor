@@ -1,11 +1,11 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USING: generic hashtables io kernel lists namespaces sequences
-styles words ;
+USING: generic hashtables io kernel lists math namespaces
+sequences strings styles words ;
 
 : declaration. ( word prop -- )
-    tuck word-name word-prop [ pprint-word ] [ drop ] ifte ;
+    tuck word-name word-prop [ pprint-word ] [ drop ] if ;
 
 : declarations. ( word -- )
     [
@@ -19,6 +19,7 @@ styles words ;
     [ [[ font-style italic ]] ] text ;
 
 : stack-picture% ( seq -- string )
+    dup integer? [ object <repeated> ] when
     [ word-name % " " % ] each ;
 
 : effect>string ( effect -- string )
@@ -33,23 +34,27 @@ styles words ;
     dup "stack-effect" word-prop [ ] [
         "infer-effect" word-prop
         dup [ effect>string ] when
-    ] ?ifte ;
+    ] ?if ;
 
 : stack-effect. ( string -- )
     [ "(" swap ")" append3 comment. ] when* ;
 
 : in. ( word -- )
-    <block \ IN: pprint-word word-vocabulary f text block;
-    newline ;
+    <block \ IN: pprint-word word-vocabulary f text block; ;
 
-: definer. ( word -- )
+: (synopsis) ( word -- )
+    dup in.
     dup definer pprint-word
     dup pprint-word
     stack-effect stack-effect. ;
 
+: synopsis ( word -- string )
+    #! Output a brief description of the word in question.
+    [ 0 margin set [ (synopsis) ] with-pprint ] string-out ;
+
 GENERIC: (see) ( word -- )
 
-M: word (see) definer. newline ;
+M: word (see) drop ;
 
 : documentation. ( word -- )
     "documentation" word-prop [
@@ -59,63 +64,71 @@ M: word (see) definer. newline ;
 : pprint-; \ ; pprint-word ;
 
 : see-body ( quot word -- )
-    dup definer. <block dup documentation. swap pprint-elements
+    <block dup documentation. swap pprint-elements
     pprint-; declarations. block; ;
 
 M: compound (see)
-    dup word-def swap see-body newline ;
+    dup word-def swap see-body ;
 
 : method. ( word [[ class method ]] -- )
     \ M: pprint-word
     unswons pprint-word
     swap pprint-word
     <block pprint-elements pprint-;
-    block; newline ;
+    block; ;
 
 M: generic (see)
-    dup dup "combination" word-prop swap see-body newline
-    dup methods [ method. ] each-with ;
+    dup dup "combination" word-prop swap see-body
+    dup methods [ newline method. ] each-with ;
 
 GENERIC: class. ( word -- )
 
 : methods. ( class -- )
     #! List all methods implemented for this class.
-    dup metaclass [
+    dup class? [
         dup implementors [
+            newline
             dup in. tuck "methods" word-prop hash* method.
         ] each-with
     ] [
         drop
-    ] ifte ;
+    ] if ;
 
 M: union class.
+    newline
     \ UNION: pprint-word
     dup pprint-word
-    "members" word-prop pprint-elements pprint-; newline ;
+    members pprint-elements pprint-; ;
 
 M: predicate class.
+    newline
     \ PREDICATE: pprint-word
-    dup "superclass" word-prop pprint-word
+    dup superclass pprint-word
     dup pprint-word
     <block
     "definition" word-prop pprint-elements
-    pprint-; block; newline ;
+    pprint-; block; ;
 
 M: tuple-class class.
+    newline
     \ TUPLE: pprint-word
     dup pprint-word
     "slot-names" word-prop [ f text ] each
-    pprint-; newline ;
+    pprint-; ;
 
 M: word class. drop ;
 
 : see ( word -- )
-    [ dup in. dup (see) dup class. methods. ] with-pprint ;
+    [
+        dup (synopsis)
+        dup (see)
+        dup class.
+        methods.
+        newline
+    ] with-pprint ;
 
 : (apropos) ( substring -- seq )
-    vocabs [
-        words [ word-name subseq? ] subset-with
-    ] map-with concat ;
+    all-words [ word-name [ subseq? ] completion? ] subset-with ;
 
 : apropos ( substring -- )
     #! List all words that contain a string.

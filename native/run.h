@@ -1,4 +1,4 @@
-#define USER_ENV 16
+#define USER_ENV 32
 
 #define CARD_OFF_ENV   1 /* for compiling set-slot */
 /* 2 is unused */
@@ -8,27 +8,23 @@
 #define CATCHSTACK_ENV 6 /* used by library only */
 #define CPU_ENV        7
 #define BOOT_ENV       8
-/* 9 is unused */
+#define CALLCC_1_ENV   9 /* used by library only */
 #define ARGS_ENV       10
 #define OS_ENV         11
 #define ERROR_ENV      12 /* a marker consed onto kernel errors */
 #define IN_ENV         13
 #define OUT_ENV        14
 #define GEN_ENV        15 /* set to gen_count */
+#define IMAGE_ENV      16 /* image name */
 
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];
 
-/* Error handlers restore this */
-#ifdef WIN32
-jmp_buf toplevel;
-#else
-sigjmp_buf toplevel;
-#endif
+/* boolean: if true, next interruption check raises exception to user code */
+DLLEXPORT bool interrupt;
 
-/* Call stack depth to start profile counter from */
-/* This ensures that words in the user's interpreter do not count */
-CELL profile_depth;
+/* Error handlers restore this */
+JMP_BUF toplevel;
 
 INLINE CELL dpop(void)
 {
@@ -87,9 +83,9 @@ INLINE void call(CELL quot)
 
 void run(void);
 void platform_run(void);
-void undefined(F_WORD* word);
-void docol(F_WORD* word);
-void dosym(F_WORD* word);
+void undefined(F_WORD *word);
+void docol(F_WORD *word);
+void dosym(F_WORD *word);
 void primitive_execute(void);
 void primitive_call(void);
 void primitive_ifte(void);

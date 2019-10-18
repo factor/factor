@@ -105,7 +105,7 @@ END-STRUCT
 ! UpdateRects, UpdateRect
 
 : SDL_Flip ( surface -- )
-    "bool" "sdl" "SDL_Flip" [ "surface*" ] alien-invoke ;
+    "void" "sdl" "SDL_Flip" [ "surface*" ] alien-invoke ;
 
 ! SDL_SetGamma: float types
 
@@ -141,3 +141,6 @@ END-STRUCT
 : SDL_WM_SetCaption ( title icon -- )
     "void" "sdl" "SDL_WM_SetCaption"
     [ "char*" "char*" ] alien-invoke ;
+
+: SDL_GL_SwapBuffers ( -- )
+    "void" "sdl" "SDL_GL_SwapBuffers" [ ] alien-invoke ;

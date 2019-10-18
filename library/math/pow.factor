@@ -9,16 +9,11 @@ USING: errors kernel math math-internals ;
 : exp >rect swap fexp swap polar> ; inline
 : log >polar swap flog swap rect> ; inline
 
-: sqrt ( z -- sqrt )
-    >polar dup pi = [
-        drop fsqrt 0 swap rect>
-    ] [
-        swap fsqrt swap 2 / polar>
-    ] ifte ; foldable
+GENERIC: sqrt ( n -- n ) foldable
 
-: norm ( vec -- n ) norm-sq sqrt ;
+M: complex sqrt >polar swap fsqrt swap 2 / polar> ;
 
-: normalize ( vec -- vec ) dup norm v/n ;
+M: real sqrt dup 0 < [ neg fsqrt 0 swap rect> ] [ fsqrt ] if ;
 
 GENERIC: ^ ( z w -- z^w ) foldable
 
@@ -38,7 +33,7 @@ M: number ^ ( z w -- z^w )
         2drop
     ] [
         2dup >r >r >r 1 bitand r> call r> -1 shift r> each-bit
-    ] ifte ; inline
+    ] if ; inline
 
 : (integer^) ( z w -- z^w )
     1 swap [ 1 number= [ dupd * ] when >r sq r> ] each-bit nip ;
@@ -48,18 +43,5 @@ M: integer ^ ( z w -- z^w )
     over 0 number= over 0 number= and [
         "0^0 is not defined" throw
     ] [
-        dup 0 < [ neg ^ recip ] [ (integer^) ] ifte
-    ] ifte ; foldable
-
-: (^mod) ( n z w -- z^w )
-    1 swap [
-        1 number= [ dupd * pick mod ] when >r sq over mod r>
-    ] each-bit 2nip ; inline
-
-: ^mod ( z w n -- z^w )
-    #! Compute z^w mod n.
-    over 0 < [
-        [ >r neg r> ^mod ] keep mod-inv
-    ] [
-        -rot (^mod)
-    ] ifte ; foldable
+        dup 0 < [ neg ^ recip ] [ (integer^) ] if
+    ] if ;

@@ -1,20 +1,15 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-editors
-USING: gadgets gadgets-labels gadgets-layouts gadgets-scrolling
-generic kernel math namespaces sdl sequences strings styles
-threads vectors ;
+USING: arrays freetype gadgets gadgets-labels gadgets-layouts
+gadgets-menus gadgets-scrolling gadgets-theme generic kernel
+lists math namespaces sequences strings styles threads ;
 
 ! A blinking caret
 TUPLE: caret ;
 
 C: caret ( -- caret )
-    <plain-gadget> over set-delegate
-    dup red background set-paint-prop ;
-
-: toggle-visible ( gadget -- )
-    dup gadget-visible? not over set-gadget-visible?
-    relayout ;
+    dup delegate>gadget dup caret-theme ;
 
 M: caret tick ( ms caret -- ) nip toggle-visible ;
 
@@ -27,21 +22,23 @@ M: caret tick ( ms caret -- ) nip toggle-visible ;
     dup remove-timer unparent ;
 
 : reset-caret ( caret -- )
-    dup restart-timer t swap set-gadget-visible? ;
+    dup restart-timer show-gadget ;
 
 USE: line-editor
 
 ! An editor gadget wraps a line editor object and passes
 ! gestures to the line editor.
 
-TUPLE: editor line caret ;
+TUPLE: editor line caret font color ;
+
+: scroll>caret ( editor -- ) editor-caret scroll-to ;
 
 : with-editor ( editor quot -- )
     #! Execute a quotation in the line editor scope, then
     #! update the display.
     swap [ editor-line swap bind ] keep
     dup editor-caret reset-caret
-    dup relayout scroll>bottom ; inline
+    dup relayout scroll>caret ; inline
 
 : editor-text ( editor -- text )
     editor-line [ line-text get ] bind ;
@@ -57,62 +54,107 @@ TUPLE: editor line caret ;
 
 : run-char-widths ( font str -- wlist )
     #! List of x co-ordinates of each character.
-    >vector [ ch>string size-string drop ] map-with
+    >array [ char-width ] map-with
     dup 0 [ + ] accumulate swap 2 v/n v+ ;
 
 : x>offset ( x font str -- offset )
     dup >r run-char-widths [ <= ] find-with drop dup -1 =
-    [ drop r> length ] [ r> drop ] ifte ;
+    [ drop r> length ] [ r> drop ] if ;
 
 : set-caret-x ( x editor -- )
     #! Move the caret to a clicked location.
     dup [
-        gadget-font line-text get x>offset caret set
+        label-font* line-text get x>offset set-caret-pos
     ] with-editor ;
 
 : click-editor ( editor -- )
-    dup hand relative first over set-caret-x request-focus ;
+    dup hand get relative first over set-caret-x request-focus ;
+
+: popup-location ( editor -- loc )
+    dup screen-loc swap editor-caret rect-extent nip v+ ;
+
+: <completion-item> ( completion editor -- menu-item )
+    dupd [ [ complete ] with-editor drop ] curry curry cons ;
+
+: <completion-menu> ( editor completions -- menu )
+    [ swap <completion-item> ] map-with <menu> ;
+
+: completion-menu ( editor completions -- )
+    over >r <completion-menu> r> popup-location show-menu ;
+
+: do-completion-1 ( editor completions -- )
+    swap [ first complete ] with-editor ;
+
+: do-completion ( editor -- )
+    dup [ completions ] with-editor {
+        { [ dup empty? ] [ 2drop ] }
+        { [ dup length 1 = ] [ do-completion-1 ] }
+        { [ t ] [ completion-menu ] }
+    } cond ;
 
 : editor-actions ( editor -- )
-    [
+    H{
         [[ [ gain-focus ] [ focus-editor ] ]]
         [[ [ lose-focus ] [ unfocus-editor ] ]]
         [[ [ button-down 1 ] [ click-editor ] ]]
-        [[ [ "BACKSPACE" ] [ [ backspace ] with-editor ] ]]
-        [[ [ "LEFT" ] [ [ left ] with-editor ] ]]
-        [[ [ "RIGHT" ] [ [ right ] with-editor ] ]]
+        [[ [ "BACKSPACE" ] [ [ T{ char-elt } delete-prev-elt ] with-editor ] ]]
+        [[ [ "DELETE" ] [ [ T{ char-elt } delete-next-elt ] with-editor ] ]]
+        [[ [ "CTRL" "BACKSPACE" ] [ [ T{ word-elt } delete-prev-elt ] with-editor ] ]]
+        [[ [ "CTRL" "DELETE" ] [ [ T{ word-elt } delete-next-elt ] with-editor ] ]]
+        [[ [ "ALT" "BACKSPACE" ] [ [ T{ document-elt } delete-prev-elt ] with-editor ] ]]
+        [[ [ "ALT" "DELETE" ] [ [ T{ document-elt } delete-next-elt ] with-editor ] ]]
+        [[ [ "LEFT" ] [ [ T{ char-elt } prev-elt ] with-editor ] ]]
+        [[ [ "RIGHT" ] [ [ T{ char-elt } next-elt ] with-editor ] ]]
+        [[ [ "CTRL" "LEFT" ] [ [ T{ word-elt } prev-elt ] with-editor ] ]]
+        [[ [ "CTRL" "RIGHT" ] [ [ T{ word-elt } next-elt ] with-editor ] ]]
+        [[ [ "HOME" ] [ [ T{ document-elt } prev-elt ] with-editor ] ]]
+        [[ [ "END" ] [ [ T{ document-elt } next-elt ] with-editor ] ]]
         [[ [ "CTRL" "k" ] [ [ line-clear ] with-editor ] ]]
-        [[ [ "HOME" ] [ [ home ] with-editor ] ]]
-        [[ [ "END" ] [ [ end ] with-editor ] ]]
-    ] swap add-actions ;
+        [[ [ "TAB" ] [ do-completion ] ]]
+    } add-actions ;
 
 C: editor ( text -- )
-    <gadget> over set-delegate
+    dup delegate>gadget
+    dup editor-theme
     <line-editor> over set-editor-line
     <caret> over set-editor-caret
     [ set-editor-text ] keep
     dup editor-actions ;
 
 : offset>x ( gadget offset str -- x )
-    head >r gadget-font r> size-string drop ;
+    head-slice >r label-font* r> string-width ;
 
 : caret-loc ( editor -- x y )
-    dup editor-line [ caret get line-text get ] bind offset>x
-    0 0 3vector ;
+    dup editor-line [ caret-pos line-text get ] bind offset>x
+    0 0 3array ;
 
 : caret-dim ( editor -- w h )
     rect-dim { 0 1 1 } v* { 1 0 0 } v+ ;
 
 M: editor user-input* ( ch editor -- ? )
-    [ insert-char ] with-editor  t ;
+    [ insert-char ] with-editor f ;
 
 M: editor pref-dim ( editor -- dim )
-    dup editor-text label-size { 1 0 0 } v+ ;
+    label-size { 1 0 0 } v+ ;
 
 M: editor layout* ( editor -- )
     dup editor-caret over caret-dim swap set-gadget-dim
     dup editor-caret swap caret-loc swap set-rect-loc ;
 
-M: editor draw-gadget* ( editor -- )
-    dup delegate draw-gadget*
-    dup editor-text draw-string ;
+M: editor label-text editor-text ;
+
+M: editor label-color editor-color ;
+
+M: editor label-font editor-font ;
+
+M: editor set-label-text set-editor-text ;
+
+M: editor set-label-color set-editor-color ;
+
+M: editor set-label-font set-editor-font ;
+
+M: editor draw-gadget* ( editor -- ) draw-label ;
+
+: set-possibilities ( possibilities editor -- )
+    #! Set completion possibilities.
+    [ possibilities set ] with-editor ;

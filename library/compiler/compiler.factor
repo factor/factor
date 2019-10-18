@@ -1,30 +1,22 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 IN: compiler
 USING: compiler-backend compiler-frontend errors inference io
-kernel lists math namespaces prettyprint sequences words ;
+kernel lists math namespaces optimizer prettyprint sequences
+words ;
 
 : supported-cpu? ( -- ? )
     cpu "unknown" = not ;
 
-GENERIC: (compile) ( word -- )
+: precompile ( quotation -- basic-blocks )
+    dataflow optimize linearize split-blocks simplify ;
 
-M: word (compile) drop ;
-
-M: compound (compile) ( word -- )
+: (compile) ( word -- )
     #! Should be called inside the with-compiler scope.
-    "Compiling " write dup .
-    dup word-def dataflow optimize linearize simplify generate ;
-
-: precompile ( word -- )
-    #! Print linear IR of word.
-    [
-        word-def dataflow optimize linearize simplify [ . ] each
-    ] with-scope ;
+    "Compiling " write dup . dup word-def precompile generate ;
 
 : compile-postponed ( -- )
-    compile-words get [
-        uncons compile-words set (compile) compile-postponed
-    ] when* ;
+    compile-words get dup empty?
+    [ dup pop (compile) compile-postponed ] unless drop ;
 
 : compile ( word -- )
     [ postpone-word compile-postponed ] with-compiler ;
@@ -34,12 +26,11 @@ M: compound (compile) ( word -- )
     "compile" get [ word compile ] when ; parsing
 
 : try-compile ( word -- )
-    [ compile ] [ error. ] catch ;
+    [ compile ] [ error. drop ] recover ;
 
 : compile-all ( -- ) [ try-compile ] each-word ;
 
-: recompile ( word -- )
-    dup update-xt compile ;
+: recompile ( word -- ) dup update-xt compile ;
 
 : compile-1 ( quot -- )
     #! Compute and call a quotation.
@@ -47,4 +38,4 @@ M: compound (compile) ( word -- )
         gensym [ swap define-compound ] keep dup compile execute
     ] [
         call
-    ] ifte ;
+    ] if ;

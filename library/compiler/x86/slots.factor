@@ -8,45 +8,45 @@ M: %slot generate-node ( vop -- )
     dest/src
     ! turn tagged fixnum slot # into an offset, multiple of 4
     dup 1 SHR
-    ! compute slot address in vop-out-1
+    ! compute slot address in 0 vop-out
     dupd ADD
-    ! load slot value in vop-out-1
+    ! load slot value in 0 vop-out
     dup unit MOV ;
 
 M: %fast-slot generate-node ( vop -- )
-    dup vop-in-1 swap vop-out-1 v>operand tuck >r 2list r>
+    dup 0 vop-in swap 0 vop-out v>operand tuck >r 2list r>
     swap MOV ;
 
 : card-offset 1 getenv ;
 
 M: %write-barrier generate-node ( vop -- )
     #! Mark the card pointed to by vreg.
-    vop-in-1 v>operand
+    0 vop-in v>operand
     dup card-bits SHR
     card-offset 2list card-mark OR
     0 rel-cards ;
 
 M: %set-slot generate-node ( vop -- )
-    dup vop-in-3 v>operand over vop-in-2 v>operand
+    dup 2 vop-in v>operand over 1 vop-in v>operand
     ! turn tagged fixnum slot # into an offset, multiple of 4
     over 1 SHR
-    ! compute slot address in vop-in-2
+    ! compute slot address in 1 vop-in
     dupd ADD
     ! store new slot value
-    >r vop-in-1 v>operand r> unit swap MOV ;
+    >r 0 vop-in v>operand r> unit swap MOV ;
 
 M: %fast-set-slot generate-node ( vop -- )
-    dup vop-in-3 over vop-in-2 v>operand
-    swap 2list swap vop-in-1 v>operand MOV ;
+    dup 2 vop-in over 1 vop-in v>operand
+    swap 2list swap 0 vop-in v>operand MOV ;
 
 : userenv@ ( n -- addr )
     cell * "userenv" f dlsym + ;
 
 M: %getenv generate-node ( vop -- )
-    dup vop-out-1 v>operand swap vop-in-1
+    dup 0 vop-out v>operand swap 0 vop-in
     [ userenv@ unit MOV ] keep 0 rel-userenv ;
 
 M: %setenv generate-node ( vop -- )
-    dup vop-in-2
-    [ userenv@ unit swap vop-in-1 v>operand MOV ] keep
+    dup 1 vop-in
+    [ userenv@ unit swap 0 vop-in v>operand MOV ] keep
     0 rel-userenv ;

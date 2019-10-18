@@ -32,3 +32,6 @@ USE: test
 
 [ t ] [ pi double>bits bits>double pi = ] unit-test
 [ t ] [ e double>bits bits>double e = ] unit-test
+
+[ 2.0 ] [ 1.0 1+ ] unit-test
+[ 0.0 ] [ 1.0 1- ] unit-test

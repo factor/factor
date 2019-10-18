@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USING: alien generic hashtables io kernel lists math namespaces
-parser sequences strings styles vectors words ;
+USING: alien arrays generic hashtables io kernel lists math
+namespaces parser sequences strings styles vectors words ;
 
 ! State
 SYMBOL: column
@@ -27,7 +27,7 @@ global [
     0 column set
     0 indent set
     0 last-newline set
-    0 line-count set
+    1 line-count set
     string-limit off
 ] bind
 
@@ -43,9 +43,6 @@ C: section ( length -- section )
     [ set-section-start ] keep
     0 over set-section-indent ;
 
-: section-fits? ( section -- ? )
-    section-end last-newline get - indent get + margin get <= ;
-
 : line-limit? ( -- ? )
     line-limit get dup [ line-count get <= ] when ;
 
@@ -57,15 +54,15 @@ C: section ( length -- section )
         drop
     ] [
         last-newline set
+        line-limit? [ "..." write end-printing get continue ] when
         line-count inc
-        line-limit? [ "..." write end-printing get call ] when
         "\n" write do-indent
-    ] ifte ;
+    ] if ;
 
 TUPLE: text string style ;
 
 C: text ( string style -- section )
-    pick length 1 + <section> over set-delegate
+    pick length 1+ <section> over set-delegate
     [ set-text-style ] keep
     [ set-text-string ] keep ;
 
@@ -76,21 +73,21 @@ TUPLE: block sections ;
 
 C: block ( -- block )
     0 <section> over set-delegate
-    { } clone over set-block-sections
+    V{ } clone over set-block-sections
     t over set-section-nl-after?
     tab-size get over set-section-indent ;
 
 : pprinter-block pprinter-stack peek ;
 
 : block-empty? ( section -- ? )
-    dup block? [ block-sections empty? ] [ drop f ] ifte ;
+    dup block? [ block-sections empty? ] [ drop f ] if ;
 
 : add-section ( section stream -- )
     over block-empty? [
         2drop
     ] [
         pprinter-block block-sections push
-    ] ifte ;
+    ] if ;
 
 : text ( string style -- ) <text> pprinter get add-section ;
 
@@ -103,11 +100,22 @@ C: block ( -- block )
     dup section-start fresh-line dup pprint-section*
     dup indent>
     dup section-nl-after?
-    [ section-end fresh-line ] [ drop ] ifte ;
+    [ section-end fresh-line ] [ drop ] if ;
+
+: section-fits? ( section -- ? )
+    margin get dup 0 = [
+        2drop t
+    ] [
+        line-limit? pick block? and [
+            2drop t
+        ] [
+            >r section-end last-newline get - indent get + r> <=
+        ] if
+    ] if ;
 
 : pprint-section ( section -- )
     dup section-fits?
-    [ pprint-section* ] [ inset-section ] ifte ;
+    [ pprint-section* ] [ inset-section ] if ;
 
 TUPLE: newline ;
 
@@ -122,7 +130,7 @@ M: newline pprint-section* ( newline -- )
         drop
     ] [
         section-start last-newline get = [ " " write ] unless
-    ] ifte ;
+    ] if ;
 
 M: block pprint-section* ( block -- )
     f swap block-sections [
@@ -155,27 +163,26 @@ M: block pprint-section* ( block -- )
 : end-blocks ( -- ) last-block? [ (block>) end-blocks ] unless ;
 
 C: pprinter ( -- stream )
-    <block> 1vector over set-pprinter-stack ;
+    <block> 1 <vector> [ push ] keep over set-pprinter-stack ;
 
 : do-pprint ( pprinter -- )
     [
         end-printing set
         dup pprinter-block pprint-section
-        end-blocks
     ] callcc0 drop ;
 
 GENERIC: pprint* ( obj -- )
 
 : vocab-style ( vocab -- style )
-    {{
-        [[ "syntax" [ [[ foreground [ 128 128 128 ] ]] ] ]]
-        [[ "kernel" [ [[ foreground [ 0 0 128 ] ]] ] ]]
-        [[ "sequences" [ [[ foreground [ 128 0 0 ] ]] ] ]]
-        [[ "math" [ [[ foreground [ 0 128 0 ] ]] ] ]]
-        [[ "math-internals" [ [[ foreground [ 192 0 0 ] ]] ] ]]
-        [[ "kernel-internals" [ [[ foreground [ 192 0 0 ] ]] ] ]]
-        [[ "io-internals" [ [[ foreground [ 192 0 0 ] ]] ] ]]
-    }} hash ;
+    H{
+        [[ "syntax" [ [[ foreground { 0.5 0.5 0.5 1.0 } ]] ] ]]
+        [[ "kernel" [ [[ foreground { 0.0 0.0 0.5 1.0 } ]] ] ]]
+        [[ "sequences" [ [[ foreground { 0.5 0.0 0.0 1.0 } ]] ] ]]
+        [[ "math" [ [[ foreground { 0.0 0.5 0.0 1.0 } ]] ] ]]
+        [[ "math-internals" [ [[ foreground { 0.75 0.0 0.0 1.0 } ]] ] ]]
+        [[ "kernel-internals" [ [[ foreground { 0.75 0.0 0.0 1.0 } ]] ] ]]
+        [[ "io-internals" [ [[ foreground { 0.75 0.0 0.0 1.0 } ]] ] ]]
+    } hash ;
 
 : word-style ( word -- style )
     dup word-vocabulary vocab-style swap presented swons add ;
@@ -191,7 +198,7 @@ M: object pprint* ( obj -- )
 M: real pprint* ( obj -- ) number>string f text ;
 
 : ch>ascii-escape ( ch -- esc )
-    {{
+    H{
         [[ CHAR: \e "\\e"  ]]
         [[ CHAR: \n "\\n"  ]]
         [[ CHAR: \r "\\r"  ]]
@@ -199,7 +206,7 @@ M: real pprint* ( obj -- ) number>string f text ;
         [[ CHAR: \0 "\\0"  ]]
         [[ CHAR: \\ "\\\\" ]]
         [[ CHAR: \" "\\\"" ]]
-    }} hash ;
+    } hash ;
 
 : ch>unicode-escape ( ch -- esc )
     >hex 4 CHAR: 0 pad-left "\\u" swap append ;
@@ -208,8 +215,8 @@ M: real pprint* ( obj -- ) number>string f text ;
     dup quotable? [
         ,
     ] [
-        dup ch>ascii-escape [ ] [ ch>unicode-escape ] ?ifte %
-    ] ifte ;
+        dup ch>ascii-escape [ ] [ ch>unicode-escape ] ?if %
+    ] if ;
 
 : do-string-limit ( string -- string )
     string-limit get [
@@ -227,11 +234,9 @@ M: string pprint* ( str -- str ) "\"" pprint-string ;
 M: sbuf pprint* ( str -- str ) "SBUF\" " pprint-string ;
 
 M: word pprint* ( word -- )
-    dup "pprint-before-hook" word-prop call
+    dup "pprint-close" word-prop [ block> ] when
     dup pprint-word
-    "pprint-after-hook" word-prop call ;
-
-M: t pprint* drop "t" f text ;
+    "pprint-open" word-prop [ <block ] when ;
 
 M: f pprint* drop "f" f text ;
 
@@ -252,13 +257,13 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
             over recursion-check [ cons ] change
             call
             recursion-check [ cdr ] change
-        ] ifte
-    ] ifte ; inline
+        ] if
+    ] if ; inline
 
 : length-limit? ( seq -- seq ? )
     length-limit get dup
-    [ swap 2dup length < [ head t ] [ nip f ] ifte ]
-    [ drop f ] ifte ;
+    [ swap 2dup length < [ head t ] [ nip f ] if ]
+    [ drop f ] if ;
 
 : pprint-element ( object -- )
     dup parsing? [ \ POSTPONE: pprint-word ] when pprint* ;
@@ -266,32 +271,35 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 : pprint-elements ( seq -- )
     length-limit? >r
     [ pprint-element ] each
-    r> [ "... " f text ] when ;
+    r> [ "..." f text ] when ;
 
 : pprint-sequence ( seq start end -- )
     swap pprint* swap pprint-elements pprint* ;
 
 M: complex pprint* ( num -- )
-    >rect 2vector \ #{ \ }# pprint-sequence ;
+    >rect 2array \ C{ \ } pprint-sequence ;
 
 M: cons pprint* ( list -- )
    [
-       dup list? [ \ [ \ ] ] [ uncons 2vector \ [[ \ ]] ] ifte
+       dup list? [ \ [ \ ] ] [ uncons 2array \ [[ \ ]] ] if
        pprint-sequence
    ] check-recursion ;
 
-M: vector pprint* ( vector -- )
+M: array pprint* ( vector -- )
     [ \ { \ } pprint-sequence ] check-recursion ;
 
+M: vector pprint* ( vector -- )
+    [ \ V{ \ } pprint-sequence ] check-recursion ;
+
 M: hashtable pprint* ( hashtable -- )
-    [ hash>alist \ {{ \ }} pprint-sequence ] check-recursion ;
+    [ hash>alist \ H{ \ } pprint-sequence ] check-recursion ;
 
 M: tuple pprint* ( tuple -- )
     [
-        \ << pprint*
-        <mirror> dup first pprint*
+        \ T{ pprint*
+        tuple>array dup first pprint*
         <block 1 swap tail-slice pprint-elements block>
-        \ >> pprint*
+        \ } pprint*
     ] check-recursion ;
 
 M: alien pprint* ( alien -- )
@@ -299,14 +307,14 @@ M: alien pprint* ( alien -- )
         drop "( alien expired )"
     ] [
         \ ALIEN: pprint-word alien-address number>string
-    ] ifte f text ;
+    ] if f text ;
 
 M: wrapper pprint* ( wrapper -- )
     dup wrapped word? [
         \ \ pprint-word wrapped pprint-word
     ] [
-        wrapped 1vector \ W[ \ ]W pprint-sequence
-    ] ifte ;
+        wrapped 1array \ W{ \ } pprint-sequence
+    ] if ;
 
 : with-pprint ( quot -- )
     [
@@ -316,9 +324,9 @@ M: wrapper pprint* ( wrapper -- )
 
 : pprint ( object -- ) [ pprint* ] with-pprint ;
 
-: unparse ( object -- str ) [ pprint ] string-out ;
-
 : . ( obj -- ) pprint terpri ;
+
+: unparse ( object -- str ) [ pprint ] string-out ;
 
 : pprint-short ( object -- string )
     [
@@ -329,37 +337,21 @@ M: wrapper pprint* ( wrapper -- )
         pprint
     ] with-scope ;
 
-: unparse-short ( object -- str ) [ pprint-short ] string-out ;
+: short. ( object -- ) pprint-short terpri ;
 
-: short. ( object -- )
-    dup unparse-short swap write-object terpri ;
-
-: sequence. ( sequence -- ) [ short. ] each ;
-
-: stack. ( sequence -- ) reverse-slice sequence. ;
-
-: .s datastack stack. ;
-: .r callstack stack. ;
+: unparse-short ( object -- string ) [ pprint-short ] string-out ;
 
 ! For integers only
 : .b >bin print ;
 : .o >oct print ;
 : .h >hex print ;
 
-: define-open
-    #! The word will be pretty-printed as a block opener.
-    #! Examples are [ { {{ [[ << and so on.
-    [ <block ] "pprint-after-hook" set-word-prop ;
-
-: define-close ( word -- )
-    #! The word will be pretty-printed as a block closer.
-    #! Examples are ] } }} ]] >> and so on.
-    [ block> ] "pprint-before-hook" set-word-prop ;
+{ 
+    POSTPONE: [ POSTPONE: [[
+    POSTPONE: { POSTPONE: V{ POSTPONE: H{
+    POSTPONE: T{ POSTPONE: W{
+} [ t "pprint-open" set-word-prop ] each
 
 {
-    { POSTPONE: [ POSTPONE: ] }
-    { POSTPONE: { POSTPONE: } }
-    { POSTPONE: {{ POSTPONE: }} }
-    { POSTPONE: [[ POSTPONE: ]] }
-    { POSTPONE: [[ POSTPONE: ]] }
-} [ first2 define-close define-open ] each
+    POSTPONE: ] POSTPONE: } POSTPONE: ]]
+} [ t "pprint-close" set-word-prop ] each

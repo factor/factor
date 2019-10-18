@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: inference
-USING: generic hashtables kernel lists math namespaces sequences
-vectors words ;
+IN: optimizer
+USING: arrays generic hashtables inference kernel lists math
+namespaces sequences words ;
 
 ! Method inlining optimization
 
@@ -10,13 +10,13 @@ GENERIC: dispatching-values ( node word -- seq )
 
 M: object dispatching-values 2drop { } ;
 
-M: simple-generic dispatching-values drop node-in-d peek 1vector ;
+M: simple-generic dispatching-values drop node-in-d peek 1array ;
 
 M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 
 : node-classes* ( node seq -- seq )
     >r node-classes r>
-    [ swap hash [ object ] unless* ] map-with ;
+    [ swap ?hash [ object ] unless* ] map-with ;
 
 : dispatching-classes ( node -- seq )
     dup dup node-param dispatching-values node-classes* ;
@@ -34,13 +34,13 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
         dup dispatching-classes dup empty? [
             2drop f
         ] [
-            dup [ = ] monotonic? [
+            dup all-eq? [
                 first swap node-param order min-class
             ] [
                 2drop f
-            ] ifte
-        ] ifte
-    ] ifte ;
+            ] if
+        ] if
+    ] if ;
 
 : will-inline ( node -- quot )
     dup inlining-class swap node-param "methods" word-prop hash ;
@@ -66,9 +66,9 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
         >r dup node-in-d node-classes* first r> related?
     ] [
         2drop f
-    ] ifte ;
+    ] if ;
 
 : optimize-predicate ( #call -- node )
     dup node-param "predicating" word-prop >r
     dup dup node-in-d node-classes* first r> class<
-    1vector inline-literals ;
+    1array inline-literals ;

@@ -10,24 +10,25 @@ words ;
 : define-getter ( offset type name -- )
     #! Define a word with stack effect ( alien -- obj ) in the
     #! current 'in' vocabulary.
-    create-in >r
-    [ "getter" get ] bind cons r> swap define-compound ;
+    create-in >r c-getter cons r> swap define-compound ;
 
 : define-setter ( offset type name -- )
     #! Define a word with stack effect ( obj alien -- ) in the
     #! current 'in' vocabulary.
-    "set-" swap append create-in >r
-    [ "setter" get ] bind cons r> swap define-compound ;
+    "set-" swap append create-in >r c-setter cons r>
+    swap define-compound ;
+
+: c-align c-type [ "align" get ] bind ;
 
 : define-field ( offset type name -- offset )
-    >r c-type dup >r [ "align" get ] bind align r> r>
+    >r dup >r c-align align r> r>
     "struct-name" get swap "-" swap append3
     ( offset type name -- )
     3dup define-getter 3dup define-setter
-    drop [ "width" get ] bind + ;
+    drop c-size + ;
 
 : define-member ( max type -- max )
-    c-type [ "width" get ] bind max ;
+    c-size max ;
 
 : define-struct-type ( width -- )
     #! Define inline and pointer type for the struct. Pointer
@@ -36,6 +37,5 @@ words ;
         "width" set
         cell "align" set
         [ swap <displaced-alien> ] "getter" set
-    ]
-    "struct-name" get define-c-type
+    ] "struct-name" get define-c-type
     "struct-name" get "in" get init-c-type ;

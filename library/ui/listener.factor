@@ -4,45 +4,49 @@ IN: help
 DEFER: <tutorial-button>
 
 IN: gadgets-listener
-USING: gadgets gadgets-labels gadgets-layouts gadgets-panes
-gadgets-presentations gadgets-scrolling gadgets-splitters
-generic help io kernel listener lists math namespaces
-prettyprint sdl sequences shells styles threads words ;
+USING: gadgets gadgets-editors gadgets-labels gadgets-layouts
+gadgets-panes gadgets-presentations gadgets-scrolling
+gadgets-splitters gadgets-theme generic hashtables help
+inspector io kernel listener lists math namespaces prettyprint
+sdl sequences shells styles threads words ;
 
 SYMBOL: datastack-display
 SYMBOL: callstack-display
 
 TUPLE: display title pane ;
 
-: display-title-theme
-    dup { 216 232 255 } background set-paint-prop
-    << solid f >> interior set-paint-prop ;
-
 : <display-title> ( text -- label )
     <label> dup display-title-theme ;
 
 : add-display-title ( title display -- )
-    2dup set-display-title add-top ;
+    2dup set-display-title @top frame-add ;
 
 C: display ( -- display )
-    <frame> over set-delegate
+    dup delegate>frame
     "" <display-title> over add-display-title
-    <pile> 2dup swap set-display-pane
-    <scroller> over add-center ;
-
-: make-presentations ( seq -- seq )
-    [ [ unparse-short <label> ] keep <object-button> ] map ;
+    f f <pane> 2dup swap set-display-pane
+    <scroller> over @center frame-add ;
 
 : present-stack ( seq title display -- )
     [ display-title set-label-text ] keep
-    [
-        display-pane dup clear-gadget
-        >r reverse-slice make-presentations r> add-gadgets
-    ] keep relayout ;
+    [ display-title relayout ] keep
+    display-pane [ stack. ] with-pane ;
+
+: present-datastack ( -- )
+    datastack-hook get call datastack-display get present-stack ;
+
+: present-callstack ( -- )
+    callstack-hook get call callstack-display get present-stack ;
+
+: usable-words ( -- words )
+    "use" get prune [ words ] map concat ;
+
+: word-completion ( -- )
+    usable-words [ word-name ] map
+    pane get pane-input set-possibilities ;
 
 : ui-listener-hook ( -- )
-    datastack-hook get call datastack-display get present-stack
-    callstack-hook get call callstack-display get present-stack ;
+    present-datastack present-callstack word-completion ;
 
 : listener-thread
     pane get [
@@ -58,8 +62,13 @@ C: display ( -- display )
     <display> dup callstack-display set
     1/2 <x-splitter> ;
 
+: <status-bar> ( -- gadget )
+    "" <label> dup status-theme ;
+
 : listener-application ( -- )
-    <pane> dup pane set <scroller> <stack-display>
-    2/3 <x-splitter> add-layer
+    t t <pane> dup pane global set-hash
+    <scroller> <stack-display>
+    2/3 <y-splitter> set-application
+    <status-bar> set-status
     [ clear listener-thread ] in-thread
     pane get request-focus ;

@@ -1,92 +1,86 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-frontend
-USING: compiler-backend errors generic lists inference kernel
-math namespaces prettyprint sequences
-strings words ;
+USING: arrays compiler-backend errors generic inference kernel
+lists math namespaces prettyprint sequences strings words ;
 
-GENERIC: linearize-node* ( node -- )
-
-M: f linearize-node* ( f -- ) drop ;
-
-M: node linearize-node* ( node -- ) drop ;
-
-: linearize-node ( node -- )
-    [
-        dup linearize-node* node-successor linearize-node
-    ] when* ;
+GENERIC: linearize* ( node -- )
 
 : linearize ( dataflow -- linear )
     #! Transform dataflow IR into linear IR. This strips out
     #! stack flow information, and flattens conditionals into
     #! jumps and labels.
-    [ %prologue , linearize-node ] [ ] make ;
+    [ %prologue , linearize* ] { } make ;
 
-M: #label linearize-node* ( node -- )
-    <label> dup %return-to , >r
-    dup node-param %label ,
-    node-child linearize-node
-    r> %label , ;
+: linearize-next node-successor linearize* ;
 
-M: #call linearize-node* ( node -- )
-    dup node-param
-    dup "intrinsic" word-prop [ call ] [ %call , drop ] ?ifte ;
+M: f linearize* ( f -- ) drop ;
 
-M: #call-label linearize-node* ( node -- )
-    node-param %call-label , ;
+M: node linearize* ( node -- ) linearize-next ;
 
-: immediate? ( obj -- ? )
-    #! fixnums and f have a pointerless representation, and
-    #! are compiled immediately. Everything else can be moved
-    #! by GC, and is indexed through a table.
-    dup fixnum? swap f eq? or ;
+M: #label linearize* ( node -- )
+    <label> [
+        %return-to ,
+        dup node-param %label ,
+        dup node-child linearize*
+    ] keep %label ,
+    linearize-next ;
 
-GENERIC: load-value ( vreg n value -- )
+: ?tail-call ( node caller jumper -- next )
+    >r >r dup node-successor #return? [
+        node-param r> drop r> execute ,
+    ] [
+        dup node-param r> execute , r> drop linearize-next
+    ] if ; inline
 
-M: object load-value ( vreg n value -- )
-    drop %peek-d , ;
+: intrinsic ( #call -- quot ) node-param "intrinsic" word-prop ;
 
-: push-literal ( vreg value -- )
-    literal-value dup
-    immediate? [ %immediate ] [ %indirect ] ifte , ;
+: if-intrinsic ( #call -- quot )
+    dup node-successor #if?
+    [ node-param "if-intrinsic" word-prop ] [ drop f ] if ;
 
-M: literal load-value ( vreg n value -- )
-    nip push-literal ;
+: linearize-if ( node label -- )
+    #! Assume the quotation emits a VOP that jumps to the label
+    #! if some condition holds; we linearize the false branch,
+    #! then the label, then the true branch.
+    >r node-children first2 linearize* r> %label , linearize* ;
 
-: push-1 ( value -- ) 0 swap push-literal ;
+M: #call linearize* ( node -- )
+    dup if-intrinsic [
+        >r <label> 2dup r> call
+        >r node-successor r> linearize-if
+    ] [
+        dup intrinsic [
+            dupd call linearize-next
+        ] [
+            \ %call \ %jump ?tail-call
+        ] if*
+    ] if* ;
 
-M: #push linearize-node* ( node -- )
-    node-out-d dup length dup %inc-d,
-    1 - swap [ push-1 0 over %replace-d , ] each drop ;
+M: #call-label linearize* ( node -- )
+    \ %call-label \ %jump-label ?tail-call ;
 
-: ifte-head ( label -- )
-    in-1  -1 %inc-d, 0 %jump-t , ;
-
-M: #ifte linearize-node* ( node -- )
-    node-children first2
-    <label> dup ifte-head
-    swap linearize-node ( false branch )
-    %label , ( branch target of BRANCH-T )
-    linearize-node ( true branch ) ;
+M: #if linearize* ( node -- )
+    <label> dup in-1  -1 %inc-d , 0 %jump-t , linearize-if ;
 
 : dispatch-head ( vtable -- label/code )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.
     in-1
-    -1 %inc-d,
-    0 %untag-fixnum ,
+    -1 %inc-d ,
     0 %dispatch ,
     [ <label> dup %target-label ,  cons ] map
     %end-dispatch , ;
 
 : dispatch-body ( label/param -- )
-    #! Output each branch, with a jump to the end label.
-    [ uncons %label , linearize-node ] each ;
+    [ uncons %label , linearize* ] each ;
 
-M: #dispatch linearize-node* ( vtable -- )
-    #! The parameter is a list of lists, each one is a branch to
+M: #dispatch linearize* ( vtable -- )
+    #! The parameter is a list of nodes, each one is a branch to
     #! take in case the top of stack has that type.
     node-children dispatch-head dispatch-body ;
 
-M: #return linearize-node* ( node -- )
-    drop  f %return , ;
+M: #return linearize* ( node -- )
+    #! Simple label returns do not count, since simple labels do
+    #! not push a stack frame on the C stack.
+    drop %return , ;

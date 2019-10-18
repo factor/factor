@@ -1,6 +1,6 @@
-IN: crypto
-USING: kernel io strings sequences namespaces math prettyprint
-unparser test parser lists ;
+IN: crypto-internals
+USING: kernel io strings sequences namespaces math
+       unparser test parser lists crypto ;
 
 SYMBOL: a
 SYMBOL: b
@@ -23,22 +23,32 @@ SYMBOL: old-d
     old-c c update-old-new
     old-d d update-old-new ;
 
+: get-md5-debug ( -- str )
+    [ [ a b c d ] [ get 4 >be % ] each ] "" make ;
+
+: get-md5 ( -- str )
+    [ [ a b c d ] [ get 4 >le % ] each ] "" make ;
+
+: get-old-md5-debug ( -- str )
+    [ [ old-a old-b old-c old-d ] [ get 4 >be % ] each ] "" make ;
+
+
 ! Let [abcd k s i] denote the operation
 ! a = b + ((a + F(b,c,d) + X[k] + T[i]) <<< s)
 
-: (F) ( vars func -- vars result )
-    >r dup second get over third get pick fourth get r> call ; inline
+: 2to4 dup second get over third get pick fourth get ;
 
-! # bits to shift, input to float-sin, x, func
-: (ABCD) ( s i x vars func -- )
-    (F) swap >r w+ swap float-sin w+ r> dup first >r swap r> update
-    dup first get rot 32 bitroll
-    over second get w+ swap first set ; inline
+: (F) ( vars func -- vars result ) >r 2to4 r> call ; inline
 
-: ABCD [ a b c d ] swap (ABCD) ; inline
-: BCDA [ b c d a ] swap (ABCD) ; inline
-: CDAB [ c d a b ] swap (ABCD) ; inline
-: DABC [ d a b c ] swap (ABCD) ; inline
+: (ABCD) ( s i x vars result -- )
+    #! bits to shift, input to float-sin, x, func
+    swap >r w+ swap float-sin w+ r> dup first >r swap r> update
+    dup first get rot 32 bitroll over second get w+ swap first set ;
+
+: ABCD { a b c d } swap (F) (ABCD) ; inline
+: BCDA { b c d a } swap (F) (ABCD) ; inline
+: CDAB { c d a b } swap (F) (ABCD) ; inline
+: DABC { d a b c } swap (F) (ABCD) ; inline
 
 ! F(X,Y,Z) = XY v not(X) Z
 : F ( X Y Z -- FXYZ )
@@ -55,23 +65,22 @@ SYMBOL: old-d
 ! I(X,Y,Z) = Y xor (X v not(Z))
 : I ( X Y Z -- IXYZ )
     rot swap bitnot bitor bitxor ;
-
-: S11 7 ;
-: S12 12 ;
-: S13 17 ;
-: S14 22 ;
-: S21 5 ;
-: S22 9 ;
-: S23 14 ;
-: S24 20 ;
-: S31 4 ;
-: S32 11 ;
-: S33 16 ;
-: S34 23 ;
-: S41 6 ;
-: S42 10 ;
-: S43 15 ;
-: S44 21 ;
+: S11 7  ; inline
+: S12 12 ; inline
+: S13 17 ; inline
+: S14 22 ; inline
+: S21 5  ; inline
+: S22 9  ; inline
+: S23 14 ; inline
+: S24 20 ; inline
+: S31 4 ;  inline
+: S32 11 ; inline
+: S33 16 ; inline
+: S34 23 ; inline
+: S41 6  ; inline
+: S42 10 ; inline
+: S43 15 ; inline
+: S44 21 ; inline
 
 : process-md5-block ( block -- )
     S11 1 pick 0 nth-int   [ F ] ABCD
@@ -141,39 +150,34 @@ SYMBOL: old-d
     S42 62 pick 11 nth-int [ I ] DABC
     S43 63 pick 2 nth-int  [ I ] CDAB
     S44 64 pick 9 nth-int  [ I ] BCDA
+
     update-md
-    drop
-    ;
+    drop ;
 
-: get-md5 ( -- str )
-    [
-        [ a b c d ] [ get 4 >le % ] each
-    ] "" make hex-string ;
 
+
+IN: crypto
 : string>md5 ( string -- md5 )
-    [
+    ! [
         initialize-md5 pad-string-md5
         dup length num-blocks [ 2dup get-block process-md5-block ] repeat
         drop get-md5
-    ] with-scope ;
+        ;
+    ! ] with-scope ;
 
-: stream>md5 ( stream -- md5 )
-    [
-        contents string>md5
-    ] with-scope ;
+: string>md5str ( string -- str )
+    string>md5 hex-string ;
 
-: file>md5 ( file -- md5 )
-    [
-        <file-reader> stream>md5
-    ] with-scope ;
+: stream>md5 ( stream -- md5 ) contents string>md5 ;
+
+: file>md5 ( file -- md5 ) <file-reader> stream>md5 ;
 
 : test-md5 ( -- )
-    [ "d41d8cd98f00b204e9800998ecf8427e" ] [ "" string>md5 ] unit-test
-    [ "0cc175b9c0f1b6a831c399e269772661" ] [ "a" string>md5 ] unit-test
-    [ "900150983cd24fb0d6963f7d28e17f72" ] [ "abc" string>md5 ] unit-test
-    [ "f96b697d7cb7938d525a2f31aaf161d0" ] [ "message digest" string>md5 ] unit-test
-    [ "c3fcd3d76192e4007dfb496cca67e13b" ] [ "abcdefghijklmnopqrstuvwxyz" string>md5 ] unit-test
-    [ "d174ab98d277d9f5a5611c2c9f419d9f" ] [ "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" string>md5 ] unit-test
-    [ "57edf4a22be3c955ac49da2e2107b67a" ] [ "12345678901234567890123456789012345678901234567890123456789012345678901234567890" string>md5 ] unit-test
+    [ "d41d8cd98f00b204e9800998ecf8427e" ] [ "" string>md5str ] unit-test
+    [ "0cc175b9c0f1b6a831c399e269772661" ] [ "a" string>md5str ] unit-test
+    [ "900150983cd24fb0d6963f7d28e17f72" ] [ "abc" string>md5str ] unit-test
+    [ "f96b697d7cb7938d525a2f31aaf161d0" ] [ "message digest" string>md5str ] unit-test
+    [ "c3fcd3d76192e4007dfb496cca67e13b" ] [ "abcdefghijklmnopqrstuvwxyz" string>md5str ] unit-test
+    [ "d174ab98d277d9f5a5611c2c9f419d9f" ] [ "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" string>md5str ] unit-test
+    [ "57edf4a22be3c955ac49da2e2107b67a" ] [ "12345678901234567890123456789012345678901234567890123456789012345678901234567890" string>md5str ] unit-test
     ;
-

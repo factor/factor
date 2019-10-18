@@ -1,6 +1,9 @@
 IN: temporary
-USING: compiler kernel kernel-internals lists math
-math-internals test words ;
+USING: arrays compiler kernel kernel-internals lists math
+math-internals sequences test words ;
+
+! Oops!
+[ 5000 ] [ [ 5000 ] compile-1 ] unit-test
 
 ! Make sure that intrinsic ops compile to correct code.
 [ 1 ] [ [[ 1 2 ]] [ 0 slot ] compile-1 ] unit-test
@@ -125,10 +128,10 @@ math-internals test words ;
 [ t ] [ "hey" type "hey" [ type ] compile-1 eq? ] unit-test
 [ t ] [ f type f [ type ] compile-1 eq? ] unit-test
 
-[ 5 ] [ 1 2 [ eq? [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
-[ 3 ] [ 2 2 [ eq? [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
-[ 3 ] [ 1 2 [ fixnum< [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
-[ 5 ] [ 2 2 [ fixnum< [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
+[ 5 ] [ 1 2 [ eq? [ 3 ] [ 5 ] if ] compile-1 ] unit-test
+[ 3 ] [ 2 2 [ eq? [ 3 ] [ 5 ] if ] compile-1 ] unit-test
+[ 3 ] [ 1 2 [ fixnum< [ 3 ] [ 5 ] if ] compile-1 ] unit-test
+[ 5 ] [ 2 2 [ fixnum< [ 3 ] [ 5 ] if ] compile-1 ] unit-test
 
 [ 8 ] [ 1 3 [ fixnum-shift ] compile-1 ] unit-test
 [ 8 ] [ 1 [ 3 fixnum-shift ] compile-1 ] unit-test
@@ -167,3 +170,12 @@ math-internals test words ;
 [ 268435456 0 ] [ -268435456 >fixnum -1 [ fixnum/mod ] compile-1 ] unit-test
 
 [ t ] [ f [ f eq? ] compile-1 ] unit-test
+
+! regression
+[ t ] [ { 1 2 3 } { 1 2 3 } [ over type over type eq? ] compile-1 2nip ] unit-test
+
+! regression
+[ 3 ] [
+    100001 <array> 3 100000 pick set-nth
+    [ 100000 swap array-nth ] compile-1
+] unit-test

@@ -6,7 +6,7 @@ strings ;
 
 ! Number parsing
 
-: not-a-number "Not a number" throw ; inline
+: not-a-number "Not a number" throw ;
 
 GENERIC: digit> ( ch -- n )
 M: digit  digit> CHAR: 0 - ;
@@ -15,14 +15,14 @@ M: LETTER digit> CHAR: A - 10 + ;
 M: object digit> not-a-number ;
 
 : digit+ ( num digit base -- num )
-    2dup < [ rot * + ] [ not-a-number ] ifte ;
+    2dup < [ rot * + ] [ not-a-number ] if ;
 
 : (base>) ( base str -- num )
     dup empty? [
         not-a-number
     ] [
         0 [ digit> pick digit+ ] reduce nip
-    ] ifte ;
+    ] if ;
 
 : base> ( str base -- num )
     #! Convert a string to an integer. Throw an error if
@@ -30,7 +30,7 @@ M: object digit> not-a-number ;
     swap "-" ?head >r (base>) r> [ neg ] when ;
 
 : string>ratio ( "a/b" -- a/b )
-    "/" split1 >r 10 base> r> 10 base> / ;
+    "/" split1 [ 10 base> ] 2apply / ;
 
 : string>number ( string -- n )
     {
@@ -44,11 +44,11 @@ M: object digit> not-a-number ;
 : hex> 16 base> ;
 
 : >digit ( n -- ch )
-    dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] ifte ;
+    dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] if ;
 
 : integer, ( num radix -- )
     dup >r /mod >digit , dup 0 >
-    [ r> integer, ] [ r> 2drop ] ifte ;
+    [ r> integer, ] [ r> 2drop ] if ;
 
 : >base ( num radix -- string )
     #! Convert a number to a string in a certain base.
@@ -57,7 +57,7 @@ M: object digit> not-a-number ;
             swap neg swap integer, CHAR: - ,
         ] [
             integer,
-        ] ifte
+        ] if
     ] "" make reverse ;
 
 : >bin ( num -- string ) 2 >base ;

@@ -1,20 +1,23 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien generic hashtables kernel lists math matrices sdl
-sequences ;
+USING: alien generic hashtables kernel lists math sequences ;
 
 : action ( gadget gesture -- quot )
     swap gadget-gestures ?hash ;
 
-: set-action ( gadget quot gesture -- )
-    pick gadget-gestures ?set-hash swap set-gadget-gestures ;
+: init-gestures ( gadget -- gestures )
+    dup gadget-gestures
+    [ ] [ H{ } clone dup rot set-gadget-gestures ] ?if ;
 
-: add-actions ( alist gadget -- )
-    swap [ unswons set-action ] each-with ;
+: set-action ( gadget quot gesture -- )
+    rot init-gestures set-hash ;
+
+: add-actions ( gadget hash -- )
+    dup [ >r init-gestures r> hash-update ] [ 2drop ] if ;
 
 : handle-gesture* ( gesture gadget -- ? )
-    tuck gadget-gestures ?hash dup [ call f ] [ 2drop t ] ifte ;
+    tuck gadget-gestures ?hash dup [ call f ] [ 2drop t ] if ;
 
 : handle-gesture ( gesture gadget -- ? )
     #! If a gadget's handle-gesture* generic returns t, the

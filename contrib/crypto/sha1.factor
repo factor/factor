@@ -1,6 +1,6 @@
-IN: crypto
+IN: crypto-internals
 USING: kernel io strings sequences namespaces math prettyprint
-unparser test parser lists vectors hashtables kernel-internals ;
+unparser test parser lists vectors hashtables kernel-internals crypto ;
 
 ! Implemented according to RFC 3174.
 
@@ -16,7 +16,6 @@ SYMBOL: D
 SYMBOL: E
 SYMBOL: w
 SYMBOL: K
-SYMBOL: f-table
 
 : reset-w ( -- )
     80 <vector> w set ;
@@ -53,29 +52,28 @@ SYMBOL: f-table
 ! f(t;B,C,D) = (B AND C) OR (B AND D) OR (C AND D)  (40 <= t <= 59)
 ! f(t;B,C,D) = B XOR C XOR D                        (60 <= t <= 79)
 
+! use this syntax eventually
 ! JUMP-TABLE: f 4 ( maximum )
-! {{
+! H{
     ! [[ 0 [ >r over bitnot r> bitand >r bitand r> bitor ] ]]
     ! [[ 1 [ bitxor bitxor ] ]]
     ! [[ 2 [ 2dup bitand >r pick bitand >r bitand r> r> bitor bitor ] ]]
     ! [[ 3 [ bitxor bitxor ] ]]
-! }} f-table set
+! } f-table set
 
 ! J: 0 f >r over bitnot r> bitand >r bitand r> bitor ;
 ! J: 1 f bitxor bitxor ;
 ! J: 2 f 2dup bitand >r pick bitand >r bitand r> r> bitor bitor ;
 ! J: 3 f bitxor bitxor ;
 
-! todo: make inlined
-{ 
-    { [ dup 0 = ] [ drop >r over bitnot r> bitand >r bitand r> bitor ] }
-    { [ dup 1 = ] [ drop bitxor bitxor ] }
-    { [ dup 2 = ] [ drop 2dup bitand >r pick bitand >r bitand r> r> bitor bitor ] }
-    { [ dup 3 = ] [ drop bitxor bitxor ] }
-} f-table set
-
 : sha1-f ( B C D t -- f_tbcd )
-    20 /i f-table get cond ;
+    20 /i
+    {   
+        { [ dup 0 = ] [ drop >r over bitnot r> bitand >r bitand r> bitor ] }
+        { [ dup 1 = ] [ drop bitxor bitxor ] }
+        { [ dup 2 = ] [ drop 2dup bitand >r pick bitand >r bitand r> r> bitor bitor ] }
+        { [ dup 3 = ] [ drop bitxor bitxor ] }
+    } cond ;
 
 : make-w ( -- )
     ! compute w, steps a-b of RFC 3174, section 6.1
@@ -83,7 +81,7 @@ SYMBOL: f-table
             [ nth-int-be w get push ] 2keep
         ] [
             dup sha1-W w get push
-        ] ifte 
+        ] if 
     ] repeat ;
 
 : init-letters ( -- )
@@ -94,26 +92,26 @@ SYMBOL: f-table
     h3 get D set
     h4 get E set ;
 
+: inner-loop ( -- )
+    ! TEMP = S^5(A) + f(t;B,C,D) + E + W(t) + K(t);
+    [
+        [ B get C get D get ] keep sha1-f ,
+        dup get-wth ,
+        dup K get nth ,
+        A get 5 32 bitroll ,
+        E get ,
+    ] { } make sum 4294967295 bitand ; inline
+
+: set-vars ( -- )
+    ! E = D;  D = C;  C = S^30(B);  B = A; A = TEMP;
+    D get E set
+    C get D set
+    B get 30 32 bitroll C set
+    A get B set ;
+
 : calculate-letters ( -- )
     ! step d of RFC 3174, section 6.1
-    80 [
-        ! TEMP = S^5(A) + f(t;B,C,D) + E + W(t) + K(t);
-        [
-            [ B get C get D get ] keep sha1-f ,
-            dup get-wth ,
-            dup K get nth ,
-            A get 5 32 bitroll ,
-            E get ,
-        ] { } make sum 4294967296 mod
-
-        ! E = D;  D = C;  C = S^30(B);  B = A; A = TEMP;
-        >r
-        D get E set
-        C get D set
-        B get 30 32 bitroll C set
-        A get B set
-        r> A set
-    ] repeat ;
+    80 [ inner-loop >r set-vars r> A set ] repeat ;
 
 : update-hs ( -- )
     ! step e of RFC 3174, section 6.1
@@ -127,10 +125,9 @@ SYMBOL: f-table
     make-w init-letters calculate-letters update-hs drop ;
 
 : get-sha1 ( -- str )
-    [
-        [ h0 h1 h2 h3 h4 ] [ get 4 >be % ] each
-    ] "" make hex-string ;
+    [ [ h0 h1 h2 h3 h4 ] [ get 4 >be % ] each ] "" make ;
 
+IN: crypto
 : string>sha1 ( string -- sha1 )
     [
         initialize-sha1 pad-string-sha1
@@ -138,20 +135,17 @@ SYMBOL: f-table
         drop get-sha1
     ] with-scope ;
 
-: stream>sha1 ( stream -- sha1 )
-    [
-        contents string>sha1
-    ] with-scope ;
+: string>sha1str ( string -- sha1str )
+    string>sha1 hex-string ;
 
-: file>sha1 ( file -- sha1 )
-    [
-        <file-reader> stream>sha1
-    ] with-scope ;
+: stream>sha1 ( stream -- sha1 ) contents string>sha1 ;
+
+: file>sha1 ( file -- sha1 ) <file-reader> stream>sha1 ;
 
 ! unit test from the RFC
 : test-sha1 ( -- )
-    [ "a9993e364706816aba3e25717850c26c9cd0d89d" ] [ "abc" string>sha1 ] unit-test
-    [ "84983e441c3bd26ebaae4aa1f95129e5e54670f1" ] [ "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" string>sha1 ] unit-test
-    ! [ "34aa973cd4c4daa4f61eeb2bdbad27316534016f" ] [ 1000000 CHAR: a fill string>sha1 ] unit-test ! takes a long time...
-    [ "dea356a2cddd90c7a7ecedc5ebb563934f460452" ] [ "0123456701234567012345670123456701234567012345670123456701234567" [ 10 [ dup % ] times ] "" make nip string>sha1 ] unit-test ;
+    [ "a9993e364706816aba3e25717850c26c9cd0d89d" ] [ "abc" string>sha1str ] unit-test
+    [ "84983e441c3bd26ebaae4aa1f95129e5e54670f1" ] [ "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" string>sha1str ] unit-test
+    ! [ "34aa973cd4c4daa4f61eeb2bdbad27316534016f" ] [ 1000000 CHAR: a fill string>sha1str ] unit-test ! takes a long time...
+    [ "dea356a2cddd90c7a7ecedc5ebb563934f460452" ] [ "0123456701234567012345670123456701234567012345670123456701234567" [ 10 [ dup % ] times ] "" make nip string>sha1str ] unit-test ;
 

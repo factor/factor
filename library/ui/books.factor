@@ -2,36 +2,30 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-books
 USING: gadgets gadgets-buttons gadgets-labels gadgets-layouts
-generic kernel lists math matrices sequences ;
+gadgets-theme generic kernel lists math namespaces sequences
+styles ;
 
 TUPLE: book page ;
 
 C: book ( pages -- book )
-    <gadget> over set-delegate
-    0 over set-book-page
-    [ add-gadgets ] keep ;
-
-M: book pref-dim ( book -- dim )
-    gadget-children [ pref-dim ] map { 0 0 0 } [ vmax ] reduce ;
+    [ >r make-stack r> set-gadget-delegate ] keep
+    0 over set-book-page ;
 
 M: book layout* ( book -- )
-    dup rect-dim over gadget-children [
-        f over set-gadget-visible?
-        { 0 0 0 } over set-rect-loc
-        set-gadget-dim
-    ] each-with
+    dup delegate layout*
+    dup gadget-children [ hide-gadget ] each
     dup book-page swap gadget-children nth
-    [ t swap set-gadget-visible? ] when* ;
+    [ show-gadget ] when* ;
 
 : show-page ( n book -- )
     [ gadget-children length rem ] keep
-    [ set-book-page ] keep relayout ;
+    [ set-book-page ] keep relayout-1 ;
 
 : first-page ( book -- ) 0 swap show-page ;
 
-: prev-page ( book -- ) [ book-page 1 - ] keep show-page ;
+: prev-page ( book -- ) [ book-page 1- ] keep show-page ;
 
-: next-page ( book -- ) [ book-page 1 + ] keep show-page ;
+: next-page ( book -- ) [ book-page 1+ ] keep show-page ;
 
 : last-page ( book -- ) -1 swap show-page ;
 
@@ -40,16 +34,19 @@ TUPLE: book-browser book ;
 : find-book ( gadget -- )
     [ book-browser? ] find-parent book-browser-book ;
 
+: <book-button> ( polygon quot -- button )
+    \ find-book swons >r gray swap <polygon-gadget> r>
+    <bevel-button> ;
+
 : <book-buttons> ( book -- gadget )
     [
-        { "|<" [ find-book first-page ] }
-        { "<"  [ find-book prev-page  ] }
-        { ">"  [ find-book next-page  ] }
-        { ">|" [ find-book last-page  ] }
-    ] [ first2 >r <label> r> <button> ] map
-    <shelf> [ add-gadgets ] keep ;
+        arrow-|left  [ first-page ] <book-button> ,
+        arrow-left   [ prev-page  ] <book-button> ,
+        arrow-right  [ next-page  ] <book-button> ,
+        arrow-right| [ last-page  ] <book-button> ,
+    ] { } make make-shelf ;
 
 C: book-browser ( book -- gadget )
-    <frame> over set-delegate
-    <book-buttons> over add-top
-    [ 2dup set-book-browser-book add-center ] keep ;
+    dup delegate>frame
+    <book-buttons> over @top frame-add
+    [ 2dup set-book-browser-book @center frame-add ] keep ;

@@ -1,46 +1,32 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-buttons
-USING: gadgets gadgets-borders gadgets-layouts generic io kernel
-lists math namespaces sdl sequences sequences styles threads ;
+USING: gadgets gadgets-borders gadgets-layouts gadgets-theme
+generic io kernel lists math namespaces sequences sequences
+styles threads ;
 
-: button-down? ( n -- ? ) hand hand-buttons member? ;
+TUPLE: button rollover? pressed? ;
 
-: mouse-over? ( gadget -- ? ) hand hand-gadget child? ;
+: button-down? ( n -- ? ) hand get hand-buttons member? ;
 
-: button-pressed? ( button -- ? )
-    #! Return true if the mouse was clicked on the button, and
-    #! is currently over the button.
-    dup mouse-over? [
-        1 button-down?
-        [ hand hand-clicked child? ] [ drop f ] ifte
-    ] [
-        drop f
-    ] ifte ;
+: mouse-over? ( gadget -- ? ) hand get hand-gadget child? ;
+
+: mouse-clicked? ( gadget -- ? ) hand get hand-clicked child? ;
 
 : button-update ( button -- )
-    dup dup mouse-over? rollover set-paint-prop
-    dup dup button-pressed? reverse-video set-paint-prop
-    relayout ;
+    dup mouse-over? over set-button-rollover?
+    dup button-rollover? 1 button-down? and
+    over mouse-clicked? and over set-button-pressed?
+    relayout-1 ;
 
 : button-clicked ( button -- )
     #! If the mouse is released while still inside the button,
     #! fire an action gesture.
-    dup button-update dup mouse-over?
+    dup button-update dup button-rollover?
     [ [ action ] swap handle-gesture ] when drop ;
 
-: button-theme ( button -- )
-    dup { 216 216 216 } background set-paint-prop
-    dup f reverse-video set-paint-prop
-    << solid >> interior set-paint-prop ;
-
-: roll-button-theme ( button -- )
-    dup f reverse-video set-paint-prop
-    dup <rollover-only> interior set-paint-prop
-    <rollover-only> boundary set-paint-prop ;
-
 : button-action ( action -- quot )
-    [ [ swap handle-gesture drop ] cons ] [ [ drop ] ] ifte* ;
+    [ [ swap handle-gesture drop ] cons ] [ [ drop ] ] if* ;
 
 : button-gestures ( button quot -- )
     dupd [ action ] set-action
@@ -49,14 +35,18 @@ lists math namespaces sdl sequences sequences styles threads ;
     dup [ button-update ] [ mouse-leave ] set-action
     [ button-update ] [ mouse-enter ] set-action ;
 
-TUPLE: button ;
-
 C: button ( gadget quot -- button )
-    rot bevel-border over set-delegate
-    dup button-theme [ swap button-gestures ] keep ;
+    rot <border> over set-gadget-delegate
+    [ swap button-gestures ] keep ;
+
+: <highlight-button> ( gadget quot -- button )
+    <button> { 0 0 0 } over set-border-size ;
 
 : <roll-button> ( gadget quot -- button )
-    >r dup roll-button-theme dup r> button-gestures ;
+    <highlight-button> dup roll-button-theme ;
+
+: <bevel-button> ( gadget quot -- button )
+    <button> dup bevel-button-theme ;
 
 : repeat-button-down ( button -- )
     dup 100 add-timer button-clicked ;
@@ -71,6 +61,21 @@ C: button ( gadget quot -- button )
 : <repeat-button> ( gadget quot -- button )
     #! Button that calls the quotation every 100ms as long as
     #! the mouse is held down.
-    <button> dup repeat-actions ;
+    <bevel-button> dup repeat-actions ;
 
 M: button tick ( ms object -- ) nip button-clicked ;
+
+TUPLE: button-paint plain rollover pressed ;
+
+: button-paint ( button paint -- button paint )
+    {
+        { [ over button-pressed? ] [ button-paint-pressed ] }
+        { [ over button-rollover? ] [ button-paint-rollover ] }
+        { [ t ] [ button-paint-plain ] }
+    } cond ;
+
+M: button-paint draw-interior ( button paint -- )
+    button-paint draw-interior ;
+
+M: button-paint draw-boundary ( button paint -- )
+    button-paint draw-boundary ;

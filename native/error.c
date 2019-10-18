@@ -33,6 +33,7 @@ void throw_error(CELL error, bool keep_stacks)
 {
 	early_error(error);
 
+	throwing = true;
 	thrown_error = error;
 	thrown_keep_stacks = keep_stacks;
 	thrown_ds = ds;
@@ -41,18 +42,12 @@ void throw_error(CELL error, bool keep_stacks)
 	thrown_executing = executing;
 
 	/* Return to run() method */
-#ifdef WIN32
-	longjmp(toplevel,1);
-#else
-	siglongjmp(toplevel,1);
-#endif
+	LONGJMP(toplevel,1);
 }
 
 void primitive_throw(void)
 {
-	CELL error = dpop();
-	if(error != F)
-		throw_error(error,true);
+	throw_error(dpop(),true);
 }
 
 void primitive_die(void)

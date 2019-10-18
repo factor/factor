@@ -1,28 +1,24 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USING: kernel lists namespaces sequences io words ;
+USING: io kernel lists math namespaces sequences words ;
 
 : file-vocabs ( -- )
     "scratchpad" "in" set
     [ "syntax" "scratchpad" ] "use" set ;
 
-: (parse-stream) ( stream -- quot )
+: parse-lines ( lines -- quot )
     [
-        lines dup length [ ]
-        [ line-number set (parse) ] 2reduce
+        dup length [ ]
+        [ 1+ line-number set (parse) ] 2reduce
         reverse
     ] with-parser ;
 
-: parse-stream ( name stream -- quot )
-    [
-        swap file set file-vocabs
-        (parse-stream)
-        file off line-number off
-    ] with-scope ;
+: parse-stream ( stream name -- quot )
+    [ file set file-vocabs lines parse-lines ] with-scope ;
 
 : parse-file ( file -- quot )
-    dup <file-reader> parse-stream ;
+    [ <file-reader> ] keep parse-stream ;
 
 : run-file ( file -- )
     parse-file call ;
@@ -34,15 +30,14 @@ USING: kernel lists namespaces sequences io words ;
     #! resource:. This allows words that operate on source
     #! files, like "jedit", to use a different resource path
     #! at run time than was used at parse time.
-    "resource:" over append swap <resource-stream> parse-stream ;
+    [ <resource-stream> "resource:" ] keep append parse-stream ;
 
 : run-resource ( file -- )
     parse-resource call ;
 
 : word-file ( word -- file )
-    "file" word-prop dup [
-        "resource:/" ?head [ resource-path swap path+ ] when
-    ] when ;
+    "file" word-prop dup
+    [ "resource:/" ?head [ resource-path ] when ] when ;
 
 : reload ( word -- )
     #! Reload the source file the word originated from.

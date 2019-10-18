@@ -4,6 +4,9 @@ IN: words
 USING: hashtables errors kernel lists namespaces strings
 sequences ;
 
+! If true in current namespace, we are bootstrapping.
+SYMBOL: bootstrapping?
+
 SYMBOL: vocabularies
 
 : word ( -- word ) \ word global hash ;
@@ -20,7 +23,7 @@ SYMBOL: vocabularies
 : words ( vocab -- list )
     #! Push a list of all words in a vocabulary.
     #! Filter empty slots.
-    vocab dup [ hash-values [ ] subset word-sort ] when ;
+    vocab dup [ hash-values ] when ;
 
 : all-words ( -- list )
     vocabs [ words ] map concat ;
@@ -38,7 +41,7 @@ SYMBOL: vocabularies
 
 : recrossref ( -- )
     #! Update word cross referencing information.
-    {{ }} clone crossref global set-hash
+    H{ } clone crossref global set-hash
     [ add-crossref ] each-word ;
 
 : lookup ( name vocab -- word ) vocab ?hash ;
@@ -61,7 +64,7 @@ SYMBOL: vocabularies
     #! already contains the word, the existing instance is
     #! returned.
     2dup check-create 2dup lookup dup
-    [ 2nip ] [ drop <word> dup reveal ] ifte ;
+    [ 2nip ] [ drop <word> dup reveal ] if ;
 
 : constructor-word ( string vocab -- word )
     >r "<" swap ">" append3 r> create ;
@@ -69,19 +72,26 @@ SYMBOL: vocabularies
 : forget ( word -- )
     #! Remove a word definition.
     dup uncrossref
+    crossref get [ dupd remove-hash ] when*
     dup word-name swap word-vocabulary vocab remove-hash ;
 
 : interned? ( word -- ? )
     #! Test if the word is a member of its vocabulary.
     dup word-name over word-vocabulary lookup eq? ;
 
-: init-search-path ( -- )
-    "scratchpad" "in" set
-    [
-        "compiler" "errors" "generic" "hashtables"
-        "help" "inference" "inspector" "interpreter" "io"
-        "jedit" "kernel" "listener" "lists" "math" "matrices"
-        "memory" "namespaces" "parser" "prettyprint" "queues"
-        "scratchpad" "sequences" "shells" "strings" "styles"
-        "syntax" "test" "threads" "vectors" "words"
-    ] "use" set ;
+: reintern ( word -- word )
+    dup word-name swap word-vocabulary
+    bootstrapping? get [
+        dup "syntax" = [ drop "!syntax" ] when
+    ] when lookup ;
+
+"scratchpad" "in" set
+[
+    "scratchpad"
+    "syntax" "arrays" "compiler" "errors" "generic" "hashtables"
+    "help" "inference" "inspector" "interpreter" "io"
+    "jedit" "kernel" "listener" "lists" "math"
+    "memory" "namespaces" "parser" "prettyprint" "queues"
+    "sequences" "shells" "strings" "styles"
+    "test" "threads" "vectors" "words"
+] "use" set

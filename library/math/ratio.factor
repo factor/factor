@@ -14,10 +14,10 @@ M: integer denominator drop 1 ;
 IN: math-internals
 
 : 2>fraction ( a/b c/d -- a c b d )
-    >r >fraction r> >fraction swapd ; inline
+    [ >fraction ] 2apply swapd ; inline
 
 M: ratio number= ( a/b c/d -- ? )
-    2>fraction number= [ number= ] [ 2drop f ] ifte ;
+    2>fraction number= [ number= ] [ 2drop f ] if ;
 
 : scale ( a/b c/d -- a*d b*c )
     2>fraction >r * swap r> * swap ; inline
@@ -35,8 +35,13 @@ M: ratio - ( x y -- x-y ) 2dup scale - -rot ratio+d / ;
 M: ratio * ( x y -- x*y ) 2>fraction * >r * r> / ;
 M: ratio / scale / ;
 M: ratio /i scale /i ;
+M: ratio /mod 2dup >r >r /i dup r> * r> swap - ;
+M: ratio mod /mod nip ;
 M: ratio /f scale /f ;
 
 M: ratio truncate >fraction /i ;
-M: ratio floor [ truncate ] keep 0 < [ 1 - ] when ;
-M: ratio ceiling [ truncate ] keep 0 > [ 1 + ] when ;
+M: ratio floor [ truncate ] keep 0 < [ 1- ] when ;
+M: ratio ceiling [ truncate ] keep 0 > [ 1+ ] when ;
+
+M: ratio 1+ >fraction [ + ] keep fraction> ;
+M: ratio 1- >fraction [ - ] keep fraction> ;

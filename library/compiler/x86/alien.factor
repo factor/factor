@@ -6,11 +6,7 @@ kernel-internals lists math memory namespaces words ;
 
 M: %alien-invoke generate-node
     #! call a C function.
-    dup vop-in-1 swap vop-in-2 load-library compile-c-call ;
-
-M: %parameters generate-node
-    #! x86 does not pass parameters in registers
-    drop ;
+    dup 0 vop-in swap 1 vop-in load-library compile-c-call ;
 
 M: %parameter generate-node
     #! x86 does not pass parameters in registers
@@ -25,15 +21,15 @@ M: int-regs push-reg drop EAX PUSH ;
 M: float-regs reg-size float-regs-size ;
 M: float-regs push-reg
     ESP swap reg-size [ SUB  [ ESP ] ] keep
-    4 = [ FSTPS ] [ FSTPL ] ifte ;
+    4 = [ FSTPS ] [ FSTPL ] if ;
 
 M: %unbox generate-node
-    dup vop-in-2 f compile-c-call  vop-in-3 push-reg ;
+    dup 1 vop-in f compile-c-call  2 vop-in push-reg ;
 
 M: %box generate-node
-    dup vop-in-2 push-reg
-    dup vop-in-1 f compile-c-call
-    vop-in-2 ESP swap reg-size ADD ;
+    dup 1 vop-in push-reg
+    dup 0 vop-in f compile-c-call
+    1 vop-in ESP swap reg-size ADD ;
 
 M: %cleanup generate-node
-    vop-in-1 dup 0 = [ drop ] [ ESP swap ADD ] ifte ;
+    0 vop-in dup 0 = [ drop ] [ ESP swap ADD ] if ;

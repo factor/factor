@@ -3,8 +3,8 @@
 
 ! Bootstrapping trick; see doc/bootstrap.txt.
 IN: !syntax
-USING: generic kernel lists namespaces parser sequences syntax
-words ;
+USING: arrays generic kernel lists namespaces parser sequences
+syntax words ;
 
 : GENERIC:
     #! GENERIC: bar == G: bar simple-combination ;
@@ -40,7 +40,7 @@ words ;
 : M: ( -- class generic [ ] )
     #! M: foo bar begins a definition of the bar generic word
     #! specialized to the foo type.
-    scan-word scan-word [ define-method ] [ ] ; parsing
+    scan-word scan-word [ -rot define-method ] [ ] ; parsing
 
 : C:
     #! Followed by a tuple name, then constructor code, then ;
@@ -48,7 +48,3 @@ words ;
     #! stack.
     scan-word [ tuple-constructor ] keep
     [ define-constructor ] [ ] ; parsing
-
-! Tuples.
-: << f ; parsing
-: >> reverse literal-tuple swons ; parsing

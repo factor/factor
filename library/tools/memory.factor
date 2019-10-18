@@ -1,17 +1,21 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: memory
-USING: errors generic hashtables io kernel kernel-internals
-lists math namespaces parser prettyprint sequences strings
-unparser vectors words ;
+USING: arrays errors generic hashtables io kernel
+kernel-internals lists math namespaces parser prettyprint
+sequences strings unparser vectors words ;
 
-: generations 15 getenv ;
+: generations ( -- n ) 15 getenv ;
 
-: full-gc generations 1 - gc ;
+: full-gc ( -- ) generations 1 - gc ;
+
+: image ( -- path )
+    #! Current image name.
+    16 getenv ;
 
 : save
     #! Save the current image.
-    "image" get save-image ;
+    image save-image ;
 
 ! Printing an overview of heap usage.
 
@@ -30,7 +34,7 @@ unparser vectors words ;
     room
     0 swap [
         "Generation " write over pprint ":" write
-        uncons (room.) 1 +
+        uncons (room.) 1+
     ] each drop
     "Semi-space:  " write kb. terpri
     "Cards:       " write kb. terpri
@@ -39,25 +43,19 @@ unparser vectors words ;
 ! Some words for iterating through the heap.
 
 : (each-object) ( quot -- )
-    next-object [ swap [ call ] keep (each-object) ] when* ;
-    inline
+    next-object dup
+    [ swap [ call ] keep (each-object) ] [ 2drop ] if ; inline
 
 : each-object ( quot -- )
-    #! Applies the quotation to each object in the image. We
-    #! use the lower-level >c and c> words here to avoid
-    #! copying the stacks.
-    [ end-scan rethrow ] >c
-    begin-scan (each-object) drop
-    f c> call ; inline
+    #! Applies the quotation to each object in the image.
+    [ begin-scan [ (each-object) ] keep ]
+    [ end-scan ] cleanup drop ; inline
 
-: instances ( quot -- list )
+: instances ( quot -- seq )
     #! Return a list of all object that return true when the
     #! quotation is applied to them.
-    [
-        [
-            [ swap call ] 2keep rot [ , ] [ drop ] ifte
-        ] each-object drop
-    ] [ ] make ;
+    [ [ [ swap call ] 2keep rot ?, ] each-object drop ] V{ } make ;
+    inline
 
 G: each-slot ( obj quot -- )
     [ over ] standard-combination ; inline
@@ -87,22 +85,16 @@ M: object each-slot ( obj quot -- )
 
 : heap-stats ( -- counts sizes )
     #! Return a list of instance count/total size pairs.
-    num-types zero-vector num-types zero-vector
+    num-types zero-array num-types zero-array
     [ >r 2dup r> heap-stat-step ] each-object ;
 
-: heap-stat. ( type instances bytes -- )
-    dup 0 = [
-        3drop
-    ] [
-        rot type>class word-name write ": " write
-        pprint " bytes, " write
-        pprint " instances" print
-    ] ifte ;
+: heap-stat. ( { instances bytes type } -- )
+    dup first 0 = [
+        dup third type>class pprint ": " write
+        dup second pprint " bytes, " write
+        dup first pprint " instances" print
+    ] unless drop ;
 
 : heap-stats. ( -- )
     #! Print heap allocation breakdown.
-    0 heap-stats [ >r >r dup r> r> heap-stat. 1 + ] 2each drop ;
-
-: orphans ( word -- list )
-    #! Orphans are forgotten but still referenced.
-    [ word? ] instances [ interned? not ] subset ;
+    heap-stats dup length 3array flip [ heap-stat. ] each ;

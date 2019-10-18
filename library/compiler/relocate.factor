@@ -19,18 +19,14 @@ SYMBOL: relocation-table
     0 rel-type, relocating word-primitive rel, ;
 
 : rel-dlsym ( name dll rel/abs 16/16 -- )
-    1 rel-type, relocating cons intern-literal rel, ;
+    1 rel-type, relocating cons add-literal rel, ;
 
 : rel-address ( rel/abs 16/16 -- )
     #! Relocate address just compiled.
-    over 1 = [ 2drop ] [ 2 rel-type, relocating 0 rel, ] ifte ;
+    over 1 = [ 2drop ] [ 2 rel-type, relocating 0 rel, ] if ;
 
 : rel-word ( word rel/abs 16/16 -- )
-    pick primitive? [
-        rel-primitive
-    ] [
-        rot drop rel-address
-    ] ifte ;
+    pick primitive? [ rel-primitive ] [ rel-address drop ] if ;
 
 : rel-userenv ( n 16/16 -- )
     0 swap 3 rel-type, relocating rel, ;

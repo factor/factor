@@ -11,7 +11,7 @@ math namespaces sequences words ;
     "math-priority" word-prop [ 100 ] unless* ;
 
 : math-class< ( class class -- ? )
-    swap math-priority swap math-priority < ;
+    [ math-priority ] 2apply < ;
 
 : math-class-max ( class class -- class )
     [ swap math-class< ] 2keep ? ;
@@ -25,27 +25,29 @@ math namespaces sequences words ;
             drop "coercer" word-prop
         ] [
             2drop [ ]
-        ] ifte
-    ] ifte ;
+        ] if
+    ] if ;
 
 TUPLE: no-math-method left right generic ;
 
 : no-math-method ( left right generic -- )
-    3dup <no-math-method> throw ; inline
+    3dup <no-math-method> throw ;
 
 : applicable-method ( generic class -- quot )
-    over "methods" word-prop hash [ ] [
-        literalize [ no-math-method ] cons
-    ] ?ifte ;
+    over "methods" word-prop hash
+    [ ] [ [ no-math-method ] curry ] ?if ;
+
+: object-method ( generic -- quot )
+    object reintern applicable-method ;
 
 : math-method ( word left right -- quot )
-    swap type>class swap type>class 2dup and [
+    [ type>class ] 2apply 2dup and [
         2dup math-upgrade >r
         math-class-max over order min-class applicable-method
         r> swap append
     ] [
-        2drop object applicable-method
-    ] ifte ;
+        2drop object-method
+    ] if ;
 
 : math-vtable ( picker quot -- )
     [
@@ -55,15 +57,15 @@ TUPLE: no-math-method left right generic ;
     ] [ ] make ; inline
 
 : math-class? ( object -- ? )
-    dup word? [ "math-priority" word-prop ] [ drop f ] ifte ;
+    dup word? [ "math-priority" word-prop ] [ drop f ] if ;
 
 : math-combination ( word -- vtable )
     \ over [
         dup type>class math-class? [
             \ dup [ >r 2dup r> math-method ] math-vtable
         ] [
-            over object applicable-method
-        ] ifte nip
+            over object-method
+        ] if nip
     ] math-vtable nip ;
 
 PREDICATE: generic 2generic ( word -- ? )

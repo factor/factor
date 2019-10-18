@@ -110,7 +110,7 @@ You can write open and close tags like orginary HTML and anything sent
 to standard output in between the tags will be enclosed in the
 specified tags. Attributes can also be used:
 
-  <p style= "text-align: center" p> "More text" write </p>
+  <p "text-align: center" =style p> "More text" write </p>
     => <p style='text-align: center'>More text</p>
 
 The attribute must be seperated from the value of that attribute via
@@ -121,7 +121,7 @@ whitespace. If you are using attributes the tag must be closed with a
 You can use any factor code at any point:
  
   "text-align: " "red" 
-  <p style= 2dup cat2 p> 
+  <p 2dup cat2 =style p> 
     "Using style " write swap write write
   </p>
     => <p style='text-align: red'>Using style text-align: red</p>
@@ -129,7 +129,7 @@ You can use any factor code at any point:
 Tags that are not normally closed are written using XML style closed
 tag (ie. with a trailing slash):
 
-  "One" write <br/> "Two" write <br/> <input type= "text" input/>
+  "One" write <br/> "Two" write <br/> <input "text" =type input/>
     => One<br>Two<br><input type='text'>
 
 Hello World 2
@@ -165,7 +165,7 @@ formatted correctly.
       <html>
         <head> <title> "Memory Statistics" write </title> </head>
         <body>
-          <table border= "1" table>
+          <table "1" =border table>
             <tr> 
               <td> "Total Data Memory" write </td>
               <td> room unparse write </td>
@@ -198,7 +198,7 @@ The HTML output can be refactored into different words. For example:
 
   : memory-stats-table ( free total -- )
     #! Output a table containing the given statistics.
-    <table border= "1" table>
+    <table "1" =border table>
       <tr> 
         <td> "Total Data Memory" write </td>
         <td> unparse write </td>
@@ -247,7 +247,7 @@ that URL, computation is resumed from the point of the end of the
         <head> <title> "Flow Example 1" write </title> </head>
         <body>
           <p> "Page 1" write </p>
-          <p> <a href= a> "Press to continue" write </a> </p>
+          <p> <a =href a> "Press to continue" write </a> </p>
         </body>
       </html>   
     ] show drop 
@@ -256,7 +256,7 @@ that URL, computation is resumed from the point of the end of the
         <head> <title> "Flow Example 1" write </title> </head>
         <body>
           <p> "Page 2" write </p>
-          <p> <a href= a> "Press to continue" write </a> </p>
+          <p> <a =href a> "Press to continue" write </a> </p>
         </body>
       </html>   
     ] show drop 
@@ -297,7 +297,7 @@ this into a seperate word:
       <body>
         <p> "Page " write rot unparse write </p>
         swap [
-          <p> <a href= a> "Press to continue" write </a> </p>
+          <p> <a =href a> "Press to continue" write </a> </p>
         ] [
           drop 
         ] ifte
@@ -362,11 +362,11 @@ containing this data. Here is a simple example:
       <html>
         <head> <title> "Please enter your name" write </title> </head>
         <body>
-          <form action= method= "post" form>
+          <form =action "post" =method form>
             <p> 
               "Please enter your name:" write
-              <input type= "text" size= "20" name= "username" input/>
-              <input type= "submit" value= "Ok" input/>
+              <input "text" =type "20" =size "username" =name input/>
+              <input "submit" =type "Ok" =value input/>
             </p>
           </form>
         </body>
@@ -533,7 +533,7 @@ very easy:
       <head> <title> "Page " write over unparse write </title> </head>
       <body>
         <p> "Page " write swap unparse write </p>
-        <p> <a href= a> "Press to continue" write </a> </p>
+        <p> <a =href a> "Press to continue" write </a> </p>
       </body>
     </html>   
   ] show 2drop ;

@@ -7,11 +7,18 @@ memory namespaces sequences strings vectors words ;
 ! Compile a VOP.
 GENERIC: generate-node ( vop -- )
 
+: set-stack-reserve ( linear -- )
+    #! The %prologue node contains the maximum stack reserve of
+    #! all VOPs. The precise meaning of stack reserve is
+    #! platform-specific.
+    0 [ 0 [ stack-reserve max ] reduce max ] reduce
+    \ stack-reserve set ;
+
 : generate-code ( word linear -- length )
     compiled-offset >r
     compile-aligned
     swap save-xt
-    [ generate-node ] each
+    [ [ generate-node ] each ] each
     compile-aligned
     compiled-offset r> - ;
 
@@ -22,7 +29,8 @@ GENERIC: generate-node ( vop -- )
 
 : (generate) ( word linear -- )
     #! Compile a word definition from linear IR.
-    100 <vector> relocation-table set
+    V{ } clone relocation-table set
+    dup set-stack-reserve
     begin-assembly swap >r >r
         generate-code
         generate-reloc
@@ -37,11 +45,9 @@ SYMBOL: previous-offset
         compiled-offset previous-offset set
         (generate)
     ] [
-        [
-            previous-offset get set-compiled-offset
-            rethrow
-        ] when*
-    ] catch ;
+        previous-offset get set-compiled-offset
+        rethrow
+    ] recover ;
 
 ! A few VOPs have trivial generators.
 
@@ -57,6 +63,8 @@ M: %target-label generate-node vop-label compile-target ;
 M: %target generate-node
     vop-label dup postpone-word  compile-target ;
 
+M: %parameters generate-node ( vop -- ) drop ;
+
 GENERIC: v>operand
 
 M: integer v>operand tag-bits shift ;
@@ -64,7 +72,7 @@ M: integer v>operand tag-bits shift ;
 M: f v>operand address ;
 
 : dest/src ( vop -- dest src )
-    dup vop-out-1 v>operand swap vop-in-1 v>operand ;
+    dup 0 vop-out v>operand swap 0 vop-in v>operand ;
 
 ! These constants must match native/card.h
 : card-bits 7 ;
@@ -72,4 +80,4 @@ M: f v>operand address ;
 
 : shift-add ( by -- n )
     #! Used in fixnum-shift overflow check.
-    1 swap cell 8 * swap 1 - - shift ;
+    1 swap cell 8 * swap 1- - shift ;

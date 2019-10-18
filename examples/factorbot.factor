@@ -1,5 +1,8 @@
 ! Simple IRC bot written in Factor.
 
+! Load the HTTP server first (contrib/httpd/load.factor).
+! This file uses the url-encode and url-decode words.
+
 USING: errors generic hashtables http io kernel math namespaces
 parser prettyprint sequences strings unparser words ;
 IN: factorbot
@@ -46,7 +49,7 @@ M: privmsg handle-irc ( line -- )
     parse-privmsg
     " " split1 swap
     [ "factorbot-commands" ] search dup
-    [ execute ] [ 2drop ] ifte ;
+    [ execute ] [ 2drop ] if ;
 
 M: ping handle-irc ( line -- )
     "PING " ?head drop "PONG " swap append irc-print ;
@@ -66,7 +69,7 @@ M: ping handle-irc ( line -- )
         " " % dup definer word-name %
         " " % dup word-name %
         "stack-effect" word-prop [ " (" % % ")" % ] when*
-    ] make-string ;
+    ] "" make ;
 
 : word-url ( word -- url )
     [
@@ -74,7 +77,7 @@ M: ping handle-irc ( line -- )
         dup word-vocabulary url-encode %
         "&word=" %
         word-name url-encode %
-    ] make-string ;
+    ] "" make ;
 
 : irc-loop ( -- )
     irc-stream get stream-readln
@@ -97,7 +100,7 @@ IN: factorbot-commands
         nip [
             dup word-string " -- " rot word-url append3 respond
         ] each
-    ] ifte ;
+    ] if ;
 
 : quit ( text -- )
     drop speaker get "slava" = [ disconnect ] when ;

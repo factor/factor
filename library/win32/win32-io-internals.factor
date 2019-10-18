@@ -59,10 +59,10 @@ GENERIC: expire
 
 : get-create ( -- creation-disposition )
     "file-mode" get uncons [
-      [ OPEN_ALWAYS ] [ CREATE_ALWAYS ] ifte  
+      [ OPEN_ALWAYS ] [ CREATE_ALWAYS ] if  
     ] [
-      [ OPEN_EXISTING ] [ 0 ] ifte
-    ] ifte ;
+      [ OPEN_EXISTING ] [ 0 ] if
+    ] if ;
 
 : win32-open-file ( file r w -- handle )
     [ 
@@ -80,7 +80,7 @@ END-STRUCT
     "overlapped-ext" c-size malloc <alien> ;
 
 C: io-queue ( -- queue )
-    { } clone over set-io-queue-callbacks ;
+    V{ } clone over set-io-queue-callbacks ;
 
 C: io-callback ( -- callback )
     io-queue get io-queue-callbacks [ push ] 2keep
@@ -91,7 +91,7 @@ C: io-callback ( -- callback )
     io-queue get io-queue-free-list [ 
         uncons io-queue get [ set-io-queue-free-list ] keep
         io-queue-callbacks nth
-    ] [ <io-callback> ] ifte*
+    ] [ <io-callback> ] if*
     [ set-io-callback-stream ] keep
     [ set-io-callback-quotation ] keep
     io-callback-overlapped ;
@@ -114,7 +114,7 @@ C: io-callback ( -- callback )
         drop f
     ] [
         <alien> overlapped-ext-user-data get-io-callback
-    ] ifte ;
+    ] if ;
 
 : cancel-timedout ( -- )
     io-queue get 

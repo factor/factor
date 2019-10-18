@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: generic interpreter kernel lists namespaces parser
-sequences vectors words ;
+USING: arrays generic hashtables interpreter kernel lists math
+namespaces parser sequences words ;
 
 ! Recursive state. An alist, mapping words to labels.
 SYMBOL: recursive-state
@@ -15,9 +15,7 @@ C: value ( -- value )
 
 M: value = eq? ;
 
-TUPLE: computed ;
-
-C: computed ( -- value ) <value> over set-delegate ;
+M: value hashcode value-uid hashcode ;
 
 TUPLE: literal value ;
 
@@ -25,21 +23,7 @@ C: literal ( obj -- value )
     <value> over set-delegate
     [ set-literal-value ] keep ;
 
-TUPLE: meet values ;
-
-C: meet ( values -- value )
-    <value> over set-delegate [ set-meet-values ] keep ;
-
-: value-refers? ( referee referrer -- ? )
-    2dup eq? [
-        2drop t
-    ] [
-        dup meet? [
-            meet-values [ value-refers? ] contains-with?
-        ] [
-            2drop f
-        ] ifte
-    ] ifte ;
+M: literal hashcode delegate hashcode ;
 
 ! The dataflow IR is the first of the two intermediate
 ! representations used by Factor. It annotates concatenative
@@ -52,12 +36,7 @@ TUPLE: node param shuffle
 M: node = eq? ;
 
 : make-node ( param in-d out-d in-r out-r node -- node )
-    [
-        >r
-        swapd <shuffle> {{ }} clone {{ }} clone { } clone f f <node>
-        r>
-        set-delegate
-    ] keep ;
+    [ >r swapd <shuffle> f f f f f <node> r> set-delegate ] keep ;
 
 : node-in-d  node-shuffle shuffle-in-d  ;
 : node-in-r  node-shuffle shuffle-in-r  ;
@@ -71,8 +50,8 @@ M: node = eq? ;
 
 : empty-node f { } { } { } { } ;
 : param-node ( label) { } { } { } { } ;
-: in-d-node ( inputs) >r f r> { } { } { } ;
-: out-d-node ( outputs) >r f { } r> { } { } ;
+: in-node ( inputs) >r f r> { } { } { } ;
+: out-node ( outputs) >r f { } r> { } { } ;
 
 : d-tail ( n -- list ) meta-d get tail* ;
 : r-tail ( n -- list ) meta-r get tail* ;
@@ -85,7 +64,7 @@ C: #label make-node ;
 
 TUPLE: #entry ;
 C: #entry make-node ;
-: #entry ( -- node ) meta-d get clone in-d-node <#entry> ;
+: #entry ( -- node ) meta-d get clone in-node <#entry> ;
 
 TUPLE: #call ;
 C: #call make-node ;
@@ -95,33 +74,38 @@ TUPLE: #call-label ;
 C: #call-label make-node ;
 : #call-label ( label -- node ) param-node <#call-label> ;
 
-TUPLE: #push ;
-C: #push make-node ;
-: #push ( outputs -- node ) d-tail out-d-node <#push> ;
-
 TUPLE: #shuffle ;
 C: #shuffle make-node ;
 : #shuffle ( -- node ) empty-node <#shuffle> ;
+: #push ( outputs -- node ) d-tail out-node <#shuffle> ;
 
 TUPLE: #values ;
 C: #values make-node ;
-: #values ( -- node ) meta-d get clone in-d-node <#values> ;
+: #values ( -- node ) meta-d get clone in-node <#values> ;
 
 TUPLE: #return ;
 C: #return make-node ;
-: #return ( -- node ) meta-d get clone in-d-node <#return> ;
+: #return ( label -- node )
+    #! The parameter is the label we are returning from, or if
+    #! f, this is a top-level return.
+    meta-d get clone in-node <#return>
+    [ set-node-param ] keep ;
 
-TUPLE: #ifte ;
-C: #ifte make-node ;
-: #ifte ( in -- node ) 1 d-tail in-d-node <#ifte> ;
+TUPLE: #if ;
+C: #if make-node ;
+: #if ( in -- node ) 1 d-tail in-node <#if> ;
 
 TUPLE: #dispatch ;
 C: #dispatch make-node ;
-: #dispatch ( in -- node ) 1 d-tail in-d-node <#dispatch> ;
+: #dispatch ( in -- node ) 1 d-tail in-node <#dispatch> ;
 
 TUPLE: #merge ;
 C: #merge make-node ;
-: #merge ( -- node ) meta-d get clone out-d-node <#merge> ;
+: #merge ( -- node ) meta-d get clone out-node <#merge> ;
+
+TUPLE: #terminate ;
+C: #terminate make-node ;
+: #terminate ( -- node ) empty-node <#terminate> ;
 
 : node-inputs ( d-count r-count node -- )
     tuck
@@ -144,22 +128,19 @@ SYMBOL: current-node
     ] [
         ! first node
         dup dataflow-graph set  current-node set
-    ] ifte ;
+    ] if ;
 
 : nest-node ( -- dataflow current )
     dataflow-graph get  dataflow-graph off
     current-node get    current-node off ;
 
 : unnest-node ( new-node dataflow current -- new-node )
-    >r >r dataflow-graph get 1vector over set-node-children
+    >r >r dataflow-graph get 1array over set-node-children
     r> dataflow-graph set
     r> current-node set ;
 
 : with-nesting ( quot -- new-node | quot: -- new-node )
     nest-node 2slip unnest-node ; inline
-
-: node-effect ( node -- [[ d-in meta-d ]] )
-    dup node-in-d swap node-out-d cons ;
 
 : node-values ( node -- values )
     [
@@ -167,28 +148,27 @@ SYMBOL: current-node
         dup node-in-r % node-out-r %
     ] { } make ;
 
-: uses-value? ( value node -- ? )
-    node-values [ value-refers? ] contains-with? ;
+: uses-value? ( value node -- ? ) node-values memq? ;
 
 : outputs-value? ( value node -- ? )
     2dup node-out-d member? >r node-out-r member? r> or ;
 
 : last-node ( node -- last )
-    dup node-successor [ last-node ] [ ] ?ifte ;
+    dup node-successor [ last-node ] [ ] ?if ;
 
 : penultimate-node ( node -- penultimate )
     dup node-successor dup [
         dup node-successor
-        [ nip penultimate-node ] [ drop ] ifte
+        [ nip penultimate-node ] [ drop ] if
     ] [
         2drop f
-    ] ifte ;
+    ] if ;
 
 : drop-inputs ( node -- #shuffle )
-    node-in-d clone in-d-node <#shuffle> ;
+    node-in-d clone in-node <#shuffle> ;
 
 : #drop ( n -- #shuffle )
-    d-tail in-d-node <#shuffle> ;
+    d-tail in-node <#shuffle> ;
 
 : each-node ( node quot -- | quot: node -- )
     over [
@@ -197,7 +177,7 @@ SYMBOL: current-node
         node-successor swap each-node
     ] [
         2drop
-    ] ifte ; inline
+    ] if ; inline
 
 : each-node-with ( obj node quot -- | quot: obj node -- )
     swap [ with ] each-node 2drop ; inline
@@ -211,73 +191,32 @@ SYMBOL: current-node
                 >r node-successor r> all-nodes?
             ] [
                 2drop f
-            ] ifte
+            ] if
         ] [
             2drop f
-        ] ifte
+        ] if
     ] [
         2drop t
-    ] ifte ; inline
+    ] if ; inline
 
 : all-nodes-with? ( obj node quot -- ? | quot: obj node -- ? )
     swap [ with rot ] all-nodes? 2nip ; inline
 
-SYMBOL: substituted
-
-DEFER: subst-value
-
-: subst-meet ( new old meet -- )
-    #! We avoid mutating the same meet more than once, since
-    #! doing so can introduce cycles.
-    dup substituted get memq? [
-        3drop
-    ] [
-        dup substituted get push meet-values subst-value
-    ] ifte ;
-
-: (subst-value) ( new old value -- value )
-    2dup eq? [
-        2drop
-    ] [
-        dup meet? [
-            pick over swap value-refers? [
-                2nip ! don't substitute a meet into itself
-            ] [
-                [ subst-meet ] keep
-            ] ifte
-        ] [
-            2nip
-        ] ifte
-    ] ifte ;
-
-: subst-value ( new old seq -- )
-    pick pick eq? over empty? or [
-        3drop
-    ] [
-        [ >r 2dup r> (subst-value) ] nmap 2drop
-    ] ifte ;
-
-: (subst-values) ( newseq oldseq seq -- )
-    #! Mutates seq.
-    -rot [ pick subst-value ] 2each drop ;
+: (subst-values) ( new old node -- )
+    [ node-in-d subst ] 3keep [ node-in-r subst ] 3keep
+    [ node-out-d subst ] 3keep node-out-r subst ;
 
 : subst-values ( new old node -- )
     #! Mutates the node.
-    [
-        { } clone substituted set [
-            3dup node-in-d  (subst-values)
-            3dup node-in-r  (subst-values)
-            3dup node-out-d (subst-values)
-            3dup node-out-r (subst-values)
-            drop
-        ] each-node 2drop
-    ] with-scope ;
+    [ >r 2dup r> (subst-values) ] each-node 2drop ;
 
 : remember-node ( word node -- )
     #! Annotate each node with the fact it was inlined from
     #! 'word'.
     [
-        dup #call? [ node-history push ] [ 2drop ] ifte
+        dup #call?
+        [ [ node-history ?push ] keep set-node-history ]
+        [ 2drop ] if
     ] each-node-with ;
 
 : (clone-node) ( node -- node )

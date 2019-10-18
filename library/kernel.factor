@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: kernel
-USING: generic kernel-internals vectors ;
+USING: generic kernel-internals math-internals vectors ;
 
 : 2swap ( x y z t -- z t x y ) rot >r rot r> ; inline
 
@@ -9,9 +9,7 @@ USING: generic kernel-internals vectors ;
     #! Clear the datastack. For interactive use only; invoking
     #! this from a word definition will clobber any values left
     #! on the data stack by the caller.
-    { } set-datastack ;
-
-UNION: boolean POSTPONE: f POSTPONE: t ;
+    V{ } set-datastack ;
 
 GENERIC: hashcode ( obj -- n ) flushable
 M: object hashcode drop 0 ;
@@ -28,15 +26,11 @@ M: object clone ;
 
 : num-types ( -- n )
     #! One more than the maximum value from type primitive.
-    21 ; inline
+    20 ; inline
 
 : ? ( cond t f -- t/f )
     #! Push t if cond is true, otherwise push f.
-    rot [ drop ] [ nip ] ifte ; inline
-
-M: wrapper = ( obj wrapper -- ? )
-    over wrapper?
-    [ swap wrapped swap wrapped = ] [ 2drop f ] ifte ;
+    rot [ drop ] [ nip ] if ; inline
 
 : >boolean t f ? ; inline
 : and ( a b -- a&b ) f ? ; inline
@@ -58,6 +52,9 @@ M: wrapper = ( obj wrapper -- ? )
 : bignum-tag  BIN: 001 ; inline
 : cons-tag    BIN: 010 ; inline
 : object-tag  BIN: 011 ; inline
+: ratio-tag   BIN: 100 ; inline
+: float-tag   BIN: 101 ; inline
+: complex-tag BIN: 110 ; inline
 
 : slip ( quot x -- x | quot: -- )
     >r call r> ; inline
@@ -74,42 +71,69 @@ M: wrapper = ( obj wrapper -- ? )
 : 3keep ( x y z quot -- x y z | quot: x y z -- )
     >r 3dup r> swap >r swap >r swap >r call r> r> r> ; inline
 
-: ifte* ( cond true false -- | true: cond -- | false: -- )
-    #! [ X ] [ Y ] ifte* ==> dup [ X ] [ drop Y ] ifte
-    pick [ drop call ] [ 2nip call ] ifte ; inline
+: 2apply ( x y quot -- | quot: x/y -- )
+    tuck 2slip call ; inline
 
-: ?ifte ( default cond true false -- )
-    #! [ X ] [ Y ] ?ifte ==> dup [ nip X ] [ drop Y ] ifte
+: if* ( cond true false -- | true: cond -- | false: -- )
+    #! [ X ] [ Y ] if* ==> dup [ X ] [ drop Y ] if
+    pick [ drop call ] [ 2nip call ] if ; inline
+
+: ?if ( default cond true false -- )
+    #! [ X ] [ Y ] ?if ==> dup [ nip X ] [ drop Y ] if
     >r >r dup [
         nip r> r> drop call
     ] [
         drop r> drop r> call
-    ] ifte ; inline
+    ] if ; inline
 
 : unless ( cond quot -- | quot: -- )
     #! Execute a quotation only when the condition is f. The
     #! condition is popped off the stack.
-    [ ] swap ifte ; inline
+    [ ] swap if ; inline
 
 : unless* ( cond quot -- | quot: -- )
     #! If cond is f, pop it off the stack and evaluate the
     #! quotation. Otherwise, leave cond on the stack.
-    over [ drop ] [ nip call ] ifte ; inline
+    over [ drop ] [ nip call ] if ; inline
 
 : when ( cond quot -- | quot: -- )
     #! Execute a quotation only when the condition is not f. The
     #! condition is popped off the stack.
-    [ ] ifte ; inline
+    [ ] if ; inline
 
 : when* ( cond quot -- | quot: cond -- )
     #! If the condition is true, it is left on the stack, and
     #! the quotation is evaluated. Otherwise, the condition is
     #! popped off the stack.
-    dupd [ drop ] ifte ; inline
+    dupd [ drop ] if ; inline
 
 : with ( obj quot elt -- obj quot )
     #! Utility word for each-with, map-with.
     pick pick >r >r swap call r> r> ; inline
 
 : keep-datastack ( quot -- )
-    datastack slip set-datastack drop ;
+    datastack slip set-datastack drop ; inline
+
+M: wrapper = ( obj wrapper -- ? )
+    over wrapper? [ [ wrapped ] 2apply = ] [ 2drop f ] if ;
+
+GENERIC: literalize ( obj -- obj )
+
+M: object literalize ;
+
+M: wrapper literalize <wrapper> ;
+
+IN: kernel-internals
+
+! These words are unsafe. Don't use them.
+
+: array-capacity ( a -- n ) 1 slot ; inline
+: array-nth ( n a -- obj ) swap 2 fixnum+ slot ; inline
+: set-array-nth ( obj n a -- ) swap 2 fixnum+ set-slot ; inline
+
+: make-tuple ( class size -- tuple )
+    #! Internal allocation function. Do not call it directly,
+    #! since you can fool the runtime and corrupt memory by
+    #! specifying an incorrect size. Note that this word is also
+    #! handled specially by the compiler's type inferencer.
+    <tuple> [ 2 set-slot ] keep ; flushable

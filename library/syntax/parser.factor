@@ -5,7 +5,7 @@ USING: kernel lists namespaces sequences words ;
 
 : parse-loop ( -- )
     scan-word [
-        dup parsing? [ execute ] [ swons ] ifte  parse-loop
+        dup parsing? [ execute ] [ swons ] if  parse-loop
     ] when* ;
 
 : (parse) ( str -- )

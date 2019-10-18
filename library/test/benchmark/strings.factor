@@ -6,11 +6,11 @@ USING: compiler kernel math namespaces sequences strings test ;
     2dup length > [
         dup [ "123" % % "456" % % "789" % ] "" make
         dup dup length 2 /i 0 swap rot subseq
-        swap dup length 2 /i 1 + 1 swap rot subseq append
+        swap dup length 2 /i 1+ 1 swap rot subseq append
         string-step
     ] [
         2drop
-    ] ifte ; compiled
+    ] if ; compiled
 
 : string-benchmark ( n -- )
     "abcdef" 10 [ 2dup string-step ] times 2drop ; compiled

@@ -1,5 +1,4 @@
 IN: temporary
-USING: memory ;
 USE: errors
 USE: kernel
 USE: namespaces
@@ -7,14 +6,15 @@ USE: test
 USE: lists
 USE: parser
 USE: io
+USE: memory
 
-[ f ] [ [ ] [ ] catch ] unit-test
+[ f ] [ [ ] catch ] unit-test
 
-[ 5 ] [ [ 5 throw ] [ ] catch ] unit-test
+[ 5 ] [ [ 5 throw ] catch ] unit-test
 
 [ t ] [
-    [ "Hello" throw ] [ drop ] catch
-    global [ "error" get ] bind
+    [ "Hello" throw ] catch drop
+    global [ error get ] bind
     "Hello" =
 ] unit-test
 
@@ -24,10 +24,11 @@ USE: io
 
 "!!! The following error is part of the test" print
 
-[ [ "2 car" ] parse ] [ print-error ] catch
+[ [ "2 car" ] parse ] catch print-error
 
-! This should not raise an error
-[ 1 2 3 ] [ 1 2 3 f throw ] unit-test
+[ car ] [ [ 5 car ] catch no-method-generic ] unit-test
+
+[ f throw ] unit-test-fails
 
 ! See how well callstack overflow is handled
 : callstack-overflow callstack-overflow f ;
@@ -35,7 +36,7 @@ USE: io
 
 ! Weird PowerPC bug.
 [ ] [
-    [ "4" throw ] [ drop ] catch
+    [ "4" throw ] catch drop
     full-gc
     full-gc
 ] unit-test

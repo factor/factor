@@ -6,7 +6,7 @@ USING: errors generic kernel kernel-internals math ;
 : (rect>) ( xr xi -- x )
     #! Does not perform a check that the arguments are reals.
     #! Do not use in your own code.
-    dup 0 number= [ drop ] [ <complex> ] ifte ; inline
+    dup 0 number= [ drop ] [ <complex> ] if ; inline
 
 IN: math
 
@@ -21,8 +21,8 @@ M: number = ( n n -- ? ) number= ;
     over real? over real? and [
         (rect>)
     ] [
-        "Complex number must have real components" throw drop
-    ] ifte ; inline
+        "Complex number must have real components" throw
+    ] if ; inline
 
 : >rect ( x -- xr xi ) dup real swap imaginary ; inline
 
@@ -41,16 +41,18 @@ M: number = ( n n -- ? ) number= ;
 : polar> ( abs arg -- z )
     cis * ; inline
 
-: absq >rect swap sq swap sq + ; inline
+: quadrant ( z -- n )
+    >rect >r 0 >= 0 1 ? r> 0 >= 0 3 ? bitxor ;
+
+M: complex absq >rect [ sq ] 2apply + ;
 
 IN: math-internals
 
 : 2>rect ( x y -- xr yr xi yi )
-    [ swap real swap real ] 2keep
-    swap imaginary swap imaginary ; inline
+    [ [ real ] 2apply ] 2keep [ imaginary ] 2apply ; inline
 
 M: complex number= ( x y -- ? )
-    2>rect number= [ number= ] [ 2drop f ] ifte ;
+    2>rect number= [ number= ] [ 2drop f ] if ;
 
 : *re ( x y -- xr*yr xi*ri ) 2>rect * >r * r> ; inline
 : *im ( x y -- xi*yr xr*yi ) 2>rect >r * swap r> * ; inline
@@ -65,6 +67,9 @@ M: complex * ( x y -- x*y ) 2dup *re - -rot *im + (rect>) ;
 
 M: complex / ( x y -- x/y ) complex/ tuck / >r / r> (rect>) ;
 M: complex /f ( x y -- x/y ) complex/ tuck /f >r /f r> (rect>) ;
+
+M: complex 1+ >rect >r 1+ r> (rect>) ;
+M: complex 1- >rect >r 1- r> (rect>) ;
 
 M: complex abs ( z -- |z| ) absq fsqrt ;
 

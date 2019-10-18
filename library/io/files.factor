@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io
-USING: kernel lists namespaces sequences strings ;
+USING: hashtables kernel lists math namespaces sequences strings
+styles ;
 
 ! Words for accessing filesystem meta-data.
 
@@ -12,18 +13,34 @@ USING: kernel lists namespaces sequences strings ;
 : directory? ( file -- ? ) stat car ;
 
 : directory ( dir -- list )
-    (directory) { "." ".." } swap seq-diff string-sort ;
+    (directory)
+    H{ [[ "." "." ]] [[ ".." ".." ]] }
+    swap remove-all string-sort ;
 
 : file-length ( file -- length ) stat third ;
 
 : file-extension ( filename -- extension )
-    "." split cdr dup [ peek ] when ;
+    "." split dup length 1 <= [ drop f ] [ peek ] if ;
 
-DEFER: <file-reader>
-
-: resource-path ( -- path )
-    "resource-path" get [ "." ] unless* ;
+: resource-path ( path -- path )
+    "resource-path" get [ "." ] unless* swap path+ ;
 
 : <resource-stream> ( path -- stream )
     #! Open a file path relative to the Factor source code root.
-    resource-path swap path+ <file-reader> ;
+    resource-path <file-reader> ;
+
+DEFER: directory.
+
+: file-style ( text path -- text style )
+    dup directory? [
+        >r "/" append r>
+        dup [ directory. ] curry outline swons unit
+    ] [
+        f
+    ] if swap file swons swons ;
+
+: file. ( dir name -- )
+    tuck path+ file-style format ;
+
+: directory. ( dir -- )
+    dup directory [ file. terpri ] each-with ;

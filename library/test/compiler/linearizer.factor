@@ -6,7 +6,7 @@ USE: compiler-frontend
 USE: inference
 USE: words
 
-: fie [ ] [ ] ifte ;
+: fie [ ] [ ] if ;
 
 [ ] [ \ fie word-def dataflow linearize drop ] unit-test
 

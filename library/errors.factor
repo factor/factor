@@ -1,31 +1,43 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: kernel
-USING: kernel-internals lists ;
-DEFER: callcc1
 IN: errors
+USING: kernel kernel-internals lists sequences ;
 
 ! This is a very lightweight exception handling system.
 
 TUPLE: no-method object generic ;
 
-: no-method ( object generic -- ) <no-method> throw ; inline
-
-: catchstack ( -- cs ) 6 getenv ;
-: set-catchstack ( cs -- ) 6 setenv ;
+: no-method ( object generic -- ) <no-method> throw ;
 
 : >c ( catch -- ) catchstack cons set-catchstack ;
 : c> ( catch -- ) catchstack uncons set-catchstack ;
 
-: catch ( try catch -- )
-    #! Call the try quotation. If an error occurs restore the
-    #! datastack, push the error, and call the catch block.
-    #! If no error occurs, push f and call the catch block.
-    [ >c >r call c> drop f r> f ] callcc1 rot drop swap call ;
+: catch ( try -- exception/f | try: -- )
+    #! Call the try quotation. If an exception is thrown in the
+    #! dynamic extent of the quotation, restore the datastack
+    #! and push the exception. Otherwise, the data stack is
+    #! not restored, and f is pushed.
+    [ >c call f c> drop f ] callcc1 nip ; inline
 
 : rethrow ( error -- )
     #! Use rethrow when passing an error on from a catch block.
-    #! For convinience, this word is a no-op if error is f.
-    [ c> call ] when* ;
+    catchstack empty?
+    [ die "Can't happen" throw ] [ c> continue-with ] if ;
+
+: cleanup ( try cleanup -- | try: -- | cleanup: -- )
+    #! Call the try quotation. If an exception is thrown in the
+    #! dynamic extent of the quotation, restore the datastack
+    #! and run the cleanup quotation. Then throw the error to
+    #! the next outermost catch handler.
+    [ >c >r call c> drop r> call ]
+    [ drop (continue-with) >r nip call r> rethrow ] ifcc ; inline
+
+: recover ( try recovery -- | try: -- | recovery: error -- )
+    #! Call the try quotation. If an exception is thrown in the
+    #! dynamic extent of the quotation, restore the datastack,
+    #! push the exception on the datastack, and call the
+    #! recovery quotation.
+    [ >c drop call c> drop ]
+    [ drop (continue-with) rot drop swap call ] ifcc ; inline
 
 GENERIC: error. ( error -- )

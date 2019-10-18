@@ -7,28 +7,30 @@ kernel-internals lists math memory namespaces words ;
 : compile-c-call ( symbol dll -- )
     2dup dlsym  11 LOAD32  0 1 rel-dlsym  11 MTLR  BLRL ;
 
+: stack-increment \ stack-reserve get 32 max stack@ 16 align ;
+
 M: %prologue generate-node ( vop -- )
     drop
-    1 1 -16 STWU
+    1 1 stack-increment neg STWU
     0 MFLR
-    0 1 20 STW ;
+    0 1 stack-increment lr@ STW ;
 
 : compile-epilogue
     #! At the end of each word that calls a subroutine, we store
     #! the previous link register value in r0 by popping it off
     #! the stack, set the link register to the contents of r0,
     #! and jump to the link register.
-    0 1 20 LWZ
-    1 1 16 ADDI
+    0 1 stack-increment lr@ LWZ
+    1 1 stack-increment ADDI
     0 MTLR ;
 
 M: %call-label generate-node ( vop -- )
     #! Near calling convention for inlined recursive combinators
     #! Note: length of instruction sequence is hard-coded.
     vop-label
-    0 1 rel-address  compiled-offset 20 + 18 LOAD32
-    1 1 -16 STWU
-    18 1 20 STW
+    compiled-offset 20 + 18 LOAD32  0 1 rel-address
+    1 1 stack-increment neg STWU
+    18 1 stack-increment lr@ STW
     B ;
 
 : word-addr ( word -- )
@@ -37,14 +39,14 @@ M: %call-label generate-node ( vop -- )
 
 : compile-call ( label -- )
     #! Far C call for primitives, near C call for compiled defs.
-    dup primitive? [ word-addr  3 MTLR  BLRL ] [ BL ] ifte ;
+    dup primitive? [ word-addr  3 MTLR  BLRL ] [ BL ] if ;
 
 M: %call generate-node ( vop -- )
     vop-label dup postpone-word compile-call ;
 
 : compile-jump ( label -- )
     #! For tail calls. IP not saved on C stack.
-    dup primitive? [ word-addr  3 MTCTR  BCTR ] [ B ] ifte ;
+    dup primitive? [ word-addr  3 MTCTR  BCTR ] [ B ] if ;
 
 M: %jump generate-node ( vop -- )
     vop-label dup postpone-word  compile-epilogue compile-jump ;
@@ -52,19 +54,13 @@ M: %jump generate-node ( vop -- )
 M: %jump-label generate-node ( vop -- )
     vop-label B ;
 
-: conditional ( vop -- label )
-    dup vop-in-1 v>operand 0 swap f address CMPI vop-label ;
-
-M: %jump-f generate-node ( vop -- )
-    conditional BEQ ;
-
 M: %jump-t generate-node ( vop -- )
-    conditional BNE ;
+    dup 0 vop-in v>operand 0 swap f address CMPI vop-label BNE ;
 
 M: %return-to generate-node ( vop -- )
     vop-label 0 3 LOAD32  absolute-16/16
-    1 1 -16 STWU
-    3 1 20 STW ;
+    1 1 stack-increment neg STWU
+    3 1 stack-increment lr@ STW ;
 
 M: %return generate-node ( vop -- )
     drop compile-epilogue BLR ;
@@ -74,21 +70,14 @@ M: %return generate-node ( vop -- )
 M: %untag generate-node ( vop -- )
     dest/src untag ;
 
-M: %untag-fixnum generate-node ( vop -- )
-    dest/src tag-bits SRAWI ;
-
 : tag-fixnum ( src dest -- ) tag-bits SLWI ;
-
-M: %retag-fixnum generate-node ( vop -- )
-    ! todo: formalize scratch register usage
-    dest/src tag-fixnum ;
 
 M: %dispatch generate-node ( vop -- )
     0 <vreg> check-src
-    3 3 2 SLWI
+    3 3 1 SRAWI
     ! The value 24 is a magic number. It is the length of the
     ! instruction sequence that follows to be generated.
-    0 1 rel-address  compiled-offset 24 + 4 LOAD32
+    compiled-offset 24 + 4 LOAD32  0 1 rel-address
     3 3 4 ADD
     3 3 0 LWZ
     3 MTLR
@@ -99,9 +88,11 @@ M: %type generate-node ( vop -- )
     <label> "f" set
     <label> "end" set
     ! Get the tag
-    3 4 tag-mask ANDI
+    3 5 tag-mask ANDI
+    ! Tag the tag
+    5 4 tag-fixnum
     ! Compare with object tag number (3).
-    0 4 object-tag CMPI
+    0 5 object-tag CMPI
     ! Jump if the object doesn't store type info in its header
     "end" get BNE
     ! It does store type info in its header
@@ -110,13 +101,14 @@ M: %type generate-node ( vop -- )
     "f" get BEQ
     ! The pointer is not equal to 3. Load the object header.
     4 3 object-tag neg LWZ
-    4 4 3 SRAWI
+    4 4 untag
     "end" get B
     "f" get save-xt
     ! The pointer is equal to 3. Load F_TYPE (9).
-    f type 4 LI
+    f type tag-bits shift 4 LI
     "end" get save-xt
     3 4 MR ;
 
 M: %tag generate-node ( vop -- )
-    dup vop-in-1 v>operand swap vop-out-1 v>operand tag-mask ANDI ;
+    dup 0 vop-in v>operand swap 0 vop-out v>operand
+    [ tag-mask ANDI ] keep dup tag-fixnum ;

@@ -2,7 +2,7 @@ IN: temporary
 USING: kernel inspector math namespaces prettyprint test
 sequences ;
 
-{ } clone inspector-stack set
+V{ } clone inspector-stack set
 
 [[ "hello" "world" ]] (inspect)
 

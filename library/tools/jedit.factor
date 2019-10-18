@@ -1,18 +1,14 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: jedit
-USING: errors io kernel lists math namespaces parser prettyprint
-sequences strings unparser vectors words ;
+USING: arrays errors io kernel listener lists math namespaces
+parser prettyprint sequences strings unparser words ;
 
 ! Some words to send requests to a running jEdit instance to
 ! edit files and position the cursor on a specific line number.
 
-: jedit-server-file ( -- path )
-    "jedit-server-file" get
-    [ "~" get "/.jedit/server" append ] unless* ;
-
 : jedit-server-info ( -- port auth )
-    jedit-server-file <file-reader> [
+    "~" get "/.jedit/server" append <file-reader> [
         readln drop
         readln string>number
         readln string>number
@@ -30,23 +26,19 @@ sequences strings unparser vectors words ;
     jedit-server-info swap "localhost" swap <client> [
         4 >be write
         dup length 2 >be write
-        write flush
+        write
     ] with-stream ;
 
 : jedit-line/file ( file line -- )
-    number>string "+line:" swap append 2vector
+    number>string "+line:" swap append 2array
     make-jedit-request send-jedit-request ;
 
 : jedit-file ( file -- )
-    1vector make-jedit-request send-jedit-request ;
+    1array make-jedit-request send-jedit-request ;
 
 : jedit ( word -- )
     #! Note that line numbers here start from 1
-    dup word-file dup [
-        swap "line" word-prop jedit-line/file
-    ] [
-        2drop "Unknown source" print
-    ] ifte ;
+    dup word-file swap "line" word-prop jedit-line/file ;
 
 ! Wire protocol for jEdit to evaluate Factor code.
 ! Packets are of the form:
@@ -87,3 +79,15 @@ sequences strings unparser vectors words ;
     #! Make a list of completions. Each element of the list is
     #! a vocabulary/name/stack-effect triplet list.
     word-subset-with [ jedit-lookup ] map ;
+
+! The telnet server is for the jEdit plugin.
+: telnetd ( port -- )
+    \ telnetd [ print-banner listener ] with-server ;
+
+IN: shells
+
+: telnet
+    "telnetd-port" get string>number telnetd ;
+
+! This is a string since we string>number it above.
+global [ "9999" "telnetd-port" set ] bind

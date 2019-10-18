@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: words
-USING: interpreter io kernel lists math namespaces prettyprint
-sequences strings test ;
+USING: interpreter inspector io kernel lists math namespaces
+prettyprint sequences strings test ;
 
 ! The annotation words let you flag a word for either tracing
 ! or single-stepping. Note that currently, words referring to
@@ -11,13 +11,14 @@ sequences strings test ;
     over >r >r dup word-def r> call r> swap define-compound ;
     inline
 
+: watch-msg ( word prefix -- ) write word-name print .s ;
+
 : (watch) ( word def -- def )
     [
-        "===> Entering: " pick word-name append ,
-        [ print .s ] %
-        %
-        "===> Leaving:  " swap word-name append ,
-        [ print .s ] %
+        swap literalize
+        dup , "===> Entering: " , \ watch-msg ,
+        swap %
+        , "===> Leaving:  " , \ watch-msg ,
     ] [ ] make ;
 
 : watch ( word -- )
@@ -35,10 +36,7 @@ sequences strings test ;
     millis >r >r call r> millis r> - swap global [ +@ ] bind ;
     inline
 
-: (profile) ( word def -- def )
-    [ , literalize , \ with-profile , ] [ ] make ;
-
 : profile ( word -- )
     #! When the word is called, time it, and add the time to
     #! the value in a global variable named by the word.
-    [ (profile) ] annotate ;
+    [ swap [ with-profile ] curry cons ] annotate ;

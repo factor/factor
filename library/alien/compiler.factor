@@ -47,16 +47,11 @@ C: alien-node make-node ;
 
 : set-alien-return ( return node -- )
     2dup set-alien-node-return
-    swap "void" = [
-        drop
-    ] [
-        [ object ] produce-d 1 0 rot node-outputs
-    ] ifte ;
+    swap "void" = [ 1 over produce-values ] unless drop ;
 
 : set-alien-parameters ( parameters node -- )
     2dup set-alien-node-parameters
-    >r [ drop object ] map dup dup ensure-d
-    length 0 r> node-inputs consume-d ;
+    >r length r> consume-values ;
 
 : ensure-dlsym ( symbol library -- ) load-library dlsym drop ;
 
@@ -75,38 +70,45 @@ C: alien-node make-node ;
 : c-aligned c-size cell align ;
 
 : stack-space ( parameters -- n )
-    0 swap [ c-aligned + ] each ;
+    0 [ c-aligned + ] reduce ;
 
 : unbox-parameter ( n parameter -- node )
     c-type [ "unboxer" get "reg-class" get ] bind %unbox ;
 
 : unbox-parameters ( params -- )
     [ stack-space ] keep
-    [ [ c-aligned - dup ] keep unbox-parameter ] map nip % ;
+    [ [ c-aligned - dup ] keep unbox-parameter , ] each drop ;
 
-: incr-param ( reg-class -- )
-    #! OS X is so ugly.
-    dup class inc  dup float-regs? [
-        os "macosx" = [
-            int-regs [ swap float-regs-size 4 / + ] change
-        ] [
-            drop
-        ] ifte
-    ] [
-        drop
-    ] ifte ;
+: reg-class-full? ( class -- ? )
+    dup class get swap fastcall-regs >= ;
+
+: spill-param ( reg-class -- n reg-class )
+    reg-class-size stack-params [ tuck + ] change
+    T{ stack-params } ;
+
+: inc-reg-class ( reg-class -- )
+    #! On Mac OS X, float parameters 'shadow' integer registers.
+    dup class inc dup float-regs? dual-fp/int-regs? and [
+        int-regs [ over reg-class-size 4 / + ] change
+    ] when drop ;
+
+: fastcall-param ( reg-class -- n reg-class )
+    [ dup class get swap inc-reg-class ] keep ;
 
 : load-parameter ( n parameter -- node )
-    c-type "reg-class" swap hash
-    [ [ class get ] keep  incr-param ] keep  %parameter ;
+    #! n is a stack location, and the value of the class
+    #! variable is a register number.
+    c-type "reg-class" swap hash dup reg-class-full?
+    [ spill-param ] [ fastcall-param ] if %parameter ;
 
 : load-parameters ( params -- )
     [
+        reverse
         0 int-regs set
         0 float-regs set
-        reverse 0 swap
-        [ 2dup load-parameter >r c-aligned + r> ] map nip
-    ] with-scope % ;
+        0 stack-params set
+        0 [ 2dup load-parameter , c-aligned + ] reduce drop
+    ] with-scope ;
 
 : linearize-parameters ( parameters -- )
     #! Generate code for boxing a list of C types, then generate
@@ -116,23 +118,23 @@ C: alien-node make-node ;
     dup stack-space %parameters ,
     dup unbox-parameters load-parameters ;
 
-: linearize-return ( return -- )
+: linearize-return ( node -- )
     alien-node-return dup "void" = [
         drop
     ] [
         c-type [ "boxer" get "reg-class" get ] bind %box ,
-    ] ifte ;
+    ] if ;
 
-M: alien-node linearize-node* ( node -- )
+M: alien-node linearize* ( node -- )
     dup parameters linearize-parameters
     dup node-param dup uncons %alien-invoke ,
     cdr library-abi "stdcall" =
     [ dup parameters stack-space %cleanup , ] unless
-    linearize-return ;
+    dup linearize-return linearize-next ;
 
 : unpair ( seq -- odds evens )
     2 swap group flip dup empty?
-    [ drop { } { } ] [ first2 ] ifte ;
+    [ drop { } { } ] [ first2 ] if ;
 
 : parse-arglist ( lst -- types stack effect )
     unpair [
@@ -159,13 +161,14 @@ M: alien-node linearize-node* ( node -- )
 ] "infer" set-word-prop
 
 global [
-    "libraries" get [ {{ }} clone "libraries" set ] unless
+    "libraries" get [ H{ } clone "libraries" set ] unless
 ] bind
 
 M: compound (uncrossref)
-    dup word-def \ alien-invoke swap member? [
+    dup word-def \ alien-invoke swap member?
+    over "infer" word-prop or [
         drop
     ] [
-        dup { "infer-effect" "base-case" "no-effect" }
+        dup { "infer-effect" "base-case" "no-effect" "terminates" }
         reset-props update-xt
-    ] ifte ;
+    ] if ;

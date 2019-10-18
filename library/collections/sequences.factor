@@ -28,21 +28,6 @@ GENERIC: resize ( n seq -- seq )
 : immutable ( seq quot -- seq | quot: seq -- )
     swap [ thaw ] keep >r dup >r swap call r> r> like ; inline
 
-G: each ( seq quot -- | quot: elt -- )
-    [ over ] standard-combination ; inline
-
-: each-with ( obj seq quot -- | quot: obj elt -- )
-    swap [ with ] each 2drop ; inline
-
-: reduce ( seq identity quot -- value | quot: x y -- z )
-    swapd each ; inline
-
-G: find ( seq quot -- i elt | quot: elt -- ? )
-    [ over ] standard-combination ; inline
-
-: find-with ( obj seq quot -- i elt | quot: elt -- ? )
-    swap [ with rot ] find 2swap 2drop ; inline
-
 : first 0 swap nth ; inline
 : second 1 swap nth ; inline
 : third 2 swap nth ; inline
@@ -52,22 +37,37 @@ G: find ( seq quot -- i elt | quot: elt -- ? )
     #! Push a value on the end of a sequence.
     dup length swap set-nth ; inline
 
-: 2nth ( s s n -- x x ) tuck swap nth >r swap nth r> ; inline
+: ?push ( elt seq/f -- seq )
+    [ 1 <vector> ] unless* [ push ] keep ;
 
-: first2 ( { x y } -- x y )
-    dup first swap second ; inline
+: bounds-check? ( n seq -- ? )
+    over 0 >= [ length < ] [ 2drop f ] if ;
 
-: first3 ( { x y z } -- x y z )
-    dup first over second rot third ; inline
+: ?nth ( n seq/f -- elt/f )
+    #! seq can even be f, since f answers with zero length.
+    2dup length >= [ 2drop f ] [ nth ] if ;
 
-TUPLE: bounds-error index seq ;
+IN: sequences-internals
 
-: bounds-error <bounds-error> throw ; inline
+! Unsafe sequence protocol for inner loops
+GENERIC: nth-unsafe
+GENERIC: set-nth-unsafe
 
-: growable-check ( n seq -- fx seq )
-    >r >fixnum dup 0 fixnum<
-    [ r> 2dup bounds-error ] [ r> ] ifte ; inline
+M: object nth-unsafe nth ;
+M: object set-nth-unsafe set-nth ;
 
-: bounds-check ( n seq -- fx seq )
-    growable-check 2dup length fixnum>=
-    [ 2dup bounds-error ] when ; inline
+: 2nth-unsafe ( s s n -- x x )
+    tuck swap nth-unsafe >r swap nth-unsafe r> ; inline
+
+: change-nth-unsafe ( seq i quot -- )
+    pick pick >r >r >r swap nth-unsafe
+    r> call r> r> swap set-nth-unsafe ; inline
+
+! Integers support the sequence protocol
+M: integer length ;
+M: integer nth drop ;
+M: integer nth-unsafe drop ;
+
+: first2-unsafe [ 0 swap nth-unsafe ] keep 1 swap nth-unsafe ; inline
+: first3-unsafe [ first2-unsafe ] keep 2 swap nth-unsafe ; inline
+: first4-unsafe [ first3-unsafe ] keep 3 swap nth-unsafe ; inline

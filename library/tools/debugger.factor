@@ -1,8 +1,12 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: errors
-USING: generic kernel kernel-internals lists math namespaces
-parser prettyprint sequences io strings vectors words ;
+USING: generic inspector kernel kernel-internals lists math
+namespaces parser prettyprint sequences io sequences-internals
+strings vectors words ;
+
+SYMBOL: error
+SYMBOL: error-continuation
 
 : expired-error. ( obj -- )
     "Object did not survive image save/load: " write . ;
@@ -41,31 +45,35 @@ parser prettyprint sequences io strings vectors words ;
     "The image refers to a library or symbol that was not found"
     " at load time" append print drop ;
 
-PREDICATE: cons kernel-error ( obj -- ? )
-    car kernel-error = ;
+: user-interrupt. ( obj -- )
+    "User interrupt" print drop ;
 
-M: f error. ( f -- ) ;
+PREDICATE: cons kernel-error ( obj -- ? )
+    dup first kernel-error = swap second 0 11 between? and ;
 
 M: kernel-error error. ( error -- )
     #! Kernel errors are indexed by integers.
     cdr uncons car swap {
-        expired-error.
-        io-error.
-        undefined-word-error.
-        type-check-error.
-        float-format-error.
-        signal-error.
-        negative-array-size-error.
-        c-string-error.
-        ffi-error.
-        heap-scan-error.
-        undefined-symbol-error.
-    } nth execute ;
+        [ expired-error. ]
+        [ io-error. ]
+        [ undefined-word-error. ]
+        [ type-check-error. ]
+        [ float-format-error. ]
+        [ signal-error. ]
+        [ negative-array-size-error. ]
+        [ c-string-error. ]
+        [ ffi-error. ]
+        [ heap-scan-error. ]
+        [ undefined-symbol-error. ]
+        [ user-interrupt. ]
+    } dispatch ;
 
 M: no-method error. ( error -- )
     "No suitable method." print
     "Generic word: " write dup no-method-generic .
-    "Object: " write no-method-object short. ;
+    "Methods: " write dup no-method-generic order .
+    "Object: " write dup no-method-object short.
+    "Object class: " write no-method-object class short. ;
 
 M: no-math-method error. ( error -- )
     "No suitable arithmetic method." print
@@ -79,7 +87,7 @@ M: no-math-method error. ( error -- )
     ":" write
     dup parse-error-line [ 1 ] unless* number>string print
     
-    dup parse-error-text dup string? [ print ] [ drop ] ifte
+    dup parse-error-text dup string? [ print ] [ drop ] if
     
     parse-error-col [ 0 ] unless* CHAR: \s fill write "^" print ;
 
@@ -97,45 +105,37 @@ M: string error. ( error -- ) print ;
 
 M: object error. ( error -- ) . ;
 
-: :s ( -- ) "error-datastack"  get stack. ;
-: :r ( -- ) "error-callstack"  get stack. ;
+: :s ( -- ) error-continuation get continuation-data stack. ;
 
-: :get ( var -- value ) "error-namestack" get (get) ;
+: :r ( -- ) error-continuation get continuation-call stack. ;
+
+: :get ( var -- value )
+    error-continuation get continuation-name (get) ;
 
 : debug-help ( -- )
     ":s :r show stacks at time of error." print
     ":get ( var -- value ) inspects the error namestack." print ;
 
-: flush-error-handler ( error -- )
+: flush-error-handler ( -- )
     #! Last resort.
-    [ "Error in default error handler!" print drop ] when ;
+    [ "Error in default error handler!" print ] when ;
 
 : print-error ( error -- )
     #! Print the error.
-    [ error. ] [ flush-error-handler ] catch ;
+    [ dup error. ] catch nip flush-error-handler ;
 
 : try ( quot -- )
     #! Execute a quotation, and if it throws an error, print it
     #! and return to the caller.
-    [ [ print-error debug-help ] when* ] catch ;
+    [ print-error debug-help ] recover ;
 
-: save-error ( error ds rs ns cs -- )
-    #! Save the stacks and parser state for post-mortem
-    #! inspection after an error.
-    global [
-        "error-catchstack" set
-        "error-namestack" set
-        "error-callstack" set
-        "error-datastack" set
-        "error" set
-    ] bind ;
+: save-error ( error continuation -- )
+    global [ error-continuation set error set ] bind ;
+
+: error-handler ( error -- )
+    dup continuation save-error rethrow ;
 
 : init-error-handler ( -- )
-    [ die ] >c ( last resort )
-    [ print-error die ] >c
     ( kernel calls on error )
-    [
-        datastack dupd callstack namestack catchstack
-        save-error rethrow
-    ] 5 setenv
+    [ error-handler ] 5 setenv
     kernel-error 12 setenv ;

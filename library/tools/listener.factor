@@ -24,10 +24,10 @@ global [ "  " listener-prompt set ] bind
             ( we're done ) r> drop t
         ] [
             ( more input needed ) r> (read-multiline)
-        ] ifte
+        ] if
     ] [
         ( EOF ) r> 2drop f
-    ] ifte ;
+    ] if ;
 
 : read-multiline ( -- quot ? )
     #! Keep parsing until the end is reached. Flag indicates
@@ -37,21 +37,24 @@ global [ "  " listener-prompt set ] bind
 : listen ( -- )
     #! Wait for user input, and execute.
     listener-hook get call
-    listener-prompt get write flush [
-        read-multiline
-        [ call ] [ bye ] ifte
-    ] try ;
+    listener-prompt get write flush
+    [ read-multiline [ call ] [ bye ] if ] try ;
 
 : listener ( -- )
     #! Run a listener loop that executes user input.
-    quit-flag get [ quit-flag off ] [ listen listener ] ifte ;
+    quit-flag get [ quit-flag off ] [ listen listener ] if ;
+
+: credits ( -- )
+    "Slava Pestov:       dup drop swap >r r>" print
+    "Alex Chapman:       OpenGL binding" print
+    "Doug Coleman:       Mersenne Twister random number generator" print
+    "Chris Double:       continuation-based web framework" print
+    "Mackenzie Straight: Windows port" print ;
 
 : print-banner ( -- )
     "Factor " write version write
-    " :: http://factor.sourceforge.net :: " write
-    os write
-    "/" write cpu print
-    "(C) 2003, 2005 Slava Pestov, Chris Double, Mackenzie Straight" print ;
+    " on " write os write "/" write cpu write
+    ". For credits, type ``credits''." print ;
 
 IN: shells
 

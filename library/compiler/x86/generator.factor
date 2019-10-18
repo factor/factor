@@ -22,14 +22,8 @@ M: %jump generate-node ( vop -- )
 M: %jump-label generate-node ( vop -- )
     vop-label JMP ;
 
-: conditional ( vop -- label )
-    dup vop-in-1 v>operand f address CMP vop-label ;
-
-M: %jump-f generate-node ( vop -- )
-    conditional JE ;
-
 M: %jump-t generate-node ( vop -- )
-    conditional JNE ;
+    dup 0 vop-in v>operand f address CMP vop-label JNE ;
 
 M: %return-to generate-node ( vop -- )
     0 PUSH vop-label absolute ;
@@ -37,22 +31,13 @@ M: %return-to generate-node ( vop -- )
 M: %return generate-node ( vop -- )
     drop RET ;
 
-M: %untag generate-node ( vop -- )
-    vop-out-1 v>operand BIN: 111 bitnot AND ;
-
-M: %retag-fixnum generate-node ( vop -- )
-    vop-out-1 v>operand 3 SHL ;
-
-M: %untag-fixnum generate-node ( vop -- )
-    vop-out-1 v>operand 3 SHR ;
-
 M: %dispatch generate-node ( vop -- )
     #! Compile a piece of code that jumps to an offset in a
     #! jump table indexed by the fixnum at the top of the stack.
     #! The jump table must immediately follow this macro.
-    vop-in-1 v>operand
-    ! Multiply by 4 to get a jump table offset
-    dup 2 SHL
+    0 vop-in v>operand
+    ! Untag and multiply by 4 to get a jump table offset
+    dup tag-bits 2 - SHR
     ! Add to jump table base
     dup HEX: ffff ADD  just-compiled >r 0 0 rel-address
     ! Jump to jump table entry
@@ -63,11 +48,11 @@ M: %dispatch generate-node ( vop -- )
     compiled-offset r> set-compiled-cell ( fixup -- ) ;
 
 M: %type generate-node ( vop -- )
-    #! Intrinstic version of type primitive. It outputs an
-    #! UNBOXED value in vop-out-1.
+    #! Intrinstic version of type primitive.
+    <label> "header" set
     <label> "f" set
     <label> "end" set
-    vop-out-1 v>operand
+    0 vop-out v>operand
     ! Make a copy
     ECX over MOV
     ! Get the tag
@@ -75,21 +60,29 @@ M: %type generate-node ( vop -- )
     ! Compare with object tag number (3).
     dup object-tag CMP
     ! Jump if the object doesn't store type info in its header
-    "end" get JNE
+    "header" get JE
     ! It doesn't store type info in its header
+    dup tag-bits SHL
+    "end" get JMP
+    "header" get save-xt
     ! It does store type info in its header
     ! Is the pointer itself equal to 3? Then its F_TYPE (9).
     ECX object-tag CMP
     "f" get JE
     ! The pointer is not equal to 3. Load the object header.
     dup ECX object-tag neg 2list MOV
-    dup 3 SHR
+    ! Mask off header tag, making a fixnum.
+    dup object-tag XOR
     "end" get JMP
     "f" get save-xt
     ! The pointer is equal to 3. Load F_TYPE (9).
-    f type MOV
+    f type tag-bits shift MOV
     "end" get save-xt ;
 
 M: %tag generate-node ( vop -- )
-    dup dup vop-in-1 check-dest
-    vop-in-1 v>operand tag-mask AND ;
+    dup dup 0 vop-in check-dest
+    0 vop-in v>operand dup tag-mask AND
+    tag-bits SHL ;
+
+M: %untag generate-node ( vop -- )
+    0 vop-out v>operand tag-mask bitnot AND ;

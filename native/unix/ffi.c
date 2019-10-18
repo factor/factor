@@ -44,7 +44,6 @@ void *ffi_dlsym(DLL *dll, F_STRING *symbol, bool error)
 	return sym;
 }
 
-
 void ffi_dlclose(DLL *dll)
 {
 	if(dlclose(dll->dll))

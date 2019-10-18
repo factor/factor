@@ -11,7 +11,7 @@ sequences strings ;
     <repeated> >string ; inline
 
 : padding ( string count char -- string )
-    >r swap length - dup 0 <= [ r> 2drop "" ] [ r> fill ] ifte ;
+    >r swap length - dup 0 <= [ r> 2drop "" ] [ r> fill ] if ;
     flushable
 
 : pad-left ( string count char -- string )
@@ -32,6 +32,5 @@ M: string thaw >sbuf ;
 
 M: string like ( seq sbuf -- string ) drop >string ;
 
-M: sbuf clone ( sbuf -- sbuf ) >sbuf ;
-
-M: sbuf like ( seq sbuf -- sbuf ) drop >sbuf ;
+M: sbuf like ( seq sbuf -- sbuf )
+    drop dup sbuf? [ >sbuf ] unless ;

@@ -10,13 +10,12 @@ void run(void)
 	CELL next;
 
 	/* Error handling. */
-#ifdef WIN32
-	setjmp(toplevel);
-#else
-	sigsetjmp(toplevel, 1);
-#endif
-	if(thrown_error != F)
+	SETJMP(toplevel);
+
+	if(throwing)
 	{
+		interrupt = false;
+
 		if(thrown_keep_stacks)
 		{
 			ds = thrown_ds;
@@ -34,13 +33,19 @@ void run(void)
 		dpush(thrown_error);
 		/* Notify any 'catch' blocks */
 		call(userenv[BREAK_ENV]);
-		thrown_error = F;
+		throwing = false;
 	}
 
 	for(;;)
 	{
 		if(callframe == F)
 		{
+			if(interrupt)
+			{
+				factorbug();
+				interrupt = false;
+			}
+
 			callframe = cpop();
 			executing = cpop();
 			continue;
@@ -104,9 +109,9 @@ void primitive_ifte(void)
 
 void primitive_dispatch(void)
 {
-	F_VECTOR *v = (F_VECTOR*)UNTAG(dpop());
+	F_ARRAY *a = untag_array_fast(dpop());
 	F_FIXNUM n = untag_fixnum_fast(dpop());
-	call(get(AREF(untag_array_fast(v->array),n)));
+	call(get(AREF(a,n)));
 }
 
 void primitive_getenv(void)

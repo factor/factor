@@ -117,7 +117,7 @@ public class FactorPlugin extends EditPlugin
 			String[] argsArray = (String[])args.toArray(
 				new String[args.size()]);
 			for(int i = 0; i < argsArray.length; i++)
-				System.out.println(argsArray[i]);
+				Log.log(Log.DEBUG,FactorPlugin.class,argsArray[i]);
 
 			process = Runtime.getRuntime().exec(
 				argsArray, null, new File(MiscUtilities

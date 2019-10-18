@@ -2,19 +2,18 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: styles
 
-! Colors are RGB triples.
-: black { 0   0   0   } ;
-: gray  { 128 128 128 } ;
-: white { 255 255 255 } ;
-: red   { 255 0   0   } ;
-: green { 0   255 0   } ;
-: blue  { 0   0   255 } ;
+! Colors are RGBA quadruples
+: black      { 0.0 0.0 0.0 1.0 } ;
+: dark-gray  { 0.25 0.25 0.25 1.0 } ;
+: gray       { 0.5 0.5 0.5 1.0 } ;
+: light-gray { 0.75 0.75 0.75 1.0 } ;
+: white      { 1.0 1.0 1.0 1.0 } ;
+: red        { 1.0 0.0 0.0 1.0 } ;
+: green      { 0.0 1.0 0.0 1.0 } ;
+: blue       { 0.0 0.0 1.0 1.0 } ;
 
 SYMBOL: foreground ! Used for text and outline shapes.
 SYMBOL: background ! Used for filled shapes.
-SYMBOL: rollover-bg
-SYMBOL: rollover
-SYMBOL: reverse-video
 
 SYMBOL: font
 SYMBOL: font-size
@@ -29,3 +28,6 @@ SYMBOL: underline
 
 SYMBOL: presented
 SYMBOL: file
+
+! A quotation that writes an outline expansion to stdio
+SYMBOL: outline

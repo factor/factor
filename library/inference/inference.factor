@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: errors generic interpreter io kernel lists math
-namespaces parser prettyprint sequences strings vectors words ;
+USING: arrays errors generic inspector interpreter io kernel
+lists math namespaces parser prettyprint sequences strings
+vectors words ;
 
 ! This variable takes a boolean value.
 SYMBOL: inferring-base-case
@@ -15,13 +16,13 @@ TUPLE: inference-error message rstate data-stack call-stack ;
 
 : inference-error ( msg -- )
     recursive-state get meta-d get meta-r get
-    <inference-error> throw ; inline
+    <inference-error> throw ;
 
 M: inference-error error. ( error -- )
     "! Inference error:" print
     dup inference-error-message print
     "! Recursive state:" print
-    inference-error-rstate sequence. ;
+    inference-error-rstate describe ;
 
 M: value literal-value ( value -- )
     {
@@ -34,7 +35,7 @@ M: value literal-value ( value -- )
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
 ! expected, and number of outputs produced.
-! - infer - quotation with custom inference behavior; ifte uses
+! - infer - quotation with custom inference behavior; if uses
 ! this. Word is passed on the stack.
 
 ! Vector of results we had to add to the datastack. Ie, the
@@ -44,38 +45,29 @@ SYMBOL: d-in
 : pop-literal ( -- rstate obj )
     1 #drop node, pop-d dup value-recursion swap literal-value ;
 
-: computed-value-vector ( n -- vector )
-    empty-vector dup [ drop <computed> ] nmap ;
+: value-vector ( n -- vector ) [ drop <value> ] map >vector ;
 
-: required-inputs ( n stack -- values )
-    length - 0 max computed-value-vector ;
+: required-inputs ( n stack -- n ) length - 0 max ;
 
-: ensure-d ( typelist -- )
-    length meta-d get required-inputs dup
-    meta-d [ append ] change
-    d-in [ append ] change ;
+: add-inputs ( n stack -- stack )
+    tuck required-inputs dup 0 >
+    [ value-vector swap append ] [ drop ] if ;
 
-: hairy-node ( node effect quot -- quot: -- )
-    over car ensure-d
-    -rot 2dup car length 0 rot node-inputs
-    2slip
-    second length 0 rot node-outputs ; inline
+: ensure-values ( n -- )
+    dup meta-d get required-inputs d-in [ + ] change
+    meta-d [ add-inputs ] change ;
 
-: effect ( -- [[ in# out# ]] )
+: effect ( -- { in# out# } )
     #! After inference is finished, collect information.
-    d-in get length object <repeated> >list
-    meta-d get length object <repeated> >list 2list ;
+    d-in get meta-d get length 2array ;
 
-: no-base-case ( word -- )
-    {
-        "The base case of a recursive word could not be inferred.\n"
-        "This means the word calls itself in every control flow path.\n"
-        "See the handbook for details."
-    } concat inference-error ;
+SYMBOL: terminated?
 
 : init-inference ( recursive-state -- )
-    init-interpreter
-    { } clone d-in set
+    terminated? off
+    V{ } clone meta-r set
+    V{ } clone meta-d set
+    0 d-in set
     recursive-state set
     dataflow-graph off
     current-node off ;
@@ -91,18 +83,16 @@ M: object apply-object apply-literal ;
 
 M: wrapper apply-object wrapped apply-literal ;
 
-: active? ( -- ? )
-    #! Is this branch not terminated?
-    d-in get meta-d get and ;
-
 : terminate ( -- )
     #! Ignore this branch's stack effect.
-    meta-d off meta-r off d-in off ;
+    terminated? on #terminate node, ;
 
-: infer-quot ( quot -- )
+GENERIC: infer-quot
+
+M: general-list infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested
     #! quotations.
-    [ active? [ apply-object t ] [ drop f ] ifte ] all? drop ;
+    [ terminated? get [ drop f ] [ apply-object t ] if ] all? drop ;
 
 : infer-quot-value ( rstate quot -- )
     recursive-state get >r swap recursive-state set
@@ -119,7 +109,7 @@ M: wrapper apply-object wrapped apply-literal ;
 : with-infer ( quot -- )
     [
         inferring-base-case off
-        [ no-base-case ] base-case-continuation set
+        base-case-continuation off
         f init-inference
         call
         check-return
@@ -130,7 +120,7 @@ M: wrapper apply-object wrapped apply-literal ;
     [ infer-quot effect ] with-infer ;
 
 : (dataflow) ( quot -- dataflow )
-    infer-quot #return node, dataflow-graph get ;
+    infer-quot f #return node, dataflow-graph get ;
 
 : dataflow ( quot -- dataflow )
     #! Data flow of a quotation.

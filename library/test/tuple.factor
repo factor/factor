@@ -1,5 +1,6 @@
+USING: errors generic kernel kernel-internals math parser
+sequences test words ;
 IN: temporary
-USING: errors generic kernel math parser sequences test words ;
 
 TUPLE: rect x y w h ;
 C: rect
@@ -69,7 +70,7 @@ M: silly-pred area dup rect-w swap rect-h * ;
 TUPLE: circle radius ;
 M: circle area circle-radius sq pi * ;
 
-[ 200 ] [ << rect f 0 0 10 20 >> area ] unit-test
+[ 200 ] [ T{ rect f 0 0 10 20 } area ] unit-test
 
 [ ] [ "IN: temporary  SYMBOL: #x  TUPLE: #x ;" eval ] unit-test
 
@@ -79,8 +80,8 @@ TUPLE: empty ;
 
 TUPLE: delegate-clone ;
 
-[ << delegate-clone << empty f >> >> ]
-[ << delegate-clone << empty f >> >> clone ] unit-test
+[ T{ delegate-clone T{ empty f } } ]
+[ T{ delegate-clone T{ empty f } } clone ] unit-test
 
 [ t ] [ \ null \ delegate-clone class< ] unit-test
 [ f ] [ \ object \ delegate-clone class< ] unit-test
@@ -89,7 +90,7 @@ TUPLE: delegate-clone ;
 [ f ] [ \ tuple \ delegate-clone class< ] unit-test
 
 ! Compiler regression
-[ t ] [ [ t length ] [ no-method-object ] catch ] unit-test
+[ t ] [ [ t length ] catch no-method-object ] unit-test
 
 ! This must be the last test in the file!
 [ "<constructor-test>" ]
@@ -101,4 +102,11 @@ TUPLE: delegate-clone ;
 [
     "IN: temporary-1 SYMBOL: foobar IN: temporary TUPLE: foobar ;" eval
     "foobar" [ "temporary-1" "temporary" ] search word-vocabulary
+] unit-test
+
+TUPLE: size-test a b c d ;
+
+[ t ] [
+    T{ size-test } array-capacity
+    size-test "tuple-size" word-prop =
 ] unit-test

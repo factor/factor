@@ -255,10 +255,10 @@ public class ExternalFactor extends VocabularyLookup
 		switch(mode)
 		{
 		case COMPLETE_START:
-			predicate = "[ word-name swap head? ]";
+			predicate = "[ word-name [ swap head? ] completion? ]";
 			break;
 		case COMPLETE_ANYWHERE:
-			predicate = "[ word-name subseq? ]";
+			predicate = "[ word-name [ subseq? ] completion? ]";
 			break;
 		case COMPLETE_EQUAL:
 			predicate = "[ word-name = ]";

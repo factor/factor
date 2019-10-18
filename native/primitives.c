@@ -115,7 +115,6 @@ void* primitives[] = {
 	primitive_room,
 	primitive_os_env,
 	primitive_millis,
-	primitive_random_int,
 	primitive_type,
 	primitive_tag,
 	primitive_cwd,
@@ -184,7 +183,11 @@ void* primitives[] = {
 	primitive_fflush,
 	primitive_fclose,
 	primitive_expired,
-	primitive_wrapper
+	primitive_wrapper,
+	primitive_clone,
+	primitive_array_to_tuple,
+	primitive_tuple_to_array,
+	primitive_array_to_vector
 };
 
 CELL primitive_to_xt(CELL primitive)

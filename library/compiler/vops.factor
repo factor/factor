@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: errors generic hashtables kernel lists math namespaces
-parser sequences vectors words ;
+USING: arrays errors generic hashtables kernel lists math
+namespaces parser sequences words ;
 
 ! The linear IR is the second of the two intermediate
 ! representations used by Factor. It is basically a high-level
@@ -16,7 +16,10 @@ parser sequences vectors words ;
     gensym  dup t "label" set-word-prop ;
 
 : label? ( obj -- ? )
-    dup word? [ "label" word-prop ] [ drop f ] ifte ;
+    dup word? [ "label" word-prop ] [ drop f ] if ;
+
+! A location is a virtual register or a stack slot. We can
+! ask a VOP if it reads or writes a location.
 
 ! A virtual register
 TUPLE: vreg n ;
@@ -25,36 +28,54 @@ TUPLE: vreg n ;
 TUPLE: int-regs ;
 TUPLE: float-regs size ;
 
+GENERIC: fastcall-regs ( register-class -- n )
+
+GENERIC: reg-class-size ( register-class -- n )
+
+M: float-regs reg-class-size float-regs-size ;
+
+! A data stack location.
+TUPLE: ds-loc n ;
+
+! A call stack location.
+TUPLE: cs-loc n ;
+
+! A pseudo-register class for parameters spilled on the stack
+TUPLE: stack-params ;
+
 ! A virtual operation
 TUPLE: vop inputs outputs label ;
-: vop-in-1 ( vop -- input ) vop-inputs first ;
-: vop-in-2 ( vop -- input ) vop-inputs second ;
-: vop-in-3 ( vop -- input ) vop-inputs third ;
-: vop-out-1 ( vop -- output ) vop-outputs first ;
-: vop-out-2 ( vop -- output ) vop-outputs second ;
+
+: vop-in ( vop n -- input ) swap vop-inputs nth ;
+: set-vop-in ( input vop n -- ) swap vop-inputs set-nth ;
+: vop-out ( vop n -- input ) swap vop-outputs nth ;
+: set-vop-out ( input vop n -- ) swap vop-outputs set-nth ;
 
 GENERIC: basic-block? ( vop -- ? )
 M: vop basic-block? drop f ;
 ! simplifies some code
 M: f basic-block? drop f ;
 
-GENERIC: calls-label? ( label vop -- ? )
-M: vop calls-label? vop-label = ;
+! Only on PowerPC. The %parameters node needs to reserve space
+! in the stack frame.
+GENERIC: stack-reserve
+
+M: vop stack-reserve drop 0 ;
 
 : make-vop ( inputs outputs label vop -- vop )
     [ >r <vop> r> set-delegate ] keep ;
 
 : empty-vop f f f ;
 : label-vop ( label) >r f f r> ;
-: label/src-vop ( label src) 1vector swap f swap ;
-: src-vop ( src) 1vector f f ;
-: dest-vop ( dest) 1vector dup f ;
-: src/dest-vop ( src dest) >r 1vector r> 1vector f ;
-: 2-in-vop ( in1 in2) 2vector f f ;
-: 3-in-vop ( in1 in2 in3) 3vector f f ;
-: 2-in/label-vop ( in1 in2 label) >r 2vector f r> ;
-: 2-vop ( in dest) [ 2vector ] keep 1vector f ;
-: 3-vop ( in1 in2 dest) >r 2vector r> 1vector f ;
+: label/src-vop ( label src) 1array swap f swap ;
+: src-vop ( src) 1array f f ;
+: dest-vop ( dest) 1array dup f ;
+: src/dest-vop ( src dest) >r 1array r> 1array f ;
+: 2-in-vop ( in1 in2) 2array f f ;
+: 3-in-vop ( in1 in2 in3) 3array f f ;
+: 2-in/label-vop ( in1 in2 label) >r 2array f r> ;
+: 2-vop ( in dest) [ 2array ] keep 1array f ;
+: 3-vop ( in1 in2 dest) >r 2array r> 1array f ;
 
 ! miscellanea
 TUPLE: %prologue ;
@@ -64,14 +85,13 @@ C: %prologue make-vop ;
 TUPLE: %label ;
 C: %label make-vop ;
 : %label label-vop <%label> ;
-M: %label calls-label? 2drop f ;
 
 ! Return vops take a label that is ignored, to have the
 ! same stack effect as jumps. This is needed for the
 ! simplifier.
 TUPLE: %return ;
 C: %return make-vop ;
-: %return ( label) label-vop <%return> ;
+: %return empty-vop <%return> ;
 
 TUPLE: %return-to ;
 C: %return-to make-vop ;
@@ -97,10 +117,6 @@ TUPLE: %jump-t ;
 C: %jump-t make-vop ;
 : %jump-t <vreg> label/src-vop <%jump-t> ;
 
-TUPLE: %jump-f ;
-C: %jump-f make-vop ;
-: %jump-f <vreg> label/src-vop <%jump-f> ;
-
 ! dispatch tables
 TUPLE: %dispatch ;
 C: %dispatch make-vop ;
@@ -119,48 +135,54 @@ C: %end-dispatch make-vop ;
 : %end-dispatch empty-vop <%end-dispatch> ;
 
 ! stack operations
-TUPLE: %peek-d ;
-C: %peek-d make-vop ;
-: %peek-d ( vreg n -- ) swap <vreg> src/dest-vop <%peek-d> ;
-M: %peek-d basic-block? drop t ;
+TUPLE: %peek ;
+C: %peek make-vop ;
 
-TUPLE: %replace-d ;
-C: %replace-d make-vop ;
-: %replace-d ( vreg n -- ) swap <vreg> 2-in-vop <%replace-d> ;
-M: %replace-d basic-block? drop t ;
+M: %peek basic-block? drop t ;
+
+: %peek-d ( vreg n -- vop )
+    <ds-loc> swap <vreg> src/dest-vop <%peek> ;
+
+: %peek-r ( vreg n -- vop )
+    <cs-loc> swap <vreg> src/dest-vop <%peek> ;
+
+TUPLE: %replace ;
+C: %replace make-vop ;
+
+M: %replace basic-block? drop t ;
+
+: %replace-d ( vreg n -- vop )
+    <ds-loc> src/dest-vop <%replace> ;
+
+: %replace-r ( vreg n -- vop )
+    <cs-loc> src/dest-vop <%replace> ;
 
 TUPLE: %inc-d ;
 C: %inc-d make-vop ;
 : %inc-d ( n -- node ) src-vop <%inc-d> ;
+
 M: %inc-d basic-block? drop t ;
 
-: %inc-d, ( n -- ) dup 0 = [ dup %inc-d , ] unless drop ;
-
-TUPLE: %immediate ;
-C: %immediate make-vop ;
-: %immediate ( vreg obj -- )
-    swap <vreg> src/dest-vop <%immediate> ;
-M: %immediate basic-block? drop t ;
-
-TUPLE: %peek-r ;
-C: %peek-r make-vop ;
-: %peek-r ( vreg n -- ) swap <vreg> src/dest-vop <%peek-r> ;
-
-TUPLE: %replace-r ;
-C: %replace-r make-vop ;
-: %replace-r ( vreg n -- ) swap <vreg> 2-in-vop <%replace-r> ;
-
 TUPLE: %inc-r ;
+
 C: %inc-r make-vop ;
 
 : %inc-r ( n -- ) src-vop <%inc-r> ;
 
-: %inc-r, ( n -- ) dup 0 = [ dup %inc-r , ] unless drop ;
+M: %inc-r basic-block? drop t ;
+
+TUPLE: %immediate ;
+C: %immediate make-vop ;
+
+: %immediate ( vreg obj -- vop )
+    swap <vreg> src/dest-vop <%immediate> ;
+
+M: %immediate basic-block? drop t ;
 
 : in-1 0 0 %peek-d , ;
 : in-2 0 1 %peek-d ,  1 0 %peek-d , ;
 : in-3 0 2 %peek-d ,  1 1 %peek-d ,  2 0 %peek-d , ;
-: out-1 0 0 %replace-d , ;
+: out-1 T{ vreg f 0 } 0 %replace-d , ;
 
 ! indirect load of a literal through a table
 TUPLE: %indirect ;
@@ -170,7 +192,6 @@ C: %indirect make-vop ;
 M: %indirect basic-block? drop t ;
 
 ! object slot accessors
-! mask off a tag (see also %untag-fixnum)
 TUPLE: %untag ;
 C: %untag make-vop ;
 : %untag <vreg> dest-vop <%untag> ;
@@ -183,10 +204,12 @@ M: %slot basic-block? drop t ;
 
 TUPLE: %set-slot ;
 C: %set-slot make-vop ;
+
 : %set-slot ( value obj n )
-    #! %set-slot writes to vreg n.
-    >r >r <vreg> r> <vreg> r> <vreg> 3vector dup second f
-    <%set-slot> ;
+    #! %set-slot writes to vreg obj.
+    rot <vreg> rot <vreg> rot <vreg> over >r 3array r> 1array
+    f <%set-slot> ;
+
 M: %set-slot basic-block? drop t ;
 
 ! in the 'fast' versions, the object's type and slot number is
@@ -201,7 +224,7 @@ TUPLE: %fast-set-slot ;
 C: %fast-set-slot make-vop ;
 : %fast-set-slot ( value obj n )
     #! %fast-set-slot writes to vreg obj.
-    >r >r <vreg> r> <vreg> r> over >r 3vector r> 1vector f
+    >r >r <vreg> r> <vreg> r> over >r 3array r> 1array f
     <%fast-set-slot> ;
 M: %fast-set-slot basic-block? drop t ;
 
@@ -222,25 +245,22 @@ TUPLE: %fixnum/i ;
 C: %fixnum/i make-vop ;      : %fixnum/i 3-vop <%fixnum/i> ;
 TUPLE: %fixnum/mod ;
 C: %fixnum/mod make-vop ;    : %fixnum/mod f <%fixnum/mod> ;
+
 TUPLE: %fixnum-bitand ;
 C: %fixnum-bitand make-vop ; : %fixnum-bitand 3-vop <%fixnum-bitand> ;
+M: %fixnum-bitand basic-block? drop t ;
+
 TUPLE: %fixnum-bitor ;
 C: %fixnum-bitor make-vop ;  : %fixnum-bitor 3-vop <%fixnum-bitor> ;
+M: %fixnum-bitor basic-block? drop t ;
+
 TUPLE: %fixnum-bitxor ;
 C: %fixnum-bitxor make-vop ; : %fixnum-bitxor 3-vop <%fixnum-bitxor> ;
+M: %fixnum-bitxor basic-block? drop t ;
+
 TUPLE: %fixnum-bitnot ;
 C: %fixnum-bitnot make-vop ; : %fixnum-bitnot 2-vop <%fixnum-bitnot> ;
-
-TUPLE: %fixnum<= ;
-C: %fixnum<= make-vop ;      : %fixnum<= 3-vop <%fixnum<=> ;
-TUPLE: %fixnum< ;
-C: %fixnum< make-vop ;       : %fixnum< 3-vop <%fixnum<> ;
-TUPLE: %fixnum>= ;
-C: %fixnum>= make-vop ;      : %fixnum>= 3-vop <%fixnum>=> ;
-TUPLE: %fixnum> ;
-C: %fixnum> make-vop ;       : %fixnum> 3-vop <%fixnum>> ;
-TUPLE: %eq? ;
-C: %eq? make-vop ;           : %eq? 3-vop <%eq?> ;
+M: %fixnum-bitnot basic-block? drop t ;
 
 ! At the VOP level, the 'shift' operation is split into five
 ! distinct operations:
@@ -252,12 +272,16 @@ C: %eq? make-vop ;           : %eq? 3-vop <%eq?> ;
 ! - shifts with a large negative count: %fixnum-sgn
 TUPLE: %fixnum<< ;
 C: %fixnum<< make-vop ;   : %fixnum<<   3-vop <%fixnum<<> ;
+
 TUPLE: %fixnum>> ;
 C: %fixnum>> make-vop ;   : %fixnum>>   3-vop <%fixnum>>> ;
+M: %fixnum>> basic-block? drop t ;
+
 ! due to x86 limitations the destination of this VOP must be
 ! vreg 2 (EDX), and the source must be vreg 0 (EAX).
 TUPLE: %fixnum-sgn ;
 C: %fixnum-sgn make-vop ; : %fixnum-sgn src/dest-vop <%fixnum-sgn> ;
+M: %fixnum-sgn basic-block? drop t ;
 
 ! Integer comparison followed by a conditional branch is
 ! optimized
@@ -281,46 +305,21 @@ TUPLE: %jump-eq? ;
 C: %jump-eq? make-vop ;     
 : %jump-eq? 2-in/label-vop <%jump-eq?> ;
 
-: fast-branch ( class -- class )
-    {{
-        [[ %fixnum<= %jump-fixnum<= ]]
-        [[ %fixnum<  %jump-fixnum<  ]]
-        [[ %fixnum>= %jump-fixnum>= ]]
-        [[ %fixnum>  %jump-fixnum>  ]]
-        [[ %eq?      %jump-eq?      ]]
-    }} hash ;
-
-PREDICATE: tuple fast-branch
-    #! Class of VOPs whose class is a key in fast-branch
-    #! hashtable.
-    class fast-branch ;
-
 ! some slightly optimized inline assembly
 TUPLE: %type ;
 C: %type make-vop ;
 : %type ( vreg ) <vreg> dest-vop <%type> ;
-M: %type basic-block? drop t ;
 
 TUPLE: %tag ;
 C: %tag make-vop ;
 : %tag ( vreg ) <vreg> dest-vop <%tag> ;
 M: %tag basic-block? drop t ;
 
-TUPLE: %retag-fixnum ;
-C: %retag-fixnum make-vop ;
-: %retag-fixnum <vreg> dest-vop <%retag-fixnum> ;
-M: %retag-fixnum basic-block? drop t ;
-
-TUPLE: %untag-fixnum ;
-C: %untag-fixnum make-vop ;
-: %untag-fixnum <vreg> dest-vop <%untag-fixnum> ;
-M: %untag-fixnum basic-block? drop t ;
-
 : check-dest ( vop reg -- )
-    swap vop-out-1 = [ "bad VOP destination" throw ] unless ;
+    swap 0 vop-out = [ "bad VOP destination" throw ] unless ;
 
 : check-src ( vop reg -- )
-    swap vop-in-1 = [ "bad VOP source" throw ] unless ;
+    swap 0 vop-in = [ "bad VOP source" throw ] unless ;
 
 TUPLE: %getenv ;
 C: %getenv make-vop ;
@@ -335,6 +334,7 @@ M: %setenv basic-block? drop t ;
 ! alien operations
 TUPLE: %parameters ;
 C: %parameters make-vop ;
+M: %parameters stack-reserve 0 vop-in ;
 : %parameters ( n -- vop ) src-vop <%parameters> ;
 
 TUPLE: %parameter ;

@@ -29,7 +29,7 @@ END-STRUCT
         <timeval>
         [ set-timeval-usec ] keep
         [ set-timeval-sec ] keep
-    ] ifte ;
+    ] if ;
 
 FUNCTION: int select ( int nfds, void* readfds, void* writefds, void* exceptfds, timeval* timeout ) ;
 

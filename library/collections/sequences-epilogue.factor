@@ -1,105 +1,31 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: sequences
-USING: errors generic kernel kernel-internals lists math strings
-vectors words ;
+IN: sequences-internals
+USING: errors generic kernel kernel-internals lists math
+sequences strings vectors words ;
 
-! Combinators
-M: object each ( seq quot -- )
-    swap dup length [
-        [ swap nth swap call ] 3keep
-    ] repeat 2drop ;
-
-: map ( seq quot -- seq | quot: elt -- elt )
-    over [
-        length <vector> rot
-        [ -rot [ slip push ] 2keep ] each nip
-    ] keep like ; inline
-
-: map-with ( obj list quot -- list | quot: obj elt -- elt )
-    swap [ with rot ] map 2nip ; inline
-
-: accumulate ( list identity quot -- values | quot: x y -- z )
-    rot [ pick >r swap call r> ] map-with nip ; inline
-
-: change-nth ( seq i quot -- )
-    pick pick >r >r >r swap nth r> call r> r> swap set-nth ;
-    inline
-
-: nmap ( seq quot -- seq | quot: elt -- elt )
-    over length [ [ swap change-nth ] 3keep ] repeat 2drop ; inline
-
-: 2each ( seq seq quot -- | quot: elt -- )
-    over length >r >r cons r> r>
-    [ [ swap >r >r uncons r> 2nth r> call ] 3keep ] repeat
-    2drop ; inline
-
-: 2reduce ( seq seq identity quot -- value | quot: e x y -- z )
-    >r -rot r> 2each ; inline
-
-: 2map ( seq seq quot -- seq | quot: elt elt -- elt )
-    over [
-        length <vector> 2swap
-        [ 2swap [ slip push ] 2keep ] 2each nip
-    ] keep like ; inline
-
-: find* ( i seq quot -- i elt )
-    pick pick length >= [
-        3drop -1 f
+: (lexi) ( seq seq i limit -- n )
+    2dup >= [
+        2drop [ length ] 2apply -
     ] [
-        3dup >r >r >r >r nth r> call [
-            r> dup r> nth r> drop
+        >r 3dup 2nth-unsafe 2dup = [
+            2drop 1+ r> (lexi)
         ] [
-            r> 1 + r> r> find*
-        ] ifte
-    ] ifte ; inline
+            r> drop - >r 3drop r>
+        ] if
+    ] if ; flushable
 
-: find-with* ( obj i seq quot -- i elt | quot: elt -- ? )
-    -rot [ with rot ] find* 2swap 2drop ; inline
+IN: sequences
 
-M: object find ( seq quot -- i elt )
-    0 -rot find* ;
+: first2 ( { x y } -- x y )
+    1 swap bounds-check nip first2-unsafe ; inline
 
-: contains? ( seq quot -- ? )
-    find drop -1 > ; inline
+: first3 ( { x y z } -- x y z )
+    2 swap bounds-check nip first3-unsafe ; inline
 
-: contains-with? ( obj seq quot -- ? )
-    find-with drop -1 > ; inline
+: first4 ( { x y z w } -- x y z w )
+    3 swap bounds-check nip first4-unsafe ; inline
 
-: all? ( seq quot -- ? )
-    #! ForAll(P in X) <==> !Exists(!P in X)
-    swap [ swap call not ] contains-with? not ; inline
-
-: all-with? ( obj seq quot -- ? | quot: elt -- ? )
-    swap [ with rot ] all? 2nip ; inline
-
-: subset ( seq quot -- seq | quot: elt -- ? )
-    #! all elements for which the quotation returned a value
-    #! other than f are collected in a new list.
-    swap [
-        dup length <vector> -rot [
-            rot >r 2dup >r >r swap call [
-                r> r> r> [ push ] keep swap
-            ] [
-                r> r> drop r> swap
-            ] ifte
-        ] each drop
-    ] keep like ; inline
-
-: subset-with ( obj seq quot -- seq | quot: obj elt -- ? )
-    swap [ with rot ] subset 2nip ; inline
-
-: (monotonic) ( quot seq i -- ? )
-    2dup 1 + swap nth >r swap nth r> rot call ; inline
-
-: monotonic? ( seq quot -- ? | quot: elt elt -- ? )
-    #! Eg, { 1 2 3 4 } [ < ] monotonic? ==> t
-    #!     { 1 3 2 4 } [ < ] monotonic? ==> f
-    swap dup length 1 - [
-        pick pick >r >r (monotonic) r> r> rot
-    ] all? 2nip ; inline
-
-! Operations
 M: object like drop ;
 
 M: object empty? ( seq -- ? ) length 0 = ;
@@ -108,8 +34,8 @@ M: object empty? ( seq -- ? ) length 0 = ;
     pick pick <= [
         3drop [ ]
     ] [
-        2dup nth >r >r 1 + r> (>list) r> swons
-    ] ifte ;
+        2dup nth >r >r 1+ r> (>list) r> swons
+    ] if ;
 
 M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 
@@ -119,10 +45,43 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 : memq?   ( obj seq -- ? )     [ eq? ] contains-with? ; flushable
 : remove  ( obj list -- list ) [ = not ] subset-with ; flushable
 
+: (subst) ( newseq oldseq elt -- new/elt )
+    [ swap index ] keep
+    over -1 > [ drop swap nth ] [ 2nip ] if ;
+
+: subst ( newseq oldseq seq -- )
+    #! Mutates seq. If an element of seq occurs in oldseq,
+    #! replace it with the corresponding element in newseq.
+    [ >r 2dup r> (subst) ] inject 2drop ;
+
+: move ( to from seq -- )
+    pick pick number=
+    [ 3drop ] [ [ nth swap ] keep set-nth ] if ; inline
+
+: (delete) ( elt store scan seq -- )
+    2dup length < [
+        3dup move
+        >r pick over r> dup >r nth = r> swap
+        [ >r >r 1+ r> r> ] unless >r 1+ r> (delete)
+    ] when ;
+
+: delete ( elt seq -- )
+    #! Delete all occurrences of elt from seq.
+    0 0 rot (delete) nip set-length drop ;
+
+: copy-into-check ( start to from -- )
+    rot rot length + swap length < [
+        "Cannot copy beyond end of sequence" throw
+    ] when ;
+
 : copy-into ( start to from -- )
-    dup length [ >r pick r> + pick set-nth ] 2each 2drop ;
+    #! Copy all elements in 'from' to 'to', storing at
+    #! consecutive indices numbered from 'start'.
+    3dup copy-into-check
+    dup length [ >r pick r> + pick set-nth-unsafe ] 2each 2drop ;
 
 : nappend ( to from -- )
+    #! Add all elements of 'from' at the end of 'to'.
     >r dup length swap r>
     over length over length + pick set-length
     copy-into ;
@@ -134,6 +93,14 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 : add ( seq elt -- seq )
     #! Outputs a new sequence of the same type as seq.
     swap [ push ] immutable ; flushable
+
+: adjoin ( elt seq -- )
+    #! Push the element if its not already there.
+    2dup member? [ 2drop ] [ push ] if ;
+
+: prune ( seq -- seq )
+    #! Remove duplicates.
+    dup dup length <vector> swap [ over adjoin ] each swap like ;
 
 : append3 ( s1 s2 s3 -- s1+s2+s3 )
     #! Return a new sequence of the same type as s1.
@@ -149,21 +116,15 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 
 M: object peek ( sequence -- element )
     #! Get value at end of sequence.
-    dup length 1 - swap nth ;
+    dup length 1- swap nth ;
+
+: pop* ( sequence -- )
+    #! Shorten the sequence by one element.
+    dup length 1- swap set-length ;
 
 : pop ( sequence -- element )
     #! Get value at end of sequence and remove it.
-    dup peek >r dup length 1 - swap set-length r> ;
-
-: push-new ( elt seq -- )
-    2dup member? [ 2drop ] [ push ] ifte ;
-
-: prune ( seq -- seq )
-    [
-        dup length <vector> swap [ over push-new ] each
-    ] keep like ; flushable
-
-: >pop> ( stack -- stack ) dup pop drop ;
+    dup peek swap pop* ;
 
 : join ( seq glue -- seq )
     #! The new sequence is of the same type as glue.
@@ -171,64 +132,40 @@ M: object peek ( sequence -- element )
         swap like
     ] [
         dup length <vector> swap
-        [ over push 2dup push ] each nip >pop>
+        [ over push 2dup push ] each nip dup pop*
         concat
-    ] ifte ; flushable
+    ] if ; flushable
 
 M: object reverse-slice ( seq -- seq ) <reversed> ;
 
 M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
 
-! Set theoretic operations
-: seq-intersect ( seq1 seq2 -- seq1/\seq2 )
-    [ swap member? ] subset-with ; flushable
+: all-equal? ( seq -- ? ) [ = ] monotonic? ;
 
-: seq-diff ( seq1 seq2 -- seq2-seq1 )
-    [ swap member? not ] subset-with ; flushable
+: all-eq? ( seq -- ? ) [ eq? ] monotonic? ;
 
-: seq-union ( seq1 seq2 -- seq1\/seq2 )
-    append prune ; flushable
-
-: contained? ( seq1 seq2 -- ? )
-    #! Is every element of seq1 in seq2
-    swap [ swap member? ] all-with? ; flushable
+: mismatch ( seq1 seq2 -- i )
+    #! Return the first index where the two sequences differ.
+    2dup min-length
+    [ >r 2dup r> 2nth-unsafe = not ] find
+    swap >r 3drop r> ; flushable
 
 ! Lexicographic comparison
-: (lexi) ( seq seq i limit -- n )
-    2dup >= [
-        2drop swap length swap length -
-    ] [
-        >r 3dup 2nth 2dup = [
-            2drop 1 + r> (lexi)
-        ] [
-            r> drop - >r 3drop r>
-        ] ifte
-    ] ifte ; flushable
-
 : lexi ( s1 s2 -- n )
     #! Lexicographically compare two sequences of numbers
     #! (usually strings). Negative if s1<s2, zero if s1=s2,
     #! positive if s1>s2.
-    0 pick length pick length min (lexi) ; flushable
+    2dup mismatch dup -1 =
+    [ drop [ length ] 2apply - ] [ 2nth-unsafe - ] if ;
+    flushable
 
 : flip ( seq -- seq )
     #! An example illustrates this word best:
     #! { { 1 2 3 } { 4 5 6 } } ==> { { 1 4 } { 2 5 } { 3 6 } }
     dup empty? [
-        dup first length [ swap [ nth ] map-with ] map-with
+        dup first [ length ] keep like
+        [ swap [ nth ] map-with ] map-with
     ] unless ; flushable
-
-: max-length ( seq -- n )
-    #! Longest sequence length in a sequence of sequences.
-    0 [ length max ] reduce ; flushable
-
-: exchange ( n n seq -- )
-    [ tuck nth >r nth r> ] 3keep tuck
-    >r >r set-nth r> r> set-nth ;
-
-: midpoint@ length 2 /i ; inline
-
-: midpoint [ midpoint@ ] keep nth ; inline
 
 IN: kernel
 
@@ -236,15 +173,15 @@ IN: kernel
     #! Push the number of elements on the datastack.
     datastack length ;
 
-: no-cond "cond fall-through" throw ; inline
+: no-cond "cond fall-through" throw ;
 
 : cond ( conditions -- )
     #! Conditions is a sequence of quotation pairs.
     #! { { [ X ] [ Y ] } { [ Z ] [ T ] } }
-    #! => X [ Y ] [ Z [ T ] [ ] ifte ] ifte
+    #! => X [ Y ] [ Z [ T ] [ ] if ] if
     #! The last condition should be a catch-all 't'.
     [ first call ] find nip dup
-    [ second call ] [ no-cond ] ifte ;
+    [ second call ] [ no-cond ] if ;
 
 : with-datastack ( stack word -- stack )
     datastack >r >r set-datastack r> execute

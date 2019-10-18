@@ -36,6 +36,7 @@ USE: sqlite
 USE: kernel
 USE: io
 USE: prettyprint
+USE: lists
 
 : show-people ( statement -- )
   dup 0 column-text write " from " write 1 column-text . ;
@@ -46,6 +47,21 @@ USE: prettyprint
   dup [ show-people ] sqlite-each 
   sqlite-finalize
   sqlite-close ;
+
+: find-person ( name -- )
+  "test.db" sqlite-open  ( name db )
+  dup "select * from test where name=?" sqlite-prepare ( name db stmt )
+  [ rot 1 swap sqlite-bind-text ] keep ( db stmt )
+  [ [ 1 column-text . ] sqlite-each ] keep
+  sqlite-finalize
+  sqlite-close ;  
+
+: find-all ( -- )
+  "test.db" sqlite-open  ( db )
+  dup "select * from test" sqlite-prepare ( db stmt )
+  [ [ [ 0 column-text ] keep 1 column-text cons ] sqlite-map ] keep
+  sqlite-finalize
+  swap sqlite-close ;  
 
 : run-test2 ( -- )
   "test.db" sqlite-open

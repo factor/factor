@@ -3,8 +3,8 @@ void primitive_os_env(void);
 void primitive_eq(void);
 s64 current_millis(void);
 void primitive_millis(void);
-void primitive_random_int(void);
 #ifdef WIN32
-F_STRING *last_error();
+char *buffer_to_c_string(char *buffer);
+F_STRING *get_error_message();
+DLLEXPORT char *error_message(DWORD id);
 #endif
-

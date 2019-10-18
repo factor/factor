@@ -4,43 +4,37 @@ IN: compiler-backend
 USING: alien assembler kernel math ;
 
 M: %alien-invoke generate-node ( vop -- )
-    dup vop-in-1 swap vop-in-2 load-library compile-c-call ;
-
-: stack-reserve 8 + 16 align ;
-: stack@ 12 + ;
-
-M: %parameters generate-node ( vop -- )
-    vop-in-1 dup 0 =
-    [ drop ] [ stack-reserve 1 1 rot SUBI ] ifte ;
+    dup 0 vop-in swap 1 vop-in load-library compile-c-call ;
 
 GENERIC: store-insn
 GENERIC: load-insn
 GENERIC: return-reg
 
-M: int-regs store-insn drop STW ;
+M: int-regs store-insn drop stack@ STW ;
 M: int-regs return-reg drop 3 ;
-M: int-regs load-insn drop 3 + 1 rot LWZ ;
+M: int-regs load-insn drop 3 + 1 rot stack@ LWZ ;
 
 M: float-regs store-insn
-    float-regs-size 4 = [ STFS ] [ STFD ] ifte ;
+    >r stack@ r> float-regs-size 4 = [ STFS ] [ STFD ] if ;
 M: float-regs return-reg drop 1 ;
 M: float-regs load-insn
-    >r 1 + 1 rot r> float-regs-size 4 = [ LFS ] [ LFD ] ifte ;
+    >r 1+ 1 rot stack@ r> 
+    float-regs-size 4 = [ LFS ] [ LFD ] if ;
+
+M: stack-params load-insn ( from to reg-class -- )
+    drop >r 0 1 rot stack@ LWZ 0 1 r> stack@ STW ;
 
 M: %unbox generate-node ( vop -- )
-    [ vop-in-2 f compile-c-call ] keep
-    [ vop-in-3 return-reg 1 ] keep
-    [ vop-in-1 stack@ ] keep
-    vop-in-3 store-insn ; 
+    [ 1 vop-in f compile-c-call ] keep
+    [ 2 vop-in return-reg 1 ] keep
+    [ 0 vop-in ] keep
+    2 vop-in store-insn ; 
 
 M: %parameter generate-node ( vop -- )
-    dup vop-in-1 stack@
-    over vop-in-2
-    rot vop-in-3 load-insn ;
+    [ 0 vop-in ] keep
+    [ 1 vop-in ] keep
+    2 vop-in load-insn ;
 
-M: %box generate-node ( vop -- )
-    vop-in-1 f compile-c-call ;
+M: %box generate-node ( vop -- ) 0 vop-in f compile-c-call ;
 
-M: %cleanup generate-node ( vop -- )
-    vop-in-1 dup 0 =
-    [ drop ] [ stack-reserve 1 1 rot ADDI ] ifte ;
+M: %cleanup generate-node ( vop -- ) drop ;

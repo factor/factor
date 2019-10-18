@@ -28,11 +28,10 @@ GENERIC: set-timeout   ( timeout stream -- )
 
 : (stream-copy) ( in out -- )
     4096 pick stream-read
-    [ over stream-write (stream-copy) ] [ 2drop ] ifte* ;
+    [ over stream-write (stream-copy) ] [ 2drop ] if* ;
 
 : stream-copy ( in out -- )
-    [ 2dup (stream-copy) ]
-    [ >r stream-close stream-close r> [ rethrow ] when* ] catch ;
+    [ 2dup (stream-copy) ] [ stream-close stream-close ] cleanup ;
 
 ! Think '/dev/null'.
 TUPLE: null-stream ;

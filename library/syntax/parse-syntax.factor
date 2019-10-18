@@ -3,7 +3,7 @@
 
 ! Bootstrapping trick; see doc/bootstrap.txt.
 IN: !syntax
-USING: alien errors generic hashtables kernel lists math
+USING: alien arrays errors generic hashtables kernel lists math
 namespaces parser sequences strings syntax vectors
 words ;
 
@@ -36,8 +36,10 @@ words ;
 
 ! Booleans
 
-: t t swons ; parsing
+! the canonical truth value is just a symbol.
+SYMBOL: t
 
+! the canonical falsity is a special runtime object.
 : f f swons ; parsing
 
 ! Lists
@@ -48,13 +50,15 @@ words ;
 : [[ f ; parsing
 : ]] first2 swons swons ; parsing
 
-! Vectors
-: { f ; parsing
-: } reverse >vector swons ; parsing
+! Arrays, vectors, etc
+: } reverse swap call swons ; parsing
 
-! Hashtables
-: {{ f ; parsing
-: }} alist>hash swons ; parsing
+: { ( array ) [ >array ] [ ] ; parsing
+: V{ ( vector ) [ >vector ] [ ] ; parsing
+: H{ ( hashtable ) [ alist>hash ] [ ] ; parsing
+: C{ ( complex ) [ first2 rect> ] [ ] ; parsing
+: T{ ( tuple ) [ array>tuple ] [ ] ; parsing
+: W{ ( wrapper ) [ first <wrapper> ] [ ] ; parsing
 
 ! Do not execute parsing word
 : POSTPONE: ( -- ) scan-word swons ; parsing
@@ -77,11 +81,6 @@ words ;
 : \
     #! Word literals: \ foo
     scan-word literalize swons ; parsing
-
-! Long wrapper syntax. Only used in the rare case that another
-! wrapper is being wrapped.
-: W[ [ ] ; parsing
-: ]W first <wrapper> swons ; parsing
 
 ! Vocabularies
 : PRIMITIVE:
@@ -133,10 +132,6 @@ words ;
 : #!
     #! Documentation comment.
     until-eol parsed-documentation ; parsing
-
-! Complex numbers
-: #{ f ; parsing
-: }# dup second swap first rect> swons ; parsing
 
 ! Reading integers in other bases
 : (BASE) ( base -- )

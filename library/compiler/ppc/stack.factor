@@ -3,32 +3,28 @@
 IN: compiler-backend
 USING: assembler compiler errors kernel math memory words ;
 
-: ds-op cell * neg 14 swap ;
-: cs-op cell * neg 15 swap ;
+GENERIC: loc>operand
+
+M: ds-loc loc>operand ds-loc-n cell * neg 14 swap ;
+M: cs-loc loc>operand cs-loc-n cell * neg 15 swap ;
 
 M: %immediate generate-node ( vop -- )
-    dup vop-in-1 address swap vop-out-1 v>operand LOAD ;
+    dup 0 vop-in address swap 0 vop-out v>operand LOAD ;
 
 : load-indirect ( dest literal -- )
-    intern-literal over LOAD dup 0 LWZ ;
+    add-literal over LOAD32 0 1 rel-address dup 0 LWZ ;
 
 M: %indirect generate-node ( vop -- )
-    dup vop-out-1 v>operand swap vop-in-1 load-indirect ;
+    dup 0 vop-out v>operand swap 0 vop-in load-indirect ;
 
-M: %peek-d generate-node ( vop -- )
-    dup vop-out-1 v>operand swap vop-in-1 ds-op LWZ ;
+M: %peek generate-node ( vop -- )
+    dup 0 vop-out v>operand swap 0 vop-in loc>operand LWZ ;
 
-M: %replace-d generate-node ( vop -- )
-    dup vop-in-2 v>operand swap vop-in-1 ds-op STW ;
+M: %replace generate-node ( vop -- )
+    dup 0 vop-in v>operand swap 0 vop-out loc>operand STW ;
 
 M: %inc-d generate-node ( vop -- )
-    14 14 rot vop-in-1 cell * ADDI ;
+    14 14 rot 0 vop-in cell * ADDI ;
 
 M: %inc-r generate-node ( vop -- )
-    15 15 rot vop-in-1 cell * ADDI ;
-
-M: %peek-r generate-node ( vop -- )
-    dup vop-out-1 v>operand swap vop-in-1 cs-op LWZ ;
-
-M: %replace-r generate-node ( vop -- )
-    dup vop-in-2 v>operand swap vop-in-1 cs-op STW ;
+    15 15 rot 0 vop-in cell * ADDI ;

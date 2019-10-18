@@ -1,8 +1,8 @@
 ! Factor test suite.
 
 IN: test
-USING: errors kernel lists math memory namespaces parser
-prettyprint sequences io strings vectors words ;
+USING: arrays errors kernel lists math memory namespaces parser
+prettyprint sequences io strings words ;
 
 TUPLE: assert got expect ;
 
@@ -12,10 +12,10 @@ M: assert error.
     "Got: " write assert-got . ;
 
 : assert= ( a b -- )
-    2dup = [ 2drop ] [ <assert> throw ] ifte ;
+    2dup = [ 2drop ] [ <assert> throw ] if ;
 
 : print-test ( input output -- )
-    "--> " write 2vector . flush ;
+    "--> " write 2array . flush ;
 
 : time ( code -- )
     #! Evaluates the given code and prints the time taken to
@@ -34,7 +34,8 @@ M: assert error.
 
 : unit-test-fails ( quot -- )
     #! Assert that the quotation throws an error.
-    [ [ not ] catch ] cons [ f ] swap unit-test ;
+    [ f ] swap [ [ call t ] [ 2drop f ] recover ]
+    curry unit-test ;
 
 : assert-depth ( quot -- )
     depth slip depth assert= ;
@@ -44,7 +45,7 @@ SYMBOL: failures
 : failure failures [ cons ] change ;
 
 : test-handler ( name quot -- ? )
-    [ [ dup error. cons failure f ] [ t ] ifte* ] catch ;
+    catch [ dup error. cons failure f ] [ t ] if* ;
 
 : test-path ( name -- path )
     "/library/test/" swap ".factor" append3 ;
@@ -74,22 +75,24 @@ SYMBOL: failures
 : tests
     {
         "lists/cons" "lists/lists" "lists/assoc"
-        "lists/namespaces" "lists/queues"
+        "lists/namespaces"
         "combinators"
-        "continuations" "errors" "hashtables" "strings"
-        "namespaces" "generic" "tuple" "files" "parser"
+        "continuations" "errors"
+        "collections/hashtables" "collections/sbuf"
+        "collections/strings" "collections/namespaces"
+        "collections/vectors" "collections/sequences"
+        "collections/queues"
+        "generic" "tuple" "files" "parser"
         "parse-number" "init" "io/io"
-        "vectors" "words" "prettyprint" "random"
+        "words" "prettyprint" "random"
         "stream" "math/bitops"
         "math/math-combinators" "math/rational" "math/float"
-        "math/complex" "math/irrational" "math/integer"
-        "math/matrices"
-        "httpd/url-encoding" "httpd/html" "httpd/httpd"
-        "httpd/http-client" "sbuf" "threads" "parsing-word"
+        "math/complex" "math/irrational"
+        "math/integer" "threads" "parsing-word"
         "inference" "interpreter" "alien"
         "gadgets/line-editor" "gadgets/rectangles"
-        "gadgets/gradients" "gadgets/frames" "memory"
-        "redefine" "annotate" "sequences" "binary" "inspector"
+        "gadgets/frames" "memory"
+        "redefine" "annotate" "binary" "inspector"
         "kernel"
     } run-tests ;
 
@@ -112,5 +115,3 @@ SYMBOL: failures
         "compiler/linearizer" "compiler/intrinsics"
         "compiler/identities"
     } run-tests ;
-
-: all-tests tests compiler-tests benchmarks ;

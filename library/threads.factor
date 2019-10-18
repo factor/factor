@@ -17,28 +17,29 @@ namespaces queues sequences vectors ;
     sleep-queue dup [ 2car swap - ] nsort ;
 
 : sleep-time ( sorted-queue -- ms )
-    dup empty? [ drop -1 ] [ peek car millis - 0 max ] ifte ;
+    dup empty? [ drop -1 ] [ peek car millis - 0 max ] if ;
 
 DEFER: next-thread
 
 : do-sleep ( -- quot )
     sleep-queue* dup sleep-time dup 0 =
-    [ drop pop ] [ nip io-multiplex next-thread ] ifte ;
+    [ drop pop cdr ] [ nip io-multiplex next-thread ] if ;
 
 : next-thread ( -- quot )
-    run-queue dup queue-empty? [ drop do-sleep ] [ deque ] ifte ;
+    run-queue dup queue-empty? [ drop do-sleep ] [ deque ] if ;
 
-: stop ( -- ) next-thread call ;
+: stop ( -- ) next-thread continue ;
 
 : yield ( -- ) [ schedule-thread stop ] callcc0 ;
 
 : sleep ( ms -- )
-    millis + [ cons sleep-queue push stop ] callcc0 drop ;
+    millis +
+    [ cons sleep-queue push stop ] callcc0 drop ;
 
 : in-thread ( quot -- )
     [
         schedule-thread
-        [ ] set-catchstack { } set-callstack
+        [ ] set-catchstack V{ } set-callstack
         try stop
     ] callcc0 drop ;
 
@@ -76,7 +77,7 @@ GENERIC: tick ( ms object -- )
         [ advance-timer ] keep timer-object tick
     ] [
         2drop
-    ] ifte ;
+    ] if ;
 
 : do-timers ( -- )
     millis timers hash-values [ do-timer ] each-with ;
@@ -84,6 +85,6 @@ GENERIC: tick ( ms object -- )
 : init-threads ( -- )
     global [
         <queue> \ run-queue set
-        { } clone \ sleep-queue set
-        {{ }} clone \ timers set
+        V{ } clone \ sleep-queue set
+        H{ } clone \ timers set
     ] bind ;

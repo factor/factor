@@ -1,19 +1,6 @@
+USING: hashtables namespaces generic test kernel math words
+lists vectors alien sequences prettyprint io parser strings ;
 IN: temporary
-USE: hashtables
-USE: namespaces
-USE: generic
-USE: test
-USE: kernel
-USE: math
-USE: words
-USE: lists
-USE: vectors
-USE: alien
-USE: sequences
-USE: prettyprint
-USE: io
-USE: parser
-USE: strings
 
 GENERIC: class-of
 
@@ -34,7 +21,7 @@ M: fixnum foobar drop "Goodbye cruel world" ;
 [ "Goodbye cruel world" ] [ 4 foobar ] unit-test
 
 GENERIC: bool>str
-M: t bool>str drop "true" ;
+M: general-t bool>str drop "true" ;
 M: f bool>str drop "false" ;
 
 : str>bool
@@ -80,6 +67,8 @@ M: very-funny gooey sq ;
 
 [ 1/4 ] [ 1/2 gooey ] unit-test
 
+[ cons ] [ [ 1 2 ] class ] unit-test
+
 [ object ] [ object object class-and ] unit-test
 [ fixnum ] [ fixnum object class-and ] unit-test
 [ fixnum ] [ object fixnum class-and ] unit-test
@@ -87,13 +76,8 @@ M: very-funny gooey sq ;
 [ fixnum ] [ fixnum integer class-and ] unit-test
 [ fixnum ] [ integer fixnum class-and ] unit-test
 [ null ] [ vector fixnum class-and ] unit-test
-[ integer ] [ fixnum bignum class-or ] unit-test
-[ integer ] [ fixnum integer class-or ] unit-test
-[ rational ] [ ratio integer class-or ] unit-test
 [ number ] [ number object class-and ] unit-test
 [ number ] [ object number class-and ] unit-test
-
-[ cons ] [ [ 1 2 ] class ] unit-test
 
 [ t ] [ \ fixnum \ integer class< ] unit-test
 [ t ] [ \ fixnum \ fixnum class< ] unit-test
@@ -111,13 +95,19 @@ M: very-funny gooey sq ;
 [ f ] [ \ cons \ list class< ] unit-test
 [ f ] [ \ list \ cons class< ] unit-test
 
-[ f ] [ \ mirror \ slice class< ] unit-test
-[ f ] [ \ slice \ mirror class< ] unit-test
+[ f ] [ \ reversed \ slice class< ] unit-test
+[ f ] [ \ slice \ reversed class< ] unit-test
+
+TUPLE: a ;
+TUPLE: b ;
+UNION: c a b ;
+
+[ t ] [ \ c \ tuple class< ] unit-test
+[ f ] [ \ tuple \ c class< ] unit-test
 
 DEFER: bah
 FORGET: bah
 UNION: bah fixnum alien ;
-[ bah ] [ fixnum alien class-or ] unit-test
 [ bah ] [ \ bah? "predicating" word-prop ] unit-test
 
 DEFER: complement-test
@@ -139,10 +129,10 @@ M: for-arguments-sake empty-method-test drop "Hi" ;
 TUPLE: another-one ;
 
 [ "Hi" ] [ <for-arguments-sake> empty-method-test empty-method-test ] unit-test
-[ << another-one f >> ] [ <another-one> empty-method-test ] unit-test
+[ T{ another-one f } ] [ <another-one> empty-method-test ] unit-test
 
 ! Test generic see and parsing
-[ "IN: temporary\nSYMBOL: bah\nUNION: bah fixnum alien ;\n" ]
+[ "IN: temporary SYMBOL: bah\nUNION: bah fixnum alien ;\n" ]
 [ [ \ bah see ] string-out ] unit-test
 
 ! Weird bug
@@ -178,7 +168,7 @@ M: object complex-combination nip ;
 TUPLE: shit ;
 
 M: shit complex-combination cons ;
-[ [[ << shit f >> 5 ]] ] [ << shit f >> 5 complex-combination ] unit-test
+[ [[ T{ shit f } 5 ]] ] [ T{ shit f } 5 complex-combination ] unit-test
 
 [ t ] [ \ complex-combination generic? >boolean ] unit-test
 
@@ -186,7 +176,7 @@ M: shit complex-combination cons ;
 ! G: small-delegation [ over ] [ type ] ;
 ! M: shit small-delegation cons ;
 ! 
-! [ [[ << shit f >> 5 ]] ] [ << delegating-small-generic << shit f >> >> 5 small-delegation ] unit-test
+! [ [[ T{ shit f } 5 ]] ] [ T{ delegating-small-generic T{ shit f } } 5 small-delegation ] unit-test
 
 GENERIC: big-generic-test
 M: fixnum big-generic-test "fixnum" ;
@@ -197,10 +187,12 @@ M: shit big-generic-test "shit" ;
 
 TUPLE: delegating ;
 
-[ << shit f >> "shit" ] [ << shit f >> big-generic-test ] unit-test
-[ << shit f >> "shit" ] [ << delegating << shit f >> >> big-generic-test ] unit-test
+[ T{ shit f } "shit" ] [ T{ shit f } big-generic-test ] unit-test
+[ T{ shit f } "shit" ] [ T{ delegating T{ shit f } } big-generic-test ] unit-test
 
 [ t ] [ \ = simple-generic? ] unit-test
 [ f ] [ \ each simple-generic? ] unit-test
 [ f ] [ \ object simple-generic? ] unit-test
 [ t ] [ \ + 2generic? ] unit-test
+
+[ "SYMBOL: not-a-class C: not-a-class ;" parse ] unit-test-fails

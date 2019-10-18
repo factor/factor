@@ -1,7 +1,7 @@
 IN: numbers-game
 USING: kernel math parser random io ;
 
-: read-number ( -- n ) readln str>number ;
+: read-number ( -- n ) readln string>number ;
 
 : guess-banner
     "I'm thinking of a number between 0 and 100." print ;
@@ -11,15 +11,15 @@ USING: kernel math parser random io ;
 : correct "Correct - you win!" print ;
 
 : inexact-guess ( actual guess -- )
-     < [ too-high ] [ too-low ] ifte ;
+     < [ too-high ] [ too-low ] if ;
 
 : judge-guess ( actual guess -- ? )
-    2dup = [ 2drop correct f ] [ inexact-guess t ] ifte ;
+    2dup = [ 2drop correct f ] [ inexact-guess t ] if ;
 
-: number-to-guess ( -- n ) 0 100 random-int ;
+: number-to-guess ( -- n ) 100 random-int ;
 
 : numbers-game-loop ( actual -- )
     dup guess-prompt read-number judge-guess
-    [ numbers-game-loop ] [ drop ] ifte ;
+    [ numbers-game-loop ] [ drop ] if ;
 
 : numbers-game number-to-guess numbers-game-loop ;

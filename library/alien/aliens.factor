@@ -1,8 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: hashtables io kernel kernel-internals lists math
-namespaces parser ;
+USING: arrays hashtables io kernel lists math namespaces parser ;
 
 UNION: c-ptr byte-array alien displaced-alien ;
 
@@ -14,7 +13,7 @@ M: alien = ( obj obj -- ? )
         alien-address swap alien-address =
     ] [
         2drop f
-    ] ifte ;
+    ] if ;
 
 : library ( name -- object )
     dup [ "libraries" get hash ] when ;

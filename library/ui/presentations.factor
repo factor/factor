@@ -1,48 +1,59 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-presentations
-USING: compiler gadgets gadgets-buttons gadgets-labels
-gadgets-menus gadgets-panes generic hashtables inference
-inspector io jedit kernel lists memory namespaces parser
-prettyprint sequences styles vectors words ;
+USING: arrays compiler gadgets gadgets-buttons gadgets-labels
+gadgets-menus gadgets-outliner gadgets-panes gadgets-theme
+generic hashtables inference inspector io jedit kernel lists
+memory namespaces parser prettyprint sequences strings styles
+words ;
 
 SYMBOL: commands
 
-{ } clone commands global set-hash
+V{ } clone commands global set-hash
 
 : define-command ( class name quot -- )
-    3vector commands get push ;
+    3array commands get push ;
 
 : applicable ( object -- seq )
     commands get [ first call ] subset-with ;
 
 : command-quot ( presented quot -- quot )
-    [
-        \ drop ,
-        [ swap literalize , % ] [ ] make ,
-        [ pane get pane-call ] %
-    ] [ ] make ;
+    [ \ drop , curry , [ pane get pane-call ] % ] [ ] make ;
 
-: command-menu ( presented -- menu )
-    dup applicable
+TUPLE: command-button object ;
+
+: command-menu ( command-button -- )
+    command-button-object dup applicable
     [ [ third command-quot ] keep second swons ] map-with
-    <menu> show-menu ;
+    <menu> show-hand-menu ;
 
-: <object-button> ( gadget object -- button )
-    [ \ drop , literalize , \ command-menu , ] [ ] make
-    <roll-button>
-    dup [ button-clicked ] [ button-down 1 ] set-action
-    dup [ button-update ] [ button-up 1 ] set-action ;
-    
-: init-commands ( gadget -- gadget )
-    dup presented paint-prop [ <object-button> ] when* ;
+C: command-button ( gadget object -- button )
+    [
+        set-command-button-object
+        [ command-menu ] <roll-button>
+    ] keep
+    [ set-gadget-delegate ] keep
+    dup menu-button-actions ;
+
+M: command-button gadget-help ( button -- string )
+    command-button-object dup word? [ synopsis ] [ summary ] if ;
+
+: init-commands ( style gadget -- gadget )
+    presented rot assoc [ <command-button> ] when* ;
+
+: style-font ( style -- font )
+    [ font swap assoc [ "Monospaced" ] unless* ] keep
+    [ font-style swap assoc [ plain ] unless* ] keep
+    font-size swap assoc [ 12 ] unless* 3array ;
 
 : <styled-label> ( style text -- label )
-    <label> swap dup [ alist>hash ] when over set-gadget-paint ;
+    <label> foreground pick assoc [ over set-label-color ] when*
+    swap style-font over set-label-font ;
 
 : <presentation> ( style text -- presentation )
-    gadget pick assoc dup
-    [ 2nip ] [ drop <styled-label> init-commands ] ifte ;
+    gadget pick assoc
+    [ ] [ >r dup dup r> <styled-label> init-commands ] ?if
+    outline rot assoc [ <outliner> ] when* ;
 
 : gadget. ( gadget -- )
     gadget swons unit
@@ -50,21 +61,18 @@ SYMBOL: commands
     swap format terpri ;
 
 [ drop t ] "Prettyprint" [ . ] define-command
-[ drop t ] "Inspect" [ inspect ] define-command
-[ drop t ] "Inspect variable" [ get inspect ] define-command
-[ drop t ] "Inspect references" [ references inspect ] define-command
+[ drop t ] "Describe" [ describe ] define-command
 [ drop t ] "Push on data stack" [ ] define-command
 
 [ word? ] "See word" [ see ] define-command
-[ word? ] "Word usage" [ usage . ] define-command
+[ word? ] "Word call hierarchy" [ uses. ] define-command
+[ word? ] "Word caller hierarchy" [ usage. ] define-command
 [ word? ] "Open in jEdit" [ jedit ] define-command
 [ word? ] "Reload original source" [ reload ] define-command
 [ compound? ] "Annotate with watchpoint" [ watch ] define-command
 [ compound? ] "Annotate with breakpoint" [ break ] define-command
 [ compound? ] "Annotate with profiling" [ profile ] define-command
 [ word? ] "Compile" [ recompile ] define-command
-[ word? ] "Show stack effect" [ unit infer . ] define-command
-[ word? ] "Show dataflow IR" [ word-def t dataflow. ] define-command
-[ word? ] "Show linear IR" [ precompile ] define-command
+[ word? ] "Infer stack effect" [ unit infer . ] define-command
 
 [ [ gadget? ] is? ] "Display gadget" [ gadget. ] define-command

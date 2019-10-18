@@ -48,9 +48,6 @@ CELL untagged_object_size(CELL pointer)
 	case WORD_TYPE:
 		size = sizeof(F_WORD);
 		break;
-	case T_TYPE:
-		size = CELLS * 2;
-		break;
 	case ARRAY_TYPE:
 	case TUPLE_TYPE:
 	case BIGNUM_TYPE:
@@ -103,8 +100,6 @@ void primitive_tag(void)
 	drepl(tag_fixnum(TAG(dpeek())));
 }
 
-#define SLOT(obj,slot) ((obj) + (slot) * CELLS)
-
 void primitive_slot(void)
 {
 	F_FIXNUM slot = untag_fixnum_fast(dpop());
@@ -144,6 +139,19 @@ void primitive_address(void)
 void primitive_size(void)
 {
 	drepl(tag_fixnum(object_size(dpeek())));
+}
+
+CELL clone(CELL obj)
+{
+	CELL size = object_size(obj);
+	CELL tag = TAG(obj);
+	void *new_obj = allot(size);
+	return RETAG(memcpy(new_obj,(void*)UNTAG(obj),size),tag);
+}
+
+void primitive_clone(void)
+{
+	drepl(clone(dpeek()));
 }
 
 void primitive_room(void)

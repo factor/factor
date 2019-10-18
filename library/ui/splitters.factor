@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-splitters
-USING: gadgets gadgets-layouts generic kernel lists math
-namespaces sequences styles vectors ;
+USING: arrays gadgets gadgets-layouts gadgets-theme generic
+kernel lists math namespaces sequences styles ;
 
 TUPLE: divider splitter ;
 
@@ -17,8 +17,8 @@ TUPLE: splitter split ;
 
 : divider-motion ( splitter -- )
     dup hand>split
-    over rect-dim { 1 1 1 } vmax v/ over pack-vector v.
-    0 max 1 min over set-splitter-split relayout ;
+    over rect-dim { 1 1 1 } vmax v/ over gadget-orientation v.
+    0 max 1 min over set-splitter-split relayout-1 ;
 
 : divider-actions ( thumb -- )
     dup [ drop ] [ button-down 1 ] set-action
@@ -26,14 +26,14 @@ TUPLE: splitter split ;
     [ gadget-parent divider-motion ] [ drag 1 ] set-action ;
 
 C: divider ( -- divider )
-    <plain-gadget> over set-delegate
-    dup t reverse-video set-paint-prop
+    dup delegate>gadget
+    dup reverse-video-theme
     dup divider-actions ;
 
 C: splitter ( first second split vector -- splitter )
-    [ >r <pack> r> set-delegate ] keep
+    [ delegate>pack ] keep
     [ set-splitter-split ] keep
-    [ >r >r <divider> r> 3vector r> add-gadgets ] keep
+    [ >r >r <divider> r> 3array r> add-gadgets ] keep
     1 over set-pack-fill ;
 
 : <x-splitter> ( first second split -- splitter )
@@ -44,7 +44,7 @@ C: splitter ( first second split vector -- splitter )
 
 : splitter-part ( splitter -- vec )
     dup splitter-split swap rect-dim
-    n*v divider-size 1/2 v*n v- ;
+    n*v [ >fixnum ] map divider-size 1/2 v*n v- ;
 
 : splitter-layout ( splitter -- { a b c } )
     [

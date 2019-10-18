@@ -9,7 +9,7 @@ M: duplex-stream stream-flush
 
 M: duplex-stream stream-finish
     dup duplex-stream-flush?
-    [ duplex-stream-out stream-flush ] [ drop ] ifte ;
+    [ duplex-stream-out stream-flush ] [ drop ] if ;
 
 M: duplex-stream stream-readln
     duplex-stream-in stream-readln ;

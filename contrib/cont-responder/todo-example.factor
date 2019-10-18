@@ -110,7 +110,7 @@ USE: sequences
 
 : include-todo-stylesheet ( -- )  
   #! Generate HTML to include the todo stylesheet
-  <link rel= "stylesheet" href= todo-stylesheet-url link/> ;
+  <link "stylesheet" =rel todo-stylesheet-url =href link/> ;
 
 : show-stack-page ( -- )
   #! Debug function to show a page containing the current call stack.
@@ -126,39 +126,39 @@ USE: sequences
 : styled-row ( class list -- )
   #! Output an html TR row with each element of the list
   #! being called to produce the output for each TD.
-  <tr class= swap tr> 
+  <tr swap =class tr> 
     [ <td> call </td> ] each
   </tr> ;
 
 : simple-input ( name -- )
   #! Output a simple HTML input field which will have the
   #! specified name.
-  <input type= "text" size= "20" name= input/> ;
+  <input "text" =type "20" =size =name input/> ;
 
 : simple-input-with-value ( name value -- )
   #! Output a simple HTML input field which will have the
   #! specified name and value.
-  <input type= "text" size= "20" value= name= input/> ;
+  <input "text" =type "20" =size =value =name input/> ;
 
 : textarea-input ( name -- )
   #! Output a simple HTML textarea field which will have the
   #! specified name.
-  <textarea name= rows= "10" cols= "40" textarea> "Enter description here." write </textarea> ;
+  <textarea =name "10" =rows "40" =cols textarea> "Enter description here." write </textarea> ;
 
 : textarea-input-with-value ( name value -- )
   #! Output a simple HTML textarea field which will have the
   #! specified name and value.
-  <textarea name= swap rows= "10" cols= "40" textarea> write </textarea> ;
+  <textarea swap =name "10" =rows "40" =cols textarea> write </textarea> ;
 
 : password-input ( name -- )
   #! Output an HTML password input field which will have the
   #! specified name.
-  <input type= "password" size= "20" name= input/> ;
+  <input "password" =type "20" =size =name input/> ;
 
 : form ( action quot  -- )
   #! Call quot with any output appearing inside an HTML form.
   #! The form is a POST form where the action is as specified.
-  <form method= "post" action= swap form> call </form> ;
+  <form "post" =method swap =action form> call </form> ;
 
 : input-value ( name -- value )
   #! Get the value of the variable "name". If it is f 
@@ -197,9 +197,9 @@ USE: sequences
         t
       ] [
         f
-      ] ifte
-    ] ifte
-  ] ifte ;
+      ] if
+    ] if
+  ] if ;
 
 : replace-invalid-username-chars ( str -- str ) 
   #! Return a string with invalid username characters mapped to underscores.
@@ -207,7 +207,7 @@ USE: sequences
     dup valid-username-char [ 
     ] [ 
       drop CHAR: _ 
-    ] ifte 
+    ] if 
   ] map ;
 
 : is-valid-username? ( username -- bool )
@@ -260,7 +260,7 @@ USE: sequences
   ] [
     <todo> init-new-todo
     "You have successfully registered your todo list." show-message-page
-  ] ifte ;
+  ] if ;
 
 : login-request-paragraph ( -- )
   #! Display the paragraph requesting the user to login or register.
@@ -300,12 +300,12 @@ USE: sequences
   #! todo item details.
   [
     <table> 
-      <tr class= "required" tr> 
-        <td class= "lbl" td> "Priority" write </td>
+      <tr "required" =class tr> 
+        <td "lbl" =class td> "Priority" write </td>
         <td> "priority" simple-input </td> 
       </tr>
-      <tr class= "required" tr> 
-        <td class= "lbl" td> "Description" write </td>
+      <tr "required" =class tr> 
+        <td "lbl" =class  td> "Description" write </td>
         <td> "description" textarea-input </td> 
       </tr>
     </table>
@@ -318,12 +318,12 @@ USE: sequences
   swap [
     [   
       <table> 
-        <tr class= "required" tr> 
-          <td class= "lbl" td> "Priority" write </td>
+        <tr "required" =class tr> 
+          <td "lbl" =class td> "Priority" write </td>
           <td> "priority" dup get simple-input-with-value  </td> 
         </tr>
-        <tr class= "required" tr> 
-          <td class= "lbl" td> "Description" write </td>
+        <tr "required" =class tr> 
+          <td "lbl" =class td> "Description" write </td>
           <td> "description" dup get textarea-input-with-value </td> 
         </tr>
       </table>
@@ -334,11 +334,11 @@ USE: sequences
 : priority-valid? ( string -- bool )
   #! Test the string containing a priority to see if it is 
   #! valid. It should be a single digit from 0-9.
-  dup length 1 = [ 0 swap nth digit? ] [ drop f ] ifte ;
+  dup length 1 = [ 0 swap nth digit? ] [ drop f ] if ;
 
 : todo-details-valid? ( priority description -- bool )
   #! Return true if a valid priority and description were entered.
-  length 0 > [ priority-valid? ] [ drop f ] ifte ;
+  length 0 > [ priority-valid? ] [ drop f ] if ;
 
 : get-new-todo-item ( -- <todo-item> )
   #! Enter a new item to the current todo list.
@@ -352,23 +352,23 @@ USE: sequences
     2drop 
     "Please ensure you enter a Priority from 0-9 and a description." show-message-page
     get-new-todo-item
-  ] ifte ;
+  ] if ;
 
 : write-get-password-form ( url -- )
   #! Display the HTML for a form allowing entry of a 
   #! new password.
   [
     <table> 
-      <tr class= "required" tr> 
-        <td class= "lbl" td> "Old Password" write </td>
+      <tr "required" =class tr> 
+        <td "lbl" =class  td> "Old Password" write </td>
         <td> "old-password" password-input </td> 
       </tr>
-      <tr class= "required" tr> 
-        <td class= "lbl" td> "New Password" write </td>
+      <tr "required" =class tr> 
+        <td "lbl" =class  td> "New Password" write </td>
         <td> "new-password" password-input </td> 
       </tr>
-      <tr class= "required" tr> 
-        <td class= "lbl" td> "Verify Password" write </td>
+      <tr "required" =class tr> 
+        <td "lbl" =class td> "Verify Password" write </td>
         <td> "verify-password" password-input </td> 
       </tr>
     </table>
@@ -388,11 +388,11 @@ USE: sequences
       ] [
         "Your new password did not match. The password was NOT changed." show-message-page
         f
-      ] ifte
+      ] if
     ] [
       "You entered an incorrect old password. The password was NOT changed." show-message-page
       f
-    ] ifte
+    ] if
   ] bind ;
 
 : edit-item-details ( item -- )
@@ -407,7 +407,7 @@ USE: sequences
     drop drop 
     "Please ensure you enter a Priority from 0-9 and a description." show-message-page
     edit-item-details
-  ] ifte ;
+  ] if ;
 
 : save-current-todo ( -- )
   #! Save the current todo list
@@ -426,7 +426,7 @@ USE: sequences
     "Delete" swap [ "todo" get swap delete-item save-current-todo ] lcurry1 quot-href
   ] [
     "Complete" swap [ set-item-completed save-current-todo ] lcurry1 quot-href
-  ] ifte ;
+  ] if ;
 
 : write-edit-action ( item -- )
   #! Write out html to allow editing an item.
@@ -435,14 +435,14 @@ USE: sequences
 : item-class ( <todo-item> -- string )
   #! Return the class to use for displaying the row for the
   #! item.
-  item-complete? [ "complete" ] [ "item" ] ifte ;
+  item-complete? [ "complete" ] [ "item" ] if ;
 
 : write-item-row ( <todo-item> -- )
   #! Write the todo list item as an HTML row.
   dup dup dup dup
   dup item-class [ 
     [ item-priority write ] 
-    [ item-complete? [ "Yes" ] [ "No" ] ifte write ] 
+    [ item-complete? [ "Yes" ] [ "No" ] if write ] 
     [ item-description write ] 
     [ write-mark-complete-action ]
     [ write-edit-action ] 
@@ -468,7 +468,7 @@ USE: sequences
     "Your password has been changed." show-message-page 
   ] [
     drop
-  ] ifte ;
+  ] if ;
 
 : show-todo-list ( -- )
   #! Show the current todo list.

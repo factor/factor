@@ -14,7 +14,6 @@ sequences io vectors words ;
     [
         [ hashtable? ] instances
         [ dup hash-size 1 max swap set-bucket-count ] each
-
         boot
     ] %
 
@@ -25,20 +24,19 @@ sequences io vectors words ;
 
         "/library/kernel.factor"
 
-        "/library/collections/sequences.factor"
-        "/library/collections/arrays.factor"
-
         "/library/math/math.factor"
         "/library/math/integer.factor"
         "/library/math/ratio.factor"
         "/library/math/float.factor"
         "/library/math/complex.factor"
-        "/library/math/random.factor"
 
+        "/library/collections/sequences.factor"
         "/library/collections/growable.factor"
         "/library/collections/cons.factor"
         "/library/collections/virtual-sequences.factor"
+        "/library/collections/sequence-combinators.factor"
         "/library/collections/sequences-epilogue.factor"
+        "/library/collections/arrays.factor"
         "/library/collections/strings.factor"
         "/library/collections/sbuf.factor"
         "/library/collections/assoc.factor"
@@ -53,13 +51,18 @@ sequences io vectors words ;
         "/library/collections/tree-each.factor"
         "/library/collections/queues.factor"
 
-        "/library/math/matrices.factor"
+        "/library/math/random.factor"
+        "/library/math/constants.factor"
+        "/library/math/pow.factor"
+        "/library/math/trig-hyp.factor"
+        "/library/math/arc-trig-hyp.factor"
+        "/library/math/vectors.factor"
         "/library/math/parse-numbers.factor"
 
         "/library/words.factor"
         "/library/vocabularies.factor"
-        "/library/errors.factor"
         "/library/continuations.factor"
+        "/library/errors.factor"
         "/library/styles.factor"
 
         "/library/io/stream.factor"
@@ -80,8 +83,6 @@ sequences io vectors words ;
         "/library/generic/standard-combination.factor"
         "/library/generic/slots.factor"
         "/library/generic/math-combination.factor"
-        "/library/generic/predicate.factor"
-        "/library/generic/union.factor"
         "/library/generic/tuple.factor"
 
         "/library/syntax/generic.factor"
@@ -90,25 +91,25 @@ sequences io vectors words ;
         "/library/alien/aliens.factor"
         
         "/library/syntax/prettyprint.factor"
-
-        "/library/io/logging.factor"
+        "/library/syntax/see.factor"
 
         "/library/tools/interpreter.factor"
+        
+        "/library/tools/describe.factor"
         "/library/tools/debugger.factor"
         "/library/tools/memory.factor"
         "/library/tools/listener.factor"
         "/library/tools/walker.factor"
-        "/library/tools/jedit.factor"
+
         "/library/tools/annotations.factor"
         "/library/tools/inspector.factor"
 
         "/library/test/test.factor"
-        
-        "/library/syntax/see.factor"
 
         "/library/threads.factor"
         
-        "/library/tools/telnetd.factor"
+        "/library/io/server.factor"
+        "/library/tools/jedit.factor"
 
         "/library/bootstrap/image.factor"
 
@@ -137,7 +138,7 @@ sequences io vectors words ;
         "/library/compiler/linearizer.factor"
         "/library/compiler/stack.factor"
         "/library/compiler/intrinsics.factor"
-        "/library/compiler/simplifier.factor"
+        "/library/compiler/basic-blocks.factor"
         "/library/compiler/generator.factor"
         "/library/compiler/compiler.factor"
 

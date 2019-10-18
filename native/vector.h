@@ -16,5 +16,6 @@ INLINE F_VECTOR* untag_vector(CELL tagged)
 F_VECTOR* vector(F_FIXNUM capacity);
 
 void primitive_vector(void);
+void primitive_array_to_vector(void);
 void fixup_vector(F_VECTOR* vector);
 void collect_vector(F_VECTOR* vector);

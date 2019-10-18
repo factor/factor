@@ -105,7 +105,7 @@ DEFER: lnil
     [ , \ lcdr , , \ lmap , ] [ ] make delay >r
     [ , \ lcar , , \ call , ] [ ] make delay r> 
     lcons 
-  ] ifte ;
+  ] if ;
 
 : ltake ( n llist -- llist )
   #! Return a lazy list containing the first n items from
@@ -120,8 +120,8 @@ DEFER: lnil
         [ [ 1 - ] cons , \ call , , \ lcdr , \ ltake , ] [ ] make delay >r
         [ , \ lcar , ] [ ] make delay r> 
         lcons 
-    ] ifte 
-  ] ifte ;
+    ] if 
+  ] if ;
 
 DEFER: lsubset
 TUPLE: lsubset-state llist pred ;
@@ -140,7 +140,7 @@ TUPLE: lsubset-state llist pred ;
   ] [ ( state lcar -- )
     drop dup lsubset-state-llist lcdr over set-lsubset-state-llist
     (lsubset-car)
-  ] ifte ;
+  ] if ;
 
 : (lsubset-set-first-car) ( state -- bool )
   #! Set the state to the first valid car. If none found
@@ -154,8 +154,8 @@ TUPLE: lsubset-state llist pred ;
     ] [
       over set-lsubset-state-llist
       (lsubset-set-first-car)
-    ] ifte
-  ] ifte ;
+    ] if
+  ] if ;
 
 : lsubset ( llist pred -- llist )
   #! Return a lazy list containing only the items from the original
@@ -170,8 +170,8 @@ TUPLE: lsubset-state llist pred ;
       [ (lsubset-car) ] cons delay r> lcons
     ] [
       drop lnil
-    ] ifte
-  ] ifte ;
+    ] if
+  ] if ;
 
 DEFER: lappend*
 DEFER: (lappend*)
@@ -193,11 +193,11 @@ USE: io
         nip
         luncons ( state rest-car rest-cdr -- )
         <lappend*-state> (lappend*)
-      ] ifte 
+      ] if 
     ] [ ( state cdr -- )
       swap lappend*-state-rest <lappend*-state> (lappend*)
-    ] ifte 
-  ] ifte ;
+    ] if 
+  ] if ;
 
 : (lappend*-car) ( state -- value )
   #! Given the state object, do the car portion of the 
@@ -206,7 +206,7 @@ USE: io
     nip
   ] [ ( state current -- )
     lcar nip
-  ] ifte ;
+  ] if ;
 
 : (lappend*) ( state -- llist )
   #! Do the main work of the lazy list appending using a
@@ -238,7 +238,7 @@ DEFER: list>llist
       2drop
   ] [
       >r luncons r> tuck >r >r call r> r> leach
-  ] ifte ;
+  ] if ;
 
 
 : (llist>list) ( result llist -- list )
@@ -248,7 +248,7 @@ DEFER: list>llist
   ] [
     dup lcar ( result llist car )
     swap lcdr >r swons r> (llist>list)  
-  ] ifte ;
+  ] if ;
 
 : llist>list ( llist -- list )
   #! Convert a lazy list to a normal list. This will cause
@@ -261,7 +261,7 @@ DEFER: list>llist
     uncons [ list>llist ] cons delay >r unit delay r> lcons 
   ] [ 
     drop lnil
-  ] ifte ;
+  ] if ;
 
 ! M: lcons nth lnth ;
 

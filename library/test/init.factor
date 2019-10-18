@@ -1,5 +1,4 @@
 IN: temporary
-USE: command-line
 USE: namespaces
 USE: test
 USE: kernel
@@ -17,7 +16,7 @@ USE: lists
 ] with-scope
 
 : traverse-path ( name object -- object )
-    dup hashtable? [ hash ] [ 2drop f ] ifte ;
+    dup hashtable? [ hash ] [ 2drop f ] if ;
 
 : (object-path) ( object list -- object )
     [ uncons >r swap traverse-path r> (object-path) ] when* ;

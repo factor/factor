@@ -1,71 +1,76 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: errors generic hashtables interpreter kernel lists math
+USING: arrays errors generic hashtables interpreter kernel math
 namespaces parser prettyprint sequences strings vectors words ;
 
 : unify-lengths ( seq -- seq )
     #! Pad all vectors to the same length. If one vector is
     #! shorter, pad it with unknown results at the bottom.
-    dup max-length swap
-    [ [ required-inputs ] keep append ] map-with ;
+    dup 0 [ length max ] reduce swap [ add-inputs ] map-with ;
 
 : unify-length ( seq seq -- seq )
-    2vector unify-lengths first2 ;
+    2array unify-lengths first2 ;
 
 : unify-values ( seq -- value )
     #! If all values in list are equal, return the value.
     #! Otherwise, unify.
-    dup [ eq? ] monotonic? [ first ] [ <meet> ] ifte ;
+    dup all-eq? [ first ] [ drop <value> ] if ;
 
 : unify-stacks ( seq -- stack )
     #! Replace differing literals in stacks with unknown
     #! results.
-    unify-lengths flip [ unify-values ] map ;
+    [ ] subset dup empty?
+    [ drop f ] [ unify-lengths flip [ unify-values ] map ] if ;
 
 : balanced? ( in out -- ? )
-    [ swap length swap length - ] 2map [ = ] monotonic? ;
+    [ dup [ length - ] [ 2drop f ] if ] 2map
+    [ ] subset all-equal? ;
+
+: unify-in-d ( seq -- n )
+    #! Input is a sequence of positive integers or f.
+    #! Output is the maximum or 0.
+    0 [ [ max ] when* ] reduce ;
+
+: unbalanced-branches ( in out -- )
+    { "Unbalanced branches:" } -rot [
+        swap number>string " " rot length number>string
+        append3
+    ] 2map append "\n" join inference-error ;
 
 : unify-effect ( in out -- in out )
-    2dup balanced?
-    [ unify-stacks >r unify-stacks r> ]
-    [
-        { "Unbalanced branches:" } -rot [
-            swap length number>string
-            " " rot length number>string append3
-        ] 2map append "\n" join inference-error
-    ] ifte ;
+    #! In is a sequence of integers; out is a sequence of stacks.
+    2dup balanced? [
+        unify-stacks >r unify-in-d r>
+    ] [
+        unbalanced-branches
+    ] if ;
+
+: active-variable ( seq symbol -- seq )
+    swap [
+        terminated? over hash [ 2drop f ] [ hash ] if
+    ] map-with ;
 
 : datastack-effect ( seq -- )
-    dup [ d-in swap hash ] map
-    swap [ meta-d swap hash ] map
-    unify-effect
-    meta-d set d-in set ;
+    dup d-in active-variable
+    swap meta-d active-variable
+    unify-effect meta-d set d-in set ;
 
 : callstack-effect ( seq -- )
-    dup length { } <repeated>
-    swap [ meta-r swap hash ] map
-    unify-effect
-    meta-r set drop ;
-
-: filter-terminators ( seq -- seq )
-    #! Remove branches that unconditionally throw errors.
-    [ [ active? ] bind ] subset ;
+    dup length 0 <repeated>
+    swap meta-r active-variable
+    unify-effect meta-r set drop ;
 
 : unify-effects ( seq -- )
-    filter-terminators dup empty?
-    [ drop terminate ]
-    [ dup datastack-effect callstack-effect ] ifte ;
+    dup datastack-effect callstack-effect ;
 
 : unify-dataflow ( effects -- nodes )
     [ [ dataflow-graph get ] bind ] map ;
 
 : copy-inference ( -- )
-    #! We avoid cloning the same object more than once in order
-    #! to preserve identity structure.
     meta-r [ clone ] change
     meta-d [ clone ] change
-    d-in [ clone ] change
+    d-in [ ] change
     dataflow-graph off
     current-node off ;
 
@@ -79,14 +84,13 @@ namespaces parser prettyprint sequences strings vectors words ;
             copy-inference
             dup value-recursion recursive-state set
             dup literal-value infer-quot
-            active? [ #values node, ] when
+            terminated? get [ #values node, ] unless
             f
         ] callcc1 [ terminate ] when drop
     ] make-hash ;
 
 : (infer-branches) ( branchlist -- list )
-    [ infer-branch ] map dup unify-effects
-    unify-dataflow ;
+    [ infer-branch ] map dup unify-effects unify-dataflow ;
 
 : infer-branches ( branches node -- )
     #! Recursive stack effect inference is done here. If one of

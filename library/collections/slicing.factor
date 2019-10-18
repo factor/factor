@@ -24,34 +24,38 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
 
 : tail* ( n seq -- seq ) [ tail-slice* ] keep like ; flushable
 
-: length< ( seq seq -- ? ) swap length swap length < ; flushable
-
 : head? ( seq begin -- ? )
-    2dup length< [
+    2dup [ length ] 2apply < [
         2drop f
     ] [
         dup length rot head-slice sequence=
-    ] ifte ; flushable
+    ] if ; flushable
 
 : ?head ( seq begin -- str ? )
-    2dup head? [ length swap tail t ] [ drop f ] ifte ; flushable
+    2dup head? [ length swap tail t ] [ drop f ] if ; flushable
 
 : tail? ( seq end -- ? )
-    2dup length< [
+    2dup [ length ] 2apply < [
         2drop f
     ] [
         dup length rot tail-slice* sequence=
-    ] ifte ; flushable
+    ] if ; flushable
 
 : ?tail ( seq end -- seq ? )
-    2dup tail? [ length swap head* t ] [ drop f ] ifte ; flushable
+    2dup tail? [ length swap head* t ] [ drop f ] if ; flushable
+
+: replace-slice ( new from to seq -- seq )
+    #! Replace the range between 'from' and 'to' in 'seq' with
+    #! 'new'. The new sequence has the same type as 'seq'.
+    tuck >r >r head-slice r> r> tail-slice swapd append3 ;
+    flushable
 
 : (group) ( n seq -- )
     2dup length >= [
         dup like , drop
     ] [
         2dup head , dupd tail-slice (group)
-    ] ifte ;
+    ] if ;
 
 : group ( n seq -- seq ) [ (group) ] { } make ; flushable
 
@@ -65,9 +69,9 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
         2dup >r >r start-step dupd sequence= [
             r> 2drop r>
         ] [
-            r> r> 1 + start*
-        ] ifte
-    ] ifte ; flushable
+            r> r> 1+ start*
+        ] if
+    ] if ; flushable
 
 : start ( subseq seq -- n )
     #! The index of a subsequence in a sequence.
@@ -81,15 +85,32 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
         2drop dup like f
     ] [
         [ swap length + over tail-slice ] keep rot head swap
-    ] ifte ; flushable
+    ] if ; flushable
 
 : split1 ( seq subseq -- before after )
     #! After is of the same type as seq.
     (split1) dup like ; flushable
 
 : (split) ( seq subseq -- )
-    tuck (split1) >r , r> dup [ swap (split) ] [ 2drop ] ifte ;
+    tuck (split1) >r , r> dup [ swap (split) ] [ 2drop ] if ;
 
 : split ( seq subseq -- seq ) [ (split) ] [ ] make ; flushable
 
-: cut ( n seq -- ) [ head ] 2keep tail ; flushable
+: (cut) ( n seq -- before after )
+    [ head ] 2keep tail-slice ; flushable
+
+: cut ( n seq -- before after )
+    [ (cut) ] keep like ; flushable
+
+: drop-prefix ( seq1 seq2 -- seq1 seq2 )
+    2dup mismatch dup -1 = [ drop 2dup min-length ] when
+    tuck swap tail-slice >r swap tail-slice r> ;
+
+IN: strings
+
+: completion? ( partial completion quot -- ? )
+    #! Test if 'partial' is a completion of 'completion', by
+    #! comparing each "-"-delimited chunk using 'quot'. The
+    #! quotation is usually either [ subseq? ] or [ swap head? ].
+    >r [ "-" split ] 2apply 2dup [ length ] 2apply <=
+    [ r> 2map [ ] all? ] [ r> 3drop f ] if ; inline

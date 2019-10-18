@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: interpreter
-USING: errors kernel listener lists math namespaces prettyprint
-sequences io strings vectors words ;
+USING: errors inspector kernel listener lists math namespaces
+prettyprint sequences io strings vectors words ;
 
 ! The single-stepper simulates Factor in Factor to allow
 ! single-stepping through the execution of a quotation. It can
@@ -36,39 +36,31 @@ sequences io strings vectors words ;
     #! Step into current word.
     next do report ;
 
-: continue
+: end-walk
     #! Continue executing the single-stepped continuation in the
     #! primary interpreter.
-    meta-d get set-datastack
-    meta-c get set-catchstack
-    meta-cf get
-    meta-r get
-    meta-n get set-namestack
-    set-callstack call ;
+    \ call push-r meta-cf get push-r meta-interp continue ;
 
 : walk-banner ( -- )
     "&s &r show stepper stacks" print
     "&get ( var -- value ) get stepper variable value" print
     "step -- single step over" print
     "into -- single step into" print
-    "continue -- continue execution" print
-    "bye -- exit single-stepper" print
+    "bye -- continue execution" print
     report ;
 
-: walk-listener walk-banner "walk " listener-prompt set listener ;
-
-: init-walk ( quot callstack namestack -- )
+: set-walk-hooks ( -- )
     [ meta-d get "Stepper data stack:" ] datastack-hook set
     [ meta-r* "Stepper return stack:" ] callstack-hook set
-    init-interpreter
-    meta-n set
-    meta-r set
-    meta-cf set
-    datastack meta-d set ;
+    "walk " listener-prompt set ;
 
 : walk ( quot -- )
     #! Single-step through execution of a quotation.
-    callstack namestack [
-        init-walk
-        walk-listener
+    datastack dup pop* callstack namestack catchstack [
+        meta-c set meta-n set meta-r set meta-d set
+        meta-cf set
+        meta-executing off
+        set-walk-hooks
+        walk-banner
+        listener end-walk
     ] with-scope ;

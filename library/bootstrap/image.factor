@@ -10,12 +10,9 @@
 ! format.
 
 IN: image
-USING: errors generic hashtables kernel lists
-math namespaces parser prettyprint sequences sequences io
-strings vectors words ;
-
-! If true in current namespace, we are bootstrapping.
-SYMBOL: bootstrapping?
+USING: arrays errors generic hashtables kernel lists
+math namespaces parser prettyprint sequences
+sequences-internals io strings vectors words ;
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
@@ -27,9 +24,17 @@ SYMBOL: objects
 SYMBOL: big-endian
 SYMBOL: 64-bits
 
-SYMBOL: t-object
-
 : emit ( cell -- ) image get push ;
+
+: d>w/w ( d -- w w )
+    dup HEX: ffffffff bitand swap -32 shift HEX: ffffffff bitand ;
+
+: emit-64 ( cell -- )
+    64-bits get [
+        emit
+    ] [
+        d>w/w big-endian get [ swap ] unless emit emit
+    ] if ;
 
 : emit-seq ( seq -- ) image get swap nappend ;
 
@@ -46,7 +51,6 @@ SYMBOL: t-object
 : untag ( cell tag -- ) tag-mask bitnot bitand ;
 : tag ( cell -- tag ) tag-mask bitand ;
 
-: t-type         7  ; inline
 : array-type     8  ; inline
 : hashtable-type 10 ; inline
 : vector-type    11 ; inline
@@ -105,27 +109,48 @@ M: fixnum ' ( n -- tagged ) fixnum-tag immediate ;
 
 ( Bignums )
 
+: bignum-bits cell 8 * 2 - ;
+
+: bignum-radix bignum-bits 1 swap shift 1- ;
+
+: (bignum>seq) ( n -- )
+    dup 0 = [
+        drop
+    ] [
+        dup bignum-radix bitand ,
+        bignum-bits neg shift (bignum>seq)
+    ] if ;
+
+: bignum>seq ( n -- seq )
+    #! n is positive or zero.
+    [ (bignum>seq) ] { } make ;
+
+: emit-bignum ( n -- )
+    [ 0 < 1 0 ? ] keep abs bignum>seq
+    dup length 1+ emit-fixnum
+    swap emit emit-seq ;
+
 M: bignum ' ( bignum -- tagged )
     #! This can only emit 0, -1 and 1.
     bignum-tag here-as >r
     bignum-tag >header emit
-    {{
-        [[ 0  [ 1 0   ] ]]
-        [[ -1 [ 2 1 1 ] ]]
-        [[ 1  [ 2 0 1 ] ]]
-    }} hash unswons emit-fixnum emit-seq align-here r> ;
+    emit-bignum align-here r> ;
+
+( Floats )
+
+M: float ' ( float -- tagged )
+    float-tag here-as >r
+    float-tag >header emit
+    align-here
+    double>bits emit-64
+    r> ;
 
 ( Special objects )
 
 ! Padded with fixnums for 8-byte alignment
 
-: t,
-    object-tag here-as
-    dup t-offset fixup t-object set
-    t-type >header emit
-    0 ' emit ;
+: t, t t-offset fixup ;
 
-M: t ' ( obj -- ptr ) drop t-object get ;
 M: f ' ( obj -- ptr )
     #! f is #define F RETAG(0,OBJECT_TYPE)
     drop object-tag ;
@@ -159,22 +184,21 @@ M: f ' ( obj -- ptr )
     0 emit ;
 
 : word-error ( word msg -- )
-    [ % dup word-vocabulary % " " % word-name % ] "" make
-    throw ; inline
+    [ % dup word-vocabulary % " " % word-name % ] "" make throw ;
 
 : transfer-word ( word -- word )
     #! This is a hack. See doc/bootstrap.txt.
     dup dup word-name swap word-vocabulary lookup
-    [ ] [ dup "Missing DEFER: " word-error ] ?ifte ;
+    [ ] [ dup "Missing DEFER: " word-error ] ?if ;
 
 : pooled-object ( object -- ptr ) objects get hash ;
 
 : fixup-word ( word -- offset )
     transfer-word dup pooled-object dup
-    [ nip ] [ "Not in image: " word-error ] ifte ;
+    [ nip ] [ "Not in image: " word-error ] if ;
 
 : fixup-words ( -- )
-    image get [ dup word? [ fixup-word ] when ] nmap ;
+    image get [ dup word? [ fixup-word ] when ] inject ;
 
 M: word ' ( word -- pointer ) ;
 
@@ -188,19 +212,23 @@ M: wrapper ' ( wrapper -- pointer )
 
 ( Conses )
 
-M: cons ' ( c -- tagged )
-    uncons ' swap '
-    cons-tag here-as
-    -rot emit emit ;
+: emit-cons ( first second tag -- pointer )
+    >r ' swap ' r> here-as -rot emit emit ;
+
+M: cons ' ( c -- tagged ) uncons cons-tag emit-cons ;
+
+M: ratio ' ( c -- tagged ) >fraction ratio-tag emit-cons ;
+
+M: complex ' ( c -- tagged ) >rect complex-tag emit-cons ;
 
 ( Strings )
 
 : emit-chars ( seq -- )
-    big-endian get [ [ reverse ] map ] unless
+    big-endian get [ [ reverse-slice ] map ] unless
     [ 0 [ swap 16 shift + ] reduce emit ] each ;
 
 : pack-string ( string -- seq )
-    dup length 1 + char align CHAR: \0 pad-right char swap group ;
+    dup length 1+ char align CHAR: \0 pad-right char swap group ;
 
 : emit-string ( string -- ptr )
     object-tag here-as swap
@@ -226,7 +254,10 @@ M: string ' ( string -- pointer )
     align-here r> ;
 
 M: tuple ' ( tuple -- pointer )
-    <mirror> tuple-type emit-array ;
+    tuple>array tuple-type emit-array ;
+
+M: array ' ( array -- pointer )
+    array-type emit-array ;
 
 M: vector ' ( vector -- pointer )
     dup array-type emit-array swap length
@@ -239,7 +270,7 @@ M: vector ' ( vector -- pointer )
 ( Hashes )
 
 M: hashtable ' ( hashtable -- pointer )
-    dup buckets>vector array-type emit-array
+    dup underlying array-type emit-array
     swap hash-size
     object-tag here-as >r
     hashtable-type >header emit
@@ -280,7 +311,7 @@ M: hashtable ' ( hashtable -- pointer )
         [ swap >be write ] each-with
     ] [
         [ swap >le write ] each-with
-    ] ifte ;
+    ] if ;
 
 : write-image ( image file -- )
     "Writing image to " write dup write "..." print
@@ -295,6 +326,7 @@ M: hashtable ' ( hashtable -- pointer )
         "Image length: " write image get length .
         "Object cache size: " write objects get hash-size .
         image get
+        \ word global remove-hash
     ] with-scope ;
 
 : make-image ( name -- )
@@ -302,7 +334,6 @@ M: hashtable ' ( hashtable -- pointer )
     [
         begin
         "/library/bootstrap/boot-stage1.factor" run-resource
-        namespace global [ "foobar" set ] bind
         end
     ] with-image
 

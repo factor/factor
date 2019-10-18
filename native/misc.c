@@ -47,31 +47,43 @@ void primitive_millis(void)
 	dpush(tag_bignum(s48_long_long_to_bignum(current_millis())));
 }
 
-void primitive_random_int(void)
+#ifdef WIN32
+// frees memory allocated by win32 api calls
+char *buffer_to_c_string(char *buffer)
 {
-	maybe_gc(0);
-	dpush(tag_bignum(s48_long_to_bignum(rand())));
+	int capacity = strlen(buffer);
+	F_STRING *_c_str = allot_string(capacity / CHARS + 1);
+	BYTE *c_str = (BYTE*)(_c_str + 1);
+	strcpy(c_str, buffer);
+	LocalFree(buffer);
+	return (char*)c_str;
 }
 
-#ifdef WIN32
-F_STRING *last_error()
+F_STRING *get_error_message()
+{
+	DWORD id = GetLastError();
+	return from_c_string(error_message(id));
+}
+
+char *error_message(DWORD id)
 {
 	char *buffer;
-	F_STRING *error;
-	DWORD dw = GetLastError();
+	int index;
 	
 	FormatMessage(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM,
 		NULL,
-		dw,
+		id,
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		(LPTSTR) &buffer,
 		0, NULL);
 
-	error = from_c_string(buffer);
-	LocalFree(buffer);
-
-	return error;
+	// strip whitespace from end
+	index = strlen(buffer) - 1;
+	while(index >= 0 && isspace(buffer[index]))
+		buffer[index--] = 0;
+	
+	return buffer_to_c_string(buffer);
 }
 #endif

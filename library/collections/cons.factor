@@ -32,20 +32,5 @@ PREDICATE: general-list list ( list -- ? )
 : unit ( a -- [ a ] ) f cons ; inline
 : 2list ( a b -- [ a b ] ) unit cons ; inline
 
-: 2car ( cons cons -- car car ) swap car swap car ; inline
-: 2cdr ( cons cons -- car car ) swap cdr swap cdr ; inline
-
-M: cons = ( obj cons -- ? )
-    2dup eq? [
-        2drop t
-    ] [
-        over cons? [
-            2dup 2car = >r 2cdr = r> and
-        ] [
-            2drop f
-        ] ifte
-    ] ifte ;
-
-M: f = ( obj f -- ? ) eq? ;
-
-M: cons hashcode ( cons -- hash ) car hashcode ;
+: 2car ( cons cons -- car car ) [ car ] 2apply ; inline
+: 2cdr ( cons cons -- car car ) [ cdr ] 2apply ; inline

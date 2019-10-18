@@ -49,10 +49,10 @@ strings vectors words ;
             nip cdr ( found )
         ] [
             cdr (get) ( keep looking )
-        ] ?ifte
+        ] ?if
     ] [
         2drop f
-    ] ifte ; flushable
+    ] if ; flushable
 
 : get ( variable -- value )
     #! Push the value of a variable by searching the namestack
@@ -64,7 +64,7 @@ strings vectors words ;
 : nest ( variable -- hash )
     #! If the variable is set in the current namespace, return
     #! its value, otherwise set its value to a new namespace.
-    dup namespace hash [ ] [ >r {{ }} clone dup r> set ] ?ifte ;
+    dup namespace hash [ ] [ >r H{ } clone dup r> set ] ?if ;
 
 : change ( var quot -- )
     #! Execute the quotation with the variable value on the
@@ -76,15 +76,15 @@ strings vectors words ;
 
 : off ( var -- ) f swap set ; inline
 
-: inc ( var -- ) [ 1 + ] change ; inline
+: inc ( var -- ) [ 1+ ] change ; inline
 
-: dec ( var -- ) [ 1 - ] change ; inline
+: dec ( var -- ) [ 1- ] change ; inline
 
 : bind ( namespace quot -- )
     #! Execute a quotation with a namespace on the namestack.
     swap >n call n> drop ; inline
 
-: make-hash ( quot -- hash ) {{ }} clone >n call n> ; inline
+: make-hash ( quot -- hash ) H{ } clone >n call n> ; inline
 
 : with-scope ( quot -- ) make-hash drop ; inline
 
@@ -101,6 +101,8 @@ SYMBOL: building
 : , ( obj -- )
     #! Add to the sequence being built with make-seq.
     building get push ;
+
+: ?, ( obj ? -- ) [ , ] [ drop ] if ;
 
 : % ( seq -- )
     #! Append to the sequence being built with make-seq.
@@ -119,15 +121,20 @@ SYMBOL: hash-buffer
 : (closure) ( key hash -- )
     tuck hash dup [
         hash-keys [
-            dup dup closure, [ 2drop ] [ swap (closure) ] ifte
+            dup dup closure, [ 2drop ] [ swap (closure) ] if
         ] each-with
     ] [
         2drop
-    ] ifte ;
+    ] if ;
 
 : closure ( key hash -- list )
     [
-        {{ }} clone hash-buffer set
+        H{ } clone hash-buffer set
         (closure)
         hash-buffer get hash-keys
     ] with-scope ;
+
+IN: lists
+
+: alist>quot ( default alist -- quot )
+    [ unswons [ % , , \ if , ] [ ] make ] each ;

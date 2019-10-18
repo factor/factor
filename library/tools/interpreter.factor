@@ -23,46 +23,41 @@ SYMBOL: meta-cf
 ! Currently executing word.
 SYMBOL: meta-executing
 
-: init-interpreter ( -- )
-    { } clone meta-r set
-    { } clone meta-d set
-    namestack meta-n set
-    catchstack meta-c set
-    f meta-cf set
-    f meta-executing set ;
-
-: copy-interpreter ( -- )
-    #! Copy interpreter state from containing namespaces.
-    meta-r [ clone ] change
-    meta-d [ clone ] change
-    meta-n [ ] change
-    meta-c [ ] change ;
-
 ! Callframe.
 : up ( -- ) pop-r meta-cf set  pop-r drop ;
 
 : next ( -- obj )
-    meta-cf get [ meta-cf [ uncons ] change ] [ up next ] ifte ;
+    meta-cf get [ meta-cf [ uncons ] change ] [ up next ] if ;
 
 : meta-interp ( -- interp )
-    meta-d get meta-r get meta-n get meta-c get <interp> ;
+    meta-d get f meta-r get meta-n get meta-c get
+    <continuation> ;
 
 : set-meta-interp ( interp -- )
-    >interp< meta-c set meta-n set meta-r set meta-d set ;
+    >continuation<
+    meta-c set meta-n set meta-r set drop meta-d set ;
 
 : host-word ( word -- )
     [
-        \ call push-r  interp [
-            interp over interp-data push
-            [ ] set-interp
-        ] cons cons push-r  meta-interp [ ] set-interp
-    ] call  set-meta-interp  pop-d 2drop ;
+        \ call push-r
+        [ continuation swap continue-with ] cons cons push-r
+        meta-interp continue
+    ] callcc1 set-meta-interp pop-d 2drop ;
 
 : meta-call ( quot -- )
     #! Note we do tail call optimization here.
     meta-cf [
         [ meta-executing get push-r  push-r ] when*
     ] change ;
+
+GENERIC: do-1 ( object -- )
+
+M: word do-1 ( word -- )
+    dup "meta-word" word-prop [ call ] [ host-word ] ?if ;
+
+M: wrapper do-1 ( wrapper -- ) wrapped push-d ;
+
+M: object do-1 ( object -- ) push-d ;
 
 GENERIC: do ( obj -- )
 
@@ -74,33 +69,12 @@ M: word do ( word -- )
             dup word-def meta-call  meta-executing set
         ] [
             host-word
-        ] ifte
-    ] ?ifte ;
+        ] if
+    ] ?if ;
 
-M: wrapper do ( wrapper -- ) wrapped push-d ;
+M: object do ( object -- ) do-1 ;
 
-M: object do ( object -- ) push-d ;
-
-GENERIC: do-1 ( object -- )
-
-M: word do-1 ( word -- )
-    dup "meta-word" word-prop [ call ] [ host-word ] ?ifte ;
-
-M: wrapper do-1 ( wrapper -- ) wrapped push-d ;
-
-M: object do-1 ( object -- ) push-d ;
-
-: set-meta-word ( word quot -- ) "meta-word" set-word-prop ;
-
-\ datastack [ meta-d get clone push-d ] set-meta-word
-\ set-datastack [ pop-d clone meta-d set ] set-meta-word
-\ >r [ pop-d push-r ] set-meta-word
-\ r> [ pop-r push-d ] set-meta-word
-\ callstack [ meta-r get clone push-d ] set-meta-word
-\ set-callstack [ pop-d clone meta-r set ] set-meta-word
-\ call [ pop-d meta-call ] set-meta-word
-\ execute [ pop-d do ] set-meta-word
-\ ifte [ pop-d pop-d pop-d [ nip ] [ drop ] ifte meta-call ] set-meta-word
-\ dispatch [ pop-d pop-d swap nth meta-call ] set-meta-word
-
-\ set-meta-word forget
+\ call [ pop-d meta-call ] "meta-word" set-word-prop
+\ execute [ pop-d do ] "meta-word" set-word-prop
+\ if [ pop-d pop-d pop-d [ nip ] [ drop ] if meta-call ] "meta-word" set-word-prop
+\ dispatch [ pop-d pop-d swap nth meta-call ] "meta-word" set-word-prop

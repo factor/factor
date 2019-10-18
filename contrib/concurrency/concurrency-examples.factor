@@ -23,7 +23,8 @@
 !
 ! Examples of using the concurrency library.
 IN: concurrency-examples
-USING: concurrency kernel io lists threads math sequences namespaces unparser prettyprint errors dlists ;
+USING: concurrency dlists errors gadgets-theme io kernel lists
+math namespaces opengl prettyprint sequences threads unparser ;
 
 : (logger) ( mailbox -- )
   #! Using the given mailbox, start a thread which
@@ -40,7 +41,7 @@ USING: concurrency kernel io lists threads math sequences namespaces unparser pr
     "pong" swap send (pong-server0)
   ] [
     "Pong server shutting down" swap send
-  ] ifte ;
+  ] if ;
   
 : pong-server0 ( -- process)
   [ (pong-server0) ] spawn ;
@@ -128,12 +129,12 @@ M: crash-command run-rpc-command ( command -- shutdown? result )
 : (robust-rpc-server) ( worker -- )
   [
     receive over send
-  ] [
-    [  
-      "Worker died, Starting a new worker" print
-      drop [ handle-rpc-message ] spawn-linked-server
-    ] when
-  ] catch 
+  ] 
+  catch 
+  [  
+    "Worker died, Starting a new worker" print
+    drop [ handle-rpc-message ] spawn-linked-server
+  ] when
   (robust-rpc-server) ;
   
 : robust-rpc-server ( -- process )
@@ -158,12 +159,14 @@ M: crash-command run-rpc-command ( command -- shutdown? result )
 USE: gadgets
 USE: gadgets-labels
 USE: gadgets-presentations
+USE: gadgets-layouts
 USE: generic
 
-TUPLE: promised-label promise ;
+TUPLE: promised-label promise font color ;
 
 C: promised-label ( promise -- promised-label )
-  <gadget> over set-delegate [ set-promised-label-promise ] keep 
+  dup delegate>gadget dup label-theme
+  [ set-promised-label-promise ] keep 
   [ [ dup promised-label-promise ?promise drop relayout ] cons spawn drop ] keep ;
 
 : promised-label-text ( promised-label -- text )
@@ -171,17 +174,26 @@ C: promised-label ( promise -- promised-label )
     ?promise
   ] [
     drop "Unfulfilled Promise" 
-  ] ifte ;
+  ] if ;
 
 M: promised-label pref-dim ( promised-label - dim )
-  dup promised-label-text label-size ;
+  label-size ;
 
 M: promised-label draw-gadget* ( promised-label -- )
-    dup delegate draw-gadget*
-    dup promised-label-text draw-string ;
+    draw-label ;
+
+M: promised-label label-text promised-label-text ;
+
+M: promised-label label-color promised-label-color ;
+
+M: promised-label label-font promised-label-font ;
+
+M: promised-label set-label-color set-promised-label-color ;
+
+M: promised-label set-label-font set-promised-label-font ;
 
 : fib ( n -- n )
-  yield dup 2 < [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] ifte ;
+  yield dup 2 < [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] if ;
   
 : test-promise-ui ( -- )
-  <promise> dup <promised-label> gadget. [ 12 fib unparse swap fulfill ] cons spawn drop ;
+  <promise> dup <promised-label> gadget. [ 30 fib unparse swap fulfill ] cons spawn drop ;

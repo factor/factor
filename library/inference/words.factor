@@ -5,47 +5,52 @@ USING: errors generic interpreter kernel lists math
 math-internals namespaces sequences strings vectors words
 hashtables parser prettyprint ;
 
-: consume-d ( typelist -- )
-    [ pop-d 2drop ] each ;
+: consume-values ( n node -- )
+    over ensure-values
+    over 0 rot node-inputs [ pop-d 2drop ] each ;
 
-: produce-d ( typelist -- )
-    [ drop <computed> push-d ] each ;
+: produce-values ( n node -- )
+    over [ drop <value> push-d ] each 0 swap node-outputs ;
 
 : consume/produce ( word effect -- )
     #! Add a node to the dataflow graph that consumes and
     #! produces a number of values.
-    swap #call [
-        over [
-            first2 swap consume-d produce-d
-        ] hairy-node
-    ] keep node, ;
+    swap #call
+    over first length over consume-values
+    swap second length over produce-values
+    node, ;
 
 : no-effect ( word -- )
     "Stack effect inference of the word " swap word-name
     " was already attempted, and failed" append3
     inference-error ;
 
-: with-block ( word [[ label quot ]] quot -- block-node )
-    #! Execute a quotation with the word on the stack, and add
-    #! its dataflow contribution to a new #label node in the IR.
-    >r 2dup cons recursive-state [ cons ] change r>
-    [ swap car #label slip ] with-nesting
+: with-recursive-state ( word label quot -- )
+    >r over word-def cons cons
+    recursive-state [ cons ] change r>
+    call
     recursive-state [ cdr ] change ; inline
 
 : inline-block ( word -- node-block )
-    gensym over word-def cons [
-        #entry node,  word-def infer-quot  #return node,
-    ] with-block ;
+    gensym 2dup [
+        [
+            dup #label >r
+            #entry node,
+            swap word-def infer-quot
+            #return node, r>
+        ] with-nesting
+    ] with-recursive-state ;
 
-: infer-compound ( word base-case -- effect )
+: infer-compound ( word base-case -- terminates? effect )
     #! Infer a word's stack effect in a separate inferencer
-    #! instance.
+    #! instance. Outputs a boolean if the word terminates
+    #! control flow by throwing an exception or restoring a
+    #! continuation.
     [
         inferring-base-case set
         recursive-state get init-inference
-        dup inline-block drop
-        effect
-    ] with-scope [ consume/produce ] keep ;
+        [ inline-block drop terminated? get effect ] keep
+    ] with-scope over consume/produce over [ terminate ] when ;
 
 GENERIC: apply-word
 
@@ -56,10 +61,12 @@ M: object apply-word ( word -- )
 M: compound apply-word ( word -- )
     #! Infer a compound word's stack effect.
     [
-        dup f infer-compound "infer-effect" set-word-prop
+        dup dup f infer-compound
+        >r "terminates" set-word-prop r>
+        "infer-effect" set-word-prop
     ] [
-        [ swap t "no-effect" set-word-prop rethrow ] when*
-    ] catch ;
+        swap t "no-effect" set-word-prop rethrow
+    ] recover ;
 
 : apply-default ( word -- )
     dup "no-effect" word-prop [
@@ -67,14 +74,15 @@ M: compound apply-word ( word -- )
     ] [
         dup "infer-effect" word-prop [
             over "infer" word-prop [
-                swap car ensure-d call drop
+                swap first length ensure-values call drop
             ] [
-                consume/produce
-            ] ifte*
+                dupd consume/produce
+                "terminates" word-prop [ terminate ] when
+            ] if*
         ] [
             apply-word
-        ] ifte*
-    ] ifte ;
+        ] if*
+    ] if ;
 
 M: word apply-object ( word -- )
     apply-default ;
@@ -86,20 +94,26 @@ M: symbol apply-object ( word -- )
     over "inline" word-prop [
         meta-d get clone >r
         over inline-block drop
-        [ #call-label ] [ #call ] ?ifte
+        [ #call-label ] [ #call ] ?if
         r> over set-node-in-d node,
     ] [
-        drop dup t infer-compound "base-case" set-word-prop
-    ] ifte ;
+        drop dup t infer-compound nip "base-case" set-word-prop
+    ] if ;
 
 : base-case ( word label -- )
-    [
-        inferring-base-case on
-        (base-case)
-    ] [
-        inferring-base-case off
-        rethrow
-    ] catch ;
+    [ inferring-base-case on (base-case) ]
+    [ inferring-base-case off ] cleanup ;
+
+: no-base-case ( word -- )
+    {
+        "The base case of a recursive word could not be inferred.\n"
+        "This means the word calls itself in every control flow path.\n"
+        "See the handbook for details."
+    } concat inference-error ;
+
+: notify-base-case ( -- )
+    base-case-continuation get
+    [ t swap continue-with ] [ no-base-case ] if* ;
 
 : recursive-word ( word [[ label quot ]] -- )
     #! Handle a recursive call, by either applying a previously
@@ -112,13 +126,12 @@ M: symbol apply-object ( word -- )
             nip consume/produce
         ] [
             inferring-base-case get [
-                t base-case-continuation get call
+                notify-base-case
             ] [
                 car base-case
-            ] ifte
-        ] ifte*
-    ] ifte* ;
-
+            ] if
+        ] if*
+    ] if* ;
 
 : splice-node ( node -- )
     dup node-successor [
@@ -133,7 +146,7 @@ M: symbol apply-object ( word -- )
         node,
     ] [
         node-child node-successor splice-node
-    ] ifte ;
+    ] if ;
 
 M: compound apply-object ( word -- )
     #! Apply the word's stack effect to the inferencer state.
@@ -141,5 +154,5 @@ M: compound apply-object ( word -- )
         recursive-word
     ] [
         dup "inline" word-prop
-        [ inline-block block, ] [ apply-default ] ifte
-    ] ifte* ;
+        [ inline-block block, ] [ apply-default ] if
+    ] if* ;

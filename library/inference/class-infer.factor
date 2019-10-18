@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: inference
-USING: generic hashtables kernel kernel-internals namespaces
-sequences vectors words ;
+IN: optimizer
+USING: arrays generic hashtables inference kernel
+kernel-internals math namespaces sequences words ;
 
 ! Infer possible classes of values in a dataflow IR.
 
@@ -61,18 +61,11 @@ M: node child-ties ( node -- seq )
 : annotate-node ( node -- )
     #! Annotate the node with the currently-inferred set of
     #! value classes.
-    dup node-values ( 2dup )
-    [ value-class ] map>hash swap set-node-classes
-    ( [ value-literal ] map>hash swap set-node-literals ) ;
-
-: assume-classes ( classes values -- )
-    [ set-value-class ] 2each ;
-
-: assume-literals ( literals values -- )
-    [ set-value-literal ] 2each ;
+    dup node-values
+    [ value-class ] map>hash swap set-node-classes ;
 
 : intersect-classes ( classes values -- )
-    [ [ value-class class-and ] 2map ] keep assume-classes ;
+    [ [ value-class class-and ] keep set-value-class ] 2each ;
 
 : type/tag-ties ( node n -- )
     over node-out-d first over [ <literal-tie> ] map-with
@@ -82,6 +75,14 @@ M: node child-ties ( node -- seq )
 \ type [ num-types type/tag-ties ] "create-ties" set-word-prop
 
 \ tag [ num-tags type/tag-ties ] "create-ties" set-word-prop
+
+\ eq? [
+    dup node-in-d second literal? [
+        dup node-in-d first2 literal-value <literal-tie>
+        over node-out-d first general-t <class-tie>
+        ties get set-hash
+    ] when drop
+] "create-ties" set-word-prop
 
 : create-ties ( #call -- )
     #! If the node is calling a class test predicate, create a
@@ -95,11 +96,11 @@ M: node child-ties ( node -- seq )
             ties get set-hash
         ] [
             2drop
-        ] ifte
-    ] ifte ;
+        ] if
+    ] if ;
 
 \ make-tuple [
-    dup node-in-d first literal-value 1vector
+    dup node-in-d first literal-value 1array
 ] "output-classes" set-word-prop
 
 : output-classes ( node -- seq )
@@ -107,22 +108,23 @@ M: node child-ties ( node -- seq )
         call
     ] [
         node-param "infer-effect" word-prop second
-    ] ?ifte ;
+        dup integer? [ drop f ] when
+    ] ?if ;
 
 M: #call infer-classes* ( node -- )
     dup node-param [
         dup create-ties
-        dup output-classes swap node-out-d intersect-classes
-    ] [
-        drop
-    ] ifte ;
+        dup output-classes
+        [ over node-out-d intersect-classes ] when*
+    ] when drop ;
 
-M: #push infer-classes* ( node -- )
-    node-out-d dup [ literal-value ] map swap assume-literals ;
+M: #shuffle infer-classes* ( node -- )
+    node-out-d [ literal? ] subset
+    [ [ literal-value ] keep set-value-literal ] each ;
 
-M: #ifte child-ties ( node -- seq )
+M: #if child-ties ( node -- seq )
     node-in-d first dup general-t <class-tie>
-    swap f <literal-tie> 2vector ;
+    swap f <literal-tie> 2array ;
 
 M: #dispatch child-ties ( node -- seq )
     dup node-in-d first
@@ -150,8 +152,8 @@ DEFER: (infer-classes)
 
 : infer-classes ( node -- )
     [
-        {{ }} clone value-classes set
-        {{ }} clone value-literals set
-        {{ }} clone ties set
+        H{ } clone value-classes set
+        H{ } clone value-literals set
+        H{ } clone ties set
         (infer-classes)
     ] with-scope ;
