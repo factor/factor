@@ -33,6 +33,11 @@ import java.lang.reflect.InvocationTargetException;
 
 public class FactorException extends Exception
 {
+	public FactorException()
+	{
+		super();
+	}
+
 	public FactorException(String str)
 	{
 		super(str);

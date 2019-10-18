@@ -34,17 +34,22 @@ import java.io.IOException;
 
 public class Dispatch extends FactorParsingDefinition
 {
+	//{{{ Dispatch constructor
+	/**
+	 * A new definition.
+	 */
 	public Dispatch(FactorWord word)
+		throws Exception
 	{
 		super(word);
-	}
+	} //}}}
 
 	public void eval(FactorInterpreter interp, FactorReader reader)
-		throws IOException, FactorParseException
+		throws Exception
 	{
 		char next = reader.getScanner().readNonEOF();
 		String dispatch = word.name + next;
-		FactorWord dispatchWord = interp.intern(dispatch);
+		FactorWord dispatchWord = reader.intern(dispatch,false);
 		if(dispatchWord.parsing != null)
 			dispatchWord.parsing.eval(interp,reader);
 		else

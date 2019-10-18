@@ -31,8 +31,35 @@ package factor;
 
 public class FactorParseException extends FactorException
 {
-	public FactorParseException(String filename, int lineno, String str)
+	public FactorParseException(
+		String filename,
+		int lineno,
+		String str)
 	{
 		super(filename + ":" + lineno + ": " + str);
+	}
+
+	public FactorParseException(
+		String filename,
+		int lineno,
+		String line,
+		int position,
+		String str)
+	{
+		super(filename + ":" + lineno + ": " + str
+			+ "\n" + getDetailMessage(line,position));
+	}
+
+	private static String getDetailMessage(String line, int position)
+	{
+		if(line == null)
+			return "#<at end of file>";
+
+		StringBuffer buf = new StringBuffer(line);
+		buf.append('\n');
+		for(int i = 0; i < position; i++)
+			buf.append(' ');
+		buf.append('^');
+		return buf.toString();
 	}
 }

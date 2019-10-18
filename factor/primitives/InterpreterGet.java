@@ -37,7 +37,11 @@ import org.objectweb.asm.*;
 public class InterpreterGet extends FactorPrimitiveDefinition
 {
 	//{{{ InterpreterGet constructor
+	/**
+	 * A new definition.
+	 */
 	public InterpreterGet(FactorWord word)
+		throws Exception
 	{
 		super(word);
 	} //}}}
@@ -51,24 +55,20 @@ public class InterpreterGet extends FactorPrimitiveDefinition
 
 	//{{{ getStackEffect() method
 	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler state) throws FactorStackException
+		FactorCompiler compiler) throws Exception
 	{
-		state.push(null);
+		compileImmediate(null,compiler,recursiveCheck);
 	} //}}}
 
-	//{{{ compileCallTo() method
-	/**
-	 * Compile a call to this word. Returns maximum JVM stack use.
-	 * XXX: does not use factor type system conversions.
-	 */
-	public int compileCallTo(
+	//{{{ compileImmediate() method
+	public void compileImmediate(
 		CodeVisitor mw,
 		FactorCompiler compiler,
 		RecursiveState recursiveCheck)
 		throws Exception
 	{
-		mw.visitVarInsn(ALOAD,0);
-		compiler.push(mw);
-		return 1;
+		if(mw != null)
+			mw.visitVarInsn(ALOAD,0);
+		compiler.push(compiler.datastack,mw,FactorInterpreter.class);
 	} //}}}
 }

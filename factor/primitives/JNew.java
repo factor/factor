@@ -38,7 +38,11 @@ import org.objectweb.asm.*;
 public class JNew extends FactorPrimitiveDefinition
 {
 	//{{{ JNew constructor
+	/**
+	 * A new definition.
+	 */
 	public JNew(FactorWord word)
+		throws Exception
 	{
 		super(word);
 	} //}}}
@@ -47,78 +51,66 @@ public class JNew extends FactorPrimitiveDefinition
 	public void eval(FactorInterpreter interp)
 		throws Exception
 	{
-		FactorDataStack datastack = interp.datastack;
-		String name = (String)datastack.pop(String.class);
-		Cons args = (Cons)datastack.pop(Cons.class);
-		Constructor constructor = FactorJava.jconstructor(
-			name,args);
-		FactorJava.jnew(datastack,constructor);
+		FactorArray datastack = interp.datastack;
+		Class clazz = FactorJava.toClass(datastack.pop());
+		Cons args = (Cons)datastack.pop();
+		Class[] _args = FactorJava.classNameToClassList(args);
+		Constructor constructor = clazz.getConstructor(_args);
+
+		Object[] params = new Object[_args.length];
+		for(int i = params.length - 1; i >= 0; i--)
+		{
+			params[i] = FactorJava.convertToJavaType(
+				datastack.pop(),_args[i]);
+		}
+
+		datastack.push(constructor.newInstance(params));
 	} //}}}
 
 	//{{{ getStackEffect() method
-	/**
-	 * XXX: does not use factor type system conversions.
-	 */
 	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler state) throws Exception
+		FactorCompiler compiler) throws Exception
 	{
-		state.ensure(state.datastack,2);
-
-		Object clazz = state.popLiteral();
-		Object args = state.popLiteral();
-		if(clazz instanceof String &&
-			(args == null || args instanceof Cons))
-		{
-			Constructor constructor
-				= FactorJava.jconstructor(
-				(String)clazz,
-				(Cons)args);
-
-			int params = constructor.getParameterTypes().length;
-			state.consume(state.datastack,params);
-			state.push(null);
-		}
-		else
-			throw new FactorCompilerException("Cannot deduce stack effect of " + word + " with non-literal arguments");;
+		compileImmediate(null,compiler,recursiveCheck);
 	} //}}}
 
 	//{{{ compileImmediate() method
-	/**
-	 * Compile a call to this word. Returns maximum JVM stack use.
-	 * XXX: does not use factor type system conversions.
-	 */
-	public int compileImmediate(
+	public void compileImmediate(
 		CodeVisitor mw,
 		FactorCompiler compiler,
 		RecursiveState recursiveCheck)
 		throws Exception
 	{
-		Object _clazz = compiler.popLiteral();
-		Object _args = compiler.popLiteral();
-		if(_clazz instanceof String &&
-			(_args == null || _args instanceof Cons))
+		if(mw == null)
+			compiler.ensure(compiler.datastack,Class.class);
+		Class clazz = FactorJava.toClass(compiler.popLiteral());
+		if(mw == null)
+			compiler.ensure(compiler.datastack,Cons.class);
+		Cons args = (Cons)compiler.popLiteral();
+
+		Class[] _args = FactorJava.classNameToClassList(args);
+		Constructor constructor = clazz.getConstructor(_args);
+
+		if(mw != null)
 		{
-			String clazz = ((String)_clazz)
-				.replace('.','/');
-			Class[] args = FactorJava.classNameToClassList(
-				(Cons)_args);
-
-			mw.visitTypeInsn(NEW,clazz);
+			FlowObject.generateToConversionPre(mw,clazz);
+			mw.visitTypeInsn(NEW,clazz.getName().replace('.','/'));
 			mw.visitInsn(DUP);
+		}
 
-			compiler.generateArgs(mw,args.length,0,args);
+		if(mw == null)
+			compiler.ensure(compiler.datastack,_args);
+		compiler.generateArgs(mw,_args.length,0,_args);
 
+		if(mw != null)
+		{
 			mw.visitMethodInsn(INVOKESPECIAL,
-				clazz,
+				clazz.getName().replace('.','/'),
 				"<init>",
 				FactorJava.javaSignatureToVMSignature(
-				args,void.class));
-
-			compiler.push(mw);
-
-			return 3 + args.length;
+				_args,Void.TYPE));
 		}
-		else
-			throw new FactorCompilerException("Cannot compile jnew with non-literal parameters");
+
+		compiler.push(compiler.datastack,mw,clazz);
 	} //}}}
 }

@@ -34,16 +34,20 @@ import java.io.IOException;
 
 public class StackComment extends FactorParsingDefinition
 {
+	//{{{ StackComment constructor
+	/**
+	 * A new definition.
+	 */
 	public StackComment(FactorWord word)
+		throws Exception
 	{
 		super(word);
-	}
+	} //}}}
 
 	public void eval(FactorInterpreter interp, FactorReader reader)
 		throws IOException, FactorParseException
 	{
-		String comment = reader.getScanner().readUntil(
-			'(',')',false,false);
+		String comment = reader.getScanner().readUntil( '(',')',false);
 		reader.append(new FactorDocComment(comment,true));
 	}
 }

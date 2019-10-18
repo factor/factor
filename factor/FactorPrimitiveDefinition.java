@@ -38,8 +38,16 @@ import java.util.Set;
 public abstract class FactorPrimitiveDefinition extends FactorWordDefinition
 {
 	//{{{ FactorPrimitiveDefinition constructor
+	/**
+	 * A new definition.
+	 */
 	public FactorPrimitiveDefinition(FactorWord word)
 	{
 		super(word);
+	} //}}}
+
+	//{{{ fromList() method
+	public void fromList(Cons cons, FactorInterpreter interp)
+	{
 	} //}}}
 }

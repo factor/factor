@@ -34,15 +34,20 @@ import java.io.IOException;
 
 public class Unreadable extends FactorParsingDefinition
 {
+	//{{{ Unreadable constructor
+	/**
+	 * A new definition.
+	 */
 	public Unreadable(FactorWord word)
+		throws Exception
 	{
 		super(word);
-	}
+	} //}}}
 
 	public void eval(FactorInterpreter interp, FactorReader reader)
 		throws IOException, FactorParseException
 	{
-		reader.getScanner().error("Objects prefixed with " + word
+		reader.getScanner().error("Objects prefixed with " + word.name
 			+ " are unreadable");
 	}
 }

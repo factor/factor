@@ -33,13 +33,18 @@ import factor.*;
 
 public class Bra extends FactorParsingDefinition
 {
+	//{{{ Bra constructor
+	/**
+	 * A new definition.
+	 */
 	public Bra(FactorWord word)
+		throws Exception
 	{
 		super(word);
-	}
+	} //}}}
 
 	public void eval(FactorInterpreter interp, FactorReader reader)
 	{
-		reader.pushState(word);
+		reader.pushState(word,null);
 	}
 }

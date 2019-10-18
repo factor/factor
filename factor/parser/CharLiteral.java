@@ -34,16 +34,22 @@ import java.io.IOException;
 
 public class CharLiteral extends FactorParsingDefinition
 {
+	//{{{ CharLiteral constructor
+	/**
+	 * A new definition.
+	 */
 	public CharLiteral(FactorWord word)
+		throws Exception
 	{
 		super(word);
-	}
+	} //}}}
 
 	public void eval(FactorInterpreter interp, FactorReader reader)
 		throws IOException, FactorParseException
 	{
-		reader.append(new Character(
-			reader.getScanner()
-			.readNonEOFEscaped()));
+		String word = (String)reader.nextNonEOF(false,false);
+		if(word.length() != 1)
+			reader.error("Bad character literal: " + word);
+		reader.append(new Character(word.charAt(0)));
 	}
 }

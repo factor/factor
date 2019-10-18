@@ -29,6 +29,7 @@
 
 package factor;
 
+import factor.math.*;
 import java.io.*;
 
 /**
@@ -72,19 +73,30 @@ public class FactorLib
 	} //}}}
 
 	//{{{ error() method
-	public static void error(String str) throws FactorRuntimeException
+	public static void error(Object obj) throws Throwable
 	{
-		throw new FactorRuntimeException(str);
+		if(obj instanceof Throwable)
+			throw (Throwable)obj;
+		else
+			throw new FactorRuntimeException(String.valueOf(obj));
 	} //}}}
 
+	//{{{ eq() method
+	public static boolean eq(Object o1, Object o2)
+	{
+		return o1 == o2;
+	} //}}}
+	
 	//{{{ equal() method
 	public static boolean equal(Object o1, Object o2)
 	{
 		if(o1 == null)
 			return o2 == null;
-		else if(o1 instanceof Number
-			&& o2 instanceof Number
-			&& o1.getClass() != o2.getClass())
+		else if((o1 instanceof Number && !(o1 instanceof FactorNumber))
+			&&
+			(o2 instanceof Number && !(o2 instanceof FactorNumber))
+			&&
+			o1.getClass() != o2.getClass())
 		{
 			// to compare different types of numbers, cast to a
 			// double first
@@ -116,6 +128,23 @@ public class FactorLib
 			{
 				return false;
 			}
+		}
+		else if(o1 instanceof String
+			&& o2 instanceof Character)
+		{
+			return o1.equals(o2.toString());
+		}
+		else if(o1 instanceof Character
+			&& o2 instanceof String)
+		{
+			return o1.toString().equals(o2);
+		}
+		else if(o1 instanceof Cons
+			&& o2 instanceof Cons)
+		{
+			Cons c1 = (Cons)o1;
+			Cons c2 = (Cons)o2;
+			return equal(c1.car,c2.car) && equal(c1.cdr,c2.cdr);
 		}
 		else
 			return o1.equals(o2);
@@ -199,21 +228,45 @@ public class FactorLib
 		int b;
 		while((b = in.read()) != -1)
 		{
-			if(b == '\n')
+			if(b == '\r')
 			{
-				if(in.markSupported() && in.available() >= 1)
+				if(in.markSupported()/*  && in.available() >= 1 */)
 				{
 					in.mark(1);
 					b = in.read();
-					if(b != '\r')
+					if(b != '\n')
 						in.reset();
 				}
 				break;
 			}
-			else if(b == '\r')
+			else if(b == '\n')
 				break;
 			buf.append((char)b);
 		}
 		return buf.toString();
+	} //}}}
+
+	//{{{ readCount() method
+	public static String readCount(int count, InputStream in)
+		throws IOException
+	{
+		byte[] bytes = new byte[count];
+		int offset = 0;
+		int read = 0;
+		while((read = in.read(bytes,offset,count - offset)) > 0)
+			offset += read;
+		return new String(bytes,"ASCII");
+	} //}}}
+
+	//{{{ readCount() method
+	public static String readCount(int count, Reader in)
+		throws IOException
+	{
+		char[] chars = new char[count];
+		int offset = 0;
+		int read = 0;
+		while((read = in.read(chars,offset,count - offset)) > 0)
+			offset += read;
+		return new String(chars);
 	} //}}}
 }

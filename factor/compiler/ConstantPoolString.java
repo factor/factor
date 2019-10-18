@@ -38,20 +38,30 @@ public class ConstantPoolString extends FlowObject
 {
 	private String str;
 
+	//{{{ ConstantPoolString constructor
 	ConstantPoolString(String str, FactorCompiler compiler,
-		RecursiveState recursiveCheck)
+		RecursiveForm word)
 	{
-		super(compiler,recursiveCheck);
+		super(compiler,word);
 		this.str = str;
-	}
+		expectedType = String.class;
+	} //}}}
 
-	public void generate(CodeVisitor mw)
+	//{{{ pop() method
+	public void pop(CodeVisitor mw)
 	{
 		mw.visitLdcInsn(str);
-	}
+	} //}}}
 
+	//{{{ getLiteral() method
 	Object getLiteral()
 	{
 		return str;
-	}
+	} //}}}
+
+	//{{{ clone() method
+	public Object clone()
+	{
+		return new Null(compiler,word);
+	} //}}}
 }

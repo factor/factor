@@ -38,7 +38,11 @@ import org.objectweb.asm.*;
 public class JVarGet extends FactorPrimitiveDefinition
 {
 	//{{{ JVarGet constructor
+	/**
+	 * A new definition.
+	 */
 	public JVarGet(FactorWord word)
+		throws Exception
 	{
 		super(word);
 	} //}}}
@@ -47,63 +51,53 @@ public class JVarGet extends FactorPrimitiveDefinition
 	public void eval(FactorInterpreter interp)
 		throws Exception
 	{
-		FactorDataStack datastack = interp.datastack;
-		Field field = FactorJava.jfield(
-			(String)datastack.pop(String.class),
-			(String)datastack.pop(String.class));
+		FactorArray datastack = interp.datastack;
+		String fieldName = FactorJava.toString(datastack.pop());
+		Class clazz = FactorJava.toClass(datastack.pop());
+		Field field = clazz.getField(fieldName);
+		Object obj = FactorJava.convertToJavaType(datastack.pop(),
+			clazz);
 		datastack.push(
-			FactorJava.jvarGet(
-			field,datastack.pop()));
+			FactorJava.convertFromJavaType(
+			field.get(obj)));
 	} //}}}
 
 	//{{{ getStackEffect() method
 	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler state) throws FactorStackException
+		FactorCompiler compiler) throws Exception
 	{
-		state.ensure(state.datastack,3);
-		state.pop(null);
-		state.pop(null);
-		state.pop(null);
-		state.push(null);
+		compileImmediate(null,compiler,recursiveCheck);
 	} //}}}
 
-	//{{{ compileCallTo() method
-	/**
-	 * Compile a call to this word. Returns maximum JVM stack use.
-	 * XXX: does not use factor type system conversions.
-	 */
-	public int compileCallTo(
+	//{{{ compileImmediate() method
+	public void compileImmediate(
 		CodeVisitor mw,
 		FactorCompiler compiler,
 		RecursiveState recursiveCheck)
 		throws Exception
 	{
-		Object _field = compiler.popLiteral();
-		Object _clazz = compiler.popLiteral();
-		if(_clazz instanceof String &&
-			_field instanceof String)
+		if(mw == null)
+			compiler.ensure(compiler.datastack,String.class);
+		String fieldName = FactorJava.toString(compiler.popLiteral());
+		if(mw == null)
+			compiler.ensure(compiler.datastack,Class.class);
+		Class clazz = FactorJava.toClass(compiler.popLiteral());
+		Field field = clazz.getField(fieldName);
+
+		if(mw != null)
+			FlowObject.generateToConversionPre(mw,field.getType());
+		if(mw == null)
+			compiler.ensure(compiler.datastack,clazz);
+		compiler.pop(compiler.datastack,mw,clazz);
+
+		if(mw != null)
 		{
-			String field = (String)_field;
-			String clazz = (String)_clazz;
-			Class cls = FactorJava.getClass(clazz);
-			clazz = clazz.replace('.','/');
-			Field fld = cls.getField(field);
-
-			FactorJava.generateToConversionPre(mw,fld.getType());
-
-			compiler.pop(mw);
-			FactorJava.generateFromConversion(mw,cls);
-
-			mw.visitFieldInsn(GETFIELD,clazz,field,
-				FactorJava.javaClassToVMClass(fld.getType()));
-
-			FactorJava.generateToConversion(mw,fld.getType());
-
-			compiler.push(mw);
-
-			return 2;
+			mw.visitFieldInsn(GETFIELD,
+				clazz.getName().replace('.','/'),
+				fieldName,
+				FactorJava.javaClassToVMClass(field.getType()));
 		}
-		else
-			throw new FactorCompilerException("Cannot compile jvar$ with non-literal parameters");
+
+		compiler.push(compiler.datastack,mw,field.getType());
 	} //}}}
 }

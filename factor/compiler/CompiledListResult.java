@@ -38,26 +38,44 @@ public class CompiledListResult extends CompiledList implements Constants
 {
 	private int local;
 
+	//{{{ CompiledListResult constructor
 	CompiledListResult(int local, Cons quotation,
 		FactorCompiler compiler,
 		RecursiveState recursiveCheck)
 	{
 		super(quotation,compiler,recursiveCheck);
 		this.local = local;
-	}
+	} //}}}
 
-	public void generate(CodeVisitor mw)
+	//{{{ push() method
+	public void push(CodeVisitor mw)
+		throws Exception
+	{
+		mw.visitVarInsn(ASTORE,local);
+	} //}}}
+
+	//{{{ pop() method
+	public void pop(CodeVisitor mw)
 	{
 		mw.visitVarInsn(ALOAD,local);
-	}
+	} //}}}
 
+	//{{{ getLocal() method
 	public int getLocal()
 	{
 		return local;
-	}
+	} //}}}
 
+	//{{{ usingLocal() method
 	boolean usingLocal(int local)
 	{
 		return (this.local == local);
-	}
+	} //}}}
+
+	//{{{ clone() method
+	public Object clone()
+	{
+		return new CompiledListResult(local,quotation,compiler,
+			recursiveCheck);
+	} //}}}
 }

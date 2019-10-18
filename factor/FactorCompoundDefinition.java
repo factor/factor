@@ -42,30 +42,25 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 {
 	private static int compileCount;
 
-	public final Cons definition;
+	public Cons definition;
 	private Cons endOfDocs;
 
-	//{{{ FactorCompiledDefinition constructor
-	public FactorCompoundDefinition(FactorWord word, Cons definition)
+	//{{{ FactorCompoundDefinition constructor
+	/**
+	 * A new definition.
+	 */
+	public FactorCompoundDefinition(FactorWord word, Cons definition,
+		FactorInterpreter interp)
 	{
 		super(word);
-		this.definition = definition;
-		if(definition == null)
-			endOfDocs = null;
-		else
-		{
-			endOfDocs = definition;
-			while(endOfDocs != null
-				&& endOfDocs.car instanceof FactorDocComment)
-				endOfDocs = endOfDocs.next();
-		}
+		fromList(definition,interp);
 	} //}}}
 
 	//{{{ eval() method
 	public void eval(FactorInterpreter interp)
 		throws Exception
 	{
-		interp.call(word,endOfDocs);
+		interp.call(endOfDocs);
 	} //}}}
 
 	//{{{ getStackEffect() method
@@ -82,15 +77,14 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 		}
 		else
 		{
-			compiler.getStackEffect(endOfDocs,recursiveCheck);
+			compiler.compile(endOfDocs,null,recursiveCheck);
 		}
 	} //}}}
 
 	//{{{ getClassName() method
 	private static String getClassName(String name)
 	{
-		return "factor/compiler/gen/"
-			+ FactorJava.getSanitizedName(name)
+		return FactorJava.getSanitizedName(name)
 			+ "_" + (compileCount++);
 	} //}}}
 
@@ -101,31 +95,34 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 	FactorWordDefinition compile(FactorInterpreter interp,
 		RecursiveState recursiveCheck) throws Exception
 	{
-		StackEffect effect = getStackEffect();
+		// Each word has its own class loader
+		FactorClassLoader loader = new FactorClassLoader();
+
+		StackEffect effect = getStackEffect(interp);
 
 		if(effect.inR != 0 || effect.outR != 0)
 			throw new FactorCompilerException("Compiled code cannot manipulate call stack frames");
 
 		String className = getClassName(word.name);
 
-		ClassWriter cw = new ClassWriter(false);
+		ClassWriter cw = new ClassWriter(true);
 		cw.visit(ACC_PUBLIC, className,
 			"factor/compiler/CompiledDefinition",
 			null, null);
 
 		compileConstructor(cw,className);
 
-		CompileResult result = compileEval(interp,cw,
+		FactorCompiler compiler = compileEval(interp,cw,loader,
 			className,effect,recursiveCheck);
 
 		// Generate auxiliary methods
-		String auxAsm = result.compiler.generateAuxiliary(cw);
+		compiler.generateAuxiliary(cw);
 
 		// Generate fields for storing literals and
 		// word references
-		result.compiler.generateFields(cw);
+		compiler.generateFields(cw);
 
-		compileToList(interp,result.compiler,cw);
+		compileToList(interp,compiler,cw);
 
 		compileGetStackEffect(cw,effect);
 
@@ -137,16 +134,21 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 		{
 			FileOutputStream fos = new FileOutputStream(
 				className + ".class");
-			fos.write(code);
-			fos.close();
+			try
+			{
+				fos.write(code);
+			}
+			finally
+			{
+				fos.close();
+			}
 		}
 
-		// store disassembly for the 'asm' word.
-		word.asm = result.asm + auxAsm;
+		String javaClassName = className.replace('/','.');
+		word.setCompiledInfo(compiler.loader,javaClassName);
 
-		Class compiledWordClass = loader._defineClass(
-			className.replace('/','.'),
-			code, 0, code.length);
+		Class compiledWordClass = loader.addClass(
+			javaClassName,code,0,code.length);
 
 		return CompiledDefinition.create(interp,word,compiledWordClass);
 	} //}}}
@@ -168,7 +170,7 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 			"factor/compiler/CompiledDefinition", "<init>",
 			"(Lfactor/FactorWord;)V");
 		mw.visitInsn(RETURN);
-		mw.visitMaxs(2, 2);
+		mw.visitMaxs(0,0);
 	} //}}}
 
 	//{{{ compileToList() method
@@ -184,7 +186,7 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 		compiler.generateParse(mw,toList(interp),1);
 		mw.visitTypeInsn(CHECKCAST,"factor/Cons");
 		mw.visitInsn(ARETURN);
-		mw.visitMaxs(2, 2);
+		mw.visitMaxs(0,0);
 	} //}}}
 
 	//{{{ compileGetStackEffect() method
@@ -209,32 +211,24 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 		mw.visitMethodInsn(INVOKEVIRTUAL,"factor/compiler/FactorCompiler",
 			"apply","(Lfactor/compiler/StackEffect;)V");
 		mw.visitInsn(RETURN);
-		mw.visitMaxs(7, 3);
+		mw.visitMaxs(0,0);
 	} //}}}
 
 	//{{{ compileEval() method
-	static class CompileResult
-	{
-		FactorCompiler compiler;
-		String asm;
-
-		CompileResult(FactorCompiler compiler, String asm)
-		{
-			this.compiler = compiler;
-			this.asm = asm;
-		}
-	}
-
 	/**
 	 * Write the definition of the eval() method in the compiled word.
 	 * Local 0 -- this
 	 * Local 1 -- interpreter
 	 */
-	protected CompileResult compileEval(FactorInterpreter interp,
-		ClassWriter cw, String className, StackEffect effect,
+	protected FactorCompiler compileEval(FactorInterpreter interp,
+		ClassWriter cw, FactorClassLoader loader,
+		String className, StackEffect effect,
 		RecursiveState recursiveCheck)
 		throws Exception
 	{
+		cw.visitField(ACC_PRIVATE | ACC_STATIC, "initialized", "Z",
+			null, null);
+
 		// creates a MethodWriter for the 'eval' method
 		CodeVisitor mw = cw.visitMethod(ACC_PUBLIC,
 			"eval", "(Lfactor/FactorInterpreter;)V",
@@ -251,16 +245,15 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 		compileJVMStackToDataStack(effect,mw);
 
 		mw.visitInsn(RETURN);
-		mw.visitMaxs(Math.max(4,2 + effect.inD),4);
+		mw.visitMaxs(0,0);
 
 		// generate core
 		FactorCompiler compiler = new FactorCompiler(interp,word,
-			className);
+			className,loader);
 		compiler.init(1,effect.inD,effect.inR,"core");
-		String asm = compiler.compileCore(endOfDocs,cw,effect,
-			recursiveCheck);
+		compiler.compileCore(endOfDocs,cw,effect,recursiveCheck);
 
-		return new CompileResult(compiler,asm);
+		return compiler;
 	} //}}}
 
 	//{{{ compileDataStackToJVMStack() method
@@ -272,25 +265,25 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 			mw.visitVarInsn(ALOAD,1);
 			mw.visitFieldInsn(GETFIELD,
 				"factor/FactorInterpreter", "datastack",
-				"Lfactor/FactorDataStack;");
+				"Lfactor/FactorArray;");
 
 			// ensure the stack has enough elements
 			mw.visitInsn(DUP);
 			mw.visitIntInsn(BIPUSH,effect.inD);
 			mw.visitMethodInsn(INVOKEVIRTUAL,
-				"factor/FactorArrayStack", "ensurePop",
+				"factor/FactorArray", "ensurePop",
 				"(I)V");
 
 			// datastack.stack -> 2
 			mw.visitInsn(DUP);
 			mw.visitFieldInsn(GETFIELD,
-				"factor/FactorArrayStack", "stack",
+				"factor/FactorArray", "stack",
 				"[Ljava/lang/Object;");
 			mw.visitVarInsn(ASTORE,2);
 			// datastack.top-args.length -> 3
 			mw.visitInsn(DUP);
 			mw.visitFieldInsn(GETFIELD,
-				"factor/FactorArrayStack", "top",
+				"factor/FactorArray", "top",
 				"I");
 			mw.visitIntInsn(BIPUSH,effect.inD);
 			mw.visitInsn(ISUB);
@@ -298,7 +291,7 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 			// datastack.top -= args.length
 			mw.visitInsn(DUP_X1);
 			mw.visitFieldInsn(PUTFIELD,
-				"factor/FactorArrayStack", "top",
+				"factor/FactorArray", "top",
 				"I");
 
 			mw.visitVarInsn(ISTORE,3);
@@ -324,12 +317,27 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 			mw.visitVarInsn(ALOAD,1);
 			mw.visitFieldInsn(GETFIELD,
 				"factor/FactorInterpreter", "datastack",
-				"Lfactor/FactorDataStack;");
+				"Lfactor/FactorArray;");
 
 			mw.visitInsn(SWAP);
 			mw.visitMethodInsn(INVOKEVIRTUAL,
-				"factor/FactorArrayStack", "push",
+				"factor/FactorArray", "push",
 				"(Ljava/lang/Object;)V");
+		}
+	} //}}}
+
+	//{{{ fromList() method
+	public void fromList(Cons definition, FactorInterpreter interp)
+	{
+		this.definition = definition;
+		if(definition == null)
+			endOfDocs = null;
+		else
+		{
+			endOfDocs = definition;
+			while(endOfDocs != null
+				&& endOfDocs.car instanceof FactorDocComment)
+				endOfDocs = endOfDocs.next();
 		}
 	} //}}}
 
@@ -337,17 +345,5 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 	public Cons toList(FactorInterpreter interp)
 	{
 		return definition;
-	} //}}}
-
-	private static SimpleClassLoader loader = new SimpleClassLoader();
-
-	//{{{ SimpleClassLoader class
-	static class SimpleClassLoader extends ClassLoader
-	{
-		public Class _defineClass(String name,
-				byte[] code, int off, int len)
-		{
-			return defineClass(name,code,off,len);
-		}
 	} //}}}
 }

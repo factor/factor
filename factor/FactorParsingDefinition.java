@@ -36,15 +36,22 @@ import java.io.IOException;
  */
 public abstract class FactorParsingDefinition
 {
-	protected FactorWord word;
+	public static final String ENCODING = "UTF8";
 
+	public FactorWord word;
+
+	//{{{ FactorParsingDefinition constructor
+	/**
+	 * A new definition.
+	 */
 	public FactorParsingDefinition(FactorWord word)
+		throws Exception
 	{
 		this.word = word;
-	}
+	} //}}}
 
 	public abstract void eval(FactorInterpreter interp, FactorReader reader)
-		throws IOException, FactorParseException;
+		throws Exception;
 
 	//{{{ toString() method
 	public String toString()

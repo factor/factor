@@ -34,41 +34,53 @@ import java.lang.reflect.*;
 import java.util.*;
 import org.objectweb.asm.*;
 
-public class Null extends FlowObject implements Constants
+public class Null extends FlowObject
 {
-	Null(FactorCompiler compiler, RecursiveState recursiveCheck)
+	//{{{ Null constructor
+	Null(FactorCompiler compiler, RecursiveForm word)
 	{
-		super(compiler,recursiveCheck);
-	}
+		super(compiler,word);
+	} //}}}
 
-	public void generate(CodeVisitor mw)
+	//{{{ pop() Method
+	public void pop(CodeVisitor mw)
 	{
 		mw.visitInsn(ACONST_NULL);
-	}
+	} //}}}
 
+	//{{{ munge() method
+	/**
+	 * Munging transforms the flow object such that it is now stored in
+	 * a local variable and hence can be mutated by compiled code, however
+	 * its original compileCallTo() semantics remain (for example, if it is
+	 * a quotation).
+	 */
+	FlowObject munge(int base, int index,
+		FactorCompiler compiler,
+		RecursiveState recursiveCheck)
+		throws Exception
+	{
+		return new CompiledListResult(index + base,null,
+			compiler,recursiveCheck);
+	} //}}}
+
+	//{{{ getLiteral() method
 	Object getLiteral()
 	{
 		return null;
-	}
+	} //}}}
 
-	/**
-	 * Stack effect of executing this -- only used for lists
-	 * and conditionals!
-	 */
-	public void getStackEffect(RecursiveState recursiveCheck)
-	{
-	}
-
+	//{{{ compileCallTo() method
 	/**
 	 * Write code for evaluating this. Returns maximum JVM stack
 	 * usage.
 	 */
-	public int compileCallTo(CodeVisitor mw, RecursiveState recursiveCheck)
+	public void compileCallTo(CodeVisitor mw, RecursiveState recursiveCheck)
 		throws Exception
 	{
-		return 0;
-	}
+	} //}}}
 
+	//{{{ equals() method
 	public boolean equals(Object o)
 	{
 		if(o instanceof Null)
@@ -77,5 +89,11 @@ public class Null extends FlowObject implements Constants
 			return ((CompiledList)o).getLiteral() == null;
 		else
 			return false;
-	}
+	} //}}}
+
+	//{{{ clone() method
+	public Object clone()
+	{
+		return new Null(compiler,word);
+	} //}}}
 }

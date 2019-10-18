@@ -33,27 +33,58 @@ import factor.parser.*;
 import factor.primitives.*;
 import java.io.*;
 
-public class FactorInterpreter implements FactorObject
+public class FactorInterpreter implements FactorObject, Runnable
 {
+	public static final String VERSION = "0.60.8";
+
 	// command line arguments are stored here.
 	public Cons args;
 
 	// boot.factor sets these.
 	public boolean interactive = true;
-	public boolean trace = false;
-	public boolean errorFlag = false;
 	public Throwable error;
 	public boolean dump = false;
-	public boolean verboseCompile = true;
-	public boolean fasl = true;
+	public boolean verboseCompile = false;
+	public boolean mini = false;
+	// if this is false and an error occurs, bail out.
+	public boolean startupDone = false;
 
-	public FactorCallFrame callframe;
-	public FactorCallStack callstack = new FactorCallStack();
-	public FactorDataStack datastack = new FactorDataStack();
-	public FactorNamespace dict;
+	public Cons callframe;
+	public FactorArray callstack = new FactorArray();
+	public FactorArray datastack = new FactorArray();
+	public FactorArray namestack = new FactorArray();
+	public FactorArray catchstack = new FactorArray();
+
+	/**
+	 * Maps vocabulary names to vocabularies.
+	 */
+	public FactorNamespace vocabularies;
+
+	/**
+	 * Vocabulary search path for interactive parser.
+	 */
+	public Cons use;
+
+	/**
+	 * Vocabulary to define new words in.
+	 */
+	public String in;
+
+	/**
+	 * Kernel vocabulary. Re-created on each startup, contains
+	 * primitives and parsing words.
+	 */
+	public FactorNamespace builtins;
+
+	/**
+	 * Most recently defined word.
+	 */
 	public FactorWord last;
+
 	public FactorNamespace global;
+
 	private FactorNamespace interpNamespace;
+
 	private Cons compiledExceptions;
 
 	//{{{ main() method
@@ -61,127 +92,187 @@ public class FactorInterpreter implements FactorObject
 	{
 		FactorInterpreter interp = new FactorInterpreter();
 		interp.init(args,null);
+		interp.run();
+	} //}}}
+
+	//{{{ init() method
+	public void init(FactorInterpreter interp) throws Exception
+	{
+		this.args = interp.args;
+		this.interactive = interp.interactive;
+		this.dump = interp.dump;
+		this.verboseCompile = interp.verboseCompile;
+		this.callframe = interp.callframe;
+		this.callstack = (FactorArray)interp.callstack.clone();
+		this.datastack = (FactorArray)interp.datastack.clone();
+		this.namestack = (FactorArray)interp.namestack.clone();
+		this.catchstack = (FactorArray)interp.catchstack.clone();
+		this.vocabularies = interp.vocabularies;
+		this.use = interp.use;
+		this.in = interp.in;
+		this.builtins = interp.builtins;
+		this.last = interp.last;
+		this.global = interp.global;
 	} //}}}
 
 	//{{{ init() method
 	public void init(String[] args, Object root) throws Exception
 	{
-		// this must be set before boot.factor is finished loading.
-		if(args.length > 0 && args[0].equals("-no-fasl"))
-			fasl = false;
+		for(int i = 0; i < args.length; i++)
+		{
+			String arg = args[i];
+			// this switch forces minimal libraries to be loaded
+			if(arg.equals("-no-mini"))
+			{
+				mini = false;
+				args[i] = null;
+			}
+			else if(arg.equals("-mini"))
+			{
+				mini = true;
+				args[i] = null;
+			}
+		}
 
 		this.args = Cons.fromArray(args);
 
-		callstack.top = 0;
-		datastack.top = 0;
-		initDictionary();
+		vocabularies = new FactorNamespace();
+		initBuiltinDictionary();
 		initNamespace(root);
 		topLevel();
+
 		runBootstrap();
 	} //}}}
 
-	//{{{ initDictionary() method
-	private void initDictionary() throws Exception
+	//{{{ initBuiltinDictionary() method
+	private void initBuiltinDictionary() throws Exception
 	{
-		dict = FactorNamespace.createConstrainedNamespace(
-			FactorWord.class);
+		builtins = new FactorNamespace();
+		vocabularies.setVariable("builtins",builtins);
 
-		// parsing words
-		FactorWord lineComment = intern("!");
+		in = "builtins";
+		use = new Cons(in,null);
+
+		/* comments */
+		FactorWord lineComment = define("builtins","!");
 		lineComment.parsing = new LineComment(lineComment,false);
-		FactorWord stackComment = intern("(");
+		FactorWord stackComment = define("builtins","(");
 		stackComment.parsing = new StackComment(stackComment);
-		FactorWord str = intern("\"");
-		str.parsing = new StringLiteral(str);
-		FactorWord t = intern("t");
-		t.parsing = new T(t);
-		FactorWord f = intern("f");
-		f.parsing = new F(f);
-		FactorWord bra = intern("[");
-		bra.parsing = new Bra(bra);
-		FactorWord ket = intern("]");
-		ket.parsing = new Ket(bra,ket);
-		FactorWord comma = intern(",");
-		comma.parsing = new Comma(comma);
-		FactorWord def = intern(":");
-		def.parsing = new Def(def);
-		def.getNamespace(this).setVariable("doc-comments",Boolean.TRUE);
-		FactorWord ine = intern(";");
-		ine.parsing = new Ine(def,ine);
-		FactorWord shu = intern("~<<");
-		shu.getNamespace(this).setVariable("doc-comments",Boolean.TRUE);
-		shu.parsing = new Shu(shu);
-		FactorWord fle = intern(">>~");
-		fle.parsing = new Fle(shu,fle);
-		FactorWord get = intern("$");
-		get.parsing = new Prefix(get,get);
-		FactorWord set = intern("@");
-		set.parsing = new Prefix(set,set);
-
-		// #X
-		FactorWord dispatch = intern("#");
-		dispatch.parsing = new Dispatch(dispatch);
-		FactorWord chr = intern("#\\");
-		chr.parsing = new CharLiteral(chr);
-		FactorWord intern = intern("#=");
-		intern.parsing = new Prefix(intern,intern("intern"));
-		FactorWord docComment = intern("#!");
+		FactorWord docComment = define("builtins","#!");
 		docComment.parsing = new LineComment(docComment,true);
-		FactorWord unreadable = intern("#<");
+
+		/* strings */
+		FactorWord str = define("builtins","\"");
+		str.parsing = new StringLiteral(str,true);
+		FactorWord ch = define("builtins","CHAR:");
+		ch.parsing = new CharLiteral(ch);
+		FactorWord raw = define("builtins","#\"");
+		raw.parsing = new StringLiteral(raw,false);
+
+		/* constants */
+		FactorWord t = define("builtins","t");
+		t.parsing = new T(t);
+		FactorWord f = define("builtins","f");
+		f.parsing = new F(f);
+		FactorWord complex = define("builtins","#{");
+		complex.parsing = new ComplexLiteral(complex,"}");
+
+		/* lists */
+		FactorWord bra = define("builtins","[");
+		bra.parsing = new Bra(bra);
+		FactorWord ket = define("builtins","]");
+		ket.parsing = new Ket(bra,ket);
+		FactorWord bar = define("builtins","|");
+		bar.parsing = new Bar(bar);
+
+		/* word defs */
+		FactorWord def = define("builtins",":");
+		def.parsing = new Def(def);
+		def.getNamespace().setVariable("doc-comments",Boolean.TRUE);
+		FactorWord ine = define("builtins",";");
+		ine.parsing = new Ine(def,ine);
+		FactorWord shuffle = define("builtins","~<<");
+		shuffle.parsing = new Shuffle(shuffle,">>~");
+
+		/* reading numbers with another base */
+		FactorWord bin = define("builtins","BIN:");
+		bin.parsing = new Base(bin,2);
+		FactorWord oct = define("builtins","OCT:");
+		oct.parsing = new Base(oct,8);
+		FactorWord hex = define("builtins","HEX:");
+		hex.parsing = new Base(hex,16);
+
+		/* specials */
+		FactorWord dispatch = define("builtins","#");
+		dispatch.parsing = new Dispatch(dispatch);
+		FactorWord unreadable = define("builtins","#<");
 		unreadable.parsing = new Unreadable(unreadable);
 
-		FactorWord interpreterGet = intern("interpreter");
+		// #: is not handled with a special dispatch. instead, when
+		// a word starting with #: is passed to intern(), it creates
+		// a new symbol
+		FactorWord passthru = define("builtins","#:");
+		passthru.parsing = new PassThrough(passthru);
+
+		/* vocabulary parsing words */
+		FactorWord noParsing = define("builtins","POSTPONE:");
+		noParsing.parsing = new NoParsing(noParsing);
+		FactorWord defer = define("builtins","DEFER:");
+		defer.parsing = new Defer(defer);
+		FactorWord in = define("builtins","IN:");
+		in.parsing = new In(in);
+		FactorWord use = define("builtins","USE:");
+		use.parsing = new Use(use);
+
+		FactorWord interpreterGet = define("builtins","interpreter");
 		interpreterGet.def = new InterpreterGet(interpreterGet);
+		interpreterGet.inline = true;
 
-		// data stack primitives
-		FactorWord datastackGet = intern("datastack$");
-		datastackGet.def = new DatastackGet(datastackGet);
-		FactorWord datastackSet = intern("datastack@");
-		datastackSet.def = new DatastackSet(datastackSet);
-		FactorWord clear = intern("clear");
-		clear.def = new Clear(clear);
-
-		// call stack primitives
-		FactorWord callstackGet = intern("callstack$");
-		callstackGet.def = new CallstackGet(callstackGet);
-		FactorWord callstackSet = intern("callstack@");
-		callstackSet.def = new CallstackSet(callstackSet);
-		FactorWord restack = intern("restack");
+		// primitives used by 'expand' and 'map'
+		FactorWord restack = define("builtins","restack");
 		restack.def = new Restack(restack);
-		FactorWord unstack = intern("unstack");
+		FactorWord unstack = define("builtins","unstack");
 		unstack.def = new Unstack(unstack);
-		FactorWord unwind = intern("unwind");
-		unwind.def = new Unwind(unwind);
 
 		// reflection primitives
-		FactorWord jinvoke = intern("jinvoke");
-		jinvoke.def = new JInvoke(jinvoke);
-		FactorWord jinvokeStatic = intern("jinvoke-static");
-		jinvokeStatic.def = new JInvokeStatic(jinvokeStatic);
-		FactorWord jnew = intern("jnew");
+		FactorWord jinvoke = define("builtins","jinvoke");
+		jinvoke.def = new JInvoke(jinvoke,false);
+		jinvoke.inline = true;
+		FactorWord jinvokeStatic = define("builtins","jinvoke-static");
+		jinvokeStatic.def = new JInvoke(jinvokeStatic,true);
+		jinvokeStatic.inline = true;
+		FactorWord jnew = define("builtins","jnew");
 		jnew.def = new JNew(jnew);
-		FactorWord jvarGet = intern("jvar$");
+		jnew.inline = true;
+		FactorWord jvarGet = define("builtins","jvar-get");
 		jvarGet.def = new JVarGet(jvarGet);
-		FactorWord jvarGetStatic = intern("jvar-static$");
+		jvarGet.inline = true;
+		FactorWord jvarGetStatic = define("builtins","jvar-static-get");
 		jvarGetStatic.def = new JVarGetStatic(jvarGetStatic);
-		FactorWord jvarSet = intern("jvar@");
+		jvarGetStatic.inline = true;
+		FactorWord jvarSet = define("builtins","jvar-set");
 		jvarSet.def = new JVarSet(jvarSet);
-		FactorWord jvarSetStatic = intern("jvar-static@");
+		jvarSet.inline = true;
+		FactorWord jvarSetStatic = define("builtins","jvar-static-set");
 		jvarSetStatic.def = new JVarSetStatic(jvarSetStatic);
+		jvarSetStatic.inline = true;
+		FactorWord coerce = define("builtins","coerce");
+		coerce.def = new Coerce(coerce);
+		coerce.inline = true;
 
 		// definition
-		FactorWord define = intern("define");
+		FactorWord define = define("builtins","define");
 		define.def = new Define(define);
 
 		// combinators
-		FactorWord execute = intern("execute");
+		FactorWord execute = define("builtins","execute");
 		execute.def = new Execute(execute);
-		FactorWord call = intern("call");
+		FactorWord call = define("builtins","call");
 		call.def = new Call(call);
-		FactorWord bind = intern("bind");
-		bind.def = new Bind(bind);
-		FactorWord choice = intern("?");
-		choice.def = new Choice(choice);
+		call.inline = true;
+		FactorWord ifte = define("builtins","ifte");
+		ifte.def = new Ifte(ifte);
+		ifte.inline = true;
 	} //}}}
 
 	//{{{ initNamespace() method
@@ -191,35 +282,44 @@ public class FactorInterpreter implements FactorObject
 
 		global.setVariable("interpreter",this);
 
-		global.setVariable("error-flag",
-			new FactorNamespace.VarBinding(
-				getClass().getField("errorFlag"),
-				this));
-
 		global.setVariable("verbose-compile",
 			new FactorNamespace.VarBinding(
 				getClass().getField("verboseCompile"),
 				this));
 
-		String[] boundFields = { "dump",
-			"interactive", "trace",
-			"dict", "args", "global", "last", "fasl" };
+		global.setVariable("startup-done",
+			new FactorNamespace.VarBinding(
+				getClass().getField("startupDone"),
+				this));
+
+		String[] boundFields = {
+			"global",
+			"vocabularies",
+			"args",
+			"dump",
+			"interactive",
+			"builtins",
+			"in",
+			"last",
+			"use"
+		};
+
 		for(int i = 0; i < boundFields.length; i++)
 		{
-			global.setVariable(boundFields[i],
+			String name = boundFields[i];
+			global.setVariable(name,
 				new FactorNamespace.VarBinding(
-					getClass().getField(boundFields[i]),
+					getClass().getField(name),
 					this));
 		}
 	} //}}}
 
 	//{{{ getNamespace() method
-	public FactorNamespace getNamespace(FactorInterpreter interp)
+	public FactorNamespace getNamespace()
 		throws Exception
 	{
 		if(interpNamespace == null)
-			interpNamespace = new FactorNamespace(
-				interp.global,this);
+			interpNamespace = new FactorNamespace(this);
 
 		return interpNamespace;
 	} //}}}
@@ -227,14 +327,17 @@ public class FactorInterpreter implements FactorObject
 	//{{{ runBootstrap() method
 	private void runBootstrap() throws Exception
 	{
-		final String initFile = "boot.factor";
+		String initFile = "/library/platform/jvm/boot.factor";
 		FactorReader parser = new FactorReader(
 			initFile,
+			new BufferedReader(
 			new InputStreamReader(
 			getClass().getResourceAsStream(
-			initFile)),
+			initFile))),
 			this);
-		call(intern("[init]"),parser.parse());
+                
+		call(parser.parse());
+
 		run();
 	} //}}}
 
@@ -249,32 +352,17 @@ public class FactorInterpreter implements FactorObject
 			try
 			{
 				if(callframe == null)
-					break;
-
-				Cons ip = callframe.ip;
-
-				if(ip == null)
 				{
 					if(callstack.top == 0)
 						break;
 
-					try
-					{
-						callframe = (FactorCallFrame)
-							callstack.pop();
-						continue;
-					}
-					catch(ClassCastException e)
-					{
-						throw new FactorRuntimeException(
-							"Unbalanced >r/r> or "
-							+ "restack/unstack");
-					}
+					callframe = (Cons)callstack.pop();
+					continue;
 				}
 
-				callframe.ip = ip.next();
-
-				eval(ip.car);
+				Object eval = callframe.car;
+				callframe = callframe.next();
+				eval(eval);
 			}
 			catch(Throwable e)
 			{
@@ -289,48 +377,38 @@ public class FactorInterpreter implements FactorObject
 	//{{{ handleError() method
 	private boolean handleError(Throwable e)
 	{
-		/* if(throwErrors)
+		error = FactorJava.unwrapException(e);
+		if(!startupDone)
 		{
-			throw e;
-		}
-		else */ if(errorFlag)
-		{
-			System.err.println("Exception inside"
-				+ " error handler:");
-			e.printStackTrace();
-			System.err.println("Original exception:");
 			error.printStackTrace();
-			System.err.println("Factor datastack:");
-			System.err.println(datastack.toList());
-			System.err.println("Factor callstack:");
-			System.err.println(callstack.toList());
-
+			topLevel();
+			return true;
+		}
+		
+		datastack.push(error);
+		try
+		{
+			FactorWord throwWord = searchVocabulary(
+				"errors","throw");
+			if(throwWord == null)
+				throw new NullPointerException();
+			eval(throwWord);
+			return false;
+		}
+		catch(Throwable e2)
+		{
+			System.err.println("Exception when calling throw:");
+			e.printStackTrace();
 			topLevel();
 
 			return true;
 		}
-		else
-		{
-			errorFlag = true;
-			error = FactorJava.unwrapException(e);
-			datastack.push(error);
-			try
-			{
-				eval(intern("break"));
-				return false;
-			}
-			catch(Throwable e2)
-			{
-				System.err.println("Exception when calling break:");
-				e.printStackTrace();
-				System.err.println("Factor callstack:");
-				System.err.println(callstack);
+	} //}}}
 
-				topLevel();
-
-				return true;
-			}
-		}
+	//{{{ createCompiledCallframe() method
+	private Cons createCompiledCallframe(FactorWord word)
+	{
+		return new Cons(new FactorWord(null,"#<compiled>"),word);
 	} //}}}
 
 	//{{{ compiledException() method
@@ -340,11 +418,7 @@ public class FactorInterpreter implements FactorObject
 	 */
 	public void compiledException(FactorWord word, Throwable t)
 	{
-		// XXX: change callframe.namespace to something more meaningful
-		FactorCallFrame compiledCallframe = new FactorCallFrame(
-			word,callframe.namespace,
-			new Cons(new FactorWord("#<compiled>"),null));
-		compiledExceptions = new Cons(compiledCallframe,
+		compiledExceptions = new Cons(createCompiledCallframe(word),
 			this.compiledExceptions);
 	} //}}}
 
@@ -352,52 +426,13 @@ public class FactorInterpreter implements FactorObject
 	/**
 	 * Pushes the given list of code onto the callstack.
 	 */
-	public final void call(Cons code)
+	public void call(Cons code)
 	{
-		call(intern("call"),code);
-	} //}}}
-
-	//{{{ call() method
-	/**
-	 * Pushes the given list of code onto the callstack.
-	 */
-	public final void call(FactorWord word, Cons code)
-	{
-		if(callframe == null)
-			call(word,global,code);
-		else
-			call(word,callframe.namespace,code);
-	} //}}}
-
-	//{{{ call() method
-	/**
-	 * Pushes the given list of code onto the callstack.
-	 */
-	public final void call(FactorWord word, FactorNamespace namespace, Cons code)
-	{
-		FactorCallFrame newcf;
-
 		// tail call optimization
-		if(callframe != null && callframe.ip == null)
-		{
-			if(trace)
-				System.err.println("-- TAIL CALL --");
-			newcf = new FactorCallFrame();
-			newcf.collapsed = true;
-		}
-		else
-		{
-			newcf = new FactorCallFrame();
-			newcf.collapsed = false;
-			if(callframe != null)
-				callstack.push(callframe);
-		}
+		if(callframe != null)
+			callstack.push(callframe);
 
-		newcf.word = word;
-		newcf.namespace = namespace;
-		newcf.ip = code;
-
-		callframe = newcf;
+		callframe = code;
 	} //}}}
 
 	//{{{ eval() method
@@ -406,15 +441,6 @@ public class FactorInterpreter implements FactorObject
 	 */
 	public void eval(Object obj) throws Exception
 	{
-		if(trace)
-		{
-			StringBuffer buf = new StringBuffer();
-			for(int i = 0; i < callstack.top; i++)
-				buf.append(' ');
-			buf.append(FactorReader.unparseObject(obj));
-			System.err.println(buf);
-		}
-
 		if(obj instanceof FactorWord)
 		{
 			try
@@ -423,7 +449,7 @@ public class FactorInterpreter implements FactorObject
 				if(d == null)
 				{
 					throw new FactorUndefinedWordException(
-						(FactorWord)obj);
+						((FactorWord)obj).name);
 				}
 				else
 					d.eval(this);
@@ -431,10 +457,8 @@ public class FactorInterpreter implements FactorObject
 			catch(Exception e)
 			{
 				callstack.push(callframe);
-				callframe = new FactorCallFrame(
-					(FactorWord)obj,
-					callframe.namespace,
-					null);
+				/* callframe = createCompiledCallframe(
+					(FactorWord)obj); */
 				while(compiledExceptions != null)
 				{
 					callstack.push(compiledExceptions.car);
@@ -448,22 +472,142 @@ public class FactorInterpreter implements FactorObject
 			datastack.push(obj);
 	} //}}}
 
-	//{{{ intern() method
-	public FactorWord intern(String name)
+	//{{{ getVariable() method
+	/**
+	 * Return the value of a variable, by searching the namestack
+	 * in order.
+	 */
+	public Object getVariable(String name) throws Exception
 	{
+		for(int i = namestack.top - 1; i >= 0; i--)
+		{
+			FactorNamespace namespace = FactorJava.toNamespace(
+				namestack.stack[i]);
+			if(namespace.isDefined(name))
+				return namespace.getVariable(name);
+		}
+
+		return null;
+	} //}}}
+
+	//{{{ isUninterned() method
+	/**
+	 * Words whose name begin with #: but are not #: themselves are not
+	 * in any vocabulary.
+	 */
+	public static boolean isUninterned(String name)
+	{
+		return (name.startsWith("#:") && name.length() > 2);
+	} //}}}
+
+	//{{{ getVocabulary() method
+	public FactorNamespace getVocabulary(String name)
+		throws Exception
+	{
+		Object value = vocabularies.getVariable(name);
+		if(value instanceof FactorNamespace)
+			return (FactorNamespace)value;
+		else
+			return null;
+	} //}}}
+
+	//{{{ defineVocabulary() method
+	public void defineVocabulary(String name)
+		throws Exception
+	{
+		Object value = vocabularies.getVariable(name);
+		if(value == null)
+		{
+			value = new FactorNamespace();
+			vocabularies.setVariable(name,value);
+		}
+	} //}}}
+
+	//{{{ searchVocabulary() method
+	/**
+	 * Search in the given vocabulary for the given word.
+	 */
+	public FactorWord searchVocabulary(String vname, String name)
+	{
+		if(isUninterned(name))
+			return new FactorWord(null,name);
+
 		try
 		{
-			FactorWord w = (FactorWord)dict.getVariable(name);
-			if(w == null)
+			FactorNamespace v = getVocabulary(vname);
+			if(v != null)
 			{
-				w = new FactorWord(name);
-				dict.setVariable(name,w);
+				Object word = v.getVariable(name);
+				if(word instanceof FactorWord)
+					return (FactorWord)word;
+				else
+					return null;
 			}
-			return w;
+			else
+				return null;
 		}
 		catch(Exception e)
 		{
-			System.err.println("Cannot internalize: " + name);
+			// should not happen!
+			throw new RuntimeException(e);
+		}
+	} //}}}
+
+	//{{{ searchVocabulary() method
+	/**
+	 * Search through the given vocabulary list for the given word.
+	 */
+	public FactorWord searchVocabulary(Cons vocabulary, String name)
+	{
+		if(isUninterned(name))
+			return new FactorWord(null,name);
+
+		while(vocabulary != null)
+		{
+			FactorWord word = searchVocabulary(
+				(String)vocabulary.car,name);
+			if(word != null)
+				return word;
+
+			vocabulary = vocabulary.next();
+		}
+
+		return null;
+	} //}}}
+
+	//{{{ define() method
+	/**
+	 * Define a word in the given vocabulary if it doesn't exist already.
+	 */
+	public FactorWord define(String vocabulary, String name)
+	{
+		if(isUninterned(name))
+			return new FactorWord(null,name);
+
+		try
+		{
+			FactorNamespace v = getVocabulary(vocabulary);
+			if(v == null)
+			{
+				v = new FactorNamespace();
+				vocabularies.setVariable(vocabulary,v);
+			}
+			Object value = v.getVariable(name);
+			if(value instanceof FactorWord)
+				return (FactorWord)value;
+			else
+			{
+				// save to same workspace as vocabulary,
+				// or no workspace if vocabulary is builtins
+				FactorWord word = new FactorWord(
+					vocabulary,name,null);
+				v.setVariable(name,word);
+				return word;
+			}
+		}
+		catch(Exception e)
+		{
+			// should not happen!
 			throw new RuntimeException(e);
 		}
 	} //}}}
@@ -476,9 +620,16 @@ public class FactorInterpreter implements FactorObject
 	{
 		callstack.top = 0;
 		datastack.top = 0;
-		callframe = new FactorCallFrame(
-			intern("[toplevel]"),
-			global,
-			null);
+		namestack.top = 0;
+		namestack.push(global);
+		catchstack.top = 0;
+		// DEFER: the word
+		define("kernel","exit*");
+		catchstack.push(new Cons(new Integer(1),
+			new Cons(searchVocabulary("kernel","exit*"),null)));
+		define("errors","default-error-handler");
+		catchstack.push(new Cons(searchVocabulary("errors",
+			"default-error-handler"),null));
+		callframe = null;
 	} //}}}
 }

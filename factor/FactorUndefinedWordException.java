@@ -31,7 +31,7 @@ package factor;
 
 public class FactorUndefinedWordException extends FactorRuntimeException
 {
-	public FactorUndefinedWordException(FactorWord word)
+	public FactorUndefinedWordException(String word)
 	{
 		super(word + " not defined");
 	}

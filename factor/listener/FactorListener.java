@@ -48,11 +48,8 @@ public class FactorListener extends JTextPane
 		= Cursor.getPredefinedCursor
 		(Cursor.WAIT_CURSOR);
 
-	private static final Object Link = new Object();
+	public static final Object Link = new Object();
 
-	private SimpleAttributeSet def;
-	private SimpleAttributeSet link;
-	private SimpleAttributeSet input;
 	private EventListenerList listenerList;
 
 	private Cons readLineContinuation;
@@ -61,21 +58,9 @@ public class FactorListener extends JTextPane
 	//{{{ FactorListener constructor
 	public FactorListener()
 	{
-		//setEditorKit(new HTMLEditorKit());
-		//setEditable(false);
 		MouseHandler mouse = new MouseHandler();
 		addMouseListener(mouse);
 		addMouseMotionListener(mouse);
-
-		def = new SimpleAttributeSet();
-		def.addAttribute(StyleConstants.FontFamily,"Monospaced");
-
-		link = new SimpleAttributeSet(def);
-		link.addAttribute(StyleConstants.Foreground,Color.blue);
-		link.addAttribute(StyleConstants.Underline,Boolean.TRUE);
-
-		input = new SimpleAttributeSet(def);
-		input.addAttribute(StyleConstants.Bold,Boolean.TRUE);
 
 		listenerList = new EventListenerList();
 
@@ -83,34 +68,13 @@ public class FactorListener extends JTextPane
 			new EnterAction());
 	} //}}}
 
-	//{{{ insertLink() method
-	public void insertLink(String text, String target)
-		throws BadLocationException
-	{
-		SimpleAttributeSet thisLink = new SimpleAttributeSet(link);
-		thisLink.addAttribute(Link, target);
-
-		insertWithAttrs(text,thisLink);
-	} //}}}
-
-	//{{{ insertText() method
-	public void insertText(String text)
-		throws BadLocationException
-	{
-		insertWithAttrs(text,def);
-	} //}}}
-
-	//{{{ insertInput() method
-	public void insertInput(String text)
-		throws BadLocationException
-	{
-		insertWithAttrs(text,input);
-	} //}}}
-
 	//{{{ insertWithAttrs() method
-	private void insertWithAttrs(String text, AttributeSet attrs)
+	public void insertWithAttrs(String text, AttributeSet attrs)
 		throws BadLocationException
 	{
+		if(text == null)
+			throw new NullPointerException();
+
 		StyledDocument doc = (StyledDocument)getDocument();
 		int offset1 = doc.getLength();
 		doc.insertString(offset1,text,null);
@@ -121,12 +85,15 @@ public class FactorListener extends JTextPane
 
 	//{{{ readLine() method
 	public void readLine(Cons continuation)
+		throws BadLocationException
 	{
+		StyledDocument doc = (StyledDocument)getDocument();
 		setCursor(DefaultCursor);
 		this.readLineContinuation = continuation;
-		cmdStart = getDocument().getLength();
+		cmdStart = doc.getLength();
 		setCaretPosition(cmdStart);
-		setCharacterAttributes(input,false);
+		/* doc.setCharacterAttributes(cmdStart,cmdStart,input,false);
+		setCharacterAttributes(input,false); */
 	} //}}}
 
 	//{{{ getLine() method
@@ -138,13 +105,6 @@ public class FactorListener extends JTextPane
 			return "";
 		else
 			return doc.getText(cmdStart,length - cmdStart);
-	} //}}}
-
-	//{{{ editLine() method
-	public void editLine(String text) throws BadLocationException
-	{
-		cmdStart = getDocument().getLength();
-		insertInput(text);
 	} //}}}
 
 	//{{{ addEvalListener() method
@@ -199,7 +159,9 @@ public class FactorListener extends JTextPane
 
 		try
 		{
-			insertInput(eval + "\n");
+			StyledDocument doc = (StyledDocument)getDocument();
+			doc.insertString(doc.getLength(),eval + "\n",
+				getCharacterAttributes());
 		}
 		catch(BadLocationException ble)
 		{

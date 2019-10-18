@@ -37,110 +37,145 @@ import org.objectweb.asm.*;
 
 public class JInvoke extends FactorPrimitiveDefinition
 {
+	public boolean staticMethod;
+
 	//{{{ JInvoke constructor
-	public JInvoke(FactorWord word)
+	/**
+	 * A new definition.
+	 */
+	public JInvoke(FactorWord word, boolean staticMethod)
+		throws Exception
 	{
 		super(word);
+		this.staticMethod = staticMethod;
+	} //}}}
+
+	//{{{ checkStatic() method
+	private void checkStatic(Method method) throws FactorRuntimeException
+	{
+		if(staticMethod)
+		{
+			if(!Modifier.isStatic(method.getModifiers()))
+				throw new FactorRuntimeException(
+					"Use jinvoke with static methods");
+		}
+		else
+		{
+			if(Modifier.isStatic(method.getModifiers()))
+				throw new FactorRuntimeException(
+					"Use jinvoke-static with static methods");
+		}
 	} //}}}
 
 	//{{{ eval() method
 	public void eval(FactorInterpreter interp)
 		throws Exception
 	{
-		FactorDataStack datastack = interp.datastack;
-		Method method = FactorJava.jmethod(
-			(String)datastack.pop(String.class),
-			(String)datastack.pop(String.class),
-			(Cons)datastack.pop(Cons.class));
-		FactorJava.jinvoke(datastack,
-			method,datastack.pop());
+		FactorArray datastack = interp.datastack;
+		String name = FactorJava.toString(datastack.pop());
+		Class clazz = FactorJava.toClass(datastack.pop());
+		Cons args = (Cons)datastack.pop();
+		Class[] _args = FactorJava.classNameToClassList(args);
+		Method method = clazz.getMethod(name,_args);
+
+		checkStatic(method);
+
+		Object instance;
+		if(staticMethod)
+			instance = null;
+		else
+		{
+			instance = FactorJava.convertToJavaType(
+				datastack.pop(),clazz);
+		}
+
+		Object[] params = new Object[_args.length];
+
+		try
+		{
+			for(int i = params.length - 1; i >= 0; i--)
+			{
+				params[i] = FactorJava.convertToJavaType(
+					datastack.pop(),_args[i]);
+			}
+
+			if(method.getReturnType() == Void.TYPE)
+				method.invoke(instance,params);
+			else
+			{
+				datastack.push(FactorJava.convertFromJavaType(
+					method.invoke(instance,params)));
+			}
+		}
+		catch(FactorStackException e)
+		{
+			throw new FactorStackException(_args.length);
+		}
 	} //}}}
 
 	//{{{ getStackEffect() method
 	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler state) throws Exception
+		FactorCompiler compiler) throws Exception
 	{
-		state.ensure(state.datastack,4);
-		Object clazz = state.popLiteral();
-		Object name = state.popLiteral();
-		Object args = state.popLiteral();
-		state.pop(null);
-
-		if(clazz instanceof String &&
-			name instanceof String &&
-			(args == null || args instanceof Cons))
-		{
-			Method method = FactorJava.jmethod(
-				(String)clazz,
-				(String)name,
-				(Cons)args);
-
-			boolean returnValue = (method.getReturnType() != Void.TYPE);
-
-			int params = method.getParameterTypes().length;
-			state.consume(state.datastack,params);
-			if(returnValue)
-				state.push(null);
-		}
-		else
-			throw new FactorCompilerException("Cannot deduce stack effect of " + word + " with non-literal arguments");
+		compileImmediate(null,compiler,recursiveCheck);
 	} //}}}
 
 	//{{{ compileImmediate() method
-	/**
-	 * Compile a call to this word. Returns maximum JVM stack use.
-	 * XXX: does not use factor type system conversions.
-	 */
-	public int compileImmediate(
+	public void compileImmediate(
 		CodeVisitor mw,
 		FactorCompiler compiler,
 		RecursiveState recursiveCheck)
 		throws Exception
 	{
-		Object _method = compiler.popLiteral();
-		Object _clazz = compiler.popLiteral();
-		Object _args = compiler.popLiteral();
-		if(_method instanceof String &&
-			_clazz instanceof String &&
-			(_args == null || _args instanceof Cons))
+		if(mw == null)
+			compiler.ensure(compiler.datastack,String.class);
+		String name = FactorJava.toString(compiler.popLiteral());
+		if(mw == null)
+			compiler.ensure(compiler.datastack,Class.class);
+		Class clazz = FactorJava.toClass(compiler.popLiteral());
+		if(mw == null)
+			compiler.ensure(compiler.datastack,Cons.class);
+		Cons args = (Cons)compiler.popLiteral();
+
+		Class[] _args = FactorJava.classNameToClassList(args);
+		Method method = clazz.getMethod(name,_args);
+
+		checkStatic(method);
+
+		Class returnType = method.getReturnType();
+
+		if(mw != null)
+			FlowObject.generateToConversionPre(mw,returnType);
+
+		if(!staticMethod)
 		{
-			String method = (String)_method;
-			String clazz = (String)_clazz;
-			Class[] args = FactorJava.classNameToClassList(
-				(Cons)_args);
-			Class cls = FactorJava.getClass(clazz);
-			Method mth = cls.getMethod(method,args);
-			Class returnType = mth.getReturnType();
+			if(mw == null)
+				compiler.ensure(compiler.datastack,clazz);
+			compiler.pop(compiler.datastack,mw,clazz);
+		}
 
-			clazz = clazz.replace('.','/');
+		if(mw == null)
+			compiler.ensure(compiler.datastack,_args);
 
-			FactorJava.generateToConversionPre(mw,returnType);
+		compiler.generateArgs(mw,_args.length,0,_args);
 
-			compiler.pop(mw);
-			FactorJava.generateFromConversion(mw,cls);
-
-			compiler.generateArgs(mw,args.length,0,args);
-
+		if(mw != null)
+		{
 			int opcode;
-			if(cls.isInterface())
+			if(staticMethod)
+				opcode = INVOKESTATIC;
+			else if(clazz.isInterface())
 				opcode = INVOKEINTERFACE;
 			else
 				opcode = INVOKEVIRTUAL;
 			mw.visitMethodInsn(opcode,
-				clazz,
-				method,
+				clazz.getName().replace('.','/'),
+				name,
 				FactorJava.javaSignatureToVMSignature(
-				args,returnType));
-
-			if(returnType != Void.TYPE)
-			{
-				FactorJava.generateToConversion(mw,returnType);
-				compiler.push(mw);
-			}
-
-			return 4 + args.length;
+				_args,returnType));
 		}
-		else
-			throw new FactorCompilerException("Cannot compile jinvoke with non-literal parameters");
+
+		if(returnType != Void.TYPE)
+			compiler.push(compiler.datastack,mw,returnType);
 	} //}}}
 }

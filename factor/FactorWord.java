@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003 Slava Pestov.
+ * Copyright (C) 2003, 2004 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,9 +39,8 @@ public class FactorWord implements FactorExternalizable, FactorObject
 {
 	private static int gensymCount = 0;
 
-	private FactorNamespace namespace;
-
-	public final String name;
+	public String vocabulary;
+	public String name;
 
 	/**
 	 * Interpreted/compiled word definition.
@@ -54,11 +53,6 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	public FactorParsingDefinition parsing;
 
 	/**
-	 * Contains a string if this is compiled.
-	 */
-	public String asm;
-
-	/**
 	 * Is this word referenced from a compiled word?
 	 */
 	public boolean compileRef;
@@ -68,41 +62,66 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	 */
 	public boolean inline;
 
+	/**
+	 * Raise an error if an attempt is made to compile this word?
+	 */
+	public boolean interpretOnly;
+
+	/**
+	 * Only compiled words have this.
+	 */
+	public FactorClassLoader loader;
+	public String className;
+
+	private FactorNamespace namespace;
+	
 	//{{{ FactorWord constructor
 	/**
 	 * Do not use this constructor unless you're writing a packages
 	 * implementation or something. Use an FactorDictionary's
 	 * intern() method instead.
 	 */
-	public FactorWord(String name)
+	public FactorWord(String vocabulary, String name,
+		FactorWordDefinition def) throws Exception
 	{
+		this.vocabulary = vocabulary;
+		this.name = name;
+		this.def = def;
+	} //}}}
+
+	//{{{ FactorWord constructor
+	/**
+	 * Do not use this constructor unless you're writing a packages
+	 * implementation or something. Use an FactorDictionary's
+	 * intern() method instead.
+	 */
+	public FactorWord(String vocabulary, String name)
+	{
+		this.vocabulary = vocabulary;
 		this.name = name;
 	} //}}}
 
 	//{{{ getNamespace() method
-	public FactorNamespace getNamespace(FactorInterpreter interp)
+	public FactorNamespace getNamespace()
 		throws Exception
 	{
 		if(namespace == null)
-			namespace = new FactorNamespace(interp.global,this);
-
+			namespace = new FactorNamespace(this);
 		return namespace;
 	} //}}}
-
+	
 	//{{{ gensym() method
 	/**
 	 * Returns an un-internalized word with a unique name.
 	 */
-	public static FactorWord gensym()
+	public synchronized static FactorWord gensym()
 	{
-		return new FactorWord("#<GENSYM:" + (gensymCount++) + ">");
+		return new FactorWord(null,"#:GENSYM:" + (gensymCount++));
 	} //}}}
 
 	//{{{ define() method
-	public void define(FactorWordDefinition def)
+	public synchronized void define(FactorWordDefinition def)
 	{
-		asm = null;
-
 		if(compileRef)
 		{
 			System.err.println("WARNING: " + this
@@ -112,20 +131,42 @@ public class FactorWord implements FactorExternalizable, FactorObject
 			System.err.println("WARNING: redefining " + this);
 
 		this.def = def;
+
+		loader = null;
+		className = null;
+	} //}}}
+
+	//{{{ setCompiledInfo() method
+	synchronized void setCompiledInfo(FactorClassLoader loader,
+		String className)
+	{
+		this.loader = loader;
+		this.className = className;
 	} //}}}
 
 	//{{{ compile() method
-	public void compile(FactorInterpreter interp)
+	public synchronized void compile(FactorInterpreter interp)
 	{
 		RecursiveState recursiveCheck = new RecursiveState();
-		recursiveCheck.add(this,new StackEffect(),null,null);
+		recursiveCheck.add(this,new StackEffect(),null,null,null);
 		compile(interp,recursiveCheck);
 		recursiveCheck.remove(this);
 	} //}}}
 
 	//{{{ compile() method
-	public void compile(FactorInterpreter interp, RecursiveState recursiveCheck)
+	public synchronized void compile(FactorInterpreter interp,
+		RecursiveState recursiveCheck)
 	{
+		if(def == null)
+			return;
+
+		if(interpretOnly)
+		{
+			if(interp.verboseCompile)
+				System.err.println(this + " is interpret-only");
+			return;
+		}
+
 		//if(def.compileFailed)
 		//	return;
 
@@ -150,6 +191,7 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	//{{{ toString() method
 	public String toString()
 	{
-		return FactorReader.charsToEscapes(name);
+		return name == null ? "#<unnamed>"
+			: FactorReader.charsToEscapes(name);
 	} //}}}
 }

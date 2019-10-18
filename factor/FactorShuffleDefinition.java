@@ -30,9 +30,8 @@
 package factor;
 
 import factor.compiler.*;
-import java.util.Map;
+import java.util.*;
 import org.objectweb.asm.*;
-import org.objectweb.asm.util.*;
 
 /**
  * ~<< name ... -- >>~
@@ -59,11 +58,13 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 	private int shuffleRstart;
 	private int shuffleRlength;
 
-	/**
-	 * This is not thread-safe!
-	 */
-	private Object[] temporaryD;
-	private Object[] temporaryR;
+	//{{{ FactorShuffleDefinition constructor
+	public FactorShuffleDefinition(FactorWord word, Cons definition,
+		FactorInterpreter interp) throws FactorException
+	{
+		super(word);
+		fromList(definition,interp);
+	} //}}}
 
 	//{{{ FactorShuffleDefinition constructor
 	public FactorShuffleDefinition(FactorWord word,
@@ -80,13 +81,18 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 		this.shuffleR = shuffleR;
 		this.shuffleRlength = shuffleRlength;
 
+		init();
+	} //}}}
+
+	//{{{ init() method
+	private void init()
+	{
 		if(this.shuffleD != null && this.shuffleDlength == 0)
 			this.shuffleD = null;
 		if(this.shuffleR != null && this.shuffleRlength == 0)
 			this.shuffleR = null;
 		if(this.shuffleD != null)
 		{
-			temporaryD = new Object[shuffleDlength];
 			for(int i = 0; i < shuffleDlength; i++)
 			{
 				if(shuffleD[i] == i)
@@ -97,7 +103,6 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 		}
 		if(this.shuffleR != null)
 		{
-			temporaryR = new Object[shuffleRlength];
 			for(int i = 0; i < shuffleRlength; i++)
 			{
 				if(shuffleR[i] == (i | FROM_R_MASK))
@@ -110,11 +115,9 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 
 	//{{{ getStackEffect() method
 	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler state) throws FactorStackException
+		FactorCompiler compiler) throws FactorStackException
 	{
-		state.ensure(state.datastack,consumeD);
-		state.ensure(state.callstack,consumeR);
-		eval(state.datastack,state.callstack);
+		compileCallTo(null,compiler,recursiveCheck);
 	} //}}}
 
 	//{{{ compile() method
@@ -128,27 +131,25 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 	} //}}}
 
 	//{{{ compileCallTo() method
-	/**
-	 * Compile a call to this word. Returns maximum JVM stack use.
-	 */
-	public int compileCallTo(CodeVisitor mw, FactorCompiler compiler,
+	public void compileCallTo(CodeVisitor mw, FactorCompiler compiler,
 		RecursiveState recursiveCheck) throws FactorStackException
 	{
 		compiler.ensure(compiler.datastack,consumeD);
 		compiler.ensure(compiler.callstack,consumeR);
-		eval(compiler.datastack,compiler.callstack);
-		return 0;
+		eval(compiler.interp,compiler.datastack,compiler.callstack);
 	} //}}}
 
 	//{{{ eval() method
 	public void eval(FactorInterpreter interp)
 		throws FactorStackException
 	{
-		eval(interp.datastack,interp.callstack);
+		eval(interp,interp.datastack,interp.callstack);
 	} //}}}
 
 	//{{{ eval() method
-	public void eval(FactorArrayStack datastack, FactorArrayStack callstack)
+	public void eval(FactorInterpreter interp,
+		FactorArray datastack,
+		FactorArray callstack)
 		throws FactorStackException
 	{
 		if(datastack.top < consumeD)
@@ -157,17 +158,25 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 		if(callstack.top < consumeR)
 			throw new FactorStackException(consumeR);
 
+		Object[] temporaryD;
 		if(shuffleD != null)
 		{
+			temporaryD = new Object[shuffleDlength];
 			shuffle(datastack,callstack,datastack,consumeD,consumeR,
 				shuffleD,temporaryD);
 		}
+		else
+			temporaryD = null;
 
+		Object[] temporaryR;
 		if(shuffleR != null)
 		{
+			temporaryR = new Object[shuffleRlength];
 			shuffle(datastack,callstack,callstack,consumeD,consumeR,
 				shuffleR,temporaryR);
 		}
+		else
+			temporaryR = null;
 
 		datastack.top -= consumeD;
 		if(temporaryD != null)
@@ -181,9 +190,9 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 
 	//{{{ shuffle() method
 	private void shuffle(
-		FactorArrayStack datastack,
-		FactorArrayStack callstack,
-		FactorArrayStack stack,
+		FactorArray datastack,
+		FactorArray callstack,
+		FactorArray stack,
 		int consumeD,
 		int consumeR,
 		int[] shuffle,
@@ -213,31 +222,140 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 		}
 	} //}}}
 
+	//{{{ fromList() method
+	public void fromList(Cons definition, FactorInterpreter interp)
+		throws FactorRuntimeException
+	{
+		String f = "--";
+
+		// 0 in consume map is last consumed, n is first consumed.
+		HashMap consumeMap = new HashMap();
+
+		while(definition != null)
+		{
+			Object next = definition.car;
+			if(f.equals(next.toString()))
+			{
+				definition = definition.next();
+				break;
+			}
+			else if(next instanceof String
+				|| next instanceof Character)
+			{
+				String name = next.toString();
+				int counter;
+				if(name.startsWith("r:"))
+				{
+					counter = (FactorShuffleDefinition
+						.FROM_R_MASK
+						| consumeR++);
+					name = name.substring(2);
+				}
+				else
+					counter = consumeD++;
+
+				Object existing = consumeMap.put(name,
+					new Integer(counter));
+				if(existing != null)
+					throw new FactorRuntimeException(
+						word + ": appears twice in shuffle LHS: "
+						+ next);
+			}
+			else if(!(next instanceof FactorDocComment))
+			{
+				throw new FactorRuntimeException(
+					word + ": unexpected "
+					+ FactorReader.unparseObject(
+					next));
+			}
+			definition = definition.next();
+		}
+
+		int consume = consumeMap.size();
+
+		if(definition != null)
+		{
+			int[] shuffle = new int[definition.length()];
+
+			int i = 0;
+			while(definition != null)
+			{
+				if(definition.car instanceof String
+					|| definition.car instanceof Character)
+				{
+					String name = definition.car.toString();
+					boolean r = (name.startsWith("r:"));
+					if(r)
+						name = name.substring(2);
+
+					Integer _index = (Integer)
+						consumeMap.get(name);
+					if(_index == null)
+					{
+						throw new FactorRuntimeException(word +
+							": does not appear in shuffle LHS: "
+							+ definition.car);
+					}
+
+					int index = _index.intValue();
+
+					if(r)
+					{
+						shuffleRlength++;
+						shuffle[i++] = (index
+							| FactorShuffleDefinition
+							.TO_R_MASK);
+					}
+					else
+					{
+						shuffleDlength++;
+						shuffle[i++] = index;
+					}
+				}
+				else
+				{
+					throw new FactorRuntimeException(
+						word + ": unexpected "
+						+ FactorReader.unparseObject(
+						definition.car));
+				}
+				definition = definition.next();
+			}
+
+			shuffleD = new int[shuffleDlength];
+			shuffleR = new int[shuffleRlength];
+
+			int j = 0, k = 0;
+			for(i = 0; i < shuffle.length; i++)
+			{
+				int index = shuffle[i];
+				if((index & FactorShuffleDefinition.TO_R_MASK)
+					== FactorShuffleDefinition.TO_R_MASK)
+				{
+					index = (index
+						& ~FactorShuffleDefinition.TO_R_MASK);
+					shuffleR[j++] = index;
+				}
+				else
+					shuffleD[k++] = index;
+			}
+		}
+
+		init();
+	} //}}}
+
 	//{{{ toList() method
 	public Cons toList(FactorInterpreter interp)
 	{
-		return new Cons(new FactorWord(toString()),null);
-	} //}}}
-
-	//{{{ toString() method
-	public String toString()
-	{
-		StringBuffer buf = new StringBuffer();
+		Cons list = null;
 
 		for(int i = 0; i < consumeD; i++)
-		{
-			buf.append((char)('A' + i));
-			buf.append(' ');
-		}
+			list = new Cons(String.valueOf((char)('A' + i)),list);
 
 		for(int i = 0; i < consumeR; i++)
-		{
-			buf.append("r:");
-			buf.append((char)('A' + consumeD + i));
-			buf.append(' ');
-		}
+			list = new Cons("r:" + (char)('A' + consumeD + i),list);
 
-		buf.append("--");
+		list = new Cons("--",list);
 
 		if(shuffleD != null)
 		{
@@ -249,8 +367,10 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 					index &= ~FROM_R_MASK;
 					index += consumeD;
 				}
-				buf.append(' ');
-				buf.append((char)('A' + index));
+
+				list = new Cons(String.valueOf(
+					(char)('A' + index)),
+					list);
 			}
 		}
 
@@ -264,11 +384,13 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 					index &= ~FROM_R_MASK;
 					index += consumeD;
 				}
-				buf.append(" r:");
-				buf.append((char)('A' + index));
+
+				list = new Cons(
+					"r:" + (char)('A' + index),
+					list);
 			}
 		}
 
-		return buf.toString();
+		return Cons.reverse(list);
 	} //}}}
 }

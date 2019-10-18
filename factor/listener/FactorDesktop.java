@@ -32,27 +32,31 @@ package factor.listener;
 import factor.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.text.html.*;
 
-public class FactorDesktop extends JFrame implements FactorObject
+public class FactorDesktop extends JFrame
 {
 	private JTabbedPane tabs;
 	private FactorInterpreter interp;
-	private FactorNamespace namespace;
+	private boolean standalone;
+	private Map listeners;
 
 	//{{{ main() method
 	public static void main(String[] args)
 	{
-		new FactorDesktop(args);
+		new FactorDesktop(args,true);
 	} //}}}
 
 	//{{{ FactorDesktop constructor
-	public FactorDesktop(String[] args)
+	public FactorDesktop(String[] args, boolean standalone)
 	{
 		super("Factor");
 		tabs = new JTabbedPane();
+		this.standalone = standalone;
+		listeners = new HashMap();
 
 		getContentPane().add(BorderLayout.CENTER,tabs);
 
@@ -60,7 +64,8 @@ public class FactorDesktop extends JFrame implements FactorObject
 		{
 			interp = new FactorInterpreter();
 			interp.interactive = false;
-			interp.init(args,this);
+			interp.init(args,null);
+			interp.global.setVariable("desktop",this);
 		}
 		catch(Exception e)
 		{
@@ -71,29 +76,23 @@ public class FactorDesktop extends JFrame implements FactorObject
 		newListener();
 
 		setSize(640,480);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(standalone
+			? EXIT_ON_CLOSE
+			: DISPOSE_ON_CLOSE);
 		show();
-	} //}}}
-
-	//{{{ getNamespace() method
-	public FactorNamespace getNamespace(FactorInterpreter interp)
-		throws Exception
-	{
-		if(namespace == null)
-			namespace = new FactorNamespace(interp.global,this);
-		return namespace;
 	} //}}}
 
 	//{{{ newListener() method
 	public FactorListener newListener()
 	{
-		FactorListener listener = new FactorListener();
+		final FactorListener listener = new FactorListener();
 		listener.addEvalListener(new EvalHandler());
 
 		try
 		{
 			interp.call(new Cons(listener,
-				new Cons(interp.intern("new-listener-hook"),
+				new Cons(interp.searchVocabulary(
+					"listener","new-listener-hook"),
 				null)));
 			interp.run();
 		}
@@ -103,8 +102,33 @@ public class FactorDesktop extends JFrame implements FactorObject
 			e.printStackTrace();
 		}
 
-		tabs.addTab("Listener",new JScrollPane(listener));
+		JScrollPane scroller = new JScrollPane(listener);
+		listeners.put(listener,scroller);
+		tabs.addTab("Listener",scroller);
+
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				listener.requestFocus();
+			}
+		});
+
 		return listener;
+	} //}}}
+
+	//{{{ closeListener() method
+	public void closeListener(FactorListener listener)
+	{
+		// remove tab containing the listener
+		tabs.remove((Component)listeners.get(listener));
+		if(tabs.getTabCount() == 0)
+		{
+			if(standalone)
+				System.exit(0);
+			else
+				dispose();
+		}
 	} //}}}
 
 	//{{{ getInterpreter() method

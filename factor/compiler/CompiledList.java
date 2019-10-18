@@ -34,60 +34,79 @@ import java.lang.reflect.*;
 import java.util.*;
 import org.objectweb.asm.*;
 
-public class CompiledList extends FlowObject implements Constants
+public class CompiledList extends FlowObject
 {
-	private Cons quotation;
+	protected Cons quotation;
 	protected RecursiveState recursiveCheck;
 
+	//{{{ CompiledList constructor
 	CompiledList(Cons quotation, FactorCompiler compiler,
 		RecursiveState recursiveCheck)
 	{
-		super(compiler,recursiveCheck);
+		super(compiler,recursiveCheck.lastCallable());
 		this.quotation = quotation;
 		// clone it
 		this.recursiveCheck = new RecursiveState(
 			recursiveCheck);
-	}
+		expectedType = Cons.class;
+	} //}}}
 
-	public void generate(CodeVisitor mw)
+	//{{{ pop() method
+	public void pop(CodeVisitor mw)
 	{
 		mw.visitFieldInsn(GETSTATIC,compiler.className,
 			compiler.literal(quotation),
 			"Ljava/lang/Object;");
-	}
+	} //}}}
 
+	//{{{ munge() method
+	/**
+	 * Munging transforms the flow object such that it is now stored in
+	 * a local variable and hence can be mutated by compiled code, however
+	 * its original compileCallTo() semantics remain (for example, if it is
+	 * a quotation).
+	 */
+	FlowObject munge(int base, int index,
+		FactorCompiler compiler,
+		RecursiveState recursiveCheck)
+		throws Exception
+	{
+		return new CompiledListResult(index + base,
+			quotation,compiler,
+			this.recursiveCheck);
+	} //}}}
+
+	//{{{ getLiteral() method
 	Object getLiteral()
 	{
 		return quotation;
-	}
+	} //}}}
 
-	/**
-	 * Stack effect of executing this -- only used for lists
-	 * and conditionals!
-	 */
-	public void getStackEffect(RecursiveState recursiveCheck)
-		throws Exception
-	{
-		// important: this.recursiveCheck due to
-		// lexically-scoped recursion issues
-		compiler.getStackEffect(quotation,new RecursiveState(
-			this.recursiveCheck));
-	}
-
+	//{{{ compileCallTo()
 	/**
 	 * Write code for evaluating this. Returns maximum JVM stack
 	 * usage.
 	 */
-	public int compileCallTo(CodeVisitor mw,
+	public void compileCallTo(CodeVisitor mw,
 		RecursiveState recursiveCheck)
 		throws Exception
 	{
-		// important: this.recursiveCheck due to
-		// lexically-scoped recursion issues
-		return compiler.compile(quotation,mw,new RecursiveState(
-			this.recursiveCheck));
-	}
+		RecursiveForm last = this.recursiveCheck.last();
+		FactorWord word = FactorWord.gensym();
+		try
+		{
+			recursiveCheck.add(word,new StackEffect(),
+				last.className,last.loader,last.method,last);
+			recursiveCheck.last().callable = false;
+			compiler.compile(quotation,mw,recursiveCheck);
+		}
+		finally
+		{
+			recursiveCheck.remove(word);
+		}
+	} //}}}
 
+	//{{{ equals() method
 	public boolean equals(Object o)
 	{
 		if(o instanceof CompiledList)
@@ -99,5 +118,11 @@ public class CompiledList extends FlowObject implements Constants
 			return quotation == null;
 		else
 			return false;
-	}
+	} //}}}
+
+	//{{{ clone() method
+	public Object clone()
+	{
+		return new CompiledList(quotation,compiler,recursiveCheck);
+	} //}}}
 }

@@ -31,12 +31,15 @@ package factor.primitives;
 
 import factor.compiler.*;
 import factor.*;
-import java.util.Map;
 
 public class Define extends FactorPrimitiveDefinition
 {
 	//{{{ Define constructor
+	/**
+	 * A new definition.
+	 */
 	public Define(FactorWord word)
+		throws Exception
 	{
 		super(word);
 	} //}}}
@@ -45,46 +48,34 @@ public class Define extends FactorPrimitiveDefinition
 	public void eval(FactorInterpreter interp)
 		throws Exception
 	{
-		FactorDataStack datastack = interp.datastack;
-		Object def = datastack.pop();
-		Object name = datastack.pop();
-		core(interp,name,def);
+		Object def = interp.datastack.pop();
+		Object w = interp.datastack.pop();
+		Object vocab = interp.datastack.pop();
+		core(interp,vocab,w,def);
 	} //}}}
 
 	//{{{ core() method
 	public static void core(FactorInterpreter interp,
-		Object name, Object def) throws Exception
+		Object vocab, Object name, Object def)
+		throws Exception
 	{
-		// name: either a string or a word
-		FactorWord newWord;
-		if(name instanceof FactorWord)
-			newWord = (FactorWord)name;
-		else
-			newWord = interp.intern((String)name);
-
-		if(def instanceof Cons)
-		{
-			// old-style compound definition.
-			def = new FactorCompoundDefinition(
-				newWord,(Cons)def);
-		}
-		else if(def instanceof String)
-		{
-			// a class name...
-			def = CompiledDefinition.create(interp,newWord,
-				Class.forName((String)def));
-		}
-
-		newWord.define((FactorWordDefinition)def);
-		interp.last = newWord;
+		FactorWordDefinition definition = (FactorWordDefinition)def;
+		FactorWord word = interp.searchVocabulary(
+			FactorJava.toString(vocab),
+			FactorJava.toString(name));
+		word.define(definition);
+		interp.last = word;
 	} //}}}
 
 	//{{{ getStackEffect() method
 	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler state) throws FactorStackException
+		FactorCompiler compiler) throws Exception
 	{
-		state.ensure(state.datastack,2);
-		state.pop(null);
-		state.pop(null);
+		compiler.ensure(compiler.datastack,FactorWordDefinition.class);
+		compiler.pop(compiler.datastack,null,FactorWordDefinition.class);
+		compiler.ensure(compiler.datastack,String.class);
+		compiler.pop(compiler.datastack,null,String.class);
+		compiler.ensure(compiler.datastack,String.class);
+		compiler.pop(compiler.datastack,null,String.class);
 	} //}}}
 }

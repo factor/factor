@@ -30,22 +30,45 @@
 package factor.compiler;
 
 import factor.*;
-import java.lang.reflect.*;
 import java.util.*;
 import org.objectweb.asm.*;
 
-public class Result extends FlowObject implements Constants
+public class Result extends FlowObject
 {
 	private int local;
+	private boolean input;
 
 	public Result(int local, FactorCompiler compiler,
-		RecursiveState recursiveCheck)
+		RecursiveForm word, Class type)
 	{
-		super(compiler,recursiveCheck);
-		this.local = local;
+		this(local,compiler,word,type,false);
 	}
 
-	public void generate(CodeVisitor mw)
+	/**
+	 * @param input An input result contains a parameter passed to a
+	 * compiled word's core() method.
+	 */
+	public Result(int local, FactorCompiler compiler,
+		RecursiveForm word, Class type,
+		boolean input)
+	{
+		super(compiler,word);
+		this.local = local;
+		if(type == null)
+			throw new NullPointerException();
+		this.expectedType = (type.isPrimitive()
+			? FactorJava.getBoxingType(type)
+			: type);
+		this.input = input;
+	}
+
+	public void push(CodeVisitor mw)
+		throws Exception
+	{
+		mw.visitVarInsn(ASTORE,local);
+	}
+
+	public void pop(CodeVisitor mw)
 	{
 		mw.visitVarInsn(ALOAD,local);
 	}
@@ -60,8 +83,19 @@ public class Result extends FlowObject implements Constants
 		return (this.local == local);
 	}
 
+	public boolean isInput()
+	{
+		return input;
+	}
+	
 	public String toString()
 	{
-		return "indeterminate:" + local;
+		return expectedType.getName() + "#" + local;
 	}
+
+	//{{{ clone() method
+	public Object clone()
+	{
+		return new Result(local,compiler,word,expectedType);
+	} //}}}
 }

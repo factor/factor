@@ -133,6 +133,18 @@ public class Cons implements PublicCloneable, FactorExternalizable
 		return l1;
 	} //}}}
 
+	//{{{ reverse() method
+	public static Cons reverse(Cons list)
+	{
+		Cons reversed = null;
+		while(list != null)
+		{
+			reversed = new Cons(list.car,reversed);
+			list = list.next();
+		}
+		return reversed;
+	} //}}}
+
 	//{{{ assoc() method
 	public static Object assoc(Cons assoc, Object key)
 	{
@@ -148,16 +160,9 @@ public class Cons implements PublicCloneable, FactorExternalizable
 		}
 	} //}}}
 
-	//{{{ isProperList() method
-	public boolean isProperList()
-	{
-		return cdr == null || (cdr instanceof Cons
-			&& ((Cons)cdr).isProperList());
-	} //}}}
-
 	//{{{ elementsToString() method
 	/**
-	 * Returns a whitespace separated string of the toString() of each
+	 * Returns a whitespace separated string of the unparseObject() of each
 	 * item.
 	 */
 	public String elementsToString()
@@ -166,10 +171,7 @@ public class Cons implements PublicCloneable, FactorExternalizable
 		Cons iter = this;
 		while(iter != null)
 		{
-			if(iter.car == this)
-				buf.append("<circular reference>");
-			else
-				buf.append(FactorReader.unparseObject(iter.car));
+			buf.append(FactorReader.unparseObject(iter.car));
 			if(iter.cdr instanceof Cons)
 			{
 				buf.append(' ');
@@ -180,7 +182,7 @@ public class Cons implements PublicCloneable, FactorExternalizable
 				break;
 			else
 			{
-				buf.append(" , ");
+				buf.append(" | ");
 				buf.append(FactorReader.unparseObject(iter.cdr));
 				iter = null;
 			}
@@ -266,28 +268,31 @@ public class Cons implements PublicCloneable, FactorExternalizable
 	} //}}}
 
 	//{{{ deepClone() method
-	public Cons deepClone()
+	public static Cons deepClone(Cons list)
 	{
+		if(list == null)
+			return null;
+
 		Object ccar;
-		if(car instanceof PublicCloneable)
-			ccar = ((PublicCloneable)car).clone();
+		if(list.car instanceof PublicCloneable)
+			ccar = ((PublicCloneable)list.car).clone();
 		else
-			ccar = car;
-		if(cdr instanceof Cons)
+			ccar = list.car;
+		if(list.cdr instanceof Cons)
 		{
-			return new Cons(ccar,next().deepClone());
+			return new Cons(ccar,deepClone(list.next()));
 		}
-		else if(cdr == null)
+		else if(list.cdr == null)
 		{
 			return new Cons(ccar,null);
 		}
 		else
 		{
 			Object ccdr;
-			if(cdr instanceof PublicCloneable)
-				ccdr = ((PublicCloneable)cdr).clone();
+			if(list.cdr instanceof PublicCloneable)
+				ccdr = ((PublicCloneable)list.cdr).clone();
 			else
-				ccdr = cdr;
+				ccdr = list.cdr;
 			return new Cons(ccar,ccdr);
 		}
 	} //}}}

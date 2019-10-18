@@ -31,5 +31,5 @@ package factor;
 
 public interface FactorObject
 {
-	FactorNamespace getNamespace(FactorInterpreter interp) throws Exception;
+	FactorNamespace getNamespace() throws Exception;
 }

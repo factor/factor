@@ -38,7 +38,11 @@ import org.objectweb.asm.*;
 public class JVarGetStatic extends FactorPrimitiveDefinition
 {
 	//{{{ JVarGetStatic constructor
+	/**
+	 * A new definition.
+	 */
 	public JVarGetStatic(FactorWord word)
+		throws Exception
 	{
 		super(word);
 	} //}}}
@@ -47,58 +51,46 @@ public class JVarGetStatic extends FactorPrimitiveDefinition
 	public void eval(FactorInterpreter interp)
 		throws Exception
 	{
-		FactorDataStack datastack = interp.datastack;
-		Field field = FactorJava.jfield(
-			(String)datastack.pop(String.class),
-			(String)datastack.pop(String.class));
+		FactorArray datastack = interp.datastack;
+		String fieldName = FactorJava.toString(datastack.pop());
+		Class clazz = FactorJava.toClass(datastack.pop());
+		Field field = clazz.getField(fieldName);
 		datastack.push(
-			FactorJava.jvarGetStatic(field));
+			FactorJava.convertFromJavaType(
+			field.get(null)));
 	} //}}}
 
 	//{{{ getStackEffect() method
 	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler state) throws FactorStackException
+		FactorCompiler compiler) throws Exception
 	{
-		state.ensure(state.datastack,2);
-		state.pop(null);
-		state.pop(null);
-		state.push(null);
+		compileImmediate(null,compiler,recursiveCheck);
 	} //}}}
 
-	//{{{ compileCallTo() method
-	/**
-	 * Compile a call to this word. Returns maximum JVM stack use.
-	 * XXX: does not use factor type system conversions.
-	 */
-	public int compileCallTo(
+	//{{{ compileImmediate() method
+	public void compileImmediate(
 		CodeVisitor mw,
 		FactorCompiler compiler,
 		RecursiveState recursiveCheck)
 		throws Exception
 	{
-		Object _field = compiler.popLiteral();
-		Object _clazz = compiler.popLiteral();
-		if(_clazz instanceof String &&
-			_field instanceof String)
+		if(mw == null)
+			compiler.ensure(compiler.datastack,String.class);
+		String fieldName = FactorJava.toString(compiler.popLiteral());
+		if(mw == null)
+			compiler.ensure(compiler.datastack,Class.class);
+		Class clazz = FactorJava.toClass(compiler.popLiteral());
+		Field field = clazz.getField(fieldName);
+
+		if(mw != null)
 		{
-			String field = (String)_field;
-			String clazz = (String)_clazz;
-			Class cls = FactorJava.getClass(clazz);
-			clazz = clazz.replace('.','/');
-			Field fld = cls.getField(field);
-
-			FactorJava.generateToConversionPre(mw,fld.getType());
-
-			mw.visitFieldInsn(GETSTATIC,clazz,field,
-				FactorJava.javaClassToVMClass(fld.getType()));
-
-			FactorJava.generateToConversion(mw,fld.getType());
-
-			compiler.push(mw);
-
-			return 2;
+			FlowObject.generateToConversionPre(mw,field.getType());
+			mw.visitFieldInsn(GETSTATIC,
+				clazz.getName().replace('.','/'),
+				fieldName,
+				FactorJava.javaClassToVMClass(field.getType()));
 		}
-		else
-			throw new FactorCompilerException("Cannot compile jvar-static$ with non-literal parameters");
+
+		compiler.push(compiler.datastack,mw,field.getType());
 	} //}}}
 }

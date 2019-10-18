@@ -38,7 +38,11 @@ import org.objectweb.asm.*;
 public class Execute extends FactorPrimitiveDefinition
 {
 	//{{{ Execute constructor
+	/**
+	 * A new definition.
+	 */
 	public Execute(FactorWord word)
+		throws Exception
 	{
 		super(word);
 	} //}}}

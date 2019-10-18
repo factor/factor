@@ -36,7 +36,11 @@ import java.util.Set;
 public class Unstack extends FactorPrimitiveDefinition
 {
 	//{{{ Unstack constructor
+	/**
+	 * A new definition.
+	 */
 	public Unstack(FactorWord word)
+		throws Exception
 	{
 		super(word);
 	} //}}}
@@ -46,7 +50,7 @@ public class Unstack extends FactorPrimitiveDefinition
 		throws Exception
 	{
 		Cons unstack = interp.datastack.toList();
-		interp.datastack = (FactorDataStack)interp.callstack.pop();
+		interp.datastack = (FactorArray)interp.callstack.pop();
 		interp.datastack.push(unstack);
 	} //}}}
 }

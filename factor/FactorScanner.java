@@ -29,8 +29,8 @@
 
 package factor;
 
+import factor.math.NumberParser;
 import java.io.*;
-import java.math.BigInteger;
 
 /**
  * Splits an input stream into words.
@@ -42,136 +42,162 @@ public class FactorScanner
 	 */
 	public static final Object EOF = new Object();
 
-	private FactorInterpreter interp;
 	private String filename;
-	private PushbackReader in;
-	private StringBuffer buf;
+	private BufferedReader in;
+
+	/**
+	 * Line number being parsed, for error reporting.
+	 */
+	private int lineNo = 0;
+
+	/**
+	 * The line currently being parsed.
+	 */
+	private String line;
+
+	/**
+	 * Position within line being parsed.
+	 */
+	private int position = 0;
+
 	private ReadTable readtable;
-	private int lineNo = 1;
-	private boolean lastCR;
+
+	/**
+	 * The current word.
+	 */
+	private StringBuffer buf;
 
 	//{{{ FactorScanner constructor
-	public FactorScanner(FactorInterpreter interp, String filename,
-		Reader in, ReadTable readtable)
+	public FactorScanner(String filename, BufferedReader in)
 	{
-		this.interp = interp;
 		this.filename = filename;
-		this.in = new PushbackReader(in,1);
-		this.readtable = readtable;
+		this.in = in;
 		buf = new StringBuffer();
+	} //}}}
+
+	//{{{ getReadTable() method
+	public ReadTable getReadTable()
+	{
+		return readtable;
+	} //}}}
+
+	//{{{ setReadTable() method
+	public void setReadTable(ReadTable readtable)
+	{
+		this.readtable = readtable;
+	} //}}}
+
+	//{{{ nextLine() method
+	private void nextLine() throws IOException
+	{
+		lineNo++;
+		line = in.readLine();
+		position = 0;
+		if(line != null && line.length() == 0)
+			nextLine();
 	} //}}}
 
 	//{{{ next() method
 	/**
 	 * @param readNumbers If true, will return either a Number or a
-	 * FactorWord. Otherwise, only FactorWords are returned.
+	 * String. Otherwise, only Strings are returned.
 	 * @param start If true, dispatches will be handled by their parsing
 	 * word, otherwise dispatches are ignored.
+	 * @param base The number base -- not that if this is not equal to
+	 * 10, floats cannot be read
 	 */
-	public Object next(boolean readNumbers, boolean start)
+	public Object next(
+		boolean readNumbers,
+		boolean start,
+		int base)
 		throws IOException, FactorParseException
 	{
+		if(line == null || position == line.length())
+			nextLine();
+		if(line == null)
+			return EOF;
+
 		for(;;)
 		{
-			int ch = in.read();
-			if(ch == -1)
+			if(position == line.length())
 			{
-				if(buf.length() == 0)
+				// EOL
+				if(buf.length() != 0)
+					return word(readNumbers,base);
+				nextLine();
+				if(line == null)
 					return EOF;
-				else
-					return word(readNumbers);
 			}
-			else if(ch == '\n')
-			{
-				if(!lastCR)
-					lineNo++;
-				if(buf.length() != 0)
-					return word(readNumbers);
-				else
-					continue;
-			}
-			else if(ch == '\r')
-			{
-				lineNo++;
-				lastCR = true;
-				if(buf.length() != 0)
-					return word(readNumbers);
-				else
-					continue;
-			}
-			else
-				lastCR = false;
 
-			int type = readtable.getCharacterType((char)ch);
+			char ch = line.charAt(position++);
+
+			int type = readtable.getCharacterType(ch);
 
 			switch(type)
 			{
 			case ReadTable.INVALID:
-				error("Invalid character in input: " + (int)ch);
+				error("Invalid character in input: " + ch);
 				break;
 			case ReadTable.WHITESPACE:
 				if(buf.length() != 0)
-					return word(readNumbers);
+					return word(readNumbers,base);
 				break;
 			case ReadTable.DISPATCH:
 				// note that s" is read as the word s", no
 				// dispatch on "
 				if(buf.length() == 0 && start)
 				{
-					buf.append((char)ch);
-					return word(readNumbers);
+					buf.append(ch);
+					return word(readNumbers,base);
 				}
 			case ReadTable.CONSTITUENT:
-				buf.append((char)ch);
+				buf.append(ch);
 				break;
 			case ReadTable.SINGLE_ESCAPE:
-				buf.append(escape(readNonEOF()));
+				buf.append(escape());
 				break;
 			}
 		}
 	} //}}}
 
+	//{{{ nextNonEOF() method
+	public Object nextNonEOF(
+		boolean readNumbers,
+		boolean start,
+		int base)
+		throws IOException, FactorParseException
+	{
+		Object next = next(readNumbers,start,base);
+		if(next == EOF)
+			error("Unexpected EOF");
+		return next;
+	} //}}}
+
 	//{{{ readUntil() method
-	public String readUntil(char start, char end,
-		boolean lineBreaksAllowed,
-		boolean escapesAllowed)
+	public String readUntil(char start, char end, boolean escapesAllowed)
 		throws IOException, FactorParseException
 	{
 		buf.setLength(0);
 
 		for(;;)
 		{
-			int ch = in.read();
-			if(ch == -1)
-				error("Expected " + end + " before EOF");
-			else if((ch == '\r' || ch == '\n')
-				&& !lineBreaksAllowed)
-			{
+			if(position == line.length())
 				error("Expected " + end + " before EOL");
-			}
-			else if(ch == '\n')
-			{
-				if(!lastCR)
-					buf.append('\n');
-				continue;
-			}
-			else if(ch == '\r')
-			{
-				buf.append('\n');
-				lastCR = true;
-				continue;
-			}
-			else if(ch == end)
+
+			if(line == null)
+				error("Expected " + end + " before EOF");
+
+			char ch = line.charAt(position++);
+
+			if(ch == end)
 				break;
-			else
-				lastCR = false;
 
-			int type = readtable.getCharacterType((char)ch);
+			int type = readtable.getCharacterType(ch);
 
-			if(type == ReadTable.SINGLE_ESCAPE)
-				buf.append(escape(readNonEOF()));
+			if(escapesAllowed && type == ReadTable.SINGLE_ESCAPE)
+				buf.append(escape());
 			else
-				buf.append((char)ch);
+				buf.append(ch);
 		}
 
 		String returnValue = buf.toString();
@@ -184,26 +210,8 @@ public class FactorScanner
 	{
 		buf.setLength(0);
 
-		for(;;)
-		{
-			int ch = in.read();
-			if(ch == -1)
-				break;
-			else if(ch == '\n')
-			{
-				if(!lastCR)
-					lineNo++;
-				break;
-			}
-			else if(ch == '\r')
-			{
-				lineNo++;
-				lastCR = true;
-				break;
-			}
-			else
-				buf.append((char)ch);
-		}
+		while(position < line.length())
+			buf.append(line.charAt(position++));
 
 		String returnValue = buf.toString();
 		buf.setLength(0);
@@ -213,55 +221,46 @@ public class FactorScanner
 	//{{{ readNonEOF() method
 	public char readNonEOF() throws FactorParseException, IOException
 	{
-		int next = in.read();
-		if(next == -1)
-		{
+		if(position == line.length())
+			error("Unexpected EOL");
+		if(line == null)
 			error("Unexpected EOF");
-			// can't happen
-			return '\0';
-		}
-		else
-			return (char)next;
+
+		return line.charAt(position++);
 	} //}}}
 
 	//{{{ readNonEOFEscaped() method
 	public char readNonEOFEscaped() throws FactorParseException, IOException
 	{
-		int next = in.read();
-		if(next == -1)
-		{
-			error("Unexpected EOF");
-			// can't happen
-			return '\0';
-		}
-		else if(readtable.getCharacterType((char)next)
-			== ReadTable.SINGLE_ESCAPE)
-		{
-			return escape(readNonEOF());
-		}
+		char next = readNonEOF();
+		if(readtable.getCharacterType(next) == ReadTable.SINGLE_ESCAPE)
+			return escape();
 		else
-			return (char)next;
+			return next;
 	} //}}}
 
 	//{{{ atEndOfWord() method
 	public boolean atEndOfWord() throws IOException
 	{
-		int next = in.read();
-		if(next == -1)
+		if(position == line.length())
 			return true;
-		else
-		{
-			in.unread(next);
-			int type = readtable.getCharacterType((char)next);
-			return type == ReadTable.WHITESPACE;
-		}
+		if(line == null)
+			return true;
+		char next = line.charAt(position);
+		int type = readtable.getCharacterType(next);
+		return type == ReadTable.WHITESPACE;
 	} //}}}
 
 	//{{{ escape() method
-	private char escape(char ch) throws FactorParseException
+	private char escape() throws FactorParseException
 	{
+		char ch = line.charAt(position++);
+
 		switch(ch)
 		{
+		case 'e':
+			// ASCII ESC
+			return (char)27;
 		case 'n':
 			return '\n';
 		case 'r':
@@ -272,9 +271,27 @@ public class FactorScanner
 			return '\\';
 		case '"':
 			return '"';
+		case 's':
 		case ' ':
 			return ' ';
 		case '0':
+			return '\0';
+		case 'u':
+			if(line.length() - position < 4)
+				error("Unexpected EOL");
+
+			String hex = line.substring(position,position + 4);
+
+			position += 4;
+
+			try
+			{
+				return (char)Integer.parseInt(hex,16);
+			}
+			catch(NumberFormatException e)
+			{
+				error("Invalid \\u escape: " + hex);
+			}
 			return '\0';
 		default:
 			error("Unknown escape: " + ch);
@@ -284,98 +301,24 @@ public class FactorScanner
 	} //}}}
 
 	//{{{ word() method
-	private Object word(boolean readNumbers)
+	private Object word(boolean readNumbers, int base)
 	{
 		String name = buf.toString();
 		buf.setLength(0);
 		if(readNumbers)
 		{
-			Number n = parseNumber(name);
+			Number n = NumberParser.parseNumber(name, base);
 			if(n != null)
 				return n;
 		}
 
-		return interp.intern(name);
-	} //}}}
-
-	//{{{ parseNumber() method
-	/**
-	 * If the given string is a number, convert it to a Number instance,
-	 * otherwise return null.
-	 */
-	public static Number parseNumber(String word)
-	{
-		if(word == null)
-			return null;
-
-		boolean number = true;
-		boolean floating = false;
-		boolean exponent = false;
-
-		for(int i = 0; i < word.length(); i++)
-		{
-			char ch = word.charAt(i);
-			if(ch == '-')
-			{
-				if((i != 0 && Character.toLowerCase(
-					word.charAt(i - 1))
-					!= 'e') || word.length() == 1)
-				{
-					number = false;
-					break;
-				}
-			}
-			else if((ch == 'e' || ch == 'E')
-				&& word.length() != 1)
-			{
-				if(exponent)
-				{
-					number = false;
-					break;
-				}
-				else
-					exponent = true;
-			}
-			else if(ch == '.' && word.length() != 1)
-			{
-				if(floating)
-				{
-					number = false;
-					break;
-				}
-				else
-					floating = true;
-			}
-			else if(!Character.isDigit(ch))
-			{
-				number = false;
-				break;
-			}
-		}
-
-		if(number)
-		{
-			if(floating || exponent)
-				return new Float(word);
-			else
-			{
-				try
-				{
-					return new Integer(word);
-				}
-				catch(NumberFormatException e)
-				{
-					return new BigInteger(word);
-				}
-			}
-		}
-
-		return null;
+		return name;
 	} //}}}
 
 	//{{{ error() method
 	public void error(String msg) throws FactorParseException
 	{
-		throw new FactorParseException(filename,lineNo,msg);
+		throw new FactorParseException(
+			filename,lineNo,line,position - 1,msg);
 	} //}}}
 }

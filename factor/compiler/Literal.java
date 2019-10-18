@@ -34,36 +34,47 @@ import java.lang.reflect.*;
 import java.util.*;
 import org.objectweb.asm.*;
 
-public class Literal extends FlowObject implements Constants
+public class Literal extends FlowObject
 {
 	private Object literal;
 
+	//{{{ Literal constructor
 	Literal(Object literal, FactorCompiler compiler,
-		RecursiveState recursiveCheck)
+		RecursiveForm word)
 	{
-		super(compiler,recursiveCheck);
+		super(compiler,word);
 		this.literal = literal;
-	}
+		expectedType = literal.getClass();
+	} //}}}
 
-	public void generate(CodeVisitor mw)
+	//{{{ pop() method
+	public void pop(CodeVisitor mw)
 	{
 		mw.visitFieldInsn(GETSTATIC,compiler.className,
 			compiler.literal(literal),
 			"Ljava/lang/Object;");
-	}
+	} //}}}
 
+	//{{{ getLiteral() method
 	Object getLiteral()
 	{
 		return literal;
-	}
+	} //}}}
 
+	//{{{ compileCallTo() method
 	/**
 	 * Write code for evaluating this. Returns maximum JVM stack
 	 * usage.
 	 */
-	public int compileCallTo(CodeVisitor mw, RecursiveState recursiveCheck)
+	public void compileCallTo(CodeVisitor mw, RecursiveState recursiveCheck)
 		throws Exception
 	{
 		throw new FactorCompilerException("Not a quotation: " + literal);
-	}
+	} //}}}
+
+	//{{{ clone() method
+	public Object clone()
+	{
+		return new Literal(literal,compiler,word);
+	} //}}}
 }

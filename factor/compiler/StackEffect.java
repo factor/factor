@@ -35,9 +35,13 @@ import java.util.*;
 public class StackEffect implements PublicCloneable, FactorExternalizable
 {
 	public int inD;
+	public Class[] inDtypes;
 	public int outD;
+	public Class[] outDtypes;
 	public int inR;
+	public Class[] inRtypes;
 	public int outR;
+	public Class[] outRtypes;
 
 	//{{{ StackEffect constructor
 	public StackEffect() {}
@@ -50,6 +54,22 @@ public class StackEffect implements PublicCloneable, FactorExternalizable
 		this.outD = outD;
 		this.inR = inR;
 		this.outR = outR;
+	} //}}}
+
+	//{{{ StackEffect constructor
+	public StackEffect(int inD, Class[] inDtypes,
+		int outD, Class[] outDtypes,
+		int inR, Class[] inRtypes,
+		int outR, Class[] outRtypes)
+	{
+		this.inD = inD;
+		this.inDtypes = inDtypes;
+		this.outD = outD;
+		this.outDtypes = outDtypes;
+		this.inR = inR;
+		this.inRtypes = inRtypes;
+		this.outR = outR;
+		this.outRtypes = outRtypes;
 	} //}}}
 
 	//{{{ compose() method
@@ -75,6 +95,10 @@ public class StackEffect implements PublicCloneable, FactorExternalizable
 	public static StackEffect decompose(StackEffect first,
 		StackEffect second)
 	{
+		if(first == null)
+			throw new NullPointerException("first == null");
+		if(second == null)
+			throw new NullPointerException("second == null");
 		if(second.inD < first.inD || second.inR < first.inR)
 			throw new IllegalArgumentException();
 
@@ -114,26 +138,46 @@ public class StackEffect implements PublicCloneable, FactorExternalizable
 			&& effect.outR == outR;
 	} //}}}
 
+	//{{{ hashCode() method
+	public int hashCode()
+	{
+		return inD + inR + outD + outR;
+	} //}}}
+
+	//{{{ typespec() method
+	private String typespec(int index, Class[] types)
+	{
+		if(types != null)
+			return types[index].getName();
+		else
+			return "X";
+	} //}}}
+
 	//{{{ toString() method
 	public String toString()
 	{
 		StringBuffer buf = new StringBuffer("( ");
 		for(int i = 0; i < inD; i++)
 		{
-			buf.append("X ");
+			buf.append(typespec(i,inDtypes));
+			buf.append(' ');
 		}
 		for(int i = 0; i < inR; i++)
 		{
-			buf.append("r:X ");
+			buf.append("r:");
+			buf.append(typespec(i,inRtypes));
+			buf.append(' ');
 		}
 		buf.append("--");
 		for(int i = 0; i < outD; i++)
 		{
-			buf.append(" X");
+			buf.append(' ');
+			buf.append(typespec(i,outDtypes));
 		}
 		for(int i = 0; i < outR; i++)
 		{
-			buf.append(" r:X");
+			buf.append(" r:");
+			buf.append(typespec(i,outRtypes));
 		}
 		buf.append(" )");
 		return buf.toString();
@@ -142,6 +186,9 @@ public class StackEffect implements PublicCloneable, FactorExternalizable
 	//{{{ clone() method
 	public Object clone()
 	{
-		return new StackEffect(inD,outD,inR,outR);
+		return new StackEffect(inD,inDtypes,
+			outD,outDtypes,
+			inR,inRtypes,
+			outR,outRtypes);
 	} //}}}
 }

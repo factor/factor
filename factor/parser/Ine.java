@@ -33,30 +33,28 @@ import factor.*;
 
 public class Ine extends FactorParsingDefinition
 {
-	private FactorWord start;
+	public FactorWord start;
 
+	//{{{ Ine constructor
+	/**
+	 * A new definition.
+	 */
 	public Ine(FactorWord start, FactorWord end)
+		throws Exception
 	{
 		super(end);
 		this.start = start;
-	}
+	} //}}}
 
 	public void eval(FactorInterpreter interp, FactorReader reader)
-		throws FactorParseException
+		throws Exception
 	{
-		Cons definition = reader.popState(start,word);
-		if(definition == null)
-			reader.error("Missing word name");
-		if(!(definition.car instanceof FactorWord))
-		{
-			reader.error("Not a word name: "
-				+ definition.car);
-		}
-
-		FactorWord w = (FactorWord)definition.car;
+		FactorReader.ParseState state = reader.popState(start,word);
+		FactorWord w = (FactorWord)state.arg;
+		reader.append(w.vocabulary);
 		reader.append(w.name);
 		reader.append(new FactorCompoundDefinition(
-			w,definition.next()));
-		reader.append(interp.intern("define"));
+			w,state.first,interp));
+		reader.append(reader.intern("define",false));
 	}
 }

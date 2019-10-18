@@ -36,7 +36,11 @@ import java.util.Set;
 public class Restack extends FactorPrimitiveDefinition
 {
 	//{{{ Restack constructor
+	/**
+	 * A new definition.
+	 */
 	public Restack(FactorWord word)
+		throws Exception
 	{
 		super(word);
 	} //}}}
@@ -45,9 +49,9 @@ public class Restack extends FactorPrimitiveDefinition
 	public void eval(FactorInterpreter interp)
 		throws Exception
 	{
-		FactorDataStack datastack = interp.datastack;
+		FactorArray datastack = interp.datastack;
 		Cons list = (Cons)datastack.pop(Cons.class);
 		interp.callstack.push(datastack);
-		interp.datastack = new FactorDataStack(list);
+		interp.datastack = new FactorArray(list);
 	} //}}}
 }

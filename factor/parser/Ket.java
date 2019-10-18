@@ -33,17 +33,22 @@ import factor.*;
 
 public class Ket extends FactorParsingDefinition
 {
-	private FactorWord start;
+	public FactorWord start;
 
+	//{{{ Ket constructor
+	/**
+	 * A new definition.
+	 */
 	public Ket(FactorWord start, FactorWord end)
+		throws Exception
 	{
 		super(end);
 		this.start = start;
-	}
+	} //}}}
 
 	public void eval(FactorInterpreter interp, FactorReader reader)
 		throws FactorParseException
 	{
-		reader.append(reader.popState(start,word));
+		reader.append(reader.popState(start,word).first);
 	}
 }

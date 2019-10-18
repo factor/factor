@@ -39,18 +39,17 @@ import java.util.Map;
 
 /**
  * A namespace is a list of name/value bindings. A namespace can optionally
- * have a parent, and a bound object, in which case every public field of the
+ * have a bound object, in which case every public field of the
  * object will be accessible through the namespace. Additionally, static fields
  * from arbitrary classes can be imported into the namespace.
  */
 public class FactorNamespace implements PublicCloneable, FactorObject
 {
-	private static FactorWord NULL = new FactorWord("( represent-f )");
-	private static FactorWord CHECK_PARENT = new FactorWord("( check-parent )");
+	private static FactorWord NULL = new FactorWord(null,"#<represent-f>");
+	private static FactorWord CHECK_PARENT = new FactorWord(null,"#<check-parent>");
 
 	public Object obj;
-	private FactorNamespace parent;
-	private Map words;
+	protected Map words;
 	private Class constraint;
 
 	//{{{ createConstrainedNamespace() method
@@ -60,32 +59,30 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 	public static FactorNamespace createConstrainedNamespace(
 		Class constraint) throws Exception
 	{
-		FactorNamespace namespace = new FactorNamespace(null,null,null);
+		FactorNamespace namespace = new FactorNamespace(null,null);
 		namespace.constraint = constraint;
 		return namespace;
 	} //}}}
 
 	//{{{ FactorNamespace constructor
-	public FactorNamespace(FactorNamespace parent) throws Exception
+	public FactorNamespace()
 	{
-		this(parent,null,null);
+		this.words = new TreeMap();
 	} //}}}
 
 	//{{{ FactorNamespace constructor
-	public FactorNamespace(FactorNamespace parent, Object obj) throws Exception
+	public FactorNamespace(Object obj) throws Exception
 	{
-		this(parent,null,obj);
+		this(null,obj);
 	} //}}}
 
 	//{{{ FactorNamespace constructor
 	/**
 	 * Cloning constructor.
 	 */
-	public FactorNamespace(FactorNamespace parent, Map words, Object obj)
+	public FactorNamespace(Map words, Object obj)
 		throws Exception
 	{
-		this.parent = parent;
-
 		this.words = new TreeMap();
 
 		// used by clone()
@@ -106,15 +103,9 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 	} //}}}
 
 	//{{{ getNamespace() method
-	public FactorNamespace getNamespace(FactorInterpreter interp)
+	public FactorNamespace getNamespace()
 	{
 		return this;
-	} //}}}
-
-	//{{{ getParent() method
-	public FactorNamespace getParent()
-	{
-		return parent;
 	} //}}}
 
 	//{{{ getThis() method
@@ -130,7 +121,7 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 	/**
 	 * Defines a variable bound to a Java field.
 	 */
-	public void importVars(String clazz, Cons vars)
+	public synchronized void importVars(String clazz, Cons vars)
 		throws Exception
 	{
 		Class clas = Class.forName(clazz);
@@ -148,8 +139,33 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 		}
 	} //}}}
 
+	//{{{ isDefined() method
+	public synchronized boolean isDefined(String name) throws Exception
+	{
+		Object o = words.get(name);
+		if(o instanceof VarBinding)
+			return true;
+		else if(o == NULL)
+			return true;
+		else if(o == CHECK_PARENT)
+			return false;
+		else if(o == null)
+		{
+			// lazily instantiate object field binding
+			if(obj == null)
+				return false;
+			else
+			{
+				lazyFieldInit(name);
+				return isDefined(name);
+			}
+		}
+		else
+			return true;
+	} //}}}
+
 	//{{{ getVariable() method
-	public Object getVariable(String name) throws Exception
+	public synchronized Object getVariable(String name) throws Exception
 	{
 		Object o = words.get(name);
 		if(o instanceof VarBinding)
@@ -159,32 +175,48 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 		else if(o == CHECK_PARENT)
 		{
 			// we know this is not a field binding
-			return parent == null ? null
-				: parent.getVariable(name);
+			return null;
 		}
 		else if(o == null)
 		{
 			// lazily instantiate object field binding
-			lazyFieldInit(name);
-			return getVariable(name);
+			if(obj == null)
+				return null;
+			else
+			{
+				lazyFieldInit(name);
+				return getVariable(name);
+			}
 		}
 		else
 			return o;
 	} //}}}
 
 	//{{{ setVariable() method
-	public void setVariable(String name, Object value)
+	public synchronized void setVariable(String name, Object value)
 		throws Exception
 	{
+		if(name == null)
+			throw new NullPointerException();
+
 		Object o = words.get(name);
 		if(o instanceof VarBinding && !(value instanceof VarBinding))
 			((VarBinding)o).set(value);
 		else if(o == null)
 		{
 			// lazily instantiate object field binding
-			lazyFieldInit(name);
-			setVariable(name,value);
-			return;
+			if(obj == null)
+			{
+				if(value == null)
+					words.put(name,NULL);
+				else
+					words.put(name,value);
+			}
+			else
+			{
+				lazyFieldInit(name);
+				setVariable(name,value);
+			}
 		}
 		else if(value == null)
 			words.put(name,NULL);
@@ -206,22 +238,19 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 	} //}}}
 
 	//{{{ lazyFieldInit() method
-	private void lazyFieldInit(String name)
+	protected void lazyFieldInit(String name)
 	{
-		if(obj != null)
+		try
 		{
-			try
+			Field f = obj.getClass().getField(name);
+			if(!Modifier.isStatic(f.getModifiers()))
 			{
-				Field f = obj.getClass().getField(name);
-				if(!Modifier.isStatic(f.getModifiers()))
-				{
-					words.put(name,new VarBinding(f,obj));
-					return;
-				}
+				words.put(name,new VarBinding(f,obj));
+				return;
 			}
-			catch(Exception e)
-			{
-			}
+		}
+		catch(Exception e)
+		{
 		}
 
 		// not a field, don't check again
@@ -251,39 +280,51 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 		}
 	} //}}}
 
-	//{{{ toVarValueList() method
+	//{{{ toVarList() method
 	/**
-	 * Returns a list of pairs of variable names, and their values.
+	 * Returns a list of variable names.
 	 */
-	public Cons toVarValueList()
+	public synchronized Cons toVarList()
 	{
 		initAllFields();
 
 		Cons first = null;
 		Cons last = null;
-		Iterator iter = words.entrySet().iterator();
+		Iterator iter = words.keySet().iterator();
 		while(iter.hasNext())
 		{
-			Map.Entry entry = (Map.Entry)iter.next();
-			Object value = entry.getValue();
-			if(value == CHECK_PARENT)
-				continue;
-			else if(value == NULL)
-				value = null;
-
-			if(value instanceof VarBinding)
+			String key = (String)iter.next();
+			if(words.get(key) != CHECK_PARENT)
 			{
-				try
+				Cons cons = new Cons(key,null);
+				if(first == null)
+					first = last = cons;
+				else
 				{
-					value = ((VarBinding)value).get();
-				}
-				catch(Exception e)
-				{
+					last.cdr = cons;
+					last = cons;
 				}
 			}
+		}
 
-			Cons cons = new Cons(new Cons(entry.getKey(),value)
-				,null);
+		return first;
+	} //}}}
+
+	//{{{ toValueList() method
+	/**
+	 * Returns a list of variable values.
+	 */
+	public synchronized Cons toValueList() throws Exception
+	{
+		initAllFields();
+
+		Cons first = null;
+		Cons last = null;
+		Cons vars = toVarList();
+		while(vars != null)
+		{
+			String key = (String)vars.car;
+			Cons cons = new Cons(getVariable(key),null);
 			if(first == null)
 				first = last = cons;
 			else
@@ -291,6 +332,37 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 				last.cdr = cons;
 				last = cons;
 			}
+			vars = vars.next();
+		}
+
+		return first;
+	} //}}}
+
+	//{{{ toVarValueList() method
+	/**
+	 * Returns a list of pairs of variable names, and their values.
+	 */
+	public synchronized Cons toVarValueList() throws Exception
+	{
+		initAllFields();
+
+		Cons first = null;
+		Cons last = null;
+		Cons vars = toVarList();
+		while(vars != null)
+		{
+			String key = (String)vars.car;
+
+			Object value = getVariable(key);
+			Cons cons = new Cons(new Cons(key,value),null);
+			if(first == null)
+				first = last = cons;
+			else
+			{
+				last.cdr = cons;
+				last = cons;
+			}
+			vars = vars.next();
 		}
 
 		return first;
@@ -300,38 +372,43 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 	/**
 	 * This is messy.
 	 */
-	static class VarBinding
+	public static class VarBinding
 	{
 		private Field field;
 		private Object instance;
 
-		VarBinding(Field field, Object instance)
+		public VarBinding(Field field, Object instance)
 			throws FactorRuntimeException
 		{
 			this.field = field;
 			this.instance = instance;
 		}
 
-		Object get() throws Exception
+		public Object get() throws Exception
 		{
-			return FactorJava.jvarGet(field,instance);
+			return FactorJava.convertFromJavaType(
+				field.get(instance));
 		}
 
-		void set(Object value) throws Exception
+		public void set(Object value) throws Exception
 		{
-			FactorJava.jvarSet(field,instance,value);
+			field.set(instance,FactorJava.convertToJavaType(
+				value,field.getType()));
 		}
 	} //}}}
 
 	//{{{ toString() method
 	public String toString()
 	{
+		initAllFields();
+
+		String str = getClass().getName() + ", " + words.size()
+			+ " items";
+
 		if(obj == null)
-		{
-			return "Namespace #" + Integer.toString(hashCode(),16);
-		}
+			return str;
 		else
-			return "Namespace: " + obj + " #" + hashCode();
+			return str + ", bound: " + obj;
 	} //}}}
 
 	//{{{ clone() method
@@ -342,7 +419,7 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 
 		try
 		{
-			return new FactorNamespace(parent,words,rebind);
+			return new FactorNamespace(words,rebind);
 		}
 		catch(Exception e)
 		{
@@ -358,7 +435,7 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 
 		try
 		{
-			return new FactorNamespace(parent,new TreeMap(words),null);
+			return new FactorNamespace(new TreeMap(words),null);
 		}
 		catch(Exception e)
 		{

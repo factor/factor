@@ -62,6 +62,11 @@ public class RecursiveForm implements PublicCloneable
 	public String className;
 
 	/**
+	 * Class loader containing this definition.
+	 */
+	public FactorClassLoader loader;
+
+	/**
 	 * Name of method to call to recurse.
 	 */
 	public String method;
@@ -76,12 +81,24 @@ public class RecursiveForm implements PublicCloneable
 	 */
 	public Label label = new Label();
 
+	/**
+	 * See RecursiveState.lastCallable().
+	 */
+	public boolean callable = true;
+
+	/**
+	 * The containing recursive form, lexically.
+	 */
+	public RecursiveForm next;
+
 	public RecursiveForm(FactorWord word, StackEffect effect,
-		String className, String method)
+		String className, FactorClassLoader loader,
+		String method)
 	{
 		this.word = word;
 		this.effect = effect;
 		this.className = className;
+		this.loader = loader;
 		this.method = method;
 	}
 
@@ -92,13 +109,17 @@ public class RecursiveForm implements PublicCloneable
 		this.baseCase = form.baseCase;
 		this.effect = form.effect;
 		this.className = form.className;
+		this.loader = form.loader;
 		this.method = form.method;
 	}
 
 	public String toString()
 	{
-		return word.toString() + "-" + baseCase + "-" + effect + "-"
-			+ active + "-" + className + "." + method;
+		return word.toString() + ",base=" + baseCase
+			+ ",effect=" + effect
+			+ (active?",active":"")
+			+ (tail?",tail":"")
+			+ "; " + className + "." + method + "()";
 	}
 
 	public Object clone()

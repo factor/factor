@@ -38,6 +38,9 @@ import org.objectweb.asm.*;
 public class Call extends FactorPrimitiveDefinition
 {
 	//{{{ Call constructor
+	/**
+	 * A new definition.
+	 */
 	public Call(FactorWord word)
 	{
 		super(word);
@@ -47,30 +50,29 @@ public class Call extends FactorPrimitiveDefinition
 	public void eval(FactorInterpreter interp)
 		throws Exception
 	{
-		interp.call(word,(Cons)interp.datastack.pop(
-			Cons.class));
+		interp.call((Cons)interp.datastack.pop());
 	} //}}}
 
 	//{{{ getStackEffect() method
 	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler state) throws Exception
+		FactorCompiler compiler) throws Exception
 	{
-		state.ensure(state.datastack,1);
-		FlowObject quot = (FlowObject)state.datastack.pop();
-		quot.getStackEffect(recursiveCheck);
+		compileImmediate(null,compiler,recursiveCheck);
 	} //}}}
 
 	//{{{ compileImmediate() method
 	/**
 	 * Compile a call to this word. Returns maximum JVM stack use.
 	 */
-	public int compileImmediate(
+	public void compileImmediate(
 		CodeVisitor mw,
 		FactorCompiler compiler,
 		RecursiveState recursiveCheck)
 		throws Exception
 	{
+		if(mw == null)
+			compiler.ensure(compiler.datastack,Cons.class);
 		FlowObject quot = (FlowObject)compiler.datastack.pop();
-		return quot.compileCallTo(mw,recursiveCheck);
+		quot.compileCallTo(mw,recursiveCheck);
 	} //}}}
 }

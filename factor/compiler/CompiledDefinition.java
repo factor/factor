@@ -51,13 +51,6 @@ public abstract class CompiledDefinition
 		FactorWord word, Class compiledWordClass)
 		throws Exception
 	{
-		Method setFields = compiledWordClass.getMethod(
-			"setFields",
-			new Class[] {
-			FactorInterpreter.class
-			});
-		setFields.invoke(null,new Object[] { interp });
-
 		Constructor constructor = compiledWordClass
 			.getConstructor(
 			new Class[] {

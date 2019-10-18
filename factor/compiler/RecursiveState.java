@@ -49,17 +49,26 @@ public class RecursiveState implements PublicCloneable
 
 	//{{{ add() method
 	public void add(FactorWord word, StackEffect effect,
-		String className, String method)
+		String className, FactorClassLoader loader, String method)
 	{
-		//System.err.println(this + ": adding " + word + "," + effect);
+		add(word,effect,className,loader,method,
+			words == null ? null : last());
+	} //}}}
+
+	//{{{ add() method
+	public void add(FactorWord word, StackEffect effect,
+		String className, FactorClassLoader loader, String method,
+		RecursiveForm next)
+	{
 		if(get(word) != null)
 		{
-			//System.err.println("throwing exception");
 			throw new RuntimeException("Calling add() twice on " + word);
 		}
-		words = new Cons(new RecursiveForm(
-			word,effect,className,method),
-			words);
+
+		RecursiveForm newForm = new RecursiveForm(
+			word,effect,className,loader,method);
+		words = new Cons(newForm,words);
+		newForm.next = next;
 	} //}}}
 
 	//{{{ remove() method
@@ -67,21 +76,22 @@ public class RecursiveState implements PublicCloneable
 	{
 		//System.err.println(this + ": removing " + word);
 		if(last().word != word)
-			throw new RuntimeException("Unbalanced add()/remove()");
+			throw new RuntimeException("Expected " + word + ", found " + last().word);
 		words = words.next();
 	} //}}}
 
 	//{{{ get() method
 	public RecursiveForm get(FactorWord word)
 	{
-		Cons iter = words;
-		while(iter != null)
+		if(words != null)
 		{
-			RecursiveForm form = (RecursiveForm)iter.car;
-			//System.err.println(form.word + "==?" + word);
-			if(form.word == word)
-				return form;
-			iter = iter.next();
+			RecursiveForm iter = last();
+			while(iter != null)
+			{
+				if(iter.word == word)
+					return iter;
+				iter = iter.next;
+			}
 		}
 
 		return null;
@@ -91,6 +101,37 @@ public class RecursiveState implements PublicCloneable
 	public RecursiveForm last()
 	{
 		return (RecursiveForm)words.car;
+	} //}}}
+
+	//{{{ lastCallable() method
+	public RecursiveForm lastCallable()
+	{
+		RecursiveForm word = (RecursiveForm)words.car;
+		while(word != null)
+		{
+			if(word.callable)
+				return word;
+			word = word.next;
+		}
+		return null;
+	} //}}}
+
+	//{{{ allTails() method
+	/**
+	 * Returns if all forms from the given form upward are at their tail,
+	 * so that we can do a direct GOTO to the given form to recurse on it.
+	 */
+	public boolean allTails(RecursiveForm form)
+	{
+		Cons iter = words;
+		for(;;)
+		{
+			if(!((RecursiveForm)iter.car).tail)
+				return false;
+			if(iter.car == form)
+				return true;
+			iter = iter.next();
+		}
 	} //}}}
 
 	//{{{ toString() method

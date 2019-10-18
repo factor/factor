@@ -33,29 +33,34 @@ import factor.*;
 import java.lang.reflect.*;
 import java.util.*;
 import org.objectweb.asm.*;
-import org.objectweb.asm.util.*;
 
 public class FactorCompiler implements Constants
 {
-	private FactorInterpreter interp;
+	public final FactorInterpreter interp;
 
 	public final FactorWord word;
 	public final String className;
+	public final FactorClassLoader loader;
 	public String method;
 
 	private int base;
-	private int max;
 	private int allotD;
 	private int allotR;
 
-	public FactorDataStack datastack;
-	public FactorCallStack callstack;
+	public FactorArray datastack;
+	public FactorArray callstack;
 
 	private int literalCount;
 
 	private Map literals;
 
 	public StackEffect effect;
+
+	/**
+	 * getStackEffect() turns these into arrays and places them in the
+	 * returned object.
+	 */
+	public Cons inDtypes, inRtypes;
 
 	private Cons aux;
 	private int auxCount;
@@ -64,9 +69,9 @@ public class FactorCompiler implements Constants
 	/**
 	 * For balancing.
 	 */
-	public FactorCompiler()
+	public FactorCompiler(FactorInterpreter interp)
 	{
-		this(null,null,null);
+		this(interp,null,null,null);
 		init(0,0,0,null);
 	} //}}}
 
@@ -75,17 +80,18 @@ public class FactorCompiler implements Constants
 	 * For compiling.
 	 */
 	public FactorCompiler(FactorInterpreter interp,
-		FactorWord word, String className)
+		FactorWord word, String className,
+		FactorClassLoader loader)
 	{
 		this.interp = interp;
-
 		this.word = word;
 		this.className = className;
+		this.loader = loader;
 
 		literals = new HashMap();
 
-		datastack = new FactorDataStack();
-		callstack = new FactorCallStack();
+		datastack = new FactorArray();
+		callstack = new FactorArray();
 	} //}}}
 
 	//{{{ getInterpreter() method
@@ -105,12 +111,20 @@ public class FactorCompiler implements Constants
 		callstack.top = 0;
 
 		for(int i = 0; i < allotD; i++)
-			datastack.push(new Result(base + i,this,null));
+		{
+			Result r = new Result(base + i,this,null,
+				Object.class,true);
+			datastack.push(r);
+			inDtypes = new Cons(r,inDtypes);
+		}
 
 		for(int i = 0; i < allotR; i++)
-			datastack.push(new Result(base + allotD + i,this,null));
-
-		max = base + allotD + allotR;
+		{
+			Result r = new Result(base + allotD + i,this,null,
+				Object.class,true);
+			callstack.push(r);
+			inRtypes = new Cons(r,inRtypes);
+		}
 
 		this.allotD = allotD;
 		this.allotR = allotR;
@@ -127,49 +141,93 @@ public class FactorCompiler implements Constants
 	} //}}}
 
 	//{{{ ensure() method
+	public void ensure(FactorArray stack, Class type)
+	{
+		if(stack.top == 0)
+		{
+			Result r = new Result(allocate(),this,null,type);
+			if(stack == datastack)
+			{
+				inDtypes = new Cons(r,inDtypes);
+				effect.inD++;
+			}
+			else if(stack == callstack)
+			{
+				inRtypes = new Cons(r,inRtypes);
+				effect.inR++;
+			}
+			stack.push(r);
+		}
+	} //}}}
+
+	//{{{ ensure() method
 	/**
 	 * Ensure stack has at least 'count' elements.
 	 * Eg, if count is 4 and stack is A B,
 	 * stack will become RESULT RESULT A B.
 	 * Used when deducing stack effects.
 	 */
-	public void ensure(FactorArrayStack stack, int count)
+	public void ensure(FactorArray stack, Class[] types)
 	{
 		int top = stack.top;
-		if(top < count)
+		if(top < types.length)
 		{
-			if(stack == datastack)
-				effect.inD += (count - top);
-			else if(stack == callstack)
-				effect.inR += (count - top);
+			Cons typespec = null;
 
-			stack.ensurePush(count - top);
+			if(stack == datastack)
+				effect.inD += (types.length - top);
+			else if(stack == callstack)
+				effect.inR += (types.length - top);
+
+			stack.ensurePush(types.length - top);
 			System.arraycopy(stack.stack,0,stack.stack,
-				count - top,top);
-			for(int i = 0; i < count - top; i++)
+				types.length - top,top);
+			for(int i = 0; i < types.length - top; i++)
 			{
 				int local = allocate();
-				stack.stack[i] = new Result(
-					local,this,null);
+				Result r = new Result(
+					local,this,null,types[i]);
+				stack.stack[i] = r;
+				typespec = new Cons(r,typespec);
 			}
-			stack.top = count;
+			stack.top = types.length;
+
+			if(stack == datastack)
+				inDtypes = Cons.nappend(inDtypes,typespec);
+			else if(stack == callstack)
+				inRtypes = Cons.nappend(inRtypes,typespec);
 		}
 	} //}}}
 
+	//{{{ ensure() method
+	/**
+	 * Ensure stack has at least 'count' elements.
+	 * Eg, if count is 4 and stack is A B,
+	 * stack will become RESULT RESULT A B.
+	 * Used when deducing stack effects.
+	 */
+	public void ensure(FactorArray stack, int count)
+	{
+		Class[] types = new Class[count];
+		for(int i = 0; i < types.length; i++)
+			types[i] = Object.class;
+		ensure(stack,types);
+	} //}}}
+
 	//{{{ consume() method
-	public void consume(FactorArrayStack stack, int count)
+	public void consume(FactorArray stack, int count)
 	{
 		ensure(stack,count);
 		stack.top -= count;
 	} //}}}
 
 	//{{{ produce() method
-	public void produce(FactorArrayStack stack, int count)
+	public void produce(FactorArray stack, int count)
 	{
 		for(int i = 0; i < count; i++)
 		{
 			int local = allocate();
-			stack.push(new Result(local,this,null));
+			stack.push(new Result(local,this,null,Object.class));
 		}
 	} //}}}
 
@@ -182,107 +240,87 @@ public class FactorCompiler implements Constants
 		produce(callstack,se.outR);
 	} //}}}
 
+	//{{{ getTypeSpec() method
+	private Class[] getTypeSpec(Cons list)
+	{
+		if(list == null)
+			return new Class[0];
+
+		int length = list.length();
+		Class[] typespec = new Class[length];
+		int i = 0;
+		while(list != null)
+		{
+			typespec[length - i - 1]
+				= ((FlowObject)list.car).getType();
+			i++;
+			list = list.next();
+		}
+
+		return typespec;
+	} //}}}
+
 	//{{{ getStackEffect() method
 	public StackEffect getStackEffect()
 	{
+		effect.inDtypes = getTypeSpec(inDtypes);
+
 		effect.outD = datastack.top;
+
+		effect.outDtypes = new Class[datastack.top];
+		for(int i = 0; i < datastack.top; i++)
+		{
+			effect.outDtypes[i] = ((FlowObject)datastack.stack[i])
+				.getType();
+		}
+
+		effect.inRtypes = getTypeSpec(inRtypes);
+
 		effect.outR = callstack.top;
+
+		effect.outRtypes = new Class[callstack.top];
+		for(int i = 0; i < callstack.top; i++)
+		{
+			effect.outRtypes[i] = ((FlowObject)callstack.stack[i])
+				.getType();
+		}
+
 		return (StackEffect)effect.clone();
 	} //}}}
 
-	//{{{ getStackEffect() method
-	public void getStackEffect(Cons definition,
-		RecursiveState recursiveCheck)
-		throws Exception
-	{
-		while(definition != null)
-		{
-			Object obj = definition.car;
-			if(obj instanceof FactorWord)
-				getStackEffectOfWord((FactorWord)obj,recursiveCheck);
-			else
-				pushLiteral(obj,recursiveCheck);
-
-			definition = definition.next();
-		}
-	} //}}}
-
-	//{{{ getStackEffectOfWord() method
-	private void getStackEffectOfWord(FactorWord word,
-		RecursiveState recursiveCheck)
-		throws Exception
-	{
-		RecursiveForm rec = recursiveCheck.get(word);
-		if(rec == null)
-		{
-			recursiveCheck.add(word,getStackEffect(),null,null);
-		}
-		else
-			rec.active = true;
-
-		word.def.getStackEffect(recursiveCheck,this);
-
-		if(rec == null)
-		{
-			recursiveCheck.remove(word);
-		}
-		else
-			rec.active = false;
-	} //}}}
-
-	//{{{ getDisassembly() method
-	protected String getDisassembly(TraceCodeVisitor mw)
-	{
-		// Save the disassembly of the eval() method
-		StringBuffer buf = new StringBuffer();
-		Iterator bytecodes = mw.getText().iterator();
-		while(bytecodes.hasNext())
-		{
-			buf.append(bytecodes.next());
-		}
-		return buf.toString();
-	} //}}}
-
 	//{{{ compileCore() method
-	public String compileCore(Cons definition, ClassWriter cw,
+	public void compileCore(Cons definition, ClassWriter cw,
 		StackEffect effect, RecursiveState recursiveCheck)
 		throws Exception
 	{
 		RecursiveForm last = recursiveCheck.last();
 		last.method = "core";
 		last.className = className;
+		last.loader = loader;
 
-		String asm = compile(definition,cw,"core",
-			effect,recursiveCheck);
-
-		return asm;
+		compileMethod(definition,cw,"core",effect,word,recursiveCheck,true);
 	} //}}}
 
-	//{{{ compile() method
-	/**
-	 * Compiles a method and returns the disassembly.
-	 */
-	public String compile(Cons definition, ClassWriter cw,
-		String methodName, StackEffect effect,
-		RecursiveState recursiveCheck)
-		throws Exception
+	//{{{ compileFieldInit() method
+	private void compileFieldInit(CodeVisitor mw, Label start)
 	{
-		String signature = effect.getCorePrototype();
+		mw.visitFieldInsn(GETSTATIC,className,"initialized","Z");
+		mw.visitJumpInsn(IFNE,start);
+		mw.visitInsn(ICONST_1);
+		mw.visitFieldInsn(PUTSTATIC,className,"initialized","Z");
+		mw.visitVarInsn(ALOAD,0);
+		mw.visitMethodInsn(INVOKESTATIC,className,"setFields",
+			"(Lfactor/FactorInterpreter;)V");
+	} //}}}
 
-		CodeVisitor _mw = cw.visitMethod(ACC_PUBLIC | ACC_STATIC,
-			methodName,signature,null,null);
-
-		TraceCodeVisitor mw = new TraceCodeVisitor(_mw);
-
-		Label start = recursiveCheck.last().label;
-
-		mw.visitLabel(start);
-
-		int maxJVMStack = compile(definition,mw,
-			recursiveCheck);
-
-		Label end = new Label();
-
+	//{{{ compileReturn() method
+	/**
+	 * Once the word finishes executing, any return values need to be
+	 * passed up.
+	 */
+	private void compileReturn(CodeVisitor mw, Label end,
+		StackEffect effect) throws Exception
+	{
 		// special case where return value is passed on
 		// JVM operand stack
 
@@ -294,10 +332,9 @@ public class FactorCompiler implements Constants
 		}
 		else if(effect.outD == 1 && effect.outR == 0)
 		{
-			pop(mw);
+			pop(datastack,mw,Object.class);
 			mw.visitLabel(end);
 			mw.visitInsn(ARETURN);
-			maxJVMStack = Math.max(maxJVMStack,1);
 		}
 		else
 		{
@@ -306,7 +343,7 @@ public class FactorCompiler implements Constants
 			mw.visitFieldInsn(GETFIELD,
 				"factor/FactorInterpreter",
 				"datastack",
-				"Lfactor/FactorDataStack;");
+				"Lfactor/FactorArray;");
 			int datastackLocal = allocate();
 			mw.visitVarInsn(ASTORE,datastackLocal);
 
@@ -314,9 +351,9 @@ public class FactorCompiler implements Constants
 			{
 				mw.visitVarInsn(ALOAD,datastackLocal);
 				((FlowObject)datastack.stack[i])
-					.generate(mw);
+					.pop(mw,Object.class);
 				mw.visitMethodInsn(INVOKEVIRTUAL,
-					"factor/FactorDataStack",
+					"factor/FactorArray",
 					"push",
 					"(Ljava/lang/Object;)V");
 			}
@@ -328,7 +365,7 @@ public class FactorCompiler implements Constants
 			mw.visitFieldInsn(GETFIELD,
 				"factor/FactorInterpreter",
 				"callstack",
-				"Lfactor/FactorCallStack;");
+				"Lfactor/FactorArray;");
 			int callstackLocal = allocate();
 			mw.visitVarInsn(ASTORE,callstackLocal);
 
@@ -336,9 +373,9 @@ public class FactorCompiler implements Constants
 			{
 				mw.visitVarInsn(ALOAD,callstackLocal);
 				((FlowObject)callstack.stack[i])
-					.generate(mw);
+					.pop(mw,Object.class);
 				mw.visitMethodInsn(INVOKEVIRTUAL,
-					"factor/FactorCallStack",
+					"factor/FactorArray",
 					"push",
 					"(Ljava/lang/Object;)V");
 			}
@@ -347,111 +384,161 @@ public class FactorCompiler implements Constants
 
 			mw.visitLabel(end);
 			mw.visitInsn(RETURN);
-
-			maxJVMStack = Math.max(2,maxJVMStack);
 		}
+	} //}}}
 
-		// Now compile exception handler.
+	//{{{ compileMethod() method
+	/**
+	 * Compiles a method.
+	 */
+	public void compileMethod(Cons definition, ClassWriter cw,
+		String methodName, StackEffect effect, FactorWord word,
+		RecursiveState recursiveCheck, boolean fieldInit)
+		throws Exception
+	{
+		String signature = effect.getCorePrototype();
 
-		Label target = new Label();
-		mw.visitLabel(target);
+		CodeVisitor mw = cw.visitMethod(ACC_PUBLIC | ACC_STATIC,
+			methodName,signature,null,null);
 
-		mw.visitVarInsn(ASTORE,1);
-		mw.visitVarInsn(ALOAD,0);
-		mw.visitFieldInsn(GETSTATIC,className,literal(
-			recursiveCheck.last().word),
-			"Ljava/lang/Object;");
-		mw.visitTypeInsn(CHECKCAST,"factor/FactorWord");
-		mw.visitVarInsn(ALOAD,1);
+		Label start = recursiveCheck.get(word).label;
 
-		mw.visitMethodInsn(INVOKEVIRTUAL,"factor/FactorInterpreter",
-			"compiledException",
-			"(Lfactor/FactorWord;Ljava/lang/Throwable;)V");
+		if(fieldInit)
+			compileFieldInit(mw,start);
 
-		mw.visitVarInsn(ALOAD,1);
-		mw.visitInsn(ATHROW);
+		mw.visitLabel(start);
 
-		maxJVMStack = Math.max(maxJVMStack,3);
-		mw.visitMaxs(maxJVMStack,max);
+		compile(definition,mw,recursiveCheck);
 
-		mw.visitTryCatchBlock(start,end,target,"java/lang/Throwable");
-		return getDisassembly(mw);
+		Label end = new Label();
+
+		compileReturn(mw,end,effect);
+
+		compileExceptionHandler(mw,start,end,word);
+
+		mw.visitMaxs(0,0);
+	} //}}}
+
+	//{{{ compileExceptionHandler() method
+	private void compileExceptionHandler(CodeVisitor mw,
+		Label start, Label end, FactorWord word)
+	{
+		// otherwise no code can throw exception etc
+		if(start.getOffset() != end.getOffset())
+		{
+			// Now compile exception handler.
+
+			Label target = new Label();
+			mw.visitLabel(target);
+
+			mw.visitVarInsn(ASTORE,1);
+			mw.visitVarInsn(ALOAD,0);
+			mw.visitFieldInsn(GETSTATIC,className,literal(word),
+				"Ljava/lang/Object;");
+			mw.visitTypeInsn(CHECKCAST,"factor/FactorWord");
+			mw.visitVarInsn(ALOAD,1);
+
+			mw.visitMethodInsn(INVOKEVIRTUAL,"factor/FactorInterpreter",
+				"compiledException",
+				"(Lfactor/FactorWord;Ljava/lang/Throwable;)V");
+
+			mw.visitVarInsn(ALOAD,1);
+			mw.visitInsn(ATHROW);
+
+			mw.visitTryCatchBlock(start,end,target,"java/lang/Throwable");
+		}
 	} //}}}
 
 	//{{{ compile() method
 	/**
-	 * Compiles a quotation and returns the maximum JVM stack depth.
+	 * Compiles a quotation.
 	 */
-	public int compile(Cons definition, CodeVisitor mw,
+	public void compile(Cons definition, CodeVisitor mw,
 		RecursiveState recursiveCheck) throws Exception
 	{
-		int maxJVMStack = 0;
-
 		while(definition != null)
 		{
 			Object obj = definition.car;
 			if(obj instanceof FactorWord)
 			{
-				FactorWord w = (FactorWord)obj;
-
-				RecursiveForm rec = recursiveCheck.get(w);
-
-				try
-				{
-					boolean recursiveCall;
-					if(rec == null)
-					{
-						recursiveCall = false;
-						recursiveCheck.add(w,
-							new StackEffect()/* getStackEffect() */,
-							className,"core");
-						recursiveCheck.last().tail = false;
-					}
-					else
-					{
-						recursiveCall = true;
-						rec.active = true;
-						rec.tail = (definition.cdr == null);
-					}
-
-					maxJVMStack = Math.max(maxJVMStack,
-						compileWord((FactorWord)obj,mw,
-						recursiveCheck,recursiveCall));
-				}
-				finally
-				{
-					if(rec == null)
-						recursiveCheck.remove(w);
-					else
-					{
-						rec.active = false;
-						rec.tail = false;
-					}
-				}
+				compileWord((FactorWord)obj,mw,recursiveCheck,
+					definition.cdr == null);
 			}
 			else
 				pushLiteral(obj,recursiveCheck);
 
 			definition = definition.next();
 		}
-
-		return maxJVMStack;
 	} //}}}
 
 	//{{{ compileWord() method
-	private int compileWord(FactorWord w, CodeVisitor mw,
+	private void compileWord(FactorWord w, CodeVisitor mw,
+		RecursiveState recursiveCheck,
+		boolean tail) throws Exception
+	{
+		if(tail && interp != null && interp.verboseCompile)
+			System.err.println("Tail: " + recursiveCheck.last());
+		recursiveCheck.last().tail = tail;
+
+		RecursiveForm rec = recursiveCheck.get(w);
+
+		try
+		{
+			boolean recursiveCall;
+			if(rec == null)
+			{
+				recursiveCall = false;
+				recursiveCheck.add(w,
+					new StackEffect(),
+					className,loader,
+					"core");
+				recursiveCheck.last().tail
+					= (w.def instanceof FactorPrimitiveDefinition);
+			}
+			else
+			{
+				recursiveCall = true;
+				rec.active = true;
+			}
+
+			compileCallTo(w,mw,recursiveCheck,recursiveCall);
+		}
+		finally
+		{
+			if(rec == null)
+				recursiveCheck.remove(w);
+			else
+			{
+				rec.active = false;
+				rec.tail = false;
+			}
+		}
+	} //}}}
+
+	//{{{ compileCallTo() method
+	private void compileCallTo(FactorWord w, CodeVisitor mw,
 		RecursiveState recursiveCheck,
 		boolean recursiveCall) throws Exception
 	{
+		if(w.def == null)
+			throw new FactorUndefinedWordException(w.name);
+
 		FactorWordDefinition d = w.def;
+
+		if(mw == null)
+		{
+			recursiveCheck.last().effect = getStackEffect();
+			d.getStackEffect(recursiveCheck,this);
+			return;
+		}
 
 		if(!recursiveCall)
 		{
-			StackEffect effect = getStackEffectOrNull(d);
-			if(effect == null)
+			if(w.inline)
 			{
-				return d.compileImmediate(mw,this,
-					recursiveCheck);
+				recursiveCheck.last().effect = getStackEffect();
+				d.compileImmediate(mw,this,recursiveCheck);
+				return;
 			}
 			else if(d instanceof FactorCompoundDefinition)
 			{
@@ -464,41 +551,31 @@ public class FactorCompiler implements Constants
 			}
 		}
 
-		w.compileRef = true;
-		return d.compileCallTo(mw,this,recursiveCheck);
+		d.compileCallTo(mw,this,recursiveCheck);
 	} //}}}
 
 	//{{{ push() method
 	/**
 	 * Generates code for pushing the top of the JVM stack onto the
-	 * data stack.
+	 * data stack. Also generates code for converting this value to
+	 * the given type.
 	 */
-	public void push(CodeVisitor mw)
+	public void push(FactorArray stack, CodeVisitor mw, Class type)
+		throws Exception
 	{
 		int local = allocate();
-		datastack.push(new Result(local,this,null));
-		if(mw != null)
-			mw.visitVarInsn(ASTORE,local);
-	} //}}}
-
-	//{{{ pushR() method
-	/**
-	 * Generates code for pushing the top of the JVM stack onto the
-	 * call stack.
-	 */
-	public void pushR(CodeVisitor mw)
-	{
-		int local = allocate();
-		callstack.push(new Result(local,this,null));
-		if(mw != null)
-			mw.visitVarInsn(ASTORE,local);
+		Result r = new Result(local,this,null,type);
+		stack.push(r);
+		r.push(mw,type);
 	} //}}}
 
 	//{{{ pushLiteral() method
 	public void pushLiteral(Object literal, RecursiveState recursiveCheck)
 	{
+		RecursiveForm word = recursiveCheck.last();
+
 		if(literal == null)
-			datastack.push(new Null(this,recursiveCheck));
+			datastack.push(new Null(this,word));
 		else if(literal instanceof Cons)
 		{
 			datastack.push(new CompiledList((Cons)literal,this,
@@ -507,48 +584,23 @@ public class FactorCompiler implements Constants
 		else if(literal instanceof String)
 		{
 			datastack.push(new ConstantPoolString((String)literal,
-				this,recursiveCheck));
+				this,word));
 		}
 		else
-		{
-			datastack.push(new Literal(literal,this,
-				recursiveCheck));
-		}
-	} //}}}
-
-	//{{{ pushChoice() method
-	public void pushChoice(RecursiveState recursiveCheck)
-		throws FactorStackException
-	{
-		FlowObject f = (FlowObject)datastack.pop();
-		FlowObject t = (FlowObject)datastack.pop();
-		FlowObject cond = (FlowObject)datastack.pop();
-		datastack.push(new CompiledChoice(
-			cond,t,f,this,recursiveCheck));
+			datastack.push(new Literal(literal,this, word));
 	} //}}}
 
 	//{{{ pop() method
 	/**
 	 * Generates code for popping the top of the data stack onto
-	 * the JVM stack.
+	 * the JVM stack. Also generates code for converting this value to
+	 * the given type.
 	 */
-	public void pop(CodeVisitor mw) throws FactorStackException
+	public void pop(FactorArray stack, CodeVisitor mw, Class type)
+		throws Exception
 	{
 		FlowObject obj = (FlowObject)datastack.pop();
-		if(mw != null)
-			obj.generate(mw);
-	} //}}}
-
-	//{{{ popR() method
-	/**
-	 * Generates code for popping the top of the call stack onto
-	 * the JVM stack.
-	 */
-	public void popR(CodeVisitor mw) throws FactorStackException
-	{
-		FlowObject obj = (FlowObject)callstack.pop();
-		if(mw != null)
-			obj.generate(mw);
+		obj.pop(mw,type);
 	} //}}}
 
 	//{{{ popLiteral() method
@@ -572,10 +624,7 @@ public class FactorCompiler implements Constants
 		for(;;)
 		{
 			if(allocate(i,datastack) && allocate(i,callstack))
-			{
-				max = Math.max(max,i + 1);
 				return i;
-			}
 			else
 				i++;
 		}
@@ -585,7 +634,7 @@ public class FactorCompiler implements Constants
 	/**
 	 * Return true if not in use, false if in use.
 	 */
-	private boolean allocate(int local, FactorArrayStack stack)
+	private boolean allocate(int local, FactorArray stack)
 	{
 		for(int i = 0; i < stack.top; i++)
 		{
@@ -613,43 +662,41 @@ public class FactorCompiler implements Constants
 	} //}}}
 
 	//{{{ auxiliary() method
-	public String auxiliary(String word, Cons code, StackEffect effect,
+	public String auxiliary(FactorWord word, Cons code, StackEffect effect,
 		RecursiveState recursiveCheck) throws Exception
 	{
-		FactorDataStack savedDatastack = (FactorDataStack)
+		FactorArray savedDatastack = (FactorArray)
 			datastack.clone();
-		FactorCallStack savedCallstack = (FactorCallStack)
+		FactorArray savedCallstack = (FactorArray)
 			callstack.clone();
 
-		String method = "aux_" + FactorJava.getSanitizedName(word) + "_"
-			+ (auxCount++);
+		String method = "aux_" + FactorJava.getSanitizedName(word.name)
+			+ "_" + (auxCount++);
 
 		recursiveCheck.last().method = method;
 		aux = new Cons(new AuxiliaryQuotation(
 			method,savedDatastack,savedCallstack,
-			code,effect,this,recursiveCheck),aux);
+			code,effect,word,this,recursiveCheck),aux);
 
 		return method;
 	} //}}}
 
 	//{{{ generateAuxiliary() method
-	public String generateAuxiliary(ClassWriter cw)
-		throws Exception
+	public void generateAuxiliary(ClassWriter cw) throws Exception
 	{
-		StringBuffer asm = new StringBuffer();
 		while(aux != null)
 		{
 			AuxiliaryQuotation q = (AuxiliaryQuotation)aux.car;
+			// order of these two important, in case
+			// compilation of q adds more quotations to aux list
 			aux = aux.next();
-			asm.append(q);
-			asm.append('\n');
-			asm.append(q.compile(this,cw,word));
+			q.compile(this,cw);
 		}
-		return asm.toString();
 	} //}}}
 
 	//{{{ normalizeStacks() method
-	public int normalizeStacks(CodeVisitor mw)
+	public void normalizeStacks(CodeVisitor mw)
+		throws Exception
 	{
 		int datastackTop = datastack.top;
 		datastack.top = 0;
@@ -660,49 +707,25 @@ public class FactorCompiler implements Constants
 		localsToStack(datastack,datastackTop,mw);
 		stackToLocals(datastack,datastackTop,mw);
 		stackToLocals(callstack,callstackTop,mw);
-
-		return datastackTop + callstackTop;
 	} //}}}
 
 	//{{{ localsToStack() method
-	private void localsToStack(FactorArrayStack stack, int top,
-		CodeVisitor mw)
+	private void localsToStack(FactorArray stack, int top,
+		CodeVisitor mw) throws Exception
 	{
 		for(int i = top - 1; i >= 0; i--)
 		{
 			FlowObject obj = (FlowObject)stack.stack[i];
-			obj.generate(mw);
+			obj.pop(mw,Object.class);
 		}
 	} //}}}
 
 	//{{{ stackToLocals() method
-	private void stackToLocals(FactorArrayStack stack, int top,
-		CodeVisitor mw)
+	private void stackToLocals(FactorArray stack, int top,
+		CodeVisitor mw) throws Exception
 	{
 		for(int i = 0; i < top; i++)
-		{
-			int local = allocate();
-			stack.push(new Result(local,this,null));
-			mw.visitVarInsn(ASTORE,local);
-		}
-	} //}}}
-
-	//{{{ normalizeStack() method
-	private void normalizeStack(FactorArrayStack stack, int top,
-		CodeVisitor mw)
-	{
-		for(int i = top - 1; i >= 0; i--)
-		{
-			FlowObject obj = (FlowObject)stack.stack[i];
-			obj.generate(mw);
-		}
-
-		for(int i = 0; i < top; i++)
-		{
-			int local = allocate();
-			stack.push(new Result(local,this,null));
-			mw.visitVarInsn(ASTORE,local);
-		}
+			push(stack,mw,Object.class);
 	} //}}}
 
 	//{{{ generateArgs() method
@@ -718,9 +741,7 @@ public class FactorCompiler implements Constants
 		{
 			FlowObject obj = (FlowObject)datastack.stack[
 				datastack.top - inD + i];
-			obj.generate(mw);
-			if(args != null)
-				FactorJava.generateFromConversion(mw,args[i]);
+			obj.pop(mw,args == null ? Object.class : args[i]);
 		}
 
 		datastack.top -= inD;
@@ -729,9 +750,7 @@ public class FactorCompiler implements Constants
 		{
 			FlowObject obj = (FlowObject)callstack.stack[
 				callstack.top - inR + i];
-			obj.generate(mw);
-			if(args != null)
-				FactorJava.generateFromConversion(mw,args[i]);
+			obj.pop(mw,args == null ? Object.class : args[i]);
 		}
 
 		callstack.top -= inR;
@@ -739,6 +758,7 @@ public class FactorCompiler implements Constants
 
 	//{{{ generateReturn() method
 	public void generateReturn(CodeVisitor mw, int outD, int outR)
+		throws Exception
 	{
 		if(outD == 0 && outR == 0)
 		{
@@ -746,7 +766,7 @@ public class FactorCompiler implements Constants
 		}
 		else if(outD == 1 && outR == 0)
 		{
-			push(mw);
+			push(datastack,mw,Object.class);
 		}
 		else
 		{
@@ -763,7 +783,7 @@ public class FactorCompiler implements Constants
 				mw.visitFieldInsn(GETFIELD,
 					"factor/FactorInterpreter",
 					"datastack",
-					"Lfactor/FactorDataStack;");
+					"Lfactor/FactorArray;");
 				int datastackLocal = allocate();
 				mw.visitVarInsn(ASTORE,datastackLocal);
 	
@@ -773,7 +793,7 @@ public class FactorCompiler implements Constants
 				{
 					mw.visitVarInsn(ALOAD,datastackLocal);
 					mw.visitMethodInsn(INVOKEVIRTUAL,
-						"factor/FactorDataStack",
+						"factor/FactorArray",
 						"pop",
 						"()Ljava/lang/Object;");
 	
@@ -781,7 +801,7 @@ public class FactorCompiler implements Constants
 						datastack.stack[
 						datastack.top - i - 1];
 	
-					mw.visitVarInsn(ASTORE,destination.getLocal());
+					destination.push(mw,Object.class);
 				}
 			}
 
@@ -793,7 +813,7 @@ public class FactorCompiler implements Constants
 				mw.visitFieldInsn(GETFIELD,
 					"factor/FactorInterpreter",
 					"callstack",
-					"Lfactor/FactorCallStack;");
+					"Lfactor/FactorArray;");
 				int callstackLocal = allocate();
 				mw.visitVarInsn(ASTORE,callstackLocal);
 
@@ -803,7 +823,7 @@ public class FactorCompiler implements Constants
 				{
 					mw.visitVarInsn(ALOAD,callstackLocal);
 					mw.visitMethodInsn(INVOKEVIRTUAL,
-						"factor/FactorCallStack",
+						"factor/FactorArray",
 						"pop",
 						"()Ljava/lang/Object;");
 	
@@ -811,7 +831,7 @@ public class FactorCompiler implements Constants
 						callstack.stack[
 						callstack.top - i - 1];
 	
-					mw.visitVarInsn(ASTORE,destination.getLocal());
+					destination.push(mw,Object.class);
 				}
 			}
 		}
@@ -823,11 +843,11 @@ public class FactorCompiler implements Constants
 	{
 		for(int i = 0; i < literalCount; i++)
 		{
-			cw.visitField(ACC_PUBLIC | ACC_STATIC,"literal_" + i,
+			cw.visitField(ACC_PRIVATE | ACC_STATIC,"literal_" + i,
 				"Ljava/lang/Object;",null,null);
 		}
 
-		CodeVisitor mw = cw.visitMethod(ACC_PUBLIC | ACC_STATIC,
+		CodeVisitor mw = cw.visitMethod(ACC_PRIVATE | ACC_STATIC,
 			"setFields","(Lfactor/FactorInterpreter;)V",null,null);
 
 		Iterator entries = literals.entrySet().iterator();
@@ -846,13 +866,14 @@ public class FactorCompiler implements Constants
 
 		mw.visitInsn(RETURN);
 
-		mw.visitMaxs(2,1);
+		mw.visitMaxs(0,0);
 	} //}}}
 
 	//{{{ generateParse() method
 	public void generateParse(CodeVisitor mw, Object obj, int interpLocal)
 	{
-		mw.visitLdcInsn(FactorReader.unparseObject(obj));
+		mw.visitLdcInsn(FactorReader.getVocabularyDeclaration(obj)
+			+ FactorReader.unparseObject(obj));
 		mw.visitVarInsn(ALOAD,interpLocal);
 		mw.visitMethodInsn(INVOKESTATIC,
 			"factor/FactorReader",
@@ -862,41 +883,16 @@ public class FactorCompiler implements Constants
 	} //}}}
 
 	//{{{ getStackEffectOrNull() method
-	static StackEffect getStackEffectOrNull(FactorWordDefinition def)
+	public StackEffect getStackEffectOrNull(FactorWordDefinition def)
 	{
 		try
 		{
-			return def.getStackEffect();
+			return def.getStackEffect(interp);
 		}
 		catch(Exception e)
 		{
 			//System.err.println("WARNING: " + e);
 			//System.err.println(def);
-			return null;
-		}
-	} //}}}
-
-	//{{{ getStackEffectOrNull() method
-	StackEffect getStackEffectOrNull(FlowObject obj,
-		RecursiveState recursiveCheck,
-		boolean decompose)
-	{
-		try
-		{
-			obj.getStackEffect(recursiveCheck);
-			StackEffect effect = getStackEffect();
-			if(decompose)
-			{
-				effect = StackEffect.decompose(
-					recursiveCheck.last().effect,
-					effect);
-			}
-			return effect;
-		}
-		catch(Exception e)
-		{
-			//System.err.println("WARNING: " + e);
-			//System.err.println(obj);
 			return null;
 		}
 	} //}}}

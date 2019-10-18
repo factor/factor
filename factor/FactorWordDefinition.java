@@ -30,6 +30,7 @@
 package factor;
 
 import factor.compiler.*;
+import java.io.*;
 import java.util.*;
 import org.objectweb.asm.*;
 
@@ -38,36 +39,54 @@ import org.objectweb.asm.*;
  */
 public abstract class FactorWordDefinition implements Constants
 {
-	public final FactorWord word;
+	protected FactorWord word;
 
 	public boolean compileFailed;
 
+	//{{{ FactorWordDefinition constructor
+	/**
+	 * A new definition.
+	 */
 	public FactorWordDefinition(FactorWord word)
 	{
 		this.word = word;
-	}
+	} //}}}
 
 	public abstract void eval(FactorInterpreter interp)
 		throws Exception;
+	
+	//{{{ getWord() method
+	public FactorWord getWord(FactorInterpreter interp)
+	{
+		return word;
+	} //}}}
+	
+	//{{{ fromList() method
+	public void fromList(Cons cons, FactorInterpreter interp)
+		throws FactorRuntimeException
+	{
+		throw new FactorRuntimeException("Cannot unpickle " + this);
+	} //}}}
 
 	//{{{ toList() method
 	public Cons toList(FactorInterpreter interp)
 	{
-		return new Cons(new FactorWord(getClass().getName()),null);
+		return new Cons(new FactorWord(null,getClass().getName()),null);
 	} //}}}
 
 	//{{{ getStackEffect() method
-	public final StackEffect getStackEffect() throws Exception
-	{
-		return getStackEffect(new RecursiveState());
-	} //}}}
-
-	//{{{ getStackEffect() method
-	public final StackEffect getStackEffect(RecursiveState recursiveCheck)
+	public final StackEffect getStackEffect(FactorInterpreter interp)
 		throws Exception
 	{
-		FactorCompiler compiler = new FactorCompiler();
-		recursiveCheck.add(word,new StackEffect(),null,null);
+		return getStackEffect(new RecursiveState(),interp);
+	} //}}}
+
+	//{{{ getStackEffect() method
+	public final StackEffect getStackEffect(RecursiveState recursiveCheck,
+		FactorInterpreter interp) throws Exception
+	{
+		FactorCompiler compiler = new FactorCompiler(interp);
+		recursiveCheck.add(word,new StackEffect(),null,null,null);
 		getStackEffect(recursiveCheck,compiler);
 		recursiveCheck.remove(word);
 		return compiler.getStackEffect();
@@ -91,7 +110,7 @@ public abstract class FactorWordDefinition implements Constants
 	/**
 	 * Compile a call to this word. Returns maximum JVM stack use.
 	 */
-	public int compileCallTo(CodeVisitor mw, FactorCompiler compiler,
+	public void compileCallTo(CodeVisitor mw, FactorCompiler compiler,
 		RecursiveState recursiveCheck) throws Exception
 	{
 		// normal word
@@ -99,28 +118,38 @@ public abstract class FactorWordDefinition implements Constants
 		String defmethod;
 		StackEffect effect;
 
+		FactorClassLoader loader;
+
 		RecursiveForm rec = recursiveCheck.get(word);
 		if(rec != null && rec.active)
 		{
+			if(compiler.interp.verboseCompile)
+				System.err.println("Recursive call to " + rec);
 			effect = StackEffect.decompose(rec.effect,rec.baseCase);
 
 			// are we recursing back on a form inside the current
 			// method?
 			RecursiveForm last = recursiveCheck.last();
-			if(rec.tail
+			if(recursiveCheck.allTails(rec)
 				&& last.className.equals(rec.className)
 				&& last.method.equals(rec.method))
 			{
+				if(compiler.interp.verboseCompile)
+					System.err.println(word + " is tail recursive");
 				// GOTO instad of INVOKEVIRTUAL; ie a loop!
-				int max = compiler.normalizeStacks(mw);
+				compiler.normalizeStacks(mw);
 				mw.visitJumpInsn(GOTO,rec.label);
 				compiler.apply(effect);
-				return max;
+				return;
 			}
 
 			/* recursive method call! */
 			defclass = rec.className;
 			defmethod = rec.method;
+			loader = rec.loader;
+
+			if(!defclass.equals(compiler.className))
+				compiler.loader.addDependency(defclass,loader);
 		}
 		// not a recursive call but we're still not compiled
 		// its a bug in the compiler.
@@ -131,15 +160,23 @@ public abstract class FactorWordDefinition implements Constants
 		// inlining?
 		else if(word.inline)
 		{
-			return compileImmediate(mw,compiler,recursiveCheck);
+			compileImmediate(mw,compiler,recursiveCheck);
+			return;
 		}
 		/* ordinary method call! */
 		else
 		{
-			defclass = getClass().getName()
-				.replace('.','/');
+			defclass = getClass().getName().replace('.','/');
 			defmethod = "core";
-			effect = getStackEffect();
+			effect = getStackEffect(compiler.interp);
+			ClassLoader l = getClass().getClassLoader();
+			if(l instanceof FactorClassLoader)
+			{
+				loader = (FactorClassLoader)l;
+				compiler.loader.addDependency(getClass().getName(),loader);
+			}
+			else
+				loader = null;
 		}
 
 		mw.visitVarInsn(ALOAD,0);
@@ -151,21 +188,75 @@ public abstract class FactorWordDefinition implements Constants
 		mw.visitMethodInsn(INVOKESTATIC,defclass,defmethod,signature);
 
 		compiler.generateReturn(mw,effect.outD,effect.outR);
+	} //}}}
 
-		return effect.inD + effect.inR + 1;
+	//{{{ compileNonRecursiveImmediate() method
+	/**
+	 * Non-recursive immediate words are inlined.
+	 */
+	protected void compileNonRecursiveImmediate(CodeVisitor mw,
+		FactorCompiler compiler,
+		RecursiveState recursiveCheck,
+		StackEffect immediateEffect) throws Exception
+	{
+		Cons definition = toList(compiler.getInterpreter());
+
+		Cons endOfDocs = definition;
+		while(endOfDocs != null
+			&& endOfDocs.car instanceof FactorDocComment)
+			endOfDocs = endOfDocs.next();
+
+		compiler.compile(endOfDocs,mw,recursiveCheck);
+	} //}}}
+
+	//{{{ compileRecursiveImmediate() method
+	/**
+	 * Recursive immediate words are compiled to an auxiliary method
+	 * inside the compiled class definition.
+	 *
+	 * This must be done so that recursion has something to jump to.
+	 */
+	protected void compileRecursiveImmediate(CodeVisitor mw,
+		FactorCompiler compiler,
+		RecursiveState recursiveCheck,
+		StackEffect immediateEffect) throws Exception
+	{
+		Cons definition = toList(compiler.getInterpreter());
+
+		Cons endOfDocs = definition;
+		while(endOfDocs != null
+			&& endOfDocs.car instanceof FactorDocComment)
+			endOfDocs = endOfDocs.next();
+
+		String method = compiler.auxiliary(word,
+			endOfDocs,immediateEffect,recursiveCheck);
+
+		mw.visitVarInsn(ALOAD,0);
+
+		compiler.generateArgs(mw,immediateEffect.inD,
+			immediateEffect.inR,null);
+
+		String signature = immediateEffect.getCorePrototype();
+
+		mw.visitMethodInsn(INVOKESTATIC,compiler.className,
+			method,signature);
+
+		compiler.generateReturn(mw,
+			immediateEffect.outD,
+			immediateEffect.outR);
 	} //}}}
 
 	//{{{ compileImmediate() method
 	/**
 	 * Compile a call to this word. Returns maximum JVM stack use.
 	 */
-	public int compileImmediate(CodeVisitor mw, FactorCompiler compiler,
+	public void compileImmediate(CodeVisitor mw, FactorCompiler compiler,
 		RecursiveState recursiveCheck) throws Exception
 	{
 		Cons definition = toList(compiler.getInterpreter());
 
 		if(definition == null)
-			return 0;
+			return;
 
 		Cons endOfDocs = definition;
 		while(endOfDocs != null
@@ -175,9 +266,9 @@ public abstract class FactorWordDefinition implements Constants
 		// determine stack effect of this instantiation, and if its
 		// recursive.
 
-		FactorDataStack savedDatastack = (FactorDataStack)
+		FactorArray savedDatastack = (FactorArray)
 			compiler.datastack.clone();
-		FactorCallStack savedCallstack = (FactorCallStack)
+		FactorArray savedCallstack = (FactorArray)
 			compiler.callstack.clone();
 		StackEffect savedEffect = compiler.getStackEffect();
 
@@ -195,51 +286,35 @@ public abstract class FactorWordDefinition implements Constants
 
 		// restore previous state.
 
-		FactorDataStack afterDatastack = (FactorDataStack)
+		FactorArray afterDatastack = (FactorArray)
 			compiler.datastack.clone();
-		FactorCallStack afterCallstack = (FactorCallStack)
+		FactorArray afterCallstack = (FactorArray)
 			compiler.callstack.clone();
 
-		compiler.datastack = (FactorDataStack)savedDatastack.clone();
-		compiler.callstack = (FactorCallStack)savedCallstack.clone();
+		compiler.datastack = (FactorArray)savedDatastack.clone();
+		compiler.callstack = (FactorArray)savedCallstack.clone();
 		compiler.effect = savedEffect;
 
 		if(!recursive)
 		{
 			// not recursive; inline.
-			mw.visitLabel(recursiveCheck.last().label);
-			return compiler.compile(endOfDocs,mw,recursiveCheck);
+			compileNonRecursiveImmediate(mw,compiler,recursiveCheck,
+				immediateEffect);
 		}
 		else
 		{
 			// recursive; must generate auxiliary method.
-			String method = compiler.auxiliary(word.name,
-				endOfDocs,immediateEffect,recursiveCheck);
-
-			mw.visitVarInsn(ALOAD,0);
-
-			compiler.generateArgs(mw,immediateEffect.inD,
-				immediateEffect.inR,null);
-
-			String signature = immediateEffect.getCorePrototype();
-
-			mw.visitMethodInsn(INVOKESTATIC,compiler.className,
-				method,signature);
-
-			compiler.generateReturn(mw,
-				immediateEffect.outD,
-				immediateEffect.outR);
+			compileRecursiveImmediate(mw,compiler,recursiveCheck,
+				immediateEffect);
 
 			mergeStacks(savedDatastack,afterDatastack,compiler.datastack);
 			mergeStacks(savedCallstack,afterCallstack,compiler.callstack);
-
-			return immediateEffect.inD + immediateEffect.inR + 1;
 		}
 	} //}}}
 
 	//{{{ mergeStacks() method
-	private void mergeStacks(FactorArrayStack s1, FactorArrayStack s2,
-		FactorArrayStack into)
+	private void mergeStacks(FactorArray s1, FactorArray s2,
+		FactorArray into)
 	{
 		for(int i = 0; i < s2.top; i++)
 		{

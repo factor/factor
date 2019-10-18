@@ -35,41 +35,20 @@ import org.objectweb.asm.*;
 class AuxiliaryQuotation
 {
 	private String method;
-	private FactorDataStack datastack;
-	private FactorCallStack callstack;
+	private FactorArray datastack;
+	private FactorArray callstack;
 	private Cons code;
 	private StackEffect effect;
+	private FactorWord word;
 	private RecursiveState recursiveCheck;
-
-	//{{{ mungeFlowObject() method
-	private FlowObject mungeFlowObject(int base, int index, FlowObject flow,
-		FactorCompiler compiler, RecursiveState recursiveCheck)
-		throws Exception
-	{
-		if(flow instanceof CompiledList)
-		{
-			return new CompiledListResult(index + base,
-				(Cons)flow.getLiteral(),compiler,
-				((CompiledList)flow).recursiveCheck);
-		}
-		else if(flow instanceof Null)
-		{
-			return new CompiledListResult(index + base,
-				(Cons)flow.getLiteral(),
-				compiler,recursiveCheck);
-		}
-		else
-		{
-			return new Result(index + base,compiler,recursiveCheck);
-		}
-	} //}}}
 
 	//{{{ AuxiliaryQuotation constructor
 	AuxiliaryQuotation(String method,
-		FactorDataStack datastack,
-        	FactorCallStack callstack,
+		FactorArray datastack,
+        	FactorArray callstack,
         	Cons code,
         	StackEffect effect,
+		FactorWord word,
 		FactorCompiler compiler,
 		RecursiveState recursiveCheck)
 		throws Exception
@@ -79,6 +58,7 @@ class AuxiliaryQuotation
 		this.callstack = callstack;
 		this.code = code;
 		this.effect = effect;
+		this.word = word;
 		this.recursiveCheck = new RecursiveState(recursiveCheck);
 
 		System.arraycopy(datastack.stack,datastack.top - effect.inD,
@@ -87,8 +67,8 @@ class AuxiliaryQuotation
 		{
 			int index = datastack.top - effect.inD + i;
 			FlowObject flow = (FlowObject)datastack.stack[index];
-			datastack.stack[index] = mungeFlowObject(1,index,flow,
-				compiler,recursiveCheck);
+			datastack.stack[index] = flow.munge(
+				1,index,compiler,recursiveCheck);
 		}
 
 		System.arraycopy(callstack.stack,callstack.top - effect.inR,
@@ -97,14 +77,13 @@ class AuxiliaryQuotation
 		{
 			int index = callstack.top - effect.inR + i;
 			FlowObject flow = (FlowObject)callstack.stack[index];
-			callstack.stack[index] = mungeFlowObject(1 + effect.inD,
-				index,flow,compiler,recursiveCheck);
+			callstack.stack[index] = flow.munge(
+				1 + effect.inD,index,compiler,recursiveCheck);
 		}
 	} //}}}
 
 	//{{{ compile() method
-	String compile(FactorCompiler compiler, ClassWriter cw,
-		FactorWord word)
+	void compile(FactorCompiler compiler, ClassWriter cw)
 		throws Exception
 	{
 		// generate core
@@ -114,8 +93,8 @@ class AuxiliaryQuotation
 		//compiler.produce(compiler.datastack,effect.inD);
 		// important: this.recursiveCheck due to
 		// lexically-scoped recursion issues
-		return compiler.compile(code,cw,method,effect,
-			new RecursiveState(this.recursiveCheck));
+		compiler.compileMethod(code,cw,method,effect,word,
+			new RecursiveState(this.recursiveCheck),false);
 	} //}}}
 
 	//{{{ toString() method
