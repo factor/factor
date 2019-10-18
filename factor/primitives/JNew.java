@@ -32,7 +32,7 @@ package factor.primitives;
 import factor.compiler.*;
 import factor.*;
 import java.lang.reflect.*;
-import java.util.Set;
+import java.util.Map;
 import org.objectweb.asm.*;
 
 public class JNew extends FactorWordDefinition
@@ -59,8 +59,8 @@ public class JNew extends FactorWordDefinition
 	/**
 	 * XXX: does not use factor type system conversions.
 	 */
-	public StackEffect getStackEffect(Set recursiveCheck,
-		LocalAllocator state) throws Exception
+	public void getStackEffect(RecursiveState recursiveCheck,
+		FactorCompiler state) throws Exception
 	{
 		state.ensure(state.datastack,2);
 
@@ -74,28 +74,27 @@ public class JNew extends FactorWordDefinition
 				(String)clazz,
 				(Cons)args);
 
+			int params = constructor.getParameterTypes().length;
+			state.consume(state.datastack,params);
 			state.push(null);
-			return new StackEffect(
-				2 + constructor.getParameterTypes()
-				.length,1,0,0);
 		}
 		else
-			return null;
+			throw new FactorCompilerException("Cannot deduce stack effect of " + word + " with non-literal arguments");;
 	} //}}}
 
-	//{{{ compileCallTo() method
+	//{{{ compileImmediate() method
 	/**
 	 * Compile a call to this word. Returns maximum JVM stack use.
 	 * XXX: does not use factor type system conversions.
 	 */
-	public int compileCallTo(
+	public int compileImmediate(
 		CodeVisitor mw,
-		LocalAllocator allocator,
-		Set recursiveCheck)
+		FactorCompiler compiler,
+		RecursiveState recursiveCheck)
 		throws Exception
 	{
-		Object _clazz = allocator.popLiteral();
-		Object _args = allocator.popLiteral();
+		Object _clazz = compiler.popLiteral();
+		Object _args = compiler.popLiteral();
 		if(_clazz instanceof String &&
 			(_args == null || _args instanceof Cons))
 		{
@@ -107,7 +106,7 @@ public class JNew extends FactorWordDefinition
 			mw.visitTypeInsn(NEW,clazz);
 			mw.visitInsn(DUP);
 
-			allocator.generateArgs(mw,args.length,args);
+			compiler.generateArgs(mw,args.length,args);
 
 			mw.visitMethodInsn(INVOKESPECIAL,
 				clazz,
@@ -115,7 +114,7 @@ public class JNew extends FactorWordDefinition
 				FactorJava.javaSignatureToVMSignature(
 				args,void.class));
 
-			allocator.push(mw);
+			compiler.push(mw);
 
 			return 3 + args.length;
 		}

@@ -31,6 +31,7 @@ package factor.primitives;
 
 import factor.compiler.*;
 import factor.*;
+import java.util.Map;
 
 public class Set extends FactorWordDefinition
 {
@@ -59,12 +60,11 @@ public class Set extends FactorWordDefinition
 	} //}}}
 
 	//{{{ getStackEffect() method
-	public StackEffect getStackEffect(java.util.Set recursiveCheck,
-		LocalAllocator state) throws FactorStackException
+	public void getStackEffect(RecursiveState recursiveCheck,
+		FactorCompiler state) throws FactorStackException
 	{
 		state.ensure(state.datastack,2);
 		state.pop(null);
 		state.pop(null);
-		return new StackEffect(2,0,0,0);
 	} //}}}
 }

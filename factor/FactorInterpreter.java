@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003 Slava Pestov.
+ * Copyright (C) 2003, 2004 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,6 +29,7 @@
 
 package factor;
 
+import factor.primitives.*;
 import java.io.*;
 
 public class FactorInterpreter
@@ -41,53 +42,20 @@ public class FactorInterpreter
 	public boolean trace = false;
 	public boolean errorFlag = false;
 	public boolean compile = true;
-	public boolean compileDump = false;
+	public boolean dump = false;
 
 	public FactorCallFrame callframe;
 	public FactorCallStack callstack = new FactorCallStack();
 	public FactorDataStack datastack = new FactorDataStack();
-	public final FactorDictionary dict = new FactorDictionary();
+	public FactorNamespace dict;
+	public FactorWord last;
 	public FactorNamespace global;
 
 	//{{{ main() method
-	/**
-	 * Need to refactor this into Factor.
-	 */
 	public static void main(String[] args) throws Exception
 	{
 		FactorInterpreter interp = new FactorInterpreter();
-
 		interp.init(args,null);
-
-		/* if(virgin)
-		{
-			System.out.println("Mini-interpreter");
-			BufferedReader in = new BufferedReader(
-				new InputStreamReader(
-				System.in));
-			String line;
-			for(;;)
-			{
-				System.out.print("] ");
-				System.out.flush();
-				line = in.readLine();
-				if(line == null)
-					break;
-
-				FactorParser parser = new FactorParser(
-					"<mini>",new StringReader(line),
-					interp.dict);
-				Cons parsed = parser.parse();
-				interp.call(parsed);
-				interp.run();
-				System.out.println(interp.datastack);
-			}
-		}
-		else
-		{
-			interp.run();
-		} */
-
 		System.exit(0);
 	} //}}}
 
@@ -98,10 +66,79 @@ public class FactorInterpreter
 
 		callstack.top = 0;
 		datastack.top = 0;
-		dict.init();
+		initDictionary();
 		initNamespace(root);
 		topLevel();
 		runBootstrap();
+	} //}}}
+
+	//{{{ initDictionary() method
+	private void initDictionary() throws Exception
+	{
+		dict = new FactorNamespace(null,null);
+
+		// data stack primitives
+		FactorWord datastackGet = intern("datastack$");
+		datastackGet.def = new DatastackGet(
+			datastackGet);
+		FactorWord datastackSet = intern("datastack@");
+		datastackSet.def = new DatastackSet(
+			datastackSet);
+		FactorWord clear = intern("clear");
+		clear.def = new Clear(clear);
+
+		// call stack primitives
+		FactorWord callstackGet = intern("callstack$");
+		callstackGet.def = new CallstackGet(
+			callstackGet);
+		FactorWord callstackSet = intern("callstack@");
+		callstackSet.def = new CallstackSet(
+			callstackSet);
+		FactorWord restack = intern("restack");
+		restack.def = new Restack(restack);
+		FactorWord unstack = intern("unstack");
+		unstack.def = new Unstack(unstack);
+		FactorWord unwind = intern("unwind");
+		unwind.def = new Unwind(unwind);
+
+		// reflection primitives
+		FactorWord jinvoke = intern("jinvoke");
+		jinvoke.def = new JInvoke(jinvoke);
+		FactorWord jinvokeStatic = intern("jinvoke-static");
+		jinvokeStatic.def = new JInvokeStatic(
+			jinvokeStatic);
+		FactorWord jnew = intern("jnew");
+		jnew.def = new JNew(jnew);
+		FactorWord jvarGet = intern("jvar$");
+		jvarGet.def = new JVarGet(jvarGet);
+		FactorWord jvarGetStatic = intern("jvar-static$");
+		jvarGetStatic.def = new JVarGetStatic(
+			jvarGetStatic);
+		FactorWord jvarSet = intern("jvar@");
+		jvarSet.def = new JVarSet(jvarSet);
+		FactorWord jvarSetStatic = intern("jvar-static@");
+		jvarSetStatic.def = new JVarSetStatic(
+			jvarSetStatic);
+
+		// namespaces
+		FactorWord get = intern("$");
+		get.def = new Get(get);
+		FactorWord set = intern("@");
+		set.def = new Set(set);
+
+		// definition
+		FactorWord define = intern("define");
+		define.def = new Define(define);
+
+		// combinators
+		FactorWord execute = intern("execute");
+		execute.def = new Execute(execute);
+		FactorWord call = intern("call");
+		call.def = new Call(call);
+		FactorWord bind = intern("bind");
+		bind.def = new Bind(bind);
+		FactorWord choice = intern("?");
+		choice.def = new Choice(choice);
 	} //}}}
 
 	//{{{ initNamespace() method
@@ -111,9 +148,14 @@ public class FactorInterpreter
 
 		global.setVariable("interpreter",this);
 
-		String[] boundFields = { "compile", "compileDump",
+		global.setVariable("error-flag",
+			new FactorNamespace.VarBinding(
+				getClass().getField("errorFlag"),
+				this));
+
+		String[] boundFields = { "compile", "dump",
 			"interactive", "trace",
-			"dict", "errorFlag", "args" };
+			"dict", "args", "global", "last" };
 		for(int i = 0; i < boundFields.length; i++)
 		{
 			global.setVariable(boundFields[i],
@@ -132,8 +174,8 @@ public class FactorInterpreter
 			new InputStreamReader(
 			getClass().getResourceAsStream(
 			initFile)),
-			dict);
-		call(dict.intern("[init]"),parser.parse());
+			this);
+		call(intern("[init]"),parser.parse());
 		run();
 	} //}}}
 
@@ -175,7 +217,7 @@ public class FactorInterpreter
 
 				eval(ip.car);
 			}
-			catch(Exception e)
+			catch(Throwable e)
 			{
 				if(handleError(e))
 					return;
@@ -186,7 +228,7 @@ public class FactorInterpreter
 	} //}}}
 
 	//{{{ handleError() method
-	private boolean handleError(Exception e)
+	private boolean handleError(Throwable e)
 	{
 		/* if(throwErrors)
 		{
@@ -213,10 +255,10 @@ public class FactorInterpreter
 			datastack.push(FactorJava.unwrapException(e));
 			try
 			{
-				eval(dict.intern("break"));
+				eval(intern("break"));
 				return false;
 			}
-			catch(Exception e2)
+			catch(Throwable e2)
 			{
 				System.err.println("Exception when calling break:");
 				e.printStackTrace();
@@ -236,7 +278,7 @@ public class FactorInterpreter
 	 */
 	public final void call(Cons code)
 	{
-		call(dict.intern("call"),code);
+		call(intern("call"),code);
 	} //}}}
 
 	//{{{ call() method
@@ -302,14 +344,14 @@ public class FactorInterpreter
 	/**
 	 * Evaluates a word.
 	 */
-	private void eval(Object obj) throws Exception
+	public void eval(Object obj) throws Exception
 	{
 		if(trace)
 		{
 			StringBuffer buf = new StringBuffer();
 			for(int i = 0; i < callstack.top; i++)
 				buf.append(' ');
-			buf.append(FactorJava.factorTypeToString(obj));
+			buf.append(FactorParser.unparse(obj));
 			System.err.println(buf);
 		}
 
@@ -333,6 +375,25 @@ public class FactorInterpreter
 			datastack.push(obj);
 	} //}}}
 
+	//{{{ intern() method
+	public FactorWord intern(String name)
+	{
+		try
+		{
+			FactorWord w = (FactorWord)dict.getVariable(name);
+			if(w == null)
+			{
+				w = new FactorWord(name);
+				dict.setVariable(name,w);
+			}
+			return w;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	} //}}}
+
 	//{{{ topLevel() method
 	/**
 	 * Returns the parser to the top level context.
@@ -342,7 +403,7 @@ public class FactorInterpreter
 		callstack.top = 0;
 		datastack.top = 0;
 		callframe = new FactorCallFrame(
-			dict.intern("[toplevel]"),
+			intern("[toplevel]"),
 			global,
 			null);
 	} //}}}

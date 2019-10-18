@@ -30,7 +30,7 @@
 package factor;
 
 import factor.compiler.*;
-import java.util.Set;
+import java.util.Map;
 import org.objectweb.asm.*;
 import org.objectweb.asm.util.*;
 
@@ -109,14 +109,12 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 	} //}}}
 
 	//{{{ getStackEffect() method
-	public StackEffect getStackEffect(Set recursiveCheck,
-		LocalAllocator state) throws FactorStackException
+	public void getStackEffect(RecursiveState recursiveCheck,
+		FactorCompiler state) throws FactorStackException
 	{
 		state.ensure(state.datastack,consumeD);
 		state.ensure(state.callstack,consumeR);
 		eval(state.datastack,state.callstack);
-		return new StackEffect(consumeD,shuffleDlength,
-			consumeR,shuffleRlength);
 	} //}}}
 
 	//{{{ compile() method
@@ -124,7 +122,7 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 	 * Compile the given word, returning a new word definition.
 	 */
 	FactorWordDefinition compile(FactorInterpreter interp,
-		Set recursiveCheck) throws Exception
+		RecursiveState recursiveCheck) throws Exception
 	{
 		return this;
 	} //}}}
@@ -133,10 +131,10 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 	/**
 	 * Compile a call to this word. Returns maximum JVM stack use.
 	 */
-	public int compileCallTo(CodeVisitor mw, LocalAllocator allocator,
-		Set recursiveCheck) throws FactorStackException
+	public int compileCallTo(CodeVisitor mw, FactorCompiler compiler,
+		RecursiveState recursiveCheck) throws FactorStackException
 	{
-		eval(allocator.datastack,allocator.callstack);
+		eval(compiler.datastack,compiler.callstack);
 		return 0;
 	} //}}}
 
@@ -211,6 +209,13 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 			}
 			temporary[i] = array[top - consume + index];
 		}
+	} //}}}
+
+	//{{{ toList() method
+	public Cons toList()
+	{
+		return new Cons(word,new Cons(
+			new FactorWord(toString()),null));
 	} //}}}
 
 	//{{{ toString() method

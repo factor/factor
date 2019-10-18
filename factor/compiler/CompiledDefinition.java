@@ -31,28 +31,39 @@ package factor.compiler;
 
 import factor.*;
 import java.lang.reflect.*;
-import java.util.Set;
+import java.util.Map;
 import org.objectweb.asm.*;
 
 /**
- * : name ... ;
+ * Compiled colon definition.
  */
 public abstract class CompiledDefinition
 	extends FactorWordDefinition
 {
 	private StackEffect effect;
+	private Cons definition;
 
 	//{{{ CompiledDefinition constructor
-	public CompiledDefinition(FactorWord word, StackEffect effect)
+	public CompiledDefinition(FactorWord word, StackEffect effect,
+		Cons definition)
 	{
 		super(word);
 		this.effect = effect;
+		this.definition = definition;
 	} //}}}
 
 	//{{{ getStackEffect() method
-	public StackEffect getStackEffect(Set recursiveCheck,
-		LocalAllocator state)
+	public void getStackEffect(RecursiveState recursiveCheck,
+		FactorCompiler compiler)
 	{
-		return effect;
+		compiler.apply(effect);
+	} //}}}
+
+	//{{{ toList() method
+	public Cons toList()
+	{
+		return new Cons(word,new Cons(effect,
+			new Cons(new FactorWord("\n"),
+			definition)));
 	} //}}}
 }

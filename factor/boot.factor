@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2003 Slava Pestov.
+! Copyright (C) 2003, 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -53,11 +53,12 @@
 ~<< tuck            A B -- B A B       >>~
 ~<< 2tuck       A B C D -- C D A B C D >>~
 
-~<< rdrop   r:A --         >>~
-~<< >r        A -- r:A     >>~
-~<< 2>r     A B -- r:A r:B >>~
-~<< r>      r:A -- A       >>~
-~<< 2r> r:A r:B -- A B     >>~
+~<< rdrop   r:A --                 >>~
+~<< rover   r:A r:B -- r:A r:B r:A >>~
+~<< >r        A -- r:A             >>~
+~<< 2>r     A B -- r:A r:B         >>~
+~<< r>      r:A -- A               >>~
+~<< 2r> r:A r:B -- A B             >>~
 
 !!! Minimum amount of I/O words needed to be able to read other resources.
 !!! Remaining I/O operations are defined in io.factor and parser.factor.
@@ -73,8 +74,8 @@
     <ireader> <breader> ;
 
 : parse* (filename reader -- list)
-    $dict
-    [ |java.lang.String |java.io.Reader |factor.FactorDictionary ]
+    $interpreter
+    [ |java.lang.String |java.io.Reader |factor.FactorInterpreter ]
     |factor.FactorParser jnew
     [ ] |factor.FactorParser |parse jinvoke ;
 
@@ -87,8 +88,11 @@
 
 "/factor/combinators.factor"   runResource
 "/factor/continuations.factor" runResource
+"/factor/debugger.factor"      runResource
 "/factor/dictionary.factor"    runResource
 "/factor/examples.factor"      runResource
+"/factor/httpd.factor"         runResource
+"/factor/inspector.factor"     runResource
 "/factor/interpreter.factor"   runResource
 "/factor/lists.factor"         runResource
 "/factor/math.factor"          runResource
@@ -96,9 +100,13 @@
 "/factor/namespaces.factor"    runResource
 "/factor/network.factor"       runResource
 "/factor/parser.factor"        runResource
-"/factor/random.factor"        runResource
 "/factor/stream.factor"        runResource
+"/factor/prettyprint.factor"   runResource
+"/factor/random.factor"        runResource
 "/factor/strings.factor"       runResource
+"/factor/test/test.factor"     runResource
+
+t @user-init
 
 : cli-param ( param -- )
     dup "no-" str-head? dup [
@@ -113,7 +121,19 @@
 $args [ cli-arg ] each
 
 ! Compile all words now
-$compile [ compileAll ] when
+$compile [
+    compile-all
+] when
+
+$~ $/ ".factor-rc" cat3 @init-path
+
+$user-init [
+    $init-path dup exists? [ run-file ] [ drop ] ifte
+] when
 
 ! If we're run stand-alone, start the interpreter in the current tty.
-$interactive [ initialInterpreterLoop ] when
+$interactive [
+    [ @top-level-continuation ] callcc0
+
+    initial-interpreter-loop
+] when

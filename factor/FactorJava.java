@@ -29,7 +29,7 @@
 
 package factor;
 
-import factor.compiler.LocalAllocator;
+import factor.compiler.FactorCompiler;
 import java.lang.reflect.*;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -123,6 +123,18 @@ public class FactorJava implements Constants
 			return false;
 		else
 			return true;
+	} //}}}
+
+	//{{{ toByte() method
+	public static byte toByte(Object arg)
+		throws FactorDomainException
+	{
+		if(arg instanceof Number)
+			return ((Number)arg).byteValue();
+		else if(arg instanceof String)
+			return Byte.parseByte((String)arg);
+		else
+			throw new FactorDomainException(arg,byte.class);
 	} //}}}
 
 	//{{{ toChar() method
@@ -232,18 +244,75 @@ public class FactorJava implements Constants
 		}
 	} //}}}
 
+	//{{{ toBooleanArray() method
+	public static boolean[] toBooleanArray(Object arg)
+		throws FactorDomainException
+	{
+		if(arg == null)
+			return new boolean[0];
+		else if(arg instanceof Cons)
+			arg = toArray(arg,Object[].class);
+
+		try
+		{
+			boolean[] returnValue = new boolean[
+				Array.getLength(arg)];
+			for(int i = 0; i < returnValue.length; i++)
+			{
+				returnValue[i] = toBoolean(
+					Array.get(arg,i));
+			}
+			return returnValue;
+		}
+		catch(IllegalArgumentException e)
+		{
+			throw new FactorDomainException(arg,boolean[].class);
+		}
+	} //}}}
+
+	//{{{ toByteArray() method
+	public static byte[] toByteArray(Object arg)
+		throws FactorDomainException
+	{
+		if(arg == null)
+			return new byte[0];
+		else if(arg instanceof Cons)
+			arg = toArray(arg,Object[].class);
+
+		try
+		{
+			byte[] returnValue = new byte[
+				Array.getLength(arg)];
+			for(int i = 0; i < returnValue.length; i++)
+			{
+				returnValue[i] = toByte(
+					Array.get(arg,i));
+			}
+			return returnValue;
+		}
+		catch(IllegalArgumentException e)
+		{
+			throw new FactorDomainException(arg,byte[].class);
+		}
+	} //}}}
+
 	//{{{ toArray() method
 	public static Object[] toArray(Object arg)
 		throws FactorDomainException
 	{
-		return toArray(arg,Object.class);
+		return toArray(arg,Object[].class);
 	} //}}}
 
 	//{{{ toArray() method
 	public static Object[] toArray(Object arg, Class clas)
 		throws FactorDomainException
 	{
-		if(arg instanceof Cons)
+		if(arg == null)
+		{
+			return (Object[])Array.newInstance(
+				clas.getComponentType(),0);
+		}
+		else if(arg instanceof Cons)
 		{
 			Cons list = (Cons)arg;
 			Object[] array = (Object[])
@@ -293,6 +362,10 @@ public class FactorJava implements Constants
 				? Boolean.TRUE
 				: Boolean.FALSE;
 		}
+		else if(clas == byte.class)
+		{
+			return new Byte(toByte(arg));
+		}
 		else if(clas == char.class)
 		{
 			return new Character(toChar(arg));
@@ -319,7 +392,11 @@ public class FactorJava implements Constants
 		}
 		else if(clas.isArray())
 		{
-			return toArray(arg,clas);
+			Class comp = clas.getComponentType();
+			if(!comp.isPrimitive())
+				return toArray(arg,clas);
+			else if(comp == boolean.class)
+				return toBooleanArray(arg);
 		}
 
 		if(arg != null && !clas.isInstance(arg))
@@ -341,25 +418,6 @@ public class FactorJava implements Constants
 			return null;
 		else
 			return arg;
-	} //}}}
-
-	//{{{ factorTypeToString() method
-	public static String factorTypeToString(Object obj)
-	{
-		// this is for string representations of lists and stacks
-		if(obj == null || obj.equals(Boolean.FALSE))
-			return "f";
-		else if(obj.equals(Boolean.TRUE))
-			return "t";
-		else if(obj instanceof String)
-			return '"' + obj.toString() + '"'; //XXX: escape
-		else if(obj instanceof Number
-			|| obj instanceof FactorExternalizable)
-			return obj.toString();
-		else if(obj instanceof Character)
-			return "#\\" + ((Character)obj).charValue();
-		else
-			return "( " + obj + " )";
 	} //}}}
 
 	//{{{ javaClassToVMClass() method
@@ -583,6 +641,29 @@ public class FactorJava implements Constants
 			return e;
 	} //}}}
 
+	//{{{ getConversionMethodName() method
+	/**
+	 * Returns method name for converting an object to the given type.
+	 * Only for primitives.
+	 */
+	public static String getConversionMethodName(Class type)
+	{
+		if(type == short.class)
+		{
+			// not yet done.
+			return null;
+		}
+		else if(type.isPrimitive())
+		{
+			String name = type.getName();
+			return "to"
+				+ Character.toUpperCase(name.charAt(0))
+				+ name.substring(1);
+		}
+		else
+			return null;
+	} //}}}
+
 	//{{{ generateFromConversion() method
 	/**
 	 * Unbox value at top of the stack.
@@ -600,18 +681,15 @@ public class FactorJava implements Constants
 			methodName = "toNumber";
 		else if(type == String.class)
 			methodName = "toString";
-		else if(type == boolean.class)
-			methodName = "toBoolean";
-		else if(type == char.class)
-			methodName = "toChar";
-		else if(type == int.class)
-			methodName = "toInt";
-		else if(type == long.class)
-			methodName = "toLong";
-		else if(type == float.class)
-			methodName = "toFloat";
-		else if(type == double.class)
-			methodName = "toDouble";
+		else if(type == short.class
+			|| type == byte.class
+			|| type == char.class)
+		{
+			// not yet done.
+			methodName = null;
+		}
+		else if(type.isPrimitive())
+			methodName = getConversionMethodName(type);
 		else if(type == Class.class)
 			methodName = "toClass";
 		else if(type == FactorNamespace.class)
@@ -620,7 +698,16 @@ public class FactorJava implements Constants
 			interpArg = true;
 		}
 		else if(type.isArray())
-			methodName = "toArray";
+		{
+			Class comp = type.getComponentType();
+			if(comp.isPrimitive())
+			{
+				methodName = getConversionMethodName(comp)
+					+ "Array";
+			}
+			else
+				methodName = "toArray";
+		}
 
 		if(methodName == null)
 		{

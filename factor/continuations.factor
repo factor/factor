@@ -66,7 +66,7 @@
 : suspend (--)
     ! Suspend the current fiber.
     ! Not really implemented yet.
-    $initialInterpreterContinuation dup [
+    $top-level-continuation dup [
         call
     ] [
         clear unwind

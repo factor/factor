@@ -60,26 +60,25 @@ public class Choice extends FactorWordDefinition
 	} //}}}
 
 	//{{{ getStackEffect() method
-	public StackEffect getStackEffect(java.util.Set recursiveCheck,
-		LocalAllocator state) throws FactorStackException
+	public void getStackEffect(RecursiveState recursiveCheck,
+		FactorCompiler state) throws FactorStackException
 	{
 		state.ensure(state.datastack,3);
-		state.pushChoice();
-		return new StackEffect(3,1,0,0);
+		state.pushChoice(recursiveCheck);
 	} //}}}
 
 	//{{{ compileCallTo() method
 	/**
 	 * Compile a call to this word. Returns maximum JVM stack use.
 	 */
-	/* public int compileCallTo(
+	public int compileCallTo(
 		CodeVisitor mw,
-		LocalAllocator allocator,
-		java.util.Set recursiveCheck)
+		FactorCompiler compiler,
+		RecursiveState recursiveCheck)
 		throws Exception
 	{
-		allocator.pushChoice();
+		compiler.pushChoice(recursiveCheck);
 
 		return 0;
-	} */ //}}}
+	} //}}}
 }

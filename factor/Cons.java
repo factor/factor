@@ -119,6 +119,35 @@ public class Cons implements PublicCloneable, FactorExternalizable
 		return size;
 	} //}}}
 
+	//{{{ nappend() method
+	public static Cons nappend(Cons l1, Cons l2)
+	{
+		if(l1 == null)
+			return l2;
+		if(l2 == null)
+			return l1;
+		Cons last = l1;
+		while(last.cdr != null)
+			last = last.next();
+		last.cdr = l2;
+		return l1;
+	} //}}}
+
+	//{{{ assoc() method
+	public static Object assoc(Cons assoc, Object key)
+	{
+		if(assoc == null)
+			return null;
+		else
+		{
+			Cons first = (Cons)assoc.car;
+			if(FactorLib.equal(first.car,key))
+				return first.cdr;
+			else
+				return assoc(assoc.next(),key);
+		}
+	} //}}}
+
 	//{{{ isProperList() method
 	public boolean isProperList()
 	{
@@ -140,7 +169,7 @@ public class Cons implements PublicCloneable, FactorExternalizable
 			if(iter.car == this)
 				buf.append("<circular reference>");
 			else
-				buf.append(FactorJava.factorTypeToString(iter.car));
+				buf.append(FactorParser.unparse(iter.car));
 			if(iter.cdr instanceof Cons)
 			{
 				buf.append(' ');
@@ -152,7 +181,7 @@ public class Cons implements PublicCloneable, FactorExternalizable
 			else
 			{
 				buf.append(" , ");
-				buf.append(FactorJava.factorTypeToString(iter.cdr));
+				buf.append(FactorParser.unparse(iter.cdr));
 				iter = null;
 			}
 		}

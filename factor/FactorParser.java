@@ -52,32 +52,33 @@ public class FactorParser
 
 	private String filename;
 	private Reader in;
-	private FactorDictionary dict;
+	private FactorInterpreter interp;;
 	private StreamTokenizer st;
 
 	// sometimes one token is expanded into two words
 	private Object next;
 
 	//{{{ FactorParser constructor
-	public FactorParser(String filename, Reader in, FactorDictionary dict)
+	public FactorParser(String filename, Reader in,
+		FactorInterpreter interp)
 	{
 		this.filename = (filename == null ? "<eval>" : filename);
 		this.in = in;
-		this.dict = dict;
+		this.interp = interp;
 
-		DEF = dict.intern(":");
-		INE = dict.intern(";");
+		DEF = interp.intern(":");
+		INE = interp.intern(";");
 
-		SHU = dict.intern("~<<");
-		F = dict.intern("--");
-		FLE = dict.intern(">>~");
+		SHU = interp.intern("~<<");
+		F = interp.intern("--");
+		FLE = interp.intern(">>~");
 
-		DEFINE = dict.intern("define");
+		DEFINE = interp.intern("define");
 
-		BRA = dict.intern("[");
-		KET = dict.intern("]");
+		BRA = interp.intern("[");
+		KET = interp.intern("]");
 
-		COMMA = dict.intern(",");
+		COMMA = interp.intern(",");
 
 		st = new StreamTokenizer(in);
 		st.resetSyntax();
@@ -293,13 +294,13 @@ public class FactorParser
 				// $foo is expanded into "foo" $
 				if(st.sval.charAt(0) == '$')
 				{
-					next = dict.intern("$");
+					next = interp.intern("$");
 					return st.sval.substring(1);
 				}
 				// @foo is expanded into "foo" @
 				else if(st.sval.charAt(0) == '@')
 				{
-					next = dict.intern("@");
+					next = interp.intern("@");
 					return st.sval.substring(1);
 				}
 			}
@@ -308,7 +309,7 @@ public class FactorParser
 			if(st.sval.charAt(0) == '|')
 				return st.sval.substring(1);
 
-			return dict.intern(st.sval);
+			return interp.intern(st.sval);
 		case '"': case '\'':
 			return st.sval;
 		default:
@@ -363,7 +364,7 @@ public class FactorParser
 				int counter;
 				if(name.startsWith("r:"))
 				{
-					next = dict.intern(name.substring(2));
+					next = interp.intern(name.substring(2));
 					counter = (FactorShuffleDefinition
 						.FROM_R_MASK
 						| consumeR++);
@@ -378,7 +379,7 @@ public class FactorParser
 			}
 			else
 			{
-				error("Unexpected " + FactorJava.factorTypeToString(
+				error("Unexpected " + FactorParser.unparse(
 					next));
 			}
 		}
@@ -407,7 +408,7 @@ public class FactorParser
 				FactorWord w = ((FactorWord)_shuffle.car);
 				String name = w.name;
 				if(name.startsWith("r:"))
-					w = dict.intern(name.substring(2));
+					w = interp.intern(name.substring(2));
 
 				Integer _index = (Integer)consumeMap.get(w);
 				if(_index == null)
@@ -429,7 +430,7 @@ public class FactorParser
 			}
 			else
 			{
-				error("Unexpected " + FactorJava.factorTypeToString(
+				error("Unexpected " + FactorParser.unparse(
 					_shuffle.car));
 			}
 			_shuffle = _shuffle.next();
@@ -543,5 +544,53 @@ public class FactorParser
 	private void error(String msg) throws FactorParseException
 	{
 		throw new FactorParseException(filename,st.lineno(),msg);
+	} //}}}
+
+	//{{{ getUnreadableString() method
+	public static String getUnreadableString(String str)
+	{
+		return "#<" + str + ">";
+	} //}}}
+
+	//{{{ unparse() method
+	public static String unparse(Object obj)
+	{
+		// this is for string representations of lists and stacks
+		if(obj == null || obj.equals(Boolean.FALSE))
+			return "f";
+		else if(obj.equals(Boolean.TRUE))
+			return "t";
+		else if(obj instanceof String)
+		{
+			StringBuffer buf = new StringBuffer("\"");
+			String str = (String)obj;
+			for(int i = 0; i < str.length(); i++)
+			{
+				char ch = str.charAt(i);
+				switch(ch)
+				{
+				case '\n':
+					buf.append("\\n");
+					break;
+				case '\t':
+					buf.append("\\t");
+					break;
+				case '"':
+					buf.append("\\\"");
+					break;
+				default:
+					buf.append(ch);
+				}
+			}
+			buf.append('"');
+			return buf.toString();
+		}
+		else if(obj instanceof Number
+			|| obj instanceof FactorExternalizable)
+			return obj.toString();
+		else if(obj instanceof Character)
+			return "#\\" + ((Character)obj).charValue();
+		else
+			return getUnreadableString(obj.toString());
 	} //}}}
 }

@@ -25,136 +25,58 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-: exception? (exception -- boolean)
-    "java.lang.Throwable" is ;
+0 @history-count
 
-: printStackTrace (exception --)
-    [ ] "java.lang.Throwable" "printStackTrace" jinvoke ;
+: exit (--)
+    $global [ t @quit-flag ] bind ;
 
-: exception. (exception --)
-    ! If this is an Factor exception, just print the message, otherwise print
-    ! the entire exception as a string.
-    dup "factor.FactorException" is [
-        [ ] "java.lang.Throwable" "getMessage" jinvoke
-    ] [
-        >str
-    ] ifte print ;
-
-: break (exception --)
-    dup @error
-
-    ! Called when the interpreter catches an exception.
-    "break called." print
-    "" print
-    ":w prints the callstack." print
-    ":j prints the Java stack." print
-    ":r returns to top level." print
-    ":s returns to top level, retaining the data stack." print
-    ":g continues execution (but expect another error)." print
-    "" print
-    "ERROR: " write exception.
-    :w
-    callstack$ @errorCallStack
-    [
-        @errorContinuation
-        interpreterLoop
-        ! If we end up here, the user just exited the err interpreter.
-        ! If we just call returnFromError here, its like :g and this
-        ! is probably not what they wanted. So we :r instead.
-        :r
-    ] callcc0 ;
-
-: returnFromError (--)
-    "Returning from break." print
-    f @errorCallStack
-    f @errorFlag
-    f @error ;
-
-: :g (--)
-    ! Continues execution from the point of the error. Can be dangerous.
-    returnFromError
-    $errorContinuation call ;
-
-: :r (--)
-    ! Returns to the top level.
-    returnFromError
-    !XXX
-    $initialInterpreterContinuation dup [
-        call
-    ] [
-        suspend
-    ] ifte ;
-
-: :s (--)
-    ! Returns to the top level, retaining the stack.
-    returnFromError
-    $initialInterpreterCallStack callstack@ ;
-
-: :j (--)
-    ! Print the stack trace from the exception that caused the last break.
-    $error dup exception? [
-        printStackTrace
-    ] [
-        "Not an exception: " write .
-    ] ifte ;
-
-: :w (--)
-    ! Print the current callstack, or the callstack of the last error inside an
-    ! error context.
-    $errorCallStack dup [
-        drop callstack$
-    ] unless . ;
-
-: printPrompt (--)
-    $errorFlag "  err> " "  ok> " ? write ;
-
-: interpreterLoop (--)
-    printPrompt read [
-        eval
-        $quitFlag [ interpreterLoop ] unless
-    ] when* ;
-
-: initialInterpreterLoop (--)
-    ! Run the stand-alone interpreter
+: print-banner ( -- )
     "Factor " $version cat2 print
     "Copyright (C) 2003, 2004 Slava Pestov" print
     "Enter ``help'' for help." print
-    "Enter ``exit'' to exit." print
+    "Enter ``exit'' to exit." print ;
+
+: history+ ( cmd -- )
+    $history 2dup contains [ 2drop ] [ cons @history ] ifte
+    "history-count" succ@ ;
+
+: history ( -- )
+    "X redo    -- evaluate the expression with number X." print
+    "X re-edit -- edit the expression with number X." print
+    $history print-numbered-list ;
+
+: get-history ( index -- )
+    $history reverse swap get ;
+
+: redo ( index -- )
+    get-history [ . ] [ eval ] cleave ;
+
+: re-edit ( index -- )
+    get-history edit ;
+
+: print-prompt ( prompt -- )
+    write $history-count write "] " write ;
+
+: interpreter-loop ( prompt -- )
+    dup >r print-prompt read [
+        [ history+ ] [ eval ] cleave
+        $global [ $quit-flag ] bind [
+            rdrop
+            $global [ f @quit-flag ] bind
+        ] [
+            r> interpreter-loop
+        ] ifte
+    ] when* ;
+
+: initial-interpreter-loop (--)
+    ! Run the stand-alone interpreter
+    print-banner
     ! Used by :r
-    [ @initialInterpreterContinuation ] callcc0
+    [ @initial-interpreter-continuation ] callcc0
     ! Used by :s
     ! We use the slightly redundant 'call' to push the current callframe.
-    [ callstack$ @initialInterpreterCallStack ] call
-    interpreterLoop ;
-
-: words. (--)
-    ! Print all defined words.
-    words [ . ] each ;
-
-: see (word --)
-    dup worddefUncompiled [
-        (word -- worddef word)
-        dup [
-            worddefUncompiled dup shuffle? "~<< " ": " ? write
-        ] dip
-
-        (worddef word -- worddef)
-        write "\n    " write
-
-        dup >str write
-
-        shuffle? " >>~\n" " ;\n" ? write
-    ] [
-        "Not defined: " write print
-    ] ifte ;
-
-: vars. (--)
-    ! Print a list of defined variables.
-    vars [ . ] each ;
-
-: .s (--)
-    ! Prints the contents of the data stack
-    datastack$ . ;
+    [ callstack$ @initial-interpreter-callstack ] call
+    "    " interpreter-loop ;
 
 : stats ( -- )
     "Cons:     " write
@@ -167,28 +89,24 @@
 : gc ( -- )
     [ ] "java.lang.System" "gc" jinvoke-static ;
 
-: balance ( code -- effect )
-    ! Push stack effect of the given code quotation.
-    [ "factor.Cons" ] "factor.compiler.StackEffect"
-    "getStackEffect" jinvoke-static ;
-
 : help
+    "clear              -- clear datastack."
+    ".s                 -- print datastack."
+    ".                  -- print top of datastack."
     "" print
-    "= Dynamic, interpreted, stack-based scripting language" print
-    "= Arbitrary precision math, ratio math" print
-    "= First-class, higher-order, and anonymous functions" print
-    "= Prototype-based object system" print
-    "= Continuations" print
-    "= Tail call optimization" print
-    "= Rich set of primitives based on recursion" print
+    "values.            -- list all variables." print
+    "inspect            -- list all variables bound on object at top of stack." print
+    "$variable .        -- show value of variable." print
     "" print
-    "Some basic commands:" print
-    "clear       -- clear stack." print
-    ".s          -- print stack." print
-    ".           -- print top of stack." print
-    "vars.       -- list all variables." print
-    "$variable . -- show value of variable." print
-    "words.      -- list all words." print
-    "\"word\" see  -- show definition of word." print
-    "exit        -- exit the interpreter." print
+    "words.             -- list all words." print
+    "\"str\" apropos      -- list all words whose name contains str." print
+    "\"word\" see         -- show definition of word." print
+    "" print
+    "[ expr ] balance . -- show stack effect of expression." print
+    "" print
+    "history            -- list previously entered expresions." print
+    "X redo             -- redo expression number X from history list." print
+    "" print
+    "stats              -- interpreter statistics." print
+    "exit               -- exit the interpreter." print
     "" print ;

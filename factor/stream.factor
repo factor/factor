@@ -25,6 +25,9 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+"user.home" system-property @~
+"file.separator" system-property @/
+
 : <stream> ( -- stream )
     ! Create a stream object. A stream is a namespace with the
     ! following entries:
@@ -42,6 +45,8 @@
         [ "freadln not implemented." break ] @freadln
         ( string -- )
         [ "fwrite not implemented."  break ] @fwrite
+        ( string -- )
+        [ "fedit not implemented."   break ] @fedit
         ( -- )
         [ ] @fflush
         ( -- )
@@ -165,6 +170,12 @@
 : fwrite ( string stream -- )
     [ $fwrite call ] bind ;
 
+: fedit ( string stream -- )
+    [ $fedit call ] bind ;
+
+: edit ( string -- )
+    $stdio fedit ;
+
 : fclose ( stream -- )
     [ $fclose call ] bind ;
 
@@ -175,14 +186,8 @@
     [ "java.io.InputStream" "java.io.OutputStream" ]
     "factor.FactorLib" "copy" jinvoke-static ;
 
-"java.lang.System" "in"  jvar-static$ <ireader> <breader> @stdin
-"java.lang.System" "out" jvar-static$ <owriter> @stdout
-$stdin $stdout <charstream> @stdio
-
-!(file -- freader)
-|<freader> [
-    [ |java.lang.String ] |java.io.FileReader jnew <breader>
-] define
+: <freader> ( file -- freader )
+    [ |java.lang.String ] |java.io.FileReader jnew <breader> ;
 
 : <file> (path -- file)
     dup "java.io.File" is not [
@@ -206,10 +211,8 @@ $stdin $stdout <charstream> @stdio
     [ "java.io.File" ] "java.io.File" "renameTo"
     jinvoke ;
 
-!(string -- reader)
-|<sreader> [
-    [ |java.lang.String ] |java.io.StringReader jnew
-] define
+: <sreader> (string -- reader)
+    [ |java.lang.String ] |java.io.StringReader jnew ;
 
 : close (stream --)
     dup "java.io.Reader" is [
@@ -222,18 +225,18 @@ $stdin $stdout <charstream> @stdio
     [ [ "java.lang.String" ] ] "factor.FactorLib" "exec"
     jinvoke-static ;
 
-!(stream -- string)
-|read* [
-    [ ] |java.io.BufferedReader |readLine jinvoke
-] define
+: print-numbered-list* ( number list -- )
+    ! Print each element of the list with a number.
+    dup [
+        uncons [ over pred ] dip print-numbered-list*
+        ": " swap cat3 print
+    ] [
+        2drop
+    ] ifte ;
 
-: print* (string stream --)
-    tuck write*
-    "\n" swap write* ;
+: print-numbered-list ( list -- )
+    dup length pred swap print-numbered-list* ;
 
-!(string stream --)
-|write* [
-    tuck
-    [ |java.lang.String ] |java.io.Writer |write jinvoke
-    [ ] |java.io.Writer |flush jinvoke
-] define
+"java.lang.System" "in"  jvar-static$ <ireader> <breader> @stdin
+"java.lang.System" "out" jvar-static$ <owriter> @stdout
+$stdin $stdout <charstream> @stdio

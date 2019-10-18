@@ -26,7 +26,6 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 : examples/httpd
-    "/factor/examples/httpd.factor" runResource
     "Enter a port number: " write
     read >fixnum
     "Enter document root (eg, /home/www/): " write
@@ -34,5 +33,4 @@
     httpd ;
 
 : examples/httpd*
-    "/factor/examples/httpd.factor" runResource
     8888 "/home/slava/ExampleHTTPD/" httpd ;

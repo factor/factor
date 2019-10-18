@@ -25,18 +25,31 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-: parse (string -- list)
+: parse ( string -- list )
     f swap <sreader> parse* ;
 
-: eval ("X" -- X)
-    parse call ;
+: compile-call ( [ X ] -- X )
+    no-name dup compile execute ;
 
-: runFile (path --)
+: eval ( "X" -- X )
+    parse $compile-toplevel [ compile-call ] [ call ] ifte ;
+
+: eval-compile ( "X" -- X )
+    parse no-name word compile word execute ;
+
+: runFile ( path -- )
     dup <freader> parse* call ;
 
-: unparse (X -- "X")
-    [ |java.lang.Object ] |factor.FactorJava |factorTypeToString
+: unparse ( X -- "X" )
+    [ |java.lang.Object ] |factor.FactorParser |unparse
     jinvoke-static ;
 
-: . (expr --)
+: . ( expr -- )
     unparse print ;
+
+: parse-number ( str -- number )
+    parse dup length 1 = [
+        car dup number? [ drop f ] unless
+    ] [
+        drop f
+    ] ifte ;

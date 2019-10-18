@@ -31,7 +31,7 @@ package factor.primitives;
 
 import factor.compiler.*;
 import factor.*;
-import java.util.Set;
+import java.util.Map;
 
 public class Define extends FactorWordDefinition
 {
@@ -46,32 +46,38 @@ public class Define extends FactorWordDefinition
 		throws Exception
 	{
 		FactorDataStack datastack = interp.datastack;
-		FactorDictionary dict = interp.dict;
-		// handle old define syntax
-		Object obj = datastack.pop();
+		Object def = datastack.pop();
+		Object name = datastack.pop();
+		core(interp,name,def);
+	} //}}}
 
-		FactorWord newWord = interp.dict.intern(
-			(String)datastack.pop(String.class));
+	//{{{ core() method
+	public static void core(FactorInterpreter interp,
+		Object name, Object def) throws Exception
+	{
+		// name: either a string or a word
+		FactorWord newWord;
+		if(name instanceof FactorWord)
+			newWord = (FactorWord)name;
+		else
+			newWord = interp.intern((String)name);
 
-		if(obj instanceof Cons)
+		if(def instanceof Cons)
 		{
-			obj = new FactorCompoundDefinition(
-				newWord,(Cons)obj);
+			def = new FactorCompoundDefinition(
+				newWord,(Cons)def);
 		}
 
-		FactorWordDefinition def = (FactorWordDefinition)obj;
-
-		newWord.define(def);
-		dict.last = newWord;
+		newWord.define((FactorWordDefinition)def);
+		interp.last = newWord;
 	} //}}}
 
 	//{{{ getStackEffect() method
-	public StackEffect getStackEffect(Set recursiveCheck,
-		LocalAllocator state) throws FactorStackException
+	public void getStackEffect(RecursiveState recursiveCheck,
+		FactorCompiler state) throws FactorStackException
 	{
 		state.ensure(state.datastack,2);
 		state.pop(null);
 		state.pop(null);
-		return new StackEffect(2,0,0,0);
 	} //}}}
 }

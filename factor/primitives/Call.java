@@ -32,7 +32,7 @@ package factor.primitives;
 import factor.compiler.*;
 import factor.*;
 import java.lang.reflect.*;
-import java.util.Set;
+import java.util.Map;
 import org.objectweb.asm.*;
 
 public class Call extends FactorWordDefinition
@@ -52,39 +52,25 @@ public class Call extends FactorWordDefinition
 	} //}}}
 
 	//{{{ getStackEffect() method
-	public StackEffect getStackEffect(Set recursiveCheck,
-		LocalAllocator state) throws Exception
+	public void getStackEffect(RecursiveState recursiveCheck,
+		FactorCompiler state) throws Exception
 	{
 		state.ensure(state.datastack,1);
-		LocalAllocator.FlowObject quot
-			= (LocalAllocator.FlowObject)
-			state.datastack.pop();
-		StackEffect effect = quot.getStackEffect(recursiveCheck);
-		if(effect != null)
-		{
-			// add 1 to inD since we consume the
-			// quotation
-			return new StackEffect(effect.inD + 1,
-				effect.outD,
-				effect.inR,
-				effect.outR);
-		}
-		else
-			return null;
+		FlowObject quot = (FlowObject)state.datastack.pop();
+		quot.getStackEffect(recursiveCheck);
 	} //}}}
 
-	//{{{ compileCallTo() method
+	//{{{ compileImmediate() method
 	/**
 	 * Compile a call to this word. Returns maximum JVM stack use.
 	 */
-	public int compileCallTo(
+	public int compileImmediate(
 		CodeVisitor mw,
-		LocalAllocator allocator,
-		Set recursiveCheck)
+		FactorCompiler compiler,
+		RecursiveState recursiveCheck)
 		throws Exception
 	{
-		LocalAllocator.FlowObject quot = (LocalAllocator.FlowObject)
-			allocator.datastack.pop();
+		FlowObject quot = (FlowObject)compiler.datastack.pop();
 		return quot.compileCallTo(mw,recursiveCheck);
 	} //}}}
 }

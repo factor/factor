@@ -42,10 +42,10 @@ import java.util.List;
 /**
  * Manages the set of available words.
  */
-public class FactorNamespace implements PublicCloneable
+public class FactorNamespace implements PublicCloneable, FactorObject
 {
-	private static FactorWord NULL = new FactorWord("(represent-f)");
-	private static FactorWord CHECK_PARENT = new FactorWord("(check-parent)");
+	private static FactorWord NULL = new FactorWord("( represent-f )");
+	private static FactorWord CHECK_PARENT = new FactorWord("( check-parent )");
 
 	public Object obj;
 	private FactorNamespace parent;
@@ -103,6 +103,12 @@ public class FactorNamespace implements PublicCloneable
 			this.obj = obj;
 			setVariable("this",obj);
 		}
+	} //}}}
+
+	//{{{ getNamespace() method
+	public FactorNamespace getNamespace(FactorInterpreter interp)
+	{
+		return this;
 	} //}}}
 
 	//{{{ getParent() method
@@ -200,20 +206,48 @@ public class FactorNamespace implements PublicCloneable
 		words.put(name,CHECK_PARENT);
 	} //}}}
 
+	//{{{ initAllFields() method
+	private void initAllFields()
+	{
+		if(obj != null)
+		{
+			try
+			{
+				Field[] fields = obj.getClass().getFields();
+				for(int i = 0; i < fields.length; i++)
+				{
+					Field f = fields[i];
+					if(Modifier.isStatic(f.getModifiers()))
+						continue;
+					words.put(f.getName(),
+						new VarBinding(f,obj));
+				}
+			}
+			catch(Exception e)
+			{
+			}
+		}
+	} //}}}
+
 	//{{{ toVarList() method
 	/**
 	 * Returns a list of variable and word names defined in this namespace.
 	 */
 	public Cons toVarList()
 	{
+		initAllFields();
+
 		Cons first = null;
 		Cons last = null;
 		Iterator iter = words.entrySet().iterator();
 		while(iter.hasNext())
 		{
 			Map.Entry entry = (Map.Entry)iter.next();
-			if(entry.getValue() == CHECK_PARENT)
+			Object value = entry.getValue();
+			if(value == CHECK_PARENT)
 				continue;
+			else if(value == NULL)
+				value = null;
 
 			String name = (String)entry.getKey();
 			Cons cons = new Cons(name,null);
@@ -235,18 +269,33 @@ public class FactorNamespace implements PublicCloneable
 	 */
 	public Cons toValueList()
 	{
+		initAllFields();
+
 		Cons first = null;
 		Cons last = null;
 		Iterator iter = words.entrySet().iterator();
 		while(iter.hasNext())
 		{
 			Map.Entry entry = (Map.Entry)iter.next();
-			if(entry.getValue() == CHECK_PARENT)
+			Object value = entry.getValue();
+			if(value == CHECK_PARENT)
 				continue;
+			else if(value == NULL)
+				value = null;
 
-			Cons cons = new Cons(
-				new Cons(entry.getKey(),
-				entry.getValue()),null);
+			if(value instanceof VarBinding)
+			{
+				try
+				{
+					value = ((VarBinding)value).get();
+				}
+				catch(Exception e)
+				{
+				}
+			}
+
+			Cons cons = new Cons(new Cons(entry.getKey(),value)
+				,null);
 			if(first == null)
 				first = last = cons;
 			else
@@ -291,11 +340,10 @@ public class FactorNamespace implements PublicCloneable
 	{
 		if(obj == null)
 		{
-			return "( Namespace #" + Integer.toString(hashCode(),16)
-				+ " )";
+			return "Namespace #" + Integer.toString(hashCode(),16);
 		}
 		else
-			return "( Namespace: " + obj + " #" + hashCode() + " )";
+			return "Namespace: " + obj + " #" + hashCode();
 	} //}}}
 
 	//{{{ clone() method

@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2003 Slava Pestov.
+! Copyright (C) 2003, 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -28,8 +28,15 @@
 : 0= (x -- boolean)
     0 = ;
 
+: 0>f ( obj -- oj )
+    ! If 0 a the top of the stack, turn it into f.
+    dup 0 = [ drop f ] when ;
+
 : 1= (x -- boolean)
     1 = ;
+
+: number? (obj -- boolean)
+    "java.lang.Number" is ;
 
 : fixnum? (obj -- boolean)
     "java.lang.Integer" is ;
@@ -58,12 +65,19 @@
     [ "java.lang.Number" "java.lang.Number" ] "factor.FactorMath" "add"
     jinvoke-static ;
 
+: v+ ( A B -- A+B )
+    [ + ] 2map ;
+
 : +@ (num var --)
     dup [ $ + ] dip @ ;
 
 : - (a b -- a-b)
     [ "java.lang.Number" "java.lang.Number" ] "factor.FactorMath" "subtract"
     jinvoke-static ;
+
+: v- ( A B -- A-B )
+    [ - ] 2map ;
+
 
 : -@ (num var --)
     dup [ $ swap - ] dip @ ;
@@ -72,12 +86,22 @@
     [ "java.lang.Number" "java.lang.Number" ] "factor.FactorMath" "multiply"
     jinvoke-static ;
 
+: v* ( A B -- A*B )
+    [ * ] 2map ;
+
+: v. ( A B -- A.B )
+    ! Dot product.
+    v* 0 swap [ + ] each ;
+
 : *@ (num var --)
     dup [ $ * ] dip @ ;
 
 : / (a b -- a/b)
     [ "java.lang.Number" "java.lang.Number" ] "factor.FactorMath" "divide"
     jinvoke-static ;
+
+: v/ ( A B -- A/B )
+    [ / ] 2map ;
 
 : /@ (num var --)
     dup [ $ / ] dip @ ;
@@ -97,9 +121,19 @@
 : and (a b -- a&b)
     f ? ;
 
+: gcd ( a b -- c )
+    [ "java.lang.Number" "java.lang.Number" ]
+    "factor.FactorMath" "gcd" jinvoke-static ;
+
 : mag2 (x y -- mag)
     ! Returns the magnitude of the vector (x,y).
     sq swap sq + sqrt ;
+
+: max ( x y -- z )
+    2dup > -rot ? ;
+
+: min ( x y -- z )
+    2dup < -rot ? ;
 
 : neg (x -- -x)
     0 swap - ;
@@ -120,20 +154,24 @@
 : pred (n -- n-1)
     1 - ;
 
-: round ( x y -- x^y )
-    [ "double" "double" ] "java.lang.Math" "pow" jinvoke-static ;
-
 : succ (n -- nsucc)
     1 + ;
 
 : pred@ (var --)
-    dup $ 1 - s@ ;
+    dup $ pred s@ ;
 
 : or (a b -- a|b)
     t swap ? ;
 
 : recip (x -- 1/x)
     1 swap / ;
+
+: rem ( x y -- remainder )
+    [ "double" "double" ] "java.lang.Math" "IEEEremainder"
+    jinvoke-static ;
+
+: round ( x to -- y )
+    dupd rem - ;
 
 : sq (x -- x^2)
     dup * ;
@@ -142,7 +180,7 @@
     [ "double" ] "java.lang.Math" "sqrt" jinvoke-static ;
 
 : succ@ (var --)
-    dup $ 1 + s@ ;
+    dup $ succ s@ ;
 
 : deg2rad (degrees -- radians)
     $pi * 180 / ;

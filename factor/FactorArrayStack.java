@@ -140,21 +140,4 @@ public abstract class FactorArrayStack implements FactorExternalizable
 		}
 		return first;
 	} //}}}
-
-	//{{{ toString() method
-	public String toString()
-	{
-		StringBuffer buf = new StringBuffer();
-		for(int i = 0; i < top; i++)
-		{
-			if(i != 0)
-				buf.append('\n');
-			buf.append(i).append(": ");
-			if(stack[i] == this)
-				buf.append("THIS STACK");
-			else
-				buf.append(FactorJava.factorTypeToString(stack[i]));
-		}
-		return buf.toString();
-	} //}}}
 }

@@ -29,14 +29,18 @@
 
 package factor;
 
-import factor.compiler.FactorCompilerException;
+import factor.compiler.*;
 import java.util.*;
 
 /**
  * An internalized symbol.
  */
-public class FactorWord implements FactorExternalizable
+public class FactorWord implements FactorExternalizable, FactorObject
 {
+	private static int gensymCount = 0;
+
+	private FactorNamespace namespace;
+
 	public final String name;
 
 	/**
@@ -45,14 +49,9 @@ public class FactorWord implements FactorExternalizable
 	public FactorWordDefinition def;
 
 	/**
-	 * Definition before compiling.
+	 * Contains a string if this is compiled.
 	 */
-	public FactorWordDefinition uncompiled;
-
-	/**
-	 * "define" pushes previous definitions onto this list, like a stack.
-	 */
-	public Cons history;
+	public String asm;
 
 	/**
 	 * Is this word referenced from a compiled word?
@@ -71,60 +70,69 @@ public class FactorWord implements FactorExternalizable
 		def = new FactorMissingDefinition(this);
 	} //}}}
 
+	//{{{ getNamespace() method
+	public FactorNamespace getNamespace(FactorInterpreter interp)
+		throws Exception
+	{
+		if(namespace == null)
+			namespace = new FactorNamespace(interp.global,this);
+
+		return namespace;
+	} //}}}
+
+	//{{{ gensym() method
+	/**
+	 * Returns an un-internalized word with a unique name.
+	 */
+	public static FactorWord gensym()
+	{
+		return new FactorWord("( GENSYM:" + (gensymCount++) + " )");
+	} //}}}
+
 	//{{{ define() method
 	public void define(FactorWordDefinition def)
 	{
+		asm = null;
+
 		if(compileRef)
 		{
 			System.err.println("WARNING: " + this
 				+ " is used in one or more compiled words; old definition will remain until full recompile");
 		}
 		else if(!(this.def instanceof FactorMissingDefinition))
-		{
 			System.err.println("WARNING: redefining " + this);
-			history = new Cons(this.def,history);
-		}
 
-		uncompiled = this.def = def;
+		this.def = def;
 	} //}}}
 
 	//{{{ compile() method
 	public void compile(FactorInterpreter interp)
 	{
-		compile(interp,new HashSet());
+		RecursiveState recursiveCheck = new RecursiveState();
+		recursiveCheck.add(this,null);
+		compile(interp,recursiveCheck);
+		recursiveCheck.remove(this);
 	} //}}}
 
 	//{{{ compile() method
-	public void compile(FactorInterpreter interp, Set recursiveCheck)
+	public void compile(FactorInterpreter interp, RecursiveState recursiveCheck)
 	{
-		if(def.compileFailed)
-			return;
+		//if(def.compileFailed)
+		//	return;
 
-		System.err.println("Compiling " + this);
-		if(recursiveCheck.contains(this))
-			System.err.println("WARNING: cannot compile recursive calls: " + this);
+		//System.err.println("Compiling " + this);
 
 		try
 		{
-			recursiveCheck.add(this);
-
 			def = def.compile(interp,recursiveCheck);
-		}
-		catch(FactorCompilerException e)
-		{
-			def.compileFailed = true;
-			System.err.println("WARNING: cannot compile " + this);
-			System.err.println(e.getMessage());
 		}
 		catch(Throwable t)
 		{
 			def.compileFailed = true;
-			System.err.println("WARNING: cannot compile " + this);
-			t.printStackTrace();
-		}
-		finally
-		{
-			recursiveCheck.remove(this);
+			/*System.err.println("WARNING: cannot compile " + this
+				+ ": " + t.getMessage());
+			if(!(t instanceof FactorException))
+				t.printStackTrace();*/
 		}
 	} //}}}
 

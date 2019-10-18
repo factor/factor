@@ -34,7 +34,6 @@ import java.lang.reflect.*;
 import java.io.FileOutputStream;
 import java.util.*;
 import org.objectweb.asm.*;
-import org.objectweb.asm.util.*;
 
 /**
  * : name ... ;
@@ -60,22 +59,21 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 	} //}}}
 
 	//{{{ getStackEffect() method
-	public StackEffect getStackEffect(Set recursiveCheck,
-		LocalAllocator state) throws Exception
+	public void getStackEffect(RecursiveState recursiveCheck,
+		FactorCompiler compiler) throws Exception
 	{
-		if(recursiveCheck.contains(this))
-			return null;
-
-		try
+		RecursiveForm rec = recursiveCheck.get(word);
+		if(rec.active)
 		{
-			recursiveCheck.add(this);
+			StackEffect se = rec.baseCase;
+			if(se == null)
+				throw new FactorCompilerException("Indeterminate recursive call");
 
-			return StackEffect.getStackEffect(definition,
-				recursiveCheck,state);
+			compiler.apply(StackEffect.decompose(rec.effect,se));
 		}
-		finally
+		else
 		{
-			recursiveCheck.remove(this);
+			compiler.getStackEffect(definition,recursiveCheck);
 		}
 	} //}}}
 
@@ -100,45 +98,40 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 	 * Compile the given word, returning a new word definition.
 	 */
 	FactorWordDefinition compile(FactorInterpreter interp,
-		Set recursiveCheck) throws Exception
+		RecursiveState recursiveCheck) throws Exception
 	{
-		StackEffect effect = getStackEffect(
-			recursiveCheck,new LocalAllocator());
-		if(effect == null)
-			throw new FactorCompilerException("Cannot deduce stack effect of " + word);
-		if(effect.outD > 1)
-			throw new FactorCompilerException("Cannot compile word that returns more than 1 value");
+		StackEffect effect = getStackEffect();
 
-		/* StringBuffer buf = new StringBuffer();
-		for(int i = 0; i < recursiveCheck.size(); i++)
-		{
-			buf.append(' ');
-		}
-		buf.append("Compiling ").append(word);
-		System.err.println(buf); */
+		if(effect.inR != 0 || effect.outR != 0)
+			throw new FactorCompilerException("Compiled code cannot manipulate call stack frames");
+
+		boolean multipleReturns = (effect.outD > 1);
 
 		String className = getSanitizedName(word.name);
 
 		ClassWriter cw = new ClassWriter(false);
 		cw.visit(ACC_PUBLIC, className,
-			"factor/compiler/CompiledDefinition", null, null);
+			"factor/compiler/CompiledDefinition",
+			null, null);
 
 		compileConstructor(cw,className);
 
 		CompileResult result = compileEval(interp,cw,
-			className,effect,recursiveCheck);
+			className,effect,recursiveCheck,
+			multipleReturns);
 
-		compileToString(cw,effect);
+		// Generate fields for storing literals and
+		// word references
+		result.compiler.generateFields(cw);
 
-		// Generate fields for storing literals and word references
-		result.allocator.generateFields(cw);
-
-		// gets the bytecode of the class, and loads it dynamically
+		// gets the bytecode of the class, and loads it
+		// dynamically
 		byte[] code = cw.toByteArray();
 
-		if(interp.compileDump)
+		if(interp.dump)
 		{
-			FileOutputStream fos = new FileOutputStream(className + ".class");
+			FileOutputStream fos = new FileOutputStream(
+				className + ".class");
 			fos.write(code);
 			fos.close();
 		}
@@ -147,17 +140,21 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 			className.replace('/','.'),
 			code, 0, code.length);
 
-		result.allocator.setFields(compiledWordClass);
+		result.compiler.setFields(compiledWordClass);
 
-		Constructor constructor = compiledWordClass.getConstructor(
-			new Class[] { FactorWord.class, StackEffect.class });
+		Constructor constructor = compiledWordClass
+			.getConstructor(
+			new Class[] {
+			FactorWord.class, StackEffect.class, Cons.class
+			});
 
-		FactorWordDefinition compiledWord = (FactorWordDefinition)
-			constructor.newInstance(new Object[] { word, effect });
+		FactorWordDefinition compiledWord
+			= (FactorWordDefinition)
+			constructor.newInstance(
+			new Object[] { word, effect, definition });
 
 		// store disassembly for the 'asm' word.
-		compiledWord.getNamespace(interp).setVariable("asm",
-			result.asm);
+		word.asm = result.asm;
 
 		return compiledWord;
 	} //}}}
@@ -168,7 +165,9 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 		// creates a MethodWriter for the constructor
 		CodeVisitor mw = cw.visitMethod(ACC_PUBLIC,
 			"<init>",
-			"(Lfactor/FactorWord;Lfactor/compiler/StackEffect;)V",
+			"(Lfactor/FactorWord;"
+			+ "Lfactor/compiler/StackEffect;"
+			+ "Lfactor/Cons;)V",
 			null, null);
 		// pushes the 'this' variable
 		mw.visitVarInsn(ALOAD, 0);
@@ -176,34 +175,27 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 		mw.visitVarInsn(ALOAD, 1);
 		// pushes the stack effect parameter
 		mw.visitVarInsn(ALOAD, 2);
+		// pushes the definition parameter
+		mw.visitVarInsn(ALOAD, 3);
 		// invokes the super class constructor
 		mw.visitMethodInsn(INVOKESPECIAL,
 			"factor/compiler/CompiledDefinition", "<init>",
-			"(Lfactor/FactorWord;Lfactor/compiler/StackEffect;)V");
+			"(Lfactor/FactorWord;"
+			+ "Lfactor/compiler/StackEffect;"
+			+ "Lfactor/Cons;)V");
 		mw.visitInsn(RETURN);
-		mw.visitMaxs(3, 3);
-	} //}}}
-
-	//{{{ compileToString() method
-	private void compileToString(ClassVisitor cw, StackEffect effect)
-	{
-		// creates a MethodWriter for the 'toString' method
-		CodeVisitor mw = cw.visitMethod(ACC_PUBLIC,
-			"toString", "()Ljava/lang/String;", null, null);
-		mw.visitLdcInsn("( compiled: " + effect + " ) " + toString());
-		mw.visitInsn(ARETURN);
-		mw.visitMaxs(1, 1);
+		mw.visitMaxs(4, 4);
 	} //}}}
 
 	//{{{ compileEval() method
 	static class CompileResult
 	{
-		LocalAllocator allocator;
+		FactorCompiler compiler;
 		String asm;
 
-		CompileResult(LocalAllocator allocator, String asm)
+		CompileResult(FactorCompiler compiler, String asm)
 		{
-			this.allocator = allocator;
+			this.compiler = compiler;
 			this.asm = asm;
 		}
 	}
@@ -215,73 +207,34 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 	 */
 	protected CompileResult compileEval(FactorInterpreter interp,
 		ClassWriter cw, String className, StackEffect effect,
-		Set recursiveCheck) throws Exception
+		RecursiveState recursiveCheck, boolean multipleReturns)
+		throws Exception
 	{
 		// creates a MethodWriter for the 'eval' method
-		CodeVisitor _mw = cw.visitMethod(ACC_PUBLIC,
+		CodeVisitor mw = cw.visitMethod(ACC_PUBLIC,
 			"eval", "(Lfactor/FactorInterpreter;)V",
 			null, null);
-
-		TraceCodeVisitor mw = new TraceCodeVisitor(_mw);
 
 		// eval() method calls core
 		mw.visitVarInsn(ALOAD,1);
 
 		compileDataStackToJVMStack(effect,mw);
 
-		String signature = effect.getCorePrototype();
-
-		mw.visitMethodInsn(INVOKESTATIC,
-			className,"core",signature);
+		mw.visitMethodInsn(INVOKESTATIC,className,"core",
+			effect.getCorePrototype());
 
 		compileJVMStackToDataStack(effect,mw);
 
 		mw.visitInsn(RETURN);
 		mw.visitMaxs(Math.max(4,2 + effect.inD),4);
 
-		String evalAsm = getDisassembly(mw);
-
 		// generate core
-		_mw = cw.visitMethod(ACC_PUBLIC | ACC_STATIC,
-			"core",signature,null,null);
-
-		mw = new TraceCodeVisitor(_mw);
-
-		LocalAllocator allocator = new LocalAllocator(interp,
+		FactorCompiler compiler = new FactorCompiler(interp,word,
 			className,1,effect.inD);
+		String asm = compiler.compile(definition,cw,className,
+			"core",effect,recursiveCheck);
 
-		int maxJVMStack = allocator.compile(definition,mw,
-			recursiveCheck);
-
-		if(effect.outD == 0)
-			mw.visitInsn(RETURN);
-		else
-		{
-			allocator.pop(mw);
-			mw.visitInsn(ARETURN);
-			maxJVMStack = Math.max(maxJVMStack,1);
-		}
-
-		mw.visitMaxs(maxJVMStack,allocator.maxLocals());
-
-		String coreAsm = getDisassembly(mw);
-
-		return new CompileResult(allocator,
-			"eval(Lfactor/FactorInterpreter;)V:\n" + evalAsm
-			+ "core" + signature + "\n" + coreAsm);
-	} //}}}
-
-	//{{{ getDisassembly() method
-	protected String getDisassembly(TraceCodeVisitor mw)
-	{
-		// Save the disassembly of the eval() method
-		StringBuffer buf = new StringBuffer();
-		Iterator bytecodes = mw.getText().iterator();
-		while(bytecodes.hasNext())
-		{
-			buf.append(bytecodes.next());
-		}
-		return buf.toString();
+		return new CompileResult(compiler,asm);
 	} //}}}
 
 	//{{{ compileDataStackToJVMStack() method
@@ -358,16 +311,37 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 	/**
 	 * Compile a call to this word. Returns maximum JVM stack use.
 	 */
-	public int compileImmediate(CodeVisitor mw, LocalAllocator allocator,
-		Set recursiveCheck) throws Exception
+	public int compileImmediate(CodeVisitor mw, FactorCompiler compiler,
+		RecursiveState recursiveCheck) throws Exception
 	{
-		return allocator.compile(definition,mw,recursiveCheck);
+		/* System.err.println("immediate call to " + word);
+		FactorDataStack savedDatastack = (FactorDataStack)
+			compiler.datastack.clone();
+		FactorCallStack savedCallstack = (FactorCallStack)
+			compiler.callstack.clone();
+		StackEffect savedEffect = compiler.getStackEffect();
+		compiler.effect = new StackEffect();
+
+		RecursiveState _recursiveCheck = new RecursiveState();
+		_recursiveCheck.add(word,null);
+		getStackEffect(_recursiveCheck,compiler);
+		_recursiveCheck.remove(word);
+		StackEffect effect = compiler.getStackEffect();
+
+		System.err.println("immediate effect is " + effect);
+
+		compiler.datastack = savedDatastack;
+		compiler.callstack = savedCallstack;
+		compiler.effect = savedEffect; */
+
+		return compiler.compile(definition,mw,recursiveCheck);
 	} //}}}
 
-	//{{{ toString() method
-	public String toString()
+	//{{{ toList() method
+	public Cons toList()
 	{
-		return definition.elementsToString();
+		return new Cons(word,new Cons(new FactorWord("\n"),
+			definition));
 	} //}}}
 
 	private static SimpleClassLoader loader = new SimpleClassLoader();

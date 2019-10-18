@@ -278,8 +278,7 @@ public class FactorMath
 		if(min == max)
 			return min;
 
-		int nextInt = random.nextInt();
-		return min + Math.abs(nextInt % (max - min + 1));
+		return min + random.nextInt(max - min + 1);
 	} //}}}
 
 	//{{{ randomFloat() method

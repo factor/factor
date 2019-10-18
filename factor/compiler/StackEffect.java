@@ -32,12 +32,16 @@ package factor.compiler;
 import factor.*;
 import java.util.*;
 
-public class StackEffect
+public class StackEffect implements PublicCloneable, FactorExternalizable
 {
-	public final int inD;
-	public final int outD;
-	public final int inR;
-	public final int outR;
+	public int inD;
+	public int outD;
+	public int inR;
+	public int outR;
+
+	//{{{ StackEffect constructor
+	public StackEffect() {}
+	//}}}
 
 	//{{{ StackEffect constructor
 	public StackEffect(int inD, int outD, int inR, int outR)
@@ -48,67 +52,55 @@ public class StackEffect
 		this.outR = outR;
 	} //}}}
 
-	//{{{ getStackEffect() method
-	public static StackEffect getStackEffect(Cons definition)
-		throws Exception
+	//{{{ compose() method
+	public static StackEffect compose(StackEffect first,
+		StackEffect second)
 	{
-		return getStackEffect(definition,new HashSet(),
-			new LocalAllocator());
-	} //}}}
+		if(first == null || second == null)
+			return null;
 
-	//{{{ getStackEffect() method
-	public static StackEffect getStackEffect(Cons definition,
-		Set recursiveCheck, LocalAllocator state)
-		throws Exception
-	{
-		int inD = 0;
-		int outD = 0;
-		int inR = 0;
-		int outR = 0;
+		int inD  = first.inD;
+		int inR  = first.inR;
+		int outD = first.outD;
+		int outR = first.outR;
 
-		Cons iter = definition;
-		while(iter != null)
+		if(second.inD <= outD)
+			outD -= second.inD;
+		else
 		{
-			Object obj = iter.car;
-			if(obj instanceof FactorWord)
-			{
-				StackEffect se = ((FactorWord)obj).def
-					.getStackEffect(
-					recursiveCheck,
-					state);
-
-				if(se == null)
-					return null;
-
-				if(se.inD <= outD)
-					outD -= se.inD;
-				else
-				{
-					inD += (se.inD - outD);
-					outD = 0;
-				}
-
-				if(se.inR <= outR)
-					outR -= se.inR;
-				else
-				{
-					inR += (se.inR - outR);
-					outR = 0;
-				}
-
-				outD += se.outD;
-				outR += se.outR;
-			}
-			else
-			{
-				outD++;
-				state.pushLiteral(obj);
-			}
-
-			iter = iter.next();
+			inD += (second.inD - outD);
+			outD = 0;
 		}
 
+		if(second.inR <= outR)
+			outR -= second.inR;
+		else
+		{
+			inR += (second.inR - outR);
+			outR = 0;
+		}
+
+		outD += second.outD;
+		outR += second.outR;
+
 		return new StackEffect(inD,outD,inR,outR);
+	} //}}}
+
+	//{{{ decompose() method
+	/**
+	 * Returns a stack effect E such that compose(first,E) == second.
+	 */
+	public static StackEffect decompose(StackEffect first,
+		StackEffect second)
+	{
+		if(second.inD < first.inD || second.inR < first.inR)
+			throw new IllegalArgumentException();
+
+		return new StackEffect(
+			first.outD + second.inD - first.inD,
+			second.outD,
+			first.outR + second.inR - first.inR,
+			second.outR);
 	} //}}}
 
 	//{{{ getCorePrototype() method
@@ -122,7 +114,7 @@ public class StackEffect
 			signatureBuf.append("Ljava/lang/Object;");
 		}
 
-		if(outD == 0)
+		if(outD != 1)
 			signatureBuf.append(")V");
 		else
 			signatureBuf.append(")Ljava/lang/Object;");
@@ -145,24 +137,31 @@ public class StackEffect
 	//{{{ toString() method
 	public String toString()
 	{
-		StringBuffer buf = new StringBuffer();
+		StringBuffer buf = new StringBuffer("( ");
 		for(int i = 0; i < inD; i++)
 		{
-			buf.append("I ");
+			buf.append("X ");
 		}
 		for(int i = 0; i < inR; i++)
 		{
-			buf.append("r:I ");
+			buf.append("r:X ");
 		}
 		buf.append("--");
 		for(int i = 0; i < outD; i++)
 		{
-			buf.append(" O");
+			buf.append(" X");
 		}
 		for(int i = 0; i < outR; i++)
 		{
-			buf.append(" r:O");
+			buf.append(" r:X");
 		}
+		buf.append(" )");
 		return buf.toString();
+	} //}}}
+
+	//{{{ clone() method
+	public Object clone()
+	{
+		return new StackEffect(inD,outD,inR,outR);
 	} //}}}
 }

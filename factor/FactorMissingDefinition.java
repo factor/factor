@@ -50,6 +50,13 @@ public class FactorMissingDefinition extends FactorWordDefinition
 		throw new FactorUndefinedWordException(word);
 	} //}}}
 
+	//{{{ toList() method
+	public Cons toList()
+	{
+		return new Cons(new FactorWord("( missing: " + word + " )"),
+			null);
+	} //}}}
+
 	//{{{ toString() method
 	public String toString()
 	{

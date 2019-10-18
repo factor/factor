@@ -32,7 +32,7 @@ package factor.primitives;
 import factor.compiler.*;
 import factor.*;
 import java.lang.reflect.*;
-import java.util.Set;
+import java.util.Map;
 import org.objectweb.asm.*;
 
 public class JVarSet extends FactorWordDefinition
@@ -58,15 +58,14 @@ public class JVarSet extends FactorWordDefinition
 	} //}}}
 
 	//{{{ getStackEffect() method
-	public StackEffect getStackEffect(Set recursiveCheck,
-		LocalAllocator state) throws FactorStackException
+	public void getStackEffect(RecursiveState recursiveCheck,
+		FactorCompiler state) throws FactorStackException
 	{
 		state.ensure(state.datastack,4);
 		state.pop(null);
 		state.pop(null);
 		state.pop(null);
 		state.pop(null);
-		return new StackEffect(4,0,0,0);
 	} //}}}
 
 	//{{{ compileCallTo() method
@@ -76,12 +75,12 @@ public class JVarSet extends FactorWordDefinition
 	 */
 	public int compileCallTo(
 		CodeVisitor mw,
-		LocalAllocator allocator,
-		Set recursiveCheck)
+		FactorCompiler compiler,
+		RecursiveState recursiveCheck)
 		throws Exception
 	{
-		Object _field = allocator.popLiteral();
-		Object _clazz = allocator.popLiteral();
+		Object _field = compiler.popLiteral();
+		Object _clazz = compiler.popLiteral();
 		if(_clazz instanceof String &&
 			_field instanceof String)
 		{
@@ -91,10 +90,10 @@ public class JVarSet extends FactorWordDefinition
 			clazz = clazz.replace('.','/');
 			Field fld = cls.getField(field);
 
-			allocator.pop(mw);
+			compiler.pop(mw);
 			FactorJava.generateFromConversion(mw,cls);
 
-			allocator.pop(mw);
+			compiler.pop(mw);
 			FactorJava.generateFromConversion(mw,fld.getType());
 
 			mw.visitFieldInsn(PUTFIELD,

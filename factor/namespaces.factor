@@ -28,13 +28,16 @@
 : s@ ( variable value -- )
     swap @ ;
 
-: lazy (var [ a ] -- value)
-    ! If the value of the variable is f, set the value to the result of
-    ! evaluating [ a ].
+: has-namespace? ( a -- boolean )
+    "factor.FactorObject" is ;
+
+: lazy ( var [ a ] -- value )
+    ! If the value of the variable is f, set the value to the
+    ! result of evaluating [ a ].
     over $ [ drop $ ] [ dip dupd @ ] ifte ;
 
-: namespace? (a -- boolean)
-    |factor.FactorNamespace is ;
+: namespace? ( a -- boolean )
+    "factor.FactorNamespace" is ;
 
 : <namespace> (-- namespace)
     $namespace [ |factor.FactorNamespace ] |factor.FactorNamespace
@@ -45,7 +48,7 @@
     [ "factor.FactorNamespace" "java.lang.Object" ]
     "factor.FactorNamespace" jnew ;
 
-: extend (object code -- object)
+: extend ( object code -- object )
     ! Used in code like this:
     ! : <subclass>
     !      <superclass> [
@@ -53,19 +56,27 @@
     !      ] extend ;
     over [ bind ] dip ;
 
-: import (class pairs --)
-    ! Import some static variables from a Java class into the current namespace.
+: import ( class pairs -- )
+    ! Import some static variables from a Java class into the
+    ! current namespace.
     $namespace [ |java.lang.String |factor.Cons ]
     |factor.FactorNamespace |importVars
     jinvoke ;
 
-: vars (-- list)
+: vars ( -- list )
     $namespace [ ] |factor.FactorNamespace |toVarList jinvoke ;
 
-: uvar? (name --)
-    [ "namespace" "parent" ] contains not ;
+: values ( -- list )
+    $namespace [ ] |factor.FactorNamespace |toValueList
+    jinvoke ;
 
-: uvars (-- list)
-    ! Does not include "namespace" and "parent" variables; ie, all user-defined
-    ! variables in given namespace.
+: uvalues ( -- list )
+    values [ car uvar? ] subset ;
+
+: uvar? ( name -- )
+    [ "namespace" "parent" "this" ] contains not ;
+
+: uvars ( -- list )
+    ! Does not include "namespace" and "parent" variables; ie,
+    ! all user-defined variables in given namespace.
     vars [ uvar? ] subset ;

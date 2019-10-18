@@ -30,6 +30,9 @@
     [ "java.lang.Object" "java.lang.Object" ]
     "factor.FactorLib" "equal" jinvoke-static ;
 
+: class-of ( obj -- class )
+    [ ] "java.lang.Object" "getClass" jinvoke ;
+
 : clone (obj -- obj)
     [ ] "factor.PublicCloneable" "clone" jinvoke ;
 
@@ -43,7 +46,7 @@
     "factor.FactorLib" "deepCloneArray"
     jinvoke-static ;
 
-: is (obj class -- boolean)
+: is ( obj class -- boolean )
     ! Like "instanceof" in Java.
     [ "java.lang.Object" ] "java.lang.Class" "isInstance"
     jinvoke ;
@@ -69,18 +72,22 @@
 : exit* (code --)
     [ |int ] |java.lang.System |exit jinvoke-static ;
 
-: exit (--)
-    0 exit* ;
-
 : millis (-- millis)
     ! Pushes the current time, in milliseconds.
     [ ] |java.lang.System |currentTimeMillis jinvoke-static
     >bignum ;
 
+: stack? ( obj -- ? )
+    "factor.FactorArrayStack" is ;
+
 : stack>list (stack -- list)
     ! Turns a callstack or datastack object into a list.
     [ ] "factor.FactorArrayStack" "toList" jinvoke ;
 
+: system-property ( name -- value )
+    [ "java.lang.String" ] "java.lang.System" "getProperty"
+    jinvoke-static ;
+
 : time (code --)
     ! Evaluates the given code and prints the time taken to execute it.
-    millis swap dip millis -- . ;
+    millis >r call millis r> - . ;

@@ -32,7 +32,7 @@ package factor.primitives;
 import factor.compiler.*;
 import factor.*;
 import java.lang.reflect.*;
-import java.util.Set;
+import java.util.Map;
 import org.objectweb.asm.*;
 
 public class Bind extends FactorWordDefinition
@@ -55,40 +55,26 @@ public class Bind extends FactorWordDefinition
 	} //}}}
 
 	//{{{ getStackEffect() method
-	public StackEffect getStackEffect(Set recursiveCheck,
-		LocalAllocator state) throws Exception
+	public void getStackEffect(RecursiveState recursiveCheck,
+		FactorCompiler state) throws Exception
 	{
 		state.ensure(state.datastack,2);
-		LocalAllocator.FlowObject quot
-			= (LocalAllocator.FlowObject)
-			state.datastack.pop();
+		FlowObject quot = (FlowObject)state.datastack.pop();
 		state.pop(null);
-		StackEffect effect = quot.getStackEffect(recursiveCheck);
-		if(effect != null)
-		{
-			// add 2 to inD since we consume the
-			// quotation and the object
-			return new StackEffect(effect.inD + 2,
-				effect.outD,
-				effect.inR,
-				effect.outR);
-		}
-		else
-			return null;
+		quot.getStackEffect(recursiveCheck);
 	} //}}}
 
-	//{{{ compileCallTo() method
+	//{{{ compileImmediate() method
 	/**
 	 * Compile a call to this word. Returns maximum JVM stack use.
 	 */
-	public int compileCallTo(
+	public int compileImmediate(
 		CodeVisitor mw,
-		LocalAllocator allocator,
-		Set recursiveCheck)
+		FactorCompiler compiler,
+		RecursiveState recursiveCheck)
 		throws Exception
 	{
-		LocalAllocator.FlowObject quot = (LocalAllocator.FlowObject)
-			allocator.datastack.pop();
+		FlowObject quot = (FlowObject)compiler.datastack.pop();
 
 		// store namespace on callstack
 		mw.visitVarInsn(ALOAD,0);
@@ -101,11 +87,11 @@ public class Bind extends FactorWordDefinition
 			"factor/FactorCallFrame",
 			"namespace",
 			"Lfactor/FactorNamespace;");
-		allocator.pushR(mw);
+		compiler.pushR(mw);
 
 		// set new namespace
 		mw.visitInsn(DUP);
-		allocator.pop(mw);
+		compiler.pop(mw);
 		FactorJava.generateFromConversion(mw,FactorNamespace.class);
 		mw.visitFieldInsn(PUTFIELD,
 			"factor/FactorCallFrame",
@@ -115,7 +101,7 @@ public class Bind extends FactorWordDefinition
 		int maxJVMStack = quot.compileCallTo(mw,recursiveCheck);
 
 		// restore namespace from callstack
-		allocator.popR(mw);
+		compiler.popR(mw);
 		mw.visitFieldInsn(PUTFIELD,
 			"factor/FactorCallFrame",
 			"namespace",

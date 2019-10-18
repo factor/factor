@@ -25,13 +25,21 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-: asm ( word -- assembly )
+: apropos ( substring -- )
+    ! Prints all word names that contain the given substring.
+    words [ 2dup str-contains [ . ] [ drop ] ifte ] each drop ;
+
+: asm ( word -- )
     ! Prints JVM bytecode disassembly of the given word.
-    worddef compiled? dup [
+    intern [ $asm ] bind dup [
         print
     ] [
         drop "Not a compiled word." print
     ] ifte ;
+
+: balance ( code -- effect )
+    ! Push stack effect of the given code quotation.
+    no-name effect ;
 
 : compile* ( word -- )
     $interpreter swap
@@ -45,55 +53,88 @@
         intern compile*
     ] ifte ;
 
-: compileAll ( -- )
+: compile-all ( -- )
     "Compiling..." write
     words [ compile ] each
     " done" print ;
 
 : compiled? ( obj -- boolean )
-    [ $asm ] bind ;
+    "factor.compiler.CompiledDefinition" is ;
 
-: compound? (obj -- boolean)
+: compound? ( obj -- boolean )
     "factor.FactorCompoundDefinition" is ;
+
+: <compound> ( word def -- worddef )
+    [ "factor.FactorWord" "factor.Cons" ]
+    "factor.FactorCompoundDefinition"
+    jnew ;
+
+: effect ( word -- effect )
+    ! Push stack effect of the given word.
+    worddef [ ] "factor.FactorWordDefinition"
+    "getStackEffect" jinvoke ;
+
+: effect>list ( effect -- effect )
+    [
+        [ "factor.compiler.StackEffect" "inD" jvar$ ]
+        [ "factor.compiler.StackEffect" "outD" jvar$ ]
+        [ "factor.compiler.StackEffect" "inR" jvar$ ]
+        [ "factor.compiler.StackEffect" "outR" jvar$ ]
+    ] interleave unit cons cons cons ;
+
+: gensym ( -- word )
+    [ ] "factor.FactorWord" "gensym" jinvoke-static ;
+
+: <word> ( name -- word )
+    ! Creates a new uninternalized word.
+    [ "java.lang.String" ] "factor.FactorWord" jnew ;
+
+: intern* ( "word" -- word )
+    dup $ dup [
+        nip
+    ] [
+        drop dup $ tuck s@
+    ] ifte ;
+
+: intern ( "word" -- word )
+    ! Returns the top of the stack if it already been interned.
+    dup word? [ $dict [ intern* ] bind ] unless ;
 
 : missing>f ( word -- word/f )
     ! Is it the missing word placeholder? Then push f.
     dup undefined? [ drop f ] when ;
 
-: shuffle? (obj -- boolean)
-    "factor.FactorShuffleDefinition" is ;
+: no-name ( list -- word )
+    ! Generates an uninternalized word and gives it a compound
+    ! definition created from the given list.
+    [ gensym dup dup ] dip <compound> define ;
 
-: intern ("word" -- word)
-    ! Returns the top of the stack if it already been interned.
-    dup word? [
-        $dict [ "java.lang.String" ]
-        "factor.FactorDictionary" "intern"
-        jinvoke
-    ] unless ;
+: shuffle? ( obj -- boolean )
+    "factor.FactorShuffleDefinition" is ;
 
 : undefined? ( obj -- boolean )
     "factor.FactorMissingDefinition" is ;
 
-: word? (obj -- boolean)
+: word? ( obj -- boolean )
     "factor.FactorWord" is ;
 
 : word ( -- word )
     ! Pushes most recently defined word.
-    $dict "factor.FactorDictionary" "last" jvar$ ;
+    $global [ $last ] bind ;
 
 : worddef? (obj -- boolean)
     "factor.FactorWordDefinition" is ;
 
 : worddef ( word -- worddef )
-    intern
-    "factor.FactorWord" "def" jvar$
-    missing>f ;
+    dup worddef? [ intern [ $def ] bind missing>f ] unless ;
 
-: worddefUncompiled ( word -- worddef )
-    intern
-    "factor.FactorWord" "uncompiled" jvar$
-    missing>f ;
+: worddef>list ( worddef -- list )
+    worddef
+    [ ] "factor.FactorWordDefinition" "toList" jinvoke ;
 
-: words (-- list)
+: words ( -- list )
     ! Pushes a list of all defined words.
-    $dict [ ] "factor.FactorDictionary" "toWordList" jinvoke ;
+    $dict [ uvalues ] bind
+    [
+        cdr dup [ drop ] unless
+    ] map ;

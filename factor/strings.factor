@@ -35,16 +35,25 @@
 !    [ #\" , "&quot;" ]
 ] @entities
 
-: >str ( obj -- string )
-    ! Returns the Java string representation of this object.
-    [ ] "java.lang.Object" "toString" jinvoke ;
-
 : >bytes ( string -- array )
     ! Converts a string to an array of ASCII bytes. An exception
     ! is thrown if the string contains non-ASCII characters.
     "ASCII" swap
     [ "java.lang.String" ] "java.lang.String" "getBytes"
     jinvoke ;
+
+: >lower ( str -- str )
+    [ ] "java.lang.String" "toLowerCase" jinvoke ;
+
+: >str ( obj -- string )
+    ! Returns the Java string representation of this object.
+    [ ] "java.lang.Object" "toString" jinvoke ;
+
+: >title ( str -- str )
+    1 str/ [ >upper ] dip >lower cat2 ;
+
+: >upper ( str -- str )
+    [ ] "java.lang.String" "toUpperCase" jinvoke ;
 
 : <sbuf> ( -- StringBuffer )
     [ ] "java.lang.StringBuffer" jnew ;
@@ -67,12 +76,15 @@
 : cat4 ( "a" "b" "c" "d" -- "abcd" )
     [ ] cons cons cons cons cat ;
 
+: cat5 ( "a" "b" "c" "d" "e" -- "abcde" )
+    [ ] cons cons cons cons cons cat ;
+
 : char? ( obj -- boolean )
     "java.lang.Character" is ;
 
 : chars>entities ( str -- str )
     ! Convert <, >, &, ' and " to HTML entities.
-    [ dup $entities assoc dup [ nip ] [ drop ] ifte ] strmap ;
+    [ dup $entities assoc dup rot ? ] str-map ;
 
 : group ( index match -- )
     [ "int" ] "java.util.regex.Matcher" "group"
@@ -151,6 +163,10 @@
         jinvoke-static
     ] when ;
 
+: spaces ( len -- str )
+    ! Returns a string containing the given number of spaces.
+    <sbuf> swap [ " " swap sbuf-append ] times >str ;
+
 : split ( string split -- list )
     2dup index-of dup -1 = [
         2drop unit
@@ -158,16 +174,27 @@
         swap [ str// ] dip split cons
     ] ifte ;
 
+: string? ( obj -- ? )
+    "java.lang.String" is ;
+
+: str->=< ( str1 str2 -- n )
+    swap [ "java.lang.String" ] "java.lang.String" "compareTo"
+    jinvoke ;
+
+: str-lexi> ( str1 str2 -- ? )
+    ! Returns if the first string lexicographically follows str2
+    str->=< 0 > ;
+
 : str/ ( str index -- str str )
     ! Returns 2 strings, that when concatenated yield the
     ! original string.
-    2dup strtail [ str-head ] dip ;
+    2dup str-tail [ str-head ] dip ;
 
 : str// ( str index -- str str )
     ! Returns 2 strings, that when concatenated yield the
     ! original string, without the character at the given
     ! index.
-    2dup succ strtail [ str-head ] dip ;
+    2dup succ str-tail [ str-head ] dip ;
 
 : str-each ( str [ code ] -- )
     ! Execute the code, with each character of the string pushed
@@ -205,12 +232,15 @@
 
 : str-length> ( str str -- boolean )
     ! Compare string lengths.
-    [ str-length ] apply2 > ;
+    [ str-length ] 2apply > ;
 
 : str-map ( str [ code ] -- [ mapping ] )
     2list restack str-each unstack cat ;
 
-: strtail ( str index -- str )
+: str-contains ( substr str -- ? )
+    swap index-of -1 = not ;
+
+: str-tail ( str index -- str )
     ! Returns a new string, from the given index until the end
     ! of the string.
     over str-length rot substring ;
