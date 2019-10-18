@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors namespaces make math sequences sets
 assocs fry compiler.cfg compiler.cfg.instructions ;
+FROM: namespaces => set ;
 IN: compiler.cfg.rpo
 
 SYMBOL: visited
@@ -38,7 +39,7 @@ SYMBOL: visited
     [ drop basic-block set ]
     [ change-instructions drop ] 2bi ; inline
 
-: local-optimization ( cfg quot: ( insns -- insns' ) -- cfg' )
+: local-optimization ( ... cfg quot: ( ... insns -- ... insns' ) -- ... cfg' )
     dupd '[ _ optimize-basic-block ] each-basic-block ; inline
 
 : needs-post-order ( cfg -- cfg' )

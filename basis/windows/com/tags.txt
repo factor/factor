@@ -1,2 +1,2 @@
-unportable
 bindings
+ffi

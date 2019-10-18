@@ -1,10 +1,10 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.functions tuple-arrays accessors fry sequences
 prettyprint ;
 IN: benchmark.tuple-arrays
 
-TUPLE: point { x float } { y float } { z float } ;
+TUPLE: point { x float } { y float } { z float } ; final
 
 TUPLE-ARRAY: point
 

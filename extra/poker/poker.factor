@@ -1,5 +1,4 @@
-! Copyright (c) 2009 Aaron Schaefer. All rights reserved.
-! Copyright (c) 2009 Doug Coleman.
+! Copyright (c) 2009 Aaron Schaefer, Doug Coleman. All rights reserved.
 ! The contents of this file are licensed under the Simplified BSD License
 ! A copy of the license is available at http://factorcode.org/license.txt
 USING: accessors arrays ascii assocs binary-search combinators
@@ -264,4 +263,4 @@ ERROR: bad-suit-symbol ch ;
     string>value value>hand-name ;
 
 SYNTAX: HAND{
-    "}" parse-tokens [ card> ] { } map-as suffix! ;
+    "}" [ card> ] map-tokens suffix! ;

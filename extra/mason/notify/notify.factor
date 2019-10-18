@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Slava Pestov.
+! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays accessors io io.sockets io.encodings.utf8 io.files
 io.launcher kernel make mason.config mason.common mason.email
@@ -21,6 +21,9 @@ IN: mason.notify
             short-running-process
         ] retry
     ] [ 2drop ] if ;
+
+: notify-heartbeat ( -- )
+    f { "heartbeat" } status-notify ;
 
 : notify-begin-build ( git-id -- )
     [ "Starting build of GIT ID " write print flush ]

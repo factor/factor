@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax alien.destructors
-kernel windows.types math.bitwise ;
+kernel windows.types math.bitwise literals ;
 IN: windows.gdi32
 
 CONSTANT: BI_RGB 0
@@ -818,7 +818,7 @@ CONSTANT: TA_RIGHT 2
 CONSTANT: TA_RTLREADING 256
 CONSTANT: TA_NOUPDATECP 0
 CONSTANT: TA_UPDATECP 1
-: TA_MASK ( -- n ) { TA_BASELINE TA_CENTER TA_UPDATECP TA_RTLREADING } flags ; foldable
+CONSTANT: TA_MASK flags{ TA_BASELINE TA_CENTER TA_UPDATECP TA_RTLREADING }
 CONSTANT: VTA_BASELINE 24
 CONSTANT: VTA_CENTER 6
 ALIAS: VTA_LEFT TA_BOTTOM

@@ -365,7 +365,6 @@ editor "editing" f {
     { undo-action com-undo }
     { redo-action com-redo }
     { T{ key-down f f "DELETE" } delete-next-character }
-    { T{ key-down f { S+ } "DELETE" } delete-next-character }
     { T{ key-down f f "BACKSPACE" } delete-previous-character }
     { T{ key-down f { S+ } "BACKSPACE" } delete-previous-character }
     { T{ key-down f { C+ } "DELETE" } delete-previous-word }

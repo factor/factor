@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.syntax alien.data 
 classes.struct combinators io.ports io.streams.duplex
-system kernel math math.bitwise vocabs.loader unix io.serial
-io.serial.unix.termios io.backend.unix ;
+system kernel math math.bitwise vocabs.loader io.serial
+io.serial.unix.termios io.backend.unix unix unix.ffi
+literals ;
 IN: io.serial.unix
 
 << {
@@ -33,7 +34,7 @@ FUNCTION: int cfsetspeed ( termios* t, speed_t s ) ;
 
 M: unix open-serial ( serial -- serial' )
     dup
-    path>> { O_RDWR O_NOCTTY O_NDELAY } flags file-mode open-file
+    path>> flags{ O_RDWR O_NOCTTY O_NDELAY } file-mode open-file
     fd>duplex-stream >>stream ;
 
 : serial-fd ( serial -- fd )

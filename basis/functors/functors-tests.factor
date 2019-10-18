@@ -1,5 +1,5 @@
-USING: classes.struct functors tools.test math words kernel
-multiline parser io.streams.string generic ;
+USING: classes.struct classes.tuple functors tools.test math
+words kernel multiline parser io.streams.string generic ;
 QUALIFIED-WITH: alien.c-types c
 IN: functors.tests
 
@@ -36,7 +36,7 @@ WW DEFINES ${W}${W}
 
 WHERE
 
-: WW ( a -- b ) \ W twice ; inline
+: WW ( a -- b ) \ W twice ;
 
 ;FUNCTOR
 
@@ -211,3 +211,44 @@ STRUCT: T-class
     }
 ] [ a-struct struct-slots ] unit-test
 
+<<
+
+FUNCTOR: define-an-inline-word ( W -- )
+
+W DEFINES ${W}
+W-W DEFINES ${W}-${W}
+
+WHERE
+
+: W ( -- ) ; inline
+: W-W ( -- ) W W ;
+
+;FUNCTOR
+
+"an-inline-word" define-an-inline-word
+
+>>
+
+[ t ] [ \ an-inline-word inline? ] unit-test
+[ f ] [ \ an-inline-word-an-inline-word inline? ] unit-test
+
+<<
+
+FUNCTOR: define-a-final-class ( T W -- )
+
+T DEFINES-CLASS ${T}
+W DEFINES ${W}
+
+WHERE
+
+TUPLE: T ; final
+
+: W ( -- ) ;
+
+;FUNCTOR
+
+"a-final-tuple" "a-word" define-a-final-class
+
+>>
+
+[ t ] [ a-final-tuple final-class? ] unit-test

@@ -212,3 +212,16 @@ M: integer forget-test 3 + ;
 ] unit-test
 
 [ 10 forget-test ] [ no-method? ] must-fail-with
+
+! Declarations on methods
+GENERIC: flushable-generic ( a -- b ) flushable
+M: integer flushable-generic ;
+
+[ t ] [ \ flushable-generic flushable? ] unit-test
+[ t ] [ M\ integer flushable-generic flushable? ] unit-test
+
+GENERIC: non-flushable-generic ( a -- b )
+M: integer non-flushable-generic ; flushable
+
+[ f ] [ \ non-flushable-generic flushable? ] unit-test
+[ t ] [ M\ integer non-flushable-generic flushable? ] unit-test

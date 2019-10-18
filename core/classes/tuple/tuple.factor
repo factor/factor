@@ -93,6 +93,14 @@ ERROR: bad-superclass class ;
         ] [ 2drop f ] if
     ] [ 2drop f ] if ; inline
 
+GENERIC: final-class? ( class -- ? )
+
+M: tuple-class final-class? "final" word-prop ;
+
+M: builtin-class final-class? tuple eq? not ;
+
+M: class final-class? drop t ;
+
 <PRIVATE
 
 : tuple-predicate-quot/1 ( class -- quot )
@@ -238,16 +246,8 @@ M: tuple-class update-class
     [ [ "slots" word-prop ] dip = ]
     bi-curry* bi and ;
 
-GENERIC: valid-superclass? ( class -- ? )
-
-M: tuple-class valid-superclass? drop t ;
-
-M: builtin-class valid-superclass? tuple eq? ;
-
-M: class valid-superclass? drop f ;
-
 : check-superclass ( superclass -- )
-    dup valid-superclass? [ bad-superclass ] unless drop ;
+    dup final-class? [ bad-superclass ] when drop ;
 
 GENERIC# (define-tuple-class) 2 ( class superclass slots -- )
 
@@ -261,6 +261,13 @@ GENERIC# (define-tuple-class) 2 ( class superclass slots -- )
         read-only suffix
     ] map ;
 
+: reset-final ( class -- )
+    dup final-class? [
+        [ f "final" set-word-prop ]
+        [ changed-conditionally ]
+        bi
+    ] [ drop ] if ;
+
 PRIVATE>
 
 : define-tuple-class ( class superclass slots -- )
@@ -268,10 +275,18 @@ PRIVATE>
     over prepare-slots
     (define-tuple-class) ;
 
+GENERIC: make-final ( class -- )
+
+M: tuple-class make-final
+    [ dup class-usage keys ?metaclass-changed ]
+    [ t "final" set-word-prop ]
+    bi ;
+
 M: word (define-tuple-class)
     define-new-tuple-class ;
 
 M: tuple-class (define-tuple-class)
+    pick reset-final
     3dup tuple-class-unchanged?
     [ 2drop ?define-symbol ] [ redefine-tuple-class ] if ;
 
@@ -301,7 +316,7 @@ M: tuple-class reset-class
         ] with each
     ] [
         [ call-next-method ]
-        [ { "layout" "slots" "boa-check" "prototype" } reset-props ]
+        [ { "layout" "slots" "boa-check" "prototype" "final" } reset-props ]
         bi
     ] bi ;
 

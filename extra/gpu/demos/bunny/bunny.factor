@@ -3,8 +3,8 @@ USING: accessors alien.c-types arrays classes.struct combinators
 combinators.short-circuit game.loop game.worlds gpu gpu.buffers
 gpu.util.wasd gpu.framebuffers gpu.render gpu.shaders gpu.state
 gpu.textures gpu.util grouping http.client images images.loader
-io io.encodings.ascii io.files io.files.temp kernel locals math
-math.matrices math.vectors.simd math.parser math.vectors
+images.tiff io io.encodings.ascii io.files io.files.temp kernel
+locals math math.matrices math.vectors.simd math.parser math.vectors
 method-chains namespaces sequences splitting threads ui ui.gadgets
 ui.gadgets.worlds ui.pixel-formats specialized-arrays
 specialized-vectors literals ;
@@ -34,12 +34,12 @@ GLSL-SHADER-FILE: window-vertex-shader vertex-shader "window.v.glsl"
 GLSL-SHADER-FILE: sobel-fragment-shader fragment-shader "sobel.f.glsl"
 GLSL-PROGRAM: sobel-program
     window-vertex-shader sobel-fragment-shader
-    window-vertex ;
+    window-vertex-format ;
 
 GLSL-SHADER-FILE: loading-fragment-shader fragment-shader "loading.f.glsl"
 GLSL-PROGRAM: loading-program
     window-vertex-shader loading-fragment-shader
-    window-vertex ;
+    window-vertex-format ;
 
 TUPLE: bunny-state
     vertexes

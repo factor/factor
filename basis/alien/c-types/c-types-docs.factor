@@ -6,10 +6,6 @@ QUALIFIED: math
 QUALIFIED: sequences
 IN: alien.c-types
 
-HELP: byte-length
-{ $values { "seq" "A byte array or float array" } { "n" "a non-negative integer" } }
-{ $contract "Outputs the size of the byte array, struct, or specialized array data in bytes." } ;
-
 HELP: heap-size
 { $values { "name" "a C type name" } { "size" math:integer } }
 { $description "Outputs the number of bytes needed for a heap-allocated value of this C type." }
@@ -32,13 +28,10 @@ HELP: no-c-type
 { $description "Throws a " { $link no-c-type } " error." }
 { $error-description "Thrown by " { $link c-type } " if a given string does not name a C type. When thrown during compile time, indicates a typo in an " { $link alien-invoke } " or " { $link alien-callback } " form." } ;
 
-HELP: c-types
-{ $var-description "Global variable holding a hashtable mapping C type names to C types. Use the " { $link c-type } " word to look up C types." } ;
-
 HELP: c-type
 { $values { "name" "a C type" } { "c-type" c-type } }
 { $description "Looks up a C type by name." }
-{ $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
+{ $errors "Throws a " { $link no-c-type } " error if the type does not exist, or the word is not a C type." } ;
 
 HELP: c-getter
 { $values { "name" "a C type" } { "quot" { $quotation "( c-ptr n -- obj )" } } }
@@ -106,8 +99,8 @@ HELP: ulonglong
 HELP: void
 { $description "This symbol is not a valid C type, but it can be used as the return type for a " { $link POSTPONE: FUNCTION: } " or " { $link POSTPONE: CALLBACK: } " definition or for an " { $link alien-invoke } " or " { $link alien-callback } " call." } ;
 HELP: void*
-{ $description "This C type represents a pointer to C memory. " { $link byte-array } " and " { $link alien } " values can be passed as " { $snippet "void*" } " function inputs, but see " { $link "byte-arrays-gc" } " for notes about passing byte arrays into C functions. " { $snippet "void*" } " output values are returned as " { $link alien } "s." } ;
-HELP: char*
+{ $description "This C type represents a generic pointer to C memory. See " { $link pointer } " for information on pointer C types." } ;
+HELP: c-string
 { $description "This C type represents a pointer to a C string. See " { $link "c-strings" } " for details about using strings with the FFI." } ;
 HELP: float
 { $description "This C type represents a single-precision IEEE 754 floating-point type. Input values will be converted to Factor " { $link math:float } "s and demoted to single-precision; output values will be returned as Factor " { $link math:float } "s." } ;
@@ -118,6 +111,19 @@ HELP: complex-float
 HELP: complex-double
 { $description "This C type represents a double-precision IEEE 754 floating-point complex type. Input values will be converted from Factor " { $link math:complex } " objects into a double-precision complex float type; output values will be returned as Factor " { $link math:complex } " objects." } ;
 
+HELP: pointer:
+{ $syntax "pointer: c-type" }
+{ $description "Constructs a " { $link pointer } " C type." } ;
+
+HELP: pointer
+{ $class-description "Represents a pointer C type. The " { $snippet "to" } " slot contains the C type being pointed to." { $link byte-array } " and " { $link alien } " values can be provided as pointer function inputs, but see " { $link "byte-arrays-gc" } " for notes about passing byte arrays into C functions. Objects with methods on " { $link >c-ptr } ", such as structs and specialized arrays, may also be used as pointer inputs."
+$nl
+"Pointer output values are represented in Factor as " { $link alien } "s. If the pointed-to type is a struct, the alien will automatically be wrapped in a struct object if it is not null."
+$nl
+"In " { $link POSTPONE: TYPEDEF: } ", " { $link POSTPONE: FUNCTION: } ", " { $link POSTPONE: CALLBACK: } ", and " { $link POSTPONE: STRUCT: } " definitions, pointer types can be created by suffixing " { $snippet "*" } " to a C type name. Outside of FFI definitions, a pointer C type can be created using the " { $link POSTPONE: pointer: } " syntax word:"
+{ $unchecked-example "FUNCTION: int* foo ( char* bar ) ;" }
+{ $unchecked-example """: foo ( bar -- int* )
+    pointer: int f \"foo\" { pointer: char } alien-invoke ;""" } } ;
 
 ARTICLE: "byte-arrays-gc" "Byte arrays and the garbage collector"
 "The Factor garbage collector can move byte arrays around, and it is only safe to pass byte arrays to C functions if the garbage collector will not run while C code still has a reference to the data."
@@ -194,11 +200,11 @@ ARTICLE: "c-types.primitives" "Primitive C types"
 "When making alien calls, Factor numbers are converted to and from the above types in a canonical way. Converting a Factor number to a C value may result in a loss of precision." ;
 
 ARTICLE: "c-types.pointers" "Pointer and array types"
-"Pointer types are specified by suffixing a C type with " { $snippet "*" } ", for example " { $snippet "float*" } ". One special case is " { $link void* } ", which denotes a generic pointer; " { $link void } " by itself is not a valid C type specifier. With the exception of strings (see " { $link "c-strings" } "), all pointer types are identical to " { $snippet "void*" } " as far as the C library interface is concerned."
+"Pointer types are specified by suffixing a C type with " { $snippet "*" } ", for example " { $snippet "float*" } ". One special case is " { $link void* } ", which denotes a generic pointer; " { $link void } " by itself is not a valid C type specifier. This syntax constructs a " { $link pointer } " object to represent the C type."
 $nl
 "Fixed-size array types are supported; the syntax consists of a C type name followed by dimension sizes in brackets; the following denotes a 3 by 4 array of integers:"
 { $code "int[3][4]" }
-"Fixed-size arrays differ from pointers in that they are allocated inside structures and unions; however when used as function parameters they behave exactly like pointers and thus the dimensions only serve as documentation." ;
+"Fixed-size arrays differ from pointers in that they are allocated inside structures and unions; however, when used as function parameters, they behave exactly like pointers with the dimensions only serving as documentation." ;
 
 ARTICLE: "c-types.ambiguity" "Word name clashes with C types"
 "Note that some of the C type word names clash with commonly-used Factor words:"
@@ -231,7 +237,7 @@ ARTICLE: "c-types.structs" "Struct and union types"
 "Struct and union types are identified by their class word. See " { $link "classes.struct" } "." ;
 
 ARTICLE: "c-types-specs" "C type specifiers"
-"C types are identified by special words, and type names occur as parameters to the " { $link alien-invoke } ", " { $link alien-indirect } " and " { $link alien-callback } " words."
+"C types are identified by special words. Type names occur as parameters to the " { $link alien-invoke } ", " { $link alien-indirect } " and " { $link alien-callback } " words."
 $nl
 "Defining new C types:"
 { $subsections

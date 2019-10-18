@@ -1,8 +1,8 @@
-! Copyright (C) 2008, 2009 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry kernel sequences assocs accessors namespaces
+USING: fry kernel sequences assocs accessors
 math.intervals arrays classes.algebra combinators columns
-stack-checker.branches locals math
+stack-checker.branches locals math namespaces
 compiler.utilities
 compiler.tree
 compiler.tree.combinators
@@ -10,6 +10,8 @@ compiler.tree.propagation.info
 compiler.tree.propagation.nodes
 compiler.tree.propagation.simple
 compiler.tree.propagation.constraints ;
+FROM: sets => union ;
+FROM: assocs => change-at ;
 IN: compiler.tree.propagation.branches
 
 ! For conditionals, an assoc of child node # --> constraint
@@ -90,7 +92,7 @@ M: #phi propagate-before ( #phi -- )
     bi ;
 
 :: update-constraints ( new old -- )
-    new [| key value | key old [ value append ] change-at ] assoc-each ;
+    new [| key value | key old [ value union ] change-at ] assoc-each ;
 
 : include-child-constraints ( i -- )
     infer-children-data get nth constraints swap at last

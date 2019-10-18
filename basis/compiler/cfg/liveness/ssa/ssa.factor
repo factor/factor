@@ -4,6 +4,7 @@ USING: kernel namespaces deques accessors sets sequences assocs fry
 hashtables dlists compiler.cfg.def-use compiler.cfg.instructions
 compiler.cfg.rpo compiler.cfg.liveness compiler.cfg.utilities
 compiler.cfg.predecessors ;
+FROM: namespaces => set ;
 IN: compiler.cfg.liveness.ssa
 
 ! TODO: merge with compiler.cfg.liveness

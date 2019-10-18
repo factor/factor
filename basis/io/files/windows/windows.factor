@@ -6,7 +6,8 @@ io.backend.windows kernel math splitting fry alien.strings
 windows windows.kernel32 windows.time windows.types calendar
 combinators math.functions sequences namespaces make words
 system destructors accessors math.bitwise continuations
-windows.errors arrays byte-arrays generalizations alien.data ;
+windows.errors arrays byte-arrays generalizations alien.data
+literals ;
 IN: io.files.windows
 
 : open-file ( path access-mode create-mode flags -- handle )
@@ -16,7 +17,7 @@ IN: io.files.windows
     ] with-destructors ;
 
 : open-r/w ( path -- win32-file )
-    { GENERIC_READ GENERIC_WRITE } flags
+    flags{ GENERIC_READ GENERIC_WRITE }
     OPEN_EXISTING 0 open-file ;
 
 : open-read ( path -- win32-file )
@@ -29,7 +30,7 @@ IN: io.files.windows
     GENERIC_WRITE OPEN_ALWAYS 0 open-file ;
 
 : open-existing ( path -- win32-file )
-    { GENERIC_READ GENERIC_WRITE } flags
+    flags{ GENERIC_READ GENERIC_WRITE }
     share-mode
     f
     OPEN_EXISTING
@@ -38,7 +39,7 @@ IN: io.files.windows
 
 : maybe-create-file ( path -- win32-file ? )
     #! return true if file was just created
-    { GENERIC_READ GENERIC_WRITE } flags
+    flags{ GENERIC_READ GENERIC_WRITE }
     share-mode
     f
     OPEN_ALWAYS

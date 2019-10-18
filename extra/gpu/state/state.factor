@@ -415,8 +415,6 @@ M: mask-state set-gpu-state*
     [ [ set-gpu-state* ] each ]
     [ set-gpu-state* ] if ; inline
 
-<PRIVATE
-
 : get-gl-bool ( enum -- value )
     0 <uchar> [ glGetBooleanv ] keep *uchar c-bool> ;
 : get-gl-int ( enum -- value )
@@ -436,8 +434,6 @@ M: mask-state set-gpu-state*
 
 : gl-enabled? ( enum -- ? )
     glIsEnabled c-bool> ;
-
-PRIVATE>
 
 TYPED: get-viewport-state ( -- viewport-state: viewport-state )
     GL_VIEWPORT get-gl-rect <viewport-state> ;

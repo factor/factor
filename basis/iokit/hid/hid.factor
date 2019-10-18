@@ -162,10 +162,10 @@ FUNCTION: IOReturn IOHIDDeviceGetValue ( IOHIDDeviceRef device, IOHIDElementRef 
 FUNCTION: IOReturn IOHIDDeviceCopyValueMultiple ( IOHIDDeviceRef device, CFArrayRef elements, CFDictionaryRef* pMultiple ) ;
 FUNCTION: IOReturn IOHIDDeviceGetValueWithCallback ( IOHIDDeviceRef device, IOHIDElementRef element, IOHIDValueRef* pValue, CFTimeInterval timeout, IOHIDValueCallback callback, void* context ) ;
 FUNCTION: IOReturn IOHIDDeviceCopyValueMultipleWithCallback ( IOHIDDeviceRef device, CFArrayRef elements, CFDictionaryRef* pMultiple, CFTimeInterval timeout, IOHIDValueMultipleCallback callback, void* context ) ;
-FUNCTION: IOReturn IOHIDDeviceSetReport ( IOHIDDeviceRef device, IOHIDReportType reportType, CFIndex reportID, uchar* report, CFIndex reportLength ) ;
-FUNCTION: IOReturn IOHIDDeviceSetReportWithCallback ( IOHIDDeviceRef device, IOHIDReportType reportType, CFIndex reportID, uchar* report, CFIndex reportLength, CFTimeInterval timeout, IOHIDReportCallback callback, void* context ) ;
-FUNCTION: IOReturn IOHIDDeviceGetReport ( IOHIDDeviceRef device, IOHIDReportType reportType, CFIndex reportID, uchar* report, CFIndex* pReportLength ) ;
-FUNCTION: IOReturn IOHIDDeviceGetReportWithCallback ( IOHIDDeviceRef device, IOHIDReportType reportType, CFIndex reportID, uchar* report, CFIndex* pReportLength, CFTimeInterval timeout, IOHIDReportCallback callback, void* context ) ;
+FUNCTION: IOReturn IOHIDDeviceSetReport ( IOHIDDeviceRef device, IOHIDReportType reportType, CFIndex reportID, char* report, CFIndex reportLength ) ;
+FUNCTION: IOReturn IOHIDDeviceSetReportWithCallback ( IOHIDDeviceRef device, IOHIDReportType reportType, CFIndex reportID, char* report, CFIndex reportLength, CFTimeInterval timeout, IOHIDReportCallback callback, void* context ) ;
+FUNCTION: IOReturn IOHIDDeviceGetReport ( IOHIDDeviceRef device, IOHIDReportType reportType, CFIndex reportID, char* report, CFIndex* pReportLength ) ;
+FUNCTION: IOReturn IOHIDDeviceGetReportWithCallback ( IOHIDDeviceRef device, IOHIDReportType reportType, CFIndex reportID, char* report, CFIndex* pReportLength, CFTimeInterval timeout, IOHIDReportCallback callback, void* context ) ;
 
 ! IOHIDManager
 
@@ -226,8 +226,8 @@ FUNCTION: Boolean IOHIDElementSetProperty ( IOHIDElementRef element, CFStringRef
 
 FUNCTION: CFTypeID IOHIDValueGetTypeID ( ) ;
 FUNCTION: IOHIDValueRef IOHIDValueCreateWithIntegerValue ( CFAllocatorRef allocator, IOHIDElementRef element, ulonglong timeStamp, CFIndex value ) ;
-FUNCTION: IOHIDValueRef IOHIDValueCreateWithBytes ( CFAllocatorRef allocator, IOHIDElementRef element, ulonglong timeStamp, uchar* bytes, CFIndex length ) ;
-FUNCTION: IOHIDValueRef IOHIDValueCreateWithBytesNoCopy ( CFAllocatorRef allocator, IOHIDElementRef element, ulonglong timeStamp, uchar* bytes, CFIndex length ) ;
+FUNCTION: IOHIDValueRef IOHIDValueCreateWithBytes ( CFAllocatorRef allocator, IOHIDElementRef element, ulonglong timeStamp, c-string bytes, CFIndex length ) ;
+FUNCTION: IOHIDValueRef IOHIDValueCreateWithBytesNoCopy ( CFAllocatorRef allocator, IOHIDElementRef element, ulonglong timeStamp, c-string bytes, CFIndex length ) ;
 FUNCTION: IOHIDElementRef IOHIDValueGetElement ( IOHIDValueRef value ) ;
 FUNCTION: ulonglong IOHIDValueGetTimeStamp ( IOHIDValueRef value ) ;
 FUNCTION: CFIndex IOHIDValueGetLength ( IOHIDValueRef value ) ;

@@ -8,7 +8,7 @@ IN: math.transforms.haar
 
 <PRIVATE
 
-: averages ( seq -- seq )
+: averages ( seq -- seq' )
     [ mean ] map ;
 
 : differences ( seq averages -- differences )
@@ -22,9 +22,9 @@ IN: math.transforms.haar
 
 PRIVATE>
 
-: haar ( seq -- seq )
+: haar ( seq -- seq' )
     dup length 1 <= [ haar-step haar prepend ] unless ;
 
-: rev-haar ( seq -- seq )
+: rev-haar ( seq -- seq' )
     dup length 2 > [ halves swap rev-haar prepend ] when rev-haar-step ;
 

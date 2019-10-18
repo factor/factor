@@ -19,11 +19,6 @@ ERROR: local-writer-in-literal-error ;
 M: local-writer-in-literal-error summary
     drop "Local writer words not permitted inside literals" ;
 
-ERROR: local-word-in-literal-error ;
-
-M: local-word-in-literal-error summary
-    drop "Local words not permitted inside literals" ;
-
 ERROR: :>-outside-lambda-error ;
 
 M: :>-outside-lambda-error summary

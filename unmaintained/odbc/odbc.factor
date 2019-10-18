@@ -5,7 +5,7 @@ combinators alien.c-types strings sequences namespaces make
 words math threads io.encodings.ascii ;
 IN: odbc
 
-<< "odbc" "odbc32.dll" "stdcall" add-library >>
+<< "odbc" "odbc32.dll" stdcall add-library >>
 
 LIBRARY: odbc
 

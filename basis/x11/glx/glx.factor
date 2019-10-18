@@ -55,9 +55,9 @@ X-FUNCTION: void glXSwapBuffers ( Display* dpy, GLXDrawable drawable ) ;
 X-FUNCTION: void glXUseXFont ( Font font, int first, int count, int listBase ) ;
 X-FUNCTION: void glXWaitGL ( ) ;
 X-FUNCTION: void glXWaitX ( ) ;
-X-FUNCTION: char* glXGetClientString ( Display* dpy, int name ) ;
-X-FUNCTION: char* glXQueryServerString ( Display* dpy, int screen, int name ) ;
-X-FUNCTION: char* glXQueryExtensionsString ( Display* dpy, int screen ) ;
+X-FUNCTION: c-string glXGetClientString ( Display* dpy, int name ) ;
+X-FUNCTION: c-string glXQueryServerString ( Display* dpy, int screen, int name ) ;
+X-FUNCTION: c-string glXQueryExtensionsString ( Display* dpy, int screen ) ;
 
 ! New for GLX 1.3
 X-FUNCTION: GLXFBConfig* glXGetFBConfigs ( Display* dpy, int screen, int* nelements ) ;
@@ -80,10 +80,10 @@ X-FUNCTION: void glXSelectEvent ( Display* dpy, GLXDrawable draw, ulong event_ma
 X-FUNCTION: void glXGetSelectedEvent ( Display* dpy, GLXDrawable draw, ulong* event_mask ) ;
 
 ! GLX 1.4 and later
-X-FUNCTION: void* glXGetProcAddress ( char* procname ) ;
+X-FUNCTION: void* glXGetProcAddress ( c-string procname ) ;
 
 ! GLX_ARB_get_proc_address extension
-X-FUNCTION: void* glXGetProcAddressARB ( char* procname ) ;
+X-FUNCTION: void* glXGetProcAddressARB ( c-string procname ) ;
 
 ! GLX_ARB_multisample
 CONSTANT: GLX_SAMPLE_BUFFERS 100000

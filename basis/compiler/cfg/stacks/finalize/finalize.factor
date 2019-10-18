@@ -27,7 +27,7 @@ IN: compiler.cfg.stacks.finalize
     to dead-in to live-in to anticip-in assoc-diff assoc-diff
     assoc-diff ;
 
-: each-insertion ( assoc bb quot: ( vreg loc -- ) -- )
+: each-insertion ( ... assoc bb quot: ( ... vreg loc -- ... ) -- ... )
     '[ drop [ loc>vreg ] [ _ untranslate-loc ] bi @ ] assoc-each ; inline
 
 ERROR: bad-peek dst loc ;

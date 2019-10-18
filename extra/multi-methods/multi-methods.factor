@@ -6,6 +6,7 @@ definitions prettyprint prettyprint.backend prettyprint.custom
 quotations generalizations debugger io compiler.units
 kernel.private effects accessors hashtables sorting shuffle
 math.order sets see effects.parser ;
+FROM: namespaces => set ;
 IN: multi-methods
 
 ! PART I: Converting hook specializers

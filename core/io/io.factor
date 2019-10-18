@@ -15,7 +15,7 @@ GENERIC: stream-read-partial ( n stream -- seq )
 GENERIC: stream-readln ( stream -- str/f )
 
 GENERIC: stream-write1 ( elt stream -- )
-GENERIC: stream-write ( seq stream -- )
+GENERIC: stream-write ( data stream -- )
 GENERIC: stream-flush ( stream -- )
 GENERIC: stream-nl ( stream -- )
 
@@ -87,7 +87,7 @@ SYMBOL: error-stream
 
 : bl ( -- ) " " write ;
 
-: each-morsel ( handler: ( data -- ) reader: ( -- data ) -- )
+: each-morsel ( ..a handler: ( ..a data -- ..b ) reader: ( ..b -- ..a data ) -- ..a )
     [ dup ] compose swap while drop ; inline
 
 <PRIVATE

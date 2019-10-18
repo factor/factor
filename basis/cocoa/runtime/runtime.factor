@@ -7,11 +7,11 @@ TYPEDEF: void* SEL
 
 TYPEDEF: void* id
 
-FUNCTION: char* sel_getName ( SEL aSelector ) ;
+FUNCTION: c-string sel_getName ( SEL aSelector ) ;
 
 FUNCTION: char sel_isMapped ( SEL aSelector ) ;
 
-FUNCTION: SEL sel_registerName ( char* str ) ;
+FUNCTION: SEL sel_registerName ( c-string str ) ;
 
 TYPEDEF: void* Class
 TYPEDEF: void* Method
@@ -33,13 +33,13 @@ CONSTANT: CLS_METHOD_ARRAY HEX: 100
 
 FUNCTION: int objc_getClassList ( void* buffer, int bufferLen ) ;
 
-FUNCTION: Class objc_getClass ( char* class ) ;
+FUNCTION: Class objc_getClass ( c-string class ) ;
 
-FUNCTION: Class objc_getMetaClass ( char* class ) ;
+FUNCTION: Class objc_getMetaClass ( c-string class ) ;
 
-FUNCTION: Protocol objc_getProtocol ( char* class ) ;
+FUNCTION: Protocol objc_getProtocol ( c-string class ) ;
 
-FUNCTION: Class objc_allocateClassPair ( Class superclass, char* name, size_t extraBytes ) ;
+FUNCTION: Class objc_allocateClassPair ( Class superclass, c-string name, size_t extraBytes ) ;
 FUNCTION: void objc_registerClassPair ( Class cls ) ;
 
 FUNCTION: id class_createInstance ( Class class, uint additionalByteCount ) ;
@@ -54,7 +54,7 @@ FUNCTION: Method* class_copyMethodList ( Class class, uint* outCount ) ;
 
 FUNCTION: Class class_getSuperclass ( Class cls ) ;
 
-FUNCTION: char* class_getName ( Class cls ) ;
+FUNCTION: c-string class_getName ( Class cls ) ;
 
 FUNCTION: char class_addMethod ( Class class, SEL name, void* imp, void* types ) ;
 
@@ -64,7 +64,7 @@ FUNCTION: uint method_getNumberOfArguments ( Method method ) ;
 
 FUNCTION: uint method_getSizeOfArguments ( Method method ) ;
 
-FUNCTION: uint method_getArgumentInfo ( Method method, int argIndex, char** type, int* offset ) ;
+FUNCTION: uint method_getArgumentInfo ( Method method, int argIndex, c-string* type, int* offset ) ;
 
 FUNCTION: void* method_copyReturnType ( Method method ) ;
 

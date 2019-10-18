@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math math.order math.parser math.functions kernel
-sequences io accessors arrays io.streams.string splitting
-combinators calendar calendar.format.macros present ;
+USING: accessors arrays calendar calendar.format.macros
+combinators io io.streams.string kernel math math.functions
+math.order math.parser present sequences typed ;
 IN: calendar.format
 
 : pad-00 ( n -- str ) number>string 2 CHAR: 0 pad-head ;
@@ -272,16 +272,16 @@ ERROR: invalid-timestamp-format ;
 : (timestamp>ymd) ( timestamp -- )
     { YYYY "-" MM "-" DD } formatted ;
 
-: timestamp>ymd ( timestamp -- str )
+TYPED: timestamp>ymd ( timestamp: timestamp -- str )
     [ (timestamp>ymd) ] with-string-writer ;
 
 : (timestamp>hms) ( timestamp -- )
     { hh ":" mm ":" ss } formatted ;
 
-: timestamp>hms ( timestamp -- str )
+TYPED: timestamp>hms ( timestamp: timestamp -- str )
     [ (timestamp>hms) ] with-string-writer ;
 
-: timestamp>ymdhms ( timestamp -- str )
+TYPED: timestamp>ymdhms ( timestamp: timestamp -- str )
     [
         >gmt
         { (timestamp>ymd) " " (timestamp>hms) } formatted

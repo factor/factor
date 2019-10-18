@@ -12,7 +12,7 @@ IN: regexp.negation.tests
             { -1 H{ { t -1 } } }
         } } 
         { start-state 0 }
-        { final-states H{ { 0 0 } { -1 -1 } } }
+        { final-states HS{ 0 -1 } }
     }
 ] [
     ! R/ a/
@@ -22,6 +22,6 @@ IN: regexp.negation.tests
             { 1 H{ } } 
         } }
         { start-state 0 }
-        { final-states H{ { 1 1 } } }
+        { final-states HS{ 1 } }
     } negate-table
 ] unit-test

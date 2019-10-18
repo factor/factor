@@ -5,7 +5,8 @@ io.files io.pathnames io.buffers io.ports io.timeouts
 io.backend.unix io.encodings.utf8 unix.linux.inotify assocs
 namespaces make threads continuations init math math.bitwise
 sets alien alien.strings alien.c-types vocabs.loader accessors
-system hashtables destructors unix classes.struct ;
+system hashtables destructors unix classes.struct literals ;
+FROM: namespaces => set ;
 IN: io.monitors.linux
 
 SYMBOL: watches
@@ -59,16 +60,18 @@ M: linux-monitor dispose* ( monitor -- )
             [ inotify>> handle>> handle-fd ] [ wd>> ] bi
             inotify_rm_watch io-error
         ] if
-    ] bi ;
+    ]
+    [ call-next-method ]
+    tri ;
 
 : ignore-flags? ( mask -- ? )
-    {
+    flags{
         IN_DELETE_SELF
         IN_MOVE_SELF
         IN_UNMOUNT
         IN_Q_OVERFLOW
         IN_IGNORED
-    } flags bitand 0 > ;
+    } bitand 0 > ;
 
 : parse-action ( mask -- changed )
     [
@@ -79,7 +82,7 @@ M: linux-monitor dispose* ( monitor -- )
         IN_MOVED_FROM +rename-file-old+ ?flag
         IN_MOVED_TO +rename-file-new+ ?flag
         drop
-    ] { } make prune ;
+    ] { } make members ;
 
 : parse-event-name ( event -- name )
     dup len>> zero?

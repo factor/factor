@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays byte-arrays byte-vectors definitions generic
 hashtables kernel math namespaces parser lexer sequences strings
@@ -8,7 +8,7 @@ generic.standard generic.hook generic.math generic.parser classes
 io.pathnames vocabs vocabs.parser classes.parser classes.union
 classes.intersection classes.mixin classes.predicate
 classes.singleton classes.tuple.parser compiler.units
-combinators effects.parser slots ;
+combinators effects.parser slots hash-sets ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -51,7 +51,7 @@ IN: bootstrap.syntax
 
     "UNUSE:" [ scan unuse-vocab ] define-core-syntax
 
-    "USING:" [ ";" parse-tokens [ use-vocab ] each ] define-core-syntax
+    "USING:" [ ";" [ use-vocab ] each-token ] define-core-syntax
 
     "QUALIFIED:" [ scan dup add-qualified ] define-core-syntax
 
@@ -104,6 +104,7 @@ IN: bootstrap.syntax
     "H{" [ \ } [ >hashtable ] parse-literal ] define-core-syntax
     "T{" [ parse-tuple-literal suffix! ] define-core-syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-core-syntax
+    "HS{" [ \ } [ <hash-set> ] parse-literal ] define-core-syntax
 
     "POSTPONE:" [ scan-word suffix! ] define-core-syntax
     "\\" [ scan-word <wrapper> suffix! ] define-core-syntax
@@ -124,13 +125,11 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "SYMBOLS:" [
-        ";" parse-tokens
-        [ create-in dup reset-generic define-symbol ] each
+        ";" [ create-in [ reset-generic ] [ define-symbol ] bi ] each-token
     ] define-core-syntax
 
     "SINGLETONS:" [
-        ";" parse-tokens
-        [ create-class-in define-singleton-class ] each
+        ";" [ create-class-in define-singleton-class ] each-token
     ] define-core-syntax
 
     "DEFER:" [
@@ -204,6 +203,10 @@ IN: bootstrap.syntax
         parse-tuple-definition define-tuple-class
     ] define-core-syntax
 
+    "final" [
+        word make-final
+    ] define-core-syntax
+
     "SLOT:" [
         scan define-protocol-slot
     ] define-core-syntax
@@ -254,4 +257,12 @@ IN: bootstrap.syntax
     "call(" [ \ call-effect parse-call( ] define-core-syntax
 
     "execute(" [ \ execute-effect parse-call( ] define-core-syntax
+
+    "<<<<<<<" [ version-control-merge-conflict ] define-core-syntax
+    "=======" [ version-control-merge-conflict ] define-core-syntax
+    ">>>>>>>" [ version-control-merge-conflict ] define-core-syntax
+
+    "<<<<<<" [ version-control-merge-conflict ] define-core-syntax
+    "======" [ version-control-merge-conflict ] define-core-syntax
+    ">>>>>>" [ version-control-merge-conflict ] define-core-syntax
 ] with-compilation-unit

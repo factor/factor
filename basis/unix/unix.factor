@@ -50,9 +50,7 @@ HOOK: open-file os ( path flags mode -- fd )
 
 : close-file ( fd -- ) [ close ] unix-system-call drop ;
 
-: _exit ( status -- * )
-    #! We throw to give this a terminating stack effect.
-    int f "_exit" { int } alien-invoke "Exit failed" throw ;
+FUNCTION: int _exit ( int status ) ;
 
 M: unix open-file [ open ] unix-system-call ;
 
@@ -74,8 +72,6 @@ M: unix open-file [ open ] unix-system-call ;
 
 <<
 
-"debugger" vocab [
-    "unix.debugger" require
-] when
+"debugger" "unix.debugger" require-when
 
 >>

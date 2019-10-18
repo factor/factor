@@ -1,11 +1,11 @@
-! Copyright (C) 2008, 2009 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs benchmark bootstrap.stage2 compiler.errors
-source-files.errors generic help.html help.lint io.directories
-io.encodings.utf8 io.files kernel mason.common math namespaces
-prettyprint sequences sets sorting tools.test tools.time
-words system io tools.errors vocabs.hierarchy vocabs.errors
-vocabs.refresh locals ;
+USING: accessors assocs benchmark bootstrap.stage2
+compiler.errors generic help.html help.lint io io.directories
+io.encodings.utf8 io.files kernel locals mason.common
+namespaces sequences sets sorting source-files.errors system
+tools.errors tools.test tools.time vocabs.errors
+vocabs.hierarchy vocabs.refresh words ;
 IN: mason.test
 
 : do-load ( -- )
@@ -23,10 +23,11 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
 :: do-step ( errors summary-file details-file -- )
     errors
     [ error-type +linkage-error+ eq? not ] filter
-    [ file>> ] map prune natural-sort summary-file to-file
+    [ file>> ] map members natural-sort summary-file to-file
     errors details-file utf8 [ errors. ] with-file-writer ;
 
 : do-tests ( -- )
+    forget-tests? on
     test-all test-failures get
     test-all-vocabs-file
     test-all-errors-file
@@ -51,19 +52,21 @@ M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
     compiler-error-messages-file
     do-step ;
 
-: check-boot-image ( -- )
-    "" to-refresh drop 2dup [ empty? not ] either?
-    [
-        "Boot image is out of date. Changed vocabs:" print
-        append prune [ print ] each
-        flush
-        1 exit
-    ] [ 2drop ] if ;
+: outdated-core-vocabs ( -- modified-sources modified-docs any? )
+    "" to-refresh drop 2dup [ empty? not ] either? ;
+
+: outdated-boot-image. ( modified-sources modified-docs -- )
+    "Boot image is out of date. Changed vocabs:" print
+    union [ print ] each
+    flush ;
+
+: check-boot-image ( -- ? )
+    outdated-core-vocabs [ outdated-boot-image. t ] [ 2drop f ] if ;
 
 : do-all ( -- )
     ".." [
         bootstrap-time get boot-time-file to-file
-        check-boot-image
+        check-boot-image [ 1 exit ] when
         [ do-load ] benchmark load-time-file to-file
         [ generate-help ] benchmark html-help-time-file to-file
         [ do-tests ] benchmark test-time-file to-file

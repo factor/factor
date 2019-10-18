@@ -42,6 +42,6 @@ ARTICLE: "gpu-summary" "GPU-accelerated rendering"
     "gpu.shaders"
     "gpu.render"
 }
-"The library is built on top of the OpenGL API, but it aims to be complete enough that raw OpenGL calls are never needed. OpenGL 2.0 with the vertex array object extension (" { $snippet "GL_APPLE_vertex_array_object" } " or " { $snippet "GL_ARB_vertex_array_object" } ") is required. Some features require later OpenGL versions or additional extensions; these requirements are documented alongside individual words. To make full use of the library, an OpenGL 3.1 or later implementation is recommended." ;
+"The library is built on top of the OpenGL API, but it aims to be complete enough that raw OpenGL calls are never needed. OpenGL 2.0 is required. Some features require later OpenGL versions or additional extensions; these requirements are documented alongside individual words. To make full use of the library, an OpenGL 3.1 or later implementation is recommended." ;
 
 ABOUT: "gpu-summary"

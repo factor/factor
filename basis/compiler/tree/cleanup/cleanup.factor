@@ -51,11 +51,16 @@ GENERIC: cleanup* ( node -- node/nodes )
     [ in-d>> #drop ]
     bi prefix ;
 
-: record-predicate-folding ( #call -- )
-    [ node-input-infos first class>> ]
+: >predicate-folding< ( #call -- value-info class result )
+    [ node-input-infos first ]
     [ word>> "predicating" word-prop ]
-    [ node-output-infos first literal>> ] tri
-    [ depends-on-class<= ] [ depends-on-classes-disjoint ] if ;
+    [ node-output-infos first literal>> ] tri ;
+
+: record-predicate-folding ( #call -- )
+    >predicate-folding< pick literal?>>
+    [ [ literal>> ] 2dip depends-on-instance-predicate ]
+    [ [ class>> ] 2dip depends-on-class-predicate ]
+    if ;
 
 : record-folding ( #call -- )
     dup word>> predicate?

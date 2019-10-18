@@ -39,10 +39,9 @@ STRUCT: XAPO_LOCKFORPROCESS_BUFFER_PARAMETERS
     { pFormat                    WAVEFORMATEX* }
     { MaxFrameCount              UINT32        } ;
 
-C-ENUM:
-        XAPO_BUFFER_SILENT
-        XAPO_BUFFER_VALID ;
-TYPEDEF: int XAPO_BUFFER_FLAGS
+C-ENUM: XAPO_BUFFER_FLAGS
+    XAPO_BUFFER_SILENT
+    XAPO_BUFFER_VALID ;
 
 STRUCT: XAPO_PROCESS_BUFFER_PARAMETERS
     { pBuffer                    void*             }

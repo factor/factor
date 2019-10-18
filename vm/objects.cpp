@@ -5,15 +5,15 @@ namespace factor
 
 void factor_vm::primitive_special_object()
 {
-	fixnum e = untag_fixnum(ctx->peek());
-	ctx->replace(special_objects[e]);
+	fixnum n = untag_fixnum(ctx->peek());
+	ctx->replace(special_objects[n]);
 }
 
 void factor_vm::primitive_set_special_object()
 {
-	fixnum e = untag_fixnum(ctx->pop());
+	fixnum n = untag_fixnum(ctx->pop());
 	cell value = ctx->pop();
-	special_objects[e] = value;
+	special_objects[n] = value;
 }
 
 void factor_vm::primitive_identity_hashcode()

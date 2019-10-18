@@ -203,7 +203,7 @@ HELP: vertex-buffer
 
 HELP: with-mapped-buffer
 { $values
-    { "buffer" buffer } { "access" buffer-access-mode } { "quot" { $quotation "( alien -- )" } }
+    { "buffer" buffer } { "access" buffer-access-mode } { "quot" { $quotation "( ..a alien -- ..b )" } }
 }
 { $description "Maps " { $snippet "buffer" } " into CPU address space with " { $snippet "access" } " for the dynamic extent of " { $snippet "quot" } ". " { $snippet "quot" } " is called with a pointer to the mapped memory on top of the stack." } ;
 

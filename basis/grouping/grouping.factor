@@ -1,7 +1,7 @@
-! Copyright (C) 2005, 2010 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.order strings arrays vectors sequences
-sequences.private accessors fry ;
+sequences.private accessors fry combinators ;
 IN: grouping
 
 <PRIVATE
@@ -59,6 +59,12 @@ TUPLE: chunking-seq { seq read-only } { n read-only } ;
 : new-groups ( seq n class -- groups )
     [ check-groups ] dip boa ; inline
 
+: slice-mod ( n length -- n' )
+    2dup >= [ - ] [ drop ] if ; inline
+
+: check-circular-clumps ( seq n -- seq n )
+    2dup 1 - swap bounds-check 2drop ; inline
+
 PRIVATE>
 
 TUPLE: groups < chunking-seq ;
@@ -106,3 +112,47 @@ INSTANCE: sliced-clumps abstract-clumps
 : all-equal? ( seq -- ? ) [ = ] monotonic? ;
 
 : all-eq? ( seq -- ? ) [ eq? ] monotonic? ;
+
+TUPLE: circular-slice { from read-only } { to read-only } { seq read-only } ;
+
+INSTANCE: circular-slice virtual-sequence
+
+M: circular-slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
+
+M: circular-slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
+
+M: circular-slice length [ to>> ] [ from>> ] bi - ; inline
+
+M: circular-slice virtual-exemplar seq>> ; inline
+
+M: circular-slice virtual@
+    [ from>> + ] [ seq>> ] bi [ length slice-mod ] keep ; inline
+
+C: <circular-slice> circular-slice
+
+TUPLE: sliced-circular-clumps < chunking-seq ;
+INSTANCE: sliced-circular-clumps sequence
+
+M: sliced-circular-clumps length
+    seq>> length ; inline
+
+M: sliced-circular-clumps nth
+    [ n>> over + ] [ seq>> ] bi <circular-slice> ; inline
+
+: <sliced-circular-clumps> ( seq n -- clumps )
+    check-circular-clumps sliced-circular-clumps boa ; inline
+
+TUPLE: circular-clumps < chunking-seq ;
+INSTANCE: circular-clumps sequence
+
+M: circular-clumps length
+    seq>> length ; inline
+
+M: circular-clumps nth
+    [ n>> over + ] [ seq>> ] bi [ <circular-slice> ] [ like ] bi ; inline
+
+: <circular-clumps> ( seq n -- clumps )
+    check-circular-clumps circular-clumps boa ; inline
+
+: circular-clump ( seq n -- array )
+    <circular-clumps> { } like ; inline

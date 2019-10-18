@@ -66,10 +66,20 @@ HELP: still-parsing?
 { $values { "lexer" lexer } { "?" "a boolean" } }
 { $description "Outputs " { $link f } " if end of input has been reached, " { $link t } " otherwise." } ;
 
+HELP: each-token
+{ $values { "end" string } { "quot" { $quotation "( ... token -- ... )" } } }
+{ $description "Reads a sequence of tokens until the first occurrence of " { $snippet "end" } ". " { $snippet "quot" } " is called on each token as it is read." }
+{ $examples "This word is used to implement " { $link POSTPONE: USING: } "." }
+$parsing-note ;
+
+HELP: map-tokens
+{ $values { "end" string } { "quot" { $quotation "( ... token -- ... elt )" } } { "seq" "a new sequence of " { $snippet "object" } "s" } }
+{ $description "Reads a sequence of tokens until the first occurrence of " { $snippet "end" } ". " { $snippet "quot" } " is called on each token as it is read, and the results are collected into a new output sequence." }
+$parsing-note ;
+
 HELP: parse-tokens
 { $values { "end" string } { "seq" "a new sequence of strings" } }
-{ $description "Reads a sequence of tokens until the first occurrence of " { $snippet "end" } ". The tokens remain as strings and are not processed in any way." }
-{ $examples "This word is used to implement " { $link POSTPONE: USING: } "." }
+{ $description "Reads a sequence of tokens until the first occurrence of " { $snippet "end" } ". The tokens remain as strings and are not processed in any way. This word is equivalent to " { $link map-tokens } " with an empty quotation." }
 $parsing-note ;
 
 HELP: unexpected

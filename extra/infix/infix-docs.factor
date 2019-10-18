@@ -65,14 +65,6 @@ $nl
     "[let { 1 2 3 4 } :> myarr [infix myarr[4/2]*3 infix] ] ."
     "9"
 }
-"Please note: in Factor " { $emphasis "fixnums are sequences too." } " If you are not careful with sequence accesses you may introduce subtle bugs:"
-{ $example
-    "USING: arrays infix locals ;"
-    ":: add-2nd-elements ( x y -- res )"
-    "    [infix x[1] + y[1] infix] ;"
-    "{ 1 2 3 } { 0 1 2 3 } add-2nd-elements ."
-    "3"
-}
 ;
 
 ABOUT: "infix"

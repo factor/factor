@@ -140,7 +140,9 @@ long getpagesize()
 void factor_vm::move_file(const vm_char *path1, const vm_char *path2)
 {
 	if(MoveFileEx((path1),(path2),MOVEFILE_REPLACE_EXISTING) == false)
-		general_error(ERROR_IO,tag_fixnum(GetLastError()),false_object,NULL);
+		general_error(ERROR_IO,tag_fixnum(GetLastError()),false_object);
 }
+
+void factor_vm::init_signals() {}
 
 }

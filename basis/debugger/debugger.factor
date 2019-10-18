@@ -1,15 +1,15 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: slots arrays definitions generic hashtables summary io kernel
-math namespaces make prettyprint prettyprint.config sequences assocs
-sequences.private strings io.styles io.pathnames vectors words system
-splitting math.parser classes.mixin classes.tuple continuations
-continuations.private combinators generic.math classes.builtin classes
-compiler.units generic.standard generic.single vocabs init
-kernel.private io.encodings accessors math.order destructors
-source-files parser classes.tuple.parser effects.parser lexer
-generic.parser strings.parser vocabs.loader vocabs.parser
-source-files.errors ;
+USING: slots arrays definitions generic hashtables summary io
+kernel math namespaces make prettyprint prettyprint.config
+sequences assocs sequences.private strings io.styles
+io.pathnames vectors words system splitting math.parser
+classes.mixin classes.tuple continuations continuations.private
+combinators generic.math classes.builtin classes compiler.units
+generic.standard generic.single vocabs init kernel.private
+io.encodings accessors math.order destructors source-files
+parser classes.tuple.parser effects.parser lexer generic.parser
+strings.parser vocabs.loader vocabs.parser source-files.errors ;
 IN: debugger
 
 GENERIC: error-help ( error -- topic )
@@ -120,6 +120,8 @@ HOOK: signal-error. os ( obj -- )
 : datastack-overflow. ( obj -- ) "Data" stack-overflow. ;
 : retainstack-underflow. ( obj -- ) "Retain" stack-underflow. ;
 : retainstack-overflow. ( obj -- ) "Retain" stack-overflow. ;
+: callstack-underflow. ( obj -- ) "Call" stack-underflow. ;
+: callstack-overflow. ( obj -- ) "Call" stack-overflow. ;
 
 : memory-error. ( error -- )
     "Memory protection fault at address " write third .h ;
@@ -153,8 +155,10 @@ PREDICATE: vm-error < array
         { 11 [ datastack-overflow.     ] }
         { 12 [ retainstack-underflow.  ] }
         { 13 [ retainstack-overflow.   ] }
-        { 14 [ memory-error.           ] }
-        { 15 [ fp-trap-error.          ] }
+        { 14 [ callstack-underflow.    ] }
+        { 15 [ callstack-overflow.     ] }
+        { 16 [ memory-error.           ] }
+        { 17 [ fp-trap-error.          ] }
     } ; inline
 
 M: vm-error summary drop "VM error" ;
@@ -194,7 +198,7 @@ M: not-a-tuple summary
     drop "Not a tuple" ;
 
 M: bad-superclass summary
-    drop "Tuple classes can only inherit from other tuple classes" ;
+    drop "Tuple classes can only inherit from non-final tuple classes" ;
 
 M: no-initial-value summary
     drop "Initial value must be provided for slots specialized to this class" ;
@@ -266,20 +270,20 @@ M: no-current-vocab summary
 
 M: no-word-error summary
     name>>
-    "No word named ``"
-    "'' found in current vocabulary search path" surround ;
+    "No word named “"
+    "” found in current vocabulary search path" surround ;
 
 M: no-word-error error. summary print ;
 
 M: no-word-in-vocab summary
     [ vocab>> ] [ word>> ] bi
-    [ "No word named ``" % % "'' found in ``" % % "'' vocabulary" % ] "" make ;
+    [ "No word named “" % % "” found in “" % % "” vocabulary" % ] "" make ;
 
 M: no-word-in-vocab error. summary print ;
 
 M: ambiguous-use-error summary
     words>> first name>>
-    "More than one vocabulary defines a word named ``" "''" surround ;
+    "More than one vocabulary defines a word named “" "”" surround ;
 
 M: ambiguous-use-error error. summary print ;
 
@@ -301,6 +305,9 @@ M: bad-inheritance summary
 
 M: not-in-a-method-error summary
     drop "call-next-method can only be called in a method definition" ;
+
+M: version-control-merge-conflict summary
+    drop "Version control merge conflict in source code" ;
 
 GENERIC: expected>string ( obj -- str )
 
@@ -328,6 +335,12 @@ M: lexer-error error-help
 
 M: bad-effect summary
     drop "Bad stack effect declaration" ;
+
+M: invalid-row-variable summary
+    drop "Stack effect row variables can only occur as the first input or output" ;
+
+M: row-variable-can't-have-type summary
+    drop "Stack effect row variables cannot have a declared type" ;
 
 M: bad-escape error.
     "Bad escape code: \\" write

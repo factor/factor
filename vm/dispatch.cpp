@@ -148,8 +148,8 @@ void quotation_jit::emit_mega_cache_lookup(cell methods_, fixnum index, cell cac
 	data_root<array> methods(methods_,parent);
 	data_root<array> cache(cache_,parent);
 
-	/* Generate machine code to determine the object's class. */
-	emit_class_lookup(index,PIC_TUPLE);
+	/* Load the object from the datastack. */
+	emit_with_literal(parent->special_objects[PIC_LOAD],tag_fixnum(-index * sizeof(cell)));
 
 	/* Do a cache lookup. */
 	emit_with_literal(parent->special_objects[MEGA_LOOKUP],cache.value());

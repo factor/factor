@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax kernel windows.types
-multiline classes.struct ;
+math multiline classes.struct ;
 IN: windows.kernel32
 
 CONSTANT: MAX_PATH 260
@@ -89,6 +89,8 @@ CONSTANT: FILE_ACTION_REMOVED 2
 CONSTANT: FILE_ACTION_MODIFIED 3
 CONSTANT: FILE_ACTION_RENAMED_OLD_NAME 4
 CONSTANT: FILE_ACTION_RENAMED_NEW_NAME 5
+
+CONSTANT: DONT_RESOLVE_DLL_REFERENCES 1
 
 STRUCT: FILE_NOTIFY_INFORMATION
     { NextEntryOffset DWORD }
@@ -197,7 +199,7 @@ CONSTANT: THREAD_PRIORITY_LOWEST -2
 CONSTANT: THREAD_PRIORITY_NORMAL 0
 CONSTANT: THREAD_PRIORITY_TIME_CRITICAL 15
 
-C-ENUM:
+C-ENUM: COMPUTER_NAME_FORMAT
     ComputerNameNetBIOS
     ComputerNameDnsHostname
     ComputerNameDnsDomain
@@ -207,8 +209,6 @@ C-ENUM:
     ComputerNamePhysicalDnsDomain
     ComputerNamePhysicalDnsFullyQualified
     ComputerNameMax ;
-
-TYPEDEF: uint COMPUTER_NAME_FORMAT
 
 STRUCT: OVERLAPPED
     { internal UINT_PTR }
@@ -787,6 +787,30 @@ CONSTANT: STATUS_CONTROL_C_EXIT             HEX: C000013A
 CONSTANT: STATUS_FLOAT_MULTIPLE_FAULTS      HEX: C00002B4
 CONSTANT: STATUS_FLOAT_MULTIPLE_TRAPS       HEX: C00002B5
 
+! Resource IDs
+: MAKEINTRESOURCE ( int -- resource ) HEX: ffff bitand <alien> ; inline
+
+: RT_CURSOR       ( -- id )  1 MAKEINTRESOURCE ; inline
+: RT_BITMAP       ( -- id )  2 MAKEINTRESOURCE ; inline
+: RT_ICON         ( -- id )  3 MAKEINTRESOURCE ; inline
+: RT_MENU         ( -- id )  4 MAKEINTRESOURCE ; inline
+: RT_DIALOG       ( -- id )  5 MAKEINTRESOURCE ; inline
+: RT_STRING       ( -- id )  6 MAKEINTRESOURCE ; inline
+: RT_FONTDIR      ( -- id )  7 MAKEINTRESOURCE ; inline
+: RT_FONT         ( -- id )  8 MAKEINTRESOURCE ; inline
+: RT_ACCELERATOR  ( -- id )  9 MAKEINTRESOURCE ; inline
+: RT_RCDATA       ( -- id ) 10 MAKEINTRESOURCE ; inline
+: RT_MESSAGETABLE ( -- id ) 11 MAKEINTRESOURCE ; inline
+: RT_GROUP_CURSOR ( -- id ) 12 MAKEINTRESOURCE ; inline
+: RT_GROUP_ICON   ( -- id ) 14 MAKEINTRESOURCE ; inline
+: RT_VERSION      ( -- id ) 16 MAKEINTRESOURCE ; inline
+: RT_DLGINCLUDE   ( -- id ) 17 MAKEINTRESOURCE ; inline
+: RT_PLUGPLAY     ( -- id ) 19 MAKEINTRESOURCE ; inline
+: RT_VXD          ( -- id ) 20 MAKEINTRESOURCE ; inline
+: RT_ANICURSOR    ( -- id ) 21 MAKEINTRESOURCE ; inline
+: RT_ANIICON      ( -- id ) 22 MAKEINTRESOURCE ; inline
+: RT_MANIFEST     ( -- id ) 24 MAKEINTRESOURCE ; inline
+
 LIBRARY: kernel32
 ! FUNCTION: _hread
 ! FUNCTION: _hwrite
@@ -826,7 +850,8 @@ FUNCTION: BOOL AllocConsole ( ) ;
 ! FUNCTION: BaseUpdateAppcompatCache
 ! FUNCTION: Beep
 ! FUNCTION: BeginUpdateResourceA
-! FUNCTION: BeginUpdateResourceW
+FUNCTION: HANDLE BeginUpdateResourceW ( LPCTSTR pFileName, BOOL bDeleteExistingResources ) ;
+ALIAS: BeginUpdateResource BeginUpdateResourceW
 ! FUNCTION: BindIoCompletionCallback
 ! FUNCTION: BuildCommDCBA
 ! FUNCTION: BuildCommDCBAndTimeoutsA
@@ -1013,7 +1038,8 @@ CONSTANT: DUPLICATE_SAME_ACCESS 2
 ! FUNCTION: EncodePointer
 ! FUNCTION: EncodeSystemPointer
 ! FUNCTION: EndUpdateResourceA
-! FUNCTION: EndUpdateResourceW
+FUNCTION: BOOL EndUpdateResourceW ( HANDLE hUpdate, BOOL fDiscard ) ;
+ALIAS: EndUpdateResource EndUpdateResourceW
 ! FUNCTION: EnterCriticalSection
 ! FUNCTION: EnumCalendarInfoA
 ! FUNCTION: EnumCalendarInfoExA
@@ -1141,7 +1167,7 @@ FUNCTION: BOOL FreeConsole ( ) ;
 ! FUNCTION: FreeEnvironmentStringsA
 FUNCTION: BOOL FreeEnvironmentStringsW ( LPTCH lpszEnvironmentBlock ) ;
 ALIAS: FreeEnvironmentStrings FreeEnvironmentStringsW
-! FUNCTION: FreeLibrary
+FUNCTION: BOOL FreeLibrary ( HMODULE hModule ) ;
 ! FUNCTION: FreeLibraryAndExitThread
 ! FUNCTION: FreeResource
 ! FUNCTION: FreeUserPhysicalPages
@@ -1288,7 +1314,8 @@ FUNCTION: DWORD GetLogicalDrives ( ) ;
 ! FUNCTION: GetLongPathNameW
 ! FUNCTION: GetMailslotInfo
 ! FUNCTION: GetModuleFileNameA
-! FUNCTION: GetModuleFileNameW
+FUNCTION: DWORD GetModuleFileNameW ( HMODULE hModule, LPTSTR lpFilename, DWORD nSize ) ;
+ALIAS: GetModuleFileName GetModuleFileNameW
 FUNCTION: HMODULE GetModuleHandleW ( LPCWSTR lpModuleName ) ;
 ALIAS: GetModuleHandle GetModuleHandleW
 ! FUNCTION: GetModuleHandleExA
@@ -1323,7 +1350,7 @@ FUNCTION: DWORD GetPriorityClass ( HANDLE hProcess ) ;
 ! FUNCTION: GetPrivateProfileStringW
 ! FUNCTION: GetPrivateProfileStructA
 ! FUNCTION: GetPrivateProfileStructW
-FUNCTION: LPVOID GetProcAddress ( HMODULE hModule, char* lpProcName ) ;
+FUNCTION: LPVOID GetProcAddress ( HMODULE hModule, c-string lpProcName ) ;
 ! FUNCTION: GetProcessAffinityMask
 ! FUNCTION: GetProcessHandleCount
 ! FUNCTION: GetProcessHeap
@@ -1831,7 +1858,8 @@ FUNCTION: BOOL UnmapViewOfFile ( LPCVOID lpBaseAddress ) ;
 ! FUNCTION: UnregisterWait
 ! FUNCTION: UnregisterWaitEx
 ! FUNCTION: UpdateResourceA
-! FUNCTION: UpdateResourceW
+FUNCTION: BOOL UpdateResourceW ( HANDLE hUpdate, LPCTSTR lpType, LPCTSTR lpName, WORD wLanguage, LPVOID lpData, DWORD cbData ) ;
+ALIAS: UpdateResource UpdateResourceW
 ! FUNCTION: UTRegister
 ! FUNCTION: UTUnRegister
 ! FUNCTION: ValidateLCType

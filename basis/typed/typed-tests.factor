@@ -1,5 +1,6 @@
 USING: accessors effects eval kernel layouts math namespaces
-quotations tools.test typed words ;
+quotations tools.test typed words words.symbol
+compiler.tree.debugger prettyprint definitions compiler.units ;
 IN: typed.tests
 
 TYPED: f+ ( a: float b: float -- c: float )
@@ -14,8 +15,8 @@ TYPED: fix+ ( a: fixnum b: fixnum -- c: fixnum )
 most-positive-fixnum neg 1 - 1quotation
 [ most-positive-fixnum 1 fix+ ] unit-test
 
-TUPLE: tweedle-dee ;
-TUPLE: tweedle-dum ;
+TUPLE: tweedle-dee ; final
+TUPLE: tweedle-dum ; final
 
 TYPED: dee ( x: tweedle-dee -- y )
     drop \ tweedle-dee ;
@@ -39,11 +40,11 @@ TYPED:: f+locals ( a: float b: float -- c: float )
 
 TUPLE: unboxable
     { x fixnum read-only }
-    { y fixnum read-only } ;
+    { y fixnum read-only } ; final
 
 TUPLE: unboxable2
     { u unboxable read-only }
-    { xy fixnum read-only } ;
+    { xy fixnum read-only } ; final
 
 TYPED: unboxy ( in: unboxable -- out: unboxable2 )
     dup [ x>> ] [ y>> ] bi - unboxable2 boa ;
@@ -63,7 +64,7 @@ IN: typed.tests
 TUPLE: unboxable
     { x fixnum read-only }
     { y fixnum read-only }
-    { z float read-only } ;
+    { z float read-only } ; final
 """ eval( -- )
 
 """
@@ -79,12 +80,14 @@ TYPED: no-inputs ( -- out: integer )
 [ 1 ] [ no-inputs ] unit-test
 
 TUPLE: unboxable3
-    { x read-only } ;
+    { x read-only } ; final
 
 TYPED: no-inputs-unboxable-output ( -- out: unboxable3 )
     T{ unboxable3 } ;
 
 [ T{ unboxable3 } ] [ no-inputs-unboxable-output ] unit-test
+
+[ f ] [ no-inputs-unboxable-output no-inputs-unboxable-output eq? ] unit-test
 
 SYMBOL: buh
 
@@ -97,3 +100,61 @@ TYPED: no-outputs-unboxable-input ( x: unboxable3 -- )
     buh set ;
 
 [ T{ unboxable3 } ] [ T{ unboxable3 } no-outputs-unboxable-input buh get ] unit-test
+
+[ f ] [
+    T{ unboxable3 } no-outputs-unboxable-input buh get
+    T{ unboxable3 } no-outputs-unboxable-input buh get
+    eq?
+] unit-test
+
+! Reported by littledan
+TUPLE: superclass { x read-only } ;
+TUPLE: subclass < superclass { y read-only } ; final
+
+TYPED: unbox-fail ( a: superclass -- ? ) subclass? ;
+
+[ t ] [ subclass new unbox-fail ] unit-test
+
+! If a final class becomes non-final, typed words need to be recompiled
+TYPED: recompile-fail ( a: subclass -- ? ) buh get eq? ;
+
+[ f ] [ subclass new [ buh set ] [ recompile-fail ] bi ] unit-test
+
+[ ] [ "IN: typed.tests TUPLE: subclass < superclass { y read-only } ;" eval( -- ) ] unit-test
+
+[ t ] [ subclass new [ buh set ] [ recompile-fail ] bi ] unit-test
+
+! Make sure that foldable and flushable work on typed words
+TYPED: add ( a: integer b: integer -- c: integer ) + ; foldable
+
+[ [ 3 ] ] [ [ 1 2 add ] cleaned-up-tree nodes>quot ] unit-test
+
+TYPED: flush-test ( s: symbol -- ? ) on t ; flushable
+
+: flush-print-1 ( symbol -- ) flush-test drop ;
+: flush-print-2 ( symbol -- ) flush-test . ;
+
+SYMBOL: a-symbol
+
+[ f ] [
+    f a-symbol [
+        a-symbol flush-print-1
+        a-symbol get
+    ] with-variable
+] unit-test
+
+[ t ] [
+    f a-symbol [
+        a-symbol flush-print-2
+        a-symbol get
+    ] with-variable
+] unit-test
+
+! Forgetting an unboxed final class should work
+TUPLE: forget-class { x read-only } ; final
+
+TYPED: forget-fail ( a: forget-class -- ) drop ;
+
+[ ] [ [ \ forget-class forget ] with-compilation-unit ] unit-test
+
+[ ] [ [ \ forget-fail forget ] with-compilation-unit ] unit-test

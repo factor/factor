@@ -129,12 +129,8 @@ M: process-was-killed error.
 
 : (wait-for-process) ( process -- status )
     dup handle>>
-    [
-        dup [ processes get at push ] curry
-        "process" suspend drop
-    ] when
-    dup killed>>
-    [ process-was-killed ] [ status>> ] if ;
+    [ self over processes get at push "process" suspend drop ] when
+    dup killed>> [ process-was-killed ] [ status>> ] if ;
 
 : wait-for-process ( process -- status )
     [ (wait-for-process) ] with-timeout ;

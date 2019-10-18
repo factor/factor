@@ -35,7 +35,7 @@ STRUCT: addrinfo
 !         int _ai_pad;            
 ! #endif
     { addrlen int }
-    { canonname char* }
+    { canonname c-string }
     { addr void* }
     { next void* } ;
 

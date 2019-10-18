@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs db.tuples furnace.actions
 furnace.utilities http.server.responses kernel locals
-mason.server mason.server.release sequences splitting urls
+mason.server mason.version.data sequences splitting urls
 webapps.mason.utils xml.syntax xml.writer ;
 IN: webapps.mason.grids
 
@@ -19,7 +19,6 @@ CONSTANT: oses
     { "macosx" "Mac OS X" }
     { "linux" "Linux" }
     { "freebsd" "FreeBSD" }
-    { "netbsd" "NetBSD" }
     { "openbsd" "OpenBSD" }
 }
 
@@ -36,7 +35,7 @@ CONSTANT: cpus
 :: render-grid-row ( cpu quot -- xml )
     cpu second oses keys [| os | cpu os quot render-grid-cell ] map
     [XML <tr><th align='center' scope='row'><-></th><-></tr> XML] ;
-    
+
 :: render-grid ( quot -- xml )
     render-grid-header
     cpus [ quot render-grid-row ] map

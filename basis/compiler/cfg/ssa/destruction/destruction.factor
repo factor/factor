@@ -15,6 +15,7 @@ compiler.cfg.ssa.interference
 compiler.cfg.ssa.interference.live-ranges
 compiler.cfg.utilities
 compiler.utilities ;
+FROM: namespaces => set ;
 IN: compiler.cfg.ssa.destruction
 
 ! Maps vregs to leaders.

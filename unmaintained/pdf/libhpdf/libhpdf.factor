@@ -10,9 +10,9 @@ USING: alien alien.syntax combinators system ;
 IN: pdf.libhpdf
 
 << "libhpdf" {
-    { [ win32? ] [ "libhpdf.dll" "stdcall" ] }
-    { [ macosx? ] [ "libhpdf.dylib" "cdecl" ] }
-    { [ unix? ] [ "$LD_LIBRARY_PATH/libhpdf.so" "cdecl" ] }
+    { [ win32? ] [ "libhpdf.dll" stdcall ] }
+    { [ macosx? ] [ "libhpdf.dylib" cdecl ] }
+    { [ unix? ] [ "$LD_LIBRARY_PATH/libhpdf.so" cdecl ] }
 } cond add-library >>
 
 ! compression mode
@@ -24,7 +24,7 @@ IN: pdf.libhpdf
 : HPDF_COMP_MASK      HEX: FF ; inline
 
 ! page mode
-C-ENUM:
+C-ENUM: f
     HPDF_PAGE_MODE_USE_NONE
     HPDF_PAGE_MODE_USE_OUTLINE
     HPDF_PAGE_MODE_USE_THUMBS

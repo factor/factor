@@ -5,9 +5,9 @@ colors.constants combinators combinators.short-circuit
 combinators.smart fry kernel locals math math.rectangles
 math.vectors models namespaces opengl opengl.gl quotations
 sequences strings ui.commands ui.gadgets ui.gadgets.borders
-ui.gadgets.labels ui.gadgets.packs ui.gadgets.tracks
-ui.gadgets.worlds ui.gestures ui.pens ui.pens.image
-ui.pens.solid ui.pens.tile ;
+ui.gadgets.labels ui.gadgets.packs ui.gadgets.theme
+ui.gadgets.tracks ui.gadgets.worlds ui.gestures ui.pens
+ui.pens.image ui.pens.solid ui.pens.tile ;
 FROM: models => change-model ;
 IN: ui.gadgets.buttons
 
@@ -220,8 +220,8 @@ TUPLE: radio-control < button value ;
 M: radio-control model-changed
     2dup [ value>> ] bi@ = >>selected? relayout-1 drop ;
 
-:: <radio-controls> ( parent model assoc quot: ( value model label -- gadget ) -- parent )
-    assoc model [ parent swap quot call add-gadget ] assoc-each ; inline
+:: <radio-controls> ( model assoc parent quot: ( value model label -- gadget ) -- parent )
+    parent assoc [ model swap quot call add-gadget ] assoc-each ; inline
 
 PRIVATE>
 

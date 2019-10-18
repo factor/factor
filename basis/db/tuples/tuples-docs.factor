@@ -51,7 +51,7 @@ HELP: <insert-user-assigned-statement>
 HELP: <select-by-slots-statement>
 { $values
      { "tuple" tuple } { "class" class }
-     { "tuple" tuple } }
+     { "statement" tuple } }
 { $description "A database-specific hook for generating the SQL for a select statement." } ;
 
 HELP: <update-tuple-statement>
@@ -267,7 +267,7 @@ T{ book
 { $list
     "Make a new tuple to represent your data"
     { "Map the Factor types to the database types with " { $link define-persistent } }
-    { "Make a custom database combinator (see" { $link "db-custom-database-combinators" } ") to open your database and run a " { $link quotation } }
+    { "Make a custom database combinator (see " { $link "db-custom-database-combinators" } ") to open your database and run a " { $link quotation } }
     { "Create a table with " { $link create-table } ", " { $link ensure-table } ", or " { $link recreate-table } }
     { "Start making and storing objects with " { $link insert-tuple } ", " { $link update-tuple } ", " { $link delete-tuples } ", and " { $link select-tuples } }
 } ;

@@ -58,7 +58,7 @@ TUPLE: nbody-system { bodies array read-only } ;
     [ <sun> <jupiter> <saturn> <uranus> <neptune> ] output>array nbody-system boa
     dup bodies>> init-bodies ; inline
 
-:: each-pair ( bodies pair-quot: ( other-body body -- ) each-quot: ( body -- ) -- )
+:: each-pair ( ... bodies pair-quot: ( ... other-body body -- ... ) each-quot: ( ... body -- ... ) -- ... )
     bodies [| body i |
         body each-quot call
         bodies i 1 + tail-slice [

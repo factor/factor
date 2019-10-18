@@ -2,9 +2,9 @@
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs byte-arrays classes.mixin classes.parser
 classes.singleton classes.struct combinators combinators.short-circuit
-definitions destructors fry generic.parser gpu gpu.buffers hashtables
-images io.encodings.ascii io.files io.pathnames kernel lexer
-literals locals math math.parser memoize multiline namespaces
+definitions destructors fry generic.parser gpu gpu.buffers gpu.private
+gpu.state hashtables images io.encodings.ascii io.files io.pathnames
+kernel lexer literals locals math math.parser memoize multiline namespaces
 opengl opengl.gl opengl.shaders parser quotations sequences
 specialized-arrays splitting strings tr ui.gadgets.worlds
 variants vectors vocabs vocabs.loader vocabs.parser words
@@ -15,7 +15,18 @@ SPECIALIZED-ARRAY: void*
 IN: gpu.shaders
 
 VARIANT: shader-kind
-    vertex-shader fragment-shader ;
+    vertex-shader fragment-shader geometry-shader ;
+
+VARIANT: geometry-shader-input
+    points-input
+    lines-input
+    lines-with-adjacency-input
+    triangles-input
+    triangles-with-adjacency-input ;
+VARIANT: geometry-shader-output
+    points-output
+    line-strips-output
+    triangle-strips-output ;
 
 UNION: ?string string POSTPONE: f ;
 
@@ -47,6 +58,7 @@ TUPLE: program
     { shaders array read-only }
     { vertex-formats array read-only }
     { feedback-format ?vertex-format read-only }
+    { geometry-shader-parameters array read-only }
     { instances hashtable read-only } ;
 
 TUPLE: shader-instance < gpu-object
@@ -197,6 +209,31 @@ TR: hyphens>underscores "-" "_" ;
     vertex-attributes [ [verify-feedback-attribute] ] map-index :> verify-cleave
     { drop verify-cleave cleave } >quotation ;
 
+: gl-geometry-shader-input ( input -- input )
+    {
+        { points-input [ GL_POINTS ] }
+        { lines-input  [ GL_LINES ] }
+        { lines-with-adjacency-input [ GL_LINES_ADJACENCY ] }
+        { triangles-input [ GL_TRIANGLES ] }
+        { triangles-with-adjacency-input [ GL_TRIANGLES_ADJACENCY ] }
+    } case ; inline
+
+: gl-geometry-shader-output ( output -- output )
+    {
+        { points-output [ GL_POINTS ] }
+        { line-strips-output  [ GL_LINE_STRIP ] }
+        { triangle-strips-output [ GL_TRIANGLE_STRIP ] }
+    } case ; inline
+
+TUPLE: geometry-shader-vertices-out
+    { count integer read-only } ;
+
+UNION: geometry-shader-parameter
+    geometry-shader-input
+    geometry-shader-output
+    geometry-shader-vertices-out ;
+
+
 GENERIC: bind-vertex-format ( program-instance buffer-ptr format -- )
 
 GENERIC: link-feedback-format ( program-handle format -- )
@@ -207,6 +244,18 @@ M: f link-feedback-format
 : link-vertex-formats ( program-handle formats -- )
     [ vertex-format-attributes [ name>> ] map sift ] map concat
     swap '[ [ _ ] 2dip swap glBindAttribLocation ] each-index ; 
+
+GENERIC: link-geometry-shader-parameter ( program-handle parameter -- )
+
+M: geometry-shader-input link-geometry-shader-parameter
+    [ GL_GEOMETRY_INPUT_TYPE ] dip gl-geometry-shader-input glProgramParameteriARB ;
+M: geometry-shader-output link-geometry-shader-parameter
+    [ GL_GEOMETRY_OUTPUT_TYPE ] dip gl-geometry-shader-output glProgramParameteriARB ;
+M: geometry-shader-vertices-out link-geometry-shader-parameter
+    [ GL_GEOMETRY_VERTICES_OUT ] dip count>> glProgramParameteriARB ;
+
+: link-geometry-shader-parameters ( program-handle parameters -- )
+    [ link-geometry-shader-parameter ] with each ;
 
 GENERIC: (verify-feedback-format) ( program-instance format -- )
 
@@ -252,13 +301,11 @@ M: f (verify-feedback-format)
     dup 1 = [ drop ] [ 2array ] if ;
 
 SYMBOL: padding-no
-padding-no [ 0 ] initialize
 
 : padding-name ( -- name )
     "padding-"
-    padding-no get number>string append
-    "(" ")" surround
-    padding-no inc ;
+    padding-no counter number>string append
+    "(" ")" surround ;
 
 : vertex-attribute>struct-slot ( vertex-attribute -- struct-slot-spec )
     [ name>> [ padding-name ] unless* ]
@@ -293,7 +340,8 @@ padding-no [ 0 ] initialize
     {
         { vertex-shader [ GL_VERTEX_SHADER ] }
         { fragment-shader [ GL_FRAGMENT_SHADER ] }
-    } case ;
+        { geometry-shader [ GL_GEOMETRY_SHADER ] }
+    } case ; inline
 
 PRIVATE>
 
@@ -319,11 +367,18 @@ SYNTAX: VERTEX-FORMAT:
 SYNTAX: VERTEX-STRUCT:
     CREATE-CLASS scan-word define-vertex-struct ;
 
-TUPLE: vertex-array < gpu-object
+TUPLE: vertex-array-object < gpu-object
     { program-instance program-instance read-only }
     { vertex-buffers sequence read-only } ;
 
-M: vertex-array dispose
+TUPLE: vertex-array-collection
+    { vertex-formats sequence read-only }
+    { program-instance program-instance read-only } ;
+
+UNION: vertex-array
+    vertex-array-object vertex-array-collection ;
+
+M: vertex-array-object dispose
     [ [ delete-vertex-array ] when* f ] change-handle drop ;
 
 : ?>buffer-ptr ( buffer/ptr -- buffer-ptr )
@@ -331,26 +386,73 @@ M: vertex-array dispose
 : ?>buffer ( buffer/ptr -- buffer )
     dup buffer? [ buffer>> ] unless ; inline
 
-:: <multi-vertex-array> ( vertex-formats program-instance -- vertex-array )
+<PRIVATE
+
+: normalize-vertex-formats ( vertex-formats -- vertex-formats' )
+    [ first2 [ ?>buffer-ptr ] dip 2array ] map ; inline
+
+: (bind-vertex-array) ( vertex-formats program-instance -- )
+    '[ _ swap first2 bind-vertex-format ] each ; inline
+
+: (reset-vertex-array) ( -- )
+    GL_MAX_VERTEX_ATTRIBS get-gl-int iota [ glDisableVertexAttribArray ] each ; inline
+
+:: <multi-vertex-array-object> ( vertex-formats program-instance -- vertex-array )
     gen-vertex-array :> handle
     handle glBindVertexArray
 
-    vertex-formats [ program-instance swap first2 [ ?>buffer-ptr ] dip bind-vertex-format ] each
-    handle program-instance vertex-formats [ first ?>buffer ] map
-    vertex-array boa window-resource ; inline
+    vertex-formats normalize-vertex-formats program-instance (bind-vertex-array)
 
-:: <vertex-array*> ( vertex-buffer program-instance format -- vertex-array )
+    handle program-instance vertex-formats [ first ?>buffer ] map
+    vertex-array-object boa window-resource ; inline
+
+: <multi-vertex-array-collection> ( vertex-formats program-instance -- vertex-array )
+    [ normalize-vertex-formats ] dip vertex-array-collection boa ; inline
+
+:: <vertex-array-object> ( vertex-buffer program-instance format -- vertex-array )
     gen-vertex-array :> handle
     handle glBindVertexArray
     program-instance vertex-buffer ?>buffer-ptr format bind-vertex-format
     handle program-instance vertex-buffer ?>buffer 1array
-    vertex-array boa window-resource ; inline
+    vertex-array-object boa window-resource ; inline
+
+: <vertex-array-collection> ( vertex-buffer program-instance format -- vertex-array )
+    swap [ [ ?>buffer-ptr ] dip 2array 1array ] dip <multi-vertex-array-collection> ; inline
+
+PRIVATE>
+
+GENERIC: bind-vertex-array ( vertex-array -- )
+
+M: vertex-array-object bind-vertex-array
+    handle>> glBindVertexArray ; inline
+
+M: vertex-array-collection bind-vertex-array
+    (reset-vertex-array)
+    [ vertex-formats>> ] [ program-instance>> ] bi (bind-vertex-array) ; inline
+
+: <multi-vertex-array> ( vertex-formats program-instance -- vertex-array )
+    has-vertex-array-objects? get
+    [ <multi-vertex-array-object> ]
+    [ <multi-vertex-array-collection> ] if ; inline
+    
+: <vertex-array*> ( vertex-buffer program-instance format -- vertex-array )
+    has-vertex-array-objects? get
+    [ <vertex-array-object> ]
+    [ <vertex-array-collection> ] if ; inline
 
 : <vertex-array> ( vertex-buffer program-instance -- vertex-array )
     dup program>> vertex-formats>> first <vertex-array*> ; inline
 
-TYPED: vertex-array-buffer ( vertex-array: vertex-array -- vertex-buffer: buffer )
-    vertex-buffers>> first ;
+GENERIC: vertex-array-buffers ( vertex-array -- buffers )
+
+M: vertex-array-object vertex-array-buffers
+    vertex-buffers>> ; inline
+
+M: vertex-array-collection vertex-array-buffers
+    vertex-formats>> [ first buffer>> ] map ; inline
+
+: vertex-array-buffer ( vertex-array: vertex-array -- vertex-buffer: buffer )
+    vertex-array-buffers first ; inline
 
 TUPLE: compile-shader-error shader log ;
 TUPLE: link-program-error program log ;
@@ -379,8 +481,12 @@ DEFER: <shader-instance>
 : (link-program) ( program shader-instances -- program-instance )
     '[ _ [ handle>> ] map ]
     [
-        [ vertex-formats>> ] [ feedback-format>> ] bi
-        '[ [ _ link-vertex-formats ] [ _ link-feedback-format ] bi ]
+        [ vertex-formats>> ] [ feedback-format>> ] [ geometry-shader-parameters>> ] tri
+        '[
+            [ _ link-vertex-formats ]
+            [ _ link-feedback-format ]
+            [ _ link-geometry-shader-parameters ] tri
+        ]
     ] bi (gl-program)
     dup gl-program-ok?  [
         [ swap world get \ program-instance boa |dispose dup verify-feedback-format ]
@@ -431,15 +537,20 @@ TUPLE: feedback-format
 : ?shader ( object -- shader/f )
     dup word? [ def>> first dup shader? [ drop f ] unless ] [ drop f ] if ;
 
-: shaders-and-formats ( words -- shaders vertex-formats feedback-format )
-    [ [ ?shader ] map sift ]
-    [ [ vertex-format-attributes ] filter ]
-    [ [ feedback-format? ] filter validate-feedback-format ] tri ;
+: shaders-and-formats ( words -- shaders vertex-formats feedback-format geom-parameters )
+    {
+        [ [ ?shader ] map sift ]
+        [ [ vertex-format-attributes ] filter ]
+        [ [ feedback-format? ] filter validate-feedback-format ]
+        [ [ geometry-shader-parameter? ] filter ]
+    } cleave ;
 
 PRIVATE>
 
 SYNTAX: feedback-format:
     scan-object feedback-format boa suffix! ;
+SYNTAX: geometry-shader-vertices-out:
+    scan-object geometry-shader-vertices-out boa suffix! ;
 
 TYPED:: refresh-program ( program: program -- )
     program shaders>> [ refresh-shader-source ] each
@@ -521,4 +632,4 @@ M: program-instance dispose
     [ world>> ] [ program>> instances>> ] [ ] tri ?delete-at
     reset-memos ;
 
-"prettyprint" vocab [ "gpu.shaders.prettyprint" require ] when
+"prettyprint" "gpu.shaders.prettyprint" require-when

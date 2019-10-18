@@ -9,6 +9,7 @@ vectors hashtables combinators effects generalizations assocs
 sets combinators.short-circuit sequences.private locals growable
 stack-checker namespaces compiler.tree.propagation.info ;
 FROM: math => float ;
+FROM: sets => set ;
 IN: compiler.tree.propagation.transforms
 
 \ equal? [
@@ -134,6 +135,7 @@ IN: compiler.tree.propagation.transforms
     in-d>> first value-info literal>> {
         { V{ } [ [ drop { } 0 vector boa ] ] }
         { H{ } [ [ drop 0 <hashtable> ] ] }
+        { HS{ } [ [ drop f fast-set ] ] }
         [ drop f ]
     } case
 ] "custom-inlining" set-word-prop
@@ -207,7 +209,7 @@ ERROR: bad-partial-eval quot word ;
         [ drop f ] swap
         [ literalize [ t ] ] { } map>assoc linear-case-quot
     ] [
-        unique [ key? ] curry
+        tester
     ] if ;
 
 \ member? [
@@ -272,14 +274,14 @@ CONSTANT: lookup-table-at-max 256
 \ at* [ at-quot ] 1 define-partial-eval
 
 : diff-quot ( seq -- quot: ( seq' -- seq'' ) )
-    tester '[ [ @ not ] filter ] ;
+    tester '[ [ [ @ not ] filter ] keep set-like ] ;
 
-\ diff [ diff-quot ] 1 define-partial-eval
+M\ set diff [ diff-quot ] 1 define-partial-eval
 
 : intersect-quot ( seq -- quot: ( seq' -- seq'' ) )
-    tester '[ _ filter ] ;
+    tester '[ [ _ filter ] keep set-like ] ;
 
-\ intersect [ intersect-quot ] 1 define-partial-eval
+M\ set intersect [ intersect-quot ] 1 define-partial-eval
 
 : fixnum-bits ( -- n )
     cell-bits tag-bits get - ;

@@ -59,14 +59,14 @@ HINTS: next* { spot } ;
     ! with-input-stream implicitly creates a new scope which we use
     swap [ init-parser call ] with-input-stream ; inline
 
-:: (skip-until) ( quot: ( -- ? ) spot -- )
+:: (skip-until) ( ... quot: ( ... -- ... ? ) spot -- ... )
     spot char>> [
         quot call [
             spot next* quot spot (skip-until)
         ] unless
     ] when ; inline recursive
 
-: skip-until ( quot: ( -- ? ) -- )
+: skip-until ( ... quot: ( ... -- ... ? ) -- ... )
     spot get (skip-until) ; inline
 
 : take-until ( quot -- string )

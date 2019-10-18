@@ -24,5 +24,5 @@ STRUCT: stat
     { st_birthtimespec timespec }
     { pad0 __int32_t[2] } ;
 
-FUNCTION: int stat  ( char* pathname, stat* buf ) ;
-FUNCTION: int lstat ( char* pathname, stat* buf ) ;
+FUNCTION: int stat  ( c-string pathname, stat* buf ) ;
+FUNCTION: int lstat ( c-string pathname, stat* buf ) ;

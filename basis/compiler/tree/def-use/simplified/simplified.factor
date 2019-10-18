@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences kernel fry vectors accessors namespaces assocs sets
 stack-checker.branches compiler.tree compiler.tree.def-use ;
+FROM: namespaces => set ;
 IN: compiler.tree.def-use.simplified
 
 ! Simplified def-use follows chains of copies.

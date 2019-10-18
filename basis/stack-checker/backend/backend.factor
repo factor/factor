@@ -3,9 +3,11 @@
 USING: fry arrays generic io io.streams.string kernel math namespaces
 parser sequences strings vectors words quotations effects classes
 continuations assocs combinators compiler.errors accessors math.order
-definitions sets hints macros stack-checker.state
+definitions locals sets hints macros stack-checker.state
 stack-checker.visitor stack-checker.errors stack-checker.values
 stack-checker.recursive-state stack-checker.dependencies summary ;
+FROM: sequences.private => from-end ;
+FROM: namespaces => set ;
 IN: stack-checker.backend
 
 : push-d ( obj -- ) meta-d push ;
@@ -16,8 +18,13 @@ IN: stack-checker.backend
     [ #introduce, ]
     tri ;
 
+: update-inner-d ( new -- )
+    inner-d-index get min inner-d-index set ;
+
 : pop-d  ( -- obj )
-    meta-d [ <value> dup 1array introduce-values ] [ pop ] if-empty ;
+    meta-d
+    [ <value> dup 1array introduce-values ]
+    [ pop meta-d length update-inner-d ] if-empty ;
 
 : peek-d ( -- obj ) pop-d dup push-d ;
 
@@ -30,13 +37,17 @@ IN: stack-checker.backend
         [ nip >array ] [ length - make-values ] [ nip delete-all ] 2tri
         [ introduce-values ] [ meta-d push-all ] bi
         meta-d push-all
-    ] when swap tail* ;
+    ] when
+    swap from-end [ tail ] [ update-inner-d ] bi ;
 
 : shorten-by ( n seq -- )
     [ length swap - ] keep shorten ; inline
 
+: shorten-d ( n -- )
+    meta-d shorten-by meta-d length update-inner-d ;
+
 : consume-d ( n -- seq )
-    [ ensure-d ] [ meta-d shorten-by ] bi ;
+    [ ensure-d ] [ shorten-d ] bi ;
 
 : output-d ( values -- ) meta-d push-all ;
 
@@ -126,7 +137,7 @@ M: bad-call summary
 : infer-r> ( n -- )
     consume-r dup copy-values [ nip output-d ] [ #r>, ] 2bi ;
 
-: consume/produce ( effect quot: ( inputs outputs -- ) -- )
+: consume/produce ( ..a effect quot: ( ..a inputs outputs -- ..b ) -- ..b )
     '[ [ in>> length consume-d ] [ out>> length produce-d ] bi @ ]
     [ terminated?>> [ terminate ] when ]
     bi ; inline
@@ -140,13 +151,6 @@ M: bad-call summary
 : required-stack-effect ( word -- effect )
     dup stack-effect [ ] [ missing-effect ] ?if ;
 
-: infer-word ( word -- )
-    {
-        { [ dup macro? ] [ do-not-compile ] }
-        { [ dup "no-compile" word-prop ] [ do-not-compile ] }
-        [ dup required-stack-effect apply-word/effect ]
-    } cond ;
-
 : with-infer ( quot -- effect visitor )
     [
         init-inference
@@ -157,3 +161,30 @@ M: bad-call summary
         current-effect
         stack-visitor get
     ] with-scope ; inline
+
+: (infer) ( quot -- effect )
+    [ infer-quot-here ] with-infer drop ;
+
+: ?quotation-effect ( in -- effect/f )
+    dup pair? [ second dup effect? [ drop f ] unless ] [ drop f ] if ;
+
+:: declare-effect-d ( word effect variables branches n -- )
+    meta-d length :> d-length
+    n d-length < [
+        d-length 1 - n - :> n'
+        n' meta-d nth :> value
+        value known :> known
+        known word effect variables branches <declared-effect> :> known'
+        known' value set-known
+        known' branches push
+    ] [ word unknown-macro-input ] if ;
+
+:: declare-input-effects ( word -- )
+    H{ } clone :> variables
+    V{ } clone :> branches
+    word stack-effect in>> <reversed> [| in n |
+        in ?quotation-effect [| effect |
+            word effect variables branches n declare-effect-d
+        ] when*
+    ] each-index ;
+

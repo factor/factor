@@ -145,7 +145,7 @@ TUPLE: link attributes clickable ;
     [ >url ] map ;
 
 : find-all-links ( vector -- vector' )
-    [ find-hrefs ] [ find-frame-links ] bi append prune ;
+    [ find-hrefs ] [ find-frame-links ] bi union ;
 
 : find-forms ( vector -- vector' )
     "form" over find-opening-tags-by-name

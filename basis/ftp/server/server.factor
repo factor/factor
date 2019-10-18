@@ -1,15 +1,14 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs byte-arrays calendar classes
-combinators combinators.short-circuit concurrency.promises
-continuations destructors ftp io io.backend io.directories
-io.encodings io.encodings.binary
-tools.files io.encodings.utf8 io.files io.files.info
-io.pathnames io.launcher.unix.parser io.servers.connection
-io.sockets io.streams.duplex io.streams.string io.timeouts
-kernel make math math.bitwise math.parser namespaces sequences
-splitting threads unicode.case logging calendar.format
-strings io.files.links io.files.types io.encodings.8-bit.latin1 ;
+USING: accessors assocs byte-arrays calendar classes combinators
+combinators.short-circuit concurrency.promises continuations
+destructors ftp io io.backend io.directories io.encodings
+io.encodings.binary tools.files io.encodings.utf8 io.files
+io.files.info io.pathnames io.servers.connection io.sockets
+io.streams.duplex io.streams.string io.timeouts kernel make math
+math.bitwise math.parser namespaces sequences splitting threads
+unicode.case logging calendar.format strings io.files.links
+io.files.types io.encodings.8-bit.latin1 simple-tokenizer ;
 IN: ftp.server
 
 SYMBOL: server
@@ -24,7 +23,7 @@ TUPLE: ftp-command raw tokenized ;
     dup \ <ftp-command> DEBUG log-message
     ftp-command new
         over >>raw
-        swap tokenize-command >>tokenized ;
+        swap tokenize >>tokenized ;
 
 TUPLE: ftp-get path ;
 : <ftp-get> ( path -- obj )

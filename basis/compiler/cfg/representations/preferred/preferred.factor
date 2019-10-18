@@ -5,6 +5,7 @@ words sets combinators generalizations cpu.architecture compiler.units
 compiler.cfg.utilities compiler.cfg compiler.cfg.rpo
 compiler.cfg.instructions compiler.cfg.def-use ;
 FROM: compiler.cfg.instructions.syntax => insn-def-slot insn-use-slots insn-temp-slots scalar-rep ;
+FROM: namespaces => set ;
 IN: compiler.cfg.representations.preferred
 
 GENERIC: defs-vreg-rep ( insn -- rep/f )
@@ -67,16 +68,16 @@ PRIVATE>
     tri
 ] with-compilation-unit
 
-: each-def-rep ( insn vreg-quot: ( vreg rep -- ) -- )
+: each-def-rep ( ... insn vreg-quot: ( ... vreg rep -- ... ) -- ... )
     [ [ defs-vreg ] [ defs-vreg-rep ] bi ] dip with when* ; inline
 
-: each-use-rep ( insn vreg-quot: ( vreg rep -- ) -- )
+: each-use-rep ( ... insn vreg-quot: ( ... vreg rep -- ... ) -- ... )
     [ [ uses-vregs ] [ uses-vreg-reps ] bi ] dip 2each ; inline
 
-: each-temp-rep ( insn vreg-quot: ( vreg rep -- ) -- )
+: each-temp-rep ( ... insn vreg-quot: ( ... vreg rep -- ... ) -- ... )
     [ [ temp-vregs ] [ temp-vreg-reps ] bi ] dip 2each ; inline
 
-: with-vreg-reps ( cfg vreg-quot: ( vreg rep -- ) -- )
+: with-vreg-reps ( ..a cfg vreg-quot: ( ..a vreg rep -- ..b ) -- ..b )
     '[
         [ basic-block set ] [
             [

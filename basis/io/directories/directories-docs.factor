@@ -46,9 +46,17 @@ HELP: directory-files
 { $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }
 { $description "Outputs the contents of a directory named by " { $snippet "path" } "." } ;
 
+HELP: directory-tree-files
+{ $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }
+{ $description "Outputs a sequence of all files and subdirectories inside the directory named by " { $snippet "path" } " or recursively inside its subdirectories." } ;
+
 HELP: with-directory-files
 { $values { "path" "a pathname string" } { "quot" quotation } }
 { $description "Calls the quotation with the directory file names on the stack and with the directory set as the " { $link current-directory } ".  Restores the current directory after the quotation is called." } ;
+
+HELP: with-directory-tree-files
+{ $values { "path" "a pathname string" } { "quot" quotation } }
+{ $description "Calls the quotation with the recursive directory file names on the stack and with the directory set as the " { $link current-directory } ".  Restores the current directory after the quotation is called." } ;
 
 HELP: with-directory-entries
 { $values { "path" "a pathname string" } { "quot" quotation } }

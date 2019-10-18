@@ -382,6 +382,7 @@ STRUCT: D3D10_BOX
     { bottom UINT }
     { back   UINT } ;
 
+C-TYPE: ID3D10Device
 COM-INTERFACE: ID3D10DeviceChild IUnknown {9B7E4C00-342C-4106-A19F-4F2704F689F0}
     void GetDevice ( ID3D10Device** ppDevice )
     HRESULT GetPrivateData ( LPGUID guid, UINT* pDataSize, void* pData )

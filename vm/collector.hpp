@@ -1,6 +1,8 @@
 namespace factor
 {
 
+struct must_start_gc_again {};
+
 template<typename TargetGeneration, typename Policy> struct data_workhorse {
 	factor_vm *parent;
 	TargetGeneration *target;
@@ -27,8 +29,7 @@ template<typename TargetGeneration, typename Policy> struct data_workhorse {
 	{
 		cell size = untagged->size();
 		object *newpointer = target->allot(size);
-		/* XXX not exception-safe */
-		if(!newpointer) longjmp(parent->current_gc->gc_unwind,1);
+		if(!newpointer) throw must_start_gc_again();
 
 		memcpy(newpointer,untagged,size);
 		untagged->forward_to(newpointer);

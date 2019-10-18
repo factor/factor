@@ -1,6 +1,8 @@
 ! Copyright (c) 2007 Sampo Vuori
 ! Copyright (c) 2008 Matthew Willis
 !
+
+
 ! Adapted from cairo.h, version 1.5.14
 ! License: http://factorcode.org/license.txt
 
@@ -10,15 +12,15 @@ alien.libraries classes.struct ;
 
 IN: cairo.ffi
 << {
-    { [ os winnt? ] [ "cairo" "libcairo-2.dll" "cdecl" add-library ] }
-    { [ os macosx? ] [ "cairo" "/opt/local/lib/libcairo.dylib" "cdecl" add-library ] }
+    { [ os winnt? ] [ "cairo" "libcairo-2.dll" cdecl add-library ] }
+    { [ os macosx? ] [ "cairo" "/opt/local/lib/libcairo.dylib" cdecl add-library ] }
     { [ os unix? ] [ ] }
 } cond >>
 
 LIBRARY: cairo
 
 FUNCTION: int cairo_version ( ) ;
-FUNCTION: char* cairo_version_string ( ) ;
+FUNCTION: c-string cairo_version_string ( ) ;
 
 TYPEDEF: int cairo_bool_t
 
@@ -38,14 +40,13 @@ TYPEDEF: void* cairo_pattern_t
 
 TYPEDEF: void* cairo_destroy_func_t
 : cairo-destroy-func ( quot -- callback )
-    [ void { void* } "cdecl" ] dip alien-callback ; inline
+    [ void { pointer: void } cdecl ] dip alien-callback ; inline
 
 ! See cairo.h for details
 STRUCT: cairo_user_data_key_t
     { unused int } ;
 
-TYPEDEF: int cairo_status_t
-C-ENUM:
+C-ENUM: cairo_status_t
     CAIRO_STATUS_SUCCESS
     CAIRO_STATUS_NO_MEMORY
     CAIRO_STATUS_INVALID_RESTORE
@@ -79,11 +80,11 @@ CONSTANT: CAIRO_CONTENT_COLOR_ALPHA HEX: 3000
 
 TYPEDEF: void* cairo_write_func_t
 : cairo-write-func ( quot -- callback )
-    [ cairo_status_t { void* uchar* int } "cdecl" ] dip alien-callback ; inline
+    [ cairo_status_t { pointer: void c-string int } cdecl ] dip alien-callback ; inline
                           
 TYPEDEF: void* cairo_read_func_t
 : cairo-read-func ( quot -- callback )
-    [ cairo_status_t { void* uchar* int } "cdecl" ] dip alien-callback ; inline
+    [ cairo_status_t { pointer: void c-string int } cdecl ] dip alien-callback ; inline
 
 ! Functions for manipulating state objects
 FUNCTION: cairo_t*
@@ -125,8 +126,7 @@ FUNCTION: void
 cairo_pop_group_to_source ( cairo_t* cr ) ;
 
 ! Modify state
-TYPEDEF: int cairo_operator_t
-C-ENUM:
+C-ENUM: cairo_operator_t
     CAIRO_OPERATOR_CLEAR
 
     CAIRO_OPERATOR_SOURCE
@@ -163,8 +163,7 @@ cairo_set_source_surface ( cairo_t* cr, cairo_surface_t* surface, double x, doub
 FUNCTION: void
 cairo_set_tolerance ( cairo_t* cr, double tolerance ) ;
 
-TYPEDEF: int cairo_antialias_t
-C-ENUM:
+C-ENUM: cairo_antialias_t
     CAIRO_ANTIALIAS_DEFAULT
     CAIRO_ANTIALIAS_NONE
     CAIRO_ANTIALIAS_GRAY
@@ -173,8 +172,7 @@ C-ENUM:
 FUNCTION: void
 cairo_set_antialias ( cairo_t* cr, cairo_antialias_t antialias ) ;
 
-TYPEDEF: int cairo_fill_rule_t
-C-ENUM:
+C-ENUM: cairo_fill_rule_t
     CAIRO_FILL_RULE_WINDING
     CAIRO_FILL_RULE_EVEN_ODD ;
 
@@ -184,8 +182,7 @@ cairo_set_fill_rule ( cairo_t* cr, cairo_fill_rule_t fill_rule ) ;
 FUNCTION: void
 cairo_set_line_width ( cairo_t* cr, double width ) ;
 
-TYPEDEF: int cairo_line_cap_t
-C-ENUM:
+C-ENUM: cairo_line_cap_t
     CAIRO_LINE_CAP_BUTT
     CAIRO_LINE_CAP_ROUND
     CAIRO_LINE_CAP_SQUARE ;
@@ -193,8 +190,7 @@ C-ENUM:
 FUNCTION: void
 cairo_set_line_cap ( cairo_t* cr, cairo_line_cap_t line_cap ) ;
 
-TYPEDEF: int cairo_line_join_t
-C-ENUM:
+C-ENUM: cairo_line_join_t
     CAIRO_LINE_JOIN_MITER
     CAIRO_LINE_JOIN_ROUND
     CAIRO_LINE_JOIN_BEVEL ;
@@ -379,35 +375,30 @@ STRUCT: cairo_font_extents_t
     { max_x_advance double }
     { max_y_advance double } ;
 
-TYPEDEF: int cairo_font_slant_t
-C-ENUM:
+C-ENUM: cairo_font_slant_t
     CAIRO_FONT_SLANT_NORMAL
     CAIRO_FONT_SLANT_ITALIC
     CAIRO_FONT_SLANT_OBLIQUE ;
 
-TYPEDEF: int cairo_font_weight_t
-C-ENUM:
+C-ENUM: cairo_font_weight_t
     CAIRO_FONT_WEIGHT_NORMAL
     CAIRO_FONT_WEIGHT_BOLD ;
 
-TYPEDEF: int cairo_subpixel_order_t
-C-ENUM:
+C-ENUM: cairo_subpixel_order_t
     CAIRO_SUBPIXEL_ORDER_DEFAULT
     CAIRO_SUBPIXEL_ORDER_RGB
     CAIRO_SUBPIXEL_ORDER_BGR
     CAIRO_SUBPIXEL_ORDER_VRGB
     CAIRO_SUBPIXEL_ORDER_VBGR ;
 
-TYPEDEF: int cairo_hint_style_t
-C-ENUM:
+C-ENUM: cairo_hint_style_t
     CAIRO_HINT_STYLE_DEFAULT
     CAIRO_HINT_STYLE_NONE
     CAIRO_HINT_STYLE_SLIGHT
     CAIRO_HINT_STYLE_MEDIUM
     CAIRO_HINT_STYLE_FULL ;
 
-TYPEDEF: int cairo_hint_metrics_t
-C-ENUM:
+C-ENUM: cairo_hint_metrics_t
     CAIRO_HINT_METRICS_DEFAULT
     CAIRO_HINT_METRICS_OFF
     CAIRO_HINT_METRICS_ON ;
@@ -463,7 +454,7 @@ cairo_font_options_get_hint_metrics ( cairo_font_options_t* options ) ;
 !  font object inside the the cairo_t.
 
 FUNCTION: void
-cairo_select_font_face ( cairo_t* cr, char* family, cairo_font_slant_t slant, cairo_font_weight_t weight ) ;
+cairo_select_font_face ( cairo_t* cr, c-string family, cairo_font_slant_t slant, cairo_font_weight_t weight ) ;
 
 FUNCTION: void
 cairo_set_font_size ( cairo_t* cr, double size ) ;
@@ -493,19 +484,19 @@ FUNCTION: cairo_scaled_font_t*
 cairo_get_scaled_font ( cairo_t* cr ) ;
 
 FUNCTION: void
-cairo_show_text ( cairo_t* cr, char* utf8 ) ;
+cairo_show_text ( cairo_t* cr, c-string utf8 ) ;
 
 FUNCTION: void
 cairo_show_glyphs ( cairo_t* cr, cairo_glyph_t* glyphs, int num_glyphs ) ;
 
 FUNCTION: void
-cairo_text_path  ( cairo_t* cr, char* utf8 ) ;
+cairo_text_path  ( cairo_t* cr, c-string utf8 ) ;
 
 FUNCTION: void
 cairo_glyph_path ( cairo_t* cr, cairo_glyph_t* glyphs, int num_glyphs ) ;
 
 FUNCTION: void
-cairo_text_extents ( cairo_t* cr, char* utf8, cairo_text_extents_t* extents ) ;
+cairo_text_extents ( cairo_t* cr, c-string utf8, cairo_text_extents_t* extents ) ;
 
 FUNCTION: void
 cairo_glyph_extents ( cairo_t* cr, cairo_glyph_t* glyphs, int num_glyphs, cairo_text_extents_t* extents ) ;
@@ -527,8 +518,7 @@ cairo_font_face_get_reference_count ( cairo_font_face_t* font_face ) ;
 FUNCTION: cairo_status_t
 cairo_font_face_status ( cairo_font_face_t* font_face ) ;
 
-TYPEDEF: int cairo_font_type_t
-C-ENUM:
+C-ENUM: cairo_font_type_t
     CAIRO_FONT_TYPE_TOY
     CAIRO_FONT_TYPE_FT
     CAIRO_FONT_TYPE_WIN32
@@ -573,7 +563,7 @@ FUNCTION: void
 cairo_scaled_font_extents ( cairo_scaled_font_t* scaled_font, cairo_font_extents_t* extents ) ;
 
 FUNCTION: void
-cairo_scaled_font_text_extents ( cairo_scaled_font_t* scaled_font, char* utf8, cairo_text_extents_t* extents ) ;
+cairo_scaled_font_text_extents ( cairo_scaled_font_t* scaled_font, c-string utf8, cairo_text_extents_t* extents ) ;
 
 FUNCTION: void
 cairo_scaled_font_glyph_extents ( cairo_scaled_font_t* scaled_font, cairo_glyph_t* glyphs, int num_glyphs, cairo_text_extents_t* extents ) ;
@@ -640,8 +630,7 @@ cairo_get_target ( cairo_t* cr ) ;
 FUNCTION: cairo_surface_t*
 cairo_get_group_target ( cairo_t* cr ) ;
 
-TYPEDEF: int cairo_path_data_type_t
-C-ENUM:
+C-ENUM: cairo_path_data_type_t
     CAIRO_PATH_MOVE_TO
     CAIRO_PATH_LINE_TO
     CAIRO_PATH_CURVE_TO
@@ -682,7 +671,7 @@ cairo_path_destroy ( cairo_path_t* path ) ;
 FUNCTION: cairo_status_t
 cairo_status ( cairo_t* cr ) ;
 
-FUNCTION: char* 
+FUNCTION: c-string 
 cairo_status_to_string ( cairo_status_t status ) ;
 
 ! Surface manipulation
@@ -707,8 +696,7 @@ cairo_surface_get_reference_count ( cairo_surface_t* surface ) ;
 FUNCTION: cairo_status_t
 cairo_surface_status ( cairo_surface_t* surface ) ;
 
-TYPEDEF: int cairo_surface_type_t
-C-ENUM:
+C-ENUM: cairo_surface_type_t
     CAIRO_SURFACE_TYPE_IMAGE
     CAIRO_SURFACE_TYPE_PDF
     CAIRO_SURFACE_TYPE_PS
@@ -731,7 +719,7 @@ FUNCTION: cairo_content_t
 cairo_surface_get_content ( cairo_surface_t* surface ) ;
 
 FUNCTION: cairo_status_t
-cairo_surface_write_to_png ( cairo_surface_t* surface, char* filename ) ;
+cairo_surface_write_to_png ( cairo_surface_t* surface, c-string filename ) ;
 
 FUNCTION: cairo_status_t
 cairo_surface_write_to_png_stream ( cairo_surface_t* surface, cairo_write_func_t write_func, void* closure ) ;
@@ -771,8 +759,7 @@ cairo_surface_show_page ( cairo_surface_t* surface ) ;
 
 ! Image-surface functions
 
-TYPEDEF: int cairo_format_t
-C-ENUM:
+C-ENUM: cairo_format_t
     CAIRO_FORMAT_ARGB32
     CAIRO_FORMAT_RGB24
     CAIRO_FORMAT_A8
@@ -786,7 +773,7 @@ FUNCTION: int
 cairo_format_stride_for_width ( cairo_format_t format, int width ) ;
 
 FUNCTION: cairo_surface_t*
-cairo_image_surface_create_for_data ( uchar* data, cairo_format_t format, int width, int height, int stride ) ;
+cairo_image_surface_create_for_data ( char* data, cairo_format_t format, int width, int height, int stride ) ;
 
 FUNCTION: uchar*
 cairo_image_surface_get_data ( cairo_surface_t* surface ) ;
@@ -804,7 +791,7 @@ FUNCTION: int
 cairo_image_surface_get_stride ( cairo_surface_t* surface ) ;
 
 FUNCTION: cairo_surface_t*
-cairo_image_surface_create_from_png ( char* filename ) ;
+cairo_image_surface_create_from_png ( c-string filename ) ;
 
 FUNCTION: cairo_surface_t*
 cairo_image_surface_create_from_png_stream ( cairo_read_func_t read_func, void* closure ) ;
@@ -844,8 +831,7 @@ cairo_pattern_get_user_data ( cairo_pattern_t* pattern, cairo_user_data_key_t* k
 FUNCTION: cairo_status_t
 cairo_pattern_set_user_data ( cairo_pattern_t* pattern, cairo_user_data_key_t* key, void* user_data, cairo_destroy_func_t destroy ) ;
 
-TYPEDEF: int cairo_pattern_type_t
-C-ENUM:
+C-ENUM: cairo_pattern_type_t
     CAIRO_PATTERN_TYPE_SOLID
     CAIRO_PATTERN_TYPE_SURFACE
     CAIRO_PATTERN_TYPE_LINEAR
@@ -866,8 +852,7 @@ cairo_pattern_set_matrix ( cairo_pattern_t* pattern, cairo_matrix_t* matrix ) ;
 FUNCTION: void
 cairo_pattern_get_matrix ( cairo_pattern_t* pattern, cairo_matrix_t* matrix ) ;
 
-TYPEDEF: int cairo_extend_t
-C-ENUM:
+C-ENUM: cairo_extend_t
     CAIRO_EXTEND_NONE
     CAIRO_EXTEND_REPEAT
     CAIRO_EXTEND_REFLECT
@@ -879,8 +864,7 @@ cairo_pattern_set_extend ( cairo_pattern_t* pattern, cairo_extend_t extend ) ;
 FUNCTION: cairo_extend_t
 cairo_pattern_get_extend ( cairo_pattern_t* pattern ) ;
 
-TYPEDEF: int cairo_filter_t
-C-ENUM:
+C-ENUM: cairo_filter_t
     CAIRO_FILTER_FAST
     CAIRO_FILTER_GOOD
     CAIRO_FILTER_BEST

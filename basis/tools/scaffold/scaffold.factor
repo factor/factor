@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs io.files io.pathnames io.directories
 io.encodings.utf8 hashtables kernel namespaces sequences
-vocabs.loader io combinators calendar accessors math.parser
-io.streams.string ui.tools.operations quotations strings arrays
-prettyprint words vocabs sorting sets classes math alien urls
-splitting ascii combinators.short-circuit alarms words.symbol
-system summary ;
+vocabs.loader vocabs.metadata io combinators calendar accessors
+math.parser io.streams.string ui.tools.operations quotations
+strings arrays prettyprint words vocabs sorting sets classes
+math alien urls splitting ascii combinators.short-circuit alarms
+words.symbol system summary ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -15,7 +15,6 @@ SYMBOL: using
 ERROR: not-a-vocab-root string ;
 ERROR: vocab-name-contains-separator path ;
 ERROR: vocab-name-contains-dot path ;
-ERROR: no-vocab vocab ;
 ERROR: bad-developer-name name ;
 
 M: bad-developer-name summary
@@ -40,9 +39,6 @@ M: bad-developer-name summary
 : check-root ( string -- string )
     dup vocab-root? [ not-a-vocab-root ] unless ;
 
-: check-vocab ( vocab -- vocab )
-    dup find-vocab-root [ no-vocab ] unless ;
-
 : check-vocab-root/vocab ( vocab-root string -- vocab-root string )
     [ check-root ] [ check-vocab-name ] bi* ;
 
@@ -62,6 +58,9 @@ M: bad-developer-name summary
 
 : vocab-root/vocab/suffix>path ( vocab-root vocab suffix -- path )
     [ vocab-root/vocab>path dup file-name append-path ] dip append ;
+
+: vocab/file>path ( vocab file -- path )
+    [ vocab>path ] dip append-path ;
 
 : vocab/suffix>path ( vocab suffix -- path )
     [ vocab>path dup file-name append-path ] dip append ;
@@ -95,7 +94,7 @@ M: bad-developer-name summary
     ] with-string-writer ;
 
 : set-scaffold-main-file ( vocab path -- )
-    [ main-file-string ] dip utf8 set-file-contents ;
+    [ main-file-string 1array ] dip utf8 set-file-lines ;
 
 : scaffold-main ( vocab-root vocab -- )
     [ ".factor" vocab-root/vocab/suffix>path ] keep swap scaffolding? [
@@ -104,16 +103,17 @@ M: bad-developer-name summary
         2drop
     ] if ;
 
-: scaffold-authors ( vocab-root vocab -- )
-    developer-name get [
-        "authors.txt" vocab-root/vocab/file>path scaffolding? [
-            developer-name get swap utf8 set-file-contents
+: scaffold-metadata ( vocab file contents -- )
+    [ ensure-vocab-exists ] 2dip
+    [
+        [ vocab/file>path ] dip 1array swap scaffolding? [
+            utf8 set-file-lines
         ] [
-            drop
+            2drop
         ] if
     ] [
         2drop
-    ] if ;
+    ] if* ;
 
 : lookup-type ( string -- object/string ? )
     "new" ?head drop [ { [ CHAR: ' = ] [ digit? ] } 1|| ] trim-tail
@@ -258,12 +258,24 @@ PRIVATE>
 : scaffold-undocumented ( string -- )
     [ interesting-words. ] [ link-vocab ] bi ;
 
+: scaffold-authors ( vocab -- )
+    "authors.txt" developer-name get scaffold-metadata ;
+
+: scaffold-tags ( vocab tags -- )
+    [ "tags.txt" ] dip scaffold-metadata ;
+
+: scaffold-summary ( vocab summary -- )
+    [ "summary.txt" ] dip scaffold-metadata ;
+
+: scaffold-platforms ( vocab platforms -- )
+    [ "platforms.txt" ] dip scaffold-metadata ;
+
 : scaffold-vocab ( vocab-root string -- )
     {
         [ scaffold-directory ]
         [ scaffold-main ]
-        [ scaffold-authors ]
         [ nip require ]
+        [ nip scaffold-authors ]
     } 2cleave ;
 
 : scaffold-core ( string -- ) "resource:core" swap scaffold-vocab ;

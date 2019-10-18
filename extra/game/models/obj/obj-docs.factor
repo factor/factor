@@ -58,7 +58,7 @@ HELP: face>aos
 { $description "Convert a face line to a sequence of vertex attributes." } ;
 
 HELP: push*
-{ $values { "elt" "an object" } { "seq" sequence } { "seq" sequence } }
+{ $values { "elt" "an object" } { "seq" sequence } }
 { $description "Push the value onto the sequence, keeping the sequence on the stack." } ;
 
 HELP: push-current-model

@@ -8,7 +8,8 @@ generalizations generic.parser kernel kernel.private lexer libc
 locals macros make math math.order parser quotations sequences
 slots slots.private specialized-arrays vectors words summary
 namespaces assocs vocabs.parser math.functions
-classes.struct.bit-accessors bit-arrays ;
+classes.struct.bit-accessors bit-arrays
+stack-checker.dependencies ;
 QUALIFIED: math
 IN: classes.struct
 
@@ -32,8 +33,6 @@ TUPLE: struct-bit-slot-spec < struct-slot-spec
 PREDICATE: struct-class < tuple-class
     superclass \ struct eq? ;
 
-M: struct-class valid-superclass? drop f ;
-
 SLOT: fields
 
 : struct-slots ( struct-class -- slots )
@@ -47,11 +46,11 @@ M: struct >c-ptr
 M: struct equal?
     {
         [ [ class ] bi@ = ]
-        [ [ >c-ptr ] [ [ >c-ptr ] [ byte-length ] bi ] bi* memory= ]
+        [ [ >c-ptr ] [ binary-object ] bi* memory= ]
     } 2&& ; inline
 
 M: struct hashcode*
-    [ >c-ptr ] [ byte-length ] bi <direct-uchar-array> hashcode* ; inline    
+    binary-object <direct-uchar-array> hashcode* ; inline
 
 : struct-prototype ( class -- prototype ) "prototype" word-prop ; foldable
 
@@ -126,11 +125,19 @@ M: struct-bit-slot-spec (writer-quot)
 
 : (unboxer-quot) ( class -- quot )
     drop [ >c-ptr ] ;
+
+MACRO: read-struct-slot ( slot -- )
+    dup type>> depends-on-c-type
+    (reader-quot) ;
+
+MACRO: write-struct-slot ( slot -- )
+    dup type>> depends-on-c-type
+    (writer-quot) ;
 PRIVATE>
 
 M: struct-class boa>object
     swap pad-struct-slots
-    [ <struct> ] [ struct-slots ] bi 
+    [ <struct> ] [ struct-slots ] bi
     [ [ (writer-quot) call( value struct -- ) ] with 2each ] curry keep ;
 
 M: struct-class initial-value* <struct> ; inline
@@ -140,10 +147,11 @@ M: struct-class initial-value* <struct> ; inline
 GENERIC: struct-slot-values ( struct -- sequence )
 
 M: struct-class reader-quot
-    nip (reader-quot) ;
+    dup type>> array? [ dup type>> first define-array-vocab drop ] when
+    nip '[ _ read-struct-slot ] ;
 
 M: struct-class writer-quot
-    nip (writer-quot) ;
+    nip '[ _ write-struct-slot ] ;
 
 : offset-of ( field struct -- offset )
     struct-slots slot-named offset>> ; inline
@@ -195,7 +203,7 @@ M: struct-c-type c-struct? drop t ;
     define-inline-method ;
 
 : clone-underlying ( struct -- byte-array )
-    [ >c-ptr ] [ byte-length ] bi memory>byte-array ; inline
+    binary-object memory>byte-array ; inline
 
 : (define-clone-method) ( class -- )
     [ \ clone ]
@@ -273,7 +281,7 @@ M: struct binary-zero? >c-ptr [ 0 = ] all? ;
     [ type>> c-type drop ] each ;
 
 : redefine-struct-tuple-class ( class -- )
-    [ dup class? [ forget-class ] [ drop ] if ] [ struct f define-tuple-class ] bi ;
+    [ struct f define-tuple-class ] [ make-final ] bi ;
 
 :: (define-struct-class) ( class slots offsets-quot -- )
     slots empty? [ struct-must-have-slots ] when
@@ -297,9 +305,6 @@ PRIVATE>
 
 : define-union-struct-class ( class slots -- )
     [ compute-union-offsets ] (define-struct-class) ;
-
-M: struct-class reset-class
-    [ call-next-method ] [ name>> c-types get delete-at ] bi ;
 
 ERROR: invalid-struct-slot token ;
 
@@ -348,7 +353,7 @@ PRIVATE>
 <PRIVATE
 : parse-struct-slot ( -- slot )
     scan scan-c-type \ } parse-until <struct-slot-spec> ;
-    
+
 : parse-struct-slots ( slots -- slots' more? )
     scan {
         { ";" [ f ] }
@@ -358,7 +363,8 @@ PRIVATE>
     } case ;
 
 : parse-struct-definition ( -- class slots )
-    CREATE-CLASS 8 <vector> [ parse-struct-slots ] [ ] while >array ;
+    CREATE-CLASS 8 <vector> [ parse-struct-slots ] [ ] while >array
+    dup [ name>> ] map check-duplicate-slots ;
 PRIVATE>
 
 SYNTAX: STRUCT:
@@ -398,4 +404,4 @@ FUNCTOR-SYNTAX: STRUCT:
 
 USING: vocabs vocabs.loader ;
 
-"prettyprint" vocab [ "classes.struct.prettyprint" require ] when
+"prettyprint" "classes.struct.prettyprint" require-when

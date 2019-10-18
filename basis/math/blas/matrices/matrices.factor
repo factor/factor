@@ -305,10 +305,10 @@ M: MATRIX pprint-delims
 : define-complex-blas-matrix ( TYPE T -- )
     "U" "C" (define-blas-matrix) ;
 
-"float"          "S" define-real-blas-matrix
-"double"         "D" define-real-blas-matrix
-"complex-float"  "C" define-complex-blas-matrix
-"complex-double" "Z" define-complex-blas-matrix
+float          "S" define-real-blas-matrix
+double         "D" define-real-blas-matrix
+complex-float  "C" define-complex-blas-matrix
+complex-double "Z" define-complex-blas-matrix
 
 >>
 

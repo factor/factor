@@ -21,7 +21,6 @@ HELP: pile
 HELP: pile-align
 { $values
     { "pile" pile } { "align" "a power of two" }
-    { "pile" pile }
 }
 { $description "Adjusts a " { $link pile } "'s internal state so that the next call to " { $link pile-alloc } " will return a pointer aligned to " { $snippet "align" } " bytes relative to the pile's initial offset." } ;
 

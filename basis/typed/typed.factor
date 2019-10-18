@@ -2,7 +2,7 @@
 USING: accessors arrays classes classes.tuple combinators
 combinators.short-circuit definitions effects fry hints
 math kernel kernel.private namespaces parser quotations
-sequences slots words locals 
+sequences slots words locals effects.parser
 locals.parser macros stack-checker.dependencies ;
 FROM: classes.tuple.private => tuple-layout ;
 IN: typed
@@ -11,8 +11,8 @@ ERROR: type-mismatch-error word expected-types ;
 ERROR: input-mismatch-error < type-mismatch-error ;
 ERROR: output-mismatch-error < type-mismatch-error ;
 
-PREDICATE: typed-gensym < word "typed-gensym" word-prop ;
-PREDICATE: typed-word < word "typed-word" word-prop ;
+PREDICATE: typed-gensym < word "typed-gensym" word-prop >boolean ;
+PREDICATE: typed-word < word "typed-word" word-prop >boolean ;
 
 <PRIVATE
 
@@ -20,6 +20,7 @@ PREDICATE: typed-word < word "typed-word" word-prop ;
     {
         [ all-slots empty? not ]
         [ immutable-tuple-class? ]
+        [ final-class? ]
     } 1&& ;
 
 ! typed inputs
@@ -30,9 +31,14 @@ PREDICATE: typed-word < word "typed-word" word-prop ;
 : input-mismatch-quot ( word types -- quot )
     [ input-mismatch-error ] 2curry ;
 
+: depends-on-unboxing ( class -- )
+    [ dup tuple-layout depends-on-tuple-layout ]
+    [ depends-on-final ]
+    bi ;
+
 : (unboxer) ( type -- quot )
     dup unboxable-tuple-class? [
-        dup dup tuple-layout depends-on-tuple-layout
+        dup depends-on-unboxing
         all-slots [
             [ name>> reader-word 1quotation ]
             [ class>> (unboxer) ] bi compose
@@ -52,7 +58,7 @@ PREDICATE: typed-word < word "typed-word" word-prop ;
 : (unboxed-types) ( type -- types )
     dup unboxable-tuple-class?
     [
-        dup dup tuple-layout depends-on-tuple-layout
+        dup depends-on-unboxing
         all-slots [ class>> (unboxed-types) ] map concat
     ]
     [ 1array ] if ;
@@ -81,7 +87,7 @@ DEFER: make-boxer
 : boxer ( type -- quot )
     dup unboxable-tuple-class?
     [
-        dup dup tuple-layout depends-on-tuple-layout
+        dup depends-on-unboxing
         [ all-slots [ class>> ] map make-boxer ]
         [ [ boa ] curry ]
         bi compose
@@ -114,10 +120,10 @@ MACRO: (typed) ( word def effect -- quot )
     [ effect-in-types unboxed-types [ "in" swap 2array ] map ]
     [ effect-out-types unboxed-types [ "out" swap 2array ] map ] bi <effect> ;
 
-M: typed-gensym stack-effect
-    call-next-method unboxed-effect ;
-M: typed-gensym crossref? 
-    "typed-gensym" word-prop crossref? ;
+M: typed-gensym stack-effect call-next-method unboxed-effect ;
+M: typed-gensym parent-word "typed-gensym" word-prop ;
+M: typed-gensym crossref? parent-word crossref? ;
+M: typed-gensym where parent-word where ;
 
 : define-typed-gensym ( word def effect -- gensym )
     [ 2drop <typed-gensym> dup ]
@@ -160,4 +166,4 @@ SYNTAX: TYPED::
 
 USING: vocabs vocabs.loader ;
 
-"prettyprint" vocab [ "typed.prettyprint" require ] when
+"prettyprint" "typed.prettyprint" require-when

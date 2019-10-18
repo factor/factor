@@ -7,6 +7,8 @@ IN: alien.complex.functor
 
 FUNCTOR: define-complex-type ( N T -- )
 
+N-type IS ${N}
+
 T-class DEFINES-CLASS ${T}
 
 <T> DEFINES <${T}>
@@ -14,7 +16,7 @@ T-class DEFINES-CLASS ${T}
 
 WHERE
 
-STRUCT: T-class { real N } { imaginary N } ;
+STRUCT: T-class { real N-type } { imaginary N-type } ;
 
 : <T> ( z -- alien )
     >rect T-class <struct-boa> >c-ptr ;

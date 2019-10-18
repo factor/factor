@@ -8,7 +8,7 @@ M: macosx reserved-area-size 6 cells ;
 
 M: macosx lr-save 2 cells ;
 
-M: float-regs param-regs drop { 1 2 3 4 5 6 7 8 9 10 11 12 13 } ;
+M: float-regs param-regs 2drop { 1 2 3 4 5 6 7 8 9 10 11 12 13 } ;
 
 M: ppc value-struct? drop t ;
 

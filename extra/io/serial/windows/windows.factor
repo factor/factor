@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files.windows io.streams.duplex kernel math
-math.bitwise windows.kernel32 accessors alien.c-types
-windows io.files.windows fry locals continuations
-classes.struct ;
+math.bitwise windows windows.kernel32 windows.errors accessors
+alien.c-types fry locals continuations classes.struct ;
 IN: io.serial.windows
 
 : <serial-stream> ( path encoding -- duplex )

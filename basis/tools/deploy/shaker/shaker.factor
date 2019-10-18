@@ -1,13 +1,13 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors io.backend io.pathnames io.streams.c
-init fry namespaces math make assocs kernel parser parser.notes
-lexer strings.parser vocabs sequences sequences.deep
+USING: arrays alien.libraries accessors io.backend io.encodings.utf8 io.files
+io.streams.c init fry namespaces math make assocs kernel parser
+parser.notes lexer strings.parser vocabs sequences sequences.deep
 sequences.private words memory kernel.private continuations io
 vocabs.loader system strings sets vectors quotations byte-arrays
 sorting compiler.units definitions generic generic.standard
 generic.single tools.deploy.config combinators classes
-classes.builtin slots.private grouping command-line ;
+classes.builtin slots.private grouping command-line io.pathnames ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes.private
 QUALIFIED: compiler.crossref
@@ -19,6 +19,9 @@ QUALIFIED: layouts
 QUALIFIED: source-files
 QUALIFIED: source-files.errors
 QUALIFIED: vocabs
+FROM: alien.libraries.private => >deployed-library-path ;
+FROM: namespaces => set ;
+FROM: sets => members ;
 IN: tools.deploy.shaker
 
 ! This file is some hairy shit.
@@ -39,12 +42,8 @@ IN: tools.deploy.shaker
     deploy-threads? get [
         "threads" startup-hooks get delete-at
     ] unless
-    native-io? [
-        "io.thread" startup-hooks get delete-at
-    ] unless
     strip-io? [
         "io.backend" startup-hooks get delete-at
-        "io.thread" startup-hooks get delete-at
     ] when
     strip-dictionary? [
         {
@@ -58,6 +57,13 @@ IN: tools.deploy.shaker
     strip-debugger? "debugger" vocab and [
         "Stripping debugger" show
         "vocab:tools/deploy/shaker/strip-debugger.factor"
+        run-file
+    ] when ;
+
+: strip-ui-error-hook ( -- )
+    strip-debugger? deploy-ui? get and "ui" vocab and [
+        "Installing generic UI error hook" show
+        "vocab:tools/deploy/shaker/strip-ui-error-hook.factor"
         run-file
     ] when ;
 
@@ -165,7 +171,6 @@ IN: tools.deploy.shaker
                 "predicate"
                 "predicate-definition"
                 "predicating"
-                "primitive"
                 "reader"
                 "reading"
                 "recursive"
@@ -371,15 +376,7 @@ IN: tools.deploy.shaker
                 compiler.errors:compiler-errors
                 continuations:thread-error-hook
             } %
-            
-            deploy-ui? get [
-                "ui-error-hook" "ui.gadgets.worlds" lookup ,
-            ] when
         ] when
-
-        deploy-c-types? get [
-            "c-types" "alien.c-types" lookup ,
-        ] unless
 
         "windows-messages" "windows.messages" lookup [ , ] when*
     ] { } make ;
@@ -395,16 +392,15 @@ IN: tools.deploy.shaker
     ] [ drop ] if ;
 
 : strip-c-io ( -- )
+    ! On all platforms, if deploy-io is 1, we strip out C streams.
+    ! On Unix, if deploy-io is 3, we strip out C streams as well.
+    ! On Windows, even if deploy-io is 3, C streams are still used
+    ! for the console, so don't strip it there.
     strip-io?
     deploy-io get 3 = os windows? not and
     or [
-        [
-            c-io-backend forget
-            "io.streams.c" forget-vocab
-            "io-thread-running?" "io.thread" lookup [
-                global delete-at
-            ] when*
-        ] with-compilation-unit
+        "Stripping C I/O" show
+        "vocab:tools/deploy/shaker/strip-c-io.factor" run-file
     ] when ;
 
 : compress ( pred post-process string -- )
@@ -466,7 +462,8 @@ SYMBOL: deploy-vocab
 
 : startup-stripper ( -- )
     t "quiet" set-global
-    f output-stream set-global ;
+    f output-stream set-global
+    V{ "resource:" } clone vocab-roots set-global ;
 
 : next-method* ( method -- quot )
     [ "method-class" word-prop ]
@@ -502,13 +499,36 @@ SYMBOL: deploy-vocab
     "Clearing megamorphic caches" show
     [ clear-megamorphic-cache ] each ;
 
-: strip ( -- )
+: write-vocab-manifest ( vocab-manifest-out -- )
+    "Writing vocabulary manifest to " write dup print flush
+    vocabs "VOCABS:" prefix
+    deploy-libraries get [ libraries get at path>> ] map members "LIBRARIES:" prefix append
+    swap utf8 set-file-lines ;
+
+: prepare-deploy-libraries ( -- )
+    "Preparing deployed libraries" show
+    deploy-libraries get [
+        libraries get [
+            [ path>> >deployed-library-path ] [ abi>> ] bi <library>
+        ] change-at
+    ] each
+    
+    [
+        "deploy-libraries" "alien.libraries" lookup forget
+        "deploy-library" "alien.libraries" lookup forget
+        ">deployed-library-path" "alien.libraries.private" lookup forget
+    ] with-compilation-unit ;
+
+: strip ( vocab-manifest-out -- )
+    [ write-vocab-manifest ] when*
     startup-stripper
+    prepare-deploy-libraries
     strip-libc
     strip-destructors
     strip-call
     strip-cocoa
     strip-debugger
+    strip-ui-error-hook
     strip-specialized-arrays
     compute-next-methods
     strip-startup-hooks
@@ -536,7 +556,7 @@ SYMBOL: deploy-vocab
         1 exit
     ] recover ; inline
 
-: (deploy) ( final-image vocab config -- )
+: (deploy) ( final-image vocab-manifest-out vocab config -- )
     #! Does the actual work of a deployment in the slave
     #! stage2 image
     [
@@ -549,11 +569,11 @@ SYMBOL: deploy-vocab
                     "ui.debugger" require
                 ] when
             ] unless
-            deploy-vocab set
-            deploy-vocab get require
-            deploy-vocab get vocab-main [
-                "Vocabulary has no MAIN: word." print flush 1 exit
-            ] unless
+            [ deploy-vocab set ] [ require ] [
+                vocab-main [
+                    "Vocabulary has no MAIN: word." print flush 1 exit
+                ] unless
+            ] tri
             strip
             "Saving final image" show
             save-image-and-exit
@@ -562,6 +582,7 @@ SYMBOL: deploy-vocab
 
 : do-deploy ( -- )
     "output-image" get
+    "vocab-manifest-out" get
     "deploy-vocab" get
     "Deploying " write dup write "..." print
     "deploy-config" get parse-file first

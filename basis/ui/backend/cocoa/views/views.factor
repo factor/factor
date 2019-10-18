@@ -149,7 +149,7 @@ CLASS: {
 
 ! Rendering
 { "drawRect:" void { id SEL NSRect }
-    [ 2drop window relayout-1 yield ]
+    [ 2drop window draw-world ]
 }
 
 ! Events

@@ -18,7 +18,8 @@ H{ } clone sub-primitives set
 "vocab:bootstrap/syntax.factor" parse-file
 
 architecture get {
-    { "x86.32" "x86/32" }
+    { "winnt-x86.32" "x86/32/winnt" }
+    { "unix-x86.32" "x86/32/unix" }
     { "winnt-x86.64" "x86/64/winnt" }
     { "unix-x86.64" "x86/64/unix" }
     { "linux-ppc" "ppc/linux" }
@@ -63,6 +64,7 @@ call( -- )
     "alien"
     "alien.accessors"
     "alien.libraries"
+    "alien.private"
     "arrays"
     "byte-arrays"
     "classes.private"
@@ -342,7 +344,7 @@ tuple
     { "(execute)" "kernel.private" (( word -- )) }
     { "(call)" "kernel.private" (( quot -- )) }
     { "unwind-native-frames" "kernel.private" (( -- )) }
-    { "set-callstack" "kernel.private" (( cs -- * )) }
+    { "set-callstack" "kernel.private" (( callstack -- * )) }
     { "lazy-jit-compile" "kernel.private" (( -- )) }
     { "c-to-factor" "kernel.private" (( -- )) }
     { "slot" "slots.private" (( obj m -- value )) }
@@ -368,6 +370,10 @@ tuple
     { "fixnum<=" "math.private" (( x y -- z )) }
     { "fixnum>" "math.private" (( x y -- ? )) }
     { "fixnum>=" "math.private" (( x y -- ? )) }
+    { "(set-context)" "threads.private" (( obj context -- obj' )) }
+    { "(set-context-and-delete)" "threads.private" (( obj context -- * )) }
+    { "(start-context)" "threads.private" (( obj quot -- obj' )) }
+    { "(start-context-and-delete)" "threads.private" (( obj quot -- * )) }
 } [ first3 make-sub-primitive ] each
 
 ! Primitive words
@@ -415,12 +421,13 @@ tuple
     { "(dlsym)" "alien.libraries" "primitive_dlsym" (( name dll -- alien )) }
     { "dlclose" "alien.libraries" "primitive_dlclose" (( dll -- )) }
     { "dll-valid?" "alien.libraries" "primitive_dll_validp" (( dll -- ? )) }
+    { "current-callback" "alien.private" "primitive_current_callback" (( -- n )) }
     { "<array>" "arrays" "primitive_array" (( n elt -- array )) }
     { "resize-array" "arrays" "primitive_resize_array" (( n array -- newarray )) }
     { "(byte-array)" "byte-arrays" "primitive_uninitialized_byte_array" (( n -- byte-array )) }
     { "<byte-array>" "byte-arrays" "primitive_byte_array" (( n -- byte-array )) }
     { "resize-byte-array" "byte-arrays" "primitive_resize_byte_array" (( n byte-array -- newbyte-array )) }
-    { "<tuple-boa>" "classes.tuple.private" "primitive_tuple_boa" (( ... layout -- tuple )) }
+    { "<tuple-boa>" "classes.tuple.private" "primitive_tuple_boa" (( slots... layout -- tuple )) }
     { "<tuple>" "classes.tuple.private" "primitive_tuple" (( layout -- tuple )) }
     { "modify-code-heap" "compiler.units" "primitive_modify_code_heap" (( alist update-existing? reset-pics? -- )) }
     { "lookup-method" "generic.single.private" "primitive_lookup_method" (( object methods -- method )) }
@@ -434,24 +441,25 @@ tuple
     { "fread" "io.streams.c" "primitive_fread" (( n alien -- str/f )) }
     { "fseek" "io.streams.c" "primitive_fseek" (( alien offset whence -- )) }
     { "ftell" "io.streams.c" "primitive_ftell" (( alien -- n )) }
-    { "fwrite" "io.streams.c" "primitive_fwrite" (( string alien -- )) }
+    { "fwrite" "io.streams.c" "primitive_fwrite" (( data length alien -- )) }
     { "(clone)" "kernel" "primitive_clone" (( obj -- newobj )) }
     { "<wrapper>" "kernel" "primitive_wrapper" (( obj -- wrapper )) }
-    { "callstack" "kernel" "primitive_callstack" (( -- cs )) }
+    { "callstack" "kernel" "primitive_callstack" (( -- callstack )) }
     { "callstack>array" "kernel" "primitive_callstack_to_array" (( callstack -- array )) }
-    { "datastack" "kernel" "primitive_datastack" (( -- ds )) }
+    { "datastack" "kernel" "primitive_datastack" (( -- array )) }
     { "die" "kernel" "primitive_die" (( -- )) }
-    { "retainstack" "kernel" "primitive_retainstack" (( -- rs )) }
+    { "retainstack" "kernel" "primitive_retainstack" (( -- array )) }
     { "(identity-hashcode)" "kernel.private" "primitive_identity_hashcode" (( obj -- code )) }
     { "become" "kernel.private" "primitive_become" (( old new -- )) }
-    { "call-clear" "kernel.private" "primitive_call_clear" (( quot -- * )) }
     { "check-datastack" "kernel.private" "primitive_check_datastack" (( array in# out# -- ? )) }
     { "compute-identity-hashcode" "kernel.private" "primitive_compute_identity_hashcode" (( obj -- )) }
+    { "context-object" "kernel.private" "primitive_context_object" (( n -- obj )) }
     { "innermost-frame-executing" "kernel.private" "primitive_innermost_stack_frame_executing" (( callstack -- obj )) }
     { "innermost-frame-scan" "kernel.private" "primitive_innermost_stack_frame_scan" (( callstack -- n )) }
-    { "set-datastack" "kernel.private" "primitive_set_datastack" (( ds -- )) }
+    { "set-context-object" "kernel.private" "primitive_set_context_object" (( obj n -- )) }
+    { "set-datastack" "kernel.private" "primitive_set_datastack" (( array -- )) }
     { "set-innermost-frame-quot" "kernel.private" "primitive_set_innermost_stack_frame_quot" (( n callstack -- )) }
-    { "set-retainstack" "kernel.private" "primitive_set_retainstack" (( rs -- )) }
+    { "set-retainstack" "kernel.private" "primitive_set_retainstack" (( array -- )) }
     { "set-special-object" "kernel.private" "primitive_set_special_object" (( obj n -- )) }
     { "special-object" "kernel.private" "primitive_special_object" (( n -- obj )) }
     { "strip-stack-traces" "kernel.private" "primitive_strip_stack_traces" (( -- )) }
@@ -462,7 +470,7 @@ tuple
     { "byte-array>bignum" "math" "primitive_byte_array_to_bignum" (( x -- y )) }
     { "double>bits" "math" "primitive_double_bits" (( x -- n )) }
     { "float>bits" "math" "primitive_float_bits" (( x -- n )) }
-    { "(float>string)" "math.parser.private" "primitive_float_to_str" (( n -- str )) }
+    { "(format-float)" "math.parser.private" "primitive_format_float" (( n format -- byte-array )) }
     { "bignum*" "math.private" "primitive_bignum_multiply" (( x y -- z )) }
     { "bignum+" "math.private" "primitive_bignum_add" (( x y -- z )) }
     { "bignum-" "math.private" "primitive_bignum_subtract" (( x y -- z )) }
@@ -526,16 +534,20 @@ tuple
     { "set-string-nth-fast" "strings.private" "primitive_set_string_nth_fast" (( ch n string -- )) }
     { "set-string-nth-slow" "strings.private" "primitive_set_string_nth_slow" (( ch n string -- )) }
     { "string-nth" "strings.private" "primitive_string_nth" (( n string -- ch )) }
-    { "(exit)" "system" "primitive_exit" (( n -- )) }
+    { "(exit)" "system" "primitive_exit" (( n -- * )) }
     { "nano-count" "system" "primitive_nano_count" (( -- ns )) }
     { "system-micros" "system" "primitive_system_micros" (( -- us )) }
     { "(sleep)" "threads.private" "primitive_sleep" (( nanos -- )) }
+    { "callstack-for" "threads.private" "primitive_callstack_for" (( context -- array )) }
+    { "context-object-for" "threads.private" "primitive_context_object_for" (( n context -- obj )) }
+    { "datastack-for" "threads.private" "primitive_datastack_for" (( context -- array )) }
+    { "retainstack-for" "threads.private" "primitive_retainstack_for" (( context -- array )) }
     { "dispatch-stats" "tools.dispatch.private" "primitive_dispatch_stats" (( -- stats )) }
     { "reset-dispatch-stats" "tools.dispatch.private" "primitive_reset_dispatch_stats" (( -- )) }
     { "profiling" "tools.profiler.private" "primitive_profiling" (( ? -- )) }
     { "optimized?" "words" "primitive_optimized_p" (( word -- ? )) }
     { "word-code" "words" "primitive_word_code" (( word -- start end )) }
-    { "(word)" "words.private" "primitive_word" (( name vocab -- word )) }
+    { "(word)" "words.private" "primitive_word" (( name vocab hashcode -- word )) }
 } [ first4 make-primitive ] each
 
 ! Bump build number

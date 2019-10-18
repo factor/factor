@@ -1,8 +1,8 @@
-! Copyright (C) 2007, 2009 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2007, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel hashtables sequences sequences.private arrays
-words namespaces make parser math assocs effects definitions
-quotations summary accessors fry ;
+words namespaces make parser effects.parser math assocs effects
+definitions quotations summary accessors fry ;
 IN: memoize
 
 <PRIVATE

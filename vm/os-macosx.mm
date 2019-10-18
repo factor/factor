@@ -70,7 +70,7 @@ const char *default_image_path(void)
 	return [returnVal UTF8String];
 }
 
-void init_signals(void)
+void factor_vm::init_signals(void)
 {
 	unix_init_signals();
 	mach_initialize();
@@ -87,14 +87,19 @@ Protocol *objc_getProtocol(char *name)
 
 u64 nano_count()
 {
-	u64 t;
-	mach_timebase_info_data_t info;
-	kern_return_t ret;
-	t = mach_absolute_time();
-	ret = mach_timebase_info(&info);
-	if(ret != 0)
-		fatal_error("mach_timebase_info failed",ret);
-	return t * (info.numer/info.denom);
+	u64 time = mach_absolute_time();
+
+	static u64 scaling_factor = 0;
+	if(!scaling_factor)
+	{
+		mach_timebase_info_data_t info;
+		kern_return_t ret = mach_timebase_info(&info);
+		if(ret != 0)
+			fatal_error("mach_timebase_info failed",ret);
+		scaling_factor = info.numer/info.denom;
+	}
+
+	return time * scaling_factor;
 }
 
 }

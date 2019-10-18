@@ -159,7 +159,7 @@ cell object::size() const
 	case WRAPPER_TYPE:
 		return align(sizeof(wrapper),data_alignment);
 	case CALLSTACK_TYPE:
-		return align(callstack_size(untag_fixnum(((callstack *)this)->length)),data_alignment);
+		return align(callstack_object_size(untag_fixnum(((callstack *)this)->length)),data_alignment);
 	default:
 		critical_error("Invalid header",(cell)this);
 		return 0; /* can't happen */

@@ -159,7 +159,7 @@ $nl
 "A C function which returns a struct by value:"
 { $code
     "USING: alien.syntax ;"
-    "FUNCTION: Point give_me_a_point ( char* description ) ;"
+    "FUNCTION: Point give_me_a_point ( c-string description ) ;"
 }
 "A C function which takes a struct parameter by reference:"
 { $code

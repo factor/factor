@@ -13,7 +13,7 @@ M: linux reserved-area-size 2 cells ;
 
 M: linux lr-save 1 cells ;
 
-M: float-regs param-regs drop { 1 2 3 4 5 6 7 8 } ;
+M: float-regs param-regs 2drop { 1 2 3 4 5 6 7 8 } ;
 
 M: ppc value-struct? drop f ;
 

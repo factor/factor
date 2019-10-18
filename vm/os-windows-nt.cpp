@@ -8,27 +8,6 @@ THREADHANDLE start_thread(void *(*start_routine)(void *), void *args)
 	return (void *)CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)start_routine, args, 0, 0);
 }
 
-DWORD dwTlsIndex; 
-
-void init_platform_globals()
-{
-	if ((dwTlsIndex = TlsAlloc()) == TLS_OUT_OF_INDEXES)
-		fatal_error("TlsAlloc failed - out of indexes",0);
-}
-
-void register_vm_with_thread(factor_vm *vm)
-{
-	if (! TlsSetValue(dwTlsIndex, vm))
-		fatal_error("TlsSetValue failed",0);
-}
-
-factor_vm *tls_vm()
-{
-	factor_vm *vm = (factor_vm*)TlsGetValue(dwTlsIndex);
-	assert(vm != NULL);
-	return vm;
-}
-
 u64 system_micros()
 {
 	FILETIME t;
@@ -39,17 +18,24 @@ u64 system_micros()
 
 u64 nano_count()
 {
-	LARGE_INTEGER count;
-	LARGE_INTEGER frequency;
+	static double scale_factor;
+
 	static u32 hi = 0;
 	static u32 lo = 0;
-	BOOL ret;
-	ret = QueryPerformanceCounter(&count);
+
+	LARGE_INTEGER count;
+	BOOL ret = QueryPerformanceCounter(&count);
 	if(ret == 0)
 		fatal_error("QueryPerformanceCounter", 0);
-	ret = QueryPerformanceFrequency(&frequency);
-	if(ret == 0)
-		fatal_error("QueryPerformanceFrequency", 0);
+
+	if(scale_factor == 0.0)
+	{
+		LARGE_INTEGER frequency;
+		BOOL ret = QueryPerformanceFrequency(&frequency);
+		if(ret == 0)
+			fatal_error("QueryPerformanceFrequency", 0);
+		scale_factor = (1000000000.0 / frequency.QuadPart);
+	}
 
 #ifdef FACTOR_64
 	hi = count.HighPart;
@@ -61,7 +47,7 @@ u64 nano_count()
 #endif
 	lo = count.LowPart;
 
-	return (u64)((((u64)hi << 32) | (u64)lo)*(1000000000.0/frequency.QuadPart));
+	return (u64)((((u64)hi << 32) | (u64)lo) * scale_factor);
 }
 
 void sleep_nanos(u64 nsec)
@@ -69,15 +55,10 @@ void sleep_nanos(u64 nsec)
 	Sleep((DWORD)(nsec/1000000));
 }
 
-LONG factor_vm::exception_handler(PEXCEPTION_POINTERS pe)
+LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch)
 {
-	PEXCEPTION_RECORD e = (PEXCEPTION_RECORD)pe->ExceptionRecord;
-	CONTEXT *c = (CONTEXT*)pe->ContextRecord;
-
-	if(in_code_heap_p(c->EIP))
-		signal_callstack_top = (stack_frame *)c->ESP;
-	else
-		signal_callstack_top = NULL;
+	c->ESP = (cell)fix_callstack_top((stack_frame *)c->ESP);
+	signal_callstack_top = (stack_frame *)c->ESP;
 
 	switch (e->ExceptionCode)
 	{
@@ -104,35 +85,18 @@ LONG factor_vm::exception_handler(PEXCEPTION_POINTERS pe)
 		MXCSR(c) &= 0xffffffc0;
 		c->EIP = (cell)factor::fp_signal_handler_impl;
 		break;
-	case 0x40010006:
-		/* If the Widcomm bluetooth stack is installed, the BTTray.exe
-		process injects code into running programs. For some reason this
-		results in random SEH exceptions with this (undocumented)
-		exception code being raised. The workaround seems to be ignoring
-		this altogether, since that is what happens if SEH is not
-		enabled. Don't really have any idea what this exception means. */
-		break;
 	default:
 		signal_number = e->ExceptionCode;
 		c->EIP = (cell)factor::misc_signal_handler_impl;
 		break;
 	}
-	return EXCEPTION_CONTINUE_EXECUTION;
+
+	return 0;
 }
 
-FACTOR_STDCALL(LONG) exception_handler(PEXCEPTION_POINTERS pe)
+VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void *frame, PCONTEXT c, void *dispatch)
 {
-	return tls_vm()->exception_handler(pe);
-}
-
-void factor_vm::c_to_factor_toplevel(cell quot)
-{
-	if(!AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)factor::exception_handler))
-		fatal_error("AddVectoredExceptionHandler failed", 0);
-
-	c_to_factor(quot);
-
- 	RemoveVectoredExceptionHandler((void *)factor::exception_handler);
+	return current_vm()->exception_handler(e,frame,c,dispatch);
 }
 
 void factor_vm::open_console()

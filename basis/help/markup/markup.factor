@@ -8,6 +8,7 @@ prettyprint.stylesheet quotations see sequences sets slots
 sorting splitting strings vectors vocabs vocabs.loader words
 words.symbol ;
 FROM: prettyprint.sections => with-pprint ;
+FROM: namespaces => set ;
 IN: help.markup
 
 PREDICATE: simple-element < array
@@ -129,8 +130,8 @@ ALIAS: $slot $snippet
     "Examples" $heading print-element ;
 
 : $example ( element -- )
-    1 cut* swap "\n" join dup <input> [
-        input-style get format nl print-element
+    1 cut* [ "\n" join ] bi@ over <input> [
+        [ print ] [ output-style get format ] bi*
     ] ($code) ;
 
 : $unchecked-example ( element -- )
@@ -441,7 +442,7 @@ M: array elements*
 : elements ( elt-type element -- seq ) [ elements* ] { } make ;
 
 : collect-elements ( element seq -- elements )
-    swap '[ _ elements [ rest ] map concat ] map concat prune ;
+    swap '[ _ elements [ rest ] map concat ] gather ;
 
 : <$link> ( topic -- element )
     1array \ $link prefix ;

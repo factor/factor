@@ -70,7 +70,7 @@ INSTANCE: rollover immutable-sequence
     over length <rollover> swap [ bitxor ] 2map ;
 
 : frequency-analysis ( seq -- seq )
-    dup prune [
+    dup members [
         [ 2dup [ = ] curry count 2array , ] each
     ] { } make nip ; inline
 

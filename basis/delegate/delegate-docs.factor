@@ -18,9 +18,16 @@ HELP: define-consult
 { $notes "Usually, " { $link POSTPONE: CONSULT: } " should be used instead. This is only for runtime use." } ;
 
 HELP: CONSULT:
-{ $syntax "CONSULT: group class getter... ;" } 
-{ $values { "group" "a protocol, generic word or tuple class" } { "class" "a class" } { "getter" "code to get where the method should be forwarded" } }
-{ $description "Defines a class to consult, using the given code, on the generic words contained in the group. This means that, when one of the words in the group is called on an object of this class, the quotation will be called, and then the generic word called again. If the getter is empty, this will cause an infinite loop. Consultation overwrites the existing methods, but others can be defined afterwards." } ;
+{ $syntax """CONSULT: group class
+    code ;""" } 
+{ $values { "group" "a protocol, generic word or tuple class" } { "class" "a class" } { "code" "code to get the object to which the method should be forwarded" } }
+{ $description "Declares that objects of " { $snippet "class" } " will delegate the generic words contained in " { $snippet "group" } " to the object returned by executing " { $snippet "code" } " with the original object as an input." { $snippet "CONSULT:" } " will overwrite any existing methods on " { $snippet "class" } " for the members of " { $snippet "group" } ", but new methods can be added after the " { $snippet "CONSULT:" } " to override the delegation." } ;
+
+HELP: BROADCAST:
+{ $syntax """BROADCAST: group class
+    code ;""" } 
+{ $values { "group" "a protocol, generic word or tuple class" } { "class" "a class" } { "code" "code to get the object to which the method should be forwarded" } }
+{ $description "Declares that objects of " { $snippet "class" } " will delegate the generic words contained in " { $snippet "group" } " to every object in the sequence returned by executing " { $snippet "code" } " with the original object as an input." { $snippet "BROADCAST:" } " will overwrite any existing methods on " { $snippet "class" } " for the members of " { $snippet "group" } ", but new methods can be added after the " { $snippet "BROADCAST:" } " to override the delegation. Every generic word in " { $snippet "group" } " must return no outputs; otherwise, a " { $link broadcast-words-must-have-no-outputs } " error will be raised." } ;
 
 HELP: SLOT-PROTOCOL:
 { $syntax "SLOT-PROTOCOL: protocol-name slots... ;" }
@@ -28,7 +35,7 @@ HELP: SLOT-PROTOCOL:
 
 { define-protocol POSTPONE: PROTOCOL: } related-words
 
-{ define-consult POSTPONE: CONSULT: } related-words
+{ define-consult POSTPONE: BROADCAST: POSTPONE: CONSULT: } related-words
 
 HELP: group-words
 { $values { "group" "a group" } { "words" "an array of words" } }
@@ -52,6 +59,7 @@ $nl
 { $subsections POSTPONE: SLOT-PROTOCOL: }
 "Defining consultation:"
 { $subsections
+    POSTPONE: BROADCAST:
     POSTPONE: CONSULT:
     define-consult
 }

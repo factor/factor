@@ -26,8 +26,8 @@ STRUCT: stat
     { st_qspare0 __int64_t }
     { st_qspare1 __int64_t } ;
 
-FUNCTION: int stat64  ( char* pathname, stat* buf ) ;
-FUNCTION: int lstat64 ( char* pathname, stat* buf ) ;
+FUNCTION: int stat64  ( c-string pathname, stat* buf ) ;
+FUNCTION: int lstat64 ( c-string pathname, stat* buf ) ;
 
 : stat ( path buf -- n ) stat64 ;
 : lstat ( path buf -- n ) lstat64 ;

@@ -26,14 +26,18 @@ enum relocation_type {
 	RT_CARDS_OFFSET,
 	/* value of vm->decks_offset */
 	RT_DECKS_OFFSET,
+	/* address of exception_handler -- this exists as a separate relocation
+	type since its used in a situation where relocation arguments cannot
+	be passed in, and so RT_DLSYM is inappropriate (Windows only) */
+	RT_EXCEPTION_HANDLER,
 };
 
 enum relocation_class {
-	/* absolute address in a 64-bit location */
+	/* absolute address in a pointer-width location */
 	RC_ABSOLUTE_CELL,
-	/* absolute address in a 32-bit location */
+	/* absolute address in a 4 byte location */
 	RC_ABSOLUTE,
-	/* relative address in a 32-bit location */
+	/* relative address in a 4 byte location */
 	RC_RELATIVE,
 	/* absolute address in a PowerPC LIS/ORI sequence */
 	RC_ABSOLUTE_PPC_2_2,
@@ -49,8 +53,10 @@ enum relocation_class {
 	RC_INDIRECT_ARM,
 	/* pointer to address in an ARM LDR/STR instruction offset by 8 bytes */
 	RC_INDIRECT_ARM_PC,
-	/* absolute address in a 16-bit location */
-	RC_ABSOLUTE_2
+	/* absolute address in a 2 byte location */
+	RC_ABSOLUTE_2,
+	/* absolute address in a 1 byte location */
+	RC_ABSOLUTE_1,
 };
 
 static const cell rel_absolute_ppc_2_mask = 0xffff;
@@ -105,6 +111,7 @@ struct relocation_entry {
 		case RT_MEGAMORPHIC_CACHE_HITS:
 		case RT_CARDS_OFFSET:
 		case RT_DECKS_OFFSET:
+		case RT_EXCEPTION_HANDLER:
 			return 0;
 		default:
 			critical_error("Bad rel type",rel_type());

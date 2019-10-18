@@ -67,7 +67,7 @@ M: sequence random
     [ [ random ] [ 1 - ] bi [ pick exchange ] keep ]
     while drop ;
 
-: randomize ( seq -- seq ) 
+: randomize ( seq -- randomized )
     dup length randomize-n-last ;
 
 ERROR: too-many-samples seq n ;

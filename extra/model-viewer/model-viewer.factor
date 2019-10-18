@@ -11,7 +11,7 @@ ui.gadgets.worlds ui.pixel-formats specialized-arrays
 specialized-vectors literals fry
 sequences.deep destructors math.bitwise opengl.gl
 game.models game.models.obj game.models.loader game.models.collada
-prettyprint images.tga ;
+prettyprint images.tga literals ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-VECTOR: uint
@@ -164,9 +164,9 @@ TUPLE: vbo
     0 0 0 0 glClearColor 
     1 glClearDepth
     HEX: ffffffff glClearStencil
-    { GL_COLOR_BUFFER_BIT
+    flags{ GL_COLOR_BUFFER_BIT
       GL_DEPTH_BUFFER_BIT
-      GL_STENCIL_BUFFER_BIT } flags glClear ;
+      GL_STENCIL_BUFFER_BIT } glClear ;
     
 : draw-model ( world -- )
     clear-screen

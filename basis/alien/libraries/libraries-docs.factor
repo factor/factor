@@ -6,7 +6,7 @@ IN: alien.libraries
 
 HELP: <library>
 { $values
-     { "path" "a pathname string" } { "abi" "the ABI used by the library, either " { $snippet "cdecl" } " or " { $snippet "stdcall" } }
+     { "path" "a pathname string" } { "abi" "the ABI used by the library, either " { $link cdecl } " or " { $link stdcall } }
      { "library" library } }
 { $description "Opens a C library using the path and ABI parameters and outputs a library tuple." }
 { $notes "User code should use " { $link add-library } " so that the opened library is added to a global hashtable, " { $link libraries } "." } ;
@@ -19,7 +19,7 @@ HELP: library
 { $description "Looks up a library by its logical name. The library object is a hashtable with the following keys:"
     { $list
         { { $snippet "name" } " - the full path of the C library binary" }
-        { { $snippet "abi" } " - the ABI used by the library, either " { $snippet "cdecl" } " or " { $snippet "stdcall" } }
+        { { $snippet "abi" } " - the ABI used by the library, either " { $link cdecl } " or " { $link stdcall } }
         { { $snippet "dll" } " - an instance of the " { $link dll } " class; only set if the library is loaded" }
     }
 } ;
@@ -43,7 +43,7 @@ HELP: load-library
 { $description "Loads a library by logical name and outputs a handle which may be passed to " { $link dlsym } " or " { $link dlclose } ". If the library is already loaded, returns the existing handle." } ;
 
 HELP: add-library
-{ $values { "name" string } { "path" string } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } }
+{ $values { "name" string } { "path" string } { "abi" "one of " { $link cdecl } " or " { $link stdcall } } }
 { $description "Defines a new logical library named " { $snippet "name" } " located in the file system at " { $snippet "path" } " and the specified ABI. The logical library name can then be used by a " { $link POSTPONE: LIBRARY: } " form to specify the logical library for subsequent " { $link POSTPONE: FUNCTION: } " definitions." }
 { $notes "Because the entire source file is parsed before top-level forms are executed, " { $link add-library } " must be placed within a " { $snippet "<< ... >>" } " parse-time evaluation block."
 $nl
@@ -53,12 +53,16 @@ $nl
 { $examples "Here is a typical usage of " { $link add-library } ":"
 { $code
     "<< \"freetype\" {"
-    "    { [ os macosx? ] [ \"libfreetype.6.dylib\" \"cdecl\" add-library ] }"
-    "    { [ os windows? ] [ \"freetype6.dll\" \"cdecl\" add-library ] }"
+    "    { [ os macosx? ] [ \"libfreetype.6.dylib\" cdecl add-library ] }"
+    "    { [ os windows? ] [ \"freetype6.dll\" cdecl add-library ] }"
     "    [ drop ]"
     "} cond >>"
 }
 "Note the parse time evaluation with " { $link POSTPONE: << } "." } ;
+
+HELP: deploy-library
+{ $values { "name" string } }
+{ $description "Specifies that the logical library named " { $snippet "name" } " should be included during " { $link "tools.deploy" } ". " { $snippet "name" } " must be the name of a library previously loaded with " { $link add-library } "." } ;
 
 HELP: remove-library
 { $values { "name" string } }
@@ -72,4 +76,9 @@ ARTICLE: "loading-libs" "Loading native libraries"
 }
 "Once a library has been defined, you can try loading it to see if the path name is correct:"
 { $subsections load-library }
-"If the compiler cannot load a library, or cannot resolve a symbol in a library, a linkage error is reported using the compiler error mechanism (see " { $link "compiler-errors" } "). Once you install the right library, reload the source file containing the " { $link add-library } " form to force the compiler to try loading the library again." ;
+"If the compiler cannot load a library, or cannot resolve a symbol in a library, a linkage error is reported using the compiler error mechanism (see " { $link "compiler-errors" } "). Once you install the right library, reload the source file containing the " { $link add-library } " form to force the compiler to try loading the library again."
+$nl
+"Libraries that do not come standard with the operating system need to be included with deployed applications that use them. A word is provided to instruct " { $link "tools.deploy" } " that a library must be so deployed:"
+{ $subsections
+    deploy-library
+} ;

@@ -1,20 +1,22 @@
-! Copyright (C) 2005, 2008 Chris Double, Slava Pestov.
+! Copyright (C) 2005, 2010 Chris Double, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel threads concurrency.mailboxes continuations
-namespaces assocs accessors summary fry ;
+USING: kernel kernel.private threads concurrency.mailboxes
+continuations namespaces assocs accessors summary fry ;
 IN: concurrency.messaging
 
 GENERIC: send ( message thread -- )
 
-: mailbox-of ( thread -- mailbox )
-    dup mailbox>> [ ] [
-        <mailbox> [ >>mailbox drop ] keep
-    ] ?if ;
+GENERIC: mailbox-of ( thread -- mailbox )
+
+M: thread mailbox-of
+    dup mailbox>>
+    [ { mailbox } declare ]
+    [ <mailbox> [ >>mailbox drop ] keep ] ?if ; inline
 
 M: thread send ( message thread -- )
-    check-registered mailbox-of mailbox-put ;
+    mailbox-of mailbox-put ;
 
-: my-mailbox ( -- mailbox ) self mailbox-of ;
+: my-mailbox ( -- mailbox ) self mailbox-of ; inline
 
 : receive ( -- message )
     my-mailbox mailbox-get ?linked ;

@@ -17,7 +17,7 @@ GENERIC: from ( channel -- value )
 <PRIVATE
 
 : wait ( channel -- )
-    [ senders>> push ] curry
+    [ self ] dip senders>> push
     "channel send" suspend drop ;
 
 : (to) ( value receivers -- )
@@ -36,7 +36,7 @@ M: channel to ( value channel -- )
     [ dup wait to ] [ nip (to) ] if-empty ;
 
 M: channel from ( channel -- value )
-    [
-        notify senders>>
-        [ (from) ] unless-empty
-    ] curry "channel receive" suspend ;
+    [ self ] dip
+    notify senders>>
+    [ (from) ] unless-empty
+    "channel receive" suspend ;

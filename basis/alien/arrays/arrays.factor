@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.strings alien.c-types alien.data alien.accessors
+USING: alien alien.strings alien.c-types alien.accessors
 arrays words sequences math kernel namespaces fry cpu.architecture
-io.encodings.utf8 accessors ;
+io.encodings.binary io.encodings.utf8 accessors compiler.units ;
 IN: alien.arrays
 
 INSTANCE: array value-type
@@ -34,16 +34,8 @@ M: array box-return drop void* box-return ;
 
 M: array stack-size drop void* stack-size ;
 
-M: array c-type-boxer-quot
-    unclip
-    [ array-length ]
-    [ [ require-c-array ] keep ] bi*
-    [ <c-direct-array> ] 2curry ;
-
-M: array c-type-unboxer-quot drop [ >c-ptr ] ;
-
 PREDICATE: string-type < pair
-    first2 [ char* = ] [ word? ] bi* and ;
+    first2 [ c-string = ] [ word? ] bi* and ;
 
 M: string-type c-type ;
 
@@ -88,10 +80,14 @@ M: string-type c-type-unboxer
     drop void* c-type-unboxer ;
 
 M: string-type c-type-boxer-quot
-    second '[ _ alien>string ] ;
+    second dup binary =
+    [ drop void* c-type-boxer-quot ]
+    [ '[ _ alien>string ] ] if ;
 
 M: string-type c-type-unboxer-quot
-    second '[ _ string>alien ] ;
+    second dup binary =
+    [ drop void* c-type-unboxer-quot ]
+    [ '[ _ string>alien ] ] if ;
 
 M: string-type c-type-getter
     drop [ alien-cell ] ;
@@ -99,8 +95,5 @@ M: string-type c-type-getter
 M: string-type c-type-setter
     drop [ set-alien-cell ] ;
 
-{ char* utf8 } char* typedef
-char* uchar* typedef
+[ { c-string utf8 } c-string typedef ] with-compilation-unit
 
-char char* "pointer-c-type" set-word-prop
-uchar uchar* "pointer-c-type" set-word-prop

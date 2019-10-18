@@ -7,7 +7,7 @@ IN: tools.deploy.test
     [ "test.image" temp-file delete-file ] ignore-errors
     "resource:" [
         [ vm "test.image" temp-file ] dip
-        dup deploy-config make-deploy-image
+        dup deploy-config make-deploy-image drop
     ] with-directory ;
 
 ERROR: image-too-big actual-size max-size ;

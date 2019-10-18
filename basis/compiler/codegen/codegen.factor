@@ -1,11 +1,12 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces make math math.order math.parser sequences accessors
-kernel kernel.private layouts assocs words summary arrays
-combinators classes.algebra alien alien.c-types
-alien.strings alien.arrays alien.complex alien.libraries sets libc
-continuations.private fry cpu.architecture classes classes.struct locals
-source-files.errors slots parser generic.parser strings
+USING: namespaces make math math.order math.parser sequences
+accessors kernel layouts assocs words summary arrays combinators
+classes.algebra alien alien.private alien.c-types alien.strings
+alien.arrays alien.complex alien.libraries sets libc
+continuations.private fry cpu.architecture classes
+classes.struct locals source-files.errors slots parser
+generic.parser strings quotations
 compiler.errors
 compiler.alien
 compiler.constants
@@ -16,6 +17,8 @@ compiler.cfg.registers
 compiler.cfg.builder
 compiler.codegen.fixup
 compiler.utilities ;
+FROM: namespaces => set ;
+FROM: compiler.errors => no-such-symbol ;
 IN: compiler.codegen
 
 SYMBOL: insn-counts
@@ -208,7 +211,8 @@ CODEGEN: ##compare-imm %compare-imm
 CODEGEN: ##compare-float-ordered %compare-float-ordered
 CODEGEN: ##compare-float-unordered %compare-float-unordered
 CODEGEN: ##save-context %save-context
-CODEGEN: ##vm-field-ptr %vm-field-ptr
+CODEGEN: ##vm-field %vm-field
+CODEGEN: ##set-vm-field %set-vm-field
 
 CODEGEN: _fixnum-add %fixnum-add
 CODEGEN: _fixnum-sub %fixnum-sub
@@ -297,12 +301,12 @@ M: float-rep next-fastcall-param
 M: double-rep next-fastcall-param
     float-regs inc [ ?dummy-stack-params ] [ ?dummy-int-params ] bi ;
 
-GENERIC: reg-class-full? ( reg-class -- ? )
+GENERIC# reg-class-full? 1 ( reg-class abi -- ? )
 
-M: stack-params reg-class-full? drop t ;
+M: stack-params reg-class-full? 2drop t ;
 
 M: reg-class reg-class-full?
-    [ get ] [ param-regs length ] bi >= ;
+    [ get ] swap '[ _ param-regs length ] bi >= ;
 
 : alloc-stack-param ( rep -- n reg-class rep )
     stack-params get
@@ -312,13 +316,22 @@ M: reg-class reg-class-full?
 : alloc-fastcall-param ( rep -- n reg-class rep )
     [ [ reg-class-of get ] [ reg-class-of ] [ next-fastcall-param ] tri ] keep ;
 
-: alloc-parameter ( parameter -- reg rep )
-    c-type-rep dup reg-class-of reg-class-full?
+:: alloc-parameter ( parameter abi -- reg rep )
+    parameter c-type-rep dup reg-class-of abi reg-class-full?
     [ alloc-stack-param ] [ alloc-fastcall-param ] if
-    [ param-reg ] dip ;
+    [ abi param-reg ] dip ;
+
+SYMBOL: (stack-value)
+<< void* c-type clone \ (stack-value) define-primitive-type
+stack-params \ (stack-value) c-type (>>rep) >>
+
+: ((flatten-type)) ( type to-type -- seq )
+    [ stack-size cell align cell /i ] dip c-type <repetition> ; inline
 
 : (flatten-int-type) ( type -- seq )
-    stack-size cell align cell /i void* c-type <repetition> ;
+    void* ((flatten-type)) ;
+: (flatten-stack-type) ( type -- seq )
+    (stack-value) ((flatten-type)) ;
 
 GENERIC: flatten-value-type ( type -- types )
 
@@ -352,8 +365,8 @@ M: c-type-name flatten-value-type c-type flatten-value-type ;
     #! Moves values from C stack to registers (if word is
     #! %load-param-reg) and registers to C stack (if word is
     #! %save-param-reg).
-    [ alien-parameters flatten-value-types ]
-    [ '[ alloc-parameter _ execute ] ]
+    [ [ alien-parameters flatten-value-types ] [ abi>> ] bi ]
+    [ '[ _ alloc-parameter _ execute ] ]
     bi* each-parameter ; inline
 
 : reverse-each-parameter ( parameters quot -- )
@@ -403,13 +416,18 @@ M: array dlsym-valid? '[ _ dlsym ] any? ;
         dll-path compiling-word get no-such-library drop
     ] if ;
 
-: stdcall-mangle ( params -- symbols )
+: decorated-symbol ( params -- symbols )
     [ function>> ] [ parameters>> parameter-offsets drop number>string ] bi
-    [ drop ] [ "@" glue ] [ "@" glue "_" prepend ] 2tri
-    3array ;
+    {
+        [ drop ]
+        [ "@" glue ]
+        [ "@" glue "_" prepend ]
+        [ "@" glue "@" prepend ]
+    } 2cleave
+    4array ;
 
 : alien-invoke-dlsym ( params -- symbols dll )
-    [ dup abi>> "stdcall" = [ stdcall-mangle ] [ function>> ] if ]
+    [ dup abi>> callee-cleanup? [ decorated-symbol ] [ function>> ] if ]
     [ library>> load-library ]
     bi 2dup check-dlsym ;
 
@@ -456,25 +474,9 @@ M: ##alien-indirect generate-insn
     ! Generate code for boxing input parameters in a callback.
     [
         dup \ %save-param-reg move-parameters
-        %nest-stacks
+        %begin-callback
         box-parameters
     ] with-param-regs ;
-
-TUPLE: callback-context ;
-
-: current-callback ( -- id ) 2 special-object ;
-
-: wait-to-return ( token -- )
-    dup current-callback eq? [
-        drop
-    ] [
-        yield-hook get call( -- ) wait-to-return
-    ] if ;
-
-: do-callback ( quot token -- )
-    init-catchstack
-    [ 2 set-special-object call ] keep
-    wait-to-return ; inline
 
 : callback-return-quot ( ctype -- quot )
     return>> {
@@ -487,16 +489,13 @@ TUPLE: callback-context ;
     parameters>> [ c-type c-type-boxer-quot ] map spread>quot ;
 
 : wrap-callback-quot ( params -- quot )
-    [
-        [ callback-prep-quot ]
-        [ quot>> ]
-        [ callback-return-quot ] tri 3append ,
-        [ callback-context new do-callback ] %
-    ] [ ] make ;
+    [ callback-prep-quot ] [ quot>> ] [ callback-return-quot ] tri 3append
+     yield-hook get
+     '[ _ _ do-callback ]
+     >quotation ;
 
 M: ##alien-callback generate-insn
     params>>
     [ registers>objects ]
     [ wrap-callback-quot %alien-callback ]
-    [ alien-return [ %unnest-stacks ] [ %callback-value ] if-void ]
-    tri ;
+    [ alien-return [ %end-callback ] [ %end-callback-value ] if-void ] tri ;

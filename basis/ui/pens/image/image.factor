@@ -18,5 +18,3 @@ M: image-pen draw-interior
 
 M: image-pen pen-pref-dim nip image>> image-dim ;
 
-: theme-image ( name -- image-name )
-    "vocab:ui/gadgets/theme/" prepend-path ".tiff" append <image-name> ;

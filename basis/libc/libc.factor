@@ -1,16 +1,19 @@
 ! Copyright (C) 2004, 2005 Mackenzie Straight
-! Copyright (C) 2007, 2009 Slava Pestov
+! Copyright (C) 2007, 2010 Slava Pestov
 ! Copyright (C) 2007, 2008 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types assocs continuations alien.destructors kernel
-namespaces accessors sets summary destructors destructors.private ;
+USING: alien alien.c-types alien.syntax assocs continuations
+alien.destructors kernel namespaces accessors sets summary
+destructors destructors.private ;
 IN: libc
 
-: errno ( -- int )
-    int "factor" "err_no" { } alien-invoke ;
+LIBRARY: factor
 
-: set-errno ( int -- )
-    void "factor" "set_err_no" { int } alien-invoke ;
+FUNCTION-ALIAS: errno
+    int err_no ( ) ;
+
+FUNCTION-ALIAS: set-errno
+    void set_err_no ( int err-no ) ;
 
 : clear-errno ( -- )
     0 set-errno ;
@@ -18,19 +21,21 @@ IN: libc
 : preserve-errno ( quot -- )
     errno [ call ] dip set-errno ; inline
 
+LIBRARY: libc
+
+FUNCTION-ALIAS: (malloc)
+    void* malloc ( ulong size ) ;
+
+FUNCTION-ALIAS: (calloc)
+    void* calloc ( ulong count,  ulong size ) ;
+
+FUNCTION-ALIAS: (free)
+    void free ( void* alien ) ;
+
+FUNCTION-ALIAS: (realloc)
+    void* realloc ( void* alien, ulong size ) ;
+
 <PRIVATE
-
-: (malloc) ( size -- alien )
-    void* "libc" "malloc" { ulong } alien-invoke ;
-
-: (calloc) ( count size -- alien )
-    void* "libc" "calloc" { ulong ulong } alien-invoke ;
-
-: (free) ( alien -- )
-    void "libc" "free" { void* } alien-invoke ;
-
-: (realloc) ( alien size -- newalien )
-    void* "libc" "realloc" { void* ulong } alien-invoke ;
 
 ! We stick malloc-ptr instances in the global disposables set
 TUPLE: malloc-ptr value continuation ;
@@ -86,16 +91,14 @@ PRIVATE>
 : free ( alien -- )
     >c-ptr [ delete-malloc ] [ (free) ] bi ;
 
-: memcpy ( dst src size -- )
-    void "libc" "memcpy" { void* void* ulong } alien-invoke ;
+FUNCTION: void memcpy ( void* dst, void* src, ulong size ) ;
 
-: memcmp ( a b size -- cmp )
-    int "libc" "memcmp" { void* void* ulong } alien-invoke ;
+FUNCTION: int memcmp ( void* a, void* b, ulong size ) ;
 
 : memory= ( a b size -- ? )
     memcmp 0 = ;
 
-: strlen ( alien -- len )
-    size_t "libc" "strlen" { char* } alien-invoke ;
+FUNCTION: size_t strlen ( c-string alien ) ;
 
 DESTRUCTOR: free
+DESTRUCTOR: (free)

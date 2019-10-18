@@ -35,19 +35,9 @@ void factor_vm::call_fault_handler(
 	MACH_THREAD_STATE_TYPE *thread_state,
 	MACH_FLOAT_STATE_TYPE *float_state)
 {
-	/* There is a race condition here, but in practice an exception
-	delivered during stack frame setup/teardown or while transitioning
-	from Factor to C is a sign of things seriously gone wrong, not just
-	a divide by zero or stack underflow in the listener */
+	MACH_STACK_POINTER(thread_state) = (cell)fix_callstack_top((stack_frame *)MACH_STACK_POINTER(thread_state));
 
-	/* Are we in compiled Factor code? Then use the current stack pointer */
-	if(in_code_heap_p(MACH_PROGRAM_COUNTER(thread_state)))
-		signal_callstack_top = (stack_frame *)MACH_STACK_POINTER(thread_state);
-	/* Are we in C? Then use the saved callstack top */
-	else
-		signal_callstack_top = NULL;
-
-	MACH_STACK_POINTER(thread_state) = align_stack_pointer(MACH_STACK_POINTER(thread_state));
+	signal_callstack_top = (stack_frame *)MACH_STACK_POINTER(thread_state);
 
 	/* Now we point the program counter at the right handler function. */
 	if(exception == EXC_BAD_ACCESS)
@@ -82,11 +72,14 @@ static void call_fault_handler(
 	MACH_THREAD_STATE_TYPE *thread_state,
 	MACH_FLOAT_STATE_TYPE *float_state)
 {
+	/* Look up the VM instance involved */
 	THREADHANDLE thread_id = pthread_from_mach_thread_np(thread);
 	assert(thread_id);
 	std::map<THREADHANDLE, factor_vm*>::const_iterator vm = thread_vms.find(thread_id);
+
+	/* Handle the exception */
 	if (vm != thread_vms.end())
-	    vm->second->call_fault_handler(exception,code,exc_state,thread_state,float_state);
+		vm->second->call_fault_handler(exception,code,exc_state,thread_state,float_state);
 }
 
 /* Handle an exception by invoking the user's fault handler and/or forwarding
@@ -100,15 +93,14 @@ catch_exception_raise (mach_port_t exception_port,
 	exception_data_t code,
 	mach_msg_type_number_t code_count)
 {
-	MACH_EXC_STATE_TYPE exc_state;
-	MACH_THREAD_STATE_TYPE thread_state;
-	MACH_FLOAT_STATE_TYPE float_state;
-	mach_msg_type_number_t exc_state_count, thread_state_count, float_state_count;
+	/* 10.6 likes to report exceptions from child processes too. Ignore those */
+	if(task != mach_task_self()) return KERN_FAILURE;
 
 	/* Get fault information and the faulting thread's register contents..
 	
 	See http://web.mit.edu/darwin/src/modules/xnu/osfmk/man/thread_get_state.html.	*/
-	exc_state_count = MACH_EXC_STATE_COUNT;
+	MACH_EXC_STATE_TYPE exc_state;
+	mach_msg_type_number_t exc_state_count = MACH_EXC_STATE_COUNT;
 	if (thread_get_state (thread, MACH_EXC_STATE_FLAVOR,
 			      (natural_t *)&exc_state, &exc_state_count)
 		!= KERN_SUCCESS)
@@ -118,7 +110,8 @@ catch_exception_raise (mach_port_t exception_port,
 		return KERN_FAILURE;
 	}
 
-	thread_state_count = MACH_THREAD_STATE_COUNT;
+	MACH_THREAD_STATE_TYPE thread_state;
+	mach_msg_type_number_t thread_state_count = MACH_THREAD_STATE_COUNT;
 	if (thread_get_state (thread, MACH_THREAD_STATE_FLAVOR,
 			      (natural_t *)&thread_state, &thread_state_count)
 		!= KERN_SUCCESS)
@@ -128,7 +121,8 @@ catch_exception_raise (mach_port_t exception_port,
 		return KERN_FAILURE;
 	}
 
-	float_state_count = MACH_FLOAT_STATE_COUNT;
+	MACH_FLOAT_STATE_TYPE float_state;
+	mach_msg_type_number_t float_state_count = MACH_FLOAT_STATE_COUNT;
 	if (thread_get_state (thread, MACH_FLOAT_STATE_FLAVOR,
 			      (natural_t *)&float_state, &float_state_count)
 		!= KERN_SUCCESS)

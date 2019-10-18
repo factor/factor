@@ -5,6 +5,7 @@ io io.styles namespaces assocs kernel.private strings
 combinators sorting math.parser vocabs definitions
 tools.profiler.private tools.crossref continuations generic
 compiler.units compiler.crossref sets classes fry ;
+FROM: sets => members ;
 IN: tools.profiler
 
 : profile ( quot -- )
@@ -41,7 +42,7 @@ IN: tools.profiler
     [ smart-usage [ word? ] filter ]
     [ generic-call-sites-of keys ]
     [ effect-dependencies-of keys ]
-    tri 3append prune ;
+    tri 3append members ;
 
 : usage-counters ( word -- alist )
     profiler-usage counters ;

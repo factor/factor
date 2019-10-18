@@ -11,7 +11,6 @@ IN: alarms.tests
 ] unit-test
 
 [ ] [
-    [
-        [ resume ] curry instant later drop
-    ] "test" suspend drop
+    self [ resume ] curry instant later drop
+    "test" suspend drop
 ] unit-test

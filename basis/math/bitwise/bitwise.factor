@@ -17,33 +17,32 @@ IN: math.bitwise
 : wrap ( m n -- m' ) 1 - bitand ; inline
 : bits ( m n -- m' ) 2^ wrap ; inline
 : mask-bit ( m n -- m' ) 2^ mask ; inline
-: on-bits ( n -- m ) 2^ 1 - ; inline
+: on-bits ( m -- n ) 2^ 1 - ; inline
 : toggle-bit ( m n -- m' ) 2^ bitxor ; inline
-
-: shift-mod ( n s w -- n )
-    [ shift ] dip 2^ wrap ; inline
+: >signed ( x n -- y ) 2dup neg 1 + shift 1 = [ 2^ - ] [ drop ] if ;
+: >odd ( m -- n ) 0 set-bit ; foldable
+: >even ( m -- n ) 0 clear-bit ; foldable
+: next-even ( m -- n ) >even 2 + ; foldable
+: next-odd ( m -- n ) dup even? [ 1 + ] [ 2 + ] if ; foldable
+: shift-mod ( m s w -- n ) [ shift ] dip 2^ wrap ; inline
 
 : bitroll ( x s w -- y )
     [ wrap ] keep
     [ shift-mod ] [ [ - ] keep shift-mod ] 3bi bitor ; inline
 
-: bitroll-32 ( n s -- n' ) 32 bitroll ; inline
+: bitroll-32 ( m s -- n ) 32 bitroll ; inline
 
-: bitroll-64 ( n s -- n' ) 64 bitroll ; inline
+: bitroll-64 ( m s -- n ) 64 bitroll ; inline
 
 ! 32-bit arithmetic
-: w+ ( int int -- int ) + 32 bits ; inline
-: w- ( int int -- int ) - 32 bits ; inline
-: w* ( int int -- int ) * 32 bits ; inline
+: w+ ( x y -- z ) + 32 bits ; inline
+: w- ( x y -- z ) - 32 bits ; inline
+: w* ( x y -- z ) * 32 bits ; inline
 
 ! 64-bit arithmetic
-: W+ ( int int -- int ) + 64 bits ; inline
-: W- ( int int -- int ) - 64 bits ; inline
-: W* ( int int -- int ) * 64 bits ; inline
-
-! flags
-MACRO: flags ( values -- )
-    [ 0 ] [ [ ?execute bitor ] curry compose ] reduce ;
+: W+ ( x y -- z ) + 64 bits ; inline
+: W- ( x y -- z ) - 64 bits ; inline
+: W* ( x y -- z ) * 64 bits ; inline
 
 : symbols>flags ( symbols assoc -- flag-bits )
     [ at ] curry map
@@ -114,19 +113,7 @@ M: byte-array bit-count
     byte-array-bit-count ;
 
 M: object bit-count
-    [ >c-ptr ] [ byte-length ] bi <direct-uchar-array>
-    byte-array-bit-count ;
-
-: >signed ( x n -- y )
-    2dup neg 1 + shift 1 = [ 2^ - ] [ drop ] if ;
-
-: >odd ( n -- int ) 0 set-bit ; foldable
-
-: >even ( n -- int ) 0 clear-bit ; foldable
-
-: next-even ( m -- n ) >even 2 + ; foldable
-
-: next-odd ( m -- n ) dup even? [ 1 + ] [ 2 + ] if ; foldable
+    binary-object <direct-uchar-array> byte-array-bit-count ;
 
 : even-parity? ( obj -- ? ) bit-count even? ;
 

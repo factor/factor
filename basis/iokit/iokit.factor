@@ -104,9 +104,9 @@ CONSTANT: KERN_SUCCESS 0
 
 FUNCTION: IOReturn IOMasterPort ( mach_port_t bootstrap, mach_port_t* master ) ;
 
-FUNCTION: CFDictionaryRef IOServiceMatching ( char* name ) ;
-FUNCTION: CFDictionaryRef IOServiceNameMatching ( char* name ) ;
-FUNCTION: CFDictionaryRef IOBSDNameMatching ( char* name ) ;
+FUNCTION: CFDictionaryRef IOServiceMatching ( c-string name ) ;
+FUNCTION: CFDictionaryRef IOServiceNameMatching ( c-string name ) ;
+FUNCTION: CFDictionaryRef IOBSDNameMatching ( c-string name ) ;
 
 FUNCTION: IOReturn IOObjectRetain ( io_object_t o ) ;
 FUNCTION: IOReturn IOObjectRelease ( io_object_t o ) ;
@@ -121,7 +121,7 @@ FUNCTION: IOReturn IORegistryEntryGetPath ( io_registry_entry_t entry, io_name_t
 
 FUNCTION: IOReturn IORegistryEntryCreateCFProperties ( io_registry_entry_t entry, CFMutableDictionaryRef properties, CFAllocatorRef allocator, IOOptionBits options ) ;
 
-FUNCTION: char* mach_error_string ( IOReturn error ) ;
+FUNCTION: c-string mach_error_string ( IOReturn error ) ;
 
 TUPLE: mach-error error-code error-string ;
 : <mach-error> ( code -- error )

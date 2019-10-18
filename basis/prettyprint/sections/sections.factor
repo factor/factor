@@ -4,6 +4,7 @@ USING: arrays generic hashtables io kernel math assocs
 namespaces make sequences strings io.styles vectors words
 prettyprint.config splitting classes continuations
 accessors sets vocabs.parser combinators vocabs ;
+FROM: namespaces => set ;
 IN: prettyprint.sections
 
 ! State

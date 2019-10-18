@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: unix byte-arrays kernel io.backend.unix math.bitwise
 io.ports io.files io.files.private io.pathnames environment
-destructors system unix.ffi ;
+destructors system unix.ffi literals ;
 IN: io.files.unix
 
 M: unix cwd ( -- path )
@@ -12,15 +12,14 @@ M: unix cwd ( -- path )
 
 M: unix cd ( path -- ) [ chdir ] unix-system-call drop ;
 
-: read-flags ( -- n ) O_RDONLY ; inline
+CONSTANT: read-flags flags{ O_RDONLY }
 
-: open-read ( path -- fd ) O_RDONLY file-mode open-file ;
+: open-read ( path -- fd ) read-flags file-mode open-file ;
 
 M: unix (file-reader) ( path -- stream )
     open-read <fd> init-fd <input-port> ;
 
-: write-flags ( -- n )
-    { O_WRONLY O_CREAT O_TRUNC } flags ; inline
+CONSTANT: write-flags flags{ O_WRONLY O_CREAT O_TRUNC }
 
 : open-write ( path -- fd )
     write-flags file-mode open-file ;
@@ -28,8 +27,7 @@ M: unix (file-reader) ( path -- stream )
 M: unix (file-writer) ( path -- stream )
     open-write <fd> init-fd <output-port> ;
 
-: append-flags ( -- n )
-    { O_WRONLY O_APPEND O_CREAT } flags ; inline
+CONSTANT: append-flags flags{ O_WRONLY O_APPEND O_CREAT }
 
 : open-append ( path -- fd )
     [

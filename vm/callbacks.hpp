@@ -38,6 +38,10 @@ struct callback_heap {
 		return w->entry_point;
 	}
 
+	bool setup_seh_p();
+	bool return_takes_param_p();
+	instruction_operand callback_operand(code_block *stub, cell index);
+	void store_callback_operand(code_block *stub, cell index);
 	void store_callback_operand(code_block *stub, cell index, cell value);
 
 	void update(code_block *stub);

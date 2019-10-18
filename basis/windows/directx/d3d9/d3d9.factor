@@ -23,6 +23,8 @@ FUNCTION: BOOL D3DPERF_QueryRepeatFrame ( ) ;
 FUNCTION: void D3DPERF_SetOptions ( DWORD dwOptions ) ;
 FUNCTION: DWORD D3DPERF_GetStatus ( ) ;
 
+C-TYPE: IDirect3DDevice9
+
 COM-INTERFACE: IDirect3D9 IUnknown {81BDCBCA-64D4-426d-AE8D-AD0147F4275C}
     HRESULT RegisterSoftwareDevice ( void* pInitializeFunction )
     UINT GetAdapterCount ( )
@@ -51,6 +53,17 @@ C-TYPE: IDirect3DVertexDeclaration9
 C-TYPE: IDirect3DVertexShader9
 C-TYPE: IDirect3DIndexBuffer9
 C-TYPE: IDirect3DPixelShader9
+C-TYPE: IDirect3DSwapChain9
+C-TYPE: IDirect3DTexture9
+C-TYPE: IDirect3DVolumeTexture9
+C-TYPE: IDirect3DCubeTexture9
+C-TYPE: IDirect3DStateBlock9
+C-TYPE: IDirect3DQuery9
+C-TYPE: IDirect3DVolume9
+C-TYPE: IDirect3D9Ex
+C-TYPE: IDirect3DDevice9Ex
+C-TYPE: IDirect3DAuthenticatedChannel9
+C-TYPE: IDirect3DCryptoSession9
 
 COM-INTERFACE: IDirect3DDevice9 IUnknown {D0223B96-BF7A-43fd-92BD-A43B0D82B9EB}
     HRESULT TestCooperativeLevel ( )
@@ -96,7 +109,7 @@ COM-INTERFACE: IDirect3DDevice9 IUnknown {D0223B96-BF7A-43fd-92BD-A43B0D82B9EB}
     HRESULT Clear ( DWORD Count, D3DRECT* pRects, DWORD Flags, D3DCOLOR Color, float Z, DWORD Stencil )
     HRESULT SetTransform ( D3DTRANSFORMSTATETYPE State, D3DMATRIX* pMatrix )
     HRESULT GetTransform ( D3DTRANSFORMSTATETYPE State, D3DMATRIX* pMatrix )
-    HRESULT MultiplyTransform ( D3DTRANSFORMSTATETYPE, D3DMATRIX* )
+    HRESULT MultiplyTransform ( D3DTRANSFORMSTATETYPE State, D3DMATRIX* pMatrix )
     HRESULT SetViewport ( D3DVIEWPORT9* pViewport )
     HRESULT GetViewport ( D3DVIEWPORT9* pViewport )
     HRESULT SetMaterial ( D3DMATERIAL9* pMaterial )

@@ -30,7 +30,7 @@ TUPLE: huffman-code
     [ free-bits 2^ iota [ huffman-code code>> free-bits 2^ * + ] map ]
     [ huffman-code code>> free-bits neg 2^ /i 1array ] if ;
 
-:: huffman-each ( tdesc quot: ( huffman-code -- ) -- )
+:: huffman-each ( ... tdesc quot: ( ... huffman-code -- ... ) -- ... )
     <huffman-code> :> code
     tdesc
     [

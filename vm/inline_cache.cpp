@@ -89,7 +89,8 @@ void inline_cache_jit::compile_inline_cache(fixnum index,
 	parent->update_pic_count(inline_cache_type);
 
 	/* Generate machine code to determine the object's class. */
-	emit_class_lookup(index,inline_cache_type);
+	emit_with_literal(parent->special_objects[PIC_LOAD],tag_fixnum(-index * sizeof(cell)));
+	emit(parent->special_objects[inline_cache_type]);
 
 	/* Generate machine code to check, in turn, if the class is one of the cached entries. */
 	cell i;

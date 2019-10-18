@@ -49,7 +49,6 @@ HELP: <update>
 HELP: >upsert
 { $values
   { "mdb-update-msg" "a mdb-update-msg" }
-  { "mdb-update-msg" "mdb-update-msg with the upsert indicator set to t" }
 }
 { $description "Marks a mdb-update-msg as upsert operation"
   "(inserts object identified by the update selector if it doesn't exist in the collection)" } ;
@@ -162,7 +161,6 @@ HELP: hint
 { $values
   { "mdb-query-msg" "a query" }
   { "index-hint" "a hint to an index" }
-  { "mdb-query-msg" "modified query object" }
 }
 { $description "Annotates the query with a hint to an index. "
   "For detailed information see: " { $url "http://www.mongodb.org/display/DOCS/Optimizing+Mongo+Performance#OptimizingMongoPerformance-Hint" } }
@@ -183,7 +181,6 @@ HELP: limit
 { $values
   { "mdb-query-msg" "a query" }
   { "limit#" "number of objects that should be returned at most" }
-  { "mdb-query-msg" "modified query object" }
 }
 { $description "Limits the number of returned objects to limit#" }
 { $examples
@@ -243,7 +240,6 @@ HELP: skip
 { $values
   { "mdb-query-msg" "a query message" }
   { "skip#" "number of objects to skip" }
-  { "mdb-query-msg" "annotated query message" }
 }
 { $description "annotates a query message with a number of objects to skip when returning the results" } ;
 
@@ -251,7 +247,6 @@ HELP: sort
 { $values
   { "mdb-query-msg" "a query message" }
   { "sort-quot" "a quotation with sort specifiers" }
-  { "mdb-query-msg" "annotated query message" }
 }
 { $description "annotates the query message for sort specifiers" } ;
 

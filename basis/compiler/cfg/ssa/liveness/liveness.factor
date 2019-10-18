@@ -6,6 +6,7 @@ compiler.cfg.rpo
 compiler.cfg.dominance
 compiler.cfg.def-use
 compiler.cfg.instructions ;
+FROM: namespaces => set ;
 IN: compiler.cfg.ssa.liveness
 
 ! Liveness checking on SSA IR, as described in

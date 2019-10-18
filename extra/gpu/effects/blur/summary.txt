@@ -1,0 +1,1 @@
+Blur effects for textures.

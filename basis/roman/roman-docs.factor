@@ -39,7 +39,7 @@ HELP: roman>
 { >roman >ROMAN roman> } related-words
 
 HELP: roman+
-{ $values { "x" string } { "x" string } { "x" string } }
+{ $values { "x" string } { "y" string } { "z" string } }
 { $description "Adds two Roman numerals." }
 { $examples 
     { $example "USING: io roman ;"
@@ -49,7 +49,7 @@ HELP: roman+
 } ;
 
 HELP: roman-
-{ $values { "x" string } { "x" string } { "x" string } }
+{ $values { "x" string } { "y" string } { "z" string } }
 { $description "Subtracts two Roman numerals." }
 { $examples 
     { $example "USING: io roman ;"
@@ -61,7 +61,7 @@ HELP: roman-
 { roman+ roman- } related-words
 
 HELP: roman*
-{ $values { "x" string } { "x" string } { "x" string } }
+{ $values { "x" string } { "y" string } { "z" string } }
 { $description "Multiplies two Roman numerals." }
 { $examples 
     { $example "USING: io roman ;"
@@ -71,7 +71,7 @@ HELP: roman*
 } ;
 
 HELP: roman/i
-{ $values { "x" string } { "x" string } { "x" string } }
+{ $values { "x" string } { "y" string } { "z" string } }
 { $description "Computes the integer division of two Roman numerals." }
 { $examples 
     { $example "USING: io roman ;"
@@ -81,7 +81,7 @@ HELP: roman/i
 } ;
 
 HELP: roman/mod
-{ $values { "x" string } { "x" string } { "x" string } { "x" string } }
+{ $values { "x" string } { "y" string } { "z" string } { "w" string } }
 { $description "Computes the quotient and remainder of two Roman numerals." }
 { $examples 
     { $example "USING: kernel io roman ;"

@@ -42,10 +42,10 @@ PRIVATE>
 
 PRIVATE>
 
-: permutation ( n seq -- seq )
+: permutation ( n seq -- seq' )
     [ permutation-indices ] keep nths ;
 
-: all-permutations ( seq -- seq )
+: all-permutations ( seq -- seq' )
     [ length factorial iota ] keep
     '[ _ permutation ] map ;
 
@@ -118,10 +118,10 @@ PRIVATE>
 : map>assoc-combinations ( seq k quot exemplar -- )
     [ combinations-quot ] dip map>assoc ; inline
 
-: combination ( m seq k -- seq )
+: combination ( m seq k -- seq' )
     <combo> apply-combination ;
 
-: all-combinations ( seq k -- seq )
+: all-combinations ( seq k -- seq' )
     [ ] combinations-quot map ;
 
 : reduce-combinations ( seq k identity quot -- result )

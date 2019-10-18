@@ -267,7 +267,7 @@ test-server-slot-values
 ] unit-test
 
 [
-    "IN: classes.tuple.tests TUPLE: bad-superclass < word ;" eval( -- )
+    "IN: classes.tuple.tests TUPLE: invalid-superclass < word ;" eval( -- )
 ] must-fail
 
 ! Dynamically changing inheritance hierarchy
@@ -770,3 +770,30 @@ TUPLE: tuple-predicate-redefine-test ;
 [ ] [ "IN: classes.tuple.tests TUPLE: tuple-predicate-redefine-test ;" eval( -- ) ] unit-test
 
 [ t ] [ \ tuple-predicate-redefine-test? predicate? ] unit-test
+
+! Final classes
+TUPLE: final-superclass ;
+TUPLE: final-subclass < final-superclass ;
+
+[ final-superclass ] [ final-subclass superclass ] unit-test
+
+! Making the superclass final should change the superclass of the subclass
+[ ] [ "IN: classes.tuple.tests TUPLE: final-superclass ; final" eval( -- ) ] unit-test
+
+[ tuple ] [ final-subclass superclass ] unit-test
+
+[ f ] [ \ final-subclass final-class? ] unit-test
+
+! Subclassing a final class should fail
+[ "IN: classes.tuple.tests TUPLE: final-subclass < final-superclass ;" eval( -- ) ]
+[ error>> bad-superclass? ] must-fail-with
+
+! Making a final class non-final should work
+[ ] [ "IN: classes.tuple.tests TUPLE: final-superclass ;" eval( -- ) ] unit-test
+
+[ ] [ "IN: classes.tuple.tests TUPLE: final-subclass < final-superclass ; final" eval( -- ) ] unit-test
+
+! Changing a superclass should not change the final status of a subclass
+[ ] [ "IN: classes.tuple.tests TUPLE: final-superclass x ;" eval( -- ) ] unit-test
+
+[ t ] [ \ final-subclass final-class? ] unit-test

@@ -7,6 +7,7 @@ IN: tools.deploy.config
 SYMBOL: deploy-name
 
 SYMBOL: deploy-ui?
+SYMBOL: deploy-console?
 SYMBOL: deploy-math?
 SYMBOL: deploy-unicode?
 SYMBOL: deploy-threads?
@@ -52,6 +53,7 @@ SYMBOL: deploy-image
 : default-config ( vocab -- assoc )
     vocab-name deploy-name associate H{
         { deploy-ui?                f }
+        { deploy-console?           t }
         { deploy-io                 2 }
         { deploy-reflection         1 }
         { deploy-threads?           t }

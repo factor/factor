@@ -6,7 +6,7 @@ llvm.core llvm.engine ;
 
 IN: llvm.wrappers
 
-: llvm-throw ( char* -- )
+: llvm-throw ( c-string -- )
     [ utf8 alien>string ] [ LLVMDisposeMessage ] bi throw ;
 
 : <dispose> ( alien class -- disposable ) new swap >>value ;

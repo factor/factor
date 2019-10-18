@@ -42,40 +42,6 @@ IN: concurrency.mailboxes.tests
     mailbox-get
 ] unit-test
 
-<mailbox> "m" set
-
-1 <count-down> "c" set
-1 <count-down> "d" set
-
-[
-    "c" get await
-    [ "m" get mailbox-get drop ]
-    [ drop "d" get count-down ] recover
-] "Mailbox close test" spawn drop
-
-[ ] [ "c" get count-down ] unit-test
-[ ] [ "m" get dispose ] unit-test
-[ ] [ "d" get 5 seconds await-timeout ] unit-test
-
-[ ] [ "m" get dispose ] unit-test
-
-<mailbox> "m" set
-
-1 <count-down> "c" set
-1 <count-down> "d" set
-
-[
-    "c" get await
-    "m" get wait-for-close
-    "d" get count-down
-] "Mailbox close test" spawn drop
-
-[ ] [ "c" get count-down ] unit-test
-[ ] [ "m" get dispose ] unit-test
-[ ] [ "d" get 5 seconds await-timeout ] unit-test
-
-[ ] [ "m" get dispose ] unit-test
-
 [ { "foo" "bar" } ] [
     <mailbox>
     "foo" over mailbox-put
@@ -86,4 +52,3 @@ IN: concurrency.mailboxes.tests
 [
     <mailbox> 1 seconds mailbox-get-timeout
 ] [ wait-timeout? ] must-fail-with
-    

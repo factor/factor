@@ -1,7 +1,7 @@
 ! Copyright (c) 2009 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays byte-arrays fry hints kernel math math.combinatorics
-    math.functions math.parser math.primes project-euler.common sequences sets ;
+USING: arrays byte-arrays fry kernel math math.combinatorics math.functions
+    math.parser math.primes project-euler.common sequences sets ;
 IN: project-euler.049
 
 ! http://projecteuler.net/index.php?section=problems&id=49
@@ -24,16 +24,6 @@ IN: project-euler.049
 ! --------
 
 <PRIVATE
-
-: count-digits ( n -- byte-array )
-    10 <byte-array> [
-        '[ 10 /mod _ [ 1 + ] change-nth dup 0 > ] loop drop
-    ] keep ;
-
-HINTS: count-digits fixnum ;
-
-: permutations? ( n m -- ? )
-    [ count-digits ] bi@ = ;
 
 : collect-permutations ( seq -- seq )
     [ V{ } clone ] [ dup ] bi* [

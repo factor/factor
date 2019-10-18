@@ -23,8 +23,8 @@ STRUCT: stat
     { st_spare0 uint32_t }
     { st_birthtimespec timespec } ;
 
-FUNCTION: int __stat13 ( char* pathname, stat* buf ) ;
-FUNCTION: int __lstat13 ( char* pathname, stat* buf ) ;
+FUNCTION: int __stat13 ( c-string pathname, stat* buf ) ;
+FUNCTION: int __lstat13 ( c-string pathname, stat* buf ) ;
 
 : stat ( pathname buf -- n ) __stat13 ;
 : lstat ( pathname buf -- n ) __lstat13 ;

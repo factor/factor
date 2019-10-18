@@ -26,7 +26,7 @@ HELP: nCk
 } ;
 
 HELP: permutation
-{ $values { "n" "a non-negative integer" } { "seq" sequence } { "seq" sequence } }
+{ $values { "n" "a non-negative integer" } { "seq" sequence } { "seq'" sequence } }
 { $description "Outputs the " { $snippet "nth" } " lexicographical permutation of " { $snippet "seq" } "." }
 { $notes "Permutations are 0-based and a bounds error will be thrown if " { $snippet "n" } " is larger than " { $snippet "seq length factorial 1 -" } "." }
 { $examples
@@ -37,7 +37,7 @@ HELP: permutation
 } ;
 
 HELP: all-permutations
-{ $values { "seq" sequence } { "seq" sequence } }
+{ $values { "seq" sequence } { "seq'" sequence } }
 { $description "Outputs a sequence containing all permutations of " { $snippet "seq" } " in lexicographical order." }
 { $examples
     { $example "USING: math.combinatorics prettyprint ;"
@@ -60,7 +60,7 @@ HELP: inverse-permutation
 } ;
 
 HELP: combination
-{ $values { "m" "a non-negative integer" } { "seq" sequence } { "k" "a non-negative integer" } { "seq" sequence } }
+{ $values { "m" "a non-negative integer" } { "seq" sequence } { "k" "a non-negative integer" } { "seq'" sequence } }
 { $description "Outputs the " { $snippet "mth" } " lexicographical combination of " { $snippet "seq" } " choosing " { $snippet "k" } " elements." }
 { $notes "Combinations are 0-based and a bounds error will be thrown if " { $snippet "m" } " is larger than " { $snippet "seq length k nCk" } "." }
 { $examples
@@ -71,7 +71,7 @@ HELP: combination
 } ;
 
 HELP: all-combinations
-{ $values { "seq" sequence } { "k" "a non-negative integer" } { "seq" sequence } }
+{ $values { "seq" sequence } { "k" "a non-negative integer" } { "seq'" sequence } }
 { $description "Outputs a sequence containing all combinations of " { $snippet "seq" } " choosing " { $snippet "k" } " elements, in lexicographical order." }
 { $examples
     { $example "USING: math.combinatorics prettyprint ;"

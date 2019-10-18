@@ -1,8 +1,8 @@
-! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar continuations debugger io
 io.directories io.files kernel mason.common
-mason.email mason.updates namespaces threads ;
+mason.email mason.updates mason.notify namespaces threads ;
 FROM: mason.build => build ;
 IN: mason
 
@@ -17,6 +17,7 @@ IN: mason
 : build-loop ( -- )
     ?prepare-build-machine
     [
+        notify-heartbeat
         [
             builds/factor set-current-directory
             new-code-available? [ build ] when

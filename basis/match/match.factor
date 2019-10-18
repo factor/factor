@@ -17,7 +17,7 @@ SYMBOL: _
     [ define-match-var ] each ;
 
 SYNTAX: MATCH-VARS: ! vars ...
-    ";" parse-tokens define-match-vars ;
+    ";" [ define-match-var ] each-token ;
 
 : match-var? ( symbol -- bool )
     dup word? [ "match-var" word-prop ] [ drop f ] if ;

@@ -362,3 +362,15 @@ TUPLE: tuple-with-initial-declared-slot { x integer initial: 123 } ;
 ] [
     [ \ tuple-with-initial-declared-slot see ] with-string-writer "\n" split
 ] unit-test
+
+TUPLE: final-tuple ; final
+
+[
+    {
+        "IN: prettyprint.tests"
+        "TUPLE: final-tuple ; final"
+        ""
+    }
+] [
+    [ \ final-tuple see ] with-string-writer "\n" split
+] unit-test

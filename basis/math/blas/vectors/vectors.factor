@@ -238,10 +238,10 @@ M: VECTOR Vasum
     [ drop (define-blas-vector) ]
     [ (define-complex-blas-vector) ] 3bi ;
 
-"float"  "S" define-real-blas-vector
-"double" "D" define-real-blas-vector
-"complex-float"  "C" "S" define-complex-blas-vector
-"complex-double" "Z" "D" define-complex-blas-vector
+float  "S" define-real-blas-vector
+double "D" define-real-blas-vector
+complex-float  "C" "S" define-complex-blas-vector
+complex-double "Z" "D" define-complex-blas-vector
 
 >>
 

@@ -63,7 +63,7 @@ HELP: building
 
 HELP: make
 { $values { "quot" quotation } { "exemplar" sequence } { "seq" "a new sequence" } }
-{ $description "Calls the quotation in a new " { $emphasis "dynamic scope" } ". The quotation and any words it calls can execute the " { $link , } " and " { $link % } " words to accumulate elements. When the quotation returns, all accumulated elements are collected into a sequence with the same type as " { $snippet "exemplar" } "." }
+{ $description "Calls the quotation in a new dynamic scope with the " { $link building } " variable bound to a new resizable mutable sequence. The quotation and any words it calls can execute the " { $link , } " and " { $link % } " words to accumulate elements. When the quotation returns, all accumulated elements are collected into a sequence with the same type as " { $snippet "exemplar" } "." }
 { $examples { $example "USING: make prettyprint ;" "[ 1 , 2 , 3 , ] { } make ." "{ 1 2 3 }" } } ;
 
 HELP: ,

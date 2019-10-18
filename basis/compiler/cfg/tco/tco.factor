@@ -29,7 +29,7 @@ IN: compiler.cfg.tco
 : word-tail-call? ( bb -- ? )
     instructions>> penultimate ##call? ;
 
-: convert-tail-call ( bb quot: ( insn -- tail-insn ) -- )
+: convert-tail-call ( ..a bb quot: ( ..a insn -- ..a tail-insn ) -- ..b )
     '[
         instructions>>
         [ pop* ] [ pop ] [ ] tri

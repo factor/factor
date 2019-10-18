@@ -8,11 +8,11 @@ IN: tokyo.alien.tcutil
     { [ os macosx? ] [ "/opt/local/lib/libtokyocabinet.dylib" ] }
     { [ os unix? ] [ "libtokyocabinet.so" ] }
     { [ os windows? ] [ "tokyocabinet.dll" ] }
-} cond "cdecl" add-library >>
+} cond cdecl add-library >>
 
 LIBRARY: tokyocabinet
 
-C-ENUM:
+C-ENUM: f
     TCDBTHASH
     TCDBTBTREE
     TCDBTFIXED
@@ -28,9 +28,9 @@ FUNCTION: TCLIST* tclistnew2 ( int anum ) ;
 FUNCTION: void tclistdel ( TCLIST* list ) ;
 FUNCTION: int tclistnum ( TCLIST* list ) ;
 FUNCTION: void* tclistval ( TCLIST* list, int index, int* sp ) ;
-FUNCTION: char* tclistval2 ( TCLIST* list, int index ) ;
+FUNCTION: c-string tclistval2 ( TCLIST* list, int index ) ;
 FUNCTION: void tclistpush ( TCLIST* list, void* ptr, int size ) ;
-FUNCTION: void tclistpush2 ( TCLIST* list, char* str ) ;
+FUNCTION: void tclistpush2 ( TCLIST* list, c-string str ) ;
 FUNCTION: void tcfree ( void* ptr ) ;
 
 TYPEDEF: void* TCCMP

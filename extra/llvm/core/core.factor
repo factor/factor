@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.libraries alien.syntax system sequences combinators kernel ;
+USING: alien alien.libraries alien.syntax system sequences combinators kernel alien.c-types ;
 
 IN: llvm.core
 
@@ -12,7 +12,7 @@ IN: llvm.core
         { [ os macosx? ] [ "/usr/local/lib/lib" ".dylib" surround ] }
         { [ os windows? ] [ ".dll" append ] }
         { [ os unix? ] [ "lib" ".so" surround ] }
-    } cond "cdecl" add-library ;
+    } cond cdecl add-library ;
 
 "LLVMSystem" add-llvm-library
 "LLVMSupport" add-llvm-library
@@ -28,20 +28,20 @@ LIBRARY: LLVMCore
 TYPEDEF: uint unsigned
 TYPEDEF: unsigned enum
 
-CONSTANT: LLVMZExtAttribute         BIN: 1
-CONSTANT: LLVMSExtAttribute         BIN: 10
-CONSTANT: LLVMNoReturnAttribute     BIN: 100
-CONSTANT: LLVMInRegAttribute        BIN: 1000
-CONSTANT: LLVMStructRetAttribute    BIN: 10000
-CONSTANT: LLVMNoUnwindAttribute     BIN: 100000
-CONSTANT: LLVMNoAliasAttribute      BIN: 1000000
-CONSTANT: LLVMByValAttribute        BIN: 10000000
-CONSTANT: LLVMNestAttribute         BIN: 100000000
-CONSTANT: LLVMReadNoneAttribute     BIN: 1000000000
-CONSTANT: LLVMReadOnlyAttribute     BIN: 10000000000
-TYPEDEF: enum LLVMAttribute;
+C-ENUM: LLVMAttribute
+    { LLVMZExtAttribute         BIN: 1 }
+    { LLVMSExtAttribute         BIN: 10 }
+    { LLVMNoReturnAttribute     BIN: 100 }
+    { LLVMInRegAttribute        BIN: 1000 }
+    { LLVMStructRetAttribute    BIN: 10000 }
+    { LLVMNoUnwindAttribute     BIN: 100000 }
+    { LLVMNoAliasAttribute      BIN: 1000000 }
+    { LLVMByValAttribute        BIN: 10000000 }
+    { LLVMNestAttribute         BIN: 100000000 }
+    { LLVMReadNoneAttribute     BIN: 1000000000 }
+    { LLVMReadOnlyAttribute     BIN: 10000000000 } ;
 
-C-ENUM:
+C-ENUM: LLVMTypeKind
   LLVMVoidTypeKind
   LLVMFloatTypeKind
   LLVMDoubleTypeKind
@@ -57,9 +57,8 @@ C-ENUM:
   LLVMPointerTypeKind
   LLVMOpaqueTypeKind
   LLVMVectorTypeKind ;
-TYPEDEF: enum LLVMTypeKind
 
-C-ENUM:
+C-ENUM: LLVMLinkage
   LLVMExternalLinkage
   LLVMLinkOnceLinkage
   LLVMWeakLinkage
@@ -69,34 +68,32 @@ C-ENUM:
   LLVMDLLExportLinkage
   LLVMExternalWeakLinkage
   LLVMGhostLinkage ;
-TYPEDEF: enum LLVMLinkage
 
-C-ENUM:
+C-ENUM: LLVMVisibility
   LLVMDefaultVisibility
   LLVMHiddenVisibility
   LLVMProtectedVisibility ;
-TYPEDEF: enum LLVMVisibility
 
-CONSTANT: LLVMCCallConv             0
-CONSTANT: LLVMFastCallConv          8
-CONSTANT: LLVMColdCallConv          9
-CONSTANT: LLVMX86StdcallCallConv    64
-CONSTANT: LLVMX86FastcallCallConv   65
-TYPEDEF: enum LLVMCallConv
+C-ENUM: LLVMCallConv
+  { LLVMCCallConv             0 }
+  { LLVMFastCallConv          8 }
+  { LLVMColdCallConv          9 }
+  { LLVMX86StdcallCallConv    64 }
+  { LLVMX86FastcallCallConv   65 } ;
 
-CONSTANT: LLVMIntEQ                 32
-CONSTANT: LLVMIntNE                 33
-CONSTANT: LLVMIntUGT                34
-CONSTANT: LLVMIntUGE                35
-CONSTANT: LLVMIntULT                36
-CONSTANT: LLVMIntULE                37
-CONSTANT: LLVMIntSGT                38
-CONSTANT: LLVMIntSGE                39
-CONSTANT: LLVMIntSLT                40
-CONSTANT: LLVMIntSLE                41
-TYPEDEF: enum LLVMIntPredicate
+C-ENUM: LLVMIntPredicate
+  { LLVMIntEQ                 32 }
+  { LLVMIntNE                 33 }
+  { LLVMIntUGT                34 }
+  { LLVMIntUGE                35 }
+  { LLVMIntULT                36 }
+  { LLVMIntULE                37 }
+  { LLVMIntSGT                38 }
+  { LLVMIntSGE                39 }
+  { LLVMIntSLT                40 }
+  { LLVMIntSLE                41 } ;
 
-C-ENUM:
+C-ENUM: LLVMRealPredicate
   LLVMRealPredicateFalse
   LLVMRealOEQ
   LLVMRealOGT
@@ -113,7 +110,6 @@ C-ENUM:
   LLVMRealULE
   LLVMRealUNE
   LLVMRealPredicateTrue ;
-TYPEDEF: enum LLVMRealPredicate
 
 ! Opaque Types
 
@@ -137,11 +133,11 @@ TYPEDEF: void* LLVMMemoryBufferRef
 
 ! Functions
 
-FUNCTION: void LLVMDisposeMessage ( char* Message ) ;
+FUNCTION: void LLVMDisposeMessage ( c-string Message ) ;
 
-FUNCTION: LLVMModuleRef LLVMModuleCreateWithName ( char* ModuleID ) ;
+FUNCTION: LLVMModuleRef LLVMModuleCreateWithName ( c-string ModuleID ) ;
 
-FUNCTION: int LLVMAddTypeName ( LLVMModuleRef M, char* Name, LLVMTypeRef Ty ) ;
+FUNCTION: int LLVMAddTypeName ( LLVMModuleRef M, c-string Name, LLVMTypeRef Ty ) ;
 
 FUNCTION: void LLVMDisposeModule ( LLVMModuleRef M ) ;
 
@@ -230,7 +226,7 @@ FUNCTION: unsigned LLVMCountParams ( LLVMValueRef Fn ) ;
 FUNCTION: void LLVMGetParams ( LLVMValueRef Fn, LLVMValueRef* Params ) ;
 
 FUNCTION: LLVMValueRef
-LLVMAddFunction ( LLVMModuleRef M, char* Name, LLVMTypeRef FunctionTy ) ;
+LLVMAddFunction ( LLVMModuleRef M, c-string Name, LLVMTypeRef FunctionTy ) ;
 
 FUNCTION: LLVMValueRef LLVMGetFirstFunction ( LLVMModuleRef M ) ;
 
@@ -241,15 +237,15 @@ FUNCTION: unsigned LLVMGetFunctionCallConv ( LLVMValueRef Fn ) ;
 FUNCTION: void LLVMSetFunctionCallConv ( LLVMValueRef Fn, unsigned CC ) ;
 
 FUNCTION: LLVMBasicBlockRef
-LLVMAppendBasicBlock ( LLVMValueRef Fn, char* Name ) ;
+LLVMAppendBasicBlock ( LLVMValueRef Fn, c-string Name ) ;
 
 FUNCTION: LLVMValueRef LLVMGetBasicBlockParent ( LLVMBasicBlockRef BB ) ;
 
 ! Values
 
 FUNCTION: LLVMTypeRef LLVMTypeOf ( LLVMValueRef Val ) ;
-FUNCTION: char* LLVMGetValueName ( LLVMValueRef Val ) ;
-FUNCTION: void LLVMSetValueName ( LLVMValueRef Val, char* Name ) ;
+FUNCTION: c-string LLVMGetValueName ( LLVMValueRef Val ) ;
+FUNCTION: void LLVMSetValueName ( LLVMValueRef Val, c-string Name ) ;
 FUNCTION: void LLVMDumpValue ( LLVMValueRef Val ) ;
 
 ! Instruction Builders
@@ -284,7 +280,7 @@ FUNCTION: LLVMValueRef LLVMBuildSwitch
 ( LLVMBuilderRef Builder, LLVMValueRef V, LLVMBasicBlockRef Else, unsigned NumCases ) ;
 FUNCTION: LLVMValueRef LLVMBuildInvoke
 ( LLVMBuilderRef Builder, LLVMValueRef Fn, LLVMValueRef* Args, unsigned NumArgs,
-  LLVMBasicBlockRef Then, LLVMBasicBlockRef Catch, char* Name ) ;
+  LLVMBasicBlockRef Then, LLVMBasicBlockRef Catch, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildUnwind
 ( LLVMBuilderRef Builder ) ;
 FUNCTION: LLVMValueRef LLVMBuildUnreachable
@@ -298,126 +294,126 @@ FUNCTION: void LLVMAddCase
 ! IB Arithmetic
 
 FUNCTION: LLVMValueRef LLVMBuildAdd
-( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildSub
-( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildMul
-( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildUDiv
-( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildSDiv
-( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildFDiv
-( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildURem
-( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildSRem
-( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildFRem
-( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildShl
-( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildLShr
-( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildAShr
-( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildAnd
-( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildOr
-( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildXor
-( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef LHS, LLVMValueRef RHS, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildNeg
-( LLVMBuilderRef Builder, LLVMValueRef V, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef V, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildNot
-( LLVMBuilderRef Builder, LLVMValueRef V, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef V, c-string Name ) ;
 
 ! IB Memory
 
 FUNCTION: LLVMValueRef LLVMBuildMalloc
-( LLVMBuilderRef Builder, LLVMTypeRef Ty, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMTypeRef Ty, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildArrayMalloc
-( LLVMBuilderRef Builder, LLVMTypeRef Ty, LLVMValueRef Val, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMTypeRef Ty, LLVMValueRef Val, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildAlloca
-( LLVMBuilderRef Builder, LLVMTypeRef Ty, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMTypeRef Ty, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildArrayAlloca
-( LLVMBuilderRef Builder, LLVMTypeRef Ty, LLVMValueRef Val, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMTypeRef Ty, LLVMValueRef Val, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildFree
 ( LLVMBuilderRef Builder, LLVMValueRef PointerVal ) ;
 FUNCTION: LLVMValueRef LLVMBuildLoad
-( LLVMBuilderRef Builder, LLVMValueRef PointerVal, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef PointerVal, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildStore
 ( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMValueRef Ptr ) ;
 FUNCTION: LLVMValueRef LLVMBuildGEP
 ( LLVMBuilderRef B, LLVMValueRef Pointer, LLVMValueRef* Indices,
-  unsigned NumIndices, char* Name ) ;
+  unsigned NumIndices, c-string Name ) ;
 
 ! IB Casts
 
 FUNCTION: LLVMValueRef LLVMBuildTrunc
-( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildZExt
-( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildSExt
-( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildFPToUI
-( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildFPToSI
-( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildUIToFP
-( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildSIToFP
-( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildFPTrunc
-( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildFPExt
-( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildPtrToInt
-( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildIntToPtr
-( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildBitCast
-( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef Val, LLVMTypeRef DestTy, c-string Name ) ;
 
 ! IB Comparisons
 
 FUNCTION: LLVMValueRef LLVMBuildICmp
-( LLVMBuilderRef Builder, LLVMIntPredicate Op, LLVMValueRef LHS, LLVMValueRef RHS, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMIntPredicate Op, LLVMValueRef LHS, LLVMValueRef RHS, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildFCmp
-( LLVMBuilderRef Builder, LLVMRealPredicate Op, LLVMValueRef LHS, LLVMValueRef RHS, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMRealPredicate Op, LLVMValueRef LHS, LLVMValueRef RHS, c-string Name ) ;
 
 ! IB Misc Instructions
 
 FUNCTION: LLVMValueRef LLVMBuildPhi
-( LLVMBuilderRef Builder, LLVMTypeRef Ty, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMTypeRef Ty, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildCall
-( LLVMBuilderRef Builder, LLVMValueRef Fn, LLVMValueRef* Args, unsigned NumArgs, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef Fn, LLVMValueRef* Args, unsigned NumArgs, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildSelect
-( LLVMBuilderRef Builder, LLVMValueRef If, LLVMValueRef Then, LLVMValueRef Else, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef If, LLVMValueRef Then, LLVMValueRef Else, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildVAArg
-( LLVMBuilderRef Builder, LLVMValueRef List, LLVMTypeRef Ty, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef List, LLVMTypeRef Ty, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildExtractElement
-( LLVMBuilderRef Builder, LLVMValueRef VecVal, LLVMValueRef Index, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef VecVal, LLVMValueRef Index, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildInsertElement
-( LLVMBuilderRef Builder, LLVMValueRef VecVal, LLVMValueRef EltVal, LLVMValueRef Index, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef VecVal, LLVMValueRef EltVal, LLVMValueRef Index, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildShuffleVector
-( LLVMBuilderRef Builder, LLVMValueRef V1, LLVMValueRef V2, LLVMValueRef Mask, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef V1, LLVMValueRef V2, LLVMValueRef Mask, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildExtractValue
-( LLVMBuilderRef Builder, LLVMValueRef AggVal, unsigned Index, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef AggVal, unsigned Index, c-string Name ) ;
 FUNCTION: LLVMValueRef LLVMBuildInsertValue
-( LLVMBuilderRef Builder, LLVMValueRef AggVal, LLVMValueRef EltVal, unsigned Index, char* Name ) ;
+( LLVMBuilderRef Builder, LLVMValueRef AggVal, LLVMValueRef EltVal, unsigned Index, c-string Name ) ;
 
 ! Memory Buffers/Bit Reader
 
 FUNCTION: int LLVMCreateMemoryBufferWithContentsOfFile
-( char* Path, LLVMMemoryBufferRef* OutMemBuf, char** OutMessage ) ;
+( c-string Path, LLVMMemoryBufferRef* OutMemBuf, c-string* OutMessage ) ;
 
 FUNCTION: void LLVMDisposeMemoryBuffer ( LLVMMemoryBufferRef MemBuf ) ;
 
 LIBRARY: LLVMBitReader
 
 FUNCTION: int LLVMParseBitcode
-( LLVMMemoryBufferRef MemBuf, LLVMModuleRef* OutModule, char** OutMessage ) ;
+( LLVMMemoryBufferRef MemBuf, LLVMModuleRef* OutModule, c-string* OutMessage ) ;
  
 FUNCTION: int LLVMGetBitcodeModuleProvider
-( LLVMMemoryBufferRef MemBuf, LLVMModuleProviderRef* OutMP, char** OutMessage ) ;
+( LLVMMemoryBufferRef MemBuf, LLVMModuleProviderRef* OutMP, c-string* OutMessage ) ;

@@ -127,19 +127,19 @@ HELP: unswons
 { leach foldl lmap>array } related-words
 
 HELP: leach
-{ $values { "list" list } { "quot" { $quotation "( obj -- )" } } }
+{ $values { "list" list } { "quot" { $quotation "( ... elt -- ... )" } } }
 { $description "Call the quotation for each item in the list." } ;
 
 HELP: foldl
-{ $values { "list" list } { "identity" "an object" } { "quot" { $quotation "( prev elt -- next )" } } { "result" "the final result" } }
+{ $values { "list" list } { "identity" "an object" } { "quot" { $quotation "( ... prev elt -- ... next )" } } { "result" "the final result" } }
 { $description "Combines successive elements of the list (in a left-assocative order) using a binary operation and outputs the final result." } ;
 
 HELP: foldr
-{ $values { "list" list } { "identity" "an object" } { "quot" { $quotation "( prev elt -- next )" } } { "result" "the final result" } }
+{ $values { "list" list } { "identity" "an object" } { "quot" { $quotation "( ... prev elt -- ... next )" } } { "result" "the final result" } }
 { $description "Combines successive elements of the list (in a right-assocative order) using a binary operation, and outputs the final result." } ;
 
 HELP: lmap
-{ $values { "list" list } { "quot" { $quotation "( old -- new )" } } { "result" "the final result" } }
+{ $values { "list" list } { "quot" { $quotation "( ... elt -- ... newelt )" } } { "result" "the final result" } }
 { $description "Applies the quotation to each element of the list in order, collecting the new elements into a new list." } ;
 
 HELP: lreverse

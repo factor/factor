@@ -76,27 +76,27 @@ HELP: day-abbreviation3
 } related-words
 
 HELP: average-month
-{ $values { "ratio" ratio } }
+{ $values { "value" ratio } }
 { $description "The length of an average month averaged over 400 years. Used internally for adding an arbitrary real number of months to a timestamp." } ;
 
 HELP: months-per-year
-{ $values { "integer" integer } }
+{ $values { "value" integer } }
 { $description "Returns the number of months in a year." } ;
 
 HELP: days-per-year
-{ $values { "ratio" ratio } }
+{ $values { "value" ratio } }
 { $description "Returns the number of days in a year averaged over 400 years. Used internally for adding an arbitrary real number of days to a timestamp." } ;
 
 HELP: hours-per-year
-{ $values { "ratio" ratio } }
+{ $values { "value" ratio } }
 { $description "Returns the number of hours in a year averaged over 400 years. Used internally for adding an arbitrary real number of hours to a timestamp." } ;
 
 HELP: minutes-per-year
-{ $values { "ratio" ratio } }
+{ $values { "value" ratio } }
 { $description "Returns the number of minutes in a year averaged over 400 years. Used internally for adding an arbitrary real number of minutes to a timestamp." } ;
 
 HELP: seconds-per-year
-{ $values { "integer" integer } }
+{ $values { "value" integer } }
 { $description "Returns the number of seconds in a year averaged over 400 years. Used internally for adding an arbitrary real number of seconds to a timestamp." } ;
 
 HELP: julian-day-number
@@ -309,7 +309,7 @@ HELP: time-
 } ;
 
 HELP: convert-timezone
-{ $values { "timestamp" timestamp } { "duration" duration } { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "duration" duration } { "timestamp'" timestamp } }
 { $description "Converts the " { $snippet "timestamp" } "'s " { $snippet "gmt-offset" } " to the GMT offset represented by the " { $snippet "duration" } "." }
 { $examples
     { $example "USING: accessors calendar prettyprint ;"
@@ -319,7 +319,7 @@ HELP: convert-timezone
 } ;
 
 HELP: >local-time
-{ $values { "timestamp" timestamp } { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Converts the " { $snippet "timestamp" } " to the timezone of your computer." }
 { $examples
     { $example "USING: accessors calendar kernel prettyprint ;"
@@ -329,7 +329,7 @@ HELP: >local-time
 } ;
 
 HELP: >gmt
-{ $values { "timestamp" timestamp } { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Converts the " { $snippet "timestamp" } " to the GMT timezone." }
 { $examples
     { $example "USING: accessors calendar kernel prettyprint ;"

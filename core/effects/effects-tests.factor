@@ -1,4 +1,4 @@
-USING: effects kernel tools.test prettyprint accessors
+USING: effects effects.parser eval kernel tools.test prettyprint accessors
 quotations sequences ;
 IN: effects.tests
 
@@ -9,6 +9,13 @@ IN: effects.tests
 [ f ] [ { "a" "b" } { "a" "b" "c" } <effect> { "a" "b" } { "a" "b" } <effect> effect<= ] unit-test
 [ 2 ] [ (( a b -- c )) in>> length ] unit-test
 [ 1 ] [ (( a b -- c )) out>> length ] unit-test
+
+[ t ] [ (( a b -- c )) (( ... a b -- ... c )) effect<= ] unit-test
+[ t ] [ (( b -- )) (( ... a b -- ... c )) effect<= ] unit-test
+[ f ] [ (( ... a b -- ... c )) (( a b -- c )) effect<= ] unit-test
+[ f ] [ (( ... b -- ... )) (( a b -- c )) effect<= ] unit-test
+[ f ] [ (( a b -- c )) (( ... a b -- c )) effect<= ] unit-test
+[ f ] [ (( a b -- c )) (( ..x a b -- ..y c )) effect<= ] unit-test
 
 [ "(( object -- object ))" ] [ { f } { f } <effect> unparse ] unit-test
 [ "(( a b -- c d ))" ] [ { "a" "b" } { "c" "d" } <effect> unparse ] unit-test
@@ -27,3 +34,18 @@ IN: effects.tests
 
 [ { object object } ] [ (( a b -- )) effect-in-types ] unit-test
 [ { object sequence } ] [ (( a b: sequence -- )) effect-in-types ] unit-test
+
+[ f   ] [ (( a b c -- d )) in-var>> ] unit-test
+[ f   ] [ (( -- d )) in-var>> ] unit-test
+[ "a" ] [ (( ..a b c -- d )) in-var>> ] unit-test
+[ { "b" "c" } ] [ (( ..a b c -- d )) in>> ] unit-test
+
+[ f   ] [ (( ..a b c -- e )) out-var>> ] unit-test
+[ "d" ] [ (( ..a b c -- ..d e )) out-var>> ] unit-test
+[ { "e" } ] [ (( ..a b c -- ..d e )) out>> ] unit-test
+
+[ "(( a ..b c -- d ))" eval( -- effect ) ]
+[ error>> invalid-row-variable? ] must-fail-with
+
+[ "(( ..a: integer b c -- d ))" eval( -- effect ) ]
+[ error>> row-variable-can't-have-type? ] must-fail-with

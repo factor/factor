@@ -9,37 +9,37 @@ IN: furnace.recaptcha
 
 TUPLE: recaptcha < filter-responder domain public-key private-key ;
 
-SYMBOLS: recaptcha-valid? recaptcha-error ;
+SYMBOL: recaptcha-error
 
-: <recaptcha> ( responder -- obj )
+: <recaptcha> ( responder -- recaptcha )
     recaptcha new
         swap >>responder ;
 
 M: recaptcha call-responder*
-    dup \ recaptcha set
+    dup recaptcha set
     responder>> call-responder ;
 
 <PRIVATE
 
 : (render-recaptcha) ( private-key -- xml )
     dup
-[XML <script type="text/javascript"
-   src=<->>
-</script>
+    [XML
+        <script type="text/javascript"
+           src=<->>
+        </script>
 
-<noscript>
-   <iframe src=<->
-       height="300" width="500" frameborder="0"></iframe><br/>
-   <textarea name="recaptcha_challenge_field" rows="3" cols="40">
-   </textarea>
-   <input type="hidden" name="recaptcha_response_field" 
-       value="manual_challenge"/>
-</noscript>
-XML] ;
+        <noscript>
+           <iframe src=<->
+               height="300" width="500" frameborder="0"></iframe><br/>
+           <textarea name="recaptcha_challenge_field" rows="3" cols="40">
+           </textarea>
+           <input type="hidden" name="recaptcha_response_field"
+               value="manual_challenge"/>
+        </noscript>
+    XML] ;
 
 : recaptcha-url ( secure? -- ? )
-    [ "https://api.recaptcha.net/challenge" ]
-    [ "http://api.recaptcha.net/challenge" ] if
+    "https://api.recaptcha.net/challenge" "http://api.recaptcha.net/challenge" ?
     recaptcha-error cget [ "?error=" glue ] when* >url ;
 
 : render-recaptcha ( -- xml )
@@ -60,17 +60,23 @@ XML] ;
     } URL" http://api-verify.recaptcha.net/verify"
     <post-request> http-request nip parse-recaptcha-response ;
 
-CHLOE: recaptcha
-    drop [ render-recaptcha ] [xml-code] ;
-
-PRIVATE>
-
-: validate-recaptcha ( -- )
+: validate-recaptcha-params ( -- )
     {
         { "recaptcha_challenge_field" [ v-required ] }
         { "recaptcha_response_field" [ v-required ] }
-    } validate-params
+    } validate-params ;
+
+PRIVATE>
+
+CHLOE: recaptcha drop [ render-recaptcha ] [xml-code] ;
+
+: validate-recaptcha ( -- )
+    begin-conversation
+    validate-recaptcha-params
+
     "recaptcha_challenge_field" value
     "recaptcha_response_field" value
-    \ recaptcha get (validate-recaptcha)
-    [ recaptcha-valid? cset ] [ recaptcha-error cset ] bi* ;
+    recaptcha get
+    (validate-recaptcha)
+    recaptcha-error cset
+    [ validation-failed ] unless ;

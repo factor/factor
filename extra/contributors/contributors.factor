@@ -11,7 +11,7 @@ IN: contributors
     ] with-directory ;
 
 : patch-counts ( authors -- assoc )
-    dup prune
+    dup members
     [ dup rot [ = ] with count ] with
     { } map>assoc ;
 

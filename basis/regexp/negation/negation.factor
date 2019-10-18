@@ -3,7 +3,7 @@
 USING: regexp.nfa regexp.disambiguate kernel sequences
 assocs regexp.classes hashtables accessors fry vectors
 regexp.ast regexp.transition-tables regexp.minimize
-regexp.dfa namespaces ;
+regexp.dfa namespaces sets ;
 IN: regexp.negation
 
 CONSTANT: fail-state -1
@@ -21,7 +21,7 @@ CONSTANT: fail-state -1
     fail-state-recurses ;
 
 : inverse-final-states ( transition-table -- final-states )
-    [ transitions>> assoc>set ] [ final-states>> ] bi assoc-diff ;
+    [ transitions>> keys ] [ final-states>> ] bi diff fast-set ;
 
 : negate-table ( transition-table -- transition-table )
     clone
@@ -36,14 +36,14 @@ CONSTANT: fail-state -1
     [ [ [ 1vector ] assoc-map ] assoc-map ] change-transitions ;
 
 : unify-final-state ( transition-table -- transition-table )
-    dup [ final-states>> keys ] keep
+    dup [ final-states>> members ] keep
     '[ -2 epsilon _ set-transition ] each
-    H{ { -2 -2 } } >>final-states ;
+    HS{ -2 } clone >>final-states ;
 
 : adjoin-dfa ( transition-table -- start end )
     unify-final-state renumber-states box-transitions 
     [ start-state>> ]
-    [ final-states>> keys first ]
+    [ final-states>> members first ]
     [ nfa-table get [ transitions>> ] bi@ swap assoc-union! drop ] tri ;
 
 : ast>dfa ( parse-tree -- minimal-dfa )

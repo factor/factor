@@ -33,7 +33,8 @@ CONSTANT: default-world-window-controls
     }
 
 TUPLE: world < track
-    active? focused? grab-input?
+    active? focused? grab-input? fullscreen?
+    saved-position
     layers
     title status status-owner
     text-handle handle images
@@ -217,8 +218,7 @@ ui-error-hook [ [ rethrow ] ] initialize
                 dup [ draw-world* ] with-gl-context
                 flush-layout-cache-hook get call( -- )
             ] [
-                over <world-error> ui-error
-                f >>active? drop
+                swap f >>active? <world-error> ui-error
             ] recover
         ] with-variable
     ] [ drop ] if ;
@@ -230,6 +230,9 @@ action-gestures [
     bi*
 ] H{ } assoc-map-as
 H{
+    { T{ key-down f { S+ } "DELETE" } [ \ cut-action send-action ] }
+    { T{ key-down f { S+ } "INSERT" } [ \ paste-action send-action ] }
+    { T{ key-down f { C+ } "INSERT" } [ \ copy-action send-action ] }
     { T{ button-down f { C+ } 1 } [ drop T{ button-down f f 3 } button-gesture ] }
     { T{ button-down f { A+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }
     { T{ button-down f { M+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }

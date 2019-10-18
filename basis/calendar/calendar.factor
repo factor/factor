@@ -99,12 +99,12 @@ CONSTANT: day-abbreviations3
 : day-abbreviation3 ( n -- string )
     day-abbreviations3 nth ; inline
 
-: average-month ( -- ratio ) 30+5/12 ; inline
-: months-per-year ( -- integer ) 12 ; inline
-: days-per-year ( -- ratio ) 3652425/10000 ; inline
-: hours-per-year ( -- ratio ) 876582/100 ; inline
-: minutes-per-year ( -- ratio ) 5259492/10 ; inline
-: seconds-per-year ( -- integer ) 31556952 ; inline
+CONSTANT: average-month 30+5/12
+CONSTANT: months-per-year 12
+CONSTANT: days-per-year 3652425/10000
+CONSTANT: hours-per-year 876582/100
+CONSTANT: minutes-per-year 5259492/10
+CONSTANT: seconds-per-year 31556952
 
 :: julian-day-number ( year month day -- n )
     #! Returns a composite date number
@@ -170,18 +170,6 @@ M: timestamp easter ( timestamp -- timestamp )
 : microseconds ( x -- duration ) 1000000 / seconds ;
 : nanoseconds ( x -- duration ) 1000000000 / seconds ;
 
-GENERIC: year ( obj -- n )
-M: integer year ;
-M: timestamp year year>> ;
-
-GENERIC: month ( obj -- n )
-M: integer month ;
-M: timestamp month month>> ;
-
-GENERIC: day ( obj -- n )
-M: integer day ;
-M: timestamp day day>> ;
-
 GENERIC: leap-year? ( obj -- ? )
 
 M: integer leap-year? ( year -- ? )
@@ -212,7 +200,7 @@ GENERIC: +second ( timestamp x -- timestamp )
     [ 3 >>month 1 >>day ] when ;
 
 M: integer +year ( timestamp n -- timestamp )
-    [ [ + ] curry change-year adjust-leap-year ] unless-zero ;
+    [ + ] curry change-year adjust-leap-year ;
 
 M: real +year ( timestamp n -- timestamp )
     [ float>whole-part swapd days-per-year * +day swap +year ] unless-zero ;
@@ -316,15 +304,15 @@ M: duration <=> [ duration>years ] compare ;
 
 GENERIC: time- ( time1 time2 -- time3 )
 
-: convert-timezone ( timestamp duration -- timestamp )
+: convert-timezone ( timestamp duration -- timestamp' )
     over gmt-offset>> over = [ drop ] [
         [ over gmt-offset>> time- time+ ] keep >>gmt-offset
     ] if ;
 
-: >local-time ( timestamp -- timestamp )
+: >local-time ( timestamp -- timestamp' )
     gmt-offset-duration convert-timezone ;
 
-: >gmt ( timestamp -- timestamp )
+: >gmt ( timestamp -- timestamp' )
     instant convert-timezone ;
 
 M: timestamp <=> ( ts1 ts2 -- n )

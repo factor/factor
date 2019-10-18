@@ -14,7 +14,7 @@ IN: compiler.tree.normalization.tests
 
 [ 2 ] [ [ 3 [ drop ] [ 2drop 3 ] if ] build-tree count-introductions ] unit-test
 
-: foo ( quot: ( -- ) -- ) call ; inline recursive
+: foo ( ..a quot: ( ..a -- ..b ) -- ..b ) call ; inline recursive
 
 : recursive-inputs ( nodes -- n )
     [ #recursive? ] find nip child>> first in-d>> length ;

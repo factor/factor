@@ -5,6 +5,7 @@ io.streams.string io.styles kernel make math math.parser namespaces
 parser prettyprint.backend prettyprint.config prettyprint.custom
 prettyprint.sections quotations sequences sorting strings vocabs
 vocabs.prettyprint words sets generic ;
+FROM: namespaces => set ;
 IN: prettyprint
 
 : with-use ( obj quot -- )
@@ -26,13 +27,7 @@ IN: prettyprint
 : unparse-use ( obj -- str ) [ pprint-use ] with-string-writer ;
 
 : pprint-short ( obj -- )
-    H{
-       { line-limit 1 }
-       { length-limit 15 }
-       { nesting-limit 2 }
-       { string-limit? t }
-       { boa-tuples? t }
-    } clone [ pprint ] bind ;
+    [ pprint ] with-short-limits ;
 
 : unparse-short ( obj -- str )
     [ pprint-short ] with-string-writer ;

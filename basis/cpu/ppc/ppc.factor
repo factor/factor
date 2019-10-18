@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs sequences kernel combinators make math
 math.order math.ranges system namespaces locals layouts words
-alien alien.accessors alien.c-types alien.data literals cpu.architecture
-cpu.ppc.assembler cpu.ppc.assembler.backend compiler.cfg.registers
+alien alien.accessors alien.c-types alien.complex alien.data
+literals cpu.architecture cpu.ppc.assembler
+cpu.ppc.assembler.backend compiler.cfg.registers
 compiler.cfg.instructions compiler.cfg.comparisons
 compiler.codegen.fixup compiler.cfg.intrinsics
 compiler.cfg.stack-frame compiler.cfg.build-stack-frame
@@ -57,11 +58,9 @@ CONSTANT: vm-reg 15
 
 : %load-vm-addr ( reg -- ) vm-reg MR ;
 
-M: ppc %vm-field ( dst field -- )
-    [ vm-reg ] dip vm-field-offset LWZ ;
+M: ppc %vm-field ( dst field -- ) [ vm-reg ] dip LWZ ;
 
-M: ppc %vm-field-ptr ( dst field -- )
-    [ vm-reg ] dip vm-field-offset ADDI ;
+M: ppc %set-vm-field ( src field -- ) [ vm-reg ] dip STW ;
 
 GENERIC: loc-reg ( loc -- reg )
 
@@ -236,7 +235,7 @@ M: spill-slot float-function-param* [ 1 ] dip n>> spill@ LFD ;
 M: integer float-function-param* FMR ;
 
 : float-function-param ( i src -- )
-    [ float-regs param-regs nth ] dip float-function-param* ;
+    [ float-regs cdecl param-regs nth ] dip float-function-param* ;
 
 : float-function-return ( reg -- )
     float-regs return-reg double-rep %copy ;
@@ -384,7 +383,7 @@ M: ppc %set-alien-float -rot STFS ;
 M: ppc %set-alien-double -rot STFD ;
 
 : load-zone-ptr ( reg -- )
-    "nursery" %vm-field-ptr ;
+    vm-reg "nursery" vm-field-offset ADDI ;
 
 : load-allot-ptr ( nursery-ptr allot-ptr -- )
     [ drop load-zone-ptr ] [ swap 0 LWZ ] 2bi ;
@@ -566,8 +565,7 @@ M:: ppc %compare-float-unordered-branch ( label src1 src2 cc -- )
     } case ;
 
 : next-param@ ( n -- reg x )
-    2 1 stack-frame get total-size>> LWZ
-    [ 2 ] dip param@ ;
+    [ 17 ] dip param@ ;
 
 : store-to-frame ( src n rep -- )
     {
@@ -586,7 +584,7 @@ M: ppc %reload ( dst rep src -- )
 M: ppc %loop-entry ;
 
 M: int-regs return-reg drop 3 ;
-M: int-regs param-regs drop { 3 4 5 6 7 8 9 10 } ;
+M: int-regs param-regs 2drop { 3 4 5 6 7 8 9 10 } ;
 M: float-regs return-reg drop 1 ;
 
 M:: ppc %save-param-reg ( stack reg rep -- )
@@ -603,14 +601,14 @@ M: ppc %push-stack ( -- )
     int-regs return-reg ds-reg 0 STW ;
 
 M: ppc %push-context-stack ( -- )
-    11 "ctx" %vm-field
+    11 %context
     12 11 "datastack" context-field-offset LWZ
     12 12 4 ADDI
     12 11 "datastack" context-field-offset STW
     int-regs return-reg 12 0 STW ;
 
 M: ppc %pop-context-stack ( -- )
-    11 "ctx" %vm-field
+    11 %context
     12 11 "datastack" context-field-offset LWZ
     int-regs return-reg 12 0 LWZ
     12 12 4 SUBI
@@ -646,7 +644,7 @@ M:: ppc %box ( n rep func -- )
     ! If the source is a stack location, load it into freg #0.
     ! If the source is f, then we assume the value is already in
     ! freg #0.
-    n [ 0 rep reg-class-of param-reg rep %load-param-reg ] when*
+    n [ 0 rep reg-class-of cdecl param-reg rep %load-param-reg ] when*
     rep double-rep? 5 4 ? %load-vm-addr
     func f %alien-invoke ;
 
@@ -676,28 +674,18 @@ M: ppc %box-large-struct ( n c-type -- )
     "from_value_struct" f %alien-invoke ;
 
 M:: ppc %restore-context ( temp1 temp2 -- )
-    temp1 "ctx" %vm-field
-    temp2 1 stack-frame get total-size>> ADDI
-    temp2 temp1 "callstack-bottom" context-field-offset STW
+    temp1 %context
     ds-reg temp1 "datastack" context-field-offset LWZ
     rs-reg temp1 "retainstack" context-field-offset LWZ ;
 
 M:: ppc %save-context ( temp1 temp2 -- )
-    temp1 "ctx" %vm-field
+    temp1 %context
     1 temp1 "callstack-top" context-field-offset STW
     ds-reg temp1 "datastack" context-field-offset STW
     rs-reg temp1 "retainstack" context-field-offset STW ;
 
 M: ppc %alien-invoke ( symbol dll -- )
     [ 11 ] 2dip %alien-global 11 MTLR BLRL ;
-
-M: ppc %alien-callback ( quot -- )
-    3 4 %restore-context
-    3 swap %load-reference
-    4 3 quot-entry-point-offset LWZ
-    4 MTLR
-    BLRL
-    3 4 %save-context ;
 
 M: ppc %prepare-alien-indirect ( -- )
     3 ds-reg 0 LWZ
@@ -709,21 +697,11 @@ M: ppc %prepare-alien-indirect ( -- )
 M: ppc %alien-indirect ( -- )
     16 MTLR BLRL ;
 
-M: ppc %callback-value ( ctype -- )
-    ! Save top of data stack
-    3 ds-reg 0 LWZ
-    3 1 0 local@ STW
-    3 %load-vm-addr
-    ! Restore data/call/retain stacks
-    "unnest_stacks" f %alien-invoke
-    ! Restore top of data stack
-    3 1 0 local@ LWZ
-    ! Unbox former top of data stack to return registers
-    unbox-return ;
-
 M: ppc immediate-arithmetic? ( n -- ? ) -32768 32767 between? ;
 
 M: ppc immediate-bitwise? ( n -- ? ) 0 65535 between? ;
+
+M: ppc struct-return-pointer-type void* ;
 
 M: ppc return-struct-in-registers? ( c-type -- ? )
     c-type return-in-registers?>> ;
@@ -756,13 +734,30 @@ M: ppc %box-small-struct ( c-type -- )
     4 3 4 LWZ
     3 3 0 LWZ ;
 
-M: ppc %nest-stacks ( -- )
+M: ppc %begin-callback ( -- )
     3 %load-vm-addr
-    "nest_stacks" f %alien-invoke ;
+    "begin_callback" f %alien-invoke ;
 
-M: ppc %unnest-stacks ( -- )
+M: ppc %alien-callback ( quot -- )
+    3 4 %restore-context
+    3 swap %load-reference
+    4 3 quot-entry-point-offset LWZ
+    4 MTLR
+    BLRL
+    3 4 %save-context ;
+
+M: ppc %end-callback ( -- )
     3 %load-vm-addr
-    "unnest_stacks" f %alien-invoke ;
+    "end_callback" f %alien-invoke ;
+
+M: ppc %end-callback-value ( ctype -- )
+    ! Save top of data stack
+    16 ds-reg 0 LWZ
+    %end-callback
+    ! Restore top of data stack
+    3 16 MR
+    ! Unbox former top of data stack to return registers
+    unbox-return ;
 
 M: ppc %unbox-small-struct ( size -- )
     heap-size cell align cell /i {
@@ -780,4 +775,4 @@ USE: vocabs.loader
     { [ os linux? ] [ "cpu.ppc.linux" require ] }
 } cond
 
-"complex-double" c-type t >>return-in-registers? drop
+complex-double c-type t >>return-in-registers? drop

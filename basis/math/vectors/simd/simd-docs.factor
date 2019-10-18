@@ -8,7 +8,7 @@ ARTICLE: "math.vectors.simd.intro" "Introduction to SIMD support"
 $nl
 "SIMD support in the processor takes the form of instruction sets which operate on vector registers. By operating on multiple scalar values at the same time, code which operates on points, colors, and other vector data can be sped up."
 $nl
-"In Factor, SIMD support is exposed in the form of special-purpose SIMD " { $link "sequence-protocol" } " implementations. These are fixed-length, homogeneous sequences. They are referred to as vectors, but should not be confused with Factor's " { $link "vectors" } ", which can hold any type of object and can be resized.)."
+"In Factor, SIMD support is exposed in the form of special-purpose SIMD " { $link "sequence-protocol" } " implementations. These are fixed-length, homogeneous sequences. They are referred to as vectors, but should not be confused with Factor's " { $link "vectors" } ", which can hold any type of object and can be resized."
 $nl
 "The words in the " { $vocab-link "math.vectors" } " vocabulary, which can be used with any sequence of numbers, are special-cased by the compiler. If the compiler can prove that only SIMD vectors are used, it expands " { $link "math-vectors" } " into " { $link "math.vectors.simd.intrinsics" } ". While in the general case, SIMD intrinsics operate on heap-allocated SIMD vectors, that too can be optimized since in many cases the compiler unbox SIMD vectors, storing them directly in registers."
 $nl
@@ -36,7 +36,7 @@ $nl
 ARTICLE: "math.vectors.simd.types" "SIMD vector types"
 "Each SIMD vector type is named " { $snippet "scalar-count" } ", where " { $snippet "scalar" } " is a scalar C type and " { $snippet "count" } " is a vector dimension."
 $nl
-"The following vector types are available:"
+"The following 128-bit vector types are defined in the " { $vocab-link "math.vectors.simd" } " vocabulary:"
 { $code
     "char-16"
     "uchar-16"
@@ -48,6 +48,19 @@ $nl
     "ulonglong-2"
     "float-4"
     "double-2"
+}
+"Double-width 256-bit vector types are defined in the " { $vocab-link "math.vectors.simd.cords" } " vocabulary:"
+{ $code
+    "char-32"
+    "uchar-32"
+    "short-16"
+    "ushort-16"
+    "int-8"
+    "uint-8"
+    "longlong-4"
+    "ulonglong-4"
+    "float-8"
+    "double-4"
 } ;
 
 ARTICLE: "math.vectors.simd.words" "SIMD vector words"
@@ -142,7 +155,12 @@ M\\ actor advance optimized."""
 """USE: compiler.tree.debugger
 
 M\\ actor advance test-mr mr.""" }
-"An example of a high-performance algorithm that uses SIMD primitives can be found in the " { $vocab-link "benchmark.nbody-simd" } " vocabulary." ;
+"Example of a high-performance algorithms that use SIMD primitives can be found in the following vocabularies:"
+{ $list
+    { $vocab-link "benchmark.nbody-simd" }
+    { $vocab-link "benchmark.raytracer-simd" }
+    { $vocab-link "random.sfmt" }
+} ;
 
 ARTICLE: "math.vectors.simd.intrinsics" "Low-level SIMD primitives"
 "The words in the " { $vocab-link "math.vectors.simd.intrinsics" } " vocabulary are used to implement SIMD support. These words have three disadvantages compared to the higher-level " { $link "math-vectors" } " words:"

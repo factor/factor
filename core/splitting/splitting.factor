@@ -61,7 +61,7 @@ PRIVATE>
     [ drop [ swap [ tail ] unless-zero , ] 2curry ]
     3tri if* ; inline recursive
 
-: split, ( seq quot -- ) [ 0 ] 2dip (split) ; inline
+: split, ( ... seq quot: ( ... elt -- ... ? ) -- ... ) [ 0 ] 2dip (split) ; inline
 
 PRIVATE>
 

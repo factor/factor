@@ -1,2 +1,2 @@
-fraptor ICON "misc/icons/Factor.ico"
+APPICON ICON "misc/icons/Factor.ico"
 

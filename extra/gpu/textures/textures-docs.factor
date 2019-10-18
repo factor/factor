@@ -335,12 +335,16 @@ HELP: compressed-texture-format
 { { $link DXT1-RGBA } }
 { { $link DXT3 } }
 { { $link DXT5 } }
+{ { $link LATC1 } }
+{ { $link LATC1-SIGNED } }
+{ { $link LATC2 } }
+{ { $link LATC2-SIGNED } }
 { { $link RGTC1 } }
 { { $link RGTC1-SIGNED } }
 { { $link RGTC2 } }
 { { $link RGTC2-SIGNED } }
 } }
-{ $notes "The " { $snippet "DXT1" } " formats require either the " { $snippet "GL_EXT_texture_compression_s3tc" } " or " { $snippet "GL_EXT_texture_compression_dxt1" } " extension. The other " { $snippet "DXT" } " formats require the " { $snippet "GL_EXT_texture_compression_s3tc" } " extension. The " { $snippet "RGTC" } " formats require OpenGL 3.0 or later or the " { $snippet "GL_EXT_texture_compression_rgtc" } " extension." } ;
+{ $notes "The " { $snippet "DXT1" } " formats require either the " { $snippet "GL_EXT_texture_compression_s3tc" } " or " { $snippet "GL_EXT_texture_compression_dxt1" } " extension. The other " { $snippet "DXT" } " formats require the " { $snippet "GL_EXT_texture_compression_s3tc" } " extension. The " { $snippet "LATC" } " formats require the " { $snippet "GL_EXT_texture_compression_latc" } " extension. The " { $snippet "RGTC" } " formats require OpenGL 3.0 or later or the " { $snippet "GL_EXT_texture_compression_rgtc" } " extension." } ;
 
 HELP: compressed-texture-data
 { $class-description { $snippet "compressed-texture-data" } " tuples are used to feed compressed texture data to " { $link allocate-compressed-texture } " and " { $link update-compressed-texture } "."

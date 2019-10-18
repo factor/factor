@@ -2,7 +2,7 @@ USING: alien alien.c-types alien.data alien.syntax arrays continuations
 destructors generic io.mmap io.ports io.backend.windows io.files.windows
 kernel libc locals math math.bitwise namespaces quotations sequences windows
 windows.advapi32 windows.kernel32 windows.types io.backend system accessors
-io.backend.windows.privileges classes.struct windows.errors ;
+io.backend.windows.privileges classes.struct windows.errors literals ;
 IN: io.backend.windows.nt.privileges
 
 TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
@@ -11,7 +11,7 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
 !  http://msdn.microsoft.com/msdnmag/issues/05/03/TokenPrivileges/
 
 : (open-process-token) ( handle -- handle )
-    { TOKEN_ADJUST_PRIVILEGES TOKEN_QUERY } flags PHANDLE <c-object>
+    flags{ TOKEN_ADJUST_PRIVILEGES TOKEN_QUERY } PHANDLE <c-object>
     [ OpenProcessToken win32-error=0/f ] keep *void* ;
 
 : open-process-token ( -- handle )

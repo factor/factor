@@ -8,11 +8,19 @@ ARTICLE: "grouping" "Groups and clumps"
 { $subsections groups <groups> <sliced-groups> }
 "Splitting a sequence into overlapping, fixed-length subsequences:"
 { $subsections clump }
+"Splitting a sequence into overlapping, fixed-length subsequences, wrapping around the end of the sequence:"
+{ $subsections circular-clump }
 "A virtual sequence for splitting a sequence into overlapping, fixed-length subsequences:"
 { $subsections clumps <clumps> <sliced-clumps> }
+"A virtual sequence for splitting a sequence into overlapping, fixed-length subsequences:"
+{ $subsections circular-clumps <circular-clumps> <sliced-circular-clumps> }
 "The difference can be summarized as the following:"
 { $list
     { "With groups, the subsequences form the original sequence when concatenated:"
+        { $unchecked-example
+            "USING: grouping ;"
+            "{ 1 2 3 4 } 2 group ." "{ { 1 2 } { 3 4 } }"
+        }
         { $unchecked-example
             "USING: grouping ;"
             "{ 1 2 3 4 } dup" "2 <groups> concat sequence= ." "t"
@@ -21,7 +29,25 @@ ARTICLE: "grouping" "Groups and clumps"
     { "With clumps, collecting the first element of each subsequence but the last one, together with the last subseqence, yields the original sequence:"
         { $unchecked-example
             "USING: grouping ;"
+            "{ 1 2 3 4 } 2 clump ." "{ { 1 2 } { 2 3 } { 3 4 } }"
+        }
+        { $unchecked-example
+            "USING: grouping ;"
             "{ 1 2 3 4 } dup" "2 <clumps> unclip-last [ [ first ] map ] dip append sequence= ." "t"
+        }
+    }
+    { "With circular clumps, collecting the first element of each subsequence yields the original sequence. Collecting the " { $snippet "n" } "th element of each subsequence would rotate the original sequence " { $snippet "n" } " elements rightward:"
+        { $unchecked-example
+            "USING: grouping ;"
+            "{ 1 2 3 4 } 2 circular-clump ." "{ { 1 2 } { 2 3 } { 3 4 } { 4 1 } }"
+        }
+        { $unchecked-example
+            "USING: grouping ;"
+            "{ 1 2 3 4 } dup" "2 <circular-clumps> [ first ] map sequence= ." "t"
+        }
+        { $unchecked-example
+            "USING: grouping ;"
+            "{ 1 2 3 4 } dup" "2 <circular-clumps> [ second ] { } map-as ." "{ 2 3 4 1 }"
         }
     }
 }
@@ -79,16 +105,29 @@ HELP: <sliced-groups>
 } ;
 
 HELP: clumps
-{ $class-description "Instances are virtual sequences whose elements are overlapping fixed-length subsequences o an underlying sequence. Clumps are mutable and resizable if the underlying sequence is mutable and resizable, respectively."
+{ $class-description "Instances are virtual sequences whose elements are overlapping fixed-length subsequences of an underlying sequence. Clumps are mutable and resizable if the underlying sequence is mutable and resizable, respectively."
 $nl
 "New clumps are created by calling " { $link <clumps> } " and " { $link <sliced-clumps> } "." } ;
+
+HELP: circular-clumps
+{ $class-description "Instances are virtual sequences whose elements are overlapping fixed-length subsequences of an underlying sequence, beginning with every element in the original sequence and wrapping around its end. Circular clumps are mutable and resizable if the underlying sequence is mutable and resizable, respectively."
+$nl
+"New clumps are created by calling " { $link <circular-clumps> } " and " { $link <sliced-circular-clumps> } "." } ;
 
 HELP: clump
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "array" "a sequence of sequences" } }
 { $description "Splits the sequence into overlapping clumps of " { $snippet "n" } " elements and collects the clumps into a new array." }
-{ $errors "Throws an error if " { $snippet "n" } " is smaller than the length of the sequence." }
+{ $errors "Throws an error if " { $snippet "n" } " is larger than the length of the sequence." }
 { $examples
     { $example "USING: grouping prettyprint ;" "{ 3 1 3 3 7 } 2 clump ." "{ { 3 1 } { 1 3 } { 3 3 } { 3 7 } }" }
+} ;
+
+HELP: circular-clump
+{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "array" "a sequence of sequences" } }
+{ $description "Splits the sequence into overlapping clumps of " { $snippet "n" } " elements, wrapping around the end of the sequence, and collects the clumps into a new array." }
+{ $errors "Throws an error if " { $snippet "n" } " is larger than the length of the sequence." }
+{ $examples
+    { $example "USING: grouping prettyprint ;" "{ 3 1 3 3 7 } 2 circular-clump ." "{ { 3 1 } { 1 3 } { 3 3 } { 3 7 } { 7 3 } }" }
 } ;
 
 HELP: <clumps>
@@ -111,24 +150,35 @@ HELP: <clumps>
     }
 } ;
 
-HELP: <sliced-clumps>
+HELP: <circular-clumps>
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "clumps" clumps } }
-{ $description "Outputs a virtual sequence whose elements are overlapping slices of " { $snippet "n" } " elements from the underlying sequence." }
+{ $description "Outputs a virtual sequence whose elements are overlapping subsequences of " { $snippet "n" } " elements from the underlying sequence, starting with each of its elements and wrapping around the end of the sequence." }
 { $examples
     { $example
         "USING: kernel sequences grouping prettyprint ;"
-        "{ 1 2 3 4 5 6 } 3 <sliced-clumps> second ."
-        "T{ slice { from 1 } { to 4 } { seq { 1 2 3 4 5 6 } } }"
+        "{ 1 2 3 4 } 3 <circular-clumps> third ."
+        "{ 3 4 1 }"
     }
 } ;
 
-{ clumps groups } related-words
+HELP: <sliced-circular-clumps>
+{ $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "clumps" clumps } }
+{ $description "Outputs a virtual sequence whose elements are overlapping slices of " { $snippet "n" } " elements from the underlying sequence, starting with each of its elements and wrapping around the end of the sequence." }
+{ $examples
+    { $example
+        "USING: arrays kernel sequences grouping prettyprint ;"
+        "{ 1 2 3 4 } 3 <sliced-circular-clumps> third >array ."
+        "{ 3 4 1 }"
+    }
+} ;
 
-{ clump group } related-words
+{ clumps circular-clumps groups } related-words
 
-{ <clumps> <groups> } related-words
+{ clump circular-clump group } related-words
 
-{ <sliced-clumps> <sliced-groups> } related-words
+{ <clumps> <circular-clumps> <groups> } related-words
+
+{ <sliced-clumps> <sliced-circular-clumps> <sliced-groups> } related-words
 
 HELP: monotonic?
 { $values { "seq" sequence } { "quot" { $quotation "( elt elt -- ? )" } } { "?" "a boolean" } }

@@ -59,7 +59,3 @@ M: hashtable make-mirror ;
 M: integer make-mirror drop f ;
 M: enumerated-sequence make-mirror <enum> ;
 M: object make-mirror <mirror> ;
-
-"specialized-arrays" vocab [
-    "specialized-arrays.mirrors" require
-] when

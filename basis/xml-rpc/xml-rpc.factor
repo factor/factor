@@ -186,7 +186,7 @@ TAG: array xml>item
 
 PRIVATE>
 
-: post-rpc ( rpc url -- rpc )
+: post-rpc ( rpc url -- rpc' )
     ! This needs to do something in the event of an error
     rpc-post-request http-request nip string>xml receive-rpc ;
 

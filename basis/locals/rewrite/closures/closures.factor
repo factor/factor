@@ -18,7 +18,7 @@ GENERIC: rewrite-closures* ( obj -- )
 
 GENERIC: defs-vars* ( seq form -- seq' )
 
-: defs-vars ( form -- vars ) { } [ defs-vars* ] reduce prune ;
+: defs-vars ( form -- vars ) { } [ defs-vars* ] reduce members ;
 
 M: def defs-vars* local>> unquote suffix ;
 
@@ -28,7 +28,7 @@ M: object defs-vars* drop ;
 
 GENERIC: uses-vars* ( seq form -- seq' )
 
-: uses-vars ( form -- vars ) { } [ uses-vars* ] reduce prune ;
+: uses-vars ( form -- vars ) { } [ uses-vars* ] reduce members ;
 
 M: local-writer uses-vars* "local-reader" word-prop suffix ;
 

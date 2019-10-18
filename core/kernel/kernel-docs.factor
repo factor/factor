@@ -26,28 +26,28 @@ HELP: -rot  ( x y z -- z x y ) $complex-shuffle ;
 HELP: dupd  ( x y -- x x y )   $complex-shuffle ;
 HELP: swapd ( x y z -- y x z ) $complex-shuffle ;
 
-HELP: datastack ( -- ds )
-{ $values { "ds" array } }
+HELP: datastack ( -- array )
+{ $values { "array" array } }
 { $description "Outputs an array containing a copy of the data stack contents right before the call to this word, with the top of the stack at the end of the array." } ;
 
-HELP: set-datastack ( ds -- )
-{ $values { "ds" array } }
+HELP: set-datastack ( array -- )
+{ $values { "array" array } }
 { $description "Replaces the data stack contents with a copy of an array. The end of the array becomes the top of the stack." } ;
 
-HELP: retainstack ( -- rs )
-{ $values { "rs" array } }
+HELP: retainstack ( -- array )
+{ $values { "array" array } }
 { $description "Outputs an array containing a copy of the retain stack contents right before the call to this word, with the top of the stack at the end of the array." } ;
 
-HELP: set-retainstack ( rs -- )
-{ $values { "rs" array } }
+HELP: set-retainstack ( array -- )
+{ $values { "array" array } }
 { $description "Replaces the retain stack contents with a copy of an array. The end of the array becomes the top of the stack." } ;
 
-HELP: callstack ( -- cs )
-{ $values { "cs" callstack } }
+HELP: callstack ( -- callstack )
+{ $values { "callstack" callstack } }
 { $description "Outputs a copy of the call stack contents, with the top of the stack at the end of the vector. The stack frame of the caller word is " { $emphasis "not" } " included." } ;
 
-HELP: set-callstack ( cs -- * )
-{ $values { "cs" callstack } }
+HELP: set-callstack ( callstack -- * )
+{ $values { "callstack" callstack } }
 { $description "Replaces the call stack contents. Control flow is transferred immediately to the innermost frame of the new call stack." } ;
 
 HELP: clear
@@ -169,7 +169,7 @@ HELP: xor
 { $notes "This word implements boolean exclusive or, so applying it to integers will not yield useful results (all integers have a true value). Bitwise exclusive or is the " { $link bitxor } " word." } ;
 
 HELP: both?
-{ $values { "x" object } { "y" object } { "quot" { $quotation "( obj -- ? )" } } { "?" "a boolean" } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation "( ... obj -- ... ? )" } } { "?" "a boolean" } }
 { $description "Tests if the quotation yields a true value when applied to both " { $snippet "x" } " and " { $snippet "y" } "." }
 { $examples
     { $example "USING: kernel math prettyprint ;" "3 5 [ odd? ] both? ." "t" }
@@ -177,7 +177,7 @@ HELP: both?
 } ;
 
 HELP: either?
-{ $values { "x" object } { "y" object } { "quot" { $quotation "( obj -- ? )" } } { "?" "a boolean" } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation "( ... obj -- ... ? )" } } { "?" "a boolean" } }
 { $description "Tests if the quotation yields a true value when applied to either " { $snippet "x" } " or " { $snippet "y" } "." }
 { $examples
     { $example "USING: kernel math prettyprint ;" "3 6 [ odd? ] either? ." "t" }
@@ -208,28 +208,23 @@ HELP: call
 
 { call POSTPONE: call( } related-words
 
-HELP: call-clear ( quot -- * )
-{ $values { "quot" callable } }
-{ $description "Calls a quotation with an empty call stack. If the quotation returns, Factor will exit.." }
-{ $notes "Used to implement " { $link "threads" } "." } ;
-
 HELP: keep
-{ $values { "x" object } { "quot" { $quotation "( x -- ... )" } } }
+{ $values { "x" object } { "quot" { $quotation "( ..a x -- ..b )" } } }
 { $description "Call a quotation with a value on the stack, restoring the value when the quotation returns." }
 { $examples
     { $example "USING: arrays kernel prettyprint ;" "2 \"greetings\" [ <array> ] keep 2array ." "{ { \"greetings\" \"greetings\" } \"greetings\" }" }
 } ;
 
 HELP: 2keep
-{ $values { "x" object } { "y" object } { "quot" { $quotation "( x y -- ... )" } } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation "( ..a x y -- ..b )" } } }
 { $description "Call a quotation with two values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: 3keep
-{ $values { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( x y z -- ... )" } } }
+{ $values { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( ..a x y z -- ..b )" } } }
 { $description "Call a quotation with three values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: bi
-{ $values { "x" object } { "p" { $quotation "( x -- ... )" } } { "q" { $quotation "( x -- ... )" } } }
+{ $values { "x" object } { "p" { $quotation "( ..a x -- ..b )" } } { "q" { $quotation "( ..c x -- ..d )" } } }
 { $description "Applies " { $snippet "p" } " to " { $snippet "x" } ", then applies " { $snippet "q" } " to " { $snippet "x" } "." }
 { $examples
     "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x -- )" } ", then the following two lines are equivalent:"
@@ -580,28 +575,84 @@ HELP: if
 { $values { "?" "a generalized boolean" } { "true" quotation } { "false" quotation } }
 { $description "If " { $snippet "cond" } " is " { $link f } ", calls the " { $snippet "false" } " quotation. Otherwise calls the " { $snippet "true" } " quotation."
 $nl
-"The " { $snippet "cond" } " value is removed from the stack before either quotation is called." } ;
+"The " { $snippet "cond" } " value is removed from the stack before either quotation is called." }
+{ $examples
+    { $example
+        "USING: io kernel math ;"
+        "10 3 < [ \"Math is broken\" print ] [ \"Math is good\" print ] if"
+        "Math is good"
+    }
+} ;
 
 HELP: when
 { $values { "?" "a generalized boolean" } { "true" quotation } }
 { $description "If " { $snippet "cond" } " is not " { $link f } ", calls the " { $snippet "true" } " quotation."
 $nl
-"The " { $snippet "cond" } " value is removed from the stack before the quotation is called." } ;
+"The " { $snippet "cond" } " value is removed from the stack before the quotation is called." }
+{ $examples
+    { $example
+        "USING: kernel math prettyprint ;"
+        "-5 dup 0 < [ 3 + ] when ."
+        "-2"
+    }
+} ;
 
 HELP: unless
 { $values { "?" "a generalized boolean" } { "false" quotation } }
 { $description "If " { $snippet "cond" } " is " { $link f } ", calls the " { $snippet "false" } " quotation."
 $nl
-"The " { $snippet "cond" } " value is removed from the stack before the quotation is called." } ;
+"The " { $snippet "cond" } " value is removed from the stack before the quotation is called." }
+{ $examples
+    { $example
+        "USING: kernel math prettyprint sequences ;"
+        "IN: scratchpad"
+        ""
+        "CONSTANT: american-cities {"
+        "    \"San Francisco\""
+        "    \"Los Angeles\""
+        "    \"New York\""
+        "}"
+        ""
+        ": add-tax ( price city -- price' )"
+        "    american-cities member? [ 1.1 * ] unless ;"
+        ""
+        "123 \"Ottawa\" add-tax ."
+        "135.3"
+    }
+} ;
 
 HELP: if*
-{ $values { "?" "a generalized boolean" } { "true" { $quotation "( cond -- ... )" } } { "false" quotation } }
+{ $values { "?" "a generalized boolean" } { "true" { $quotation "( ..a ? -- ..b )" } } { "false" { $quotation "( ..a -- ..b )" } } }
 { $description "Alternative conditional form that preserves the " { $snippet "cond" } " value if it is true."
 $nl
 "If the condition is true, it is retained on the stack before the " { $snippet "true" } " quotation is called. Otherwise, the condition is removed from the stack and the " { $snippet "false" } " quotation is called."
 $nl
 "The following two lines are equivalent:"
-{ $code "X [ Y ] [ Z ] if*" "X dup [ Y ] [ drop Z ] if" } } ;
+{ $code "X [ Y ] [ Z ] if*" "X dup [ Y ] [ drop Z ] if" } }
+{ $examples
+    "Notice how in this example, the same value is tested by the conditional, and then used in the true branch; the false branch does not need to drop the value because of how " { $link if* } " works:"
+    { $example
+        "USING: assocs io kernel math.parser ;"
+        "IN: scratchpad"
+        ""
+        ": curry-price ( meat -- price )
+    {
+        { \"Beef\" 10 }
+        { \"Chicken\" 12 }
+        { \"Lamb\" 13 }
+    } at ;
+
+: order-curry ( meat -- )
+    curry-price [
+        \"Your order will be \" write
+        number>string write
+        \" dollars.\" write
+    ] [ \"Invalid order.\" print ] if* ;"
+        ""
+        "\"Deer\" order-curry"
+        "Invalid order."
+    }
+} ;
 
 HELP: when*
 { $values { "?" "a generalized boolean" } { "true" { $quotation "( cond -- ... )" } } }
@@ -618,7 +669,7 @@ HELP: unless*
 { $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" } } ;
 
 HELP: ?if
-{ $values { "default" object } { "cond" "a generalized boolean" } { "true" { $quotation "( cond -- ... )" } } { "false" { $quotation "( default -- ... )" } } }
+{ $values { "default" object } { "cond" "a generalized boolean" } { "true" { $quotation "( ..a cond -- ..b )" } } { "false" { $quotation "( ..a default -- ..b )" } } }
 { $description "If the condition is " { $link f } ", the " { $snippet "false" } " quotation is called with the " { $snippet "default" } " value on the stack. Otherwise, the " { $snippet "true" } " quotation is called with the condition on the stack." }
 { $notes
 "The following two lines are equivalent:"
@@ -708,7 +759,7 @@ HELP: 3curry
 { $notes "This operation is efficient and does not copy the quotation." } ;
 
 HELP: with
-{ $values { "param" object } { "obj" object } { "quot" { $quotation "( param elt -- ... )" } } { "obj" object } { "curry" curry } }
+{ $values { "param" object } { "obj" object } { "quot" { $quotation "( param elt -- ... )" } } { "curry" curry } }
 { $description "Partial application on the left. The following two lines are equivalent:"
     { $code "swap [ swap A ] curry B" }
     { $code "[ A ] with B" }
@@ -771,15 +822,15 @@ HELP: 4dip
 } ;
 
 HELP: while
-{ $values { "pred" { $quotation "( -- ? )" } } { "body" "a quotation" } }
+{ $values { "pred" { $quotation "( ..a -- ..b ? )" } } { "body" { $quotation "( ..b -- ..a )" } } }
 { $description "Calls " { $snippet "body" } " until " { $snippet "pred" } " returns " { $link f } "." } ;
 
 HELP: until
-{ $values { "pred" { $quotation "( -- ? )" } } { "body" "a quotation" } }
+{ $values { "pred" { $quotation "( ..a -- ..b ? )" } } { "body" { $quotation "( ..b -- ..a )" } } }
 { $description "Calls " { $snippet "body" } " until " { $snippet "pred" } " returns " { $link t } "." } ;
 
 HELP: do
-{ $values { "pred" { $quotation "( -- ? )" } } { "body" "a quotation" } }
+{ $values { "pred" { $quotation "( ..a -- ..b ? )" } } { "body" { $quotation "( ..b -- ..a )" } } }
 { $description "Executes one iteration of a " { $link while } " or " { $link until } " loop." } ;
 
 HELP: loop

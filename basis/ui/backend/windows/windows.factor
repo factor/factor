@@ -14,6 +14,7 @@ math.order calendar ascii sets io.encodings.utf16n
 windows.errors literals ui.pixel-formats
 ui.pixel-formats.private memoize classes colors
 specialized-arrays classes.struct alien.data ;
+FROM: namespaces => set ;
 SPECIALIZED-ARRAY: POINT
 IN: ui.backend.windows
 
@@ -212,7 +213,7 @@ PRIVATE>
             dup win32-error=0/f
     
         dup GlobalLock dup win32-error=0/f
-        swapd byte-array>memory
+        rot binary-object memcpy
         dup GlobalUnlock win32-error=0/f
         CF_UNICODETEXT swap SetClipboardData win32-error=0/f
     ] with-clipboard ;
@@ -608,7 +609,7 @@ SYMBOL: trace-messages?
 
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
-    uint { void* uint long long } "stdcall" [
+    uint { void* uint long long } stdcall [
         pick
         trace-messages? get-global [ dup windows-message-name name>> print flush ] when
         wm-handlers get-global at* [ call ] [ drop DefWindowProc ] if
@@ -627,12 +628,12 @@ M: windows-ui-backend do-events
     WNDCLASSEX <struct> f GetModuleHandle
     class-name-ptr pick GetClassInfoEx 0 = [
         WNDCLASSEX heap-size >>cbSize
-        { CS_HREDRAW CS_VREDRAW CS_OWNDC } flags >>style
+        flags{ CS_HREDRAW CS_VREDRAW CS_OWNDC } >>style
         ui-wndproc >>lpfnWndProc
         0 >>cbClsExtra
         0 >>cbWndExtra
         f GetModuleHandle >>hInstance
-        f GetModuleHandle "fraptor" utf16n string>alien LoadIcon >>hIcon
+        f GetModuleHandle "APPICON" utf16n string>alien LoadIcon >>hIcon
         f IDC_ARROW LoadCursor >>hCursor
 
         class-name-ptr >>lpszClassName
@@ -783,6 +784,9 @@ M: windows-ui-backend (with-ui)
 M: windows-ui-backend beep ( -- )
     0 MessageBeep drop ;
 
+M: windows-ui-backend system-alert
+    [ f ] 2dip swap MB_OK MessageBox drop ;
+
 : fullscreen-RECT ( hwnd -- RECT )
     MONITOR_DEFAULTTONEAREST MonitorFromWindow
     MONITORINFOEX <struct>
@@ -807,8 +811,7 @@ M: windows-ui-backend (ungrab-input) ( handle -- )
     f ClipCursor drop
     1 ShowCursor drop ;
 
-: fullscreen-flags ( -- n )
-    { WS_CAPTION WS_BORDER WS_THICKFRAME } flags ; inline
+CONSTANT: fullscreen-flags { WS_CAPTION WS_BORDER WS_THICKFRAME }
 
 : enter-fullscreen ( world -- )
     handle>> hWnd>>
@@ -834,7 +837,7 @@ M: windows-ui-backend (ungrab-input) ( handle -- )
         [
             f
             over hwnd>RECT get-RECT-dimensions
-            { SWP_NOMOVE SWP_NOSIZE SWP_NOZORDER SWP_FRAMECHANGED } flags
+            flags{ SWP_NOMOVE SWP_NOSIZE SWP_NOZORDER SWP_FRAMECHANGED }
             SetWindowPos win32-error=0/f
         ]
         [ SW_RESTORE ShowWindow win32-error=0/f ]

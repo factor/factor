@@ -1,9 +1,39 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences byte-arrays bit-arrays math hints ;
+USING: kernel accessors sequences byte-arrays bit-arrays math hints sets ;
 IN: bit-sets
 
+TUPLE: bit-set { table bit-array read-only } ;
+
+: <bit-set> ( capacity -- bit-set )
+    <bit-array> bit-set boa ;
+
+INSTANCE: bit-set set
+
+M: bit-set in?
+    over integer? [ table>> ?nth ] [ 2drop f ] if ; inline
+
+M: bit-set adjoin
+    ! This is allowed to crash when the elt couldn't go in the set
+    [ t ] 2dip table>> set-nth ;
+
+M: bit-set delete
+    ! This isn't allowed to crash if the elt wasn't in the set
+    over integer? [
+        table>> 2dup bounds-check? [
+            [ f ] 2dip set-nth
+        ] [ 2drop ] if
+    ] [ 2drop ] if ;
+
+! If you do binary set operations with a bitset, it's expected
+! that the other thing can also be represented as a bitset
+! of the same length.
 <PRIVATE
+
+ERROR: check-bit-set-failed ;
+
+: check-bit-set ( bit-set -- bit-set )
+    dup bit-set? [ check-bit-set-failed ] unless ; inline
 
 : bit-set-map ( seq1 seq2 quot -- seq )
     [ 2drop length>> ]
@@ -14,18 +44,43 @@ IN: bit-sets
         ] dip 2map
     ] 3bi bit-array boa ; inline
 
+: (bit-set-op) ( set1 set2 -- table1 table2 )
+    [ set-like ] keep [ table>> ] bi@ ; inline
+
+: bit-set-op ( set1 set2 quot: ( a b -- c ) -- bit-set )
+    [ (bit-set-op) ] dip bit-set-map bit-set boa ; inline
+
 PRIVATE>
 
-: bit-set-union ( seq1 seq2 -- seq ) [ bitor ] bit-set-map ;
+M: bit-set union
+    [ bitor ] bit-set-op ;
 
-HINTS: bit-set-union bit-array bit-array ;
+M: bit-set intersect
+    [ bitand ] bit-set-op ;
 
-: bit-set-intersect ( seq1 seq2 -- seq ) [ bitand ] bit-set-map ;
+M: bit-set diff
+    [ bitnot bitand ] bit-set-op ;
 
-HINTS: bit-set-intersect bit-array bit-array ;
+M: bit-set subset?
+    [ intersect ] keep = ;
 
-: bit-set-diff ( seq1 seq2 -- seq ) [ bitnot bitand ] bit-set-map ;
+M: bit-set members
+    [ table>> length iota ] keep [ in? ] curry filter ;
 
-HINTS: bit-set-diff bit-array bit-array ;
+<PRIVATE
 
-: bit-set-subset? ( seq1 seq2 -- ? ) dupd bit-set-intersect = ;
+: bit-set-like ( set bit-set -- bit-set' )
+    ! This crashes if there are keys that can't be put in the bit set
+    over bit-set? [ 2dup [ table>> length ] bi@ = ] [ f ] if
+    [ drop ] [
+        [ members ] dip table>> length <bit-set>
+        [ [ adjoin ] curry each ] keep
+    ] if ;
+
+PRIVATE>
+
+M: bit-set set-like
+    bit-set-like check-bit-set ; inline
+
+M: bit-set clone
+    table>> clone bit-set boa ;

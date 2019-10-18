@@ -11,7 +11,7 @@ STRUCT: addrinfo
     { socktype int }
     { protocol int }
     { addrlen socklen_t }
-    { canonname char* }
+    { canonname c-string }
     { addr void* }
     { next addrinfo* } ;
 
@@ -32,7 +32,7 @@ STRUCT: utmpx
 
 CONSTANT: __DARWIN_MAXPATHLEN 1024
 CONSTANT: __DARWIN_MAXNAMELEN 255
-CONSTANT: __DARWIN_MAXNAMELEN+1 255
+CONSTANT: __DARWIN_MAXNAMELEN+1 256
 
 STRUCT: dirent
     { d_ino ino_t }

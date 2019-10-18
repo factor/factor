@@ -6,13 +6,13 @@ continuations urls hashtables accessors namespaces xml.data
 io.encodings.8-bit.latin1 ;
 IN: http.tests
 
-[ "text/plain" latin1 ] [ "text/plain" parse-content-type ] unit-test
+[ "text/plain" "UTF-8" ] [ "text/plain" parse-content-type ] unit-test
 
-[ "text/html" utf8 ] [ "text/html;  charset=UTF-8" parse-content-type ] unit-test
+[ "text/html" "ASCII" ] [ "text/html;  charset=ASCII" parse-content-type ] unit-test
 
-[ "text/html" utf8 ] [ "text/html; charset=\"utf-8\"" parse-content-type ] unit-test
+[ "text/html" "utf-8" ] [ "text/html; charset=\"utf-8\"" parse-content-type ] unit-test
 
-[ "application/octet-stream" binary ] [ "application/octet-stream" parse-content-type ] unit-test
+[ "application/octet-stream" f ] [ "application/octet-stream" parse-content-type ] unit-test
 
 : lf>crlf ( string -- string' ) "\n" split "\r\n" join ;
 
@@ -115,7 +115,8 @@ blah
         { header H{ { "content-type" "text/html; charset=UTF-8" } } }
         { cookies { } }
         { content-type "text/html" }
-        { content-charset utf8 }
+        { content-charset "UTF-8" }
+        { content-encoding utf8 }
     }
 ] [
     read-response-test-1 lf>crlf

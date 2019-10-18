@@ -1,10 +1,11 @@
-! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman
+! Copyright (C) 2005, 2010 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel io sequences io.buffers io.timeouts generic
 byte-vectors system io.encodings math.order io.backend
-continuations classes byte-arrays namespaces splitting
-grouping dlists assocs io.encodings.binary summary accessors
-destructors combinators ;
+continuations classes byte-arrays namespaces splitting grouping
+dlists alien alien.c-types assocs io.encodings.binary summary
+accessors destructors combinators fry specialized-arrays ;
+SPECIALIZED-ARRAY: uchar
 IN: io.ports
 
 SYMBOL: default-buffer-size
@@ -111,14 +112,17 @@ M: output-port stream-write1
     1 over wait-to-write
     buffer>> byte>buffer ; inline
 
+: write-in-groups ( byte-array port -- )
+    [ binary-object <direct-uchar-array> ] dip
+    [ buffer>> size>> <groups> ] [ '[ _ stream-write ] ] bi
+    each ;
+
 M: output-port stream-write
     dup check-disposed
-    over length over buffer>> size>> > [
-        [ buffer>> size>> <groups> ]
-        [ [ stream-write ] curry ] bi
-        each
+    2dup [ byte-length ] [ buffer>> size>> ] bi* > [
+        write-in-groups
     ] [
-        [ [ length ] dip wait-to-write ]
+        [ [ byte-length ] dip wait-to-write ]
         [ buffer>> >buffer ] 2bi
     ] if ;
 

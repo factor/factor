@@ -13,8 +13,8 @@ SINGLETONS: f2c-abi g95-abi gfortran-abi intel-unix-abi intel-windows-abi ;
 
 << 
 : add-f2c-libraries ( -- )
-    "I77" "libI77.so" "cdecl" add-library
-    "F77" "libF77.so" "cdecl" add-library ;
+    "I77" "libI77.so" cdecl add-library
+    "F77" "libF77.so" cdecl add-library ;
 
 os netbsd? [ add-f2c-libraries ] when
 >>
@@ -42,11 +42,11 @@ library-fortran-abis [ H{ } clone ] initialize
     [ "__" append ] [ "_" append ] if ;
 
 HOOK: fortran-c-abi fortran-abi ( -- abi )
-M: f2c-abi fortran-c-abi "cdecl" ;
-M: g95-abi fortran-c-abi "cdecl" ;
-M: gfortran-abi fortran-c-abi "cdecl" ;
-M: intel-unix-abi fortran-c-abi "cdecl" ;
-M: intel-windows-abi fortran-c-abi "cdecl" ;
+M: f2c-abi fortran-c-abi cdecl ;
+M: g95-abi fortran-c-abi cdecl ;
+M: gfortran-abi fortran-c-abi cdecl ;
+M: intel-unix-abi fortran-c-abi cdecl ;
+M: intel-windows-abi fortran-c-abi cdecl ;
 
 HOOK: real-functions-return-double? fortran-abi ( -- ? )
 M: f2c-abi real-functions-return-double? t ;
@@ -392,13 +392,13 @@ PRIVATE>
 
 : fortran-arg-type>c-type ( fortran-type -- c-type added-args )
     parse-fortran-type
-    [ (fortran-type>c-type) resolve-pointer-type ]
+    [ (fortran-type>c-type) <pointer> ]
     [ added-c-args ] bi ;
 : fortran-ret-type>c-type ( fortran-type -- c-type added-args )
     parse-fortran-type dup returns-by-value?
     [ (fortran-ret-type>c-type) { } ] [
         c:void swap 
-        [ added-c-args ] [ (fortran-type>c-type) resolve-pointer-type ] bi prefix
+        [ added-c-args ] [ (fortran-type>c-type) <pointer> ] bi prefix
     ] if ;
 
 : fortran-arg-types>c-types ( fortran-types -- c-types )
@@ -434,15 +434,15 @@ MACRO: fortran-invoke ( return library function parameters -- )
     [ \ fortran-invoke 5 [ ] nsequence ] dip define-declared ;
 
 SYNTAX: SUBROUTINE: 
-    f "c-library" get scan ";" parse-tokens
+    f current-library get scan ";" parse-tokens
     [ "()" subseq? not ] filter define-fortran-function ;
 
 SYNTAX: FUNCTION:
-    scan "c-library" get scan ";" parse-tokens
+    scan current-library get scan ";" parse-tokens
     [ "()" subseq? not ] filter define-fortran-function ;
 
 SYNTAX: LIBRARY:
     scan
-    [ "c-library" set ]
+    [ current-library set ]
     [ set-fortran-abi ] bi ;
 

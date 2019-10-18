@@ -14,6 +14,10 @@ TUPLE: deploy-gadget < pack vocab settings ;
     deploy-name get <model-field>
     "Executable name:" label-on-left add-gadget ;
 
+: deploy-console ( parent -- parent )
+    deploy-console? get
+    "Deploy as Windows console application" <checkbox> add-gadget ;
+
 : deploy-ui ( parent -- parent )
     deploy-ui? get
     "Include user interface framework" <checkbox> add-gadget ;
@@ -45,6 +49,7 @@ TUPLE: deploy-gadget < pack vocab settings ;
             <pile>
             bundle-name
             deploy-ui
+            deploy-console
             io-settings
             reflection-settings
             advanced-settings

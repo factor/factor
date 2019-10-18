@@ -51,6 +51,7 @@ UNION: ?float-array float-array POSTPONE: f ;
 
 VARIANT: compressed-texture-format
     DXT1-RGB DXT1-RGBA DXT3 DXT5
+    LATC1 LATC1-SIGNED LATC2 LATC2-SIGNED
     RGTC1 RGTC1-SIGNED RGTC2 RGTC2-SIGNED ;
 
 TUPLE: compressed-texture-data

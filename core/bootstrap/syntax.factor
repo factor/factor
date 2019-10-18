@@ -29,6 +29,7 @@ IN: bootstrap.syntax
         "HEX:"
         "HOOK:"
         "H{"
+        "HS{"
         "IN:"
         "INSTANCE:"
         "M:"
@@ -49,6 +50,7 @@ IN: bootstrap.syntax
         "SYMBOLS:"
         "CONSTANT:"
         "TUPLE:"
+        "final"
         "SLOT:"
         "T{"
         "UNION:"
@@ -87,6 +89,12 @@ IN: bootstrap.syntax
         "read-only"
         "call("
         "execute("
+        "<<<<<<"
+        "======"
+        ">>>>>>"
+        "<<<<<<<"
+        "======="
+        ">>>>>>>"
     } [ "syntax" create drop ] each
 
     "t" "syntax" lookup define-symbol

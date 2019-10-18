@@ -246,7 +246,7 @@ cell factor_vm::unbox_array_size_slow()
 		}
 	}
 
-	general_error(ERROR_ARRAY_SIZE,ctx->pop(),tag_fixnum(array_size_max),NULL);
+	general_error(ERROR_ARRAY_SIZE,ctx->pop(),tag_fixnum(array_size_max));
 	return 0; /* can't happen */
 }
 
@@ -260,10 +260,12 @@ void factor_vm::primitive_bignum_to_float()
 	ctx->replace(allot_float(bignum_to_float(ctx->peek())));
 }
 
-void factor_vm::primitive_float_to_str()
+void factor_vm::primitive_format_float()
 {
-	byte_array *array = allot_byte_array(33);
-	SNPRINTF((char *)(array + 1),32,"%.16g",untag_float_check(ctx->pop()));
+	byte_array *array = allot_byte_array(100);
+	char *format = alien_offset(ctx->pop());
+	double value = untag_float_check(ctx->pop());
+	SNPRINTF(array->data<char>(),99,format,value);
 	ctx->push(tag<byte_array>(array));
 }
 

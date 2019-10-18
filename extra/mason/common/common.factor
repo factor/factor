@@ -17,8 +17,8 @@ SYMBOL: current-git-id
 
 : short-running-process ( command -- )
     #! Give network operations and shell commands at most
-    #! 15 minutes to complete, to catch hangs.
-    >process 15 minutes >>timeout try-output-process ;
+    #! 30 minutes to complete, to catch hangs.
+    >process 30 minutes >>timeout try-output-process ;
 
 HOOK: really-delete-tree os ( path -- )
 

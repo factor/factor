@@ -183,8 +183,6 @@ PRIVATE>
 ! Literal syntax
 SYNTAX: URL" lexer get skip-blank parse-string >url suffix! ;
 
-USING: vocabs vocabs.loader ;
+USE: vocabs.loader
 
-"prettyprint" vocab [
-    "urls.prettyprint" require
-] when
+"prettyprint" "urls.prettyprint" require-when

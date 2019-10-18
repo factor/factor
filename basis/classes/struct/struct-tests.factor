@@ -1,12 +1,14 @@
 ! (c)Joe Groff bsd license
-USING: accessors alien alien.c-types alien.data ascii
-assocs byte-arrays classes.struct classes.tuple.private
-combinators compiler.tree.debugger compiler.units destructors
-io.encodings.utf8 io.pathnames io.streams.string kernel libc
-literals math mirrors namespaces prettyprint
-prettyprint.config see sequences specialized-arrays system
-tools.test parser lexer eval layouts ;
+USING: accessors alien alien.c-types alien.data alien.syntax ascii
+assocs byte-arrays classes.struct classes.tuple.parser
+classes.tuple.private classes.tuple combinators compiler.tree.debugger
+compiler.units destructors io.encodings.utf8 io.pathnames
+io.streams.string kernel libc literals math mirrors namespaces
+prettyprint prettyprint.config see sequences specialized-arrays
+system tools.test parser lexer eval layouts generic.single classes
+vocabs ;
 FROM: math => float ;
+FROM: specialized-arrays.private => specialized-array-vocab ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: char
 SPECIALIZED-ARRAY: int
@@ -139,7 +141,7 @@ UNION-STRUCT: struct-test-float-and-bits
 [ 123 ] [ [ struct-test-foo malloc-struct &free y>> ] with-destructors ] unit-test
 
 STRUCT: struct-test-string-ptr
-    { x char* } ;
+    { x c-string } ;
 
 [ "hello world" ] [
     [
@@ -219,7 +221,7 @@ UNION-STRUCT: struct-test-float-and-bits
         { type bool }
         { class object }
     }
-} ] [ "struct-test-foo" c-type fields>> ] unit-test
+} ] [ struct-test-foo c-type fields>> ] unit-test
 
 [ {
     T{ struct-slot-spec
@@ -236,7 +238,7 @@ UNION-STRUCT: struct-test-float-and-bits
         { class integer }
         { initial 0 }
     }
-} ] [ "struct-test-float-and-bits" c-type fields>> ] unit-test
+} ] [ struct-test-float-and-bits c-type fields>> ] unit-test
 
 STRUCT: struct-test-equality-1
     { x int } ;
@@ -303,6 +305,12 @@ SPECIALIZED-ARRAY: struct-test-optimization
     { x>> } inlined?
 ] unit-test
 
+[ ] [
+    [
+        struct-test-optimization specialized-array-vocab forget-vocab
+    ] with-compilation-unit
+] unit-test
+
 ! Test cloning structs
 STRUCT: clone-test-struct { x int } { y char[3] } ;
 
@@ -334,24 +342,40 @@ STRUCT: struct-that's-a-word { x int } ;
     "struct-class-test-1" parse-stream
 ] [ error>> error>> unexpected-eof? ] must-fail-with
 
+[
+    "USING: alien.c-types classes.struct ; IN: classes.struct.tests STRUCT: struct-test-duplicate-slots { x uint } { x uint } ;" eval( -- )
+] [ error>> duplicate-slot-names? ] must-fail-with
+
+[
+    "USING: alien.c-types classes.struct ; IN: classes.struct.tests STRUCT: struct-test-duplicate-slots { x uint } { x float } ;" eval( -- )
+] [ error>> duplicate-slot-names? ] must-fail-with
+
 ! S{ with non-struct type
 [
     "USE: classes.struct IN: classes.struct.tests TUPLE: not-a-struct ; S{ not-a-struct }"
     eval( -- value )
-] must-fail
+] [ error>> no-method? ] must-fail-with
 
 ! Subclassing a struct class should not be allowed
 [
-    "USE: classes.struct IN: classes.struct.tests STRUCT: a-struct { x int } ; TUPLE: not-a-struct < a-struct ;"
+    "USING: alien.c-types classes.struct ; IN: classes.struct.tests STRUCT: a-struct { x int } ; TUPLE: not-a-struct < a-struct ;"
     eval( -- )
-] must-fail
+] [ error>> bad-superclass? ] must-fail-with
 
-! Remove c-type when struct class is forgotten
-[ ] [
-    "USE: classes.struct IN: classes.struct.tests TUPLE: a-struct ;" eval( -- )
-] unit-test
+! Changing a superclass into a struct should reset the subclass
+TUPLE: will-become-struct ;
 
-[ f ] [ "a-struct" c-types get key? ] unit-test
+TUPLE: a-subclass < will-become-struct ;
+
+[ f ] [ will-become-struct struct-class? ] unit-test
+
+[ will-become-struct ] [ a-subclass superclass ] unit-test
+
+[ ] [ "IN: classes.struct.tests USING: classes.struct alien.c-types ; STRUCT: will-become-struct { x int } ;" eval( -- ) ] unit-test
+
+[ t ] [ will-become-struct struct-class? ] unit-test
+
+[ tuple ] [ a-subclass superclass ] unit-test
 
 STRUCT: bit-field-test
     { a uint bits: 12 }
@@ -365,6 +389,63 @@ STRUCT: bit-field-test
 [ -2 ] [ bit-field-test <struct> 2 >>b b>> ] unit-test
 [ 1 ] [ bit-field-test <struct> 257 >>c c>> ] unit-test
 [ 3 ] [ bit-field-test heap-size ] unit-test
+
+STRUCT: referent
+    { y int } ;
+STRUCT: referrer
+    { x referent* } ;
+
+[ 57 ] [
+    [
+        referrer <struct>
+            referent malloc-struct &free
+                57 >>y
+            >>x
+        x>> y>>
+    ] with-destructors
+] unit-test
+
+STRUCT: self-referent
+    { x self-referent* }
+    { y int } ;
+
+[ 75 ] [
+    [
+        self-referent <struct>
+            self-referent malloc-struct &free
+                75 >>y
+            >>x
+        x>> y>>
+    ] with-destructors
+] unit-test
+
+C-TYPE: forward-referent
+STRUCT: backward-referent
+    { x forward-referent* }
+    { y int } ;
+STRUCT: forward-referent
+    { x backward-referent* }
+    { y int } ;
+
+[ 41 ] [
+    [
+        forward-referent <struct>
+            backward-referent malloc-struct &free
+                41 >>y
+            >>x
+        x>> y>>
+    ] with-destructors
+] unit-test
+
+[ 14 ] [
+    [
+        backward-referent <struct>
+            forward-referent malloc-struct &free
+                14 >>y
+            >>x
+        x>> y>>
+    ] with-destructors
+] unit-test
 
 cpu ppc? [
     STRUCT: ppc-align-test-1

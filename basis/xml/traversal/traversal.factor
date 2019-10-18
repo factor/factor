@@ -18,7 +18,7 @@ IN: xml.traversal
 : children-tags ( tag -- sequence )
     children>> [ tag? ] filter ;
 
-: first-child-tag ( tag -- tag )
+: first-child-tag ( tag -- child )
     children>> [ tag? ] find nip ;
 
 : tag-named? ( name elem -- ? )

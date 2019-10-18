@@ -33,7 +33,7 @@ HELP: y-up { $class-description "Right-handed 3D coordinate system where Y is up
 HELP: z-up { $class-description "Right-handed 3D coordinate system where Z is up." } ;
 
 HELP: >y-up-axis!
-{ $values { "seq" sequence } { "from-axis" rh-up } { "seq" sequence } }
+{ $values { "seq" sequence } { "from-axis" rh-up } }
 { $description "Destructively swizzles the first three elements of the input sequence to a right-handed 3D coordinate system where Y is up and returns the modified sequence." } ;
 
 HELP: source>seq
@@ -53,7 +53,7 @@ HELP: mesh>vertices
 { $description "Convert the mesh tag's vertices element to a pair for further lookup in " { $link collect-sources } ". " } ;
 
 HELP: collect-sources
-{ $values { "sources" hashtable } { "vertices" pair } { "inputs" tag sequence } { "sources" sequence } }
+{ $values { "sources" hashtable } { "vertices" pair } { "inputs" tag sequence } { "seq" sequence } }
 { $description "Look up the sources for these " { $emphasis "input" } " elements and return a sequence of " { $link source } " tuples." } ;
 
 HELP: group-indices

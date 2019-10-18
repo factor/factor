@@ -61,18 +61,17 @@ M: pathname uses string>> source-file top-level-form>> [ uses ] [ { } ] if* ;
 ! To make UI browser happy
 M: vocab uses drop f ;
 
-GENERIC: crossref-def ( defspec -- )
-
-M: object crossref-def
+: crossref-def ( defspec -- )
     dup uses crossref get add-vertex ;
-
-M: word crossref-def
-    [ call-next-method ] [ subwords [ crossref-def ] each ] bi ;
 
 : defs-to-crossref ( -- seq )
     [
         all-words
+        [ [ generic? not ] filter ]
+        [ [ subwords ] map concat ] bi
+
         all-articles [ >link ] map
+
         source-files get keys [ <pathname> ] map
     ] append-outputs ;
 

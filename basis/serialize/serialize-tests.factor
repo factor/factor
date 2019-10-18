@@ -4,7 +4,8 @@
 USING: tools.test kernel serialize io io.streams.byte-array
 alien arrays byte-arrays bit-arrays specialized-arrays
 sequences math prettyprint parser classes math.constants
-io.encodings.binary random assocs serialize.private alien.c-types ;
+io.encodings.binary random assocs serialize.private alien.c-types
+combinators.short-circuit ;
 SPECIALIZED-ARRAY: double
 IN: serialize.tests
 
@@ -16,11 +17,12 @@ IN: serialize.tests
 [ t ] [
     100 [
         drop
-        40 [        test-serialize-cell ] all-integers?
-         4 [ 40 *   test-serialize-cell ] all-integers?
-         4 [ 400 *  test-serialize-cell ] all-integers?
-         4 [ 4000 * test-serialize-cell ] all-integers?
-        and and and
+        {
+            [ 40 [        test-serialize-cell ] all-integers? ]
+            [  4 [ 40 *   test-serialize-cell ] all-integers? ]
+            [  4 [ 400 *  test-serialize-cell ] all-integers? ]
+            [  4 [ 4000 * test-serialize-cell ] all-integers? ]
+        } 0&&
     ] all-integers?
 ] unit-test
 

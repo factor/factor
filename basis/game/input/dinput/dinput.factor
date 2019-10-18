@@ -30,15 +30,15 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     +dinput+ [ com-release f ] change-global ;
 
 : device-for-guid ( guid -- device )
-    +dinput+ get swap f <void*>
+    +dinput+ get-global swap f <void*>
     [ f IDirectInput8W::CreateDevice ole32-error ] keep *void* ;
 
 : set-coop-level ( device -- )
-    +device-change-window+ get DISCL_BACKGROUND DISCL_NONEXCLUSIVE bitor
-    IDirectInputDevice8W::SetCooperativeLevel ole32-error ;
+    +device-change-window+ get-global DISCL_BACKGROUND DISCL_NONEXCLUSIVE bitor
+    IDirectInputDevice8W::SetCooperativeLevel ole32-error ; inline
 
 : set-data-format ( device format-symbol -- )
-    get IDirectInputDevice8W::SetDataFormat ole32-error ;
+    get-global IDirectInputDevice8W::SetDataFormat ole32-error ; inline
 
 : <buffer-size-diprop> ( size -- DIPROPDWORD )
     DIPROPDWORD <struct> [
@@ -92,25 +92,25 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     +dinput+ get swap device-guid
     IDirectInput8W::GetDeviceStatus S_OK = ;
 
+: (find-device-axes-callback) ( lpddoi pvRef -- BOOL )
+    +controller-devices+ get-global at
+    swap guidType>> {
+        { [ dup GUID_XAxis = ] [ drop 0.0 >>x ] }
+        { [ dup GUID_YAxis = ] [ drop 0.0 >>y ] }
+        { [ dup GUID_ZAxis = ] [ drop 0.0 >>z ] }
+        { [ dup GUID_RxAxis = ] [ drop 0.0 >>rx ] }
+        { [ dup GUID_RyAxis = ] [ drop 0.0 >>ry ] }
+        { [ dup GUID_RzAxis = ] [ drop 0.0 >>rz ] }
+        { [ dup GUID_Slider = ] [ drop 0.0 >>slider ] }
+        [ drop ]
+    } cond drop
+    DIENUM_CONTINUE ;
+
 : find-device-axes-callback ( -- alien )
-    [ ! ( lpddoi pvRef -- BOOL )
-        [ DIDEVICEOBJECTINSTANCEW memory>struct ] dip
-        +controller-devices+ get at
-        swap guidType>> {
-            { [ dup GUID_XAxis = ] [ drop 0.0 >>x ] }
-            { [ dup GUID_YAxis = ] [ drop 0.0 >>y ] }
-            { [ dup GUID_ZAxis = ] [ drop 0.0 >>z ] }
-            { [ dup GUID_RxAxis = ] [ drop 0.0 >>rx ] }
-            { [ dup GUID_RyAxis = ] [ drop 0.0 >>ry ] }
-            { [ dup GUID_RzAxis = ] [ drop 0.0 >>rz ] }
-            { [ dup GUID_Slider = ] [ drop 0.0 >>slider ] }
-            [ drop ]
-        } cond drop
-        DIENUM_CONTINUE
-    ] LPDIENUMDEVICEOBJECTSCALLBACKW ;
+    [ (find-device-axes-callback) ] LPDIENUMDEVICEOBJECTSCALLBACKW ;
 
 : find-device-axes ( device controller-state -- controller-state )
-    swap [ +controller-devices+ get set-at ] 2keep
+    swap [ +controller-devices+ get-global set-at ] 2keep
     find-device-axes-callback over DIDFT_AXIS
     IDirectInputDevice8W::EnumObjects ole32-error ;
 
@@ -122,32 +122,33 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     find-device-axes ;
 
 : device-known? ( guid -- ? )
-    +controller-guids+ get key? ; inline
+    +controller-guids+ get-global key? ; inline
 
 : (add-controller) ( guid -- )
     device-for-guid {
         [ configure-controller ]
         [ controller-state-template ]
-        [ dup device-guid clone +controller-guids+ get set-at ]
-        [ +controller-devices+ get set-at ]
+        [ dup device-guid clone +controller-guids+ get-global set-at ]
+        [ +controller-devices+ get-global set-at ]
     } cleave ;
 
 : add-controller ( guid -- )
     dup device-known? [ drop ] [ (add-controller) ] if ;
 
 : remove-controller ( device -- )
-    [ +controller-devices+ get delete-at ]
-    [ device-guid +controller-guids+ get delete-at ]
+    [ +controller-devices+ get-global delete-at ]
+    [ device-guid +controller-guids+ get-global delete-at ]
     [ com-release ] tri ;
 
+: (find-controller-callback) ( lpddi pvRef -- BOOL )
+    drop guidInstance>> add-controller
+    DIENUM_CONTINUE ;
+
 : find-controller-callback ( -- alien )
-    [ ! ( lpddi pvRef -- BOOL )
-        drop DIDEVICEINSTANCEW memory>struct guidInstance>> add-controller
-        DIENUM_CONTINUE
-    ] LPDIENUMDEVICESCALLBACKW ; inline
+    [ (find-controller-callback) ] LPDIENUMDEVICESCALLBACKW ;
 
 : find-controllers ( -- )
-    +dinput+ get DI8DEVCLASS_GAMECTRL find-controller-callback
+    +dinput+ get-global DI8DEVCLASS_GAMECTRL find-controller-callback
     f DIEDFL_ATTACHEDONLY IDirectInput8W::EnumDevices ole32-error ;
 
 : set-up-controllers ( -- )
@@ -156,7 +157,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     find-controllers ;
 
 : find-and-remove-detached-devices ( -- )
-    +controller-devices+ get keys
+    +controller-devices+ get-global keys
     [ device-attached? not ] filter
     [ remove-controller ] each ;
 
@@ -252,7 +253,7 @@ M: dinput-game-input-backend (reset-game-input)
     ] bind ;
 
 M: dinput-game-input-backend get-controllers
-    +controller-devices+ get
+    +controller-devices+ get-global
     [ drop controller boa ] { } assoc>map ;
 
 M: dinput-game-input-backend product-string
@@ -314,7 +315,7 @@ CONSTANT: pov-values
     } case ;
 
 : fill-mouse-state ( buffer count -- state )
-    iota [ +mouse-state+ get ] 2dip swap [ nth (fill-mouse-state) ] curry each ;
+    iota [ +mouse-state+ get-global ] 2dip swap [ nth (fill-mouse-state) ] curry each ;
 
 : get-device-state ( device DIJOYSTATE2 -- )
     [ dup IDirectInputDevice8W::Poll ole32-error ] dip
@@ -326,25 +327,25 @@ CONSTANT: pov-values
     [ fill-controller-state ] [ drop f ] with-acquisition ;
 
 M: dinput-game-input-backend read-controller
-    handle>> dup +controller-devices+ get at
+    handle>> dup +controller-devices+ get-global at
     [ (read-controller) ] [ drop f ] if* ;
 
 M: dinput-game-input-backend calibrate-controller
     handle>> f 0 IDirectInputDevice8W::RunControlPanel ole32-error ;
 
 M: dinput-game-input-backend read-keyboard
-    +keyboard-device+ get
-    [ +keyboard-state+ get [ keys>> underlying>> get-device-state ] keep ]
+    +keyboard-device+ get-global
+    [ +keyboard-state+ get-global [ keys>> underlying>> get-device-state ] keep ]
     [ ] [ f ] with-acquisition ;
 
 M: dinput-game-input-backend read-mouse
-    +mouse-device+ get [ +mouse-buffer+ get MOUSE-BUFFER-SIZE read-device-buffer ]
+    +mouse-device+ get-global [ +mouse-buffer+ get-global MOUSE-BUFFER-SIZE read-device-buffer ]
     [ fill-mouse-state ] [ f ] with-acquisition ;
 
 M: dinput-game-input-backend reset-mouse
-    +mouse-device+ get [ f MOUSE-BUFFER-SIZE read-device-buffer ]
+    +mouse-device+ get-global [ f MOUSE-BUFFER-SIZE read-device-buffer ]
     [ 2drop ] [ ] with-acquisition
-    +mouse-state+ get
+    +mouse-state+ get-global
         0 >>dx
         0 >>dy
         0 >>scroll-dx

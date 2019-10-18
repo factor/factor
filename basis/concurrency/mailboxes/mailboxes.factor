@@ -1,51 +1,52 @@
-! Copyright (C) 2005, 2008 Chris Double, Slava Pestov.
+! Copyright (C) 2005, 2010 Chris Double, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: dlists deques threads sequences continuations
-destructors namespaces math quotations words kernel
-arrays assocs init system concurrency.conditions accessors
-debugger debugger.threads locals fry ;
+USING: dlists deques threads sequences continuations namespaces
+math quotations words kernel arrays assocs init system
+concurrency.conditions accessors debugger debugger.threads
+locals fry ;
 IN: concurrency.mailboxes
 
-TUPLE: mailbox < disposable threads data ;
-
-M: mailbox dispose* threads>> notify-all ;
+TUPLE: mailbox { threads dlist } { data dlist } ;
 
 : <mailbox> ( -- mailbox )
-    mailbox new-disposable <dlist> >>threads <dlist> >>data ;
+    mailbox new
+        <dlist> >>threads
+        <dlist> >>data ; inline
 
 : mailbox-empty? ( mailbox -- bool )
-    data>> deque-empty? ;
+    data>> deque-empty? ; inline
 
-: mailbox-put ( obj mailbox -- )
+GENERIC: mailbox-put ( obj mailbox -- )
+
+M: mailbox mailbox-put
     [ data>> push-front ]
     [ threads>> notify-all ] bi yield ;
 
 : wait-for-mailbox ( mailbox timeout -- )
-    [ threads>> ] dip "mailbox" wait ;
+    [ threads>> ] dip "mailbox" wait ; inline
 
-:: block-unless-pred ( mailbox timeout pred: ( message -- ? ) -- )
-    mailbox check-disposed
+:: block-unless-pred ( ... mailbox timeout pred: ( ... message -- ... ? ) -- ... )
     mailbox data>> pred dlist-any? [
         mailbox timeout wait-for-mailbox
         mailbox timeout pred block-unless-pred
     ] unless ; inline recursive
 
 : block-if-empty ( mailbox timeout -- mailbox )
-    over check-disposed
     over mailbox-empty? [
         2dup wait-for-mailbox block-if-empty
     ] [
         drop
-    ] if ;
+    ] if ; inline recursive
 
 : mailbox-peek ( mailbox -- obj )
     data>> peek-back ;
 
-: mailbox-get-timeout ( mailbox timeout -- obj )
-    block-if-empty data>> pop-back ;
+GENERIC# mailbox-get-timeout 1 ( mailbox timeout -- obj )
+
+M: mailbox mailbox-get-timeout block-if-empty data>> pop-back ;
 
 : mailbox-get ( mailbox -- obj )
-    f mailbox-get-timeout ;
+    f mailbox-get-timeout ; inline
 
 : mailbox-get-all-timeout ( mailbox timeout -- array )
     block-if-empty

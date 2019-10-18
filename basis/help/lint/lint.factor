@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs continuations fry help help.lint.checks
-help.topics io kernel namespaces parser sequences
-source-files.errors vocabs.hierarchy vocabs words classes
-locals tools.errors listener ;
+USING: assocs combinators continuations fry help
+help.lint.checks help.topics io kernel namespaces parser
+sequences source-files.errors vocabs.hierarchy vocabs words
+classes locals tools.errors listener ;
 FROM: help.lint.checks => all-vocabs ;
 FROM: vocabs => child-vocabs ;
 IN: help.lint
@@ -49,10 +49,12 @@ PRIVATE>
     [ with-file-vocabs ] vocabs-quot set
     dup word-help [
         [ >link ] keep '[
-            _ dup word-help
-            [ check-values ]
-            [ check-class-description ]
-            [ nip [ check-nulls ] [ check-see-also ] [ check-markup ] tri ] 2tri
+            _ dup word-help {
+                [ check-values ]
+                [ check-value-effects ]
+                [ check-class-description ]
+                [ nip [ check-nulls ] [ check-see-also ] [ check-markup ] tri ]
+            } 2cleave
         ] check-something
     ] [ drop ] if ;
 

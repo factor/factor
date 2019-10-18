@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io kernel
-prettyprint.sections words ;
+prettyprint.sections words quotations ;
 IN: prettyprint.config
 
 ABOUT: "prettyprint-variables"
@@ -31,3 +31,11 @@ HELP: boa-tuples?
 
 HELP: c-object-pointers?
 { $var-description "Toggles whether C objects such as structs and direct arrays only print their underlying address. If this flag isn't set, C objects will attempt to print their contents. If a C object points to invalid memory, it will display only its address regardless." } ;
+
+HELP: with-short-limits
+{ $values { "quot" quotation } }
+{ $description "Calls a quotation in a new dynamic scope with prettyprinter limits set to produce a single line of output." } ;
+
+HELP: without-limits
+{ $values { "quot" quotation } }
+{ $description "Calls a quotation in a new dynamic scope with prettyprinter limits set to produce unlimited output." } ;

@@ -4,7 +4,7 @@ ifdef CONFIG
 	AR = ar
 	LD = ld
 
-	VERSION = 0.92
+	VERSION = 0.93
 
 	BUNDLE = Factor.app
 	LIBPATH = -L/usr/X11R6/lib
@@ -52,6 +52,7 @@ ifdef CONFIG
 		vm/io.o \
 		vm/jit.o \
 		vm/math.o \
+		vm/mvm.o \
 		vm/nursery_collector.o \
 		vm/object_start_map.o \
 		vm/objects.o \
@@ -168,22 +169,16 @@ macosx.app: factor
 	mkdir -p $(BUNDLE)/Contents/Frameworks
 	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
 	ln -s Factor.app/Contents/MacOS/factor ./factor
-	cp $(ENGINE) $(BUNDLE)/Contents/Frameworks/$(ENGINE)
-
-	install_name_tool \
-		-change libfactor.dylib \
-		@executable_path/../Frameworks/libfactor.dylib \
-		Factor.app/Contents/MacOS/factor
 
 $(ENGINE): $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(DLL_OBJS)
 
-factor: $(EXE_OBJS) $(ENGINE)
-	$(TOOLCHAIN_PREFIX)$(CPP) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
+factor: $(EXE_OBJS) $(DLL_OBJS)
+	$(TOOLCHAIN_PREFIX)$(CPP) $(LIBS) $(LIBPATH) -L. $(DLL_OBJS) \
 		$(CFLAGS) -o $(EXECUTABLE) $(EXE_OBJS)
 
-factor-console: $(EXE_OBJS) $(ENGINE)
-	$(TOOLCHAIN_PREFIX)$(CPP) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
+factor-console: $(EXE_OBJS) $(DLL_OBJS)
+	$(TOOLCHAIN_PREFIX)$(CPP) $(LIBS) $(LIBPATH) -L. $(DLL_OBJS) \
 		$(CFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(EXE_OBJS)
 
 factor-ffi-test: $(FFI_TEST_LIBRARY)

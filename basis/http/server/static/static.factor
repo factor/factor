@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2009 Slava Pestov.
+! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar kernel math math.order math.parser namespaces
 parser sequences strings assocs hashtables debugger mime.types
@@ -16,11 +16,8 @@ TUPLE: file-responder root hook special allow-listings ;
     dup [ rfc822>timestamp ] when ;
 
 : modified-since? ( filename -- ? )
-    request get modified-since dup [
-        [ file-info modified>> ] dip after?
-    ] [
-        2drop t
-    ] if ;
+    request get modified-since dup
+    [ [ file-info modified>> ] dip after? ] [ 2drop t ] if ;
 
 : <file-responder> ( root hook -- responder )
     file-responder new
@@ -30,8 +27,8 @@ TUPLE: file-responder root hook special allow-listings ;
 
 : (serve-static) ( path mime-type -- response )
     [
-        [ binary <file-reader> &dispose ] dip
-        <content> binary >>content-charset
+        [ binary <file-reader> &dispose ] dip <content>
+        binary >>content-encoding
     ]
     [ drop file-info [ size>> ] [ modified>> ] bi ] 2bi
     [ "content-length" set-header ]

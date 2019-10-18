@@ -9,7 +9,7 @@ IN: cpu.x86.features
 <PRIVATE
 
 : (sse-version) ( -- n )
-    int { } "cdecl" [
+    int { } cdecl [
         "sse-42" define-label
         "sse-41" define-label
         "ssse-3" define-label
@@ -97,12 +97,12 @@ MEMO: sse-version ( -- n )
 HOOK: instruction-count cpu ( -- n )
 
 M: x86.32 instruction-count
-    longlong { } "cdecl" [
+    longlong { } cdecl [
         RDTSC
     ] alien-assembly ;
 
 M: x86.64 instruction-count
-    longlong { } "cdecl" [
+    longlong { } cdecl [
         RAX 0 MOV
         RDTSC
         RDX 32 SHL

@@ -69,10 +69,10 @@ IN: regexp.dfa
 
 : set-final-states ( nfa dfa -- )
     [
-        [ final-states>> keys ]
+        [ final-states>> members ]
         [ transitions>> keys ] bi*
         [ intersects? ] with filter
-        unique
+        fast-set
     ] keep (>>final-states) ;
 
 : initialize-dfa ( nfa -- dfa )

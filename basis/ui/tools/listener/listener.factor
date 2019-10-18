@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2009 Slava Pestov.
+! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar combinators locals
 source-files.errors colors.constants combinators.short-circuit
@@ -16,6 +16,7 @@ ui.tools.listener.completion ui.tools.listener.popups
 ui.tools.listener.history ui.images ui.tools.error-list
 tools.errors.model ;
 FROM: source-files.errors => all-errors ;
+FROM: namespaces => set ;
 IN: ui.tools.listener
 
 ! If waiting is t, we're waiting for user input, and invoking
@@ -29,7 +30,7 @@ output history flag mailbox thread waiting token-model word-model popup ;
     drop ;
 
 : interactor-continuation ( interactor -- continuation )
-    thread>> continuation>> value>> ;
+    thread>> thread-continuation ;
 
 : interactor-busy? ( interactor -- ? )
     #! We're busy if there's no thread to resume.

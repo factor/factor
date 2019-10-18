@@ -7,17 +7,12 @@ compiler.cfg.registers ;
 IN: cpu.x86.64.unix
 
 M: int-regs param-regs
-    drop { RDI RSI RDX RCX R8 R9 } ;
+    2drop { RDI RSI RDX RCX R8 R9 } ;
 
 M: float-regs param-regs
-    drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
+    2drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
 M: x86.64 reserved-stack-space 0 ;
-
-SYMBOL: (stack-value)
-! The ABI for passing structs by value is pretty great
-<< void* c-type clone \ (stack-value) define-primitive-type
-stack-params \ (stack-value) c-type (>>rep) >>
 
 : struct-types&offset ( struct-type -- pairs )
     fields>> [
@@ -36,8 +31,7 @@ stack-params \ (stack-value) c-type (>>rep) >>
     ] map ;
 
 : flatten-large-struct ( c-type -- seq )
-    heap-size cell align
-    cell /i \ (stack-value) c-type <repetition> ;
+    (flatten-stack-type) ;
 
 : flatten-struct ( c-type -- seq )
     dup heap-size 16 > [

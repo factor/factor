@@ -1,6 +1,7 @@
 ! (c)2009 Joe Groff bsd license
 USING: accessors alien.c-types classes.struct classes.struct.vectored
-kernel sequences specialized-arrays tools.test ;
+kernel sequences specialized-arrays tools.test vocabs compiler.units ;
+FROM: specialized-arrays.private => specialized-array-vocab ;
 SPECIALIZED-ARRAYS: int ushort float ;
 IN: classes.struct.vectored.tests
 
@@ -70,4 +71,10 @@ VECTORED-STRUCT: foo
         { z ushort-array{ 10   20   30   40   } }
         { w ushort-array{ 15   25   35   45   } }
     } third vectored-element>
+] unit-test
+
+[ ] [
+    [
+        foo specialized-array-vocab forget-vocab
+    ] with-compilation-unit
 ] unit-test

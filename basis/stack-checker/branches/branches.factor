@@ -1,9 +1,10 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry vectors sequences assocs math math.order accessors kernel
-combinators quotations namespaces grouping stack-checker.state
+USING: arrays effects fry vectors sequences assocs math math.order accessors kernel
+combinators quotations namespaces grouping locals stack-checker.state
 stack-checker.backend stack-checker.errors stack-checker.visitor
 stack-checker.values stack-checker.recursive-state ;
+FROM: sequences.private => dispatch ;
 IN: stack-checker.branches
 
 : balanced? ( pairs -- ? )
@@ -43,14 +44,20 @@ SYMBOLS: +bottom+ +top+ ;
 : phi-outputs ( phi-in -- stack )
     flip [ unify-values ] map ;
 
-SYMBOL: quotations
+SYMBOLS: combinator quotations ;
+
+: simple-unbalanced-branches-error ( word quots branches -- * )
+    [ length [ (( ..a -- ..b )) ] replicate ]
+    [ [ length [ "x" <array> ] bi@ <effect> ] { } assoc>map ] bi
+    unbalanced-branches-error ;
 
 : unify-branches ( ins stacks -- in phi-in phi-out )
     zip [ 0 { } { } ] [
         [ keys supremum ] [ ] [ balanced? ] tri
-        [ dupd phi-inputs dup phi-outputs ]
-        [ quotations get unbalanced-branches-error ]
-        if
+        [ dupd phi-inputs dup phi-outputs ] [
+            [ combinator get quotations get ] dip
+            simple-unbalanced-branches-error
+        ] if
     ] if-empty ;
 
 : branch-variable ( seq symbol -- seq )
@@ -61,7 +68,9 @@ SYMBOL: quotations
     branch-variable ;
 
 : datastack-phi ( seq -- phi-in phi-out )
-    [ input-count branch-variable ] [ \ meta-d active-variable ] bi
+    [ input-count branch-variable ]
+    [ inner-d-index branch-variable infimum inner-d-index set ]
+    [ \ meta-d active-variable ] tri
     unify-branches
     [ input-count set ] [ ] [ dup >vector \ meta-d set ] tri* ;
 
@@ -80,7 +89,8 @@ SYMBOL: quotations
 : copy-inference ( -- )
     \ meta-d [ clone ] change
     literals [ clone ] change
-    input-count [ ] change ;
+    input-count [ ] change
+    inner-d-index [ ] change ;
 
 GENERIC: infer-branch ( literal -- namespace )
 
@@ -90,6 +100,9 @@ M: literal infer-branch
         nest-visitor
         [ value>> quotation set ] [ infer-literal-quot ] bi
     ] H{ } make-assoc ;
+
+M: declared-effect infer-branch
+    known>> infer-branch ;
 
 M: callable infer-branch
     [
@@ -107,12 +120,26 @@ M: callable infer-branch
     infer-branches
     [ first2 #if, ] dip compute-phi-function ;
 
+GENERIC: curried/composed? ( known -- ? )
+M: object curried/composed? drop f ;
+M: curried curried/composed? drop t ;
+M: composed curried/composed? drop t ;
+M: declared-effect curried/composed? known>> curried/composed? ;
+
+: declare-if-effects ( -- )
+    H{ } clone V{ } clone
+    [ [ \ if (( ..a -- ..b )) ] 2dip 0 declare-effect-d ]
+    [ [ \ if (( ..a -- ..b )) ] 2dip 1 declare-effect-d ] 2bi ;
+
 : infer-if ( -- )
+    \ if combinator set
     2 literals-available? [
         (infer-if)
     ] [
-        drop 2 consume-d
-        dup [ known [ curried? ] [ composed? ] bi or ] any? [
+        drop 2 ensure-d
+        declare-if-effects
+        2 shorten-d
+        dup [ known curried/composed? ] any? [
             output-d
             [ rot [ drop call ] [ nip call ] if ]
             infer-quot-here
@@ -122,5 +149,6 @@ M: callable infer-branch
     ] if ;
 
 : infer-dispatch ( -- )
+    \ dispatch combinator set
     pop-literal nip infer-branches
     [ #dispatch, ] dip compute-phi-function ;

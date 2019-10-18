@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: unix alien alien.c-types kernel math sequences strings
 io.backend.unix splitting io.encodings.utf8 io.encodings.string
-specialized-arrays ;
+specialized-arrays alien.syntax ;
 SPECIALIZED-ARRAY: char
 IN: system-info.linux
 
-: (uname) ( buf -- int )
-    int f "uname" { char* } alien-invoke ;
+FUNCTION-ALIAS: (uname)
+    int uname ( c-string buf ) ;
 
 : uname ( -- seq )
     65536 <char-array> [ (uname) io-error ] keep

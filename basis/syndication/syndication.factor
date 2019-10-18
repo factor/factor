@@ -70,7 +70,8 @@ TUPLE: entry title url description date ;
     tri ;
 
 : atom-entry-link ( tag -- url/f )
-    "link" tags-named [ "rel" attr "alternate" = ] find nip
+    "link" tags-named
+    [ "rel" attr { f "alternate" } member? ] find nip
     dup [ "href" attr >url ] when ;
 
 : atom1.0-entry ( tag -- entry )

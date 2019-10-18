@@ -42,7 +42,7 @@ M: ##branch linearize-insn
 
 : successors ( bb -- first second ) successors>> first2 ; inline
 
-:: conditional ( bb insn n conditional-quot negate-cc-quot -- bb successor label ... )
+:: conditional ( bb insn n conditional-quot negate-cc-quot -- bb successor label etc... )
     bb insn
     conditional-quot
     [ drop dup successors>> second useless-branch? ] 2bi

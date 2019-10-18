@@ -1,7 +1,7 @@
 include vm/Config.unix
 CFLAGS += -fPIC
 
-PLAF_DLL_OBJS += vm/os-macosx.o vm/mach_signal.o
+PLAF_DLL_OBJS += vm/os-macosx.o vm/mach_signal.o vm/mvm-unix.o
 
 DLL_EXTENSION = .dylib
 SHARED_DLL_EXTENSION = .dylib

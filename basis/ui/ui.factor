@@ -138,7 +138,7 @@ M: world ungraft*
         layout-queue [
             dup layout find-world [ , ] when*
         ] slurp-deque
-    ] { } make prune ;
+    ] { } make members ;
 
 : redraw-worlds ( seq -- )
     [ dup update-hand draw-world ] each ;
@@ -242,6 +242,8 @@ M: object close-window
     ui-running? [ call( -- ) ] [ '[ init-ui @ ] (with-ui) ] if ;
 
 HOOK: beep ui-backend ( -- )
+
+HOOK: system-alert ui-backend ( caption text -- )
 
 : parse-main-window-attributes ( class -- attributes )
     "{" expect dup all-slots parse-tuple-literal-slots ;

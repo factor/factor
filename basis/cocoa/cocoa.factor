@@ -39,6 +39,7 @@ SYNTAX: IMPORT: scan [ ] import-objc-class ;
 
 [
     {
+        "NSAlert"
         "NSApplication"
         "NSArray"
         "NSAutoreleasePool"

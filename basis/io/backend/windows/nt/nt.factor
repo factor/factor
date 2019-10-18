@@ -40,8 +40,8 @@ M: winnt add-completion ( win32-handle -- )
 : twiddle-thumbs ( overlapped port -- bytes-transferred )
     [
         drop
-        [ >c-ptr pending-overlapped get-global set-at ] curry "I/O" suspend
-        {
+        [ self ] dip >c-ptr pending-overlapped get-global set-at
+        "I/O" suspend {
             { [ dup integer? ] [ ] }
             { [ dup array? ] [
                 first dup eof?

@@ -1,8 +1,9 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs sets kernel namespaces sequences
+USING: accessors assocs kernel namespaces sequences
 compiler.cfg.instructions compiler.cfg.def-use
-compiler.cfg.rpo compiler.cfg.predecessors ;
+compiler.cfg.rpo compiler.cfg.predecessors hash-sets sets ;
+FROM: namespaces => set ;
 IN: compiler.cfg.dce
 
 ! Maps vregs to sequences of vregs
@@ -12,18 +13,18 @@ SYMBOL: liveness-graph
 SYMBOL: live-vregs
 
 : live-vreg? ( vreg -- ? )
-    live-vregs get key? ;
+    live-vregs get in? ;
 
 ! vregs which are the result of an allocation
 SYMBOL: allocations
 
 : allocation? ( vreg -- ? )
-    allocations get key? ;
+    allocations get in? ;
 
 : init-dead-code ( -- )
     H{ } clone liveness-graph set
-    H{ } clone live-vregs set
-    H{ } clone allocations set ;
+    HS{ } clone live-vregs set
+    HS{ } clone allocations set ;
 
 GENERIC: build-liveness-graph ( insn -- )
 
@@ -46,7 +47,7 @@ M: ##write-barrier-imm build-liveness-graph
     dup src>> setter-liveness-graph ;
 
 M: ##allot build-liveness-graph
-    [ dst>> allocations get conjoin ] [ call-next-method ] bi ;
+    [ dst>> allocations get adjoin ] [ call-next-method ] bi ;
 
 M: insn build-liveness-graph
     dup defs-vreg dup [ add-edges ] [ 2drop ] if ;
@@ -55,8 +56,8 @@ GENERIC: compute-live-vregs ( insn -- )
 
 : (record-live) ( vregs -- )
     [
-        dup live-vregs get key? [ drop ] [
-            [ live-vregs get conjoin ]
+        dup live-vreg? [ drop ] [
+            [ live-vregs get adjoin ]
             [ liveness-graph get at (record-live) ]
             bi
         ] if

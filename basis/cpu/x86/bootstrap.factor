@@ -12,59 +12,78 @@ big-endian off
 [
     ! Optimizing compiler's side of callback accesses
     ! arguments that are on the stack via the frame pointer.
-    ! On x86-64, some arguments are passed in registers, and
-    ! so the only register that is safe for use here is safe-reg.
+    ! On x86-32 fastcall, and x86-64, some arguments are passed
+    ! in registers, and so the only registers that are safe for
+    ! use here are frame-reg, nv-reg and vm-reg.
     frame-reg PUSH
     frame-reg stack-reg MOV
 
     ! Save all non-volatile registers
     nv-regs [ PUSH ] each
 
-    ! Save old stack pointer and align
-    safe-reg stack-reg MOV
-    stack-reg bootstrap-cell SUB
-    stack-reg -16 AND
-    stack-reg [] safe-reg MOV
-
-    ! Register shadow area - only required on Win64, but doesn't
-    ! hurt on other platforms
-    stack-reg 32 SUB
+    jit-save-tib
 
     ! Load VM into vm-reg
     vm-reg 0 MOV rc-absolute-cell rt-vm jit-rel
 
+    ! Save old context
+    nv-reg vm-reg vm-context-offset [+] MOV
+    nv-reg PUSH
+
+    ! Switch over to the spare context
+    nv-reg vm-reg vm-spare-context-offset [+] MOV
+    vm-reg vm-context-offset [+] nv-reg MOV
+
+    ! Save C callstack pointer
+    nv-reg context-callstack-save-offset [+] stack-reg MOV
+
+    ! Load Factor callstack pointer
+    stack-reg nv-reg context-callstack-bottom-offset [+] MOV
+
+    nv-reg jit-update-tib
+    jit-install-seh
+
     ! Call into Factor code
-    safe-reg 0 MOV rc-absolute-cell rt-entry-point jit-rel
-    safe-reg CALL
+    nv-reg 0 MOV rc-absolute-cell rt-entry-point jit-rel
+    nv-reg CALL
 
-    ! Tear down register shadow area
-    stack-reg 32 ADD
+    ! Load VM into vm-reg; only needed on x86-32, but doesn't
+    ! hurt on x86-64
+    vm-reg 0 MOV rc-absolute-cell rt-vm jit-rel
 
-    ! Undo stack alignment
-    stack-reg stack-reg [] MOV
+    ! Load C callstack pointer
+    nv-reg vm-reg vm-context-offset [+] MOV
+    stack-reg nv-reg context-callstack-save-offset [+] MOV
+
+    ! Load old context
+    nv-reg POP
+    vm-reg vm-context-offset [+] nv-reg MOV
 
     ! Restore non-volatile registers
+    jit-restore-tib
+
     nv-regs <reversed> [ POP ] each
 
     frame-reg POP
 
-    ! Callbacks which return structs, or use stdcall, need a
-    ! parameter here. See the comment in callback-return-rewind
-    ! in cpu.x86.32
+    ! Callbacks which return structs, or use stdcall/fastcall/thiscall,
+    ! need a parameter here.
+
+    ! See the comment for M\ x86.32 stack-cleanup in cpu.x86.32
     HEX: ffff RET rc-absolute-2 rt-untagged jit-rel
 ] callback-stub jit-define
 
 [
     ! Load word
-    safe-reg 0 MOV rc-absolute-cell rt-literal jit-rel
+    temp0 0 MOV rc-absolute-cell rt-literal jit-rel
     ! Bump profiling counter
-    safe-reg profile-count-offset [+] 1 tag-fixnum ADD
+    temp0 profile-count-offset [+] 1 tag-fixnum ADD
     ! Load word->code
-    safe-reg safe-reg word-code-offset [+] MOV
+    temp0 temp0 word-code-offset [+] MOV
     ! Compute word entry point
-    safe-reg compiled-header-size ADD
+    temp0 compiled-header-size ADD
     ! Jump to entry point
-    safe-reg JMP
+    temp0 JMP
 ] jit-profiling jit-define
 
 [
@@ -183,47 +202,41 @@ big-endian off
 
 ! ! ! Polymorphic inline caches
 
-! The PIC stubs are not permitted to touch temp3.
+! The PIC stubs are not permitted to touch pic-tail-reg.
 
 ! Load a value from a stack position
 [
-    temp1 ds-reg HEX: ffffffff [+] MOV rc-absolute rt-untagged jit-rel
+    temp1 ds-reg HEX: 7f [+] MOV rc-absolute-1 rt-untagged jit-rel
 ] pic-load jit-define
 
-! Tag
-: load-tag ( -- )
-    temp1 tag-mask get AND
-    temp1 tag-bits get SHL ;
+[ temp1 tag-mask get AND ] pic-tag jit-define
 
-[ load-tag ] pic-tag jit-define
-
-! The 'make' trick lets us compute the jump distance for the
-! conditional branches there
-
-! Tuple
 [
     temp0 temp1 MOV
-    load-tag
-    temp1 tuple type-number tag-fixnum CMP
+    temp1 tag-mask get AND
+    temp1 tuple type-number CMP
     [ JNE ]
-    [ temp1 temp0 tuple type-number neg bootstrap-cell + [+] MOV ]
+    [ temp1 temp0 tuple-class-offset [+] MOV ]
     jit-conditional
 ] pic-tuple jit-define
 
 [
-    temp1 HEX: ffffffff CMP rc-absolute rt-literal jit-rel
+    temp1 HEX: 7f CMP rc-absolute-1 rt-untagged jit-rel
 ] pic-check-tag jit-define
-
-[
-    temp2 HEX: ffffffff MOV rc-absolute-cell rt-literal jit-rel
-    temp1 temp2 CMP
-] pic-check-tuple jit-define
 
 [ 0 JE rc-relative rt-entry-point jit-rel ] pic-hit jit-define
 
 ! ! ! Megamorphic caches
 
 [
+    ! class = ...
+    temp0 temp1 MOV
+    temp1 tag-mask get AND
+    temp1 tag-bits get SHL
+    temp1 tuple type-number tag-fixnum CMP
+    [ JNE ]
+    [ temp1 temp0 tuple-class-offset [+] MOV ]
+    jit-conditional
     ! cache = ...
     temp0 0 MOV rc-absolute-cell rt-literal jit-rel
     ! key = hashcode(class)
@@ -237,14 +250,16 @@ big-endian off
     temp0 temp2 ADD
     ! if(get(cache) == class)
     temp0 [] temp1 CMP
-    bootstrap-cell 4 = 14 22 ? JNE ! Yuck!
-    ! megamorphic_cache_hits++
-    temp1 0 MOV rc-absolute-cell rt-megamorphic-cache-hits jit-rel
-    temp1 [] 1 ADD
-    ! goto get(cache + bootstrap-cell)
-    temp0 temp0 bootstrap-cell [+] MOV
-    temp0 word-entry-point-offset [+] JMP
-    ! fall-through on miss
+    [ JNE ]
+    [
+        ! megamorphic_cache_hits++
+        temp1 0 MOV rc-absolute-cell rt-megamorphic-cache-hits jit-rel
+        temp1 [] 1 ADD
+        ! goto get(cache + bootstrap-cell)
+        temp0 temp0 bootstrap-cell [+] MOV
+        temp0 word-entry-point-offset [+] JMP
+        ! fall-through on miss
+    ] jit-conditional
 ] mega-lookup jit-define
 
 ! ! ! Sub-primitives
@@ -460,23 +475,23 @@ big-endian off
     ! load value
     temp3 ds-reg [] MOV
     ! make a copy
-    temp1 temp3 MOV
-    ! compute positive shift value in temp1
-    temp1 CL SHL
+    temp2 temp3 MOV
+    ! compute positive shift value in temp2
+    temp2 CL SHL
     shift-arg NEG
     ! compute negative shift value in temp3
     temp3 CL SAR
     temp3 tag-mask get bitnot AND
     shift-arg 0 CMP
-    ! if shift count was negative, move temp0 to temp1
-    temp1 temp3 CMOVGE
+    ! if shift count was negative, move temp0 to temp2
+    temp2 temp3 CMOVGE
     ! push to stack
-    ds-reg [] temp1 MOV
+    ds-reg [] temp2 MOV
 ] \ fixnum-shift-fast define-sub-primitive
 
 : jit-fixnum-/mod ( -- )
     ! load second parameter
-    temp3 ds-reg [] MOV
+    temp1 ds-reg [] MOV
     ! load first parameter
     div-arg ds-reg bootstrap-cell neg [+] MOV
     ! make a copy
@@ -484,7 +499,7 @@ big-endian off
     ! sign-extend
     mod-arg bootstrap-cell-bits 1 - SAR
     ! divide
-    temp3 IDIV ;
+    temp1 IDIV ;
 
 [
     jit-fixnum-/mod

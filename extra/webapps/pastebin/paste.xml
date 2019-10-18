@@ -47,11 +47,7 @@
 				<tr><th class="field-label">Author: </th><td><t:field t:name="author" /></td></tr>
 				<tr><th class="field-label">Mode: </th><td><t:choice t:name="mode" t:choices="modes" /></td></tr>
 				<tr><th class="field-label big-field-label">Body: </th><td><t:textarea t:name="contents" t:rows="20" t:cols="60" /></td></tr>
-				<tr><th class="field-label">Captcha: </th><td><t:field t:name="captcha" /></td></tr>
-				<tr>
-				<td></td>
-				<td>Leave the captcha blank. Spam-bots will fill it indiscriminantly, so their attempts to register will be blocked.</td>
-				</tr>
+				<tr><td colspan="2"><t:recaptcha /></td></tr>
 			</table>
 
 			<p> <button type="submit">Done</button> </p>

@@ -73,11 +73,13 @@ GENERIC: crossref? ( word -- ? )
 M: word crossref?
     dup "forgotten" word-prop [ drop f ] [ vocabulary>> >boolean ] if ;
 
-: inline? ( word -- ? ) "inline" word-prop ; inline
-
 GENERIC: subwords ( word -- seq )
 
 M: word subwords drop f ;
+
+GENERIC: parent-word ( word -- word/f )
+
+M: word parent-word drop f ;
 
 : define ( word def -- )
     over changed-definition [ ] like >>def drop ;
@@ -100,6 +102,8 @@ M: word subwords drop f ;
 : make-deprecated ( word -- )
     t "deprecated" set-word-prop ;
 
+: inline? ( word -- ? ) "inline" word-prop ; inline
+
 ERROR: cannot-be-inline word ;
 
 GENERIC: make-inline ( word -- )
@@ -111,21 +115,29 @@ M: word make-inline
         bi
     ] if ;
 
+: define-inline ( word def effect -- )
+    [ define-declared ] [ 2drop make-inline ] 3bi ;
+
 : make-recursive ( word -- )
     t "recursive" set-word-prop ;
+
+GENERIC: flushable? ( word -- ? )
+
+M: word flushable?
+    [ "flushable" word-prop ]
+    [ parent-word dup [ flushable? ] when ] bi or ;
 
 : make-flushable ( word -- )
     t "flushable" set-word-prop ;
 
+GENERIC: foldable? ( word -- ? )
+
+M: word foldable?
+    [ "foldable" word-prop ]
+    [ parent-word dup [ foldable? ] when ] bi or ;
+
 : make-foldable ( word -- )
     dup make-flushable t "foldable" set-word-prop ;
-
-: define-inline ( word def effect -- )
-    [ define-declared ] [ 2drop make-inline ] 3bi ;
-
-GENERIC: flushable? ( word -- ? )
-
-M: word flushable? "flushable" word-prop ;
 
 GENERIC: reset-word ( word -- )
 
@@ -208,9 +220,10 @@ M: word set-where swap "loc" set-word-prop ;
 
 M: word forget*
     dup "forgotten" word-prop [ drop ] [
+        [ subwords forget-all ]
         [ [ name>> ] [ vocabulary>> vocab-words ] bi delete-at ]
         [ t "forgotten" set-word-prop ]
-        bi
+        tri
     ] if ;
 
 M: word hashcode*

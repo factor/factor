@@ -1,5 +1,5 @@
 USING: alien.syntax windows.types classes.struct math alien.c-types
-math.bitwise kernel locals windows.kernel32 ;
+math.bitwise kernel locals windows.kernel32 literals ;
 IN: windows.directx.d3d9types
 
 TYPEDEF: DWORD D3DCOLOR
@@ -54,19 +54,21 @@ CONSTANT: D3DCS_PLANE3      HEX: 00000200
 CONSTANT: D3DCS_PLANE4      HEX: 00000400
 CONSTANT: D3DCS_PLANE5      HEX: 00000800
 
-: D3DCS_ALL ( -- n )
-    { D3DCS_LEFT
-      D3DCS_RIGHT
-      D3DCS_TOP
-      D3DCS_BOTTOM
-      D3DCS_FRONT
-      D3DCS_BACK
-      D3DCS_PLANE0
-      D3DCS_PLANE1
-      D3DCS_PLANE2
-      D3DCS_PLANE3
-      D3DCS_PLANE4
-      D3DCS_PLANE5 } flags ; inline
+CONSTANT: D3DCS_ALL
+    flags{
+        D3DCS_LEFT
+        D3DCS_RIGHT
+        D3DCS_TOP
+        D3DCS_BOTTOM
+        D3DCS_FRONT
+        D3DCS_BACK
+        D3DCS_PLANE0
+        D3DCS_PLANE1
+        D3DCS_PLANE2
+        D3DCS_PLANE3
+        D3DCS_PLANE4
+        D3DCS_PLANE5
+    }
 
 STRUCT: D3DCLIPSTATUS9
     { ClipUnion        DWORD }
@@ -500,8 +502,7 @@ CONSTANT: MAXD3DDECLUSAGE         13
 CONSTANT: MAXD3DDECLUSAGEINDEX    15
 CONSTANT: MAXD3DDECLLENGTH        64
 
-TYPEDEF: int D3DDECLMETHOD
-C-ENUM:
+C-ENUM: D3DDECLMETHOD
     D3DDECLMETHOD_DEFAULT
     D3DDECLMETHOD_PARTIALU
     D3DDECLMETHOD_PARTIALV
@@ -757,28 +758,27 @@ CONSTANT: D3DSHADER_ADDRMODE_FORCE_DWORD HEX: 7fffffff
 CONSTANT: D3DVS_SWIZZLE_SHIFT     16
 CONSTANT: D3DVS_SWIZZLE_MASK      HEX: 00FF0000
 
-: D3DVS_X_X ( -- n ) 0 D3DVS_SWIZZLE_SHIFT shift ; inline
-: D3DVS_X_Y ( -- n ) 1 D3DVS_SWIZZLE_SHIFT shift ; inline
-: D3DVS_X_Z ( -- n ) 2 D3DVS_SWIZZLE_SHIFT shift ; inline
-: D3DVS_X_W ( -- n ) 3 D3DVS_SWIZZLE_SHIFT shift ; inline
+CONSTANT: D3DVS_X_X $[ 0 16 shift ]
+CONSTANT: D3DVS_X_Y $[ 1 16 shift ]
+CONSTANT: D3DVS_X_Z $[ 2 16 shift ]
+CONSTANT: D3DVS_X_W $[ 3 16 shift ]
 
-: D3DVS_Y_X ( -- n ) 0 D3DVS_SWIZZLE_SHIFT 2 + shift ; inline
-: D3DVS_Y_Y ( -- n ) 1 D3DVS_SWIZZLE_SHIFT 2 + shift ; inline
-: D3DVS_Y_Z ( -- n ) 2 D3DVS_SWIZZLE_SHIFT 2 + shift ; inline
-: D3DVS_Y_W ( -- n ) 3 D3DVS_SWIZZLE_SHIFT 2 + shift ; inline
+CONSTANT: D3DVS_Y_X $[ 0 16 2 + shift ]
+CONSTANT: D3DVS_Y_Y $[ 1 16 2 + shift ]
+CONSTANT: D3DVS_Y_Z $[ 2 16 2 + shift ]
+CONSTANT: D3DVS_Y_W $[ 3 16 2 + shift ]
 
-: D3DVS_Z_X ( -- n ) 0 D3DVS_SWIZZLE_SHIFT 4 + shift ; inline
-: D3DVS_Z_Y ( -- n ) 1 D3DVS_SWIZZLE_SHIFT 4 + shift ; inline
-: D3DVS_Z_Z ( -- n ) 2 D3DVS_SWIZZLE_SHIFT 4 + shift ; inline
-: D3DVS_Z_W ( -- n ) 3 D3DVS_SWIZZLE_SHIFT 4 + shift ; inline
+CONSTANT: D3DVS_Z_X $[ 0 16 4 + shift ]
+CONSTANT: D3DVS_Z_Y $[ 1 16 4 + shift ]
+CONSTANT: D3DVS_Z_Z $[ 2 16 4 + shift ]
+CONSTANT: D3DVS_Z_W $[ 3 16 4 + shift ]
 
-: D3DVS_W_X ( -- n ) 0 D3DVS_SWIZZLE_SHIFT 6 + shift ; inline
-: D3DVS_W_Y ( -- n ) 1 D3DVS_SWIZZLE_SHIFT 6 + shift ; inline
-: D3DVS_W_Z ( -- n ) 2 D3DVS_SWIZZLE_SHIFT 6 + shift ; inline
-: D3DVS_W_W ( -- n ) 3 D3DVS_SWIZZLE_SHIFT 6 + shift ; inline
+CONSTANT: D3DVS_W_X $[ 0 16 6 + shift ]
+CONSTANT: D3DVS_W_Y $[ 1 16 6 + shift ]
+CONSTANT: D3DVS_W_Z $[ 2 16 6 + shift ]
+CONSTANT: D3DVS_W_W $[ 3 16 6 + shift ]
 
-: D3DVS_NOSWIZZLE ( -- n )
-    { D3DVS_X_X D3DVS_Y_Y D3DVS_Z_Z D3DVS_W_W } flags ; inline
+CONSTANT: D3DVS_NOSWIZZLE flags{ D3DVS_X_X D3DVS_Y_Y D3DVS_Z_Z D3DVS_W_W }
 
 CONSTANT: D3DSP_SWIZZLE_SHIFT     16
 CONSTANT: D3DSP_SWIZZLE_MASK      HEX: 00FF0000
@@ -786,20 +786,20 @@ CONSTANT: D3DSP_SRCMOD_SHIFT      24
 CONSTANT: D3DSP_SRCMOD_MASK       HEX: 0F000000
 
 TYPEDEF: int D3DSHADER_PARAM_SRCMOD_TYPE
-: D3DSPSM_NONE    ( -- n ) 0 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_NEG     ( -- n ) 1 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_BIAS    ( -- n ) 2 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_BIASNEG ( -- n ) 3 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_SIGN    ( -- n ) 4 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_SIGNNEG ( -- n ) 5 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_COMP    ( -- n ) 6 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_X2      ( -- n ) 7 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_X2NEG   ( -- n ) 8 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_DZ      ( -- n ) 9 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_DW      ( -- n ) 10 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_ABS     ( -- n ) 11 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_ABSNEG  ( -- n ) 12 D3DSP_SRCMOD_SHIFT shift ; inline
-: D3DSPSM_NOT     ( -- n ) 13 D3DSP_SRCMOD_SHIFT shift ; inline
+CONSTANT: D3DSPSM_NONE    $[ 0 24 shift ]
+CONSTANT: D3DSPSM_NEG     $[ 1 24 shift ]
+CONSTANT: D3DSPSM_BIAS    $[ 2 24 shift ]
+CONSTANT: D3DSPSM_BIASNEG $[ 3 24 shift ]
+CONSTANT: D3DSPSM_SIGN    $[ 4 24 shift ]
+CONSTANT: D3DSPSM_SIGNNEG $[ 5 24 shift ]
+CONSTANT: D3DSPSM_COMP    $[ 6 24 shift ]
+CONSTANT: D3DSPSM_X2      $[ 7 24 shift ]
+CONSTANT: D3DSPSM_X2NEG   $[ 8 24 shift ]
+CONSTANT: D3DSPSM_DZ      $[ 9 24 shift ]
+CONSTANT: D3DSPSM_DW      $[ 10 24 shift ]
+CONSTANT: D3DSPSM_ABS     $[ 11 24 shift ]
+CONSTANT: D3DSPSM_ABSNEG  $[ 12 24 shift ]
+CONSTANT: D3DSPSM_NOT     $[ 13 24 shift ]
 CONSTANT: D3DSPSM_FORCE_DWORD HEX: 7fffffff
 
 : D3DPS_VERSION ( major minor -- n )
@@ -900,12 +900,6 @@ CONSTANT: D3DMULTISAMPLE_14_SAMPLES      14
 CONSTANT: D3DMULTISAMPLE_15_SAMPLES      15
 CONSTANT: D3DMULTISAMPLE_16_SAMPLES      16
 CONSTANT: D3DMULTISAMPLE_FORCE_DWORD     HEX: 7fffffff
-
-:: MAKEFOURCC ( ch0 ch1 ch2 ch3 -- n )
-    ch3 HEX: ff bitand 24 shift
-    ch2 HEX: ff bitand 16 shift
-    ch1 HEX: ff bitand  8 shift
-    ch0 HEX: ff bitand bitor bitor bitor ; inline
                                                                   
 TYPEDEF: int D3DFORMAT
 CONSTANT: D3DFMT_UNKNOWN              0
@@ -937,15 +931,15 @@ CONSTANT: D3DFMT_X8L8V8U8             62
 CONSTANT: D3DFMT_Q8W8V8U8             63
 CONSTANT: D3DFMT_V16U16               64
 CONSTANT: D3DFMT_A2W10V10U10          67
-#! : D3DFMT_UYVY                 ( -- n ) 'U' 'Y' 'V' 'Y' MAKEFOURCC
-#! D3DFMT_R8G8_B8G8            = MAKEFOURCC('R', 'G', 'B', 'G'),
-#! D3DFMT_YUY2                 = MAKEFOURCC('Y', 'U', 'Y', '2'),
-#! D3DFMT_G8R8_G8B8            = MAKEFOURCC('G', 'R', 'G', 'B'),
-#! D3DFMT_DXT1                 = MAKEFOURCC('D', 'X', 'T', '1'),
-#! D3DFMT_DXT2                 = MAKEFOURCC('D', 'X', 'T', '2'),
-#! D3DFMT_DXT3                 = MAKEFOURCC('D', 'X', 'T', '3'),
-#! D3DFMT_DXT4                 = MAKEFOURCC('D', 'X', 'T', '4'),
-#! D3DFMT_DXT5                 = MAKEFOURCC('D', 'X', 'T', '5'),
+CONSTANT: D3DFMT_UYVY                 HEX: 55595659
+CONSTANT: D3DFMT_R8G8_B8G8            HEX: 52474247
+CONSTANT: D3DFMT_YUY2                 HEX: 59555932
+CONSTANT: D3DFMT_G8R8_G8B8            HEX: 47524742
+CONSTANT: D3DFMT_DXT1                 HEX: 44585431
+CONSTANT: D3DFMT_DXT2                 HEX: 44585432
+CONSTANT: D3DFMT_DXT3                 HEX: 44585433
+CONSTANT: D3DFMT_DXT4                 HEX: 44585434
+CONSTANT: D3DFMT_DXT5                 HEX: 44585435
 CONSTANT: D3DFMT_D16_LOCKABLE         70
 CONSTANT: D3DFMT_D32                  71
 CONSTANT: D3DFMT_D15S1                73
@@ -962,7 +956,7 @@ CONSTANT: D3DFMT_VERTEXDATA           100
 CONSTANT: D3DFMT_INDEX16              101
 CONSTANT: D3DFMT_INDEX32              102
 CONSTANT: D3DFMT_Q16W16V16U16         110
-#! D3DFMT_MULTI2_ARGB8         = MAKEFOURCC('M', 'E', 'T', '1'),
+CONSTANT: D3DFMT_MULTI2_ARGB8         HEX: 4d455431
 CONSTANT: D3DFMT_R16F                 111
 CONSTANT: D3DFMT_G16R16F              112
 CONSTANT: D3DFMT_A16B16G16R16F        113

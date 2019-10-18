@@ -7,7 +7,6 @@ tools.deploy.config.editor assocs hashtables prettyprint ;
 IN: tools.deploy.unix
 
 : create-app-dir ( vocab bundle-name -- vm )
-    dup "" copy-theme
     copy-vm
     dup OCT: 755 set-file-permissions ;
 
@@ -20,6 +19,7 @@ M: unix deploy* ( vocab -- )
             [ bundle-name create-app-dir ] keep
             [ bundle-name image-name ] keep
             namespace make-deploy-image
+            bundle-name "" [ copy-resources ] [ copy-libraries ] 3bi
             bundle-name normalize-path [ "Binary deployed to " % % "." % ] "" make print
         ] bind
     ] with-directory ;

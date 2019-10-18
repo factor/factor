@@ -8,14 +8,14 @@ IN: glib
 <<
 
 {
-    { [ os winnt? ] [ "glib" "libglib-2.0-0.dll" "cdecl" add-library ] }
-    { [ os macosx? ] [ "glib" "/opt/local/lib/libglib-2.0.0.dylib" "cdecl" add-library ] }
+    { [ os winnt? ] [ "glib" "libglib-2.0-0.dll" cdecl add-library ] }
+    { [ os macosx? ] [ "glib" "/opt/local/lib/libglib-2.0.0.dylib" cdecl add-library ] }
     { [ os unix? ] [ ] }
 } cond
 
 {
-    { [ os winnt? ] [ "gobject" "libgobject-2.0-0.dll" "cdecl" add-library ] }
-    { [ os macosx? ] [ "gobject" "/opt/local/lib/libgobject-2.0.0.dylib" "cdecl" add-library ] }
+    { [ os winnt? ] [ "gobject" "libgobject-2.0-0.dll" cdecl add-library ] }
+    { [ os macosx? ] [ "gobject" "/opt/local/lib/libgobject-2.0.0.dylib" cdecl add-library ] }
     { [ os unix? ] [ ] }
 } cond
 

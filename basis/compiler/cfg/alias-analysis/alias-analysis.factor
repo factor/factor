@@ -12,6 +12,7 @@ compiler.cfg.registers
 compiler.cfg.comparisons
 compiler.cfg.instructions
 compiler.cfg.representations.preferred ;
+FROM: namespaces => set ;
 IN: compiler.cfg.alias-analysis
 
 ! We try to eliminate redundant slot operations using some simple heuristics.
@@ -201,14 +202,16 @@ M: ##slot-imm insn-slot# slot>> ;
 M: ##set-slot insn-slot# slot>> constant ;
 M: ##set-slot-imm insn-slot# slot>> ;
 M: ##alien-global insn-slot# [ library>> ] [ symbol>> ] bi 2array ;
-M: ##vm-field-ptr insn-slot# field-name>> ;
+M: ##vm-field insn-slot# offset>> ;
+M: ##set-vm-field insn-slot# offset>> ;
 
 M: ##slot insn-object obj>> resolve ;
 M: ##slot-imm insn-object obj>> resolve ;
 M: ##set-slot insn-object obj>> resolve ;
 M: ##set-slot-imm insn-object obj>> resolve ;
 M: ##alien-global insn-object drop \ ##alien-global ;
-M: ##vm-field-ptr insn-object drop \ ##vm-field-ptr ;
+M: ##vm-field insn-object drop \ ##vm-field ;
+M: ##set-vm-field insn-object drop \ ##vm-field ;
 
 : init-alias-analysis ( insns -- insns' )
     H{ } clone histories set
@@ -221,7 +224,7 @@ M: ##vm-field-ptr insn-object drop \ ##vm-field-ptr ;
     0 ac-counter set
     next-ac heap-ac set
 
-    \ ##vm-field-ptr set-new-ac
+    \ ##vm-field set-new-ac
     \ ##alien-global set-new-ac
 
     dup local-live-in [ set-heap-ac ] each ;
@@ -297,14 +300,14 @@ SYMBOL: live-stores
     histories get
     values [
         values [ [ store? ] filter [ insn#>> ] map ] map concat
-    ] map concat unique
+    ] map concat fast-set
     live-stores set ;
 
 GENERIC: eliminate-dead-stores* ( insn -- insn' )
 
 : (eliminate-dead-stores) ( insn -- insn' )
     dup insn-slot# [
-        insn# get live-stores get key? [
+        insn# get live-stores get in? [
             drop f
         ] unless
     ] when ;

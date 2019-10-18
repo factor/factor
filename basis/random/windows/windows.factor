@@ -36,7 +36,7 @@ CONSTANT: factor-crypto-container "FactorCryptoContainer"
     ] if ;
 
 : create-crypto-context ( provider type -- handle )
-    { CRYPT_MACHINE_KEYSET CRYPT_NEWKEYSET } flags
+    flags{ CRYPT_MACHINE_KEYSET CRYPT_NEWKEYSET }
     (acquire-crypto-context) win32-error=0/f *void* ;
 
 ERROR: acquire-crypto-context-failed provider type ;

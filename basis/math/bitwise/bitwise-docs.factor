@@ -88,10 +88,10 @@ HELP: bit-count
 
 HELP: bitroll-32
 { $values
-     { "n" integer } { "s" integer }
-     { "n'" integer }
+     { "m" integer } { "s" integer }
+     { "n" integer }
 }     
-{ $description "Rolls the number " { $snippet "n" } " by " { $snippet "s" } " bits to the left, wrapping around after 32 bits." }
+{ $description "Rolls the number " { $snippet "m" } " by " { $snippet "s" } " bits to the left, wrapping around after 32 bits." }
 { $examples 
     { $example "USING: math.bitwise prettyprint ;"
                "HEX: 1 10 bitroll-32 .h"
@@ -105,10 +105,10 @@ HELP: bitroll-32
 
 HELP: bitroll-64
 { $values
-     { "n" integer } { "s" "a shift integer" }
-     { "n'" integer }
+     { "m" integer } { "s" "a shift integer" }
+     { "n" integer }
 }
-{ $description "Rolls the number " { $snippet "n" } " by " { $snippet "s" } " bits to the left, wrapping around after 64 bits." }
+{ $description "Rolls the number " { $snippet "m" } " by " { $snippet "s" } " bits to the left, wrapping around after 64 bits." }
 { $examples 
     { $example "USING: math.bitwise prettyprint ;"
                "HEX: 1 10 bitroll-64 .h"
@@ -132,18 +132,6 @@ HELP: clear-bit
     { $example "USING: math.bitwise kernel prettyprint ;"
         "HEX: ff 7 clear-bit .h"
         "7f"
-    }
-} ;
-
-HELP: flags
-{ $values { "values" sequence } }
-{ $description "Constructs a constant flag value from a sequence of integers or words that output integers. The resulting constant is computed at compile-time, which makes this word as efficient as using a literal integer." }
-{ $examples
-    { $example "USING: math.bitwise kernel prettyprint ;"
-        "IN: scratchpad"
-        "CONSTANT: x HEX: 1"
-        "{ HEX: 20 x BIN: 100 } flags .h"
-        "25"
     }
 } ;
 
@@ -226,10 +214,10 @@ HELP: odd-parity?
 
 HELP: on-bits
 { $values
-     { "n" integer }
      { "m" integer }
+     { "n" integer }
 }
-{ $description "Returns an integer with " { $snippet "n" } " bits set." }
+{ $description "Returns an integer with " { $snippet "m" } " bits set." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "6 on-bits .h"
@@ -274,7 +262,7 @@ HELP: set-bit
 
 HELP: shift-mod
 { $values
-     { "n" integer } { "s" integer } { "w" integer }
+     { "m" integer } { "s" integer } { "w" integer }
      { "n" integer }
 }
 { $description "Calls " { $link shift } " on " { $snippet "n" } " and " { $snippet "s" } ", wrapping the result to " { $snippet "w" } " bits." } ;
@@ -307,8 +295,8 @@ HELP: unmask?
 
 HELP: w*
 { $values
-     { "int" integer } { "int" integer }
-     { "int" integer }
+     { "x" integer } { "y" integer }
+     { "z" integer }
 }
 { $description "Multiplies two integers and wraps the result to 32 bits." }
 { $examples
@@ -320,8 +308,8 @@ HELP: w*
 
 HELP: w+
 { $values
-     { "int" integer } { "int" integer }
-     { "int" integer }
+     { "x" integer } { "y" integer }
+     { "z" integer }
 }
 { $description "Adds two integers and wraps the result to 32 bits." }
 { $examples
@@ -333,8 +321,8 @@ HELP: w+
 
 HELP: w-
 { $values
-     { "int" integer } { "int" integer }
-     { "int" integer }
+     { "x" integer } { "y" integer }
+     { "z" integer }
 }
 { $description "Subtracts two integers and wraps the result to 32 bits." }
 { $examples
@@ -375,6 +363,10 @@ $nl
     bit?
     bit-clear?
 }
+"Toggling a bit:"
+{ $subsections
+    toggle-bit
+}
 "Operations with bitmasks:"
 { $subsections
     mask
@@ -404,7 +396,6 @@ $nl
 }
 "Bitfields:"
 { $subsections
-    flags
     "math-bitfields"
 } ;
 

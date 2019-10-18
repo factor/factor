@@ -36,7 +36,7 @@ $nl
 "Off by default. During normal execution, the word definition quotation of a word compiled with the optimizing compiler is not used, so disabling this flag can save space. However, some libraries introspect word definitions dynamically (for example, " { $vocab-link "inverse" } ") and so programs using these libraries must retain word definition quotations." } ;
 
 HELP: deploy-c-types?
-{ $description "Deploy flag. If set, the deploy tool retains the " { $link c-types } " table, otherwise this table is stripped out, saving space."
+{ $description "Deploy flag. If set, the deploy tool retains word properties containing metadata for C types and struct classes; otherwise, these properties are stripped out, saving space."
 $nl
 "Off by default."
 $nl
@@ -49,7 +49,7 @@ $nl
     { $link malloc-object }
     { $link malloc-array }
 }
-"If your program looks up C types dynamically or from words which do not have a stack effect, you must enable this flag, because in these situations the C type lookup is not folded away and the global table must be consulted at runtime." } ;
+"If your program looks up C types dynamically or from words which do not have a stack effect, you must enable this flag, because in these situations the C type lookup code is not folded away and the word properties must be consulted at runtime." } ;
 
 HELP: deploy-math?
 { $description "Deploy flag. If set, the deployed image will contain support for " { $link ratio } " and " { $link complex } " types."

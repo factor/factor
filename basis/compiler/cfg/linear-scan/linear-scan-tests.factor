@@ -1,4 +1,3 @@
-IN: compiler.cfg.linear-scan.tests
 USING: tools.test random sorting sequences sets hashtables assocs
 kernel fry arrays splitting namespaces math accessors vectors locals
 math.order grouping strings strings.private classes layouts
@@ -21,6 +20,8 @@ compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.allocation.splitting
 compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.debugger ;
+FROM: namespaces => set ;
+IN: compiler.cfg.linear-scan.tests
 
 check-allocation? on
 check-numbering? on

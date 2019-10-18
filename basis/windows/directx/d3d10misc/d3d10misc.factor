@@ -1,5 +1,5 @@
 USING: alien.c-types alien.syntax windows.com windows.com.syntax
-windows.directx.dxgi windows.types alien.libraries ;
+windows.directx.d3d10 windows.directx.dxgi windows.types ;
 IN: windows.directx.d3d10misc
 
 LIBRARY: d3d10

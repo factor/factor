@@ -68,7 +68,7 @@ set_downloader() {
     if [[ $? -ne 0 ]] ; then
         DOWNLOADER=wget
     else
-        DOWNLOADER="curl -O"
+        DOWNLOADER="curl -f -O"
     fi
 }
 
@@ -107,6 +107,7 @@ check_installed_programs() {
     ensure_program_installed git
     ensure_program_installed wget curl
     ensure_program_installed gcc
+    ensure_program_installed g++ cl
     ensure_program_installed make gmake
     ensure_program_installed md5sum md5
     ensure_program_installed cut
@@ -290,9 +291,15 @@ set_build_info() {
     elif [[ $OS == winnt && $ARCH == x86 && $WORD == 64 ]] ; then
         MAKE_IMAGE_TARGET=winnt-x86.64
         MAKE_TARGET=winnt-x86-64
+    elif [[ $OS == winnt && $ARCH == x86 && $WORD == 32 ]] ; then
+        MAKE_IMAGE_TARGET=winnt-x86.32
+        MAKE_TARGET=winnt-x86-32
     elif [[ $ARCH == x86 && $WORD == 64 ]] ; then
         MAKE_IMAGE_TARGET=unix-x86.64
         MAKE_TARGET=$OS-x86-64
+    elif [[ $ARCH == x86 && $WORD == 32 ]] ; then
+        MAKE_IMAGE_TARGET=unix-x86.32
+        MAKE_TARGET=$OS-x86-32
     else
         MAKE_IMAGE_TARGET=$ARCH.$WORD
         MAKE_TARGET=$OS-$ARCH-$WORD

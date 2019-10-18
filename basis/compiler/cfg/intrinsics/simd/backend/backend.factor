@@ -3,145 +3,93 @@ USING: accessors arrays assocs classes combinators
 combinators.short-circuit compiler.cfg.builder.blocks
 compiler.cfg.registers compiler.cfg.stacks
 compiler.cfg.stacks.local compiler.tree.propagation.info
+compiler.cfg.instructions
 cpu.architecture effects fry generalizations
-kernel locals macros math namespaces quotations sequences
+kernel locals macros make math namespaces quotations sequences
 splitting stack-checker words ;
 IN: compiler.cfg.intrinsics.simd.backend
 
 ! Selection of implementation based on available CPU instructions
 
-: can-has? ( quot -- ? )
-    [ t \ can-has? ] dip '[ @ drop \ can-has? get ] with-variable ; inline
+GENERIC: insn-available? ( ## -- reps )
 
-: can-has-rep? ( rep reps -- )
-    member? \ can-has? [ and ] change ; inline
+M: object insn-available? drop t ;
 
-GENERIC: create-can-has ( word -- word' )
+M: ##zero-vector insn-available? rep>> %zero-vector-reps member? ;
+M: ##fill-vector insn-available? rep>> %fill-vector-reps member? ;
+M: ##gather-vector-2 insn-available? rep>> %gather-vector-2-reps member? ;
+M: ##gather-vector-4 insn-available? rep>> %gather-vector-4-reps member? ;
+M: ##alien-vector insn-available? rep>> %alien-vector-reps member? ;
+M: ##shuffle-vector insn-available? rep>> %shuffle-vector-reps member? ;
+M: ##shuffle-vector-imm insn-available? rep>> %shuffle-vector-imm-reps member? ;
+M: ##merge-vector-head insn-available? rep>> %merge-vector-reps member? ;
+M: ##merge-vector-tail insn-available? rep>> %merge-vector-reps member? ;
+M: ##signed-pack-vector insn-available? rep>> %signed-pack-vector-reps member? ;
+M: ##unsigned-pack-vector insn-available? rep>> %unsigned-pack-vector-reps member? ;
+M: ##unpack-vector-head insn-available? rep>> %unpack-vector-head-reps member? ;
+M: ##unpack-vector-tail insn-available? rep>> %unpack-vector-tail-reps member? ;
+M: ##tail>head-vector insn-available? rep>> %unpack-vector-head-reps member? ;
+M: ##integer>float-vector insn-available? rep>> %integer>float-vector-reps member? ;
+M: ##float>integer-vector insn-available? rep>> %float>integer-vector-reps member? ;
+M: ##compare-vector insn-available? [ rep>> ] [ cc>> ] bi %compare-vector-reps member? ;
+M: ##test-vector insn-available? rep>> %test-vector-reps member? ;
+M: ##add-vector insn-available? rep>> %add-vector-reps member? ;
+M: ##saturated-add-vector insn-available? rep>> %saturated-add-vector-reps member? ;
+M: ##add-sub-vector insn-available? rep>> %add-sub-vector-reps member? ;
+M: ##sub-vector insn-available? rep>> %sub-vector-reps member? ;
+M: ##saturated-sub-vector insn-available? rep>> %saturated-sub-vector-reps member? ;
+M: ##mul-vector insn-available? rep>> %mul-vector-reps member? ;
+M: ##mul-high-vector insn-available? rep>> %mul-high-vector-reps member? ;
+M: ##mul-horizontal-add-vector insn-available? rep>> %mul-horizontal-add-vector-reps member? ;
+M: ##saturated-mul-vector insn-available? rep>> %saturated-mul-vector-reps member? ;
+M: ##div-vector insn-available? rep>> %div-vector-reps member? ;
+M: ##min-vector insn-available? rep>> %min-vector-reps member? ;
+M: ##max-vector insn-available? rep>> %max-vector-reps member? ;
+M: ##avg-vector insn-available? rep>> %avg-vector-reps member? ;
+M: ##dot-vector insn-available? rep>> %dot-vector-reps member? ;
+M: ##sad-vector insn-available? rep>> %sad-vector-reps member? ;
+M: ##sqrt-vector insn-available? rep>> %sqrt-vector-reps member? ;
+M: ##horizontal-add-vector insn-available? rep>> %horizontal-add-vector-reps member? ;
+M: ##horizontal-sub-vector insn-available? rep>> %horizontal-sub-vector-reps member? ;
+M: ##abs-vector insn-available? rep>> %abs-vector-reps member? ;
+M: ##and-vector insn-available? rep>> %and-vector-reps member? ;
+M: ##andn-vector insn-available? rep>> %andn-vector-reps member? ;
+M: ##or-vector insn-available? rep>> %or-vector-reps member? ;
+M: ##xor-vector insn-available? rep>> %xor-vector-reps member? ;
+M: ##not-vector insn-available? rep>> %not-vector-reps member? ;
+M: ##shl-vector insn-available? rep>> %shl-vector-reps member? ;
+M: ##shr-vector insn-available? rep>> %shr-vector-reps member? ;
+M: ##shl-vector-imm insn-available? rep>> %shl-vector-imm-reps member? ;
+M: ##shr-vector-imm insn-available? rep>> %shr-vector-imm-reps member? ;
+M: ##horizontal-shl-vector-imm insn-available? rep>> %horizontal-shl-vector-imm-reps member? ;
+M: ##horizontal-shr-vector-imm insn-available? rep>> %horizontal-shr-vector-imm-reps member? ;
 
-PREDICATE: hat-word < word
-    {
-        [ name>> { [ "^" head? ] [ "##" head? ] } 1|| ]
-        [ vocabulary>> { "compiler.cfg.intrinsics.simd" "compiler.cfg.hats" } member? ]
-    } 1&& ;
+: [vector-op-checked] ( #dup quot -- quot )
+    '[ _ ndup [ @ ] { } make dup [ insn-available? ] all? ] ;
 
-PREDICATE: vector-op-word < hat-word
-    name>> "-vector" swap subseq? ;
+GENERIC# >vector-op-cond 2 ( quot #pick #dup -- quotpair )
+M:: callable >vector-op-cond ( quot #pick #dup -- quotpair )
+    #dup quot [vector-op-checked] '[ 2drop @ ]
+    #dup '[ % _ nnip ]
+    2array ;
 
-: reps-word ( word -- word' )
-    name>> "^^" ?head drop "##" ?head drop
-    "%" "-reps" surround "cpu.architecture" lookup ;
-
-SYMBOL: blub
-
-:: can-has-^^-quot ( word def effect -- quot )
-    effect in>> { "rep" } split1 [ length ] bi@ 1 +
-    word reps-word 1quotation
-    effect out>> length blub <array> >quotation
-    '[ [ _ ndrop ] _ ndip @ can-has-rep? @ ] ;
-
-:: can-has-^-quot ( word def effect -- quot )
-    def create-can-has first ;
-
-: map-concat-like ( seq quot -- seq' )
-    '[ _ map ] [ concat-as ] bi ; inline
-
-M: object create-can-has 1quotation ;
-
-M: array create-can-has
-    [ create-can-has ] map-concat-like 1quotation ;
-M: callable create-can-has
-    [ create-can-has ] map-concat-like 1quotation ;
-
-: (can-has-word) ( word -- word' )
-    name>> "can-has-" prepend "compiler.cfg.intrinsics.simd.backend" lookup ;
-
-: (can-has-quot) ( word -- quot )
-    [ ] [ def>> ] [ stack-effect ] tri {
-        { [ pick name>> "^^" head? ] [ can-has-^^-quot ] }
-        { [ pick name>> "##" head? ] [ can-has-^^-quot ] }
-        { [ pick name>> "^"  head? ] [ can-has-^-quot  ] }
-    } cond ;
-
-: (can-has-nop-quot) ( word -- quot )
-    stack-effect in>> length '[ _ ndrop blub ] ;
-
-DEFER: can-has-words
-
-M: word create-can-has
-    can-has-words ?at drop 1quotation ;
-
-M: hat-word create-can-has
-    (can-has-nop-quot) ;
-
-M: vector-op-word create-can-has
-    dup (can-has-word) [ 1quotation ] [ (can-has-quot) ] ?if ;
-
-GENERIC# >can-has-cond 2 ( quot #pick #dup -- quotpair )
-M:: callable >can-has-cond ( quot #pick #dup -- quotpair )
-    #dup quot create-can-has '[ _ ndup @ can-has? ] quot 2array ;
-
-M:: pair >can-has-cond ( pair #pick #dup -- quotpair )
+M:: pair >vector-op-cond ( pair #pick #dup -- quotpair )
     pair first2 :> ( class quot )
-    #pick class #dup quot create-can-has
-    '[ _ npick _ instance? [ _ ndup @ can-has? ] dip and ]
-    quot 2array ;
+    #pick class #dup quot [vector-op-checked]
+    '[ 2drop _ npick _ instance? _ [ f f f ] if ]
+    #dup '[ % _ nnip ]
+    2array ;
 
 MACRO: v-vector-op ( trials -- )
-    [ 1 2 >can-has-cond ] map '[ _ cond ] ;
+    [ 1 2 >vector-op-cond ] map '[ f f _ cond ] ;
 MACRO: vl-vector-op ( trials -- )
-    [ 1 3 >can-has-cond ] map '[ _ cond ] ;
+    [ 1 3 >vector-op-cond ] map '[ f f _ cond ] ;
 MACRO: vv-vector-op ( trials -- )
-    [ 1 3 >can-has-cond ] map '[ _ cond ] ;
+    [ 1 3 >vector-op-cond ] map '[ f f _ cond ] ;
 MACRO: vv-cc-vector-op ( trials -- )
-    [ 2 4 >can-has-cond ] map '[ _ cond ] ;
+    [ 2 4 >vector-op-cond ] map '[ f f _ cond ] ;
 MACRO: vvvv-vector-op ( trials -- )
-    [ 1 5 >can-has-cond ] map '[ _ cond ] ;
-
-! Special-case conditional instructions
-
-: can-has-^(compare-vector) ( src1 src2 rep cc -- dst )
-    [ 2drop ] 2dip %compare-vector-reps member?
-    \ can-has? [ and ] change
-    blub ;
-
-: can-has-^^test-vector ( src rep vcc -- dst )
-    [ drop ] 2dip drop %test-vector-reps member?
-    \ can-has? [ and ] change
-    blub ;
-
-MACRO: can-has-case ( cases -- )
-    dup first second inputs 1 +
-    '[ _ ndrop f ] suffix '[ _ case ] ;
-
-GENERIC# >can-has-trial 1 ( obj #pick -- quot )
-
-M: callable >can-has-trial
-    drop '[ _ can-has? ] ;
-M: pair >can-has-trial
-    swap first2 dup inputs
-    '[ _ npick _ instance? [ _ can-has? ] [ _ ndrop blub ] if ] ; 
-
-MACRO: can-has-vector-op ( trials #pick #dup -- )
-    [ '[ _ >can-has-trial ] map ] dip '[ _ _ n|| \ can-has? [ and ] change blub ] ;
-
-: can-has-v-vector-op ( trials -- ? )
-    1 2 can-has-vector-op ; inline
-: can-has-vv-vector-op ( trials -- ? )
-    1 3 can-has-vector-op ; inline
-: can-has-vv-cc-vector-op ( trials -- ? )
-    2 4 can-has-vector-op ; inline
-: can-has-vvvv-vector-op ( trials -- ? )
-    1 5 can-has-vector-op ; inline
-
-CONSTANT: can-has-words
-    H{
-        { case can-has-case }
-        { v-vector-op     can-has-v-vector-op  }
-        { vl-vector-op    can-has-vv-vector-op }
-        { vv-vector-op    can-has-vv-vector-op }
-        { vv-cc-vector-op can-has-vv-cc-vector-op }
-        { vvvv-vector-op  can-has-vvvv-vector-op }
-    }
+    [ 1 5 >vector-op-cond ] map '[ f f _ cond ] ;
 
 ! Intrinsic code emission
 

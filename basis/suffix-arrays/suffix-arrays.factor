@@ -35,5 +35,5 @@ SYNTAX: SA{ \ } [ >suffix-array ] parse-literal ;
 
 : query ( begin suffix-array -- matches )
     2dup find-index dup
-    [ -rot [ from-to ] keep <funky-slice> [ seq>> ] map prune ]
+    [ -rot [ from-to ] keep <funky-slice> [ seq>> ] map members ]
     [ 3drop { } ] if ;

@@ -1,6 +1,6 @@
 USING: accessors math math.bitwise tools.test kernel words
 specialized-arrays alien.c-types math.vectors.simd
-sequences destructors libc ;
+sequences destructors libc literals ;
 SPECIALIZED-ARRAY: int
 IN: math.bitwise.tests
 
@@ -22,17 +22,6 @@ IN: math.bitwise.tests
 [ 268 ] [ 1 { 8 { 3 2 } } bitfield ] unit-test
 : test-1+ ( x -- y ) 1 + ;
 [ 512 ] [ 1 { { test-1+ 8 } } bitfield ] unit-test
-
-CONSTANT: a 1
-CONSTANT: b 2
-
-: foo ( -- flags ) { a b } flags ;
-
-[ 3 ] [ foo ] unit-test
-[ 3 ] [ { a b } flags ] unit-test
-\ foo def>> must-infer
-
-[ 1 ] [ { 1 } flags ] unit-test
 
 [ 8 ] [ 0 3 toggle-bit ] unit-test
 [ 0 ] [ 8 3 toggle-bit ] unit-test

@@ -32,22 +32,22 @@ PRIVATE>
 : ensure-buffer ( -- )
     (buffer) drop ; inline
 
-: with-buffer ( quot: ( -- ) -- byte-vector )
+: with-buffer ( ..a quot: ( ..a -- ..b ) -- ..b byte-vector )
     [ (buffer) [ reset-buffer ] keep dup ] dip
     with-output-stream* ; inline
 
-: with-length ( quot: ( -- ) -- bytes-written start-index )
+: with-length ( ..a quot: ( ..a -- ..b ) -- ..b bytes-written start-index )
     [ (buffer) [ length ] keep ] dip
     call length swap [ - ] keep ; inline
 
-: (with-length-prefix) ( quot: ( -- ) length-quot: ( bytes-written -- length ) -- )
+: (with-length-prefix) ( ..a quot: ( ..a -- ..b ) length-quot: ( bytes-written -- length ) -- ..b )
     [ [ B{ 0 0 0 0 } write ] prepose with-length ] dip swap
     [ call ] dip (buffer) copy ; inline
 
-: with-length-prefix ( quot: ( -- ) -- )
+: with-length-prefix ( ..a quot: ( ..a -- ..b ) -- ..b )
     [ INT32-SIZE >le ] (with-length-prefix) ; inline
     
-: with-length-prefix-excl ( quot: ( -- ) -- )
+: with-length-prefix-excl ( ..a quot: ( ..a -- ..b ) -- ..b )
     [ INT32-SIZE [ - ] keep >le ] (with-length-prefix) ; inline
     
 <PRIVATE

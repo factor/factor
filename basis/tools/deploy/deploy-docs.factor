@@ -7,11 +7,17 @@ ARTICLE: "prepare-deploy" "Preparing to deploy an application"
 { $subsections
     "deploy-config"
     "deploy-flags"
+    "deploy-resources"
 } ;
+
+ARTICLE: "deploy-resources" "Deployed resource files"
+"To include additional files in your deployed application, specify their names in a vocabulary's " { $snippet "resources.txt" } " file. The " { $snippet "resources.txt" } " file contains one glob pattern per line. These patterns are expanded relative to the vocabulary directory; files outside of the vocabulary directory cannot be referenced. If a file inside the vocabulary directory matches any of these patterns, it will be included in deployed applications that reference the vocabulary. If a subdirectory matches, its contents will be included recursively."
+$nl
+"If the deployed vocabulary includes an icon file for the current platform, it will be embedded in the deployed application as its GUI icon. See " { $link "vocabs.icons" } "." ;
 
 ARTICLE: "tools.deploy.usage" "Deploy tool usage"
 "Once the necessary deployment flags have been set, the application can be deployed:"
-{ $subsections deploy }
+{ $subsections deploy deploy-image-only }
 "For example, you can deploy the " { $vocab-link "hello-ui" } " demo which comes with Factor. Note that this demo already has a deployment configuration, so nothing needs to be configured:"
 { $code "\"hello-ui\" deploy" }
 { $list
@@ -55,4 +61,10 @@ ABOUT: "tools.deploy"
 
 HELP: deploy
 { $values { "vocab" "a vocabulary specifier" } }
-{ $description "Deploys " { $snippet "vocab" } ", saving the deployed image as " { $snippet { $emphasis "vocab" } ".image" } "." } ;
+{ $description "Deploys " { $snippet "vocab" } " into a packaged application. This will create a directory containing the Factor VM, a deployed image set up to run the " { $link POSTPONE: MAIN: } " entry point of " { $snippet "vocab" } " at startup, and any " { $link "deploy-resources" } " and shared libraries the application depends on. On Mac OS X, the deployment directory will be a standard " { $snippet ".app" } " bundle executable from Finder. To only generate the Factor image, use " { $link deploy-image-only } "." } ;
+
+HELP: deploy-image-only
+{ $values { "vocab" "a vocabulary specifier" } { "image" "a pathname" } }
+{ $description "Deploys " { $snippet "vocab" } ", saving the deployed image to the location specified by " { $snippet "image" } ". This only builds the Factor image for the vocabulary; to create a complete packaged application, use " { $link deploy } "." } ;
+
+{ deploy deploy-image-only } related-words

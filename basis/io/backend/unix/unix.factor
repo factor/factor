@@ -67,12 +67,11 @@ M: io-timeout summary drop "I/O operation timed out" ;
 
 : wait-for-fd ( handle event -- )
     dup +retry+ eq? [ 2drop ] [
-        '[
-            swap handle-fd mx get-global _ {
-                { +input+ [ add-input-callback ] }
-                { +output+ [ add-output-callback ] }
-            } case
-        ] "I/O" suspend nip [ io-timeout ] when
+        [ [ self ] dip handle-fd mx get-global ] dip {
+            { +input+ [ add-input-callback ] }
+            { +output+ [ add-output-callback ] }
+        } case
+        "I/O" suspend [ io-timeout ] when
     ] if ;
 
 : wait-for-port ( port event -- )

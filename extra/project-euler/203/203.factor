@@ -45,7 +45,7 @@ IN: project-euler.203
     [ 0 prefix ] [ 0 suffix ] bi [ + ] 2map ;
 
 : generate ( n -- seq )
-    1 - { 1 } [ (generate) ] iterate concat prune ;
+    1 - { 1 } [ (generate) ] iterate combine ;
 
 : squarefree ( n -- ? )
     factors all-unique? ;

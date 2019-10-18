@@ -2,18 +2,18 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math math.bitwise math.vectors
 namespaces sequences x11 x11.xlib x11.constants x11.glx arrays
-fry classes.struct ;
+fry classes.struct literals ;
 IN: x11.windows
 
-: create-window-mask ( -- n )
-    { CWBackPixel CWBorderPixel CWColormap CWEventMask } flags ;
+CONSTANT: create-window-mask
+    flags{ CWBackPixel CWBorderPixel CWColormap CWEventMask }
 
 : create-colormap ( visinfo -- colormap )
     [ dpy get root get ] dip visual>> AllocNone
     XCreateColormap ;
 
-: event-mask ( -- n )
-    {
+CONSTANT: event-mask
+    flags{
         ExposureMask
         StructureNotifyMask
         KeyPressMask
@@ -25,7 +25,7 @@ IN: x11.windows
         EnterWindowMask
         LeaveWindowMask
         PropertyChangeMask
-    } flags ;
+    }
 
 : window-attributes ( visinfo -- attributes )
     XSetWindowAttributes <struct>

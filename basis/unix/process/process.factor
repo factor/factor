@@ -11,9 +11,9 @@ FUNCTION: pid_t fork ( ) ;
 
 : fork-process ( -- pid ) [ fork ] unix-system-call ;
 
-FUNCTION: int execv ( char* path, char** argv ) ;
-FUNCTION: int execvp ( char* path, char** argv ) ;
-FUNCTION: int execve ( char* path, char** argv, char** envp ) ;
+FUNCTION: int execv ( c-string path, c-string* argv ) ;
+FUNCTION: int execvp ( c-string path, c-string* argv ) ;
+FUNCTION: int execve ( c-string path, c-string* argv, c-string* envp ) ;
 
 : exec ( pathname argv -- int )
     [ utf8 malloc-string ] [ utf8 strings>alien ] bi* execv ;
@@ -36,8 +36,7 @@ FUNCTION: int execve ( char* path, char** argv, char** envp ) ;
     [ [ first ] [ ] bi ] dip exec-with-env ;
 
 : with-fork ( child parent -- )
-    [ [ fork-process dup zero? ] dip '[ drop @ ] ] dip
-    if ; inline
+    [ fork-process ] 2dip if-zero ; inline
 
 CONSTANT: SIGKILL 9
 CONSTANT: SIGTERM 15

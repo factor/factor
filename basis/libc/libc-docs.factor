@@ -32,6 +32,10 @@ HELP: free
 { $values { "alien" c-ptr } }
 { $description "Deallocates a block of memory allocated by " { $link malloc } ", " { $link calloc } " or " { $link realloc } "." } ;
 
+HELP: (free)
+{ $values { "alien" c-ptr } }
+{ $description "Deallocates a block of memory allocated by an external C library." } ;
+
 HELP: &free
 { $values { "alien" c-ptr } }
 { $description "Marks the block of memory for unconditional deallocation at the end of the current " { $link with-destructors } " scope." } ;

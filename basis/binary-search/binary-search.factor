@@ -21,7 +21,7 @@ DEFER: (search)
 : keep-searching ( seq quot -- slice )
     [ dup midpoint@ ] dip call collapse-slice slice boa (search) ; inline
 
-: (search) ( quot: ( elt -- <=> ) seq -- i elt )
+: (search) ( ... quot: ( ... elt -- ... <=> ) seq -- ... i elt )
     dup length 1 <= [
         finish
     ] [

@@ -198,7 +198,7 @@ USE: sorting
 USE: binary-search
 USE: binary-search.private
 
-: old-binsearch ( elt quot: ( -- ) seq -- elt quot i )
+: old-binsearch ( elt quot: ( ..a -- ..b ) seq -- elt quot i )
     dup length 1 <= [
         from>>
     ] [

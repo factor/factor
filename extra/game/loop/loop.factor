@@ -6,7 +6,8 @@ IN: game.loop
 
 TUPLE: game-loop
     { tick-interval-micros integer read-only }
-    delegate
+    tick-delegate
+    draw-delegate
     { last-tick integer }
     thread 
     { running? boolean }
@@ -46,10 +47,10 @@ TUPLE: game-loop-error game-loop error ;
 
 : redraw ( loop -- )
     [ 1 + ] change-frame-number
-    [ tick-slice ] [ delegate>> ] bi draw* ;
+    [ tick-slice ] [ draw-delegate>> ] bi draw* ;
 
 : tick ( loop -- )
-    delegate>> tick* ;
+    tick-delegate>> tick* ;
 
 : increment-tick ( loop -- )
     [ 1 + ] change-tick-number
@@ -65,7 +66,7 @@ TUPLE: game-loop-error game-loop error ;
 
 : (run-loop) ( loop -- )
     dup running?>>
-    [ [ MAX-FRAMES-TO-SKIP ?tick ] [ redraw ] [ 1 milliseconds sleep (run-loop) ] tri ]
+    [ [ MAX-FRAMES-TO-SKIP ?tick ] [ redraw ] [ yield (run-loop) ] tri ]
     [ drop ] if ;
 
 : run-loop ( loop -- )
@@ -101,13 +102,16 @@ PRIVATE>
     f >>thread
     drop ;
 
-: <game-loop> ( tick-interval-micros delegate -- loop )
+: <game-loop*> ( tick-interval-micros tick-delegate draw-delegate -- loop )
     system-micros f f 0 0 system-micros 0 0
     game-loop boa ;
+
+: <game-loop> ( tick-interval-micros delegate -- loop )
+    dup <game-loop*> ; inline
 
 M: game-loop dispose
     stop-loop ;
 
 USING: vocabs vocabs.loader ;
 
-"prettyprint" vocab [ "game.loop.prettyprint" require ] when
+"prettyprint" "game.loop.prettyprint" require-when

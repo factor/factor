@@ -2,7 +2,7 @@ USING: alien alien.c-types arrays destructors generic io.mmap
 io.ports io.backend.windows io.files.windows io.backend.windows.privileges
 io.mmap.private kernel libc math math.bitwise namespaces quotations sequences
 windows windows.advapi32 windows.kernel32 io.backend system
-accessors locals windows.errors ;
+accessors locals windows.errors literals ;
 IN: io.mmap.windows
 
 : create-file-mapping ( hFile lpAttributes flProtect dwMaximumSizeHigh dwMaximumSizeLow lpName -- HANDLE )
@@ -29,9 +29,9 @@ C: <win32-mapped-file> win32-mapped-file
 
 M: windows (mapped-file-r/w)
     [
-        { GENERIC_WRITE GENERIC_READ } flags
+        flags{ GENERIC_WRITE GENERIC_READ }
         OPEN_ALWAYS
-        { PAGE_READWRITE SEC_COMMIT } flags
+        flags{ PAGE_READWRITE SEC_COMMIT }
         FILE_MAP_ALL_ACCESS mmap-open
         -rot <win32-mapped-file>
     ] with-destructors ;
@@ -40,7 +40,7 @@ M: windows (mapped-file-reader)
     [
         GENERIC_READ
         OPEN_ALWAYS
-        { PAGE_READONLY SEC_COMMIT } flags
+        flags{ PAGE_READONLY SEC_COMMIT }
         FILE_MAP_READ mmap-open
         -rot <win32-mapped-file>
     ] with-destructors ;

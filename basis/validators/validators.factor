@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2008 Slava Pestov
+! Copyright (C) 2006, 2010 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel continuations sequences math namespaces make sets
 math.parser math.ranges assocs regexp unicode.categories arrays
@@ -9,7 +9,7 @@ IN: validators
     >lower "on" = ;
 
 : v-default ( str def -- str/def )
-    [ nip empty? ] 2keep ? ;
+    [ drop empty? not ] 2keep ? ;
 
 : v-required ( str -- str )
     dup empty? [ "required" throw ] when ;
@@ -97,7 +97,7 @@ IN: validators
     sum 10 mod 0 = ;
 
 : v-credit-card ( str -- n )
-    "- " diff
+    "- " without
     dup CHAR: 0 CHAR: 9 [a,b] diff empty? [
         13 v-min-length
         16 v-max-length

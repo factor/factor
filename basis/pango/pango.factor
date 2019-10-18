@@ -11,8 +11,8 @@ IN: pango
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 << {
-    { [ os winnt? ] [ "pango" "libpango-1.0-0.dll" "cdecl" add-library ] }
-    { [ os macosx? ] [ "pango" "/opt/local/lib/libpango-1.0.0.dylib" "cdecl" add-library ] }
+    { [ os winnt? ] [ "pango" "libpango-1.0-0.dll" cdecl add-library ] }
+    { [ os macosx? ] [ "pango" "/opt/local/lib/libpango-1.0.0.dylib" cdecl add-library ] }
     { [ os unix? ] [ ] }
 } cond >>
 

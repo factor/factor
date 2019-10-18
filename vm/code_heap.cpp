@@ -7,8 +7,14 @@ code_heap::code_heap(cell size)
 {
 	if(size > ((u64)1 << (sizeof(cell) * 8 - 6))) fatal_error("Heap too large",size);
 	seg = new segment(align_page(size),true);
-	if(!seg) fatal_error("Out of memory in heap allocator",size);
-	allocator = new free_list_allocator<code_block>(size,seg->start);
+	if(!seg) fatal_error("Out of memory in code_heap constructor",size);
+
+	cell start = seg->start + seh_area_size;
+
+	allocator = new free_list_allocator<code_block>(seg->end - start,start);
+
+	/* See os-windows-nt-x86.64.cpp for seh_area usage */
+	seh_area = (char *)seg->start;
 }
 
 code_heap::~code_heap()

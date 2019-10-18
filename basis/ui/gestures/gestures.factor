@@ -5,6 +5,8 @@ namespaces make sequences words strings system hashtables math.parser
 math.vectors classes.tuple classes boxes calendar alarms combinators
 sets columns fry deques ui.gadgets ui.gadgets.private ascii
 combinators.short-circuit ;
+FROM: namespaces => set ;
+FROM: sets => members ;
 IN: ui.gestures
 
 : get-gesture-handler ( gesture gadget -- quot )
@@ -234,7 +236,7 @@ SYMBOL: drag-timer
 
 : modifier ( mod modifiers -- seq )
     [ second swap bitand 0 > ] with filter
-    0 <column> prune [ f ] [ >array ] if-empty ;
+    0 <column> members [ f ] [ >array ] if-empty ;
 
 : drag-loc ( -- loc )
     hand-loc get-global hand-click-loc get-global v- ;

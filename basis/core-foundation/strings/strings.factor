@@ -37,7 +37,7 @@ FUNCTION: void CFStringGetCharacters ( void* theString, CFIndex start, CFIndex l
 
 FUNCTION: Boolean CFStringGetCString (
     CFStringRef theString,
-    char* buffer,
+    UInt8* buffer,
     CFIndex bufferSize,
     CFStringEncoding encoding
 ) ;
@@ -55,7 +55,7 @@ FUNCTION: CFIndex CFStringGetBytes (
 
 FUNCTION: CFStringRef CFStringCreateWithCString (
     CFAllocatorRef alloc,
-    char* cStr,
+    UInt8* cStr,
     CFStringEncoding encoding
 ) ;
 

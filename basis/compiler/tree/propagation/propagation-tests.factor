@@ -467,6 +467,12 @@ TUPLE: fold-boa-test-tuple { x read-only } { y read-only } { z read-only } ;
 [ [ 1 2 3 fold-boa-test-tuple boa ] final-literals ]
 unit-test
 
+TUPLE: don't-fold-boa-test-tuple < identity-tuple ;
+
+[ V{ f } ]
+[ [ don't-fold-boa-test-tuple boa ] final-literals ]
+unit-test
+
 TUPLE: immutable-prop-test-tuple { x sequence read-only } ;
 
 [ V{ T{ immutable-prop-test-tuple f "hey" } } ] [
@@ -648,7 +654,7 @@ M: array iterate first t ; inline
     ] final-info drop
 ] unit-test
 
-[ V{ word } ] [
+[ V{ t } ] [
     [ { hashtable } declare hashtable instance? ] final-classes
 ] unit-test
 
@@ -660,7 +666,7 @@ M: array iterate first t ; inline
     [ { assoc } declare hashtable instance? ] final-classes
 ] unit-test
 
-[ V{ word } ] [
+[ V{ t } ] [
     [ { string } declare string? ] final-classes
 ] unit-test
 
@@ -774,7 +780,7 @@ MIXIN: empty-mixin
     [ { fixnum } declare log2 ] final-classes
 ] unit-test
 
-[ V{ word } ] [
+[ V{ t } ] [
     [ { fixnum } declare log2 0 >= ] final-classes
 ] unit-test
 

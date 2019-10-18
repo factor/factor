@@ -1,11 +1,11 @@
-! Copyright (C) 2003, 2008 Slava Pestov.
+! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel combinators math namespaces make assocs
 sequences splitting sorting sets strings vectors hashtables
 quotations arrays byte-arrays math.parser calendar
-calendar.format present urls fry
-io io.encodings io.encodings.iana io.encodings.binary
-io.crlf ascii io.encodings.8-bit.latin1 http.parsers base64 ;
+calendar.format present urls fry io io.encodings
+io.encodings.iana io.encodings.binary io.encodings.utf8 io.crlf
+ascii io.encodings.8-bit.latin1 http.parsers base64 mime.types ;
 IN: http
 
 CONSTANT: max-redirects 10
@@ -170,6 +170,7 @@ header
 cookies
 content-type
 content-charset
+content-encoding
 body ;
 
 : <response> ( -- response )
@@ -179,7 +180,7 @@ body ;
         "close" "connection" set-header
         now timestamp>http-string "date" set-header
         "Factor http.server" "server" set-header
-        latin1 >>content-charset
+        utf8 >>content-encoding
         V{ } clone >>cookies ;
 
 M: response clone
@@ -221,5 +222,5 @@ TUPLE: post-data data params content-type content-encoding ;
 
 : parse-content-type ( content-type -- type encoding )
     ";" split1
-    parse-content-type-attributes "charset" swap at name>encoding
-    [ dup "text/" head? latin1 binary ? ] unless* ;
+    parse-content-type-attributes "charset" swap at
+    [ dup mime-type-encoding encoding>name ] unless* ;

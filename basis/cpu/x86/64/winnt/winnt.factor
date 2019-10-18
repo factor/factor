@@ -5,9 +5,9 @@ compiler.cfg.registers cpu.architecture cpu.x86.assembler cpu.x86
 cpu.x86.assembler.operands ;
 IN: cpu.x86.64.winnt
 
-M: int-regs param-regs drop { RCX RDX R8 R9 } ;
+M: int-regs param-regs 2drop { RCX RDX R8 R9 } ;
 
-M: float-regs param-regs drop { XMM0 XMM1 XMM2 XMM3 } ;
+M: float-regs param-regs 2drop { XMM0 XMM1 XMM2 XMM3 } ;
 
 M: x86.64 reserved-stack-space 4 cells ;
 

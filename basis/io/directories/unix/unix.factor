@@ -4,11 +4,10 @@ USING: accessors alien.c-types alien.strings combinators
 continuations destructors fry io io.backend io.backend.unix
 io.directories io.encodings.binary io.encodings.utf8 io.files
 io.pathnames io.files.types kernel math.bitwise sequences system
-unix unix.stat vocabs.loader classes.struct unix.ffi ;
+unix unix.stat vocabs.loader classes.struct unix.ffi literals ;
 IN: io.directories.unix
 
-: touch-mode ( -- n )
-    { O_WRONLY O_APPEND O_CREAT O_EXCL } flags ; foldable
+CONSTANT: touch-mode flags{ O_WRONLY O_APPEND O_CREAT O_EXCL }
 
 M: unix touch-file ( path -- )
     normalize-path

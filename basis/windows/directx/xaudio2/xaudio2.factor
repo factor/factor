@@ -133,12 +133,11 @@ STRUCT: XAUDIO2_EFFECT_CHAIN
     { EffectCount        UINT32                     }
     { pEffectDescriptors XAUDIO2_EFFECT_DESCRIPTOR* } ;
 
-C-ENUM:
+C-ENUM: XAUDIO2_FILTER_TYPE
     LowPassFilter
     BandPassFilter
     HighPassFilter
     NotchFilter ;
-TYPEDEF: int XAUDIO2_FILTER_TYPE
 
 STRUCT: XAUDIO2_FILTER_PARAMETERS
     { Type      XAUDIO2_FILTER_TYPE }
@@ -203,6 +202,9 @@ CONSTANT: XAUDIO2_LOG_STREAMING  HEX: 1000
 
 C-TYPE: IXAudio2EngineCallback
 C-TYPE: IXAudio2VoiceCallback
+C-TYPE: IXAudio2SourceVoice
+C-TYPE: IXAudio2SubmixVoice
+C-TYPE: IXAudio2MasteringVoice
 
 COM-INTERFACE: IXAudio2 IUnknown {8bcf1f58-9fe7-4583-8ac6-e2adc465c8bb}
     HRESULT GetDeviceCount ( UINT32* pCount )

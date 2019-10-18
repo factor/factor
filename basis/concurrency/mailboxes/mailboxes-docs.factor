@@ -21,7 +21,7 @@ HELP: block-unless-pred
 { $values
     { "mailbox" mailbox }
     { "timeout" "a " { $link duration } " or " { $link f } }
-    { "pred" { $quotation "( obj -- ? )" } } 
+    { "pred" { $quotation "( ... message -- ... ? )" } } 
 }
 { $description "Block the thread if there are no items in the mailbox that return true when the predicate is called with the item on the stack." } ;
 

@@ -52,7 +52,7 @@ HELP: delete-gl-shader
 { $description "Deletes the shader object, invalidating it and releasing any resources allocated for it by the OpenGL implementation." } ;
 
 HELP: gl-shader-info-log
-{ $values { "shader" "A " { $link gl-shader } " object" } { "shader" "a new " { $link gl-shader } } { "log" string } }
+{ $values { "shader" "A " { $link gl-shader } " object" } { "log" string } }
 { $description "Retrieves the info log for " { $snippet "shader" } ", including any errors or warnings generated in compiling the shader object." } ;
 
 HELP: gl-program

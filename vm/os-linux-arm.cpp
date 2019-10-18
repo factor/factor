@@ -25,7 +25,7 @@ void flush_icache(cell start, cell len)
 		: "r0","r1","r2");
 
 	if(result < 0)
-		tls_vm()critical_error("flush_icache() failed",result);
+		critical_error("flush_icache() failed",result);
 }
 
 }

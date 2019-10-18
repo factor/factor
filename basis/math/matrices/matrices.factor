@@ -11,7 +11,7 @@ IN: math.matrices
 
 : identity-matrix ( n -- matrix )
     #! Make a nxn identity matrix.
-    iota dup [ [ = 1 0 ? ] with map ] curry map ;
+    iota dup [ = 1 0 ? ] cartesian-map ;
 
 :: rotation-matrix3 ( axis theta -- matrix )
     theta cos :> c
@@ -111,11 +111,17 @@ IN: math.matrices
 : mnorm ( m -- n ) dup mmax abs m/n ;
 
 : cross ( vec1 vec2 -- vec3 )
-    [ [ { 1 2 1 } vshuffle ] [ { 2 0 0 } vshuffle ] bi* v* ]
-    [ [ { 2 0 0 } vshuffle ] [ { 1 2 1 } vshuffle ] bi* v* ] 2bi v- ; inline
+    [ [ { 1 2 0 } vshuffle ] [ { 2 0 1 } vshuffle ] bi* v* ]
+    [ [ { 2 0 1 } vshuffle ] [ { 1 2 0 } vshuffle ] bi* v* ] 2bi v- ; inline
 
 : proj ( v u -- w )
     [ [ v. ] [ norm-sq ] bi / ] keep n*v ;
+
+: perp ( v u -- w )
+    dupd proj v- ;
+
+: angle-between ( v u -- a )
+    [ normalize ] bi@ v. acos ;
 
 : (gram-schmidt) ( v seq -- newseq )
     [ dupd proj v- ] each ;
@@ -126,9 +132,6 @@ IN: math.matrices
 : norm-gram-schmidt ( seq -- orthonormal )
     gram-schmidt [ normalize ] map ;
 
-: cross-zip ( seq1 seq2 -- seq1xseq2 )
-    [ [ 2array ] with map ] curry map ;
-    
 : m^n ( m n -- n ) 
     make-bits over first length identity-matrix
     [ [ dupd m. ] when [ dup m. ] dip ] reduce nip ;

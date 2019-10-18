@@ -176,3 +176,13 @@ IN: calendar.tests
 [ t ] [ 1356998399 unix-time>timestamp 2013 <year-gmt> 1 seconds time- = ] unit-test
 
 [ t ] [ 1500000000 random [ unix-time>timestamp timestamp>unix-time ] keep = ] unit-test
+
+[ t ] [
+    2009 1 29 <date> 1 months time+
+    2009 3 1 <date> =
+] unit-test
+
+[ t ] [
+    2008 1 29 <date> 1 months time+
+    2008 2 29 <date> =
+] unit-test

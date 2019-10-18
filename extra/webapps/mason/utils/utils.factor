@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs db.tuples furnace.actions
-html.forms kernel mason.server mason.server.release sequences
+html.forms kernel mason.server mason.version.data sequences
 validators xml.syntax ;
 IN: webapps.mason.utils
 
@@ -38,3 +38,6 @@ IN: webapps.mason.utils
         ] [ drop f ] if
     ] bi
     2array sift [ [XML <li><-></li> XML] ] map [XML <ul><-></ul> XML] ;
+
+: download-url ( string -- string' )
+    "http://downloads.factorcode.org/" prepend ;

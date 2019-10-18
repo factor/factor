@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences sorting math math.order
 calendar alarms logging concurrency.combinators namespaces
@@ -194,4 +194,7 @@ posting "POSTINGS"
         { planet "planet-common" } >>template ;
 
 : start-update-task ( db -- )
-    '[ _ [ update-cached-postings ] with-db ] 10 minutes every drop ;
+    '[
+        "webapps.planet"
+        [ _ [ update-cached-postings ] with-db ] with-logging
+    ] 10 minutes every drop ;

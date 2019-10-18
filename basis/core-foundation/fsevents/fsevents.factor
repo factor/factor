@@ -36,7 +36,6 @@ STRUCT: FSEventStreamContext
     { release void* }
     { copyDescription void* } ;
 
-! callback(
 CALLBACK: void FSEventStreamCallback ( FSEventStreamRef streamRef, void* clientCallBackInfo, size_t numEvents, void* eventPaths, FSEventStreamEventFlags* eventFlags, FSEventStreamEventId* eventIds ) ;
 
 CONSTANT: FSEventStreamEventIdSinceNow HEX: FFFFFFFFFFFFFFFF
@@ -173,16 +172,7 @@ SYMBOL: event-stream-callbacks
     info event-stream-callbacks get at [ drop ] or call( changes -- ) ;
 
 : master-event-source-callback ( -- alien )
-    "void"
-    {
-        "FSEventStreamRef"
-        "void*"                     ! info
-        "size_t"                    ! numEvents
-        "void*"                     ! eventPaths
-        "FSEventStreamEventFlags*"
-        "FSEventStreamEventId*"
-    }
-    "cdecl" [ (master-event-source-callback) ] alien-callback ;
+    [ (master-event-source-callback) ] FSEventStreamCallback ;
 
 TUPLE: event-stream < disposable info handle ;
 

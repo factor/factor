@@ -3,6 +3,8 @@
 USING: kernel classes classes.private combinators accessors
 sequences arrays vectors assocs namespaces words sorting layouts
 math hashtables kernel.private sets math.order ;
+FROM: classes => members ;
+RENAME: members sets => set-members
 IN: classes.algebra
 
 <PRIVATE
@@ -10,13 +12,14 @@ IN: classes.algebra
 TUPLE: anonymous-union { members read-only } ;
 
 : <anonymous-union> ( members -- class )
-    [ null eq? not ] filter prune
+    [ null eq? not ] filter set-members
     dup length 1 = [ first ] [ anonymous-union boa ] if ;
 
 TUPLE: anonymous-intersection { participants read-only } ;
 
 : <anonymous-intersection> ( participants -- class )
-    prune dup length 1 = [ first ] [ anonymous-intersection boa ] if ;
+    set-members dup length 1 =
+    [ first ] [ anonymous-intersection boa ] if ;
 
 TUPLE: anonymous-complement { class read-only } ;
 
@@ -234,3 +237,12 @@ ERROR: topological-sort-failed ;
 
 : flatten-class ( class -- assoc )
     [ (flatten-class) ] H{ } make-assoc ;
+
+SYMBOL: +incomparable+
+
+: compare-classes ( class1 class2 -- ? )
+    {
+        { [ 2dup class<= ] [ t ] }
+        { [ 2dup classes-intersect? not ] [ f ] }
+        [ +incomparable+ ]
+    } cond 2nip ;

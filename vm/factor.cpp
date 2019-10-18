@@ -3,19 +3,25 @@
 namespace factor
 {
 
-std::map<THREADHANDLE, factor_vm*> thread_vms;
-
 void init_globals()
 {
-	init_platform_globals();
+	init_mvm();
 }
 
 void factor_vm::default_parameters(vm_parameters *p)
 {
 	p->image_path = NULL;
 
-	p->ds_size = 32 * sizeof(cell);
-	p->rs_size = 32 * sizeof(cell);
+	p->datastack_size = 32 * sizeof(cell);
+	p->retainstack_size = 32 * sizeof(cell);
+
+#if defined(__OpenBSD__) && defined(FACTOR_X86)
+	p->callstack_size = 64 * sizeof(cell);
+#elif defined(FACTOR_PPC)
+	p->callstack_size = 256 * sizeof(cell);
+#else
+	p->callstack_size = 128 * sizeof(cell);
+#endif
 
 	p->code_size = 8 * sizeof(cell);
 	p->young_size = sizeof(cell) / 4;
@@ -59,8 +65,9 @@ void factor_vm::init_parameters_from_args(vm_parameters *p, int argc, vm_char **
 	{
 		vm_char *arg = argv[i];
 		if(STRCMP(arg,STRING_LITERAL("--")) == 0) break;
-		else if(factor_arg(arg,STRING_LITERAL("-datastack=%d"),&p->ds_size));
-		else if(factor_arg(arg,STRING_LITERAL("-retainstack=%d"),&p->rs_size));
+		else if(factor_arg(arg,STRING_LITERAL("-datastack=%d"),&p->datastack_size));
+		else if(factor_arg(arg,STRING_LITERAL("-retainstack=%d"),&p->retainstack_size));
+		else if(factor_arg(arg,STRING_LITERAL("-callstack=%d"),&p->callstack_size));
 		else if(factor_arg(arg,STRING_LITERAL("-young=%d"),&p->young_size));
 		else if(factor_arg(arg,STRING_LITERAL("-aging=%d"),&p->aging_size));
 		else if(factor_arg(arg,STRING_LITERAL("-tenured=%d"),&p->tenured_size));
@@ -91,8 +98,9 @@ void factor_vm::prepare_boot_image()
 void factor_vm::init_factor(vm_parameters *p)
 {
 	/* Kilobytes */
-	p->ds_size = align_page(p->ds_size << 10);
-	p->rs_size = align_page(p->rs_size << 10);
+	p->datastack_size = align_page(p->datastack_size << 10);
+	p->retainstack_size = align_page(p->retainstack_size << 10);
+	p->callstack_size = align_page(p->callstack_size << 10);
 	p->callback_size = align_page(p->callback_size << 10);
 
 	/* Megabytes */
@@ -117,7 +125,7 @@ void factor_vm::init_factor(vm_parameters *p)
 
 	srand((unsigned int)system_micros());
 	init_ffi();
-	init_stacks(p->ds_size,p->rs_size);
+	init_contexts(p->datastack_size,p->retainstack_size,p->callstack_size);
 	init_callbacks(p->callback_size);
 	load_image(p);
 	init_c_io();
@@ -136,6 +144,7 @@ void factor_vm::init_factor(vm_parameters *p)
 	special_objects[OBJ_EXECUTABLE] = allot_alien(false_object,(cell)p->executable_path);
 	special_objects[OBJ_ARGS] = false_object;
 	special_objects[OBJ_EMBEDDED] = false_object;
+	special_objects[OBJ_VM_COMPILER] = allot_alien(false_object,(cell)FACTOR_COMPILER_VERSION);
 
 	/* We can GC now */
 	gc_off = false;
@@ -160,16 +169,12 @@ void factor_vm::start_factor(vm_parameters *p)
 {
 	if(p->fep) factorbug();
 
-	nest_stacks();
 	c_to_factor_toplevel(special_objects[OBJ_STARTUP_QUOT]);
-	unnest_stacks();
 }
 
 void factor_vm::stop_factor()
 {
-	nest_stacks();
 	c_to_factor_toplevel(special_objects[OBJ_SHUTDOWN_QUOT]);
-	unnest_stacks();
 }
 
 char *factor_vm::factor_eval_string(char *string)
@@ -205,11 +210,6 @@ void factor_vm::start_standalone_factor(int argc, vm_char **argv)
 	start_factor(&p);
 }
 
-struct startargs {
-	int argc;
-	vm_char **argv;
-};
-
 factor_vm *new_factor_vm()
 {
 	factor_vm *newvm = new factor_vm();
@@ -219,28 +219,10 @@ factor_vm *new_factor_vm()
 	return newvm;
 }
 
-// arg must be new'ed because we're going to delete it!
-void *start_standalone_factor_thread(void *arg) 
-{
-	factor_vm *newvm = new_factor_vm();
-	startargs *args = (startargs*) arg;
-	int argc = args->argc; vm_char **argv = args->argv;
-	delete args;
-	newvm->start_standalone_factor(argc, argv);
-	return 0;
-}
-
 VM_C_API void start_standalone_factor(int argc, vm_char **argv)
 {
 	factor_vm *newvm = new_factor_vm();
 	return newvm->start_standalone_factor(argc,argv);
-}
-
-VM_C_API THREADHANDLE start_standalone_factor_in_new_thread(int argc, vm_char **argv)
-{
-	startargs *args = new startargs;
-	args->argc = argc; args->argv = argv; 
-	return start_thread(start_standalone_factor_thread,args);
 }
 
 }

@@ -21,9 +21,9 @@ FUNCTION: PangoContext*
 pango_layout_get_context ( PangoLayout* layout ) ;
 
 FUNCTION: void
-pango_layout_set_text ( PangoLayout* layout, char* text, int length ) ;
+pango_layout_set_text ( PangoLayout* layout, c-string text, int length ) ;
 
-FUNCTION: char*
+FUNCTION: c-string
 pango_layout_get_text ( PangoLayout* layout ) ;
 
 FUNCTION: void

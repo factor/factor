@@ -36,53 +36,53 @@ ARTICLE: "math.libm" "C standard library math functions"
 ABOUT: "math.libm"
 
 HELP: facos
-{ $values { "x" real } { "y" real } }
+{ $values { "x" real } { "double" real } }
 { $description "Calls the inverse trigonometric cosine function from the C standard library. User code should call " { $link acos } " instead." } ;
 
 HELP: fasin
-{ $values { "x" real } { "y" real } }
+{ $values { "x" real } { "double" real } }
 { $description "Calls the inverse trigonometric sine function from the C standard library. User code should call " { $link asin } " instead." } ;
 
 HELP: fatan
-{ $values { "x" real } { "y" real } }
+{ $values { "x" real } { "double" real } }
 { $description "Calls the inverse trigonometric tangent function from the C standard library. User code should call " { $link atan } " instead." } ;
 
 HELP: fatan2
-{ $values { "x" real } { "y" real } { "z" real } }
+{ $values { "x" real } { "y" real } { "double" real } }
 { $description "Calls the two-parameter inverse trigonometric tangent function from the C standard library. User code should call " { $link arg } " instead." } ;
 
 HELP: fcos
-{ $values { "x" real } { "y" real } }
+{ $values { "x" real } { "double" real } }
 { $description "Calls the trigonometric cosine function from the C standard library. User code should call " { $link cos } " instead." } ;
 
 HELP: fsin
-{ $values { "x" real } { "y" real } }
+{ $values { "x" real } { "double" real } }
 { $description "Calls the trigonometric sine function from the C standard library. User code should call " { $link sin } " instead." } ;
 
 HELP: fcosh
-{ $values { "x" real } { "y" real } }
+{ $values { "x" real } { "double" real } }
 { $description "Calls the hyperbolic cosine function from the C standard library. User code should call " { $link cosh } " instead." } ;
 
 HELP: fsinh
-{ $values { "x" real } { "y" real } }
+{ $values { "x" real } { "double" real } }
 { $description "Calls the hyperbolic sine function from the C standard library. User code should call " { $link sinh } " instead." } ;
 
 HELP: fexp
-{ $values { "x" real } { "y" real } }
+{ $values { "x" real } { "double" real } }
 { $description "Calls the exponential function (" { $snippet "y=e^x" } " from the C standard library. User code should call " { $link exp } " instead." } ;
 
 HELP: flog
-{ $values { "x" real } { "y" real } }
+{ $values { "x" real } { "double" real } }
 { $description "Calls the natural logarithm function from the C standard library. User code should call " { $link log } " instead." } ;
 
 HELP: flog10
-{ $values { "x" real } { "y" real } }
+{ $values { "x" real } { "double" real } }
 { $description "Calls the base 10 logarithm function from the C standard library. User code should call " { $link log10 } " instead." } ;
 
 HELP: fpow
-{ $values { "x" real } { "y" real } { "z" real } }
+{ $values { "x" real } { "y" real } { "double" real } }
 { $description "Calls the power function (" { $snippet "z=x^y" } ") from the C standard library. User code should call " { $link ^ } " instead." } ;
 
 HELP: fsqrt
-{ $values { "x" real } { "y" real } }
+{ $values { "x" real } { "double" real } }
 { $description "Calls the square root function from the C standard library. User code should call " { $link sqrt } " instead." } ;

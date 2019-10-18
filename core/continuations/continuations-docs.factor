@@ -9,9 +9,13 @@ ARTICLE: "errors-restartable" "Restartable errors"
     throw-restarts
     rethrow-restarts
 }
+"A utility word using the above:"
+{ $subsections
+    throw-continue
+}
 "The list of restarts from the most recently-thrown error is stored in a global variable:"
 { $subsections restarts }
-"To invoke restarts, see " { $link "debugger" } "." ;
+"To invoke restarts, use " { $link "debugger" } "." ;
 
 ARTICLE: "errors-post-mortem" "Post-mortem error inspection"
 "The most recently thrown error, together with the continuation at that point, are stored in a pair of global variables:"
@@ -178,7 +182,7 @@ HELP: cleanup
 { $description "Calls the " { $snippet "try" } " quotation. If no error is thrown, calls " { $snippet "cleanup-always" } " without restoring the data stack. If an error is thrown, restores the data stack, calls " { $snippet "cleanup-always" } " followed by " { $snippet "cleanup-error" } ", and rethrows the error." } ;
 
 HELP: recover
-{ $values { "try" quotation } { "recovery" { $quotation "( error -- )" } } }
+{ $values { "try" { $quotation "( ..a -- ..b )" } } { "recovery" { $quotation "( ..a error -- ..b )" } } }
 { $description "Calls the " { $snippet "try" } " quotation. If an exception is thrown in the dynamic extent of the " { $snippet "try" } " quotation, restores the data stack and calls the " { $snippet "recovery" } " quotation to handle the error." } ;
 
 HELP: ignore-errors
@@ -213,7 +217,11 @@ HELP: rethrow-restarts
 { $values { "error" object } { "restarts" "a sequence of " { $snippet "{ string object }" } " pairs" } { "restart" object } }
 { $description "Throws a restartable error using " { $link rethrow } ". Otherwise, this word is identical to " { $link throw-restarts } "." } ;
 
-{ throw rethrow throw-restarts rethrow-restarts } related-words
+{ throw rethrow throw-restarts rethrow-restarts throw-continue } related-words
+
+HELP: throw-continue
+{ $values { "error" object } }
+{ $description "Throws a resumable error. If the user elects to continue execution, this word returns normally." } ;
 
 HELP: compute-restarts
 { $values { "error" object } { "seq" "a sequence" } }
@@ -227,7 +235,7 @@ HELP: save-error
 $low-level-note ;
 
 HELP: with-datastack
-{ $values { "stack" sequence } { "quot" quotation } { "newstack" sequence } }
+{ $values { "stack" sequence } { "quot" quotation } { "new-stack" sequence } }
 { $description "Executes the quotation with the given data stack contents, and outputs the new data stack after the word returns. The input sequence is not modified; a new sequence is produced. Does not affect the data stack in surrounding code, other than consuming the two inputs and pushing the output." }
 { $examples
     { $example "USING: continuations math prettyprint ;" "{ 3 7 } [ + ] with-datastack ." "{ 10 }" }

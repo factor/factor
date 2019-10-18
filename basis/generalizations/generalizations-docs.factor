@@ -252,17 +252,17 @@ HELP: spread*
 { $notes "This word can be used with " { $link apply-curry } " to generalize the " { $snippet "bi-curry@ bi*" } " or " { $snippet "tri-curry@ tri*" } " dataflow patterns." } ;
 
 HELP: apply-curry
-{ $values { "...a" { $snippet "n" } " values on the datastack" } { "quot" quotation } { "n" integer } }
+{ $values { "a..." { $snippet "n" } " values on the datastack" } { "quot" quotation } { "n" integer } }
 { $description "Curries each of the top " { $snippet "n" } " items of the datastack onto " { $snippet "quot" } ", leaving " { $snippet "n" } " quotations on the datastack. A generalization of " { $link bi-curry@ } " and " { $link tri-curry@ } "." }
 { $notes "This word can be used with " { $link cleave* } " and " { $link spread* } " to generalize dataflow patterns such as " { $snippet "bi-curry@ bi" } ", " { $snippet "tri-curry@ tri" } ", " { $snippet "bi-curry@ bi*" } ", and " { $snippet "tri-curry@ tri*" } "." } ;
 
 HELP: cleave-curry
-{ $values { "a" object } { "...quot" { $snippet "n" } " quotations on the datastack" } { "n" integer } }
+{ $values { "a" object } { "quot..." { $snippet "n" } " quotations on the datastack" } { "n" integer } }
 { $description "Curries " { $snippet "a" } " onto the " { $snippet "n" } " quotations on the top of the datastack. A generalization of " { $link bi-curry } " and " { $link tri-curry } "." }
 { $notes "This word can be used with " { $link cleave* } " and " { $link spread* } " to generalize dataflow patterns such as " { $snippet "bi-curry bi" } ", " { $snippet "tri-curry tri" } ", " { $snippet "bi-curry bi*" } ", and " { $snippet "tri-curry tri*" } "." } ;
 
 HELP: spread-curry
-{ $values { "...a" { $snippet "n" } " objects on the datastack" } { "...quot" { $snippet "n" } " quotations on the datastack" } { "n" integer } }
+{ $values { "a..." { $snippet "n" } " objects on the datastack" } { "quot..." { $snippet "n" } " quotations on the datastack" } { "n" integer } }
 { $description "Curries the " { $snippet "n" } " quotations on the top of the datastack with the " { $snippet "n" } " values just below them. A generalization of " { $link bi-curry* } " and " { $link tri-curry* } "." }
 { $notes "This word can be used with " { $link cleave* } " and " { $link spread* } " to generalize dataflow patterns such as " { $snippet "bi-curry* bi" } ", " { $snippet "tri-curry* tri" } ", " { $snippet "bi-curry* bi*" } ", and " { $snippet "tri-curry* tri*" } "." } ;
 
