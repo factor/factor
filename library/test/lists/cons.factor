@@ -25,4 +25,3 @@ USE: test
 
 [ [ 1 2 ]   ] [ 1 2   2list  ] unit-test
 [ [ 1 2 3 ] ] [ 1 2 3 3list  ] unit-test
-[ [ 2 1 ]   ] [ 1 2   2rlist ] unit-test

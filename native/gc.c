@@ -149,3 +149,11 @@ void primitive_gc(void)
 
 	gc_in_progress = false;
 }
+
+/* WARNING: only call this from a context where all local variables
+are also reachable via the GC roots. */
+void maybe_garbage_collection(void)
+{
+	if(active.here > active.alarm)
+		primitive_gc();
+}

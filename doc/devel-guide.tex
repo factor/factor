@@ -1087,30 +1087,12 @@ Unless otherwise documented, list manipulation words expect proper
 lists as arguments. Given an improper list, they will either raise
 an error, or disregard the hanging cdr at the end of the list.
 
-Also unless otherwise documented, list manipulation words return newly-created
+List manipulation words usually return newly-created
 lists only. The original parameters are not modified. This may seem
 inefficient, however the absence of side effects makes code much easier
 to test and debug.%
 \footnote{Side effect-free code is the fundamental idea underlying functional
-programming languages. While Factor allows side effects and is not
-a functional programming language, for a lot of problems, coding in
-a functional style gives the most maintainable and readable results.%
-} Where performance is important, a set of {}``destructive'' words
-is provided. They are documented in \ref{sub:Destructively-modifying-lists}.
-
-\texttt{add ( list obj -{}- list )} Create a new list consisting of
-the original list, and a new element added at the end:
-
-\begin{alltt}
-{[} 1 2 3 {]} 4 add .
-\emph{{[} 1 2 3 4 {]}}
-1 {[} 2 3 4 {]} cons .
-\emph{{[} 1 2 3 4 {]}}
-\end{alltt}
-
-While \texttt{cons} and \texttt{add} appear to have similar effects,
-they are quite different -- \texttt{cons} is a very cheap operation,
-while \texttt{add} has to copy the entire list first! If you need to add to the end of a sequence frequently, consider either using a vector, or adding to the beginning of a list and reversing the list when done.
+programming languages.
 
 \texttt{append ( list list -{}- list )} Append two lists at the
 top of the stack:
@@ -1173,15 +1155,6 @@ of the object removed. All other elements are in the same order:
 \emph{{[} "Canada" "New Zealand" "Russia" {]}}
 \end{alltt}
 
-\texttt{remove-nth ( index list -{}- list )} Push a new list, with
-an index removed:
-
-\begin{alltt}
-: remove-1 ( list -- list ) 1 swap remove-nth ;
-{[} "Canada" "New Zealand" "Australia" "Russia" {]} remove-1 .
-\emph{{[} "Canada" "Australia" "Russia" {]}}
-\end{alltt}
-
 \texttt{reverse ( list -{}- list )} Push a new list which has the
 same elements as the original one, but in reverse order:
 
@@ -1190,7 +1163,7 @@ same elements as the original one, but in reverse order:
 \emph{{[} 1 2 3 4 {]}}
 \end{alltt}
 
-\texttt{contains ( obj list -{}- list )} Look for an occurrence of
+\texttt{contains?~( obj list -{}- list )} Look for an occurrence of
 an object in a list. The remainder of the list starting from the first
 occurrence is returned. If the object does not occur in the list,
 f is returned:
@@ -1224,81 +1197,6 @@ looks like''. The concept of object equality is covered later.
 "Unit 18" unit .
 \emph{{[} "Unit 18" {]}}
 \end{alltt}
-
-\subsection{\label{sub:Destructively-modifying-lists}Destructively modifying lists}
-
-All previously discussed list modification functions always returned
-newly-allocated lists. Destructive list manipulation functions on
-the other hand reuse the cons cells of their input lists, and hence
-avoid memory allocation.
-
-Only ever destructively change lists you do not intend to reuse again.
-You should not rely on the side effects -- they are unpredictable.
-It is wrong to think that destructive words {}``modify'' the original
-list -- rather, think of them as returning a new list, just like the
-normal versions of the words, with the added caveat that the original
-list must not be used again.
-
-\texttt{nreverse ( list -{}- list )} reverses a list without consing.
-In the following example, the return value has reused the cons cells of
-the original list, and the original list has been destroyed:
-
-\begin{alltt}
-{[} 1 2 3 4 {]} dup nreverse .s
-\emph{\{ {[} 1 {]} {[} 4 3 2 1 {]} \}}
-\end{alltt}
-
-Compare the second stack element (which is what remains of the original
-list) and the top stack element (the list returned by \texttt{nreverse}).
-
-The \texttt{nreverse} word is the most frequently used destructive
-list manipulator. The usual idiom is a loop where values are consed
-onto the beginning of a list in each iteration of a loop, then the
-list is reversed at the end. Since the original list is never used
-again, \texttt{nreverse} can safely be used here.
-
-\texttt{nappend ( list list -{}- list )} sets the cdr of the last
-cons cell in the first list to the second list, unless the first list
-is \texttt{f}, in which case it simply returns the second list. Again,
-the side effects on the first list are unpredictable -- if it is \texttt{f},
-it is unchanged, otherwise, it is equal to the return value:
-
-\begin{alltt}
-{[} 1 2 {]} {[} 3 4 {]} nappend .
-\emph{{[} 1 2 3 4 {]}}
-\end{alltt}
-
-Note in the above examples, we use literal list parameters to \texttt{nreverse}
-and \texttt{nappend}. This is actually a very bad idea, since the same literal
-list may be used more than once! For example, lets make a colon definition:
-
-\begin{alltt}
-: very-bad-idea {[} 1 2 3 4 {]} nreverse ;
-very-bad-idea .
-\emph{{[} 4 3 2 1 {]}}
-very-bad-idea .
-\emph{{[} 1 {]}}
-"very-bad-idea" see
-\emph{: very-bad-idea}
- \emph{   {[} 1 {]} nreverse ;}
-\end{alltt}
-
-As you can see, the word definition itself was ruined!
-
-Sometimes it is desirable make a copy of a list, so that the copy
-may be safely side-effected later.
-
-\texttt{clone-list ( list -{}- list )} pushes a new list containing
-the exact same elements as the original. The elements themselves are
-not copied.
-
-If you want to write your own destructive list manipulation words,
-you can use \texttt{set-car ( value cons -{}- )} and \texttt{set-cdr
-( value cons -{}- )} to modify individual cons cells. Some words that
-are not destructive on their inputs nonetheless create intermediate
-lists which are operated on using these words. One example is \texttt{clone-list}
-itself.
-
 
 \subsection{\label{sub:Vectors}Vectors}
 
@@ -2208,8 +2106,6 @@ On the other hand, duplicating an object reference on the stack using \texttt{du
 \end{alltt}
 
 In most cases, only \texttt{=} needs to be used. In fact, \texttt{eq?} is only used in a handful of places in the Factor standard library.
-
-An object can be cloned using \texttt{clone ( obj -{}- obj )}. The clone will no longer be \texttt{eq?} to the original (unless the original is immutable, in which case cloning is a no-op); however clones are always \texttt{=}.
 
 \subsection{Association lists}
 

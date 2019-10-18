@@ -53,17 +53,6 @@ USE: vectors
 ! bind ( namespace quot -- ) executes a quotation with a
 ! namespace pushed on the namespace stack.
 
-: namestack ( -- stack )
-    #! Push a copy of the namespace stack; same naming
-    #! convention as the primitives datastack and callstack.
-    namestack* clone ; inline
-
-: set-namestack ( stack -- )
-    #! Set the namespace stack to a copy of another stack; same
-    #! naming convention as the primitives datastack and
-    #! callstack.
-    clone set-namestack* ; inline
-
 : >n ( namespace -- n:namespace )
     #! Push a namespace on the namespace stack.
     namestack* vector-push ; inline
@@ -75,10 +64,6 @@ USE: vectors
 : namespace ( -- namespace )
     #! Push the current namespace.
     namestack* vector-peek ; inline
-
-: bind ( namespace quot -- )
-    #! Execute a quotation with a namespace on the namestack.
-    swap namespace-of >n call n> drop ; inline
 
 : with-scope ( quot -- )
     #! Execute a quotation with a new namespace on the
@@ -98,14 +83,6 @@ USE: vectors
     #! result of evaluating [ a ].
     over get [ drop get ] [ swap >r call dup r> set ] ifte ;
 
-: alist> ( alist namespace -- )
-    #! Set each key in the alist to its value in the
-    #! namespace.
-    [ [ unswons set ] each ] bind ;
-
-: alist>namespace ( alist -- namespace )
-    <namespace> tuck alist> ;
-
 : traverse-path ( name object -- object )
     dup has-namespace? [ get* ] [ 2drop f ] ifte ;
 
@@ -116,7 +93,7 @@ USE: vectors
     #! An object path is a list of strings. Each string is a
     #! variable name in the object namespace at that level.
     #! Returns f if any of the objects are not set.
-    this swap (object-path) ;
+    namespace swap (object-path) ;
 
 : (set-object-path) ( name -- namespace )
     dup namespace get* dup [

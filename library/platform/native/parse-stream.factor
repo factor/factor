@@ -69,16 +69,12 @@ USE: strings
 : (parse-stream) ( name stream -- quot )
     #! Uses the current namespace for temporary variables.
     >r "file" set f r>
-    [ (parse) ] read-lines nreverse
+    [ (parse) ] read-lines reverse
     "file" off
     "line-number" off ;
 
 : parse-stream ( name stream -- quot )
-    [
-        10 "base" set
-        file-vocabs
-        (parse-stream)
-    ] with-scope ;
+    [ file-vocabs (parse-stream) ] with-scope ;
 
 : parse-file ( file -- quot )
     dup <filecr> parse-stream ;

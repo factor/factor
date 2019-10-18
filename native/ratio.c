@@ -4,8 +4,12 @@
 library implementation, to avoid breaking invariants. */
 void primitive_from_fraction(void)
 {
-	CELL denominator = dpop();
-	CELL numerator = dpop();
+	CELL numerator, denominator;
+
+	maybe_garbage_collection();
+
+	denominator = dpop();
+	numerator = dpop();
 	if(zerop(denominator))
 		raise(SIGFPE);
 	if(onep(denominator))
@@ -16,27 +20,6 @@ void primitive_from_fraction(void)
 		ratio->numerator = numerator;
 		ratio->denominator = denominator;
 		dpush(tag_ratio(ratio));
-	}
-}
-
-void primitive_to_fraction(void)
-{
-	RATIO* r;
-
-	switch(type_of(dpeek()))
-	{
-	case FIXNUM_TYPE:
-	case BIGNUM_TYPE:
-		dpush(tag_fixnum(1));
-		break;
-	case RATIO_TYPE:
-		r = untag_ratio(dpeek());
-		drepl(r->numerator);
-		dpush(r->denominator);
-		break;
-	default:
-		type_error(RATIONAL_TYPE,dpeek());
-		break;
 	}
 }
 

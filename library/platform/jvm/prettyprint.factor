@@ -51,13 +51,13 @@ USE: words
     tab-size - ;
 
 : prettyprint-~<<>>~ ( indent word list -- indent )
-    [ [ prettyprint-~<< ] dip prettyprint-word " " write ] dip
+    >r >r prettyprint-~<< r> prettyprint-word " " write r>
     [ write " " write ] each
     prettyprint->>~ ;
 
 : see ( word -- )
     0 swap
-    intern dup worddef
+    dup worddef
     [
         [ compound-or-compiled? ] [ word-parameter prettyprint-:; ]
         [ shuffle? ] [ word-parameter prettyprint-~<<>>~ ]

@@ -51,8 +51,6 @@ USE: words
     [ cons                   | " car cdr -- [ car | cdr ] " ]
     [ car                    | " [ car | cdr ] -- car " ]
     [ cdr                    | " [ car | cdr ] -- cdr " ]
-    [ set-car                | " car cons -- " ]
-    [ set-cdr                | " cdr cons -- " ]
     [ <vector>               | " capacity -- vector" ]
     [ vector-length          | " vector -- n " ]
     [ set-vector-length      | " n vector -- " ]
@@ -84,14 +82,12 @@ USE: words
     [ >float                 | " n -- float " ]
     [ numerator              | " a/b -- a " ]
     [ denominator            | " a/b -- b " ]
-    [ >fraction              | " a/b -- a b " ]
     [ fraction>              | " a b -- a/b " ]
     [ str>float              | " str -- float " ]
     [ unparse-float          | " float -- str " ]
     [ float>bits             | " float -- n " ]
     [ real                   | " #{ re im } -- re " ]
     [ imaginary              | " #{ re im } -- im " ]
-    [ >rect                  | " #{ re im } -- re im " ]
     [ rect>                  | " re im -- #{ re im } " ]
     [ fixnum=                | " x y -- ? " ]
     [ fixnum+                | " x y -- x+y " ]
@@ -211,7 +207,6 @@ USE: words
     [ allot-profiling        | " depth -- " ]
     [ allot-count            | " word -- n " ]
     [ set-allot-count        | " n word -- n " ]
-    [ dump                   | " obj -- " ]
     [ cwd                    | " -- dir " ]
     [ cd                     | " dir -- " ]
     [ compiled-offset        | " -- ptr " ]
@@ -225,7 +220,7 @@ USE: words
     [ dlsym                  | " name dll -- ptr " ]
     [ dlsym-self             | " name -- ptr " ]
     [ dlclose                | " dll -- " ]
-    [ <alien>                | " ptr len -- alien " ]
+    [ <alien>                | " ptr -- alien " ]
     [ <local-alien>          | " len -- alien " ]
     [ alien-cell             | " alien off -- n " ]
     [ set-alien-cell         | " n alien off -- " ]
@@ -238,5 +233,5 @@ USE: words
     [ heap-stats             | " -- instances bytes " ]
     [ throw                  | " error -- " ]
 ] [
-    unswons "stack-effect" set-word-property
+    uncons "stack-effect" set-word-property
 ] each

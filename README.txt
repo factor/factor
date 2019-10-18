@@ -103,9 +103,6 @@ a list. Note that it uses 'call' to execute the given quotation:
 : each ( list quotation -- )
     #! Push each element of a proper list in turn, and apply a
     #! quotation to each element.
-    #!
-    #! In order to compile, the quotation must consume one more
-    #! value than it produces.
     over [
         >r uncons r> tuck >r >r call r> r> each
     ] [
@@ -223,3 +220,43 @@ The 'with-stream' word is implemented by pushing a new namespace on the
 namestack, setting the 'stdio' variable therein, and execution the given
 quotation.
 
+* Continuations
+
+A continuation is a quotation that restores execution to the point where
+it was captured. Continuations are captured using the callcc0 and
+callcc1 words in the 'continuations' vocabulary.
+
+The word names are abbreviations for 'call with current continuation';
+the 0 or 1 refers to the arity of the continuation.
+
+Consider the phrase 'call with current continuation':
+
+- 'call'                 -- it calls a quotation given as a parameter...
+- 'with'                 -- with a value on the stack....
+- 'current continuation' -- that is a quotation that can be called
+                            to restore execution at the current point.
+
+A continuation can either have arity 0 or 1. This refers to the number
+of parameters the quotation transfers from the caller stack to the
+restored point.
+
+Three very simple examples:
+
+    [ call ] callcc0 "Hello world." print
+                    ^
+                    ------- captured continuation restores here.
+    ==> Hello world.
+
+    [ "my-c" set ] callcc0 "Hello world." print
+                          ^
+                          -------- captured continuation restores here.
+    ==> Hello world.
+    
+    "my-c" get call
+    ==> Hello world.
+
+Continuations are an advanced feature and are used in the implementation
+of error handling, multi-tasking, co-routines, and generators.
+
+(This is for my editor. It can be removed.
+:tabSize=4:indentSize=4:noTabs=true:)

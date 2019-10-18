@@ -54,7 +54,7 @@ USE: strings
 : fcopy ( from to -- )
     #! Copy the contents of the byte-stream 'from' to the
     #! byte-stream 'to'.
-    [ [ "in" get ] bind ] dip
+    >r [ "in" get ] bind r>
     [ "out" get ] bind
     [ "java.io.InputStream" "java.io.OutputStream" ]
     "factor.FactorLib" "copy" jinvoke-static ;

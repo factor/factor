@@ -7,11 +7,10 @@
 #define GLOBAL_ENV     4
 #define BREAK_ENV      5
 #define CATCHSTACK_ENV 6 /* used by library only */
-#define GC_ENV         7
+#define CPU_ENV        7
 #define BOOT_ENV       8
 #define RUNQUEUE_ENV   9 /* used by library only */
 #define ARGS_ENV       10
-#define CPU_ENV        11
 
 /* Profiling timer */
 struct itimerval prof_timer;
@@ -94,9 +93,6 @@ INLINE void call(CELL quot)
 	callframe = quot;
 }
 
-void signal_handler(int signal, siginfo_t* siginfo, void* uap);
-void call_profiling_step(int signal, siginfo_t* siginfo, void* uap);
-void init_signals(void);
 void clear_environment(void);
 
 void run(void);
@@ -108,6 +104,3 @@ void primitive_call(void);
 void primitive_ifte(void);
 void primitive_getenv(void);
 void primitive_setenv(void);
-void primitive_exit(void);
-void primitive_os_env(void);
-void primitive_call_profiling(void);

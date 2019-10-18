@@ -72,5 +72,5 @@ IN: kernel
     ] assoc ;
 
 : num-types ( -- n )
-    #! One more than the maximum value from type-of.
+    #! One more than the maximum value from type primitive.
     17 ;

@@ -8,7 +8,6 @@ DLL* untag_dll(CELL tagged);
 typedef struct {
 	CELL header;
 	CELL ptr;
-	CELL length;
 	/* local aliens are heap-allocated as strings and must be collected. */
 	bool local;
 } ALIEN;

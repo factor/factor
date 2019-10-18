@@ -74,7 +74,6 @@ USE: words
 
 : see ( name -- )
     #! Show a word definition.
-    intern
     [
         [ compound? ] [ see-compound ]
         [ symbol? ] [ see-symbol ]

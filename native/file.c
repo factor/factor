@@ -4,9 +4,13 @@ void primitive_open_file(void)
 {
 	bool write = untag_boolean(dpop());
 	bool read = untag_boolean(dpop());
-	char* path = unbox_c_string();
-	int mode;
-	int fd;
+
+	char* path;
+	int mode, fd;
+
+	maybe_garbage_collection();
+
+	path = unbox_c_string();
 
 	if(read && write)
 		mode = O_RDWR | O_CREAT;
@@ -28,7 +32,11 @@ void primitive_open_file(void)
 void primitive_stat(void)
 {
 	struct stat sb;
-	STRING* path = untag_string(dpop());
+	STRING* path;
+
+	maybe_garbage_collection();
+
+	path = untag_string(dpop());
 	if(stat(to_c_string(path),&sb) < 0)
 		dpush(F);
 	else
@@ -50,14 +58,19 @@ void primitive_stat(void)
 
 void primitive_read_dir(void)
 {
-	STRING* path = untag_string(dpop());
-	DIR* dir = opendir(to_c_string(path));
+	STRING* path;
+	DIR* dir;
 	CELL result = F;
+
+	maybe_garbage_collection();
+
+	path = untag_string(dpop());
+	dir = opendir(to_c_string(path));
 	if(dir != NULL)
 	{
 		struct dirent* file;
 
-		while(file = readdir(dir))
+		while((file = readdir(dir)) != NULL)
 		{
 			CELL name = tag_object(from_c_string(
 				file->d_name));
@@ -73,6 +86,7 @@ void primitive_read_dir(void)
 void primitive_cwd(void)
 {
 	char wd[MAXPATHLEN];
+	maybe_garbage_collection();
 	if(getcwd(wd,MAXPATHLEN) < 0)
 		io_error(__FUNCTION__);
 	box_c_string(wd);
@@ -80,5 +94,6 @@ void primitive_cwd(void)
 
 void primitive_cd(void)
 {
+	maybe_garbage_collection();
 	chdir(unbox_c_string());
 }

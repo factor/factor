@@ -82,6 +82,6 @@ USE: lists
     ( f -- ) compile-quot
     r> end-if ;
 
-[ compile-ifte ] \ ifte "compiling" set-word-property
-[ compile-when ] \ when "compiling" set-word-property
-[ compile-unless ] \ unless "compiling" set-word-property
+\ ifte [ compile-ifte ] "compiling" set-word-property
+\ when [ compile-when ] "compiling" set-word-property
+\ unless [ compile-unless ] "compiling" set-word-property

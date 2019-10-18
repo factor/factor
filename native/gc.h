@@ -7,3 +7,4 @@ void collect_object(void);
 void collect_next(void);
 void collect_roots(void);
 void primitive_gc(void);
+void maybe_garbage_collection(void);

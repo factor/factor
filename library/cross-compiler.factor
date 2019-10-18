@@ -74,7 +74,6 @@ DEFER: os-env
 DEFER: type
 DEFER: size
 DEFER: address
-DEFER: dump
 DEFER: heap-stats
 
 IN: strings
@@ -186,7 +185,7 @@ DEFER: word-plist
 DEFER: set-word-plist
 
 IN: unparser
-DEFER: unparse-float
+DEFER: (unparse-float)
 
 IN: image
 
@@ -198,8 +197,6 @@ IN: image
         cons
         car
         cdr
-        set-car
-        set-cdr
         <vector>
         vector-length
         set-vector-length
@@ -231,14 +228,12 @@ IN: image
         >float
         numerator
         denominator
-        >fraction
         fraction>
         str>float
-        unparse-float
+        (unparse-float)
         float>bits
         real
         imaginary
-        >rect
         rect>
         fixnum=
         fixnum+
@@ -359,7 +354,6 @@ IN: image
         (random-int)
         type
         size
-        dump
         cwd
         cd
         compiled-offset

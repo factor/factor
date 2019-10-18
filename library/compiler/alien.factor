@@ -82,5 +82,4 @@ USE: words
 
 global [ <namespace> "libraries" set ] bind
 
-[ alien-call compile-alien-call ]
-unswons "compiling" set-word-property
+\ alien-call [ compile-alien-call ] "compiling" set-word-property

@@ -67,12 +67,8 @@ USE: words
     word-file ;
 
 : jedit ( word -- )
-    intern dup [
-        word-line/file dup [
-            jedit-line/file
-        ] [
-            3drop "Unknown source" print
-        ] ifte
+    word-line/file dup [
+        jedit-line/file
     ] [
-        "Not defined" print
+        3drop "Unknown source" print
     ] ifte ;

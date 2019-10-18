@@ -78,7 +78,7 @@ USE: logic
 : attrs>string ( alist -- string )
     #! Convert the attrs alist to a string
     #! suitable for embedding in an html tag.
-    nreverse <% [ dup car % "='" % cdr % "'" % ] each %> ;
+    reverse <% [ dup car % "='" % cdr % "'" % ] each %> ;
 
 : write-attributes ( n: namespace -- )    
     #! With the attribute namespace on the stack, get the attributes

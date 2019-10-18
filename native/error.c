@@ -13,20 +13,8 @@ void critical_error(char* msg, CELL tagged)
 	exit(1);
 }
 
-void fix_stacks(void)
-{
-	if(STACK_UNDERFLOW(ds,ds_bot)
-		|| STACK_OVERFLOW(ds,ds_bot))
-		reset_datastack();
-	if(STACK_UNDERFLOW(cs,cs_bot)
-		|| STACK_OVERFLOW(cs,cs_bot))
-		reset_callstack();
-}
-
 void throw_error(CELL error)
 {
-	fix_stacks();
-
 	dpush(error);
 	/* Execute the 'throw' word */
 	call(userenv[BREAK_ENV]);
@@ -69,8 +57,8 @@ void type_error(CELL type, CELL tagged)
 	general_error(ERROR_TYPE,c);
 }
 
-void range_error(CELL tagged, CELL index, CELL max)
+void range_error(CELL tagged, FIXNUM index, CELL max)
 {
-	CELL c = cons(tagged,cons(tag_fixnum(index),cons(tag_fixnum(max),F)));
+	CELL c = cons(tagged,cons(tag_integer(index),cons(tag_cell(max),F)));
 	general_error(ERROR_RANGE,c);
 }

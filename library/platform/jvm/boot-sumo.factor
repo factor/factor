@@ -69,6 +69,7 @@ USE: parser
 "/library/platform/jvm/stream.factor"       run-resource ! streams
 "/library/platform/jvm/files.factor"        run-resource ! files
 "/library/stdio.factor"                     run-resource ! stdio
+"/library/extend-stream.factor"             run-resource ! streams
 "/library/platform/jvm/unparser.factor"     run-resource ! unparser
 "/library/platform/jvm/parser.factor"       run-resource ! parser
 "/library/styles.factor"                    run-resource ! styles
@@ -82,13 +83,10 @@ USE: parser
 "/library/math/pow.factor"               run-resource ! math
 "/library/math/trig-hyp.factor"          run-resource ! math
 "/library/math/arc-trig-hyp.factor"      run-resource ! math
-"/library/math/quadratic.factor"         run-resource ! math
 "/library/math/list-math.factor"         run-resource ! math
-"/library/math/simpson.factor"           run-resource ! math
 
 !!! Development tools.
 "/library/platform/jvm/processes.factor"   run-resource ! processes
-"/library/extend-stream.factor"            run-resource ! streams
 "/library/stdio-binary.factor"             run-resource ! stdio
 "/library/vocabulary-style.factor"         run-resource ! style
 "/library/prettyprint.factor"              run-resource ! prettyprint

@@ -10,6 +10,7 @@ VECTOR* vector(FIXNUM capacity)
 
 void primitive_vector(void)
 {
+	maybe_garbage_collection();
 	drepl(tag_object(vector(to_fixnum(dpeek()))));
 }
 
@@ -20,8 +21,13 @@ void primitive_vector_length(void)
 
 void primitive_set_vector_length(void)
 {
-	VECTOR* vector = untag_vector(dpop());
-	FIXNUM length = to_fixnum(dpop());
+	VECTOR* vector;
+	FIXNUM length;
+
+	maybe_garbage_collection();
+
+	vector = untag_vector(dpop());
+	length = to_fixnum(dpop());
 	if(length < 0)
 		range_error(tag_object(vector),length,vector->top);
 	vector->top = length;
@@ -51,9 +57,15 @@ void vector_ensure_capacity(VECTOR* vector, CELL index)
 
 void primitive_set_vector_nth(void)
 {
-	VECTOR* vector = untag_vector(dpop());
-	FIXNUM index = to_fixnum(dpop());
-	CELL value = dpop();
+	VECTOR* vector;
+	FIXNUM index;
+	CELL value;
+
+	maybe_garbage_collection();
+
+	vector = untag_vector(dpop());
+	index = to_fixnum(dpop());
+	value = dpop();
 
 	if(index < 0)
 		range_error(tag_object(vector),index,vector->top);

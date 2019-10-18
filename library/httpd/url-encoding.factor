@@ -27,6 +27,7 @@
 
 IN: url-encoding
 USE: combinators
+USE: errors
 USE: kernel
 USE: logic
 USE: format
@@ -41,13 +42,16 @@ USE: unparser
         dup url-quotable? [ "%" swap >hex 2 digits cat2 ] unless
     ] str-map ;
 
+: catch-hex> ( str -- n )
+    #! Push f if string is not a valid hex literal.
+    [ hex> ] [ [ drop f ] when ] catch ;
+
 : url-decode-hex ( index str -- )
     2dup str-length 2 - >= [
         2drop
     ] [
-        ! Note that hex> will push f if there is an invalid
-        ! hex literal
-        >r succ dup 2 + r> substring hex> [ >char % ] when*
+        >r succ dup 2 + r> substring
+        catch-hex> [ >char % ] when*
     ] ifte ;
 
 : url-decode-% ( index str -- index str )

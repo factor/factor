@@ -51,53 +51,36 @@ USE: unparser
     ] cond ;
 
 : digit ( num digit base -- num )
-    2dup <= [ rot * + ] [ not-a-number ] ifte ;
+    2dup < [ rot * + ] [ not-a-number ] ifte ;
 
-: (str>integer) ( str base -- num )
-    over str-length 0 = [
+: (base>) ( base str -- num )
+    dup str-length 0 = [
         not-a-number
     ] [
-        0 rot [ digit> pick digit ] str-each nip
+        0 swap [ digit> pick digit ] str-each nip
     ] ifte ;
 
-: str>integer ( str base -- num )
-    swap "-" ?str-head [
-        swap (str>integer) neg
-    ] [
-        swap (str>integer)
-    ] ifte ;
+: base> ( str base -- num )
+    #! Convert a string to an integer. Throw an error if
+    #! conversion fails.
+    swap "-" ?str-head [ (base>) neg ] [ (base>) ] ifte ;
 
 : str>ratio ( str -- num )
-    dup CHAR: / index-of str//
-    swap 10 str>integer swap 10 str>integer / ;
+    dup CHAR: / index-of str// swap 10 base> swap 10 base> / ;
 
 : str>number ( str -- num )
-    #! Affected by "base" variable.
+    #! Convert a string to a number; throws errors.
     [
-        [ "/" swap str-contains? ] [ str>ratio      ]
-        [ "." swap str-contains? ] [ str>float      ]
-        [ drop t                 ] [ 10 str>integer ]
+        [ "/" swap str-contains? ] [ str>ratio ]
+        [ "." swap str-contains? ] [ str>float ]
+        [ drop t                 ] [ 10 base>  ]
     ] cond ;
 
-: base> ( str base -- num/f )
-    [ str>integer ] [ [ 2drop f ] when ] catch ;
-
-: bin> ( str -- num )
-    #! Convert a binary string to a number.
-    2 base> ;
-
-: oct> ( str -- num )
-    #! Convert an octal string to a number.
-    8 base> ;
-
-: dec> ( str -- num )
-    #! Convert a decimal string to a number.
-    10 base> ;
-
-: hex> ( str -- num )
-    #! Convert a hexadecimal string to a number.
-    16 base> ;
-
-! Something really sucks about these words here
 : parse-number ( str -- num )
+    #! Convert a string to a number; return f on error.
     [ str>number ] [ [ drop f ] when ] catch ;
+
+: bin> 2 base> ;
+: oct> 8 base> ;
+: dec> 10 base> ;
+: hex> 16 base> ;

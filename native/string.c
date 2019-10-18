@@ -274,9 +274,14 @@ INLINE STRING* substring(CELL start, CELL end, STRING* string)
 /* start end string -- string */
 void primitive_substring(void)
 {
-	STRING* string = untag_string(dpop());
-	CELL end = to_fixnum(dpop());
-	CELL start = to_fixnum(dpop());
+	STRING* string;
+	CELL end, start;
+
+	maybe_garbage_collection();
+
+	string = untag_string(dpop());
+	end = to_fixnum(dpop());
+	start = to_fixnum(dpop());
 	dpush(tag_object(substring(start,end,string)));
 }
 
@@ -305,7 +310,11 @@ STRING* string_clone(STRING* s, int len)
 
 void primitive_string_reverse(void)
 {
-	STRING* s = untag_string(dpeek());
+	STRING* s;
+
+	maybe_garbage_collection();
+
+	s = untag_string(dpeek());
 	s = string_clone(s,s->capacity);
 	string_reverse(s,s->capacity);
 	rehash_string(s);

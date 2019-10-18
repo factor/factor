@@ -33,6 +33,11 @@
 typedef unsigned long int CELL;
 #define CELLS ((signed)sizeof(CELL))
 
+#define FIXNUM_MAX (LONG_MAX >> TAG_BITS)
+#define FIXNUM_MIN (LONG_MIN >> TAG_BITS)
+
+#define FIXNUM long int /* unboxed */
+
 #define WORD_SIZE (CELLS*8)
 #define HALF_WORD_SIZE (CELLS*4)
 #define HALF_WORD_MASK (((unsigned long)1<<HALF_WORD_SIZE)-1)
@@ -44,11 +49,10 @@ typedef unsigned short CHAR;
 /* must always be 8 bits */
 typedef unsigned char BYTE;
 
-/* Memory heap size */
-#define DEFAULT_ARENA (5 * 1024 * 1024)
-#define COMPILE_ZONE_SIZE (5 * 1024 * 1024)
-
-#define STACK_SIZE 16384
+/* Memory areas */
+#define DEFAULT_ARENA (64 * 1024 * 1024)
+#define COMPILE_ZONE_SIZE (64 * 1024 * 1024)
+#define STACK_SIZE (2 * 1024 * 1024)
 
 #include "memory.h"
 #include "error.h"
@@ -56,6 +60,7 @@ typedef unsigned char BYTE;
 #include "types.h"
 #include "word.h"
 #include "run.h"
+#include "signal.h"
 #include "fixnum.h"
 #include "array.h"
 #include "s48_bignumint.h"

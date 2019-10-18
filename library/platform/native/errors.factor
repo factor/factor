@@ -32,6 +32,6 @@ USE: vectors
 ! This is a very lightweight exception handling system.
 
 : catchstack* ( -- cs ) 6 getenv ;
-: catchstack ( -- cs ) catchstack* clone ;
+: catchstack ( -- cs ) catchstack* vector-clone ;
 : set-catchstack* ( cs -- ) 6 setenv ;
-: set-catchstack ( cs -- ) clone set-catchstack* ;
+: set-catchstack ( cs -- ) vector-clone set-catchstack* ;

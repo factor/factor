@@ -27,15 +27,22 @@ double to_float(CELL tagged)
 
 void primitive_to_float(void)
 {
+	maybe_garbage_collection();
 	drepl(tag_object(make_float(to_float(dpeek()))));
 }
 
 void primitive_str_to_float(void)
 {
-	STRING* str = untag_string(dpeek());
-	char* c_str = to_c_string(str);
-	char* end = c_str;
-	double f = strtod(c_str,&end);
+	STRING* str;
+	char *c_str, *end;
+	double f;
+
+	maybe_garbage_collection();
+
+	str = untag_string(dpeek());
+	c_str = to_c_string(str);
+	end = c_str;
+	f = strtod(c_str,&end);
 	if(end != c_str + str->capacity)
 		general_error(ERROR_FLOAT_FORMAT,tag_object(str));
 	drepl(tag_object(make_float(f)));
@@ -44,6 +51,9 @@ void primitive_str_to_float(void)
 void primitive_float_to_str(void)
 {
 	char tmp[33];
+
+	maybe_garbage_collection();
+
 	snprintf(tmp,32,"%.16g",to_float(dpop()));
 	tmp[32] = '\0';
 	box_c_string(tmp);
@@ -51,43 +61,49 @@ void primitive_float_to_str(void)
 
 void primitive_float_to_bits(void)
 {
-	double f = untag_float(dpeek());
-	long long f_raw = *(long long*)&f;
+	double f;
+	long long f_raw;
+
+	maybe_garbage_collection();
+
+	f = untag_float(dpeek());
+	f_raw = *(long long*)&f;
 	drepl(tag_object(s48_long_long_to_bignum(f_raw)));
 }
 
+#define GC_AND_POP_FLOATS(x,y) \
+	double x, y; \
+	maybe_garbage_collection(); \
+	y = to_float(dpop()); \
+	x = to_float(dpop());
+
 void primitive_float_eq(void)
 {
-	double y = to_float(dpop());
-	double x = to_float(dpop());
+	GC_AND_POP_FLOATS(x,y);
 	dpush(tag_boolean(x == y));
 }
 
 void primitive_float_add(void)
 {
-	double y = to_float(dpop());
-	double x = to_float(dpop());
+	GC_AND_POP_FLOATS(x,y);
 	dpush(tag_object(make_float(x + y)));
 }
 
 void primitive_float_subtract(void)
 {
-	double y = to_float(dpop());
-	double x = to_float(dpop());
+	GC_AND_POP_FLOATS(x,y);
 	dpush(tag_object(make_float(x - y)));
 }
 
 void primitive_float_multiply(void)
 {
-	double y = to_float(dpop());
-	double x = to_float(dpop());
+	GC_AND_POP_FLOATS(x,y);
 	dpush(tag_object(make_float(x * y)));
 }
 
 void primitive_float_divfloat(void)
 {
-	double y = to_float(dpop());
-	double x = to_float(dpop());
+	GC_AND_POP_FLOATS(x,y);
 	dpush(tag_object(make_float(x / y)));
 }
 
@@ -121,64 +137,72 @@ void primitive_float_greatereq(void)
 
 void primitive_facos(void)
 {
+	maybe_garbage_collection();
 	drepl(tag_object(make_float(acos(to_float(dpeek())))));
 }
 
 void primitive_fasin(void)
 {
+	maybe_garbage_collection();
 	drepl(tag_object(make_float(asin(to_float(dpeek())))));
 }
 
 void primitive_fatan(void)
 {
+	maybe_garbage_collection();
 	drepl(tag_object(make_float(atan(to_float(dpeek())))));
 }
 
 void primitive_fatan2(void)
 {
-	double x = to_float(dpop());
-	double y = to_float(dpop());
-	dpush(tag_object(make_float(atan2(y,x))));
+	GC_AND_POP_FLOATS(x,y);
+	dpush(tag_object(make_float(atan2(x,y))));
 }
 
 void primitive_fcos(void)
 {
+	maybe_garbage_collection();
 	drepl(tag_object(make_float(cos(to_float(dpeek())))));
 }
 
 void primitive_fexp(void)
 {
+	maybe_garbage_collection();
 	drepl(tag_object(make_float(exp(to_float(dpeek())))));
 }
 
 void primitive_fcosh(void)
 {
+	maybe_garbage_collection();
 	drepl(tag_object(make_float(cosh(to_float(dpeek())))));
 }
 
 void primitive_flog(void)
 {
+	maybe_garbage_collection();
 	drepl(tag_object(make_float(log(to_float(dpeek())))));
 }
 
 void primitive_fpow(void)
 {
-	double x = to_float(dpop());
-	double y = to_float(dpop());
-	dpush(tag_object(make_float(pow(y,x))));
+	GC_AND_POP_FLOATS(x,y);
+	dpush(tag_object(make_float(pow(x,y))));
 }
 
 void primitive_fsin(void)
 {
+	maybe_garbage_collection();
 	drepl(tag_object(make_float(sin(to_float(dpeek())))));
 }
 
 void primitive_fsinh(void)
 {
+	maybe_garbage_collection();
 	drepl(tag_object(make_float(sinh(to_float(dpeek())))));
 }
 
 void primitive_fsqrt(void)
 {
+	maybe_garbage_collection();
 	drepl(tag_object(make_float(sqrt(to_float(dpeek())))));
 }

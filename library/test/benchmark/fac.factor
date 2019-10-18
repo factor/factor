@@ -3,4 +3,4 @@ USE: math
 USE: stack
 USE: test
 
-[ 30000 fac drop ] time
+[ 1 ] [ 10000 fac 10000 [ succ / ] times* ] unit-test

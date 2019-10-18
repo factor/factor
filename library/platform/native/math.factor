@@ -39,6 +39,7 @@ USE: words
 : reduce ( x y -- x' y' )
     dup 0 < [ swap neg swap neg ] when 2dup gcd tuck /i >r /i r> ;
 : ratio ( x y -- x/y ) reduce fraction> ;
+: >fraction ( a/b -- a b ) dup numerator swap denominator ;
 : 2>fraction ( a/b c/d -- a b c d ) >r >fraction r> >fraction ;
 
 : ratio= ( a/b c/d -- ? ) 2>fraction 2= ;
@@ -55,6 +56,7 @@ USE: words
 : ratio> ( x y -- ? ) ratio-scale > ;
 : ratio>= ( x y -- ? ) ratio-scale >= ;
 
+: >rect ( x -- x:re x: im ) dup real swap imaginary ;
 : 2>rect ( x y -- x:re x:im y:re y:im ) >r >rect r> >rect ;
 
 : complex= ( x y -- ? ) 2>rect 2= ;

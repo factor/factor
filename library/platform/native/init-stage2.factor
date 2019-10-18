@@ -64,14 +64,11 @@ USE: words
     t "ansi" set
     t "compile" set
 
+    "ansi" get [ "stdio" get <ansi-stream> "stdio" set ] when
+
     ! The first CLI arg is the image name.
     cli-args uncons parse-command-line "image" set
 
     "compile" get [ init-compiler ] when
 
-    run-user-init
-
-    "ansi" get [ "stdio" get <ansi-stream> "stdio" set ] when
-    "interactive" get [ init-interpreter ] when
-
-    0 exit* ;
+    run-user-init ;

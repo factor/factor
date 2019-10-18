@@ -36,7 +36,6 @@ void init_arena(CELL size)
 	init_zone(&prior,size);
 	allot_profiling = false;
 	gc_in_progress = false;
-	gc_protect = false;
 }
 
 void allot_profile_step(CELL a)
@@ -56,25 +55,6 @@ void allot_profile_step(CELL a)
 	}
 
 	executing->allot_count += a;
-}
-
-void garbage_collection_later(void)
-{
-	if(gc_protect)
-		return;
-
-	if(active.here > active.limit)
-	{
-		fprintf(stderr,"Out of memory\n");
-		fprintf(stderr,"active.base  = %ld\n",active.base);
-		fprintf(stderr,"active.here  = %ld\n",active.here);
-		fprintf(stderr,"active.limit = %ld\n",active.limit);
-		fflush(stderr);
-		exit(1);
-	}
-
-	/* Execute the 'garbage-collection' word */
-	call(userenv[GC_ENV]);
 }
 
 void flip_zones()

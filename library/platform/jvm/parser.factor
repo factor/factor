@@ -81,35 +81,25 @@ USE: strings
 : eval ( "X" -- X )
     parse call ;
 
-: base> ( str base -- num )
-    #! Parse a number in a specified base.
+: parse-number* ( str base -- num )
+    #! Convert a string to a number. Return f if conversion
+    #! fails.
     [ "java.lang.String" "int" ]
     "factor.math.NumberParser"
     "parseNumber"
     jinvoke-static ;
 
-: bin> ( str -- num )
-    #! Convert a binary string to a number.
-    2 base> ;
+: parse-number 10 parse-number* ;
 
-: oct> ( str -- num )
-    #! Convert an octal string to a number.
-    8 base> ;
+: not-a-number "Not a number" throw ;
 
-: dec> ( str -- num )
-    #! Convert a decimal string to a number.
-    10 base> ;
+: base> ( str base -- num )
+    #! Convert a string to a number. Throw an error if
+    #! conversion fails.
+    parse-number* [ not-a-number ] unless* ;
 
-: hex> ( str -- num )
-    #! Convert a hexadecimal string to a number.
-    16 base> ;
-
-! Something really sucks about these words here
-: parse-number ( str -- num ) dec> ;
-
-: str>number ( str -- num )
-    dup "base" get base> dup [
-        nip
-    ] [
-        drop "Not a number: " swap cat2 throw
-    ] ifte ;
+: bin> 2 base> ;
+: oct> 8 base> ;
+: dec> 10 base> ;
+: hex> 16 base> ;
+: str>number dec> ;

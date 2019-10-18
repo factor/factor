@@ -33,23 +33,18 @@ USE: namespaces
 USE: stack
 USE: styles
 
-: get-vocab-style ( vocab -- style )
+: vocab-style ( vocab -- style )
     #! Each vocab has a style object specifying how words are
     #! to be printed.
-    "vocabularies" 2rlist get-style ;
+    "vocabularies" get-style get* ;
 
 : set-vocab-style ( style vocab -- )
-    swap default-style append swap
-    [ "styles" "vocabularies" ] object-path set* ;
+    >r default-style append r> "vocabularies" get-style set* ;
 
 : word-style ( word -- style )
-    word-vocabulary dup [
-        get-vocab-style
-    ] [
-        drop default-style
-    ] ifte ;
+    word-vocabulary [ vocab-style ] [ default-style ] ifte* ;
 
-"styles" get [ <namespace> "vocabularies" set ] bind
+<namespace> "vocabularies" set-style
 
 [
     [ "ansi-fg" | "1" ]

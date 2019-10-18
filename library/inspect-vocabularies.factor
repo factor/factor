@@ -64,11 +64,7 @@ USE: unparser
 
 : usages. ( word -- )
     #! List all usages of a word in all vocabularies.
-    intern [
-        vocabs [ dupd usages-in-vocab. ] each drop
-    ] [
-        "Not defined" print
-    ] ifte* ;
+    vocabs [ dupd usages-in-vocab. ] each drop ;
 
 : vocab-apropos ( substring vocab -- list )
     #! Push a list of all words in a vocabulary whose names

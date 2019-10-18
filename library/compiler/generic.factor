@@ -89,5 +89,5 @@ USE: vectors
     pop-literal commit-literals
     ARITHMETIC-TYPE  compile-jump-table ;
 
-[ compile-generic ] \ generic "compiling" set-word-property
-[ compile-2generic ] \ 2generic "compiling" set-word-property
+\ generic [ compile-generic ] "compiling" set-word-property
+\ 2generic [ compile-2generic ] "compiling" set-word-property

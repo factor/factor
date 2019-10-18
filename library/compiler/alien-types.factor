@@ -29,6 +29,7 @@ IN: alien
 USE: combinators
 USE: compiler
 USE: errors
+USE: hashtables
 USE: lists
 USE: math
 USE: namespaces
@@ -53,7 +54,7 @@ USE: words
 
 : c-type ( name -- type )
     global [
-        dup "c-types" get get* dup [
+        dup "c-types" get hash dup [
             nip
         ] [
             drop "No such C type: " swap cat2 throw
@@ -83,24 +84,20 @@ USE: words
     drop [ "width" get ] bind + ;
 
 : define-constructor ( len -- )
-    [ <alien> ] cons
+    #! Make a word <foo> where foo is the structure name that
+    #! allocates a Factor heap-local instance of this structure.
+    #! Used for C functions that expect you to pass in a struct.
+    [ <local-alien> ] cons
     <% "<" % "struct-name" get % ">" % %>
     "in" get create swap
     define-compound ;
 
-: define-local-constructor ( len -- )
-    [ <local-alien> ] cons
-    <% "<local-" % "struct-name" get % ">" % %>
-    "in" get create swap
-    define-compound ;
-
-: define-struct-type ( len -- )
-    #! For example, if len is 32, make a C type with getter:
-    #! [ 32 >r alien-cell r> <alien> ] cons
+: define-struct-type ( -- )
     #! The setter just throws an error for now.
     [
-        [ >r alien-cell r> <alien> ] cons "getter" set
+        [ alien-cell <alien> ] "getter" set
         "unbox_alien" "unboxer" set
+        "box_alien" "boxer" set
         cell "width" set
     ] "struct-name" get "*" cat2 define-c-type ;
 
@@ -110,18 +107,16 @@ USE: words
 : FIELD: ( offset -- offset )
     scan scan define-field ; parsing
 
-: END-STRUCT ( offset -- )
-    dup define-constructor
-    dup define-local-constructor
-    define-struct-type ; parsing
+: END-STRUCT ( length -- )
+    define-constructor define-struct-type ; parsing
 
 global [ <namespace> "c-types" set ] bind
 
 [
-    [ alien-cell ] "getter" set
+    [ alien-cell <alien> ] "getter" set
     [ set-alien-cell ] "setter" set
     cell "width" set
-    "does_not_exist" "boxer" set
+    "box_alien" "boxer" set
     "unbox_alien" "unboxer" set
 ] "void*" define-c-type
 
@@ -134,6 +129,14 @@ global [ <namespace> "c-types" set ] bind
 ] "int" define-c-type
 
 [
+    [ alien-4 ] "getter" set
+    [ set-alien-4 ] "setter" set
+    4 "width" set
+    "box_integer" "boxer" set
+    "unbox_integer" "unboxer" set
+] "uint" define-c-type
+
+[
     [ alien-2 ] "getter" set
     [ set-alien-2 ] "setter" set
     2 "width" set
@@ -142,12 +145,28 @@ global [ <namespace> "c-types" set ] bind
 ] "short" define-c-type
 
 [
+    [ alien-2 ] "getter" set
+    [ set-alien-2 ] "setter" set
+    2 "width" set
+    "box_integer" "boxer" set
+    "unbox_integer" "unboxer" set
+] "ushort" define-c-type
+
+[
     [ alien-1 ] "getter" set
     [ set-alien-1 ] "setter" set
     1 "width" set
     "box_integer" "boxer" set
     "unbox_integer" "unboxer" set
 ] "char" define-c-type
+
+[
+    [ alien-1 ] "getter" set
+    [ set-alien-1 ] "setter" set
+    1 "width" set
+    "box_integer" "boxer" set
+    "unbox_integer" "unboxer" set
+] "uchar" define-c-type
 
 [
     [ alien-4 ] "getter" set

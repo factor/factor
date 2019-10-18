@@ -148,5 +148,5 @@ USE: unparser
     "Factor" "realname" set
     "factorbot" "nick" set
     "irc.freenode.net" 6667 <client> [
-        [ "#factor" ] irc
+        [ "#concatenative" ] irc
     ] with-stream ;

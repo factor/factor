@@ -41,18 +41,13 @@ USE: vectors
 : init-errors ( -- )
     64 <vector> set-catchstack* ;
 
-: init-gc ( -- )
-    [ garbage-collection ] 7 setenv ;
-
 : boot ( -- )
     #! Initialize an interpreter with the basic services.
-    init-gc
     init-errors
     init-namespaces
     init-threads
     init-stdio
     "HOME" os-env [ "." ] unless* "~" set
-    10 "base" set
     "/" "/" set
     init-search-path ;
 

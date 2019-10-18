@@ -4,4 +4,4 @@ USE: prettyprint
 USE: test
 USE: words
 
-[ vocabs [ words [ see ] each ] each ] time
+[ ] [ vocabs [ words [ see ] each ] each ] unit-test

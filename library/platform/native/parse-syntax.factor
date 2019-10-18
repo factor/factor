@@ -25,7 +25,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: syntax
+IN: parser
 
 USE: combinators
 USE: errors
@@ -41,68 +41,16 @@ USE: words
 USE: vectors
 USE: unparser
 
-! The variable "in-definition" is set inside a : ... ;.
-! ( and #! then add "stack-effect" and "documentation"
-! properties to the current word if it is set.
-
-! Constants
-: t t parsed ; parsing
-: f f parsed ; parsing
-
-! Lists
-: [ [ ] ; parsing
-: ] nreverse parsed ; parsing
-
-: | ( syntax: | cdr ] )
-    #! See the word 'parsed'. We push a special sentinel, and
-    #! 'parsed' acts accordingly.
-    "|" ; parsing
-
-! Vectors
-: { f ; parsing
-: } nreverse list>vector parsed ; parsing
-
-! Do not execute parsing word
-: POSTPONE: ( -- ) scan-word parsed ; parsing
-
 ! Colon defs
 : CREATE ( -- word )
     scan "in" get create dup set-word
-    f over "documentation" set-word-property
-    f over "stack-effect" set-word-property ;
+    dup f "documentation" set-word-property
+    dup f "stack-effect" set-word-property ;
 
 : remember-where ( word -- )
-    "line-number" get over "line" set-word-property
-    "col"         get over "col"  set-word-property
-    "file"        get over "file" set-word-property
-    drop ;
-
-: :
-    #! Begin a word definition. Word name follows.
-    CREATE dup remember-where [ ]
-    "in-definition" on ; parsing
-
-: ;-hook ( word def -- )
-    ";-hook" get [ call ] [ define-compound ] ifte* ;
-
-: ;
-    #! End a word definition.
-    "in-definition" off
-    nreverse
-    ;-hook ; parsing
-
-! Symbols
-: SYMBOL: CREATE define-symbol ; parsing
-
-: \
-    #! Parsed as a piece of code that pushes a word on the stack
-    #! \ foo ==> [ foo ] car
-    scan-word unit parsed [ car ] car parsed ; parsing
-
-! Vocabularies
-: DEFER: CREATE drop ; parsing
-: USE: scan "use" cons@ ; parsing
-: IN: scan dup "use" cons@ "in" set ; parsing
+    dup "line-number" get "line" set-word-property
+    dup "col"         get "col"  set-word-property
+        "file"        get "file" set-word-property ;
 
 ! \x
 : unicode-escape>ch ( -- esc )
@@ -138,6 +86,82 @@ USE: unparser
 : parse-ch ( ch -- ch )
     dup CHAR: \\ = [ drop parse-escape ] when ;
 
+: doc-comment-here? ( parsed -- ? )
+    not "in-definition" get and ;
+
+: parsed-stack-effect ( parsed str -- parsed )
+    over doc-comment-here? [
+        word swap "stack-effect" set-word-property
+    ] [
+        drop
+    ] ifte ;
+
+: documentation+ ( word str -- )
+    over "documentation" word-property [
+        swap "\n" swap cat3
+    ] when*
+    "documentation" set-word-property ;
+
+: parsed-documentation ( parsed str -- parsed )
+    over doc-comment-here? [
+        word swap documentation+
+    ] [
+        drop
+    ] ifte ;
+
+IN: syntax
+
+! The variable "in-definition" is set inside a : ... ;.
+! ( and #! then add "stack-effect" and "documentation"
+! properties to the current word if it is set.
+
+! Constants
+: t t parsed ; parsing
+: f f parsed ; parsing
+
+! Lists
+: [ [ ] ; parsing
+: ] reverse parsed ; parsing
+
+: | ( syntax: | cdr ] )
+    #! See the word 'parsed'. We push a special sentinel, and
+    #! 'parsed' acts accordingly.
+    "|" ; parsing
+
+! Vectors
+: { f ; parsing
+: } reverse list>vector parsed ; parsing
+
+! Do not execute parsing word
+: POSTPONE: ( -- ) scan-word parsed ; parsing
+
+: :
+    #! Begin a word definition. Word name follows.
+    CREATE dup remember-where [ ]
+    "in-definition" on ; parsing
+
+: ;-hook ( word def -- )
+    ";-hook" get [ call ] [ define-compound ] ifte* ;
+
+: ;
+    #! End a word definition.
+    "in-definition" off
+    reverse
+    ;-hook ; parsing
+
+! Symbols
+: SYMBOL: CREATE define-symbol ; parsing
+
+: \
+    #! Parsed as a piece of code that pushes a word on the stack
+    #! \ foo ==> [ foo ] car
+    scan-word unit parsed  \ car parsed ; parsing
+
+! Vocabularies
+: DEFER: CREATE drop ; parsing
+: USE: scan "use" cons@ ; parsing
+: IN: scan dup "use" cons@ "in" set ; parsing
+
 ! Char literal
 : CHAR: ( -- ) next-word-ch parse-ch parsed ; parsing
 
@@ -160,34 +184,9 @@ USE: unparser
     scan str>number scan str>number rect> "}" expect parsed ;
 
 ! Comments
-: doc-comment-here? ( parsed -- ? )
-    not "in-definition" get and ;
-
-: parsed-stack-effect ( parsed str -- parsed )
-    over doc-comment-here? [
-        word "stack-effect" set-word-property
-    ] [
-        drop
-    ] ifte ;
-
 : ( ")" until parsed-stack-effect ; parsing
 
 : ! until-eol drop ; parsing
-
-: documentation+ ( str word -- )
-    [
-        "documentation" word-property [
-            swap "\n" swap cat3
-        ] when*
-    ] keep
-    "documentation" set-word-property ;
-
-: parsed-documentation ( parsed str -- parsed )
-    over doc-comment-here? [
-        word documentation+
-    ] [
-        drop
-    ] ifte ;
 
 : #! until-eol parsed-documentation ; parsing
 
@@ -195,7 +194,7 @@ USE: unparser
 
 : BASE: ( base -- )
     #! Read a number in a specific base.
-    scan swap str>integer parsed ;
+    scan swap base> parsed ;
 
 : HEX: 16 BASE: ; parsing
 : DEC: 10 BASE: ; parsing

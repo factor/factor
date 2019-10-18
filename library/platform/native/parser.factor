@@ -59,7 +59,7 @@ USE: unparser
     #! Mark the most recently defined word to execute at parse
     #! time, rather than run time. The word can use 'scan' to
     #! read ahead in the input stream.
-    t word "parsing" set-word-property ;
+    word t "parsing" set-word-property ;
 
 : end? ( -- ? )
     "col" get "line" get str-length >= ;
@@ -135,9 +135,9 @@ USE: unparser
         ] ifte
     ] when ;
 
-: parsed| ( obj -- )
+: parsed| ( parsed parsed obj -- parsed )
     #! Some ugly ugly code to handle [ a | b ] expressions.
-    >r nreverse dup last* r> swap set-cdr swons ;
+    >r unswons r> cons swap [ swons ] each swons ;
 
 : expect ( word -- )
     dup scan = not [
@@ -158,7 +158,7 @@ USE: unparser
 
 : parse ( str -- code )
     #! Parse the string into a parse tree that can be executed.
-    f swap (parse) nreverse ;
+    f swap (parse) reverse ;
 
 : eval ( "X" -- X )
     parse call ;
@@ -185,4 +185,4 @@ USE: unparser
 ! Once this file has loaded, we can use 'parsing' normally.
 ! This hack is needed because in Java Factor, 'parsing' is
 ! not parsing, but in CFactor, it is.
-t "parsing" [ "parser" ] search "parsing" set-word-property
+\ parsing t "parsing" set-word-property

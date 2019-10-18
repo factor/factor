@@ -68,6 +68,7 @@ USE: stdio
     "/library/platform/native/io-internals.factor"
     "/library/platform/native/stream.factor"
     "/library/stdio.factor"
+    "/library/extend-stream.factor"
     "/library/platform/native/words.factor"
     "/library/words.factor"
     "/library/platform/native/vocabularies.factor"
@@ -92,11 +93,8 @@ USE: stdio
     "/library/math/pow.factor"
     "/library/math/trig-hyp.factor"
     "/library/math/arc-trig-hyp.factor"
-    "/library/math/quadratic.factor"
     "/library/math/list-math.factor"
-    "/library/math/simpson.factor"
 
-    "/library/extend-stream.factor"
     "/library/platform/native/in-thread.factor"
     "/library/platform/native/network.factor"
     "/library/logging.factor"
@@ -162,6 +160,9 @@ cpu "x86" = [
         "/library/sdl/sdl.factor"
         "/library/sdl/sdl-video.factor"
         "/library/sdl/sdl-event.factor"
+        "/library/sdl/sdl-gfx.factor"
+        "/library/sdl/sdl-utils.factor"
+        "/library/sdl/hsv.factor"
     ] [
         dup print
         run-resource
@@ -179,9 +180,19 @@ IN: compiler
 DEFER: compilable-words
 DEFER: compilable-word-list
 
-[ warm-boot ] set-boot
+IN: init
+DEFER: init-interpreter
+
+[
+    warm-boot
+    "interactive" get [ init-interpreter ] when
+    0 exit*
+] set-boot
 
 compilable-words compilable-word-list set
+
+! Save a bit of space
+global [ "stdio" off ] bind
 
 garbage-collection
 "factor.image" save-image

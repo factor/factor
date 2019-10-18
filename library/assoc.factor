@@ -31,9 +31,12 @@ USE: combinators
 USE: kernel
 USE: stack
 
+! An association list is a list of conses where the car of each
+! cons is a key, and the cdr is a value. See the Factor
+! Developer's Guide for details.
+
 : assoc? ( list -- ? )
-    #! Push if the list appears to be an alist (each element is
-    #! a cons).
+    #! Push if the list appears to be an alist.
     dup list? [ [ cons? ] all? ] [ drop f ] ifte ;
 
 : assoc* ( key alist -- [ key | value ] )
@@ -50,20 +53,22 @@ USE: stack
     ] ifte ;
 
 : assoc ( key alist -- value )
-    #! Looks up the key in an alist. An alist is a proper list
-    #! of comma pairs, the car of each pair is a key, the cdr is
-    #! the value. For example:
-    #! [ [ 1 | "one" ] [ 2 | "two" ] [ 3 | "three" ] ]
+    #! Looks up the key in an alist.
     assoc* dup [ cdr ] when ;
 
+: remove-assoc ( key alist -- alist )
+    #! Remove all key/value pairs with this key.
+    [ dupd car = not ] subset nip ;
+
 : acons ( value key alist -- alist )
+    #! Adds the key/value pair to the alist. Existing pairs with
+    #! this key are not removed; the new pair simply shadows
+    #! existing pairs.
     >r swons r> cons ;
 
 : set-assoc ( value key alist -- alist )
-    #! Sets the key in the alist. Does not modify the existing
-    #! list by consing a new key/value pair onto the alist. The
-    #! newly-added pair 'shadows' the previous value.
-    [ dupd car = not ] subset acons ;
+    #! Adds the key/value pair to the alist.
+    dupd remove-assoc acons ;
 
 : assoc-apply ( value-alist quot-alist -- )
     #! Looks up the key of each pair in the first list in the

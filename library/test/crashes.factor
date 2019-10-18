@@ -28,7 +28,7 @@ USE: lists
 
 10 <vector> "x" set
 [ -2 "x" get set-vector-length ] [ drop ] catch
-[ "x" get clone drop ] [ drop ] catch
+[ "x" get vector-clone drop ] [ drop ] catch
 
 10 [ [ -1000000 <vector> ] [ drop ] catch ] times
 

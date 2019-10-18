@@ -41,28 +41,10 @@ USE: strings
     #! Get a vocabulary.
     global [ "vocabularies" get get* ] bind ;
 
-: <vocab> ( name -- vocab )
-    #! Create a vocabulary.
-    <namespace> dup >r "vocabularies" get put* r> ;
-
-: vocab* ( name -- vocab )
-    #! Get a vocabulary, creating it if it doesn't exist.
-    global [
-        dup "vocabularies" get get* dup [
-            nip
-        ] [
-            drop <vocab>
-        ] ifte
-    ] bind ;
-
 : words ( vocab -- list )
     #! Push a list of all words in a vocabulary.
     #! Filter empty slots.
     vocab [ values ] bind [ ] subset ;
-
-: intern ( "word" -- word )
-    #! Returns the top of the stack if it already been interned.
-    dup string? [ "use" get search ] when ;
 
 : init-search-path ( -- )
     ! For files

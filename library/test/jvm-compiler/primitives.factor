@@ -7,9 +7,6 @@ USE: test
 ! jvar-get
 "car" must-compile
 
-! jvar-set
-"set-car" must-compile
-
 ! jvar-get-static
 "version" must-compile
 

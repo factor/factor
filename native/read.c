@@ -107,8 +107,12 @@ void primitive_can_read_line(void)
 
 void primitive_add_read_line_io_task(void)
 {
-	CELL callback = dpop();
-	CELL port = dpop();
+	CELL callback, port;
+
+	maybe_garbage_collection();
+
+	callback = dpop();
+	port = dpop();
 	add_io_task(IO_TASK_READ_LINE,port,F,callback,
 		read_io_tasks,&read_fd_count);
 
@@ -140,7 +144,11 @@ bool perform_read_line_io_task(PORT* port)
 
 void primitive_read_line_8(void)
 {
-	PORT* port = untag_port(dpeek());
+	PORT* port;
+
+	maybe_garbage_collection();
+
+	port = untag_port(dpeek());
 
 	pending_io_error(port);
 
@@ -199,16 +207,27 @@ bool can_read_count(PORT* port, FIXNUM count)
 
 void primitive_can_read_count(void)
 {
-	PORT* port = untag_port(dpop());
-	FIXNUM len = to_fixnum(dpop());
+	PORT* port;
+	FIXNUM len;
+
+	maybe_garbage_collection();
+
+	port = untag_port(dpop());
+	len = to_fixnum(dpop());
 	dpush(tag_boolean(can_read_count(port,len)));
 }
 
 void primitive_add_read_count_io_task(void)
 {
-	CELL callback = dpop();
-	PORT* port = untag_port(dpop());
-	FIXNUM count = to_fixnum(dpop());
+	CELL callback;
+	PORT* port;
+	FIXNUM count;
+
+	maybe_garbage_collection();
+
+	callback = dpop();
+	port = untag_port(dpop());
+	count = to_fixnum(dpop());
 	add_io_task(IO_TASK_READ_COUNT,
 		tag_object(port),F,callback,
 		read_io_tasks,&read_fd_count);
@@ -233,8 +252,13 @@ bool perform_read_count_io_task(PORT* port)
 
 void primitive_read_count_8(void)
 {
-	PORT* port = untag_port(dpop());
-	FIXNUM len = to_fixnum(dpop());
+	PORT* port;
+	FIXNUM len;
+
+	maybe_garbage_collection();
+
+	port = untag_port(dpop());
+	len = to_fixnum(dpop());
 	if(port->count != len)
 		critical_error("read# counts don't match",tag_object(port));
 

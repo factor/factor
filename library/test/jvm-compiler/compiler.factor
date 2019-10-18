@@ -45,15 +45,15 @@ USE: words
 
 [ [ 0 0 0 0 ] ] [ [ null-rec ] ] [ balance>list ] test-word
 
-: null-rec ( -- )
-    t [ drop null-rec ] when* ; word must-compile
-
-[ [ 0 0 0 0 ] ] [ [ null-rec ] ] [ balance>list ] test-word
+! : null-rec ( -- )
+!     t [ drop null-rec ] when* ; word must-compile
+! 
+! [ [ 0 0 0 0 ] ] [ [ null-rec ] ] [ balance>list ] test-word
 
 !: null-rec ( -- )
 !    t [ t null-rec ] unless* drop ; word must-compile test-null-rec
 
-[ f 1 2 3 ] [ [ [ 2 | 1 ] ] 3 ] [ [ unswons unswons ] dip ] test-word
+[ f 1 2 3 ] [ [ [ 2 | 1 ] ] 3 ] [ >r unswons unswons r> ] test-word
 
 [ [ 2 1 0 0 ] ] [ [ >r [ ] [ ] ifte r> ] ] [ balance>list ] test-word
 

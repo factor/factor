@@ -38,32 +38,14 @@ void primitive_imaginary(void)
 	}
 }
 
-void primitive_to_rect(void)
-{
-	COMPLEX* c;
-	switch(type_of(dpeek()))
-	{
-	case FIXNUM_TYPE:
-	case BIGNUM_TYPE:
-	case FLOAT_TYPE:
-	case RATIO_TYPE:
-		dpush(tag_fixnum(0));
-		break;
-	case COMPLEX_TYPE:
-		c = untag_complex(dpop());
-		dpush(c->real);
-		dpush(c->imaginary);
-		break;
-	default:
-		type_error(NUMBER_TYPE,dpeek());
-		break;
-	}
-}
-
 void primitive_from_rect(void)
 {
-	CELL imaginary = dpop();
-	CELL real = dpop();
+	CELL imaginary, real;
+
+	maybe_garbage_collection();
+
+	imaginary = dpop();
+	real = dpop();
 
 	if(!realp(imaginary))
 		type_error(REAL_TYPE,imaginary);

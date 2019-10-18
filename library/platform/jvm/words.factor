@@ -33,9 +33,14 @@ USE: lists
 USE: logic
 USE: namespaces
 USE: stack
+USE: strings
 
 : worddef? ( obj -- boolean )
     "factor.FactorWordDefinition" is ;
+
+: intern ( "word" -- word )
+    #! Returns the top of the stack if it already been interned.
+    dup string? [ "use" get search ] when ;
 
 : worddef ( word -- worddef )
     dup worddef? [
@@ -45,8 +50,8 @@ USE: stack
 : word-property ( word pname -- pvalue )
     swap [ get ] bind ;
 
-: set-word-property ( pvalue word pname -- )
-    swap [ set ] bind ;
+: set-word-property ( word pvalue pname -- )
+    rot [ set ] bind ;
 
 : redefine ( word def -- )
     swap [ "def" set ] bind ;
@@ -81,7 +86,7 @@ USE: stack
 : no-name ( list -- word )
     ! Generates an uninternalized word and gives it a compound
     ! definition created from the given list.
-    [ gensym dup dup ] dip <compound> redefine ;
+    >r gensym dup dup r> <compound> redefine ;
 
 : primitive? ( worddef -- boolean )
     "factor.FactorPrimitiveDefinition" is ;

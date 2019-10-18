@@ -32,23 +32,17 @@ DEFER: vector-hashcode
 IN: kernel
 
 USE: combinators
-USE: errors
-USE: io-internals
 USE: lists
-USE: logic
 USE: math
-USE: namespaces
 USE: stack
-USE: stdio
 USE: strings
 USE: vectors
 USE: words
-USE: unparser
 USE: vectors
 
 : cpu ( -- arch )
     #! Returns one of "x86" or "unknown".
-    11 getenv ;
+    7 getenv ;
 
 ! The 'fake vtable' used here speeds things up a lot.
 ! It is quite clumsy, however. A higher-level CLOS-style
@@ -112,14 +106,6 @@ IN: kernel
     #! Test if a = c, b = d.
     swapd = [ = ] [ 2drop f ] ifte ;
 
-: clone ( obj -- obj )
-    [
-        [ cons? ] [ clone-list ]
-        [ vector? ] [ vector-clone ]
-        [ sbuf? ] [ sbuf-clone ]
-        [ drop t ] [ ( return the object ) ]
-    ] cond ;
-
 : set-boot ( quot -- )
     #! Set the boot quotation.
     8 setenv ;
@@ -130,11 +116,3 @@ IN: kernel
 ! No compiler...
 : inline ;
 : interpret-only ;
-
-! HACKS
-
-IN: strings
-: char? drop f ;
-: >char ;
-: >upper ;
-: >lower ;

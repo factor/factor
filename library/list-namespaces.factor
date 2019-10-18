@@ -31,17 +31,6 @@ USE: kernel
 USE: namespaces
 USE: stack
 
-: append@ ( [ list ] var -- )
-    #! Append a proper list stored in a variable with another
-    #! list, storing the result back in the variable.
-    #! given variable using 'append'.
-    tuck get swap append put ;
-
-: add@ ( elem var -- )
-    #! Add an element at the end of a proper list stored in a
-    #! variable, storing the result back in the variable.
-    tuck get swap add put ;
-
 : cons@ ( x var -- )
     #! Prepend x to the list stored in var.
     tuck get cons put ;
@@ -78,10 +67,6 @@ USE: stack
     #! if the object does not already occur in the list.
     "list-buffer" unique@ ;
 
-: list, ( list -- )
-    #! Append each element to the currently constructing list.
-    [ , ] each ;
-
 : ,] ( -- list )
     #! Finish constructing a list and push it on the stack.
-    "list-buffer" get nreverse n> drop ;
+    "list-buffer" get reverse n> drop ;

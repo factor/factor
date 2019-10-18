@@ -35,11 +35,8 @@ USE: stack
     #!
     #! In order to compile, the code must produce as many values
     #! as it consumes.
-    tuck >r dup 0 <= [
-        r> 3drop
-    ] [
-        pred slip r> times
-    ] ifte ; inline interpret-only
+    tuck >r dup 0 <= [ r> 3drop ] [ pred slip r> times ] ifte ;
+    inline interpret-only
 
 : (times) ( limit n quot -- )
     pick pick <= [

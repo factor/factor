@@ -38,16 +38,25 @@ bool can_write(PORT* port, FIXNUM len)
 
 void primitive_can_write(void)
 {
-	PORT* port = untag_port(dpop());
-	FIXNUM len = to_fixnum(dpop());
+	PORT* port;
+	FIXNUM len;
+
+	maybe_garbage_collection();
+	
+	port = untag_port(dpop());
+	len = to_fixnum(dpop());
 	pending_io_error(port);
 	dpush(tag_boolean(can_write(port,len)));
 }
 
 void primitive_add_write_io_task(void)
 {
-	CELL callback = dpop();
-	CELL port = dpop();
+	CELL callback, port;
+
+	maybe_garbage_collection();
+
+	callback = dpop();
+	port = dpop();
 	add_io_task(IO_TASK_WRITE,port,F,callback,
 		write_io_tasks,&write_fd_count);
 }
@@ -107,11 +116,16 @@ void write_string_8(PORT* port, STRING* str)
 
 void primitive_write_8(void)
 {
-	PORT* port = untag_port(dpop());
-
-	CELL text = dpop();
-	CELL type = type_of(text);
+	PORT* port;
+	CELL text, type;
 	STRING* str;
+
+	maybe_garbage_collection();
+
+	port = untag_port(dpop());
+
+	text = dpop();
+	type = type_of(text);
 
 	pending_io_error(port);
 

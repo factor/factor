@@ -36,32 +36,11 @@ USE: stack
 ! significance to the 'fwrite-attr' word when applied to a
 ! stream that supports attributed string output.
 
-: default-style ( -- style )
-    #! Push the default style object.
-    "styles" get [ "default" get ] bind ;
-
-: paragraph ( -- style )
-    #! Push the paragraph break meta-style.
-    "styles" get [ "paragraph" get ] bind ;
-
-: <style> ( alist -- )
-    #! Create a new style object, cloned from the default
-    #! style.
-    default-style clone tuck alist> ;
-
-: get-style ( obj-path -- style )
-    #! Push a style named by an object path, for example
-    #! [ "prompt" ] or [ "vocabularies" "math" ].
-    dup [
-        "styles" get [ object-path ] bind
-        [ default-style ] unless*
-    ] [
-        drop default-style
-    ] ifte ;
-
-: set-style ( style name -- )
-    ! XXX: use object path...
-    "styles" get [ set ] bind ;
+: (get-style) ( name -- style ) "styles" get get* ;
+: default-style ( -- style ) "default" (get-style) ;
+: get-style ( name -- style )
+    (get-style) [ default-style ] unless* ;
+: set-style ( style name -- ) "styles" get set* ;
 
 <namespace> "styles" set
 

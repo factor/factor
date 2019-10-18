@@ -8,6 +8,7 @@ USE: compiler
 USE: errors
 USE: kernel
 USE: lists
+USE: logic
 USE: math
 USE: namespaces
 USE: parser
@@ -27,12 +28,24 @@ USE: unparser
 : keep-datastack ( quot -- )
     datastack >r call r> set-datastack drop ;
 
+: time ( code -- )
+    #! Evaluates the given code and prints the time taken to
+    #! execute it.
+    millis >r call millis r> -
+    unparse write " milliseconds" print ;
+
 : unit-test ( output input -- )
     [
-        2dup print-test
-        swap >r >r clear r> call datastack vector>list r>
-        = assert
-    ] keep-datastack 2drop ;
+        [
+            2dup print-test
+            swap >r >r clear r> call datastack vector>list r>
+            = assert
+        ] keep-datastack 2drop
+    ] time ;
+
+: unit-test-fails ( quot -- )
+    #! Assert that the quotation throws an error.
+    [ [ not ] catch ] cons [ f ] swap unit-test ;
 
 : test-word ( output input word -- )
     #! Old-style test.
@@ -42,37 +55,27 @@ USE: unparser
     #! Flag for tests that are known not to work.
     3drop ;
 
-: time ( code -- )
-    #! Evaluates the given code and prints the time taken to
-    #! execute it.
-    "Timing " write dup .
-    millis >r call millis r> - . ;
-
 : test ( name -- )
     ! Run the given test.
     depth pred >r
     "Testing " write dup write "..." print
     "/library/test/" swap ".factor" cat3 run-resource
     "Checking before/after depth..." print
-    depth r> = assert
-    ;
+    depth r> = assert ;
 
 : all-tests ( -- )
     "Running Factor test suite..." print
     "vocabularies" get [ f "scratchpad" set ] bind
     [
-        "crashes"
         "lists/cons"
         "lists/lists"
         "lists/assoc"
-        "lists/destructive"
         "lists/namespaces"
         "combinators"
         "continuations"
         "errors"
         "hashtables"
         "strings"
-        "sbuf"
         "namespaces/namespaces"
         "files"
         "format"
@@ -89,6 +92,7 @@ USE: unparser
         "unparser"
         "random"
         "stream"
+        "styles"
         "math/bignum"
         "math/bitops"
         "math/gcd"
@@ -97,7 +101,6 @@ USE: unparser
         "math/float"
         "math/complex"
         "math/irrational"
-        "math/simpson"
         "math/namespaces"
         "httpd/url-encoding"
         "httpd/html"
@@ -107,14 +110,19 @@ USE: unparser
     ] each
     
     native? [
-        [
-            "threads"
-            "x86-compiler/simple"
-            "x86-compiler/ifte"
-            "x86-compiler/generic"
-        ] [
-            test
-        ] each
+        "crashes" test
+        "sbuf" test
+        "threads" test
+
+        cpu "x86" = [
+            [
+                "x86-compiler/simple"
+                "x86-compiler/ifte"
+                "x86-compiler/generic"
+            ] [
+                test
+            ] each
+        ] when
     ] when
 
     java? [
@@ -132,4 +140,10 @@ USE: unparser
         ] [
             test
         ] each
-    ] when ;
+    ] when
+
+    "benchmark/empty-loop" test
+    "benchmark/fac" test
+    "benchmark/fib" test
+    "benchmark/sort" test 
+    "benchmark/continuations" test ;

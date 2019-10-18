@@ -23,13 +23,8 @@ USE: words
 
 [ ] [ ] [ tail-call-1 ] test-word
 
-: tail-call-2 ( list -- f )
-    [ dup cons? ] [ uncons nip ] while ; word must-compile
-
-[ f ] [ [ 1 2 3 ] ] [ tail-call-2 ] test-word
-
 : tail-call-3 ( x y -- z )
-    [ dup succ ] dip swap 6 = [
+    >r dup succ r> swap 6 = [
         +
     ] [
         swap tail-call-3

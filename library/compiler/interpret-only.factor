@@ -38,9 +38,8 @@ USE: words
     "Cannot compile " swap cat2 throw ;
 
 : word-interpret-only ( word -- )
-    t over "interpret-only" set-word-property
+    dup t "interpret-only" set-word-property
     dup word-name [ interpret-only-error ] cons
-    swap
     "compiling" set-word-property ;
 
 \ call word-interpret-only

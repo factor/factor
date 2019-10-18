@@ -10,15 +10,11 @@ ZONE prior;
 
 bool allot_profiling;
 
-/* we can temporarily disable GC */
-bool gc_protect;
-
 void* alloc_guarded(CELL size);
 void init_zone(ZONE* zone, CELL size);
 void init_arena(CELL size);
 void flip_zones();
 
-void garbage_collection_later(void);
 void allot_profile_step(CELL a);
 
 INLINE CELL align8(CELL a)
@@ -32,8 +28,6 @@ INLINE void* allot(CELL a)
 	active.here += align8(a);
 	if(allot_profiling)
 		allot_profile_step(align8(a));
-	if(active.here > active.alarm)
-		garbage_collection_later();
 	return (void*)h;
 }
 

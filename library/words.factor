@@ -36,14 +36,8 @@ USE: stack
 : word-name ( word -- name )
     "name" word-property ;
 
-: set-word-name ( word name -- )
-    "name" set-word-property ;
-
 : word-vocabulary ( word -- vocab )
     "vocabulary" word-property ;
-
-: set-word-vocabulary ( word vocab -- )
-    "vocabulary" set-word-property ;
 
 : each-word ( quot -- )
     #! Apply a quotation to each word in the image.
