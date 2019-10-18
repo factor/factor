@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003 Slava Pestov.
+ * Copyright (C) 2003, 2004 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,23 +29,36 @@
 
 package factor;
 
+import factor.primitives.*;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class FactorDictionary
 {
-	// these are defined here for use by the precompiler
-	FactorWord jconstructor;
+	public FactorWord last;
+
+	FactorWord datastackGet;
+	FactorWord datastackSet;
+	FactorWord clear;
+	FactorWord callstackGet;
+	FactorWord callstackSet;
+	FactorWord restack;
+	FactorWord unstack;
+	FactorWord unwind;
 	FactorWord jnew;
-	FactorWord jfield;
 	FactorWord jvarGet;
 	FactorWord jvarSet;
 	FactorWord jvarGetStatic;
 	FactorWord jvarSetStatic;
-	FactorWord jmethod;
 	FactorWord jinvoke;
 	FactorWord jinvokeStatic;
+	FactorWord get;
+	FactorWord set;
+	FactorWord define;
+	FactorWord call;
+	FactorWord bind;
+	FactorWord choice;
 
 	private Map intern;
 
@@ -55,50 +68,65 @@ public class FactorDictionary
 		intern = new TreeMap();
 
 		// data stack primitives
-		intern("datastack$").def = new FactorPrimitive.P_datastackGet();
-		intern("datastack@").def = new FactorPrimitive.P_datastackSet();
-		intern("clear").def = new FactorPrimitive.P_clear();
+		datastackGet = intern("datastack$");
+		datastackGet.def = new DatastackGet(
+			datastackGet);
+		datastackSet = intern("datastack@");
+		datastackSet.def = new DatastackSet(
+			datastackSet);
+		clear = intern("clear");
+		clear.def = new Clear(clear);
 
 		// call stack primitives
-		intern("callstack$").def = new FactorPrimitive.P_callstackGet();
-		intern("callstack@").def = new FactorPrimitive.P_callstackSet();
-		intern("restack").def = new FactorPrimitive.P_restack();
-		intern("unstack").def = new FactorPrimitive.P_unstack();
-		intern("unwind").def = new FactorPrimitive.P_unwind();
+		callstackGet = intern("callstack$");
+		callstackGet.def = new CallstackGet(
+			callstackGet);
+		callstackSet = intern("callstack@");
+		callstackSet.def = new CallstackSet(
+			callstackSet);
+		restack = intern("restack");
+		restack.def = new Restack(restack);
+		unstack = intern("unstack");
+		unstack.def = new Unstack(unstack);
+		unwind = intern("unwind");
+		unwind.def = new Unwind(unwind);
 
 		// reflection primitives
-		jconstructor = intern("jconstructor");
-		jconstructor.def = new FactorPrimitive.P_jconstructor();
-		jfield = intern("jfield");
-		jfield.def = new FactorPrimitive.P_jfield();
 		jinvoke = intern("jinvoke");
-		jinvoke.def = new FactorPrimitive.P_jinvoke();
-		jinvokeStatic = intern("jinvokeStatic");
-		jinvokeStatic.def = new FactorPrimitive.P_jinvokeStatic();
-		jmethod = intern("jmethod");
-		jmethod.def = new FactorPrimitive.P_jmethod();
+		jinvoke.def = new JInvoke(jinvoke);
+		jinvokeStatic = intern("jinvoke-static");
+		jinvokeStatic.def = new JInvokeStatic(
+			jinvokeStatic);
 		jnew = intern("jnew");
-		jnew.def = new FactorPrimitive.P_jnew();
+		jnew.def = new JNew(jnew);
 		jvarGet = intern("jvar$");
-		jvarGet.def = new FactorPrimitive.P_jvarGet();
-		jvarGetStatic = intern("jvarStatic$");
-		jvarGetStatic.def = new FactorPrimitive.P_jvarGetStatic();
+		jvarGet.def = new JVarGet(jvarGet);
+		jvarGetStatic = intern("jvar-static$");
+		jvarGetStatic.def = new JVarGetStatic(
+			jvarGetStatic);
 		jvarSet = intern("jvar@");
-		jvarSet.def = new FactorPrimitive.P_jvarSet();
-		jvarSetStatic = intern("jvarStatic@");
-		jvarSetStatic.def = new FactorPrimitive.P_jvarSetStatic();
+		jvarSet.def = new JVarSet(jvarSet);
+		jvarSetStatic = intern("jvar-static@");
+		jvarSetStatic.def = new JVarSetStatic(
+			jvarSetStatic);
 
 		// namespaces
-		intern("$").def = new FactorPrimitive.P_get();
-		intern("@").def = new FactorPrimitive.P_set();
-		intern("s@").def = new FactorPrimitive.P_swap_set();
+		get = intern("$");
+		get.def = new Get(get);
+		set = intern("@");
+		set.def = new Set(set);
 
 		// definition
-		intern("define").def = new FactorPrimitive.P_define();
+		define = intern("define");
+		define.def = new Define(define);
 
 		// combinators
-		intern("call").def = new FactorPrimitive.P_call();
-		intern("bind").def = new FactorPrimitive.P_bind();
+		call = intern("call");
+		call.def = new Call(call);
+		bind = intern("bind");
+		bind.def = new Bind(bind);
+		choice = intern("?");
+		choice.def = new Choice(choice);
 	} //}}}
 
 	//{{{ intern() method
@@ -114,17 +142,17 @@ public class FactorDictionary
 	} //}}}
 
 	//{{{ toWordList() method
-	public FactorList toWordList()
+	public Cons toWordList()
 	{
-		FactorList first = null;
-		FactorList last = null;
+		Cons first = null;
+		Cons last = null;
 		Iterator iter = intern.values().iterator();
 		while(iter.hasNext())
 		{
 			FactorWord word = (FactorWord)iter.next();
-			if(word.def != FactorMissingDefinition.INSTANCE)
+			if(!(word.def instanceof FactorMissingDefinition))
 			{
-				FactorList cons = new FactorList(word,null);
+				Cons cons = new Cons(word,null);
 				if(first == null)
 					first = cons;
 				else

@@ -28,28 +28,30 @@
 !!! The stack operators are defined using shuffle notation. This saves several
 !!! hundred lines of code!
 
-~<< drop             A --             >>~
-~<< 2drop          A B --             >>~
-~<< dup              A -- A A         >>~
-~<< 2dup           A B -- A B A B     >>~
-~<< dupd           A B -- A A B       >>~
-~<< 2dupd      A B C D -- A B A B C D >>~
-~<< nip            A B -- B           >>~
-~<< 2nip       A B C D -- C D         >>~
-~<< nop                --             >>~ ! Does nothing!
-~<< over           A B -- A B A       >>~
-~<< 2over      A B C D -- A B C D A B >>~
-~<< pick         A B C -- A B C A     >>~ ! Not the Forth pick!
-~<< rot          A B C -- B C A       >>~
-~<< 2rot   A B C D E F -- C D E F A B >>~
-~<< -rot         A B C -- C A B       >>~
-~<< 2-rot  A B C D E F -- E F A B C D >>~
-~<< swap           A B -- B A         >>~
-~<< 2swap      A B C D -- C D A B     >>~
-~<< swapd        A B C -- B A C       >>~
-~<< 2swapd A B C D E F -- C D A B E F >>~
-~<< tuck           A B -- B A B       >>~
-~<< 2tuck      A B C D -- C D A B C D >>~
+~<< drop              A --             >>~
+~<< 2drop           A B --             >>~
+~<< dup               A -- A A         >>~
+~<< 2dup            A B -- A B A B     >>~
+~<< dupd            A B -- A A B       >>~
+~<< 2dupd       A B C D -- A B A B C D >>~
+~<< nip             A B -- B           >>~
+~<< 2nip        A B C D -- C D         >>~
+~<< nop                 --             >>~ ! Does nothing!
+~<< over            A B -- A B A       >>~
+~<< 2over       A B C D -- A B C D A B >>~
+~<< pick          A B C -- A B C A     >>~ ! Not the Forth pick!
+~<< rot           A B C -- B C A       >>~
+~<< 2rot    A B C D E F -- C D E F A B >>~
+~<< -rot          A B C -- C A B       >>~
+~<< 2-rot   A B C D E F -- E F A B C D >>~
+~<< swap            A B -- B A         >>~
+~<< 2swap       A B C D -- C D A B     >>~
+~<< swapd         A B C -- B A C       >>~
+~<< 2swapd  A B C D E F -- C D A B E F >>~
+~<< transp        A B C -- C B A       >>~    
+~<< 2transp A B C D E F -- E F C D A B >>~
+~<< tuck            A B -- B A B       >>~
+~<< 2tuck       A B C D -- C D A B C D >>~
 
 ~<< rdrop   r:A --         >>~
 ~<< >r        A -- r:A     >>~
@@ -60,21 +62,21 @@
 !!! Minimum amount of I/O words needed to be able to read other resources.
 !!! Remaining I/O operations are defined in io.factor and parser.factor.
 : <breader> (reader -- breader)
-    [ |java.io.Reader ] |java.io.BufferedReader jconstructor jnew ;
+    [ |java.io.Reader ] |java.io.BufferedReader jnew ;
 
 : <ireader> (inputstream -- breader)
-    [ |java.io.InputStream ] |java.io.InputStreamReader jconstructor jnew ;
+    [ |java.io.InputStream ] |java.io.InputStreamReader jnew ;
 
 : <rreader> (path -- inputstream)
     |factor.FactorInterpreter
-    [ |java.lang.String ] |java.lang.Class |getResourceAsStream jmethod jinvoke
+    [ |java.lang.String ] |java.lang.Class |getResourceAsStream jinvoke
     <ireader> <breader> ;
 
 : parse* (filename reader -- list)
     $dict
     [ |java.lang.String |java.io.Reader |factor.FactorDictionary ]
-    |factor.FactorParser jconstructor jnew
-    [ ] |factor.FactorParser |parse jmethod jinvoke ;
+    |factor.FactorParser jnew
+    [ ] |factor.FactorParser |parse jinvoke ;
 
 : runResource (path --)
     dup <rreader> parse* call ;
@@ -97,6 +99,21 @@
 "/factor/random.factor"        runResource
 "/factor/stream.factor"        runResource
 "/factor/strings.factor"       runResource
+
+: cli-param ( param -- )
+    dup "no-" str-head? dup [
+        f s@ drop
+    ] [
+        drop t s@
+    ] ifte ;
+
+: cli-arg ( argument -- boolean )
+    "-" str-head? [ cli-param ] when* ;
+
+$args [ cli-arg ] each
+
+! Compile all words now
+$compile [ compileAll ] when
 
 ! If we're run stand-alone, start the interpreter in the current tty.
 $interactive [ initialInterpreterLoop ] when

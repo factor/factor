@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2003 Slava Pestov.
+! Copyright (C) 2003, 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -31,8 +31,8 @@
 : 2rlist (a b -- [ b a ])
     swap unit cons ;
 
-: append ([ list1 ] [ list2 ] -- [ list1 list2 ])
-    swap rappend ;
+: append ( [ list1 ] [ list2 ] -- [ list1 list2 ] )
+    over [ [ uncons ] dip append cons ] [ nip ] ifte ;
 
 : add ([ list1 ] elem -- [ list1 elem ])
     unit append ;
@@ -42,7 +42,8 @@
     dup [ $ swap append ] dip @ ;
 
 : array>list ( array -- list )
-    [ "[Ljava.lang.Object;" ] "factor.FactorList" "fromArray" jmethod jinvokeStatic ;
+    [ [ "java.lang.Object" ] ] "factor.Cons" "fromArray"
+    jinvoke-static ;
 
 : add@ (elem variable --)
     ! Adds the element to the end of the list stored in the given variable.
@@ -63,10 +64,10 @@
     ] ifte ;
 
 : car ([ car , cdr ] -- car)
-    |factor.FactorList |car jfield jvar$ ;
+    |factor.Cons |car jvar$ ;
 
 : cdr ([ car , cdr ] -- cdr)
-    |factor.FactorList |cdr jfield jvar$ ;
+    |factor.Cons |cdr jvar$ ;
 
 : caar (list -- caar)
     car car ;
@@ -83,10 +84,10 @@
 : cloneList (list -- list)
     ! Returns a new list where each element is a clone of the elements of
     ! the given list.
-    dup [ [ ] "factor.FactorList" "deepClone" jmethod jinvoke ] when ;
+    dup [ [ ] "factor.Cons" "deepClone" jinvoke ] when ;
 
 : cons (car cdr -- [ car , cdr ])
-    [ |java.lang.Object |java.lang.Object ] |factor.FactorList jconstructor jnew ;
+    [ |java.lang.Object |java.lang.Object ] |factor.Cons jnew ;
 
 : contains (elem list -- boolean)
     dup [
@@ -113,9 +114,13 @@
 : get (list n -- list[n])
     [ cdr ] times car ;
 
-: last (list -- last)
+: last* ( list -- last )
+    ! Pushes last cons of the list.
+    [ dup cdr ] [ cdr ] while ;
+
+: last ( list -- last )
     ! Pushes last element of the list.
-    [ dup cdr ] [ cdr ] while car ;
+    last* car ;
 
 : length (list -- length)
     0 swap [ drop succ ] each ;
@@ -126,18 +131,27 @@
 : list? (list -- boolean)
     dup pair? [ cdr list? ] [ f ] ifte ;
 
-: pair? (list -- boolean)
-    |factor.FactorList is ;
+: nappend ( [ list1 ] [ list2 ] -- [ list1 list2 ] )
+    ! Destructive on list1!
+    over [ last* rplacd ] when* ;
 
-: rappend ([ list2 ] [ list1 ] -- [ list1 list2 ])
-    [ [ |factor.FactorList ] |factor.FactorList |append jmethod jinvoke ] when* ;
+: pair? (list -- boolean)
+    |factor.Cons is ;
 
 : reverse (list -- list)
     [ ] swap [ swons ] each ;
 
+: rplaca ( A [ B , C ] -- [ A , C ] )
+    ! Destructive!
+    "factor.Cons" "car" jvar@ ;
+
+: rplacd ( A [ B , C ] -- [ B , A ] )
+    ! Destructive!
+    "factor.Cons" "cdr" jvar@ ;
+
 : swons (cdr car -- [ car , cdr ])
     swap [ |java.lang.Object |java.lang.Object ]
-    |factor.FactorList jconstructor jnew ;
+    |factor.Cons jnew ;
 
 : uncons ([ car , cdr ] -- car cdr)
     dup car swap cdr ;

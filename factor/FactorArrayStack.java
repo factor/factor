@@ -44,7 +44,7 @@ public abstract class FactorArrayStack implements FactorExternalizable
 	} //}}}
 
 	//{{{ FactorArrayStack constructor
-	public FactorArrayStack(FactorList list)
+	public FactorArrayStack(Cons list)
 	{
 		if(list != null)
 		{
@@ -126,12 +126,12 @@ public abstract class FactorArrayStack implements FactorExternalizable
 	} //}}}
 
 	//{{{ toList() method
-	public FactorList toList()
+	public Cons toList()
 	{
-		FactorList first = null, last = null;
+		Cons first = null, last = null;
 		for(int i = 0; i < top; i++)
 		{
-			FactorList cons = new FactorList(stack[i],null);
+			Cons cons = new Cons(stack[i],null);
 			if(first == null)
 				first = cons;
 			else

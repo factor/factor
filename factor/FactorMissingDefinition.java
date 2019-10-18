@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003 Slava Pestov.
+ * Copyright (C) 2003, 2004 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,16 +29,22 @@
 
 package factor;
 
+import factor.compiler.*;
+import java.util.Set;
+
 /**
  * A placeholder for an undefined word.
  */
 public class FactorMissingDefinition extends FactorWordDefinition
 {
-	public static final FactorMissingDefinition INSTANCE
-		= new FactorMissingDefinition();
+	//{{{ FactorMissingDefinition constructor
+	public FactorMissingDefinition(FactorWord word)
+	{
+		super(word);
+	} //}}}
 
 	//{{{ eval() method
-	public void eval(FactorWord word, FactorInterpreter interp)
+	public void eval(FactorInterpreter interp)
 		throws FactorUndefinedWordException
 	{
 		throw new FactorUndefinedWordException(word);

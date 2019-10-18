@@ -108,10 +108,10 @@ public class FactorParser
 	 * Reads the file being parsed, and returns a list of all tokens that
 	 * were read in. This list can be evaluated to run the file.
 	 */
-	public FactorList parse() throws IOException, FactorParseException
+	public Cons parse() throws IOException, FactorParseException
 	{
-		FactorList first = null;
-		FactorList last = null;
+		Cons first = null;
+		Cons last = null;
 
 		try
 		{
@@ -131,12 +131,15 @@ public class FactorParser
 						error("Expected word name after " + next);
 					}
 
-					FactorWordDefinition def = readDef();
+					FactorWord word = (FactorWord)obj;
 
-					FactorList l = new FactorList(DEFINE,null);
-					FactorList cons = new FactorList(
-						((FactorWord)obj).name,
-						new FactorList(def,l));
+					FactorWordDefinition def
+						= readDef(word);
+
+					Cons l = new Cons(DEFINE,null);
+					Cons cons = new Cons(
+						word.name,
+						new Cons(def,l));
 					if(first == null)
 						first = cons;
 					else
@@ -152,12 +155,15 @@ public class FactorParser
 						error("Expected word name after " + next);
 					}
 
-					FactorWordDefinition def = readShuffle();
+					FactorWord word = (FactorWord)obj;
 
-					FactorList l = new FactorList(DEFINE,null);
-					FactorList cons = new FactorList(
-						((FactorWord)obj).name,
-						new FactorList(def,l));
+					FactorWordDefinition def
+						= readShuffle(word);
+
+					Cons l = new Cons(DEFINE,null);
+					Cons cons = new Cons(
+						word.name,
+						new Cons(def,l));
 					if(first == null)
 						first = cons;
 					else
@@ -166,7 +172,7 @@ public class FactorParser
 				}
 				else if(next == BRA)
 				{
-					FactorList cons = new FactorList(
+					Cons cons = new Cons(
 						readList(),null);
 					if(first == null)
 						first = cons;
@@ -180,7 +186,7 @@ public class FactorParser
 				}
 				else
 				{
-					FactorList cons = new FactorList(next,null);
+					Cons cons = new Cons(next,null);
 					if(first == null)
 						first = cons;
 					else
@@ -323,10 +329,10 @@ public class FactorParser
 	/**
 	 * Read list until ;.
 	 */
-	private FactorWordDefinition readDef()
+	private FactorWordDefinition readDef(FactorWord word)
 		throws IOException, FactorParseException
 	{
-		return new FactorCompoundDefinition(readList(INE,false));
+		return new FactorCompoundDefinition(word,readList(INE,false));
 	} //}}}
 
 	//{{{ readShuffle() method
@@ -336,7 +342,7 @@ public class FactorParser
 	 * On the left is inputs, on the right is their arrangement on the
 	 * stack.
 	 */
-	private FactorWordDefinition readShuffle()
+	private FactorWordDefinition readShuffle(FactorWord word)
 		throws IOException, FactorParseException
 	{
 		// 0 in consume map is last consumed, n is first consumed.
@@ -377,13 +383,14 @@ public class FactorParser
 			}
 		}
 
-		FactorList _shuffle = readList(FLE,false);
+		Cons _shuffle = readList(FLE,false);
 
 		int consume = consumeMap.size();
 
 		if(_shuffle == null)
 		{
-			return new FactorShuffleDefinition(consumeD,consumeR,
+			return new FactorShuffleDefinition(word,
+				consumeD,consumeR,
 				null,0,null,0);
 		}
 
@@ -397,12 +404,12 @@ public class FactorParser
 		{
 			if(_shuffle.car instanceof FactorWord)
 			{
-				FactorWord word = ((FactorWord)_shuffle.car);
-				String name = word.name;
+				FactorWord w = ((FactorWord)_shuffle.car);
+				String name = w.name;
 				if(name.startsWith("r:"))
-					word = dict.intern(name.substring(2));
+					w = dict.intern(name.substring(2));
 
-				Integer _index = (Integer)consumeMap.get(word);
+				Integer _index = (Integer)consumeMap.get(w);
 				if(_index == null)
 					error("Does not appear in shuffle LHS: " + _shuffle.car);
 				int index = _index.intValue();
@@ -445,7 +452,7 @@ public class FactorParser
 				shuffleD[k++] = index;
 		}
 
-		return new FactorShuffleDefinition(consumeD,consumeR,
+		return new FactorShuffleDefinition(word,consumeD,consumeR,
 			shuffleD,shuffleDlength,shuffleR,shuffleRlength);
 	} //}}}
 
@@ -453,7 +460,7 @@ public class FactorParser
 	/**
 	 * Read list until ].
 	 */
-	private FactorList readList()
+	private Cons readList()
 		throws IOException, FactorParseException
 	{
 		return readList(KET,true);
@@ -463,11 +470,11 @@ public class FactorParser
 	/**
 	 * Read list until a given word.
 	 */
-	private FactorList readList(FactorWord until, boolean allowCommaPair)
+	private Cons readList(FactorWord until, boolean allowCommaPair)
 		throws IOException, FactorParseException
 	{
-		FactorList first = null;
-		FactorList last = null;
+		Cons first = null;
+		Cons last = null;
 
 		for(;;)
 		{
@@ -509,12 +516,12 @@ public class FactorParser
 			}
 			else if(next == BRA)
 			{
-				FactorList list = readList();
+				Cons list = readList();
 				if(first == null)
-					first = last = new FactorList(list,null);
+					first = last = new Cons(list,null);
 				else
 				{
-					FactorList nextList = new FactorList(list,null);
+					Cons nextList = new Cons(list,null);
 					last.cdr = nextList;
 					last = nextList;
 				}
@@ -522,10 +529,10 @@ public class FactorParser
 			else if(isParsingWord(next))
 				error("Unexpected " + next);
 			else if(first == null)
-				first = last = new FactorList(next,null);
+				first = last = new Cons(next,null);
 			else
 			{
-				FactorList nextList = new FactorList(next,null);
+				Cons nextList = new Cons(next,null);
 				last.cdr = nextList;
 				last = nextList;
 			}

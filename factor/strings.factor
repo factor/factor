@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2003 Slava Pestov.
+! Copyright (C) 2003, 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -35,103 +35,186 @@
 !    [ #\" , "&quot;" ]
 ] @entities
 
+: >str ( obj -- string )
+    ! Returns the Java string representation of this object.
+    [ ] "java.lang.Object" "toString" jinvoke ;
+
 : >bytes ( string -- array )
-    ! Converts a string to an array of ASCII bytes. An exception is thrown
-    ! if the string contains non-ASCII characters.
+    ! Converts a string to an array of ASCII bytes. An exception
+    ! is thrown if the string contains non-ASCII characters.
     "ASCII" swap
-    [ "java.lang.String" ] "java.lang.String" "getBytes" jmethod jinvoke ;
+    [ "java.lang.String" ] "java.lang.String" "getBytes"
+    jinvoke ;
 
-: cat ([ "a" "b" "c" ] -- "abc")
-    [ "factor.FactorList" ] "factor.FactorLib" "cat" jmethod jinvokeStatic ;
+: <sbuf> ( -- StringBuffer )
+    [ ] "java.lang.StringBuffer" jnew ;
 
-: cat2 ("a" "b" -- "ab")
-    [ "java.lang.Object" "java.lang.Object" ]
-    "factor.FactorLib" "cat2" jmethod jinvokeStatic ;
+: sbuf-append ( str buf -- buf )
+    [ "java.lang.String" ] "java.lang.StringBuffer" "append"
+    jinvoke ;
 
-: cat3 ("a" "b" "c" -- "abc")
-    [ "java.lang.Object" "java.lang.Object" "java.lang.Object" ]
-    "factor.FactorLib" "cat3" jmethod jinvokeStatic ;
+: cat ( [ "a" "b" "c" ] -- "abc" )
+    ! If f appears in the list, it is not appended to the
+    ! string.
+    <sbuf> swap [ [ swap sbuf-append ] when* ] each >str ;
 
-: cat4 ("a" "b" "c" "d" -- "abcd")
-    cat2 cat3 ;
+: cat2 ( "a" "b" -- "ab" )
+    swap <sbuf> sbuf-append sbuf-append >str ;
 
-: chars>entities (str -- str)
+: cat3 ( "a" "b" "c" -- "abc" )
+    [ ] cons cons cons cat ;
+
+: cat4 ( "a" "b" "c" "d" -- "abcd" )
+    [ ] cons cons cons cons cat ;
+
+: char? ( obj -- boolean )
+    "java.lang.Character" is ;
+
+: chars>entities ( str -- str )
     ! Convert <, >, &, ' and " to HTML entities.
-    "" [ dup $entities assoc dup [ nip ] [ drop ] ifte ] strmap ;
+    [ dup $entities assoc dup [ nip ] [ drop ] ifte ] strmap ;
 
-: group (index match --)
+: group ( index match -- )
     [ "int" ] "java.util.regex.Matcher" "group"
-    jmethod jinvoke ;
+    jinvoke ;
 
-: groupCount (matcher -- count)
+: group-count ( matcher -- count )
     [ ] "java.util.regex.Matcher" "groupCount"
-    jmethod jinvoke ;
+    jinvoke ;
 
-: groups* (matcher -- list)
+: groups* ( matcher -- list )
     [
         [
-            dup groupCount [
+            dup group-count [
                 succ over group swap
             ] times* drop
         ] cons expand
-    ] [matches] ;
+    ] [re-matches] ;
 
-: groups (input regex -- list)
+: groups ( input regex -- list )
     <regex> <matcher> groups* ;
 
-: [matches] ( matcher code -- boolean )
-    ! If the matcher's matches* function returns true,
+: index-of* ( index string substring -- index )
+    dup char? [
+        -rot
+        ! Why is the first parameter an int and not a char?
+        [ "int" "int" ]
+        "java.lang.String" "indexOf"
+        jinvoke
+    ] [
+        -rot
+        [ "java.lang.String" "int" ]
+        "java.lang.String" "indexOf"
+        jinvoke
+    ] ifte ;
+
+: index-of ( string substring -- index )
+    0 -rot index-of* ;
+
+: [re-matches] ( matcher code -- boolean )
+    ! If the matcher's re-matches* function returns true,
     ! evaluate the code with the matcher at the top of the
     ! stack. Otherwise, pop the matcher off the stack and
     ! push f.
-    [ dup matches* ] dip [ drop f ] ifte ;
+    [ dup re-matches* ] dip [ drop f ] ifte ;
 
-: <matcher> (string pattern -- matcher)
+: <matcher> ( string pattern -- matcher )
     [ "java.lang.CharSequence" ]
     "java.util.regex.Pattern" "matcher"
-    jmethod jinvoke ;
+    jinvoke ;
 
-: matches* (matcher -- boolean)
+: re-matches* ( matcher -- boolean )
     [ ] "java.util.regex.Matcher" "matches"
-    jmethod jinvoke ;
+    jinvoke ;
 
-: matches (input regex -- boolean)
-    <regex> <matcher> matches* ;
+: re-matches ( input regex -- boolean )
+    <regex> <matcher> re-matches* ;
 
-: replace* ( replace matcher -- string )
+: re-replace* ( replace matcher -- string )
     [ "java.lang.String" ] "java.util.regex.Matcher"
-    "replaceAll" jmethod jinvoke ;
+    "replaceAll" jinvoke ;
 
-: replace ( input regex replace -- string )
+: re-replace ( input regex replace -- string )
     ! Replaces all occurrences of the regex in the input string
     ! with the replace string.
-    -rot <regex> <matcher> replace* ;
+    -rot <regex> <matcher> re-replace* ;
+
+: re-split ( string split -- list )
+    <regex> [ "java.lang.CharSequence" ]
+    "java.util.regex.Pattern" "split" jinvoke array>list ;
 
 : <regex> (pattern -- regex)
     ! Compile the regex, if its not already compiled.
     dup "java.util.regex.Pattern" is not [
-        [ "java.lang.String" ] "java.util.regex.Pattern" "compile"
-        jmethod jinvokeStatic
+        [ "java.lang.String" ]
+        "java.util.regex.Pattern" "compile"
+        jinvoke-static
     ] when ;
 
-: strget (index str -- char)
-    [ "int" ] "java.lang.String" "charAt" jmethod jinvoke ;
+: split ( string split -- list )
+    2dup index-of dup -1 = [
+        2drop unit
+    ] [
+        swap [ str// ] dip split cons
+    ] ifte ;
 
-: strlen (str -- length)
-    [ ] "java.lang.String" "length" jmethod jinvoke ;
+: str/ ( str index -- str str )
+    ! Returns 2 strings, that when concatenated yield the
+    ! original string.
+    2dup strtail [ str-head ] dip ;
 
-: streach (str [ code ] --)
-    ! Execute the code, with each character of the string pushed onto the
-    ! stack.
-    over strlen [
-        -rot 2dup [ [ strget ] dip call ] 2dip
+: str// ( str index -- str str )
+    ! Returns 2 strings, that when concatenated yield the
+    ! original string, without the character at the given
+    ! index.
+    2dup succ strtail [ str-head ] dip ;
+
+: str-each ( str [ code ] -- )
+    ! Execute the code, with each character of the string pushed
+    ! onto the stack.
+    over str-length [
+        -rot 2dup [ [ str-get ] dip call ] 2dip
     ] times* 2drop ;
 
-: strmap (str initial [ code ] -- [ mapping ])
-    ! If the 'initial' parameter is f, turn it into "".
-    ! Maybe cat should handle this instead?
-    [ dup [ drop "" ] unless ] dip
-    swapd [ ] cons cons cons
-    restack
-        streach
-    unstack cat ;
+: str-expand ( [ code ] -- str )
+    expand cat ;
+
+: str-get (index str -- char)
+    [ "int" ] "java.lang.String" "charAt" jinvoke ;
+
+: str-head ( str index -- str )
+    ! Returns a new string, from the beginning of the string
+    ! until the given index.
+    0 transp substring ;
+
+: str-headcut ( str begin -- str str )
+    str-length str/ ;
+
+: str-head? ( str begin -- str )
+    ! If the string starts with begin, return the rest of the
+    ! string after begin. Otherwise, return f.
+    2dup str-length> [
+        tuck str-headcut
+        [ = ] dip f ?
+    ] [
+        2drop f
+    ] ifte ;
+
+: str-length ( str -- length )
+    [ ] "java.lang.String" "length" jinvoke ;
+
+: str-length> ( str str -- boolean )
+    ! Compare string lengths.
+    [ str-length ] apply2 > ;
+
+: str-map ( str [ code ] -- [ mapping ] )
+    2list restack str-each unstack cat ;
+
+: strtail ( str index -- str )
+    ! Returns a new string, from the given index until the end
+    ! of the string.
+    over str-length rot substring ;
+
+: substring ( start end str -- str )
+    [ "int" "int" ] "java.lang.String" "substring"
+    jinvoke ;

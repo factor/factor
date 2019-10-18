@@ -35,76 +35,64 @@
     "java.lang.Integer" is ;
 
 : >fixnum (num -- fixnum)
-    [ ] "java.lang.Number" "intValue" jmethod jinvoke ;
+    [ ] "java.lang.Number" "intValue" jinvoke ;
 
 : bignum? (obj -- boolean)
     "java.math.BigInteger" is ;
 
 : >bignum (num -- bignum)
-    [ ] "java.lang.Number" "longValue" jmethod jinvoke
-    [ "long" ] "java.math.BigInteger" "valueOf" jmethod jinvokeStatic ;
+    [ ] "java.lang.Number" "longValue" jinvoke
+    [ "long" ] "java.math.BigInteger" "valueOf" jinvoke-static ;
 
 : realnum? (obj -- boolean)
     dup  "java.lang.Float"  is
     swap "java.lang.Double" is or ;
 
 : >realnum (num -- realnum)
-    [ ] "java.lang.Number" "doubleValue" jmethod jinvoke ;
+    [ ] "java.lang.Number" "doubleValue" jinvoke ;
 
 : ratio? (obj -- boolean)
     "factor.FactorRatio" is ;
 
 : + (a b -- a+b)
     [ "java.lang.Number" "java.lang.Number" ] "factor.FactorMath" "add"
-    jmethod jinvokeStatic ;
+    jinvoke-static ;
 
 : +@ (num var --)
     dup [ $ + ] dip @ ;
 
 : - (a b -- a-b)
     [ "java.lang.Number" "java.lang.Number" ] "factor.FactorMath" "subtract"
-    jmethod jinvokeStatic ;
+    jinvoke-static ;
 
 : -@ (num var --)
-    dup [ $ -- ] dip @ ;
-
-: -- (a b -- b-a)
-    swap - ;
-
-: --@ (var num --)
-    [ dup $ - ] dip s@ ;
+    dup [ $ swap - ] dip @ ;
 
 : * (a b -- a*b)
     [ "java.lang.Number" "java.lang.Number" ] "factor.FactorMath" "multiply"
-    jmethod jinvokeStatic ;
+    jinvoke-static ;
 
 : *@ (num var --)
     dup [ $ * ] dip @ ;
 
 : / (a b -- a/b)
     [ "java.lang.Number" "java.lang.Number" ] "factor.FactorMath" "divide"
-    jmethod jinvokeStatic ;
+    jinvoke-static ;
 
 : /@ (num var --)
     dup [ $ / ] dip @ ;
 
-: // (a b -- b/a)
-    swap / ;
-
-: //@ (num var --)
-    [ dup $ / ] dip s@ ;
-
 : > (a b -- boolean)
-    [ "float" "float" ] "factor.FactorMath" "greater" jmethod jinvokeStatic ;
+    [ "float" "float" ] "factor.FactorMath" "greater" jinvoke-static ;
 
 : >= (a b -- boolean)
-    [ "float" "float" ] "factor.FactorMath" "greaterEqual" jmethod jinvokeStatic ;
+    [ "float" "float" ] "factor.FactorMath" "greaterEqual" jinvoke-static ;
 
 : < (a b -- boolean)
-    [ "float" "float" ] "factor.FactorMath" "less" jmethod jinvokeStatic ;
+    [ "float" "float" ] "factor.FactorMath" "less" jinvoke-static ;
 
 : <= (a b -- boolean)
-    [ "float" "float" ] "factor.FactorMath" "lessEqual" jmethod jinvokeStatic ;
+    [ "float" "float" ] "factor.FactorMath" "lessEqual" jinvoke-static ;
 
 : and (a b -- a&b)
     f ? ;
@@ -126,8 +114,14 @@
 : not@ (boolean -- boolean)
     dup $ not s@ ;
 
+: pow ( x y -- x^y )
+    [ "double" "double" ] "java.lang.Math" "pow" jinvoke-static ;
+
 : pred (n -- n-1)
     1 - ;
+
+: round ( x y -- x^y )
+    [ "double" "double" ] "java.lang.Math" "pow" jinvoke-static ;
 
 : succ (n -- nsucc)
     1 + ;
@@ -139,13 +133,13 @@
     t swap ? ;
 
 : recip (x -- 1/x)
-    1 // ;
+    1 swap / ;
 
 : sq (x -- x^2)
     dup * ;
 
 : sqrt (x -- sqrt x)
-    [ "double" ] "java.lang.Math" "sqrt" jmethod jinvokeStatic ;
+    [ "double" ] "java.lang.Math" "sqrt" jinvoke-static ;
 
 : succ@ (var --)
     dup $ 1 + s@ ;

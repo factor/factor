@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2003 Slava Pestov.
+! Copyright (C) 2003, 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -25,64 +25,76 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-: randomAngle (-- theta)
-    [ ] "factor.FactorMath" "randomAngle" jmethod jinvokeStatic ;
+: random-angle ( -- theta )
+    [ ] "factor.FactorMath"
+    "randomAngle" jinvoke-static ;
 
-: randomBoolean (-- boolean)
-    [ ] "factor.FactorMath" "randomBoolean" jmethod jinvokeStatic ;
+: random-boolean ( -- boolean )
+    [ ] "factor.FactorMath"
+    "randomBoolean" jinvoke-static ;
 
-: randomInt (min max -- random)
-    [ "int" "int" ] "factor.FactorMath" "randomInt" jmethod jinvokeStatic ;
+: random-digit ( -- digit )
+    0 9 random-int ;
 
-: randomSymmetricInt (max -- random)
+: random-float ( min max scale -- random )
+    [ "int" "int" "float" ] "factor.FactorMath"
+    "randomFloat" jinvoke-static ;
+
+: random-int ( min max -- random )
+    [ "int" "int" ] "factor.FactorMath"
+    "randomInt" jinvoke-static ;
+
+: random-symmetric-int ( max -- random )
     ! Return a random integer between -max and max.
-    dup neg swap randomInt ;
+    dup neg swap random-int ;
 
-: chance (n -- boolean)
-    ! Returns true with a 1/n probability, false with a (n-1)/n probability.
-    1 swap randomInt 1 = ;
-
-: randomElement (list -- random)
-    ! Returns a random element from the given list.
-    dup length pred 0 swap randomInt get ;
-
-: randomSubset (list -- list)
-    ! Returns a random subset of the given list. Each item is chosen with a 50%
+: chance ( n -- boolean )
+    ! Returns true with a 1/n probability, false with a (n-1)/n
     ! probability.
-    [ ] [ randomBoolean [ drop ] when ] map ;
+    1 swap random-int 1 = ;
 
-: car+ (list -- sum)
+: random-element ( list -- random )
+    ! Returns a random element from the given list.
+    dup length pred 0 swap random-int get ;
+
+: random-subset ( list -- list )
+    ! Returns a random subset of the given list. Each item is
+    ! chosen with a 50%
+    ! probability.
+    [ random-boolean [ drop ] when ] map ;
+
+: car+ ( list -- sum )
     ! Adds the car of each element of the given list.
     0 swap [ car + ] each ;
 
-: randomProbability (list -- sum)
-    ! Adds the car of each element of the given list, and returns a random
-    ! number between 1 and this sum.
-    1 swap car+ randomInt ;
+: random-probability ( list -- sum )
+    ! Adds the car of each element of the given list, and
+    ! returns a random number between 1 and this sum.
+    1 swap car+ random-int ;
 
-: randomElementIter (list index -- elem)
-    ! Used by randomElement*. Do not call directly.
+: random-element-iter ( list index -- elem )
+    ! Used by random-element*. Do not call directly.
     [ unswons unswons ] dip (list elem probability index)
-    --                      (list elem index)
+    swap -                  (list elem index)
     dup 0 <= [
         drop nip
     ] [
-        nip randomElementIter
+        nip random-element-iter
     ] ifte ;
 
-: randomElement* (list -- elem)
-    ! Returns a random element of the given list of comma pairs. The
-    ! car of each pair is a probability, the cdr is the item itself.
-    ! Only the cdr of the comma pair is returned.
-    dup 1 swap car+ randomInt randomElementIter ;
+: random-element* ( list -- elem )
+    ! Returns a random element of the given list of comma pairs.
+    ! The car of each pair is a probability, the cdr is the item
+    ! itself. Only the cdr of the comma pair is returned.
+    dup 1 swap car+ random-int random-element-iter ;
 
-: randomSubset* (list -- list)
-    ! Returns a random subset of the given list of comma pairs. The
-    ! car of each pair is a probability, the cdr is the item itself.
-    ! Only the cdr of the comma pair is returned.
+: random-subset* ( list -- list )
+    ! Returns a random subset of the given list of comma pairs.
+    ! The car of each pair is a probability, the cdr is the item
+    ! itself. Only the cdr of the comma pair is returned.
     dup [ [ [ ] ] dip car+ ] dip ([ ] probabilitySum list)
     [
-        [ 1 over randomInt ] dip ([ ] probabilitySum probability elem)
+        [ 1 over random-int ] dip ([ ] probabilitySum probability elem)
         uncons ([ ] probabilitySum probability elema elemd)
         -rot ([ ] probabilitySum elemd probability elema)
         > ([ ] probabilitySum elemd boolean)

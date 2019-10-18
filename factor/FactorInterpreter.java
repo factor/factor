@@ -33,15 +33,15 @@ import java.io.*;
 
 public class FactorInterpreter
 {
-	/**
-	 * boot.factor checks this, if its true, an interpreter is run on
-	 * standard input.
-	 */
-	public boolean interactive = false;
+	// command line arguments are stored here.
+	public Cons args;
 
+	// boot.factor sets these.
+	public boolean interactive = true;
 	public boolean trace = false;
 	public boolean errorFlag = false;
 	public boolean compile = true;
+	public boolean compileDump = false;
 
 	public FactorCallFrame callframe;
 	public FactorCallStack callstack = new FactorCallStack();
@@ -57,21 +57,9 @@ public class FactorInterpreter
 	{
 		FactorInterpreter interp = new FactorInterpreter();
 
-		boolean virgin = false;
+		interp.init(args,null);
 
-		for(int i = 0; i < args.length; i++)
-		{
-			if(args[i].equals("-trace"))
-				interp.trace = true;
-			else if(args[i].equals("-virgin"))
-				virgin = true;
-			else if(args[i].equals("-interp"))
-				interp.compile = false;
-		}
-
-		interp.interactive = true;
-		interp.init(null,!virgin);
-		if(virgin)
+		/* if(virgin)
 		{
 			System.out.println("Mini-interpreter");
 			BufferedReader in = new BufferedReader(
@@ -89,7 +77,7 @@ public class FactorInterpreter
 				FactorParser parser = new FactorParser(
 					"<mini>",new StringReader(line),
 					interp.dict);
-				FactorList parsed = parser.parse();
+				Cons parsed = parser.parse();
 				interp.call(parsed);
 				interp.run();
 				System.out.println(interp.datastack);
@@ -98,21 +86,22 @@ public class FactorInterpreter
 		else
 		{
 			interp.run();
-		}
+		} */
 
 		System.exit(0);
 	} //}}}
 
 	//{{{ init() method
-	public void init(Object root, boolean bootstrap) throws Exception
+	public void init(String[] args, Object root) throws Exception
 	{
+		this.args = Cons.fromArray(args);
+
 		callstack.top = 0;
 		datastack.top = 0;
 		dict.init();
 		initNamespace(root);
 		topLevel();
-		if(bootstrap)
-			runBootstrap();
+		runBootstrap();
 	} //}}}
 
 	//{{{ initNamespace() method
@@ -122,8 +111,9 @@ public class FactorInterpreter
 
 		global.setVariable("interpreter",this);
 
-		String[] boundFields = { "compile", "interactive", "trace",
-			"dict", "errorFlag" };
+		String[] boundFields = { "compile", "compileDump",
+			"interactive", "trace",
+			"dict", "errorFlag", "args" };
 		for(int i = 0; i < boundFields.length; i++)
 		{
 			global.setVariable(boundFields[i],
@@ -160,7 +150,7 @@ public class FactorInterpreter
 				if(callframe == null)
 					break;
 
-				FactorList ip = callframe.ip;
+				Cons ip = callframe.ip;
 
 				if(ip == null)
 				{
@@ -213,6 +203,8 @@ public class FactorInterpreter
 			System.err.println("Factor callstack:");
 			System.err.println(callstack);
 
+			topLevel();
+
 			return true;
 		}
 		else
@@ -231,6 +223,8 @@ public class FactorInterpreter
 				System.err.println("Factor callstack:");
 				System.err.println(callstack);
 
+				topLevel();
+
 				return true;
 			}
 		}
@@ -240,7 +234,7 @@ public class FactorInterpreter
 	/**
 	 * Pushes the given list of code onto the callstack.
 	 */
-	public final void call(FactorList code)
+	public final void call(Cons code)
 	{
 		call(dict.intern("call"),code);
 	} //}}}
@@ -249,7 +243,7 @@ public class FactorInterpreter
 	/**
 	 * Pushes the given list of code onto the callstack.
 	 */
-	public final void call(FactorWord word, FactorList code)
+	public final void call(FactorWord word, Cons code)
 	{
 		if(callframe == null)
 			call(word,global,code);
@@ -261,7 +255,7 @@ public class FactorInterpreter
 	/**
 	 * Pushes the given list of code onto the callstack.
 	 */
-	public final void call(FactorWord word, FactorNamespace namespace, FactorList code)
+	public final void call(FactorWord word, FactorNamespace namespace, Cons code)
 	{
 		FactorCallFrame newcf;
 
@@ -321,17 +315,15 @@ public class FactorInterpreter
 
 		if(obj instanceof FactorWord)
 		{
-			FactorWord w = (FactorWord)obj;
-
 			try
 			{
-				w.def.eval(w,this);
+				((FactorWord)obj).def.eval(this);
 			}
 			catch(Exception e)
 			{
 				callstack.push(callframe);
 				callframe = new FactorCallFrame(
-					w,
+					(FactorWord)obj,
 					callframe.namespace,
 					null);
 				throw e;

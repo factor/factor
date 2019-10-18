@@ -25,30 +25,28 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-: >str (obj -- string)
-    ! Returns the Java string representation of this object.
-    [ ] "java.lang.Object" "toString" jmethod jinvoke ;
-
 : = (a b -- boolean)
     ! Returns true if a = b.
     [ "java.lang.Object" "java.lang.Object" ]
-    "factor.FactorLib" "equal" jmethod jinvokeStatic ;
+    "factor.FactorLib" "equal" jinvoke-static ;
 
 : clone (obj -- obj)
-    [ ] "factor.PublicCloneable" "clone" jmethod jinvoke ;
+    [ ] "factor.PublicCloneable" "clone" jinvoke ;
 
 : cloneArray (obj -- obj)
-    [ "[Ljava.lang.Object;" ] "factor.FactorLib" "cloneArray"
-    jmethod jinvokeStatic ;
+    [ [ "java.lang.Object" ] ]
+    "factor.FactorLib" "cloneArray"
+    jinvoke-static ;
 
 : deepCloneArray (obj -- obj)
-    [ "[Ljava.lang.Object;" ] "factor.FactorLib" "deepCloneArray"
-    jmethod jinvokeStatic ;
+    [ [ "java.lang.Object" ] ]
+    "factor.FactorLib" "deepCloneArray"
+    jinvoke-static ;
 
 : is (obj class -- boolean)
     ! Like "instanceof" in Java.
     [ "java.lang.Object" ] "java.lang.Class" "isInstance"
-    jmethod jinvoke ;
+    jinvoke ;
 
 : not= (a b -- boolean)
     = not ;
@@ -57,36 +55,31 @@
     ! Returns true if a = c, b = d.
     swapd = [ = ] dip and ;
 
-: ? (cond obj1 obj2 -- obj)
-    ! Pushes obj1 if cond is true, obj2 if cond is false.
-    [ "boolean" "java.lang.Object" "java.lang.Object" ]
-    "factor.FactorLib" "branch2" jmethod jinvokeStatic ;
-
 : >=< (x y obj1 obj2 obj3 -- obj)
     ! If x > y, pushes obj1, if x = y, pushes obj2, else obj3.
     [
         "float" "float"
         "java.lang.Object" "java.lang.Object"  "java.lang.Object"
     ]
-    "factor.FactorLib" "branch3" jmethod jinvokeStatic ;
+    "factor.FactorLib" "branch3" jinvoke-static ;
 
 : error (msg --)
-    [ "java.lang.String" ] "factor.FactorLib" "error" jmethod jinvokeStatic ;
+    [ "java.lang.String" ] "factor.FactorLib" "error" jinvoke-static ;
 
 : exit* (code --)
-    [ |int ] |java.lang.System |exit jmethod jinvokeStatic ;
+    [ |int ] |java.lang.System |exit jinvoke-static ;
 
 : exit (--)
     0 exit* ;
 
 : millis (-- millis)
     ! Pushes the current time, in milliseconds.
-    [ ] |java.lang.System |currentTimeMillis jmethod jinvokeStatic
+    [ ] |java.lang.System |currentTimeMillis jinvoke-static
     >bignum ;
 
 : stack>list (stack -- list)
     ! Turns a callstack or datastack object into a list.
-    [ ] "factor.FactorArrayStack" "toList" jmethod jinvoke ;
+    [ ] "factor.FactorArrayStack" "toList" jinvoke ;
 
 : time (code --)
     ! Evaluates the given code and prints the time taken to execute it.

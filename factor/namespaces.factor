@@ -25,6 +25,9 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+: s@ ( variable value -- )
+    swap @ ;
+
 : lazy (var [ a ] -- value)
     ! If the value of the variable is f, set the value to the result of
     ! evaluating [ a ].
@@ -35,12 +38,12 @@
 
 : <namespace> (-- namespace)
     $namespace [ |factor.FactorNamespace ] |factor.FactorNamespace
-    jconstructor jnew ;
+    jnew ;
 
 : <objnamespace> ( object -- namespace )
     $namespace swap
     [ "factor.FactorNamespace" "java.lang.Object" ]
-    "factor.FactorNamespace" jconstructor jnew ;
+    "factor.FactorNamespace" jnew ;
 
 : extend (object code -- object)
     ! Used in code like this:
@@ -52,12 +55,12 @@
 
 : import (class pairs --)
     ! Import some static variables from a Java class into the current namespace.
-    $namespace [ |java.lang.String |factor.FactorList ]
+    $namespace [ |java.lang.String |factor.Cons ]
     |factor.FactorNamespace |importVars
-    jmethod jinvoke ;
+    jinvoke ;
 
 : vars (-- list)
-    $namespace [ ] |factor.FactorNamespace |toVarList jmethod jinvoke ;
+    $namespace [ ] |factor.FactorNamespace |toVarList jinvoke ;
 
 : uvar? (name --)
     [ "namespace" "parent" ] contains not ;

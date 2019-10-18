@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003 Slava Pestov.
+ * Copyright (C) 2003, 2004 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,20 +29,18 @@
 
 package factor;
 
-import java.util.LinkedList;
-import java.util.List;
 /**
  * Used to build up linked lists.
  */
-public class FactorList implements PublicCloneable, FactorExternalizable
+public class Cons implements PublicCloneable, FactorExternalizable
 {
 	public static int COUNT;
 
 	public Object car;
 	public Object cdr;
 
-	//{{{ FactorList constructor
-	public FactorList(Object car, Object cdr)
+	//{{{ Cons constructor
+	public Cons(Object car, Object cdr)
 	{
 		this.car = car;
 		this.cdr = cdr;
@@ -63,9 +61,9 @@ public class FactorList implements PublicCloneable, FactorExternalizable
 	} //}}}
 
 	//{{{ next() method
-	public FactorList next()
+	public Cons next()
 	{
-		return (FactorList)cdr;
+		return (Cons)cdr;
 	} //}}}
 
 	//{{{ get() method
@@ -75,12 +73,12 @@ public class FactorList implements PublicCloneable, FactorExternalizable
 	} //}}}
 
 	//{{{ _get() method
-	public FactorList _get(int index)
+	public Cons _get(int index)
 	{
-		FactorList iter = this;
+		Cons iter = this;
 		while(index != 0)
 		{
-			iter = (FactorList)iter.cdr;
+			iter = (Cons)iter.cdr;
 			index--;
 		}
 		return iter;
@@ -89,7 +87,7 @@ public class FactorList implements PublicCloneable, FactorExternalizable
 	//{{{ contains() method
 	public boolean contains(Object obj)
 	{
-		FactorList iter = this;
+		Cons iter = this;
 		while(iter != null)
 		{
 			if(FactorLib.objectsEqual(obj,iter.car))
@@ -99,100 +97,33 @@ public class FactorList implements PublicCloneable, FactorExternalizable
 		return false;
 	} //}}}
 
-	//{{{ set() method
-	/**
-	 * Returns a new list where the item at the given index is changed.
-	 */
-	public FactorList set(int index, Object car, Object cdr)
+	//{{{ contains() method
+	public static boolean contains(Cons list, Object obj)
 	{
-		if(index == 0)
-			return new FactorList(car,cdr);
+		if(list == null)
+			return false;
 		else
-		{
-			return new FactorList(this.car,
-				this.next().set(index - 1,car,cdr));
-		}
-	} //}}}
-
-	//{{{ set() method
-	/**
-	 * Returns a new list containing the first n elements of this list.
-	 */
-	public FactorList head(int n)
-	{
-		if(n == 0)
-			return null;
-		else if(cdr == null && n == 1)
-			return this;
-		else
-		{
-			FactorList head = next().head(n - 1);
-			if(head == cdr)
-				return this;
-			else
-				return new FactorList(car,head);
-		}
+			return list.contains(obj);
 	} //}}}
 
 	//{{{ length() method
 	public int length()
 	{
 		int size = 0;
-		FactorList iter = this;
+		Cons iter = this;
 		while(iter != null)
 		{
-			iter = (FactorList)iter.cdr;
+			iter = (Cons)iter.cdr;
 			size++;
 		}
 		return size;
 	} //}}}
 
-	//{{{ append() method
-	public FactorList append(FactorList list)
-	{
-		if(list == null)
-			return this;
-
-		FactorList returnValue = null;
-		FactorList end = null;
-		FactorList iter = this;
-		for(;;)
-		{
-			FactorList cons = new FactorList(iter.car,null);
-			if(end != null)
-				end.cdr = cons;
-			end = cons;
-			if(returnValue == null)
-				returnValue = cons;
-			if(iter.cdr == null)
-			{
-				end.cdr = list;
-				break;
-			}
-			else
-				iter = iter.next();
-		}
-		return returnValue;
-	} //}}}
-
-	//{{{ reverse() method
-	public FactorList reverse()
-	{
-		FactorList returnValue = null;
-		FactorList iter = this;
-		while(iter != null)
-		{
-			returnValue = new FactorList(iter.car,returnValue);
-			iter = iter.next();
-		}
-		return returnValue;
-	} //}}}
-
 	//{{{ isProperList() method
 	public boolean isProperList()
 	{
-		return cdr == null || (cdr instanceof FactorList
-			&& ((FactorList)cdr).isProperList());
+		return cdr == null || (cdr instanceof Cons
+			&& ((Cons)cdr).isProperList());
 	} //}}}
 
 	//{{{ elementsToString() method
@@ -203,17 +134,17 @@ public class FactorList implements PublicCloneable, FactorExternalizable
 	public String elementsToString()
 	{
 		StringBuffer buf = new StringBuffer();
-		FactorList iter = this;
+		Cons iter = this;
 		while(iter != null)
 		{
 			if(iter.car == this)
 				buf.append("<circular reference>");
 			else
 				buf.append(FactorJava.factorTypeToString(iter.car));
-			if(iter.cdr instanceof FactorList)
+			if(iter.cdr instanceof Cons)
 			{
 				buf.append(' ');
-				iter = (FactorList)iter.cdr;
+				iter = (Cons)iter.cdr;
 				continue;
 			}
 			else if(iter.cdr == null)
@@ -238,19 +169,6 @@ public class FactorList implements PublicCloneable, FactorExternalizable
 		return "[ " + elementsToString() + " ]";
 	} //}}}
 
-	//{{{ toJavaList() method
-	public List toJavaList()
-	{
-		LinkedList returnValue = new LinkedList();
-		FactorList iter = this;
-		while(iter != null)
-		{
-			returnValue.add(iter.car);
-			iter = (FactorList)iter.cdr;
-		}
-		return returnValue;
-	} //}}}
-
 	//{{{ toArray() method
 	/**
 	 * Note that unlike Java list toArray(), the given array must already
@@ -259,7 +177,7 @@ public class FactorList implements PublicCloneable, FactorExternalizable
 	public Object[] toArray(Object[] returnValue)
 	{
 		int i = 0;
-		FactorList iter = this;
+		Cons iter = this;
 		while(iter != null)
 		{
 			returnValue[i++] = iter.car;
@@ -269,17 +187,17 @@ public class FactorList implements PublicCloneable, FactorExternalizable
 	} //}}}
 
 	//{{{ fromArray() method
-	public static FactorList fromArray(Object[] array)
+	public static Cons fromArray(Object[] array)
 	{
 		if(array == null || array.length == 0)
 			return null;
 		else
 		{
-			FactorList first = new FactorList(array[0],null);
-			FactorList last = first;
+			Cons first = new Cons(array[0],null);
+			Cons last = first;
 			for(int i = 1; i < array.length; i++)
 			{
-				FactorList cons = new FactorList(array[i],null);
+				Cons cons = new Cons(array[i],null);
 				last.cdr = cons;
 				last = cons;
 			}
@@ -290,9 +208,9 @@ public class FactorList implements PublicCloneable, FactorExternalizable
 	//{{{ equals() method
 	public boolean equals(Object o)
 	{
-		if(o instanceof FactorList)
+		if(o instanceof Cons)
 		{
-			FactorList l = (FactorList)o;
+			Cons l = (Cons)o;
 			return FactorLib.objectsEqual(car,l.car)
 				&& FactorLib.objectsEqual(cdr,l.cdr);
 		}
@@ -312,10 +230,10 @@ public class FactorList implements PublicCloneable, FactorExternalizable
 	//{{{ clone() method
 	public Object clone()
 	{
-		if(cdr instanceof FactorList)
-			return new FactorList(car,((FactorList)cdr).clone());
+		if(cdr instanceof Cons)
+			return new Cons(car,((Cons)cdr).clone());
 		else
-			return new FactorList(car,cdr);
+			return new Cons(car,cdr);
 	} //}}}
 
 	//{{{ deepClone() method
@@ -326,13 +244,13 @@ public class FactorList implements PublicCloneable, FactorExternalizable
 			ccar = ((PublicCloneable)car).clone();
 		else
 			ccar = car;
-		if(cdr instanceof FactorList)
+		if(cdr instanceof Cons)
 		{
-			return new FactorList(ccar,next().deepClone());
+			return new Cons(ccar,next().deepClone());
 		}
 		else if(cdr == null)
 		{
-			return new FactorList(ccar,null);
+			return new Cons(ccar,null);
 		}
 		else
 		{
@@ -341,7 +259,7 @@ public class FactorList implements PublicCloneable, FactorExternalizable
 				ccdr = ((PublicCloneable)cdr).clone();
 			else
 				ccdr = cdr;
-			return new FactorList(ccar,ccdr);
+			return new Cons(ccar,ccdr);
 		}
 	} //}}}
 }

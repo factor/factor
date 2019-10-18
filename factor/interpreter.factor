@@ -29,13 +29,13 @@
     "java.lang.Throwable" is ;
 
 : printStackTrace (exception --)
-    [ ] "java.lang.Throwable" "printStackTrace" jmethod jinvoke ;
+    [ ] "java.lang.Throwable" "printStackTrace" jinvoke ;
 
 : exception. (exception --)
     ! If this is an Factor exception, just print the message, otherwise print
     ! the entire exception as a string.
     dup "factor.FactorException" is [
-        [ ] "java.lang.Throwable" "getMessage" jmethod jinvoke
+        [ ] "java.lang.Throwable" "getMessage" jinvoke
     ] [
         >str
     ] ifte print ;
@@ -53,6 +53,7 @@
     ":g continues execution (but expect another error)." print
     "" print
     "ERROR: " write exception.
+    :w
     callstack$ @errorCallStack
     [
         @errorContinuation
@@ -131,9 +132,11 @@
     words [ . ] each ;
 
 : see (word --)
-    dup worddef [
+    dup worddefUncompiled [
         (word -- worddef word)
-        dup [ worddef dup shuffle? "~<< " ": " ? write ] dip
+        dup [
+            worddefUncompiled dup shuffle? "~<< " ": " ? write
+        ] dip
 
         (worddef word -- worddef)
         write "\n    " write
@@ -152,6 +155,22 @@
 : .s (--)
     ! Prints the contents of the data stack
     datastack$ . ;
+
+: stats ( -- )
+    "Cons:     " write
+    "factor.Cons" "COUNT" jvar-static$ .
+    "Words:    " write
+    words length .
+    "Compiled: " write
+    words [ worddef compiled? ] subset length . ;
+
+: gc ( -- )
+    [ ] "java.lang.System" "gc" jinvoke-static ;
+
+: balance ( code -- effect )
+    ! Push stack effect of the given code quotation.
+    [ "factor.Cons" ] "factor.compiler.StackEffect"
+    "getStackEffect" jinvoke-static ;
 
 : help
     "" print

@@ -90,18 +90,20 @@
     ! [ [ condition 1 ] [ code 1 ]
     !   [ condition 2 ] [ code 2 ]
     !   ... ]
-    ! Each condition is evaluated in turn. If it returns true, the code
-    ! is evaluated. If it returns false, the next condition is checked.
-    [
-        uncons >r
-            call
-        r>
-        swap [
+    ! Each condition is evaluated in turn. If it returns true,
+    ! the code is evaluated. If it returns false, the next
+    ! condition is checked. Before evaluating each condition,
+    ! the top of the stack is duplicated. After the last
+    ! condition is evaluated, the top of the stack is popped.
+    dup [
+        uncons [ over [ call ] dip ] dip rot [
             car call
         ] [
             cdr cond
         ] ifte
-    ] when* ;
+    ] [
+        2drop
+    ] ifte ;
 
 : dip (a [ b ] -- b a)
     ! Calls b as if b was not even present on the stack -- b has no way of
@@ -122,14 +124,7 @@
 : each ([ list ] [ code ] --)
     ! Applies the code to each element of the list.
     over [
-        >r
-            uncons
-        r>
-        tuck
-        2>r
-            call
-        2r>
-        each
+        [ uncons ] dip tuck [ call ] 2dip each
     ] [
         2drop
     ] ifte ;
@@ -143,6 +138,9 @@
         call
     unstack ;
 
+: ifte (cond [if true] [if false] --)
+    ? call ;
+
 : interleave ( X list -- ... )
     ! Evaluate each element of the list with X on top of the
     ! stack.
@@ -151,9 +149,6 @@
     ] [
         2drop
     ] ifte ;
-
-: ifte (cond [if true] [if false] --)
-    ? call ;
 
 : linrec ( [ P ] [ T ] [ R1 ] [ R2 ] -- )
     ! Evaluate P, if it pushes t, evaluate T. Otherwise, evaluate R1, recurse,
@@ -168,13 +163,10 @@
         r> call
     ] ifte ;
 
-: map ([ items ] [ initial ] [ code ] -- [ mapping ])
-    ! Applies the code to each item, returns a list that begins with the initial
-    ! list and contains the result of each application.
-    swapd 2list append
-    restack
-        each
-    unstack ;
+: map ( [ items ] [ code ] -- [ mapping ] )
+    ! Applies the code to each item, returns a list that
+    ! contains the result of each application.
+    2list restack each unstack ;
 
 : push ([ a b c ... ] -- a b c ...)
     ! Pushes values onto the stack literally (even if they are words).

@@ -36,12 +36,6 @@ import java.io.*;
  */
 public class FactorLib
 {
-	//{{{ branch2() method
-	public static Object branch2(boolean condition, Object o1, Object o2)
-	{
-		return (condition ? o1 : o2);
-	} //}}}
-
 	//{{{ branch3() method
 	public static Object branch3(float x, float y,
 		Object o1, Object o2, Object o3)
@@ -52,36 +46,6 @@ public class FactorLib
 			return o2;
 		else
 			return o3;
-	} //}}}
-
-	//{{{ cat() method
-	public static String cat(FactorList list)
-	{
-		StringBuffer buf = new StringBuffer();
-
-		while(list != null)
-		{
-			if(list.car instanceof FactorList)
-				buf.append(cat((FactorList)list.car));
-			else
-				buf.append(list.car);
-			list = list.next();
-		}
-
-		return buf.toString();
-	} //}}}
-
-	//{{{ cat2() method
-	public static String cat2(Object str1, Object str2)
-	{
-		return new StringBuffer().append(str1).append(str2).toString();
-	} //}}}
-
-	//{{{ cat3() method
-	public static String cat3(Object str1, Object str2, Object str3)
-	{
-		return new StringBuffer().append(str1).append(str2).append(str3)
-			.toString();
 	} //}}}
 
 	//{{{ cloneArray() method

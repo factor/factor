@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2003 Slava Pestov.
+! Copyright (C) 2003, 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -26,18 +26,18 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 : <stream> ( -- stream )
-    ! Create a stream object. A stream is a namespace with the following
-    ! entries:
+    ! Create a stream object. A stream is a namespace with the
+    ! following entries:
     ! - fflush
     ! - freadln -- you must provide an implementation!
     ! - fwriteln
     ! - fwrite -- you must provide an implementation!
     ! - fclose
-    ! Note that you must extend this object and provide your own implementations
-    ! of all entries except for fwriteln, which is defined to fwrite the string
-    ! followed by the newline by default.
+    ! Note that you must extend this object and provide your own
+    ! implementations of all entries except for fwriteln, which
+    ! is defined to fwrite the string followed by the newline by
+    ! default.
     <namespace> [
-        
         ( -- string )
         [ "freadln not implemented." break ] @freadln
         ( string -- )
@@ -50,91 +50,99 @@
         [ $namespace fwrite "\n" $namespace fwrite ] @fwriteln
     ] extend ;
 
+! These are in separate words so that they can be compiled.
+! Do not call them directly.
+
+: <bytestream>/freadln ( -- string )
+    $in [ "java.io.InputStream" ] "factor.FactorLib" "readLine"
+    jinvoke-static ;
+
+: <bytestream>/fwrite ( string -- )
+    >bytes
+    $out [ [ "byte" ] ]
+    "java.io.OutputStream" "write" jinvoke ;
+
+: <bytestream>/fflush ( -- )
+    $out [ ] "java.io.OutputStream" "flush" jinvoke ;
+
+: <bytestream>/fclose ( -- )
+    $in  [ ] "java.io.InputStream"  "close" jinvoke
+    $out [ ] "java.io.OutputStream" "close" jinvoke ;
+
 : <bytestream> ( in out -- stream )
-    ! Creates a new stream for reading from the java.io.InputStream in, and
-    ! writing to the java.io.OutputStream out.
+    ! Creates a new stream for reading from the
+    ! java.io.InputStream in, and writing to the
+    ! java.io.OutputStream out.
     <stream> [
         @out
         @in
-
         ( -- string )
-        [
-            $in [ "java.io.InputStream" ] "factor.FactorLib" "readLine"
-            jmethod jinvokeStatic
-        ] @freadln
-
+        [ <bytestream>/freadln ] @freadln
         ( string -- )
-        [
-            >bytes
-            $out [ "[B" ] "java.io.OutputStream" "write" jmethod jinvoke
-        ] @fwrite
-
+        [ <bytestream>/fwrite  ] @fwrite
         ( -- )
-        [
-            $out [ ] "java.io.OutputStream" "flush" jmethod jinvoke
-        ] @fflush
-
+        [ <bytestream>/fflush  ] @fflush
         ( -- )
-        [
-            $in  [ ] "java.io.InputStream"  "close" jmethod jinvoke
-            $out [ ] "java.io.OutputStream" "close" jmethod jinvoke
-        ] @fclose
+        [ <bytestream>/fclose  ] @fclose
     ] extend ;
 
+: <charstream>/freadln ( -- string )
+    $in [ ] "java.io.BufferedReader" "readLine"
+    jinvoke ;
+
+: <charstream>/fwrite ( string -- )
+    $out [ "java.lang.String" ] "java.io.Writer" "write"
+    jinvoke ;
+
+: <charstream>/fflush ( -- )
+    $out [ ] "java.io.Writer" "flush" jinvoke ;
+
+: <charstream>/fclose ( -- )
+    $in  [ ] "java.io.Reader" "close" jinvoke
+    $out [ ] "java.io.Writer" "close" jinvoke ;
+
 : <charstream> ( in out -- stream )
-    ! Creates a new stream for reading from the java.io.BufferedReader in, and
-    ! writing to the java.io.Reader out.
+    ! Creates a new stream for reading from the
+    ! java.io.BufferedReader in, and writing to the
+    ! java.io.Reader out.
     <stream> [
         @out
         @in
-
         ( -- string )
-        [
-            $in [ ] "java.io.BufferedReader" "readLine" jmethod jinvoke
-        ] @freadln
-
+        [ <charstream>/freadln ] @freadln
         ( string -- )
-        [
-            $out [ "java.lang.String" ] "java.io.Writer" "write" jmethod jinvoke
-        ] @fwrite
-
+        [ <charstream>/fwrite  ] @fwrite
         ( -- )
-        [
-            $out [ ] "java.io.Writer" "flush" jmethod jinvoke
-        ] @fflush
-
+        [ <charstream>/fflush  ] @fflush
         ( -- )
-        [
-            $in  [ ] "java.io.Reader" "close" jmethod jinvoke
-            $out [ ] "java.io.Writer" "close" jmethod jinvoke
-        ] @fclose
+        [ <charstream>/fclose  ] @fclose
     ] extend ;
 
 : <filecr> ( path -- stream )
-    [ |java.lang.String ] |java.io.FileReader jconstructor jnew <breader>
+    [ |java.lang.String ] |java.io.FileReader jnew <breader>
     f
     <charstream> ;
 
 : <filecw> ( path -- stream )
     f
-    [ |java.lang.String ] |java.io.FileWriter jconstructor jnew <bwriter>
+    [ |java.lang.String ] |java.io.FileWriter jnew <bwriter>
     <charstream> ;
 
 : <filebr> ( path -- stream )
-    [ |java.lang.String ] |java.io.FileInputStream jconstructor jnew
+    [ |java.lang.String ] |java.io.FileInputStream jnew
     f
     <bytestream> ;
 
 : <filebw> ( path -- stream )
     f
-    [ |java.lang.String ] |java.io.FileOutputStream jconstructor jnew
+    [ |java.lang.String ] |java.io.FileOutputStream jnew
     <bytestream> ;
 
 : <bwriter> (writer -- bwriter)
-    [ |java.io.Writer ] |java.io.BufferedWriter jconstructor jnew ;
+    [ |java.io.Writer ] |java.io.BufferedWriter jnew ;
 
 : <owriter> (outputstream -- owriter)
-    [ |java.io.OutputStream ] |java.io.OutputStreamWriter jconstructor jnew ;
+    [ |java.io.OutputStream ] |java.io.OutputStreamWriter jnew ;
 
 : read ( -- string )
     $stdio freadln ;
@@ -165,30 +173,30 @@
     [ [ $in ] bind ] dip
     [ $out ] bind
     [ "java.io.InputStream" "java.io.OutputStream" ]
-    "factor.FactorLib" "copy" jmethod jinvokeStatic ;
+    "factor.FactorLib" "copy" jinvoke-static ;
 
-"java.lang.System" "in"  jfield jvarStatic$ <ireader> <breader> @stdin
-"java.lang.System" "out" jfield jvarStatic$ <owriter> @stdout
+"java.lang.System" "in"  jvar-static$ <ireader> <breader> @stdin
+"java.lang.System" "out" jvar-static$ <owriter> @stdout
 $stdin $stdout <charstream> @stdio
 
 !(file -- freader)
 |<freader> [
-    [ |java.lang.String ] |java.io.FileReader jconstructor jnew <breader>
+    [ |java.lang.String ] |java.io.FileReader jnew <breader>
 ] define
 
 : <file> (path -- file)
     dup "java.io.File" is not [
-        [ "java.lang.String" ] "java.io.File" jconstructor jnew
+        [ "java.lang.String" ] "java.io.File" jnew
     ] when ;
 
 : exists? (file -- boolean)
-    <file> [ ] "java.io.File" "exists" jmethod jinvoke ;
+    <file> [ ] "java.io.File" "exists" jinvoke ;
 
 : directory? (file -- boolean)
-    <file> [ ] "java.io.File" "isDirectory" jmethod jinvoke ;
+    <file> [ ] "java.io.File" "isDirectory" jinvoke ;
 
 : directory ( file -- listing )
-    <file> [ ] "java.io.File" "list" jmethod jinvoke
+    <file> [ ] "java.io.File" "list" jinvoke
     array>list ;
 
 : rename ( from to -- )
@@ -196,26 +204,27 @@ $stdin $stdout <charstream> @stdio
     ! java.io.File instances.
     <file> swap <file>
     [ "java.io.File" ] "java.io.File" "renameTo"
-    jmethod jinvoke ;
+    jinvoke ;
 
 !(string -- reader)
 |<sreader> [
-    [ |java.lang.String ] |java.io.StringReader jconstructor jnew
+    [ |java.lang.String ] |java.io.StringReader jnew
 ] define
 
 : close (stream --)
-    dup "java.io.Reader" is
-    [ ] "java.io.Reader" "close" jmethod
-    [ ] "java.io.Writer" "close" jmethod
-    ?
-    jinvoke ;
+    dup "java.io.Reader" is [
+        [ ] "java.io.Reader" "close" jinvoke
+    ] [
+        [ ] "java.io.Writer" "close" jinvoke
+    ] ifte ;
 
-: exec (args -- exitCode)
-    [ "[Ljava.lang.String;" ] "factor.FactorLib" "exec" jmethod jinvokeStatic ;
+: exec ( args -- exitCode )
+    [ [ "java.lang.String" ] ] "factor.FactorLib" "exec"
+    jinvoke-static ;
 
 !(stream -- string)
 |read* [
-    [ ] |java.io.BufferedReader |readLine jmethod jinvoke
+    [ ] |java.io.BufferedReader |readLine jinvoke
 ] define
 
 : print* (string stream --)
@@ -225,6 +234,6 @@ $stdin $stdout <charstream> @stdio
 !(string stream --)
 |write* [
     tuck
-    [ |java.lang.String ] |java.io.Writer |write jmethod jinvoke
-    [ ] |java.io.Writer |flush jmethod jinvoke
+    [ |java.lang.String ] |java.io.Writer |write jinvoke
+    [ ] |java.io.Writer |flush jinvoke
 ] define

@@ -25,43 +25,75 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-! Undefined words's def field is equal to this.
-"factor.FactorMissingDefinition" "INSTANCE" jfield jvarStatic$ @undefinedWord
-
-: asm. (word -- assembly)
+: asm ( word -- assembly )
     ! Prints JVM bytecode disassembly of the given word.
-    worddef [ $asm ] bind dup [
+    worddef compiled? dup [
         print
     ] [
         drop "Not a compiled word." print
     ] ifte ;
 
-: word? (obj -- boolean)
-    "factor.FactorWord" is ;
+: compile* ( word -- )
+    $interpreter swap
+    [ "factor.FactorInterpreter" ] "factor.FactorWord" "compile"
+    jinvoke ;
 
-: str>word ("word" -- word)
-    ! Returns the top of the stack if it already been interned.
-    dup word? [
-        $dict [ "java.lang.String" ] "factor.FactorDictionary" "intern"
-        jmethod jinvoke
-    ] unless ;
+: compile ( word -- )
+    dup worddef compiled? [
+        drop
+    ] [
+        intern compile*
+    ] ifte ;
 
-: worddef? (obj -- boolean)
-    "factor.FactorWordDefinition" is ;
+: compileAll ( -- )
+    "Compiling..." write
+    words [ compile ] each
+    " done" print ;
+
+: compiled? ( obj -- boolean )
+    [ $asm ] bind ;
 
 : compound? (obj -- boolean)
     "factor.FactorCompoundDefinition" is ;
 
+: missing>f ( word -- word/f )
+    ! Is it the missing word placeholder? Then push f.
+    dup undefined? [ drop f ] when ;
+
 : shuffle? (obj -- boolean)
     "factor.FactorShuffleDefinition" is ;
 
-: worddef (word -- worddef)
-    str>word
-    ! Get the 'def' field
-    "factor.FactorWord" "def" jfield jvar$
-    ! Is it equal to the missing word placeholder? Then push f.
-    dup $undefinedWord = [ drop f ] when ;
+: intern ("word" -- word)
+    ! Returns the top of the stack if it already been interned.
+    dup word? [
+        $dict [ "java.lang.String" ]
+        "factor.FactorDictionary" "intern"
+        jinvoke
+    ] unless ;
+
+: undefined? ( obj -- boolean )
+    "factor.FactorMissingDefinition" is ;
+
+: word? (obj -- boolean)
+    "factor.FactorWord" is ;
+
+: word ( -- word )
+    ! Pushes most recently defined word.
+    $dict "factor.FactorDictionary" "last" jvar$ ;
+
+: worddef? (obj -- boolean)
+    "factor.FactorWordDefinition" is ;
+
+: worddef ( word -- worddef )
+    intern
+    "factor.FactorWord" "def" jvar$
+    missing>f ;
+
+: worddefUncompiled ( word -- worddef )
+    intern
+    "factor.FactorWord" "uncompiled" jvar$
+    missing>f ;
 
 : words (-- list)
     ! Pushes a list of all defined words.
-    $dict [ ] "factor.FactorDictionary" "toWordList" jmethod jinvoke ;
+    $dict [ ] "factor.FactorDictionary" "toWordList" jinvoke ;

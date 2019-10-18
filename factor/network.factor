@@ -28,21 +28,21 @@
 : <server> ( port -- stream )
     ! Starts listening on localhost:port. Returns a stream that you can close
     ! with fclose. No other stream operations are supported.
-    [ "int" ] "java.net.ServerSocket" jconstructor jnew
+    [ "int" ] "java.net.ServerSocket" jnew
     <stream> [
         @socket
 
         ( -- )
         [
-            $socket [ ] "java.net.ServerSocket" "close" jmethod jinvoke
+            $socket [ ] "java.net.ServerSocket" "close" jinvoke
         ] @fclose
     ] extend ;
 
 : <socketstream> ( socket -- stream )
     ! Wraps a socket inside a bytestream.
     dup
-    [ [ ] "java.net.Socket" "getInputStream"  jmethod jinvoke ]
-    [ [ ] "java.net.Socket" "getOutputStream" jmethod jinvoke ]
+    [ [ ] "java.net.Socket" "getInputStream"  jinvoke ]
+    [ [ ] "java.net.Socket" "getOutputStream" jinvoke ]
     cleave
     <bytestream> [
         @socket
@@ -50,11 +50,11 @@
         ! We "extend" bytestream's fclose.
         ( -- )
         $fclose [
-            $socket [ ] "java.net.Socket" "close" jmethod jinvoke
+            $socket [ ] "java.net.Socket" "close" jinvoke
         ] append @fclose
     ] extend ;
 
 : accept ( server -- client )
     ! Accept a connection from a server socket.
     [ $socket ] bind
-    [ ] "java.net.ServerSocket" "accept" jmethod jinvoke <socketstream> ;
+    [ ] "java.net.ServerSocket" "accept" jinvoke <socketstream> ;

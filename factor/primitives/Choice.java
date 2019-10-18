@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003 Slava Pestov.
+ * Copyright (C) 2003, 2004 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,45 +27,59 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor;
+package factor.primitives;
 
-/**
- * The call stack. Stores call frames.
- * @author Slava Pestov
- */
-public class FactorCallStack extends FactorArrayStack implements PublicCloneable
+import factor.compiler.*;
+import factor.*;
+import org.objectweb.asm.*;
+
+public class Choice extends FactorWordDefinition
 {
-	//{{{ FactorCallStack constructor
-	public FactorCallStack()
+	//{{{ Choice constructor
+	public Choice(FactorWord word)
 	{
+		super(word);
 	} //}}}
 
-	//{{{ FactorCallStack constructor
-	public FactorCallStack(Object[] stack, int top)
+	//{{{ eval() method
+	public void eval(FactorInterpreter interp)
+		throws Exception
 	{
-		super(stack,top);
+		FactorDataStack datastack = interp.datastack;
+		Object f = datastack.pop();
+		Object t = datastack.pop();
+		Object cond = datastack.pop();
+		datastack.push(core(interp,cond,t,f));
 	} //}}}
 
-	//{{{ shouldClear() method
+	//{{{ core() method
+	public static Object core(FactorInterpreter interp,
+		Object cond, Object t, Object f) throws Exception
+	{
+		return FactorJava.toBoolean(cond) ? t : f;
+	} //}}}
+
+	//{{{ getStackEffect() method
+	public StackEffect getStackEffect(java.util.Set recursiveCheck,
+		LocalAllocator state) throws FactorStackException
+	{
+		state.ensure(state.datastack,3);
+		state.pushChoice();
+		return new StackEffect(3,1,0,0);
+	} //}}}
+
+	//{{{ compileCallTo() method
 	/**
-	 * Some data (arbitrary objects) should be removed from the stack as
-	 * soon as they're popped, but some (callframes) should be left on and
-	 * reused later.
+	 * Compile a call to this word. Returns maximum JVM stack use.
 	 */
-	public boolean shouldClear(Object o)
+	/* public int compileCallTo(
+		CodeVisitor mw,
+		LocalAllocator allocator,
+		java.util.Set recursiveCheck)
+		throws Exception
 	{
-		return !(o instanceof FactorCallFrame);
-	} //}}}
+		allocator.pushChoice();
 
-	//{{{ clone() method
-	public Object clone()
-	{
-		if(stack == null)
-			return new FactorCallStack();
-		else
-		{
-			return new FactorCallStack(
-				FactorLib.deepCloneArray(stack),top);
-		}
-	} //}}}
+		return 0;
+	} */ //}}}
 }

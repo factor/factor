@@ -115,7 +115,7 @@ public class FactorNamespace implements PublicCloneable
 	/**
 	 * Defines a variable bound to a Java field.
 	 */
-	public void importVars(String clazz, FactorList vars)
+	public void importVars(String clazz, Cons vars)
 		throws Exception
 	{
 		Class clas = Class.forName(clazz);
@@ -155,16 +155,6 @@ public class FactorNamespace implements PublicCloneable
 		}
 		else
 			return o;
-	} //}}}
-
-	//{{{ _setVariable() method
-	/**
-	 * Alternative form for bindings.
-	 */
-	public void _setVariable(Object value, String name)
-		throws Exception
-	{
-		setVariable(name,value);
 	} //}}}
 
 	//{{{ setVariable() method
@@ -214,10 +204,10 @@ public class FactorNamespace implements PublicCloneable
 	/**
 	 * Returns a list of variable and word names defined in this namespace.
 	 */
-	public FactorList toVarList()
+	public Cons toVarList()
 	{
-		FactorList first = null;
-		FactorList last = null;
+		Cons first = null;
+		Cons last = null;
 		Iterator iter = words.entrySet().iterator();
 		while(iter.hasNext())
 		{
@@ -226,7 +216,7 @@ public class FactorNamespace implements PublicCloneable
 				continue;
 
 			String name = (String)entry.getKey();
-			FactorList cons = new FactorList(name,null);
+			Cons cons = new Cons(name,null);
 			if(first == null)
 				first = last = cons;
 			else
@@ -243,10 +233,10 @@ public class FactorNamespace implements PublicCloneable
 	/**
 	 * Returns a list of pairs of variable and word names, and their values.
 	 */
-	public FactorList toValueList()
+	public Cons toValueList()
 	{
-		FactorList first = null;
-		FactorList last = null;
+		Cons first = null;
+		Cons last = null;
 		Iterator iter = words.entrySet().iterator();
 		while(iter.hasNext())
 		{
@@ -254,8 +244,8 @@ public class FactorNamespace implements PublicCloneable
 			if(entry.getValue() == CHECK_PARENT)
 				continue;
 
-			FactorList cons = new FactorList(
-				new FactorList(entry.getKey(),
+			Cons cons = new Cons(
+				new Cons(entry.getKey(),
 				entry.getValue()),null);
 			if(first == null)
 				first = last = cons;
@@ -299,7 +289,13 @@ public class FactorNamespace implements PublicCloneable
 	//{{{ toString() method
 	public String toString()
 	{
-		return "Namespace[" + obj + "]";
+		if(obj == null)
+		{
+			return "( Namespace #" + Integer.toString(hashCode(),16)
+				+ " )";
+		}
+		else
+			return "( Namespace: " + obj + " #" + hashCode() + " )";
 	} //}}}
 
 	//{{{ clone() method

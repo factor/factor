@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003 Slava Pestov.
+ * Copyright (C) 2003, 2004 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,45 +27,44 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor;
+package factor.primitives;
 
-/**
- * The call stack. Stores call frames.
- * @author Slava Pestov
- */
-public class FactorCallStack extends FactorArrayStack implements PublicCloneable
+import factor.compiler.*;
+import factor.*;
+
+public class Set extends FactorWordDefinition
 {
-	//{{{ FactorCallStack constructor
-	public FactorCallStack()
+	//{{{ Set constructor
+	public Set(FactorWord word)
 	{
+		super(word);
 	} //}}}
 
-	//{{{ FactorCallStack constructor
-	public FactorCallStack(Object[] stack, int top)
+	//{{{ eval() method
+	public void eval(FactorInterpreter interp)
+		throws Exception
 	{
-		super(stack,top);
+		FactorDataStack datastack = interp.datastack;
+		Object name = datastack.pop();
+		Object value = datastack.pop();
+		core(interp,value,name);
 	} //}}}
 
-	//{{{ shouldClear() method
-	/**
-	 * Some data (arbitrary objects) should be removed from the stack as
-	 * soon as they're popped, but some (callframes) should be left on and
-	 * reused later.
-	 */
-	public boolean shouldClear(Object o)
+	//{{{ core() method
+	public static void core(FactorInterpreter interp,
+		Object value, Object name) throws Exception
 	{
-		return !(o instanceof FactorCallFrame);
+		interp.callframe.namespace.setVariable(
+			FactorJava.toString(name),value);
 	} //}}}
 
-	//{{{ clone() method
-	public Object clone()
+	//{{{ getStackEffect() method
+	public StackEffect getStackEffect(java.util.Set recursiveCheck,
+		LocalAllocator state) throws FactorStackException
 	{
-		if(stack == null)
-			return new FactorCallStack();
-		else
-		{
-			return new FactorCallStack(
-				FactorLib.deepCloneArray(stack),top);
-		}
+		state.ensure(state.datastack,2);
+		state.pop(null);
+		state.pop(null);
+		return new StackEffect(2,0,0,0);
 	} //}}}
 }

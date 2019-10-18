@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003 Slava Pestov.
+ * Copyright (C) 2003, 2004 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,45 +27,51 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor;
+package factor.primitives;
 
-/**
- * The call stack. Stores call frames.
- * @author Slava Pestov
- */
-public class FactorCallStack extends FactorArrayStack implements PublicCloneable
+import factor.compiler.*;
+import factor.*;
+import java.util.Set;
+
+public class Define extends FactorWordDefinition
 {
-	//{{{ FactorCallStack constructor
-	public FactorCallStack()
+	//{{{ Define constructor
+	public Define(FactorWord word)
 	{
+		super(word);
 	} //}}}
 
-	//{{{ FactorCallStack constructor
-	public FactorCallStack(Object[] stack, int top)
+	//{{{ eval() method
+	public void eval(FactorInterpreter interp)
+		throws Exception
 	{
-		super(stack,top);
-	} //}}}
+		FactorDataStack datastack = interp.datastack;
+		FactorDictionary dict = interp.dict;
+		// handle old define syntax
+		Object obj = datastack.pop();
 
-	//{{{ shouldClear() method
-	/**
-	 * Some data (arbitrary objects) should be removed from the stack as
-	 * soon as they're popped, but some (callframes) should be left on and
-	 * reused later.
-	 */
-	public boolean shouldClear(Object o)
-	{
-		return !(o instanceof FactorCallFrame);
-	} //}}}
+		FactorWord newWord = interp.dict.intern(
+			(String)datastack.pop(String.class));
 
-	//{{{ clone() method
-	public Object clone()
-	{
-		if(stack == null)
-			return new FactorCallStack();
-		else
+		if(obj instanceof Cons)
 		{
-			return new FactorCallStack(
-				FactorLib.deepCloneArray(stack),top);
+			obj = new FactorCompoundDefinition(
+				newWord,(Cons)obj);
 		}
+
+		FactorWordDefinition def = (FactorWordDefinition)obj;
+
+		newWord.define(def);
+		dict.last = newWord;
+	} //}}}
+
+	//{{{ getStackEffect() method
+	public StackEffect getStackEffect(Set recursiveCheck,
+		LocalAllocator state) throws FactorStackException
+	{
+		state.ensure(state.datastack,2);
+		state.pop(null);
+		state.pop(null);
+		return new StackEffect(2,0,0,0);
 	} //}}}
 }

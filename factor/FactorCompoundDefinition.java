@@ -29,289 +29,356 @@
 
 package factor;
 
+import factor.compiler.*;
 import java.lang.reflect.*;
+import java.io.FileOutputStream;
+import java.util.*;
 import org.objectweb.asm.*;
+import org.objectweb.asm.util.*;
 
 /**
  * : name ... ;
  */
 public class FactorCompoundDefinition extends FactorWordDefinition
 {
-	public FactorList definition;
+	private static int compileCount;
 
-	public FactorCompoundDefinition(FactorList definition)
+	public Cons definition;
+
+	//{{{ FactorCompiledDefinition constructor
+	public FactorCompoundDefinition(FactorWord word, Cons definition)
 	{
+		super(word);
 		this.definition = definition;
-	}
+	} //}}}
 
-	public void eval(FactorWord word, FactorInterpreter interp)
+	//{{{ eval() method
+	public void eval(FactorInterpreter interp)
 		throws Exception
 	{
 		interp.call(word,definition);
-	}
+	} //}}}
 
-	//{{{ canCompile() method
-	boolean canCompile()
+	//{{{ getStackEffect() method
+	public StackEffect getStackEffect(Set recursiveCheck,
+		LocalAllocator state) throws Exception
 	{
-		return true;
+		if(recursiveCheck.contains(this))
+			return null;
+
+		try
+		{
+			recursiveCheck.add(this);
+
+			return StackEffect.getStackEffect(definition,
+				recursiveCheck,state);
+		}
+		finally
+		{
+			recursiveCheck.remove(this);
+		}
+	} //}}}
+
+	//{{{ getSanitizedName() method
+	private String getSanitizedName(String name)
+	{
+		StringBuffer sanitizedName = new StringBuffer();
+		for(int i = 0; i < name.length(); i++)
+		{
+			char ch = name.charAt(i);
+			if(!Character.isJavaIdentifierStart(ch))
+				sanitizedName.append("_");
+			else
+				sanitizedName.append(ch);
+		}
+		return "factor/compiler/gen/" + sanitizedName
+			+ "_" + (compileCount++);
 	} //}}}
 
 	//{{{ compile() method
 	/**
+	 * Compile the given word, returning a new word definition.
+	 */
+	FactorWordDefinition compile(FactorInterpreter interp,
+		Set recursiveCheck) throws Exception
+	{
+		StackEffect effect = getStackEffect(
+			recursiveCheck,new LocalAllocator());
+		if(effect == null)
+			throw new FactorCompilerException("Cannot deduce stack effect of " + word);
+		if(effect.outD > 1)
+			throw new FactorCompilerException("Cannot compile word that returns more than 1 value");
+
+		/* StringBuffer buf = new StringBuffer();
+		for(int i = 0; i < recursiveCheck.size(); i++)
+		{
+			buf.append(' ');
+		}
+		buf.append("Compiling ").append(word);
+		System.err.println(buf); */
+
+		String className = getSanitizedName(word.name);
+
+		ClassWriter cw = new ClassWriter(false);
+		cw.visit(ACC_PUBLIC, className,
+			"factor/compiler/CompiledDefinition", null, null);
+
+		compileConstructor(cw,className);
+
+		CompileResult result = compileEval(interp,cw,
+			className,effect,recursiveCheck);
+
+		compileToString(cw,effect);
+
+		// Generate fields for storing literals and word references
+		result.allocator.generateFields(cw);
+
+		// gets the bytecode of the class, and loads it dynamically
+		byte[] code = cw.toByteArray();
+
+		if(interp.compileDump)
+		{
+			FileOutputStream fos = new FileOutputStream(className + ".class");
+			fos.write(code);
+			fos.close();
+		}
+
+		Class compiledWordClass = loader._defineClass(
+			className.replace('/','.'),
+			code, 0, code.length);
+
+		result.allocator.setFields(compiledWordClass);
+
+		Constructor constructor = compiledWordClass.getConstructor(
+			new Class[] { FactorWord.class, StackEffect.class });
+
+		FactorWordDefinition compiledWord = (FactorWordDefinition)
+			constructor.newInstance(new Object[] { word, effect });
+
+		// store disassembly for the 'asm' word.
+		compiledWord.getNamespace(interp).setVariable("asm",
+			result.asm);
+
+		return compiledWord;
+	} //}}}
+
+	//{{{ compileConstructor() method
+	private void compileConstructor(ClassVisitor cw, String className)
+	{
+		// creates a MethodWriter for the constructor
+		CodeVisitor mw = cw.visitMethod(ACC_PUBLIC,
+			"<init>",
+			"(Lfactor/FactorWord;Lfactor/compiler/StackEffect;)V",
+			null, null);
+		// pushes the 'this' variable
+		mw.visitVarInsn(ALOAD, 0);
+		// pushes the word parameter
+		mw.visitVarInsn(ALOAD, 1);
+		// pushes the stack effect parameter
+		mw.visitVarInsn(ALOAD, 2);
+		// invokes the super class constructor
+		mw.visitMethodInsn(INVOKESPECIAL,
+			"factor/compiler/CompiledDefinition", "<init>",
+			"(Lfactor/FactorWord;Lfactor/compiler/StackEffect;)V");
+		mw.visitInsn(RETURN);
+		mw.visitMaxs(3, 3);
+	} //}}}
+
+	//{{{ compileToString() method
+	private void compileToString(ClassVisitor cw, StackEffect effect)
+	{
+		// creates a MethodWriter for the 'toString' method
+		CodeVisitor mw = cw.visitMethod(ACC_PUBLIC,
+			"toString", "()Ljava/lang/String;", null, null);
+		mw.visitLdcInsn("( compiled: " + effect + " ) " + toString());
+		mw.visitInsn(ARETURN);
+		mw.visitMaxs(1, 1);
+	} //}}}
+
+	//{{{ compileEval() method
+	static class CompileResult
+	{
+		LocalAllocator allocator;
+		String asm;
+
+		CompileResult(LocalAllocator allocator, String asm)
+		{
+			this.allocator = allocator;
+			this.asm = asm;
+		}
+	}
+
+	/**
 	 * Write the definition of the eval() method in the compiled word.
 	 * Local 0 -- this
-	 * Local 1 -- word
-	 * Local 2 -- interpreter
+	 * Local 1 -- interpreter
 	 */
-	boolean compile(FactorWord word, FactorInterpreter interp,
-		ClassWriter cw, CodeVisitor mw)
-		throws Exception
+	protected CompileResult compileEval(FactorInterpreter interp,
+		ClassWriter cw, String className, StackEffect effect,
+		Set recursiveCheck) throws Exception
 	{
-		if(definition == null)
-		{
+		// creates a MethodWriter for the 'eval' method
+		CodeVisitor _mw = cw.visitMethod(ACC_PUBLIC,
+			"eval", "(Lfactor/FactorInterpreter;)V",
+			null, null);
+
+		TraceCodeVisitor mw = new TraceCodeVisitor(_mw);
+
+		// eval() method calls core
+		mw.visitVarInsn(ALOAD,1);
+
+		compileDataStackToJVMStack(effect,mw);
+
+		String signature = effect.getCorePrototype();
+
+		mw.visitMethodInsn(INVOKESTATIC,
+			className,"core",signature);
+
+		compileJVMStackToDataStack(effect,mw);
+
+		mw.visitInsn(RETURN);
+		mw.visitMaxs(Math.max(4,2 + effect.inD),4);
+
+		String evalAsm = getDisassembly(mw);
+
+		// generate core
+		_mw = cw.visitMethod(ACC_PUBLIC | ACC_STATIC,
+			"core",signature,null,null);
+
+		mw = new TraceCodeVisitor(_mw);
+
+		LocalAllocator allocator = new LocalAllocator(interp,
+			className,1,effect.inD);
+
+		int maxJVMStack = allocator.compile(definition,mw,
+			recursiveCheck);
+
+		if(effect.outD == 0)
 			mw.visitInsn(RETURN);
-			// Max stack and locals
-			mw.visitMaxs(1,1);
-			return true;
-		}
-
-		FactorList fdef = compilePass1(interp,definition);
-		if(fdef.car instanceof FactorReflectionForm
-			&& fdef.cdr == null)
+		else
 		{
-			return ((FactorReflectionForm)fdef.car).compile(
-				word,interp,cw,mw);
+			allocator.pop(mw);
+			mw.visitInsn(ARETURN);
+			maxJVMStack = Math.max(maxJVMStack,1);
 		}
-		/* else
-			System.err.println("WARNING: cannot compile reflection & more"); */
 
-		return false;
+		mw.visitMaxs(maxJVMStack,allocator.maxLocals());
+
+		String coreAsm = getDisassembly(mw);
+
+		return new CompileResult(allocator,
+			"eval(Lfactor/FactorInterpreter;)V:\n" + evalAsm
+			+ "core" + signature + "\n" + coreAsm);
 	} //}}}
 
-	//{{{ compilePass1() method
+	//{{{ getDisassembly() method
+	protected String getDisassembly(TraceCodeVisitor mw)
+	{
+		// Save the disassembly of the eval() method
+		StringBuffer buf = new StringBuffer();
+		Iterator bytecodes = mw.getText().iterator();
+		while(bytecodes.hasNext())
+		{
+			buf.append(bytecodes.next());
+		}
+		return buf.toString();
+	} //}}}
+
+	//{{{ compileDataStackToJVMStack() method
+	private void compileDataStackToJVMStack(StackEffect effect,
+		CodeVisitor mw)
+	{
+		if(effect.inD != 0)
+		{
+			mw.visitVarInsn(ALOAD,1);
+			mw.visitFieldInsn(GETFIELD,
+				"factor/FactorInterpreter", "datastack",
+				"Lfactor/FactorDataStack;");
+
+			// ensure the stack has enough elements
+			mw.visitInsn(DUP);
+			mw.visitIntInsn(BIPUSH,effect.inD);
+			mw.visitMethodInsn(INVOKEVIRTUAL,
+				"factor/FactorArrayStack", "ensurePop",
+				"(I)V");
+
+			// datastack.stack -> 2
+			mw.visitInsn(DUP);
+			mw.visitFieldInsn(GETFIELD,
+				"factor/FactorArrayStack", "stack",
+				"[Ljava/lang/Object;");
+			mw.visitVarInsn(ASTORE,2);
+			// datastack.top-args.length -> 3
+			mw.visitInsn(DUP);
+			mw.visitFieldInsn(GETFIELD,
+				"factor/FactorArrayStack", "top",
+				"I");
+			mw.visitIntInsn(BIPUSH,effect.inD);
+			mw.visitInsn(ISUB);
+
+			// datastack.top -= args.length
+			mw.visitInsn(DUP_X1);
+			mw.visitFieldInsn(PUTFIELD,
+				"factor/FactorArrayStack", "top",
+				"I");
+
+			mw.visitVarInsn(ISTORE,3);
+
+			for(int i = 0; i < effect.inD; i++)
+			{
+				mw.visitVarInsn(ALOAD,2);
+				mw.visitVarInsn(ILOAD,3);
+				mw.visitInsn(AALOAD);
+				if(i != effect.inD - 1)
+					mw.visitIincInsn(3,1);
+			}
+		}
+	} //}}}
+
+	//{{{ compileJVMStackToDataStack() method
+	private void compileJVMStackToDataStack(StackEffect effect,
+		CodeVisitor mw)
+	{
+		if(effect.outD == 1)
+		{
+			// ( datastack )
+			mw.visitVarInsn(ALOAD,1);
+			mw.visitFieldInsn(GETFIELD,
+				"factor/FactorInterpreter", "datastack",
+				"Lfactor/FactorDataStack;");
+
+			mw.visitInsn(SWAP);
+			mw.visitMethodInsn(INVOKEVIRTUAL,
+				"factor/FactorArrayStack", "push",
+				"(Ljava/lang/Object;)V");
+		}
+	} //}}}
+
+	//{{{ compileImmediate() method
 	/**
-	 * Turn reflection calls into ReflectionForm objects.
+	 * Compile a call to this word. Returns maximum JVM stack use.
 	 */
-	private FactorList compilePass1(FactorInterpreter interp, FactorList def)
+	public int compileImmediate(CodeVisitor mw, LocalAllocator allocator,
+		Set recursiveCheck) throws Exception
 	{
-		if(!def.isProperList())
-			return def;
-
-		FactorList rdef = def.reverse();
-
-		FactorDictionary dict = interp.dict;
-
-		// A list of words and Java reflection forms
-		FactorList fdef = null;
-		while(rdef != null)
-		{
-			Object car = rdef.car;
-			if(car == dict.jvarGet
-				|| car == dict.jvarSet
-				|| car == dict.jvarGetStatic
-				|| car == dict.jvarSetStatic
-				|| car == dict.jnew)
-			{
-				FactorList form = rdef;
-				rdef = form._get(3);
-				fdef = new FactorList(new FactorReflectionForm(form),
-					fdef);
-			}
-			else if(car == dict.jinvoke
-				|| car == dict.jinvokeStatic)
-			{
-				FactorList form = rdef;
-				rdef = form._get(4);
-				fdef = new FactorList(new FactorReflectionForm(form),
-					fdef);
-			}
-			else if(car instanceof FactorList)
-			{
-				fdef = new FactorList(compilePass1(
-					interp,((FactorList)car)),fdef);
-			}
-			else
-				fdef = new FactorList(car,fdef);
-
-			rdef = rdef.next();
-		}
-
-		return fdef;
+		return allocator.compile(definition,mw,recursiveCheck);
 	} //}}}
 
-	//{{{ precompile() method
-	void precompile(FactorWord newWord, FactorInterpreter interp)
-		throws Exception
-	{
-		FactorDictionary dict = interp.dict;
-
-		if(definition != null)
-		{
-			FactorList before = definition;
-			FactorList fed = definition.reverse();
-			precompile(interp,newWord,fed);
-			definition = fed.reverse();
-			/* if(!def.equals(before))
-			{
-				System.out.println("BEFORE: " + before);
-				System.out.println("AFTER: " + def);
-			} */
-		}
-	} //}}}
-
-	//{{{ precompile() method
-	/**
-	 * Precompiling turns jconstructor, jfield and jmethod calls
-	 * with all-literal arguments into inline
-	 * Constructor/Field/Method literals. This improves performance.
-	 */
-	private void precompile(FactorInterpreter interp,
-		FactorWord newWord, FactorList list)
-		throws Exception
-	{
-		if(interp.compile)
-			return;
-
-		FactorDictionary dict = interp.dict;
-
-		while(list != null)
-		{
-			Object o = list.car;
-			if(o instanceof FactorWord)
-			{
-				FactorWord word = (FactorWord)o;
-				if(word.def != FactorMissingDefinition.INSTANCE)
-				{
-					word.def.references++;
-				}
-				else
-				{
-					/*System.err.println(
-						"WARNING: "
-						+ newWord
-						+ " references "
-						+ o
-						+ " before its defined");*/
-				}
-
-				if(o == dict.jconstructor)
-				{
-					jconstructorPrecompile(
-						interp,list);
-				}
-				else if(o == dict.jmethod)
-				{
-					jmethodPrecompile(
-						interp,list);
-				}
-				else if(o == dict.jfield)
-				{
-					jfieldPrecompile(
-						interp,list);
-				}
-			}
-			else if(o instanceof FactorList)
-			{
-				if(((FactorList)o).isProperList())
-				{
-					FactorList l = (FactorList)o;
-					FactorList _l = l.reverse();
-					precompile(interp,newWord,_l);
-					list.car = _l.reverse();
-				}
-			}
-			list = list.next();
-		}
-	} //}}}
-
-	//{{{ jconstructorPrecompile() method
-	private void jconstructorPrecompile(
-		FactorInterpreter interp, FactorList list)
-		throws Exception
-	{
-		FactorList cdr = list.next();
-		if(cdr == null)
-			return;
-		if(!(cdr.car instanceof String))
-			return;
-		String clazz = (String)cdr.car;
-
-		FactorList cddr = cdr.next();
-		if(cddr == null)
-			return;
-		if(!(cddr.car instanceof FactorList))
-			return;
-		FactorList args = (FactorList)cddr.car;
-
-		Constructor c = FactorJava.jconstructor(clazz,args);
-
-		list.car = c;
-		list.cdr = cddr.next();
-	} //}}}
-
-	//{{{ jfieldPrecompile() method
-	private void jfieldPrecompile(
-		FactorInterpreter interp, FactorList list)
-		throws Exception
-	{
-		FactorList cdr = list.next();
-		if(cdr == null)
-			return;
-		if(!(cdr.car instanceof String))
-			return;
-		String field = (String)cdr.car;
-
-		FactorList cddr = cdr.next();
-		if(cddr == null)
-			return;
-		if(!(cddr.car instanceof String))
-			return;
-		String clazz = (String)cddr.car;
-
-		Field f = FactorJava.jfield(field,clazz);
-
-		list.car = f;
-		list.cdr = cddr.next();
-	} //}}}
-
-	//{{{ jmethodPrecompile() method
-	/**
-	 * Check if this jmethod has all-literal arguments, and if so,
-	 * inline the result.
-	 */
-	private void jmethodPrecompile(
-		FactorInterpreter interp, FactorList list)
-		throws Exception
-	{
-		FactorList cdr = list.next();
-		if(cdr == null)
-			return;
-		if(!(cdr.car instanceof String))
-			return;
-		String method = (String)cdr.car;
-
-		FactorList cddr = cdr.next();
-		if(cddr == null)
-			return;
-		if(!(cddr.car instanceof String))
-			return;
-		String clazz = (String)cddr.car;
-
-		FactorList cdddr = cddr.next();
-		if(cdddr == null)
-			return;
-		if(!(cdddr.car instanceof FactorList))
-			return;
-		FactorList args = (FactorList)cdddr.car;
-
-		Method m = FactorJava.jmethod(method,clazz,args);
-
-		list.car = m;
-		list.cdr = cdddr.next();
-	} //}}}
-
+	//{{{ toString() method
 	public String toString()
 	{
 		return definition.elementsToString();
-	}
+	} //}}}
+
+	private static SimpleClassLoader loader = new SimpleClassLoader();
+
+	//{{{ SimpleClassLoader class
+	static class SimpleClassLoader extends ClassLoader
+	{
+		public Class _defineClass(String name,
+				byte[] code, int off, int len)
+		{
+			return defineClass(name,code,off,len);
+		}
+	} //}}}
 }

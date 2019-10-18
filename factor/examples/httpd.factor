@@ -40,7 +40,7 @@
 ! - implement an LSP that does an "apropos" search
 
 : httpdGetPath ( request -- file )
-    dup ".*\\.\\.*" matches [
+    dup ".*\\.\\.*" re-matches [
         f
     ] [
         dup [ "GET (.*?)( HTTP.*|)" groups dup [ car ] when ] when
@@ -58,12 +58,12 @@
 
 : httpdFiletype (filename -- mime-type)
     [
-        [ dup ".*\.gif"  matches ] [ drop "image/gif"                ]
-        [ dup ".*\.png"  matches ] [ drop "image/png"                ]
-        [ dup ".*\.html" matches ] [ drop "text/html"                ]
-        [ dup ".*\.txt"  matches ] [ drop "text/plain"               ]
-        [ dup ".*\.lsd"  matches ] [ drop "text/plain"               ]
-        [ t ]                      [ drop "application/octet-stream" ]
+        [ ".*\.gif"  re-matches ] [ drop "image/gif"                ]
+        [ ".*\.png"  re-matches ] [ drop "image/png"                ]
+        [ ".*\.html" re-matches ] [ drop "text/html"                ]
+        [ ".*\.txt"  re-matches ] [ drop "text/plain"               ]
+        [ ".*\.lsd"  re-matches ] [ drop "text/plain"               ]
+        [ t ]                     [ drop "application/octet-stream" ]
     ] cond ;
 
 : httpdUriToPath (uri -- path)
@@ -123,7 +123,7 @@
         dup directory? [
             httpdServeDirectory
         ] [
-            dup ".*\.lhtml" matches [
+            dup ".*\.lhtml" re-matches [
                 httpdServeScript
             ] [
                 httpdServeFile

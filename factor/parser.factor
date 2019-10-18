@@ -36,7 +36,7 @@
 
 : unparse (X -- "X")
     [ |java.lang.Object ] |factor.FactorJava |factorTypeToString
-    jmethod jinvokeStatic ;
+    jinvoke-static ;
 
 : . (expr --)
     unparse print ;

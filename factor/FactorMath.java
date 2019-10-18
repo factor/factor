@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003 Slava Pestov.
+ * Copyright (C) 2003,2004 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -280,6 +280,12 @@ public class FactorMath
 
 		int nextInt = random.nextInt();
 		return min + Math.abs(nextInt % (max - min + 1));
+	} //}}}
+
+	//{{{ randomFloat() method
+	public static float randomFloat(int min, int max, float scale)
+	{
+		return randomInt(min,max) / scale;
 	} //}}}
 
 	//{{{ sgn() method

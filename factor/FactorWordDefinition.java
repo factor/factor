@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003 Slava Pestov.
+ * Copyright (C) 2003, 2004 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,10 +29,10 @@
 
 package factor;
 
-import java.io.FileOutputStream;
-import java.util.Iterator;
+import factor.compiler.*;
+import java.util.HashSet;
+import java.util.Set;
 import org.objectweb.asm.*;
-import org.objectweb.asm.util.*;
 
 /**
  * A word definition.
@@ -40,152 +40,89 @@ import org.objectweb.asm.util.*;
 public abstract class FactorWordDefinition implements FactorObject, Constants
 {
 	private FactorNamespace namespace;
+	protected FactorWord word;
 
-	/**
-	 * Number of times this word has been referenced from a
-	 * compound word (incremented by the precompiler).
-	 */
-	public int references;
+	public boolean compileFailed;
 
-	public abstract void eval(FactorWord word, FactorInterpreter interp)
+	public FactorWordDefinition(FactorWord word)
+	{
+		this.word = word;
+	}
+
+	public abstract void eval(FactorInterpreter interp)
 		throws Exception;
 
-	void precompile(FactorWord word, FactorInterpreter interp)
-		throws Exception {}
-
+	//{{{ getNamespace() method
 	public FactorNamespace getNamespace(FactorInterpreter interp) throws Exception
 	{
 		if(namespace == null)
 			namespace = new FactorNamespace(interp.global,this);
 
 		return namespace;
-	}
-
-	//{{{ canCompile() method
-	boolean canCompile()
-	{
-		return false;
 	} //}}}
 
-	private static int compileCount;
-
-	//{{{ compile() method
-	/**
-	 * Compile the given word, returning a new word definition.
-	 */
-	FactorWordDefinition compile(FactorWord word, FactorInterpreter interp)
-		throws Exception
+	//{{{ getStackEffect() method
+	public final StackEffect getStackEffect() throws Exception
 	{
-		if(!canCompile())
-			return this;
+		return getStackEffect(new HashSet(),new LocalAllocator());
+	} //}}}
 
-		//System.out.println("Compiling " + word);
-
-		StringBuffer sanitizedName = new StringBuffer();
-		for(int i = 0; i < word.name.length(); i++)
-		{
-			char ch = word.name.charAt(i);
-			if(!Character.isJavaIdentifierStart(ch))
-				sanitizedName.append("_");
-			else
-				sanitizedName.append(ch);
-		}
-		String className = "factor/__compiler__/" + sanitizedName
-			+ "_" + (compileCount++);
-
-		ClassWriter cw = new ClassWriter(false);
-		cw.visit(ACC_PUBLIC, className,
-			"factor/FactorWordDefinition", null, null);
-
-		// creates a MethodWriter for the (implicit) constructor
-		CodeVisitor mw = cw.visitMethod(ACC_PUBLIC,
-			"<init>", "()V", null, null);
-		// pushes the 'this' variable
-		mw.visitVarInsn(ALOAD, 0);
-		// invokes the super class constructor
-		mw.visitMethodInsn(INVOKESPECIAL,
-			"factor/FactorWordDefinition", "<init>", "()V");
-		mw.visitInsn(RETURN);
-		// this code uses a maximum of one stack element and one local
-		// variable
-		mw.visitMaxs(1, 1);
-
-		// creates a MethodWriter for the 'toString' method
-		mw = cw.visitMethod(ACC_PUBLIC,
-			"toString", "()Ljava/lang/String;", null, null);
-		mw.visitLdcInsn("( compiled ) " + toString());
-		mw.visitInsn(ARETURN);
-		mw.visitMaxs(1, 1);
-
-		// pushes the 'this' variable
-		mw.visitVarInsn(ALOAD, 0);
-		// invokes the super class constructor
-		mw.visitMethodInsn(INVOKESPECIAL,
-			"factor/FactorWordDefinition", "<init>", "()V");
-		mw.visitInsn(RETURN);
-		// this code uses a maximum of one stack element and one local
-		// variable
-		mw.visitMaxs(1, 1);
-
-		// creates a MethodWriter for the 'eval' method
-		mw = cw.visitMethod(ACC_PUBLIC,
-			"eval", "(Lfactor/FactorWord;Lfactor/FactorInterpreter;)V",
-			null, null);
-
-		// We store a string with disassembly for debugging
-		// purposes.
-		TraceCodeVisitor disasm = new TraceCodeVisitor(mw);
-		if(!compile(word,interp,cw,disasm))
-			return this;
-
-		// Save the disassembly
-		StringBuffer buf = new StringBuffer();
-		Iterator bytecodes = disasm.getText().iterator();
-		while(bytecodes.hasNext())
-		{
-			buf.append(bytecodes.next());
-		}
-
-		// gets the bytecode of the class, and loads it dynamically
-		byte[] code = cw.toByteArray();
-
-		/* FileOutputStream fos = new FileOutputStream(className + ".class");
-		fos.write(code);
-		fos.close(); */
-
-		SimpleClassLoader loader = new SimpleClassLoader();
-		Class compiledWordClass = loader._defineClass(className,
-			code, 0, code.length);
-
-		FactorWordDefinition compiledWord = (FactorWordDefinition)
-			compiledWordClass.newInstance();
-
-		compiledWord.getNamespace(interp).setVariable("asm",buf.toString());
-
-		return compiledWord;
+	//{{{ getStackEffect() method
+	public StackEffect getStackEffect(Set recursiveCheck,
+		LocalAllocator state) throws Exception
+	{
+		return null;
 	} //}}}
 
 	//{{{ compile() method
-	/**
-	 * Write the definition of the eval() method in the compiled word.
-	 * Local 0 -- this
-	 * Local 1 -- word
-	 * Local 2 -- interpreter
-	 */
-	boolean compile(FactorWord word, FactorInterpreter interp,
-		ClassWriter cw, CodeVisitor mw)
-		throws Exception
+	FactorWordDefinition compile(FactorInterpreter interp,
+		Set recursiveCheck) throws Exception
 	{
-		throw new FactorRuntimeException("Don't know how to compile " + word);
+		return this;
 	} //}}}
 
-	//{{{ SimpleClassLoader class
-	static class SimpleClassLoader extends ClassLoader
+	//{{{ compileCallTo() method
+	/**
+	 * Compile a call to this word. Returns maximum JVM stack use.
+	 */
+	public int compileCallTo(CodeVisitor mw, LocalAllocator allocator,
+		Set recursiveCheck) throws Exception
 	{
-		public Class _defineClass(String name,
-				byte[] code, int off, int len)
+		StackEffect effect = getStackEffect();
+		if(effect == null)
 		{
-			return defineClass(name,code,off,len);
+			// combinator; inline
+			return compileImmediate(mw,allocator,recursiveCheck);
 		}
+		else
+		{
+			// normal word
+			mw.visitVarInsn(ALOAD,0);
+
+			allocator.generateArgs(mw,effect.inD,null);
+
+			String defclass = getClass().getName().replace('.','/');
+
+			String signature = effect.getCorePrototype();
+
+			mw.visitMethodInsn(INVOKESTATIC,defclass,"core",signature);
+
+			if(effect.outD > 1)
+				throw new FactorCompilerException("Cannot compile word with non-0/1-out factors");
+			if(effect.outD == 1)
+				allocator.push(mw);
+
+			return effect.inD + 1;
+		}
+	} //}}}
+
+	//{{{ compileImmediate() method
+	/**
+	 * Compile a call to this word. Returns maximum JVM stack use.
+	 */
+	public int compileImmediate(CodeVisitor mw, LocalAllocator allocator,
+		Set recursiveCheck) throws Exception
+	{
+		throw new FactorCompilerException("Cannot compile " + word + " in immediate mode");
 	} //}}}
 }

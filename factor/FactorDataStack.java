@@ -41,7 +41,7 @@ public class FactorDataStack extends FactorArrayStack implements PublicCloneable
 	} //}}}
 
 	//{{{ FactorDataStack constructor
-	public FactorDataStack(FactorList list)
+	public FactorDataStack(Cons list)
 	{
 		super(list);
 	} //}}}
@@ -66,6 +66,12 @@ public class FactorDataStack extends FactorArrayStack implements PublicCloneable
 	//{{{ clone() method
 	public Object clone()
 	{
-		return new FactorDataStack(FactorLib.cloneArray(stack),top);
+		if(stack == null)
+			return new FactorDataStack();
+		else
+		{
+			return new FactorDataStack(
+				FactorLib.cloneArray(stack),top);
+		}
 	} //}}}
 }

@@ -44,12 +44,17 @@ public class FactorCallFrame implements PublicCloneable, FactorExternalizable
 	/**
 	 * Next word to be evaluated.
 	 */
-	public FactorList ip;
+	public Cons ip;
 
 	/**
 	 * Collapsed tail calls? See call().
 	 */
 	public boolean collapsed;
+
+	/**
+	 * Compiled code?
+	 */
+	public boolean compiled;
 
 	//{{{ FactorCallFrame constructor
 	public FactorCallFrame()
@@ -59,7 +64,7 @@ public class FactorCallFrame implements PublicCloneable, FactorExternalizable
 	//{{{ FactorCallFrame constructor
 	public FactorCallFrame(FactorWord word,
 		FactorNamespace namespace,
-		FactorList ip)
+		Cons ip)
 	{
 		this.word = word;
 		this.namespace = namespace;
@@ -90,12 +95,17 @@ public class FactorCallFrame implements PublicCloneable, FactorExternalizable
 
 		buf.append("at ").append(word);
 
+		if(compiled)
+			buf.append(" ( compiled )");
+		else if(ip != null)
+		{
+			buf.append(" ( ip: ").append(ip.elementsToString())
+				.append(" )");
+		}
+
 		buf.append('\n').append(indent);
 
-		buf.append("  namespace: ").append(namespace)
-			.append('\n').append(indent);
-
-		buf.append("  ip: ").append(ip);
+		buf.append(namespace);
 
 		return buf.toString();
 	} //}}}

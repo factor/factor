@@ -29,8 +29,8 @@
 
 package factor;
 
-import java.util.HashMap;
-import java.util.Map;
+import factor.compiler.FactorCompilerException;
+import java.util.*;
 
 /**
  * An internalized symbol.
@@ -45,9 +45,19 @@ public class FactorWord implements FactorExternalizable
 	public FactorWordDefinition def;
 
 	/**
+	 * Definition before compiling.
+	 */
+	public FactorWordDefinition uncompiled;
+
+	/**
 	 * "define" pushes previous definitions onto this list, like a stack.
 	 */
-	public FactorList history;
+	public Cons history;
+
+	/**
+	 * Is this word referenced from a compiled word?
+	 */
+	public boolean compileRef;
 
 	//{{{ FactorWord constructor
 	/**
@@ -58,7 +68,64 @@ public class FactorWord implements FactorExternalizable
 	public FactorWord(String name)
 	{
 		this.name = name;
-		def = FactorMissingDefinition.INSTANCE;
+		def = new FactorMissingDefinition(this);
+	} //}}}
+
+	//{{{ define() method
+	public void define(FactorWordDefinition def)
+	{
+		if(compileRef)
+		{
+			System.err.println("WARNING: " + this
+				+ " is used in one or more compiled words; old definition will remain until full recompile");
+		}
+		else if(!(this.def instanceof FactorMissingDefinition))
+		{
+			System.err.println("WARNING: redefining " + this);
+			history = new Cons(this.def,history);
+		}
+
+		uncompiled = this.def = def;
+	} //}}}
+
+	//{{{ compile() method
+	public void compile(FactorInterpreter interp)
+	{
+		compile(interp,new HashSet());
+	} //}}}
+
+	//{{{ compile() method
+	public void compile(FactorInterpreter interp, Set recursiveCheck)
+	{
+		if(def.compileFailed)
+			return;
+
+		System.err.println("Compiling " + this);
+		if(recursiveCheck.contains(this))
+			System.err.println("WARNING: cannot compile recursive calls: " + this);
+
+		try
+		{
+			recursiveCheck.add(this);
+
+			def = def.compile(interp,recursiveCheck);
+		}
+		catch(FactorCompilerException e)
+		{
+			def.compileFailed = true;
+			System.err.println("WARNING: cannot compile " + this);
+			System.err.println(e.getMessage());
+		}
+		catch(Throwable t)
+		{
+			def.compileFailed = true;
+			System.err.println("WARNING: cannot compile " + this);
+			t.printStackTrace();
+		}
+		finally
+		{
+			recursiveCheck.remove(this);
+		}
 	} //}}}
 
 	//{{{ toString() method
