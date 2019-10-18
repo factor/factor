@@ -1,11 +1,14 @@
 IN: temporary
-USING: test inspector prettyprint math ;
+USING: kernel inspector math namespaces prettyprint test
+sequences ;
 
-[[ 1 2 ]] inspect
-[ 1 2 3 ] inspect
-f inspect
-\ + inspect
+{ } clone inspector-stack set
 
-[ "hello world how are you" ]
-[ [ "hello" "world" "how" "are" "you" ] " " join ]
-unit-test
+[[ "hello" "world" ]] (inspect)
+
+[ "hello" ] [ 0 inspector-slots get nth ] unit-test
+[ "world" ] [ 1 inspector-slots get nth ] unit-test
+
+[ 1 2 3 ] (inspect)
+f (inspect)
+\ + (inspect)

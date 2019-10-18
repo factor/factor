@@ -24,21 +24,21 @@ IN: sdl USING: alien kernel math ;
 : SDL_SRCALPHA    HEX: 00010000 ; ! Blit uses source alpha blending
 : SDL_PREALLOC    HEX: 01000000 ; ! Surface uses preallocated memory
 
-BEGIN-STRUCT: rect
+BEGIN-STRUCT: sdl-rect
     FIELD: short x
     FIELD: short y
     FIELD: ushort w
     FIELD: ushort h
 END-STRUCT
 
-BEGIN-STRUCT: color
+BEGIN-STRUCT: sdl-color
     FIELD: uchar r
     FIELD: uchar g
     FIELD: uchar b
     FIELD: uchar unused
 END-STRUCT
 
-BEGIN-STRUCT: format
+BEGIN-STRUCT: sdl-format
     FIELD: void* palette
     FIELD: uchar  BitsPerPixel
     FIELD: uchar  BytesPerPixel
@@ -58,42 +58,25 @@ BEGIN-STRUCT: format
     FIELD: uchar  alpha
 END-STRUCT
 
-BEGIN-STRUCT: rect
-    FIELD: short  clip-x
-    FIELD: short  clip-y
-    FIELD: ushort clip-w
-    FIELD: ushort clip-h
-END-STRUCT
-
 BEGIN-STRUCT: surface
-    FIELD: uint    flags
-    FIELD: format* format
-    FIELD: int     w
-    FIELD: int     h
-    FIELD: ushort  pitch
-    FIELD: void*   pixels
-    FIELD: int     offset
-    FIELD: void*   hwdata
-    FIELD: short   clip-x
-    FIELD: short   clip-y
-    FIELD: ushort   clip-w
-    FIELD: ushort   clip-h
-    FIELD: uint    unused1
-    FIELD: uint    locked
-    FIELD: int     map
-    FIELD: uint    format_version
-    FIELD: int     refcount
+    FIELD: uint        flags
+    FIELD: sdl-format* format
+    FIELD: int         w
+    FIELD: int         h
+    FIELD: ushort      pitch
+    FIELD: void*       pixels
+    FIELD: int         offset
+    FIELD: void*       hwdata
+    FIELD: short       clip-x
+    FIELD: short       clip-y
+    FIELD: ushort      clip-w
+    FIELD: ushort      clip-h
+    FIELD: uint        unused1
+    FIELD: uint        locked
+    FIELD: int         map
+    FIELD: uint        format_version
+    FIELD: int         refcount
 END-STRUCT
-
-: must-lock-surface? ( surface -- ? )
-    #! This is a macro in SDL_video.h.
-    dup surface-offset 0 = [
-        surface-flags
-        SDL_HWSURFACE SDL_ASYNCBLIT bitor SDL_RLEACCEL bitor
-        bitand 0 = not
-    ] [
-        drop t
-    ] ifte ;
 
 : SDL_VideoInit ( driver-name flags -- )
     "int" "sdl" "SDL_VideoInit"
@@ -137,7 +120,7 @@ END-STRUCT
     "void" "sdl" "SDL_UnlockSurface" [ "surface*" ] alien-invoke ;
 
 : SDL_SetClipRect ( surface rect -- ? )
-    "bool" "sdl" "SDL_SetClipRect" [ "surface*" "rect*" ] alien-invoke ;
+    "bool" "sdl" "SDL_SetClipRect" [ "surface*" "sdl-rect*" ] alien-invoke ;
 
 : SDL_FreeSurface ( surface -- )
     "void" "sdl" "SDL_FreeSurface" [ "surface*" ] alien-invoke ;
@@ -146,14 +129,14 @@ END-STRUCT
     #! The blit function should not be called on a locked
     #! surface.
     "int" "sdl" "SDL_UpperBlit" [
-        "surface*" "rect*"
-        "surface*" "rect*"
+        "surface*" "sdl-rect*"
+        "surface*" "sdl-rect*"
     ] alien-invoke ;
 
 : SDL_FillRect ( surface rect color -- n )
     #! If rect is null, fills entire surface.
     "bool" "sdl" "SDL_FillRect"
-    [ "surface*" "rect*" "uint" ] alien-invoke ;
+    [ "surface*" "sdl-rect*" "uint" ] alien-invoke ;
 
 : SDL_WM_SetCaption ( title icon -- )
     "void" "sdl" "SDL_WM_SetCaption"

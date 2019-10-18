@@ -13,7 +13,7 @@ void primitive_expired(void)
 		drepl(F);
 }
 
-INLINE void* alien_offset(CELL object)
+void* alien_offset(CELL object)
 {
 	ALIEN *alien;
 	F_ARRAY *array;
@@ -32,6 +32,8 @@ INLINE void* alien_offset(CELL object)
 	case DISPLACED_ALIEN_TYPE:
 		d = untag_displaced_alien_fast(object);
 		return alien_offset(d->alien) + d->displacement;
+	case F_TYPE:
+		return NULL;
 	default:
 		type_error(ALIEN_TYPE,object);
 		return (void*)-1; /* can't happen */

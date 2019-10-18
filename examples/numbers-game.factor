@@ -1,7 +1,7 @@
 IN: numbers-game
 USING: kernel math parser random io ;
 
-: read-number ( -- n ) readln parse-number ;
+: read-number ( -- n ) readln str>number ;
 
 : guess-banner
     "I'm thinking of a number between 0 and 100." print ;

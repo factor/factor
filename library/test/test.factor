@@ -2,7 +2,7 @@
 
 IN: test
 USING: errors kernel lists math memory namespaces parser
-prettyprint sequences io strings unparser vectors words ;
+prettyprint sequences io strings vectors words ;
 
 TUPLE: assert got expect ;
 
@@ -15,17 +15,13 @@ M: assert error.
     2dup = [ 2drop ] [ <assert> throw ] ifte ;
 
 : print-test ( input output -- )
-    "--> " write 2list . flush ;
-
-: keep-datastack ( quot -- ) datastack slip set-datastack drop ;
+    "--> " write 2vector . flush ;
 
 : time ( code -- )
     #! Evaluates the given code and prints the time taken to
     #! execute it.
     millis >r gc-time >r call gc-time r> - millis r> -
-    [
-        unparse % " ms run / " % unparse % " ms GC time" %
-    ] make-string print ;
+    [ # " ms run / " % # " ms GC time" % ] "" make print ;
 
 : unit-test ( output input -- )
     [
@@ -56,7 +52,9 @@ SYMBOL: failures
 : test ( name -- ? )
     [
         "=====> " write dup write "..." print
-        test-path [ [ run-resource ] keep ] assert-depth drop
+        test-path [
+            [ [ run-resource ] with-scope ] keep
+        ] assert-depth drop
     ] test-handler ;
 
 : prepare-tests ( -- )
@@ -74,45 +72,45 @@ SYMBOL: failures
     prepare-tests [ test ] subset terpri passed. failed. ;
 
 : tests
-    [
+    {
         "lists/cons" "lists/lists" "lists/assoc"
-        "lists/namespaces" "lists/combinators" "lists/queues"
+        "lists/namespaces" "lists/queues"
         "combinators"
         "continuations" "errors" "hashtables" "strings"
         "namespaces" "generic" "tuple" "files" "parser"
-        "parse-number" "image" "init" "io/io"
-        "listener" "vectors" "words" "unparser" "random"
+        "parse-number" "init" "io/io"
+        "vectors" "words" "prettyprint" "random"
         "stream" "math/bitops"
         "math/math-combinators" "math/rational" "math/float"
         "math/complex" "math/irrational" "math/integer"
         "math/matrices"
         "httpd/url-encoding" "httpd/html" "httpd/httpd"
-        "httpd/http-client"
-        "crashes" "sbuf" "threads" "parsing-word"
-        "inference" "interpreter"
-        "alien"
+        "httpd/http-client" "sbuf" "threads" "parsing-word"
+        "inference" "interpreter" "alien"
         "gadgets/line-editor" "gadgets/rectangles"
-        "gadgets/gradients" "memory"
+        "gadgets/gradients" "gadgets/frames" "memory"
         "redefine" "annotate" "sequences" "binary" "inspector"
-    ] run-tests ;
+        "kernel"
+    } run-tests ;
 
 : benchmarks
-    [
+    {
         "benchmark/empty-loop" "benchmark/fac"
         "benchmark/fib" "benchmark/sort"
         "benchmark/continuations" "benchmark/ack"
         "benchmark/hashtables" "benchmark/strings"
         "benchmark/vectors" "benchmark/prettyprint"
         "benchmark/image"
-    ] run-tests ;
+    } run-tests ;
 
 : compiler-tests
-    [
+    {
         "io/buffer" "compiler/optimizer"
         "compiler/simple"
         "compiler/stack" "compiler/ifte"
         "compiler/generic" "compiler/bail-out"
         "compiler/linearizer" "compiler/intrinsics"
-    ] run-tests ;
+        "compiler/identities"
+    } run-tests ;
 
 : all-tests tests compiler-tests benchmarks ;

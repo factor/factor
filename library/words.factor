@@ -6,77 +6,68 @@ namespaces sequences strings vectors ;
 
 ! The basic word type. Words can be named and compared using
 ! identity. They hold a property map.
-DEFER: word?
-BUILTIN: word 17 word?
-    [ 1 hashcode f ]
-    [ 4 "word-def" "set-word-def" ]
-    [ 5 "word-props" "set-word-props" ] ;
 
 : word-prop ( word name -- value ) swap word-props hash ;
 : set-word-prop ( word value name -- ) rot word-props set-hash ;
 
-: word-name ( word -- str ) "name" word-prop ;
-: word-vocabulary ( word -- str ) "vocabulary" word-prop ;
-
 ! Pointer to executable native code
 GENERIC: word-xt
-M: word word-xt ( w -- xt ) 2 integer-slot ;
+M: word word-xt ( w -- xt ) 7 integer-slot ;
 GENERIC: set-word-xt
-M: word set-word-xt ( xt w -- ) 2 set-integer-slot ;
-
-! Primitive number; some are magic, see below.
-GENERIC: word-primitive
-M: word word-primitive ( w -- n ) 3 integer-slot ;
-GENERIC: set-word-primitive
-M: word set-word-primitive ( n w -- )
-    [ 3 set-integer-slot ] keep update-xt ;
+M: word set-word-xt ( xt w -- ) 7 set-integer-slot ;
 
 : word-sort ( list -- list )
     #! Sort a list of words by name.
-    [ swap word-name swap word-name lexi> ] sort ;
+    [ swap word-name swap word-name lexi ] sort ;
+
+: uses ( word -- uses )
+    #! Outputs a list of words that this word directly calls.
+    [
+        dup word-def [
+            dup word? [ 2dup eq? [ dup , ] unless ] when 2drop
+        ] tree-each-with
+    ] { } make prune ;
 
 ! The cross-referencer keeps track of word dependencies, so that
 ! words can be recompiled when redefined.
 SYMBOL: crossref
 
-: (add-crossref)
-    dup word? [
-        crossref get [ dupd nest set-hash ] bind
-    ] [
-        2drop
-    ] ifte ;
+: (add-crossref) crossref get [ dupd nest set-hash ] bind ;
 
 : add-crossref ( word -- )
     #! Marks each word in the quotation as being a dependency
     #! of the word.
-    dup word-def [ (add-crossref) ] tree-each-with ;
-
-: (remove-crossref)
-    dup word? [
-        crossref get [ nest remove-hash ] bind
+    crossref get [
+        dup uses [ (add-crossref) ] each-with
     ] [
-        2drop
+        drop
     ] ifte ;
+
+: (remove-crossref) crossref get [ nest remove-hash ] bind ;
 
 : remove-crossref ( word -- )
     #! Marks each word in the quotation as not being a
     #! dependency of the word.
-    dup word-def [ (remove-crossref) ] tree-each-with ;
+    crossref get [
+        dup uses [ (remove-crossref) ] each-with
+    ] [
+        drop
+    ] ifte ;
 
 : usages ( word -- deps )
     #! List all usages of a word. This is a transitive closure,
     #! so indirect usages are reported.
-    crossref get closure word-sort ;
+    crossref get dup [ closure ] [ 2drop { } ] ifte ;
 
 : usage ( word -- list )
     #! List all direct usages of a word.
-    crossref get hash dup [ hash-keys ] when word-sort ;
+    crossref get ?hash dup [ hash-keys ] when ;
 
 GENERIC: (uncrossref) ( word -- )
 M: word (uncrossref) drop ;
 
 : uncrossref ( word -- )
-    dup (uncrossref) usages  [ (uncrossref) ] each ;
+    dup (uncrossref) usages [ (uncrossref) ] each ;
 
 ! The word primitive combined with the word def specify what the
 ! word does when invoked.
@@ -85,7 +76,7 @@ M: word (uncrossref) drop ;
     pick uncrossref
     pick set-word-def
     over set-word-primitive
-    f "parsing" set-word-prop ;
+    update-xt ;
 
 GENERIC: definer ( word -- word )
 #! Return the parsing word that defined this word.
@@ -111,17 +102,34 @@ M: symbol definer drop \ SYMBOL: ;
 PREDICATE: word compound  ( obj -- ? ) word-primitive 1 = ;
 M: compound definer drop \ : ;
 
-: (define-compound) ( word def -- )
+: define-compound ( word def -- )
     >r dup dup remove-crossref r> 1 swap define add-crossref ;
 
-: define-compound ( word def -- )
-    #! If the word is a generic word, clear the properties 
-    #! involved so that 'see' can work properly.
-    over f "methods" set-word-prop
-    over f "picker" set-word-prop
-    over f "dispatcher" set-word-prop
-    (define-compound) ;
+: reset-props ( word seq -- )
+    [ f swap set-word-prop ] each-with ;
 
-: literalize ( word/obj -- quot )
-    #! Produce a quotation that pushes this object.
-    dup word? [ unit [ car ] ] [ f ] ifte cons ;
+: reset-word ( word -- )
+    {
+        "parsing" "inline" "foldable" "flushable" "predicating"
+        "documentation" "stack-effect"
+    } reset-props ;
+
+: reset-generic ( word -- )
+    dup reset-word { "methods" "combination" } reset-props ;
+
+GENERIC: literalize ( obj -- obj )
+
+M: object literalize ;
+
+M: word literalize <wrapper> ;
+
+M: wrapper literalize <wrapper> ;
+
+: gensym ( -- word )
+    #! Return a word that is distinct from every other word, and
+    #! is not contained in any vocabulary.
+    "G:"
+    global [ \ gensym dup inc get ] bind
+    number>string append f <word> ;
+
+0 \ gensym global set-hash

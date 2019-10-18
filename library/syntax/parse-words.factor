@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
 USING: errors kernel lists math namespaces sequences io
-strings unparser words ;
+strings words ;
 
 ! The parser uses a number of variables:
 ! line - the line being parsed
@@ -13,6 +13,8 @@ strings unparser words ;
 ! When a token is scanned, it is searched for in the 'use' list
 ! of vocabularies. If it is a parsing word, it is executed
 ! immediately. Otherwise it is appended to the parse tree.
+
+SYMBOL: line-number
 
 : use+ ( string -- ) "use" [ cons ] change ;
 
@@ -58,7 +60,7 @@ global [ string-mode off ] bind
 : scan-word ( -- obj )
     scan dup [
         dup ";" = not string-mode get and [
-            dup "use" get search [ ] [ str>number ] ?ifte
+            dup "use" get search [ ] [ string>number ] ?ifte
         ] unless
     ] when ;
 
@@ -146,5 +148,5 @@ global [ string-mode off ] bind
     #! Read a string from the input stream, until it is
     #! terminated by a ".
     "col" [
-        [ "line" get (parse-string) ] make-string swap
+        [ "line" get (parse-string) ] "" make swap
     ] change ;

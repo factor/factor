@@ -1,160 +1,364 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USING: alien errors generic hashtables io kernel lists math
-matrices memory namespaces parser presentation sequences strings
-styles unparser vectors words ;
+USING: alien generic hashtables io kernel lists math namespaces
+parser sequences strings styles vectors words ;
 
-SYMBOL: prettyprint-limit
-SYMBOL: one-line
-SYMBOL: tab-size
+! State
+SYMBOL: column
+SYMBOL: indent
+SYMBOL: last-newline
 SYMBOL: recursion-check
+SYMBOL: line-count
+SYMBOL: end-printing
 
-GENERIC: prettyprint* ( indent obj -- indent )
+! Configuration
+SYMBOL: tab-size
+SYMBOL: margin
+SYMBOL: nesting-limit
+SYMBOL: length-limit
+SYMBOL: line-limit
+SYMBOL: string-limit
 
-: unparse. ( obj -- )
-    dup unparse swap presented swons unit format ;
+global [
+    4 tab-size set
+    64 margin set
+    recursion-check off
+    0 column set
+    0 indent set
+    0 last-newline set
+    0 line-count set
+    string-limit off
+] bind
 
-M: object prettyprint* ( indent obj -- indent )
-    unparse. ;
+TUPLE: pprinter stack ;
 
-M: word prettyprint* ( indent word -- indent )
-    dup parsing? [ \ POSTPONE: unparse. bl ] when unparse. ;
+GENERIC: pprint-section*
 
-: indent ( indent -- )
-    #! Print the given number of spaces.
-    CHAR: \s fill write ;
+TUPLE: section start end nl-after? indent ;
 
-: prettyprint-newline ( indent -- )
-    "\n" write indent ;
+C: section ( length -- section )
+    >r column [ dup rot + dup ] change r>
+    [ set-section-end ] keep
+    [ set-section-start ] keep
+    0 over set-section-indent ;
 
-: \? ( list -- ? )
-    #! Is the head of the list a [ foo ] car?
-    dup car dup cons? [
-        dup car word? [
-            cdr [ drop f ] [ second \ car = ] ifte
-        ] [
-            2drop f
-        ] ifte
+: section-fits? ( section -- ? )
+    section-end last-newline get - indent get + margin get <= ;
+
+: line-limit? ( -- ? )
+    line-limit get dup [ line-count get <= ] when ;
+
+: do-indent indent get CHAR: \s fill write ;
+
+: fresh-line ( n -- )
+    #! n is current column position.
+    dup last-newline get = [
+        drop
     ] [
-        2drop f
+        last-newline set
+        line-count inc
+        line-limit? [ "..." write end-printing get call ] when
+        "\n" write do-indent
     ] ifte ;
 
-: prettyprint-elements ( indent list -- indent )
+TUPLE: text string style ;
+
+C: text ( string style -- section )
+    pick length 1 + <section> over set-delegate
+    [ set-text-style ] keep
+    [ set-text-string ] keep ;
+
+M: text pprint-section*
+    dup text-string swap text-style format ;
+
+TUPLE: block sections ;
+
+C: block ( -- block )
+    0 <section> over set-delegate
+    { } clone over set-block-sections
+    t over set-section-nl-after?
+    tab-size get over set-section-indent ;
+
+: pprinter-block pprinter-stack peek ;
+
+: block-empty? ( section -- ? )
+    dup block? [ block-sections empty? ] [ drop f ] ifte ;
+
+: add-section ( section stream -- )
+    over block-empty? [
+        2drop
+    ] [
+        pprinter-block block-sections push
+    ] ifte ;
+
+: text ( string style -- ) <text> pprinter get add-section ;
+
+: <indent ( section -- ) section-indent indent [ + ] change ;
+
+: indent> ( section -- ) section-indent indent [ swap - ] change ;
+
+: inset-section ( section -- )
+    dup <indent
+    dup section-start fresh-line dup pprint-section*
+    dup indent>
+    dup section-nl-after?
+    [ section-end fresh-line ] [ drop ] ifte ;
+
+: pprint-section ( section -- )
+    dup section-fits?
+    [ pprint-section* ] [ inset-section ] ifte ;
+
+TUPLE: newline ;
+
+C: newline ( -- section )
+    0 <section> over set-delegate ;
+
+M: newline pprint-section* ( newline -- )
+    section-start fresh-line ;
+
+: advance ( section -- )
+    dup newline? [
+        drop
+    ] [
+        section-start last-newline get = [ " " write ] unless
+    ] ifte ;
+
+M: block pprint-section* ( block -- )
+    f swap block-sections [
+        over [ dup advance ] when pprint-section drop t
+    ] each drop ;
+
+: <block ( -- ) <block> pprinter get pprinter-stack push ;
+
+: newline ( -- ) <newline> pprinter get add-section ;
+
+: end-block ( block -- ) column get swap set-section-end ;
+
+: pop-block ( pprinter -- ) pprinter-stack pop drop ;
+
+: (block>) ( -- )
+    pprinter get dup pprinter-block
+    dup end-block swap dup pop-block add-section ;
+
+: last-block? ( -- ? )
+    pprinter get pprinter-stack length 1 = ;
+
+: block> ( -- )
+    #! Protect against malformed <block ... block> forms.
+    last-block? [ (block>) ] unless ;
+
+: block; ( -- )
+    pprinter get pprinter-block f swap set-section-nl-after?
+    block> ;
+
+: end-blocks ( -- ) last-block? [ (block>) end-blocks ] unless ;
+
+C: pprinter ( -- stream )
+    <block> 1vector over set-pprinter-stack ;
+
+: do-pprint ( pprinter -- )
     [
-        dup \? [
-            \ \ unparse. bl
-            uncons >r car unparse. bl
-            r> cdr prettyprint-elements
-        ] [
-            uncons >r prettyprint* bl
-            r> prettyprint-elements
-        ] ifte
-    ] when* ;
+        end-printing set
+        dup pprinter-block pprint-section
+        end-blocks
+    ] callcc0 drop ;
 
-: ?prettyprint-newline ( indent -- )
-    one-line get [
-        bl drop
+GENERIC: pprint* ( obj -- )
+
+: vocab-style ( vocab -- style )
+    {{
+        [[ "syntax" [ [[ foreground [ 128 128 128 ] ]] ] ]]
+        [[ "kernel" [ [[ foreground [ 0 0 128 ] ]] ] ]]
+        [[ "sequences" [ [[ foreground [ 128 0 0 ] ]] ] ]]
+        [[ "math" [ [[ foreground [ 0 128 0 ] ]] ] ]]
+        [[ "math-internals" [ [[ foreground [ 192 0 0 ] ]] ] ]]
+        [[ "kernel-internals" [ [[ foreground [ 192 0 0 ] ]] ] ]]
+        [[ "io-internals" [ [[ foreground [ 192 0 0 ] ]] ] ]]
+    }} hash ;
+
+: word-style ( word -- style )
+    dup word-vocabulary vocab-style swap presented swons add ;
+
+: pprint-word ( obj -- )
+    dup word-name [ "( unnamed )" ] unless*
+    swap word-style text ;
+
+M: object pprint* ( obj -- )
+    "( unprintable object: " swap class word-name " )" append3
+    f text ;
+
+M: real pprint* ( obj -- ) number>string f text ;
+
+: ch>ascii-escape ( ch -- esc )
+    {{
+        [[ CHAR: \e "\\e"  ]]
+        [[ CHAR: \n "\\n"  ]]
+        [[ CHAR: \r "\\r"  ]]
+        [[ CHAR: \t "\\t"  ]]
+        [[ CHAR: \0 "\\0"  ]]
+        [[ CHAR: \\ "\\\\" ]]
+        [[ CHAR: \" "\\\"" ]]
+    }} hash ;
+
+: ch>unicode-escape ( ch -- esc )
+    >hex 4 CHAR: 0 pad-left "\\u" swap append ;
+
+: unparse-ch ( ch -- ch/str )
+    dup quotable? [
+        ,
     ] [
-        prettyprint-newline
+        dup ch>ascii-escape [ ] [ ch>unicode-escape ] ?ifte %
     ] ifte ;
 
-: <prettyprint ( indent -- indent )
-    tab-size get + dup ?prettyprint-newline ;
+: do-string-limit ( string -- string )
+    string-limit get [
+        dup length margin get > [
+            margin get 3 - swap head "..." append
+        ] when
+    ] when ;
 
-: prettyprint> ( indent -- indent )
-    tab-size get - one-line get
-    [ dup prettyprint-newline ] unless ;
+: pprint-string ( string prefix -- )
+    [ % [ unparse-ch ] each CHAR: " , ] "" make
+    do-string-limit f text ;
 
-: prettyprint-limit? ( indent -- ? )
-    prettyprint-limit get dup [ >= ] [ nip ] ifte ;
+M: string pprint* ( str -- str ) "\"" pprint-string ;
 
-: check-recursion ( indent obj quot -- ? indent )
+M: sbuf pprint* ( str -- str ) "SBUF\" " pprint-string ;
+
+M: word pprint* ( word -- )
+    dup "pprint-before-hook" word-prop call
+    dup pprint-word
+    "pprint-after-hook" word-prop call ;
+
+M: t pprint* drop "t" f text ;
+
+M: f pprint* drop "f" f text ;
+
+M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
+
+: nesting-limit? ( -- ? )
+    nesting-limit get dup
+    [ pprinter get pprinter-stack length < ] when ;
+
+: check-recursion ( obj quot -- indent )
     #! We detect circular structure.
-    pick prettyprint-limit? >r
-    over recursion-check get memq? r> or [
-        2drop "..." write
+    nesting-limit? [
+        2drop "#" f text
     ] [
-        over recursion-check [ cons ] change
-        call
-        recursion-check [ cdr ] change
-    ] ifte ;
+        over recursion-check get memq? [
+            2drop "&" f text
+        ] [
+            over recursion-check [ cons ] change
+            call
+            recursion-check [ cdr ] change
+        ] ifte
+    ] ifte ; inline
 
-: prettyprint-sequence ( indent start list end -- indent )
-    #! Prettyprint a list, with start/end delimiters; eg, [ ],
-    #! or { }, or << >>. The body of the list is indented,
-    #! unless the list is empty.
-    over [
-        >r >r unparse. <prettyprint
-        r> prettyprint-elements
-        prettyprint> r> unparse.
-    ] [
-        >r >r unparse. bl r> drop r> unparse.
-    ] ifte ;
+: length-limit? ( seq -- seq ? )
+    length-limit get dup
+    [ swap 2dup length < [ head t ] [ nip f ] ifte ]
+    [ drop f ] ifte ;
 
-M: list prettyprint* ( indent list -- indent )
+: pprint-element ( object -- )
+    dup parsing? [ \ POSTPONE: pprint-word ] when pprint* ;
+
+: pprint-elements ( seq -- )
+    length-limit? >r
+    [ pprint-element ] each
+    r> [ "... " f text ] when ;
+
+: pprint-sequence ( seq start end -- )
+    swap pprint* swap pprint-elements pprint* ;
+
+M: complex pprint* ( num -- )
+    >rect 2vector \ #{ \ }# pprint-sequence ;
+
+M: cons pprint* ( list -- )
    [
-       \ [ swap \ ] prettyprint-sequence
+       dup list? [ \ [ \ ] ] [ uncons 2vector \ [[ \ ]] ] ifte
+       pprint-sequence
    ] check-recursion ;
 
-M: cons prettyprint* ( indent cons -- indent )
-    #! Here we turn the cons into a list of two elements.
+M: vector pprint* ( vector -- )
+    [ \ { \ } pprint-sequence ] check-recursion ;
+
+M: hashtable pprint* ( hashtable -- )
+    [ hash>alist \ {{ \ }} pprint-sequence ] check-recursion ;
+
+M: tuple pprint* ( tuple -- )
     [
-        \ [[ swap uncons 2list \ ]] prettyprint-sequence
+        \ << pprint*
+        <mirror> dup first pprint*
+        <block 1 swap tail-slice pprint-elements block>
+        \ >> pprint*
     ] check-recursion ;
 
-M: vector prettyprint* ( indent vector -- indent )
+M: alien pprint* ( alien -- )
+    dup expired? [
+        drop "( alien expired )"
+    ] [
+        \ ALIEN: pprint-word alien-address number>string
+    ] ifte f text ;
+
+M: wrapper pprint* ( wrapper -- )
+    dup wrapped word? [
+        \ \ pprint-word wrapped pprint-word
+    ] [
+        wrapped 1vector \ W[ \ ]W pprint-sequence
+    ] ifte ;
+
+: with-pprint ( quot -- )
     [
-        \ { swap >list \ } prettyprint-sequence
-    ] check-recursion ;
+        <pprinter> pprinter set call pprinter get do-pprint
+    ] with-scope ; inline
 
-M: hashtable prettyprint* ( indent hashtable -- indent )
+: pprint ( object -- ) [ pprint* ] with-pprint ;
+
+: unparse ( object -- str ) [ pprint ] string-out ;
+
+: . ( obj -- ) pprint terpri ;
+
+: pprint-short ( object -- string )
     [
-        \ {{ swap hash>alist \ }} prettyprint-sequence
-    ] check-recursion ;
-
-M: tuple prettyprint* ( indent tuple -- indent )
-    [
-        \ << swap <mirror> >list \ >> prettyprint-sequence
-    ] check-recursion ;
-
-M: alien prettyprint* ( alien -- str )
-    \ ALIEN: unparse. bl alien-address unparse write ;
-
-: matrix-rows. ( indent list -- indent )
-    uncons >r [ one-line on prettyprint* ] with-scope r>
-    [ over ?prettyprint-newline matrix-rows. ] when* ;
-
-M: matrix prettyprint* ( indent obj -- indent )
-    \ M[ unparse. bl >r 3 + r>
-    row-list matrix-rows.
-    bl \ ]M unparse. 3 - ;
-
-: prettyprint ( obj -- )
-    [
-        recursion-check off
-        0 swap prettyprint* drop terpri
+        1 line-limit set
+        20 length-limit set
+        2 nesting-limit set
+        string-limit on
+        pprint
     ] with-scope ;
 
-: . ( obj -- )
-    [
-        one-line on
-        16 prettyprint-limit set
-        prettyprint
-    ] with-scope ;
+: unparse-short ( object -- str ) [ pprint-short ] string-out ;
 
-: [.] ( sequence -- )
-    #! Unparse each element on its own line.
-    [ . ] each ;
+: short. ( object -- )
+    dup unparse-short swap write-object terpri ;
 
-: .s datastack  reverse [.] flush ;
-: .r callstack  reverse [.] flush ;
-: .n namestack  [.] flush ;
-: .c catchstack [.] flush ;
+: sequence. ( sequence -- ) [ short. ] each ;
+
+: stack. ( sequence -- ) reverse-slice sequence. ;
+
+: .s datastack stack. ;
+: .r callstack stack. ;
 
 ! For integers only
 : .b >bin print ;
 : .o >oct print ;
 : .h >hex print ;
 
-global [ 4 tab-size set ] bind
+: define-open
+    #! The word will be pretty-printed as a block opener.
+    #! Examples are [ { {{ << and so on.
+    [ <block ] "pprint-after-hook" set-word-prop ;
+
+: define-close ( word -- )
+    #! The word will be pretty-printed as a block closer.
+    #! Examples are ] } }} ]] and so on.
+    [ block> ] "pprint-before-hook" set-word-prop ;
+
+{
+    { POSTPONE: [ POSTPONE: ] }
+    { POSTPONE: { POSTPONE: } }
+    { POSTPONE: {{ POSTPONE: }} }
+    { POSTPONE: [[ POSTPONE: ]] }
+    { POSTPONE: [[ POSTPONE: ]] }
+} [ first2 define-close define-open ] each

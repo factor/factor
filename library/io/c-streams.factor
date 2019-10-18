@@ -34,6 +34,8 @@ M: c-stream stream-close ( stream -- )
 : init-io ( -- )
     13 getenv  14 getenv  t <c-stream> <line-reader> stdio set ;
 
+: io-multiplex ( ms -- ) drop ;
+
 IN: io
 
 : <file-reader> ( path -- stream )

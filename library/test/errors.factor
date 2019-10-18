@@ -1,4 +1,5 @@
 IN: temporary
+USING: memory ;
 USE: errors
 USE: kernel
 USE: namespaces
@@ -27,3 +28,14 @@ USE: io
 
 ! This should not raise an error
 [ 1 2 3 ] [ 1 2 3 f throw ] unit-test
+
+! See how well callstack overflow is handled
+: callstack-overflow callstack-overflow f ;
+[ callstack-overflow ] unit-test-fails
+
+! Weird PowerPC bug.
+[ ] [
+    [ "4" throw ] [ drop ] catch
+    full-gc
+    full-gc
+] unit-test

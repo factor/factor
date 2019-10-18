@@ -1,10 +1,13 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets
-USING: generic hashtables io kernel line-editor listener lists
-math namespaces prettyprint sequences strings styles threads ;
-
+IN: gadgets-presentations
 DEFER: <presentation>
+
+IN: gadgets-panes
+USING: gadgets gadgets-editors gadgets-labels gadgets-layouts
+gadgets-scrolling generic hashtables io kernel line-editor lists
+math namespaces prettyprint sequences strings styles threads
+vectors ;
 
 ! A pane is an area that can display text.
 
@@ -18,30 +21,44 @@ TUPLE: pane output active current input continuation ;
 : add-input 2dup set-pane-input add-gadget ;
 
 : <active-line> ( input current -- line )
-    <line-shelf> [ add-gadget ] keep [ add-gadget ] keep ;
+    2vector <shelf> [ add-gadgets ] keep ;
 
 : init-active-line ( pane -- )
     dup pane-active unparent
-    [ dup pane-input swap pane-current <active-line> ] keep
+    [ dup pane-current swap pane-input <active-line> ] keep
     2dup set-pane-active add-gadget ;
-
-: pane-paint ( pane -- )
-    "Monospaced" font set-paint-prop ;
 
 : pop-continuation ( pane -- quot )
     dup pane-continuation f rot set-pane-continuation ;
 
 : pane-eval ( string pane -- )
-    2dup stream-print pop-continuation in-thread drop ;
+    pop-continuation in-thread drop ;
+
+SYMBOL: structured-input
+
+: elements. ( quot -- )
+    [
+        2 nesting-limit set
+        5 length-limit set
+        <block pprint-elements block> newline
+    ] with-pprint ;
 
 : pane-call ( quot pane -- )
-    [ "(Structured input) " write dup . call ] with-stream* ;
+    2dup [ elements. ] with-stream*
+    >r structured-input global set-hash
+    "\"structured-input\" \"gadgets-panes\" lookup global hash call"
+    r> pane-eval ;
+
+: editor-commit ( editor -- line )
+    #! Add current line to the history, and clear the editor.
+    [ commit-history line-text get line-clear ] with-editor ;
 
 : pane-return ( pane -- )
-    [
-        pane-input
-        [ commit-history line-text get line-clear ] with-editor
-    ] keep pane-eval ;
+    [ pane-input editor-commit ] keep
+    2dup stream-print pane-eval ;
+
+: pane-clear ( pane -- )
+    dup pane-output clear-incremental pane-current clear-gadget ;
  
 : pane-actions ( line -- )
     [
@@ -49,59 +66,59 @@ TUPLE: pane output active current input continuation ;
         [[ [ "RETURN" ] [ pane-return ] ]]
         [[ [ "UP" ] [ pane-input [ history-prev ] with-editor ] ]]
         [[ [ "DOWN" ] [ pane-input [ history-next ] with-editor ] ]]
+        [[ [ "CTRL" "l" ] [ pane get pane-clear ] ]]
     ] swap add-actions ;
 
 C: pane ( -- pane )
-    <line-pile> over set-delegate
-    <line-pile> <incremental> over add-output
-    <line-shelf> over set-pane-current
+    <pile> over set-delegate
+    <pile> <incremental> over add-output
+    <shelf> over set-pane-current
     "" <editor> over set-pane-input
     dup init-active-line
-    dup pane-paint
     dup pane-actions ;
 
 M: pane focusable-child* ( pane -- editor )
     pane-input ;
 
-: pane-clear ( pane -- )
-    dup pane-output clear-incremental pane-current clear-gadget ;
-
-: pane-ignore? ( style text pane -- ? )
-    #! If we already have stuff in the current pack, and there
-    #! is no style information or text to write, ignore it.
-    #! Otherwise, we either have a fancy style (like an icon
-    #! or gadget being output), or we want the current pack to
-    #! have a minimal height so we put the empty label there.
-    pane-current gadget-children empty? not
-    rot not and swap empty? and ;
-
 : pane-write-1 ( style text pane -- )
-    3dup pane-ignore? [
+    pick not pick empty? and [
         3drop
     ] [
         >r <presentation> r> pane-current add-gadget
     ] ifte ;
 
+: prepare-print ( current -- gadget )
+    #! Optimization: if line has 1 child, add the child.
+    dup gadget-children {
+        { [ dup empty? ] [ 2drop "" <label> ] }
+        { [ dup length 1 = ] [ nip first ] }
+        { [ t ] [ drop ] }
+    } cond ;
+
+: pane-print-1 ( current pane -- )
+    >r prepare-print r> pane-output add-incremental ;
+
 : pane-terpri ( pane -- )
-    dup pane-current over pane-output add-incremental
-    <line-shelf> over set-pane-current init-active-line ;
+    dup pane-current over pane-print-1
+    <shelf> over set-pane-current init-active-line ;
 
 : pane-write ( style pane list -- )
     3dup car swap pane-write-1 cdr dup
     [ over pane-terpri pane-write ] [ 3drop ] ifte ;
 
 ! Panes are streams.
-M: pane stream-flush ( stream -- ) drop ;
+M: pane stream-flush ( pane -- ) drop ;
 
-M: pane stream-finish ( stream -- ) drop ;
+M: pane stream-finish ( pane -- ) drop ;
 
-M: pane stream-readln ( stream -- line )
+M: pane stream-readln ( pane -- line )
     [ over set-pane-continuation stop ] callcc1 nip ;
 
-M: pane stream-write1 ( string style stream -- )
-    [ rot ch>string unit pane-write ] keep scroll>bottom ;
+M: pane stream-write1 ( char pane -- )
+    [ >r ch>string <label> r> pane-current add-gadget ] keep
+    scroll>bottom ;
 
-M: pane stream-format ( string style stream -- )
+M: pane stream-format ( string style pane -- )
     [ rot "\n" split pane-write ] keep scroll>bottom ;
 
-M: pane stream-close ( stream -- ) drop ;
+M: pane stream-close ( pane -- ) drop ;

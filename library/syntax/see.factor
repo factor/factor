@@ -2,131 +2,128 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
 USING: generic hashtables io kernel lists namespaces sequences
-streams strings styles unparser words ;
+styles words ;
 
-: prettyprint-IN: ( word -- )
-    \ IN: unparse. bl word-vocabulary write terpri ;
+: declaration. ( word prop -- )
+    tuck word-name word-prop [ pprint-word ] [ drop ] ifte ;
 
-: prettyprint-prop ( word prop -- )
-    tuck word-name word-prop [
-        bl unparse.
+: declarations. ( word -- )
+    [
+        POSTPONE: parsing
+        POSTPONE: inline
+        POSTPONE: foldable
+        POSTPONE: flushable
+    ] [ declaration. ] each-with ;
+
+: comment. ( comment -- )
+    [ [[ font-style italic ]] ] text ;
+
+: stack-picture% ( seq -- string )
+    [ word-name % " " % ] each ;
+
+: effect>string ( effect -- string )
+    [
+        " " %
+        dup first stack-picture%
+        "-- " %
+        second stack-picture%
+    ] "" make ;
+
+: stack-effect ( word -- string )
+    dup "stack-effect" word-prop [ ] [
+        "infer-effect" word-prop
+        dup [ effect>string ] when
+    ] ?ifte ;
+
+: stack-effect. ( string -- )
+    [ "(" swap ")" append3 comment. ] when* ;
+
+: in. ( word -- )
+    <block \ IN: pprint-word word-vocabulary f text block;
+    newline ;
+
+: definer. ( word -- )
+    dup definer pprint-word
+    dup pprint-word
+    stack-effect stack-effect. ;
+
+GENERIC: (see) ( word -- )
+
+M: word (see) definer. newline ;
+
+: documentation. ( word -- )
+    "documentation" word-prop [
+        "\n" split [ "#!" swap append comment. newline ] each
+    ] when* ;
+
+: pprint-; \ ; pprint-word ;
+
+: see-body ( quot word -- )
+    dup definer. <block dup documentation. swap pprint-elements
+    pprint-; declarations. block; ;
+
+M: compound (see)
+    dup word-def swap see-body newline ;
+
+: method. ( word [[ class method ]] -- )
+    \ M: pprint-word
+    unswons pprint-word
+    swap pprint-word
+    <block pprint-elements pprint-;
+    block; newline ;
+
+M: generic (see)
+    dup dup "combination" word-prop swap see-body newline
+    dup methods [ method. ] each-with ;
+
+GENERIC: class. ( word -- )
+
+: methods. ( class -- )
+    #! List all methods implemented for this class.
+    dup metaclass [
+        dup implementors [
+            dup in. tuck "methods" word-prop hash* method.
+        ] each-with
     ] [
         drop
     ] ifte ;
 
-: prettyprint-plist ( word -- )
-    dup
-    \ parsing prettyprint-prop
-    \ inline prettyprint-prop ;
-
-: comment. ( comment -- )
-    [ [[ font-style italic ]] ] format ;
-
-: infer-effect. ( effect -- )
-    [
-        "(" %
-        2unlist >r [ " " % unparse % ] each r>
-        " --" %
-        [ " " % unparse % ] each
-        " )" %
-    ] make-string comment. ;
-
-: stack-effect. ( word -- )
-    dup "stack-effect" word-prop [
-        [ CHAR: ( , % CHAR: ) , ] make-string
-        comment.
-    ] [
-        "infer-effect" word-prop dup [
-            infer-effect.
-        ] [
-            drop
-        ] ifte
-    ] ?ifte ;
-
-: documentation. ( indent word -- indent )
-    "documentation" word-prop [
-        "\n" split [
-            "#!" swap append comment.
-            dup prettyprint-newline
-        ] each
-    ] when* ;
-
-: definer. ( word -- ) dup definer unparse. bl unparse. bl ;
-
-GENERIC: (see) ( word -- )
-
-M: compound (see) ( word -- )
-    tab-size get dup indent swap
-    [ documentation. ] keep
-    [ word-def prettyprint-elements \ ; unparse. ] keep
-    prettyprint-plist terpri drop ;
-
-: prettyprint-M: ( -- indent )
-    \ M: unparse. bl tab-size get ;
-
-: prettyprint-; \ ; unparse. terpri ;
-
-: method. ( word [[ class method ]] -- )
-    uncons >r >r >r prettyprint-M: r> r> unparse. bl unparse. bl
-    dup prettyprint-newline r> prettyprint-elements
-    prettyprint-; drop ;
-
-M: generic (see) ( word -- )
-    tab-size get dup indent [
-        one-line on
-        over "picker" word-prop prettyprint* bl
-        over "dispatcher" word-prop prettyprint* bl
-    ] with-scope
-    drop
-    \ ; unparse. terpri
-    dup methods [ method. ] each-with ;
-
-M: word (see) drop ;
-
-GENERIC: class.
-
 M: union class.
-    \ UNION: unparse. bl
-    dup unparse. bl
-    0 swap "members" word-prop prettyprint-elements drop
-    prettyprint-; ;
+    \ UNION: pprint-word
+    dup pprint-word
+    "members" word-prop pprint-elements pprint-; newline ;
 
 M: complement class.
-    \ COMPLEMENT: unparse. bl
-    dup unparse. bl
-    "complement" word-prop unparse. terpri ;
-
-M: builtin class.
-    \ BUILTIN: unparse. bl
-    dup unparse. bl
-    dup "builtin-type" word-prop unparse write bl
-    0 swap "slots" word-prop prettyprint-elements drop
-    prettyprint-; ;
+    \ COMPLEMENT: pprint-word
+    dup pprint-word
+    "complement" word-prop pprint-word newline ;
 
 M: predicate class.
-    \ PREDICATE: unparse. bl
-    dup "superclass" word-prop unparse. bl
-    dup unparse. bl
-    tab-size get dup prettyprint-newline swap
-    "definition" word-prop prettyprint-elements drop
-    prettyprint-; ;
+    \ PREDICATE: pprint-word
+    dup "superclass" word-prop pprint-word
+    dup pprint-word
+    <block
+    "definition" word-prop pprint-elements
+    pprint-; block; newline ;
 
 M: tuple-class class.
-    \ TUPLE: unparse. bl
-    dup unparse. bl
-    "slot-names" word-prop [ write bl ] each
-    prettyprint-; ;
+    \ TUPLE: pprint-word
+    dup pprint-word
+    "slot-names" word-prop [ f text ] each
+    pprint-; newline ;
 
 M: word class. drop ;
 
 : see ( word -- )
-    dup prettyprint-IN: dup definer.
-    dup stack-effect. terpri dup (see) class. ;
+    [ dup in. dup (see) dup class. methods. ] with-pprint ;
 
-: methods. ( class -- )
-    #! List all methods implemented for this class.
-    dup class.
-    dup implementors [
-        dup prettyprint-IN:
-        [ "methods" word-prop hash* ] keep swap method.
-    ] each-with ;
+: (apropos) ( substring -- seq )
+    vocabs [
+        words [ word-name subseq? ] subset-with
+    ] map-with concat ;
+
+: apropos ( substring -- )
+    #! List all words that contain a string.
+    (apropos) [
+        "IN: " write dup word-vocabulary write " " write .
+    ] each ;

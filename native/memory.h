@@ -69,6 +69,7 @@ CELL T;
 #define STRING_TYPE 12
 #define SBUF_TYPE 13
 #define DLL_TYPE 15
+#define WRAPPER_TYPE 14
 #define ALIEN_TYPE 16
 #define WORD_TYPE 17
 #define TUPLE_TYPE 18
@@ -136,6 +137,7 @@ CELL untagged_object_size(CELL pointer);
 CELL object_size(CELL pointer);
 void primitive_room(void);
 void primitive_type(void);
+void primitive_tag(void);
 void primitive_slot(void);
 void primitive_set_slot(void);
 void primitive_integer_slot(void);

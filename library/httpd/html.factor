@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: html
-USING: generic http io kernel lists namespaces presentation
-sequences strings styles unparser words ;
+USING: generic http io kernel lists math namespaces parser
+presentation sequences strings styles words ;
 
 : html-entities ( -- alist )
     [
@@ -13,14 +13,11 @@ sequences strings styles unparser words ;
         [[ CHAR: " "&quot;" ]]
     ] ;
 
-: char>entity ( ch -- str )
-    dup >r html-entities assoc dup r> ? ;
-
 : chars>entities ( str -- str )
     #! Convert <, >, &, ' and " to HTML entities.
     [
         [ dup html-entities assoc [ % ] [ , ] ?ifte ] each
-    ] make-string ;
+    ] "" make ;
 
 : hex-color, ( triplet -- )
     [ >hex 2 CHAR: 0 pad-left % ] each ;
@@ -38,7 +35,7 @@ sequences strings styles unparser words ;
     [ "text-decoration: underline; " % ] when ;
 
 : size-css, ( size -- )
-    "font-size: " % unparse % "; " % ;
+    "font-size: " % # "; " % ;
 
 : font-css, ( font -- )
     "font-family: " % % "; " % ;
@@ -52,7 +49,7 @@ sequences strings styles unparser words ;
             [ font-size   size-css, ]
             [ underline   underline-css, ]
         ] assoc-apply
-    ] make-string ;
+    ] "" make ;
 
 : span-tag ( style quot -- )
     over css-style dup "" = [
@@ -69,7 +66,7 @@ sequences strings styles unparser words ;
     ] when* "/" ?tail drop ;
 
 : file-link-href ( path -- href )
-    [ "/" % resolve-file-link url-encode % ] make-string ;
+    [ "/" % resolve-file-link url-encode % ] "" make ;
 
 : file-link-tag ( style quot -- )
     over file swap assoc [
@@ -80,21 +77,16 @@ sequences strings styles unparser words ;
 
 : browser-link-href ( word -- href )
     dup word-name swap word-vocabulary
-    [ "/responder/browser/?vocab=" % % "&word=" % % ] make-string ;
+    [
+        "/responder/browser/?vocab=" %
+        url-encode %
+        "&word=" %
+        url-encode %
+    ] "" make ;
 
 : browser-link-tag ( style quot -- style )
     over presented swap assoc dup word? [
         <a href= browser-link-href a> call </a>
-    ] [
-        drop call
-    ] ifte ;
-
-: icon-tag ( string style quot -- )
-    over icon swap assoc dup [
-        <img src= "/responder/resource/" swap append img/>
-        #! Ignore the quotation, since no further style
-        #! can be applied
-        3drop
     ] [
         drop call
     ] ifte ;
@@ -110,10 +102,8 @@ M: html-stream stream-format ( str style stream -- )
     [
         [
             [
-                [
-                    [ drop chars>entities write ] span-tag
-                ] file-link-tag
-            ] icon-tag
+                [ drop chars>entities write ] span-tag
+            ] file-link-tag
         ] browser-link-tag
     ] with-wrapper ;
 
@@ -129,7 +119,6 @@ C: html-stream ( stream -- stream )
     #! font-style
     #! font-size
     #! underline
-    #! icon
     #! file
     #! word
     #! vocab

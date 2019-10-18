@@ -39,9 +39,9 @@ USE: win32-api
 
 IN: io-internals
 
-: io-multiplex ( timeout -- task )
+: io-multiplex ( timeout -- )
     #! FIXME: needs to work given a timeout
-    -1 = [ win32-next-io-task ] when ;
+    dup -1 = [ drop INFINITE ] when cancel-timedout wait-for-io swap call ;
 
 : init-io ( -- )
     win32-init-stdio ;

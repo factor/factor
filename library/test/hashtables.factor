@@ -12,10 +12,10 @@ USE: sequences
 
 : silly-key/value dup dup * swap ;
 
-1000 [ [ silly-key/value "testhash" get set-hash ] keep ] repeat
+1000 [ silly-key/value "testhash" get set-hash ] each
 
 [ f ]
-[ 1000 count [ silly-key/value "testhash" get hash = not ] subset ]
+[ 1000 >list [ silly-key/value "testhash" get hash = not ] subset ]
 unit-test
 
 [ t ]
@@ -63,12 +63,12 @@ f 100000000000000000000000000 "testhash" get set-hash
 [ 4 ] [
     "hey"
     {{ [[ "hey" 4 ]] [[ "whey" 5 ]] }} 2dup (hashcode)
-    >r buckets>list r> [ cdr ] times car assoc
+    swap buckets>vector nth assoc
 ] unit-test
 
 ! Testing the hash element counting
 
-<namespace> "counting" set
+{{ }} clone "counting" set
 "value" "key" "counting" get set-hash
 [ 1 ] [ "counting" get hash-size ] unit-test
 "value" "key" "counting" get set-hash
@@ -77,6 +77,14 @@ f 100000000000000000000000000 "testhash" get set-hash
 [ 0 ] [ "counting" get hash-size ] unit-test
 "key" "counting" get remove-hash
 [ 0 ] [ "counting" get hash-size ] unit-test
+
+[ t ] [ {{ }} dup hash-contained? ] unit-test
+[ f ] [ {{ [[ 1 3 ]] }} {{ }} hash-contained? ] unit-test
+[ t ] [ {{ }} {{ [[ 1 3 ]] }} hash-contained? ] unit-test
+[ t ] [ {{ [[ 1 3 ]] }} {{ [[ 1 3 ]] }} hash-contained? ] unit-test
+[ f ] [ {{ [[ 1 3 ]] }} {{ [[ 1 "hey" ]] }} hash-contained? ] unit-test
+[ f ] [ {{ [[ 1 f ]] }} {{ }} hash-contained? ] unit-test
+[ t ] [ {{ [[ 1 f ]] }} {{ [[ 1 f ]] }} hash-contained? ] unit-test
 
 [ t ] [ {{ }} dup = ] unit-test
 [ f ] [ "xyz" {{ }} = ] unit-test
@@ -131,7 +139,7 @@ f 100000000000000000000000000 "testhash" get set-hash
     ] hash-each
 ] unit-test
 
-<namespace> "cache-test" set
+{{ }} clone "cache-test" set
 
 [ 4 ] [ 1 "cache-test" get [ 3 + ] cache ] unit-test
 [ 5 ] [ 2 "cache-test" get [ 3 + ] cache ] unit-test

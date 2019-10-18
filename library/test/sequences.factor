@@ -1,5 +1,6 @@
 IN: temporary
-USING: kernel lists math sequences strings test vectors ;
+USING: kernel lists math sequences sorting-internals strings
+test vectors ;
 
 [ { 1 2 3 4 } ] [ 1 5 <range> >vector ] unit-test
 [ 3 ] [ 1 4 <range> length ] unit-test
@@ -7,13 +8,11 @@ USING: kernel lists math sequences strings test vectors ;
 [ 2 ] [ 1 3 { 1 2 3 4 } <slice> length ] unit-test
 [ { 2 3 } ] [ 1 3 { 1 2 3 4 } <slice> >vector ] unit-test
 [ { 4 5 } ] [ 2 { 1 2 3 4 5 } tail-slice* >vector ] unit-test
-[ { 1 2 } { 3 4 } ] [ 2 { 1 2 3 4 } cut ] unit-test
-[ { 1 2 } { 4 5 } ] [ 2 { 1 2 3 4 5 } cut* ] unit-test
-[ { 3 4 } ] [ 2 4 1 10 <range> subseq ] unit-test
-[ { 3 4 } ] [ 0 2 2 4 1 10 <range> <slice> subseq ] unit-test
+[ { 3 4 } ] [ 2 4 1 10 <range> subseq >vector ] unit-test
+[ { 3 4 } ] [ 0 2 2 4 1 10 <range> <slice> subseq >vector ] unit-test
 [ "cba" ] [ 3 "abcdef" head-slice reverse ] unit-test
 
-[ 1 2 3 ] [ 1 2 3 3vector 3unseq ] unit-test
+[ 1 2 3 ] [ 1 2 3 3vector first3 ] unit-test
 
 [ 5040 ] [ [ 1 2 3 4 5 6 7 ] 1 [ * ] reduce ] unit-test
 
@@ -54,3 +53,105 @@ USING: kernel lists math sequences strings test vectors ;
 [ { 4 2 6 } ] [ { 1 4 2 5 3 6 } [ 2 mod 0 = ] subset ] unit-test
 
 [ [ 3 ] ] [ 2 [ 1 2 3 ] [ < ] subset-with ] unit-test
+
+[ "hello world how are you" ]
+[ { "hello" "world" "how" "are" "you" } " " join ]
+unit-test
+
+[ "" ] [ { } "" join ] unit-test
+
+[ { 1 2 }   ] [ 1 2   2vector ] unit-test
+[ { 1 2 3 } ] [ 1 2 3 3vector ] unit-test
+
+[ { } ] [ { } flip ] unit-test
+
+[ { "b" "e" } ] [ 1 { { "a" "b" "c" } { "d" "e" "f" } } flip nth ] unit-test
+
+[ { { 1 4 } { 2 5 } { 3 6 } } ]
+[ { { 1 2 3 } { 4 5 6 } } flip ] unit-test
+
+[ [ "a" 43 [ ] ] ] [ [ "a" 43 43 43 [ ] 43 "a" [ ] ] prune ] unit-test
+
+[ f ] [ [ { } { } "Hello" ] [ = ] monotonic? ] unit-test
+[ f ] [ [ { 2 } { } { } ] [ = ] monotonic? ] unit-test
+[ t ] [ [ ] [ = ] monotonic? ] unit-test
+[ t ] [ [ 1/2 ] [ = ] monotonic? ] unit-test
+[ t ] [ [ 1.0 10/10 1 ] [ = ] monotonic? ] unit-test
+[ t ] [ { 1 2 3 4 } [ < ] monotonic? ] unit-test
+[ f ] [ { 1 2 3 4 } [ > ] monotonic? ] unit-test
+[ [ 2 3 4 ] ] [ 1 [ 1 2 3 ] [ + ] map-with ] unit-test
+
+[ 1 ] [ 0 [ 1 2 ] nth ] unit-test
+[ 2 ] [ 1 [ 1 2 ] nth ] unit-test
+
+[ [ ]           ] [ [ ]   [ ]       append ] unit-test
+[ [ 1 ]         ] [ [ 1 ] [ ]       append ] unit-test
+[ [ 2 ]         ] [ [ ] [ 2 ]       append ] unit-test
+[ [ 1 2 3 4 ]   ] [ [ 1 2 3 ] [ 4 ] append ] unit-test
+[ [ 1 2 3 4 ]   ] [ [ 1 2 3 ] { 4 } append ] unit-test
+
+[ [ ]       ] [ 1 [ ]           remove ] unit-test
+[ [ ]       ] [ 1 [ 1 ]         remove ] unit-test
+[ [ 3 1 1 ] ] [ 2 [ 3 2 1 2 1 ] remove ] unit-test
+
+[ [ ]       ] [ [ ]       reverse ] unit-test
+[ [ 1 ]     ] [ [ 1 ]     reverse ] unit-test
+[ [ 3 2 1 ] ] [ [ 1 2 3 ] reverse ] unit-test
+
+[ f ] [ 0 f head ] unit-test
+[ f ] [ 0 [ 1 ] head ] unit-test
+[ [ 1 2 3 ] ] [ 3 [ 1 2 3 4 ] head ] unit-test
+[ f ] [ 3 [ 1 2 3 ] tail ] unit-test
+[ [ 3 ] ] [ 2 [ 1 2 3 ] tail ] unit-test
+
+[ [ 1 3 ] ] [ [ 2 ] [ 1 2 3 ] seq-diff ] unit-test
+
+[ t ] [ [ 1 2 3 ] [ 1 2 3 4 5 ] contained? ] unit-test
+[ f ] [ [ 1 2 3 6 ] [ 1 2 3 4 5 ] contained? ] unit-test
+
+[ t ] [ [ 1 2 3 ] [ 1 2 3 ] sequence= ] unit-test
+[ t ] [ [ 1 2 3 ] { 1 2 3 } sequence= ] unit-test
+[ t ] [ { 1 2 3 } [ 1 2 3 ] sequence= ] unit-test
+[ f ] [ [ ] [ 1 2 3 ] sequence= ] unit-test
+
+[ { 1 3 2 4 } ] [ { 1 2 3 4 } clone 1 2 pick exchange ] unit-test
+
+[ 3 ] [ { 1 2 3 4 } midpoint ] unit-test
+
+[ -1 ] [ 3 { } [ - ] binsearch ] unit-test
+[ 0 ] [ 3 { 3 } [ - ] binsearch ] unit-test
+[ 1 ] [ 2 { 1 2 3 } [ - ] binsearch ] unit-test
+[ 3 ] [ 4 { 1 2 3 4 5 6 } [ - ] binsearch ] unit-test
+[ 1 ] [ 3.5 { 1 2 3 4 5 6 7 8 } [ - ] binsearch ] unit-test
+[ 3 ] [ 5.5 { 1 2 3 4 5 6 7 8 } [ - ] binsearch ] unit-test
+[ 10 ] [ 10 20 >vector [ - ] binsearch ] unit-test
+
+: seq-sorter 0 over length 1 - <sorter> ;
+
+[ { 4 2 3 1 } ]
+[ { 1 2 3 4 } clone dup seq-sorter sorter-exchange ] unit-test
+
+[ -1 ] [ [ - ] { 1 2 3 4 } seq-sorter 1 compare ] unit-test
+
+[ 1 ] [ [ - ] { -5 4 -3 5 } seq-sorter sort-up sorter-start nip ] unit-test
+
+[ 3 ] [ [ - ] { -5 4 -3 -6 5 } seq-sorter sort-down sorter-end nip ] unit-test
+
+[ { 1 2 3 4 5 6 7 8 9 } ] [
+    [ - ] { 9 8 7 6 5 4 3 2 1 } clone seq-sorter sort-step
+    sorter-seq >vector nip
+] unit-test
+
+[ { 1 2 3 4 5 6 7 8 9 } ] [
+    [ - ] { 1 2 3 4 5 6 7 8 9 } clone seq-sorter sort-step
+    sorter-seq >vector nip
+] unit-test
+
+[ [ ] ] [ [ ] number-sort ] unit-test
+
+[ t ] [
+    100 [
+        drop
+        1000 [ drop 0 1000 random-int ] map number-sort [ <= ] monotonic?
+    ] all?
+] unit-test

@@ -3,9 +3,6 @@ USING: compiler kernel kernel-internals lists math
 math-internals test words ;
 
 ! Make sure that intrinsic ops compile to correct code.
-: compile-1 ( quot -- word )
-    gensym [ swap define-compound ] keep dup compile execute ;
-
 [ 1 ] [ [[ 1 2 ]] [ 0 slot ] compile-1 ] unit-test
 [ 1 ] [ [ [[ 1 2 ]] 0 slot ] compile-1 ] unit-test
 [ 3 ] [ 3 1 2 cons [ [ 0 set-slot ] keep ] compile-1 car ] unit-test
@@ -14,6 +11,9 @@ math-internals test words ;
 [ 3 ] [ 3 1 2 cons [ [ 1 set-slot ] keep ] compile-1 cdr ] unit-test
 [ 3 ] [ 3 1 2 [ cons [ 1 set-slot ] keep ] compile-1 cdr ] unit-test
 [ 3 ] [ [ 3 1 2 cons [ 1 set-slot ] keep ] compile-1 cdr ] unit-test
+
+! Write barrier hits on the wrong value were causing segfaults
+[ -3 ] [ -3 1 2 [ cons [ 1 set-slot ] keep ] compile-1 cdr ] unit-test
 
 [ ] [ 1 [ drop ] compile-1 ] unit-test
 [ ] [ [ 1 drop ] compile-1 ] unit-test
@@ -125,9 +125,6 @@ math-internals test words ;
 [ t ] [ "hey" type "hey" [ type ] compile-1 eq? ] unit-test
 [ t ] [ f type f [ type ] compile-1 eq? ] unit-test
 
-[ 1 1 0 ] [ 1 1 [ arithmetic-type ] compile-1 ] unit-test
-[ 1.0 1.0 5 ] [ 1.0 1 [ arithmetic-type ] compile-1 ] unit-test
-
 [ 5 ] [ 1 2 [ eq? [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
 [ 3 ] [ 2 2 [ eq? [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
 [ 3 ] [ 1 2 [ fixnum< [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
@@ -166,3 +163,5 @@ math-internals test words ;
 [ t ] [ 1 20 shift neg 1 20 shift neg [ fixnum* ] compile-1 1 40 shift = ] unit-test
 
 [ 268435456 ] [ -268435456 >fixnum -1 [ fixnum/i ] compile-1 ] unit-test
+
+[ t ] [ f [ f eq? ] compile-1 ] unit-test

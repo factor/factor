@@ -5,22 +5,27 @@
    number that indexes a list of xts. */
 void update_xt(F_WORD* word)
 {
-	word->xt = primitive_to_xt(word->primitive);
+	word->xt = primitive_to_xt(untag_fixnum_fast(word->primitive));
 }
 
-/* <word> ( primitive parameter plist -- word ) */
+/* <word> ( name vocabulary -- word ) */
 void primitive_word(void)
 {
-	F_WORD* word;
+	F_WORD *word;
+	CELL name, vocabulary;
 
 	maybe_gc(sizeof(F_WORD));
 
+	vocabulary = dpop();
+	name = dpop();
 	word = allot_object(WORD_TYPE,sizeof(F_WORD));
 	word->hashcode = tag_fixnum((CELL)word); /* initial address */
-	word->xt = (CELL)undefined;
-	word->primitive = 0;
+	word->name = name;
+	word->vocabulary = vocabulary;
+	word->primitive = tag_fixnum(0);
 	word->def = F;
-	word->props = F;
+	word->props = tag_object(hashtable(8));
+	word->xt = (CELL)undefined;
 	dpush(tag_object(word));
 }
 
@@ -46,12 +51,16 @@ void fixup_word(F_WORD* word)
 	else
 		update_xt(word);
 
+	data_fixup(&word->name);
+	data_fixup(&word->vocabulary);
 	data_fixup(&word->def);
 	data_fixup(&word->props);
 }
 
 void collect_word(F_WORD* word)
 {
+	copy_handle(&word->name);
+	copy_handle(&word->vocabulary);
 	copy_handle(&word->def);
 	copy_handle(&word->props);
 }

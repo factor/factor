@@ -10,20 +10,17 @@ sequences io strings vectors words ;
 
 : &s
     #! Print stepper data stack.
-    meta-d get reverse [.] ;
+    meta-d get stack. ;
+
+: meta-r*
+    #! Stepper call stack, as well as the currently
+    #! executing quotation.
+    [ meta-r get % meta-executing get , meta-cf get , ] { } make ;
 
 : &r
     #! Print stepper call stack, as well as the currently
     #! executing quotation.
-    meta-cf get . meta-executing get . meta-r get reverse [.] ;
-
-: &n
-    #! Print stepper name stack.
-    meta-n get [.] ;
-
-: &c
-    #! Print stepper catch stack.
-    meta-c get [.] ;
+    meta-r* stack. ;
 
 : &get ( var -- value )
     #! Get stepper variable value.
@@ -50,19 +47,19 @@ sequences io strings vectors words ;
     set-callstack call ;
 
 : walk-banner ( -- )
-    [ &s &r &n &c ] [ unparse. bl ] each
-    "show stepper stacks." print
-    \ &get unparse.
-    " ( var -- value ) inspects the stepper namestack." print
-    \ step unparse. " -- single step over" print
-    \ into unparse. " -- single step into" print
-    \ continue unparse. " -- continue execution" print
-    \ bye unparse. " -- exit single-stepper" print
+    "&s &r show stepper stacks" print
+    "&get ( var -- value ) get stepper variable value" print
+    "step -- single step over" print
+    "into -- single step into" print
+    "continue -- continue execution" print
+    "bye -- exit single-stepper" print
     report ;
 
 : walk-listener walk-banner "walk " listener-prompt set listener ;
 
 : init-walk ( quot callstack namestack -- )
+    [ meta-d get "Stepper data stack:" ] datastack-hook set
+    [ meta-r* "Stepper return stack:" ] callstack-hook set
     init-interpreter
     meta-n set
     meta-r set

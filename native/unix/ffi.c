@@ -7,27 +7,39 @@ void init_ffi(void)
 	null_dll = dlopen(NULL,RTLD_LAZY);
 }
 
-void ffi_dlopen(DLL *dll)
+void ffi_dlopen(DLL *dll, bool error)
 {
 	void *dllptr = dlopen(to_c_string(untag_string(dll->path)), RTLD_LAZY);
 
 	if(dllptr == NULL)
 	{
-		general_error(ERROR_FFI,tag_object(
-			from_c_string(dlerror())));
+		if(error)
+		{
+			general_error(ERROR_FFI,tag_object(
+				from_c_string(dlerror())));
+		}
+		else
+			dll->dll = NULL;
+
+		return;
 	}
 
 	dll->dll = dllptr;
 }
 
-void *ffi_dlsym(DLL *dll, F_STRING *symbol)
+void *ffi_dlsym(DLL *dll, F_STRING *symbol, bool error)
 {
 	void *handle = (dll == NULL ? null_dll : dll->dll);
 	void *sym = dlsym(handle,to_c_string(symbol));
 	if(sym == NULL)
 	{
-		general_error(ERROR_FFI,tag_object(
-			from_c_string(dlerror())));
+		if(error)
+		{
+			general_error(ERROR_FFI,tag_object(
+				from_c_string(dlerror())));
+		}
+
+		return NULL;
 	}
 	return sym;
 }

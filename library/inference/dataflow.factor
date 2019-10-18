@@ -4,27 +4,73 @@ IN: inference
 USING: generic interpreter kernel lists namespaces parser
 sequences vectors words ;
 
+! Recursive state. An alist, mapping words to labels.
+SYMBOL: recursive-state
+
+TUPLE: value recursion uid ;
+
+C: value ( -- value )
+    gensym over set-value-uid
+    recursive-state get over set-value-recursion ;
+
+M: value = eq? ;
+
+TUPLE: computed ;
+
+C: computed ( -- value ) <value> over set-delegate ;
+
+TUPLE: literal value ;
+
+C: literal ( obj -- value )
+    <value> over set-delegate
+    [ set-literal-value ] keep ;
+
+TUPLE: meet values ;
+
+C: meet ( values -- value )
+    <value> over set-delegate [ set-meet-values ] keep ;
+
+: value-refers? ( referee referrer -- ? )
+    2dup eq? [
+        2drop t
+    ] [
+        dup meet? [
+            meet-values [ value-refers? ] contains-with?
+        ] [
+            2drop f
+        ] ifte
+    ] ifte ;
+
 ! The dataflow IR is the first of the two intermediate
 ! representations used by Factor. It annotates concatenative
 ! code with stack flow information and types.
 
-TUPLE: node effect param in-d out-d in-r out-r
+TUPLE: node param in-d out-d in-r out-r
+       classes literals history
        successor children ;
 
-: make-node ( effect param in-d out-d in-r out-r node -- node )
-    [ >r f <node> r> set-delegate ] keep ;
+M: node = eq? ;
 
-: empty-node f f f f f f f f f ;
-: param-node ( label) f swap f f f f f ;
-: in-d-node ( inputs) >r f f r> f f f f ;
-: out-d-node ( outputs) >r f f f r> f f f ;
+: make-node ( param in-d out-d in-r out-r node -- node )
+    [
+        >r {{ }} clone {{ }} clone { } clone f f <node> r>
+        set-delegate
+    ] keep ;
 
-: d-tail ( n -- list ) meta-d get tail* >list ;
-: r-tail ( n -- list ) meta-r get tail* >list ;
+: param-node ( label) { } { } { } { } ;
+: in-d-node ( inputs) >r f r> { } { } { } ;
+: out-d-node ( outputs) >r f { } r> { } { } ;
+
+: d-tail ( n -- list ) meta-d get tail* >vector ;
+: r-tail ( n -- list ) meta-r get tail* >vector ;
 
 TUPLE: #label ;
 C: #label make-node ;
 : #label ( label -- node ) param-node <#label> ;
+
+TUPLE: #entry ;
+C: #entry make-node ;
+: #entry ( -- node ) meta-d get clone in-d-node <#entry> ;
 
 TUPLE: #call ;
 C: #call make-node ;
@@ -44,11 +90,11 @@ C: #drop make-node ;
 
 TUPLE: #values ;
 C: #values make-node ;
-: #values ( -- node ) meta-d get >list in-d-node <#values> ;
+: #values ( -- node ) meta-d get clone in-d-node <#values> ;
 
 TUPLE: #return ;
 C: #return make-node ;
-: #return ( -- node ) meta-d get >list in-d-node <#return> ;
+: #return ( -- node ) meta-d get clone in-d-node <#return> ;
 
 TUPLE: #ifte ;
 C: #ifte make-node ;
@@ -57,6 +103,10 @@ C: #ifte make-node ;
 TUPLE: #dispatch ;
 C: #dispatch make-node ;
 : #dispatch ( in -- node ) 1 d-tail in-d-node <#dispatch> ;
+
+TUPLE: #merge ;
+C: #merge make-node ;
+: #merge ( -- node ) meta-d get clone out-d-node <#merge> ;
 
 : node-inputs ( d-count r-count node -- )
     tuck
@@ -86,7 +136,7 @@ SYMBOL: current-node
     current-node get    current-node off ;
 
 : unnest-node ( new-node dataflow current -- new-node )
-    >r >r dataflow-graph get unit over set-node-children
+    >r >r dataflow-graph get 1vector over set-node-children
     r> dataflow-graph set
     r> current-node set ;
 
@@ -102,16 +152,129 @@ SYMBOL: current-node
 : node-effect ( node -- [[ d-in meta-d ]] )
     dup node-in-d swap node-out-d cons ;
 
-: consumes-literal? ( literal node -- ? )
-    #! Does the dataflow node consume the literal?
-    2dup node-in-d memq? >r node-in-r memq? r> or ;
+: node-values ( node -- values )
+    [
+        dup node-in-d % dup node-out-d %
+        dup node-in-r % node-out-r %
+    ] { } make ;
 
-: produces-literal? ( literal node -- ? )
-    #! Does the dataflow node produce the literal?
-    2dup node-out-d memq? >r node-out-r memq? r> or ;
+: uses-value? ( value node -- ? )
+    node-values [ value-refers? ] contains-with? ;
 
 : last-node ( node -- last )
     dup node-successor [ last-node ] [ ] ?ifte ;
 
-! Recursive state. An alist, mapping words to labels.
-SYMBOL: recursive-state
+: penultimate-node ( node -- penultimate )
+    dup node-successor dup [
+        dup node-successor
+        [ nip penultimate-node ] [ drop ] ifte
+    ] [
+        2drop f
+    ] ifte ;
+
+: drop-inputs ( node -- #drop )
+    node-in-d clone in-d-node <#drop> ;
+
+: each-node ( node quot -- | quot: node -- )
+    over [
+        [ call ] 2keep swap
+        [ node-children [ swap each-node ] each-with ] 2keep
+        node-successor swap each-node
+    ] [
+        2drop
+    ] ifte ; inline
+
+: each-node-with ( obj node quot -- | quot: obj node -- )
+    swap [ with ] each-node 2drop ; inline
+
+: all-nodes? ( node quot -- ? | quot: node -- ? )
+    over [
+        [ call ] 2keep rot [
+            [
+                swap node-children [ swap all-nodes? ] all-with?
+            ] 2keep rot [
+                >r node-successor r> all-nodes?
+            ] [
+                2drop f
+            ] ifte
+        ] [
+            2drop f
+        ] ifte
+    ] [
+        2drop t
+    ] ifte ; inline
+
+: all-nodes-with? ( obj node quot -- ? | quot: obj node -- ? )
+    swap [ with rot ] all-nodes? 2nip ; inline
+
+SYMBOL: substituted
+
+DEFER: subst-value
+
+: subst-meet ( new old meet -- )
+    #! We avoid mutating the same meet more than once, since
+    #! doing so can introduce cycles.
+    dup substituted get memq? [
+        3drop
+    ] [
+        dup substituted get push meet-values subst-value
+    ] ifte ;
+
+: (subst-value) ( new old value -- value )
+    2dup eq? [
+        2drop
+    ] [
+        dup meet? [
+            pick over swap value-refers? [
+                2nip ! don't substitute a meet into itself
+            ] [
+                [ subst-meet ] keep
+            ] ifte
+        ] [
+            2nip
+        ] ifte
+    ] ifte ;
+
+: subst-value ( new old seq -- )
+    pick pick eq? over empty? or [
+        3drop
+    ] [
+        [ >r 2dup r> (subst-value) ] nmap 2drop
+    ] ifte ;
+
+: (subst-values) ( newseq oldseq seq -- )
+    #! Mutates seq.
+    -rot [ pick subst-value ] 2each drop ;
+
+: subst-values ( new old node -- )
+    #! Mutates the node.
+    [
+        { } clone substituted set [
+            3dup node-in-d  (subst-values)
+            3dup node-in-r  (subst-values)
+            3dup node-out-d (subst-values)
+            3dup node-out-r (subst-values)
+            drop
+        ] each-node 2drop
+    ] with-scope ;
+
+: remember-node ( word node -- )
+    #! Annotate each node with the fact it was inlined from
+    #! 'word'.
+    [
+        dup #call? [ node-history push ] [ 2drop ] ifte
+    ] each-node-with ;
+
+: (clone-node) ( node -- node )
+    clone
+    dup node-in-d clone over set-node-in-d
+    dup node-in-r clone over set-node-in-r
+    dup node-out-d clone over set-node-out-d
+    dup node-out-r clone over set-node-out-r ;
+
+: clone-node ( node -- node )
+    dup [
+        (clone-node)
+        dup node-children [ clone-node ] map over set-node-children
+        dup node-successor clone-node over set-node-successor
+    ] when ;

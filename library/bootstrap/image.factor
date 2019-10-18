@@ -8,24 +8,30 @@
 ! generate the minimal image, and writing the cons cells, words,
 ! strings etc to the image file in the CFactor object memory
 ! format.
-!
-! What is a bootstrap image? It basically contains enough code
-! to parse a source file. See platform/native/boot.factor --
-! It initializes the core interpreter services, and proceeds to
-! run platform/native/boot-stage2.factor.
 
 IN: image
 USING: errors generic hashtables kernel lists
 math namespaces parser prettyprint sequences sequences io
 strings vectors words ;
 
+! If true in current namespace, we are bootstrapping.
+SYMBOL: bootstrapping?
+
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
 
-! Boot quotation, set by boot.factor
-SYMBOL: boot-quot
+! Object cache
+SYMBOL: objects
+
+! Image output format
+SYMBOL: big-endian
+SYMBOL: 64-bits
+
+SYMBOL: t-object
 
 : emit ( cell -- ) image get push ;
+
+: emit-seq ( seq -- ) image get swap nappend ;
 
 : fixup ( value offset -- ) image get set-nth ;
 
@@ -34,8 +40,8 @@ SYMBOL: boot-quot
 : image-magic HEX: 0f0e0d0c ;
 : image-version 0 ;
 
-: cell "64-bits" get 8 4 ? ;
-: char "64-bits" get 4 2 ? ;
+: cell 64-bits get 8 4 ? ;
+: char 64-bits get 4 2 ? ;
 
 : untag ( cell tag -- ) tag-mask bitnot bitand ;
 : tag ( cell -- tag ) tag-mask bitand ;
@@ -45,6 +51,7 @@ SYMBOL: boot-quot
 : hashtable-type 10 ; inline
 : vector-type    11 ; inline
 : string-type    12 ; inline
+: wrapper-type   14 ; inline
 : word-type      17 ; inline
 : tuple-type     18 ; inline
 
@@ -53,12 +60,7 @@ SYMBOL: boot-quot
 
 ( Image header )
 
-: base
-    #! We relocate the image to after the header, and leaving
-    #! some empty cells. This lets us differentiate an F pointer
-    #! (0/tag 3) from a pointer to the first object in the
-    #! image.
-    64 cell * ;
+: base 1024 ;
 
 : header ( -- )
     image-magic emit
@@ -95,14 +97,6 @@ GENERIC: ' ( obj -- ptr )
 : align-here ( -- )
     here 8 mod 4 = [ 0 emit ] when ;
 
-( Remember what objects we've compiled )
-
-: pooled-object ( object -- pointer )
-    "objects" get hash ;
-
-: pool-object ( object pointer -- )
-    swap "objects" get set-hash ;
-
 ( Fixnums )
 
 : emit-fixnum ( n -- ) fixnum-tag immediate emit ;
@@ -115,11 +109,11 @@ M: bignum ' ( bignum -- tagged )
     #! This can only emit 0, -1 and 1.
     bignum-tag here-as >r
     bignum-tag >header emit
-    [
+    {{
         [[ 0  [ 1 0   ] ]]
         [[ -1 [ 2 1 1 ] ]]
         [[ 1  [ 2 0 1 ] ]]
-    ] assoc unswons emit-fixnum [ emit ] each align-here r> ;
+    }} hash unswons emit-fixnum emit-seq align-here r> ;
 
 ( Special objects )
 
@@ -127,11 +121,11 @@ M: bignum ' ( bignum -- tagged )
 
 : t,
     object-tag here-as
-    dup t-offset fixup "t" set
+    dup t-offset fixup t-object set
     t-type >header emit
     0 ' emit ;
 
-M: t ' ( obj -- ptr ) drop "t" get ;
+M: t ' ( obj -- ptr ) drop t-object get ;
 M: f ' ( obj -- ptr )
     #! f is #define F RETAG(0,OBJECT_TYPE)
     drop object-tag ;
@@ -148,37 +142,49 @@ M: f ' ( obj -- ptr )
 
 ( Words )
 
-: word, ( word -- )
-    [
-        word-type >header ,
-        dup hashcode fixnum-tag immediate ,
-        0 ,
-        dup word-primitive ,
-        dup word-def ' ,
-        dup word-props ' ,
-    ] make-list
-    swap object-tag here-as pool-object
-    [ emit ] each ;
+: emit-word ( word -- )
+    dup word-props ' >r
+    dup word-def ' >r
+    dup word-primitive ' >r
+    dup word-vocabulary ' >r
+    dup word-name ' >r
+    object-tag here-as over objects get set-hash
+    word-type >header emit
+    hashcode emit-fixnum
+    r> emit
+    r> emit
+    r> emit
+    r> emit
+    r> emit
+    0 emit ;
 
 : word-error ( word msg -- )
-    [ % dup word-vocabulary % " " % word-name % ] make-string
-    throw ;
+    [ % dup word-vocabulary % " " % word-name % ] "" make
+    throw ; inline
 
 : transfer-word ( word -- word )
     #! This is a hack. See doc/bootstrap.txt.
-    dup dup word-name swap word-vocabulary unit search
+    dup dup word-name swap word-vocabulary lookup
     [ ] [ dup "Missing DEFER: " word-error ] ?ifte ;
 
+: pooled-object ( object -- ptr ) objects get hash ;
+
 : fixup-word ( word -- offset )
-    dup pooled-object [ ] [ "Not in image: " word-error ] ?ifte ;
+    transfer-word dup pooled-object dup
+    [ nip ] [ "Not in image: " word-error ] ifte ;
 
 : fixup-words ( -- )
-    image get [
-        dup word? [ fixup-word ] when
-    ] map image set ;
+    image get [ dup word? [ fixup-word ] when ] nmap ;
 
-M: word ' ( word -- pointer )
-    transfer-word dup pooled-object dup [ nip ] [ drop ] ifte ;
+M: word ' ( word -- pointer ) ;
+
+( Wrappers )
+
+M: wrapper ' ( wrapper -- pointer )
+    wrapped '
+    object-tag here-as >r
+    wrapper-type >header emit
+    emit r> ;
 
 ( Conses )
 
@@ -189,37 +195,25 @@ M: cons ' ( c -- tagged )
 
 ( Strings )
 
-: align-string ( n str -- )
-    tuck length - CHAR: \0 fill append ;
+: emit-chars ( seq -- )
+    big-endian get [ [ reverse ] map ] unless
+    [ 0 [ swap 16 shift + ] reduce emit ] each ;
 
-: emit-chars ( str -- )
-    "big-endian" get [ reverse ] unless
-    0 swap [ swap 16 shift + ] each emit ;
+: pack-string ( string -- seq )
+    dup length 1 + char align CHAR: \0 pad-right char swap group ;
 
-: (pack-string) ( n list -- )
-    #! Emit bytes for a string, with n characters per word.
-    [
-        2dup length > [ dupd align-string ] when
-        emit-chars
-    ] each drop ;
-
-: pack-string ( string -- )
-    char tuck swap group (pack-string) ;
-
-: emit-string ( string -- )
+: emit-string ( string -- ptr )
     object-tag here-as swap
     string-type >header emit
     dup length emit-fixnum
     dup hashcode emit-fixnum
-    "\0" append pack-string
+    pack-string emit-chars
     align-here ;
 
 M: string ' ( string -- pointer )
     #! We pool strings so that each string is only written once
     #! to the image
-    dup pooled-object [ ] [
-        dup emit-string dup >r pool-object r>
-    ] ?ifte ;
+    objects get [ emit-string ] cache ;
 
 ( Arrays and vectors )
 
@@ -228,13 +222,13 @@ M: string ' ( string -- pointer )
     object-tag here-as >r
     >header emit
     dup length emit-fixnum
-    ( elements -- ) [ emit ] each
+    ( elements -- ) emit-seq
     align-here r> ;
 
 M: tuple ' ( tuple -- pointer )
     <mirror> tuple-type emit-array ;
 
-: emit-vector ( vector -- pointer )
+M: vector ' ( vector -- pointer )
     dup array-type emit-array swap length
     object-tag here-as >r
     vector-type >header emit
@@ -242,94 +236,83 @@ M: tuple ' ( tuple -- pointer )
     emit ( array ptr )
     align-here r> ;
 
-M: vector ' ( vector -- pointer )
-    emit-vector ;
+( Hashes )
 
-: emit-hashtable ( hash -- pointer )
-    dup buckets>list array-type emit-array
-    swap hash>alist length
+M: hashtable ' ( hashtable -- pointer )
+    dup buckets>vector array-type emit-array
+    swap hash-size
     object-tag here-as >r
     hashtable-type >header emit
     emit-fixnum ( length )
     emit ( array ptr )
     align-here r> ;
 
-M: hashtable ' ( hashtable -- pointer )
-    #! Only hashtables are pooled, not vectors!
-    dup pooled-object [ ] [
-        dup emit-hashtable [ pool-object ] keep
-    ] ?ifte ;
-
 ( End of the image )
 
-: vocabulary, ( hash -- )
-    dup hashtable? [
-        [ cdr dup word? [ word, ] [ drop ] ifte ] hash-each
-    ] [
-        drop
-    ] ifte ;
-
-: vocabularies, ( vocabularies -- )
-    [ cdr vocabulary, ] hash-each ;
+: words, ( -- )
+    all-words [ emit-word ] each ;
 
 : global, ( -- )
-    vocabularies get
-    dup vocabularies,
-    <namespace> [
-        vocabularies set
-        typemap [ ] change
-        builtins [ ] change
-        crossref [ ] change
-    ] extend '
+    [
+        { vocabularies typemap builtins } [ [ ] change ] each
+    ] make-hash '
     global-offset fixup ;
 
-: boot, ( quot -- )
-    boot-quot get swap append ' boot-quot-offset fixup ;
+: boot, ( quot -- ) ' boot-quot-offset fixup ;
+
+: heap-size image get length header-size - cell * ;
 
 : end ( quot -- )
+    "Generating words..." print
+    words,
+    "Generating global namespace..." print
     global,
+    "Generating boot quotation..." print
     boot,
+    "Performing some word fixups..." print
     fixup-words
-    here base - heap-size-offset fixup ;
+    heap-size heap-size-offset fixup ;
 
 ( Image output )
 
 : (write-image) ( image -- )
-    "64-bits" get 8 4 ? swap "big-endian" get [
+    64-bits get 8 4 ? swap big-endian get [
         [ swap >be write ] each-with
     ] [
         [ swap >le write ] each-with
     ] ifte ;
 
 : write-image ( image file -- )
+    "Writing image to " write dup write "..." print
     <file-writer> [ (write-image) ] with-stream ;
 
-: with-minimal-image ( quot -- image )
+: with-image ( quot -- image )
     [
-        300000 <vector> image set
-        <namespace> "objects" set
+        bootstrapping? on
+        800000 <vector> image set
+        20000 <hashtable> objects set
         call
+        "Image length: " write image get length .
+        "Object cache size: " write objects get hash-size .
         image get
     ] with-scope ;
 
-: with-image ( quot -- image )
-    #! The quotation leaves a boot quotation on the stack.
-    [ begin call end ] with-minimal-image ;
-
 : make-image ( name -- )
-    #! Make an image for the C interpreter.
+    #! Make a bootstrap image.
     [
-        boot-quot off
+        begin
         "/library/bootstrap/boot-stage1.factor" run-resource
+        namespace global [ "foobar" set ] bind
+        end
     ] with-image
 
     swap write-image ;
 
 : make-images ( -- )
-    "64-bits" off
-    "big-endian" off "boot.image.le32" make-image
-    "big-endian" on  "boot.image.be32" make-image
-    "64-bits" on
-    "big-endian" off "boot.image.le64" make-image
-    "big-endian" on  "boot.image.be64" make-image
-    "64-bits" off ;
+    64-bits off
+    big-endian off "boot.image.le32" make-image
+    big-endian on  "boot.image.be32" make-image
+    64-bits on
+    big-endian off "boot.image.le64" make-image
+    big-endian on  "boot.image.be64" make-image
+    64-bits off ;

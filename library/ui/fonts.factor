@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: alien hashtables io kernel lists namespaces sdl sequences
-styles ;
+styles vectors ;
 
 : ttf-name ( font style -- name )
     cons {{
@@ -21,15 +21,15 @@ styles ;
     }} hash ;
 
 : ttf-path ( name -- string )
-    [ resource-path % "/fonts/" % % ".ttf" % ] make-string ;
+    [ resource-path % "/fonts/" % % ".ttf" % ] "" make ;
 
 : open-font ( [ font style ptsize ] -- alien )
-    3unlist >r ttf-name ttf-path r> TTF_OpenFont ;
+    first3 >r ttf-name ttf-path r> TTF_OpenFont ;
 
 SYMBOL: open-fonts
 
 : lookup-font ( font style ptsize -- font )
-    3list open-fonts get [ open-font ] cache ;
+    3vector open-fonts get [ open-font ] cache ;
 
 global [ open-fonts nest drop ] bind
 

@@ -1,63 +1,42 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inspector
-USING: generic hashtables io kernel kernel-internals lists math
-memory namespaces prettyprint sequences strings test unparser
-vectors words ;
-
-SYMBOL: inspecting
+USING: generic hashtables io kernel kernel-internals listener
+lists math memory namespaces prettyprint sequences strings
+styles test vectors words ;
 
 GENERIC: sheet ( obj -- sheet )
 
 M: object sheet ( obj -- sheet )
     dup class "slots" word-prop
     [ second ] map
-    tuck [ execute ] map-with 2list ;
+    tuck [ execute ] map-with
+    2vector ;
 
-PREDICATE: list nonvoid cons? ;
+M: list sheet 1vector ;
 
-M: nonvoid sheet >list unit ;
+M: vector sheet 1vector ;
 
-M: vector sheet >list unit ;
+M: array sheet 1vector ;
 
-M: array sheet >list unit ;
+M: hashtable sheet dup hash-keys swap hash-values 2vector ;
 
-M: hashtable sheet hash>alist unzip 2list ;
-
-: column ( list -- list )
-    [ unparse ] map
-    [ [ length ] map 0 [ max ] reduce ] keep
+: format-column ( list -- list )
+    [ unparse-short ] map
+    [ max-length ] keep
     [ swap CHAR: \s pad-right ] map-with ;
 
-: (join) ( list glue -- )
-    over [
-        over car % >r cdr dup
-        [ r> dup % (join) ] [ r> 2drop ] ifte
-    ] [
-        2drop
-    ] ifte ;
+: sheet-numbers ( sheet -- sheet )
+    dup first length >vector 1vector swap append ;
 
-: join ( list glue -- seq )
-    #! The new sequence is of the same type as glue.
-    [ [ (join) ] make-vector ] keep like ;
+SYMBOL: inspector-slots
 
-: describe ( obj -- list )
-    sheet dup first length count swons
-    dup peek over first zip [ uncons set ] each
-    [ column ] map
-    seq-transpose
+: format-sheet ( sheet -- list )
+    sheet-numbers
+    dup peek inspector-slots set
+    [ format-column ] map
+    flip
     [ " | " join ] map ;
-
-: class-banner ( word -- )
-    dup metaclass dup [
-        "This is a class whose behavior is specifed by the " write
-        unparse. " metaclass," print
-        "currently having " write
-        "predicate" word-prop instances length unparse write
-        " instances." print
-    ] [
-        2drop
-    ] ifte ;
 
 : vocab-banner ( word -- )
     dup word-vocabulary [
@@ -67,7 +46,7 @@ M: hashtable sheet hash>alist unzip 2list ;
             "This is an orphan not part of the dictionary." print
             "It claims to belong to the " write
         ] ifte
-        word-vocabulary unparse write " vocabulary." print
+        word-vocabulary pprint " vocabulary." print
     ] [
         drop
         "The word is a uniquely generated symbol." print
@@ -76,25 +55,58 @@ M: hashtable sheet hash>alist unzip 2list ;
 GENERIC: extra-banner ( obj -- )
 
 M: word extra-banner ( obj -- )
-    dup vocab-banner swap class-banner ;
+    dup vocab-banner
+    metaclass [
+        "This is a class whose behavior is specifed by the " write
+        pprint " metaclass." print
+    ] when* ;
 
 M: object extra-banner ( obj -- ) drop ;
 
 : inspect-banner ( obj -- )
-    dup references length >r
-    "You are looking at an instance of the " write dup class unparse.
+    "You are looking at an instance of the " write dup class pprint
     " class:" print
-    "  " write dup unparse. terpri
-    "The object has been placed in the inspecting variable." print
-    "It is located at address " write dup address >hex write
-    " and takes up " write dup size unparse write
-    " bytes of memory." print
-    "This object is referenced from " write r> unparse write
-    " other objects in the heap." print
-    extra-banner
-    "The object's slots, if any, are stored in integer variables," print
-    "numbered starting from 0." print ;
+    "  " write dup pprint-short terpri
+    "It takes up " write dup size pprint " bytes of memory." print
+    extra-banner ;
+
+: describe ( obj -- )
+    sheet dup format-sheet swap peek
+    [ write-object terpri ] 2each ;
+
+SYMBOL: inspector-stack
+
+: inspecting ( -- obj ) inspector-stack get peek ;
+
+: (inspect) ( obj -- )
+    dup inspector-stack get push
+    dup inspect-banner describe ;
+
+: inspector-help ( -- )
+    "Object inspector." print
+    "inspecting ( -- obj ) push current object" print
+    "go ( n -- ) inspect nth slot" print
+    "up -- return to previous object" print
+    "refs -- inspect references to current object" print
+    "bye -- exit inspector" print ;
+
+: inspector ( obj -- )
+    [
+        inspector-help
+        terpri
+        "inspector " listener-prompt set
+        [ inspector-stack get "Inspector history:" ] callstack-hook set
+        { } clone inspector-stack set
+        (inspect)
+        listener
+    ] with-scope ;
 
 : inspect ( obj -- )
-    dup inspecting set
-    dup inspect-banner describe [ print ] each ;
+    #! Start an inspector if its not already running.
+    inspector-stack get [ (inspect) ] [ inspector ] ifte ;
+
+: go ( n -- ) inspector-slots get nth (inspect) ;
+
+: up ( -- ) inspector-stack get >pop> pop (inspect) ;
+
+: refs ( -- ) inspecting references (inspect) ;

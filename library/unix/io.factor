@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
-USING: alien assembler errors generic hashtables kernel
-kernel-internals lists math sequences io strings threads
-unix-internals unparser vectors ;
+USING: alien assembler errors generic hashtables io kernel
+kernel-internals lists math parser sequences strings threads
+unix-internals vectors ;
 
 ! We want namespaces::bind to shadow the bind system call from
 ! unix-internals
@@ -29,9 +29,7 @@ USING: namespaces ;
     swap -5 shift set-alien-unsigned-4 ;
 
 : clear-bits ( alien len -- )
-    bit-length [
-        0 pick pick set-alien-unsigned-cell
-    ] repeat drop ;
+    bit-length [ 0 -rot set-alien-unsigned-cell ] each-with ;
 
 ! Global variables
 SYMBOL: read-fdset
@@ -79,16 +77,13 @@ M: port set-timeout ( timeout port -- )
     dup port-error f rot set-port-error throw ;
 
 : report-error ( error port -- )
-    [
-        "Error on fd " %
-        dup port-handle unparse %
-        ": " % swap %
-    ] make-string swap set-port-error ;
+    [ "Error on fd " % dup port-handle # ": " % swap % ] "" make
+    swap set-port-error ;
 
 : defer-error ( port -- ? )
     #! Return t if it is an unrecoverable error.
     err_no dup EAGAIN = over EINTR = or
-    [ 2drop f ] [ strerror swap report-error ] ifte ;
+    [ 2drop f ] [ strerror swap report-error t ] ifte ;
 
 ! Associates a port with a list of continuations waiting on the
 ! port to finish I/O
@@ -145,7 +140,7 @@ GENERIC: task-container ( task -- vector )
 : init-fdsets ( -- read write except )
     read-fdset get [ read-tasks get init-fdset ] keep
     write-fdset get [ write-tasks get init-fdset ] keep
-    NULL ;
+    f ;
 
 : io-multiplex ( timeout -- )
     >r FD_SETSIZE init-fdsets r> make-timeval select drop
@@ -302,20 +297,15 @@ M: port stream-close ( stream -- )
 : <fd-stream> ( infd outfd flush? -- stream )
     >r >r <reader> r> <writer> r> <duplex-stream> ;
 
-: idle-io-task ( -- )
-    [ schedule-thread 10 io-multiplex stop ] callcc0
-    idle-io-task ;
-
 USE: io
 
 : init-io ( -- )
     #! Should only be called on startup. Calling this at any
     #! other time can have unintended consequences.
     global [
-        <namespace> read-tasks set
+        {{ }} clone read-tasks set
         FD_SETSIZE <bit-array> read-fdset set
-        <namespace> write-tasks set
+        {{ }} clone write-tasks set
         FD_SETSIZE <bit-array> write-fdset set
         0 1 t <fd-stream> stdio set
-    ] bind
-    [ idle-io-task ] in-thread ;
+    ] bind ;

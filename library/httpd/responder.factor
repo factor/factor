@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd
-USING: hashtables http kernel lists namespaces parser sequences
-io strings ;
+USING: hashtables http kernel lists math namespaces parser
+sequences io strings ;
 
 ! Variables
 SYMBOL: vhosts
@@ -49,10 +49,7 @@ SYMBOL: responders
     [
         "request" get % CHAR: / ,
         "raw-query" get [ CHAR: ? , % ] when*
-    ] make-string redirect ;
-
-: content-length ( alist -- length )
-    "Content-Length" swap assoc parse-number ;
+    ] "" make redirect ;
 
 : query>alist ( query -- alist )
     dup [
@@ -64,11 +61,12 @@ SYMBOL: responders
     ] when ;
 
 : read-post-request ( header -- alist )
-    content-length dup [ read query>alist ] when ;
+    "Content-Length" swap assoc dup
+    [ string>number read query>alist ] when ;
 
 : log-user-agent ( alist -- )
     "User-Agent" swap assoc* [
-        unswons [ % ": " % % ] make-string log
+        unswons [ % ": " % % ] "" make log-message
     ] when* ;
 
 : prepare-url ( url -- url )
@@ -95,8 +93,12 @@ SYMBOL: responders
 ! - header -- an alist of headers from the user's client
 ! - response -- an alist of the POST request response
 
-: <responder> ( -- responder )
-    <namespace> [
+: add-responder ( responder -- )
+    #! Add a responder object to the list.
+    "responder" over hash  responders get set-hash ;
+
+: make-responder ( quot -- responder )
+    [
         ( url -- )
         [
             drop "GET method not implemented" httpd-error
@@ -113,7 +115,9 @@ SYMBOL: responders
         [
             drop bad-request
         ] "bad" set
-    ] extend ;
+        
+        call
+    ] make-hash add-responder ;
 
 : vhost ( name -- responder )
     vhosts get hash [ "default" vhost ] unless* ;
@@ -134,7 +138,7 @@ SYMBOL: responders
     "default" responder call-responder ;
 
 : log-responder ( path -- )
-    "Calling responder " swap append log ;
+    "Calling responder " swap append log-message ;
 
 : trim-/ ( url -- url )
     #! Trim a leading /, if there is one.
@@ -162,7 +166,3 @@ SYMBOL: responders
 
 : no-such-responder ( -- )
     "404 No such responder" httpd-error ;
-
-: add-responder ( responder -- )
-    #! Add a responder object to the list.
-    "responder" over hash  responders get set-hash ;

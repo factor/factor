@@ -2,7 +2,6 @@ IN: temporary
 USE: kernel
 USE: math
 USE: test
-USE: unparser
 
 [ 1 2 ] [ 1/2 >fraction ] unit-test
 

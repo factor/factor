@@ -47,7 +47,7 @@ GENERIC: expire
     GetLastError expected-error? [ drop f ] unless ;
 
 : add-completion ( handle -- )
-    completion-port get NULL 1 CreateIoCompletionPort drop ;
+    completion-port get f 1 CreateIoCompletionPort drop ;
 
 : get-access ( -- file-mode )
     "file-mode" get uncons 
@@ -67,7 +67,7 @@ GENERIC: expire
 : win32-open-file ( file r w -- handle )
     [ 
         cons "file-mode" set
-        get-access get-sharemode NULL get-create FILE_FLAG_OVERLAPPED NULL 
+        get-access get-sharemode f get-create FILE_FLAG_OVERLAPPED f 
         CreateFile dup INVALID_HANDLE_VALUE = [ win32-throw-error ] when
         dup add-completion
     ] with-scope ;
@@ -80,7 +80,7 @@ END-STRUCT
     "overlapped-ext" c-size malloc <alien> ;
 
 C: io-queue ( -- queue )
-    0 <vector> over set-io-queue-callbacks ;
+    { } clone over set-io-queue-callbacks ;
 
 C: io-callback ( -- callback )
     io-queue get io-queue-callbacks [ push ] 2keep
@@ -124,20 +124,8 @@ C: io-callback ( -- callback )
     (wait-for-io) overlapped>callback swap indirect-pointer-value 
     rot [ queue-error ] unless ;
 
-: win32-next-io-task ( -- )
-    INFINITE wait-for-io swap call ;
-
-: win32-io-thread ( -- )
-    cancel-timedout 10 wait-for-io swap [
-        [ schedule-thread call ] callcc0 2drop
-    ] [
-        drop yield
-    ] ifte* 
-    win32-io-thread ;
-
 : win32-init-stdio ( -- )
-    INVALID_HANDLE_VALUE NULL NULL 1 CreateIoCompletionPort
+    INVALID_HANDLE_VALUE f f 1 CreateIoCompletionPort
     completion-port set 
-    <io-queue> io-queue set 
-    [ win32-io-thread ] in-thread ;
+    <io-queue> io-queue set ;
 

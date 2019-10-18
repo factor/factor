@@ -17,9 +17,6 @@ DEFER: repeat
 IN: kernel-internals
 USING: kernel math-internals sequences ;
 
-DEFER: array?
-BUILTIN: array 8 array? ;
-
 : array-capacity ( a -- n ) 1 slot ; inline
 : array-nth ( n a -- obj ) swap 2 fixnum+ slot ; inline
 : set-array-nth ( obj n a -- ) swap 2 fixnum+ set-slot ; inline
@@ -34,8 +31,12 @@ M: array resize resize-array ;
         3dup swap array-nth pick rot set-array-nth
     ] repeat 2drop ;
 
-DEFER: byte-array?
-BUILTIN: byte-array 19 byte-array? ;
-
 M: byte-array length array-capacity ;
 M: byte-array resize resize-array ;
+
+: make-tuple ( class size -- tuple )
+    #! Internal allocation function. Do not call it directly,
+    #! since you can fool the runtime and corrupt memory by
+    #! specifying an incorrect size. Note that this word is also
+    #! handled specially by the compiler's type inferencer.
+    <tuple> [ 2 set-slot ] keep ; flushable

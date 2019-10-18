@@ -94,10 +94,10 @@ USE: io
   #! Create a namespace holding data required
   #! for testing continuation based responder functions
   #! at the interpreter console.
-  <namespace> [
+  [
     reset-continuation-table
     init-session-namespace    
-  ] extend ;
+  ] make-hash ;
 
 : test-cont-function ( <state> quot -- <state> )
   #! Call a continuation responder function with required

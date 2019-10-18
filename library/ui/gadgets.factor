@@ -8,27 +8,26 @@ SYMBOL: origin
 
 global [ { 0 0 0 } origin set ] bind
 
-TUPLE: rectangle loc dim ;
+TUPLE: rect loc dim ;
 
-GENERIC: inside? ( loc shape -- ? )
+M: vector rect-loc ;
 
-: shape-bounds ( shape -- loc dim )
-    dup rectangle-loc swap rectangle-dim ;
+M: vector rect-dim drop { 0 0 0 } ;
 
-: shape-extent ( shape -- loc dim )
-    dup rectangle-loc dup rot rectangle-dim v+ ;
+: rect-bounds ( rect -- loc dim ) dup rect-loc swap rect-dim ;
 
-: screen-bounds ( shape -- rect )
-    shape-bounds >r origin get v+ r> <rectangle> ;
+: rect-extent ( rect -- loc dim ) rect-bounds over v+ ;
 
-M: rectangle inside? ( loc rect -- ? )
-    screen-bounds shape-bounds { 1 1 1 } v- { 0 0 0 } vmax
-    >r v- { 0 0 0 } r> vbetween? conj ;
+: >absolute ( rect -- rect )
+    rect-bounds >r origin get v+ r> <rect> ;
 
-: intersect ( shape shape -- rect )
-    >r shape-extent r> shape-extent
-    swapd vmin >r vmax dup r> swap v- { 0 0 0 } vmax
-    <rectangle> ;
+: intersect ( rect rect -- rect )
+    >r rect-extent r> rect-extent swapd vmin >r vmax dup r>
+    swap v- { 0 0 0 } vmax <rect> ;
+
+: intersects? ( rect/point rect -- ? )
+    >r rect-extent r> rect-extent swapd vmin >r vmax r> v-
+    [ 0 <= ] all? ;
 
 ! A gadget is a rectangle, a paint, a mapping of gestures to
 ! actions, and a reference to the gadget's parent.
@@ -36,58 +35,42 @@ TUPLE: gadget
     paint gestures visible? relayout? root?
     parent children ;
 
+M: gadget = eq? ;
+
 : gadget-child gadget-children first ;
 
 C: gadget ( -- gadget )
-    { 0 0 0 } dup <rectangle> over set-delegate
+    { 0 0 0 } dup <rect> over set-delegate
     t over set-gadget-visible? ;
-
-DEFER: add-invalid
-
-: invalidate ( gadget -- )
-    t swap set-gadget-relayout? ;
-
-: relayout ( gadget -- )
-    #! Relayout and redraw a gadget and its parent before the
-    #! next iteration of the event loop.
-    dup gadget-relayout? [
-        drop
-    ] [
-        dup invalidate
-        dup gadget-root?
-        [ add-invalid ]
-        [ gadget-parent [ relayout ] when* ] ifte
-    ] ifte ;
-
-: (relayout-down)
-    dup invalidate gadget-children [ (relayout-down) ] each ;
-
-: relayout-down ( gadget -- )
-    #! Relayout a gadget and its children.
-    dup add-invalid (relayout-down) ;
-
-: set-gadget-dim ( dim gadget -- )
-    2dup rectangle-dim =
-    [ 2drop ] [ [ set-rectangle-dim ] keep relayout-down ] ifte ;
-
-GENERIC: pref-dim ( gadget -- dim )
-
-M: gadget pref-dim rectangle-dim ;
-
-GENERIC: layout* ( gadget -- )
-
-: prefer ( gadget -- ) dup pref-dim swap set-gadget-dim ;
-
-M: gadget layout* drop ;
 
 GENERIC: user-input* ( ch gadget -- ? )
 
 M: gadget user-input* 2drop t ;
 
-GENERIC: focusable-child* ( gadget -- gadget/t )
+: invalidate ( gadget -- )
+    t swap set-gadget-relayout? ;
 
-M: gadget focusable-child* drop t ;
+DEFER: add-invalid
 
-: focusable-child ( gadget -- gadget )
-    dup focusable-child*
-    dup t = [ drop ] [ nip focusable-child ] ifte ;
+GENERIC: children-on ( rect/point gadget -- list )
+
+M: gadget children-on ( rect/point gadget -- list )
+    nip gadget-children ;
+
+: inside? ( bounds gadget -- ? )
+    dup gadget-visible?
+    [ >absolute intersects? ] [ 2drop f ] ifte ;
+
+: pick-up-list ( rect/point gadget -- gadget/f )
+    dupd children-on reverse-slice [ inside? ] find-with nip ;
+
+: translate ( rect/point -- )
+    rect-loc origin [ v+ ] change ;
+
+: pick-up ( rect/point gadget -- gadget )
+    2dup inside? [
+        [
+            dup translate 2dup pick-up-list dup
+            [ nip pick-up ] [ rot 2drop ] ifte
+        ] with-scope
+    ] [ 2drop f ] ifte ;

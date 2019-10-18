@@ -15,7 +15,7 @@ sequences ;
 
 : modifiers, ( mod -- )
     modifiers get [
-        uncons pick bitand 0 = [ drop ] [ unique, ] ifte
+        uncons pick bitand 0 = [ drop ] [ , ] ifte
     ] each
     drop ;
 
@@ -31,4 +31,4 @@ sequences ;
     [
         dup keyboard-event-mod modifiers,
         keyboard-event-sym keysym,
-    ] make-list ;
+    ] [ ] make prune ;

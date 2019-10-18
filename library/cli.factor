@@ -8,7 +8,7 @@ sequences strings ;
 ! on all other words already being defined.
 
 : ?run-file ( file -- )
-    dup exists? [ (run-file) ] [ drop ] ifte ;
+    dup exists? [ run-file ] [ drop ] ifte ;
 
 : run-user-init ( -- )
     #! Run user init file if it exists

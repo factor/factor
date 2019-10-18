@@ -4,7 +4,7 @@ IN: io
 USING: errors generic kernel lists namespaces strings styles ;
 
 : flush  ( -- )              stdio get stream-flush ;
-: readln ( -- string/f )       stdio get stream-readln ;
+: readln ( -- string/f )     stdio get stream-readln ;
 : read1  ( -- char/f )       stdio get stream-read1 ;
 : read   ( count -- string ) stdio get stream-read ;
 : write  ( string -- )       stdio get stream-write ;
@@ -14,12 +14,8 @@ USING: errors generic kernel lists namespaces strings styles ;
 : terpri ( -- )              stdio get stream-terpri ;
 : close  ( -- )              stdio get stream-close ;
 
-: crlf   ( -- )              "\r\n" write ;
-: bl     ( -- )              " " write ;
-
-: write-icon ( resource -- )
-    #! Write an icon. Eg, /library/icons/File.png
-    icon swons unit "" swap format ;
+: write-object ( string object -- )
+    presented swons unit format ;
 
 : with-stream ( stream quot -- )
     #! Close the stream no matter what happens.
@@ -31,3 +27,7 @@ USING: errors generic kernel lists namespaces strings styles ;
         swap stdio set
         [ [ close rethrow ] when* ] catch
     ] with-scope ;
+
+: contents ( stream -- string )
+    #! Read the entire stream into a string.
+    4096 <sbuf> [ stream-copy ] keep >string ;

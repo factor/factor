@@ -1,12 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: math
-USING: errors generic kernel math ;
+USING: errors generic kernel math sequences ;
 
-DEFER: fixnum?
-BUILTIN: fixnum 0 fixnum? ;
-DEFER: bignum?
-BUILTIN: bignum 1 bignum? ;
 UNION: integer fixnum bignum ;
 
 : (gcd) ( b a y x -- a d )
@@ -14,35 +10,31 @@ UNION: integer fixnum bignum ;
         drop nip
     ] [
         tuck /mod >r pick * swap >r swapd - r> r> (gcd)
-    ] ifte ;
+    ] ifte ; inline
 
 : gcd ( x y -- a d )
     #! Compute the greatest common divisor d and multiplier a
     #! such that a*x=d mod y.
-    swap 0 1 2swap (gcd) abs ;
+    swap 0 1 2swap (gcd) abs ; foldable
+
+: lcm ( a b -- c )
+    #! Smallest integer such that c/a and c/b are both integers.
+    2dup gcd nip >r * r> /i ; foldable
 
 : mod-inv ( x n -- y )
     #! Compute the multiplicative inverse of x mod n.
     gcd 1 = [ "Non-trivial divisor found" throw ] unless ;
-
-: bitroll ( n s w -- n )
-    #! Roll n by s bits to the right, wrapping around after
-    #! w bits.
-    [ mod shift ] 3keep over 0 >= [ - ] [ + ] ifte shift bitor ;
+    foldable
 
 IN: math-internals
 
 : fraction> ( a b -- a/b )
-    dup 1 number= [
-        drop
-    ] [
-        (fraction>)
-    ] ifte ;
+    dup 1 number= [ drop ] [ (fraction>) ] ifte ; inline
 
 : division-by-zero ( x y -- )
-    "Division by zero" throw drop ;
+    "Division by zero" throw drop ; inline
 
-: integer/ ( x y -- x/y )
+M: integer / ( x y -- x/y )
     dup 0 number= [
         division-by-zero
     ] [
@@ -50,7 +42,7 @@ IN: math-internals
             swap neg swap neg
         ] when
         2dup gcd nip tuck /i >r /i r> fraction>
-    ] ifte ; inline
+    ] ifte ;
 
 M: fixnum number=
     #! Fixnums are immediate values, so equality testing is
@@ -65,7 +57,6 @@ M: fixnum >= fixnum>= ;
 M: fixnum + fixnum+ ;
 M: fixnum - fixnum- ;
 M: fixnum * fixnum* ;
-M: fixnum / integer/ ;
 M: fixnum /i fixnum/i ;
 M: fixnum /f fixnum/f ;
 M: fixnum mod fixnum-mod ;
@@ -88,7 +79,6 @@ M: bignum >= bignum>= ;
 M: bignum + bignum+ ;
 M: bignum - bignum- ;
 M: bignum * bignum* ;
-M: bignum / integer/ ;
 M: bignum /i bignum/i ;
 M: bignum /f bignum/f ;
 M: bignum mod bignum-mod ;
@@ -105,3 +95,7 @@ M: bignum bitnot bignum-bitnot ;
 M: integer truncate ;
 M: integer floor ;
 M: integer ceiling ;
+
+! Integers support the sequence protocol
+M: integer length ;
+M: integer nth drop ;

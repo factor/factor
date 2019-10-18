@@ -42,7 +42,7 @@ USE: namespaces
   #! each successive value being the result of applying quot to
   #! n.
   swap dup unit delay -rot 
-  [ , dup , \ call , , \ lfrom-by , ] make-list delay lcons ;
+  [ , dup , \ call , , \ lfrom-by , ] [ ] make delay lcons ;
 
 : lnaturals 0 lfrom ;
 : lpositves 1 lfrom ;

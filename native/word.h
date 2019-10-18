@@ -3,14 +3,18 @@ typedef struct {
 	CELL header;
 	/* TAGGED hashcode */
 	CELL hashcode;
-	/* untagged execution token: jump here to execute word */
-	CELL xt;
-	/* untagged on-disk primitive number */
+	/* TAGGED word name */
+	CELL name;
+	/* TAGGED word vocabulary */
+	CELL vocabulary;
+	/* TAGGED on-disk primitive number */
 	CELL primitive;
 	/* TAGGED parameter to xt; used for colon definitions */
 	CELL def;
 	/* TAGGED property hash for library code */
 	CELL props;
+	/* untagged execution token: jump here to execute word */
+	CELL xt;
 } F_WORD;
 
 typedef void (*XT)(F_WORD* word);

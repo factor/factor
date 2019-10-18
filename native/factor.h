@@ -116,7 +116,6 @@ typedef unsigned char BYTE;
 #include "ratio.h"
 #include "float.h"
 #include "complex.h"
-#include "arithmetic.h"
 #include "string.h"
 #include "misc.h"
 #include "sbuf.h"
@@ -131,6 +130,7 @@ typedef unsigned char BYTE;
 #include "relocate.h"
 #include "alien.h"
 #include "dll.h"
+#include "wrapper.h"
 #include "debug.h"
 
 #endif /* __FACTOR_H__ */

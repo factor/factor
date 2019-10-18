@@ -9,7 +9,9 @@ USE: test
 USE: sequences
 USE: lists
 
-[ "abc" ] [ [ "a" "b" "c" ] [ [ % ] each ] make-string ] unit-test
+[ ] [ 10 [ [ -1000000 <sbuf> ] [ drop ] catch ] times ] unit-test
+
+[ "abc" ] [ [ "a" "b" "c" ] [ [ % ] each ] "" make ] unit-test
 
 [ "abc" ] [ "ab" "c" append ] unit-test
 [ "abc" ] [ "a" "b" "c" append3 ] unit-test
@@ -30,12 +32,6 @@ USE: lists
 [ f ] [ "actore" "Factor" subseq? ] unit-test
 
 [ "end" ] [ 14 "Beginning and end" tail ] unit-test
-
-[ "" 10 cut ] unit-test-fails
-
-[ "Beginning" " and end" ] [ 9 "Beginning and end" cut ] unit-test
-
-[ "Beginning" "and end" ] [ 9 "Beginning and end" cut* ] unit-test
 
 [ "hello" "world" ] [ "hello world" " " split1 ] unit-test
 [ "goodbye" f ] [ "goodbye" " " split1 ] unit-test
@@ -77,7 +73,7 @@ unit-test
 
 [ f ] [ [ 0 10 "hello" subseq ] [ not ] catch ] unit-test
 
-[ [ "hell" "o wo" "rld" ] ] [ 4 "hello world" group ] unit-test
+[ { "hell" "o wo" "rld" } ] [ 4 "hello world" group ] unit-test
 
 [ 4 ] [
     0 "There are Four Upper Case characters"

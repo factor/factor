@@ -36,22 +36,23 @@ USE: prettyprint
 USE: hashtables
 USE: sequences
 USE: http
+USE: unparser
 
 : <todo> ( user password -- <todo> )
   #! Create an empty todo list
-  <namespace> [
+  [
     "password" set
      "user" set
      f "items" set
-  ] extend ;
+  ] make-hash ;
 
 : <todo-item> ( priority description -- )
   #! Create a todo item
-  <namespace> [
+  [
     "description" set
     "priority" set
     f "complete?" set
-  ] extend ;
+  ] make-hash ;
 
 : add-todo-item ( <todo> <item> -- )
   #! Add the item to the todo list
@@ -93,14 +94,14 @@ USE: http
 
 : read-todo ( -- <todo> )
   #! Read a todo list from the current input stream.
-  read-line url-decode read-line url-decode <todo> 
-  read-line str>number [
+  readln url-decode readln url-decode <todo> 
+  readln string>number [
     dup
-    <namespace> [
-      read-line url-decode "yes" = "complete?" set
-      read-line url-decode "priority" set
-      read-line url-decode "description" set
-    ] extend add-todo-item
+    [
+      readln url-decode "yes" = "complete?" set
+      readln url-decode "priority" set
+      readln url-decode "description" set
+    ] make-hash add-todo-item
   ] times ;
 
 : load-todo ( filename -- <todo> )
@@ -147,9 +148,10 @@ USE: http
   #! return the description for the todo list item.
   "description" swap hash ;
 
-: priority-comparator ( item1 item2 -- bool )
-  #! Return true if item1 is a higher priority than item2
-  >r item-priority r> item-priority string> ;
+: priority-comparator ( item1 item2 -- number )
+  #! Return 0 if item equals item2, -1 if item1 < item2 and
+  #! 1 if item1 > item2.
+  >r item-priority r> item-priority lexi ;
   
 : todo-items ( <todo> -- alist )
   #! Return a list of items for the given todo list.

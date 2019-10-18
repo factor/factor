@@ -5,21 +5,6 @@
 IN: kernel-internals
 USING: errors kernel math math-internals sequences ;
 
-: assert-positive ( fx -- )
-    0 fixnum<
-    [ "Sequence index must be positive" throw ] when ; inline
-
-: assert-bounds ( fx seq -- )
-    over assert-positive
-    length fixnum>=
-    [ "Sequence index out of bounds" throw ] when ; inline
-
-: bounds-check ( n seq -- fixnum seq )
-    >r >fixnum r> 2dup assert-bounds ; inline
-
-: growable-check ( n seq -- fixnum seq )
-    >r >fixnum dup assert-positive r> ; inline
-
 GENERIC: underlying
 GENERIC: set-underlying
 GENERIC: set-capacity

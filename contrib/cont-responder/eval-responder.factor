@@ -46,11 +46,11 @@ USE: sequences
   #! Create an 'evaluator' object that holds
   #! the current stack, output and history for
   #! do-eval.
-  <namespace> [
+  [
     "history" set
     "output" set
     "stack" set
-  ] extend ;
+  ] make-hash ;
 
 : display-eval-form ( url -- )
   #! Display the components for allowing entry of 
@@ -73,13 +73,13 @@ USE: sequences
   #! Replace occurrences of single quotes with
   #! backslash quote.
   [
-    [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc [ , ] [ , ] ?ifte ] each
-  ] make-string ;
+    [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc [ % ] [ % ] ?ifte ] each
+  ] "" make ;
  
 : make-eval-javascript ( string -- string )
   #! Give a string return some javascript that when
   #! executed will set the eval textarea to that string.
-  [ "document.forms.main.eval.value=\"" , escape-quotes , "\"" , ] make-string ;
+  [ "document.forms.main.eval.value=\"" % escape-quotes % "\"" % ] "" make ;
 : write-eval-link ( string -- )
   #! Given text to evaluate, create an A HREF link which when
   #! clicked sets the eval textarea to that value.
@@ -115,13 +115,13 @@ USE: sequences
   #! Return an html fragment dispaying the source
   #! of the given word.
   dup dup
-  <namespace> [
+  {{ }} clone [
     "browser" "responder" set
     <table border= "1" table> 
       <tr> <th colspan= "2" th> "Source" write </th> </tr>
       <tr> <td colspan= "2" td> [ [ parse ] [ [ "No such word" write ] [ car see ] ifte ] catch ] with-simple-html-output </td> </tr>
       <tr> <th> "Apropos" write </th> <th> "Usages" write </th> </tr>
-      <tr> <td valign= "top" td> [ apropos. ] with-simple-html-output </td> 
+      <tr> <td valign= "top" td> [ apropos ] with-simple-html-output </td> 
            <td valign= "top" td> [ [ parse ] [ [ "No such word" write ] [ car usages. ] ifte ] catch ] with-simple-html-output </td>
       </tr>
     </table>

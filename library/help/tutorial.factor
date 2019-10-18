@@ -1,35 +1,46 @@
 IN: help
-USING: gadgets generic kernel lists math matrices namespaces sdl
+USING: gadgets gadgets-books gadgets-borders gadgets-buttons
+gadgets-editors gadgets-labels gadgets-layouts gadgets-panes
+gadgets-presentations generic kernel lists math namespaces sdl
 sequences strings styles ;
 
-: <title> ( text -- gadget )
+: <slide-title> ( text -- gadget )
     <label> dup 36 font-size set-paint-prop ;
 
 : <underline> ( -- gadget )
     <gadget>
-    dup << gradient f { 1 0 0 } [ 64 64 64 ] [ 255 255 255 ] >> interior set-paint-prop
+    dup << gradient f { 1 0 0 } { 64 64 64 } { 255 255 255 } >>
+    interior set-paint-prop
     { 0 10 0 } over set-gadget-dim ;
 
 GENERIC: tutorial-line ( object -- gadget )
 
-M: string tutorial-line <label> ;
+M: string tutorial-line
+    {
+        { [ "* " ?head ] [ <slide-title> ] }
+        { [ dup "--" = ] [ drop <underline> ] }
+        { [ t ] [ <label> ] }
+    } cond ;
+
+: example-theme
+    dup button-theme
+    "Monospaced" font set-paint-prop ;
 
 M: general-list tutorial-line
-    car dup <label> dup rot [ pane get pane-input set-editor-text drop ] cons
-    button-gestures
-    dup "Monospaced" font set-paint-prop ;
+    car
+    <label> [ label-text pane get pane-input set-editor-text ]
+    <roll-button> dup example-theme ;
 
 : <page> ( list -- gadget )
-    0 1 <pile>
-    over car <title> over add-gadget
-    <underline> over add-gadget
-    swap cdr [ tutorial-line over add-gadget ] each
+    [ tutorial-line ] map
+    <pile> 1 over set-pack-fill [ add-gadgets ] keep
     empty-border ;
 
 : tutorial-pages
     [
         [
-            "Factor: a dynamic language"
+            "* Factor: a dynamic language"
+            "--"
             "This series of slides presents a quick overview of Factor."
             ""
             "Factor is interactive, which means you can test out the code"
@@ -44,7 +55,8 @@ M: general-list tutorial-line
             ""
             "http://factor.sourceforge.net"
         ] [
-            "The view from 10,000 feet"
+            "* The view from 10,000 feet"
+            "--"
             "- Everything is an object"
             "- A word is a basic unit of code"
             "- Words are identified by names, and organized in vocabularies"
@@ -52,7 +64,8 @@ M: general-list tutorial-line
             "- Code blocks can be passed as parameters to words"
             "- Word definitions are very short with very high code reuse"
         ] [
-            "Basic syntax"
+            "* Basic syntax"
+            "--"
             "Factor code is made up of whitespace-speparated tokens."
             "Recall the example from the first slide:"
             ""
@@ -62,7 +75,8 @@ M: general-list tutorial-line
             "The second token (print) is a word."
             "The string is pushed on the stack, and the print word prints it."
         ] [
-            "The stack"
+            "* The stack"
+            "--"
             "- The stack is like a pile of papers."
             "- You can ``push'' papers on the top of the pile,"
             "  and ``pop'' papers from the top of the pile."
@@ -73,7 +87,8 @@ M: general-list tutorial-line
             ""
             "Try running it in the listener now."
         ] [
-            "Postfix arithmetic"
+            "* Postfix arithmetic"
+            "--"
             "What happened when you ran it?"
             ""
             "The two numbers (2 3) are pushed on the stack."
@@ -84,7 +99,8 @@ M: general-list tutorial-line
             "Traditional arithmetic is called infix: 3 + (6 * 2)"
             "Lets translate this into postfix: 3 6 2 * + ."
         ] [
-            "Colon definitions"
+            "* Colon definitions"
+            "--"
             "We can define new words in terms of existing words."
             ""
             [ ": twice  2 * ;" ]
@@ -98,7 +114,8 @@ M: general-list tutorial-line
             ""
             [ "3 2 * 2 * ." ]
         ] [
-            "Stack effects"
+            "* Stack effects"
+            "--"
             "When we look at the definition of the ``twice'' word,"
             "it is intuitively obvious that it takes one value from the stack,"
             "and leaves one value behind. However, with more complex"
@@ -112,7 +129,8 @@ M: general-list tutorial-line
             "The stack effect of + is ( x y -- x+y )."
             "The stack effect of . is ( object -- )."
         ] [
-            "Reading user input"
+            "* Reading user input"
+            "--"
             "User input is read using the readln ( -- string ) word."
             "Note its stack effect; it puts a string on the stack."
             ""
@@ -121,7 +139,8 @@ M: general-list tutorial-line
             [ "\"What is your name?\" print" ]
             [ "readln \"Hello, \" write print" ]
         ] [
-            "Shuffle words"
+            "* Shuffle words"
+            "--"
             "The word ``twice'' we defined is useless."
             "Let's try something more useful: squaring a number."
             ""
@@ -133,10 +152,11 @@ M: general-list tutorial-line
             "( object -- object object ), and it does exactly what we"
             "need. The ``dup'' word is known as a shuffle word."
         ] [
-            "The squared word"
+            "* The squared word"
+            "--"
             "Try entering the following word definition:"
             ""
-            [ ": squared ( n -- n*n ) dup * ;" ]
+            [ ": square ( n -- n*n ) dup * ;" ]
             ""
             "Shuffle words solve the problem where we need to compose"
             "two words, but their stack effects do not ``fit''."
@@ -147,7 +167,8 @@ M: general-list tutorial-line
             "swap ( obj1 obj2 -- obj2 obj1 )"
             "over ( obj1 obj2 -- obj1 obj2 obj1 )"
         ] [
-            "Another shuffle example"
+            "* Another shuffle example"
+            "--"
             "Now let us write a word that negates a number."
             "Start by entering the following in the listener"
             ""
@@ -161,56 +182,55 @@ M: general-list tutorial-line
             ""
             [ ": negate ( n -- -n ) 0 swap - ;" ]
         ] [
-            "Seeing words"
+            "* Seeing words"
+            "--"
             "If you have entered every definition in this tutorial,"
             "you will now have several new colon definitions:"
             ""
             "  twice"
-            "  squared"
-            "  negated"
+            "  square"
+            "  negate"
             ""
             "You can look at previously-entered word definitions using 'see'."
             "Try the following:"
             ""
-            [ "\\ negated see" ]
+            [ "\\ negate see" ]
             ""
             "Prefixing a word with \\ pushes it on the stack, instead of"
             "executing it. So the see word has stack effect ( word -- )."
         ] [
-            "Booleans"
-            "In Factor, any object can be used as a truth value."
-            "- The f object is false."
-            "- Anything else is true."
-            ""
-            "Here is a word that outputs a boolean:"
-            ""
-            [ ": negative? ( n -- ? ) 0 < ;" ]
-        ] [
-            "Branches"
+            "* Branches"
+            "--"
             "Now suppose we want to write a word that computes the"
             "absolute value of a number; that is, if it is less than 0,"
             "the number will be negated to yield a positive result."
             ""
-            [ ": absolute ( x -- |x| ) dup 0 < [ negated ] when ;" ]
+            [ ": absolute ( x -- |x| ) dup 0 < [ negate ] when ;" ]
             ""
-            "It duplicates the top of the stack, since negative? pops it."
-            "Then if the top of the stack was found to be negative,"
-            "it is negated, yielding a postive result."
+            "If the top of the stack is negative, the word negates it"
+            "again, making it positive."
+            ""
+            "The < ( x y -- x<y ) word outputs a boolean."
+            "In Factor, any object can be used as a truth value."
+            "- The f object is false."
+            "- Anything else is true."
         ] [
-            "More branches"
+            "* More branches"
+            "--"
             "On the previous slide, you saw the 'when' conditional:"
             ""
-            [ "  ... condition ... [ ... code to run if true ... ] when" ]
+            [ "  ... condition ... [ ... true case ... ] when" ]
             ""
             "Another commonly-used form is 'unless':"
             ""
-            [ "  ... condition ... [ ... code to run if true ... ] unless" ]
+            [ "  ... condition ... [ ... false case ... ] unless" ]
             ""
             "The 'ifte' conditional takes action on both branches:"
             ""
             [ "  ... condition ... [ ... ] [ ... ] ifte" ]
         ] [
-            "Combinators"
+            "* Combinators"
+            "--"
             "ifte, when, unless are words that take lists of code as input."
             ""
             "Lists of code are called ``quotations''."
@@ -223,7 +243,8 @@ M: general-list tutorial-line
             ""
             [ "10 [ \"Hello combinators\" print ] times" ]
         ] [
-            "Sequences"
+            "* Sequences"
+            "--"
             "You have already seen strings, very briefly:"
             ""
             "  \"Hello world\""
@@ -238,13 +259,14 @@ M: general-list tutorial-line
             "can contain any type of object, including other lists"
             "and vectors."
         ] [
-            "Sequences and combinators"
+            "* Sequences and combinators"
+            "--"
             "A very useful combinator is each ( seq quot -- )."
             "It calls a quotation with each element of the sequence in turn."
             ""
             "Try this:"
             ""
-            [ "[ 10 20 30 ] [ . ] each" ]
+            [ "{ 10 20 30 } [ . ] each" ]
             ""
             "A closely-related combinator is map ( seq quot -- seq )."
             "It also calls a quotation with each element."
@@ -253,10 +275,11 @@ M: general-list tutorial-line
             ""
             "Try this:"
             ""
-            [ "[ 10 20 30 ] [ 3 + ] map ." ]
-            "==> [ 13 23 33 ]"
+            [ "{ 10 20 30 } [ 3 + ] map ." ]
+            "==> { 13 23 33 }"
         ] [
-            "Numbers - integers and ratios"
+            "* Numbers - integers and ratios"
+            "--"
             "Factor's supports arbitrary-precision integers and ratios."
             ""
             "Try the following:"
@@ -269,17 +292,19 @@ M: general-list tutorial-line
             "Rational numbers are added, multiplied and reduced to"
             "lowest terms in the same way you learned in grade school."
         ] [
-            "Numbers - higher math"
-            ""
+            "* Numbers - higher math"
+            "--"
             [ "2 sqrt ." ]
             ""
             [ "-1 sqrt ." ]
             ""
-            [ "M[ [ 10 3 ] [ 7 5 ] [ -2 0 ] ]M M[ [ 11 2 ] [ 4 8 ] ]M m." ]
+            [ "{ { 10 3 } { 7 5 } { -2 0 } }" ]
+            [ "{ { 11 2 } { 4 8 } } m." ]
             ""
             "... and there is much more for the math geeks."
         ] [
-            "Object oriented programming"
+            "* Object oriented programming"
+            "--"
             "Each object belongs to a class."
             "Generic words act differently based on an object's class."
             ""
@@ -293,7 +318,8 @@ M: general-list tutorial-line
             ""
             "integer, string, object are built-in classes."
         ] [
-            "Defining new classes"
+            "* Defining new classes"
+            "--"
             "New classes can be defined:"
             ""
             [ "TUPLE: point x y ;" ]
@@ -307,7 +333,8 @@ M: general-list tutorial-line
             "Tuples support custom constructors, delegation..."
             "see the developer's handbook for details."
         ] [
-            "The library"
+            "* The library"
+            "--"
             "Offers a good selection of highly-reusable words:"
             "- Operations on sequences"
             "- Variety of mathematical functions"
@@ -321,7 +348,8 @@ M: general-list tutorial-line
             "- To show a word definition:"
             [ "\\ reverse see" ]
         ] [
-            "Learning more"
+            "* Learning more"
+            "--"
             "Hopefully this tutorial has sparked your interest in Factor."
             ""
             "You can learn more by reading the Factor developer's handbook:"
@@ -333,13 +361,19 @@ M: general-list tutorial-line
         ]
     ] ;
 
+: tutorial-theme
+    dup { 204 204 255 } background set-paint-prop
+    dup << gradient f { 0 1 0 } { 204 204 255 } { 255 204 255 } >> interior set-paint-prop
+    dup "Sans Serif" font set-paint-prop
+    18 font-size set-paint-prop ;
+
 : <tutorial> ( pages -- browser )
     tutorial-pages [ <page> ] map <book>
-    dup [ 204 204 255 ] background set-paint-prop
-    dup << gradient f { 0 1 0 } [ 204 204 255 ] [ 255 204 255 ] >> interior set-paint-prop
-    dup "Sans Serif" font set-paint-prop
-    dup 18 font-size set-paint-prop
-    <book-browser> ;
+    dup tutorial-theme <book-browser> ;
 
 : tutorial ( -- )
     <tutorial> gadget. ;
+
+: <tutorial-button>
+    "Tutorial" <label>
+    [ drop [ tutorial ] pane get pane-call ] <button> ;

@@ -61,11 +61,11 @@ SYMBOL: history-index
     "" line-text set ;
 
 : <line-editor> ( -- editor )
-    <namespace> [
+    [
         line-clear
-        100 <vector> history set
+        { } clone history set
         0 history-index set
-    ] extend ;
+    ] make-hash ;
 
 : caret-insert ( str offset -- )
     #! Call this in the line editor scope.
@@ -79,7 +79,7 @@ SYMBOL: history-index
     #! Call this in the line editor scope.
     reset-history
     2dup caret-insert
-    line-text get cut
+    line-text get [ head ] 2keep tail
     swapd append3 line-text set ;
 
 : insert-char ( ch -- )
@@ -117,3 +117,11 @@ SYMBOL: history-index
 : right ( -- )
     #! Call this in the line editor scope.
     caret [ 1 + line-text get length min ] change ;
+
+: home ( -- )
+    #! Call this in the line editor scope.
+    0 caret set ;
+
+: end ( -- )
+    #! Call this in the line editor scope.
+    line-text get length caret set ;

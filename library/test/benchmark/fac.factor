@@ -1,8 +1,5 @@
 IN: temporary
-USE: math
-USE: test
-USE: compiler
-USE: kernel
+USING: compiler kernel math sequences test ;
 
 : (fac) ( n! i -- n! )
     dup 0 = [
@@ -16,10 +13,10 @@ USE: kernel
 
 : small-fac-benchmark
     #! This tests fixnum math.
-    1 swap [ 10 fac 10 [ [ 1 + / ] keep ] repeat max ] times ; compiled
+    1 swap [ 10 fac 10 [ 1 + / ] each max ] times ; compiled
 
 : big-fac-benchmark
-    10000 fac 10000 [ [ 1 + / ] keep ] repeat ; compiled
+    10000 fac 10000 [ 1 + / ] each ; compiled
 
 [ 1 ] [ big-fac-benchmark ] unit-test
 

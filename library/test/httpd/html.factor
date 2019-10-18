@@ -13,15 +13,6 @@ USING: html io kernel namespaces styles test ;
     ] with-scope
 ] unit-test
 
-[ "<img src='/responder/resource/library/icons/File.png'>" ]
-[
-    [
-        ""
-        [ [[ icon "library/icons/File.png" ]] ]
-        [ drop ] icon-tag
-    ] string-out
-] unit-test
-
 [ "" ]
 [
     [

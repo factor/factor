@@ -1,11 +1,35 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: errors generic interpreter kernel lists math namespaces
-prettyprint sequences strings unparser vectors words ;
+USING: errors generic interpreter io kernel lists math
+namespaces parser prettyprint sequences strings vectors words ;
 
 ! This variable takes a boolean value.
 SYMBOL: inferring-base-case
+
+! Called when a recursive call during base case inference is
+! found. Either tries to infer another branch, or gives up.
+SYMBOL: base-case-continuation
+
+TUPLE: inference-error message rstate data-stack call-stack ;
+
+: inference-error ( msg -- )
+    recursive-state get meta-d get meta-r get
+    <inference-error> throw ; inline
+
+M: inference-error error. ( error -- )
+    "! Inference error:" print
+    dup inference-error-message print
+    "! Recursive state:" print
+    inference-error-rstate sequence. ;
+
+M: value literal-value ( value -- )
+    {
+        "A literal value was expected where a computed value was found.\n"
+        "This means the word you are inferring applies 'call' or 'execute'\n"
+        "to a value that is not known at compile time.\n"
+        "See the handbook for details."
+    } concat inference-error ;
 
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
@@ -18,33 +42,16 @@ SYMBOL: inferring-base-case
 SYMBOL: d-in
 
 : pop-literal ( -- rstate obj )
-    1 #drop node, pop-d >literal< ;
+    1 #drop node, pop-d dup value-recursion swap literal-value ;
 
-: (ensure-types) ( typelist n stack -- )
-    pick [
-        3dup >r >r car r> r> nth value-class-and
-        >r >r cdr r> 1 + r> (ensure-types)
-    ] [
-        3drop
-    ] ifte ;
+: computed-value-vector ( n -- vector )
+    empty-vector dup [ drop <computed> ] nmap ;
 
-: ensure-types ( typelist stack -- )
-    dup length pick length - dup 0 < [
-        swap >r neg swap tail 0 r>
-    ] [
-        swap
-    ] ifte (ensure-types) ;
-
-: required-inputs ( typelist stack -- values )
-    >r dup length r> length - dup 0 > [
-        swap head [ <computed> ] map
-    ] [
-        2drop f
-    ] ifte ;
+: required-inputs ( n stack -- values )
+    length - 0 max computed-value-vector ;
 
 : ensure-d ( typelist -- )
-    dup meta-d get ensure-types
-    meta-d get required-inputs >vector dup
+    length meta-d get required-inputs dup
     meta-d [ append ] change
     d-in [ append ] change ;
 
@@ -54,20 +61,21 @@ SYMBOL: d-in
     2slip
     second length 0 rot node-outputs ; inline
 
-: (present-effect) ( vector -- list )
-    >list [ value-class ] map ;
-
-: present-effect ( [[ d-in meta-d ]] -- [ in-types out-types ] )
+: effect ( -- [[ in# out# ]] )
     #! After inference is finished, collect information.
-    uncons >r (present-effect) r> (present-effect) 2list ;
+    d-in get length object <repeated> >list
+    meta-d get length object <repeated> >list 2list ;
 
-: simple-effect ( [[ d-in meta-d ]] -- [[ in# out# ]] )
-    #! After inference is finished, collect information.
-    uncons length >r length r> cons ;
+: no-base-case ( word -- )
+    {
+        "The base case of a recursive word could not be inferred.\n"
+        "This means the word calls itself in every control flow path.\n"
+        "See the handbook for details."
+    } concat inference-error ;
 
 : init-inference ( recursive-state -- )
     init-interpreter
-    0 <vector> d-in set
+    { } clone d-in set
     recursive-state set
     dataflow-graph off
     current-node off ;
@@ -77,67 +85,57 @@ GENERIC: apply-object
 : apply-literal ( obj -- )
     #! Literals are annotated with the current recursive
     #! state.
-    recursive-state get <literal> push-d  1 #push node, ;
+    <literal> push-d  1 #push node, ;
 
 M: object apply-object apply-literal ;
+
+M: wrapper apply-object wrapped apply-literal ;
 
 : active? ( -- ? )
     #! Is this branch not terminated?
     d-in get meta-d get and ;
 
-: effect ( -- [[ d-in meta-d ]] )
-    d-in get meta-d get cons ;
-
 : terminate ( -- )
     #! Ignore this branch's stack effect.
     meta-d off meta-r off d-in off ;
 
-: terminator? ( obj -- ? )
-    #! Does it throw an error?
-    dup word? [ "terminator" word-prop ] [ drop f ] ifte ;
-
-: handle-terminator ( quot -- )
-    #! If the quotation throws an error, do not count its stack
-    #! effect.
-    [ terminator? ] find drop -1 > [ terminate ] when ;
-
 : infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested
     #! quotations.
-    active? [
-        [ unswons apply-object infer-quot ] when*
-    ] [
-        drop
-    ] ifte ;
+    [ active? [ apply-object t ] [ drop f ] ifte ] all? drop ;
 
 : infer-quot-value ( rstate quot -- )
-    recursive-state get >r
-    swap recursive-state set
-    dup infer-quot handle-terminator
-    r> recursive-state set ;
-
-: check-active ( -- )
-    active? [ "Provable runtime error" inference-error ] unless ;
+    recursive-state get >r swap recursive-state set
+    infer-quot r> recursive-state set ;
 
 : check-return ( -- )
     #! Raise an error if word leaves values on return stack.
     meta-r get empty? [
-        "Word leaves elements on return stack" inference-error
+        "Word leaves " meta-r get length number>string
+        " element(s) on return stack. Check >r/r> usage." append3
+        inference-error
     ] unless ;
 
 : with-infer ( quot -- )
     [
         inferring-base-case off
+        [ no-base-case ] base-case-continuation set
         f init-inference
         call
-        check-active
         check-return
     ] with-scope ;
 
 : infer ( quot -- effect )
     #! Stack effect of a quotation.
-    [ infer-quot effect present-effect ] with-infer ;
+    [ infer-quot effect ] with-infer ;
+
+: (dataflow) ( quot -- dataflow )
+    infer-quot #return node, dataflow-graph get ;
 
 : dataflow ( quot -- dataflow )
     #! Data flow of a quotation.
-    [ infer-quot #return node, dataflow-graph get ] with-infer ;
+    [ (dataflow) ] with-infer ;
+
+: dataflow-with ( quot stack -- effect )
+    #! Infer starting from a stack of values.
+    [ meta-d set (dataflow) ] with-infer ;

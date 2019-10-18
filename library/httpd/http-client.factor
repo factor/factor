@@ -1,12 +1,12 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: http-client
-USING: errors http kernel lists namespaces parser sequences
-io strings unparser ;
+USING: errors http kernel lists math namespaces parser sequences
+io strings ;
 
 : parse-host ( url -- host port )
     #! Extract the host name and port number from an HTTP URL.
-    ":" split1 [ parse-number ] [ 80 ] ifte* ;
+    ":" split1 [ string>number ] [ 80 ] ifte* ;
 
 : parse-url ( url -- host resource )
     "http://" ?head [
@@ -16,15 +16,17 @@ io strings unparser ;
 
 : parse-response ( line -- code )
     "HTTP/" ?head [ " " split1 nip ] when
-    " " split1 drop parse-number ;
+    " " split1 drop string>number ;
 
 : read-response ( -- code header )
     #! After sending a GET oR POST we read a response line and
     #! header.
     flush readln parse-response read-header ;
 
+: crlf "\r\n" write ;
+
 : http-request ( host resource method -- )
-    write CHAR: \s write write " HTTP/1.0" write crlf
+    write " " write write " HTTP/1.0" write crlf
     "Host: " write write crlf ;
 
 : get-request ( host resource -- )
@@ -50,10 +52,11 @@ DEFER: http-get
     >r http-get 2nip r> <file-writer> stream-copy ;
 
 : post-request ( content-type content host resource -- )
+    #! Note: It is up to the caller to url encode the content if
+    #! it is required according to the content-type.
     "POST" http-request [
-        url-encode
-        "Content-Length: " write length unparse write crlf
-        "Content-Type: " write write crlf
+        "Content-Length: " write length number>string write crlf
+        "Content-Type: " write url-encode write crlf
         crlf
     ] keep write ;
 

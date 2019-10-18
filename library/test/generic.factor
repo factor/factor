@@ -1,6 +1,4 @@
 IN: temporary
-USING: parser prettyprint sequences io strings unparser ;
-
 USE: hashtables
 USE: namespaces
 USE: generic
@@ -11,6 +9,11 @@ USE: words
 USE: lists
 USE: vectors
 USE: alien
+USE: sequences
+USE: prettyprint
+USE: io
+USE: parser
+USE: strings
 
 GENERIC: class-of
 
@@ -92,13 +95,30 @@ M: very-funny gooey sq ;
 
 [ cons ] [ [ 1 2 ] class ] unit-test
 
+[ t ] [ \ fixnum \ integer class< ] unit-test
+[ t ] [ \ fixnum \ fixnum class< ] unit-test
+[ f ] [ \ integer \ fixnum class< ] unit-test
+[ t ] [ \ integer \ object class< ] unit-test
+[ f ] [ \ integer \ null class< ] unit-test
+[ t ] [ \ null \ object class< ] unit-test
+[ t ] [ \ list \ general-list class< ] unit-test
+[ t ] [ \ list \ object class< ] unit-test
+[ t ] [ \ null \ list class< ] unit-test
+
 [ t ] [ \ generic \ compound class< ] unit-test
 [ f ] [ \ compound \ generic class< ] unit-test
+
+[ f ] [ \ cons \ list class< ] unit-test
+[ f ] [ \ list \ cons class< ] unit-test
+
+[ f ] [ \ mirror \ slice class< ] unit-test
+[ f ] [ \ slice \ mirror class< ] unit-test
 
 DEFER: bah
 FORGET: bah
 UNION: bah fixnum alien ;
 [ bah ] [ fixnum alien class-or ] unit-test
+[ bah ] [ \ bah? "predicating" word-prop ] unit-test
 
 DEFER: complement-test
 FORGET: complement-test
@@ -122,12 +142,12 @@ TUPLE: another-one ;
 [ << another-one f >> ] [ <another-one> empty-method-test ] unit-test
 
 ! Test generic see and parsing
-[ "IN: temporary\nSYMBOL: bah \nUNION: bah fixnum alien ;\n" ]
+[ "IN: temporary\nSYMBOL: bah\nUNION: bah fixnum alien ;\n" ]
 [ [ \ bah see ] string-out ] unit-test
 
 [ t ] [
     DEFER: not-fixnum
-    "IN: temporary\nSYMBOL: not-fixnum \nCOMPLEMENT: not-fixnum fixnum\n"
+    "IN: temporary\nSYMBOL: not-fixnum\nCOMPLEMENT: not-fixnum fixnum\n"
     dup eval
     [ \ not-fixnum see ] string-out =
 ] unit-test
@@ -143,9 +163,6 @@ M: f testing 3 ;
 M: sequence testing 4 ;
 [ [ 1 2 ] 2 ] [ [ 1 2 ] testing ] unit-test
 
-! Bootstrap hashing
-[ f ] [ \ f \ unparse "methods" word-prop hash not ] unit-test
-
 GENERIC: union-containment
 M: integer union-containment drop 1 ;
 M: number union-containment drop 2 ;
@@ -158,7 +175,7 @@ M: number union-containment drop 2 ;
 [ "M: vocabularies unhappy ;" eval ] unit-test-fails
 [ ] [ "GENERIC: unhappy" eval ] unit-test
 
-G: complex-combination [ over ] [ type ] ;
+G: complex-combination [ over ] standard-combination ;
 M: string complex-combination drop ;
 M: object complex-combination nip ;
 
@@ -189,3 +206,8 @@ TUPLE: delegating ;
 
 [ << shit f >> "shit" ] [ << shit f >> big-generic-test ] unit-test
 [ << shit f >> "shit" ] [ << delegating << shit f >> >> big-generic-test ] unit-test
+
+[ t ] [ \ = simple-generic? ] unit-test
+[ f ] [ \ each simple-generic? ] unit-test
+[ f ] [ \ object simple-generic? ] unit-test
+[ t ] [ \ + 2generic? ] unit-test

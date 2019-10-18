@@ -1,10 +1,10 @@
-USING: compiler hashtables kernel math namespaces test ;
+USING: compiler hashtables kernel math namespaces sequences test ;
 
 : store-hash ( hashtable n -- )
-    [ [ >float dup pick set-hash ] keep ] repeat drop ;
+    [ >float dup pick set-hash ] each drop ;
 
 : lookup-hash ( hashtable n -- )
-    [ [ >float over hash drop ] keep ] repeat drop ;
+    [ >float over hash drop ] each drop ;
 
 : hashtable-benchmark ( -- )
     100 [

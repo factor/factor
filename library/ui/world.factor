@@ -1,9 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien errors generic io kernel lists math memory
-namespaces prettyprint sdl sequences sequences strings threads
-vectors ;
+USING: alien errors gadgets-layouts generic io kernel lists math
+memory namespaces prettyprint sdl sequences sequences strings
+threads vectors ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the
@@ -14,8 +14,11 @@ TUPLE: world running? hand glass invalid ;
 DEFER: <hand>
 DEFER: update-hand
 
+: add-layer ( gadget -- )
+    world get add-gadget ;
+
 C: world ( -- world )
-    f <stack> over set-delegate
+    <stack> over set-delegate
     t over set-gadget-root?
     dup <hand> over set-world-hand ;
 
@@ -29,24 +32,18 @@ C: world ( -- world )
     world get world-invalid
     [ pop-invalid [ layout ] each layout-world ] when ;
 
-: add-layer ( gadget -- )
-    world get add-gadget ;
-
 : hide-glass ( -- )
     world get world-glass unparent f
     world get set-world-glass ;
 
 : show-glass ( gadget -- )
     hide-glass
-    <gadget> dup
-    world get 2dup add-gadget set-world-glass
+    <gadget> dup add-layer dup world get set-world-glass
     dupd add-gadget prefer ;
-
-M: world inside? ( point world -- ? ) 2drop t ;
 
 : draw-world ( world -- )
     [
-        { 0 0 0 } width get height get 0 3vector <rectangle> clip set
+        { 0 0 0 } width get height get 0 3vector <rect> clip set
         draw-gadget
     ] with-surface ;
 
@@ -56,8 +53,7 @@ DEFER: handle-event
     world get dup world-invalid >r layout-world r>
     [ dup world-hand update-hand draw-world ] [ drop ] ifte ;
 
-: next-event ( -- event ? )
-    <event> dup SDL_PollEvent ;
+: next-event ( -- event ? ) <event> dup SDL_PollEvent ;
 
 : run-world ( -- )
     #! Keep polling for events until there are no more events in
@@ -65,8 +61,8 @@ DEFER: handle-event
     next-event [
         handle-event run-world
     ] [
-        drop world-step
-        world get world-running? [ yield run-world ] when
+        drop world-step do-timers
+        world get world-running? [ 10 sleep run-world ] when
     ] ifte ;
 
 : start-world ( -- )

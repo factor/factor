@@ -3,13 +3,9 @@
 IN: strings
 USING: generic kernel kernel-internals lists math sequences ;
 
-! Strings
-DEFER: string?
-BUILTIN: string 12 string? [ 1 length f ] [ 2 hashcode f ] ;
-
 M: string nth ( n str -- ch ) bounds-check char-slot ;
 
-GENERIC: >string ( seq -- string )
+GENERIC: >string ( seq -- string ) flushable
 
 M: string >string ;
 
@@ -23,7 +19,7 @@ PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
 : quotable? ( ch -- ? )
     #! In a string literal, can this character be used without
     #! escaping?
-    dup printable? swap "\"\\" member? not and ;
+    dup printable? swap "\"\\" member? not and ; foldable
 
 : url-quotable? ( ch -- ? )
     #! In a URL, can this character be used without
@@ -31,4 +27,4 @@ PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
     dup letter?
     over LETTER? or
     over digit? or
-    swap "/_?." member? or ;
+    swap "/_?." member? or ; foldable

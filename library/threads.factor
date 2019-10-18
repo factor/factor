@@ -2,32 +2,88 @@
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: threads
-USING: errors kernel kernel-internals lists namespaces ;
- 
-! Core of the multitasker. Used by io-internals.factor and
-! in-thread.factor.
+USING: errors hashtables io-internals kernel lists math
+namespaces queues sequences vectors ;
 
-: run-queue ( -- queue ) 9 getenv ;
-: set-run-queue ( queue -- ) 9 setenv ;
-: init-threads ( -- ) <queue> set-run-queue ;
+! Co-operative multitasker.
+
+: run-queue ( -- queue ) \ run-queue global hash ;
+
+: schedule-thread ( quot -- ) run-queue enque ;
+
+: sleep-queue ( -- vec ) \ sleep-queue global hash ;
+
+: sleep-queue* ( -- vec )
+    sleep-queue dup [ 2car swap - ] nsort ;
+
+: sleep-time ( sorted-queue -- ms )
+    dup empty? [ drop -1 ] [ peek car millis - 0 max ] ifte ;
+
+DEFER: next-thread
+
+: do-sleep ( -- quot )
+    sleep-queue* dup sleep-time dup 0 =
+    [ drop pop ] [ nip io-multiplex next-thread ] ifte ;
 
 : next-thread ( -- quot )
-    run-queue dup queue-empty? [
-        drop f
+    run-queue dup queue-empty? [ drop do-sleep ] [ deque ] ifte ;
+
+: stop ( -- ) next-thread call ;
+
+: yield ( -- ) [ schedule-thread stop ] callcc0 ;
+
+: sleep ( ms -- )
+    millis + [ cons sleep-queue push stop ] callcc0 drop ;
+
+: in-thread ( quot -- )
+    [
+        schedule-thread
+        [ ] set-catchstack { } set-callstack
+        try stop
+    ] callcc0 drop ;
+
+TUPLE: timer object delay last ;
+
+: timer-now millis swap set-timer-last ;
+
+C: timer ( object delay -- timer )
+    [ set-timer-delay ] keep
+    [ set-timer-object ] keep
+    dup timer-now ;
+
+GENERIC: tick ( ms object -- )
+
+: timers ( -- hash ) \ timers global hash ;
+
+: add-timer ( object delay -- )
+    over >r <timer> r> timers set-hash ;
+
+: remove-timer ( object -- ) timers remove-hash ;
+
+: restart-timer ( object -- )
+    timers hash [ timer-now ] when* ;
+
+: next-time ( timer -- ms ) dup timer-delay swap timer-last + ;
+
+: advance-timer ( ms timer -- delay )
+    #! Outputs the time since the last firing.
+    [ timer-last - 0 max ] 2keep set-timer-last ;
+
+: do-timer ( ms timer -- )
+    #! Takes current time, and a timer. If the timer is set to
+    #! fire, calls its callback.
+    dup next-time pick <= [
+        [ advance-timer ] keep timer-object tick
     ] [
-        deque set-run-queue
+        2drop
     ] ifte ;
 
-: schedule-thread ( quot -- )
-    run-queue enque set-run-queue ;
+: do-timers ( -- )
+    millis timers hash-values [ do-timer ] each-with ;
 
-: stop ( -- )
-    #! Stop the current thread and begin executing the next one.
-    next-thread [ call ] [ "No more tasks" throw ] ifte* ;
-
-: yield ( -- )
-    #! Add the current continuation to the run queue, and yield
-    #! to the next quotation. The current continuation will
-    #! eventually be restored by a future call to stop or
-    #! yield.
-    [ schedule-thread stop ] callcc0 ;
+: init-threads ( -- )
+    global [
+        <queue> \ run-queue set
+        { } clone \ sleep-queue set
+        {{ }} clone \ timers set
+    ] bind ;

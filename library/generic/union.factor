@@ -7,48 +7,18 @@ sequences strings words vectors ;
 ! Union metaclass for dispatch on multiple classes.
 SYMBOL: union
 
-union [
-    [ ] swap "members" word-prop [
-        builtin-supertypes append
-    ] each
-] "builtin-supertypes" set-word-prop
-
-union [
-    ( generic vtable definition class -- )
-    "members" word-prop [ >r 3dup r> add-method ] each 3drop
-] "add-method" set-word-prop
-
-union 55 "priority" set-word-prop
-
-union [
-    swap builtin-supertypes swap builtin-supertypes contained?
-] "class<" set-word-prop
-
-: union-predicate ( definition -- list )
+: union-predicate ( members -- list )
     [
-        [
-            \ dup ,
-            unswons "predicate" word-prop %
-            [ drop t ] ,
-            union-predicate ,
-            \ ifte ,
-        ] make-list
-    ] [
-        [ drop f ]
-    ] ifte* ;
+        "predicate" word-prop \ dup swons [ drop t ] cons
+    ] map [ drop f ] swap alist>quot ;
 
-: define-union ( class predicate definition -- )
+: set-members ( class members -- )
+    2dup [ types ] map concat "types" set-word-prop
+    "members" set-word-prop ;
+
+: define-union ( class predicate members -- )
     #! We have to turn the f object into the f word, same for t.
-    [
-        [
-            [
-                [[ f POSTPONE: f ]]
-                [[ t POSTPONE: t ]]
-            ] assoc dup
-        ] keep ?
-    ] map
-    [ union-predicate define-compound ] keep
-    dupd "members" set-word-prop
-    union define-class ;
+    3dup nip set-members pick union define-class
+    union-predicate define-predicate ;
 
 PREDICATE: word union metaclass union = ;

@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: kernel-internals
-USING: words parser kernel namespaces lists strings math
-hashtables errors sequences vectors ;
+IN: generic
+USING: errors hashtables kernel kernel-internals lists math
+namespaces parser sequences strings vectors words ;
 
 ! Tuples are really arrays in the runtime, but with a different
 ! type number. The layout is as follows:
@@ -12,53 +12,18 @@ hashtables errors sequences vectors ;
 ! slot 2 - the class, a word
 ! slot 3 - the delegate tuple, or f
 
-: make-tuple ( class size -- tuple )
-    #! Internal allocation function. Do not call it directly,
-    #! since you can fool the runtime and corrupt memory by
-    #! specifying an incorrect size.
-    <tuple> [ 2 set-slot ] keep ;
+: class ( object -- class )
+    dup tuple? [ 2 slot ] [ type type>class ] ifte ; inline
 
-: class-tuple 2 slot ; inline
-
-IN: generic
-
-DEFER: tuple?
-BUILTIN: tuple 18 tuple? ;
-
-M: tuple delegate 3 slot ;
-M: tuple set-delegate 3 set-slot ;
-
-#! arrayed objects can be passed to array-nth, and set-array-nth
-UNION: arrayed array tuple ;
-
-: class ( obj -- class )
-    #! The class of an object.
-    dup tuple? [ class-tuple ] [ type builtin-type ] ifte ;
-
-: (literal-tuple) ( list size -- tuple )
-    dup <tuple> swap [
-        ( list tuple n -- list tuple n )
-        pick car pick pick swap set-array-nth
-        >r >r cdr r> r>
-    ] repeat nip ;
-
-: literal-tuple ( list -- tuple )
-    dup car "tuple-size" word-prop over length over = [
-        (literal-tuple)
-    ] [
-        "Incorrect tuple length" throw
-    ] ifte ;
+: class-tuple ( object -- class )
+    dup tuple? [ 2 slot ] [ drop f ] ifte ; inline
 
 : tuple-predicate ( word -- )
     #! Make a foo? word for testing the tuple class at the top
     #! of the stack.
-    dup predicate-word 2dup unit "predicate" set-word-prop
-    swap [
-        [ dup tuple? ] %
-        [ \ class-tuple , literal, \ eq? , ] make-list ,
-        [ drop f ] ,
-        \ ifte ,
-    ] make-list define-compound ;
+    dup predicate-word
+    [ \ class-tuple , over literalize , \ eq? , ] [ ] make
+    define-predicate ;
 
 : forget-tuple ( class -- )
     dup forget "predicate" word-prop car [ forget ] when* ;
@@ -66,104 +31,52 @@ UNION: arrayed array tuple ;
 : check-shape ( word slots -- )
     #! If the new list of slots is different from the previous,
     #! forget the old definition.
-    >r "use" get search dup [
+    >r "in" get lookup dup [
         dup "tuple-size" word-prop r> length 2 + =
         [ drop ] [ forget-tuple ] ifte
     ] [
         r> 2drop
     ] ifte ;
 
+: delegate-slots { { 3 delegate set-delegate } } ;
+
 : tuple-slots ( tuple slots -- )
     2dup "slot-names" set-word-prop
     2dup length 2 + "tuple-size" set-word-prop
-    4 -rot simple-slots ;
+    dupd 4 simple-slots
+    2dup delegate-slots swap append "slots" set-word-prop
+    define-slots ;
 
-: define-constructor ( word def -- )
-    >r [ word-name "in" get constructor-word ] keep [
-        dup literal, "tuple-size" word-prop , \ make-tuple ,
-    ] make-list r> append define-compound ;
+: tuple-constructor ( class -- word )
+    word-name "in" get constructor-word dup save-location ;
+
+: define-constructor ( word class def -- )
+    >r [
+        dup literalize , "tuple-size" word-prop , \ make-tuple ,
+    ] [ ] make r> append define-compound ;
 
 : default-constructor ( tuple -- )
-    dup [
-        "slots" word-prop
-        reverse [ peek unit , \ keep , ] each
-    ] make-list define-constructor ;
+    [ tuple-constructor ] keep dup [
+        "slots" word-prop 1 swap tail-slice reverse-slice
+        [ peek unit , \ keep , ] each
+    ] [ ] make define-constructor ;
 
 : define-tuple ( tuple slots -- )
     2dup check-shape
     >r create-in
     dup intern-symbol
     dup tuple-predicate
+    dup tuple "superclass" set-word-prop
     dup tuple "metaclass" set-word-prop
     dup r> tuple-slots
     default-constructor ;
-
-: alist>quot ( default alist -- quot )
-    #! Turn an association list that maps values to quotations
-    #! into a quotation that executes a quotation depending on
-    #! the value on the stack.
-    [
-        [
-            unswons
-            \ dup , unswons literal, \ eq? , \ drop swons ,
-            alist>quot , \ ifte ,
-        ] make-list
-    ] when* ;
-
-: (hash>quot) ( default hash -- quot )
-    [
-        \ dup , \ hashcode , dup bucket-count , \ rem ,
-        buckets>list [ alist>quot ] map-with >vector ,
-        \ dispatch ,
-    ] make-list ;
-
-: hash>quot ( default hash -- quot )
-    #! Turn a hash  table that maps values to quotations into a
-    #! quotation that executes a quotation depending on the
-    #! value on the stack.
-    ( dup hash-size 4 <= ) t [
-        hash>alist alist>quot
-    ] [
-        (hash>quot)
-    ] ifte ;
-
-: default-tuple-method ( generic -- quot )
-    #! If the generic does not define a specific method for a
-    #! tuple, execute the return value of this.
-    dup "methods" word-prop
-    tuple over hash* dup [
-        2nip cdr
-    ] [
-        drop object over hash* dup [
-            2nip cdr
-        ] [
-            2drop empty-method
-        ] ifte
-    ] ifte ;
-
-: tuple-methods ( generic -- hash )
-    #! A hashtable of methods on tuples.
-    "methods" word-prop [ car metaclass tuple = ] hash-subset ;
-
-: tuple-dispatch-quot ( generic -- quot )
-    #! Generate a quotation that performs tuple class dispatch
-    #! for methods defined on the given generic.
-    dup default-tuple-method \ drop swons
-    over tuple-methods hash>quot
-    >r "picker" word-prop [ class-tuple ] r> append3 ;
-
-: add-tuple-dispatch ( word vtable -- )
-    >r tuple-dispatch-quot tuple r> set-vtable ;
 
 ! A sequence of all slots in a tuple, used for equality testing.
 TUPLE: mirror tuple ;
 
 C: mirror ( tuple -- mirror )
-    over tuple? [
-        [ set-mirror-tuple ] keep
-    ] [
-        "Not a tuple" throw
-    ] ifte ;
+    over tuple? [ "Not a tuple" throw ] unless
+    [ set-mirror-tuple ] keep ;
 
 M: mirror nth ( n mirror -- elt )
     bounds-check mirror-tuple array-nth ;
@@ -173,6 +86,10 @@ M: mirror set-nth ( n mirror -- elt )
 
 M: mirror length ( mirror -- len )
     mirror-tuple array-capacity ;
+
+: literal-tuple ( seq -- tuple )
+    dup first "tuple-size" word-prop <tuple>
+    [ <mirror> 0 swap rot copy-into ] keep ;
 
 : clone-tuple ( tuple -- tuple )
     #! Make a shallow copy of a tuple, without cloning its
@@ -203,18 +120,7 @@ M: tuple = ( obj tuple -- ? )
         ] ifte
     ] ifte ;
 
-tuple [
-    ( generic vtable definition class -- )
-    2drop add-tuple-dispatch
-] "add-method" set-word-prop
-
-tuple [
-    drop tuple "builtin-type" word-prop unit
-] "builtin-supertypes" set-word-prop
-
-tuple 10 "priority" set-word-prop
-
-tuple [ 2drop t ] "class<" set-word-prop
+tuple [ 2drop f ] "class<" set-word-prop
 
 PREDICATE: word tuple-class metaclass tuple = ;
 

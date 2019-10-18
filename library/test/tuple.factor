@@ -1,5 +1,5 @@
 IN: temporary
-USING: generic kernel test math parser ;
+USING: errors generic kernel math parser sequences test words ;
 
 TUPLE: rect x y w h ;
 C: rect
@@ -81,3 +81,24 @@ TUPLE: delegate-clone ;
 
 [ << delegate-clone << empty f >> >> ]
 [ << delegate-clone << empty f >> >> clone ] unit-test
+
+[ t ] [ \ null \ delegate-clone class< ] unit-test
+[ f ] [ \ object \ delegate-clone class< ] unit-test
+[ f ] [ \ object \ delegate-clone class< ] unit-test
+[ t ] [ \ delegate-clone \ tuple class< ] unit-test
+[ f ] [ \ tuple \ delegate-clone class< ] unit-test
+
+! Compiler regression
+[ t ] [ [ t length ] [ no-method-object ] catch ] unit-test
+
+! This must be the last test in the file!
+[ "<constructor-test>" ]
+[ "TUPLE: constructor-test ; C: constructor-test ;" eval word word-name ] unit-test
+
+! There was a typo in check-shape; it would unintern the wrong
+! words!
+[ "temporary-1" ]
+[
+    "IN: temporary-1 SYMBOL: foobar IN: temporary TUPLE: foobar ;" eval
+    "foobar" [ "temporary-1" "temporary" ] search word-vocabulary
+] unit-test

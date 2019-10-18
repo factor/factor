@@ -1,20 +1,15 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien hashtables kernel lists namespaces sdl sequences
-strings styles io ;
-
-: surface-rect ( x y surface -- rect )
-    dup surface-w swap surface-h make-rect ;
+USING: alien hashtables io kernel lists math namespaces sdl
+sequences strings styles ;
 
 : draw-surface ( x y surface -- )
     surface get SDL_UnlockSurface
-    [
-        [ surface-rect ] keep swap surface get 0 0
-    ] keep surface-rect swap rot SDL_UpperBlit drop
-    surface get dup must-lock-surface? [
-        SDL_LockSurface
-    ] when drop ;
+    [ [ surface-rect ] keep swap surface get 0 0 ] keep
+    surface-rect swap rot SDL_UpperBlit drop
+    surface get dup must-lock-surface?
+    [ SDL_LockSurface ] when drop ;
 
 : filter-nulls ( str -- str )
     [ dup 0 = [ drop CHAR: \s ] when ] map ;
@@ -32,8 +27,8 @@ strings styles io ;
         2drop
     ] [
         >r [ gadget-font ] keep r> swap
-        fg 3unlist make-color
+        fg first3 make-color
         TTF_RenderUNICODE_Blended
-        [ >r origin get 2unseq r> draw-surface ] keep
+        [ >r origin get first2 r> draw-surface ] keep
         SDL_FreeSurface
     ] ifte ;

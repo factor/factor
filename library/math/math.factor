@@ -4,34 +4,34 @@ IN: math
 USING: errors generic kernel math-internals ;
 
 ! Math operations
-G: number= ( x y -- ? ) [ ] [ arithmetic-type ] ;
+G: number= ( x y -- ? ) math-combination ; foldable
 M: object number= 2drop f ;
 
-G: <  ( x y -- ? ) [ ] [ arithmetic-type ] ;
-G: <= ( x y -- ? ) [ ] [ arithmetic-type ] ;
-G: >  ( x y -- ? ) [ ] [ arithmetic-type ] ;
-G: >= ( x y -- ? ) [ ] [ arithmetic-type ] ;
+G: <  ( x y -- ? ) math-combination ; foldable
+G: <= ( x y -- ? ) math-combination ; foldable
+G: >  ( x y -- ? ) math-combination ; foldable
+G: >= ( x y -- ? ) math-combination ; foldable
 
-G: +   ( x y -- x+y ) [ ] [ arithmetic-type ] ;
-G: -   ( x y -- x-y ) [ ] [ arithmetic-type ] ;
-G: *   ( x y -- x*y ) [ ] [ arithmetic-type ] ;
-G: /   ( x y -- x/y ) [ ] [ arithmetic-type ] ;
-G: /i  ( x y -- x/y ) [ ] [ arithmetic-type ] ;
-G: /f  ( x y -- x/y ) [ ] [ arithmetic-type ] ;
-G: mod ( x y -- x%y ) [ ] [ arithmetic-type ] ;
+G: +   ( x y -- x+y ) math-combination ; foldable
+G: -   ( x y -- x-y ) math-combination ; foldable
+G: *   ( x y -- x*y ) math-combination ; foldable
+G: /   ( x y -- x/y ) math-combination ; foldable
+G: /i  ( x y -- x/y ) math-combination ; foldable
+G: /f  ( x y -- x/y ) math-combination ; foldable
+G: mod ( x y -- x%y ) math-combination ; foldable
 
-G: /mod ( x y -- x/y x%y ) [ ] [ arithmetic-type ] ;
+G: /mod ( x y -- x/y x%y ) math-combination ; foldable
 
-G: bitand ( x y -- z ) [ ] [ arithmetic-type ] ;
-G: bitor  ( x y -- z ) [ ] [ arithmetic-type ] ;
-G: bitxor ( x y -- z ) [ ] [ arithmetic-type ] ;
-G: shift  ( x n -- y ) [ ] [ arithmetic-type ] ;
+G: bitand ( x y -- z ) math-combination ; foldable
+G: bitor  ( x y -- z ) math-combination ; foldable
+G: bitxor ( x y -- z ) math-combination ; foldable
+G: shift  ( x n -- y ) math-combination ; foldable
 
-GENERIC: bitnot ( n -- n )
+GENERIC: bitnot ( n -- n ) foldable
 
-GENERIC: truncate ( n -- n )
-GENERIC: floor    ( n -- n )
-GENERIC: ceiling  ( n -- n )
+GENERIC: truncate ( n -- n ) foldable
+GENERIC: floor    ( n -- n ) foldable
+GENERIC: ceiling  ( n -- n ) foldable
 
 : max ( x y -- z ) [ > ] 2keep ? ; inline
 : min ( x y -- z ) [ < ] 2keep ? ; inline
@@ -39,7 +39,7 @@ GENERIC: ceiling  ( n -- n )
 : between? ( x min max -- ? )
     #! Push if min <= x <= max. Handles case where min > max
     #! by swapping them.
-    2dup > [ swap ] when  >r dupd max r> min = ;
+    2dup > [ swap ] when  >r dupd max r> min = ; foldable
 
 : sq dup * ; inline
 
@@ -48,16 +48,16 @@ GENERIC: ceiling  ( n -- n )
 
 : rem ( x y -- x%y )
     #! Like modulus, but always gives a positive result.
-    [ mod ] keep  over 0 < [ + ] [ drop ] ifte ;
+    [ mod ] keep  over 0 < [ + ] [ drop ] ifte ; inline
 
 : sgn ( n -- -1/0/1 )
     #! Push the sign of a real number.
-    dup 0 = [ drop 0 ] [ 1 < -1 1 ? ] ifte ;
+    dup 0 = [ drop 0 ] [ 1 < -1 1 ? ] ifte ; foldable
 
 GENERIC: abs ( z -- |z| )
 
 : align ( offset width -- offset )
-    2dup mod dup 0 number= [ 2drop ] [ - + ] ifte ;
+    2dup mod dup 0 number= [ 2drop ] [ - + ] ifte ; inline
 
 : (repeat) ( i n quot -- )
     pick pick >=
@@ -72,17 +72,12 @@ GENERIC: abs ( z -- |z| )
 : times ( n quot -- | quot: -- )
     swap [ >r dup slip r> ] repeat drop ; inline
 
-: 2repeat ( i j quot -- | quot: i j -- i j )
-    rot [
-        rot [ [ rot dup slip -rot ] repeat ] keep -rot
-    ] repeat 2drop ; inline
-
 : power-of-2? ( n -- ? )
     dup 0 > [
         dup dup neg bitand =
     ] [
         drop f
-    ] ifte ;
+    ] ifte ; foldable
 
 : log2 ( n -- b )
     #! Log base two for integers.
@@ -90,4 +85,6 @@ GENERIC: abs ( z -- |z| )
         "Input must be positive" throw
     ] [
         dup 1 = [ drop 0 ] [ 2 /i log2 1 + ] ifte
-    ] ifte ;
+    ] ifte ; foldable
+
+GENERIC: number>string ( str -- num ) foldable

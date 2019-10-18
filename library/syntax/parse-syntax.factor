@@ -4,7 +4,7 @@
 ! Bootstrapping trick; see doc/bootstrap.txt.
 IN: !syntax
 USING: alien errors generic hashtables kernel lists math
-namespaces parser sequences strings syntax unparse vectors
+namespaces parser sequences strings syntax vectors
 words ;
 
 : parsing ( -- )
@@ -17,20 +17,27 @@ words ;
     #! Mark the last word to be inlined.
     word  t "inline" set-word-prop ; parsing
 
+: flushable ( -- )
+    #! Declare that a word may be removed if the value it
+    #! computes is unused.
+    word  t "flushable" set-word-prop ; parsing
+
+: foldable ( -- )
+    #! Declare a word as safe for compile-time evaluation.
+    #! Foldable implies flushable, since we can first fold to
+    #! a constant then flush the constant.
+    word
+    dup t "foldable" set-word-prop
+    t "flushable" set-word-prop ; parsing
+
 ! The variable "in-definition" is set inside a : ... ;.
 ! ( and #! then add "stack-effect" and "documentation"
 ! properties to the current word if it is set.
 
 ! Booleans
 
-! The canonical t is a heap-allocated dummy object.
-BUILTIN: t 7 t? ;
 : t t swons ; parsing
 
-! In the runtime, the canonical f is represented as a null
-! pointer with tag 3. So
-! f address . ==> 3
-BUILTIN: f 9 not ;
 : f f swons ; parsing
 
 ! Lists
@@ -39,7 +46,7 @@ BUILTIN: f 9 not ;
 
 ! Conses (whose cdr might not be a list)
 : [[ f ; parsing
-: ]] 2unlist swons swons ; parsing
+: ]] first2 swons swons ; parsing
 
 ! Vectors
 : { f ; parsing
@@ -49,17 +56,14 @@ BUILTIN: f 9 not ;
 : {{ f ; parsing
 : }} alist>hash swons ; parsing
 
-! Tuples.
-: << f ; parsing
-: >> reverse literal-tuple swons ; parsing
-
 ! Do not execute parsing word
 : POSTPONE: ( -- ) scan-word swons ; parsing
 
 ! Word definitions
 : :
     #! Begin a word definition. Word name follows.
-    CREATE [ define-compound ] [ ] "in-definition" on ; parsing
+    CREATE dup reset-generic [ define-compound ]
+    [ ] "in-definition" on ; parsing
 
 : ;
     #! End a word definition.
@@ -68,12 +72,16 @@ BUILTIN: f 9 not ;
 ! Symbols
 : SYMBOL:
     #! A symbol is a word that pushes itself when executed.
-    CREATE define-symbol ; parsing
+    CREATE dup reset-generic define-symbol ; parsing
 
 : \
-    #! Parsed as a piece of code that pushes a word on the stack
-    #! \ foo ==> [ foo ] car
-    scan-word literalize [ swons ] each ; parsing
+    #! Word literals: \ foo
+    scan-word literalize swons ; parsing
+
+! Long wrapper syntax. Only used in the rare case that another
+! wrapper is being wrapped.
+: W[ [ ] ; parsing
+: ]W first <wrapper> swons ; parsing
 
 ! Vocabularies
 : PRIMITIVE:
@@ -83,7 +91,7 @@ BUILTIN: f 9 not ;
 : DEFER:
     #! Create a word with no definition. Used for mutually
     #! recursive words.
-    CREATE drop ; parsing
+    CREATE dup reset-generic drop ; parsing
 
 : FORGET:
     #! Followed by a word name. The word is removed from its
@@ -125,3 +133,17 @@ BUILTIN: f 9 not ;
 : #!
     #! Documentation comment.
     until-eol parsed-documentation ; parsing
+
+! Complex numbers
+: #{ f ; parsing
+: }# dup second swap first rect> swons ; parsing
+
+! Reading integers in other bases
+: (BASE) ( base -- )
+    #! Reads an integer in a specific base.
+    scan swap base> swons ;
+
+: HEX: 16 (BASE) ; parsing
+: DEC: 10 (BASE) ; parsing
+: OCT: 8 (BASE) ; parsing
+: BIN: 2 (BASE) ; parsing

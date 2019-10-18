@@ -6,69 +6,34 @@ IN: lists USING: generic kernel sequences ;
 ! else depends on, and is loaded early in bootstrap.
 ! lists.factor has everything else.
 
-DEFER: cons?
-BUILTIN: cons 2 cons? [ 0 "car" f ] [ 1 "cdr" f ] ;
-
 ! We borrow an idiom from Common Lisp. The car/cdr of an empty
 ! list is the empty list.
 M: f car ;
 M: f cdr ;
 
-UNION: general-list f cons ;
+UNION: general-list POSTPONE: f cons ;
 
 GENERIC: >list ( seq -- list )
 M: general-list >list ( list -- list ) ;
 
 : last ( list -- last )
     #! Last cons of a list.
-    dup cdr cons? [ cdr last ] when ;
+    dup cdr cons? [ cdr last ] when ; foldable
 
 PREDICATE: general-list list ( list -- ? )
     #! Proper list test. A proper list is either f, or a cons
     #! cell whose cdr is a proper list.
     dup [ last cdr ] when not ;
 
-: uncons ( [[ car cdr ]] -- car cdr ) dup car swap cdr ;
-: unswons ( [[ car cdr ]] -- cdr car ) dup cdr swap car ;
+: uncons ( [[ car cdr ]] -- car cdr ) dup car swap cdr ; inline
+: unswons ( [[ car cdr ]] -- cdr car ) dup cdr swap car ; inline
 
-: swons ( cdr car -- [[ car cdr ]] ) swap cons ;
-: unit ( a -- [ a ] ) f cons ;
-: 2list ( a b -- [ a b ] ) unit cons ;
-: 3list ( a b c -- [ a b c ] ) 2list cons ;
-: 2unlist ( [ a b ] -- a b ) uncons car ;
-: 3unlist ( [ a b c ] -- a b c ) uncons uncons car ;
+: swons ( cdr car -- [[ car cdr ]] ) swap cons ; inline
+: unit ( a -- [ a ] ) f cons ; inline
+: 2list ( a b -- [ a b ] ) unit cons ; inline
 
-: 2car ( cons cons -- car car ) swap car swap car ;
-: 2cdr ( cons cons -- car car ) swap cdr swap cdr ;
-: 2cons ( ca1 ca2 cd1 cd2 -- c1 c2 ) rot swons >r cons r> ;
-: 2uncons ( c1 c2 -- ca1 ca2 cd1 cd2 ) [ 2car ] 2keep 2cdr ;
-
-: zip ( list list -- list )
-    #! Make a new list containing pairs of corresponding
-    #! elements from the two given lists.
-    2dup and [ 2uncons zip >r cons r> cons ] [ 2drop [ ] ] ifte ;
-
-: unzip ( assoc -- keys values )
-    #! Split an association list into two lists of keys and
-    #! values.
-    [ uncons >r uncons r> unzip 2cons ] [ [ ] [ ] ] ifte* ;
-
-: unpair ( list -- list1 list2 )
-    [ uncons uncons unpair rot swons >r cons r> ] [ f f ] ifte* ;
-
-: <queue> ( -- queue )
-    #! Make a new functional queue.
-    [[ [ ] [ ] ]] ;
-
-: queue-empty? ( queue -- ? )
-    uncons or not ;
-
-: enque ( obj queue -- queue )
-    uncons >r cons r> cons ;
-
-: deque ( queue -- obj queue )
-    uncons
-    [ uncons swapd cons ] [ reverse uncons f swons ] ifte* ;
+: 2car ( cons cons -- car car ) swap car swap car ; inline
+: 2cdr ( cons cons -- car car ) swap cdr swap cdr ; inline
 
 M: cons = ( obj cons -- ? )
     2dup eq? [

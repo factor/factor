@@ -701,10 +701,10 @@ FUNCTION: void glViewport ( GLint x, GLint y, GLsizei width, GLsizei height ) ;
 FUNCTION: void glPushMatrix ( ) ;
 FUNCTION: void glPopMatrix ( ) ;
 FUNCTION: void glLoadIdentity ( ) ;
-FUNCTION: void glLoadMatrixd ( GLdouble *m ) ;
-FUNCTION: void glLoadMatrixf ( GLfloat *m ) ;
-FUNCTION: void glMultMatrixd ( GLdouble *m ) ;
-FUNCTION: void glMultMatrixf ( GLfloat *m ) ;
+FUNCTION: void glLoadMatrixd ( GLdouble* m ) ;
+FUNCTION: void glLoadMatrixf ( GLfloat* m ) ;
+FUNCTION: void glMultMatrixd ( GLdouble* m ) ;
+FUNCTION: void glMultMatrixf ( GLfloat* m ) ;
 FUNCTION: void glRotated ( GLdouble angle, GLdouble x, GLdouble y, GLdouble z ) ;
 FUNCTION: void glRotatef ( GLfloat angle, GLfloat x, GLfloat y, GLfloat z ) ;
 FUNCTION: void glScaled ( GLdouble x, GLdouble y, GLdouble z ) ;
@@ -892,10 +892,10 @@ FUNCTION: void glRectf ( GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2 ) ;
 FUNCTION: void glRecti ( GLint x1, GLint y1, GLint x2, GLint y2 ) ;
 FUNCTION: void glRects ( GLshort x1, GLshort y1, GLshort x2, GLshort y2 ) ;
 
-FUNCTION: void glRectdv ( GLdouble *v1, GLdouble *v2 ) ;
-FUNCTION: void glRectfv ( GLfloat *v1, GLfloat *v2 ) ;
-FUNCTION: void glRectiv ( GLint *v1, GLint *v2 ) ;
-FUNCTION: void glRectsv ( GLshort *v1, GLshort *v2 ) ;
+FUNCTION: void glRectdv ( GLdouble* v1, GLdouble* v2 ) ;
+FUNCTION: void glRectfv ( GLfloat* v1, GLfloat* v2 ) ;
+FUNCTION: void glRectiv ( GLint* v1, GLint* v2 ) ;
+FUNCTION: void glRectsv ( GLshort* v1, GLshort* v2 ) ;
 
 
 ! Vertex Arrays (1.1)

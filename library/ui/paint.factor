@@ -7,36 +7,30 @@ namespaces sdl sequences strings styles vectors ;
 SYMBOL: clip
 
 : >sdl-rect ( rectangle -- sdlrect )
-    [ rectangle-loc 2unseq ] keep rectangle-dim 2unseq make-rect ;
+    [ rect-loc first2 ] keep rect-dim first2 make-rect ;
 
-: set-clip ( rect -- ? )
+: set-clip ( rect -- )
     #! The top/left corner of the clip rectangle is the location
     #! of the gadget on the screen. The bottom/right is the
-    #! intersected clip rectangle. Return f if the clip region
-    #! is an empty region.
-    surface get swap >sdl-rect SDL_SetClipRect ;
+    #! intersected clip rectangle.
+    surface get swap >sdl-rect SDL_SetClipRect drop ;
 
-: with-clip ( shape quot -- )
-    #! All drawing done inside the quotation is clipped to the
-    #! shape's bounds.
-    [
-        >r screen-bounds clip [ intersect dup ] change set-clip
-        [ r> call ] [ r> 2drop ] ifte
-    ] with-scope ; inline
+: visible-children ( gadget -- seq ) clip get swap children-on ;
 
 GENERIC: draw-gadget* ( gadget -- )
 
+: do-clip ( gadget -- )
+    >absolute clip [ intersect dup ] change set-clip ;
+
 : draw-gadget ( gadget -- )
-    dup gadget-visible? [
-        dup [
-            dup rectangle-loc origin [ v+ ] change
-            dup draw-gadget*
-            gadget-children [ draw-gadget ] each
-        ] with-clip
+    clip get over inside? [
+        [
+            dup do-clip dup translate dup draw-gadget*
+            visible-children [ draw-gadget ] each
+        ] with-scope
     ] [ drop ] ifte ;
 
-: paint-prop* ( gadget key -- value )
-    swap gadget-paint ?hash ;
+: paint-prop* ( gadget key -- value ) swap gadget-paint ?hash ;
 
 : paint-prop ( gadget key -- value )
     over [
@@ -70,18 +64,33 @@ GENERIC: draw-boundary ( gadget boundary -- )
 M: f draw-interior 2drop ;
 M: f draw-boundary 2drop ;
 
+! Solid fill/border
 TUPLE: solid ;
 
 : rect>screen ( shape -- x1 y1 x2 y2 )
-    >r origin get dup r> rectangle-dim v+ >r 2unseq r> 2unseq ;
+    >r origin get dup r> rect-dim v+
+    >r first2 r> first2 >r 1 - r> 1 - ;
 
 ! Solid pen
 M: solid draw-interior
     drop >r surface get r> [ rect>screen ] keep bg rgb boxColor ;
 
 M: solid draw-boundary
-    drop >r surface get r> [ rect>screen >r 1 - r> 1 - ] keep
+    drop >r surface get r> [ rect>screen ] keep
     fg rgb rectangleColor ;
+
+! Rollover only
+TUPLE: rollover-only ;
+
+C: rollover-only << solid f >> over set-delegate ;
+
+M: rollover-only draw-interior ( gadget interior -- )
+    over rollover paint-prop
+    [ delegate draw-interior ] [ 2drop ] ifte ;
+
+M: rollover-only draw-boundary ( gadget boundary -- )
+    over rollover paint-prop
+    [ delegate draw-boundary ] [ 2drop ] ifte ;
 
 ! Gradient pen
 TUPLE: gradient vector from to ;
@@ -113,17 +122,17 @@ TUPLE: gradient vector from to ;
     dup first [ 3dup gradient-y ] repeat 2drop ;
 
 M: gradient draw-interior ( gadget gradient -- )
-    swap rectangle-dim { 1 1 1 } vmax
+    swap rect-dim { 1 1 1 } vmax
     over gradient-vector { 1 0 0 } =
     [ horiz-gradient ] [ vert-gradient ] ifte ;
 
 ! Bevel pen
 TUPLE: bevel width ;
 
-: x1/x2/y1 surface get pick pick >r 2unseq r> first swap ;
-: x1/x2/y2 surface get pick pick >r first r> 2unseq ;
-: x1/y1/y2 surface get pick pick >r 2unseq r> second ;
-: x2/y1/y2 surface get pick pick >r second r> 2unseq swapd ;
+: x1/x2/y1 surface get pick pick >r first2 r> first swap ;
+: x1/x2/y2 surface get pick pick >r first r> first2 ;
+: x1/y1/y2 surface get pick pick >r first2 r> second ;
+: x2/y1/y2 surface get pick pick >r second r> first2 swapd ;
 
 SYMBOL: bevel-1
 SYMBOL: bevel-2
@@ -144,12 +153,10 @@ SYMBOL: bevel-2
 M: bevel draw-boundary ( gadget boundary -- )
     #! Ugly code.
     bevel-width [
-        [
-            >r origin get over rectangle-dim over v+ r>
-            { 1 1 0 } n*v tuck v- { 1 1 0 } v- >r v+ r>
-            rot draw-bevel
-        ] 2keep
-    ] repeat drop ;
+        >r origin get over rect-dim over v+ r>
+        { 1 1 0 } n*v tuck v- { 1 1 0 } v- >r v+ r>
+        rot draw-bevel
+    ] each-with ;
 
 M: gadget draw-gadget* ( gadget -- )
     dup
@@ -164,3 +171,9 @@ M: gadget draw-gadget* ( gadget -- )
 
 : <bevel-gadget> ( -- gadget )
     <plain-gadget> dup << bevel f 2 >> boundary set-paint-prop ;
+
+: draw-line ( from to color -- )
+    >r >r >r surface get r> first2 r> first2 r> rgb lineColor ;
+
+: draw-fanout ( from tos color -- )
+    -rot [ >r 2dup r> rot draw-line ] each 2drop ;

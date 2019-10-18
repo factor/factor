@@ -38,21 +38,3 @@ math namespaces parser sequences strings words ;
     ]
     "struct-name" get define-c-type
     "struct-name" get "in" get init-c-type ;
-
-: BEGIN-STRUCT: ( -- offset )
-    scan "struct-name" set  0 ; parsing
-
-: FIELD: ( offset -- offset )
-    scan scan define-field ; parsing
-
-: END-STRUCT ( length -- )
-    define-struct-type ; parsing
-
-: BEGIN-UNION: ( -- max )
-    scan "struct-name" set  0 ; parsing
-
-: MEMBER: ( max -- max )
-    scan define-member ; parsing
-
-: END-UNION ( max -- )
-    define-struct-type ; parsing

@@ -1,13 +1,12 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic hashtables kernel lists math matrices namespaces
-sequences vectors ;
+USING: gadgets-layouts generic hashtables kernel lists math
+namespaces sequences vectors ;
 
 : remove-gadget ( gadget parent -- )
-    [ 2dup gadget-children remq swap set-gadget-children ] keep
-    relayout
-    f swap set-gadget-parent ;
+    2dup gadget-children remove over set-gadget-children
+    relayout f swap set-gadget-parent ;
 
 : unparent ( gadget -- )
     [
@@ -16,9 +15,8 @@ sequences vectors ;
     ] when* ;
 
 : (clear-gadget) ( gadget -- )
-    gadget-children [
-        dup [ f swap set-gadget-parent ] each 0 swap set-length
-    ] when* ;
+    dup gadget-children [ f swap set-gadget-parent ] each
+    f swap set-gadget-children ;
 
 : clear-gadget ( gadget -- )
     dup (clear-gadget) relayout ;
@@ -34,6 +32,10 @@ sequences vectors ;
 : add-gadget ( gadget parent -- )
     #! Add a gadget to a parent gadget.
     [ (add-gadget) ] keep relayout ;
+
+: add-gadgets ( seq parent -- )
+    #! Add all gadgets in a sequence to a parent gadget.
+    swap [ over (add-gadget) ] each relayout ;
 
 : (parents-down) ( list gadget -- list )
     [ [ swons ] keep gadget-parent (parents-down) ] when* ;
@@ -56,10 +58,22 @@ sequences vectors ;
 
 : screen-loc ( gadget -- point )
     #! The position of the gadget on the screen.
-    parents-up { 0 0 0 } [ rectangle-loc v+ ] reduce ;
+    parents-up { 0 0 0 } [ rect-loc v+ ] reduce ;
 
-: relative ( g1 g2 -- g2-g1 )
-    screen-loc swap screen-loc v- ;
+: gadget-point ( gadget vector -- point )
+    #! { 0 0 0 } - top left corner
+    #! { 1/2 1/2 0 } - middle
+    #! { 1 1 0 } - bottom right corner
+    >r dup screen-loc swap rect-dim r> v* v+ ;
 
-: child? ( parent child -- ? )
-    parents-down memq? ;
+: relative ( g1 g2 -- g2-g1 ) screen-loc swap screen-loc v- ;
+
+: child? ( parent child -- ? ) parents-down memq? ;
+
+GENERIC: focusable-child* ( gadget -- gadget/t )
+
+M: gadget focusable-child* drop t ;
+
+: focusable-child ( gadget -- gadget )
+    dup focusable-child*
+    dup t = [ drop ] [ nip focusable-child ] ifte ;

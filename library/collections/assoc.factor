@@ -2,23 +2,11 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: lists USING: kernel sequences ;
 
-: assoc? ( list -- ? )
-    #! Push if the list appears to be an alist. An association
-    #! list is a list of conses where the car of each cons is a
-    #! key, and the cdr is a value.
-    dup list? [ [ cons? ] all? ] [ drop f ] ifte ;
-
 : assoc* ( key alist -- [[ key value ]] )
     #! Look up a key/value pair.
     [ car = ] find-with nip ;
 
 : assoc ( key alist -- value ) assoc* cdr ;
-
-: assq* ( key alist -- [[ key value ]] )
-    #! Looks up a key/value pair using identity comparison.
-    [ car eq? ] find-with nip ;
-
-: assq ( key alist -- value ) assq* cdr ;
 
 : remove-assoc ( key alist -- alist )
     #! Remove all key/value pairs with this key.

@@ -12,7 +12,6 @@ kernel-internals lists math memory namespaces words ;
 : compile-c-call ( symbol dll -- )
     2dup dlsym  19 LOAD32  0 1 rel-dlsym  19 MTLR  BLRL ;
 
-M: integer v>operand tag-bits shift ;
 M: vreg v>operand vreg-n 17 + ;
 
 M: %prologue generate-node ( vop -- )
@@ -86,7 +85,7 @@ M: %untag-fixnum generate-node ( vop -- )
 
 : tag-fixnum ( dest src -- ) tag-bits SLWI ;
 
-M: %tag-fixnum generate-node ( vop -- )
+M: %retag-fixnum generate-node ( vop -- )
     ! todo: formalize scratch register usage
     dest/src tag-fixnum ;
 
@@ -125,20 +124,5 @@ M: %type generate-node ( vop -- )
     "end" get save-xt
     17 18 MR ;
 
-M: %arithmetic-type generate-node ( vop -- )
-    0 <vreg> check-dest
-    <label> "end" set
-    ! Load top two stack values
-    3 14 -4 LWZ
-    4 14 0 LWZ
-    ! Compute their tags
-    3 3 tag-mask ANDI
-    4 4 tag-mask ANDI
-    ! Are the tags equal?
-    0 3 4 CMPL
-    "end" get BEQ
-    ! No, they are not equal. Call a runtime function to
-    ! coerce the integers to a higher type.
-    "arithmetic_type" f compile-c-call
-    "end" get save-xt
-    17 3 MR ;
+M: %tag generate-node ( vop -- )
+    dup vop-in-1 swap vop-out-1 tag-mask ANDI ;

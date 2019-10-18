@@ -150,17 +150,24 @@ char *to_c_string_unchecked(F_STRING *s)
 }
 
 /* FFI calls this */
-char *unbox_c_string(void)
+char* unbox_c_string(void)
 {
 	CELL str = dpop();
-	return (str ? to_c_string(untag_string(str)) : NULL);
+	if(type_of(str) == STRING_TYPE)
+		return to_c_string(untag_string(str));
+	else
+		return (char*)alien_offset(str);
 }
 
 /* FFI calls this */
 u16* unbox_utf16_string(void)
 {
 	/* Return pointer to first character */
-	return (u16*)(untag_string(dpop()) + 1);
+	CELL str = dpop();
+	if(type_of(str) == STRING_TYPE)
+		return (u16*)(untag_string(str) + 1);
+	else
+		return (u16*)alien_offset(str);
 }
 
 void primitive_char_slot(void)

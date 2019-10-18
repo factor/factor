@@ -37,14 +37,14 @@ USE: prettyprint
 : live-search-apropos-word ( string -- )
   #! Given a string that is a factor word, show the
   #! aporpos of that word.
-  <namespace> [
+  [
     "browser" "responder" set
     <pre> 
         stdio get <html-stream> [   
-          apropos.
+          apropos
         ] with-stream              
     </pre>
-  ] bind ;
+  ] with-scope ;
       
 : live-updater-responder ( -- )
   [
@@ -57,7 +57,7 @@ USE: prettyprint
       <body> 
        [
          [ 
-           "millis" [ millis prettyprint ] "Display Server millis" live-anchor
+           "millis" [ millis pprint ] "Display Server millis" live-anchor
            <div id= "millis" div>  
              "The millisecond time from the server will appear here" write 
            </div>         

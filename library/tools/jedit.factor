@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: jedit
-USING: kernel lists namespaces parser sequences io strings
-unparser words ;
+USING: errors io kernel lists math namespaces parser prettyprint
+sequences strings unparser vectors words ;
 
 ! Some words to send requests to a running jEdit instance to
 ! edit files and position the cursor on a specific line number.
@@ -14,17 +14,17 @@ unparser words ;
 : jedit-server-info ( -- port auth )
     jedit-server-file <file-reader> [
         readln drop
-        readln parse-number
-        readln parse-number
+        readln string>number
+        readln string>number
     ] with-stream ;
 
 : make-jedit-request ( files params -- code )
     [
-        "EditServer.handleClient(false,false,false,null," %
-        "new String[] {" %
-        [ unparse % "," % ] each
-        "null});\n" %
-    ] make-string ;
+        "EditServer.handleClient(false,false,false,null," write
+        "new String[] {" write
+        [ pprint "," write ] each
+        "null});\n" write
+    ] string-out ;
 
 : send-jedit-request ( request -- )
     jedit-server-info swap "localhost" swap <client> [
@@ -34,11 +34,11 @@ unparser words ;
     ] with-stream ;
 
 : jedit-line/file ( file line -- )
-    unparse "+line:" swap append 2list
+    number>string "+line:" swap append 2vector
     make-jedit-request send-jedit-request ;
 
 : jedit-file ( file -- )
-    unit make-jedit-request send-jedit-request ;
+    1vector make-jedit-request send-jedit-request ;
 
 : jedit ( word -- )
     #! Note that line numbers here start from 1
@@ -63,6 +63,9 @@ unparser words ;
 
 : read-packet ( -- string ) 4 read be> read ;
 
+: eval>string ( str -- )
+    [ [ [ eval ] keep ] try drop ] string-out ;
+
 : wire-server ( -- )
     #! Repeatedly read jEdit requests and execute them. Return
     #! on EOF.
@@ -73,12 +76,11 @@ unparser words ;
     #! required word info.
     dup [
         [
-            "vocabulary"
-            "name"
-            "stack-effect"
-        ] [
-            dupd word-prop
-        ] map >r definer r> cons
+            dup definer ,
+            dup word-vocabulary ,
+            dup word-name ,
+            "stack-effect" word-prop ,
+        ] [ ] make
     ] when ;
 
 : completions ( str pred -- list | pred: str word -- ? )

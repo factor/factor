@@ -13,9 +13,6 @@ USE: lists
     [ "text/html" 12 file-response ] string-out
 ] unit-test
 
-[ 5430 ]
-[ f "Content-Length: 5430" header-line content-length ] unit-test
-
 [
     [
         [[ "X-Spyware-Requested" "yes" ]]

@@ -4,7 +4,6 @@ IN: compiler-backend
 USING: alien assembler compiler inference kernel
 kernel-internals lists math memory namespaces sequences words ;
 
-M: integer v>operand tag-bits shift ;
 M: vreg v>operand vreg-n { EAX ECX EDX } nth ;
 
 ! Not used on x86
@@ -43,7 +42,7 @@ M: %return generate-node ( vop -- )
 M: %untag generate-node ( vop -- )
     vop-out-1 v>operand BIN: 111 bitnot AND ;
 
-M: %tag-fixnum generate-node ( vop -- )
+M: %retag-fixnum generate-node ( vop -- )
     vop-out-1 v>operand 3 SHL ;
 
 M: %untag-fixnum generate-node ( vop -- )
@@ -93,21 +92,6 @@ M: %type generate-node ( vop -- )
     f type MOV
     "end" get save-xt ;
 
-M: %arithmetic-type generate-node ( vop -- )
-    #! This one works directly with the stack. It outputs an
-    #! UNBOXED value in vop-out-1.
-    0 <vreg> check-dest
-    <label> "end" set
-    ! Load top two stack values
-    EAX [ ESI -4 ] MOV
-    ECX [ ESI ] MOV
-    ! Compute their tags
-    EAX tag-mask AND
-    ECX tag-mask AND
-    ! Are the tags equal?
-    EAX ECX CMP
-    "end" get JE
-    ! No, they are not equal. Call a runtime function to
-    ! coerce the integers to a higher type.
-    "arithmetic_type" f compile-c-call
-    "end" get save-xt ;
+M: %tag generate-node ( vop -- )
+    dup dup vop-in-1 check-dest
+    vop-in-1 v>operand tag-mask AND ;

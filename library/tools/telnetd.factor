@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: telnetd
-USING: errors listener kernel namespaces io threads parser ;
+USING: errors listener kernel math namespaces io threads parser ;
 
 : telnet-client ( socket -- )
     dup [ log-client print-banner listener ] with-stream ;
@@ -24,7 +24,7 @@ USING: errors listener kernel namespaces io threads parser ;
 IN: shells
 
 : telnet
-    "telnetd-port" get str>number telnetd ;
+    "telnetd-port" get string>number telnetd ;
 
-! This is a string since we str>number it above.
+! This is a string since we string>number it above.
 global [ "9999" "telnetd-port" set ] bind

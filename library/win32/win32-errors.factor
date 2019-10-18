@@ -70,8 +70,8 @@ CONSTANT: WAIT_TIMEOUT 258 ;
 
 : win32-error-message ( id -- string )
     4096 <buffer> dup >r >r >r
-    FORMAT_MESSAGE_FROM_SYSTEM NULL r>
-    LANG_NEUTRAL SUBLANG_DEFAULT MAKELANGID r> buffer-ptr <alien> 4096 NULL
+    FORMAT_MESSAGE_FROM_SYSTEM f r>
+    LANG_NEUTRAL SUBLANG_DEFAULT MAKELANGID r> buffer-ptr <alien> 4096 f
     FormatMessage r> 2dup buffer-reset nip dup buffer-contents 
     swap buffer-free ;
 

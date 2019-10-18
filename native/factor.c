@@ -10,8 +10,10 @@ void init_factor(char* image, CELL ds_size, CELL cs_size,
 	init_ffi();
 	init_arena(gen_count,young_size,aging_size);
 	init_compiler(code_size);
-	load_image(image,literal_size);
 	init_stacks(ds_size,cs_size);
+	callframe = F;
+	load_image(image,literal_size);
+	callframe = userenv[BOOT_ENV];
 	init_c_io();
 	init_signals();
 	init_errors();

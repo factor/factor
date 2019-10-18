@@ -4,22 +4,27 @@ IN: strings
 USING: generic kernel kernel-internals lists math namespaces
 sequences strings ;
 
-: empty-sbuf ( len -- sbuf ) dup <sbuf> [ set-length ] keep ;
+: empty-sbuf ( len -- sbuf )
+    dup <sbuf> [ set-length ] keep ; inline
 
-: fill ( count char -- string ) <repeated> >string ;
+: fill ( count char -- string )
+    <repeated> >string ; inline
 
 : padding ( string count char -- string )
     >r swap length - dup 0 <= [ r> 2drop "" ] [ r> fill ] ifte ;
+    flushable
 
 : pad-left ( string count char -- string )
-    pick >r padding r> append ;
+    pick >r padding r> append ; flushable
 
 : pad-right ( string count char -- string )
-    pick >r padding r> swap append ;
+    pick >r padding r> swap append ; flushable
 
-: ch>string ( ch -- str ) 1 <sbuf> [ push ] keep (sbuf>string) ;
+: ch>string ( ch -- str )
+    1 <sbuf> [ push ] keep (sbuf>string) ; flushable
 
-: >sbuf ( seq -- sbuf ) dup length <sbuf> [ swap nappend ] keep ;
+: >sbuf ( seq -- sbuf )
+    dup length <sbuf> [ swap nappend ] keep ; inline
 
 M: object >string >sbuf (sbuf>string) ;
 

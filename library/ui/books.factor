@@ -1,53 +1,55 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets
-USING: generic kernel lists math matrices sequences ;
+IN: gadgets-books
+USING: gadgets gadgets-buttons gadgets-labels gadgets-layouts
+generic kernel lists math matrices sequences ;
 
 TUPLE: book page ;
 
 C: book ( pages -- book )
     <gadget> over set-delegate
     0 over set-book-page
-    swap [ over add-gadget ] each ;
+    [ add-gadgets ] keep ;
 
 M: book pref-dim ( book -- dim )
-    gadget-children { 0 0 0 } [ pref-dim vmax ] reduce ;
+    gadget-children [ pref-dim ] map { 0 0 0 } [ vmax ] reduce ;
 
 M: book layout* ( book -- )
-    dup rectangle-dim over gadget-children [
+    dup rect-dim over gadget-children [
         f over set-gadget-visible?
-        { 0 0 0 } over set-rectangle-loc
+        { 0 0 0 } over set-rect-loc
         set-gadget-dim
     ] each-with
     dup book-page swap gadget-children nth
-    t swap set-gadget-visible? ;
+    [ t swap set-gadget-visible? ] when* ;
 
 : show-page ( n book -- )
     [ gadget-children length rem ] keep
     [ set-book-page ] keep relayout ;
 
-: first-page ( book -- )
-    0 swap show-page ;
+: first-page ( book -- ) 0 swap show-page ;
 
-: prev-page ( book -- )
-    [ book-page 1 - ] keep show-page ;
+: prev-page ( book -- ) [ book-page 1 - ] keep show-page ;
 
-: next-page ( book -- )
-    [ book-page 1 + ] keep show-page ;
+: next-page ( book -- ) [ book-page 1 + ] keep show-page ;
 
-: last-page ( book -- )
-    -1 swap show-page ;
+: last-page ( book -- ) -1 swap show-page ;
 
-: book-buttons ( book -- gadget )
-    <line-shelf> swap [
-        [ "|<" first-page drop ]
-        [ "<" prev-page drop ]
-        [ ">" next-page drop ]
-        [ ">|" last-page drop ]
-    ] [
-        uncons swapd cons <button> over add-gadget
-    ] each-with ;
+TUPLE: book-browser book ;
 
-: <book-browser> ( book -- gadget )
-    dup book-buttons <frame>
-    [ add-top ] keep [ add-center ] keep ;
+: find-book ( gadget -- )
+    [ book-browser? ] find-parent book-browser-book ;
+
+: <book-buttons> ( book -- gadget )
+    [
+        { "|<" [ find-book first-page ] }
+        { "<"  [ find-book prev-page  ] }
+        { ">"  [ find-book next-page  ] }
+        { ">|" [ find-book last-page  ] }
+    ] [ first2 >r <label> r> <button> ] map
+    <shelf> [ add-gadgets ] keep ;
+
+C: book-browser ( book -- gadget )
+    <frame> over set-delegate
+    <book-buttons> over add-top
+    [ 2dup set-book-browser-book add-center ] keep ;

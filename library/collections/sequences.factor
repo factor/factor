@@ -11,26 +11,25 @@ USING: errors generic kernel math math-internals strings vectors ;
 ! kernel-internals vocabulary, so don't use them unless you have
 ! a good reason.
 
-GENERIC: empty? ( sequence -- ? )
-GENERIC: length ( sequence -- n )
+GENERIC: empty? ( sequence -- ? ) flushable
+GENERIC: length ( sequence -- n ) flushable
 GENERIC: set-length ( n sequence -- )
-GENERIC: nth ( n sequence -- obj )
+GENERIC: nth ( n sequence -- obj ) flushable
 GENERIC: set-nth ( value n sequence -- obj )
-GENERIC: thaw ( seq -- mutable-seq )
-GENERIC: like ( seq seq -- seq )
-GENERIC: reverse ( seq -- seq )
-GENERIC: reverse-slice ( seq -- seq )
-GENERIC: peek ( seq -- elt )
-GENERIC: head ( n seq -- seq )
-GENERIC: tail ( n seq -- seq )
-GENERIC: concat ( seq -- seq )
+GENERIC: thaw ( seq -- mutable-seq ) flushable
+GENERIC: like ( seq seq -- seq ) flushable
+GENERIC: reverse ( seq -- seq ) flushable
+GENERIC: reverse-slice ( seq -- seq ) flushable
+GENERIC: peek ( seq -- elt ) flushable
+GENERIC: head ( n seq -- seq ) flushable
+GENERIC: tail ( n seq -- seq ) flushable
 GENERIC: resize ( n seq -- seq )
 
 : immutable ( seq quot -- seq | quot: seq -- )
     swap [ thaw ] keep >r dup >r swap call r> r> like ; inline
 
 G: each ( seq quot -- | quot: elt -- )
-    [ over ] [ type ] ; inline
+    [ over ] standard-combination ; inline
 
 : each-with ( obj seq quot -- | quot: obj elt -- )
     swap [ with ] each 2drop ; inline
@@ -38,20 +37,11 @@ G: each ( seq quot -- | quot: elt -- )
 : reduce ( seq identity quot -- value | quot: x y -- z )
     swapd each ; inline
 
-G: 2map ( seq seq quot -- seq | quot: elt elt -- elt )
-    [ over ] [ type ] ; inline
-
 G: find ( seq quot -- i elt | quot: elt -- ? )
-    [ over ] [ type ] ; inline
+    [ over ] standard-combination ; inline
 
 : find-with ( obj seq quot -- i elt | quot: elt -- ? )
     swap [ with rot ] find 2swap 2drop ; inline
-
-G: find* ( i seq quot -- i elt | quot: elt -- ? )
-    [ over ] [ type ] ; inline
-
-: find-with* ( obj i seq quot -- i elt | quot: elt -- ? )
-    -rot [ with rot ] find* 2swap 2drop ; inline
 
 : first 0 swap nth ; inline
 : second 1 swap nth ; inline
@@ -60,12 +50,24 @@ G: find* ( i seq quot -- i elt | quot: elt -- ? )
 
 : push ( element sequence -- )
     #! Push a value on the end of a sequence.
-    dup length swap set-nth ;
+    dup length swap set-nth ; inline
 
-: 2nth ( s s n -- x x ) tuck swap nth >r swap nth r> ;
+: 2nth ( s s n -- x x ) tuck swap nth >r swap nth r> ; inline
 
-: 2unseq ( { x y } -- x y )
-    dup first swap second ;
+: first2 ( { x y } -- x y )
+    dup first swap second ; inline
 
-: 3unseq ( { x y z } -- x y z )
-    dup first over second rot third ;
+: first3 ( { x y z } -- x y z )
+    dup first over second rot third ; inline
+
+TUPLE: bounds-error index seq ;
+
+: bounds-error <bounds-error> throw ; inline
+
+: growable-check ( n seq -- fx seq )
+    >r >fixnum dup 0 fixnum<
+    [ r> 2dup bounds-error ] [ r> ] ifte ; inline
+
+: bounds-check ( n seq -- fx seq )
+    growable-check 2dup length fixnum>=
+    [ 2dup bounds-error ] when ; inline

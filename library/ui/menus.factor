@@ -1,35 +1,41 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets
-USING: generic kernel lists math namespaces sequences ;
+IN: gadgets-menus
+USING: gadgets gadgets-borders gadgets-buttons gadgets-layouts
+gadgets-labels generic kernel lists math namespaces sequences ;
 
-: show-menu ( menu -- )
-    hand screen-loc over set-rectangle-loc show-glass ;
+: retarget-drag ( -- )
+    hand [ rect-loc world get pick-up ] keep
+    2dup hand-clicked eq? [
+        2dup set-hand-clicked dup update-hand
+    ] unless 2drop ;
 
-: menu-item-border ( child -- border )
-    <plain-gadget> { 1 1 0 } <border> ;
-
-: <menu-item> ( label quot -- gadget )
-    >r <label> menu-item-border dup r> button-gestures ;
-
-TUPLE: menu ;
-
-: menu-actions ( menu -- )
+: menu-actions ( glass -- )
+    dup [ drop retarget-drag ] [ drag 1 ] set-action
     [ drop hide-glass ] [ button-down 1 ] set-action ;
 
-: assoc>menu ( assoc menu -- )
+: fit-bounds ( loc dim max -- loc )
+    #! Adjust loc to fit inside max.
+    swap v- { 0 0 0 } vmax vmin ;
+
+: menu-loc ( menu -- loc )
+    hand rect-loc swap rect-dim world get rect-dim fit-bounds ;
+
+: show-menu ( menu -- )
+    dup show-glass
+    dup menu-loc swap set-rect-loc
+    world get world-glass dup menu-actions
+    hand set-hand-clicked ;
+
+: menu-items ( assoc -- pile )
     #! Given an association list mapping labels to quotations.
     #! Prepend a call to hide-menu to each quotation.
-    [
-        uncons \ hide-glass swons <menu-item> swap add-gadget
-    ] each-with ;
+    [ uncons \ hide-glass swons >r <label> r> <roll-button> ] map
+    <pile> 1 over set-pack-fill [ add-gadgets ] keep ;
 
-C: menu ( assoc -- gadget )
+: menu-theme ( menu -- )
+    << solid >> interior set-paint-prop ;
+
+: <menu> ( assoc -- gadget )
     #! Given an association list mapping labels to quotations.
-    [ f line-border swap set-delegate ] keep
-    0 1 <pile> [ swap add-gadget ] 2keep
-    rot assoc>menu dup menu-actions ;
-
-! While a menu is open, clicking anywhere sends the click to
-! the menu.
-M: menu inside? ( point menu -- ? ) 2drop t ;
+    menu-items line-border dup menu-theme ;

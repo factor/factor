@@ -1,129 +1,77 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets
-USING: gadgets generic kernel lists math namespaces sdl
-sequences vectors words ;
+IN: gadgets-layouts
+USING: gadgets generic kernel lists math namespaces sequences
+vectors ;
 
-SYMBOL: x
-SYMBOL: y
+! A frame arranges gadgets in a 3x3 grid, where the center
+! gadgets gets left-over space.
+TUPLE: frame grid ;
 
-! A frame arranges left/right/top/bottom gadgets around a
-! center gadget, which gets any leftover space.
-TUPLE: frame left right top bottom center ;
-
-: add-center ( gadget frame -- )
-    dup frame-center unparent 2dup set-frame-center add-gadget ;
-: add-left ( gadget frame -- )
-    dup frame-left unparent 2dup set-frame-left add-gadget ;
-: add-right ( gadget frame -- )
-    dup frame-right unparent 2dup set-frame-right add-gadget ;
-: add-top ( gadget frame -- )
-    dup frame-top unparent 2dup set-frame-top add-gadget ;
-: add-bottom ( gadget frame -- )
-    dup frame-bottom unparent 2dup set-frame-bottom add-gadget ;
+: <frame-grid> { { f f f } { f f f } { f f f } } [ clone ] map ;
 
 C: frame ( -- frame )
-    [ <gadget> swap set-delegate ] keep
-    [ <gadget> swap set-frame-center ] keep
-    [ <gadget> swap set-frame-left ] keep
-    [ <gadget> swap set-frame-right ] keep
-    [ <gadget> swap set-frame-top ] keep
-    [ <gadget> swap set-frame-bottom ] keep ;
+    <gadget> over set-delegate <frame-grid> over set-frame-grid ;
 
-: frame-major ( frame -- list )
+: frame-child ( frame i j -- gadget ) rot frame-grid nth nth ;
+
+: set-frame-child ( gadget frame i j -- )
+    3dup frame-child unparent
+    >r >r 2dup add-gadget r> r>
+    rot frame-grid nth set-nth ;
+
+: add-center ( gadget frame -- ) 1 1 set-frame-child ;
+: add-left   ( gadget frame -- ) 0 1 set-frame-child ;
+: add-right  ( gadget frame -- ) 2 1 set-frame-child ;
+: add-top    ( gadget frame -- ) 1 0 set-frame-child ;
+: add-bottom ( gadget frame -- ) 1 2 set-frame-child ;
+
+: get-center ( frame -- gadget ) 1 1 frame-child ;
+: get-left   ( frame -- gadget ) 0 1 frame-child ;
+: get-right  ( frame -- gadget ) 2 1 frame-child ;
+: get-top    ( frame -- gadget ) 1 0 frame-child ;
+: get-bottom ( frame -- gadget ) 1 2 frame-child ;
+
+: reduce-grid ( grid -- seq )
+    [ { 0 0 0 } [ vmax ] reduce ] map ;
+
+: frame-pref-dim ( grid -- dim )
+    reduce-grid { 0 0 0 } [ v+ ] reduce ;
+
+: pref-dim-grid ( grid -- grid )
+    [ [ [ pref-dim ] [ { 0 0 0 } ] ifte* ] map ] map ;
+
+M: frame pref-dim ( frame -- dim )
+    frame-grid pref-dim-grid
+    dup flip frame-pref-dim first
+    swap frame-pref-dim second
+    0 3vector ;
+
+: frame-layout ( horiz vert -- grid )
+    [ swap [ swap 0 3vector ] map-with ] map-with ;
+
+: do-grid ( dim-grid gadget-grid quot -- )
+    -rot [
+        [ dup [ pick call ] [ 2drop ] ifte ] 2each
+    ] 2each drop ; inline
+
+: position-grid ( gadgets horiz vert -- )
+    >r 0 [ + ] accumulate r> 0 [ + ] accumulate
+    frame-layout swap [ set-rect-loc ] do-grid ;
+
+: resize-grid ( gadgets horiz vert -- )
+    frame-layout swap [ set-gadget-dim ] do-grid ;
+
+: (fill-center) ( vec n -- )
+    over first pick third + - 0 max 1 rot set-nth ;
+
+: fill-center ( horiz vert dim -- )
+    tuck second (fill-center) first (fill-center) ;
+
+M: frame layout* ( frame -- dim )
     [
-        dup frame-top , dup frame-center , frame-bottom ,
-    ] make-list ;
-
-: frame-minor ( frame -- list )
-    [
-        dup frame-left , dup frame-center , frame-right ,
-    ] make-list ;
-
-: pref-size pref-dim 3unseq drop ;
-
-: max-h pref-size nip height [ max ] change ;
-: max-w pref-size drop width [ max ] change ;
-
-: add-h pref-size nip height [ + ] change ;
-: add-w pref-size drop width [ + ] change ;
-
-: with-pref-size ( quot -- )
-    [
-        0 width set 0 height set call width get height get
-    ] with-scope ; inline
-
-M: frame pref-dim ( glue -- dim )
-    [
-        dup frame-major [ max-w ] each
-        dup frame-minor [ max-h ] each
-        dup frame-left add-w
-        dup frame-right add-w
-        dup frame-top add-h
-        frame-bottom add-h
-    ] with-pref-size 0 3vector ;
-
-SYMBOL: frame-right-run
-SYMBOL: frame-bottom-run
-
-: var-frame-x [ execute pref-size drop ] keep set ; inline
-: var-frame-y [ execute pref-size nip ] keep set ; inline
-: var-frame-left \ frame-left var-frame-x ;
-: var-frame-top \ frame-top var-frame-y ;
-: var-frame-right
-    dup \ frame-right var-frame-x
-    swap rectangle-dim first \ frame-right [ - ] change
-    \ frame-right get \ frame-left get - frame-right-run set ;
-: var-frame-bottom
-    dup \ frame-bottom var-frame-y
-    swap rectangle-dim second \ frame-bottom [ - ] change
-    \ frame-bottom get \ frame-top get - frame-bottom-run set ;
-
-: setup-frame ( frame -- )
-    dup var-frame-left
-    dup var-frame-top
-    dup var-frame-right
-    var-frame-bottom ;
-
-: move-gadget ( x y gadget -- )
-    >r 0 3vector r> set-rectangle-loc ;
-
-: reshape-gadget ( x y w h gadget -- )
-    [ >r 0 3vector r> set-gadget-dim ] keep move-gadget ;
-
-: pos-frame-center
-    >r \ frame-left get \ frame-top get
-    \ frame-right-run get \ frame-bottom-run get r>
-    reshape-gadget ;
-
-: pos-frame-left
-    [
-        >r 0 \ frame-top get r> pref-size drop \ frame-bottom-run get
-    ] keep reshape-gadget ;
-
-: pos-frame-right
-    [
-        >r \ frame-right get \ frame-top get r> pref-size drop
-        \ frame-bottom-run get
-    ] keep reshape-gadget ;
-
-: pos-frame-top
-    [
-        >r \ frame-left get 0 \ frame-right get r> pref-size nip
-    ] keep reshape-gadget ;
-
-: pos-frame-bottom
-    [
-        >r \ frame-left get \ frame-bottom get \ frame-right get
-        r> pref-size nip
-    ] keep reshape-gadget ;
-
-: layout-frame ( frame -- )
-    dup frame-center pos-frame-center
-    dup frame-left pos-frame-left
-    dup frame-right pos-frame-right
-    dup frame-top pos-frame-top
-    frame-bottom pos-frame-bottom ;
-
-M: frame layout* ( frame -- )
-    [ 0 x set 0 y set dup setup-frame layout-frame ] with-scope ;
+        frame-grid dup pref-dim-grid
+        dup flip reduce-grid [ first ] map
+        swap reduce-grid [ second ] map
+        2dup
+    ] keep rect-dim fill-center 3dup position-grid resize-grid ;

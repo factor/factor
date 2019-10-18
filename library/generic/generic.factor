@@ -7,126 +7,62 @@ math-internals ;
 
 ! A simple single-dispatch generic word system.
 
+! Maps lists of builtin type numbers to class objects.
+SYMBOL: typemap
+
+! Forward definitions.
+SYMBOL: object
+SYMBOL: null
+
+! Global vector mapping type numbers to builtin class objects.
+SYMBOL: builtins
+
+! Builtin metaclass
+SYMBOL: builtin
+
+: type>class ( n -- symbol ) builtins get nth ;
+
 : predicate-word ( word -- word )
-    word-name "?" append create-in
-    dup t "inline" set-word-prop ;
+    word-name "?" append create-in ;
 
-! Terminology:
-! - type: a datatype built in to the runtime, eg fixnum, word
-! cons. All objects have exactly one type, new types cannot be
-! defined, and types are disjoint.
-! - class: a user defined way of differentiating objects, either
-! based on type, or some combination of type, predicate, or
-! method map.
-! - metaclass: a metaclass is a symbol with a handful of word
-! properties: "builtin-supertypes" "priority" "add-method"
-! "class<"
-
-! So far, only tuples can have delegates, which also must be
-! tuples (the UI uses numbers as delegates in a couple of places
-! but this is Unsupported(tm)).
-GENERIC: delegate
-GENERIC: set-delegate
-
-M: object delegate drop f ;
-
-! Metaclasses have priority -- this induces an order in which
-! methods are added to the vtable.
+: define-predicate ( class predicate quot -- )
+    dupd define-compound
+    2dup unit "predicate" set-word-prop
+    swap "predicating" set-word-prop ;
 
 : metaclass ( class -- metaclass )
     "metaclass" word-prop ;
 
-: builtin-supertypes ( class -- list )
-    #! A list of builtin supertypes of the class.
-    dup metaclass "builtin-supertypes" word-prop call ;
+: types ( class -- types )
+    dup "types" word-prop [ ] [
+        "superclass" word-prop [ types ] [ [ ] ] ifte*
+    ] ?ifte ;
 
-: set-vtable ( definition class vtable -- )
-    >r "builtin-type" word-prop r> set-nth ;
+: 2types ( class class -- seq seq ) swap types swap types ;
 
-: class-ord ( class -- n ) metaclass "priority" word-prop ;
+: custom-class< metaclass "class<" word-prop ;
 
 : class< ( cls1 cls2 -- ? )
     #! Test if class1 is a subclass of class2.
-    over metaclass over metaclass = [
-        dup metaclass "class<" word-prop call
-    ] [
-        swap class-ord swap class-ord <
-    ] ifte ;
+    {
+        { [ 2dup eq? ] [ 2drop t ] }
+        { [ over types empty? ] [ 2drop t ] }
+        { [ dup types empty? ] [ 2drop f ] }
+        { [ dup custom-class< ] [ dup custom-class< call ] }
+        { [ t ] [ 2types contained? ] }
+    } cond ;
+
+: class-compare ( cls1 cls2 -- -1/0/1 )
+    2dup eq? [ 2drop 0 ] [ class< 1 -1 ? ] ifte ;
 
 : methods ( generic -- alist )
-    "methods" word-prop hash>alist [ 2car class< ] sort ;
+    "methods" word-prop hash>alist [ 2car class-compare ] sort ;
 
 : order ( generic -- list )
-    "methods" word-prop hash-keys [ class< ] sort ;
-
-: add-method ( generic vtable definition class -- )
-    #! Add the method entry to the vtable. Unlike define-method,
-    #! this is called at vtable build time, and in the sorted
-    #! order.
-    dup metaclass "add-method" word-prop [
-        [ "Metaclass is missing add-method" throw ]
-    ] unless* call ;
-
-: picker% "picker" word-prop % ;
-
-: dispatcher% "dispatcher" word-prop % ;
-
-: error-method ( generic -- method )
-    [ dup picker% literal, \ no-method , ] make-list ;
-
-: empty-method ( generic -- method )
-    dup "picker" word-prop [ dup ] = [
-        [
-            [ dup delegate ] %
-            [ dup , ] make-list ,
-            error-method ,
-            \ ?ifte ,
-        ] make-list
-    ] [
-        error-method
-    ] ifte ;
-
-: <empty-vtable> ( generic -- vtable )
-    empty-method num-types swap <repeated> >vector ;
-
-: <vtable> ( generic -- vtable )
-    dup <empty-vtable> over methods [
-        ( generic vtable method )
-        >r 2dup r> unswons add-method
-    ] each nip ;
-
-: (small-generic) ( word methods -- quot )
-    [
-        2dup cdr (small-generic) [
-            >r >r picker%
-            r> car unswons "predicate" word-prop %
-            , r> , \ ifte ,
-        ] make-list
-    ] [
-        empty-method
-    ] ifte* ;
-
-: small-generic ( word -- def )
-    dup methods reverse (small-generic) ;
-
-: big-generic ( word -- def )
-    [
-        dup picker%
-        dup dispatcher%
-        <vtable> ,
-        \ dispatch ,
-    ] make-list ;
-
-: small-generic? ( word -- ? )
-    dup "methods" word-prop hash-size 3 <=
-    swap "dispatcher" word-prop [ type ] = and ;
+    "methods" word-prop hash-keys [ class-compare ] sort ;
 
 : make-generic ( word -- )
-    dup dup small-generic? [
-        small-generic
-    ] [
-        big-generic
-    ] ifte  (define-compound) ;
+    dup dup "combination" word-prop call define-compound ;
 
 : define-method ( class generic definition -- )
     -rot
@@ -135,57 +71,81 @@ M: object delegate drop f ;
     ] unless
     [ "methods" word-prop set-hash ] keep make-generic ;
 
+: forget-method ( class generic -- )
+    [ "methods" word-prop remove-hash ] keep make-generic ;
+
 : init-methods ( word -- )
-     dup "methods" word-prop [
-         drop
-     ] [
-        <namespace> "methods" set-word-prop
-     ] ifte ;
+     dup "methods" word-prop
+     [ drop ] [ {{ }} clone "methods" set-word-prop ] ifte ;
 
 ! Defining generic words
-: define-generic* ( picker dispatcher word -- )
-    [ swap "dispatcher" set-word-prop ] keep
-    [ swap "picker" set-word-prop ] keep
+
+: bootstrap-combination ( quot -- quot )
+    #! Bootstrap hack.
+    global [
+        [
+            dup word? [
+                dup word-name swap word-vocabulary lookup
+            ] when
+        ] map
+    ] bind ;
+
+: define-generic* ( word combination -- )
+    bootstrap-combination
+    dupd "combination" set-word-prop
     dup init-methods make-generic ;
 
-: define-generic ( word -- )
-    >r [ dup ] [ type ] r> define-generic* ;
-
 PREDICATE: compound generic ( word -- ? )
-    "dispatcher" word-prop ;
+    "combination" word-prop ;
 
 M: generic definer drop \ G: ;
 
-! Maps lists of builtin type numbers to class objects.
-SYMBOL: typemap
-
-SYMBOL: object
-
 : lookup-union ( typelist -- class )
-    [ > ] sort typemap get hash [ object ] unless* ;
+    number-sort typemap get hash [ object ] unless* ;
 
 : class-or ( class class -- class )
     #! Return a class that both classes are subclasses of.
-    swap builtin-supertypes
-    swap builtin-supertypes
-    seq-union lookup-union ;
-
-: class-or-list ( list -- class )
-    #! Return a class that every class in the list is a
-    #! subclass of.
-    [
-        [ builtin-supertypes [ unique, ] each ] each
-    ] make-list lookup-union ;
+    2dup class< [
+        nip
+    ] [
+        2dup swap class< [
+            drop
+        ] [
+            2types seq-union lookup-union
+        ] ifte
+    ] ifte ;
 
 : class-and ( class class -- class )
     #! Return a class that is a subclass of both, or null in
     #! the degenerate case.
-    swap builtin-supertypes swap builtin-supertypes
-    seq-intersect lookup-union ;
+    2dup class< [
+        drop
+    ] [
+        2dup swap class< [
+            nip 
+        ] [
+            2types seq-intersect lookup-union
+        ] ifte
+    ] ifte ;
+
+: classes-intersect? ( class class -- ? )
+    class-and null = not ;
+
+: min-class ( class seq -- class/f )
+    #! Is this class the smallest class in the sequence?
+    [ dupd classes-intersect? ] subset
+    [ class-compare neg ] sort
+    tuck [ class< ] all-with? [ first ] [ drop f ] ifte ;
 
 : define-class ( class metaclass -- )
     dupd "metaclass" set-word-prop
-    dup builtin-supertypes [ > ] sort
-    typemap get set-hash ;
+    dup types number-sort typemap get set-hash ;
 
-typemap get [ <namespace> typemap set ] unless
+: implementors ( class -- list )
+    #! Find a list of generics that implement a method
+    #! specializing on this class.
+    [ "methods" word-prop ?hash ] word-subset-with ;
+
+: classes ( -- list )
+    #! Output a list of all defined classes.
+    [ metaclass ] word-subset ;

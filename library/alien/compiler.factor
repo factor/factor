@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
 USING: assembler compiler compiler-backend compiler-frontend
-errors generic hashtables inference kernel lists math namespaces
-sequences io strings unparser words ;
+errors generic hashtables inference io kernel lists math
+namespaces prettyprint sequences strings words parser ;
 
 ! ! ! WARNING ! ! !
 ! Reloading this file into a running Factor instance on Win32
@@ -26,21 +26,14 @@ sequences io strings unparser words ;
 
 ! FFI code does not run in the interpreter.
 
-TUPLE: alien-error symbol library ;
-
-C: alien-error ( lib sym -- )
-    [ set-alien-error-symbol ] keep
-    [ set-alien-error-library ] keep ;
+TUPLE: alien-error library symbol ;
 
 M: alien-error error. ( error -- )
-    [
-        "C library interface words cannot be interpreted. " %
-        "Either the compiler is disabled, " %
-        "or the " % dup alien-error-library unparse %
-        " library does not define the " %
-        alien-error-symbol unparse %
-        " symbol." %
-    ] make-string print ;
+    "C library interface words cannot be interpreted. " write
+    "Either the compiler is disabled, " write
+    "or the " write dup alien-error-library pprint
+    " library does not define the " write
+    alien-error-symbol pprint " symbol." print ;
 
 : alien-invoke ( ... return library function parameters -- ... )
     #! Call a C library function.
@@ -93,7 +86,7 @@ C: alien-node make-node ;
 
 : incr-param ( reg-class -- )
     #! OS X is so ugly.
-    dup class [ 1 + ] change  dup float-regs? [
+    dup class inc  dup float-regs? [
         os "macosx" = [
             int-regs [ swap float-regs-size 4 / + ] change
         ] [
@@ -137,6 +130,23 @@ M: alien-node linearize-node* ( node -- )
     [ dup parameters stack-space %cleanup , ] unless
     linearize-return ;
 
+: unpair ( seq -- odds evens )
+    2 swap group flip dup empty?
+    [ drop { } { } ] [ first2 ] ifte ;
+
+: parse-arglist ( lst -- types stack effect )
+    unpair [
+        " " % [ "," ?tail drop % " " % ] each "-- " %
+    ] "" make ;
+
+: (define-c-word) ( type lib func types stack-effect -- )
+    >r over create-in >r 
+    [ alien-invoke ] cons cons cons cons r> swap define-compound
+    word r> "stack-effect" set-word-prop ;
+
+: define-c-word ( type lib func function-args -- )
+    [ "()" subseq? not ] subset parse-arglist (define-c-word) ;
+
 \ alien-invoke [ [ string object string general-list ] [ ] ]
 "infer-effect" set-word-prop
 
@@ -149,5 +159,13 @@ M: alien-node linearize-node* ( node -- )
 ] "infer" set-word-prop
 
 global [
-    "libraries" get [ <namespace> "libraries" set ] unless
+    "libraries" get [ {{ }} clone "libraries" set ] unless
 ] bind
+
+M: compound (uncrossref)
+    dup word-def \ alien-invoke swap member? [
+        drop
+    ] [
+        dup { "infer-effect" "base-case" "no-effect" }
+        reset-props update-xt
+    ] ifte ;

@@ -7,7 +7,16 @@ else
 	STRIP = strip
 endif
 
-DEFAULT_LIBS = -lm
+ifdef STATIC
+	DEFAULT_LIBS = -lm -Wl,-static -Wl,-whole-archive \
+		-Wl,-export-dynamic \
+		-lSDL -lSDL_gfx -lSDL_ttf \
+		-Wl,-no-whole-archive \
+		-lfreetype -lz -L/usr/X11R6/lib -lX11 -lXext \
+		-Wl,-Bdynamic
+else
+	DEFAULT_LIBS = -lm
+endif
 
 UNIX_OBJS = native/unix/file.o \
 	native/unix/signal.o \
@@ -28,7 +37,7 @@ else
 	PLAF_OBJS = $(UNIX_OBJS)
 endif
 
-OBJS = $(PLAF_OBJS) native/arithmetic.o native/array.o native/bignum.o \
+OBJS = $(PLAF_OBJS) native/array.o native/bignum.o \
 	native/s48_bignum.o \
 	native/complex.o native/cons.o native/error.o \
 	native/factor.o native/fixnum.o \
@@ -45,7 +54,8 @@ OBJS = $(PLAF_OBJS) native/arithmetic.o native/array.o native/bignum.o \
 	native/debug.o \
 	native/hashtable.o \
 	native/icache.o \
-	native/io.o
+	native/io.o \
+	native/wrapper.o
 
 default:
 	@echo "Run 'make' with one of the following parameters:"
@@ -76,13 +86,13 @@ macosx:
 linux:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic" \
-		LIBS="$(DEFAULT_LIBS) -ldl"
+		LIBS="-ldl $(DEFAULT_LIBS)"
 	$(STRIP) f
 
 linux-ppc:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic -mregnames" \
-		LIBS="$(DEFAULT_LIBS) -ldl"
+		LIBS="-ldl $(DEFAULT_LIBS)"
 	$(STRIP) f
 
 windows:

@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: sdl
-USING: kernel lists math namespaces ;
+USING: kernel lists math namespaces sequences ;
 
 SYMBOL: surface
 SYMBOL: width
@@ -21,7 +21,7 @@ SYMBOL: bpp
     [ >r init-screen r> call SDL_Quit ] with-scope ; inline
 
 : rgb ( [ r g b ] -- n )
-    3unlist
+    first3
     255
     swap >fixnum 8 shift bitor
     swap >fixnum 16 shift bitor
@@ -36,11 +36,11 @@ SYMBOL: bpp
     swap bitor ;
 
 : make-rect ( x y w h -- rect )
-    <rect>
-    [ set-rect-h ] keep
-    [ set-rect-w ] keep
-    [ set-rect-y ] keep
-    [ set-rect-x ] keep ;
+    <sdl-rect>
+    [ set-sdl-rect-h ] keep
+    [ set-sdl-rect-w ] keep
+    [ set-sdl-rect-y ] keep
+    [ set-sdl-rect-x ] keep ;
 
 : with-pixels ( quot -- )
     width get [
@@ -49,6 +49,16 @@ SYMBOL: bpp
             [ rot pixelColor ] 2keep
         ] repeat
     ] repeat drop ; inline
+
+: must-lock-surface? ( surface -- ? )
+    #! This is a macro in SDL_video.h.
+    dup surface-offset 0 = [
+        surface-flags
+        SDL_HWSURFACE SDL_ASYNCBLIT bitor SDL_RLEACCEL bitor
+        bitand 0 = not
+    ] [
+        drop t
+    ] ifte ;
 
 : with-surface ( quot -- )
     #! Execute a quotation, locking the current surface if it
@@ -60,3 +70,6 @@ SYMBOL: bpp
             slip
         ] ifte SDL_Flip drop
     ] with-scope ; inline
+
+: surface-rect ( x y surface -- rect )
+    dup surface-w swap surface-h make-rect ;

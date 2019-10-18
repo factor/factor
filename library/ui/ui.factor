@@ -1,53 +1,34 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: help
-DEFER: tutorial
-
 IN: gadgets
-USING: generic help io kernel listener math namespaces
-prettyprint sdl sequences styles threads words ;
+USING: gadgets-layouts gadgets-listener generic help io kernel
+listener lists math namespaces prettyprint sdl sequences shells
+styles threads words ;
 
-SYMBOL: stack-display
-
-: ui.s ( -- )
-    stack-display get dup pane-clear [
-        datastack reverse [ unparse. terpri ] each
-    ] with-stream* ;
+: world-theme
+    {{
+        [[ background { 255 255 255 } ]]
+        [[ rollover-bg { 236 230 232 } ]]
+        [[ bevel-1 { 160 160 160 } ]]
+        [[ bevel-2 { 232 232 232 } ]]
+        [[ foreground { 0 0 0 } ]]
+        [[ reverse-video f ]]
+        [[ font "Monospaced" ]]
+        [[ font-size 12 ]]
+        [[ font-style plain ]]
+    }} ;
 
 : init-world
+    ttf-init
     global [
         <world> world set
+        { 600 800 0 } world get set-gadget-dim
         
-        {{
-            [[ background [ 255 255 255 ] ]]
-            [[ rollover-bg [ 216 216 255 ] ]]
-            [[ bevel-1 [ 160 160 160 ] ]]
-            [[ bevel-2 [ 216 216 216 ] ]]
-            [[ foreground [ 0 0 0 ] ]]
-            [[ reverse-video f ]]
-            [[ font "Sans Serif" ]]
-            [[ font-size 12 ]]
-            [[ font-style plain ]]
-        }} world get set-gadget-paint
-        
-        { 1024 768 0 } world get set-gadget-dim
-        
+        world-theme world get set-gadget-paint
+
         <plain-gadget> add-layer
-    
-        <pane> dup pane set <scroller>
-        <pane> dup stack-display set <scroller>
-        3/4 <y-splitter> add-layer
-        
-        [
-            pane get [
-                [ ui.s ] listener-hook set
-                clear print-banner
-                "Tutorial" [ drop [ tutorial ] pane get pane-call ] <button> gadget.
-                listener
-            ] with-stream
-        ] in-thread
-        
-        pane get request-focus
+
+        listener-application
     ] bind ;
 
 SYMBOL: first-time
@@ -56,16 +37,20 @@ global [ first-time on ] bind
 
 : ?init-world
     first-time get [ init-world first-time off ] when ;
+
 IN: shells
+
+: ui-title
+    [ "Factor " % version % " - " % "image" get % ] "" make ;
 
 : ui ( -- )
     #! Start the Factor graphics subsystem with the given screen
     #! dimensions.
     ttf-init
     ?init-world
-    world get rectangle-dim 2unseq 0 SDL_RESIZABLE [
+    world get rect-dim first2 0 SDL_RESIZABLE [
         [
-            "Factor " version append dup SDL_WM_SetCaption
+            ui-title dup SDL_WM_SetCaption
             start-world
             run-world
         ] with-screen

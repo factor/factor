@@ -3,7 +3,7 @@
 IN: compiler-frontend
 USING: assembler compiler-backend generic hashtables inference
 kernel kernel-internals lists math math-internals namespaces
-sequences words ;
+sequences vectors words ;
 
 ! Architecture description
 : fixnum-imm?
@@ -54,26 +54,32 @@ sequences words ;
     out-1
 ] "intrinsic" set-word-prop
 
-: node-peek ( node -- obj ) node-in-d peek ;
+: node-peek ( node -- value ) node-in-d peek ;
 
-: peek-2 dup length 2 - swap nth ;
-: node-peek-2 ( node -- obj ) node-in-d peek-2 ;
+: type-tag ( type -- tag )
+    #! Given a type number, return the tag number.
+    dup 6 > [ drop 3 ] when ;
 
-: typed? ( value -- ? ) value-types length 1 = ;
+: value-tag ( value node -- n/f )
+    #! If the tag is known, output it, otherwise f.
+    node-classes hash dup [
+        types [ type-tag ] map dup [ = ] monotonic?
+        [ first ] [ drop f ] ifte
+    ] [
+        drop f
+    ] ifte ;
 
-: slot@ ( node -- n )
+: slot@ ( node -- n/f )
     #! Compute slot offset.
-    node-in-d
-    dup peek literal-value cell *
-    swap peek-2 value-types car type-tag - ;
-
-: typed-literal? ( node -- ? )
-    #! Output if the node's first input is well-typed, and the
-    #! second is a literal.
-    dup node-peek safe-literal? swap node-peek-2 typed? and ;
+    dup node-in-d reverse dup first dup literal? [
+        literal-value cell * swap second
+        rot value-tag dup [ - ] [ 2drop f ] ifte
+    ] [
+        3drop f
+    ] ifte ;
 
 \ slot [
-    dup typed-literal? [
+    dup slot@ [
         1 %dec-d ,
         in-1
         0 swap slot@ %fast-slot ,
@@ -87,36 +93,34 @@ sequences words ;
 ] "intrinsic" set-word-prop
 
 \ set-slot [
-    dup typed-literal? [
+    dup slot@ [
         1 %dec-d ,
         in-2
         2 %dec-d ,
         slot@ >r 0 1 r> %fast-set-slot ,
-        0 %write-barrier ,
     ] [
         drop
         in-3
         3 %dec-d ,
         1 %untag ,
         0 1 2 %set-slot ,
-        1 %write-barrier ,
     ] ifte
+    1 %write-barrier ,
 ] "intrinsic" set-word-prop
 
 \ type [
     drop
     in-1
     0 %type ,
-    0 %tag-fixnum ,
+    0 %retag-fixnum ,
     out-1
 ] "intrinsic" set-word-prop
 
-\ arithmetic-type [
+\ tag [
     drop
     in-1
-    0 %arithmetic-type ,
-    0 %tag-fixnum ,
-    1 %inc-d ,
+    0 %tag ,
+    0 %retag-fixnum ,
     out-1
 ] "intrinsic" set-word-prop
 
@@ -136,23 +140,23 @@ sequences words ;
 
 : value/vreg-list ( in -- list )
     [ 0 swap length 1 - ] keep
-    [ >r 2dup r> 3list >r 1 - >r 1 + r> r> ] map 2nip ;
+    [ >r 2dup r> 3vector >r 1 - >r 1 + r> r> ] map 2nip ;
 
 : values>vregs ( in -- in )
     value/vreg-list
-    dup [ 3unlist load-value ] each
-    [ car <vreg> ] map ;
+    dup [ first3 load-value ] each
+    [ first <vreg> ] map ;
 
 : load-inputs ( node -- in )
     dup node-in-d values>vregs
     [ length swap node-out-d length - %dec-d , ] keep ;
 
 : binary-op-reg ( node op -- )
-    >r load-inputs 2unlist swap dup r> execute ,
+    >r load-inputs first2 swap dup r> execute ,
     0 0 %replace-d , ; inline
 
-: literal-fixnum? ( value -- ? )
-    dup safe-literal? [ literal-value fixnum? ] [ drop f ] ifte ;
+: literal-immediate? ( value -- ? )
+    dup literal? [ literal-value immediate? ] [ drop f ] ifte ;
 
 : binary-op-imm ( imm op -- )
     1 %dec-d , in-1
@@ -162,7 +166,7 @@ sequences words ;
 : binary-op ( node op -- )
     #! out is a vreg where the vop stores the result.
     fixnum-imm? [
-        >r dup node-peek dup literal-fixnum? [
+        >r dup node-peek dup literal-immediate? [
             literal-value r> binary-op-imm drop
         ] [
             drop r> binary-op-reg
@@ -183,7 +187,7 @@ sequences words ;
     [[ fixnum>       %fixnum>       ]]
     [[ eq?           %eq?           ]]
 ] [
-    uncons [ literal, \ binary-op , ] make-list
+    uncons [ literalize , \ binary-op , ] [ ] make
     "intrinsic" set-word-prop
 ] each
 
@@ -197,7 +201,7 @@ sequences words ;
 
 \ fixnum* [
     ! Turn multiplication by a power of two into a left shift.
-    dup node-peek dup literal-fixnum? [
+    dup node-peek dup literal-immediate? [
         literal-value dup power-of-2? [
             nip fast-fixnum*
         ] [

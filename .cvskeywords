@@ -1,10 +1,10 @@
-./library/win32/win32-io-internals.factor:! $Id: win32-io-internals.factor,v 1.8 2005/07/23 09:30:17 eiz Exp $
+./library/win32/win32-io-internals.factor:! $Id: win32-io-internals.factor,v 1.11 2005/09/03 18:48:25 spestov Exp $
 ./library/win32/win32-io.factor:! $Id: win32-io.factor,v 1.4 2005/07/23 06:11:07 eiz Exp $
-./library/win32/win32-stream.factor:! $Id: win32-stream.factor,v 1.8 2005/07/23 06:11:07 eiz Exp $
-./library/win32/win32-errors.factor:! $Id: win32-errors.factor,v 1.7 2005/06/09 02:32:45 eiz Exp $
-./library/win32/win32-server.factor:! $Id: win32-server.factor,v 1.7 2005/07/23 06:11:07 eiz Exp $
-./library/win32/winsock.factor:! $Id: winsock.factor,v 1.5 2005/06/13 21:04:58 spestov Exp $
-./library/bootstrap/win32-io.factor:! $Id: win32-io.factor,v 1.8 2005/06/19 21:50:33 spestov Exp $
+./library/win32/win32-stream.factor:! $Id: win32-stream.factor,v 1.10 2005/09/03 18:48:25 spestov Exp $
+./library/win32/win32-errors.factor:! $Id: win32-errors.factor,v 1.8 2005/09/03 18:48:25 spestov Exp $
+./library/win32/win32-server.factor:! $Id: win32-server.factor,v 1.11 2005/09/03 18:48:25 spestov Exp $
+./library/win32/winsock.factor:! $Id: winsock.factor,v 1.6 2005/08/31 22:42:52 eiz Exp $
+./library/bootstrap/win32-io.factor:! $Id: win32-io.factor,v 1.9 2005/08/31 05:39:36 eiz Exp $
 ./factor/ExternalFactor.java: * $Id: ExternalFactor.java,v 1.27 2005/07/17 20:29:04 spestov Exp $
 ./factor/ConstructorArtifact.java: * $Id: ConstructorArtifact.java,v 1.1 2005/03/01 23:55:59 spestov Exp $
 ./factor/math/Complex.java: * $Id: Complex.java,v 1.1.1.1 2004/07/16 06:26:13 spestov Exp $

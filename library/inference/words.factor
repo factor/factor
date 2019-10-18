@@ -9,26 +9,21 @@ hashtables parser prettyprint ;
     [ pop-d 2drop ] each ;
 
 : produce-d ( typelist -- )
-    [ <computed> push-d ] each ;
+    [ drop <computed> push-d ] each ;
 
 : consume/produce ( word effect -- )
     #! Add a node to the dataflow graph that consumes and
     #! produces a number of values.
     swap #call [
         over [
-            2unlist swap consume-d produce-d
+            first2 swap consume-d produce-d
         ] hairy-node
     ] keep node, ;
 
 : no-effect ( word -- )
-    "Unknown stack effect: " swap word-name append
+    "Stack effect inference of the word " swap word-name
+    " was already attempted, and failed" append3
     inference-error ;
-
-: inhibit-parital ( -- )
-    meta-d get [ f swap set-value-safe? ] each ;
-
-: recursive? ( word -- ? )
-    f swap dup word-def [ = or ] tree-each-with ;
 
 : with-block ( word [[ label quot ]] quot -- block-node )
     #! Execute a quotation with the word on the stack, and add
@@ -39,89 +34,62 @@ hashtables parser prettyprint ;
 
 : inline-block ( word -- node-block )
     gensym over word-def cons [
-        inhibit-parital  word-def infer-quot
+        #entry node,  word-def infer-quot  #return node,
     ] with-block ;
 
-: inline-compound ( word -- )
-    #! Infer the stack effect of a compound word in the current
-    #! inferencer instance. If the word in question is recursive
-    #! we infer its stack effect inside a new block.
-    dup recursive? [
-        inline-block node,
-    ] [
-        word-def infer-quot
-    ] ifte ;
-
-: (infer-compound) ( word base-case -- effect )
+: infer-compound ( word base-case -- effect )
     #! Infer a word's stack effect in a separate inferencer
     #! instance.
     [
         inferring-base-case set
         recursive-state get init-inference
         dup inline-block drop
-        effect present-effect
+        effect
     ] with-scope [ consume/produce ] keep ;
 
-: infer-compound ( word -- )
+GENERIC: apply-word
+
+M: object apply-word ( word -- )
+    #! A primitive with an unknown stack effect.
+    no-effect ;
+
+M: compound apply-word ( word -- )
+    #! Infer a compound word's stack effect.
     [
-        dup f (infer-compound) "infer-effect" set-word-prop
+        dup f infer-compound "infer-effect" set-word-prop
     ] [
         [ swap t "no-effect" set-word-prop rethrow ] when*
     ] catch ;
 
-GENERIC: (apply-word)
-
-M: object (apply-word) ( word -- )
-    #! A primitive with an unknown stack effect.
-    no-effect ;
-
-M: primitive (apply-word) ( word -- )
-    dup "infer-effect" word-prop [
-        consume/produce
-    ] [
-        no-effect
-    ] ifte ;
-
-M: compound (apply-word) ( word -- )
-    #! Infer a compound word's stack effect.
+: apply-default ( word -- )
     dup "no-effect" word-prop [
         no-effect
     ] [
-        infer-compound
+        dup "infer-effect" word-prop [
+            over "infer" word-prop [
+                swap car ensure-d call drop
+            ] [
+                consume/produce
+            ] ifte*
+        ] [
+            apply-word
+        ] ifte*
     ] ifte ;
 
-M: symbol (apply-word) ( word -- )
-    apply-literal ;
-
-GENERIC: apply-word
-
-: apply-default ( word -- )
-    dup "infer-effect" word-prop [
-        over "infer" word-prop [
-            swap car ensure-d call drop
-        ] [
-            consume/produce
-        ] ifte*
-    ] [
-        (apply-word)
-    ] ifte* ;
-
-M: word apply-word ( word -- )
+M: word apply-object ( word -- )
     apply-default ;
 
-M: compound apply-word ( word -- )
-    dup "inline" word-prop [
-        inline-compound
-    ] [
-        apply-default
-    ] ifte ;
+M: symbol apply-object ( word -- )
+    apply-literal ;
 
 : (base-case) ( word label -- )
     over "inline" word-prop [
+        meta-d get clone >r
         over inline-block drop
-        [ #call-label ] [ #call ] ?ifte node,
+        [ #call-label ] [ #call ] ?ifte
+        r> over set-node-in-d node,
     ] [
-        drop dup t (infer-compound) "base-case" set-word-prop
+        drop dup t infer-compound "base-case" set-word-prop
     ] ifte ;
 
 : base-case ( word label -- )
@@ -144,39 +112,24 @@ M: compound apply-word ( word -- )
             nip consume/produce
         ] [
             inferring-base-case get [
-                2drop terminate
+                t base-case-continuation get call
             ] [
                 car base-case
             ] ifte
         ] ifte*
     ] ifte* ;
 
-M: word apply-object ( word -- )
+M: compound apply-object ( word -- )
     #! Apply the word's stack effect to the inferencer state.
     dup recursive-state get assoc [
         recursive-word
     ] [
-        apply-word
+        dup "inline" word-prop
+        [ inline-block node, ] [ apply-default ] ifte
     ] ifte* ;
 
-\ call [
-    pop-literal infer-quot-value
-] "infer" set-word-prop
-
-\ execute [
-    pop-literal unit infer-quot-value
-] "infer" set-word-prop
-
-! These hacks will go away soon
-\ delegate [ [ object ] [ object ] ] "infer-effect" set-word-prop
-\ no-method t "terminator" set-word-prop
-\ no-method [ [ object word ] [ ] ] "infer-effect" set-word-prop
-\ <no-method> [ [ object object ] [ tuple ] ] "infer-effect" set-word-prop
-\ set-no-method-generic [ [ object tuple ] [ ] ] "infer-effect" set-word-prop
-\ set-no-method-object [ [ object tuple ] [ ] ] "infer-effect" set-word-prop
-\ not-a-number t "terminator" set-word-prop
-\ inference-error t "terminator" set-word-prop
-\ throw t "terminator" set-word-prop
-\ = [ [ object object ] [ boolean ] ] "infer-effect" set-word-prop
-\ integer/ [ [ integer integer ] [ rational ] ] "infer-effect" set-word-prop
-\ gcd [ [ integer integer ] [ integer integer ] ] "infer-effect" set-word-prop
+: infer-shuffle ( word -- )
+    dup #call [
+        over "infer-effect" word-prop
+        [ meta-d [ swap with-datastack ] change ] hairy-node
+    ] keep node, ;

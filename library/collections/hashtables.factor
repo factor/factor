@@ -1,20 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: kernel-internals
-
-DEFER: hash-array
-DEFER: set-hash-array
-DEFER: set-hash-size
-
 IN: hashtables
-USING: generic kernel lists math sequences vectors ;
-
-! We put hash-size in the hashtables vocabulary, and
-! the other words in kernel-internals.
-DEFER: hashtable?
-BUILTIN: hashtable 10 hashtable?
-    [ 1 "hash-size" set-hash-size ]
-    [ 2 hash-array set-hash-array ] ;
+USING: generic kernel lists math sequences vectors
+kernel-internals ;
 
 ! A hashtable is implemented as an array of buckets. The
 ! array index is determined using a hash function, and the
@@ -62,9 +50,9 @@ IN: hashtables
 
 : hash* ( key table -- [[ key value ]] )
     #! Look up a value in the hashtable.
-    2dup (hashcode) swap hash-bucket assoc* ;
+    2dup (hashcode) swap hash-bucket assoc* ; flushable
 
-: hash ( key table -- value ) hash* cdr ;
+: hash ( key table -- value ) hash* cdr ; flushable
 
 : set-hash* ( key hash quot -- )
     #! Apply the quotation to yield a new association list.
@@ -83,6 +71,7 @@ IN: hashtables
 : hash>alist ( hash -- alist )
     #! Push a list of key/value pairs in a hashtable.
     [ ] swap [ hash-bucket [ swons ] each ] each-bucket ;
+    flushable
 
 : (set-hash) ( value key hash -- )
     dup hash-size+ [ set-assoc ] set-hash* ;
@@ -113,24 +102,40 @@ IN: hashtables
 : hash-clear ( hash -- )
     0 over set-hash-size [ f -rot set-hash-bucket ] each-bucket ;
 
-: buckets>list ( hash -- list )
-    hash-array >list ;
+: buckets>vector ( hash -- vector )
+    hash-array >vector ;
 
 : alist>hash ( alist -- hash )
     dup length 1 max <hashtable> swap
-    [ unswons pick set-hash ] each ;
+    [ unswons pick set-hash ] each ; foldable
 
 : hash-keys ( hash -- list )
-    hash>alist [ car ] map ;
+    hash>alist [ car ] map ; flushable
 
 : hash-values ( hash -- alist )
-    hash>alist [ cdr ] map ;
+    hash>alist [ cdr ] map ; flushable
 
-: hash-each ( hash quot -- )
+: hash-each ( hash quot -- | quot: [[ k v ]] -- )
     swap hash-array [ swap each ] each-with ; inline
 
-: hash-each-with ( obj hash quot -- | quot: obj elt -- )
+: hash-each-with ( obj hash quot -- | quot: obj [[ k v ]] -- )
     swap [ with ] hash-each 2drop ; inline
+
+: hash-all? ( hash quot -- | quot: [[ k v ]] -- ? )
+    swap hash-array [ swap all? ] all-with? ; inline
+
+: hash-all-with? ( obj hash quot -- ? | quot: [[ k v ]] -- ? )
+    swap [ with rot ] hash-all? 2nip ; inline
+
+: hash-contained? ( h1 h2 -- ? )
+    #! Test if h2 contains all the key/value pairs of h1.
+    swap [
+        uncons >r swap hash* dup [
+            cdr r> =
+        ] [
+            r> 2drop f
+        ] ifte
+    ] hash-all-with? ; flushable
 
 : hash-subset ( hash quot -- hash | quot: [[ k v ]] -- ? )
     >r hash>alist r> subset alist>hash ; inline
@@ -145,8 +150,7 @@ M: hashtable = ( obj hash -- ? )
         2drop t
     ] [
         over hashtable? [
-            swap hash>alist swap hash>alist 2dup
-            contained? >r swap contained? r> and
+            2dup hash-contained? >r swap hash-contained? r> and
         ] [
             2drop f
         ] ifte
@@ -166,8 +170,12 @@ M: hashtable hashcode ( hash -- n )
         pick rot >r >r call dup r> r> set-hash
     ] ifte* ; inline
 
+: map>hash ( seq quot -- hash | quot: elt -- value )
+    over >r map r> dup length <hashtable> -rot
+    [ pick set-hash ] 2each ; inline
+
 : ?hash ( key hash/f -- value/f )
-    dup [ hash ] [ 2drop f ] ifte ;
+    dup [ hash ] [ 2drop f ] ifte ; flushable
 
 : ?set-hash ( value key hash/f -- hash )
     [ 1 <hashtable> ] unless* [ set-hash ] keep ;

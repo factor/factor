@@ -3,19 +3,16 @@
 
 ! Bootstrapping trick; see doc/bootstrap.txt.
 IN: !syntax
-USING: syntax generic kernel lists namespaces parser words ;
+USING: generic kernel lists namespaces parser sequences syntax
+words ;
 
 : GENERIC:
-    #! GENERIC: bar == G: bar [ dup ] [ type ] ;
-    CREATE define-generic ; parsing
+    #! GENERIC: bar == G: bar simple-combination ;
+    CREATE dup reset-word define-generic ; parsing
 
 : G:
-    #! G: word picker dispatcher ;
-    CREATE [ 2unlist rot define-generic* ] [ ] ; parsing
-
-: BUILTIN:
-    #! Syntax: BUILTIN: <class> <type#> <predicate> <slots> ;
-    CREATE scan-word scan-word [ define-builtin ] [ ] ; parsing
+    #! G: word combination ;
+    CREATE dup reset-word [ define-generic* ] [ ] ; parsing
 
 : COMPLEMENT: ( -- )
     #! Followed by a class name, then a complemented class.
@@ -37,8 +34,7 @@ USING: syntax generic kernel lists namespaces parser words ;
     CREATE dup intern-symbol
     dup rot "superclass" set-word-prop
     dup predicate-word
-    [ dupd unit "predicate" set-word-prop ] keep
-    [ define-predicate ] [ ] ; parsing
+    [ define-predicate-class ] [ ] ; parsing
 
 : TUPLE:
     #! Followed by a tuple name, then slot names, then ;
@@ -56,4 +52,9 @@ USING: syntax generic kernel lists namespaces parser words ;
     #! Followed by a tuple name, then constructor code, then ;
     #! Constructor code executes with the empty tuple on the
     #! stack.
-    scan-word [ define-constructor ] [ ] ; parsing
+    scan-word [ tuple-constructor ] keep
+    [ define-constructor ] [ ] ; parsing
+
+! Tuples.
+: << f ; parsing
+: >> reverse literal-tuple swons ; parsing

@@ -1,15 +1,15 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets
-USING: errors generic hashtables kernel lists math matrices
-namespaces sdl vectors ;
+IN: gadgets-borders
+USING: errors gadgets gadgets-layouts generic hashtables kernel
+math namespaces vectors ;
 
 TUPLE: border size ;
 
 C: border ( child delegate size -- border )
     [ set-border-size ] keep
     [ set-delegate ] keep
-    [ over [ add-gadget ] [ 2drop ] ifte ] keep ;
+    [ add-gadget ] keep ;
 
 : empty-border ( child -- border )
     <gadget> { 5 5 0 } <border> ;
@@ -21,10 +21,10 @@ C: border ( child delegate size -- border )
     <bevel-gadget> { 5 5 0 } <border> ;
 
 : layout-border-loc ( border -- )
-    dup border-size swap gadget-child set-rectangle-loc ;
+    dup border-size swap gadget-child set-rect-loc ;
 
 : layout-border-dim ( border -- )
-    dup rectangle-dim over border-size 2 v*n v-
+    dup rect-dim over border-size 2 v*n v-
     swap gadget-child set-gadget-dim ;
 
 M: border pref-dim ( border -- dim )

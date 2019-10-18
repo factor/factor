@@ -4,10 +4,10 @@ USE: namespaces
 USE: test
 USE: words
 
-<namespace> "test-namespace" set
+{{ }} clone "test-namespace" set
 
 : test-namespace ( -- )
-    <namespace> dup [ namespace = ] bind ;
+    {{ }} clone dup [ namespace = ] bind ;
 
 [ t ] [ test-namespace ] unit-test
 
@@ -21,5 +21,5 @@ USE: words
 
 10 "some-global" set
 [ f ]
-[ <namespace> [ f "some-global" set "some-global" get ] bind ]
+[ {{ }} clone [ f "some-global" set "some-global" get ] bind ]
 unit-test

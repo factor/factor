@@ -32,6 +32,9 @@ void relocate_object(CELL relocating)
 	case DISPLACED_ALIEN_TYPE:
 		fixup_displaced_alien((DISPLACED_ALIEN*)relocating);
 		break;
+	case WRAPPER_TYPE:
+		fixup_wrapper((F_WRAPPER*)relocating);
+		break;
 	}
 }
 
@@ -82,12 +85,27 @@ void relocate_data()
 	}
 }
 
+void undefined_symbol(void)
+{
+	general_error(ERROR_UNDEFINED_SYMBOL,F);
+}
+
 CELL get_rel_symbol(F_REL* rel)
 {
 	F_CONS* cons = untag_cons(get(rel->argument));
 	F_STRING* symbol = untag_string(cons->car);
 	DLL* dll = (cons->cdr == F ? NULL : untag_dll(cons->cdr));
-	return (CELL)ffi_dlsym(dll,symbol);
+	CELL sym;
+
+	if(dll != NULL && !dll->dll)
+		return (CELL)undefined_symbol;
+
+	sym = (CELL)ffi_dlsym(dll,symbol,false);
+
+	if(!sym)
+		return (CELL)undefined_symbol;
+
+	return sym;
 }
 
 INLINE CELL compute_code_rel(F_REL *rel, CELL original)

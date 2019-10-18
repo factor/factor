@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: memory
-USING: errors generic hashtables kernel kernel-internals lists
-math namespaces prettyprint sequences io strings unparser
-vectors words ;
+USING: errors generic hashtables io kernel kernel-internals
+lists math namespaces parser prettyprint sequences strings
+unparser vectors words ;
 
 : generations 15 getenv ;
 
@@ -15,7 +15,10 @@ vectors words ;
 
 ! Printing an overview of heap usage.
 
-: kb. 1024 /i unparse 6 CHAR: \s pad-left  write " KB" write ;
+: kb.
+    1024 /i number>string
+    6 CHAR: \s pad-left  write
+    " KB" write ;
 
 : (room.) ( free total -- )
     2dup swap - swap ( free used total )
@@ -26,7 +29,7 @@ vectors words ;
 : room. ( -- )
     room
     0 swap [
-        "Generation " write over unparse write ":" write
+        "Generation " write over pprint ":" write
         uncons (room.) 1 +
     ] each drop
     "Semi-space:  " write kb. terpri
@@ -35,13 +38,17 @@ vectors words ;
 
 ! Some words for iterating through the heap.
 
+: (each-object) ( quot -- )
+    next-object [ swap [ call ] keep (each-object) ] when* ;
+    inline
+
 : each-object ( quot -- )
     #! Applies the quotation to each object in the image. We
     #! use the lower-level >c and c> words here to avoid
     #! copying the stacks.
     [ end-scan rethrow ] >c
-    begin-scan [ next-object ] while
-    f c> call ;
+    begin-scan (each-object) drop
+    f c> call ; inline
 
 : instances ( quot -- list )
     #! Return a list of all object that return true when the
@@ -50,26 +57,17 @@ vectors words ;
         [
             [ swap call ] 2keep rot [ , ] [ drop ] ifte
         ] each-object drop
-    ] make-list ;
+    ] [ ] make ;
 
-GENERIC: (each-slot) ( quot obj -- ) inline
+G: each-slot ( obj quot -- )
+    [ over ] standard-combination ; inline
 
-M: arrayed (each-slot) ( quot array -- )
-    dup array-capacity [
-        [
-            ( quot obj n -- )
-            swap array-nth swap dup slip
-        ] 2keep
-    ] repeat 2drop ;
+M: array each-slot ( array quot -- ) each ;
 
-M: object (each-slot) ( quot obj -- )
-    dup class "slots" word-prop [
-        pick pick >r >r car slot swap call r> r>
+M: object each-slot ( obj quot -- )
+    over class "slots" word-prop [
+        -rot [ >r swap first slot r> call ] 2keep
     ] each 2drop ;
-
-: each-slot ( obj quot -- )
-    #! Apply the quotation to each slot value of the object.
-    swap (each-slot) ; inline
 
 : refers? ( to obj -- ? )
     f swap [ pick eq? or ] each-slot nip ;
@@ -87,24 +85,23 @@ M: object (each-slot) ( quot obj -- )
     [ dup size swap type rot seq+ ] keep
     1 swap type rot seq+ ;
 
-: heap-stats ( -- stats )
+: heap-stats ( -- counts sizes )
     #! Return a list of instance count/total size pairs.
     num-types zero-vector num-types zero-vector
-    [ >r 2dup r> heap-stat-step ] each-object
-    swap >list swap >list zip ;
+    [ >r 2dup r> heap-stat-step ] each-object ;
 
 : heap-stat. ( type instances bytes -- )
     dup 0 = [
         3drop
     ] [
-        rot builtin-type word-name write ": " write
-        unparse write " bytes, " write
-        unparse write " instances" print
+        rot type>class word-name write ": " write
+        pprint " bytes, " write
+        pprint " instances" print
     ] ifte ;
 
 : heap-stats. ( -- )
     #! Print heap allocation breakdown.
-    0 heap-stats [ dupd uncons heap-stat. 1 + ] each drop ;
+    0 heap-stats [ >r >r dup r> r> heap-stat. 1 + ] 2each drop ;
 
 : orphans ( word -- list )
     #! Orphans are forgotten but still referenced.

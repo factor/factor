@@ -4,20 +4,7 @@ IN: alien
 USING: hashtables io kernel kernel-internals lists math
 namespaces parser ;
 
-DEFER: dll?
-BUILTIN: dll 15 dll? [ 1 "dll-path" f ] ;
-
-DEFER: alien?
-BUILTIN: alien 16 alien? ;
-
-DEFER: displaced-alien?
-BUILTIN: displaced-alien 20 displaced-alien? ;
-
 UNION: c-ptr byte-array alien displaced-alien ;
-
-: NULL ( -- null )
-    #! C null value.
-    0 <alien> ;
 
 M: alien hashcode ( obj -- n )
     alien-address >fixnum ;
@@ -44,13 +31,12 @@ M: alien = ( obj obj -- ? )
 
 : add-library ( library name abi -- )
     "libraries" get [
-        <namespace> [
-          "abi" set
-          "name" set
-        ] extend swap set
+        [ "abi" set "name" set ] make-hash swap set
     ] bind ;
 
 : library-abi ( library -- abi )
-    library [ [ "abi" get ] bind ] [ "cdecl" ] ifte* ;
+    library "abi" swap ?hash [ "cdecl" ] unless* ;
+
+: DLL" skip-blank parse-string dlopen swons ; parsing
 
 : ALIEN: scan-word <alien> swons ; parsing

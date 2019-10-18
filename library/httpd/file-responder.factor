@@ -1,17 +1,17 @@
 ! Copyright (C) 2004,2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: file-responder
-USING: html httpd kernel lists namespaces parser sequences
-io strings unparser ;
+USING: html httpd kernel lists math namespaces parser sequences
+io strings ;
 
 : serving-path ( filename -- filename )
     [ "" ] unless* "doc-root" get swap append ;
 
 : file-response ( mime-type length -- )
     [
-        unparse "Content-Length" swons ,
+        number>string "Content-Length" swons ,
         "Content-Type" swons ,
-    ] make-list "200 OK" response terpri ;
+    ] [ ] make "200 OK" response terpri ;
 
 : serve-static ( filename mime-type -- )
     over file-length file-response  "method" get "head" = [
@@ -26,6 +26,18 @@ io strings unparser ;
     ] [
         serve-static
     ] ifte ;
+
+: file-link. ( text path -- )
+    file swons unit format ;
+
+: file-type. ( path -- )
+    directory? "[DIR ] " "[FILE] " ? write ;
+
+: file. ( dir name -- )
+    tuck path+ [ file-type. ] keep file-link. ;
+
+: directory. ( dir -- )
+    dup directory [ file. terpri ] each-with ;
 
 : list-directory ( directory -- )
     serving-html
