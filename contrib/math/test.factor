@@ -2,35 +2,37 @@ IN: temporary
 USING: kernel math test sequences math-contrib ;
 
 ! Tests
-[ V{ 0 1 } ] [ { 0 1 0 0 } ptrim ] unit-test
-[ V{ 1 } ] [ { 1 0 0 } ptrim ] unit-test
-[ V{ 0 } ] [ { 0 } ptrim ] unit-test
-[ V{ 3 10 8 } ] [ { 1 2 } { 3 4 } p* ] unit-test
-[ V{ 3 10 8 } ] [ { 3 4 } { 1 2 } p* ] unit-test
-[ V{ 0 0 0 0 0 0 0 0 0 0 } ] [ { 0 0 0 } { 0 0 0 0 0 0 0 0 } p* ] unit-test
-[ V{ 0 1 } ] [ { 0 1 } { 1 } p* ] unit-test
-[ V{ 0 } ] [ { } { } p* ] unit-test
-[ V{ 0 } ] [ { 0 } { } p* ] unit-test
-[ V{ 0 } ] [ { } { 0 } p* ] unit-test
-[ V{ 0 0 0 } ] [ { 0 0 0 } { 0 0 0 } p+ ] unit-test
-[ V{ 0 0 0 } ] [ { 0 0 0 } { 0 0 0 } p- ] unit-test
+[ { 0 1 } ] [ { 0 1 0 0 } ptrim ] unit-test
+[ { 1 } ] [ { 1 0 0 } ptrim ] unit-test
+[ { 0 } ] [ { 0 } ptrim ] unit-test
+[ { 3 10 8 } ] [ { 1 2 } { 3 4 } p* ] unit-test
+[ { 3 10 8 } ] [ { 3 4 } { 1 2 } p* ] unit-test
+[ { 0 0 0 0 0 0 0 0 0 0 } ] [ { 0 0 0 } { 0 0 0 0 0 0 0 0 } p* ] unit-test
+[ { 0 1 } ] [ { 0 1 } { 1 } p* ] unit-test
+[ { 0 } ] [ { } { } p* ] unit-test
+[ { 0 } ] [ { 0 } { } p* ] unit-test
+[ { 0 } ] [ { } { 0 } p* ] unit-test
+[ { 0 0 0 } ] [ { 0 0 0 } { 0 0 0 } p+ ] unit-test
+[ { 0 0 0 } ] [ { 0 0 0 } { 0 0 0 } p- ] unit-test
 [ { 0 0 0 } ] [ 4 { 0 0 0 } n*p ] unit-test
 [ { 4 8 0 12 } ] [ 4 { 1 2 0 3 } n*p ] unit-test
-[ V{ 1 4 7 6 0 0 0 0 0 } ] [ { 1 2 3 0 0 0 } { 1 2 0 0 } p* ] unit-test
+[ { 1 4 7 6 0 0 0 0 0 } ] [ { 1 2 3 0 0 0 } { 1 2 0 0 } p* ] unit-test
 [ V{ 7 -2 1 } V{ -20 0 0 } ] [ { 1 1 1 1 } { 3 1 } p/mod ] unit-test
 [ V{ 0 0 } V{ 1 1 } ] [ { 1 1 } { 1 1 1 1 } p/mod ] unit-test
 [ V{ 1 0 1 } V{ 0 0 0 } ] [ { 1 1 1 1 } { 1 1 } p/mod ] unit-test
 [ V{ 1 0 1 } V{ 0 0 0 } ] [ { 1 1 1 1 } { 1 1 0 0 0 0 0 0 } p/mod ] unit-test
 [ V{ 1 0 1 } V{ 0 0 0 } ] [ { 1 1 1 1 0 0 0 0 } { 1 1 0 0 } p/mod ] unit-test
-! [ { 5.0 } { 0.0 } ] [ { 10.0 } { 2.0 } p/mod ] unit-test
-! [ { 15/16 } { 0 } ] [ { 3/4 } { 4/5 } p/mod ] unit-test
+[ V{ 5.0 } V{ 0.0 } ] [ { 10.0 } { 2.0 } p/mod ] unit-test
+[ V{ 15/16 } V{ 0 } ] [ { 3/4 } { 4/5 } p/mod ] unit-test
 [ t ] [ { 0 1 } { 0 1 0 } p= ] unit-test
 [ f ] [ { 0 0 1 } { 0 1 0 } p= ] unit-test
 [ t ] [ { 1 1 1 } { 1 1 1 } p= ] unit-test
-[ V{ 0 0 } V{ 1 1 } ] [ { 1 1 1 1 } { 1 1 } pgcd ] unit-test
+[ { 0 0 } { 1 1 } ] [ { 1 1 1 1 } { 1 1 } pgcd ] unit-test
 
 [ t ] [ 10 3 nPk 10 factorial 7 factorial / = ] unit-test
 [ t ] [ 10 3 nCk 10 factorial 3 factorial 7 factorial * / = ] unit-test
+[ { 3 7 9 0 5 2 6 8 1 4 } ] [ { 3 8 5 0 9 4 6 1 7 2 } inverse-permutation ] unit-test
+[ { } ] [ { } inverse-permutation ] unit-test
 [ 1 ] [ 0 factorial ] unit-test
 [ 1 ] [ 1 factorial ] unit-test
 [ 2 ] [ 2 factorial ] unit-test
@@ -45,15 +47,15 @@ USING: kernel math test sequences math-contrib ;
 [ 1 ] [ 2 0 nCk ] unit-test
 [ 1 ] [ 2 0 nPk ] unit-test
 [ t ] [ -9000000000000000000000000000000000000000000 gamma 1/0. = ] unit-test
-[ t ] [ -1.5 gamma 2.36327 almost= ] unit-test
+[ t ] [ -1.5 gamma 2.363271801207344 almost= ] unit-test
 [ t ] [ -1 gamma 1/0. = ] unit-test
-[ t ] [ -0.5 gamma -3.5449 almost= ] unit-test
+[ t ] [ -0.5 gamma -3.544907701811 almost= ] unit-test
 [ t ] [ 0 gamma 1/0. = ] unit-test
 [ t ] [ .5 gamma 1.7724538 almost= ] unit-test
 [ t ] [ 1 gamma 1 almost= ] unit-test
 [ t ] [ 2 gamma 1 almost= ] unit-test
 [ t ] [ 3 gamma 2 almost= ] unit-test
-[ t ] [ 11 gamma 3628800 almost= ] unit-test
+[ t ] [ 11 gamma 3628800.000015679 almost= ] unit-test
 [ t ] [ 90000000000000000000000000000000000000000000 gamma 1/0. = ] unit-test
 ! some fun identities
 [ t ] [ 2/3 gamma 2 pi * 3 sqrt 1/3 gamma * / almost= ] unit-test
@@ -69,7 +71,7 @@ USING: kernel math test sequences math-contrib ;
 [ t ] [ 1 gammaln 0 almost= ] unit-test
 [ t ] [ 2 gammaln 0 almost= ] unit-test
 [ t ] [ 3 gammaln 0.693147180 almost= ] unit-test
-[ t ] [ 11 gammaln 15.1044 almost= ] unit-test
+[ t ] [ 11 gammaln 15.1044125 almost= ] unit-test
 [ t ] [ 9000000000000000000000000000000000000000000 gammaln 8.811521863477754e+44 almost= ] unit-test
 
 [ 1 ] [ qi norm ] unit-test

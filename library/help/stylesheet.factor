@@ -20,6 +20,9 @@ USING: styles ;
 : emphasis-style
     H{ { font-style italic } } ;
 
+: strong-style
+    H{ { font-style bold } } ;
+
 : title-style
     H{
         { font "sans-serif" }

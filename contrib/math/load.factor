@@ -1,4 +1,5 @@
-PROVIDE: math { 
+REQUIRES: contrib/sequences ;
+PROVIDE: contrib/math { 
     "utils.factor"
     "combinatorics.factor"
     "analysis.factor"

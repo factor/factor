@@ -1,34 +1,20 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+IN: gadgets-listener
+DEFER: call-listener
+
 IN: gadgets-presentations
 USING: arrays definitions gadgets gadgets-borders
 gadgets-buttons gadgets-grids gadgets-labels gadgets-outliner
-gadgets-panes gadgets-paragraphs gadgets-theme generic
-hashtables inspector io kernel prettyprint sequences strings
+gadgets-panes gadgets-paragraphs gadgets-theme
+generic hashtables tools io kernel prettyprint sequences strings
 styles words help math models namespaces ;
 
 ! Clickable objects
-TUPLE: presentation object commands ;
+TUPLE: presentation object ;
 
-C: presentation ( button object commands -- button )
-    [ set-presentation-commands ] keep
-    [ set-presentation-object ] keep
-    [ set-gadget-delegate ] keep ;
-
-: <object-presentation> ( gadget object -- button )
-    >r f <roll-button> r>
-    dup mouse-operations <presentation> ;
-
-: <command-presentation> ( target command -- button )
-    dup command-name f <bevel-button> -rot { f f } swap add*
-    <presentation> ;
-
-: invoke-presentation ( gadget button# -- )
-    1- over presentation-commands nth [
-        >r presentation-object r> invoke-command
-    ] [
-        drop
-    ] if* ;
+: invoke-presentation ( presentation -- )
+    presentation-object dup default-operation invoke-command ;
 
 : show-mouse-help ( presentation -- )
     dup find-world [ world-status set-model* ] [ drop ] if* ;
@@ -36,39 +22,43 @@ C: presentation ( button object commands -- button )
 : hide-mouse-help ( presentation -- )
     find-world [ world-status f swap set-model* ] when* ;
 
+M: presentation ungraft* ( presentation -- )
+    dup hide-mouse-help delegate ungraft* ;
+
+C: presentation ( gadget object -- button )
+    [ set-presentation-object ] keep
+    swap [ invoke-presentation ] <roll-button>
+    over set-gadget-delegate ;
+
+: <command-button> ( target command -- button )
+    dup command-name -rot
+    [ invoke-command drop ] curry curry
+    <bevel-button> ;
+
+: <commands-menu> ( target commands -- gadget )
+    [ hand-clicked get find-world hide-glass ] modify-operations
+    [ <command-button> ] map-with
+    make-pile 1 over set-pack-fill ;
+
+: operations-menu ( presentation -- gadget )
+    dup presentation-object
+    dup object-operations <commands-menu>
+    swap show-menu ;
+
 presentation H{
-    { T{ button-up f f 1 } [ [ 1 invoke-presentation ] if-clicked ] }
-    { T{ button-up f f 2 } [ [ 2 invoke-presentation ] if-clicked ] }
-    { T{ button-up f f 3 } [ [ 3 invoke-presentation ] if-clicked ] }
+    { T{ button-down f f 3 } [ operations-menu ] }
     { T{ mouse-leave } [ dup hide-mouse-help button-update ] }
-    { T{ mouse-enter } [ dup show-mouse-help button-update ] }
+    { T{ motion } [ dup show-mouse-help button-update ] }
 } set-gestures
 
 ! Presentation help bar
-: <presentation-summary> ( model -- )
-    [ [ presentation-object summary ] [ "" ] if* ]
-    <filter> <label-control> ;
-
-: presentation-mouse-help ( presentation -- string )
+: <presentation-help> ( model -- gadget )
     [
-        presentation-commands
-        dup length [ 2array ] 2map [ first ] subset
-        [ first2 "Button " % 1+ # ": " % command-name % ]
-        [ "  " % ] interleave
-    ] "" make ;
-
-: <presentation-mouse-help> ( model -- help )
-    [
-        [
-            presentation-mouse-help
-        ] [
-            "Press F1 for keyboard help"
-        ] if*
+        [ presentation-object summary ] [ "" ] if*
     ] <filter> <label-control> dup reverse-video-theme ;
 
-: <presentation-help> ( model -- gadget )
-    dup <presentation-mouse-help> swap <presentation-summary>
-    2array make-pile 1 over set-pack-fill ;
+: <listener-button> ( gadget quot -- button )
+    [ call-listener ] curry <roll-button> ;
 
 ! Character styles
 
@@ -90,7 +80,10 @@ presentation H{
     over specified-font over set-label-font ;
 
 : apply-presentation-style ( style gadget -- style gadget )
-    presented [ <object-presentation> ] apply-style ;
+    presented [ <presentation> ] apply-style ;
+
+: apply-quotation-style ( style gadget -- style gadget )
+    quotation [ <listener-button> ] apply-style ;
 
 : <styled-label> ( style text -- gadget )
     <label>
@@ -98,6 +91,7 @@ presentation H{
     apply-background-style
     apply-font-style
     apply-presentation-style
+    apply-quotation-style
     nip ;
 
 ! Paragraph styles
@@ -130,6 +124,7 @@ presentation H{
     apply-border-color-style
     apply-page-color-style
     apply-presentation-style
+    apply-quotation-style
     apply-outliner-style
     nip ;
 
@@ -156,10 +151,10 @@ presentation H{
         [ pick pick >r >r -rot styled-pane r> r> rot ] map
     ] map styled-grid nip ;
 
-M: pane with-stream-table
+M: pane-stream with-stream-table
     >r rot <pane-grid> r> print-gadget ;
 
-M: pane with-nested-stream
+M: pane-stream with-nested-stream
     >r styled-pane r> write-gadget ;
 
 ! Stream utilities

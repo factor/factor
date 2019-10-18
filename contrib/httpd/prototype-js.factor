@@ -11,7 +11,7 @@ strings ;
 : include-prototype-js ( -- )
   #! Write out the HTML script tag to include the prototype
   #! javascript library.
-  <script "text/javascript" =type "/responder/resources/contrib/httpd/javascript/prototype.js"
+  <script "text/javascript" =type "/responder/resources/prototype.js"
   =src script>
   </script> ;
 

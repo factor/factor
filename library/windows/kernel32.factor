@@ -94,8 +94,14 @@ FUNCTION: HANDLE CreateFileA ( char* lpFileName, DWORD dwDesiredAccess, DWORD dw
 FUNCTION: HANDLE CreateFileW ( char* lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttribures, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile ) ;
 : CreateFile \ CreateFileW \ CreateFileA unicode-exec ;
 
-! FUNCTION: CreateFileMappingA
-! FUNCTION: CreateFileMappingW
+FUNCTION: HANDLE  CreateFileMappingA ( HANDLE hFile,
+                                       LPSECURITY_ATTRIBUTES lpAttributes,
+                                       DWORD flProtect,
+                                       DWORD dwMaximumSizeHigh,
+                                       DWORD dwMaximumSizeLow,
+                                       LPCTSTR lpName ) ;
+: CreateFileMapping CreateFileMappingA ;
+
 ! FUNCTION: CreateHardLinkA
 ! FUNCTION: CreateHardLinkW
 ! FUNCTION: HANDLE CreateIoCompletionPort ( HANDLE hFileHandle, HANDLE hExistingCompletionPort, ULONG_PTR uCompletionKey, DWORD dwNumberofConcurrentThreads ) ;
@@ -316,7 +322,7 @@ FUNCTION: HANDLE CreateIoCompletionPort ( HANDLE hFileHandle, HANDLE hExistingCo
 ! FUNCTION: GetConsoleProcessList
 ! FUNCTION: GetConsoleScreenBufferInfo
 ! FUNCTION: GetConsoleSelectionInfo
-FUNCTION: DWORD GetConsoleTitleA ( LPTSTR lpConsoleTitle, DWORD nSize ) ;
+FUNCTION: DWORD GetConsoleTitleA ( LPCTSTR lpConsoleTitle, DWORD nSize ) ;
 FUNCTION: DWORD GetConsoleTitleW ( LPWSTR lpConsoleTitle, DWORD nSize ) ;
 : GetConsoleTitle \ GetConsoleTitleW \ GetConsoleTitleA unicode-exec ;
 ! FUNCTION: GetConsoleWindow
@@ -633,8 +639,19 @@ FUNCTION: BOOL GlobalUnlock ( HGLOBAL hMem ) ;
 ! FUNCTION: LZStart
 ! FUNCTION: MapUserPhysicalPages
 ! FUNCTION: MapUserPhysicalPagesScatter
-! FUNCTION: MapViewOfFile
-! FUNCTION: MapViewOfFileEx
+FUNCTION: LPVOID MapViewOfFile ( HANDLE hFileMappingObject,
+                                 DWORD dwDesiredAccess,
+                                 DWORD dwFileOffsetHigh,
+                                 DWORD dwFileOffsetLow,
+                                 SIZE_T dwNumberOfBytesToMap ) ;
+
+FUNCTION: LPVOID MapViewOfFileEx ( HANDLE hFileMappingObject,
+                                 DWORD dwDesiredAccess,
+                                 DWORD dwFileOffsetHigh,
+                                 DWORD dwFileOffsetLow,
+                                 SIZE_T dwNumberOfBytesToMap,
+                                 LPVOID lpBaseAddress ) ;
+
 ! FUNCTION: Module32First
 ! FUNCTION: Module32FirstW
 ! FUNCTION: Module32Next
@@ -656,8 +673,10 @@ FUNCTION: BOOL GlobalUnlock ( HGLOBAL hMem ) ;
 ! FUNCTION: OpenEventA
 ! FUNCTION: OpenEventW
 ! FUNCTION: OpenFile
-! FUNCTION: OpenFileMappingA
-! FUNCTION: OpenFileMappingW
+FUNCTION: HANDLE OpenFileMappingA ( DWORD dwDesiredAccess,
+                                    BOOL bInheritHandle,
+                                    LPCTSTR lpName ) ;
+: OpenFileMapping OpenFileMappingA ;
 ! FUNCTION: OpenJobObjectA
 ! FUNCTION: OpenJobObjectW
 ! FUNCTION: OpenMutexA

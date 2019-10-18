@@ -48,6 +48,13 @@ M: stack-params %freg>stack
 : %alien-invoke ( symbol dll -- )
     reset-sse compile-c-call ;
 
+: alien-temp ( quot -- )
+    0 R11 MOV "alien_temp" f rel-absolute-cell rel-dlsym
+    R11 swap call ; inline
+
+: %alien-indirect ( -- )
+    reset-sse [ CALL ] alien-temp ;
+
 : %alien-callback ( quot -- )
     RDI load-indirect "run_callback" f compile-c-call ;
 

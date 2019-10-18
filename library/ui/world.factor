@@ -16,11 +16,13 @@ kernel math models namespaces opengl sequences ;
 !   UI code assumes that everything starts at { 0 0 }.
 TUPLE: world
 active?
-gadget
+gadget glass
 title status
 focus focused?
 fonts handle
 loc ;
+
+SYMBOL: menu-mode?
 
 : free-fonts ( world -- )
     dup world-handle select-gl-context
@@ -43,21 +45,15 @@ C: world ( gadget -- world )
 M: world pref-dim*
     delegate pref-dim* [ >fixnum ] map { 1024 768 } vmin ;
 
-: activate-world-model ( world model -- )
-    [ add-connection ] keep activate-model ;
-
 M: world graft*
-    dup dup world-title activate-world-model
-    dup dup world-status activate-world-model
+    dup dup world-title add-connection
+    dup dup world-status add-connection
     model-changed ;
-
-: deactivate-world-model ( world model -- )
-    [ remove-connection ] keep deactivate-model ;
 
 M: world ungraft*
     dup
-    dup world-title deactivate-world-model
-    dup world-status deactivate-world-model ;
+    dup world-title remove-connection
+    dup world-status remove-connection ;
 
 M: world model-changed
     dup world-title model-value swap set-title ;
@@ -68,7 +64,23 @@ M: world model-changed
 : font-sprites ( font world -- pair )
     world-fonts [ lookup-font V{ } clone 2array ] cache ;
 
-: draw-string ( font string -- )
-    >r world get font-sprites first2 r> (draw-string) ;
+: draw-string ( font string loc -- )
+    >r >r world get font-sprites first2 r> r> (draw-string) ;
 
 M: world gadget-title world-gadget gadget-title ;
+
+M: world layout*
+    dup delegate layout*
+    dup world-glass [
+        >r dup rect-dim r> set-layout-dim
+    ] when* drop ;
+
+: hide-glass ( world -- )
+    f menu-mode? set-global
+    dup world-glass [ unparent ] when*
+    f swap set-world-glass ;
+
+: show-glass ( gadget world -- )
+    [ hide-glass ] keep
+    [ add-gadget ] 2keep
+    set-world-glass ;

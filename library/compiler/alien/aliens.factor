@@ -6,7 +6,7 @@ sequences ;
 
 : <alien> ( address -- alien ) f <displaced-alien> ; inline
 
-UNION: c-ptr byte-array alien ;
+UNION: c-ptr byte-array alien POSTPONE: f ;
 
 M: alien equal?
     over alien? [

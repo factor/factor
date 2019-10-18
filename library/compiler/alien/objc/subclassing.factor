@@ -19,9 +19,8 @@ libc math namespaces sequences strings words ;
     dup length dup <empty-method-list> -rot
     [ pick method-list@ objc-method-nth init-method ] 2each ;
 
-: <method-lists> ( methods -- lists )
-    <method-list> alien-address
-    "void*" <malloc-object> [ 0 set-alien-unsigned-cell ] keep ;
+: define-objc-methods ( class methods -- )
+    <method-list> class_addMethods ;
 
 : <objc-class> ( name info -- class )
     "objc-class" <malloc-object>
@@ -42,23 +41,23 @@ libc math namespaces sequences strings words ;
     dup objc-class-super-class objc-class-instance-size
     swap set-objc-class-instance-size ;
 
-: <meta-class> ( methods superclass name -- class )
+: <meta-class> ( superclass name -- class )
     CLS_META <objc-class>
     [ >r dup objc-class-isa r> set-objc-class-super-class ] keep
     [ >r meta-meta-class r> set-objc-class-isa ] keep
-    [ >r <method-lists> r> set-objc-class-methodLists ] keep
     dup copy-instance-size ;
 
-: <new-class> ( methods metaclass superclass name -- class )
+: <new-class> ( metaclass superclass name -- class )
     CLS_CLASS <objc-class>
     [ set-objc-class-super-class ] keep
     [ set-objc-class-isa ] keep
-    [ >r <method-lists> r> set-objc-class-methodLists ] keep
     dup copy-instance-size ;
 
-: (define-objc-class) ( imeth cmeth superclass name -- )
-    >r objc-class r> [ <meta-class> ] 2keep <new-class>
-    objc_addClass ;
+: (define-objc-class) ( superclass name imeth -- )
+    >r
+    >r objc-class r>
+    [ <meta-class> ] 2keep <new-class> dup objc_addClass
+    r> <method-list> class_addMethods ;
 
 : encode-types ( return types -- encoding )
     >r 1array r> append
@@ -78,8 +77,11 @@ libc math namespaces sequences strings words ;
 : prepare-methods ( methods -- methods )
     [ first4 prepare-method 3array ] map ;
 
-: define-objc-class ( superclass name imeth cmeth -- )
-    pick >r
-    [ prepare-methods ] 2apply
-    [ 2array % 2array % \ (define-objc-class) , ] [ ] make
-    r> swap import-objc-class ;
+: redefine-objc-methods ( name imeth -- )
+    >r objc_getClass r> define-objc-methods ;
+
+: define-objc-class ( superclass name imeth -- )
+    prepare-methods
+    over class-exists? [ 2dup redefine-objc-methods ] when
+    over >r [ 3array % \ (define-objc-class) , ] [ ] make r>
+    swap import-objc-class ;

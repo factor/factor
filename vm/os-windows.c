@@ -58,7 +58,7 @@ void ffi_dlopen (DLL *dll, bool error)
 	{
 		dll->dll = NULL;
 		if(error)
-			general_error(ERROR_FFI, tag_object(get_error_message()),F,true);
+			general_error(ERROR_FFI, F, tag_object(get_error_message()),true);
 		else
 			return;
 	}
@@ -74,7 +74,8 @@ void *ffi_dlsym (DLL *dll, F_STRING *symbol, bool error)
 	if (!sym)
 	{
 		if(error)
-			general_error(ERROR_FFI, tag_object(get_error_message()),F,true);
+			general_error(ERROR_FFI, tag_object(symbol),
+				tag_object(get_error_message()),true);
 		else
 			return NULL;
 	}
@@ -199,11 +200,29 @@ void dealloc_bounded_block(BOUNDED_BLOCK *block)
 	free(block);
 }
 
+long getpagesize (void)
+{
+	static long g_pagesize = 0;
+	if (! g_pagesize)
+	{
+		SYSTEM_INFO system_info;
+		GetSystemInfo (&system_info);
+		g_pagesize = system_info.dwPageSize;
+	}
+	return g_pagesize;
+}
+
+const char *default_image_path(void)
+{
+	return "factor.image";
+}
+
 /* SEH support. Proceed with caution. */
 typedef long exception_handler_t(
-	void *rec, void *frame, void *context, void *dispatch);
+	PEXCEPTION_RECORD rec, void *frame, void *context, void *dispatch);
 
-typedef struct exception_record {
+typedef struct exception_record
+{
 	struct exception_record *next_handler;
 	void *handler_func;
 } exception_record_t;
@@ -218,27 +237,18 @@ void seh_call(void (*func)(), exception_handler_t *handler)
 	asm("mov %0, %%fs:0" : "=r" (record.next_handler));
 }
 
-long getpagesize (void) {
-	static long g_pagesize = 0;
-	if (! g_pagesize) {
-		SYSTEM_INFO system_info;
-		GetSystemInfo (&system_info);
-		g_pagesize = system_info.dwPageSize;
-	}
-	return g_pagesize;
-}
-
-static void exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)
+static long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)
 {
 	memory_protection_error((void*)rec->ExceptionInformation[1], SIGSEGV);
+	return -1; /* unreachable */
 }
 
-void platform_run(void)
+void run(void)
 {
-	seh_call(run_toplevel, (exception_handler_t*) exception_handler);
+	interpreter();
 }
 
-const char *default_image_path(void)
+void run_toplevel(void)
 {
-	return "factor.image";
+	seh_call(run, exception_handler);
 }

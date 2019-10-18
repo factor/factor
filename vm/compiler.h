@@ -1,18 +1,3 @@
-/* The compiled code heap is structured into blocks. */
-typedef struct
-{
-	CELL code_length; /* # bytes */
-	CELL reloc_length; /* # bytes */
-	CELL literal_length; /* # bytes */
-	CELL words_length; /* # bytes */
-	CELL finalized; /* has finalize_code_block() been called on this yet? */
-} F_COMPILED;
-
-typedef void (*CODE_HEAP_ITERATOR)(F_COMPILED *compiled, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL words_start);
-
-void iterate_code_heap(CELL start, CELL end, CODE_HEAP_ITERATOR iter);
-
 typedef enum {
 	/* arg is a primitive number */
 	RT_PRIMITIVE,
@@ -53,15 +38,7 @@ typedef struct {
 	CELL offset;
 } F_REL;
 
-void finalize_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literal_start, CELL words_start);
-
-void collect_literals(void);
-
-void init_compiler(CELL size);
-
+void relocate_code_block(F_COMPILED *relocating, CELL code_start,
+	CELL reloc_start, CELL literal_start, CELL words_start, CELL words_end);
 void primitive_add_compiled_block(void);
-
-CELL last_flush;
-
 void primitive_finalize_compile(void);

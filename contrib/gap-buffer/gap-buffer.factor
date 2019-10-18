@@ -19,7 +19,7 @@ TUPLE: gb
 : required-space ( n gb -- n )
     tuck gb-expand-factor * ceiling >fixnum swap gb-min-size max ;
 
-C: gb ( seq gb -- gb )
+C: gb ( seq -- gb )
     5 over set-gb-min-size
     1.5 over set-gb-expand-factor
     [ >r length r> set-gb-gap-start ] 2keep

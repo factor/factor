@@ -1,34 +1,30 @@
-! Updated by Matthew Willis, July 2006
-!
 ! Copyright (C) 2004 Chris Double.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-USING: kernel sequences math vectors arrays namespaces ;
+! See http://factorcode.org/license.txt for BSD license.
+!
+! Updated by Matthew Willis, July 2006
+! Updated by Chris Double, September 2006
+!
+USING: kernel sequences math vectors arrays namespaces generic errors ;
 IN: lazy-lists
+
+! Lazy List Protocol
+GENERIC: car   ( cons -- car )
+GENERIC: cdr   ( cons -- cdr )
+GENERIC: nil?  ( cons -- bool )
+GENERIC: list? ( object -- bool )
 
 TUPLE: promise quot forced? value ;
 
 C: promise ( quot -- promise ) [ set-promise-quot ] keep ;
+
+: promise ( quot -- promise ) 
+  <promise> ;
+
+: promise-with ( value quot -- promise )
+  curry <promise> ;
+
+: promise-with2 ( value1 value2 quot -- promise )
+  curry curry <promise> ;
 
 : force ( promise -- value )
     #! Force the given promise leaving the value of calling the
@@ -39,169 +35,408 @@ C: promise ( quot -- promise ) [ set-promise-quot ] keep ;
         t over set-promise-forced?
     ] unless
     promise-value ;
-  
+
+M: promise car ( promise -- car )
+  force car ;
+
+M: promise cdr ( promise -- cdr )
+  force cdr ;
+
+M: promise nil? ( cons -- bool )
+  force nil? ;
+
+M: promise list? ( object -- bool )
+  drop t ;
+
 TUPLE: cons car cdr ;
 
-: nil ( -- list )
-    #! The nil lazy list.
-    T{ promise f [ { } ] t { } } ;
+M: object list? ( object -- bool )
+  drop f ;
 
-: nil? ( list -- bool )
-    #! Is the given lazy cons the nil value
-    force { } = ;
+C: cons ( car cdr -- list ) 
+    [ set-cons-cdr ] keep 
+    [ set-cons-car ] keep ;
 
-: car ( list -- car )
-    #! Return the value of the head of the lazy list. 
-    force cons-car ;
+M: cons car ( cons -- car )
+    cons-car ;    
 
-: cdr ( list -- cdr )
-    #! Return the rest of the lazy list.
-    #! This is itself a lazy list.
-    force cons-cdr ;
+M: cons cdr ( cons -- cdr )
+    cons-cdr ;    
+
+: nil ( -- cons )
+  T{ cons f f f } ;
+
+M: cons nil? ( cons -- bool )
+    nil eq? ;
+
+M: cons list? ( object -- bool )
+  drop t ;
 
 : cons ( car cdr -- list )
-    #! Given a car and cdr, both lazy values, return a lazy cons.
-    [ swap , , \ <cons> , ] [ ] make <promise> ;
+    <cons> ;
 
-: lunit ( obj -- list )
-    #! Given a value produce a lazy list containing that value.
-    nil cons ;
+: 1list ( obj -- cons )
+    nil <cons> ;
 
-: lnth ( n list -- value )
-    #! Return the nth item in a lazy list
-    swap [ cdr ] times car ;
+: 2list ( a b -- cons )
+    nil <cons> <cons> ;
+
+: 3list ( a b c -- cons )
+    nil <cons> <cons> <cons> ;
+
+! Both 'car' and 'cdr' are promises  
+TUPLE: lazy-cons car cdr ;
+
+: lazy-cons ( car cdr -- promise ) 
+    >r promise r> promise <lazy-cons> 
+    T{ promise f f t f } clone [ set-promise-value ] keep ;
+
+M: lazy-cons car ( lazy-cons -- car )
+    lazy-cons-car force ;    
+
+M: lazy-cons cdr ( lazy-cons -- cdr )
+    lazy-cons-cdr force ;    
+
+M: lazy-cons nil? ( lazy-cons -- bool )
+    nil eq? ;
+
+M: lazy-cons list? ( object -- bool )
+  drop t ;
+
+DEFER: lunit 
+DEFER: lnth 
+TUPLE: list ;
+
+: 1lazy-list ( a -- lazy-cons )
+  [ nil ] lazy-cons ;
+
+: 2lazy-list ( a b -- lazy-cons )
+  1lazy-list unit lazy-cons ;
+
+: 3lazy-list ( a b c -- lazy-cons )
+  2lazy-list unit lazy-cons ;
+
+: lnth ( n list -- elt ) 
+  swap [ cdr ] times car ;
 
 : uncons ( cons -- car cdr )
     #! Return the car and cdr of the lazy list
-    force dup cons-car swap cons-cdr ;
-    
-: force-promise ( list-quot -- list )
-    #! Promises to force list-quot, which should be
-    #! a quot that produces a list.
-    #! This allows caching of the resultant list value.
-    [ call \ force , ] [ ] make <promise> ; inline
-
-DEFER: lmap
-: (lmap) ( list quot -- list )
-	over nil? [ drop ] 
-	[
-  	    swap 2dup
-  	    cdr swap lmap >r
-        car swap call r> 
-  	    cons
-	] if ;
-
-: lmap ( list quot -- list )
-    #! Return a lazy list containing the collected result of calling
-    #! quot on the original lazy list.
-    [ swap , , \ (lmap) ,  ] force-promise ;
-
-DEFER: ltake
-: (ltake) ( n list -- list )
-    over 0 = [ 2drop nil ] 
-	[ dup nil? [ nip ] 
-		[
-            swap  ( list n -- list )
-            1 - >r uncons r> swap ltake 
-            cons
-  	    ] if 
-	] if ;
-
-: ltake ( n list -- list )
-    #! Return a lazy list containing the first n items from
-    #! the original lazy list.
-    [ swap , , \ (ltake) , ] force-promise ;
-
-DEFER: lsubset
-: (lsubset) ( list pred -- list )
-	>r dup nil? [ r> drop ] 
-	[
-		uncons swap dup r> dup >r call 
-		[ swap r> lsubset cons ] 
-		[ drop r> (lsubset) ] if
-	] if ;
-	
-: lsubset ( list pred -- list )
-    #! Return a lazy list containing the elements in llist 
-    #! satisfying pred	
-	[ swap , , \ (lsubset) , ] force-promise ;
-
-: (list>backwards-vector) ( list -- vector )
-    dup nil? [ drop V{ } clone ]
-	[ uncons (list>backwards-vector) swap over push ] if ;
-	
-: list>vector ( list -- vector )
-    #! Convert a lazy list to a vector. This will cause
-    #! an infinite loop if the lazy list is an infinite list.
-    (list>backwards-vector) reverse ;
-
-: list>array ( list -- array )
-    list>vector >array ;
-
-DEFER: backwards-vector>list
-: (backwards-vector>list) ( vector -- list )
-    dup empty? [ drop nil ]
-	[ dup pop swap backwards-vector>list cons ] if ;
-
-: backwards-vector>list ( vector -- list )
-    [ , \ (backwards-vector>list) , ] force-promise ;
-    
-: array>list ( array -- list )
-    #! Convert a list to a lazy list.
-    reverse >vector backwards-vector>list ;
-
-DEFER: lappend*
-: (lappend*) ( lists -- list )
-	dup nil? [ 
-		uncons >r dup nil? [ drop r> (lappend*) ]
-		[ uncons r> cons lappend* cons ] if
-	] unless ;
-
-: lappend* ( llists -- list )
-    #! Given a lazy list of lazy lists, concatenate them 
-    #! together in a lazy fashion. The actual appending is 
-    #! done lazily on iteration rather than immediately
-    #! so it works very fast no matter how large the lists.
-	[ , \ (lappend*) , ] force-promise ;
-
-: lappend ( list1 list2 -- llist )
-    #! Concatenate two lazy lists such that they appear to be one big
-    #! lazy list.
-    lunit cons lappend* ;
+    dup car swap cdr ;
 
 : leach ( list quot -- )
-    #! Call the quotation on each item in the lazy list. 
-    #! Warning: If the list is infinite then this will
-    #! never return. 
-	swap dup nil? [ 2drop ] [
-		uncons swap pick call swap leach
-	] if ;
+  swap dup nil? [ 
+    2drop 
+  ] [
+    uncons swap pick call swap leach
+  ] if ;
 
-DEFER: lapply	
-: (lapply) ( list quot -- list )
-	over nil? [ drop ] [ 
-		swap dup car >r uncons pick call swap lapply
-		r> swap cons 
-	] if ;
-	
-: lapply ( list quot -- list )
-    #! Returns a lazy list which is
-	#! (cons (car list)
-	#!		   (lapply (quot (car list) (cdr list)) quot))
-	#! This allows for complicated list functions
-    [ swap , , \ (lapply) , ] force-promise ;
+: 2curry ( a b quot -- quot )
+  curry curry ;
 
-DEFER: lfrom-by
-: (lfrom-by) ( n quot -- list )
-	2dup call swap lfrom-by cons ;
-	
+TUPLE: memoized-cons original car cdr nil? ;
+
+: not-memoized ( -- obj )
+  { } ;
+
+: not-memoized? ( obj -- bool )
+  not-memoized eq? ;
+
+C: memoized-cons ( cons -- memoized-cons )
+  [ set-memoized-cons-original ] keep
+  not-memoized over set-memoized-cons-car 
+  not-memoized over set-memoized-cons-cdr 
+  not-memoized over set-memoized-cons-nil? ;
+
+M: memoized-cons car ( memoized-cons -- car )
+  dup memoized-cons-car not-memoized? [
+    dup memoized-cons-original car [ swap set-memoized-cons-car ] keep
+  ] [
+    memoized-cons-car
+  ] if ;
+
+M: memoized-cons cdr ( memoized-cons -- cdr )
+  dup memoized-cons-cdr not-memoized? [
+    dup memoized-cons-original cdr [ swap set-memoized-cons-cdr ] keep
+  ] [
+    memoized-cons-cdr
+  ] if ;
+
+M: memoized-cons nil? ( memoized-cons -- bool )
+  dup memoized-cons-nil? not-memoized? [
+    dup memoized-cons-original nil? [ swap set-memoized-cons-nil? ] keep
+  ] [
+    memoized-cons-nil?
+  ] if ;
+
+M: memoized-cons list? ( object -- bool )
+  drop t ;
+
+TUPLE: lazy-map cons quot ;
+
+: lmap ( list quot -- result )
+    over nil? [ 2drop nil ] [ <lazy-map> <memoized-cons> ] if ;
+
+M: lazy-map car ( lazy-map -- car )
+  [ lazy-map-cons car ] keep
+  lazy-map-quot call ;
+
+M: lazy-map cdr ( lazy-map -- cdr )
+  [ lazy-map-cons cdr ] keep
+  lazy-map-quot lmap ;
+
+M: lazy-map nil? ( lazy-map -- bool )
+  lazy-map-cons nil? ;
+
+M: lazy-map list? ( object -- bool )
+  drop t ;
+
+TUPLE: lazy-map-with value cons quot ;
+
+: lmap-with ( value list quot -- result )
+  over nil? [ 3drop nil ] [ <lazy-map-with> <memoized-cons> ] if ;
+
+M: lazy-map-with car ( lazy-map-with -- car )
+  [ lazy-map-with-value ] keep
+  [ lazy-map-with-cons car ] keep
+  lazy-map-with-quot call ;
+
+M: lazy-map-with cdr ( lazy-map-with -- cdr )
+  [ lazy-map-with-value ] keep
+  [ lazy-map-with-cons cdr ] keep
+  lazy-map-with-quot lmap-with ;
+
+M: lazy-map-with nil? ( lazy-map-with -- bool )
+  lazy-map-with-cons nil? ;
+
+M: lazy-map-with list? ( object -- bool )
+  drop t ;
+
+TUPLE: lazy-take n cons ;
+
+: ltake ( n list -- result )
+    over zero? [ 2drop nil ] [ <lazy-take> ] if ;
+     
+M: lazy-take car ( lazy-take -- car )
+  lazy-take-cons car ;
+
+M: lazy-take cdr ( lazy-take -- cdr )
+  [ lazy-take-n 1- ] keep
+  lazy-take-cons cdr ltake ;
+
+M: lazy-take nil? ( lazy-take -- bool )
+  lazy-take-n zero? ;
+
+M: lazy-take list? ( object -- bool )
+  drop t ;
+
+TUPLE: lazy-subset cons quot ;
+
+: lsubset ( list quot -- list )
+    over nil? [ 2drop nil ] [ <lazy-subset> <memoized-cons> ] if ;
+
+: car-subset?  ( lazy-subset -- )
+  [ lazy-subset-cons car ] keep
+  lazy-subset-quot call ;
+
+: skip ( lazy-subset -- )
+  [ lazy-subset-cons cdr ] keep
+  set-lazy-subset-cons ;
+
+M: lazy-subset car ( lazy-subset -- car )
+  dup car-subset? [
+    lazy-subset-cons car
+  ] [
+    dup skip car
+  ] if ;
+
+M: lazy-subset cdr ( lazy-subset -- cdr )
+  dup car-subset? [
+    [ lazy-subset-cons cdr ] keep
+    lazy-subset-quot lsubset
+  ] [
+    dup skip cdr
+  ] if ;
+
+M: lazy-subset nil? ( lazy-subset -- bool )
+  dup lazy-subset-cons nil? [
+    drop t
+  ] [
+    dup car-subset? [
+      drop f
+    ] [
+      dup skip nil?
+    ] if 
+  ] if ;
+
+M: lazy-subset list? ( object -- bool )
+  drop t ;
+
+: list>vector ( list -- vector )
+  [ [ , ] leach ] V{ } make ;
+
+: list>array ( list -- array )
+  [ [ , ] leach ] { } make ;
+
+TUPLE: lazy-append list1 list2 ;
+
+: lappend ( list1 list2 -- result )
+  {
+    { [ over nil? ] [ nip ] }
+    { [ t ] [ <lazy-append> ] }
+  } cond ;
+
+M: lazy-append car ( lazy-append -- car )
+  lazy-append-list1 car ;
+
+M: lazy-append cdr ( lazy-append -- cdr )
+  [ lazy-append-list1 cdr  ] keep
+  lazy-append-list2 lappend ;
+
+M: lazy-append nil? ( lazy-append -- bool )
+  dup lazy-append-list1 nil? [
+    lazy-append-list2 nil?     
+  ] [
+    drop f
+  ] if ;
+
+M: lazy-append list? ( object -- bool )
+  drop t ;
+
+TUPLE: lazy-from-by n quot ;
+
 : lfrom-by ( n quot -- list )
-    #! Return a lazy list of values starting from n, with
-    #! each successive value being the result of applying quot to
-    #! n.
-    [ swap , , \ (lfrom-by) , ] force-promise ;
+  <lazy-from-by> ;
     
 : lfrom ( n -- list )
-	#! Return a lazy list of increasing numbers starting
-	#! from the initial value 'n'.
-	[ 1 + ] lfrom-by ;
+  [ 1 + ] lfrom-by ;
+
+M: lazy-from-by car ( lazy-from-by -- car )
+  lazy-from-by-n ;
+
+M: lazy-from-by cdr ( lazy-from-by -- cdr )
+  [ lazy-from-by-n ] keep
+  lazy-from-by-quot dup >r call r> lfrom-by ;
+
+M: lazy-from-by nil? ( lazy-from-by -- bool )
+  drop f ;
+  
+M: lazy-from-by list? ( object -- bool )
+  drop t ;
+
+TUPLE: lazy-zip list1 list2 ;
+
+: lzip ( list1 list2 -- lazy-zip )
+    over nil? over nil? or 
+    [ 2drop nil ] [ <lazy-zip> ] if ;
+
+M: lazy-zip car ( lazy-zip -- car )
+    [ lazy-zip-list1 car ] keep lazy-zip-list2 car 2array ;
+   
+M: lazy-zip cdr ( lazy-zip -- cdr )
+    [ lazy-zip-list1 cdr ] keep lazy-zip-list2 cdr lzip ;
+
+M: lazy-zip nil? ( lazy-zip -- bool )
+    drop f ;
+
+M: lazy-zip list? ( object -- bool )
+  drop t ;
+
+TUPLE: sequence-cons index seq ;
+
+: seq>list ( index seq -- list )
+  2dup length >= [
+    2drop nil
+  ] [
+    <sequence-cons>
+  ] if ;
+
+M: sequence-cons car ( sequence-cons -- car )
+  [ sequence-cons-index ] keep
+  sequence-cons-seq nth ;
+  
+M: sequence-cons cdr ( sequence-cons -- cdr )
+  [ sequence-cons-index 1+ ] keep
+  sequence-cons-seq seq>list ;
+
+M: sequence-cons nil? ( sequence-cons -- bool )
+    drop f ;      
+
+M: sequence-cons list? ( object -- bool )
+  drop t ;
+
+: >list ( object -- list )
+  {
+    { [ dup sequence? ] [ 0 swap seq>list ] }
+    { [ dup list?     ] [ ] }
+    { [ t ] [ "Could not convert object to a list" throw ] }
+  } cond ;
+
+TUPLE: lazy-concat car cdr ;
+
+DEFER: lconcat
+
+: (lconcat) ( car cdr -- list )
+  over nil? [
+    nip lconcat 
+  ] [
+    <lazy-concat>    
+  ] if ;
+  
+: lconcat ( list -- list )
+  dup nil? [
+    drop nil
+  ] [
+    uncons (lconcat)
+  ] if ;
+
+M: lazy-concat car ( lazy-concat -- car )
+  lazy-concat-car car ;
+
+M: lazy-concat cdr ( lazy-concat -- cdr )
+  [ lazy-concat-car cdr ] keep lazy-concat-cdr (lconcat) ;
+
+M: lazy-concat nil? ( lazy-concat -- bool )
+  dup lazy-concat-car nil? [
+    lazy-concat-cdr nil?
+  ] [
+    drop f
+  ] if ;
+
+M: lazy-concat list? ( object -- bool )
+  drop t ;
+
+: lcartesian-product ( list1 list2 -- result ) 
+  swap [ swap [ 2array ] lmap-with ] lmap-with lconcat ;
+
+: lcartesian-product* ( lists -- result )
+  dup nil? [
+    drop nil
+  ] [
+    [ car ] keep cdr [ car lcartesian-product ] keep cdr list>array swap [ 
+      swap [ swap [ add ] lmap-with ] lmap-with lconcat     
+    ] reduce    
+  ] if ;
+
+: lcomp ( list quot -- result )
+  >r lcartesian-product* r> lmap ;
+
+: lcomp* ( list guards quot -- result )
+  >r >r lcartesian-product* r> [ lsubset ] each r> lmap ;
+
+DEFER: lmerge
+
+: (lmerge) ( list1 list2 -- result )
+  over [ car ] curry -rot 
+  [ 
+    dup [ car ] curry -rot
+    [
+      >r cdr r> cdr lmerge
+    ] curry curry lazy-cons       
+  ] curry curry lazy-cons ;
+
+: lmerge ( list1 list2 -- result ) 
+  {
+    { [ over nil? ] [ nip   ] }
+    { [ dup nil?  ]  [ drop ] }
+    { [ t         ]  [ (lmerge) ] }
+  } cond ;

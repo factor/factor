@@ -5,8 +5,6 @@ IN: win32-api-messages
 
 SYMBOL: windows-messages
 
-USE: inspector
-
 : maybe-create-windows-messages
     windows-messages get hashtable? 
     [ H{ } clone global [ windows-messages set ] bind ] unless ;

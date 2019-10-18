@@ -12,12 +12,12 @@ SYMBOL: listener-hook
 : (read-multiline) ( quot depth -- newquot ? )
     >r readln dup [
         (parse) depth r> dup >r <= [
-            ( we're done ) r> drop t
+            r> drop t
         ] [
-            ( more input needed ) r> (read-multiline)
+            r> (read-multiline)
         ] if
     ] [
-        ( EOF ) r> 2drop f
+        r> 2drop f
     ] if ;
 
 : read-multiline ( -- quot ? )

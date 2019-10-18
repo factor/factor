@@ -231,7 +231,7 @@ HELP: .
 
 HELP: unparse
 { $values { "obj" "an object" } { "str" "Factor source string" } }
-{ $description "Outputs a prettyprinted string representation ofan object. Output is influenced by many variables; see " { $link "prettyprint-variables" } "." } ;
+{ $description "Outputs a prettyprinted string representation of an object. Output is influenced by many variables; see " { $link "prettyprint-variables" } "." } ;
 
 HELP: pprint-short
 { $values { "obj" "an object" } }

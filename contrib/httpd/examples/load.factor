@@ -1,9 +1,8 @@
-IN: scratchpad
-USING: words kernel parser sequences io compiler ;
+USING: modules ;
 
-"/contrib/httpd/load.factor" run-resource
+REQUIRES: contrib/httpd ;
 
 { 
-    "cont-examples"
-    "cont-numbers-game"
-} [ "/contrib/httpd/examples/" swap ".factor" append3 run-resource ] each
+    "resource:contrib/httpd/examples/cont-examples.factor"
+    "resource:contrib/httpd/examples/cont-numbers-game.factor"
+} run-files

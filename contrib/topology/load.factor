@@ -1,4 +1,4 @@
-PROVIDE: topology
+PROVIDE: contrib/topology
 {
     "matrix.factor"
     "linear.factor"

@@ -1,5 +1,5 @@
 IN: temporary
-USING: kernel inspector math namespaces prettyprint test
+USING: kernel tools math namespaces prettyprint test
 sequences ;
 
 [ 1 2 3 ] describe

@@ -108,8 +108,11 @@ M: world button-up-event
     >r mouse-event>gesture >r <button-up> r> r>
     send-button-up ;
 
+: mouse-event>scroll-direction ( event -- pair )
+    XButtonEvent-button 4 = 1 -1 ? 0 swap 2array ;
+
 M: world wheel-event
-    >r dup XButtonEvent-button 4 = swap mouse-event-loc r>
+    >r dup mouse-event>scroll-direction swap mouse-event-loc r>
     send-wheel ;
 
 M: world enter-event motion-event ;

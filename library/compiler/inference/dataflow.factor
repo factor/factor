@@ -16,30 +16,24 @@ SYMBOL: meta-r
 : pop-r meta-r get pop ;
 : peek-r meta-r get peek ;
 
-TUPLE: node param shuffle
-       classes literals history
-       successor children ;
+TUPLE: node param
+in-d out-d in-r out-r
+classes literals history
+successor children ;
 
 M: node equal? eq? ;
 
+: node-shuffle ( node -- shuffle )
+    dup node-in-d swap node-out-d <effect> ;
+
 : make-node ( param in-d out-d in-r out-r node -- node )
-    [ >r swapd <shuffle> f f f f f <node> r> set-delegate ] keep ;
-
-: node-in-d  node-shuffle shuffle-in-d  ;
-: node-in-r  node-shuffle shuffle-in-r  ;
-: node-out-d node-shuffle shuffle-out-d ;
-: node-out-r node-shuffle shuffle-out-r ;
-
-: set-node-in-d  node-shuffle set-shuffle-in-d  ;
-: set-node-in-r  node-shuffle set-shuffle-in-r  ;
-: set-node-out-d node-shuffle set-shuffle-out-d ;
-: set-node-out-r node-shuffle set-shuffle-out-r ;
+    [ >r f f f f f <node> r> set-delegate ] keep ;
 
 : empty-node f { } { } { } { } ;
 : param-node { } { } { } { } ;
 : in-node >r f r> { } { } { } ;
 : out-node >r f { } r> { } { } ;
-: meta-d-node meta-d get clone in-node ;
+: meta-d-node f meta-d get clone dup { } { } ;
 
 : d-tail ( n -- seq )
     dup zero? [ drop f ] [ meta-d get swap tail* ] if ;
@@ -68,12 +62,20 @@ C: #call-label make-node ;
 
 TUPLE: #push ;
 C: #push make-node ;
-: #push ( -- node ) peek-d 1array out-node <#push> ;
+: #push ( -- node ) empty-node <#push> ;
 : >#push< ( node -- seq ) node-out-d [ value-literal ] map ;
 
 TUPLE: #shuffle ;
 C: #shuffle make-node ;
 : #shuffle ( -- node ) empty-node <#shuffle> ;
+
+TUPLE: #>r ;
+C: #>r make-node ;
+: #>r ( -- node ) empty-node <#>r> ;
+
+TUPLE: #r> ;
+C: #r> make-node ;
+: #r> ( -- node ) empty-node <#r>> ;
 
 TUPLE: #values ;
 C: #values make-node ;
@@ -94,7 +96,7 @@ C: #dispatch make-node ;
 
 TUPLE: #merge ;
 C: #merge make-node ;
-: #merge ( -- node ) meta-d get clone out-node <#merge> ;
+: #merge ( -- node ) meta-d-node <#merge> ;
 
 TUPLE: #terminate ;
 C: #terminate make-node ;

@@ -4,7 +4,8 @@ USING: arrays sequences kernel gadgets-panes definitions
 prettyprint gadgets-theme gadgets-borders gadgets
 generic gadgets-scrolling math io words models styles
 namespaces gadgets-tracks gadgets-presentations gadgets-grids
-gadgets-frames help gadgets-buttons gadgets-search ;
+gadgets-workspace gadgets-frames help gadgets-buttons
+gadgets-search tools ;
 IN: gadgets-browser
 
 TUPLE: browser navigator definitions search ;
@@ -44,7 +45,8 @@ TUPLE: tile definition gadget ;
     <default-border> dup faint-boundary ;
 
 C: tile ( definition -- gadget )
-    2dup <toolbar> <tile-content> over set-gadget-delegate
+    2dup { tile } <toolbar>
+    <tile-content> over set-gadget-delegate
     [ set-tile-definition ] keep ;
 
 : show-definition ( definition definitions -- )
@@ -81,9 +83,24 @@ C: navigator ( -- gadget )
 
 C: browser ( -- gadget )
     {
-        { [ <navigator> ] set-browser-navigator f 1/5 }
-        { [ <definitions> ] set-browser-definitions [ <scroller> ] 3/5 }
-        { [ [ apropos ] <search-gadget> ] set-browser-search f 1/5 }
+        {
+            [ <navigator> ]
+            set-browser-navigator
+            f
+            1/5
+        }
+        {
+            [ <definitions> ]
+            set-browser-definitions
+            [ <scroller> ]
+            3/5
+        }
+        {
+            [ "" [ browser call-tool ] <word-search> ]
+            set-browser-search
+            [ "Word search" <labelled-gadget> ]
+            1/5
+        }
     } { 0 1 } make-track* ;
 
 M: browser focusable-child* browser-search ;
@@ -98,9 +115,17 @@ M: browser focusable-child* browser-search ;
 : clear-browser ( browser -- )
     browser-definitions close-definitions ;
 
-browser {
-    {
-        "Browser"
-        { "Clear" T{ key-down f f "CLEAR" } [ clear-browser ] }
-    }
+browser "toolbar" {
+    { "Clear" T{ key-down f f "CLEAR" } [ clear-browser ] }
 } define-commands
+
+M: browser call-tool*
+    over vocab-link? [
+        >r vocab-link-name r> show-vocab
+    ] [
+        show-word
+    ] if ;
+
+M: browser tool-scroller browser-definitions find-scroller ;
+
+M: browser tool-help drop "ui-browser" ;

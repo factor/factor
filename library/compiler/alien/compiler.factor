@@ -23,9 +23,6 @@ kernel-internals math namespaces sequences words ;
     [ dup class get swap inc-reg-class ] keep ;
 
 : alloc-parameter ( parameter -- reg reg-class )
-    #! Allocate a register and stack frame location.
-    #! n is a stack location, and the value of the class
-    #! variable is a register number.
     c-type "reg-class" swap hash dup reg-class-full?
     [ spill-param ] [ fastcall-param ] if
     [ fastcall-regs nth ] keep ;

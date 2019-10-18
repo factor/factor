@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions generic hashtables inspector io kernel
+USING: arrays definitions generic hashtables io kernel
 namespaces parser prettyprint sequences strings styles vectors
 words ;
 IN: help
@@ -70,6 +70,8 @@ M: f print-element drop ;
 
 : $emphasis [ emphasis-style print-element* ] ($span) ;
 
+: $strong [ strong-style print-element* ] ($span) ;
+
 : $url [ url-style print-element* ] ($span) ;
 
 : $terpri terpri terpri drop ;
@@ -133,10 +135,13 @@ M: f print-element drop ;
 ! Some links
 : >link ( obj -- obj ) dup link? [ <link> ] unless ;
 
-: $link ( element -- )
-    first link-style [
+: ($link) ( article -- )
+    link-style [
         dup article-title swap >link write-object
     ] with-style ;
+
+: $link ( element -- )
+    first ($link) ;
 
 : $vocab-link ( element -- )
     first link-style [

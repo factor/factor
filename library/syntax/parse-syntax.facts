@@ -272,7 +272,7 @@ $terpri
 HELP: REQUIRES:
 { $syntax "REQUIRES: modules... ;" }
 { $values { "modules" "module name strings" } }
-{ $description "Loads a list of modules by calling " { $link (require) } " on each one." } ;
+{ $description "Loads a list of modules by calling " { $link require } " on each one." } ;
 
 HELP: PROVIDE:
 { $syntax "PROVIDE: name files tests ;" }

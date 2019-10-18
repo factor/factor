@@ -1,6 +1,6 @@
 IN: scratchpad
 USING: kernel kernel-internals math memory namespaces sequences
-test ;
+test errors ;
 
 [ 0 ] [ f size ] unit-test
 [ t ] [ [ \ = \ = ] all-equal? ] unit-test
@@ -14,3 +14,7 @@ test ;
 [ [ 3 ] ] [ 3 f curry ] unit-test
 [ [ \ + ] ] [ \ + f curry ] unit-test
 [ [ \ + = ] ] [ \ + [ = ] curry ] unit-test
+
+! Make sure we report the correct error on stack underflow
+[ { kernel-error 11 f f } ]
+[ [ clear drop ] catch ] unit-test

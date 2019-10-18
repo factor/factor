@@ -1,29 +1,31 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-books
-USING: gadgets gadgets-controls gadgets-panes gadgets-scrolling
+USING: gadgets gadgets-panes gadgets-scrolling
 kernel sequences models ;
 
-TUPLE: book pages ;
+TUPLE: book ;
 
-: get-page ( n book -- page ) book-pages nth ;
+: hide-all ( book -- ) gadget-children [ hide-gadget ] each ;
+
+: current-page ( book -- gadget )
+    [ control-value ] keep nth-gadget ;
 
 M: book model-changed ( book -- )
-    [ control-model model-value ] keep
-    [ gadget-child unparent ] keep
-    [ get-page ] keep
-    [ control-self add-gadget ] keep
+    dup hide-all
+    dup current-page show-gadget
+    dup relayout
     request-focus ;
 
 C: book ( pages -- book )
-    dup 0 <model> delegate>control
-    dup dup set-control-self
-    [ set-book-pages ] keep
+    dup 0 <model> <gadget> delegate>control
+    [ add-gadgets ] keep
     dup model-changed ;
 
-M: book pref-dim* gadget-child pref-dim ;
+M: book pref-dim* gadget-children pref-dims max-dim ;
 
 M: book layout*
-    dup rect-dim swap gadget-child set-layout-dim ;
+    dup rect-dim swap gadget-children
+    [ set-layout-dim ] each-with ;
 
-M: book focusable-child* gadget-child ;
+M: book focusable-child* current-page ;

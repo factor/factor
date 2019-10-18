@@ -12,7 +12,7 @@
 ! Then, start Factor as usual (./f factor.image) and enter these
 ! at the listener:
 !
-! "/contrib/cairo/load.factor" run-resource
+! "contrib/cario" require
 ! "cairo_simple.factor" run-file
 
 IN: cairo-simple

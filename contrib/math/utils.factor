@@ -33,8 +33,8 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
         -rot (^mod)
     ] if ; foldable
 
-: powers ( n x -- { 1 x x^2 x^3 ... } )
-    #! Output sequence has n elements.
+: powers ( n x -- seq )
+    #! Output sequence has n elements, { 1 x x^2 x^3 ... }
     <array> 1 [ * ] accumulate ;
 
 : ** ( u v -- u*v' ) conjugate * ; inline
@@ -42,9 +42,6 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
 : c. ( v v -- x )
     #! Complex inner product.
     0 [ ** + ] 2reduce ;
-
-: sum ( v -- n ) 0 [ + ] reduce ;
-: product ( v -- n ) 1 [ * ] reduce ;
 
 : proj ( u v -- w )
     #! Orthogonal projection of u onto v.
@@ -58,7 +55,7 @@ USING: errors kernel sequences math sequences-internals namespaces arrays ;
     #! find the absolute values of the min and max of a seq in one pass
     minmax 2dup [ abs ] 2apply > [ swap ] when ;
 
-SYMBOL: almost=-precision .0001 almost=-precision set-global
+SYMBOL: almost=-precision .000001 almost=-precision set-global
 : almost= ( a b -- bool )
     - abs almost=-precision get < ;
 
@@ -89,13 +86,8 @@ M: frange length ( frange -- n )
 M: frange nth ( n frange -- obj )
     [ frange-step * ] keep frange-from + ;
 
-: nseq-swap ( a b seq -- seq )
-    #! swap indices a,b in seq
-    3dup [ nth ] keep swapd [ nth ] keep
-    >r >r rot r> r> swapd set-nth -rot set-nth ;
-
 ! : pivot ( left right index seq -- )
-    ! [ nth ] keep [ nseq-swap ] 3keep ;
+    ! [ nth ] keep [ exchange ] 3keep ;
 
 SYMBOL: step-size .01 step-size set  ! base on arguments
 : (limit) ( count diff quot -- x quot )
@@ -107,22 +99,8 @@ SYMBOL: step-size .01 step-size set  ! base on arguments
 : limit ( quot -- x )
     .1 step-size set [ call ] keep step-size [ 2 / ] change 0 -rot (limit) 2drop ;
 
-! take elements n at a time and apply the quotation, forming a new seq
-: group-map ( seq n quot -- seq )
-    pick length pick /
-    [ [ >r pick pick r> -rot pick over * [ + ] keep swap rot <slice> pick call
-    , ] repeat ] { } make 2nip nip ;
-
-: nths ( start n seq -- seq )
-    -rot pick length <frange-no-endpt> [ over nth ] map nip ;
-
-! take a set of every nth element and apply the quotation, forming a new seq
-! { 1 2 3 4 5 6 } 3 [ sum ] skip-map ->  { 1 4 } { 2 5 } { 3 6 } -> { 5 7 9 }
-: skip-map ( seq n quot -- seq )
-    pick length pick /mod 
-    0 = [ "seq length must be a multiple of n" throw ] unless
-    1 <= [ "seq must be 2n or longer" throw ] when 
-    over [ [ dup >r >r pick pick r> rot swapd nths over call , r> ] repeat ] { } make 2nip nip ;
-
 : nth-rand ( seq -- elem ) [ length random-int ] keep nth ;
+
+: count-end ( seq quot -- count )
+    >r [ length ] keep r> find-last drop dup -1 = [ 2drop 0 ] [ - 1- ] if ;
 

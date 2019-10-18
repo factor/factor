@@ -105,6 +105,11 @@ typedef struct {
 	CELL array;
 } F_HASHTABLE;
 
+/* When a word is executed we jump to the value of the XT field. However this
+value is an unportable function pointer. Interpreted and primitive words will
+have their XT set to a value in the 'primitives' global (see primitives.c).
+Compiled words are marked as such and their XT, which point inside the code
+heap, are instead relocated on startup, and also considered a code GC root. */
 typedef struct {
 	/* TAGGED header */
 	CELL header;
@@ -120,6 +125,8 @@ typedef struct {
 	CELL def;
 	/* TAGGED property hash for library code */
 	CELL props;
+	/* TAGGED t or f, depending on if the word is compiled or not */
+	CELL compiledp;
 	/* UNTAGGED execution token: jump here to execute word */
 	CELL xt;
 } F_WORD;

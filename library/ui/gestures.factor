@@ -27,8 +27,7 @@ TUPLE: motion ;
 TUPLE: drag # ;
 TUPLE: button-up mods # ;
 TUPLE: button-down mods # ;
-TUPLE: wheel-up ;
-TUPLE: wheel-down ;
+TUPLE: mouse-scroll ;
 TUPLE: mouse-enter ;
 TUPLE: mouse-leave ;
 TUPLE: lose-focus ;
@@ -64,6 +63,7 @@ TUPLE: key-up mods sym ;
 ! are in the co-ordinate system of the world which contains
 ! the gadget in question.
 SYMBOL: hand-gadget
+SYMBOL: hand-world
 SYMBOL: hand-loc
 { 0 0 } hand-loc set-global
 
@@ -72,6 +72,9 @@ SYMBOL: hand-click-loc
 
 SYMBOL: hand-buttons
 V{ } clone hand-buttons set-global
+
+SYMBOL: scroll-direction
+{ 0 0 } scroll-direction set-global
 
 : button-gesture ( gesture -- )
     hand-clicked get-global 2dup handle-gesture [
@@ -105,8 +108,10 @@ V{ } clone hand-buttons set-global
     #! After we restore the UI, send mouse leave events to all
     #! gadgets that were under the mouse at the time of the
     #! save, since the mouse is in a different location now.
-    f hand-gadget [ get-global ] 2keep set-global
-    parents hand-gestures ;
+    f hand-world set-global
+    hand-gadget get-global >r
+    f hand-gadget set-global
+    f r> parents hand-gestures ;
 
 : focus-gestures ( new old -- )
     drop-prefix <reversed>
@@ -145,14 +150,16 @@ V{ } clone hand-buttons set-global
     #! the current gadget, with all parents in between.
     hand-gadget get-global parents <reversed> ;
 
-: move-hand ( loc world -- )
-    under-hand >r over hand-loc set-global
-    pick-up hand-gadget set-global
-    under-hand r> hand-gestures ;
-
 : update-clicked ( -- )
     hand-gadget get-global hand-clicked set-global
     hand-loc get-global hand-click-loc set-global ;
+
+: move-hand ( loc world -- )
+    dup hand-world set-global
+    under-hand >r over hand-loc set-global
+    pick-up hand-gadget set-global
+    menu-mode? get-global [ update-clicked ] when
+    under-hand r> hand-gestures ;
 
 : send-button-down ( gesture loc world -- )
     move-hand
@@ -165,10 +172,28 @@ V{ } clone hand-buttons set-global
     dup button-up-# hand-buttons get-global delete
     button-gesture ;
 
-: send-wheel ( up/down loc world -- )
+: send-wheel ( direction loc world -- )
     move-hand
-    T{ wheel-up } T{ wheel-down } ?
-    hand-gadget get-global handle-gesture drop ;
+    scroll-direction set-global
+    T{ mouse-scroll } hand-gadget get-global handle-gesture
+    drop ;
 
 : send-action ( world gesture -- )
     swap world-focus handle-gesture drop ;
+
+: resend-button-down ( gesture world -- )
+    hand-loc get-global swap send-button-down ;
+
+: resend-button-up  ( gesture world -- )
+    hand-loc get-global swap send-button-up ;
+
+world H{
+    { T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }
+    { T{ key-down f { C+ } "c" } [ T{ copy-action } send-action ] }
+    { T{ key-down f { C+ } "v" } [ T{ paste-action } send-action ] }
+    { T{ key-down f { C+ } "a" } [ T{ select-all-action } send-action ] }
+    { T{ button-down f { C+ } 1 } [ T{ button-down f f 3 } swap resend-button-down ] }
+    { T{ button-down f { A+ } 1 } [ T{ button-down f f 2 } swap resend-button-down ] }
+    { T{ button-up f { C+ } 1 } [ T{ button-up f f 3 } swap resend-button-up ] }
+    { T{ button-up f { A+ } 1 } [ T{ button-up f f 2 } swap resend-button-up ] }
+} set-gestures

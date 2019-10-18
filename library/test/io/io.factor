@@ -1,7 +1,12 @@
 IN: temporary
 USING: io kernel math parser strings test ;
 
-[ 4 ] [ "/library/test/io/no-trailing-eol.factor" run-resource ] unit-test
+[ 4 ] [
+    "resource:/library/test/io/no-trailing-eol.factor" run-file
+] unit-test
+
+: <resource-reader> ( resource -- stream )
+    resource-path <file-reader> ;
 
 : lines-test ( stream -- line1 line2 )
     [ readln readln ] with-stream ;

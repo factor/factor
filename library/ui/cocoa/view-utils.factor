@@ -54,7 +54,8 @@ opengl sequences ;
         { 118 "F4" }
         { 96 "F5" }
         { 97 "F6" }
-        { 98 "F8" }
+        { 98 "F7" }
+        { 100 "F8" }
         { 123 "LEFT" }
         { 124 "RIGHT" }
         { 125 "DOWN" }
@@ -99,8 +100,10 @@ opengl sequences ;
     mouse-location rot window send-button-up ;
 
 : send-wheel$ ( view event -- )
-    [ -> deltaY 0 > ] 2keep mouse-location
-    rot window send-wheel ;
+    over >r
+    dup -> deltaX sgn neg over -> deltaY sgn neg 2array -rot
+    mouse-location
+    r> window send-wheel ;
 
 : send-action$ ( view event gesture -- junk )
     >r drop window r> send-action f ;
@@ -243,6 +246,7 @@ opengl sequences ;
         [
             [
                 2drop dup view-dim swap window set-gadget-dim
+                ui-step
             ] ui-try
         ]
     }
@@ -268,7 +272,7 @@ opengl sequences ;
             SUPER-> dealloc
         ]
     }
-} { } define-objc-class
+} define-objc-class
 
 : <FactorView> ( world -- view )
     FactorView over rect-dim <GLView> [ register-window ] keep ;

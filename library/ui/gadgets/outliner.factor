@@ -3,18 +3,22 @@
 IN: gadgets-outliner
 USING: arrays gadgets gadgets-borders gadgets-buttons
 gadgets-frames gadgets-grids gadgets-labels gadgets-panes
-gadgets-theme generic io kernel math opengl sequences styles ;
+gadgets-theme generic io kernel math opengl sequences styles
+namespaces ;
 
 ! Vertical line.
 TUPLE: guide color ;
 
 M: guide draw-interior
     guide-color gl-color
-    rect-dim dup { 0.5 0 0 } v* swap { 0.5 1 0 } v* gl-line ;
+    rect-dim dup { 0.5 0 0 } v* origin get v+
+    swap { 0.5 1 0 } v* origin get v+ gl-line ;
+
+: guide-theme ( gadget -- )
+    T{ guide f { 0.5 0.5 0.5 1.0 } } swap set-gadget-interior ;
 
 : <guide-gadget> ( -- gadget )
-    <gadget>
-    T{ guide f { 0.5 0.5 0.5 1.0 } } over set-gadget-interior ;
+    <gadget> dup guide-theme ;
 
 ! Outliner gadget.
 TUPLE: outliner quot ;

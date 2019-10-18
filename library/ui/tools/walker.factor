@@ -3,7 +3,7 @@
 IN: gadgets-walker
 USING: arrays errors gadgets gadgets-buttons gadgets-frames
 gadgets-listener gadgets-panes gadgets-scrolling gadgets-text
-gadgets-tracks generic hashtables inspector
+gadgets-tracks gadgets-workspace generic hashtables tools
 interpreter io kernel kernel-internals listener math models
 namespaces sequences shells threads vectors ;
 
@@ -18,14 +18,6 @@ namespaces sequences shells threads vectors ;
 : <retainstack-display> ( model -- )
     [ [ continuation-retain stack. ] when* ]
     "Retain stack" <labelled-pane> ;
-
-: <namestack-display> ( model -- )
-    [ [ continuation-name stack. ] when* ]
-    "Name stack" <labelled-pane> ;
-
-: <catchstack-display> ( model -- )
-    [ [ continuation-catch stack. ] when* ]
-    "Catch stack" <labelled-pane> ;
 
 : <quotation-display> ( quot -- gadget )
     [ [ first2 callframe. ] when* ]
@@ -42,40 +34,21 @@ TUPLE: walker-gadget model quot ns ;
     [ slip update-stacks ] bind ; inline
 
 : walker-command ( gadget quot -- )
-    over walker-gadget-ns [ with-walker ] [ 2drop ] if ; inline
+    meta-interp pick walker-gadget-ns hash
+    [ with-walker ] [ 2drop ] if ; inline
 
 : reset-walker ( walker -- )
-    f over set-walker-gadget-ns
-    f over walker-gadget-model set-model
-    f over walker-gadget-quot set-model ;
+    dup H{ } clone swap set-walker-gadget-ns
+    update-stacks ;
 
 : walker-step [ step ] walker-command ;
 : walker-step-in [ step-in ] walker-command ;
 : walker-step-out [ step-out ] walker-command ;
 : walker-step-back [ step-back ] walker-command ;
-: walker-step-all dup [ step-all ] walker-command reset-walker ;
 
-walker-gadget {
-    {
-        "Walker"
-        { "Step" T{ key-down f f "s" } [ walker-step ] }
-        { "Step in" T{ key-down f f "i" } [ walker-step-in ] }
-        { "Step out" T{ key-down f f "o" } [ walker-step-out ] }
-        { "Step back" T{ key-down f f "b" } [ walker-step-back ] }
-        { "Continue" T{ key-down f f "c" } [ walker-step-all ] }
-    }
-} define-commands
-
-: init-walker-models ( walker -- model quot )
+: init-walker-models ( walker -- )
     f <model> over set-walker-gadget-quot
     f <model> swap set-walker-gadget-model ;
-
-: (walk) ( quot continuation walker -- )
-    H{ } clone over set-walker-gadget-ns [
-        V{ } clone meta-history set
-        meta-interp set
-        (meta-call)
-    ] with-walker ;
 
 : walker-gadget-quot$ gadget get walker-gadget-quot ;
 : walker-gadget-model$ gadget get walker-gadget-model ;
@@ -83,9 +56,38 @@ walker-gadget {
 C: walker-gadget ( -- gadget )
     dup init-walker-models {
         { [ walker-gadget-quot$ <quotation-display> ] f f 1/6 }
-        { [ walker-gadget-model$ <callstack-display> ] f f 1/6 }
-        { [ walker-gadget-model$ <datastack-display> ] f f 1/6 }
-        { [ walker-gadget-model$ <retainstack-display> ] f f 1/6 }
-        { [ walker-gadget-model$ <namestack-display> ] f f 1/6 }
-        { [ walker-gadget-model$ <catchstack-display> ] f f 1/6 }
+        { [ walker-gadget-model$ <datastack-display> ] f f 1/4 }
+        { [ walker-gadget-model$ <retainstack-display> ] f f 1/4 }
+        { [ walker-gadget-model$ <callstack-display> ] f f 1/3 }
     } { 0 1 } make-track* ;
+
+M: walker-gadget call-tool* ( continuation walker -- )
+    dup reset-walker [
+        V{ } clone meta-history set
+        restore-normally
+    ] with-walker ;
+
+M: walker-gadget tool-help drop "ui-walker" ;
+
+: walker-inspect ( walker -- )
+    walker-gadget-ns [ meta-interp get ] bind
+    [ inspect ] curry call-listener ;
+
+: walker-step-all ( walker -- )
+    dup [ step-all ] walker-command reset-walker
+    find-workspace listener-gadget select-tool ;
+
+walker-gadget "toolbar" {
+    { "Step" T{ key-down f f "s" } [ walker-step ] }
+    { "Step in" T{ key-down f f "i" } [ walker-step-in ] }
+    { "Step out" T{ key-down f f "o" } [ walker-step-out ] }
+    { "Step back" T{ key-down f f "b" } [ walker-step-back ] }
+    { "Continue" T{ key-down f f "c" } [ walker-step-all ] }
+    { "Inspect" T{ key-down f f "n" } [ walker-inspect ] }
+} define-commands
+
+[ walker-gadget call-tool stop ] break-hook set-global
+
+IN: tools
+
+: walk ( quot -- ) [ break ] swap append call ;

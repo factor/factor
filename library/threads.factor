@@ -23,8 +23,12 @@ namespaces queues sequences vectors ;
     dup empty? [ drop 1000 ] [ peek first millis [-] ] if ;
 
 : stop ( -- )
-    run-queue deque dup array?
-    [ first2 continue-with ] [ continue ] if ;
+    get-walker-hook [
+        f swap continue-with
+    ] [
+        run-queue deque dup array?
+        [ first2 continue-with ] [ continue ] if
+    ] if* ;
 
 : yield ( -- ) [ schedule-thread stop ] callcc0 ;
 

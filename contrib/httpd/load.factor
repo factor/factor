@@ -1,11 +1,9 @@
 USING: io ;
 
-REQUIRES: calendar embedded ;
+REQUIRES: contrib/calendar contrib/http contrib/xml ;
 
-PROVIDE: httpd { 
+PROVIDE: contrib/httpd { 
     "mime.factor"
-    "xml.factor"
-    "http-common.factor"
     "html-tags.factor"
     "responder.factor"
     "httpd.factor"
@@ -13,12 +11,9 @@ PROVIDE: httpd {
     "cont-responder.factor"
     "prototype-js.factor"
     "html.factor"
+    "embedded.factor"
     "file-responder.factor"
-    "help-responder.factor"
-    "inspect-responder.factor"
-    "browser-responder.factor"
     "default-responders.factor"
-    "http-client.factor"
 } {
     "test/html.factor"
     "test/http-client.factor"

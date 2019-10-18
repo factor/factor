@@ -1,23 +1,27 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference
-USING: arrays errors generic inspector io kernel
+USING: arrays errors generic io kernel
 math namespaces parser prettyprint sequences strings
 vectors words ;
 
-TUPLE: inference-error rstate ;
+TUPLE: inference-error rstate major? ;
 
-C: inference-error ( msg rstate -- error )
+C: inference-error ( msg rstate important? -- error )
+    [ set-inference-error-major? ] keep
     [ set-inference-error-rstate ] keep
     [ set-delegate ] keep ;
 
 : inference-error ( msg -- * )
-    recursive-state get <inference-error> throw ;
+    recursive-state get t <inference-error> throw ;
+
+: inference-warning ( msg -- * )
+    recursive-state get f <inference-error> throw ;
 
 TUPLE: literal-expected ;
 
 M: object value-literal
-    <literal-expected> inference-error ;
+    <literal-expected> inference-warning ;
 
 : pop-literal ( -- rstate obj )
     1 #drop node,
@@ -56,7 +60,9 @@ SYMBOL: recorded
 GENERIC: apply-object
 
 : apply-literal ( obj -- )
-    <value> push-d #push node, ;
+    #push dup node,
+    swap <value> push-d
+    1 d-tail swap set-node-out-d ;
 
 M: object apply-object apply-literal ;
 
@@ -76,12 +82,19 @@ M: quotation infer-quot
     recursive-state get >r swap recursive-state set
     infer-quot r> recursive-state set ;
 
-TUPLE: check-retain ;
+TUPLE: too-many->r ;
 
-: check-retain ( -- )
+: check->r ( -- )
     meta-r get empty? [
-        <check-retain> inference-error
+        <too-many->r> inference-error
     ] unless ;
+
+TUPLE: too-many-r> ;
+
+: check-r> ( -- )
+    meta-r get empty? [
+        <too-many-r>> inference-error
+    ] when ;
 
 : undo-infer ( -- )
     recorded get
@@ -95,7 +108,7 @@ TUPLE: check-retain ;
             V{ } clone recorded set
             f init-inference
             call
-            check-retain
+            check->r
         ] [
             undo-infer
             rethrow

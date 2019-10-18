@@ -7,7 +7,7 @@
 ! !syntax vocab to syntax, and removes the ! prefix from each
 ! word name.
 IN: !syntax
-USING: alien arrays compiler definitions errors generic
+USING: alien arrays definitions errors generic
 hashtables kernel math modules namespaces parser sequences
 strings vectors words ;
 
@@ -66,7 +66,8 @@ DEFER: !PRIMITIVE: parsing
     parsing
 
 : !C:
-    scan-word [ create-constructor ] keep
+    scan-word
+    [ create-constructor dup reset-generic dup set-word ] keep
     [ define-constructor ] f ; parsing
 
 : !FORGET: scan use get hash-stack [ forget ] when* ; parsing
@@ -75,8 +76,10 @@ DEFER: !PRIMITIVE: parsing
     scan [ { { } { } } append first2 provide ] f ; parsing
 
 : !REQUIRES:
-    string-mode on
-    [ string-mode off [ (require) ] each ] f ; parsing
+    string-mode on [
+        string-mode off
+        [ [ require ] each ] no-parse-hook
+    ] f ; parsing
 
 : !(
     parse-effect word [

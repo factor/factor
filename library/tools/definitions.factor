@@ -4,9 +4,6 @@ IN: definitions
 USING: arrays errors generic hashtables io kernel math
 namespaces parser prettyprint sequences styles words ;
 
-: ?resource-path ( path -- path )
-    "resource:/" ?head [ resource-path ] when ;
-
 : where ( defspec -- loc )
     where* dup [ first2 >r ?resource-path r> 2array ] when ;
 
@@ -20,6 +17,8 @@ SYMBOL: edit-hook
 : edit-location ( file line -- )
     edit-hook get [ call ] [ <no-edit-hook> throw ] if* ;
 
+: edit-file ( file -- ) ?resource-path 0 edit-location ;
+
 : edit ( defspec -- )
     where [
         first2 edit-location
@@ -27,7 +26,7 @@ SYMBOL: edit-hook
         "Not from a source file" throw
     ] if* ;
 
-GENERIC: synopsis ( defspec -- )
+GENERIC: synopsis* ( defspec -- )
 
 : write-vocab ( vocab -- )
     dup <vocab-link> presented associate styled-text ;
@@ -40,17 +39,19 @@ GENERIC: synopsis ( defspec -- )
 : comment. ( string -- )
     [ H{ { font-style italic } } styled-text ] when* ;
 
-M: word synopsis
+M: word synopsis*
     dup in.
     dup definer pprint-word
     dup pprint-word
     stack-effect [ effect>string comment. ] when* ;
 
-M: method-spec synopsis
+M: method-spec synopsis*
     \ M: pprint-word [ pprint-word ] each ;
 
-M: word summary ( defspec -- str )
-    [ 0 margin set [ synopsis ] with-pprint ] string-out ;
+: synopsis ( defspec -- str )
+    [ 0 margin set [ synopsis* ] with-pprint ] string-out ;
+
+M: word summary synopsis ;
 
 GENERIC: definition ( spec -- quot ? )
 
@@ -80,7 +81,7 @@ M: word declarations.
 
 : (see) ( spec -- )
     [
-        dup synopsis
+        dup synopsis*
         dup definition [
             H{ } <block
             pprint-elements pprint-; declarations.

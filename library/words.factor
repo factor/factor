@@ -49,12 +49,6 @@ M: symbol definer drop \ SYMBOL: ;
     [ rot word-props set-hash ]
     [ nip remove-word-prop ] if ;
 
-GENERIC: word-xt ( word -- xt )
-M: word word-xt 7 integer-slot ;
-
-GENERIC: set-word-xt ( xt word -- )
-M: word set-word-xt 7 set-integer-slot ;
-
 SYMBOL: vocabularies
 
 : vocab ( name -- vocab ) vocabularies get hash ;
@@ -108,7 +102,8 @@ SYMBOL: crossref
     dup update-xt
     xref-word ;
 
-: define-symbol ( word -- ) dup 2 define ;
+: define-symbol ( word -- )
+    dup symbol? [ drop ] [ dup 2 define ] if ;
 
 : intern-symbol ( word -- )
     dup undefined? [ define-symbol ] [ drop ] if ;
@@ -155,10 +150,11 @@ SYMBOL: bootstrapping?
 : xref-words ( -- )
     all-words [ uses ] crossref get build-graph ;
 
+: create-vocab ( name -- vocab )
+    vocabularies get [ nest ] bind ;
+
 : reveal ( word -- )
-    vocabularies get [
-        dup word-name over word-vocabulary nest set-hash
-    ] bind ;
+    dup word-name over word-vocabulary create-vocab set-hash ;
 
 TUPLE: check-create name vocab ;
 : check-create ( name vocab -- name vocab )

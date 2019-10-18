@@ -160,17 +160,13 @@ C: font ( handle -- font )
     over glyph-size pick glyph-texture-size <sprite>
     [ bitmap>texture ] keep [ init-sprite ] keep ;
 
-: char-sprite ( open-font char sprites -- sprite )
-    #! Get a cached display list of a FreeType-rendered
-    #! glyph.
-    [ dupd <char-sprite> ] cache-nth nip ;
+: draw-char ( open-font char sprites -- )
+    [ dupd <char-sprite> ] cache-nth nip
+    sprite-dlist glCallList ;
 
-: (draw-string) ( open-font sprites string -- )
+: (draw-string) ( open-font sprites string loc -- )
     GL_TEXTURE_2D [
-        GL_MODELVIEW [
-            [
-                >r 2dup r> swap char-sprite
-                sprite-dlist glCallList
-            ] each 2drop
-        ] do-matrix
+        [
+            [ >r 2dup r> swap draw-char ] each 2drop
+        ] with-translation
     ] do-enabled ;

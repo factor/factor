@@ -1,5 +1,5 @@
 IN: math-contrib
-USING: kernel sequences errors namespaces math ;
+USING: arrays kernel sequences errors namespaces math ;
 
 : <range> ( from to -- seq ) dup <slice> ; inline
 : (0..n] ( n -- (0..n] ) 1+ 1 swap <range> ; inline
@@ -35,3 +35,7 @@ USING: kernel sequences errors namespaces math ;
     ] [
         2dup - nip [ factorial ] keep rot pick >r factorial-part r> /
     ] if ;
+
+: inverse-permutation ( seq -- seq )
+    dup length dup 0 <array> -rot swap [ pick set-nth ] 2each ;
+

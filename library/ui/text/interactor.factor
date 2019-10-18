@@ -1,15 +1,16 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
-USING: arrays definitions gadgets gadgets-controls gadgets-panes
+USING: arrays definitions gadgets gadgets-panes
 generic hashtables help io kernel namespaces prettyprint styles
-threads sequences vectors definitions parser words strings ;
+threads sequences vectors definitions parser words strings
+math ;
 
 TUPLE: interactor history output continuation queue busy? ;
 
 C: interactor ( output -- gadget )
     [ set-interactor-output ] keep
-    f <field> over set-gadget-delegate
+    <editor> over set-gadget-delegate
     V{ } clone over set-interactor-history
     dup dup set-control-self ;
 
@@ -49,17 +50,20 @@ SYMBOL: structured-input
     dup interactor-busy? [
         drop
     ] [
-        [ field-commit ] keep interactor-eval
+        [ editor-text ] keep interactor-eval
     ] if ;
-
-: interactor-history. ( -- )
-    stdio get dup duplex-stream-out [
-        duplex-stream-in interactor-history
-        [ dup print-input ] each
-    ] with-stream* ;
 
 M: interactor stream-readln
     dup interactor-queue empty? [
         f over set-interactor-busy?
         [ over set-interactor-continuation stop ] callcc0
     ] when interactor-queue pop ;
+
+M: interactor stream-read
+    swap dup zero?
+    [ 2drop "" ] [ >r stream-readln r> head ] if ;
+
+interactor "interactor" {
+    { "Evaluate" T{ key-down f f "RETURN" } [ interactor-commit ] }
+    { "Clear input" T{ key-down f { C+ } "k" } [ control-model clear-doc ] }
+} define-commands

@@ -7,7 +7,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 IN: serialize
-USING: kernel kernel-internals math hashtables namespaces io strings sequences generic words errors arrays vectors ;
+USING: kernel kernel-internals math hashtables namespaces io strings sequences generic words errors arrays vectors alien ;
 
 ! Variable holding a sequence of objects already serialized
 SYMBOL: serialized
@@ -32,18 +32,17 @@ GENERIC: serialize  ( obj -- )
 M: f serialize ( obj -- )
   drop "n" write ;
 
-M: fixnum serialize ( obj -- )
-  ! Factor may use 64 bit fixnums on such systems
-  "f" write
-  4 >be write ;
+: bytes-needed ( number -- int )
+  log2 8 + 8 /i ;
 
-: bytes-needed ( bignum -- int )
-  log2 8 + 8 / floor ;
-
-M: bignum serialize ( obj -- )
-  "b" write
-  dup bytes-needed serialize
-  dup bytes-needed >be write ;
+M: integer serialize ( obj -- )
+  dup 0 = [
+    drop "z" write
+  ] [
+    dup 0 < [ neg "m" ] [ "p" ] if write 
+    dup bytes-needed dup 4 >be write
+    >be write 
+  ] if ;
 
 M: float serialize ( obj -- )
   "F" write
@@ -88,7 +87,7 @@ M: sbuf serialize ( obj -- )
 
 M: tuple serialize ( obj -- )
   [
-    "t" write 
+    "T" write 
     dup add-object serialize
     tuple>array serialize 
   ] serialize-shared ;
@@ -118,6 +117,16 @@ M: wrapper serialize ( obj -- )
   "W" write
   wrapped serialize ;
 
+M: byte-array serialize ( obj -- )
+  [
+    "A" write
+    dup add-object serialize
+    dup length cells dup serialize
+    [
+      2dup alien-unsigned-1 serialize
+    ] repeat    
+  ] serialize-shared drop ;
+
 DEFER: deserialize ( -- obj )
 
 : intern-object ( id obj -- )
@@ -125,9 +134,6 @@ DEFER: deserialize ( -- obj )
 
 : deserialize-false ( -- f )
   f ;
-
-: deserialize-fixnum ( -- fixnum )
-  4 read be> ;
 
 : deserialize-string ( -- string )
   deserialize deserialize read [ intern-object ] keep ;
@@ -138,8 +144,14 @@ DEFER: deserialize ( -- obj )
 : deserialize-complex ( -- complex )
   deserialize deserialize deserialize rect> [ intern-object ] keep ;
 
-: deserialize-bignum ( -- bignum )
-  deserialize read be> ;
+: deserialize-negative-integer ( -- number )
+  4 read be> read be> neg ;
+
+: deserialize-positive-integer ( -- number )
+  4 read be> read be> ;
+
+: deserialize-zero ( -- number )
+  0 ;
 
 : deserialize-float ( -- float )
   deserialize bits>float ;
@@ -184,16 +196,24 @@ DEFER: deserialize ( -- obj )
   deserialize array>tuple
   [ intern-object ] keep ;
 
+: deserialize-byte-array ( -- byte-array )
+  deserialize 
+  deserialize dup <byte-array> swap 
+  [
+    deserialize pick pick set-alien-unsigned-1
+  ] repeat
+  [ intern-object ] keep ;
+
 : deserialize-unknown ( -- object )
   deserialize serialized get nth ;
 
 : deserialize ( -- object )
   read1 ch>string dup
-  H{ { "f" deserialize-fixnum }
-     { "s" deserialize-string }
+  H{ { "s" deserialize-string }
      { "r" deserialize-ratio }
      { "c" deserialize-complex }
-     { "b" deserialize-bignum }
+     { "p" deserialize-positive-integer }
+     { "m" deserialize-negative-integer }
      { "F" deserialize-float }
      { "w" deserialize-word }
      { "W" deserialize-wrapper }
@@ -202,7 +222,9 @@ DEFER: deserialize ( -- obj )
      { "v" deserialize-vector }
      { "q" deserialize-quotation }
      { "h" deserialize-hashtable }
-     { "t" deserialize-tuple }
+     { "T" deserialize-tuple }
+     { "z" deserialize-zero }
+     { "A" deserialize-byte-array }
      { "o" deserialize-unknown }
   }
   hash dup [ "Unknown typecode" throw ] unless nip execute ;

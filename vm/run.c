@@ -34,7 +34,7 @@ void call(CELL quot)
 	set_callframe(quot);
 }
 
-/* Called from platform_run() */
+/* Called from interpreter() */
 void handle_error(void)
 {
 	if(throwing)
@@ -55,7 +55,7 @@ void handle_error(void)
 	}
 }
 
-void run(void)
+void interpreter_loop(void)
 {
 	CELL next;
 
@@ -91,18 +91,18 @@ void run(void)
 	}
 }
 
-void run_toplevel(void)
+void interpreter(void)
 {
 	SETJMP(stack_chain->toplevel);
 	handle_error();
-	run();
+	interpreter_loop();
 }
 
 /* Called by compiled callbacks after nest_stacks() and boxing registers */
 void run_callback(CELL quot)
 {
 	call(quot);
-	platform_run();
+	run();
 }
 
 /* XT of deferred words */
@@ -191,6 +191,46 @@ void primitive_millis(void)
 	dpush(tag_bignum(s48_long_long_to_bignum(current_millis())));
 }
 
+void primitive_type(void)
+{
+	drepl(tag_fixnum(type_of(dpeek())));
+}
+
+void primitive_tag(void)
+{
+	drepl(tag_fixnum(TAG(dpeek())));
+}
+
+void primitive_slot(void)
+{
+	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	CELL obj = UNTAG(dpop());
+	dpush(get(SLOT(obj,slot)));
+}
+
+void primitive_set_slot(void)
+{
+	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	CELL obj = UNTAG(dpop());
+	CELL value = dpop();
+	put(SLOT(obj,slot),value);
+	write_barrier(obj);
+}
+
+CELL clone(CELL obj)
+{
+	CELL size = object_size(obj);
+	CELL tag = TAG(obj);
+	void *new_obj = allot(size);
+	return RETAG(memcpy(new_obj,(void*)UNTAG(obj),size),tag);
+}
+
+void primitive_clone(void)
+{
+	maybe_gc(0);
+	drepl(clone(dpeek()));
+}
+
 void fatal_error(char* msg, CELL tagged)
 {
 	fprintf(stderr,"Fatal error: %s %lx\n",msg,tagged);
@@ -225,7 +265,7 @@ void throw_error(CELL error, bool keep_stacks)
 	thrown_ds = ds;
 	thrown_rs = rs;
 
-	/* Return to run() method */
+	/* Return to interpreter() function */
 	LONGJMP(stack_chain->toplevel,1);
 }
 

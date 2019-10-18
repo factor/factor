@@ -4,9 +4,10 @@ void init_factor(const char* image,
 	CELL ds_size, CELL rs_size, CELL cs_size,
 	CELL gen_count, CELL young_size, CELL aging_size, CELL code_size)
 {
+	srand(current_millis());
 	init_ffi();
-	init_arena(gen_count,young_size,aging_size);
-	init_compiler(code_size);
+	init_data_heap(gen_count,young_size,aging_size);
+	init_code_heap(code_size);
 	init_stacks(ds_size,rs_size,cs_size);
 	/* callframe must be valid in case load_image() does GC */
 	callframe = F;
@@ -92,9 +93,9 @@ int main(int argc, char** argv)
 
 	userenv[ARGS_ENV] = tag_object(args);
 
-	platform_run();
+	run_toplevel();
 
-	critical_error("run() returned due to empty callstack",0);
+	critical_error("run_toplevel() returned due to empty callstack",0);
 
 	return 0;
 }

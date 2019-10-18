@@ -1,6 +1,6 @@
-REQUIRES: math ;
+REQUIRES: contrib/math ;
 
-PROVIDE: crypto {
+PROVIDE: contrib/crypto {
 
     "common.factor"
     "timing.factor"
@@ -17,6 +17,7 @@ PROVIDE: crypto {
     "crc32.factor"
     "md5.factor"
     "sha1.factor"
+    "sha2.factor"
 
 ! Block ciphers
     "rc4.factor"
@@ -28,6 +29,7 @@ PROVIDE: crypto {
     "test/common.factor"
     "test/md5.factor"
     "test/sha1.factor"
+    "test/sha2.factor"
     "test/base64.factor"
     "test/miller-rabin.factor"
     "test/crc32.factor"

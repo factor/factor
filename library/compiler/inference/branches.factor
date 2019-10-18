@@ -81,5 +81,6 @@ TUPLE: unbalanced-branches-error in out ;
     [ infer-branch ] map dup unify-effects unify-dataflow ;
 
 : infer-branches ( branches node -- )
-    [ >r (infer-branches) r> set-node-children ] keep
-    node, #merge node, ;
+    dup node,
+    >r (infer-branches) r> set-node-children
+    #merge node, ;

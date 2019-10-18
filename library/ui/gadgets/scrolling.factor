@@ -16,13 +16,21 @@ TUPLE: scroller viewport x y follows ;
 
 : find-scroller [ scroller? ] find-parent ;
 
+: scroll-up-page scroller-y -1 swap slide-by-page ;
+
+: scroll-down-page scroller-y 1 swap slide-by-page ;
+
 : scroll-up-line scroller-y -1 swap slide-by-line ;
 
 : scroll-down-line scroller-y 1 swap slide-by-line ;
 
+: do-mouse-scroll ( scroller -- )
+    scroll-direction get-global first2
+    pick scroller-y slide-by-line
+    swap scroller-x slide-by-line ;
+
 scroller H{
-    { T{ wheel-up } [ scroll-up-line ] }
-    { T{ wheel-down } [ scroll-down-line ] }
+    { T{ mouse-scroll } [ do-mouse-scroll ] }
     { T{ slider-changed } [ relayout-1 ] }
 } set-gestures
 
@@ -48,7 +56,7 @@ C: scroller ( gadget -- scroller )
     r> set-slider ;
 
 : position-viewport ( scroller -- )
-    dup scroller-origin vneg
+    dup scroller-origin vneg viewport-gap v+
     swap scroller-viewport gadget-child
     set-rect-loc ;
 
@@ -58,7 +66,10 @@ C: scroller ( gadget -- scroller )
     position-viewport ;
 
 : (scroll>rect) ( rect scroller -- )
-    [ scroller-origin vneg offset-rect viewport-rect ] keep
+    [
+        scroller-origin vneg offset-rect
+        viewport-gap offset-rect
+    ] keep
     [
         scroller-viewport 2rect-extent
         >r >r v- { 0 0 } vmin r> r> v- { 0 0 } vmax v+
@@ -71,8 +82,7 @@ C: scroller ( gadget -- scroller )
         2drop
     ] if ;
 
-: scroll>bottom ( gadget -- )
-    t swap scroll>rect ;
+: scroll>bottom ( gadget -- ) t swap scroll>rect ;
 
 : (scroll>bottom) ( scroller -- )
     dup scroller-viewport viewport-dim { 0 1 } v* scroll ;

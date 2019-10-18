@@ -1,14 +1,9 @@
-USING: kernel parser sequences ;
+USE: kernel
 
-{
-    { [ cpu "x86" = ] [ "/library/compiler/x86/objc.factor" ] }
-    { [ cpu "ppc" = ] [ "/library/compiler/ppc/objc.factor" ] }
-} cond run-resource
-
-{
-    "/library/compiler/alien/objc/runtime.factor"
-    "/library/compiler/alien/objc/utilities.factor"
-    "/library/compiler/alien/objc/subclassing.factor"
-} [
-    run-resource
-] each
+PROVIDE: library/compiler/alien/objc {
+    { "objc-x86.factor" [ cpu "x86" = ] }
+    { "objc-ppc.factor" [ cpu "ppc" = ] }
+    "runtime.factor"
+    "utilities.factor"
+    "subclassing.factor"
+} ;

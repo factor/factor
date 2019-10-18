@@ -114,6 +114,6 @@ SYMBOL: cols
     "Generating " write dup write "..." print
     <file-writer> [ run write ] with-stream ;
 
-\ render compile
-
 [ "mandel.pnm" run>file ] time
+
+PROVIDE: examples/mandel ;

@@ -28,11 +28,16 @@ sequences strings words ;
     "set-" swap append create-in >r c-setter* swap add* r>
     swap define-compound ;
 
+: parse-c-decl ( string -- count name )
+    "[]" split "" swap remove unclip >r dup empty?
+    [ drop 1 ] [ [ string>number ] map product ] if r> over 1 > [ "[]" append ] when ;
+
 : define-field ( offset type name -- offset )
-    >r dup >r c-align align r> r>
+    >r parse-c-decl [ c-align ] keep
+    >r swapd align r> r> 
     "struct-name" get swap "-" swap append3
     3dup define-getter 3dup define-setter
-    drop c-size + ;
+    drop c-size rot * + ;
 
 : define-member ( max type -- max )
     c-size max ;

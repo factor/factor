@@ -88,30 +88,6 @@ M: filter model-changed
     dup filter-model model-value over filter-quot call
     swap set-model ;
 
-TUPLE: validator model quot ;
-
-C: validator ( model quot -- filter )
-    dup delegate>model
-    [ set-validator-quot ] keep
-    [ set-validator-model ] 2keep
-    [ add-dependency ] keep
-    dup model-changed ;
-
-M: validator model-changed
-    dup validator-model model-value dup
-    pick validator-quot call [
-        swap delegate set-model
-    ] [
-        2drop
-    ] if ;
-
-M: validator set-model
-    2dup validator-quot call [
-        validator-model set-model
-    ] [
-        2drop
-    ] if ;
-
 TUPLE: compose ;
 
 C: compose ( models -- compose )

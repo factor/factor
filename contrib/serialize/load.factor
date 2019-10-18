@@ -1,4 +1,4 @@
-PROVIDE: serialize {
+PROVIDE: contrib/serialize {
 	"serialize.factor"
 	"serialize.facts"
 } { 

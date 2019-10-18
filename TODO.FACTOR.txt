@@ -1,92 +1,44 @@
-+ 0.85:
-
-- ENTER key on keypad should do something
-- pane output in UI should use less memory
-- signal 4 on datastack underflow on mac intel??
-- why is a 'null' type inferred for the output of foo in
-  : foo f ;
-  : bar foo 4 4 = and ;
-- faster I/O
-- buffer-ptr should be an alien
-- faster Unix stream-read#
-- EOF kills a port
+- live search: timer delay would be nice
+- hashed generic method dispatch
 - fix this:
   [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 ] .
 [ 1 2 3 4 5 6 7 8 9 10 10 10 10 10 10 10 10 10 10 11 11 11 113 
 ]
 - prettier printing of hashtable literals, alists, cond, ...
-- alien-indirect
-- handle code heap exhaustion with a critical error
-- more compact relocation info
-- problem if major gc happens during relocation
-  - in fact relocation should not cons at all
-- we need to optimize  [ dup array? [ array? ] [ array? ] if ]
-- better way of dealing with compiler errors
-- track individual method usages
-- modularize core
-- track module files and modification times, and a list of assets loaded
-  from that file
-- 'changes' word, asks if files changed on disk from loaded modules
-  should be reloaded -- do this in the right order
-- variable width word wrap
-- add-gadget, model-changed, set-model should compile
-- graphical module manager tool
-- continuation handling in walker is screwy
-- don't allow stepping inside >c etc
-- editor:
-  - only redraw visible lines
-  - more efficient multi-line inserts
-  - write "foo| " and put caret at | then select word element: selects
-    space
-- we have trouble drawing rectangles
-- UI dataflow visualizer
-- status help persists after clicking on a link
-- tool help
-- new section in cookbook: philosophy
-- interactor commands: don't invoke if interactor is busy
-- browser: show currently selected vocab & words
 
 + ui:
 
-- x11: scroll up/down wiggles caret
-- perhaps commands window should sort by gesture
+- menu should stay up if mouse button released
+- completion is not ideal: eg, search for "buttons"
+- some way of intercepting all gestures
+- slider needs to be modelized
+- better help result ranking
+- help search looks funny
+- menus should not require mouse to be held
+- variable width word wrap
+- graphical module manager tool
+- ui browser: show currently selected vocab & words
+- auto-update browser and help when sources reload
+- how do we refer to command shortcuts in the docs?
 - roundoff is still not quite right with tracks
 - fix top level window positioning
-- merge keyboard help with help in some way
-- keyboard help: hide commands whose gestures are shadowed
-- x11.app has a problem with A+ keys
-- status bar showing number of words needing a recompile
 - services do not launch if factor not running
-- fix ui listener delay
 - editor:
-  - editor should support stream output protocol
   - double/triple click
   - autoscroll
-  - undo and redo
   - transpose char/word/line
-  - page up/down
-  - search and replace
-- slider needs to be modelized
-- fonts/ should go inside the .app -- we need multi-tier resource-path
-- should be possible to drop an image file on the .app to run it
-- support x11's large selections, if needed
-- own-selection violates ICCCM
-- cocoa: windows are not updated while resizing
+  - more efficient multi-line inserts
+  - write "foo| " and put caret at | then select word element: selects
+    space
 - grid slows down with 2000 lines
-- ui uses too much cpu time idling
 - see if its possible to only repaint dirty regions
-- x11 title bars are funny
-- rollover is not updated on window focus changes
-- x11 input methods
-- cocoa:
-  - horizontal wheel scrolling
-  - polish OS X menu bar code
 - structure editor
-- loading space invaders slows the UI down
 
 + module system:
 
-- generic 'define ( asset def -- )'
+- convention for main entry point of a module
+- convention for main help article of a module
+- track a list of assets loaded from each module's file
 - C types should be words
   - TYPEDEF: float { ... } { ... } ;   ==> \ float T{ c-type ... } "c-type" swp
   - TYPEDEF: float FTFloat ;  ==> \ float \ FTFloat "c-type" swp
@@ -96,10 +48,9 @@
 
 + compiler/ffi:
 
-- see if alien calls can be made faster
-- [ r> ] infer should throw an inference error
-- compiler tests are not as reliable now because of try-compile usage
-  - we can just do [ t ] [ \ foo compiled? ] unit-test
+- more compact relocation info
+- relocation should not cons at all
+- stdcall callbacks
 - [ [ dup call ] dup call ] infer hangs
 - callstack overflow when compiling mutually recursive inline words
 - test what is done in the case of an invalid declaration on an inline
@@ -113,20 +64,21 @@
 - float= doesn't consider nans equal
 - intrinsic fixnum>float float>fixnum
 - C functions returning structs by value
-- code gc
 - infer which variables are read, written in a quotation
 - compiled continuations
 - compiled call traces
 
 + misc:
 
-- sometimes darcs get fails with the httpd
+- minor GC takes too long now, we should card mark code heap
+- buffer-ptr should be an alien
+- swap nappend ==> nappend
 - gdb triggers 'mutliple i/o ops on port' error
-- factorcode httpd crashed: bad file descriptor
 - growable data heap
 - incremental GC
 - UDP
 - slice: if sequence or seq start is changed, abstraction violation
-- hashed generic method dispatch
-- httpd search tools
+
++ httpd:
+
 - remaining HTML issues need fixing

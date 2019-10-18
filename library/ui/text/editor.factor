@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-text
 USING: arrays errors freetype gadgets gadgets-borders
-gadgets-buttons gadgets-controls gadgets-frames gadgets-labels
+gadgets-buttons gadgets-frames gadgets-labels
 gadgets-scrolling gadgets-theme io kernel math models namespaces
 opengl sequences strings styles ;
 
@@ -21,8 +21,7 @@ TUPLE: loc-monitor editor ;
     dup <loc> swap set-editor-mark ;
 
 C: editor ( -- editor )
-    dup <document> delegate>control
-    dup dup set-control-self
+    dup <document> <gadget> delegate>control
     dup init-editor-locs
     dup editor-theme ;
 
@@ -63,10 +62,7 @@ M: editor model-changed
 : change-caret&mark ( editor quot -- )
     over >r change-caret r> mark>caret ; inline
 
-: editor-lines ( editor -- seq )
-    control-model model-value ;
-
-: editor-line ( n editor -- str ) editor-lines nth ;
+: editor-line ( n editor -- str ) control-value nth ;
 
 : editor-font* ( editor -- font ) editor-font lookup-font ;
 
@@ -118,39 +114,66 @@ M: editor model-changed
 : caret-dim ( editor -- dim )
     line-height 0 swap 2array ;
 
-: caret-rect ( editor -- dim )
-    dup caret-loc swap caret-dim <rect> ;
-
 : scroll>caret ( editor -- )
-    dup caret-rect swap scroll>rect ;
+    dup gadget-grafted? [
+        dup caret-loc over caret-dim { 1 0 } v+ <rect>
+        over scroll>rect
+    ] when drop ;
 
 M: loc-monitor model-changed
-    loc-monitor-editor control-self scroll>caret ;
+    loc-monitor-editor control-self
+    dup relayout-1 scroll>caret ;
 
 : draw-caret ( -- )
     editor get editor-focused? [
         editor get
         dup editor-caret-color gl-color
-        caret-rect rect-extent gl-line
+        dup caret-loc origin get v+
+        swap caret-dim over v+ gl-line
     ] when ;
 
-: translate-lines ( n editor -- )
-    line-height * 0.0 swap 0.0 glTranslated ;
+: line-translation ( n -- loc )
+    editor get line-height * 0.0 swap 2array ;
+
+: translate-lines ( n -- )
+    line-translation gl-translate ;
 
 : draw-line ( editor str -- )
-    over editor-color gl-color
-    >r editor-font r> draw-string ;
+    >r dup editor-color gl-color editor-font r>
+    { 0 0 } draw-string ;
+
+: first-visible-line ( editor -- n )
+    clip get rect-loc second origin get second -
+    swap y>line ;
+
+: last-visible-line ( editor -- n )
+    clip get rect-extent nip second origin get second -
+    swap y>line 1+ ;
 
 : with-editor ( editor quot -- )
     [
-        swap dup control-model document set editor set call
+        swap
+        dup first-visible-line \ first-visible-line set
+        dup last-visible-line \ last-visible-line set
+        dup control-model document set
+        editor set
+        call
     ] with-scope ; inline
 
+: visible-lines ( editor -- seq )
+    \ first-visible-line get
+    \ last-visible-line get
+    rot control-value <slice> ;
+
+: with-editor-translation ( n quot -- )
+    >r line-translation origin get v+ r> with-translation ;
+    inline
+
 : draw-lines ( -- )
-    GL_MODELVIEW [
-        editor get dup editor-lines
-        [ over >r draw-line 1 r> translate-lines ] each-with
-    ] do-matrix ;
+    \ first-visible-line get [
+        editor get dup visible-lines
+        [ draw-line 1 translate-lines ] each-with
+    ] with-editor-translation ;
 
 : selection-start/end ( editor -- start end )
     dup editor-mark* swap editor-caret*
@@ -166,29 +189,24 @@ M: loc-monitor model-changed
     editor get offset>x
     (draw-selection) ;
 
-: translate>selection-start ( start -- )
-    first editor get translate-lines ;
-
 : draw-selection ( -- )
-    GL_MODELVIEW [
-        editor get
-        dup editor-selection-color gl-color
-        selection-start/end
-        over translate>selection-start
+    editor get editor-selection-color gl-color
+    editor get selection-start/end
+    over first [
         2dup [
             >r 2dup r> draw-selected-line
-            1 editor get translate-lines
+            1 translate-lines
         ] each-line 2drop
-    ] do-matrix ;
+    ] with-editor-translation ;
 
 M: editor draw-gadget*
     [ draw-selection draw-lines draw-caret ] with-editor ;
 
 : editor-height ( editor -- n )
-    [ editor-lines length ] keep line>y ;
+    [ control-value length ] keep line>y ;
 
 : editor-width ( editor -- n )
-    0 swap dup editor-font* swap editor-lines
+    0 swap dup editor-font* swap control-value
     [ string-width max ] each-with ;
 
 M: editor pref-dim*
@@ -212,3 +230,10 @@ M: editor user-input*
 
 : set-editor-text ( str editor -- )
     control-model set-doc-text ;
+
+! Editors support the stream output protocol
+M: editor stream-write1 >r ch>string r> stream-write ;
+
+M: editor stream-write control-self user-input ;
+
+M: editor stream-close drop ;

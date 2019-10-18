@@ -465,7 +465,7 @@ M: cpu reset ( cpu -- )
   [ HEX: 10 swap set-cpu-last-interrupt ] keep
   0 swap set-cpu-cycles ;
 
-C: cpu ( cpu -- cpu )
+C: cpu ( -- cpu )
   [ reset ] keep ;
 
 : (load-rom) ( n ram -- )
@@ -573,7 +573,7 @@ C: cpu ( cpu -- cpu )
 : test-n ( n -- )
   test-cpu swap [ test-step ] times ;
 
-: run-n ( cpu n -- )
+: run-n ( cpu n -- cpu )
   [ dup step ] times ;
 
 : register-lookup ( string -- vector )
@@ -1332,7 +1332,7 @@ SYMBOL: $4
   #! Given an instruction string, return the emulation quotation for
   #! it. This will later be expanded to produce the disassembly and
   #! assembly quotations.
-  8080-generator-parser some call call ;
+  8080-generator-parser some parse force call ;
 
 SYMBOL: last-instruction
 SYMBOL: last-opcode

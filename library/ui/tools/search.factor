@@ -3,25 +3,85 @@
 IN: gadgets-search
 USING: arrays gadgets gadgets-frames gadgets-labels
 gadgets-panes gadgets-scrolling gadgets-text gadgets-theme
-generic help inspector kernel models sequences words
-gadgets-borders ;
+generic help tools kernel models sequences words
+gadgets-borders gadgets-lists namespaces parser hashtables io
+completion styles ;
 
-TUPLE: search-gadget input ;
+TUPLE: live-search field list producer action presenter ;
 
-: <search-pane> ( model quot -- )
-    [ over empty? [ 2drop ] [ call ] if ] curry
-    <pane-control> ;
+: find-live-search [ live-search? ] find-parent ;
 
-: <search-bar> ( field -- gadget )
+: find-search-list find-live-search live-search-list ;
+
+TUPLE: search-field ;
+
+C: search-field ( string -- gadget )
+    <editor> over set-gadget-delegate
+    dup dup set-control-self
+    [ set-editor-text ] keep
+    [ editor-doc-end ] keep ;
+
+search-field H{
+    { T{ key-down f f "UP" } [ find-search-list select-prev ] }
+    { T{ key-down f f "DOWN" } [ find-search-list select-next ] }
+    { T{ key-down f f "RETURN" } [ find-search-list call-action ] }
+} set-gestures
+
+: <search-model> ( -- model )
+    gadget get dup live-search-field control-model
+    swap live-search-producer [ "\n" join ] swap append
+    <filter> ;
+
+: <search-list>
+    <search-model>
+    gadget get live-search-presenter [ make-pane ] curry
+    gadget get live-search-action \ first add*
+    <list> ;
+
+C: live-search ( string action producer presenter -- gadget )
+    [ set-live-search-presenter ] keep
+    [ set-live-search-producer ] keep
+    [ set-live-search-action ] keep
     {
-        { [ "Search: " <label> ] f f @left }
-        { f f f @center }
-    } make-frame ;
-
-C: search-gadget ( quot -- )
-    >r f <model> dup r> {
-        { [ <field> ] set-search-gadget-input [ <search-bar> ] @top }
-        { [ swap <search-pane> <scroller> ] f f @center }
+        {
+            [ <search-field> ]
+            set-live-search-field
+            f
+            @top
+        }
+        {
+            [ <search-list> ]
+            set-live-search-list
+            [ <scroller> ]
+            @center
+        }
     } make-frame* ;
 
-M: search-gadget focusable-child* search-gadget-input ;
+M: live-search focusable-child* live-search-field ;
+
+: <word-search> ( string action -- gadget )
+    all-words
+    [ word-completions ] curry
+    [ word-completion. ]
+    <live-search> ;
+
+: <help-search> ( string action -- gadget )
+    [ search-help ]
+    [ first ($link) ]
+    <live-search> ;
+
+: string-completion. ( pair quot -- )
+    >r first2 over completion>string swap r> call write-object ;
+    inline
+
+: <source-files-search> ( string action -- gadget )
+    source-files get hash-keys natural-sort
+    [ string-completions ] curry
+    [ [ <pathname> ] string-completion. ]
+    <live-search> ;
+
+: <vocabs-search> ( string action -- gadget )
+    vocabs
+    [ string-completions ] curry
+    [ [ <vocab-link> ] string-completion. ]
+    <live-search> ;

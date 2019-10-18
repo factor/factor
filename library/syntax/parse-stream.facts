@@ -1,4 +1,4 @@
-USING: compiler help io parser definitions ;
+USING: help io parser definitions ;
 
 HELP: file-vocabs
 { $description "Installs the initial the vocabulary search path for parsing a file." } ;
@@ -23,12 +23,18 @@ HELP: eval
 { $errors "Throws an error if the input is malformed, or if the quotation throws an error." } ;
 
 HELP: parse-hook
-{ $var-description "A quotation called by " { $link parse-stream } " after parsing the input stream. The default value calls " { $link recompile } " to recompile any changed definitions." }
+{ $var-description "A quotation called by " { $link parse-stream } " after parsing the input stream. The default value recompiles new word definitions; see " { $link "recompile" } " for details." }
 { $see-also no-parse-hook } ;
 
 HELP: no-parse-hook
 { $values { "quot" "a quotation" } }
 { $description "Runs the quotation in a new dynamic scope where " { $link parse-hook } " is set to " { $link f } ". This disables the default behavior of recompiling changed definitions after a source file is loaded." } ;
+
+HELP: run-files
+{ $values { "seq" "a sequence of strings" } }
+{ $description "Load a collection of source files."
+$terpri
+"If bootstrapping, this word appends the top-level forms to the currently constructing quotation instead." } ;
 
 HELP: parse-stream
 { $values { "stream" "an input stream" } { "name" "a file name for error reporting" } { "quot" "a new quotation" } }
@@ -48,14 +54,3 @@ HELP: run-file
 HELP: ?run-file
 { $values { "file" "a path name string" } }
 { $description "Forgiving variant of " { $link run-file } " which does nothing if the file does not exist, and logs errors to the default stream without re-throwing them." }  ;
-
-HELP: parse-resource
-{ $values { "path" "a resource name string" } { "quot" "a new quotation" } }
-{ $description "Parses a library resource." }
-{ $notes "the source file name given to the parser is special for resources and begins with " { $snippet "resource:" } ". This allows words that operate on source files, like " { $link edit } ", to use a different resource path at run time than was used at parse time." }
-{ $errors "Throws an I/O error if there was an error reading the resource. Throws a parse error if the input is malformed." } ;
-
-HELP: run-resource
-{ $values { "path" "a resource name string" } }
-{ $description "Parses and runs a library resource." }
-{ $errors "Throws an I/O error if there was an error reading the resource. Throws a parse error if the input is malformed." } ;

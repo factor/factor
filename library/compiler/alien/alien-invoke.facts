@@ -8,7 +8,7 @@ HELP: alien-invoke
 { $values { "return" "a C return type" } { "library" "a logical library name" } { "function" "a C function name" } { "parameters" "a sequence of C parameter types" } }
 { $description "Calls a C library function with the given name. Input parameters are taken from the data stack, and the return value is pushed on the data stack after the function returns. A return type of " { $snippet "\"void\"" } " indicates that no value is to be expected." }
 { $errors "Throws an " { $link alien-invoke-error } " if the word calling " { $link alien-invoke } " is not compiled." }
-{ $see-also alien-callback } ;
+{ $see-also alien-indirect alien-callback } ;
 
 HELP: define-c-word
 { $values { "return" "a C return type" } { "library" "a logical library name" } { "function" "a C function name" } { "parameters" "a sequence of C parameter types" } }

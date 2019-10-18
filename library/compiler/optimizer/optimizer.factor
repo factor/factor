@@ -40,6 +40,14 @@ M: node optimize-node* drop t ;
 M: #shuffle optimize-node* 
     [ node-values empty? ] prune-if ;
 
+! #>r
+M: #>r optimize-node* 
+    [ node-in-d empty? ] prune-if ;
+
+! #r>
+M: #r> optimize-node* 
+    [ node-in-r empty? ] prune-if ;
+
 ! #push
 M: #push optimize-node* 
     [ node-out-d empty? ] prune-if ;

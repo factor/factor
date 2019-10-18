@@ -46,3 +46,6 @@ C: effect
     dup "declared-effect" word-prop [ ] [
         dup "infer-effect" word-prop [ ] [ drop f ] ?if
     ] ?if ;
+
+M: effect clone
+    [ effect-in clone ] keep effect-out clone <effect> ;

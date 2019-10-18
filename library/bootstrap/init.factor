@@ -9,7 +9,6 @@ namespaces parser threads words ;
     cell \ cell set
     millis init-random
     init-io
-    "HOME" os-env [ "." ] unless* "~" set
     init-error-handler
     init-threads
     default-cli-args

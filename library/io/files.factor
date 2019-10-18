@@ -19,6 +19,8 @@ strings styles ;
 
 : file-length ( path -- n ) stat third ;
 
+: file-modified ( path -- n ) stat fourth ;
+
 : parent-dir ( path -- parent )
     CHAR: / over last-index CHAR: \\ pick last-index max
     dup -1 = [ 2drop "." ] [ head ] if ;
@@ -27,13 +29,15 @@ strings styles ;
     \ resource-path get [ image parent-dir ] unless*
     swap path+ ;
 
-: <resource-reader> ( resource -- stream )
-    resource-path <file-reader> ;
+: ?resource-path ( path -- path )
+    "resource:" ?head [ resource-path ] when ;
 
 TUPLE: pathname string ;
 
 : (file.) ( name path -- )
     <pathname> write-object ;
+
+: write-pathname ( path -- ) dup (file.) ;
 
 DEFER: directory.
 
@@ -47,3 +51,6 @@ DEFER: directory.
 
 : directory. ( path -- )
     dup directory [ file. ] each-with ;
+
+: home ( -- dir )
+    windows? "USERPROFILE" "HOME" ? os-env [ "." ] unless* ;

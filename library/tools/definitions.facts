@@ -1,5 +1,5 @@
 IN: definitions
-USING: help io prettyprint ;
+USING: help io modules prettyprint ;
 
 HELP: ?resource-path
 { $values { "path" "a string" } { "newpath" "a string" } }
@@ -33,3 +33,17 @@ HELP: comment.
 { $values { "string" "a string" } }
 { $description "Prettyprints some text with the comment style." }
 $prettyprinting-note ;
+
+HELP: edit
+{ $values { "defspec" "a definition specifier" } }
+{ $description "Opens the source file containing the definition in the default editor. You must load one of the following modules using " { $link require } " for this word to work:"
+    { $list
+        { $snippet "contrib/emacs" }
+        { $snippet "contrib/jedit" }
+        { $snippet "contrib/textmate" }
+        { $snippet "contrib/vim" }
+    }
+} ;
+
+HELP: no-edit-hook
+{ $error-description "Thrown when " { $link edit } " is called when the " { $link edit-hook } " variable is not set. See " { $link edit } " for details." } ;

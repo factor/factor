@@ -1,18 +1,12 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+IN: alien
+SYMBOL: c-types
 
-! This library allows one to generate a new set of bootstrap
-! images.
-!
-! It does this by parsing the set of source files needed to
-! generate the minimal image, and writing the cons cells, words,
-! strings etc to the image file in the CFactor object memory
-! format.
-
-USING: alien arrays errors generic hashtables
-hashtables-internals help io kernel kernel-internals math
-namespaces parser prettyprint sequences sequences-internals
-strings vectors words ;
+USING: arrays errors generic hashtables hashtables-internals
+help io kernel kernel-internals math namespaces parser
+prettyprint sequences sequences-internals strings vectors words
+modules ;
 IN: image
 
 ! Constants
@@ -178,6 +172,7 @@ M: f '
         dup word-primitive ' ,
         dup word-def ' ,
         dup word-props ' ,
+        f ' ,
         0 ,
     ] { } make
     word-tag word-tag [ emit-seq ] emit-object
@@ -292,7 +287,7 @@ M: hashtable '
         {
             vocabularies typemap builtins c-types crossref
             articles parent-graph term-index changed-words
-            class<map
+            modules class<map source-files
         } [ dup get swap bootstrap-word set ] each
     ] make-hash '
     global-offset fixup ;
@@ -332,8 +327,9 @@ M: hashtable '
     <file-writer> [ (write-image) ] with-stream ;
 
 : prepare-profile ( arch -- )
-    "/library/bootstrap/profile-" swap ".factor" append3
-    run-resource ;
+    "resource:/library/bootstrap/profile-"
+    swap ".factor" append3
+    run-file ;
 
 : prepare-image ( arch -- )
     bootstrapping? on dup architecture set prepare-profile
@@ -344,7 +340,7 @@ M: hashtable '
         parse-hook off
         prepare-image
         begin-image
-        "/library/bootstrap/boot-stage1.factor" run-resource
+        "resource:/library/bootstrap/boot-stage1.factor" run-file
         end-image
         image get image-name write-image
     ] with-scope ;

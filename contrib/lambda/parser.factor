@@ -6,41 +6,41 @@
 #! <expr> ::= (<expr> <expr>)
 #! <line> ::= <expr>
 #! <line> ::= <name> : <expr>
-USING: parser-combinators strings sequences kernel ;
+USING: lazy-lists parser-combinators strings sequences kernel ;
 
 IN: lambda
 
-: <letter> 
+LAZY: <letter> 
     #! parses an uppercase or lowercase letter
 	[ letter? ] satisfy [ ch>string ] <@ ;
 
-: <LETTER> 
+LAZY: <LETTER> 
     #! parses an uppercase or lowercase letter
     [ LETTER? ] satisfy [ ch>string ] <@ ;
 
-: <number>
+LAZY: <number>
     #! parses a number
     [ digit? ] satisfy [ ch>string ] <@ ;
 
-: <alphanumeric>
+LAZY: <alphanumeric>
     #! parses an alphanumeral
     <letter> <number> <|> ;
 
-: <ALPHANUMERIC>
+LAZY: <ALPHANUMERIC>
     #! parses an alphanumeral
     <LETTER> <number> <|> ;
 
-: <id>
+LAZY: <id>
     #! parses an identifier (string for now)
     #! TODO: do we need to enter it into a symbol table?
     <letter> <alphanumeric> <*> <&:> [ concat <var-node> ] <@ ;
 
-: <name>
+LAZY: <name>
     #! parses a name, which is used in replacement
     <ALPHANUMERIC> <+> [ concat ] <@ ;
 
 DEFER: <expr>
-: <lambda>
+LAZY: <lambda> ( -- parser )
     #! parses (<id>.<expr>), the "lambda" expression
     #! all occurences of <id> are replaced with a pointer to this
     #! lambda expression.
@@ -48,23 +48,23 @@ DEFER: <expr>
     <expr> sp <&> ")" token sp <&
     [ [ first var-node-name ] keep second <lambda-node> ] <@ ;
 
-: <apply>
+LAZY: <apply> ( -- parser )
     #! parses (<expr> <expr>), the function application
     "(" token <expr> sp &> <expr> sp <&> ")" token sp <& 
     [ [ first ] keep second <apply-node> ] <@ ;
 
-: <alien>
+LAZY: <alien> ( -- parser )
     #! parses [<FACTOR-WORD>], the alien invocation
     #! an alien factor word must be all capital letters and numerals
     "[" token <name> sp &> "]" token sp <& [ <alien-node> ] <@ ;
 
-: <expr>
-    [ <id> call ] [ <lambda> call ] [ <apply> call ] <|> <|>
+LAZY: <expr>
+    <id> <lambda> <apply> <|> <|>
     <name> [ <var-node> ] <@ <|> <alien> <|> ;
 
-: <line>
+LAZY: <line>
     ":" token <name> &> <expr> sp <&> f succeed <expr> <&> 
     <|> "." token <name> &> f succeed <&> <|> ;
 
 : lambda-parse
-    <line> some call ;
+    <line> some parse force ;

@@ -1,7 +1,7 @@
-! Copyright (C) 2005 Slava Pestov.
-! See http://factor.sf.net/license.txt for BSD license.
+! Copyright (C) 2005, 2006 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: gadgets-buttons
-USING: gadgets gadgets-borders gadgets-controls gadgets-labels
+USING: gadgets gadgets-borders gadgets-labels
 gadgets-theme generic io kernel math models namespaces sequences
 strings styles threads words ;
 
@@ -53,25 +53,19 @@ C: button ( gadget quot -- button )
 : <bevel-button> ( gadget quot -- button )
     <button> dup bevel-button-theme ;
 
-: repeat-button-down ( button -- )
-    dup 100 add-timer button-clicked ;
-
-: repeat-button-up ( button -- )
-    dup button-update remove-timer ;
-
 TUPLE: repeat-button ;
 
 repeat-button H{
-    { T{ button-down } [ repeat-button-down ] }
-    { T{ button-up } [ repeat-button-up ] }
+    { T{ button-down } [ [ button-clicked ] start-timer-gadget ] }
+    { T{ button-up } [ dup stop-timer-gadget button-update ] }
 } set-gestures
 
 C: repeat-button ( gadget quot -- button )
     #! Button that calls the quotation every 100ms as long as
     #! the mouse is held down.
-    [ >r <bevel-button> r> set-gadget-delegate ] keep ;
-
-M: repeat-button tick nip button-clicked ;
+    [
+        >r <bevel-button> <timer-gadget> r> set-gadget-delegate
+    ] keep ;
 
 TUPLE: button-paint plain rollover pressed selected ;
 

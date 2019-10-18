@@ -46,7 +46,7 @@ DEFER: (splay)
         dup splay-node-r [ link-left (splay) ] when
     ] when ;
 
-: (splay) ( left right key node -- )
+: (splay) ( left right key node -- left right key node )
     cmp dup 0 <
     [ drop splay-left ] [ 0 > [ splay-right ] when ] if ;
 
@@ -72,7 +72,7 @@ DEFER: (splay)
 : (get-splay) ( key tree -- node )
     2dup splay splay-tree-r cmp 0 = [ nip ] [ 2drop f ] if ;
 
-: get-largest
+: get-largest ( node -- node )
     dup [ dup splay-node-r [ nip get-largest ] when* ] when ;
 
 : splay-largest
@@ -114,4 +114,4 @@ USING: namespaces words ;
 all-words [ dup word-name "foo" get set-splay ] each
 all-words [ word-name "foo" get get-splay drop ] each
 
-PROVIDE: splay-trees ;
+PROVIDE: contrib/splay-trees ;

@@ -59,7 +59,7 @@ TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o bitmap ;
   [ [ 1 + ] dip uchar-nth ] 2keep
   [ 2 + ] dip uchar-nth 3array ;
   
-C: space-invaders ( cpu -- cpu )
+C: space-invaders ( -- cpu )
   [ <cpu> swap set-delegate ] keep
   [ make-opengl-bitmap swap set-space-invaders-bitmap ] keep
   [ reset ] keep ;

@@ -6,12 +6,12 @@ parser sequences strings ;
 
 : run-bootstrap-init ( -- )
     "user-init" get [
-        "~" get "/.factor-boot-rc" append ?run-file
+        home ".factor-boot-rc" path+ ?run-file
     ] when ;
 
 : run-user-init ( -- )
     "user-init" get [
-        "~" get "/.factor-rc" append ?run-file
+        home ".factor-rc" path+ ?run-file
     ] when ;
 
 : cli-var-param ( name value -- ) swap set-global ;

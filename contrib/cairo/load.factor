@@ -1,3 +1,3 @@
 USING: alien ;
 
-PROVIDE: cairo { "cairo.factor" } ;
+PROVIDE: contrib/cairo { "cairo.factor" } ;

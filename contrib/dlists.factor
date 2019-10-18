@@ -62,4 +62,4 @@ C: dlist-node
 : dlist-length ( dlist -- length )
     0 swap [ drop 1 + ] dlist-each ;
 
-PROVIDE: dlists ;
+PROVIDE: contrib/dlists ;

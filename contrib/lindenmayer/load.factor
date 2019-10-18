@@ -1,0 +1,1 @@
+PROVIDE: contrib/lindenmayer { "lindenmayer.factor" } ;

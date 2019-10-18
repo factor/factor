@@ -1,5 +1,5 @@
 IN: words
-USING: help inference ;
+USING: help ;
 
 HELP: effect
 { $class-description "An object representing a stack effect. Holds a sequence of inputs, a sequence of outputs and a flag indicating if an error is thrown unconditionally." } ;
@@ -21,4 +21,4 @@ HELP: effect>string
 
 HELP: stack-effect
 { $values { "word" "a word" } { "effect/f" "a stack effect" } }
-{ $description "Outputs the stack effect of a word; either a stack effect declared with " { $link POSTPONE: ( } ", or a stack effect inferred with " { $link infer } "." } ;
+{ $description "Outputs the stack effect of a word; either a stack effect declared with " { $link POSTPONE: ( } ", or an inferred stack effect (see " { $link "inference" } "." } ;

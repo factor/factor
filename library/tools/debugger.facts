@@ -1,5 +1,5 @@
 IN: errors
-USING: alien arrays generic help inference kernel math memory
+USING: alien arrays generic help kernel math memory
 strings vectors ;
 
 HELP: restarts
@@ -87,7 +87,7 @@ HELP: user-interrupt.
 
 HELP: datastack-underflow.
 { $error-description "Thrown by the runtime if an attempt is made to pop elements from an empty data stack." }
-{ $notes "You can use the " { $link infer } " tool to statically check stack effects of quotations." } ;
+{ $notes "You can use the stack effect tool to statically check stack effects of quotations. See " { $link "inference" } "." } ;
 
 HELP: datastack-overflow.
 { $error-description "Thrown by the runtime if an attempt is made to push elements on a full data stack." }
@@ -95,7 +95,7 @@ HELP: datastack-overflow.
 
 HELP: retainstack-underflow.
 { $error-description "Thrown by the runtime if " { $link r> } " is called while the retain stack is empty." }
-{ $notes "You can use the " { $link infer } " tool to statically check stack effects of quotations." } ;
+{ $notes "You can use the stack effect tool to statically check stack effects of quotations. See " { $link "inference" } "." } ;
 
 HELP: retainstack-overflow.
 { $error-description "Thrown by the runtime if " { $link >r } " is called when the retain stack is full." }

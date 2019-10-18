@@ -14,3 +14,5 @@ USING: sequences kernel math io ;
     3 [ 2dup lcd-row terpri ] repeat drop ;
 
 "31337" lcd
+
+PROVIDE: examples/lcd ;

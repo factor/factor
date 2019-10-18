@@ -68,3 +68,5 @@ SYMBOL: tape
 : n
     #! Do one step and print new state.
     turing-step c ;
+
+PROVIDE: examples/turing ;

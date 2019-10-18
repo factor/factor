@@ -33,7 +33,7 @@ M: object like drop ;
 : memq? ( obj seq -- ? )
     [ eq? ] contains-with? ;
 
-: remove ( obj list -- list )
+: remove ( obj seq -- newseq )
     [ = not ] subset-with ;
 
 : (subst) ( newseq oldseq elt -- new/elt )
@@ -123,6 +123,15 @@ M: object like drop ;
     [ second = ] find-with nip first ;
 
 : last/first ( seq -- pair ) dup peek swap first 2array ;
+
+: padding ( seq n elt -- newseq )
+    >r swap length [-] r> <array> ;
+
+: pad-left ( seq n elt -- padded )
+    pick >r pick >r padding r> append r> like ;
+
+: pad-right ( seq n elt -- padded )
+    pick >r padding r> swap append ;
 
 : sequence= ( seq1 seq2 -- ? )
     2dup [ length ] 2apply tuck number=

@@ -1,15 +1,13 @@
-! Copyright (C) 2004, 2005 Mackenzie Straight.
+! Copyright (C) 2006 Mackenzie Straight, Doug Coleman.
 
-IN: win32-stream
+IN: win32-server
 USING: alien errors generic kernel kernel-internals math namespaces
        prettyprint sequences io strings threads win32-api
-       win32-io-internals io-internals ;
+       win32-io-internals io-internals win32-stream ;
 
-TUPLE: win32-server this ;
 TUPLE: win32-client-stream host port ;
-SYMBOL: socket
 
-: (handle-socket-error)
+: (handle-socket-error) ( -- )
     WSAGetLastError [ ERROR_IO_PENDING ERROR_SUCCESS ] member?
     [ WSAGetLastError error_message throw ] unless ;
 
@@ -21,7 +19,6 @@ SYMBOL: socket
 
 : init-winsock ( -- )
     HEX: 0202 <wsadata> WSAStartup handle-socket-error!=0/f ;
-
 
 : new-socket ( -- socket )
     AF_INET SOCK_STREAM 0 f f WSA_FLAG_OVERLAPPED
@@ -36,8 +33,10 @@ SYMBOL: socket
 : bind-socket ( port socket -- )
     swap setup-sockaddr "sockaddr-in" c-size wsa-bind handle-socket-error!=0/f ;
 
+: listen-backlog ( -- n ) 20 ; inline
+
 : listen-socket ( socket -- )
-    20 wsa-listen handle-socket-error!=0/f ;
+    listen-backlog wsa-listen handle-socket-error!=0/f ;
 
 : sockaddr> ( sockaddr -- port host )
     dup sockaddr-in-port ntohs swap sockaddr-in-addr inet-ntoa ;
@@ -54,50 +53,18 @@ C: win32-client-stream ( buf stream -- stream )
     [ set-win32-client-stream-host ] keep 
     [ set-win32-client-stream-port ] keep ;
 
-M: win32-client-stream client-stream-host win32-client-stream-host ;
-M: win32-client-stream client-stream-port win32-client-stream-port ;
+M: win32-client-stream client-stream-host ( win32-client-stream -- host )
+    win32-client-stream-host ;
+M: win32-client-stream client-stream-port ( win32-client-stream -- port )
+    win32-client-stream-port ;
 
-C: win32-server ( port -- server )
-    swap [ 
-        new-socket tuck bind-socket dup listen-socket 
-        dup add-completion
-        socket set
-        dup stream set
-    ] make-hash over set-win32-server-this ;
-
-M: win32-server stream-close
-    win32-server-this [ socket get CloseHandle drop ] bind ;
-
-M: win32-server set-timeout
-    win32-server-this [ timeout set ] bind ;
-
-M: win32-server expire
-    win32-server-this [
-        timeout get [ millis cutoff get > [ socket get CancelIo ] when ] when
-    ] bind ;
+: make-win32-server ( port -- win32-stream )
+    new-socket tuck bind-socket dup listen-socket dup add-completion
+    <win32-stream> <win32-duplex-stream> ;
 
 : client-sockaddr ( host port -- sockaddr )
     setup-sockaddr [
         >r gethostbyname dup handle-socket-error=0/f hostent-addr
         r> set-sockaddr-in-addr
     ] keep ;
-
-IN: io
-: accept ( server -- client )
-    win32-server-this [
-        update-timeout new-socket 64 <buffer>
-        [
-            stream get alloc-io-callback init-overlapped
-            >r >r >r socket get r> r> 
-            buffer-ptr <alien> 0 32 32 f r> AcceptEx
-            handle-socket-error!=0/f stop
-        ] callcc1 pending-error drop
-        swap dup add-completion <win32-stream> <line-reader> 
-        dupd <win32-client-stream> swap buffer-free
-    ] bind ;
-
-: <client> ( host port -- stream )
-    client-sockaddr new-socket
-    [ swap "sockaddr-in" c-size connect handle-socket-error!=0/f ] keep 
-    dup add-completion <win32-stream> <line-reader> ;
 

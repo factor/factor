@@ -1,5 +1,5 @@
-REQUIRES: embedded process ;
-PROVIDE: vim {
+REQUIRES: contrib/httpd contrib/process ;
+PROVIDE: contrib/vim {
     "vim.factor"
 } ;
 

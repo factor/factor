@@ -94,7 +94,7 @@ void dump_cell(CELL cell)
 			fprintf(stderr," -- F");
 		else if(cell < TYPE_COUNT<<TAG_BITS)
 			fprintf(stderr," -- header: %ld",cell>>TAG_BITS);
-		else if(cell >= heap_start && cell < heap_end)
+		else if(cell >= data_heap_start && cell < data_heap_end)
 		{
 			CELL header = get(UNTAG(cell));
 			CELL type = header>>TAG_BITS;
@@ -165,7 +165,7 @@ void factorbug(void)
 	fprintf(stderr,"g                -- dump generations\n");
 	fprintf(stderr,"card <addr>      -- print card containing address\n");
 	fprintf(stderr,"addr <card>      -- print address containing card\n");
-	fprintf(stderr,"c <gen>          -- force garbage collection\n");
+	fprintf(stderr,"code             -- code heap dump\n");
 	
 	for(;;)
 	{
@@ -223,12 +223,6 @@ void factorbug(void)
 		}
 		else if(strcmp(cmd,"g") == 0)
 			dump_generations();
-		else if(strcmp(cmd,"c") == 0)
-		{
-			CELL gen;
-			scanf("%lu",&gen);
-			garbage_collection(gen);
-		}
 		else if(strcmp(cmd,"card") == 0)
 		{
 			CELL addr;
@@ -249,6 +243,8 @@ void factorbug(void)
 			exit(1);
 		else if(strcmp(cmd,"im") == 0)
 			save_image("fep.image");
+		else if(strcmp(cmd,"code") == 0)
+			dump_heap(&compiling);
 		else
 			fprintf(stderr,"unknown command\n");
 	}

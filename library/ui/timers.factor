@@ -3,31 +3,29 @@
 IN: gadgets
 USING: hashtables kernel math namespaces sequences ;
 
-TUPLE: timer object delay last ;
+TUPLE: timer object delay next ;
 
-C: timer ( object delay -- timer )
+C: timer ( object delay initial -- timer )
+    [ >r millis + r> set-timer-next ] keep
     [ set-timer-delay ] keep
-    [ set-timer-object ] keep
-    millis over set-timer-last ;
+    [ set-timer-object ] keep ;
 
-GENERIC: tick ( ms object -- )
+GENERIC: tick ( object -- )
 
 : timers \ timers get-global ;
 
 : init-timers ( -- ) H{ } clone \ timers set-global ;
 
-: add-timer ( object delay -- )
-    over >r <timer> r> timers set-hash ;
+: add-timer ( object delay initial -- )
+    pick >r <timer> r> timers set-hash ;
 
 : remove-timer ( object -- ) timers remove-hash ;
 
-: next-time ( timer -- ms ) dup timer-delay swap timer-last + ;
-
-: advance-timer ( ms timer -- delay )
-    [ timer-last [-] ] 2keep set-timer-last ;
+: advance-timer ( ms timer -- )
+    [ timer-delay + ] keep set-timer-next ;
 
 : do-timer ( ms timer -- )
-    dup next-time pick <=
+    dup timer-next pick <=
     [ [ advance-timer ] keep timer-object tick ] [ 2drop ] if ;
 
 : do-timers ( -- )

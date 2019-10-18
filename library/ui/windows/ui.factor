@@ -3,7 +3,7 @@
 USING: alien arrays errors freetype gadgets gadgets-listener
        gadgets-workspace hashtables io kernel math namespaces prettyprint
        sequences strings vectors words win32-api win32-api-messages ;
-USING: inspector threads memory ;
+USING: tools threads memory ;
 IN: win32
 
 ! world-handle is a <win>
@@ -11,6 +11,7 @@ TUPLE: win hWnd hDC hRC world ;
 
 SYMBOL: msg-obj
 SYMBOL: class-name
+SYMBOL: track-mouse-state
 
 : random-class-name "Factor" 100000000 random-int unparse append ;
 
@@ -25,7 +26,6 @@ SYMBOL: class-name
 
 : make-adjusted-RECT ( width height -- RECT )
     make-RECT dup adjust-RECT ;
-
 
 : get-RECT-dimensions ( RECT -- width height )
     [ RECT-right ] keep [ RECT-left - ] keep
@@ -42,7 +42,7 @@ SYMBOL: class-name
     2nip
     dup { 0 0 } = [ 2drop ] [ swap window set-gadget-dim ] if ;
 
-: wm-keydown-codes ( n -- key )
+: wm-keydown-codes ( -- key )
     H{
         { 8 "BACKSPACE" }
         { 9 "TAB" }
@@ -100,7 +100,6 @@ SYMBOL: class-name
         { 17 "CTRL" }
         { 18 "ALT" }
         { 20 "CAPS-LOCK" }
-        { 27 "ESCAPE" }
     } ;
 
 : exclude-keys-wm-char
@@ -109,13 +108,13 @@ SYMBOL: class-name
         { 8 "BACKSPACE" }
         { 9 "TAB" }
         { 13 "RETURN" }
+        { 27 "ESCAPE" }
     } ;
 
 : exclude-key-wm-keydown? ( n -- bool ) exclude-keys-wm-keydown hash* nip ;
 : exclude-key-wm-char? ( n -- bool ) exclude-keys-wm-char hash* nip ;
-: handle-key? ( n -- bool ) wm-keydown-codes hash* nip ;
  
-: keystroke>gesture ( n -- <key-down> )
+: keystroke>gesture ( n -- sym mods )
     dup wm-keydown-codes hash*
     [ nip ] [ drop ch>string lower-case? [ >lower ] when ] if
     key-modifiers swap ;
@@ -163,8 +162,8 @@ SYMBOL: hWnd
 : handle-wm-kill-focus ( hWnd uMsg wParam lParam -- )
     3drop window [ unfocus-world ] when* ;
 
-: mouse-coordinate ( lParam -- seq ) [ lo-word ] keep hi-word 2array ;
-: mouse-wheel ( lParam -- n ) hi-word 0 > ;
+: mouse-lparam ( lParam -- seq ) [ lo-word ] keep hi-word 2array ;
+: mouse-wheel ( lParam -- n ) mouse-lparam [ sgn neg ] map ;
 
 : mouse-event>gesture ( uMsg -- button )
     key-modifiers swap
@@ -178,26 +177,42 @@ SYMBOL: hWnd
         { [ t ] [ "bad button" throw ] }
     } cond ;
 
+: capture-mouse? ( umsg -- ? )
+    { WM_LBUTTONDOWN WM_RBUTTONDOWN } member? ;
+
 : prepare-mouse ( hWnd uMsg wParam lParam -- button coordinate world )
-    nip >r mouse-event>gesture r> mouse-coordinate rot window ;
+    nip >r mouse-event>gesture r> mouse-lparam rot window ;
 
 : handle-wm-buttondown ( hWnd uMsg wParam lParam -- )
-    >r pick SetCapture drop r>
+    >r over capture-mouse? [ pick SetCapture drop ] when r>
     prepare-mouse send-button-down ;
 
 : handle-wm-buttonup ( hWnd uMsg wParam lParam -- )
-    ReleaseCapture drop
+    pick capture-mouse? [ ReleaseCapture drop ] when
     prepare-mouse send-button-up ;
 
 : handle-wm-mousemove ( hWnd uMsg wParam lParam -- )
-    2nip mouse-coordinate swap window move-hand fire-motion ;
+    2nip
+    track-mouse-state get [
+        over "TRACKMOUSEEVENT" <c-object> [ set-TRACKMOUSEEVENT-hwndTrack ] keep
+        "TRACKMOUSEEVENT" c-size over set-TRACKMOUSEEVENT-cbSize
+        TME_LEAVE over set-TRACKMOUSEEVENT-dwFlags
+        0 over set-TRACKMOUSEEVENT-dwHoverTime
+        TrackMouseEvent drop
+        track-mouse-state on
+    ] unless
+    mouse-lparam swap window move-hand fire-motion ;
 
 : handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
-    mouse-coordinate >r mouse-wheel nip r> rot window send-wheel ;
+    mouse-lparam >r mouse-wheel nip r> rot window send-wheel ;
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
     #! message sent if windows needs application to stop dragging
     3drop drop ReleaseCapture drop ;
+
+: handle-wm-mouseleave ( hWnd uMsg wParam lParam -- )
+    #! message sent if mouse leaves main application 
+    3drop drop forget-rollover track-mouse-state off ;
 
 : 4dup ( a b c d -- a b c d a b c d )
     >r >r 2dup r> r> 2swap >r >r 2dup r> r> 2swap ;
@@ -236,6 +251,7 @@ SYMBOL: hWnd
                 { [ dup WM_MOUSEMOVE = ] [ drop handle-wm-mousemove 0 ] }
                 { [ dup WM_MOUSEWHEEL = ] [ drop handle-wm-mousewheel 0 ] }
                 { [ dup WM_CANCELMODE = ] [ drop handle-wm-cancelmode 0 ] }
+                { [ dup WM_MOUSELEAVE = ] [ drop handle-wm-mouseleave 0 ] }
 
                 { [ t ] [ drop DefWindowProc ] }
             } cond
@@ -256,7 +272,7 @@ SYMBOL: hWnd
         [ do-events ui-step ] ui-try event-loop
     ] unless ;
 
-: register-wndclassex ( classname wndproc -- )
+: register-wndclassex ( classname wndproc -- class )
     "WNDCLASSEX" <c-object>
     "WNDCLASSEX" c-size over set-WNDCLASSEX-cbSize
     CS_HREDRAW CS_VREDRAW bitor CS_OWNDC bitor over set-WNDCLASSEX-style

@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: image
 USING: alien arrays generic hashtables help io kernel
-kernel-internals math namespaces parser sequences strings
-vectors words ;
+kernel-internals math modules namespaces parser sequences
+strings vectors words ;
 
 ! Some very tricky code creating a bootstrap embryo in the
 ! host image.
@@ -11,13 +11,16 @@ vectors words ;
 "Creating primitives and basic runtime structures..." print flush
 
 H{ } clone c-types set
-"/library/compiler/alien/primitive-types.factor" parse-resource
+
+"resource:/library/compiler/alien/primitive-types.factor" parse-file
 
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab
 
+H{ } clone source-files set
 H{ } clone vocabularies set
 H{ } clone class<map set
+V{ } clone modules set
 
 vocabularies get [ "syntax" set ] bind
 
@@ -98,7 +101,7 @@ call
     { "float>=" "math-internals"            }
     { "(word)" "kernel-internals"           }
     { "update-xt" "words"                   }
-    { "compiled?" "words"                   }
+    { "word-xt" "words"                     }
     { "drop" "kernel"                       }
     { "2drop" "kernel"                      }
     { "3drop" "kernel"                      }
@@ -122,7 +125,8 @@ call
     { "setenv" "kernel-internals"           }
     { "stat" "io"                           }
     { "(directory)" "io"                    }
-    { "gc" "memory"                         }
+    { "data-gc" "memory"                    }
+    { "code-gc" "memory"                    }
     { "gc-time" "memory"                    }
     { "save-image" "memory"                 }
     { "datastack" "kernel"                  }
@@ -132,7 +136,8 @@ call
     { "set-retainstack" "kernel"            }
     { "set-callstack" "kernel"              }
     { "exit" "kernel"                       }
-    { "room" "memory"                       }
+    { "data-room" "memory"                  }
+    { "code-room" "memory"                  }
     { "os-env" "kernel"                     }
     { "millis" "kernel"                     }
     { "type" "kernel"                       }
@@ -179,8 +184,6 @@ call
     { "alien-address" "alien"               }
     { "slot" "kernel-internals"             }
     { "set-slot" "kernel-internals"         }
-    { "integer-slot" "kernel-internals"     }
-    { "set-integer-slot" "kernel-internals" }
     { "char-slot" "kernel-internals"        }
     { "set-char-slot" "kernel-internals"    }
     { "resize-array" "arrays"               }
@@ -280,6 +283,12 @@ num-types f <array> builtins set
         object
         { "word-props" "words" }
         { "set-word-props" "words" }
+    }
+    {
+        7
+        object
+        { "compiled?" "words" }
+        f
     }
 } define-builtin
 

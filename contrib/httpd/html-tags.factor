@@ -53,9 +53,10 @@ USE: sequences
 
 SYMBOL: html
 
-: write-html H{ { html t } } format ;
+: write-html ( str -- )
+    H{ { html t } } format ;
 
-: html-word ( name def -- )
+: html-word ( name def -- word )
     #! Define 'word creating' word to allow
     #! dynamically creating words.
     >r "html" create dup r> define-compound ;
@@ -127,13 +128,13 @@ SYMBOL: html
 
 : define-attribute-word ( name -- )
     dup "=" swap append swap
-    [ , [ write-attr ] % ] [ ] make html-word drop ;
+    [ write-attr ] curry html-word drop ;
 
 ! Define some closed HTML tags
 [
     "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8" "h9"    
     "ol" "li" "form" "a" "p" "html" "head" "body" "title"
-    "b" "i" "ul" "table" "tr" "td" "th" "pre" "textarea"
+    "b" "i" "ul" "table" "tbody" "tr" "td" "th" "pre" "textarea"
     "script" "div" "span" "select" "option" "style"
 ] [ define-closed-html-word ] each
 

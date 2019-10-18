@@ -54,7 +54,6 @@ TUPLE: check-tuple class ;
     dup tuple-class? [ <check-tuple> throw ] unless ;
 
 : define-constructor ( word class def -- )
-    pick reset-generic
     swap check-tuple [
         dup literalize ,
         "tuple-size" word-prop ,
@@ -62,7 +61,9 @@ TUPLE: check-tuple class ;
     ] [ ] make define-compound ;
 
 : default-constructor ( class -- )
-    dup create-constructor 2dup "constructor" set-word-prop
+    dup create-constructor
+    2dup "constructor" set-word-prop
+    dup reset-generic
     swap dup "slots" word-prop unclip drop <reversed>
     [ [ tuck ] swap peek add ] map concat >quotation
     define-constructor ;

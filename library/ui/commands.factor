@@ -4,7 +4,7 @@ USING: arrays definitions kernel gadgets sequences strings math
 words generic namespaces hashtables help ;
 IN: gadgets
 
-TUPLE: command group name gesture quot ;
+TUPLE: command name gesture quot ;
 
 M: command equal? eq? ;
 
@@ -25,79 +25,50 @@ M: key-down gesture>string
 M: button-up gesture>string
     [
         dup button-up-mods modifiers>string %
-        "Mouse Up" %
+        "Click Button" %
         button-up-# [ " " % # ] when*
     ] "" make ;
 
 M: button-down gesture>string
     [
         dup button-down-mods modifiers>string %
-        "Mouse Down" %
+        "Press Button" %
         button-down-# [ " " % # ] when*
     ] "" make ;
 
 M: object gesture>string drop f ;
 
-: command-gestures ( commands -- hash )
+: commands ( class -- hash )
+    dup "commands" word-prop [ ] [
+        H{ } clone [ "commands" set-word-prop ] keep
+    ] ?if ;
+
+: commands>gestures ( class -- hash )
+    commands hash-values concat
     [ command-gesture ] subset
     [ dup command-gesture swap [ invoke-command ] curry ]
     map>hash ;
 
-: define-commands* ( class specs -- )
-    2dup "commands" set-word-prop
-    command-gestures "gestures" set-word-prop ;
-
-: <commands> ( specs -- commands )
-    #! Specs is an array of { group { name gesture quot }* }
-    unclip swap [ first3 <command> ] map-with ;
-
-: define-commands ( class specs -- )
-    [ <commands> ] map concat define-commands* ;
-
-: commands ( gadget -- seq )
-    delegates [ class "commands" word-prop ] map concat ;
-
-: all-commands ( gadget -- assoc )
-    [
-        parents [
-            dup commands [ set ] each-with
-        ] each
-    ] make-hash
-    hash>alist [ [ first command-name ] 2apply <=> ] sort ;
-
-: resend-button-down ( gesture world -- )
-    hand-loc get-global swap send-button-down ;
-
-: resend-button-up  ( gesture world -- )
-    hand-loc get-global swap send-button-up ;
-
-world H{
-    { T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }
-    { T{ key-down f { C+ } "c" } [ T{ copy-action } send-action ] }
-    { T{ key-down f { C+ } "v" } [ T{ paste-action } send-action ] }
-    { T{ key-down f { C+ } "a" } [ T{ select-all-action } send-action ] }
-    { T{ button-down f { C+ } 1 } [ T{ button-down f f 3 } swap resend-button-down ] }
-    { T{ button-down f { A+ } 1 } [ T{ button-down f f 2 } swap resend-button-down ] }
-    { T{ button-up f { C+ } 1 } [ T{ button-up f f 3 } swap resend-button-up ] }
-    { T{ button-up f { A+ } 1 } [ T{ button-up f f 2 } swap resend-button-up ] }
-} set-gestures
+: define-commands ( class group specs -- )
+    [ dup array? [ first3 <command> ] when ] map
+    swap pick commands set-hash
+    dup commands>gestures "gestures" set-word-prop ;
 
 SYMBOL: +name+
-SYMBOL: +button+
-SYMBOL: +group+
 SYMBOL: +quot+
 SYMBOL: +listener+
-SYMBOL: +gesture+
+SYMBOL: +keyboard+
+SYMBOL: +default+
 
-TUPLE: operation predicate button gesture listener? ;
+TUPLE: operation predicate listener? default? ;
 
-: (operation) ( -- command )
-    +group+ get +name+ get +gesture+ get +quot+ get <command> ;
+: (command) ( -- command )
+    +name+ get +keyboard+ get +quot+ get <command> ;
 
 C: operation ( predicate hash -- operation )
     swap [
-        (operation) over set-delegate
-        +button+ get over set-operation-button
+        (command) over set-delegate
+        +default+ get over set-operation-default?
         +listener+ get over set-operation-listener?
     ] bind
     [ set-operation-predicate ] keep ;
@@ -111,10 +82,13 @@ SYMBOL: operations
     "predicate" word-prop
     operations get [ operation-predicate = ] subset-with ;
 
-: mouse-operation ( obj button# -- command )
-    swap object-operations
-    [ operation-button = ] subset-with
-    dup empty? [ drop f ] [ peek ] if ;
+: default-operation ( obj -- command )
+    object-operations [ operation-default? ] find-last nip ;
 
-: mouse-operations ( obj -- seq )
-    3 [ 1+ mouse-operation ] map-with ;
+: modify-operation ( quot operation -- operation )
+    clone
+    [ command-quot append ] keep
+    [ set-command-quot ] keep ;
+
+: modify-operations ( operations quot -- operations )
+    swap [ modify-operation ] map-with ;

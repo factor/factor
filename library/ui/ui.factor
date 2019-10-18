@@ -28,7 +28,7 @@ SYMBOL: windows
 
 : update-hand ( gadget -- )
     find-world [
-        dup hand-gadget get-global find-world eq?
+        dup hand-world get-global eq?
         [ hand-loc get-global swap move-hand ] [ drop ] if
     ] when* ;
 
@@ -119,37 +119,36 @@ C: titled-gadget ( gadget title -- )
 : restore-windows? ( -- ? )
     windows get [ empty? not ] [ f ] if* ;
 
-: <toolbar> ( gadget -- toolbar )
-    dup commands [ <command-presentation> ] map-with
+: <toolbar> ( target classes -- toolbar )
+    [ commands "toolbar" swap hash ] map concat
+    [ <command-button> ] map-with
     make-shelf ;
 
-: $gadget ( element -- ) first gadget. ;
+: command-description ( command -- element )
+    dup command-name swap command-gesture gesture>string
+    2array ;
 
-: command-description ( target command -- element )
-    [ <command-presentation> \ $gadget swap 2array ] keep
-    command-gesture gesture>string 2array ;
+: commands. ( commands -- )
+    [ command-gesture key-down? ] subset
+    [ command-description ] map
+    { { $strong "Command" } { $strong "Shortcut" } } add*
+    $table ;
 
-: gadget-info ( gadget -- )
-    "Gadget: " write
-    [ class word-name ] keep write-object terpri ;
+: $commands ( elt -- )
+    first2 swap commands hash commands. ;
 
-: command-table. ( commands group -- )
-    $heading
-    [ first2 swap command-description ] map
-    { "Command" "Gesture" } add* $table ;
+TUPLE: labelled-gadget content ;
 
-: push-hash ( elt key hash -- )
-    [ hash ?push ] 2keep set-hash ;
+C: labelled-gadget ( gadget title -- gadget )
+    {
+        { [ <label> dup reverse-video-theme ] f f @top }
+        { f set-labelled-gadget-content f @center }
+    } make-frame* ;
 
-: group-commands ( commands -- seq )
-    H{ } clone swap
-    [ dup first command-group pick push-hash ] each
-    hash>alist [ [ first ] 2apply <=> ] sort ;
+M: labelled-gadget focusable-child* labelled-gadget-content ;
 
-: commands. ( gadget -- )
-    dup gadget-info terpri
-    all-commands [ first command-gesture key-down? ] subset
-    group-commands [ first2 swap command-table. ] each ;
+: <labelled-pane> ( model quot title -- gadget )
+    >r <pane-control> <scroller> r> <labelled-gadget> ;
 
 : pane-window ( quot title -- )
     >r make-pane <scroller> r> open-titled-window ;
@@ -172,8 +171,13 @@ M: world-error error.
     "This world has been deactivated to prevent cascading errors." print
     delegate error. ;
 
+: draw-world? ( world -- ? )
+    #! We don't draw deactivated worlds, or those with 0 size.
+    #! On Windows, the latter case results in GL errors.
+    dup world-active? swap rect-dim [ zero? not ] all? and ;
+
 : draw-world ( world -- )
-    dup world-active? [
+    dup draw-world? [
         [
             dup world set [
                 dup (draw-world)

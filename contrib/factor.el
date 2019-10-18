@@ -77,7 +77,8 @@
     ("!.*$" . font-lock-comment-face)
     ("( .* )" . font-lock-comment-face)
     "IN:" "USING:" "TUPLE:" "^C:" "^M:" "USE:" "REQUIRE:" "PROVIDE:"
-    "GENERIC:" "SYMBOL:" "PREDICATE:"))
+    "REQUIRES:"
+    "GENERIC:" "SYMBOL:" "PREDICATE:" "VAR:"))
 
 (defun factor-mode ()
   "A mode for editing programs written in the Factor programming language."
@@ -108,7 +109,7 @@
 (defun factor-server ()
   (interactive)
   (make-comint "factor-server" factor-binary nil factor-image "-shell=tty")
-  (comint-send-string "*factor-server*" "USE: jedit telnet\n"))
+  (comint-send-string "*factor-server*" "USE: shells telnet\n"))
 
 ;; (defun factor-listener ()
 ;;   (interactive)
@@ -136,8 +137,8 @@
   (make-comint-in-buffer
    "factor-listener" (current-buffer) '("localhost" . 9999)))
 
-(defun load-factor-file (file-name)
-  (interactive "fLoad Factor file: ")
+(defun factor-run-file (file-name)
+  (interactive "fRun Factor file: ")
   (comint-send-string nil (format "\"%s\" run-file\n" file-name)))
 
 (defun factor-update-stack-buffer (&optional string)
@@ -162,7 +163,7 @@
    (first
     (comint-redirect-results-list-from-process 
      (get-buffer-process "*factor-listener*")
-     (format "\\ %s synopsis print" (thing-at-point 'symbol))
+     (format "\\ %s summary print" (thing-at-point 'symbol))
      ;; "[ ]*\\(.*\\)\n"
      "\\(.*\\)\n"
      1))))

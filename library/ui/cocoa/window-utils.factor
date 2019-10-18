@@ -73,10 +73,11 @@ USING: arrays gadgets kernel math objc sequences ;
 
     {
         "windowDidResignKey:" "void" { "id" "SEL" "id" } [
+            forget-rollover
             2nip -> object -> contentView window unfocus-world
         ]
     }
-} { } define-objc-class
+} define-objc-class
 
 : install-window-delegate ( window -- )
     FactorWindowDelegate install-delegate ;

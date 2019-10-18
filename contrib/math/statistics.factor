@@ -14,13 +14,12 @@ USING: kernel math sequences ;
     #! positive reals only
     0 [ recip + ] reduce recip ;
 
-! : number-sort [ - ] sort ;
 : median ( seq -- n )
     #! middle number if odd, avg of two middle numbers if even
-    [ - ] sort dup length dup even? [
-        1+ 2 /i dup 1- rot [ nth ] keep swapd nth + 2 /
+    natural-sort dup length dup even? [
+        1- 2 / swap [ nth ] 2keep >r 1+ r> nth + 2 /
     ] [
-        2 /i swap nth
+        2 / swap nth
     ] if ;
 
 : range ( seq -- n )
@@ -29,7 +28,7 @@ USING: kernel math sequences ;
 
 : var ( seq -- x )
     #! variance, normalize by N-1
-    dup length 1- dup 0 = [
+    dup length 1- dup zero? [
         0 2nip
     ] [
         swap [ mean ] keep 0 [ pick - sq + ] reduce nip swap /

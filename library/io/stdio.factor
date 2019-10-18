@@ -46,7 +46,12 @@ SYMBOL: stdio
 : write-outliner ( str obj content -- )
     outline associate [ write-object ] with-nesting ;
 
-: print-input ( string input -- )
-    <input> presented associate
-    [ H{ { font-style bold } } format ] with-nesting
+: (print-input/quot)
+    associate [ H{ { font-style bold } } format ] with-nesting
     terpri ;
+
+: print-input ( string input -- )
+    <input> presented (print-input/quot) ;
+
+: print-quot ( string quot -- )
+    quotation (print-input/quot) ;

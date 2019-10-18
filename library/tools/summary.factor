@@ -10,8 +10,9 @@ M: object summary
     "an instance of the " swap class word-name " class" append3 ;
 
 M: input summary
-    "Input: " swap input-string
-    dup string? [ unparse-short ] unless append ;
+    "Input: " swap input-string dup string?
+    [ "\n" split1 "..." "" ? append ] [ unparse-short ] if
+    append ;
 
 M: vocab-link summary
     [

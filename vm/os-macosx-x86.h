@@ -11,9 +11,7 @@
 /* Adjust stack pointer so we can push an arg */
 INLINE unsigned long fix_stack_ptr(unsigned long sp)
 {
-	  if ((sp & 0xf) != 0) sp -= (sp & 0xf);
-	  sp -= 8;
-	  return sp;
+	  return sp - (sp & 0xf);
 }
 
 INLINE void pass_arg0(SIGSEGV_THREAD_STATE_TYPE *thr_state, CELL arg)

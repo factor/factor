@@ -3,7 +3,7 @@ CC = gcc
 BINARY = f
 IMAGE = factor.image
 BUNDLE = Factor.app
-VERSION = 0.84
+VERSION = 0.85
 DISK_IMAGE_DIR = Factor-$(VERSION)
 DISK_IMAGE = Factor-$(VERSION).dmg
 
@@ -13,12 +13,6 @@ ifdef DEBUG
 else
 	CFLAGS = -Wall -O3 -ffast-math -fomit-frame-pointer $(SITE_CFLAGS)
 	STRIP = strip
-endif
-
-ifdef NO_UI
-	X11_UI_LIBS =
-else
-	X11_UI_LIBS = -lfreetype -lGL -lGLU -L/usr/X11R6/lib -lX11
 endif
 
 ifdef CONFIG
@@ -35,7 +29,8 @@ OBJS = $(PLAF_OBJS) \
 	vm/image.o \
 	vm/io.o \
 	vm/math.o \
-	vm/memory.o \
+	vm/data_gc.o \
+	vm/code_gc.o \
 	vm/primitives.o \
 	vm/run.o \
 	vm/stack.o \
@@ -55,6 +50,10 @@ default:
 	@echo ""
 	@echo "On Unix, pass NO_UI=1 if you don't want to link with the"
 	@echo "X11 and OpenGL libraries."
+	@echo ""
+	@echo "On Mac OS X, pass X11=1 if you want to link with the"
+	@echo "X11 library instead of Cocoa. You will also need to bootstrap"
+	@echo "Factor with the -no-cocoa -x11 switches."
 	@echo
 	@echo "Also, you might want to set the SITE_CFLAGS environment"
 	@echo "variable to enable some CPU-specific optimizations; this"
@@ -108,7 +107,7 @@ macosx.dmg:
 	mkdir -p $(DISK_IMAGE_DIR)/Factor/
 	cp -R $(BUNDLE) $(DISK_IMAGE_DIR)/Factor/$(BUNDLE)
 	chmod +x cp_dir
-	cp factor.image license.txt README.txt TODO.FACTOR.txt version.factor \
+	cp factor.image license.txt README.txt TODO.FACTOR.txt \
 		$(DISK_IMAGE_DIR)/Factor/
 	find doc library contrib examples fonts \( -name '*.factor' \
 		-o -name '*.facts' \
@@ -118,6 +117,7 @@ macosx.dmg:
 		-o -name '*.el' \
 		-o -name '*.vim' \
 		-o -name '*.fgen' \
+		-o -name '*.tex' \
 		-o -name '*.js' \) \
 		-exec ./cp_dir {} $(DISK_IMAGE_DIR)/Factor/{} \;
 	hdiutil create -srcfolder "$(DISK_IMAGE_DIR)" -fs HFS+ \

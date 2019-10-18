@@ -7,7 +7,9 @@ sequences strings vectors words prettyprint ;
 \ declare [
     pop-literal nip
     dup length ensure-values
-    dup #declare [ >r length d-tail r> set-node-in-d ] keep
+    dup length d-tail
+    swap #declare
+    [ 2dup set-node-in-d set-node-out-d ] keep
     node,
 ] "infer" set-word-prop
 \ declare { object } { } <effect> "infer-effect" set-word-prop
@@ -227,17 +229,24 @@ t over set-effect-terminated?
 \ (word) { object object } { word } <effect> "infer-effect" set-word-prop
 
 \ update-xt { word } { } <effect> "infer-effect" set-word-prop
-\ compiled? { word } { object } <effect> "infer-effect" set-word-prop
+
+\ word-xt { word } { integer } <effect> "infer-effect" set-word-prop
 
 \ getenv { fixnum } { object } <effect> "infer-effect" set-word-prop
 \ setenv { object fixnum } { } <effect> "infer-effect" set-word-prop
 \ stat { string } { object } <effect> "infer-effect" set-word-prop
 \ (directory) { string } { array } <effect> "infer-effect" set-word-prop
-\ gc { integer } { } <effect> "infer-effect" set-word-prop
+\ data-gc { integer } { } <effect> "infer-effect" set-word-prop
+
+! code-gc does not declare a stack effect since it might be
+! called from a compiled word which becomes unreachable during
+! the course of its execution, resulting in a crash
+
 \ gc-time { } { integer } <effect> "infer-effect" set-word-prop
 \ save-image { string } { } <effect> "infer-effect" set-word-prop
 \ exit { integer } { } <effect> "infer-effect" set-word-prop
-\ room { } { integer integer integer integer array } <effect> "infer-effect" set-word-prop
+\ data-room { } { integer integer array } <effect> "infer-effect" set-word-prop
+\ code-room { } { integer integer } <effect> "infer-effect" set-word-prop
 \ os-env { string } { object } <effect> "infer-effect" set-word-prop
 \ millis { } { integer } <effect> "infer-effect" set-word-prop
 
@@ -314,10 +323,6 @@ t over set-effect-terminated?
 \ slot { object fixnum } { object } <effect> "infer-effect" set-word-prop
 
 \ set-slot { object object fixnum } { } <effect> "infer-effect" set-word-prop
-
-\ integer-slot { object fixnum } { integer } <effect> "infer-effect" set-word-prop
-
-\ set-integer-slot { integer object fixnum } { } <effect> "infer-effect" set-word-prop
 
 \ char-slot { fixnum object } { fixnum } <effect> "infer-effect" set-word-prop
 

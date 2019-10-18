@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: kernel-internals
-USING: generic namespaces sequences ;
+USING: arrays generic namespaces sequences ;
 
 : >c ( continuation -- ) catchstack* push ;
 : c> ( -- continuation ) catchstack* pop ;
@@ -16,21 +16,17 @@ SYMBOL: error-continuation
     [ >c call f c> drop f ] callcc1 nip ; inline
 
 : rethrow ( error -- )
-    catchstack* empty? [
-        die
-    ] [
-        dup error set-global
-        c> dup quotation? [ call ] [ continue-with ] if
-    ] if ;
+    catchstack* empty?
+    [ die ] [ dup error set-global c> continue-with ] if ;
 
 : cleanup ( try cleanup -- )
     [ >c >r call c> drop r> call ]
-    [ drop (continue-with) >r nip call r> rethrow ] ifcc ;
+    [ >r nip call r> rethrow ] ifcc ;
     inline
 
 : recover ( try recovery -- )
     [ >c drop call c> drop ]
-    [ drop (continue-with) rot drop swap call ] ifcc ; inline
+    [ rot drop swap call ] ifcc ; inline
 
 TUPLE: condition restarts cc ;
 

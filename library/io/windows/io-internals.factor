@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2005 Mackenzie Straight.
+! Copyright (C) 2006 Mackenzie Straight, Doug Coleman.
 
 IN: win32-io-internals
 USING: alien arrays errors kernel kernel-internals math namespaces threads 
@@ -10,11 +10,10 @@ SYMBOL: io-queue
 TUPLE: io-queue free-list callbacks ;
 TUPLE: io-callback overlapped quotation stream ;
 
-GENERIC: expire
-
-: expected-error? ( -- bool )
+: expected-error? ( obj -- bool )
     [ 
         ERROR_IO_PENDING ERROR_HANDLE_EOF ERROR_SUCCESS WAIT_TIMEOUT 
+        997
     ] member? ;
 
 : handle-io-error ( -- )
@@ -86,6 +85,9 @@ C: io-callback ( -- callback )
         <alien> overlapped-ext-user-data get-io-callback
     ] if ;
 
+IN: win32-stream
+DEFER: expire
+IN: win32-io-internals
 : cancel-timedout ( -- )
     io-queue get 
     io-queue-callbacks [ io-callback-stream [ expire ] when* ] each ;

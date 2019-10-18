@@ -6,8 +6,6 @@ USING: vectors ;
 : catchstack* ( -- catchstack )
     6 getenv { vector } declare ; inline
 
-: (continue-with) 9 getenv ;
-
 IN: errors
 USING: kernel kernel-internals ;
 
@@ -15,13 +13,9 @@ USING: kernel kernel-internals ;
 : set-catchstack ( catchstack -- ) >vector 6 setenv ; inline
 
 IN: kernel
-USING: namespaces sequences ;
+USING: arrays namespaces sequences ;
 
 TUPLE: continuation data retain call name catch ;
-
-: <empty-continuation> ( -- continuation )
-    V{ } clone V{ } clone V{ } clone V{ } clone V{ } clone
-    <continuation> ;
 
 : continuation ( -- continuation )
     datastack retainstack callstack namestack catchstack
@@ -35,24 +29,44 @@ TUPLE: continuation data retain call name catch ;
     continuation-catch ; inline
 
 : ifcc ( terminator balance -- )
-    [ f f continuation 2nip dup ] call 2swap if ; inline
+    >r >r f [ continuation nip t ] call r> r> if ; inline
 
-: callcc0 ( quot -- ) [ drop ] ifcc ; inline
+: callcc0 ( quot -- ) [ ] ifcc ; inline
 
-: continue ( continuation -- )
+: callcc1 ( quot -- obj ) callcc0 ; inline
+
+DEFER: continue-with
+
+: set-walker-hook 2 setenv ; inline
+
+: get-walker-hook 2 getenv f set-walker-hook ; inline
+
+: (continue) ( continuation -- )
     >continuation<
     set-catchstack
     set-namestack
     set-callstack
     set-retainstack
-    set-datastack ;
+    set-datastack ; inline
+
+: (continue-with) ( obj continuation -- )
+    #! There's no good way to avoid this code duplication!
+    swap 9 setenv
+    >continuation<
+    set-catchstack
+    set-namestack
+    set-callstack
+    set-retainstack
+    set-datastack
+    9 getenv swap ; inline
+
+: continue ( continuation -- )
+    get-walker-hook [ (continue-with) ] [ (continue) ] if* ;
     inline
 
-: callcc1 ( quot -- obj )
-    [ drop (continue-with) ] ifcc ; inline
-
 : continue-with ( obj continuation -- )
-    swap 9 setenv continue ; inline
+    get-walker-hook [ >r 2array r> ] when* (continue-with) ;
+    inline
 
 M: continuation clone
     [ continuation-data clone ] keep

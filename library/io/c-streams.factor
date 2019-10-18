@@ -31,8 +31,10 @@ M: c-stream stream-close
     >r f <c-stream> <line-reader> f r> <c-stream> <plain-writer>
     <duplex-stream> ;
 
-: init-io ( -- )
+: init-c-io ( -- )
     13 getenv 14 getenv <duplex-c-stream> stdio set ;
+
+: init-io init-c-io ;
 
 : io-multiplex ( ms -- ) drop ;
 

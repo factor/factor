@@ -116,15 +116,19 @@ C: divider ( -- divider )
     dup add-divider [ add-gadget ] keep
     dup track-sizes track-add-size swap set-track-sizes ;
 
-: track-remove@ ( n track -- )
-    #! Remove the divider if this is not the last child.
-    2dup nth-gadget unparent
-    dup gadget-children empty? [
-        2dup gadget-children length = [ >r 1- r> ] when
-        2dup nth-gadget unparent
-    ] unless
+: remove-divider ( n track -- )
+    2dup gadget-children length = [ >r 1- r> ] when
+    nth-gadget unparent ;
+
+: track-remove-size ( n track -- )
     [ >r 2 /i r> track-sizes remove-nth normalize-sizes ] keep
-    [ set-track-sizes ] keep relayout-1 ;
+    set-track-sizes ;
+
+: track-remove@ ( n track -- )
+    2dup nth-gadget unparent
+    dup gadget-children empty? [ 2dup remove-divider ] unless
+    [ track-remove-size ] keep
+    relayout-1 ;
 
 : track-remove ( gadget track -- )
     [ gadget-children index ] keep track-remove@ ;

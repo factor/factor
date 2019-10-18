@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference
-USING: hashtables kernel math namespaces sequences ;
+USING: hashtables kernel math namespaces sequences words ;
 
 SYMBOL: recursive-state
 
@@ -22,35 +22,17 @@ M: integer value-uid ;
 
 M: integer value-recursion drop f ;
 
-TUPLE: shuffle in-d in-r out-d out-r ;
+: split-shuffle ( stack shuffle -- stack1 stack2 )
+    effect-in length swap cut* ;
 
-: load-shuffle ( d r shuffle -- )
-    tuck shuffle-in-r [ set ] 2each shuffle-in-d [ set ] 2each ;
+: load-shuffle ( stack shuffle -- )
+    effect-in [ set ] 2each ;
 
-: shuffled-values ( values -- values )
-    [ [ namespace hash dup ] keep ? ] map ;
+: shuffled-values ( shuffle -- values )
+    effect-out [ get ] map ;
 
-: store-shuffle ( shuffle -- d r )
-    dup shuffle-out-d shuffled-values
-    swap shuffle-out-r shuffled-values ;
+: shuffle* ( stack shuffle -- stack )
+    [ [ load-shuffle ] keep shuffled-values ] with-scope ;
 
-: shuffle* ( d r shuffle -- d r )
-    [ [ load-shuffle ] keep store-shuffle ] with-scope ;
-
-: split-shuffle ( d r shuffle -- d' r' d r )
-    tuck shuffle-in-r length swap cut*
-    >r >r shuffle-in-d length swap cut*
-    r> swap r> ;
-
-: join-shuffle ( d' r' d r -- d r )
-    swapd append >r append r> ;
-
-: shuffle ( d r shuffle -- newd newr )
-    [ split-shuffle ] keep shuffle* join-shuffle ;
-
-M: shuffle clone
-    [ shuffle-in-d clone ] keep
-    [ shuffle-in-r clone ] keep
-    [ shuffle-out-d clone ] keep
-    shuffle-out-r clone
-    <shuffle> ;
+: shuffle ( stack shuffle -- stack )
+    [ split-shuffle ] keep shuffle* append ;

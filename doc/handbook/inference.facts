@@ -85,7 +85,7 @@ $terpri
 { $subsection infer-quot-value } ;
 
 ARTICLE: "inference" "Stack effect inference"
-"The stack effect inference tool is used to check correctness of code before it is run. It is also used by the compiler to build a dataflow graph on which optimizations can be performed. A word Only words for which a stack effect can be inferred will compile."
+"The stack effect inference tool is used to check correctness of code before it is run. It is also used by the compiler to build a dataflow graph on which optimizations can be performed. Only words for which a stack effect can be inferred will compile."
 $terpri
 "The main entry point is a single word taking a quotation as input and returning a stack effect as output:"
 { $subsection infer }
