@@ -1,0 +1,1 @@
+Support for breakpoints and watchpoints on words

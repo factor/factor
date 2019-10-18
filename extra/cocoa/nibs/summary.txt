@@ -1,0 +1,1 @@
+Cocoa NSNib and .nib-related handy words

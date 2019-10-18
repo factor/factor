@@ -1,0 +1,121 @@
+! -*-factor-*-
+
+USING: kernel unix vars mortar slot-accessors
+       x.widgets.wm.menu x.widgets.wm.unmapped-frames-menu ;
+
+IN: factory
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! Helper words
+
+: new-wm-menu ( -- menu ) <wm-menu> new* 1 <-- set-border-width ;
+
+: shrink-wrap ( menu -- ) dup <- calc-size <-- resize drop ;
+
+: set-menu-items ( items menu -- ) swap >>items shrink-wrap ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+VAR: apps-menu
+
+apps-menu> not [ new-wm-menu >apps-menu ] when
+
+{ { "Emacs"     [ "emacs &" system drop ] }
+  { "KMail"     [ "kmail &" system drop ] }
+  { "Akregator" [ "akregator &" system drop ] }
+  { "Amarok" 	[ "amarok &" system drop ] }
+  { "K3b"	[ "k3b &" system drop ] }
+  { "xchat"	[ "xchat &" system drop ] }
+  { "Nautilus"  [ "nautilus --no-desktop &" system drop ] }
+  { "synaptic"	[ "gksudo synaptic &" system drop ] }
+  { "Volume control" [ "gnome-volume-control &" system drop ] }
+  { "Azureus"        [ "~/azureus/azureus &" system drop ] }
+  { "Xephyr"	     [ "Xephyr -host-cursor :1 &" system drop ] }
+  { "Stop Xephyr"    [ "pkill Xephyr &" system drop ] }
+  { "Stop Firefox"   [ "pkill firefox &" system drop ] }
+} apps-menu> set-menu-items
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+VAR: emacs-menu
+
+emacs-menu> not [ new-wm-menu >emacs-menu ] when
+
+{ { "Start Emacs" [ "emacs &" system drop ] }
+  { "Small"  [ "emacsclient -e '(make-small-frame-command)' &" system drop ] }
+  { "Large"  [ "emacsclient -e '(make-frame-command)' &" system drop ] }
+  { "Full"   [ "emacsclient -e '(make-full-frame-command)' &" system drop ] }
+  { "Gnus"   [ "emacsclient -e '(gnus-other-frame)' &" system drop ] }
+  { "Factor" [ "emacsclient -e '(run-factor-other-frame)' &" system drop ] }
+} emacs-menu> set-menu-items
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+VAR: mail-menu
+
+mail-menu> not [ new-wm-menu >mail-menu ] when
+
+{ { "Kmail"   [ "kmail &" system drop ] }
+  { "compose" [ "kmail --composer &" system drop ] }
+  { "slava"   [ "kmail slava@factorcode.org &" system drop ] }
+  { "erg"     [ "kmail doug.coleman@gmail.com &" system drop ] }
+  { "doublec" [ "kmail chris.double@double.co.nz &" system drop ] }
+  { "yuuki"   [ "kmail matthew.willis@mac.com &" system drop ] }
+} mail-menu> set-menu-items
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+VAR: factor-menu
+
+factor-menu> not [ new-wm-menu >factor-menu ] when
+
+{ { "Factor" [ "cd /scratch/repos/Factor ; ./factor &" system drop ] }
+  { "Factor (tty)"
+    [ "cd /scratch/repos/Factor ; xterm -e ./factor -run=listener &"
+      system drop ] }
+  { "Terminal : repos/Factor"
+    [ "cd /scratch/repos/Factor ; xterm &" system drop ] }
+  { "darcs whatsnew"
+    [ "cd /scratch/repos/Factor ; xterm -e 'darcs whatsnew | less' &"
+      system drop ] }
+  { "darcs pull"
+    [ "cd /scratch/repos/Factor ; xterm -e 'darcs pull http://factorcode.org/repos' &" system drop ] }
+  { "darcs push"
+    [ "cd /scratch/repos/Factor ; xterm -e 'darcs push dharmatech@onigirihouse.com:doc-root/repos' &" system drop ] }
+} factor-menu> set-menu-items
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+VAR: factory-menu
+
+factory-menu> not [ new-wm-menu >factory-menu ] when
+
+{ { "Maximize"          [ maximize ] }
+  { "Maximize Vertical" [ maximize-vertical ] }
+  { "Restore"           [ restore ] }
+  { "Hide"         	[ minimize ] }
+  { "Tile Master"	[ tile-master ] }
+}
+
+factory-menu> set-menu-items
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! VAR: root-menu
+
+{ { "xterm"             [ "xterm &" system drop ] }
+  { "Firefox"		[ "firefox &" system drop ] }
+  { "xclock" 		[ "xclock &" system drop ] }
+  { "Apps >" 		[ apps-menu> <- popup ] }
+  { "Factor >"          [ factor-menu> <- popup ] }
+  { "Unmapped frames >" [ unmapped-frames-menu> <- popup ] }
+  { "Emacs >" 	     	[ emacs-menu> <- popup ] }
+  { "Mail >" 	     	[ mail-menu> <- popup ] }
+  { "onigirihouse"	[ "xterm -e 'ssh dharmatech@onigirihouse.com' &"
+    			  system drop ] }
+  { "Edit menus"	[ edit-factory-menus ] }
+  { "Reload menus"      [ load-factory-menus ] }
+  { "Factory >"		[ factory-menu> <- popup ] }
+} root-menu> set-menu-items
+

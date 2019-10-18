@@ -1,0 +1,1 @@
+Contributor patch count tally from darcs demo

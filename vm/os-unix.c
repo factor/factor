@@ -9,9 +9,15 @@ s64 current_millis(void)
 	return (s64)t.tv_sec * 1000 + t.tv_usec/1000;
 }
 
+void sleep_millis(CELL msec)
+{
+	usleep(msec * 1000);
+}
+
 void init_ffi(void)
 {
-	null_dll = dlopen(NULL,RTLD_LAZY);
+    // NULL_DLL is "libfactor.dylib" for OS X and NULL for generic unix
+	null_dll = dlopen(NULL_DLL,RTLD_LAZY);
 }
 
 void ffi_dlopen(F_DLL *dll, bool error)
@@ -70,6 +76,19 @@ void primitive_stat(void)
 	}
 }
 
+/* Allocates memory */
+CELL parse_dir_entry(struct dirent *file)
+{
+	CELL name = tag_object(from_char_string(file->d_name));
+	if(UNKNOWN_TYPE_P(file))
+		return name;
+	else
+	{
+		CELL dirp = tag_boolean(DIRECTORY_P(file));
+		return allot_array_2(name,dirp);
+	}
+}
+
 void primitive_read_dir(void)
 {
 	DIR* dir = opendir(unbox_char_string());
@@ -82,9 +101,9 @@ void primitive_read_dir(void)
 		while((file = readdir(dir)) != NULL)
 		{
 			REGISTER_ARRAY(result);
-			CELL name = tag_object(from_char_string(file->d_name));
+			CELL pair = parse_dir_entry(file);
 			UNREGISTER_ARRAY(result);
-			GROWABLE_ADD(result,name);
+			GROWABLE_ADD(result,pair);
 		}
 
 		closedir(dir);
@@ -181,7 +200,7 @@ void unix_init_signals(void)
 {
 	struct sigaction memory_sigaction;
 	struct sigaction misc_sigaction;
-	struct sigaction ign_sigaction;
+	struct sigaction ignore_sigaction;
 
 	memset(&memory_sigaction,0,sizeof(struct sigaction));
 	sigemptyset(&memory_sigaction.sa_mask);
@@ -200,11 +219,11 @@ void unix_init_signals(void)
 	sigaction_safe(SIGFPE,&misc_sigaction,NULL);
 	sigaction_safe(SIGQUIT,&misc_sigaction,NULL);
 	sigaction_safe(SIGILL,&misc_sigaction,NULL);
-	
-	memset(&ign_sigaction,0,sizeof(struct sigaction));
-	sigemptyset(&ign_sigaction.sa_mask);
-	ign_sigaction.sa_handler = SIG_IGN;
-	sigaction_safe(SIGPIPE,&ign_sigaction,NULL);
+
+	memset(&ignore_sigaction,0,sizeof(struct sigaction));
+	sigemptyset(&ignore_sigaction.sa_mask);
+	ignore_sigaction.sa_handler = SIG_IGN;
+	sigaction_safe(SIGPIPE,&ignore_sigaction,NULL);
 }
 
 void reset_stdio(void)

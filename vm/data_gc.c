@@ -1,13 +1,5 @@
 #include "master.h"
 
-/* If memory allocation fails, bail out */
-void *safe_malloc(size_t size)
-{
-	void *ptr = malloc(size);
-	if(!ptr) fatal_error("Out of memory in safe_malloc", 0);
-	return ptr;
-}
-
 CELL init_zone(F_ZONE *z, CELL size, CELL start)
 {
 	z->size = size;
@@ -22,11 +14,6 @@ void init_cards_offset(void)
 		- (data_heap->segment->start >> CARD_BITS);
 }
 
-/* the data heap layout is important:
-- two semispaces: tenured and prior
-- younger generations follow
-this is so that we can easily check if a pointer is in some generation or a
-younger one */
 F_DATA_HEAP *alloc_data_heap(CELL gens, CELL young_size, CELL aging_size)
 {
 	young_size = align_page(young_size);
@@ -37,10 +24,23 @@ F_DATA_HEAP *alloc_data_heap(CELL gens, CELL young_size, CELL aging_size)
 	data_heap->aging_size = aging_size;
 	data_heap->gen_count = gens;
 
-	CELL total_size = (gens - 1) * young_size + 2 * aging_size;
+	CELL total_size;
+	if(data_heap->gen_count == 1)
+		total_size = 2 * aging_size;
+	else if(data_heap->gen_count == 2)
+		total_size = (gens - 1) * young_size + 2 * aging_size;
+	else if(data_heap->gen_count == 3)
+		total_size = gens * young_size + 2 * aging_size;
+	else
+	{
+		fatal_error("Invalid number of generations",data_heap->gen_count);
+		return NULL; /* can't happen */
+	}
+
 	data_heap->segment = alloc_segment(total_size);
 
 	data_heap->generations = safe_malloc(sizeof(F_ZONE) * gens);
+	data_heap->semispaces = safe_malloc(sizeof(F_ZONE) * gens);
 
 	CELL cards_size = total_size / CARD_SIZE;
 	data_heap->cards = safe_malloc(cards_size);
@@ -48,15 +48,31 @@ F_DATA_HEAP *alloc_data_heap(CELL gens, CELL young_size, CELL aging_size)
 
 	CELL alloter = data_heap->segment->start;
 
-	alloter = init_zone(&tenured,aging_size,alloter);
-	alloter = init_zone(&data_heap->prior,aging_size,alloter);
+	alloter = init_zone(&data_heap->semispaces[NURSERY],0,alloter);
+
+	alloter = init_zone(&data_heap->generations[TENURED],aging_size,alloter);
+	alloter = init_zone(&data_heap->semispaces[TENURED],aging_size,alloter);
 
 	int i;
 
-	for(i = gens - 2; i >= 0; i--)
+	if(data_heap->gen_count > 2)
 	{
-		alloter = init_zone(&data_heap->generations[i],
-			young_size,alloter);
+		alloter = init_zone(&data_heap->generations[AGING],young_size,alloter);
+		alloter = init_zone(&data_heap->semispaces[AGING],young_size,alloter);
+
+		for(i = gens - 3; i >= 0; i--)
+		{
+			alloter = init_zone(&data_heap->generations[i],
+				young_size,alloter);
+		}
+	}
+	else
+	{
+		for(i = gens - 2; i >= 0; i--)
+		{
+			alloter = init_zone(&data_heap->generations[i],
+				young_size,alloter);
+		}
 	}
 
 	if(alloter != data_heap->segment->end)
@@ -79,6 +95,7 @@ void dealloc_data_heap(F_DATA_HEAP *data_heap)
 {
 	dealloc_segment(data_heap->segment);
 	free(data_heap->generations);
+	free(data_heap->semispaces);
 	free(data_heap->cards);
 	free(data_heap);
 }
@@ -138,8 +155,6 @@ CELL unaligned_object_size(CELL pointer)
 {
 	switch(untag_header(get(pointer)))
 	{
-	case WORD_TYPE:
-		return sizeof(F_WORD);
 	case ARRAY_TYPE:
 	case TUPLE_TYPE:
 	case BIGNUM_TYPE:
@@ -151,12 +166,17 @@ CELL unaligned_object_size(CELL pointer)
 	case BIT_ARRAY_TYPE:
 		return bit_array_size(
 			bit_array_capacity((F_BIT_ARRAY*)pointer));
+	case FLOAT_ARRAY_TYPE:
+		return float_array_size(
+			float_array_capacity((F_FLOAT_ARRAY*)pointer));
+	case STRING_TYPE:
+		return string_size(string_capacity((F_STRING*)pointer));
+	case WORD_TYPE:
+		return sizeof(F_WORD);
 	case HASHTABLE_TYPE:
 		return sizeof(F_HASHTABLE);
 	case VECTOR_TYPE:
 		return sizeof(F_VECTOR);
-	case STRING_TYPE:
-		return string_size(string_capacity((F_STRING*)pointer));
 	case SBUF_TYPE:
 		return sizeof(F_SBUF);
 	case RATIO_TYPE:
@@ -171,6 +191,8 @@ CELL unaligned_object_size(CELL pointer)
 		return sizeof(F_ALIEN);
 	case WRAPPER_TYPE:
 		return sizeof(F_WRAPPER);
+	case CURRY_TYPE:
+		return sizeof(F_CURRY);
 	default:
 		critical_error("Cannot determine untagged_object_size",pointer);
 		return -1; /* can't happen */
@@ -189,7 +211,6 @@ void primitive_data_room(void)
 	int gen;
 
 	dpush(tag_fixnum((data_heap->cards_end - data_heap->cards) >> 10));
-	dpush(tag_fixnum((data_heap->prior.size) >> 10));
 
 	for(gen = 0; gen < data_heap->gen_count; gen++)
 	{
@@ -202,36 +223,40 @@ void primitive_data_room(void)
 }
 
 /* Disables GC and activates next-object ( -- obj ) primitive */
+void begin_scan(void)
+{
+	heap_scan_ptr = data_heap->generations[TENURED].start;
+	gc_off = true;
+}
+
 void primitive_begin_scan(void)
 {
 	primitive_data_gc();
-	heap_scan_ptr = tenured.start;
-	gc_off = true;
+	begin_scan();
+}
+
+CELL next_object(void)
+{
+	if(!gc_off)
+		simple_error(ERROR_HEAP_SCAN,F,F);
+
+	CELL value = get(heap_scan_ptr);
+	CELL obj = heap_scan_ptr;
+	CELL type;
+
+	if(heap_scan_ptr >= data_heap->generations[TENURED].here)
+		return F;
+	
+	type = untag_header(value);
+	heap_scan_ptr += untagged_object_size(heap_scan_ptr);
+
+	return RETAG(obj,type <= HEADER_TYPE ? type : OBJECT_TYPE);
 }
 
 /* Push object at heap scan cursor and advance; pushes f when done */
 void primitive_next_object(void)
 {
-	CELL value = get(heap_scan_ptr);
-	CELL obj = heap_scan_ptr;
-	CELL type;
-
-	if(!gc_off)
-		simple_error(ERROR_HEAP_SCAN,F,F);
-
-	if(heap_scan_ptr >= tenured.here)
-	{
-		dpush(F);
-		return;
-	}
-	
-	type = untag_header(value);
-	heap_scan_ptr += untagged_object_size(heap_scan_ptr);
-
-	if(type <= HEADER_TYPE)
-		dpush(RETAG(obj,type));
-	else
-		dpush(RETAG(obj,OBJECT_TYPE));
+	dpush(next_object());
 }
 
 /* Re-enables GC */
@@ -241,14 +266,12 @@ void primitive_end_scan(void)
 }
 
 /* Scan all the objects in the card */
-INLINE void collect_card(F_CARD *ptr, CELL here)
+INLINE void collect_card(F_CARD *ptr, CELL gen, CELL here)
 {
 	F_CARD c = *ptr;
 	CELL offset = (c & CARD_BASE_MASK);
-	CELL card_scan = (CELL)CARD_TO_ADDR(ptr) + offset;
-	CELL card_end = (CELL)CARD_TO_ADDR(ptr + 1);
 
-	if(offset == 0x7f)
+	if(offset == CARD_BASE_MASK)
 	{
 		if(c == 0xff)
 			critical_error("bad card",(CELL)ptr);
@@ -256,9 +279,12 @@ INLINE void collect_card(F_CARD *ptr, CELL here)
 			return;
 	}
 
+	CELL card_scan = (CELL)CARD_TO_ADDR(ptr) + offset;
+	CELL card_end = (CELL)CARD_TO_ADDR(ptr + 1);
+
 	while(card_scan < card_end && card_scan < here)
 		card_scan = collect_next(card_scan);
-	
+
 	cards_scanned++;
 }
 
@@ -268,32 +294,71 @@ INLINE void collect_gen_cards(CELL gen)
 	F_CARD *ptr = ADDR_TO_CARD(data_heap->generations[gen].start);
 	CELL here = data_heap->generations[gen].here;
 	F_CARD *last_card = ADDR_TO_CARD(here - 1);
-	
+
+	CELL mask, unmask;
+
+	/* if we are collecting the nursery, we care about old->nursery pointers
+	but not old->aging pointers */
+	if(collecting_gen == NURSERY)
+	{
+		mask = CARD_POINTS_TO_NURSERY;
+
+		/* after the collection, no old->nursery pointers remain
+		anywhere, but old->aging pointers might remain in tenured
+		space */
+		if(gen == TENURED)
+			unmask = CARD_POINTS_TO_NURSERY;
+		/* after the collection, all cards in aging space can be
+		cleared */
+		else if(HAVE_AGING_P && gen == AGING)
+			unmask = CARD_MARK_MASK;
+		else
+		{
+			critical_error("bug in collect_gen_cards",gen);
+			return;
+		}
+	}
+	/* if we are collecting aging space into tenured space, we care about
+	all old->nursery and old->aging pointers. no old->aging pointers can
+	remain */
+	else if(HAVE_AGING_P && collecting_gen == AGING)
+	{
+		if(collecting_aging_again)
+		{
+			mask = CARD_POINTS_TO_AGING;
+			unmask = CARD_MARK_MASK;
+		}
+		/* after we collect aging space into the aging semispace, no
+		old->nursery pointers remain but tenured space might still have
+		pointers to aging space. */
+		else
+		{
+			mask = CARD_POINTS_TO_AGING;
+			unmask = CARD_POINTS_TO_NURSERY;
+		}
+	}
+	else
+	{
+		critical_error("bug in collect_gen_cards",gen);
+		return;
+	}
+
 	for(; ptr <= last_card; ptr++)
 	{
-		if(card_marked(*ptr))
-			collect_card(ptr,here);
+		if(*ptr & mask)
+		{
+			collect_card(ptr,gen,here);
+			*ptr &= ~unmask;
+		}
 	}
-}
-
-/* After all old->new forward references have been copied over, we must unmark
-the cards */
-void unmark_cards(CELL from, CELL to)
-{
-	F_CARD *ptr = ADDR_TO_CARD(data_heap->generations[from].start);
-	CELL here = data_heap->generations[to].here;
-	F_CARD *last_card = ADDR_TO_CARD(here - 1);
-
-	for(; ptr <= last_card; ptr++)
-		unmark_card(ptr);
 }
 
 /* Scan cards in all generations older than the one being collected, copying
 old->new references */
-void collect_cards(CELL gen)
+void collect_cards(void)
 {
 	int i;
-	for(i = gen + 1; i < data_heap->gen_count; i++)
+	for(i = collecting_gen + 1; i < data_heap->gen_count; i++)
 		collect_gen_cards(i);
 }
 
@@ -370,7 +435,7 @@ INLINE void *copy_untagged_object(void *pointer, CELL size)
 {
 	void *newpointer;
 	if(newspace->here + size >= newspace->end)
-		longjmp(gc_jmp,1);
+		LONGJMP(gc_jmp,1);
 	allot_barrier(newspace->here);
 	newpointer = allot_zone(newspace,size);
 	memcpy(newpointer,pointer,size);
@@ -412,24 +477,25 @@ CELL resolve_forwarding(CELL untagged, CELL tag)
 If the object has already been copied, return the forwarding
 pointer address without copying anything; otherwise, install
 a new forwarding pointer. */
-CELL copy_object(CELL pointer)
+INLINE CELL copy_object(CELL pointer)
 {
-	CELL tag;
-	CELL header;
+	CELL tag = TAG(pointer);
+	CELL header = get(UNTAG(pointer));
 
-	if(pointer == F)
-		return F;
-
-	tag = TAG(pointer);
-
-	if(tag == FIXNUM_TYPE)
-		return pointer;
-
-	header = get(UNTAG(pointer));
 	if(TAG(header) == GC_COLLECTED)
 		return resolve_forwarding(UNTAG(header),tag);
 	else
 		return RETAG(copy_object_impl(pointer),tag);
+}
+
+void copy_handle(CELL *handle)
+{
+	CELL pointer = *handle;
+
+	if(immediate_p(pointer) || !should_copy(pointer))
+		return;
+
+	*handle = copy_object(pointer);
 }
 
 /* The number of cells from the start of the object which should be scanned by
@@ -444,6 +510,7 @@ CELL binary_payload_start(CELL pointer)
 	case FLOAT_TYPE:
 	case BYTE_ARRAY_TYPE:
 	case BIT_ARRAY_TYPE:
+	case FLOAT_ARRAY_TYPE:
 	case BIGNUM_TYPE:
 		return 0;
 	/* these objects have some binary data at the end */
@@ -458,39 +525,21 @@ CELL binary_payload_start(CELL pointer)
 	}
 }
 
-/* Every object has a regular representation in the runtime, which makes GC
-much simpler. Every slot of the object until binary_payload_start is a pointer
-to some other object. */
-INLINE void collect_object(CELL start)
+CELL collect_next(CELL scan)
 {
-	CELL scan = start;
-	CELL payload_start = binary_payload_start(scan);
-	CELL end = scan + payload_start;
-
-	scan += CELLS;
-
-	while(scan < end)
-	{
-		copy_handle((CELL*)scan);
-		scan += CELLS;
-	}
+	do_slots(scan,copy_handle);
 
 	/* It is odd to put this hook here, but this is the only special case
 	made for any type of object by the GC. If code GC is being performed,
 	compiled code blocks referenced by this word must be marked. */
-	if(collecting_code && object_type(start) == WORD_TYPE)
+	if(collecting_code && object_type(scan) == WORD_TYPE)
 	{
-		F_WORD *word = (F_WORD *)start;
+		F_WORD *word = (F_WORD *)scan;
 		if(word->compiledp != F)
 			recursive_mark(word->xt);
 	}
-}
 
-CELL collect_next(CELL scan)
-{
-	CELL size = untagged_object_size(scan);
-	collect_object(scan);
-	return scan + size;
+	return scan + untagged_object_size(scan);
 }
 
 INLINE void reset_generation(CELL i)
@@ -511,42 +560,34 @@ void reset_generations(CELL from, CELL to)
 }
 
 /* Prepare to start copying reachable objects into an unused zone */
-void begin_gc(CELL gen,
-	bool code_gc,
-	bool growing_data_heap_,
-	CELL requested_bytes)
+void begin_gc(CELL requested_bytes)
 {
-	collecting_code = code_gc;
-	growing_data_heap = growing_data_heap_;
-	collecting_gen = gen;
-
 	if(growing_data_heap)
 	{
-		if(gen != TENURED)
+		if(collecting_gen != TENURED)
 			critical_error("Invalid parameters to begin_gc",0);
 
 		old_data_heap = data_heap;
 		set_data_heap(grow_data_heap(old_data_heap,requested_bytes));
-		newspace = &data_heap->generations[gen];
+		newspace = &data_heap->generations[collecting_gen];
 	}
-	else if(gen == TENURED)
+	else if(collecting_accumulation_gen_p())
 	{
-		/* when collecting the oldest generation, rotate it
+		/* when collecting one of these generations, rotate it
 		with the semispace */
-		F_ZONE z = data_heap->generations[gen];
-		data_heap->generations[gen] = data_heap->prior;
-		data_heap->prior = z;
-		reset_generation(gen);
-		newspace = &data_heap->generations[gen];
-		clear_cards(TENURED,TENURED);
+		F_ZONE z = data_heap->generations[collecting_gen];
+		data_heap->generations[collecting_gen] = data_heap->semispaces[collecting_gen];
+		data_heap->semispaces[collecting_gen] = z;
+		reset_generation(collecting_gen);
+		newspace = &data_heap->generations[collecting_gen];
+		clear_cards(collecting_gen,collecting_gen);
 	}
 	else
 	{
 		/* when collecting a younger generation, we copy
 		reachable objects to the next oldest generation,
 		so we set the newspace so the next generation. */
-		newspace = &data_heap->generations[gen + 1];
-		collecting_gen_start = data_heap->generations[gen].start;
+		newspace = &data_heap->generations[collecting_gen + 1];
 	}
 }
 
@@ -572,83 +613,114 @@ void end_gc(void)
 			data_heap->segment->size);
 	}
 
-	if(collecting_gen == TENURED)
+	if(collecting_accumulation_gen_p())
 	{
-		/* we did a full collection; no more
-		old-to-new pointers remain since everything
-		is in tenured space */
-		unmark_cards(TENURED,TENURED);
-		/* all generations except tenured space are
-		now empty */
-		reset_generations(NURSERY,TENURED - 1);
+		/* all younger generations except are now empty.
+		if collecting_gen == NURSERY here, we only have 1 generation;
+		old-school Cheney collector */
+		if(collecting_gen != NURSERY)
+			reset_generations(NURSERY,collecting_gen - 1);
 
-		major_gc_message();
+		if(collecting_gen == TENURED)
+			major_gc_message();
+		else if(HAVE_AGING_P && collecting_gen == AGING)
+			minor_collections++;
 	}
 	else
 	{
-		/* we collected a younger generation. so the
-		next-oldest generation no longer has any
-		pointers into the younger generation (the
-		younger generation is empty!) */
-		unmark_cards(collecting_gen + 1,collecting_gen + 1);
 		/* all generations up to and including the one
 		collected are now empty */
 		reset_generations(NURSERY,collecting_gen);
 
 		minor_collections++;
 	}
-	
+
 	if(collecting_code)
 	{
 		/* now that all reachable code blocks have been marked,
 		deallocate the rest */
 		free_unmarked(&code_heap);
 	}
+
+	collecting_aging_again = false;
 }
 
 /* Collect gen and all younger generations.
 If growing_data_heap_ is true, we must grow the data heap to such a size that
 an allocation of requested_bytes won't fail */
-void garbage_collection(volatile CELL gen,
+void garbage_collection(CELL gen,
 	bool code_gc,
-	volatile bool growing_data_heap,
+	bool growing_data_heap_,
 	CELL requested_bytes)
 {
-	s64 start = current_millis();
-	CELL scan;
-
 	if(gc_off)
+	{
 		critical_error("GC disabled",gen);
+		return;
+	}
+
+	s64 start = current_millis();
+
+	performing_gc = true;
+	collecting_code = code_gc;
+	growing_data_heap = growing_data_heap_;
+	collecting_gen = gen;
 
 	/* we come back here if a generation is full */
-	if(setjmp(gc_jmp))
+	if(SETJMP(gc_jmp))
 	{
 		/* We have no older generations we can try collecting, so we
 		resort to growing the data heap */
-		if(gen == TENURED)
+		if(collecting_gen == TENURED)
+		{
 			growing_data_heap = true;
+
+			/* see the comment in unmark_marked() */
+			if(collecting_code)
+				unmark_marked(&code_heap);
+		}
+		/* we try collecting AGING space twice before going on to
+		collect TENURED */
+		else if(HAVE_AGING_P
+			&& collecting_gen == AGING
+			&& !collecting_aging_again)
+		{
+			collecting_aging_again = true;
+		}
 		/* Collect the next oldest generation */
 		else
-			gen++;
+		{
+			collecting_gen++;
+		}
 	}
 
-	begin_gc(gen,code_gc,growing_data_heap,requested_bytes);
+	begin_gc(requested_bytes);
 
 	/* initialize chase pointer */
-	scan = newspace->here;
+	CELL scan = newspace->here;
 
 	/* collect objects referenced from stacks and environment */
 	collect_roots();
 	
 	/* collect objects referenced from older generations */
-	collect_cards(gen);
+	collect_cards();
 
-	if(!code_gc)
+	if(!collecting_code)
 	{
-		/* if we are doing code GC, then we will copy over literals
-		from any code block which gets marked as live. if we are not
-		doing code GC, just consider all literals as roots. */
-		collect_literals();
+		/* don't scan code heap unless it has pointers to this
+		generation or younger */
+		if(collecting_gen >= last_code_heap_scan)
+		{
+			/* if we are doing code GC, then we will copy over
+			literals from any code block which gets marked as live.
+			if we are not doing code GC, just consider all literals
+			as roots. */
+			collect_literals();
+			if(collecting_accumulation_gen_p())
+				last_code_heap_scan = collecting_gen;
+			else
+				last_code_heap_scan = collecting_gen + 1;
+		}
 	}
 
 	while(scan < newspace->here)
@@ -657,6 +729,7 @@ void garbage_collection(volatile CELL gen,
 	end_gc();
 
 	gc_time += (current_millis() - start);
+	performing_gc = false;
 }
 
 void primitive_data_gc(void)
@@ -678,9 +751,9 @@ void simple_gc(void)
 void primitive_become(void)
 {
 	F_VECTOR *new_object_vector = untag_vector(dpop());
-	F_ARRAY *new_objects = untag_array_fast(new_object_vector->array);
+	F_ARRAY *new_objects = untag_object(new_object_vector->array);
 	F_VECTOR *old_object_vector = untag_vector(dpop());
-	F_ARRAY *old_objects = untag_array_fast(old_object_vector->array);
+	F_ARRAY *old_objects = untag_object(old_object_vector->array);
 
 	CELL capacity = untag_fixnum_fast(new_object_vector->top);
 	CELL i;

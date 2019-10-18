@@ -1,5 +1,6 @@
 USING: compiler definitions generic assocs inference math
-namespaces parser test words kernel sequences arrays io ;
+namespaces parser tools.test words kernel sequences arrays io
+effects ;
 IN: temporary
 
 parse-hook get [
@@ -7,7 +8,7 @@ parse-hook get [
     DEFER: bar \ bar reset-generic
 
     : short-effect
-        dup effect-in length swap effect-out length 2array nip ;
+        dup effect-in length swap effect-out length 2array ;
 
     [   ] [ \ foo [ 1 2 ] define-compound     ] unit-test
     [ { 0 2 } ] [ [ foo ] infer short-effect ] unit-test
@@ -33,8 +34,6 @@ parse-hook get [
 
     : xy ;
     : yx xy ;
-
-    \ yx [ "Hey" print ] "infer-vars" set-word-prop
 
     \ yx compile
     

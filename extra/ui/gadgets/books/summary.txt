@@ -1,0 +1,1 @@
+Book gadget displays one child at a time

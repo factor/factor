@@ -1,0 +1,20 @@
+# ================================================
+# Note: This is only a portion of the original PropList.txt
+
+09BE          ; Other_Grapheme_Extend # Mc       BENGALI VOWEL SIGN AA
+09D7          ; Other_Grapheme_Extend # Mc       BENGALI AU LENGTH MARK
+0B3E          ; Other_Grapheme_Extend # Mc       ORIYA VOWEL SIGN AA
+0B57          ; Other_Grapheme_Extend # Mc       ORIYA AU LENGTH MARK
+0BBE          ; Other_Grapheme_Extend # Mc       TAMIL VOWEL SIGN AA
+0BD7          ; Other_Grapheme_Extend # Mc       TAMIL AU LENGTH MARK
+0CC2          ; Other_Grapheme_Extend # Mc       KANNADA VOWEL SIGN UU
+0CD5..0CD6    ; Other_Grapheme_Extend # Mc   [2] KANNADA LENGTH MARK..KANNADA AI LENGTH MARK
+0D3E          ; Other_Grapheme_Extend # Mc       MALAYALAM VOWEL SIGN AA
+0D57          ; Other_Grapheme_Extend # Mc       MALAYALAM AU LENGTH MARK
+0DCF          ; Other_Grapheme_Extend # Mc       SINHALA VOWEL SIGN AELA-PILLA
+0DDF          ; Other_Grapheme_Extend # Mc       SINHALA VOWEL SIGN GAYANUKITTA
+200C..200D    ; Other_Grapheme_Extend # Cf   [2] ZERO WIDTH NON-JOINER..ZERO WIDTH JOINER
+1D165         ; Other_Grapheme_Extend # Mc       MUSICAL SYMBOL COMBINING STEM
+1D16E..1D172  ; Other_Grapheme_Extend # Mc   [5] MUSICAL SYMBOL COMBINING FLAG-1..MUSICAL SYMBOL COMBINING FLAG-5
+
+# Total code points: 21

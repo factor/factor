@@ -1,9 +1,5 @@
 IN: temporary
-USE: compiler
-USE: errors
-USE: math
-USE: test
-USE: kernel
+USING: compiler math tools.test kernel ;
 
 : bail-out call + ;
 

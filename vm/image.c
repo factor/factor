@@ -16,23 +16,25 @@ void init_objects(F_HEADER *h)
 
 INLINE void load_data_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
 {
-	CELL good_size = h->data_size * 2;
+	CELL good_size = h->data_size + (1 << 20);
 
 	if(good_size > p->aging_size)
 		p->aging_size = good_size;
 
 	init_data_heap(p->gen_count,p->young_size,p->aging_size,p->secure_gc);
 
-	if(fread((void*)tenured.start,h->data_size,1,file) != 1)
+	F_ZONE *tenured = &data_heap->generations[TENURED];
+
+	if(fread((void*)tenured->start,h->data_size,1,file) != 1)
 		fatal_error("load_data_heap failed",0);
 
-	tenured.here = tenured.start + h->data_size;
+	tenured->here = tenured->start + h->data_size;
 	data_relocation_base = h->data_relocation_base;
 }
 
 INLINE void load_code_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
 {
-	CELL good_size = h->code_size * 2;
+	CELL good_size = h->code_size + (1 << 19);
 
 	if(good_size > p->code_size)
 		p->code_size = good_size;
@@ -82,6 +84,19 @@ void load_image(F_PARAMETERS *p)
 	userenv[IMAGE_ENV] = tag_object(from_native_string(p->image));
 }
 
+/* Compute total sum of sizes of free blocks */
+void save_code_heap(FILE *file)
+{
+	F_BLOCK *scan = first_block(&code_heap);
+
+	while(scan)
+	{
+		if(scan->status == B_ALLOCATED)
+			fwrite(scan,scan->size,1,file);
+		scan = next_block(&code_heap,scan);
+	}
+}
+
 /* Save the current image to disk */
 bool save_image(const F_CHAR *filename)
 {
@@ -94,11 +109,13 @@ bool save_image(const F_CHAR *filename)
 	if(file == NULL)
 		fatal_error("Cannot open image for writing",errno);
 
+	F_ZONE *tenured = &data_heap->generations[TENURED];
+
 	h.magic = IMAGE_MAGIC;
 	h.version = IMAGE_VERSION;
-	h.data_relocation_base = tenured.start;
+	h.data_relocation_base = tenured->start;
 	h.boot = userenv[BOOT_ENV];
-	h.data_size = tenured.here - tenured.start;
+	h.data_size = tenured->here - tenured->start;
 	h.global = userenv[GLOBAL_ENV];
 	h.t = T;
 	h.bignum_zero = bignum_zero;
@@ -109,7 +126,8 @@ bool save_image(const F_CHAR *filename)
 	h.code_relocation_base = code_heap.segment->start;
 	fwrite(&h,sizeof(F_HEADER),1,file);
 
-	fwrite((void*)tenured.start,h.data_size,1,file);
+	fwrite((void*)tenured->start,h.data_size,1,file);
+	/* save_code_heap(file); */
 	fwrite(first_block(&code_heap),h.code_size,1,file);
 
 	fclose(file);
@@ -125,20 +143,21 @@ void primitive_save_image(void)
 	save_image(unbox_native_string());
 }
 
+void primitive_save_image_and_exit(void)
+{
+	/* do a full GC + code heap compaction */
+	compact_code_heap();
+
+	save_image(unbox_native_string());
+
+	/* now exit; we cannot continue executing like this */
+	exit(0);
+}
+
 /* Initialize an object in a newly-loaded image */
 void relocate_object(CELL relocating)
 {
-	CELL scan = relocating;
-	CELL payload_start = binary_payload_start(scan);
-	CELL end = scan + payload_start;
-
-	scan += CELLS;
-
-	while(scan < end)
-	{
-		data_fixup((CELL*)scan);
-		scan += CELLS;
-	}
+	do_slots(relocating,data_fixup);
 
 	switch(untag_header(get(relocating)))
 	{
@@ -167,8 +186,10 @@ void relocate_data()
 	data_fixup(&bignum_pos_one);
 	data_fixup(&bignum_neg_one);
 
-	for(relocating = tenured.start;
-		relocating < tenured.here;
+	F_ZONE *tenured = &data_heap->generations[TENURED];
+
+	for(relocating = tenured->start;
+		relocating < tenured->here;
 		relocating += untagged_object_size(relocating))
 	{
 		allot_barrier(relocating);

@@ -1,0 +1,1 @@
+Cocoa NSView implementation displaying Factor gadgets

@@ -1,0 +1,1 @@
+Observable slots which can be composed in various ways

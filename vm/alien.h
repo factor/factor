@@ -1,8 +1,3 @@
-INLINE F_ALIEN* untag_alien_fast(CELL tagged)
-{
-	return (F_ALIEN*)UNTAG(tagged);
-}
-
 CELL allot_alien(CELL delegate, CELL displacement);
 
 void primitive_expired(void);
@@ -40,11 +35,12 @@ void primitive_alien_float(void);
 void primitive_set_alien_float(void);
 void primitive_alien_double(void);
 void primitive_set_alien_double(void);
+void primitive_alien_cell(void);
+void primitive_set_alien_cell(void);
 
 DLLEXPORT void to_value_struct(CELL src, void *dest, CELL size);
 DLLEXPORT void box_value_struct(void *src, CELL size);
-DLLEXPORT void box_struct_1(CELL x);
-DLLEXPORT void box_struct_2(CELL x, CELL y);
+DLLEXPORT void box_small_struct(CELL x, CELL y, CELL size);
 
 INLINE F_DLL *untag_dll(CELL tagged)
 {

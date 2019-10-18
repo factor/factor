@@ -1,6 +1,6 @@
 IN: temporary
-USING: compiler generic test math kernel words arrays sequences
-quotations ;
+USING: compiler generic tools.test math kernel words arrays
+sequences quotations ;
 
 GENERIC: single-combination-test
 

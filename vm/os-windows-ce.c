@@ -23,7 +23,7 @@ void primitive_cd(void)
 char *strerror(int err)
 {
 	/* strerror() is not defined on WinCE */
-	return "unknown error (TODO: Native I/O)";
+	return "strerror() is not defined on WinCE. Use native io";
 }
 
 void flush_icache()
@@ -39,9 +39,8 @@ char *getenv(char *name)
 
 long exception_handler(PEXCEPTION_RECORD rec, void *frame, void *ctx, void *dispatch)
 {
-	// CE returns 0x21201000, but real ptr is at 0x1201000
 	memory_protection_error(
-		rec->ExceptionInformation[1] & 0xfffffff,
+		rec->ExceptionInformation[1] & 0x1ffffff,
 		native_stack_pointer());
 	return -1; /* unreachable */
 }

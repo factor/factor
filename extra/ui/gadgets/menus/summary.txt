@@ -1,0 +1,1 @@
+Menu gadgets pop up as a list of commands at the mouse location

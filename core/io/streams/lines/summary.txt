@@ -1,0 +1,1 @@
+Read lines of text from a character-oriented stream

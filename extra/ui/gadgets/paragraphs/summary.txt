@@ -1,0 +1,1 @@
+Paragraph gadgets lay out their children from left to right, wrapping at a fixed margin

@@ -1,0 +1,13 @@
+<% USING: kernel io http.server namespaces sequences math html.elements random furnace webapps.article-manager webapps.article-manager.database ; %>
+    <div id="banner"><h1><% "arg1" get second article-title write %></h1></div>
+    <% f "navigation" render-template %>
+    <div id="article">
+    <% 100 random 25 > [ "arg1" get first 100 random 50 > [ site-ad2 ] [ site-ad3 ] if write-html ] when %>
+    <% "arg1" get second article-body write-html %>
+
+	<h1>Tags</h1>
+        <% "arg1" get second tags-for-article <template-args> "tags" render-template %>
+</div>
+<p class="footer"></p>
+<p id="copyright"><% "arg1" get first site-footer write %></p>
+<% "arg1" get first site-html write-html %>

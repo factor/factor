@@ -3,20 +3,20 @@
 void print_word(F_WORD* word, CELL nesting)
 {
 	if(type_of(word->name) == STRING_TYPE)
-		fprintf(stderr,"%s",to_char_string(untag_string(word->name),true));
+		printf("%s",to_char_string(untag_string(word->name),true));
 	else
 	{
-		fprintf(stderr,"#<not a string: ");
+		printf("#<not a string: ");
 		print_nested_obj(word->name,nesting - 1);
-		fprintf(stderr,">");
+		printf(">");
 	}
 
-	fprintf(stderr," (#%ld)",untag_fixnum_fast(word->primitive));
+	printf(" (#%ld)",untag_fixnum_fast(word->primitive));
 }
 
 void print_string(F_STRING* str)
 {
-	fprintf(stderr,"\"%s\"",to_char_string(str,true));
+	printf("\"%s\"",to_char_string(str,true));
 }
 
 void print_array(F_ARRAY* array, CELL nesting)
@@ -26,7 +26,7 @@ void print_array(F_ARRAY* array, CELL nesting)
 
 	for(i = 0; i < length; i++)
 	{
-		fprintf(stderr," ");
+		printf(" ");
 		print_nested_obj(get(AREF(array,i)),nesting - 1);
 	}
 }
@@ -35,14 +35,14 @@ void print_nested_obj(CELL obj, CELL nesting)
 {
 	if(nesting == 0)
 	{
-		fprintf(stderr," ... ");
+		printf(" ... ");
 		return;
 	}
 
 	switch(type_of(obj))
 	{
 	case FIXNUM_TYPE:
-		fprintf(stderr,"%ld",untag_fixnum_fast(obj));
+		printf("%ld",untag_fixnum_fast(obj));
 		break;
 	case WORD_TYPE:
 		print_word(untag_word(obj),nesting - 1);
@@ -51,25 +51,25 @@ void print_nested_obj(CELL obj, CELL nesting)
 		print_string(untag_string(obj));
 		break;
 	case F_TYPE:
-		fprintf(stderr,"f");
+		printf("f");
 		break;
 	case TUPLE_TYPE:
-		fprintf(stderr,"T{");
+		printf("T{");
 		print_array((F_ARRAY*)UNTAG(obj),nesting - 1);
-		fprintf(stderr," }");
+		printf(" }");
 		break;
 	case ARRAY_TYPE:
-		fprintf(stderr,"{");
+		printf("{");
 		print_array((F_ARRAY*)UNTAG(obj),nesting - 1);
-		fprintf(stderr," }");
+		printf(" }");
 		break;
 	case QUOTATION_TYPE:
-		fprintf(stderr,"[");
+		printf("[");
 		print_array((F_ARRAY*)UNTAG(obj),nesting - 1);
-		fprintf(stderr," ]");
+		printf(" ]");
 		break;
 	default:
-		fprintf(stderr,"#<type %ld @ %lx>",type_of(obj),obj);
+		printf("#<type %ld @ %lx>",type_of(obj),obj);
 		break;
 	}
 }
@@ -84,7 +84,7 @@ void print_objects(CELL start, CELL end)
 	for(; start <= end; start += CELLS)
 	{
 		print_obj(get(start));
-		fprintf(stderr,"\n");
+		printf("\n");
 	}
 }
 
@@ -94,17 +94,17 @@ void print_callstack(void)
 	for(frame = cs_bot; frame < cs; frame++)
 	{
 		print_obj(frame->quot);
-		fprintf(stderr,"\n");
+		printf("\n");
 	}
 }
 
 void dump_cell(CELL cell)
 {
-	fprintf(stderr,"%08lx: ",cell);
+	printf("%08lx: ",cell);
 
 	cell = get(cell);
 
-	fprintf(stderr,"%08lx tag %ld",cell,TAG(cell));
+	printf("%08lx tag %ld",cell,TAG(cell));
 
 	switch(TAG(cell))
 	{
@@ -112,24 +112,24 @@ void dump_cell(CELL cell)
 	case BIGNUM_TYPE:
 	case FLOAT_TYPE:
 		if(cell == F)
-			fprintf(stderr," -- F");
+			printf(" -- F");
 		else if(cell < TYPE_COUNT<<TAG_BITS)
-			fprintf(stderr," -- header: %ld",cell>>TAG_BITS);
+			printf(" -- header: %ld",cell>>TAG_BITS);
 		else if(cell >= data_heap->segment->start
 			&& cell < data_heap->segment->end)
 		{
 			CELL header = get(UNTAG(cell));
 			CELL type = header>>TAG_BITS;
-			fprintf(stderr," -- object; ");
+			printf(" -- object; ");
 			if(TAG(header) == OBJECT_TYPE && type < TYPE_COUNT)
-				fprintf(stderr," type %ld",type);
+				printf(" type %ld",type);
 			else
-				fprintf(stderr," header corrupt");
+				printf(" header corrupt");
 		}
 		break;
 	}
 	
-	fprintf(stderr,"\n");
+	printf("\n");
 }
 
 void dump_memory(CELL from, CELL to)
@@ -140,10 +140,10 @@ void dump_memory(CELL from, CELL to)
 		dump_cell(from);
 }
 
-void dump_generation(F_ZONE z)
+void dump_zone(F_ZONE z)
 {
-	fprintf(stderr,"base=%lx, size=%lx, here=%lx\n",
-		z.start,z.size,z.here - z.start);
+	printf("start=%lx, size=%lx, end=%lx, here=%lx\n",
+		z.start,z.size,z.end,z.here - z.start);
 }
 
 void dump_generations(void)
@@ -151,14 +151,17 @@ void dump_generations(void)
 	int i;
 	for(i = 0; i < data_heap->gen_count; i++)
 	{
-		fprintf(stderr,"Generation %d: ",i);
-		dump_generation(data_heap->generations[i]);
+		printf("Generation %d: ",i);
+		dump_zone(data_heap->generations[i]);
 	}
 
-	fprintf(stderr,"Semispace: ");
-	dump_generation(data_heap->prior);
+	for(i = 0; i < data_heap->gen_count; i++)
+	{
+		printf("Semispace %d: ",i);
+		dump_zone(data_heap->semispaces[i]);
+	}
 
-	fprintf(stderr,"Cards: base=%lx, size=%lx\n",
+	printf("Cards: base=%lx, size=%lx\n",
 		(CELL)data_heap->cards,
 		(CELL)(data_heap->cards_end - data_heap->cards));
 }
@@ -167,30 +170,30 @@ void factorbug(void)
 {
 	reset_stdio();
 
-	fprintf(stderr,"Starting low level debugger...\n");
-	fprintf(stderr,"  Basic commands:\n");
-	fprintf(stderr,"q                -- continue executing Factor - NOT SAFE\n");
-	fprintf(stderr,"im               -- save image to fep.image\n");
-	fprintf(stderr,"x                -- exit Factor\n");
-	fprintf(stderr,"  Advanced commands:\n");
-	fprintf(stderr,"d <addr> <count> -- dump memory\n");
-	fprintf(stderr,"u <addr>         -- dump object at tagged <addr>\n");
-	fprintf(stderr,". <addr>         -- print object at tagged <addr>\n");
-	fprintf(stderr,"s r              -- dump data, retain stacks\n");
-	fprintf(stderr,".s .r .c         -- print data, retain, call stacks\n");
-	fprintf(stderr,"i                -- dump interpreter state\n");
-	fprintf(stderr,"e                -- dump environment\n");
-	fprintf(stderr,"g                -- dump generations\n");
-	fprintf(stderr,"card <addr>      -- print card containing address\n");
-	fprintf(stderr,"addr <card>      -- print address containing card\n");
-	fprintf(stderr,"code             -- code heap dump\n");
+	printf("Starting low level debugger...\n");
+	printf("  Basic commands:\n");
+	printf("q                -- continue executing Factor - NOT SAFE\n");
+	printf("im               -- save image to fep.image\n");
+	printf("x                -- exit Factor\n");
+	printf("  Advanced commands:\n");
+	printf("d <addr> <count> -- dump memory\n");
+	printf("u <addr>         -- dump object at tagged <addr>\n");
+	printf(". <addr>         -- print object at tagged <addr>\n");
+	printf("s r              -- dump data, retain stacks\n");
+	printf(".s .r .c         -- print data, retain, call stacks\n");
+	printf("i                -- dump interpreter state\n");
+	printf("e                -- dump environment\n");
+	printf("g                -- dump generations\n");
+	printf("card <addr>      -- print card containing address\n");
+	printf("addr <card>      -- print address containing card\n");
+	printf("code             -- code heap dump\n");
 	
 	for(;;)
 	{
 		char cmd[1024];
 
-		fprintf(stderr,"READY\n");
-		fflush(stderr);
+		printf("READY\n");
+		fflush(stdout);
 
 		if(scanf("%1000s",cmd) <= 0)
 			exit(1);
@@ -213,7 +216,7 @@ void factorbug(void)
 			CELL addr;
 			scanf("%lx",&addr);
 			print_obj(addr);
-			fprintf(stderr,"\n");
+			printf("\n");
 		}
 		else if(strcmp(cmd,"s") == 0)
 			dump_memory(ds_bot,ds);
@@ -227,9 +230,9 @@ void factorbug(void)
 			print_callstack();
 		else if(strcmp(cmd,"i") == 0)
 		{
-			fprintf(stderr,"Call frame:\n");
+			printf("Call frame:\n");
 			print_obj(callframe.quot);
-			fprintf(stderr,"\n");
+			printf("\n");
 		}
 		else if(strcmp(cmd,"e") == 0)
 		{
@@ -243,13 +246,13 @@ void factorbug(void)
 		{
 			CELL addr;
 			scanf("%lx",&addr);
-			fprintf(stderr,"%lx\n",(CELL)ADDR_TO_CARD(addr));
+			printf("%lx\n",(CELL)ADDR_TO_CARD(addr));
 		}
 		else if(strcmp(cmd,"addr") == 0)
 		{
 			CELL card;
 			scanf("%lx",&card);
-			fprintf(stderr,"%lx\n",(CELL)CARD_TO_ADDR(card));
+			printf("%lx\n",(CELL)CARD_TO_ADDR(card));
 		}
 		else if(strcmp(cmd,"q") == 0)
 			return;
@@ -260,6 +263,6 @@ void factorbug(void)
 		else if(strcmp(cmd,"code") == 0)
 			dump_heap(&code_heap);
 		else
-			fprintf(stderr,"unknown command\n");
+			printf("unknown command\n");
 	}
 }

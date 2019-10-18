@@ -1,8 +1,9 @@
 ! Black box testing of templater optimization
 
-USING: arrays compiler kernel kernel-internals math
-hashtables-internals math-internals namespaces sequences
-sequences-internals test ;
+USING: arrays compiler kernel kernel.private math
+hashtables.private math.private math.ratios.private namespaces
+sequences sequences.private tools.test namespaces.private
+slots.private ;
 IN: temporary
 
 ! Oops!
@@ -74,7 +75,7 @@ unit-test
 [ 3 ]
 [
     global [ 3 \ foo set ] bind
-    \ foo [ global >n get n> drop ] compile-1
+    \ foo [ global >n get ndrop ] compile-1
 ] unit-test
 
 : blech drop ;
@@ -88,7 +89,7 @@ unit-test
 [ 3 ]
 [
     global [ 3 \ foo set ] bind
-    \ foo [ global [ get ] swap >n call n> drop ] compile-1
+    \ foo [ global [ get ] swap >n call ndrop ] compile-1
 ] unit-test
 
 [ 3 ]
@@ -107,24 +108,6 @@ unit-test
     -12 -13 [ [ 0 swap fixnum- ] 2apply ] compile-1
 ] unit-test
 
-[ { t t } ] [
-    { t } { t } [
-        dup dup array-capacity [
-            2dup swap swap 2 fixnum+fast slot
-            >r pick swap 2 fixnum+fast slot r> 2array
-        ] collect 2nip
-    ] compile-1 first
-] unit-test
-
-[ { t t } ] [
-    { t } { t } [
-        dup dup array-capacity [
-            2dup swap swap 2 fixnum+ slot
-            >r pick swap 2 fixnum+ slot r> 2array
-        ] collect 2nip
-    ] compile-1 first
-] unit-test
-
 [ 2 ] [
     SBUF" " [ 2 slot 2 [ slot ] keep ] compile-1 nip
 ] unit-test
@@ -141,11 +124,11 @@ unit-test
     [ swap >r dup dup dup dup dup dup dup dup dup r> ] compile-1
 ] unit-test
 
-[ ] [ [ 9 [ ] repeat ] compile-1 ] unit-test
+[ ] [ [ 9 [ ] times ] compile-1 ] unit-test
 
 [ ] [
     [
-        [ 200 dup [ 200 3array ] map-with drop ] repeat
+        [ 200 dup [ 200 3array ] curry map drop ] times
     ] compile-quot drop
 ] unit-test
 
@@ -189,3 +172,16 @@ unit-test
     H{ { 1 2 } { 3 4 } } dup hash-array
     [ 0 swap hellish-bug-2 drop ] compile-1
 ] unit-test
+
+! Regression
+: foox
+    dup not
+    [ drop 3 ] [ dup tuple? [ drop 4 ] [ drop 5 ] if ] if ;
+
+[ 3 ] [ f foox ] unit-test
+
+TUPLE: my-tuple ;
+
+[ 4 ] [ T{ my-tuple } foox ] unit-test
+
+[ 5 ] [ "hi" foox ] unit-test

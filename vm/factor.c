@@ -6,10 +6,19 @@ void default_parameters(F_PARAMETERS *p)
 	p->ds_size = 128;
 	p->rs_size = 128;
 	p->cs_size = 128;
+
+	/* We make a wild guess here that if we're running on ARM, we don't
+	have a lot of memory. */
+#ifdef FACTOR_ARM
 	p->gen_count = 2;
+	p->code_size = 2 * CELLS;
+#else
+	p->gen_count = 3;
+	p->code_size = 4 * CELLS;
+#endif
+
 	p->young_size = 2 * CELLS;
 	p->aging_size = 4 * CELLS;
-	p->code_size = 2 * CELLS;
 	p->secure_gc = false;
 }
 
@@ -47,13 +56,16 @@ void init_factor(F_PARAMETERS *p)
 	userenv[OS_ENV] = tag_object(from_char_string(FACTOR_OS_STRING));
 	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
 
+	performing_gc = false;
 	gc_off = false;
+	last_code_heap_scan = NURSERY;
+	collecting_aging_again = false;
 }
 
-INLINE bool factor_arg(const char* str, const char* arg, CELL* value)
+INLINE bool factor_arg(const F_CHAR* str, const F_CHAR* arg, CELL* value)
 {
 	int val;
-	if(sscanf(str,arg,&val))
+	if(SSCANF(str,arg,&val) > 0)
 	{
 		*value = val;
 		return true;
@@ -62,7 +74,7 @@ INLINE bool factor_arg(const char* str, const char* arg, CELL* value)
 		return false;
 }
 
-void init_factor_from_args(F_CHAR *image, int argc, char **argv, bool embedded)
+void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded)
 {
 	F_PARAMETERS p;
 	default_parameters(&p);
@@ -71,19 +83,24 @@ void init_factor_from_args(F_CHAR *image, int argc, char **argv, bool embedded)
 
 	CELL i;
 
+	posix_argc = argc;
+	posix_argv = safe_malloc(argc * sizeof(F_CHAR*));
+	posix_argv[0] = safe_strdup(argv[0]);
+
 	for(i = 1; i < argc; i++)
 	{
-		if(factor_arg(argv[i],"-datastack=%d",&p.ds_size));
-		else if(factor_arg(argv[i],"-retainstack=%d",&p.rs_size));
-		else if(factor_arg(argv[i],"-callstack=%d",&p.cs_size));
-		else if(factor_arg(argv[i],"-generations=%d",&p.gen_count));
-		else if(factor_arg(argv[i],"-young=%d",&p.young_size));
-		else if(factor_arg(argv[i],"-aging=%d",&p.aging_size));
-		else if(factor_arg(argv[i],"-codeheap=%d",&p.code_size));
-		else if(strcmp(argv[i],"-securegc") == 0)
+		posix_argv[i] = safe_strdup(argv[i]);
+		if(factor_arg(argv[i],STR_FORMAT("-datastack=%d"),&p.ds_size));
+		else if(factor_arg(argv[i],STR_FORMAT("-retainstack=%d"),&p.rs_size));
+		else if(factor_arg(argv[i],STR_FORMAT("-callstack=%d"),&p.cs_size));
+		else if(factor_arg(argv[i],STR_FORMAT("-generations=%d"),&p.gen_count));
+		else if(factor_arg(argv[i],STR_FORMAT("-young=%d"),&p.young_size));
+		else if(factor_arg(argv[i],STR_FORMAT("-aging=%d"),&p.aging_size));
+		else if(factor_arg(argv[i],STR_FORMAT("-codeheap=%d"),&p.code_size));
+		else if(STRCMP(argv[i],STR_FORMAT("-securegc")) == 0)
 			p.secure_gc = true;
-		else if(strncmp(argv[i],"-i=",3) == 0)
-			p.image = char_to_F_CHAR((char*)argv[i] + 3);
+		else if(STRNCMP(argv[i],STR_FORMAT("-i="),3) == 0)
+			p.image = argv[i] + 3;
 	}
 
 	init_factor(&p);
@@ -93,19 +110,27 @@ void init_factor_from_args(F_CHAR *image, int argc, char **argv, bool embedded)
 	for(i = 1; i < argc; i++)
 	{
 		REGISTER_ARRAY(args);
-		CELL arg = tag_object(from_char_string(argv[i]));
+		CELL arg = tag_object(from_native_string(argv[i]));
 		UNREGISTER_ARRAY(args);
 		set_array_nth(args,i,arg);
 	}
 
 	userenv[ARGS_ENV] = tag_object(args);
-	userenv[EXECUTABLE_ENV] = tag_object(from_char_string(argv[0]));
+
+	const F_CHAR *executable_path = vm_executable_path();
+	if(!executable_path)
+		executable_path = argv[0];
+
+	userenv[EXECUTABLE_ENV] = tag_object(from_native_string(executable_path));
 	userenv[EMBEDDED_ENV] = (embedded ? T : F);
 
 	nest_stacks();
 	call(userenv[BOOT_ENV]);
 	run_toplevel();
 	unnest_stacks();
+
+	for(i = 0; i < argc; i++)
+		free(posix_argv[i]);
 }
 
 char *factor_eval_string(char *string)
@@ -123,4 +148,10 @@ void factor_yield(void)
 {
 	void (*callback)() = alien_offset(userenv[YIELD_CALLBACK_ENV]);
 	callback();
+}
+
+void factor_sleep(long ms)
+{
+	void (*callback)() = alien_offset(userenv[SLEEP_CALLBACK_ENV]);
+	callback(ms);
 }

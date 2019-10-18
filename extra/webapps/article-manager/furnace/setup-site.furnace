@@ -1,0 +1,33 @@
+<% USING: kernel io namespaces furnace webapps.article-manager html.elements ; %>
+<script type="text/javascript">
+function transformWiky() {
+  var wiky = $('#wiky').get(0).value;
+  var html = Wiky.toHtml(wiky);
+  $('#html').get(0).value = html;
+  $('#preview').html(html);
+}
+function transformHtml() {
+  var html = $('#preview').get(0).innerHTML;
+  var wiky = Wiky.toWiki(html);
+  $('#wiky').get(0).value = wiky;
+  $('#html').get(0).value = html;
+}
+</script>
+<h1>Setup New Site</h1>
+<form method="post" action="<% update-site-link write %>">
+  <table>
+    <tr><td>Hostname:</td><td><input type="text" name="hostname" value="<% "hostname" get write %>"/></td></tr>
+    <tr><td>Title:</td><td><input type="text" name="title" value="<% "title" get write %>"/></td></tr>
+    <tr><td>footer:</td><td><input type="text" name="footer" value="<% "footer" get write %>"/></td></tr>
+    <tr><td>Introduction:</td><td><textarea id='wiky' onkeyup="transformWiky();" rows="10" cols="80"></textarea></td></tr>
+    <tr><td>Preview:</td><td><input id="html" type="hidden" name="intro" value=""/><div id="preview"><% "intro" get write-html %></div></td></tr>
+    <tr><td>HTML:</td><td><textarea name="html" rows="10" cols="80"><% "html" get write %></textarea></td></tr>
+    <tr><td>Ad Block 1:</td><td><textarea name="ad1" rows="10" cols="80"><% "ad1" get write %></textarea></td></tr>
+    <tr><td>Ad Block 2:</td><td><textarea name="ad2" rows="10" cols="80"><% "ad2" get write %></textarea></td></tr>
+    <tr><td>Ad Block 3:</td><td><textarea name="ad3" rows="10" cols="80"><% "ad3" get write %></textarea></td></tr>
+    <tr><td colspan="2"><input type="submit" name="post" value="Post"/></td></tr>
+</form>
+<script type="text/javascript">
+transformHtml();
+</script>
+

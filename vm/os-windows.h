@@ -1,6 +1,11 @@
 #include <windows.h>
 #include <ctype.h>
 
+#ifndef wcslen
+  /* for cygwin */
+  #include <wchar.h>
+#endif
+
 typedef wchar_t F_CHAR;
 
 #define from_native_string from_u16_string
@@ -14,15 +19,15 @@ typedef wchar_t F_CHAR;
 #define SETJMP setjmp
 #define LONGJMP longjmp
 #define JMP_BUF jmp_buf
+#define SSCANF swscanf
+#define STRCMP wcscmp
+#define STRNCMP wcsncmp
+#define STRDUP _wcsdup
 
 #define OPEN_READ(path) _wfopen(path,L"rb")
 #define OPEN_WRITE(path) _wfopen(path,L"wb")
 #define FPRINTF(stream,format,arg) fwprintf(stream,L##format,arg)
 
-#ifndef wcslen
-  // for cygwin
-  #include <wchar.h>
-#endif
 
 /* Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970 */
 #define EPOCH_OFFSET 0x019db1ded53e8000LL
@@ -40,10 +45,11 @@ void primitive_stat(void);
 void primitive_read_dir(void);
 void primitive_cwd(void);
 void primitive_cd(void);
+void sleep_millis(DWORD msec);
 
 INLINE void init_signals(void) {}
 INLINE void early_init(void) {}
-F_CHAR *char_to_F_CHAR(char *ptr);
+const F_CHAR *vm_executable_path(void);
 const F_CHAR *default_image_path(void);
 long getpagesize (void);
 

@@ -1,0 +1,1 @@
+Virtual sequence consisting of a range of numbers

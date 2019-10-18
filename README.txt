@@ -32,14 +32,14 @@ Factor supports the following platforms:
   OpenBSD/x86
   Solaris/x86
   Solaris/AMD64
-  MS Windows (XP and above)
+  MS Windows/x86 (XP and above)
+  MS Windows CE/ARM
 
 Please donate time or hardware if you wish to see Factor running on
 other platforms. In particular, we are interested in:
 
   Windows/AMD64
   Mac OS X/AMD64
-  Windows CE/ARM
   Solaris/UltraSPARC
 
 * Compiling the Factor VM
@@ -51,22 +51,8 @@ Factor requires gcc 3.4 or later. On x86, it /will not/ build using gcc
 3.3 or earlier.
 
 Run 'make' (or 'gmake' on non-Linux platforms) with no parameters to see
-a list of targets. Then run 'make' with the appropriate target for your
-platform.
-
-The following options can be given to make:
-
-  SITE_CFLAGS="..."
-  DEBUG=1
-
-The former allows optimization flags to be specified, for example
-"-march=pentium4 -ffast-math -O3". Nowadays most of the hard work is
-done by Factor compiled code, so optimizing the runtime is not that
-important. Usually the defaults are fine.
-
-The DEBUG flag disables optimization and builds an executable with
-debug symbols. This is probably only of interest to people intending to
-hack on the runtime sources.
+a list of targets and build options. Then run 'make' with the
+appropriate target for your platform.
 
 Compilation may print a handful of warnings about singled/unsigned
 comparisons. They may safely be ignored.
@@ -87,7 +73,7 @@ system using the image that corresponds to your CPU architecture.
 Once you download the right image, bootstrap the system with the
 following command line:
 
-./factor -i=boot.image.<foo>
+./factor -i=boot.<cpu>.image
 
 Bootstrap can take a while, depending on your system. When the process
 completes, a 'factor.image' file will be generated. Note that this image
@@ -106,7 +92,7 @@ automatically:
 
 To run an interactive terminal listener:
 
-  ./factor -shell=tty
+  ./factor -run=listener
 
 If you're inside a terminal session, you can start the UI with one of
 the following two commands:
@@ -140,9 +126,9 @@ When compiling Factor, pass the X11=1 parameter:
 
   make macosx-ppc X11=1
 
-Then bootstrap with the following pair of switches:
+Then bootstrap with the following switches:
 
-  ./factor -i=boot.image.ppc -no-cocoa -x11
+  ./factor -i=boot.ppc.image -ui-backend=x11
 
 Now if $DISPLAY is set, running ./factor will start the UI.
 
@@ -151,13 +137,13 @@ Now if $DISPLAY is set, running ./factor will start the UI.
 If you did not download the binary package, you can bootstrap Factor in
 the command prompt:
 
-  factor.exe -i=boot.image.pentium4 (or boot.image.x86)
+  factor.exe -i=boot.x86.32.image
 
-Once bootstrapped, double-clicking f.exe starts the Factor UI.
+Once bootstrapped, double-clicking factor.exe starts the Factor UI.
 
 To run the listener in the command prompt:
 
-  factor.exe -shell=tty
+  factor.exe -run=listener
 
 * Command line usage
 
@@ -171,14 +157,15 @@ Or visit <http://factorcode.org/responder/help/show-help?topic=cli>.
 
 * Source organization
 
-The following four directories are managed by the module system; consult
+The following two directories are managed by the module system; consult
 the documentation for details:
 
-  apps/ - user-contributed applications
-  libs/ - user-contributed libraries
-  demos/ - small examples illustrating various language features
-  extras/ - editor modes, icons, etc
-  core/ - sources for the library, written in Factor
+  core/ - Factor core library and compiler
+  extra/ - more libraries
+
+The following directories contain additional files:
+
+  misc/ - editor modes, icons, etc
   vm/ - sources for the Factor runtime, written in C
   fonts/ - TrueType fonts used by UI
   unmaintained/ - unmaintained contributions, please help!

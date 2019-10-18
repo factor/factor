@@ -1,0 +1,1 @@
+Virtual sequence presenting a rotation of an underlying sequence

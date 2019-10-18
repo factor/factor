@@ -1,0 +1,1 @@
+World gadgets are the top level of the gadget hierarchy and are displayed in native windows

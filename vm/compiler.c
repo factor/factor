@@ -181,7 +181,7 @@ void finalize_code_block(F_COMPILED *relocating, CELL code_start,
 void deposit_integers(CELL here, F_VECTOR *vector, CELL format)
 {
 	CELL count = untag_fixnum_fast(vector->top);
-	F_ARRAY *array = untag_array_fast(vector->array);
+	F_ARRAY *array = untag_object(vector->array);
 	CELL i;
 
 	for(i = 0; i < count; i++)
@@ -201,7 +201,7 @@ void deposit_integers(CELL here, F_VECTOR *vector, CELL format)
 /* Write a sequence of tagged pointers to memory */
 void deposit_objects(CELL here, F_VECTOR *vector, CELL literal_length)
 {
-	F_ARRAY *array = untag_array_fast(vector->array);
+	F_ARRAY *array = untag_object(vector->array);
 	memcpy((void*)here,array + 1,literal_length);
 }
 
@@ -300,6 +300,10 @@ void primitive_add_compiled_block(void)
 	word->xt = xt;
 	word->compiledp = T;
 	dpush(tag_word(word));
+
+	/* next time we do a minor GC, we have to scan the code heap for
+	literals */
+	last_code_heap_scan = NURSERY;
 }
 
 #undef FROB

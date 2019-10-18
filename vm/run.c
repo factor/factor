@@ -14,22 +14,34 @@ INLINE void push_callframe(void)
 	*(cs++) = callframe;
 }
 
-INLINE void set_callframe(CELL quot)
-{
-	type_check(QUOTATION_TYPE,quot);
-	F_ARRAY *untagged = untag_array_fast(quot);
-	callframe.quot = quot;
-	callframe.scan = AREF(untagged,0);
-	callframe.end = AREF(untagged,array_capacity(untagged));
-}
-
 #define TAIL_CALL_P (callframe.scan == callframe.end)
 
-void call(CELL quot)
+void call(CELL obj)
 {
-	if(quot == F) return;
-	if(!TAIL_CALL_P) push_callframe();
-	set_callframe(quot);
+	F_CURRY *curry;
+	F_ARRAY *quot;
+
+	switch(type_of(obj))
+	{
+	case F_TYPE:
+		break;
+	case CURRY_TYPE:
+		curry = untag_object(obj);
+		dpush(curry->obj);
+		call(curry->quot);
+		break;
+	case QUOTATION_TYPE:
+		if(!TAIL_CALL_P) push_callframe();
+
+		quot = untag_object(obj);
+		callframe.quot = obj;
+		callframe.scan = AREF(quot,0);
+		callframe.end = AREF(quot,array_capacity(quot));
+		break;
+	default:
+		type_error(QUOTATION_TYPE,obj);
+		break;
+	}
 }
 
 /* Called from interpreter() */
@@ -57,7 +69,7 @@ void handle_error(void)
 	if(TAIL_CALL_P) push_callframe();
 
 	/* Notify any 'catch' blocks */
-	set_callframe(userenv[BREAK_ENV]);
+	call(userenv[BREAK_ENV]);
 }
 
 void interpreter_loop(void)
@@ -81,19 +93,26 @@ void interpreter_loop(void)
 			/* look at current object */
 			CELL next = get(callframe.scan);
 			F_WORD *next_word;
+			F_WRAPPER *next_wrapper;
 			callframe.scan += CELLS;
 
 			/* execute words, push literals on data stack */
 			switch(TAG(next))
 			{
 			case WORD_TYPE:
-				next_word = untag_word_fast(next);
+				next_word = untag_object(next);
+
 				if(profiling)
-					next_word->counter += tag_fixnum(1);
+				{
+					if(next_word->compiledp == F)
+						next_word->counter += tag_fixnum(1);
+				}
+
 				execute(next_word);
 				break;
 			case WRAPPER_TYPE:
-				dpush(untag_wrapper_fast(next)->object);
+				next_wrapper = untag_object(next);
+				dpush(next_wrapper->object);
 				break;
 			default:
 				dpush(next);
@@ -154,7 +173,7 @@ void primitive_ifte(void)
 
 void primitive_dispatch(void)
 {
-	F_ARRAY *a = untag_array_fast(dpop());
+	F_ARRAY *a = untag_object(dpop());
 	F_FIXNUM n = untag_fixnum_fast(dpop());
 	call(get(AREF(a,n)));
 }
@@ -170,11 +189,6 @@ void primitive_setenv(void)
 	F_FIXNUM e = untag_fixnum_fast(dpop());
 	CELL value = dpop();
 	userenv[e] = value;
-}
-
-void primitive_profiling(void)
-{
-	profiling = to_boolean(dpop());
 }
 
 void primitive_exit(void)
@@ -204,6 +218,11 @@ void primitive_millis(void)
 	box_unsigned_8(current_millis());
 }
 
+void primitive_sleep(void)
+{
+	sleep_millis(to_cell(dpop()));
+}
+
 void primitive_type(void)
 {
 	drepl(tag_fixnum(type_of(dpeek())));
@@ -214,17 +233,38 @@ void primitive_tag(void)
 	drepl(tag_fixnum(TAG(dpeek())));
 }
 
+void primitive_class_hash(void)
+{
+	CELL obj = dpeek();
+	CELL tag = TAG(obj);
+	if(tag != OBJECT_TYPE)
+		drepl(tag_fixnum(tag));
+	else if(obj == F)
+		drepl(tag_fixnum(F_TYPE));
+	else
+	{
+		CELL type = object_type(obj);
+		if(type != TUPLE_TYPE)
+			drepl(tag_fixnum(type));
+		else
+		{
+			F_WORD *class = untag_object(get(SLOT(obj,2)));
+			drepl(class->hashcode);
+		}
+	}
+}
+
 void primitive_slot(void)
 {
 	F_FIXNUM slot = untag_fixnum_fast(dpop());
-	CELL obj = UNTAG(dpop());
+	CELL obj = dpop();
 	dpush(get(SLOT(obj,slot)));
 }
 
 void primitive_set_slot(void)
 {
 	F_FIXNUM slot = untag_fixnum_fast(dpop());
-	CELL obj = UNTAG(dpop());
+	CELL obj = dpop();
 	CELL value = dpop();
 	set_slot(obj,slot,value);
 }
@@ -264,8 +304,7 @@ CELL allot_native_stack_trace(F_COMPILED_FRAME *stack)
 	{
 		CELL return_address = RETURN_ADDRESS(stack);
 
-		if(return_address >= code_heap.segment->start
-			&& return_address <= code_heap.segment->end)
+		if(in_code_heap_p(return_address))
 		{
 			REGISTER_ARRAY(array);
 			CELL cell = allot_cell(return_address);
@@ -359,7 +398,7 @@ void memory_protection_error(CELL addr, F_COMPILED_FRAME *native_stack)
 	else if(in_page(addr, (CELL)cs_bot, cs_size, 0))
 		general_error(ERROR_CS_OVERFLOW,F,F,false,native_stack);
 	else if(in_page(addr, nursery->end, 0, 0))
-		critical_error("allot() missed GC check",0);
+		critical_error("allot_object() missed GC check",0);
 	else if(in_page(addr, extra_roots_region->start, 0, -1))
 		critical_error("local root underflow",0);
 	else if(in_page(addr, extra_roots_region->end, 0, 0))
@@ -387,4 +426,9 @@ void divide_by_zero_error(void)
 void primitive_error(void)
 {
 	simple_error(ERROR_PRIMITIVE,F,F);
+}
+
+void primitive_profiling(void)
+{
+	profiling = to_boolean(dpop());
 }

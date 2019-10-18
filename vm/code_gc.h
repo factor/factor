@@ -8,8 +8,18 @@ typedef enum
 typedef struct _F_BLOCK
 {
 	F_BLOCK_STATUS status;
+
+	/* In bytes, includes this header */
 	CELL size;
+
+	/* Filled in on image load */
 	struct _F_BLOCK *next_free;
+
+	/* Used during compaction */
+	struct _F_BLOCK *forwarding;
+
+	/* Alignment padding */
+	CELL padding[4];
 } F_BLOCK;
 
 typedef struct {
@@ -20,8 +30,9 @@ typedef struct {
 void new_heap(F_HEAP *heap, CELL size);
 void build_free_list(F_HEAP *heap, CELL size);
 CELL heap_allot(F_HEAP *heap, CELL size);
+void unmark_marked(F_HEAP *heap);
 void free_unmarked(F_HEAP *heap);
-CELL heap_free_space(F_HEAP *heap);
+CELL heap_usage(F_HEAP *heap, F_BLOCK_STATUS status);
 CELL heap_size(F_HEAP *heap);
 
 INLINE F_BLOCK *next_block(F_HEAP *heap, F_BLOCK *block)
@@ -44,6 +55,7 @@ typedef struct
 	CELL literal_length; /* # bytes */
 	CELL words_length; /* # bytes */
 	CELL finalized; /* has finalize_code_block() been called on this yet? */
+	CELL padding[3];
 } F_COMPILED;
 
 typedef void (*CODE_HEAP_ITERATOR)(F_COMPILED *compiled, CELL code_start,
@@ -70,6 +82,16 @@ INLINE F_COMPILED *xt_to_compiled(XT xt)
 	return (F_COMPILED *)((CELL)xt - sizeof(F_COMPILED));
 }
 
+INLINE F_COMPILED *block_to_compiled(F_BLOCK *block)
+{
+	return (F_COMPILED *)(block + 1);
+}
+
+INLINE XT block_to_xt(F_BLOCK *block)
+{
+	return (XT)((CELL)block + sizeof(F_BLOCK) + sizeof(F_COMPILED));
+}
+
 INLINE F_BLOCK *first_block(F_HEAP *heap)
 {
 	return (F_BLOCK *)heap->segment->start;
@@ -81,9 +103,11 @@ INLINE F_BLOCK *last_block(F_HEAP *heap)
 }
 
 void init_code_heap(CELL size);
+bool in_code_heap_p(CELL ptr);
 void iterate_code_heap(CODE_HEAP_ITERATOR iter);
 void collect_literals(void);
 void recursive_mark(XT xt);
 void primitive_code_room(void);
 void primitive_code_gc(void);
 void dump_heap(F_HEAP *heap);
+void compact_code_heap(void);

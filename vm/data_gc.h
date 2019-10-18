@@ -1,8 +1,6 @@
 /* Set by the -S command line argument */
 bool secure_gc;
 
-void *safe_malloc(size_t size);
-
 typedef struct {
 	CELL start;
 	CELL size;
@@ -20,7 +18,9 @@ CELL object_size(CELL pointer);
 CELL binary_payload_start(CELL pointer);
 void primitive_data_room(void);
 void primitive_size(void);
+void begin_scan(void);
 void primitive_begin_scan(void);
+CELL next_object(void);
 void primitive_next_object(void);
 void primitive_end_scan(void);
 
@@ -41,10 +41,9 @@ typedef struct {
 	CELL aging_size;
 
 	CELL gen_count;
-	F_ZONE *generations;
 
-	/* spare semi-space; rotates with tenured. */
-	F_ZONE prior;
+	F_ZONE *generations;
+	F_ZONE* semispaces;
 
 	CELL *cards;
 	CELL *cards_end;
@@ -59,35 +58,23 @@ the mark flag is set by the write barrier when an object in the
 card has a slot written to.
 
 the offset of the first object is set by the allocator. */
-#define CARD_MARK_MASK 0x80
-#define CARD_BASE_MASK 0x7f
+
+/* if CARD_POINTS_TO_NURSERY is set, CARD_POINTS_TO_AGING must also be set. */
+#define CARD_POINTS_TO_NURSERY 0x80
+#define CARD_POINTS_TO_AGING 0x40
+#define CARD_MARK_MASK (CARD_POINTS_TO_NURSERY | CARD_POINTS_TO_AGING)
+#define CARD_BASE_MASK 0x3f
 typedef u8 F_CARD;
 
-/* A card is 16 bytes (128 bits), 5 address bits per card.
-it is important that 7 bits is sufficient to represent every
+/* A card is 64 bytes. 6 bits is sufficient to represent every
 offset within the card */
-#define CARD_SIZE 128
-#define CARD_BITS 7
+#define CARD_SIZE 64
+#define CARD_BITS 6
 #define ADDR_CARD_MASK (CARD_SIZE-1)
-
-INLINE F_CARD card_marked(F_CARD c)
-{
-	return c & CARD_MARK_MASK;
-}
-
-INLINE void unmark_card(F_CARD *c)
-{
-	*c &= CARD_BASE_MASK;
-}
 
 INLINE void clear_card(F_CARD *c)
 {
 	*c = CARD_BASE_MASK; /* invalid value */
-}
-
-INLINE u8 card_base(F_CARD c)
-{
-	return c & CARD_BASE_MASK;
 }
 
 DLLEXPORT CELL cards_offset;
@@ -103,10 +90,10 @@ to a younger one */
 INLINE void write_barrier(CELL address)
 {
 	F_CARD *c = ADDR_TO_CARD(address);
-	*c |= CARD_MARK_MASK;
+	*c |= (CARD_POINTS_TO_NURSERY | CARD_POINTS_TO_AGING);
 }
 
-#define SLOT(obj,slot) ((obj) + (slot) * CELLS)
+#define SLOT(obj,slot) (UNTAG(obj) + (slot) * CELLS)
 
 INLINE void set_slot(CELL obj, CELL slot, CELL value)
 {
@@ -119,17 +106,20 @@ INLINE void allot_barrier(CELL address)
 {
 	F_CARD *ptr = ADDR_TO_CARD(address);
 	F_CARD c = *ptr;
-	CELL b = card_base(c);
+	CELL b = (c & CARD_BASE_MASK);
 	CELL a = (address & ADDR_CARD_MASK);
-	*ptr = (card_marked(c) | ((b < a) ? b : a));
+	*ptr = ((c & CARD_MARK_MASK) | ((b < a) ? b : a));
 }
 
-void unmark_cards(CELL from, CELL to);
 void clear_cards(CELL from, CELL to);
-void collect_cards(CELL gen);
+void collect_cards(void);
 
 /* the 0th generation is where new objects are allocated. */
 #define NURSERY 0
+#define HAVE_NURSERY_P (data_heap->gen_count>1)
+/* where objects hang around */
+#define AGING (data_heap->gen_count-2)
+#define HAVE_AGING_P (data_heap->gen_count>2)
 /* the oldest generation */
 #define TENURED (data_heap->gen_count-1)
 
@@ -138,8 +128,6 @@ F_ZONE *newspace;
 
 /* new objects are allocated here */
 DLLEXPORT F_ZONE *nursery;
-
-#define tenured data_heap->generations[TENURED]
 
 INLINE bool in_zone(F_ZONE *z, CELL pointer)
 {
@@ -159,13 +147,49 @@ CELL minor_collections;
 CELL cards_scanned;
 
 /* only meaningful during a GC */
+bool performing_gc;
 CELL collecting_gen;
-CELL collecting_gen_start;
 bool collecting_code;
+
+/* if true, we collecting AGING space for the second time, so if it is still
+full, we go on to collect TENURED */
+bool collecting_aging_again;
+
+INLINE bool collecting_accumulation_gen_p(void)
+{
+	return ((HAVE_AGING_P
+		&& collecting_gen == AGING
+		&& !collecting_aging_again)
+		|| collecting_gen == TENURED);
+}
+
+/* What generation was being collected when collect_literals() was last
+called? Until the next call to primitive_add_compiled_block(), future
+collections of younger generations don't have to touch the code
+heap. */
+CELL last_code_heap_scan;
 
 /* sometimes we grow the heap */
 bool growing_data_heap;
 F_DATA_HEAP *old_data_heap;
+
+/* Every object has a regular representation in the runtime, which makes GC
+much simpler. Every slot of the object until binary_payload_start is a pointer
+to some other object. */
+INLINE void do_slots(CELL obj, void (* iter)(CELL *))
+{
+	CELL scan = obj;
+	CELL payload_start = binary_payload_start(obj);
+	CELL end = obj + payload_start;
+
+	scan += CELLS;
+
+	while(scan < end)
+	{
+		iter((CELL *)scan);
+		scan += CELLS;
+	}
+}
 
 /* test if the pointer is in generation being collected, or a younger one.
 init_data_heap() arranges things so that the older generations are first,
@@ -173,27 +197,26 @@ so we have to check that the pointer occurs after the beginning of
 the requested generation. */
 INLINE bool should_copy(CELL untagged)
 {
-	if(collecting_gen == TENURED)
-		return !in_zone(newspace,untagged);
-	else if(in_zone(&data_heap->prior,untagged))
-		return true;
-	else if(collecting_gen_start <= untagged)
-		return true;
-	else
+	if(in_zone(newspace,untagged))
 		return false;
+	if(collecting_gen == TENURED)
+		return true;
+	else if(HAVE_AGING_P && collecting_gen == AGING)
+		return !in_zone(&data_heap->generations[TENURED],untagged);
+	else if(HAVE_NURSERY_P && collecting_gen == NURSERY)
+		return in_zone(&data_heap->generations[NURSERY],untagged);
+	else
+	{
+		critical_error("Bug in should_copy",untagged);
+		return false;
+	}
 }
 
-CELL copy_object(CELL pointer);
-#define COPY_OBJECT(lvalue) if(should_copy(lvalue)) lvalue = copy_object(lvalue)
-
-INLINE void copy_handle(CELL *handle)
-{
-	COPY_OBJECT(*handle);
-}
+void copy_handle(CELL *handle);
 
 /* in case a generation fills up in the middle of a gc, we jump back
 up to try collecting the next generation. */
-jmp_buf gc_jmp;
+JMP_BUF gc_jmp;
 
 /* A heap walk allows useful things to be done, like finding all
 references to an object for debugging purposes. */
@@ -219,10 +242,10 @@ DEFPUSHPOP(root_,extra_roots)
 #define UNREGISTER_ROOT(obj) obj = root_pop()
 
 #define REGISTER_ARRAY(obj) root_push(tag_object(obj))
-#define UNREGISTER_ARRAY(obj) obj = untag_array_fast(root_pop())
+#define UNREGISTER_ARRAY(obj) obj = untag_object(root_pop())
 
 #define REGISTER_STRING(obj) root_push(tag_object(obj))
-#define UNREGISTER_STRING(obj) obj = untag_string_fast(root_pop())
+#define UNREGISTER_STRING(obj) obj = untag_object(root_pop())
 
 /* We ignore strings which point outside the data heap, but we might be given
 a char* which points inside the data heap, in which case it is a root, for
@@ -249,7 +272,7 @@ INLINE bool root_push_alien(const void *ptr)
 	if(obj##_root) obj = alien_offset(root_pop())
 
 #define REGISTER_BIGNUM(obj) if(obj) root_push(tag_bignum(obj))
-#define UNREGISTER_BIGNUM(obj) if(obj) obj = (untag_bignum_fast(root_pop()))
+#define UNREGISTER_BIGNUM(obj) if(obj) obj = (untag_object(root_pop()))
 
 INLINE void *allot_zone(F_ZONE *z, CELL a)
 {
@@ -277,19 +300,14 @@ INLINE void maybe_gc(CELL a)
 	/* There is now sufficient room in the nursery for 'a' */
 }
 
-INLINE void *allot(CELL a)
-{
-	maybe_gc(a);
-	return allot_zone(nursery,a);
-}
-
 /*
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!
  */
 INLINE void* allot_object(CELL type, CELL length)
 {
-	CELL* object = allot(length);
+	maybe_gc(length);
+	CELL* object = allot_zone(nursery,length);
 	*object = tag_header(type);
 	return object;
 }

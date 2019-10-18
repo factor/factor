@@ -1,0 +1,1 @@
+Extended stream output protocol implementation for character-oriented output streams

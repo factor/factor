@@ -1,0 +1,1 @@
+CRC32 checksum algorithm

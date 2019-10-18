@@ -40,11 +40,13 @@
 
 		#ifdef __FreeBSD__
 			#define FACTOR_OS_STRING "freebsd"
+			#include "os-freebsd.h"
 			#include "os-unix-ucontext.h"
 		#elif defined(__OpenBSD__)
 			#define FACTOR_OS_STRING "openbsd"
+			#include "os-openbsd.h"
 
-			#ifdef FACTOR_X86
+			#if defined(FACTOR_X86)
 				#include "os-openbsd-x86.h"
 			#elif defined(FACTOR_AMD64)
 				#include "os-openbsd-amd64.h"
@@ -53,15 +55,23 @@
 			#endif
 		#elif defined(linux)
 			#define FACTOR_OS_STRING "linux"
-			#include "os-unix-ucontext.h"
+			#include "os-linux.h"
 
-			#if defined(FACTOR_PPC)
+			#if defined(FACTOR_X86)
+				#include "os-unix-ucontext.h"
+			#elif defined(FACTOR_PPC)
+				#include "os-unix-ucontext.h"
 				#include "os-linux-ppc.h"
 			#elif defined(FACTOR_ARM)
 				#include "os-linux-arm.h"
+			#elif defined(FACTOR_AMD64)
+				#include "os-unix-ucontext.h"
+			#else
+				#error "Unsupported Linux flavor"
 			#endif
 		#elif defined(__SVR4) && defined(sun)
 			#define FACTOR_OS_STRING "solaris"
+			#include "os-solaris.h"
 			#include "os-unix-ucontext.h"
 		#else
 			#error "Unsupported OS"

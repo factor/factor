@@ -1,220 +1,271 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: image
+IN: bootstrap.primitives
 USING: alien arrays byte-arrays generic hashtables
-hashtables-internals help io kernel-internals kernel math
-modules namespaces parser sequences strings vectors words
-quotations assocs ;
+hashtables.private io kernel math namespaces parser sequences
+strings vectors words quotations assocs layouts classes tuples
+kernel.private vocabs vocabs.loader source-files definitions
+slots classes.union ;
 
 ! Some very tricky code creating a bootstrap embryo in the
 ! host image.
 
 "Creating primitives and basic runtime structures..." print flush
 
-! Bring up a bare cross-compiling vocabulary.
-"syntax" vocab
-
-H{ } clone source-files set
-H{ } clone vocabularies set
-H{ } clone class<map set
-V{ } clone modules set
-
-vocabularies get [
-    "syntax" set
-    H{ } clone "scratchpad" set
-] bind
-
-H{ } clone articles set
-help-tree off
+load-help? off
 crossref off
 changed-words off
+
+! Bring up a bare cross-compiling vocabulary.
+"syntax" vocab vocab-words bootstrap-syntax set
+
+"resource:core/bootstrap/syntax.factor" parse-file
+H{ } clone dictionary set
+call
+
+! Create some empty vocabs where the below primitives and
+! classes will go
+{
+    "alien"
+    "arrays"
+    "bit-arrays"
+    "byte-arrays"
+    "classes.private"
+    "continuations.private"
+    "float-arrays"
+    "generator"
+    "growable"
+    "hashtables"
+    "hashtables.private"
+    "io"
+    "io.files"
+    "io.files.private"
+    "io.streams.c"
+    "kernel"
+    "kernel.private"
+    "math"
+    "math.private"
+    "memory"
+    "quotations"
+    "sbufs"
+    "sbufs.private"
+    "scratchpad"
+    "sequences"
+    "sequences.private"
+    "slots.private"
+    "strings"
+    "strings.private"
+    "system"
+    "threads.private"
+    "tools.profiler.private"
+    "tuples"
+    "tuples.private"
+    "words"
+    "words.private"
+    "vectors"
+    "vectors.private"
+} [
+    dup find-vocab-root swap create-vocab
+    [ set-vocab-root ] keep
+    f swap set-vocab-source-loaded?
+] each
+
+H{ } clone source-files set
+H{ } clone class<map set
+H{ } clone update-map set
 
 : make-primitive ( word vocab n -- ) >r create f r> define ;
 
 {
-    { "execute" "words"                     }
-    { "call" "kernel"                       }
-    { "if" "kernel"                         }
-    { "dispatch" "kernel-internals"         }
-    { "string>sbuf" "sbufs"                 }
-    { "bignum>fixnum" "math-internals"      }
-    { "float>fixnum" "math-internals"       }
-    { "fixnum>bignum" "math-internals"      }
-    { "float>bignum" "math-internals"       }
-    { "fixnum>float" "math-internals"       }
-    { "bignum>float" "math-internals"       }
-    { "(fraction>)" "math-internals"        }
-    { "string>float" "math-internals"       }
-    { "float>string" "math-internals"       }
-    { "float>bits" "math"                   }
-    { "double>bits" "math"                  }
-    { "bits>float" "math"                   }
-    { "bits>double" "math"                  }
-    { "<complex>" "math-internals"          }
-    { "fixnum+" "math-internals"            }
-    { "fixnum+fast" "math-internals"        }
-    { "fixnum-" "math-internals"            }
-    { "fixnum-fast" "math-internals"        }
-    { "fixnum*" "math-internals"            }
-    { "fixnum*fast" "math-internals"        }
-    { "fixnum/i" "math-internals"           }
-    { "fixnum-mod" "math-internals"         }
-    { "fixnum/mod" "math-internals"         }
-    { "fixnum-bitand" "math-internals"      }
-    { "fixnum-bitor" "math-internals"       }
-    { "fixnum-bitxor" "math-internals"      }
-    { "fixnum-bitnot" "math-internals"      }
-    { "fixnum-shift" "math-internals"       }
-    { "fixnum<" "math-internals"            }
-    { "fixnum<=" "math-internals"           }
-    { "fixnum>" "math-internals"            }
-    { "fixnum>=" "math-internals"           }
-    { "bignum=" "math-internals"            }
-    { "bignum+" "math-internals"            }
-    { "bignum-" "math-internals"            }
-    { "bignum*" "math-internals"            }
-    { "bignum/i" "math-internals"           }
-    { "bignum-mod" "math-internals"         }
-    { "bignum/mod" "math-internals"         }
-    { "bignum-bitand" "math-internals"      }
-    { "bignum-bitor" "math-internals"       }
-    { "bignum-bitxor" "math-internals"      }
-    { "bignum-bitnot" "math-internals"      }
-    { "bignum-shift" "math-internals"       }
-    { "bignum<" "math-internals"            }
-    { "bignum<=" "math-internals"           }
-    { "bignum>" "math-internals"            }
-    { "bignum>=" "math-internals"           }
-    { "float+" "math-internals"             }
-    { "float-" "math-internals"             }
-    { "float*" "math-internals"             }
-    { "float/f" "math-internals"            }
-    { "float-mod" "math-internals"          }
-    { "float<" "math-internals"             }
-    { "float<=" "math-internals"            }
-    { "float>" "math-internals"             }
-    { "float>=" "math-internals"            }
-    { "<word>" "words"                      }
-    { "update-xt" "words"                   }
-    { "word-xt" "words"                     }
-    { "drop" "kernel"                       }
-    { "2drop" "kernel"                      }
-    { "3drop" "kernel"                      }
-    { "dup" "kernel"                        }
-    { "2dup" "kernel"                       }
-    { "3dup" "kernel"                       }
-    { "rot" "kernel"                        }
-    { "-rot" "kernel"                       }
-    { "dupd" "kernel"                       }
-    { "swapd" "kernel"                      }
-    { "nip" "kernel"                        }
-    { "2nip" "kernel"                       }
-    { "tuck" "kernel"                       }
-    { "over" "kernel"                       }
-    { "pick" "kernel"                       }
-    { "swap" "kernel"                       }
-    { ">r" "kernel"                         }
-    { "r>" "kernel"                         }
-    { "eq?" "kernel"                        }
-    { "getenv" "kernel-internals"           }
-    { "setenv" "kernel-internals"           }
-    { "(stat)" "io"                         }
-    { "(directory)" "io"                    }
-    { "data-gc" "memory"                    }
-    { "code-gc" "memory"                    }
-    { "gc-time" "memory"                    }
-    { "save-image" "memory"                 }
-    { "datastack" "kernel"                  }
-    { "retainstack" "kernel"                }
-    { "callstack" "kernel"                  }
-    { "set-datastack" "kernel"              }
-    { "set-retainstack" "kernel"            }
-    { "set-callstack" "kernel"              }
-    { "exit" "kernel"                       }
-    { "data-room" "memory"                  }
-    { "code-room" "memory"                  }
-    { "os-env" "kernel"                     }
-    { "millis" "kernel"                     }
-    { "type" "kernel"                       }
-    { "tag" "kernel-internals"              }
-    { "cwd" "io"                            }
-    { "cd" "io"                             }
-    { "add-compiled-block" "generator"      }
-    { "dlopen" "alien"                      }
-    { "dlsym" "alien"                       }
-    { "dlclose" "alien"                     }
-    { "<byte-array>" "byte-arrays"          }
-    { "<bit-array>" "bit-arrays"            }
-    { "<displaced-alien>" "alien"           }
-    { "alien-signed-cell" "alien"           }
-    { "set-alien-signed-cell" "alien"       }
-    { "alien-unsigned-cell" "alien"         }
-    { "set-alien-unsigned-cell" "alien"     }
-    { "alien-signed-8" "alien"              }
-    { "set-alien-signed-8" "alien"          }
-    { "alien-unsigned-8" "alien"            }
-    { "set-alien-unsigned-8" "alien"        }
-    { "alien-signed-4" "alien"              }
-    { "set-alien-signed-4" "alien"          }
-    { "alien-unsigned-4" "alien"            }
-    { "set-alien-unsigned-4" "alien"        }
-    { "alien-signed-2" "alien"              }
-    { "set-alien-signed-2" "alien"          }
-    { "alien-unsigned-2" "alien"            }
-    { "set-alien-unsigned-2" "alien"        }
-    { "alien-signed-1" "alien"              }
-    { "set-alien-signed-1" "alien"          }
-    { "alien-unsigned-1" "alien"            }
-    { "set-alien-unsigned-1" "alien"        }
-    { "alien-float" "alien"                 }
-    { "set-alien-float" "alien"             }
-    { "alien-double" "alien"                }
-    { "set-alien-double" "alien"            }
-    { "alien>char-string" "alien"           }
-    { "string>char-alien" "alien"           }
-    { "alien>u16-string" "alien"            }
-    { "string>u16-alien" "alien"            }
-    { "throw" "errors"                      }
-    { "string>memory" "kernel-internals"    }
-    { "memory>string" "kernel-internals"    }
-    { "alien-address" "alien"               }
-    { "slot" "kernel-internals"             }
-    { "set-slot" "kernel-internals"         }
-    { "char-slot" "kernel-internals"        }
-    { "set-char-slot" "kernel-internals"    }
-    { "resize-array" "arrays"               }
-    { "resize-string" "strings"             }
-    { "(hashtable)" "hashtables-internals"  }
-    { "<array>" "arrays"                    }
-    { "begin-scan" "memory"                 }
-    { "next-object" "memory"                }
-    { "end-scan" "memory"                   }
-    { "size" "memory"                       }
-    { "die" "kernel"                        }
-    { "finalize-compile" "generator"        }
-    { "fopen"  "c-streams"                  }
-    { "fgetc" "c-streams"                   }
-    { "fread" "c-streams"                   }
-    { "fwrite" "c-streams"                  }
-    { "fflush" "c-streams"                  }
-    { "fclose" "c-streams"                  }
-    { "expired?" "alien"                    }
-    { "<wrapper>" "kernel"                  }
-    { "(clone)" "kernel-internals"          }
-    { "array>vector" "vectors"              }
-    { "<string>" "strings"                  }
-    { "xt-map" "kernel-internals"           }
-    { "(>tuple)" "kernel-internals"         }
-    { "<quotation>" "quotations"            }
-    { "<tuple>" "kernel-internals"          }
-    { "tuple>array" "generic"               }
-    { "profiling" "profiler"                }
-    { "become" "kernel-internals"           }
+    { "execute" "words" }
+    { "call" "kernel" }
+    { "if" "kernel" }
+    { "dispatch" "kernel.private" }
+    { "string>sbuf" "sbufs.private" }
+    { "bignum>fixnum" "math.private" }
+    { "float>fixnum" "math.private" }
+    { "fixnum>bignum" "math.private" }
+    { "float>bignum" "math.private" }
+    { "fixnum>float" "math.private" }
+    { "bignum>float" "math.private" }
+    { "<ratio>" "math.private" }
+    { "string>float" "math.private" }
+    { "float>string" "math.private" }
+    { "float>bits" "math" }
+    { "double>bits" "math" }
+    { "bits>float" "math" }
+    { "bits>double" "math" }
+    { "<complex>" "math.private" }
+    { "fixnum+" "math.private" }
+    { "fixnum+fast" "math.private" }
+    { "fixnum-" "math.private" }
+    { "fixnum-fast" "math.private" }
+    { "fixnum*" "math.private" }
+    { "fixnum*fast" "math.private" }
+    { "fixnum/i" "math.private" }
+    { "fixnum-mod" "math.private" }
+    { "fixnum/mod" "math.private" }
+    { "fixnum-bitand" "math.private" }
+    { "fixnum-bitor" "math.private" }
+    { "fixnum-bitxor" "math.private" }
+    { "fixnum-bitnot" "math.private" }
+    { "fixnum-shift" "math.private" }
+    { "fixnum<" "math.private" }
+    { "fixnum<=" "math.private" }
+    { "fixnum>" "math.private" }
+    { "fixnum>=" "math.private" }
+    { "bignum=" "math.private" }
+    { "bignum+" "math.private" }
+    { "bignum-" "math.private" }
+    { "bignum*" "math.private" }
+    { "bignum/i" "math.private" }
+    { "bignum-mod" "math.private" }
+    { "bignum/mod" "math.private" }
+    { "bignum-bitand" "math.private" }
+    { "bignum-bitor" "math.private" }
+    { "bignum-bitxor" "math.private" }
+    { "bignum-bitnot" "math.private" }
+    { "bignum-shift" "math.private" }
+    { "bignum<" "math.private" }
+    { "bignum<=" "math.private" }
+    { "bignum>" "math.private" }
+    { "bignum>=" "math.private" }
+    { "float+" "math.private" }
+    { "float-" "math.private" }
+    { "float*" "math.private" }
+    { "float/f" "math.private" }
+    { "float-mod" "math.private" }
+    { "float<" "math.private" }
+    { "float<=" "math.private" }
+    { "float>" "math.private" }
+    { "float>=" "math.private" }
+    { "<word>" "words" }
+    { "update-xt" "words" }
+    { "word-xt" "words" }
+    { "drop" "kernel" }
+    { "2drop" "kernel" }
+    { "3drop" "kernel" }
+    { "dup" "kernel" }
+    { "2dup" "kernel" }
+    { "3dup" "kernel" }
+    { "rot" "kernel" }
+    { "-rot" "kernel" }
+    { "dupd" "kernel" }
+    { "swapd" "kernel" }
+    { "nip" "kernel" }
+    { "2nip" "kernel" }
+    { "tuck" "kernel" }
+    { "over" "kernel" }
+    { "pick" "kernel" }
+    { "swap" "kernel" }
+    { ">r" "kernel" }
+    { "r>" "kernel" }
+    { "eq?" "kernel" }
+    { "getenv" "kernel.private" }
+    { "setenv" "kernel.private" }
+    { "(stat)" "io.files.private" }
+    { "(directory)" "io.files.private" }
+    { "data-gc" "memory" }
+    { "code-gc" "memory" }
+    { "gc-time" "memory" }
+    { "save-image" "memory" }
+    { "save-image-and-exit" "memory" }
+    { "datastack" "kernel" }
+    { "retainstack" "kernel" }
+    { "callstack" "kernel" }
+    { "set-datastack" "kernel.private" }
+    { "set-retainstack" "kernel.private" }
+    { "set-callstack" "kernel.private" }
+    { "exit" "system" }
+    { "data-room" "memory" }
+    { "code-room" "memory" }
+    { "os-env" "system" }
+    { "millis" "system" }
+    { "type" "kernel.private" }
+    { "tag" "kernel.private" }
+    { "cwd" "io.files" }
+    { "cd" "io.files" }
+    { "add-compiled-block" "generator" }
+    { "dlopen" "alien" }
+    { "dlsym" "alien" }
+    { "dlclose" "alien" }
+    { "<byte-array>" "byte-arrays" }
+    { "<bit-array>" "bit-arrays" }
+    { "<displaced-alien>" "alien" }
+    { "alien-signed-cell" "alien" }
+    { "set-alien-signed-cell" "alien" }
+    { "alien-unsigned-cell" "alien" }
+    { "set-alien-unsigned-cell" "alien" }
+    { "alien-signed-8" "alien" }
+    { "set-alien-signed-8" "alien" }
+    { "alien-unsigned-8" "alien" }
+    { "set-alien-unsigned-8" "alien" }
+    { "alien-signed-4" "alien" }
+    { "set-alien-signed-4" "alien" }
+    { "alien-unsigned-4" "alien" }
+    { "set-alien-unsigned-4" "alien" }
+    { "alien-signed-2" "alien" }
+    { "set-alien-signed-2" "alien" }
+    { "alien-unsigned-2" "alien" }
+    { "set-alien-unsigned-2" "alien" }
+    { "alien-signed-1" "alien" }
+    { "set-alien-signed-1" "alien" }
+    { "alien-unsigned-1" "alien" }
+    { "set-alien-unsigned-1" "alien" }
+    { "alien-float" "alien" }
+    { "set-alien-float" "alien" }
+    { "alien-double" "alien" }
+    { "set-alien-double" "alien" }
+    { "alien-cell" "alien" }
+    { "set-alien-cell" "alien" }
+    { "alien>char-string" "alien" }
+    { "string>char-alien" "alien" }
+    { "alien>u16-string" "alien" }
+    { "string>u16-alien" "alien" }
+    { "throw" "kernel" }
+    { "string>memory" "alien" }
+    { "memory>string" "alien" }
+    { "alien-address" "alien" }
+    { "slot" "slots.private" }
+    { "set-slot" "slots.private" }
+    { "char-slot" "strings.private" }
+    { "set-char-slot" "strings.private" }
+    { "resize-array" "arrays" }
+    { "resize-string" "strings" }
+    { "(hashtable)" "hashtables.private" }
+    { "<array>" "arrays" }
+    { "begin-scan" "memory" }
+    { "next-object" "memory" }
+    { "end-scan" "memory" }
+    { "size" "memory" }
+    { "die" "kernel" }
+    { "finalize-compile" "generator" }
+    { "fopen" "io.streams.c" }
+    { "fgetc" "io.streams.c" }
+    { "fread" "io.streams.c" }
+    { "fwrite" "io.streams.c" }
+    { "fflush" "io.streams.c" }
+    { "fclose" "io.streams.c" }
+    { "expired?" "alien" }
+    { "<wrapper>" "kernel" }
+    { "(clone)" "kernel.private" }
+    { "array>vector" "vectors.private" }
+    { "<string>" "strings" }
+    { "xt-map" "continuations.private" }
+    { "(>tuple)" "tuples.private" }
+    { "<quotation>" "quotations" }
+    { "<tuple>" "tuples.private" }
+    { "tuple>array" "tuples" }
+    { "profiling" "tools.profiler.private" }
+    { "become" "tuples.private" }
+    { "(sleep)" "threads.private" }
+    { "<float-array>" "float-arrays" }
+    { "curry" "kernel" }
+    { "<tuple-boa>" "tuples.private" }
+	{ "class-hash" "kernel.private" }
 }
 dup length [ 3 + ] map
 [ >r first2 r> make-primitive ] 2each
-
-FORGET: make-primitive
 
 ! Okay, now we have primitives fleshed out. Bring up the generic
 ! word system.
@@ -234,9 +285,9 @@ FORGET: make-primitive
     ] map ;
 
 : define-builtin ( symbol type# predicate slotspec -- )
-    >r >r >r
+    >r dup make-inline >r >r
     dup r> "type" set-word-prop
-    dup define-class
+    dup f f builtin-class define-class
     dup r> builtin-predicate
     dup r> intern-slots 2dup "slots" set-word-prop
     define-slots
@@ -247,30 +298,27 @@ num-types get f <array> builtins set
 
 ! These symbols are needed by the code that executes below
 {
-    { "object" "generic" }
-    { "null" "generic" }
+    { "object" "kernel" }
+    { "null" "kernel" }
 } [ create drop ] assoc-each
 
-"fixnum?" "math" create (inline)
 "fixnum" "math" create 0 "fixnum?" "math" create { } define-builtin
 "fixnum" "math" create ">fixnum" "math" create 1quotation "coercer" set-word-prop
 
-"bignum?" "math" create (inline)
 "bignum" "math" create 1 "bignum?" "math" create { } define-builtin
 "bignum" "math" create ">bignum" "math" create 1quotation "coercer" set-word-prop
 
-"word?" "words" create (inline)
 "word" "words" create 2 "word?" "words" create
 {
     {
-        { "object" "generic" }
+        { "object" "kernel" }
         "name"
         2
         { "word-name" "words" }
         { "set-word-name" "words" }
     }
     {
-        { "object" "generic" }
+        { "object" "kernel" }
         "vocabulary"
         3
         { "word-vocabulary" "words" }
@@ -280,25 +328,25 @@ num-types get f <array> builtins set
         { "fixnum" "math" }
         "primitive"
         4
-        { "word-primitive" "kernel-internals" }
-        { "set-word-primitive" "kernel-internals" }
+        { "word-primitive" "words.private" }
+        { "set-word-primitive" "words.private" }
     }
     {
-        { "object" "generic" }
+        { "object" "kernel" }
         "def"
         5
         { "word-def" "words" }
         { "set-word-def" "words" }
     }
     {
-        { "object" "generic" }
+        { "object" "kernel" }
         "props"
         6
         { "word-props" "words" }
         { "set-word-props" "words" }
     }
     {
-        { "object" "generic" }
+        { "object" "kernel" }
         "?"
         7
         { "compiled?" "words" }
@@ -308,12 +356,11 @@ num-types get f <array> builtins set
         { "fixnum" "math" }
         "counter"
         8
-        { "profile-counter" "profiler" }
-        { "set-profile-counter" "profiler" }
+        { "profile-counter" "tools.profiler.private" }
+        { "set-profile-counter" "tools.profiler.private" }
     }
 } define-builtin
 
-"ratio?" "math" create (inline)
 "ratio" "math" create 4 "ratio?" "math" create
 {
     {
@@ -332,11 +379,9 @@ num-types get f <array> builtins set
     }
 } define-builtin
 
-"float?" "math" create (inline)
 "float" "math" create 5 "float?" "math" create { } define-builtin
 "float" "math" create ">float" "math" create 1quotation "coercer" set-word-prop
 
-"complex?" "math" create (inline)
 "complex" "math" create 6 "complex?" "math" create
 {
     {
@@ -355,11 +400,10 @@ num-types get f <array> builtins set
     }
 } define-builtin
 
-"wrapper?" "kernel" create (inline)
 "wrapper" "kernel" create 7 "wrapper?" "kernel" create
 {
     {
-        { "object" "generic" }
+        { "object" "kernel" }
         "wrapped"
         1
         { "wrapped" "kernel" }
@@ -367,60 +411,56 @@ num-types get f <array> builtins set
     }
 } define-builtin
 
-"array?" "arrays" create (inline)
 "array" "arrays" create 8 "array?" "arrays" create
 { } define-builtin
 
-"!f" "!syntax" create 9 "not" "kernel" create
+"f" "syntax" lookup 9 "not" "kernel" create
 { } define-builtin
 
-"hashtable?" "hashtables" create (inline)
 "hashtable" "hashtables" create 10 "hashtable?" "hashtables" create
 {
     {
-        { "array-capacity" "sequences-internals" }
+        { "array-capacity" "sequences.private" }
         "count"
         1
-        { "hash-count" "hashtables-internals" }
-        { "set-hash-count" "hashtables-internals" }
+        { "hash-count" "hashtables.private" }
+        { "set-hash-count" "hashtables.private" }
     } {
-        { "array-capacity" "sequences-internals" }
+        { "array-capacity" "sequences.private" }
         "deleted"
         2
-        { "hash-deleted" "hashtables-internals" }
-        { "set-hash-deleted" "hashtables-internals" }
+        { "hash-deleted" "hashtables.private" }
+        { "set-hash-deleted" "hashtables.private" }
     } {
         { "array" "arrays" }
         "array"
         3
-        { "hash-array" "hashtables-internals" }
-        { "set-hash-array" "hashtables-internals" }
+        { "hash-array" "hashtables.private" }
+        { "set-hash-array" "hashtables.private" }
     }
 } define-builtin
 
-"vector?" "vectors" create (inline)
 "vector" "vectors" create 11 "vector?" "vectors" create
 {
     {
-        { "array-capacity" "sequences-internals" }
+        { "array-capacity" "sequences.private" }
         "fill"
         1
         { "length" "sequences" }
-        { "set-fill" "sequences-internals" }
+        { "set-fill" "growable" }
     } {
         { "array" "arrays" }
         "underlying"
         2
-        { "underlying" "sequences-internals" }
-        { "set-underlying" "sequences-internals" }
+        { "underlying" "growable" }
+        { "set-underlying" "growable" }
     }
 } define-builtin
 
-"string?" "strings" create (inline)
 "string" "strings" create 12 "string?" "strings" create
 {
     {
-        { "array-capacity" "sequences-internals" }
+        { "array-capacity" "sequences.private" }
         "length"
         1
         { "length" "sequences" }
@@ -428,30 +468,27 @@ num-types get f <array> builtins set
     }
 } define-builtin
 
-"sbuf?" "sbufs" create (inline) 
 "sbuf" "sbufs" create 13 "sbuf?" "sbufs" create
 {
     {
-        { "array-capacity" "sequences-internals" }
+        { "array-capacity" "sequences.private" }
         "length"
         1
         { "length" "sequences" }
-        { "set-fill" "sequences-internals" }
+        { "set-fill" "growable" }
     }
     {
         { "string" "strings" }
         "underlying"
         2
-        { "underlying" "sequences-internals" }
-        { "set-underlying" "sequences-internals" }
+        { "underlying" "growable" }
+        { "set-underlying" "growable" }
     }
 } define-builtin
 
-"quotation?" "quotations" create (inline)
 "quotation" "quotations" create 14 "quotation?" "quotations" create
 { } define-builtin
 
-"dll?" "alien" create (inline)
 "dll" "alien" create 15 "dll?" "alien" create
 { { byte-array "path" 1 { "(dll-path)" "alien" } f } }
 define-builtin
@@ -460,58 +497,82 @@ define-builtin
 { { c-ptr "alien" 1 { "underlying-alien" "alien" } f } }
 define-builtin
 
-"tuple?" "kernel" create (inline)
 "tuple" "kernel" create 17 "tuple?" "kernel" create
 { } define-builtin
 
-"byte-array?" "byte-arrays" create (inline)
 "byte-array" "byte-arrays" create 18
 "byte-array?" "byte-arrays" create
 { } define-builtin
 
-"bit-array?" "bit-arrays" create (inline) 
 "bit-array" "bit-arrays" create 19
 "bit-array?" "bit-arrays" create
 { } define-builtin
 
+"float-array" "float-arrays" create 20
+"float-array?" "float-arrays" create
+{ } define-builtin
+
+"curry" "kernel" create 21
+"curry?" "kernel" create
+{
+    {
+        { "object" "kernel" }
+        "obj"
+        1
+        { "curry-obj" "kernel" }
+        f
+    }
+    {
+        { "object" "kernel" }
+        "obj"
+        2
+        { "curry-quot" "kernel" }
+        f
+    }
+} define-builtin
+
 ! Define general-t type, which is any object that is not f.
 "general-t" "kernel" create
-"!f" "!syntax" lookup builtins get remove [ ] subset
-(define-union-class)
+"f" "syntax" lookup builtins get remove [ ] subset f union-class
+define-class
 
 ! Catch-all class for providing a default method.
-"object" "generic" create [ drop t ] "predicate" set-word-prop
-"object" "generic" create
-builtins get [ ] subset (define-union-class)
+"object" "kernel" create [ drop t ] "predicate" set-word-prop
+"object" "kernel" create
+builtins get [ ] subset f union-class define-class
+
+! Class of objects with object tag
+"hi-tag" "classes.private" create [ drop t ] "predicate" set-word-prop
+"hi-tag" "classes.private" create
+builtins get num-tags get tail f union-class define-class
 
 ! Null class with no instances.
-"null" "generic" create [ drop f ] "predicate" set-word-prop
-"null" "generic" create { } (define-union-class)
+"null" "kernel" create [ drop f ] "predicate" set-word-prop
+"null" "kernel" create { } f union-class define-class
 
 ! Create special tombstone values
-"tombstone" "hashtables-internals" create { } define-tuple-class
+"tombstone" "hashtables.private" create { } define-tuple-class
 
-"((empty))" "hashtables-internals" create
+"((empty))" "hashtables.private" create
 T{ tombstone f } 1quotation define-compound
 
-"((empty))" "hashtables-internals" lookup
-(inline)
+"((empty))" "hashtables.private" lookup
+make-inline
 
-"((tombstone))" "hashtables-internals" create
+"((tombstone))" "hashtables.private" create
 T{ tombstone t } 1quotation define-compound
 
-"((tombstone))" "hashtables-internals" lookup
-(inline)
+"((tombstone))" "hashtables.private" lookup
+make-inline
 
 "c-ptr" "alien" create
 {
     { "bit-array" "bit-arrays" }
     { "byte-array" "byte-arrays" }
+    { "float-array" "float-arrays" }
     { "alien" "alien" }
-    { "!f" "!syntax" }
+    { "f" "syntax" }
 } [ lookup ] { } assoc>map define-union-class
 
-FORGET: builtin-predicate
-FORGET: register-builtin
-FORGET: define-builtin
-FORGET: intern-slots
+! Bump build number
+"build" "kernel" create build 1+ 1quotation define-compound

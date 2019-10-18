@@ -1,0 +1,1 @@
+Associative structure with expected constant time lookup

@@ -153,3 +153,73 @@ float ffi_test_23(float x[3], float y[3])
 {
 	return x[0] * y[0] + x[1] * y[1] + x[2] * y[2];
 }
+
+DLLEXPORT struct test_struct_1 ffi_test_24(void)
+{
+	struct test_struct_1 s;
+	s.x = 1;
+	return s;
+}
+
+DLLEXPORT struct test_struct_2 ffi_test_25(void)
+{
+	struct test_struct_2 s;
+	s.x = 1;
+	s.y = 2;
+	return s;
+}
+
+DLLEXPORT struct test_struct_3 ffi_test_26(void)
+{
+	struct test_struct_3 s;
+	s.x = 1;
+	s.y = 2;
+	s.z = 3;
+	return s;
+}
+
+DLLEXPORT struct test_struct_4 ffi_test_27(void)
+{
+	struct test_struct_4 s;
+	s.x = 1;
+	s.y = 2;
+	s.z = 3;
+	s.a = 4;
+	return s;
+}
+
+DLLEXPORT struct test_struct_5 ffi_test_28(void)
+{
+	struct test_struct_5 s;
+	s.x = 1;
+	s.y = 2;
+	s.z = 3;
+	s.a = 4;
+	s.b = 5;
+	return s;
+}
+
+DLLEXPORT struct test_struct_6 ffi_test_29(void)
+{
+	struct test_struct_6 s;
+	s.x = 1;
+	s.y = 2;
+	s.z = 3;
+	s.a = 4;
+	s.b = 5;
+	s.c = 6;
+	return s;
+}
+
+DLLEXPORT struct test_struct_7 ffi_test_30(void)
+{
+	struct test_struct_7 s;
+	s.x = 1;
+	s.y = 2;
+	s.z = 3;
+	s.a = 4;
+	s.b = 5;
+	s.c = 6;
+	s.d = 7;
+	return s;
+}

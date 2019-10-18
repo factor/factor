@@ -5,7 +5,7 @@
 
 INLINE F_FIXNUM bignum_to_fixnum(CELL tagged)
 {
-	return (F_FIXNUM)s48_bignum_to_fixnum(untag_array_fast(tagged));
+	return (F_FIXNUM)s48_bignum_to_fixnum(untag_object(tagged));
 }
 
 DLLEXPORT F_FIXNUM to_fixnum(CELL tagged);
@@ -36,11 +36,6 @@ void primitive_fixnum_not(void);
 CELL bignum_zero;
 CELL bignum_pos_one;
 CELL bignum_neg_one;
-
-INLINE F_ARRAY* untag_bignum_fast(CELL tagged)
-{
-	return (F_ARRAY*)UNTAG(tagged);
-}
 
 INLINE CELL tag_bignum(F_ARRAY* bignum)
 {
@@ -141,7 +136,7 @@ INLINE double fixnum_to_float(CELL tagged)
 
 INLINE double bignum_to_float(CELL tagged)
 {
-	return s48_bignum_to_double(untag_array_fast(tagged));
+	return s48_bignum_to_double(untag_object(tagged));
 }
 
 void primitive_fixnum_to_float(void);

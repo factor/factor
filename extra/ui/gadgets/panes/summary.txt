@@ -1,0 +1,1 @@
+Pane gadgets display formatted stream output

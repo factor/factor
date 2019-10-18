@@ -14,13 +14,16 @@ typedef char F_SYMBOL;
 #define unbox_native_string unbox_char_string
 #define string_to_native_alien(string) string_to_char_alien(string,true)
 #define unbox_symbol_string unbox_char_string
-#define char_to_F_CHAR(string) string
 
 #define STR_FORMAT(string) string
 
 #define SETJMP(jmpbuf) sigsetjmp(jmpbuf,1)
 #define LONGJMP siglongjmp
 #define JMP_BUF sigjmp_buf
+#define SSCANF sscanf
+#define STRCMP strcmp
+#define STRNCMP strncmp
+#define STRDUP strdup
 
 #define OPEN_READ(path) fopen(path,"rb")
 #define OPEN_WRITE(path) fopen(path,"wb")
@@ -42,5 +45,6 @@ void primitive_cwd(void);
 void primitive_cd(void);
 
 s64 current_millis(void);
+void sleep_millis(CELL msec);
 
 void reset_stdio(void);

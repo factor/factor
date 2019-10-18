@@ -242,6 +242,7 @@ void stack_to_vector(CELL bottom, CELL top)
 	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,depth);
 	memcpy(a + 1,(void*)bottom,depth * CELLS);
 	dpush(tag_object(a));
+	dpush(tag_fixnum(depth));
 	primitive_array_to_vector();
 }
 
@@ -275,6 +276,7 @@ void primitive_callstack(void)
 	}
 
 	dpush(tag_object(a));
+	dpush(tag_fixnum(depth * 3));
 	primitive_array_to_vector();
 }
 
@@ -283,7 +285,7 @@ CELL vector_to_stack(F_VECTOR* vector, CELL bottom)
 {
 	CELL start = bottom;
 	CELL len = untag_fixnum_fast(vector->top) * CELLS;
-	memcpy((void*)start,untag_array_fast(vector->array) + 1,len);
+	memcpy((void*)start,(F_ARRAY *)untag_object(vector->array) + 1,len);
 	return start + len - CELLS;
 }
 
@@ -300,7 +302,7 @@ void primitive_set_retainstack(void)
 void primitive_set_callstack(void)
 {
 	F_VECTOR *v = untag_vector(dpop());
-	F_ARRAY *a = untag_array_fast(v->array);
+	F_ARRAY *a = untag_object(v->array);
 	CELL depth = untag_fixnum_fast(v->top) / 3;
 
 	CELL i;
@@ -309,7 +311,7 @@ void primitive_set_callstack(void)
 		CELL quot = get(AREF(a,3 * i));
 		type_check(QUOTATION_TYPE,quot);
 
-		F_ARRAY *untagged = untag_array_fast(quot);
+		F_ARRAY *untagged = untag_object(quot);
 		CELL length = array_capacity(untagged);
 
 		F_FIXNUM position = to_fixnum(get(AREF(a,3 * i + 1)));

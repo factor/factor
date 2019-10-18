@@ -1,4 +1,4 @@
-USING: compiler test kernel kernel-internals ;
+USING: compiler tools.test kernel kernel.private ;
 IN: temporary
 
 ! Test empty word
@@ -49,4 +49,9 @@ IN: temporary
 ! Labels
 
 : recursive ( ? -- ) [ f recursive ] when ; inline
+
 [ ] [ t [ recursive ] compile-1 ] unit-test
+
+\ recursive compile
+
+[ ] [ t recursive ] unit-test

@@ -1,4 +1,4 @@
-#define FACTOR_CPU_STRING "x86"
+#define FACTOR_CPU_STRING "x86.32"
 
 register CELL ds asm("esi");
 register CELL rs asm("edi");

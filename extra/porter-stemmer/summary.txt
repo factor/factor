@@ -1,0 +1,1 @@
+Porter stemming algorithm

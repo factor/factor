@@ -1,0 +1,1 @@
+Scrollers display a user-chosen portion of a child which may have arbitrary dimensions

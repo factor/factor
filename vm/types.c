@@ -58,6 +58,21 @@ F_BIT_ARRAY *allot_bit_array(CELL size)
 	return array;
 }
 
+/* size is in 8-byte doubles */
+F_BIT_ARRAY *allot_float_array(CELL size, double initial)
+{
+	F_FLOAT_ARRAY *array = allot_object(FLOAT_ARRAY_TYPE,
+		float_array_size(size));
+	array->capacity = tag_fixnum(size);
+
+	double *elements = (double *)AREF(array,0);
+	int i;
+	for(i = 0; i < size; i++)
+		elements[i] = initial;
+
+	return array;
+}
+
 /* push a new array on the stack */
 void primitive_array(void)
 {
@@ -82,6 +97,20 @@ void primitive_tuple(void)
 	dpush(tag_object(array));
 }
 
+/* push a new tuple on the stack, filling its slots from the stack */
+void primitive_tuple_boa(void)
+{
+	CELL size = unbox_array_size();
+	F_ARRAY *array = allot_array(TUPLE_TYPE,size,F);
+	set_array_nth(array,0,dpop());
+
+	CELL i;
+	for(i = size - 1; i >= 2; i--)
+		set_array_nth(array,i,dpop());
+
+	dpush(tag_object(array));
+}
+
 /* push a new byte array on the stack */
 void primitive_byte_array(void)
 {
@@ -96,10 +125,18 @@ void primitive_bit_array(void)
 	dpush(tag_object(allot_bit_array(size)));
 }
 
+/* push a new float array on the stack */
+void primitive_float_array(void)
+{
+	double initial = untag_float(dpop());
+	CELL size = unbox_array_size();
+	dpush(tag_object(allot_float_array(size,initial)));
+}
+
 void primitive_clone(void)
 {
 	CELL size = object_size(dpeek());
-	void *new_obj = allot(size);
+	void *new_obj = allot_object(type_of(dpeek()),size);
 	CELL tag = TAG(dpeek());
 	memcpy(new_obj,(void*)UNTAG(dpeek()),size);
 	drepl(RETAG(new_obj,tag));
@@ -109,13 +146,25 @@ void primitive_tuple_to_array(void)
 {
 	type_check(TUPLE_TYPE,dpeek());
 	primitive_clone();
-	set_slot(UNTAG(dpeek()),0,tag_header(ARRAY_TYPE));
+	set_slot(dpeek(),0,tag_header(ARRAY_TYPE));
 }
 
 void primitive_to_tuple(void)
 {
 	primitive_clone();
-	set_slot(UNTAG(dpeek()),0,tag_header(TUPLE_TYPE));
+	set_slot(dpeek(),0,tag_header(TUPLE_TYPE));
+}
+
+CELL allot_array_2(CELL v1, CELL v2)
+{
+	REGISTER_ROOT(v1);
+	REGISTER_ROOT(v2);
+	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,2);
+	UNREGISTER_ROOT(v2);
+	UNREGISTER_ROOT(v1);
+	set_array_nth(a,0,v1);
+	set_array_nth(a,1,v2);
+	return tag_object(a);
 }
 
 CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
@@ -171,10 +220,9 @@ void primitive_resize_array(void)
 void primitive_array_to_vector(void)
 {
 	F_VECTOR *vector = allot_object(VECTOR_TYPE,sizeof(F_VECTOR));
-	F_ARRAY *array = untag_array(dpeek());
-	vector->top = array->capacity;
-	vector->array = tag_object(array);
-	drepl(tag_object(vector));
+	vector->top = dpop();
+	vector->array = dpop();
+	dpush(tag_object(vector));
 }
 
 /* untagged */
@@ -193,21 +241,25 @@ F_STRING* allot_string_internal(CELL capacity)
 	return string;
 }
 
+void fill_string(F_STRING *string, CELL start, CELL capacity, CELL fill)
+{
+	if(fill == 0)
+		memset((void*)SREF(string,start),'\0',
+			(capacity - start) * CHARS);
+	else
+	{
+		CELL i;
+
+		for(i = start; i < capacity; i++)
+			cput(SREF(string,i),fill);
+	}
+}
+
 /* untagged */
 F_STRING *allot_string(CELL capacity, CELL fill)
 {
-	CELL i;
-
 	F_STRING* string = allot_string_internal(capacity);
-
-	if(fill == 0)
-		memset((void*)SREF(string,0),'\0',capacity * CHARS);
-	else
-	{
-		for(i = 0; i < capacity; i++)
-			cput(SREF(string,i),fill);
-	}
-
+	fill_string(string,0,capacity,fill);
 	return string;
 }
 
@@ -220,23 +272,16 @@ void primitive_string(void)
 
 F_STRING* reallot_string(F_STRING* string, CELL capacity, u16 fill)
 {
-	/* later on, do an optimization: if end of array is here, just grow */
-	CELL i;
 	CELL to_copy = string_capacity(string);
-
 	if(capacity < to_copy)
 		to_copy = capacity;
 
 	REGISTER_STRING(string);
-
 	F_STRING *new_string = allot_string_internal(capacity);
-
 	UNREGISTER_STRING(string);
 
 	memcpy(new_string + 1,string + 1,to_copy * CHARS);
-
-	for(i = to_copy; i < capacity; i++)
-		cput(SREF(new_string,i),fill);
+	fill_string(new_string,to_copy,capacity,fill);
 
 	return new_string;
 }
@@ -364,14 +409,14 @@ STRING_TO_MEMORY(u16);
 
 void primitive_char_slot(void)
 {
-	F_STRING* string = untag_string_fast(dpop());
+	F_STRING* string = untag_object(dpop());
 	CELL index = untag_fixnum_fast(dpop());
 	dpush(tag_fixnum(string_nth(string,index)));
 }
 
 void primitive_set_char_slot(void)
 {
-	F_STRING* string = untag_string_fast(dpop());
+	F_STRING* string = untag_object(dpop());
 	CELL index = untag_fixnum_fast(dpop());
 	CELL value = untag_fixnum_fast(dpop());
 	set_string_nth(string,index,value);
@@ -380,10 +425,9 @@ void primitive_set_char_slot(void)
 void primitive_string_to_sbuf(void)
 {
 	F_SBUF *sbuf = allot_object(SBUF_TYPE,sizeof(F_SBUF));
-	F_STRING *string = untag_string(dpeek());
-	sbuf->top = string->length;
-	sbuf->string = tag_object(string);
-	drepl(tag_object(sbuf));
+	sbuf->top = dpop();
+	sbuf->string = dpop();
+	dpush(tag_object(sbuf));
 }
 
 void primitive_hashtable(void)
@@ -453,4 +497,12 @@ void primitive_wrapper(void)
 	F_WRAPPER *wrapper = allot_object(WRAPPER_TYPE,sizeof(F_WRAPPER));
 	wrapper->object = dpeek();
 	drepl(tag_wrapper(wrapper));
+}
+
+void primitive_curry(void)
+{
+	F_CURRY *curry = allot_object(CURRY_TYPE,sizeof(F_CURRY));
+	curry->quot = dpop();
+	curry->obj = dpop();
+	dpush(tag_object(curry));
 }

@@ -62,8 +62,15 @@ typedef signed long long s64;
 #define TUPLE_TYPE 17
 #define BYTE_ARRAY_TYPE 18
 #define BIT_ARRAY_TYPE 19
+#define FLOAT_ARRAY_TYPE 20
+#define CURRY_TYPE 21
 
-#define TYPE_COUNT 20
+#define TYPE_COUNT 22
+
+INLINE bool immediate_p(CELL obj)
+{
+	return (TAG(obj) == FIXNUM_TYPE || obj == F);
+}
 
 INLINE F_FIXNUM untag_fixnum_fast(CELL tagged)
 {
@@ -75,6 +82,11 @@ INLINE CELL tag_fixnum(F_FIXNUM untagged)
 	return RETAG(untagged << TAG_BITS,FIXNUM_TYPE);
 }
 
+INLINE void *untag_object(CELL tagged)
+{
+	return (void *)UNTAG(tagged);
+}
+
 typedef struct {
 	CELL header;
 	/* tagged */
@@ -84,6 +96,8 @@ typedef struct {
 typedef F_ARRAY F_BYTE_ARRAY;
 
 typedef F_ARRAY F_BIT_ARRAY;
+
+typedef F_ARRAY F_FLOAT_ARRAY;
 
 typedef struct {
 	/* always tag_header(VECTOR_TYPE) */
@@ -195,6 +209,14 @@ typedef struct {
 	/* OS-specific handle */
 	void* dll;
 } F_DLL;
+
+typedef struct {
+	CELL header;
+	/* tagged */
+	CELL obj;
+	/* tagged */
+	CELL quot;
+} F_CURRY;
 
 typedef struct {
 	CELL quot;

@@ -43,16 +43,35 @@ void early_init(void)
 	[[NSAutoreleasePool alloc] init];
 }
 
+
+const char *vm_executable_path(void)
+{
+	return [[[NSBundle mainBundle] executablePath] cString];
+}
+
 const char *default_image_path(void)
 {
 	NSBundle *bundle = [NSBundle mainBundle];
 	NSString *path = [bundle bundlePath];
-	NSString *image;
+	NSString *executable = [[bundle executablePath] lastPathComponent];
+	NSString *image = [executable stringByAppendingString:@".image"];
+
+	NSString *returnVal;
+
 	if([path hasSuffix:@".app"] || [path hasSuffix:@".app/"])
-		image = [[path stringByDeletingLastPathComponent] stringByAppendingString:@"/factor.image"];
+	{
+		NSFileManager *mgr = [NSFileManager defaultManager];
+
+		NSString *imageInBundle = [[path stringByAppendingPathComponent:@"Contents/Resources"] stringByAppendingPathComponent:image];
+		NSString *imageAlongBundle = [[path stringByDeletingLastPathComponent] stringByAppendingPathComponent:image];
+
+		returnVal = ([mgr fileExistsAtPath:imageInBundle]
+			? imageInBundle : imageAlongBundle);
+	}
 	else
-		image = [path stringByAppendingString:@"/factor.image"];
-	return [image cString];
+		returnVal = [path stringByAppendingPathComponent:image];
+
+	return [returnVal cString];
 }
 
 void init_signals(void)

@@ -1,11 +1,6 @@
 IN: temporary
-USING: alien strings ;
-USE: compiler
-USE: test
-USE: math
-USE: kernel
-USE: words
-USE: math-internals
+USING: alien strings compiler tools.test math kernel words
+math.private combinators ;
 
 : dummy-if-1 t [ ] [ ] if ;
 
@@ -31,7 +26,7 @@ USE: math-internals
     dup 1 fixnum<= [
         drop 1
     ] [
-        1 fixnum- dup swap 1 fixnum- fixnum+
+        1 fixnum- dup 1 fixnum- fixnum+
     ] if ;
 
 [ 17 ] [ 10 dummy-if-6 ] unit-test

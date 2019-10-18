@@ -1,3 +1,0 @@
-LIBS = -lm
-PLAF_SUFFIX = .exe
-include vm/Config.x86

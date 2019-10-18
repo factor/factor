@@ -96,6 +96,7 @@ static void *_primitives[] = {
 	primitive_code_gc,
 	primitive_gc_time,
 	primitive_save_image,
+	primitive_save_image_and_exit,
 	primitive_datastack,
 	primitive_retainstack,
 	primitive_callstack,
@@ -142,6 +143,8 @@ static void *_primitives[] = {
 	primitive_set_alien_float,
 	primitive_alien_double,
 	primitive_set_alien_double,
+	primitive_alien_cell,
+	primitive_set_alien_cell,
 	primitive_alien_to_char_string,
 	primitive_string_to_char_alien,
 	primitive_alien_to_u16_string,
@@ -181,7 +184,12 @@ static void *_primitives[] = {
 	primitive_tuple,
 	primitive_tuple_to_array,
 	primitive_profiling,
-	primitive_become
+	primitive_become,
+	primitive_sleep,
+	primitive_float_array,
+	primitive_curry,
+	primitive_tuple_boa,
+	primitive_class_hash,
 };
 
 void init_primitives(void)

@@ -103,7 +103,7 @@ void primitive_fixnum_divmod(void)
 {
 	POP_FIXNUMS(x,y)
 	box_signed_cell(x / y);
-	box_signed_cell(x % y);
+	dpush(tag_fixnum(x % y));
 }
 
 void primitive_fixnum_mod(void)
@@ -154,7 +154,7 @@ void primitive_fixnum_shift(void)
 	}
 	else if(y < WORD_SIZE - TAG_BITS)
 	{
-		F_FIXNUM mask = -(1 << (WORD_SIZE - 1 - TAG_BITS - y));
+		F_FIXNUM mask = -(1L << (WORD_SIZE - 1 - TAG_BITS - y));
 		if((x > 0 && (x & mask) == 0) || (x & mask) == mask)
 		{
 			dpush(tag_fixnum(x << y));
@@ -207,8 +207,8 @@ void primitive_float_to_bignum(void)
 }
 
 #define POP_BIGNUMS(x,y) \
-	F_ARRAY *y = untag_bignum_fast(dpop()); \
-	F_ARRAY *x = untag_bignum_fast(dpop());
+	F_ARRAY *y = untag_object(dpop()); \
+	F_ARRAY *x = untag_object(dpop());
 
 void primitive_bignum_eq(void)
 {
@@ -276,7 +276,7 @@ void primitive_bignum_xor(void)
 void primitive_bignum_shift(void)
 {
 	F_FIXNUM y = untag_fixnum_fast(dpop());
-        F_ARRAY* x = untag_bignum_fast(dpop());
+        F_ARRAY* x = untag_object(dpop());
 	dpush(tag_bignum(s48_bignum_arithmetic_shift(x,y)));
 }
 
@@ -306,8 +306,7 @@ void primitive_bignum_greatereq(void)
 
 void primitive_bignum_not(void)
 {
-	drepl(tag_bignum(s48_bignum_bitwise_not(
-		untag_bignum_fast(dpeek()))));
+	drepl(tag_bignum(s48_bignum_bitwise_not(untag_object(dpeek()))));
 }
 
 void box_signed_1(s8 n)
@@ -365,7 +364,7 @@ s64 to_signed_8(CELL obj)
 	case FIXNUM_TYPE:
 		return untag_fixnum_fast(obj);
 	case BIGNUM_TYPE:
-		return s48_bignum_to_long_long(untag_array_fast(obj));
+		return s48_bignum_to_long_long(untag_object(obj));
 	default:
 		type_error(BIGNUM_TYPE,obj);
 		return -1;
@@ -387,7 +386,7 @@ u64 to_unsigned_8(CELL obj)
 	case FIXNUM_TYPE:
 		return untag_fixnum_fast(obj);
 	case BIGNUM_TYPE:
-		return s48_bignum_to_ulong_long(untag_array_fast(obj));
+		return s48_bignum_to_ulong_long(untag_object(obj));
 	default:
 		type_error(BIGNUM_TYPE,obj);
 		return -1;
@@ -410,9 +409,9 @@ CELL unbox_array_size(void)
 		}
 	case BIGNUM_TYPE:
 		{
-			bignum_type zero = untag_bignum_fast(bignum_zero);
+			bignum_type zero = untag_object(bignum_zero);
 			bignum_type max = s48_ulong_to_bignum(ARRAY_SIZE_MAX);
-			bignum_type n = untag_bignum_fast(dpeek());
+			bignum_type n = untag_object(dpeek());
 			if(s48_bignum_compare(n,zero) != bignum_comparison_less
 				&& s48_bignum_compare(n,max) == bignum_comparison_less)
 			{

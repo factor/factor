@@ -791,6 +791,9 @@ bignum_divide_unsigned_large_denominator(bignum_type numerator,
   bignum_length_type length_n = ((BIGNUM_LENGTH (numerator)) + 1);
   bignum_length_type length_d = (BIGNUM_LENGTH (denominator));
 
+  REGISTER_BIGNUM(numerator);
+  REGISTER_BIGNUM(denominator);
+
   bignum_type q =
     ((quotient != ((bignum_type *) 0))
      ? (allot_bignum ((length_n - length_d), q_negative_p))
@@ -799,6 +802,9 @@ bignum_divide_unsigned_large_denominator(bignum_type numerator,
   REGISTER_BIGNUM(q);
   bignum_type u = (allot_bignum (length_n, r_negative_p));
   UNREGISTER_BIGNUM(q);
+
+  UNREGISTER_BIGNUM(denominator);
+  UNREGISTER_BIGNUM(numerator);
 
   int shift = 0;
   BIGNUM_ASSERT (length_d > 1);

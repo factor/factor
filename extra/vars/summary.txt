@@ -1,0 +1,1 @@
+Shorthand notation for variables

@@ -38,9 +38,9 @@ HMODULE hFactorDll;
 
 void init_ffi()
 {
-	hFactorDll = GetModuleHandle(L"factor.dll");
+	hFactorDll = GetModuleHandle(FACTOR_DLL);
 	if(!hFactorDll)
-		fatal_error("GetModuleHandle(\"factor.dll\") failed", 0);
+		fatal_error("GetModuleHandle(\"" FACTOR_DLL_NAME "\") failed", 0);
 }
 
 void ffi_dlopen (F_DLL *dll, bool error)
@@ -60,7 +60,7 @@ void ffi_dlopen (F_DLL *dll, bool error)
 	dll->dll = module;
 }
 
-void *ffi_dlsym (F_DLL *dll, F_SYMBOL *symbol)
+void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol)
 {
 	return GetProcAddress(dll ? (HMODULE)dll->dll : hFactorDll, symbol);
 }
@@ -71,37 +71,41 @@ void ffi_dlclose(F_DLL *dll)
 	dll->dll = NULL;
 }
 
-static F_CHAR *image_path = 0;
-
-const F_CHAR *default_image_path(void)
+static void get_full_exe_path(F_CHAR *path, DWORD size)
 {
-	F_CHAR path_temp[MAX_UNICODE_PATH];
-	if(!image_path)
-	{
-		int ret;
-		if(!(ret = GetModuleFileName(GetModuleHandle(NULL),
-			path_temp,MAX_UNICODE_PATH)))
-			return 0;
-
-		F_CHAR *ptr;
-		ptr = wcsrchr(path_temp, '\\');
-		if(!ptr)
-			return 0;
-
-		snwprintf(ptr, MAX_UNICODE_PATH - (ptr - path_temp),
-			L"\\factor.image");
-		image_path = _wcsdup(path_temp);
-		if(!image_path)
-			fatal_error("Out of memory in default_image_path",0);
-	}
-	return image_path;
+	DWORD ret;
+	HMODULE hModule = GetModuleHandle(NULL);
+	if(!hModule)
+		fatal_error("GetModuleHandle(NULL) failed", 0);
+	ret = GetModuleFileName(hModule, path, size);
+	if(!ret)
+		fatal_error("GetModuleFileName(...) failed", 0);
 }
 
-F_CHAR *char_to_F_CHAR(char *ptr)
+/* You must free() this yourself. */
+const F_CHAR *default_image_path(void)
 {
-	F_CHAR buffer[MAX_UNICODE_PATH];
-	mbstowcs(buffer, ptr, MAX_UNICODE_PATH-2);
-	return _wcsdup(buffer);
+	F_CHAR full_path[MAX_UNICODE_PATH];
+	F_CHAR *ptr;
+	F_CHAR path_temp[MAX_UNICODE_PATH];
+
+	get_full_exe_path(full_path, MAX_UNICODE_PATH);
+
+	if((ptr = wcsrchr(full_path, '.')))
+		*ptr = 0;
+
+	snwprintf(path_temp, sizeof(path_temp)-1, L"%s.image", full_path); 
+	path_temp[sizeof(path_temp) - 1] = 0;
+
+	return safe_strdup(path_temp);
+}
+
+/* You must free() this yourself. */
+const F_CHAR *vm_executable_path(void)
+{
+	F_CHAR full_path[MAX_UNICODE_PATH];
+	get_full_exe_path(full_path, MAX_UNICODE_PATH);
+	return safe_strdup(full_path);
 }
 
 void primitive_stat(void)
@@ -122,7 +126,7 @@ void primitive_stat(void)
 	else
 	{
 		box_boolean(st.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
-		box_signed_4(0);
+		dpush(tag_fixnum(0));
 		box_unsigned_8(
 			(u64)st.nFileSizeLow | (u64)st.nFileSizeHigh << 32);
 		box_unsigned_8(
@@ -144,10 +148,11 @@ void primitive_read_dir(void)
 		do
 		{
 			REGISTER_ARRAY(result);
-			CELL name = tag_object(from_u16_string(
-				find_data.cFileName));
+			CELL name = tag_object(from_u16_string(find_data.cFileName));
+			CELL dirp = tag_boolean(find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
+			CELL pair = allot_array_2(name,dirp);
 			UNREGISTER_ARRAY(result);
-			GROWABLE_ADD(result,name);
+			GROWABLE_ADD(result,pair);
 		}
 		while (FindNextFile(dir, &find_data));
 		CloseHandle(dir);
@@ -204,7 +209,13 @@ long getpagesize(void)
 	return g_pagesize;
 }
 
+void sleep_millis(DWORD msec)
+{
+    Sleep(msec);
+}
+
 void run(void)
 {
 	interpreter();
 }
+

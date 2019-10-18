@@ -1,0 +1,1 @@
+libmad MP3 library binding

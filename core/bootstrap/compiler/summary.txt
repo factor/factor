@@ -1,0 +1,1 @@
+Loading the compiler in stage 2 bootstrap

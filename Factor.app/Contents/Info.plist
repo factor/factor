@@ -20,7 +20,7 @@
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
-	<string>Factor</string>
+	<string>factor</string>
 	<key>CFBundleIconFile</key>
 	<string>FRaptorMix.icns</string>
 	<key>CFBundleIdentifier</key>

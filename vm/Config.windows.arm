@@ -1,4 +1,0 @@
-CFLAGS += -DWINCE
-LIBS = -lm
-PLAF_SUFFIX = .exe
-include vm/Config.windows vm/Config.arm

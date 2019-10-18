@@ -39,14 +39,18 @@ void load_image(F_PARAMETERS *p);
 void init_objects(F_HEADER *h);
 bool save_image(const F_CHAR *file);
 void primitive_save_image(void);
+void primitive_save_image_and_exit(void);
 
 /* relocation base of currently loaded image's data heap */
 CELL data_relocation_base;
 
 INLINE void data_fixup(CELL *cell)
 {
-	if(TAG(*cell) != FIXNUM_TYPE && *cell != F)
-		*cell += (tenured.start - data_relocation_base);
+	if(immediate_p(*cell))
+		return;
+
+	F_ZONE *tenured = &data_heap->generations[TENURED];
+	*cell += (tenured->start - data_relocation_base);
 }
 
 CELL code_relocation_base;

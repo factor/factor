@@ -1,5 +1,5 @@
 /* Is profiling on? */
-bool profiling;
+DLLEXPORT bool profiling;
 
 /* Callstack top pointer */
 F_INTERP_FRAME *cs;
@@ -30,6 +30,7 @@ typedef enum {
 	EXECUTABLE_ENV,		/* runtime executable path name */
 	YIELD_CALLBACK_ENV,     /* used when Factor is embedded in a C app */
 	EMBEDDED_ENV,		/* are we embedded in another app? */
+	SLEEP_CALLBACK_ENV,     /* used when Factor is embedded in a C app */
 } F_ENVTYPE;
 
 /* TAGGED user environment data; see getenv/setenv prims */
@@ -137,15 +138,16 @@ void primitive_execute(void);
 void primitive_call(void);
 void primitive_ifte(void);
 void primitive_dispatch(void);
-void primitive_profiling(void);
 void primitive_getenv(void);
 void primitive_setenv(void);
 void primitive_exit(void);
 void primitive_os_env(void);
 void primitive_eq(void);
 void primitive_millis(void);
+void primitive_sleep(void);
 void primitive_type(void);
 void primitive_tag(void);
+void primitive_class_hash(void);
 void primitive_slot(void);
 void primitive_set_slot(void);
 
@@ -208,3 +210,5 @@ INLINE void type_check(CELL type, CELL tagged)
 {
 	if(type_of(tagged) != type) type_error(type,tagged);
 }
+
+void primitive_profiling(void);

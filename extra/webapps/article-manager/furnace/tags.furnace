@@ -1,0 +1,6 @@
+<% USING: kernel namespaces sequences webapps.article-manager.database io sorting ; %>
+	<ul>
+      <% "arg1" get [ <=> ] sort [ %>
+       <li><a href="<% "responder-url" get write "tag/" write dup write "/" write %>"><% write %></a></li>
+      <% ] each %>
+	</ul>

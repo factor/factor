@@ -35,5 +35,6 @@
 #include "alien.h"
 #include "primitives.h"
 #include "factor.h"
+#include "utilities.h"
 
 #endif /* __FACTOR_MASTER_H__ */

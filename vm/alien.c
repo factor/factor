@@ -7,7 +7,7 @@ void primitive_expired(void)
 
 	if(type_of(object) == ALIEN_TYPE)
 	{
-		F_ALIEN *alien = untag_alien_fast(object);
+		F_ALIEN *alien = untag_object(object);
 		drepl(tag_boolean(alien->expired));
 	}
 	else
@@ -19,18 +19,16 @@ void *alien_offset(CELL object)
 {
 	F_ALIEN *alien;
 	F_BYTE_ARRAY *byte_array;
-	F_BIT_ARRAY *bit_array;
 
 	switch(type_of(object))
 	{
 	case BYTE_ARRAY_TYPE:
-		byte_array = untag_byte_array_fast(object);
-		return byte_array + 1;
 	case BIT_ARRAY_TYPE:
-		bit_array = untag_bit_array_fast(object);
-		return bit_array + 1;
+	case FLOAT_ARRAY_TYPE:
+		byte_array = untag_object(object);
+		return byte_array + 1;
 	case ALIEN_TYPE:
-		alien = untag_alien_fast(object);
+		alien = untag_object(object);
 		if(alien->expired)
 			simple_error(ERROR_EXPIRED,object,F);
 		return alien_offset(alien->alien) + alien->displacement;
@@ -127,14 +125,15 @@ DEF_ALIEN_SLOT(signed_cell,F_FIXNUM,box_signed_cell,to_fixnum)
 DEF_ALIEN_SLOT(unsigned_cell,CELL,box_unsigned_cell,to_cell)
 DEF_ALIEN_SLOT(signed_8,s64,box_signed_8,to_signed_8)
 DEF_ALIEN_SLOT(unsigned_8,u64,box_unsigned_8,to_unsigned_8)
-DEF_ALIEN_SLOT(signed_4,s32,box_signed_cell,to_fixnum)
-DEF_ALIEN_SLOT(unsigned_4,u32,box_unsigned_cell,to_cell)
-DEF_ALIEN_SLOT(signed_2,s16,box_signed_cell,to_fixnum)
-DEF_ALIEN_SLOT(unsigned_2,u16,box_unsigned_cell,to_cell)
-DEF_ALIEN_SLOT(signed_1,u8,box_signed_cell,to_fixnum)
-DEF_ALIEN_SLOT(unsigned_1,u8,box_unsigned_cell,to_cell)
-DEF_ALIEN_SLOT(float,float,box_float,untag_float)
-DEF_ALIEN_SLOT(double,double,box_float,untag_float)
+DEF_ALIEN_SLOT(signed_4,s32,box_signed_4,to_fixnum)
+DEF_ALIEN_SLOT(unsigned_4,u32,box_unsigned_4,to_cell)
+DEF_ALIEN_SLOT(signed_2,s16,box_signed_2,to_fixnum)
+DEF_ALIEN_SLOT(unsigned_2,u16,box_unsigned_2,to_cell)
+DEF_ALIEN_SLOT(signed_1,s8,box_signed_1,to_fixnum)
+DEF_ALIEN_SLOT(unsigned_1,u8,box_unsigned_1,to_cell)
+DEF_ALIEN_SLOT(float,float,box_float,to_float)
+DEF_ALIEN_SLOT(double,double,box_double,to_double)
+DEF_ALIEN_SLOT(cell,void *,box_alien,alien_offset)
 
 /* for FFI calls passing structs by value */
 void to_value_struct(CELL src, void *dest, CELL size)
@@ -151,19 +150,12 @@ void box_value_struct(void *src, CELL size)
 }
 
 /* On OS X, structs <= 8 bytes are returned in registers. */
-void box_struct_1(CELL x)
+void box_small_struct(CELL x, CELL y, CELL size)
 {
-	F_BYTE_ARRAY *array = allot_byte_array(2 * CELLS);
-	put(AREF(array,0),x);
-	dpush(tag_object(array));
-}
-
-void box_struct_2(CELL x, CELL y)
-{
-	F_BYTE_ARRAY *array = allot_byte_array(2 * CELLS);
-	put(AREF(array,0),x);
-	put(AREF(array,1),y);
-	dpush(tag_object(array));
+	CELL data[2];
+	data[0] = x;
+	data[1] = y;
+	box_value_struct(data,size);
 }
 
 /* open a native library and push a handle */

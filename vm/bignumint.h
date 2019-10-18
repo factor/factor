@@ -75,9 +75,9 @@ typedef F_FIXNUM bignum_length_type;
 
 /* These definitions are here to facilitate caching of the constants
    0, 1, and -1. */
-#define BIGNUM_ZERO() untag_array_fast(bignum_zero)
+#define BIGNUM_ZERO() untag_object(bignum_zero)
 #define BIGNUM_ONE(neg_p) \
-   untag_array_fast(neg_p ? bignum_neg_one : bignum_pos_one)
+   untag_object(neg_p ? bignum_neg_one : bignum_pos_one)
 
 #define HD_LOW(digit) ((digit) & BIGNUM_HALF_DIGIT_MASK)
 #define HD_HIGH(digit) ((digit) >> BIGNUM_HALF_DIGIT_LENGTH)

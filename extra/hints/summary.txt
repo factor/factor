@@ -1,0 +1,1 @@
+Syntax sugar for the Factor compiler's specializer hints facility

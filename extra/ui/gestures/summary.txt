@@ -1,0 +1,1 @@
+Translating window system events to gestures, and delivering gestures to gadgets

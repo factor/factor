@@ -1,23 +1,9 @@
 ! Copyright (C) 2004, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: kernel namespaces arrays sequences io inference.backend
+generator debugger math.parser prettyprint words continuations
+vocabs assocs alien.compiler ;
 IN: compiler
-USING: errors generic assocs inference io kernel math
-namespaces generator optimizer parser prettyprint sequences
-threads words arrays ;
-
-SYMBOL: compiler-hook
-
-SYMBOL: compile-errors
-
-SYMBOL: batch-mode
-
-: compile-begins ( word -- )
-    compiler-hook get call
-    "quiet" get batch-mode get or [
-        drop
-    ] [
-        "Compiling " write . flush
-    ] if ;
 
 M: object inference-error-major? drop t ;
 
@@ -25,7 +11,7 @@ M: object inference-error-major? drop t ;
     batch-mode get [
         2array compile-errors get push
     ] [
-        "quiet" get [ drop ] [ error. flush ] if drop
+        "quiet" get [ drop ] [ print-error flush ] if drop
     ] if ;
 
 : begin-batch ( seq -- )
@@ -39,7 +25,7 @@ M: object inference-error-major? drop t ;
     nl
     "While compiling " write dup first pprint ": " print
     nl
-    second error. ;
+    second print-error ;
 
 : (:errors) ( -- seq )
     compile-errors get-global
@@ -65,24 +51,10 @@ M: object inference-error-major? drop t ;
         nl
     ] unless ;
 
-: word-dataflow ( word -- dataflow )
-    [
-        dup "no-effect" word-prop [ no-effect ] when
-        dup dup add-recursive-state
-        [ specialized-def (dataflow) ] keep
-        finish-word 2drop
-    ] with-infer ;
-
-: (compile) ( word -- )
-    dup compiling? not over compound? and [
-        dup compile-begins
-        dup dup word-dataflow optimize generate
-    ] [
-        drop
-    ] if ;
-
 : compile ( word -- )
-    [ (compile) ] with-compiler ;
+    H{ } clone [
+        compiled-xts [ (compile) ] with-variable
+    ] keep >alist finalize-compile ;
 
 : compile-failed ( word error -- )
     dupd compile-error dup update-xt unchanged-word ;
@@ -115,3 +87,6 @@ M: object inference-error-major? drop t ;
     changed-words get [
         dup keys compile-batch clear-assoc
     ] when* ;
+
+: recompile-all ( -- )
+    all-words [ changed-word ] each recompile ;
