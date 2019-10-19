@@ -327,6 +327,9 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
 : read-acute ( string n slice -- string n' acute )
     [ matching-section-delimiter 1array lex-until ] keep swap unclip-last 3array ;
 
+: read-turnoff ( string n slice -- string n' obj )
+    [ lex-factor ] dip swap 2array ;
+
 ! Words like append! and suffix! are allowed for now.
 : read-exclamation ( string n slice -- string n' obj )
     dup { [ "!" sequence= ] [ "#!" sequence= ] } 1||
@@ -376,6 +379,7 @@ DEFER: lex-factor-top*
 
 : lex-factor-fallthrough ( string n/f slice/f ch/f -- string n'/f literal )
     {
+        { char: # [ read-turnoff ] } ! char: \#
         { char: \\ [ read-backslash ] }
         { char: \[ [ read-bracket ] }
         { char: \{ [ read-brace ] }
@@ -428,7 +432,7 @@ DEFER: lex-factor-top*
     } case ;
 
 : lex-factor-nested ( n/f string -- n'/f string literal )
-    "\"\\!:[{(]})<>\s\r\n" slice-til-either lex-factor-nested* ; inline
+    "\"\\!#:[{(]})<>\s\r\n" slice-til-either lex-factor-nested* ; inline
 
 : lex-factor-top* ( n/f string slice/f ch/f -- n'/f string literal )
     {
@@ -454,7 +458,7 @@ DEFER: lex-factor-top*
     } case ;
 
 : lex-factor-top ( string/f n/f -- string/f n'/f literal )
-    "\"\\!:[{(]})<>\s\r\n" slice-til-either lex-factor-top* ; inline
+    "\"\\!#:[{(]})<>\s\r\n" slice-til-either lex-factor-top* ; inline
 
 : check-for-compound-syntax ( seq n/f obj -- seq n/f obj )
     dup length 1 > [ compound-syntax-disallowed ] when ;
