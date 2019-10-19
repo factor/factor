@@ -10,14 +10,17 @@ TUPLE: ws string ;
 CONSTRUCTOR: <ws> ws ( string -- ws )
     dup string>> [ blank? not ] any? [ ws-expected ] when ;
 
+: no-ws ( seq -- seq' )
+    [ ws? ] reject ;
+
 M: ws nth string>> nth ;
 M: ws nth-unsafe string>> nth-unsafe ;
 M: ws length string>> length ;
 
 ! Weird experiment
-M: ws pprint*
+! M: ws pprint*
     ! drop ;
-    string>> dup "\"" "\"" pprint-string ;
+    ! string>> dup "\"" "\"" pprint-string ;
 
 TUPLE: lexed tokens ;
 
@@ -34,7 +37,10 @@ TUPLE: dbrace < lexed tag payload ;
 CONSTRUCTOR: <dbrace> dbrace ( tag payload -- obj ) ;
 
 TUPLE: lcolon < lexed tag payload ;
-CONSTRUCTOR: <lcolon> lcolon ( tag payload -- obj ) ;
+: <lcolon> ( tag payload -- obj )
+    lcolon new
+        swap no-ws >>payload
+        swap >>tag ; inline
 
 TUPLE: ucolon < lexed name effect body ;
 CONSTRUCTOR: <ucolon> ucolon ( name effect body -- obj ) ;

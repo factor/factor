@@ -137,7 +137,7 @@ IN: modern.tests
 
 [ "char: \\" string>literals >strings ] must-fail ! char: \ should be legal eventually
 
-{ { { "\\" { "(" } } } } [ "\\ (" string>literals >strings ] unit-test
+{ { { "\\" { "\\(" } } } } [ [[\ \(]] string>literals >strings ] unit-test
 
 { { "\\[[" } } [ "\\[[" string>literals >strings ] unit-test
 { { "\\[=[" } } [ "\\[=[" string>literals >strings ] unit-test

@@ -49,7 +49,9 @@ DEFER: lex-factor
 : lex-until ( string n tag-sequence -- string n' payload )
     3dup '[
         [
-            lex-factor-top dup f like [ , ] when* [
+            lex-factor-top f like ! <ws> possible
+            dup [ blank? ] all? [ dup , ] unless ! save unless blank
+            [
                 dup [
                     ! } gets a chance, but then also full seq { } after recursion...
                     [ _ ] dip '[ _ sequence= ] any? not
@@ -68,7 +70,9 @@ DEFER: lex-factor-nested
 : lex-colon-until ( string n tag-sequence -- string n' payload )
     '[
         [
-            lex-factor-nested dup f like [ , ] when* [
+            lex-factor-nested f like ! <ws> possible
+            dup [ blank? ] all? [ dup , ] unless ! save unless blank
+            [
                 dup [
                     ! This is for ending COLON: forms like ``A: PRIVATE>``
                     dup section-close? [
@@ -152,11 +156,10 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
     dup [ char: \: = ] count-tail
     '[
         _ [
-            slice-til-not-whitespace drop <ws> ! XXX: whitespace here
-            [ dup [ f unexpected-eof ] unless ] dip
-            [ lex-factor ] dip swap 2array
-        ] replicate
-        ensure-tokens
+            slice-til-not-whitespace drop <ws> drop ! XXX: whitespace here
+            dup [ f unexpected-eof ] unless
+            lex-factor
+        ] replicate ensure-tokens ! concat
     ] dip swap 2array ;
 
 : (strict-upper?) ( string -- ? )
@@ -342,9 +345,8 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
         '[
             _ [
                 slice-til-not-whitespace drop
-                [ <ws> ] [ "escaped string" unexpected-eof ] if*
-                [ lex-factor ] dip
-                swap 2array
+                [ <ws> drop ] [ "escaped string" unexpected-eof ] if*
+                lex-factor
             ] replicate
             ensure-tokens
         ] dip swap 2array
@@ -369,7 +371,7 @@ DEFER: lex-factor-top*
 ! Return it to the main loop as a ws form.
 : read-token-or-whitespace ( string n slice -- string n' slice/f )
     dup length 0 = [
-        merge-slice-til-not-whitespace <ws>
+        merge-slice-til-not-whitespace ! <ws>
     ] when ;
 
 : lex-factor-fallthrough ( string n/f slice/f ch/f -- string n'/f literal )
@@ -466,14 +468,15 @@ DEFER: lex-factor-top*
     [
         ! Compound syntax loop
         [
-            lex-factor-top f like [ , ] when*
+            lex-factor-top f like
+            dup [ blank? ] all? [ drop ] [ , ] if ! save unless blank
             ! concatenated syntax ( a )[ a 1 + ]( b )
             check-compound-loop
         ] loop
     ] { } make
     check-for-compound-syntax
     ! concat ! "ALIAS: n*quot (n*quot)" string>literals ... breaks here
-    ?first f like ;
+    ?first ;
 
 : string>literals ( string -- sequence )
     [
