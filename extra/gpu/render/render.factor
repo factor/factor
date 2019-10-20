@@ -509,7 +509,7 @@ DEFER: [bind-uniform-tuple]
         { "<" [ scan-word parse-array-def [ first3 uniform boa ] map ] }
         { "{" [
             uniform-tuple
-            \ } parse-until parse-array-def swap prefix
+            \ \} parse-until parse-array-def swap prefix
             [ first3 uniform boa ] map
         ] }
     } case ;

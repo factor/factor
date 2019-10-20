@@ -37,6 +37,6 @@ M: identity-hash-set clone
 M: identity-hash-set set-like
     drop dup identity-hash-set? [ ?members >identity-hash-set ] unless ; inline
 
-SYNTAX: \IHS{ \ } [ >identity-hash-set ] parse-literal ;
+SYNTAX: \IHS{ \ \} [ >identity-hash-set ] parse-literal ;
 
 { "hash-sets.identity" "prettyprint" } "hash-sets.identity.prettyprint" require-when

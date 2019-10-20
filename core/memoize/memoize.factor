@@ -75,7 +75,7 @@ PRIVATE>
 
 PREDICATE: memoized < word "memoize" word-prop >boolean ;
 
-M: memoized definer drop \ MEMO: \ ; ;
+M: memoized definer drop \ \MEMO: \ \; ;
 
 M: memoized definition "memo-quot" word-prop ;
 

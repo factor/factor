@@ -192,11 +192,11 @@ TUPLE: row-traverser shaped-array index ;
 
 GENERIC: next-index ( object -- index )
 
-SYNTAX: \sa{ \ } [ >shaped-array ] parse-literal ;
+SYNTAX: \sa{ \ \} [ >shaped-array ] parse-literal ;
 
 ! M: row-array pprint* shaped-array>array pprint* ;
 ! M: col-array pprint* shaped-array>array flip pprint* ;
-M: shaped-array pprint-delims drop \ sa{ \ } ;
+M: shaped-array pprint-delims drop \ \sa{ \ \} ;
 M: shaped-array >pprint-sequence shaped-array>array ;
 M: shaped-array pprint* pprint-object ;
 M: shaped-array pprint-narrow? drop f ;

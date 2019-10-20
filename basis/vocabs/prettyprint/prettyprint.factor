@@ -10,7 +10,7 @@ IN: vocabs.prettyprint
     [ vocab-name ] [ lookup-vocab vocab-style ] bi styled-text ;
 
 : pprint-in ( vocab -- )
-    [ \ IN: pprint-word pprint-vocab ] with-pprint ;
+    [ \ \IN: pprint-word pprint-vocab ] with-pprint ;
 
 <PRIVATE
 
@@ -20,9 +20,9 @@ IN: vocabs.prettyprint
 : pprint-using ( seq -- )
     "syntax" lookup-vocab '[ _ = ] reject
     sort-vocabs [
-        \ USING: pprint-word
+        \ \USING: pprint-word
         [ pprint-vocab ] each
-        \ ; pprint-word
+        \ \; pprint-word
     ] with-pprint ;
 
 GENERIC: pprint-qualified ( qualified -- )
@@ -30,33 +30,33 @@ GENERIC: pprint-qualified ( qualified -- )
 M: qualified pprint-qualified ( qualified -- )
     [
         dup [ vocab>> vocab-name ] [ prefix>> ] bi = [
-            \ QUALIFIED: pprint-word
+            \ \QUALIFIED: pprint-word
             vocab>> pprint-vocab
         ] [
-            \ QUALIFIED-WITH: pprint-word
+            \ \QUALIFIED-WITH: pprint-word
             [ vocab>> pprint-vocab ] [ prefix>> text ] bi
         ] if
     ] with-pprint ;
 
 M: from pprint-qualified ( from -- )
     [
-        \ FROM: pprint-word
+        \ \FROM: pprint-word
         [ vocab>> pprint-vocab "=>" text ]
         [ names>> [ text ] each ] bi
-        \ ; pprint-word
+        \ \; pprint-word
     ] with-pprint ;
 
 M: exclude pprint-qualified ( exclude -- )
     [
-        \ EXCLUDE: pprint-word
+        \ \EXCLUDE: pprint-word
         [ vocab>> pprint-vocab "=>" text ]
         [ names>> [ text ] each ] bi
-        \ ; pprint-word
+        \ \; pprint-word
     ] with-pprint ;
 
 M: rename pprint-qualified ( rename -- )
     [
-        \ RENAME: pprint-word
+        \ \RENAME: pprint-word
         [ word>> text ]
         [ vocab>> text "=>" text ]
         [ words>> >alist first first text ]

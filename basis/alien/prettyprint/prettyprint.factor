@@ -11,12 +11,12 @@ M: alien pprint*
     {
         { [ dup expired? ] [ drop \ BAD-ALIEN pprint-word ] }
         { [ dup pinned-c-ptr? not ] [ drop "( displaced alien )" text ] }
-        [ \ alien: [ alien-address >hex text ] pprint-prefix ]
+        [ \ \alien: [ alien-address >hex text ] pprint-prefix ]
     } cond ;
 
 M: dll pprint* dll-path dup "DLL\" " "\"" pprint-string ;
 
-M: c-type-word definer drop \ C-TYPE: f ;
+M: c-type-word definer drop \ \C-TYPE: f ;
 M: c-type-word definition drop f ;
 M: c-type-word declarations. drop ;
 
@@ -37,9 +37,9 @@ PRIVATE>
     [ record-c-type ] [ c-type-string ] [ ] tri present-text ;
 
 M: pointer pprint*
-    <flow \ pointer: pprint-word to>> pprint* block> ;
+    <flow \ \pointer: pprint-word to>> pprint* block> ;
 
-M: typedef-word definer drop \ TYPEDEF: f ;
+M: typedef-word definer drop \ \TYPEDEF: f ;
 
 M: typedef-word synopsis*
     {
@@ -60,7 +60,7 @@ M: typedef-word synopsis*
     ] if-empty ;
 
 : pprint-library ( library -- )
-    [ \ LIBRARY: [ text ] pprint-prefix ] when* ;
+    [ \ \LIBRARY: [ text ] pprint-prefix ] when* ;
 
 : pprint-function ( word quot -- )
     [ def>> first pprint-c-type ]
@@ -79,7 +79,7 @@ PREDICATE: alien-function-alias-word < word
     } 1&& ;
 
 M: alien-function-alias-word definer
-    drop \ FUNCTION-ALIAS: f ;
+    drop \ \FUNCTION-ALIAS: f ;
 M: alien-function-alias-word definition drop f ;
 M: alien-function-alias-word synopsis*
     {
@@ -95,7 +95,7 @@ PREDICATE: alien-function-word < alien-function-alias-word
     [ def>> third ] [ name>> ] bi = ;
 
 M: alien-function-word definer
-    drop \ FUNCTION: f ;
+    drop \ \FUNCTION: f ;
 M: alien-function-word synopsis*
     {
         [ seeing-word ]
@@ -108,7 +108,7 @@ PREDICATE: alien-callback-type-word < typedef-word
     "callback-effect" word-prop >boolean ;
 
 M: alien-callback-type-word definer
-    drop \ CALLBACK: f ;
+    drop \ \CALLBACK: f ;
 M: alien-callback-type-word definition drop f ;
 M: alien-callback-type-word synopsis*
     {
@@ -126,7 +126,7 @@ M: alien-callback-type-word synopsis*
     } cleave ;
 
 M: enum-c-type-word definer
-    drop \ ENUM: \ ; ;
+    drop \ \ENUM: \ \; ;
 M: enum-c-type-word synopsis*
     {
         [ seeing-word ]

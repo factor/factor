@@ -364,7 +364,7 @@ PRIVATE>
 
 <PRIVATE
 : parse-struct-slot ( -- slot )
-    scan-token scan-c-type \ } parse-until <struct-slot-spec> ;
+    scan-token scan-c-type \ \} parse-until <struct-slot-spec> ;
 
 : parse-struct-slots ( slots -- slots' more? )
     scan-token {
@@ -397,10 +397,10 @@ SYNTAX: S@
 
 <PRIVATE
 : scan-c-type* ( -- c-type/param )
-    scan-token dup "{" = [ drop \ } parse-until >array ] [ search ] if ;
+    scan-token dup "{" = [ drop \ \} parse-until >array ] [ search ] if ;
 
 : parse-struct-slot* ( accum -- accum )
-    scan-string-param scan-c-type* \ } parse-until
+    scan-string-param scan-c-type* \ \} parse-until
     [ <struct-slot-spec> suffix! ] 3curry append! ;
 
 : parse-struct-slots* ( accum -- accum more? )

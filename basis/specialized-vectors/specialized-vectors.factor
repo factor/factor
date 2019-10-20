@@ -25,7 +25,7 @@ SPECIALIZED-ARRAY: ${type}
 VECTORIZED: ${type} ${type}-array <${type}-array>
 >>
 
-SYNTAX: ${type}-vector{ \ } [ >${type}-vector ] parse-literal ;
+SYNTAX: ${type}-vector{ \ \} [ >${type}-vector ] parse-literal ;
 
 INSTANCE: ${type}-vector specialized-vector
 
@@ -33,7 +33,7 @@ M: ${type}-vector contract 2drop ; inline
 
 M: ${type}-vector element-size drop \ ${type} heap-size ; inline
 
-M: ${type}-vector pprint-delims drop \ ${type}-vector{ \ } ;
+M: ${type}-vector pprint-delims drop \ \${type}-vector{ \ \} ;
 
 M: ${type}-vector >pprint-sequence ;
 

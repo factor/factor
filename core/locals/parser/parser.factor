@@ -40,7 +40,7 @@ SINGLETON: lambda-parser
     ] with-variables ; inline
 
 : (parse-lambda) ( assoc -- quot )
-    [ \ ] parse-until >quotation ] with-lambda-scope ;
+    [ \ \] parse-until >quotation ] with-lambda-scope ;
 
 : parse-lambda ( -- lambda )
     parse-local-defs

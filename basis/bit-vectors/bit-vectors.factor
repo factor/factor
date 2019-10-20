@@ -7,7 +7,7 @@ IN: bit-vectors
 
 VECTORIZED: bit bit-array <bit-array>
 
-SYNTAX: \?V{ \ } [ >bit-vector ] parse-literal ;
+SYNTAX: \?V{ \ \} [ >bit-vector ] parse-literal ;
 
 M: bit-vector contract 2drop ;
 

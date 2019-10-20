@@ -410,14 +410,14 @@ PRIVATE>
     T{ tree f f 0 } assoc-clone-like ;
 
 SYNTAX: \TREE{
-    \ } [ >tree ] parse-literal ;
+    \ \} [ >tree ] parse-literal ;
 
 <PRIVATE
 
 M: tree assoc-like drop dup tree? [ >tree ] unless ;
 
 M: tree assoc-size count>> ;
-M: tree pprint-delims drop \ TREE{ \ } ;
+M: tree pprint-delims drop \ \TREE{ \ \} ;
 M: tree >pprint-sequence >alist ;
 M: tree pprint-narrow? drop t ;
 

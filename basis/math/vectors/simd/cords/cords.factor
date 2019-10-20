@@ -59,9 +59,9 @@ INLINE-FUNCTOR: simd-128-cord ( type/2: existing-word type: name -- ) [[
     M: ${type} pprint* pprint-object ;
 
     <<
-    SYNTAX: ${type}{ \ } [ >${type} ] parse-literal ;
+    SYNTAX: \${type}{ \ \} [ >${type} ] parse-literal ;
     >>
-    M: ${type} pprint-delims drop \ ${type}{ \ } ;
+    M: ${type} pprint-delims drop \ \${type}{ \ \} ;
 ]]
 >>
 

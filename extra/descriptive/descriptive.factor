@@ -40,7 +40,7 @@ SYNTAX: \DESCRIPTIVE: (:) define-descriptive ;
 PREDICATE: descriptive < word
     "descriptive-definition" word-prop >boolean ;
 
-M: descriptive definer drop \ DESCRIPTIVE: \ ; ;
+M: descriptive definer drop \ \DESCRIPTIVE: \ \; ;
 
 M: descriptive definition
     "descriptive-definition" word-prop ;
@@ -49,7 +49,7 @@ SYNTAX: \DESCRIPTIVE:: (::) define-descriptive ;
 
 INTERSECTION: descriptive-lambda descriptive lambda-word ;
 
-M: descriptive-lambda definer drop \ DESCRIPTIVE:: \ ; ;
+M: descriptive-lambda definer drop \ \DESCRIPTIVE:: \ \; ;
 
 M: descriptive-lambda definition
     "lambda" word-prop body>> ;

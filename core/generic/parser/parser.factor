@@ -42,9 +42,9 @@ ERROR: bad-method-effect ;
 
 : parse-method-definition ( -- quot )
     scan-datum {
-        { \ ( [ ")" parse-effect check-method-effect parse-definition ] }
-        { \ ; [ [ ] ] }
-        [ ?execute-parsing \ ; parse-until append >quotation ]
+        { \ \( [ ")" parse-effect check-method-effect parse-definition ] }
+        { \ \; [ [ ] ] }
+        [ ?execute-parsing \ \; parse-until append >quotation ]
     } case ;
 
 : (M:) ( -- method def )

@@ -138,7 +138,7 @@ INLINE-FUNCTOR: blas-vector ( type: name t: string -- ) [[
         [ ${type} >c-array underlying>> ] [ length ] bi 1 <${type}-blas-vector> ;
     >>
     <<
-    SYNTAX: ${t}vector{ \ } [ >${type}-blas-vector ] parse-literal ;
+    SYNTAX: \${t}vector{ \ \} [ >${type}-blas-vector ] parse-literal ;
     >>
 
     M: ${type}-blas-vector clone
@@ -166,7 +166,7 @@ INLINE-FUNCTOR: blas-vector ( type: name t: string -- ) [[
         (prepare-scal) [ ${t}SCAL ] dip ;
 
     M: ${type}-blas-vector pprint-delims
-        drop \ ${t}vector{ \ } ;
+        drop \ \${t}vector{ \ \} ;
 ]]
 >>
 

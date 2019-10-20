@@ -25,7 +25,7 @@ M: lambda-word subwords
         [ vars>> % ] [ body>> [ lambda-subwords ] each ] bi
     ] { } make ;
 
-M: lambda-word definer drop \ :: \ ; ;
+M: lambda-word definer drop \ \:: \ \; ;
 
 M: lambda-word definition
     "lambda" word-prop body>> ;
@@ -35,7 +35,7 @@ M: lambda-word reset-word
 
 INTERSECTION: lambda-macro macro lambda-word ;
 
-M: lambda-macro definer drop \ MACRO:: \ ; ;
+M: lambda-macro definer drop \ \MACRO:: \ \; ;
 
 M: lambda-macro definition
     "lambda" word-prop body>> ;
@@ -45,7 +45,7 @@ M: lambda-macro reset-word
 
 INTERSECTION: lambda-method method lambda-word ;
 
-M: lambda-method definer drop \ M:: \ ; ;
+M: lambda-method definer drop \ \M:: \ \; ;
 
 M: lambda-method definition
     "lambda" word-prop body>> ;
@@ -55,7 +55,7 @@ M: lambda-method reset-word
 
 INTERSECTION: lambda-memoized memoized lambda-word ;
 
-M: lambda-memoized definer drop \ MEMO:: \ ; ;
+M: lambda-memoized definer drop \ \MEMO:: \ \; ;
 
 M: lambda-memoized definition
     "lambda" word-prop body>> ;

@@ -23,9 +23,9 @@ PRIVATE>
 
 SYNTAX: $ scan-word expand-literal >vector ;
 SYNTAX: \$[ parse-quotation with-datastack >vector ;
-SYNTAX: \${ \ } [ expand-literals ] parse-literal ;
+SYNTAX: \${ \ \} [ expand-literals ] parse-literal ;
 SYNTAX: \flags{
-    \ } [
+    \ \} [
         expand-literals
         0 [ bitor ] reduce
     ] parse-literal ;

@@ -251,7 +251,7 @@ SYNTAX: \M:
 ! Definition protocol. We qualify core generics here
 QUALIFIED: syntax
 
-syntax:M: generic definer drop \ MULTI-GENERIC: f ;
+syntax:M: generic definer drop \ \MULTI-GENERIC: f ;
 
 syntax:M: generic definition drop f ;
 
@@ -277,7 +277,7 @@ syntax:M: method-spec forget*
     unclip method forget* ;
 
 syntax:M: method-body definer
-    drop \ METHOD: \ ; ;
+    drop \ \METHOD: \ \; ;
 
 syntax:M: method-body synopsis*
     dup definer.

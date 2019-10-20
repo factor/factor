@@ -307,7 +307,7 @@ c:<c-type>
 : ${type}-with ( n -- v ) $[ ${type}-coercer ] call \ ${type}-rep (simd-with) \ ${type} boa ; inline
 : ${type}-cast ( v -- v' ) underlying>> \ ${type} boa ; inline
 : >${type} ( seq -- simd ) \ ${type} new clone-like ; inline
-SYNTAX: ${type}{ \ } [ >${type} ] parse-literal ;
+SYNTAX: \${type}{ \ \} [ >${type} ] parse-literal ;
 
 M: ${type} new-underlying    drop \ ${type} boa ; inline
 M: ${type} simd-rep          drop ${type}-rep ; inline
@@ -336,7 +336,7 @@ DEFER: ${type}-boa
 $[ $[ ${type}-rep rep-length ] "n" <array> { "v" } <effect> ] define-inline
 >>
 
-M: ${type} pprint-delims drop \ ${type}{ \ } ;
+M: ${type} pprint-delims drop \ \${type}{ \ \} ;
 
 INSTANCE: ${type} sequence
 

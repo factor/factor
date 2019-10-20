@@ -5,7 +5,7 @@ IN: linked-assocs.prettyprint
 PREDICATE: linked-hash < linked-assoc
     [ class-of linked-assoc = ] [ assoc>> hashtable? ] bi and ;
 
-M: linked-hash pprint-delims drop \ LH{ \ } ;
+M: linked-hash pprint-delims drop \ \LH{ \ \} ;
 
 M: linked-hash >pprint-sequence >alist ;
 

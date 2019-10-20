@@ -100,7 +100,7 @@ TUPLE: slides < book ;
     first3 2 over length [a,b] [ head 3array ] with with with map ;
 
 SYNTAX: \strip-tease{
-    \ } [ strip-tease ] parse-literal ;
+    \ \} [ strip-tease ] parse-literal ;
 
 \ slides H{
     { T{ button-down } [ request-focus ] }

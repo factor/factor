@@ -16,7 +16,7 @@ PREDICATE: role < mixin-class
     scan-new-class scan-token {
         { ";" [ { } { } ] }
         { "<" [ scan-word 1array [ parse-tuple-slots ] { } make ] }
-        { "<{" [ \ } parse-until >array [ parse-tuple-slots ] { } make ] }
+        { "<{" [ \ \} parse-until >array [ parse-tuple-slots ] { } make ] }
         [ { } swap [ parse-slot-name [ parse-tuple-slots ] when ] { } make ]
     } case ;
 

@@ -37,7 +37,7 @@ ERROR: bad-array-type ;
 
 : scan-c-type ( -- c-type )
     scan-token {
-        { [ dup "{" = ] [ drop \ } parse-until >array ] }
+        { [ dup "{" = ] [ drop \ \} parse-until >array ] }
         { [ dup "pointer:" = ] [ drop scan-c-type <pointer> ] }
         [ parse-c-type ]
     } cond ;

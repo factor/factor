@@ -40,10 +40,10 @@ ERROR: malformed-complex obj ;
 : parse-complex ( seq -- complex )
     dup length 2 = [ first2-unsafe rect> ] [ malformed-complex ] if ;
 
-SYNTAX: \C{ \ } [ parse-complex ] parse-literal ;
+SYNTAX: \C{ \ \} [ parse-complex ] parse-literal ;
 
 USE: prettyprint.custom
 
 M: complex pprint* pprint-object ;
-M: complex pprint-delims drop \ C{ \ } ;
+M: complex pprint-delims drop \ \C{ \ \} ;
 M: complex >pprint-sequence >rect 2array ;

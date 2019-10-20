@@ -33,7 +33,7 @@ PREDICATE: macro < word "macro" word-prop >boolean ;
 
 M: macro make-inline cannot-be-inline ;
 
-M: macro definer drop \ MACRO: \ ; ;
+M: macro definer drop \ \MACRO: \ \; ;
 
 M: macro definition "macro" word-prop ;
 

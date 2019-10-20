@@ -36,6 +36,6 @@ M: sequence-hash-set clone
 : >sequence-hash-set ( members -- shash-set )
     [ <sequence-wrapper> ] map >hash-set sequence-hash-set boa ;
 
-SYNTAX: \SHS{ \ } [ >sequence-hash-set ] parse-literal ;
+SYNTAX: \SHS{ \ \} [ >sequence-hash-set ] parse-literal ;
 
 { "hash-sets.sequences" "prettyprint" } "hash-sets.sequences.prettyprint" require-when

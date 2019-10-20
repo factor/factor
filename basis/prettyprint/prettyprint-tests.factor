@@ -406,7 +406,7 @@ M: integer harhar M\\ integer harhar drop ;
 M: maybe{ har } harhar ;
 
 USING: kernel math prettyprint.tests ;
-M: integer harhar M\\ integer harhar drop ;\n"
+M: integer harhar M\\\\ integer harhar drop ;\n"
 } [
     [ \ harhar see-methods ] with-string-writer
 ] unit-test

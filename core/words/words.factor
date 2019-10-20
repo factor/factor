@@ -25,7 +25,7 @@ M: word execute (execute) ;
 
 M: word <=> [ [ name>> ] [ vocabulary>> ] bi 2array ] compare ;
 
-M: word definer drop \ : \ ; ;
+M: word definer drop \ \: \ \; ;
 
 M: word definition def>> ;
 
@@ -235,7 +235,7 @@ ERROR: bad-create name vocab ;
 
 PREDICATE: parsing-word < word "parsing" word-prop ;
 
-M: parsing-word definer drop \ SYNTAX: \ ; ;
+M: parsing-word definer drop \ \SYNTAX: \ \; ;
 
 : define-syntax ( word quot -- )
     [ drop ] [ define ] 2bi t "parsing" set-word-prop ;

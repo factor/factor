@@ -162,6 +162,6 @@ M: avl assoc-like
     drop dup avl? [ >avl ] unless ;
 
 SYNTAX: \AVL{
-    \ } [ >avl ] parse-literal ;
+    \ \} [ >avl ] parse-literal ;
 
-M: avl pprint-delims drop \ AVL{ \ } ;
+M: avl pprint-delims drop \ \AVL{ \ \} ;

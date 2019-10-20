@@ -143,19 +143,19 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "[" [ parse-quotation suffix! ] define-core-syntax
-    "{" [ \ } [ >array ] parse-literal ] define-core-syntax
-    "V{" [ \ } [ >vector ] parse-literal ] define-core-syntax
-    "B{" [ \ } [ >byte-array ] parse-literal ] define-core-syntax
-    "BV{" [ \ } [ >byte-vector ] parse-literal ] define-core-syntax
-    "H{" [ \ } [ parse-hashtable ] parse-literal ] define-core-syntax
+    "{" [ \ \} [ >array ] parse-literal ] define-core-syntax
+    "V{" [ \ \} [ >vector ] parse-literal ] define-core-syntax
+    "B{" [ \ \} [ >byte-array ] parse-literal ] define-core-syntax
+    "BV{" [ \ \} [ >byte-vector ] parse-literal ] define-core-syntax
+    "H{" [ \ \} [ parse-hashtable ] parse-literal ] define-core-syntax
     "T{" [ parse-tuple-literal suffix! ] define-core-syntax
     "TH{" [ parse-tuple-hash-literal suffix! ] define-core-syntax
-    "W{" [ \ } [ first <wrapper> ] parse-literal ] define-core-syntax
-    "HS{" [ \ } [ >hash-set ] parse-literal ] define-core-syntax
+    "W{" [ \ \} [ first <wrapper> ] parse-literal ] define-core-syntax
+    "HS{" [ \ \} [ >hash-set ] parse-literal ] define-core-syntax
 
     "postpone:" [ scan-syntax-word suffix! ] define-core-syntax
     "\\" [ scan-word <wrapper> suffix! ] define-core-syntax
-    "M\\\\" [ scan-object scan-object lookup-method <wrapper> suffix! ] define-core-syntax
+    "M\\\\" [ scan-word scan-word lookup-method <wrapper> suffix! ] define-core-syntax
     "inline" [ last-word make-inline ] define-core-syntax
     "private" [ last-word make-private ] define-core-syntax
     "recursive" [ last-word make-recursive ] define-core-syntax
@@ -324,19 +324,19 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "maybe{" [
-        \ } [ <anonymous-union> <maybe> ] parse-literal
+        \ \} [ <anonymous-union> <maybe> ] parse-literal
     ] define-core-syntax
 
     "not{" [
-        \ } [ <anonymous-union> <anonymous-complement> ] parse-literal
+        \ \} [ <anonymous-union> <anonymous-complement> ] parse-literal
     ] define-core-syntax
 
     "intersection{" [
-         \ } [ <anonymous-intersection> ] parse-literal
+         \ \} [ <anonymous-intersection> ] parse-literal
     ] define-core-syntax
 
     "union{" [
-        \ } [ <anonymous-union> ] parse-literal
+        \ \} [ <anonymous-union> ] parse-literal
     ] define-core-syntax
 
     "initial:" "syntax" lookup-word define-symbol
@@ -347,7 +347,7 @@ IN: bootstrap.syntax
 
     "execute(" [ \ execute-effect parse-call-paren ] define-core-syntax
 
-    "IH{" [ \ } [ >identity-hashtable ] parse-literal ] define-core-syntax
+    "IH{" [ \ \} [ >identity-hashtable ] parse-literal ] define-core-syntax
 
     "::" [ (::) apply-inlined-effects define-declared ] define-core-syntax
     "M::" [ (M::) define ] define-core-syntax

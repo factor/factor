@@ -31,7 +31,7 @@ ERROR: duplicate-slot-names names ;
 ERROR: invalid-slot-name name ;
 
 : parse-long-slot-name ( -- spec )
-    [ scan-token , \ } parse-until % ] { } make ;
+    [ scan-token , \ \} parse-until % ] { } make ;
 
 : parse-slot-name-delim ( end-delim string/f -- ? )
     ! Check for mistakes of this form:
@@ -109,7 +109,7 @@ M: tuple-class boa>object
 
 : parse-tuple-literal-slots ( class slots -- tuple )
     scan-token {
-        { "f" [ drop \ } parse-until boa>object ] }
+        { "f" [ drop \ \} parse-until boa>object ] }
         { "{" [ 2dup parse-slot-values assoc>object ] }
         { "}" [ drop new ] }
         [ bad-literal-tuple ]

@@ -61,6 +61,6 @@ M: linked-assoc assoc-like
 M: linked-assoc equal?
     over linked-assoc? [ [ dlist>> ] bi@ = ] [ 2drop f ] if ;
 
-SYNTAX: \LH{ \ } [ check-hashtable >linked-hash ] parse-literal ;
+SYNTAX: \LH{ \ \} [ check-hashtable >linked-hash ] parse-literal ;
 
 { "linked-assocs" "prettyprint" } "linked-assocs.prettyprint" require-when

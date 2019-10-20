@@ -174,7 +174,7 @@ SYMBOL: quotation-parser
 
 HOOK: parse-quotation quotation-parser ( -- quot )
 
-M: f parse-quotation \ ] parse-until >quotation ;
+M: f parse-quotation \ \] parse-until >quotation ;
 
 : (parse-lines) ( lexer -- quot )
     [ f parse-until >quotation ] with-lexer ;
@@ -186,10 +186,10 @@ M: f parse-quotation \ ] parse-until >quotation ;
     [ parse-until ] dip call suffix! ; inline
 
 : parse-definition ( -- quot )
-    \ ; parse-until >quotation ;
+    \ \; parse-until >quotation ;
 
 : parse-array-def ( -- array )
-    \ ; parse-until >array ;
+    \ \; parse-until >array ;
 
 ERROR: bad-number ;
 

@@ -213,6 +213,6 @@ PRIVATE>
 
 INSTANCE: dlist deque
 
-SYNTAX: \DL{ \ } [ >dlist ] parse-literal ;
+SYNTAX: \DL{ \ \} [ >dlist ] parse-literal ;
 
 { "dlists" "prettyprint" } "dlists.prettyprint" require-when

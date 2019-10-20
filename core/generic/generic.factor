@@ -165,7 +165,7 @@ PREDICATE: default-method < word "default" word-prop ;
 
 ! Definition protocol
 M: method definer
-    drop \ M: \ ; ;
+    drop \ \M: \ \; ;
 
 M: method forget*
     dup "forgotten" word-prop [ drop ] [

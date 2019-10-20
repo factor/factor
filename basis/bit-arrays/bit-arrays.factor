@@ -86,7 +86,7 @@ M: bit-array resize
 
 M: bit-array byte-length length bits>bytes ; inline
 
-SYNTAX: \?{ \ } [ >bit-array ] parse-literal ;
+SYNTAX: \?{ \ \} [ >bit-array ] parse-literal ;
 
 : integer>bit-array ( n -- bit-array )
     dup 0 =

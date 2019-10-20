@@ -36,6 +36,6 @@ M: number-hash-set clone
 : >number-hash-set ( members -- shash-set )
     [ <number-wrapper> ] map >hash-set number-hash-set boa ;
 
-SYNTAX: \NHS{ \ } [ >number-hash-set ] parse-literal ;
+SYNTAX: \NHS{ \ \} [ >number-hash-set ] parse-literal ;
 
 { "hash-sets.numbers" "prettyprint" } "hash-sets.numbers.prettyprint" require-when

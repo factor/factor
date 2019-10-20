@@ -50,7 +50,7 @@ M: vlist like
 
 INSTANCE: vlist immutable-sequence
 
-SYNTAX: \VL{ \ } [ >vlist ] parse-literal ;
+SYNTAX: \VL{ \ \} [ >vlist ] parse-literal ;
 
 TUPLE: valist { vlist vlist read-only } ;
 
@@ -84,6 +84,6 @@ M: valist assoc-like
 
 INSTANCE: valist assoc
 
-SYNTAX: \VA{ \ } [ >valist ] parse-literal ;
+SYNTAX: \VA{ \ \} [ >valist ] parse-literal ;
 
 { "vlists" "prettyprint" } "vlists.prettyprint" require-when

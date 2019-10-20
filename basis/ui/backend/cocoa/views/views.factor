@@ -599,7 +599,7 @@ PRIVATE>
         ] ;
     
     COCOA-METHOD: id validAttributesForMarkedText [             
-            NSArray "NSMarkedClauseSegment" <NSString> send: arrayWithObject:
+            NSArray "NSMarkedClauseSegment" <NSString> send: \arrayWithObject:
         ] ;
 
     COCOA-METHOD: id attributedSubstringForProposedRange: NSRange aRange

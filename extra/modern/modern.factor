@@ -94,6 +94,7 @@ DEFER: lex-factor-nested
     dup [ { [ "--" sequence= ] } 1&& ] split-when
     dup length 1 > [ nip ] [ drop ] if ;
 
+DEFER: lex-factor-fallthrough
 MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
     ch dup matching-delimiter {
         [ drop "=" swap prefix ]
@@ -107,7 +108,10 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
                 drop dup '[ _ matching-delimiter-string closestr1 2array members lex-until ] dip
                 swap unclip-last 3array
             ] } ! ( foo )
-            [ drop [ slice-til-whitespace drop ] dip span-slices ] ! (foo)
+            [
+                drop [ slice-til-whitespace drop ] dip span-slices
+                dup last lex-factor-fallthrough
+            ] ! (foo) ${foo}stuff{ }
         } cond
     ] ;
 
@@ -396,6 +400,9 @@ DEFER: lex-factor-top*
             ] unless
         ] }
         { f [ ] }
+        ! foo{abc}s -- the ``s`` here is fine
+        ! any character that is not special is fine here
+        [ drop ]
     } case ;
 
 ! Inside a FOO: or a <FOO FOO>

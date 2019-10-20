@@ -39,6 +39,6 @@ M: number-hashtable clone
 
 M: number-hashtable new-assoc drop <number-hashtable> ;
 
-SYNTAX: \NH{ \ } [ >number-hashtable ] parse-literal ;
+SYNTAX: \NH{ \ \} [ >number-hashtable ] parse-literal ;
 
 { "hashtables.numbers" "prettyprint" } "hashtables.numbers.prettyprint" require-when

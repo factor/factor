@@ -6,7 +6,7 @@ IN: help.definitions
 
 ! Definition protocol implementation
 
-M: link definer drop \ ARTICLE: \ ; ;
+M: link definer drop \ \ARTICLE: \ \; ;
 
 M: link where name>> lookup-article loc>> ;
 
@@ -21,7 +21,7 @@ M: link synopsis*
     dup name>> pprint*
     article-title pprint* ;
 
-M: word-link definer drop \ HELP: \ ; ;
+M: word-link definer drop \ \HELP: \ \; ;
 
 M: word-link where name>> "help-loc" word-prop ;
 

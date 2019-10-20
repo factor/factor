@@ -54,7 +54,7 @@ M: word pprint-class pprint-word ;
     <block swap pprint-word call block> ; inline
 
 M: parsing-word pprint*
-    \ postpone: [ pprint-word ] pprint-prefix ;
+    \ \postpone: [ pprint-word ] pprint-prefix ;
 
 M: word pprint*
     [ pprint-word ] [ ?start-group ] [ ?end-group ] tri ;
@@ -84,7 +84,7 @@ M: real pprint*
 
 M: float pprint*
     dup fp-nan? [
-        \ nan: [ fp-nan-payload >hex text ] pprint-prefix
+        \ \nan: [ fp-nan-payload >hex text ] pprint-prefix
     ] [
         call-next-method
     ] if ;
@@ -166,9 +166,9 @@ M: pathname pprint*
     [ class-of all-slots ] [ tuple-slots ] bi zip filter-tuple-assoc ;
 
 : pprint-slot-value ( name value -- )
-    <flow \ { pprint-word
+    <flow \ \{ pprint-word
     [ text ] [ f <inset pprint* block> ] bi*
-    \ } pprint-word block> ;
+    \ \} pprint-word block> ;
 
 : (pprint-tuple) ( opener class slots closer -- )
     <flow {
@@ -182,7 +182,7 @@ M: pathname pprint*
     [ boa-tuples? get [ pprint-object ] ] dip [ check-recursion ] curry if ; inline
 
 : pprint-tuple ( tuple -- )
-    [ [ \ T{ ] dip [ class-of ] [ tuple>assoc ] bi \ } (pprint-tuple) ] ?pprint-tuple ;
+    [ [ \ \T{ ] dip [ class-of ] [ tuple>assoc ] bi \ \} (pprint-tuple) ] ?pprint-tuple ;
 
 M: tuple pprint*
     pprint-tuple ;
@@ -207,22 +207,22 @@ M: tuple pprint*
     [ [ pprint* ] each ] dip
     [ number>string "~" " more~" surround text ] when* ;
 
-M: quotation pprint-delims drop \ [ \ ] ;
-M: curried pprint-delims drop \ [ \ ] ;
-M: composed pprint-delims drop \ [ \ ] ;
-M: array pprint-delims drop \ { \ } ;
-M: byte-array pprint-delims drop \ B{ \ } ;
-M: byte-vector pprint-delims drop \ BV{ \ } ;
-M: vector pprint-delims drop \ V{ \ } ;
-M: hashtable pprint-delims drop \ H{ \ } ;
-M: tuple pprint-delims drop \ T{ \ } ;
-M: wrapper pprint-delims drop \ W{ \ } ;
-M: callstack pprint-delims drop \ CS{ \ } ;
-M: hash-set pprint-delims drop \ HS{ \ } ;
-M: anonymous-union pprint-delims drop \ union{ \ } ;
-M: anonymous-intersection pprint-delims drop \ intersection{ \ } ;
-M: anonymous-complement pprint-delims drop \ not{ \ } ;
-M: maybe pprint-delims drop \ maybe{ \ } ;
+M: quotation pprint-delims drop \ \[ \ \] ;
+M: curried pprint-delims drop \ \[ \ \] ;
+M: composed pprint-delims drop \ \[ \ \] ;
+M: array pprint-delims drop \ \{ \ \} ;
+M: byte-array pprint-delims drop \ \B{ \ \} ;
+M: byte-vector pprint-delims drop \ \BV{ \ \} ;
+M: vector pprint-delims drop \ \V{ \ \} ;
+M: hashtable pprint-delims drop \ \H{ \ \} ;
+M: tuple pprint-delims drop \ \T{ \ \} ;
+M: wrapper pprint-delims drop \ \W{ \ \} ;
+M: callstack pprint-delims drop \ \CS{ \ \} ;
+M: hash-set pprint-delims drop \ \HS{ \ \} ;
+M: anonymous-union pprint-delims drop \ \union{ \ \} ;
+M: anonymous-intersection pprint-delims drop \ \intersection{ \ \} ;
+M: anonymous-complement pprint-delims drop \ \not{ \ \} ;
+M: maybe pprint-delims drop \ \maybe{ \ \} ;
 
 M: object >pprint-sequence ;
 M: vector >pprint-sequence ;
@@ -282,6 +282,6 @@ M: maybe pprint* pprint-object ;
 M: wrapper pprint*
     {
         { [ dup wrapped>> method? ] [ wrapped>> pprint* ] }
-        { [ dup wrapped>> word? ] [ <block \ \ pprint-word wrapped>> pprint-word block> ] }
+        { [ dup wrapped>> word? ] [ <block \ \\ pprint-word wrapped>> pprint-word block> ] }
         [ pprint-object ]
     } cond ;

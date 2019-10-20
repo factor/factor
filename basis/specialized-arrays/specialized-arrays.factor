@@ -68,7 +68,7 @@ INSTANCE: ${A} specialized-array-mixin
     [ \ ${type} (underlying) ] keep ${<direct-A>} ; inline
 >>
 
-SYNTAX: ${A}{ \ } [ \ ${type} >c-array ] parse-literal ;
+SYNTAX: \${A}{ \ \} [ \ ${type} >c-array ] parse-literal ;
 
 M: ${A} direct-like drop ${<direct-A>} ; inline
 
@@ -98,7 +98,7 @@ M: ${A} element-size drop \ ${type} heap-size ; inline
 
 M: ${A} underlying-type drop \ ${type} ;
 
-M: ${A} pprint-delims drop \ ${A}{ \ } ;
+M: ${A} pprint-delims drop \ \${A}{ \ \} ;
 
 M: ${A} >pprint-sequence ;
 

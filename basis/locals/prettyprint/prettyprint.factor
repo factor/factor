@@ -16,19 +16,19 @@ IN: locals.prettyprint
 
 M: lambda pprint*
     <flow
-    \ |[ pprint-word
+    \ \|[ pprint-word
     dup vars>> pprint-vars
     "|" text
     f <inset body>> pprint-elements block>
-    \ ] pprint-word
+    \ \] pprint-word
     block> ;
 
 : pprint-let ( let word -- )
     pprint-word
     <block body>> pprint-elements block>
-    \ ] pprint-word ;
+    \ \] pprint-word ;
 
-M: let pprint* \ let[ pprint-let ;
+M: let pprint* \ \let[ pprint-let ;
 
 M: def pprint*
     dup local>> word?

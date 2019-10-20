@@ -140,9 +140,9 @@ PRIVATE>
     T{ splay f f 0 } assoc-clone-like ;
 
 SYNTAX: \SPLAY{
-    \ } [ >splay ] parse-literal ;
+    \ \} [ >splay ] parse-literal ;
 
 M: splay assoc-like
     drop dup splay? [ >splay ] unless ;
 
-M: splay pprint-delims drop \ SPLAY{ \ } ;
+M: splay pprint-delims drop \ \SPLAY{ \ \} ;

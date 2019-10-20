@@ -254,7 +254,7 @@ INLINE-FUNCTOR: blas-matrix ( type: name t: string u: string c: string -- ) [[
     : >${type}-blas-matrix ( arrays -- matrix )
         [ ${type} >c-array underlying>> ] (>matrix) <${type}-blas-matrix> ;
     
-    SYNTAX: ${t}matrix{ \ } [ >${type}-blas-matrix ] parse-literal ;
+    SYNTAX: \${t}matrix{ \ \} [ >${type}-blas-matrix ] parse-literal ;
 
     M: ${type}-blas-matrix element-type
         drop ${type} ;
@@ -275,7 +275,7 @@ INLINE-FUNCTOR: blas-matrix ( type: name t: string u: string c: string -- ) [[
         (prepare-ger) [ ${t}GER${c} ] dip ;
 
     M: ${type}-blas-matrix pprint-delims
-        drop \ ${t}matrix{ \ } ;
+        drop \ \${t}matrix{ \ \} ;
 ]]
 >>
 

@@ -186,7 +186,7 @@ M: protocol forget*
 
 M: protocol definition protocol-words show-words ;
 
-M: protocol definer drop \ PROTOCOL: \ ; ;
+M: protocol definer drop \ \PROTOCOL: \ \; ;
 
 M: protocol group-words protocol-words ;
 

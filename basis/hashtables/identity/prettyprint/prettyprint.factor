@@ -5,4 +5,4 @@ USING: hashtables.identity kernel prettyprint.custom ;
 
 IN: hashtables.identity.prettyprint
 
-M: identity-hashtable pprint-delims drop \ IH{ \ } ;
+M: identity-hashtable pprint-delims drop \ \IH{ \ \} ;

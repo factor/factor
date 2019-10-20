@@ -13,36 +13,36 @@ IN: classes.struct.prettyprint
 : struct-definer-word ( class -- word )
     struct-slots
     {
-        { [ dup [ packed?>> ] all? ] [ drop \ PACKED-STRUCT: ] }
-        { [ dup length 1 <= ] [ drop \ STRUCT: ] }
-        { [ dup [ offset>> 0 = ] all? ] [ drop \ UNION-STRUCT: ] }
-        [ drop \ STRUCT: ]
+        { [ dup [ packed?>> ] all? ] [ drop \ \PACKED-STRUCT: ] }
+        { [ dup length 1 <= ] [ drop \ \STRUCT: ] }
+        { [ dup [ offset>> 0 = ] all? ] [ drop \ \UNION-STRUCT: ] }
+        [ drop \ \STRUCT: ]
     } cond ;
 
 : struct>assoc ( struct -- assoc )
     [ class-of struct-slots ] [ struct-slot-values ] bi zip ;
 
 : pprint-struct-slot ( slot -- )
-    <flow \ { pprint-word
+    <flow \ \{ pprint-word
     f <inset {
         [ name>> text ]
         [ type>> pprint-c-type ]
         [ read-only>> [ \ read-only pprint-word ] when ]
-        [ initial>> [ \ initial: pprint-word pprint* ] when* ]
+        [ initial>> [ \ \initial: pprint-word pprint* ] when* ]
         [
             dup struct-bit-slot-spec?
-            [ \ bits: pprint-word bits>> pprint* ]
+            [ \ \bits: pprint-word bits>> pprint* ]
             [ drop ] if
         ]
     } cleave block>
-    \ } pprint-word block> ;
+    \ \} pprint-word block> ;
 
 : pprint-struct ( struct -- )
     [
-        [ \ S{ ] dip
+        [ \ \S{ ] dip
         [ class-of ]
         [ struct>assoc [ [ name>> ] dip ] assoc-map ] bi
-        \ } (pprint-tuple)
+        \ \} (pprint-tuple)
     ] ?pprint-tuple ;
 
 : pprint-struct-pointer ( struct -- )
@@ -56,7 +56,7 @@ M: struct-class see-class*
     block> pprint-; block> ;
 
 M: struct pprint-delims
-    drop \ S{ \ } ;
+    drop \ \S{ \ \} ;
 
 M: struct >pprint-sequence
     [ class-of ] [ struct-slot-values ] bi class-slot-sequence ;
