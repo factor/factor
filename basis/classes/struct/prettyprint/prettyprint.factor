@@ -53,7 +53,7 @@ PRIVATE>
 M: struct-class see-class*
     <colon dup struct-definer-word pprint-word dup pprint-word
     <block struct-slots [ pprint-struct-slot ] each
-    block> pprint-; block> ;
+    block> pprint-semi block> ;
 
 M: struct pprint-delims
     drop \ \S{ \ \} ;
