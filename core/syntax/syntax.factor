@@ -420,6 +420,14 @@ IN: bootstrap.syntax
     "![=====[" [ "]=====]" parse-multiline-string0 drop ] define-core-syntax
     "![======[" [ "]======]" parse-multiline-string0 drop ] define-core-syntax
 
+    "#[[" [ "]]" parse-multiline-string0 drop ] define-core-syntax
+    "#[=[" [ "]=]" parse-multiline-string0 drop ] define-core-syntax
+    "#[==[" [ "]==]" parse-multiline-string0 drop ] define-core-syntax
+    "#[===[" [ "]===]" parse-multiline-string0 drop ] define-core-syntax
+    "#[====[" [ "]====]" parse-multiline-string0 drop ] define-core-syntax
+    "#[=====[" [ "]=====]" parse-multiline-string0 drop ] define-core-syntax
+    "#[======[" [ "]======]" parse-multiline-string0 drop ] define-core-syntax
+
     "I[[" [ "]]" define-interpolate-syntax ] define-core-syntax
     "I[=[" [ "]=]" define-interpolate-syntax ] define-core-syntax
     "I[==[" [ "]==]" define-interpolate-syntax ] define-core-syntax
