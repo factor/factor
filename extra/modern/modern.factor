@@ -383,7 +383,7 @@ DEFER: lex-factor-top*
 
 : lex-factor-fallthrough ( string n/f slice/f ch/f -- string n'/f literal )
     {
-        { char: # [ read-turnoff ] } ! char: \#
+        { char: \# [ read-turnoff ] } ! char: \#
         { char: \\ [ read-backslash ] }
         { char: \[ [ read-bracket ] }
         { char: \{ [ read-brace ] }
@@ -391,6 +391,7 @@ DEFER: lex-factor-top*
         { char: \] [ ] }
         { char: \} [ ] }
         { char: \) [ ] }
+        { f [ ] } ! end of stream
         { char: \" [ read-string ] }
         { char: \! [ read-exclamation ] }
         { char: > [
@@ -399,7 +400,6 @@ DEFER: lex-factor-top*
                 [ slice-til-whitespace drop ] dip ?span-slices
             ] unless
         ] }
-        { f [ ] }
         ! foo{abc}s -- the ``s`` here is fine
         ! any character that is not special is fine here
         [ drop ]
