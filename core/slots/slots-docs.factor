@@ -62,7 +62,7 @@ $nl
 { $see-also "slots" "mirrors" } ;
 
 ARTICLE: "slot-initial-values" "Initial values of slots"
-"An initial value for a slot can be specified with the " { $link \ initial: } " slot declaration attribute. For certain classes, the initial value is optional; in these cases, it does not need to be specified. For others, it is required. Initial values can be used independently of class declaration, but if specified, the value must satisfy the class predicate."
+"An initial value for a slot can be specified with the " { $link \ \initial: } " slot declaration attribute. For certain classes, the initial value is optional; in these cases, it does not need to be specified. For others, it is required. Initial values can be used independently of class declaration, but if specified, the value must satisfy the class predicate."
 $nl
 "The following classes have default initial values:"
 { $table
@@ -77,7 +77,7 @@ $nl
 { $list
     { "If the class is a union or mixin class which " { $emphasis "contains" } " one of the above known classes, then the initial value of the class is that of the known class, with preference given to classes earlier in the list. For example, if the slot is declared " { $link object } " (this is the default), the initial value is " { $link f } ". Similarly for " { $link sequence } " and " { $link assoc } "." }
     { "If the class is a tuple class, the initial value of the slot is a new, shared instance of the class created with " { $link new } "." }
-    { "Otherwise, a " { $link bad-initial-value } " error is thrown. In this case, an initial value must be specified explicitly using " { $link \ initial: } "." }
+    { "Otherwise, a " { $link bad-initial-value } " error is thrown. In this case, an initial value must be specified explicitly using " { $link \ \initial: } "." }
 }
 "A word can be used to check if a class has an initial value or not:"
 { $subsections initial-value } ;

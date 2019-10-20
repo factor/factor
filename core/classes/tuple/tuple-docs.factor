@@ -29,7 +29,7 @@ ARTICLE: "tuple-declarations" "Tuple slot declarations"
 { $list
     "class declaration: values must satisfy the class predicate"
     { "whether a slot is read only or not (" { $link read-only } ")" }
-    { "an initial value (" { $link \ initial: } ")" }
+    { "an initial value (" { $link \ \initial: } ")" }
 }
 { $subsections
     "slot-read-only-declaration"

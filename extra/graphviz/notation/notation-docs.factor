@@ -82,7 +82,7 @@ HELP: \--[
     { "head" object }
     { "edge" edge }
 }
-{ $description "Shorthand for " { $link <edge> } " to be used with " { $link \ ] } " and attribute-setting generic words (see " { $link { "graphviz.notation" "=attrs" } } ") so that undirected " { $link graph } "s read more like graphs in the DOT language." }
+{ $description "Shorthand for " { $link <edge> } " to be used with " { $link \ \] } " and attribute-setting generic words (see " { $link { "graphviz.notation" "=attrs" } } ") so that undirected " { $link graph } "s read more like graphs in the DOT language." }
 { $examples
   "Instead of writing"
   { $code
@@ -108,7 +108,7 @@ HELP: \->[
     { "head" object }
     { "edge" edge }
 }
-{ $description "Shorthand for " { $link <edge> } " to be used with " { $link \ ] } " and attribute-setting generic words (see " { $link { "graphviz.notation" "=attrs" } } ") so that directed " { $link graph } "s read more like digraphs in the DOT language." }
+{ $description "Shorthand for " { $link <edge> } " to be used with " { $link \ \] } " and attribute-setting generic words (see " { $link { "graphviz.notation" "=attrs" } } ") so that directed " { $link graph } "s read more like digraphs in the DOT language." }
 { $examples
   "Instead of writing"
   { $code
@@ -134,7 +134,7 @@ HELP: \add-edge[
     { "head" object }
     { "edge" edge }
 }
-{ $description "Shorthand for " { $link <edge> } " to be used with " { $link \ ] } " and attribute-setting generic words (see " { $link { "graphviz.notation" "=attrs" } } ") so that setting an " { $link edge } "'s " { $slot "attributes" } " reads more like the equivalent in the DOT language." }
+{ $description "Shorthand for " { $link <edge> } " to be used with " { $link \ \] } " and attribute-setting generic words (see " { $link { "graphviz.notation" "=attrs" } } ") so that setting an " { $link edge } "'s " { $slot "attributes" } " reads more like the equivalent in the DOT language." }
 { $examples
   "Instead of writing"
   { $code
@@ -153,7 +153,7 @@ HELP: \add-edge[
     "}"
   }
   $nl
-  "This has the advantage over " { $link \ --[ } " and " { $link \ ->[ } " of reading nicely for both directed " { $emphasis "and" } " undirected " { $link graph } "s."
+  "This has the advantage over " { $link \ \--[ } " and " { $link \ \->[ } " of reading nicely for both directed " { $emphasis "and" } " undirected " { $link graph } "s."
 } ;
 
 HELP: \add-node[
@@ -161,7 +161,7 @@ HELP: \add-node[
     { "id" object }
     { "node" node }
 }
-{ $description "Shorthand for " { $link <node> } " to be used with " { $link \ ] } " and attribute-setting generic words (see " { $link { "graphviz.notation" "=attrs" } } ") so that setting a " { $link node } "'s " { $slot "attributes" } " reads more like the equivalent in the DOT language." }
+{ $description "Shorthand for " { $link <node> } " to be used with " { $link \ \] } " and attribute-setting generic words (see " { $link { "graphviz.notation" "=attrs" } } ") so that setting a " { $link node } "'s " { $slot "attributes" } " reads more like the equivalent in the DOT language." }
 { $examples
   "Instead of writing"
   { $code
@@ -185,7 +185,7 @@ HELP: \edge[
 { $values
         { "attrs" edge-attributes }
 }
-{ $description "Shorthand for " { $link <edge-attributes> } " to be used with " { $link \ ] } " and attribute-setting generic words (see " { $link { "graphviz.notation" "=attrs" } } ") so that adding " { $link edge-attributes } " to a " { $link graph } " or " { $link subgraph } " reads more like the equivalent in the DOT language." }
+{ $description "Shorthand for " { $link <edge-attributes> } " to be used with " { $link \ \] } " and attribute-setting generic words (see " { $link { "graphviz.notation" "=attrs" } } ") so that adding " { $link edge-attributes } " to a " { $link graph } " or " { $link subgraph } " reads more like the equivalent in the DOT language." }
 { $examples
   "Instead of writing"
   { $code
@@ -209,7 +209,7 @@ HELP: \graph[
 { $values
         { "attrs" graph-attributes }
 }
-{ $description "Shorthand for " { $link <graph-attributes> } " to be used with " { $link \ ] } " and attribute-setting generic words (see " { $link { "graphviz.notation" "=attrs" } } ") so that adding " { $link graph-attributes } " to a " { $link graph } " or " { $link subgraph } " reads more like the equivalent in the DOT language." }
+{ $description "Shorthand for " { $link <graph-attributes> } " to be used with " { $link \ \] } " and attribute-setting generic words (see " { $link { "graphviz.notation" "=attrs" } } ") so that adding " { $link graph-attributes } " to a " { $link graph } " or " { $link subgraph } " reads more like the equivalent in the DOT language." }
 { $notes "This word is rendered redundant by the " { $link graph } " and " { $link subgraph } " methods defined by " { $vocab-link "graphviz.notation" } " for setting attributes. Sometimes it still might look better to delineate certain attribute-setting code." }
 { $examples
   "Instead of writing"
@@ -248,7 +248,7 @@ HELP: \node[
 { $values
         { "attrs" node-attributes }
 }
-{ $description "Shorthand for " { $link <node-attributes> } " to be used with " { $link \ ] } " and attribute-setting generic words (see " { $link { "graphviz.notation" "=attrs" } } ") so that adding " { $link node-attributes } " to a " { $link graph } " or " { $link subgraph } " reads more like the equivalent in the DOT language." }
+{ $description "Shorthand for " { $link <node-attributes> } " to be used with " { $link \ \] } " and attribute-setting generic words (see " { $link { "graphviz.notation" "=attrs" } } ") so that adding " { $link node-attributes } " to a " { $link graph } " or " { $link subgraph } " reads more like the equivalent in the DOT language." }
 { $examples
   "Instead of writing"
   { $code

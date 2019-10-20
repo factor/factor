@@ -60,7 +60,7 @@ unit-test
 { } [ \ duplex-stream see ] unit-test
 
 { "[ \\ + ]" } [ [ \ + ] unparse ] unit-test
-{ "[ \\ [ ]" } [ [ \ [ ] unparse ] unit-test
+{ "[ \\ [ ]" } [ [ \ \[ ] unparse ] unit-test
 
 { t } [
     100 \ dup <array> unparse-short
@@ -305,7 +305,9 @@ INTERSECTION: intersection-see-test sequence number ;
 { } [ \ compose see ] unit-test
 { } [ \ curry see ] unit-test
 
-{ "postpone: \[" } [ \ [ unparse ] unit-test
+{ "postpone: \[" } [
+    \ \[ unparse
+] unit-test
 
 TUPLE: started-out-hustlin ;
 

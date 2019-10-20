@@ -244,7 +244,7 @@ CONSTANT: case-const-2 2
         { \ * [ "times" ] }
         { \ / [ "divide" ] }
         { \ ^ [ "power" ] }
-        { \ [ [ "obama" ] }
+        { \ \[ [ "obama" ] }
     } case ;
 
 \ test-case-7 def>> must-infer

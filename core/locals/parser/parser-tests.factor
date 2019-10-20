@@ -65,7 +65,7 @@ IN: locals.parser.tests
     [
         "locals" use-vocab
         { "99 :> kkk kkk ;" } <lexer> [
-            H{ } clone [ \ ; parse-until ] with-lambda-scope
+            H{ } clone [ \ \; parse-until ] with-lambda-scope
         ] with-lexer
     ] with-compilation-unit unparse
 ] unit-test
