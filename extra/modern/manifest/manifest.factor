@@ -1,11 +1,12 @@
 ! Copyright (C) 2019 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators kernel modern
-sequences strings words ;
+sequences splitting.monotonic strings words ;
 IN: modern.manifest
 
 TUPLE: syntax-forms
     sections
+    named-sections
     ucolons
     lcolons
     containers
@@ -13,11 +14,16 @@ TUPLE: syntax-forms
     brackets
     parens
     ldecorators
-    rdecorators ;
+    rdecorators
+
+    named-section-arities
+    ucolon-arities
+    ;
 
 : <syntax-forms> ( -- syntax-forms )
     syntax-forms new
         H{ } clone >>sections
+        H{ } clone >>named-sections
         H{ } clone >>ucolons
         H{ } clone >>lcolons
         H{ } clone >>containers
@@ -26,6 +32,9 @@ TUPLE: syntax-forms
         H{ } clone >>parens
         H{ } clone >>ldecorators
         H{ } clone >>rdecorators
+
+        H{ } clone >>named-section-arities
+        H{ } clone >>ucolon-arities
     ; inline
 
 ERROR: key-exists val key assoc existing-value ;
@@ -42,6 +51,8 @@ ERROR: key-exists val key assoc existing-value ;
 : add-ldecorators-form ( syntax-forms parser tag -- syntax-forms ) pick ldecorators>> checked-set-at ;
 : add-rdecorators-form ( syntax-forms parser tag -- syntax-forms ) pick rdecorators>> checked-set-at ;
 
+: add-ucolon-arity ( syntax-forms parser tag -- syntax-forms ) pick ucolon-arities>> checked-set-at ;
+: add-named-section-arity ( syntax-forms parser tag -- syntax-forms ) pick named-section-arities>> checked-set-at ;
 
 ! One syntax-forms per vocab-root
 : core-syntax-forms ( -- obj )
@@ -55,6 +66,7 @@ ERROR: key-exists val key assoc existing-value ;
         "private-section" "PRIVATE" add-section-form
 
         "word" "" add-ucolon-form  ! : :: ::: ...
+        ! "about" "ABOUT" add-ucolon-form
         "alias" "ALIAS" add-ucolon-form
         "broadcast" "BROADCAST" add-ucolon-form
         "builtin" "BUILTIN" add-ucolon-form
@@ -140,18 +152,50 @@ ERROR: key-exists val key assoc existing-value ;
         "comment" "#" add-containers-form
         "path" "path" add-containers-form
 
+        "delimiter" "delimiter" add-rdecorators-form
+        "deprecated" "deprecated" add-rdecorators-form
         "inline" "inline" add-rdecorators-form
         "recursive" "recursive" add-rdecorators-form
         "private" "private" add-rdecorators-form
         "final" "final" add-rdecorators-form
         "flushable" "flushable" add-rdecorators-form
         "foldable" "foldable" add-rdecorators-form
+
+        2 "ALIAS" add-ucolon-arity
+        1 "BUILTIN" add-ucolon-arity
+        2 "C" add-ucolon-arity
+        2 "CONSTANT" add-ucolon-arity
+        1 "DEFER" add-ucolon-arity
+        3 "GENERIC#" add-ucolon-arity
+        2 "GENERIC" add-ucolon-arity
+        3 "HOOK" add-ucolon-arity
+        1 "IN" add-ucolon-arity
+        2 "INITIALIZED-SYMBOL" add-ucolon-arity
+        2 "INSTANCE" add-ucolon-arity
+        1 "MAIN" add-ucolon-arity
+        2 "MATH" add-ucolon-arity
+        1 "MIXIN" add-ucolon-arity
+        2 "PRIMITIVE" add-ucolon-arity
+        2 "QUALIFIED-WITH" add-ucolon-arity
+        1 "QUALIFIED" add-ucolon-arity
+        2 "RENAME" add-ucolon-arity
+        2 "SHUTDOWN-HOOK" add-ucolon-arity
+        1 "SINGLETON" add-ucolon-arity
+        1 "SLOT" add-ucolon-arity
+        2 "STARTUP-HOOK" add-ucolon-arity
+        1 "SYMBOL" add-ucolon-arity
+        1 "UNUSE" add-ucolon-arity
+        1 "USE" add-ucolon-arity
     ;
 
 : lookup-syntax ( string -- form )
     ;
 
+! : map-forms ( seq quot -- seq' ) [ ] map ;
 
+
+: apply-decorators ( seq forms -- seq' )
+    '[ nip dup slice? [ >string _ rdecorators>> at ] [ drop f ] if ] monotonic-split ;
 
 TUPLE: manifest ;
 
