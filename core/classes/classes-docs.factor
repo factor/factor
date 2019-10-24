@@ -87,7 +87,7 @@ HELP: class-usage
 { $description "Lists all classes that uses or depends on this class." } ;
 
 HELP: classes
-{ $values { "seq" "a sequence of class words" } }
+{ $values { "seq" { $sequence class } } }
 { $description "Finds all class words in the dictionary." } ;
 
 HELP: contained-classes
@@ -166,12 +166,12 @@ HELP: class-participants
 { $description "If " { $snippet "class" } " is an intersection class, outputs a sequence of its participant classes, otherwise outputs " { $link f } "." } ;
 
 HELP: define-class
-{ $values { "word" word } { "superclass" class } { "members" "a sequence of class words" } { "participants" "a sequence of class words" } { "metaclass" class } }
+{ $values { "word" word } { "superclass" class } { "members" { $sequence class } } { "participants" { $sequence class } } { "metaclass" class } }
 { $description "Sets a property indicating this word is a class word, thus making it an instance of " { $link class } ", and registers it with " { $link update-map } "." }
 $low-level-note ;
 
 HELP: implementors
-{ $values { "class/classes" "a class or a sequence of classes" } { "seq" "a sequence of generic words" } }
+{ $values { "class/classes" { $or class { $sequence class } } } { "seq" "a sequence of generic words" } }
 { $description "Finds all generic words in the dictionary implementing methods for the given set of classes." } ;
 
 HELP: instance?
