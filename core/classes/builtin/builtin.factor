@@ -26,7 +26,7 @@ M: builtin-class rank-class drop 0 ;
 
 M: builtin-class instance? [ tag ] [ class>type ] bi* eq? ;
 
-M: builtin-class (flatten-class) dup ,, ;
+M: builtin-class (flatten-class) , ;
 
 M: builtin-class (classes-intersect?) eq? ;
 
