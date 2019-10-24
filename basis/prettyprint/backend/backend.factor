@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
 classes.algebra.private classes.maybe classes.private
-classes.tuple combinators continuations effects generic
+classes.tuple combinators continuations effects fry generic
 hash-sets hashtables io.pathnames io.styles kernel lists make
 math math.order math.parser namespaces prettyprint.config
 prettyprint.custom prettyprint.sections prettyprint.stylesheet
@@ -271,8 +271,13 @@ M: cons-state pprint*
         dup pprint-delims [
             pprint-word
             dup pprint-narrow? <inset
-            [ car pprint* ]
-            [ cdr nil? [ "~more~" text ] unless ] bi
+            [
+                building get
+                length-limit get
+                '[ dup cons-state? _ length _ < and ]
+                [ uncons swap , ] while
+            ] { } make
+            [ pprint* ] each nil? [ "~more~" text ] unless
             block>
         ] dip pprint-word block>
     ] check-recursion ;
