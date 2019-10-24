@@ -41,11 +41,11 @@ $nl
 { $subsections rank-class } ;
 
 HELP: flatten-class
-{ $values { "class" class } { "assoc" "an assoc whose keys are classes" } }
+{ $values { "class" class } { "seq" { $sequence class } } }
 { $description "Outputs a set of builtin and tuple classes whose union is the smallest cover of " { $snippet "class" } "." } ;
 
 HELP: class<=
-{ $values { "first" "a class" } { "second" "a class" } { "?" boolean } }
+{ $values { "first" class } { "second" class } { "?" boolean } }
 { $description "Tests if all instances of " { $snippet "class1" } " are also instances of " { $snippet "class2" } "." }
 { $notes "Classes are partially ordered. This means that if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class1" } ", then " { $snippet "class1 <= class2" } ". Also, if " { $snippet "class1 <= class2" } " and " { $snippet "class2 <= class3" } ", then " { $snippet "class1 <= class3" } "." } ;
 
@@ -74,5 +74,5 @@ HELP: smallest-class
 { $description "Outputs a minimum class from the given sequence." } ;
 
 HELP: sort-classes
-{ $values { "seq" "a sequence of class" } { "newseq" "a new sequence of classes" } }
+{ $values { "seq" { $sequence class } } { "newseq" { $sequence class } } }
 { $description "Outputs a linear sort of a sequence of classes. Larger classes come before their subclasses." } ;
