@@ -22,8 +22,7 @@ M: class union-of-builtins?
     drop f ;
 
 : fast-union-mask ( class -- n )
-    [ 0 ] dip flatten-class
-    [ drop class>type 2^ bitor ] assoc-each ;
+    flatten-class 0 [ class>type 2^ bitor ] each ;
 
 : empty-union-predicate-quot ( class -- quot )
     drop [ drop f ] ;
