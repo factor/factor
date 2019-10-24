@@ -146,6 +146,8 @@ IN: modern.tests
 
 { t } [ "FOO:" strict-upper? ] unit-test
 { t } [ ":" strict-upper? ] unit-test
+{ t } [ "::" strict-upper? ] unit-test
+{ t } [ ":::" strict-upper? ] unit-test
 { f } [ "<FOO" strict-upper? ] unit-test
 { f } [ "<FOO:" strict-upper? ] unit-test
 { f } [ "->" strict-upper? ] unit-test
@@ -156,6 +158,9 @@ IN: modern.tests
 { f } [ "FOO:" section-open? ] unit-test
 { f } [ ";FOO" section-close? ] unit-test
 { f } [ "FOO" section-close? ] unit-test
+
+{ f } [ ":>" section-close? ] unit-test
+{ f } [ ":::>" section-close? ] unit-test
 
 
 ! Strings

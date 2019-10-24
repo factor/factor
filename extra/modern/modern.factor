@@ -179,7 +179,7 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
     } 1&& ;
 
 : strict-upper? ( string -- ? )
-    { [ ":" sequence= ] [ (strict-upper?) ] } 1|| ;
+    { [ [ char: \: = ] all? ] [ (strict-upper?) ] } 1|| ;
 
 ! <A <A: but not <A>
 : section-open? ( string -- ? )
@@ -254,6 +254,7 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
         [ length 2 >= ]
         [ "\\" head? not ] ! XXX: good?
         [ ">" tail? ]
+        [ but-last [ char: \: = ] all? not ]  ! :> ::> :::> not section-close
         [
             {
                 [ but-last strict-upper? ]
