@@ -105,4 +105,4 @@ M: list >list ;
 
 M: sequence >list sequence>list ;
 
-SYNTAX: L{ \ } [ sequence>list ] parse-literal ;
+SYNTAX: \L{ \ \} [ sequence>list ] parse-literal ;
