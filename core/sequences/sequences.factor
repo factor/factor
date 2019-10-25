@@ -377,7 +377,11 @@ PRIVATE>
 
 : surround ( seq1 seq2 seq3 -- newseq ) swapd 3append ; inline
 
+: surround-as ( seq1 seq2 seq3 exemplar -- newseq ) [ swapd ] dip 3append-as ; inline
+
 : glue ( seq1 seq2 seq3 -- newseq ) swap 3append ; inline
+
+: glue-as ( seq1 seq2 seq3 exemplar -- newseq ) swapd 3append-as ; inline
 
 : change-nth ( ..a i seq quot: ( ..a elt -- ..b newelt ) -- ..b )
     [ [ nth ] dip call ] 2keepd set-nth-unsafe ; inline
