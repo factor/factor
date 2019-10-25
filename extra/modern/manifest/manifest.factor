@@ -1,7 +1,8 @@
 ! Copyright (C) 2019 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators kernel modern
-sequences splitting.monotonic strings words ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit kernel modern sequences
+splitting.monotonic strings words ;
 IN: modern.manifest
 
 TUPLE: syntax-forms
@@ -76,6 +77,7 @@ ERROR: key-exists val key assoc existing-value ;
         "defer" "DEFER" add-ucolon-form
         "error" "ERROR" add-ucolon-form
         "exclude" "EXCLUDE" add-ucolon-form
+        "forget" "FORGET" add-ucolon-form
         "generic#" "GENERIC#" add-ucolon-form
         "generic" "GENERIC" add-ucolon-form
         "hints" "HINTS" add-ucolon-form
@@ -166,6 +168,7 @@ ERROR: key-exists val key assoc existing-value ;
         2 "C" add-ucolon-arity
         2 "CONSTANT" add-ucolon-arity
         1 "DEFER" add-ucolon-arity
+        1 "FORGET" add-ucolon-arity
         3 "GENERIC#" add-ucolon-arity
         2 "GENERIC" add-ucolon-arity
         3 "HOOK" add-ucolon-arity
