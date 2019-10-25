@@ -191,11 +191,11 @@ ARTICLE: "math-vectors" "Vector operations"
 ABOUT: "math-vectors"
 
 HELP: vneg
-{ $values { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "v" { $sequence number } } { "w" { $sequence number } } }
 { $description "Negates each element of " { $snippet "v" } "." } ;
 
 HELP: vabs
-{ $values { "v" "a sequence of numbers" } { "w" "a sequence of non-negative real numbers" } }
+{ $values { "v" { $sequence number } } { "w" "a sequence of non-negative real numbers" } }
 { $description "Takes the absolute value of each element of " { $snippet "v" } "." } ;
 
 HELP: vsqrt
@@ -204,69 +204,69 @@ HELP: vsqrt
 { $warning "For performance reasons, this does not work with negative inputs, unlike " { $link sqrt } "." } ;
 
 HELP: vfloor
-{ $values { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
+{ $values { "v" { $sequence real } } { "w" { $sequence real } } }
 { $description "Takes the " { $link floor } " of each element of " { $snippet "v" } "." } ;
 
 HELP: vceiling
-{ $values { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
+{ $values { "v" { $sequence real } } { "w" { $sequence real } } }
 { $description "Takes the " { $link ceiling } " of each element of " { $snippet "v" } "." } ;
 
 HELP: vtruncate
-{ $values { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
+{ $values { "v" { $sequence real } } { "w" { $sequence real } } }
 { $description "Truncates each element of " { $snippet "v" } "." } ;
 
 HELP: n+v
-{ $values { "n" number } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "n" number } { "v" { $sequence number } } { "w" { $sequence number } } }
 { $description "Adds " { $snippet "n" } " to each element of " { $snippet "v" } "." } ;
 
 HELP: v+n
-{ $values { "v" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
+{ $values { "v" { $sequence number } } { "n" number } { "w" { $sequence number } } }
 { $description "Adds " { $snippet "n" } " to each element of " { $snippet "v" } "." } ;
 
 HELP: n-v
-{ $values { "n" number } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "n" number } { "v" { $sequence number } } { "w" { $sequence number } } }
 { $description "Subtracts each element of " { $snippet "v" } " from " { $snippet "n" } "." } ;
 
 HELP: v-n
-{ $values { "v" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
+{ $values { "v" { $sequence number } } { "n" number } { "w" { $sequence number } } }
 { $description "Subtracts " { $snippet "n" } " from each element of " { $snippet "v" } "." } ;
 
 HELP: n*v
-{ $values { "n" number } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "n" number } { "v" { $sequence number } } { "w" { $sequence number } } }
 { $description "Multiplies each element of " { $snippet "v" } " by " { $snippet "n" } "." } ;
 
 HELP: v*n
-{ $values { "v" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
+{ $values { "v" { $sequence number } } { "n" number } { "w" { $sequence number } } }
 { $description "Multiplies each element of " { $snippet "v" } " by " { $snippet "n" } "." } ;
 
 HELP: n/v
-{ $values { "n" number } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "n" number } { "v" { $sequence number } } { "w" { $sequence number } } }
 { $description "Divides " { $snippet "n" } " by each element of " { $snippet "v" } "." }
 { $errors "May throw an error if a division by zero occurs; see " { $link "division-by-zero" } "." } ;
 
 HELP: v/n
-{ $values { "v" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
+{ $values { "v" { $sequence number } } { "n" number } { "w" { $sequence number } } }
 { $description "Divides each element of " { $snippet "v" } " by " { $snippet "n" } "." }
 { $errors "May throw an error if a division by zero occurs; see " { $link "division-by-zero" } "." } ;
 
 HELP: n^v
-{ $values { "n" number } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "n" number } { "v" { $sequence number } } { "w" { $sequence number } } }
 { $description "Raises " { $snippet "n" } " to the power of each element of " { $snippet "v" } "." } ;
 
 HELP: v^n
-{ $values { "v" "a sequence of numbers" } { "n" number } { "w" "a sequence of numbers" } }
+{ $values { "v" { $sequence number } } { "n" number } { "w" { $sequence number } } }
 { $description "Raises each element of " { $snippet "u" } " to the power of " { $snippet "v" } "." } ;
 
 HELP: v+
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "u" { $sequence number } } { "v" { $sequence number } } { "w" { $sequence number } } }
 { $description "Adds " { $snippet "u" } " and " { $snippet "v" } " component-wise." } ;
 
 HELP: v-
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "u" { $sequence number } } { "v" { $sequence number } } { "w" { $sequence number } } }
 { $description "Subtracts " { $snippet "v" } " from " { $snippet "u" } " component-wise." } ;
 
 HELP: v+-
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "u" { $sequence number } } { "v" { $sequence number } } { "w" { $sequence number } } }
 { $description "Adds and subtracts alternate elements of " { $snippet "v" } " and " { $snippet "u" } " component-wise. Elements at even indexes are subtracted, while elements at odd indexes are added." }
 { $examples
     { $example
@@ -277,34 +277,34 @@ HELP: v+-
 } ;
 
 HELP: [v-]
-{ $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
+{ $values { "u" { $sequence real } } { "v" { $sequence real } } { "w" { $sequence real } } }
 { $description "Subtracts " { $snippet "v" } " from " { $snippet "u" } " component-wise; any components which become negative are set to zero." } ;
 
 HELP: v*
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "u" { $sequence number } } { "v" { $sequence number } } { "w" { $sequence number } } }
 { $description "Multiplies " { $snippet "u" } " and " { $snippet "v" } " component-wise." } ;
 
 HELP: v/
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "u" { $sequence number } } { "v" { $sequence number } } { "w" { $sequence number } } }
 { $description "Divides " { $snippet "u" } " by " { $snippet "v" } " component-wise." }
 { $errors "May throw an error if a division by zero occurs; see " { $link "division-by-zero" } "." } ;
 
 HELP: v^
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "u" { $sequence number } } { "v" { $sequence number } } { "w" { $sequence number } } }
 { $description "Raises " { $snippet "u" } " to the power of " { $snippet "v" } " component-wise." } ;
 
 HELP: vmax
-{ $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
+{ $values { "u" { $sequence real } } { "v" { $sequence real } } { "w" { $sequence real } } }
 { $description "Creates a sequence where each element is the maximum of the corresponding elements from " { $snippet "u" } " and " { $snippet "v" } "." }
 { $examples { $example "USING: math.vectors prettyprint ;" "{ 1 2 5 } { -7 6 3 } vmax ." "{ 1 6 5 }" } } ;
 
 HELP: vmin
-{ $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
+{ $values { "u" { $sequence real } } { "v" { $sequence real } } { "w" { $sequence real } } }
 { $description "Creates a sequence where each element is the minimum of the corresponding elements from " { $snippet "u" } " and " { $snippet "v" } "." }
 { $examples { $example "USING: math.vectors prettyprint ;" "{ 1 2 5 } { -7 6 3 } vmin ." "{ -7 2 3 }" } } ;
 
 HELP: vclamp
-{ $values { "v" "a sequence of real numbers" } { "min" "a sequence of real numbers" } { "max" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
+{ $values { "v" { $sequence real } } { "min" { $sequence real } } { "max" { $sequence real } } { "w" { $sequence real } } }
 { $description "Creates a sequence where each element is clamped to the minimum and maximum elements of the " { $snippet "min" } " and " { $snippet "max" } " sequences." }
 { $examples
   { $example
@@ -315,15 +315,15 @@ HELP: vclamp
 } ;
 
 HELP: v.
-{ $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "x" "a real number" } }
+{ $values { "u" { $sequence real } } { "v" { $sequence real } } { "x" "a real number" } }
 { $description "Computes the dot product of two vectors." } ;
 
 HELP: h.
-{ $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "x" "a real number" } }
+{ $values { "u" { $sequence real } } { "v" { $sequence real } } { "x" "a real number" } }
 { $description "Computes the Hermitian inner product of two vectors." } ;
 
 HELP: vs+
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "u" { $sequence number } } { "v" { $sequence number } } { "w" { $sequence number } } }
 { $description "Adds " { $snippet "u" } " and " { $snippet "v" } " component-wise with saturation." }
 { $examples
     "With saturation:"
@@ -343,40 +343,40 @@ HELP: vs+
 } ;
 
 HELP: vs-
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "u" { $sequence number } } { "v" { $sequence number } } { "w" { $sequence number } } }
 { $description "Subtracts " { $snippet "v" } " from " { $snippet "u" } " component-wise with saturation." } ;
 
 HELP: vs*
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of numbers" } }
+{ $values { "u" { $sequence number } } { "v" { $sequence number } } { "w" { $sequence number } } }
 { $description "Multiplies " { $snippet "u" } " and " { $snippet "v" } " component-wise with saturation." } ;
 
 HELP: vbitand
-{ $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
+{ $values { "u" { $sequence real } } { "v" { $sequence real } } { "w" { $sequence real } } }
 { $description "Takes the bitwise and of " { $snippet "u" } " and " { $snippet "v" } " component-wise." }
 { $notes "Unlike " { $link bitand } ", this word may be used on a specialized array of floats or doubles, in which case the bitwise representation of the floating point numbers is operated upon." } ;
 
 HELP: vbitandn
-{ $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
+{ $values { "u" { $sequence real } } { "v" { $sequence real } } { "w" { $sequence real } } }
 { $description "Takes the bitwise and-not of " { $snippet "u" } " and " { $snippet "v" } " component-wise, where " { $snippet "x and-not y" } " is defined as " { $snippet "not(x) and y" } "." }
 { $notes "This word may be used on a specialized array of floats or doubles, in which case the bitwise representation of the floating point numbers is operated upon." } ;
 
 HELP: vbitor
-{ $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
+{ $values { "u" { $sequence real } } { "v" { $sequence real } } { "w" { $sequence real } } }
 { $description "Takes the bitwise or of " { $snippet "u" } " and " { $snippet "v" } " component-wise." }
 { $notes "Unlike " { $link bitor } ", this word may be used on a specialized array of floats or doubles, in which case the bitwise representation of the floating point numbers is operated upon." } ;
 
 HELP: vbitxor
-{ $values { "u" "a sequence of real numbers" } { "v" "a sequence of real numbers" } { "w" "a sequence of real numbers" } }
+{ $values { "u" { $sequence real } } { "v" { $sequence real } } { "w" { $sequence real } } }
 { $description "Takes the bitwise exclusive or of " { $snippet "u" } " and " { $snippet "v" } " component-wise." }
 { $notes "Unlike " { $link bitxor } ", this word may be used on a specialized array of floats or doubles, in which case the bitwise representation of the floating point numbers is operated upon." } ;
 
 HELP: vlshift
-{ $values { "v" "a sequence of integers" } { "n" "a non-negative integer" } { "w" "a sequence of integers" } }
+{ $values { "v" { $sequence integer } } { "n" "a non-negative integer" } { "w" { $sequence integer } } }
 { $description "Shifts each element of " { $snippet "v" } " to the left by " { $snippet "n" } " bits." }
 { $notes "Undefined behavior will result if " { $snippet "n" } " is negative." } ;
 
 HELP: vrshift
-{ $values { "v" "a sequence of integers" } { "n" "a non-negative integer" } { "w" "a sequence of integers" } }
+{ $values { "v" { $sequence integer } } { "n" "a non-negative integer" } { "w" { $sequence integer } } }
 { $description "Shifts each element of " { $snippet "v" } " to the right by " { $snippet "n" } " bits." }
 { $notes "Undefined behavior will result if " { $snippet "n" } " is negative." } ;
 
@@ -478,92 +478,92 @@ HELP: vshuffle
 } ;
 
 HELP: norm-sq
-{ $values { "v" "a sequence of numbers" } { "x" "a non-negative real number" } }
+{ $values { "v" { $sequence number } } { "x" "a non-negative real number" } }
 { $description "Computes the squared length of a mathematical vector." } ;
 
 HELP: norm
-{ $values { "v" "a sequence of numbers" } { "x" "a non-negative real number" } }
+{ $values { "v" { $sequence number } } { "x" "a non-negative real number" } }
 { $description "Computes the length of a mathematical vector." } ;
 
 HELP: p-norm
-{ $values { "v" "a sequence of numbers" } { "p" "a positive real number" } { "x" "a non-negative real number" } }
+{ $values { "v" { $sequence number } } { "p" "a positive real number" } { "x" "a non-negative real number" } }
 { $description "Computes the length of a mathematical vector in " { $snippet "L^p" } " space." } ;
 
 HELP: normalize
-{ $values { "v" "a sequence of numbers, not all zero" } { "w" "a sequence of numbers" } }
+{ $values { "v" "a sequence of numbers, not all zero" } { "w" { $sequence number } } }
 { $description "Outputs a vector with the same direction as " { $snippet "v" } " but length 1." } ;
 
 HELP: distance
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "x" "a non-negative real number" } }
+{ $values { "u" { $sequence number } } { "v" { $sequence number } } { "x" "a non-negative real number" } }
 { $description "Outputs the Euclidean distance between two vectors." } ;
 
 HELP: set-axis
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "axis" "a sequence of 0/1" } { "w" "a sequence of numbers" } }
+{ $values { "u" { $sequence number } } { "v" { $sequence number } } { "axis" "a sequence of 0/1" } { "w" { $sequence number } } }
 { $description "Using " { $snippet "w" } " as a template, creates a new sequence containing corresponding elements from " { $snippet "u" } " in place of 0, and corresponding elements from " { $snippet "v" } " in place of 1." }
 { $examples { $example "USING: math.vectors prettyprint ;" "{ 1 2 3 } { 4 5 6 } { 0 1 0 } set-axis ." "{ 1 5 3 }" } } ;
 
 HELP: v<
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of booleans" } }
+{ $values { "u" { $sequence number } } { "v" { $sequence number } } { "w" { $sequence boolean } } }
 { $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when the former is less than the latter or " { $link f } " otherwise." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean results when using SIMD types." } ;
 
 HELP: v<=
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of booleans" } }
+{ $values { "u" { $sequence number } } { "v" { $sequence number } } { "w" { $sequence boolean } } }
 { $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when the former is less than or equal to the latter or " { $link f } " otherwise." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean results when using SIMD types." } ;
 
 HELP: v=
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of booleans" } }
+{ $values { "u" { $sequence number } } { "v" { $sequence number } } { "w" { $sequence boolean } } }
 { $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when they are equal or " { $link f } " otherwise." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean results when using SIMD types." } ;
 
 HELP: v>
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of booleans" } }
+{ $values { "u" { $sequence number } } { "v" { $sequence number } } { "w" { $sequence boolean } } }
 { $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when the former is greater than the latter or " { $link f } " otherwise." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean results when using SIMD types." } ;
 
 HELP: v>=
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of booleans" } }
+{ $values { "u" { $sequence number } } { "v" { $sequence number } } { "w" { $sequence boolean } } }
 { $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when the former is greater than or equal to the latter or " { $link f } " otherwise." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean results when using SIMD types." } ;
 
 HELP: vunordered?
-{ $values { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } { "w" "a sequence of booleans" } }
+{ $values { "u" { $sequence number } } { "v" { $sequence number } } { "w" { $sequence boolean } } }
 { $description "Compares each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", returning " { $link t } " in the result vector when either value is Not-a-Number or " { $link f } " otherwise." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean results when using SIMD types." } ;
 
 HELP: vand
-{ $values { "u" "a sequence of booleans" } { "v" "a sequence of booleans" } { "w" "a sequence of booleans" } }
+{ $values { "u" { $sequence boolean } } { "v" { $sequence boolean } } { "w" { $sequence boolean } } }
 { $description "Takes the logical AND of each corresponding element of " { $snippet "u" } " and " { $snippet "v" } "." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
 
 HELP: vandn
-{ $values { "u" "a sequence of booleans" } { "v" "a sequence of booleans" } { "w" "a sequence of booleans" } }
+{ $values { "u" { $sequence boolean } } { "v" { $sequence boolean } } { "w" { $sequence boolean } } }
 { $description "Takes the logical AND-NOT of each corresponding element of " { $snippet "u" } " and " { $snippet "v" } ", where " { $snippet "x AND-NOT y" } " is defined as " { $snippet "NOT(x) AND y" } "." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
 
 HELP: vor
-{ $values { "u" "a sequence of booleans" } { "v" "a sequence of booleans" } { "w" "a sequence of booleans" } }
+{ $values { "u" { $sequence boolean } } { "v" { $sequence boolean } } { "w" { $sequence boolean } } }
 { $description "Takes the logical OR of each corresponding element of " { $snippet "u" } " and " { $snippet "v" } "." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
 
 HELP: vxor
-{ $values { "u" "a sequence of booleans" } { "v" "a sequence of booleans" } { "w" "a sequence of booleans" } }
+{ $values { "u" { $sequence boolean } } { "v" { $sequence boolean } } { "w" { $sequence boolean } } }
 { $description "Takes the logical XOR of each corresponding element of " { $snippet "u" } " and " { $snippet "v" } "." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
 
 HELP: vnot
-{ $values { "v" "a sequence of booleans" } { "w" "a sequence of booleans" } }
+{ $values { "v" { $sequence boolean } } { "w" { $sequence boolean } } }
 { $description "Takes the logical NOT of each element of " { $snippet "v" } "." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
 
 HELP: v?
-{ $values { "mask" "a sequence of booleans" } { "true" "a sequence of numbers" } { "false" "a sequence of numbers" } { "result" "a sequence of numbers" } }
+{ $values { "mask" { $sequence boolean } } { "true" { $sequence number } } { "false" { $sequence number } } { "result" { $sequence number } } }
 { $description "Creates a new sequence by selecting elements from the " { $snippet "true" } " and " { $snippet "false" } " sequences based on whether the corresponding bits of the " { $snippet "mask" } " sequence are set or not." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types." } ;
 
 HELP: vif
-{ $values { "mask" "a sequence of booleans" } { "true-quot" { $quotation ( -- vector ) } } { "false-quot" { $quotation ( -- vector ) } } { "result" sequence } }
+{ $values { "mask" { $sequence boolean } } { "true-quot" { $quotation ( -- vector ) } } { "false-quot" { $quotation ( -- vector ) } } { "result" sequence } }
 { $description "If all of the elements of " { $snippet "mask" } " are true, " { $snippet "true-quot" } " is called and its output value returned. If all of the elements of " { $snippet "mask" } " are false, " { $snippet "false-quot" } " is called and its output value returned. Otherwise, both quotations are called and " { $snippet "mask" } " is used to select elements from each output as with " { $link v? } "." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs and results when using SIMD types."
 $nl
@@ -572,17 +572,17 @@ $nl
 { v? vif } related-words
 
 HELP: vany?
-{ $values { "v" "a sequence of booleans" } { "?" boolean } }
+{ $values { "v" { $sequence boolean } } { "?" boolean } }
 { $description "Returns true if any element of " { $snippet "v" } " is true." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs when using SIMD types." } ;
 
 HELP: vall?
-{ $values { "v" "a sequence of booleans" } { "?" boolean } }
+{ $values { "v" { $sequence boolean } } { "?" boolean } }
 { $description "Returns true if every element of " { $snippet "v" } " is true." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs when using SIMD types." } ;
 
 HELP: vnone?
-{ $values { "v" "a sequence of booleans" } { "?" boolean } }
+{ $values { "v" { $sequence boolean } } { "?" boolean } }
 { $description "Returns true if every element of " { $snippet "v" } " is false." }
 { $notes "See " { $link "math-vectors-simd-logic" } " for notes on dealing with vector boolean inputs when using SIMD types." } ;
 
