@@ -194,28 +194,38 @@ ERROR: key-exists val key assoc existing-value ;
 : lookup-syntax ( string -- form )
     ;
 
-:: map-forms ( seq quot: ( obj -- obj' ) -- seq' )
+: ?glue-as ( seq1 seq2 glue exemplar -- seq )
+    reach [
+        glue-as
+    ] [
+        nip like nip
+    ] if ; inline
+
+:: map-forms* ( seq namespace quot: ( namespace obj -- obj' ) -- seq' )
     seq
     [
         {
-          ! { [ dup slice? ] [ quot call ] }
+          ! { [ dup slice? ] [ namespace quot call ] }
           { [
               dup { [ array? ] [ first section-open? ] } 1&&
             ] [
                 first3 ! pick .
-                [ quot map-forms ] dip 3array
+                [ namespace pick [ char: < = ] trim-head "." "" ?glue-as dup . quot map-forms* ] dip 3array
                 ! dup last .
           ] }
           { [
               dup { [ array? ] [ first upper-colon? ] } 1&&
           ] [
-              dup first2 first 2array .
+              dup first2 first namespace -rot 3array .
           ] }
           [
               ! "oops" throw
           ]
         } cond
     ] map ; inline recursive
+
+: map-forms ( seq quot: ( namespace obj -- obj' ) -- seq' )
+    f swap map-forms* ; inline
 
 
 : apply-decorators ( seq forms -- seq' )
