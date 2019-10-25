@@ -194,7 +194,28 @@ ERROR: key-exists val key assoc existing-value ;
 : lookup-syntax ( string -- form )
     ;
 
-! : map-forms ( seq quot -- seq' ) [ ] map ;
+:: map-forms ( seq quot: ( obj -- obj' ) -- seq' )
+    seq
+    [
+        {
+          ! { [ dup slice? ] [ quot call ] }
+          { [
+              dup { [ array? ] [ first section-open? ] } 1&&
+            ] [
+                first3 ! pick .
+                [ quot map-forms ] dip 3array
+                ! dup last .
+          ] }
+          { [
+              dup { [ array? ] [ first upper-colon? ] } 1&&
+          ] [
+              dup first2 first 2array .
+          ] }
+          [
+              ! "oops" throw
+          ]
+        } cond
+    ] map ; inline recursive
 
 
 : apply-decorators ( seq forms -- seq' )
