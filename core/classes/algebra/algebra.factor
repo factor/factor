@@ -288,5 +288,5 @@ ERROR: topological-sort-failed ;
         [ ] [ [ class<= ] most ] map-reduce
     ] if-empty ;
 
-: flatten-class ( class -- assoc )
-    [ (flatten-class) ] H{ } make ;
+: flatten-class ( class -- seq )
+    [ (flatten-class) ] { } make members ;

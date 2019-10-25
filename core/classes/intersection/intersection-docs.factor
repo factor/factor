@@ -19,7 +19,7 @@ ARTICLE: "intersections" "Intersection classes"
 ABOUT: "intersections"
 
 HELP: define-intersection-class
-{ $values { "class" class } { "participants" "a sequence of classes" } }
+{ $values { "class" class } { "participants" { $sequence class } } }
 { $description "Defines a intersection class with specified participants. This is the run time equivalent of " { $link \ \INTERSECTION: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "class" } ;

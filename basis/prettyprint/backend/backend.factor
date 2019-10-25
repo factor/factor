@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
 classes.algebra.private classes.maybe classes.private
-classes.tuple combinators continuations effects generic
-hash-sets hashtables io.pathnames io.styles kernel make math
-math.order math.parser namespaces prettyprint.config
+classes.tuple combinators continuations effects fry generic
+hash-sets hashtables io.pathnames io.styles kernel lists make
+math math.order math.parser namespaces prettyprint.config
 prettyprint.custom prettyprint.sections prettyprint.stylesheet
 quotations sbufs sequences strings vectors words ;
 QUALIFIED: sets
@@ -214,6 +214,7 @@ M: array pprint-delims drop \ \{ \ \} ;
 M: byte-array pprint-delims drop \ \B{ \ \} ;
 M: byte-vector pprint-delims drop \ \BV{ \ \} ;
 M: vector pprint-delims drop \ \V{ \ \} ;
+M: cons-state pprint-delims drop \ \L{ \ \} ;
 M: hashtable pprint-delims drop \ \H{ \ \} ;
 M: tuple pprint-delims drop \ \T{ \ \} ;
 M: wrapper pprint-delims drop \ \W{ \ \} ;
@@ -264,6 +265,23 @@ M: object pprint-object ( obj -- )
 M: object pprint* pprint-object ;
 M: vector pprint* pprint-object ;
 M: byte-vector pprint* pprint-object ;
+
+M: cons-state pprint*
+    [
+        <flow
+        dup pprint-delims [
+            pprint-word
+            dup pprint-narrow? <inset
+            [
+                building get
+                length-limit get
+                '[ dup cons-state? _ length _ < and ]
+                [ uncons swap , ] while
+            ] { } make
+            [ pprint* ] each nil? [ "~more~" text ] unless
+            block>
+        ] dip pprint-word block>
+    ] check-recursion ;
 
 : with-extra-nesting-level ( quot -- )
     nesting-limit [ dup [ 1 + ] [ f ] if* ] change

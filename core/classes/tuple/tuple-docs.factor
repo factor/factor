@@ -373,7 +373,7 @@ HELP: define-tuple-predicate
 $low-level-note ;
 
 HELP: redefine-tuple-class
-{ $values { "class" class } { "superclass" class } { "slots" "a sequence of strings" } }
+{ $values { "class" class } { "superclass" class } { "slots" { $sequence string } } }
 { $description "If the new slot layout differs from the existing one, updates all existing instances of this tuple class, and forgets any slot accessor words which are no longer needed."
 $nl
 "If the class is not a tuple class word, this word does nothing." }
@@ -396,7 +396,7 @@ HELP: check-tuple
 { $error-description "Thrown if " { $link \ \C: } " is called with a word which does not name a tuple class." } ;
 
 HELP: define-tuple-class
-{ $values { "class" word } { "superclass" class } { "slots" "a sequence of strings" } }
+{ $values { "class" word } { "superclass" class } { "slots" { $sequence string } } }
 { $description "Defines a tuple class inheriting from " { $snippet "superclass" } " with slots named by " { $snippet "slots" } ". This is the run time equivalent of " { $link \ \TUPLE: } "." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." }
 { $side-effects "class" } ;
