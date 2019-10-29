@@ -143,9 +143,9 @@ ERROR: key-exists val key assoc existing-value ;
         "let" "let" add-brackets-form
         "binder-quotation" "|" add-brackets-form
 
-        "call-paren" "" add-parens-form ! ( )
+        "stack-effect" "" add-parens-form ! ( )
         "call-paren" "call" add-parens-form ! call( )
-        "execute-paren" "execute" add-parens-form
+        "execute-paren" "execute" add-parens-form ! execute( )
 
         "string" "" add-containers-form  ! "" [[ ]] [=[ ]=] ...
         "interpolate" "I" add-containers-form

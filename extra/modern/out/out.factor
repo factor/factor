@@ -7,9 +7,6 @@ prettyprint sequences sequences.extras splitting strings
 syntax.modern vocabs.loader ;
 IN: modern.out
 
-: token? ( obj -- ? )
-    { [ slice? ] [ seq>> string? ] } 1&& ;
-
 TUPLE: renamed slice string ;
 CONSTRUCTOR: <renamed> renamed ( slice string -- obj ) ;
 
@@ -21,13 +18,13 @@ CONSTRUCTOR: <renamed> renamed ( slice string -- obj ) ;
 : write-whitespace ( last obj -- )
     swap
     [ swap slice-between ] [ slice-before ] if*
-    trim-before-newline io:write ;
+    trim-before-newline >string io:write ;
 
 GENERIC: write-literal* ( last obj -- last' )
-M: slice write-literal* write ; ! [ write-whitespace ] [ write ] [ ] tri ;
+M: slice write-literal* [ write-whitespace ] [ >string write ] [ ] tri ;
 M: array write-literal* [ write-literal* ] each ;
-! M: renamed write-literal* [ slice>> write-whitespace ] [ string>> write ] [ slice>> ] tri ; ! for refactoring
-M: string write-literal* write ;
+M: renamed write-literal* [ slice>> write-whitespace ] [ string>> write ] [ slice>> ] tri ; ! for refactoring
+: write-literal ( obj -- ) f swap write-literal* drop ;
 
 DEFER: map-literals
 : (map-literals) ( obj quot: ( obj -- obj' ) -- seq )
@@ -40,15 +37,11 @@ DEFER: map-literals
 : map-literals ( obj quot: ( obj -- obj' ) -- seq )
     '[ _ (map-literals) ] map ; inline recursive
 
-
-! Start with no slice as ``last``
-: write-literal ( obj -- ) f swap write-literal* drop ;
-
 : write-modern-string ( seq -- string )
     [ write-literal ] with-string-writer ; inline
 
 : write-modern-path ( seq path -- )
-    utf8 [ write-literal ] with-file-writer ; inline
+    utf8 [ write-literal "\n" write ] with-file-writer ; inline
 
 : write-modern-vocab ( seq vocab -- )
     vocab-source-path write-modern-path ; inline
