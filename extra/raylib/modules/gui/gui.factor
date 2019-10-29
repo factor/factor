@@ -25,7 +25,7 @@ ENUM: GuiTextAlignment
 
 ! Gui standard controls
 ENUM: GuiControlStandard
-    DEFAULT 
+    DEFAULT
     LABEL          ! LABELBUTTON
     BUTTON         ! IMAGEBUTTON
     TOGGLE         ! TOGGLEGROUP

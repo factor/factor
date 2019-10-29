@@ -33,7 +33,7 @@ IN: raylib.gui-demo
     rl-gui-unlock ;
 
 : render-loop ( -- )
-    begin-drawing white-background 
+    begin-drawing white-background
     say-hello render-gui end-drawing ;
 
 : main ( -- )

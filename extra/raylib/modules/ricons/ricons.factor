@@ -9,7 +9,7 @@ IN: raylib.modules.ricons
 FUNCTION-ALIAS: rl-draw-icon void DrawIcon ( int iconId, Vector2 position, int pixelSize, Color color )
 
 ENUM: rIconDescription
-    RICON_NONE 
+    RICON_NONE
     RICON_FOLDER_FILE_OPEN
     RICON_FILE_SAVE_CLASSIC
     RICON_FOLDER_OPEN
@@ -208,4 +208,3 @@ ENUM: rIconDescription
     RICON_LAYERS_VISIBLE
     RICON_LAYERS
     RICON_WINDOW ;
-

@@ -46,7 +46,7 @@ STRUCT: xoshiro-256-star-star { s0 ulonglong } { s1 ulonglong } { s2 ulonglong }
 
 : next-256 ( xoshiro-256-star-star -- r64 )
     dup get[ s0 s1 s2 s3 ] (next-256)
-    [ set[ s0 s1 s2 s3 ] drop ] dip ; 
+    [ set[ s0 s1 s2 s3 ] drop ] dip ;
 
 :: jump ( s0! s1! s2! s3! jump-table -- s0' s1' s2' s3' )
     0 0 0 0 :> ( t0! t1! t2! t3! )

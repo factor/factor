@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 Jack Lucas
 ! See http://factorcode.org/license.txt for BSD license.
 USING: raylib.ffi kernel math.ranges sequences locals random combinators.random  math threads calendar namespaces accessors classes.struct combinators alien.enums ;
-IN: raylib.demo 
+IN: raylib.demo
 
 : say-hello ( -- )
     "Hello, Factor!" 200 400 60 MAGENTA draw-text ;
