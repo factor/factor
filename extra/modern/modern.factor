@@ -332,8 +332,13 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
 : read-acute ( string n slice -- string n' acute )
     [ matching-section-delimiter 1array lex-until ] keep swap unclip-last 3array ;
 
+! #{ } turned off, foo# not turned off
 : read-turnoff ( string n slice -- string n' obj )
-    [ lex-factor ] dip swap 2array ;
+    dup { [ "#" head? ] [ "#" sequence= not ] } 1&&  [
+        [ lex-factor ] dip swap 2array
+    ] [
+        merge-slice-til-whitespace
+    ] if ;
 
 ! Words like append! and suffix! are allowed for now.
 : read-exclamation ( string n slice -- string n' obj )
