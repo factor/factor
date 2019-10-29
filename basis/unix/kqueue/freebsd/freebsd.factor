@@ -7,7 +7,7 @@ STRUCT: kevent
     { flags  ushort }
     { fflags uint }
     { data __int64_t }
-    { udata  void* } 
+    { udata  void* }
     { ext __uint64_t[4] } ;
 
 FUNCTION-ALIAS: kevent-func int kevent ( int kq, kevent* changelist, int nchanges, kevent* eventlist, int nevents, timespec* timeout )
@@ -28,4 +28,3 @@ CONSTANT: EVFILT_USER     -11 ! user events
 CONSTANT: EVFILT_SENDFILE -12 ! attached to sendfile requests
 CONSTANT: EVFILT_EMPTY    -13 ! empty send socket buf
 CONSTANT: EVFILT_SYSCOUNT  13
-

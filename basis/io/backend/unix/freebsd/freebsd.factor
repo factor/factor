@@ -7,5 +7,5 @@ M: freebsd init-io ( -- )
    
 freebsd set-io-backend
 
-[ start-signal-pipe-thread ] 
+[ start-signal-pipe-thread ]
 "io.backend.unix:signal-pipe-thread" add-startup-hook

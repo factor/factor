@@ -21,4 +21,3 @@ CONSTANT: ST_RDONLY   1 ! Read-only file system
 CONSTANT: ST_NOSUID   2 ! Does not honor setuid/setgid
 
 FUNCTION-ALIAS: statvfs-func int statvfs ( c-string path, statvfs* buf )
-

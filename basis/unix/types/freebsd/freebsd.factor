@@ -22,4 +22,3 @@ TYPEDEF: int        pid_t
 TYPEDEF: long       time_t
 TYPEDEF: __uint64_t fsblkcnt_t
 TYPEDEF: __uint64_t fsfilcnt_t
-

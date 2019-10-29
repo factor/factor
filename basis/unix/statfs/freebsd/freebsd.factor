@@ -31,7 +31,6 @@ STRUCT: statfs
     { f_mntfromname { char MNAMELEN } }
     { f_mntonname { char MNAMELEN } } ;
 
-FUNCTION-ALIAS: statfs-func int statfs ( c-string path, statfs* buf ) 
+FUNCTION-ALIAS: statfs-func int statfs ( c-string path, statfs* buf )
 CONSTANT: MNT_WAIT    1   ! synchronously wait for I/O to complete
 CONSTANT: MNT_NOWAIT  2   ! start all I/O, but do not wait for it
-

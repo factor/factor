@@ -27,7 +27,6 @@ STRUCT: stat
     { st_gen __uint64_t }
     { st_spare __int64_t[10] } ;
     
-FUNCTION-ALIAS: stat-func int stat  ( c-string pathname, stat* buf ) 
+FUNCTION-ALIAS: stat-func int stat  ( c-string pathname, stat* buf )
 FUNCTION: int lstat ( c-string pathname, stat* buf )
 FUNCTION: int fstat ( int fd, stat* buf )
-

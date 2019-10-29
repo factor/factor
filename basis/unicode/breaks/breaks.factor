@@ -80,7 +80,7 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
 CATEGORY: spacing Mc ;
 
 : regional? ( ch -- ? )
-    "Regional_Indicator" property? ; 
+    "Regional_Indicator" property? ;
 >>
 
 : modifier? ( ch -- ? ) emoji-modifier-table interval-key? ; inline
@@ -99,10 +99,10 @@ CATEGORY: spacing Mc ;
                       [ modifier? ]
                       tri or or not
                   ] find-last drop [ swap ?nth ] [ last ] if*
-                  extended-pictographic-table interval-key? [                      
+                  extended-pictographic-table interval-key? [
                       (Extended_Pictographic-Extend*-)ZWJ
                   ] [ ZWJ ] if
-              ] when               
+              ] when
           ] }
         { [ dup extend? ] [ drop Extend ] }
         { [ dup modifier? ] [ drop Extend ] }
@@ -110,7 +110,7 @@ CATEGORY: spacing Mc ;
                              interval-key? [ Any ] [ SpacingMark ] if ] }
         { [ dup loe? ] [ drop Prepend ] }
         { [ dup regional? ] [
-              drop  
+              drop
               f :> ri-even?!
               str unclip-last-slice drop [
                   regional? [ ri-even? not ri-even?! f ] [ t ] if
@@ -338,7 +338,7 @@ define-constant
         { check-Extended_Pictographic
           [ swap ?nth extended-pictographic-table interval-key? ] }
         { check-RI-pair [
-              2drop 
+              2drop
               f :> ri-even?!
               i str [
                   regional? [ ri-even? not ri-even?! f ] [ t ] if

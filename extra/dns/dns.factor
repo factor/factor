@@ -427,4 +427,3 @@ MACOS>
 
 : with-dns-servers ( servers quot -- )
     [ dns-servers ] dip with-variable ; inline
-
