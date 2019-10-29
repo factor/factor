@@ -5,6 +5,16 @@ combinators.short-circuit kernel modern sequences
 splitting.monotonic strings words ;
 IN: modern.manifest
 
+MIXIN: token
+
+TUPLE: uri
+    uri
+    vocab-root
+    vocab
+    section-path
+    word ;
+
+
 TUPLE: syntax-forms
     sections
     named-sections
@@ -201,47 +211,9 @@ ERROR: key-exists val key assoc existing-value ;
         nip like nip
     ] if ; inline
 
-:: map-forms* ( seq namespace quot: ( namespace obj -- obj' ) -- seq' )
-    seq
-    [
-        {
-          ! { [ dup slice? ] [ namespace quot call ] }
-          { [
-              dup { [ array? ] [ first section-open? ] } 1&&
-            ] [
-                first3 ! pick .
-                [ namespace pick [ char: < = ] trim-head "." "" ?glue-as dup . quot map-forms* ] dip 3array
-                ! dup last .
-          ] }
-          { [
-              dup { [ array? ] [ first upper-colon? ] } 1&&
-          ] [
-              dup first2 first namespace -rot 3array .
-          ] }
-          [
-              ! "oops" throw
-          ]
-        } cond
-    ] map ; inline recursive
-
-: map-forms ( seq quot: ( namespace obj -- obj' ) -- seq' )
-    f swap map-forms* ; inline
-
 
 : apply-decorators ( seq forms -- seq' )
     '[ nip dup slice? [ >string _ rdecorators>> at ] [ drop f ] if ] monotonic-split ;
-
-TUPLE: manifest ;
-
-GENERIC: flatten-literal ( obj -- obj' )
-M: sequence flatten-literal
-    [ flatten-literal ] map ;
-
-M: slice flatten-literal >string ;
-
-: flatten-literals ( seq -- seq' )
-    ;
-
 
 : upper-colon>form ( seq -- form )
     [ first "syntax" lookup-word ] [ ] bi 2array ;
@@ -251,82 +223,9 @@ GENERIC: upper-colon>definitions ( form -- seq )
 ! M: \: upper-colon>definitions
 !    second first >string ;
 
-
-
 : form>definitions ( obj -- obj' )
     {
         { [ dup ?first upper-colon? ] [ upper-colon>definitions ] }
         [ ]
     } cond ;
 
-
-! math+private,macos:fixnum+
-! math+private:fixnum+
-! math:fixnum+
-#[[
-  <PRIVATE PRIVATE>
-    private decorator
-  <MACOS MACOS>
-    macos decorator
-  <MACOS <PRIVATE PRIVATE> MACOS>
-    macos,private decorators
-<VOCAB: math
-  : foo ;
-  <PRIVATE
-    : bar ;
-    <MACOS
-      : baz ;
-    MACOS>
-  PRIVATE>
-;VOCAB>
-    private.macos namespace
-
-    math#private.macos
-    math+private.macos
-    math:foo
-    math+private:foo
-    math+private.macos:foo
-
-    git@github.com:erg/factor#master
-git@github.com:erg/factor#master\core/math+private.macos:foo
-                                ^
-
-uri\path\path/path/
-
-GITHUB\core/math.order
-git@github.com:erg/factor#master\core/math/order/order.factor
-git@github.com:erg/factor#master\core//math.order
-git@github.com:erg/factor#master\core//math.order
-${github}:erg/factor#master\core//math.order
-
-
-
-
-git branch name: no backslash, ., .., ~^:<sp>, end in /
-
-<ROOT: core
-  <VOCAB: math
-    : foo ;
-    <PRIVATE
-      : bar ;
-      <MACOS
-        : baz ;
-      MACOS>
-    PRIVATE>
-  ;VOCAB>
-;ROOT>
-
-<REPO: github
-  <ROOT: core
-    <VOCAB: math
-      : foo ;
-      <PRIVATE
-        : bar ;
-        <MACOS
-          : baz ;
-        MACOS>
-      PRIVATE>
-    ;VOCAB>
-  ;ROOT>
-;REPO>
-]]

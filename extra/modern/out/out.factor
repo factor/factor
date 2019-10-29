@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit
 constructors continuations io io.encodings.utf8 io.files
-io.streams.string kernel modern modern.paths modern.slices
-prettyprint sequences sequences.extras splitting strings
-syntax.modern vocabs.loader ;
+io.streams.string kernel modern modern.compiler modern.paths
+modern.slices prettyprint sequences sequences.extras splitting
+strings syntax.modern vocabs.loader ;
 IN: modern.out
 
 TUPLE: renamed slice string ;
@@ -23,6 +23,7 @@ CONSTRUCTOR: <renamed> renamed ( slice string -- obj ) ;
 GENERIC: write-literal* ( last obj -- last' )
 M: slice write-literal* [ write-whitespace ] [ >string write ] [ ] tri ;
 M: array write-literal* [ write-literal* ] each ;
+M: lexed write-literal* tokens>> write-literal* ;
 M: renamed write-literal* [ slice>> write-whitespace ] [ string>> write ] [ slice>> ] tri ; ! for refactoring
 : write-literal ( obj -- ) f swap write-literal* drop ;
 

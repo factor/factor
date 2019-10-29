@@ -2,10 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators combinators.short-circuit
 constructors continuations io.encodings.utf8 io.files kernel
-make math math.order modern.lexer modern.paths modern.slices
+make math math.order modern.paths modern.slices
 sequences sequences.extras sequences.generalizations sets
 shuffle splitting strings syntax.modern unicode vocabs.loader ;
 IN: modern
+
+: <ws> ( obj -- obj ) ;
 
 ERROR: long-opening-mismatch tag open string n ch ;
 ERROR: unexpected-terminator string n slice ; ! ] } ) ;
@@ -180,6 +182,16 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
 
 : strict-upper? ( string -- ? )
     { [ [ char: \: = ] all? ] [ (strict-upper?) ] } 1|| ;
+
+: neither? ( obj1 obj2 quot -- ? ) either? not ; inline
+: xnor ( obj1 obj2 -- ? ) xor not ; inline
+: xnor? ( obj1 obj2 quot -- ? ) bi@ xnor ; inline
+: count-bs ( string -- n ) [ char: \\ = ] count-head ; inline
+: uri-token? ( string -- ? ) count-bs 4 = ;
+: vocab-root-token? ( string -- ? ) count-bs 3 = ;
+: vocab-token? ( string -- ? ) count-bs 2 = ;
+: word-token? ( string -- ? ) count-bs 1 = ;
+
 
 ! <A <A: but not <A>
 : section-open? ( string -- ? )
