@@ -334,8 +334,8 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
 
 ! #{ } turned off, foo# not turned off
 : read-turnoff ( string n slice -- string n' obj )
-    dup { [ "#" head? ] [ "#" sequence= not ] } 1&&  [
-        [ lex-factor ] dip swap 2array
+    dup "#" head? [
+        [ lex-factor ] dip swap [ 2array ] when* ! ``{ # foo }`` or ``#`` standalone
     ] [
         merge-slice-til-whitespace
     ] if ;
