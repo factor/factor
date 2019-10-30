@@ -116,7 +116,7 @@ TUPLE: entry key value ;
 : multi-string ( -- parser )
     multi-basic-string multi-literal-string 2choice [
         "" like "\n" ?head drop
-        R/ \\[ \t\r\n]*\n[ \t\r\n]*/m "" re-replace
+        re:: [[\\[ \t\r\n]*\n[ \t\r\n]*]] "m" "" re-replace
     ] action ;
 
 : string-parser ( -- parser )

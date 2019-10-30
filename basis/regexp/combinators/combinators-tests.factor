@@ -10,7 +10,7 @@ IN: regexp.combinators.tests
 { f f f } [ "food" "ibar" "ba" [ strings matches? ] tri@ ] unit-test
 
 : conj ( -- regexp )
-    { R/ .*a/ R/ b.*/ } <and> ;
+    { re".*a" re"b.*" } <and> ;
 
 { t } [ "bljhasflsda" conj matches? ] unit-test
 { f } [ "bsdfdfs" conj matches? ] unit-test

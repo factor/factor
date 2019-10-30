@@ -7,10 +7,10 @@ unicode multiline ;
 IN: globs
 
 : not-path-separator ( -- sep )
-    os windows? R/ [^\/\\]/ R/ [^\/]/ ? ; foldable
+    os windows? re"[^\/\\]" re"[^\/]" ? ; foldable
 
 : wild-path-separator ( -- sep )
-    os windows? R/ [^\/\\][\/\\]|[^\/\\]/ R/ [^\/][\/]|[^\/]/ ? ; foldable
+    os windows? re"[^\/\\][\/\\]|[^\/\\]" re"[^\/][\/]|[^\/]" ? ; foldable
 
 EBNF: <glob> [=[
 

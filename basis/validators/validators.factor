@@ -61,11 +61,11 @@ IN: validators
     ! From http://www.regular-expressions.info/email.html
     320 v-max-length
     "e-mail"
-    R/ [A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/i
+    re:: [[[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}]] "i"
     v-regexp ;
 
 : v-url ( str -- str )
-    "url" R/ (?:ftp|http|https):\/\/\S+/ v-regexp ;
+    "url" re[[(?:ftp|http|https):\/\/\S+]] v-regexp ;
 
 : v-captcha ( str -- str )
     dup empty? [ "must remain blank" throw ] unless ;

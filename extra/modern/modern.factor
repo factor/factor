@@ -144,7 +144,7 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
     2over ?nth-of char: \[ = [
         [ 1 + ] dip 1 modify-to 2over ?nth-of read-double-matched-bracket
     ] [
-        [ slice-til-eol drop ] dip swap 2array
+        [ slice-til-eol drop ] dip swap 2array <comment>
     ] if ;
 
 : terminator? ( slice -- ? )
@@ -166,7 +166,7 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
             dup [ f unexpected-eof ] unless
             lex-factor
         ] replicate ensure-tokens ! concat
-    ] dip swap 2array ;
+    ] dip swap 2array <lower-colon> ;
 
 : (strict-upper?) ( string -- ? )
     {
@@ -280,17 +280,16 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
     swap
     ! What ended the FOO: .. ; form?
     ! Remove the ; from the payload if present
-    ! XXX: probably can remove this, T: is dumb
     ! Also in stack effects ( T: int -- ) can be ended by -- and )
     dup ?last {
-        { [ dup ";" sequence= ] [ drop unclip-last 3array ] }
-        { [ dup ";" tail? ] [ drop unclip-last 3array ] }
-        { [ dup "--" sequence= ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
-        { [ dup "]" sequence= ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
-        { [ dup "}" sequence= ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
-        { [ dup ")" sequence= ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] } ! (n*quot) breaks
-        { [ dup section-close? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
-        { [ dup upper-colon? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
+        { [ dup ";" sequence= ] [ drop unclip-last 3array <upper-colon> ] }
+        { [ dup ";" tail? ] [ drop unclip-last 3array <upper-colon> ] }
+        { [ dup "--" sequence= ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
+        { [ dup "]" sequence= ] [ "omg1" throw drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
+        { [ dup "}" sequence= ] [ "omg2" throw drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
+        { [ dup ")" sequence= ] [ B "opg3" throw drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] } ! (n*quot) breaks
+        { [ dup section-close? ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
+        { [ dup upper-colon? ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
         [ drop 2array <upper-colon> ]
     } cond ;
 
@@ -342,7 +341,7 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
     } cond ;
 
 : read-acute ( string n slice -- string n' acute )
-    [ matching-section-delimiter 1array lex-until ] keep swap unclip-last 3array ;
+    [ matching-section-delimiter 1array lex-until ] keep swap unclip-last 3array <section> ;
 
 ! #{ } turned off, foo# not turned off
 : read-turnoff ( string n slice -- string n' obj )

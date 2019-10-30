@@ -87,7 +87,7 @@ M: text-printer print-comment-tag drop ;
 M: text-printer print-dtd-tag drop ;
 
 : collapse-spaces ( text -- text' )
-    preformatted? get [ R/ \s+/ " " re-replace ] unless ;
+    preformatted? get [ re"\s+" " " re-replace ] unless ;
 
 M: text-printer print-text-tag
     script? get style? get or

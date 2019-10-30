@@ -869,7 +869,7 @@ CONSTANT: emoji H{
 }
 
 : emojify ( str -- str' )
-    R/ :([^:])+:/ [ >string emoji at ] re-replace-with ;
+    R[[:([^:])+:]] [ >string emoji at ] re-replace-with ;
 
 : emojify-main ( -- )
     command-line get [

@@ -29,25 +29,25 @@ M: lexed length tokens>> length ;
 
 
 TUPLE: comment < lexed payload ;
-CONSTRUCTOR: <comment> comment ( tokens payload -- obj ) ;
+CONSTRUCTOR: <comment> comment ( tokens -- obj ) ;
 
 TUPLE: escaped-identifier < lexed name ;
-CONSTRUCTOR: <escaped-identifier> escaped-identifier ( tokens name -- obj ) ;
+CONSTRUCTOR: <escaped-identifier> escaped-identifier ( tokens -- obj ) ;
 
 TUPLE: escaped-object < lexed name payload ;
-CONSTRUCTOR: <escaped-object> escaped-object ( tokens name payload -- obj ) ;
+CONSTRUCTOR: <escaped-object> escaped-object ( tokens -- obj ) ;
 
 TUPLE: section < lexed tag payload ;
-CONSTRUCTOR: <section> section ( tokens tag payload -- obj ) ;
+CONSTRUCTOR: <section> section ( tokens -- obj ) ;
 
 TUPLE: named-section < lexed tag name payload ;
-CONSTRUCTOR: <named-section> named-section ( tokens tag name payload -- obj ) ;
+CONSTRUCTOR: <named-section> named-section ( tokens -- obj ) ;
 
 TUPLE: upper-colon < lexed tag payload ;
 CONSTRUCTOR: <upper-colon> upper-colon ( tokens -- obj ) ;
 
 TUPLE: lower-colon < lexed tag payload ;
-CONSTRUCTOR: <lower-colon> lower-colon ( tokens tag payload -- obj ) ;
+CONSTRUCTOR: <lower-colon> lower-colon ( tokens -- obj ) ;
 
 TUPLE: matched < lexed tag payload ;
 
@@ -98,11 +98,11 @@ CONSTRUCTOR: <double-paren> double-paren ( tokens -- obj )
 
 
 TUPLE: double-quote < matched ;
-CONSTRUCTOR: <double-quote> double-quote ( tokens tag payload -- obj ) ;
+CONSTRUCTOR: <double-quote> double-quote ( tokens -- obj ) ;
 
 
 TUPLE: identifier < lexed name ;
-CONSTRUCTOR: <identifier> identifier ( tokens name -- obj ) ;
+CONSTRUCTOR: <identifier> identifier ( tokens -- obj ) ;
 
 
 

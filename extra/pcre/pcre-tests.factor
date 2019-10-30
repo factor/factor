@@ -158,4 +158,4 @@ version 8.36 <= [
 ] unit-test
 
 ! Test that the regexp syntax works.
-{ t } [ "1234abcd" regexp:R/ ^\d+\w+$/ matches? ] unit-test
+{ t } [ "1234abcd" regexp:R[[^\d+\w+$]] matches? ] unit-test
