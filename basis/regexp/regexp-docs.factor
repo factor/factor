@@ -27,20 +27,20 @@ ARTICLE: "regexp" "Regular expressions"
 
 ARTICLE: "regexp-intro" "A quick introduction to regular expressions"
 "Regular expressions are a terse way to do certain simple string processing tasks. For example, to replace all instances of " { $snippet "foo" } " in one string with " { $snippet "bar" } ", the following can be used:"
-{ $code "R/ foo/ \"bar\" re-replace" }
+{ $code "re[[foo]] \"bar\" re-replace" }
 "That could be done with sequence operations, but consider doing this replacement for an arbitrary number of o's, at least two:"
-{ $code "R/ foo+/ \"bar\" re-replace" }
+{ $code "re[[foo+]] \"bar\" re-replace" }
 "The " { $snippet "+" } " operator matches one or more occurrences of the previous expression; in this case " { $snippet "o" } ". Another useful feature is alternation. Say we want to do this replacement with fooooo or boooo. Then we could use the code"
-{ $code "R/ (f|b)oo+/ \"bar\" re-replace" }
+{ $code "re[[(f|b)oo+]] \"bar\" re-replace" }
 "To search a file for all lines that match a given regular expression, you could use code like this:"
-{ $code "\"file.txt\" ascii file-lines [ R/ (f|b)oo+/ re-contains? ] filter" }
+{ $code "\"file.txt\" ascii file-lines [ re[[(f|b)oo+]] re-contains? ] filter" }
 "To test if a string in its entirety matches a regular expression, the following can be used:"
-{ $example "USE: regexp \"fooo\" R/ (b|f)oo+/ matches? ." "t" }
+{ $example "USE: regexp \"fooo\" re[[(b|f)oo+]] matches? ." "t" }
 "Regular expressions can't be used for all parsing tasks. For example, they are not powerful enough to match balancing parentheses." ;
 
 ARTICLE: "regexp-construction" "Constructing regular expressions"
 "Most of the time, regular expressions are literals and the parsing word should be used, to construct them at parse time. This ensures that they are only compiled once, and gives parse time syntax checking."
-{ $subsections postpone: R/ }
+{ $subsections postpone: \re[[ }
 "Sometimes, regular expressions need to be constructed at run time instead; for example, in a text editor, the user might input a regular expression to search for in a document."
 { $subsections <regexp> <optioned-regexp> }
 "Another approach is to use " { $vocab-link "regexp.combinators" } "." ;
@@ -48,9 +48,9 @@ ARTICLE: "regexp-construction" "Constructing regular expressions"
 ARTICLE: "regexp-syntax" "Regular expression syntax"
 "Regexp syntax is largely compatible with Perl, Java and extended POSIX regexps, but not completely. Below, the syntax is documented."
 { $heading "Characters" }
-"At its core, regular expressions consist of character literals. For example, " { $snippet "R/ f/" } " is a regular expression matching just the string 'f'. In addition, the normal escape codes are provided, like " { $snippet "\\t" } " for the tab character and " { $snippet "\\uxxxxxx" } " for an arbitrary Unicode code point, by its hex value. In addition, any character can be preceded by a backslash to escape it, unless this has special meaning. For example, to match a literal opening parenthesis, use " { $snippet "\\(" } "."
+"At its core, regular expressions consist of character literals. For example, " { $snippet "re[[f]]" } " is a regular expression matching just the string 'f'. In addition, the normal escape codes are provided, like " { $snippet "\\t" } " for the tab character and " { $snippet "\\uxxxxxx" } " for an arbitrary Unicode code point, by its hex value. In addition, any character can be preceded by a backslash to escape it, unless this has special meaning. For example, to match a literal opening parenthesis, use " { $snippet "\\(" } "."
 { $heading "Concatenation, alternation and grouping" }
-"Regular expressions can be built out of multiple characters by concatenation. For example, " { $snippet "R/ ab/" } " matches a followed by b. The " { $snippet "|" } " (alternation) operator can construct a regexp which matches one of two alternatives. Parentheses can be used for grouping. So " { $snippet "R/ f(oo|ar)/" } " would match either 'foo' or 'far'."
+"Regular expressions can be built out of multiple characters by concatenation. For example, " { $snippet "re[[ab]]" } " matches a followed by b. The " { $snippet "|" } " (alternation) operator can construct a regexp which matches one of two alternatives. Parentheses can be used for grouping. So " { $snippet "re[[f(oo|ar)]]" } " would match either 'foo' or 'far'."
 { $heading "Character classes" }
 "Square brackets define a convenient way to refer to a set of characters. For example, " { $snippet "[ab]" } " refers to either a or b. And " { $snippet "[a-z]" } " refers to all of the characters between a and z, in code point order. You can use these together, as in " { $snippet "[ac-fz]" } " which matches all of the characters between c and f, in addition to a and z. Character classes can be negated using a caret, as in " { $snippet "[^a]" } " which matches all characters which are not a."
 { $heading "Predefined character classes" }
@@ -110,7 +110,7 @@ ARTICLE: "regexp-syntax" "Regular expression syntax"
     { { $snippet "(?<=a)" } "Asserts that the current position is immediately preceded by a" }
     { { $snippet "(?<!a)" } "Asserts that the current position is not immediately preceded by a" } }
 { $heading "Quotation" }
-"To make it convenient to have a long string which uses regexp operators, a special syntax is provided. If a substring begins with " { $snippet "\\Q" } " then everything until " { $snippet "\\E" } " is quoted (escaped). For example, " { $snippet "R/ \\Qfoo\\bar|baz()\\E/" } " matches exactly the string " { $snippet "\"foo\\bar|baz()\"" } "."
+"To make it convenient to have a long string which uses regexp operators, a special syntax is provided. If a substring begins with " { $snippet "\\Q" } " then everything until " { $snippet "\\E" } " is quoted (escaped). For example, " { $snippet "re[[\\Qfoo\\bar|baz()\\E/]]" } " matches exactly the string " { $snippet "\"foo\\bar|baz()\"" } "."
 { $heading "Unsupported features" }
 { $subheading "Group capture" }
 { $subheading "Reluctant and possessive quantifiers" }
@@ -140,23 +140,23 @@ $nl
 } ;
 
 HELP: case-insensitive
-{ $syntax "R/ .../i" }
+{ $syntax "re:: [[...]] [[i]]" }
 { $description "On regexps, the " { $snippet "i" } " option makes the match case-insensitive. Currently, this is handled incorrectly with respect to Unicode, as characters like ß do not expand into SS in upper case. This should be fixed in a future version." } ;
 
 HELP: unix-lines
-{ $syntax "R/ .../d" }
+{ $syntax "re:: [[...]] [[d]]" }
 { $description "With this mode, only newlines (" { $snippet "\\n" } ") are recognized for line breaking. This affects " { $snippet "$" } " and " { $snippet "^" } " when in multiline mode." } ;
 
 HELP: multiline
-{ $syntax "R/ .../m" }
+{ $syntax "re:: [[...]] [[m]]" }
 { $description "This mode makes the zero-width constraints " { $snippet "$" } " and " { $snippet "^" } " match the beginning or end of a line. Otherwise, they only match the beginning or end of the input text. This can be used together with " { $link dotall } "." } ;
 
 HELP: dotall
-{ $syntax "R/ .../s" }
+{ $syntax "re:: [[...]] [[s]]" }
 { $description "This mode, traditionally called single line mode, makes " { $snippet "." } " match everything, including line breaks. By default, it does not match line breaking characters. This can be used together with " { $link multiline } "." } ;
 
 HELP: reversed-regexp
-{ $syntax "R/ .../r" }
+{ $syntax "re:: [[...]] [[r]]" }
 { $description "When running a regexp compiled with this mode, matches will start from the end of the input string, going towards the beginning." } ;
 
 ARTICLE: "regexp-theory" "The theory of regular expressions"
@@ -202,8 +202,9 @@ HELP: <optioned-regexp>
 { $values { "string" string } { "options" "a string of " { $link "regexp-options" } } { "regexp" regexp } }
 { $description "Given a string in regular expression syntax, and a string of options, creates a regular expression object. When it is first used for matching, a DFA is compiled, and this DFA is stored for reuse so it is only compiled once." } ;
 
-HELP: R/
-{ $syntax "R/ foo.*|[a-zA-Z]bar/options" }
+HELP: \re[[
+{ $syntax "re[[foo.*|[a-zA-Z]bar]]" }
+{ $syntax "re:: [[foo.*|[a-zA-Z]bar]] [[options]]" }
 { $description "Literal syntax for a regular expression. When this syntax is used, the DFA is compiled at compile-time, rather than on first use. The syntax for the " { $snippet "options" } " string is documented in " { $link "regexp-options" } "." } ;
 
 HELP: regexp
@@ -231,7 +232,7 @@ HELP: re-replace
 { $examples
     { $example
         "USING: prettyprint regexp ;"
-        "\"python is pythonic\" R/ python/ \"factor\" re-replace ."
+        "\"python is pythonic\" re[[python]] \"factor\" re-replace ."
         "\"factor is factoric\"" }
 } ;
 
@@ -241,7 +242,7 @@ HELP: re-replace-with
 { $examples
     { $example
         "USING: ascii prettyprint regexp ;"
-        "\"abcdefghi\" R/ [aeiou]/ [ >upper ] re-replace-with ."
+        "\"abcdefghi\" re\"[aeiou]\" [ >upper ] re-replace-with ."
         "\"AbcdEfghI\"" }
 } ;
 

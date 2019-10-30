@@ -223,7 +223,7 @@ PRIVATE>
     parse-noblank-token <optioned-regexp> compile-next-match
     suffix! ;
 
-SYNTAX: R/ parse-regexp ;
+! SYNTAX: R/ parse-regexp ;
 SYNTAX: \R[[ "]]" parse-optioned-regexp ;
 SYNTAX: \R[=[ "]=]" parse-optioned-regexp ;
 SYNTAX: \R[==[ "]==]" parse-optioned-regexp ;
@@ -236,8 +236,8 @@ SYNTAX: \re[==[ "]==]" parse-optioned-regexp ;
 SYNTAX: \re[===[ "]===]" parse-optioned-regexp ;
 SYNTAX: \re[====[ "]====]" parse-optioned-regexp ;
 
-SYNTAX: \re: scan-object "" <optioned-regexp> suffix! ;
-SYNTAX: \re:: scan-object scan-object <optioned-regexp> suffix! ;
+SYNTAX: \re: scan-object "" <optioned-regexp> compile-next-match suffix! ;
+SYNTAX: \re:: scan-object scan-object <optioned-regexp> compile-next-match suffix! ;
 
 SYNTAX: \R(( "))" parse-optioned-regexp ;
 SYNTAX: \R(=( ")=)" parse-optioned-regexp ;

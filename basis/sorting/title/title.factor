@@ -5,6 +5,6 @@ sorting.functor unicode ;
 IN: sorting.title
 
 SORTING: title "[
-    >lower dup R/ ^(the|a|an|el|la|los|las|il) / first-match
+    >lower dup re[[^(the|a|an|el|la|los|las|il) ]] first-match
     [ to>> tail-slice ] when*
 ]"
