@@ -1,10 +1,10 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators combinators.short-circuit
-constructors continuations io.encodings.utf8 io.files kernel
-make math math.order modern.paths modern.slices
-sequences sequences.extras sequences.generalizations sets
-shuffle splitting strings syntax.modern unicode vocabs.loader ;
+continuations io.encodings.utf8 io.files kernel make math
+math.order modern.compiler modern.paths modern.slices sequences
+sequences.extras sets splitting strings syntax.modern unicode
+vocabs.loader ;
 IN: modern
 
 : <ws> ( obj -- obj ) ;
@@ -29,13 +29,13 @@ MACRO:: read-double-matched ( open-ch -- quot: ( string n tag ch -- string n' se
 
                 string' n' needle slice-til-string :> ( string'' n'' payload closing )
                 string n''
-                tag opening payload closing 4array
+                tag opening payload closing 4array <double-bracket>
             ] }
             { open-ch [
                 tag 1 cut-slice* swap tag! 1 modify-to :> opening
                 string n 1 + closestr2 slice-til-string :> ( string' n' payload closing )
                 string n'
-                tag opening payload closing 4array
+                tag opening payload closing 4array <double-bracket>
             ] }
             [ [ tag openstr2 string n ] dip long-opening-mismatch ]
         } case
@@ -108,7 +108,7 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
             { [ dup openstreq member? ] [ ch read-double-matched ] } ! (=( or ((
             { [ dup blank? ] [
                 drop dup '[ _ matching-delimiter-string closestr1 2array members lex-until ] dip
-                swap unclip-last 3array
+                swap unclip-last 3array ch <matched>
             ] } ! ( foo )
             [
                 drop [ slice-til-whitespace drop ] dip span-slices
@@ -117,9 +117,9 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
         } cond
     ] ;
 
-: read-bracket ( string n slice -- string n' slice' ) char: \[ read-matched ;
-: read-brace ( string n slice -- string n' slice' ) char: \{ read-matched ;
-: read-paren ( string n slice -- string n' slice' ) char: \( read-matched ;
+: read-bracket ( string n slice -- string n' obj ) char: \[ read-matched ;
+: read-brace ( string n slice -- string n' obj ) char: \{ read-matched ;
+: read-paren ( string n slice -- string n' obj ) char: \( read-matched ;
 : read-string-payload ( string n -- string n' )
     dup [
         { char: \\ char: \" } slice-until-include {
@@ -291,7 +291,7 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
         { [ dup ")" sequence= ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] } ! (n*quot) breaks
         { [ dup section-close? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
         { [ dup upper-colon? ] [ drop unclip-last -rot 2array [ rewind-slice ] dip ] }
-        [ drop 2array ]
+        [ drop 2array <upper-colon> ]
     } cond ;
 
 : read-colon ( string n slice -- string n' colon )

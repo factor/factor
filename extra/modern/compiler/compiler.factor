@@ -2,106 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
 combinators.short-circuit combinators.smart constructors fry
-kernel lexer math math.parser modern namespaces sequences sets
-splitting strings ;
+kernel lexer math math.parser modern.slices namespaces sequences
+sequences.private sets splitting strings ;
 IN: modern.compiler
-
-<<
-INITIALIZED-SYMBOL: left-decorators [ HS{ } clone ]
->>
-<<
-: make-left-decorator ( string -- )
-    left-decorators get adjoin ;
-
->>
-<<
-SYNTAX: \LEFT-DECORATOR: scan-token make-left-decorator ;
->>
-
-LEFT-DECORATOR: delimiter
-LEFT-DECORATOR: deprecated
-LEFT-DECORATOR: final
-LEFT-DECORATOR: flushable
-LEFT-DECORATOR: foldable
-LEFT-DECORATOR: inline
-LEFT-DECORATOR: recursive
-
-: left-decorator? ( obj -- ? )
-    left-decorators get in? ;
-
-<<
-! Initialize with : foo ( -- ) .. ; already
-INITIALIZED-SYMBOL: arities [ H{ } clone 2 "" pick set-at ]
->>
-<<
-: make-arity ( n string -- )
-    arities get set-at ;
->>
-<<
-SYNTAX: \ARITY:
-    scan-token
-    scan-token string>number swap make-arity ;
->>
-
-ARITY: \ABOUT: 1
-ARITY: \ALIAS: 2
-ARITY: \ARITY: 2
-ARITY: \B: 1
-ARITY: \BUILTIN: 1
-ARITY: \CONSTANT: 2
-ARITY: \DEFER: 1
-ARITY: \FORGET: 1
-ARITY: \GENERIC#: 3
-ARITY: \GENERIC: 2
-ARITY: \LEFT-DECORATOR: 1
-ARITY: \HOOK: 3
-ARITY: \IN: 1
-ARITY: \INSTANCE: 2
-ARITY: \MAIN: 1
-ARITY: \MATH: 2
-ARITY: \MIXIN: 1
-ARITY: \PRIMITIVE: 2
-ARITY: \QUALIFIED-WITH: 2
-ARITY: \QUALIFIED: 1
-ARITY: \RENAME: 3
-ARITY: \SINGLETON: 1
-ARITY: \SLOT: 1
-ARITY: \SOLUTION: 1
-ARITY: \SYMBOL: 1
-ARITY: \UNUSE: 1
-ARITY: \USE: 1
-
-ARITY: \MEMO: 2
-ARITY: \: 2
-
-! ARITY: \USING: 0
-
-: get-arity ( string -- n/f )
-    arities get at ;
-
-<<
-INITIALIZED-SYMBOL: variable-arities [ H{ } clone ]
->>
-<<
-: make-variable-arity ( n string -- )
-    variable-arities get set-at ;
->>
-<<
-SYNTAX: \VARIABLE-ARITY: scan-token scan-token swap make-arity ;
->>
-
-VARIABLE-ARITY: \EXCLUDE: 2
-VARIABLE-ARITY: \FROM: 2
-VARIABLE-ARITY: \INTERSECTION: 1
-VARIABLE-ARITY: \PREDICATE: 3
-VARIABLE-ARITY: \SYNTAX: 1
-VARIABLE-ARITY: \TUPLE: 1
-VARIABLE-ARITY: \UNION: 1
-VARIABLE-ARITY: \WORD: 2
-
-VARIABLE-ARITY: \<CLASS: 3
-VARIABLE-ARITY: \<FUNCTOR: 2
-
 
 TUPLE: vocabulary-root uri path ;
 CONSTRUCTOR: <vocabulary-root> vocabulary-root ( uri path -- obj ) ;
@@ -117,41 +20,13 @@ CONSTANT: extra-root T{ vocabulary-root f "git@github.com:factor/factor" "extra/
 : syntax-vocabulary ( -- vocabulary )
     "syntax" <vocabulary> ;
 
-TUPLE: word name effect quot ;
-
-: add-word ( word vocabulary -- )
-    [ dup name>> ] [ words>> ] bi* set-at ;
-
-
-: find-sections ( literals -- sections )
-    [ ?first section-open? ] filter ;
-
-DEFER: map-literals
-: map-literal ( obj quot: ( obj -- obj' ) -- obj )
-    over { [ array? ] [ ?first section-open? ] } 1&& [
-        [ first3 swap ] dip map-literals swap 3array
-    ] [
-        call
-    ] if ; inline recursive
-
-: map-literals ( seq quot: ( obj -- obj' ) -- seq' )
-    '[ _ map-literal ] map ; inline recursive
-
-
-DEFER: map-literals!
-: map-literal! ( obj quot: ( obj -- obj' ) -- obj )
-    over { [ array? ] [ ?first section-open? ] } 1&& [
-        [ call drop ] [
-            map-literals!
-        ] 2bi
-    ] [
-        call
-    ] if ; inline recursive
-
-: map-literals! ( seq quot: ( obj -- obj' ) -- seq )
-    '[ _ map-literal! ] map! ; inline recursive
-
 TUPLE: lexed tokens ;
+
+INSTANCE: lexed sequence
+M: lexed nth tokens>> nth ;
+M: lexed nth-unsafe tokens>> nth-unsafe ;
+M: lexed length tokens>> length ;
+
 
 TUPLE: comment < lexed payload ;
 CONSTRUCTOR: <comment> comment ( tokens payload -- obj ) ;
@@ -169,33 +44,57 @@ TUPLE: named-section < lexed tag name payload ;
 CONSTRUCTOR: <named-section> named-section ( tokens tag name payload -- obj ) ;
 
 TUPLE: upper-colon < lexed tag payload ;
-CONSTRUCTOR: <upper-colon> upper-colon ( tokens tag payload -- obj ) ;
+CONSTRUCTOR: <upper-colon> upper-colon ( tokens -- obj ) ;
 
 TUPLE: lower-colon < lexed tag payload ;
 CONSTRUCTOR: <lower-colon> lower-colon ( tokens tag payload -- obj ) ;
 
 TUPLE: matched < lexed tag payload ;
-CONSTRUCTOR: <matched> matched ( tokens tag payload -- obj ) ;
 
 TUPLE: single-bracket < matched ;
-CONSTRUCTOR: <single-bracket> single-bracket ( tokens tag payload -- obj ) ;
+CONSTRUCTOR: <single-bracket> single-bracket ( tokens -- obj )
+    dup tokens>>
+        [ first >string >>tag ]
+        [ second >strings >>payload ] bi ;
 
 TUPLE: double-bracket < matched ;
-CONSTRUCTOR: <double-bracket> double-bracket ( tokens tag payload -- obj ) ;
+CONSTRUCTOR: <double-bracket> double-bracket ( tokens -- obj )
+    dup tokens>>
+        [ first >string >>tag ]
+        [ third >string >>payload ] bi ;
 
 
 TUPLE: single-brace < matched ;
-CONSTRUCTOR: <single-brace> single-brace ( tokens tag payload -- obj ) ;
+CONSTRUCTOR: <single-brace> single-brace ( tokens -- obj )
+    dup tokens>>
+        [ first >string >>tag ]
+        [ second >strings >>payload ] bi ;
 
 TUPLE: double-brace < matched ;
-CONSTRUCTOR: <double-brace> double-brace ( tokens tag payload -- obj ) ;
+CONSTRUCTOR: <double-brace> double-brace ( tokens -- obj )
+    dup tokens>>
+        [ first >string >>tag ]
+        [ third >string >>payload ] bi ;
 
 
 TUPLE: single-paren < matched ;
-CONSTRUCTOR: <single-paren> single-paren ( tokens tag payload -- obj ) ;
+CONSTRUCTOR: <single-paren> single-paren ( tokens -- obj )
+    dup tokens>>
+        [ first >string but-last >>tag ]
+        [ second >strings >>payload ] bi ;
 
 TUPLE: double-paren < matched ;
-CONSTRUCTOR: <double-paren> double-paren ( tokens tag payload -- obj ) ;
+CONSTRUCTOR: <double-paren> double-paren ( tokens -- obj )
+    dup tokens>>
+        [ first >string >>tag ]
+        [ third >string >>payload ] bi ;
+
+: <matched> ( tokens ch -- obj )
+    {
+        { char: \[ [ <single-bracket> ] }
+        { char: \{ [ <single-brace> ] }
+        { char: \( [ <single-paren> ] }
+    } case ;
 
 
 TUPLE: double-quote < matched ;
@@ -205,104 +104,7 @@ CONSTRUCTOR: <double-quote> double-quote ( tokens tag payload -- obj ) ;
 TUPLE: identifier < lexed name ;
 CONSTRUCTOR: <identifier> identifier ( tokens name -- obj ) ;
 
-ERROR: unknown-literal tokens ;
 
-DEFER: literal>tuple
-: literal>tuple* ( obj -- tuple )
-    {
-        ! Comment has to be first
-        { [ dup ?first "!" head? ] [
-            [ ] [ ?second >string ] bi <comment>
-        ] }
-
-        ! Must be before escaped-identifier so that ``\ foo`` works
-        { [ dup ?first "\\" tail? ] [
-            [ ] [ ?first >string ] [ ?second ] tri <escaped-object>
-        ] }
-
-        { [ dup ?first "\\" head? ] [
-            [ ] [ ?second >string ] bi <escaped-identifier>
-        ] }
-
-        { [ dup ?first section-open? ] [
-            dup first ":" tail? [
-                { [ ] [ first "<" ?head drop ":" ?tail drop ] [ ?second ?first >string ] [ ?second dup length 0 > [ rest dup [ [ literal>tuple ] map ] when ] when ] } cleave <named-section>
-            ] [
-                [ ] [ first "<" ?head drop ] [ rest but-last ?first dup [ [ literal>tuple ] map ] when ] tri <section>
-            ] if
-        ] }
-        { [ dup { [ ?first ":" tail? ] [ ?first strict-upper? ] } 1&& ] [
-            ! : .. ;  FOO: ;
-            [ ] [ ?first ":" ?tail drop ] [ rest dup ?last ";" tail? [ but-last ] when ?first dup [ [ literal>tuple ] map ] when ] tri <upper-colon>
-        ] }
-        { [ dup ?first ":" tail? ] [
-            ! foo: 123
-            [ ] [ ?first >string ] [ second literal>tuple ] tri <lower-colon>
-        ] }
-        { [ dup ?first "\"" tail? ] [
-            [ ] [ ?first >string ] [ second >string ] tri <double-quote>
-        ] }
-        { [ dup ?first "[" tail? ] [
-            [ ] [ ?first "[" ?tail drop ] [ rest but-last ?first dup [ [ literal>tuple ] map ] when ] tri <single-bracket>
-        ] }
-        { [ dup ?first "{" tail? ] [
-            [ ] [ ?first "{" ?tail drop ] [ rest but-last ?first dup [ [ literal>tuple ] map ] when ] tri <single-brace>
-        ] }
-        { [ dup ?first "(" tail? ] [
-            [ ] [ ?first "(" ?tail drop ] [ rest but-last ?first dup [ [ literal>tuple ] map ] when ] tri <single-paren>
-        ] }
-        { [ dup ?second "[" head? ] [
-            [ ] [ ?first ] [ 2 tail but-last ] tri <double-bracket>
-        ] }
-        { [ dup ?second "{" head? ] [
-            [ ] [ ?first ] [ 2 tail but-last ] tri <double-brace>
-        ] }
-        { [ dup ?second "(" head? ] [
-            [ ] [ ?first ] [ 2 tail but-last ] tri <double-paren>
-        ] }
-
-        { [ dup array? ] [ [ literal>tuple ] map ] }
-
-        [ unknown-literal ]
-    } cond ;
-
-: literal>tuple ( obj -- tuple )
-    dup { [ slice? ] [ string? ] } 1|| [
-        [ ] [ >string ] bi <identifier>
-    ] [
-        literal>tuple*
-    ] if ;
-
-: literals>tuples ( seq -- seq' )
-    [ literal>tuple ] map ;
-
-: vocab>tuples ( path -- seq )
-    vocab>literals literals>tuples ;
-
-: string>tuples ( string -- seq )
-    string>literals literals>tuples ;
-
-: literals>vocabulary ( literals -- vocabulary )
-    ;
-
-
-![[
-GENERIC: tuple>string ( obj -- string )
-
-M: sequence tuple>string
-    [ tuple>string ] map " " join ;
-
-M: upper-colon tuple>string
-    [
-        {
-            [ tag>> ": " ]
-            [ payload>> [ tuple>string ] map " " join ]
-            [ drop " ;" ]
-        } cleave
-    ] "" append-outputs-as ;
-
-M: identifier tuple>string name>> ;
-]]
 
 TUPLE: compilation-unit ;
 
@@ -364,12 +166,6 @@ M: upper-colon tuple>identifiers
 
 M: sequence tuple>identifiers
     [ tuple>identifiers ] map sift concat ;
-
-: vocab>identifiers ( vocab -- hashtable )
-    vocab>tuples tuple>identifiers ;
-
-: string>identifiers ( string -- identifiers )
-    string>tuples tuple>identifiers ;
 
 
 ![[

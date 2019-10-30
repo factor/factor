@@ -229,3 +229,26 @@ GENERIC: upper-colon>definitions ( form -- seq )
         [ ]
     } cond ;
 
+DEFER: map-literals
+: map-literal ( obj quot: ( obj -- obj' ) -- obj )
+    over { [ array? ] [ ?first section-open? ] } 1&& [
+        [ first3 swap ] dip map-literals swap 3array
+    ] [
+        call
+    ] if ; inline recursive
+
+: map-literals ( seq quot: ( obj -- obj' ) -- seq' )
+    '[ _ map-literal ] map ; inline recursive
+
+DEFER: map-literals!
+: map-literal! ( obj quot: ( obj -- obj' ) -- obj )
+    over { [ array? ] [ ?first section-open? ] } 1&& [
+        [ call drop ] [
+            map-literals!
+        ] 2bi
+    ] [
+        call
+    ] if ; inline recursive
+
+: map-literals! ( seq quot: ( obj -- obj' ) -- seq )
+    '[ _ map-literal! ] map! ; inline recursive

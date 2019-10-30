@@ -24,12 +24,16 @@ GENERIC: write-literal* ( last obj -- last' )
 M: slice write-literal* [ write-whitespace ] [ >string write ] [ ] tri ;
 M: array write-literal* [ write-literal* ] each ;
 M: lexed write-literal* tokens>> write-literal* ;
-M: renamed write-literal* [ slice>> write-whitespace ] [ string>> write ] [ slice>> ] tri ; ! for refactoring
+M: renamed write-literal*
+    [ slice>> write-whitespace ]
+    [ string>> write ]
+    [ slice>> ] tri ; ! for refactoring
 : write-literal ( obj -- ) f swap write-literal* drop ;
 
 DEFER: map-literals
 : (map-literals) ( obj quot: ( obj -- obj' ) -- seq )
-    over [ array? ] any? [
+    over array? [
+    ! over [ array? ] any? [
         [ call ] [ map-literals ] bi
     ] [
         over array? [ map-literals ] [ call ] if
@@ -63,17 +67,6 @@ DEFER: map-literals
 
 : rewrite-string-exact ( string -- string' )
     string>literals write-modern-string ;
-
-![[
-: rewrite-path-exact ( path -- )
-    [ path>literals ] [ ] bi write-modern-path ;
-
-: rewrite-vocab-exact ( name -- )
-    vocab-source-path rewrite-path-exact ;
-
-: rewrite-paths ( paths -- )
-    [ rewrite-path-exact ] each ;
-]]
 
 : strings-core-to-file ( -- )
     core-vocabs
