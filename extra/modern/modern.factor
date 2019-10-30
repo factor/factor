@@ -284,10 +284,12 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
     dup ?last {
         { [ dup ";" sequence= ] [ drop unclip-last 3array <upper-colon> ] }
         { [ dup ";" tail? ] [ drop unclip-last 3array <upper-colon> ] }
+        ! XXX: this part is sketchy
+        ! FOO: asdf --  FOO: asdf ]  FOO: asdf }  FOO: asdf )  FOO: asdf ASDF>  FOO: asdf BAR:
         { [ dup "--" sequence= ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
-        { [ dup "]" sequence= ] [ "omg1" throw drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
-        { [ dup "}" sequence= ] [ "omg2" throw drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
-        { [ dup ")" sequence= ] [ B "opg3" throw drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] } ! (n*quot) breaks
+        { [ dup "]" sequence= ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
+        { [ dup "}" sequence= ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
+        { [ dup ")" sequence= ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] } ! (n*quot) breaks
         { [ dup section-close? ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
         { [ dup upper-colon? ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
         [ drop 2array <upper-colon> ]
