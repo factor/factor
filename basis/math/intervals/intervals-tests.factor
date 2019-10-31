@@ -398,6 +398,12 @@ commutative-ops [
 
 { t } [ -1/0. 1/0. [ full-interval interval-contains? ] bi@ and ] unit-test
 
+! Interval bitand
+${ 0 0xaf [a,b] } [ 0 0xff [a,b] 0 0xaf [a,b] interval-bitand ] unit-test
+${ -0x100 -10 [a,b] } [ -0xff -1 [a,b] -0xaf -10 [a,b] interval-bitand ] unit-test
+${ -0x100 10 [a,b] } [ -0xff 1 [a,b] -0xaf 10 [a,b] interval-bitand ] unit-test
+${ 0 0xff [a,b] } [ -0xff -1 [a,b] 0 0xff [a,b] interval-bitand ] unit-test
+
 ! Interval bitor
 { 1/0. } [ 1/0. bit-weight ] unit-test
 { 1/0. } [ -1/0. bit-weight ] unit-test
