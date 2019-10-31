@@ -447,7 +447,8 @@ PRIVATE>
 : interval-bitor ( i1 i2 -- i3 )
     [
         { { [ 2dup [ interval-nonnegative? ] both? ]
-            [ [ max-lower-bound ] [ max-upper-bound ] 2bi bit-weight 1 - [a,b] ] }
+            ! FIXME: this should maybe be bitweight 1 -
+            [ [ max-lower-bound ] [ max-upper-bound ] 2bi bit-weight [a,b] ] }
           { [ 2dup [ interval-negative? ] both? ]
             [ max-lower-bound -1 [a,b] ] }
           [ interval-union interval-bit-weight [ neg ] [ 1 - ] bi [a,b] ]
