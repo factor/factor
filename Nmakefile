@@ -8,21 +8,21 @@ VERSION = 0.99
 !IF [git describe --all > git-describe.tmp] == 0
 GIT_DESCRIBE = \
 !INCLUDE <git-describe.tmp>
-!IF [rm git-describe.tmp] == 0
+!IF [del git-describe.tmp] == 0
 !ENDIF
 !ENDIF
 
 !IF [git rev-parse HEAD > git-id.tmp] == 0
 GIT_ID = \
 !INCLUDE <git-id.tmp>
-!IF [rm git-id.tmp] == 0
+!IF [del git-id.tmp] == 0
 !ENDIF
 !ENDIF
 
 !IF [git rev-parse --abbrev-ref HEAD > git-branch.tmp] == 0
 GIT_BRANCH = \
 !INCLUDE <git-branch.tmp>
-!IF [rm git-branch.tmp] == 0
+!IF [del git-branch.tmp] == 0
 !ENDIF
 !ENDIF
 
