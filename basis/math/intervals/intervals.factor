@@ -422,11 +422,13 @@ PRIVATE>
                     to>> first 0 swap [a,b]
                 ]
             }
-            {
-                [ 2dup [ interval-negative? ] both? ]
-                [ [ min-lower-bound bit-weight neg ] [ min-upper-bound ] 2bi [a,b] ]
-            }
-            [ [ min-lower-bound bit-weight neg ] [ max-upper-bound ] 2bi [a,b] ]
+            [
+                [ min-lower-bound bit-weight neg ]
+                [
+                    2dup [ interval-negative? ] both?
+                    [ min-upper-bound ] [ max-upper-bound ] if
+                ] 2bi [a,b]
+            ]
         } cond
     ] do-empty-interval ;
 
