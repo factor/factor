@@ -374,45 +374,100 @@ SYMBOL: incomparable
         [ nip (rem-range) ]
     } cond ;
 
-: interval-bitand-pos ( i1 i2 -- ? )
-    [ to>> first ] bi@ min 0 swap [a,b] ;
-
-: interval-bitand-neg ( i1 i2 -- ? )
-    dup from>> first 0 < [ drop ] [ nip ] if
-    0 swap to>> first [a,b] ;
-
 : interval-nonnegative? ( i -- ? )
     from>> first 0 >= ;
 
+: interval-negative? ( interval -- ? )
+    to>> first 0 < ;
+
+<PRIVATE
+! Return the weight of the MSB.  For signed numbers, this does
+! not mean the sign bit.
+: bit-weight  ( n -- m )
+    dup [ -1/0. = ] [ 1/0. = ] bi or
+    [ drop 1/0. ]
+    [ dup 0 > [ 1 + ] [ neg ] if next-power-of-2 ] if ;
+
+GENERIC: interval-bounds ( interval -- lower upper )
+M: full-interval interval-bounds drop -1/0. 1/0. ;
+M: interval interval-bounds interval>points [ first ] bi@ ;
+
+: min-lower-bound ( i1 i2 -- n )
+    [ from>> first ] bi@ min ;
+
+: max-lower-bound ( i1 i2 -- n )
+    [ from>> first ] bi@ max ;
+
+: min-upper-bound ( i1 i2 -- n )
+    [ to>> first ] bi@ min ;
+
+: max-upper-bound ( i1 i2 -- n )
+    [ to>> first ] bi@ max ;
+
+: interval-bit-weight ( i1 -- n )
+    interval-bounds [ bit-weight ] bi@ max ;
+PRIVATE>
+
 : interval-bitand ( i1 i2 -- i3 )
-    ! Inaccurate.
     [
         {
             {
                 [ 2dup [ interval-nonnegative? ] both? ]
-                [ interval-bitand-pos ]
+                [ min-upper-bound 0 swap [a,b] ]
             }
             {
                 [ 2dup [ interval-nonnegative? ] either? ]
-                [ interval-bitand-neg ]
+                [
+                    dup interval-nonnegative? [ nip ] [ drop ] if
+                    to>> first 0 swap [a,b]
+                ]
             }
-            [ 2drop [-inf,inf] ]
+            [
+                [ min-lower-bound bit-weight neg ]
+                [
+                    2dup [ interval-negative? ] both?
+                    [ min-upper-bound ] [ max-upper-bound ] if
+                ] 2bi [a,b]
+            ]
         } cond
     ] do-empty-interval ;
 
+! Basic Property of bitor: bits can never be taken away.  For both signed and
+! unsigned integers this means that the number can only grow towards positive
+! infinity.  Also, the significant bit range can never be larger than either of
+! the operands.
+! In case both intervals are positive:
+! lower(i1 bitor i2) = max(lower(i1),lower(i2))
+! upper(i1 bitor i2) = 2 ^ max(bit-length(upper(i1)), bit-length(upper(i2))) - 1
+! In case both intervals are negative:
+! lower(i1 bitor i2) = max(lower(i1),lower(i2))
+! upper(i1 bitor i2) = -1
+! In case one is negative and the other positive, simply assume the whole
+! bit-range.  This case is not accurate though.
 : interval-bitor ( i1 i2 -- i3 )
-    ! Inaccurate.
     [
-        2dup [ interval-nonnegative? ] both?
-        [
-            [ interval>points [ first ] bi@ ] bi@
-            4array supremum 0 swap >integer next-power-of-2 [a,b]
-        ] [ 2drop [-inf,inf] ] if
+        { { [ 2dup [ interval-nonnegative? ] both? ]
+            ! FIXME: this should maybe be bitweight 1 -
+            [ [ max-lower-bound ] [ max-upper-bound ] 2bi bit-weight [a,b] ] }
+          { [ 2dup [ interval-negative? ] both? ]
+            [ max-lower-bound -1 [a,b] ] }
+          [ interval-union interval-bit-weight [ neg ] [ 1 - ] bi [a,b] ]
+        } cond
     ] do-empty-interval ;
 
+! Basic Property of bitxor: can always produce 0,  can never increase
+! significant range
+! If both operands are known to be negative, the sign bit(s) will be zero,
+! always resulting in a positive number
 : interval-bitxor ( i1 i2 -- i3 )
-    ! Inaccurate.
-    interval-bitor ;
+    [
+        { { [ 2dup [ interval-nonnegative? ] both? ]
+            [ max-upper-bound bit-weight 1 - 0 swap [a,b] ] }
+          { [ 2dup [ interval-negative? ] both? ]
+            [ min-lower-bound bit-weight 1 - 0 swap [a,b] ] }
+          [ interval-union interval-bit-weight [ neg ] [ 1 - ] bi [a,b] ]
+        } cond
+    ] do-empty-interval ;
 
 GENERIC: interval-log2 ( i1 -- i2 )
 M: empty-interval interval-log2 ;

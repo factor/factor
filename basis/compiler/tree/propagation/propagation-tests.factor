@@ -1059,8 +1059,7 @@ M: tuple-with-read-only-slot clone
 ! Output range for string-nth now that string-nth is a library word and
 ! not a primitive
 { t } [
-    ! Should actually be 0 23 2^ 1 - [a,b]
-    [ string-nth ] final-info first interval>> 0 23 2^ [a,b] =
+    [ string-nth ] final-info first interval>> 0 23 2^ 1 - [a,b] =
 ] unit-test
 
 ! Non-zero displacement for <displaced-alien> restricts the output type

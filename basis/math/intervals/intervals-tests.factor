@@ -1,6 +1,6 @@
-USING: math.intervals kernel sequences words math math.order
-arrays prettyprint tools.test random vocabs combinators
-accessors math.constants fry ;
+USING: accessors combinators fry kernel literals math math.intervals
+math.intervals.private math.order math.statistics random sequences
+sequences.deep tools.test vocabs ;
 IN: math.intervals.tests
 
 { empty-interval } [ 2 2 (a,b) ] unit-test
@@ -397,3 +397,43 @@ commutative-ops [
 { f } [ -1/0. 1/0. [ empty-interval interval-contains? ] bi@ or ] unit-test
 
 { t } [ -1/0. 1/0. [ full-interval interval-contains? ] bi@ and ] unit-test
+
+! Interval bitand
+${ 0 0xaf [a,b] } [ 0 0xff [a,b] 0 0xaf [a,b] interval-bitand ] unit-test
+${ -0x100 -10 [a,b] } [ -0xff -1 [a,b] -0xaf -10 [a,b] interval-bitand ] unit-test
+${ -0x100 10 [a,b] } [ -0xff 1 [a,b] -0xaf 10 [a,b] interval-bitand ] unit-test
+${ 0 0xff [a,b] } [ -0xff -1 [a,b] 0 0xff [a,b] interval-bitand ] unit-test
+
+! Interval bitor
+{ 1/0. } [ 1/0. bit-weight ] unit-test
+{ 1/0. } [ -1/0. bit-weight ] unit-test
+
+{ t } [
+    16 <iota> dup [ bitor ] cartesian-map flatten
+    [ 0 15 [a,b] interval-contains? ] all?
+] unit-test
+
+${ 0 256 [a,b] } [ 0 255 [a,b] dup interval-bitor ] unit-test
+${ 0 512 [a,b] } [ 0 256 [a,b] dup interval-bitor ] unit-test
+
+${ -128 127 [a,b] } [ -128 127 [a,b] dup interval-bitor ] unit-test
+${ -256 255 [a,b] } [ -128 128 [a,b] dup interval-bitor ] unit-test
+
+{ full-interval } [ full-interval -128 127 [a,b] interval-bitor ] unit-test
+${ 0 [a,inf] } [ 0 [a,inf] dup interval-bitor ] unit-test
+{ full-interval } [ 0 [-inf,a] dup interval-bitor ] unit-test
+${ 4 [a,inf] } [ 4 [a,inf] 3 [a,inf] interval-bitor ] unit-test
+
+! Interval bitxor
+${ 0 255 [a,b] } [ 0 255 [a,b] dup interval-bitxor ] unit-test
+${ 0 511 [a,b] } [ 0 256 [a,b] dup interval-bitxor ] unit-test
+
+${ -128 127 [a,b] } [ -128 127 [a,b] dup interval-bitxor ] unit-test
+${ -256 255 [a,b] } [ -128 128 [a,b] dup interval-bitxor ] unit-test
+${ 0 127 [a,b] } [ -128 -1 [a,b] dup interval-bitxor ] unit-test
+
+{ full-interval } [ full-interval -128 127 [a,b] interval-bitxor ] unit-test
+${ 0 [a,inf] } [ 0 [a,inf] dup interval-bitxor ] unit-test
+${ 0 [a,inf] } [ -1 [-inf,a] dup interval-bitxor ] unit-test
+${ 0 [a,inf] } [ 4 [a,inf] 3 [a,inf] interval-bitxor ] unit-test
+{ full-interval } [ 4 [a,inf] -3 [a,inf] interval-bitxor ] unit-test
