@@ -1,6 +1,6 @@
 ! Copyright (C) 2019 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators.short-circuit kernel modern
+USING: assocs combinators.short-circuit graphviz kernel modern
 modern.compiler modern.out modern.slices sequences
 sequences.extras ;
 IN: modern.tools
@@ -26,3 +26,7 @@ IN: modern.tools
         ] if
       ] map-literals harvest concat harvest
     ] assoc-map ;
+
+: vocabs>graph ( vocabs -- graph )
+    [ <graph> ] dip vocabs>using-tool2
+    [ [ add-edge ] with each ] assoc-each ;
