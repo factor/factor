@@ -66,8 +66,7 @@ DEFER: lex-factor
         ] loop
     ] { } make ;
 
-DEFER: section-close?
-DEFER: upper-colon?
+DEFER: section-close-form?
 DEFER: lex-factor-nested
 : lex-colon-until ( string n tag-sequence -- string n' payload )
     '[
@@ -77,7 +76,7 @@ DEFER: lex-factor-nested
             [
                 dup [
                     ! This is for ending COLON: forms like ``A: PRIVATE>``
-                    dup section-close? [
+                    dup section-close-form? [
                         drop f
                     ] [
                         ! } gets a chance, but then also full seq { } after recursion...
@@ -249,7 +248,7 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
         [ html-close? ]
     } 1|| ;
 
-: upper-colon? ( string -- ? )
+: upper-colon-form? ( string -- ? )
     dup { [ length 0 > ] [ [ char: \: = ] all? ] } 1&& [
         drop t
     ] [
@@ -261,7 +260,7 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
         } 1&&
     ] if ;
 
-: section-close? ( string -- ? )
+: section-close-form? ( string -- ? )
     {
         [ length 2 >= ]
         [ "\\" head? not ] ! XXX: good?
@@ -290,8 +289,8 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
         { [ dup "]" sequence= ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
         { [ dup "}" sequence= ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
         { [ dup ")" sequence= ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] } ! (n*quot) breaks
-        { [ dup section-close? ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
-        { [ dup upper-colon? ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
+        { [ dup section-close-form? ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
+        { [ dup upper-colon-form? ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
         [ drop 2array <upper-colon> ]
     } cond ;
 
@@ -415,7 +414,7 @@ DEFER: lex-factor-top*
         { char: \! [ read-exclamation ] }
         { char: > [
             [ [ char: > = not ] slice-until-exclude drop ] dip merge-slices
-            dup section-close? [
+            dup section-close-form? [
                 [ slice-til-whitespace drop ] dip ?span-slices
             ] unless
         ] }
@@ -432,7 +431,7 @@ DEFER: lex-factor-top*
             ! A: B: then interrupt the current parser
             ! A: b: then keep going
             merge-slice-til-whitespace
-            dup { [ upper-colon? ] [ ":" = ] } 1||
+            dup { [ upper-colon-form? ] [ ":" = ] } 1||
             ! dup upper-colon?
             [ rewind-slice f ]
             [ read-colon ] if

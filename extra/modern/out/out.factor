@@ -30,6 +30,7 @@ M: renamed write-literal*
     [ slice>> ] tri ; ! for refactoring
 : write-literal ( obj -- ) f swap write-literal* drop ;
 
+![[
 DEFER: map-literals
 : (map-literals) ( obj quot: ( obj -- obj' ) -- seq )
     over array? [
@@ -41,6 +42,32 @@ DEFER: map-literals
 
 : map-literals ( obj quot: ( obj -- obj' ) -- seq )
     '[ _ (map-literals) ] map ; inline recursive
+]]
+
+DEFER: map-literals
+: map-literal ( obj quot: ( ..a obj -- ..a obj' ) -- obj )
+    over section? [
+        [ second ] dip map-literals
+    ] [
+        call
+    ] if ; inline recursive
+
+: map-literals ( seq quot: ( ..a obj -- ..a obj' ) -- seq' )
+    '[ _ map-literal ] map ; inline recursive
+
+DEFER: map-literals!
+: map-literal! ( obj quot: ( obj -- obj' ) -- obj )
+    over { [ array? ] [ ?first section-open? ] } 1&& [
+        [ call drop ] [
+            map-literals!
+        ] 2bi
+    ] [
+        call
+    ] if ; inline recursive
+
+: map-literals! ( seq quot: ( obj -- obj' ) -- seq )
+    '[ _ map-literal! ] map! ; inline recursive
+
 
 : write-modern-string ( seq -- string )
     [ write-literal ] with-string-writer ; inline
