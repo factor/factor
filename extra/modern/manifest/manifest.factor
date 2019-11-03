@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit kernel modern modern.compiler
+combinators.short-circuit kernel math modern modern.compiler
 sequences splitting.monotonic strings words ;
 IN: modern.manifest
 
@@ -71,6 +71,9 @@ ERROR: key-exists val key assoc existing-value ;
     ] [
         2drop f
     ] if ;
+
+: lookup-decorator ( name syntax-forms -- n/f )
+    rdecorators>> at ;
 
 ! One syntax-forms per vocab-root
 : core-syntax-forms ( -- obj )
@@ -208,8 +211,7 @@ ERROR: key-exists val key assoc existing-value ;
         1 "USE" add-ucolon-arity
     ;
 
-: lookup-syntax ( string -- form )
-    ;
+: lookup-syntax ( string -- form ) ;
 
 : ?glue-as ( seq1 seq2 glue exemplar -- seq )
     reach [
@@ -218,11 +220,17 @@ ERROR: key-exists val key assoc existing-value ;
         nip like nip
     ] if ; inline
 
-! : apply-arity ( seq syntax-forms -- seq' )
-!    '[ 
+
+GENERIC#: apply-decorators2 1 ( seq syntax-forms -- seq' )
+
+M: array apply-decorators2
+    '[ nip dup slice? [ >string _ rdecorators>> at ] [ drop f ] if ] monotonic-split ;
+
+M: section apply-decorators2
+    '[ _ swap apply-decorators2 ] change-payload ;
 
 : apply-decorators ( seq syntax-forms -- seq' )
-    '[ nip dup slice? [ >string _ rdecorators>> at ] [ drop f ] if ] monotonic-split ;
+    '[ [ nip dup slice? [ >string _ rdecorators>> at ] [ drop f ] if ] monotonic-split ] map-literals ;
 
 : upper-colon>form ( seq -- form )
     [ first "syntax" lookup-word ] [ ] bi 2array ;
@@ -238,29 +246,76 @@ GENERIC: upper-colon>definitions ( form -- seq )
         [ ]
     } cond ;
 
+
+: loopn-index ( n quot -- )
+    [ <iota> ] [ '[ @ not ] ] bi* find 2drop ; inline
+
+: loopn ( n quot -- )
+    [ drop ] prepose loopn-index ; inline
+
+
+ERROR: undefined-find-nth m n seq quot ;
+
+: check-trivial-find ( m n seq quot -- m n seq quot )
+    pick 0 = [ undefined-find-nth ] when ; inline
+
+: find-nth-from ( m n seq quot -- i/f elt/f )
+    check-trivial-find [ f ] 3dip '[
+        drop _ _ find-from [ dup [ 1 + ] when ] dip over
+    ] loopn [ dup [ 1 - ] when ] dip ; inline
+
+: find-nth ( n seq quot -- i/f elt/f )
+    [ 0 ] 3dip find-nth-from ; inline
+
+
+ERROR: combinator-nth-reached-end n seq quot ;
+
+:: head-nth-match ( n seq quot -- seq' )
+    n seq quot find-nth drop [
+        [ seq ] dip 1 + head
+    ] [
+        n seq quot combinator-nth-reached-end
+    ] if* ; inline
+
+:: cut-nth-match ( n seq quot -- head tail )
+    n seq quot find-nth drop [
+        [ seq ] dip 1 + cut
+    ] [
+        n seq quot combinator-nth-reached-end
+    ] if* ; inline
+
+: multiline-comment? ( obj -- ? )
+    { [ double-bracket? ] [ first "!" sequence= ] } 1&& ;
+
+: any-comment? ( obj -- ? )
+    { [ comment? ] [ multiline-comment? ] } 1|| ;
+
 GENERIC#: fixup-arity 1 ( obj syntax-forms -- seq )
 
-![[
+: change-upper-token-payload ( upper-colon quot -- upper-colon )
+    dup '[
+        dup length 2 = [ first2 _ call 2array ] [ first3 _ dip 3array ] if
+    ] change-tokens ; inline
+
 ERROR: closing-tag-required obj ;
 M: upper-colon fixup-arity
-    dup tag>> janky-arities ?at [
-        '[ _ swap [ any-comment? not ] cut-nth-match swap ] change-payload
-        swap 2array
-        dup first f >>closing-tag drop
-        dup first [ ] [ underlying>> ] [ payload>> last-underlying-slice ] tri force-merge-slices >>underlying drop
-        ! dup first " ;" >>closing-tag drop
+    dupd lookup-arity [
+        over tokens>> second [ any-comment? not ] cut-nth-match
+        [ >>payload ] dip dup length '[ [ _ head* ] change-upper-token-payload ] dip swap prefix
+        ! ! dup first " ;" >>closing-tag drop
     ] [
-        drop
         ! dup closing-tag>> [ B closing-tag-required ] unless
         ! dup closing-tag>> [ " ;" >>closing-tag ] unless
-    ] if ;
+    ] if* ;
 
-M: less-than-literal fixup-arity
-    [ [ fixup-arity ] map ] change-payload ;
+M: section fixup-arity
+    '[ [ _ fixup-arity ] map ] change-payload ;
 
-M: object fixup-arity ;
+M: array fixup-arity
+    '[ _ fixup-arity ] map ;
 
-: postprocess-modern ( seq -- seq' )
-    collapse-decorators [ fixup-arity ] map flatten ;
+M: object fixup-arity drop ;
 
-]]
+: fixup-parse ( seq -- seq' )
+    core-syntax-forms
+    [ fixup-arity ] [ apply-decorators ] bi ;

@@ -44,7 +44,10 @@ TUPLE: named-section < lexed tag name payload ;
 CONSTRUCTOR: <named-section> named-section ( tokens -- obj ) ;
 
 TUPLE: upper-colon < lexed tag payload ;
-CONSTRUCTOR: <upper-colon> upper-colon ( tokens -- obj ) ;
+CONSTRUCTOR: <upper-colon> upper-colon ( tokens -- obj )
+    ! put this in the fixup-arity/decorators instead
+    dup tokens>> first but-last-slice >>tag ;
+    ! dup tokens>> [ first but-last-slice >>tag ] [ second >>payload ] bi ;
 
 TUPLE: lower-colon < lexed tag payload ;
 CONSTRUCTOR: <lower-colon> lower-colon ( tokens -- obj ) ;
@@ -100,6 +103,7 @@ CONSTRUCTOR: <double-paren> double-paren ( tokens -- obj )
 TUPLE: double-quote < matched ;
 CONSTRUCTOR: <double-quote> double-quote ( tokens -- obj ) ;
 
+TUPLE: decorator < lexed name ;
 
 TUPLE: identifier < lexed name ;
 CONSTRUCTOR: <identifier> identifier ( tokens -- obj ) ;
@@ -167,29 +171,3 @@ M: upper-colon tuple>identifiers
 M: sequence tuple>identifiers
     [ tuple>identifiers ] map sift concat ;
 
-
-![[
-GENERIC: fixup-arity ( obj -- seq )
-
-ERROR: closing-tag-required obj ;
-M: uppercase-colon-literal fixup-arity
-    dup tag>> janky-arities ?at [
-        '[ _ swap [ any-comment? not ] cut-nth-match swap ] change-payload
-        swap 2array
-        dup first f >>closing-tag drop
-        dup first [ ] [ underlying>> ] [ payload>> last-underlying-slice ] tri force-merge-slices >>underlying drop
-        ! dup first " ;" >>closing-tag drop
-    ] [
-        drop
-        ! dup closing-tag>> [ B closing-tag-required ] unless
-        ! dup closing-tag>> [ " ;" >>closing-tag ] unless
-    ] if ;
-
-M: less-than-literal fixup-arity
-    [ [ fixup-arity ] map ] change-payload ;
-
-M: object fixup-arity ;
-
-: postprocess-modern ( seq -- seq' )
-    collapse-decorators [ fixup-arity ] map flatten ;
-]]

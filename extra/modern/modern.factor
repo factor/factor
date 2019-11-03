@@ -191,6 +191,7 @@ MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
 : vocab-token? ( string -- ? ) count-bs 2 = ;
 : word-token? ( string -- ? ) count-bs 1 = ;
 
+! [ [ char: \\ = ] xnor? ] monotonic-split
 
 ! <A <A: but not <A>
 : section-open? ( string -- ? )
