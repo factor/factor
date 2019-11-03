@@ -85,6 +85,34 @@ DEFER: map-literals!
 : map-literals! ( seq quot: ( obj -- obj' ) -- seq )
     '[ _ map-literal! ] map! ; inline recursive
 
+![[
+GENERIC: split-to-sections ( seq -- seq' )
+
+M: array split-to-sections ( seq -- seq' )
+    dup length 1 = [
+        [ dup section? [ split-to-sections ] when ] map
+    ] [
+        [
+            [ nip dup section? [ split-to-sections ] when drop ]
+            [ [ section? ] either? not ] 2bi
+        ] monotonic-split
+    ] if ;
+
+M: section split-to-sections ( seq -- seq' )
+    [ split-to-sections ] change-payload ;
+
+
+GENERIC#: map-sections* 1 ( seq quot -- seq' )
+
+M: section map-sections* ( seq quot -- seq' )
+    '[ _ ] change-payload ; inline recursive
+
+M: array map-sections* ( seq quot -- seq' )
+    dup '[ dup section? [ _ map-sections* ] [ @ ] if ] map ; inline recursive
+
+: map-sections ( seq quot -- seq' )
+    [ split-to-sections ] dip map-sections* ; inline
+]]
 
 : write-modern-string ( seq -- string )
     [ write-literal ] with-string-writer ; inline

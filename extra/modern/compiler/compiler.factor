@@ -38,16 +38,22 @@ TUPLE: escaped-object < lexed name payload ;
 CONSTRUCTOR: <escaped-object> escaped-object ( tokens -- obj ) ;
 
 TUPLE: section < lexed tag payload ;
-CONSTRUCTOR: <section> section ( tokens -- obj ) ;
+CONSTRUCTOR: <section> section ( tokens -- obj )
+    dup second >>payload ;
 
 TUPLE: named-section < lexed tag name payload ;
 CONSTRUCTOR: <named-section> named-section ( tokens -- obj ) ;
 
-TUPLE: upper-colon < lexed tag payload ;
+
+TUPLE: upper-colon < lexed tag payload decorators ;
 CONSTRUCTOR: <upper-colon> upper-colon ( tokens -- obj )
     ! put this in the fixup-arity/decorators instead
     dup tokens>> first but-last-slice >>tag ;
     ! dup tokens>> [ first but-last-slice >>tag ] [ second >>payload ] bi ;
+
+: add-upper-colon-decorator ( upper-colon obj -- upper-colon )
+    [ '[ _ suffix ] change-decorators ]
+    [ '[ _ suffix ] change-tokens ] bi ;
 
 TUPLE: lower-colon < lexed tag payload ;
 CONSTRUCTOR: <lower-colon> lower-colon ( tokens -- obj ) ;

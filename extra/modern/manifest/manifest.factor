@@ -221,16 +221,33 @@ ERROR: key-exists val key assoc existing-value ;
     ] if ; inline
 
 
+ERROR: not-a-decorator obj ;
+
 GENERIC#: apply-decorators2 1 ( seq syntax-forms -- seq' )
 
 M: array apply-decorators2
-    '[ nip dup slice? [ >string _ rdecorators>> at ] [ drop f ] if ] monotonic-split ;
+    ! monotonoic-split doesn't iterate if only one item
+    over length 1 = [
+        '[ dup section? [ _ apply-decorators2 ] when ] map
+    ] [
+        dup '[
+            nip dup slice? [
+                >string _ rdecorators>> ?at [ not-a-decorator ] unless
+            ] [
+                dup section? [
+                    [ _ apply-decorators2 ] change-payload drop f
+                ] [
+                    drop f
+                ] if
+            ] if
+        ] monotonic-split
+    ] if ;
 
 M: section apply-decorators2
-    '[ _ swap apply-decorators2 ] change-payload ;
+    '[ _ apply-decorators2 ] change-payload ;
 
-: apply-decorators ( seq syntax-forms -- seq' )
-    '[ [ nip dup slice? [ >string _ rdecorators>> at ] [ drop f ] if ] monotonic-split ] map-literals ;
+! : apply-decorators ( seq syntax-forms -- seq' )
+!    '[ [ nip dup slice? [ >string _ rdecorators>> at ] [ drop f ] if ] monotonic-split ] map-literals ;
 
 : upper-colon>form ( seq -- form )
     [ first "syntax" lookup-word ] [ ] bi 2array ;
@@ -318,4 +335,4 @@ M: object fixup-arity drop ;
 
 : fixup-parse ( seq -- seq' )
     core-syntax-forms
-    [ fixup-arity ] [ apply-decorators ] bi ;
+    [ fixup-arity ] [ apply-decorators2 ] bi ;
