@@ -65,6 +65,13 @@ ERROR: key-exists val key assoc existing-value ;
 : add-ucolon-arity ( syntax-forms parser tag -- syntax-forms ) pick ucolon-arities>> checked-set-at ;
 : add-named-section-arity ( syntax-forms parser tag -- syntax-forms ) pick named-section-arities>> checked-set-at ;
 
+: lookup-arity ( form syntax-forms -- n/f )
+    over upper-colon? [
+        [ first >string but-last ] [ ucolon-arities>> ] bi* at
+    ] [
+        2drop f
+    ] if ;
+
 ! One syntax-forms per vocab-root
 : core-syntax-forms ( -- obj )
     <syntax-forms>
@@ -211,8 +218,10 @@ ERROR: key-exists val key assoc existing-value ;
         nip like nip
     ] if ; inline
 
+! : apply-arity ( seq syntax-forms -- seq' )
+!    '[ 
 
-: apply-decorators ( seq forms -- seq' )
+: apply-decorators ( seq syntax-forms -- seq' )
     '[ nip dup slice? [ >string _ rdecorators>> at ] [ drop f ] if ] monotonic-split ;
 
 : upper-colon>form ( seq -- form )
@@ -225,6 +234,33 @@ GENERIC: upper-colon>definitions ( form -- seq )
 
 : form>definitions ( obj -- obj' )
     {
-        { [ dup ?first upper-colon? ] [ upper-colon>definitions ] }
+        { [ dup upper-colon? ] [ upper-colon>definitions ] }
         [ ]
     } cond ;
+
+GENERIC#: fixup-arity 1 ( obj syntax-forms -- seq )
+
+![[
+ERROR: closing-tag-required obj ;
+M: upper-colon fixup-arity
+    dup tag>> janky-arities ?at [
+        '[ _ swap [ any-comment? not ] cut-nth-match swap ] change-payload
+        swap 2array
+        dup first f >>closing-tag drop
+        dup first [ ] [ underlying>> ] [ payload>> last-underlying-slice ] tri force-merge-slices >>underlying drop
+        ! dup first " ;" >>closing-tag drop
+    ] [
+        drop
+        ! dup closing-tag>> [ B closing-tag-required ] unless
+        ! dup closing-tag>> [ " ;" >>closing-tag ] unless
+    ] if ;
+
+M: less-than-literal fixup-arity
+    [ [ fixup-arity ] map ] change-payload ;
+
+M: object fixup-arity ;
+
+: postprocess-modern ( seq -- seq' )
+    collapse-decorators [ fixup-arity ] map flatten ;
+
+]]

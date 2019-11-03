@@ -47,13 +47,30 @@ DEFER: map-literals
 DEFER: map-literals
 : map-literal ( obj quot: ( ..a obj -- ..a obj' ) -- obj )
     over section? [
-        [ second ] dip map-literals
+        [ second ] dip map-literals concat
     ] [
         call
     ] if ; inline recursive
 
 : map-literals ( seq quot: ( ..a obj -- ..a obj' ) -- seq' )
     '[ _ map-literal ] map ; inline recursive
+
+![[
+! ": foo ; <PRIV : bar ; PRIV>" string>literals [ B upper-colon? ] filter-literals >strings
+
+DEFER: filter-literals
+: filter-literal ( obj quot: ( ..a obj -- ..a obj' ) -- obj )
+    over section? [
+        B [ second ] dip filter-literals
+    ] [
+        call
+    ] if ; inline recursive
+
+: filter-literals ( seq quot: ( ..a obj -- ..a obj' ) -- seq' )
+    { } pick length over [ (selector-as) [ each ] dip ] 2curry
+    [ dip like ] 3curry
+    '[ _ filter-literal ] filter ; inline recursive
+]]
 
 DEFER: map-literals!
 : map-literal! ( obj quot: ( obj -- obj' ) -- obj )

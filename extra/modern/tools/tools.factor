@@ -11,7 +11,7 @@ IN: modern.tools
         [
             { [ upper-colon? ] [ first "USING:" sequence= ] } 1&&
         ] filter
-        [ second >strings ] map
+        [ second >strings ] map concat
     ] assoc-map ;
 
 ! Needs filter-literals
@@ -24,7 +24,7 @@ IN: modern.tools
         ] [
           drop f
         ] if
-      ] map-literals harvest concat harvest
+      ] map-literals harvest concat
     ] assoc-map ;
 
 : vocabs>graph ( vocabs -- graph )
