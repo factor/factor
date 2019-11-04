@@ -65,7 +65,7 @@ M: product-sequence nth
     sequences product-length exemplar
     |[ result |
         sequences [ quot call i result set-nth-unsafe i 1 + i! ] product-each
-    ] new-like* ; inline
+    ] new-like ; inline
 
 : product-map ( ... sequences quot: ( ... seq -- ... value ) -- ... sequence )
     over product-map-as ; inline
@@ -75,4 +75,4 @@ M: product-sequence nth
     sequences product-length { }
     |[ result |
         sequences [ quot call 2array i result set-nth-unsafe i 1 + i! ] product-each
-    ] new-like* exemplar assoc-like ; inline
+    ] new-like exemplar assoc-like ; inline

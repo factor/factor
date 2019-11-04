@@ -16,9 +16,6 @@ GENERIC: like ( seq exemplar -- newseq ) flushable
 GENERIC: clone-like ( seq exemplar -- newseq ) flushable
 
 : new-like ( len exemplar quot -- seq )
-    over [ [ new-sequence ] dip call ] dip like ; inline
-
-: new-like* ( len exemplar quot -- seq )
     over [ [ new-sequence ] dip [ call ] keepd ] dip like ; inline
 
 M: sequence like drop ; inline
@@ -159,16 +156,16 @@ INSTANCE: iota immutable-sequence
 PRIVATE>
 
 : 1sequence ( obj exemplar -- seq )
-    1 swap [ (1sequence) ] new-like* ; inline
+    1 swap [ (1sequence) ] new-like ; inline
 
 : 2sequence ( obj1 obj2 exemplar -- seq )
-    2 swap [ (2sequence) ] new-like* ; inline
+    2 swap [ (2sequence) ] new-like ; inline
 
 : 3sequence ( obj1 obj2 obj3 exemplar -- seq )
-    3 swap [ (3sequence) ] new-like* ; inline
+    3 swap [ (3sequence) ] new-like ; inline
 
 : 4sequence ( obj1 obj2 obj3 obj4 exemplar -- seq )
-    4 swap [ (4sequence) ] new-like* ; inline
+    4 swap [ (4sequence) ] new-like ; inline
 
 : first2 ( seq -- first second )
     1 swap bounds-check nip first2-unsafe ; inline
@@ -361,13 +358,13 @@ PRIVATE>
 
 : append-as ( seq1 seq2 exemplar -- newseq )
     [ 2dup [ length ] bi@ + ] dip
-    [ (append) ] new-like* ; inline
+    [ (append) ] new-like ; inline
 
 : 3append-as ( seq1 seq2 seq3 exemplar -- newseq )
     [ 3dup [ length ] tri@ + + ] dip [
         [ [ 2over [ length ] bi@ + ] dip copy-unsafe ]
         [ (append) ] bi
-    ] new-like* ; inline
+    ] new-like ; inline
 
 : append ( seq1 seq2 -- newseq ) over append-as ;
 
@@ -472,7 +469,7 @@ PRIVATE>
     swapd each ; inline
 
 : map-integers ( ... len quot: ( ... i -- ... elt ) exemplar -- ... newseq )
-    overd [ collect ] new-like* ; inline
+    overd [ collect ] new-like ; inline
 
 : map-as ( ... seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
     [ [ length ensure-integer ] keep ] 2dip
@@ -480,7 +477,7 @@ PRIVATE>
         [ [ nth-unsafe ] curry ]
         [ compose [ keep ] curry ]
         [ [ set-nth-unsafe ] curry compose ] tri* each-integer
-    ] new-like* ; inline
+    ] new-like ; inline
 
 : map ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     over map-as ; inline
@@ -768,13 +765,13 @@ PRIVATE>
 : prefix ( seq elt -- newseq )
     over [ over length 1 + ] dip [
         [ (1sequence) ] [ 1 swap copy-unsafe ] bi
-    ] new-like* ;
+    ] new-like ;
 
 : suffix ( seq elt -- newseq )
     over [ over length 1 + ] dip [
         [ [ over length ] dip set-nth-unsafe ]
         [ 0 swap copy-unsafe ] bi
-    ] new-like* ;
+    ] new-like ;
 
 : suffix! ( seq elt -- seq ) over push ; inline
 
