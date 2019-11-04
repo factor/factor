@@ -63,7 +63,7 @@ CONSTANT: alphabet $[
             { 0 [ ] }
             { 1 [ drop char: = ] }
             { 2 [ 2drop char: = char: = ] }
-        } case data (4sequence) output stream-write-lines
+        } case data [ (4sequence) ] keep output stream-write-lines
     ] while 2drop ; inline
 
 PRIVATE>
@@ -99,7 +99,7 @@ PRIVATE>
         B{ char: \n char: \r } input read1-ignoring char: = or
         B{ char: \n char: \r } input read1-ignoring char: = or
         B{ char: \n char: \r } input read1-ignoring char: = or
-        [ decode4 data (3sequence) ] 3keep
+        [ decode4 data [ (3sequence) ] keep ] 3keep
         [ char: = eq? 1 0 ? ] tri@ + +
         [ head-slice* ] unless-zero
         output stream-write

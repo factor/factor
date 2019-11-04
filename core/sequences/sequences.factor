@@ -144,31 +144,31 @@ INSTANCE: iota immutable-sequence
 
 : from-end ( seq n -- seq n' ) [ dup length ] dip - ; inline
 
-: (1sequence) ( obj seq -- seq )
-    [ 0 swap set-nth-unsafe ] keep ; inline
+: (1sequence) ( obj seq -- )
+    0 swap set-nth-unsafe ; inline
 
-: (2sequence) ( obj1 obj2 seq -- seq )
-    [ 1 swap set-nth-unsafe ] keep (1sequence) ; inline
+: (2sequence) ( obj1 obj2 seq -- )
+    [ 1 swap set-nth-unsafe ] [ (1sequence) ] bi ; inline
 
-: (3sequence) ( obj1 obj2 obj3 seq -- seq )
-    [ 2 swap set-nth-unsafe ] keep (2sequence) ; inline
+: (3sequence) ( obj1 obj2 obj3 seq -- )
+    [ 2 swap set-nth-unsafe ] [ (2sequence) ] bi ; inline
 
-: (4sequence) ( obj1 obj2 obj3 obj4 seq -- seq )
-    [ 3 swap set-nth-unsafe ] keep (3sequence) ; inline
+: (4sequence) ( obj1 obj2 obj3 obj4 seq -- )
+    [ 3 swap set-nth-unsafe ] [ (3sequence) ] bi ; inline
 
 PRIVATE>
 
 : 1sequence ( obj exemplar -- seq )
-    1 swap [ (1sequence) ] new-like ; inline
+    1 swap [ (1sequence) ] new-like* ; inline
 
 : 2sequence ( obj1 obj2 exemplar -- seq )
-    2 swap [ (2sequence) ] new-like ; inline
+    2 swap [ (2sequence) ] new-like* ; inline
 
 : 3sequence ( obj1 obj2 obj3 exemplar -- seq )
-    3 swap [ (3sequence) ] new-like ; inline
+    3 swap [ (3sequence) ] new-like* ; inline
 
 : 4sequence ( obj1 obj2 obj3 obj4 exemplar -- seq )
-    4 swap [ (4sequence) ] new-like ; inline
+    4 swap [ (4sequence) ] new-like* ; inline
 
 : first2 ( seq -- first second )
     1 swap bounds-check nip first2-unsafe ; inline
@@ -353,22 +353,21 @@ M: immutable-sequence clone-like like ; inline
 
 <PRIVATE
 
-: (append) ( seq1 seq2 accum -- accum )
+: (append) ( seq1 seq2 accum -- )
     [ [ over length ] dip copy-unsafe ]
-    [ 0 swap copy-unsafe ]
-    [ ] tri ; inline
+    [ 0 swap copy-unsafe ] bi ; inline
 
 PRIVATE>
 
 : append-as ( seq1 seq2 exemplar -- newseq )
     [ 2dup [ length ] bi@ + ] dip
-    [ (append) ] new-like ; inline
+    [ (append) ] new-like* ; inline
 
 : 3append-as ( seq1 seq2 seq3 exemplar -- newseq )
     [ 3dup [ length ] tri@ + + ] dip [
         [ [ 2over [ length ] bi@ + ] dip copy-unsafe ]
         [ (append) ] bi
-    ] new-like ; inline
+    ] new-like* ; inline
 
 : append ( seq1 seq2 -- newseq ) over append-as ;
 
@@ -473,7 +472,7 @@ PRIVATE>
     swapd each ; inline
 
 : map-integers ( ... len quot: ( ... i -- ... elt ) exemplar -- ... newseq )
-    overd [ [ collect ] keep ] new-like ; inline
+    overd [ collect ] new-like* ; inline
 
 : map-as ( ... seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
     [ [ length ensure-integer ] keep ] 2dip
@@ -768,14 +767,14 @@ PRIVATE>
 
 : prefix ( seq elt -- newseq )
     over [ over length 1 + ] dip [
-        (1sequence) [ 1 swap copy-unsafe ] keep
-    ] new-like ;
+        [ (1sequence) ] [ 1 swap copy-unsafe ] bi
+    ] new-like* ;
 
 : suffix ( seq elt -- newseq )
     over [ over length 1 + ] dip [
-        [ [ over length ] dip set-nth-unsafe ] keep
-        [ 0 swap copy-unsafe ] keep
-    ] new-like ;
+        [ [ over length ] dip set-nth-unsafe ]
+        [ 0 swap copy-unsafe ] bi
+    ] new-like* ;
 
 : suffix! ( seq elt -- seq ) over push ; inline
 

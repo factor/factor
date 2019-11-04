@@ -25,7 +25,7 @@ PRIVATE>
     (unrolled-collect) unrolled-each-integer ; inline
 
 : unrolled-map-integers ( n quot: ( n -- value ) exemplar -- newseq )
-    overd [ [ unrolled-collect ] keep ] new-like ; inline
+    overd [ unrolled-collect ] new-like* ; inline
 
 ERROR: unrolled-bounds-error
     seq unroll-length ;
