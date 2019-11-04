@@ -18,6 +18,9 @@ GENERIC: clone-like ( seq exemplar -- newseq ) flushable
 : new-like ( len exemplar quot -- seq )
     over [ [ new-sequence ] dip call ] dip like ; inline
 
+: new-like* ( len exemplar quot -- seq )
+    over [ [ new-sequence ] dip [ call ] keepd ] dip like ; inline
+
 M: sequence like drop ; inline
 
 GENERIC: lengthen ( n seq -- )
@@ -473,7 +476,12 @@ PRIVATE>
     overd [ [ collect ] keep ] new-like ; inline
 
 : map-as ( ... seq quot: ( ... elt -- ... newelt ) exemplar -- ... newseq )
-    [ (each) ] dip map-integers ; inline
+    [ [ length ensure-integer ] keep ] 2dip
+    pickd [
+        [ [ nth-unsafe ] curry ]
+        [ compose [ keep ] curry ]
+        [ [ set-nth-unsafe ] curry compose ] tri* each-integer
+    ] new-like* ; inline
 
 : map ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     over map-as ; inline
