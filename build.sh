@@ -92,7 +92,7 @@ check_ret() {
 set_downloader() {
     test_program_installed wget
     if [[ $? -ne 0 ]] ; then
-        DOWNLOADER=wget
+        DOWNLOADER="wget -nd"
         DOWNLOADER_NAME=wget
         return
     fi
@@ -154,6 +154,23 @@ clang_version_ok() {
 }
 
 set_cc() {
+
+    # on Cygwin we MUST use the MinGW "cross-compiler", therefore check these first
+    # furthermore, we prefer 64 bit over 32 bit versions if both are available
+    test_programs_installed x86_64-w64-mingw32-gcc x86_64-w64-mingw32-g++
+    if [[ $? -ne 0 ]] ; then
+        [ -z "$CC" ] && CC=x86_64-w64-mingw32-gcc
+        [ -z "$CXX" ] && CXX=x86_64-w64-mingw32-g++
+        return
+    fi
+
+    test_programs_installed i686-w64-mingw32-gcc i686-w64-mingw32-g++
+    if [[ $? -ne 0 ]] ; then
+        [ -z "$CC" ] && CC=i686-w64-mingw32-gcc
+        [ -z "$CXX" ] && CXX=i686-w64-mingw32-g++
+        return
+    fi
+
     test_programs_installed clang clang++
     if [[ $? -ne 0 ]] && clang_version_ok ; then
         [ -z "$CC" ] && CC=clang
@@ -161,6 +178,7 @@ set_cc() {
         return
     fi
 
+    # gcc and g++ will fail to correctly build Factor on Cygwin
     test_programs_installed gcc g++
     if [[ $? -ne 0 ]] ; then
         [ -z "$CC" ] && CC=gcc
@@ -187,8 +205,8 @@ check_installed_programs() {
     ensure_program_installed uname
     ensure_program_installed git
     ensure_program_installed wget curl
-    ensure_program_installed clang gcc
-    ensure_program_installed clang++ g++ cl
+    ensure_program_installed clang x86_64-w64-mingw32-gcc i686-w64-mingw32-gcc gcc
+    ensure_program_installed clang++ x86_64-w64-mingw32-g++ i686-w64-mingw32-g++ g++ cl
     ensure_program_installed make gmake
     ensure_program_installed md5sum md5
     ensure_program_installed cut
