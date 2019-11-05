@@ -46,7 +46,7 @@ struct vm_parameters {
 
   vm_parameters();
   ~vm_parameters();
-  void init_from_args(int argc, vm_char** argv);
+  bool init_from_args(int argc, vm_char** argv);
 };
 
 }

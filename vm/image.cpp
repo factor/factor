@@ -49,7 +49,7 @@ vm_parameters::~vm_parameters() {
   free((vm_char *)executable_path);
 }
 
-void vm_parameters::init_from_args(int argc, vm_char** argv) {
+bool vm_parameters::init_from_args(int argc, vm_char** argv) {
   int i = 0;
 
   for (i = 1; i < argc; i++) {
@@ -96,7 +96,13 @@ void vm_parameters::init_from_args(int argc, vm_char** argv) {
       signals = false;
     else if (STRCMP(arg, STRING_LITERAL("-console")) == 0)
       console = true;
+    else if (STRCMP(arg, STRING_LITERAL("--help")) == 0) {
+      puts ("help for factor");
+      return false;
+    }
   }
+
+  return true;
 }
 
 void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {

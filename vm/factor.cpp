@@ -154,7 +154,7 @@ void factor_vm::factor_sleep(long us) {
 
 void factor_vm::start_standalone_factor(int argc, vm_char** argv) {
   vm_parameters p;
-  p.init_from_args(argc, argv);
+  if (!p.init_from_args(argc, argv)) return;
   init_factor(&p);
   pass_args_to_factor(argc, argv);
 
