@@ -97,7 +97,9 @@ bool vm_parameters::init_from_args(int argc, vm_char** argv) {
     else if (STRCMP(arg, STRING_LITERAL("-console")) == 0)
       console = true;
     else if (STRCMP(arg, STRING_LITERAL("--help")) == 0) {
-      puts ("help for factor");
+      puts ("Usage: factor [options] [script [args]|-run=<vocab>]\n"
+            "       to get full help on commandline options, run factor without arguments,\n"
+            "       then in the Listener type '\"command-line\" help'");
       return false;
     }
   }
