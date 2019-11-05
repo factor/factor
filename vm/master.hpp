@@ -43,6 +43,8 @@
 #elif defined(__INTEL_COMPILER)
 #define FACTOR_COMPILER_VERSION \
   "Intel C Compiler " FACTOR_STRINGIZE(__INTEL_COMPILER)
+#elif defined(__MINGW32__)
+#define FACTOR_COMPILER_VERSION "MinGW (GCC " __VERSION__ ")"
 #elif defined(__GNUC__)
 #define FACTOR_COMPILER_VERSION "GCC " __VERSION__
 #elif defined(_MSC_FULL_VER)
@@ -79,7 +81,7 @@
 #error "Unsupported architecture"
 #endif
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined (__MINGW32__)
 #define WINDOWS
 #define WINNT
 #elif defined(WIN32)
