@@ -35,7 +35,7 @@ GENERIC: contract ( len seq -- )
 M: growable contract ( len seq -- )
     [ length ] keep
     [ [ 0 ] 2dip set-nth-unsafe ] curry
-    (each-integer) ; inline
+    iterate-upto ; inline
 
 M: growable set-length ( n seq -- )
     bounds-check-head

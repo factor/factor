@@ -245,23 +245,24 @@ GENERIC: prev-float ( m -- n )
 : align ( m w -- n )
     1 - [ + ] keep bitnot bitand ; inline
 
-: (each-integer) ( ... i n quot: ( ... i -- ... ) -- ... )
+: iterate-upto ( ... i n quot: ( ... i -- ... ) -- ... )
     2over < [
         [ nip call ] 3keep
-        [ 1 + ] 2dip (each-integer)
+        [ 1 + ] 2dip iterate-upto
     ] [
         3drop
     ] if ; inline recursive
 
-: (find-integer) ( ... i n quot: ( ... i -- ... ? ) -- ... i/f )
+: find-upto ( ... i n quot: ( ... i -- ... ? ) -- ... i/f )
     2over < [
         [ nip call ] 3keep roll
         [ 2drop ]
-        [ [ 1 + ] 2dip (find-integer) ] if
+        [ [ 1 + ] 2dip find-upto ] if
     ] [
         3drop f
     ] if ; inline recursive
 
+! iterate-end?
 : (all-integers?) ( ... i n quot: ( ... i -- ... ? ) -- ... ? )
     2over < [
         [ nip call ] 3keep roll
@@ -272,13 +273,13 @@ GENERIC: prev-float ( m -- n )
     ] if ; inline recursive
 
 : each-integer ( ... n quot: ( ... i -- ... ) -- ... )
-    [ 0 ] 2dip (each-integer) ; inline
+    [ 0 ] 2dip iterate-upto ; inline
 
 : times ( ... n quot: ( ... -- ... ) -- ... )
     [ drop ] prepose each-integer ; inline
 
 : find-integer ( ... n quot: ( ... i -- ... ? ) -- ... i/f )
-    [ 0 ] 2dip (find-integer) ; inline
+    [ 0 ] 2dip find-upto ; inline
 
 : all-integers? ( ... n quot: ( ... i -- ... ? ) -- ... ? )
     [ 0 ] 2dip (all-integers?) ; inline

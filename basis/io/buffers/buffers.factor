@@ -80,7 +80,7 @@ TYPED: buffer-find ( seps buffer: buffer -- n/f )
     [
         swap [ [ pos>> ] [ fill>> ] [ ptr>> ] tri ] dip
         [ swap alien-unsigned-1 ] [ member-eq? ] bi-curry*
-        compose (find-integer)
+        compose find-upto
     ] [
         [ pos>> - ] curry [ f ] if*
     ] bi ; inline

@@ -34,7 +34,7 @@ CONSTANT: hex-digits $[
     [ 0 swap length ] keep ; inline
 
 : each-byte ( from to bytes quot: ( elt -- ) -- )
-    '[ _ nth-unsafe @ ] (each-integer) ; inline
+    '[ _ nth-unsafe @ ] iterate-upto ; inline
 
 : write-bytes ( from to bytes stream -- )
     '[ hex-digits nth-unsafe _ stream-write ] each-byte ; inline
