@@ -3,7 +3,7 @@
 USING: accessors assocs classes classes.algebra
 classes.algebra.private classes.builtin classes.private
 combinators definitions kernel kernel.private math math.private
-quotations sequences sets words ;
+quotations sequences sets sorting words ;
 IN: classes.union
 
 PREDICATE: union-class < class
@@ -21,20 +21,28 @@ M: union-class union-of-builtins?
 M: class union-of-builtins?
     drop f ;
 
-: fast-union-mask ( class -- n )
-    flatten-class 0 [ class>type 2^ bitor ] reduce ;
-
 : empty-union-predicate-quot ( class -- quot )
     drop [ drop f ] ;
 
-: fast-union-predicate-quot ( class -- quot )
+: fast-union-mask ( class/builtin-classes -- n )
+    dup sequence? [ flatten-class ] unless
+    0 [ class>type 2^ bitor ] reduce ;
+
+: fast-union-predicate-quot ( class/builtin-classes -- quot )
     fast-union-mask 1quotation
     [ tag 1 swap fixnum-shift-fast ]
     [ fixnum-bitand 0 eq? not ]
     surround ;
 
 : slow-union-predicate-quot ( class -- quot )
-    class-members [ predicate-def ] map unclip swap
+    class-members
+    dup [ builtin-class? ] count 1 > [
+        [ builtin-class? ] partition
+        [ predicate-def ] map swap
+        [ fast-union-predicate-quot suffix ] unless-empty
+    ] [
+        [ predicate-def ] map
+    ] if unclip swap
     [ [ dup ] prepend [ drop t ] ] { } map>assoc alist>quot ;
 
 : union-predicate-quot ( class -- quot )
