@@ -373,14 +373,6 @@ M: interactor stream-read-quot ( stream -- quot/f )
     [ nip ] [ gesture>operation ] 2bi
     [ invoke-command f ] [ drop t ] if* ;
 
-: ?check-popup ( interactor -- interactor )
-    dup popup>> [
-        gadget-child dup completion-popup? [
-            completion-mode>> over completion-mode =
-            [ dup popup>> hide-glass ] unless
-        ] [ drop ] if
-    ] when* ;
-
 M: interactor handle-gesture
     {
         { [ over key-gesture? not ] [ call-next-method ] }
