@@ -290,6 +290,53 @@ PRIVATE>
     [ 0.0 0.0 ] 2dip [ 2dip rot kahan+ ] curry
     [ -rot ] prepose each nip ; inline
 
+<PRIVATE
+
+! Adaptive Precision Floating-Point Arithmetic and Fast Robust Geometric Predicates
+! www-2.cs.cmu.edu/afs/cs/project/quake/public/papers/robust-arithmetic.ps
+
+: sort-partial ( x y -- x' y' )
+    2dup [ abs ] bi@ < [ swap ] when ; inline
+
+:: partial+ ( x y -- hi lo )
+    x y + dup x - :> yr y yr - ; inline
+
+:: partial-sums ( seq -- seq' )
+    V{ } clone :> partials
+    seq [
+        0 partials [
+            swapd sort-partial partial+ swapd
+            [ over partials set-nth 1 + ] unless-zero
+        ] each :> i
+        i partials shorten
+        [ i partials set-nth ] unless-zero
+    ] each partials ;
+
+:: sum-exact ( partials -- n )
+    partials empty? [ 0.0 ] [
+        ! sum from the top, stop when sum becomes inexact
+        0.0 0.0 partials [
+            nip partial+ dup 0.0 = not
+        ] find-last drop :> ( lo n )
+
+        ! make half-even rounding work across multiple partials
+        n [ 0 > ] [ f ] if* [
+            n 1 - partials nth
+            [ 0.0 < lo 0.0 < and ]
+            [ 0.0 > lo 0.0 > and ] bi or [
+                lo 2.0 * :> y
+                dup y + :> x
+                x over - :> yr
+                y yr = [ drop x ] when
+            ] when
+        ] when
+    ] if ;
+
+PRIVATE>
+
+: sum-floats ( seq -- n )
+    partial-sums sum-exact ;
+
 ! SYNTAX: .. dup pop scan-object [a,b) suffix! ;
 ! SYNTAX: ... dup pop scan-object [a,b] suffix! ;
 
