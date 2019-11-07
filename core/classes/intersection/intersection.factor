@@ -46,9 +46,9 @@ M: intersection-class (flatten-class)
 
 M: anonymous-intersection (flatten-class)
     participants>> [ full-cover ] [
-        [ flatten-class keys ]
+        [ flatten-class ]
         [ intersect-flattened-classes ] map-reduce
-        [ dup ,, ] each
+        %
     ] if-empty ;
 
 M: anonymous-intersection class-name

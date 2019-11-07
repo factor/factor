@@ -196,3 +196,13 @@ M: completion-popup handle-gesture ( gesture completion -- ? )
     2dup completion-gesture [
         [ nip hide-glass ] [ invoke-command ] 2bi* f
     ] [ drop call-next-method ] if* ;
+
+: ?check-popup ( interactor -- interactor )
+    dup popup>> [
+        gadget-child dup completion-popup? [
+            completion-mode>> dup history-completion? [ drop ] [
+                over completion-mode =
+                [ dup popup>> hide-glass ] unless
+            ] if
+        ] [ drop ] if
+    ] when* ;
