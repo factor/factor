@@ -91,6 +91,7 @@ $nl
 ARTICLE: "standard-cli-args" "Command line switches for general usage"
 "The following command line switches can be passed to a bootstrapped Factor image:"
 { $table
+    { { $snippet "-help" } { "Show help for the command line switches." } }
     { { $snippet "-e=" { $emphasis "code" } } { "This specifies a code snippet to evaluate and then exit Factor." } }
     { { $snippet "-run=" { $emphasis "vocab" } } { { $snippet { $emphasis "vocab" } } " is the name of a vocabulary with a " { $link POSTPONE: MAIN: } " hook to run on startup, for example " { $vocab-link "listener" } " or " { $vocab-link "ui.tools" } "." } }
     { { $snippet "-no-user-init" } { "Inhibits the running of user initialization files on startup. See " { $link "rc-files" } "." } }
