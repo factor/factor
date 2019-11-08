@@ -3,11 +3,11 @@
 
 USING: accessors arrays assocs assocs.extras byte-arrays
 combinators combinators.short-circuit compression.zlib fry
-grouping kernel locals math math.combinatorics math.constants
-math.functions math.order math.primes math.primes.factors
-math.ranges math.ranges.private math.statistics math.vectors
-memoize parser random sequences sequences.extras
-sequences.private sets sorting sorting.extras ;
+grouping kernel locals math math.bitwise math.combinatorics
+math.constants math.functions math.order math.primes
+math.primes.factors math.ranges math.ranges.private
+math.statistics math.vectors memoize parser random sequences
+sequences.extras sequences.private sets sorting sorting.extras ;
 
 IN: math.extras
 
@@ -357,3 +357,18 @@ M: iota sum-cubes sum sq ;
 
 : kelly ( winning-probability odds -- fraction )
     [ 1 + * 1 - ] [ / ] bi ;
+
+:: integer-sqrt ( m -- n )
+    m [ 0 ] [
+        dup 0 < [ non-negative-integer-expected ] when
+        bit-length 1 - 2 /i :> c
+        1 :> a!
+        0 :> d!
+        c bit-length <iota> <reversed> [| s |
+            d :> e
+            c s neg shift d!
+            a d e - 1 - shift
+            m 2 c * e - d - 1 + neg shift a /i + a!
+        ] each
+        a a sq m > [ 1 - ] when
+    ] if-zero ;
