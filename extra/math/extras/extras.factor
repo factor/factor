@@ -173,8 +173,8 @@ PRIVATE>
     seq natural-sort :> sorted
     seq length :> len
     sorted 0 [ + ] cum-reduce :> ( a b )
-    b len a * / :> B
-    1 len recip + 2 B * - ;
+    b len a * / :> c
+    1 len recip + 2 c * - ;
 
 PRIVATE>
 
@@ -202,7 +202,8 @@ PRIVATE>
     unzip cum-sum [ last random ] [ bisect-left ] bi swap nth ;
 
 : unique-indices ( seq -- unique indices )
-    [ members ] keep over dup length <iota> H{ } zip-as '[ _ at ] map ;
+    [ members ] keep over dup length <iota>
+    H{ } zip-as '[ _ at ] map ;
 
 : digitize] ( seq bins -- seq' )
     '[ _ bisect-left ] map ;
@@ -313,9 +314,9 @@ PRIVATE>
     ] each partials ;
 
 :: sum-exact ( partials -- n )
-    partials empty? [ 0.0 ] [
+    partials [ 0.0 ] [
         ! sum from the top, stop when sum becomes inexact
-        0.0 0.0 partials [
+        [ 0.0 0.0 ] dip [
             nip partial+ dup 0.0 = not
         ] find-last drop :> ( lo n )
 
@@ -330,7 +331,7 @@ PRIVATE>
                 y yr = [ drop x ] when
             ] when
         ] when
-    ] if ;
+    ] if-empty ;
 
 PRIVATE>
 
