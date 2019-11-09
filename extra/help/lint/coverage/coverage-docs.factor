@@ -10,7 +10,7 @@ PRIVATE>
 ABOUT: "help.lint.coverage"
 
 ARTICLE: "help.lint.coverage" "Help coverage linting"
-"The " { $vocab-link "help.lint.coverage" } " vocabulary implements a very picky documentation completeness checker."
+"The " { $vocab-link "help.lint.coverage" } " vocabulary implements a very pedantic documentation completeness checker."
 $nl
 "The documentation coverage linter requires most words to have " { $link POSTPONE: HELP: } " declarations defining some of the "
 { $links $values $description $error-description $class-description $examples } " sections (see " { $links "element-types" } ")."
