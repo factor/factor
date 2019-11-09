@@ -144,6 +144,10 @@ FUNCTION: LLVMValueRef LLVMBuildSub ( LLVMBuilderRef Builder,
                                       LLVMValueRef LHS,
                                       LLVMValueRef RHS,
                                       c-string Name )
+FUNCTION: LLVMValueRef LLVMBuildMul ( LLVMBuilderRef Builder,
+                                      LLVMValueRef LHS,
+                                      LLVMValueRef RHS,
+                                      c-string Name )
 FUNCTION: LLVMValueRef LLVMBuildRet ( LLVMBuilderRef Builder,
                                       LLVMValueRef V )
 
