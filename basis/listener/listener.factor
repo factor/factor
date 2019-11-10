@@ -229,6 +229,6 @@ SYMBOL: interactive-vocabs
     ] with-interactive-vocabs ;
 
 : listener-main ( -- )
-    version-info print flush listener ;
+    "q" get [ version-info print flush ] unless listener ;
 
 MAIN: listener-main

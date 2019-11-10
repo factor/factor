@@ -59,7 +59,7 @@ PRIVATE>
         [ factors [ number>string ] map " " join print ] bi*
     ] [
         "factor: `" "' is not a valid positive integer" surround print
-    ] if* ;
+    ] if* flush ;
 
 : run-unix-factor ( -- )
     command-line get [

@@ -3,11 +3,11 @@
 
 USING: accessors arrays assocs assocs.extras byte-arrays
 combinators combinators.short-circuit compression.zlib fry
-grouping kernel locals math math.combinatorics math.constants
-math.functions math.order math.primes math.primes.factors
-math.ranges math.ranges.private math.statistics math.vectors
-memoize parser random sequences sequences.extras
-sequences.private sets sorting sorting.extras ;
+grouping kernel locals math math.bitwise math.combinatorics
+math.constants math.functions math.order math.primes
+math.primes.factors math.ranges math.ranges.private
+math.statistics math.vectors memoize parser random sequences
+sequences.extras sequences.private sets sorting sorting.extras ;
 
 IN: math.extras
 
@@ -173,8 +173,8 @@ PRIVATE>
     seq natural-sort :> sorted
     seq length :> len
     sorted 0 [ + ] cum-reduce :> ( a b )
-    b len a * / :> B
-    1 len recip + 2 B * - ;
+    b len a * / :> c
+    1 len recip + 2 c * - ;
 
 PRIVATE>
 
@@ -202,7 +202,8 @@ PRIVATE>
     unzip cum-sum [ last random ] [ bisect-left ] bi swap nth ;
 
 : unique-indices ( seq -- unique indices )
-    [ members ] keep over dup length <iota> H{ } zip-as '[ _ at ] map ;
+    [ members ] keep over dup length <iota>
+    H{ } zip-as '[ _ at ] map ;
 
 : digitize] ( seq bins -- seq' )
     '[ _ bisect-left ] map ;
@@ -290,6 +291,53 @@ PRIVATE>
     [ 0.0 0.0 ] 2dip [ 2dip rot kahan+ ] curry
     [ -rot ] prepose each nip ; inline
 
+<PRIVATE
+
+! Adaptive Precision Floating-Point Arithmetic and Fast Robust Geometric Predicates
+! www-2.cs.cmu.edu/afs/cs/project/quake/public/papers/robust-arithmetic.ps
+
+: sort-partial ( x y -- x' y' )
+    2dup [ abs ] bi@ < [ swap ] when ; inline
+
+:: partial+ ( x y -- hi lo )
+    x y + dup x - :> yr y yr - ; inline
+
+:: partial-sums ( seq -- seq' )
+    V{ } clone :> partials
+    seq [
+        0 partials [
+            swapd sort-partial partial+ swapd
+            [ over partials set-nth 1 + ] unless-zero
+        ] each :> i
+        i partials shorten
+        [ i partials set-nth ] unless-zero
+    ] each partials ;
+
+:: sum-exact ( partials -- n )
+    partials [ 0.0 ] [
+        ! sum from the top, stop when sum becomes inexact
+        [ 0.0 0.0 ] dip [
+            nip partial+ dup 0.0 = not
+        ] find-last drop :> ( lo n )
+
+        ! make half-even rounding work across multiple partials
+        n [ 0 > ] [ f ] if* [
+            n 1 - partials nth
+            [ 0.0 < lo 0.0 < and ]
+            [ 0.0 > lo 0.0 > and ] bi or [
+                lo 2.0 * :> y
+                dup y + :> x
+                x over - :> yr
+                y yr = [ drop x ] when
+            ] when
+        ] when
+    ] if-empty ;
+
+PRIVATE>
+
+: sum-floats ( seq -- n )
+    partial-sums sum-exact ;
+
 ! SYNTAX: .. dup pop scan-object [a,b) suffix! ;
 ! SYNTAX: ... dup pop scan-object [a,b] suffix! ;
 
@@ -310,3 +358,18 @@ M: iota sum-cubes sum sq ;
 
 : kelly ( winning-probability odds -- fraction )
     [ 1 + * 1 - ] [ / ] bi ;
+
+:: integer-sqrt ( m -- n )
+    m [ 0 ] [
+        dup 0 < [ non-negative-integer-expected ] when
+        bit-length 1 - 2 /i :> c
+        1 :> a!
+        0 :> d!
+        c bit-length <iota> <reversed> [| s |
+            d :> e
+            c s neg shift d!
+            a d e - 1 - shift
+            m 2 c * e - d - 1 + neg shift a /i + a!
+        ] each
+        a a sq m > [ 1 - ] when
+    ] if-zero ;

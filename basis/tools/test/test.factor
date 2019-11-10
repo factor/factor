@@ -28,6 +28,9 @@ T{ error-type-holder
    { quot [ test-failures get ] }
 } define-error-type
 
+SYMBOL: silent-tests?
+f silent-tests? set-global
+
 SYMBOL: verbose-tests?
 t verbose-tests? set-global
 
@@ -157,7 +160,7 @@ M: must-fail-with-experiment experiment. ( experiment -- )
 
 :: experiment ( word: ( -- error/f failed? tested? ) line-number -- )
     word <experiment> :> e
-    e experiment.
+    silent-tests? get [ e experiment. ] unless
     word execute [
         [
             current-test-file get [

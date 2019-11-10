@@ -35,8 +35,9 @@ SINGLETONS: vocab-completion color-completion char-completion
 path-completion history-completion ;
 UNION: definition-completion word-completion
 vocab-word-completion vocab-completion ;
-UNION: listener-completion definition-completion
-color-completion char-completion path-completion history-completion ;
+UNION: code-completion definition-completion
+color-completion char-completion path-completion ;
+UNION: listener-completion code-completion history-completion ;
 
 GENERIC: completion-quot ( interactor completion-mode -- quot )
 
@@ -196,3 +197,13 @@ M: completion-popup handle-gesture ( gesture completion -- ? )
     2dup completion-gesture [
         [ nip hide-glass ] [ invoke-command ] 2bi* f
     ] [ drop call-next-method ] if* ;
+
+: ?check-popup ( interactor -- interactor )
+    dup popup>> [
+        gadget-child dup completion-popup? [
+            completion-mode>> dup code-completion? [
+                over completion-mode =
+                [ dup popup>> hide-glass ] unless
+            ] [ drop ] if
+        ] [ drop ] if
+    ] when* ;

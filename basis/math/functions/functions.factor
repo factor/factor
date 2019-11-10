@@ -239,6 +239,19 @@ M: complex log10 log 10 log / ; inline
 
 M: bignum log10 [ log10 ] log10-2 (bignum-log) ;
 
+GENERIC: e^-1 ( x -- e^x-1 )
+
+M: float e^-1
+    dup abs 0.7 < [
+        dup e^ dup 1.0 = [
+            drop
+        ] [
+            [ 1.0 - * ] [ log / ] bi
+        ] if
+    ] [ e^ 1.0 - ] if ; inline
+
+M: real e^-1 >float e^-1 ; inline
+
 GENERIC: cos ( x -- y ) foldable
 
 M: complex cos
