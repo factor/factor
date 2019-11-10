@@ -129,6 +129,10 @@ DEFER: if
 
 : -roll ( w x y z -- z w x y ) swap -rotd ; inline
 
+: rolld ( v w x y z -- w x y v z ) [ roll ] dip ; inline
+
+: -rolld ( v w x y z -- y v w x z ) [ -roll ] dip ; inline
+
 : nipd ( x y z -- y z ) [ nip ] dip ; inline
 
 : overd ( x y z -- x y x z ) [ over ] dip ; inline
@@ -148,6 +152,10 @@ DEFER: if
 : 5drop ( v w x y z -- ) 4drop drop ; inline
 
 : reach ( w x y z -- w x y z w ) [ pick ] dip swap ; inline
+
+: 5roll ( v w x y z -- w x y z v ) rolld swap ; inline
+
+: -5roll ( v w x y z -- w x y z v ) swap -rolld ; inline
 
 ! Keepers
 : keep ( ..a x quot: ( ..a x -- ..b ) -- ..b x )
