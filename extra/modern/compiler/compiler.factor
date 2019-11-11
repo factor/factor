@@ -176,4 +176,3 @@ M: upper-colon tuple>identifiers
 
 M: sequence tuple>identifiers
     [ tuple>identifiers ] map sift concat ;
-
