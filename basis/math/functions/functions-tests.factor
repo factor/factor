@@ -101,7 +101,7 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 { 1/0. } [ 1/0. e^-1 ] unit-test
 { -1.0 } [ -1/0. e^-1 ] unit-test
 { -1.0 } [ -1/0. e^-1 ] unit-test
-{ t } [ NAN: 8000000000000 dup e^-1 [ fp-nan-payload ] same? ] unit-test
+{ t } [ nan: 8000000000000 dup e^-1 [ fp-nan-payload ] same? ] unit-test
 { 5e-324 } [ 5e-324 e^-1 ] unit-test
 { 1e-20 } [ 1e-20 e^-1 ] unit-test
 { -5e-324 } [ -5e-324 e^-1 ] unit-test
