@@ -47,7 +47,7 @@ DEFER: map-literals
 DEFER: map-literals
 : map-literal ( obj quot: ( ..a obj -- ..a obj' ) -- obj )
     over section? [
-        [ second ] dip map-literals concat
+        [ second ] dip map-literals
     ] [
         call
     ] if ; inline recursive
