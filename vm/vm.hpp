@@ -1,4 +1,4 @@
-using namespace std;
+#include <memory>
 
 namespace factor {
 
@@ -58,13 +58,13 @@ struct factor_vm {
   int callback_id;
 
   // List of callback function descriptors for PPC
-  std::list<void**> function_descriptors;
+  std::list<std::unique_ptr<void*[]>> function_descriptors;
 
   // Pooling unused contexts to make context allocation cheaper
-  std::list<context*> unused_contexts;
+  std::list<std::shared_ptr<context>> unused_contexts;
 
   // Active contexts, for tracing by the GC
-  std::set<context*> active_contexts;
+  std::set<std::shared_ptr<context>> active_contexts;
 
   // External entry points
   c_to_factor_func_type c_to_factor_func;
@@ -92,16 +92,16 @@ struct factor_vm {
   bool gc_off;
 
   // Data heap
-  data_heap* data;
+  std::unique_ptr<data_heap> data;
 
   // Code heap
-  code_heap* code;
+  std::unique_ptr<code_heap> code;
 
   // Pinned callback stubs
-  callback_heap* callbacks;
+  std::unique_ptr<callback_heap> callbacks;
 
   // Only set if we're performing a GC
-  gc_state* current_gc;
+  std::unique_ptr<gc_state> current_gc;
   volatile bool current_gc_p;
 
   // Set if we're in the jit
@@ -111,7 +111,7 @@ struct factor_vm {
   std::vector<cell> mark_stack;
 
   // If not NULL, we push GC events here
-  std::vector<gc_event>* gc_events;
+  std::unique_ptr<std::vector<gc_event>> gc_events;
 
   // If a runtime function needs to call another function which potentially
   // allocates memory, it must wrap any references to the data and code
@@ -140,7 +140,7 @@ struct factor_vm {
   uint64_t last_nano_count;
 
   // Stack for signal handlers, only used on Unix
-  segment* signal_callstack_seg;
+  std::unique_ptr<segment> signal_callstack_seg;
 
   // Are we already handling a fault? Used to catch double memory faults
   static bool fatal_erroring_p;
@@ -276,7 +276,7 @@ struct factor_vm {
   bignum* bignum_gcd(bignum* a_, bignum* b_);
 
   //data heap
-  void set_data_heap(data_heap* data_);
+  void set_data_heap(std::unique_ptr<data_heap> data_);
   void primitive_size();
   data_heap_room data_room();
   void primitive_data_room();
@@ -287,7 +287,7 @@ struct factor_vm {
   inline void each_object(Generation* gen, Iterator& iterator) {
     cell obj = gen->first_object();
     while (obj) {
-      iterator((object*)obj);
+      iterator(reinterpret_cast<object*>(obj));
       obj = gen->next_object_after(obj);
     }
   }
@@ -300,8 +300,8 @@ struct factor_vm {
     FACTOR_ASSERT(data->nursery->occupied_space() == 0);
 
     gc_off = true;
-    each_object(data->tenured, iterator);
-    each_object(data->aging, iterator);
+    each_object(data->tenured.get(), iterator);
+    each_object(data->aging.get(), iterator);
     gc_off = false;
   }
 
@@ -319,16 +319,16 @@ struct factor_vm {
   // the write barrier must be called any time we are potentially storing a
   // pointer from an older generation to a younger one
   inline void write_barrier(cell* slot_ptr) {
-    *(unsigned char*)(cards_offset + ((cell)slot_ptr >> card_bits)) = card_mark_mask;
-    *(unsigned char*)(decks_offset + ((cell)slot_ptr >> deck_bits)) = card_mark_mask;
+    *reinterpret_cast<unsigned char*>(cards_offset + (reinterpret_cast<cell>(slot_ptr) >> card_bits)) = card_mark_mask;
+    *reinterpret_cast<unsigned char*>(decks_offset + (reinterpret_cast<cell>(slot_ptr) >> deck_bits)) = card_mark_mask;
   }
 
   inline void write_barrier(object* obj, cell size) {
-    cell start = (cell)obj & (~card_size + 1);
-    cell end = ((cell)obj + size + card_size - 1) & (~card_size + 1);
+    cell start = reinterpret_cast<cell>(obj) & (~card_size + 1);
+    cell end = (reinterpret_cast<cell>(obj) + size + card_size - 1) & (~card_size + 1);
 
     for (cell offset = start; offset < end; offset += card_size)
-      write_barrier((cell*)offset);
+      write_barrier(reinterpret_cast<cell*>(offset));
   }
 
   // data heap checker
@@ -358,7 +358,7 @@ struct factor_vm {
 
   // Allocates memory
   template <typename Type> Type* allot(cell size) {
-    return (Type*)allot_object(Type::type_number, size);
+    return reinterpret_cast<Type*>(allot_object(Type::type_number, size));
   }
 
   // generic arrays
@@ -368,30 +368,31 @@ struct factor_vm {
   template <typename Array> Array* reallot_array(Array* array_, cell capacity);
 
   // debug
-  void print_chars(ostream& out, string* str);
-  void print_word(ostream& out, word* word, cell nesting);
-  void print_factor_string(ostream& out, string* str);
-  void print_array(ostream& out, array* array, cell nesting);
-  void print_byte_array(ostream& out, byte_array* array, cell nesting);
-  void print_tuple(ostream& out, tuple* tuple, cell nesting);
-  void print_alien(ostream& out, alien* alien, cell nesting);
-  void print_nested_obj(ostream& out, cell obj, fixnum nesting);
-  void print_obj(ostream& out, cell obj);
-  void print_objects(ostream& out, cell* start, cell* end);
-  void print_datastack(ostream& out);
-  void print_retainstack(ostream& out);
-  void print_callstack(ostream& out);
-  void print_callstack_object(ostream& out, callstack* obj);
-  void dump_cell(ostream& out, cell x);
-  void dump_memory(ostream& out, cell from, cell to);
-  void dump_memory_layout(ostream& out);
-  void dump_objects(ostream& out, cell type);
-  void dump_edges(ostream& out);
-  void find_data_references(ostream& out, cell look_for_);
-  void dump_code_heap(ostream& out);
+  void print_chars(std::ostream& out, string* str);
+  void print_word(std::ostream& out, word* word, cell nesting);
+  void print_factor_string(std::ostream& out, string* str);
+  void print_array(std::ostream& out, array* array, cell nesting);
+  void print_byte_array(std::ostream& out, byte_array* array, cell nesting);
+  void print_tuple(std::ostream& out, tuple* tuple, cell nesting);
+  void print_alien(std::ostream& out, alien* alien, cell nesting);
+  void print_nested_obj(std::ostream& out, cell obj, fixnum nesting);
+  void print_obj(std::ostream& out, cell obj);
+  void print_objects(std::ostream& out, cell* start, cell* end);
+  void print_datastack(std::ostream& out);
+  void print_retainstack(std::ostream& out);
+  void print_callstack(std::ostream& out);
+  void print_callstack_object(std::ostream& out, callstack* obj);
+  void dump_cell(std::ostream& out, cell x);
+  void dump_memory(std::ostream& out, cell from, cell to);
+  void dump_memory_layout(std::ostream& out);
+  void dump_objects(std::ostream& out, cell type);
+  void dump_edges(std::ostream& out);
+  void find_data_references(std::ostream& out, cell look_for_);
+  void dump_code_heap(std::ostream& out);
   void factorbug_usage(bool advanced_p);
   void factorbug();
   void primitive_die();
+  void primitive_debug_print();
   void primitive_enable_ctrl_break();
   void primitive_disable_ctrl_break();
 
@@ -606,8 +607,8 @@ struct factor_vm {
   void iterate_callstack_object(callstack* stack_, Iterator& iterator);
 
   callstack* allot_callstack(cell size);
-  cell second_from_top_stack_frame(context* ctx);
-  cell capture_callstack(context* ctx);
+  cell second_from_top_stack_frame(context* ctx_);
+  cell capture_callstack(context* ctx_);
   void primitive_callstack_for();
   void primitive_callstack_to_array();
   void primitive_innermost_stack_frame_executing();

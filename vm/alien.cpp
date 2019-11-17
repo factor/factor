@@ -72,7 +72,7 @@ void factor_vm::primitive_displaced_alien() {
 // if the object is a byte array, as a sanity check.
 // Allocates memory (from_unsigned_cell can allocate)
 void factor_vm::primitive_alien_address() {
-  ctx->replace(from_unsigned_cell((cell)pinned_alien_offset(ctx->peek())));
+  ctx->replace(from_unsigned_cell(reinterpret_cast<cell>(pinned_alien_offset(ctx->peek()))));
 }
 
 // pop ( alien n ) from datastack, return alien's address plus n
@@ -84,12 +84,14 @@ void* factor_vm::alien_pointer() {
 // define words to read/write values at an alien address
 #define DEFINE_ALIEN_ACCESSOR(name, type, from, to)                     \
   VM_C_API void primitive_alien_##name(factor_vm * parent) {            \
-    parent->ctx->push(parent->from(*(type*)(parent->alien_pointer()))); \
+    type value;                                                         \
+    memcpy(&value, parent->alien_pointer(), sizeof(type));              \
+    parent->ctx->push(parent->from(value));                             \
   }                                                                     \
   VM_C_API void primitive_set_alien_##name(factor_vm * parent) {        \
-    type* ptr = (type*)parent->alien_pointer();                         \
+    void* ptr = parent->alien_pointer();                                \
     type value = (type)parent->to(parent->ctx->pop());                  \
-    *ptr = value;                                                       \
+    memcpy(ptr, &value, sizeof(type));                                  \
   }
 
 EACH_ALIEN_PRIMITIVE(DEFINE_ALIEN_ACCESSOR)
@@ -117,7 +119,7 @@ void factor_vm::primitive_dlsym() {
   if (to_boolean(library.value())) {
     dll* d = untag_check<dll>(library.value());
 
-    if (d->handle == NULL)
+    if (d->handle == nullptr)
       ctx->replace(false_object);
     else
       ctx->replace(allot_alien(ffi_dlsym(d, sym)));
@@ -128,14 +130,14 @@ void factor_vm::primitive_dlsym() {
 // close a native library handle
 void factor_vm::primitive_dlclose() {
   dll* d = untag_check<dll>(ctx->pop());
-  if (d->handle != NULL)
+  if (d->handle != nullptr)
     ffi_dlclose(d);
 }
 
 void factor_vm::primitive_dll_validp() {
   cell library = ctx->peek();
   if (to_boolean(library))
-    ctx->replace(tag_boolean(untag_check<dll>(library)->handle != NULL));
+    ctx->replace(tag_boolean(untag_check<dll>(library)->handle != nullptr));
   else
     ctx->replace(special_objects[OBJ_CANONICAL_TRUE]);
 }

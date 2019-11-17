@@ -8,7 +8,7 @@ struct growable_byte_array {
   growable_byte_array(factor_vm* parent, cell capacity = 40)
       : count(0), elements(parent->allot_byte_array(capacity), parent) {}
 
-  void reallot_array(cell count);
+  void reallot_array(cell new_count);
   void grow_bytes(cell len);
   void append_bytes(void* elts, cell len);
   void append_byte_array(cell elts);
@@ -19,9 +19,9 @@ struct growable_byte_array {
 // Allocates memory
 template <typename Type>
 byte_array* factor_vm::byte_array_from_value(Type* value) {
-  byte_array* data = allot_uninitialized_array<byte_array>(sizeof(Type));
-  memcpy(data->data<char>(), value, sizeof(Type));
-  return data;
+  byte_array* array = allot_uninitialized_array<byte_array>(sizeof(Type));
+  memcpy(array->data<char>(), value, sizeof(Type));
+  return array;
 }
 
 }

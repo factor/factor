@@ -56,7 +56,7 @@ void factor_vm::init_factor(vm_parameters* p) {
 
   p->executable_path = vm_executable_path();
 
-  if (p->image_path == NULL) {
+  if (p->image_path == nullptr) {
     if (embedded_image_p()) {
       p->embedded_image = true;
       p->image_path = safe_strdup(p->executable_path);
@@ -74,7 +74,7 @@ void factor_vm::init_factor(vm_parameters* p) {
   ctx = NULL;
   spare_ctx = new_context();
 
-  callbacks = new callback_heap(p->callback_size, this);
+  callbacks = std::make_unique<callback_heap>(p->callback_size, this);
   load_image(p);
   max_pic_size = (int)p->max_pic_size;
   special_objects[OBJ_CELL_SIZE] = tag_fixnum(sizeof(cell));

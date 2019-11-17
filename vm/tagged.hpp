@@ -1,10 +1,16 @@
 namespace factor {
 
-template <typename Type> cell tag(Type* value) {
+// C++20 concept for Factor objects
+template<typename T>
+concept FactorObject = requires(T t) {
+  { T::type_number } -> std::convertible_to<cell>;
+};
+
+template <FactorObject Type> cell tag(Type* value) {
   return RETAG(value, Type::type_number);
 }
 
-inline static cell tag_dynamic(object* value) {
+inline cell tag_dynamic(const object* value) {
   return RETAG(value, value->type());
 }
 
@@ -26,10 +32,10 @@ template <typename Type> struct tagged {
 
   Type* untagged() const {
     FACTOR_ASSERT(type_p());
-    return (Type*)(UNTAG(value_));
+    return reinterpret_cast<Type*>(UNTAG(value_));
   }
 
-  explicit tagged(cell tagged) : value_(tagged) {}
+  explicit tagged(cell tag_val) : value_(tag_val) {}
   explicit tagged(Type* untagged) : value_(factor::tag(untagged)) {}
 
   void set_value(const cell ptr) {

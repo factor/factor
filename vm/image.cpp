@@ -36,7 +36,7 @@ vm_parameters::vm_parameters() {
   signals = true;
 
 #ifdef WINDOWS
-  console = GetConsoleWindow() != NULL;
+  console = GetConsoleWindow() != nullptr;
 #else
   console = true;
 #endif
@@ -100,14 +100,25 @@ void vm_parameters::init_from_args(int argc, vm_char** argv) {
 void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
   p->tenured_size = std::max((h->data_size * 3) / 2, p->tenured_size);
 
-  data_heap *d = new data_heap(&nursery,
+  auto d = std::make_unique<data_heap>(&nursery,
                                p->young_size, p->aging_size, p->tenured_size);
-  set_data_heap(d);
+  set_data_heap(std::move(d));
 
   auto uncompress = h->data_size != h->compressed_data_size;
   auto uncompressed_data_size = uncompress ? align_page(h->data_size) : 0;
-  auto temp = uncompress && uncompressed_data_size+h->compressed_data_size > data->tenured->size;
-  auto buf = temp ? malloc(h->compressed_data_size) : (char*)data->tenured->start+uncompressed_data_size;
+  auto temp = uncompress && uncompressed_data_size+h->compressed_data_size > data->tenured.get()->size;
+  
+  // Use unique_ptr with custom deleter for automatic cleanup
+  std::unique_ptr<char, decltype(&free)> temp_buffer(nullptr, &free);
+  char* buf = nullptr;
+  
+  if (temp) {
+    temp_buffer.reset(static_cast<char*>(malloc(h->compressed_data_size)));
+    buf = temp_buffer.get();
+  } else {
+    buf = reinterpret_cast<char*>(data->tenured.get()->start) + uncompressed_data_size;
+  }
+  
   if (!buf) fatal_error("Out of memory in load_data_heap", 0);
 
   fixnum bytes_read =
@@ -122,7 +133,7 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
   if (uncompress) {
     lib::zstd::zstd_lib zstd;
     zstd.open();
-    size_t result = zstd.decompress((void*)data->tenured->start, h->data_size, buf, h->compressed_data_size);
+    size_t result = zstd.decompress(reinterpret_cast<void*>(data->tenured.get()->start), h->data_size, buf, h->compressed_data_size);
     if (zstd.is_error(result)) {
       std::cout << "data heap decompression: " << zstd.get_error_name(result) << '\n';
       fatal_error("load_data_heap failed", 0);
@@ -130,22 +141,33 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
     zstd.close();
   }
 
-  if (temp) free(buf);
+  // temp_buffer automatically frees memory via unique_ptr destructor
 
-  data->tenured->initial_free_list(h->data_size);
+  data->tenured.get()->initial_free_list(h->data_size);
 }
 
 void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
   if (h->code_size > p->code_size)
     fatal_error("Code heap too small to fit image", h->code_size);
 
-  code = new code_heap(p->code_size);
+  code = std::make_unique<code_heap>(p->code_size);
 
   if (h->code_size != 0) {
     auto uncompress = h->code_size != h->compressed_code_size;
     auto uncompressed_code_size = uncompress ? align_page(h->code_size) : 0;
     auto temp = uncompress && uncompressed_code_size+h->compressed_code_size > code->allocator->size;
-    auto buf = temp ? malloc(h->compressed_code_size) : (char*)code->allocator->start+uncompressed_code_size;
+    
+    // Use unique_ptr with custom deleter for automatic cleanup
+    std::unique_ptr<char, decltype(&free)> temp_buffer(nullptr, &free);
+    char* buf = nullptr;
+    
+    if (temp) {
+      temp_buffer.reset(static_cast<char*>(malloc(h->compressed_code_size)));
+      buf = temp_buffer.get();
+    } else {
+      buf = reinterpret_cast<char*>(code->allocator->start) + uncompressed_code_size;
+    }
+    
     if (!buf) fatal_error("Out of memory in load_code_heap", 0);
 
     size_t bytes_read =
@@ -159,7 +181,7 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
     if (uncompress) {
       lib::zstd::zstd_lib zstd;
       zstd.open();
-      size_t result = zstd.decompress((void*)code->allocator->start, h->code_size, buf, h->compressed_code_size);
+      size_t result = zstd.decompress(reinterpret_cast<void*>(code->allocator->start), h->code_size, buf, h->compressed_code_size);
       if (zstd.is_error(result)) {
         std::cout << "code heap decompression: " << zstd.get_error_name(result) << '\n';
         fatal_error("load_code_heap failed", 0);
@@ -167,7 +189,7 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
       zstd.close();
     }
 
-    if (temp) free(buf);
+    // temp_buffer automatically frees memory via unique_ptr destructor
   }
 
   code->allocator->initial_free_list(h->code_size);
@@ -184,11 +206,11 @@ struct startup_fixup {
       : data_offset(data_offset), code_offset(code_offset) {}
 
   object* fixup_data(object* obj) {
-    return (object*)((cell)obj + data_offset);
+    return (object*)(reinterpret_cast<cell>(obj) + data_offset);
   }
 
   code_block* fixup_code(code_block* obj) {
-    return (code_block*)((cell)obj + code_offset);
+    return reinterpret_cast<code_block*>(reinterpret_cast<cell>(obj) + code_offset);
   }
 
   object* translate_data(const object* obj) {
@@ -196,7 +218,7 @@ struct startup_fixup {
   }
 
   code_block* translate_code(const code_block* compiled) {
-    return fixup_code((code_block*)compiled);
+    return fixup_code(const_cast<code_block*>(compiled));
   }
 
   cell size(const object* obj) {
@@ -215,7 +237,7 @@ void factor_vm::fixup_heaps(cell data_offset, cell code_offset) {
 
   auto start_object_updater = [&](object *obj, cell size) {
     (void)size;
-    data->tenured->starts.record_object_start_offset(obj);
+    data->tenured.get()->starts.record_object_start_offset(obj);
     visitor.visit_slots(obj);
     switch (obj->type()) {
       case ALIEN_TYPE: {
@@ -236,7 +258,7 @@ void factor_vm::fixup_heaps(cell data_offset, cell code_offset) {
       }
     }
   };
-  data->tenured->iterate(start_object_updater, fixup);
+  data->tenured.get()->iterate(start_object_updater, fixup);
 
   auto updater = [&](code_block* compiled, cell size) {
     (void)size;
@@ -268,7 +290,7 @@ char *threadsafe_strerror(int errnum) {
 void factor_vm::load_image(vm_parameters* p) {
 
   FILE* file = OPEN_READ(p->image_path);
-  if (file == NULL) {
+  if (file == nullptr) {
     std::cout << "Cannot open image file: " << AS_UTF8(p->image_path) << std::endl;
     char *msg = threadsafe_strerror(errno);
     std::cout << "strerror: " << msg << std::endl;
@@ -309,7 +331,7 @@ void factor_vm::load_image(vm_parameters* p) {
   // Certain special objects in the image are known to the runtime
   memcpy(special_objects, h.special_objects, sizeof(special_objects));
 
-  cell data_offset = data->tenured->start - h.data_relocation_base;
+  cell data_offset = data->tenured.get()->start - h.data_relocation_base;
   cell code_offset = code->allocator->start - h.code_relocation_base;
   fixup_heaps(data_offset, code_offset);
 }
@@ -323,8 +345,8 @@ bool factor_vm::save_image(const vm_char* saving_filename,
 
   h.magic = image_magic;
   h.version = image_version;
-  h.data_relocation_base = data->tenured->start;
-  h.compressed_data_size = h.escaped_data_size = data->tenured->occupied_space();
+  h.data_relocation_base = data->tenured.get()->start;
+  h.compressed_data_size = h.escaped_data_size = data->tenured.get()->occupied_space();
   h.code_relocation_base = code->allocator->start;
   h.compressed_code_size = h.code_size = code->allocator->occupied_space();
 
@@ -333,15 +355,15 @@ bool factor_vm::save_image(const vm_char* saving_filename,
         (save_special_p(i) ? special_objects[i] : false_object);
 
   FILE* file = OPEN_WRITE(saving_filename);
-  if (file == NULL)
+  if (file == nullptr)
     return false;
   if (safe_fwrite(&h, sizeof(image_header), 1, file) != 1)
     return false;
   if (h.escaped_data_size > 0 &&
-      safe_fwrite((void*)data->tenured->start, h.escaped_data_size, 1, file) != 1)
+      safe_fwrite(reinterpret_cast<void*>(data->tenured.get()->start), h.escaped_data_size, 1, file) != 1)
     return false;
   if (h.code_size > 0 &&
-      safe_fwrite((void*)code->allocator->start, h.code_size, 1, file) != 1)
+      safe_fwrite(reinterpret_cast<void*>(code->allocator->start), h.code_size, 1, file) != 1)
     return false;
   if (raw_fclose(file) == -1)
     return false;

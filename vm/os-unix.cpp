@@ -4,7 +4,7 @@ namespace factor {
 
 bool set_memory_locked(cell base, cell size, bool locked) {
   int prot = locked ? PROT_NONE : PROT_READ | PROT_WRITE;
-  int status = mprotect((char*)base, size, prot);
+  int status = mprotect(reinterpret_cast<char*>(base), size, prot);
   return status != -1;
 }
 
@@ -27,8 +27,8 @@ void sleep_nanos(uint64_t nsec) {
   timespec ts;
   timespec ts_rem;
   int ret;
-  ts.tv_sec = nsec / 1000000000;
-  ts.tv_nsec = nsec % 1000000000;
+  ts.tv_sec = static_cast<__time_t>(nsec / 1000000000);
+  ts.tv_nsec = static_cast<__syscall_slong_t>(nsec % 1000000000);
   ret = nanosleep(&ts, &ts_rem);
   while (ret == -1 && errno == EINTR) {
     memcpy(&ts, &ts_rem, sizeof(ts));
@@ -58,7 +58,7 @@ void factor_vm::ffi_dlopen(dll* dll) {
 }
 
 cell factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
-  return (cell)dlsym(dll ? dll->handle : null_dll, symbol);
+  return reinterpret_cast<cell>(dlsym(dll ? dll->handle : null_dll, symbol));
 }
 
 void factor_vm::ffi_dlclose(dll* dll) {
@@ -69,7 +69,7 @@ void factor_vm::ffi_dlclose(dll* dll) {
 
 void factor_vm::primitive_existsp() {
   struct stat sb;
-  char* path = (char*)(untag_check<byte_array>(ctx->pop()) + 1);
+  char* path = reinterpret_cast<char*>(untag_check<byte_array>(ctx->pop()) + 1);
   ctx->push(tag_boolean(stat(path, &sb) >= 0));
 }
 
@@ -99,18 +99,18 @@ segment::segment(cell size_, bool executable_p) {
   int flags = MAP_ANON | MAP_PRIVATE;
 #endif
 
-  cell alloc_size = 2 * pagesize + size;
-  char* array = (char*)mmap(NULL, alloc_size, prot, flags, -1, 0);
+  cell alloc_size = 2 * static_cast<cell>(pagesize) + size;
+  char* array = static_cast<char*>(mmap(NULL, alloc_size, prot, flags, -1, 0));
 
-  if (array == (char*)-1)
+  if (array == reinterpret_cast<char*>(-1))
     fatal_error("Out of memory in mmap", alloc_size);
 
-  start = (cell)(array + pagesize);
+  start = reinterpret_cast<cell>(array + pagesize);
   end = start + size;
 
 #if defined(__APPLE__) && defined(FACTOR_ARM64)
   if (executable_p) {
-    if (mprotect((char*)start, size, prot | PROT_EXEC) == -1)
+    if (mprotect(reinterpret_cast<char*>(start), size, prot | PROT_EXEC) == -1)
       fatal_error("mprotect executable page failed", 0);
   }
 #endif
@@ -119,15 +119,17 @@ segment::segment(cell size_, bool executable_p) {
 }
 
 segment::~segment() {
-  int pagesize = getpagesize();
-  int retval = munmap((void*)(start - pagesize), 2 * pagesize + size);
-  if (retval)
-    fatal_error("Segment deallocation failed", 0);
+  if (start != 0) {
+    int pagesize = getpagesize();
+    int retval = munmap(reinterpret_cast<void*>(start - static_cast<cell>(pagesize)), 2 * static_cast<cell>(pagesize) + size);
+    if (retval)
+      fatal_error("Segment deallocation failed", 0);
+  }
 }
 
 void factor_vm::start_sampling_profiler_timer() {
   struct itimerval timer;
-  memset((void*)&timer, 0, sizeof(struct itimerval));
+  memset(&timer, 0, sizeof(struct itimerval));
   timer.it_value.tv_usec = 1000000 / samples_per_second;
   timer.it_interval.tv_usec = 1000000 / samples_per_second;
   setitimer(ITIMER_REAL, &timer, NULL);
@@ -135,20 +137,20 @@ void factor_vm::start_sampling_profiler_timer() {
 
 void factor_vm::end_sampling_profiler_timer() {
   struct itimerval timer;
-  memset((void*)&timer, 0, sizeof(struct itimerval));
+  memset(&timer, 0, sizeof(struct itimerval));
   setitimer(ITIMER_REAL, &timer, NULL);
 }
 
 void factor_vm::dispatch_signal(void* uap, void(handler)()) {
-  dispatch_signal_handler((cell*)&UAP_STACK_POINTER(uap),
-                          (cell*)&UAP_PROGRAM_COUNTER(uap),
-                          (cell)FUNCTION_CODE_POINTER(handler));
+  dispatch_signal_handler(reinterpret_cast<cell*>(&UAP_STACK_POINTER(uap)),
+                          reinterpret_cast<cell*>(&UAP_PROGRAM_COUNTER(uap)),
+                          reinterpret_cast<cell>(FUNCTION_CODE_POINTER(handler)));
 }
 
 void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
   (void) signal;
-  cell fault_addr = (cell)siginfo->si_addr;
-  cell fault_pc = (cell)UAP_PROGRAM_COUNTER(uap);
+  cell fault_addr = reinterpret_cast<cell>(siginfo->si_addr);
+  cell fault_pc = static_cast<cell>(UAP_PROGRAM_COUNTER(uap));
   factor_vm* vm = current_vm();
   vm->set_memory_protection_error(fault_addr, fault_pc);
   vm->dispatch_signal(uap, factor::memory_signal_handler_impl);
@@ -202,12 +204,12 @@ void sample_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
   (void) siginfo;
   factor_vm* vm = current_vm_p();
   bool foreign_thread = false;
-  if (vm == NULL) {
+  if (vm == nullptr) {
     foreign_thread = true;
     vm = thread_vms.begin()->second;
   }
   if (atomic::load(&vm->sampling_profiler_p))
-    vm->enqueue_samples(1, (cell)UAP_PROGRAM_COUNTER(uap), foreign_thread);
+    vm->enqueue_samples(1, static_cast<cell>(UAP_PROGRAM_COUNTER(uap)), foreign_thread);
   else if (!foreign_thread)
     enqueue_signal(vm, signal);
 }
@@ -278,10 +280,10 @@ static void init_signal_pipe(factor_vm* vm) {
 void factor_vm::unix_init_signals() {
   init_signal_pipe(this);
 
-  signal_callstack_seg = new segment(callstack_size, false);
+  signal_callstack_seg = std::make_unique<segment>(callstack_size, false);
 
   stack_t signal_callstack;
-  signal_callstack.ss_sp = (char*)signal_callstack_seg->start;
+  signal_callstack.ss_sp = reinterpret_cast<char*>(signal_callstack_seg->start);
   signal_callstack.ss_size = signal_callstack_seg->size;
   signal_callstack.ss_flags = 0;
 
@@ -399,7 +401,6 @@ bool safe_read(int fd, void* data, ssize_t size) {
       return safe_read(fd, data, size);
     else {
       fatal_error("error reading fd", errno);
-      return false;
     }
   } else
     return (bytes == size);
@@ -513,7 +514,7 @@ void factor_vm::primitive_enable_ctrl_break() {
   stop_on_ctrl_break = true;
 }
 
-void abort() {
+[[noreturn]] void abort() {
   sig_t ret;
   do {
     ret = signal(SIGABRT, SIG_DFL);

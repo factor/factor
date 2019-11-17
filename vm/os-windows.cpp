@@ -321,7 +321,7 @@ static DWORD WINAPI ctrl_break_thread_proc(LPVOID parent_vm) {
 
 void factor_vm::primitive_disable_ctrl_break() {
   stop_on_ctrl_break = false;
-  if (ctrl_break_thread != NULL) {
+  if (ctrl_break_thread != nullptr) {
     DWORD wait_result = WaitForSingleObject(ctrl_break_thread,
                                             2 * ctrl_break_sleep);
     if (wait_result != WAIT_OBJECT_0)
@@ -333,7 +333,7 @@ void factor_vm::primitive_disable_ctrl_break() {
 
 void factor_vm::primitive_enable_ctrl_break() {
   stop_on_ctrl_break = true;
-  if (ctrl_break_thread == NULL) {
+  if (ctrl_break_thread == nullptr) {
     DisableProcessWindowsGhosting();
     ctrl_break_thread = CreateThread(NULL, 0, factor::ctrl_break_thread_proc,
                                      static_cast<LPVOID>(this), 0, NULL);
@@ -418,6 +418,6 @@ void factor_vm::end_sampling_profiler_timer() {
   sampler_thread = NULL;
 }
 
-void abort() { ::abort(); }
+[[noreturn]] void abort() { ::abort(); }
 
 }

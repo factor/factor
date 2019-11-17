@@ -3,21 +3,21 @@ namespace factor {
 typedef intptr_t fixnum;
 typedef uintptr_t cell;
 
-inline static cell align(cell a, cell b) { return (a + (b - 1)) & ~(b - 1); }
+[[nodiscard]] constexpr cell align(cell a, cell b) { return (a + (b - 1)) & ~(b - 1); }
 
-inline static cell alignment_for(cell a, cell b) { return align(a, b) - a; }
+[[nodiscard]] constexpr cell alignment_for(cell a, cell b) { return align(a, b) - a; }
 
-static const cell data_alignment = 16;
+constexpr cell data_alignment = 16;
 
 // Must match leaf-stack-frame-size in basis/bootstrap/layouts.factor
 #define LEAF_FRAME_SIZE 16
 
-#define WORD_SIZE (signed)(sizeof(cell) * 8)
+#define WORD_SIZE static_cast<signed>(sizeof(cell) * 8)
 
 #define TAG_MASK 15
 #define TAG_BITS 4
-#define TAG(x) ((cell)(x) & TAG_MASK)
-#define UNTAG(x) ((cell)(x) & ~TAG_MASK)
+#define TAG(x) (reinterpret_cast<cell>(x) & TAG_MASK)
+#define UNTAG(x) (reinterpret_cast<cell>(x) & static_cast<cell>(~TAG_MASK))
 #define RETAG(x, tag) (UNTAG(x) | (tag))
 
 // Type tags, should be kept in sync with:
@@ -41,8 +41,8 @@ enum type_tags {
   TYPE_COUNT
 };
 
-static inline const char* type_name(cell type) {
-  static const char* const type_names[]={
+constexpr const char* type_name(cell type) {
+  constexpr const char* const type_names[]={
     "fixnum",
     "f",
     "array",
@@ -82,20 +82,20 @@ enum {
 };
 
 // What Factor calls 'f'
-static const cell false_object = F_TYPE;
+constexpr cell false_object = F_TYPE;
 
-inline static bool immediate_p(cell obj) {
+[[nodiscard]] constexpr bool immediate_p(cell obj) {
   // We assume that fixnums have tag 0 and false_object has tag 1
   return TAG(obj) <= F_TYPE;
 }
 
-inline static fixnum untag_fixnum(cell tagged) {
+[[nodiscard]] inline fixnum untag_fixnum(cell tagged) {
   FACTOR_ASSERT(TAG(tagged) == FIXNUM_TYPE);
-  return ((fixnum)tagged) >> TAG_BITS;
+  return static_cast<fixnum>(tagged) >> TAG_BITS;
 }
 
-inline static cell tag_fixnum(fixnum untagged) {
-  return ( (cell)untagged << TAG_BITS) | FIXNUM_TYPE;
+[[nodiscard]] constexpr cell tag_fixnum(fixnum untagged) {
+  return (static_cast<cell>(untagged) << TAG_BITS) | FIXNUM_TYPE;
 }
 
 #define NO_TYPE_CHECK static const cell type_number = TYPE_COUNT
@@ -119,29 +119,29 @@ struct object {
   cell slot_count() const;
   template <typename Fixup> cell slot_count(Fixup fixup) const;
 
-  cell* slots() const { return (cell*)this; }
+  cell* slots() const { return const_cast<cell*>(reinterpret_cast<const cell*>(this)); }
 
   template <typename Iterator> void each_slot(Iterator& iter);
 
   // Only valid for objects in tenured space; must cast to free_heap_block
   // to do anything with it if its free
-  bool free_p() const { return (header & 1) == 1; }
+  [[nodiscard]] bool free_p() const { return (header & 1) == 1; }
 
-  cell type() const { return (header >> 2) & TAG_MASK; }
+  [[nodiscard]] cell type() const { return (header >> 2) & TAG_MASK; }
 
   void initialize(cell type) { header = type << 2; }
 
-  cell hashcode() const { return (header >> 6); }
+  [[nodiscard]] cell hashcode() const { return (header >> 6); }
 
   void set_hashcode(cell hashcode) {
     header = (header & 0x3f) | (hashcode << 6);
   }
 
-  bool forwarding_pointer_p() const { return (header & 2) == 2; }
+  [[nodiscard]] bool forwarding_pointer_p() const { return (header & 2) == 2; }
 
-  object* forwarding_pointer() const { return (object*)UNTAG(header); }
+  [[nodiscard]] object* forwarding_pointer() const { return reinterpret_cast<object*>(UNTAG(header)); }
 
-  void forward_to(object* pointer) { header = ((cell)pointer | 2); }
+  void forward_to(object* pointer) { header = (reinterpret_cast<cell>(pointer) | 2); }
 };
 
 // Assembly code makes assumptions about the layout of this struct
@@ -151,7 +151,7 @@ struct array : public object {
   // tagged
   cell capacity;
 
-  cell* data() const { return (cell*)(this + 1); }
+  cell* data() const { return const_cast<cell*>(reinterpret_cast<const cell*>(this + 1)); }
 };
 
 // These are really just arrays, but certain elements have special
@@ -172,7 +172,7 @@ struct bignum : public object {
   // tagged
   cell capacity;
 
-  cell* data() const { return (cell*)(this + 1); }
+  cell* data() const { return const_cast<cell*>(reinterpret_cast<const cell*>(this + 1)); }
 };
 
 struct byte_array : public object {
@@ -187,7 +187,7 @@ struct byte_array : public object {
 #endif
 
   template <typename Scalar> Scalar* data() const {
-    return (Scalar*)(this + 1);
+    return const_cast<Scalar*>(reinterpret_cast<const Scalar*>(this + 1));
   }
 };
 
@@ -201,7 +201,7 @@ struct string : public object {
   // tagged
   cell hashcode;
 
-  uint8_t* data() const { return (uint8_t*)(this + 1); }
+  uint8_t* data() const { return const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(this + 1)); }
 };
 
 struct code_block;
@@ -311,12 +311,13 @@ struct callstack : public object {
   cell length;
 
   cell frame_top_at(cell offset) const {
-    return (cell)(this + 1) + offset;
+    return reinterpret_cast<cell>(this + 1) + offset;
   }
 
-  cell top() const { return (cell)(this + 1); }
+  cell top() const { return reinterpret_cast<cell>(this + 1); }
   cell bottom() const {
-    return (cell)(this + 1) + untag_fixnum(length);
+    fixnum len = untag_fixnum(length);
+    return reinterpret_cast<cell>(this + 1) + static_cast<cell>(len);
   }
 };
 
@@ -325,11 +326,12 @@ struct tuple : public object {
   // tagged layout
   cell layout;
 
-  cell* data() const { return (cell*)(this + 1); }
+  cell* data() const { return const_cast<cell*>(reinterpret_cast<const cell*>(this + 1)); }
 };
 
 inline static cell tuple_capacity(const tuple_layout *layout) {
-  return untag_fixnum(layout->size);
+  fixnum size = untag_fixnum(layout->size);
+  return static_cast<cell>(size);
 }
 
 inline static cell tuple_size(const tuple_layout* layout) {
@@ -337,7 +339,8 @@ inline static cell tuple_size(const tuple_layout* layout) {
 }
 
 inline static cell string_capacity(const string* str) {
-  return untag_fixnum(str->length);
+  fixnum len = untag_fixnum(str->length);
+  return static_cast<cell>(len);
 }
 
 inline static cell string_size(cell size) { return sizeof(string) + size; }

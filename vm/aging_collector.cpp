@@ -2,12 +2,25 @@
 
 namespace factor {
 
-struct to_aging_copier : no_fixup {
+struct alignas(16) to_aging_copier : no_fixup {
   aging_space* aging;
   tenured_space* tenured;
 
-  to_aging_copier(aging_space* aging, tenured_space* tenured)
-      : aging(aging), tenured(tenured) { }
+  to_aging_copier() : aging(nullptr), tenured(nullptr) { }
+  
+  to_aging_copier(aging_space* aging_, tenured_space* tenured_)
+      : aging(aging_), tenured(tenured_) { }
+  
+  to_aging_copier(const to_aging_copier& other)
+      : aging(other.aging), tenured(other.tenured) { }
+  
+  to_aging_copier& operator=(const to_aging_copier& other) {
+    if (this != &other) {
+      aging = other.aging;
+      tenured = other.tenured;
+    }
+    return *this;
+  }
 
   object* fixup_data(object* obj) {
     if (aging->contains_p(obj) || tenured->contains_p(obj)) {
@@ -43,14 +56,14 @@ void factor_vm::collect_aging() {
     // Change the op so that if we fail here, an assertion will be raised.
     current_gc->op = COLLECT_TO_TENURED_OP;
 
-    slot_visitor<from_tenured_refs_copier>
-        visitor(this, from_tenured_refs_copier(data->tenured, &mark_stack));
+    from_tenured_refs_copier copier(data->tenured.get(), &mark_stack);
+    slot_visitor<from_tenured_refs_copier> visitor(this, copier);
 
-    gc_event* event = current_gc->event;
+    gc_event* event = current_gc->event.get();
 
     if (event)
       event->reset_timer();
-    visitor.visit_cards(data->tenured, card_points_to_aging, 0xff);
+    visitor.visit_cards(data->tenured.get(), card_points_to_aging, 0xff);
     if (event) {
       event->ended_phase(PHASE_CARD_SCAN);
       event->cards_scanned += visitor.cards_scanned;
@@ -73,9 +86,9 @@ void factor_vm::collect_aging() {
     std::swap(data->aging, data->aging_semispace);
     data->reset_aging();
 
-    aging_space *aging = data->aging;
-    slot_visitor<to_aging_copier>
-        visitor(this, to_aging_copier(aging, data->tenured));
+    aging_space *aging = data->aging.get();
+    to_aging_copier copier(aging, data->tenured.get());
+    slot_visitor<to_aging_copier> visitor(this, copier);
 
     cell scan = aging->start + aging->occupied_space();
 
