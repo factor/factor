@@ -1,7 +1,8 @@
 ! Copyright (C) 2017 John Benediktsson, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs assocs.extras combinators kernel math math.order
-math.statistics sequences sequences.extras sets ;
+USING: ascii assocs assocs.extras combinators kernel math
+math.order math.statistics sequences sequences.extras sets
+strings ;
 IN: escape-strings
 
 : find-escapes ( str -- set )
@@ -13,6 +14,21 @@ IN: escape-strings
             [ 3drop 0 0 ]
         } case
     ] each 0 > [ over adjoin ] [ drop ] if ;
+
+: find-number-escapes ( str -- set )
+    [ HS{ } clone sbuf"" clone 0 ] dip
+    [
+        {
+            { [ dup char: \] = ] [
+                drop 1 + dup 2 = [
+                    drop dup >string pick adjoin
+                    0 over set-length 1
+                ] when
+            ] }
+            { [ dup digit? ] [ [ dup 1 = ] dip '[ [ _ over push ] dip ] [ ] if ] }
+            [ 2drop 0 over set-length 0 ]
+        } cond
+    ] each 0 > [ >string over adjoin ] [ drop ] if ;
 
 : lowest-missing ( set -- min )
     members dup [ = not ] find-index
