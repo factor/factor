@@ -8,9 +8,9 @@ IN: random.passwords
 CONSTANT: ascii-printable-charset $[ 33 126 [a,b] ]
 CONSTANT: hex-charset "0123456789ABCDEF"
 CONSTANT: alphanum-charset $[
-    CHAR: 0 CHAR: 9 [a,b]
-    CHAR: a CHAR: z [a,b] append
-    CHAR: A CHAR: Z [a,b] append ]
+    char: 0 char: 9 [a,b]
+    char: a char: z [a,b] append
+    char: A char: Z [a,b] append ]
 
 PRIVATE>
 
