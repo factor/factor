@@ -2,13 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs assocs.extras calendar
 calendar.format checksums checksums.sha combinators
-combinators.smart compression.zlib constructors fry grouping io
-io.binary io.directories io.directories.search
-io.encodings.binary io.encodings.string io.encodings.utf8
-io.files io.files.info io.pathnames io.streams.byte-array
-io.streams.peek kernel math math.bitwise math.parser
-math.statistics memoize namespaces random sequences
-sequences.extras splitting strings ;
+combinators.short-circuit combinators.smart compression.zlib
+constructors fry grouping io io.binary io.directories
+io.directories.search io.encodings.binary io.encodings.string
+io.encodings.utf8 io.files io.files.info io.pathnames
+io.streams.byte-array io.streams.peek kernel make math
+math.bitwise math.parser math.statistics memoize modern.slices
+namespaces random sequences sequences.extras splitting strings ;
 IN: git
 
 ERROR: byte-expected offset ;
@@ -120,10 +120,10 @@ ERROR: unhandled-git-index-trailing-bytes bytes ;
         [ name>> file-info modified>> timestamp>unix-time >integer ] bi = not
     ] filter ;
 
-TUPLE: commit hash tree parents author committer message ;
+TUPLE: commit hash tree parents author committer gpgsig message ;
 CONSTRUCTOR: <commit> commit ( tree parents author committer -- obj ) ;
 
-TUPLE: tree hash tree parents author committer message ;
+TUPLE: tree hash tree parents author committer gpgsig message ;
 CONSTRUCTOR: <tree> tree ( -- obj ) ;
 
 : last2 ( seq -- penultimate ultimate ) 2 tail* first2 ;
@@ -151,43 +151,57 @@ ERROR: unknown-commit-line line name ;
 ERROR: eof-too-early ;
 ERROR: unknown-field field ;
 
-: parse-commit-field ( obj parameter -- obj )
-    [ "\r\n" read-until [ eof-too-early ] unless ] dip {
-        { "tree" [ >>tree ] }
-        { "parent" [ >>parents ] }
-        { "author" [ >>author ] }
-        { "committer" [ >>committer ] }
+: read-field* ( bytes n -- bytes n' )
+    1 peek-from
+    "\s" sequence= [
+        1 +
+        "\n" slice-til-string drop ,
+        read-field*
+    ] when ;
+
+: read-field ( bytes n -- bytes n' seq )
+    [
+        read-field*
+    ] { } make concat ;
+
+: parse-commit-field ( commit bytes n parameter -- commit bytes n )
+    [ read-field ] dip >string {
+        { "tree" [ reach tree<< ] }
+        { "parent" [ reach parents<< ] }
+        { "author" [ reach author<< ] }
+        { "committer" [ reach committer<< ] }
+        { "gpgsig" [ reach gpgsig<< ] }
         [ unknown-field ]
     } case ;
 
 ERROR: unexpected-text text ;
 
-: parse-commit-lines ( obj -- obj )
-    " \n" read-until {
+: parse-commit-lines ( obj bytes n -- obj )
+    "\s\n" slice-til-either {
         { char: \s [ parse-commit-field parse-commit-lines ] }
-        { char: \n [ drop contents >>message ] }
+        { char: \n [ drop 1 + tail >>message ] }
         [ unexpected-text ]
     } case ;
 
 : parse-commit ( bytes -- commit )
     " " split1 [ "commit" assert= ] [ string>number read ] bi*
-    utf8 [
-        commit new parse-commit-lines
-    ] with-byte-reader ;
+    [ commit new ] dip 0 parse-commit-lines ;
 
-: parse-tree-field ( obj parameter -- obj )
-    [ "\r\n" read-until* ] dip {
-        { "tree" [ >>tree ] }
-        { "parent" [ >>parents ] }
-        { "author" [ >>author ] }
-        { "committer" [ >>committer ] }
+: parse-tree-field ( tree bytes n parameter -- tree bytes n )
+    [ read-field ] dip  {
+        { "tree" [ reach tree<< ] }
+        { "parent" [ reach parents<< ] }
+        { "author" [ reach author<< ] }
+        { "committer" [ reach committer<< ] }
+        { "gpgsig" [ reach gpgsig<< ] }
         [ unknown-field ]
     } case ;
 
-: parse-tree-lines ( obj -- obj )
-    "\s\n" read-until {
-        { char: \s [ parse-tree-field parse-tree-lines ] }
-        { char: \n [ drop contents >>message ] }
+
+: bytes>tree ( obj bytes n -- obj )
+    "\s\n" slice-til-either {
+        { char: \s [ >string parse-tree-field bytes>tree ] }
+        { char: \n [ drop 1 + tail >>message ] }
         [ unexpected-text ]
     } case ;
 
@@ -223,12 +237,8 @@ ERROR: unknown-git-object obj ;
         H{ } clone parse-object-line>assoc assoc>git-object
     ] with-byte-reader ;
 
-
 : parse-tree ( bytes -- commit )
-    [ tree new ] dip
-    utf8 [
-        parse-tree-lines
-    ] with-byte-reader ;
+    [ tree new ] dip 0 bytes>tree ;
 
 : parse-object ( bytes -- git-obj )
     utf8 [
@@ -377,6 +387,7 @@ ERROR: unsupported-packed-raw-type type ;
 : read-packed-raw ( -- string )
     read-type-length first2 swap {
         { 1 [ 256 + read uncompress ] }
+        ! { 6 [ read ] } ! delta-packed with DEFLATE
         [ unsupported-packed-raw-type ]
     } case ;
 
@@ -396,7 +407,7 @@ SYMBOL: initial-offset
         read-type-length first2 swap {
             { 1 [ 256 + read uncompress parse-object ] }
             { 6 [ read-offset-delta first2 do-deltas parse-object-bytes>assoc ] }
-            ! { 7 [ B read-sha1-delta ] }
+            ! { 7 [ read-sha1-delta ] }
             [ number>string "unknown packed type: " prepend throw ]
         } case
     ] with-variable ;
