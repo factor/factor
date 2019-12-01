@@ -4,31 +4,31 @@ USING: kernel modern modern.out modern.slices multiline
 sequences tools.test ;
 IN: modern.tests
 
-{ f } [ "" upper-colon? ] unit-test
-{ t } [ ":" upper-colon? ] unit-test
-{ t } [ "::" upper-colon? ] unit-test
-{ t } [ ":::" upper-colon? ] unit-test
-{ t } [ "FOO:" upper-colon? ] unit-test
-{ t } [ "FOO::" upper-colon? ] unit-test
-{ t } [ "FOO:::" upper-colon? ] unit-test
+{ f } [ "" upper-colon-form? ] unit-test
+{ t } [ ":" upper-colon-form? ] unit-test
+{ t } [ "::" upper-colon-form? ] unit-test
+{ t } [ ":::" upper-colon-form? ] unit-test
+{ t } [ "FOO:" upper-colon-form? ] unit-test
+{ t } [ "FOO::" upper-colon-form? ] unit-test
+{ t } [ "FOO:::" upper-colon-form? ] unit-test
 
 ! 'FOO:
-{ f } [ "'" upper-colon? ] unit-test
-{ t } [ "':" upper-colon? ] unit-test
-{ t } [ "'::" upper-colon? ] unit-test
-{ t } [ "':::" upper-colon? ] unit-test
-{ t } [ "'FOO:" upper-colon? ] unit-test
-{ t } [ "'FOO::" upper-colon? ] unit-test
-{ t } [ "'FOO:::" upper-colon? ] unit-test
+{ f } [ "'" upper-colon-form? ] unit-test
+{ t } [ "':" upper-colon-form? ] unit-test
+{ t } [ "'::" upper-colon-form? ] unit-test
+{ t } [ "':::" upper-colon-form? ] unit-test
+{ t } [ "'FOO:" upper-colon-form? ] unit-test
+{ t } [ "'FOO::" upper-colon-form? ] unit-test
+{ t } [ "'FOO:::" upper-colon-form? ] unit-test
 
 ! \FOO: is not an upper-colon form, it is deactivated by the \
-{ f } [ "\\" upper-colon? ] unit-test
-{ f } [ "\\:" upper-colon? ] unit-test
-{ f } [ "\\::" upper-colon? ] unit-test
-{ f } [ "\\:::" upper-colon? ] unit-test
-{ f } [ "\\FOO:" upper-colon? ] unit-test
-{ f } [ "\\FOO::" upper-colon? ] unit-test
-{ f } [ "\\FOO:::" upper-colon? ] unit-test
+{ f } [ "\\" upper-colon-form? ] unit-test
+{ f } [ "\\:" upper-colon-form? ] unit-test
+{ f } [ "\\::" upper-colon-form? ] unit-test
+{ f } [ "\\:::" upper-colon-form? ] unit-test
+{ f } [ "\\FOO:" upper-colon-form? ] unit-test
+{ f } [ "\\FOO::" upper-colon-form? ] unit-test
+{ f } [ "\\FOO:::" upper-colon-form? ] unit-test
 
 
 ! Comment
@@ -156,11 +156,11 @@ IN: modern.tests
 
 { f } [ "FOO" section-open? ] unit-test
 { f } [ "FOO:" section-open? ] unit-test
-{ f } [ ";FOO" section-close? ] unit-test
-{ f } [ "FOO" section-close? ] unit-test
+{ f } [ ";FOO" section-close-form? ] unit-test
+{ f } [ "FOO" section-close-form? ] unit-test
 
-{ f } [ ":>" section-close? ] unit-test
-{ f } [ ":::>" section-close? ] unit-test
+{ f } [ ":>" section-close-form? ] unit-test
+{ f } [ ":::>" section-close-form? ] unit-test
 
 
 ! Strings
@@ -250,9 +250,9 @@ IN: modern.tests
 
 
 { t } [ "![[ ]]" [ rewrite-string-exact ] keep sequence= ] unit-test
-{ t } [ "![=[ ]=]" [ rewrite-string-exact ] keep sequence= ] unit-test
-{ t } [ "![==[ ]==]" [ rewrite-string-exact ] keep sequence= ] unit-test
+{ t } [ "![0[ ]0]" [ rewrite-string-exact ] keep sequence= ] unit-test
+{ t } [ "![00[ ]00]" [ rewrite-string-exact ] keep sequence= ] unit-test
 
 { t } [ "foo[[ ]]" [ rewrite-string-exact ] keep sequence= ] unit-test
-{ t } [ "foo[=[ ]=]" [ rewrite-string-exact ] keep sequence= ] unit-test
-{ t } [ "foo[==[ ]==]" [ rewrite-string-exact ] keep sequence= ] unit-test
+{ t } [ "foo[11[ ]11]" [ rewrite-string-exact ] keep sequence= ] unit-test
+{ t } [ "foo[123[ ]123]" [ rewrite-string-exact ] keep sequence= ] unit-test

@@ -106,7 +106,7 @@ DEFER: lex-factor-nested
 
 DEFER: lex-factor-fallthrough
 MACRO:: read-matched ( $ch -- quot: ( string n tag -- string n' slice' ) )
-    10 <iota> [ char: 0 + ] map
+    { 48 49 50 51 52 53 54 55 56 57 $ch }
     $ch matching-delimiter 1string :> ( $openstreq $closestr1 ) ! digits ]
     |[ $string $n $tag |
         $string $n $tag
