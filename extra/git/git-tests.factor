@@ -22,9 +22,8 @@ IN: git.tests
     ] with-empty-test-git-repo ; inline
 
 { "hello" } [
-    commit new "author" "hello\r\n"
-    [ parse-commit-field ] with-string-reader
-    author>>
+    commit new " hello\n\n" 0 "author"
+    parse-commit-field 2drop author>>
 ] unit-test
 
 { "refs/heads/master" } [
