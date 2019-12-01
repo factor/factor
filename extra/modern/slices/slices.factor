@@ -134,3 +134,6 @@ ERROR: subseq-expected-but-got-eof string n expected ;
     ] [
         nip [ [ length ] bi@ - ] keepd swap
     ] if ; inline
+
+: peek-from ( string n count -- string n slice )
+    [ drop ] [ drop ] [ + ] 2tri reach ?<slice> ;
