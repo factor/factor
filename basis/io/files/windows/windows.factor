@@ -76,7 +76,7 @@ SYMBOL: master-completion-port
             { [ dup integer? ] [ ] }
             { [ dup array? ] [
                 first dup eof?
-                [ drop 0 ] [ n>win32-error-string throw ] if
+                [ drop 0 ] [ throw-windows-error ] if
             ] }
         } cond
     ] with-timeout ;
@@ -117,7 +117,7 @@ M: windows init-io ( -- )
 : handle>file-size ( handle -- n/f )
     (handle>file-size) [
         GetLastError ERROR_INVALID_FUNCTION =
-        [ f ] [ throw-win32-error ] if
+        [ f ] [ win32-error ] if
     ] unless* ;
 
 ERROR: seek-before-start n ;
@@ -147,7 +147,7 @@ M: windows handle-length ( handle -- n/f )
         GetLastError {
             { [ dup expected-io-error? ] [ drop f ] }
             { [ dup eof? ] [ drop t ] }
-            [ n>win32-error-string throw ]
+            [ throw-windows-error ]
         } cond
     ] [ f ] if ;
 
@@ -399,8 +399,8 @@ M: windows home
     WIN32_FIND_STREAM_DATA <struct>
     0
     [ FindFirstStream ] keepd
-    over -1 <alien> = [
-        2drop throw-win32-error
+    over INVALID_HANDLE_VALUE = [
+        2drop win32-error
     ] [
         1vector swap file-streams-rest
     ] if ;

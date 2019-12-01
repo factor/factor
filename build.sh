@@ -98,7 +98,7 @@ set_downloader() {
     fi
     test_program_installed curl
     if [[ $? -ne 0 ]] ; then
-        DOWNLOADER="curl -f -O"
+        DOWNLOADER="curl -L -f -O"
         DOWNLOADER_NAME=curl
         return
     fi
