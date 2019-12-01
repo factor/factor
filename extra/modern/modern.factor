@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators combinators.short-circuit
 continuations io.encodings.utf8 io.files kernel make math
-math.order modern.compiler modern.paths modern.slices sequences
-sequences.extras sets splitting strings syntax.modern unicode
-vocabs.loader ;
+math.order math.parser modern.compiler modern.paths modern.slices
+sequences sequences.extras sets splitting strings syntax.modern
+unicode vocabs.loader ;
 IN: modern
 
 : <ws> ( obj -- obj ) ;
@@ -13,32 +13,41 @@ ERROR: long-opening-mismatch tag open string n ch ;
 ERROR: unexpected-terminator string n slice ; ! ] } ) ;
 ERROR: compound-syntax-disallowed seq n obj ;
 
-! (( )) [[ ]] {{ }}
-MACRO:: read-double-matched ( open-ch -- quot: ( string n tag ch -- string n' seq ) )
-    2 open-ch <string>
-    open-ch 1string
-    2 open-ch matching-delimiter <string>
-    :> ( openstr2 openstr1 closestr2 ) ! "[[" "[" "]]"
-    |[ string n tag! ch |
-        ch {
-            { char: = [
-                tag 1 cut-slice* drop tag! ! tag of (=( is ( here, fix it
-                string n openstr1 slice-until-include [ -1 modify-from ] dip :> ( string' n' opening ch )
-                ch open-ch = [ tag openstr2 string n ch long-opening-mismatch ] unless
-                opening matching-delimiter-string :> needle
+ERROR: expected-digits-only str n got ;
+! Allow [00[ ]00] etc
+: check-digits ( str n got -- str n digits )
+    dup but-last [ digit? ] all?
+    [ >string but-last expected-digits-only ] unless ;
 
-                string' n' needle slice-til-string :> ( string'' n'' payload closing )
-                string n''
-                tag opening payload closing 4array <double-bracket>
+! (( )) [[ ]] {{ }}
+MACRO:: read-double-matched ( $open-ch -- quot: ( string n tag ch -- string n' seq ) )
+    2 $open-ch <string>
+    $open-ch 1string
+    2 $open-ch matching-delimiter <string>
+    :> ( $openstr2 $openstr1 $closestr2 ) ! "[[" "[" "]]"
+    |[ $string $n $tag! $ch |
+        $ch {
+            { [ dup digit? ] [
+                drop $tag 1 cut-slice* drop $tag! ! XXX: $tag of (=( is ( here, fix it (??)
+                $string $n $openstr1 slice-until-include [
+                    check-digits  ! 000] ok,  00a] bad
+                    -1 modify-from
+                ] dip :> ( $string' $n' $opening $ch )
+                $ch $open-ch = [ $tag $openstr2 $string $n $ch long-opening-mismatch ] unless
+                $opening matching-delimiter-string :> $needle
+
+                $string' $n' $needle slice-til-string :> ( $string'' $n'' $payload $closing )
+                $string $n''
+                $tag $opening $payload $closing 4array <double-bracket>
             ] }
-            { open-ch [
-                tag 1 cut-slice* swap tag! 1 modify-to :> opening
-                string n 1 + closestr2 slice-til-string :> ( string' n' payload closing )
-                string n'
-                tag opening payload closing 4array <double-bracket>
+            { [ dup $open-ch = ] [
+                drop $tag 1 cut-slice* swap $tag! 1 modify-to :> $opening
+                $string $n 1 + $closestr2 slice-til-string :> ( $string' $n' $payload $closing )
+                $string $n'
+                $tag $opening $payload $closing 4array <double-bracket>
             ] }
-            [ [ tag openstr2 string n ] dip long-opening-mismatch ]
-        } case
+            [ [ $tag $openstr2 $string $n ] dip long-opening-mismatch ]
+        } cond
      ] ;
 
 : read-double-matched-bracket ( string n tag ch -- string n' seq ) char: \[ read-double-matched ;
@@ -96,18 +105,16 @@ DEFER: lex-factor-nested
     dup length 1 > [ nip ] [ drop ] if ;
 
 DEFER: lex-factor-fallthrough
-MACRO:: read-matched ( ch -- quot: ( string n tag -- string n' slice' ) )
-    ch dup matching-delimiter {
-        [ drop "=" swap prefix ]
-        [ nip 1string ]
-    } 2cleave :> ( openstreq closestr1 ) ! [= ]
-    |[ string n tag |
-        string n tag
+MACRO:: read-matched ( $ch -- quot: ( string n tag -- string n' slice' ) )
+    10 <iota> [ char: 0 + ] map
+    $ch matching-delimiter 1string :> ( $openstreq $closestr1 ) ! digits ]
+    |[ $string $n $tag |
+        $string $n $tag
         2over nth-check-eof {
-            { [ dup openstreq member? ] [ ch read-double-matched ] } ! (=( or ((
+            { [ dup $openstreq member? ] [ $ch read-double-matched ] } ! (=( or ((
             { [ dup blank? ] [
-                drop dup '[ _ matching-delimiter-string closestr1 2array members lex-until ] dip
-                swap unclip-last 3array ch <matched>
+                drop dup '[ _ matching-delimiter-string $closestr1 2array members lex-until ] dip
+                swap unclip-last 3array $ch <matched>
             ] } ! ( foo )
             [
                 drop [ slice-til-whitespace drop ] dip span-slices
