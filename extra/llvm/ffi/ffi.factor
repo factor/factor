@@ -5,9 +5,10 @@ kernel ldcache system ;
 IN: llvm.ffi
 
 << "llvm" {
-    { [ os linux? ] [ "LLVM-3.9" find-so [ cdecl add-library ] [ drop ] if* ] }
+    { [ os linux? ] [ "LLVM-3.9" find-so ] }
+    { [ os macosx? ] [ "/usr/local/opt/llvm/lib/libLLVM.dylib" ] }
     [ drop ]
-} cond
+} cond [ cdecl add-library ] when*
 >>
 
 LIBRARY: llvm
