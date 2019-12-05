@@ -31,7 +31,7 @@ ERROR: file-delete-failed path error ;
 : (delete-file) ( path -- )
     dup DeleteFile 0 = [
         GetLastError ERROR_ACCESS_DENIED =
-        [ delete-read-only-file ] [ throw-win32-error ] if
+        [ delete-read-only-file ] [ win32-error ] if
     ] [ drop ] if ;
 
 M: windows delete-file ( path -- )
@@ -48,8 +48,7 @@ M: windows delete-directory ( path -- )
     RemoveDirectory win32-error=0/f ;
 
 : find-first-file ( path WIN32_FIND_DATA -- WIN32_FIND_DATA HANDLE )
-    [ nip ] [ FindFirstFile ] 2bi
-    [ INVALID_HANDLE_VALUE = [ win32-error-string throw ] when ] keep ;
+    [ nip ] [ FindFirstFile ] 2bi check-invalid-handle ;
 
 : find-next-file ( HANDLE WIN32_FIND_DATA -- WIN32_FIND_DATA/f )
     [ nip ] [ FindNextFile ] 2bi 0 = [
