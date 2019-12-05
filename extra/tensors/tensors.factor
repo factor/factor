@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays
 concurrency.combinators grouping kernel locals math.functions
-math.ranges math.statistics math multi-methods quotations sequences 
+math.ranges math.statistics math multi-methods quotations sequences
 sequences.private specialized-arrays tensors.tensor-slice typed ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
@@ -191,7 +191,7 @@ TYPED:: matmul ( tensor1: tensor tensor2: tensor -- tensor3: tensor )
         n p * i * dup n p * + tensor2 vec>> <slice>
         ! Now make the resulting vector
         m p * i * dup m p * + tensor3 vec>> <slice>
-        ! Push n and p and multiply the clices
+        ! Push n and p and multiply the slices
         n p 2d-matmul
         0
     ] map drop
