@@ -156,7 +156,6 @@ TYPED:: 2d-matmul ( vec1: slice vec2: slice res: slice n: number p: number -- )
         ! Get the row
         [ [ vec1 n ] dip p row ]
         ! Get the column
-        ! [ p mod vec2 swap p every ] bi
         [ p mod f p vec2 <step-slice> ] bi
         ! Take the dot product
         [ * ] [ + ] 2map-reduce
