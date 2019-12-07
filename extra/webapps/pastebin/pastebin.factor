@@ -4,12 +4,14 @@ USING: accessors calendar db db.tuples db.types furnace.actions
 furnace.auth furnace.boilerplate furnace.recaptcha
 furnace.redirection furnace.syndication html.forms
 http.server.dispatchers http.server.responses kernel math.parser
-sequences sorting urls validators xmode.catalog ;
+namespaces sequences smtp sorting urls validators xmode.catalog ;
 IN: webapps.pastebin
 
 TUPLE: pastebin < dispatcher ;
 
 SYMBOL: can-delete-pastes?
+
+SYMBOL: pastebin-email-list
 
 can-delete-pastes? define-capability
 
@@ -150,6 +152,17 @@ M: annotation entity-url
     now >>date
     { "summary" "author" "mode" "contents" } to-object ;
 
+: email-on-paste ( url -- )
+    pastebin-email-list get-global [
+        drop
+    ] [
+        <email> swap >>to
+        swap >>body
+        "factor-builds2@gmail.com" >>from
+        "New paste" >>subject
+        send-email
+    ] if-empty ;
+
 : <new-paste-action> ( -- action )
     <page-action>
         [
@@ -168,7 +181,7 @@ M: annotation entity-url
             f <paste-state>
             [ deposit-entity-slots ]
             [ insert-tuple ]
-            [ id>> paste-url <redirect> ]
+            [ id>> paste-url [ email-on-paste ] [ <redirect> ] bi ]
             tri
         ] >>submit ;
 
