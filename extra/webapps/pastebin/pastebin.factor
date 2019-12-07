@@ -4,7 +4,7 @@ USING: accessors calendar db db.tuples db.types furnace.actions
 furnace.auth furnace.boilerplate furnace.recaptcha
 furnace.redirection furnace.syndication html.forms
 http.server.dispatchers http.server.responses kernel math.parser
-namespaces present sequences smtp sorting urls validators
+namespaces present sequences smtp splitting sorting urls validators
 xmode.catalog ;
 IN: webapps.pastebin
 
