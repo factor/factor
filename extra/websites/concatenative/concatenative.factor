@@ -95,7 +95,8 @@ SYMBOLS: key-password key-file dh-file ;
 : <gitweb> ( path -- responder )
     <dispatcher>
         swap <static> enable-cgi >>default
-        URL" /gitweb.cgi" <redirect-responder> "" add-responder ;
+        URL" /gitweb.cgi" <redirect-responder> "" add-responder
+        URL" /github-sync.cgi" <redirect-responder> "github-sync" add-responder ;
 
 : init-production ( -- )
     common-configuration
