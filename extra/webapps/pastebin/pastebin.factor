@@ -2,17 +2,18 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar db db.tuples db.types furnace.actions
 furnace.auth furnace.boilerplate furnace.recaptcha
-furnace.redirection furnace.syndication html.forms
-http.server.dispatchers http.server.responses kernel math.parser
-namespaces present sequences smtp splitting sorting urls validators
-xmode.catalog ;
+furnace.redirection furnace.syndication furnace.utilities
+html.forms http.server.dispatchers http.server.responses kernel
+math.parser namespaces present sequences smtp sorting splitting
+urls validators xmode.catalog ;
 IN: webapps.pastebin
 
 TUPLE: pastebin < dispatcher ;
 
 SYMBOL: can-delete-pastes?
 
-SYMBOL: pastebin-email-list
+SYMBOL: pastebin-email-from
+SYMBOL: pastebin-email-to
 
 can-delete-pastes? define-capability
 
@@ -154,17 +155,14 @@ M: annotation entity-url
     { "summary" "author" "mode" "contents" } to-object ;
 
 : email-on-paste ( url -- )
-    pastebin-email-list get-global [
+    pastebin-email-to get-global [
         drop
     ] [
-        <email> swap >>to
-        swap clone
-            "https" >>protocol
-            "paste.factorcode.org" >>host
-            [ "$pastebin" ?head drop ] change-path
-        present >>body
-        "factor-builds2@gmail.com" >>from
-        "New paste" >>subject
+        <email>
+            swap >>to
+            swap adjust-url present >>body
+        pastebin-email-from get-global >>from
+        "New paste!" >>subject
         send-email
     ] if-empty ;
 
