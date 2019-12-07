@@ -157,13 +157,12 @@ M: annotation entity-url
     pastebin-email-list get-global [
         drop
     ] [
-        clone
+        <email> swap >>to
+        swap clone
             "https" >>protocol
             "paste.factorcode.org" >>host
             [ "$pastebin" ?head drop ] change-path
-        present
-        <email> swap >>to
-        swap >>body
+        present >>body
         "factor-builds2@gmail.com" >>from
         "New paste" >>subject
         send-email
