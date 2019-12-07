@@ -4,7 +4,8 @@ USING: accessors calendar db db.tuples db.types furnace.actions
 furnace.auth furnace.boilerplate furnace.recaptcha
 furnace.redirection furnace.syndication html.forms
 http.server.dispatchers http.server.responses kernel math.parser
-namespaces sequences smtp sorting urls validators xmode.catalog ;
+namespaces present sequences smtp sorting urls validators
+xmode.catalog ;
 IN: webapps.pastebin
 
 TUPLE: pastebin < dispatcher ;
@@ -156,6 +157,11 @@ M: annotation entity-url
     pastebin-email-list get-global [
         drop
     ] [
+        clone
+            "https" >>protocol
+            "paste.factorcode.org" >>host
+            [ "$pastebin" ?head drop ] change-path
+        present
         <email> swap >>to
         swap >>body
         "factor-builds2@gmail.com" >>from
