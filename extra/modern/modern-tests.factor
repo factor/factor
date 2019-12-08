@@ -260,3 +260,6 @@ IN: modern.tests
 
 { } [ "[1,b)" string>literals drop ] unit-test
 { } [ "[1,b]" string>literals drop ] unit-test
+{ } [ "REAL[5" string>literals drop ] unit-test
+{ } [ "REAL[5]" string>literals drop ] unit-test
+{ } [ "REAL[5][5]" string>literals drop ] unit-test

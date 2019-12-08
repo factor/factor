@@ -126,9 +126,10 @@ MACRO:: read-matched ( $ch -- quot: ( string n tag -- string n' slice' ) )
                     [ $openstr-chars member? ]
                     [
                         ! check that opening is good form
+                        ! stop at (, ), or blank
                         drop
                         $string $n [
-                            { [ $ch = ] [ blank? ] } 1||
+                            { [ $ch = ] [ $ch matching-delimiter = ] [ blank? ] } 1||
                         ] t slice-until 3nip $ch =
                     ]
                 } 1&&
