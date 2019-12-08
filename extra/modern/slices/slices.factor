@@ -1,7 +1,8 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs fry kernel locals math sequences
-sequences.deep sequences.extras strings unicode sequences.private ;
+sequences.deep sequences.extras strings unicode sequences.private
+shuffle ;
 IN: modern.slices
 
 ERROR: unexpected-eof string n expected ;
@@ -53,38 +54,39 @@ ERROR: unexpected-eof string n expected ;
 : find-from*' ( ... seq n quot: ( ... elt -- ... ? ) -- ... i elt ? )
     swapd find-from* ; inline
 
-: slice-until-exclude ( string n quot -- string n' slice/f ch/f )
-    over [
-        [ drop ]
-        [ find-from' ] 3bi ! ( string n n' ch )
-        [ drop nip ]
-        [ [ rot ?<slice> ] dip ] 4bi
+: slice-until ( string n quot include? -- string n' slice/f ch/f )
+    pick [
+        '[
+            [ drop ]
+            [ find-from' _ [ [ ?1+ ] dip ] when ] 3bi ! ( string n n' ch )
+
+            [ drop nip ]
+            [ [ rot ?<slice> ] dip ] 4bi
+        ] call
     ] [
-        drop f f
+        2drop f f
     ] if ; inline
 
-: slice-until-include ( string n tokens -- string n' slice/f ch/f )
-    over [
-        '[ _ member? ]
-        [ drop ]
-        [ find-from' [ ?1+ ] dip ] 3bi ! ( string n n' ch )
-        [ drop nip ]
-        [ [ rot ?<slice> ] dip ] 4bi
-    ] [
-        drop f f
-    ] if ; inline
+: slice-until-token-exclude ( string n tokens -- string n' slice/f ch/f )
+    '[ _ member? ] f slice-until ; inline
+
+: slice-until-token-include ( string n tokens -- string n' slice/f ch/f )
+    '[ _ member? ] t slice-until ; inline
+
+: peek-until ( string n quot include? -- string n slice/f ch/f )
+    '[ _ slice-until 2nipd ] 2keepd 2swap ; inline
 
 : slice-til-whitespace ( string n -- string n' slice/f ch/f )
-    [ "\s\r\n" member? ] slice-until-exclude ; inline
+    [ "\s\r\n" member? ] f slice-until ; inline
 
 : slice-til-not-whitespace ( string n -- string n' slice/f ch/f )
-    [ "\s\r\n" member? not ] slice-until-exclude ; inline
+    [ "\s\r\n" member? not ] f slice-until ; inline
 
 : skip-whitespace ( string n/f -- string n'/f )
     slice-til-not-whitespace 2drop ;
 
 : slice-til-eol ( string n -- string n' slice/f ch/f )
-    [ "\r\n" member? ] slice-until-exclude ; inline
+    [ "\r\n" member? ] f slice-until ; inline
 
 : merge-slice-til-whitespace ( string n slice -- string n' slice' )
     over [

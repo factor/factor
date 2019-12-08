@@ -256,3 +256,7 @@ IN: modern.tests
 { t } [ "foo[[ ]]" [ rewrite-string-exact ] keep sequence= ] unit-test
 { t } [ "foo[11[ ]11]" [ rewrite-string-exact ] keep sequence= ] unit-test
 { t } [ "foo[123[ ]123]" [ rewrite-string-exact ] keep sequence= ] unit-test
+
+
+{ } [ "[1,b)" string>literals drop ] unit-test
+{ } [ "[1,b]" string>literals drop ] unit-test

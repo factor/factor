@@ -13,11 +13,17 @@ ERROR: long-opening-mismatch tag open string n ch ;
 ERROR: unexpected-terminator string n slice ; ! ] } ) ;
 ERROR: compound-syntax-disallowed seq n obj ;
 
-ERROR: expected-digits-only str n got ;
+ERROR: expected-digits-only-or-equals-only str n got ;
 ! Allow [00[ ]00] etc
-: check-digits ( str n got -- str n digits )
-    dup but-last [ digit? ] all?
-    [ >string but-last expected-digits-only ] unless ;
+: container-expander-char? ( ch -- ? )
+    { [ digit? ] [ char: = = ] } 1|| ; inline
+
+: check-container-expander ( str n got -- str n digits )
+    dup but-last {
+        [ [ digit? ] all? ]
+        [ [ char: = = ] all? ]
+    } 1||
+    [ >string but-last expected-digits-only-or-equals-only ] unless ;
 
 ! (( )) [[ ]] {{ }}
 MACRO:: read-double-matched ( $open-ch -- quot: ( string n tag ch -- string n' seq ) )
@@ -27,10 +33,10 @@ MACRO:: read-double-matched ( $open-ch -- quot: ( string n tag ch -- string n' s
     :> ( $openstr2 $openstr1 $closestr2 ) ! "[[" "[" "]]"
     |[ $string $n $tag! $ch |
         $ch {
-            { [ dup digit? ] [
+            { [ dup container-expander-char? ] [
                 drop $tag 1 cut-slice* drop $tag! ! XXX: $tag of (=( is ( here, fix it (??)
-                $string $n $openstr1 slice-until-include [
-                    check-digits  ! 000] ok,  00a] bad
+                $string $n $openstr1 slice-until-token-include [
+                    check-container-expander  ! 000] ok, =] ok,  00=] bad
                     -1 modify-from
                 ] dip :> ( $string' $n' $opening $ch )
                 $ch $open-ch = [ $tag $openstr2 $string $n $ch long-opening-mismatch ] unless
@@ -106,12 +112,27 @@ DEFER: lex-factor-nested
 
 DEFER: lex-factor-fallthrough
 MACRO:: read-matched ( $ch -- quot: ( string n tag -- string n' slice' ) )
-    { 48 49 50 51 52 53 54 55 56 57 $ch }
-    $ch matching-delimiter 1string :> ( $openstreq $closestr1 ) ! digits ]
+    {
+        char: 0 char: 1 char: 2 char: 3 char: 4 char: 5
+        char: 6 char: 7 char: 8 char: 9 $ch char: =
+    } :> $openstr-chars
+
+    $ch matching-delimiter 1string :> $closestr1
     |[ $string $n $tag |
         $string $n $tag
         2over nth-check-eof {
-            { [ dup $openstreq member? ] [ $ch read-double-matched ] } ! (=( or ((
+            { [
+                dup {
+                    [ $openstr-chars member? ]
+                    [
+                        ! check that opening is good form
+                        drop
+                        $string $n [
+                            { [ $ch = ] [ blank? ] } 1||
+                        ] t slice-until 3nip $ch =
+                    ]
+                } 1&&
+            ] [ $ch read-double-matched ] } ! (=( or ((
             { [ dup blank? ] [
                 drop dup '[ _ matching-delimiter-string $closestr1 2array members lex-until ] dip
                 swap unclip-last 3array $ch <matched>
@@ -128,7 +149,7 @@ MACRO:: read-matched ( $ch -- quot: ( string n tag -- string n' slice' ) )
 : read-paren ( string n slice -- string n' obj ) char: \( read-matched ;
 : read-string-payload ( string n -- string n' )
     dup [
-        { char: \\ char: \" } slice-until-include {
+        { char: \\ char: \" } slice-until-token-include {
             { f [ drop ] }
             { char: \" [ drop ] }
             { char: \\ [ drop next-char-from drop read-string-payload ] }
@@ -421,7 +442,7 @@ DEFER: lex-factor-top*
         { char: \" [ read-string ] }
         { char: \! [ read-exclamation ] }
         { char: > [
-            [ [ char: > = not ] slice-until-exclude drop ] dip merge-slices
+            [ [ char: > = not ] f slice-until drop ] dip merge-slices
             dup section-close-form? [
                 [ slice-til-whitespace drop ] dip ?span-slices
             ] unless
