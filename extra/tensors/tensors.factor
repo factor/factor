@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays
 concurrency.combinators grouping kernel locals math.functions
-math.ranges math.statistics math multi-methods quotations sequences 
+math.ranges math.statistics math multi-methods quotations sequences
 sequences.private specialized-arrays tensors.tensor-slice typed ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
