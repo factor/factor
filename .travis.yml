@@ -33,15 +33,14 @@ addons:
       - libsnappy-dev
       - libgtk2.0-dev
       - gtk2-engines-pixbuf
-      - rvm
 before_install:
   - uname -s
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build.sh deps-macosx ; else ./build.sh deps-apt-get ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions portable-ruby || brew install homebrew/portable-ruby/portable-ruby ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then echo "ruby1" && ruby -v && which ruby; fi # https://github.com/Homebrew/brew/issues/3404
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo rm -rf /Library/Ruby/Site/2.3.3 ; fi # https://github.com/Homebrew/brew/issues/3404
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install homebrew/portable-ruby/portable-ruby rvm ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then echo "ruby2" && ruby -v && which ruby; fi # https://github.com/Homebrew/brew/issues/3404
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then echo "ruby3" && rvm use 2.6 && ruby -v && which ruby; fi # https://github.com/Homebrew/brew/issues/3404
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo rm -rf /Library/Ruby/Site/2.3.3 ; fi # https://github.com/Homebrew/brew/issues/3404
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions snappy > /dev/null || brew install snappy; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions cmake > /dev/null || brew install cmake; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions libmagic > /dev/null || brew install libmagic; fi
