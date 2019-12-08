@@ -3,11 +3,12 @@
 USING: accessors arrays assocs combinators command-line
 compiler.units continuations debugger effects fry
 generalizations io io.files.temp io.files.unique kernel lexer
-locals macros math.functions math.vectors namespaces parser
+locals macros math math.functions math.vectors namespaces parser
 prettyprint quotations sequences sequences.generalizations
 source-files source-files.errors source-files.errors.debugger
-splitting stack-checker summary system tools.errors unicode
-vocabs vocabs.files vocabs.metadata vocabs.parser words ;
+splitting stack-checker summary system tools.errors tools.time
+unicode vocabs vocabs.files vocabs.metadata vocabs.parser words
+;
 FROM: vocabs.hierarchy => load ;
 IN: tools.test
 
@@ -45,6 +46,9 @@ t restartable-tests? set-global
         swap >>asset
         swap >>error
         error-continuation get >>continuation ;
+
+SYMBOL: long-unit-tests-threshold
+long-unit-tests-threshold [ 10,000,000,000 ] initialize
 
 SYMBOL: long-unit-tests-enabled?
 long-unit-tests-enabled? [ t ] initialize
@@ -167,15 +171,26 @@ SYMBOL: forget-tests?
     forget-tests? get
     [ [ [ forget-source ] each ] with-compilation-unit ] [ drop ] if ;
 
+: possible-long-unit-tests ( vocab nanos -- )
+    long-unit-tests-threshold get [
+        dupd > long-unit-tests-enabled? get not and [
+            swap
+            "Warning: possible long unit test for " write
+            vocab-name write " - " write
+            1,000,000,000 /f pprint " seconds" print
+        ] [ 2drop ] if
+    ] [ 2drop ] if* ;
+
 : test-vocab ( vocab -- )
-    lookup-vocab dup [
+    lookup-vocab [
         dup source-loaded?>> [
-            vocab-tests
-            [ [ run-test-file ] each ]
-            [ forget-tests ]
-            bi
+            dup vocab-tests [
+                [ [ run-test-file ] each ]
+                [ forget-tests ]
+                bi
+            ] benchmark possible-long-unit-tests
         ] [ drop ] if
-    ] [ drop ] if ;
+    ] when* ;
 
 : test-vocabs ( vocabs -- ) [ test-vocab ] each ;
 
