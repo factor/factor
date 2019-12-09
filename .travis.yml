@@ -40,6 +40,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/mpapis.asc | gpg --import - ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/pkuczynski.asc | gpg --import - ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://get.rvm.io | bash -s stable; fi  # https://github.com/travis-ci/travis-ci/issues/6307
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm reload ; fi # for homebrew
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm use 2.6 ; fi # for homebrew
 
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build.sh deps-macosx ; else ./build.sh deps-apt-get ; fi
