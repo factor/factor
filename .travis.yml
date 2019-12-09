@@ -35,14 +35,14 @@ addons:
       - gtk2-engines-pixbuf
 before_install:
   - uname -s
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export HOMEBREW_NO_AUTO_UPDATE=1 ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export HOMEBREW_NO_AUTO_UPDATE=1 ; fi # Don't let homebrew upgrade itself
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm -rf ~/.gnupg/; fi  # https://github.com/rvm/rvm/issues/3110
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/mpapis.asc | gpg --import - ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/pkuczynski.asc | gpg --import - ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://get.rvm.io | bash -s stable; fi  # https://github.com/travis-ci/travis-ci/issues/6307
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm reload ; fi # for homebrew
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm install ruby-2.6.3 ; fi # for homebrew
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm use 2.6 ; fi # for homebrew
+  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm reload ; fi # for homebrew to have 2.6.3, which takes too long. instead we just use HOMEBREW_NO_AUTO_UPDATE=1
+  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm install ruby-2.6.3 ; fi # for homebrew
+  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm use 2.6 ; fi # for homebrew
 
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build.sh deps-macosx ; else ./build.sh deps-apt-get ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions snappy > /dev/null || brew install snappy; fi
