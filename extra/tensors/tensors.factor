@@ -235,5 +235,5 @@ TYPED:: transpose ( tensor: tensor -- tensor': tensor )
         ! find index in original tensor
         old-shape mults [ [ /mod ] dip * ] 2map-sum nip
         ! get that index in original tensor
-        vec nth-unsafe
+        vec nth
     ] float-array{ } map-as <tensor> ;
