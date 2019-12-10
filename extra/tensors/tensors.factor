@@ -210,48 +210,27 @@ TYPED:: matmul ( tensor1: tensor tensor2: tensor -- tensor3: tensor )
 
 
 <PRIVATE
-! helper for transpose: gets the turns a shape into a list of things
+! helper for transpose: turns a shape into a list of things
 ! by which to multiply indices to get a full index
 : ind-mults ( shape -- seq )
-    rest-slice <reversed> cum-product { 1 } prepend ;
+    <reversed> 1 swap [ swap [ * ] keep ] map nip ;
 
 ! helper for transpose: given shape, flat index, & mults for the shape, gives nd index
-:: trans-index ( ind shape mults -- seq )
-    ! what we use to divide things
-    shape reverse :> S
-    ! accumulator
-    V{ } clone
-    ! loop thru elements & indices of S (mod by elment m)
-    S [| m i |
-        ! we divide by the product of the 1st n elements of S
-        S i head-slice product :> div
-        ! do not mod on the last index
-        i S length 1 - = not :> mod?
-        ! multiply accumulator by mults & sum
-        dup mults [ * ] 2map sum
-        ! subtract from ind & divide
-        ind swap - div /
-        ! mod if necessary
-        mod? [ m mod ] [ ] if
-        ! append to accumulator
-        [ dup ] dip swap push
-    ] each-index
-    reverse ;
+: transpose-index ( i shape -- seq )
+    <reversed> [ /mod ] map reverse nip ;
 PRIVATE>
 
 ! Transpose an n-dimensional tensor
 TYPED:: transpose ( tensor: tensor -- tensor': tensor )
-    ! new shape
-    tensor shape>> reverse :> newshape
-    ! what we multiply by to get indices in the old tensor
-    tensor shape>> ind-mults :> old-mults
-    ! what we multiply to get indices in new tensor
-    newshape ind-mults :> mults
-    ! new tensor of correct shape
-    newshape naturals dup vec>>
-    [ ! go thru each index
+    tensor shape>> :> old-shape
+    tensor vec>> :> vec
+    old-shape reverse :> new-shape
+    new-shape product vec length assert=
+    old-shape ind-mults reverse :> mults
+    ! loop through new tensor
+    new-shape dup product <iota> [
         ! find index in original tensor
-        newshape mults trans-index old-mults [ * ] 2map sum >fixnum
+        old-shape mults [ [ /mod ] dip * ] 2map-sum nip
         ! get that index in original tensor
-        tensor vec>> nth
-    ] map! >>vec ;
+        vec nth-unsafe
+    ] float-array{ } map-as <tensor> ;
