@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays
 concurrency.combinators grouping kernel locals math.functions
-math.ranges math.statistics math multi-methods quotations sequences 
+math.ranges math.statistics math multi-methods quotations sequences
 sequences.private specialized-arrays tensors.tensor-slice typed ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
@@ -47,7 +47,7 @@ PRIVATE>
 ! Construct a one-dimensional tensor with values start, start+step,
 ! ..., stop (inclusive)
 : arange ( a b step -- tensor )
-    <range> [ length 1array ] keep >float-array <tensor> ;
+    <range> [ length >fixnum 1array ] keep >float-array <tensor> ;
 
 ! Construct a tensors with vec { 0 1 2 ... } and reshape to the desired shape
 : naturals ( shape -- tensor )
@@ -148,20 +148,31 @@ METHOD: t% { number tensor } swap [ swap mod ] curry t-uop ;
 
 ! Perform matrix multiplication muliplying an
 ! mxn matrix with a nxp matrix
-TYPED:: 2d-matmul ( vec1: slice vec2: slice res: slice n: number p: number -- )
+TYPED:: 2d-matmul ( vec1: float-array start1: fixnum
+                      vec2: float-array start2: fixnum
+                      res: float-array start3: fixnum
+                      m: fixnum n: fixnum p: fixnum -- )
     ! For each element in the range, we want to compute the dot product of the
     ! corresponding row and column
-    res
-    [   >fixnum
-        ! Get the row
-        [ [ vec1 n ] dip p row ]
-        ! Get the column
-        ! [ p mod vec2 swap p every ] bi
-        [ p mod f p vec2 <step-slice> ] bi
-        ! Take the dot product
-        [ * ] [ + ] 2map-reduce
-    ]
-    map! drop ;
+    ! m p * 1array naturals vec>> :> res
+    0 [ :> i
+        0 [ :> j
+            0 ! This is the sum
+            0 [ :> k
+                ! Add to the sum
+                i n * k + start1 + vec1 nth
+                k p * j + start2 + vec2 nth
+                * +
+                ! Loop variable increment and drop
+                k 1 + dup n = not
+            ] loop drop
+            i p * j + start3 + res set-nth
+            ! Loop variable increment and drop
+            j 1 + dup p = not
+        ] loop drop
+        ! Loop variable increment and drop
+        i 1 + dup m = not
+    ] loop drop ;
 
 PRIVATE>
 
@@ -185,17 +196,18 @@ TYPED:: matmul ( tensor1: tensor tensor2: tensor -- tensor3: tensor )
     rest [0,b)
     [
         :> i
-        ! First make vec1
-        m n * i * dup m n * + tensor1 vec>> <slice>
-        ! Now make vec2
-        n p * i * dup n p * + tensor2 vec>> <slice>
+        ! First make vec1 and start1
+        tensor1 vec>> m n * i *
+        ! Now make vec2 and start2
+        tensor2 vec>> n p * i *
         ! Now make the resulting vector
-        m p * i * dup m p * + tensor3 vec>> <slice>
-        ! Push n and p and multiply the clices
-        n p 2d-matmul
+        tensor3 vec>> m p * i *
+        ! Push m, n, and p and multiply the arrays
+        m n p 2d-matmul
         0
     ] map drop
     tensor3 ;
+
 
 <PRIVATE
 ! helper for transpose: gets the turns a shape into a list of things
