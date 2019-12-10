@@ -1,9 +1,12 @@
 ! Copyright (C) 2019 HMC Clinic.
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: accessors alien.c-types alien.data arrays
 concurrency.combinators grouping kernel locals math.functions
 math.ranges math.statistics math multi-methods quotations sequences
-sequences.private specialized-arrays tensors.tensor-slice typed ;
+sequences.private specialized-arrays tensors.tensor-slice typed
+sequences.extras ;
+
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
 IN: tensors
