@@ -717,34 +717,23 @@ CONSTANT: FORMAT_MESSAGE_MAX_WIDTH_MASK   0x000000FF
     [ drop "Unknown error 0x" id 0xffff,ffff bitand >hex append ]
     [ alien>native-string [ blank? ] trim ] if ;
 
-: win32-error-string ( -- str )
-    GetLastError n>win32-error-string ;
-
 ERROR: windows-error n string ;
 
-: (win32-error) ( n -- )
-    [ dup win32-error-string windows-error ] unless-zero ;
+: throw-windows-error ( n -- * )
+    dup n>win32-error-string windows-error ;
 
-: win32-error ( -- )
-    GetLastError (win32-error) ;
+: n>win32-error-check ( n -- )
+    [ throw-windows-error ] unless-zero ;
 
+! Note that win32-error* words throw GetLastError code.
+: win32-error ( -- ) GetLastError n>win32-error-check ;
 : win32-error=0/f ( n -- ) { 0 f } member? [ win32-error ] when ;
 : win32-error>0 ( n -- ) 0 > [ win32-error ] when ;
 : win32-error<0 ( n -- ) 0 < [ win32-error ] when ;
-: win32-error<>0 ( n -- ) zero? [ win32-error ] unless ;
-
-: n>win32-error-check ( n -- )
-    dup ERROR_SUCCESS = [
-        drop
-    ] [
-        dup n>win32-error-string windows-error
-    ] if ;
-
-: throw-win32-error ( -- * )
-    win32-error-string throw ;
+: win32-error<>0 ( n -- ) [ win32-error ] unless-zero ;
 
 : check-invalid-handle ( handle -- handle )
-    dup INVALID_HANDLE_VALUE = [ throw-win32-error ] when ;
+    dup INVALID_HANDLE_VALUE = [ win32-error ] when ;
 
 CONSTANT: expected-io-errors
     ${
@@ -758,11 +747,7 @@ CONSTANT: expected-io-errors
     expected-io-errors member? ;
 
 : expected-io-error ( error-code -- )
-    dup expected-io-error? [
-        drop
-    ] [
-        throw-win32-error
-    ] if ;
+    expected-io-error? [ win32-error ] unless ;
 
 : io-error ( return-value -- )
     { 0 f } member? [ GetLastError expected-io-error ] when ;

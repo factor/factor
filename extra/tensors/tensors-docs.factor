@@ -8,7 +8,7 @@ ARTICLE: "tensors" "Tensors" "A " { $snippet "tensor" } " is a sequence "
 "shaped into an n-dimensional matrix. It supports fast, scalable matrix "
 "operations such as matrix multiplication and transposition as well as a "
 "number of element-wise operations. Words for working with tensors are found "
-"in the " { $vocab-link "tensors" } " vocabulary.\n\n"
+"in the " { $vocab-link "tensors" } " vocabulary." $nl $nl
 "Tensors can be created "
 "by calling one of four constructors:"
 { $subsections zeros ones naturals arange }
@@ -73,14 +73,14 @@ HELP: naturals
 "shape has zero or negative values." } ;
 
 HELP: reshape
-{ $values { "tensor" tensor } { "shape" sequence } { "tensor" tensor } }
+{ $values { "tensor" tensor } { "shape" sequence } }
 { $description "Reshapes " { $snippet "tensor" } " to have shape "
 { $snippet "shape" } "." }
 { $errors "Throws a " { $link non-positive-shape-error } " if the given "
 "shape has zero or negative values." } ;
 
 HELP: flatten
-{ $values { "tensor" tensor } { "tensor" tensor } }
+{ $values { "tensor" tensor } }
 { $description "Reshapes " { $snippet "tensor" } " so that it is one-dimensional." } ;
 
 HELP: dims
