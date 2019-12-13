@@ -101,32 +101,32 @@ PRIVATE>
 ! Add a tensor to either another tensor or a scalar
 multi-methods:GENERIC: t+ ( x y -- tensor )
 METHOD: t+ { tensor tensor } [ + ] t-bop ;
-METHOD: t+ { tensor number } [ + ] curry t-uop ;
-METHOD: t+ { number tensor } swap [ + ] curry t-uop ;
+METHOD: t+ { tensor number } >float [ + ] curry t-uop ;
+METHOD: t+ { number tensor } [ >float ] dip [ + ] with t-uop ;
 
 ! Subtraction between two tensors or a tensor and a scalar
 multi-methods:GENERIC: t- ( x y -- tensor )
 METHOD: t- { tensor tensor } [ - ] t-bop ;
-METHOD: t- { tensor number } [ - ] curry t-uop ;
-METHOD: t- { number tensor } swap [ swap - ] curry t-uop ;
+METHOD: t- { tensor number } >float [ - ] curry t-uop ;
+METHOD: t- { number tensor } [ >float ] dip [ - ] with t-uop ;
 
 ! Multiply a tensor with either another tensor or a scalar
 multi-methods:GENERIC: t* ( x y -- tensor )
 METHOD: t* { tensor tensor } [ * ] t-bop ;
 METHOD: t* { tensor number } [ * ] curry t-uop ;
-METHOD: t* { number tensor } swap [ * ] curry t-uop ;
+METHOD: t* { number tensor } [ >float ] dip [ * ] with t-uop ;
 
 ! Divide two tensors or a tensor and a scalar
 multi-methods:GENERIC: t/ ( x y -- tensor )
 METHOD: t/ { tensor tensor } [ / ] t-bop ;
 METHOD: t/ { tensor number } [ / ] curry t-uop ;
-METHOD: t/ { number tensor } swap [ swap / ] curry t-uop ;
+METHOD: t/ { number tensor } [ / ] with t-uop ;
 
 ! Divide two tensors or a tensor and a scalar
 multi-methods:GENERIC: t% ( x y -- tensor )
 METHOD: t% { tensor tensor } [ mod ] t-bop ;
 METHOD: t% { tensor number } [ mod ] curry t-uop ;
-METHOD: t% { number tensor } swap [ swap mod ] curry t-uop ;
+METHOD: t% { number tensor } [ mod ] with t-uop ;
 
 <PRIVATE
 
