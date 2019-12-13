@@ -127,7 +127,7 @@ ERROR: unknown-syntax syntax ;
 PRIVATE>
 
 : read-cuesheet ( -- cuesheet )
-    <cuesheet> [ readln dup ] [ parse-line ] while drop ;
+    <cuesheet> [ readln ] [ parse-line ] while* ;
 
 : file>cuesheet ( path -- cuesheet )
     utf8 [ read-cuesheet ] with-file-reader ;

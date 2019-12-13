@@ -38,12 +38,12 @@ STRUCT: wav-data-chunk
 
 :: read-wav-chunks ( -- fmt data )
     f :> fmt! f :> data!
-    [ { [ fmt data and not ] [ read-chunk ] } 0&& dup ]
+    [ { [ fmt data and not ] [ read-chunk ] } 0&& ]
     [ {
         { [ dup FMT-MAGIC  wav-fmt-chunk  check-chunk ] [ wav-fmt-chunk  memory>struct fmt!  ] }
         { [ dup DATA-MAGIC wav-data-chunk check-chunk ] [ wav-data-chunk memory>struct data! ] }
         [ drop ]
-    } cond ] while drop
+    } cond ] while*
     fmt data 2dup and [ invalid-audio-file ] unless ;
 
 : verify-wav ( chunk -- )
