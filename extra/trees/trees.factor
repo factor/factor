@@ -238,10 +238,10 @@ PRIVATE>
     [ root>> (nodepath-at) ] { } make ;
 
 : right-extremity ( node -- node' )
-    [ dup right>> dup ] [ nip ] while drop ;
+    [ dup right>> ] [ nip ] while* ;
 
 : left-extremity ( node -- node' )
-    [ dup left>> dup ] [ nip ] while drop ;
+    [ dup left>> ] [ nip ] while* ;
 
 : lower-node-in-child? ( key node -- ? )
     [ nip left>> ] [ key>> = ] 2bi and ;

@@ -37,10 +37,10 @@ M: TYPE assoc-size handle>> DBRNUM ;
 : DBKEYS ( db -- keys )
     [ assoc-size <vector> ] [ handle>> ] bi
     dup DBITERINIT drop 0 int <ref>
-    [ 2dup DBITERNEXT dup ] [
+    [ 2dup DBITERNEXT ] [
         [ memory>object ] [ tcfree ] bi
         reach push
-    ] while 3drop ;
+    ] while* 2drop ;
 
 M: TYPE >alist
     [ DBKEYS dup ] keep '[ dup _ at 2array ] map! drop ;
