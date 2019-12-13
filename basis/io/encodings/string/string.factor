@@ -13,7 +13,7 @@ IN: io.encodings.string
         ] [
             byte-array encoding <byte-reader> :> reader
             byte-array length encoding guess-decoded-length <sbuf> :> buf
-            [ reader stream-read1 dup ] [ buf push ] while drop
+            [ reader stream-read1 ] [ buf push ] while*
             buf "" like
         ] if
     ] if ; inline
