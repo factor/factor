@@ -1,6 +1,6 @@
-USING: timers timers.private calendar concurrency.count-downs
+USING: accessors calendar combinators concurrency.count-downs
 concurrency.promises fry kernel math math.order sequences
-threads tools.test tools.time ;
+threads timers tools.test tools.time ;
 
 { } [
     1 <count-down>
@@ -74,3 +74,20 @@ threads tools.test tools.time ;
     dup restart-timer drop
     700 milliseconds sleep
 ] unit-test
+
+
+{ { 1 } t t t t } [
+    { 0 }
+    dup '[ 0 _ [ 1 + ] change-nth ] 300 milliseconds f <timer>
+    dup start-timer [ thread>> ] keep {
+        [ dup restart-timer thread>> eq? ]
+        [ dup restart-timer thread>> eq? ]
+        [ dup restart-timer thread>> eq? ]
+        [ dup restart-timer thread>> eq? ]
+    } 2cleave
+    700 milliseconds sleep
+] unit-test
+
+[
+    [ ] 1 seconds later start-timer
+] [ timer-already-started? ] must-fail-with
