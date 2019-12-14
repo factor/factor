@@ -1621,6 +1621,10 @@ HELP: assert-sequence=
   }
 } ;
 
+HELP: cartesian-find
+{ $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation ( ... elt1 elt2 -- ... ? ) } } { "elt1" object } { "elt2" object } }
+{ $description "Applies the quotation to every possible pairing of elements from the two sequences, returning the first two elements where the quotation returns a true value." } ;
+
 HELP: cartesian-each
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation ( ... elt1 elt2 -- ... ) } } }
 { $description "Applies the quotation to every possible pairing of elements from the two sequences." } ;
@@ -1981,6 +1985,7 @@ $nl
 { $subsections
     cartesian-each
     cartesian-map
+    cartesian-find
 }
 "Computing the cartesian product of two sequences:"
 { $subsections
