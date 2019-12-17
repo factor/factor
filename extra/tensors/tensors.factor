@@ -1,9 +1,12 @@
 ! Copyright (C) 2019 HMC Clinic.
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: accessors alien.c-types alien.data arrays
 concurrency.combinators grouping kernel locals math.functions
 math.ranges math.statistics math multi-methods quotations sequences
-sequences.private specialized-arrays tensors.tensor-slice typed ;
+sequences.extras sequences.private specialized-arrays
+tensors.tensor-slice typed ;
+
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
 IN: tensors
@@ -47,7 +50,7 @@ PRIVATE>
 ! Construct a one-dimensional tensor with values start, start+step,
 ! ..., stop (inclusive)
 : arange ( a b step -- tensor )
-    <range> [ length 1array ] keep >float-array <tensor> ;
+    <range> [ length >fixnum 1array ] keep >float-array <tensor> ;
 
 ! Construct a tensors with vec { 0 1 2 ... } and reshape to the desired shape
 : naturals ( shape -- tensor )
@@ -98,32 +101,32 @@ PRIVATE>
 ! Add a tensor to either another tensor or a scalar
 multi-methods:GENERIC: t+ ( x y -- tensor )
 METHOD: t+ { tensor tensor } [ + ] t-bop ;
-METHOD: t+ { tensor number } [ + ] curry t-uop ;
-METHOD: t+ { number tensor } swap [ + ] curry t-uop ;
+METHOD: t+ { tensor number } >float [ + ] curry t-uop ;
+METHOD: t+ { number tensor } [ >float ] dip [ + ] with t-uop ;
 
 ! Subtraction between two tensors or a tensor and a scalar
 multi-methods:GENERIC: t- ( x y -- tensor )
 METHOD: t- { tensor tensor } [ - ] t-bop ;
-METHOD: t- { tensor number } [ - ] curry t-uop ;
-METHOD: t- { number tensor } swap [ swap - ] curry t-uop ;
+METHOD: t- { tensor number } >float [ - ] curry t-uop ;
+METHOD: t- { number tensor } [ >float ] dip [ - ] with t-uop ;
 
 ! Multiply a tensor with either another tensor or a scalar
 multi-methods:GENERIC: t* ( x y -- tensor )
 METHOD: t* { tensor tensor } [ * ] t-bop ;
 METHOD: t* { tensor number } [ * ] curry t-uop ;
-METHOD: t* { number tensor } swap [ * ] curry t-uop ;
+METHOD: t* { number tensor } [ >float ] dip [ * ] with t-uop ;
 
 ! Divide two tensors or a tensor and a scalar
 multi-methods:GENERIC: t/ ( x y -- tensor )
 METHOD: t/ { tensor tensor } [ / ] t-bop ;
 METHOD: t/ { tensor number } [ / ] curry t-uop ;
-METHOD: t/ { number tensor } swap [ swap / ] curry t-uop ;
+METHOD: t/ { number tensor } [ / ] with t-uop ;
 
 ! Divide two tensors or a tensor and a scalar
 multi-methods:GENERIC: t% ( x y -- tensor )
 METHOD: t% { tensor tensor } [ mod ] t-bop ;
 METHOD: t% { tensor number } [ mod ] curry t-uop ;
-METHOD: t% { number tensor } swap [ swap mod ] curry t-uop ;
+METHOD: t% { number tensor } [ mod ] with t-uop ;
 
 <PRIVATE
 
@@ -148,20 +151,24 @@ METHOD: t% { number tensor } swap [ swap mod ] curry t-uop ;
 
 ! Perform matrix multiplication muliplying an
 ! mxn matrix with a nxp matrix
-TYPED:: 2d-matmul ( vec1: slice vec2: slice res: slice n: number p: number -- )
+TYPED:: 2d-matmul ( vec1: float-array start1: fixnum
+                      vec2: float-array start2: fixnum
+                      res: float-array start3: fixnum
+                      m: fixnum n: fixnum p: fixnum -- )
     ! For each element in the range, we want to compute the dot product of the
     ! corresponding row and column
-    res
-    [   >fixnum
-        ! Get the row
-        [ [ vec1 n ] dip p row ]
-        ! Get the column
-        ! [ p mod vec2 swap p every ] bi
-        [ p mod f p vec2 <step-slice> ] bi
-        ! Take the dot product
-        [ * ] [ + ] 2map-reduce
-    ]
-    map! drop ;
+    m [ :> i
+        p [ :> j
+            0.0 ! This is the sum
+            n [ :> k
+                ! Add to the sum
+                i n * k + start1 + vec1 nth-unsafe
+                k p * j + start2 + vec2 nth-unsafe
+                * +
+            ] each-integer
+            i p * j + start3 + res set-nth-unsafe
+        ] each-integer
+    ] each-integer ;
 
 PRIVATE>
 
@@ -176,70 +183,52 @@ TYPED:: matmul ( tensor1: tensor tensor2: tensor -- tensor3: tensor )
     tensor1 shape>> unclip-last-slice :> n
     unclip-last-slice :> m :> top-shape
     tensor2 shape>> last :> p
-    top-shape product :> rest
+    top-shape product :> top-prod
 
-    ! Now create the new tensor with { 0 ... m*p-1 } repeating
-    top-shape { m p } append naturals m p * t% :> tensor3
+    ! Create the shape of the resulting tensor
+    top-shape { m p } append
+
+    ! Now create the new float array to store the underlying result
+    dup product c:float (c-array) :> vec3
 
     ! Now update the tensor3 to contain the multiplied matricies
-    rest [0,b)
-    [
+    top-prod [
         :> i
-        ! First make vec1
-        m n * i * dup m n * + tensor1 vec>> <slice>
-        ! Now make vec2
-        n p * i * dup n p * + tensor2 vec>> <slice>
-        ! Now make the resulting vector
-        m p * i * dup m p * + tensor3 vec>> <slice>
-        ! Push n and p and multiply the clices
-        n p 2d-matmul
-        0
-    ] map drop
-    tensor3 ;
+        ! Compute vec1 and start1
+        tensor1 vec>> m n * i *
+        ! Compute vec2 and start2
+        tensor2 vec>> n p * i *
+        ! Compute the result
+        vec3 m p * i *
+        ! Push m, n, and p and multiply the arrays
+        m n p 2d-matmul
+    ] each-integer
+    vec3 <tensor> ;
+
 
 <PRIVATE
-! helper for transpose: gets the turns a shape into a list of things
+! helper for transpose: turns a shape into a list of things
 ! by which to multiply indices to get a full index
 : ind-mults ( shape -- seq )
-    rest-slice <reversed> cum-product { 1 } prepend ;
+    <reversed> 1 swap [ swap [ * ] keep ] map nip ;
 
 ! helper for transpose: given shape, flat index, & mults for the shape, gives nd index
-:: trans-index ( ind shape mults -- seq )
-    ! what we use to divide things
-    shape reverse :> S
-    ! accumulator
-    V{ } clone
-    ! loop thru elements & indices of S (mod by elment m)
-    S [| m i |
-        ! we divide by the product of the 1st n elements of S
-        S i head-slice product :> div
-        ! do not mod on the last index
-        i S length 1 - = not :> mod?
-        ! multiply accumulator by mults & sum
-        dup mults [ * ] 2map sum
-        ! subtract from ind & divide
-        ind swap - div /
-        ! mod if necessary
-        mod? [ m mod ] [ ] if
-        ! append to accumulator
-        [ dup ] dip swap push
-    ] each-index
-    reverse ;
+: transpose-index ( i shape -- seq )
+    <reversed> [ /mod ] map reverse nip ;
 PRIVATE>
 
-! Transpose an n-dimensional tensor
+! Transpose an n-dimensional tensor by flipping the axes
 TYPED:: transpose ( tensor: tensor -- tensor': tensor )
-    ! new shape
-    tensor shape>> reverse :> newshape
-    ! what we multiply by to get indices in the old tensor
-    tensor shape>> ind-mults :> old-mults
-    ! what we multiply to get indices in new tensor
-    newshape ind-mults :> mults
-    ! new tensor of correct shape
-    newshape naturals dup vec>>
-    [ ! go thru each index
+    tensor shape>> :> old-shape
+    tensor vec>> :> vec
+    old-shape reverse :> new-shape
+    ! check that the size is fine
+    new-shape product vec length assert=
+    old-shape ind-mults reverse :> mults
+    ! loop through new tensor
+    new-shape dup product <iota> [
         ! find index in original tensor
-        newshape mults trans-index old-mults [ * ] 2map sum >fixnum
+        old-shape mults [ [ /mod ] dip * ] 2map-sum nip
         ! get that index in original tensor
-        tensor vec>> nth
-    ] map! >>vec ;
+        vec nth-unsafe
+    ] float-array{ } map-as <tensor> ;

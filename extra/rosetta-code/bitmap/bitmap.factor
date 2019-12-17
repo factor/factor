@@ -36,7 +36,7 @@ IN: rosetta-code.bitmap
 
 ! The storage functions
 : <raster-image> ( width height -- image )
-    zero-matrix [ drop { 0 0 0 } ] mmap ;
+    <zero-matrix> [ drop { 0 0 0 } ] mmap ;
 : fill-image ( {R,G,B} image -- image )
     swap '[ drop _ ] mmap! ;
 : set-pixel ( {R,G,B} {i,j} image -- ) set-Mi,j ; inline

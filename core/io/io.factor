@@ -105,9 +105,6 @@ SYMBOL: error-stream
 
 : bl ( -- ) output-stream get stream-bl ;
 
-: each-morsel ( ..a handler: ( ..a data -- ..b ) reader: ( ..b -- ..a data ) -- ..a )
-    [ dup ] compose swap while drop ; inline
-
 <PRIVATE
 
 : stream-exemplar ( stream -- exemplar )
@@ -158,7 +155,7 @@ ERROR: invalid-read-buffer buf stream ;
     input-stream get stream-read-partial-into ; inline
 
 : each-stream-line ( ... stream quot: ( ... line -- ... ) -- ... )
-    swap [ stream-readln ] curry each-morsel ; inline
+    [ [ stream-readln ] curry ] dip while* ; inline
 
 : each-line ( ... quot: ( ... line -- ... ) -- ... )
     input-stream get swap each-stream-line ; inline
@@ -174,15 +171,16 @@ ERROR: invalid-read-buffer buf stream ;
 CONSTANT: each-block-size 65536
 
 : (each-stream-block-slice) ( ... stream quot: ( ... block-slice -- ... ) block-size -- ... )
-    [ [ drop ] prepose swap ] dip
-    [ swap (new-sequence-for-stream) ] keepd
-    [ stream-read-partial-into ] 2curry each-morsel drop ; inline
+    -rot [
+        [ (new-sequence-for-stream) ] keep
+        [ stream-read-partial-into ] 2curry
+    ] dip while drop ; inline
 
 : each-stream-block-slice ( ... stream quot: ( ... block-slice -- ... ) -- ... )
     each-block-size (each-stream-block-slice) ; inline
 
 : (each-stream-block) ( ... stream quot: ( ... block -- ... ) block-size -- ... )
-    rot [ stream-read-partial ] 2curry each-morsel ; inline
+    -rot [ [ stream-read-partial ] 2curry ] dip while* ; inline
 
 : each-stream-block ( ... stream quot: ( ... block -- ... ) -- ... )
     each-block-size (each-stream-block) ; inline

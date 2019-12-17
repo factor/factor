@@ -13,7 +13,7 @@ IN: compression.run-length
 
 :: run-length-uncompress-bitmap4 ( byte-array m n -- byte-array' )
     byte-array <sequence-parser> :> sp
-    m  1 + n zero-matrix :> matrix
+    m  1 + n <zero-matrix> :> matrix
     n 4 mod n + :> stride
     0 :> i!
     0 :> j!
@@ -45,7 +45,7 @@ IN: compression.run-length
 
 :: run-length-uncompress-bitmap8 ( byte-array m n -- byte-array' )
     byte-array <sequence-parser> :> sp
-    m  1 + n zero-matrix :> matrix
+    m  1 + n <zero-matrix> :> matrix
     n 4 mod n + :> stride
     0 :> i!
     0 :> j!

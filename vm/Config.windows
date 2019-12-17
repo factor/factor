@@ -1,4 +1,4 @@
-SITE_CFLAGS += -mno-cygwin -mwindows
+SITE_CFLAGS += -mwindows
 CFLAGS_CONSOLE += -mconsole
 SHARED_FLAG = -shared
 SHARED_DLL_EXTENSION=.dll
@@ -7,7 +7,7 @@ LIBS = -lm
 
 PLAF_DLL_OBJS += vm/os-windows.o vm/mvm-windows.o
 PLAF_EXE_OBJS += vm/resources.o vm/main-windows.o
-PLAF_MASTER_HEADERS += vm/os-windows.hpp vm/mvm-windows.hpp
+PLAF_MASTER_HEADERS += vm/os-windows.hpp
 
 EXE_SUFFIX=
 EXE_EXTENSION=.exe
@@ -15,5 +15,5 @@ DLL_SUFFIX=
 DLL_EXTENSION=.dll
 CONSOLE_EXTENSION=.com
 
-LINKER = $(CPP) -shared -mno-cygwin -o 
+LINKER = $(CPP) -shared -o 
 LINK_WITH_ENGINE = -l$(DLL_PREFIX)factor$(DLL_SUFFIX)

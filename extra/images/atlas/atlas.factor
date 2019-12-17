@@ -47,7 +47,7 @@ ERROR: atlas-image-formats-dont-match images ;
 :: (pack-images) ( images atlas-width sort-quot -- placements )
     images sort-quot inv-sort-with [ f image-placement boa ] map :> image-placements
     0 :> @y!
-    [ image-placements atlas-width @y (pack-stripe) dup ] [ @y + @y! ] while drop
+    [ image-placements atlas-width @y (pack-stripe) ] [ @y + @y! ] while*
     image-placements ; inline
 
 : atlas-image-format ( image-placements -- component-order component-type upside-down? )

@@ -35,6 +35,15 @@ addons:
       - gtk2-engines-pixbuf
 before_install:
   - uname -s
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export HOMEBREW_NO_AUTO_UPDATE=1 ; fi # Don't let homebrew upgrade itself
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm -rf ~/.gnupg/; fi  # https://github.com/rvm/rvm/issues/3110
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/mpapis.asc | gpg --import - ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/pkuczynski.asc | gpg --import - ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://get.rvm.io | bash -s stable; fi  # https://github.com/travis-ci/travis-ci/issues/6307
+  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm reload ; fi # for homebrew to have 2.6.3, which takes too long. instead we just use HOMEBREW_NO_AUTO_UPDATE=1
+  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm install ruby-2.6.3 ; fi # for homebrew
+  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm use 2.6 ; fi # for homebrew
+
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build.sh deps-macosx ; else ./build.sh deps-apt-get ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions snappy > /dev/null || brew install snappy; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions cmake > /dev/null || brew install cmake; fi
@@ -47,10 +56,6 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start redis; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start postgresql; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start memcached; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm -rf ~/.gnupg/; fi  # https://github.com/rvm/rvm/issues/3110
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/mpapis.asc | gpg --import - ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/pkuczynski.asc | gpg --import - ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://get.rvm.io | bash -s stable; fi  # https://github.com/travis-ci/travis-ci/issues/6307
   - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then
       wget https://github.com/vmt/udis86/archive/v1.7.2.tar.gz && tar xzvf v1.7.2.tar.gz &&
       ( cd udis86-1.7.2/ && ./autogen.sh && ./configure --enable-shared=yes && make && sudo make install ) &&
@@ -69,7 +74,7 @@ script:
   - export CI_BRANCH="${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}"
   - echo "CI_BRANCH=${CI_BRANCH}"
   - DEBUG=1 ./build.sh net-bootstrap < /dev/null
-  - "./factor -e='USING: memory vocabs.hierarchy ; \"zealot\" load save'"
+  - "./factor -e='USING: memory vocabs.hierarchy tools.test namespaces ; \"zealot\" load f long-unit-tests-enabled? set-global save'"
   - './factor -run=zealot.cli-changed-vocabs'
   - './factor -run=tools.test `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`'
   - './factor -run=zealot.help-lint `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`'

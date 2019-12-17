@@ -1122,6 +1122,9 @@ M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
 : cartesian-product ( seq1 seq2 -- newseq )
     [ { } 2sequence ] cartesian-map ;
 
+: cartesian-find ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... elt1 elt2 )
+    [ f ] 3dip [ with find swap ] 2curry [ nip ] prepose find nip swap ; inline
+
 <PRIVATE
 
 : select-by ( ... seq quot: ( ... elt -- ... x ) compare: ( obj1 obj2 -- ? ) -- ... elt )

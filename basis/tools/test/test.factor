@@ -1,14 +1,14 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators command-line
-compiler.units constructors continuations debugger effects fry
+compiler.units constructors continuations debugger effects
 generalizations io io.files.temp io.files.unique
-io.streams.string kernel lexer locals macros math.functions
-math.vectors namespaces parser prettyprint quotations sequences
+io.streams.string kernel lexer math math.functions math.vectors
+namespaces parser prettyprint quotations sequences
 sequences.generalizations source-files source-files.errors
 source-files.errors.debugger splitting stack-checker summary
-system tools.errors unicode vocabs vocabs.files vocabs.metadata
-vocabs.parser words ;
+system tools.errors tools.time unicode vocabs vocabs.files
+vocabs.metadata vocabs.parser words ;
 FROM: vocabs.hierarchy => load ;
 IN: tools.test
 
@@ -45,6 +45,7 @@ t restartable-tests? set-global
         swap >>error
         error-continuation get >>continuation ;
 
+INITIALIZED-SYMBOL: long-unit-tests-threshold [ 10,000,000,000 ]
 INITIALIZED-SYMBOL: long-unit-tests-enabled? [ t ]
 
 <PRIVATE
@@ -213,16 +214,26 @@ SYMBOL: forget-tests?
     [ [ [ forget-source ] each ] with-compilation-unit ] [ drop ] if ;
 
 PRIVATE>
+: possible-long-unit-tests ( vocab nanos -- )
+    long-unit-tests-threshold get [
+        dupd > long-unit-tests-enabled? get not and [
+            swap
+            "Warning: possible long unit test for " write
+            vocab-name write " - " write
+            1,000,000,000 /f pprint " seconds" print
+        ] [ 2drop ] if
+    ] [ 2drop ] if* ;
 
 : test-vocab ( vocab -- )
-    lookup-vocab dup [
+    lookup-vocab [
         dup source-loaded?>> [
-            vocab-tests
-            [ [ run-test-file ] each ]
-            [ forget-tests ]
-            bi
+            dup vocab-tests [
+                [ [ run-test-file ] each ]
+                [ forget-tests ]
+                bi
+            ] benchmark possible-long-unit-tests
         ] [ drop ] if
-    ] [ drop ] if ;
+    ] when* ;
 
 : test-vocabs ( vocabs -- ) [ test-vocab ] each ;
 
