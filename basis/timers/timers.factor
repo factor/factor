@@ -29,11 +29,7 @@ M: duration >nanoseconds duration>nanoseconds >integer ;
     [ dupd [ mod ] [ swap - ] bi + + ] [ 2drop f ] if* ;
 
 : next-nanos ( timer -- timer n/f )
-    dup thread>> self eq? [
-        dup next-nanos>> dup t eq? [
-            drop dup delay-nanos [ >>next-nanos ] keep
-        ] when
-    ] [ f ] if ;
+    dup thread>> self eq? [ dup next-nanos>> ] [ f ] if ;
 
 : run-timer ( timer -- timer )
     dup interval-nanos >>next-nanos
@@ -65,7 +61,7 @@ ERROR: timer-already-started timer ;
 
 : start-timer ( timer -- )
     dup thread>> [ timer-already-started ] when
-    t >>next-nanos
+    dup delay-nanos >>next-nanos
     dup '[ _ timer-loop ] "Timer" <thread>
     [ >>thread drop ] [ (spawn) ] bi ;
 
@@ -74,7 +70,8 @@ ERROR: timer-already-started timer ;
 
 : restart-timer ( timer -- )
     dup thread>> [
-        t >>next-nanos [ thread>> ] [ ?interrupt ] bi
+        dup delay-nanos >>next-nanos
+        [ thread>> ] [ ?interrupt ] bi
     ] [
         start-timer
     ] if ;
