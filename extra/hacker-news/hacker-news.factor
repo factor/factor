@@ -1,11 +1,9 @@
 ! Copyright (C) 2012 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-
 USING: accessors assocs calendar calendar.elapsed
-colors.constants colors.hex combinators concurrency.combinators
-formatting fry hashtables http.client io io.styles json.reader
-kernel make math math.parser sequences ui urls vocabs ;
-
+calendar.holidays.us colors.constants colors.hex combinators
+concurrency.combinators formatting hashtables http.client io
+io.styles json.reader kernel make math sequences ui urls ;
 IN: hacker-news
 
 <PRIVATE
@@ -88,9 +86,11 @@ PRIVATE>
     H{
         { font-size 20 }
         { font-style bold }
-        { background hexcolor: ff6600 }
         { foreground color: black }
-    } assoc-union format nl ;
+    } assoc-union
+    now christmas-day today? hexcolor: CC0F0E hexcolor: ff6600 ?
+    background set-of
+    format nl ;
 
 : hacker-news-feed. ( seq -- )
     [ 1 + post. ] each-index ;
