@@ -48,7 +48,15 @@ IN: hacker-news
         hexcolor: 888888 foreground ,,
     ] H{ } make format ;
 
-: write-text ( str -- )
+: format-index ( str i -- )
+    now christmas-day today? [
+        odd? hexcolor: BE2728 hexcolor: 015A00 ?
+    ] [
+        drop hexcolor: 88888888
+    ] if
+    foreground associate format ;
+
+: format-text ( i -- )
     H{ { foreground hexcolor: 888888 } } format ;
 
 : post>user-url ( post -- user-url )
@@ -64,15 +72,15 @@ IN: hacker-news
 PRIVATE>
 
 : post. ( post index -- )
-    "%2d. " sprintf write-text {
+    [ "%2d. " sprintf ] keep format-index {
         [ [ "title" of ] [ "url" of ] bi write-title ]
-        [ post>url host>> " (" ")" surround write-text nl ]
-        [ "score" of "    %d points" sprintf write-text ]
-        [ dup "by" of [ " by " write-text [ "by" of ] [ post>user-url ] bi write-link ] [ drop ] if ]
-        [ "time" of [ " " write-text unix-time>timestamp relative-time write-text ] when* ]
+        [ post>url host>> " (" ")" surround format-text nl ]
+        [ "score" of "    %d points" sprintf format-text ]
+        [ dup "by" of [ " by " format-text [ "by" of ] [ post>user-url ] bi write-link ] [ drop ] if ]
+        [ "time" of [ " " format-text unix-time>timestamp relative-time format-text ] when* ]
         [
             dup "descendants" of [
-                " | " write-text
+                " | " format-text
                 [ "descendants" of [ "discuss" ] [ "%d comments" sprintf ] if-zero ]
                 [ post>comments-url ] bi write-link
             ] [
