@@ -120,6 +120,9 @@ PRIVATE>
 : of ( assoc key -- value/f )
     swap at ; inline
 
+: set-of ( assoc val key -- assoc )
+    pick set-at ; inline
+
 M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ dup assoc-size ] dip new-assoc
     [ [ set-at ] with-assoc assoc-each ] keep ; inline
