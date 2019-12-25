@@ -405,6 +405,9 @@ M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
 : today ( -- timestamp )
     now midnight ; inline
 
+: today? ( timestamp -- ? )
+    now same-day? ; inline
+
 : tomorrow ( -- timestamp )
     1 days hence midnight ; inline
 
