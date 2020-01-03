@@ -8,8 +8,7 @@ IN: mason.disk
 
 : sufficient-disk-space? ( -- ? )
     current-directory get find-mount-point-info
-    file-system-info available-space>>
-    1 Gi > ;
+    available-space>> 1 Gi > ;
 
 : check-disk-space ( -- )
     sufficient-disk-space? [
