@@ -35,14 +35,15 @@ HOOK: file-writable? os ( path -- ? )
 HOOK: file-executable? os ( path -- ? )
 
 : mount-points ( -- assoc )
-    file-systems [ [ mount-point>> ] keep ] H{ } map>assoc ;
+    file-systems [ [ mount-point>> canonicalize-path-full ] keep ] H{ } map>assoc ;
 
 : (find-mount-point-info) ( path assoc -- mtab-entry )
-    [ resolve-symlinks ] dip
+    [ resolve-symlinks canonicalize-path-full ] dip
     2dup at* [
         2nip
     ] [
-        drop [ parent-directory ] dip (find-mount-point-info)
+        drop [ parent-directory ] dip
+        (find-mount-point-info)
     ] if ;
 
 : find-mount-point-info ( path -- file-system-info )
