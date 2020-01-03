@@ -740,6 +740,9 @@ ERROR: windows-error n string ;
         dup n>win32-error-string windows-error
     ] if ;
 
+: throw-win32-error ( -- * )
+    win32-error-string throw ;
+
 : check-invalid-handle ( handle -- handle )
     dup INVALID_HANDLE_VALUE = [ win32-error ] when ;
 
@@ -755,7 +758,11 @@ CONSTANT: expected-io-errors
     expected-io-errors member? ;
 
 : expected-io-error ( error-code -- )
-    expected-io-error? [ win32-error ] unless ;
+    dup expected-io-error? [
+        drop
+    ] [
+        throw-win32-error
+    ] if ;
 
 : io-error ( return-value -- )
     { 0 f } member? [ GetLastError expected-io-error ] when ;
