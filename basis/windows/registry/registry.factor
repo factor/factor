@@ -45,7 +45,11 @@ CONSTANT: registry-value-max-length 16384
     f 0 KEY_ALL_ACCESS f create-key* drop ;
 
 : close-key ( hkey -- )
-    RegCloseKey n>win32-error-check ;
+    RegCloseKey dup ERROR_SUCCESS = [
+        drop
+    ] [
+        n>win32-error-string throw
+    ] if ;
 
 :: with-open-registry-key ( key subkey mode quot -- )
     key subkey mode open-key :> hkey
@@ -78,7 +82,7 @@ PRIVATE>
             key value-name ptr1 lpType buffer
             grow-buffer reg-query-value-ex
         ] [
-            ret throw-windows-error
+            ret n>win32-error-string throw
         ] if
     ] if ;
 
