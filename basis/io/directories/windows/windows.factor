@@ -48,7 +48,8 @@ M: windows delete-directory ( path -- )
     RemoveDirectory win32-error=0/f ;
 
 : find-first-file ( path WIN32_FIND_DATA -- WIN32_FIND_DATA HANDLE )
-    [ nip ] [ FindFirstFile ] 2bi check-invalid-handle ;
+    [ nip ] [ FindFirstFile ] 2bi
+    [ INVALID_HANDLE_VALUE = [ win32-error-string throw ] when ] keep ;
 
 : find-next-file ( HANDLE WIN32_FIND_DATA -- WIN32_FIND_DATA/f )
     [ nip ] [ FindNextFile ] 2bi 0 = [
