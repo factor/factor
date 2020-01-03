@@ -1,12 +1,12 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-alien.syntax arrays assocs classes.struct combinators
+alien.syntax arrays ascii assocs classes.struct combinators
 combinators.short-circuit continuations destructors environment io
 io.backend io.binary io.buffers io.files io.files.private
-io.files.types io.pathnames io.ports io.streams.c io.streams.null
-io.timeouts kernel libc literals locals math math.bitwise namespaces
-sequences specialized-arrays system threads tr vectors windows
+io.files.types io.pathnames io.pathnames.private io.ports io.streams.c
+io.streams.null io.timeouts kernel libc literals locals math math.bitwise
+namespaces sequences specialized-arrays system threads tr vectors windows
 windows.errors windows.handles windows.kernel32 windows.shell32
 windows.time windows.types windows.winsock splitting ;
 SPECIALIZED-ARRAY: ushort
@@ -345,6 +345,11 @@ PRIVATE>
 
 M: windows canonicalize-path
     remove-unicode-prefix canonicalize-path* ;
+
+M: windows canonicalize-drive
+    dup windows-absolute-path? [ ":" split1 [ >upper ] dip ":" glue ] when ;
+
+M: windows canonicalize-path-full canonicalize-path canonicalize-drive >windows-path ;
 
 M: windows root-path remove-unicode-prefix root-path* ;
 

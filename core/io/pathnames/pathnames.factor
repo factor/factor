@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators io.backend kernel math math.order
-namespaces sequences splitting strings system ;
+USING: accessors assocs combinators io.backend kernel math
+math.order namespaces sequences splitting strings system ;
 IN: io.pathnames
 
 SYMBOL: current-directory
@@ -61,13 +61,13 @@ ERROR: no-parent-directory path ;
         [ nip ]
     } cond ;
 
-: windows-absolute-path? ( path -- path ? )
+: windows-absolute-path? ( path -- ? )
     {
         { [ dup "\\\\?\\" head? ] [ t ] }
         { [ dup length 2 < ] [ f ] }
         { [ dup second CHAR: : = ] [ t ] }
         [ f ]
-    } cond ;
+    } cond nip ;
 
 : special-path? ( path -- rest ? )
     {
@@ -80,12 +80,12 @@ PRIVATE>
 
 : absolute-path? ( path -- ? )
     {
-        { [ dup empty? ] [ f ] }
-        { [ dup special-path? nip ] [ t ] }
+        { [ dup empty? ] [ drop f ] }
+        { [ dup special-path? nip ] [ drop t ] }
         { [ os windows? ] [ windows-absolute-path? ] }
-        { [ dup first path-separator? ] [ t ] }
-        [ f ]
-    } cond nip ;
+        { [ dup first path-separator? ] [ drop t ] }
+        [ drop f ]
+    } cond ;
 
 : append-relative-path ( path1 path2 -- path )
     [ trim-tail-separators ]
@@ -212,6 +212,16 @@ M: object relative-path relative-path* ;
 HOOK: canonicalize-path io-backend ( path -- path' )
 
 M: object canonicalize-path canonicalize-path* ;
+
+HOOK: canonicalize-drive io-backend ( path -- path' )
+
+M: object canonicalize-drive ;
+
+HOOK: canonicalize-path-full io-backend ( path -- path' )
+
+M: object canonicalize-path-full canonicalize-path canonicalize-drive ;
+
+: >windows-path ( path -- path' ) H{ { CHAR: / CHAR: \\ } } substitute ;
 
 TUPLE: pathname string ;
 
