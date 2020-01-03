@@ -34,6 +34,20 @@ HOOK: file-readable? os ( path -- ? )
 HOOK: file-writable? os ( path -- ? )
 HOOK: file-executable? os ( path -- ? )
 
+: mount-points ( -- assoc )
+    file-systems [ [ mount-point>> ] keep ] H{ } map>assoc ;
+
+: (find-mount-point-info) ( path assoc -- mtab-entry )
+    [ resolve-symlinks ] dip
+    2dup at* [
+        2nip
+    ] [
+        drop [ parent-directory ] dip (find-mount-point-info)
+    ] if ;
+
+: find-mount-point-info ( path -- file-system-info )
+    mount-points (find-mount-point-info) ;
+
 {
     { [ os unix? ] [ "io.files.info.unix" ] }
     { [ os windows? ] [ "io.files.info.windows" ] }

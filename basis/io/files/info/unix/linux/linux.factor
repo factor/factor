@@ -81,17 +81,6 @@ frequency pass-number ;
 M: linux file-systems
     parse-mtab [ mtab-entry>file-system-info ] map sift ;
 
-: (find-mount-point) ( path mtab-paths -- mtab-entry )
-    2dup at* [
-        2nip
-    ] [
-        drop [ parent-directory ] dip (find-mount-point)
-    ] if ;
-
-: find-mount-point ( path -- mtab-entry )
-    resolve-symlinks
-    parse-mtab [ [ mount-point>> ] keep ] H{ } map>assoc (find-mount-point) ;
-
 M: linux file-system-info ( path -- file-system-info )
     normalize-path
     [
@@ -100,7 +89,7 @@ M: linux file-system-info ( path -- file-system-info )
         [ file-system-statvfs statvfs>file-system-info ] bi
         file-system-calculations
     ] keep
-    find-mount-point
+    find-mount-point-info
     {
         [ file-system-name>> >>device-name drop ]
         [ mount-point>> >>mount-point drop ]
