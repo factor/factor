@@ -39,17 +39,17 @@ HOOK: mount-points os ( -- assoc )
 M: object mount-points
     file-systems [ [ mount-point>> ] keep ] H{ } map>assoc ;
 
-: (find-mount-point-info) ( path assoc -- mtab-entry )
+: (find-mount-point) ( path assoc -- path )
     [ resolve-symlinks canonicalize-path-full ] dip
     2dup at* [
         2nip
     ] [
         drop [ parent-directory ] dip
-        (find-mount-point-info)
+        (find-mount-point)
     ] if ;
 
-: find-mount-point-info ( path -- file-system-info )
-    mount-points (find-mount-point-info) ;
+: find-mount-point ( path -- path' )
+    mount-points (find-mount-point) mount-point>> ;
 
 {
     { [ os unix? ] [ "io.files.info.unix" ] }
