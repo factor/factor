@@ -78,6 +78,9 @@ frequency pass-number ;
         } cleave
     ] [ { [ libc-error? ] [ errno>> EACCES = ] } 1&& ] ignore-error/f ;
 
+M: linux mount-points
+    parse-mtab [ [ mount-point>> ] keep ] H{ } map>assoc ;
+
 M: linux file-systems
     parse-mtab [ mtab-entry>file-system-info ] map sift ;
 
