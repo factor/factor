@@ -34,8 +34,10 @@ HOOK: file-readable? os ( path -- ? )
 HOOK: file-writable? os ( path -- ? )
 HOOK: file-executable? os ( path -- ? )
 
-: mount-points ( -- assoc )
-    file-systems [ [ mount-point>> canonicalize-path-full ] keep ] H{ } map>assoc ;
+HOOK: mount-points os ( -- assoc )
+
+M: object mount-points
+    file-systems [ [ mount-point>> ] keep ] H{ } map>assoc ;
 
 : (find-mount-point-info) ( path assoc -- mtab-entry )
     [ resolve-symlinks canonicalize-path-full ] dip
