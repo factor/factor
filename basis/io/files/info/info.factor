@@ -39,17 +39,16 @@ HOOK: mount-points os ( -- assoc )
 M: object mount-points
     file-systems [ [ mount-point>> ] keep ] H{ } map>assoc ;
 
-: (find-mount-point) ( path assoc -- path )
+: (find-mount-point) ( path assoc -- object )
     [ resolve-symlinks canonicalize-path-full ] dip
     2dup at* [
         2nip
     ] [
-        drop [ parent-directory ] dip
-        (find-mount-point)
+        drop [ parent-directory ] dip (find-mount-point)
     ] if ;
 
-: find-mount-point ( path -- path' )
-    mount-points (find-mount-point) mount-point>> ;
+: find-mount-point ( path -- object )
+    mount-points (find-mount-point) ;
 
 {
     { [ os unix? ] [ "io.files.info.unix" ] }
