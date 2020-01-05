@@ -7,7 +7,7 @@ IN: mason.disk
 : Gi ( n -- gibibits ) 30 2^ * ; inline
 
 : sufficient-disk-space? ( -- ? )
-    current-directory get find-mount-point
+    current-directory get find-mount-point mount-point>>
     file-system-info available-space>> 1 Gi > ;
 
 : check-disk-space ( -- )
@@ -18,7 +18,7 @@ IN: mason.disk
 : Gi-str ( n -- string ) 1 Gi /f ;
 
 : path>disk-usage ( path -- string )
-    find-mount-point file-system-info
+    find-mount-point mount-point>> file-system-info
     [ used-space>> ] [ available-space>> ] [ total-space>> ] tri
     2dup /f 100 *
     [ [ Gi-str ] tri@ ] dip

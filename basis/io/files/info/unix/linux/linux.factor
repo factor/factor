@@ -68,9 +68,15 @@ frequency pass-number ;
     CHAR: \s [ "/etc/mtab" utf8 file>csv ] with-delimiter
     [ mtab-csv>mtab-entry ] map ;
 
+: (file-system-info) ( path -- file-system-info )
+    [ new-file-system-info ] dip
+    [ file-system-statfs statfs>file-system-info ]
+    [ file-system-statvfs statvfs>file-system-info ] bi
+    file-system-calculations ; inline
+
 : mtab-entry>file-system-info ( mtab-entry -- file-system-info/f )
     '[
-        _ [ mount-point>> file-system-info ] keep
+        _ [ mount-point>> (file-system-info) ] [ ] bi
         {
             [ file-system-name>> >>device-name ]
             [ mount-point>> >>mount-point ]
@@ -85,14 +91,8 @@ M: linux file-systems
     parse-mtab [ mtab-entry>file-system-info ] map sift ;
 
 M: linux file-system-info ( path -- file-system-info )
-    normalize-path
-    [
-        [ new-file-system-info ] dip
-        [ file-system-statfs statfs>file-system-info ]
-        [ file-system-statvfs statvfs>file-system-info ] bi
-        file-system-calculations
-    ] keep
-    find-mount-point-info
+    normalize-path [ (file-system-info) ] [ ] bi
+    find-mount-point
     {
         [ file-system-name>> >>device-name drop ]
         [ mount-point>> >>mount-point drop ]
