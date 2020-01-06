@@ -19,7 +19,7 @@ TUPLE: windows-file-info < file-info-tuple attributes ;
 
 : get-compressed-file-size ( path -- n )
     { DWORD } [ GetCompressedFileSize ] with-out-parameters
-    over INVALID_FILE_SIZE = [ win32-error ] [ >64bit ] if ;
+    over INVALID_FILE_SIZE = [ win32-error ] when >64bit ;
 
 : set-windows-size-on-disk ( file-info path -- file-info )
     over attributes>> +compressed+ swap member? [
