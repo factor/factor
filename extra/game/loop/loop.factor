@@ -36,7 +36,8 @@ TUPLE: game-loop-error-state error game-loop ;
 
 : last-tick-percent-offset ( loop -- float )
     [ draw-timer>> next-nanos>> nano-count - ]
-    [ tick-interval-nanos>> ] bi /f 0.0 1.0 clamp ;
+    [ tick-interval-nanos>> ] bi /f 1.0 swap -
+    0.0 1.0 clamp ;
 
 GENERIC#: record-benchmarking 1 ( loop quot -- )
 
