@@ -14,7 +14,7 @@ M: openssl ssl-certificate-verification-supported? f ;
 
 : load-windows-cert-store ( string -- HCERTSTORE )
     [ f ] dip CertOpenSystemStore
-    [ win32-error ] when-zero ;
+    [ win32-error f ] when-zero ;
 
 : X509-NAME. ( X509_NAME -- )
     f 0 X509_NAME_oneline

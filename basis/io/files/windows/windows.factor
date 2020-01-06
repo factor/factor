@@ -117,7 +117,7 @@ M: windows init-io ( -- )
 : handle>file-size ( handle -- n/f )
     (handle>file-size) [
         GetLastError ERROR_INVALID_FUNCTION =
-        [ f ] [ win32-error ] if
+        [ win32-error ] unless f
     ] unless* ;
 
 ERROR: seek-before-start n ;
@@ -405,7 +405,7 @@ M: windows home
     0
     [ FindFirstStream ] keepd
     over INVALID_HANDLE_VALUE = [
-        2drop win32-error
+        2drop win32-error f
     ] [
         1vector swap file-streams-rest
     ] if ;
