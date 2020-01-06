@@ -31,7 +31,7 @@ ERROR: file-delete-failed path error ;
 : (delete-file) ( path -- )
     dup DeleteFile 0 = [
         GetLastError ERROR_ACCESS_DENIED =
-        [ delete-read-only-file ] [ win32-error ] if
+        [ delete-read-only-file ] [ drop win32-error ] if
     ] [ drop ] if ;
 
 M: windows delete-file ( path -- )
