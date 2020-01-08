@@ -8,7 +8,7 @@ IN: llvm.ffi
     { [ os linux? ] [ "LLVM-3.9" find-so ] }
     { [ os macosx? ] [ "/usr/local/opt/llvm/lib/libLLVM.dylib" ] }
     [ drop f ]
-} cond [ cdecl add-library ] when*
+} cond [ cdecl add-library ] [ drop ] if*
 >>
 
 LIBRARY: llvm
