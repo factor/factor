@@ -1,8 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays ascii assocs combinators combinators.short-circuit
-fry io.encodings.string io.encodings.utf8 kernel linked-assocs
-make math math.parser present sequences splitting strings ;
+USING: arrays ascii assocs byte-arrays combinators
+combinators.short-circuit fry io.encodings.string
+io.encodings.utf8 kernel linked-assocs make math math.parser
+present sequences splitting strings ;
 IN: urls.encoding
 
 : url-quotable? ( ch -- ? )
@@ -34,19 +35,28 @@ IN: urls.encoding
 
 <PRIVATE
 
+: hex% ( n -- )
+    CHAR: % , >hex >upper 2 CHAR: 0 pad-head % ;
+
 : push-utf8 ( ch -- )
-    1string utf8 encode
-    [ CHAR: % , >hex >upper 2 CHAR: 0 pad-head % ] each ;
+    1string utf8 encode [ hex% ] each ;
 
 : (url-encode) ( str quot: ( ch -- ? ) -- encoded )
-    '[ [ dup @ [ , ] [ push-utf8 ] if ] each ] "" make ; inline
+    [
+        over byte-array? [
+            '[ dup @ [ , ] [ hex% ] if ] each
+        ] [
+            [ present ] dip
+            '[ dup @ [ , ] [ push-utf8 ] if ] each
+        ] if
+    ] "" make ; inline
 
 PRIVATE>
 
-: url-encode ( str -- encoded )
+: url-encode ( obj -- encoded )
     [ url-quotable? ] (url-encode) ;
 
-: url-encode-full ( str -- encoded )
+: url-encode-full ( obj -- encoded )
     [ unreserved? ] (url-encode) ;
 
 <PRIVATE
@@ -105,7 +115,7 @@ PRIVATE>
         [
             [ url-encode-full ] dip [
                 dup array? [ 1array ] unless
-                [ present url-encode-full "=" glue , ] with each
+                [ url-encode-full "=" glue , ] with each
             ] [ , ] if*
         ] assoc-each
     ] { } make "&" join ;
