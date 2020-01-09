@@ -6,6 +6,8 @@ USING: bencode linked-assocs tools.test ;
 
 { "4:spam" } [ "spam" >bencode ] unit-test
 
+{ "3:\x01\x02\x03" } [ B{ 1 2 3 } >bencode ] unit-test
+
 { { "spam" 42 } } [ "l4:spami42ee" bencode> ] unit-test
 
 { LH{ { "bar" "spam" } { "foo" 42 } } } [
