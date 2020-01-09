@@ -34,7 +34,7 @@ delete-staging-images
 { } [ "sudoku" shake-and-bake 800000 small-enough? ] long-unit-test
 
 ! [ ] [ "hello-ui" shake-and-bake 1605000 small-enough? ] long-unit-test
-{ } [ "hello-ui" shake-and-bake 2762000 small-enough? ] long-unit-test
+{ } [ "hello-ui" shake-and-bake 2764000 small-enough? ] long-unit-test
 
 { "math-threads-compiler-io-ui" } [
     "hello-ui" deploy-config config>profile
@@ -42,24 +42,24 @@ delete-staging-images
 ] long-unit-test
 
 ! [ ] [ "maze" shake-and-bake 1520000 small-enough? ] long-unit-test
-{ } [ "maze" shake-and-bake 2800000 small-enough? ] long-unit-test
+{ } [ "maze" shake-and-bake 2801000 small-enough? ] long-unit-test
 
 ! [ ] [ "tetris" shake-and-bake 1734000 small-enough? ] long-unit-test
 { } [ "tetris" shake-and-bake 2850000 small-enough? ] long-unit-test
 
 ! [ ] [ "spheres" shake-and-bake 1557000 small-enough? ] long-unit-test
-{ } [ "spheres" shake-and-bake 2820000 small-enough? ] long-unit-test
+{ } [ "spheres" shake-and-bake 2850000 small-enough? ] long-unit-test
 
 ! [ ] [ "terrain" shake-and-bake 2053000 small-enough? ] long-unit-test
-{ } [ "terrain" shake-and-bake 2685300 small-enough? ] long-unit-test
+{ } [ "terrain" shake-and-bake 3385300 small-enough? ] long-unit-test
 
 ! [ ] [ "gpu.demos.raytrace" shake-and-bake 2764000 small-enough? ] long-unit-test
-{ } [ "gpu.demos.raytrace" shake-and-bake 3557800 small-enough? ] long-unit-test
+{ } [ "gpu.demos.raytrace" shake-and-bake 4157800 small-enough? ] long-unit-test
 
 ! { } [ "bunny" shake-and-bake 2559640 small-enough? ] long-unit-test
-{ } [ "bunny" shake-and-bake 2700000 small-enough? ] long-unit-test
+{ } [ "bunny" shake-and-bake 3400000 small-enough? ] long-unit-test
 
-{ } [ "gpu.demos.bunny" shake-and-bake 3750000 small-enough? ] long-unit-test
+{ } [ "gpu.demos.bunny" shake-and-bake 4200000 small-enough? ] long-unit-test
 
 os macosx? [
     [ ] [ "webkit-demo" shake-and-bake 600000 small-enough? ] long-unit-test
