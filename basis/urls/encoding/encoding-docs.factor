@@ -6,11 +6,11 @@ HELP: url-decode
 { $description "Decodes a URL-encoded string." } ;
 
 HELP: url-encode
-{ $values { "str" string } { "encoded" string } }
+{ $values { "obj" object } { "encoded" string } }
 { $description "URL-encodes a string, excluding certain characters, such as \"/\"." } ;
 
 HELP: url-encode-full
-{ $values { "str" string } { "encoded" string } }
+{ $values { "obj" object } { "encoded" string } }
 { $description "URL-encodes a string, including all reserved characters, such as \"/\"." } ;
 
 HELP: url-quotable?
