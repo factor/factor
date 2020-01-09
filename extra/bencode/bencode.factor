@@ -1,6 +1,6 @@
-USING: arrays assocs combinators hashtables io
-io.encodings.ascii io.encodings.string io.streams.string kernel
-math math.parser sequences strings ;
+USING: arrays assocs combinators io io.encodings.ascii
+io.encodings.string io.streams.string kernel linked-assocs math
+math.parser sequences strings ;
 IN: bencode
 
 GENERIC: >bencode ( obj -- bencode )
@@ -18,9 +18,9 @@ M: assoc >bencode
     [ [ >bencode ] bi@ append ] { } assoc>map concat
     "d" "e" surround ;
 
-<PRIVATE
-
 DEFER: read-bencode
+
+<PRIVATE
 
 : read-integer ( -- obj )
     "e" read-until char: e assert= string>number ;
@@ -31,11 +31,13 @@ DEFER: read-bencode
 : read-dictionary ( -- obj )
     [
         read-bencode [ read-bencode 2array ] [ f ] if* dup
-    ] [ ] produce nip >hashtable ;
+    ] [ ] produce nip >linked-hash ;
 
 : read-string ( prefix -- obj )
     ":" read-until char: \: assert= swap prefix
-    string>number read ascii decode ;
+    string>number read "" like ;
+
+PRIVATE>
 
 : read-bencode ( -- obj )
     read1 {
@@ -45,8 +47,6 @@ DEFER: read-bencode
         { char: e [ f ] }
         [ read-string ]
     } case ;
-
-PRIVATE>
 
 : bencode> ( bencode -- obj )
     [ read-bencode ] with-string-reader ;

@@ -68,9 +68,15 @@ frequency pass-number ;
     char: \s [ "/etc/mtab" utf8 file>csv ] with-delimiter
     [ mtab-csv>mtab-entry ] map ;
 
+: (file-system-info) ( path -- file-system-info )
+    [ new-file-system-info ] dip
+    [ file-system-statfs statfs>file-system-info ]
+    [ file-system-statvfs statvfs>file-system-info ] bi
+    file-system-calculations ; inline
+
 : mtab-entry>file-system-info ( mtab-entry -- file-system-info/f )
     '[
-        _ [ mount-point>> file-system-info ] keep
+        _ [ mount-point>> (file-system-info) ] [ ] bi
         {
             [ file-system-name>> >>device-name ]
             [ mount-point>> >>mount-point ]
@@ -78,28 +84,14 @@ frequency pass-number ;
         } cleave
     ] [ { [ libc-error? ] [ errno>> EACCES = ] } 1&& ] ignore-error/f ;
 
+M: linux mount-points
+    parse-mtab [ [ mount-point>> ] keep ] H{ } map>assoc ;
+
 M: linux file-systems
     parse-mtab [ mtab-entry>file-system-info ] map sift ;
 
-: (find-mount-point) ( path mtab-paths -- mtab-entry )
-    2dup at* [
-        2nip
-    ] [
-        drop [ parent-directory ] dip (find-mount-point)
-    ] if ;
-
-: find-mount-point ( path -- mtab-entry )
-    resolve-symlinks
-    parse-mtab [ [ mount-point>> ] keep ] H{ } map>assoc (find-mount-point) ;
-
 M: linux file-system-info ( path -- file-system-info )
-    normalize-path
-    [
-        [ new-file-system-info ] dip
-        [ file-system-statfs statfs>file-system-info ]
-        [ file-system-statvfs statvfs>file-system-info ] bi
-        file-system-calculations
-    ] keep
+    normalize-path [ (file-system-info) ] [ ] bi
     find-mount-point
     {
         [ file-system-name>> >>device-name drop ]

@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien byte-arrays combinators destructors hints
-io io.backend io.buffers io.encodings io.files io.timeouts
-kernel kernel.private libc locals math math.order math.private
+USING: accessors alien combinators destructors hints io
+io.backend io.buffers io.encodings io.files io.timeouts kernel
+kernel.private libc locals math math.order math.private
 namespaces sequences strings system ;
 IN: io.ports
 

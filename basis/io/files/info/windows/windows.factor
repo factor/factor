@@ -1,4 +1,3 @@
-! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings ascii
 calendar classes.struct combinators combinators.short-circuit
@@ -19,7 +18,7 @@ TUPLE: windows-file-info < file-info-tuple attributes ;
 
 : get-compressed-file-size ( path -- n )
     { DWORD } [ GetCompressedFileSize ] with-out-parameters
-    over INVALID_FILE_SIZE = [ win32-error-string throw ] [ >64bit ] if ;
+    over INVALID_FILE_SIZE = [ win32-error ] when >64bit ;
 
 : set-windows-size-on-disk ( file-info path -- file-info )
     over attributes>> +compressed+ swap member? [

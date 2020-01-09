@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors timers alien.c-types calendar classes.struct
-continuations destructors fry kernel math math.order memory
-namespaces sequences system ui ui.gadgets.worlds vm
-vocabs.loader arrays locals ;
+USING: accessors calendar continuations destructors fry kernel
+locals math math.order system timers ui ui.gadgets.worlds
+vocabs.loader ;
 IN: game.loop
 
 TUPLE: game-loop
@@ -36,8 +35,9 @@ TUPLE: game-loop-error-state error game-loop ;
 <PRIVATE
 
 : last-tick-percent-offset ( loop -- float )
-    [ draw-timer>> iteration-start-nanos>> nano-count swap - ]
-    [ tick-interval-nanos>> ] bi /f 1.0 min ;
+    [ draw-timer>> next-nanos>> nano-count - ]
+    [ tick-interval-nanos>> ] bi /f 1.0 swap -
+    0.0 1.0 clamp ;
 
 GENERIC#: record-benchmarking 1 ( loop quot -- )
 

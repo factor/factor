@@ -104,7 +104,7 @@ UNIFORM-TUPLE: loading-uniforms
     V{ } clone swap (read-line-tokens) ;
 
 : each-line-tokens ( quot -- )
-    input-stream get [ stream-read-line-tokens ] curry each-morsel ; inline
+    [ input-stream get [ stream-read-line-tokens ] curry ] dip while* ; inline
 
 : (parse-bunny-model) ( vs is -- vs is )
     [
