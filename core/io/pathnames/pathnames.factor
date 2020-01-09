@@ -221,7 +221,7 @@ HOOK: canonicalize-path-full io-backend ( path -- path' )
 
 M: object canonicalize-path-full canonicalize-path canonicalize-drive ;
 
-: >windows-path ( path -- path' ) H{ { CHAR: / CHAR: \\ } } substitute ;
+: >windows-path ( path -- path' ) H{ { char: / char: \\ } } substitute ;
 
 TUPLE: pathname string ;
 
