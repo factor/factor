@@ -3,9 +3,9 @@
 
 USING: accessors ascii byte-arrays byte-vectors combinators
 command-line destructors fry io io.encodings io.encodings.binary
-io.files io.streams.string kernel literals locals math
-math.parser namespaces sequences sequences.private strings typed
-;
+io.encodings.string io.encodings.utf8 io.files io.streams.string
+kernel literals locals math math.parser namespaces sequences
+sequences.private strings typed ;
 
 IN: tools.hexdump
 
@@ -77,6 +77,9 @@ GENERIC: hexdump. ( byte-array -- )
 M: byte-array hexdump. all-bytes hexdump-bytes ;
 
 M: byte-vector hexdump. all-bytes underlying>> hexdump-bytes ;
+
+M: string hexdump. utf8 encode hexdump. ;
+
 
 : hexdump ( byte-array -- str )
     [ hexdump. ] with-string-writer ;
