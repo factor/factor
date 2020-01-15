@@ -27,8 +27,7 @@ MACRO: write-tuple ( class -- quot )
 
 : check-final ( class -- )
     tuple-class check-instance
-    final-class check-instance
-    drop ;
+    dup final-class? [ drop ] [ not-final ] if ;
 
 PRIVATE>
 
