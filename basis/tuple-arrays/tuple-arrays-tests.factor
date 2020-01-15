@@ -1,5 +1,5 @@
 USING: tuple-arrays sequences tools.test namespaces kernel
-math accessors classes.tuple eval classes.struct ;
+math accessors classes classes.tuple eval classes.struct ;
 IN: tuple-arrays.tests
 
 SYMBOL: mat
