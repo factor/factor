@@ -220,11 +220,11 @@ GENERIC: update-methods ( class seq -- )
     dup class-usages
     [ nip [ update-class ] each ] [ update-methods ] 2bi ;
 
-: check-inheritance ( subclass superclass -- )
-    2dup superclass-of? [ bad-inheritance ] [ 2drop ] if ;
+: check-inheritance ( subclass superclass -- subclass superclass )
+    2dup superclass-of? [ bad-inheritance ] when ;
 
 : define-class ( word superclass members participants metaclass -- )
-    [ 2dup check-inheritance ] 3dip
+    [ check-inheritance ] 3dip
     make-class-props [ (define-class) ] [ drop changed-definition ] 2bi ;
 
 : forget-predicate ( class -- )
@@ -255,3 +255,8 @@ M: class metaclass-changed
 
 M: class forget* ( class -- )
     [ call-next-method ] [ forget-class ] bi ;
+
+ERROR: not-an-instance obj class ;
+
+: check-instance ( obj class -- obj )
+    [ dupd instance? ] keep [ not-an-instance ] curry unless ; inline
