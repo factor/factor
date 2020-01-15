@@ -61,13 +61,8 @@ M: mixin-class rank-class drop 8 ;
 
 PRIVATE>
 
-ERROR: not-a-class object ;
-
-ERROR: not-a-mixin-class object ;
-
 : check-types ( class mixin -- class mixin )
-    [ dup class? [ not-a-class ] unless ]
-    [ dup mixin-class? [ not-a-mixin-class ] unless ] bi* ;
+    [ class check-instance ] [ mixin-class check-instance ] bi* ;
 
 : add-mixin-instance ( class mixin -- )
     check-types [ 2drop ] [ (add-mixin-instance) ] if-mixin-member? ;

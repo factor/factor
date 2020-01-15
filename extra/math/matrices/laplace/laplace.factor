@@ -29,12 +29,7 @@ INSTANCE: missing immutable-sequence
         v* [ odd? [ neg ] when ] map-index sum
     ] if ;
 
-ERROR: not-a-square-matrix matrix ;
-
-: check-square-matrix ( matrix -- matrix )
-    dup square-matrix? [ not-a-square-matrix ] unless ; inline
-
 PRIVATE>
 
 : determinant ( matrix -- x )
-    check-square-matrix 0 swap laplace-expansion ;
+    square-matrix check-instance 0 swap laplace-expansion ;

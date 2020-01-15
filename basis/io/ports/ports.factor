@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien combinators destructors hints io
+USING: accessors alien classes combinators destructors hints io
 io.backend io.buffers io.encodings io.files io.timeouts kernel
 kernel.private libc locals math math.order math.private
 namespaces sequences strings system ;
@@ -42,11 +42,6 @@ M: input-port stream-read1
     check-disposed
     dup wait-to-read [ drop f ] [ buffer>> buffer-pop ] if ; inline
 
-ERROR: not-a-c-ptr object ;
-
-: check-c-ptr ( c-ptr -- c-ptr )
-    dup c-ptr? [ not-a-c-ptr ] unless ; inline
-
 <PRIVATE
 
 : read-step ( count port -- count ptr/f )
@@ -73,11 +68,11 @@ ERROR: not-a-c-ptr object ;
 PRIVATE>
 
 M: input-port stream-read-partial-unsafe
-    [ check-c-ptr swap ] dip prepare-read read-step
+    [ c-ptr check-instance swap ] dip prepare-read read-step
     [ swap [ memcpy ] keep ] [ 2drop 0 ] if* ;
 
 M: input-port stream-read-unsafe
-    [ check-c-ptr swap ] dip prepare-read 0 read-loop ;
+    [ c-ptr check-instance swap ] dip prepare-read 0 read-loop ;
 
 <PRIVATE
 
@@ -158,7 +153,7 @@ PRIVATE>
 M: output-port stream-write
     check-disposed [
         binary-object
-        [ check-c-ptr ] [ integer>fixnum-strict ] bi*
+        [ c-ptr check-instance ] [ integer>fixnum-strict ] bi*
     ] [ port-write ] bi* ;
 
 HOOK: tell-handle os ( handle -- n )

@@ -13,21 +13,10 @@ TUPLE: anonymous-union { members read-only } ;
 
 INSTANCE: anonymous-union classoid
 
-ERROR: not-classoids sequence ;
-
-: check-classoids ( members -- members )
-    dup [ classoid? ] all?
-    [ [ classoid? ] reject not-classoids ] unless ;
-
-ERROR: not-a-classoid object ;
-
-: check-classoid ( object -- object )
-    dup classoid? [ not-a-classoid ] unless ;
-
 : <anonymous-union> ( members -- classoid )
-    check-classoids
-    [ null eq? ] reject members
-    dup length 1 = [ first ] [ sort-classes f like anonymous-union boa ] if ;
+    [ classoid check-instance ] map [ null eq? ] reject
+    members dup length 1 =
+    [ first ] [ sort-classes f like anonymous-union boa ] if ;
 
 M: anonymous-union rank-class drop 6 ;
 
@@ -36,7 +25,7 @@ TUPLE: anonymous-intersection { participants read-only } ;
 INSTANCE: anonymous-intersection classoid
 
 : <anonymous-intersection> ( participants -- classoid )
-    check-classoids
+    [ classoid check-instance ] map
     members dup length 1 =
     [ first ] [ sort-classes f like anonymous-intersection boa ] if ;
 
@@ -47,7 +36,7 @@ TUPLE: anonymous-complement { class read-only } ;
 INSTANCE: anonymous-complement classoid
 
 : <anonymous-complement> ( object -- classoid )
-    check-classoid anonymous-complement boa ;
+    classoid check-instance anonymous-complement boa ;
 
 M: anonymous-complement rank-class drop 3 ;
 
