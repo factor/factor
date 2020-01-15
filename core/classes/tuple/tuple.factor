@@ -17,8 +17,6 @@ PREDICATE: tuple-class < class
 
 ERROR: too-many-slots class slots got max ;
 
-ERROR: not-a-tuple object ;
-
 : all-slots ( class -- slots )
     superclasses-of [ "slots" word-prop ] map concat ;
 
@@ -59,14 +57,12 @@ M: tuple class-of layout-of 2 slot { word } declare ; inline
     layout-of 3 slot { fixnum } declare ; inline
 
 : layout-up-to-date? ( object -- ? )
-    dup tuple?
-    [ [ layout-of ] [ class-of tuple-layout ] bi eq? ] [ drop t ] if ;
-
-: check-tuple ( object -- tuple )
-    dup tuple? [ not-a-tuple ] unless ; inline
+    dup tuple? [
+        [ layout-of ] [ class-of tuple-layout ] bi eq?
+    ] [ drop t ] if ;
 
 : prepare-tuple-slots ( tuple -- n tuple )
-    check-tuple [ tuple-size <iota> ] keep ;
+    tuple check-instance [ tuple-size <iota> ] keep ;
 
 : copy-tuple-slots ( n tuple -- array )
     [ array-nth ] curry map ;
@@ -323,13 +319,9 @@ M: tuple-class (define-tuple-class)
 : boa-effect ( class -- effect )
     [ all-slots [ name>> ] map ] [ name>> 1array ] bi <effect> ;
 
-ERROR: not-a-tuple-class object ;
-
-: check-tuple-class ( class -- class )
-    dup tuple-class? [ not-a-tuple-class ] unless ; inline
-
 : define-boa-word ( word class -- )
-    check-tuple-class [ [ boa ] curry ] [ boa-effect ] bi
+    tuple-class check-instance
+    [ [ boa ] curry ] [ boa-effect ] bi
     define-inline ;
 
 : forget-slot-accessors ( class slots -- )

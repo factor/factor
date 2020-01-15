@@ -29,10 +29,8 @@ ERROR: edges-in-same-face ;
     [ dup opposite-edge>> assert-same-face ]
     bi ;
 
-ERROR: not-a-base-face face ;
-
 : assert-base-face ( face -- )
-    dup base-face? [ drop ] [ not-a-base-face ] if ;
+    base-face check-instance drop ;
 
 ERROR: has-rings face ;
 
