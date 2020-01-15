@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators combinators.private kernel
-kernel.private make namespaces sequences vectors ;
+USING: accessors assocs classes combinators combinators.private
+kernel kernel.private make namespaces sequences vectors ;
 IN: continuations
 
 : with-datastack ( stack quot -- new-stack )
@@ -49,11 +49,10 @@ C: <continuation> continuation
 
 <PRIVATE
 
-ERROR: not-a-continuation object ;
-
 : >continuation< ( continuation -- data call retain name catch )
-    dup continuation? [ not-a-continuation ] unless
-    { [ data>> ] [ call>> ] [ retain>> ] [ name>> ] [ catch>> ] } cleave ; inline
+    continuation check-instance {
+        [ data>> ] [ call>> ] [ retain>> ] [ name>> ] [ catch>> ]
+    } cleave ; inline
 
 PRIVATE>
 
