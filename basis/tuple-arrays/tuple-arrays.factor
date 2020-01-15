@@ -26,11 +26,9 @@ MACRO: write-tuple ( class -- quot )
     bi '[ _ dip @ ] ;
 
 : check-final ( class -- )
-    {
-        { [ dup tuple-class? not ] [ not-a-tuple ] }
-        { [ dup final-class? not ] [ not-final ] }
-        [ drop ]
-    } cond ;
+    tuple-class check-instance
+    final-class check-instance
+    drop ;
 
 PRIVATE>
 

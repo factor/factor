@@ -63,4 +63,4 @@ M: f lol2 drop "lol22" ;
 [ 3 lol2 ] [ no-method? ] must-fail-with
 
 [ "IN: classes-tests maybe{ 1 2 3 }" eval( -- ) ]
-[ error>> not-classoids? ] must-fail-with
+[ error>> not-an-instance? ] must-fail-with

@@ -9,11 +9,6 @@ SYMBOL: builtins
 PREDICATE: builtin-class < class
     "metaclass" word-prop builtin-class eq? ;
 
-ERROR: not-a-builtin object ;
-
-: check-builtin ( class -- )
-    dup builtin-class? [ drop ] [ not-a-builtin ] if ;
-
 : class>type ( class -- n ) "type" word-prop ; foldable
 
 : type>class ( n -- class ) builtins get-global nth ; foldable
