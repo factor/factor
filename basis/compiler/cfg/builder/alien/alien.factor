@@ -48,7 +48,7 @@ IN: compiler.cfg.builder.alien
 : caller-parameters ( params -- reg-inputs stack-inputs )
     [ abi>> ] [ parameters>> ] [ return>> ] tri
     '[
-        _ unbox-parameters 
+        _ unbox-parameters
         _ prepare-struct-caller struct-return-area set
         (caller-parameters)
     ] with-param-regs ;
