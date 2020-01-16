@@ -15,6 +15,8 @@ IN: compiler.cfg.builder.alien
         0 stack-params set
         V{ } clone reg-values set
         V{ } clone stack-values set
+        0 int-reg-reps set
+        0 float-reg-reps set
         @
         reg-values get
         stack-values get
@@ -46,7 +48,7 @@ IN: compiler.cfg.builder.alien
 : caller-parameters ( params -- reg-inputs stack-inputs )
     [ abi>> ] [ parameters>> ] [ return>> ] tri
     '[
-        _ unbox-parameters
+        _ unbox-parameters 
         _ prepare-struct-caller struct-return-area set
         (caller-parameters)
     ] with-param-regs ;
