@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes.tuple classes.tuple.private
-combinators combinators.smart fry functors2 kernel macros math parser
-sequences sequences.private ;
+USING: accessors arrays classes classes.tuple
+classes.tuple.private combinators combinators.smart fry functors
+kernel macros math parser sequences sequences.private ;
 FROM: inverse => undo ;
 IN: tuple-arrays
 
@@ -25,12 +25,9 @@ MACRO: write-tuple ( class -- quot )
     [ tuple-arity <iota> <reversed> [ '[ [ _ ] dip set-nth-unsafe ] ] map '[ _ cleave ] ]
     bi '[ _ dip @ ] ;
 
-: check-final ( class -- class )
-    {
-        { [ dup tuple-class? not ] [ not-a-tuple ] }
-        { [ dup final-class? not ] [ not-final ] }
-        [ ]
-    } cond ;
+: check-final ( class -- )
+    tuple-class check-instance
+    dup final-class? [ drop ] [ not-final ] if ;
 
 PRIVATE>
 

@@ -390,11 +390,6 @@ HELP: define-tuple-slots
 { $description "Defines slot accessor and mutator words for the tuple." }
 $low-level-note ;
 
-HELP: check-tuple
-{ $values { "class" class } }
-{ $description "Throws a " { $link check-tuple } " error if " { $snippet "word" } " is not a tuple class word." }
-{ $error-description "Thrown if " { $link \ \C: } " is called with a word which does not name a tuple class." } ;
-
 HELP: define-tuple-class
 { $values { "class" word } { "superclass" class } { "slots" { $sequence string } } }
 { $description "Defines a tuple class inheriting from " { $snippet "superclass" } " with slots named by " { $snippet "slots" } ". This is the run time equivalent of " { $link \ \TUPLE: } "." }

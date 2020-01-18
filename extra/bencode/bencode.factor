@@ -1,6 +1,6 @@
-USING: arrays assocs combinators io io.encodings.ascii
-io.encodings.string io.streams.string kernel linked-assocs math
-math.parser sequences strings ;
+USING: arrays assocs byte-arrays combinators io
+io.encodings.binary io.streams.byte-array io.streams.string
+kernel linked-assocs math math.parser sequences strings ;
 IN: bencode
 
 GENERIC: >bencode ( obj -- bencode )
@@ -10,6 +10,8 @@ M: integer >bencode
 
 M: string >bencode
     [ length number>string ":" ] keep 3append ;
+
+M: byte-array >bencode "" like >bencode ;
 
 M: sequence >bencode
     [ >bencode ] map concat "l" "e" surround ;
@@ -48,5 +50,10 @@ PRIVATE>
         [ read-string ]
     } case ;
 
-: bencode> ( bencode -- obj )
+GENERIC: bencode> ( bencode -- obj )
+
+M: byte-array bencode>
+    binary [ read-bencode ] with-byte-reader ;
+
+M: string bencode>
     [ read-bencode ] with-string-reader ;

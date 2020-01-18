@@ -125,7 +125,7 @@ SYMBOL: a-symbol
     [
         \ a-symbol \ silly-mixin add-mixin-instance
     ] with-compilation-unit
-] [ not-a-class? ] must-fail-with
+] [ not-an-instance? ] must-fail-with
 
 SYMBOL: not-a-mixin
 TUPLE: a-class ;
@@ -134,7 +134,7 @@ TUPLE: a-class ;
     [
         \ a-class \ not-a-mixin add-mixin-instance
     ] with-compilation-unit
-] [ not-a-mixin-class? ] must-fail-with
+] [ not-an-instance? ] must-fail-with
 
 ! Changing a mixin member's metaclass should not remove it from the mixin
 MIXIN: metaclass-change-mixin

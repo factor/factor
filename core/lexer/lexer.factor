@@ -1,28 +1,23 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators continuations io kernel
+USING: accessors arrays classes combinators continuations io kernel
 kernel.private math math.order math.parser namespaces sequences
 sequences.private source-files.errors splitting strings vectors ;
 IN: lexer
 
 
 TUPLE: lexer
-{ text array }
-{ line fixnum }
-{ line-text string }
-{ line-length fixnum }
-{ column fixnum }
-{ parsing-words vector } ;
+    { text array }
+    { line fixnum }
+    { line-text string }
+    { line-length fixnum }
+    { column fixnum }
+    { parsing-words vector } ;
 
 TUPLE: lexer-parsing-word word line line-text column ;
 
-ERROR: not-a-lexer object ;
-
-: check-lexer ( lexer -- lexer )
-    dup lexer? [ not-a-lexer ] unless ; inline
-
 : next-line ( lexer -- )
-    check-lexer
+    lexer check-instance
     dup [ line>> ] [ text>> ] bi ?nth "" or
     [ >>line-text ] [ length >>line-length ] bi
     [ 1 + ] change-line
@@ -30,13 +25,13 @@ ERROR: not-a-lexer object ;
     drop ;
 
 : push-parsing-word ( word -- )
-    lexer get check-lexer [
+    lexer get lexer check-instance [
         [ line>> ] [ line-text>> ] [ column>> ] tri
         lexer-parsing-word boa
     ] [ parsing-words>> push ] bi ;
 
 : pop-parsing-word ( -- )
-    lexer get check-lexer parsing-words>> pop* ;
+    lexer get lexer check-instance parsing-words>> pop* ;
 
 : new-lexer ( text class -- lexer )
     new
@@ -59,7 +54,7 @@ ERROR: unexpected want got ;
     ] dip or ; inline
 
 : change-lexer-column ( ..a lexer quot: ( ..a col line -- ..b newcol ) -- ..b )
-    [ check-lexer [ column>> ] [ line-text>> ] bi ] prepose
+    [ lexer check-instance [ column>> ] [ line-text>> ] bi ] prepose
     keep column<< ; inline
 
 GENERIC: skip-blank ( lexer -- )
@@ -113,13 +108,13 @@ M: lexer skip-word
     ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )
-    check-lexer [ line>> ] [ text>> length ] bi <= ;
+    lexer check-instance [ line>> ] [ text>> length ] bi <= ;
 
 : still-parsing-line? ( lexer -- ? )
-    check-lexer [ column>> ] [ line-length>> ] bi < ;
+    lexer check-instance [ column>> ] [ line-length>> ] bi < ;
 
 : (parse-raw) ( lexer -- str )
-    check-lexer {
+    lexer check-instance {
         [ column>> ]
         [ skip-word ]
         [ column>> ]
@@ -195,6 +190,8 @@ M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
         } cleave
     ] dip lexer-error boa ;
 
+<PRIVATE
+
 : simple-lexer-dump ( error -- )
     [ line>> number>string ": " append ]
     [ line-text>> ]
@@ -202,24 +199,22 @@ M: lexer-error error-line [ error>> error-line ] [ line>> ] bi or ;
     pick length + char: \s <string>
     [ write ] [ print ] [ write "^" print ] tri* ;
 
-: (parsing-word-lexer-dump) ( error parsing-word -- )
-    [
-        line>> number>string
-        over line>> number>string length
-        char: \s pad-head
-        ": " append write
-    ] [ line-text>> print ] bi
-    simple-lexer-dump ;
+: parsing-word-lexer-dump ( error parsing-word -- error )
+    2dup [ line>> ] same? [ drop ] [
+        [
+            line>> number>string
+            over line>> number>string length
+            char: \s pad-head
+            ": " append write
+        ] [ line-text>> print ] bi
+    ] if ;
 
-: parsing-word-lexer-dump ( error parsing-word -- )
-    2dup [ line>> ] same?
-    [ drop simple-lexer-dump ]
-    [ (parsing-word-lexer-dump) ] if ;
+PRIVATE>
 
 : lexer-dump ( error -- )
-    dup parsing-words>>
-    [ simple-lexer-dump ]
-    [ last parsing-word-lexer-dump ] if-empty ;
+    dup parsing-words>> ?last [
+        parsing-word-lexer-dump
+    ] when* simple-lexer-dump ;
 
 : with-lexer ( lexer quot -- newquot )
     [ [ <lexer-error> rethrow ] recover ] curry

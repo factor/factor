@@ -215,9 +215,6 @@ M: inconsistent-next-method summary
 M: check-method-error summary
     drop "Invalid parameters for create-method" ;
 
-M: not-a-tuple summary
-    drop "Not a tuple" ;
-
 M: bad-superclass summary
     drop "Tuple classes can only inherit from non-final tuple classes" ;
 
@@ -377,8 +374,6 @@ M: bad-escape error.
     "Bad escape code: \\" write char>> write nl ;
 
 M: bad-literal-tuple summary drop "Bad literal tuple" ;
-
-M: not-a-mixin-class summary drop "Not a mixin class" ;
 
 M: not-found-in-roots summary
     path>> "Cannot resolve vocab: " prepend ;

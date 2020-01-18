@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax arrays
-assocs cache colors combinators core-foundation
+assocs cache classes colors combinators core-foundation
 core-foundation.attributed-strings core-foundation.strings
 core-graphics core-graphics.types core-text.fonts destructors
 fonts init kernel locals make math math.functions math.order
@@ -34,8 +34,6 @@ FUNCTION: CGRect CTLineGetImageBounds ( CTLineRef line, CGContextRef context )
 
 SYMBOL: retina?
 
-ERROR: not-a-string object ;
-
 MEMO: make-attributes ( open-font color -- hashtable )
     [
         kCTForegroundColorAttributeName ,,
@@ -46,7 +44,7 @@ MEMO: make-attributes ( open-font color -- hashtable )
     [
         [
             dup selection? [ string>> ] when
-            dup string? [ not-a-string ] unless
+            string check-instance
         ] 2dip
         make-attributes <CFAttributedString> &CFRelease
         CTLineCreateWithAttributedString
