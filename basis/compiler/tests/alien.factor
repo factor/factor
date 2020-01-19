@@ -969,7 +969,12 @@ STRUCT: test66_st1 { mem1 ulong } { mem2 ulong } ;
 STRUCT: test66_st2 { mem1 ulong } { mem2 ulong } { mem3 ulong } ;
 FUNCTION: ulong ffi_test_66 ( ulong a, ulong b, ulong c, test66_st1 d, test66_st1 e )
 FUNCTION: ulong ffi_test_67 ( ulong a, ulong b, ulong c, test66_st1 d, test66_st1 e ulong f )
-    
+FUNCTION: ulong ffi_test_68 ( ulong a, ulong b, ulong c, test66_st1 d, test66_st2 e test66_st1 f )
+
 { 28 } [ 1 2 3 S{ test66_st1 f 4 5 } S{ test66_st1 f 6 7 } ffi_test_66 ] unit-test
 
 { 44 } [ 1 2 3 S{ test66_st1 f 4 5 } S{ test66_st1 f 6 7 } 8 ffi_test_67 ] unit-test
+
+{ 55 } [
+    1 2 3 S{ test66_st1 f 4 5 } S{ test66_st2 f 6 7 8 } S{ test66_st1 f 9 10 } ffi_test_68
+] unit-test

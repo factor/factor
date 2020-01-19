@@ -64,6 +64,7 @@ EXPORTS
         ffi_test_65
         ffi_test_66
         ffi_test_67
+        ffi_test_68
         bug1021_test_1
         bug1021_test_2
         bug1021_test_3
