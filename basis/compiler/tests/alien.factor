@@ -2,7 +2,7 @@ USING: accessors alien alien.c-types alien.complex alien.data alien.libraries
 alien.syntax arrays byte-arrays classes classes.struct combinators
 combinators.extras compiler compiler.test concurrency.promises continuations
 destructors effects generalizations io io.backend io.pathnames
-io.streams.string kernel kernel.private libc layouts locals math math.bitwise
+io.streams.string kernel kernel.private libc layouts math math.bitwise
 math.private memory namespaces namespaces.private random parser quotations
 sequences slots.private specialized-arrays stack-checker stack-checker.errors
 system threads tools.test words ;
@@ -962,72 +962,4 @@ FUNCTION: void* bug1021_test_3 ( c-string a )
 
 { } [
     10000 [ 0 doit 33 assert= ] times
-] unit-test
-
-! Tests for System V AMD64 ABI 
-STRUCT: test_struct_66 { mem1 ulong } { mem2 ulong } ;
-STRUCT: test_struct_68 { mem1 ulong } { mem2 ulong } { mem3 ulong } ;
-FUNCTION: ulong ffi_test_66 ( ulong a, ulong b, ulong c, test_struct_66 d, test_struct_66 e )
-FUNCTION: ulong ffi_test_67 ( ulong a, ulong b, ulong c, test_struct_66 d, test_struct_66 e ulong _f )
-FUNCTION: ulong ffi_test_68 ( ulong a, ulong b, ulong c, test_struct_66 d, test_struct_68 e test_struct_66 _f )
-
-{ 28 } [ 1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_66 f 6 7 } ffi_test_66 ] unit-test
-
-: callback-14 ( -- callback )
-    ulong { ulong ulong ulong test_struct_66 test_struct_66 } cdecl
-    [| a b c d e |
-        a b + c +
-        d [ mem1>> + ] [ mem2>> + ] bi
-        e [ mem1>> + ] [ mem2>> + ] bi
-    ] alien-callback ;
-
-: callback-14-test ( a b c d e callback -- result )
-    ulong { ulong ulong ulong test_struct_66 test_struct_66 } cdecl alien-indirect ;
-
-{ 28 } [
-    1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_66 f 6 7 } callback-14 [
-        callback-14-test
-    ] with-callback
-] unit-test
-
-{ 44 } [ 1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_66 f 6 7 } 8 ffi_test_67 ] unit-test
-
-: callback-15 ( -- callback )
-    ulong { ulong ulong ulong test_struct_66 test_struct_66 ulong } cdecl
-    [| a b c d e _f |
-        a b + c +
-        d [ mem1>> + ] [ mem2>> + ] bi
-        e [ mem1>> + ] [ mem2>> + ] bi
-        _f 2 * + 
-    ] alien-callback ;
-
-: callback-15-test ( a b c d e _f callback -- result )
-    ulong { ulong ulong ulong test_struct_66 test_struct_66 ulong } cdecl alien-indirect ;
-
-{ 44 } [
-    1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_66 f 6 7 } 8 callback-15 [
-        callback-15-test
-    ] with-callback
-] unit-test
-
-{ 55 } [
-    1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_68 f 6 7 8 } S{ test_struct_66 f 9 10 } ffi_test_68
-] unit-test
-
-: callback-16 ( -- callback )
-    ulong { ulong ulong ulong test_struct_66 test_struct_68 test_struct_66 } cdecl
-    [| a b c d e _f |
-        a b + c +
-        d [ mem1>> + ] [ mem2>> + ] bi
-        e [ mem1>> + ] [ mem2>> + ] [ mem3>> + ] tri
-        _f [ mem1>> + ] [ mem2>> + ] bi
-    ] alien-callback ;
-
-: callback-16-test ( a b c d e _f callback -- result )
-    ulong { ulong ulong ulong test_struct_66 test_struct_68 test_struct_66 } cdecl alien-indirect ;
-
-{ 55 } [
-    1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_68 f 6 7 8 } S{ test_struct_66 f 9 10 } callback-16 [
-        callback-16-test
-    ] with-callback
 ] unit-test
