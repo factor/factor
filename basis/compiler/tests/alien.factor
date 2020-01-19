@@ -2,7 +2,7 @@ USING: accessors alien alien.c-types alien.complex alien.data alien.libraries
 alien.syntax arrays byte-arrays classes classes.struct combinators
 combinators.extras compiler compiler.test concurrency.promises continuations
 destructors effects generalizations io io.backend io.pathnames
-io.streams.string kernel kernel.private libc layouts math math.bitwise
+io.streams.string kernel kernel.private libc layouts locals math math.bitwise
 math.private memory namespaces namespaces.private random parser quotations
 sequences slots.private specialized-arrays stack-checker stack-checker.errors
 system threads tools.test words ;
@@ -963,3 +963,13 @@ FUNCTION: void* bug1021_test_3 ( c-string a )
 { } [
     10000 [ 0 doit 33 assert= ] times
 ] unit-test
+
+! Tests for System V AMD64 ABI 
+STRUCT: test66_st1 { mem1 ulong } { mem2 ulong } ;
+STRUCT: test66_st2 { mem1 ulong } { mem2 ulong } { mem3 ulong } ;
+FUNCTION: ulong ffi_test_66 ( ulong a, ulong b, ulong c, test66_st1 d, test66_st1 e )
+FUNCTION: ulong ffi_test_67 ( ulong a, ulong b, ulong c, test66_st1 d, test66_st1 e ulong f )
+    
+{ 28 } [ 1 2 3 S{ test66_st1 f 4 5 } S{ test66_st1 f 6 7 } ffi_test_66 ] unit-test
+
+{ 44 } [ 1 2 3 S{ test66_st1 f 4 5 } S{ test66_st1 f 6 7 } 8 ffi_test_67 ] unit-test
