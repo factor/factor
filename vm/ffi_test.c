@@ -357,27 +357,6 @@ double ffi_test_65(int n, ...) {
     return sum;
 }
 
-unsigned long ffi_test_66(unsigned long a, unsigned long b, unsigned long c,
-                          struct test_struct_66 d, struct test_struct_66 e) {
-    unsigned long x;
-    x = a + b + c + d.mem1 + d.mem2 + e.mem1 + e.mem2;
-    return x;
-}
-
-unsigned long ffi_test_67(unsigned long a, unsigned long b, unsigned long c,
-                          struct test_struct_66 d, struct test_struct_66 e,
-                          unsigned long f) {
-    unsigned long x;
-    x = a + b + c + d.mem1 + d.mem2 + e.mem1 + e.mem2 + f*2;
-    return x;
-}
-
-unsigned long ffi_test_68(unsigned long a, unsigned long b, unsigned long c,
-                          struct test_struct_66 d, struct test_struct_68 e, struct test_struct_66 f) {
-    unsigned long x;
-    x = a + b + c + d.mem1 + d.mem2 + e.mem1 + e.mem2 + e.mem3 + f.mem1 + f.mem2;
-	return x;
-}
 
 void* bug1021_test_1(void* x, int y) {
   return (void*)(y * y + (size_t)x);
