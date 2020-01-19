@@ -376,7 +376,7 @@ unsigned long ffi_test_68(unsigned long a, unsigned long b, unsigned long c,
                           struct test66_st1 d, struct test66_st2 e, struct test66_st1 f) {
     unsigned long x;
     x = a + b + c + d.mem1 + d.mem2 + e.mem1 + e.mem2 + e.mem3 + f.mem1 + f.mem2;
-	return x;
+    return x;
 }
 
 void* bug1021_test_1(void* x, int y) {
