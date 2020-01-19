@@ -27,7 +27,8 @@ M: x86.64 reserved-stack-space 0 ;
 :: flatten-small-struct ( c-type -- seq )
     c-type struct-types&offset split-struct [
         [ lookup-c-type c-type-rep reg-class-of ] map
-        int-regs swap member? int-rep double-rep ? f f 3array
+        int-regs swap member? int-rep double-rep ?
+        f f 3array
     ] map :> reps
     int-reg-reps get float-reg-reps get and [
         0 :> int-mems!

@@ -12,25 +12,19 @@ SYMBOL: struct-return-area
 
 SYMBOLS: int-reg-reps float-reg-reps ;
 
-<PRIVATE
-
-: inc-not-f ( variable -- ) dup get [ inc ] [ drop ] if ; inline
-
-: dec-not-f ( variable -- ) dup get [ dec ] [ drop ] if ; inline
-
-PRIVATE>
-
 : record-reg-reps ( reps -- reps )
     dup [
         dup second not [  ! on-stack?: f 
-            first int-rep? int-reg-reps float-reg-reps ? inc-not-f
+            first int-rep? int-reg-reps float-reg-reps ?
+            dup get [ inc ] [ drop ] if
         ] [ drop ] if
     ] each ;
 
 : unrecord-reg-reps ( reps -- reps )
     dup [
         dup second not [  ! on-stack?: f 
-            first int-rep? int-reg-reps float-reg-reps ? dec-not-f
+            first int-rep? int-reg-reps float-reg-reps ?
+            dup get [ dec ] [ drop ] if
         ] [ drop ] if
     ] each ;
 
