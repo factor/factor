@@ -232,23 +232,26 @@ FACTOR_EXPORT struct ulonglong_pair ffi_test_63(void);
 FACTOR_EXPORT int ffi_test_64(int n, ...);
 FACTOR_EXPORT double ffi_test_65(int n, ...);
 
-struct test66_st1 {
+
+struct test_struct_66 {
   unsigned long mem1;
   unsigned long mem2;
 };
 
-struct test66_st2 {
+struct test_struct_68 {
   unsigned long mem1;
   unsigned long mem2;
   unsigned long mem3;  
 };
 
 FACTOR_EXPORT unsigned long ffi_test_66(unsigned long a, unsigned long b, unsigned long c,
-                                        struct test66_st1 d, struct test66_st1 e);
+                                        struct test_struct_66 d, struct test_struct_66 e);
+
 FACTOR_EXPORT unsigned long ffi_test_67(unsigned long a, unsigned long b, unsigned long c,
-                                        struct test66_st1 d, struct test66_st1 e, unsigned long f);
+                                        struct test_struct_66 d, struct test_struct_66 e, unsigned long f);
+
 FACTOR_EXPORT unsigned long ffi_test_68(unsigned long a, unsigned long b, unsigned long c,
-                                        struct test66_st1 d, struct test66_st2 e, struct test66_st1 f);
+                                        struct test_struct_66 d, struct test_struct_68 e, struct test_struct_66 f);
 
 FACTOR_EXPORT void* bug1021_test_1(void* x, int y);
 FACTOR_EXPORT int bug1021_test_2(int x, char* y, void *z);
