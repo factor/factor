@@ -13,21 +13,17 @@ SYMBOL: struct-return-area
 SYMBOLS: int-reg-reps float-reg-reps ;
 
 : record-reg-reps ( reps -- reps )
-    dup [
-        dup second not [  ! on-stack?: f 
-            first int-rep? int-reg-reps float-reg-reps ?
-            dup get [ inc ] [ drop ] if
-        ] [ drop ] if
-    ] each ;
+    dup  ! reps: { { reg-rep on-stack? odd-register? } ... }
+    [ [ [ second not ] [ first int-rep?     ] bi and ] count int-reg-reps   +@ ]
+    [ [ [ second not ] [ first int-rep? not ] bi and ] count float-reg-reps +@ ]
+    bi ;
 
 : unrecord-reg-reps ( reps -- reps )
-    dup [
-        dup second not [  ! on-stack?: f 
-            first int-rep? int-reg-reps float-reg-reps ?
-            dup get [ dec ] [ drop ] if
-        ] [ drop ] if
-    ] each ;
-
+    dup
+    [ [ [ second not ] [ first int-rep?     ] bi and ] count -1 * int-reg-reps   +@ ]
+    [ [ [ second not ] [ first int-rep? not ] bi and ] count -1 * float-reg-reps +@ ]
+    bi ;
+    
 GENERIC: flatten-c-type ( c-type -- pairs )
 
 M: c-type flatten-c-type
