@@ -31,15 +31,8 @@ M: x86.64 reserved-stack-space 0 ;
         f f 3array
     ] map :> reps
     int-reg-reps get float-reg-reps get and [
-        0 :> int-mems!
-        0 :> float-mems!
-        reps [
-            first int-rep? [
-                int-mems 1 + int-mems!
-            ] [
-                float-mems 1 + float-mems!
-            ] if
-        ] each
+        reps [ first int-rep? ] count :> int-mems
+        reps length int-mems - :> float-mems
         int-reg-reps get int-mems + 6 >
         float-reg-reps get float-mems + 8 > or [
             reps [ first t f 3array ] map
