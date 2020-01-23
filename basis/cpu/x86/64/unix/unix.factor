@@ -31,8 +31,7 @@ M: x86.64 reserved-stack-space 0 ;
         f f 3array
     ] map :> reps
     int-reg-reps get float-reg-reps get and [
-        reps [ first int-rep? ] count :> int-mems
-        reps length int-mems - :> float-mems
+        reps reg-reps :> ( int-mems float-mems )
         int-reg-reps get int-mems + 6 >
         float-reg-reps get float-mems + 8 > or [
             reps [ first t f 3array ] map
@@ -42,8 +41,8 @@ M: x86.64 reserved-stack-space 0 ;
 M: x86.64 flatten-struct-type ( c-type -- seq )
     dup heap-size 16 <=
     [ flatten-small-struct record-reg-reps ] [
-        call-next-method [ first t f 3array ] map
-        unrecord-reg-reps
+        call-next-method unrecord-reg-reps
+        [ first t f 3array ] map
     ] if ;
 
 M: x86.64 return-struct-in-registers? ( c-type -- ? )
