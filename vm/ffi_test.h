@@ -244,6 +244,12 @@ struct test_struct_68 {
   unsigned long mem3;  
 };
 
+struct test_struct_69 {
+  float         mem1;
+  unsigned long mem2;
+  unsigned long mem3;  
+};
+
 FACTOR_EXPORT unsigned long ffi_test_66(unsigned long a, unsigned long b, unsigned long c,
                                         struct test_struct_66 d, struct test_struct_66 e);
 
@@ -252,6 +258,12 @@ FACTOR_EXPORT unsigned long ffi_test_67(unsigned long a, unsigned long b, unsign
 
 FACTOR_EXPORT unsigned long ffi_test_68(unsigned long a, unsigned long b, unsigned long c,
                                         struct test_struct_66 d, struct test_struct_68 e, struct test_struct_66 f);
+
+FACTOR_EXPORT unsigned long ffi_test_69(unsigned long a, unsigned long b, unsigned long c,
+                                        struct test_struct_66 d, struct test_struct_69 e, struct test_struct_66 f);
+
+FACTOR_EXPORT unsigned long ffi_test_70(struct test_struct_68 a, struct test_struct_68 b, struct test_struct_66 c);
+
 
 FACTOR_EXPORT void* bug1021_test_1(void* x, int y);
 FACTOR_EXPORT int bug1021_test_2(int x, char* y, void *z);

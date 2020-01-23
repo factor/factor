@@ -967,9 +967,12 @@ FUNCTION: void* bug1021_test_3 ( c-string a )
 ! Tests for System V AMD64 ABI 
 STRUCT: test_struct_66 { mem1 ulong } { mem2 ulong } ;
 STRUCT: test_struct_68 { mem1 ulong } { mem2 ulong } { mem3 ulong } ;
+STRUCT: test_struct_69 { mem1 float } { mem2 ulong } { mem3 ulong } ;
 FUNCTION: ulong ffi_test_66 ( ulong a, ulong b, ulong c, test_struct_66 d, test_struct_66 e )
 FUNCTION: ulong ffi_test_67 ( ulong a, ulong b, ulong c, test_struct_66 d, test_struct_66 e ulong _f )
 FUNCTION: ulong ffi_test_68 ( ulong a, ulong b, ulong c, test_struct_66 d, test_struct_68 e test_struct_66 _f )
+FUNCTION: ulong ffi_test_69 ( ulong a, ulong b, ulong c, test_struct_66 d, test_struct_69 e test_struct_66 _f )
+FUNCTION: ulong ffi_test_70 ( test_struct_68 a test_struct_68 b, test_struct_66 c )  
 
 { 28 } [ 1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_66 f 6 7 } ffi_test_66 ] unit-test
 
@@ -1029,5 +1032,48 @@ FUNCTION: ulong ffi_test_68 ( ulong a, ulong b, ulong c, test_struct_66 d, test_
 { 55 } [
     1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_68 f 6 7 8 } S{ test_struct_66 f 9 10 } callback-16 [
         callback-16-test
+    ] with-callback
+] unit-test
+
+{ 55 } [
+   1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_69 f 6.0 7 8 } S{ test_struct_66 f 9 10 } ffi_test_69
+] unit-test
+
+: callback-17 ( -- callback )
+    ulong { ulong ulong ulong test_struct_66 test_struct_69 test_struct_66 } cdecl
+    [| a b c d e _f |
+        a b + c +
+        d [ mem1>> + ] [ mem2>> + ] bi
+        e [ mem1>> >integer + ] [ mem2>> + ] [ mem3>> + ] tri
+        _f [ mem1>> + ] [ mem2>> + ] bi
+    ] alien-callback ;
+
+: callback-17-test ( a b c d e _f callback -- result )
+    ulong { ulong ulong ulong test_struct_66 test_struct_69 test_struct_66 } cdecl alien-indirect ;
+
+{ 55 } [
+    1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_69 f 6.0 7 8 } S{ test_struct_66 f 9 10 } callback-17 [
+        callback-17-test
+    ] with-callback
+] unit-test
+
+{ 36 } [
+    S{ test_struct_68 f 1 2 3 } S{ test_struct_68 f 4 5 6 } S{ test_struct_66 f 7 8 } ffi_test_70
+] unit-test
+
+: callback-18 ( -- callback )
+    ulong { test_struct_68 test_struct_68 test_struct_66 } cdecl
+    [| a b c |
+        a [ mem1>> ] [ mem2>> + ] [ mem3>> + ] tri     
+        b [ mem1>> + ] [ mem2>> + ] [ mem3>> + ] tri
+        c [ mem1>> + ] [ mem2>> + ] bi
+    ] alien-callback ;
+
+: callback-18-test ( a b c callback -- result )
+    ulong { test_struct_68 test_struct_68 test_struct_66 } cdecl alien-indirect ;
+
+{ 36 } [
+    S{ test_struct_68 f 1 2 3 } S{ test_struct_68 f 4 5 6 } S{ test_struct_66 f 7 8 } callback-18 [
+        callback-18-test
     ] with-callback
 ] unit-test
