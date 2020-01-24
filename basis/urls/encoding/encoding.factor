@@ -43,7 +43,7 @@ IN: urls.encoding
 
 : (url-encode) ( str quot: ( ch -- ? ) -- encoded )
     [
-        over byte-array? [
+        over byte-sequence? [
             '[ dup @ [ , ] [ hex% ] if ] each
         ] [
             [ present ] dip

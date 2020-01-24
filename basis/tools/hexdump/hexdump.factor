@@ -1,11 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-
 USING: accessors ascii byte-arrays byte-vectors combinators
-command-line destructors fry io io.encodings io.encodings.binary
-io.files io.streams.string kernel literals locals math
-math.parser namespaces sequences sequences.private strings typed ;
-
+command-line destructors io io.encodings io.encodings.binary
+io.encodings.string io.encodings.utf8 io.files io.streams.string
+kernel literals math math.parser namespaces sequences
+sequences.private strings ;
 IN: tools.hexdump
 
 <PRIVATE
@@ -76,6 +75,9 @@ GENERIC: hexdump. ( byte-array -- )
 M: byte-array hexdump. all-bytes hexdump-bytes ;
 
 M: byte-vector hexdump. all-bytes underlying>> hexdump-bytes ;
+
+M: string hexdump. utf8 encode hexdump. ;
+
 
 : hexdump ( byte-array -- str )
     [ hexdump. ] with-string-writer ;
