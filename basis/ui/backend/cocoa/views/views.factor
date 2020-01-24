@@ -238,16 +238,15 @@ IMPORT: NSAttributedString
     ] [ underlines ] if ;
 
 :: update-marked-text ( gadget str selectedRange replacementRange -- )
-    replacementRange location>>  NSNotFound = not     ! [ 
-    replacementRange length>> NSNotFound = not and [  ! erase this line
+    replacementRange location>>  NSNotFound = not [ 
         gadget editor-caret first
         dup gadget editor-line
         [ 
-            replacementRange length>> ! location>>
+            replacementRange location>>
             >codepoint-index
             2array gadget set-caret
         ] [
-            replacementRange length>> 1 + ! [ location>> ] [ length>> ] bi +
+            replacementRange [ location>> ] [ length>> ] bi +
             >codepoint-index
             2array gadget set-mark
         ] 2bi
