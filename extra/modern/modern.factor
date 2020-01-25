@@ -454,12 +454,12 @@ DEFER: lex-factor-top*
     } case ;
 
 ! Inside a FOO: or a <FOO FOO>
-: lex-factor-nested* ( n/f string slice/f ch/f -- n'/f string literal )
+: lex-factor-nested* ( string n/f slice/f ch/f -- string n'/f literal )
     {
         ! Nested ``A: a B: b`` so rewind and let the parser get it top-level
         { char: \: [
-            ! A: B: then interrupt the current parser
-            ! A: b: then keep going
+            ! true?  A: B: then interrupt the current parser
+            ! false?  A: b: then keep going
             merge-slice-til-whitespace
             dup { [ upper-colon-form? ] [ ":" = ] } 1||
             ! dup upper-colon?
@@ -486,10 +486,10 @@ DEFER: lex-factor-top*
         [ lex-factor-fallthrough ]
     } case ;
 
-: lex-factor-nested ( n/f string -- n'/f string literal )
+: lex-factor-nested ( string n/f -- string n'/f literal )
     "\"\\!#:[{(]})<>\s\r\n" slice-til-either lex-factor-nested* ; inline
 
-: lex-factor-top* ( n/f string slice/f ch/f -- n'/f string literal )
+: lex-factor-top* ( string n/f slice/f ch/f -- string n'/f literal )
     {
         { char: \: [ merge-slice-til-whitespace read-colon ] }
         { char: < [
