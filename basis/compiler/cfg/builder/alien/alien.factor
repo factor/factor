@@ -15,6 +15,8 @@ IN: compiler.cfg.builder.alien
         0 stack-params set
         V{ } clone reg-values set
         V{ } clone stack-values set
+        0 int-reg-reps set
+        0 float-reg-reps set
         @
         reg-values get
         stack-values get
