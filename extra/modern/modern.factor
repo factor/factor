@@ -406,7 +406,6 @@ MACRO:: read-matched ( $ch -- quot: ( string n tag -- string n' slice' ) )
         ] dip swap 2array
     ] when ;
 
-DEFER: lex-factor-top*
 : read-backslash ( string n slice -- string n' obj )
     ! foo\ so far, could be foo\bar{
     ! remove the \ and continue til delimiter/eof
@@ -418,7 +417,8 @@ DEFER: lex-factor-top*
         dup "\\" sequence= [ (read-backslash) ] [ merge-slice-til-whitespace ] if
     ] [
         ! foo\ or foo\bar (?)
-        over "\\" tail? [ drop (read-backslash) ] [ lex-factor-top* ] if
+        ! XXX: false branch was lex-factor-top* hmmm
+        over "\\" tail? [ drop (read-backslash) ] [ lex-factor-fallthrough ] if
     ] if ;
 
 ! If the slice is 0 width, we stopped on whitespace before any token.
