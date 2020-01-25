@@ -105,6 +105,9 @@ CONSTRUCTOR: <double-paren> double-paren ( tokens -- obj )
         { char: \( [ <single-paren> ] }
     } case ;
 
+TUPLE: turned-off < lexed obj ;
+CONSTRUCTOR: <turned-off> turned-off ( obj -- obj' )
+    dup obj>> tokens>> >>tokens ;
 
 TUPLE: double-quote < matched ;
 CONSTRUCTOR: <double-quote> double-quote ( tokens -- obj ) ;

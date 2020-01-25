@@ -1,10 +1,10 @@
 ! Copyright (C) 2016 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators combinators.short-circuit
-continuations io.encodings.utf8 io.files kernel make math
-math.order math.parser modern.compiler modern.paths modern.slices
-sequences sequences.extras sets splitting strings syntax.modern
-unicode vocabs.loader ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit continuations io.encodings.utf8
+io.files kernel make math math.order math.parser modern.compiler
+modern.paths modern.slices sequences sequences.extras sets
+splitting strings syntax.modern unicode vocabs.loader ;
 IN: modern
 
 : <ws> ( obj -- obj ) ;
@@ -60,7 +60,9 @@ MACRO:: read-double-matched ( $open-ch -- quot: ( string n tag ch -- string n' s
 ! : read-double-matched-paren ( string n tag ch -- string n' seq ) char: \( read-double-matched ;
 ! : read-double-matched-brace ( string n tag ch -- string n' seq ) char: \{ read-double-matched ;
 
+DEFER: lex-factor-guard
 DEFER: lex-factor-top
+DEFER: lex-factor-nested
 DEFER: lex-factor
 ! For implementing [ { (
 : lex-until ( string n tag-sequence -- string n' payload )
@@ -82,7 +84,10 @@ DEFER: lex-factor
     ] { } make ;
 
 DEFER: section-close-form?
+DEFER: lex-factor*
+DEFER: lex-factor-top
 DEFER: lex-factor-nested
+
 : lex-colon-until ( string n tag-sequence -- string n' payload )
     '[
         [
@@ -310,15 +315,15 @@ MACRO:: read-matched ( $ch -- quot: ( string n tag -- string n' slice' ) )
     ! What ended the FOO: .. ; form?
     ! Remove the ; from the payload if present
     ! Also in stack effects ( T: int -- ) can be ended by -- and )
+    ! XXX: this part is sketchy
+    ! FOO: asdf --  FOO: asdf ]  FOO: asdf }  FOO: asdf )  FOO: asdf ASDF>  FOO: asdf BAR:
     dup ?last {
         { [ dup ";" sequence= ] [ drop unclip-last 3array <upper-colon> ] }
         { [ dup ";" tail? ] [ drop unclip-last 3array <upper-colon> ] }
-        ! XXX: this part is sketchy
-        ! FOO: asdf --  FOO: asdf ]  FOO: asdf }  FOO: asdf )  FOO: asdf ASDF>  FOO: asdf BAR:
         { [ dup "--" sequence= ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
+        { [ dup ")" sequence= ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] } ! (n*quot) breaks
         { [ dup "]" sequence= ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
         { [ dup "}" sequence= ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
-        { [ dup ")" sequence= ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] } ! (n*quot) breaks
         { [ dup section-close-form? ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
         { [ dup upper-colon-form? ] [ drop unclip-last -rot 2array <upper-colon> [ rewind-slice ] dip ] }
         [ drop 2array <upper-colon> ]
@@ -371,16 +376,10 @@ MACRO:: read-matched ( $ch -- quot: ( string n tag -- string n' slice' ) )
         [ [ slice-til-whitespace drop ] dip span-slices ]
     } cond ;
 
+! TODO: handle <, <html> here
+! read-acute-html is not even called
 : read-acute ( string n slice -- string n' acute )
     [ matching-section-delimiter 1array lex-until ] keep swap unclip-last 3array <section> ;
-
-! #{ } turned off, foo# not turned off
-: read-turnoff ( string n slice -- string n' obj )
-    dup "#" head? [
-        [ lex-factor ] dip swap [ 2array ] when* ! ``{ # foo }`` or ``#`` standalone
-    ] [
-        merge-slice-til-whitespace
-    ] if ;
 
 ! Words like append! and suffix! are allowed for now.
 : read-exclamation ( string n slice -- string n' obj )
@@ -431,7 +430,6 @@ DEFER: lex-factor-top*
 
 : lex-factor-fallthrough ( string n/f slice/f ch/f -- string n'/f literal )
     {
-        { char: \# [ read-turnoff ] } ! char: \#
         { char: \\ [ read-backslash ] }
         { char: \[ [ read-bracket ] }
         { char: \{ [ read-brace ] }
@@ -453,16 +451,27 @@ DEFER: lex-factor-top*
         [ drop ]
     } case ;
 
+! Handle nested-turned-off, not that important yet
+: handle-turnoff ( obj -- obj' )
+    dup lexed? [
+        dup first "#" head? [ <turned-off> ] when
+    ] when ;
+
 ! Inside a FOO: or a <FOO FOO>
-: lex-factor-nested* ( string n/f slice/f ch/f -- string n'/f literal )
+! Guard against ``A:`` containing the ``B:`` form in ``A: a B: b``
+! if the nested? flag is true
+: lex-factor-guard ( string n/f nested? slice/f ch/f -- string n'/f literal )
     {
         ! Nested ``A: a B: b`` so rewind and let the parser get it top-level
         { char: \: [
             ! true?  A: B: then interrupt the current parser
             ! false?  A: b: then keep going
-            merge-slice-til-whitespace
-            dup { [ upper-colon-form? ] [ ":" = ] } 1||
-            ! dup upper-colon?
+            swap [
+                merge-slice-til-whitespace
+                dup { [ upper-colon-form? ] [ ":" = ] } 1||
+            ] dip
+
+            and
             [ rewind-slice f ]
             [ read-colon ] if
         ] }
@@ -475,45 +484,29 @@ DEFER: lex-factor-top*
             ! if we are in a FOO: and we hit a <BAR or <BAR:
             ! then end the FOO:
             ! Don't rewind for a <foo/> or <foo></foo>
-            [ slice-til-whitespace drop ] dip span-slices
-            dup section-open? [ rewind-slice f ] when
+            swap [
+                [ slice-til-whitespace drop ] dip span-slices
+            ] dip
+            ! Handle <html> here with ``cond`` form
+            over section-open? [
+                [ rewind-slice f ] [ read-acute ] if
+            ] [
+                drop ! read-acute
+            ] if
         ] }
 
         ! Two cases: zero width slice if we found whitespace token, otherwise text token
-        { char: \s [ read-token-or-whitespace ] }
-        { char: \r [ read-token-or-whitespace ] }
-        { char: \n [ read-token-or-whitespace ] }
-        [ lex-factor-fallthrough ]
+        { char: \s [ nip read-token-or-whitespace ] }
+        { char: \r [ nip read-token-or-whitespace ] }
+        { char: \n [ nip read-token-or-whitespace ] }
+        [ nipd lex-factor-fallthrough ]
     } case ;
 
-: lex-factor-nested ( string n/f -- string n'/f literal )
-    "\"\\!#:[{(]})<>\s\r\n" slice-til-either lex-factor-nested* ; inline
-
-: lex-factor-top* ( string n/f slice/f ch/f -- string n'/f literal )
-    {
-        { char: \: [ merge-slice-til-whitespace read-colon ] }
-        { char: < [
-            ! FOO: a b <BAR: ;BAR>
-            ! FOO: a b <BAR BAR>
-            ! FOO: a b <asdf>
-            ! FOO: a b <asdf asdf>
-
-            ! if we are in a FOO: and we hit a <BAR or <BAR:
-            ! then end the FOO:
-            [ slice-til-whitespace drop ] dip span-slices
-            ! read-acute-html
-            dup section-open? [ read-acute ] when
-        ] }
-
-        ! Two cases: zero width slice if we found whitespace token, otherwise text token
-        { char: \s [ read-token-or-whitespace ] }
-        { char: \r [ read-token-or-whitespace ] }
-        { char: \n [ read-token-or-whitespace ] }
-        [ lex-factor-fallthrough ]
-    } case ;
+: lex-factor-nested ( string/f n/f -- string/f n'/f literal )
+    "\"\\!:[{(]})<>\s\r\n" slice-til-either t -rot lex-factor-guard ; inline
 
 : lex-factor-top ( string/f n/f -- string/f n'/f literal )
-    "\"\\!#:[{(]})<>\s\r\n" slice-til-either lex-factor-top* ; inline
+    "\"\\!:[{(]})<>\s\r\n" slice-til-either f -rot lex-factor-guard ; inline
 
 : check-for-compound-syntax ( seq n/f obj -- seq n/f obj )
     dup length 1 > [ compound-syntax-disallowed ] when ;
@@ -528,6 +521,7 @@ DEFER: lex-factor-top*
         ! Compound syntax loop
         [
             lex-factor-top f like
+            handle-turnoff
             dup [ blank? ] all? [ drop ] [ , ] if ! save unless blank
             ! concatenated syntax ( a )[ a 1 + ]( b )
             check-compound-loop
