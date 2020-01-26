@@ -263,3 +263,6 @@ IN: modern.tests
 { } [ "REAL[5" string>literals drop ] unit-test
 { } [ "REAL[5]" string>literals drop ] unit-test
 { } [ "REAL[5][5]" string>literals drop ] unit-test
+
+{ 1 } [ "ABC\\DEF: 1" string>literals length ] unit-test
+{ 2 } [ "ABC\\DEF: 1 2 3 B\\C: lol" string>literals length ] unit-test

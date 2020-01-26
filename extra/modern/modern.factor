@@ -84,7 +84,6 @@ DEFER: lex-factor
     ] { } make ;
 
 DEFER: section-close-form?
-DEFER: lex-factor*
 DEFER: lex-factor-top
 DEFER: lex-factor-nested
 
@@ -145,7 +144,8 @@ MACRO:: read-matched ( $ch -- quot: ( string n tag -- string n' slice' ) )
             ] } ! ( foo )
             [
                 drop [ slice-til-whitespace drop ] dip span-slices
-                dup last lex-factor-fallthrough
+                ! XXX: need to preserve ``nested?`` here instead of passing ``f`` ?
+                dup last f -rot lex-factor-fallthrough
             ] ! (foo) ${foo}stuff{ }
         } cond
     ] ;
@@ -406,19 +406,21 @@ MACRO:: read-matched ( $ch -- quot: ( string n tag -- string n' slice' ) )
         ] dip swap 2array
     ] when ;
 
-: read-backslash ( string n slice -- string n' obj )
+: read-backslash ( string n nested? slice -- string n' obj )
     ! foo\ so far, could be foo\bar{
     ! remove the \ and continue til delimiter/eof
-    [ "\"!:[{(<>\s\r\n" slice-til-either ] dip swap [ span-slices ] dip
-    over "\\" head? [
-        drop
+    swap [
+        [ "\"!:[{(<>\s\r\n" slice-til-either ] dip swap [ span-slices ] dip
+    ] dip
+    pick "\\" head? [
+        2drop
         ! \\  ! done, \ turns parsing off, \\ is complete token
         ! \ foo
         dup "\\" sequence= [ (read-backslash) ] [ merge-slice-til-whitespace ] if
     ] [
         ! foo\ or foo\bar (?)
         ! XXX: false branch was lex-factor-top* hmmm
-        over "\\" tail? [ drop (read-backslash) ] [ lex-factor-fallthrough ] if
+        pick "\\" tail? [ 2drop (read-backslash) ] [ -rot lex-factor-guard ] if
     ] if ;
 
 ! If the slice is 0 width, we stopped on whitespace before any token.
@@ -428,19 +430,20 @@ MACRO:: read-matched ( $ch -- quot: ( string n tag -- string n' slice' ) )
         merge-slice-til-not-whitespace ! <ws>
     ] when ;
 
-: lex-factor-fallthrough ( string n/f slice/f ch/f -- string n'/f literal )
+: lex-factor-fallthrough ( string n/f nested? slice/f ch/f -- string n'/f literal )
     {
         { char: \\ [ read-backslash ] }
-        { char: \[ [ read-bracket ] }
-        { char: \{ [ read-brace ] }
-        { char: \( [ read-paren ] }
-        { char: \] [ ] }
-        { char: \} [ ] }
-        { char: \) [ ] }
-        { f [ ] } ! end of stream
-        { char: \" [ read-string ] }
-        { char: \! [ read-exclamation ] }
+        { char: \[ [ nip read-bracket ] }
+        { char: \{ [ nip read-brace ] }
+        { char: \( [ nip read-paren ] }
+        { char: \] [ nip ] }
+        { char: \} [ nip ] }
+        { char: \) [ nip ] }
+        { f [ nip ] } ! end of stream
+        { char: \" [ nip read-string ] }
+        { char: \! [ nip read-exclamation ] }
         { char: > [
+            nip
             [ [ char: > = not ] f slice-until drop ] dip merge-slices
             dup section-close-form? [
                 [ slice-til-whitespace drop ] dip ?span-slices
@@ -448,7 +451,7 @@ MACRO:: read-matched ( $ch -- quot: ( string n tag -- string n' slice' ) )
         ] }
         ! foo{abc}s -- the ``s`` here is fine
         ! any character that is not special is fine here
-        [ drop ]
+        [ drop nip ]
     } case ;
 
 ! Handle nested-turned-off, not that important yet
@@ -499,7 +502,7 @@ MACRO:: read-matched ( $ch -- quot: ( string n tag -- string n' slice' ) )
         { char: \s [ nip read-token-or-whitespace ] }
         { char: \r [ nip read-token-or-whitespace ] }
         { char: \n [ nip read-token-or-whitespace ] }
-        [ nipd lex-factor-fallthrough ]
+        [ lex-factor-fallthrough ]
     } case ;
 
 : lex-factor-nested ( string/f n/f -- string/f n'/f literal )
