@@ -367,7 +367,7 @@ PRIVATE>
             gadget [
                 gadget preedit? not [
                     window event send: action utf8 alien>string validate-action
-                    [ >c-bool ] [ drop self event super: validateUserInterfaceItem: ] if
+                    [ >c-bool ] [ drop self event super: \validateUserInterfaceItem: ] if
                 ] [ 0 ] if
             ] [ 0 ] if
         ] [ 0 ] if
