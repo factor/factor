@@ -971,7 +971,7 @@ FUNCTION: ulong ffi_test_66 ( ulong a, ulong b, ulong c, test_struct_66 d, test_
 FUNCTION: ulong ffi_test_67 ( ulong a, ulong b, ulong c, test_struct_66 d, test_struct_66 e ulong _f )
 FUNCTION: ulong ffi_test_68 ( ulong a, ulong b, ulong c, test_struct_66 d, test_struct_68 e test_struct_66 _f )
 FUNCTION: ulong ffi_test_69 ( ulong a, ulong b, ulong c, test_struct_66 d, test_struct_69 e test_struct_66 _f )
-FUNCTION: ulong ffi_test_70 ( test_struct_68 a test_struct_68 b, test_struct_66 c )  
+FUNCTION: ulong ffi_test_70 ( test_struct_68 a test_struct_68 b, test_struct_66 c )
 
 { 28 } [ 1 2 3 S{ test_struct_66 f 4 5 } S{ test_struct_66 f 6 7 } ffi_test_66 ] unit-test
 
@@ -1000,7 +1000,7 @@ FUNCTION: ulong ffi_test_70 ( test_struct_68 a test_struct_68 b, test_struct_66 
         a b + c +
         d [ mem1>> + ] [ mem2>> + ] bi
         e [ mem1>> + ] [ mem2>> + ] bi
-        _f 2 * + 
+        _f 2 * +
     ] alien-callback ;
 
 : callback-15-test ( a b c d e _f callback -- result )
@@ -1063,7 +1063,7 @@ FUNCTION: ulong ffi_test_70 ( test_struct_68 a test_struct_68 b, test_struct_66 
 : callback-18 ( -- callback )
     ulong { test_struct_68 test_struct_68 test_struct_66 } cdecl
     [| a b c |
-        a [ mem1>> ] [ mem2>> + ] [ mem3>> + ] tri     
+        a [ mem1>> ] [ mem2>> + ] [ mem3>> + ] tri
         b [ mem1>> + ] [ mem2>> + ] [ mem3>> + ] tri
         c [ mem1>> + ] [ mem2>> + ] bi
     ] alien-callback ;

@@ -15,7 +15,7 @@ SYMBOLS: int-reg-reps float-reg-reps ;
 : reg-reps ( reps -- int-reps float-reps )
     [ second ] reject [ [ first int-rep? ] count ] [ length over - ] bi ;
 
-: record-reg-reps ( reps -- reps )            
+: record-reg-reps ( reps -- reps )
     dup reg-reps [ int-reg-reps +@ ] [ float-reg-reps +@ ] bi* ;
 
 : unrecord-reg-reps ( reps -- reps )
