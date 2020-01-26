@@ -266,3 +266,19 @@ IN: modern.tests
 
 { 1 } [ "ABC\\DEF: 1" string>literals length ] unit-test
 { 2 } [ "ABC\\DEF: 1 2 3 B\\C: lol" string>literals length ] unit-test
+
+{ } [
+    "{ B: 1 } D: 3" string>literals drop
+] unit-test
+
+{ } [
+    "{ B: 1 -- C: 2 } D: 3" string>literals drop
+] unit-test
+
+{ } [
+    "[ B: 1 -- C: 2 ] D: 3" string>literals drop
+] unit-test
+
+{ } [
+    "( B: 1 -- C: 2 ) D: 3" string>literals drop
+] unit-test

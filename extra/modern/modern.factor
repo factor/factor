@@ -3,8 +3,9 @@
 USING: accessors arrays assocs combinators
 combinators.short-circuit continuations io.encodings.utf8
 io.files kernel make math math.order math.parser modern.compiler
-modern.paths modern.slices sequences sequences.extras sets
-splitting strings syntax.modern unicode vocabs.loader ;
+modern.paths modern.slices sequences sequences.extras
+sequences.generalizations sets splitting strings syntax.modern
+unicode vocabs.loader ;
 IN: modern
 
 : <ws> ( obj -- obj ) ;
@@ -310,7 +311,7 @@ MACRO:: read-matched ( $ch -- quot: ( string n tag -- string n' slice' ) )
     } 1&& ;
 
 : read-til-semicolon ( string n slice -- string n' semi )
-    [ but-last ";" append ";" "--" ")" 4array lex-colon-until ] keep
+    [ but-last ";" append ";" "--" ")" "]" "}" 6 narray lex-colon-until ] keep
     swap
     ! What ended the FOO: .. ; form?
     ! Remove the ; from the payload if present
