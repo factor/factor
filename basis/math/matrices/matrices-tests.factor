@@ -33,7 +33,7 @@ PRIVATE>
     { { { } } }
     { { } { } { } }
     { { { } } { { { } } } }
-} [ null-matrix? ] map [ ] all?
+} [ null-matrix? ] all?
 ] unit-test
 
 { f } [ {
@@ -41,7 +41,7 @@ PRIVATE>
     { { 1 2 } }
     { { 1 } { 2 } }
     { { { 1 } } { 2 } { } }
-} [ null-matrix? ] map [ ] any?
+} [ null-matrix? ] any?
 ] unit-test
 
 { t } [ 10 dup <zero-matrix> zero-matrix? ] unit-test
@@ -345,7 +345,7 @@ PRIVATE>
     { { { } } }
     { { } { } { } }
     { { { } } { { { } } } }
-} [ null-matrix? ] map [ ] all?
+} [ null-matrix? ] all?
 ] unit-test
 
 { f } [ {
@@ -353,7 +353,7 @@ PRIVATE>
     { { 1 2 } }
     { { 1 } { 2 } }
     { { { 1 } } { 2 } { } }
-} [ null-matrix? ] map [ ] any?
+} [ null-matrix? ] any?
 ] unit-test
 
 { t } [ 10 dup <zero-matrix> zero-matrix? ] unit-test
