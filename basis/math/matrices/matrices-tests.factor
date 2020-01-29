@@ -675,7 +675,7 @@ PRIVATE>
     { 0 1 2 }
     { 3 4 5 }
     { 6 7 8 }
-} matrix-except-all dup flatten sorted-histogram [ second ] map
+} matrix-except-all dup flatten sorted-histogram values
     { [ length 9 = ] [ [ 4 = ] all? ] }
     1&&
 ] unit-test
@@ -690,7 +690,7 @@ PRIVATE>
     { 4 5 6 7 }
     { 8 9 10 11 }
     { 12 13 14 15 }
-} matrix-except-all flatten sorted-histogram [ second ] map
+} matrix-except-all flatten sorted-histogram values
     { [ length 16 = ] [ [ 9 = ] all? ] }
     1&&
 ] unit-test
