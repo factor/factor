@@ -1,4 +1,9 @@
-USING: bittorrent io.sockets tools.test ;
+USING: bittorrent sequences io.sockets tools.test ;
+
+
+{ { t f t t f t f t } } [
+    8 <iota> [ B{ 0b10110101 } check-bitfield ] map
+] unit-test
 
 {
     {
