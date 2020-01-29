@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2010, 2018 Slava Pestov, Joe Groff, and Cat Stevens.
-USING: arrays combinators.short-circuit grouping kernel math math.matrices math.matrices.private
-math.statistics math.vectors sequences sequences.deep sets tools.test ;
+USING: arrays assocs combinators.short-circuit grouping kernel
+math math.statistics sequences sequences.deep tools.test ;
 IN: math.matrices
 
 <PRIVATE
