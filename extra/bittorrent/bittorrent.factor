@@ -40,7 +40,7 @@ torrent-port [ 6881 ] initialize
     '[ _ _ [ set-bit ] [ clear-bit ] if ] change-nth ;
 
 : check-bitfield ( n bitfield -- ? )
-    [ bitfield-index swap ] dip nth bit? ;
+    [ bitfield-index swap ] dip nth swap bit? ;
 
 
 ! http
