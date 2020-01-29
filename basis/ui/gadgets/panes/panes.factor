@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes combinators destructors
-documents.private fonts fry io io.styles kernel locals
+documents.private fonts fry io io.styles kernel locals math
 math.rectangles math.vectors memoize models namespaces sequences
 sorting splitting strings ui.baseline-alignment ui.clipboards
 ui.gadgets ui.gadgets.borders ui.gadgets.grid-lines
@@ -10,7 +10,7 @@ ui.gadgets.labels ui.gadgets.menus ui.gadgets.packs
 ui.gadgets.paragraphs ui.gadgets.presentations
 ui.gadgets.private ui.gadgets.scrollers ui.gadgets.tracks
 ui.gestures ui.images ui.pens.solid ui.render ui.theme
-ui.traverse ;
+ui.traverse unicode ;
 FROM: io.styles => foreground background ;
 FROM: ui.gadgets.wrappers => <wrapper> ;
 IN: ui.gadgets.panes
@@ -117,11 +117,18 @@ M: pane-stream stream-nl
 M: pane-stream stream-write1
     [ current>> stream-write1 ] do-pane-stream ;
 
+: split-pane ( str quot: ( str -- ) -- )
+    '[
+        dup length 3639 >
+        [ 3639 over last-grapheme-from cut-slice ] [ f ] if
+        swap "" like split-lines @ dup
+    ] loop drop ; inline
+
 M: pane-stream stream-write
-    [ [ split-lines ] dip pane-write ] do-pane-stream ;
+    [ '[ _ pane-write ] split-pane ] do-pane-stream ;
 
 M: pane-stream stream-format
-    [ [ split-lines ] 2dip pane-format ] do-pane-stream ;
+    [ '[ _ _ pane-format ] split-pane ] do-pane-stream ;
 
 M: pane-stream dispose drop ;
 
