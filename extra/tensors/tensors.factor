@@ -1,11 +1,9 @@
 ! Copyright (C) 2019 HMC Clinic.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors alien.c-types alien.data arrays
-concurrency.combinators grouping kernel locals math.functions
-math.ranges math.statistics math multi-methods quotations sequences
-sequences.extras sequences.private specialized-arrays
-tensors.tensor-slice typed ;
+USING: accessors alien.data arrays grouping kernel locals math
+math.functions math.ranges multi-methods sequences
+sequences.extras sequences.private specialized-arrays typed ;
 
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
@@ -113,20 +111,20 @@ METHOD: t- { number tensor } [ >float ] dip [ - ] with t-uop ;
 ! Multiply a tensor with either another tensor or a scalar
 multi-methods:GENERIC: t* ( x y -- tensor )
 METHOD: t* { tensor tensor } [ * ] t-bop ;
-METHOD: t* { tensor number } [ * ] curry t-uop ;
+METHOD: t* { tensor number } >float [ * ] curry t-uop ;
 METHOD: t* { number tensor } [ >float ] dip [ * ] with t-uop ;
 
 ! Divide two tensors or a tensor and a scalar
 multi-methods:GENERIC: t/ ( x y -- tensor )
 METHOD: t/ { tensor tensor } [ / ] t-bop ;
-METHOD: t/ { tensor number } [ / ] curry t-uop ;
-METHOD: t/ { number tensor } [ / ] with t-uop ;
+METHOD: t/ { tensor number } >float [ / ] curry t-uop ;
+METHOD: t/ { number tensor } [ >float ] dip [ / ] with t-uop ;
 
 ! Divide two tensors or a tensor and a scalar
 multi-methods:GENERIC: t% ( x y -- tensor )
 METHOD: t% { tensor tensor } [ mod ] t-bop ;
-METHOD: t% { tensor number } [ mod ] curry t-uop ;
-METHOD: t% { number tensor } [ mod ] with t-uop ;
+METHOD: t% { tensor number } >float [ mod ] curry t-uop ;
+METHOD: t% { number tensor } [ >float ] dip [ mod ] with t-uop ;
 
 <PRIVATE
 
@@ -152,9 +150,9 @@ METHOD: t% { number tensor } [ mod ] with t-uop ;
 ! Perform matrix multiplication muliplying an
 ! mxn matrix with a nxp matrix
 TYPED:: 2d-matmul ( vec1: float-array start1: fixnum
-                      vec2: float-array start2: fixnum
-                      res: float-array start3: fixnum
-                      m: fixnum n: fixnum p: fixnum -- )
+                    vec2: float-array start2: fixnum
+                    res: float-array start3: fixnum
+                    m: fixnum n: fixnum p: fixnum -- )
     ! For each element in the range, we want to compute the dot product of the
     ! corresponding row and column
     m [ :> i
@@ -212,7 +210,8 @@ TYPED:: matmul ( tensor1: tensor tensor2: tensor -- tensor3: tensor )
 : ind-mults ( shape -- seq )
     <reversed> 1 swap [ swap [ * ] keep ] map nip ;
 
-! helper for transpose: given shape, flat index, & mults for the shape, gives nd index
+! helper for transpose: given shape, flat index, & mults for
+! the shape, gives nd index
 : transpose-index ( i shape -- seq )
     <reversed> [ /mod ] map reverse nip ;
 PRIVATE>
