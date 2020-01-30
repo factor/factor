@@ -67,11 +67,21 @@ M: incorrect-type type>c-type drop void* ;
 
 GENERIC: parse-const-value ( str data-type -- value )
 
+: number-type? ( name -- ? )
+    {
+        [ "gint" head? ]
+        [ "guint" head? ]
+        [ "gchar" = ]
+        [ "guchar" = ]
+        [ "gdouble" = ]
+        [ "gfloat" = ]
+    } 1|| ;
+
 M: atomic-type parse-const-value
     name>> {
-        { "gint" [ string>number ] }
-        { "gdouble" [ string>number ] }
-    } case ;
+        { [ dup number-type? ] [ drop string>number ] }
+        { [ dup "gboolean" = ] [ drop "true" = ] }
+    } cond ;
 
 M: utf8-type parse-const-value drop ;
 
