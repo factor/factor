@@ -52,20 +52,24 @@ PLAF_DLL_OBJS = vm\os-windows-x86.64.obj vm\cpu-x86.obj
 SUBSYSTEM_COM_FLAGS = console,"5.02"
 SUBSYSTEM_EXE_FLAGS = windows,"5.02"
 
-
 !ELSEIF "$(PLATFORM)" == "x86-64-vista"
 CL_FLAGS = $(CL_FLAGS) $(CL_FLAGS_VISTA)
 PLAF_DLL_OBJS = vm\os-windows-x86.64.obj vm\cpu-x86.obj
 SUBSYSTEM_COM_FLAGS = console
 SUBSYSTEM_EXE_FLAGS = windows
 
-!ELSE
+!ELSEIF "$(PLATFORM)" == "arm-64"
 CL_FLAGS = $(CL_FLAGS) $(CL_FLAGS_VISTA)
-PLAF_DLL_OBJS = vm\os-windows-x86.64.obj vm\cpu-x86.obj
+#PLAT_DLL_OBJS =
 SUBSYSTEM_COM_FLAGS = console
 SUBSYSTEM_EXE_FLAGS = windows
 
+!ELSE
+@echo Unhandled platform: "$(PLATFORM)"
+@exit 1
+
 !ENDIF
+
 
 !IF DEFINED(DEBUG)
 LINK_FLAGS = $(LINK_FLAGS) /DEBUG
@@ -171,6 +175,7 @@ default:
 	@echo x86-64
 	@echo x86-32-vista
 	@echo x86-64-vista
+	@echo arm-64
 	@exit 1
 
 x86-32:
@@ -184,6 +189,9 @@ x86-32-vista:
 
 x86-64-vista:
 	nmake /nologo PLATFORM=x86-64-vista /f Nmakefile all
+
+arm-64:
+	nmake /nologo PLATFORM=arm-64 /f Nmakefile all
 
 clean:
 	del vm\*.obj
@@ -200,6 +208,6 @@ clean:
 	if exist libfactor-ffi-test.exp del libfactor-ffi-test.exp
 	if exist libfactor-ffi-test.lib del libfactor-ffi-test.lib
 
-.PHONY: all default x86-32 x86-64 x86-32-vista x86-64-vista clean factor.exe.manifest
+.PHONY: all default x86-32 x86-64 x86-32-vista x86-64-vista arm-64 clean factor.exe.manifest
 
 .SUFFIXES: .rs
