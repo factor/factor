@@ -28,15 +28,15 @@
   #else
     #include "os-genunix.hpp"
     #if defined(__FreeBSD__)
-	#define FACTOR_OS_STRING "freebsd"
-	#include "os-freebsd.hpp"
-        #if defined(FACTOR_X86)
-	    #include "os-freebsd-x86.32.hpp"
-        #elif defined(FACTOR_AMD64)
-	    #include "os-freebsd-x86.64.hpp"
-        #else
-            #error "Unsupported FreeBSD flavor"
-        #endif
+      #define FACTOR_OS_STRING "freebsd"
+      #include "os-freebsd.hpp"
+      #if defined(FACTOR_X86)
+        #include "os-freebsd-x86.32.hpp"
+      #elif defined(FACTOR_AMD64)
+        #include "os-freebsd-x86.64.hpp"
+      #else
+        #error "Unsupported FreeBSD flavor"
+      #endif
     #elif defined(__linux__)
       #define FACTOR_OS_STRING "linux"
       #include "os-linux.hpp"
