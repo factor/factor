@@ -157,25 +157,18 @@ TYPED:: 2d-matmul ( vec1: float-array start1: fixnum
                       m: fixnum n: fixnum p: fixnum -- )
     ! For each element in the range, we want to compute the dot product of the
     ! corresponding row and column
-    ! m p * 1array naturals vec>> :> res
-    0 [ :> i
-        0 [ :> j
-            0 ! This is the sum
-            0 [ :> k
+    m [ :> i
+        p [ :> j
+            0.0 ! This is the sum
+            n [ :> k
                 ! Add to the sum
-                i n * k + start1 + vec1 nth
-                k p * j + start2 + vec2 nth
+                i n * k + start1 + vec1 nth-unsafe
+                k p * j + start2 + vec2 nth-unsafe
                 * +
-                ! Loop variable increment and drop
-                k 1 + dup n = not
-            ] loop drop
-            i p * j + start3 + res set-nth
-            ! Loop variable increment and drop
-            j 1 + dup p = not
-        ] loop drop
-        ! Loop variable increment and drop
-        i 1 + dup m = not
-    ] loop drop ;
+            ] each-integer
+            i p * j + start3 + res set-nth-unsafe
+        ] each-integer
+    ] each-integer ;
 
 PRIVATE>
 
@@ -190,26 +183,28 @@ TYPED:: matmul ( tensor1: tensor tensor2: tensor -- tensor3: tensor )
     tensor1 shape>> unclip-last-slice :> n
     unclip-last-slice :> m :> top-shape
     tensor2 shape>> last :> p
-    top-shape product :> rest
+    top-shape product :> top-prod
 
-    ! Now create the new tensor with { 0 ... m*p-1 } repeating
-    top-shape { m p } append naturals m p * t% :> tensor3
+    ! Create the shape of the resulting tensor
+    top-shape { m p } append
+
+    ! Now create the new float array to store the underlying result
+    dup product c:float (c-array) :> vec3
 
     ! Now update the tensor3 to contain the multiplied matricies
-    rest [0,b)
-    [
+    top-prod [
         :> i
-        ! First make vec1 and start1
+        ! Compute vec1 and start1
         tensor1 vec>> m n * i *
-        ! Now make vec2 and start2
+        ! Compute vec2 and start2
         tensor2 vec>> n p * i *
-        ! Now make the resulting vector
-        tensor3 vec>> m p * i *
+        ! Compute the result
+        vec3 m p * i *
         ! Push m, n, and p and multiply the arrays
         m n p 2d-matmul
-        0
-    ] map drop
-    tensor3 ;
+    ] each-integer
+    vec3 <tensor> ;
+
 
 
 <PRIVATE
@@ -223,11 +218,12 @@ TYPED:: matmul ( tensor1: tensor tensor2: tensor -- tensor3: tensor )
     <reversed> [ /mod ] map reverse nip ;
 PRIVATE>
 
-! Transpose an n-dimensional tensor
+! Transpose an n-dimensional tensor by flipping the axes
 TYPED:: transpose ( tensor: tensor -- tensor': tensor )
     tensor shape>> :> old-shape
     tensor vec>> :> vec
     old-shape reverse :> new-shape
+    ! check that the size is fine
     new-shape product vec length assert=
     old-shape ind-mults reverse :> mults
     ! loop through new tensor
@@ -235,5 +231,5 @@ TYPED:: transpose ( tensor: tensor -- tensor': tensor )
         ! find index in original tensor
         old-shape mults [ [ /mod ] dip * ] 2map-sum nip
         ! get that index in original tensor
-        vec nth
+        vec nth-unsafe
     ] float-array{ } map-as <tensor> ;

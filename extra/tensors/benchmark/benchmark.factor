@@ -15,13 +15,22 @@ IN: tensors.benchmark
     nip nip ;
 
 :: matmul-tensors ( trials elems -- time )
-    ! Create the arrays to be added
+    ! Create the arrays to be multiplied
     elems elems 2array naturals dup
     ! Benchmark!
     [ trials [ 2dup matmul drop ] times ] benchmark
     ! Normalize
     trials / >float
     nip nip ;
+
+:: transpose-tensor ( trials elems -- time )
+    ! Create the array to be transposed
+    elems elems 2array naturals
+    ! benchmark
+    [ trials [ dup transpose drop ] times ] benchmark
+    ! Normalize
+    trials / >float
+    nip ;
 
 PRIVATE>
 
@@ -32,7 +41,10 @@ PRIVATE>
     "Add two 100,000 element tensors" print
     10000 100000 add-tensors .
     "Multiply two 10x10 matrices" print
-    10000 10 matmul-tensors .
+    100000 10 matmul-tensors .
     "Multiply two 100x100 matrices" print
-    10 100 matmul-tensors . ;
-
+    1000 100 matmul-tensors .
+    "Transpose a 10x10 matrix" print
+    10000 10 transpose-tensor .
+    "Transpose a 100x100 matrix" print
+    10 100 transpose-tensor . ;
