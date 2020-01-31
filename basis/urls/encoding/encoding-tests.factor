@@ -17,6 +17,9 @@ accessors linked-assocs ;
 { ":foo" } [ ":foo" url-encode ] unit-test
 { "%3Afoo" } [ ":foo" url-encode-full ] unit-test
 
+{ "%01%02%03ABC" } [ B{ 1 2 3 65 66 67 } url-encode ] unit-test
+{ "%01%02%03ABC" } [ B{ 1 2 3 65 66 67 } url-encode-full ] unit-test
+
 { "hello world" } [ "hello+world" query-decode ] unit-test
 
 { "\u001234hi\u002045" } [ "\u001234hi\u002045" url-encode url-decode ] unit-test

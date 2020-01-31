@@ -284,6 +284,9 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 : while ( ..a pred: ( ..a -- ..b ? ) body: ( ..b -- ..a ) -- ..b )
     swap do compose [ loop ] curry when ; inline
 
+: while* ( ..a pred: ( ..a -- ..b ? ) body: ( ..b ? -- ..a ) -- ..b )
+    [ [ dup ] compose ] dip while drop ; inline
+
 : until ( ..a pred: ( ..a -- ..b ? ) body: ( ..b -- ..a ) -- ..b )
     [ [ not ] compose ] dip while ; inline
 

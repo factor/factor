@@ -140,3 +140,6 @@ GENERIC: generic-predicate? ( a -- b )
 } [
     f { fixnum } { } f  make-class-props
 ] unit-test
+
+{ "test" } [ "test" sequence check-instance ] unit-test
+[ "test" fixnum check-instance ] [ not-an-instance? ] must-fail-with

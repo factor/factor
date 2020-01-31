@@ -28,7 +28,7 @@ PRIVATE>
 
 : html-escape ( str -- newstr )
     [
-        [ dup next-escape dup ] [ escape, ] while 2drop ,
+        [ dup next-escape ] [ escape, ] while* drop ,
     ] { } make dup length 1 > [ concat ] [ first ] if ;
 
 <PRIVATE

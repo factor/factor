@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2010, 2018 Slava Pestov, Joe Groff, and Cat Stevens.
-USING: arrays combinators.short-circuit grouping kernel math math.matrices math.matrices.private
-math.statistics math.vectors sequences sequences.deep sets tools.test ;
+USING: arrays assocs combinators.short-circuit grouping kernel
+math math.statistics sequences sequences.deep tools.test ;
 IN: math.matrices
 
 <PRIVATE
@@ -33,7 +33,7 @@ PRIVATE>
     { { { } } }
     { { } { } { } }
     { { { } } { { { } } } }
-} [ null-matrix? ] map [ ] all?
+} [ null-matrix? ] all?
 ] unit-test
 
 { f } [ {
@@ -41,7 +41,7 @@ PRIVATE>
     { { 1 2 } }
     { { 1 } { 2 } }
     { { { 1 } } { 2 } { } }
-} [ null-matrix? ] map [ ] any?
+} [ null-matrix? ] any?
 ] unit-test
 
 { t } [ 10 dup <zero-matrix> zero-matrix? ] unit-test
@@ -345,7 +345,7 @@ PRIVATE>
     { { { } } }
     { { } { } { } }
     { { { } } { { { } } } }
-} [ null-matrix? ] map [ ] all?
+} [ null-matrix? ] all?
 ] unit-test
 
 { f } [ {
@@ -353,7 +353,7 @@ PRIVATE>
     { { 1 2 } }
     { { 1 } { 2 } }
     { { { 1 } } { 2 } { } }
-} [ null-matrix? ] map [ ] any?
+} [ null-matrix? ] any?
 ] unit-test
 
 { t } [ 10 dup <zero-matrix> zero-matrix? ] unit-test
@@ -675,7 +675,7 @@ PRIVATE>
     { 0 1 2 }
     { 3 4 5 }
     { 6 7 8 }
-} matrix-except-all dup flatten sorted-histogram [ second ] map
+} matrix-except-all dup flatten sorted-histogram values
     { [ length 9 = ] [ [ 4 = ] all? ] }
     1&&
 ] unit-test
@@ -690,7 +690,7 @@ PRIVATE>
     { 4 5 6 7 }
     { 8 9 10 11 }
     { 12 13 14 15 }
-} matrix-except-all flatten sorted-histogram [ second ] map
+} matrix-except-all flatten sorted-histogram values
     { [ length 16 = ] [ [ 9 = ] all? ] }
     1&&
 ] unit-test

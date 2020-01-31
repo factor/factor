@@ -126,7 +126,7 @@ DEFER: (read-json-string)
     } case ;
 
 : json-read-input ( stream -- objects )
-    V{ } clone over '[ _ stream-read1 dup ] [ scan ] while drop nip ;
+    V{ } clone over '[ _ stream-read1 ] [ scan ] while* nip ;
 
 ! If there are no json objects, return an empty hashtable
 ! This happens for empty files.

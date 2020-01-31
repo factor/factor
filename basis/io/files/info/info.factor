@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel system sequences combinators
-vocabs vocabs.loader io.files io.files.types math ;
+USING: accessors assocs combinators io.files io.files.types
+io.pathnames kernel math system vocabs ;
 IN: io.files.info
 
 ! File info
@@ -33,6 +33,22 @@ HOOK: file-system-info os ( path -- file-system-info )
 HOOK: file-readable? os ( path -- ? )
 HOOK: file-writable? os ( path -- ? )
 HOOK: file-executable? os ( path -- ? )
+
+HOOK: mount-points os ( -- assoc )
+
+M: object mount-points
+    file-systems [ [ mount-point>> ] keep ] H{ } map>assoc ;
+
+: (find-mount-point) ( path assoc -- object )
+    [ resolve-symlinks canonicalize-path-full ] dip
+    2dup at* [
+        2nip
+    ] [
+        drop [ parent-directory ] dip (find-mount-point)
+    ] if ;
+
+: find-mount-point ( path -- object )
+    mount-points (find-mount-point) ;
 
 {
     { [ os unix? ] [ "io.files.info.unix" ] }

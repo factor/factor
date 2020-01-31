@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data alien.syntax
+USING: accessors alien.c-types alien.data alien.syntax classes
 classes.struct combinators destructors destructors.private fry
 io.backend io.backend.unix.multiplexers io.buffers io.files
 io.ports io.timeouts kernel kernel.private libc locals make math
@@ -83,13 +83,8 @@ M: unix wait-for-fd ( handle event -- )
 
 ! Some general stuff
 
-ERROR: not-a-buffered-port port ;
-
-: check-buffered-port ( port -- port )
-    dup buffered-port? [ not-a-buffered-port ] unless ; inline
-
 M: fd refill
-    [ check-buffered-port buffer>> ] [ fd>> ] bi*
+    [ buffered-port check-instance buffer>> ] [ fd>> ] bi*
     over [ buffer-end ] [ buffer-capacity ] bi read
     { fixnum } declare dup 0 >= [
         swap buffer+ f
@@ -108,7 +103,7 @@ M: unix (wait-to-read) ( port -- )
 
 ! Writers
 M: fd drain
-    [ check-buffered-port buffer>> ] [ fd>> ] bi*
+    [ buffered-port check-instance buffer>> ] [ fd>> ] bi*
     over [ buffer@ ] [ buffer-length ] bi write
     { fixnum } declare dup 0 >= [
         over buffer-consume

@@ -1,5 +1,5 @@
 USING: tuple-arrays sequences tools.test namespaces kernel
-math accessors classes.tuple eval classes.struct ;
+math accessors classes classes.tuple eval classes.struct ;
 IN: tuple-arrays.tests
 
 SYMBOL: mat
@@ -33,7 +33,7 @@ TUPLE-ARRAY: broken
 
 ! Can't define a tuple array for a non-tuple class
 [ "IN: tuple-arrays.tests USING: tuple-arrays words ; TUPLE-ARRAY: word" eval( -- ) ]
-[ error>> not-a-tuple? ]
+[ error>> not-an-instance? ]
 must-fail-with
 
 ! Can't define a tuple array for a non-final class
