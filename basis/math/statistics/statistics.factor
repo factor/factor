@@ -201,6 +201,15 @@ PRIVATE>
 : quartile ( seq -- seq' )
     { 1/4 1/2 3/4 } quantile5 ;
 
+: interquartile ( seq -- q1 q3 )
+    quartile [ first ] [ last ] bi ;
+
+: interquartile-range ( seq -- n )
+    interquartile - ;
+
+: midhinge ( seq -- n )
+    interquartile + 2 / ;
+
 : trimean ( seq -- x )
     quartile first3 [ 2 * ] dip + + 4 / ;
 
@@ -230,6 +239,9 @@ PRIVATE>
 
 : range ( seq -- x )
     minmax swap - ;
+
+: fivenum ( seq -- seq' )
+    [ quartile ] [ minmax ] bi [ prefix ] [ suffix ] bi* ;
 
 : var-ddof ( seq n -- x )
     2dup [ length ] dip - 0 <= [
