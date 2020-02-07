@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 HMC Clinic.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays arrays.shaped io kernel locals math math.matrices math.ranges
-prettyprint tensors tools.time ;
+memory prettyprint sequences tensors tools.time ;
 IN: tensors.benchmark
 
 <PRIVATE
@@ -74,7 +74,7 @@ IN: tensors.benchmark
 
 PRIVATE>
 
-: run-benchmarks ( -- )
+: run-tensor-benchmarks ( -- )
     "Benchmarking the tensors vocabulary" print
     "Add two 100 element tensors" print
     1000000 100 add-tensors .
@@ -87,12 +87,10 @@ PRIVATE>
     "Transpose a 10x10 tensor" print
     10000 10 transpose-tensor .
     "Transpose a 100x100 tensor" print
-    10 100 transpose-tensor . 
-    "Benchmarking the arrays.shaped vocabulary" print
-    "Add two 100 element shaped arrays" print
-    1000000 100 add-shaped-array .
-    "Add two 100,000 element shaped arrays" print
-    10000 100000 add-shaped-array .
+    10 100 transpose-tensor .
+    ;
+
+: run-matrix-benchmarks ( -- )
     "Benchmarking the math.matrices vocabulary" print
     "Add two 10x10 matrices" print
     1000000 10 add-matrices .
@@ -105,5 +103,79 @@ PRIVATE>
     "Transpose a 10x10 matrix" print
     10000 10 transpose-matrix .
     "Transpose a 100x100 matrix" print
-    10 100 transpose-matrix . 
+    10 100 transpose-matrix .
     ;
+
+
+:: test-steady-state-add-ts ( -- arr )
+    ! Create the arrays to be multiplied
+    100000 :> elems
+    30 :> trials
+    trials 0 <array> :> arr
+    elems 1array naturals dup
+    ! Benchmark!
+    trials [ [ gc [  2dup t+ drop ] benchmark ] dip arr set-nth ] each-integer
+    ! Normalize
+    drop drop
+    arr ;
+
+:: test-steady-state-matmul-ts ( -- arr )
+    ! Create the arrays to be multiplied
+    100 :> elems
+    30 :> trials
+    trials 0 <array> :> arr
+    elems elems 2array naturals dup
+    ! Benchmark!
+    trials [ [ gc [  2dup matmul drop ] benchmark ] dip arr set-nth ] each-integer
+    ! Normalize
+    drop drop
+    arr ;
+
+:: test-steady-state-transpose-ts ( -- arr )
+    ! Create the arrays to be multiplied
+    100 :> elems
+    30 :> trials
+    trials 0 <array> :> arr
+    elems elems 2array naturals
+    ! Benchmark!
+    trials [ [ gc [  dup tensors:transpose drop ] benchmark ] dip arr set-nth ] each-integer
+    ! Normalize
+    drop
+    arr ;
+
+
+:: test-steady-state-add-mat ( -- arr )
+    ! Create the arrays to be multiplied
+    316 :> elems
+    30 :> trials
+    trials 0 <array> :> arr
+    0 elems 1 - 1 <range> <square-rows> 0 elems elems * elems - elems <range> <square-cols> m+ dup
+    ! Benchmark!
+    trials [ [ gc [  2dup m+ drop ] benchmark ] dip arr set-nth ] each-integer
+    ! Normalize
+    drop drop
+    arr ;
+
+:: test-steady-state-matmul-mat ( -- arr )
+    ! Create the arrays to be multiplied
+    100 :> elems
+    30 :> trials
+    trials 0 <array> :> arr
+    0 elems 1 - 1 <range> <square-rows> 0 elems elems * elems - elems <range> <square-cols> m+ dup
+    ! Benchmark!
+    trials [ [ gc [  2dup m. drop ] benchmark ] dip arr set-nth ] each-integer
+    ! Normalize
+    drop drop
+    arr ;
+
+:: test-steady-state-transpose-mat ( -- arr )
+    ! Create the arrays to be multiplied
+    100 :> elems
+    30 :> trials
+    trials 0 <array> :> arr
+    0 elems 1 - 1 <range> <square-rows> 0 elems elems * elems - elems <range> <square-cols> m+
+    ! Benchmark!
+    trials [ [ gc [  dup math.matrices:transpose drop ] benchmark ] dip arr set-nth ] each-integer
+    ! Normalize
+    drop
+    arr ;
