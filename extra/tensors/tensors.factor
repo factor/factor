@@ -54,6 +54,20 @@ PRIVATE>
 : naturals ( shape -- tensor )
     check-shape [ ] [ product [0,b) >float-array ] bi <tensor> ;
 
+! ! Virtual sequence protocol implementation
+! syntax:M: tensor length vec>> length ;
+! syntax:M: tensor virtual@ vec>> ;
+! syntax:M: tensor virtual-exemplar vec>> ;
+
+! INSTANCE: tensor virtual-sequence
+
+! Sequence protocol implementation
+syntax:M: tensor length vec>> length ;
+syntax:M: tensor nth-unsafe vec>> nth-unsafe ;
+syntax:M: tensor set-nth-unsafe vec>> set-nth-unsafe ;
+
+INSTANCE: tensor sequence
+
 <PRIVATE
 
 : check-reshape ( shape1 shape2 -- shape1 shape2 )
