@@ -18,7 +18,7 @@ M: vocab-prefix vocab-name name>> ;
     { [ directory? ] [ name>> "." head? not ] } 1&& ;
 
 : visible-dirs ( seq -- seq' )
-    [ visible-dir? ] filter ;
+    [ visible-dir? ] filter [ name>> ] sort-with ;
 
 ERROR: vocab-root-required root ;
 
@@ -33,7 +33,7 @@ ERROR: vocab-root-required root ;
     over dup exists? [ directory-entries ] [ drop { } ] if ;
 
 : (disk-vocabs) ( root prefix -- seq )
-    vocab-directory-entries visible-dirs [ name>> ] sort-with [
+    vocab-directory-entries visible-dirs [
         name>>
         [ dup ".factor" append append-path append-path ]
         [ over empty? [ nip ] [ "." glue ] if ] bi-curry bi*
@@ -56,8 +56,7 @@ DEFER: add-vocab%
 
 : (disk-vocabs-recursive) ( root prefix -- seq )
     vocab-directory-entries
-    [ add-vocab-children% ] { } make
-    [ name>> ] sort-with ;
+    [ add-vocab-children% ] { } make ;
 
 : no-rooted ( seq -- seq' ) [ find-vocab-root ] reject ;
 
