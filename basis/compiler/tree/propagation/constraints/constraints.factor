@@ -34,7 +34,7 @@ M: true-constraint satisfied?
 
 TUPLE: false-constraint value ;
 
-: =f ( value -- constriant ) resolve-copy false-constraint boa ;
+: =f ( value -- constraint ) resolve-copy false-constraint boa ;
 
 M: false-constraint assume*
     [ \ f <class-info> swap value>> refine-value-info ]
