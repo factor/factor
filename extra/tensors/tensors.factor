@@ -7,6 +7,7 @@ sequences.extras sequences.private specialized-arrays typed ;
 
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
+SPECIALIZED-ARRAY: float-4
 IN: tensors
 
 ! Tensor class definition
@@ -96,6 +97,14 @@ TYPED: tensor>array ( tensor: tensor -- seq: array )
 
 <PRIVATE
 
+:: make-subseq ( arr start len -- arr )
+    ! Find the index
+    c:float heap-size start *
+    ! Compute the starting pointer
+    arr underlying>> <displaced-alien>
+    ! Push length and type to create the new array
+    len c:float <c-direct-array> ;
+
 : check-bop-shape ( shape1 shape2 -- shape )
     2dup = [ shape-mismatch-error ] unless drop ;
 
@@ -179,15 +188,6 @@ TYPED:: 2d-matmul ( vec1: float-array vec2: float-array res: float-array
             i p * j + res set-nth-unsafe
         ] each-integer
     ] each-integer ;
-
-:: make-subseq ( arr start len -- arr )
-    ! Find the index
-    c:float heap-size start *
-    ! Compute the starting pointer
-    arr underlying>> <displaced-alien>
-    ! Push length and type to create the new array
-    len c:float <c-direct-array> ;
-
 
 PRIVATE>
 
