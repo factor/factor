@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien alien.c-types alien.data arrays grouping kernel locals
-math math.functions math.ranges math.vectors.simd multi-methods sequences
+math math.functions math.ranges math.vectors math.vectors.simd multi-methods sequences
 sequences.extras sequences.private specialized-arrays typed ;
 
 QUALIFIED-WITH: alien.c-types c
@@ -105,6 +105,16 @@ TYPED: tensor>array ( tensor: tensor -- seq: array )
     ! Push length and type to create the new array
     len c:float <c-direct-array> ;
 
+: make-simd-arr ( arr -- simd )
+    ! Make the first part
+    dup length dup 4 mod - [ 0 ] dip make-subseq
+    ! Convert to SIMD array
+    float-4 cast-array ;
+
+: make-rest-arr ( arr -- rest )
+    ! Make the first part
+    dup length dup 4 mod dup [ - ] dip make-subseq ;
+
 : check-bop-shape ( shape1 shape2 -- shape )
     2dup = [ shape-mismatch-error ] unless drop ;
 
@@ -112,6 +122,18 @@ TYPED: tensor>array ( tensor: tensor -- seq: array )
 TYPED:: t-bop ( tensor1: tensor tensor2: tensor quot: ( x y -- z ) -- tensor: tensor )
     tensor1 shape>> tensor2 shape>> check-bop-shape
     tensor1 vec>> tensor2 vec>> quot 2map <tensor> ; inline
+
+! Apply the binary operator bop to combine the tensors
+TYPED:: t-bop-simd ( tensor1: tensor tensor2: tensor quot: ( x y -- z ) -- tensor: tensor )
+    ! Check shape
+    tensor1 shape>> tensor2 shape>> check-bop-shape
+    ! Multiply most of it using SIMD
+    tensor1 vec>> make-simd-arr tensor2 vec>> make-simd-arr quot 2map
+    c:float cast-array
+    ! Multiply the rest
+    tensor1 vec>> make-rest-arr tensor2 vec>> make-rest-arr quot call
+    ! Combine
+    2array concat <tensor> ; inline
 
 ! Apply the operation to the tensor
 TYPED:: t-uop ( tensor: tensor quot: ( x -- y ) -- tensor: tensor )
@@ -121,7 +143,8 @@ PRIVATE>
 
 ! Add a tensor to either another tensor or a scalar
 multi-methods:GENERIC: t+ ( x y -- tensor )
-METHOD: t+ { tensor tensor } [ + ] t-bop ;
+METHOD: t+ { tensor tensor } [ v+ ] t-bop-simd ;
+! METHOD: t+ { tensor tensor } [ + ] t-bop ;
 METHOD: t+ { tensor number } >float [ + ] curry t-uop ;
 METHOD: t+ { number tensor } [ >float ] dip [ + ] with t-uop ;
 
