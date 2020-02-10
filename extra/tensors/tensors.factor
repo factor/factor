@@ -223,11 +223,6 @@ TYPED:: matmul ( tensor1: tensor tensor2: tensor -- tensor3: tensor )
 ! by which to multiply indices to get a full index
 : ind-mults ( shape -- seq )
     <reversed> 1 swap [ swap [ * ] keep ] map nip ;
-
-! helper for transpose: given shape, flat index, & mults for
-! the shape, gives nd index
-: transpose-index ( i shape -- seq )
-    <reversed> [ /mod ] map reverse nip ;
 PRIVATE>
 
 ! Transpose an n-dimensional tensor by flipping the axes
@@ -235,8 +230,6 @@ TYPED:: transpose ( tensor: tensor -- tensor': tensor )
     tensor shape>> :> old-shape
     tensor vec>> :> vec
     old-shape reverse :> new-shape
-    ! check that the size is fine
-    new-shape product vec length assert=
     old-shape ind-mults reverse :> mults
     ! loop through new tensor
     new-shape dup product <iota> [

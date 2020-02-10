@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 HMC Clinic.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays arrays.shaped io kernel locals math math.matrices math.ranges
-memory prettyprint sequences tensors tools.time ;
+USING: arrays arrays.shaped io kernel locals math math.functions math.matrices math.ranges
+math.statistics memory prettyprint sequences tensors tools.time ;
 IN: tensors.benchmark
 
 <PRIVATE
@@ -179,3 +179,14 @@ PRIVATE>
     ! Normalize
     drop
     arr ;
+
+! finds the confidence interval of seq with significance level 95
+:: confidence-interval ( seq -- {c1,c2} )
+    seq mean :> m
+    ! HARDCODING ALERT: z value for alpha = 95 is 1.96
+    seq sample-std 1.96 * 
+    ! div by sqrt(n)
+    seq length sqrt / :> modifier
+    m modifier -
+    m modifier +
+    2array ;
