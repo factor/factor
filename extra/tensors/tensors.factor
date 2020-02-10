@@ -1,8 +1,8 @@
 ! Copyright (C) 2019 HMC Clinic.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors alien.data arrays grouping kernel locals math
-math.functions math.ranges multi-methods sequences
+USING: accessors alien alien.c-types alien.data arrays grouping kernel locals
+math math.functions math.ranges math.vectors.simd multi-methods sequences
 sequences.extras sequences.private specialized-arrays typed ;
 
 QUALIFIED-WITH: alien.c-types c
@@ -163,9 +163,7 @@ METHOD: t% { number tensor } [ >float ] dip [ mod ] with t-uop ;
 
 ! Perform matrix multiplication muliplying an
 ! mxn matrix with a nxp matrix
-TYPED:: 2d-matmul ( vec1: float-array start1: fixnum
-                    vec2: float-array start2: fixnum
-                    res: float-array start3: fixnum
+TYPED:: 2d-matmul ( vec1: float-array vec2: float-array res: float-array
                     m: fixnum n: fixnum p: fixnum -- )
     ! For each element in the range, we want to compute the dot product of the
     ! corresponding row and column
@@ -174,13 +172,22 @@ TYPED:: 2d-matmul ( vec1: float-array start1: fixnum
             0.0 ! This is the sum
             n [ :> k
                 ! Add to the sum
-                i n * k + start1 + vec1 nth-unsafe
-                k p * j + start2 + vec2 nth-unsafe
+                i n * k + vec1 nth-unsafe
+                k p * j + vec2 nth-unsafe
                 * +
             ] each-integer
-            i p * j + start3 + res set-nth-unsafe
+            i p * j + res set-nth-unsafe
         ] each-integer
     ] each-integer ;
+
+:: make-subseq ( arr start len -- arr )
+    ! Find the index
+    c:float heap-size start *
+    ! Compute the starting pointer
+    arr underlying>> <displaced-alien>
+    ! Push length and type to create the new array
+    len c:float <c-direct-array> ;
+
 
 PRIVATE>
 
@@ -206,12 +213,15 @@ TYPED:: matmul ( tensor1: tensor tensor2: tensor -- tensor3: tensor )
     ! Now update the tensor3 to contain the multiplied matricies
     top-prod [
         :> i
-        ! Compute vec1 and start1
-        tensor1 vec>> m n * i *
+
+        ! Compute vec1 using direct C arrays
+        tensor1 vec>> m n * i * m n * make-subseq
+
         ! Compute vec2 and start2
-        tensor2 vec>> n p * i *
+        tensor2 vec>> n p * i * n p * make-subseq
+
         ! Compute the result
-        vec3 m p * i *
+        vec3 m p * i * m p * make-subseq
         ! Push m, n, and p and multiply the arrays
         m n p 2d-matmul
     ] each-integer
