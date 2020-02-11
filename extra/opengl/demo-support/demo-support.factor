@@ -55,7 +55,7 @@ M: demo-world resize-world
     [ demo-world-frustum glFrustum ] bi ;
 
 : demo-world-set-matrix ( gadget -- )
-    GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
+    flags{ GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT } glClear
     GL_MODELVIEW glMatrixMode
     glLoadIdentity
     [ [ 0.0 0.0 ] dip distance>> neg glTranslatef ]

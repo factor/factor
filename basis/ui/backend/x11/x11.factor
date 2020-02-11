@@ -268,7 +268,7 @@ M: x11-ui-backend set-title ( string world -- )
         dpy get
         root get
         0
-        SubstructureNotifyMask SubstructureRedirectMask bitor
+        flags{ SubstructureNotifyMask SubstructureRedirectMask }
     ] dip XSendEvent drop ;
 
 M: x11-ui-backend (set-fullscreen) ( world ? -- )
