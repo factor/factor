@@ -206,7 +206,7 @@ M: spheres-world end-world
     program center radius (draw-sphere) ;
 
 : sphere-scene ( gadget -- )
-    GL_DEPTH_BUFFER_BIT GL_COLOR_BUFFER_BIT bitor glClear
+    flags{ GL_DEPTH_BUFFER_BIT GL_COLOR_BUFFER_BIT } glClear
     [
         solid-sphere-program>> [
             {
