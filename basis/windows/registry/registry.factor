@@ -200,7 +200,7 @@ TUPLE: registry-enum-key ;
 
 :: change-registry-value ( key subkey value-name quot: ( value -- value' ) -- )
     0 DWORD <ref> :> type
-    key subkey KEY_QUERY_VALUE KEY_SET_VALUE bitor [
+    key subkey flags{ KEY_QUERY_VALUE KEY_SET_VALUE } [
         dup :> hkey value-name f type MAX_PATH <byte-array>
         reg-query-value-ex
         type DWORD deref ${ REG_SZ REG_EXPAND_SZ REG_MULTI_SZ } in?
