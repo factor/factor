@@ -156,6 +156,50 @@ IN: tensors.tests
     { 1 2 3 } zeros dims
 ] unit-test
 
+! Test sequence operations
+! TODO: add tests for clone, length, nth, set-nth, new-sequence, and clone-like
+
+! Test like
+{ float-array{ 0.0 1.0 2.0 3.0 4.0 5.0 } } [
+    { 2 3 } naturals dup like vec>>
+] unit-test
+
+{ { 2 3 } } [
+    { 2 3 } naturals dup like shape>>
+] unit-test
+
+{ float-array{ 0.0 1.0 2.0 3.0 4.0 5.0 } } [
+    { 0 1 2 3 4 5 } { 2 3 } naturals like vec>>
+] unit-test
+
+{ { 2 3 } } [
+    { 0 1 2 3 4 5 } { 2 3 } naturals like shape>>
+] unit-test
+
+{ float-array{ 0.0 1.0 2.0 3.0 4.0 5.0 } } [
+    float-array{ 0 1 2 3 4 5 } { 2 3 } naturals like vec>>
+] unit-test
+
+{ { 2 3 } } [
+    float-array{ 0 1 2 3 4 5 } { 2 3 } naturals like shape>>
+] unit-test
+
+{ float-array{ 0.0 1.0 2.0 3.0 4.0 } } [
+    { 0 1 2 3 4 } { 2 3 } naturals like vec>>
+] unit-test
+
+{ { 5 } } [
+    { 0 1 2 3 4 } { 2 3 } naturals like shape>>
+] unit-test
+
+{ float-array{ 0.0 1.0 2.0 3.0 4.0 } } [
+    float-array{ 0 1 2 3 4 } { 2 3 } naturals like vec>>
+] unit-test
+
+{ { 5 } } [
+    float-array{ 0 1 2 3 4 } { 2 3 } naturals like shape>>
+] unit-test
+
 ! Test addition
 { float-array{ 1.0 2.0 3.0 4.0 } } [
     { 4 } naturals { 4 } ones t+ vec>>

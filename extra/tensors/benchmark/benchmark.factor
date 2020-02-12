@@ -184,7 +184,7 @@ PRIVATE>
 :: confidence-interval ( seq -- {c1,c2} )
     seq mean :> m
     ! HARDCODING ALERT: z value for alpha = 95 is 1.96
-    seq sample-std 1.96 * 
+    seq sample-std 1.96 *
     ! div by sqrt(n)
     seq length sqrt / :> modifier
     m modifier -

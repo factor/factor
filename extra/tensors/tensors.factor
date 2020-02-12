@@ -1,9 +1,10 @@
 ! Copyright (C) 2019 HMC Clinic.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors alien alien.c-types alien.data arrays grouping kernel locals
-math math.functions math.ranges math.vectors math.vectors.simd multi-methods sequences
-sequences.extras sequences.private specialized-arrays typed ;
+USING: accessors alien alien.c-types alien.data arrays byte-arrays grouping
+kernel locals math math.functions math.ranges math.vectors math.vectors.simd
+multi-methods sequences sequences.extras sequences.private specialized-arrays
+typed ;
 
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
@@ -29,6 +30,7 @@ ERROR: shape-mismatch-error shape1 shape2 ;
 : <tensor> ( shape seq -- tensor )
     tensor boa ;
 
+! Creates a freshly-allocated float-array with the desired c-type values
 : >float-array ( seq -- float-array )
     c:float >c-array ;
 
@@ -55,19 +57,54 @@ PRIVATE>
 : naturals ( shape -- tensor )
     check-shape [ ] [ product [0,b) >float-array ] bi <tensor> ;
 
-! Virtual sequence protocol implementation
+! Sequence protocol implementation
+syntax:M: tensor clone [ shape>> clone ] [ vec>> clone ] bi <tensor> ;
+
 syntax:M: tensor length vec>> length ;
-syntax:M: tensor virtual@ vec>> ;
-syntax:M: tensor virtual-exemplar vec>> ;
 
-INSTANCE: tensor virtual-sequence
+syntax:M: tensor nth-unsafe vec>> nth-unsafe ;
 
-! ! Sequence protocol implementation
-! syntax:M: tensor length vec>> length ;
-! syntax:M: tensor nth-unsafe vec>> nth-unsafe ;
-! syntax:M: tensor set-nth-unsafe vec>> set-nth-unsafe ;
+syntax:M: tensor set-nth-unsafe vec>> set-nth-unsafe ;
 
-! INSTANCE: tensor sequence
+syntax:M: tensor new-sequence
+    ! Check if the old and new tensors are the same size
+    shape>> 2dup product =
+    ! If so preserve the shape, otherwise create a 1D tensor
+    [ nip zeros ] [ drop 1array zeros ] if ;
+
+syntax:M: tensor like
+    ! If the original sequence is already a tensor, we are done
+    over tensor?
+    [ drop ] [
+        ! Otherwise, if the original sequence and the exemplar have the same
+        ! number of elements, we should use the shape of the exemplar
+        2dup [ length ] bi@ = [
+            shape>> swap
+            ! Check if the seq is a float-array, otherwise convert it
+            dup float-array? [ >float-array ] unless
+        ] [
+            ! Otherwise, just create an appropriately sized 1D tensor
+            drop [ length 1array ] [ >float-array ] bi
+        ] if
+        <tensor>
+    ] if ;
+
+syntax:M: tensor clone-like
+    ! If the original sequence is already a tensor, we just need to clone it
+    over tensor?
+    [ drop clone ] [
+        ! Otherwise, if the original sequence and the exemplar have the same
+        ! number of elements, we should use the shape of the exemplar
+        2dup [ length ] bi@ = [
+            shape>> swap >float-array
+        ] [
+            ! Otherwise, just create an appropriately sized 1D tensor
+            drop [ length 1array ] [ >float-array ] bi
+        ] if
+        <tensor>
+    ] if ;
+
+INSTANCE: tensor sequence
 
 <PRIVATE
 
@@ -123,17 +160,32 @@ TYPED:: t-bop ( tensor1: tensor tensor2: tensor quot: ( x y -- z ) -- tensor: te
     tensor1 shape>> tensor2 shape>> check-bop-shape
     tensor1 vec>> tensor2 vec>> quot 2map <tensor> ; inline
 
-! Apply the binary operator bop to combine the tensors
-TYPED:: t-bop-simd ( tensor1: tensor tensor2: tensor quot: ( x y -- z ) -- tensor: tensor )
-    ! Check shape
+! ! Apply the binary operator bop to combine the tensors
+! TYPED:: t-bop-simd ( tensor1: tensor tensor2: tensor quot: ( x y -- z ) -- tensor: tensor )
+!     ! Check shape
+!     tensor1 shape>> tensor2 shape>> check-bop-shape
+!     ! Multiply most of it using SIMD
+!     tensor1 vec>> make-simd-arr tensor2 vec>> make-simd-arr quot 2map
+!     c:float cast-array
+!     ! Multiply the rest
+!     tensor1 vec>> make-rest-arr tensor2 vec>> make-rest-arr quot call
+!     ! Combine
+!     2array concat <tensor> ; inline
+
+: simd-slice ( array -- simd-array rest-slice/f )
+    dup length dup 4 mod [ drop f ] [ - cut-slice ] if-zero
+    [ float-4 cast-array ] dip ; inline
+
+TYPED:: t-bop-simd ( tensor1: tensor tensor2: tensor simd-quot: ( x y -- z ) quot: ( x y -- z ) -- tensor: tensor )
     tensor1 shape>> tensor2 shape>> check-bop-shape
-    ! Multiply most of it using SIMD
-    tensor1 vec>> make-simd-arr tensor2 vec>> make-simd-arr quot 2map
-    c:float cast-array
-    ! Multiply the rest
-    tensor1 vec>> make-rest-arr tensor2 vec>> make-rest-arr quot call
-    ! Combine
-    2array concat <tensor> ; inline
+    tensor1 vec>> tensor2 vec>> :> ( vec1 vec2 )
+    vec1 underlying>> length (byte-array) c:float cast-array :> vec3
+    vec1 simd-slice :> ( simd1 rest1 )
+    vec2 simd-slice :> ( simd2 rest2 )
+    vec3 simd-slice :> ( simd3 rest3 )
+    simd1 simd2 simd-quot simd3 2map-into
+    rest1 rest2 quot rest3 2map-into
+    vec3 <tensor> ; inline
 
 ! Apply the operation to the tensor
 TYPED:: t-uop ( tensor: tensor quot: ( x -- y ) -- tensor: tensor )
@@ -143,7 +195,8 @@ PRIVATE>
 
 ! Add a tensor to either another tensor or a scalar
 multi-methods:GENERIC: t+ ( x y -- tensor )
-METHOD: t+ { tensor tensor } [ v+ ] t-bop-simd ;
+METHOD: t+ { tensor tensor } [ v+ ] [ + ] t-bop-simd ;
+! METHOD: t+ { tensor tensor } [ v+ ] t-bop-simd ;
 ! METHOD: t+ { tensor tensor } [ + ] t-bop ;
 METHOD: t+ { tensor number } >float [ + ] curry t-uop ;
 METHOD: t+ { number tensor } [ >float ] dip [ + ] with t-uop ;
