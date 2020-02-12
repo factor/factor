@@ -55,19 +55,19 @@ PRIVATE>
 : naturals ( shape -- tensor )
     check-shape [ ] [ product [0,b) >float-array ] bi <tensor> ;
 
-! ! Virtual sequence protocol implementation
-! syntax:M: tensor length vec>> length ;
-! syntax:M: tensor virtual@ vec>> ;
-! syntax:M: tensor virtual-exemplar vec>> ;
-
-! INSTANCE: tensor virtual-sequence
-
-! Sequence protocol implementation
+! Virtual sequence protocol implementation
 syntax:M: tensor length vec>> length ;
-syntax:M: tensor nth-unsafe vec>> nth-unsafe ;
-syntax:M: tensor set-nth-unsafe vec>> set-nth-unsafe ;
+syntax:M: tensor virtual@ vec>> ;
+syntax:M: tensor virtual-exemplar vec>> ;
 
-INSTANCE: tensor sequence
+INSTANCE: tensor virtual-sequence
+
+! ! Sequence protocol implementation
+! syntax:M: tensor length vec>> length ;
+! syntax:M: tensor nth-unsafe vec>> nth-unsafe ;
+! syntax:M: tensor set-nth-unsafe vec>> set-nth-unsafe ;
+
+! INSTANCE: tensor sequence
 
 <PRIVATE
 
@@ -200,15 +200,17 @@ TYPED:: 2d-matmul ( vec1: float-array vec2: float-array res: float-array
     ! For each element in the range, we want to compute the dot product of the
     ! corresponding row and column
     m [ :> i
+        i n * :> in
+        i p * :> ip
         p [ :> j
             0.0 ! This is the sum
             n [ :> k
                 ! Add to the sum
-                i n * k + vec1 nth-unsafe
+                in k + vec1 nth-unsafe
                 k p * j + vec2 nth-unsafe
                 * +
             ] each-integer
-            i p * j + res set-nth-unsafe
+            ip j + res set-nth-unsafe
         ] each-integer
     ] each-integer ;
 
