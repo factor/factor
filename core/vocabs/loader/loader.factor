@@ -160,7 +160,7 @@ M: vocab-link (require)
     vocab-name (require) ;
 
 M: string (require)
-   dup check-vocab-hook get call( vocab -- )
+    dup check-vocab-hook get call( vocab -- )
     create-vocab (require) ;
 
 PRIVATE>
