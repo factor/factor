@@ -1904,7 +1904,7 @@ ARTICLE: "sequences-destructive-discussion" "When to use destructive operations"
 ARTICLE: "sequences-destructive" "Destructive sequence operations"
 "Many operations have destructive variants that side effect an input sequence, instead of creating a new sequence:"
 { $table
-    { "Constructive" "Destructive" }
+    { { $strong "Constructive" } { $strong "Destructive" } }
     { { $link suffix } { $link suffix! } }
     { { $link remove } { $link remove! } }
     { { $link remove-eq } { $link remove-eq! } }

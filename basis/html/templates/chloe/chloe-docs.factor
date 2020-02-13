@@ -62,7 +62,7 @@ HELP: compile-with-scope
 ARTICLE: "html.templates.chloe.tags.component" "Component Chloe tags"
 "The following Chloe tags correspond exactly to " { $link "html.components" } ". The " { $snippet "name" } " attribute should be the name of a form value (see " { $link "html.forms.values" } "). Singleton component tags do not allow any other attributes. Tuple component tags map all other attributes to tuple slot values of the component instance."
 { $table
-    { "Tag" "Component class" }
+    { { $strong "Tag" } { $strong "Component class" } }
     { { $snippet "t:checkbox" }   { $link checkbox } }
     { { $snippet "t:choice" }     { $link choice } }
     { { $snippet "t:code" }       { $link code } }
