@@ -13,7 +13,7 @@ ARTICLE: "conventions" "Conventions"
 { $heading "Glossary of terms" }
 "Common terminology and abbreviations used throughout Factor and its documentation:"
 { $table
-    { "Term" "Definition" }
+    { { $strong "Term" } { $strong "Definition" } }
     { "alist" { "an association list; see " { $link "alists" } } }
     { "assoc" { "an associative mapping; see " { $link "assocs" } } }
     { "associative mapping" { "an object whose class implements the " { $link "assocs-protocol" } } }
@@ -49,7 +49,7 @@ $nl
 { $heading "Word naming conventions" }
 "These conventions are not hard and fast, but are usually a good first step in understanding a word's behavior:"
 { $table
-    { "General form" "Description" "Examples" }
+    { { $strong "General form" } { $strong "Description" } { $strong "Examples" } }
     { { $snippet { $emphasis "foo" } "?" } "outputs a boolean" { { $link empty? } } }
     { { $snippet { $emphasis "foo" } "!" } { "a variant of " { $snippet "foo" } " which mutates one of its arguments" } { { $link append! } } }
     { { $snippet "?" { $emphasis "foo" } } { "conditionally performs " { $snippet { $emphasis "foo" } } } { { $links ?nth } } }
