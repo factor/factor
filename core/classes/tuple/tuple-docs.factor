@@ -214,7 +214,7 @@ ARTICLE: "tuple-examples" "Tuple examples"
 { $code "TUPLE: employee name position salary ;" }
 "This defines a class word named " { $snippet "employee" } ", a predicate " { $snippet "employee?" } ", and the following slot accessors:"
 { $table
-    { "Reader" "Writer" "Setter" "Changer" }
+    { { $strong "Reader" } { $strong "Writer" } { $strong "Setter" } { $strong "Changer" } }
     { { $snippet "name>>" } { $snippet "name<<" } { $snippet ">>name" } { $snippet "change-name" } }
     { { $snippet "position>>" } { $snippet "position<<" } { $snippet ">>position" } { $snippet "change-position" } }
     { { $snippet "salary>>" } { $snippet "salary<<" } { $snippet ">>salary" } { $snippet "change-salary" } }

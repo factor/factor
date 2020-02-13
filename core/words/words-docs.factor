@@ -91,7 +91,7 @@ ARTICLE: "word-props" "Word properties"
 $nl
 "The following are some of the properties used by the library:"
 { $table
-  { "Property" "Documentation" }
+  { { $strong "Property" } { $strong "Documentation" } }
   {
       { $snippet "\"declared-effect\"" } { $link "effects" }
   }
@@ -162,7 +162,7 @@ $nl
 }
 "Properties which are defined for classes only:"
 { $table
-    { "Property" "Documentation" }
+    { { $strong "Property" } { $strong "Documentation" } }
     { { $snippet "\"class\"" } { "A boolean indicating whether this word is a class - " { $link "classes" } } }
 
     { { $snippet "\"coercer\"" } { "A quotation for converting the top of the stack to an instance of this class" } }

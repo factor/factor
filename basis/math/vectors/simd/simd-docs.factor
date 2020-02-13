@@ -66,7 +66,7 @@ $nl
 ARTICLE: "math.vectors.simd.words" "SIMD vector words"
 "For each SIMD vector type, several words are defined, where " { $snippet "type" } " is the type in question:"
 { $table
-    { "Word" "Stack effect" "Description" }
+    { { $strong "Word" } { $strong "Stack effect" } { $strong "Description" } }
     { { $snippet "type-with" } { $snippet "( x -- simd-array )" } "creates a new instance where all components are set to a single scalar" }
     { { $snippet "type-boa" } { $snippet "( ... -- simd-array )" } "creates a new instance where components are read from the stack" }
     { { $snippet "type-cast" } { $snippet "( simd-array -- simd-array' )" } "creates a new SIMD array where the underlying data is taken from another SIMD array, with no format conversion" }
