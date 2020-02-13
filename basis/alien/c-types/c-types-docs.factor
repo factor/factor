@@ -105,7 +105,7 @@ $nl
 ARTICLE: "c-types.primitives" "Primitive C types"
 "The following numerical types are defined in the " { $vocab-link "alien.c-types" } " vocabulary; a " { $snippet "u" } " prefix denotes an unsigned type:"
 { $table
-    { "C type" "Notes" }
+    { { $strong "C type" } { $strong "Notes" } }
     { { $link char } "always 1 byte" }
     { { $link uchar } { } }
     { { $link short } "always 2 bytes" }
