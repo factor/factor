@@ -16,7 +16,7 @@ $nl
 $nl
 "Coming back to the example in the beginning of this article, the following series of steps occurs as the code is evaluated:"
 { $table
-    { "Action" "Stack contents" }
+    { { $strong "Action" } { $strong "Stack contents" } }
     { "10 is pushed on the stack." { $snippet "10" } }
     { { "The " { $link sq } " word is executed. It pops one input from the stack - the integer 10 - and squares it, pushing the result." } { $snippet "100" } }
     { { "5 is pushed on the stack." } { $snippet "100 5" } }
