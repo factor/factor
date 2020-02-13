@@ -503,5 +503,5 @@ M: array elements*
     drop
     icons get sort-keys
     [ [ <$link> ] [ definition-icon-path <$image> ] bi* swap ] assoc-map
-    { "" "Definition class" } prefix
+    { f { $strong "Definition class" } } prefix
     $table ;
