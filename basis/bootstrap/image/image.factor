@@ -540,3 +540,5 @@ PRIVATE>
 
 : make-my-image ( -- )
     my-arch-name make-image ;
+
+MAIN: make-my-image
