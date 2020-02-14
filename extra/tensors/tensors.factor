@@ -53,9 +53,14 @@ PRIVATE>
 : arange ( a b step -- tensor )
     <range> [ length >fixnum 1array ] keep >float-array <tensor> ;
 
-! Construct a tensors with vec { 0 1 2 ... } and reshape to the desired shape
+! Construct a tensor with vec { 0 1 2 ... } and reshape to the desired shape
 : naturals ( shape -- tensor )
     check-shape [ ] [ product [0,b) >float-array ] bi <tensor> ;
+
+! Construct a tensor without initializing its values
+: uninitialized ( shape -- tensor )
+    dup length (float-array) <tensor> ;
+
 
 ! Sequence protocol implementation
 syntax:M: tensor clone [ shape>> clone ] [ vec>> clone ] bi <tensor> ;
@@ -70,7 +75,7 @@ syntax:M: tensor new-sequence
     ! Check if the old and new tensors are the same size
     shape>> 2dup product =
     ! If so preserve the shape, otherwise create a 1D tensor
-    [ nip zeros ] [ drop 1array zeros ] if ;
+    [ nip uninitialized ] [ drop 1array uninitialized ] if ;
 
 syntax:M: tensor like
     ! If the original sequence is already a tensor, we are done
@@ -272,7 +277,7 @@ TYPED:: matmul ( tensor1: tensor tensor2: tensor -- tensor3: tensor )
     top-shape { m p } append
 
     ! Now create the new float array to store the underlying result
-    dup product c:float (c-array) :> vec3
+    dup product (float-array) :> vec3
 
     ! Now update the tensor3 to contain the multiplied matricies
     top-prod [
