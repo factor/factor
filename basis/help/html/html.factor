@@ -76,11 +76,12 @@ M: pathname url-of
     [XML
         <div class="navbar">
         <b> Factor Documentation </b> |
-        <a href="/">Home</a> |
-        <a href=<->>Glossary</a> |
+        <a href="http://factorcode.org">Factor</a>
+        <a href="/">Home</a>
+        <a href=<->>Glossary</a>
         <form method="get" action="/search" style="display:inline;">
-            <input name="search" type="text"/>
-            <button type="submit">Search</button>
+            <input placeholder="Search" name="search" type="text"/>
+            <input type="submit" value="Go"/>
         </form>
         <a href="http://factorcode.org" style="float:right; padding: 4px;">factorcode.org</a>
         </div>
