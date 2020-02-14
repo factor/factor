@@ -27,6 +27,6 @@ a:hover { text-decoration: underline; color: #104e8b; }
 .page {
     font-size: 120%;
     margin: 20px;
-    width: 800px;
+    max-width: 800px;
     line-height: 125%;
 }
