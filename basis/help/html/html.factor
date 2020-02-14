@@ -75,15 +75,13 @@ M: pathname url-of
     "conventions" >link topic>filename
     [XML
         <div class="navbar">
-        <b> Factor Documentation </b> |
         <a href="http://factorcode.org">Factor</a>
-        <a href="/">Home</a>
+        <a href="/">Documentation</a>
         <a href=<->>Glossary</a>
         <form method="get" action="/search" style="display:inline;">
             <input placeholder="Search" name="search" type="text"/>
             <input type="submit" value="Go"/>
         </form>
-        <a href="http://factorcode.org" style="float:right; padding: 4px;">factorcode.org</a>
         </div>
      XML] ;
 
