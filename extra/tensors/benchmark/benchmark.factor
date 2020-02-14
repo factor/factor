@@ -6,7 +6,7 @@ IN: tensors.benchmark
 
 ! puts items from els (a quotation) on stack, runs ops (a quot w no stack effect) n times
 ! returns an array with times (ns) for each trial
-:: benchmark-multiple ( els op: ( ... -- ... ) n -- arr )
+:: benchmark-multiple ( els op: ( .. -- .. ) n -- ..arr )
     ! put els on stack
     els call
     ! create array

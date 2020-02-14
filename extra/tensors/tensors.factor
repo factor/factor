@@ -296,24 +296,41 @@ TYPED:: matmul ( tensor1: tensor tensor2: tensor -- tensor3: tensor )
     ] each-integer
     vec3 <tensor> ;
 
+! assumes 2d tensor
+: array>tensor ( seq -- tensor )
+    ! get the shape
+    dup length 
+    [ dup first length ] dip swap
+    2array swap
+    ! flatten the array
+    concat
+    ! turn into a tensor
+    >float-array <tensor> ;
 
 <PRIVATE
 ! helper for transpose: turns a shape into a list of things
 ! by which to multiply indices to get a full index
 : ind-mults ( shape -- seq )
     <reversed> 1 swap [ swap [ * ] keep ] map nip ;
+
+! transposes a 2-dimensional tensor in the easiest possible way
+TYPED: 2d-transpose ( tensor: tensor -- tensor': tensor )
+    tensor>array flip array>tensor ;
 PRIVATE>
 
 ! Transpose an n-dimensional tensor by flipping the axes
 TYPED:: transpose ( tensor: tensor -- tensor': tensor )
-    tensor shape>> :> old-shape
-    tensor vec>> :> vec
-    old-shape reverse :> new-shape
-    old-shape ind-mults reverse :> mults
-    ! loop through new tensor
-    new-shape dup product <iota> [
-        ! find index in original tensor
-        old-shape mults [ [ /mod ] dip * ] 2map-sum nip
-        ! get that index in original tensor
-        vec nth-unsafe
-    ] float-array{ } map-as <tensor> ;
+    tensor shape>> length 2 =
+    [ tensor 2d-transpose ]
+    [ tensor shape>> :> old-shape
+        tensor vec>> :> vec
+        old-shape reverse :> new-shape
+        old-shape ind-mults reverse :> mults
+        ! loop through new tensor
+        new-shape dup product <iota> [
+            ! find index in original tensor
+            old-shape mults [ [ /mod ] dip * ] 2map-sum nip
+            ! get that index in original tensor
+            vec nth-unsafe
+        ] float-array{ } map-as <tensor> 
+    ] if ;
