@@ -133,8 +133,8 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
             [ ($title) ]
             [ ($navigation-path) ]
             [ ($navigation-links) ] tri
-        ] with-nesting
-    ] with-style ;
+        ] with-style
+    ] with-nesting ;
 
 : print-topic ( topic -- )
     >link
