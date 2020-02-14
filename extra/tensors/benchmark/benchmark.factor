@@ -4,7 +4,7 @@ USING: arrays kernel locals math math.functions math.statistics
 sequences tools.time ;
 IN: tensors.benchmark
 
-! puts items from els (a quotation) on stack, runs ops n times
+! puts items from els (a quotation) on stack, runs ops (a quot w no stack effect) n times
 ! returns an array with times (ns) for each trial
 :: benchmark-multiple ( els op: ( ... -- ... ) n -- arr ) 
     ! put els on stack
@@ -12,7 +12,7 @@ IN: tensors.benchmark
     ! create array
     n 0 <array> :> arr
     ! perform op n times
-    n [ [ op benchmark ] dip arr set-nth ] each-integer
+    n [ gc [ op benchmark ] dip arr set-nth ] each-integer
     arr ; inline
 
 
