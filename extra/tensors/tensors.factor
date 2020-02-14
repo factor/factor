@@ -142,16 +142,6 @@ TYPED: tensor>array ( tensor: tensor -- seq: array )
     ! Push length and type to create the new array
     len c:float <c-direct-array> ;
 
-: make-simd-arr ( arr -- simd )
-    ! Make the first part
-    dup length dup 4 mod - [ 0 ] dip make-subseq
-    ! Convert to SIMD array
-    float-4 cast-array ;
-
-: make-rest-arr ( arr -- rest )
-    ! Make the first part
-    dup length dup 4 mod dup [ - ] dip make-subseq ;
-
 : check-bop-shape ( shape1 shape2 -- shape )
     2dup = [ shape-mismatch-error ] unless drop ;
 
@@ -160,29 +150,17 @@ TYPED:: t-bop ( tensor1: tensor tensor2: tensor quot: ( x y -- z ) -- tensor: te
     tensor1 shape>> tensor2 shape>> check-bop-shape
     tensor1 vec>> tensor2 vec>> quot 2map <tensor> ; inline
 
-! ! Apply the binary operator bop to combine the tensors
-! TYPED:: t-bop-simd ( tensor1: tensor tensor2: tensor quot: ( x y -- z ) -- tensor: tensor )
-!     ! Check shape
-!     tensor1 shape>> tensor2 shape>> check-bop-shape
-!     ! Multiply most of it using SIMD
-!     tensor1 vec>> make-simd-arr tensor2 vec>> make-simd-arr quot 2map
-!     c:float cast-array
-!     ! Multiply the rest
-!     tensor1 vec>> make-rest-arr tensor2 vec>> make-rest-arr quot call
-!     ! Combine
-!     2array concat <tensor> ; inline
-
+! Create an array of 4-element SIMD arrays for processing floats
 : simd-slice ( array -- simd-array rest-slice/f )
     dup length dup 4 mod [ drop f ] [ - cut-slice ] if-zero
     [ float-4 cast-array ] dip ; inline
 
-TYPED:: t-bop-simd ( tensor1: tensor tensor2: tensor simd-quot: ( x y -- z ) quot: ( x y -- z ) -- tensor: tensor )
+! Apply the binary operators simd-quot and quot to quickly combine the tensors
+:: t-bop-simd ( tensor1 tensor2 simd-quot: ( x y -- z ) quot: ( x y -- z ) -- tensor )
     tensor1 shape>> tensor2 shape>> check-bop-shape
-    tensor1 vec>> tensor2 vec>> :> ( vec1 vec2 )
-    vec1 underlying>> length (byte-array) c:float cast-array :> vec3
-    vec1 simd-slice :> ( simd1 rest1 )
-    vec2 simd-slice :> ( simd2 rest2 )
-    vec3 simd-slice :> ( simd3 rest3 )
+    tensor1 vec>> tensor2 vec>>
+    dup length (float-array) dup :> vec3
+    [ simd-slice ] tri@ :> ( simd1 rest1 simd2 rest2 simd3 rest3 )
     simd1 simd2 simd-quot simd3 2map-into
     rest1 rest2 quot rest3 2map-into
     vec3 <tensor> ; inline
@@ -191,35 +169,43 @@ TYPED:: t-bop-simd ( tensor1: tensor tensor2: tensor simd-quot: ( x y -- z ) quo
 TYPED:: t-uop ( tensor: tensor quot: ( x -- y ) -- tensor: tensor )
     tensor vec>> quot map [ tensor shape>> ] dip <tensor> ; inline
 
+! Apply the binary operators simd-quot and quot to quickly combine a tensor and
+! a number
+:: t-uop-simd ( tensor n simd-quot: ( x y -- z ) quot: ( x y -- z ) -- tensor )
+    tensor dup [ shape>> ] [ vec>> ] bi*
+    dup length (float-array) dup :> vec2
+    [ simd-slice ] bi@ :> ( simd1 rest1 simd2 rest2 )
+    simd1 n n n n float-4-boa simd-quot curry simd2 map-into
+    rest1 n quot curry rest2 map-into
+    vec2 <tensor> ; inline
+
 PRIVATE>
 
 ! Add a tensor to either another tensor or a scalar
 multi-methods:GENERIC: t+ ( x y -- tensor )
 METHOD: t+ { tensor tensor } [ v+ ] [ + ] t-bop-simd ;
-! METHOD: t+ { tensor tensor } [ v+ ] t-bop-simd ;
-! METHOD: t+ { tensor tensor } [ + ] t-bop ;
-METHOD: t+ { tensor number } >float [ + ] curry t-uop ;
-METHOD: t+ { number tensor } [ >float ] dip [ + ] with t-uop ;
+METHOD: t+ { tensor number } [ v+ ] [ + ] t-uop-simd ;
+METHOD: t+ { number tensor } swap [ swap v+ ] [ swap + ] t-uop-simd ;
 
 ! Subtraction between two tensors or a tensor and a scalar
 multi-methods:GENERIC: t- ( x y -- tensor )
-METHOD: t- { tensor tensor } [ - ] t-bop ;
-METHOD: t- { tensor number } >float [ - ] curry t-uop ;
-METHOD: t- { number tensor } [ >float ] dip [ - ] with t-uop ;
+METHOD: t- { tensor tensor } [ v- ] [ - ] t-bop-simd ;
+METHOD: t- { tensor number } [ v- ] [ - ] t-uop-simd ;
+METHOD: t- { number tensor } swap [ swap v- ] [ swap - ] t-uop-simd ;
 
 ! Multiply a tensor with either another tensor or a scalar
 multi-methods:GENERIC: t* ( x y -- tensor )
-METHOD: t* { tensor tensor } [ * ] t-bop ;
-METHOD: t* { tensor number } >float [ * ] curry t-uop ;
-METHOD: t* { number tensor } [ >float ] dip [ * ] with t-uop ;
+METHOD: t* { tensor tensor } [ v* ] [ * ] t-bop-simd ;
+METHOD: t* { tensor number } [ v* ] [ * ] t-uop-simd ;
+METHOD: t* { number tensor } swap [ swap v* ] [ swap * ] t-uop-simd ;
 
 ! Divide two tensors or a tensor and a scalar
 multi-methods:GENERIC: t/ ( x y -- tensor )
-METHOD: t/ { tensor tensor } [ / ] t-bop ;
-METHOD: t/ { tensor number } >float [ / ] curry t-uop ;
-METHOD: t/ { number tensor } [ >float ] dip [ / ] with t-uop ;
+METHOD: t/ { tensor tensor } [ v/ ] [ / ] t-bop-simd ;
+METHOD: t/ { tensor number } [ v/ ] [ / ] t-uop-simd ;
+METHOD: t/ { number tensor } swap [ swap v/ ] [ swap / ] t-uop-simd ;
 
-! Divide two tensors or a tensor and a scalar
+! Mod two tensors or a tensor and a scalar
 multi-methods:GENERIC: t% ( x y -- tensor )
 METHOD: t% { tensor tensor } [ mod ] t-bop ;
 METHOD: t% { tensor number } >float [ mod ] curry t-uop ;

@@ -1,12 +1,12 @@
 ! Copyright (C) 2019 HMC Clinic.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel locals math math.functions math.statistics
+USING: arrays kernel locals math math.functions math.statistics memory
 sequences tools.time ;
 IN: tensors.benchmark
 
 ! puts items from els (a quotation) on stack, runs ops (a quot w no stack effect) n times
 ! returns an array with times (ns) for each trial
-:: benchmark-multiple ( els op: ( ... -- ... ) n -- arr ) 
+:: benchmark-multiple ( els op: ( ... -- ... ) n -- arr )
     ! put els on stack
     els call
     ! create array
