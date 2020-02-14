@@ -1,3 +1,17 @@
+html {
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, ol, ul {
+  margin: 0;
+  padding: 0;
+}
+
 a:link { text-decoration: none; color: #104e8b; }
 a:visited { text-decoration: none; color: #104e8b; }
 a:active { text-decoration: none; color: #104e8b; }
@@ -5,8 +19,14 @@ a:hover { text-decoration: underline; color: #104e8b; }
 
 .navbar {
     background-color: #f3f2ea;
-    padding: 5px;
-    border: 1px solid #ccc;
-    font: 9pt sans-serif;
-    margin-bottom: 10px;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    font: 12pt sans-serif;
+}
+
+.page {
+    font-size: 120%;
+    margin: 20px;
+    width: 800px;
+    line-height: 125%;
 }

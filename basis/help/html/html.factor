@@ -120,7 +120,8 @@ M: pathname url-of
     [ article-title " - Factor Documentation" append ]
     [
         [ print-topic ] with-html-writer css-styles-to-classes
-        [ help-stylesheet ] [ help-navbar prepend ] bi*
+        [ help-stylesheet help-navbar ] dip
+        [XML <-><div class="page"><-></div> XML]
     ] bi simple-page ;
 
 : generate-help-file ( topic -- )
