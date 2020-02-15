@@ -99,10 +99,8 @@ ALIAS: $slot $snippet
 
 : ($code) ( presentation quot -- )
     [
-        code-char-style get [
-            last-element off
-            [ ($code-style) ] dip with-nesting
-        ] with-style
+        last-element off
+        [ ($code-style) ] dip with-nesting
     ] ($block) ; inline
 
 : $code ( element -- )
@@ -411,11 +409,7 @@ M: f ($instance) ($link) ;
     "Notes" $heading print-element ;
 
 : ($see) ( word quot -- )
-    [
-        code-char-style get [
-            code-style get swap with-nesting
-        ] with-style
-    ] ($block) ; inline
+    [ code-style get swap with-nesting ] ($block) ; inline
 
 : $see ( element -- ) check-first [ see* ] ($see) ;
 
