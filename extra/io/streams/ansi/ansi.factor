@@ -64,7 +64,7 @@ M: ansi stream-format
         [ background of [ color>background ] [ "" ] if* ]
         [ font-style of [ font-styles ] [ "" ] if* ]
         tri 3append [ "\e[0m" surround ] unless-empty
-    ] dip stream>> stream-write ;
+    ] dip call-next-method ;
 
 M: ansi make-span-stream
     swap <style-stream> <ignore-close-stream> ;
