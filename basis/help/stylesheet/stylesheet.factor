@@ -82,14 +82,10 @@ H{
     { foreground $ snippet-color }
 } snippet-style set-global
 
-SYMBOL: code-char-style
+SYMBOL: code-style
 H{
     { font-name $ default-monospace-font-name }
     { font-size $ default-font-size }
-} code-char-style set-global
-
-SYMBOL: code-style
-H{
     { page-color $ code-background-color }
     { inset { 5 5 } }
     { wrap-margin f }
@@ -147,6 +143,6 @@ SYMBOL: bullet
             default-style title-style
             help-path-style heading-style
             subsection-style snippet-style
-            code-char-style
+            code-style
         }
     ] dip '[ get-global [ _ + ] change-at ] with each ;
