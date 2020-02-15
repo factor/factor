@@ -129,11 +129,9 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 
 : $title ( topic -- )
     title-style get [
-        title-style get [
-            [ ($title) ]
-            [ ($navigation-path) ]
-            [ ($navigation-links) ] tri
-        ] with-style
+        [ ($title) ]
+        [ ($navigation-path) ]
+        [ ($navigation-links) ] tri
     ] with-nesting ;
 
 : print-topic ( topic -- )
