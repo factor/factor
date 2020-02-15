@@ -1,9 +1,8 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators destructors fry html io
-io.backend io.pathnames io.styles kernel macros make math
-math.order math.parser namespaces sequences strings words
-splitting xml xml.syntax ;
+io.styles kernel macros make math math.parser sequences
+splitting strings xml.syntax ;
 IN: html.streams
 
 GENERIC: url-of ( object -- url )
@@ -13,20 +12,21 @@ M: object url-of drop f ;
 TUPLE: html-writer data ;
 INSTANCE: html-writer output-stream
 
+: <html-writer> ( -- html-writer )
+    html-writer new V{ } clone >>data ;
+
+: with-html-writer ( quot -- xml )
+    <html-writer> [ swap with-output-stream* ] keep data>> ; inline
+
 <PRIVATE
 
-: new-html-writer ( class -- html-writer )
-    new V{ } clone >>data ; inline
-
-TUPLE: html-sub-stream < html-writer style parent ;
+TUPLE: html-sub-stream < style-stream parent ;
 
 : new-html-sub-stream ( style stream class -- stream )
-    new-html-writer
-        swap >>parent
-        swap >>style ; inline
+    [ <html-writer> ] 3dip boa ; inline
 
 : end-sub-stream ( substream -- string style stream )
-    [ data>> ] [ style>> ] [ parent>> ] tri ;
+    [ stream>> data>> ] [ style>> ] [ parent>> ] tri ;
 
 : object-link-tag ( xml style -- xml )
     presented of [ url-of [ simple-link ] when* ] when* ;
@@ -173,16 +173,10 @@ M: html-writer make-cell-stream
 M: html-writer stream-write-table
     [
         table-style swap [
-            [ data>> [XML <td valign="top" style=<->><-></td> XML] ] with map
+            [ stream>> data>> [XML <td valign="top" style=<->><-></td> XML] ] with map
             [XML <tr><-></tr> XML]
         ] with map
         [XML <table style="display: inline-table; border-collapse: collapse;"><-></table> XML]
     ] emit-html ;
 
 M: html-writer dispose drop ;
-
-: <html-writer> ( -- html-writer )
-    html-writer new-html-writer ;
-
-: with-html-writer ( quot -- xml )
-    <html-writer> [ swap with-output-stream* ] keep data>> ; inline
