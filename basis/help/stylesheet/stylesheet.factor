@@ -22,18 +22,14 @@ IN: help.stylesheet
 : font-size-span ( -- n )
     13/12 default-font-size * >integer ;
 
-SYMBOL: default-span-style
+SYMBOL: default-style
 H{
     { font-name $ default-sans-serif-font-name }
     { font-size $ font-size-span }
     { foreground $ text-color }
     { font-style plain }
-} default-span-style set-global
-
-SYMBOL: default-block-style
-H{
     { wrap-margin $ wrap-margin-full }
-} default-block-style set-global
+} default-style set-global
 
 SYMBOL: link-style
 H{
@@ -148,7 +144,7 @@ SYMBOL: bullet
     [
         font-size
         {
-            default-span-style title-style
+            default-style title-style
             help-path-style heading-style
             subsection-style snippet-style
             code-char-style
