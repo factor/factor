@@ -80,16 +80,13 @@ M: style-stream make-span-stream
     do-nested-style make-span-stream ;
 
 M: style-stream make-block-stream
-    [ do-nested-style make-block-stream ] [ style>> ] bi
-    <style-stream> ;
+    do-nested-style make-block-stream ;
 
 M: style-stream make-cell-stream
-    [ do-nested-style make-cell-stream ] [ style>> ] bi
-    <style-stream> ;
+    do-nested-style make-cell-stream ;
 
 M: style-stream stream-write-table
-    [ [ [ stream>> ] map ] map ] [ ] [ stream>> ] tri*
-    stream-write-table ;
+    do-nested-style stream-write-table ;
 
 M: plain-writer stream-format
     nip stream-write ;
