@@ -73,14 +73,9 @@ intensities [| r i |
         { bold-italic "\e[1m\e[3m" }
     } at "" or ;
 
-TUPLE: 256color stream ;
+TUPLE: 256color < filter-writer ;
 
 C: <256color> 256color
-
-M: 256color stream-write1 stream>> stream-write1 ;
-M: 256color stream-write stream>> stream-write ;
-M: 256color stream-flush stream>> stream-flush ;
-M: 256color stream-nl stream>> stream-nl ;
 
 M: 256color stream-format
     [
