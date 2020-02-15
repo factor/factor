@@ -63,13 +63,17 @@ INSTANCE: style-stream output-stream
 
 DEFER: inherit-style
 
-: do-nested-style ( style style-stream -- style stream )
+<PRIVATE
+
+: nested-style ( style style-stream -- style stream )
     [ style>> inherit-style ] [ stream>> ] bi ; inline
+
+PRIVATE>
 
 C: <style-stream> style-stream
 
 M: style-stream stream-format
-    do-nested-style stream-format ;
+    nested-style stream-format ;
 
 M: style-stream stream-write
     [ style>> ] [ stream>> ] bi stream-format ;
@@ -78,16 +82,16 @@ M: style-stream stream-write1
     [ 1string ] dip stream-write ;
 
 M: style-stream make-span-stream
-    do-nested-style make-span-stream ;
+    nested-style make-span-stream ;
 
 M: style-stream make-block-stream
-    do-nested-style make-block-stream ;
+    nested-style make-block-stream ;
 
 M: style-stream make-cell-stream
-    do-nested-style make-cell-stream ;
+    nested-style make-cell-stream ;
 
 M: style-stream stream-write-table
-    do-nested-style stream-write-table ;
+    nested-style stream-write-table ;
 
 M: plain-writer stream-format
     nip stream-write ;
