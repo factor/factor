@@ -277,7 +277,12 @@ M: cons-state pprint*
                 '[ dup cons-state? _ length _ < and ]
                 [ uncons swap , ] while
             ] { } make
-            [ pprint* ] each nil? [ "~more~" text ] unless
+            [ pprint* ] each
+            dup list? [
+                nil? [ "~more~" text ] unless
+            ] [
+                "." text pprint*
+            ] if
             block>
         ] dip pprint-word block>
     ] check-recursion ;
