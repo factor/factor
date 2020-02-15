@@ -2,15 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes combinators destructors
 documents.private fonts fry io io.styles kernel locals math
-math.rectangles math.vectors memoize models namespaces sequences
-sorting splitting strings ui.baseline-alignment ui.clipboards
-ui.gadgets ui.gadgets.borders ui.gadgets.grid-lines
-ui.gadgets.grids ui.gadgets.icons ui.gadgets.incremental
-ui.gadgets.labels ui.gadgets.menus ui.gadgets.packs
-ui.gadgets.paragraphs ui.gadgets.presentations
-ui.gadgets.private ui.gadgets.scrollers ui.gadgets.tracks
-ui.gestures ui.images ui.pens.solid ui.render ui.theme
-ui.traverse unicode ;
+math.rectangles math.vectors models namespaces sequences sorting
+splitting strings ui.baseline-alignment ui.clipboards ui.gadgets
+ui.gadgets.borders ui.gadgets.grid-lines ui.gadgets.grids
+ui.gadgets.icons ui.gadgets.incremental ui.gadgets.labels
+ui.gadgets.menus ui.gadgets.packs ui.gadgets.paragraphs
+ui.gadgets.presentations ui.gadgets.private ui.gadgets.scrollers
+ui.gadgets.tracks ui.gestures ui.images ui.pens.solid ui.render
+ui.theme ui.traverse unicode ;
 FROM: io.styles => foreground background ;
 FROM: ui.gadgets.wrappers => <wrapper> ;
 IN: ui.gadgets.panes
@@ -98,7 +97,8 @@ M: pane selected-children
         add-incremental
     ] [ next-line ] bi ;
 
-: smash-pane ( pane -- gadget ) [ pane-nl ] [ output>> smash-line ] bi ;
+: smash-pane ( pane -- gadget )
+    [ pane-nl ] [ output>> smash-line ] bi ;
 
 : pane-write ( seq pane -- )
     [ pane-nl ] [ current>> stream-write ]
@@ -273,15 +273,13 @@ MEMO:: specified-font ( name style size foreground background -- font )
     apply-presentation-style
     nip ;
 
-TUPLE: nested-pane-stream < pane-stream style parent ;
+TUPLE: nested-pane-stream < style-stream parent ;
 
 : new-nested-pane-stream ( style parent class -- stream )
-    new
-        swap >>parent
-        swap <pane> apply-wrap-style [ >>style ] [ >>pane ] bi* ; inline
+    [ <pane> apply-wrap-style <pane-stream> swap ] 2dip boa ; inline
 
 : unnest-pane-stream ( stream -- child parent )
-    [ [ style>> ] [ pane>> smash-pane ] bi style-pane ] [ parent>> ] bi ;
+    [ style>> ] [ stream>> pane>> smash-pane style-pane ] [ parent>> ] tri ;
 
 TUPLE: pane-block-stream < nested-pane-stream ;
 
@@ -315,7 +313,7 @@ M: pane-stream make-cell-stream
 
 M: pane-stream stream-write-table
     [
-        swap [ [ pane>> smash-pane ] map ] map
+        swap [ [ stream>> pane>> smash-pane ] map ] map
         styled-grid
     ] dip write-gadget ;
 
