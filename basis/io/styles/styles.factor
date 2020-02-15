@@ -1,10 +1,9 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs colors colors.constants delegate
-delegate.protocols destructors fry hashtables io
-io.streams.plain io.streams.string kernel make math.order
-namespaces present sequences splitting strings strings.tables
-summary ;
+USING: accessors assocs colors delegate delegate.protocols
+destructors hashtables io io.streams.plain io.streams.string
+kernel make namespaces present sequences sets splitting strings
+strings.tables summary ;
 IN: io.styles
 
 GENERIC: stream-format ( str style stream -- )
@@ -62,8 +61,10 @@ C: <ignore-close-stream> ignore-close-stream
 TUPLE: style-stream < filter-writer style ;
 INSTANCE: style-stream output-stream
 
+DEFER: inherit-style
+
 : do-nested-style ( style style-stream -- style stream )
-    [ style>> swap assoc-union ] [ stream>> ] bi ; inline
+    [ style>> inherit-style ] [ stream>> ] bi ; inline
 
 C: <style-stream> style-stream
 
@@ -143,6 +144,18 @@ CONSTANT: standard-table-style
         { table-gap { 5 5 } }
         { table-border T{ rgba f 0.8 0.8 0.8 1.0 } }
     }
+
+<PRIVATE
+
+: inherit? ( format -- ? )
+    HS{
+        foreground background font-name font-size font-style
+    } in? ;
+
+PRIVATE>
+
+: inherit-style ( child parent -- child' )
+    [ drop inherit? ] assoc-filter swap assoc-union! ;
 
 ! Input history
 TUPLE: input string ;
