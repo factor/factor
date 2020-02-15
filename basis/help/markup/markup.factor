@@ -49,9 +49,7 @@ M: f print-element drop ;
     [ print-element ] with-style ;
 
 : with-default-style ( quot -- )
-    default-span-style get [
-        default-block-style get swap with-nesting
-    ] with-style ; inline
+    default-style get swap with-nesting ; inline
 
 : print-content ( element -- )
     [ print-element ] with-default-style ;
