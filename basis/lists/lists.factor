@@ -113,7 +113,7 @@ M: sequence >list sequence>list ;
 :: (parse-list-literal) ( accum right-of-dot? -- accum )
     accum scan-token {
         { "}" [ +nil+ , ] }
-        { "rest:" [ t (parse-list-literal) ] }
+        { "." [ t (parse-list-literal) ] }
         [
             parse-datum dup parsing-word? [
                 V{ } clone swap execute-parsing first
