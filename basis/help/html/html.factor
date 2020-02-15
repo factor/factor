@@ -5,8 +5,8 @@ debugger fry help help.home help.topics help.vocabs html
 html.streams io.directories io.encodings.binary
 io.encodings.utf8 io.files io.files.temp io.pathnames kernel
 locals make math math.parser memoize namespaces sequences
-serialize sorting splitting tools.completion vocabs
-vocabs.hierarchy words xml.data xml.syntax xml.traversal
+sequences.deep serialize sorting splitting tools.completion
+vocabs vocabs.hierarchy words xml.data xml.syntax xml.traversal
 xml.writer ;
 FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
@@ -75,8 +75,8 @@ M: pathname url-of
     "conventions" >link topic>filename
     [XML
         <div class="navbar">
-        <a href="http://factorcode.org">Factor</a>
-        <a href="/">Documentation</a>
+        <a href="http://factorcode.org">factorcode.org</a>
+        <a href="/">Handbook</a>
         <a href=<->>Glossary</a>
         <form method="get" action="/search" style="display:inline;">
             <input placeholder="Search" name="search" type="text"/>
@@ -100,10 +100,9 @@ M: pathname url-of
     H{ } clone :> classes
     body [
         dup xml-chunk? [
-            seq>> [ tag? ] filter
-            "span" "div" [ deep-tags-named ] bi-curry@ bi append
-            [
+            seq>> [
                 dup {
+                    [ tag? ]
                     [ "style" attr ]
                     [ "class" attr not ]
                 } 1&& [
@@ -111,7 +110,7 @@ M: pathname url-of
                     "style" over delete-at* drop classes css-class
                     "class" rot set-at
                 ] [ drop ] if
-            ] each
+            ] deep-each
         ] [ drop ] if
     ] each classes sort-values css-classes body ;
 
