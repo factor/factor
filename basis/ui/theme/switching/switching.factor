@@ -16,7 +16,7 @@ IN: ui.theme.switching
     content-background default-font-background-color set-global
 
     ! help.stylesheet
-    default-span-style text-color foreground update-style
+    default-style text-color foreground update-style
     link-style link-color foreground update-style
     title-style title-color foreground update-style
     help-path-style help-path-border-color table-border update-style
