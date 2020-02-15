@@ -54,14 +54,9 @@ CONSTANT: colors H{
         { bold-italic "\e[1m\e[3m" }
     } at "" or ;
 
-TUPLE: ansi stream ;
+TUPLE: ansi < filter-writer ;
 
 C: <ansi> ansi
-
-M: ansi stream-write1 stream>> stream-write1 ;
-M: ansi stream-write stream>> stream-write ;
-M: ansi stream-flush stream>> stream-flush ;
-M: ansi stream-nl stream>> stream-nl ;
 
 M: ansi stream-format
     [
