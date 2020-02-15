@@ -23,6 +23,10 @@ input {
     border-radius: 3px;
 }
 
+img {
+    vertical-align: middle;
+}
+
 .navbar {
     background-color: #f3f2ea;
     padding: 10px;
