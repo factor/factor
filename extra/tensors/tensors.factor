@@ -269,9 +269,19 @@ METHOD: t% { number tensor } [ >float ] dip [ mod ] with t-uop ;
 !         ] each-integer
 !     ] each-integer ;
 
-! transposes a 2-dimensional tensor in the easiest possible way
-TYPED: 2d-transpose ( tensor: tensor -- tensor': tensor )
-    tensor>array flip array>tensor ;
+! much quicker transpose for 2d tensors
+TYPED:: 2d-transpose ( tensor: tensor -- tensor': tensor )
+    tensor shape>> :> old-shape
+    tensor vec>> :> vec
+    ! loop through new tensor
+    old-shape reverse dup product <iota> [
+        ! find y*b val in original tensor
+        old-shape first old-shape second [ /mod ] dip *
+        ! find x val in original tensor
+        [ old-shape second /mod ] dip + nip
+        ! get that index in original tensor
+        vec nth-unsafe
+    ] float-array{ } map-as <tensor> ;
 
 ! Perform matrix multiplication muliplying an
 ! mxn matrix with a nxp matrix
