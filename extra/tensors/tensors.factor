@@ -137,6 +137,17 @@ TYPED: tensor>array ( tensor: tensor -- seq: array )
     [ vec>> >array ] [ shape>> ] bi
     [ rest-slice reverse [ group ] each ] unless-empty ;
 
+! assumes 2d tensor
+: array>tensor ( seq -- tensor )
+    ! get the shape
+    dup length
+    [ dup first length ] dip swap
+    2array swap
+    ! flatten the array
+    concat
+    ! turn into a tensor
+    >float-array <tensor> ;
+
 <PRIVATE
 
 :: make-subseq ( arr start len -- arr )
@@ -237,23 +248,52 @@ METHOD: t% { number tensor } [ >float ] dip [ mod ] with t-uop ;
     ! Take a slice
     rot <slice> ;
 
+! ! Perform matrix multiplication muliplying an
+! ! mxn matrix with a nxp matrix
+! TYPED:: 2d-matmul ( vec1: float-array vec2: float-array res: float-array
+!                     m: fixnum n: fixnum p: fixnum -- )
+!     ! For each element in the range, we want to compute the dot product of the
+!     ! corresponding row and column
+!     m [ :> i
+!         i n * :> in
+!         i p * :> ip
+!         p [ :> j
+!             0.0 ! This is the sum
+!             n [ :> k
+!                 ! Add to the sum
+!                 in k + vec1 nth-unsafe
+!                 k p * j + vec2 nth-unsafe
+!                 * +
+!             ] each-integer
+!             ip j + res set-nth-unsafe
+!         ] each-integer
+!     ] each-integer ;
+
+! transposes a 2-dimensional tensor in the easiest possible way
+TYPED: 2d-transpose ( tensor: tensor -- tensor': tensor )
+    tensor>array flip array>tensor ;
+
 ! Perform matrix multiplication muliplying an
 ! mxn matrix with a nxp matrix
 TYPED:: 2d-matmul ( vec1: float-array vec2: float-array res: float-array
                     m: fixnum n: fixnum p: fixnum -- )
     ! For each element in the range, we want to compute the dot product of the
     ! corresponding row and column
+    ! Transpose vec2 so that we are doing row * row (as opposed to row * col)
+    { n p } vec2 <tensor> 2d-transpose vec>> :> vec2
+
     m [ :> i
         i n * :> in
         i p * :> ip
         p [ :> j
-            0.0 ! This is the sum
-            n [ :> k
-                ! Add to the sum
-                in k + vec1 nth-unsafe
-                k p * j + vec2 nth-unsafe
-                * +
+            vec1 in n make-subseq simd-slice :> ( simd1 rest1 )
+            vec2 j n * n make-subseq simd-slice :> ( simd2 rest2 )
+            0.0
+            simd1 length [
+                [ simd1 nth-unsafe ] [ simd2 nth-unsafe ] bi
+                v. +
             ] each-integer
+            rest1 rest2 [ * ] 2map sum +
             ip j + res set-nth-unsafe
         ] each-integer
     ] each-integer ;
@@ -296,26 +336,12 @@ TYPED:: matmul ( tensor1: tensor tensor2: tensor -- tensor3: tensor )
     ] each-integer
     vec3 <tensor> ;
 
-! assumes 2d tensor
-: array>tensor ( seq -- tensor )
-    ! get the shape
-    dup length 
-    [ dup first length ] dip swap
-    2array swap
-    ! flatten the array
-    concat
-    ! turn into a tensor
-    >float-array <tensor> ;
-
 <PRIVATE
 ! helper for transpose: turns a shape into a list of things
 ! by which to multiply indices to get a full index
 : ind-mults ( shape -- seq )
     <reversed> 1 swap [ swap [ * ] keep ] map nip ;
 
-! transposes a 2-dimensional tensor in the easiest possible way
-TYPED: 2d-transpose ( tensor: tensor -- tensor': tensor )
-    tensor>array flip array>tensor ;
 PRIVATE>
 
 ! Transpose an n-dimensional tensor by flipping the axes
@@ -332,5 +358,5 @@ TYPED:: transpose ( tensor: tensor -- tensor': tensor )
             old-shape mults [ [ /mod ] dip * ] 2map-sum nip
             ! get that index in original tensor
             vec nth-unsafe
-        ] float-array{ } map-as <tensor> 
+        ] float-array{ } map-as <tensor>
     ] if ;
