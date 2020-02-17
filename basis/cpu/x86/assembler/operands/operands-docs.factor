@@ -3,9 +3,9 @@ IN: cpu.x86.assembler.operands
 
 HELP: indirect
 { $class-description "Tuple that represents an indirect addressing operand. It has the following slots:"
-  { $table
-    { { $slot "index" } { "Register for the index value. It must not be " { $link ESP } " or " { $link RSP } "." } }
-    { { $slot "displacement" } { "An integer offset." } }
+  { $slots
+    { "index" { "Register for the index value. It must not be " { $link ESP } " or " { $link RSP } "." } }
+    { "displacement" { "An integer offset." } }
   }
 } ;
 

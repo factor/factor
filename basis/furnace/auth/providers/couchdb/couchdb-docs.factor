@@ -4,20 +4,20 @@ IN: furnace.auth.providers.couchdb
 HELP: couchdb-auth-provider
 {
     $class-description "Implements the furnace authentication protocol for CouchDB."
-    { $table
-      { { $slot "base-url" } { "The base URL for the CouchDB database, e.g. http://foo.org:5984/mydatabase" } }
-      { { $slot "username-view" } { "A URL for a view which emits usernames as keys and user documents as values, "
+    { $slots
+      { "base-url" { "The base URL for the CouchDB database, e.g. http://foo.org:5984/mydatabase" } }
+      { "username-view" { "A URL for a view which emits usernames as keys and user documents as values, "
                                     "i.e. something like emit(doc.username, doc). The URL should be relative"
                                     " to base-url (e.g. \"_design/my_views/_view/by_username\")."
                                     " The view is not defined automatically by the library." } }
-      { { $slot "prefix" } { "In order to ensure the uniqueness of user IDs and email addresses,"
+      { "prefix" { "In order to ensure the uniqueness of user IDs and email addresses,"
                              " the library creates documents in the database with ids corresponding to these values. "
                              "These ids "
                              "are prefixed by the string given as the value for this slot. Ideally, you should guarantee that no other "
                              "documents in the database can have ids with this prefix. However, "
                              "the worst that can happen is for someone to falsely be told that a username "
                              "is taken when it is in fact free." } }
-      { { $slot "field-map" } { "An assoc taking " { $link user } " slot names to CouchDB document "
+      { "field-map" { "An assoc taking " { $link user } " slot names to CouchDB document "
                                 "field names. It is not usually necessary to set this slot - it is useful only if "
                                 "you do not wish to use the default field names." } }
   }

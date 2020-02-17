@@ -12,10 +12,10 @@ ARTICLE: "wrap" "Word wrapping"
 
 HELP: element
 { $class-description "An element to be wrapped. It has the following slots:" }
-{ $table
-    { { $slot "contents" } "The object being wrapped." }
-    { { $slot "black" } "The width of the object (e.g., the text length)." }
-    { { $slot "white" } "The space after the object (e.g., trailing whitespace)." }
+{ $slots
+    { "contents" "The object being wrapped." }
+    { "black" "The width of the object (e.g., the text length)." }
+    { "white" "The space after the object (e.g., trailing whitespace)." }
 } ;
 
 HELP: wrap

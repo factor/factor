@@ -50,9 +50,9 @@ HELP: line
 { $class-description "This is a " { $link gadget } " which, when added as a child to the " { $link chart } ", will display its data as straight line segments. The implementation is oriented towards speed to allow large data sets to be displayed as quickly as possible."
 $nl
 "Slots:"
-{ $list
-    { { $slot "data" } " - a " { $link sequence } " of { x y } pairs sorted by non-descending x;" }
-    { { $slot "data" } " - a " { $link color } " to draw the line with." }
+{ $slots
+    { "data" { "a " { $link sequence } " of { x y } pairs sorted by non-descending x;" } }
+    { "color" { "a " { $link color } " to draw the line with." } }
 } } ;
 
 HELP: y-at
