@@ -83,7 +83,7 @@ M: 256color stream-format
         [ background of [ color>background ] [ "" ] if* ]
         [ font-style of [ font-styles ] [ "" ] if* ]
         tri 3append [ "\e[0m" surround ] unless-empty
-    ] dip call-next-method ;
+    ] dip stream>> stream-write ;
 
 M: 256color make-span-stream
     swap <style-stream> <ignore-close-stream> ;
