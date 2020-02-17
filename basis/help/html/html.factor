@@ -1,13 +1,12 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit
-debugger fry help help.home help.topics help.vocabs html
-html.streams io.directories io.encodings.binary
+debugger formatting fry help help.home help.topics help.vocabs
+html html.streams io.directories io.encodings.binary
 io.encodings.utf8 io.files io.files.temp io.pathnames kernel
-locals make math math.parser memoize namespaces sequences
+locals make math math.parser memoize namespaces regexp sequences
 sequences.deep serialize sorting splitting tools.completion
-vocabs vocabs.hierarchy words xml.data xml.syntax xml.traversal
-xml.writer ;
+vocabs vocabs.hierarchy words xml.data xml.syntax xml.writer ;
 FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
 IN: help.html
@@ -91,9 +90,15 @@ M: pathname url-of
 : css-class ( style classes -- name )
     dup '[ drop _ assoc-size 1 + bijective-base26 ] cache ;
 
+: css-style ( style -- style' )
+    R/ font-size: \d+pt;/ [
+        "font-size: " ?head drop "pt;" ?tail drop
+        string>number 12 / "font-size: %frem;" sprintf
+    ] re-replace-with ;
+
 : css-classes ( classes -- stylesheet )
     [
-        [ " { " "}" surround ] [ "." prepend ] bi* prepend
+        [ css-style " { " "}" surround ] [ "." prepend ] bi* prepend
     ] { } assoc>map "\n" join ;
 
 :: css-styles-to-classes ( body -- stylesheet body )
