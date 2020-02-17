@@ -43,11 +43,11 @@ ABOUT: "buffers"
 
 HELP: buffer
 { $class-description "The class of I/O buffers, which resemble FIFO queues, but are optimized for holding bytes, are have underlying storage allocated at a fixed address. Buffers must be de-allocated manually. It has the following slots:"
-    { $table
-        { { $slot "size" } "The total size, in bytes, of the buffer" }
-        { { $slot "ptr" } { "The " { $link c-ptr } " memory where data is stored" } }
-        { { $slot "fill" } "The fill pointer, a write index where new data is added" }
-        { { $slot "pos" } "The position, a read index where data is consumed" }
+    { $slots
+        { "size" "The total size, in bytes, of the buffer" }
+        { "ptr" { "The " { $link c-ptr } " memory where data is stored" } }
+        { "fill" "The fill pointer, a write index where new data is added" }
+        { "pos" "The position, a read index where data is consumed" }
     }
 } ;
 

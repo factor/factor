@@ -52,13 +52,13 @@ HELP: <hashcash>
 
 HELP: hashcash
 { $class-description "An hashcash object. An hashcash have the following slots:"
-    { $table
-        { { $slot "version" } "The version number. Only version 1 is supported." }
-        { { $slot "bits" } "The claimed bit value." }
-        { { $slot "date" } "The date a stamp was minted." }
-        { { $slot "resource" } "The resource for which a stamp is minted." }
-        { { $slot "ext" } "Extensions that a specialized application may want." }
-        { { $slot "salt" } "A random salt." }
-        { { $slot "suffix" } "The computed suffix. This is supposed to be manipulated by the library." }
+    { $slots
+        { "version" "The version number. Only version 1 is supported." }
+        { "bits" "The claimed bit value." }
+        { "date" "The date a stamp was minted." }
+        { "resource" "The resource for which a stamp is minted." }
+        { "ext" "Extensions that a specialized application may want." }
+        { "salt" "A random salt." }
+        { "suffix" "The computed suffix. This is supposed to be manipulated by the library." }
     }
 } ;

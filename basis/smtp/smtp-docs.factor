@@ -6,12 +6,12 @@ IN: smtp
 
 HELP: smtp-config
 { $class-description "An SMTP configuration object, with the following slots:"
-    { $table
-        { { $slot "domain" } { "Name of the machine sending the email, or " { $link host-name } " if empty." } }
-        { { $slot "server" } { "An " { $link <inet> } " of the SMTP server." } }
-        { { $slot "tls?" } { "Secure socket after connecting to server, server must support " { $snippet "STARTTLS" } } }
-        { { $slot "read-timeout" } { "Length of time after which we give up waiting for a response." } }
-        { { $slot "auth" } { "Either " { $link no-auth } " or an instance of " { $link plain-auth } " or " { $link login-auth } } }
+    { $slots
+        { "domain" { "Name of the machine sending the email, or " { $link host-name } " if empty." } }
+        { "server" { "An " { $link <inet> } " of the SMTP server." } }
+        { "tls?" { "Secure socket after connecting to server, server must support " { $snippet "STARTTLS" } } }
+        { "read-timeout" { "Length of time after which we give up waiting for a response." } }
+        { "auth" { "Either " { $link no-auth } " or an instance of " { $link plain-auth } " or " { $link login-auth } } }
     }
 } ;
 
@@ -53,15 +53,15 @@ HELP: with-smtp-connection
 
 HELP: email
 { $class-description "An e-mail. E-mails have the following slots:"
-    { $table
-        { { $slot "from" } "The sender of the e-mail. An e-mail address." }
-        { { $slot "to" } "The recipients of the e-mail. A sequence of e-mail addresses." }
-        { { $slot "cc" } "Carbon-copy. A sequence of e-mail addresses." }
-        { { $slot "bcc" } "Blind carbon-copy. A sequence of e-mail addresses." }
-        { { $slot "subject" } "The subject of the e-mail. A string." }
-        { { $slot "content-type" } { "The MIME type of the body. A string, default is " { $snippet "text/plain" } "." } }
-        { { $slot "encoding" } { "An encoding to send the body as. Default is " { $link utf8 } "." } }
-        { { $slot "body" } " The body of the e-mail. A string." }
+    { $slots
+        { "from" "The sender of the e-mail. An e-mail address." }
+        { "to" "The recipients of the e-mail. A sequence of e-mail addresses." }
+        { "cc" "Carbon-copy. A sequence of e-mail addresses." }
+        { "bcc" "Blind carbon-copy. A sequence of e-mail addresses." }
+        { "subject" "The subject of the e-mail. A string." }
+        { "content-type" { "The MIME type of the body. A string, default is " { $snippet "text/plain" } "." } }
+        { "encoding" { "An encoding to send the body as. Default is " { $link utf8 } "." } }
+        { "body" " The body of the e-mail. A string." }
     }
 "The " { $slot "from" } " and " { $slot "to" } " slots are required; the rest are optional."
 $nl
