@@ -100,12 +100,16 @@ M: pane selected-children
 : smash-pane ( pane -- gadget )
     [ pane-nl ] [ output>> smash-line ] bi ;
 
-: pane-write ( seq pane -- )
-    [ pane-nl ] [ current>> stream-write ]
+GENERIC: pane-write ( str gadget -- )
+GENERIC: pane-write1 ( char gadget -- )
+GENERIC: pane-format ( str style gadget -- )
+
+M: pane pane-write
+    [ pane-nl ] [ current>> pane-write ]
     bi-curry interleave ;
 
-: pane-format ( seq style pane -- )
-    [ nip pane-nl ] [ current>> stream-format ]
+M: pane pane-format
+    [ nip pane-nl ] [ current>> pane-format ]
     bi-curry bi-curry interleave ;
 
 : do-pane-stream ( pane-stream quot -- )
@@ -115,7 +119,7 @@ M: pane-stream stream-nl
     [ pane-nl ] do-pane-stream ;
 
 M: pane-stream stream-write1
-    [ current>> stream-write1 ] do-pane-stream ;
+    [ current>> pane-write1 ] do-pane-stream ;
 
 : split-pane ( str quot: ( str -- ) -- )
     '[
@@ -318,30 +322,27 @@ M: pane-stream stream-write-table
     ] dip write-gadget ;
 
 ! Stream utilities
-M: pack dispose drop ;
-
-M: paragraph dispose drop ;
 
 : gadget-write ( string gadget -- )
     swap dup empty?
     [ 2drop ] [ <label> monospace-font >>font add-gadget drop ] if ;
 
-M: pack stream-write gadget-write ;
+M: pack pane-write gadget-write ;
 
 : gadget-bl ( style stream -- )
     swap " " <word-break-gadget> style-label add-gadget drop ;
 
-M: paragraph stream-write
+M: paragraph pane-write
     swap " " split
     [ H{ } over gadget-bl ] [ over gadget-write ] interleave
     drop ;
 
 : gadget-write1 ( char gadget -- )
-    [ 1string ] dip stream-write ;
+    [ 1string ] dip pane-write ;
 
-M: pack stream-write1 gadget-write1 ;
+M: pack pane-write1 gadget-write1 ;
 
-M: paragraph stream-write1
+M: paragraph pane-write1
     over CHAR: \s =
     [ H{ } swap gadget-bl drop ] [ gadget-write1 ] if ;
 
@@ -352,10 +353,10 @@ M: paragraph stream-write1
     [ [ empty-output? ] 2keep ] dip
     '[ _ _ swap <styled-label> _ swap add-gadget drop ] unless ;
 
-M: pack stream-format
+M: pack pane-format
     gadget-format ;
 
-M: paragraph stream-format
+M: paragraph pane-format
     over { presented image-style } [ swap key? ] with any? [
         gadget-format
     ] [
