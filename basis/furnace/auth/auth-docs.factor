@@ -97,18 +97,18 @@ ARTICLE: "furnace.auth.protected" "Protected resources"
     <protected>
 }
 "Protected responders have the following two slots which may be set:"
-{ $table
-    { { $slot "description" } "A string identifying the protected resource for user interface purposes" }
-    { { $slot "capabilities" } { "A sequence of capabilities; see " { $link "furnace.auth.capabilities" } } }
+{ $slots
+    { "description" "A string identifying the protected resource for user interface purposes" }
+    { "capabilities" { "A sequence of capabilities; see " { $link "furnace.auth.capabilities" } } }
 } ;
 
 ARTICLE: "furnace.auth.realm-config" "Authentication realm configuration"
 "Instances of subclasses of " { $link realm } " have the following slots which may be set:"
-{ $table
-    { { $slot "name" } "A string identifying the realm for user interface purposes" }
-    { { $slot "users" } { "An authentication provider (see " { $link "furnace.auth.providers" } "). By default, the " { $link users-in-db } " provider is used." } }
-    { { $slot "checksum" } { "An implementation of the checksum protocol used for verifying passwords (see " { $link "checksums" } "). The " { $link sha-256 } " checksum is used by default." } }
-    { { $slot "secure" } { "A boolean, that when set to a true value, forces the client to access the authentication realm via HTTPS. An attempt to access the realm via HTTP results in a redirect to the corresponding HTTPS URL. On by default." } }
+{ $slots
+    { "name" "A string identifying the realm for user interface purposes" }
+    { "users" { "An authentication provider (see " { $link "furnace.auth.providers" } "). By default, the " { $link users-in-db } " provider is used." } }
+    { "checksum" { "An implementation of the checksum protocol used for verifying passwords (see " { $link "checksums" } "). The " { $link sha-256 } " checksum is used by default." } }
+    { "secure" { "A boolean, that when set to a true value, forces the client to access the authentication realm via HTTPS. An attempt to access the realm via HTTP results in a redirect to the corresponding HTTPS URL. On by default." } }
 } ;
 
 ARTICLE: "furnace.auth.providers" "Authentication providers"

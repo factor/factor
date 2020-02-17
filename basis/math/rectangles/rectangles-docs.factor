@@ -3,9 +3,9 @@ IN: math.rectangles
 
 HELP: rect
 { $class-description "A rectangle with the following slots:"
-    { $list
-        { { $slot "loc" } " - the top-left corner of the rectangle as an x/y pair" }
-        { { $slot "dim" } " - the dimensions of the rectangle as a width/height pair" }
+    { $slots
+        { "loc" "the top-left corner of the rectangle as an x/y pair" }
+        { "dim" "the dimensions of the rectangle as a width/height pair" }
     }
     "Rectangles are constructed by calling " { $link <rect> } " and " { $link <extent-rect> } "."
 } ;

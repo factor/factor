@@ -92,15 +92,15 @@ $nl
 
 ARTICLE: "furnace.actions.config" "Furnace action configuration"
 "Actions have the following slots:"
-{ $table
-  { { $slot "rest" } { "A parameter name to map the rest of the URL, after the action name, to. If this is not set, then navigating to a URL where the action is not the last path component will return to the client with an error. A more general facility can be found in the " { $vocab-link "http.server.rewrite" } " vocabulary." } }
-    { { $slot "init" } { "A quotation called at the beginning of a GET or HEAD request. Typically this quotation configures " { $link "html.forms" } " and parses query parameters." } }
-    { { $slot "authorize" } { "A quotation called at the beginning of a GET, HEAD or POST request. In GET requests, it is called after the " { $slot "init" } " quotation; in POST requests, it is called after the " { $slot "validate" } " quotation. By convention, this quotation performs custom authorization checks which depend on query parameters or POST parameters." } }
-    { { $slot "display" } { "A quotation called after the " { $slot "init" } " quotation in a GET request. This quotation must return an HTTP " { $link response } "." } }
-    { { $slot "validate" } { "A quotation called at the beginning of a POST request to validate POST parameters." } }
-    { { $slot "submit" } { "A quotation called after the " { $slot "validate" } " quotation in a POST request. This quotation must return an HTTP " { $link response } "." } }
-    { { $slot "replace" } { "A quotation called after the " { $slot "validate" } " quotation in a PUT request. This quotation must return an HTTP " { $link response } "." } }
-    { { $slot "update" } { "A quotation called after the " { $slot "validate" } " quotation in a PATCH request. This quotation must return an HTTP " { $link response } "." } }
+{ $slots
+    { "rest" { "A parameter name to map the rest of the URL, after the action name, to. If this is not set, then navigating to a URL where the action is not the last path component will return to the client with an error. A more general facility can be found in the " { $vocab-link "http.server.rewrite" } " vocabulary." } }
+    { "init" { "A quotation called at the beginning of a GET or HEAD request. Typically this quotation configures " { $link "html.forms" } " and parses query parameters." } }
+    { "authorize" { "A quotation called at the beginning of a GET, HEAD or POST request. In GET requests, it is called after the " { $slot "init" } " quotation; in POST requests, it is called after the " { $slot "validate" } " quotation. By convention, this quotation performs custom authorization checks which depend on query parameters or POST parameters." } }
+    { "display" { "A quotation called after the " { $slot "init" } " quotation in a GET request. This quotation must return an HTTP " { $link response } "." } }
+    { "validate" { "A quotation called at the beginning of a POST request to validate POST parameters." } }
+    { "submit" { "A quotation called after the " { $slot "validate" } " quotation in a POST request. This quotation must return an HTTP " { $link response } "." } }
+    { "replace" { "A quotation called after the " { $slot "validate" } " quotation in a PUT request. This quotation must return an HTTP " { $link response } "." } }
+    { "update" { "A quotation called after the " { $slot "validate" } " quotation in a PATCH request. This quotation must return an HTTP " { $link response } "." } }
 }
 "At least one of the " { $slot "display" } " and " { $slot "submit" } " slots must be set, otherwise the action will be useless." ;
 

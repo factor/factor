@@ -7,9 +7,9 @@ HELP: debug-leaks?
 
 HELP: disposable
 { $class-description "Parent class for disposable resources. This class has two slots:"
-    { $list
-        { { $slot "disposed" } " - boolean. Set to true by " { $link dispose } ". Assert that it is false with " { $link check-disposed } "." }
-        { { $slot "continuation" } " - current continuation at construction time, for debugging. Set by " { $link new-disposable } " if " { $link debug-leaks? } " is on." }
+    { $slots
+        { "disposed" { "A boolean value, set to true by " { $link dispose } ". Assert that it is false with " { $link check-disposed } "." } }
+        { "continuation" { "The current continuation at construction time, for debugging. Set by " { $link new-disposable } " if " { $link debug-leaks? } " is on." } }
     }
 "New instances must be constructed with " { $link new-disposable } " and subclasses must implement " { $link dispose* } "." } ;
 

@@ -65,9 +65,6 @@ M: f print-element drop ;
 : $snippet ( children -- )
     [ snippet-style get print-element* ] ($span) ;
 
-! for help-lint
-ALIAS: $slot $snippet
-
 : $emphasis ( children -- )
     [ emphasis-style get print-element* ] ($span) ;
 
@@ -335,6 +332,12 @@ PRIVATE>
             ] with-row
         ] each
     ] ($grid) ;
+
+! for help-lint
+ALIAS: $slot $snippet
+
+: $slots ( children -- )
+    [ unclip \ $slot swap 2array prefix ] map $table ;
 
 : a/an ( str -- str )
     [ first ] [ length ] bi 1 =

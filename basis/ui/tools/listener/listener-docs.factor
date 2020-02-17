@@ -10,9 +10,9 @@ HELP: <listener-gadget>
 
 HELP: interactor
 { $class-description "An interactor is an " { $link editor } " intended to be used as the input component of a " { $link "ui-listener" } ". It has the following slots:"
-{ $table
+{ $slots
   {
-      { $slot "waiting" }
+      "waiting"
       { "If waiting is " { $link t } ", the interactor is waiting for user input, and invoking " { $link evaluate-input } " resumes the thread." }
   }
 }
