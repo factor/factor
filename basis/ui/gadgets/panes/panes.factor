@@ -175,14 +175,14 @@ M: style-stream write-gadget
 : gadget. ( gadget -- )
     output-stream get print-gadget ;
 
-: pane-clear ( pane -- )
+: clear-pane ( pane -- )
     clear-selection
     [ output>> clear-incremental ]
     [ current>> clear-gadget ]
     bi ;
 
 : with-pane ( pane quot -- )
-    [ [ scroll>top ] [ pane-clear ] [ <pane-stream> ] tri ] dip
+    [ [ scroll>top ] [ clear-pane ] [ <pane-stream> ] tri ] dip
     with-output-stream* ; inline
 
 : make-pane ( quot -- gadget )
