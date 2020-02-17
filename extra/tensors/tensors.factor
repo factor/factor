@@ -58,8 +58,8 @@ PRIVATE>
     check-shape [ ] [ product [0,b) >float-array ] bi <tensor> ;
 
 ! Construct a tensor without initializing its values
-: uninitialized ( shape -- tensor )
-    dup length (float-array) <tensor> ;
+: (tensor) ( shape -- tensor )
+    dup product (float-array) <tensor> ;
 
 
 ! Sequence protocol implementation
@@ -75,7 +75,7 @@ syntax:M: tensor new-sequence
     ! Check if the old and new tensors are the same size
     shape>> 2dup product =
     ! If so preserve the shape, otherwise create a 1D tensor
-    [ nip uninitialized ] [ drop 1array uninitialized ] if ;
+    [ nip (tensor) ] [ drop 1array (tensor) ] if ;
 
 syntax:M: tensor like
     ! If the original sequence is already a tensor, we are done
@@ -200,26 +200,26 @@ PRIVATE>
 ! Add a tensor to either another tensor or a scalar
 multi-methods:GENERIC: t+ ( x y -- tensor )
 METHOD: t+ { tensor tensor } [ v+ ] [ + ] t-bop-simd ;
-METHOD: t+ { tensor number } [ v+ ] [ + ] t-uop-simd ;
-METHOD: t+ { number tensor } swap [ swap v+ ] [ swap + ] t-uop-simd ;
+METHOD: t+ { tensor number } >float [ v+ ] [ + ] t-uop-simd ;
+METHOD: t+ { number tensor } swap >float [ swap v+ ] [ swap + ] t-uop-simd ;
 
 ! Subtraction between two tensors or a tensor and a scalar
 multi-methods:GENERIC: t- ( x y -- tensor )
 METHOD: t- { tensor tensor } [ v- ] [ - ] t-bop-simd ;
-METHOD: t- { tensor number } [ v- ] [ - ] t-uop-simd ;
-METHOD: t- { number tensor } swap [ swap v- ] [ swap - ] t-uop-simd ;
+METHOD: t- { tensor number } >float [ v- ] [ - ] t-uop-simd ;
+METHOD: t- { number tensor } swap >float [ swap v- ] [ swap - ] t-uop-simd ;
 
 ! Multiply a tensor with either another tensor or a scalar
 multi-methods:GENERIC: t* ( x y -- tensor )
 METHOD: t* { tensor tensor } [ v* ] [ * ] t-bop-simd ;
-METHOD: t* { tensor number } [ v* ] [ * ] t-uop-simd ;
-METHOD: t* { number tensor } swap [ swap v* ] [ swap * ] t-uop-simd ;
+METHOD: t* { tensor number } >float [ v* ] [ * ] t-uop-simd ;
+METHOD: t* { number tensor } swap >float [ swap v* ] [ swap * ] t-uop-simd ;
 
 ! Divide two tensors or a tensor and a scalar
 multi-methods:GENERIC: t/ ( x y -- tensor )
 METHOD: t/ { tensor tensor } [ v/ ] [ / ] t-bop-simd ;
-METHOD: t/ { tensor number } [ v/ ] [ / ] t-uop-simd ;
-METHOD: t/ { number tensor } swap [ swap v/ ] [ swap / ] t-uop-simd ;
+METHOD: t/ { tensor number } >float [ v/ ] [ / ] t-uop-simd ;
+METHOD: t/ { number tensor } swap >float [ swap v/ ] [ swap / ] t-uop-simd ;
 
 ! Mod two tensors or a tensor and a scalar
 multi-methods:GENERIC: t% ( x y -- tensor )
