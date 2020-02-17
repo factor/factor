@@ -1,15 +1,14 @@
 html {
-  box-sizing: border-box;
-  font-size: 16px;
+    box-sizing: border-box;
 }
 
 *, *:before, *:after {
-  box-sizing: inherit;
+    box-sizing: inherit;
 }
 
 body, h1, h2, h3, h4, h5, h6, p, ol, ul {
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
 a:link { text-decoration: none; color: #104e8b; }
@@ -27,11 +26,21 @@ img {
     vertical-align: middle;
 }
 
+table {
+    border-collapse: collapse;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
 .navbar {
     background-color: #f3f2ea;
     padding: 10px;
     border-bottom: 1px solid #ccc;
-    font: 12pt sans-serif;
+    font-family: sans-serif;
 }
 
 .navbar a {
@@ -41,8 +50,7 @@ img {
 }
 
 .page {
-    font-size: 120%;
     margin: 20px;
     max-width: 800px;
-    line-height: 125%;
+    line-height: 150%;
 }
