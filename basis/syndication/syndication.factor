@@ -26,6 +26,9 @@ TUPLE: entry title url description date ;
 : try-parsing-timestamp ( string -- timestamp )
     [ rfc822>timestamp ] [ drop rfc3339>timestamp ] recover ;
 
+: ?children>string ( tag -- str/f )
+    dup [ children>string ] when ; inline
+
 : rss1.0-entry ( tag -- entry )
     <entry> swap {
         [ "title" tag-named children>string >>title ]
@@ -47,12 +50,12 @@ TUPLE: entry title url description date ;
 
 : rss2.0-entry ( tag -- entry )
     <entry> swap {
-        [ "title" tag-named children>string >>title ]
-        [ { "link" "guid" } any-tag-named children>string >url >>url ]
-        [ { "description" "encoded" } any-tag-named children>string >>description ]
+        [ "title" tag-named ?children>string >>title ]
+        [ { "link" "guid" } any-tag-named ?children>string >url >>url ]
+        [ { "description" "encoded" } any-tag-named ?children>string >>description ]
         [
             { "date" "pubDate" } any-tag-named
-            children>string try-parsing-timestamp >>date
+            ?children>string try-parsing-timestamp >>date
         ]
     } cleave ;
 
