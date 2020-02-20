@@ -7,7 +7,7 @@ $nl
 "The " { $vocab-link "source-files.errors" } " vocabulary contains backend code used by this tool."
 { $heading "Message icons" }
 { $table
-    { "Icon" "Message type" "Reference" }
+    { { $strong "Icon" } { $strong "Message type" } { $strong "Reference" } }
     ! { { $image "vocab:ui/tools/error-list/icons/note.tiff" } "Parser note" { $link "parser" } }
     ! { { $image "vocab:ui/tools/error-list/icons/syntax-error.tiff" } "Syntax error" { $link "syntax" } }
     { { $image "vocab:ui/tools/error-list/icons/compiler-error.tiff" } "Compiler error" { $link "compiler-errors" } }
