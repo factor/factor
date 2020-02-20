@@ -1,26 +1,26 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs colors.constants fonts fry io.styles kernel literals
-math namespaces sequences ui.theme ;
+USING: assocs colors.constants fonts fry io.styles kernel
+literals math math.order namespaces sequences ui.theme ;
 IN: help.stylesheet
 
 : wrap-margin-full ( -- n )
-    42 default-font-size * ;
+    48 default-font-size * ;
 
 : wrap-margin-table-content ( -- n )
-    29 default-font-size * ;
+    32 default-font-size * ;
 
 : font-size-subsection ( -- n )
-    7/6 default-font-size * >integer ;
+    14/12 default-font-size * >integer ;
 
 : font-size-title ( -- n )
-    5/3 default-font-size * >integer ;
+    20/12 default-font-size * >integer ;
 
 : font-size-heading ( -- n )
-    4/3 default-font-size * >integer ;
+    16/12 default-font-size * >integer ;
 
 : font-size-span ( -- n )
-    13/12 default-font-size * >integer ;
+    14/12 default-font-size * >integer ;
 
 SYMBOL: default-style
 H{
@@ -56,7 +56,10 @@ H{
 
 SYMBOL: help-path-style
 H{
-    { font-size $ default-font-size }
+    { font-name $ default-sans-serif-font-name }
+    { font-size $ font-size-span }
+    { font-style plain }
+    { foreground $ text-color }
     { table-gap { 5 5 } }
 } help-path-style set-global
 
@@ -131,7 +134,9 @@ H{
 } table-style set-global
 
 SYMBOL: list-style
-H{ { table-gap { 10 2 } } } list-style set-global
+H{
+    { table-gap { 5 5 } }
+} list-style set-global
 
 SYMBOL: bullet
 "• " bullet set-global
@@ -145,4 +150,4 @@ SYMBOL: bullet
             subsection-style snippet-style
             code-style
         }
-    ] dip '[ get-global [ _ + ] change-at ] with each ;
+    ] dip '[ get-global [ _ + 1 max ] change-at ] with each ;
