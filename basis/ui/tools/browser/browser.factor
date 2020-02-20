@@ -43,7 +43,7 @@ CONSTANT: next 1
 : $navigation-arrow ( content element direction -- )
     [ prefix 1array ] dip add-navigation-arrow , ;
 
-:: ($navigation) ( topic direction -- )
+:: $navigation ( topic direction -- )
     help-path-style get [
         topic [
             direction prev/next-article
@@ -51,17 +51,12 @@ CONSTANT: next 1
         ] { } make [ ($navigation-table) ] unless-empty
     ] with-style ;
 
-: $navigation ( topic direction -- )
-    title-style get [ ($navigation) ] with-style ;
-
 : $title ( topic -- )
-    title-style get clone page-color over delete-at dup
+    title-style get clone page-color over delete-at
     [
-        [
-            [ ($title) ]
-            [ ($navigation-path) ] bi
-        ] with-nesting
-    ] with-style ;
+        [ ($title) ]
+        [ ($navigation-path) ] bi
+    ] with-nesting ;
 
 : <help-header> ( browser-gadget -- gadget )
     model>> [ '[ _ $title ] try ] <pane-control> ;
