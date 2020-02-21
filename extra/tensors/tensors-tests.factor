@@ -519,6 +519,23 @@ IN: tensors.tests
     { 2 3 2 } ones tensor>array
 ] unit-test
 
+! test array>tensor
+{ t } [
+    { 2 3 4 } naturals dup tensor>array array>tensor =
+] unit-test
+
+{ t } [
+    { { { 1.0 2.0 } { 3.0 4.0 } } 
+      { { 5.0 6.0 } { 7.0 8.0 } } 
+      { { 9.0 10.0 } { 11.0 12.0 } } }
+    dup array>tensor tensor>array =
+] unit-test
+
+{ t } [
+    { 2 3 } naturals
+    { { 0 1 2 } { 3 4 5 } } array>tensor =
+] unit-test
+
 ! test matmul
 { float-array{ 70.0 76.0 82.0 88.0 94.0 190.0 212.0 234.0
                256.0 278.0 310.0 348.0 386.0 424.0 462.0 } } [
