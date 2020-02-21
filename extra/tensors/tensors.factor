@@ -137,15 +137,32 @@ TYPED: tensor>array ( tensor: tensor -- seq: array )
     [ vec>> >array ] [ shape>> ] bi
     [ rest-slice reverse [ group ] each ] unless-empty ;
 
-! assumes 2d tensor
-: array>tensor ( seq -- tensor )
+<PRIVATE
+! recursively finds shape of nested array
+! assumes properly shaped array (all sub-arrays are same size)
+:: find-shape ( seq shape -- shape' )
+    ! add length of seq element to shape
+    shape seq length 1array append :> shape'
+    ! base case: check if the first element is a seq
+    seq first :> 1st
+    1st sequence?
+    ! is a sequence: recurse on 1st element
+    [ 1st shape' find-shape ]
+    ! not a sequence: return shape'
+    [ shape' ] if ;
+PRIVATE>
+
+! turns a nested array into a tensor
+:: array>tensor ( seq -- tensor )
     ! get the shape
-    dup length
-    [ dup first length ] dip swap
-    2array swap
+    seq { } find-shape :> shape
     ! flatten the array
-    concat
+    seq
+    shape length 1 - [
+        drop concat
+    ] each-integer
     ! turn into a tensor
+    shape swap
     >float-array <tensor> ;
 
 <PRIVATE
