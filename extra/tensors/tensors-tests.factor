@@ -519,21 +519,21 @@ IN: tensors.tests
     { 2 3 2 } ones tensor>array
 ] unit-test
 
-! test array>tensor
+! test >tensor
 { t } [
-    { 2 3 4 } naturals dup tensor>array array>tensor =
+    { 2 3 4 } naturals dup tensor>array >tensor =
 ] unit-test
 
 { t } [
     { { { 1.0 2.0 } { 3.0 4.0 } } 
       { { 5.0 6.0 } { 7.0 8.0 } } 
       { { 9.0 10.0 } { 11.0 12.0 } } }
-    dup array>tensor tensor>array =
+    dup >tensor tensor>array =
 ] unit-test
 
 { t } [
     { 2 3 } naturals
-    { { 0 1 2 } { 3 4 5 } } array>tensor =
+    { { 0 1 2 } { 3 4 5 } } >tensor =
 ] unit-test
 
 ! test matmul

@@ -19,6 +19,7 @@ TUPLE: tensor
 ! Errors
 ERROR: non-positive-shape-error shape ;
 ERROR: shape-mismatch-error shape1 shape2 ;
+ERROR: non-uniform-seq-error seq ;
 
 <PRIVATE
 
@@ -153,17 +154,19 @@ TYPED: tensor>array ( tensor: tensor -- seq: array )
 PRIVATE>
 
 ! turns a nested array into a tensor
-:: array>tensor ( seq -- tensor )
+:: >tensor ( seq -- tensor )
     ! get the shape
     seq { } find-shape :> shape
     ! flatten the array
     seq
     shape length 1 - [
         drop concat
-    ] each-integer
+    ] each-integer :> flatseq
+    ! check that the size is good
+    shape product flatseq length =  
+    [ seq non-uniform-seq-error ] unless
     ! turn into a tensor
-    shape swap
-    >float-array <tensor> ;
+    shape flatseq >float-array <tensor> ;
 
 <PRIVATE
 
