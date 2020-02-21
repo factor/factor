@@ -3,8 +3,8 @@
 
 USING: accessors alien alien.c-types alien.data arrays byte-arrays grouping
 kernel locals math math.functions math.ranges math.vectors math.vectors.simd
-multi-methods sequences sequences.extras sequences.private specialized-arrays
-typed ;
+multi-methods parser sequences sequences.extras sequences.private
+specialized-arrays typed ;
 
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
@@ -61,7 +61,6 @@ PRIVATE>
 ! Construct a tensor without initializing its values
 : (tensor) ( shape -- tensor )
     dup product (float-array) <tensor> ;
-
 
 ! Sequence protocol implementation
 syntax:M: tensor clone [ shape>> clone ] [ vec>> clone ] bi <tensor> ;
@@ -163,10 +162,12 @@ PRIVATE>
         drop concat
     ] each-integer :> flatseq
     ! check that the size is good
-    shape product flatseq length =  
+    shape product flatseq length =
     [ seq non-uniform-seq-error ] unless
     ! turn into a tensor
     shape flatseq >float-array <tensor> ;
+
+SYNTAX: t{ \ } [ >tensor ] parse-literal ;
 
 <PRIVATE
 
@@ -268,26 +269,26 @@ METHOD: t% { number tensor } [ >float ] dip [ mod ] with t-uop ;
     ! Take a slice
     rot <slice> ;
 
-! ! Perform matrix multiplication muliplying an
-! ! mxn matrix with a nxp matrix
-! TYPED:: 2d-matmul ( vec1: float-array vec2: float-array res: float-array
-!                     m: fixnum n: fixnum p: fixnum -- )
-!     ! For each element in the range, we want to compute the dot product of the
-!     ! corresponding row and column
-!     m [ :> i
-!         i n * :> in
-!         i p * :> ip
-!         p [ :> j
-!             0.0 ! This is the sum
-!             n [ :> k
-!                 ! Add to the sum
-!                 in k + vec1 nth-unsafe
-!                 k p * j + vec2 nth-unsafe
-!                 * +
-!             ] each-integer
-!             ip j + res set-nth-unsafe
-!         ] each-integer
-!     ] each-integer ;
+! Perform matrix multiplication muliplying an
+! mxn matrix with a nxp matrix
+TYPED:: 2d-matmul ( vec1: float-array vec2: float-array res: float-array
+                    m: fixnum n: fixnum p: fixnum -- )
+    ! For each element in the range, we want to compute the dot product of the
+    ! corresponding row and column
+    m [ :> i
+        i n * :> in
+        i p * :> ip
+        p [ :> j
+            0.0 ! This is the sum
+            n [ :> k
+                ! Add to the sum
+                in k + vec1 nth-unsafe
+                k p * j + vec2 nth-unsafe
+                * +
+            ] each-integer
+            ip j + res set-nth-unsafe
+        ] each-integer
+    ] each-integer ;
 
 ! much quicker transpose for 2d tensors
 TYPED:: 2d-transpose ( tensor: tensor -- tensor': tensor )
@@ -304,30 +305,38 @@ TYPED:: 2d-transpose ( tensor: tensor -- tensor': tensor )
         vec nth-unsafe
     ] float-array{ } map-as <tensor> ;
 
-! Perform matrix multiplication muliplying an
-! mxn matrix with a nxp matrix
-TYPED:: 2d-matmul ( vec1: float-array vec2: float-array res: float-array
-                    m: fixnum n: fixnum p: fixnum -- )
-    ! For each element in the range, we want to compute the dot product of the
-    ! corresponding row and column
-    ! Transpose vec2 so that we are doing row * row (as opposed to row * col)
-    { n p } vec2 <tensor> 2d-transpose vec>> :> vec2
+! ! Perform matrix multiplication muliplying an
+! ! mxn matrix with a nxp matrix
+! TYPED:: 2d-matmul ( vec1: float-array vec2: float-array res: float-array
+!                     m: fixnum n: fixnum p: fixnum -- )
+!     m [ :> i
+!         vec1 i n * n make-subseq simd-slice drop .
+!     ] each-integer ;
 
-    m [ :> i
-        i n * :> in
-        i p * :> ip
-        p [ :> j
-            vec1 in n make-subseq simd-slice :> ( simd1 rest1 )
-            vec2 j n * n make-subseq simd-slice :> ( simd2 rest2 )
-            0.0
-            simd1 length [
-                [ simd1 nth-unsafe ] [ simd2 nth-unsafe ] bi
-                v. +
-            ] each-integer
-            rest1 rest2 [ * ] 2map sum +
-            ip j + res set-nth-unsafe
-        ] each-integer
-    ] each-integer ;
+! ! Perform matrix multiplication muliplying an
+! ! mxn matrix with a nxp matrix
+! TYPED:: 2d-matmul ( vec1: float-array vec2: float-array res: float-array
+!                     m: fixnum n: fixnum p: fixnum -- )
+!     ! For each element in the range, we want to compute the dot product of the
+!     ! corresponding row and column
+!     ! Transpose vec2 so that we are doing row * row (as opposed to row * col)
+!     { n p } vec2 <tensor> 2d-transpose vec>> :> vec2
+
+!     m [ :> i
+!         i n * :> in
+!         i p * :> ip
+!         p [ :> j
+!             vec1 in n make-subseq simd-slice :> ( simd1 rest1 )
+!             vec2 j n * n make-subseq simd-slice :> ( simd2 rest2 )
+!             0.0
+!             simd1 length [
+!                 [ simd1 nth-unsafe ] [ simd2 nth-unsafe ] bi
+!                 v. +
+!             ] each-integer
+!             rest1 rest2 [ * ] 2map sum +
+!             ip j + res set-nth-unsafe
+!         ] each-integer
+!     ] each-integer ;
 
 PRIVATE>
 
