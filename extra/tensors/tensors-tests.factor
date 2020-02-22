@@ -200,6 +200,32 @@ IN: tensors.tests
     float-array{ 0 1 2 3 4 } { 2 3 } naturals like shape>>
 ] unit-test
 
+! Test tensor parsing word
+{ float-array{ 1 2 3 4 5 6 7 8 } } [
+    t{ 1 2 3 4 5 6 7 8 } vec>>
+] unit-test
+
+{ { 8 } } [
+    t{ 1 2 3 4 5 6 7 8 } shape>>
+] unit-test
+
+{ float-array{ 1 2 3 4 5 6 7 8 } } [
+    t{ { 1 2 3 4 } { 5 6 7 8 } } vec>>
+] unit-test
+
+{ { 2 4 } } [
+    t{ { 1 2 3 4 } { 5 6 7 8 } } shape>>
+] unit-test
+
+{ float-array{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 } } [
+    t{ { { 1 2 3 4 } { 5 6 7 8 } { 9 10 11 12 } } { { 13 14 15 16 } { 17 18 19 20 } { 21 22 23 24 } } } vec>>
+] unit-test
+
+{ { 2 3 4 } } [
+    t{ { { 1 2 3 4 } { 5 6 7 8 } { 9 10 11 12 } } { { 13 14 15 16 } { 17 18 19 20 } { 21 22 23 24 } } } shape>>
+] unit-test
+
+
 ! Test addition
 { float-array{ 1.0 2.0 3.0 4.0 } } [
     { 4 } naturals { 4 } ones t+ vec>>
@@ -525,8 +551,8 @@ IN: tensors.tests
 ] unit-test
 
 { t } [
-    { { { 1.0 2.0 } { 3.0 4.0 } } 
-      { { 5.0 6.0 } { 7.0 8.0 } } 
+    { { { 1.0 2.0 } { 3.0 4.0 } }
+      { { 5.0 6.0 } { 7.0 8.0 } }
       { { 9.0 10.0 } { 11.0 12.0 } } }
     dup >tensor tensor>array =
 ] unit-test

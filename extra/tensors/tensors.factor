@@ -3,7 +3,7 @@
 
 USING: accessors alien alien.c-types alien.data arrays byte-arrays grouping
 kernel locals math math.functions math.ranges math.vectors math.vectors.simd
-multi-methods parser sequences sequences.extras sequences.private
+multi-methods parser prettyprint.custom sequences sequences.extras sequences.private
 specialized-arrays typed ;
 
 QUALIFIED-WITH: alien.c-types c
@@ -169,6 +169,11 @@ PRIVATE>
 
 SYNTAX: t{ \ } [ >tensor ] parse-literal ;
 
+! Pretty printing
+syntax:M: tensor pprint-delims drop \ t{ \ } ;
+syntax:M: tensor >pprint-sequence tensor>array ;
+syntax:M: tensor pprint* pprint-object ;
+
 <PRIVATE
 
 :: make-subseq ( arr start len -- arr )
@@ -310,7 +315,7 @@ TYPED:: 2d-transpose ( tensor: tensor -- tensor': tensor )
 ! TYPED:: 2d-matmul ( vec1: float-array vec2: float-array res: float-array
 !                     m: fixnum n: fixnum p: fixnum -- )
 !     m [ :> i
-!         vec1 i n * n make-subseq simd-slice drop .
+!         i n * dup n + vec1 <slice> simd-slice drop .
 !     ] each-integer ;
 
 ! ! Perform matrix multiplication muliplying an
