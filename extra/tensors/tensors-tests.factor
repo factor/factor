@@ -157,7 +157,28 @@ IN: tensors.tests
 ] unit-test
 
 ! Test sequence operations
-! TODO: add tests for clone, length, nth, set-nth, new-sequence, and clone-like
+! TODO: add tests for clone, nth, set-nth, and clone-like
+! test length
+{ 20 } [
+    { 2 2 5 } naturals length
+] unit-test
+
+{ 0 } [
+    t{ } length
+] unit-test
+
+! test new-sequence
+{ 10 } [
+    10 { 2 5 } ones new-sequence shape>> product
+] unit-test
+
+{ 2 } [
+    2 { 3 4 5 } ones new-sequence shape>> product
+] unit-test
+
+{ 20 } [
+    20 { 2 5 } ones new-sequence shape>> product
+] unit-test
 
 ! Test like
 { float-array{ 0.0 1.0 2.0 3.0 4.0 5.0 } } [
@@ -561,6 +582,11 @@ IN: tensors.tests
     { 2 3 } naturals
     { { 0 1 2 } { 3 4 5 } } >tensor =
 ] unit-test
+
+[
+    { { 1 2 } { 3 } } >tensor
+]
+[ { { 1 2 } { 3 } } \ non-uniform-seq-error boa = ] must-fail-with
 
 ! test matmul
 { float-array{ 70.0 76.0 82.0 88.0 94.0 190.0 212.0 234.0
