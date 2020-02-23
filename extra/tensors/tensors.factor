@@ -141,15 +141,17 @@ TYPED: tensor>array ( tensor: tensor -- seq: array )
 ! recursively finds shape of nested array
 ! assumes properly shaped array (all sub-arrays are same size)
 :: find-shape ( seq shape -- shape' )
-    ! add length of seq element to shape
-    shape seq length 1array append :> shape'
-    ! base case: check if the first element is a seq
-    seq first :> 1st
-    1st sequence?
-    ! is a sequence: recurse on 1st element
-    [ 1st shape' find-shape ]
-    ! not a sequence: return shape'
-    [ shape' ] if ;
+    seq empty? [ { 0 } ] [
+        ! add length of seq element to shape
+        shape seq length 1array append :> shape'
+        ! base case: check if the first element is a seq
+        seq first :> 1st
+        1st sequence?
+        ! is a sequence: recurse on 1st element
+        [ 1st shape' find-shape ]
+        ! not a sequence: return shape'
+        [ shape' ] if
+    ] if ;
 PRIVATE>
 
 ! turns a nested array into a tensor
