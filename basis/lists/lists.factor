@@ -105,23 +105,28 @@ M: list >list ;
 
 M: sequence >list sequence>list ;
 
-: items>list ( seq -- cons-pair )
-    dup empty? [ drop +nil+ ] [
-        reverse unclip swap [ swap cons ] each
-    ] if ;
+<PRIVATE
 
-:: (parse-list-literal) ( accum right-of-dot? -- accum )
-    accum scan-token {
-        { "}" [ +nil+ , ] }
-        { "." [ t (parse-list-literal) ] }
+: items>list ( sequence -- list )
+    [ +nil+ ] [
+        <reversed> unclip-slice [ swons ] reduce
+    ] if-empty ;
+
+: (parse-list-literal) ( right-of-dot? -- )
+    scan-token {
+        { "}" [ drop +nil+ , ] }
+        { "." [ drop t (parse-list-literal) ] }
         [
             parse-datum dup parsing-word? [
                 V{ } clone swap execute-parsing first
             ] when
-            , right-of-dot? [ "}" expect ] [ f (parse-list-literal) ] if ]
+            , [ "}" expect ] [ f (parse-list-literal) ] if
+        ]
     } case ;
 
-: parse-list-literal ( accum -- accum object )
+: parse-list-literal ( -- list )
     [ f (parse-list-literal) ] { } make items>list ;
+
+PRIVATE>
 
 SYNTAX: L{ parse-list-literal suffix! ;
