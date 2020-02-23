@@ -121,7 +121,7 @@ M: f print-element drop ;
     "Generic word contract" $heading print-element ;
 
 : $examples ( element -- )
-    "Examples" $heading [ f $nl ] [ print-element ] interleave ;
+    "Examples" $heading print-element ;
 
 : $example ( element -- )
     unclip-last [ "\n" join ] dip over <input> [
