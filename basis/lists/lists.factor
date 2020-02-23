@@ -105,6 +105,8 @@ M: list >list ;
 
 M: sequence >list sequence>list ;
 
+ERROR: list-syntax-error ;
+
 <PRIVATE
 
 : items>list ( sequence -- list )
@@ -115,7 +117,7 @@ M: sequence >list sequence>list ;
 : (parse-list-literal) ( right-of-dot? -- )
     scan-token {
         { "}" [ drop +nil+ , ] }
-        { "." [ drop t (parse-list-literal) ] }
+        { "." [ [ list-syntax-error ] when t (parse-list-literal) ] }
         [
             parse-datum dup parsing-word? [
                 V{ } clone swap execute-parsing first
