@@ -175,15 +175,8 @@ syntax:M: tensor clone-like
     ! If the original sequence is already a tensor, we just need to clone it
     over tensor?
     [ drop clone ] [
-        ! Otherwise, if the original sequence and the exemplar have the same
-        ! number of elements, we should use the shape of the exemplar
-        2dup [ length ] bi@ = [
-            shape>> swap >float-array
-        ] [
-            ! Otherwise, just create an appropriately sized 1D tensor
-            drop [ length 1array ] [ >float-array ] bi
-        ] if
-        <tensor>
+        [ >tensor ] dip
+        2dup [ length ] bi@ = [ shape>> reshape ] [ drop ] if
     ] if ;
 
 INSTANCE: tensor sequence
