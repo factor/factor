@@ -157,7 +157,7 @@ IN: tensors.tests
 ] unit-test
 
 ! Test sequence operations
-! TODO: add tests for clone, nth, set-nth, and clone-like
+! TODO: add tests for clone-like
 ! test length
 { 20 } [
     { 2 2 5 } naturals length
@@ -178,6 +178,50 @@ IN: tensors.tests
 
 { 20 } [
     20 { 2 5 } ones new-sequence shape>> product
+] unit-test
+
+! test nth
+{ 1.0 } [
+    1 { 5 } naturals nth
+] unit-test
+
+{ 3.0 } [
+    3 { 2 2 } naturals nth
+] unit-test
+
+{ 5.0 } [
+    5 { 2 2 2 } naturals nth
+] unit-test
+
+[
+    10 t{ 1 2 3 } nth
+]
+[ 10 t{ 1 2 3 } \ bounds-error boa = ] must-fail-with
+
+! test set-nth
+{ t{ 1 5 3 } } [
+    t{ 1 2 3 } dup [ 5 1 ] dip set-nth
+] unit-test
+
+{ t{ { 0 1 } { 5 3 } } } [
+    { 2 2 } naturals dup [ 5 2 ] dip set-nth
+] unit-test
+
+{ t{ { { 0 1 } { 2 3 } } { { 4 10 } { 6 7 } } } } [
+    { 2 2 2 } naturals dup [ 10 5 ] dip set-nth
+] unit-test
+
+! test clone
+{ t{ 1 2 3 }  } [
+    t{ 1 2 3 } dup clone [ 5 1 ] dip set-nth
+] unit-test
+
+{ t } [
+    t{ 1 2 3 } dup clone =
+] unit-test
+
+{ f } [
+    t{ 1 2 3 } dup clone dup [ 5 1 ] dip set-nth =
 ] unit-test
 
 ! Test like
@@ -219,6 +263,20 @@ IN: tensors.tests
 
 { { 5 } } [
     float-array{ 0 1 2 3 4 } { 2 3 } naturals like shape>>
+] unit-test
+
+{ t{ { 0.0 1.0 } { 2.0 3.0 } } } [
+    { { 0 1 } { 2 3 } } t{ } like
+] unit-test
+
+! test clone-like
+{ float-array{ 1.0 2.0 3.0 } } [
+    { 1 2 3 } t{ } clone-like vec>>
+] unit-test
+
+{ f } [
+    float-array{ 1.0 2.0 3.0 } dup t{ } clone-like
+    dup [ 5 1 ] dip set-nth vec>> =
 ] unit-test
 
 ! Test tensor parsing word
