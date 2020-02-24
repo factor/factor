@@ -46,6 +46,28 @@ HELP: non-positive-shape-error
 ", which allow users to directly set the shape of a " { $link tensor }
 ", when the shape has zero or negative values." } ;
 
+HELP: non-uniform-seq-error
+{ $values { "seq" sequence } }
+{ $description "Throws a " { $link non-uniform-seq-error } "." }
+{ $error-description "Thrown by operations such as " { $link >tensor } 
+", which allow users to directly input the values of a " { $link tensor }
+" as a nested sequence, when the subsequences have varying lengths." } ;
+
+HELP: t{
+{ $syntax "t{ elements... }" }
+{ $values { "elements" "a list of numbers" } }
+{ $description "Initializes a tensor with the given elements."
+" Preserves the shape of nested arrays. Assumes uniformly nested arrays." } 
+{ $errors "Throws a " { $link non-uniform-seq-error } " if the given "
+"sequence have subsequences of varying lengths." } ;
+
+HELP: (tensor)
+{ $values { "shape" sequence } { "tensor" tensor } }
+{ $description "Creates a tensor with shape " { $snippet "shape" }
+" containing uninitialized values." } 
+{ $errors "Throws a " { $link non-positive-shape-error } " if the given "
+"shape has zero or negative values." } ;
+
 HELP: zeros
 { $values { "shape" sequence } { "tensor" tensor } }
 { $description "Initializes a tensor with shape " { $snippet "shape" }
@@ -86,6 +108,13 @@ HELP: flatten
 HELP: dims
 { $values { "tensor" tensor } { "n" integer } }
 { $description "Returns the dimension of " { $snippet "tensor" } "." } ;
+
+HELP: >tensor
+{ $values { "seq" sequence } { "tensor" tensor } }
+{ $description "Turns a nested sequence " { $snippet "seq" } 
+" into a tensor of the corresponding shape. Assumes a uniformly nested sequence." } 
+{ $errors "Throws a " { $link non-uniform-seq-error } " if the given "
+"sequence have subsequences of varying lengths." } ;
 
 HELP: t+
 { $values { "x" { $or tensor number } } { "y" { $or tensor number } } { "tensor" tensor } }
