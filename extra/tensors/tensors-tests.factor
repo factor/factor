@@ -588,6 +588,14 @@ IN: tensors.tests
 ]
 [ { { 1 2 } { 3 } } \ non-uniform-seq-error boa = ] must-fail-with
 
+{ float-array{ } } [
+    t{ } vec>>
+] unit-test
+
+{ { 0 } } [
+    t{ } shape>>
+] unit-test
+
 ! test matmul
 { float-array{ 70.0 76.0 82.0 88.0 94.0 190.0 212.0 234.0
                256.0 278.0 310.0 348.0 386.0 424.0 462.0 } } [

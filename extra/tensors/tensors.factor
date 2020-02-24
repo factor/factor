@@ -62,55 +62,6 @@ PRIVATE>
 : (tensor) ( shape -- tensor )
     dup product (float-array) <tensor> ;
 
-! Sequence protocol implementation
-syntax:M: tensor clone [ shape>> clone ] [ vec>> clone ] bi <tensor> ;
-
-syntax:M: tensor length vec>> length ;
-
-syntax:M: tensor nth-unsafe vec>> nth-unsafe ;
-
-syntax:M: tensor set-nth-unsafe vec>> set-nth-unsafe ;
-
-syntax:M: tensor new-sequence
-    ! Check if the old and new tensors are the same size
-    shape>> 2dup product =
-    ! If so preserve the shape, otherwise create a 1D tensor
-    [ nip (tensor) ] [ drop 1array (tensor) ] if ;
-
-syntax:M: tensor like
-    ! If the original sequence is already a tensor, we are done
-    over tensor?
-    [ drop ] [
-        ! Otherwise, if the original sequence and the exemplar have the same
-        ! number of elements, we should use the shape of the exemplar
-        2dup [ length ] bi@ = [
-            shape>> swap
-            ! Check if the seq is a float-array, otherwise convert it
-            dup float-array? [ >float-array ] unless
-        ] [
-            ! Otherwise, just create an appropriately sized 1D tensor
-            drop [ length 1array ] [ >float-array ] bi
-        ] if
-        <tensor>
-    ] if ;
-
-syntax:M: tensor clone-like
-    ! If the original sequence is already a tensor, we just need to clone it
-    over tensor?
-    [ drop clone ] [
-        ! Otherwise, if the original sequence and the exemplar have the same
-        ! number of elements, we should use the shape of the exemplar
-        2dup [ length ] bi@ = [
-            shape>> swap >float-array
-        ] [
-            ! Otherwise, just create an appropriately sized 1D tensor
-            drop [ length 1array ] [ >float-array ] bi
-        ] if
-        <tensor>
-    ] if ;
-
-INSTANCE: tensor sequence
-
 <PRIVATE
 
 : check-reshape ( shape1 shape2 -- shape1 shape2 )
@@ -175,6 +126,68 @@ SYNTAX: t{ \ } [ >tensor ] parse-literal ;
 syntax:M: tensor pprint-delims drop \ t{ \ } ;
 syntax:M: tensor >pprint-sequence tensor>array ;
 syntax:M: tensor pprint* pprint-object ;
+
+! Sequence protocol implementation
+syntax:M: tensor clone [ shape>> clone ] [ vec>> clone ] bi <tensor> ;
+
+syntax:M: tensor length vec>> length ;
+
+syntax:M: tensor nth-unsafe vec>> nth-unsafe ;
+
+syntax:M: tensor set-nth-unsafe vec>> set-nth-unsafe ;
+
+syntax:M: tensor new-sequence
+    ! Check if the old and new tensors are the same size
+    shape>> 2dup product =
+    ! If so preserve the shape, otherwise create a 1D tensor
+    [ nip (tensor) ] [ drop 1array (tensor) ] if ;
+
+! syntax:M: tensor like
+!     ! If the original sequence is already a tensor, we are done
+!     over tensor?
+!     [ drop ] [
+!         ! Otherwise, if the original sequence and the exemplar have the same
+!         ! number of elements, we should use the shape of the exemplar
+!         2dup [ length ] bi@ = [
+!             shape>>
+!         ] [
+!             ! Otherwise, just create an appropriately sized 1D tensor
+!             drop dup length 1array
+!         ] if
+!         ! Check if the seq is a float-array, otherwise convert it
+!         swap dup float-array? [ >float-array ] unless
+!         <tensor>
+!     ] if ;
+
+syntax:M: tensor like
+    ! If the original sequence is already a tensor, we are done
+    over tensor?
+    [ drop ] [
+        over float-array? [
+            [ dup [ length 1array ] dip <tensor> ] dip
+        ] [
+            [ >tensor ] dip
+        ] if
+        2dup [ length ] bi@ = [ shape>> reshape ] [ drop ] if
+    ] if ;
+
+syntax:M: tensor clone-like
+    ! If the original sequence is already a tensor, we just need to clone it
+    over tensor?
+    [ drop clone ] [
+        ! Otherwise, if the original sequence and the exemplar have the same
+        ! number of elements, we should use the shape of the exemplar
+        2dup [ length ] bi@ = [
+            shape>> swap >float-array
+        ] [
+            ! Otherwise, just create an appropriately sized 1D tensor
+            drop [ length 1array ] [ >float-array ] bi
+        ] if
+        <tensor>
+    ] if ;
+
+INSTANCE: tensor sequence
+
 
 <PRIVATE
 
