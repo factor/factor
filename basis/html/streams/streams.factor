@@ -114,14 +114,15 @@ M: html-span-stream dispose
 CONSTANT: pre-css "white-space: pre; font-family: monospace; "
 
 : div-css-style ( style -- str )
+    [ span-css-style ]
     [
         {
             { page-color bg-css, }
             { border-color border-css, }
             { inset padding-css, }
         } make-css
-    ] [ wrap-margin of [ pre-css append ] unless ] bi
-    "display: inline-block; " append ;
+    ] [ wrap-margin of [ pre-css append ] unless ] tri
+    "display: inline-block; " 3append ;
 
 : div-tag ( xml style -- xml' )
     div-css-style
