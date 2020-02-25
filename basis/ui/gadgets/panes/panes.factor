@@ -338,14 +338,12 @@ M: pane-stream stream-write-table
     swap " " <word-break-gadget> apply-character-style add-gadget drop ;
 
 : <styled-label> ( style text -- gadget )
-    [
-        <label>
-        apply-font-style
-        apply-background-style
-        apply-image-style
-    ] keep [ blank? ] all? [
-        apply-presentation-style
-    ] unless nip ;
+    <label>
+    apply-font-style
+    apply-background-style
+    apply-image-style
+    apply-presentation-style
+    nip ;
 
 : pane-text ( string style gadget -- )
     [ swap <styled-label> ] [ swap add-gadget drop ] bi* ;
