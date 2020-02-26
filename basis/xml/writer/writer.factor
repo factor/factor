@@ -153,9 +153,6 @@ M: directive write-xml
 M: instruction write-xml
     "<?" write text>> write "?>" write ;
 
-M: number write-xml
-    "Numbers are not allowed in XML" throw ;
-
 M: sequence write-xml
     [ write-xml ] each ;
 
