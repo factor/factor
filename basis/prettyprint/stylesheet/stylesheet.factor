@@ -52,7 +52,7 @@ H{
 
 SYMBOL: stack-effect-style
 H{
-    { foreground COLOR: FactorDarkGreen }
+    { foreground COLOR: FactorDarkSlateBlue }
     { font-style plain }
 } stack-effect-style set-global
 
