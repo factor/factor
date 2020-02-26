@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit
-debugger fry help help.home help.topics help.vocabs html
-html.streams io.directories io.encodings.binary
+debugger fonts formatting fry help help.home help.topics
+help.vocabs html html.streams io.directories io.encodings.binary
 io.encodings.utf8 io.files io.files.temp io.pathnames kernel
 locals make math math.parser memoize namespaces regexp sequences
 sequences.deep serialize sorting splitting tools.completion
@@ -93,8 +93,14 @@ M: pathname url-of
 : css-style ( style -- style' )
     R/ font-size: \d+pt;/ [
         "font-size: " ?head drop "pt;" ?tail drop
-        string>number 12 /f number>string
-        "font-size: " "rem; " surround
+        string>number default-font-size /f
+        "font-size: %.3frem;" sprintf
+    ] re-replace-with
+
+    R/ padding: \d+px;/ [
+        "padding: " ?head drop "px;" ?tail drop
+        string>number dup even? [ 1 + ] when 2 * number>string
+        "padding: " "px;" surround
     ] re-replace-with ;
 
 : css-classes ( classes -- stylesheet )
@@ -112,7 +118,7 @@ M: pathname url-of
                     [ "style" attr ]
                     [ "class" attr not ]
                 } 1&& [
-                    attrs>> [ V{ } like ] change-alist
+                    [ clone [ V{ } like ] change-alist ] change-attrs
                     "style" over delete-at* drop classes css-class
                     "class" rot set-at
                 ] [ drop ] if
