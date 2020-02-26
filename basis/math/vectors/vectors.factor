@@ -220,8 +220,8 @@ M: object v?
 GENERIC: vdot ( u v -- x )
 M: object vdot [ * ] [ + ] 2map-reduce ; inline
 
-GENERIC: h. ( u v -- x )
-M: object h. [ conjugate * ] [ + ] 2map-reduce ; inline
+GENERIC: hdot ( u v -- x )
+M: object hdot [ conjugate * ] [ + ] 2map-reduce ; inline
 
 GENERIC: norm-sq ( v -- x )
 M: object norm-sq [ absq ] [ + ] map-reduce ; inline
@@ -294,4 +294,4 @@ PRIVATE>
     dupd proj v- ;
 
 : angle-between ( v u -- a )
-    [ normalize ] bi@ h. acos ;
+    [ normalize ] bi@ hdot acos ;
