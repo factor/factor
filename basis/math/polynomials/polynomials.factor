@@ -36,7 +36,7 @@ ALIAS: n*p n*v
     [ drop length [ <iota> ] keep ]
     [ nip <reversed> ]
     [ drop ] 2tri
-    '[ _ _ <slice> _ v. ] map reverse! ;
+    '[ _ _ <slice> _ vdot ] map reverse! ;
 
 : p-sq ( p -- p^2 ) dup p* ; inline
 

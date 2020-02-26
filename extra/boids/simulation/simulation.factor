@@ -29,7 +29,7 @@ C: <boid> boid
     [ [ pos>> ] bi@ distance ] dip <= ; inline
 
 : angle-between ( u v -- angle )
-    [ normalize ] bi@ v. ; inline
+    [ normalize ] bi@ vdot ; inline
 
 : relative-position ( self other -- v )
     swap [ pos>> ] bi@ v- ; inline

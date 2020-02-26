@@ -248,8 +248,8 @@ DEFER: matrix-set-nths
 : m*  ( m1 m2 -- m ) [ v* ] 2map ;
 : m/  ( m1 m2 -- m ) [ v/ ] 2map ;
 
-: v.m ( v m -- p ) flip [ v. ] with map ;
-: m.v ( m v -- p ) [ v. ] curry map ;
+: v.m ( v m -- p ) flip [ vdot ] with map ;
+: m.v ( m v -- p ) [ vdot ] curry map ;
 : m. ( m m -- m ) flip [ swap m.v ] curry map ;
 
 : m~  ( m1 m2 epsilon -- ? ) [ v~ ] curry 2all? ;

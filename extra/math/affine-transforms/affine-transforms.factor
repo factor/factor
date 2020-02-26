@@ -62,10 +62,10 @@ CONSTANT: identity-transform T{ affine-transform f
 
 : a. ( a a -- a )
     {
-        [ [ transpose-axes x>> ] [ x>> ] bi* v. ]
-        [ [ transpose-axes y>> ] [ x>> ] bi* v. ]
-        [ [ transpose-axes x>> ] [ y>> ] bi* v. ]
-        [ [ transpose-axes y>> ] [ y>> ] bi* v. ]
+        [ [ transpose-axes x>> ] [ x>> ] bi* vdot ]
+        [ [ transpose-axes y>> ] [ x>> ] bi* vdot ]
+        [ [ transpose-axes x>> ] [ y>> ] bi* vdot ]
+        [ [ transpose-axes y>> ] [ y>> ] bi* vdot ]
         [ origin>> a.v ]
     } 2cleave
     [ [ 2array ] 2bi@ ] dip <affine-transform> ;

@@ -94,7 +94,7 @@ TYPED:: m4.v ( m: matrix4 v: float-4 -- v': float-4 )
     v fourth m4 n*v v+ ;
 
 TYPED:: v.m4 ( v: float-4 m: matrix4 -- c: float-4 )
-    m columns [ v v. ] 4 napply float-4-boa ;
+    m columns [ v vdot ] 4 napply float-4-boa ;
 
 CONSTANT: identity-matrix4
     S{ matrix4 f
