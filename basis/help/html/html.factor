@@ -99,8 +99,8 @@ M: pathname url-of
 
     R/ padding: \d+px;/ [
         "padding: " ?head drop "px;" ?tail drop
-        string>number dup even? [ 1 + ] when 2 * number>string
-        "padding: " "px;" surround
+        string>number dup even? [ 2 * 1 + ] [ 2 * ] if
+        number>string "padding: " "px;" surround
     ] re-replace-with ;
 
 : css-classes ( classes -- stylesheet )
