@@ -82,7 +82,7 @@ PRIVATE>
 
 : scalar-projection ( v1 v2 -- n )
     ! the scalar projection of v1 onto v2
-    [ v. ] [ norm ] bi / ;
+    [ vdot ] [ norm ] bi / ;
 
 : proj-perp ( u v -- w )
     dupd proj v- ;
@@ -93,7 +93,7 @@ PRIVATE>
 
 :: reflect ( v n -- v' )
     ! bounce v on a surface with normal n
-    v v n v. n n v. / 2 * n n*v v- ;
+    v v n vdot n n vdot / 2 * n n*v v- ;
 
 : half-way ( p1 p2 -- p3 )
     over v- 2 v/n v+ ;

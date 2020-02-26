@@ -70,7 +70,7 @@ PRIVATE>
     { } euler-like ; inline
 
 :: slerp ( q0 q1 t -- qt )
-    q0 q1 v. -1.0 1.0 clamp :> dot
+    q0 q1 vdot -1.0 1.0 clamp :> dot
     dot facos t * :> omega
     q1 dot q0 n*v v- normalize :> qt'
     omega fcos q0 n*v omega fsin qt' n*v v+ ; inline

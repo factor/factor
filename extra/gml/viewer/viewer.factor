@@ -24,7 +24,7 @@ CONSTANT: selected-face-color float-4{ 1 0.9 0.8 1 }
     >rgba-components float-4-boa ; inline
 
 : face-color ( edge -- color )
-    face-normal float-4{ 0 1 0.1 0 } v. 0.3 * 0.4 + dup dup 1.0 float-4-boa ; inline
+    face-normal float-4{ 0 1 0.1 0 } vdot 0.3 * 0.4 + dup dup 1.0 float-4-boa ; inline
 
 TUPLE: b-rep-vertices
     { array byte-array read-only }
@@ -234,11 +234,11 @@ CONSTANT: edge-hitbox-radius 0.05
 :: line-nearest-t ( p0 u q0 v -- tp tq )
     p0 q0 v- :> w0
 
-    u u v. :> a
-    u v v. :> b
-    v v v. :> c
-    u w0 v. :> d
-    v w0 v. :> e
+    u u vdot :> a
+    u v vdot :> b
+    v v vdot :> c
+    u w0 vdot :> d
+    v w0 vdot :> e
 
     a c * b b * - :> denom
 

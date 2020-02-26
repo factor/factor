@@ -65,13 +65,13 @@ sharp-continue ;
 
 :: project-pt-line ( p p0 p1 -- q )
     p1 p0 v- :> vt
-    p p0 v- vt v.
+    p p0 v- vt vdot
     vt norm-sq /
     vt n*v p0 v+ ; inline
 
 :: project-pt-plane ( line-p0 line-vt plane-n plane-d -- q )
-    plane-d neg plane-n line-p0 v. -
-    line-vt plane-n v. /
+    plane-d neg plane-n line-p0 vdot -
+    line-vt plane-n vdot /
     line-vt n*v line-p0 v+ ; inline
 
 : project-poly-plane ( poly vdir plane-n plane-d -- qoly )

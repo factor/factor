@@ -72,7 +72,7 @@ CONSTANT: default-segment-radius 1
 
 : heading-segment ( segments current-segment heading -- segment )
     ! the next segment on the given heading
-    over forward>> v. 0 <=> {
+    over forward>> vdot 0 <=> {
         { +gt+ [ next-segment ] }
         { +lt+ [ previous-segment ] }
         { +eq+ [ nip ] } ! current segment
@@ -80,12 +80,12 @@ CONSTANT: default-segment-radius 1
 
 :: distance-to-next-segment ( current next location heading -- distance )
     current forward>> :> cf
-    cf next location>> v. cf location v. - cf heading v. / ;
+    cf next location>> vdot cf location vdot - cf heading vdot / ;
 
 :: distance-to-next-segment-area ( current next location heading -- distance )
     current forward>> :> cf
     next current half-way-between-oints :> h
-    cf h v. cf location v. - cf heading v. / ;
+    cf h vdot cf location vdot - cf heading vdot / ;
 
 : vector-to-centre ( seg loc -- v )
     over location>> swap v- swap forward>> proj-perp ;
@@ -110,9 +110,9 @@ CONSTANT: distant 1000
     v norm 0 = [
         distant
     ] [
-        v dup v. :> a
-        v w v. 2 * :> b
-        w dup v. r sq - :> c
+        v dup vdot :> a
+        v w vdot 2 * :> b
+        w dup vdot r sq - :> c
         c b a quadratic max-real
     ] if ;
 

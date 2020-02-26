@@ -171,8 +171,8 @@ M: simd-128 vmin
     dup simd-rep [ (simd-vmin) ] [ call-next-method ] vv->v-op ; inline
 M: simd-128 vmax
     dup simd-rep [ (simd-vmax) ] [ call-next-method ] vv->v-op ; inline
-M: simd-128 v.
-    dup simd-rep [ (simd-v.) ] [ call-next-method ] vv->x-op ; inline
+M: simd-128 vdot
+    dup simd-rep [ (simd-vdot) ] [ call-next-method ] vv->x-op ; inline
 M: simd-128 vsad
     dup simd-rep [ (simd-vsad) ] [ call-next-method ] vv->x-op ; inline
 M: simd-128 vsqrt
@@ -253,7 +253,7 @@ M: simd-128 v+n over simd-with v+ ; inline
 M: simd-128 v-n over simd-with v- ; inline
 M: simd-128 v*n over simd-with v* ; inline
 M: simd-128 v/n over simd-with v/ ; inline
-M: simd-128 norm-sq dup v. assert-positive ; inline
+M: simd-128 norm-sq dup vdot assert-positive ; inline
 M: simd-128 distance v- norm ; inline
 
 M: simd-128 >pprint-sequence ;

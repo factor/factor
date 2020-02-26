@@ -169,7 +169,7 @@ terrain-world H{
     segment bitmap>> 4 <groups> :> pixels
     pixel dim pixel-indices :> indices
 
-    indices [ pixels nth COMPONENT-SCALE v. 255.0 / ] map
+    indices [ pixels nth COMPONENT-SCALE vdot 255.0 / ] map
     first4 pixel-mantissa bilerp ;
 
 : (collide) ( segment location -- location' )

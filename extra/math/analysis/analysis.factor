@@ -23,7 +23,7 @@ CONSTANT: gamma-p6
 : (gamma-lanczos6) ( x -- log[gamma[x+1]] )
     ! log(gamma(x+1)
     [ 0.5 + dup gamma-g6 + [ log * ] keep - ]
-    [ 6 gamma-z gamma-p6 v. log ] bi + ;
+    [ 6 gamma-z gamma-p6 vdot log ] bi + ;
 
 : gamma-lanczos6 ( x -- gamma[x] )
     ! gamma(x) = gamma(x+1) / x

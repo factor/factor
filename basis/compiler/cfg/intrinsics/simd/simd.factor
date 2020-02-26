@@ -417,7 +417,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         ] }
     } emit-vv-vector-op ;
 
-: emit-simd-v. ( node -- )
+: emit-simd-vdot ( node -- )
     {
         [ ^^dot-vector ]
         { float-vector-rep [ [ ^^mul-vector ] [ ^sum-vector ] bi ] }
@@ -667,7 +667,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         { (simd-vmin)               [ emit-simd-vmin                ] }
         { (simd-vmax)               [ emit-simd-vmax                ] }
         { (simd-vavg)               [ emit-simd-vavg                ] }
-        { (simd-v.)                 [ emit-simd-v.                  ] }
+        { (simd-vdot                [ emit-simd-vdot                ] }
         { (simd-vsad)               [ emit-simd-vsad                ] }
         { (simd-vsqrt)              [ emit-simd-vsqrt               ] }
         { (simd-sum)                [ emit-simd-sum                 ] }
