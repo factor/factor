@@ -9,14 +9,14 @@ IN: benchmark.3d-matrix-scalar
 :: mv-matrix ( pitch yaw location -- matrix )
     { 1.0 0.0 0.0 } pitch <rotation-matrix4>
     { 0.0 1.0 0.0 } yaw   <rotation-matrix4>
-    location vneg <translation-matrix4> m. m. ;
+    location vneg <translation-matrix4> mdot mdot ;
 
 :: 3d-matrix-scalar-benchmark ( -- )
     f :> result!
     100000 [
         { 1024.0 768.0 } 0.7 0.25 1024.0 p-matrix :> p
         3.0 1.0 { 10.0 -0.0 2.0 } mv-matrix :> mv
-        mv p m. result!
+        mv p mdot result!
     ] times
     result . ;
 

@@ -9,7 +9,6 @@ math.vectors.simd math.vectors.simd.cords method-chains models
 namespaces sequences sets specialized-vectors typed ui
 ui.gadgets ui.gadgets.worlds ui.gestures ui.pixel-formats
 vectors ;
-FROM: math.matrices => m.v ;
 FROM: models => change-model ;
 SPECIALIZED-VECTORS: ushort float-4 ;
 IN: gml.viewer
