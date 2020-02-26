@@ -45,7 +45,7 @@ IN: ui.theme.switching
     highlighted-word-style highlighted-word-color foreground update-style
     base-string-style string-color foreground update-style
     base-vocab-style dim-color foreground update-style
-    stack-effect-style stack-effect-color foreground update-style
+    base-effect-style stack-effect-color foreground update-style
 
     ! listener
     prompt-style prompt-background-color background update-style
