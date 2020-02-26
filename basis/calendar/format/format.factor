@@ -52,15 +52,15 @@ MACRO: formatted ( spec -- quot )
 
 GENERIC: day. ( obj -- )
 
-M: integer day. ( n -- )
+M: integer day.
     number>string dup length 2 < [ bl ] when write ;
 
-M: timestamp day. ( timestamp -- )
+M: timestamp day.
     day>> day. ;
 
 GENERIC: month. ( obj -- )
 
-M: array month. ( pair -- )
+M: array month.
     first2
     [ month-name write bl number>string print ]
     [ 1 zeller-congruence ]
@@ -71,15 +71,15 @@ M: array month. ( pair -- )
         1 + + 7 mod zero? [ nl ] [ bl ] if
     ] with each-integer nl ;
 
-M: timestamp month. ( timestamp -- )
+M: timestamp month.
     [ year>> ] [ month>> ] bi 2array month. ;
 
 GENERIC: year. ( obj -- )
 
-M: integer year. ( n -- )
+M: integer year.
     12 [ 1 + 2array month. nl ] with each-integer ;
 
-M: timestamp year. ( timestamp -- )
+M: timestamp year.
     year>> year. ;
 
 : timestamp>mdtm ( timestamp -- str )
