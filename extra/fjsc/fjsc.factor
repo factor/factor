@@ -304,36 +304,36 @@ M: ast-using (compile)
 
 GENERIC: (parse-factor-quotation) ( object -- ast )
 
-M: number (parse-factor-quotation) ( object -- ast )
+M: number (parse-factor-quotation)
     ast-number boa ;
 
-M: symbol (parse-factor-quotation) ( object -- ast )
+M: symbol (parse-factor-quotation)
     [ >string ] [ vocabulary>> ] bi ast-identifier boa ;
 
-M: word (parse-factor-quotation) ( object -- ast )
+M: word (parse-factor-quotation)
     [ name>> ] [ vocabulary>> ] bi ast-identifier boa ;
 
-M: string (parse-factor-quotation) ( object -- ast )
+M: string (parse-factor-quotation)
     ast-string boa ;
 
-M: quotation (parse-factor-quotation) ( object -- ast )
+M: quotation (parse-factor-quotation)
     [ (parse-factor-quotation) ] { } map-as ast-quotation boa ;
 
-M: array (parse-factor-quotation) ( object -- ast )
+M: array (parse-factor-quotation)
     [ (parse-factor-quotation) ] { } map-as ast-array boa ;
 
-M: hashtable (parse-factor-quotation) ( object -- ast )
+M: hashtable (parse-factor-quotation)
     >alist [ (parse-factor-quotation) ] { } map-as ast-hashtable boa ;
 
-M: wrapper (parse-factor-quotation) ( object -- ast )
+M: wrapper (parse-factor-quotation)
     wrapped>> [ name>> ] [ vocabulary>> ] bi ast-word boa ;
 
 GENERIC: fjsc-parse ( object -- ast )
 
-M: string fjsc-parse ( object -- ast )
+M: string fjsc-parse
     expression-parser parse ;
 
-M: quotation fjsc-parse ( object -- ast )
+M: quotation fjsc-parse
     [ (parse-factor-quotation) ] { } map-as ast-expression boa ;
 
 : fjsc-compile ( ast -- string )
