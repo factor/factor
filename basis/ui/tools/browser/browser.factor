@@ -38,7 +38,7 @@ CONSTANT: prev -1
 CONSTANT: next 1
 
 : add-navigation-arrow ( str direction -- str )
-    prev = [ "<" prefix ] [ ">" suffix ] if ;
+    prev = [ "←" prefix ] [ "→" suffix ] if ;
 
 : $navigation-arrow ( content element direction -- )
     [ prefix 1array ] dip add-navigation-arrow , ;
