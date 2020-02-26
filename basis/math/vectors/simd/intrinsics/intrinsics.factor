@@ -185,7 +185,7 @@ PRIVATE>
 : (simd-vmin)              ( a b rep -- c ) [ min ] components-2map ;
 : (simd-vmax)              ( a b rep -- c ) [ max ] components-2map ;
 ! XXX
-: (simd-v.)                ( a b rep -- n )
+: (simd-vdot)              ( a b rep -- n )
     [ 2byte>rep-array [ [ first ] bi@ * ] 2keep ] keep
     1 swap rep-length [a,b) [ '[ _ swap nth-unsafe ] bi@ * + ] 2with each ;
 : (simd-vsqrt)             ( a   rep -- c ) [ fsqrt ] components-map ;
