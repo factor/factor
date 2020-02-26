@@ -1,13 +1,11 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes colors colors.constants
-combinators combinators.smart compiler.units definitions
-definitions.icons effects fry generic hash-sets hashtables
-help.stylesheet help.topics io io.styles kernel locals make math
-namespaces parser present prettyprint prettyprint.stylesheet
-quotations see sequences sequences.private sets slots sorting
-splitting strings urls vectors vocabs vocabs.loader words
-words.symbol ;
+USING: accessors arrays assocs combinators compiler.units
+definitions.icons effects fry hashtables help.stylesheet
+help.topics io io.styles kernel locals make math namespaces
+present prettyprint prettyprint.stylesheet quotations see
+sequences sequences.private sets sorting strings urls vocabs
+words words.symbol ;
 FROM: prettyprint.sections => with-pprint ;
 IN: help.markup
 
