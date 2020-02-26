@@ -80,7 +80,7 @@ CONSTANT: vector-words
         { vneg { +vector+ -> +vector+ } }
         { vs- { +vector+ +vector+ -> +vector+ } }
         { v-n { +vector+ +scalar+ -> +vector+ } }
-        { v. { +vector+ +vector+ -> +scalar+ } }
+        { vdot { +vector+ +vector+ -> +scalar+ } }
         { vsad { +vector+ +vector+ -> +scalar+ } }
         { v/ { +vector+ +vector+ -> +vector+ } }
         { v/n { +vector+ +scalar+ -> +vector+ } }

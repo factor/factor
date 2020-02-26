@@ -69,7 +69,7 @@ M: gadget children-on nip children>> ;
     children [
         [ point ] dip
         quot call( value -- loc ) v-
-        axis v. 0 <=>
+        axis vdot 0 <=>
     ] search drop ; inline
 
 PRIVATE>

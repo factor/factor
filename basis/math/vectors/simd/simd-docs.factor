@@ -23,11 +23,11 @@ $nl
 $nl
 "SSE2 introduces double-precision SIMD (" { $snippet "double-2" } ") and integer SIMD (all types). Integer SIMD is missing a few features; in particular, the " { $link vmin } " and " { $link vmax } " operations only work on " { $snippet "uchar-16" } " and " { $snippet "short-8" } "."
 $nl
-"SSE3 introduces horizontal adds (summing all components of a single vector register), which are useful for computing dot products. Where available, SSE3 operations are used to speed up " { $link sum } ", " { $link v. } ", " { $link norm-sq } ", " { $link norm } ", and " { $link distance } "."
+"SSE3 introduces horizontal adds (summing all components of a single vector register), which are useful for computing dot products. Where available, SSE3 operations are used to speed up " { $link sum } ", " { $link vdot } ", " { $link norm-sq } ", " { $link norm } ", and " { $link distance } "."
 $nl
 "SSSE3 introduces " { $link vabs } " for " { $snippet "char-16" } ", " { $snippet "short-8" } " and " { $snippet "int-4" } "."
 $nl
-"SSE4.1 introduces " { $link vmin } " and " { $link vmax } " for all remaining integer types, a faster instruction for " { $link v. } ", and a few other things."
+"SSE4.1 introduces " { $link vmin } " and " { $link vmax } " for all remaining integer types, a faster instruction for " { $link vdot } ", and a few other things."
 $nl
 "On PowerPC, or older x86 chips without SSE, software fallbacks are used for all high-level vector operations. SIMD code can run with no loss in functionality, just decreased performance."
 $nl
