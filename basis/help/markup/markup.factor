@@ -305,15 +305,13 @@ PRIVATE>
     check-first dup "related" word-prop remove
     [ $see-also ] unless-empty ;
 
-: ($grid) ( style quot -- )
-    [
-        table-content-style get [
-            swap [ last-element off call ] tabular-output
-        ] with-style
+: ($grid) ( style content-style quot -- )
+    '[
+        _ [ last-element off _ tabular-output ] with-style
     ] ($block) ; inline
 
 : $list ( element -- )
-    list-style get [
+    list-style get list-content-style get [
         [
             [
                 bullet get write-cell
@@ -323,7 +321,7 @@ PRIVATE>
     ] ($grid) ;
 
 : $table ( element -- )
-    table-style get [
+    table-style get table-content-style get [
         [
             [
                 [ [ print-element ] with-cell ] each

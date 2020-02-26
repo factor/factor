@@ -10,6 +10,9 @@ IN: help.stylesheet
 : wrap-margin-table-content ( -- n )
     32 default-font-size * ;
 
+: wrap-margin-list-content ( -- n )
+    40 default-font-size * ;
+
 : font-size-subsection ( -- n )
     14/12 default-font-size * >integer ;
 
@@ -132,6 +135,11 @@ H{
     { table-gap { 5 5 } }
     { table-border $ table-border-color }
 } table-style set-global
+
+SYMBOL: list-content-style
+H{
+    { wrap-margin $ wrap-margin-list-content }
+} list-content-style set-global
 
 SYMBOL: list-style
 H{
