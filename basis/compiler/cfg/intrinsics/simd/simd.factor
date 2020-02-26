@@ -667,7 +667,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         { (simd-vmin)               [ emit-simd-vmin                ] }
         { (simd-vmax)               [ emit-simd-vmax                ] }
         { (simd-vavg)               [ emit-simd-vavg                ] }
-        { (simd-vdot                [ emit-simd-vdot                ] }
+        { (simd-vdot)               [ emit-simd-vdot                ] }
         { (simd-vsad)               [ emit-simd-vsad                ] }
         { (simd-vsqrt)              [ emit-simd-vsqrt               ] }
         { (simd-sum)                [ emit-simd-sum                 ] }
