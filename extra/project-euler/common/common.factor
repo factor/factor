@@ -162,7 +162,7 @@ PRIVATE>
 <PRIVATE
 
 : transform ( triple matrix -- new-triple )
-    [ 1array ] dip m. first ;
+    [ 1array ] dip mdot first ;
 
 PRIVATE>
 

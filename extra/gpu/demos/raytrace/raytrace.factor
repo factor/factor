@@ -49,7 +49,7 @@ TUPLE: raytrace-world < wasd-world
 
 : sphere-center ( sphere -- center )
     [ [ axis>> ] [ theta>> ] bi <rotation-matrix4> ]
-    [ home>> ] bi m.v ;
+    [ home>> ] bi mdotv ;
 
 M: sphere audio-position sphere-center ; inline
 M: sphere audio-distance radius>> fsqrt 2.0 * ; inline

@@ -5,4 +5,4 @@ IN: gml.geometry
 
 GML: rot_vec ( v n alpha -- v )
     ! Inefficient!
-    deg>rad <rotation-matrix4> swap >array m.v >double-4 ;
+    deg>rad <rotation-matrix4> swap >array mdotv >double-4 ;
