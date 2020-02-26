@@ -306,7 +306,7 @@ M: matrix recip
 ! TODO: use the faster algorithm: [ determinant zero? ]
 : invertible-matrix? ( matrix -- ? )
     [ dimension first2 max <identity-matrix> ] keep
-    dup recip m. = ;
+    dup recip mdot = ;
 
 : linearly-independent-matrix? ( matrix -- ? ) ;
 
@@ -314,7 +314,7 @@ M: matrix recip
 ! this is the original definition of m^n as committed in 2012; it has not been lost
 : (m^n) ( m n -- n )
     make-bits over first length <identity-matrix>
-    [ [ dupd m. ] when [ dup m. ] dip ] reduce nip ;
+    [ [ dupd mdot ] when [ dup mdot ] dip ] reduce nip ;
 PRIVATE>
 
 ! A^-1 is the inverse but other negative powers are nonsense

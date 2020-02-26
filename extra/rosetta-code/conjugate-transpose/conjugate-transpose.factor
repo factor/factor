@@ -35,7 +35,7 @@ IN: rosetta-code.conjugate-transpose
     dup conj-t = ;
 
 : normal-matrix? ( matrix -- ? )
-    dup conj-t [ m. ] [ swap m. ] 2bi = ;
+    dup conj-t [ mdot ] [ swap mdot ] 2bi = ;
 
 : unitary-matrix? ( matrix -- ? )
-    [ dup conj-t m. ] [ length <identity-matrix> ] bi = ;
+    [ dup conj-t mdot ] [ length <identity-matrix> ] bi = ;

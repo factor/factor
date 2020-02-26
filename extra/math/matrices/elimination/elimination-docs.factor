@@ -10,7 +10,7 @@ HELP: inverse
   { $example
     "USING: kernel math.matrices prettyprint ;"
     "FROM: math.matrices.elimination => inverse ;"
-    "{ { 3 4 } { 7 9 } } dup inverse m. 2 <identity-matrix> = ."
+    "{ { 3 4 } { 7 9 } } dup inverse mdot 2 <identity-matrix> = ."
     "t"
   }
 } ;

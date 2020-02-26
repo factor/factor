@@ -15,7 +15,7 @@ IN: game.debug.tests
     } clear-framebuffer ;
 
 :: draw-debug-tests ( world -- )
-    world [ wasd-p-matrix ] [ wasd-mv-matrix ] bi m. :> mvp-matrix
+    world [ wasd-p-matrix ] [ wasd-mv-matrix ] bi mdot :> mvp-matrix
     { 0 0 0 } clear-screen
 
     [
