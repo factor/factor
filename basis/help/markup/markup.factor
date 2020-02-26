@@ -182,7 +182,7 @@ M: symbol link-effect? drop f ;
 M: word link-effect? drop t ;
 
 : $effect ( effect -- )
-    effect>string stack-effect-style get format ;
+    effect>string base-effect-style get format ;
 
 M: word link-long-text
     dup presented associate [
