@@ -279,7 +279,7 @@ PRIVATE>
     [ lookup-vocab ] map $links ;
 
 : $breadcrumbs ( topics -- )
-    [ [ ($link) ] " > " (textual-list) ] ($span) ;
+    [ [ ($link) ] " » " (textual-list) ] ($span) ;
 
 : $see-also ( topics -- )
     "See also" $heading $links ;
