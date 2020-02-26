@@ -318,7 +318,7 @@ HELP: vdot
 { $values { "u" { $sequence real } } { "v" { $sequence real } } { "x" real } }
 { $description "Computes the dot product of two vectors." } ;
 
-HELP: h.
+HELP: hdot
 { $values { "u" { $sequence real } } { "v" { $sequence real } } { "x" real } }
 { $description "Computes the Hermitian inner product of two vectors." } ;
 

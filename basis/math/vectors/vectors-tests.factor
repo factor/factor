@@ -33,7 +33,7 @@ SPECIALIZED-ARRAY: int
 { 32 } [ { 1 2 3 } { 4 5 6 } vdot ] unit-test
 { -1 } [ { C{ 0 1 } } dup vdot ] unit-test
 
-{ 1 } [ { C{ 0 1 } } dup h. ] unit-test
+{ 1 } [ { C{ 0 1 } } dup hdot ] unit-test
 
 { { 1 2 3 } } [
     { t t t } [ { 1 2 3 } ] [ { 4 5 6 } ] vif
