@@ -31,5 +31,5 @@ CONSTANT: R_earth 6372.8 ! in kilometers
     [ [ swap - haversin ] 2map ]
     [ [ first cos ] bi@ * 1 swap 2array ]
     2bi
-    v.
+    vdot
     haversininv R_earth * ;
