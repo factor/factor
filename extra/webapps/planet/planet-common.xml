@@ -5,16 +5,16 @@
 	<t:style t:include="resource:extra/webapps/planet/planet.css" />
 
 	<div class="navbar">
-		  <t:a t:href="$planet">Front Page</t:a>
-		| <t:a t:href="$planet/feed.xml">Atom Feed</t:a>
-		| <t:a t:href="$planet/admin">Admin</t:a>
+		<t:a t:href="$planet">Front Page</t:a>
+		<t:a t:href="$planet/feed.xml">Atom Feed</t:a>
+		<t:a t:href="$planet/admin">Admin</t:a>
 
 		<t:if t:code="furnace.auth:logged-in?">
 			<t:if t:code="furnace.auth.features.edit-profile:allow-edit-profile?">
-				| <t:a t:href="$realm/edit-profile" t:aside="begin">Edit Profile</t:a>
+				<t:a t:href="$realm/edit-profile" t:aside="begin">Edit Profile</t:a>
 			</t:if>
 	
-			| <t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
+			<t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
 		</t:if>
 	</div>
 
