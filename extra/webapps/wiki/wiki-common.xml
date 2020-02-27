@@ -8,61 +8,68 @@
 
 	<t:style t:include="resource:extra/webapps/wiki/wiki.css" />
 
-	<table width="100%">
-		<tr>
-			<t:if t:value="contents">
-				<td valign="top" style="width: 210px;">
-					<div class="contents">
-						<t:bind t:name="contents">
-							<h2>
-								<t:a t:href="$wiki/view" t:rest="title">
-									<t:label t:name="title" />
-								</t:a>
-							</h2>
+    <div id="container">
 
-							<t:farkup t:name="content" />
-						</t:bind>
-					</div>
-				</td>
-			</t:if>
+        <div id="left">
 
-			<td valign="top">
+            <t:if t:value="contents">
 
-				<div class="navbar">
+                <t:style t:include="resource:extra/webapps/wiki/wiki-contents.css" />
+                <div class="contents">
+                    <t:bind t:name="contents">
+                        <h2>
+                            <t:a t:href="$wiki/view" t:rest="title">
+                                <t:label t:name="title" />
+                            </t:a>
+                        </h2>
 
-					<t:a t:href="$wiki">Front Page</t:a>
-					| <t:a t:href="$wiki/articles">All Articles</t:a>
-					| <t:a t:href="$wiki/changes">Recent Changes</t:a>
-					| <t:a t:href="$wiki/random">Random Article</t:a>
+                        <t:farkup t:name="content" />
+                    </t:bind>
+                </div>
+            </t:if>
 
-					<t:if t:code="furnace.auth:logged-in?">
+        </div>
 
-						<t:if t:code="furnace.auth.features.edit-profile:allow-edit-profile?">
-							| <t:a t:href="$realm/edit-profile" t:aside="begin">Edit Profile</t:a>
-						</t:if>
+        <div id="right">
 
-						| <t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
+            <div class="navbar">
 
-					</t:if>
+                <t:a t:href="$wiki">Front Page</t:a>
+                <t:a t:href="$wiki/articles">All Articles</t:a>
+                <t:a t:href="$wiki/changes">Recent Changes</t:a>
+                <t:a t:href="$wiki/random">Random Article</t:a>
 
-				</div>
+                <t:if t:code="furnace.auth:logged-in?">
 
-				<h1><t:write-title /></h1>
+                    <t:if t:code="furnace.auth.features.edit-profile:allow-edit-profile?">
+                        <t:a t:href="$realm/edit-profile" t:aside="begin">Edit Profile</t:a>
+                    </t:if>
 
-				<t:call-next-template />
+                    <t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
 
-			</td>
-		</tr>
+                </t:if>
 
-		<t:if t:value="footer">
-			<tr>
-				<td colspan="2" class="footer">
-					<t:bind t:name="footer">
-						<t:farkup t:name="content" />
-					</t:bind>
-				</td>
-			</tr>
-		</t:if>
-	</table>
+            </div>
+
+            <div class="page">
+                <h1><t:write-title /></h1>
+
+                <t:call-next-template />
+
+            </div>
+
+            <t:if t:value="footer">
+                <div class="footer">
+                    <t:bind t:name="footer">
+                        <t:farkup t:name="content" />
+                    </t:bind>
+                </div>
+            </t:if>
+
+        </div>
+
+        <span style="display:none"></span>
+
+    </div>
 
 </t:chloe>

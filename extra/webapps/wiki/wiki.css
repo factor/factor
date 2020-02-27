@@ -1,3 +1,20 @@
+body {
+    margin: 0;
+}
+
+#container {
+    margin: 0 auto;
+    width: 100%;
+}
+
+#left {
+    width: 0;
+}
+
+#right {
+    max-width: 800px;
+}
+
 .comparison th {
     border-width: 1px;
     border-color: #666;
@@ -39,13 +56,36 @@
 }
 
 .contents {
-    padding: 4px;
-    margin: 4px;
-    border: 1px dashed gray;
-    background: #f5f1fd;
-    width: 200px;
+    font-size: smaller;
+    margin: 0;
+    padding: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+    line-height: 125%;
+}
+
+.contents ul {
+    list-style-type: none;
+    margin: 0;
+    padding-left: 10px;
+}
+
+.page {
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+}
+
+.page .navbar {
+    margin-left: -15px;
+    margin-right: -15px;
+    margin-bottom: -15px;
+    border-top: 1px solid #ccc;
+    border-bottom: none;
 }
 
 .footer {
-    font-size: 75%;
+    border-top: 1px solid #ccc;
+    padding-left: 15px;
+    font-size: smaller;
 }
