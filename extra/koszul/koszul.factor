@@ -221,7 +221,7 @@ DEFER: (d)
     ] if ;
 
 : laplacian-matrix ( basis1 basis2 basis3 -- matrix )
-    dupd d-matrix mdotm' [ d-matrix m'.m ] dip ?m+ ;
+    dupd d-matrix mdotm' [ d-matrix m'dotm ] dip ?m+ ;
 
 : laplacian-betti ( basis1 basis2 basis3 -- n )
     laplacian-matrix null/rank drop ;
