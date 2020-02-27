@@ -1,3 +1,17 @@
+body {
+    margin: 0;
+}
+
+#container {
+    max-width: 1000px;
+}
+
+.page {
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+}
+
 pre.code {
 	border:1px dashed #ccc;
 	background-color:#f5f5f5;
