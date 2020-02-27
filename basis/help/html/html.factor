@@ -81,7 +81,7 @@ M: pathname url-of
             <input type="submit" value="Go"/>
         </form>
         <div style="float: right;">
-        <a href="http://factorcode.org"><b>factorcode.org</b></a>
+            <a href="//factorcode.org"><b>factorcode.org</b></a>
         </div>
         </div>
      XML] ;
