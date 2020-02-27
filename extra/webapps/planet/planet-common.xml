@@ -4,6 +4,8 @@
 
 	<t:style t:include="resource:extra/webapps/planet/planet.css" />
 
+    <div id="container">
+
 	<div class="navbar">
 		<t:a t:href="$planet">Front Page</t:a>
 		<t:a t:href="$planet/feed.xml">Atom Feed</t:a>
@@ -15,11 +17,16 @@
 			</t:if>
 	
 			<t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
-		</t:if>
+        </t:if>
+        <div style="float: right;">
+            <a href="https://factorcode.org"><b>factorcode.org</b></a>
+        </div>
 	</div>
 
+    <div class="page">
 	<h1><t:write-title /></h1>
 
         <t:call-next-template />
+    </div>
 
 </t:chloe>
