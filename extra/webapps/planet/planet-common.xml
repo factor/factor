@@ -4,8 +4,6 @@
 
 	<t:style t:include="resource:extra/webapps/planet/planet.css" />
 
-    <div id="container">
-
 	<div class="navbar">
 		<t:a t:href="$planet">Front Page</t:a>
 		<t:a t:href="$planet/feed.xml">Atom Feed</t:a>
@@ -29,5 +27,4 @@
         <t:call-next-template />
     </div>
 
-    </div>
 </t:chloe>

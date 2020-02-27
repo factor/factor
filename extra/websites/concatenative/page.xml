@@ -16,8 +16,12 @@
 			<t:write-atom />
 		</head>
 
-		<body>
-			<t:call-next-template />
+        <body>
+
+            <div id="container">
+            <t:call-next-template />
+            </div>
+
 		</body>
 
 	</t:chloe>

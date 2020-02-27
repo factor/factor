@@ -6,6 +6,10 @@ html {
     box-sizing: inherit;
 }
 
+body {
+    margin: 0;
+}
+
 body, button {
     font-size: 12pt;
     font-family: sans-serif;
@@ -30,6 +34,10 @@ table {
 a, .link { color: #104e8b; }
 a:link, a:visited, a:active, .link { text-decoration: none; }
 a:hover, .link:hover { text-decoration: underline; }
+
+#container {
+    max-width: 1000px;
+}
 
 .error { color: #a00; }
 
