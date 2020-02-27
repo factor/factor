@@ -1,10 +1,10 @@
 #left {
     float: left;
-    width: 180px;
+    width: 200px;
     border-right: 1px solid #ccc;
     background: #f3f2ea;
 }
 
 #right {
-    margin-left: 180px;
+    margin-left: 200px;
 }
