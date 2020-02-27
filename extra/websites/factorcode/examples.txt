@@ -62,3 +62,19 @@ USING: io kernel sequences ;
     "Happy Birthday " write
     2 = "dear NAME" "to You" ? print
 ] each
+----
+USING: dice formatting ;
+
+ROLL: 2d8+4
+"You do %s points of damage!" printf
+----
+USING: kernel rot13 ;
+
+"Hello, world!" rot13
+"Uryyb, jbeyq!" assert=
+----
+USING: ascii tools.test ;
+
+{ "HELLO" } [ "HeLlO" >upper ] unit-test
+{ "Hello" } [ "HeLlO" >title ] unit-test
+{ "hello" } [ "HeLlO" >lower ] unit-test
