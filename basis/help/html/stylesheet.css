@@ -11,10 +11,14 @@ body, h1, h2, h3, h4, h5, h6, p, ol, ul {
     padding: 0;
 }
 
-a:link { text-decoration: none; color: #104e8b; }
-a:visited { text-decoration: none; color: #104e8b; }
-a:active { text-decoration: none; color: #104e8b; }
-a:hover { text-decoration: underline; color: #104e8b; }
+a, .link { color: #104e8b; }
+a:link, a:visited, a:active, .link { text-decoration: none; }
+a:hover, .link:hover { text-decoration: underline; }
+
+body {
+    font-family: sans-serif;
+    line-height: 140%;
+}
 
 input {
     border: 1px solid #999999;
@@ -37,20 +41,19 @@ tr:hover {
 }
 
 .navbar {
-    background-color: #f3f2ea;
-    padding: 10px;
+    margin: 0;
+    padding: 15px;
     border-bottom: 1px solid #ccc;
-    font-family: sans-serif;
 }
 
 .navbar a {
-    border-right: 1px solid #999;
-    padding-right: 10px;
-    margin-right: 5px;
+    margin-right: 10px;
+}
+
+#container {
+    max-width: 800px;
 }
 
 .page {
-    margin: 20px;
-    max-width: 800px;
-    line-height: 140%;
+    margin: 15px;
 }
