@@ -1,18 +1,9 @@
-body {
-    margin: 0;
-}
-
-#container {
-    margin: 0 auto;
-    width: 100%;
-}
-
 #left {
     width: 0;
 }
 
 #right {
-    max-width: 800px;
+    width: 800px;
 }
 
 .comparison th {
@@ -56,18 +47,17 @@ body {
 }
 
 .contents {
-    font-size: smaller;
+    font-size: 90%;
     margin: 0;
     padding: 0;
     padding-left: 10px;
     padding-right: 10px;
-    line-height: 125%;
 }
 
 .contents ul {
     list-style-type: none;
     margin: 0;
-    padding-left: 10px;
+    padding-left: 20px;
 }
 
 .page {
