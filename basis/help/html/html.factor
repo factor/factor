@@ -74,13 +74,15 @@ M: pathname url-of
     "conventions" >link topic>filename
     [XML
         <div class="navbar">
-        <a href="http://factorcode.org">factorcode.org</a>
         <a href="/">Handbook</a>
         <a href=<->>Glossary</a>
         <form method="get" action="/search" style="display:inline;">
             <input placeholder="Search" name="search" type="text"/>
             <input type="submit" value="Go"/>
         </form>
+        <div style="float: right;">
+        <a href="http://factorcode.org"><b>factorcode.org</b></a>
+        </div>
         </div>
      XML] ;
 
@@ -131,7 +133,7 @@ M: pathname url-of
     [
         [ print-topic ] with-html-writer css-styles-to-classes
         [ help-stylesheet help-navbar ] dip
-        [XML <-><div class="page"><-></div> XML]
+        [XML <div id="container"><-><div class="page"><-></div></div> XML]
     ] bi simple-page ;
 
 : generate-help-file ( topic -- )
