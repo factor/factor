@@ -1,0 +1,10 @@
+#left {
+    float: left;
+    width: 180px;
+    border-right: 1px solid #ccc;
+    background: #f3f2ea;
+}
+
+#right {
+    margin-left: 180px;
+}
