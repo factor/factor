@@ -37,7 +37,7 @@ TUPLE: line words width height baseline ;
 
 : <line> ( words -- line )
     [ ] [ line-width ] [ [ key>> ] map dup pref-dims ] tri
-    [ measure-height ] [ measure-metrics drop ] 2bi line boa ;
+    measure-metrics [ + ] 2keep drop line boa ;
 
 : wrap-paragraph ( paragraph -- wrapped-paragraph )
     [ children>> [ gadget>word ] map ] [ margin>> ] bi
