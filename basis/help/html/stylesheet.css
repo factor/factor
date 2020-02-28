@@ -13,7 +13,7 @@ a:hover, .link:hover { text-decoration: underline; }
 body {
     margin: 0;
     font-family: sans-serif;
-    line-height: 140%;
+    line-height: 150%;
 }
 
 input {

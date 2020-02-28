@@ -20,7 +20,7 @@
                 margin: 0;
                 font-family: sans-serif;
                 font-size: 12pt;
-                line-height: 140%;
+                line-height: 150%;
             }
 
             a { color: #104e8b; }
