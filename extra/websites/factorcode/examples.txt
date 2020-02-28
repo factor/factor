@@ -78,3 +78,29 @@ USING: ascii tools.test ;
 { "HELLO" } [ "HeLlO" >upper ] unit-test
 { "Hello" } [ "HeLlO" >title ] unit-test
 { "hello" } [ "HeLlO" >lower ] unit-test
+----
+USING: io io.encodings.ascii io.files
+random sequences splitting ;
+
+"/usr/share/games/fortune/fortunes"
+ascii file-lines { "%" } split
+random [ print ] each
+----
+USING: morse text-to-speech ;
+
+"Hello, world!" speak-text
+
+"Factor" play-as-morse
+----
+USING: combinators io kernel locals
+math.functions math.parser math.ranges
+sequences ;
+
+100 [1,b] [| i |
+    {
+        { [ i 15 divisor? ] [ "FizzBuzz" ] }
+        { [ i  3 divisor? ] [ "Fizz" ] }
+        { [ i  5 divisor? ] [ "Buzz" ] }
+        [ i number>string ]
+    } cond print
+] each
