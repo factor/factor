@@ -6,12 +6,51 @@
     <head>
 
         <t:base t:href="$help-webapp/content/" />
-
         <title>Search - Factor Documentation</title>
-
-        <t:style t:include="resource:basis/help/html/stylesheet.css" />
-
         <style>
+            html {
+                box-sizing: border-box;
+            }
+
+            *, *:before, *:after {
+                box-sizing: inherit;
+            }
+
+            body {
+                margin: 0;
+                font-family: sans-serif;
+                font-size: 12pt;
+                line-height: 140%;
+            }
+
+            a { color: #104e8b; }
+            a:link, a:visited, a:active { text-decoration: none; }
+            a:hover { text-decoration: underline; }
+
+            input {
+                border: 1px solid #999999;
+                font-size: smaller;
+                border-radius: 3px;
+            }
+
+            #container {
+                max-width: 800px;
+            }
+
+            .navbar {
+                margin: 0;
+                padding: 15px;
+                border-bottom: 1px solid #ccc;
+            }
+
+            .navbar a {
+                margin-right: 10px;
+            }
+
+            .page {
+                margin: 15px;
+            }
+
             h2 {
                 padding: 10px;
                 background-color: #f5f5f5;
@@ -28,7 +67,6 @@
     </head>
 
     <body>
-
     <div id="container">
 		<t:html t:name="navbar"/>
 
