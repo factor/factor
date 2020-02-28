@@ -83,14 +83,8 @@ USING: io io.encodings.ascii io.files
 random sequences splitting ;
 
 "/usr/share/games/fortune/fortunes"
-ascii file-lines { "%" } split
-random [ print ] each
-----
-USING: morse text-to-speech ;
-
-"Hello, world!" speak-text
-
-"Factor" play-as-morse
+ascii file-lines { "%" } split random
+[ print ] each
 ----
 USING: combinators io kernel locals
 math.functions math.parser math.ranges
@@ -103,4 +97,21 @@ sequences ;
         { [ i  5 divisor? ] [ "Buzz" ] }
         [ i number>string ]
     } cond print
+] each
+----
+USING: kernel math sequences text-to-speech ;
+
+"factor"
+
+dup [ "aeiou" member? ] find drop [
+    [ "way" append ]
+    [ cut swap "ay" 3append ] if-zero
+] when*
+
+speak-text
+----
+USING: math.text.english morse sequences ;
+
+{ 4 8 15 16 23 42 } [
+    number>text play-as-morse
 ] each
