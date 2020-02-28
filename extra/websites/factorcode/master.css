@@ -54,6 +54,7 @@ li {
     border-left: none;
     letter-spacing: 2px;
     text-transform: uppercase;
+    font-size: smaller;
     padding: 6px;
     background: #CAE8EA url(bg_header.jpg) no-repeat;
     text-align: center;
