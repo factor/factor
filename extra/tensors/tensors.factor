@@ -1,10 +1,10 @@
 ! Copyright (C) 2019 HMC Clinic.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors alien alien.c-types alien.data arrays byte-arrays grouping
-kernel locals math math.functions math.ranges math.vectors math.vectors.simd
-multi-methods parser prettyprint.custom sequences sequences.extras sequences.private
-specialized-arrays typed ;
+USING: accessors alien alien.c-types alien.data arrays byte-arrays combinators
+grouping kernel locals math math.functions math.ranges math.vectors
+math.vectors.simd multi-methods parser prettyprint.custom sequences sequences.extras
+sequences.private specialized-arrays typed ;
 
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
@@ -142,23 +142,6 @@ syntax:M: tensor new-sequence
     ! If so preserve the shape, otherwise create a 1D tensor
     [ nip (tensor) ] [ drop 1array (tensor) ] if ;
 
-! syntax:M: tensor like
-!     ! If the original sequence is already a tensor, we are done
-!     over tensor?
-!     [ drop ] [
-!         ! Otherwise, if the original sequence and the exemplar have the same
-!         ! number of elements, we should use the shape of the exemplar
-!         2dup [ length ] bi@ = [
-!             shape>>
-!         ] [
-!             ! Otherwise, just create an appropriately sized 1D tensor
-!             drop dup length 1array
-!         ] if
-!         ! Check if the seq is a float-array, otherwise convert it
-!         swap dup float-array? [ >float-array ] unless
-!         <tensor>
-!     ] if ;
-
 syntax:M: tensor like
     ! If the original sequence is already a tensor, we are done
     over tensor?
@@ -190,7 +173,7 @@ INSTANCE: tensor sequence
     ! Compute the starting pointer
     arr underlying>> <displaced-alien>
     ! Push length and type to create the new array
-    len c:float <c-direct-array> ;
+    len c:float <c-direct-array> ; inline
 
 : check-bop-shape ( shape1 shape2 -- shape )
     2dup = [ shape-mismatch-error ] unless drop ;
@@ -204,6 +187,19 @@ TYPED:: t-bop ( tensor1: tensor tensor2: tensor quot: ( x y -- z ) -- tensor: te
 : simd-slice ( array -- simd-array rest-slice/f )
     dup length dup 4 mod [ drop f ] [ - cut-slice ] if-zero
     [ float-4 cast-array ] dip ; inline
+
+! Create an array of 4-element SIMD arrays for processing floats
+:: simd-slice-2 ( arr start -- first-slice/f simd-array rest-slice/f )
+    ! Compute the beginning
+    start [ f ] [ drop arr 0 start make-subseq ] if-zero
+    ! Compute the SIMD part
+    arr length start - :> len
+    len 4 mod :> end
+    len end - [ float-4-array{ } ] [
+        drop arr start len end - make-subseq float-4 cast-array
+    ] if-zero
+    ! Compute the end
+    end [ f ] [ drop arr dup length end - end make-subseq ] if-zero ; inline
 
 ! Apply the binary operators simd-quot and quot to quickly combine the tensors
 :: t-bop-simd ( tensor1 tensor2 simd-quot: ( x y -- z ) quot: ( x y -- z ) -- tensor )
@@ -282,27 +278,6 @@ METHOD: t% { number tensor } [ >float ] dip [ mod ] with t-uop ;
     ! Take a slice
     rot <slice> ;
 
-! Perform matrix multiplication muliplying an
-! mxn matrix with a nxp matrix
-TYPED:: 2d-matmul ( vec1: float-array vec2: float-array res: float-array
-                    m: fixnum n: fixnum p: fixnum -- )
-    ! For each element in the range, we want to compute the dot product of the
-    ! corresponding row and column
-    m [ :> i
-        i n * :> in
-        i p * :> ip
-        p [ :> j
-            0.0 ! This is the sum
-            n [ :> k
-                ! Add to the sum
-                in k + vec1 nth-unsafe
-                k p * j + vec2 nth-unsafe
-                * +
-            ] each-integer
-            ip j + res set-nth-unsafe
-        ] each-integer
-    ] each-integer ;
-
 ! much quicker transpose for 2d tensors
 TYPED:: 2d-transpose ( tensor: tensor -- tensor': tensor )
     tensor shape>> :> old-shape
@@ -318,38 +293,52 @@ TYPED:: 2d-transpose ( tensor: tensor -- tensor': tensor )
         vec nth-unsafe
     ] float-array{ } map-as <tensor> ;
 
-! ! Perform matrix multiplication muliplying an
-! ! mxn matrix with a nxp matrix
-! TYPED:: 2d-matmul ( vec1: float-array vec2: float-array res: float-array
-!                     m: fixnum n: fixnum p: fixnum -- )
-!     m [ :> i
-!         i n * dup n + vec1 <slice> simd-slice drop .
-!     ] each-integer ;
 
-! ! Perform matrix multiplication muliplying an
-! ! mxn matrix with a nxp matrix
-! TYPED:: 2d-matmul ( vec1: float-array vec2: float-array res: float-array
-!                     m: fixnum n: fixnum p: fixnum -- )
-!     ! For each element in the range, we want to compute the dot product of the
-!     ! corresponding row and column
-!     ! Transpose vec2 so that we are doing row * row (as opposed to row * col)
-!     { n p } vec2 <tensor> 2d-transpose vec>> :> vec2
+! Perform matrix multiplication muliplying an
+! mxn matrix with a nxp matrix
+TYPED:: 2d-matmul ( vec1: float-array vec2: float-array res: float-array
+                    m: fixnum n: fixnum p: fixnum -- )
+    ! For each element in the range, we want to compute the dot product of the
+    ! corresponding row and column
+    ! Transpose vec2 so that we are doing row * row (as opposed to row * col)
+    { n p } vec2 <tensor> 2d-transpose vec>> :> vec2
 
-!     m [ :> i
-!         i n * :> in
-!         i p * :> ip
-!         p [ :> j
-!             vec1 in n make-subseq simd-slice :> ( simd1 rest1 )
-!             vec2 j n * n make-subseq simd-slice :> ( simd2 rest2 )
-!             0.0
-!             simd1 length [
-!                 [ simd1 nth-unsafe ] [ simd2 nth-unsafe ] bi
-!                 v. +
-!             ] each-integer
-!             rest1 rest2 [ * ] 2map sum +
-!             ip j + res set-nth-unsafe
-!         ] each-integer
-!     ] each-integer ;
+    m [ :> i
+        i n * :> in
+        i p * :> ip
+        vec1 in n make-subseq
+        p [ :> j
+            dup
+            vec2 j n * n make-subseq
+            0.0 [ * + ] 2reduce
+            ip j + res set-nth-unsafe
+        ] each-integer
+        drop
+    ] each-integer ;
+
+! Perform matrix multiplication muliplying an
+! mxn matrix with a nxp matrix
+! Should only be called when n is a multiple of 4
+TYPED:: 2d-matmul-all-simd ( vec1: float-array vec2: float-array
+                             res: float-array
+                             m: fixnum n: fixnum p: fixnum -- )
+    ! For each element in the range, we want to compute the dot product of the
+    ! corresponding row and column
+    ! Transpose vec2 so that we are doing row * row (as opposed to row * col)
+    { n p } vec2 <tensor> 2d-transpose vec>> :> vec2
+
+    m [ :> i
+        i n * :> in
+        i p * :> ip
+        vec1 in n make-subseq float-4 cast-array
+        p [ :> j
+            dup
+            vec2 j n * n make-subseq float-4 cast-array
+            0.0 [ v. + ] 2reduce
+            ip j + res set-nth-unsafe
+        ] each-integer
+        drop
+    ] each-integer ;
 
 PRIVATE>
 
@@ -385,7 +374,8 @@ TYPED:: matmul ( tensor1: tensor tensor2: tensor -- tensor3: tensor )
         ! Compute the result
         vec3 m p * i * m p * make-subseq
         ! Push m, n, and p and multiply the arrays
-        m n p 2d-matmul
+        m n p
+        n 4 mod 0 = [ 2d-matmul-all-simd ] [ 2d-matmul ] if
     ] each-integer
     vec3 <tensor> ;
 
