@@ -6,16 +6,12 @@ html {
     box-sizing: inherit;
 }
 
-body, h1, h2, h3, h4, h5, h6, p, ol, ul {
-    margin: 0;
-    padding: 0;
-}
-
 a, .link { color: #104e8b; }
 a:link, a:visited, a:active, .link { text-decoration: none; }
 a:hover, .link:hover { text-decoration: underline; }
 
 body {
+    margin: 0;
     font-family: sans-serif;
     line-height: 140%;
 }
