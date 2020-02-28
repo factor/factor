@@ -702,6 +702,23 @@ IN: tensors.tests
     { 2 2 3 4 } naturals { 2 2 4 5 } naturals matmul shape>>
 ] unit-test
 
+! m where mod 4 is not 0 and n & p have same mod 4 val
+{ float-array{ 45.0 48.0 51.0 54.0 57.0 60.0 63.0 66.0 69.0 126.0
+    138.0 150.0 162.0 174.0 186.0 198.0 210.0 222.0 207.0 228.0
+    249.0 270.0 291.0 312.0 333.0 354.0 375.0 288.0 318.0 348.0
+    378.0 408.0 438.0 468.0 498.0 528.0 369.0 408.0 447.0 486.0
+    525.0 564.0 603.0 642.0 681.0 } } [
+    { 5 3 } naturals { 3 9 } naturals matmul vec>>
+] unit-test
+
+! m where mod 4 is not 0 and n & p have different mod 4 vals
+{ float-array{ 35.0 38.0 41.0 44.0 47.0 50.0 53.0 98.0 110.0
+    122.0 134.0 146.0 158.0 170.0 161.0 182.0 203.0 224.0
+    245.0 266.0 287.0 224.0 254.0 284.0 314.0 344.0 374.0
+    404.0 287.0 326.0 365.0 404.0 443.0 482.0 521.0 } } [
+    { 5 3 } naturals { 3 7 } naturals matmul vec>>
+] unit-test
+
 ! test transpose
 { float-array{ 0.0 2.0 1.0 3.0 } } [
     { 2 2 } naturals transpose vec>>
