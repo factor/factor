@@ -28,6 +28,7 @@ table {
 pre {
     overflow: auto;
     font-size: smaller;
+    line-height: 125%;
 }
 
 .link-button {
