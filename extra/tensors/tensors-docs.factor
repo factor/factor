@@ -1,6 +1,6 @@
 ! Copyright (C) 2019 HMC Clinic.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays help.markup help.syntax math sequences ;
+USING: arrays help.markup help.syntax lexer math sequences ;
 IN: tensors
 
 ARTICLE: "tensors" "Tensors" "A " { $snippet "tensor" } " is a sequence "
@@ -57,16 +57,15 @@ HELP: t{
 { $syntax "t{ elements... }" }
 { $values { "elements" "a list of numbers" } }
 { $description "Initializes a tensor with the given elements."
-" Preserves the shape of nested arrays. Assumes uniformly nested arrays." } 
+" Preserves the shape of nested sequences. Assumes uniformly nested sequences." } 
 { $errors "Throws a " { $link non-uniform-seq-error } " if the given "
-"sequence have subsequences of varying lengths." } ;
+"sequence have subsequences of varying lengths. Throws a " 
+{ $link lexer-error } " if the given sequence is not uniformly nested." } ;
 
 HELP: (tensor)
 { $values { "shape" sequence } { "tensor" tensor } }
 { $description "Creates a tensor with shape " { $snippet "shape" }
-" containing uninitialized values." } 
-{ $errors "Throws a " { $link non-positive-shape-error } " if the given "
-"shape has zero or negative values." } ;
+" containing uninitialized values. Allows non-positive shapes." } ;
 
 HELP: zeros
 { $values { "shape" sequence } { "tensor" tensor } }
@@ -114,7 +113,8 @@ HELP: >tensor
 { $description "Turns a nested sequence " { $snippet "seq" } 
 " into a tensor of the corresponding shape. Assumes a uniformly nested sequence." } 
 { $errors "Throws a " { $link non-uniform-seq-error } " if the given "
-"sequence have subsequences of varying lengths." } ;
+"sequence have subsequences of varying lengths. Throws a " 
+{ $link lexer-error } " if the given sequence is not uniformly nested." } ;
 
 HELP: t+
 { $values { "x" { $or tensor number } } { "y" { $or tensor number } } { "tensor" tensor } }

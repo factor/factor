@@ -106,6 +106,19 @@ IN: tensors.tests
 ]
 [ { -3 5 } \ non-positive-shape-error boa = ] must-fail-with
 
+! Test (tensor)
+{ { 2 4 } } [
+    { 2 4 } (tensor) shape>>
+] unit-test
+
+{ { 0 } } [
+    { 0 } (tensor) shape>>
+]
+
+{ float-array{ } } [
+    { 0 } (tensor) vec>>
+]
+
 
 ! Test reshape
 { float-array{ 0.0 0.0 0.0 0.0 } } [
