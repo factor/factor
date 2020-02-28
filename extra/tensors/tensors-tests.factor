@@ -113,11 +113,11 @@ IN: tensors.tests
 
 { { 0 } } [
     { 0 } (tensor) shape>>
-]
+] unit-test
 
 { float-array{ } } [
     { 0 } (tensor) vec>>
-]
+] unit-test
 
 
 ! Test reshape
