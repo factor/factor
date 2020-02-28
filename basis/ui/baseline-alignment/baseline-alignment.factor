@@ -99,3 +99,7 @@ PRIVATE>
 
 : measure-height ( children sizes -- height )
     (measure-metrics) [ combine-metrics + ] [ 2drop ] if* ;
+
+: measure-height-metrics ( children sizes -- height ascent descent )
+    (measure-metrics) [ dup ] 3dip
+    [ combine-metrics ] keep [ [ + nip ] 2keep ] when ;
