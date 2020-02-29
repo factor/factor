@@ -37,7 +37,7 @@ CONSTANT: cpus
     render-grid-header
     cpus [ quot render-grid-row ] map
     [XML
-        <table id="downloads" cellspacing="0">
+        <table class="downloads" cellspacing="0">
             <tr><th class="nobg">OS/CPU</th><-></tr>
             <->
         </table>
