@@ -12,6 +12,7 @@ webapps.mason.utils webapps.mason.version.data xml.writer xmode.highlight ;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -31,10 +32,7 @@ webapps.mason.utils webapps.mason.version.data xml.writer xmode.highlight ;
 <p>The <b>Factor programming language</b> is a <a href="http://www.concatenative.org/">concatenative</a>, stack-based programming language with <a href="http://concatenative.org/wiki/view/Factor/Features/The%20language">high-level features</a> including dynamic types, extensible syntax, macros, and garbage collection.  On a practical side, Factor has a <a href="http://docs.factorcode.org/content/article-vocab-index.html">full-featured library</a>, supports many different platforms, and has been extensively documented.</p>
 <p>The implementation is <a href="http://concatenative.org/wiki/view/Factor/Optimizing%20compiler">fully compiled</a> for performance, while still supporting <a href="http://concatenative.org/wiki/view/Factor/Interactive%20development">interactive development</a>. Factor applications are portable between all common platforms. Factor can <a href="http://concatenative.org/wiki/view/Factor/Deployment">deploy stand-alone applications</a> on all platforms. Full <a href="https://github.com/factor/factor">source code</a> for the Factor project is available under a <a href="https://factorcode.org/license.txt">BSD license</a>.</p>
 
-<table>
-
-<tr>
-<td width="50%" valign="top">
+<div class="left">
 
 <ul>
 <li><a href="https://concatenative.org/wiki/view/Factor">Learn more about Factor</a></li>
@@ -47,8 +45,10 @@ webapps.mason.utils webapps.mason.version.data xml.writer xmode.highlight ;
 <li>Screenshots on <a href="https://factorcode.org/factor-macosx.png">Mac OS X</a>, <a href="https://factorcode.org/factor-windows7.png">Windows</a></li>
 </ul>
 
-</td>
-<td width="50%" valign="top">
+</div>
+
+<div class="right">
+
 <pre><%
 "resource:extra/websites/factorcode/examples.txt" utf8 file-lines
 { "----" } split random
@@ -56,9 +56,10 @@ webapps.mason.utils webapps.mason.version.data xml.writer xmode.highlight ;
 xml>string write-html
 %></pre>
 
-</td>
-</tr>
-</table>
+</div>
+
+<div style="clear: both;"></div>
+
 
 <h1>Downloads</h1>
 
