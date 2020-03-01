@@ -16,6 +16,7 @@
     left: calc(100% - 215px);
     width: 200px;
     padding: 10px;
+    line-height: 130%;
 }
 
 .posting-title {
