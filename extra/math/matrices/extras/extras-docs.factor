@@ -49,9 +49,6 @@ ARTICLE: "math.matrices.extras" "Extra matrix operations"
 
 "Matrix algebra:"
 { $subsections
-    mmin
-    mmax
-    mnorm
     rank
     nullity
 

@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2010, 2018 Slava Pestov, Joe Groff, and Cat Stevens.
+! Copyright (C) 2005, 2010, 2018, 2020 Slava Pestov, Joe Groff, and Cat Stevens.
 USING: arrays assocs combinators.short-circuit grouping kernel
 math math.statistics sequences sequences.deep tools.test ;
 IN: math.matrices
@@ -317,17 +317,6 @@ PRIVATE>
     mdot
 ] unit-test
 
-
-! TODO: note: merge conflict from HEAD contained the following
-! ------------------------
-! predicates
-
-{ t } [ { } square-matrix? ] unit-test
-{ t } [ { { 1 } } square-matrix? ] unit-test
-{ t } [ { { 1 2 } { 3 4 } } square-matrix? ] unit-test
-{ f } [ { { 1 } { 2 3 } } square-matrix? ] unit-test
-{ f } [ { { 1 2 } } square-matrix? ] unit-test
-
 { 9 }
 [ { { 2 -2 1 } { 1 3 -1 } { 2 -4 2 } } m-1norm ] unit-test
 
@@ -336,40 +325,37 @@ PRIVATE>
 
 { 2.0 }
 [ { { 1 1 } { 1 1 } } frobenius-norm ] unit-test
-! from "intermediate commit"
-! any deep-empty matrix is null
-! it doesn't make any sense for { } to be null while { { } } to be considered nonnull
-{ t } [ {
-    { }
-    { { } }
-    { { { } } }
-    { { } { } { } }
-    { { { } } { { { } } } }
-} [ null-matrix? ] all?
-] unit-test
 
-{ f } [ {
-    { 1 2 }
-    { { 1 2 } }
-    { { 1 } { 2 } }
-    { { { 1 } } { 2 } { } }
-} [ null-matrix? ] any?
-] unit-test
+{ 10e-8 }
+[
+  5.4772255
+  { { 1 2 } { 3 4 } } frobenius-norm
+] unit-test~
 
-{ t } [ 10 dup <zero-matrix> zero-matrix? ] unit-test
-{ t } [ 10 10 15 <simple-eye> zero-matrix? ] unit-test
-{ t } [ 0 dup <zero-matrix> null-matrix? ] unit-test
-{ f } [ 0 dup <zero-matrix> zero-matrix? ] unit-test
-{ f } [ 4 <identity-matrix> zero-matrix? ] unit-test
+{ 10e-6 }
+[
+  36.94590
+  { { 1 2 } { 4 8 } { 16 32 } } frobenius-norm
+] unit-test~
 
-{ t } [ { }                 regular-matrix? ] unit-test
-{ t } [ { { } }             regular-matrix? ] unit-test
-{ t } [ { { 1 2 } }         regular-matrix? ] unit-test
-{ t } [ { { 1 2 } { 3 4 } } regular-matrix? ] unit-test
-{ t } [ { { 1 } { 3 } }     regular-matrix? ] unit-test
-{ f } [ { { 1 2 } { 3 } }   regular-matrix? ] unit-test
-{ f } [ { { 1 } { 3 2 } }   regular-matrix? ] unit-test
-! TODO: note: lines since last HEAD comment were deleted in "fix more code and add more rigorous tests"
+! equivalent to frobenius for p = q = 2
+{ 2.0 }
+[ { { 1 1 } { 1 1 } } 2 2 matrix-p-q-norm ] unit-test
+
+{ 10e-7 }
+[
+  33.456466
+  { { 1 2 } { 4 8 } { 16 32 } } 3 matrix-p-norm-entrywise
+] unit-test~
+
+{ { { -1 0 } { 0 0 } } }
+[ { { -2 0 } { 0 0 } } normalize-matrix ] unit-test
+
+{ { { -1 0 } { 0 1/2 } } }
+[ { { -2 0 } { 0 1 } } normalize-matrix ] unit-test
+
+{ t }
+[ 3 3 <zero-matrix> dup normalize-matrix = ] unit-test
 
 ! diagonals
 
