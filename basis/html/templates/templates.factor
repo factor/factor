@@ -59,6 +59,18 @@ SYMBOL: style
 : write-style ( -- )
     get-style write ;
 
+SYMBOL: script
+
+: add-script ( string -- )
+    "\n" script get push-all
+         script get push-all ;
+
+: get-script ( -- string )
+    script get >string ;
+
+: write-script ( -- )
+    get-script write ;
+
 SYMBOL: atom-feeds
 
 : add-atom-feed ( title url -- )
@@ -91,6 +103,7 @@ M: f call-template* drop call-next-template ;
     [
         title [ [ <box> ] unless* ] change
         style [ [ SBUF" " clone ] unless* ] change
+        script [ [ SBUF" " clone ] unless* ] change
         atom-feeds [ V{ } like ] change
 
         [
