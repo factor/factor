@@ -2,21 +2,23 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 
-	<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+    <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
         <head>
             <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-			<t:write-title />
+            <t:write-title />
 
-			<t:style t:include="resource:basis/xmode/code2html/stylesheet.css" />
+            <t:style t:include="resource:basis/xmode/code2html/stylesheet.css" />
 
-			<t:style t:include="resource:extra/websites/concatenative/page.css" />
+            <t:style t:include="resource:extra/websites/concatenative/page.css" />
 
-			<t:write-style />
+            <t:write-style />
 
-			<t:write-atom />
-		</head>
+            <t:write-script />
+
+            <t:write-atom />
+        </head>
 
         <body>
 
@@ -24,8 +26,8 @@
             <t:call-next-template />
             </div>
 
-		</body>
+        </body>
 
-	</t:chloe>
+    </t:chloe>
 
 </html>
