@@ -13,12 +13,8 @@ h1.planet-title {
 	background-color:#f5f5f5;
 }
 
-pre, code {
-	color: #000000;
-}
-
-.infobox {
-    padding-left: 10px;
+.posting-body {
+    line-height: 150%;
 }
 
 .posting-date {
@@ -26,11 +22,10 @@ pre, code {
 	font-size: 90%;
 }
 
-a.more {
-	display: block;
-	padding: 0 0 5px 0;
-	color: #333;
-	text-decoration: none;
-	text-align: right;
-	border: none;
+pre, code {
+	color: #000000;
+}
+
+.infobox {
+    padding-left: 10px;
 }

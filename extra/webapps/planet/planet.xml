@@ -16,9 +16,9 @@
 						<t:a t:value="url"><t:label t:name="title" /></t:a>
 					</h2>
 
-					<p class="posting-body">
+					<div class="posting-body">
 						<t:html t:name="description" />
-					</p>
+					</div>
 
 					<p class="posting-date">
 						<t:a t:value="url"><t:label t:name="date" /></t:a>
