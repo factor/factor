@@ -70,6 +70,12 @@ M: pathname url-of
     "vocab:help/html/stylesheet.css" ascii file-contents
     swap "\n" glue [XML <style><-></style> XML] ;
 
+: help-meta ( -- xml )
+    [XML <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1"
+        /> XML] ;
+
 : help-navbar ( -- xml )
     "conventions" >link topic>filename
     [XML
@@ -105,7 +111,11 @@ M: pathname url-of
         number>string "padding: " "px;" surround
     ] re-replace-with
 
-    R/ white-space: pre;/ [
+    R/ width: \d+px;/ [
+       drop ""
+    ] re-replace-with
+
+    R/ font-family: monospace;/ [
         " line-height: 125%;" append
     ] re-replace-with ;
 
@@ -136,7 +146,7 @@ M: pathname url-of
     [ article-title " - Factor Documentation" append ]
     [
         [ print-topic ] with-html-writer css-styles-to-classes
-        [ help-stylesheet help-navbar ] dip
+        [ help-stylesheet help-meta prepend help-navbar ] dip
         [XML <div id="container"><-><div class="page"><-></div></div> XML]
     ] bi simple-page ;
 
