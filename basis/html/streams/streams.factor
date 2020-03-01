@@ -55,7 +55,8 @@ TUPLE: html-sub-stream < html-writer style parent ;
     "font-size: " % # "pt; " % ;
 
 : font-css, ( font -- )
-    "font-family: " % % "; " % ;
+    [ "font-family: " % % "; " % ]
+    [ "monospace" = [ "white-space: pre-wrap; " % ] when ] bi ;
 
 MACRO: make-css ( pairs -- str )
     [ '[ _ of [ _ execute ] when* ] ] { } assoc>map
@@ -111,7 +112,8 @@ M: html-span-stream dispose
 : padding-css, ( padding -- )
     first2 (padding-css,) ;
 
-CONSTANT: pre-css "white-space: pre; font-family: monospace; "
+: width-css, ( width -- )
+    "width: " % # "px; " % ;
 
 : div-css-style ( style -- str )
     [ span-css-style ]
@@ -120,9 +122,9 @@ CONSTANT: pre-css "white-space: pre; font-family: monospace; "
             { page-color bg-css, }
             { border-color border-css, }
             { inset padding-css, }
+            { wrap-margin width-css, }
         } make-css
-    ] [ wrap-margin of [ pre-css append ] unless ] tri
-    "display: inline-block; " 3append ;
+    ] bi "display: inline-block; " 3append ;
 
 : div-tag ( xml style -- xml' )
     div-css-style
