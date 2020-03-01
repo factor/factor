@@ -119,4 +119,4 @@ M: cord v*n '[ _ v*n ] cord-map ; inline
 M: cord v/n '[ _ v/n ] cord-map ; inline
 
 M: cord norm-sq [ norm-sq ] cord-both + ; inline
-M: cord distance v- norm ; inline
+M: cord distance v- l2-norm ; inline

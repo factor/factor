@@ -15,7 +15,7 @@ IN: math.vectors.simd.tests
 ! Test type propagation
 { V{ float } } [ [ { float-4 } declare norm-sq ] final-classes ] unit-test
 
-{ V{ float } } [ [ { float-4 } declare norm ] final-classes ] unit-test
+{ V{ float } } [ [ { float-4 } declare l2-norm ] final-classes ] unit-test
 
 { V{ float-4 } } [ [ { float-4 } declare normalize ] final-classes ] unit-test
 
@@ -64,7 +64,7 @@ CONSTANT: vector-words
         { n+v { +scalar+ +vector+ -> +vector+ } }
         { n-v { +scalar+ +vector+ -> +vector+ } }
         { n/v { +scalar+ +vector+ -> +vector+ } }
-        { norm { +vector+ -> +nonnegative+ } }
+        { l2-norm { +vector+ -> +nonnegative+ } }
         { norm-sq { +vector+ -> +nonnegative+ } }
         { normalize { +vector+ -> +vector+ } }
         { v* { +vector+ +vector+ -> +vector+ } }

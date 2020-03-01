@@ -91,7 +91,7 @@ CONSTANT: default-segment-radius 1
     over location>> swap v- swap forward>> proj-perp ;
 
 : distance-from-centre ( seg loc -- distance )
-    vector-to-centre norm ;
+    vector-to-centre l2-norm ;
 
 : wall-normal ( seg oint -- n )
     location>> vector-to-centre normalize ;
@@ -107,7 +107,7 @@ CONSTANT: distant 1000
     ] if ;
 
 :: collision-coefficient ( v w r -- c )
-    v norm 0 = [
+    v l2-norm 0 = [
         distant
     ] [
         v dup vdot :> a
