@@ -8,3 +8,26 @@
 #right {
     margin-left: 200px;
 }
+
+.navbar img {
+    margin: -15px;
+    margin-top: -20px;
+    margin-right: 0px;
+    padding: 15px;
+    vertical-align: middle;
+    display: none;
+}
+
+@media screen and (max-width: 600px) {
+    #left {
+        display: none;
+    }
+
+    #right {
+        margin-left: 0;
+    }
+
+    .navbar img {
+        display: inline;
+    }
+}
