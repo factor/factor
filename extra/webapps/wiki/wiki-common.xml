@@ -55,7 +55,7 @@
         </div>
 
         <div class="page">
-            <h1><t:write-title /></h1>
+            <h1 class="title"><t:write-title /></h1>
 
             <t:call-next-template />
 
