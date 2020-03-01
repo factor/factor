@@ -38,7 +38,7 @@
             </t:each>
         </ul>
 
-        <hr/>
+        <hr size="1" />
 
         <p>
             <strong>planet-factor</strong> is an Atom/RSS aggregator that collects the
