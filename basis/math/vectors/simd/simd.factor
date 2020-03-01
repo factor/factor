@@ -94,7 +94,7 @@ DEFER: simd-construct-op
 
 : (vvx->v-op) ( a b obj rep quot: ( (a) (b) obj rep -- (c) ) -- c )
     [ [ simd-unbox ] [ underlying>> ] bi* ] 3dip 2curry 2curry make-underlying ; inline
-    
+
 : vv->v-op ( a b rep quot: ( (a) (b) rep -- (c) ) fallback-quot -- c )
     [ '[ _ (vv->v-op) ] ] [ '[ drop @ ] ] bi* if-both-vectors-match ; inline
 
@@ -254,7 +254,7 @@ M: simd-128 v-n over simd-with v- ; inline
 M: simd-128 v*n over simd-with v* ; inline
 M: simd-128 v/n over simd-with v/ ; inline
 M: simd-128 norm-sq dup vdot assert-positive ; inline
-M: simd-128 distance v- norm ; inline
+M: simd-128 distance v- l2-norm ; inline
 
 M: simd-128 >pprint-sequence ;
 M: simd-128 pprint* pprint-object ;

@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel math math.functions
-sequences ;
+math.matrices sequences ;
 IN: math.vectors
 
 ARTICLE: "math-vectors-arithmetic" "Vector arithmetic"
@@ -20,6 +20,7 @@ ARTICLE: "math-vectors-arithmetic" "Vector arithmetic"
     vfloor
     vceiling
     vtruncate
+    normalize
 }
 "Vector/scalar and scalar/vector binary operations:"
 { $subsections
@@ -44,9 +45,10 @@ ARTICLE: "math-vectors-arithmetic" "Vector arithmetic"
 "Inner product and norm:"
 { $subsections
     vdot
-    norm
     norm-sq
-    normalize
+    l1-norm
+    l2-norm
+    l-infinity-norm
     p-norm
 }
 "Comparing entire vectors:"
@@ -481,17 +483,50 @@ HELP: norm-sq
 { $values { "v" { $sequence number } } { "x" "a non-negative real number" } }
 { $description "Computes the squared length of a mathematical vector." } ;
 
-HELP: norm
-{ $values { "v" { $sequence number } } { "x" "a non-negative real number" } }
-{ $description "Computes the length of a mathematical vector." } ;
+HELP: l1-norm
+{ $values { "k" sequence } { "x" "a non-negative real number" } }
+{ $contract "Computes the norm (size) of " { $snippet "k" } " in 𝑙₁ (" { $snippet "L^1" } ") vector space." }
+{ $notes "See " { $link matrix-l1-norm } " for matrix-specific documentation about this word." }
+{ $examples
+    { $example
+        "USING: math.vectors prettyprint ;"
+        "{ 1 2 3 4 } l1-norm ."
+        "10"
+    }
+} ;
+
+HELP: l2-norm
+{ $values { "k" sequence } { "x" "a non-negative real number" } }
+{ $contract "Computes the norm (size) of " { $snippet "k" } " in 𝑙₂ (" { $snippet "L^2" } ") vector space." }
+{ $notes "See " { $link matrix-l2-norm } " for matrix-specific documentation about this word." }
+{ $examples
+    { $example
+        "USING: math.vectors math.functions prettyprint ;"
+        "{ 1 2 3 4 } l2-norm 5.4772255 10e-8 ~ ."
+        "t"
+    }
+} ;
+
+HELP: l-infinity-norm
+{ $values { "k" sequence } { "x" "a non-negative real number" } }
+{ $contract "Computes the norm (size) of " { $snippet "k" } " in 𝑙∞ (" { $snippet "L^∞" } ") vector space. For a mathematical vector, this is simply its " { $link supremum } "." }
+{ $notes "See " { $link matrix-l-infinity-norm } " for matrix-specific documentation about this word." }
+{ $examples
+    { $example
+        "USING: math.vectors prettyprint ;"
+        "{ 1 2 3 4 } l-infinity-norm ."
+        "4"
+    }
+} ;
 
 HELP: p-norm
-{ $values { "v" { $sequence number } } { "p" "a positive real number" } { "x" "a non-negative real number" } }
-{ $description "Computes the length of a mathematical vector in " { $snippet "L^p" } " space." } ;
+{ $values { "k" { $sequence number } } { "p" "a positive real number" } { "x" "a non-negative real number" } }
+{ $contract "Computes the norm (size) of " { $snippet "k" } " in 𝑙ₚ (" { $snippet "L^p" } ") vector space." }
+{ $notes "See " { $link matrix-p-norm } " for matrix-specific documentation about this word." } ;
 
 HELP: normalize
-{ $values { "v" "a sequence of numbers, not all zero" } { "w" { $sequence number } } }
-{ $description "Outputs a vector with the same direction as " { $snippet "v" } " but length 1." } ;
+{ $values { "v" { $sequence "at least 1 non-zero number" } } { "w" { $sequence number } } }
+{ $description "Outputs a vector with the same direction as " { $snippet "v" } ", but length 1." } ;
 
 HELP: distance
 { $values { "u" { $sequence number } } { "v" { $sequence number } } { "x" "a non-negative real number" } }
