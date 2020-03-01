@@ -36,6 +36,19 @@ CHLOE: write-style
         [XML <style type="text/css"> <-> </style> XML]
     ] [xml-code] ;
 
+CHLOE: script
+    dup "include" optional-attr [
+        utf8 file-contents [ add-script ] [code-with]
+    ] [
+        compile-children>string [ add-script ] [code]
+    ] ?if ;
+
+CHLOE: write-script
+    drop [
+        get-script
+        [XML <script type="text/javascript"> <-> </script> XML]
+    ] [xml-code] ;
+
 CHLOE: even
     [ "index" value even? swap when ] process-children ;
 
