@@ -19,9 +19,6 @@
 
             <t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
         </t:if>
-        <div style="float: right;">
-            <a href="//factorcode.org"><b>factorcode.org</b></a>
-        </div>
     </div>
 
     <div class="page">
