@@ -116,7 +116,7 @@ M: pathname url-of
     ] re-replace-with
 
     R/ font-family: monospace;/ [
-        " line-height: 125%;" append
+        " white-space: pre-wrap; line-height: 125%;" append
     ] re-replace-with ;
 
 : css-classes ( classes -- stylesheet )
