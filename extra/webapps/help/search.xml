@@ -7,6 +7,7 @@
 
         <t:base t:href="$help-webapp/content/" />
         <title>Search - Factor Documentation</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <style>
             html {
                 box-sizing: border-box;
