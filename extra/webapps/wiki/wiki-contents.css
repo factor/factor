@@ -11,9 +11,11 @@
 
 .navbar img {
     margin: -15px;
-    margin-top: -20px;
+    margin-top: -19px;
     margin-right: 0px;
     padding: 15px;
+    padding-top: 13px;
+    padding-bottom: 11px;
     vertical-align: middle;
     display: none;
 }
@@ -21,7 +23,7 @@
 @media screen and (max-width: 600px) {
     #left {
         position: absolute;
-        margin-top: 40px;
+        margin-top: 32px;
         display: none;
     }
 
