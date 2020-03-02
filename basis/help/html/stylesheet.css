@@ -39,6 +39,9 @@ tr:hover {
 .navbar {
     margin: 0;
     padding: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    line-height: 150%;
     border-bottom: 1px solid #ccc;
 }
 
