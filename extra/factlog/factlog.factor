@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.tuple combinators
 combinators.short-circuit compiler.units continuations
-formatting fry io kernel lexer lists locals make math namespaces
-parser prettyprint prettyprint.backend prettyprint.config
+formatting fry io kernel lexer lists locals make math multiline
+namespaces parser prettyprint prettyprint.backend prettyprint.config
 prettyprint.custom prettyprint.sections quotations sequences
 sequences.deep sets splitting strings words words.symbol
 vectors ;
@@ -58,6 +58,9 @@ SYNTAX: LOGIC-PREDS: ";"
         [ [ name>> <pred> ] keep set-global ] tri
     ] each-token ;
 >>
+
+SYNTAX: %!
+  "!%" parse-multiline-string drop ;
 
 <PRIVATE
 
@@ -573,4 +576,3 @@ LOGIC-PREDS:
 
 { listo L{ } } fact
 { listo L{ __ . __ } } fact
-

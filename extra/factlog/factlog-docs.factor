@@ -1,7 +1,7 @@
 ! Copyright (C) 2019-2020 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays help.markup help.syntax kernel quotations sequences
-    prettyprint assocs math lists urls factlog.private ;
+    prettyprint assocs math make lists urls factlog.private ;
 IN: factlog
 
 HELP: !!
@@ -138,6 +138,18 @@ HELP: LOGIC-VARS:
     "{ mouseo X } query ."
     "{ H{ { X Jerry } } }"
   }
+} ;
+
+HELP: %!
+{ $description "A multiline comment. Despite being a Prolog single-line comment, " { $link % } " is already well-known in Factor, so this variant is given instead." }
+{ $syntax "%! comment !%" }
+{ $examples
+    { $example
+        "USE: factlog"
+        "%! I think that I shall never see"
+        "   A proof lovely as a factlog. !%"
+        ""
+    }
 } ;
 
 HELP: \+
@@ -722,7 +734,7 @@ SYMBOLS: Tom Jerry Nibbles ;"
     { cato Y } ;; { mouseo Y }
 } rule"
 } $nl
-{ $link ;; } " is used to represent " { $strong "disjunction" } ". The code below it has the same meaning as the code below it." $nl
+{ $link ;; } " is used to represent " { $strong "disjunction" } ". The following two forms are equivalent:" $nl
 { $code "Gh { Gb1 Gb2 Gb3 ;; Gb4 Gb5 ;; Gb6 } rule" }
 $nl
 { $code
