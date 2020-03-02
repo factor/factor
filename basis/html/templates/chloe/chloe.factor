@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs html.components html.forms
+USING: accessors arrays assocs fry html.components html.forms
 html.templates html.templates.chloe.compiler
 html.templates.chloe.components html.templates.chloe.syntax
 io.encodings.utf8 io.files io.files.info kernel logging make
@@ -48,6 +48,14 @@ CHLOE: write-script
         get-script
         [XML <script type="text/javascript"> <-> </script> XML]
     ] [xml-code] ;
+
+CHLOE: meta
+    [ "name" optional-attr ]
+    [ "content" optional-attr ] bi
+    '[ _ _ add-meta ] [code] ;
+
+CHLOE: write-meta
+    drop [ get-meta ] [xml-code] ;
 
 CHLOE: even
     [ "index" value even? swap when ] process-children ;
