@@ -55,8 +55,7 @@ TUPLE: html-sub-stream < html-writer style parent ;
     "font-size: " % # "pt; " % ;
 
 : font-css, ( font -- )
-    [ "font-family: " % % "; " % ]
-    [ "monospace" = [ "white-space: pre-wrap; " % ] when ] bi ;
+    "font-family: " % % "; " % ;
 
 MACRO: make-css ( pairs -- str )
     [ '[ _ of [ _ execute ] when* ] ] { } assoc>map
