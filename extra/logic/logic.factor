@@ -222,7 +222,7 @@ DEFER: unify*
     ] [
         body unclip :> ( rest-goals! first-goal! )
         first-goal !! = [  ! cut
-            rest-goals env cut [ quot call( -- ) ] resolve-body
+            rest-goals env cut quot resolve-body
             t cut set-info
         ] [
             first-goal callable? [
@@ -243,11 +243,11 @@ DEFER: unify*
                         first-goal env d-head d-env trail d-env unify* [
                             d-body callable? [
                                 d-env trail <callback-env> d-body call( cb-env -- ? ) [
-                                    rest-goals env cut [ quot call( -- ) ] resolve-body
+                                    rest-goals env cut quot resolve-body
                                 ] when
                             ] [
                                 d-body d-env d-cut [
-                                    rest-goals env cut [ quot call( -- ) ] resolve-body
+                                    rest-goals env cut quot resolve-body
                                     cut cut? d-cut set-info-if-f
                                 ] resolve-body
                             ] if
