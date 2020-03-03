@@ -1,7 +1,7 @@
 ! Copyright (C) 2020 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: factlog kernel lists assocs locals math ;
-IN: factlog.examples.fib2
+USING: logic kernel lists assocs locals math ;
+IN: logic.examples.fib2
 
 LOGIC-PREDS: fibo ;
 LOGIC-VARS: F F1 F2 N N1 N2 ;

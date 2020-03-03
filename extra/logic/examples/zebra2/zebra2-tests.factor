@@ -1,7 +1,7 @@
 ! Copyright (C) 2019-2020 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test factlog lists factlog.examples.zebra2 ;
-IN: factlog.examples.zebra2.tests
+USING: tools.test logic lists logic.examples.zebra2 ;
+IN: logic.examples.zebra2.tests
 
 {
     {

@@ -1,7 +1,7 @@
 ! Copyright (C) 2019-2020 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: factlog kernel assocs math ;
-IN: factlog.examples.factorial
+USING: logic kernel assocs math ;
+IN: logic.examples.factorial
 
 LOGIC-PREDS: factorial ;
 LOGIC-VARS: N F N2 F2 ;
