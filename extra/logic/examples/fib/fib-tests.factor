@@ -1,7 +1,6 @@
 ! Copyright (C) 2019-2020 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test logic lists logic.examples.fib ;
-IN: logic.examples.fib.tests
 
 { { H{ { L L{ 0 } } } } } [ { fibo 0 L } query ] unit-test
 

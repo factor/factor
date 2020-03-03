@@ -1,7 +1,6 @@
 ! Copyright (C) 2019-2020 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test logic lists logic.examples.money ;
-IN: logic.examples.money.tests
 
 {
     {
