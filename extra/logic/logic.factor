@@ -8,7 +8,7 @@ prettyprint.custom prettyprint.sections quotations sequences
 sequences.deep sets splitting strings words words.symbol
 vectors ;
 
-IN: factlog
+IN: logic
 
 SYMBOL: !!    ! cut operator         in prolog: !
 SYMBOL: __    ! anonymous variable   in prolog: _
@@ -270,7 +270,7 @@ SYMBOL: *anonymouse-var-no*
 : proxy-var-for-'__' ( -- var-symbol )
     [
         *anonymouse-var-no* counter "ANON-%d_" sprintf
-        "factlog.private" create-word dup dup
+        "logic.private" create-word dup dup
         define-symbol
         ANONYMOUSE-LOGIC-VAR swap set-global
     ] with-compilation-unit ;
