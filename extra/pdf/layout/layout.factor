@@ -117,6 +117,11 @@ TUPLE: text string style ;
 : <text> ( string style -- text )
     [ convert-string ] dip text boa ;
 
+! FIXME: need to make links clickable, render text first, draw
+! box over text that is "link"
+
+! https://www.w3.org/WAI/WCAG21/Techniques/pdf/PDF11.html
+
 M: text pdf-render
     [ style>> set-style ] keep
     [
@@ -250,11 +255,22 @@ M: table-row pdf-render
         [ widths [ 0 or max ] change-at ] each-index
     ] each widths >alist sort-keys values
 
-    ! make last cell larger
-    dup sum 400 swap [-] [ + ] curry dupd sequences.extras:change-last
+    dup sum dup 450 > [
 
-    ! size down each column
-    dup sum dup 400 > [ 400 swap / [ * ] curry map ] [ drop ] if ;
+        over first 150 < [
+            ! special-case small first column
+            drop dup unclip-slice over sum swap
+            450 swap - swap / [ * ] curry map! drop
+        ] [
+            ! size down all columns
+            450 swap / [ * ] curry map
+        ] if
+
+    ] [
+        ! make last cell larger
+        450 swap [-] [ + ] curry dupd
+        sequences.extras:change-last
+    ] if ;
 
 : set-col-widths ( canvas rows -- )
     [ max-col-widths ] keep [
@@ -286,7 +302,7 @@ M: table pdf-render
     } 2cleave ;
 
 M: table pdf-width
-    2drop 400 ; ! FIXME: hardcoded max-width
+    2drop 450 ; ! FIXME: hardcoded max-width
 
 
 : pdf-object ( str n -- str' )
