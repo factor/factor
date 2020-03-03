@@ -1,0 +1,7 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+    <t:meta t:name="author" t:content="John Doe" />
+    <t:meta t:name="viewport" t:content="width=device-width, initial-scale=1.0" />
+	<t:write-meta />
+</t:chloe>
