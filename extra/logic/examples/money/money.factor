@@ -1,8 +1,8 @@
 ! Copyright (C) 2019-2020 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: factlog lists assocs sequences kernel math
+USING: logic lists assocs sequences kernel math
 locals formatting io ;
-IN: factlog.examples.money
+IN: logic.examples.money
 
 LOGIC-PREDS: sumo sum1o digitsumo delo donaldo moneyo ;
 LOGIC-VARS: S E N D M O R Y A L G B T
