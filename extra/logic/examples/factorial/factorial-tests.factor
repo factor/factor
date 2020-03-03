@@ -1,7 +1,6 @@
 ! Copyright (C) 2019-2020 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test logic logic.examples.factorial ;
-IN: logic.examples.factorial.tests
 
 { { H{ { F 1 } } } } [ { factorial 0 F } query ] unit-test
 

@@ -1,6 +1,6 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: logic arrays ;
+USING: logic lists ;
 IN: logic.examples.zebra-short
 
 ! Do the same as this Prolog program
