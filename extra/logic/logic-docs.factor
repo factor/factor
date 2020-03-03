@@ -1,15 +1,15 @@
 ! Copyright (C) 2019-2020 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays help.markup help.syntax kernel quotations sequences
-    prettyprint assocs math make lists urls factlog.private ;
-IN: factlog
+    prettyprint assocs math make lists urls logic.private ;
+IN: logic
 
 HELP: !!
 { $var-description "The cut operator.\nUse the cut operator to suppress backtracking." }
 { $examples
   "In the following example, it is used to define that cats generally eat mice, but Tom does not."
   { $example
-    "USING: factlog prettyprint ;"
+    "USING: logic prettyprint ;"
     "IN: scratchpad"
     ""
     "LOGIC-PREDS: is-ao consumeso ;"
@@ -96,7 +96,7 @@ HELP: =:=
     { "quot" quotation }
     { "goal" logic-goal }
 }
-{ $description "The quotations takes an environment and returns two values. " { $snippet "=:=" } " returns the internal representation of the goal which returns t if values returned by the quotation are same numbers.\n" { $snippet "=:=" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." }
+{ $description "The quotations takes an environment and returns two values. " { $snippet "=:=" } " returns the internal representation of the goal which returns t if values returned by the quotation are same numbers.\n" { $snippet "=:=" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, " { $snippet "logic" } " uses the internal definition of the goal obtained by calling it." }
 { $see-also (==) =\= } ;
 
 HELP: =\=
@@ -104,7 +104,7 @@ HELP: =\=
     { "quot" quotation }
     { "goal" logic-goal }
 }
-{ $description "The quotations takes an environment and returns two values. " { $snippet "=\\=" } " returns the internal representation of the goal which returns t if values returned by the quotation are numbers and are not same.\n" { $snippet "=\\=" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." }
+{ $description "The quotations takes an environment and returns two values. " { $snippet "=\\=" } " returns the internal representation of the goal which returns t if values returned by the quotation are numbers and are not same.\n" { $snippet "=\\=" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, " { $snippet "logic" } " uses the internal definition of the goal obtained by calling it." }
 { $see-also (==) =:= } ;
 
 HELP: LOGIC-PREDS:
@@ -112,7 +112,7 @@ HELP: LOGIC-PREDS:
 { $syntax "LOGIC-PREDS: preds... ;" }
 { $examples
   { $code
-    "USE: factlog"
+    "USE: logic"
     "IN: scratchpad"
     ""
     "LOGIC-PREDS: cato mouseo ;"
@@ -128,7 +128,7 @@ HELP: LOGIC-VARS:
 { $syntax "LOGIC-VARS: vars... ;" }
 { $examples
   { $example
-    "USING: factlog prettyprint ;"
+    "USING: logic prettyprint ;"
     "IN: scratchpad"
     ""
     "LOGIC-PREDS: mouseo ;"
@@ -145,7 +145,7 @@ HELP: %!
 { $syntax "%! comment !%" }
 { $examples
     { $example
-        "USE: factlog"
+        "USE: logic"
         "%! I think that I shall never see"
         "   A proof lovely as a factlog. !%"
         ""
@@ -156,7 +156,7 @@ HELP: \+
 { $var-description "Express negation. \\+ acts on the goal immediately following it.\n" }
 { $examples
   { $example
-    "USING: factlog prettyprint ;"
+    "USING: logic prettyprint ;"
     "IN: scratchpad"
     ""
     "LOGIC-PREDS: cato mouseo creatureo ;"
@@ -187,7 +187,7 @@ HELP: __
 { $var-description "An anonymous logic variable.\nUse in place of a regular logic variable when you do not need its name and value." }
 { $examples
   { $example
-    "USING: factlog prettyprint ;"
+    "USING: logic prettyprint ;"
     "IN: scratchpad"
     ""
     "SYMBOLS: Tom Jerry Nibbles ;"
@@ -220,7 +220,7 @@ HELP: appendo
 { $syntax "{ appendo List1 List2 List1+List2 }" }
 { $examples
   { $example
-    "USING: factlog lists prettyprint ;"
+    "USING: logic lists prettyprint ;"
     "IN: scratchpad"
     ""
     "SYMBOLS: Tom Jerry Nibbles ;"
@@ -268,7 +268,7 @@ HELP: clear-pred
 { $description "Clears all the definition information for the given logic predicate." }
 { $examples
   { $example
-    "USING: factlog prettyprint ;"
+    "USING: logic prettyprint ;"
     "IN: scratchpad"
     ""
     "LOGIC-PREDS: mouseo ;"
@@ -293,7 +293,7 @@ HELP: fact
 { $description "Registers the fact to the end of the logic predicate that is in the head." }
 { $examples
   { $code
-    "USE: factlog"
+    "USE: logic"
     "IN: scratchpad"
     ""
     "LOGIC-PREDS: cato mouseo ;"
@@ -318,7 +318,7 @@ HELP: facts
 { $description "Registers these facts to the end of the logic predicate that is in the head." }
 { $examples
   { $code
-    "USE: factlog"
+    "USE: logic"
     "IN: scratchpad"
     ""
     "LOGIC-PREDS: cato mouseo ;"
@@ -338,18 +338,18 @@ HELP: is
     { "quot" quotation } { "dist" "a logic predicate" }
     { "goal" logic-goal }
 }
-{ $description "Takes a quotation and a logic variable to be unified. Each of the two quotations takes an environment and returns a value. " { $snippet "is" } " returns the internal representation of the goal.\n" { $snippet "is" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." } ;
+{ $description "Takes a quotation and a logic variable to be unified. Each of the two quotations takes an environment and returns a value. " { $snippet "is" } " returns the internal representation of the goal.\n" { $snippet "is" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, " { $snippet "logic" } " uses the internal definition of the goal obtained by calling it." } ;
 
 HELP: invoke
 { $values
     { "quot" quotation }
     { "goal" logic-goal }
 }
-{ $description "Creates a goal which uses the values of obtained logic variables. It can be used to add new rules to or drop rules from the database while a " { $link query } " is running.\nThe argument " { $snippet "quot" } " must not return any values, the created goal always return " { $link t } ".\n" { $snippet "invoke" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." }
+{ $description "Creates a goal which uses the values of obtained logic variables. It can be used to add new rules to or drop rules from the database while a " { $link query } " is running.\nThe argument " { $snippet "quot" } " must not return any values, the created goal always return " { $link t } ".\n" { $snippet "invoke" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, " { $snippet "logic" } " uses the internal definition of the goal obtained by calling it." }
 { $examples
   "In this example, the calculated values are memorized to eliminate recalculation."
   { $example
-    "USING: factlog kernel lists assocs locals math prettyprint ;"
+    "USING: logic kernel lists assocs locals math prettyprint ;"
     "IN: scratchpad"
     ""
     "LOGIC-PREDS: fibo ;"
@@ -380,7 +380,7 @@ HELP: invoke*
     { "quot" quotation }
     { "goal" logic-goal }
 }
-{ $description "Creates a goal which uses the values of obtained logic variables. The difference with " { $link invoke } " is that " { $snippet "quot" } " returns " { $link t } " or " { $link f } ", and the created goal returns it.\n" { $snippet "invoke*" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." }
+{ $description "Creates a goal which uses the values of obtained logic variables. The difference with " { $link invoke } " is that " { $snippet "quot" } " returns " { $link t } " or " { $link f } ", and the created goal returns it.\n" { $snippet "invoke*" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, " { $snippet "logic" } " uses the internal definition of the goal obtained by calling it." }
 { $see-also invoke } ;
 
 HELP: lengtho
@@ -388,7 +388,7 @@ HELP: lengtho
 { $syntax "{ lengtho List X }" }
 { $examples
   { $example
-    "USING: factlog lists prettyprint ;"
+    "USING: logic lists prettyprint ;"
     "IN: scratchpad"
     ""
     "SYMBOLS: Tom Jerry Nibbles ;"
@@ -405,7 +405,7 @@ HELP: listo
 { $syntax "{ listo X }" }
 { $examples
   { $example
-    "USING: factlog lists prettyprint ;"
+    "USING: logic lists prettyprint ;"
     "IN: scratchpad"
     ""
     "SYMBOLS: Tom Jerry Nibbles ;"
@@ -421,7 +421,7 @@ HELP: membero
 { $syntax "{ membero X List }" }
 { $examples
   { $example
-    "USING: factlog lists prettyprint ;"
+    "USING: logic lists prettyprint ;"
     "IN: scratchpad"
     ""
     "SYMBOLS: Tom Jerry Nibbles Spike ;"
@@ -467,7 +467,7 @@ When you query with logic variable(s), you will get the answer for the logic var
 }
 { $examples
   { $example
-    "USING: factlog prettyprint ;"
+    "USING: logic prettyprint ;"
     "IN: scratchpad"
     ""
     "LOGIC-PREDS: cato mouseo creatureo ;"
@@ -502,7 +502,7 @@ HELP: retract
 { $description "Removes the first definition that matches the given head information." }
 { $examples
   { $example
-    "USING: factlog prettyprint ;"
+    "USING: logic prettyprint ;"
     "IN: scratchpad"
     ""
     "LOGIC-PREDS: mouseo ;"
@@ -526,7 +526,7 @@ HELP: retract-all
 { $description "Removes all definitions that match a given head goal definition." }
 { $examples
   { $example
-    "USING: factlog prettyprint ;"
+    "USING: logic prettyprint ;"
     "IN: scratchpad"
     ""
     "LOGIC-PREDS: mouseo ;"
@@ -559,7 +559,7 @@ If the body array contains only one goal definition, you can write it instead of
     Gh Gb rule" }
 { $examples
   { $example
-    "USING: factlog prettyprint ;"
+    "USING: logic prettyprint ;"
     "IN: scratchpad"
     ""
     "LOGIC-PREDS: mouseo youngo young-mouseo ;"
@@ -651,23 +651,23 @@ HELP: writeo
 { $syntax "{ writeo X }" }
 { $see-also writenlo nlo } ;
 
-ARTICLE: "factlog" "How to use factlog"
-{ $vocab-link "factlog" }
-" is an embedded language that runs on "{ $url "https://github.com/factor/factor" "Factor" } " with the capabilities of a subset of Prolog." $nl
+ARTICLE: "logic" "Logic"
+{ $vocab-link "logic" }
+" is a vocab for an embedded language that runs on "{ $url "https://github.com/factor/factor" "Factor" } " with the capabilities of a subset of Prolog." $nl
 "It is an extended port from tiny_prolog and its descendants, " { $url "https://github.com/preston/ruby-prolog" "ruby-prolog" } "." $nl
 { $code
-"USE: factlog
+"USE: logic
 
 LOGIC-PREDS: cato mouseo creatureo ;
 LOGIC-VARS: X Y ;
 SYMBOLS: Tom Jerry Nibbles ;"
 } $nl
-"In factlog, words that represent relationships are called " { $strong "logic predicates" } ". Use " { $link \ LOGIC-PREDS: } " to declare the predicates you want to use. " { $strong "Logic variables" } " are used to represent relationships. use " { $link \ LOGIC-VARS: } " to declare the logic variables you want to use." $nl
+"In the DSL, words that represent relationships are called " { $strong "logic predicates" } ". Use " { $link \ LOGIC-PREDS: } " to declare the predicates you want to use. " { $strong "Logic variables" } " are used to represent relationships. use " { $link \ LOGIC-VARS: } " to declare the logic variables you want to use." $nl
 "In the above code, logic predicates end with the character 'o', which is a convention borrowed from miniKanren and so on, and means relation. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: " { $snippet "cat°" } ", " { $snippet "mouse°" } " and " { $snippet "creature°" } ", but we use 'o' because it's easy to type." $nl
-{ $strong "Goals" } " are questions that factlog tries to meet to be true. To represent a goal, write an array with a logic predicate followed by zero or more arguments. factlog converts such definitions to internal representations." $nl
+{ $strong "Goals" } " are questions that " { $snippet "logic" } " tries to meet to be true. To represent a goal, write an array with a logic predicate followed by zero or more arguments. " { $snippet "logic" } " converts such definitions to internal representations." $nl
 { $code "{ LOGIC-PREDICATE ARG1 ARG2 ... }" }
 { $code "{ LOGIC-PREDICATE }" } $nl
-"We will write factlog programs using these goals." $nl
+"We will write logic programs using these goals." $nl
 { $code
 "{ cato Tom } fact
 { mouseo Jerry } fact
@@ -742,7 +742,7 @@ $nl
   "Gh { Gb4 Gb5 } rule"
   "Gh { Gb6 } rule"
 } $nl
-"factlog actually converts the disjunction in that way. You may need to be careful about that when deleting definitions that you registered using " { $link rule } ", etc." $nl
+{ $snippet "logic" } " actually converts the disjunction in that way. You may need to be careful about that when deleting definitions that you registered using " { $link rule } ", etc." $nl
 "You can use " { $link query-n } " to limit the number of answers to a query. Specify a number greater than or equal to 1." $nl
 { $unchecked-example
 "{ creatureo Y } 2 query-n ."
@@ -923,7 +923,7 @@ mouseo clear-pred
 { creatureo X } query ."
 "{ H{ { X Tom } } }\n{ H{ { X big } { Y a-big-cat } } H{ { X small } { Y a-small-cat } } }\n{ H{ { X Tom } } H{ { X Jerry } } H{ { X Nibbles } }"
 } $nl
-"If you need to identify a logic predicate that has a different " { $strong "arity" } ", that is numbers of arguments, express it with a slash and an arity number. For example, " { $snippet "cato" } " with arity 1 is " { $snippet "cato/1" } ", " { $snippet "cato" } " with arity 2 is " { $snippet "cato/2" } ". But, note that factlog does not recognize these names." $nl
+"If you need to identify a logic predicate that has a different " { $strong "arity" } ", that is numbers of arguments, express it with a slash and an arity number. For example, " { $snippet "cato" } " with arity 1 is " { $snippet "cato/1" } ", " { $snippet "cato" } " with arity 2 is " { $snippet "cato/2" } ". But, note that " { $snippet "logic" } " does not recognize these names." $nl
 { $link clear-pred } " will clear all definitions of any arity. If you only want to remove the definition of a certain arity, you should use " { $link retract-all } " with logic variables." $nl
 { $unchecked-example
 "{ cato __ __ } retract-all
@@ -931,14 +931,14 @@ mouseo clear-pred
 "{ cato X } query ."
 "f\n{ H{ { X Tom } } }"
 } $nl
-"You can " { $strong "trace" } " factlog's execution. The word to do this is " { $link trace } "." $nl
+"You can " { $strong "trace" } " " { $snippet "logic" } "'s execution. The word to do this is " { $link trace } "." $nl
 "The word to stop tracing is " { $link notrace } "." $nl
 "Here is a Prolog definition for the factorial predicate " { $snippet "factorial" } "." $nl
 "factorial(0, 1)." $nl
 "factorial(N, F) :- N > 0, N2 is N - 1, factorial(N2, F2), F is F2 * N." $nl
-"Let's think about how to do the same thing with factlog. It is mostly the following code, but is surrounded by backquotes where it has not been explained." $nl
+"Let's think about how to do the same thing. It is mostly the following code, but is surrounded by backquotes where it has not been explained." $nl
 { $code
-"USE: factlog
+"USE: logic
 
 LOGIC-PREDS: factorialo ;
 LOGIC-VARS: N N2 F F2 ;
@@ -951,7 +951,7 @@ LOGIC-VARS: N N2 F F2 ;
     `F is F2 * N`
 } rule"
 } $nl
-"Within these backquotes are comparisons, calculations, and assignments (to be precise, " { $strong "unifications" } "). factlog has a mechanism to call Factor code to do these things. Here are some example." $nl
+"Within these backquotes are comparisons, calculations, and assignments (to be precise, " { $strong "unifications" } "). " { $snippet "logic" } " has a mechanism to call Factor code to do these things. Here are some example." $nl
 { $code "LOGIC-PREDS: N_>_0  N2_is_N_-_1  F_is_F2_*_N ;" }
 { $code "{ N_>_0 N } [ N of 0 > ] callback" }
 { $code "{ N2_is_N_-_1 N2 N } [ dup N of 1 - N2 unify ] callback" }
@@ -960,7 +960,7 @@ LOGIC-VARS: N N2 F F2 ;
 "The word " { $link unify } " unifies the two following the environment in that environment." $nl
 "Now we can rewrite the definition of factorialo to use them." $nl
 { $code
-"USE: factlog
+"USE: logic
 
 LOGIC-PREDS: factorialo N_>_0  N2_is_N_-_1  F_is_F2_*_N ;
 LOGIC-VARS: N N2 F F2 ;
@@ -992,12 +992,12 @@ LOGIC-VARS: N N2 F F2 ;
 "{ factorialo 10 F } query ."
 "{ H{ { F 3628800 } } }"
 } $nl
-"factlog has features that make it easier to meet the typical requirements shown here." $nl
+{ $snippet "logic" } " has features that make it easier to meet the typical requirements shown here." $nl
 "There are the built-in logic predicates " { $link (<) } ", " { $link (>) } ", " { $link (>=) } ", and " { $link (=<) } " to compare numbers. There are also " { $link (==) } " and " { $link (\==) } " to test for equality and inequality of two arguments." $nl
-"The word " { $link is } " takes a quotation and a logic variable to be unified. The quotation takes an environment and returns a value. And " { $link is } " returns the internal representation of the goal. " { $link is } " is intended to be used in a quotation. If there is a quotation in the definition of " { $link rule } ", factlog uses the internal definition of the goal obtained by calling it." $nl
+"The word " { $link is } " takes a quotation and a logic variable to be unified. The quotation takes an environment and returns a value. And " { $link is } " returns the internal representation of the goal. " { $link is } " is intended to be used in a quotation. If there is a quotation in the definition of " { $link rule } ", " { $snippet "logic" } " uses the internal definition of the goal obtained by calling it." $nl
 "If you use these features to rewrite the definition of " { $snippet "factorialo" } ":" $nl
 { $code
-"USE: factlog
+"USE: logic
 
 LOGIC-PREDS: factorialo ;
 LOGIC-VARS: N N2 F F2 ;
@@ -1012,7 +1012,7 @@ LOGIC-VARS: N N2 F F2 ;
 } $nl
 "Use the built-in logic predicate " { $link (=) } " for unification that does not require processing with a quotation. " { $link (\=) } " will be true when such a unification fails. Note that " { $link (\=) } " does not actually do the unification." $nl
 { $link varo } " takes a argument and is true if it is a logic variable with no value. On the other hand, " { $link nonvaro } " is true if its argument is not a logic variable or is a concrete logic variable." $nl
-"Now almost everything about factlog is explained."
+"Now almost everything about " { $snippet "logic" } " is explained."
 ;
 
-ABOUT: "factlog"
+ABOUT: "logic"

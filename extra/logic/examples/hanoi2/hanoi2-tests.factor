@@ -1,8 +1,8 @@
 ! Copyright (C) 2019-2020 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test factlog lists factlog.examples.hanoi2
+USING: tools.test logic lists logic.examples.hanoi2
 formatting sequences ;
-IN: factlog.examples.hanoi2.tests
+IN: logic.examples.hanoi2.tests
 
 { t } [
     {

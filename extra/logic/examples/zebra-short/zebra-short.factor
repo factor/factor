@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: factlog arrays ;
-IN: factlog.examples.zebra-short
+USING: logic arrays ;
+IN: logic.examples.zebra-short
 
 ! Do the same as this Prolog program
 !

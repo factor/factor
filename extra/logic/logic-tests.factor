@@ -1,17 +1,17 @@
 ! Copyright (C) 2019-2020 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test factlog lists assocs math kernel namespaces
+USING: tools.test logic lists assocs math kernel namespaces
 accessors sequences
-factlog.examples.factorial
-factlog.examples.fib
-factlog.examples.fib2
-factlog.examples.hanoi
-factlog.examples.hanoi2
-factlog.examples.money
-factlog.examples.zebra
-factlog.examples.zebra2 ;
+logic.examples.factorial
+logic.examples.fib
+logic.examples.fib2
+logic.examples.hanoi
+logic.examples.hanoi2
+logic.examples.money
+logic.examples.zebra
+logic.examples.zebra2 ;
 
-IN: factlog.tests
+IN: logic.tests
 
 LOGIC-PREDS: cato mouseo creatureo ;
 LOGIC-VARS: X Y ;
