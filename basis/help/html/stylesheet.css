@@ -43,6 +43,7 @@ tr:hover {
     padding-bottom: 10px;
     line-height: 150%;
     border-bottom: 1px solid #ccc;
+    background-color: #f5f5f5;
 }
 
 .navbar a {
