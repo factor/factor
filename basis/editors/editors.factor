@@ -116,13 +116,13 @@ M: object edit-tests
 M: word edit-tests vocabulary>> edit-tests ;
 
 : edit-platforms ( vocab -- )
-    dup vocab-platforms-path vocab-append-path 1 edit-location ;
+    public-vocab-name vocab-platforms-path 1 edit-location ;
 
 : edit-authors ( vocab -- )
-    dup vocab-authors-path vocab-append-path 1 edit-location ;
+    public-vocab-name vocab-authors-path 1 edit-location ;
 
 : edit-tags ( vocab -- )
-    dup vocab-tags-path vocab-append-path 1 edit-location ;
+    public-vocab-name vocab-tags-path 1 edit-location ;
 
 : edit-summary ( vocab -- )
-    dup vocab-summary-path vocab-append-path 1 edit-location ;
+    public-vocab-name vocab-summary-path 1 edit-location ;
