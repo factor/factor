@@ -6,14 +6,13 @@ IN: gdbm
 
 HELP: gdbm
 { $class-description "Instance of this class is used as database configuration object. It has following slots:"
-
-  { $table
-    { { $slot "name" } "The file name of the database." }
-    { { $slot "block-size" } "The size of a single transfer from disk to memory. If the value is less than 512, the file system blocksize is used (this is default)." }
-    { { $slot "role" } "Determines what kind of access the user wants to obtain (see below)." }
-    { { $slot "sync" } { "Being set to " { $link t } " causes all database operations to be synchronized to the disk." } }
-    { { $slot "nolock" } { "Being set to " { $link t } " prevents gdbm from performing any locking on the database file." } }
-    { { $slot "mode" } "An integer representing standard UNIX access permissions." }
+  { $slots
+    { "name" "The file name of the database." }
+    { "block-size" "The size of a single transfer from disk to memory. If the value is less than 512, the file system blocksize is used (this is default)." }
+    { "role" "Determines what kind of access the user wants to obtain (see below)." }
+    { "sync" { "Being set to " { $link t } " causes all database operations to be synchronized to the disk." } }
+    { "nolock" { "Being set to " { $link t } " prevents gdbm from performing any locking on the database file." } }
+    { "mode" "An integer representing standard UNIX access permissions." }
   }
   "The " { $slot "role" } " can be set to one of the folowing values:"
   { $table

@@ -9,14 +9,14 @@ IN: webapps.mason.grids
 : render-grid-cell ( cpu os quot -- xml )
     call( cpu os -- url label )
     2dup and
-    [ link XML-CHUNK[[ <td class="supported"><div class="bigdiv"><-></div></td> ]] ]
-    [ 2drop XML-CHUNK[[ <td class="doesnotexist" /> ]] ]
+    [ link XML[ <td class="supported"><-></td> XML] ]
+    [ 2drop XML[ <td class="doesnotexist" /> XML] ]
     if ;
 
 CONSTANT: oses
 {
     { "windows" "Windows" }
-    { "macosx" "Mac OS X" }
+    { "macosx" "Mac OS" }
     { "linux" "Linux" }
 }
 
@@ -27,17 +27,17 @@ CONSTANT: cpus
 }
 
 : render-grid-header ( -- xml )
-    oses values [ XML-CHUNK[[ <th align='center' scope='col'><-></th> ]] ] map ;
+    oses values [ XML[ <th scope='col'><-></th> XML] ] map ;
 
 :: render-grid-row ( cpu quot -- xml )
-    cpu second oses keys |[ os | cpu os quot render-grid-cell ] map
-    XML-CHUNK[[ <tr><th align='center' scope='row'><-></th><-></tr> ]] ;
+    cpu second oses keys [| os | cpu os quot render-grid-cell ] map
+    XML[ <tr><th scope='row'><-></th><-></tr> XML] ;
 
 :: render-grid ( quot -- xml )
     render-grid-header
     cpus [ quot render-grid-row ] map
-    XML-CHUNK[[
-        <table id="downloads" cellspacing="0">
+    XML[
+        <table class="downloads" cellspacing="0">
             <tr><th class="nobg">OS/CPU</th><-></tr>
             <->
         </table>

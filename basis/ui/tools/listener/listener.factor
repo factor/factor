@@ -310,7 +310,7 @@ M: listener-operation invoke-command ( target command -- )
     input>> interactor-eof ;
 
 : clear-output ( listener -- )
-    output>> pane-clear ;
+    output>> clear-pane ;
 
 \ clear-output H{ { +listener+ t } } define-command
 

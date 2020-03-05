@@ -4,12 +4,12 @@ IN: models
 
 HELP: model
 { $class-description "A mutable cell holding a single value. When the value is changed, a sequence of connected objects are notified. Models have the following slots:"
-    { $list
-        { { $slot "value" } " - the value of the model. Use " { $link set-model } " to change the value." }
-        { { $slot "connections" } " - a sequence of objects implementing the " { $link model-changed } " generic word, to be notified when the model's value changes." }
-        { { $slot "dependencies" } " - a sequence of models which should have this model added to their sequence of connections when activated." }
-        { { $slot "ref" } " - a reference count tracking the number of models which depend on this one." }
-        { { $slot "locked?" } " - a slot set by " { $link with-locked-model } " to ensure that the model doesn't get changed recursively" }
+    { $slots
+        { "value" "the value of the model. Use " { $link set-model } " to change the value." }
+        { "connections" "a sequence of objects implementing the " { $link model-changed } " generic word, to be notified when the model's value changes." }
+        { "dependencies" "a sequence of models which should have this model added to their sequence of connections when activated." }
+        { "ref" "a reference count tracking the number of models which depend on this one." }
+        { "locked?" "a slot set by " { $link with-locked-model } " to ensure that the model doesn't get changed recursively" }
     }
 "Other classes may inherit from " { $link model } "."
 } ;

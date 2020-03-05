@@ -4,7 +4,6 @@ USING: accessors timers arrays calendar kernel make math math.rectangles
 math.parser namespaces sequences system tetris.game tetris.gl ui.gadgets
 ui.gadgets.labels ui.gadgets.worlds ui.gadgets.status-bar ui.gestures
 ui.render ui ;
-FROM: tetris.game => level>> ;
 IN: tetris
 
 TUPLE: tetris-gadget < gadget { tetris tetris } { timer } ;
@@ -16,7 +15,7 @@ M: tetris-gadget pref-dim* drop { 200 400 } ;
 
 : update-status ( gadget -- )
     dup tetris>> [
-        [ "Level: " % level>> # ]
+        [ "Level: " % level # ]
         [ " Score: " % score>> # ]
         [ paused?>> [ " (Paused)" % ] when ] tri
     ] "" make swap show-status ;

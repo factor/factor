@@ -75,8 +75,7 @@ M: cord v*                [ v*                ] [ call-next-method ] cord-2map ;
 M: cord v/                [ v/                ] [ call-next-method ] cord-2map ; inline
 M: cord vmin              [ vmin              ] [ call-next-method ] cord-2map ; inline
 M: cord vmax              [ vmax              ] [ call-next-method ] cord-2map ; inline
-M: cord v.
-    [ v.                ] [ + ] [ call-next-method ] cord-2both ; inline
+M: cord vdot              [ vdot              ] [ + ] [ call-next-method ] cord-2both ; inline
 M: cord vsqrt             [ vsqrt             ] cord-map  ; inline
 M: cord sum               [ sum               ] cord-both + ; inline
 M: cord vabs              [ vabs              ] cord-map  ; inline

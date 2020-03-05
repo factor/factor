@@ -3,7 +3,7 @@
 
 USING: accessors alien.c-types alien.data alien.strings
 alien.syntax classes.struct destructors io.files.trash kernel
-libc math sequences system windows.types ;
+libc literals math sequences system windows.types ;
 
 IN: io.files.trash.windows
 
@@ -59,10 +59,12 @@ M: windows send-to-trash ( path -- )
             FO_DELETE >>wFunc
             swap >>pFrom
             f >>pTo
-            FOF_ALLOWUNDO
-            FOF_NOCONFIRMATION bitor
-            FOF_NOERRORUI bitor
-            FOF_SILENT bitor >>fFlags
+            flags{
+                FOF_ALLOWUNDO
+                FOF_NOCONFIRMATION
+                FOF_NOERRORUI
+                FOF_SILENT
+            } >>fFlags
 
         SHFileOperationW [ throw ] unless-zero
 

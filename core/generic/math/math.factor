@@ -35,12 +35,8 @@ PRIVATE>
     [ [ math-precedence ] bi@ after? ] most ;
 
 : math-upgrade ( class1 class2 -- quot )
-    [ math-class-max ] 2keep
-    [
-        (math-upgrade)
-        dup empty? [ [ dip ] curry [ ] like ] unless
-    ] [ (math-upgrade) ]
-    bi-curry* bi append ;
+    [ math-class-max ] 2keep [ (math-upgrade) ] bi-curry@ bi
+    [ dup empty? [ [ dip ] curry ] unless ] dip [ ] append-as ;
 
 ERROR: no-math-method left right generic ;
 
@@ -74,8 +70,7 @@ PRIVATE>
 SYMBOL: generic-word
 
 : make-math-method-table ( classes quot: ( ... class -- ... quot ) -- alist )
-    [ bootstrap-words ] dip
-    [ [ drop ] [ call ] 2bi ] curry { } map>assoc ; inline
+    [ bootstrap-words ] dip [ keep swap ] curry { } map>assoc ; inline
 
 : math-alist>quot ( alist -- quot )
     [ generic-word get object-method ] dip alist>quot ;
@@ -93,8 +88,8 @@ SYMBOL: generic-word
     swap [ [ tuple-dispatch-entry ] curry dip ] curry assoc-map math-alist>quot ;
 
 : math-dispatch-step ( picker quot: ( ... class -- ... quot ) -- quot )
-    [ [ { bignum float fixnum } ] dip make-math-method-table ]
-    [ [ { ratio complex } ] dip make-math-method-table tuple-dispatch ] 2bi
+    [ { bignum float fixnum } swap make-math-method-table ]
+    [ { ratio complex } swap make-math-method-table tuple-dispatch ] 2bi
     tuple swap 2array prefix tag-dispatch ; inline
 
 : fixnum-optimization ( word quot -- word quot' )

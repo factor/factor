@@ -1,11 +1,11 @@
-! Copyright (C) 2005, 2010, 2018 Slava Pestov, Joe Groff, and Cat Stevens.
+! Copyright (C) 2005, 2010, 2018, 2020 Slava Pestov, Joe Groff, and Cat Stevens.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.singleton columns combinators
 combinators.short-circuit combinators.smart formatting fry
 grouping kernel locals math math.bits math.functions math.order
 math.private math.ranges math.statistics math.vectors
-math.vectors.private sequences sequences.deep sequences.private
-slots.private summary ;
+math.vectors.private sequences sequences.deep sequences.extras
+sequences.private slots.private summary ;
 IN: math.matrices
 
 ! defined here because of issue #1943
@@ -248,18 +248,56 @@ DEFER: matrix-set-nths
 : m*  ( m1 m2 -- m ) [ v* ] 2map ;
 : m/  ( m1 m2 -- m ) [ v/ ] 2map ;
 
-: v.m ( v m -- p ) flip [ v. ] with map ;
-: m.v ( m v -- p ) [ v. ] curry map ;
-: m. ( m m -- m ) flip [ swap m.v ] curry map ;
+: vdotm ( v m -- p ) flip [ vdot ] with map ;
+: mdotv ( m v -- p ) [ vdot ] curry map ;
+: mdot ( m m -- m ) flip [ swap mdotv ] curry map ;
 
 : m~  ( m1 m2 epsilon -- ? ) [ v~ ] curry 2all? ;
 
 : mmin ( m -- n ) [ 1/0. ] dip [ [ min ] each ] each ;
 : mmax ( m -- n ) [ -1/0. ] dip [ [ max ] each ] each ;
-: mnorm ( m -- m' ) dup mmax abs m/n ;
-: m-infinity-norm ( m -- n ) [ [ abs ] map-sum ] map supremum ;
-: m-1norm ( m -- n ) flip m-infinity-norm ;
-: frobenius-norm ( m -- n ) [ [ sq ] map-sum ] map-sum sqrt ;
+
+: m-infinity-norm ( m -- n )
+    dup zero-matrix? [ drop 0. ] [
+        [ [ abs ] map-sum ] map supremum
+    ] if ;
+
+: m-1norm ( m -- n )
+    dup zero-matrix? [ drop 0. ] [
+        flip m-infinity-norm
+    ] if ;
+
+: frobenius-norm ( m -- n )
+    dup zero-matrix? [ drop 0. ] [
+        [ [ sq ] map-sum ] map-sum sqrt
+    ] if ;
+
+ALIAS: hilbert-schmidt-norm frobenius-norm
+
+:: matrix-p-q-norm ( m p q -- n )
+    m dup zero-matrix? [ drop 0. ] [
+        [ [ sq ] map-sum q p / ^ ] map-sum q recip ^
+    ] if ;
+
+: matrix-p-norm-entrywise ( m p -- n )
+    dup zero-matrix? [ 2drop 0. ] [
+        [ flatten1 V{ } like ] dip p-norm-default
+    ] if ;
+
+: matrix-p-norm ( m p -- n )
+    dup zero-matrix? [ 2drop 0. ] [
+        {
+            { [ dup 1 = ] [ drop m-1norm ] }
+            { [ dup 2 = ] [ drop frobenius-norm ] }
+            { [ dup fp-infinity? ] [ drop m-infinity-norm ] }
+            [ matrix-p-norm-entrywise ]
+        } cond
+    ] if ;
+
+: normalize-matrix ( m -- m' )
+  dup zero-matrix? [ ] [
+      dup mabs mmax m/n
+  ] if ;
 
 ! well-defined for square matrices; but works on nonsquare too
 : main-diagonal ( matrix -- seq )

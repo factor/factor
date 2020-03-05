@@ -37,7 +37,7 @@ ERROR: file-delete-failed path error ;
 M: windows delete-file ( path -- )
     absolute-path
     [ (delete-file) ]
-    [ \ file-delete-failed boa rethrow ] recover ;
+    [ file-delete-failed boa rethrow ] recover ;
 
 M: windows make-directory ( path -- )
     normalize-path

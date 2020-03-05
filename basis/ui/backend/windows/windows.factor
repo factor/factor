@@ -191,7 +191,7 @@ CONSTANT: window-control>ex-style
         { minimize-button 0 }
         { maximize-button 0 }
         { resize-handles $ WS_EX_WINDOWEDGE }
-        { small-title-bar $[ WS_EX_TOOLWINDOW WS_EX_TOPMOST bitor ] }
+        { small-title-bar flags{ WS_EX_TOOLWINDOW WS_EX_TOPMOST } }
         { normal-title-bar $ WS_EX_APPWINDOW }
         { dialog-window 0 }
     }
@@ -638,7 +638,7 @@ M: windows-ui-backend do-events
     [ get-window-class f ] dip
     [
         [ ex-style ] 2dip
-        WS_CLIPSIBLINGS WS_CLIPCHILDREN bitor style bitor
+        flags{ WS_CLIPSIBLINGS WS_CLIPCHILDREN } style bitor
     ] dip get-RECT-dimensions
     f f f GetModuleHandle f CreateWindowEx dup win32-error=0/f ;
 

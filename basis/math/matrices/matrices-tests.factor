@@ -1,6 +1,6 @@
-! Copyright (C) 2005, 2010, 2018 Slava Pestov, Joe Groff, and Cat Stevens.
-USING: arrays combinators.short-circuit grouping kernel math math.matrices math.matrices.private
-math.statistics math.vectors sequences sequences.deep sets tools.test ;
+! Copyright (C) 2005, 2010, 2018, 2020 Slava Pestov, Joe Groff, and Cat Stevens.
+USING: arrays assocs combinators.short-circuit grouping kernel
+math math.statistics sequences sequences.deep tools.test ;
 IN: math.matrices
 
 <PRIVATE
@@ -33,7 +33,7 @@ PRIVATE>
     { { { } } }
     { { } { } { } }
     { { { } } { { { } } } }
-} [ null-matrix? ] map [ ] all?
+} [ null-matrix? ] all?
 ] unit-test
 
 { f } [ {
@@ -41,7 +41,7 @@ PRIVATE>
     { { 1 2 } }
     { { 1 } { 2 } }
     { { { 1 } } { 2 } { } }
-} [ null-matrix? ] map [ ] any?
+} [ null-matrix? ] any?
 ] unit-test
 
 { t } [ 10 dup <zero-matrix> zero-matrix? ] unit-test
@@ -305,28 +305,17 @@ PRIVATE>
     m-
 ] unit-test
 
-{ { 3 4 } } [ { { 1 0 } { 0 1 } } { 3 4 } m.v ] unit-test
-{ { 4 3 } } [ { { 0 1 } { 1 0 } } { 3 4 } m.v ] unit-test
+{ { 3 4 } } [ { { 1 0 } { 0 1 } } { 3 4 } mdotv ] unit-test
+{ { 4 3 } } [ { { 0 1 } { 1 0 } } { 3 4 } mdotv ] unit-test
 
-{ { { 6 } } } [ { { 3 } } { { 2 } } m. ] unit-test
-{ { { 11 } } } [ { { 1 3 } } { { 5 } { 2 } } m. ] unit-test
+{ { { 6 } } } [ { { 3 } } { { 2 } } mdot ] unit-test
+{ { { 11 } } } [ { { 1 3 } } { { 5 } { 2 } } mdot ] unit-test
 
 { { { 28 } } } [
     { { 2 4 6 } }
     { { 1 } { 2 } { 3 } }
-    m.
+    mdot
 ] unit-test
-
-
-! TODO: note: merge conflict from HEAD contained the following
-! ------------------------
-! predicates
-
-{ t } [ { } square-matrix? ] unit-test
-{ t } [ { { 1 } } square-matrix? ] unit-test
-{ t } [ { { 1 2 } { 3 4 } } square-matrix? ] unit-test
-{ f } [ { { 1 } { 2 3 } } square-matrix? ] unit-test
-{ f } [ { { 1 2 } } square-matrix? ] unit-test
 
 { 9 }
 [ { { 2 -2 1 } { 1 3 -1 } { 2 -4 2 } } m-1norm ] unit-test
@@ -336,40 +325,37 @@ PRIVATE>
 
 { 2.0 }
 [ { { 1 1 } { 1 1 } } frobenius-norm ] unit-test
-! from "intermediate commit"
-! any deep-empty matrix is null
-! it doesn't make any sense for { } to be null while { { } } to be considered nonnull
-{ t } [ {
-    { }
-    { { } }
-    { { { } } }
-    { { } { } { } }
-    { { { } } { { { } } } }
-} [ null-matrix? ] map [ ] all?
-] unit-test
 
-{ f } [ {
-    { 1 2 }
-    { { 1 2 } }
-    { { 1 } { 2 } }
-    { { { 1 } } { 2 } { } }
-} [ null-matrix? ] map [ ] any?
-] unit-test
+{ 10e-8 }
+[
+  5.4772255
+  { { 1 2 } { 3 4 } } frobenius-norm
+] unit-test~
 
-{ t } [ 10 dup <zero-matrix> zero-matrix? ] unit-test
-{ t } [ 10 10 15 <simple-eye> zero-matrix? ] unit-test
-{ t } [ 0 dup <zero-matrix> null-matrix? ] unit-test
-{ f } [ 0 dup <zero-matrix> zero-matrix? ] unit-test
-{ f } [ 4 <identity-matrix> zero-matrix? ] unit-test
+{ 10e-6 }
+[
+  36.94590
+  { { 1 2 } { 4 8 } { 16 32 } } frobenius-norm
+] unit-test~
 
-{ t } [ { }                 regular-matrix? ] unit-test
-{ t } [ { { } }             regular-matrix? ] unit-test
-{ t } [ { { 1 2 } }         regular-matrix? ] unit-test
-{ t } [ { { 1 2 } { 3 4 } } regular-matrix? ] unit-test
-{ t } [ { { 1 } { 3 } }     regular-matrix? ] unit-test
-{ f } [ { { 1 2 } { 3 } }   regular-matrix? ] unit-test
-{ f } [ { { 1 } { 3 2 } }   regular-matrix? ] unit-test
-! TODO: note: lines since last HEAD comment were deleted in "fix more code and add more rigorous tests"
+! equivalent to frobenius for p = q = 2
+{ 2.0 }
+[ { { 1 1 } { 1 1 } } 2 2 matrix-p-q-norm ] unit-test
+
+{ 10e-7 }
+[
+  33.456466
+  { { 1 2 } { 4 8 } { 16 32 } } 3 matrix-p-norm-entrywise
+] unit-test~
+
+{ { { -1 0 } { 0 0 } } }
+[ { { -2 0 } { 0 0 } } normalize-matrix ] unit-test
+
+{ { { -1 0 } { 0 1/2 } } }
+[ { { -2 0 } { 0 1 } } normalize-matrix ] unit-test
+
+{ t }
+[ 3 3 <zero-matrix> dup normalize-matrix = ] unit-test
 
 ! diagonals
 
@@ -675,7 +661,7 @@ PRIVATE>
     { 0 1 2 }
     { 3 4 5 }
     { 6 7 8 }
-} matrix-except-all dup flatten sorted-histogram [ second ] map
+} matrix-except-all dup flatten sorted-histogram values
     { [ length 9 = ] [ [ 4 = ] all? ] }
     1&&
 ] unit-test
@@ -690,7 +676,7 @@ PRIVATE>
     { 4 5 6 7 }
     { 8 9 10 11 }
     { 12 13 14 15 }
-} matrix-except-all flatten sorted-histogram [ second ] map
+} matrix-except-all flatten sorted-histogram values
     { [ length 16 = ] [ [ 9 = ] all? ] }
     1&&
 ] unit-test

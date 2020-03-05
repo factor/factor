@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs html.components html.forms
+USING: accessors arrays assocs fry html.components html.forms
 html.templates html.templates.chloe.compiler
 html.templates.chloe.components html.templates.chloe.syntax
 io.encodings.utf8 io.files io.files.info kernel logging make
@@ -35,6 +35,27 @@ CHLOE: write-style
         get-style
         XML-CHUNK[[ <style type="text/css"> <-> </style> ]]
     ] [xml-code] ;
+
+CHLOE: script
+    dup "include" optional-attr [
+        utf8 file-contents [ add-script ] [code-with]
+    ] [
+        compile-children>string [ add-script ] [code]
+    ] ?if ;
+
+CHLOE: write-script
+    drop [
+        get-script
+        [XML <script type="text/javascript"> <-> </script> XML]
+    ] [xml-code] ;
+
+CHLOE: meta
+    [ "name" optional-attr ]
+    [ "content" optional-attr ] bi
+    '[ _ _ add-meta ] [code] ;
+
+CHLOE: write-meta
+    drop [ get-meta ] [xml-code] ;
 
 CHLOE: even
     [ "index" value even? swap when ] process-children ;

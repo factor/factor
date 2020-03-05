@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 James Cash, Daniel Ehrenberg, Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators.short-circuit kernel locals math
-parser sequences ;
+USING: accessors combinators combinators.short-circuit kernel
+lexer locals make math namespaces parser sequences words ;
 IN: lists
 
 ! List Protocol
@@ -105,4 +105,33 @@ M: list >list ;
 
 M: sequence >list sequence>list ;
 
-SYNTAX: \L{ \ \} [ sequence>list ] parse-literal ;
+ERROR: list-syntax-error ;
+
+<PRIVATE
+
+: items>list ( sequence -- list )
+    [ +nil+ ] [
+        <reversed> unclip-slice [ swons ] reduce
+    ] if-empty ;
+
+: ?list-syntax-error ( right-of-dot? -- )
+    building get empty? or [ list-syntax-error ] when ;
+
+: (parse-list-literal) ( right-of-dot? -- )
+    scan-token {
+        { "}" [ drop +nil+ , ] }
+        { "." [ ?list-syntax-error t (parse-list-literal) ] }
+        [
+            parse-datum dup parsing-word? [
+                V{ } clone swap execute-parsing first
+            ] when
+            , [ "}" expect ] [ f (parse-list-literal) ] if
+        ]
+    } case ;
+
+: parse-list-literal ( -- list )
+    [ f (parse-list-literal) ] { } make items>list ;
+
+PRIVATE>
+
+SYNTAX: L{ parse-list-literal suffix! ;

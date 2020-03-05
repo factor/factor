@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2010, 2018 Slava Pestov, Joe Groff, and Cat Stevens.
+! Copyright (C) 2005, 2010, 2018, 2020 Slava Pestov, Joe Groff, and Cat Stevens.
 USING: accessors arrays assocs generic.single formatting locals help.markup help.markup.private help.syntax io
 kernel math math.functions math.order math.ratios math.vectors opengl.gl prettyprint
 sequences sequences.generalizations urls ;
@@ -114,7 +114,7 @@ $nl
 { $subsections m+ m- m* m/ m~ }
 
 "Dot product (multiplication) of vectors and matrices:"
-{ $subsections v.m m.v m. }
+{ $subsections vdotm mdotv mdot }
 
 "Transformations and elements of matrices:"
 { $subsections
@@ -136,7 +136,15 @@ $nl
 } { $subsections
     main-diagonal
     anti-diagonal
+}
 
+"The following matrix norms are provided in the 𝑙ₚ vector space; these words are equivalent to ∥･∥ₚ for " { $snippet "p = 1, 2, ∞, n" } ", respectively:"
+{ $subsections
+    m-1norm
+    m-infinity-norm
+    frobenius-norm
+    matrix-p-norm-entrywise
+    matrix-p-norm
 } ;
 
 ! PREDICATE CLASSES
@@ -524,6 +532,17 @@ HELP: cols
     }
 } ;
 
+HELP: >square-matrix
+{ $values { "m" matrix } { "subset" square-matrix } }
+{ $description "Find only the " { $link2 square-matrix "square" } " subset of the input matrix." }
+{ $examples
+    { $example
+        "USING: math.matrices prettyprint ;"
+        "{ { 0 2 4 6 } { 1 3 5 7 } } >square-matrix ."
+        "{ { 0 2 } { 1 3 } }"
+    }
+} ;
+
 HELP: matrix-map
 { $values { "matrix" matrix } { "quot" { $quotation ( ... elt -- ... elt' ) } } { "matrix'" matrix } }
 { $description "Apply the quotation to every element of the matrix." }
@@ -845,39 +864,39 @@ HELP: m/
     }
 } ;
 
-HELP: m.v
+HELP: mdotv
 { $values { "m" matrix } { "v" sequence } { "p" matrix } }
 { $description "Computes the dot product of a matrix and a vector." }
 { $notelist
-    { $equiv-word-note "swapped" v.m }
+    { $equiv-word-note "swapped" vdotm }
     $2d-only-note
     { $matrix-scalar-note * + }
 }
 { $examples
     { $example
         "USING: math.matrices prettyprint ;"
-        "{ { 1 -1 2 } { 0 -3 1 } } { 2 1 0 } m.v ."
+        "{ { 1 -1 2 } { 0 -3 1 } } { 2 1 0 } mdotv ."
         "{ 1 -3 }"
     }
 } ;
 
-HELP: v.m
+HELP: vdotm
 { $values { "v" sequence } { "m" matrix } { "p" matrix } }
 { $description "Computes the dot product of a vector and a matrix." }
 { $notelist
-    { $equiv-word-note "swapped" m.v }
+    { $equiv-word-note "swapped" mdotv }
     $2d-only-note
     { $matrix-scalar-note * + }
 }
 { $examples
     { $example
         "USING: math.matrices prettyprint ;"
-        "{ 2 1 0 } { { 1 -1 2 } { 0 -3 1 } } v.m ."
+        "{ 2 1 0 } { { 1 -1 2 } { 0 -3 1 } } vdotm ."
         "{ 2 -5 5 }"
     }
 } ;
 
-HELP: m.
+HELP: mdot
 { $values { "m" matrix } }
 { $description "Computes the dot product of two matrices, i.e multiplies them." }
 { $notelist
@@ -887,7 +906,7 @@ HELP: m.
 { $examples
     { $example
         "USING: math.matrices prettyprint ;"
-        "{ { 1 -1 2 } { 0 -3 1 } } { { 3 7 } { 9 12 } } m. ."
+        "{ { 1 -1 2 } { 0 -3 1 } } { { 3 7 } { 9 12 } } mdot ."
         "{ { -6 -5 } { -27 -36 } }"
     }
 } ;
@@ -938,7 +957,97 @@ HELP: mmax
     }
 } ;
 
-HELP: mnorm
+HELP: m-1norm
+{ $values { "m" matrix } { "n" number } }
+{ $description "Find the size of a matrix in  𝑙₁ (" { $snippet "L^₁" } ") vector space, usually written ∥･∥₁."
+$nl "This is the matrix norm when " { $snippet "p=1" } ", and is the overall maximum of the sums of the columns." }
+{ $notelist { $equiv-word-note "transpose" m-infinity-norm } }
+{ $examples
+    { $example
+        "USING: math.matrices prettyprint ;"
+        "{ { 2 -2 1 } { 1 3 -1 } { 2 -4 2 } } m-1norm ."
+        "9"
+    }
+} ;
+
+HELP: m-infinity-norm
+{ $values { "m" matrix } { "n" number } }
+{ $description "Find the size of a matrix, in 𝑙∞ (" { $snippet "L^∞" } ") vector space, usually written ∥･∥∞."
+$nl "This is the matrix norm when " { $snippet "p=∞" } ", and is the overall maximum of the sums of the rows." }
+{ $notelist { $equiv-word-note "transpose" m-1norm } }
+{ $examples
+    { $example
+        "USING: math.matrices prettyprint ;"
+        "{ { 2 -2 1 } { 1 3 -1 } { 2 -4 2 } } m-infinity-norm ."
+        "8"
+    }
+} ;
+
+HELP: frobenius-norm
+{ $values { "m" matrix } { "n" number } }
+{ $description "Find the size of a matrix in 𝑙₂ (" { $snippet "L^2" } ") vector space, usually written ∥･∥₂ₚ."
+$nl "This is the matrix norm when " { $snippet "p=2" } ", and is the square root of the sums of the squares of all the elements of the matrix." }
+{ $notelist
+    { "This norm is sometimes called the Hilbert-Schmidt norm." }
+    { "Because " $snippet { "p=2" } ", this word could be named " { $snippet "m-2norm" } "." }
+}
+{ $examples
+    { $example
+        "USING: math.matrices prettyprint ;"
+        "{ { 1 1 } { 1 1 } } frobenius-norm ."
+        "2.0"
+    }
+} ;
+
+{ m-1norm m-infinity-norm frobenius-norm } related-words
+
+HELP: matrix-p-q-norm
+{ $values { "m" matrix } { "p" "positive real number" } { "q" "positive real number" } { "n" "non-negative real number" } }
+{ $description "Find the size of a matrix in " { $snippet "L^p,q" } " vector space."
+$nl "This is the matrix norm for any " { $snippet "p, q ≥ 1" } ". It is still an entry-wise norm, like " { $link matrix-p-norm-entrywise } "." }
+{ $examples
+    "Equivalent to " { $link frobenius-norm } " for " { $snippet "p = q = 2 " } ":"
+    { $example
+        "USING: math.matrices prettyprint ;"
+        "{ { 1 1 } { 1 1 } } 2 2 matrix-p-q-norm ."
+        "2.0"
+    }
+} ;
+
+HELP: matrix-p-norm-entrywise
+{ $values { "m" matrix } { "p" "positive real number" } { "n" "non-negative real number" } }
+{ $description "Find the entry-wise norm of a matrix, in 𝑙ₚ (" { $snippet "L^p" } ") vector space."  }
+{ $notes "This word is distinct from a Schatten p-norm, as well as any of " { $links m-1norm frobenius-norm m-infinity-norm } "." }
+{ $examples
+    { $example
+        "USING: math.matrices prettyprint ;"
+        "4 4 1 <matrix> 2 matrix-p-norm-entrywise ."
+        "4.0"
+    }
+} ;
+
+HELP: matrix-p-norm
+{ $values { "m" matrix } { "p" "positive real number" } { "n" "non-negative real number" } }
+{ $description "Find the size of a matrix in 𝑙ₚ (" { $snippet "L^p" } ") vector space, usually written ∥･∥ₚ. For " { $snippet "p ≠ 1, 2, ∞" } ", this is an \"entry-wise\" norm." }
+{ $examples
+    "Calls " { $link m-1norm } ":"
+    { $example
+        "USING: math.matrices prettyprint ;"
+        "4 4 1 <matrix> 1 matrix-p-norm ."
+        "4"
+    }
+    "Falls back to " { $link matrix-p-norm-entrywise } ":"
+    { $example
+        "USING: math.functions math.matrices prettyprint ;"
+        "2 2 3 <matrix> 1.5 matrix-p-norm 7.559 10e-4 ~ ."
+        "t"
+    }
+} ;
+
+{ matrix-p-norm matrix-p-norm-entrywise } related-words
+{ matrix-p-norm matrix-p-q-norm } related-words
+
+HELP: normalize-matrix
 { $values { "m" matrix } { "m'" matrix } }
 { $description "Normalize a matrix. Each element from the input matrix is computed as a fraction of the maximum element. The maximum element becomes " { $snippet "1/1" } "." }
 { $notelist
@@ -948,29 +1057,8 @@ HELP: mnorm
 { $examples
     { $example
         "USING: math.matrices prettyprint ;"
-        "{ { 5 9 } { 15 17 } } mnorm ."
+        "{ { 5 9 } { 15 17 } } normalize-matrix ."
         "{ { 5/17 9/17 } { 15/17 1 } }"
-    }
-} ;
-
-HELP: m-infinity-norm
-{ $values { "m" matrix } { "n" number } } ;
-
-HELP: m-1norm
-{ $values { "m" matrix } { "n" number } } ;
-
-HELP: frobenius-norm
-{ $values { "m" matrix } { "n" number } }
-{ $notes "Also known as the Hilbert-Schmidt norm." } ;
-
-HELP: >square-matrix
-{ $values { "m" matrix } { "subset" square-matrix } }
-{ $description "Find only the " { $link2 square-matrix "square" } " subset of the input matrix." }
-{ $examples
-    { $example
-        "USING: math.matrices prettyprint ;"
-        "{ { 0 2 4 6 } { 1 3 5 7 } } >square-matrix ."
-        "{ { 0 2 } { 1 3 } }"
     }
 } ;
 

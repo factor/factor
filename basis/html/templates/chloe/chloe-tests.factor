@@ -194,3 +194,21 @@ TUPLE: person first-name last-name ;
         ] run-template
     ] with-scope
 ] [ error>> tag-not-allowed-here? ] must-fail-with
+
+{ "This is     <style type=\"text/css\"> * { font-family: monospace; } </style>" } [
+    SBUF" " clone style [
+        [ "test16" test-template call-template ] run-template
+    ] with-variable
+] unit-test
+
+{ "<script type=\"text/javascript\"> function testAlerts() {    window.alert(\"Hello, world!\");} </script>" } [
+    SBUF" " clone script [
+        [ "test17" test-template call-template ] run-template
+    ] with-variable
+] unit-test
+
+{ "<meta name=\"author\" content=\"John Doe\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>" } [
+    V{ } clone meta [
+        [ "test18" test-template call-template ] run-template
+    ] with-variable
+] unit-test

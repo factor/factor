@@ -49,10 +49,10 @@ HELP: feed-entry-url
 
 ARTICLE: "furnace.syndication.config" "Configuring Atom feed actions"
 "Instances of " { $link feed-action } " have three slots which need to be set:"
-{ $table
-    { { $slot "title" } "The title of the feed as a string" }
-    { { $slot "url" } { "The feed " { $link url } } }
-    { { $slot "entries" } { "A quotation with stack effect " { $snippet "( -- seq )" } ", which produces a sequence of objects responding to the " { $link "furnace.syndication.protocol" } " protocol" } }
+{ $slots
+    { "title" "The title of the feed as a string" }
+    { "url" { "The feed " { $link url } } }
+    { "entries" { "A quotation with stack effect " { $snippet "( -- seq )" } ", which produces a sequence of objects responding to the " { $link "furnace.syndication.protocol" } " protocol" } }
 } ;
 
 ARTICLE: "furnace.syndication.protocol" "Atom feed entry protocol"

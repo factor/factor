@@ -215,6 +215,7 @@ M: byte-array pprint-delims drop \ \B{ \ \} ;
 M: byte-vector pprint-delims drop \ \BV{ \ \} ;
 M: vector pprint-delims drop \ \V{ \ \} ;
 M: cons-state pprint-delims drop \ \L{ \ \} ;
+M: +nil+ pprint-delims drop \ \L{ \ \} ;
 M: hashtable pprint-delims drop \ \H{ \ \} ;
 M: tuple pprint-delims drop \ \T{ \ \} ;
 M: wrapper pprint-delims drop \ \W{ \ \} ;
@@ -278,10 +279,18 @@ M: cons-state pprint*
                 '[ dup cons-state? _ length _ < and ]
                 [ uncons swap , ] while
             ] { } make
-            [ pprint* ] each nil? [ "~more~" text ] unless
+            [ pprint* ] each
+            dup list? [
+                nil? [ "~more~" text ] unless
+            ] [
+                "." text pprint*
+            ] if
             block>
         ] dip pprint-word block>
     ] check-recursion ;
+
+M: +nil+ pprint*
+    <flow pprint-delims [ pprint-word ] bi@ block> ;
 
 : with-extra-nesting-level ( quot -- )
     nesting-limit [ dup [ 1 + ] [ f ] if* ] change

@@ -27,7 +27,7 @@ SYMBOL: xim
     [
         [ xim get-global XNClientWindow ] dip
         XNFocusWindow over
-        XNInputStyle XIMPreeditNothing XIMStatusNothing bitor
+        XNInputStyle flags{ XIMPreeditNothing XIMStatusNothing }
         XNResourceName
     ] dip
     XNResourceClass over 0 XCreateIC

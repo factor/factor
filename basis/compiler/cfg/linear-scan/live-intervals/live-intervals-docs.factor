@@ -76,26 +76,27 @@ HELP: last-use?
 
 HELP: live-interval-state
 { $class-description "A class encoding the \"liveness\" of a virtual register. It has the following slots:"
-  { $table
-    { { $slot "vreg" } { "The vreg this live interval state is bound to." } }
+  { $slots
+    { "vreg" { "The vreg this live interval state is bound to." } }
     {
-        { $slot "reg" }
+        "reg"
         { "The allocated register, set in the " { $link allocate-registers } " step." }
     }
     {
-        { $slot "spill-rep" }
+        "spill-rep"
         { { $link representation } " the vreg will have when it is spilled." }
     }
     {
-        { $slot "spill-to" }
+        "spill-to"
         { { $link spill-slot } " to use for spilling, if it needs to be spilled." }
     }
     {
-        { $slot "ranges" }
+        "ranges"
         { "Inclusive ranges where the live interval is live. This is because the [start,end] interval can have gaps." }
     }
     {
-        { $slot "uses" } { "sequence of insn# numbers which reference insructions that use the register in the live interval." }
+        "uses"
+        { "sequence of insn# numbers which reference insructions that use the register in the live interval." }
     }
   }
 }
@@ -118,9 +119,9 @@ HELP: record-temp
 
 HELP: sync-point
 { $class-description "A location where all live registers have to be spilled. For example when garbage collection is run or an alien ffi call is invoked. Figuring out where in the " { $link cfg } " the sync points are is done in the " { $link compute-live-intervals } " step. The tuple has the following slots:"
-  { $table
-    { { $slot "n" } { "Set from an instructions sequence number." } }
-    { { $slot "keep-dst?" } { "Boolean that determines whether registers are spilled around this sync point." } }
+  { $slots
+    { "n" { "Set from an instructions sequence number." } }
+    { "keep-dst?" { "Boolean that determines whether registers are spilled around this sync point." } }
   }
 }
 { $see-also cfg>sync-points clobber-insn hairy-clobber-insn insn } ;

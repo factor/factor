@@ -208,10 +208,10 @@ ERROR: shaped-bounds-error seq shape ;
 
 ! Inefficient
 : calculate-row-major-index ( seq shape -- i )
-    1 [ * ] accumulate nip reverse v. ;
+    1 [ * ] accumulate nip reverse vdot ;
 
 : calculate-column-major-index ( seq shape -- i )
-    1 [ * ] accumulate nip v. ;
+    1 [ * ] accumulate nip vdot ;
 
 : set-shaped-row-major ( obj seq shaped -- )
     shaped-bounds-check [ shape calculate-row-major-index ] [ underlying>> ] bi set-nth ;

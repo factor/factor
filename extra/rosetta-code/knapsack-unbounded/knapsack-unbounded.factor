@@ -40,9 +40,9 @@ TUPLE: bounty amounts value weight volume ;
 : <bounty> ( items -- bounty )
     [ bounty new ] dip {
         [ >>amounts ]
-        [ values v. >>value ]
-        [ weights v. >>weight ]
-        [ volumes v. >>volume ]
+        [ values vdot >>value ]
+        [ weights vdot >>weight ]
+        [ volumes vdot >>volume ]
     } cleave ;
 
 : valid-bounty? ( bounty -- ? )

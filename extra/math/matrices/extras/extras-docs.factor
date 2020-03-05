@@ -49,9 +49,6 @@ ARTICLE: "math.matrices.extras" "Extra matrix operations"
 
 "Matrix algebra:"
 { $subsections
-    mmin
-    mmax
-    mnorm
     rank
     nullity
 
@@ -371,7 +368,7 @@ HELP: gram-schmidt-normalize
 "{
     { 0.4472135954999579 0.8944271909999159 }
     { 0.894427190999916 -0.447213595499958 }
-    { NAN: 8000000000000 NAN: 8000000000000 }
+    { nan: 8000000000000 nan: 8000000000000 }
 }"
     }
 } ;

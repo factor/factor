@@ -19,13 +19,13 @@ IN: benchmark.pidigits
     [ 2array ] 2bi@ 2array ;
 
 : produce ( z y -- z' )
-    [ 10 ] dip -10 * 0 1 >matrix swap m. ;
+    [ 10 ] dip -10 * 0 1 >matrix swap mdot ;
 
 : gen-x ( x -- matrix )
     dup 2 * 1 + [ 2 * 0 ] keep >matrix ;
 
 : consume ( z k -- z' )
-    gen-x m. ;
+    gen-x mdot ;
 
 :: (padded-total) ( row col -- str n format )
     "" row col + "%" "s\t:%d\n"

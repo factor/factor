@@ -3,8 +3,8 @@
 
 USING: accessors arrays assocs calendar colors colors.gray
 combinators combinators.short-circuit fonts formatting
-hashtables io kernel make math math.parser sequences strings
-xml.entities ;
+hashtables io kernel make math math.parser sequences splitting
+strings xml.entities ;
 
 IN: pdf.values
 
@@ -52,6 +52,10 @@ M: font pdf-value
             [ [ bold?>> ] [ italic?>> ] bi or [ "-" append ] when ]
             [ bold?>> [ "Bold" append ] when ]
             [ italic?>> [ "Italic" append ] when ]
+            [
+                name>> { "sans-serif" "monospace" } member?
+                [ "Italic" "Oblique" replace ] when
+            ]
         } cleave
         "/BaseFont " prepend ,
         ">>" ,

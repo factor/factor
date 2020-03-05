@@ -30,10 +30,10 @@ SPECIALIZED-ARRAY: int
 
 { { 0 3 2 5 4 } } [ { 1 2 3 4 5 } { 1 1 1 1 1 } v+- ] unit-test
 
-{ 32 } [ { 1 2 3 } { 4 5 6 } v. ] unit-test
-{ -1 } [ { C{ 0 1 } } dup v. ] unit-test
+{ 32 } [ { 1 2 3 } { 4 5 6 } vdot ] unit-test
+{ -1 } [ { C{ 0 1 } } dup vdot ] unit-test
 
-{ 1 } [ { C{ 0 1 } } dup h. ] unit-test
+{ 1 } [ { C{ 0 1 } } dup hdot ] unit-test
 
 { { 1 2 3 } } [
     { t t t } [ { 1 2 3 } ] [ { 4 5 6 } ] vif

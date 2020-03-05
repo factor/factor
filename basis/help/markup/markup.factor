@@ -7,7 +7,13 @@ generic hash-sets hashtables help.stylesheet help.topics io
 io.styles kernel locals make math math.parser namespaces parser
 present prettyprint prettyprint.stylesheet quotations see
 sequences sequences.private sets slots sorting splitting strings
-unicode urls vectors vocabs vocabs.loader words words.symbol ;
+unicode urls vectors vocabs vocabs.loader words words.symbol
+accessors arrays assocs combinators compiler.units
+definitions.icons effects fry hashtables help.stylesheet
+help.topics io io.styles kernel locals make math namespaces
+present prettyprint prettyprint.stylesheet quotations see
+sequences sequences.private sets sorting strings urls vocabs
+words words.symbol ;
 FROM: prettyprint.sections => with-pprint ;
 IN: help.markup
 
@@ -51,9 +57,7 @@ M: f print-element drop ;
     [ print-element ] with-style ;
 
 : with-default-style ( quot -- )
-    default-span-style get [
-        default-block-style get swap with-nesting
-    ] with-style ; inline
+    default-style get swap with-nesting ; inline
 
 : print-content ( element -- )
     [ print-element ] with-default-style ;
@@ -68,9 +72,6 @@ M: f print-element drop ;
 
 : $snippet ( children -- )
     [ snippet-style get print-element* ] ($span) ;
-
-! for help-lint
-ALIAS: $slot $snippet
 
 : $emphasis ( children -- )
     [ emphasis-style get print-element* ] ($span) ;
@@ -103,10 +104,8 @@ ALIAS: $slot $snippet
 
 : ($code) ( presentation quot -- )
     [
-        code-char-style get [
-            last-element off
-            [ ($code-style) ] dip with-nesting
-        ] with-style
+        last-element off
+        [ ($code-style) ] dip with-nesting
     ] ($block) ; inline
 
 : $code ( element -- )
@@ -200,7 +199,7 @@ M: symbol link-effect? drop f ;
 M: word link-effect? drop t ;
 
 : $effect ( effect -- )
-    effect>string stack-effect-style get format ;
+    effect>string base-effect-style get format ;
 
 M: word link-long-text
     dup presented associate [
@@ -295,7 +294,7 @@ PRIVATE>
     [ lookup-vocab ] map $links ;
 
 : $breadcrumbs ( topics -- )
-    [ [ ($link) ] " > " (textual-list) ] ($span) ;
+    [ [ ($link) ] " » " (textual-list) ] ($span) ;
 
 : $see-also ( topics -- )
     "See also" $heading $links ;
@@ -326,15 +325,13 @@ PRIVATE>
     check-first dup "related" word-prop remove
     [ $see-also ] unless-empty ;
 
-: ($grid) ( style quot -- )
-    [
-        table-content-style get [
-            swap [ last-element off call ] tabular-output
-        ] with-style
+: ($grid) ( style content-style quot -- )
+    '[
+        _ [ last-element off _ tabular-output ] with-style
     ] ($block) ; inline
 
 : $list ( element -- )
-    list-style get [
+    list-style get list-content-style get [
         [
             [
                 bullet get write-cell
@@ -344,13 +341,19 @@ PRIVATE>
     ] ($grid) ;
 
 : $table ( element -- )
-    table-style get [
+    table-style get table-content-style get [
         [
             [
                 [ [ print-element ] with-cell ] each
             ] with-row
         ] each
     ] ($grid) ;
+
+! for help-lint
+ALIAS: $slot $snippet
+
+: $slots ( children -- )
+    [ unclip \ $slot swap 2array prefix ] map $table ;
 
 : a/an ( str -- str )
     [ first ] [ length ] bi 1 =
@@ -425,11 +428,7 @@ M: f ($instance) ($link) ;
     "Notes" $heading print-element ;
 
 : ($see) ( word quot -- )
-    [
-        code-char-style get [
-            code-style get swap with-nesting
-        ] with-style
-    ] ($block) ; inline
+    [ code-style get swap with-nesting ] ($block) ; inline
 
 : $see ( element -- ) check-first [ see* ] ($see) ;
 
@@ -515,5 +514,5 @@ M: array elements*
     drop
     icons get sort-keys
     [ [ <$link> ] [ definition-icon-path <$image> ] bi* swap ] assoc-map
-    { "" "Definition class" } prefix
+    { f { $strong "Definition class" } } prefix
     $table ;

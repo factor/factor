@@ -50,11 +50,11 @@ H{
 : vocab-style ( vocab -- style )
     presented base-vocab-style get clone [ set-at ] keep ;
 
-SYMBOL: stack-effect-style
+SYMBOL: base-effect-style
 H{
-    { foreground color: FactorDarkGreen }
+    { foreground color: FactorDarkSlateBlue }
     { font-style plain }
-} stack-effect-style set-global
+} base-effect-style set-global
 
 : effect-style ( effect -- style )
-    presented stack-effect-style get clone [ set-at ] keep ;
+    presented base-effect-style get clone [ set-at ] keep ;

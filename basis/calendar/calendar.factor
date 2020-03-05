@@ -40,10 +40,10 @@ CONSTANT: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 }
 
 GENERIC: leap-year? ( obj -- ? )
 
-M: integer leap-year? ( year -- ? )
+M: integer leap-year?
     dup 100 divisor? 400 4 ? divisor? ;
 
-M: timestamp leap-year? ( timestamp -- ? )
+M: timestamp leap-year?
     year>> leap-year? ;
 
 : (days-in-month) ( year month -- n )
@@ -121,10 +121,10 @@ GENERIC: easter ( obj -- obj' )
 
     h l + 7 m * - 114 + 31 /mod 1 + ;
 
-M: integer easter ( year -- timestamp )
+M: integer easter
     dup easter-month-day <date> ;
 
-M: timestamp easter ( timestamp -- timestamp )
+M: timestamp easter
     clone
     dup year>> easter-month-day
     swapd >>day swap >>month ;
@@ -167,52 +167,52 @@ GENERIC: +second ( timestamp x -- timestamp )
     { [ day>> 29 = ] [ month>> 2 = ] [ leap-year? not ] } 1&&
     [ 3 >>month 1 >>day ] when ;
 
-M: integer +year ( timestamp n -- timestamp )
+M: integer +year
     [ + ] curry change-year adjust-leap-year ;
 
-M: real +year ( timestamp n -- timestamp )
+M: real +year
     [ float>whole-part swapd days-per-year * +day swap +year ] unless-zero ;
 
 : months/years ( n -- months years )
     12 /rem [ 1 - 12 ] when-zero swap ; inline
 
-M: integer +month ( timestamp n -- timestamp )
+M: integer +month
     [ over month>> + months/years [ >>month ] dip +year ] unless-zero ;
 
-M: real +month ( timestamp n -- timestamp )
+M: real +month
     [ float>whole-part swapd average-month * +day swap +month ] unless-zero ;
 
-M: integer +day ( timestamp n -- timestamp )
+M: integer +day
     [
         over >date< julian-day-number + julian-day-number>date
         [ >>year ] [ >>month ] [ >>day ] tri*
     ] unless-zero ;
 
-M: real +day ( timestamp n -- timestamp )
+M: real +day
     [ float>whole-part swapd 24 * +hour swap +day ] unless-zero ;
 
 : hours/days ( n -- hours days )
     24 /rem swap ;
 
-M: integer +hour ( timestamp n -- timestamp )
+M: integer +hour
     [ over hour>> + hours/days [ >>hour ] dip +day ] unless-zero ;
 
-M: real +hour ( timestamp n -- timestamp )
+M: real +hour
     float>whole-part swapd 60 * +minute swap +hour ;
 
 : minutes/hours ( n -- minutes hours )
     60 /rem swap ;
 
-M: integer +minute ( timestamp n -- timestamp )
+M: integer +minute
     [ over minute>> + minutes/hours [ >>minute ] dip +hour ] unless-zero ;
 
-M: real +minute ( timestamp n -- timestamp )
+M: real +minute
     [ float>whole-part swapd 60 * +second swap +minute ] unless-zero ;
 
 : seconds/minutes ( n -- seconds minutes )
     60 /rem swap >integer ;
 
-M: number +second ( timestamp n -- timestamp )
+M: number +second
     [ over second>> + seconds/minutes [ >>second ] dip +minute ] unless-zero ;
 
 : (time+) ( timestamp duration -- timestamp' duration )
@@ -291,8 +291,7 @@ GENERIC: time- ( time1 time2 -- time3 )
         [ neg +year   0 ] change-year drop
     ] if ;
 
-M: timestamp <=> ( ts1 ts2 -- n )
-    [ >gmt tuple-slots ] compare ;
+M: timestamp <=> [ >gmt tuple-slots ] compare ;
 
 : same-day? ( ts1 ts2 -- ? )
     [ >gmt >date< <date> ] same? ;
@@ -376,8 +375,9 @@ M: duration time-
 
 GENERIC: days-in-year ( obj -- n )
 
-M: integer days-in-year ( year -- n ) leap-year? 366 365 ? ;
-M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
+M: integer days-in-year leap-year? 366 365 ? ;
+
+M: timestamp days-in-year year>> days-in-year ;
 
 : days-in-month ( timestamp -- n )
     >date< drop (days-in-month) ;

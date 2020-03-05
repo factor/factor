@@ -167,7 +167,7 @@ M: light-theme prompt-background-color T{ rgba f 1 0.7 0.7 1 } ;
 M: light-theme dim-color color: gray35 ;
 M: light-theme highlighted-word-color color: DarkSlateGray ;
 M: light-theme string-color color: LightSalmon4 ;
-M: light-theme stack-effect-color color: FactorDarkGreen ;
+M: light-theme stack-effect-color color: FactorDarkSlateBlue ;
 
 M: light-theme vocab-background-color color: FactorLightTan ;
 M: light-theme vocab-border-color color: FactorDarkTan ;

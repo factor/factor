@@ -153,7 +153,7 @@ ARTICLE: "syntax-words" "Word syntax"
 
 ARTICLE: "escape" "Character escape codes"
 { $table
-    { "Escape code" "Meaning" }
+    { { $strong "Escape code" } { $strong "Meaning" } }
     { { $snippet "\\\\" } { $snippet "\\" } }
     { { $snippet "\\s" } "a space" }
     { { $snippet "\\t" } "a tab" }

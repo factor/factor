@@ -108,7 +108,9 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     [ [ article-title ] [ >link ] bi write-object ] ($block) ;
 
 : ($navigation-table) ( element -- )
-    help-path-style get table-style [ $table ] with-variable ;
+    help-path-style get dup [
+        table-style [ $table ] with-variable
+    ] with-style ;
 
 : ($navigation-path) ( topic -- )
     help-path-style get [
@@ -119,22 +121,18 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     [ prefix 1array ] dip prefix , ;
 
 : ($navigation-links) ( topic -- )
-    help-path-style get [
-        [
-            [ prev-article [ 1array \ $long-link "Prev:" ($navigation-link) ] when* ]
-            [ next-article [ 1array \ $long-link "Next:" ($navigation-link) ] when* ]
-            bi
-        ] { } make [ ($navigation-table) ] unless-empty
-    ] with-style ;
+    [
+        [ prev-article [ 1array \ $long-link "Prev:" ($navigation-link) ] when* ]
+        [ next-article [ 1array \ $long-link "Next:" ($navigation-link) ] when* ]
+        bi
+    ] { } make [ ($navigation-table) ] unless-empty ;
 
 : $title ( topic -- )
     title-style get [
-        title-style get [
-            [ ($title) ]
-            [ ($navigation-path) ]
-            [ ($navigation-links) ] tri
-        ] with-nesting
-    ] with-style ;
+        [ ($title) ]
+        [ ($navigation-path) ]
+        [ ($navigation-links) ] tri
+    ] with-nesting ;
 
 : print-topic ( topic -- )
     >link

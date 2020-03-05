@@ -48,7 +48,6 @@ FROM: math.ranges => [a,b] ;
 { 3 } [ { 1 2 3 4 5 } lower-median ] unit-test
 { 3 } [ { 1 2 3 4 5 } upper-median ] unit-test
 
-
 { 1 } [ { 1 } lower-median ] unit-test
 { 1 } [ { 1 } upper-median ] unit-test
 { 1 } [ { 1 } median ] unit-test
@@ -160,6 +159,10 @@ FROM: math.ranges => [a,b] ;
 [
     { 6 7 15 36 39 40 41 42 43 47 49 } { 1/4 1/2 3/4 } quantile9 [ >float ] map
     { 18.9375 40.0 42.8125 } .00001 v~
+] unit-test
+
+{ 75 } [
+    { 7 7 31 31 47 75 87 115 116 119 119 155 177 } midhinge
 ] unit-test
 
 { 0x1.02eb63cff3f8p0 } [ { 1 2 3 } entropy ] unit-test

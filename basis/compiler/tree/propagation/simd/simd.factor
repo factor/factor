@@ -64,7 +64,7 @@ CONSTANT: vector>vector-intrinsics
 
 CONSTANT: vector-other-intrinsics
     {
-        (simd-v.)
+        (simd-vdot)
         (simd-vsad)
         (simd-sum)
         (simd-vany?)
@@ -96,7 +96,7 @@ vector>vector-intrinsics [ { byte-array } "default-output-classes" set-word-prop
 
 \ (simd-sum) [ nip scalar-output-class ] "outputs" set-word-prop
 
-\ (simd-v.) [ 2nip scalar-output-class ] "outputs" set-word-prop
+\ (simd-vdot) [ 2nip scalar-output-class ] "outputs" set-word-prop
 
 {
     (simd-vany?)

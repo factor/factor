@@ -1,13 +1,12 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit
-debugger fry help help.home help.topics help.vocabs html
-html.streams io.directories io.encodings.binary
+debugger formatting fry help help.home help.topics help.vocabs
+html html.streams io.directories io.encodings.binary
 io.encodings.utf8 io.files io.files.temp io.pathnames kernel
-locals make math math.parser memoize namespaces sequences
-serialize sorting splitting tools.completion vocabs
-vocabs.hierarchy words xml.data xml.syntax xml.traversal
-xml.writer ;
+locals make math math.parser memoize namespaces regexp sequences
+sequences.deep serialize sorting splitting tools.completion
+vocabs vocabs.hierarchy words xml.data xml.syntax xml.writer ;
 FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
 IN: help.html
@@ -71,18 +70,25 @@ M: pathname url-of
     "vocab:help/html/stylesheet.css" ascii file-contents
     swap "\n" glue XML-CHUNK[[ <style><-></style> ]] ;
 
+: help-meta ( -- xml )
+    [XML <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1"
+        /> XML] ;
+
 : help-navbar ( -- xml )
     "conventions" >link topic>filename
     XML-CHUNK[[
         <div class="navbar">
-        <b> Factor Documentation </b> |
-        <a href="/">Home</a> |
-        <a href=<->>Glossary</a> |
+        <a href="/">Handbook</a>
+        <a href=<->>Glossary</a>
         <form method="get" action="/search" style="display:inline;">
-            <input name="search" type="text"/>
-            <button type="submit">Search</button>
+            <input placeholder="Search" name="search" type="text"/>
+            <input type="submit" value="Go"/>
         </form>
-        <a href="http://factorcode.org" style="float:right; padding: 4px;">factorcode.org</a>
+        <div style="float: right;">
+            <a href="//factorcode.org"><b>factorcode.org</b></a>
+        </div>
         </div>
      ]] ;
 
@@ -92,27 +98,47 @@ M: pathname url-of
 : css-class ( style classes -- name )
     dup '[ drop _ assoc-size 1 + bijective-base26 ] cache ;
 
+: css-style ( style -- style' )
+    R/ font-size: \d+pt;/ [
+        "font-size: " ?head drop "pt;" ?tail drop
+        string>number 2 -
+        "font-size: %dpt;" sprintf
+    ] re-replace-with
+
+    R/ padding: \d+px;/ [
+        "padding: " ?head drop "px;" ?tail drop
+        string>number dup even? [ 2 * 1 + ] [ 2 * ] if
+        number>string "padding: " "px;" surround
+    ] re-replace-with
+
+    R/ width: \d+px;/ [
+       drop ""
+    ] re-replace-with
+
+    R/ font-family: monospace;/ [
+        " white-space: pre-wrap; line-height: 125%;" append
+    ] re-replace-with ;
+
 : css-classes ( classes -- stylesheet )
     [
-        [ " { " "}" surround ] [ "." prepend ] bi* prepend
+        [ css-style " { " "}" surround ] [ "." prepend ] bi* prepend
     ] { } assoc>map "\n" join ;
 
 :: css-styles-to-classes ( body -- stylesheet body )
     H{ } clone :> classes
     body [
         dup xml-chunk? [
-            seq>> [ tag? ] filter
-            "span" "div" [ deep-tags-named ] bi-curry@ bi append
-            [
+            seq>> [
                 dup {
+                    [ tag? ]
                     [ "style" attr ]
                     [ "class" attr not ]
                 } 1&& [
-                    attrs>> [ V{ } like ] change-alist
+                    [ clone [ V{ } like ] change-alist ] change-attrs
                     "style" over delete-at* drop classes css-class
                     "class" rot set-at
                 ] [ drop ] if
-            ] each
+            ] deep-each
         ] [ drop ] if
     ] each classes sort-values css-classes body ;
 
@@ -120,7 +146,8 @@ M: pathname url-of
     [ article-title " - Factor Documentation" append ]
     [
         [ print-topic ] with-html-writer css-styles-to-classes
-        [ help-stylesheet ] [ help-navbar prepend ] bi*
+        [ help-stylesheet help-meta prepend help-navbar ] dip
+        [XML <div id="container"><-><div class="page"><-></div></div> XML]
     ] bi simple-page ;
 
 : generate-help-file ( topic -- )

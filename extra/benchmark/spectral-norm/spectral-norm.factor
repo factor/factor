@@ -47,7 +47,7 @@ IN: benchmark.spectral-norm
     ] times ; inline
 
 TYPED: spectral-norm ( n: fixnum -- norm )
-    u/v [ v. ] [ norm-sq ] bi /f sqrt ;
+    u/v [ vdot ] [ norm-sq ] bi /f sqrt ;
 
 : spectral-norm-benchmark ( -- )
     2000 spectral-norm number>string print ;

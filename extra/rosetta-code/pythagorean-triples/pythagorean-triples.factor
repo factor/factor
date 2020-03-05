@@ -55,7 +55,8 @@ TUPLE: triplets-count primitives total ;
 
 : <0-triplets-count> ( -- a ) 0 0 \ triplets-count boa ;
 
-: next-triplet ( triplet T -- triplet' ) [ 1array ] [ m. ] bi* first ;
+: next-triplet ( triplet T -- triplet' )
+    [ 1array ] [ mdot ] bi* first ;
 
 : candidates-triplets ( seed -- candidates )
     array[ T1 T2 T3 ] [ next-triplet ] with map ;

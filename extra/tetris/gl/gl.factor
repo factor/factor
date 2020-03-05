@@ -1,8 +1,9 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators kernel math math.vectors
-namespaces opengl opengl.gl sequences tetris.board tetris.game
-tetris.piece ui.render tetris.tetromino ui.gadgets colors ;
+USING: accessors arrays colors colors.constants combinators
+kernel math opengl opengl.gl sequences tetris.game tetris.piece
+;
+
 IN: tetris.gl
 
 ! OpenGL rendering for tetris
@@ -22,24 +23,32 @@ IN: tetris.gl
 
 ! TODO: move implementation specific stuff into tetris-board
 : (draw-row) ( x y row -- )
-    overd nth dup
-    [ gl-color 2array draw-block ] [ 3drop ] if ;
+    overd nth [ gl-color 2array draw-block ] [ 2drop ] if* ;
 
 : draw-row ( y row -- )
     [ length <iota> swap ] keep [ (draw-row) ] 2curry each ;
 
 : draw-board ( board -- )
-    rows>> [ length <iota> ] keep
-    [ dupd nth draw-row ] curry each ;
+    rows>> [ swap draw-row ] each-index ;
 
 : scale-board ( width height board -- )
     [ width>> ] [ height>> ] bi swapd [ / ] dup 2bi* 1 glScalef ;
+
+: set-background-color ( tetris -- )
+    dup running?>> [
+        paused?>> COLOR: light-gray COLOR: white ?
+    ] [ drop COLOR: black ] if gl-color ;
+
+: draw-background ( board -- )
+    [ 0 0 ] dip [ width>> ] [ height>> ] bi glRectf ;
 
 : draw-tetris ( width height tetris -- )
     ! width and height are in pixels
     [
         {
             [ board>> scale-board ]
+            [ set-background-color ]
+            [ board>> draw-background ]
             [ board>> draw-board ]
             [ next-piece draw-next-piece ]
             [ current-piece draw-piece ]

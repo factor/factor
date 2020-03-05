@@ -7,33 +7,75 @@
 
         <t:base t:href="$help-webapp/content/" />
         <title>Search - Factor Documentation</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <style>
-            a:link { text-decoration: none; color: #104e8b; }
-            a:visited { text-decoration: none; color: #104e8b; }
-            a:active { text-decoration: none; color: #104e8b; }
-            a:hover { text-decoration: underline; color: #104e8b; }
+            html {
+                box-sizing: border-box;
+            }
+
+            *, *:before, *:after {
+                box-sizing: inherit;
+            }
 
             body {
-                font-family: sans-serif; font-style: normal
+                margin: 0;
+                font-family: sans-serif;
                 font-size: 12pt;
+                line-height: 150%;
+            }
+
+            a { color: #104e8b; }
+            a:link, a:visited, a:active { text-decoration: none; }
+            a:hover { text-decoration: underline; }
+
+            input {
+                border: 1px solid #999999;
+                font-size: smaller;
+                border-radius: 3px;
+            }
+
+            #container {
+                max-width: 800px;
             }
 
             .navbar {
-                background-color: #f3f2ea;
-                padding: 5px;
-                border: 1px solid #ccc;
-                font: 9pt sans-serif;
-                margin-bottom: 10px;
+                margin: 0;
+                padding: 15px;
+                padding-top: 10px;
+                padding-bottom: 10px;
+                line-height: 150%;
+                border-bottom: 1px solid #ccc;
+                background-color: #f5f5f5;
             }
 
-            h2 { background-color: #f5f5f5; color: #222; }
-            hr { border: 0; background-color: #ccc; color: #ccc; height: 1px; }
+            .navbar a {
+                margin-right: 10px;
+            }
+
+            .page {
+                margin: 15px;
+            }
+
+            h2 {
+                padding: 10px;
+                background-color: #f3f2ea;
+                color: #222;
+            }
+
+            hr {
+                border: 0;
+                background-color: #ccc;
+                color: #ccc;
+                height: 1px;
+            }
         </style>
     </head>
 
     <body>
+    <div id="container">
 		<t:html t:name="navbar"/>
 
+        <div class="page">
         <t:if t:value="articles">
             <h2>Articles</h2>
             <ul>
@@ -66,7 +108,8 @@
         documentation, generated offline from a
         <code>load-all</code> image. If you want, you can also browse the
         documentation from within the <a href="http://factorcode.org" target="_top">Factor</a> UI.</p>
-
+        </div>
+    </div>
     </body>
 </html>
 

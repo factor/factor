@@ -107,7 +107,7 @@ ERROR: all-points-colinear ;
     [ normalize ] [ all-points-colinear ] if* ;
 
 : (face-plane-dist) ( normal edge -- d )
-    vertex-pos v. neg ; inline
+    vertex-pos vdot neg ; inline
 
 : face-plane-dist ( edge -- d )
     [ face-normal ] [ (face-plane-dist) ] bi ; inline

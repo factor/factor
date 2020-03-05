@@ -8,25 +8,17 @@ IN: slides
 
 CONSTANT: stylesheet
     H{
-        { default-span-style
+        { default-style
             H{
                 { font-name 1[ default-sans-serif-font-name ] }
                 { font-size 1[ default-font-size 3 * ] }
-            }
-        }
-        { default-block-style
-            H{
                 { wrap-margin 1[ default-font-size 92 * ] }
-            }
-        }
-        { code-char-style
-            H{
-                { font-name 1[ default-monospace-font-name ] }
-                { font-size 1[ default-font-size 3 * ] }
             }
         }
         { code-style
             H{
+                { font-name 1[ default-monospace-font-name ] }
+                { font-size 1[ default-font-size 3 * ] }
                 { page-color T{ rgba f 0.4 0.4 0.4 0.3 } }
             }
         }

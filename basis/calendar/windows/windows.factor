@@ -28,7 +28,7 @@ IN: calendar.windows
         [ [ wSecond>> ] [ wMilliseconds>> 1000 / ] bi + ]
     } cleave instant <timestamp> ;
 
-M: windows gmt-offset ( -- hours minutes seconds )
+M: windows gmt-offset
     TIME_ZONE_INFORMATION <struct>
     dup GetTimeZoneInformation {
         { TIME_ZONE_ID_INVALID [ win32-error-string throw ] }
