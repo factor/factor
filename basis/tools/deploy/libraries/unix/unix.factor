@@ -6,8 +6,13 @@ IN: tools.deploy.libraries.unix
 
 ! stupid hack. better ways to find the library name would be open the library,
 ! note a symbol address found in the library, then call dladdr (or use
+
+<PRIVATE
+
 : ?exists ( path -- path/f )
     dup exists? [ drop f ] unless ; inline
+
+PRIVATE>
 
 M: unix find-library-file
     dup absolute-path? [ ?exists ] [
