@@ -3,32 +3,20 @@ IN: vocabs.metadata
 
 ARTICLE: "vocabs.metadata" "Vocabulary metadata"
 "Vocabulary directories can contain text files with metadata:"
-{ $list
-    { { $snippet "authors.txt" } " - a series of lines, with one author name per line. These are listed under " { $link "vocab-authors" } "." }
-    { { $snippet "platforms.txt" } " - a series of lines, with one operating system name per line." }
-    { { $snippet "resources.txt" } " - a series of lines, with one file glob pattern per line. Files inside the vocabulary directory whose names match any of these glob patterns will be included with the compiled application as " { $link "deploy-resources" } "." }
-    { { $snippet "summary.txt" } " - a one-line description." }
-    { { $snippet "tags.txt" } " - a series of lines, with one tag per line. Tags help classify the vocabulary. Consult " { $link "vocab-tags" } " for a list of existing tags you can reuse." }
+{ $table
+    { { $snippet "authors.txt" } { "a series of lines, with one author name per line. These are listed under " { $link "vocab-authors" } "." } }
+    { { $snippet "platforms.txt" } { "a series of lines, with one operating system name per line." } }
+    { { $snippet "resources.txt" } { "a series of lines, with one file glob pattern per line. Files inside the vocabulary directory whose names match any of these glob patterns will be included with the compiled application as " { $link "deploy-resources" } "." } }
+    { { $snippet "summary.txt" } { "a one-line description." } }
+    { { $snippet "tags.txt" } { "a series of lines, with one tag per line. Tags help classify the vocabulary. Consult " { $link "vocab-tags" } " for a list of existing tags you can reuse." } }
 }
-"Words for reading " { $snippet "summary.txt" } ":"
-{ $subsections
-    vocab-summary
-}
-"Words for reading " { $snippet "authors.txt" } ":"
+"These metadata files can be accessed with the following words:"
 { $subsections
     vocab-authors
-}
-"Words for reading " { $snippet "tags.txt" } ":"
-{ $subsections
-    vocab-tags
-}
-"Words for reading " { $snippet "platforms.txt" } ":"
-{ $subsections
     vocab-platforms
-}
-"Words for reading " { $snippet "resources.txt" } ":"
-{ $subsections
     vocab-resources
+    vocab-summary
+    vocab-tags
 }
 "Getting and setting arbitrary vocabulary metadata:"
 { $subsections
