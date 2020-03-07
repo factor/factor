@@ -232,9 +232,9 @@ void factor_vm::load_image(vm_parameters* p) {
 
   FILE* file = OPEN_READ(p->image_path);
   if (file == NULL) {
-    std::cout << "Cannot open image file: " << p->image_path << std::endl;
+    std::cout << "Cannot open image file: " << AS_UTF8(p->image_path) << std::endl;
     char *msg = threadsafe_strerror(errno);
-    std::cout << "strerror:2: " << msg << std::endl;
+    std::cout << "strerror: " << msg << std::endl;
     free(msg);
     exit(1);
   }
