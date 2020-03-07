@@ -58,6 +58,13 @@ CL_FLAGS = $(CL_FLAGS) $(CL_FLAGS_VISTA)
 PLAF_DLL_OBJS = vm\os-windows-x86.64.obj vm\cpu-x86.obj
 SUBSYSTEM_COM_FLAGS = console
 SUBSYSTEM_EXE_FLAGS = windows
+
+!ELSE
+CL_FLAGS = $(CL_FLAGS) $(CL_FLAGS_VISTA)
+PLAF_DLL_OBJS = vm\os-windows-x86.64.obj vm\cpu-x86.obj
+SUBSYSTEM_COM_FLAGS = console
+SUBSYSTEM_EXE_FLAGS = windows
+
 !ENDIF
 
 !IF DEFINED(DEBUG)
@@ -142,6 +149,9 @@ factor.com: $(EXE_OBJS) $(DLL_OBJS)
 
 factor.exe: $(EXE_OBJS) $(DLL_OBJS)
 	link $(LINK_FLAGS) /out:factor.exe /SUBSYSTEM:$(SUBSYSTEM_EXE_FLAGS) $(EXE_OBJS) $(DLL_OBJS)
+
+factor.exe.manifest: factor.exe
+	mt -manifest factor.exe.manifest -outputresource:factor.exe;#1
 
 all: factor.com factor.exe factor.dll.lib libfactor-ffi-test.dll
 
