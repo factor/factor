@@ -64,7 +64,7 @@ os windows? [
 ERROR: unsupported-pixel-format component-order ;
 
 : check-pixel-format ( component-order -- )
-    dup { BGRX BGRA } member? [ drop ] [ unsupported-pixel-format ] if ;
+    dup { BGRX BGRA RGBA } member? [ drop ] [ unsupported-pixel-format ] if ;
 
 : image>gdi+-bitmap ( image -- bitmap )
     dup component-order>> check-pixel-format
@@ -84,8 +84,7 @@ ERROR: unsupported-pixel-format component-order ;
     nip swap ImageCodecInfo <c-direct-array> ;
 
 : extension>mime-type ( extension -- mime-type )
-    ! Crashes if you let this mime through on my machine.
-    dup mime-types at dup "image/bmp" = [ unknown-image-extension ] when nip ;
+    mime-types ?at [ unknown-image-extension ] unless ;
 
 : mime-type>clsid ( mime-type -- clsid )
     image-encoders [ MimeType>> alien>native-string = ] with find nip Clsid>> ;
