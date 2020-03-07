@@ -42,15 +42,9 @@ os { linux windows } member? [
 
     ! Windows can't save .bmp-files for unknown reason. It can load
     ! them though.
-    os windows? [
-        [
-            open-png-image "foo.bmp" temp-file save-graphic-image
-        ] [ unknown-image-extension? ] must-fail-with
-    ] [
-        { t } [
-            open-png-image dup "bmp" convert-to =
-        ] unit-test
-    ] if
+    { t } [
+        open-png-image dup "bmp" convert-to =
+    ] unit-test
 
     { t } [
         "vocab:images/testing/bmp/rgb_8bit.bmp" load-image dup
