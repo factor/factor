@@ -2259,3 +2259,140 @@ STRUCT: POWERBROADCAST_SETTING
 
 : msgbox ( str -- )
     f swap "DebugMsg" MB_OK MessageBox drop ;
+
+! HighDPI
+TYPEDEF: HANDLE DPI_AWARENESS_CONTEXT
+
+ENUM: PROCESS_DPI_AWARENESS
+    { PROCESS_DPI_UNAWARE 0 }
+    { PROCESS_SYSTEM_DPI_AWARE 1 }
+    { PROCESS_PER_MONITOR_DPI_AWARE 2 } ;
+
+ENUM: DPI_AWARENESS
+    { DPI_AWARENESS_INVALID -1 }
+    { DPI_AWARENESS_UNAWARE 0 }
+    { DPI_AWARENESS_SYSTEM_AWARE 1 }
+    { DPI_AWARENESS_PER_MONITOR_AWARE 2 } ;
+
+FUNCTION: BOOL AdjustWindowRectExForDpi (
+    LPRECT lpRect,
+    DWORD  dwStyle,
+    BOOL   bMenu,
+    DWORD  dwExStyle,
+    UINT   dpi
+)
+
+FUNCTION: BOOL EnableNonClientDpiScaling (
+    HWND hwnd
+)
+
+FUNCTION: BOOL AreDpiAwarenessContextsEqual (
+    DPI_AWARENESS_CONTEXT dpiContextA,
+    DPI_AWARENESS_CONTEXT dpiContextB
+)
+
+ENUM: DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS
+    DCDC_DEFAULT
+    DCDC_DISABLE_FONT_UPDATE
+    DCDC_DISABLE_RELAYOUT ;
+
+FUNCTION: DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS GetDialogControlDpiChangeBehavior (
+    HWND hWnd
+)
+
+ENUM: DIALOG_DPI_CHANGE_BEHAVIORS
+    DDC_DEFAULT
+    DDC_DISABLE_ALL
+    DDC_DISABLE_RESIZE
+    DDC_DISABLE_CONTROL_RELAYOUT ;
+
+FUNCTION: DIALOG_DPI_CHANGE_BEHAVIORS GetDialogDpiChangeBehavior (
+    HWND hDlg
+)
+
+FUNCTION: UINT GetDpiForSystem ( )
+
+FUNCTION: UINT GetDpiForWindow ( HWND hwnd )
+
+FUNCTION: HRESULT GetProcessDpiAwareness ( HANDLE hprocess, PROCESS_DPI_AWARENESS* value )
+
+FUNCTION: UINT GetSystemDpiForProcess (
+    HANDLE hProcess
+)
+
+FUNCTION: int GetSystemMetricsForDpi (
+    int  nIndex,
+    UINT dpi
+)
+
+FUNCTION: DPI_AWARENESS_CONTEXT GetThreadDpiAwarenessContext ( )
+FUNCTION: DPI_AWARENESS_CONTEXT SetThreadDpiAwarenessContext ( DPI_AWARENESS_CONTEXT dpiContext )
+
+ENUM: DPI_HOSTING_BEHAVIOR
+    DPI_HOSTING_BEHAVIOR_INVALID
+    DPI_HOSTING_BEHAVIOR_DEFAULT
+    DPI_HOSTING_BEHAVIOR_MIXED ;
+
+FUNCTION: DPI_HOSTING_BEHAVIOR GetThreadDpiHostingBehavior ( )
+
+FUNCTION: DPI_HOSTING_BEHAVIOR GetWindowDpiHostingBehavior (
+    HWND hwnd
+)
+
+FUNCTION: BOOL SetProcessDPIAware ( )
+FUNCTION: HRESULT SetProcessDpiAwareness ( PROCESS_DPI_AWARENESS value )
+FUNCTION: BOOL SetProcessDpiAwarenessContext ( DPI_AWARENESS_CONTEXT value )
+
+FUNCTION: DPI_AWARENESS_CONTEXT GetWindowDpiAwarenessContext ( HWND hwnd )
+FUNCTION: DPI_AWARENESS GetAwarenessFromDpiAwarenessContext ( DPI_AWARENESS_CONTEXT value )
+
+FUNCTION: BOOL IsValidDpiAwarenessContext (
+    DPI_AWARENESS_CONTEXT value
+)
+
+! Needs work
+! GetThreadDpiAwarenessContext -8 swap <displaced-alien> IsValidDpiAwarenessContext ! 0, should be 1
+! : DPI_AWARENESS_CONTEXT_UNAWARE ( -- DPI_AWARENESS_CONTEXT )
+!     GetThreadDpiAwarenessContext -1 swap <displaced-alien> ;
+! : DPI_AWARENESS_CONTEXT_SYSTEM_AWARE ( -- DPI_AWARENESS_CONTEXT )
+!     GetThreadDpiAwarenessContext -2 swap <displaced-alien> ;
+! : DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE ( -- DPI_AWARENESS_CONTEXT )
+!     GetThreadDpiAwarenessContext -3 swap <displaced-alien> ;
+! : DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 ( -- DPI_AWARENESS_CONTEXT )
+!     GetThreadDpiAwarenessContext -4 swap <displaced-alien> ;
+! : DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED ( -- DPI_AWARENESS_CONTEXT )
+!     GetThreadDpiAwarenessContext -5 swap <displaced-alien> ;
+
+FUNCTION: BOOL LogicalToPhysicalPointForPerMonitorDPI (
+    HWND    hWnd,
+    LPPOINT lpPoint
+)
+
+FUNCTION: BOOL PhysicalToLogicalPointForPerMonitorDPI (
+    HWND    hWnd,
+    LPPOINT lpPoint
+)
+
+FUNCTION: BOOL SetDialogControlDpiChangeBehavior (
+    HWND                                hWnd,
+    DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS mask,
+    DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS values
+)
+
+FUNCTION: BOOL SetDialogDpiChangeBehavior (
+    HWND                        hDlg,
+    DIALOG_DPI_CHANGE_BEHAVIORS mask,
+    DIALOG_DPI_CHANGE_BEHAVIORS values
+)
+
+FUNCTION: DPI_HOSTING_BEHAVIOR SetThreadDpiHostingBehavior (
+    DPI_HOSTING_BEHAVIOR value
+)
+
+FUNCTION: BOOL SystemParametersInfoForDpi (
+    UINT  uiAction,
+    UINT  uiParam,
+    PVOID pvParam,
+    UINT  fWinIni,
+    UINT  dpi
+)
