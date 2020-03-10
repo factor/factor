@@ -254,7 +254,7 @@ M: simd-128 v-n over simd-with v- ; inline
 M: simd-128 v*n over simd-with v* ; inline
 M: simd-128 v/n over simd-with v/ ; inline
 M: simd-128 norm-sq dup vdot assert-positive ; inline
-M: simd-128 distance v- l2-norm ; inline
+M: simd-128 distance v- norm ; inline
 
 M: simd-128 >pprint-sequence ;
 M: simd-128 pprint* pprint-object ;

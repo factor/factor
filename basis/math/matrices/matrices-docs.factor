@@ -983,7 +983,7 @@ $nl "This is the matrix norm when " { $snippet "p=1" } ", and is the overall max
 
 HELP: matrix-l2-norm
 { $values { "m" matrix } { "n" number } }
-{ $description "Find the norm (size) of a matrix in 𝑙₂ (" { $snippet "L^2" } ") vector space, usually written ∥･∥₂ₚ."
+{ $description "Find the norm (size) of a matrix in 𝑙₂ (" { $snippet "L^2" } ") vector space, usually written ∥･∥₂."
 $nl "This is the matrix norm when " { $snippet "p=2" } ", and is the square root of the sums of the squares of all the elements of the matrix." }
 { $notelist
     { "This norm is sometimes called the Hilbert-Schmidt norm." }
@@ -1070,7 +1070,7 @@ HELP: matrix-p-norm
 } ;
 
 { matrix-p-norm matrix-p-norm-entrywise } related-words
-{ matrix-p-norm matrix-p-q-norm } related-words
+{ matrix-l1-norm matrix-l2-norm matrix-l-infinity-norm matrix-p-norm matrix-p-q-norm } related-words
 
 HELP: matrix-normalize
 { $values { "m" "a matrix with at least 1 non-zero number" } { "m'" matrix } }

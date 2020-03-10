@@ -8,11 +8,11 @@ CONSTANT: qi { 0 1 0 0 }
 CONSTANT: qj { 0 0 1 0 }
 CONSTANT: qk { 0 0 0 1 }
 
-{ 1.0 } [ qi l2-norm ] unit-test
-{ 1.0 } [ qj l2-norm ] unit-test
-{ 1.0 } [ qk l2-norm ] unit-test
-{ 1.0 } [ q1 l2-norm ] unit-test
-{ 0.0 } [ q0 l2-norm ] unit-test
+{ 1.0 } [ qi norm ] unit-test
+{ 1.0 } [ qj norm ] unit-test
+{ 1.0 } [ qk norm ] unit-test
+{ 1.0 } [ q1 norm ] unit-test
+{ 0.0 } [ q0 norm ] unit-test
 { t } [ qi qj q* qk = ] unit-test
 { t } [ qj qk q* qi = ] unit-test
 { t } [ qk qi q* qj = ] unit-test
