@@ -230,6 +230,7 @@ M: object l1-norm [ abs ] map-sum ; inline
 
 GENERIC: l2-norm ( k -- x )
 M: object l2-norm norm-sq sqrt ; inline
+ALIAS: norm l2-norm
 
 GENERIC: l-infinity-norm ( k -- x )
 M: object l-infinity-norm supremum ; inline
