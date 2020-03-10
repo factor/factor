@@ -40,10 +40,12 @@ os { linux windows } member? [
         ] [ unknown-image-extension? ] recover
     ] unit-test
 
-    ! Windows can't save .bmp-files for unknown reason. It can load
+    ! Windows 32 can't save .bmp-files for unknown reason. It can load
     ! them though.
     { t } [
-        open-png-image dup "bmp" convert-to =
+        64bit? [
+            open-png-image dup "bmp" convert-to =
+        ] when
     ] unit-test
 
     { t } [
