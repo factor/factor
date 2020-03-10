@@ -115,8 +115,8 @@ GML: abs ( x -- y )
     {
         { [ dup integer? ] [ abs ] }
         { [ dup float? ] [ abs ] }
-        { [ dup vec2d? ] [ l2-norm ] }
-        { [ dup vec3d? ] [ l2-norm ] }
+        { [ dup vec2d? ] [ norm ] }
+        { [ dup vec3d? ] [ norm ] }
     } cond ;
 
 : must-be-positive ( x -- x ) dup 0 < [ "Domain error" throw ] when ; inline

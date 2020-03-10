@@ -252,7 +252,7 @@ CONSTANT: edge-hitbox-radius 0.05
 
     ray-t 0.0 >= edge-t 0.0 0.5 between? and [
         source direction ray-t v*n v+
-        edge-source edge-direction edge-t v*n v+ v- l2-norm
+        edge-source edge-direction edge-t v*n v+ v- norm
         edge-hitbox-radius <
     ] [ f ] if ;
 
