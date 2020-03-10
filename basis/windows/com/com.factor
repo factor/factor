@@ -11,8 +11,14 @@ COM-INTERFACE: IUnknown f {00000000-0000-0000-C000-000000000046}
     ULONG Release ( ) ;
 
 C-TYPE: IAdviseSink
-C-TYPE: IEnumFORMATETC
 C-TYPE: IEnumSTATDATA
+C-TYPE: IStorage
+
+COM-INTERFACE: IEnumFORMATETC IUnknown {00000103-0000-0000-C000-000000000046}
+    HRESULT Clone ( IEnumFORMATETC **ppenum )
+    HRESULT Next ( ULONG celt, FORMATETC *rgelt, ULONG* pceltFetched )
+    HRESULT Reset ( )
+    HRESULT Skip ( ULONG celt ) ;
 
 COM-INTERFACE: IDataObject IUnknown {0000010E-0000-0000-C000-000000000046}
     HRESULT GetData ( FORMATETC* pFormatetc, STGMEDIUM* pmedium )
@@ -35,6 +41,42 @@ COM-INTERFACE: IDropTarget IUnknown {00000122-0000-0000-C000-000000000046}
     HRESULT DragLeave ( )
     HRESULT Drop ( IDataObject* pDataObject, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect ) ;
 
+TYPEDEF: LPWSTR LPCOLESTR
+TYPEDEF: LPWSTR OLESTR
+TYPEDEF: OLESTR** SNB
+TYPEDEF: wchar_t* OLECHAR
+C-TYPE: IEnumSTATSTG
+
+STRUCT: STATSTG
+    { pwcsName LPOLESTR }
+    { type DWORD }
+    { cbSize ULARGE_INTEGER }
+    { mtime FILETIME }
+    { ctime FILETIME }
+    { atime FILETIME }
+    { grfMode DWORD }
+    { grfLocksSupported DWORD }
+    { clsid CLSID }
+    { grfStateBits DWORD }
+    { reserved DWORD } ;
+
+COM-INTERFACE: IStorage IUnknown {0000000B-0000-0000-C000-000000000046}
+    HRESULT Commit ( DWORD grfCommitFlags )
+    HRESULT CopyTo ( DWORD ciidExclude, IID *rgiidExclude, SNB snbExclude, IStorage *pstgDest )
+    HRESULT CreateStorage ( OLECHAR *pwcsName, DWORD grfMode, DWORD reserved1, DWORD reserved2, IStorage **ppstg )
+    HRESULT CreateStream ( OLECHAR *pwcsName, DWORD grfMode, DWORD reserved1, DWORD reserved2, IStream **ppstm )
+    HRESULT DestroyElement ( OLECHAR *pwcsName )
+    HRESULT EnumElements ( DWORD reserved1, void *reserved2, DWORD reserved3, IEnumSTATSTG **ppenum )
+    HRESULT MoveElementTo ( OLECHAR *pwcsName, IStorage *pstgDest, OLECHAR *pwcsNewName, DWORD grfFlags )
+    HRESULT OpenStorage ( OLECHAR *pwcsName, IStorage *pstgPriority, DWORD grfMode, SNB snbExclude, DWORD reserved, IStorage **ppstg )
+    HRESULT OpenStream ( OLECHAR *pwcsName, void *reserved1, DWORD grfMode, DWORD reserved2, IStream **ppstm )
+    HRESULT RenameElement ( OLECHAR *pwcsOldName, OLECHAR *pwcsNewName )
+    HRESULT Revert ( )
+    HRESULT SetClass ( REFCLSID clsid )
+    HRESULT SetElementTimes ( OLECHAR  *pwcsName, FILETIME *pctime, FILETIME *patime, FILETIME *pmtime )
+    HRESULT SetStateBits ( DWORD grfStateBits, DWORD grfMask )
+    HRESULT Stat ( STATSTG *pstatstg, DWORD grfStatFlag ) ;
+
 TYPEDEF: IDataObject* LPDATAOBJECT
 TYPEDEF: IDropSource* LPDROPSOURCE
 
@@ -49,18 +91,6 @@ COM-INTERFACE: ISequentialStream IUnknown {0C733A30-2A1C-11CE-ADE5-00AA0044773D}
     HRESULT Read ( void* pv, ULONG cb, ULONG* pcbRead )
     HRESULT Write ( void* pv, ULONG cb, ULONG* pcbWritten ) ;
 
-STRUCT: STATSTG
-    { pwcsName LPOLESTR }
-    { type DWORD }
-    { cbSize ULARGE_INTEGER }
-    { mtime FILETIME }
-    { ctime FILETIME }
-    { atime FILETIME }
-    { grfMode DWORD }
-    { grfLocksSupported DWORD }
-    { clsid CLSID }
-    { grfStateBits DWORD }
-    { reserved DWORD } ;
 
 CONSTANT: STGM_READ 0
 CONSTANT: STGM_WRITE 1
