@@ -2263,11 +2263,6 @@ STRUCT: POWERBROADCAST_SETTING
 ! HighDPI
 TYPEDEF: HANDLE DPI_AWARENESS_CONTEXT
 
-ENUM: PROCESS_DPI_AWARENESS
-    { PROCESS_DPI_UNAWARE 0 }
-    { PROCESS_SYSTEM_DPI_AWARE 1 }
-    { PROCESS_PER_MONITOR_DPI_AWARE 2 } ;
-
 ENUM: DPI_AWARENESS
     { DPI_AWARENESS_INVALID -1 }
     { DPI_AWARENESS_UNAWARE 0 }
@@ -2314,8 +2309,6 @@ FUNCTION: UINT GetDpiForSystem ( )
 
 FUNCTION: UINT GetDpiForWindow ( HWND hwnd )
 
-FUNCTION: HRESULT GetProcessDpiAwareness ( HANDLE hprocess, PROCESS_DPI_AWARENESS* value )
-
 FUNCTION: UINT GetSystemDpiForProcess (
     HANDLE hProcess
 )
@@ -2340,28 +2333,40 @@ FUNCTION: DPI_HOSTING_BEHAVIOR GetWindowDpiHostingBehavior (
 )
 
 FUNCTION: BOOL SetProcessDPIAware ( )
-FUNCTION: HRESULT SetProcessDpiAwareness ( PROCESS_DPI_AWARENESS value )
 FUNCTION: BOOL SetProcessDpiAwarenessContext ( DPI_AWARENESS_CONTEXT value )
 
 FUNCTION: DPI_AWARENESS_CONTEXT GetWindowDpiAwarenessContext ( HWND hwnd )
 FUNCTION: DPI_AWARENESS GetAwarenessFromDpiAwarenessContext ( DPI_AWARENESS_CONTEXT value )
 
+: get-thread-dpi-awareness ( -- enum )
+    GetThreadDpiAwarenessContext GetAwarenessFromDpiAwarenessContext ;
+
 FUNCTION: BOOL IsValidDpiAwarenessContext (
     DPI_AWARENESS_CONTEXT value
 )
 
-! Needs work
-! GetThreadDpiAwarenessContext -8 swap <displaced-alien> IsValidDpiAwarenessContext ! 0, should be 1
-! : DPI_AWARENESS_CONTEXT_UNAWARE ( -- DPI_AWARENESS_CONTEXT )
-!     GetThreadDpiAwarenessContext -1 swap <displaced-alien> ;
-! : DPI_AWARENESS_CONTEXT_SYSTEM_AWARE ( -- DPI_AWARENESS_CONTEXT )
-!     GetThreadDpiAwarenessContext -2 swap <displaced-alien> ;
-! : DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE ( -- DPI_AWARENESS_CONTEXT )
-!     GetThreadDpiAwarenessContext -3 swap <displaced-alien> ;
-! : DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 ( -- DPI_AWARENESS_CONTEXT )
-!     GetThreadDpiAwarenessContext -4 swap <displaced-alien> ;
-! : DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED ( -- DPI_AWARENESS_CONTEXT )
-!     GetThreadDpiAwarenessContext -5 swap <displaced-alien> ;
+! DPI_AWARENESS_CONTEXT experimentally:
+! USE: math.ranges -100 1000 [a,b] [ <alien> IsValidDpiAwarenessContext ] map-zip
+! [ nip 0 > ] assoc-filter keys .
+! { -5 -4 -3 -2 -1 17 18 34 273 529 785 }
+
+! -4 <alien> 34 <alien> AreDpiAwarenessContextsEqual . ! t
+! -5 <alien> -5 <alien> AreDpiAwarenessContextsEqual . ! t
+! -6 <alien> -6 <alien> AreDpiAwarenessContextsEqual . ! f
+: DPI_AWARENESS_CONTEXT_UNAWARE ( -- DPI_AWARENESS_CONTEXT )
+    -1 <alien> ;
+
+: DPI_AWARENESS_CONTEXT_SYSTEM_AWARE ( -- DPI_AWARENESS_CONTEXT )
+    -2 <alien> ;
+
+: DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE ( -- DPI_AWARENESS_CONTEXT )
+    -3 <alien> ;
+
+: DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 ( -- DPI_AWARENESS_CONTEXT )
+    -4 <alien> ;
+
+: DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED ( -- DPI_AWARENESS_CONTEXT )
+    -5 <alien> ;
 
 FUNCTION: BOOL LogicalToPhysicalPointForPerMonitorDPI (
     HWND    hWnd,

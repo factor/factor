@@ -1640,7 +1640,7 @@ FUNCTION: BOOL GdiFlush ( )
 ! FUNCTION: GetDCBrushColor
 ! FUNCTION: GetDCOrgEx
 ! FUNCTION: GetDCPenColor
-! FUNCTION: GetDeviceCaps
+FUNCTION: int GetDeviceCaps ( HDC hdc, int index )
 ! FUNCTION: GetDeviceGammaRamp
 ! FUNCTION: GetDIBColorTable
 ! FUNCTION: GetDIBits
