@@ -15,7 +15,7 @@ SPECIALIZED-ARRAY: int
 { 5 } [ { 1 2 } norm-sq ] unit-test
 { 13 } [ { 2 3 } norm-sq ] unit-test
 
-{ t } [ { 1 2 3 } [ l2-norm ] [ 2 p-norm ] bi = ] unit-test
+{ t } [ { 1 2 3 } [ norm ] [ 2 p-norm ] bi = ] unit-test
 { t } [ { 1 2 3 } 3 p-norm 3.301927248894626 1e-10 ~ ] unit-test
 
 { { 1.0  2.5  } } [ { 1.0 2.5 } { 2.5 1.0 } 0.0 vnlerp ] unit-test
