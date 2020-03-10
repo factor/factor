@@ -47,7 +47,7 @@ ARTICLE: "math-vectors-arithmetic" "Vector arithmetic"
     vdot
     norm-sq
     l1-norm
-    l2-norm
+    norm
     l-infinity-norm
     p-norm
 }
@@ -485,7 +485,7 @@ HELP: norm-sq
 
 HELP: l1-norm
 { $values { "k" sequence } { "x" "a non-negative real number" } }
-{ $contract "Computes the norm (size) of " { $snippet "k" } " in 𝑙₁ (" { $snippet "L^1" } ") vector space." }
+{ $contract "Computes the norm (size) of " { $snippet "k" } " in 𝑙₁ (" { $snippet "L^1" } ") vector space, usually written ∥･∥₁." }
 { $notes "See " { $link matrix-l1-norm } " for matrix-specific documentation about this word." }
 { $examples
     { $example
@@ -497,19 +497,24 @@ HELP: l1-norm
 
 HELP: l2-norm
 { $values { "k" sequence } { "x" "a non-negative real number" } }
-{ $contract "Computes the norm (size) of " { $snippet "k" } " in 𝑙₂ (" { $snippet "L^2" } ") vector space." }
-{ $notes "See " { $link matrix-l2-norm } " for matrix-specific documentation about this word." }
+{ $contract "Implementation for the default " { $link norm } ", in 𝑙₂ (" { $snippet "L^2" } ") vector space, usually written ∥･∥₂." }
+{ $notes "See " { $link matrix-l2-norm } " for matrix-specific documentation about this word." } ;
+
+HELP: norm
+{ $values { "k" sequence } { "x" "a non-negative real number" } }
+{ $contract "Computes the norm (size) of " { $snippet "k" } " in 𝑙₂ (" { $snippet "L^2" } ") vector space, usually written ∥･∥₂. " }
+{ $notes "This is generally the \"default norm\", and when referring to an unqualified norm, so it is an alias for the " { $link l2-norm } " implementation." }
 { $examples
     { $example
         "USING: math.vectors math.functions prettyprint ;"
-        "{ 1 2 3 4 } l2-norm 5.4772255 10e-8 ~ ."
+        "{ 1 2 3 4 } norm 5.4772255 10e-8 ~ ."
         "t"
     }
 } ;
 
 HELP: l-infinity-norm
 { $values { "k" sequence } { "x" "a non-negative real number" } }
-{ $contract "Computes the norm (size) of " { $snippet "k" } " in 𝑙∞ (" { $snippet "L^∞" } ") vector space. For a mathematical vector, this is simply its " { $link supremum } "." }
+{ $contract "Computes the norm (size) of " { $snippet "k" } " in 𝑙∞ (" { $snippet "L^∞" } ") vector space, usually written ∥･∥∞. For a mathematical vector, this is simply its " { $link supremum } "." }
 { $notes "See " { $link matrix-l-infinity-norm } " for matrix-specific documentation about this word." }
 { $examples
     { $example
@@ -521,12 +526,16 @@ HELP: l-infinity-norm
 
 HELP: p-norm
 { $values { "k" { $sequence number } } { "p" "a positive real number" } { "x" "a non-negative real number" } }
-{ $contract "Computes the norm (size) of " { $snippet "k" } " in 𝑙ₚ (" { $snippet "L^p" } ") vector space." }
+{ $contract "Computes the norm (size) of " { $snippet "k" } " in 𝑙ₚ (" { $snippet "L^p" } ") vector space, usually written ∥･∥ₚ." }
 { $notes "See " { $link matrix-p-norm } " for matrix-specific documentation about this word." } ;
+
+{ norm-sq l1-norm l2-norm norm l-infinity-norm p-norm } related-words
 
 HELP: normalize
 { $values { "v" { $sequence "at least 1 non-zero number" } } { "w" { $sequence number } } }
 { $description "Outputs a vector with the same direction as " { $snippet "v" } ", but length 1." } ;
+
+{ normalize matrix-normalize } related-words
 
 HELP: distance
 { $values { "u" { $sequence number } } { "v" { $sequence number } } { "x" "a non-negative real number" } }
