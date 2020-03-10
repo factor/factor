@@ -20,9 +20,10 @@ inline code_block* factor_vm::allot_code_block(cell size,
 
     // Insufficient room even after code GC, give up
     if (block == NULL) {
-      std::cout << "Code heap used: " << code->allocator->occupied_space()
-                << "\n";
-      std::cout << "Code heap free: " << code->allocator->free_space << "\n";
+      std::cout << "Code heap used:               " << code->allocator->occupied_space() << "\n";
+      std::cout << "Code heap free:               " << code->allocator->free_space << "\n";
+      std::cout << "Code heap free_block_count:   " << code->allocator->free_block_count << "\n";
+      std::cout << "Code heap largest_free_block: " << code->allocator->largest_free_block() << "\n";
       std::cout << "Request       : " << block_size << "\n";
       fatal_error("Out of memory in allot_code_block", 0);
     }
