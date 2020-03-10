@@ -78,11 +78,11 @@ PRIVATE>
     [ location>> ] bi@ swap v- ;
 
 : distance ( oint oint -- distance )
-    distance-vector l2-norm ;
+    distance-vector norm ;
 
 : scalar-projection ( v1 v2 -- n )
     ! the scalar projection of v1 onto v2
-    [ vdot ] [ l2-norm ] bi / ;
+    [ vdot ] [ norm ] bi / ;
 
 : proj-perp ( u v -- w )
     dupd proj v- ;

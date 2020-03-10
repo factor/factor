@@ -7,13 +7,13 @@ sequences sequences.extras ;
 IN: math.similarity
 
 : euclidian-similarity ( a b -- n )
-    v- l2-norm 1 + recip ;
+    v- norm 1 + recip ;
 
 : pearson-similarity ( a b -- n )
     over length 3 < [ 2drop 1.0 ] [ population-corr 0.5 * 0.5 + ] if ;
 
 : cosine-similarity ( a b -- n )
-    [ vdot ] [ [ l2-norm ] bi@ * ] 2bi / ;
+    [ vdot ] [ [ norm ] bi@ * ] 2bi / ;
 
 <PRIVATE
 
