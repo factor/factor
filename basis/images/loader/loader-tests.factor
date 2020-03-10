@@ -42,11 +42,11 @@ os { linux windows } member? [
 
     ! Windows 32 can't save .bmp-files for unknown reason. It can load
     ! them though.
-    { t } [
-        64bit? [
+    64bit? [
+        { t } [
             open-png-image dup "bmp" convert-to =
-        ] when
-    ] unit-test
+        ] unit-test
+    ] when
 
     { t } [
         "vocab:images/testing/bmp/rgb_8bit.bmp" load-image dup
