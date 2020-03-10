@@ -1,10 +1,10 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays classes.struct fry kernel
-literals locals make math math.bitwise multiline sequences
-slots.syntax ui.backend.windows vocabs.loader windows.errors
-windows.gdi32 windows.kernel32 windows.types windows.user32
-ui.gadgets.worlds ;
+USING: accessors alien.c-types alien.data classes.struct
+io.binary kernel literals locals make math math.bitwise
+sequences slots.syntax ui.backend.windows ui.gadgets.worlds
+windows.errors windows.gdi32 windows.shcore windows.types
+windows.user32 ;
 IN: windows.fullscreen
 
 : hwnd>hmonitor ( HWND -- HMONITOR )
@@ -140,3 +140,7 @@ ERROR: unsupported-resolution triple ;
 
 : set-fullscreen ( gadget triple fullscreen? -- )
     [ find-world ] 2dip (set-fullscreen) ;
+
+: get-desktop-scale-factor ( -- n )
+    desktop-hmonitor 0 DEVICE_SCALE_FACTOR <ref>
+    [ GetScaleFactorForMonitor win32-error=0/f ] keep le> ;
