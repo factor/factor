@@ -49,9 +49,8 @@ TUPLE: color
 { green integer }
 { blue integer } ;
 
-{ T{ color f 0 0 0 } } [
-    1 2 3 color boa [ <mirror> clear-assoc ] keep
-] unit-test
+[ \ + make-mirror clear-assoc ] must-fail
+[ \ + make-mirror [ "name" ] dip delete-at ] must-fail
 
 ! Test reshaping with a mirror
 1 2 3 color boa <mirror> "mirror" set

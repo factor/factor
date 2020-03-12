@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.tuple classes.tuple.private
 combinators fry hash-sets hashtables kernel math sequences sets slots
-slots.private ;
+slots.private summary present formatting ;
 IN: mirrors
 
 TUPLE: mirror { object read-only } ;
@@ -30,13 +30,16 @@ M: mirror set-at ( val key mirror -- )
     [ object-slots slot-named check-set-slot ] [ object>> ] bi
     swap set-slot ;
 
+ERROR: mirror-slot-removal slots mirror method ;
+
 M: mirror delete-at ( key mirror -- )
-    [ f ] 2dip set-at ;
+    \ delete-at mirror-slot-removal ;
 
 M: mirror clear-assoc ( mirror -- )
-    [ object-slots ] [ object>> ] bi '[
-        [ initial>> ] [ offset>> _ swap set-slot ] bi
-    ] each ;
+    [ object-slots ] keep \ clear-assoc mirror-slot-removal ;
+
+M: mirror-slot-removal summary
+    drop "Slots cannot be removed from a tuple or a mirror of it" ;
 
 M: mirror >alist ( mirror -- alist )
     [ object-slots ] [ object>> ] bi '[
