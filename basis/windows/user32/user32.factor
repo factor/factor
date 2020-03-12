@@ -1898,7 +1898,7 @@ ALIAS: MessageBoxEx MessageBoxExW
 
 ! FUNCTION: ModifyMenuA
 ! FUNCTION: ModifyMenuW
-! FUNCTION: MonitorFromPoint
+FUNCTION: HMONITOR MonitorFromPoint ( POINT pt, DWORD dwFlags )
 ! FUNCTION: MonitorFromRect
 FUNCTION: HMONITOR MonitorFromWindow ( HWND hWnd, DWORD dwFlags )
 ! FUNCTION: mouse_event
@@ -2258,3 +2258,145 @@ STRUCT: POWERBROADCAST_SETTING
 
 : msgbox ( str -- )
     f swap "DebugMsg" MB_OK MessageBox drop ;
+
+! HighDPI
+TYPEDEF: HANDLE DPI_AWARENESS_CONTEXT
+
+ENUM: DPI_AWARENESS
+    { DPI_AWARENESS_INVALID -1 }
+    { DPI_AWARENESS_UNAWARE 0 }
+    { DPI_AWARENESS_SYSTEM_AWARE 1 }
+    { DPI_AWARENESS_PER_MONITOR_AWARE 2 } ;
+
+FUNCTION: BOOL AdjustWindowRectExForDpi (
+    LPRECT lpRect,
+    DWORD  dwStyle,
+    BOOL   bMenu,
+    DWORD  dwExStyle,
+    UINT   dpi
+)
+
+FUNCTION: BOOL EnableNonClientDpiScaling (
+    HWND hwnd
+)
+
+FUNCTION: BOOL AreDpiAwarenessContextsEqual (
+    DPI_AWARENESS_CONTEXT dpiContextA,
+    DPI_AWARENESS_CONTEXT dpiContextB
+)
+
+ENUM: DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS
+    DCDC_DEFAULT
+    DCDC_DISABLE_FONT_UPDATE
+    DCDC_DISABLE_RELAYOUT ;
+
+FUNCTION: DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS GetDialogControlDpiChangeBehavior (
+    HWND hWnd
+)
+
+ENUM: DIALOG_DPI_CHANGE_BEHAVIORS
+    DDC_DEFAULT
+    DDC_DISABLE_ALL
+    DDC_DISABLE_RESIZE
+    DDC_DISABLE_CONTROL_RELAYOUT ;
+
+FUNCTION: DIALOG_DPI_CHANGE_BEHAVIORS GetDialogDpiChangeBehavior (
+    HWND hDlg
+)
+
+FUNCTION: UINT GetDpiForSystem ( )
+
+FUNCTION: UINT GetDpiForWindow ( HWND hwnd )
+
+FUNCTION: UINT GetSystemDpiForProcess (
+    HANDLE hProcess
+)
+
+FUNCTION: int GetSystemMetricsForDpi (
+    int  nIndex,
+    UINT dpi
+)
+
+FUNCTION: DPI_AWARENESS_CONTEXT GetThreadDpiAwarenessContext ( )
+FUNCTION: DPI_AWARENESS_CONTEXT SetThreadDpiAwarenessContext ( DPI_AWARENESS_CONTEXT dpiContext )
+
+ENUM: DPI_HOSTING_BEHAVIOR
+    DPI_HOSTING_BEHAVIOR_INVALID
+    DPI_HOSTING_BEHAVIOR_DEFAULT
+    DPI_HOSTING_BEHAVIOR_MIXED ;
+
+FUNCTION: DPI_HOSTING_BEHAVIOR GetThreadDpiHostingBehavior ( )
+
+FUNCTION: DPI_HOSTING_BEHAVIOR GetWindowDpiHostingBehavior (
+    HWND hwnd
+)
+
+FUNCTION: BOOL SetProcessDPIAware ( )
+FUNCTION: BOOL SetProcessDpiAwarenessContext ( DPI_AWARENESS_CONTEXT value )
+
+FUNCTION: DPI_AWARENESS_CONTEXT GetWindowDpiAwarenessContext ( HWND hwnd )
+FUNCTION: DPI_AWARENESS GetAwarenessFromDpiAwarenessContext ( DPI_AWARENESS_CONTEXT value )
+
+: get-thread-dpi-awareness ( -- enum )
+    GetThreadDpiAwarenessContext GetAwarenessFromDpiAwarenessContext ;
+
+FUNCTION: BOOL IsValidDpiAwarenessContext (
+    DPI_AWARENESS_CONTEXT value
+)
+
+! DPI_AWARENESS_CONTEXT experimentally:
+! USE: math.ranges -100 1000 [a,b] [ <alien> IsValidDpiAwarenessContext ] map-zip
+! [ nip 0 > ] assoc-filter keys .
+! { -5 -4 -3 -2 -1 17 18 34 273 529 785 }
+
+! -4 <alien> 34 <alien> AreDpiAwarenessContextsEqual . ! t
+! -5 <alien> -5 <alien> AreDpiAwarenessContextsEqual . ! t
+! -6 <alien> -6 <alien> AreDpiAwarenessContextsEqual . ! f
+: DPI_AWARENESS_CONTEXT_UNAWARE ( -- DPI_AWARENESS_CONTEXT )
+    -1 <alien> ;
+
+: DPI_AWARENESS_CONTEXT_SYSTEM_AWARE ( -- DPI_AWARENESS_CONTEXT )
+    -2 <alien> ;
+
+: DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE ( -- DPI_AWARENESS_CONTEXT )
+    -3 <alien> ;
+
+: DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 ( -- DPI_AWARENESS_CONTEXT )
+    -4 <alien> ;
+
+: DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED ( -- DPI_AWARENESS_CONTEXT )
+    -5 <alien> ;
+
+FUNCTION: BOOL LogicalToPhysicalPointForPerMonitorDPI (
+    HWND    hWnd,
+    LPPOINT lpPoint
+)
+
+FUNCTION: BOOL PhysicalToLogicalPointForPerMonitorDPI (
+    HWND    hWnd,
+    LPPOINT lpPoint
+)
+
+FUNCTION: BOOL SetDialogControlDpiChangeBehavior (
+    HWND                                hWnd,
+    DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS mask,
+    DIALOG_CONTROL_DPI_CHANGE_BEHAVIORS values
+)
+
+FUNCTION: BOOL SetDialogDpiChangeBehavior (
+    HWND                        hDlg,
+    DIALOG_DPI_CHANGE_BEHAVIORS mask,
+    DIALOG_DPI_CHANGE_BEHAVIORS values
+)
+
+FUNCTION: DPI_HOSTING_BEHAVIOR SetThreadDpiHostingBehavior (
+    DPI_HOSTING_BEHAVIOR value
+)
+
+FUNCTION: BOOL SystemParametersInfoForDpi (
+    UINT  uiAction,
+    UINT  uiParam,
+    PVOID pvParam,
+    UINT  fWinIni,
+    UINT  dpi
+)

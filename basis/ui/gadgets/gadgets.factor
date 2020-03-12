@@ -385,6 +385,8 @@ GENERIC: focusable-child* ( gadget -- child/t )
 
 M: gadget focusable-child* drop t ;
 
+M: f focusable-child* drop f ;
+
 : focusable-child ( gadget -- child )
     dup focusable-child*
     dup t eq? [ drop ] [ nip focusable-child ] if ;

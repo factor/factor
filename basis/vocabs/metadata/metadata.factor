@@ -1,17 +1,20 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes.algebra
+USING: accessors assocs classes.algebra
 combinators.short-circuit continuations io.directories
 io.encodings.utf8 io.files io.pathnames kernel make math.parser
-memoize namespaces sequences sets summary system vocabs
-vocabs.loader words ;
+memoize namespaces sequences summary system vocabs vocabs.loader
+words ;
 IN: vocabs.metadata
 
 : check-vocab ( vocab -- vocab )
     dup find-vocab-root [ no-vocab ] unless ;
 
+: vocab-file-path ( vocab name -- path/f )
+    [ dup vocab-dir ] [ append-path ] bi* vocab-append-path ;
+
 MEMO: vocab-file-lines ( vocab name -- lines/f )
-    vocab-append-path dup [
+    vocab-file-path dup [
         dup exists? [
             utf8 file-lines harvest
         ] [
@@ -20,23 +23,22 @@ MEMO: vocab-file-lines ( vocab name -- lines/f )
     ] when ;
 
 : set-vocab-file-lines ( lines vocab name -- )
-    dupd vocab-append-path [
+    dupd vocab-file-path [
         swap [ ?delete-file ] [ swap utf8 set-file-lines ] if-empty
         \ vocab-file-lines reset-memoized
     ] [ vocab-name no-vocab ] ?if ;
 
-: vocab-resources-path ( vocab -- string )
-    vocab-dir "resources.txt" append-path ;
+: vocab-resources-path ( vocab -- path/f )
+    "resources.txt" vocab-file-path ;
 
 : vocab-resources ( vocab -- patterns )
-    dup vocab-resources-path vocab-file-lines ;
+    "resources.txt" vocab-file-lines ;
 
-: vocab-summary-path ( vocab -- string )
-    vocab-dir "summary.txt" append-path ;
+: vocab-summary-path ( vocab -- path/f )
+    "summary.txt" vocab-file-path ;
 
 : vocab-summary ( vocab -- summary )
-    dup dup vocab-summary-path vocab-file-lines
-    [
+    dup "summary.txt" vocab-file-lines [
         vocab-name " vocabulary" append
     ] [
         nip first
@@ -52,25 +54,25 @@ M: vocab summary
 
 M: vocab-link summary vocab-summary ;
 
-: vocab-tags-path ( vocab -- string )
-    vocab-dir "tags.txt" append-path ;
+: vocab-tags-path ( vocab -- path/f )
+    "tags.txt" vocab-file-path ;
 
 : vocab-tags ( vocab -- tags )
-    dup vocab-tags-path vocab-file-lines ;
+    "tags.txt" vocab-file-lines ;
 
-: vocab-authors-path ( vocab -- string )
-    vocab-dir "authors.txt" append-path ;
+: vocab-authors-path ( vocab -- path/f )
+    "authors.txt" vocab-file-path ;
 
 : vocab-authors ( vocab -- authors )
-    dup vocab-authors-path vocab-file-lines ;
+    "authors.txt" vocab-file-lines ;
 
-: vocab-platforms-path ( vocab -- string )
-    vocab-dir "platforms.txt" append-path ;
+: vocab-platforms-path ( vocab -- path/f )
+    "platforms.txt" vocab-file-path ;
 
 ERROR: bad-platform name ;
 
 : vocab-platforms ( vocab -- platforms )
-    dup vocab-platforms-path vocab-file-lines
+    "platforms.txt" vocab-file-lines
     [ dup "system" lookup-word [ ] [ bad-platform ] ?if ] map ;
 
 : supported-platform? ( platforms -- ? )

@@ -49,9 +49,9 @@ M:: core-text-renderer x>offset ( x font string -- n )
     [ 2drop 0 ] [
         cached-line line>>
         swap scale 0 <CGPoint> CTLineGetStringIndexForPosition
-    ] if-empty
-    2 * 0 swap string utf16n encode subseq
-    utf16n decode length ;
+        2 * 0 swap string utf16n encode subseq
+        utf16n decode length
+    ] if-empty ;
 
 M:: core-text-renderer offset>x ( n font string -- x )
     font string cached-line line>>
