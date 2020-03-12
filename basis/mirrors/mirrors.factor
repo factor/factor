@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.tuple classes.tuple.private
 combinators fry hash-sets hashtables kernel math sequences sets slots
-slots.private summary present formatting ;
+slots.private summary ;
 IN: mirrors
 
 TUPLE: mirror { object read-only } ;
