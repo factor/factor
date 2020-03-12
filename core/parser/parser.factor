@@ -76,7 +76,7 @@ DEFER: scan-object
         ! { [ dup strict-upper-colon? ] [ parse-upper-colon t ] }
         ! { [ dup strict-section? ] [ parse-section t ] }
         ! { [ dup strict-named-section? ] [ parse-named-section t ] }
-        { [ dup strict-single-quote? ] [ parse-single-quote t ] }
+        ! { [ dup strict-single-quote? ] [ parse-single-quote t ] }
         ! { [ dup strict-double-quote? ] [ parse-double-quote t ] }
         ! { [ dup strict-bracket-container? ] [ parse-bracket-container t ] }
         ! { [ dup strict-brace-container? ] [ parse-brace-container t ] }
