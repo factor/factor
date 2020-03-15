@@ -12,7 +12,7 @@ OS=
 ARCH=
 WORD=
 GIT_PROTOCOL=${GIT_PROTOCOL:="git"}
-GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://factorcode.org/git/factor.git"}
+GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://github.com/factor/factor.git"}
 SCRIPT_ARGS="$*"
 
 REQUIRE_CLANG_VERSION=3.1
@@ -467,7 +467,7 @@ invoke_git() {
 }
 
 git_clone() {
-    $ECHO "Downloading the git repository from factorcode.org..."
+    $ECHO "Downloading the git repository from github.com..."
     invoke_git clone $GIT_URL
 }
 
@@ -492,11 +492,13 @@ update_script_changed() {
     invoke_git diff --stat "$(invoke_git merge-base HEAD FETCH_HEAD)" FETCH_HEAD | grep 'build\.sh' >/dev/null
 }
 
-git_fetch_factorcode() {
-    $ECHO "Fetching the git repository from factorcode.org..."
+git_fetch() {
+    $ECHO "Fetching the git repository from github.com..."
+    branch=$(current_git_branch)
 
     rm -f "$(update_script_name)"
-    invoke_git fetch "$GIT_URL" master
+	$ECHO git fetch "$GIT_URL" "$branch"
+    invoke_git fetch "$GIT_URL" "$branch"
 
     if update_script_changed; then
         $ECHO "Updating and restarting the build.sh script..."
@@ -567,7 +569,9 @@ make_clean_factor() {
 }
 
 current_git_branch() {
-    git rev-parse --abbrev-ref HEAD
+    # git rev-parse --abbrev-ref HEAD # outputs HEAD for detached head
+    # outputs nothing for detached HEAD, which is fine for ``git fetch``
+    git describe --all --exact-match 2>/dev/null | sed 's=.*/=='
 }
 
 check_url() {
@@ -624,7 +628,7 @@ update_boot_image() {
         $ECHO "Factorcode md5: $factorcode_md5";
         $ECHO "Disk md5: $disk_md5";
         if [[ "$factorcode_md5" == "$disk_md5" ]] ; then
-            $ECHO "Your disk boot image matches the one on factorcode.org."
+            $ECHO "Your disk boot image matches the one on downloads.factorcode.org."
         else
             $DELETE $BOOT_IMAGE > /dev/null 2>&1
             get_boot_image
@@ -677,7 +681,7 @@ install() {
 
 update() {
     get_config_info
-    git_fetch_factorcode
+    git_fetch
     backup_factor
     make_clean_factor
 }
@@ -770,7 +774,7 @@ if [[ -n "$2" ]] ; then
 fi
 
 if [ "$#" -gt 3 ]; then
-	usage
+    usage
     $ECHO "error: too many arguments"
     exit 1
 fi
