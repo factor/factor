@@ -497,7 +497,7 @@ git_fetch() {
     branch=$(current_git_branch)
 
     rm -f "$(update_script_name)"
-	$ECHO git fetch "$GIT_URL" "$branch"
+    $ECHO git fetch "$GIT_URL" "$branch"
     invoke_git fetch "$GIT_URL" "$branch"
 
     if update_script_changed; then
