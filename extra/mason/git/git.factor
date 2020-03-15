@@ -16,7 +16,7 @@ IN: mason.git
     {
         "git"
         "clone"
-        "git://factorcode.org/git/factor.git"
+        "git://github.com/factor/factor.git"
     } ;
 
 : git-clone ( -- )
@@ -28,7 +28,7 @@ IN: mason.git
     {
         "git"
         "pull"
-        "git://factorcode.org/git/factor.git"
+        "git://github.com/factor/factor.git"
         "master"
     } ;
 
