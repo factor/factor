@@ -72,7 +72,7 @@ creatureo clear-pred
 ] unit-test
 
 { { H{ { Y Tom } } H{ { Y Jerry } } } } [
-    { creatureo Y } 2 query-n
+    { creatureo Y } 2 nquery
 ] unit-test
 
 SYMBOL: Spike

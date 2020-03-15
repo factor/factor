@@ -3,10 +3,10 @@
 USING: accessors arrays assocs classes classes.tuple combinators
 combinators.short-circuit compiler.units continuations
 formatting fry io kernel lexer lists locals make math multiline
-namespaces parser prettyprint prettyprint.backend prettyprint.config
-prettyprint.custom prettyprint.sections quotations sequences
-sequences.deep sets splitting strings words words.symbol
-vectors ;
+namespaces parser prettyprint prettyprint.backend
+prettyprint.config prettyprint.custom prettyprint.sections
+quotations sequences sequences.deep sequences.generalizations
+sets splitting strings vectors words words.symbol ;
 
 IN: logic
 
@@ -36,27 +36,31 @@ INSTANCE: ANONYMOUSE-LOGIC-VAR LOGIC-VAR
 
 SYMBOLS: *trace?* *trace-depth* ;
 
+: define-logic-var ( name -- )
+    create-word-in
+    [ reset-generic ]
+    [ define-symbol ]
+    [ NORMAL-LOGIC-VAR swap set-global ] tri ;
+
+: define-logic-pred ( name -- )
+    create-word-in
+    [ reset-generic ]
+    [ define-symbol ]
+    [ [ name>> <pred> ] keep set-global ] tri ;
+
 PRIVATE>
 
 : trace ( -- ) t *trace?* set-global ;
 
 : notrace ( -- ) f *trace?* set-global ;
 
-SYNTAX: LOGIC-VARS: ";"
-    [
-        create-word-in
-        [ reset-generic ]
-        [ define-symbol ]
-        [ NORMAL-LOGIC-VAR swap set-global ] tri
-    ] each-token ;
+SYNTAX: LOGIC-VAR: scan-token define-logic-var ;
 
-SYNTAX: LOGIC-PREDS: ";"
-    [
-        create-word-in
-        [ reset-generic ]
-        [ define-symbol ]
-        [ [ name>> <pred> ] keep set-global ] tri
-    ] each-token ;
+SYNTAX: LOGIC-VARS: ";" [ define-logic-var ] each-token ;
+
+SYNTAX: LOGIC-PRED: scan-token define-logic-pred ;
+
+SYNTAX: LOGIC-PREDS: ";" [ define-logic-pred ] each-token ;
 >>
 
 SYNTAX: %!
@@ -67,12 +71,12 @@ SYNTAX: %!
 TUPLE: logic-goal pred args ;
 
 : called-args ( args -- args' )
-    [ dup callable? [ call( -- term ) ] when ] map ;
+    [ dup callable? [ call( -- term ) ] when ] map ; inline
 
 :: <goal> ( pred args -- goal )
     pred get args called-args logic-goal boa ; inline
 
-: def>goal ( goal-def -- goal ) unclip swap <goal> ; inline
+: def>goal ( goal-def -- goal ) unclip swap <goal> ;
 
 : normalize ( goal-def/defs -- goal-defs )
     dup {
@@ -93,7 +97,7 @@ TUPLE: logic-env table ;
 : env-clear ( env -- ) table>> clear-assoc ; inline
 
 : dereference ( term env -- term' env' )
-    [ 2dup env-get [ 2nip first2 t ] [ f ] if* ] loop ;
+    [ 2dup env-get [ 2nip first2 t ] [ f ] if* ] loop ; inline
 
 PRIVATE>
 
@@ -107,19 +111,19 @@ M: logic-env at*
         { [ over sequence? ] [
               '[ _ at ] map t ] }
         [ drop t ]
-    } cond ;
+    } cond ; inline
 
 <PRIVATE
 
 TUPLE: callback-env env trail ;
 
-C: <callback-env> callback-env
+C: <callback-env> callback-env inline
 
-M: callback-env at* env>> at* ;
+M: callback-env at* env>> at* ; inline
 
 TUPLE: cut-info cut? ;
 
-C: <cut> cut-info
+C: <cut> cut-info inline
 
 : cut? ( cut-info -- ? ) cut?>> ; inline
 
@@ -128,70 +132,61 @@ C: <cut> cut-info
 : set-info-if-f ( ? cut-info -- )
     dup cut?>> [ 2drop ] [ cut?<< ] if ; inline
 
+: 2each-until ( seq1 seq2 quot -- all-failed? ) 2 nfind 2drop f = ; inline
+
 DEFER: unify*
 
 :: (unify*) ( x! x-env! y! y-env! trail tmp-env -- success? )
     f :> ret-value!  f :> ret?!  f :> ret2?!
-    t :> loop?!
-    [ loop? ] [
-        { { [ x logic-var? ] [
-                x x-env env-get :> xp!
-                xp not [
-                    y y-env dereference y-env! y!
-                    x y = x-env y-env eq? and [
-                        x { y y-env } x-env env-put
-                        x-env tmp-env eq? [
-                            { x x-env } trail push
-                        ] unless
-                    ] unless
-                    f loop?!  t ret?!  t ret-value!
-                ] [
-                    xp first2 x-env! x!
-                    x x-env dereference x-env! x!
-                ] if ] }
-          { [ y logic-var? ] [
-                x y x! y!  x-env y-env x-env! y-env! ] }
-          [ f loop?! ]
+    [
+        {
+            { [ x logic-var? ] [
+                  x x-env env-get :> xp
+                  xp [
+                      xp first2 x-env! x!
+                      x x-env dereference x-env! x!
+                      t
+                  ] [
+                      y y-env dereference y-env! y!
+                      x y = x-env y-env eq? and [
+                          x { y y-env } x-env env-put
+                          x-env tmp-env eq? [
+                              { x x-env } trail push
+                          ] unless
+                      ] unless
+                      t ret?!  t ret-value!
+                      f
+                  ] if ] }
+            { [ y logic-var? ] [
+                  x y x! y!  x-env y-env x-env! y-env!
+                  t ] }
+            [ f ]
         } cond
-    ] while
+    ] loop
     ret? [
         t ret-value!
         x y [ logic-goal? ] both? [
             x pred>> y pred>> = [
                 x args>> x!  y args>> y!
             ] [
-                f ret-value! t ret2?!
+                f ret-value!  t ret2?!
             ] if
         ] when
         ret2? [
             {
                 { [ x y [ tuple? ] both? ] [
                       x y [ class-of ] same? [
-                          x y [ tuple-slots ] bi@ :> ( x-slots y-slots )
-                          0 :> i!  x-slots length 1 - :> stop-i  t :> loop?!
-                          [ i stop-i <= loop? and ] [
-                              x-slots y-slots [ i swap nth ] bi@
-                                  :> ( x-item y-item )
-                              x-item x-env y-item y-env trail tmp-env unify* [
-                                  f loop?!
-                                  f ret-value!
-                              ] unless
-                              i 1 + i!
-                          ] while
-                      ] [ f ret-value! ] if ] }
+                          x y [ tuple-slots ] bi@ [| x-item y-item |
+                              x-item x-env y-item y-env trail tmp-env unify* not
+                          ] 2each-until
+                      ] [ f ] if ret-value! ] }
                 { [ x y [ sequence? ] both? ] [
                       x y [ class-of ] same? x y [ length ] same? and [
-                          0 :> i!  x length 1 - :> stop-i  t :> loop?!
-                          [ i stop-i <= loop? and ] [
-                              x y [ i swap nth ] bi@ :> ( x-item y-item )
-                              x-item x-env y-item y-env trail tmp-env unify* [
-                                  f loop?!
-                                  f ret-value!
-                              ] unless
-                              i 1 + i!
-                          ] while
-                      ] [ f ret-value! ] if ] }
-                [  x y = ret-value! ]
+                          x y [| x-item y-item |
+                              x-item x-env y-item y-env trail tmp-env unify* not
+                          ] 2each-until
+                      ] [ f ] if ret-value! ] }
+                [ x y = ret-value! ]
             } cond
         ] unless
     ] unless
@@ -212,54 +207,159 @@ DEFER: unify*
         success? [ "==> Success\n" ] [ "==> Fail\n" ] if "%s\n" printf
         *trace-depth* get-global 1 - *trace-depth* set-global
     ] when
-    success? ;
+    success? ; inline
 
-: each-until ( seq quot -- ) find 2drop ; inline
+SYMBOLS:
+    s-start:
+    s-not-empty:
+    s-cut: s-cut/iter:
+    s-not-cut:
+    s-defs-loop:
+    s-callable: s-callable/iter:
+    s-not-callable: s-not-callable/outer-iter: s-not-callable/inner-iter:
+    s-unify?-exit:
+    s-defs-loop-end:
+    s-end: ;
 
-:: resolve-body ( body env cut quot: ( -- ) -- )
-    body empty? [
-        quot call( -- )
-    ] [
-        body unclip :> ( rest-goals! first-goal! )
-        first-goal !! = [  ! cut
-            rest-goals env cut quot resolve-body
-            t cut set-info
-        ] [
-            first-goal callable? [
-                first-goal call( -- goal ) first-goal!
-            ] when
-            *trace?* get-global [
-                first-goal
-                [ pred>> name>> "in: { %s " printf ]
-                [ args>> [ "%u " printf ] each "}\n" printf ] bi
-            ] when
-            <env> :> d-env!
-            f <cut> :> d-cut!
-            first-goal pred>> defs>> [
-                first2 :> ( d-head d-body )
-                first-goal d-head [ args>> length ] same? [
-                    d-cut cut? cut cut? or [ t ] [
-                        V{ } clone :> trail
-                        first-goal env d-head d-env trail d-env unify* [
-                            d-body callable? [
-                                d-env trail <callback-env> d-body call( cb-env -- ? ) [
-                                    rest-goals env cut quot resolve-body
-                                ] when
-                            ] [
-                                d-body d-env d-cut [
-                                    rest-goals env cut quot resolve-body
-                                    cut cut? d-cut set-info-if-f
-                                ] resolve-body
-                            ] if
-                        ] when
-                        trail [ first2 env-delete ] each
-                        d-env env-clear
-                        f
-                    ] if
-                ] [ f ] if
-            ] each-until
-        ] if
-    ] if ;
+TUPLE: resolver-gen
+    { state initial: s-start: }
+    body env cut
+    first-goal rest-goals d-head d-body defs trail d-env d-cut
+    sub-resolver1 sub-resolver2 i loop-end
+    yield? return? ;
+
+:: <resolver> ( body env cut -- resolver )
+    resolver-gen new
+        body >>body env >>env cut >>cut ; inline
+
+GENERIC: next ( generator -- yield? )
+
+M:: resolver-gen next ( resolver -- yield? )
+    [
+        f resolver return?<<
+        f resolver yield?<<
+        resolver state>> {
+            { s-start: [
+                  resolver body>> empty? [
+                      t resolver yield?<<
+                      s-end: resolver state<<
+                  ] [
+                      s-not-empty: resolver state<<
+                  ] if ] }
+            { s-not-empty: [
+                  resolver body>> unclip
+                  [ resolver rest-goals<< ] [ resolver first-goal<< ] bi*
+                  resolver first-goal>> !! = [  ! cut
+                      s-cut: resolver state<<
+                  ] [
+                      s-not-cut: resolver state<<
+                  ] if ] }
+            { s-cut: [
+                  resolver [ rest-goals>> ] [ env>> ] [ cut>> ] tri <resolver>
+                  resolver sub-resolver1<<
+                  s-cut/iter: resolver state<< ] }
+            { s-cut/iter: [
+                  resolver sub-resolver1>> next [
+                      t resolver yield?<<
+                  ] [
+                      t resolver cut>> set-info
+                      s-end: resolver state<<
+                  ] if ] }
+            { s-not-cut: [
+                  resolver first-goal>> callable? [
+                      resolver first-goal>> call( -- goal ) resolver first-goal<<
+                  ] when
+                  *trace?* get-global [
+                      resolver first-goal>>
+                      [ pred>> name>> "in: { %s " printf ]
+                      [ args>> [ "%u " printf ] each "}\n" printf ] bi
+                  ] when
+                  <env> resolver d-env<<
+                  f <cut> resolver d-cut<<
+                  resolver first-goal>> pred>> defs>> dup resolver defs<<
+                  length 1 - dup 0 >= [
+                      resolver loop-end<<
+                      0 resolver i<<
+                      s-defs-loop: resolver state<<
+                  ] [
+                      drop
+                      s-end: resolver state<<
+                  ] if ] }
+            { s-defs-loop: [
+                  resolver [ i>> ] [ defs>> ] bi nth
+                  first2 [ resolver d-head<< ] [ resolver d-body<< ] bi*
+                  resolver d-cut>> cut? resolver cut>> cut? or [
+                      s-end: resolver state<<
+                  ] [
+                      V{ } clone resolver trail<<
+                      resolver {
+                          [ first-goal>> ]
+                          [ env>> ]
+                          [ d-head>> ]
+                          [ d-env>> ]
+                          [ trail>> ]
+                          [ d-env>> ]
+                      } cleave unify* [
+                          resolver d-body>> callable? [
+                              s-callable: resolver state<<
+                          ] [
+                              s-not-callable: resolver state<<
+                          ] if
+                      ] [
+                          s-unify?-exit: resolver state<<
+                      ] if
+                  ] if ] }
+            { s-callable: [
+                  resolver [ d-env>> ] [ trail>> ] bi <callback-env>
+                  resolver d-body>> call( cb-env -- ? ) [
+                      resolver [ rest-goals>> ] [ env>> ] [ cut>> ] tri <resolver>
+                      resolver sub-resolver1<<
+                      s-callable/iter: resolver state<<
+                  ] [
+                      s-unify?-exit: resolver state<<
+                  ] if ] }
+            { s-callable/iter: [
+                  resolver sub-resolver1>> next [
+                      t resolver yield?<<
+                  ] [
+                      s-unify?-exit: resolver state<<
+                  ] if ] }
+            { s-not-callable: [
+                  resolver [ d-body>> ] [ d-env>> ] [ d-cut>> ] tri <resolver>
+                  resolver sub-resolver1<<
+                  s-not-callable/outer-iter: resolver state<< ] }
+            { s-not-callable/outer-iter: [
+                  resolver sub-resolver1>> next [
+                      resolver [ rest-goals>> ] [ env>> ] [ cut>> ] tri <resolver>
+                      resolver sub-resolver2<<
+                      s-not-callable/inner-iter: resolver state<<
+                  ] [
+                      s-unify?-exit: resolver state<<
+                  ] if ] }
+            { s-not-callable/inner-iter: [
+                  resolver sub-resolver2>> next [
+                      t resolver yield?<<
+                  ] [
+                      resolver cut>> cut? resolver d-cut>> set-info-if-f
+                      s-not-callable/outer-iter: resolver state<<
+                  ] if ] }
+            { s-unify?-exit: [
+                  resolver trail>> [ first2 env-delete ] each
+                  resolver d-env>> env-clear
+                  s-defs-loop-end: resolver state<< ] }
+            { s-defs-loop-end: [
+                  resolver [ i>> ] [ loop-end>> ] bi >= [
+                      s-end: resolver state<<
+                  ] [
+                      resolver [ 1 + ] change-i drop
+                      s-defs-loop: resolver state<<
+                  ] if ] }
+            { s-end: [
+                  t resolver return?<< ] }
+        } case
+        resolver [ yield?>> ] [ return?>> ] bi or [ f ] [ t ] if
+    ] loop
+    resolver yield?>> ;
 
 : split-body ( body -- bodies ) { ;; } split [ >array ] map ;
 
@@ -288,30 +388,18 @@ SYMBOL: *anonymouse-var-no*
 : collect-logic-vars ( seq -- vars-array )
     [ logic-var? ] deep-filter members ;
 
-:: (resolve) ( goal-def/defs quot: ( env -- ) -- )
-    goal-def/defs replace-'__' normalize [ def>goal ] map :> goals
-    <env> :> env
-    goals env f <cut> [ env quot call( env -- ) ] resolve-body ;
-
-: resolve ( goal-def/defs quot: ( env -- ) -- ) (resolve) ;
-
-: resolve* ( goal-def/defs -- ) [ drop ] resolve ;
-
 SYMBOL: dummy-item
 
 :: negation-goal ( goal -- negation-goal )
     "failo_" <pred> :> f-pred
     f-pred { } clone logic-goal boa :> f-goal
     V{ { f-goal [ drop f ] } } f-pred defs<<
-    "trueo_" <pred> :> t-pred
-    t-pred { } clone logic-goal boa :> t-goal
-    V{ { t-goal [ drop t ] } } t-pred defs<<
     goal pred>> name>> "\\+%s_" sprintf <pred> :> negation-pred
     negation-pred goal args>> clone logic-goal boa :> negation-goal
     V{
-        { negation-goal { goal !! f-goal } }
-        { negation-goal { t-goal } }
-    } negation-pred defs<<  ! \+P_ { P !! { failo_ } ;; { trueo_ } } rule
+        { negation-goal { goal !! f-goal } } ! \+P_ { P !! { failo_ } } rule
+        { negation-goal { } }                ! \+P_ fact
+    } negation-pred defs<<
     negation-goal ;
 
 SYMBOLS: at-the-beginning at-the-end ;
@@ -360,17 +448,17 @@ SYMBOLS: at-the-beginning at-the-end ;
 
 PRIVATE>
 
-: rule ( head body -- ) at-the-end (rule) ; inline
+: rule ( head body -- ) at-the-end (rule) ;
 
-: rule* ( head body -- ) at-the-beginning (rule) ; inline
+: rule* ( head body -- ) at-the-beginning (rule) ;
 
-: rules ( defs -- ) [ first2 rule ] each ; inline
+: rules ( defs -- ) [ first2 rule ] each ;
 
-: fact ( head -- ) at-the-end (fact) ; inline
+: fact ( head -- ) at-the-end (fact) ;
 
-: fact* ( head -- ) at-the-beginning (fact) ; inline
+: fact* ( head -- ) at-the-beginning (fact) ;
 
-: facts ( defs -- ) [ fact ] each ; inline
+: facts ( defs -- ) [ fact ] each ;
 
 :: callback ( head quot: ( callback-env -- ? ) -- )
     head def>goal :> head-goal
@@ -459,7 +547,100 @@ PRIVATE>
     } invoke*-pred defs<<
     invoke*-goal ;
 
-:: query-n ( goal-def/defs n/f -- bindings-array/success? )
+:: nquery ( goal-def/defs n/f -- bindings-array/success? )
+    *trace?* get-global :> trace?
+    0 :> n!
+    f :> success?!
+    V{ } clone :> bindings
+    <env> :> env
+    goal-def/defs replace-'__' normalize [ def>goal ] map
+    env f <cut>
+    <resolver> :> resolver
+    [
+        [
+            resolver next dup [
+                resolver env>> table>> keys [ get NORMAL-LOGIC-VAR? ] filter
+                [ dup env at ] H{ } map>assoc
+                trace? get-global [ dup [ "%u: %u\n" printf ] assoc-each ] when
+                bindings push
+                t success?!
+                n/f [
+                    n 1 + n!
+                    n n/f >= [ return ] when
+                ] when
+            ] when
+        ] loop
+    ] with-return
+     bindings dup {
+        [ empty? ]
+        [ first keys empty? ]
+    } 1|| [ drop success? ] [ >array ] if ;
+
+: query ( goal-def/defs -- bindings-array/success? ) f nquery ;
+
+! nquery has been modified to use generators created by finite
+! state machines to reduce stack consumption.
+! Since the processing algorithm of the code is difficult
+! to understand, the words no longer used are kept as private
+! words for verification.
+
+<PRIVATE
+
+: each-until ( seq quot -- ) find 2drop ; inline
+
+:: resolve-body ( body env cut quot: ( -- ) -- )
+    body empty? [
+        quot call( -- )
+    ] [
+        body unclip :> ( rest-goals! first-goal! )
+        first-goal !! = [  ! cut
+            rest-goals env cut quot resolve-body
+            t cut set-info
+        ] [
+            first-goal callable? [
+                first-goal call( -- goal ) first-goal!
+            ] when
+            *trace?* get-global [
+                first-goal
+                [ pred>> name>> "in: { %s " printf ]
+                [ args>> [ "%u " printf ] each "}\n" printf ] bi
+            ] when
+            <env> :> d-env!
+            f <cut> :> d-cut!
+            first-goal pred>> defs>> [
+                first2 :> ( d-head d-body )
+                first-goal d-head [ args>> length ] same? [
+                    d-cut cut? cut cut? or [ t ] [
+                        V{ } clone :> trail
+                        first-goal env d-head d-env trail d-env unify* [
+                            d-body callable? [
+                                d-env trail <callback-env> d-body call( cb-env -- ? ) [
+                                    rest-goals env cut quot resolve-body
+                                ] when
+                            ] [
+                                d-body d-env d-cut [
+                                    rest-goals env cut quot resolve-body
+                                    cut cut? d-cut set-info-if-f
+                                ] resolve-body
+                            ] if
+                        ] when
+                        trail [ first2 env-delete ] each
+                        d-env env-clear
+                        f
+                    ] if
+               ] [ f ] if
+            ] each-until
+        ] if
+    ] if ;
+
+:: (resolve) ( goal-def/defs quot: ( env -- ) -- )
+    goal-def/defs replace-'__' normalize [ def>goal ] map :> goals
+    <env> :> env
+    goals env f <cut> [ env quot call( env -- ) ] resolve-body ;
+
+: resolve ( goal-def/defs quot: ( env -- ) -- ) (resolve) ;
+
+:: nquery/rec ( goal-def/defs n/f -- bindings-array/success? )
     *trace?* get-global :> trace?
     0 :> n!
     f :> success?!
@@ -479,11 +660,13 @@ PRIVATE>
     ] with-return
     bindings dup {
         [ empty? ]
-        [ first keys [ get NORMAL-LOGIC-VAR? ] any? not ]
+        [ first keys empty? ]
     } 1|| [ drop success? ] [ >array ] if ;
 
-: query ( goal-def/defs -- bindings-array/success? ) f query-n ;
+: query/rec ( goal-def/defs -- bindings-array/success? )
+    f nquery/rec ;
 
+PRIVATE>
 
 ! Built-in predicate definitions -----------------------------------------------------
 
@@ -492,15 +675,14 @@ LOGIC-PREDS:
     varo nonvaro
     (<) (>) (>=) (=<) (==) (\==) (=) (\=)
     writeo writenlo nlo
-    membero appendo lengtho listo
-;
+    membero appendo lengtho listo ;
 
 { trueo } [ drop t ] callback
 
 { failo } [ drop f ] callback
 
 
-<PRIVATE LOGIC-VARS: A B C X Y Z ; PRIVATE>
+<PRIVATE LOGIC-VARS: X Y Z ; PRIVATE>
 
 { varo X } [ X of logic-var? ] callback
 
@@ -554,25 +736,21 @@ LOGIC-PREDS:
 { nlo } [ drop nl t ] callback
 
 
-{ membero X L{ X . Z } } fact
-{ membero X L{ Y . Z } } { membero X Z } rule
+<PRIVATE LOGIC-VARS: L L1 L2 L3 Head Tail N N1 ; PRIVATE>
 
-{ appendo L{ } A A } fact
-{ appendo L{ A . X } Y L{ A . Z } } {
-    { appendo X Y Z }
+{ membero X L{ X . Tail } } fact
+{ membero X L{ Head . Tail } } { membero X Tail } rule
+
+{ appendo L{ } L L } fact
+{ appendo L{ X . L1 } L2 L{ X . L3 } } {
+    { appendo L1 L2 L3 }
 } rule
-
-
-<PRIVATE LOGIC-VARS: Tail N N1 ; PRIVATE>
 
 { lengtho L{ } 0 } fact
 { lengtho L{ __ . Tail } N } {
     { lengtho Tail N1 }
     [ [ N1 of 1 + ] N is ]
 } rule
-
-
-<PRIVATE LOGIC-VARS: L ; PRIVATE>
 
 { listo L{ } } fact
 { listo L{ __ . __ } } fact
