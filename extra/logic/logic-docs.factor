@@ -107,6 +107,22 @@ HELP: =\=
 { $description "The quotations takes an environment and returns two values. " { $snippet "=\\=" } " returns the internal representation of the goal which returns t if values returned by the quotation are numbers and are not same.\n" { $snippet "=\\=" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, " { $snippet "logic" } " uses the internal definition of the goal obtained by calling it." }
 { $see-also (==) =:= } ;
 
+HELP: LOGIC-PRED:
+{ $description "Creates a new logic predicate." }
+{ $syntax "LOGIC-PRED: pred" }
+{ $examples
+  { $code
+    "USE: logic"
+    "IN: scratchpad"
+    ""
+    "LOGIC-PRED: cato"
+    "SYMBOL: Tom"
+    ""
+    "{ cato Tom } fact"
+  }
+}
+{ $see-also \ LOGIC-PREDS: } ;
+
 HELP: LOGIC-PREDS:
 { $description "Creates a new logic predicate for every token until the ;." }
 { $syntax "LOGIC-PREDS: preds... ;" }
@@ -121,7 +137,26 @@ HELP: LOGIC-PREDS:
     "{ cato Tom } fact"
     "{ mouseo Jerry } fact"
   }
-} ;
+}
+{ $see-also \ LOGIC-PRED: } ;
+
+HELP: LOGIC-VAR:
+{ $description "Creates a new logic variable." }
+{ $syntax "LOGIC-VAR: var" }
+{ $examples
+  { $example
+    "USING: logic prettyprint ;"
+    "IN: scratchpad"
+    ""
+    "LOGIC-PRED: mouseo"
+    "LOGIC-VAR: X"
+    "SYMBOL: Jerry"
+    "{ mouseo Jerry } fact"
+    "{ mouseo X } query ."
+    "{ H{ { X Jerry } } }"
+  }
+}
+{ $see-also \ LOGIC-VARS: } ;
 
 HELP: LOGIC-VARS:
 { $description "Creates a new logic variable for every token until the ;." }
@@ -131,14 +166,15 @@ HELP: LOGIC-VARS:
     "USING: logic prettyprint ;"
     "IN: scratchpad"
     ""
-    "LOGIC-PREDS: mouseo ;"
+    "LOGIC-PRED: mouseo"
     "LOGIC-VARS: X ;"
     "SYMBOL: Jerry"
     "{ mouseo Jerry } fact"
     "{ mouseo X } query ."
     "{ H{ { X Jerry } } }"
   }
-} ;
+}
+{ $see-also \ LOGIC-VAR: } ;
 
 HELP: %!
 { $description "A multiline comment. Despite being a Prolog single-line comment, " { $link % } " is already well-known in Factor, so this variant is given instead." }
@@ -192,8 +228,8 @@ HELP: __
     ""
     "SYMBOLS: Tom Jerry Nibbles ;"
     "TUPLE: house living dining kitchen in-the-wall ;"
-    "LOGIC-PREDS: houseo ;"
-    "LOGIC-VARS: X ;"
+    "LOGIC-PRED: houseo"
+    "LOGIC-VAR: X"
 
     ""
     "{ houseo T{ house"
@@ -240,7 +276,7 @@ HELP: callback
 { $description "Set the quotation to be called. Such quotations take an environment which holds the binding of logic variables, and returns t or " { $link f } " as a result of execution. To retrieve the values of logic variables in the environment, use " { $link of } " or " { $link at } "." }
 { $examples
   { $code
-    "LOGIC-PREDS: N_>_0 ;"
+    "LOGIC-PRED: N_>_0"
     "{ N_>_0 N } [ N of 0 > ] callback"
   }
 }
@@ -271,9 +307,9 @@ HELP: clear-pred
     "USING: logic prettyprint ;"
     "IN: scratchpad"
     ""
-    "LOGIC-PREDS: mouseo ;"
+    "LOGIC-PRED: mouseo"
     "SYMBOLS: Jerry Nibbles ;"
-    "LOGIC-VARS: X ;"
+    "LOGIC-VAR: X"
     ""
     "{ mouseo Jerry } fact"
     "{ mouseo Nibbles } fact"
@@ -352,7 +388,7 @@ HELP: invoke
     "USING: logic kernel lists assocs locals math prettyprint ;"
     "IN: scratchpad"
     ""
-    "LOGIC-PREDS: fibo ;"
+    "LOGIC-PRED: fibo"
     "LOGIC-VARS: F F1 F2 N N1 N2 ;"
     ""
     "{ fibo 1 1 } fact"
@@ -392,7 +428,7 @@ HELP: lengtho
     "IN: scratchpad"
     ""
     "SYMBOLS: Tom Jerry Nibbles ;"
-    "LOGIC-VARS: X ;"
+    "LOGIC-VAR: X"
     ""
     "{ lengtho L{ Tom Jerry Nibbles } 3 } query ."
     "{ lengtho L{ Tom Jerry Nibbles } X } query ."
@@ -484,9 +520,9 @@ When you query with logic variable(s), you will get the answer for the logic var
     "t\nf\n{ H{ { X Jerry } } H{ { X Nibbles } } }"
   }
 }
-{ $see-also query-n } ;
+{ $see-also nquery } ;
 
-HELP: query-n
+HELP: nquery
 { $values
     { "goal-def/defs" "a goal def or an array of goal defs" } { "n/f" "the highest number of responses" }
     { "bindings-array/success?" "anser" }
@@ -505,7 +541,7 @@ HELP: retract
     "USING: logic prettyprint ;"
     "IN: scratchpad"
     ""
-    "LOGIC-PREDS: mouseo ;"
+    "LOGIC-PRED: mouseo"
     "SYMBOLS: Jerry Nibbles ;"
     ""
     "{ mouseo Jerry } fact"
@@ -529,7 +565,7 @@ HELP: retract-all
     "USING: logic prettyprint ;"
     "IN: scratchpad"
     ""
-    "LOGIC-PREDS: mouseo ;"
+    "LOGIC-PRED: mouseo"
     "SYMBOLS: Jerry Nibbles ;"
     ""
     "{ mouseo Jerry } fact"
@@ -662,7 +698,7 @@ LOGIC-PREDS: cato mouseo creatureo ;
 LOGIC-VARS: X Y ;
 SYMBOLS: Tom Jerry Nibbles ;"
 } $nl
-"In the DSL, words that represent relationships are called " { $strong "logic predicates" } ". Use " { $link \ LOGIC-PREDS: } " to declare the predicates you want to use. " { $strong "Logic variables" } " are used to represent relationships. use " { $link \ LOGIC-VARS: } " to declare the logic variables you want to use." $nl
+"In the DSL, words that represent relationships are called " { $strong "logic predicates" } ". Use " { $link \ LOGIC-PRED: } " or " { $link \ LOGIC-PREDS: } " to declare the predicates you want to use. " { $strong "Logic variables" } " are used to represent relationships. use " { $link \ LOGIC-VAR: } " or " { $link \ LOGIC-VARS: } " to declare the logic variables you want to use." $nl
 "In the above code, logic predicates end with the character 'o', which is a convention borrowed from miniKanren and so on, and means relation. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: " { $snippet "cat°" } ", " { $snippet "mouse°" } " and " { $snippet "creature°" } ", but we use 'o' because it's easy to type." $nl
 { $strong "Goals" } " are questions that " { $snippet "logic" } " tries to meet to be true. To represent a goal, write an array with a logic predicate followed by zero or more arguments. " { $snippet "logic" } " converts such definitions to internal representations." $nl
 { $code "{ LOGIC-PREDICATE ARG1 ARG2 ... }" }
@@ -728,7 +764,7 @@ SYMBOLS: Tom Jerry Nibbles ;"
 } $nl
 "To tell the truth, we were able to describe at once that cats and mice were creatures by doing the following." $nl
 { $code
-"LOGIC-PREDS: creatureo ;
+"LOGIC-PRED: creatureo
 
 { creatureo Y } {
     { cato Y } ;; { mouseo Y }
@@ -743,9 +779,9 @@ $nl
   "Gh { Gb6 } rule"
 } $nl
 { $snippet "logic" } " actually converts the disjunction in that way. You may need to be careful about that when deleting definitions that you registered using " { $link rule } ", etc." $nl
-"You can use " { $link query-n } " to limit the number of answers to a query. Specify a number greater than or equal to 1." $nl
+"You can use " { $link nquery } " to limit the number of answers to a query. Specify a number greater than or equal to 1." $nl
 { $unchecked-example
-"{ creatureo Y } 2 query-n ."
+"{ creatureo Y } 2 nquery ."
 "{ H{ { Y Tom } } H{ { Y Jerry } } }"
 } $nl
 "Use " { $link \+ } " to express " { $strong "negation" } ". " { $link \+ } " acts on the goal immediately following it." $nl
@@ -776,7 +812,9 @@ $nl
 "Such quotations are called only once when converting the goal definitions to internal representations." $nl
 { $link membero } " is a built-in logic predicate for the relationship an element is in a list." $nl
 { $unchecked-example
-  "SYMBOL: Spike
+  "USE: lists
+SYMBOL: Spike
+
 { membero Jerry L{ Tom Jerry Nibbles } } query .
 { membero Spike [ Tom Jerry Nibbles L{ } cons cons cons ] } query ."
 "t\nf"
@@ -784,7 +822,7 @@ $nl
 "Recently, they moved into a small house. The house has a living room, a dining room and a kitchen. Well, humans feel that way. Each of them seems to be in their favorite room." $nl
 { $code
 "TUPLE: house living dining kitchen in-the-wall ;
-LOGIC-PREDS: houseo ;
+LOGIC-PRED: houseo
 
 { houseo T{ house { living Tom } { dining f } { kitchen Nibbles } { in-the-wall Jerry } } } fact"
 } $nl
@@ -839,7 +877,7 @@ SYMBOLS: mouse cat milk cheese fresh-milk Emmentaler ;
 } $nl
 "This is a problematical answer. We have to redefine " { $snippet "consumeso" } "." $nl
 { $code
-"LOGIC-PREDS: consumeso ;
+"LOGIC-PRED: consumeso
 
 { consumeso X milk } {
     { is-ao X mouse } ;;
@@ -886,7 +924,7 @@ mouseo clear-pred
 
 { mouseo Y } query .
 
-{ creatureo Y } 2 query-n ."
+{ creatureo Y } 2 nquery ."
 "{ H{ { Y Nibbles } } H{ { Y Jerry } } }\n{ H{ { Y Tom } } H{ { Y Nibbles } } }"
 } $nl
 "While " { $link clear-pred } " clears all the definition information for a given logic predicate, " { $link retract } " and " { $link retract-all } " provide selective clearing." $nl
@@ -940,7 +978,7 @@ mouseo clear-pred
 { $code
 "USE: logic
 
-LOGIC-PREDS: factorialo ;
+LOGIC-PRED: factorialo
 LOGIC-VARS: N N2 F F2 ;
 
 { factorialo 0 1 } fact
@@ -999,7 +1037,7 @@ LOGIC-VARS: N N2 F F2 ;
 { $code
 "USE: logic
 
-LOGIC-PREDS: factorialo ;
+LOGIC-PRED: factorialo
 LOGIC-VARS: N N2 F F2 ;
 
 { factorialo 0 1 } fact

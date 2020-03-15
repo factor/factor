@@ -493,13 +493,13 @@ update_script_changed() {
     invoke_git diff --stat "$(invoke_git merge-base HEAD FETCH_HEAD)" FETCH_HEAD | grep 'build\.sh' >/dev/null
 }
 
-git_fetch_factorcode() {
+git_fetch() {
     $ECHO "Fetching the git repository from github.com..."
     branch=$(current_git_branch)
 
     rm -f "$(update_script_name)"
-    invoke_git fetch "$GIT_URL"
-    invoke_git fetch "$GIT_URL" --tags
+	$ECHO git fetch "$GIT_URL" "$branch"
+    invoke_git fetch "$GIT_URL" "$branch"
 
     if update_script_changed; then
         $ECHO "Updating and restarting the build.sh script..."
@@ -570,7 +570,9 @@ make_clean_factor() {
 }
 
 current_git_branch() {
-    git rev-parse --abbrev-ref HEAD
+    # git rev-parse --abbrev-ref HEAD # outputs HEAD for detached head
+    # outputs nothing for detached HEAD, which is fine for ``git fetch``
+    git describe --all --exact-match 2>/dev/null | sed 's=.*/=='
 }
 
 check_url() {
@@ -680,7 +682,7 @@ install() {
 
 update() {
     get_config_info
-    git_fetch_factorcode
+    git_fetch
     backup_factor
     make_clean_factor
 }
@@ -773,7 +775,7 @@ if [[ -n "$2" ]] ; then
 fi
 
 if [ "$#" -gt 3 ]; then
-	usage
+    usage
     $ECHO "error: too many arguments"
     exit 1
 fi
