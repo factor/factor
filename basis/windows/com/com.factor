@@ -40,11 +40,6 @@ COM-INTERFACE: IDropTarget IUnknown {00000122-0000-0000-C000-000000000046}
     HRESULT DragOver ( DWORD grfKeyState, POINTL pt, DWORD* pdwEffect )
     HRESULT DragLeave ( )
     HRESULT Drop ( IDataObject* pDataObject, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect ) ;
-
-TYPEDEF: LPWSTR LPCOLESTR
-TYPEDEF: LPWSTR OLESTR
-TYPEDEF: OLESTR** SNB
-TYPEDEF: wchar_t* OLECHAR
 C-TYPE: IEnumSTATSTG
 
 STRUCT: STATSTG
@@ -60,6 +55,7 @@ STRUCT: STATSTG
     { grfStateBits DWORD }
     { reserved DWORD } ;
 
+C-TYPE: IStream
 COM-INTERFACE: IStorage IUnknown {0000000B-0000-0000-C000-000000000046}
     HRESULT Commit ( DWORD grfCommitFlags )
     HRESULT CopyTo ( DWORD ciidExclude, IID *rgiidExclude, SNB snbExclude, IStorage *pstgDest )
