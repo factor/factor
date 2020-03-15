@@ -12,7 +12,7 @@ OS=
 ARCH=
 WORD=
 GIT_PROTOCOL=${GIT_PROTOCOL:="git"}
-GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://factorcode.org/git/factor.git"}
+GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://github.com/factor/factor.git"}
 SCRIPT_ARGS="$*"
 
 REQUIRE_CLANG_VERSION=3.1
@@ -467,7 +467,7 @@ invoke_git() {
 }
 
 git_clone() {
-    $ECHO "Downloading the git repository from factorcode.org..."
+    $ECHO "Downloading the git repository from github.com..."
     invoke_git clone $GIT_URL
 }
 
@@ -494,7 +494,7 @@ update_script_changed() {
 }
 
 git_fetch_factorcode() {
-    $ECHO "Fetching the git repository from factorcode.org..."
+    $ECHO "Fetching the git repository from github.com..."
     branch=$(current_git_branch)
 
     rm -f "$(update_script_name)"
@@ -627,7 +627,7 @@ update_boot_image() {
         $ECHO "Factorcode md5: $factorcode_md5";
         $ECHO "Disk md5: $disk_md5";
         if [[ "$factorcode_md5" == "$disk_md5" ]] ; then
-            $ECHO "Your disk boot image matches the one on factorcode.org."
+            $ECHO "Your disk boot image matches the one on downloads.factorcode.org."
         else
             $DELETE $BOOT_IMAGE > /dev/null 2>&1
             get_boot_image
