@@ -514,7 +514,7 @@ PRIVATE>
 : 4seq ( parser1 parser2 parser3 parser4 -- parser )
     4array seq ;
 
-: seq* ( quot -- paser )
+: seq* ( quot -- parser )
     { } make seq ; inline
 
 : choice ( seq -- parser )
@@ -529,7 +529,7 @@ PRIVATE>
 : 4choice ( parser1 parser2 parser3 parser4 -- parser )
     4array choice ;
 
-: choice* ( quot -- paser )
+: choice* ( quot -- parser )
     { } make choice ; inline
 
 : repeat0 ( parser -- parser )
