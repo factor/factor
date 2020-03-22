@@ -21,7 +21,57 @@ FUNCTION: uint32_t randombytes_uniform ( uint32_t upper_bound )
 FUNCTION: void randombytes_stir ( )
 
 ! crypto_pwhash_argon2id_H
+CONSTANT: crypto_pwhash_argon2id_ALG_ARGON2ID13 2
+CONSTANT: crypto_pwhash_argon2id_BYTES_MIN 16
+CONSTANT: crypto_pwhash_argon2id_BYTES_MAX 4294967295
+CONSTANT: crypto_pwhash_argon2id_PASSWD_MIN 0
+CONSTANT: crypto_pwhash_argon2id_PASSWD_MAX 4294967295
+CONSTANT: crypto_pwhash_argon2id_SALTBYTES 16
 CONSTANT: crypto_pwhash_argon2id_STRBYTES 128
+CONSTANT: crypto_pwhash_argon2id_STRPREFIX "$argon2id$"
+CONSTANT: crypto_pwhash_argon2id_OPSLIMIT_MIN 1
+CONSTANT: crypto_pwhash_argon2id_OPSLIMIT_MAX 4294967295
+CONSTANT: crypto_pwhash_argon2id_MEMLIMIT_MIN 8192
+CONSTANT: crypto_pwhash_argon2id_MEMLIMIT_MAX 4398046510080
+CONSTANT: crypto_pwhash_argon2id_OPSLIMIT_INTERACTIVE 2
+CONSTANT: crypto_pwhash_argon2id_MEMLIMIT_INTERACTIVE 67108864
+CONSTANT: crypto_pwhash_argon2id_OPSLIMIT_MODERATE 3
+CONSTANT: crypto_pwhash_argon2id_MEMLIMIT_MODERATE 268435456
+CONSTANT: crypto_pwhash_argon2id_OPSLIMIT_SENSITIVE 4
+CONSTANT: crypto_pwhash_argon2id_MEMLIMIT_SENSITIVE 1073741824
+
+FUNCTION: int crypto_pwhash_argon2id_alg_argon2id13 ( )
+FUNCTION: size_t crypto_pwhash_argon2id_bytes_min ( )
+FUNCTION: size_t crypto_pwhash_argon2id_bytes_max ( )
+FUNCTION: size_t crypto_pwhash_argon2id_passwd_min ( )
+FUNCTION: size_t crypto_pwhash_argon2id_passwd_max ( )
+FUNCTION: size_t crypto_pwhash_argon2id_saltbytes ( )
+FUNCTION: size_t crypto_pwhash_argon2id_strbytes ( )
+FUNCTION: char* crypto_pwhash_argon2id_strprefix ( )
+FUNCTION: size_t crypto_pwhash_argon2id_opslimit_min ( )
+FUNCTION: size_t crypto_pwhash_argon2id_opslimit_max ( )
+FUNCTION: size_t crypto_pwhash_argon2id_memlimit_min ( )
+FUNCTION: size_t crypto_pwhash_argon2id_memlimit_max ( )
+FUNCTION: size_t crypto_pwhash_argon2id_opslimit_interactive ( )
+FUNCTION: size_t crypto_pwhash_argon2id_memlimit_interactive ( )
+FUNCTION: size_t crypto_pwhash_argon2id_opslimit_moderate ( )
+FUNCTION: size_t crypto_pwhash_argon2id_memlimit_moderate ( )
+FUNCTION: size_t crypto_pwhash_argon2id_opslimit_sensitive ( )
+FUNCTION: size_t crypto_pwhash_argon2id_memlimit_sensitive ( )
+FUNCTION: int crypto_pwhash_argon2id (
+    uchar* out, ulonglong outlen,
+    char* passwd, ulonglong passwdlen,
+    uchar* salt, ulonglong opslimit, size_t memlimit, int alg )
+FUNCTION: int crypto_pwhash_argon2id_str (
+    char[crypto_pwhash_argon2id_STRBYTES] out,
+    char* passwd, ulonglong passwdlen,
+    ulonglong opslimit, size_t memlimit )
+FUNCTION: int crypto_pwhash_argon2id_str_verify (
+    char[crypto_pwhash_argon2id_STRBYTES] str,
+    char* passwd, ulonglong passwdlen )
+FUNCTION: int crypto_pwhash_argon2id_str_needs_rehash (
+    char[crypto_pwhash_argon2id_STRBYTES] str,
+    ulonglong opslimit, size_t memlimit )
 
 ! crypto_pwhash_H
 CONSTANT: crypto_pwhash_STRBYTES 128
