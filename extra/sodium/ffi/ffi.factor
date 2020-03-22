@@ -185,6 +185,115 @@ FUNCTION: int crypto_auth_verify (
     uchar* h, uchar* in, ulonglong inlen, uchar* k )
 FUNCTION: void crypto_auth_keygen ( uchar k[crypto_auth_keybytes] )
 
+! crypto_hash_sha256_H
+CONSTANT: crypto_hash_sha256_BYTES 32
+STRUCT: crypto_hash_sha256_state
+    { state uint32_t[8] }
+    { count uint64_t }
+    { buf uint8_t[64] } ;
+
+FUNCTION: size_t crypto_hash_sha256_statebytes ( )
+FUNCTION: size_t crypto_hash_sha256_bytes ( )
+FUNCTION: int crypto_hash_sha256 (
+    uchar* out, uchar* in, ulonglong inlen )
+FUNCTION: int crypto_hash_sha256_init (
+    crypto_hash_sha256_state* state )
+FUNCTION: int crypto_hash_sha256_update (
+    crypto_hash_sha256_state* state, uchar* in, ulonglong inlen )
+FUNCTION: int crypto_hash_sha256_final (
+    crypto_hash_sha256_state* state, uchar* out )
+
+! crypto_auth_hmacsha256_H
+CONSTANT: crypto_auth_hmacsha256_BYTES 32
+CONSTANT: crypto_auth_hmacsha256_KEYBYTES 32
+
+STRUCT: crypto_auth_hmacsha256_state
+    { ictx crypto_hash_sha256_state }
+    { octx crypto_hash_sha256_state } ;
+
+FUNCTION: size_t crypto_auth_hmacsha256_bytes ( )
+FUNCTION: size_t crypto_auth_hmacsha256_keybytes ( )
+FUNCTION: int crypto_auth_hmacsha256 (
+    uchar* out, uchar* in, ulonglong inlen, uchar* k )
+FUNCTION: int crypto_auth_hmacsha256_verify (
+    uchar* h, uchar* in, ulonglong inlen, uchar* k )
+FUNCTION: size_t crypto_auth_hmacsha256_statebytes ( )
+FUNCTION: int crypto_auth_hmacsha256_init (
+    crypto_auth_hmacsha256_state* state, uchar* key, size_t keylen )
+FUNCTION: int crypto_auth_hmacsha256_update (
+    crypto_auth_hmacsha256_state* state, uchar* in, ulonglong inlen )
+FUNCTION: int crypto_auth_hmacsha256_final (
+    crypto_auth_hmacsha256_state* state, uchar* out )
+FUNCTION: void crypto_auth_hmacsha256_keygen (
+    uchar k[crypto_auth_hmacsha256_KEYBYTES] )
+
+! crypto_hash_sha512_H
+CONSTANT: crypto_hash_sha512_BYTES 64
+
+STRUCT: crypto_hash_sha512_state
+    { state uint64_t[8] }
+    { count uint64_t[2] }
+    { buf uint8_t[128] } ;
+
+FUNCTION: size_t crypto_hash_sha512_statebytes ( )
+FUNCTION: size_t crypto_hash_sha512_bytes ( )
+FUNCTION: int crypto_hash_sha512 (
+    uchar* out, uchar* in, ulonglong inlen )
+FUNCTION: int crypto_hash_sha512_init (
+    crypto_hash_sha512_state* state )
+FUNCTION: int crypto_hash_sha512_update (
+    crypto_hash_sha512_state* state, uchar* in, ulonglong inlen )
+FUNCTION: int crypto_hash_sha512_final (
+    crypto_hash_sha512_state* state, uchar* out )
+
+! crypto_auth_hmacsha512_H
+CONSTANT: crypto_auth_hmacsha512_BYTES 64
+CONSTANT: crypto_auth_hmacsha512_KEYBYTES 32
+
+STRUCT: crypto_auth_hmacsha512_state
+    { ict crypto_hash_sha512_state }
+    { octx crypto_hash_sha512_state } ;
+
+FUNCTION: size_t crypto_auth_hmacsha512_bytes ( )
+FUNCTION: size_t crypto_auth_hmacsha512_keybytes ( )
+FUNCTION: int crypto_auth_hmacsha512 (
+    uchar* in, uchar* out, ulonglong inlen, uchar* k )
+FUNCTION: int crypto_auth_hmacsha512_verify (
+    uchar* h, uchar* in, ulonglong inlen, uchar* k )
+FUNCTION: size_t crypto_auth_hmacsha512_statebytes ( )
+FUNCTION: int crypto_auth_hmacsha512_init (
+    crypto_auth_hmacsha512_state* state, uchar* key, size_t keylen )
+FUNCTION: int crypto_auth_hmacsha512_update (
+    crypto_auth_hmacsha512_state* state, uchar* in, ulonglong inlen )
+FUNCTION: int crypto_auth_hmacsha512_final (
+    crypto_auth_hmacsha512_state* state, uchar* out )
+FUNCTION: void crypto_auth_hmacsha512_keygen (
+    uchar k[crypto_auth_hmacsha512_KEYBYTES] )
+
+! crypto_auth_hmacsha512256_H
+CONSTANT: crypto_auth_hmacsha512256_BYTES 32
+CONSTANT: crypto_auth_hmacsha512256_KEYBYTES 32
+
+TYPEDEF: crypto_auth_hmacsha512_state crypto_auth_hmacsha512256_state
+
+FUNCTION: size_t crypto_auth_hmacsha512256_bytes ( )
+FUNCTION: size_t crypto_auth_hmacsha512256_keybytes ( )
+FUNCTION: int crypto_auth_hmacsha512256 (
+    uchar* out, uchar* in, ulonglong inlen, uchar* k )
+FUNCTION: int crypto_auth_hmacsha512256_verify (
+    uchar* h, uchar* in, ulonglong inlen, uchar* k )
+FUNCTION: size_t crypto_auth_hmacsha512256_statebytes ( )
+FUNCTION: int crypto_auth_hmacsha512256_init (
+    crypto_auth_hmacsha512256_state* state,
+    uchar* key, size_t keylen )
+FUNCTION: int crypto_auth_hmacsha512256_update (
+    crypto_auth_hmacsha512256_state* state,
+    uchar* in, ulonglong inlen )
+FUNCTION: int crypto_auth_hmacsha512256_final (
+    crypto_auth_hmacsha512256_state* state, uchar* out )
+FUNCTION: void crypto_auth_hmacsha512256_keygen (
+    uchar k[crypto_auth_hmacsha512256_KEYBYTES] )
+
 ! crypto_kdf_H
 FUNCTION: size_t crypto_kdf_bytes_min ( )
 FUNCTION: size_t crypto_kdf_bytes_max ( )
@@ -246,11 +355,6 @@ FUNCTION: void crypto_onetimeauth_keygen (
     uchar k[crypto_onetimeauth_keybytes] )
 
 ! crypto_sign_H
-STRUCT: crypto_hash_sha512_state
-    { state uint64_t[8] }
-    { count uint64_t[2] }
-    { buf uint8_t[128] }
-;
 STRUCT: crypto_sign_state
     { hs crypto_hash_sha512_state }
 ;
