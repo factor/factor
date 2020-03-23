@@ -401,11 +401,11 @@ FUNCTION: int crypto_onetimeauth (
 FUNCTION: int crypto_onetimeauth_verify (
     uchar* h, uchar* in, ulonglong inlen, uchar* k )
 FUNCTION: int crypto_onetimeauth_init (
-    crypto_onetimeauth_state *state, uchar* key )
+    crypto_onetimeauth_state* state, uchar* key )
 FUNCTION: int crypto_onetimeauth_update (
-    crypto_onetimeauth_state *state, uchar* in, ulonglong inlen )
+    crypto_onetimeauth_state* state, uchar* in, ulonglong inlen )
 FUNCTION: int crypto_onetimeauth_final (
-    crypto_onetimeauth_state *state, uchar* out )
+    crypto_onetimeauth_state* state, uchar* out )
 FUNCTION: void crypto_onetimeauth_keygen (
     uchar[crypto_onetimeauth_keybytes] k )
 
@@ -424,26 +424,26 @@ FUNCTION: int crypto_sign_seed_keypair (
     uchar* pk, uchar* sk, uchar* seed )
 FUNCTION: int crypto_sign_keypair ( uchar* pk, uchar* sk )
 FUNCTION: int crypto_sign (
-    uchar* sm, ulonglong *smlen_p,
+    uchar* sm, ulonglong* smlen_p,
     uchar* m, ulonglong mlen,
     uchar* sk )
 FUNCTION: int crypto_sign_open (
-    uchar* m, ulonglong *mlen_p,
+    uchar* m, ulonglong* mlen_p,
     uchar* sm, ulonglong smlen,
     uchar* pk )
 FUNCTION: int crypto_sign_detached (
-    uchar* sig, ulonglong *siglen_p,
+    uchar* sig, ulonglong* siglen_p,
     uchar* m, ulonglong mlen,
     uchar* sk )
 FUNCTION: int crypto_sign_verify_detached (
     uchar* sig, uchar* m, ulonglong mlen, uchar* pk )
-FUNCTION: int crypto_sign_init ( crypto_sign_state *state )
+FUNCTION: int crypto_sign_init ( crypto_sign_state* state )
 FUNCTION: int crypto_sign_update (
-    crypto_sign_state *state, uchar* m, ulonglong mlen )
+    crypto_sign_state* state, uchar* m, ulonglong mlen )
 FUNCTION: int crypto_sign_final_create (
-    crypto_sign_state *state, uchar* sig, ulonglong *siglen_p, uchar* sk )
+    crypto_sign_state* state, uchar* sig, ulonglong* siglen_p, uchar* sk )
 FUNCTION: int crypto_sign_final_verify (
-    crypto_sign_state *state, uchar* sig, uchar* pk )
+    crypto_sign_state* state, uchar* sig, uchar* pk )
 
 ! crypto_aead_xchacha20poly1305_H
 FUNCTION: size_t crypto_aead_xchacha20poly1305_ietf_keybytes ( )
