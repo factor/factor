@@ -1,4 +1,4 @@
-! Copyright (C) 2017, 2018 Alexander Ilin.
+! Copyright (C) 2017, 2018, 2020 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax
 classes.struct combinators system ;
