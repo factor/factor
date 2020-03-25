@@ -143,6 +143,7 @@ IN: formatting.tests
 { "[####monkey]" } [ "monkey" "[%'#10s]" sprintf ] unit-test
 { "[many monke]" } [ "many monkeys" "[%10.10s]" sprintf ] unit-test
 
+{ "{ 1, 2, 3 }" } [ BV{ 1 2 3 } "%[%d, %]" sprintf ] unit-test
 { "{ 1, 2, 3 }" } [ { 1 2 3 } "%[%s, %]" sprintf ] unit-test
 { "{ 1:2, 3:4 }" } [ H{ { 1 2 } { 3 4 } } "%[%s: %s %]" sprintf ] unit-test
 

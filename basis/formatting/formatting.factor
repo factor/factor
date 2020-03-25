@@ -136,9 +136,9 @@ numbers   = sign pad numbers_    => [[ unclip-last prefix compose-all [ fix-sign
 
 types     = strings|numbers
 
-lists     = "[%" types ", %]"    => [[ second '[ _ map ", " join "{ " prepend " }" append ] ]]
+lists     = "[%" types ", %]"    => [[ second '[ _ { } map-as ", " join "{ " " }" surround ] ]]
 
-assocs    = "[%" types ": %" types " %]" => [[ [ second ] [ fourth ] bi '[ unzip [ _ map ] dip _ map zip [ ":" join ] map ", " join "{ " prepend " }" append ] ]]
+assocs    = "[%" types ": %" types " %]" => [[ [ second ] [ fourth ] bi '[ [ _ _ bi* ":" glue ] { } assoc>map ", " join "{ " " }" surround ] ]]
 
 formats   = "%" (types|fmt-%|lists|assocs|unknown) => [[ second ]]
 
