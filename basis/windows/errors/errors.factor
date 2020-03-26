@@ -748,11 +748,7 @@ CONSTANT: expected-io-errors
     expected-io-errors member? ;
 
 : expected-io-error ( error-code -- )
-    dup expected-io-error? [
-        drop
-    ] [
-        win32-error
-    ] if ;
+    expected-io-error? [ win32-error ] unless ;
 
 : io-error ( return-value -- )
     { 0 f } member? [ GetLastError expected-io-error ] when ;
