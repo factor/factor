@@ -290,7 +290,7 @@ HELP: <anti-diagonal-matrix>
 
 HELP: <identity-matrix>
 { $values { "n" integer } { "matrix" matrix } }
-{ $description "Creates an " { $url URL" http://enwp.org/Identity_matrix" "identity matrix" } " of size " { $snippet "n x n" } ", where the diagonal values are all ones." }
+{ $description "Creates an " { $url url"http://enwp.org/Identity_matrix" "identity matrix" } " of size " { $snippet "n x n" } ", where the diagonal values are all ones." }
 { $examples
     { $example
         "USING: math.matrices prettyprint ;"
@@ -377,7 +377,7 @@ HELP: <cartesian-indices>
 
 HELP: <cartesian-square-indices>
 { $values { "n" integer } { "matrix" square-matrix } }
-{ $description "Create a " { $link square-matrix } " full of " { $link cartesian-product } "s. See " { $url URL" https://en.wikipedia.org/wiki/Cartesian_product" "cartesian product" } "." }
+{ $description "Create a " { $link square-matrix } " full of " { $link cartesian-product } "s. See " { $url url"https://en.wikipedia.org/wiki/Cartesian_product" "cartesian product" } "." }
 { $notes
     { $equiv-word-note "square" <cartesian-indices> }
 }
@@ -434,7 +434,7 @@ HELP: <square-cols>
 
 HELP: <lower-matrix>
 { $values { "object" object } { "m" integer } { "n" integer } { "matrix" matrix } }
-{ $description "Make a lower triangular matrix, where all the values above the main diagonal are " { $snippet "0" } ". " { $snippet "object" } " will be used as the value for the nonzero part of the matrix, while " { $snippet "m" } " and " { $snippet "n" } " are used as the dimensions. The inverse of this word is " { $link <upper-matrix> } ". See " { $url URL" https://en.wikipedia.org/wiki/Triangular_matrix" "triangular matrix" } "." }
+{ $description "Make a lower triangular matrix, where all the values above the main diagonal are " { $snippet "0" } ". " { $snippet "object" } " will be used as the value for the nonzero part of the matrix, while " { $snippet "m" } " and " { $snippet "n" } " are used as the dimensions. The inverse of this word is " { $link <upper-matrix> } ". See " { $url url"https://en.wikipedia.org/wiki/Triangular_matrix" "triangular matrix" } "." }
 { $examples
     { $example
         "USING: math.matrices prettyprint ;"
@@ -451,7 +451,7 @@ HELP: <lower-matrix>
 
 HELP: <upper-matrix>
 { $values { "object" object } { "m" integer } { "n" integer } { "matrix" matrix } }
-{ $description "Make an upper triangular matrix, where all the values below the main diagonal are " { $snippet "0" } ". " { $snippet "object" } " will be used as the value for the nonzero part of the matrix, while " { $snippet "m" } " and " { $snippet "n" } " are used as the dimensions. The inverse of this word is " { $link <lower-matrix> } ". See " { $url URL" https://en.wikipedia.org/wiki/Triangular_matrix" "triangular matrix" } "." }
+{ $description "Make an upper triangular matrix, where all the values below the main diagonal are " { $snippet "0" } ". " { $snippet "object" } " will be used as the value for the nonzero part of the matrix, while " { $snippet "m" } " and " { $snippet "n" } " are used as the dimensions. The inverse of this word is " { $link <lower-matrix> } ". See " { $url url"https://en.wikipedia.org/wiki/Triangular_matrix" "triangular matrix" } "." }
 { $examples
     { $example
         "USING: math.matrices prettyprint ;"

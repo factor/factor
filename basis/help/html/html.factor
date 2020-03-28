@@ -71,10 +71,10 @@ M: pathname url-of
     swap "\n" glue XML-CHUNK[[ <style><-></style> ]] ;
 
 : help-meta ( -- xml )
-    [XML <meta
+    XML-CHUNK[[ <meta
             name="viewport"
             content="width=device-width, initial-scale=1"
-        /> XML] ;
+        /> ]] ;
 
 : help-navbar ( -- xml )
     "conventions" >link topic>filename
@@ -99,23 +99,23 @@ M: pathname url-of
     dup '[ drop _ assoc-size 1 + bijective-base26 ] cache ;
 
 : css-style ( style -- style' )
-    R/ font-size: \d+pt;/ [
+    re"font-size: \d+pt;" [
         "font-size: " ?head drop "pt;" ?tail drop
         string>number 2 -
         "font-size: %dpt;" sprintf
     ] re-replace-with
 
-    R/ padding: \d+px;/ [
+    re"padding: \d+px;" [
         "padding: " ?head drop "px;" ?tail drop
         string>number dup even? [ 2 * 1 + ] [ 2 * ] if
         number>string "padding: " "px;" surround
     ] re-replace-with
 
-    R/ width: \d+px;/ [
+    re"width: \d+px;" [
        drop ""
     ] re-replace-with
 
-    R/ font-family: monospace;/ [
+    re"font-family: monospace;" [
         " white-space: pre-wrap; line-height: 125%;" append
     ] re-replace-with ;
 
@@ -147,7 +147,7 @@ M: pathname url-of
     [
         [ print-topic ] with-html-writer css-styles-to-classes
         [ help-stylesheet help-meta prepend help-navbar ] dip
-        [XML <div id="container"><-><div class="page"><-></div></div> XML]
+        XML-CHUNK[[ <div id="container"><-><div class="page"><-></div></div> ]]
     ] bi simple-page ;
 
 : generate-help-file ( topic -- )

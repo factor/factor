@@ -46,7 +46,7 @@ CHLOE: script
 CHLOE: write-script
     drop [
         get-script
-        [XML <script type="text/javascript"> <-> </script> XML]
+        XML-CHUNK[[ <script type="text/javascript"> <-> </script> ]]
     ] [xml-code] ;
 
 CHLOE: meta

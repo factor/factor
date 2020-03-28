@@ -82,7 +82,7 @@ SYMBOL: meta
 
 : get-meta ( -- xml )
     meta get [
-        [XML <meta name=<-> content=<->/> XML]
+        XML-CHUNK[[ <meta name=<-> content=<->/> ]]
     ] { } assoc>map ;
 
 : write-meta ( -- )
