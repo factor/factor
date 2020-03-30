@@ -324,6 +324,14 @@ c_find_word_size() {
     check_ret $CC
     ./$C_WORD
     WORD=$?
+    case $WORD in
+        32) ;;
+        64) ;;
+        *)
+            echo "Word size should be 32/64, got $WORD"
+            exit_script 15;;
+    esac
+
     $DELETE -f $C_WORD
 }
 
