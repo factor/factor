@@ -274,6 +274,7 @@ find_os() {
         *CYGWIN_NT*) OS=windows;;
         *CYGWIN*) OS=windows;;
         MINGW32*) OS=windows;;
+        MINGW64*) OS=windows;;
         MSYS_NT*) OS=windows;;
         *darwin*) OS=macosx;;
         *Darwin*) OS=macosx;;
