@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 John Benediktsson, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs assocs.extras combinators kernel math math.order
-math.statistics sequences sequences.extras sets ;
+USING: assocs combinators kernel math math.order
+math.statistics sequences sets ;
 IN: escape-strings
 
 : find-escapes ( str -- set )
@@ -32,7 +32,7 @@ IN: escape-strings
     [ escape-string ] dip prepend ;
 
 : escape-simplest ( str -- str' )
-    dup { CHAR: ' CHAR: " CHAR: \r CHAR: \n CHAR: \s } counts {
+    dup histogram {
         ! { [ dup { CHAR: ' CHAR: \r CHAR: \n CHAR: \s } values-of sum 0 = ] [ drop "'" prepend ] }
         { [ dup CHAR: " of not ] [ drop "\"" "\"" surround ] }
         [ drop escape-string ]

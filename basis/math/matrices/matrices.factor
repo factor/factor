@@ -4,8 +4,8 @@ USING: accessors arrays classes.singleton columns combinators
 combinators.short-circuit combinators.smart formatting fry
 grouping kernel locals math math.bits math.functions math.order
 math.private math.ranges math.statistics math.vectors
-math.vectors.private sequences sequences.deep sequences.extras
-sequences.private slots.private summary ;
+math.vectors.private sequences sequences.deep sequences.private
+slots.private summary ;
 IN: math.matrices
 
 ! defined here because of issue #1943

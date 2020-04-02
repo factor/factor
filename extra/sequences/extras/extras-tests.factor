@@ -202,10 +202,6 @@ tools.test vectors vocabs ;
 { { 1 0 0 1 0 0 0 1 0 0 } }
 [ 1 { 0 3 7 } 10 0 <array> [ set-nths-unsafe ] keep ] unit-test
 
-{ V{ 1 } } [ 1 flatten1 ] unit-test
-{ { 1 2 3 } } [ { 1 2 3 } flatten1 ] unit-test
-{ { 1 2 3 { { 4 } } } } [ { 1 { 2 } { 3 { { 4 } } } } flatten1 ] unit-test
-
 { t 3 3 } [ 10 <iota> [ [ odd? ] [ 1 > ] bi* and ] map-find-index ] unit-test
 { f f f } [ 10 <iota> [ [ odd? ] [ 9 > ] bi* and ] map-find-index ] unit-test
 
