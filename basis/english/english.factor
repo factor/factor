@@ -1,9 +1,8 @@
 ! Copyright (C) 2015, 2018 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors arrays assocs assocs.extras combinators
-help.markup kernel literals locals math math.parser sequences
-sequences.extras splitting unicode words ;
-
+USING: accessors arrays assocs combinators help.markup kernel
+literals locals math math.order math.parser sequences splitting
+unicode words ;
 IN: english
 
 <PRIVATE
@@ -95,7 +94,7 @@ CONSTANT: singular-to-plural H{
 }
 >>
 
-CONSTANT: plural-to-singular $[ singular-to-plural assoc-invert ]
+CONSTANT: plural-to-singular $[ singular-to-plural [ swap ] assoc-map ]
 
 :: match-case ( master disciple -- master' )
     {
@@ -168,8 +167,11 @@ PRIVATE>
 : ?plural-article ( word -- article )
     dup singular? [ a/an ] [ drop "the" ] if ;
 
-: comma-list ( parts conjunction  -- clause-seq )
-    [ ", " interleaved ] dip over length dup 3 >= [
+: comma-list ( parts conjunction -- clause-seq )
+    [
+        [ length dup 1 [-] + ", " <array> ]
+        [ [ 2 * pick set-nth ] each-index ] bi
+    ] dip over length dup 3 >= [
         [ 3 > ", " " " ? " " surround ] [ 2 - pick set-nth ] bi
     ] [ 2drop ] if ;
 

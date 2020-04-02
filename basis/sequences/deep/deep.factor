@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Daniel Ehrenberg, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences kernel strings math fry ;
+USING: fry kernel make math sequences strings ;
 IN: sequences.deep
 
 ! All traversal goes in postorder
@@ -69,3 +69,12 @@ M: object branch? drop f ;
 
 : flatten-as ( obj exemplar -- seq )
     [ branch? ] swap deep-reject-as ;
+
+: flatten1 ( obj -- seq )
+    [
+        [
+            dup branch? [
+                [ dup branch? [ % ] [ , ] if ] each
+            ] [ , ] if
+        ]
+    ] keep dup branch? [ drop f ] unless make ;
