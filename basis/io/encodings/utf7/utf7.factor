@@ -34,7 +34,7 @@ TUPLE: utf7codec dialect buffer ;
 
 : split-chunk ( str -- after before printable? )
     dup first printable? [
-        dupd '[ printable? _ = not ] find drop
+        [ 1 over ] dip '[ printable? _ = not ] find-from drop
         [ cut-slice ] [ f ] if* swap
     ] keep ;
 
