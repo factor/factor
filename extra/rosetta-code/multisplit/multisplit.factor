@@ -8,7 +8,7 @@ IN: rosetta-code.multisplit
     over [ 2array ] [ 2drop f ] if ;
 
 : best-separator ( seq -- pos index )
-    dup [ first ] map infimum '[ first _ = ] filter first first2 ;
+    dup [ first ] map infimum '[ first _ = ] find nip first2 ;
 
 : first-subseq ( separators seq -- n separator )
     dupd [ swap [ subseq-start ] dip ?pair ] curry map-index sift
