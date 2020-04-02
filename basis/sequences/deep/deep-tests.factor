@@ -47,3 +47,7 @@ IN: sequences.deep.tests
         dup integer? [ even? [ 1 + ] when ] [ drop ] if
     ] deep-reduce
 ] unit-test
+
+{ V{ 1 } } [ 1 flatten1 ] unit-test
+{ { 1 2 3 } } [ { 1 2 3 } flatten1 ] unit-test
+{ { 1 2 3 { { 4 } } } } [ { 1 { 2 } { 3 { { 4 } } } } flatten1 ] unit-test

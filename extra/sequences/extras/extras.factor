@@ -481,15 +481,6 @@ PRIVATE>
 : set-nths-unsafe ( value indices seq -- )
     swapd '[ _ swap _ set-nth-unsafe ] each ; inline
 
-: flatten1 ( obj -- seq )
-    [
-        [
-            dup branch? [
-                [ dup branch? [ % ] [ , ] if ] each
-            ] [ , ] if
-        ]
-    ] keep dup branch? [ drop f ] unless make ;
-
 <PRIVATE
 
 : (map-find-index) ( seq quot find-quot -- result i elt )
