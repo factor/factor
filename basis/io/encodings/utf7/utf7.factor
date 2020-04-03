@@ -1,7 +1,7 @@
 ! Copyright (C) 2013-2014 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors ascii base64 fry grouping.extras io
-io.encodings io.encodings.string io.encodings.utf16 kernel math
+USING: accessors ascii base64 fry io io.encodings
+io.encodings.string io.encodings.utf16 kernel make math
 math.functions sequences splitting strings ;
 IN: io.encodings.utf7
 
@@ -28,14 +28,22 @@ TUPLE: utf7codec dialect buffer ;
 : raw-base64> ( str -- str' )
     dup length 4 / ceiling 4 * char: = pad-tail base64> utf16be decode ;
 
-: encode-chunk ( repl-pair surround-pair chunk ascii? -- bytes )
+: encode-chunk ( repl-pair surround-pair chunk printable? -- bytes )
     [ swap [ first ] [ concat ] bi replace nip ]
     [ >raw-base64 -rot [ first2 replace ] [ first2 surround ] bi* ] if ;
 
+: split-chunk ( str -- after before printable? )
+    dup first printable? [
+        [ 1 over ] dip '[ printable? _ = not ] find-from drop
+        [ cut-slice ] [ f ] if* swap
+    ] keep ;
+
 : encode-utf7-string ( str codec -- bytes )
-    [ [ printable? ] group-by ] dip
-    dialect>> first2 '[ _ _ rot first2 swap encode-chunk ] map
-    B{ } concat-as ;
+    dialect>> first2 rot '[
+        [ dup empty? ] [
+            split-chunk '[ 2dup _ _ encode-chunk % ] dip
+        ] until
+    ] B{ } make 3nip ;
 
 M: utf7codec encode-string ( str stream codec -- )
     swapd encode-utf7-string swap stream-write ;

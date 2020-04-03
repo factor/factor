@@ -154,21 +154,24 @@ clang_version_ok() {
 }
 
 set_cc() {
-
     # on Cygwin we MUST use the MinGW "cross-compiler", therefore check these first
     # furthermore, we prefer 64 bit over 32 bit versions if both are available
-    test_programs_installed x86_64-w64-mingw32-gcc x86_64-w64-mingw32-g++
-    if [[ $? -ne 0 ]] ; then
-        [ -z "$CC" ] && CC=x86_64-w64-mingw32-gcc
-        [ -z "$CXX" ] && CXX=x86_64-w64-mingw32-g++
-        return
-    fi
 
-    test_programs_installed i686-w64-mingw32-gcc i686-w64-mingw32-g++
-    if [[ $? -ne 0 ]] ; then
-        [ -z "$CC" ] && CC=i686-w64-mingw32-gcc
-        [ -z "$CXX" ] && CXX=i686-w64-mingw32-g++
-        return
+    # we need this condition so we don't find a mingw32 compiler on linux
+    if [[ $OS == windows ]] ; then
+        test_programs_installed x86_64-w64-mingw32-gcc x86_64-w64-mingw32-g++
+        if [[ $? -ne 0 ]] ; then
+            [ -z "$CC" ] && CC=x86_64-w64-mingw32-gcc
+            [ -z "$CXX" ] && CXX=x86_64-w64-mingw32-g++
+            return
+        fi
+
+        test_programs_installed i686-w64-mingw32-gcc i686-w64-mingw32-g++
+        if [[ $? -ne 0 ]] ; then
+            [ -z "$CC" ] && CC=i686-w64-mingw32-gcc
+            [ -z "$CXX" ] && CXX=i686-w64-mingw32-g++
+            return
+        fi
     fi
 
     test_programs_installed clang clang++
@@ -274,6 +277,7 @@ find_os() {
         *CYGWIN_NT*) OS=windows;;
         *CYGWIN*) OS=windows;;
         MINGW32*) OS=windows;;
+        MINGW64*) OS=windows;;
         MSYS_NT*) OS=windows;;
         *darwin*) OS=macosx;;
         *Darwin*) OS=macosx;;
@@ -324,6 +328,14 @@ c_find_word_size() {
     check_ret $CC
     ./$C_WORD
     WORD=$?
+    case $WORD in
+        32) ;;
+        64) ;;
+        *)
+            echo "Word size should be 32/64, got $WORD"
+            exit_script 15;;
+    esac
+
     $DELETE -f $C_WORD
 }
 

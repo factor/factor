@@ -1,6 +1,6 @@
 ! Copyright (C) 2015 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.extras combinators.short-circuit editors
+USING: combinators.short-circuit editors
 generalizations io.files io.pathnames io.standard-paths kernel
 make math.parser memoize namespaces sequences system tools.which ;
 IN: editors.visual-studio-code
@@ -35,7 +35,7 @@ M: linux find-visual-studio-code-invocation
         [ "Code" which ]
         [ home "VSCode-linux-x64/Code" append-path ]
         [ "/usr/share/code/code" ]
-    } [ [ exists? ] ?1arg ] map-compose 0|| ;
+    } [ dup exists? [ drop f ] unless ] map-compose 0|| ;
 
 M: windows find-visual-studio-code-invocation
     {

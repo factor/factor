@@ -488,15 +488,6 @@ PRIVATE>
 : set-nths-unsafe* ( values indices seq -- seq )
     -rot [ pick set-nth-unsafe ] 2each ; inline
 
-: flatten1 ( obj -- seq )
-    [
-        [
-            dup branch? [
-                [ dup branch? [ % ] [ , ] if ] each
-            ] [ , ] if
-        ]
-    ] keep dup branch? [ drop f ] unless make ;
-
 <PRIVATE
 
 : (map-find-index) ( seq quot find-quot -- result i elt )

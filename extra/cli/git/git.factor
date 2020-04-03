@@ -8,7 +8,7 @@ IN: cli.git
 
 INITIALIZED-SYMBOL: cli-git-num-parallel [ cpus 2 * ]
 
-: git-command>string ( quot -- string )
+: git-command>string ( desc -- string )
     utf8 <process-reader> stream-contents [ blank? ] trim-tail ;
 
 : git-clone-as ( uri path -- process ) [ { "git" "clone" } ] 2dip 2array append run-process ;
