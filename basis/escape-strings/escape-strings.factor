@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 John Benediktsson, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators kernel math math.order
-math.statistics sequences sets ;
+USING: ascii assocs combinators kernel math math.order
+math.statistics sequences sets strings ;
 IN: escape-strings
 
 : find-escapes ( str -- set )
