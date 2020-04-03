@@ -4,8 +4,8 @@ USING: accessors alien alien.c-types alien.data alien.strings
 alien.syntax arrays byte-arrays classes.struct combinators
 combinators.smart destructors io.encodings.string
 io.encodings.utf8 io.sockets io.sockets.private kernel libc
-make refs sequences sequences.extras windows.errors
-windows.kernel32 windows.types windows.winsock fry ;
+make refs sequences windows.errors windows.kernel32
+windows.types windows.winsock ;
 IN: windows.iphlpapi
 
 LIBRARY: iphlpapi
@@ -404,7 +404,7 @@ FUNCTION: DWORD GetNetworkParams ( PFIXED_INFO pFixedInfo, PULONG pOutBufLen )
 <PRIVATE
 
 : loop-list ( obj -- seq )
-    [ [ dup [ Next>> ] when ] keep ] loop>array nip ;
+    [ Next>> ] follow ;
 
 ! Don't use this, use each/map-adapters
 : iterate-interfaces ( -- seq )
