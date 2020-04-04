@@ -265,6 +265,10 @@ METHOD: t% { tensor tensor } [ mod ] t-bop ;
 METHOD: t% { tensor number } >float [ mod ] curry t-uop ;
 METHOD: t% { number tensor } [ >float ] dip [ mod ] with t-uop ;
 
+syntax:M: tensor sum vec>> 0 <simd-slice>
+    [ simd-slice>> 0 [ sum + ] reduce ]
+    [ end-slice>> sum ] bi + ;
+
 <PRIVATE
 
 ! Check that the tensor has an acceptable shape for matrix multiplication

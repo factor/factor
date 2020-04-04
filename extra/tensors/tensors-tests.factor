@@ -292,6 +292,15 @@ IN: tensors.tests
     dup [ 5 1 ] dip set-nth vec>> =
 ] unit-test
 
+! Test sum
+{ 21.0 } [
+    t{ 1 2 3 4 5 6 } sum
+] unit-test
+
+{ 50005000.0 } [
+    { 100 100 } naturals 1 t+ sum
+] unit-test
+
 ! Test tensor parsing word
 { float-array{ 1 2 3 4 5 6 7 8 } } [
     t{ 1 2 3 4 5 6 7 8 } vec>>
