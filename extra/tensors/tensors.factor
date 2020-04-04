@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien alien.c-types alien.data arrays byte-arrays combinators
-grouping kernel locals math math.functions math.ranges math.vectors
+grouping kernel locals kernel.private math math.functions math.ranges math.vectors
 math.vectors.simd multi-methods parser prettyprint.custom sequences sequences.extras
 sequences.private specialized-arrays typed ;
 
@@ -184,29 +184,37 @@ TYPED:: t-bop ( tensor1: tensor tensor2: tensor quot: ( x y -- z ) -- tensor: te
     tensor1 vec>> tensor2 vec>> quot 2map <tensor> ; inline
 
 ! Create an array of 4-element SIMD arrays for processing floats
-: simd-slice ( array -- simd-array rest-slice/f )
+: simd-for-bop ( array -- simd-array rest-slice/f )
     dup length dup 4 mod [ drop f ] [ - cut-slice ] if-zero
     [ float-4 cast-array ] dip ; inline
 
 ! Create an array of 4-element SIMD arrays for processing floats
-:: simd-slice-2 ( arr start -- first-slice/f simd-array rest-slice/f )
+! Tensor class definition
+TUPLE: simd-slice
+    { first-slice float-array }
+    { simd-slice float-4-array }
+    { end-slice float-array } ;
+
+:: (simd-slice) ( arr start len -- arr/f )
+    len [ float-array{ } ] [ drop arr start len make-subseq ] if-zero ; inline
+
+:: <simd-slice> ( arr start -- simd-slice )
     ! Compute the beginning
-    start [ f ] [ drop arr 0 start make-subseq ] if-zero
+    arr 0 start (simd-slice)
     ! Compute the SIMD part
     arr length start - :> len
     len 4 mod :> end
-    len end - [ float-4-array{ } ] [
-        drop arr start len end - make-subseq float-4 cast-array
-    ] if-zero
+    arr start len end - (simd-slice) float-4 cast-array
     ! Compute the end
-    end [ f ] [ drop arr dup length end - end make-subseq ] if-zero ; inline
+    arr dup length end - end (simd-slice)
+    simd-slice boa ; inline
 
 ! Apply the binary operators simd-quot and quot to quickly combine the tensors
 :: t-bop-simd ( tensor1 tensor2 simd-quot: ( x y -- z ) quot: ( x y -- z ) -- tensor )
     tensor1 shape>> tensor2 shape>> check-bop-shape
     tensor1 vec>> tensor2 vec>>
     dup length (float-array) dup :> vec3
-    [ simd-slice ] tri@ :> ( simd1 rest1 simd2 rest2 simd3 rest3 )
+    [ simd-for-bop ] tri@ :> ( simd1 rest1 simd2 rest2 simd3 rest3 )
     simd1 simd2 simd-quot simd3 2map-into
     rest1 rest2 quot rest3 2map-into
     vec3 <tensor> ; inline
@@ -220,7 +228,7 @@ TYPED:: t-uop ( tensor: tensor quot: ( x -- y ) -- tensor: tensor )
 :: t-uop-simd ( tensor n simd-quot: ( x y -- z ) quot: ( x y -- z ) -- tensor )
     tensor dup [ shape>> ] [ vec>> ] bi*
     dup length (float-array) dup :> vec2
-    [ simd-slice ] bi@ :> ( simd1 rest1 simd2 rest2 )
+    [ simd-for-bop ] bi@ :> ( simd1 rest1 simd2 rest2 )
     simd1 n n n n float-4-boa simd-quot curry simd2 map-into
     rest1 n quot curry rest2 map-into
     vec2 <tensor> ; inline
@@ -293,7 +301,6 @@ TYPED:: 2d-transpose ( tensor: tensor -- tensor': tensor )
         vec nth-unsafe
     ] float-array{ } map-as <tensor> ;
 
-
 ! Perform matrix multiplication muliplying an
 ! mxn matrix with a nxp matrix
 TYPED:: 2d-matmul ( vec1: float-array vec2: float-array res: float-array
@@ -318,8 +325,44 @@ TYPED:: 2d-matmul ( vec1: float-array vec2: float-array res: float-array
 
 ! Perform matrix multiplication muliplying an
 ! mxn matrix with a nxp matrix
+TYPED:: 2d-matmul-mixed ( vec1: float-array vec2: float-array res: float-array
+                    m: fixnum n: fixnum p: fixnum start: fixnum -- )
+    ! For each element in the range, we want to compute the dot product of the
+    ! corresponding row and column
+    ! Transpose vec2 so that we are doing row * row (as opposed to row * col)
+    { n p } vec2 <tensor> 2d-transpose vec>> :> vec2
+
+    ! Compute the location in the float-array each 2D matrix will start at
+    start m n * * :> start1
+    start n p * * :> start2
+
+    m [ :> i
+        i n * :> in
+        4 4 in start1 + 4 mod - swap mod :> in4m
+        i p * :> ip
+        vec1 in n make-subseq :> sub1
+        sub1 in4m <simd-slice> :> slice1
+        p [ :> j
+            j n * :> jn
+            4 4 jn 4 mod - swap mod :> jn4m
+            vec2 jn n make-subseq
+            in4m jn4m = [
+                jn4m <simd-slice> slice1 swap
+                2dup [ first-slice>> ] bi@ 0.0 [ * + ] 2reduce
+                [ 2dup [ simd-slice>> ] bi@ ] dip [ v. + ] 2reduce
+                [ [ end-slice>> ] bi@ ] dip [ * + ] 2reduce
+            ] [
+                sub1 swap
+                0.0 [ * + ] 2reduce
+            ] if
+            ip j + res set-nth-unsafe
+        ] each-integer
+    ] each-integer ;
+
+! ! Perform matrix multiplication muliplying an
+! mxn matrix with a nxp matrix
 ! Should only be called when n is a multiple of 4
-TYPED:: 2d-matmul-all-simd ( vec1: float-array vec2: float-array
+TYPED:: 2d-matmul-simd ( vec1: float-array vec2: float-array
                              res: float-array
                              m: fixnum n: fixnum p: fixnum -- )
     ! For each element in the range, we want to compute the dot product of the
@@ -375,7 +418,11 @@ TYPED:: matmul ( tensor1: tensor tensor2: tensor -- tensor3: tensor )
         vec3 m p * i * m p * make-subseq
         ! Push m, n, and p and multiply the arrays
         m n p
-        n 4 mod 0 = [ 2d-matmul-all-simd ] [ 2d-matmul ] if
+        { { [ n 4 mod 0 = ] [ 2d-matmul-simd ] }
+          { [ n 4 < ] [ 2d-matmul ] }
+          [ i 2d-matmul-mixed ]
+        } cond
+
     ] each-integer
     vec3 <tensor> ;
 
