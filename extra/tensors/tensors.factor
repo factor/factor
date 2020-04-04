@@ -265,9 +265,59 @@ METHOD: t% { tensor tensor } [ mod ] t-bop ;
 METHOD: t% { tensor number } >float [ mod ] curry t-uop ;
 METHOD: t% { number tensor } [ >float ] dip [ mod ] with t-uop ;
 
+! Sum together all elements in the tensor
 syntax:M: tensor sum vec>> 0 <simd-slice>
     [ simd-slice>> 0 [ sum + ] reduce ]
     [ end-slice>> sum ] bi + ;
+
+<PRIVATE
+
+! Also converts all elements of the sequence to tensors
+:: check-concat-shape ( seq -- seq )
+    ! Compute the bottom shape of the first element in the sequence
+    seq first { } >tensor dup :> empty-tensor
+    like shape>> dup :> first-shape rest :> rest-shape
+    seq [
+        ! Compute the bottom shape of this element
+        empty-tensor like dup shape>> rest
+        ! Compare; if they are different, throw an error
+        rest-shape = [ shape>> first-shape swap shape-mismatch-error ] unless
+    ] map ;
+
+! Also converts all elements of the sequence to tensors
+:: check-stack-shape ( seq -- seq )
+    ! Compute the bottom shape of the first element in the sequence
+    seq first { } >tensor dup :> empty-tensor
+    like shape>> :> first-shape
+    seq [
+        ! Compute the bottom shape of this element
+        empty-tensor like dup shape>>
+        ! Compare; if they are different, throw an error
+        first-shape = [ shape>> first-shape swap shape-mismatch-error ] unless
+    ] map ;
+
+PRIVATE>
+
+! Concatenation operations
+! Concatenate across the last dimension
+: t-concat ( seq -- tensor )
+    check-concat-shape
+    ! Compute the final shape
+    [
+        ! Compute the first dimension
+        [ 0 [ shape>> first + ] reduce 1array ]
+        ! Compute the other dimensions
+        [ first shape>> rest ] bi  append
+    ]
+    ! Concatenate all of the float-arrays
+    [ [ vec>> ] map concat ] bi <tensor> ;
+
+: stack ( seq -- tensor )
+    check-stack-shape
+    ! Compute the new shape
+    [ [ length 1array ] [ first shape>> ] bi append ]
+    ! Concatenate all of the tensors
+    [ [ vec>> ] map concat ] bi <tensor> ;
 
 <PRIVATE
 
