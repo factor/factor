@@ -296,6 +296,45 @@ syntax:M: tensor sum vec>> 0 <simd-slice>
         first-shape = [ shape>> first-shape swap shape-mismatch-error ] unless
     ] map ;
 
+! Also converts all elements of the sequence to tensors
+:: check-hstack-shape ( seq -- seq )
+    ! Compute the top shape of the first element in the sequence
+    seq first { } >tensor dup :> empty-tensor
+    like shape>> dup :> first-shape but-last :> but-last-shape
+    seq [
+        ! Compute the top shape of this element
+        empty-tensor like dup shape>> but-last
+        ! Compare; if they are different, throw an error
+        but-last-shape = [ shape>> first-shape swap shape-mismatch-error ] unless
+    ] map ;
+
+: final-hstack-shape ( seq -- shape )
+    ! Get the top part
+    dup first shape>> but-last swap
+    ! Compute the last part of the shape
+    [ shape>> last ] map sum 1array append ;
+
+! Returns an guide for hstacking where the index corresponds to the postion
+! in the last dimension of the resulting tensor, and the elements are
+! { which tensor, len of tensor, index }
+:: hstack-guide ( seq -- guide )
+    ! Compute the list of last shape parts
+    seq [ shape>> last ] map :> last-dims
+    ! Curr tensor and index in tensor
+    0 0
+    last-dims sum [0,b) [
+        drop :> old-t-ind :> last-dims-i
+        last-dims-i last-dims nth
+        old-t-ind -
+        ! If we need to move onto the next tensor
+        [ last-dims-i 1 + 0 ]
+        ! Otherwise, stay with the current tensor
+        [ drop last-dims-i old-t-ind ] if-zero
+        2dup [ dup last-dims nth ] dip 3array
+        [ 1 + ] dip
+    ] map nip nip ;
+
+
 PRIVATE>
 
 ! Concatenation operations
@@ -318,6 +357,20 @@ PRIVATE>
     [ [ length 1array ] [ first shape>> ] bi append ]
     ! Concatenate all of the tensors
     [ [ vec>> ] map concat ] bi <tensor> ;
+
+:: hstack ( seq -- tensor )
+    ! Check shape and convert everything to tensors
+    seq check-hstack-shape :> tseq
+    ! Get the new shape
+    tseq final-hstack-shape (tensor)
+    tseq hstack-guide dup length :> repeat :> guide
+    dup vec>> [
+        :> i drop
+        i repeat /mod guide nth
+        dup first tseq nth
+        [ [ second ] [ third ] bi -rot * + ] dip nth
+    ] map-index! drop ;
+
 
 <PRIVATE
 
