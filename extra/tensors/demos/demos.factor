@@ -2,15 +2,22 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: arrays accessors csv io io.encodings.utf8 kernel locals math math.parser
-math.statistics prettyprint sequences tensors ;
+math.ranges math.statistics prettyprint sequences tensors ;
 IN: tensors.demos
 
 <PRIVATE
 
 ! Normalize across each of the features
 :: normalize ( X -- norm )
-    X X mean t- X std t/
-;
+    ! Compute the mean for each of the features and repeat it so that it can be
+    ! combined with X
+    X transpose tensor>array [ mean ] map >tensor :> feat-means
+    X shape>> first [0,b) [ drop feat-means ] map stack :> means
+    ! Compute the std for each of the features and repeat it so that it can be
+    ! combined with X
+    X transpose tensor>array [ std ] map >tensor :> feat-stds
+    X shape>> first [0,b) [ drop feat-stds ] map stack :> stds
+    X means t- stds t/ ;
 
 :: compute-cost ( X y params -- cost )
     ! Compute (1/(2*n_samples))
