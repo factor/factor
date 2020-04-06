@@ -363,14 +363,16 @@ PRIVATE>
     seq check-hstack-shape :> tseq
     ! Get the new shape
     tseq final-hstack-shape (tensor)
+    ! Compute the guide information
     tseq hstack-guide dup length :> repeat :> guide
     dup vec>> [
         :> i drop
+        ! First get the correct tensor
         i repeat /mod guide nth
         dup first tseq nth
+        ! Now find the correct value within that tensor
         [ [ second ] [ third ] bi -rot * + ] dip nth
     ] map-index! drop ;
-
 
 <PRIVATE
 
