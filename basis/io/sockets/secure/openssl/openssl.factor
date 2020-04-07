@@ -59,6 +59,11 @@ PRIVATE>
     dup length
     f BN_bin2bn ; inline
 
+: disable-old-tls ( ctx -- )
+    handle>>
+    SSL_OP_NO_TLSv1 SSL_OP_NO_TLSv1_1 bitor
+    SSL_CTX_set_options ssl-error ;
+
 : set-session-cache ( ctx -- )
     handle>>
     [ SSL_SESS_CACHE_BOTH SSL_CTX_set_session_cache_mode ssl-error ]
