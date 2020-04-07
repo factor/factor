@@ -13,6 +13,7 @@ IN: sodium.tests
 
 { t } [
     "Signature verification test" utf8 encode
-    crypto-sign-keypair [ over ] dip crypto-sign
-    -rot crypto-sign-verify
+    crypto-sign-keypair
+    [ nip crypto-sign ]
+    [ drop crypto-sign-verify ] 3bi
 ] unit-test
