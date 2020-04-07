@@ -235,8 +235,8 @@ STRUCT: ASN1_STRING
     { data uchar* }
     { flags long } ;
 
-FUNCTION: int ASN1_STRING_cmp ( ASN1_STRING *a, ASN1_STRING *b )
-FUNCTION: ASN1_VALUE* ASN1_item_d2i ( ASN1_VALUE** val, uchar **in, long len, ASN1_ITEM *it )
+FUNCTION: int ASN1_STRING_cmp ( ASN1_STRING* a, ASN1_STRING* b )
+FUNCTION: ASN1_VALUE* ASN1_item_d2i ( ASN1_VALUE** val, uchar** in, long len, ASN1_ITEM* it )
 
 ! ===============================================
 ! ossl_typ.h
@@ -386,7 +386,7 @@ CONSTANT: OPENSSL_INIT_NO_ADD_ALL_CIPHERS     0x00000010
 CONSTANT: OPENSSL_INIT_NO_ADD_ALL_DIGESTS     0x00000020
 
 
-FUNCTION: int OPENSSL_init_ssl ( uint64_t opts, void *settings )
+FUNCTION: int OPENSSL_init_ssl ( uint64_t opts, void* settings )
 ! ------------------------------------------------------------------------------
 ! API < 1.1.0, removed in new versions
 ! ------------------------------------------------------------------------------
@@ -507,6 +507,18 @@ FUNCTION: void SSL_CTX_set_tmp_dh_callback ( SSL_CTX* ctx, void* dh )
 
 FUNCTION: void SSL_CTX_set_tmp_rsa_callback ( SSL_CTX* ctx, void* rsa )
 
+FUNCTION: ulong SSL_CTX_set_options ( SSL_CTX* ctx, ulong options )
+FUNCTION: ulong SSL_set_options ( SSL* ssl, ulong options )
+
+FUNCTION: ulong SSL_CTX_clear_options ( SSL_CTX* ctx, ulong options )
+FUNCTION: ulong SSL_clear_options ( SSL* ssl, ulong options )
+
+FUNCTION: ulong SSL_CTX_get_options ( SSL_CTX* ctx )
+FUNCTION: ulong SSL_get_options ( SSL* ssl )
+
+FUNCTION: ulong SSL_get_secure_renegotiation_support ( SSL* ssl )
+
+
 ! ------------------------------------------------------------------------------
 ! Misc
 ! ------------------------------------------------------------------------------
@@ -598,12 +610,12 @@ FUNCTION: int X509_NAME_get_text_by_NID ( X509_NAME* name, int nid, void* buf, i
 FUNCTION: char* X509_NAME_oneline ( X509_NAME* a, char* buf, int size )
 
 FUNCTION: int X509_get_ext_by_NID ( X509* a, int nid, int lastpos )
-FUNCTION: void* X509_get_ext_d2i ( X509 *a, int nid, int* crit, int* idx )
+FUNCTION: void* X509_get_ext_d2i ( X509* a, int nid, int* crit, int* idx )
 FUNCTION: X509_NAME* X509_get_issuer_name ( X509* a )
 FUNCTION: X509_NAME* X509_get_subject_name ( X509* a )
 FUNCTION: int X509_check_trust ( X509* a, int id, int flags )
 FUNCTION: X509_EXTENSION* X509_get_ext ( X509* a, int loc )
-FUNCTION: void X509_free ( X509 *a )
+FUNCTION: void X509_free ( X509* a )
 DESTRUCTOR: X509_free
 FUNCTION: X509* d2i_X509 ( X509** px, uchar** in, int len )
 FUNCTION: int i2d_X509 ( X509* x, uchar** out )
@@ -616,13 +628,13 @@ FUNCTION: int X509_STORE_add_cert ( X509_STORE* ctx, X509* x )
 ! ------------------------------------------------------------------------------
 ! API >= 1.1.0
 ! ------------------------------------------------------------------------------
-FUNCTION: int OPENSSL_sk_num ( _STACK *s )
-FUNCTION: void* OPENSSL_sk_value ( _STACK *s, int v )
+FUNCTION: int OPENSSL_sk_num ( _STACK* s )
+FUNCTION: void* OPENSSL_sk_value ( _STACK* s, int v )
 
 ! ------------------------------------------------------------------------------
 ! API < 1.1.0, removed in new versions
 ! ------------------------------------------------------------------------------
-FUNCTION: int sk_num ( _STACK *s )
-FUNCTION: void* sk_value ( _STACK *s, int v )
+FUNCTION: int sk_num ( _STACK* s )
+FUNCTION: void* sk_value ( _STACK* s, int v )
 
 ! ------------------------------------------------------------------------------
