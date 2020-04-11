@@ -209,7 +209,7 @@ IN: tensors.tests
 [
     10 t{ 1 2 3 } nth
 ]
-[ 10 t{ 1 2 3 } \ bounds-error boa = ] must-fail-with
+[ 10 float-array{ 1 2 3 } \ bounds-error boa = ] must-fail-with
 
 ! test set-nth
 { t{ 1 5 3 } } [

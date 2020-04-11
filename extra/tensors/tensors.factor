@@ -127,14 +127,36 @@ syntax:M: tensor pprint-delims drop \ t{ \ } ;
 syntax:M: tensor >pprint-sequence tensor>array ;
 syntax:M: tensor pprint* pprint-object ;
 
+
+<PRIVATE
+! turns a shape into a list of things by which to multiply 
+! indices to get a full index (e.g. { 2 3 4 } -> { 12 4 1 })
+: ind-mults ( shape -- seq )
+    <reversed> 1 swap [ swap [ * ] keep ] map nip reverse ;
+
+! turns a num/seq index & tensor into num index & tensor
+: num-index ( n/seq tensor -- n tensor )
+    ! check form of index (num or seq)
+    swap dup array? not
+    [ ! if array, turn into num
+        [ dup shape>> ind-mults ] dip [ * ] 2map-sum
+    ] unless swap ;
+
+PRIVATE>
+
+
 ! Sequence protocol implementation
 syntax:M: tensor clone [ shape>> clone ] [ vec>> clone ] bi <tensor> ;
 
 syntax:M: tensor length vec>> length ;
 
-syntax:M: tensor nth-unsafe vec>> nth-unsafe ;
+syntax:M: tensor nth num-index vec>> nth ;
 
-syntax:M: tensor set-nth-unsafe vec>> set-nth-unsafe ;
+syntax:M: tensor nth-unsafe num-index vec>> nth-unsafe ;
+
+syntax:M: tensor set-nth num-index vec>> set-nth ;
+
+syntax:M: tensor set-nth-unsafe num-index vec>> set-nth-unsafe ;
 
 syntax:M: tensor new-sequence
     ! Check if the old and new tensors are the same size
@@ -535,14 +557,6 @@ TYPED:: matmul ( tensor1: tensor tensor2: tensor -- tensor3: tensor )
     ] each-integer
     vec3 <tensor> ;
 
-<PRIVATE
-! helper for transpose: turns a shape into a list of things
-! by which to multiply indices to get a full index
-: ind-mults ( shape -- seq )
-    <reversed> 1 swap [ swap [ * ] keep ] map nip ;
-
-PRIVATE>
-
 ! Transpose an n-dimensional tensor by flipping the axes
 TYPED:: transpose ( tensor: tensor -- tensor': tensor )
     tensor shape>> length 2 =
@@ -550,7 +564,7 @@ TYPED:: transpose ( tensor: tensor -- tensor': tensor )
     [ tensor shape>> :> old-shape
         tensor vec>> :> vec
         old-shape reverse :> new-shape
-        old-shape ind-mults reverse :> mults
+        old-shape ind-mults :> mults
         ! loop through new tensor
         new-shape dup product <iota> [
             ! find index in original tensor
