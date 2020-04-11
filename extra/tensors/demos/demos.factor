@@ -1,5 +1,6 @@
 ! Copyright (C) 2019 HMC Clinic.
 ! See http://factorcode.org/license.txt for BSD license.
+! Code based on https://towardsdatascience.com/linear-regression-from-scratch-with-numpy-implementation-finally-8e617d8e274c
 
 USING: arrays accessors csv io io.encodings.utf8 kernel locals math math.parser
 math.ranges math.statistics prettyprint sequences tensors ;

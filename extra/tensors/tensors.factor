@@ -356,6 +356,56 @@ syntax:M: tensor sum vec>> 0 <simd-slice>
         [ 1 + ] dip
     ] map nip nip ;
 
+! Given a sequence of tensors, stack them across the last dimension
+:: hstack-unsafe ( tseq -- tensor )
+    ! Create the final tensor
+    tseq final-hstack-shape (tensor)
+    ! Compute the guide information
+    tseq hstack-guide dup length :> repeat :> guide
+    dup vec>> [
+        :> i drop
+        ! First get the correct tensor
+        i repeat /mod guide nth
+        dup first tseq nth
+        ! Now find the correct value within that tensor
+        [ [ second ] [ third ] bi -rot * + ] dip nth
+    ] map-index! drop ;
+
+! Also converts all elements of the sequence to tensors
+:: check-vstack-shape ( seq -- seq )
+    ! Compute the shape of the first sequence
+    seq first { } >tensor dup :> empty-tensor
+    like shape>> dup :> first-shape
+    ! Compute the index of the dimension to be stacked across
+    length 2 - :> vdim
+    seq [
+        ! Convert this element to a tensor
+        empty-tensor like dup
+        ! Compare the shapes
+        shape>> first-shape [ = ] 2map
+        vdim swap remove-nth
+        ! If the shapes differ in anything except the second-to-last dimension
+        ! this sequence cannot be vstacked
+        t [ = ] reduce [ shape>> first-shape swap shape-mismatch-error ] unless
+    ] map ;
+
+! Compute the shape after the vstack has been completed
+:: final-vstack-shape ( seq -- shape )
+    ! Compute the new second-to-last dimension
+    seq first dims 2 - :> vdim
+    seq 0 [ shape>> vdim swap nth + ] reduce
+    ! Combine it to create the new shape
+    seq first shape>> clone :> new-shape
+    vdim new-shape set-nth
+    new-shape ;
+
+! Combine the second-to-last and last dimensions of each tensor for stacking
+:: reshape-for-vstack ( seq -- seq )
+    seq first dims 2 - :> vdim
+    seq [
+        dup shape>> vdim cut product 1array append >>shape
+    ] map! ;
+
 
 PRIVATE>
 
@@ -380,21 +430,19 @@ PRIVATE>
     ! Concatenate all of the tensors
     [ [ vec>> ] map concat ] bi <tensor> ;
 
-:: hstack ( seq -- tensor )
+: hstack ( seq -- tensor )
     ! Check shape and convert everything to tensors
-    seq check-hstack-shape :> tseq
-    ! Get the new shape
-    tseq final-hstack-shape (tensor)
-    ! Compute the guide information
-    tseq hstack-guide dup length :> repeat :> guide
-    dup vec>> [
-        :> i drop
-        ! First get the correct tensor
-        i repeat /mod guide nth
-        dup first tseq nth
-        ! Now find the correct value within that tensor
-        [ [ second ] [ third ] bi -rot * + ] dip nth
-    ] map-index! drop ;
+    check-hstack-shape hstack-unsafe ;
+
+: vstack ( seq -- tensor )
+    ! Check shape and convert everything to tensors
+    check-vstack-shape
+    ! Find the final shape
+    [ final-vstack-shape ]
+    ! Reshape each of the tensors and stack
+    [ reshape-for-vstack hstack-unsafe ] bi
+    ! Finally reshape and return
+    swap >>shape ;
 
 <PRIVATE
 
