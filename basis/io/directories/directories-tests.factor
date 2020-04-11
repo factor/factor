@@ -161,7 +161,7 @@ io.launcher io.pathnames kernel sequences tools.test ;
     ! Issue #890
     { } [
         "foo" [ make-directories ] keep
-        [ "touch bar" try-output-process ] with-directory
+        [ "echo hi" try-output-process ] with-directory
     ] unit-test
 
     { t } [
