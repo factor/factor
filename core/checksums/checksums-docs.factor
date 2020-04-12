@@ -38,7 +38,9 @@ HELP: checksum-file
 { $values { "path" "a pathname specifier" } { "checksum" "a checksum specifier" } { "value" byte-array } }
 { $description "Computes the checksum of all data in a file." }
 { $examples
-    { $example
+    { $unchecked-example
+        ! This example fails on Windows if you ``git clone`` with Windows line-endings
+        ! Issue #2276
         "USING: checksums checksums.crc32 prettyprint ;"
         "\"resource:core/checksums/crc32/crc-me.txt\" crc32 checksum-file ."
         "B{ 196 202 117 155 }"
