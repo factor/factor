@@ -1,6 +1,7 @@
-USING: destructors io io.directories io.directories.hierarchy
-io.encodings.ascii io.encodings.utf8 io.files io.files.info
-io.launcher io.pathnames kernel sequences tools.test ;
+USING: arrays destructors io io.directories
+io.directories.hierarchy io.encodings.ascii io.encodings.utf8
+io.files io.files.info io.launcher io.pathnames kernel sequences
+system tools.test ;
 
 { { "kernel" } } [
     "core" resource-path [
@@ -161,7 +162,7 @@ io.launcher io.pathnames kernel sequences tools.test ;
     ! Issue #890
     { } [
         "foo" [ make-directories ] keep
-        [ "echo hi" try-output-process ] with-directory
+        [ vm-path "-help" 2array try-output-process ] with-directory
     ] unit-test
 
     { t } [
