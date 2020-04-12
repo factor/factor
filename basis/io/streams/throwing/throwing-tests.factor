@@ -1,8 +1,9 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: destructors io io.encodings.binary io.encodings.utf8
-io.files io.streams.byte-array io.streams.string
-io.streams.throwing kernel namespaces tools.test ;
+USING: arrays destructors io io.encodings.binary
+io.encodings.utf8 io.files io.streams.byte-array
+io.streams.string io.streams.throwing kernel namespaces
+sequences tools.test ;
 
 { "asdf" }
 [
