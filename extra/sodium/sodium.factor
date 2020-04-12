@@ -41,6 +41,14 @@ PRIVATE>
 
 : check0 ( n -- ) 0 = [ call-fail ] unless ;
 
+ERROR: sodium-malloc-error ;
+
+: check-malloc ( ptr -- ptr/* )
+    dup [ sodium-malloc-error ] unless ;
+
+: sodium-malloc ( size -- ptr )
+    sodium_malloc check-malloc ;
+
 : crypto-pwhash-str ( password opslimit memlimit -- str )
     [ crypto_pwhash_strbytes <byte-array> dup ] 3dip
     [ utf8 encode dup length ] 2dip crypto_pwhash_str check0
