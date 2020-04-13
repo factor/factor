@@ -36,7 +36,7 @@ TUPLE: secure-memory < disposable
 : secure-memory= ( a b -- ? )
     [ check-disposed ] bi@ {
         [ [ size>> ] bi@ = ]
-        [ [ [ >c-ptr ] bi@ ] keep size>> sodium_memcmp ]
+        [ [ [ >c-ptr ] bi@ ] keep size>> sodium_memcmp 0 = ]
     } 2&& ;
 
 M: secure-memory dispose* ( disposable -- )
