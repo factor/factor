@@ -9,7 +9,7 @@ ABOUT: "sodium.secure-memory"
 ARTICLE: "sodium.secure-memory" "Secure memory"
 "The " { $vocab-link "sodium.secure-memory" } " vocab provides a simple wrapper around some of the libsodium's Secure memory functions, see " { $url "https://libsodium.gitbook.io/doc/memory_management" } "." $nl
 "The class for securely allocated alien memory:"
-{ $subsections secure-memory new-secure-memory }
+{ $subsections secure-memory new-secure-memory with-new-secure-memory }
 "Temporary memory access combinators:"
 { $subsections with-read-access with-write-access }
 "Memory access restriction setters:"
@@ -31,6 +31,15 @@ HELP: new-secure-memory
 { $description "Allocates a new instance of " { $link secure-memory } " with " { $snippet "size" } " bytes of freshly allocated alien memory pointed by the " { $slot "underlying" } " slot. Follow the " { $link "destructors-using" } " protocol to release the memory." $nl
   "In case the memory could not be allocated, " { $link sodium-malloc-error } " is thrown." $nl
   "Initial memory contents are not zero, see documentation at " { $url "https://libsodium.gitbook.io/doc/memory_management" } ". The memory is initially in the read-write mode, but is protected against swapping out by the OS (if supported) and against out of boundary access. Call " { $link allow-no-access } " to restrict access after your own initialization." } ;
+
+HELP: with-new-secure-memory
+{ $values
+  { "size" number }
+  { "quot" { $quotation ( ..a secure-memory -- ..b ) } }
+}
+{ $description "Call " { $snippet "quot" } " with a newly allocated " { $link secure-memory } " instance of the given " { $snippet "size" } ". When the quotation is called, the memory is writable. After the call the access is restricted using " { $link allow-no-access } ". This combinator is especially useful when you need to initialize and lock a new memory region. The " { $snippet "quot" } " should save a reference to the memory for subsequent disposal." } ;
+
+{ new-secure-memory with-new-secure-memory } related-words
 
 HELP: allow-no-access
 { $values
