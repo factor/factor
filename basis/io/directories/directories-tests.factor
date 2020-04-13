@@ -160,9 +160,13 @@ system tools.test ;
     { } [ "copy-tree-test" delete-tree ] unit-test
 
     ! Issue #890
-    { } [
+    { f t } [
         "foo" [ make-directories ] keep
-        [ vm-path "-help" 2array try-output-process ] with-directory
+        [
+            "bar" exists?
+            vm-path "-e=USE: io.directories \"bar\" touch-file" 2array try-output-process
+            "bar" exists?
+        ] with-directory
     ] unit-test
 
     { t } [
