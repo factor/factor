@@ -30,7 +30,7 @@ TUPLE: secure-memory < disposable
 : with-write-access ( ..a secure-memory quot: ( ..a secure-memory -- ..b ) -- ..b )
     over dup allow-write-access [ allow-no-access ] curry finally ; inline
 
-: with-new-secure-memory ( ..a size quot: ( ..a secure-memory -- ..b ) -- ..b secure-memory )
+: with-new-secure-memory ( ..a size quot: ( ..a secure-memory -- ..b ) -- ..b )
     [ new-secure-memory ] dip with-write-access ; inline
 
 : secure-memory= ( a b -- ? )
