@@ -53,14 +53,14 @@ HELP: allow-write-access
 HELP: with-read-access
 { $values
   { "secure-memory" secure-memory }
-  { "quot: ( secure-memory -- )" quotation }
+  { "quot" { $quotation ( ..a secure-memory -- ..b ) } }
 }
 { $description "Temporarily allow read-only access to the " { $snippet "secure-memory" } " for the duration of the " { $snippet "quot" } " call. When the quotation terminates, disable the access using " { $link allow-no-access } "." } ;
 
 HELP: with-write-access
 { $values
   { "secure-memory" secure-memory }
-  { "quot: ( secure-memory -- )" quotation }
+  { "quot" { $quotation ( ..a secure-memory -- ..b ) } }
 }
 { $description "Temporarily allow read and write access to the " { $snippet "secure-memory" } " for the duration of the " { $snippet "quot" } " call. When the quotation terminates, disable the access using " { $link allow-no-access } "." } ;
 
