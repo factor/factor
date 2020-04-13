@@ -25,4 +25,4 @@ USE: vocabs
 "furnace.scopes" require
 "furnace.sessions" require
 "furnace.syndication" require
-"webapps.user-admin" require
+! "webapps.user-admin" require

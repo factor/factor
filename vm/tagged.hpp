@@ -41,7 +41,7 @@ template <typename Type> struct tagged {
   }
 
   Type* operator->() const { return untagged(); }
-  cell* operator&() const { return &value_; }
+  cell* operator&() const { return &value(); }
 
   bool operator==(const tagged<Type>& x) { return value_ == x.value_; }
   bool operator!=(const tagged<Type>& x) { return value_ != x.value_; }

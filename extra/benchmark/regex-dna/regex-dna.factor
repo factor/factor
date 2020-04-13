@@ -44,8 +44,9 @@ IN: benchmark.regex-dna
 SYMBOL: ilen
 SYMBOL: clen
 
+! Make sure we read the file with \n as the newline delimiter.
 : regex-dna ( file -- )
-    ascii file-contents dup length ilen set
+    ascii file-lines [ "\n" append ] map concat dup length ilen set
     strip-line-breaks dup length clen set
     dup count-patterns
     do-replacements

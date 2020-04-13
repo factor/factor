@@ -6,6 +6,8 @@ TYPEDEF: ulong     __ulongword_type
 TYPEDEF: long      __sword_type
 TYPEDEF: ulong     __uword_type
 TYPEDEF: long      __slongword_type
+TYPEDEF: uint      __u32
+TYPEDEF: ulonglong __u64
 TYPEDEF: uint      __u32_type
 TYPEDEF: int       __s32_type
 
@@ -22,6 +24,7 @@ TYPEDEF: __slongword_type blksize_t
 TYPEDEF: __slongword_type blkcnt_t
 TYPEDEF: __sword_type     ssize_t
 TYPEDEF: __s32_type       pid_t
+TYPEDEF: ulong sigset_t
 TYPEDEF: __slongword_type time_t
 TYPEDEF: __slongword_type __time_t
 

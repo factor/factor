@@ -1,9 +1,11 @@
-USING: benchmark.regex-dna io io.files io.encodings.ascii
-io.streams.string kernel tools.test splitting ;
+USING: benchmark.regex-dna io.encodings.ascii io.files
+io.streams.string kernel sequences tools.test ;
 
 { t } [
     "resource:extra/benchmark/regex-dna/regex-dna-test-in.txt"
     [ regex-dna ] with-string-writer
     "resource:extra/benchmark/regex-dna/regex-dna-test-out.txt"
-    ascii file-contents =
+    ! Ensure the line endings don't change on Windows
+    ! when checking out with git.
+    ascii file-lines [ "\n" append ] map concat =
 ] unit-test
