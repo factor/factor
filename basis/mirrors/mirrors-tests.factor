@@ -49,8 +49,8 @@ TUPLE: color
 { green integer }
 { blue integer } ;
 
-[ \ + make-mirror clear-assoc ] must-fail
-[ \ + make-mirror [ "name" ] dip delete-at ] must-fail
+[ \ + make-mirror clear-assoc ] [ mirror-slot-removal? ] must-fail-with
+[ \ + make-mirror [ "name" ] dip delete-at ] [ mirror-slot-removal? ] must-fail-with
 
 ! Test reshaping with a mirror
 1 2 3 color boa <mirror> "mirror" set
