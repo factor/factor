@@ -3,25 +3,39 @@
 USING: arrays help.markup help.syntax lexer math sequences ;
 IN: tensors
 
-ARTICLE: "tensors" "Tensors" "A " { $snippet "tensor" } " is a sequence "
-"of floating point numbers "
+ARTICLE: "tensors" "Tensors" 
+"A " { $snippet "tensor" } " is a sequence of floating point numbers "
 "shaped into an n-dimensional matrix. It supports fast, scalable matrix "
 "operations such as matrix multiplication and transposition as well as a "
 "number of element-wise operations. Words for working with tensors are found "
-"in the " { $vocab-link "tensors" } " vocabulary." $nl $nl
-"Tensors can be created "
-"by calling one of four constructors:"
-{ $subsections zeros ones naturals arange }
-"They can be converted to the corresponding N-dimensional array with"
-{ $subsections tensor>array }
+"in the " { $vocab-link "tensors" } " vocabulary." $nl
+"More information about tensors can be found here:"
+{ $subsections "creation" "manipulation" } ;
+
+ARTICLE: "creation" "Creating Tensors" 
+"Tensors can be created by calling one of following constructors:"
+{ $subsections zeros ones naturals arange (tensor) }
+"They can be converted to/from the corresponding N-dimensional array with"
+{ $subsections tensor>array >tensor }
+"There is also a tensor parsing word"
+{ $subsections POSTPONE: t{ } ;
+
+ARTICLE: "manipulation" "Manipulating Tensors"
 "The number of dimensions can be extracted with:"
 { $subsections dims }
-"Additionally, tensors can be reshaped with:"
+"Tensors can be reshaped with:"
 { $subsections reshape flatten }
 "Tensors can be combined element-wise with other tensors as well as numbers with:"
 { $subsections t+ t- t* t/ t% }
-"Finally, tensors support the following matrix operations:"
-{ $subsections matmul transpose } ;
+"Tensors support the following matrix operations:"
+{ $subsections matmul transpose } 
+"Tensors also support the following concatenation operations:"
+{ $subsections stack hstack vstack t-concat }
+"Tensors implement all " { $vocab-link "sequences" } " operations." $nl
+"Tensors can be indexed into using either numbers or arrays, for example:"
+{ $example "USING: sequences tensors ;" 
+"{ 1 1 } t{ { 0.0 1.0 2.0 } { 3.0 4.0 5.0 } } nth" 
+"4 t{ { 0.0 1.0 2.0 } { 3.0 4.0 5.0 } } nth =" "t" } ;
 
 ARTICLE: "tensor-operators" "Tensor Operators" "Info here" ;
 
@@ -160,6 +174,33 @@ HELP: matmul
 
 HELP: transpose
 { $values { "tensor" tensor } { "tensor'" tensor } }
-{ $description "Performs n-dimensional matrix transposition on " { $snippet "tens" } "." } ;
+{ $description "Performs n-dimensional matrix transposition on " { $snippet "tensor" } "." } ;
+
+HELP: stack 
+{ $values { "seq" sequence } { "tensor" tensor } } 
+{ $description "Joins the sequences in " { $snippet "seq" } " along a new axis. "
+{ $snippet "tensor" } " will have one more dimension than the arrays in " { $snippet "seq" } "." } 
+{ $errors "Throws a " { $link shape-mismatch-error } " if the sequences in "
+{ $snippet "seq" } " do not have the same shape."} ;
+
+
+HELP: hstack 
+{ $values { "seq" sequence } { "tensor" tensor } } 
+{ $description "Joins the sequences in " { $snippet "seq" } " column-wise." }
+{ $errors "Throws a " { $link shape-mismatch-error } " if the sequences in "
+{ $snippet "seq" } " do not have the same shape along all but the second axis."} ;
+
+HELP: vstack 
+{ $values { "seq" sequence } { "tensor" tensor } } 
+{ $description "Joins the sequences in " { $snippet "seq" } " row-wise." }
+{ $errors "Throws a " { $link shape-mismatch-error } " if the sequences in "
+{ $snippet "seq" } " do not have the same shape along all but the first axis."} ;
+
+HELP: t-concat
+{ $values { "seq" sequence } { "tensor" tensor } } 
+{ $description "Joins the sequences in " { $snippet "seq" } " along the first axis." }
+{ $errors "Throws a " { $link shape-mismatch-error } " if the sequences in "
+{ $snippet "seq" } " do not have the same shape along all but the first axis."} ;
+
 
 ABOUT: "tensors"
