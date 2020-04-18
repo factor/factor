@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors calendar combinators.short-circuit environment
-formatting io io.directories io.encodings.utf8 io.files
-io.files.info io.files.info.unix io.files.trash io.files.types
-io.pathnames kernel math math.parser sequences system unix.stat
-unix.users xdg ;
+formatting io io.backend io.directories io.encodings.utf8
+io.files io.files.info io.files.info.unix io.files.trash
+io.files.types io.pathnames kernel math math.parser sequences
+system unix.stat unix.users xdg ;
 
 IN: io.files.trash.unix
 
@@ -65,7 +65,7 @@ IN: io.files.trash.unix
 PRIVATE>
 
 M: unix send-to-trash ( path -- )
-    dup trash-path [
+    normalize-path dup trash-path [
         "files" append-path [ make-user-directory ] keep
         to-directory safe-file-name
     ] [
