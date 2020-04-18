@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: alien.c-types alien.strings alien.syntax classes.struct
-core-foundation io.encodings.utf8 io.files.trash kernel system ;
+core-foundation io.backend io.encodings.utf8 io.files.trash
+kernel system ;
 
 IN: io.files.trash.macosx
 
@@ -59,5 +60,6 @@ FUNCTION: OSStatus FSPathMakeRefWithOptions (
 PRIVATE>
 
 M: macosx send-to-trash ( path -- )
+    normalize-path
     <fs-ref> f kFSFileOperationDefaultOptions
     FSMoveObjectToTrashSync check-err ;
