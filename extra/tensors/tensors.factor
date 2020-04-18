@@ -20,6 +20,7 @@ TUPLE: tensor
 ERROR: non-positive-shape-error shape ;
 ERROR: shape-mismatch-error shape1 shape2 ;
 ERROR: non-uniform-seq-error seq ;
+ERROR: dimension-mismatch-error tensor-dim index-dim ;
 
 <PRIVATE
 
@@ -135,10 +136,14 @@ syntax:M: tensor pprint* pprint-object ;
     <reversed> 1 swap [ swap [ * ] keep ] map nip reverse ;
 
 ! turns a num/seq index & tensor into num index & tensor
+! also throws a dimension mismatch if seq & tens shape>> arent the same len
 : num-index ( n/seq tensor -- n tensor )
     ! check form of index (num or seq)
     swap dup array? not
-    [ ! if array, turn into num
+    [ ! if array, first check if it's a valid index
+        2dup [ shape>> length ] dip length 2dup = 
+        [ dimension-mismatch-error ] unless 2drop
+        ! turn into num
         [ dup shape>> ind-mults ] dip [ * ] 2map-sum
     ] unless swap ;
 

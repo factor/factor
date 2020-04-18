@@ -210,6 +210,11 @@ IN: tensors.tests
     { 1 0 1 } { 2 2 2 } naturals nth
 ] unit-test
 
+[
+    { 1 2 3 } t{ 1 2 3 } nth
+]
+[ 1 3 \ dimension-mismatch-error boa = ] must-fail-with
+
 ! test set-nth
 { t{ 1 5 3 } } [
     t{ 1 2 3 } dup [ 5 { 1 } ] dip set-nth
@@ -222,6 +227,11 @@ IN: tensors.tests
 { t{ { { 0 1 } { 2 3 } } { { 4 10 } { 6 7 } } } } [
     { 2 2 2 } naturals dup [ 10 { 1 0 1 } ] dip set-nth
 ] unit-test
+
+[
+    { 2 2 } naturals dup [ 5 { 1 } ] dip set-nth
+]
+[ 2 1 \ dimension-mismatch-error boa = ] must-fail-with
 
 ! test clone
 { t{ 1 2 3 }  } [

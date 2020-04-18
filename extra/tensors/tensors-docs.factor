@@ -35,7 +35,9 @@ ARTICLE: "manipulation" "Manipulating Tensors"
 "Tensors can be indexed into using either numbers or arrays, for example:"
 { $example "USING: sequences tensors ;" 
 "{ 1 1 } t{ { 0.0 1.0 2.0 } { 3.0 4.0 5.0 } } nth" 
-"4 t{ { 0.0 1.0 2.0 } { 3.0 4.0 5.0 } } nth =" "t" } ;
+"4 t{ { 0.0 1.0 2.0 } { 3.0 4.0 5.0 } } nth =" "t" }
+"If the array being used to index into the tensor has the wrong number "
+"of dimensions, a " { $link dimension-mismatch-error } " will be thrown." ;
 
 ARTICLE: "tensor-operators" "Tensor Operators" "Info here" ;
 
@@ -66,6 +68,13 @@ HELP: non-uniform-seq-error
 { $error-description "Thrown by operations such as " { $link >tensor } 
 ", which allow users to directly input the values of a " { $link tensor }
 " as a nested sequence, when the subsequences have varying lengths." } ;
+
+HELP: dimension-mismatch-error
+{ $values { "tensor-dim" number } { "index-dim" number } }
+{ $description "Throws a " { $link dimension-mismatch-error } "." }
+{ $error-description "Thrown by indexing operations such as " { $link nth }
+" and " { $link set-nth } " if the array being used to index has a different number "
+"of dimensions than the tensor." } ;
 
 HELP: t{
 { $syntax "t{ elements... }" }
