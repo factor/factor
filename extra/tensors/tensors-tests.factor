@@ -1,6 +1,6 @@
 ! Copyright (C) 2019 HMC Clinic.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types kernel math math.order math.vectors
+USING: accessors alien.c-types arrays kernel math math.order math.vectors
 sequences specialized-arrays tensors tools.test ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
@@ -198,30 +198,29 @@ IN: tensors.tests
     1 { 5 } naturals nth
 ] unit-test
 
+{ 1.0 } [
+    { 1 } { 5 } naturals nth
+] unit-test
+
 { 3.0 } [
-    3 { 2 2 } naturals nth
+    { 1 1 } { 2 2 } naturals nth
 ] unit-test
 
 { 5.0 } [
-    5 { 2 2 2 } naturals nth
+    { 1 0 1 } { 2 2 2 } naturals nth
 ] unit-test
-
-[
-    10 t{ 1 2 3 } nth
-]
-[ 10 float-array{ 1 2 3 } \ bounds-error boa = ] must-fail-with
 
 ! test set-nth
 { t{ 1 5 3 } } [
-    t{ 1 2 3 } dup [ 5 1 ] dip set-nth
+    t{ 1 2 3 } dup [ 5 { 1 } ] dip set-nth
 ] unit-test
 
 { t{ { 0 1 } { 5 3 } } } [
-    { 2 2 } naturals dup [ 5 2 ] dip set-nth
+    { 2 2 } naturals dup [ 5 { 1 0 } ] dip set-nth
 ] unit-test
 
 { t{ { { 0 1 } { 2 3 } } { { 4 10 } { 6 7 } } } } [
-    { 2 2 2 } naturals dup [ 10 5 ] dip set-nth
+    { 2 2 2 } naturals dup [ 10 { 1 0 1 } ] dip set-nth
 ] unit-test
 
 ! test clone
@@ -631,6 +630,188 @@ IN: tensors.tests
     3
     t% shape>>
 ] unit-test
+
+! t-concat
+{ t{ { 0.0 1.0 2.0 } { 3.0 4.0 5.0 } { 0.0 1.0 2.0 } { 3.0 4.0 5.0 } } } [
+    { 2 3 } naturals dup 2array t-concat
+] unit-test
+
+{ t{ { 0.0 1.0 2.0 } { 3.0 4.0 5.0 } { 0.0 1.0 2.0 } { 3.0 4.0 5.0 }
+     { 0.0 1.0 2.0 } { 3.0 4.0 5.0 } } } [
+    { 2 3 } naturals dup dup 3array t-concat
+] unit-test
+
+{ t{ { 0.0 1.0 2.0 }
+     { 3.0 4.0 5.0 }
+     { 0.0 1.0 2.0 }
+     { 3.0 4.0 5.0 }
+     { 6.0 7.0 8.0 }
+     { 9.0 10.0 11.0 }
+     { 12.0 13.0 14.0 } } } [
+    { 2 3 } naturals { 5 3 } naturals 2array t-concat
+] unit-test
+
+{ t{ { { 0.0 1.0 } { 2.0 3.0 } { 4.0 5.0 } }
+     { { 6.0 7.0 } { 8.0 9.0 } { 10.0 11.0 } }
+     { { 0.0 1.0 } { 2.0 3.0 } { 4.0 5.0 } }
+     { { 6.0 7.0 } { 8.0 9.0 } { 10.0 11.0 } } } } [
+     { 2 3 2 } naturals dup 2array t-concat
+] unit-test
+
+{ t{ { { 0.0 1.0 } { 2.0 3.0 } { 4.0 5.0 } }
+     { { 6.0 7.0 } { 8.0 9.0 } { 10.0 11.0 } }
+     { { 0.0 1.0 } { 2.0 3.0 } { 4.0 5.0 } }
+     { { 6.0 7.0 } { 8.0 9.0 } { 10.0 11.0 } }
+     { { 0.0 1.0 } { 2.0 3.0 } { 4.0 5.0 } }
+     { { 6.0 7.0 } { 8.0 9.0 } { 10.0 11.0 } } } } [
+     { 2 3 2 } naturals dup dup 3array t-concat
+] unit-test
+
+[
+    { 2 2 } naturals { 2 3 } naturals 2array t-concat
+]
+[ { 2 2 } { 2 3 } \ shape-mismatch-error boa = ] must-fail-with
+
+[
+    { 2 2 } naturals dup { 2 3 } naturals 3array t-concat
+]
+[ { 2 2 } { 2 3 } \ shape-mismatch-error boa = ] must-fail-with
+
+! stack
+{ t{ { { 0.0 1.0 2.0 } { 3.0 4.0 5.0 } }
+     { { 0.0 1.0 2.0 } { 3.0 4.0 5.0 } } } } [
+    { 2 3 } naturals dup 2array stack
+] unit-test
+
+{ t{ { { 0.0 1.0 2.0 } { 3.0 4.0 5.0 } }
+     { { 0.0 1.0 2.0 } { 3.0 4.0 5.0 } }
+     { { 0.0 1.0 2.0 } { 3.0 4.0 5.0 } } } } [
+    { 2 3 } naturals dup dup 3array stack
+] unit-test
+
+{ t{ { { { 0.0 1.0 } { 2.0 3.0 } { 4.0 5.0 } }
+       { { 6.0 7.0 } { 8.0 9.0 } { 10.0 11.0 } } }
+     { { { 0.0 1.0 } { 2.0 3.0 } { 4.0 5.0 } }
+       { { 6.0 7.0 } { 8.0 9.0 } { 10.0 11.0 } } } } } [
+     { 2 3 2 } naturals dup 2array stack
+] unit-test
+
+{ t{ { { { 0.0 1.0 } { 2.0 3.0 } { 4.0 5.0 } }
+       { { 6.0 7.0 } { 8.0 9.0 } { 10.0 11.0 } } }
+     { { { 0.0 1.0 } { 2.0 3.0 } { 4.0 5.0 } }
+       { { 6.0 7.0 } { 8.0 9.0 } { 10.0 11.0 } } }
+     { { { 0.0 1.0 } { 2.0 3.0 } { 4.0 5.0 } }
+       { { 6.0 7.0 } { 8.0 9.0 } { 10.0 11.0 } } } } } [
+     { 2 3 2 } naturals dup dup 3array stack
+] unit-test
+
+[
+    { 2 2 } naturals { 2 3 } naturals 2array stack
+]
+[ { 2 2 } { 2 3 } \ shape-mismatch-error boa = ] must-fail-with
+
+[
+    { 2 2 } naturals { 3 2 } naturals 2array stack
+]
+[ { 2 2 } { 3 2 } \ shape-mismatch-error boa = ] must-fail-with
+
+[
+    { 2 2 } naturals dup { 2 3 } naturals 3array stack
+]
+[ { 2 2 } { 2 3 } \ shape-mismatch-error boa = ] must-fail-with
+
+[
+    { 2 2 } naturals dup { 3 2 } naturals 3array stack
+]
+[ { 2 2 } { 3 2 } \ shape-mismatch-error boa = ] must-fail-with
+
+! hstack
+
+{ t{ { 0.0 1.0 2.0 3.0 1.0 }
+     { 4.0 5.0 6.0 7.0 1.0 }
+     { 8.0 9.0 10.0 11.0 1.0 } } } [
+    { 3 4 } naturals { 3 1 } ones 2array hstack
+] unit-test
+
+{ t{ { 0.0 1.0 2.0 3.0 1.0 0.0 0.0 }
+     { 4.0 5.0 6.0 7.0 1.0 0.0 0.0 }
+     { 8.0 9.0 10.0 11.0 1.0 0.0 0.0 } } } [
+    { 3 4 } naturals { 3 1 } ones { 3 2 } zeros 3array hstack
+] unit-test
+
+{ t{ { { 0.0 1.0 2.0 3.0 1.0 } { 4.0 5.0 6.0 7.0 1.0 } }
+     { { 8.0 9.0 10.0 11.0 1.0 } { 12.0 13.0 14.0 15.0 1.0 } } } } [
+     { 2 2 4 } naturals { 2 2 1 } ones 2array hstack
+] unit-test
+
+{ t{ { { 0.0 1.0 2.0 3.0 1.0 0.0 0.0 }
+       { 4.0 5.0 6.0 7.0 1.0 0.0 0.0 } }
+     { { 8.0 9.0 10.0 11.0 1.0 0.0 0.0 }
+       { 12.0 13.0 14.0 15.0 1.0 0.0 0.0 } } } } [
+     { 2 2 4 } naturals { 2 2 1 } ones { 2 2 2 } zeros 3array hstack
+] unit-test
+
+[
+    { 2 2 } naturals { 3 2 } naturals 2array hstack
+]
+[ { 2 2 } { 3 2 } \ shape-mismatch-error boa = ] must-fail-with
+
+[
+    { 2 2 } naturals dup { 3 2 } naturals 3array hstack
+]
+[ { 2 2 } { 3 2 } \ shape-mismatch-error boa = ] must-fail-with
+
+[
+    { 2 2 2 } naturals { 3 2 2 } naturals 2array hstack
+]
+[ { 2 2 2 } { 3 2 2 } \ shape-mismatch-error boa = ] must-fail-with
+
+[
+    { 2 2 2 } naturals dup { 3 2 2 } naturals 3array hstack
+]
+[ { 2 2 2 } { 3 2 2 } \ shape-mismatch-error boa = ] must-fail-with
+
+! vstack
+{ t{ { 0.0 1.0 } { 2.0 3.0 } { 4.0 5.0 } { 0.0 1.0 } } } [
+    { 3 2 } naturals { 1 2 } naturals 2array vstack
+] unit-test
+
+{ t{ { 0.0 1.0 } { 2.0 3.0 } { 4.0 5.0 }
+     { 0.0 1.0 } { 0.0 1.0 } { 2.0 3.0 } } } [
+    { 3 2 } naturals { 1 2 } naturals { 2 2 } naturals 3array vstack
+] unit-test
+
+{ t{ { { 0.0 1.0 } { 2.0 3.0 } { 4.0 5.0 } { 0.0 1.0 } }
+     { { 6.0 7.0 } { 8.0 9.0 } { 10.0 11.0 } { 2.0 3.0 } } } } [
+    { 2 3 2 } naturals { 2 1 2 } naturals 2array vstack
+] unit-test
+
+{ t{ { { 0.0 1.0 } { 2.0 3.0 } { 4.0 5.0 }
+       { 0.0 1.0 } { 0.0 1.0 } { 2.0 3.0 } }
+     { { 6.0 7.0 } { 8.0 9.0 } { 10.0 11.0 }
+       { 2.0 3.0 } { 4.0 5.0 } { 6.0 7.0 } } } } [
+    { 2 3 2 } naturals { 2 1 2 } naturals { 2 2 2 } naturals 3array vstack
+] unit-test
+
+[
+    { 2 2 } naturals { 2 3 } naturals 2array vstack
+]
+[ { 2 2 } { 2 3 } \ shape-mismatch-error boa = ] must-fail-with
+
+[
+    { 2 2 } naturals dup { 2 3 } naturals 3array vstack
+]
+[ { 2 2 } { 2 3 } \ shape-mismatch-error boa = ] must-fail-with
+
+[
+    { 2 2 2 } naturals { 3 2 2 } naturals 2array vstack
+]
+[ { 2 2 2 } { 3 2 2 } \ shape-mismatch-error boa = ] must-fail-with
+
+[
+    { 2 2 2 } naturals dup { 3 2 2 } naturals 3array vstack
+]
+[ { 2 2 2 } { 3 2 2 } \ shape-mismatch-error boa = ] must-fail-with
 
 ! test tensor>array
 { { 0.0 0.0 } } [
