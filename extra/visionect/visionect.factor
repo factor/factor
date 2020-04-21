@@ -48,7 +48,9 @@ SYMBOL: visionect-api-secret
     visionect-url <delete-request> visionect-request ;
 
 : visionect-post ( post-data path -- data )
-    visionect-url <post-request> visionect-request ;
+    visionect-url <post-request>
+    dup post-data>> content-type>> "content-type" set-header
+    visionect-request ;
 
 PRIVATE>
 
@@ -72,15 +74,17 @@ PRIVATE>
 : tclv-list ( uuid -- tclv )
     "/api/devicetclv/" prepend visionect-get "" like json> ;
 
-: get-tclv ( uuid type -- config )
-    [ "/api/cmd/Param/" prepend ] dip
-    "{\"Data\": [{\"Type\": %d, \"Control\": 0, \"Value\": \"\"}]}"
-    sprintf swap visionect-post "" like json> ;
+: get-tclv ( type uuid -- config )
+    [
+        "{\"Data\": [{\"Type\": %d, \"Control\": 0, \"Value\": \"\"}]}"
+        sprintf B{ } like "application/json" <post-data> swap >>data
+    ] dip "/api/cmd/Param/" prepend visionect-post "" like json> ;
 
-: set-tclv ( uuid type value -- config )
-    [ "/api/cmd/Param/" prepend ] 2dip
-    "{\"Data\": [{\"Type\": %d, \"Control\": 1, \"Value\": \"%s\"}]}"
-    sprintf swap visionect-post "" like json> ;
+: set-tclv ( type value uuid -- config )
+    [
+        "{\"Data\": [{\"Type\": %d, \"Control\": 1, \"Value\": \"%s\"}]}"
+        sprintf B{ } like "application/json" <post-data> swap >>data
+    ] dip "/api/cmd/Param/" prepend visionect-post "" like json> ;
 
 : reboot-device ( uuid -- )
     f swap "/api/device/" "/reboot" surround visionect-post drop ;
@@ -182,7 +186,4 @@ PRIVATE>
         png-data % "\n" %
         "--" % boundary % "--\n" %
     ] B{ } make >>data
-    "/backend/" uuid append visionect-url
-    <post-request>
-    content-type "content-type" set-header
-    set-visionect-headers http-request 2drop ;
+    "/backend/" uuid append visionect-post drop ;
