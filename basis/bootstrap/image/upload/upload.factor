@@ -47,7 +47,7 @@ SYMBOL: build-images-destination
         ] each
     ] with-file-writer ;
 
-: scp-name os ( -- path ) "scp" ;
+: scp-name ( -- path ) "scp" ;
 
 : upload-images ( -- )
     [
