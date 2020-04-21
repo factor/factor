@@ -1,9 +1,11 @@
 ! Copyright (C) 2020 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
+
 USING: accessors assocs base64 calendar calendar.format
-checksums.hmac checksums.sha combinators formatting http
-http.client json.reader json.writer kernel math.parser
-namespaces sequences ;
+checksums.hmac checksums.sha combinators combinators.smart
+formatting fry http http.client json.reader json.writer kernel
+locals make math.parser namespaces random sequences ;
+
 IN: visionect
 
 SYMBOL: visionect-base-url
@@ -15,14 +17,20 @@ SYMBOL: visionect-api-secret
 
 <PRIVATE
 
-: visionect-authorization ( verb date path -- auth )
-    "%s\n\n\n%s\n%s" sprintf visionect-api-secret get sha-256
-    hmac-bytes >base64 visionect-api-key get ":" rot 3append ;
+: visionect-authorization ( request -- auth )
+    {
+        [ method>> ]
+        [ "content-sha256" header ]
+        [ "content-type" header ]
+        [ "date" header ]
+        [ url>> path>> ]
+    } cleave>array "\n" join
+    visionect-api-secret get sha-256 hmac-bytes >base64
+    visionect-api-key get ":" rot 3append ;
 
 : set-visionect-headers ( request -- request )
-    now timestamp>http-string "Date" set-header
-    dup [ method>> ] [ "Date" header ] [ url>> path>> ] tri
-    visionect-authorization "Authorization" set-header ;
+    now timestamp>http-string "date" set-header
+    dup visionect-authorization "authorization" set-header ;
 
 : visionect-request ( request -- data )
     set-visionect-headers http-request nip ;
@@ -152,5 +160,29 @@ PRIVATE>
 
 ! ## BACKENDS
 
-: http-backend ( png uuid -- )
-    "/backend/" prepend visionect-put drop ;
+<PRIVATE
+
+: choose-boundary ( data -- boundary )
+    f swap '[
+        drop 16 random-bytes bytes>hex-string
+        dup _ subseq?
+    ] loop ;
+
+PRIVATE>
+
+:: http-backend ( png-data uuid -- )
+    png-data choose-boundary :> boundary
+    "multipart/form-data; boundary=\"" boundary "\"" 3append :> content-type
+    content-type <post-data>
+    [
+        "--" % boundary % "\n" %
+        "Content-Disposition: form-data; name=\"image\"; filename=\"image.png\"\n" %
+        "Content-Type: image/png\n" %
+        "\n" %
+        png-data % "\n" %
+        "--" % boundary % "--\n" %
+    ] B{ } make >>data
+    "/backend/" uuid append visionect-url
+    <post-request>
+    content-type "content-type" set-header
+    set-visionect-headers http-request 2drop ;
