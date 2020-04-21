@@ -64,6 +64,8 @@ TUPLE: mx preference exchange ;
 
 TUPLE: soa mname rname serial refresh retry expire minimum ;
 
+TUPLE: srv priority weight port target ;
+
 TUPLE: a name ;
 CONSTRUCTOR: <a> a ( name -- obj ) ;
 
@@ -204,6 +206,13 @@ CONSTANT: ipv6-arpa-suffix ".ip6.arpa"
         2 read be> >>preference
         parse-name >>exchange ;
 
+: parse-srv ( -- srv )
+    srv new
+    2 read be> >>priority
+    2 read be> >>weight
+    2 read be> >>port
+    parse-name >>target ;
+
 GENERIC: parse-rdata ( n type -- obj )
 
 M: object parse-rdata drop read ;
@@ -214,6 +223,7 @@ M: MX parse-rdata 2drop parse-mx ;
 M: NS parse-rdata 2drop parse-name <ns> ;
 M: PTR parse-rdata 2drop parse-name <ptr> ;
 M: SOA parse-rdata 2drop parse-soa ;
+M: SRV parse-rdata 2drop parse-srv ;
 
 : parse-rr ( -- rr )
     rr new
@@ -342,6 +352,7 @@ M: TXT rdata>byte-array
 : dns-MX-query ( name -- message ) MX IN dns-query ;
 : dns-NS-query ( name -- message ) NS IN dns-query ;
 : dns-TXT-query ( name -- message ) TXT IN dns-query ;
+: dns-SRV-query ( name -- message ) SRV IN dns-query ;
 
 : read-TXT-strings ( byte-array -- strings )
     [
