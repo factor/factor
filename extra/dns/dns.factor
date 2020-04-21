@@ -20,7 +20,7 @@ ENUM: dns-type
 { MR 9 } { NULL 10 } { WKS 11 } { PTR 12 }
 { HINFO 13 } { MINFO 14 } { MX 15 } { TXT 16 }
 { RP 17 } { AFSDB 18 } { SIG 24 } { KEY 25 }
-{ AAAA 28 } { LOC 29 } { SVR 33 } { NAPTR 35 }
+{ AAAA 28 } { LOC 29 } { SRV 33 } { NAPTR 35 }
 { KX 36 } { CERT 37 } { DNAME 39 } { OPT 41 }
 { APL 42 } { DS 43 } { SSHFP 44 } { IPSECKEY 45 }
 { RRSIG 46 } { NSEC 47 } { DNSKEY 48 } { DHCID 49 }
