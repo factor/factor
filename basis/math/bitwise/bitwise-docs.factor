@@ -4,12 +4,12 @@ USING: assocs help.markup help.syntax math sequences kernel ;
 IN: math.bitwise
 
 HELP: bitfield
-{ $values { "values..." "a series of objects" } { "bitspec" "an array" } { "n" integer } }
-{ $description "Constructs an integer from a series of values on the stack together with a bit field specifier, which is an array whose elements have one of the following shapes:"
+{ $values { "values..." "a series of objects on the stack" } { "bitspec" "an array" } { "n" integer } }
+{ $description "Constructs an integer (bit field) from a series of values on the stack together with a bit field specifier, which is an array whose elements have one of the following shapes:"
     { $list
-        { { $snippet "{ constant shift }" } " - the resulting bit field is bitwise or'd with " { $snippet "constant" } " shifted to the right by " { $snippet "shift" } " bits" }
-        { { $snippet "{ word shift }" } " - the resulting bit field is bitwise or'd with " { $snippet "word" } " applied to the top of the stack; the result is shifted to the right by " { $snippet "shift" } " bits" }
-        { { $snippet "shift" } " - the resulting bit field is bitwise or'd with the top of the stack; the result is shifted to the right by " { $snippet "shift" } " bits" }
+        { { $snippet "{ word shift }" } " - " { $snippet "word" } " is applied to the top of the stack and the result is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+        { { $snippet "shift" } " - the top of the stack is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+        { { $snippet "{ constant shift }" } " - " { $snippet "constant" } " is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
     }
 "The bit field specifier is processed left to right, so stack values should be supplied in reverse order." }
 { $examples
@@ -30,6 +30,18 @@ HELP: bitfield
         "        0"
         "    } bitfield ;"
     }
+    "Square the 3 from the stack and shift 8, place the 1 from the stack at bit 5, and shift a constant 1 to bit 2:"
+    { $example
+        "USING: math math.bitwise prettyprint ;"
+        "1 3"
+        "    {"
+        "        { sq 8 }"
+        "        5"
+        "        { 1 2 }"
+        "    } bitfield .b"
+        "0b100100100100"
+    }
+
 } ;
 
 HELP: bits

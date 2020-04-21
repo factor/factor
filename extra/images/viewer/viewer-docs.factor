@@ -37,7 +37,7 @@ HELP: set-image
 { $values
     { "gadget" image-gadget } { "object" { $or pathname string image } }
 }
-{ $description "Sets the image of this gadget. This word loads the image from disk if the input is a string or a pathname."
+{ $description "Sets the image of this gadget. This word loads the image from disk if the input is a string or a pathname. "
 "If the input is a model, gadget has to be " { $instance image-control } "." } ;
 
 HELP: image-control
@@ -90,7 +90,7 @@ $nl
 { $notes "The image can be set after the gadget has been grafted. However, for " { $instance image-gadget } ", this can "
 " be done only once. If your image is changing, you should be using " { $instance image-control } " and " { $instance model } "."
 $nl
-" Performance will be greatly reduced if you are using images that have more than 512 pixels on one of their"
+"Performance will be greatly reduced if you are using images that have more than 512 pixels on one of their"
 " axis." }
 
 

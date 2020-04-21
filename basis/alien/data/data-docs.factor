@@ -41,8 +41,8 @@ HELP: memory>byte-array
 
 HELP: cast-array
 { $values { "byte-array" byte-array } { "c-type" "a C type" } { "array" "a specialized array" } }
-{ $description "Converts a byte array into a specialized array by interpreting the bytes in as machine-specific values. Code which uses this word is unportable." }
-{ $notes "The appropriate specialized array vocabulary must be loaded; otherwise, an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
+{ $description "Converts a " { $link byte-array } " into a specialized array by interpreting the bytes in it as machine-specific values. Code using this word is unportable." }
+{ $notes "The appropriate specialized array vocabulary must be loaded, otherwise an error will be thrown. See the " { $vocab-link "specialized-arrays" } " vocabulary for details on the underlying sequence type constructed." }
 { $errors "Throws an error if the type does not exist, the necessary specialized array vocabulary is not loaded, or the requested size is negative." } ;
 
 HELP: malloc-array
@@ -257,4 +257,4 @@ ARTICLE: "c-out-params" "Output parameters in C"
 { $code
   "1234 { c-string } [ do_frob ] with-out-parameters"
 }
-"which would put the functions return value and error string on the stack." ;
+"which would put the function's return value and error string on the stack." ;
