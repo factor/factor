@@ -49,7 +49,8 @@ SYMBOL: visionect-api-secret
 
 : visionect-post ( post-data path -- data )
     visionect-url <post-request>
-    dup post-data>> content-type>> "content-type" set-header
+    dup post-data>> dup post-data?
+    [ content-type>> "content-type" set-header ] [ drop ] if
     visionect-request ;
 
 PRIVATE>
