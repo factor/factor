@@ -180,11 +180,11 @@ PRIVATE>
     "multipart/form-data; boundary=\"" boundary "\"" 3append :> content-type
     content-type <post-data>
     [
-        "--" % boundary % "\n" %
-        "Content-Disposition: form-data; name=\"image\"; filename=\"image.png\"\n" %
-        "Content-Type: image/png\n" %
-        "\n" %
-        png-data % "\n" %
-        "--" % boundary % "--\n" %
+        "--" % boundary % "\r\n" %
+        "Content-Disposition: form-data; name=\"image\"; filename=\"image.png\"\r\n" %
+        "Content-Type: image/png\r\n" %
+        "\r\n" %
+        png-data % "\r\n" %
+        "--" % boundary % "--\r\n" %
     ] B{ } make >>data
     "/backend/" uuid append visionect-post drop ;
