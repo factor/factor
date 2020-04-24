@@ -75,6 +75,12 @@ MACRO: bitfield ( bitspec -- quot )
         [ (bitfield-quot) ] [ '[ @ _ dip bitor ] ] map-reduce
     ] if-empty ;
 
+MACRO: bitfield* ( bitspec -- quot )
+    [ [ 0 ] ] [
+        reverse
+        [ (bitfield-quot) ] [ '[ @ _ dip bitor ] ] map-reduce
+    ] if-empty ;
+
 ! bit-count
 <PRIVATE
 
