@@ -41,13 +41,23 @@ HELP: bitfield
         "    } bitfield .b"
         "0b100100100100"
     }
-
 } ;
 
 HELP: bits
 { $values { "m" integer } { "n" integer } { "m'" integer } }
-{ $description "Keep only n bits from the integer m." }
-{ $example "USING: math.bitwise prettyprint ;" "0x123abcdef 16 bits .h" "0xcdef" } ;
+{ $description "Keep only n bits from the integer m. For negative numbers, represent the number as two's complement (a positive integer representing a negative integer)." }
+{ $examples
+    { $example
+        "USING: math.bitwise prettyprint ;"
+        "0x123abcdef 16 bits .h"
+        "0xcdef"
+    }
+    { $example
+        "USING: math.bitwise prettyprint ;"
+        "-2 16 bits .h"
+        "0xfffe"
+    }
+} ;
 
 HELP: bit-range
 { $values { "x" integer } { "high" integer } { "low" integer } { "y" integer } }
@@ -190,8 +200,14 @@ HELP: >signed
         "0xff 8 >signed ."
         "-1"
     }
+    { $example "USING: math.bitwise prettyprint ;"
+        "0xf0 4 >signed ."
+        "0"
+    }
 }
-{ $description "Interprets a number " { $snippet "x" } " as an " { $snippet "n" } "-bit number and converts it to a negative number " { $snippet "n" } "-bit number if the topmost bit is set." } ;
+{ $description "Interprets a number " { $snippet "x" } " as an " { $snippet "n" } "-bit number and converts it to a negative number if the topmost bit is set." } ;
+
+{ >signed bits } related-words
 
 HELP: mask
 { $values
