@@ -99,7 +99,7 @@ HELP: bitfield*
 
 HELP: bits
 { $values { "m" integer } { "n" integer } { "m'" integer } }
-{ $description "Keep only " { $snippet "n" } " bits from the integer " { $snippet "m" } ". For negative numbers, represent the number as two's complement (a positive integer representing a negative integer)." }
+{ $description "Keep only n bits from the integer m. For negative numbers, represent the number as two's complement (a positive integer representing a negative integer)." }
 { $examples
     { $example
         "USING: math.bitwise prettyprint ;"
