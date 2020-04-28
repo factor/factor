@@ -1,27 +1,46 @@
 ! Copyright (C) 2019 HMC Clinic.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays help.markup help.syntax math sequences ;
+USING: arrays help.markup help.syntax lexer math sequences ;
 IN: tensors
 
-ARTICLE: "tensors" "Tensors" "A " { $snippet "tensor" } " is a sequence "
-"of floating point numbers "
+ARTICLE: "tensors" "Tensors"
+"A " { $snippet "tensor" } " is a sequence of floating point numbers "
 "shaped into an n-dimensional matrix. It supports fast, scalable matrix "
 "operations such as matrix multiplication and transposition as well as a "
 "number of element-wise operations. Words for working with tensors are found "
-"in the " { $vocab-link "tensors" } " vocabulary." $nl $nl
-"Tensors can be created "
-"by calling one of four constructors:"
-{ $subsections zeros ones naturals arange }
-"They can be converted to the corresponding N-dimensional array with"
-{ $subsections tensor>array }
+"in the " { $vocab-link "tensors" } " vocabulary." $nl
+"More information about tensors can be found here:"
+{ $subsections "creation" "manipulation" } ;
+
+ARTICLE: "creation" "Creating Tensors"
+"Tensors can be created by calling one of following constructors:"
+{ $subsections zeros ones naturals arange (tensor) }
+"They can be converted to/from the corresponding N-dimensional array with"
+{ $subsections tensor>array >tensor }
+"There is also a tensor parsing word"
+{ $subsections POSTPONE: t{ } ;
+
+ARTICLE: "manipulation" "Manipulating Tensors"
 "The number of dimensions can be extracted with:"
 { $subsections dims }
-"Additionally, tensors can be reshaped with:"
+"Tensors can be reshaped with:"
 { $subsections reshape flatten }
 "Tensors can be combined element-wise with other tensors as well as numbers with:"
 { $subsections t+ t- t* t/ t% }
-"Finally, tensors support the following matrix operations:"
-{ $subsections matmul transpose } ;
+"Tensors support the following matrix operations:"
+{ $subsections matmul transpose }
+"Tensors also support the following concatenation operations:"
+{ $subsections stack hstack vstack t-concat }
+"Tensors implement all " { $vocab-link "sequences" } " operations." $nl
+"Tensors can be indexed into using either numbers or arrays, for example:"
+{ $example
+    "USING: prettyprint sequences tensors ;"
+    "t{ { 0.0 1.0 2.0 } { 3.0 4.0 5.0 } }"
+    "[ { 1 1 } swap nth ] [ 4 swap nth ] bi = ."
+    "t"
+}
+"If the array being used to index into the tensor has the wrong number "
+"of dimensions, a " { $link dimension-mismatch-error } " will be thrown." ;
 
 ARTICLE: "tensor-operators" "Tensor Operators" "Info here" ;
 
@@ -45,6 +64,34 @@ HELP: non-positive-shape-error
 { $link ones } ", " { $link naturals } ", and " { $link reshape }
 ", which allow users to directly set the shape of a " { $link tensor }
 ", when the shape has zero or negative values." } ;
+
+HELP: non-uniform-seq-error
+{ $values { "seq" sequence } }
+{ $description "Throws a " { $link non-uniform-seq-error } "." }
+{ $error-description "Thrown by operations such as " { $link >tensor } 
+", which allow users to directly input the values of a " { $link tensor }
+" as a nested sequence, when the subsequences have varying lengths." } ;
+
+HELP: dimension-mismatch-error
+{ $values { "tensor-dim" number } { "index-dim" number } }
+{ $description "Throws a " { $link dimension-mismatch-error } "." }
+{ $error-description "Thrown by indexing operations such as " { $link nth }
+" and " { $link set-nth } " if the array being used to index has a different number "
+"of dimensions than the tensor." } ;
+
+HELP: t{
+{ $syntax "t{ elements... }" }
+{ $values { "elements" "a list of numbers" } }
+{ $description "Initializes a tensor with the given elements."
+" Preserves the shape of nested sequences. Assumes uniformly nested sequences." } 
+{ $errors "Throws a " { $link non-uniform-seq-error } " if the given "
+"sequence have subsequences of varying lengths. Throws a " 
+{ $link lexer-error } " if the given sequence is not uniformly nested." } ;
+
+HELP: (tensor)
+{ $values { "shape" sequence } { "tensor" tensor } }
+{ $description "Creates a tensor with shape " { $snippet "shape" }
+" containing uninitialized values. Allows non-positive shapes." } ;
 
 HELP: zeros
 { $values { "shape" sequence } { "tensor" tensor } }
@@ -86,6 +133,14 @@ HELP: flatten
 HELP: dims
 { $values { "tensor" tensor } { "n" integer } }
 { $description "Returns the dimension of " { $snippet "tensor" } "." } ;
+
+HELP: >tensor
+{ $values { "seq" sequence } { "tensor" tensor } }
+{ $description "Turns a nested sequence " { $snippet "seq" } 
+" into a tensor of the corresponding shape. Assumes a uniformly nested sequence." } 
+{ $errors "Throws a " { $link non-uniform-seq-error } " if the given "
+"sequence have subsequences of varying lengths. Throws a " 
+{ $link lexer-error } " if the given sequence is not uniformly nested." } ;
 
 HELP: t+
 { $values { "x" { $or tensor number } } { "y" { $or tensor number } } { "tensor" tensor } }
@@ -131,6 +186,33 @@ HELP: matmul
 
 HELP: transpose
 { $values { "tensor" tensor } { "tensor'" tensor } }
-{ $description "Performs n-dimensional matrix transposition on " { $snippet "tens" } "." } ;
+{ $description "Performs n-dimensional matrix transposition on " { $snippet "tensor" } "." } ;
+
+HELP: stack 
+{ $values { "seq" sequence } { "tensor" tensor } } 
+{ $description "Joins the sequences in " { $snippet "seq" } " along a new axis. "
+{ $snippet "tensor" } " will have one more dimension than the arrays in " { $snippet "seq" } "." } 
+{ $errors "Throws a " { $link shape-mismatch-error } " if the sequences in "
+{ $snippet "seq" } " do not have the same shape."} ;
+
+
+HELP: hstack 
+{ $values { "seq" sequence } { "tensor" tensor } } 
+{ $description "Joins the sequences in " { $snippet "seq" } " column-wise." }
+{ $errors "Throws a " { $link shape-mismatch-error } " if the sequences in "
+{ $snippet "seq" } " do not have the same shape along all but the second axis."} ;
+
+HELP: vstack 
+{ $values { "seq" sequence } { "tensor" tensor } } 
+{ $description "Joins the sequences in " { $snippet "seq" } " row-wise." }
+{ $errors "Throws a " { $link shape-mismatch-error } " if the sequences in "
+{ $snippet "seq" } " do not have the same shape along all but the first axis."} ;
+
+HELP: t-concat
+{ $values { "seq" sequence } { "tensor" tensor } } 
+{ $description "Joins the sequences in " { $snippet "seq" } " along the first axis." }
+{ $errors "Throws a " { $link shape-mismatch-error } " if the sequences in "
+{ $snippet "seq" } " do not have the same shape along all but the first axis."} ;
+
 
 ABOUT: "tensors"
