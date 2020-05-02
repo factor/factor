@@ -45,7 +45,7 @@ HELP: bitfield
 
 HELP: bits
 { $values { "m" integer } { "n" integer } { "m'" integer } }
-{ $description "Keep only n bits from the integer m. For negative numbers, represent the number as two's complement (a positive integer representing a negative integer)." }
+{ $description "Keep only " { $snippet "n" } " bits from the integer " { $snippet "m" } ". For negative numbers, represent the number as two's complement (a positive integer representing a negative integer)." }
 { $examples
     { $example
         "USING: math.bitwise prettyprint ;"
@@ -67,7 +67,7 @@ HELP: bit-range
 HELP: bitroll
 { $values { "x" integer } { "s" "a shift integer" } { "w" "a wrap integer" } { "y" integer }
 }
-{ $description "Roll n by s bits to the left, wrapping around after w bits." }
+{ $description "Roll " { $snippet "n" } " by " { $snippet "s" } " bits to the left, wrapping around after " { $snippet "w" } " bits." }
 { $examples
     { $example "USING: math.bitwise prettyprint ;" "1 -1 32 bitroll .b" "0b10000000000000000000000000000000" }
     { $example "USING: math.bitwise prettyprint ;" "0xffff0000 8 32 bitroll .h" "0xff0000ff" }
@@ -137,7 +137,7 @@ HELP: clear-bit
      { "x" integer } { "n" integer }
      { "y" integer }
 }
-{ $description "Sets the nth bit of " { $snippet "x" } " to zero." }
+{ $description "Sets the " { $snippet "n" } "th bit of " { $snippet "x" } " to zero." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "0xff 7 clear-bit .h"
@@ -227,7 +227,7 @@ HELP: mask-bit
      { "m" integer } { "n" integer }
      { "m'" integer }
 }
-{ $description "Turns off all bits besides the nth bit." }
+{ $description "Turns off all bits besides the " { $snippet "n" } "th bit." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "0xff 2 mask-bit .b"
@@ -290,7 +290,7 @@ HELP: toggle-bit
      { "n" integer }
      { "m'" integer }
 }
-{ $description "Toggles the nth bit of an integer." }
+{ $description "Toggles the " { $snippet "n" } "th bit of an integer." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "0 3 toggle-bit .b"
@@ -307,7 +307,7 @@ HELP: set-bit
      { "x" integer } { "n" integer }
      { "y" integer }
 }
-{ $description "Sets the nth bit of " { $snippet "x" } "." }
+{ $description "Sets the " { $snippet "n" } "th bit of " { $snippet "x" } "." }
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "0 5 set-bit .h"
