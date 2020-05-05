@@ -9,7 +9,7 @@ math.vectors namespaces sequences strings system threads ui ui.backend
 ui.backend.gtk.input-methods ui.backend.gtk.io ui.backend.x11.keys
 ui.clipboards ui.event-loop ui.gadgets ui.gadgets.private
 ui.gadgets.worlds ui.gestures ui.pixel-formats
-ui.pixel-formats.private ui.private vocabs.loader ;
+ui.pixel-formats.private ui.private vocabs.loader unicode ;
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend
@@ -157,14 +157,40 @@ CONSTANT: events-mask
 : key-sym ( keyval -- string/f action? )
     code>sym [ dup integer? [ gdk_keyval_to_unicode 1string ] when ] dip ;
 
-: key-event>gesture ( event -- key-gesture )
-    [ event-modifiers ] [ keyval>> key-sym ] [
-        type>> GDK_KEY_PRESS = [ <key-down> ] [ <key-up> ] if
-    ] tri ;
+:: key-event>gesture ( event -- key-gesture )
+    event event-modifiers
+    event keyval>> code>sym drop
+    dup integer? not [
+        drop event keyval>> key-sym
+    ] [
+        gdk_keyval_to_unicode 1string f
+    ] if
+    event type>> GDK_KEY_PRESS = [ <key-down> ] [ <key-up> ] if ;
 
-: on-key-press/release ( win event user-data -- ? )
-    drop swap [ key-event>gesture ] [ window ] bi* propagate-key-gesture t ;
-
+:: on-key-press/release ( win event user-data -- ? )
+    event win [ key-event>gesture ] [ window ] bi*
+    over :> gesture
+    gesture sym>> length 1 = [
+        { { [ gesture sym>> first LETTER?
+              S+ event event-modifiers member? not and ] 
+            [ gesture [ >lower ] change-sym drop ] }
+          { [ gesture sym>> first letter?
+              S+ event event-modifiers member? and ]
+            [ gesture [ >upper ] change-sym drop ] }
+          [ ]
+        } cond
+    ] when
+    event keyval>> shift-ignore-keys key? [
+        gesture [ S+ swap remove ] change-mods drop
+    ] when
+    over sym>> "\0" =
+    event keyval>> exclude-keys-keydown/up key? or [
+        2drop
+    ] [
+        propagate-key-gesture
+    ] if
+    t ;
+ 
 : on-focus-in ( win event user-data -- ? )
     2drop window focus-world t ;
 
