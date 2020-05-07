@@ -1,7 +1,7 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators combinators.short-circuit io
-io.encodings.utf8 io.files json.reader kernel math math.order
+USING: accessors assocs arrays combinators combinators.short-circuit
+io io.encodings.utf8 io.files json.reader kernel math math.order
 memoize modern.slices prettyprint sequences strings ;
 IN: html5
 
@@ -260,6 +260,7 @@ quirks-mode?
 tree
 tree-insert-mode
 doctype-token
+tag
 tag-name
 attribute-name
 attribute-value
@@ -276,11 +277,20 @@ TUPLE: doctype
 
 : <doctype> ( -- doctype )
     doctype new
-        SBUF" " >>name ; inline
+        SBUF" " clone >>name ; inline
 
 : make-doctype-token ( ch -- doctype )
     doctype new
         swap ?1sbuf >>name ; inline
+
+TUPLE: tag
+    name
+    attributes ;
+
+: <tag> ( -- tag )
+    tag new
+        SBUF" " clone >>name
+        V{ } clone >>attributes ;
 
 
 : <document> ( -- document )
@@ -288,6 +298,7 @@ TUPLE: doctype
         V{ } clone >>tree
         initial-mode >>tree-insert-mode
         <doctype> >>doctype-token
+        <tag> >>tag
         SBUF" " clone >>tag-name
         SBUF" " clone >>attribute-name
         SBUF" " clone >>attribute-value
@@ -365,6 +376,23 @@ MEMO: load-entities ( -- assoc )
 : push-comment-token ( ch document -- ) comment-token>> push ;
 : push-all-comment-token ( string document -- ) comment-token>> push-all ;
 
+: current-attribute ( document -- attribute/f )
+    [ attribute-name>> >string f like ]
+    [ attribute-value>> >string f like ] bi
+    2dup or [ 2array ] [ 2drop f ] if ;
+
+: push-when ( obj/f seq -- )
+    over [ push ] [ 2drop ] if ; inline
+
+: reset-attribute ( document -- )
+    SBUF" " clone >>attribute-name
+    SBUF" " clone >>attribute-value drop ;
+
+: push-attribute ( document -- )
+    [ current-attribute ]
+    [ tag>> attributes>> push-when ]
+    [ reset-attribute ] tri ;
+
 : flush-temporary-buffer ( document -- )
     "flushing character-reference: " write
     [ temporary-buffer>> >string . ]
@@ -376,8 +404,13 @@ MEMO: load-entities ( -- assoc )
 : emit-string ( char document -- ) drop "emit-string: " write . ;
 : emit-tag ( document -- )
     "emit tag: " write
-    [ tag-name>> >string . ]
-    [ SBUF" " clone >>tag-name drop ] bi ;
+    {
+        [ [ tag-name>> >string ] [ tag>> name<< ] bi ]
+        [ push-attribute ]
+        [ tag>> . ]
+        [ <tag> >>tag drop ]
+        [ SBUF" " clone >>tag-name drop ]
+    } cleave ;
 : emit-end-tag ( document -- ) "emit end tag: " write . ;
 : emit-doctype-token ( document -- )
     "emit doctype: " write
@@ -853,7 +886,7 @@ MEMO: load-entities ( -- assoc )
         { [ dup "/>" member? ] [ (after-attribute-name-state) ] }
         { [ dup f = ] [ (after-attribute-name-state) ] }
         { [ dup CHAR: = = ] [ unexpected-equals-sign-before-attribute-name ] }
-        [ (attribute-name-state) ]
+        [ reach push-attribute (attribute-name-state) ]
     } cond ;
 
 : before-attribute-name-state ( document n/f string -- document n'/f string )
@@ -865,9 +898,15 @@ MEMO: load-entities ( -- assoc )
         { [ dup "\t\n\f\s/>" member? ] [ (after-attribute-name-state) ] }
         { [ dup f = ] [ (after-attribute-name-state) ] }
         { [ dup CHAR: = = ] [ drop before-attribute-value-state ] }
-        { [ dup ascii-upper-alpha? ] [ 0x20 + reach push-attribute-name ] }
+        { [ dup ascii-upper-alpha? ] [
+            0x20 + reach push-attribute-name
+            attribute-name-state
+        ] }
         { [ dup CHAR: \0 = ] [ unexpected-null-character ] }
-        { [ dup "\"'<" member? ] [ unexpected-character-in-attribute-name ] }
+        { [ dup "\"'<" member? ] [
+            unexpected-character-in-attribute-name
+            reach push-attribute-name attribute-name-state
+        ] }
         [ reach push-attribute-name attribute-name-state ]
     } cond ;
 
@@ -880,9 +919,9 @@ MEMO: load-entities ( -- assoc )
         { [ dup "\t\n\f\s" member? ] [ drop after-attribute-name-state ] }
         { [ dup CHAR: / = ] [ drop self-closing-start-tag-state ] }
         { [ dup CHAR: = = ] [ drop before-attribute-value-state ] }
-        { [ dup CHAR: > = ] [ drop data-state ] }
+        { [ dup CHAR: > = ] [ drop pick emit-tag data-state ] }
         { [ dup f = ] [ eof-in-tag ] }
-        [ "start a new attribute" unimplemented ]
+        [ [ pick push-attribute ] dip (attribute-name-state) ]
     } cond ;
 
 : after-attribute-name-state ( document n/f string -- document n'/f string )
@@ -905,7 +944,10 @@ MEMO: load-entities ( -- assoc )
 : (attribute-value-double-quoted-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup CHAR: " = ] [ drop after-attribute-value-quoted-state ] }
-        { [ dup CHAR: & = ] [ drop [ \ attribute-value-double-quoted-state >>return-state ] 2dip character-reference-state ] }
+        { [ dup CHAR: & = ] [
+            drop
+            [ \ attribute-value-double-quoted-state >>return-state ] 2dip character-reference-state
+        ] }
         { [ dup CHAR: \0 = ] [ unexpected-null-character ] }
         { [ dup f = ] [ eof-in-tag ] }
         [ reach push-attribute-value attribute-value-double-quoted-state ]
@@ -918,8 +960,14 @@ MEMO: load-entities ( -- assoc )
 : (attribute-value-single-quoted-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup CHAR: ' = ] [ drop after-attribute-value-quoted-state ] }
-        { [ dup CHAR: & = ] [ drop [ \ attribute-value-single-quoted-state >>return-state ] 2dip character-reference-state ] }
-        { [ dup CHAR: \0 = ] [ drop unexpected-null-character CHAR: replacement-character reach push-attribute-value ] }
+        { [ dup CHAR: & = ] [
+            drop [ \ attribute-value-single-quoted-state >>return-state ] 2dip
+            character-reference-state
+        ] }
+        { [ dup CHAR: \0 = ] [
+            drop unexpected-null-character
+            CHAR: replacement-character reach push-attribute-value
+        ] }
         { [ dup f = ] [ eof-in-tag ] }
         [ reach push-attribute-value attribute-value-single-quoted-state ]
     } cond ;
@@ -931,7 +979,10 @@ MEMO: load-entities ( -- assoc )
 : (attribute-value-unquoted-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup "\t\n\f\s" member? ] [ drop before-attribute-name-state ] }
-        { [ dup CHAR: & = ] [ drop [ \ attribute-value-unquoted-state >>return-state ] 2dip character-reference-state ] }
+        { [ dup CHAR: & = ] [
+            drop
+            [ \ attribute-value-unquoted-state >>return-state ] 2dip character-reference-state
+        ] }
         { [ dup CHAR: > = ] [ drop pick emit-tag data-state ] }
         { [ dup CHAR: \0 = ] [ drop unexpected-null-character CHAR: replacement-character reach push-attribute-value ] }
         { [ dup "\"'<=`" member? ] [
@@ -951,7 +1002,7 @@ MEMO: load-entities ( -- assoc )
     {
         { [ dup "\t\n\f\s" member? ] [ drop before-attribute-name-state ] }
         { [ dup CHAR: / = ] [ drop self-closing-start-tag-state ] }
-        { [ dup CHAR: > = ] [ drop data-state ] }
+        { [ dup CHAR: > = ] [ drop pick emit-tag data-state ] }
         { [ dup f = ] [ eof-in-tag ] }
         [ missing-whitespace-between-attributes (before-attribute-name-state) ]
     } cond ;
@@ -1120,6 +1171,7 @@ MEMO: load-entities ( -- assoc )
 
 
 : (before-doctype-name-state) ( document n/f string ch/f -- document n'/f string )
+B
     {
         { [ dup "\t\n\f\s" member? ] [ drop before-doctype-name-state ] }
         { [ dup ascii-upper-alpha? ] [ 0x20 + reach push-tag-name tag-name-state ] }
