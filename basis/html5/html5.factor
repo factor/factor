@@ -5,6 +5,9 @@ io.encodings.utf8 io.files json.reader kernel math math.order
 memoize modern.slices prettyprint sequences strings ;
 IN: html5
 
+: 1sbuf ( ch -- sbuf ) [ SBUF" " clone ] dip over push ; inline
+: ?1sbuf ( ch -- sbuf ) [ SBUF" " clone ] dip [ over push ] when* ; inline
+
 ! https://html.spec.whatwg.org/multipage/parsing.html#tokenization
 
 DEFER: data-state
@@ -160,7 +163,11 @@ DEFER: (numeric-character-reference-state)
 DEFER: hexadecimal-character-reference-start-state
 DEFER: (hexadecimal-character-reference-start-state)
 DEFER: decimal-character-reference-start-state
-DEFER: (decimal-character-reference-start-sttag
+DEFER: (decimal-character-reference-start-state)
+DEFER: hexadecimal-character-reference-state
+DEFER: (hexadecimal-character-reference-state)
+DEFER: decimal-character-reference-state
+DEFER: (decimal-character-reference-state)
 DEFER: numeric-character-reference-end-state
 DEFER: (numeric-character-reference-end-state)
 
@@ -251,7 +258,7 @@ TUPLE: end-tag self-closing? attributes ;
 TUPLE: document
 tree
 tree-insert-mode
-doctype-name
+doctype-token
 tag-name
 end-tag-name
 attribute-name
@@ -261,11 +268,26 @@ comment-token
 open-elements
 return-state ;
 
+TUPLE: doctype
+    name
+    public-identifier
+    system-identifier
+    quirks-flag ;
+
+: <doctype> ( -- doctype )
+    doctype new
+        SBUF" " >>name ; inline
+
+: make-doctype-token ( ch -- doctype )
+    doctype new
+        swap ?1sbuf >>name ; inline
+
+
 : <document> ( -- document )
     document new
         V{ } clone >>tree
         initial-mode >>tree-insert-mode
-        SBUF" " clone >>doctype-name
+        <doctype> >>doctype-token
         SBUF" " clone >>tag-name
         SBUF" " clone >>end-tag-name
         SBUF" " clone >>attribute-name
@@ -274,6 +296,21 @@ return-state ;
         SBUF" " clone >>comment-token
         V{ } clone >>open-elements
     ; inline
+
+: force-quirks-flag-on ( document -- )
+    doctype-token>> t >>quirks-flag drop ;
+
+: initialize-doctype-public-identifier ( document -- )
+    [ SBUF" " clone ] dip doctype-token>> public-identifier<< ;
+
+: initialize-doctype-system-identifier ( document -- )
+    [ SBUF" " clone ] dip doctype-token>> system-identifier<< ;
+
+: push-doctype-public-identifier ( ch document -- )
+    doctype-token>> public-identifier>> push ;
+
+: push-doctype-system-identifier ( ch document -- )
+    doctype-token>> system-identifier>> push ;
 
 GENERIC: tree-insert* ( document obj tree-insert-mode -- document )
 M: initial-mode tree-insert*
@@ -318,7 +355,8 @@ MEMO: load-entities ( -- assoc )
 : entity? ( string -- entity/string > )
     load-entities ?at ;
 
-: push-doctype-name ( ch document -- ) doctype-name>> push ;
+
+: push-doctype-name ( ch document -- ) doctype-token>> name>> push ;
 : push-tag-name ( ch document -- ) tag-name>> push ;
 : push-attribute-name ( ch document -- ) attribute-name>> push ;
 : push-attribute-value ( ch document -- ) attribute-value>> push ;
@@ -326,16 +364,27 @@ MEMO: load-entities ( -- assoc )
 : reset-temporary-buffer ( document -- ) SBUF" " clone temporary-buffer<< ;
 : reset-end-tag ( document -- ) SBUF" " clone end-tag-name<< ;
 : push-comment-token ( ch document -- ) comment-token>> push ;
+: push-all-comment-token ( string document -- ) comment-token>> push-all ;
+
+: flush-temporary-buffer ( document -- )
+    "flushing character-reference: " write
+    [ temporary-buffer>> >string . ]
+    [ SBUF" " clone >>temporary-buffer drop ] bi ;
+
 : emit-eof ( document -- ) drop "emit-eof" print ;
 : emit-char ( char document -- ) drop "emit-char:" write . ;
 : emit-temporary-buffer-with ( string document -- ) "emit-temp-buffer: " write temporary-buffer>> append . ;
 : emit-string ( char document -- ) drop "emit-string:" write . ;
 : emit-tag ( document -- ) "emit tag: " write . ;
 : emit-end-tag ( document -- ) "emit end tag: " write . ;
-: emit-doctype ( document -- )
+: emit-doctype-token ( document -- )
     "emit doctype: " write
-    [ doctype-name>> >string . ]
-    [ SBUF" " clone doctype-name<< ] bi ;
+    doctype-token>> . ;
+: emit-comment-token ( document -- )
+    "emit comment token: " write
+    [ comment-token>> >string . ]
+    [ SBUF" " clone comment-token<< ] bi ;
+
 
 ! check if matches open tag
 : appropriate-end-tag-token? ( document -- ? )
@@ -343,10 +392,28 @@ MEMO: load-entities ( -- assoc )
 
 : ascii-upper-alpha? ( ch -- ? ) [ CHAR: A CHAR: Z between? ] [ f ] if* ; inline
 : ascii-lower-alpha? ( ch -- ? ) [ CHAR: a CHAR: z between? ] [ f ] if* ; inline
+: ascii-upper-hex-digit? ( ch -- ? ) [ CHAR: A CHAR: F between? ] [ f ] if* ; inline
+: ascii-lower-hex-digit? ( ch -- ? ) [ CHAR: a CHAR: f between? ] [ f ] if* ; inline
+: ascii-hex-alpha? ( ch -- ? ) { [ ascii-upper-hex-digit? ] [ ascii-lower-hex-digit? ] } 1|| ; inline
+
 : ascii-digit? ( ch/f -- ? ) [ CHAR: 0 CHAR: 9 between? ] [ f ] if* ;
 : ascii-alpha? ( ch/f -- ? ) { [ ascii-lower-alpha? ] [ ascii-upper-alpha? ] } 1|| ;
 : ascii-alphanumeric? ( ch/f -- ? ) { [ ascii-alpha? ] [ ascii-digit? ] } 1|| ;
+: ascii-hex-digit? ( ch/f -- ? ) { [ ascii-digit? ] [ ascii-hex-alpha? ] } 1|| ;
 
+: (return-state) ( n/f string document ch/f -- document n'/f string )
+    over return-state>> dup [ "no return state" throw ] unless
+    [
+        f >>return-state
+    ] 2dip
+    execute( n/f string document ch/f -- document n'/f string ) ;
+
+: return-state ( n/f string document -- document n'/f string )
+    over return-state>>
+    [
+        f >>return-state
+    ] 2dip
+    execute( n/f string document -- document n'/f string ) ;
 
 : (data-state) ( document n/f string ch/f -- document n'/f string )
     {
@@ -848,7 +915,11 @@ MEMO: load-entities ( -- assoc )
 
 : (attribute-value-single-quoted-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: ' = ] [ drop after-attribute-value-quoted-state ] }
+        { [ dup CHAR: & = ] [ drop [ \ attribute-value-single-quoted-state >>return-state ] 2dip character-reference-state ] }
+        { [ dup CHAR: \0 = ] [ drop unexpected-null-character CHAR: replacement-character reach push-attribute-value ] }
+        { [ dup f = ] [ eof-in-tag ] }
+        [ reach push-attribute-value attribute-value-single-quoted-state ]
     } cond ;
 
 : attribute-value-single-quoted-state ( document n/f string -- document n'/f string )
@@ -857,7 +928,17 @@ MEMO: load-entities ( -- assoc )
 
 : (attribute-value-unquoted-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup "\t\n\f\s" member? ] [ drop before-attribute-name-state ] }
+        { [ dup CHAR: & = ] [ drop [ \ attribute-value-unquoted-state >>return-state ] 2dip character-reference-state ] }
+        { [ dup CHAR: > = ] [ drop pick emit-tag data-state ] }
+        { [ dup CHAR: \0 = ] [ drop unexpected-null-character CHAR: replacement-character reach push-attribute-value ] }
+        { [ dup "\"'<=`" member? ] [
+            unexpected-character-in-unquoted-attribute-value
+            reach push-attribute-value
+            attribute-value-unquoted-state
+        ] }
+        { [ dup f = ] [ eof-in-tag ] }
+        [ reach push-attribute-value attribute-value-unquoted-state ]
     } cond ;
 
 : attribute-value-unquoted-state ( document n/f string -- document n'/f string )
@@ -890,7 +971,10 @@ MEMO: load-entities ( -- assoc )
 
 : (bogus-comment-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: > = ] [ drop pick emit-comment-token data-state ] }
+        { [ dup f = ] [ drop pick [ emit-comment-token ] [ emit-eof ] bi ] }
+        { [ dup CHAR: \0 = ] [ drop unexpected-null-character CHAR: replacement-character reach push-comment-token ] }
+        [ reach push-comment-token bogus-comment-state ]
     } cond ;
 
 : bogus-comment-state ( document n/f string -- document n'/f string )
@@ -901,6 +985,7 @@ MEMO: load-entities ( -- assoc )
     drop {
         { [ "--" take-from? ] [ comment-start-state ] }
         { [ "DOCTYPE" take-from-insensitive? ] [ doctype-state ] }
+        { [ "[CDATA[" take-from-insensitive? ] [ unimplemented* ] }
         [
             incorrectly-opened-comment ! bogus-comment-state
         ]
@@ -913,7 +998,7 @@ MEMO: load-entities ( -- assoc )
 : (comment-start-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup CHAR: - = ] [ drop comment-start-dash-state ] }
-        { [ dup CHAR: > = ] [ drop abrupt-closing-of-empty-comment ] }
+        { [ dup CHAR: > = ] [ drop abrupt-closing-of-empty-comment pick emit-comment-token data-state ] }
         [ (comment-state) ]
     } cond ;
 
@@ -948,7 +1033,9 @@ MEMO: load-entities ( -- assoc )
 
 : (comment-less-than-sign-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: ! = ] [ reach push-comment-token comment-less-than-sign-bang-state ] }
+        { [ dup CHAR: < = ] [ reach push-comment-token comment-less-than-sign-state ] }
+        [ (comment-state) ]
     } cond ;
 
 : comment-less-than-sign-state ( document n/f string -- document n'/f string )
@@ -957,7 +1044,8 @@ MEMO: load-entities ( -- assoc )
 
 : (comment-less-than-sign-bang-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: - = ] [ reach push-comment-token comment-less-than-sign-bang-dash-state ] }
+        [ (comment-state) ]
     } cond ;
 
 : comment-less-than-sign-bang-state ( document n/f string -- document n'/f string )
@@ -966,7 +1054,8 @@ MEMO: load-entities ( -- assoc )
 
 : (comment-less-than-sign-bang-dash-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: - = ] [ drop comment-less-than-sign-bang-dash-dash-state ] }
+        [ (comment-end-dash-state) ]
     } cond ;
 
 : comment-less-than-sign-bang-dash-state ( document n/f string -- document n'/f string )
@@ -975,7 +1064,9 @@ MEMO: load-entities ( -- assoc )
 
 : (comment-less-than-sign-bang-dash-dash-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: > = ] [ (comment-end-state) ] }
+        { [ dup f = ] [ (comment-end-state) ] }
+        [ nested-comment (comment-end-state) ]
     } cond ;
 
 : comment-less-than-sign-bang-dash-dash-state ( document n/f string -- document n'/f string )
@@ -995,10 +1086,11 @@ MEMO: load-entities ( -- assoc )
 
 : (comment-end-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup CHAR: - = ] [ drop comment-start-dash-state ] }
-        { [ dup f = ] [ eof-in-comment ] }
-
-        [ unimplemented* ]
+        { [ dup CHAR: > = ] [ drop pick emit-comment-token data-state ] }
+        { [ dup CHAR: ! = ] [ drop comment-end-bang-state ] }
+        { [ dup CHAR: - = ] [ reach push-comment-token comment-end-state ] }
+        { [ dup f = ] [ drop eof-in-comment pick [ emit-comment-token ] [ emit-eof ] bi ] }
+        [ [ "--" reach push-all-comment-token ] dip (comment-state) ]
     } cond ;
 
 : comment-end-state ( document n/f string -- document n'/f string )
@@ -1008,10 +1100,9 @@ MEMO: load-entities ( -- assoc )
 : (comment-end-bang-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup CHAR: - = ] [ drop comment-end-dash-state ] }
-        { [ dup CHAR: > = ] [ drop incorrectly-closed-comment ] } ! emit comment token, data-state
+        { [ dup CHAR: > = ] [ drop incorrectly-closed-comment pick emit-comment-token data-state ] }
         { [ dup f = ] [ eof-in-comment ] }
-
-        [ unimplemented* ]
+        [ [ "--!" reach push-all-comment-token ] dip (comment-state) ]
     } cond ;
 
 : comment-end-bang-state ( document n/f string -- document n'/f string )
@@ -1022,8 +1113,7 @@ MEMO: load-entities ( -- assoc )
     {
         { [ dup "\t\n\f\s" member? ] [ drop before-doctype-name-state ] }
         { [ dup CHAR: > = ] [ (before-doctype-name-state) ] }
-        { [ dup f = ] [ eof-in-doctype ] }
-
+        { [ dup f = ] [ eof-in-doctype ] } ! todo force-quirks
         [ missing-whitespace-before-doctype-name ]
     } cond ;
 
@@ -1035,8 +1125,13 @@ MEMO: load-entities ( -- assoc )
     {
         { [ dup "\t\n\f\s" member? ] [ drop before-doctype-name-state ] }
         { [ dup ascii-upper-alpha? ] [ 0x20 + reach push-tag-name tag-name-state ] }
-
-        [ unimplemented* ]
+        { [ dup CHAR: \0 = ] [
+            drop
+            unexpected-null-character
+            CHAR: replacement-character make-doctype-token reach doctype-token<<
+            doctype-name-state
+        ] }
+        [ make-doctype-token reach doctype-token<< doctype-name-state ]
     } cond ;
 
 : before-doctype-name-state ( document n/f string -- document n'/f string )
@@ -1046,10 +1141,14 @@ MEMO: load-entities ( -- assoc )
 : (doctype-name-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup "\t\n\f\s" member? ] [ drop after-doctype-name-state ] }
-        { [ dup CHAR: > = ] [ drop pick emit-doctype data-state ] }
-        ! { [ dup ascii-upper-alpha? ] [ 0x20 + reach push-doctype-name doctype-name-state ] }
-        ! { [ dup CHAR: \0 = ] [ drop unexpected-null-character ] }
-        ! { [ dup f = ] [ eof-in-doctype ] }
+        { [ dup CHAR: > = ] [ drop pick emit-doctype-token data-state ] }
+        { [ dup ascii-upper-alpha? ] [ 0x20 + reach push-doctype-name doctype-name-state ] }
+        { [ dup CHAR: \0 = ] [
+            drop unexpected-null-character
+            CHAR: replacement-character pick push-doctype-name
+            doctype-name-state
+        ] }
+        { [ dup f = ] [ drop eof-in-doctype pick [ emit-doctype-token ] [ emit-eof ] bi ] } ! force-quirks on for doctype-token
         [ reach push-doctype-name doctype-name-state ]
     } cond ;
 
@@ -1060,7 +1159,7 @@ MEMO: load-entities ( -- assoc )
 : (after-doctype-name-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup "\t\n\f\s" member? ] [ drop after-doctype-name-state ] }
-        { [ dup CHAR: > = ] [ drop pick emit-doctype data-state ] }
+        { [ dup CHAR: > = ] [ drop pick emit-doctype-token data-state ] }
         { [ dup f = ] [ eof-in-doctype ] }
         { [ [ "PUBLIC" take-from-insensitive? ] dip swap ] [ drop after-doctype-public-keyword-state ] }
         { [ [ "SYSTEM" take-from-insensitive? ] dip swap ] [ drop after-doctype-system-keyword-state ] }
@@ -1074,8 +1173,15 @@ MEMO: load-entities ( -- assoc )
 : (after-doctype-public-keyword-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup "\t\n\f\s" member? ] [ drop before-doctype-public-identifier-state ] }
-
-        [ unimplemented* ]
+        { [ dup CHAR: " = ] [ missing-whitespace-after-doctype-public-keyword ] }
+        { [ dup CHAR: ' = ] [ missing-whitespace-after-doctype-public-keyword ] }
+        { [ dup CHAR: > = ] [ drop missing-doctype-public-identifier force-quirks-flag-on data-state ] }
+        { [ dup f = ] [ drop eof-in-doctype pick [ emit-doctype-token ] [ emit-eof ] bi ] }
+        [
+            missing-quote-before-doctype-public-identifier
+            [ reach force-quirks-flag-on ] dip
+            (bogus-doctype-state)
+        ]
     } cond ;
 
 : after-doctype-public-keyword-state ( document n/f string -- document n'/f string )
@@ -1084,7 +1190,26 @@ MEMO: load-entities ( -- assoc )
 
 : (before-doctype-public-identifier-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup "\t\n\f\s" member? ] [ drop before-doctype-public-identifier-state ] }
+        { [ dup CHAR: " = ] [
+            drop pick initialize-doctype-public-identifier
+            doctype-public-identifier-double-quoted-state
+        ] }
+        { [ dup CHAR: ' = ] [
+            drop pick initialize-doctype-public-identifier
+            doctype-public-identifier-single-quoted-state
+        ] }
+        { [ dup CHAR: > = ] [
+            drop missing-doctype-public-identifier
+            pick [ force-quirks-flag-on ] [ emit-doctype-token ] bi
+            data-state
+        ] }
+        { [ dup f = ] [ drop eof-in-doctype pick [ emit-doctype-token ] [ emit-eof ] bi ] }
+        [
+            missing-quote-before-doctype-public-identifier
+            [ reach force-quirks-flag-on ] dip
+            (bogus-doctype-state)
+        ]
     } cond ;
 
 : before-doctype-public-identifier-state ( document n/f string -- document n'/f string )
@@ -1093,7 +1218,23 @@ MEMO: load-entities ( -- assoc )
 
 : (doctype-public-identifier-double-quoted-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: " = ] [ drop after-doctype-public-identifier-state ] }
+        { [ dup CHAR: \0 = ] [
+            drop
+            unexpected-null-character
+            CHAR: replacement-character pick push-doctype-public-identifier
+            doctype-public-identifier-double-quoted-state
+        ] }
+        { [ dup CHAR: > = ] [
+            drop abrupt-doctype-public-identifier
+            pick [ force-quirks-flag-on ] [ emit-doctype-token ] bi
+            data-state
+        ] }
+        { [ dup f = ] [
+            drop eof-in-doctype
+            pick [ force-quirks-flag-on ] [ emit-doctype-token ] [ emit-eof ] tri
+        ] }
+        [ reach push-doctype-public-identifier doctype-public-identifier-double-quoted-state ]
     } cond ;
 
 : doctype-public-identifier-double-quoted-state ( document n/f string -- document n'/f string )
@@ -1102,7 +1243,23 @@ MEMO: load-entities ( -- assoc )
 
 : (doctype-public-identifier-single-quoted-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: ' = ] [ drop after-doctype-public-identifier-state ] }
+        { [ dup CHAR: \0 = ] [
+            drop
+            unexpected-null-character
+            CHAR: replacement-character pick push-doctype-public-identifier
+            doctype-public-identifier-double-quoted-state
+        ] }
+        { [ dup CHAR: > = ] [
+            drop abrupt-doctype-public-identifier
+            pick [ force-quirks-flag-on ] [ emit-doctype-token ] bi
+            data-state
+        ] }
+        { [ dup f = ] [
+            drop eof-in-doctype
+            pick [ force-quirks-flag-on ] [ emit-doctype-token ] [ emit-eof ] tri
+        ] }
+        [ reach push-doctype-public-identifier doctype-public-identifier-single-quoted-state ]
     } cond ;
 
 : doctype-public-identifier-single-quoted-state ( document n/f string -- document n'/f string )
@@ -1111,7 +1268,27 @@ MEMO: load-entities ( -- assoc )
 
 : (after-doctype-public-identifier-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup "\t\n\f\s" member? ] [ drop between-doctype-public-and-system-identifiers-state ] }
+        { [ dup CHAR: > = ] [
+            drop pick emit-doctype-token
+            data-state
+        ] }
+        { [ dup CHAR: " = ] [
+            drop missing-whitespace-between-doctype-public-and-system-identifiers
+            pick initialize-doctype-system-identifier
+            doctype-system-identifier-double-quoted-state
+        ] }
+        { [ dup CHAR: ' = ] [
+            drop missing-whitespace-between-doctype-public-and-system-identifiers
+            pick initialize-doctype-system-identifier
+            doctype-system-identifier-single-quoted-state
+        ] }
+        { [ dup f = ] [ drop eof-in-doctype pick [ force-quirks-flag-on ] [ emit-doctype-token ] [ emit-eof ] tri ] }
+        [
+            missing-quote-before-doctype-system-identifier
+            [ reach force-quirks-flag-on ] dip
+            (bogus-doctype-state)
+        ]
     } cond ;
 
 : after-doctype-public-identifier-state ( document n/f string -- document n'/f string )
@@ -1120,7 +1297,25 @@ MEMO: load-entities ( -- assoc )
 
 : (between-doctype-public-and-system-identifiers-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup "\t\n\f\s" member? ] [ drop between-doctype-public-and-system-identifiers-state ] }
+        { [ dup CHAR: > = ] [
+            drop pick emit-doctype-token
+            data-state
+        ] }
+        { [ dup CHAR: " = ] [
+            drop pick initialize-doctype-system-identifier
+            doctype-system-identifier-double-quoted-state
+        ] }
+        { [ dup CHAR: ' = ] [
+            drop pick initialize-doctype-system-identifier
+            doctype-system-identifier-single-quoted-state
+        ] }
+        { [ dup f = ] [ drop eof-in-doctype pick [ force-quirks-flag-on ] [ emit-doctype-token ] [ emit-eof ] tri ] }
+        [
+            missing-quote-before-doctype-system-identifier
+            [ reach force-quirks-flag-on ] dip
+            (bogus-doctype-state)
+        ]
     } cond ;
 
 : between-doctype-public-and-system-identifiers-state ( document n/f string -- document n'/f string )
@@ -1129,7 +1324,28 @@ MEMO: load-entities ( -- assoc )
 
 : (after-doctype-system-keyword-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup "\t\n\f\s" member? ] [ drop between-doctype-public-and-system-identifiers-state ] }
+        { [ dup CHAR: " = ] [
+            drop missing-whitespace-after-doctype-system-keyword
+            pick initialize-doctype-system-identifier
+            doctype-system-identifier-double-quoted-state
+        ] }
+        { [ dup CHAR: ' = ] [
+            drop missing-whitespace-after-doctype-system-keyword
+            pick initialize-doctype-system-identifier
+            doctype-system-identifier-single-quoted-state
+        ] }
+        { [ dup CHAR: > = ] [
+            drop missing-doctype-system-identifier
+            pick [ force-quirks-flag-on ] [ emit-doctype-token ] bi
+            data-state
+        ] }
+        { [ dup f = ] [ drop eof-in-doctype pick [ force-quirks-flag-on ] [ emit-doctype-token ] [ emit-eof ] tri ] }
+        [
+            missing-quote-before-doctype-system-identifier
+            [ reach force-quirks-flag-on ] dip
+            (bogus-doctype-state)
+        ]
     } cond ;
 
 : after-doctype-system-keyword-state ( document n/f string -- document n'/f string )
@@ -1138,7 +1354,26 @@ MEMO: load-entities ( -- assoc )
 
 : (before-doctype-system-identifier-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup "\t\n\f\s" member? ] [ drop before-doctype-system-identifier-state ] }
+        { [ dup CHAR: " = ] [
+            drop pick initialize-doctype-system-identifier
+            doctype-system-identifier-double-quoted-state
+        ] }
+        { [ dup CHAR: ' = ] [
+            drop pick initialize-doctype-system-identifier
+            doctype-system-identifier-single-quoted-state
+        ] }
+        { [ dup CHAR: > = ] [
+            drop missing-doctype-system-identifier
+            pick [ force-quirks-flag-on ] [ emit-doctype-token ] bi
+            data-state
+        ] }
+        { [ dup f = ] [ drop eof-in-doctype pick [ emit-doctype-token ] [ emit-eof ] bi ] }
+        [
+            missing-quote-before-doctype-system-identifier
+            [ reach force-quirks-flag-on ] dip
+            (bogus-doctype-state)
+        ]
     } cond ;
 
 : before-doctype-system-identifier-state ( document n/f string -- document n'/f string )
@@ -1147,7 +1382,23 @@ MEMO: load-entities ( -- assoc )
 
 : (doctype-system-identifier-double-quoted-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: " = ] [ drop after-doctype-system-identifier-state ] }
+        { [ dup CHAR: \0 = ] [
+            drop
+            unexpected-null-character
+            CHAR: replacement-character pick push-doctype-system-identifier
+            doctype-system-identifier-double-quoted-state
+        ] }
+        { [ dup CHAR: > = ] [
+            drop abrupt-doctype-system-identifier
+            pick [ force-quirks-flag-on ] [ emit-doctype-token ] bi
+            data-state
+        ] }
+        { [ dup f = ] [
+            drop eof-in-doctype
+            pick [ force-quirks-flag-on ] [ emit-doctype-token ] [ emit-eof ] tri
+        ] }
+        [ reach push-doctype-system-identifier doctype-system-identifier-double-quoted-state ]
     } cond ;
 
 : doctype-system-identifier-double-quoted-state ( document n/f string -- document n'/f string )
@@ -1156,7 +1407,23 @@ MEMO: load-entities ( -- assoc )
 
 : (doctype-system-identifier-single-quoted-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: ' = ] [ drop after-doctype-system-identifier-state ] }
+        { [ dup CHAR: \0 = ] [
+            drop
+            unexpected-null-character
+            CHAR: replacement-character pick push-doctype-system-identifier
+            doctype-system-identifier-double-quoted-state
+        ] }
+        { [ dup CHAR: > = ] [
+            drop abrupt-doctype-system-identifier
+            pick [ force-quirks-flag-on ] [ emit-doctype-token ] bi
+            data-state
+        ] }
+        { [ dup f = ] [
+            drop eof-in-doctype
+            pick [ force-quirks-flag-on ] [ emit-doctype-token ] [ emit-eof ] tri
+        ] }
+        [ reach push-doctype-system-identifier doctype-system-identifier-single-quoted-state ]
     } cond ;
 
 : doctype-system-identifier-single-quoted-state ( document n/f string -- document n'/f string )
@@ -1165,7 +1432,17 @@ MEMO: load-entities ( -- assoc )
 
 : (after-doctype-system-identifier-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup "\t\n\f\s" member? ] [ drop after-doctype-system-identifier-state ] }
+        { [ dup CHAR: > = ] [
+            drop pick emit-doctype-token
+            data-state
+        ] }
+        { [ dup f = ] [ drop eof-in-doctype pick [ force-quirks-flag-on ] [ emit-doctype-token ] [ emit-eof ] tri ] }
+        [
+            unexpected-character-after-doctype-system-identifier
+            [ reach force-quirks-flag-on ] dip
+            (bogus-doctype-state)
+        ]
     } cond ;
 
 : after-doctype-system-identifier-state ( document n/f string -- document n'/f string )
@@ -1174,7 +1451,10 @@ MEMO: load-entities ( -- assoc )
 
 : (bogus-doctype-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: > = ] [ drop pick emit-doctype-token data-state ] }
+        { [ dup CHAR: \0 = ] [ drop unexpected-null-character bogus-doctype-state ] }
+        { [ dup f = ] [ drop eof-in-doctype pick emit-eof ] }
+        [ drop bogus-doctype-state ]
     } cond ;
 
 : bogus-doctype-state ( document n/f string -- document n'/f string )
@@ -1183,7 +1463,9 @@ MEMO: load-entities ( -- assoc )
 
 : (cdata-section-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: ] = ] [ drop cdata-section-bracket-state ] }
+        { [ dup f = ] [ drop eof-in-cdata pick emit-eof ] }
+        [ reach emit-char cdata-section-state ]
     } cond ;
 
 : cdata-section-state ( document n/f string -- document n'/f string )
@@ -1192,7 +1474,8 @@ MEMO: load-entities ( -- assoc )
 
 : (cdata-section-bracket-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: ] = ] [ drop cdata-section-end-state ] }
+        [ [ CHAR: ] reach emit-char ] dip (cdata-section-state) ]
     } cond ;
 
 : cdata-section-bracket-state ( document n/f string -- document n'/f string )
@@ -1201,7 +1484,9 @@ MEMO: load-entities ( -- assoc )
 
 : (cdata-section-end-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: ] = ] [ reach emit-char cdata-section-end-state ] }
+        { [ dup CHAR: > = ] [ drop data-state ] }
+        [ [ "]]" reach emit-string ] dip (cdata-section-state) ]
     } cond ;
 
 : cdata-section-end-state ( document n/f string -- document n'/f string )
@@ -1210,7 +1495,9 @@ MEMO: load-entities ( -- assoc )
 
 : (character-reference-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup ascii-alphanumeric? ] [ (named-character-reference-state) ] }
+        { [ dup CHAR: # = ] [ reach push-temporary-buffer numeric-character-reference-state ] }
+        [ reach flush-temporary-buffer (return-state) ]
     } cond ;
 
 : character-reference-state ( document n/f string -- document n'/f string )
@@ -1219,8 +1506,12 @@ MEMO: load-entities ( -- assoc )
 
 : (named-character-reference-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup ascii-alphanumeric? ] [ reach push-temporary-buffer named-character-reference-state ] }
-        [ unimplemented* ]
+        { [ dup ascii-alphanumeric? ] [
+            unimplemented*
+            reach push-temporary-buffer
+            named-character-reference-state
+        ] }
+        [ drop pick flush-temporary-buffer ambiguous-ampersand-state ]
     } cond ;
 
 : named-character-reference-state ( document n/f string -- document n'/f string )
@@ -1229,7 +1520,11 @@ MEMO: load-entities ( -- assoc )
 
 : (ambiguous-ampersand-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup ascii-alphanumeric? ] [
+            unimplemented*
+        ] }
+        { [ dup CHAR: ; = ] [ unknown-named-character-reference (return-state) ] }
+        [ (return-state) ]
     } cond ;
 
 : ambiguous-ampersand-state ( document n/f string -- document n'/f string )
@@ -1238,7 +1533,8 @@ MEMO: load-entities ( -- assoc )
 
 : (numeric-character-reference-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup "xX" member? ] [ reach push-temporary-buffer hexadecimal-character-reference-start-state ] }
+        [ (decimal-character-reference-start-state) ]
     } cond ;
 
 : numeric-character-reference-state ( document n/f string -- document n'/f string )
@@ -1247,7 +1543,8 @@ MEMO: load-entities ( -- assoc )
 
 : (hexadecimal-character-reference-start-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup ascii-hex-digit? ] [ (hexadecimal-character-reference-state) ] }
+        [ absence-of-digits-in-numeric-character-reference reach flush-temporary-buffer (return-state) ]
     } cond ;
 
 : hexadecimal-character-reference-start-state ( document n/f string -- document n'/f string )
@@ -1256,7 +1553,8 @@ MEMO: load-entities ( -- assoc )
 
 : (decimal-character-reference-start-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup ascii-digit? ] [ (decimal-character-reference-state) ] }
+        [ absence-of-digits-in-numeric-character-reference reach flush-temporary-buffer (return-state) ]
     } cond ;
 
 : decimal-character-reference-start-state ( document n/f string -- document n'/f string )
@@ -1265,7 +1563,11 @@ MEMO: load-entities ( -- assoc )
 
 : (hexadecimal-character-reference-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup ascii-digit? ] [ unimplemented* ] }
+        { [ dup ascii-upper-hex-digit? ] [ unimplemented* ] }
+        { [ dup ascii-lower-hex-digit? ] [ unimplemented* ] }
+        { [ dup CHAR: ; = ] [ drop numeric-character-reference-end-state ] }
+        [ missing-semicolon-after-character-reference ]
     } cond ;
 
 : hexadecimal-character-reference-state ( document n/f string -- document n'/f string )
@@ -1274,7 +1576,9 @@ MEMO: load-entities ( -- assoc )
 
 : (decimal-character-reference-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup ascii-digit? ] [ unimplemented* ] }
+        { [ dup CHAR: ; = ] [ drop numeric-character-reference-end-state ] }
+        [ missing-semicolon-after-character-reference ]
     } cond ;
 
 : decimal-character-reference-state ( document n/f string -- document n'/f string )
@@ -1283,7 +1587,7 @@ MEMO: load-entities ( -- assoc )
 
 : (numeric-character-reference-end-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        [ missing-semicolon-after-character-reference ]
     } cond ;
 
 : numeric-character-reference-end-state ( document n/f string -- document n'/f string )
