@@ -256,11 +256,11 @@ TUPLE: end-tag self-closing? attributes ;
     ; inline
 
 TUPLE: document
+quirks-mode?
 tree
 tree-insert-mode
 doctype-token
 tag-name
-end-tag-name
 attribute-name
 attribute-value
 temporary-buffer
@@ -289,7 +289,6 @@ TUPLE: doctype
         initial-mode >>tree-insert-mode
         <doctype> >>doctype-token
         SBUF" " clone >>tag-name
-        SBUF" " clone >>end-tag-name
         SBUF" " clone >>attribute-name
         SBUF" " clone >>attribute-value
         SBUF" " clone >>temporary-buffer
@@ -372,10 +371,13 @@ MEMO: load-entities ( -- assoc )
     [ SBUF" " clone >>temporary-buffer drop ] bi ;
 
 : emit-eof ( document -- ) drop "emit-eof" print ;
-: emit-char ( char document -- ) drop "emit-char:" write . ;
+: emit-char ( char document -- ) drop "emit-char: " write 1string . ;
 : emit-temporary-buffer-with ( string document -- ) "emit-temp-buffer: " write temporary-buffer>> append . ;
-: emit-string ( char document -- ) drop "emit-string:" write . ;
-: emit-tag ( document -- ) "emit tag: " write . ;
+: emit-string ( char document -- ) drop "emit-string: " write . ;
+: emit-tag ( document -- )
+    "emit tag: " write
+    [ tag-name>> >string . ]
+    [ SBUF" " clone >>tag-name drop ] bi ;
 : emit-end-tag ( document -- ) "emit end tag: " write . ;
 : emit-doctype-token ( document -- )
     "emit doctype: " write
@@ -981,8 +983,8 @@ MEMO: load-entities ( -- assoc )
     next-char-from (bogus-comment-state) ;
 
 
-: (markup-declaration-open-state) ( document n/f string ch/f -- document n'/f string )
-    drop {
+: markup-declaration-open-state ( document n/f string -- document n'/f string )
+    {
         { [ "--" take-from? ] [ comment-start-state ] }
         { [ "DOCTYPE" take-from-insensitive? ] [ doctype-state ] }
         { [ "[CDATA[" take-from-insensitive? ] [ unimplemented* ] }
@@ -990,10 +992,6 @@ MEMO: load-entities ( -- assoc )
             incorrectly-opened-comment ! bogus-comment-state
         ]
     } cond ;
-
-: markup-declaration-open-state ( document n/f string -- document n'/f string )
-    next-char-from (markup-declaration-open-state) ;
-
 
 : (comment-start-state) ( document n/f string ch/f -- document n'/f string )
     {
