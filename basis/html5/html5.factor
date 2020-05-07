@@ -7,175 +7,6 @@ IN: html5
 
 ! https://html.spec.whatwg.org/multipage/parsing.html#tokenization
 
-ERROR: unimplemented string ;
-ERROR: unimplemented* ;
-
-! Errors: https://html.spec.whatwg.org/multipage/parsing.html#parse-errors
-ERROR: abrupt-closing-of-empty-comment ;
-ERROR: abrupt-doctype-public-identifier ;
-ERROR: abrupt-doctype-system-identifier ;
-ERROR: absence-of-digits-in-numeric-character-reference ;
-ERROR: cdata-in-html-content ;
-ERROR: character-reference-outside-unicode-range ;
-ERROR: control-character-in-input-stream ;
-ERROR: control-character-reference ;
-ERROR: end-tag-with-attributes ;
-ERROR: duplicate-attribute ;
-ERROR: end-tag-with-trailing-solidus ;
-ERROR: eof-before-tag-name ;
-ERROR: eof-in-cdata ;
-ERROR: eof-in-comment ;
-ERROR: eof-in-doctype ;
-ERROR: eof-in-script-html-comment-like-text ;
-ERROR: eof-in-tag ;
-ERROR: incorrectly-closed-comment ;
-ERROR: incorrectly-opened-comment ;
-ERROR: invalid-character-sequence-after-doctype-name ;
-ERROR: invalid-first-character-of-tag-name ;
-ERROR: missing-attribute-value ;
-ERROR: missing-doctype-name ;
-ERROR: missing-doctype-public-identifier ;
-ERROR: missing-doctype-system-identifier ;
-ERROR: missing-end-tag-name ;
-ERROR: missing-quote-before-doctype-public-identifier ;
-
-ERROR: missing-quote-before-doctype-system-identifier ;
-ERROR: missing-semicolon-after-character-reference ;
-ERROR: missing-whitespace-after-doctype-public-keyword ;
-ERROR: missing-whitespace-after-doctype-system-keyword ;
-ERROR: missing-whitespace-before-doctype-name ;
-ERROR: missing-whitespace-between-attributes ;
-ERROR: missing-whitespace-between-doctype-public-and-system-identifiers ;
-ERROR: nested-comment ;
-ERROR: noncharacter-character-reference ;
-ERROR: noncharacter-in-input-stream ;
-ERROR: non-void-html-element-start-tag-with-trailing-solidus ;
-ERROR: null-character-reference ;
-ERROR: surrogate-character-reference ;
-ERROR: surrogate-in-input-stream ;
-ERROR: unexpected-character-after-doctype-system-identifier ;
-ERROR: unexpected-character-in-attribute-name ;
-ERROR: unexpected-character-in-unquoted-attribute-value ;
-ERROR: unexpected-equals-sign-before-attribute-name ;
-ERROR: unexpected-null-character ;
-ERROR: unexpected-question-mark-instead-of-tag-name ;
-ERROR: unexpected-solidus-in-tag ;
-ERROR: unknown-named-character-reference ;
-
-! Tree insertion modes
-SINGLETONS: initial-mode before-html-mode before-head-mode
-in-head-mode in-head-noscript-mode after-head-mode
-in-body-mode text-mode in-table-mode in-table-text-mode
-in-caption-mode in-column-group-mode in-table-body-mode
-in-row-mode in-cell-mode in-select-mode in-select-in-table-mode in-template-mode
-after-body-mode in-frameset-mode after-frameset-mode after-after-body-mode
-after-after-frameset-mode ;
-
-TUPLE: tag-state
-name ;
-
-TUPLE: start-tag self-closing? attributes ;
-: <start-tag> ( -- start-tag )
-    start-tag new
-        H{ } clone >>attributes
-    ; inline
-
-TUPLE: end-tag self-closing? attributes ;
-: <end-tag> ( -- start-tag )
-    end-tag new
-        H{ } clone >>attributes
-    ; inline
-
-: <tag-state> ( -- tag-state )
-    tag-state new
-    ; inline
-
-TUPLE: document
-tree
-tree-insert-mode
-doctype-name
-tag-name
-attribute-name
-attribute-value
-temporary-buffer
-comment-token
-open-elements
-return-state ;
-
-: <document> ( -- document )
-    document new
-        V{ } clone >>tree
-        initial-mode >>tree-insert-mode
-        SBUF" " clone >>doctype-name
-        SBUF" " clone >>tag-name
-        SBUF" " clone >>attribute-name
-        SBUF" " clone >>attribute-value
-        SBUF" " clone >>temporary-buffer
-        SBUF" " clone >>comment-token
-        V{ } clone >>open-elements
-    ; inline
-
-GENERIC: tree-insert* ( document obj tree-insert-mode -- document )
-M: initial-mode tree-insert*
-    drop {
-        { CHAR: \t [ ] }
-        { CHAR: \n [ ] }
-        { CHAR: \f [ ] }
-        { CHAR: \r [ ] }
-        { CHAR: \s [ ] }
-        [ "initial-mode tree-insert*" unimplemented ]
-    } case ;
-
-M: before-html-mode tree-insert* drop unimplemented* ;
-M: before-head-mode tree-insert* drop unimplemented* ;
-M: in-head-mode tree-insert* drop unimplemented* ;
-M: in-head-noscript-mode tree-insert* drop unimplemented* ;
-M: after-head-mode tree-insert* drop unimplemented* ;
-M: in-body-mode tree-insert* drop unimplemented* ;
-M: text-mode tree-insert* drop unimplemented* ;
-M: in-table-mode tree-insert* drop unimplemented* ;
-M: in-table-text-mode tree-insert* drop unimplemented* ;
-M: in-caption-mode tree-insert* drop unimplemented* ;
-M: in-column-group-mode tree-insert* drop unimplemented* ;
-M: in-table-body-mode tree-insert* drop unimplemented* ;
-M: in-row-mode tree-insert* drop unimplemented* ;
-M: in-cell-mode tree-insert* drop unimplemented* ;
-M: in-select-mode tree-insert* drop unimplemented* ;
-M: in-select-in-table-mode tree-insert* drop unimplemented* ;
-M: in-template-mode tree-insert* drop unimplemented* ;
-M: after-body-mode tree-insert* drop unimplemented* ;
-M: in-frameset-mode tree-insert* drop unimplemented* ;
-M: after-frameset-mode tree-insert* drop unimplemented* ;
-M: after-after-body-mode tree-insert* drop unimplemented* ;
-M: after-after-frameset-mode tree-insert* drop unimplemented* ;
-
-: tree-insert ( document obj -- document )
-    over tree-insert-mode>> tree-insert* ;
-
-MEMO: load-entities ( -- assoc )
-    "vocab:html5/entities.json" utf8 file-contents json> ;
-
-: entity? ( string -- entity/string > )
-    load-entities ?at ;
-
-: push-doctype-name ( ch document -- ) doctype-name>> push ;
-: push-tag-name ( ch document -- ) tag-name>> push ;
-: push-attribute-name ( ch document -- ) attribute-name>> push ;
-: push-attribute-value ( ch document -- ) attribute-value>> push ;
-: push-temporary-buffer ( ch document -- ) temporary-buffer>> push ;
-: push-comment-token ( ch document -- ) comment-token>> push ;
-: emit-tag ( document -- ) "emit tag" print .  ;
-: emit-doctype ( document -- )
-    "emit doctype: " write
-    [ doctype-name>> >string . ]
-    [ SBUF" " clone doctype-name<< ] bi ;
-
-: ascii-upper-alpha? ( ch -- ? ) [ CHAR: A CHAR: Z between? ] [ f ] if* ; inline
-: ascii-lower-alpha? ( ch -- ? ) [ CHAR: a CHAR: z between? ] [ f ] if* ; inline
-: ascii-digit? ( ch/f -- ? ) [ CHAR: 0 CHAR: 9 between? ] [ f ] if* ;
-: ascii-alpha? ( ch/f -- ? ) { [ ascii-lower-alpha? ] [ ascii-upper-alpha? ] } 1|| ;
-: ascii-alphanumeric? ( ch/f -- ? ) { [ ascii-alpha? ] [ ascii-digit? ] } 1|| ;
-
 DEFER: data-state
 DEFER: (data-state)
 DEFER: rcdata-state
@@ -329,23 +160,202 @@ DEFER: (numeric-character-reference-state)
 DEFER: hexadecimal-character-reference-start-state
 DEFER: (hexadecimal-character-reference-start-state)
 DEFER: decimal-character-reference-start-state
-DEFER: (decimal-character-reference-start-state)
-DEFER: hexadecimal-character-reference-state
-DEFER: (hexadecimal-character-reference-state)
-DEFER: decimal-character-reference-state
-DEFER: (decimal-character-reference-state)
+DEFER: (decimal-character-reference-start-sttag
 DEFER: numeric-character-reference-end-state
 DEFER: (numeric-character-reference-end-state)
 
 
+ERROR: unimplemented string ;
+ERROR: unimplemented* ;
+
+! Errors: https://html.spec.whatwg.org/multipage/parsing.html#parse-errors
+ERROR: abrupt-closing-of-empty-comment ;
+ERROR: abrupt-doctype-public-identifier ;
+ERROR: abrupt-doctype-system-identifier ;
+ERROR: absence-of-digits-in-numeric-character-reference ;
+ERROR: cdata-in-html-content ;
+ERROR: character-reference-outside-unicode-range ;
+ERROR: control-character-in-input-stream ;
+ERROR: control-character-reference ;
+ERROR: end-tag-with-attributes ;
+ERROR: duplicate-attribute ;
+ERROR: end-tag-with-trailing-solidus ;
+ERROR: eof-before-tag-name ;
+ERROR: eof-in-cdata ;
+ERROR: eof-in-comment ;
+ERROR: eof-in-doctype ;
+ERROR: eof-in-script-html-comment-like-text ;
+ERROR: eof-in-tag ;
+ERROR: incorrectly-closed-comment ;
+ERROR: incorrectly-opened-comment ;
+ERROR: invalid-character-sequence-after-doctype-name ;
+ERROR: invalid-first-character-of-tag-name ;
+ERROR: missing-attribute-value ;
+ERROR: missing-doctype-name ;
+ERROR: missing-doctype-public-identifier ;
+ERROR: missing-doctype-system-identifier ;
+ERROR: missing-end-tag-name ;
+ERROR: missing-quote-before-doctype-public-identifier ;
+
+ERROR: missing-quote-before-doctype-system-identifier ;
+ERROR: missing-semicolon-after-character-reference ;
+ERROR: missing-whitespace-after-doctype-public-keyword ;
+ERROR: missing-whitespace-after-doctype-system-keyword ;
+ERROR: missing-whitespace-before-doctype-name ;
+ERROR: missing-whitespace-between-attributes ;
+ERROR: missing-whitespace-between-doctype-public-and-system-identifiers ;
+ERROR: nested-comment ;
+ERROR: noncharacter-character-reference ;
+ERROR: noncharacter-in-input-stream ;
+ERROR: non-void-html-element-start-tag-with-trailing-solidus ;
+ERROR: null-character-reference ;
+ERROR: surrogate-character-reference ;
+ERROR: surrogate-in-input-stream ;
+ERROR: unexpected-character-after-doctype-system-identifier ;
+ERROR: unexpected-character-in-attribute-name ;
+ERROR: unexpected-character-in-unquoted-attribute-value ;
+ERROR: unexpected-equals-sign-before-attribute-name ;
+ERROR: unexpected-null-character ;
+ERROR: unexpected-question-mark-instead-of-tag-name ;
+ERROR: unexpected-solidus-in-tag ;
+ERROR: unknown-named-character-reference ;
+
+! Tree insertion modes
+SINGLETONS: initial-mode before-html-mode before-head-mode
+in-head-mode in-head-noscript-mode after-head-mode
+in-body-mode text-mode in-table-mode in-table-text-mode
+in-caption-mode in-column-group-mode in-table-body-mode
+in-row-mode in-cell-mode in-select-mode in-select-in-table-mode in-template-mode
+after-body-mode in-frameset-mode after-frameset-mode after-after-body-mode
+after-after-frameset-mode ;
+
+TUPLE: tag-state
+name ;
+
+TUPLE: start-tag self-closing? attributes ;
+: <start-tag> ( -- start-tag )
+    start-tag new
+        H{ } clone >>attributes
+    ; inline
+
+TUPLE: end-tag self-closing? attributes ;
+: <end-tag> ( -- start-tag )
+    end-tag new
+        H{ } clone >>attributes
+    ; inline
+
+: <tag-state> ( -- tag-state )
+    tag-state new
+    ; inline
+
+TUPLE: document
+tree
+tree-insert-mode
+doctype-name
+tag-name
+end-tag-name
+attribute-name
+attribute-value
+temporary-buffer
+comment-token
+open-elements
+return-state ;
+
+: <document> ( -- document )
+    document new
+        V{ } clone >>tree
+        initial-mode >>tree-insert-mode
+        SBUF" " clone >>doctype-name
+        SBUF" " clone >>tag-name
+        SBUF" " clone >>end-tag-name
+        SBUF" " clone >>attribute-name
+        SBUF" " clone >>attribute-value
+        SBUF" " clone >>temporary-buffer
+        SBUF" " clone >>comment-token
+        V{ } clone >>open-elements
+    ; inline
+
+GENERIC: tree-insert* ( document obj tree-insert-mode -- document )
+M: initial-mode tree-insert*
+    drop {
+        { CHAR: \t [ ] }
+        { CHAR: \n [ ] }
+        { CHAR: \f [ ] }
+        { CHAR: \r [ ] }
+        { CHAR: \s [ ] }
+        [ "initial-mode tree-insert*" unimplemented ]
+    } case ;
+
+M: before-html-mode tree-insert* drop unimplemented* ;
+M: before-head-mode tree-insert* drop unimplemented* ;
+M: in-head-mode tree-insert* drop unimplemented* ;
+M: in-head-noscript-mode tree-insert* drop unimplemented* ;
+M: after-head-mode tree-insert* drop unimplemented* ;
+M: in-body-mode tree-insert* drop unimplemented* ;
+M: text-mode tree-insert* drop unimplemented* ;
+M: in-table-mode tree-insert* drop unimplemented* ;
+M: in-table-text-mode tree-insert* drop unimplemented* ;
+M: in-caption-mode tree-insert* drop unimplemented* ;
+M: in-column-group-mode tree-insert* drop unimplemented* ;
+M: in-table-body-mode tree-insert* drop unimplemented* ;
+M: in-row-mode tree-insert* drop unimplemented* ;
+M: in-cell-mode tree-insert* drop unimplemented* ;
+M: in-select-mode tree-insert* drop unimplemented* ;
+M: in-select-in-table-mode tree-insert* drop unimplemented* ;
+M: in-template-mode tree-insert* drop unimplemented* ;
+M: after-body-mode tree-insert* drop unimplemented* ;
+M: in-frameset-mode tree-insert* drop unimplemented* ;
+M: after-frameset-mode tree-insert* drop unimplemented* ;
+M: after-after-body-mode tree-insert* drop unimplemented* ;
+M: after-after-frameset-mode tree-insert* drop unimplemented* ;
+
+: tree-insert ( document obj -- document )
+    over tree-insert-mode>> tree-insert* ;
+
+MEMO: load-entities ( -- assoc )
+    "vocab:html5/entities.json" utf8 file-contents json> ;
+
+: entity? ( string -- entity/string > )
+    load-entities ?at ;
+
+: push-doctype-name ( ch document -- ) doctype-name>> push ;
+: push-tag-name ( ch document -- ) tag-name>> push ;
+: push-attribute-name ( ch document -- ) attribute-name>> push ;
+: push-attribute-value ( ch document -- ) attribute-value>> push ;
+: push-temporary-buffer ( ch document -- ) temporary-buffer>> push ;
+: reset-temporary-buffer ( document -- ) SBUF" " clone temporary-buffer<< ;
+: reset-end-tag ( document -- ) SBUF" " clone end-tag-name<< ;
+: push-comment-token ( ch document -- ) comment-token>> push ;
+: emit-eof ( document -- ) drop "emit-eof" print ;
+: emit-char ( char document -- ) drop "emit-char:" write . ;
+: emit-temporary-buffer-with ( string document -- ) "emit-temp-buffer: " write temporary-buffer>> append . ;
+: emit-string ( char document -- ) drop "emit-string:" write . ;
+: emit-tag ( document -- ) "emit tag: " write . ;
+: emit-end-tag ( document -- ) "emit end tag: " write . ;
+: emit-doctype ( document -- )
+    "emit doctype: " write
+    [ doctype-name>> >string . ]
+    [ SBUF" " clone doctype-name<< ] bi ;
+
+! check if matches open tag
+: appropriate-end-tag-token? ( document -- ? )
+    drop f ;
+
+: ascii-upper-alpha? ( ch -- ? ) [ CHAR: A CHAR: Z between? ] [ f ] if* ; inline
+: ascii-lower-alpha? ( ch -- ? ) [ CHAR: a CHAR: z between? ] [ f ] if* ; inline
+: ascii-digit? ( ch/f -- ? ) [ CHAR: 0 CHAR: 9 between? ] [ f ] if* ;
+: ascii-alpha? ( ch/f -- ? ) { [ ascii-lower-alpha? ] [ ascii-upper-alpha? ] } 1|| ;
+: ascii-alphanumeric? ( ch/f -- ? ) { [ ascii-alpha? ] [ ascii-digit? ] } 1|| ;
+
+
 : (data-state) ( document n/f string ch/f -- document n'/f string )
     {
-        ! { CHAR: & [ "character-reference-state-mode" unimplemented ] }
-        { CHAR: < [ tag-open-state ] }
-        { CHAR: \0 [ unexpected-null-character ] }
-        { f [ ] }
-        [ reach push-tag-name data-state ]
-    } case ;
+        { [ dup CHAR: & = ] [ drop \ data-state reach return-state<< character-reference-state ] }
+        { [ dup CHAR: < = ] [ drop tag-open-state ] }
+        { [ dup CHAR: \0 = ] [ unexpected-null-character ] }
+        { [ dup f = ] [ drop pick emit-eof ] }
+        [ reach emit-char data-state ]
+    } cond ;
 
 : data-state ( document n/f string -- document n'/f string )
     next-char-from (data-state) ;
@@ -353,7 +363,11 @@ DEFER: (numeric-character-reference-end-state)
 
 : (rcdata-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: & = ] [ drop \ rcdata-state reach return-state<< character-reference-state ] }
+        { [ dup CHAR: < = ] [ drop rcdata-less-than-sign-state ] }
+        { [ dup CHAR: \0 = ] [ unexpected-null-character ] }
+        { [ dup f = ] [ drop pick emit-eof ] }
+        [ reach emit-char rcdata-state ]
     } cond ;
 
 : rcdata-state ( document n/f string -- document n'/f string )
@@ -362,7 +376,10 @@ DEFER: (numeric-character-reference-end-state)
 
 : (rawtext-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: < = ] [ drop rawtext-less-than-sign-state ] }
+        { [ dup CHAR: \0 = ] [ drop unexpected-null-character ] }
+        { [ dup f = ] [ drop pick emit-eof ] }
+        [ reach emit-char rawtext-state ]
     } cond ;
 
 : rawtext-state ( document n/f string -- document n'/f string )
@@ -371,7 +388,10 @@ DEFER: (numeric-character-reference-end-state)
 
 : (script-data-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: < = ] [ drop script-data-less-than-sign-state ] }
+        { [ dup CHAR: \0 = ] [ drop unexpected-null-character ] }
+        { [ dup f = ] [ drop pick emit-eof ] }
+        [ reach emit-char script-data-state ]
     } cond ;
 
 : script-data-state ( document n/f string -- document n'/f string )
@@ -380,7 +400,9 @@ DEFER: (numeric-character-reference-end-state)
 
 : (plaintext-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: \0 = ] [ drop unexpected-null-character ] }
+        { [ dup f = ] [ drop pick emit-eof ] }
+        [ reach emit-char plaintext-state ]
     } cond ;
 
 : plaintext-state ( document n/f string -- document n'/f string )
@@ -388,7 +410,7 @@ DEFER: (numeric-character-reference-end-state)
 
 
 : (tag-open-state) ( document n/f string ch/f -- document n'/f string )
-{
+    {
         { [ dup ascii-alpha? ] [ (tag-name-state) ] }
         { [ dup CHAR: ! = ] [ drop markup-declaration-open-state ] }
         { [ dup CHAR: / = ] [ drop end-tag-open-state ] }
@@ -430,7 +452,8 @@ DEFER: (numeric-character-reference-end-state)
 
 : (rcdata-less-than-sign-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: / = ] [ drop pick reset-temporary-buffer rcdata-end-tag-open-state ] }
+        [ [ CHAR: < reach emit-char ] dip (rcdata-state) ]
     } cond ;
 
 : rcdata-less-than-sign-state ( document n/f string -- document n'/f string )
@@ -439,7 +462,8 @@ DEFER: (numeric-character-reference-end-state)
 
 : (rcdata-end-tag-open-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup ascii-alpha? ] [ reach reset-end-tag (rcdata-end-tag-name-state) ] }
+        [ [ CHAR: < reach emit-char ] dip (rcdata-state) ]
     } cond ;
 
 : rcdata-end-tag-open-state ( document n/f string -- document n'/f string )
@@ -448,7 +472,21 @@ DEFER: (numeric-character-reference-end-state)
 
 : (rcdata-end-tag-name-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup "\t\n\f\s" member? ] [
+            drop pick appropriate-end-tag-token?
+            [ before-attribute-name-state ] [ "</" reach emit-temporary-buffer-with rcdata-state ] if
+        ] }
+        { [ dup CHAR: / = ] [
+            drop pick appropriate-end-tag-token?
+            [ self-closing-start-tag-state ] [ "</" reach emit-temporary-buffer-with rcdata-state ] if
+        ] }
+        { [ dup CHAR: > = ] [
+            drop pick appropriate-end-tag-token?
+            [ pick emit-end-tag data-state ] [ "</" reach emit-temporary-buffer-with rcdata-state ] if
+        ] }
+        { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-tag-name ] [ reach push-temporary-buffer ] bi rcdata-end-tag-name-state ] }
+        { [ dup ascii-lower-alpha? ] [ [ reach push-tag-name ] [ reach push-temporary-buffer ] bi rcdata-end-tag-name-state ] }
+        [ [ "</" reach emit-temporary-buffer-with ] dip (rcdata-state) ]
     } cond ;
 
 : rcdata-end-tag-name-state ( document n/f string -- document n'/f string )
@@ -457,7 +495,8 @@ DEFER: (numeric-character-reference-end-state)
 
 : (rawtext-less-than-sign-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: / = ] [ drop pick reset-temporary-buffer rawtext-end-tag-open-state ] }
+        [ [ CHAR: < reach emit-char ] dip (rawtext-state) ]
     } cond ;
 
 : rawtext-less-than-sign-state ( document n/f string -- document n'/f string )
@@ -466,7 +505,8 @@ DEFER: (numeric-character-reference-end-state)
 
 : (rawtext-end-tag-open-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup ascii-alpha? ] [ reach reset-end-tag (rawtext-end-tag-name-state) ] }
+        [ [ CHAR: < reach emit-char ] dip (rawtext-state) ]
     } cond ;
 
 : rawtext-end-tag-open-state ( document n/f string -- document n'/f string )
@@ -475,7 +515,21 @@ DEFER: (numeric-character-reference-end-state)
 
 : (rawtext-end-tag-name-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup "\t\n\f\s" member? ] [
+            drop pick appropriate-end-tag-token?
+            [ before-attribute-name-state ] [ "</" reach emit-temporary-buffer-with rawtext-state ] if
+        ] }
+        { [ dup CHAR: / = ] [
+            drop pick appropriate-end-tag-token?
+            [ self-closing-start-tag-state ] [ "</" reach emit-temporary-buffer-with rawtext-state ] if
+        ] }
+        { [ dup CHAR: > = ] [
+            drop pick appropriate-end-tag-token?
+            [ pick emit-end-tag data-state ] [ "</" reach emit-temporary-buffer-with rawtext-state ] if
+        ] }
+        { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-tag-name ] [ reach push-temporary-buffer ] bi rawtext-end-tag-name-state ] }
+        { [ dup ascii-lower-alpha? ] [ [ reach push-tag-name ] [ reach push-temporary-buffer ] bi rawtext-end-tag-name-state ] }
+        [ [ "</" reach emit-temporary-buffer-with ] dip (rawtext-state) ]
     } cond ;
 
 : rawtext-end-tag-name-state ( document n/f string -- document n'/f string )
@@ -484,7 +538,9 @@ DEFER: (numeric-character-reference-end-state)
 
 : (script-data-less-than-sign-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: / = ] [ drop pick reset-temporary-buffer script-data-end-tag-open-state ] }
+        { [ dup CHAR: ! = ] [ drop "<!" reach emit-string script-data-escape-start-state ] }
+        [ [ CHAR: < reach emit-char ] dip (script-data-state) ]
     } cond ;
 
 : script-data-less-than-sign-state ( document n/f string -- document n'/f string )
@@ -493,7 +549,8 @@ DEFER: (numeric-character-reference-end-state)
 
 : (script-data-end-tag-open-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup ascii-alpha? ] [ reach reset-end-tag (script-data-end-tag-name-state) ] }
+        [ [ "</" reach emit-string ] dip (script-data-state) ]
     } cond ;
 
 : script-data-end-tag-open-state ( document n/f string -- document n'/f string )
@@ -502,7 +559,21 @@ DEFER: (numeric-character-reference-end-state)
 
 : (script-data-end-tag-name-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup "\t\n\f\s" member? ] [
+            drop pick appropriate-end-tag-token?
+            [ before-attribute-name-state ] [ "</" reach emit-temporary-buffer-with script-data-state ] if
+        ] }
+        { [ dup CHAR: / = ] [
+            drop pick appropriate-end-tag-token?
+            [ self-closing-start-tag-state ] [ "</" reach emit-temporary-buffer-with script-data-state ] if
+        ] }
+        { [ dup CHAR: > = ] [
+            drop pick appropriate-end-tag-token?
+            [ pick emit-end-tag data-state ] [ "</" reach emit-temporary-buffer-with script-data-state ] if
+        ] }
+        { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-tag-name ] [ reach push-temporary-buffer ] bi rawtext-end-tag-name-state ] }
+        { [ dup ascii-lower-alpha? ] [ [ reach push-tag-name ] [ reach push-temporary-buffer ] bi rawtext-end-tag-name-state ] }
+        [ [ "</" reach emit-temporary-buffer-with ] dip (script-data-state) ]
     } cond ;
 
 : script-data-end-tag-name-state ( document n/f string -- document n'/f string )
@@ -511,7 +582,8 @@ DEFER: (numeric-character-reference-end-state)
 
 : (script-data-escape-start-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: - = ] [ drop script-data-escape-start-dash-state ] }
+        [ (script-data-state) ]
     } cond ;
 
 : script-data-escape-start-state ( document n/f string -- document n'/f string )
@@ -520,7 +592,8 @@ DEFER: (numeric-character-reference-end-state)
 
 : (script-data-escape-start-dash-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: - = ] [ drop script-data-escaped-dash-dash-state ] }
+        [ (script-data-state) ]
     } cond ;
 
 : script-data-escape-start-dash-state ( document n/f string -- document n'/f string )
@@ -529,7 +602,11 @@ DEFER: (numeric-character-reference-end-state)
 
 : (script-data-escaped-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: - = ] [ drop script-data-escaped-dash-state ] }
+        { [ dup CHAR: < = ] [ drop script-data-escaped-less-than-sign-state ] }
+        { [ dup CHAR: \0 = ] [ unexpected-null-character CHAR: replacement-character unimplemented* ] }
+        { [ dup f = ] [ eof-in-script-html-comment-like-text ] }
+        [ reach emit-char script-data-escaped-state ]
     } cond ;
 
 : script-data-escaped-state ( document n/f string -- document n'/f string )
@@ -538,7 +615,11 @@ DEFER: (numeric-character-reference-end-state)
 
 : (script-data-escaped-dash-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: - = ] [ drop script-data-escaped-dash-dash-state ] }
+        { [ dup CHAR: < = ] [ drop script-data-escaped-less-than-sign-state ] }
+        { [ dup CHAR: \0 = ] [ unexpected-null-character script-data-escaped-state ] }
+        { [ dup f = ] [ eof-in-script-html-comment-like-text ] }
+        [ reach emit-char script-data-escaped-state ]
     } cond ;
 
 : script-data-escaped-dash-state ( document n/f string -- document n'/f string )
@@ -547,7 +628,12 @@ DEFER: (numeric-character-reference-end-state)
 
 : (script-data-escaped-dash-dash-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: - = ] [ reach emit-char script-data-escaped-dash-dash-state ] }
+        { [ dup CHAR: < = ] [ drop script-data-escaped-less-than-sign-state ] }
+        { [ dup CHAR: > = ] [ reach emit-char script-data-state ] }
+        { [ dup CHAR: \0 = ] [ unexpected-null-character script-data-escaped-state ] }
+        { [ dup f = ] [ eof-in-script-html-comment-like-text ] }
+        [ reach emit-char script-data-escaped-state ]
     } cond ;
 
 : script-data-escaped-dash-dash-state ( document n/f string -- document n'/f string )
@@ -556,7 +642,9 @@ DEFER: (numeric-character-reference-end-state)
 
 : (script-data-escaped-less-than-sign-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: / = ] [ drop pick reset-temporary-buffer script-data-escaped-end-tag-open-state ] }
+        { [ dup ascii-alpha? ] [ [ pick reset-temporary-buffer CHAR: < reach emit-char ] dip (script-data-double-escape-start-state) ] }
+        [ [ CHAR: < reach emit-char ] dip (script-data-escaped-state) ]
     } cond ;
 
 : script-data-escaped-less-than-sign-state ( document n/f string -- document n'/f string )
@@ -565,7 +653,8 @@ DEFER: (numeric-character-reference-end-state)
 
 : (script-data-escaped-end-tag-open-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup ascii-alpha? ] [ [ pick reset-end-tag ] dip (script-data-escaped-end-tag-name-state) ] }
+        [ [ "</" reach emit-string ] dip (script-data-escaped-state) ]
     } cond ;
 
 : script-data-escaped-end-tag-open-state ( document n/f string -- document n'/f string )
@@ -574,7 +663,21 @@ DEFER: (numeric-character-reference-end-state)
 
 : (script-data-escaped-end-tag-name-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup "\t\n\f\s" member? ] [
+            drop pick appropriate-end-tag-token?
+            [ before-attribute-name-state ] [ "</" reach emit-temporary-buffer-with script-data-escaped-state ] if
+        ] }
+        { [ dup CHAR: / = ] [
+            drop pick appropriate-end-tag-token?
+            [ self-closing-start-tag-state ] [ "</" reach emit-temporary-buffer-with script-data-escaped-state ] if
+        ] }
+        { [ dup CHAR: > = ] [
+            drop pick appropriate-end-tag-token?
+            [ pick emit-end-tag data-state ] [ "</" reach emit-temporary-buffer-with script-data-escaped-state ] if
+        ] }
+        { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-tag-name ] [ reach push-temporary-buffer ] bi script-data-escaped-end-tag-name-state ] }
+        { [ dup ascii-lower-alpha? ] [ [ reach push-tag-name ] [ reach push-temporary-buffer ] bi script-data-escaped-end-tag-name-state ] }
+        [ [ "</" reach emit-temporary-buffer-with ] dip (script-data-escaped-state) ]
     } cond ;
 
 : script-data-escaped-end-tag-name-state ( document n/f string -- document n'/f string )
@@ -583,7 +686,14 @@ DEFER: (numeric-character-reference-end-state)
 
 : (script-data-double-escape-start-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup "\t\n\f\s/>" member? ] [
+            reach emit-char
+            pick temporary-buffer>> "script" sequence=
+            [ script-data-double-escaped-state ] [ script-data-escaped-state ] if
+        ] }
+        { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-tag-name ] [ reach push-temporary-buffer ] bi script-data-double-escape-start-state ] }
+        { [ dup ascii-lower-alpha? ] [ [ reach push-tag-name ] [ reach push-temporary-buffer ] bi script-data-double-escape-start-state ] } ! todo
+        [ (script-data-escaped-state) ]
     } cond ;
 
 : script-data-double-escape-start-state ( document n/f string -- document n'/f string )
@@ -592,7 +702,15 @@ DEFER: (numeric-character-reference-end-state)
 
 : (script-data-double-escaped-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: - = ] [ reach emit-char script-data-double-escaped-dash-state ] }
+        { [ dup CHAR: < = ] [ reach emit-char script-data-double-escaped-less-than-sign-state ] }
+        { [ dup CHAR: \0 = ] [
+            unexpected-null-character
+            CHAR: replacement-character reach emit-char
+            script-data-double-escaped-state
+        ] }
+        { [ dup f = ] [ eof-in-script-html-comment-like-text ] }
+        [ reach emit-char script-data-double-escaped-state ]
     } cond ;
 
 : script-data-double-escaped-state ( document n/f string -- document n'/f string )
@@ -601,7 +719,15 @@ DEFER: (numeric-character-reference-end-state)
 
 : (script-data-double-escaped-dash-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: - = ] [ reach emit-char script-data-double-escaped-dash-dash-state ] }
+        { [ dup CHAR: < = ] [ reach emit-char script-data-double-escaped-less-than-sign-state ] }
+        { [ dup CHAR: \0 = ] [
+            unexpected-null-character
+            CHAR: replacement-character reach emit-char
+            script-data-double-escaped-state
+        ] }
+        { [ dup f = ] [ eof-in-script-html-comment-like-text ] }
+        [ reach emit-char script-data-double-escaped-state ]
     } cond ;
 
 : script-data-double-escaped-dash-state ( document n/f string -- document n'/f string )
@@ -610,7 +736,16 @@ DEFER: (numeric-character-reference-end-state)
 
 : (script-data-double-escaped-dash-dash-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: - = ] [ reach emit-char script-data-double-escaped-dash-dash-state ] }
+        { [ dup CHAR: < = ] [ reach emit-char script-data-double-escaped-less-than-sign-state ] }
+        { [ dup CHAR: > = ] [ reach emit-char script-data-state ] }
+        { [ dup CHAR: \0 = ] [
+            unexpected-null-character
+            CHAR: replacement-character reach emit-char
+            script-data-double-escaped-state
+        ] }
+        { [ dup f = ] [ eof-in-script-html-comment-like-text ] }
+        [ reach emit-char script-data-escaped-state ]
     } cond ;
 
 : script-data-double-escaped-dash-dash-state ( document n/f string -- document n'/f string )
@@ -619,7 +754,8 @@ DEFER: (numeric-character-reference-end-state)
 
 : (script-data-double-escaped-less-than-sign-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup CHAR: / = ] [ reach emit-char pick reset-temporary-buffer script-data-double-escape-end-state ] }
+        [ (script-data-double-escaped-state) ]
     } cond ;
 
 : script-data-double-escaped-less-than-sign-state ( document n/f string -- document n'/f string )
@@ -628,7 +764,14 @@ DEFER: (numeric-character-reference-end-state)
 
 : (script-data-double-escape-end-state) ( document n/f string ch/f -- document n'/f string )
     {
-        [ unimplemented* ]
+        { [ dup "\t\n\f\s/>" member? ] [
+            reach emit-char
+            pick temporary-buffer>> "script" sequence=
+            [ script-data-escaped-state ] [ script-data-double-escaped-state ] if
+        ] }
+        { [ dup ascii-upper-alpha? ] [ [ 0x20 + reach push-tag-name ] [ reach push-temporary-buffer ] bi script-data-double-escape-end-state ] }
+        { [ dup ascii-lower-alpha? ] [ [ reach push-tag-name ] [ reach push-temporary-buffer ] bi script-data-double-escape-end-state ] } ! todo
+        [ (script-data-double-escaped-state) ]
     } cond ;
 
 : script-data-double-escape-end-state ( document n/f string -- document n'/f string )
