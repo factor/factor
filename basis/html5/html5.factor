@@ -1,8 +1,9 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs arrays combinators combinators.short-circuit
-io io.encodings.utf8 io.files json.reader kernel math math.order
-memoize modern.slices prettyprint sequences strings ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit io io.encodings.utf8 io.files
+json.reader kernel math math.order memoize modern.slices
+prettyprint sequences strings suffix-arrays words ;
 IN: html5
 
 : 1sbuf ( ch -- sbuf ) [ SBUF" " clone ] dip over push ; inline
@@ -236,32 +237,16 @@ in-row-mode in-cell-mode in-select-mode in-select-in-table-mode in-template-mode
 after-body-mode in-frameset-mode after-frameset-mode after-after-body-mode
 after-after-frameset-mode ;
 
-TUPLE: tag-state
-name ;
-
-TUPLE: start-tag self-closing? attributes ;
-: <start-tag> ( -- start-tag )
-    start-tag new
-        H{ } clone >>attributes
-    ; inline
-
-TUPLE: end-tag self-closing? attributes ;
-: <end-tag> ( -- start-tag )
-    end-tag new
-        H{ } clone >>attributes
-    ; inline
-
-: <tag-state> ( -- tag-state )
-    tag-state new
-    ; inline
-
 TUPLE: document
 quirks-mode?
+fostering-parent?
 tree
 tree-insert-mode
-doctype-token
+doctype
 tag
+end-tag
 tag-name
+end-tag-name
 attribute-name
 attribute-value
 temporary-buffer
@@ -269,37 +254,62 @@ comment-token
 open-elements
 return-state ;
 
+: temporary-buffer-attribute? ( document -- ? )
+    return-state>>
+    {
+        attribute-value-unquoted-state
+        attribute-value-single-quoted-state
+        attribute-value-double-quoted-state
+    } member? ;
+
+! name, public/system identifier should not be empty strings
+! until the state machine demands it
 TUPLE: doctype
     name
     public-identifier
     system-identifier
-    quirks-flag ;
+    quirks? ;
 
 : <doctype> ( -- doctype )
-    doctype new
-        SBUF" " clone >>name ; inline
+    doctype new ; inline
 
-: make-doctype-token ( ch -- doctype )
-    doctype new
-        swap ?1sbuf >>name ; inline
+: new-doctype-from-ch ( ch document -- )
+    [
+        doctype new
+            swap ?1sbuf >>name
+    ] dip doctype<< ; inline
 
-TUPLE: tag
-    name
-    attributes ;
+: new-doctype-with-quirks ( document -- )
+    <doctype> t >>quirks? >>doctype drop ;
+
+TUPLE: tag self-closing? name attributes ;
 
 : <tag> ( -- tag )
     tag new
         SBUF" " clone >>name
         V{ } clone >>attributes ;
 
+TUPLE: end-tag self-closing? name attributes ;
+
+: <end-tag> ( -- tag )
+    end-tag new
+        SBUF" " clone >>name
+        V{ } clone >>attributes ;
+
+: new-tag ( document -- )
+    <tag> >>tag drop ;
+
+: new-end-tag ( document -- )
+    <end-tag> >>tag drop ;
+
+: set-self-closing ( document -- )
+    tag>> t >>self-closing? drop ;
 
 : <document> ( -- document )
     document new
         V{ } clone >>tree
         initial-mode >>tree-insert-mode
-        <doctype> >>doctype-token
-        <tag> >>tag
-        SBUF" " clone >>tag-name
+        <doctype> >>doctype
         SBUF" " clone >>attribute-name
         SBUF" " clone >>attribute-value
         SBUF" " clone >>temporary-buffer
@@ -307,20 +317,26 @@ TUPLE: tag
         V{ } clone >>open-elements
     ; inline
 
-: force-quirks-flag-on ( document -- )
-    doctype-token>> t >>quirks-flag drop ;
+: force-quirks ( document -- )
+    doctype>> t >>quirks? drop ;
+
+: initialize-doctype-name ( document -- )
+    [ SBUF" " clone ] dip doctype>> name<< ;
 
 : initialize-doctype-public-identifier ( document -- )
-    [ SBUF" " clone ] dip doctype-token>> public-identifier<< ;
+    [ SBUF" " clone ] dip doctype>> public-identifier<< ;
 
 : initialize-doctype-system-identifier ( document -- )
-    [ SBUF" " clone ] dip doctype-token>> system-identifier<< ;
+    [ SBUF" " clone ] dip doctype>> system-identifier<< ;
+
+: push-doctype-name ( ch document -- )
+    doctype>> name>> push ;
 
 : push-doctype-public-identifier ( ch document -- )
-    doctype-token>> public-identifier>> push ;
+    doctype>> public-identifier>> push ;
 
 : push-doctype-system-identifier ( ch document -- )
-    doctype-token>> system-identifier>> push ;
+    doctype>> system-identifier>> push ;
 
 GENERIC: tree-insert* ( document obj tree-insert-mode -- document )
 M: initial-mode tree-insert*
@@ -362,19 +378,42 @@ M: after-after-frameset-mode tree-insert* drop unimplemented* ;
 MEMO: load-entities ( -- assoc )
     "vocab:html5/entities.json" utf8 file-contents json> ;
 
-: entity? ( string -- entity/string > )
+MEMO: entities-suffix-array ( -- assoc )
+    load-entities keys >suffix-array ;
+
+: lookup-entity ( string -- entity/string ? )
     load-entities ?at ;
 
+: named-character-match? ( document -- prefix? exact? )
+    temporary-buffer>>
+    [ entities-suffix-array query f like ]
+    [ last CHAR: ; = ] bi ;
 
-: push-doctype-name ( ch document -- ) doctype-token>> name>> push ;
-: push-tag-name ( ch document -- ) tag-name>> push ;
+: temporary-buffer-attribute-on ( document -- )
+    t >>temporary-buffer-attribute? drop ;
+
+: temporary-buffer-attribute-off ( document -- )
+    f >>temporary-buffer-attribute? drop ;
+
+ERROR: unknown-named-entity entity ;
+: take-named-character ( document -- )
+    dup
+    temporary-buffer>> >string lookup-entity [
+        "characters" of
+        SBUF" " clone-like >>temporary-buffer drop
+    ] [
+        unknown-named-entity
+    ] if ;
+
+: push-tag-name ( ch document -- ) tag>> name>> push ;
 : push-attribute-name ( ch document -- ) attribute-name>> push ;
 : push-attribute-value ( ch document -- ) attribute-value>> push ;
-: push-temporary-buffer ( ch document -- ) temporary-buffer>> push ;
-: reset-temporary-buffer ( document -- ) SBUF" " clone temporary-buffer<< ;
-: reset-end-tag ( document -- ) SBUF" " clone end-tag-name<< ;
 : push-comment-token ( ch document -- ) comment-token>> push ;
 : push-all-comment-token ( string document -- ) comment-token>> push-all ;
+
+ERROR: invalid-return-state obj ;
+: check-return-state ( obj -- return-state )
+    dup word? [ invalid-return-state ] unless ;
 
 : current-attribute ( document -- attribute/f )
     [ attribute-name>> >string f like ]
@@ -393,33 +432,47 @@ MEMO: load-entities ( -- assoc )
     [ tag>> attributes>> push-when ]
     [ reset-attribute ] tri ;
 
-: flush-temporary-buffer ( document -- )
-    "flushing character-reference: " write
-    [ temporary-buffer>> >string . ]
-    [ SBUF" " clone >>temporary-buffer drop ] bi ;
-
 : emit-eof ( document -- ) drop "emit-eof" print ;
 : emit-char ( char document -- ) drop "emit-char: " write 1string . ;
-: emit-temporary-buffer-with ( string document -- ) "emit-temp-buffer: " write temporary-buffer>> append . ;
 : emit-string ( char document -- ) drop "emit-string: " write . ;
 : emit-tag ( document -- )
     "emit tag: " write
     {
-        [ [ tag-name>> >string ] [ tag>> name<< ] bi ]
+        [ tag>> [ name>> >string ] [ name<< ] bi ]
         [ push-attribute ]
         [ tag>> . ]
-        [ <tag> >>tag drop ]
-        [ SBUF" " clone >>tag-name drop ]
+        [ f >>tag drop ]
     } cleave ;
-: emit-end-tag ( document -- ) "emit end tag: " write . ;
-: emit-doctype-token ( document -- )
+: emit-end-tag ( document -- )
+    "emit end tag: " write
+    [ tag>> . ]
+    [ f >>tag drop ] bi ;
+: emit-doctype ( document -- )
     "emit doctype: " write
-    doctype-token>> . ;
+    doctype>>
+    [ >string ] change-name
+    . ;
 : emit-comment-token ( document -- )
     "emit comment token: " write
     [ comment-token>> >string . ]
     [ SBUF" " clone comment-token<< ] bi ;
 
+
+: reset-temporary-buffer ( document -- ) SBUF" " clone temporary-buffer<< ;
+: ch>new-temporary-buffer ( ch document -- ) [ 1sbuf ] dip temporary-buffer<< ;
+: string>new-temporary-buffer ( string document -- ) [ SBUF" " clone-like ] dip temporary-buffer<< ;
+: temporary-buffer-last ( document -- ch/f ) temporary-buffer>> ?last ;
+: push-temporary-buffer ( ch document -- ) temporary-buffer>> push ;
+: push-all-temporary-buffer ( string document -- ) temporary-buffer>> push-all ;
+
+: flush-temporary-buffer ( document -- )
+    "flush-temporary-buffer: " write
+    [ [ temporary-buffer>> ] keep [ emit-char ] curry each ]
+    [ SBUF" " clone >>temporary-buffer drop ] bi ;
+
+: emit-temporary-buffer-with ( string document -- )
+    [ temporary-buffer>> push-all ]
+    [ flush-temporary-buffer ] bi ;
 
 ! check if matches open tag
 : appropriate-end-tag-token? ( document -- ? )
@@ -436,23 +489,17 @@ MEMO: load-entities ( -- assoc )
 : ascii-alphanumeric? ( ch/f -- ? ) { [ ascii-alpha? ] [ ascii-digit? ] } 1|| ;
 : ascii-hex-digit? ( ch/f -- ? ) { [ ascii-digit? ] [ ascii-hex-alpha? ] } 1|| ;
 
-: (return-state) ( n/f string document ch/f -- document n'/f string )
-    over return-state>> dup [ "no return state" throw ] unless
-    [
-        f >>return-state
-    ] 2dip
-    execute( n/f string document ch/f -- document n'/f string ) ;
+: (return-state) ( document n/f string ch/f -- document n'/f string )
+    B reach [ f ] change-return-state drop check-return-state
+    execute( document n/f string ch/f -- document n'/f string ) ;
 
-: return-state ( n/f string document -- document n'/f string )
-    over return-state>>
-    [
-        f >>return-state
-    ] 2dip
-    execute( n/f string document -- document n'/f string ) ;
+: return-state ( document n/f string -- document n'/f string )
+    B pick [ f ] change-return-state drop check-return-state
+    execute( document n/f string -- document n'/f string ) ;
 
 : (data-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup CHAR: & = ] [ drop \ data-state reach return-state<< character-reference-state ] }
+        { [ dup CHAR: & = ] [ drop [ \ data-state >>return-state ] 2dip character-reference-state ] }
         { [ dup CHAR: < = ] [ drop tag-open-state ] }
         { [ dup CHAR: \0 = ] [ unexpected-null-character ] }
         { [ dup f = ] [ drop pick emit-eof ] }
@@ -465,7 +512,7 @@ MEMO: load-entities ( -- assoc )
 
 : (rcdata-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup CHAR: & = ] [ drop \ rcdata-state reach return-state<< character-reference-state ] }
+        { [ dup CHAR: & = ] [ drop [ \ rcdata-state >>return-state ] 2dip character-reference-state ] }
         { [ dup CHAR: < = ] [ drop rcdata-less-than-sign-state ] }
         { [ dup CHAR: \0 = ] [ unexpected-null-character ] }
         { [ dup f = ] [ drop pick emit-eof ] }
@@ -513,7 +560,7 @@ MEMO: load-entities ( -- assoc )
 
 : (tag-open-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup ascii-alpha? ] [ (tag-name-state) ] }
+        { [ dup ascii-alpha? ] [ reach new-tag (tag-name-state) ] }
         { [ dup CHAR: ! = ] [ drop markup-declaration-open-state ] }
         { [ dup CHAR: / = ] [ drop end-tag-open-state ] }
         { [ dup CHAR: ? = ] [ unexpected-question-mark-instead-of-tag-name ] }
@@ -527,7 +574,7 @@ MEMO: load-entities ( -- assoc )
 
 : (end-tag-open-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup ascii-alpha? ] [ (tag-name-state) ] }
+        { [ dup ascii-alpha? ] [ reach new-end-tag (tag-name-state) ] }
         { [ dup CHAR: > = ] [ missing-end-tag-name ] }
         { [ dup f = ] [ eof-before-tag-name ] }
         [ invalid-first-character-of-tag-name ]
@@ -564,7 +611,7 @@ MEMO: load-entities ( -- assoc )
 
 : (rcdata-end-tag-open-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup ascii-alpha? ] [ reach reset-end-tag (rcdata-end-tag-name-state) ] }
+        { [ dup ascii-alpha? ] [ reach new-end-tag (rcdata-end-tag-name-state) ] }
         [ [ CHAR: < reach emit-char ] dip (rcdata-state) ]
     } cond ;
 
@@ -607,7 +654,7 @@ MEMO: load-entities ( -- assoc )
 
 : (rawtext-end-tag-open-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup ascii-alpha? ] [ reach reset-end-tag (rawtext-end-tag-name-state) ] }
+        { [ dup ascii-alpha? ] [ reach new-end-tag (rawtext-end-tag-name-state) ] }
         [ [ CHAR: < reach emit-char ] dip (rawtext-state) ]
     } cond ;
 
@@ -651,7 +698,7 @@ MEMO: load-entities ( -- assoc )
 
 : (script-data-end-tag-open-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup ascii-alpha? ] [ reach reset-end-tag (script-data-end-tag-name-state) ] }
+        { [ dup ascii-alpha? ] [ reach new-end-tag (script-data-end-tag-name-state) ] }
         [ [ "</" reach emit-string ] dip (script-data-state) ]
     } cond ;
 
@@ -755,7 +802,7 @@ MEMO: load-entities ( -- assoc )
 
 : (script-data-escaped-end-tag-open-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup ascii-alpha? ] [ [ pick reset-end-tag ] dip (script-data-escaped-end-tag-name-state) ] }
+        { [ dup ascii-alpha? ] [ [ pick new-end-tag ] dip (script-data-escaped-end-tag-name-state) ] }
         [ [ "</" reach emit-string ] dip (script-data-escaped-state) ]
     } cond ;
 
@@ -1013,7 +1060,7 @@ MEMO: load-entities ( -- assoc )
 
 : (self-closing-start-tag-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup CHAR: > = ] [ missing-end-tag-name ] }
+        { [ dup CHAR: > = ] [ drop pick [ set-self-closing ] [ emit-tag ] bi data-state ] }
         { [ dup f = ] [ eof-in-tag ] }
         [ unexpected-solidus-in-tag ]
     } cond ;
@@ -1162,7 +1209,7 @@ MEMO: load-entities ( -- assoc )
     {
         { [ dup "\t\n\f\s" member? ] [ drop before-doctype-name-state ] }
         { [ dup CHAR: > = ] [ (before-doctype-name-state) ] }
-        { [ dup f = ] [ eof-in-doctype ] } ! todo force-quirks
+        { [ dup f = ] [ drop eof-in-doctype pick [ new-doctype-with-quirks ] [ emit-doctype ] [ emit-eof ] tri ] }
         [ missing-whitespace-before-doctype-name ]
     } cond ;
 
@@ -1171,17 +1218,24 @@ MEMO: load-entities ( -- assoc )
 
 
 : (before-doctype-name-state) ( document n/f string ch/f -- document n'/f string )
-B
     {
         { [ dup "\t\n\f\s" member? ] [ drop before-doctype-name-state ] }
-        { [ dup ascii-upper-alpha? ] [ 0x20 + reach push-tag-name tag-name-state ] }
+        { [ dup ascii-upper-alpha? ] [ 0x20 + reach new-doctype-from-ch doctype-name-state ] }
         { [ dup CHAR: \0 = ] [
             drop
             unexpected-null-character
-            CHAR: replacement-character make-doctype-token reach doctype-token<<
+            CHAR: replacement-character reach new-doctype-from-ch
             doctype-name-state
         ] }
-        [ make-doctype-token reach doctype-token<< doctype-name-state ]
+        { [ dup CHAR: > = ] [
+            drop missing-doctype-name
+            pick [ new-doctype-with-quirks ] [ emit-doctype ] bi
+        ] }
+        { [ dup f = ] [
+            drop eof-in-doctype
+            pick [ new-doctype-with-quirks ] [ emit-doctype ] [ emit-eof ] tri
+        ] }
+        [ reach new-doctype-from-ch doctype-name-state ]
     } cond ;
 
 : before-doctype-name-state ( document n/f string -- document n'/f string )
@@ -1191,14 +1245,14 @@ B
 : (doctype-name-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup "\t\n\f\s" member? ] [ drop after-doctype-name-state ] }
-        { [ dup CHAR: > = ] [ drop pick emit-doctype-token data-state ] }
+        { [ dup CHAR: > = ] [ drop pick emit-doctype data-state ] }
         { [ dup ascii-upper-alpha? ] [ 0x20 + reach push-doctype-name doctype-name-state ] }
         { [ dup CHAR: \0 = ] [
             drop unexpected-null-character
             CHAR: replacement-character pick push-doctype-name
             doctype-name-state
         ] }
-        { [ dup f = ] [ drop eof-in-doctype pick [ emit-doctype-token ] [ emit-eof ] bi ] } ! force-quirks on for doctype-token
+        { [ dup f = ] [ drop eof-in-doctype pick [ emit-doctype ] [ emit-eof ] bi ] } ! force-quirks on for doctype
         [ reach push-doctype-name doctype-name-state ]
     } cond ;
 
@@ -1209,7 +1263,7 @@ B
 : (after-doctype-name-state) ( document n/f string ch/f -- document n'/f string )
     {
         { [ dup "\t\n\f\s" member? ] [ drop after-doctype-name-state ] }
-        { [ dup CHAR: > = ] [ drop pick emit-doctype-token data-state ] }
+        { [ dup CHAR: > = ] [ drop pick emit-doctype data-state ] }
         { [ dup f = ] [ eof-in-doctype ] }
         { [ [ "PUBLIC" take-from-insensitive? ] dip swap ] [ drop after-doctype-public-keyword-state ] }
         { [ [ "SYSTEM" take-from-insensitive? ] dip swap ] [ drop after-doctype-system-keyword-state ] }
@@ -1225,11 +1279,11 @@ B
         { [ dup "\t\n\f\s" member? ] [ drop before-doctype-public-identifier-state ] }
         { [ dup CHAR: " = ] [ missing-whitespace-after-doctype-public-keyword ] }
         { [ dup CHAR: ' = ] [ missing-whitespace-after-doctype-public-keyword ] }
-        { [ dup CHAR: > = ] [ drop missing-doctype-public-identifier force-quirks-flag-on data-state ] }
-        { [ dup f = ] [ drop eof-in-doctype pick [ emit-doctype-token ] [ emit-eof ] bi ] }
+        { [ dup CHAR: > = ] [ drop missing-doctype-public-identifier force-quirks data-state ] }
+        { [ dup f = ] [ drop eof-in-doctype pick [ emit-doctype ] [ emit-eof ] bi ] }
         [
             missing-quote-before-doctype-public-identifier
-            [ reach force-quirks-flag-on ] dip
+            [ reach force-quirks ] dip
             (bogus-doctype-state)
         ]
     } cond ;
@@ -1251,13 +1305,13 @@ B
         ] }
         { [ dup CHAR: > = ] [
             drop missing-doctype-public-identifier
-            pick [ force-quirks-flag-on ] [ emit-doctype-token ] bi
+            pick [ force-quirks ] [ emit-doctype ] bi
             data-state
         ] }
-        { [ dup f = ] [ drop eof-in-doctype pick [ emit-doctype-token ] [ emit-eof ] bi ] }
+        { [ dup f = ] [ drop eof-in-doctype pick [ emit-doctype ] [ emit-eof ] bi ] }
         [
             missing-quote-before-doctype-public-identifier
-            [ reach force-quirks-flag-on ] dip
+            [ reach force-quirks ] dip
             (bogus-doctype-state)
         ]
     } cond ;
@@ -1277,12 +1331,12 @@ B
         ] }
         { [ dup CHAR: > = ] [
             drop abrupt-doctype-public-identifier
-            pick [ force-quirks-flag-on ] [ emit-doctype-token ] bi
+            pick [ force-quirks ] [ emit-doctype ] bi
             data-state
         ] }
         { [ dup f = ] [
             drop eof-in-doctype
-            pick [ force-quirks-flag-on ] [ emit-doctype-token ] [ emit-eof ] tri
+            pick [ force-quirks ] [ emit-doctype ] [ emit-eof ] tri
         ] }
         [ reach push-doctype-public-identifier doctype-public-identifier-double-quoted-state ]
     } cond ;
@@ -1302,12 +1356,12 @@ B
         ] }
         { [ dup CHAR: > = ] [
             drop abrupt-doctype-public-identifier
-            pick [ force-quirks-flag-on ] [ emit-doctype-token ] bi
+            pick [ force-quirks ] [ emit-doctype ] bi
             data-state
         ] }
         { [ dup f = ] [
             drop eof-in-doctype
-            pick [ force-quirks-flag-on ] [ emit-doctype-token ] [ emit-eof ] tri
+            pick [ force-quirks ] [ emit-doctype ] [ emit-eof ] tri
         ] }
         [ reach push-doctype-public-identifier doctype-public-identifier-single-quoted-state ]
     } cond ;
@@ -1320,7 +1374,7 @@ B
     {
         { [ dup "\t\n\f\s" member? ] [ drop between-doctype-public-and-system-identifiers-state ] }
         { [ dup CHAR: > = ] [
-            drop pick emit-doctype-token
+            drop pick emit-doctype
             data-state
         ] }
         { [ dup CHAR: " = ] [
@@ -1333,10 +1387,10 @@ B
             pick initialize-doctype-system-identifier
             doctype-system-identifier-single-quoted-state
         ] }
-        { [ dup f = ] [ drop eof-in-doctype pick [ force-quirks-flag-on ] [ emit-doctype-token ] [ emit-eof ] tri ] }
+        { [ dup f = ] [ drop eof-in-doctype pick [ force-quirks ] [ emit-doctype ] [ emit-eof ] tri ] }
         [
             missing-quote-before-doctype-system-identifier
-            [ reach force-quirks-flag-on ] dip
+            [ reach force-quirks ] dip
             (bogus-doctype-state)
         ]
     } cond ;
@@ -1349,7 +1403,7 @@ B
     {
         { [ dup "\t\n\f\s" member? ] [ drop between-doctype-public-and-system-identifiers-state ] }
         { [ dup CHAR: > = ] [
-            drop pick emit-doctype-token
+            drop pick emit-doctype
             data-state
         ] }
         { [ dup CHAR: " = ] [
@@ -1360,10 +1414,10 @@ B
             drop pick initialize-doctype-system-identifier
             doctype-system-identifier-single-quoted-state
         ] }
-        { [ dup f = ] [ drop eof-in-doctype pick [ force-quirks-flag-on ] [ emit-doctype-token ] [ emit-eof ] tri ] }
+        { [ dup f = ] [ drop eof-in-doctype pick [ force-quirks ] [ emit-doctype ] [ emit-eof ] tri ] }
         [
             missing-quote-before-doctype-system-identifier
-            [ reach force-quirks-flag-on ] dip
+            [ reach force-quirks ] dip
             (bogus-doctype-state)
         ]
     } cond ;
@@ -1387,13 +1441,13 @@ B
         ] }
         { [ dup CHAR: > = ] [
             drop missing-doctype-system-identifier
-            pick [ force-quirks-flag-on ] [ emit-doctype-token ] bi
+            pick [ force-quirks ] [ emit-doctype ] bi
             data-state
         ] }
-        { [ dup f = ] [ drop eof-in-doctype pick [ force-quirks-flag-on ] [ emit-doctype-token ] [ emit-eof ] tri ] }
+        { [ dup f = ] [ drop eof-in-doctype pick [ force-quirks ] [ emit-doctype ] [ emit-eof ] tri ] }
         [
             missing-quote-before-doctype-system-identifier
-            [ reach force-quirks-flag-on ] dip
+            [ reach force-quirks ] dip
             (bogus-doctype-state)
         ]
     } cond ;
@@ -1415,13 +1469,13 @@ B
         ] }
         { [ dup CHAR: > = ] [
             drop missing-doctype-system-identifier
-            pick [ force-quirks-flag-on ] [ emit-doctype-token ] bi
+            pick [ force-quirks ] [ emit-doctype ] bi
             data-state
         ] }
-        { [ dup f = ] [ drop eof-in-doctype pick [ emit-doctype-token ] [ emit-eof ] bi ] }
+        { [ dup f = ] [ drop eof-in-doctype pick [ emit-doctype ] [ emit-eof ] bi ] }
         [
             missing-quote-before-doctype-system-identifier
-            [ reach force-quirks-flag-on ] dip
+            [ reach force-quirks ] dip
             (bogus-doctype-state)
         ]
     } cond ;
@@ -1441,12 +1495,12 @@ B
         ] }
         { [ dup CHAR: > = ] [
             drop abrupt-doctype-system-identifier
-            pick [ force-quirks-flag-on ] [ emit-doctype-token ] bi
+            pick [ force-quirks ] [ emit-doctype ] bi
             data-state
         ] }
         { [ dup f = ] [
             drop eof-in-doctype
-            pick [ force-quirks-flag-on ] [ emit-doctype-token ] [ emit-eof ] tri
+            pick [ force-quirks ] [ emit-doctype ] [ emit-eof ] tri
         ] }
         [ reach push-doctype-system-identifier doctype-system-identifier-double-quoted-state ]
     } cond ;
@@ -1466,12 +1520,12 @@ B
         ] }
         { [ dup CHAR: > = ] [
             drop abrupt-doctype-system-identifier
-            pick [ force-quirks-flag-on ] [ emit-doctype-token ] bi
+            pick [ force-quirks ] [ emit-doctype ] bi
             data-state
         ] }
         { [ dup f = ] [
             drop eof-in-doctype
-            pick [ force-quirks-flag-on ] [ emit-doctype-token ] [ emit-eof ] tri
+            pick [ force-quirks ] [ emit-doctype ] [ emit-eof ] tri
         ] }
         [ reach push-doctype-system-identifier doctype-system-identifier-single-quoted-state ]
     } cond ;
@@ -1484,13 +1538,13 @@ B
     {
         { [ dup "\t\n\f\s" member? ] [ drop after-doctype-system-identifier-state ] }
         { [ dup CHAR: > = ] [
-            drop pick emit-doctype-token
+            drop pick emit-doctype
             data-state
         ] }
-        { [ dup f = ] [ drop eof-in-doctype pick [ force-quirks-flag-on ] [ emit-doctype-token ] [ emit-eof ] tri ] }
+        { [ dup f = ] [ drop eof-in-doctype pick [ force-quirks ] [ emit-doctype ] [ emit-eof ] tri ] }
         [
             unexpected-character-after-doctype-system-identifier
-            [ reach force-quirks-flag-on ] dip
+            [ reach force-quirks ] dip
             (bogus-doctype-state)
         ]
     } cond ;
@@ -1501,7 +1555,7 @@ B
 
 : (bogus-doctype-state) ( document n/f string ch/f -- document n'/f string )
     {
-        { [ dup CHAR: > = ] [ drop pick emit-doctype-token data-state ] }
+        { [ dup CHAR: > = ] [ drop pick emit-doctype data-state ] }
         { [ dup CHAR: \0 = ] [ drop unexpected-null-character bogus-doctype-state ] }
         { [ dup f = ] [ drop eof-in-doctype pick emit-eof ] }
         [ drop bogus-doctype-state ]
@@ -1544,6 +1598,7 @@ B
 
 
 : (character-reference-state) ( document n/f string ch/f -- document n'/f string )
+    [ CHAR: & reach ch>new-temporary-buffer ] dip
     {
         { [ dup ascii-alphanumeric? ] [ (named-character-reference-state) ] }
         { [ dup CHAR: # = ] [ reach push-temporary-buffer numeric-character-reference-state ] }
@@ -1555,14 +1610,25 @@ B
 
 
 : (named-character-reference-state) ( document n/f string ch/f -- document n'/f string )
-    {
-        { [ dup ascii-alphanumeric? ] [
+    B reach push-temporary-buffer
+    pick named-character-match? [
+        drop ! exact match, drop prefix match
+        {
+            [ pick temporary-buffer-attribute? ]
+            [ pick temporary-buffer>> ?last CHAR: ; = not ]
+            [ 2dup peek-from { [ CHAR: = = ] [ ascii-alphanumeric? ] } 1|| ]
+        } 0&& [
             unimplemented*
-            reach push-temporary-buffer
-            named-character-reference-state
-        ] }
-        [ drop pick flush-temporary-buffer ambiguous-ampersand-state ]
-    } cond ;
+            flush-temporary-buffer
+            return-state
+        ] [
+            pick [ take-named-character ] [ flush-temporary-buffer ] bi return-state
+        ] if
+    ] [
+        ! prefix match?
+        [ named-character-reference-state ]
+        [ pick flush-temporary-buffer ambiguous-ampersand-state ] if
+    ] if ;
 
 : named-character-reference-state ( document n/f string -- document n'/f string )
     next-char-from (named-character-reference-state) ;
