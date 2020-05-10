@@ -1,7 +1,8 @@
 ! Copyright (C) 2017, 2018, 2020 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax
-classes.struct combinators system ;
+classes.struct combinators literals math.order
+sodium.ffi.const sodium.ffi.const.size_max system ;
 IN: sodium.ffi
 
 << "sodium" {
@@ -71,6 +72,64 @@ FUNCTION: int crypto_pwhash_argon2id_str_verify (
     char* passwd, ulonglong passwdlen )
 FUNCTION: int crypto_pwhash_argon2id_str_needs_rehash (
     char[crypto_pwhash_argon2id_STRBYTES] str,
+    ulonglong opslimit, size_t memlimit )
+
+! crypto_pwhash_scryptsalsa208sha256_H
+CONSTANT: crypto_pwhash_scryptsalsa208sha256_BYTES_MIN 16
+CONSTANT: crypto_pwhash_scryptsalsa208sha256_PASSWD_MIN 0
+CONSTANT: crypto_pwhash_scryptsalsa208sha256_BYTES_MAX $[ SODIUM_SIZE_MAX 0x1fffffffe0 min ]
+CONSTANT: crypto_pwhash_scryptsalsa208sha256_PASSWD_MAX SODIUM_SIZE_MAX
+CONSTANT: crypto_pwhash_scryptsalsa208sha256_MEMLIMIT_MAX $[ SIZE_MAX 68719476736 min ]
+CONSTANT: crypto_pwhash_scryptsalsa208sha256_MEMLIMIT_INTERACTIVE 16777216
+CONSTANT: crypto_pwhash_scryptsalsa208sha256_MEMLIMIT_MIN 16777216
+CONSTANT: crypto_pwhash_scryptsalsa208sha256_MEMLIMIT_SENSITIVE 1073741824
+CONSTANT: crypto_pwhash_scryptsalsa208sha256_OPSLIMIT_INTERACTIVE 524288
+CONSTANT: crypto_pwhash_scryptsalsa208sha256_OPSLIMIT_MAX 4294967295
+CONSTANT: crypto_pwhash_scryptsalsa208sha256_OPSLIMIT_MIN 32768
+CONSTANT: crypto_pwhash_scryptsalsa208sha256_OPSLIMIT_SENSITIVE 33554432
+CONSTANT: crypto_pwhash_scryptsalsa208sha256_SALTBYTES 32
+CONSTANT: crypto_pwhash_scryptsalsa208sha256_STRBYTES 102
+CONSTANT: crypto_pwhash_scryptsalsa208sha256_STRPREFIX "$7$"
+
+FUNCTION: size_t crypto_pwhash_scryptsalsa208sha256_bytes_min ( )
+FUNCTION: size_t crypto_pwhash_scryptsalsa208sha256_bytes_max ( )
+FUNCTION: size_t crypto_pwhash_scryptsalsa208sha256_passwd_min ( )
+FUNCTION: size_t crypto_pwhash_scryptsalsa208sha256_passwd_max ( )
+FUNCTION: size_t crypto_pwhash_scryptsalsa208sha256_memlimit_interactive ( )
+FUNCTION: size_t crypto_pwhash_scryptsalsa208sha256_memlimit_max ( )
+FUNCTION: size_t crypto_pwhash_scryptsalsa208sha256_memlimit_min ( )
+FUNCTION: size_t crypto_pwhash_scryptsalsa208sha256_memlimit_sensitive ( )
+FUNCTION: size_t crypto_pwhash_scryptsalsa208sha256_opslimit_interactive ( )
+FUNCTION: size_t crypto_pwhash_scryptsalsa208sha256_opslimit_max ( )
+FUNCTION: size_t crypto_pwhash_scryptsalsa208sha256_opslimit_min ( )
+FUNCTION: size_t crypto_pwhash_scryptsalsa208sha256_opslimit_sensitive ( )
+FUNCTION: size_t crypto_pwhash_scryptsalsa208sha256_saltbytes ( )
+FUNCTION: size_t crypto_pwhash_scryptsalsa208sha256_strbytes ( )
+FUNCTION: char* crypto_pwhash_scryptsalsa208sha256_strprefix ( )
+
+FUNCTION: int crypto_pwhash_scryptsalsa208sha256 (
+    uchar* out, ulonglong outlen,
+    char* passwd, ulonglong passwdlen,
+    uchar* salt,
+    ulonglong opslimit, size_t memlimit )
+
+FUNCTION: int crypto_pwhash_scryptsalsa208sha256_str (
+    char[crypto_pwhash_scryptsalsa208sha256_STRBYTES] out,
+    char* passwd, ulonglong passwdlen,
+    ulonglong opslimit, size_t memlimit )
+
+FUNCTION: int crypto_pwhash_scryptsalsa208sha256_str_verify (
+    char[crypto_pwhash_scryptsalsa208sha256_STRBYTES] str,
+    char* passwd, ulonglong passwdlen )
+
+FUNCTION: int crypto_pwhash_scryptsalsa208sha256_ll (
+    uint8_t* passwd, size_t passwdlen,
+    uint8_t* salt, size_t saltlen,
+    uint64_t N, uint32_t r, uint32_t p,
+    uint8_t* buf, size_t buflen )
+
+FUNCTION: int crypto_pwhash_scryptsalsa208sha256_str_needs_rehash (
+    char[crypto_pwhash_scryptsalsa208sha256_STRBYTES] str,
     ulonglong opslimit, size_t memlimit )
 
 ! crypto_pwhash_H
