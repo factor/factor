@@ -46,8 +46,10 @@
         #include "os-linux-ppc.64.hpp"
       #elif defined(FACTOR_PPC32)
         #include "os-linux-ppc.32.hpp"
-      #elif defined(FACTOR_ARM)
-        #include "os-linux-arm.hpp"
+      #elif defined(FACTOR_ARM32)
+        #include "os-linux-arm.32.hpp"
+      #elif defined(FACTOR_ARM64)
+        #include "os-linux-arm.64.hpp"
       #elif defined(FACTOR_AMD64)
         #include "os-linux-x86.64.hpp"
       #else
@@ -65,7 +67,11 @@
   #include "cpu-x86.hpp"
 #elif defined(FACTOR_PPC)
   #include "cpu-ppc.hpp"
-#elif defined(FACTOR_ARM)
+#elif defined(FACTOR_ARM32)
+  #include "cpu-arm.32.hpp"
+  #include "cpu-arm.hpp"
+#elif defined(FACTOR_ARM64)
+  #include "cpu-arm.64.hpp"
   #include "cpu-arm.hpp"
 #else
   #error "Unsupported CPU"

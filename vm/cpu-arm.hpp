@@ -1,5 +1,6 @@
 namespace factor {
 
-#define FACTOR_CPU_STRING "arm"
+// void c_to_factor(cell quot);
+// void lazy_jit_compile(cell quot);
 
 }

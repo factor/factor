@@ -200,8 +200,8 @@ linux-ppc-32:
 linux-ppc-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc.64
 
-linux-arm:
-	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm
+linux-arm-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.64
 
 windows-x86-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.32
