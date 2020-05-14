@@ -705,6 +705,32 @@ With prefix, non-existing files will be created."
       (save-buffer))))
 
 
+;;; imenu tags
+
+;; TODO Handle the plural words (SINGLETONS:, SYMBOLS:, etc)
+(defvar factor-imenu-generic-expression
+  `((nil
+     ,(concat "^\\s-*"
+              (regexp-opt '(":" "::" "ALIAS:" "BUILTIN:" "C:" "CONSTANT:" "ERROR:"
+                            "GENERIC:" "GENERIC#:" "HOOK:" "INTERSECTION:" "MATH:"
+                            "MIXIN:" "PREDICATE:" "PRIMITIVE:" "SINGLETON:" "SLOT:"
+                            "SYMBOL:" "SYNTAX:" "TUPLE:" "UNION:" "LOG:" "C-TYPE:" "ENUM:"
+                            "STRUCT:" "FUNCTION-ALIAS:"))
+              "\\s-+\\(\\(?:\\s_\\|\\sw\\|\\s\\\\)+\\)")
+     1)
+    ("Methods"
+     ,(concat "^\\s-*"
+              (regexp-opt '("M:" "M::"))
+              "\\s-+\\(\\(?:\\s_\\|\\sw|\\s\\\\)+\\s-+\\(?:\\s_\\|\\sw|\\s\\\\)+\\)")
+     1)
+    (nil
+     ,(concat "^\\s-*"
+              (regexp-opt '("FUNCTION:" "TYPEDEF:"))
+              "\\s-+\\(?:\\(?:\\s_\\|\\sw\\|\\s\\\\)+\\s-+\\)\\(\\(?:\\s_\\|\\sw\\|\\s\\\\)+\\)")
+     1))
+  "Imenu generic expression for factor-mode. See `imenu-generic-expression'.")
+
+
 ;;; factor-mode:
 
 (defvar factor-mode-syntax-table (fuel-syntax-table))
@@ -758,6 +784,7 @@ With prefix, non-existing files will be created."
               :forward-token #'factor-smie-forward-token
               :backward-token #'factor-smie-backward-token)
   (setq-local smie-indent-basic factor-block-offset)
+  (setq-local imenu-generic-expression factor-imenu-generic-expression)
 
   (setq-local beginning-of-defun-function 'factor-beginning-of-defun)
   (setq-local end-of-defun-function 'factor-end-of-defun)
