@@ -170,6 +170,9 @@ PRIVATE>
         [ [ anchor>>    ] either? >>anchor ]
     } 2cleave ;
 
+: redacted-url ( url -- url' )
+    clone [ "xxxxx" and ] change-password ;
+
 ! Half-baked stuff follows
 : secure-protocol? ( protocol -- ? )
     "https" = ;
