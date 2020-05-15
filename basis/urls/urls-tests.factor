@@ -325,3 +325,7 @@ urls [
 { URL" http://www.google.com/" } [
     URL" http://www.google.com/"
 ] unit-test
+
+{ URL" https://host:1234/path" } [ URL" https://host:1234/path" redacted-url ] unit-test
+{ URL" https://user@host:1234/path" } [ URL" https://user@host:1234/path" redacted-url ] unit-test
+{ URL" https://user:xxxxx@host:1234/path" } [ URL" https://user:password@host:1234/path" redacted-url ] unit-test
