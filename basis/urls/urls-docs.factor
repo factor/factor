@@ -136,6 +136,10 @@ HELP: relative-url?
      { "?" boolean } }
 { $description "Tests whether a URL is relative." } ;
 
+HELP: redacted-url
+{ $values { "url" url } { "url'" url } }
+{ $description "Outputs a new URL with the password (if specified) replaced with " { $snippet "xxxxx" } ". This is useful for logging utilities where you want to avoid printing out the password in the logs." } ;
+
 HELP: secure-protocol?
 { $values { "protocol" string } { "?" boolean } }
 { $description "Tests if protocol connections must be made with secure sockets (SSL/TLS)." }
