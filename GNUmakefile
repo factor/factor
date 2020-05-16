@@ -15,7 +15,6 @@ ifdef CONFIG
 
 	XCODE_PATH ?= /Applications/Xcode.app
 	MACOSX_32_SDK ?= MacOSX10.11.sdk
-	MACOSX_SDK ?= MacOSX10.13.sdk
 
 	include $(CONFIG)
 
