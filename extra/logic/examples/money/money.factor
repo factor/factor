@@ -25,7 +25,7 @@ LOGIC-VARS: S E N D M O R Y A L G B T
     { delo D Digs3 Digs }
     [ [ [ D1 of ] [ D2 of ] [ C1 of ] tri + + ] S is ]
     [ [ S of 10 mod ] D is ]
-    [ [ S of 10 / >integer ] C is ]
+    [ [ S of 10 /i ] C is ]
 } rule
 
 { delo A L L } { { nonvaro A } !! } rule
