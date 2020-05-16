@@ -6,7 +6,9 @@ ui.baseline-alignment.private ui.gadgets ;
 IN: ui.gadgets.packs
 
 TUPLE: pack < aligned-gadget
-{ align initial: 0 } { fill initial: 0 } { gap initial: { 0 0 } } ;
+    { align initial: 0 }
+    { fill initial: 0 }
+    { gap initial: { 0 0 } } ;
 
 <PRIVATE
 
