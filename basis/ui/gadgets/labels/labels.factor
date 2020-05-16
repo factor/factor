@@ -56,10 +56,10 @@ M: label pref-dim*
 PRIVATE>
 
 M: label baseline*
-    label-metrics ascent>> round ;
+    label-metrics ascent>> ;
 
 M: label cap-height*
-    label-metrics cap-height>> round ;
+    label-metrics cap-height>> ;
 
 <PRIVATE
 
