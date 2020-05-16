@@ -19,7 +19,8 @@ TUPLE: line-gadget < gadget
 
 GENERIC: line-leading* ( gadget -- n )
 
-M: line-gadget line-leading* font>> font-metrics leading>> ;
+M: line-gadget line-leading*
+    font>> font-metrics leading>> ;
 
 GENERIC: line-leading ( gadget -- n )
 
@@ -32,7 +33,8 @@ M: line-gadget line-leading
 
 GENERIC: line-height* ( gadget -- n )
 
-M: line-gadget line-height* font>> font-metrics height>> ceiling ;
+M: line-gadget line-height*
+    font>> font-metrics height>> ceiling >integer ;
 
 GENERIC: line-height ( gadget -- n )
 
