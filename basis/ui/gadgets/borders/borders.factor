@@ -5,10 +5,10 @@ sequences ui.baseline-alignment ui.gadgets ;
 IN: ui.gadgets.borders
 
 TUPLE: border < aligned-gadget
-{ size initial: { 0 0 } }
-{ fill initial: { 0 0 } }
-{ align initial: { 1/2 1/2 } }
-{ min-dim initial: { 0 0 } } ;
+    { size initial: { 0 0 } }
+    { fill initial: { 0 0 } }
+    { align initial: { 1/2 1/2 } }
+    { min-dim initial: { 0 0 } } ;
 
 : new-border ( child class -- border )
     new swap add-gadget ; inline
