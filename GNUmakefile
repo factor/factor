@@ -85,58 +85,58 @@ ifdef CONFIG
 		vm/words.o
 
 	MASTER_HEADERS = $(PLAF_MASTER_HEADERS) \
+		vm/aging_space.hpp \
+		vm/allot.hpp \
+		vm/arrays.hpp \
 		vm/assert.hpp \
+		vm/bignum.hpp \
+		vm/bignumint.hpp \
+		vm/bitwise_hacks.hpp \
+		vm/booleans.hpp \
+		vm/bump_allocator.hpp \
+		vm/byte_arrays.hpp \
+		vm/callbacks.hpp \
+		vm/callstack.hpp  \
+		vm/code_blocks.hpp \
+		vm/code_heap.hpp \
+		vm/code_roots.hpp \
+		vm/contexts.hpp \
+		vm/data_heap.hpp \
+		vm/data_roots.hpp \
 		vm/debug.hpp \
+		vm/dispatch.hpp \
+		vm/errors.hpp \
+		vm/factor.hpp \
+		vm/fixup.hpp \
+		vm/float_bits.hpp \
+		vm/free_list.hpp \
+		vm/gc.hpp \
+		vm/gc_info.hpp \
+		vm/generic_arrays.hpp \
+		vm/image.hpp \
+		vm/inline_cache.hpp \
+		vm/instruction_operands.hpp \
+		vm/io.hpp \
+		vm/jit.hpp \
 		vm/layouts.hpp \
+		vm/mark_bits.hpp \
+		vm/math.hpp \
+		vm/mvm.hpp \
+		vm/object_start_map.hpp \
+		vm/objects.hpp \
 		vm/platform.hpp \
 		vm/primitives.hpp \
-		vm/segments.hpp \
-		vm/gc_info.hpp \
-		vm/contexts.hpp \
-		vm/run.hpp \
-		vm/objects.hpp \
-		vm/sampling_profiler.hpp \
-		vm/errors.hpp \
-		vm/bignumint.hpp \
-		vm/bignum.hpp \
-		vm/booleans.hpp \
-		vm/instruction_operands.hpp \
-		vm/code_blocks.hpp \
-		vm/bump_allocator.hpp \
-		vm/bitwise_hacks.hpp \
-		vm/mark_bits.hpp \
-		vm/free_list.hpp \
-		vm/fixup.hpp \
-		vm/write_barrier.hpp \
-		vm/object_start_map.hpp \
-		vm/aging_space.hpp \
-		vm/tenured_space.hpp \
-		vm/data_heap.hpp \
-		vm/code_heap.hpp \
-		vm/gc.hpp \
-		vm/float_bits.hpp \
-		vm/io.hpp \
-		vm/image.hpp \
-		vm/callbacks.hpp \
-		vm/dispatch.hpp \
-		vm/vm.hpp \
-		vm/allot.hpp \
-		vm/tagged.hpp \
-		vm/data_roots.hpp \
-		vm/code_roots.hpp \
-		vm/generic_arrays.hpp \
-		vm/callstack.hpp \
-		vm/slot_visitor.hpp \
-		vm/to_tenured_collector.hpp \
-		vm/arrays.hpp \
-		vm/math.hpp \
-		vm/byte_arrays.hpp \
-		vm/jit.hpp \
 		vm/quotations.hpp \
-		vm/inline_cache.hpp \
-		vm/mvm.hpp \
-		vm/factor.hpp \
-		vm/utilities.hpp
+		vm/run.hpp \
+		vm/sampling_profiler.hpp \
+		vm/segments.hpp \
+		vm/slot_visitor.hpp \
+		vm/tagged.hpp \
+		vm/tenured_space.hpp \
+		vm/to_tenured_collector.hpp \
+		vm/utilities.hpp \
+		vm/vm.hpp \
+		vm/write_barrier.hpp
 
 	EXE_OBJS = $(PLAF_EXE_OBJS)
 
