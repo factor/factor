@@ -20,7 +20,7 @@ CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
     0 utf16-index 2 * str utf16n encode subseq utf16n decode length ;
 
 :: >utf16-index ( str codepoint-index -- utf16-index )
-    0 codepoint-index str subseq utf16n encode length 2 / >integer ;
+    0 codepoint-index str subseq utf16n encode length 2 /i ;
 
 PRIVATE>
 
@@ -48,7 +48,7 @@ PRIVATE>
 : make-ssa ( dc script-string -- ssa )
     dup selection? [ string>> ] when
     utf16n encode ! pString
-    dup length 2 / >integer ! cString
+    dup length 2 /i ! cString
     dup 1.5 * 16 + >integer ! cGlyphs -- MSDN says this is "recommended size"
     -1 ! iCharset -- Unicode
     ssa-dwFlags

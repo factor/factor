@@ -195,7 +195,7 @@ IMPORT: NSAttributedString
     0 utf16-index 2 * str utf16n encode subseq utf16n decode length ;
 
 :: >utf16-index ( str codepoint-index -- utf16-index )
-    0 codepoint-index str subseq utf16n encode length 2 / >integer ;
+    0 codepoint-index str subseq utf16n encode length 2 /i ;
 
 :: earlier-caret/mark ( editor -- loc )
     editor editor-caret :> caret

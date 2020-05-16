@@ -54,8 +54,8 @@ M:: core-text-renderer x>offset ( x font string -- n )
     ] if-empty ;
 
 M:: core-text-renderer offset>x ( n font string -- x )
-    font string cached-line line>> 
-    0 n string subseq utf16n encode length 2 / >integer
+    font string cached-line line>>
+    0 n string subseq utf16n encode length 2 /i
     f
     CTLineGetOffsetForStringIndex unscale ;
 
