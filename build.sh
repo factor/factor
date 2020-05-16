@@ -490,8 +490,9 @@ update_script_name() {
 update_script() {
     local -r update_script=$(update_script_name)
     local -r bash_path=$(which bash)
+    $ECHO "updating from ${CURRENT_BRANCH}"
     $ECHO "#!$bash_path" >"$update_script"
-    $ECHO "git pull \"$GIT_URL\" master" >>"$update_script"
+    $ECHO "git pull \"$GIT_URL\" ${CURRENT_BRANCH}" >>"$update_script"
     $ECHO "if [[ \$? -eq 0 ]]; then exec \"$0\" $SCRIPT_ARGS; else echo \"git pull failed\"; exit 2; fi" \
         >>"$update_script"
     $ECHO "exit 0" >>"$update_script"
@@ -506,18 +507,18 @@ update_script_changed() {
 
 git_fetch() {
     $ECHO "Fetching the git repository from github.com..."
-    branch=$(current_git_branch)
+    set_current_branch
 
     rm -f "$(update_script_name)"
-    $ECHO git fetch "$GIT_URL" "$branch"
-    invoke_git fetch "$GIT_URL" "$branch"
+    $ECHO git fetch "$GIT_URL" "${CURRENT_BRANCH}"
+    invoke_git fetch "$GIT_URL" "${CURRENT_BRANCH}"
 
     if update_script_changed; then
         $ECHO "Updating and restarting the build.sh script..."
         update_script
     else
         $ECHO "Updating the working tree..."
-        invoke_git pull "$GIT_URL" master
+        invoke_git pull "$GIT_URL" "${CURRENT_BRANCH}"
     fi
 }
 
