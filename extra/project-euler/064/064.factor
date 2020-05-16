@@ -147,7 +147,7 @@ C: <cfrac> cfrac
 
 :: split ( fr -- k fr' )
     fr >cfrac< :> ( n a b )
-    n sqrt a + b / >integer
+    n sqrt a + b /i
     dup n swap
     b * a swap -
     b

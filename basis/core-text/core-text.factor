@@ -86,7 +86,7 @@ render-loc render-dim ;
 
 : selection-rect ( dim line selection -- rect )
     [let [ start>> ] [ end>> ] [ string>> ] tri :> ( start end string )
-     start end [ 0 swap string subseq utf16n encode length 2 / >integer ] bi@
+     start end [ 0 swap string subseq utf16n encode length 2 /i ] bi@
     ]
     [ f CTLineGetOffsetForStringIndex round ] bi-curry@ bi
     [ drop nip 0 ] [ swap - swap second ] 3bi <CGRect> ;
