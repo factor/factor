@@ -16,7 +16,7 @@ M: unix find-in-path*
     utf8 decode [ blank? ] trim ":" split ;
 
 : standard-login-paths ( -- strings )
-    { "-l" "-c" "echo $PATH" }
+    { "-l" "-c" "echo \"$PATH\"" }
     effective-user-id user-passwd shell>> prefix
     binary <process-reader> stream-contents parse-login-paths ;
 
