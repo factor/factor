@@ -25,7 +25,7 @@ TUPLE: pack < aligned-gadget
     [ { 0 0 } ] dip '[ v+ _ v+ ] accumulate nip ;
 
 : numerically-aligned-locs ( sizes pack -- seq )
-    [ align>> ] [ dim>> ] bi '[ [ _ _ ] dip v- [ * >integer ] with map ] map ;
+    [ align>> ] [ dim>> ] bi rot [ v- [ * ] with map ] 2with map ;
 
 : baseline-aligned-locs ( pack -- seq )
     children>> align-baselines [ 0 swap 2array ] map ;
@@ -39,15 +39,10 @@ TUPLE: pack < aligned-gadget
 : packed-locs ( sizes pack -- seq )
     [ aligned-locs ] [ gap>> gap-locs ] [ nip ] 2tri orient ;
 
-: round-dims ( seq -- newseq )
-    [ { 0 0 } ] dip
-    [ swap v- dup vceiling [ swap v- ] keep ] map
-    nip ;
-
 PRIVATE>
 
 : pack-layout ( pack sizes -- )
-    [ round-dims packed-dims ] [ drop ] 2bi
+    [ packed-dims ] [ drop ] 2bi
     [ children>> [ dim<< ] 2each ]
     [ [ packed-locs ] [ children>> ] bi [ loc<< ] 2each ] 2bi ;
 
