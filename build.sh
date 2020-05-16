@@ -803,6 +803,7 @@ case "$1" in
     deps-macosx) install_deps_macosx ;;
     deps-dnf) install_deps_dnf ;;
     deps-pkg) install_deps_pkg ;;
+    self-bootstrap) get_config_info; make_boot_image; bootstrap;;
     self-update) update; make_boot_image; bootstrap;;
     quick-update) update; refresh_image ;;
     update|latest) update; download_and_bootstrap ;;
