@@ -77,9 +77,7 @@ render-loc render-dim ;
     compute-height ;
 
 : metrics>dim ( bounds -- dim )
-    [ width>> ] [ [ ascent>> ] [ descent>> ] bi + ] bi
-    [ ceiling >integer ]
-    bi@ 2array ;
+    [ width>> ] [ [ ascent>> ] [ descent>> ] bi + ] bi 2array ;
 
 : fill-background ( context font dim -- )
     [ background>> >rgba-components CGContextSetRGBFillColor ]
