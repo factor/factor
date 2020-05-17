@@ -29,9 +29,9 @@ TUPLE: arm64-assembler ip labels out ;
 : BL ( offset -- ) ip - 4 / BL-encode >out ;
 : BR ( register -- ) BR-encode >out ;
 
-: LDR-pre ( imm9 Rn Rt -- ) [ 8 / 9 bits ] 2dip LDRpre64-encode >out ;
-: LDR-post ( imm9 Rn Rt -- ) [ 8 / 9 bits ] 2dip LDRpost64-encode >out ;
-: LDR-uoff ( imm12 Rn Rt -- ) [ 8 / 12 bits ] 2dip LDRuoff64-encode >out ;
+: LDR-pre ( imm9 Rn Rt -- ) LDRpre64-encode >out ;
+: LDR-post ( imm9 Rn Rt -- ) LDRpost64-encode >out ;
+: LDR-uoff ( imm12 Rn Rt -- ) [ 8 / ] 2dip LDRuoff64-encode >out ;
 
 : LSLi64 ( imm6 Rd Rt -- ) LSLi64-encode >out ;
 : LSRi64 ( imm6 Rd Rt -- ) LSRi64-encode >out ;
