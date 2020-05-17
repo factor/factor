@@ -1,13 +1,14 @@
 ! Copyright (C) 2011 Erik Charlebois
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.accessors alien.c-types alien.complex alien.data
-alien.libraries assocs byte-arrays classes.algebra classes.struct combinators
-compiler.cfg compiler.cfg.build-stack-frame compiler.cfg.comparisons
-compiler.cfg.instructions compiler.cfg.intrinsics compiler.cfg.registers
-compiler.cfg.stack-frame compiler.codegen compiler.codegen.fixup
-compiler.constants compiler.units cpu.architecture cpu.ppc.assembler fry io
-kernel layouts literals locals make math math.order math.ranges memory
-namespaces prettyprint sequences system vm words ;
+USING: accessors alien alien.c-types alien.complex assocs
+byte-arrays classes.algebra classes.struct combinators
+compiler.cfg compiler.cfg.comparisons compiler.cfg.instructions
+compiler.cfg.intrinsics compiler.cfg.registers
+compiler.cfg.stack-frame compiler.codegen.gc-maps
+compiler.codegen.labels compiler.codegen.relocation
+compiler.constants cpu.architecture cpu.ppc.assembler fry kernel
+layouts literals locals math math.order math.ranges memory
+namespaces sequences system vm vocabs ;
 QUALIFIED-WITH: alien.c-types c
 FROM: cpu.ppc.assembler => B ;
 FROM: math => float ;
@@ -467,7 +468,7 @@ M:: ppc %alien-indirect ( src
                           reg-outputs dead-outputs
                           cleanup stack-size
                           gc-map -- )
-    reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size [
+    varargs? reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size [
         has-toc [
             11 src load-param
             2 11 1 cells %load-cell
@@ -1054,7 +1055,6 @@ M: ppc immediate-store?      immediate-comparand? ;
 M: ppc enable-cpu-features
     enable-float-intrinsics ;
 
-USE: vocabs
 {
     { [ os linux? ] [
         {
