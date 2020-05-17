@@ -1635,8 +1635,8 @@ ARM-INSTRUCTION: SUBer32-encode ( 0 1 0 01011 00 1 Rm option3 imm3 Rn Rd -- inst
 ARM-INSTRUCTION: SUBer64-encode ( 1 1 0 01011 00 1 Rm option3 imm3 Rn Rd -- instruction )
 
 ! SUB (immediate): Subtract (immediate).
-ARM-INSTRUCTION: SUBimm32-encode ( 0 1 0 10001 shift2 imm12 Rn Rd -- instruction )
-ARM-INSTRUCTION: SUBimm64-encode ( 1 1 0 10001 shift2 imm12 Rn Rd -- instruction )
+ARM-INSTRUCTION: SUBi32-encode ( 0 1 0 10001 shift2 imm12 Rn Rd -- instruction )
+ARM-INSTRUCTION: SUBi64-encode ( 1 1 0 10001 shift2 imm12 Rn Rd -- instruction )
 
 ! SUB (shifted register): Subtract (shifted register).
 ARM-INSTRUCTION: SUBsr32-encode ( 0 1 0 01011 shift2 0 Rm imm6 Rn Rd -- instruction )

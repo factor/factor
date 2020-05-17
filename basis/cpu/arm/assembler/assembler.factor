@@ -1,7 +1,7 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors cpu.arm.assembler.opcodes kernel math
-math.bitwise namespaces sequences ;
+USING: accessors combinators cpu.arm.assembler.opcodes kernel
+math math.bitwise namespaces sequences ;
 IN: cpu.arm.assembler
 
 ! pre-index mode: computed addres is the base-register + offset
@@ -19,8 +19,6 @@ TUPLE: arm64-assembler ip labels out ;
 
 : ip ( -- address ) arm64-assembler get ip>> ;
 : >out ( instruction -- ) arm64-assembler get out>> push ;
-
-: ADDi64 ( imm12 Rn Rd -- ) [ 0 ] 3dip ADDi64-encode >out ;
 
 : ADRP ( imm Rd -- )
     [
@@ -71,14 +69,38 @@ ERROR: imm-out-of-range imm n ;
         [ imm-out-of-range ]
     } cond ;
 
+: ADDi32 ( imm12 Rn Rd -- )
+    [ 12 prepare-split-imm 1 0 ? swap ] 2dip
+    ADDi32-encode >out ;
+
+: ADDi64 ( imm12 Rn Rd -- )
+    [ 12 prepare-split-imm 1 0 ? swap ] 2dip
+    ADDi64-encode >out ;
+
 : SUBi32 ( imm12 Rn Rd -- )
     [ 12 prepare-split-imm 1 0 ? swap ] 2dip
-    SUBimm32-encode >out ;
+    SUBi32-encode >out ;
 
 : SUBi64 ( imm12 Rn Rd -- )
     [ 12 prepare-split-imm 1 0 ? swap ] 2dip
-    SUBimm64-encode >out ;
+    SUBi64-encode >out ;
 
+: CMPi32 ( imm12 Rd -- )
+    [ 12 prepare-split-imm 1 0 ? swap ] dip
+    CMPi32-encode >out ;
+
+: CMPi64 ( imm12 Rd -- )
+    [ 12 prepare-split-imm 1 0 ? swap ] dip
+    CMPi64-encode >out ;
+
+: STRuoff32 ( imm12 Rn Rt -- )
+    [ -2 shift ] 2dip STRuoff32-encode >out ;
+
+: STRuoff64 ( imm12 Rn Rt -- )
+    [ -3 shift ] 2dip STRuoff64-encode >out ;
+
+: STRr64 ( Rm Rn Rt -- )
+    [ 0 0 ] 2dip STRr64-encode >out ;
 
 : with-output-variable ( value variable quot -- value )
     over [ get ] curry compose with-variable ; inline
