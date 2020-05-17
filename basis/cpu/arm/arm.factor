@@ -3,5 +3,5 @@
 USING: ;
 IN: cpu.arm
 
-HOOK: ds-reg cpu ( -- reg )
-HOOK: rs-reg cpu ( -- reg )
+! HOOK: ds-reg cpu ( -- reg )
+! HOOK: rs-reg cpu ( -- reg )

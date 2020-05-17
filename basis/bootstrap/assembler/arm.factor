@@ -1,8 +1,8 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image.private kernel kernel.private
-locals.backend math.private namespaces slots.private
-strings.private ;
+USING: bootstrap.image.private cpu.arm.assembler kernel
+kernel.private layouts locals.backend math.private namespaces
+slots.private strings.private ;
 IN: bootstrap.arm
 
 big-endian off
@@ -19,7 +19,46 @@ big-endian off
 [
 ] JIT-IF jit-define
 
+: jit->r ( -- )
+    1 bootstrap-cells rs-reg rs-reg ADDi64
+    -1 bootstrap-cells ds-reg rs-reg LDR-post ;
+
+: jit-r> ( -- )
+    1 bootstrap-cells ds-reg ds-reg ADDi64
+    -1 bootstrap-cells rs-reg ds-reg LDR-post ;
+
+: jit-2>r ( -- )
+    1 bootstrap-cells rs-reg rs-reg ADDi64
+    -1 bootstrap-cells ds-reg rs-reg LDR-post
+    1 bootstrap-cells rs-reg rs-reg ADDi64
+    -1 bootstrap-cells ds-reg rs-reg LDR-post ;
+
+: jit-2r> ( -- )
+    1 bootstrap-cells ds-reg ds-reg ADDi64
+    -1 bootstrap-cells rs-reg ds-reg LDR-post
+    1 bootstrap-cells ds-reg ds-reg ADDi64
+    -1 bootstrap-cells rs-reg ds-reg LDR-post ;
+
+: jit-3>r ( -- )
+    1 bootstrap-cells rs-reg rs-reg ADDi64
+    -1 bootstrap-cells ds-reg rs-reg LDR-post
+    1 bootstrap-cells rs-reg rs-reg ADDi64
+    -1 bootstrap-cells ds-reg rs-reg LDR-post
+    1 bootstrap-cells rs-reg rs-reg ADDi64
+    -1 bootstrap-cells ds-reg rs-reg LDR-post ;
+
+: jit-3r> ( -- )
+    1 bootstrap-cells ds-reg ds-reg ADDi64
+    -1 bootstrap-cells rs-reg ds-reg LDR-post
+    1 bootstrap-cells ds-reg ds-reg ADDi64
+    -1 bootstrap-cells rs-reg ds-reg LDR-post
+    1 bootstrap-cells ds-reg ds-reg ADDi64
+    -1 bootstrap-cells rs-reg ds-reg LDR-post ;
+
 [
+    ! jit->r
+    ! 0 CALL f rc-relative rel-word
+    ! jit-r>
 ] JIT-DIP jit-define
 
 [
@@ -133,7 +172,7 @@ big-endian off
     ! ## Shufflers
 
     ! ### Drops
-    { drop [ ] } ! ds-reg bootstrap-cell SUB ] }
+    { drop [ ] } ! ds-reg SUBi64 ] } ! ds-reg bootstrap-cell SUB ] }
     { 2drop [ ] } ! ds-reg 2 bootstrap-cells SUB ] }
     { 3drop [ ] } ! ds-reg 3 bootstrap-cells SUB ] }
     { 4drop [ ] } ! ds-reg 4 bootstrap-cells SUB ] }
