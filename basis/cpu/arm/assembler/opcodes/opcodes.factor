@@ -4,7 +4,7 @@ USING: accessors assocs classes.error classes.parser effects
 effects.parser fry kernel lexer math math.bitwise math.parser
 multiline parser sequences sequences.extras vocabs.parser words
 words.symbol ;
-IN: cpu.arm64.assembler.opcodes
+IN: cpu.arm.assembler.opcodes
 
 ! https://static.docs.arm.com/ddi0487/fb/DDI0487F_b_armv8_arm.pdf
 

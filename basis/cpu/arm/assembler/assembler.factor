@@ -1,8 +1,8 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors cpu.arm64.assembler.opcodes kernel math
+USING: accessors cpu.arm.assembler.opcodes kernel math
 math.bitwise namespaces sequences ;
-IN: cpu.arm64.assembler
+IN: cpu.arm.assembler
 
 ! pre-index mode: computed addres is the base-register + offset
 ! ldr X1, [X2, #4]!
@@ -22,7 +22,11 @@ TUPLE: arm64-assembler ip labels out ;
 
 : ADDi64 ( imm12 Rn Rd -- ) [ 0 ] 3dip ADDi64-encode >out ;
 
-: ADRP ( imm Rd -- ) [ ip 12 on-bits unmask - -12 shift [ 2 bits ] [ -2 shift ] bi ] dip ADRP-encode >out ;
+: ADRP ( imm Rd -- )
+    [
+        ip 12 on-bits unmask - -12 shift
+        [ 2 bits ] [ -2 shift ] bi
+    ] dip ADRP-encode >out ;
 
 : BL ( offset -- ) ip - 4 / BL-encode >out ;
 : BR ( register -- ) BR-encode >out ;
