@@ -33,9 +33,6 @@ TUPLE: arm64-assembler ip labels out ;
 : LDR-post ( imm9 Rn Rt -- ) LDRpost64-encode >out ;
 : LDR-uoff ( imm12 Rn Rt -- ) [ 8 / ] 2dip LDRuoff64-encode >out ;
 
-: LSLi64 ( imm6 Rd Rt -- ) LSLi64-encode >out ;
-: LSRi64 ( imm6 Rd Rt -- ) LSRi64-encode >out ;
-
 : MOVwi64 ( imm Rt -- ) [ 0 ] 2dip MOVwi64-encode >out ;
 : MOVr64 ( Rn Rd -- ) MOVr64-encode >out ;
 
