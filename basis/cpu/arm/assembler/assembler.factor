@@ -54,6 +54,32 @@ TUPLE: arm64-assembler ip labels out ;
 : STP-signed-offset ( offset register-offset register-mid register -- )
     [ 8 / 7 bits ] 3dip swapd STPsoff64-encode >out ;
 
+! Some instructions allow an immediate literal of n bits
+! or n bits shifted. This means there are invalid immediate
+! values, e.g. imm12 of 1, 4096, but not 4097
+ERROR: imm-out-of-range imm n ;
+: imm-lower? ( imm n -- ? )
+    on-bits unmask 0 > not ;
+
+ : imm-upper? ( imm n -- ? )
+    [ on-bits ] [ shift ] bi unmask 0 > not ;
+
+: prepare-split-imm ( imm n -- imm upper? )
+    {
+        { [ 2dup imm-lower? ] [ drop f ] }
+        { [ 2dup imm-upper? ] [ drop t ] }
+        [ imm-out-of-range ]
+    } cond ;
+
+: SUBi32 ( imm12 Rn Rd -- )
+    [ 12 prepare-split-imm 1 0 ? swap ] 2dip
+    SUBimm32-encode >out ;
+
+: SUBi64 ( imm12 Rn Rd -- )
+    [ 12 prepare-split-imm 1 0 ? swap ] 2dip
+    SUBimm64-encode >out ;
+
+
 : with-output-variable ( value variable quot -- value )
     over [ get ] curry compose with-variable ; inline
 
