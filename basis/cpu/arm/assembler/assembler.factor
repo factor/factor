@@ -102,6 +102,13 @@ ERROR: imm-out-of-range imm n ;
 : STRr64 ( Rm Rn Rt -- )
     [ 0 0 ] 2dip STRr64-encode >out ;
 
+: ASRi32 ( imm6 Rn Rd -- ) ASRi32-encode >out ;
+: ASRi64 ( imm6 Rn Rd -- ) ASRi64-encode >out ;
+: LSLi32 ( imm6 Rn Rd -- ) LSLi32-encode >out ;
+: LSLi64 ( imm6 Rn Rd -- ) LSLi64-encode >out ;
+: LSRi32 ( imm6 Rn Rd -- ) LSRi32-encode >out ;
+: LSRi64 ( imm6 Rn Rd -- ) LSRi64-encode >out ;
+
 : with-output-variable ( value variable quot -- value )
     over [ get ] curry compose with-variable ; inline
 
