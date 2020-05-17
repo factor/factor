@@ -73,8 +73,6 @@ M: pair (bitfield-quot)
         [ (bitfield-quot) ] [ '[ @ _ dip bitor ] ] map-reduce
     ] if-empty ;
 
-PRIVATE>
-
 MACRO: bitfield ( bitspec -- quot ) (bitfield) ;
 
 MACRO: bitfield* ( bitspec -- quot ) reverse (bitfield) ;
