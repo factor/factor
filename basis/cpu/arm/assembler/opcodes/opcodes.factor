@@ -18,10 +18,10 @@ SYNTAX: REGISTERS:
     ] each-token ;
 >>
 
+<<
 GENERIC: register ( obj -- n )
 M: word register "ordinal" word-prop ;
 M: integer register ;
-<<
 : error-word ( word -- new-class )
     name>> "-range" append create-class-in dup save-location
     tuple
@@ -52,6 +52,7 @@ SYNTAX: REGISTER-FIELD:
 
 >>
 
+<<
 FIELD: op1 1
 FIELD: op2 2
 FIELD: op3 3
@@ -271,7 +272,6 @@ SINGLETONS: SPSR_EL1 SPSR_EL2 SPSR_EL3 ;
     [ -4 shift 4 bits ] [ 4 bits ] [ drop 0 ] tri ;
 
 
-<<
 ERROR: no-field-word vocab name ;
 
 TUPLE: integer-literal value width ;
@@ -301,6 +301,8 @@ M: object value ;
     dup values [ f = ] any? [ throw ] when ;
 
 ERROR: bad-instruction values ;
+>>
+<<
 SYNTAX: ARM-INSTRUCTION:
     scan-new-word
     scan-effect
@@ -312,6 +314,8 @@ SYNTAX: ARM-INSTRUCTION:
       '[ _ bitfield* ]
     ] [ in>> [ string>number ] reject { "instruction" } <effect> ] bi define-declared ;
 >>
+
+
 
 ! ADC: Add with Carry.
 ! ADCS: Add with Carry, setting flags.
@@ -1786,5 +1790,3 @@ ARM-INSTRUCTION: XPACLRI-encode ( 1101010100 0 00 011 0010 0000 111 11111 -- ins
 
 ! YIELD: YIELD.
 ARM-INSTRUCTION: YIELD-encode ( 1101010100 0 00 011 0010 0000 001 11111 -- instruction )
-
-
