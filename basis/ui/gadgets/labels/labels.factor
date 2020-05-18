@@ -46,7 +46,7 @@ M: label string<< ( string label -- )
     [ font>> ] [ text>> ] bi ; inline
 
 M: label pref-dim*
-    >label< text-dim ;
+    >label< text-dim first2 ceiling 2array ;
 
 <PRIVATE
 
