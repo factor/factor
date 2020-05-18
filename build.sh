@@ -716,7 +716,7 @@ refresh_image() {
 }
 
 make_boot_image() {
-    ./$FACTOR_BINARY -e="\"$MAKE_IMAGE_TARGET\" USING: system bootstrap.image memory ; make-image save 0 exit"
+    ./$FACTOR_BINARY -run="bootstrap.image" "$MAKE_IMAGE_TARGET"
     check_ret factor
 }
 
