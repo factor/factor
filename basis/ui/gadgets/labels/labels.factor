@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes colors.constants combinators
-fonts fry kernel make math.functions math.vectors models
-namespaces sequences splitting strings ui.baseline-alignment
-ui.gadgets ui.gadgets.tracks ui.pens.solid ui.render ui.text
+fonts fry kernel make math.functions models namespaces sequences
+splitting strings ui.baseline-alignment ui.gadgets
+ui.gadgets.tracks ui.pens.solid ui.render ui.text
 ui.theme.images ;
 IN: ui.gadgets.labels
 
@@ -46,7 +46,7 @@ M: label string<< ( string label -- )
     [ font>> ] [ text>> ] bi ; inline
 
 M: label pref-dim*
-    >label< text-dim vceiling ;
+    >label< text-dim ;
 
 <PRIVATE
 
