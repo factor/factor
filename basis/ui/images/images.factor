@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs cache combinators images.loader kernel
-memoize namespaces opengl.textures sequences system
+math memoize namespaces opengl.textures sequences system
 ui.gadgets.worlds vocabs ;
 IN: ui.images
 
@@ -9,7 +9,8 @@ TUPLE: image-name path ;
 
 C: <image-name> image-name
 
-MEMO: cached-image ( image-name -- image ) path>> load-image ;
+MEMO: cached-image ( image-name -- image )
+    path>> load-image t >>2x? ;
 
 <PRIVATE
 
@@ -29,7 +30,7 @@ PRIVATE>
     rendered-image draw-scaled-texture ;
 
 : image-dim ( image-name -- dim )
-    cached-image dim>> ;
+    cached-image dim>> [ 2 / ] map ;
 
 {
     { [ os macosx? ] [ "images.loader.cocoa" require ] }
