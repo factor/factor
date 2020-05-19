@@ -63,8 +63,8 @@ TUPLE: gadget-metrics height ascent descent cap-height ;
     ascent [
         cap-height 0 or 2 / :> mid-line
         graphics-height 2 /
-        [ ascent mid-line - max mid-line + ]
-        [ descent mid-line + max mid-line - ] bi
+        [ ascent mid-line - max mid-line + floor >integer ]
+        [ descent mid-line + max mid-line - ceiling >integer ] bi
     ] [ f f ] if ;
 
 : (measure-metrics) ( children sizes -- graphics-height ascent descent cap-height )
@@ -84,14 +84,14 @@ PRIVATE>
     dup max-cap-height 0 or :> max-cap-height
     dup max-graphics-height :> max-graphics-height
 
-    max-cap-height max-graphics-height + 2 / :> critical-line
+    max-cap-height max-graphics-height + 2 /i :> critical-line
     critical-line max-ascent [-] :> text-leading
     max-ascent critical-line [-] :> graphics-leading
 
     [
         dup ascent>>
         [ ascent>> max-ascent swap - text-leading ]
-        [ height>> max-graphics-height swap - 2 / graphics-leading ] if +
+        [ height>> max-graphics-height swap - 2 /i graphics-leading ] if +
     ] map ;
 
 : measure-metrics ( children sizes -- ascent descent )
