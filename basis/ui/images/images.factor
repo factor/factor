@@ -17,7 +17,7 @@ MEMO: cached-image-path ( path -- image )
 PRIVATE>
 
 : cached-image ( image-name -- image )
-    path>> gl-scale-factor get-global 1.0 > [
+    path>> gl-scale-factor get-global [ 1.0 > ] [ f ] if* [
         "." split1-last "@2x." glue
     ] when cached-image-path ;
 
