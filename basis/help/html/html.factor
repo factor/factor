@@ -6,7 +6,8 @@ html html.streams io.directories io.encodings.binary
 io.encodings.utf8 io.files io.files.temp io.pathnames kernel
 locals make math math.parser memoize namespaces regexp sequences
 sequences.deep serialize sorting splitting tools.completion
-vocabs vocabs.hierarchy words xml.data xml.syntax xml.writer ;
+vocabs vocabs.hierarchy words xml.data xml.syntax xml.traversal
+xml.writer ;
 FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
 IN: help.html
@@ -142,10 +143,25 @@ M: pathname url-of
         ] [ drop ] if
     ] each classes sort-values css-classes body ;
 
+: img@2x ( body -- body' )
+    dup [
+        dup xml-chunk? [
+            seq>> [
+                T{ name { main "img" } } over tag-named? [
+                    dup "src" attr
+                    dup "@2x.png" tail? [ 2drop ] [
+                        "." split1-last "@2x." glue
+                        "src" set-attr
+                    ] if
+                ] [ drop ] if
+            ] deep-each
+        ] [ drop ] if
+    ] each ;
+
 : help>html ( topic -- xml )
     [ article-title " - Factor Documentation" append ]
     [
-        [ print-topic ] with-html-writer css-styles-to-classes
+        [ print-topic ] with-html-writer css-styles-to-classes img@2x
         [ help-stylesheet help-meta prepend help-navbar ] dip
         [XML <div id="container"><-><div class="page"><-></div></div> XML]
     ] bi simple-page ;
