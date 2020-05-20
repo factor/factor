@@ -24,8 +24,6 @@ input {
 
 img {
     vertical-align: middle;
-    width: 16px;
-    height: 16px;
 }
 
 table {
@@ -58,4 +56,9 @@ tr:hover {
 
 .page {
     margin: 15px;
+}
+
+.page img {
+    width: 16px;
+    height: 16px;
 }
