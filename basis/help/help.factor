@@ -9,8 +9,25 @@ IN: help
 
 GENERIC: word-help* ( word -- content )
 
+<PRIVATE
+
+: inputs-and-outputs ( content word -- content' word )
+   over [ dup array? [ { $values } head? ] [ drop f ] if ] find drop [
+        '[ _ cut unclip rest ] dip [
+            stack-effect [ in>> ] [ out>> ] bi
+            [ [ dup pair? [ first ] when ] map ] bi@
+            [ '[ ?first _ member? ] filter ] bi-curry@
+            \ $inputs \ $outputs
+            [ '[ @ _ prefix ] ] bi-curry@ bi* bi
+            2array glue
+        ] keep
+    ] when* ;
+
+PRIVATE>
+
 : word-help ( word -- content )
-    dup "help" word-prop [ ] [ word-help* ] ?if ;
+    [ dup "help" word-prop [ ] [ word-help* ] ?if ]
+    [ inputs-and-outputs drop ] bi ;
 
 M: word word-help*
     stack-effect [ in>> ] [ out>> ] bi [
@@ -183,22 +200,5 @@ help-hook [ [ print-topic ] ] initialize
 : remove-word-help ( word -- )
     f "help" set-word-prop ;
 
-<PRIVATE
-
-: inputs-and-outputs ( content word -- content' word )
-   over [ dup array? [ { $values } head? ] [ drop f ] if ] find drop [
-        '[ _ cut unclip rest ] dip [
-            stack-effect [ in>> ] [ out>> ] bi
-            [ [ dup pair? [ first ] when ] map ] bi@
-            [ '[ ?first _ member? ] filter ] bi-curry@
-            \ $inputs \ $outputs
-            [ '[ @ _ prefix ] ] bi-curry@ bi* bi
-            2array glue
-        ] keep
-    ] when* ;
-
-PRIVATE>
-
 : set-word-help ( content word -- )
-    inputs-and-outputs
     [ swap "help" set-word-prop ] keep xref-article ;

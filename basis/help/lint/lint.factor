@@ -3,7 +3,7 @@
 USING: assocs classes combinators command-line continuations fry
 help help.lint.checks help.topics io kernel listener locals
 namespaces parser sequences source-files.errors system
-tools.errors vocabs vocabs.hierarchy ;
+tools.errors vocabs vocabs.hierarchy words ;
 IN: help.lint
 
 SYMBOL: lint-failures
@@ -45,13 +45,15 @@ PRIVATE>
 
 : check-word ( word -- )
     [ with-file-vocabs ] vocabs-quot set
-    dup word-help [
+    dup "help" word-prop [
         [ >link ] keep '[
-            _ dup word-help {
+            _ dup "help" word-prop {
                 [ check-values ]
                 [ check-value-effects ]
                 [ check-class-description ]
-                [ nip [ check-nulls ] [ check-see-also ] [ check-markup ] tri ]
+                [ nip check-nulls ]
+                [ nip check-see-also ]
+                [ nip check-markup ]
             } 2cleave
         ] check-something
     ] [ drop ] if ;
