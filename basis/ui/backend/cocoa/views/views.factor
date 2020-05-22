@@ -125,12 +125,6 @@ CONSTANT: key-codes
 : send-action$ ( view event gesture -- )
     [ drop window ] dip over [ send-action ] [ 2drop ] if ;
 
-: add-resize-observer ( observer object -- )
-    [
-        "updateFactorGadgetSize:"
-        "NSViewFrameDidChangeNotification" <NSString>
-    ] dip add-observer ;
-
 : string-or-nil? ( NSString -- ? )
     [ CF>string NSStringPboardType = ] [ t ] if* ;
 
@@ -299,6 +293,13 @@ PRIVATE>
         ] when
     ] ;
 
+    METHOD: void reshape [
+        self window :> window
+        window [
+            self view-dim window dim<<
+        ] when
+    ] ;
+
     ! TouchBar
     METHOD: void touchBarCommand0 [ 0 touchbar-invoke-command ] ;
     METHOD: void touchBarCommand1 [ 1 touchbar-invoke-command ] ;
@@ -324,7 +325,11 @@ PRIVATE>
     ] ;
 
     ! Rendering
-    METHOD: void drawRect: NSRect rect [ self window [ draw-world ] when* ] ;
+    METHOD: void drawRect: NSRect rect [
+        self window [
+            draw-world yield
+        ] when*
+    ] ;
 
     ! Events
     METHOD: char acceptsFirstMouse: id event [ 0 ] ;
@@ -632,18 +637,9 @@ PRIVATE>
     METHOD: void doCommandBySelector: SEL selector [ ] ;
 
     ! Initialization
-    METHOD: void updateFactorGadgetSize: id notification
-    [
-        self window :> window
-        window [
-            self view-dim window dim<< yield
-        ] when
-    ] ;
-
     METHOD: id initWithFrame: NSRect frame pixelFormat: id pixelFormat
     [
         self frame pixelFormat SUPER-> initWithFrame:pixelFormat:
-        dup dup add-resize-observer
     ] ;
 
     METHOD: char isOpaque [ 0 ] ;
