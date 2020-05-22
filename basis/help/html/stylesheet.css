@@ -18,8 +18,12 @@ body {
 
 input {
     border: 1px solid #999999;
-    font-size: smaller;
     border-radius: 3px;
+    font-size: 1.0em;
+}
+
+input[type=text] {
+    width: 200px;
 }
 
 img {
@@ -61,4 +65,15 @@ tr:hover {
 .page img {
     width: 16px;
     height: 16px;
+}
+
+@media screen and (max-width: 480px) {
+
+    input {
+        font-size: smaller;
+    }
+
+    input[type=text] {
+        width: 100px;
+    }
 }
