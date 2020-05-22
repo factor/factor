@@ -19,8 +19,8 @@ PRIVATE>
 { f } [ \ a-defined-word empty-examples? ] unit-test
 { f } [ \ keep empty-examples? ] unit-test
 
-{ { $description $values } } [ \ an-empty-word-with-a-unique-name missing-sections natural-sort ] unit-test
-{ { $description $values } } [ \ a-defined-word missing-sections natural-sort ] unit-test
+{ { $description $inputs $outputs } } [ \ an-empty-word-with-a-unique-name missing-sections natural-sort ] unit-test
+{ { $description $inputs $outputs } } [ \ a-defined-word missing-sections natural-sort ] unit-test
 { { } } [ \ keep missing-sections ] unit-test
 
 { { "a.b" "a.b.c" } } [ { "a.b" "a.b.private" "a.b.c.private" "a.b.c" } filter-private ] unit-test
@@ -32,8 +32,8 @@ PRIVATE>
 { { $examples } } [ \ an-empty-word-with-a-unique-name word-defines-sections ] unit-test
 { { $examples } } [ \ a-defined-word word-defines-sections ] unit-test
 { { } } [ \ a-nonexistent-word word-defines-sections ] unit-test
-{ { $values $description $examples } } [ \ keep word-defines-sections ] unit-test
-{ { $values $contract $examples } } [ \ <word-help-coverage> word-defines-sections ] unit-test
+{ { $inputs $outputs $description $examples } } [ \ keep word-defines-sections ] unit-test
+{ { $inputs $outputs $contract $examples } } [ \ <word-help-coverage> word-defines-sections ] unit-test
 
 { an-empty-word-with-a-unique-name } [ "an-empty-word-with-a-unique-name" find-word ] unit-test
 
