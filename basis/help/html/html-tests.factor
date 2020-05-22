@@ -1,8 +1,7 @@
 USING: help.html help.vocabs tools.test help.topics kernel sequences vocabs
 math ;
-IN: help.html.tests
 
-{ } [ "xml" >link help>html drop ] unit-test
+{ } [ [ "xml" >link help>html drop ] with-test-directory ] unit-test
 
 { } [ "foobar" >link topic>filename drop ] unit-test
 

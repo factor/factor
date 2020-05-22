@@ -108,11 +108,11 @@ HELP: prefix-help-coverage.
 [english] pluralize: full help coverage
 [english] singular?: full help coverage
 [english] singularize: full help coverage
-[english.private] $0-plurality: needs help sections: $description and $examples
-[english.private] $keep-case: needs help sections: $description and $examples
-[english.private] match-case: needs help sections: $description and $examples
-[english.private] plural-to-singular: needs help sections: $description and $examples
-[english.private] singular-to-plural: needs help sections: $description and $examples
+[english.private] $0-plurality: needs help sections: $values, $description, and $examples
+[english.private] $keep-case: needs help sections: $values, $description, and $examples
+[english.private] match-case: needs help sections: $values, $description, and $examples
+[english.private] plural-to-singular: needs help sections: $values, $description, and $examples
+[english.private] singular-to-plural: needs help sections: $values, $description, and $examples
 
 70.6% of words have complete documentation"
     }
@@ -176,23 +176,23 @@ HELP: <prefix-help-coverage>
     }
     T{ word-help-coverage
         { word-name $0-plurality }
-        { omitted-sections { $description $examples } }
+        { omitted-sections { $values $description $examples } }
     }
     T{ word-help-coverage
         { word-name $keep-case }
-        { omitted-sections { $description $examples } }
+        { omitted-sections { $values $description $examples } }
     }
     T{ word-help-coverage
         { word-name match-case }
-        { omitted-sections { $description $examples } }
+        { omitted-sections { $values $description $examples } }
     }
     T{ word-help-coverage
         { word-name plural-to-singular }
-        { omitted-sections { $description $examples } }
+        { omitted-sections { $values $description $examples } }
     }
     T{ word-help-coverage
         { word-name singular-to-plural }
-        { omitted-sections { $description $examples } }
+        { omitted-sections { $values $description $examples } }
     }
 }"
     }
