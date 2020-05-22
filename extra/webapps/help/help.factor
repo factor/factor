@@ -41,6 +41,7 @@ TUPLE: help-webapp < dispatcher ;
         help-dir <search-action> <secure-only> "search" add-responder
         help-dir <static> <secure-only> "content" add-responder
         "resource:basis/definitions/icons/" <static> <secure-only> "icons" add-responder ;
+        "resource:basis/ui/tools/error-list/icons/" <static> <secure-only> "icons2" add-responder ;
 
 : run-help-webapp ( -- )
     "docs" cache-file <help-webapp>

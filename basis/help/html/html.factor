@@ -151,13 +151,16 @@ M: pathname url-of
                     dup "src" attr
 
                     ! use @2x retina images
-                    dup "@2x.png" tail? [
+                    "@2x" over subseq? [
                         "." split1-last "@2x." glue
                     ] unless
 
                     ! src mapping for webapps.help
                     "vocab:definitions/icons/" ?head
                     [ "/icons/" prepend ] when
+
+                    "vocab:ui/tools/error-list/icons/" ?head
+                    [ "/icons2/" prepend ] when
 
                     "src" set-attr
                 ] [ drop ] if
