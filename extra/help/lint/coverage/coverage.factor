@@ -95,15 +95,13 @@ M: word-help-coverage summary
 : filter-private ( seq -- no-private )
     [ ".private" ?tail nip ] reject ; inline
 
-: ?remove-$inputs ( word spec -- word spec )
-    over "declared-effect" word-prop [
-        in>> empty? [ \ $inputs swap remove ] when
-    ] when* ;
-
-: ?remove-$outputs ( word spec -- word spec )
-    over "declared-effect" word-prop [
-        out>> empty? [ \ $outputs swap remove ] when
-    ] when* ;
+: ?remove-$values ( word spec -- spec )
+    \ $values over member? [
+        swap "declared-effect" word-prop [
+            [ in>> ] [ out>> ] bi append [
+                \ $values swap remove
+            ] [ drop ] if-empty
+    ] when* ] [ nip ] if ;
 
 : should-define ( word -- spec )
     dup {
@@ -112,12 +110,12 @@ M: word-help-coverage summary
         { [ dup primitive? ]   [ drop { $description } ] }
         ! aliases should describe why they exist but ideally $values should be
         ! automatically inherited from the aliased word's docs
-        { [ dup alias? ]       [ drop { $inputs $outputs $description } ] }
-        { [ dup error-class? ] [ drop { $inputs $outputs $description $error-description } ] }
+        { [ dup alias? ]       [ drop { $values $description } ] }
+        { [ dup error-class? ] [ drop { $values $description $error-description } ] }
         { [ dup class? ]       [ drop { $class-description } ] }
-        { [ dup generic? ]     [ drop { $inputs $outputs $contract $examples } ] }
-        { [ dup word? ]        [ drop { $inputs $outputs $description $examples } ] }
-    } cond ?remove-$inputs ?remove-$outputs nip ;
+        { [ dup generic? ]     [ drop { $values $contract $examples } ] }
+        { [ dup word? ]        [ drop { $values $description $examples } ] }
+    } cond ?remove-$values ;
 
 : word-defines-sections ( word -- seq )
     word-help [ ignored-words member? not ] filter [ ?first ] map ;
