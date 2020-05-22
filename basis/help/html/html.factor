@@ -143,25 +143,20 @@ M: pathname url-of
         ] [ drop ] if
     ] each classes sort-values css-classes body ;
 
-: img@2x ( body -- body' )
+: retina-image ( path -- path' )
+    "@2x" over subseq? [ "." split1-last "@2x." glue ] unless ;
+
+: ?copy-file ( from to -- )
+    dup exists? [ 2drop ] [ copy-file ] if ;
+
+: cache-images ( body -- body' )
     dup [
         dup xml-chunk? [
             seq>> [
                 T{ name { main "img" } } over tag-named? [
                     dup "src" attr
-
-                    ! use @2x retina images
-                    "@2x" over subseq? [
-                        "." split1-last "@2x." glue
-                    ] unless
-
-                    ! src mapping for webapps.help
-                    "vocab:definitions/icons/" ?head
-                    [ "/icons/" prepend ] when
-
-                    "vocab:ui/tools/error-list/icons/" ?head
-                    [ "/icons2/" prepend ] when
-
+                    retina-image dup file-name
+                    [ ?copy-file ] keep
                     "src" set-attr
                 ] [ drop ] if
             ] deep-each
@@ -171,7 +166,8 @@ M: pathname url-of
 : help>html ( topic -- xml )
     [ article-title " - Factor Documentation" append ]
     [
-        [ print-topic ] with-html-writer css-styles-to-classes img@2x
+        [ print-topic ] with-html-writer
+        css-styles-to-classes cache-images
         [ help-stylesheet help-meta prepend help-navbar ] dip
         [XML <div id="container"><-><div class="page"><-></div></div> XML]
     ] bi simple-page ;
