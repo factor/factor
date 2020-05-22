@@ -54,6 +54,12 @@ tr:hover {
     margin-right: 10px;
 }
 
+.navbar form a {
+    margin-left: 10px;
+    font-size: 1.0em;
+    font-weight: bold;
+}
+
 #container {
     max-width: 800px;
 }
@@ -75,5 +81,12 @@ tr:hover {
 
     input[type=text] {
         width: 100px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+
+    .navbar form a {
+        display: none;
     }
 }
