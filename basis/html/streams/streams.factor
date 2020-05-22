@@ -77,11 +77,8 @@ MACRO: make-css ( pairs -- str )
 : emit-html ( stream quot -- )
     dip data>> push ; inline
 
-: icon-path ( path -- icons-path )
-    "vocab:definitions/icons/" ?head [ "/icons/" prepend ] when ;
-
 : img-tag ( xml style -- xml )
-    image-style of [ nip icon-path simple-image ] when* ;
+    image-style of [ nip simple-image ] when* ;
 
 : format-html-span ( string style stream -- )
     [
