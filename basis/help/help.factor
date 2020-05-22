@@ -1,11 +1,10 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.error
-classes.tuple combinators combinators.short-circuit
-continuations debugger effects generic help.crossref help.markup
-help.stylesheet help.topics io io.styles kernel locals make
-namespaces prettyprint sequences sets sorting vocabs words
-words.symbol ;
+USING: accessors arrays assocs classes classes.error combinators
+combinators.short-circuit continuations debugger effects fry
+generic help.crossref help.markup help.stylesheet help.topics io
+io.styles kernel make namespaces prettyprint sequences sets
+sorting vocabs words words.symbol ;
 IN: help
 
 GENERIC: word-help* ( word -- content )
@@ -184,5 +183,22 @@ help-hook [ [ print-topic ] ] initialize
 : remove-word-help ( word -- )
     f "help" set-word-prop ;
 
+<PRIVATE
+
+: inputs-and-outputs ( content word -- content' word )
+   over [ dup array? [ { $values } head? ] [ drop f ] if ] find drop [
+        '[ _ cut unclip rest ] dip [
+            stack-effect [ in>> ] [ out>> ] bi
+            [ [ dup pair? [ first ] when ] map ] bi@
+            [ '[ ?first _ member? ] filter ] bi-curry@
+            \ $inputs \ $outputs
+            [ '[ @ _ prefix ] ] bi-curry@ bi* bi
+            2array glue
+        ] keep
+    ] when* ;
+
+PRIVATE>
+
 : set-word-help ( content word -- )
+    inputs-and-outputs
     [ swap "help" set-word-prop ] keep xref-article ;
