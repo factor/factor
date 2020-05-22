@@ -83,13 +83,10 @@ M: pathname url-of
         <div class="navbar">
         <a href="/">Handbook</a>
         <a href=<->>Glossary</a>
-        <form method="get" action="/search" style="display:inline;">
+        <form method="get" action="/search" style="float: right;">
             <input placeholder="Search" name="search" type="text"/>
             <input type="submit" value="Go"/>
         </form>
-        <div style="float: right;">
-            <a href="//factorcode.org"><b>factorcode.org</b></a>
-        </div>
         </div>
      XML] ;
 
