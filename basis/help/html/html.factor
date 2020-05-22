@@ -86,6 +86,7 @@ M: pathname url-of
         <form method="get" action="/search" style="float: right;">
             <input placeholder="Search" name="search" type="text"/>
             <input type="submit" value="Go"/>
+            <a href="//factorcode.org">factorcode.org</a>
         </form>
         </div>
      XML] ;
