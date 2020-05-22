@@ -18,7 +18,7 @@ T{ error-type-holder
    { type +help-lint-failure+ }
    { word ":lint-failures" }
    { plural "help lint failures" }
-   { icon "vocab:ui/tools/error-list/icons/help-lint-error.tiff" }
+   { icon "vocab:ui/tools/error-list/icons/help-lint-error.png" }
    { quot [ lint-failures get values ] }
    { forget-quot [ lint-failures get delete-at ] }
 } define-error-type
