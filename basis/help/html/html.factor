@@ -149,10 +149,17 @@ M: pathname url-of
             seq>> [
                 T{ name { main "img" } } over tag-named? [
                     dup "src" attr
-                    dup "@2x.png" tail? [ 2drop ] [
+
+                    ! use @2x retina images
+                    dup "@2x.png" tail? [
                         "." split1-last "@2x." glue
-                        "src" set-attr
-                    ] if
+                    ] unless
+
+                    ! src mapping for webapps.help
+                    "vocab:definitions/icons/" ?head
+                    [ "/icons/" prepend ] when
+
+                    "src" set-attr
                 ] [ drop ] if
             ] deep-each
         ] [ drop ] if
