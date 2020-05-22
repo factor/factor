@@ -8,13 +8,13 @@ $nl
 { $heading "Message icons" }
 { $table
     { { $strong "Icon" } { $strong "Message type" } { $strong "Reference" } }
-    ! { { $image "vocab:ui/tools/error-list/icons/note.tiff" } "Parser note" { $link "parser" } }
-    ! { { $image "vocab:ui/tools/error-list/icons/syntax-error.tiff" } "Syntax error" { $link "syntax" } }
-    { { $image "vocab:ui/tools/error-list/icons/compiler-error.tiff" } "Compiler error" { $link "compiler-errors" } }
-    { { $image "vocab:ui/tools/error-list/icons/linkage-error.tiff" } "Linkage error" { $link "loading-libs" } }
-    { { $image "vocab:ui/tools/error-list/icons/help-lint-error.tiff" } "Help lint failure" { $link "help.lint" } }
-    { { $image "vocab:ui/tools/error-list/icons/unit-test-error.tiff" } "Unit test failure" { $link "tools.test" } }
-    { { $image "vocab:ui/tools/error-list/icons/deprecation-note.tiff" } "Deprecated words used" { $link "tools.deprecation" } }
+    ! { { $image "vocab:ui/tools/error-list/icons/note.png" } "Parser note" { $link "parser" } }
+    ! { { $image "vocab:ui/tools/error-list/icons/syntax-error.png" } "Syntax error" { $link "syntax" } }
+    { { $image "vocab:ui/tools/error-list/icons/compiler-error.png" } "Compiler error" { $link "compiler-errors" } }
+    { { $image "vocab:ui/tools/error-list/icons/linkage-error.png" } "Linkage error" { $link "loading-libs" } }
+    { { $image "vocab:ui/tools/error-list/icons/help-lint-error.png" } "Help lint failure" { $link "help.lint" } }
+    { { $image "vocab:ui/tools/error-list/icons/unit-test-error.png" } "Unit test failure" { $link "tools.test" } }
+    { { $image "vocab:ui/tools/error-list/icons/deprecation-note.png" } "Deprecated words used" { $link "tools.deprecation" } }
 } ;
 
 ABOUT: "ui.tools.error-list"
