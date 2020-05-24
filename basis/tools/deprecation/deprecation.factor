@@ -23,7 +23,7 @@ T{ error-type-holder
     { type +deprecation-note+ }
     { word ":deprecations" }
     { plural "deprecated word usages" }
-    { icon "vocab:ui/tools/error-list/icons/deprecation-note.tiff" }
+    { icon "vocab:ui/tools/error-list/icons/deprecation-note.png" }
     { quot [ deprecation-notes get values ] }
     { forget-quot [ deprecation-notes get delete-at ] }
     { fatal? f }

@@ -413,6 +413,16 @@ M: f ($instance) ($link) ;
     unclip \ $snippet swap present 2array
     swap dup first word? [ \ $instance prefix ] when 2array ;
 
+: $inputs ( element -- )
+    "Inputs" $heading
+    [ [ "None" write ] ($block) ]
+    [ [ values-row ] map $table ] if-empty ;
+
+: $outputs ( element -- )
+    "Outputs" $heading
+    [ [ "None" write ] ($block) ]
+    [ [ values-row ] map $table ] if-empty ;
+
 : $values ( element -- )
     "Inputs and outputs" $heading
     [ values-row ] map $table ;

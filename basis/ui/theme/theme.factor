@@ -158,7 +158,7 @@ M: light-theme deprecated-border-color hexcolor: F37B00 ;
 M: light-theme warning-background-color hexcolor: F4D9D9 ;
 M: light-theme warning-border-color hexcolor: F42300 ;
 M: light-theme code-background-color color: FactorLightTan ;
-M: light-theme help-path-border-color color: FactorLightTan ;
+M: light-theme help-path-border-color color: grey95 ;
 
 M: light-theme tip-background-color color: lavender ;
 
@@ -245,7 +245,7 @@ M: dark-theme deprecated-border-color color: solarized-yellow ;
 M: dark-theme warning-background-color hexcolor: 492d33 ;
 M: dark-theme warning-border-color color: solarized-red ;
 M: dark-theme code-background-color hexcolor: 2F4D5B ;
-M: dark-theme help-path-border-color hexcolor: 2F4D5B ;
+M: dark-theme help-path-border-color color: solarized-base02 ;
 
 M: dark-theme tip-background-color hexcolor: 2F4D5B ;
 

@@ -6,7 +6,8 @@ html html.streams io.directories io.encodings.binary
 io.encodings.utf8 io.files io.files.temp io.pathnames kernel
 locals make math math.parser memoize namespaces regexp sequences
 sequences.deep serialize sorting splitting tools.completion
-vocabs vocabs.hierarchy words xml.data xml.syntax xml.writer ;
+vocabs vocabs.hierarchy words xml.data xml.syntax xml.traversal
+xml.writer ;
 FROM: io.encodings.ascii => ascii ;
 FROM: ascii => ascii? ;
 IN: help.html
@@ -82,13 +83,11 @@ M: pathname url-of
         <div class="navbar">
         <a href="/">Handbook</a>
         <a href=<->>Glossary</a>
-        <form method="get" action="/search" style="display:inline;">
+        <form method="get" action="/search" style="float: right;">
             <input placeholder="Search" name="search" type="text"/>
             <input type="submit" value="Go"/>
+            <a href="//factorcode.org">factorcode.org</a>
         </form>
-        <div style="float: right;">
-            <a href="//factorcode.org"><b>factorcode.org</b></a>
-        </div>
         </div>
      ]] ;
 
@@ -142,10 +141,31 @@ M: pathname url-of
         ] [ drop ] if
     ] each classes sort-values css-classes body ;
 
+: retina-image ( path -- path' )
+    "@2x" over subseq? [ "." split1-last "@2x." glue ] unless ;
+
+: ?copy-file ( from to -- )
+    dup exists? [ 2drop ] [ copy-file ] if ;
+
+: cache-images ( body -- body' )
+    dup [
+        dup xml-chunk? [
+            seq>> [
+                T{ name { main "img" } } over tag-named? [
+                    dup "src" attr
+                    retina-image dup file-name
+                    [ ?copy-file ] keep
+                    "src" set-attr
+                ] [ drop ] if
+            ] deep-each
+        ] [ drop ] if
+    ] each ;
+
 : help>html ( topic -- xml )
     [ article-title " - Factor Documentation" append ]
     [
-        [ print-topic ] with-html-writer css-styles-to-classes
+        [ print-topic ] with-html-writer
+        css-styles-to-classes cache-images
         [ help-stylesheet help-meta prepend help-navbar ] dip
         XML-CHUNK[[ <div id="container"><-><div class="page"><-></div></div> ]]
     ] bi simple-page ;

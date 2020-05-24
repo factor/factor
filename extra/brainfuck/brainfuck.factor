@@ -26,9 +26,6 @@ TUPLE: brainfuck pointer memory ;
 : (-) ( brainfuck n -- brainfuck )
     [ get-memory ] dip - 255 bitand set-memory ;
 
-: (?) ( brainfuck -- brainfuck t/f )
-    get-memory zero? not ;
-
 : (.) ( brainfuck -- brainfuck )
     get-memory write1 ;
 
@@ -62,7 +59,7 @@ space    = [ \t\n\r]+ => [[ [ ] ]]
 unknown  = (.)  => [[ "Invalid input" throw ]]
 
 ops   = inc-ptr|dec-ptr|inc-mem|dec-mem|output|input|debug|space
-loop  = "[" {loop|ops}+ "]" => [[ second compose-all '[ [ (?) ] _ while ] ]]
+loop  = "[" {loop|ops}+ "]" => [[ second compose-all '[ [ get-memory zero? ] _ until ] ]]
 
 code  = (loop|ops|unknown)*  => [[ compose-all ]]
 

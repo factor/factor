@@ -15,13 +15,25 @@ let
     udis86 # available since NixOS 19.09
     openal
   ];
+  runtimeLibPath = lib.makeLibraryPath runtimeLibs;
 in
 (mkClangShell {
   name = "factor-shell-env";
-  LD_LIBRARY_PATH = "/run/opengl-driver/lib:${lib.makeLibraryPath runtimeLibs}" ;
+  LD_LIBRARY_PATH = "/run/opengl-driver/lib:${runtimeLibPath}" ;
   buildInputs = runtimeLibs ++ [
     # for building factor
     git
     curl
+    makeWrapper
   ];
+  shellHook = ''
+    wrapFactor () {
+    [ -n "$1" ] || { printf "Usage: wrapFactor <factor-root>" ; return; }
+    local root="$(realpath $1)"
+    local binary="''${root}/factor"
+    wrapProgram "$binary" --prefix LD_LIBRARY_PATH : ${runtimeLibPath} \
+      --argv0 factor
+    ln -sf "''${root}/factor.image" "''${root}/.factor-wrapped.image"
+    }
+  '';
 })

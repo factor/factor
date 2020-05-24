@@ -1,15 +1,25 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs cache combinators images.loader kernel
-memoize namespaces opengl.textures sequences system
-ui.gadgets.worlds vocabs ;
+math memoize namespaces opengl opengl.textures sequences
+splitting system ui.gadgets.worlds vocabs ;
 IN: ui.images
 
 TUPLE: image-name path ;
 
 C: <image-name> image-name
 
-MEMO: cached-image ( image-name -- image ) path>> load-image ;
+<PRIVATE
+
+MEMO: cached-image-path ( path -- image )
+    [ load-image ] [ "@2x" swap subseq? >>2x? ] bi ;
+
+PRIVATE>
+
+: cached-image ( image-name -- image )
+    path>> gl-scale-factor get-global [ 1.0 > ] [ f ] if* [
+        "." split1-last "@2x." glue
+    ] when cached-image-path ;
 
 <PRIVATE
 
@@ -29,7 +39,7 @@ PRIVATE>
     rendered-image draw-scaled-texture ;
 
 : image-dim ( image-name -- dim )
-    cached-image dim>> ;
+    cached-image [ dim>> ] [ 2x?>> [ [ 2 / ] map ] when ] bi ;
 
 {
     { [ os macosx? ] [ "images.loader.cocoa" require ] }

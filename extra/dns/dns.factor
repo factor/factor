@@ -20,7 +20,7 @@ ENUM: dns-type
 { MR 9 } { NULL 10 } { WKS 11 } { PTR 12 }
 { HINFO 13 } { MINFO 14 } { MX 15 } { TXT 16 }
 { RP 17 } { AFSDB 18 } { SIG 24 } { KEY 25 }
-{ AAAA 28 } { LOC 29 } { SVR 33 } { NAPTR 35 }
+{ AAAA 28 } { LOC 29 } { SRV 33 } { NAPTR 35 }
 { KX 36 } { CERT 37 } { DNAME 39 } { OPT 41 }
 { APL 42 } { DS 43 } { SSHFP 44 } { IPSECKEY 45 }
 { RRSIG 46 } { NSEC 47 } { DNSKEY 48 } { DHCID 49 }
@@ -65,6 +65,8 @@ TUPLE: hinfo cpu os ;
 TUPLE: mx preference exchange ;
 
 TUPLE: soa mname rname serial refresh retry expire minimum ;
+
+TUPLE: srv priority weight port target ;
 
 TUPLE: a name ;
 CONSTRUCTOR: <a> a ( name -- obj ) ;
@@ -206,6 +208,13 @@ CONSTANT: ipv6-arpa-suffix ".ip6.arpa"
         2 read be> >>preference
         parse-name >>exchange ;
 
+: parse-srv ( -- srv )
+    srv new
+    2 read be> >>priority
+    2 read be> >>weight
+    2 read be> >>port
+    parse-name >>target ;
+
 GENERIC: parse-rdata ( n type -- obj )
 
 M: object parse-rdata drop read ;
@@ -216,6 +225,7 @@ M: MX parse-rdata 2drop parse-mx ;
 M: NS parse-rdata 2drop parse-name <ns> ;
 M: PTR parse-rdata 2drop parse-name <ptr> ;
 M: SOA parse-rdata 2drop parse-soa ;
+M: SRV parse-rdata 2drop parse-srv ;
 
 : parse-rr ( -- rr )
     rr new
@@ -344,6 +354,7 @@ M: TXT rdata>byte-array
 : dns-MX-query ( name -- message ) MX IN dns-query ;
 : dns-NS-query ( name -- message ) NS IN dns-query ;
 : dns-TXT-query ( name -- message ) TXT IN dns-query ;
+: dns-SRV-query ( name -- message ) SRV IN dns-query ;
 
 : read-TXT-strings ( byte-array -- strings )
     [

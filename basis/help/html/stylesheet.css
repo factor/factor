@@ -18,8 +18,12 @@ body {
 
 input {
     border: 1px solid #999999;
-    font-size: smaller;
     border-radius: 3px;
+    font-size: 1.0em;
+}
+
+input[type=text] {
+    width: 200px;
 }
 
 img {
@@ -50,10 +54,39 @@ tr:hover {
     margin-right: 10px;
 }
 
+.navbar form a {
+    margin-left: 10px;
+    font-size: 1.0em;
+    font-weight: bold;
+}
+
 #container {
     max-width: 800px;
 }
 
 .page {
     margin: 15px;
+}
+
+.page img {
+    width: 16px;
+    height: 16px;
+}
+
+@media screen and (max-width: 480px) {
+
+    input {
+        font-size: smaller;
+    }
+
+    input[type=text] {
+        width: 100px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+
+    .navbar form a {
+        display: none;
+    }
 }

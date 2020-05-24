@@ -125,12 +125,6 @@ CONSTANT: key-codes
 : send-action$ ( view event gesture -- )
     [ drop window ] dip over [ send-action ] [ 2drop ] if ;
 
-: add-resize-observer ( observer object -- )
-    [
-        "updateFactorGadgetSize:"
-        "NSViewFrameDidChangeNotification" <NSString>
-    ] dip add-observer ;
-
 : string-or-nil? ( NSString -- ? )
     [ CFString>string NSStringPboardType = ] [ t ] if* ;
 
@@ -195,7 +189,7 @@ IMPORT: NSAttributedString
     0 utf16-index 2 * str utf16n encode subseq utf16n decode length ;
 
 :: >utf16-index ( str codepoint-index -- utf16-index )
-    0 codepoint-index str subseq utf16n encode length 2 / >integer ;
+    0 codepoint-index str subseq utf16n encode length 2 /i ;
 
 :: earlier-caret/mark ( editor -- loc )
     editor editor-caret :> caret
@@ -299,6 +293,13 @@ PRIVATE>
         ] when
     ] ;
 
+    COCOA-METHOD: void reshape [
+        self window :> window
+        window [
+            self view-dim window dim<<
+        ] when
+    ] ;
+
     ! TouchBar
     COCOA-METHOD: void touchBarCommand0 [ 0 touchbar-invoke-command ] ;
     COCOA-METHOD: void touchBarCommand1 [ 1 touchbar-invoke-command ] ;
@@ -324,7 +325,11 @@ PRIVATE>
     ] ;
 
     ! Rendering
-    COCOA-METHOD: void drawRect: NSRect rect [ self window [ draw-world ] when* ] ;
+    COCOA-METHOD: void drawRect: NSRect rect [
+        self window [
+            draw-world yield
+        ] when*
+    ] ;
 
     ! Events
     COCOA-METHOD: char acceptsFirstMouse: id event [ 0 ] ;
@@ -632,18 +637,9 @@ PRIVATE>
     COCOA-METHOD: void doCommandBySelector: SEL selector [ ] ;
 
     ! Initialization
-    COCOA-METHOD: void updateFactorGadgetSize: id notification
-    [
-        self window :> window
-        window [
-            self view-dim window dim<< yield
-        ] when
-    ] ;
-
     COCOA-METHOD: id initWithFrame: NSRect frame pixelFormat: id pixelFormat
     [
-        self frame pixelFormat super: initWithFrame:pixelFormat:
-        dup dup add-resize-observer
+        self frame pixelFormat super: \initWithFrame:pixelFormat:
     ] ;
 
     COCOA-METHOD: char isOpaque [ 0 ] ;

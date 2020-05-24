@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays ascii assocs calendar calendar.format
-combinators continuations csv formatting fry grouping
-http.client io io.encodings.ascii io.files io.styles kernel math
-math.extras math.parser memoize regexp sequences sorting.human
-splitting strings urls wrap.strings ;
+combinators command-line continuations csv formatting fry
+grouping http.client io io.encodings.ascii io.files io.styles
+kernel math math.extras math.parser memoize namespaces regexp
+sequences sorting.human splitting strings urls wrap.strings ;
 
 IN: metar
 
@@ -199,6 +199,7 @@ CONSTANT: compass-directions H{
     "V" split1 [ parse-compass ] bi@
     ", variable from %s to %s" sprintf ;
 
+! FIXME: "1 1/2SM" visibility doesn't work
 : parse-visibility ( str -- str' )
     dup first {
         { char: M [ rest "less than " ] }
@@ -734,3 +735,10 @@ M: station taf. cccc>> taf. ;
 M: string taf.
     [ taf <taf-report> taf-report. ]
     [ drop "%s TAF not found\n" printf ] recover ;
+
+: metar-main ( -- )
+    command-line get [
+        [ metar print ] [ taf print ] bi nl
+    ] each ;
+
+MAIN: metar-main

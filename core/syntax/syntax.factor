@@ -304,8 +304,10 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "MAIN:" [
-        scan-word
-        dup ( -- ) check-stack-effect
+        scan-word dup \ [ = [
+            drop "( main )" <uninterned-word> dup
+            parse-quotation ( -- ) define-declared
+        ] when dup ( -- ) check-stack-effect
         [ current-vocab main<< ]
         [ current-source-file get [ main<< ] [ drop ] if* ] bi
     ] define-core-syntax

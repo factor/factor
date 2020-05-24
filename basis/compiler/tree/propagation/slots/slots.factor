@@ -47,9 +47,6 @@ IN: compiler.tree.propagation.slots
         [ swap slot <literal-info> ]
     } 2&& ;
 
-: length-accessor? ( slot info -- ? )
-    [ 1 = ] [ length>> ] bi* and ;
-
 : value-info-slot ( slot info -- info' )
     {
         { [ over 0 = ] [ 2drop fixnum <class-info> ] }

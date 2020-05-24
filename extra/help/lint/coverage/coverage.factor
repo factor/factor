@@ -118,12 +118,12 @@ M: word-help-coverage summary
     } cond ?remove-$values ;
 
 : word-defines-sections ( word -- seq )
-    word-help [ ignored-words member? not ] filter [ ?first ] map ;
+    "help" word-prop [ ignored-words member? not ] filter [ ?first ] map ;
 
 ! only words that need examples, need to have them nonempty
 ! not defining examples is not the same as an empty { $examples }
 : empty-examples? ( word -- ? )
-    word-help \ $examples swap elements [ f ] [ first rest empty? ] if-empty ;
+    "help" word-prop \ $examples swap elements [ f ] [ first rest empty? ] if-empty ;
 
 : missing-sections ( word -- missing )
     [ should-define ] [ word-defines-sections ] bi diff ;

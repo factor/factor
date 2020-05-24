@@ -29,7 +29,7 @@ T{ error-type-holder
    { type +compiler-error+ }
    { word ":errors" }
    { plural "compiler errors" }
-   { icon "vocab:ui/tools/error-list/icons/compiler-error.tiff" }
+   { icon "vocab:ui/tools/error-list/icons/compiler-error.png" }
    { quot [ compiler-errors get values ] }
    { forget-quot [ compiler-errors get delete-at ] }
 } define-error-type
@@ -47,7 +47,7 @@ T{ error-type-holder
    { type +linkage-error+ }
    { word ":linkage" }
    { plural "linkage errors" }
-   { icon "vocab:ui/tools/error-list/icons/linkage-error.tiff" }
+   { icon "vocab:ui/tools/error-list/icons/linkage-error.png" }
    { quot [ linkage-errors get values ] }
    { forget-quot [ linkage-errors get delete-at ] }
    { fatal? f }
@@ -73,7 +73,7 @@ T{ error-type-holder
     { type +user-init-error+ }
     { word ":user-init-errors" }
     { plural "rc file errors" }
-    { icon "vocab:ui/tools/error-list/icons/user-init-error.tiff" }
+    { icon "vocab:ui/tools/error-list/icons/user-init-error.png" }
     { quot [ user-init-errors get-global values ] }
     { forget-quot [ user-init-errors get-global delete-at ] }
 } define-error-type

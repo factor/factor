@@ -15,7 +15,7 @@ ui.tools.inspector ;
 IN: ui.tools.error-list
 
 CONSTANT: source-file-icon
-    T{ image-name f "vocab:ui/tools/error-list/icons/source-file.tiff" }
+    T{ image-name f "vocab:ui/tools/error-list/icons/source-file.png" }
 
 MEMO: error-icon ( type -- image-name )
     error-icon-path <image-name> ;

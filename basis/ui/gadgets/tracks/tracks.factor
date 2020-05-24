@@ -45,7 +45,7 @@ M: track layout* ( track -- ) dup track-layout pack-layout ;
     [
         [ children>> pref-dims ] [ normalized-sizes ] bi
         [ dup { 0 f } member? [ 2drop { 0 0 } ] [ v/n ] if ] 2map
-        max-dims [ >fixnum ] map
+        max-dims
     ] [ gap-dim ] bi v+ ;
 
 M: track pref-dim* ( gadget -- dim )

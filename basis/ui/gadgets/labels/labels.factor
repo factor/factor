@@ -46,7 +46,7 @@ M: label string<< ( string label -- )
     [ font>> ] [ text>> ] bi ; inline
 
 M: label pref-dim*
-    >label< text-dim ;
+    >label< text-dim first2 ceiling 2array ;
 
 <PRIVATE
 
@@ -56,10 +56,10 @@ M: label pref-dim*
 PRIVATE>
 
 M: label baseline*
-    label-metrics ascent>> round ;
+    label-metrics ascent>> ;
 
 M: label cap-height*
-    label-metrics cap-height>> round ;
+    label-metrics cap-height>> ;
 
 <PRIVATE
 
