@@ -570,7 +570,8 @@ TUPLE: multiline-editor < editor ;
 
 <PRIVATE
 
-: page-elt ( editor -- editor element ) dup visible-lines 1 - <page-elt> ;
+: page-elt ( editor -- editor element )
+    dup visible-lines 1 - [ 1 ] when-zero <page-elt> ;
 
 PRIVATE>
 
