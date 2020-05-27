@@ -21,7 +21,7 @@ TUPLE: editor < line-gadget
     preedit-selection-mode?
     preedit-underlines ;
 
-M: editor preedit? preedit-start>> [ t ] [ f ] if ;
+M: editor preedit? preedit-start>> ;
 
 <PRIVATE
 
