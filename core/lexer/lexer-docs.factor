@@ -5,10 +5,10 @@ IN: lexer
 HELP: lexer
 { $var-description "Stores the current " { $link lexer } " instance." }
 { $class-description "An object for tokenizing parser input. It has the following slots:"
-    { $list
-        { { $snippet "text" } " - the lines being parsed; an array of strings" }
-        { { $snippet "line" } " - the line number being parsed; unlike most indices this is 1-based for friendlier error reporting and integration with text editors" }
-        { { $snippet "column" } " - the current column position, zero-based" }
+    { $slots
+        { "text" "the lines being parsed; an array of strings" }
+        { "line" "the line number being parsed; unlike most indices this is 1-based for friendlier error reporting and integration with text editors" }
+        { "column" "the current column position, zero-based" }
     }
 "Custom lexing can be implemented by delegating a tuple to an instance of this class and implementing the " { $link skip-word } " and " { $link skip-blank } " generic words." } ;
 
