@@ -23,9 +23,9 @@ $nl
 ARTICLE: "ui.gadgets.tables.selection" "Table row selection"
 "A few slots in the table gadget concern row selection:"
 { $slots
-  { "selection" { " - if set to a model, the values of the currently selected row or rows, as determined by a " { $link row-value } " call to the renderer, is stored in this model. See " { $link "models" } "." } }
-  { "selection-index" { " - if set to a model, the indices of the currently selected rows." } }
-  { "selection-required?" { " - if set to a true value, the table ensures that some row is always selected, if the model is non-empty. If set to " { $link f } ", a state where nothing is selected is permitted to occur. The default is " { $link f } "." } }
+  { "selection" { "if set to a model, the values of the currently selected row or rows, as determined by a " { $link row-value } " call to the renderer, is stored in this model. See " { $link "models" } "." } }
+  { "selection-index" { "if set to a model, the indices of the currently selected rows." } }
+  { "selection-required?" { "if set to a true value, the table ensures that some row is always selected, if the model is non-empty. If set to " { $link f } ", a state where nothing is selected is permitted to occur. The default is " { $link f } "." } }
 }
 "Some words for row selection:"
 { $subsections
