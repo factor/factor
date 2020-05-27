@@ -72,34 +72,34 @@ ABOUT: "threads"
 
 HELP: thread
 { $class-description "A thread. The slots are as follows:"
-    { $list
+    { $slots
       {
-          { $snippet "id" }
-          " - a unique identifier assigned to each thread."
+          "id"
+          "a unique identifier assigned to each thread."
       }
       {
-          { $snippet "exit-handler" }
-          " - a " { $link quotation } " run when the thread is being stopped."
+          "exit-handler"
+          { "a " { $link quotation } " run when the thread is being stopped." }
       }
       {
-          { $snippet "name" }
-          " - the name passed to " { $link spawn } "."
+          "name"
+          { "the name passed to " { $link spawn } "." }
       }
       {
-          { $snippet "quot" }
-          " - the initial quotation passed to " { $link spawn } "."
+          "quot"
+          { "the initial quotation passed to " { $link spawn } "." }
       }
       {
-          { $snippet "runnable" }
-          " - whether the thread is runnable. Initially it is, " { $link f } "."
+          "runnable"
+          { "whether the thread is runnable. Initially it is, " { $link f } "." }
       }
       {
-          { $snippet "state" }
-          " - a " { $link string } " indicating what the thread is waiting for, or " { $link f } ". This slot is intended to be used for debugging purposes."
+          "state"
+          { "a " { $link string } " indicating what the thread is waiting for, or " { $link f } ". This slot is intended to be used for debugging purposes." }
       }
       {
-          { $snippet "context" }
-          " - a " { $link box } " holding an alien pointer to the threads " { $link context } " object."
+          "context"
+          { "a " { $link box } " holding an alien pointer to the threads " { $link context } " object." }
       }
     }
 } ;
