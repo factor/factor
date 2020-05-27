@@ -577,7 +577,7 @@ TUPLE: multiline-editor < editor ;
     dup editor-caret first page-elt ;
 
 : next-page-elt ( editor -- editor element )
-    dup [ control-value length ] [ editor-caret first ] bi - page-elt ;
+    dup [ control-value length 1 - ] [ editor-caret first ] bi - page-elt ;
 
 PRIVATE>
 
