@@ -357,7 +357,7 @@ M:: resolver-gen next ( resolver -- yield? )
             { s-end: [
                   t resolver return?<< ] }
         } case
-        resolver [ yield?>> ] [ return?>> ] bi or [ f ] [ t ] if
+        resolver [ yield?>> ] [ return?>> ] bi or not
     ] loop
     resolver yield?>> ;
 
