@@ -478,6 +478,8 @@ editor "caret-motion" f {
     { T{ button-down } position-caret }
     { T{ key-down f f "LEFT" } previous-character }
     { T{ key-down f f "RIGHT" } next-character }
+    { T{ key-down f { C+ } "b" } previous-character }
+    { T{ key-down f { C+ } "f" } next-character }
     { T{ key-down f { C+ } "LEFT" } previous-word }
     { T{ key-down f { C+ } "RIGHT" } next-word }
     { T{ key-down f f "HOME" } start-of-line }
@@ -640,6 +642,8 @@ PRIVATE>
 multiline-editor "multiline" f {
     { T{ key-down f f "UP" } previous-line }
     { T{ key-down f f "DOWN" } next-line }
+    { T{ key-down f { C+ } "p" } previous-line }
+    { T{ key-down f { C+ } "n" } next-line }
     { T{ key-down f { S+ } "UP" } select-previous-line }
     { T{ key-down f { S+ } "DOWN" } select-next-line }
     { T{ key-down f f "PAGE_UP" } previous-page }
@@ -650,6 +654,9 @@ multiline-editor "multiline" f {
     { T{ key-down f { S+ } "RET" } insert-newline }
     { T{ key-down f f "ENTER" } insert-newline }
     { T{ key-down f { C+ } "j" } com-join-lines }
+    { T{ key-down f { C+ } "k" } delete-to-end-of-line }
+    { T{ key-down f { C+ } "a" } start-of-line }
+    { T{ key-down f { C+ } "e" } end-of-line }
 } define-command-map
 
 TUPLE: source-editor < multiline-editor ;
