@@ -543,6 +543,10 @@ editor "selection" f {
     { T{ key-down f { S+ } "END" } select-end-of-line }
     { T{ key-down f { S+ C+ } "HOME" } select-start-of-document }
     { T{ key-down f { S+ C+ } "END" } select-end-of-document }
+    { T{ key-down f { C+ } "u" } delete-to-start-of-line }
+    { T{ key-down f { C+ } "k" } delete-to-end-of-line }
+    { T{ key-down f { C+ } "a" } start-of-line }
+    { T{ key-down f { C+ } "e" } end-of-line }
 } define-command-map
 
 : editor-menu ( editor -- )
@@ -654,9 +658,6 @@ multiline-editor "multiline" f {
     { T{ key-down f { S+ } "RET" } insert-newline }
     { T{ key-down f f "ENTER" } insert-newline }
     { T{ key-down f { C+ } "j" } com-join-lines }
-    { T{ key-down f { C+ } "k" } delete-to-end-of-line }
-    { T{ key-down f { C+ } "a" } start-of-line }
-    { T{ key-down f { C+ } "e" } end-of-line }
 } define-command-map
 
 TUPLE: source-editor < multiline-editor ;
