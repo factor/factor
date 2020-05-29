@@ -434,6 +434,8 @@ editor "editing" f {
     { T{ key-down f { C+ } "BACKSPACE" } delete-previous-word }
     { T{ key-down f { A+ } "DELETE" } delete-to-end-of-line }
     { T{ key-down f { A+ } "BACKSPACE" } delete-to-start-of-line }
+    { T{ key-down f { C+ } "u" } delete-to-start-of-line }
+    { T{ key-down f { C+ } "k" } delete-to-end-of-line }
 } define-command-map
 
 : com-paste ( editor -- ) clipboard get paste-clipboard ;
@@ -472,6 +474,12 @@ editor "clipboard" f {
 
 : start-of-line ( editor -- ) one-line-elt editor-prev ;
 
+DEFER: select-all
+
+: start-of-line/select-all ( editor -- )
+    dup editor-caret second 0 =
+    [ select-all ] [ start-of-line ] if ;
+
 : end-of-line ( editor -- ) one-line-elt editor-next ;
 
 editor "caret-motion" f {
@@ -484,6 +492,8 @@ editor "caret-motion" f {
     { T{ key-down f { C+ } "RIGHT" } next-word }
     { T{ key-down f f "HOME" } start-of-line }
     { T{ key-down f f "END" } end-of-line }
+    { T{ key-down f { C+ } "a" } start-of-line/select-all }
+    { T{ key-down f { C+ } "e" } end-of-line }
     { T{ key-down f { C+ } "HOME" } start-of-document }
     { T{ key-down f { C+ } "END" } end-of-document }
 } define-command-map
@@ -543,10 +553,6 @@ editor "selection" f {
     { T{ key-down f { S+ } "END" } select-end-of-line }
     { T{ key-down f { S+ C+ } "HOME" } select-start-of-document }
     { T{ key-down f { S+ C+ } "END" } select-end-of-document }
-    { T{ key-down f { C+ } "u" } delete-to-start-of-line }
-    { T{ key-down f { C+ } "k" } delete-to-end-of-line }
-    { T{ key-down f { C+ } "a" } start-of-line }
-    { T{ key-down f { C+ } "e" } end-of-line }
 } define-command-map
 
 : editor-menu ( editor -- )
