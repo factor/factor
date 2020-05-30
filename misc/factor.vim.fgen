@@ -12,7 +12,7 @@ IN: factor.vim.fgen
 " Vim syntax file
 " Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
-" Last Change: 2012 Jul 11
+" Last Change: 2020 May 29
 " To run: USING: html.templates html.templates.fhtml ; "resource:misc/factor.vim.fgen" <fhtml> call-template
 
 " For version 5.x: Clear all syntax items
@@ -41,16 +41,17 @@ syn match factorShebang /\%\^#!.*/ display
 syn match factorShebangErr /\%\^#!\S\+/
 
 syn cluster factorDefnContents contains=@factorCluster,factorStackEffect,factorLiteralStackEffect,factorArray0,factorQuotation0
+syn cluster factorGenericContents contains=factorComment,factorStackEffect
 
 syn region factorDefn matchgroup=factorDefnDelims start=/\<\(SYNTAX\|\(MACRO\|MEMO\|TYPED\)\?:\?\):\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents
 syn region factorMethod matchgroup=factorMethodDelims start=/\<M::\?\s\+\S\+\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents
-syn region factorGeneric matchgroup=factorGenericDelims start=/\<\(GENERIC\|MATH\|PRIMITIVE\):\s\+\S\+\>/ end=/$/ contains=factorStackEffect
-syn region factorGenericN matchgroup=factorGenericNDelims start=/\<GENERIC#:\s\+\S\+\s\+\d\+\>/ end=/$/ contains=factorStackEffect
+syn region factorGeneric matchgroup=factorGenericDelims start=/\<\(GENERIC\|MATH\|PRIMITIVE\):\s\+\S\+\>/ end=/$/ contains=@factorGenericContents
+syn region factorGenericN matchgroup=factorGenericNDelims start=/\<GENERIC#:\s\+\S\+\s\+\d\+\>/ end=/$/ contains=@factorGenericContents
 
 syn region factorPrivateDefn matchgroup=factorPrivateDefnDelims start=/\<\(SYNTAX\|\(MACRO\|MEMO\|TYPED\)\?:\?\):\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents contained
 syn region factorPrivateMethod matchgroup=factorPrivateMethodDelims start=/\<M::\?\s\+\S\+\s\+\S\+\>/ end=/\<;\>/ contains=@factorDefnContents contained
-syn region factorPGeneric matchgroup=factorPGenericDelims start=/\<\(GENERIC\|MATH\|PRIMITIVE\):\s\+\S\+\>/ end=/$/ contains=factorStackEffect contained
-syn region factorPGenericN matchgroup=factorPGenericNDelims start=/\<GENERIC#:\s\+\S\+\s\+\d\+\>/ end=/$/ contains=factorStackEffect contained
+syn region factorPGeneric matchgroup=factorPGenericDelims start=/\<\(GENERIC\|MATH\|PRIMITIVE\):\s\+\S\+\>/ end=/$/ contains=@factorGenericContents contained
+syn region factorPGenericN matchgroup=factorPGenericNDelims start=/\<GENERIC#:\s\+\S\+\s\+\d\+\>/ end=/$/ contains=@factorGenericContents contained
 
 syn region None matchgroup=factorPrivate start=/\<<PRIVATE\>/ end=/\<PRIVATE>\>/ contains=@factorDefnContents,factorPrivateDefn,factorPrivateMethod,factorPGeneric,factorPGenericN
 
@@ -92,48 +93,48 @@ syn match   factorHexErr        /\<[+-]\=0x\(,\S*\|\S*,\|[-0-9a-fA-Fp,]*[^-0-9a-
 syn match   factorHex           /\<[+-]\=0x[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\(\.[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\)\?\(p-\=[0-9]\([0-9,]*[0-9]\)\?\)\?\>/
 syn match   factorOctErr        /\<[+-]\=0o\(,\S*\|\S*,\|[0-7,]*[^0-7, ]\S*\)\>/
 syn match   factorOctal         /\<[+-]\=0o[0-7,]\+\>/
-syn match   factorNan           /\<NAN:\s\+[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\>/
+syn match   factorNan           /\<NAN:\s\+[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\>/ contains=factorComment
 
-syn match   factorIn            /\<IN:\s\+\S\+\>/
-syn match   factorUse           /\<USE:\s\+\S\+\>/
-syn match   factorUnuse         /\<UNUSE:\s\+\S\+\>/
+syn match   factorIn            /\<IN:\s\+\S\+\>/    contains=factorComment
+syn match   factorUse           /\<USE:\s\+\S\+\>/   contains=factorComment
+syn match   factorUnuse         /\<UNUSE:\s\+\S\+\>/ contains=factorComment
 
 syn match   factorChar          /\<CHAR:\s\+\S\+\>/
 
-syn match   factorBackslash     /\<\\\>\s\+\S\+\>/
-syn match   factorMBackslash    /\<M\\\>\s\+\S\+\s\+\S\+\>/
-syn match   factorLiteral       /\<\$\>\s\+\S\+\>/
-syn region  factorLiteralBlock  start=/\<\$\[\>/ end=/\<\]\>/
+syn match   factorBackslash     /\<\\\>\s\+\S\+\>/            contains=factorComment
+syn match   factorMBackslash    /\<M\\\>\s\+\S\+\s\+\S\+\>/   contains=factorComment
+syn match   factorLiteral       /\<\$\>\s\+\S\+\>/            contains=factorComment
+syn region  factorLiteralBlock  start=/\<\$\[\>/ end=/\<\]\>/ contains=factorComment
 
-syn region  factorUsing         start=/\<USING:\>/       end=/;/
-syn match   factorQualified     /\<QUALIFIED:\s\+\S\+\>/
-syn match   factorQualifiedWith /\<QUALIFIED-WITH:\s\+\S\+\s\+\S\+\>/
-syn region  factorExclude       start=/\<EXCLUDE:\>/     end=/;/
-syn region  factorFrom          start=/\<FROM:\>/        end=/;/
-syn match   factorRename        /\<RENAME:\s\+\S\+\s\+\S\+\s=>\s\+\S\+\>/
-syn region  factorSingletons    start=/\<SINGLETONS:\>/  end=/;/
-syn match   factorSymbol        /\<SYMBOL:\s\+\S\+\>/
-syn region  factorSymbols       start=/\<SYMBOLS:\>/     end=/;/
-syn region  factorConstructor2  start=/\<CONSTRUCTOR:\?/ end=/;/
-syn region  factorIntersection  start=/\<INTERSECTION:\>/ end=/\<;\>/
-syn region  factorTuple         start=/\<\(TUPLE\|BUILTIN\):\>/ end=/\<;\>/
-syn region  factorError         start=/\<ERROR:\>/ end=/\<;\>/
-syn region  factorUnion         start=/\<UNION:\>/ end=/\<;\>/
-syn region  factorStruct        start=/\<\(UNION-STRUCT:\|STRUCT:\)\>/ end=/\<;\>/
+syn region  factorUsing         start=/\<USING:\>/       end=/;/                   contains=factorComment
+syn match   factorQualified     /\<QUALIFIED:\s\+\S\+\>/                           contains=factorComment
+syn match   factorQualifiedWith /\<QUALIFIED-WITH:\s\+\S\+\s\+\S\+\>/              contains=factorComment
+syn region  factorExclude       start=/\<EXCLUDE:\>/     end=/;/                   contains=factorComment
+syn region  factorFrom          start=/\<FROM:\>/        end=/;/                   contains=factorComment
+syn match   factorRename        /\<RENAME:\s\+\S\+\s\+\S\+\s=>\s\+\S\+\>/          contains=factorComment
+syn region  factorSingletons    start=/\<SINGLETONS:\>/  end=/;/                   contains=factorComment
+syn match   factorSymbol        /\<SYMBOL:\s\+\S\+\>/                              contains=factorComment
+syn region  factorSymbols       start=/\<SYMBOLS:\>/     end=/;/                   contains=factorComment
+syn region  factorConstructor2  start=/\<CONSTRUCTOR:\?/ end=/;/                   contains=factorComment
+syn region  factorIntersection  start=/\<INTERSECTION:\>/ end=/\<;\>/              contains=factorComment
+syn region  factorTuple         start=/\<\(TUPLE\|BUILTIN\):\>/ end=/\<;\>/        contains=factorComment
+syn region  factorError         start=/\<ERROR:\>/ end=/\<;\>/                     contains=factorComment
+syn region  factorUnion         start=/\<UNION:\>/ end=/\<;\>/                     contains=factorComment
+syn region  factorStruct        start=/\<\(UNION-STRUCT:\|STRUCT:\)\>/ end=/\<;\>/ contains=factorComment
 
-syn match   factorConstant      /\<CONSTANT:\s\+\S\+\>/
-syn match   factorAlias         /\<ALIAS:\s\+\S\+\s\+\S\+\>/
-syn match   factorSingleton     /\<SINGLETON:\s\+\S\+\>/
-syn match   factorPostpone      /\<POSTPONE:\s\+\S\+\>/
-syn match   factorDefer         /\<DEFER:\s\+\S\+\>/
-syn match   factorForget        /\<FORGET:\s\+\S\+\>/
-syn match   factorMixin         /\<MIXIN:\s\+\S\+\>/
-syn match   factorInstance      /\<INSTANCE:\s\+\S\+\s\+\S\+\>/
-syn match   factorHook          /\<HOOK:\s\+\S\+\s\+\S\+\>/ nextgroup=factorStackEffect skipwhite skipempty
-syn match   factorMain          /\<MAIN:\s\+\S\+\>/
-syn match   factorConstructor   /\<C:\s\+\S\+\s\+\S\+\>/
-syn match   factorAlien         /\<ALIEN:\s\+[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\>/
-syn match   factorSlot          /\<SLOT:\s\+\S\+\>/
+syn match   factorConstant      /\<CONSTANT:\s\+\S\+\>/         contains=factorComment
+syn match   factorAlias         /\<ALIAS:\s\+\S\+\s\+\S\+\>/    contains=factorComment
+syn match   factorSingleton     /\<SINGLETON:\s\+\S\+\>/        contains=factorComment
+syn match   factorPostpone      /\<POSTPONE:\s\+\S\+\>/         contains=factorComment
+syn match   factorDefer         /\<DEFER:\s\+\S\+\>/            contains=factorComment
+syn match   factorForget        /\<FORGET:\s\+\S\+\>/           contains=factorComment
+syn match   factorMixin         /\<MIXIN:\s\+\S\+\>/            contains=factorComment
+syn match   factorInstance      /\<INSTANCE:\s\+\S\+\s\+\S\+\>/ contains=factorComment
+syn match   factorHook          /\<HOOK:\s\+\S\+\s\+\S\+\>/     contains=factorComment nextgroup=factorStackEffect skipwhite skipempty
+syn match   factorMain          /\<MAIN:\s\+\S\+\>/             contains=factorComment
+syn match   factorConstructor   /\<C:\s\+\S\+\s\+\S\+\>/        contains=factorComment
+syn match   factorAlien         /\<ALIEN:\s\+[0-9a-fA-F]\([0-9a-fA-F,]*[0-9a-fA-F]\)\?\>/ contains=factorComment
+syn match   factorSlot          /\<SLOT:\s\+\S\+\>/             contains=factorComment
 
 syn cluster factorWordOps       contains=factorConstant,factorAlias,factorSingleton,factorSingletons,factorSymbol,factorSymbols,factorPostpone,factorDefer,factorForget,factorMixin,factorInstance,factorHook,factorMain,factorConstructor
 
@@ -162,8 +163,8 @@ syn match factorMultiStringContents /.*/ contained
 "syn match factorStackEffectErr /\<)\>/
 "syn region factorStackEffectErr start=/\<(\>/ end=/\<)\>/
 "syn region factorStackEffect start=/\<(\>/ end=/\<)\>/ contained
-syn match factorStackEffect /(\s\+\(\S*\s\+\)*--\(\s\+\S*\)*\s\+)\>/ contained contains=factorStackDelims,factorStackItems,factorStackVariables,factorCallExecuteDelim
-syn match factorLiteralStackEffect /((\s\+\(\S*\s\+\)*--\(\s\+\S*\)*\s\+))\>/ contained contains=factorStackDelims,factorStackItems,factorStackVariables,factorCallExecuteDelim
+syn match factorStackEffect /(\s\+\(\S*\s\+\)*--\(\s\+\S*\)*\s\+)\>/ contained contains=factorComment,factorStackDelims,factorStackItems,factorStackVariables,factorCallExecuteDelim
+syn match factorLiteralStackEffect /((\s\+\(\S*\s\+\)*--\(\s\+\S*\)*\s\+))\>/ contained contains=factorComment,factorStackDelims,factorStackItems,factorStackVariables,factorCallExecuteDelim
 syn match factorStackVariables contained "\<\.\.\S\+\>"
 syn match factorStackItems contained "\<\(\.\.\)\@!\S\+\>"
 syn keyword factorStackDelims contained ( ) (( )) --
