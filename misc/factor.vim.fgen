@@ -1,340 +1,98 @@
-<%
-USING: accessors io kernel multiline prettyprint sequences sorting vocabs ;
+USING: accessors
+    calendar calendar.format
+    io kernel multiline prettyprint sequences sorting
+    splitting tr vocabs ;
 IN: factor.vim.fgen
+ALIAS: wr write
 
-: print-keywords ( vocab -- )
-    vocab-words [ name>> ] sort-with [
-        "syn keyword factorKeyword " write
-        [ bl ] [ pprint ] interleave nl
-    ] when* ;
-
-%>
-" Vim syntax file
+[=[ " Vim syntax file
 " Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
-" Last Change: 2020 May 29
-" To run: USING: html.templates html.templates.fhtml ; "resource:misc/factor.vim.fgen" <fhtml> call-template
+" Last Change: ]=] wr
+    now >gmt { YYYY " " MONTH " " DD } formatted [=[
+" Minimum Version: 600
+" To regenerate: ]=] wr {
+    [=[ USING: io.encodings.utf8 io.files parser ; ]=]
+    [=[ "resource:misc/vim/syntax/factor/generated.vim" utf8 ]=]
+    [=[ "resource:misc/factor.vim.fgen" parse-file ]=]
+    [=[ with-file-writer]=]
+} [ wr ] each [=[
 
-" For version 5.x: Clear all syntax items
-" For version 6.x: Quit when a syntax file was already loaded
-if version < 600
-    syntax clear
-elseif exists("b:current_syntax")
-    finish
+if exists('b:factorsyn_no_generated')
+  finish
 endif
+]=] wr nl
 
-" Factor is case sensitive.
-syn case match
+[=[ command -nargs=+ -bar HiLink hi def link <args>
+function s:syn_keyword_factor_word(group, ...)
+  execute 'HiLink' a:group 'factorWord'
+  execute 'syn' 'cluster' 'factorWord' 'add=' . a:group
+endfunction
+command -nargs=+ -bar SynKeywordFactorWord
+      \ call s:syn_keyword_factor_word(<f-args>)
+]=] wr nl
+: (vocab-name>syntax-group-name) ( string -- string )
+    "_" "___" "-" "__" "." "_" [ replace ] 2tri@ ;
+: vocab-name>syntax-group-name ( string -- string )
+    (vocab-name>syntax-group-name) "factorWord_" prepend ;
+: write-syn-keyword ( string seq seq -- )
+    "syn keyword " wr [ wr ] 2dip
+    [ bl [ bl ] [ wr ] interleave ] unless-empty
+    [ bl [ bl ] [ "|" "\\|" replace wr ] interleave ]
+        unless-empty ;
+: write-keywords ( vocab -- )
+    lookup-vocab
+    [ name>> ] [ vocab-words [ name>> ] map ] bi natural-sort [
+        [ vocab-name>syntax-group-name
+            [ "SynKeywordFactorWord " wr wr " | " wr ] keep
+        ] dip
+        { "contained" } write-syn-keyword nl
+    ] [ drop ] if* ;
 
-" Make all of these characters part of a word (useful for skipping over words with w, e, and b)
-if version >= 600
-    setlocal iskeyword=!,@,33-35,%,$,38-64,A-Z,91-96,a-z,123-126,128-255
-else
-    set iskeyword=!,@,33-35,%,$,38-64,A-Z,91-96,a-z,123-126,128-255
-endif
+f
+! Uncomment to highlight all words from all vocabularies.
+! Note that factor/generated.vim grows from ~16k to ~100k.
+! drop t
+[ loaded-vocab-names ] [ {
+    "alien"
+    "arrays"
+    "assocs"
+    "byte-arrays"
+    "classes"
+    "classes.maybe"
+    "combinators"
+    "continuations"
+    "definitions"
+    "destructors"
+    "generic"
+    "growable"
+    "io"
+    "io.encodings"
+    "io.encodings.binary"
+    "io.encodings.utf8"
+    "io.files"
+    "kernel"
+    "layouts"
+    "make"
+    "math"
+    "math.order"
+    "memory"
+    "namespaces"
+    "sequences"
+    "sets"
+    "sorting"
+    "splitting"
+    "strings"
+    "strings.parser"
+    "syntax"
+    "vectors"
+} ] if [ write-keywords ] each nl
+[=[ delcommand HiLink
+delcommand SynKeywordFactorWord
+]=] wr nl
 
-syn cluster factorCluster contains=factorComment,factorFrySpecifier,factorKeyword,factorRepeat,factorConditional,factorBoolean,factorBreakpoint,factorDeclaration,factorCallQuotation,factorExecute,factorCallNextMethod,factorString,factorTriString,factorSbuf,@factorNumber,@factorNumErr,factorDelimiter,factorChar,factorBackslash,factorMBackslash,factorLiteral,factorLiteralBlock,@factorWordOps,factorAlien,factorSlot,factorTuple,factorError,factorStruct
-
-" All syntax patterns are "very magic" (see `:help /\v`).
-" Escape all literal [^0-9a-zA-Z_-!:;] characters in these patterns.
-" (Not escaping [-!:;] characters risks forward-incompatibility,
-"   but fixes if an incompatibile Vim arises would be trivial,
-"   and Factor likes these characters.)
-
-syn match factorTodo /\v(TODO|FIXME|XXX):=/ contained
-syn match factorComment /\v<\#?!>.*/ contains=factorTodo,@Spell
-syn match factorShebang /\v%^\#!.*/ display
-syn match factorShebangErr /\v%^\#!\S+/
-
-syn cluster factorDefnContents contains=@factorCluster,factorStackEffect,factorLiteralStackEffect,factorArray0,factorQuotation0
-syn cluster factorGenericContents contains=factorComment,factorStackEffect
-
-syn region factorDefn matchgroup=factorDefnDelims start=/\v<%(SYNTAX|%(MACRO|MEMO|TYPED)?:?):\s+\S+>/ end=/\v<;>/ contains=@factorDefnContents
-syn region factorMethod matchgroup=factorMethodDelims start=/\v<M::?\s+\S+\s+\S+>/ end=/\v<;>/ contains=@factorDefnContents
-syn region factorGeneric matchgroup=factorGenericDelims start=/\v<%(GENERIC|MATH|PRIMITIVE):\s+\S+>/ end=/\v$/ contains=@factorGenericContents
-syn region factorGenericN matchgroup=factorGenericNDelims start=/\v<GENERIC\#:\s+\S+\s+\d+>/ end=/\v$/ contains=@factorGenericContents
-
-syn region factorPrivateDefn matchgroup=factorPrivateDefnDelims start=/\v<%(SYNTAX|%(MACRO|MEMO|TYPED)?:?):\s+\S+>/ end=/\v<;>/ contains=@factorDefnContents contained
-syn region factorPrivateMethod matchgroup=factorPrivateMethodDelims start=/\v<M::?\s+\S+\s+\S+>/ end=/\v<;>/ contains=@factorDefnContents contained
-syn region factorPGeneric matchgroup=factorPGenericDelims start=/\v<%(GENERIC|MATH|PRIMITIVE):\s+\S+>/ end=/\v$/ contains=@factorGenericContents contained
-syn region factorPGenericN matchgroup=factorPGenericNDelims start=/\v<GENERIC\#:\s+\S+\s+\d+>/ end=/\v$/ contains=@factorGenericContents contained
-
-syn region None matchgroup=factorPrivate start=/\v<\<PRIVATE>/ end=/\v<PRIVATE\>>/ contains=@factorDefnContents,factorPrivateDefn,factorPrivateMethod,factorPGeneric,factorPGenericN
-
-
-syn keyword factorBoolean f t
-syn keyword factorBreakpoint B
-syn keyword factorFrySpecifier @ _ contained
-syn keyword factorDeclaration delimiter deprecated final flushable foldable inline recursive
-syn match factorCallQuotation /\v<call\(\s+%(\S*\s+)*--%(\s+\S*)*\s+\)>/ contained contains=factorStackEffect
-syn match factorExecute /\v<execute\(\s+%(\S*\s+)*--%(\s+\S*)*\s+\)>/ contained contains=factorStackEffect
-syn keyword factorCallNextMethod call-next-method
-
-<%
-
-! uncomment this if you want all words from all vocabularies highlighted. Note
-! that this changes factor.vim from around 8k to around 100k (and is a bit
-! broken)
-
-! vocabs [ print-keywords ] each
-
-    {
-        "kernel" "assocs" "combinators" "math" "sequences"
-        "namespaces" "arrays" "io" "strings" "vectors"
-        "continuations"
-    } [ print-keywords ] each
-%>
-
-syn cluster factorReal          contains=factorInt,factorFloat,factorPosRatio,factorNegRatio,factorBinary,factorHex,factorOctal
-syn cluster factorNumber        contains=@factorReal,factorComplex
-syn cluster factorNumErr        contains=factorBinErr,factorHexErr,factorOctErr
-syn match   factorInt           /\v<[+-]=[0-9]%([0-9,]*[0-9])?%([eE]%([+-])?[0-9]+)?>/
-syn match   factorFloat         /\v<[+-]=%([0-9,]*[0-9])?%(\.%(%([0-9,]*[0-9]+)?%([eE]%([+-])?[0-9]+)?)?)?>/
-syn match   factorPosRatio      /\v<\+=[0-9]%([0-9,]*[0-9])?%(\+[0-9]%([0-9,]*[0-9]+)?)?\/-=[0-9]%([0-9,]*[0-9]+)?\.?>/
-syn match   factorNegRatio      /\v<\-[0-9]%([0-9,]*[0-9])?%(\-[0-9]%([0-9,]*[0-9]+)?)?\/-=[0-9]%([0-9,]*[0-9]+)?\.?>/
-syn region  factorComplex       start=/\v<C\{>/ end=/\v<\}>/ contains=@factorReal
-syn match   factorBinErr        /\v<[+-]=0b[01,]*[^01 ]\S*>/
-syn match   factorBinary        /\v<[+-]=0b[01,]+>/
-syn match   factorHexErr        /\v<[+-]=0x%(,\S*|\S*,|[-0-9a-fA-Fp,]*[^-0-9a-fA-Fp, ]\S*)>/
-syn match   factorHex           /\v<[+-]=0x[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?%(\.[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?)?%(p-=[0-9]%([0-9,]*[0-9])?)?>/
-syn match   factorOctErr        /\v<[+-]=0o%(,\S*|\S*,|[0-7,]*[^0-7, ]\S*)>/
-syn match   factorOctal         /\v<[+-]=0o[0-7,]+>/
-syn match   factorNan           /\v<NAN:\s+[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?>/ contains=factorComment
-
-syn match   factorIn            /\v<IN:\s+\S+>/    contains=factorComment
-syn match   factorUse           /\v<USE:\s+\S+>/   contains=factorComment
-syn match   factorUnuse         /\v<UNUSE:\s+\S+>/ contains=factorComment
-
-syn match   factorChar          /\v<CHAR:\s+\S+>/
-
-syn match   factorBackslash     /\v<\\>\s+\S+>/               contains=factorComment
-syn match   factorMBackslash    /\v<M\\>\s+\S+\s+\S+>/        contains=factorComment
-syn match   factorLiteral       /\v<\$>\s+\S+>/               contains=factorComment
-syn region  factorLiteralBlock  start=/\v<\$\[>/ end=/\v<\]>/ contains=factorComment
-
-syn region  factorUsing         start=/\v<USING:>/                  end=/\v;/   contains=factorComment
-syn match   factorQualified     /\v<QUALIFIED:\s+\S+>/                          contains=factorComment
-syn match   factorQualifiedWith /\v<QUALIFIED-WITH:\s+\S+\s+\S+>/               contains=factorComment
-syn region  factorExclude       start=/\v<EXCLUDE:>/                end=/\v;/   contains=factorComment
-syn region  factorFrom          start=/\v<FROM:>/                   end=/\v;/   contains=factorComment
-syn match   factorRename        /\v<RENAME:\s+\S+\s+\S+\s\=\>\s+\S+>/           contains=factorComment
-syn region  factorSingletons    start=/\v<SINGLETONS:>/             end=/\v;/   contains=factorComment
-syn match   factorSymbol        /\v<SYMBOL:\s+\S+>/                             contains=factorComment
-syn region  factorSymbols       start=/\v<SYMBOLS:>/                end=/\v;/   contains=factorComment
-syn region  factorConstructor2  start=/\v<CONSTRUCTOR:?/            end=/\v;/   contains=factorComment
-syn region  factorIntersection  start=/\v<INTERSECTION:>/           end=/\v<;>/ contains=factorComment
-syn region  factorTuple         start=/\v<%(TUPLE|BUILTIN):>/       end=/\v<;>/ contains=factorComment
-syn region  factorError         start=/\v<ERROR:>/                  end=/\v<;>/ contains=factorComment
-syn region  factorUnion         start=/\v<UNION:>/                  end=/\v<;>/ contains=factorComment
-syn region  factorStruct        start=/\v<%(UNION-STRUCT|STRUCT):>/ end=/\v<;>/ contains=factorComment
-
-syn match   factorConstant      /\v<CONSTANT:\s+\S+>/       contains=factorComment
-syn match   factorAlias         /\v<ALIAS:\s+\S+\s+\S+>/    contains=factorComment
-syn match   factorSingleton     /\v<SINGLETON:\s+\S+>/      contains=factorComment
-syn match   factorPostpone      /\v<POSTPONE:\s+\S+>/       contains=factorComment
-syn match   factorDefer         /\v<DEFER:\s+\S+>/          contains=factorComment
-syn match   factorForget        /\v<FORGET:\s+\S+>/         contains=factorComment
-syn match   factorMixin         /\v<MIXIN:\s+\S+>/          contains=factorComment
-syn match   factorInstance      /\v<INSTANCE:\s+\S+\s+\S+>/ contains=factorComment
-syn match   factorHook          /\v<HOOK:\s+\S+\s+\S+>/     contains=factorComment nextgroup=factorStackEffect skipwhite skipempty
-syn match   factorMain          /\v<MAIN:\s+\S+>/           contains=factorComment
-syn match   factorConstructor   /\v<C:\s+\S+\s+\S+>/        contains=factorComment
-syn match   factorAlien         /\v<ALIEN:\s+[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?>/ contains=factorComment
-syn match   factorSlot          /\v<SLOT:\s+\S+>/           contains=factorComment
-
-syn cluster factorWordOps       contains=factorConstant,factorAlias,factorSingleton,factorSingletons,factorSymbol,factorSymbols,factorPostpone,factorDefer,factorForget,factorMixin,factorInstance,factorHook,factorMain,factorConstructor
-
-"TODO:
-"misc:
-" HELP:
-" ARTICLE:
-"literals:
-" PRIMITIVE:
-
-"C interface:
-" C-ENUM:
-" FUNCTION:
-" TYPEDEF:
-" LIBRARY:
-"#\ "
-
-syn match factorEscape /\v\\([\\astnrbvf0e\"]|u\x{6}|u\{\S+}|x\x{2})/ contained display
-syn region factorString start=/\v<"/ skip=/\v\\"/ end=/\v"/ contains=factorEscape
-syn region factorTriString start=/\v<"""/ skip=/\v\\"/ end=/\v"""/ contains=factorEscape
-syn region factorSbuf start=/\v<[-a-zA-Z0-9]+">/ skip=/\v\\"/ end=/\v"/
-
-syn region factorMultiString matchgroup=factorMultiStringDelims start=/\v<STRING:\s+\S+>/ end=/\v^;$/ contains=factorMultiStringContents
-syn match factorMultiStringContents /\v.*/ contained
-
-"syn match factorStackEffectErr /\v<\)>/
-"syn region factorStackEffectErr start=/\v<\(>/ end=/\v<\)>/
-"syn region factorStackEffect start=/\v<\(>/ end=/\v<\)>/ contained
-syn match factorStackEffect /\v\(\s+%(\S*\s+)*--%(\s+\S*)*\s+\)>/ contained contains=factorComment,factorStackDelims,factorStackItems,factorStackVariables,factorCallExecuteDelim
-syn match factorLiteralStackEffect /\v\(\(\s+%(\S*\s+)*--%(\s+\S*)*\s+\)\)>/ contained contains=factorComment,factorStackDelims,factorStackItems,factorStackVariables,factorCallExecuteDelim
-syn match factorStackVariables contained "\<\.\.\S\+\>"
-syn match factorStackItems contained "\<\(\.\.\)\@!\S\+\>"
-syn keyword factorStackDelims contained ( ) (( )) --
-syn match factorCallExecuteDelim contained /\v\(\s/
-
-"adapted from lisp.vim
-if exists("g:factor_norainbow")
-    syn region factorQuotation matchgroup=factorDelimiter start=/\v<%(%(%('|\$|)\[)|\[%(let|\|))>/ matchgroup=factorDelimiter end=/\v<\]>/ contains=ALL
-else
-    syn region factorQuotation0           matchgroup=hlLevel0 start=/\v<%(%(%('|\$|)\[)|\[%(let|\|))>/  end=/\v<\]>/ contains=@factorCluster,factorQuotation1,factorArray1
-    syn region factorQuotation1 contained matchgroup=hlLevel1 start=/\v<%(%(%('|\$|)\[)|\[%(let|\|))>/  end=/\v<\]>/ contains=@factorCluster,factorQuotation2,factorArray2
-    syn region factorQuotation2 contained matchgroup=hlLevel2 start=/\v<%(%(%('|\$|)\[)|\[%(let|\|))>/  end=/\v<\]>/ contains=@factorCluster,factorQuotation3,factorArray3
-    syn region factorQuotation3 contained matchgroup=hlLevel3 start=/\v<%(%(%('|\$|)\[)|\[%(let|\|))>/  end=/\v<\]>/ contains=@factorCluster,factorQuotation4,factorArray4
-    syn region factorQuotation4 contained matchgroup=hlLevel4 start=/\v<%(%(%('|\$|)\[)|\[%(let|\|))>/  end=/\v<\]>/ contains=@factorCluster,factorQuotation5,factorArray5
-    syn region factorQuotation5 contained matchgroup=hlLevel5 start=/\v<%(%(%('|\$|)\[)|\[%(let|\|))>/  end=/\v<\]>/ contains=@factorCluster,factorQuotation6,factorArray6
-    syn region factorQuotation6 contained matchgroup=hlLevel6 start=/\v<%(%(%('|\$|)\[)|\[%(let|\|))>/  end=/\v<\]>/ contains=@factorCluster,factorQuotation7,factorArray7
-    syn region factorQuotation7 contained matchgroup=hlLevel7 start=/\v<%(%(%('|\$|)\[)|\[%(let|\|))>/  end=/\v<\]>/ contains=@factorCluster,factorQuotation8,factorArray8
-    syn region factorQuotation8 contained matchgroup=hlLevel8 start=/\v<%(%(%('|\$|)\[)|\[%(let|\|))>/  end=/\v<\]>/ contains=@factorCluster,factorQuotation9,factorArray9
-    syn region factorQuotation9 contained matchgroup=hlLevel9 start=/\v<%(%(%('|\$|)\[)|\[%(let|\|))>/  end=/\v<\]>/ contains=@factorCluster,factorQuotation0,factorArray0
-endif
-
-if exists("g:factor_norainbow")
-    syn region factorArray     matchgroup=factorDelimiter start=/\v<%(\$|[-a-zA-Z0-9]+)?\{>/ matchgroup=factorDelimiter end=/\v<}>/ contains=ALL
-else
-    syn region factorArray0           matchgroup=hlLevel0 start=/\v<%(\$|[-a-zA-Z0-9]+)?\{>/ end=/\v<}>/ contains=@factorCluster,factorArray1,factorQuotation1
-    syn region factorArray1 contained matchgroup=hlLevel1 start=/\v<%(\$|[-a-zA-Z0-9]+)?\{>/ end=/\v<}>/ contains=@factorCluster,factorArray2,factorQuotation2
-    syn region factorArray2 contained matchgroup=hlLevel2 start=/\v<%(\$|[-a-zA-Z0-9]+)?\{>/ end=/\v<}>/ contains=@factorCluster,factorArray3,factorQuotation3
-    syn region factorArray3 contained matchgroup=hlLevel3 start=/\v<%(\$|[-a-zA-Z0-9]+)?\{>/ end=/\v<}>/ contains=@factorCluster,factorArray4,factorQuotation4
-    syn region factorArray4 contained matchgroup=hlLevel4 start=/\v<%(\$|[-a-zA-Z0-9]+)?\{>/ end=/\v<}>/ contains=@factorCluster,factorArray5,factorQuotation5
-    syn region factorArray5 contained matchgroup=hlLevel5 start=/\v<%(\$|[-a-zA-Z0-9]+)?\{>/ end=/\v<}>/ contains=@factorCluster,factorArray6,factorQuotation6
-    syn region factorArray6 contained matchgroup=hlLevel6 start=/\v<%(\$|[-a-zA-Z0-9]+)?\{>/ end=/\v<}>/ contains=@factorCluster,factorArray7,factorQuotation7
-    syn region factorArray7 contained matchgroup=hlLevel7 start=/\v<%(\$|[-a-zA-Z0-9]+)?\{>/ end=/\v<}>/ contains=@factorCluster,factorArray8,factorQuotation8
-    syn region factorArray8 contained matchgroup=hlLevel8 start=/\v<%(\$|[-a-zA-Z0-9]+)?\{>/ end=/\v<}>/ contains=@factorCluster,factorArray9,factorQuotation9
-    syn region factorArray9 contained matchgroup=hlLevel9 start=/\v<%(\$|[-a-zA-Z0-9]+)?\{>/ end=/\v<}>/ contains=@factorCluster,factorArray0,factorQuotation0
-endif
-
-syn match factorBracketErr /\v<\]>/
-syn match factorBracketErr /\v<}>/
-
-syn sync lines=100
-
-if version >= 508 || !exists("did_factor_syn_inits")
-    if version <= 508
-        let did_factor_syn_inits = 1
-        command -nargs=+ HiLink hi link <args>
-    else
-        command -nargs=+ HiLink hi def link <args>
-    endif
-
-    HiLink factorComment                Comment
-    HiLink factorShebang                PreProc
-    HiLink factorShebangErr             Error
-    HiLink factorStackEffect            Typedef
-    HiLink factorStackDelims            Delimiter
-    HiLink factorCallExecuteDelim       Delimiter
-    HiLink factorStackVariables         Special
-    HiLink factorStackItems             Identifier
-    HiLink factorLiteralStackEffect     Typedef
-    HiLink factorTodo                   Todo
-    HiLink factorInclude                Include
-    HiLink factorRepeat                 Repeat
-    HiLink factorConditional            Conditional
-    HiLink factorKeyword                Keyword
-    HiLink factorCallQuotation          Keyword
-    HiLink factorExecute                Keyword
-    HiLink factorCallNextMethod         Keyword
-    HiLink factorOperator               Operator
-    HiLink factorFrySpecifier           Operator
-    HiLink factorBoolean                Boolean
-    HiLink factorBreakpoint             Debug
-    HiLink factorDefnDelims             Typedef
-    HiLink factorMethodDelims           Typedef
-    HiLink factorGenericDelims          Typedef
-    HiLink factorGenericNDelims         Typedef
-    HiLink factorConstructor            Typedef
-    HiLink factorConstructor2           Typedef
-    HiLink factorPrivate                Special
-    HiLink factorPrivateDefnDelims      Special
-    HiLink factorPrivateMethodDelims    Special
-    HiLink factorPGenericDelims         Special
-    HiLink factorPGenericNDelims        Special
-    HiLink factorEscape                 SpecialChar
-    HiLink factorString                 String
-    HiLink factorTriString              String
-    HiLink factorSbuf                   String
-    HiLink factorMultiStringContents    String
-    HiLink factorMultiStringDelims      Typedef
-    HiLink factorBracketErr             Error
-    HiLink factorComplex                Number
-    HiLink factorPosRatio               Number
-    HiLink factorNegRatio               Number
-    HiLink factorBinary                 Number
-    HiLink factorBinErr                 Error
-    HiLink factorHex                    Number
-    HiLink factorHexErr                 Error
-    HiLink factorNan                    Number
-    HiLink factorOctal                  Number
-    HiLink factorOctErr                 Error
-    HiLink factorFloat                  Float
-    HiLink factorInt                    Number
-    HiLink factorUsing                  Include
-    HiLink factorQualified              Include
-    HiLink factorQualifiedWith          Include
-    HiLink factorExclude                Include
-    HiLink factorFrom                   Include
-    HiLink factorRename                 Include
-    HiLink factorUse                    Include
-    HiLink factorUnuse                  Include
-    HiLink factorIn                     Define
-    HiLink factorChar                   Character
-    HiLink factorDelimiter              Delimiter
-    HiLink factorBackslash              Special
-    HiLink factorMBackslash             Special
-    HiLink factorLiteral                Special
-    HiLink factorLiteralBlock           Special
-    HiLink factorDeclaration            Typedef
-    HiLink factorSymbol                 Define
-    HiLink factorSymbols                Define
-    HiLink factorConstant               Define
-    HiLink factorAlias                  Define
-    HiLink factorSingleton              Define
-    HiLink factorSingletons             Define
-    HiLink factorMixin                  Typedef
-    HiLink factorInstance               Typedef
-    HiLink factorHook                   Typedef
-    HiLink factorMain                   Define
-    HiLink factorPostpone               Define
-    HiLink factorDefer                  Define
-    HiLink factorForget                 Define
-    HiLink factorAlien                  Define
-    HiLink factorSlot                   Define
-    HiLink factorIntersection           Typedef
-    HiLink factorTuple                  Typedef
-    HiLink factorError                  Typedef
-    HiLink factorUnion                  Typedef
-    HiLink factorStruct                 Typedef
-
-    if &bg == "dark"
-        hi   hlLevel0 ctermfg=red         guifg=red1
-        hi   hlLevel1 ctermfg=yellow      guifg=orange1
-        hi   hlLevel2 ctermfg=green       guifg=yellow1
-        hi   hlLevel3 ctermfg=cyan        guifg=greenyellow
-        hi   hlLevel4 ctermfg=magenta     guifg=green1
-        hi   hlLevel5 ctermfg=red         guifg=springgreen1
-        hi   hlLevel6 ctermfg=yellow      guifg=cyan1
-        hi   hlLevel7 ctermfg=green       guifg=slateblue1
-        hi   hlLevel8 ctermfg=cyan        guifg=magenta1
-        hi   hlLevel9 ctermfg=magenta     guifg=purple1
-    else
-        hi   hlLevel0 ctermfg=red         guifg=red3
-        hi   hlLevel1 ctermfg=darkyellow  guifg=orangered3
-        hi   hlLevel2 ctermfg=darkgreen   guifg=orange2
-        hi   hlLevel3 ctermfg=blue        guifg=yellow3
-        hi   hlLevel4 ctermfg=darkmagenta guifg=olivedrab4
-        hi   hlLevel5 ctermfg=red         guifg=green4
-        hi   hlLevel6 ctermfg=darkyellow  guifg=paleturquoise3
-        hi   hlLevel7 ctermfg=darkgreen   guifg=deepskyblue4
-        hi   hlLevel8 ctermfg=blue        guifg=darkslateblue
-        hi   hlLevel9 ctermfg=darkmagenta guifg=darkviolet
-    endif
-
-    delcommand HiLink
-endif
-
-let b:current_syntax = "factor"
-
-" vim:set ft=vim sw=4:
+[=[ let b:factor_syn_no_generated = 1
+]=] wr nl
+! Modeline is broken up to prevent detection here.
+[=[ " vim]=] wr [=[ :set ft=vim sw=2:]=] wr nl
+! vim:set ft=factor:
