@@ -73,12 +73,15 @@ ui.gadgets.editors ui.gestures ui.tools.listener ;
 editor \"emacs\" f {
     { T{ key-down f { C+ } \"b\" } previous-character }
     { T{ key-down f { C+ } \"f\" } next-character }
-    { T{ key-down f { C+ } \"p\" } previous-line }
-    { T{ key-down f { C+ } \"n\" } next-line }
     { T{ key-down f { C+ } \"u\" } delete-to-start-of-line }
     { T{ key-down f { C+ } \"k\" } delete-to-end-of-line }
     { T{ key-down f { C+ } \"a\" } start-of-line }
     { T{ key-down f { C+ } \"e\" } end-of-line }
+} define-command-map
+
+multiline-editor \"emacs\" f {
+    { T{ key-down f { C+ } \"p\" } previous-line }
+    { T{ key-down f { C+ } \"n\" } next-line }
 } define-command-map
 
 \"interactor\" interactor get-command-at [
