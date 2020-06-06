@@ -88,8 +88,8 @@ debugger "gestures" f {
 \ com-edit H{ { +listener+ t } } define-command
 
 debugger "toolbar" f {
-    { T{ key-down f { C+ } "I" } com-inspect }
-    { T{ key-down f { C+ } "T" } com-traceback }
-    { T{ key-down f { C+ } "H" } com-help }
-    { T{ key-down f { C+ } "E" } com-edit }
+    { T{ key-down f { A+ } "i" } com-inspect }
+    { T{ key-down f { A+ } "t" } com-traceback }
+    { T{ key-down f { A+ } "d" } com-help }
+    { T{ key-down f { A+ } "e" } com-edit }
 } define-command-map
