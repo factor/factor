@@ -1,10 +1,10 @@
 ! Generate a new factor.vim file for syntax highlighting
-USING: html.templates html.templates.fhtml io.files io.pathnames ;
+USING: io.encodings.utf8 io.files parser ;
 IN: editors.vim.generate-syntax
 
 : generate-vim-syntax ( -- )
-    "resource:misc/factor.vim.fgen" <fhtml>
-    "resource:misc/vim/syntax/factor.vim"
-    template-convert ;
+    "resource:misc/vim/syntax/factor/generated.vim"
+    utf8 "resource:misc/factor.vim.fgen" parse-file
+    with-file-writer ;
 
 MAIN: generate-vim-syntax
