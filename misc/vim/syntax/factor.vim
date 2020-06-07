@@ -171,25 +171,26 @@ syn match   factorPosRatio              /\v<\+=[0-9]%([0-9,]*[0-9])?%(\+[0-9]%([
 syn match   factorNegRatio              /\v<\-[0-9]%([0-9,]*[0-9])?%(\-[0-9]%([0-9,]*[0-9]+)?)?\/-=[0-9]%([0-9,]*[0-9]+)?\.?>/
 syn region  factorComplex         start=/\v<C\{>/   end=/\v<\}>/    contains=@factorReal
 syn cluster factorBin                   contains=factorBin
+syn match   factorBin                   /\v<[+-]=0b[01,]+>/
 if !exists('g:factor_syn_no_error')
-  syn match   factorBinError            /\v\<[+-]=0b[01,]*[^01 ]\S*\>/
+  syn match   factorBinError            /\v<[+-]=0b[01,]*[^01 ]\S*>/
   syn cluster factorBin                 add=factorBinError
 endif
-syn match   factorBin                   /\v\<[+-]=0b[01,]\+\>/
 syn cluster factorHexNoRadixTrans       contains=factorHexNoRadixTrans
+syn match   factorHexNoRadixTrans       /\v<[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?%(\.[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?)?%(p-=[0-9]%([0-9,]*[0-9])?)?>/ contained transparent
 syn cluster factorHex                   contains=factorHex
+syn match   factorHex                   /\v<[+-]=0x[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?%(\.[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?)?%(p-=[0-9]%([0-9,]*[0-9])?)?>/
 if !exists('g:factor_syn_no_error')
   syn match   factorHexNoRadixError     /\v<%(,\S*|\S*,|[-0-9a-fA-Fp,]*[^-0-9a-fA-Fp, ]\S*)>/ contained
   syn cluster factorHexNoRadixTrans     add=factorHexNoRadixError
   syn match   factorHexError            /\v<[+-]=0x%(,\S*|\S*,|[-0-9a-fA-Fp,]*[^-0-9a-fA-Fp, ]\S*)>/
   syn cluster factorHex                 add=factorHexError
 endif
-syn match   factorHexNoRadixTrans       /\v<[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?%(\.[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?)?%(p-=[0-9]%([0-9,]*[0-9])?)?>/ contained transparent
-syn match   factorHex                   /\v<[+-]=0x[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?%(\.[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?)?%(p-=[0-9]%([0-9,]*[0-9])?)?>/
 syn cluster factorOct                   contains=factorOct
+syn match   factorOct                   /\v<[+-]=0o[0-7,]+>/
 if !exists('g:factor_syn_no_error')
   syn match   factorOctError             /\v<[+-]=0o%(,\S*|\S*,|[0-7,]*[^0-7, ]\S*)>/
-  syn cluster factorOct                 contains=factorOctError
+  syn cluster factorOct                 add=factorOctError
 endif
 syn match   factorOct                   /\v<[+-]=0o[0-7,]+>/
 syn region  factorNan matchgroup=factorNan start=/\v<NAN:>/ matchgroup=NONE end=/\v<\S+>/ contains=@factorComment,@factorHexNoRadixTrans
