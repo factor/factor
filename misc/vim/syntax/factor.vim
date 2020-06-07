@@ -170,7 +170,7 @@ syn match   factorFloat                 /\v<[+-]=%([0-9,]*[0-9])?%(\.%(%([0-9,]*
 syn match   factorPosRatio              /\v<\+=[0-9]%([0-9,]*[0-9])?%(\+[0-9]%([0-9,]*[0-9]+)?)?\/-=[0-9]%([0-9,]*[0-9]+)?\.?>/
 syn match   factorNegRatio              /\v<\-[0-9]%([0-9,]*[0-9])?%(\-[0-9]%([0-9,]*[0-9]+)?)?\/-=[0-9]%([0-9,]*[0-9]+)?\.?>/
 syn region  factorComplex         start=/\v<C\{>/   end=/\v<\}>/    contains=@factorReal
-syn match   factorBin                   /\v<[+-]=0b[01,]\+>/
+syn match   factorBin                   /\v<[+-]=0b[01,]+>/
 syn cluster factorBin                   add=factorBin
 if !exists('g:factor_syn_no_error')
   syn match   factorBinError            /\v<[+-]=0b[01,]*[^01 ]\S*>/
