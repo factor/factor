@@ -142,7 +142,7 @@ syn match   factorCallQuotation     /\vcall\V(\v/me=e-1    nextgroup=@factorStac
 syn match   factorExecute           /\vexecute\V(\v/me=e-1 nextgroup=@factorStackEffect
 syn keyword factorCallNextMethod    call-next-method
 
-syn region  factorChar        start=/\v<CHAR:>/ end=/\v\S+/
+syn region  factorChar        start=/\v<CHAR:>/ end=/\v\S+>/
 
 syn cluster factorString            contains=factorString,factorTriString,factorPrefixedString
 syn match   factorEscape            /\v\\([\\astnrbvf0e\"]|u\x{6}|u\{\S+}|x\x{2})/  contained display
@@ -166,32 +166,32 @@ syn region  factorMultilineCComment matchgroup=factorMultilineCCommentDelims  st
 syn cluster factorReal                  contains=factorInt,factorFloat,factorPosRatio,factorNegRatio,@factorBin,@factorHex,@factorOct,factorNan
 syn cluster factorNumber                contains=@factorReal,factorComplex
 syn match   factorInt                   /\v<[+-]=[0-9]%([0-9,]*[0-9])?%([eE]%([+-])?[0-9]+)?>/
-syn match   factorFloat                 /\v<[+-]=%([0-9,]*[0-9])?%(\.%(%([0-9,]*[0-9]+)?%([eE]%([+-])?[0-9]+)?)?)?>/
+syn match   factorFloat                 /\v<[+-]=[0-9]%([0-9,]*[0-9])?%(\.%(%([0-9,]*[0-9]+)?%([eE]%([+-])?[0-9]%([0-9,]*[0-9])?)?)?)?>/
 syn match   factorPosRatio              /\v<\+=[0-9]%([0-9,]*[0-9])?%(\+[0-9]%([0-9,]*[0-9]+)?)?\/-=[0-9]%([0-9,]*[0-9]+)?\.?>/
 syn match   factorNegRatio              /\v<\-[0-9]%([0-9,]*[0-9])?%(\-[0-9]%([0-9,]*[0-9]+)?)?\/-=[0-9]%([0-9,]*[0-9]+)?\.?>/
 syn region  factorComplex         start=/\v<C\{>/   end=/\v<\}>/    contains=@factorReal
-syn match   factorBin                   /\v<[+-]=0b[01,]+>/
-syn cluster factorBin                   add=factorBin
+syn cluster factorBin                   contains=factorBin
 if !exists('g:factor_syn_no_error')
-  syn match   factorBinError            /\v<[+-]=0b[01,]*[^01 ]\S*>/
-  syn cluster factorBin                 contains=factorBinError
+  syn match   factorBinError            /\v\<[+-]=0b[01,]*[^01 ]\S*\>/
+  syn cluster factorBin                 add=factorBinError
 endif
-syn match   factorHexNoRadixTrans       /\v<[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?%(\.[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?)?%(p-=[0-9]%([0-9,]*[0-9])?)?>/ contained transparent
-syn cluster factorHexNoRadixTrans       add=factorHexNoRadixTrans
-syn match   factorHex                   /\v<[+-]=0x[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?%(\.[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?)?%(p-=[0-9]%([0-9,]*[0-9])?)?>/
-syn cluster factorHex                   add=factorHex
+syn match   factorBin                   /\v\<[+-]=0b[01,]\+\>/
+syn cluster factorHexNoRadixTrans       contains=factorHexNoRadixTrans
+syn cluster factorHex                   contains=factorHex
 if !exists('g:factor_syn_no_error')
   syn match   factorHexNoRadixError     /\v<%(,\S*|\S*,|[-0-9a-fA-Fp,]*[^-0-9a-fA-Fp, ]\S*)>/ contained
-  syn cluster factorHexNoRadixTrans     contains=factorHexNoRadixError
+  syn cluster factorHexNoRadixTrans     add=factorHexNoRadixError
   syn match   factorHexError            /\v<[+-]=0x%(,\S*|\S*,|[-0-9a-fA-Fp,]*[^-0-9a-fA-Fp, ]\S*)>/
-  syn cluster factorHex                 contains=factorHexError
+  syn cluster factorHex                 add=factorHexError
 endif
-syn match   factorOct                   /\v<[+-]=0o[0-7,]+>/
-syn cluster factorOct                   add=factorOct
+syn match   factorHexNoRadixTrans       /\v<[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?%(\.[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?)?%(p-=[0-9]%([0-9,]*[0-9])?)?>/ contained transparent
+syn match   factorHex                   /\v<[+-]=0x[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?%(\.[0-9a-fA-F]%([0-9a-fA-F,]*[0-9a-fA-F])?)?%(p-=[0-9]%([0-9,]*[0-9])?)?>/
+syn cluster factorOct                   contains=factorOct
 if !exists('g:factor_syn_no_error')
   syn match   factorOctError             /\v<[+-]=0o%(,\S*|\S*,|[0-7,]*[^0-7, ]\S*)>/
   syn cluster factorOct                 contains=factorOctError
 endif
+syn match   factorOct                   /\v<[+-]=0o[0-7,]+>/
 syn region  factorNan matchgroup=factorNan start=/\v<NAN:>/ matchgroup=NONE end=/\v<\S+>/ contains=@factorComment,@factorHexNoRadixTrans
 
 syn region  factorBackslash       start=/\v<\\>/   skip=/\v<!>/ end=/\v<\S+>/   contains=@factorComment
@@ -276,7 +276,7 @@ syn cluster factorStackEffect           contains=factorStackEffect
 " Erroring on stack effects without a "--" separator would be nice.
 " Unfortunately, that sort of vacuous detection is above Vim's pay-grade,
 "   especially when stack effects can be nested arbitrarily via types.
-syn match   factorStackEffectSkip   /\v%(\_\s+%(!>.*)?)*/ nextgroup=factorStackEffectRequired,@factorStackEffect transparent contained
+syn match   factorStackEffectSkip       /\v%(\_\s+%(!>.*)?)*/ nextgroup=factorStackEffectRequired,@factorStackEffect transparent contained
 syn region  factorStackEffect       matchgroup=factorStackEffectDelims    start=/\v\V(\v>/  end=/\v<\V)\v>/ contains=@factorStackEffectContents
 syn match   factorStackEffectVar        /\v<\S+>/           contained
 " Note that ":!" parses to the "!" word and doesn't lex as a comment.
@@ -285,10 +285,10 @@ syn match   factorStackEffectVar        /\v<\S+>/           contained
 "   "factorStackEffectType".
 " syn cluster factorStackEffectType contains=factorWord,@factorStackEffect
 syn cluster factorStackEffectType       contains=@factorClusterValue
-syn region  factorStackEffectVar    matchgroup=factorStackEffectVar       start=/v<\S+:>/       matchgroup=NONE end=/\v%(\_\s+%(!>.*)?)+/ contains=@factorComment nextgroup=@factorStackEffectType transparent contained
+syn region  factorStackEffectVar    matchgroup=factorStackEffectVar       start=/\v<\S+:>/       matchgroup=NONE end=/\v%(\_\s+%(!>.*)?)+/ contains=@factorComment nextgroup=@factorStackEffectType transparent contained
 syn match   factorStackEffectType       /\v<:/              contained nextgroup=@factorStackEffectType
 syn match   factorStackEffectRowVar     /\v<\.\.\S+>/       contained
-syn region  factorStackEffectRowVar matchgroup=factorStackEffectRowVar    start=/v<\.\.\S+:>/   matchgroup=NONE end=/\v%(\_\s+%(!>.*)?)+/ contains=@factorComment nextgroup=@factorStackEffectType transparent contained
+syn region  factorStackEffectRowVar matchgroup=factorStackEffectRowVar    start=/\v<\.\.\S+:>/   matchgroup=NONE end=/\v%(\_\s+%(!>.*)?)+/ contains=@factorComment nextgroup=@factorStackEffectType transparent contained
 syn match   factorStackEffectDelims     /\v<-->/            contained
 if !exists('g:factor_syn_no_error')
   syn cluster factorStackEffectContents add=factorStackEffectError
