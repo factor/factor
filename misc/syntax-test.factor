@@ -63,6 +63,27 @@
     SLOT: name
     C: <foo> foo
 
+! Private definitions
+
+<PRIVATE
+
+    : word ( x -- ) drop ;
+    :: word ( x -- ) x drop ;
+    TYPED: word ( a b: class ... -- x: class y ... ) body ;
+    TYPED:: word ( a b: class ... -- x: class y ... ) body ;
+    MACRO: word ( inputs... -- ) definition... ) ;
+    MACRO:: word ( vars... -- outputs... ) definition... ) ;
+    M: class generic (definition) ... ;
+    M:: class generic ( vars... -- outputs... ) body... ;
+    GENERIC: word ( stack -- effect )
+    HOOK: word variable ( stack -- effect )
+    GENERIC#: word 1 ( stack -- effect )
+    MATH: + ( x y -- z ) foldable flushable
+    SLOT: name
+    C: <foo> foo
+
+PRIVATE>
+
 ! Alien
 
     LIBRARY: name
