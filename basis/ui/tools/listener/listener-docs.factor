@@ -56,12 +56,12 @@ $nl
 { $table
     { "Ctrl-b" "Move cursor to previous character" }
     { "Ctrl-f" "Move cursor to next character" }
-    { "Ctrl-p" "Move cursor to previous line" }
-    { "Ctrl-n" "Move cursor to next line" }
-    { "Ctrl-u" "Delete to start of line" }
-    { "Ctrl-k" "Delete to end of line" }
     { "Ctrl-a" "Move cursor to start of line" }
     { "Ctrl-e" "Move cursor to end of line" }
+    { "Ctrl-u" "Delete to start of line" }
+    { "Ctrl-k" "Delete to end of line" }
+    { "Ctrl-p" "Move cursor to previous line" }
+    { "Ctrl-n" "Move cursor to next line" }
 }
 $nl
 "Then you can run the following code, or add it to your " { $link ".factor-rc" } "."
@@ -73,10 +73,10 @@ ui.gadgets.editors ui.gestures ui.tools.listener ;
 editor \"emacs\" f {
     { T{ key-down f { C+ } \"b\" } previous-character }
     { T{ key-down f { C+ } \"f\" } next-character }
-    { T{ key-down f { C+ } \"u\" } delete-to-start-of-line }
-    { T{ key-down f { C+ } \"k\" } delete-to-end-of-line }
     { T{ key-down f { C+ } \"a\" } start-of-line }
     { T{ key-down f { C+ } \"e\" } end-of-line }
+    { T{ key-down f { C+ } \"u\" } delete-to-start-of-line }
+    { T{ key-down f { C+ } \"k\" } delete-to-end-of-line }
 } define-command-map
 
 multiline-editor \"emacs\" f {
