@@ -192,7 +192,7 @@ if !exists('g:factor_syn_no_error')
   syn cluster factorOct                 add=factorOctError
 endif
 syn match   factorOct                   /\v<[+-]=0o[0-7,]+>/
-syn region  factorNan matchgroup=factorNan start=/\v<NAN:>/ matchgroup=NONE end=/\v<\S+>/ contains=@factorComment,@factorHexNoRadixTrans
+syn region  factorNan matchgroup=factorNan start=/\v<NAN:>/ matchgroup=NONE end=/\v<\S+>/ contains=@factorComment contains=@factorHexNoRadixTrans
 
 syn region  factorBackslash       start=/\v<\\>/   skip=/\v<!>/ end=/\v<\S+>/   contains=@factorComment
 syn region  factorMBackslash      start=/\v<M\\>/  skip=/\v<!>/ end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment
@@ -214,7 +214,7 @@ syn region  factorSymbol          start=/\v<SYMBOL:>/          skip=/\v<!>/ end=
 syn region  factorSymbols         start=/\v<SYMBOLS:>/                      end=/\v<;>/     contains=@factorComment
 syn region  factorConstructor2    start=/\v<CONSTRUCTOR:?/                  end=/\v<;>/     contains=@factorComment
 syn region  factorIntersection    start=/\v<INTERSECTION:>/                 end=/\v<;>/     contains=@factorComment
-syn cluster factorSlotAttr              contains=factorSlotAttrInitial,factorSlotAttrReadOnly
+syn cluster factorSlotAttr              contains=factorSlotAttrInitial contains=factorSlotAttrReadOnly
 syn cluster factorTupleSlotAttr         contains=@factorSlotAttr
 syn match   factorTupleSlotName         /\v<\S+>/ nextgroup=factorTupleSlotClassSkip contained
 syn match   factorTupleSlotNameSkip     /\v%(\_\s+%(!>.*)?)*/ nextgroup=factorTupleSlotName transparent contained
@@ -399,8 +399,8 @@ if !exists('g:factor_syn_no_init')
   HiLink   factorPrivate                Special
   HiLink   factorPDefnDelims            Special
   HiLink   factorPMethodDelims          Special
-  HiLink   factorPGenericDelims         Special
-  HiLink   factorPGenericNDelims        Special
+  HiLink   factorPGeneric               Special
+  HiLink   factorPGenericN              Special
   HiLink   factorEscape                 SpecialChar
   HiLink   factorString                 String
   HiLink   factorStringDelims           factorString
