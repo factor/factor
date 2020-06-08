@@ -1,9 +1,9 @@
 " Vim syntax file
 " Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
-" Last Change: 2020 Jun 05
+" Last Change: 2020 Jun 08
 " Minimum Version: 600
-" To regenerate: USING: io.encodings.utf8 io.files parser ; "resource:misc/vim/syntax/factor/generated.vim" utf8 "resource:misc/factor.vim.fgen" parse-file with-file-writer
+" To regenerate: USE: editors.vim.generate-syntax generate-vim-syntax
 
 if exists('b:factorsyn_no_generated')
   finish
