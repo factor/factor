@@ -49,16 +49,40 @@
 ! Definitions
 
     : word ( x -- ) drop ;
+    : word error drop ;
     :: word ( x -- ) x drop ;
     TYPED: word ( a b: class ... -- x: class y ... ) body ;
     TYPED:: word ( a b: class ... -- x: class y ... ) body ;
     MACRO: word ( inputs... -- ) definition... ) ;
     MACRO:: word ( vars... -- outputs... ) definition... ) ;
-    M: class generic (definition) ... ;
+    M: object explain drop "an object" print ;
+    M: class generic definition... ;
     M:: class generic ( vars... -- outputs... ) body... ;
+    M:: class generic error body... ;
     GENERIC: word ( stack -- effect )
+    GENERIC: word
+        ( stack -- effect )
+    GENERIC: word
+( stack -- effect )
+    GENERIC: word ! comment
+        ( stack -- effect )
+    GENERIC: word drop ! 3rd token wrong
+    GENERIC: word ! next line wrong
+        drop
+    GENERIC: word
+drop ! wrong
     HOOK: word variable ( stack -- effect )
     GENERIC#: word 1 ( stack -- effect )
+    GENERIC#: ! comment
+        word 1 ( stack -- effect )
+    GENERIC#: word 1 ( stack -- effect ) drop ! last token other
+    GENERIC#: word ! 2 should GENERIC# stack effect error
+        1 2 ( stack -- effect )
+    GENERIC#: word ! 2nd eff. should be independent of GENERIC#,
+        1 ! and 2 & 3 shouldn't GENERIC# highlight
+        ( stack -- effect ) ( independent -- effect ) 2 3
+    GENERIC#: word 1 ! comment
+        drop ! wrong
     MATH: + ( x y -- z ) foldable flushable
     SLOT: name
     C: <foo> foo
@@ -73,7 +97,7 @@
     TYPED:: word ( a b: class ... -- x: class y ... ) body ;
     MACRO: word ( inputs... -- ) definition... ) ;
     MACRO:: word ( vars... -- outputs... ) definition... ) ;
-    M: class generic (definition) ... ;
+    M: class generic definition... ;
     M:: class generic ( vars... -- outputs... ) body... ;
     GENERIC: word ( stack -- effect )
     HOOK: word variable ( stack -- effect )
@@ -226,12 +250,25 @@ PRIVATE>
     -1.5e30
     1.5e-30
     1,000.1,2
-    0xCAFEBABE
+    0XCAFEBABE
     0x1AB4p30
-    0b10101
-    0o1234567
-    NAN: CAFE1234
+    0B10101
+    0O1234567
+    NAN: CAFE1234 0,. ! third token wrong
+    0,. ! wrong, next line also wrong
+    0,.
+    NAN: ! ff 0xff comment
+        xCAFE1234 ! wrong
+        ff ! shouldn't match as a hex number
+    0o7
     NAN: 0
+    drop
+    NAN: !
+        ! a 1 comment 1
+        f
+
+    NAN:
+f,
 
 ! Not numbers
 
@@ -270,6 +307,8 @@ PRIVATE>
 
     ( x n -- (x)n )
 
+    ( p:
+boolean -- q: boolean )
     ( m: integer -- n: float )
     ( :integer -- :float )
 
@@ -304,8 +343,33 @@ tail?
 -0.1
 -0,1.1
 1.
-.  ! wrong
--. ! wrong
+.  ! other
+-. ! other
+
+! Numeral comma separator parsing (!: wrong, ~: other):
+  ! int
+  0 00 0,0 +0,0 -0,,0
+  /* ! */ ,0 ,00 0,, 00,, +,0 -,,0 +0, -0,, /* ~ */ , +, -,,
+
+  ! float
+  0,0e0 0e0,0 0,0e0,0 +0,0e+0,0 -0,0e-0,0
+  /* ~ */ e e, ,e ,e, +e -e +e, -e,
+  /* ~ */ +e -e +,e -,e +e+, -e-, +,e-,, -,,e+,
+  /* ~ */ +e -e +,e -,e +e+, -e-, +,e-,, -,,e+,
+  /* ! */ e0, -e,0 ,0e, 0,e, +,e0 -,e-0 0,e0 +0,0e+ -0,0e-,, 0e+ -0e-
+  /* ! */ +0e+0, -0e-,,0
+
+  ! float
+  0,0. .0,0 /* ! */ 0,. .,0 ,.0 0., ,0. .0,
+  +0,0.0 -0,0.0,0
+  0,0.0,0e0 0,0.0,0e0,0
+  0,0.0,0e+0,0 0,0.0,0e-0,0
+
+  ! ratio
+  /* ~ */ / /. +/ -/ ,/ /, 0/ /0
+  0/1 1/1 1/1. 1/0. 0/0. /* ! */ 0/0 1/0 1./1
+  1/2 +1/2 -1/2 +2/2 /* ! */ 1/+2 1/-2 1/+0 +2/+2
+  +1+1/2 -0-1/2 /* ! */ +1+2/2 +1+1/2. +0-1/2 -0+1/2
 
 ! Regexp is colored wrong (on Github):
 
