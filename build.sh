@@ -284,6 +284,7 @@ find_os() {
         *linux*) OS=linux;;
         *Linux*) OS=linux;;
         FreeBSD) OS=freebsd;;
+        Haiku) OS=haiku;;
     esac
 }
 
