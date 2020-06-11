@@ -1,9 +1,8 @@
 ! Copyright (C) 2013 Björn Lindqvist, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license
-USING: alien.libraries.finder arrays assocs
-combinators.short-circuit io io.encodings.utf8
-io.launcher kernel sequences sets splitting system
-unicode ;
+USING: alien.libraries.finder arrays assocs combinators.short-circuit
+continuations io io.encodings.utf8 io.launcher kernel sequences sets splitting
+system unicode ;
 IN: alien.libraries.finder.linux
 
 <PRIVATE
@@ -25,8 +24,13 @@ CONSTANT: mach-map {
     ] map ;
 
 : load-ldconfig-cache ( -- seq )
-    "/sbin/ldconfig -p" utf8 [ lines ] with-process-reader
-    rest parse-ldconfig-lines ;
+    [
+        "/sbin/ldconfig -p" utf8 [ lines ] with-process-reader
+        rest parse-ldconfig-lines
+    ] [
+        dup process-failed?
+        [ drop f ] [ rethrow ] if
+    ] recover ;
 
 : ldconfig-arch ( -- str )
     mach-map cpu of { "libc6" } or ;
