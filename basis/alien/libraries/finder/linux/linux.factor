@@ -1,8 +1,8 @@
 ! Copyright (C) 2013 Björn Lindqvist, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license
 USING: alien.libraries.finder arrays assocs
-combinators.short-circuit io io.encodings.utf8 io.files
-io.files.info io.launcher kernel sequences sets splitting system
+combinators.short-circuit io io.encodings.utf8
+io.launcher kernel sequences sets splitting system
 unicode ;
 IN: alien.libraries.finder.linux
 
