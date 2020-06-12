@@ -9,7 +9,7 @@ math.vectors namespaces sequences strings system threads ui ui.backend
 ui.backend.gtk.input-methods ui.backend.gtk.io ui.backend.x11.keys
 ui.clipboards ui.event-loop ui.gadgets ui.gadgets.private
 ui.gadgets.worlds ui.gestures ui.pixel-formats
-ui.pixel-formats.private ui.private vocabs.loader ;
+ui.private vocabs.loader ;
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend

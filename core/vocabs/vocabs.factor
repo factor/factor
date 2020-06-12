@@ -47,6 +47,11 @@ M: vocab lookup-vocab ;
 
 M: object lookup-vocab vocab-name dictionary get at ;
 
+ERROR: no-vocab-named name ;
+
+: ?lookup-vocab ( vocab-spec -- vocab )
+    dup lookup-vocab [ nip ] [ no-vocab-named ] if* ;
+
 GENERIC: vocab-words-assoc ( vocab-spec -- assoc/f )
 
 M: vocab vocab-words-assoc words>> ;
@@ -156,3 +161,6 @@ M: string require
 
 : load-vocab ( name -- vocab )
     [ require ] [ lookup-vocab ] bi ;
+
+: ?load-vocab ( name -- vocab )
+    [ require ] [ ?lookup-vocab ] bi ;
