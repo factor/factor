@@ -312,7 +312,7 @@ HELP: unless-zero
 HELP: times
 { $values { "n" integer } { "quot" quotation } }
 { $description "Calls the quotation " { $snippet "n" } " times." }
-{ $notes "If you need to pass the current index to the quotation, use " { $link each } "." }
+{ $notes "If you need to pass the current index to the quotation, use " { $link each-integer } "." }
 { $examples
     { $example "USING: io math ;" "3 [ \"Hi\" print ] times" "Hi\nHi\nHi" }
 } ;
