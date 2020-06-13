@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs definitions hashtables kernel
 kernel.private math math.order namespaces quotations sequences
-slots.private strings vocabs ;
+sets slots.private strings vocabs ;
 IN: words
 
 BUILTIN: word
@@ -178,7 +178,7 @@ M: word reset-word
     {
         "unannotated-def" "parsing" "inline" "recursive"
         "foldable" "flushable" "reading" "writing" "reader"
-        "writer" "delimiter" "deprecated"
+        "writer" "delimiter" "deprecated" "sections"
     } remove-word-props ;
 
 : reset-generic ( word -- )

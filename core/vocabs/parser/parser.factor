@@ -3,8 +3,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.units
 continuations hash-sets hashtables kernel math namespaces
-parser.notes sequences sets sorting splitting vectors vocabs
-words ;
+parser.notes sections sequences sets sorting splitting system
+vectors vocabs words ;
 IN: vocabs.parser
 
 ERROR: no-word-error name ;
@@ -27,21 +27,24 @@ current-vocab
 { search-vocab-names hash-set }
 { search-vocabs vector }
 { qualified-vocabs vector }
-{ auto-used vector } ;
+{ auto-used vector }
+{ sections hash-set } ;
 
 : <manifest> ( -- manifest )
     manifest new
         HS{ } clone >>search-vocab-names
         V{ } clone >>search-vocabs
         V{ } clone >>qualified-vocabs
-        V{ } clone >>auto-used ;
+        V{ } clone >>auto-used
+        HS{ } clone >>sections ;
 
 M: manifest clone
     call-next-method
         [ clone ] change-search-vocab-names
         [ clone ] change-search-vocabs
         [ clone ] change-qualified-vocabs
-        [ clone ] change-auto-used ;
+        [ clone ] change-auto-used
+        [ clone ] change-sections ;
 
 TUPLE: extra-words words ;
 
@@ -95,17 +98,19 @@ TUPLE: no-current-vocab-error ;
 : current-vocab ( -- vocab )
     manifest get current-vocab>> [ no-current-vocab ] unless* ;
 
+: add-manifest-section ( section -- )
+    manifest get sections>> adjoin ;
+
+: remove-manifest-section ( section -- )
+    manifest get sections>> delete ;
+
 ERROR: unbalanced-private-declaration vocab ;
 
 : begin-private ( -- )
-    current-vocab name>> ".private" ?tail
-    [ unbalanced-private-declaration ]
-    [ ".private" append set-current-vocab ] if ;
+    private add-manifest-section ;
 
 : end-private ( -- )
-    current-vocab name>> ".private" ?tail
-    [ set-current-vocab ]
-    [ unbalanced-private-declaration ] if ;
+    private remove-manifest-section ;
 
 : using-vocab? ( vocab -- ? )
     vocab-name manifest get search-vocab-names>> in? ;
