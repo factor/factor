@@ -732,28 +732,37 @@ HELP: MIXIN:
 { $syntax "MIXIN: class" }
 { $values { "class" "a new class word to define" } }
 { $description "Defines a mixin class. A mixin is similar to a union class, except it has no members initially, and new members can be added with the " { $link POSTPONE: INSTANCE: } " word." }
-{ $examples "The " { $link sequence } " and " { $link assoc } " mixin classes." } ;
+{ $examples
+    { $example
+        "USING: prettyprint ;"
+        "IN: scratchpad"
+        "MIXIN: movie-robot"
+        "SINGLETONS: crow-t-robot tom-servo cambot ;"
+        "INSTANCE: crow-t-robot movie-robot"
+        "INSTANCE: tom-servo movie-robot"
+        "INSTANCE: cambot movie-robot"
+        "tom-servo movie-robot? ."
+        "t"
+    }
+    "Also see the " { $link sequence } " and " { $link assoc } " mixin classes."
+} ;
 
 HELP: INSTANCE:
 { $syntax "INSTANCE: instance mixin" }
 { $values { "instance" "a class word" } { "mixin" "a mixin class word" } }
-{ $description "Makes " { $snippet "instance" } " an instance of " { $snippet "mixin" } "." } ;
-
-HELP: PREDICATE:
-{ $syntax "PREDICATE: class < superclass predicate... ;" }
-{ $values { "class" "a new class word to define" } { "superclass" "an existing class word" } { "predicate" "membership test with stack effect " { $snippet "( superclass -- ? )" } } }
-{ $description
-    "Defines a predicate class deriving from " { $snippet "superclass" } "."
-    $nl
-    "An object is an instance of a predicate class if two conditions hold:"
-    { $list
-        "it is an instance of the predicate's superclass,"
-        "it satisfies the predicate"
-    }
-    "Each predicate must be defined as a subclass of some other class. This ensures that predicates inheriting from disjoint classes do not need to be exhaustively tested during method dispatch."
-}
+{ $description "Makes " { $snippet "instance" } " an instance of " { $snippet "mixin" } "." }
 { $examples
-    { $code "USING: math ;" "PREDICATE: positive < integer 0 > ;" }
+    { $example
+        "USING: prettyprint ;"
+        "IN: scratchpad"
+        "MIXIN: movie-robot"
+        "SINGLETONS: crow-t-robot tom-servo cambot ;"
+        "INSTANCE: crow-t-robot movie-robot"
+        "INSTANCE: tom-servo movie-robot"
+        "INSTANCE: cambot movie-robot"
+        "tom-servo movie-robot? ."
+        "t"
+    }
 } ;
 
 HELP: TUPLE:
