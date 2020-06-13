@@ -5,13 +5,14 @@ IN: math.bitwise
 
 HELP: bitfield
 { $values { "values..." "a series of objects on the stack" } { "bitspec" "an array" } { "n" integer } }
-{ $description "Constructs an integer (bit field) from a series of values on the stack together with a bit field specifier, which is an array whose elements have one of the following shapes:"
-{ $list
-    { { $snippet "{ word shift }" } " - " { $snippet "word" } " is applied to the top of the stack and the result is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
-    { { $snippet "shift" } " - the top of the stack is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
-    { { $snippet "{ constant shift }" } " - " { $snippet "constant" } " is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+    { $description "Constructs an integer (bit field) from a series of values on the stack together with a bit field specifier, which is an array whose elements have one of the following shapes:"
+    { $list
+        { { $snippet "{ word shift }" } " - " { $snippet "word" } " is applied to the top of the stack and the result is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+        { { $snippet "shift" } " - the top of the stack is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+        { { $snippet "{ constant shift }" } " - " { $snippet "constant" } " is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+    }
+    "The last entry in the bit field specifier is processed in reverse, so stack values are supplied in reverse order, e.g. the leftmost stack value is the last bit field specifier."
 }
-"The bit field specifier is processed left to right, so stack values should be supplied in reverse order." }
 { $examples
     "Consider the following specification:"
     { $list
@@ -51,12 +52,13 @@ HELP: bitfield
 HELP: bitfield*
 { $values { "values..." "a series of objects on the stack" } { "bitspec" "an array" } { "n" integer } }
 { $description "Constructs an integer (bit field) from a series of values on the stack together with a bit field specifier, which is an array whose elements have one of the following shapes:"
-{ $list
-    { { $snippet "{ word shift }" } " - " { $snippet "word" } " is applied to the top of the stack and the result is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
-    { { $snippet "shift" } " - the top of the stack is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
-    { { $snippet "{ constant shift }" } " - " { $snippet "constant" } " is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+    { $list
+        { { $snippet "{ word shift }" } " - " { $snippet "word" } " is applied to the top of the stack and the result is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+        { { $snippet "shift" } " - the top of the stack is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+        { { $snippet "{ constant shift }" } " - " { $snippet "constant" } " is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+    }
+    "The bit field specifier is processed in order, so stack values are taken from left to right."
 }
-"The bit field specifier is processed left to right, so stack values should be supplied in reverse order." }
 { $examples
     "Consider the following specification:"
     { $list
@@ -80,18 +82,20 @@ HELP: bitfield*
         "1 2 3 baz-bitfield* ."
         "233473"
     }
-    "Square the 3 from the stack and shift 8, place the 1 from the stack at bit 5, and shift a constant 1 to bit 2:"
+    "Put a 1 at bit 1, put the 1 from the stack at bit 5, square the 3 and put it at bit 8:"
     { $example
         "USING: math math.bitwise prettyprint ;"
         "1 3"
         "    {"
-        "        { sq 8 }"
-        "        5"
         "        { 1 2 }"
-        "    } bitfield .b"
+        "        5"
+        "        { sq 8 }"
+        "    } bitfield* .b"
         "0b100100100100"
     }
 } ;
+
+{ bitfield bitfield* } related-words
 
 HELP: bits
 { $values { "m" integer } { "n" integer } { "m'" integer } }
