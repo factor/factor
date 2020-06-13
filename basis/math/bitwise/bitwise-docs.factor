@@ -6,11 +6,11 @@ IN: math.bitwise
 HELP: bitfield
 { $values { "values..." "a series of objects on the stack" } { "bitspec" "an array" } { "n" integer } }
 { $description "Constructs an integer (bit field) from a series of values on the stack together with a bit field specifier, which is an array whose elements have one of the following shapes:"
-    { $list
-        { { $snippet "{ word shift }" } " - " { $snippet "word" } " is applied to the top of the stack and the result is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
-        { { $snippet "shift" } " - the top of the stack is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
-        { { $snippet "{ constant shift }" } " - " { $snippet "constant" } " is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
-    }
+{ $list
+    { { $snippet "{ word shift }" } " - " { $snippet "word" } " is applied to the top of the stack and the result is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+    { { $snippet "shift" } " - the top of the stack is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+    { { $snippet "{ constant shift }" } " - " { $snippet "constant" } " is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+}
 "The bit field specifier is processed left to right, so stack values should be supplied in reverse order." }
 { $examples
     "Consider the following specification:"
@@ -21,7 +21,10 @@ HELP: bitfield
         { "bits 16-20 are set to the value of " { $snippet "fooify" } " applied to " { $snippet "z" } }
     }
     "Such a bit field construction can be specified with a word like the following:"
-    { $code
+    { $example
+        "USING: math math.bitwise prettyprint ;"
+        "IN: math.bitwise.examples"
+        ": fooify ( x -- y ) 0b1111 bitand ;"
         ": baz-bitfield ( x y z -- n )"
         "    {"
         "        { fooify 16 }"
@@ -29,6 +32,53 @@ HELP: bitfield
         "        11"
         "        0"
         "    } bitfield ;"
+        "3 2 1 baz-bitfield ."
+        "102403"
+    }
+    "Square the 3 from the stack and shift 8, place the 1 from the stack at bit 5, and shift a constant 1 to bit 2:"
+    { $example
+        "USING: math math.bitwise prettyprint ;"
+        "1 3"
+        "    {"
+        "        { sq 8 }"
+        "        5"
+        "        { 1 2 }"
+        "    } bitfield .b"
+        "0b100100100100"
+    }
+} ;
+
+HELP: bitfield*
+{ $values { "values..." "a series of objects on the stack" } { "bitspec" "an array" } { "n" integer } }
+{ $description "Constructs an integer (bit field) from a series of values on the stack together with a bit field specifier, which is an array whose elements have one of the following shapes:"
+{ $list
+    { { $snippet "{ word shift }" } " - " { $snippet "word" } " is applied to the top of the stack and the result is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+    { { $snippet "shift" } " - the top of the stack is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+    { { $snippet "{ constant shift }" } " - " { $snippet "constant" } " is shifted to the left by " { $snippet "shift" } " bits and bitor'd with the bit field" }
+}
+"The bit field specifier is processed left to right, so stack values should be supplied in reverse order." }
+{ $examples
+    "Consider the following specification:"
+    { $list
+        { "bits 0-10 are set to the value of " { $snippet "x" } }
+        { "bits 11-14 are set to the value of " { $snippet "y" } }
+        { "bit 15 is always on" }
+        { "bits 16-20 are set to the value of " { $snippet "fooify" } " applied to " { $snippet "z" } }
+    }
+    "Such a bit field construction can be specified with a word like the following:"
+    { $example
+        "USING: math math.bitwise prettyprint ;"
+        "IN: math.bitwise.examples"
+        ": fooify ( x -- y ) 0b1111 bitand ;"
+        ": baz-bitfield* ( x y z -- n )"
+        "    {"
+        "        0"
+        "        11"
+        "        { 1 15 }"
+        "        { fooify 16 }"
+        "    } bitfield* ;"
+        "1 2 3 baz-bitfield* ."
+        "233473"
     }
     "Square the 3 from the stack and shift 8, place the 1 from the stack at bit 5, and shift a constant 1 to bit 2:"
     { $example
