@@ -1,5 +1,5 @@
 USING: accessors compiler.cfg.utilities kernel sequences tools.test ;
-IN: compiler.cfg.utilities.tests
+IN: compiler.cfg.utilities+tests
 
 
 { "eh" "eh" 1 2 } [

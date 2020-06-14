@@ -1,6 +1,6 @@
 USING: assocs compiler.crossref fry io kernel namespaces sequences
 stack-checker.dependencies tools.test vocabs words ;
-IN: compiler.crossref.tests
+IN: compiler.crossref+tests
 
 ! Dependencies of all words should always be satisfied unless we're
 ! in the middle of recompiling something

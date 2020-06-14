@@ -1,4 +1,4 @@
-IN: persistent-vectors.tests
+IN: persistent-vectors+tests
 USING: accessors tools.test persistent.vectors
 persistent.sequences sequences kernel arrays random namespaces
 vectors math math.order ;

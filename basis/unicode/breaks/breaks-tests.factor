@@ -1,7 +1,7 @@
 USING: tools.test unicode sequences math kernel splitting
 unicode.categories io.pathnames io.encodings.utf8 io.files
 strings quotations math.parser locals ;
-IN: unicode.breaks.tests
+IN: unicode.breaks+tests
 
 { "\u001112\u001161\u0011abA\u000300a\r\r\n" }
 [ "\r\n\raA\u000300\u001112\u001161\u0011ab" string-reverse ] unit-test

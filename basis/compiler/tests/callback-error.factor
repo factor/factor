@@ -1,6 +1,6 @@
 USING: accessors io io.encodings.ascii io.files io.files.temp
 io.launcher kernel make sequences system tools.test ;
-IN: compiler.tests.callback-error
+IN: compiler+tests.callback-error
 
 : callback-error-script ( -- path )
     "callback-error-script" temp-file ;

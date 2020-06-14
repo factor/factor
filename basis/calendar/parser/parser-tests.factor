@@ -1,6 +1,6 @@
 USING: accessors calendar calendar.format calendar.parser io
 io.streams.string kernel math.order tools.test ;
-IN: calendar.parser.tests
+IN: calendar.parser+tests
 
 ! attempt-all-quots
 { 2 } [ { [ 2 ] } attempt-all-quots ] unit-test

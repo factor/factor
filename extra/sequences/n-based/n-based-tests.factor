@@ -1,7 +1,7 @@
 ! (c)2008 Joe Groff, see BSD license etc.
 USING: kernel accessors assocs
 sequences sequences.n-based tools.test ;
-IN: sequences.n-based.tests
+IN: sequences.n-based+tests
 
 : months ( -- assoc )
     V{

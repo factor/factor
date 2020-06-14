@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes classes.algebra classes.algebra+private
 classes.maybe eval generic.single kernel math slots tools.test ;
-IN: classes.maybe.tests
+IN: classes.maybe+tests
 
 { t } [ 3 maybe{ integer } instance? ] unit-test
 { t } [ f maybe{ integer } instance? ] unit-test

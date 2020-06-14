@@ -1,5 +1,5 @@
 USING: hash-sets.identity kernel literals sets tools.test ;
-IN: hash-sets.identity.tests
+IN: hash-sets.identity+tests
 
 CONSTANT: the-real-slim-shady "marshall mathers"
 

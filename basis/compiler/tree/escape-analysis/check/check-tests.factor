@@ -1,7 +1,7 @@
 USING: compiler.tree.escape-analysis.check tools.test accessors kernel
 kernel+private math compiler.tree.builder compiler.tree.normalization
 compiler.tree.propagation compiler.tree.cleanup ;
-IN: compiler.tree.escape-analysis.check.tests
+IN: compiler.tree.escape-analysis.check+tests
 
 : test-checker ( quot -- ? )
     build-tree normalize propagate cleanup-tree run-escape-analysis? ;

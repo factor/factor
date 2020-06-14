@@ -1,6 +1,6 @@
 USING: accessors compiler.cfg.block-joining compiler.cfg.utilities
 kernel tools.test ;
-IN: compiler.cfg.block-joining.tests
+IN: compiler.cfg.block-joining+tests
 
 {
     V{ "hello" "there" "B" }

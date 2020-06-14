@@ -1,6 +1,6 @@
 USING: multi-methods tools.test math sequences namespaces system
 kernel strings words compiler.units quotations ;
-IN: multi-methods.tests
+IN: multi-methods+tests
 
 DEFER: fake
 \ fake H{ } clone "multi-methods" set-word-prop

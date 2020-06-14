@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test c.preprocessor kernel accessors multiline ;
-IN: c.preprocessor.tests
+IN: c.preprocessor+tests
 
 [ "vocab:c/tests/test1/test1.c" start-preprocess-file ]
 [ include-nested-too-deeply? ] must-fail-with

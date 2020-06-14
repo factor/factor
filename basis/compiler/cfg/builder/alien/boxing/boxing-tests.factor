@@ -1,7 +1,7 @@
 USING: alien.c-types classes.struct compiler.cfg.builder.alien.boxing
 compiler.cfg.instructions compiler.cfg.registers compiler.test
 cpu.architecture kernel make system tools.test ;
-IN: compiler.cfg.builder.alien.boxing.tests
+IN: compiler.cfg.builder.alien.boxing+tests
 
 STRUCT: some-struct
     { f1 int }

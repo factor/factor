@@ -11,7 +11,7 @@ logic.examples.money
 logic.examples.zebra
 logic.examples.zebra2 ;
 
-IN: logic.tests
+IN: logic+tests
 
 LOGIC-PREDS: cato mouseo creatureo ;
 LOGIC-VARS: X Y ;

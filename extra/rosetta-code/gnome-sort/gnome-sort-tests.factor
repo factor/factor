@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test rosetta-code.gnome-sort ;
-IN: rosetta-code.gnome-sort.tests
+IN: rosetta-code.gnome-sort+tests
 
 { V{ } } [ V{ } gnome-sort ] unit-test
 { V{ 0 } } [ V{ 0 } gnome-sort ] unit-test

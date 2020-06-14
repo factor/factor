@@ -5,7 +5,7 @@ io kernel namespaces sequences source-files.errors
 source-files.errors.debugger summary ;
 IN: tools.errors
 
-! Tools for source-files.errors. Used by tools.tests and others
+! Tools for source-files.errors. Used by tools+tests and others
 ! for error reporting
 
 : errors. ( errors -- )

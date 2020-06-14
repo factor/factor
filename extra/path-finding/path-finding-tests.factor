@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators hashtables kernel literals math math.functions
 math.vectors memoize path-finding sequences sorting splitting strings tools.test ;
-IN: path-finding.tests
+IN: path-finding+tests
 
 ! Use a 10x9 maze (see below) to try to go from s to e, f or g.
 ! X means that a position is unreachable.

@@ -1,7 +1,7 @@
 USING: accessors arrays assocs definitions fry generic help
 help.markup io.streams.string kernel math namespaces parser
 sequences sets strings tools.test words ;
-IN: help.markup.tests
+IN: help.markup+tests
 
 : with-markup-test ( quot -- )
     [ f last-element ] dip

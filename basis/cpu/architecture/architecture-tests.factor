@@ -1,7 +1,7 @@
 USING: accessors compiler.cfg compiler.cfg.instructions
 compiler.cfg.stack-frame compiler.cfg.utilities cpu.architecture
 cpu.x86 kernel layouts math namespaces system tools.test ;
-IN: cpu.architecture.tests
+IN: cpu.architecture+tests
 
 : cfg-w-spill-area-base ( base -- cfg )
     stack-frame new swap >>spill-area-base

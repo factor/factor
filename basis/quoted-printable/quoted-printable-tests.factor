@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test quoted-printable io.encodings.string
 sequences splitting kernel io.encodings.8-bit ;
-IN: quoted-printable.tests
+IN: quoted-printable+tests
 
 { "José was the
 person who knew how to write the letters:

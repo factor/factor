@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test crypto.passwd-md5 ;
-IN: crypto.passwd-md5.tests
+IN: crypto.passwd-md5+tests
 
 
 { "$1$npUpD5oQ$1.X7uXR2QG0FzPifVeZ2o1" }

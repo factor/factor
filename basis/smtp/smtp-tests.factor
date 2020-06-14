@@ -2,7 +2,7 @@ USING: accessors assocs combinators concurrency.promises
 continuations fry io.sockets io.sockets.secure io.streams.string
 kernel namespaces sequences smtp smtp+private smtp.server
 sorting system tools.test ;
-IN: smtp.tests
+IN: smtp+tests
 
 : with-test-smtp-config ( quot -- )
     [

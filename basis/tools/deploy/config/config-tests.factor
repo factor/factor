@@ -1,5 +1,5 @@
 USING: tools.deploy.config tools.test ;
-IN: tools.deploy.config.tests
+IN: tools.deploy.config+tests
 
 ! config>profile
 {

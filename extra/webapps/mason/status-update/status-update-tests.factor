@@ -1,6 +1,6 @@
 USING: db db.sqlite io.files.temp tools.test webapps.mason.backend
 webapps.mason.status-update ;
-IN: webapps.mason.status-update.tests
+IN: webapps.mason.status-update+tests
 
 ! find-builder
 {

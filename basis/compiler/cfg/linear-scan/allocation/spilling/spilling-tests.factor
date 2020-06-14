@@ -4,7 +4,7 @@ compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
 cpu.architecture cpu.x86.assembler.operands kernel linked-assocs
 locals namespaces tools.test vectors ;
-IN: compiler.cfg.linear-scan.allocation.spilling.tests
+IN: compiler.cfg.linear-scan.allocation.spilling+tests
 
 : test-live-interval ( -- live-interval )
     T{ live-interval-state

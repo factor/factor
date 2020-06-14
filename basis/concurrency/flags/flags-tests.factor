@@ -1,6 +1,6 @@
 USING: tools.test concurrency.flags concurrency.combinators
 kernel threads locals accessors calendar ;
-IN: concurrency.flags.tests
+IN: concurrency.flags+tests
 
 :: flag-test-1 ( -- val )
     <flag> :> f

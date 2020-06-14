@@ -6,7 +6,7 @@ cpu.x86 kernel layouts make math namespaces sequences
 specialized-arrays system tools.test ;
 QUALIFIED: vm
 SPECIALIZED-ARRAY: uint
-IN: compiler.codegen.gc-maps.tests
+IN: compiler.codegen.gc-maps+tests
 
 SINGLETON: fake-cpu
 

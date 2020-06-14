@@ -2,7 +2,7 @@ USING: kernel namespaces quotations stack-checker.backend
 stack-checker.branches stack-checker.recursive-state
 stack-checker.state stack-checker.values stack-checker.visitor
 tools.test ;
-IN: stack-checker.branches.tests
+IN: stack-checker.branches+tests
 
 ! infer-branch
 {

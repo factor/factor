@@ -10,7 +10,7 @@ math.vectors.simd.cords alien.data ;
 FROM: math.vectors.simd.intrinsics => alien-vector set-alien-vector ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
-IN: math.vectors.simd.tests
+IN: math.vectors.simd+tests
 
 ! Test type propagation
 { V{ float } } [ [ { float-4 } declare norm-sq ] final-classes ] unit-test

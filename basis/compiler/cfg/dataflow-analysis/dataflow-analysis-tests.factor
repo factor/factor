@@ -1,7 +1,7 @@
 USING: accessors assocs compiler.cfg.dataflow-analysis
 compiler.cfg.dataflow-analysis+private compiler.cfg.rpo compiler.cfg.utilities
 kernel tools.test ;
-IN: compiler.cfg.dataflow-analysis.tests
+IN: compiler.cfg.dataflow-analysis+tests
 
 ! run-dataflow-analysis
 TUPLE: im-a-dfa test ;

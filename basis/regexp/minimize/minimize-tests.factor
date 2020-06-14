@@ -3,7 +3,7 @@
 USING: tools.test regexp.minimize assocs regexp
 accessors regexp.transition-tables regexp.parser
 regexp.classes regexp.negation ;
-IN: regexp.minimize.tests
+IN: regexp.minimize+tests
 
 { t } [ 1 2 HS{ { 1 2 } } same-partition? ] unit-test
 { t } [ 2 1 HS{ { 1 2 } } same-partition? ] unit-test

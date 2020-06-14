@@ -1,7 +1,7 @@
 USING: arrays assocs fry grouping hash-sets io.encodings.utf8
 io.files kernel math math.order math.parser sequences sets
 splitting strings tools.test unicode ;
-IN: unicode.collation.tests
+IN: unicode.collation+tests
 
 : test-equality ( str1 str2 -- ? ? ? ? )
     { primary= secondary= tertiary= quaternary= }

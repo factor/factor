@@ -3,7 +3,7 @@
 !
 USING: continuations kernel tools.test strings namespaces make arrays
 sequences peg peg+private peg.parsers words math accessors ;
-IN: peg.tests
+IN: peg+tests
 
 { } [ reset-pegs ] unit-test
 

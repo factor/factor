@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations db db.tuples io.directories io.files.temp kernel
 locals sequences site-watcher.db tools.test webapps.utils ;
-IN: site-watcher.tests
+IN: site-watcher+tests
 
 "site-watcher.db" temp-file ?delete-file
 

@@ -5,7 +5,7 @@ io.encodings.ascii io.files io.files.temp io.files.unique
 io.servers io.streams.duplex io.streams.string
 kernel math.ranges mime.multipart multiline namespaces random
 sequences sorting strings threads tools.test ;
-IN: mime.multipart.tests
+IN: mime.multipart+tests
 
 CONSTANT: separator1 "----WebKitFormBoundary6odjpVPXIighAE2L"
 

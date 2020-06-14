@@ -22,7 +22,7 @@ compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.ranges
 compiler.cfg.linear-scan.debugger
 compiler.cfg.utilities ;
-IN: compiler.cfg.linear-scan.tests
+IN: compiler.cfg.linear-scan+tests
 
 check-allocation? on
 check-numbering? on

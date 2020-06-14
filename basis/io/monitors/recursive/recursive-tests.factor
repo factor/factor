@@ -2,7 +2,7 @@ USING: accessors math kernel namespaces continuations
 io.files io.monitors io.monitors.recursive io.backend
 concurrency.mailboxes tools.test destructors io.files.info
 io.pathnames io.files.temp io.directories.hierarchy fry ;
-IN: io.monitors.recursive.tests
+IN: io.monitors.recursive+tests
 
 SINGLETON: mock-io-backend
 

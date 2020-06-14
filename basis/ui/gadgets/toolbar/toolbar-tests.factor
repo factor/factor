@@ -1,6 +1,6 @@
 USING: accessors namespaces sequences tools.test ui.commands
 ui.gadgets ui.gadgets.toolbar ;
-IN: ui.gadgets.toolbar.tests
+IN: ui.gadgets.toolbar+tests
 
 TUPLE: foo-gadget ;
 

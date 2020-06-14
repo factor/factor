@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math slots.macros tools.test ;
-IN: slots.macros.tests
+IN: slots.macros+tests
 
 TUPLE: foo a b c ;
 

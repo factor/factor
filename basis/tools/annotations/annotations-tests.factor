@@ -1,7 +1,7 @@
 USING: destructors eval io io.streams.string kernel math memory
 namespaces parser sequences strings tools.annotations
 tools.test tools.time ;
-IN: tools.annotations.tests
+IN: tools.annotations+tests
 
 : foo ( -- ) ;
 \ foo watch
@@ -19,7 +19,7 @@ M: integer some-generic 1 + ;
 
 { 4 } [ 3 some-generic ] unit-test
 
-{ } [ "IN: tools.annotations.tests USE: math M: integer some-generic 1 - ;" eval( -- ) ] unit-test
+{ } [ "IN: tools.annotations+tests USE: math M: integer some-generic 1 - ;" eval( -- ) ] unit-test
 
 { 2 } [ 3 some-generic ] unit-test
 
@@ -34,7 +34,7 @@ M: object another-generic ;
 
 \ another-generic watch
 
-{ } [ "IN: tools.annotations.tests GENERIC: another-generic ( a -- b )" eval( -- ) ] unit-test
+{ } [ "IN: tools.annotations+tests GENERIC: another-generic ( a -- b )" eval( -- ) ] unit-test
 
 { } [ \ another-generic reset ] unit-test
 

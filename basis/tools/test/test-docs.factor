@@ -13,7 +13,7 @@ $nl
 }
 "The latter is used for vocabularies with more extensive test suites."
 $nl
-"If the test harness needs to define words, they should be placed in a vocabulary named " { $snippet { $emphasis "vocab" } ".tests" } " where " { $emphasis "vocab" } " is the vocab being tested."
+"If the test harness needs to define words, they should be placed in a vocabulary named " { $snippet { $emphasis "vocab" } "+tests" } " where " { $emphasis "vocab" } " is the vocab being tested."
 { $heading "Writing unit tests" }
 "Several worlds exist for writing different kinds of unit tests. The most general one asserts that a quotation outputs a specific set of values:"
 { $subsections POSTPONE: unit-test }

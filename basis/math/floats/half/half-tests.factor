@@ -2,7 +2,7 @@ USING: accessors alien.c-types alien.data classes.struct kernel
 math math.floats.half math.order sequences specialized-arrays
 tools.test ;
 SPECIALIZED-ARRAY: half
-IN: math.floats.half.tests
+IN: math.floats.half+tests
 
 { 0x0000 } [  0.0  half>bits ] unit-test
 { 0x8000 } [ -0.0  half>bits ] unit-test

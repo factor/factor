@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: kernel tools.test peg peg.expr multiline sequences ;
-IN: peg.expr.tests
+IN: peg.expr+tests
 
 { 5 } [
   "2+3" expr

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test math.rectangles math.rectangles.positioning ;
-IN: math.rectangles.positioning.tests
+IN: math.rectangles.positioning+tests
 
 { T{ rect f { 0 1 } { 30 30 } } } [
     T{ rect f { 0 0 } { 1 1 } }

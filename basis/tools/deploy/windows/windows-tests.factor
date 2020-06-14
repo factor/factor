@@ -1,4 +1,4 @@
-IN: tools.deploy.windows.tests
+IN: tools.deploy.windows+tests
 USING: io.files.temp tools.deploy.windows tools.test sequences ;
 
 [ t ] [

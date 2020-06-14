@@ -2,14 +2,14 @@ USING: accessors alien assocs classes classes.algebra
 classes.predicate classes.union classes.union+private
 compiler.units eval io.streams.string kernel math math+private
 parser quotations see sequences slots strings tools.test words ;
-IN: classes.union.tests
+IN: classes.union+tests
 
 ! DEFER: bah
 ! FORGET: bah
 UNION: bah fixnum alien ;
 { bah } [ \ bah? "predicating" word-prop ] unit-test
 
-{ "USING: alien math ;\nIN: classes.union.tests\nUNION: bah fixnum alien ;\n" }
+{ "USING: alien math ;\nIN: classes.union+tests\nUNION: bah fixnum alien ;\n" }
 [ [ \ bah see ] with-string-writer ] unit-test
 
 ! Test redefinition of classes
@@ -23,13 +23,13 @@ M: union-1 generic-update-test drop "union-1" ;
 { t } [ union-1 number class<= ] unit-test
 { "union-1" } [ 1.0 generic-update-test ] unit-test
 
-"IN: classes.union.tests USE: math USE: arrays UNION: union-1 rational array ;" eval( -- )
+"IN: classes.union+tests USE: math USE: arrays UNION: union-1 rational array ;" eval( -- )
 
 { t } [ bignum union-1 class<= ] unit-test
 { f } [ union-1 number class<= ] unit-test
 { "union-1" } [ { 1.0 } generic-update-test ] unit-test
 
-"IN: classes.union.tests USE: math PREDICATE: union-1 < integer even? ;" eval( -- )
+"IN: classes.union+tests USE: math PREDICATE: union-1 < integer even? ;" eval( -- )
 
 { f } [ union-1 union-class? ] unit-test
 { t } [ union-1 predicate-class? ] unit-test
@@ -57,7 +57,7 @@ UNION: redefine-bug-2 redefine-bug-1 quotation ;
 { t } [ fixnum redefine-bug-2 class<= ] unit-test
 { t } [ quotation redefine-bug-2 class<= ] unit-test
 
-{ } [ "IN: classes.union.tests USE: math UNION: redefine-bug-1 bignum ;" eval( -- ) ] unit-test
+{ } [ "IN: classes.union+tests USE: math UNION: redefine-bug-1 bignum ;" eval( -- ) ] unit-test
 
 { t } [ bignum redefine-bug-1 class<= ] unit-test
 { f } [ fixnum redefine-bug-2 class<= ] unit-test
@@ -65,17 +65,17 @@ UNION: redefine-bug-2 redefine-bug-1 quotation ;
 
 ! Too eager with reset-class
 
-{ } [ "IN: classes.union.tests SINGLETON: foo UNION: blah foo ;" <string-reader> "union-reset-test" parse-stream drop ] unit-test
+{ } [ "IN: classes.union+tests SINGLETON: foo UNION: blah foo ;" <string-reader> "union-reset-test" parse-stream drop ] unit-test
 
-{ t } [ "blah" "classes.union.tests" lookup-word union-class? ] unit-test
+{ t } [ "blah" "classes.union+tests" lookup-word union-class? ] unit-test
 
-{ t } [ "foo?" "classes.union.tests" lookup-word predicate? ] unit-test
+{ t } [ "foo?" "classes.union+tests" lookup-word predicate? ] unit-test
 
-{ } [ "IN: classes.union.tests USE: math UNION: blah integer ;" <string-reader> "union-reset-test" parse-stream drop ] unit-test
+{ } [ "IN: classes.union+tests USE: math UNION: blah integer ;" <string-reader> "union-reset-test" parse-stream drop ] unit-test
 
-{ t } [ "blah" "classes.union.tests" lookup-word union-class? ] unit-test
+{ t } [ "blah" "classes.union+tests" lookup-word union-class? ] unit-test
 
-{ f } [ "foo?" "classes.union.tests" lookup-word predicate? ] unit-test
+{ f } [ "foo?" "classes.union+tests" lookup-word predicate? ] unit-test
 
 GENERIC: test-generic ( x -- y )
 
@@ -97,17 +97,17 @@ M: a-union test-generic ;
 
 { t } [ \ integer? def>> \ fixnum-bitand swap member? ] unit-test
 
-{ } [ "IN: classes.union.tests USE: math UNION: fast-union-1 fixnum ; UNION: fast-union-2 fast-union-1 bignum ;" eval( -- ) ] unit-test
+{ } [ "IN: classes.union+tests USE: math UNION: fast-union-1 fixnum ; UNION: fast-union-2 fast-union-1 bignum ;" eval( -- ) ] unit-test
 
-{ t } [ "fast-union-2?" "classes.union.tests" lookup-word def>> \ fixnum-bitand swap member? ] unit-test
+{ t } [ "fast-union-2?" "classes.union+tests" lookup-word def>> \ fixnum-bitand swap member? ] unit-test
 
-{ } [ "IN: classes.union.tests USE: vectors UNION: fast-union-1 vector ;" eval( -- ) ] unit-test
+{ } [ "IN: classes.union+tests USE: vectors UNION: fast-union-1 vector ;" eval( -- ) ] unit-test
 
-{ f } [ "fast-union-2?" "classes.union.tests" lookup-word def>> \ fixnum-bitand swap member? ] unit-test
+{ f } [ "fast-union-2?" "classes.union+tests" lookup-word def>> \ fixnum-bitand swap member? ] unit-test
 
 { { fixnum } } [
-    "IN: classes.union.tests USE: math UNION: um fixnum ;" eval( -- )
-    "um" "classes.union.tests" lookup-word "members" word-prop
+    "IN: classes.union+tests USE: math UNION: um fixnum ;" eval( -- )
+    "um" "classes.union+tests" lookup-word "members" word-prop
 ] unit-test
 
 ! Test union{

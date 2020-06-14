@@ -1,7 +1,7 @@
 USING: accessors arrays assocs combinators fry kernel locals
 math math.combinatorics math.ranges namespaces random sequences
 sequences.product tools.test trees trees+private ;
-IN: trees.tests
+IN: trees+tests
 
 : test-tree ( -- tree )
     TREE{

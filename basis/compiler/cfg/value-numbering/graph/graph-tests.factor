@@ -1,6 +1,6 @@
 USING: arrays compiler.cfg.instructions
 compiler.cfg.value-numbering.graph kernel namespaces tools.test ;
-IN: compiler.cfg.value-numbering.graph.tests
+IN: compiler.cfg.value-numbering.graph+tests
 
 {
     T{ ##and-imm { dst 4 } { src1 5 } { src2 6 } }

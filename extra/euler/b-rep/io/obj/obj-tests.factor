@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: euler.b-rep euler.b-rep.examples euler.b-rep.io.obj
 io.streams.string literals math.vectors.simd.cords tools.test ;
-IN: euler.b-rep.io.obj.tests
+IN: euler.b-rep.io.obj+tests
 
 CONSTANT: valid-cube-obj
 "v -1.0 -1.0 -1.0

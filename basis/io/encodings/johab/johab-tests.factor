@@ -3,7 +3,7 @@
 USING: arrays byte-arrays io io.encodings io.encodings.johab assocs
 io.encodings.string io.streams.string io.encodings.euc+private words
 kernel locals multiline namespaces sequences strings tools.test ;
-IN: io.encodings.johab.tests
+IN: io.encodings.johab+tests
 
 : johab>unicode ( ch -- ch/f )
     johab euc-table word-prop at ;

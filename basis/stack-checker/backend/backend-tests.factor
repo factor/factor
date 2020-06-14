@@ -2,7 +2,7 @@ USING: accessors assocs classes.tuple compiler.tree kernel namespaces
 sequences stack-checker.backend stack-checker.dependencies
 stack-checker.state stack-checker.values stack-checker.visitor
 tools.test ;
-IN: stack-checker.backend.tests
+IN: stack-checker.backend+tests
 
 { } [
     V{ } clone (meta-d) set

@@ -1,14 +1,14 @@
 USING: eval tools.test compiler.units vocabs words kernel ;
-IN: compiler.tests.redefine5
+IN: compiler+tests.redefine5
 
 ! Regression: if dispatch was eliminated but method was not inlined,
 ! compiled usage information was not recorded.
 
-[ "compiler.tests.redefine5" forget-vocab ] with-compilation-unit
+[ "compiler+tests.redefine5" forget-vocab ] with-compilation-unit
 
 [ ] [
     "USING: sorting kernel math.order ;
-    IN: compiler.tests.redefine5
+    IN: compiler+tests.redefine5
     GENERIC: my-generic ( a -- b )
     M: object my-generic [ <=> ] sort ;
     : my-inline ( a -- b ) my-generic ;"
@@ -17,12 +17,12 @@ IN: compiler.tests.redefine5
 
 [ ] [
     "USE: kernel
-    IN: compiler.tests.redefine5
+    IN: compiler+tests.redefine5
     TUPLE: my-tuple ;
     M: my-tuple my-generic drop 0 ;" eval( -- )
 ] unit-test
 
 [ 0 ] [
-    "my-tuple" "compiler.tests.redefine5" lookup-word boa
-    "my-inline" "compiler.tests.redefine5" lookup-word execute
+    "my-tuple" "compiler+tests.redefine5" lookup-word boa
+    "my-inline" "compiler+tests.redefine5" lookup-word execute
 ] unit-test

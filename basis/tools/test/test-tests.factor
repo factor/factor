@@ -1,4 +1,4 @@
-IN: tools.test.tests
+IN: tools.test+tests
 USING: continuations debugger io.streams.string kernel namespaces
 sequences tools.test tools.test+private ;
 

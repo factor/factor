@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar curses curses.ffi kernel random sequences threads
 tools.test ;
-IN: curses.tests
+IN: curses+tests
 
 : hello-curses ( -- )
     <curses-window> [

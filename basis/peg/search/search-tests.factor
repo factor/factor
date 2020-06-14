@@ -3,7 +3,7 @@
 !
 USING: kernel math math.parser arrays tools.test peg peg.parsers
 peg.search ;
-IN: peg.search.tests
+IN: peg.search+tests
 
 { V{ 123 456 } } [
   "abc 123 def 456" integer-parser search

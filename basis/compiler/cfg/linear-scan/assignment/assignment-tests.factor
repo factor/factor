@@ -5,7 +5,7 @@ compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities
 cpu.architecture cpu.x86.assembler.operands heaps kernel make
 namespaces sequences sorting tools.test ;
-IN: compiler.cfg.linear-scan.assignment.tests
+IN: compiler.cfg.linear-scan.assignment+tests
 
 : cherry-pick ( seq indices -- seq' )
     [ swap nth ] with map  ;

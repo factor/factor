@@ -1,5 +1,5 @@
 USING: io lint kernel math sequences tools.test ;
-IN: lint.tests
+IN: lint+tests
 
 ! Don't write code like this
 : lint1 ( obj -- ) [ "hi" print ] [ ] if ; ! when

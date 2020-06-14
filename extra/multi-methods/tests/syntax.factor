@@ -2,7 +2,7 @@ USING: multi-methods tools.test math sequences namespaces system
 kernel strings definitions prettyprint debugger arrays
 hashtables continuations classes assocs accessors see ;
 RENAME: GENERIC: multi-methods => multi-methods:GENERIC:
-IN: multi-methods.tests
+IN: multi-methods+tests
 
 multi-methods:GENERIC: first-test ( -- )
 

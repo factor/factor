@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.data byte-arrays destructors kernel literals
 namespaces sequences sodium.ffi sodium.secure-memory tools.test ;
-IN: sodium.secure-memory.tests
+IN: sodium.secure-memory+tests
 
 SYMBOLS: test-mem test-cloned ;
 

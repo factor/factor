@@ -1,5 +1,5 @@
 USING: kernel tools.test regexp.parser fry sequences ;
-IN: regexp.parser.tests
+IN: regexp.parser+tests
 
 : regexp-parses ( string -- )
     [ [ ] ] dip '[ _ parse-regexp drop ] unit-test ;

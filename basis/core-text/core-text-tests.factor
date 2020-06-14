@@ -4,7 +4,7 @@ USING: tools.test core-text core-text.fonts core-foundation
 core-foundation.dictionaries destructors arrays kernel generalizations
 locals math accessors core-foundation.utilities combinators hashtables colors
 colors.constants ;
-IN: core-text.tests
+IN: core-text+tests
 
 : test-font ( name -- font )
     [ >cf &CFRelease 0.0 f CTFontCreateWithName ] with-destructors ;

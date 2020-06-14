@@ -1,5 +1,5 @@
 USING: images images.loader.gdiplus+private tools.test ;
-IN: images.loader.gdiplus.tests
+IN: images.loader.gdiplus+tests
 
 { } [
     BGRA check-pixel-format

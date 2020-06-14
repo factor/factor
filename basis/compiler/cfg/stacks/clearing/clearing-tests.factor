@@ -1,7 +1,7 @@
 USING: compiler.cfg.instructions compiler.cfg.linearization
 compiler.cfg.registers compiler.cfg.stacks.clearing compiler.cfg.utilities
 kernel tools.test ;
-IN: compiler.cfg.stacks.clearing.tests
+IN: compiler.cfg.stacks.clearing+tests
 
 ! clear-uninitialized
 {

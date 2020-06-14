@@ -1,6 +1,6 @@
 USING: arrays assocs classes.tuple kernel math named-tuples
 sequences tools.test ;
-IN: named-tuples.tests
+IN: named-tuples+tests
 
 TUPLE: foo x y z ;
 

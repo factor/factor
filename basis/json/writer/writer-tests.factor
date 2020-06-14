@@ -1,5 +1,5 @@
 USING: hashtables json.writer tools.test json.reader json kernel namespaces ;
-IN: json.writer.tests
+IN: json.writer+tests
 
 { "false" } [ f >json ] unit-test
 { "true" } [ t >json ] unit-test

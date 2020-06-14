@@ -1,6 +1,6 @@
 USING: accessors kernel tools.test euler.b-rep euler.operators
 euler.modeling game.models.half-edge ;
-IN: euler.modeling.tests
+IN: euler.modeling+tests
 
 ! polygon>double-face
 { } [

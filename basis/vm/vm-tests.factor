@@ -1,7 +1,7 @@
 USING: accessors classes.struct kernel kernel+private math math.order
 tools.test ;
 QUALIFIED: vm
-IN: vm.tests
+IN: vm+tests
 
 : get-ctx ( -- ctx )
     context vm:context memory>struct ;

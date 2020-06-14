@@ -1,14 +1,14 @@
 USING: eval tools.test compiler.units vocabs words
 kernel ;
-IN: compiler.tests.redefine8
+IN: compiler+tests.redefine8
 
 ! Mixin redefinition did not recompile all necessary words.
 
-[ ] [ [ "compiler.tests.redefine8" forget-vocab ] with-compilation-unit ] unit-test
+[ ] [ [ "compiler+tests.redefine8" forget-vocab ] with-compilation-unit ] unit-test
 
 [ ] [
     "USING: kernel math math.order sorting ;
-    IN: compiler.tests.redefine8
+    IN: compiler+tests.redefine8
     MIXIN: my-mixin
     INSTANCE: fixnum my-mixin
     GENERIC: my-generic ( a -- b )
@@ -20,11 +20,11 @@ IN: compiler.tests.redefine8
 
 [ ] [
     "USE: math
-    IN: compiler.tests.redefine8
+    IN: compiler+tests.redefine8
     INSTANCE: float my-mixin"
     eval( -- )
 ] unit-test
 
 [ 2.0 ] [
-    1.0 "my-generic" "compiler.tests.redefine8" lookup-word execute
+    1.0 "my-generic" "compiler+tests.redefine8" lookup-word execute
 ] unit-test

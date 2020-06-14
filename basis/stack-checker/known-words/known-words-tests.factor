@@ -2,7 +2,7 @@ USING: accessors classes.tuple compiler.tree kernel namespaces sequences
 stack-checker.backend stack-checker.known-words stack-checker.recursive-state
 stack-checker.state stack-checker.values stack-checker.visitor tools.test
 words ;
-IN: stack-checker.known-words.tests
+IN: stack-checker.known-words+tests
 
 ! Because node is an identity-tuple
 : node-seqs-eq? ( seq1 seq2 -- ? )

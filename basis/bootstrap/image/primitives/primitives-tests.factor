@@ -1,6 +1,6 @@
 USING: bootstrap.image.primitives kernel+private sequences tools.test
 vocabs words ;
-IN: bootstrap.image.primitives.tests
+IN: bootstrap.image.primitives+tests
 
 {
     [

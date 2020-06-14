@@ -1,4 +1,4 @@
-IN: ui.backend.cocoa.views.tests
+IN: ui.backend.cocoa.views+tests
 USING: ui.backend.cocoa.views tools.test kernel math.rectangles
 namespaces ;
 

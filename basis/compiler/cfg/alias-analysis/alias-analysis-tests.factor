@@ -2,7 +2,7 @@ USING: arrays compiler.cfg.alias-analysis compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.debugger compiler.cfg.comparisons
 cpu.architecture tools.test byte-arrays layouts literals alien
 accessors sequences ;
-IN: compiler.cfg.alias-analysis.tests
+IN: compiler.cfg.alias-analysis+tests
 
 : test-alias-analysis ( insn -- insn )
     init-alias-analysis

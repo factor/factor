@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel tools.test unix.linux.proc ;
-IN: unix.linux.proc.tests
+IN: unix.linux.proc+tests
 
 { } [ parse-proc-cmdline drop ] unit-test
 { } [ parse-proc-cpuinfo drop ] unit-test

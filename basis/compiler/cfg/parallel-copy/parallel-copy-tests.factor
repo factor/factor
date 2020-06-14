@@ -1,7 +1,7 @@
 USING: compiler.cfg.parallel-copy tools.test arrays
 compiler.cfg.registers namespaces compiler.cfg.instructions
 cpu.architecture ;
-IN: compiler.cfg.parallel-copy.tests
+IN: compiler.cfg.parallel-copy+tests
 
 SYMBOL: temp
 

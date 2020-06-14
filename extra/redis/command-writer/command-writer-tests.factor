@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test redis.command-writer io.streams.string ;
-IN: redis.command-writer.tests
+IN: redis.command-writer+tests
 
 ! Connection
 { "*1\r\n$4\r\nQUIT\r\n" }

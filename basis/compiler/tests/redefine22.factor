@@ -1,4 +1,4 @@
-IN: compiler.tests.redefine22
+IN: compiler+tests.redefine22
 USING: kernel sequences compiler.units vocabs tools.test definitions ;
 
 TUPLE: ttt ;

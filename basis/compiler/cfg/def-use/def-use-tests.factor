@@ -3,7 +3,7 @@
 USING: compiler.cfg.def-use compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.utilities compiler.test namespaces
 tools.test ;
-IN: compiler.cfg.def-use.tests
+IN: compiler.cfg.def-use+tests
 
 ! compute-insns
 {

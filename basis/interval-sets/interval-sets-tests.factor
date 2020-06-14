@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test interval-sets math grouping sequences accessors
 combinators.short-circuit literals ;
-IN: interval-sets.tests
+IN: interval-sets+tests
 
 { f } [ 0 T{ interval-set } in? ] unit-test
 { f } [ 2 T{ interval-set } in? ] unit-test

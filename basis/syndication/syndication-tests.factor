@@ -1,6 +1,6 @@
 USING: syndication io kernel io.files tools.test io.encodings.binary
 calendar urls xml.writer ;
-IN: syndication.tests
+IN: syndication+tests
 
 : load-news-file ( filename -- feed )
     ! Load an news syndication file and process it, returning

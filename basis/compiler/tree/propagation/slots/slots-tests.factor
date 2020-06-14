@@ -2,7 +2,7 @@ USING: accessors arrays byte-arrays compiler.tree
 compiler.tree.propagation.copy compiler.tree.propagation.info
 compiler.tree.propagation.slots hashtables kernel math math.intervals
 namespaces sequences strings tools.test ;
-IN: compiler.tree.propagation.slots.tests
+IN: compiler.tree.propagation.slots+tests
 
 : indexize ( seq -- assoc )
     [ swap 2array ] map-index ;

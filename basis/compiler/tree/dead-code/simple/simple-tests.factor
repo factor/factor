@@ -1,6 +1,6 @@
 USING: accessors compiler.tree compiler.tree.dead-code.liveness
 compiler.tree.dead-code.simple kernel math namespaces tools.test ;
-IN: compiler.tree.dead-code.simple.tests
+IN: compiler.tree.dead-code.simple+tests
 
 ! dead-flushable-call?
 { t } [

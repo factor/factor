@@ -1,5 +1,5 @@
 USING: xml xml.writer tools.test ;
-IN: xml.tests
+IN: xml+tests
 
 {
 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>

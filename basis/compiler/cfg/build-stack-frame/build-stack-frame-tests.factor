@@ -2,7 +2,7 @@ USING: accessors compiler.cfg.build-stack-frame
 compiler.cfg.instructions compiler.cfg.linearization
 compiler.cfg.stack-frame compiler.cfg.utilities cpu.x86 kernel math
 sequences slots.syntax tools.test ;
-IN: compiler.cfg.build-stack-frame.tests
+IN: compiler.cfg.build-stack-frame+tests
 
 {
     ! 91 8 align

@@ -1,4 +1,4 @@
-IN: db.pools.tests
+IN: db.pools+tests
 USING: db.pools tools.test continuations io.files io.files.temp
 io.directories namespaces accessors kernel math destructors ;
 

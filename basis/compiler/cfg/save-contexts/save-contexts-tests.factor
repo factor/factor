@@ -1,7 +1,7 @@
 USING: accessors compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.save-contexts compiler.test cpu.architecture kernel
 namespaces tools.test ;
-IN: compiler.cfg.save-contexts.tests
+IN: compiler.cfg.save-contexts+tests
 
 ! insns-needs-save-context?
 { f f t } [

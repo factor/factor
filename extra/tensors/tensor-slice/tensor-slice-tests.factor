@@ -1,5 +1,5 @@
 USING: arrays sequences tensors.tensor-slice tools.test ;
-IN: tensors.tensor-slice.tests
+IN: tensors.tensor-slice+tests
 
 { { 9 7 5 } } [ -1 -6 -2 10 <iota> <step-slice> >array ] unit-test
 { { 9 7 } } [ -1 -5 -2 10 <iota> <step-slice> >array ] unit-test

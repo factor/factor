@@ -1,7 +1,7 @@
 USING: accessors compiler.cfg.loop-detection
 compiler.cfg.loop-detection+private compiler.cfg.utilities
 compiler.test kernel namespaces sequences sets tools.test ;
-IN: compiler.cfg.loop-detection.tests
+IN: compiler.cfg.loop-detection+tests
 
 { V{ 0 } { 1 } } [
     V{ } 0 insns>block V{ } 1 insns>block [ connect-bbs ] keep

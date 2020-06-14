@@ -1,6 +1,6 @@
 USING: tuple-arrays sequences tools.test namespaces kernel
 math accessors classes classes.tuple eval classes.struct ;
-IN: tuple-arrays.tests
+IN: tuple-arrays+tests
 
 SYMBOL: mat
 TUPLE: foo bar ; final
@@ -32,14 +32,14 @@ TUPLE-ARRAY: broken
 { 100 } [ 100 <broken-array> length ] unit-test
 
 ! Can't define a tuple array for a non-tuple class
-[ "IN: tuple-arrays.tests USING: tuple-arrays words ; TUPLE-ARRAY: word" eval( -- ) ]
+[ "IN: tuple-arrays+tests USING: tuple-arrays words ; TUPLE-ARRAY: word" eval( -- ) ]
 [ error>> not-an-instance? ]
 must-fail-with
 
 ! Can't define a tuple array for a non-final class
 TUPLE: non-final x ;
 
-[ "IN: tuple-arrays.tests USE: tuple-arrays TUPLE-ARRAY: non-final" eval( -- ) ]
+[ "IN: tuple-arrays+tests USE: tuple-arrays TUPLE-ARRAY: non-final" eval( -- ) ]
 [ error>> not-final? ]
 must-fail-with
 
@@ -62,7 +62,7 @@ TUPLE-ARRAY: tuple-to-struct
 
 ! This shouldn't crash
 { } [
-    "IN: tuple-arrays.tests
+    "IN: tuple-arrays+tests
     USING: alien.c-types classes.struct ;
     STRUCT: tuple-to-struct { x int } ;"
     eval( -- )

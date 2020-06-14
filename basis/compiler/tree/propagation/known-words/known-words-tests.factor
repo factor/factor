@@ -1,7 +1,7 @@
 USING: accessors compiler.tree.propagation.info
 compiler.tree.propagation.known-words kernel kernel+private layouts math
 math.intervals math+private random tools.test words ;
-IN: compiler.tree.propagation.known-words.tests
+IN: compiler.tree.propagation.known-words+tests
 
 {
     fixnum T{ interval { from { -19 t } } { to { 19 t } } }

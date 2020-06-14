@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: inverse tools.test arrays math kernel sequences
 math.functions math.constants continuations combinators.smart ;
-IN: inverse.tests
+IN: inverse+tests
 
 { 2 } [ { 3 2 } [ 3 swap 2array ] undo ] unit-test
 [ { 3 4 } [ dup 2array ] undo ] must-fail

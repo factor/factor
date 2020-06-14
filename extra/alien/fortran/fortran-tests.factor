@@ -6,7 +6,7 @@ generalizations io.encodings.ascii kernel macros
 macros.expander namespaces sequences shuffle tools.test vocabs.parser ;
 FROM: alien.syntax => pointer: ;
 QUALIFIED-WITH: alien.c-types c
-IN: alien.fortran.tests
+IN: alien.fortran+tests
 
 << intel-unix-abi "(alien.fortran-tests)" (add-fortran-library) >>
 LIBRARY: (alien.fortran-tests)
@@ -94,7 +94,7 @@ intel-unix-abi fortran-abi [
     [ fortran_test_record ]
     [
         [
-            "alien.fortran.tests" use-vocab
+            "alien.fortran+tests" use-vocab
             "fortran_test_record" fortran-type>c-type
         ] with-manifest
     ] unit-test
@@ -113,7 +113,7 @@ intel-unix-abi fortran-abi [
     [ pointer: fortran_test_record { } ]
     [
         [
-            "alien.fortran.tests" use-vocab
+            "alien.fortran+tests" use-vocab
             "fortran_test_record" fortran-arg-type>c-type
         ] with-manifest
     ] unit-test
@@ -162,7 +162,7 @@ intel-unix-abi fortran-abi [
     [ c:void { pointer: fortran_test_record } ]
     [
         [
-            "alien.fortran.tests" use-vocab
+            "alien.fortran+tests" use-vocab
             "fortran_test_record" fortran-ret-type>c-type
         ] with-manifest
     ] unit-test

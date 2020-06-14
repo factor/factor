@@ -2,7 +2,7 @@ USING: continuations io.sockets io.sockets+private sequences math
 tools.test namespaces accessors kernel destructors calendar io.timeouts
 io.encodings.utf8 io concurrency.promises threads
 io.streams.string present system ;
-IN: io.sockets.tests
+IN: io.sockets+tests
 
 os unix? [
     [ T{ local f "/tmp/foo" } ] [ "/tmp/foo" <local> ] unit-test

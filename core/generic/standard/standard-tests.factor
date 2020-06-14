@@ -6,7 +6,7 @@ math.constants math.functions namespaces parser quotations
 sequences specialized-vectors strings tools.test words ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-VECTOR: c:double
-IN: generic.standard.tests
+IN: generic.standard+tests
 
 GENERIC: class-of ( x -- y )
 
@@ -188,11 +188,11 @@ M: byte-array small-lo-tag drop "byte-array" ;
 { "double-array" } [ double-array{ 1.0 } small-lo-tag ] unit-test
 
 ! Testing recovery from bad method definitions
-"IN: generic.standard.tests GENERIC: unhappy ( x -- x )" eval( -- )
+"IN: generic.standard+tests GENERIC: unhappy ( x -- x )" eval( -- )
 [
-    "IN: generic.standard.tests M: dictionary unhappy ;" eval( -- )
+    "IN: generic.standard+tests M: dictionary unhappy ;" eval( -- )
 ] must-fail
-{ } [ "IN: generic.standard.tests GENERIC: unhappy ( x -- x )" eval( -- ) ] unit-test
+{ } [ "IN: generic.standard+tests GENERIC: unhappy ( x -- x )" eval( -- ) ] unit-test
 
 GENERIC#: complex-combination 1 ( a b -- c )
 M: string complex-combination drop ;
@@ -237,7 +237,7 @@ M: f generic-forget-test ;
 
 { } [ [ "m" get forget ] with-compilation-unit ] unit-test
 
-{ } [ "IN: generic.standard.tests M: f generic-forget-test ;" eval( -- ) ] unit-test
+{ } [ "IN: generic.standard+tests M: f generic-forget-test ;" eval( -- ) ] unit-test
 
 { } [ [ "m" get forget ] with-compilation-unit ] unit-test
 
@@ -245,7 +245,7 @@ M: f generic-forget-test ;
 
 ! erg's regression
 { } [
-    "IN: generic.standard.tests
+    "IN: generic.standard+tests
 
     GENERIC: jeah ( a -- b )
     TUPLE: boii ;
@@ -253,10 +253,10 @@ M: f generic-forget-test ;
     GENERIC: jeah* ( a -- b )
     M: boii jeah* jeah ;" eval( -- )
 
-    "IN: generic.standard.tests
+    "IN: generic.standard+tests
     FORGET: boii" eval( -- )
 
-    "IN: generic.standard.tests
+    "IN: generic.standard+tests
     TUPLE: boii ;
     M: boii jeah ;" eval( -- )
 ] unit-test
@@ -358,38 +358,38 @@ M: c funky* "c" , call-next-method ;
 ] unit-test
 
 ! Changing method combination should not fail
-{ } [ "IN: generic.standard.tests GENERIC: xyz ( a -- b )" eval( -- ) ] unit-test
-{ } [ "IN: generic.standard.tests MATH: xyz ( a b -- c )" eval( -- ) ] unit-test
+{ } [ "IN: generic.standard+tests GENERIC: xyz ( a -- b )" eval( -- ) ] unit-test
+{ } [ "IN: generic.standard+tests MATH: xyz ( a b -- c )" eval( -- ) ] unit-test
 
-{ f } [ "xyz" "generic.standard.tests" lookup-word pic-def>> ] unit-test
-{ f } [ "xyz" "generic.standard.tests" lookup-word "decision-tree" word-prop ] unit-test
+{ f } [ "xyz" "generic.standard+tests" lookup-word pic-def>> ] unit-test
+{ f } [ "xyz" "generic.standard+tests" lookup-word "decision-tree" word-prop ] unit-test
 
 ! Corner cases
-[ "IN: generic.standard.tests GENERIC: broken-generic ( -- )" eval( -- ) ]
+[ "IN: generic.standard+tests GENERIC: broken-generic ( -- )" eval( -- ) ]
 [ error>> bad-dispatch-position? ]
 must-fail-with
-[ "IN: generic.standard.tests GENERIC#: broken-generic# -1 ( a -- b )" eval( -- ) ]
+[ "IN: generic.standard+tests GENERIC#: broken-generic# -1 ( a -- b )" eval( -- ) ]
 [ error>> bad-dispatch-position? ]
 must-fail-with
-[ "IN: generic.standard.tests GENERIC#: broken-generic# 1 ( a -- b )" eval( -- ) ]
+[ "IN: generic.standard+tests GENERIC#: broken-generic# 1 ( a -- b )" eval( -- ) ]
 [ error>> bad-dispatch-position? ]
 must-fail-with
-[ "IN: generic.standard.tests GENERIC#: broken-generic# 2/3 ( a b c -- )" eval( -- ) ]
+[ "IN: generic.standard+tests GENERIC#: broken-generic# 2/3 ( a b c -- )" eval( -- ) ]
 [ error>> bad-dispatch-position? ]
 must-fail-with
 
 ! Generic words cannot be inlined
-{ } [ "IN: generic.standard.tests GENERIC: foo ( x -- x )" eval( -- ) ] unit-test
-[ "IN: generic.standard.tests GENERIC: foo ( x -- x ) inline" eval( -- ) ] must-fail
+{ } [ "IN: generic.standard+tests GENERIC: foo ( x -- x )" eval( -- ) ] unit-test
+[ "IN: generic.standard+tests GENERIC: foo ( x -- x ) inline" eval( -- ) ] must-fail
 
 ! Moving a method from one vocab to another didn't always work
 GENERIC: move-method-generic ( a -- b )
 
-{ } [ "IN: generic.standard.tests.a USE: strings USE: generic.standard.tests M: string move-method-generic ;" <string-reader> "move-method-test-1" parse-stream drop ] unit-test
+{ } [ "IN: generic.standard+tests.a USE: strings USE: generic.standard+tests M: string move-method-generic ;" <string-reader> "move-method-test-1" parse-stream drop ] unit-test
 
-{ } [ "IN: generic.standard.tests.b USE: strings USE: generic.standard.tests M: string move-method-generic ;" <string-reader> "move-method-test-2" parse-stream drop ] unit-test
+{ } [ "IN: generic.standard+tests.b USE: strings USE: generic.standard+tests M: string move-method-generic ;" <string-reader> "move-method-test-2" parse-stream drop ] unit-test
 
-{ } [ "IN: generic.standard.tests.a" <string-reader> "move-method-test-1" parse-stream drop ] unit-test
+{ } [ "IN: generic.standard+tests.a" <string-reader> "move-method-test-1" parse-stream drop ] unit-test
 
 { { string } } [ \ move-method-generic order ] unit-test
 
@@ -398,7 +398,7 @@ GENERIC: forget-test ( a -- b )
 
 M: integer forget-test 3 + ;
 
-{ } [ "IN: generic.standard.tests USE: math FORGET: M\\ integer forget-test" eval( -- ) ] unit-test
+{ } [ "IN: generic.standard+tests USE: math FORGET: M\\ integer forget-test" eval( -- ) ] unit-test
 
 { { } } [
     \ + all-dependencies-of keys [ method? ] filter

@@ -2,7 +2,7 @@ USING: accessors alien alien.c-types alien+private kernel
 kernel+private literals math namespaces stack-checker.alien
 stack-checker.state stack-checker.values system threads+private
 tools.test ;
-IN: stack-checker.alien.tests
+IN: stack-checker.alien+tests
 
 ! alien-inputs/outputs
 {

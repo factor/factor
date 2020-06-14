@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel tools.test slots.syntax ;
-IN: slots.syntax.tests
+IN: slots.syntax+tests
 
 TUPLE: slot-test1 a b c ;
 

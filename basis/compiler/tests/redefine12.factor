@@ -1,5 +1,5 @@
 USING: kernel tools.test eval ;
-IN: compiler.tests.redefine12
+IN: compiler+tests.redefine12
 
 ! A regression that came about when fixing the
 ! 'no method on classes-intersect?' bug
@@ -15,6 +15,6 @@ M: object g drop t ;
 
 TUPLE: jeah ;
 
-[ ] [ "USE: kernel IN: compiler.tests.redefine12 M: jeah g drop f ;" eval( -- ) ] unit-test
+[ ] [ "USE: kernel IN: compiler+tests.redefine12 M: jeah g drop f ;" eval( -- ) ] unit-test
 
 [ f ] [ T{ jeah } h ] unit-test

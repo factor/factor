@@ -1,7 +1,7 @@
 USING: accessors compiler.cfg.copy-prop compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.utilities compiler.test
 cpu.architecture namespaces tools.test ;
-IN: compiler.cfg.copy-prop.tests
+IN: compiler.cfg.copy-prop+tests
 
 : test-copy-propagation ( -- )
     0 get block>cfg copy-propagation ;

@@ -1,6 +1,6 @@
 USING: arrays assocs bootstrap.image+private kernel layouts math
 math.bitwise namespaces sequences tools.test vectors ;
-IN: bootstrap.image.tests
+IN: bootstrap.image+tests
 
 { f } [ { 1 2 3 } [ 1 2 3 ] eql? ] unit-test
 

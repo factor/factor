@@ -1,6 +1,6 @@
 USING: accessors arrays classes deques dlists kernel locals
 math sequences tools.test ;
-IN: dlists.tests
+IN: dlists+tests
 
 { t } [ <dlist> deque-empty? ] unit-test
 

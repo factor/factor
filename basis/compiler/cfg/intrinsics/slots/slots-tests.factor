@@ -2,7 +2,7 @@ USING: accessors arrays compiler.cfg compiler.cfg.builder.blocks
 compiler.cfg.instructions compiler.cfg.intrinsics.slots compiler.test
 compiler.tree compiler.tree.propagation.info kernel layouts literals
 make math math.intervals sequences slots+private tools.test ;
-IN: compiler.cfg.intrinsics.slots.tests
+IN: compiler.cfg.intrinsics.slots+tests
 
 : call-node-1 ( -- node )
     T{ #call

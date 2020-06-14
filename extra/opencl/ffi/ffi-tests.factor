@@ -5,7 +5,7 @@ io.encodings.string sequences libc alien.c-types destructors math
 specialized-arrays alien.data math.order alien ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAYS: float void* ;
-IN: opencl.ffi.tests
+IN: opencl.ffi+tests
 
 STRING: kernel-source
 __kernel void square(

@@ -3,7 +3,7 @@
 USING: accessors compression.lzw images.gif images.testing io
 io.encodings.binary io.files kernel math math.bitwise
 namespaces sequences tools.test ;
-IN: images.gif.tests
+IN: images.gif+tests
 
 {
     "vocab:images/testing/gif/circle.gif"

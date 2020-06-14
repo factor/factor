@@ -1,6 +1,6 @@
 USING: accessors calendar continuations db io.directories
 io.files.temp kernel tools.test webapps.mason.backend webapps.utils ;
-IN: webapps.mason.backend.tests
+IN: webapps.mason.backend+tests
 
 "mason-test.db" temp-file ?delete-file
 

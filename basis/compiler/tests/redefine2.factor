@@ -1,11 +1,11 @@
 USING: compiler compiler.units tools.test math parser kernel
 sequences sequences+private classes.mixin generic definitions
 arrays words assocs eval words.symbol ;
-IN: compiler.tests.redefine2
+IN: compiler+tests.redefine2
 
 DEFER: redefine2-test
 
-[ ] [ "USE: sequences USE: kernel IN: compiler.tests.redefine2 TUPLE: redefine2-test ; M: redefine2-test nth 2drop 3 ; INSTANCE: redefine2-test sequence" eval( -- ) ] unit-test
+[ ] [ "USE: sequences USE: kernel IN: compiler+tests.redefine2 TUPLE: redefine2-test ; M: redefine2-test nth 2drop 3 ; INSTANCE: redefine2-test sequence" eval( -- ) ] unit-test
 
 [ t ] [ \ redefine2-test symbol? ] unit-test
 

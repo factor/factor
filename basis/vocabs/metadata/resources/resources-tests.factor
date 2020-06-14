@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays globs sorting tools.test vocabs.metadata.resources ;
-IN: vocabs.metadata.resources.tests
+IN: vocabs.metadata.resources+tests
 
 ! match-pattern
 { { "hello.txt" } } [

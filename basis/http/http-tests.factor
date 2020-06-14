@@ -4,7 +4,7 @@ io.encodings.utf8 io.encodings.latin1 io.encodings.binary io.encodings.string
 io.encodings.ascii kernel arrays splitting sequences assocs io.sockets db
 db.sqlite make continuations urls hashtables accessors namespaces xml.data
 random combinators.short-circuit literals ;
-IN: http.tests
+IN: http+tests
 
 { "text/plain" "UTF-8" } [ "text/plain" parse-content-type ] unit-test
 

@@ -1,6 +1,6 @@
 USING: multi-methods tools.test math sequences namespaces system
 kernel strings ;
-IN: multi-methods.tests
+IN: multi-methods+tests
 
 [ { POSTPONE: f integer } ] [ { f integer } canonicalize-specializer-0 ] unit-test
 

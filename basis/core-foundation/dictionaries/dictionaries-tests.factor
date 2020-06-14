@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test core-foundation core-foundation.dictionaries
 arrays destructors core-foundation.strings kernel namespaces ;
-IN: core-foundation.dictionaries.tests
+IN: core-foundation.dictionaries+tests
 
 { } [ { } <CFDictionary> CFRelease ] unit-test
 

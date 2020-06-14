@@ -1,5 +1,5 @@
 USING: help tools.test ;
-IN: help.handbook.tests
+IN: help.handbook+tests
 
 { } [ "article-index" print-topic ] unit-test
 { } [ "primitive-index" print-topic ] unit-test

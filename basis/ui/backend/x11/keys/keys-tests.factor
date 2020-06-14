@@ -1,5 +1,5 @@
 USING: tools.test ui.backend.x11.keys x11.keysymdef ;
-IN: ui.backend.x11.keys.tests
+IN: ui.backend.x11.keys+tests
 
 {
     65 f

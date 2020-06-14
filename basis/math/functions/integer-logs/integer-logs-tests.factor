@@ -1,7 +1,7 @@
 ! Copyright (C) 2016 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test math math.functions math.functions.integer-logs ;
-IN: math.functions.integer-logs.tests
+IN: math.functions.integer-logs+tests
 
 [ -576460752303423489 integer-log10 ] [ log-expects-positive? ] must-fail-with
 [ -123124 integer-log10 ] [ log-expects-positive? ] must-fail-with

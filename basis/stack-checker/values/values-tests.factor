@@ -1,6 +1,6 @@
 USING: accessors kernel namespaces stack-checker.state
 stack-checker.values tools.test ;
-IN: stack-checker.values.tests
+IN: stack-checker.values+tests
 
 TUPLE: foo-tup a b ;
 

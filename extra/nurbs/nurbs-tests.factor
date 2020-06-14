@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: literals math math.functions math.vectors namespaces
 nurbs tools.test ;
-IN: nurbs.tests
+IN: nurbs+tests
 
 SYMBOL: test-nurbs
 

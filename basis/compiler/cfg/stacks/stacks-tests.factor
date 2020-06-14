@@ -1,7 +1,7 @@
 USING: accessors arrays assocs combinators compiler.cfg.registers
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.test kernel literals
 namespaces tools.test ;
-IN: compiler.cfg.stacks.tests
+IN: compiler.cfg.stacks+tests
 
 ! store-vregs
 {

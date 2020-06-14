@@ -1,7 +1,7 @@
 USING: alien.c-types literals specialized-arrays tools.test
 ui.pixel-formats ;
 SPECIALIZED-ARRAY: int
-IN: ui.pixel-formats.tests
+IN: ui.pixel-formats+tests
 
 CONSTANT: attrib-table {
     { windowed { 99 } }

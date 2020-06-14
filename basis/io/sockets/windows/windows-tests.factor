@@ -1,6 +1,6 @@
 USING: accessors continuations destructors io.sockets io.sockets.windows
 kernel sequences tools.test urls windows.winsock ;
-IN: io.sockets.windows.tests
+IN: io.sockets.windows+tests
 
 : google-socket ( -- socket )
     URL" http://www.google.com" url-addr resolve-host first

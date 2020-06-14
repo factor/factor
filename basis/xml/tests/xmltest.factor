@@ -2,7 +2,7 @@ USING: accessors assocs combinators combinators.smart
 continuations fry generalizations io.pathnames kernel macros
 sequences stack-checker tools.test xml xml.traversal xml.writer
 arrays xml.data ;
-IN: xml.tests.suite
+IN: xml+tests.suite
 
 TUPLE: xml-test id uri sections description type ;
 

@@ -5,7 +5,7 @@
 ! end of a compilation unit.
 
 USING: kernel accessors peg.ebnf words multiline ;
-IN: compiler.tests.peg-regression
+IN: compiler+tests.peg-regression
 
 TUPLE: pipeline-expr background ;
 

@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-IN: xml.tests
+IN: xml+tests
 USING: kernel xml tools.test io namespaces make sequences
 xml.errors xml.entities.html parser strings xml.data io.files
 xml.traversal continuations assocs io.encodings.binary

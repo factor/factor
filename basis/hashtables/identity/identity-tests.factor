@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables.identity kernel literals tools.test ;
-IN: hashtables.identity.tests
+IN: hashtables.identity+tests
 
 CONSTANT: the-real-slim-shady "marshall mathers"
 

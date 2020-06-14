@@ -1,5 +1,5 @@
 USING: kernel tools.test windows.winsock ;
-IN: windows.winsock.tests
+IN: windows.winsock+tests
 
 : normal-socket ( -- socket )
     AF_INET SOCK_STREAM IPPROTO_TCP socket ;

@@ -1,7 +1,7 @@
 USING: tools.test math math.functions kernel sequences lists
 promises monads ;
 FROM: monads => do ;
-IN: monads.tests
+IN: monads+tests
 
 { 5 } [ 1 identity-monad return [ 4 + ] fmap run-identity ] unit-test
 [ "OH HAI" identity-monad fail ] must-fail

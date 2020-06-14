@@ -4,7 +4,7 @@ compiler.cfg.gc-checks+private compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.rpo compiler.cfg.utilities
 compiler.test cpu.architecture kernel layouts math memory namespaces
 sequences tools.test ;
-IN: compiler.cfg.gc-checks.tests
+IN: compiler.cfg.gc-checks+tests
 
 ! insert-gc-check?
 { t f } [

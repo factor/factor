@@ -1,6 +1,6 @@
 USING: io.encodings.iana io.encodings.iana+private
 io.encodings.utf8 tools.test assocs namespaces ;
-IN: io.encodings.iana.tests
+IN: io.encodings.iana+tests
 
 { utf8 } [ "UTF-8" name>encoding ] unit-test
 { utf8 } [ "utf8" name>encoding ] unit-test

@@ -1,5 +1,5 @@
 USING: accessors alien alien.libraries alien.syntax kernel tools.test ;
-IN: alien.libraries.tests
+IN: alien.libraries+tests
 
 { f } [ DLL" fadfasdfsada" dll-valid? ] unit-test
 

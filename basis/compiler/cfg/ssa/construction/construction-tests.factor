@@ -2,7 +2,7 @@ USING: accessors assocs compiler.cfg compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.ssa.construction
 compiler.cfg.ssa.construction+private compiler.cfg.utilities
 compiler.test kernel namespaces sequences tools.test ;
-IN: compiler.cfg.ssa.construction.tests
+IN: compiler.cfg.ssa.construction+tests
 
 ! insert-phi-later
 {

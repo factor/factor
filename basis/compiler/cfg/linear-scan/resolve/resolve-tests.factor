@@ -1,7 +1,7 @@
 USING: accessors compiler.cfg compiler.cfg.instructions
 compiler.cfg.linear-scan.resolve compiler.cfg.utilities
 cpu.architecture kernel make namespaces sequences tools.test ;
-IN: compiler.cfg.linear-scan.resolve.tests
+IN: compiler.cfg.linear-scan.resolve+tests
 
 {
     {

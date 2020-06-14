@@ -1,7 +1,7 @@
 USING: http.server http.server.dispatchers http.server.responses
 tools.test kernel namespaces accessors io http math sequences
 assocs arrays classes words urls ;
-IN: http.server.dispatchers.tests
+IN: http.server.dispatchers+tests
 
 TUPLE: mock-responder path ;
 

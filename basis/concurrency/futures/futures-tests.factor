@@ -1,5 +1,5 @@
 USING: concurrency.futures kernel tools.test threads ;
-IN: concurrency.futures.tests
+IN: concurrency.futures+tests
 
 { 50 } [
     [ 50 ] future ?future

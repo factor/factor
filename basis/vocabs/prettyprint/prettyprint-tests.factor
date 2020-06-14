@@ -1,6 +1,6 @@
 USING: vocabs.prettyprint vocabs.prettyprint+private tools.test
 io.streams.string eval ;
-IN: vocabs.prettyprint.tests
+IN: vocabs.prettyprint+tests
 
 : manifest-test-1 ( -- string )
     "USING: kernel namespaces vocabs.parser vocabs.prettyprint ;
@@ -14,13 +14,13 @@ IN: vocabs.prettyprint.tests
 
 : manifest-test-2 ( -- string )
     "USING: kernel namespaces vocabs.parser vocabs.prettyprint ;
-    IN: vocabs.prettyprint.tests
+    IN: vocabs.prettyprint+tests
 
     << manifest get pprint-manifest >>" ;
 
 {
 "USING: kernel namespaces vocabs.parser vocabs.prettyprint ;
-IN: vocabs.prettyprint.tests"
+IN: vocabs.prettyprint+tests"
 }
 [ [ manifest-test-2 eval( -- ) ] with-string-writer ] unit-test
 
@@ -30,7 +30,7 @@ IN: vocabs.prettyprint.tests"
     QUALIFIED: system
     QUALIFIED-WITH: assocs a
     EXCLUDE: parser => run-file ;
-    IN: vocabs.prettyprint.tests
+    IN: vocabs.prettyprint+tests
 
     << manifest get pprint-manifest >>" ;
 
@@ -40,7 +40,7 @@ FROM: math => + - ;
 QUALIFIED: system
 QUALIFIED-WITH: assocs a
 EXCLUDE: parser => run-file ;
-IN: vocabs.prettyprint.tests"
+IN: vocabs.prettyprint+tests"
 }
 [ [ manifest-test-3 eval( -- ) ] with-string-writer ] unit-test
 

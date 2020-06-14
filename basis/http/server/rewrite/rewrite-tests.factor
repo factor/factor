@@ -1,6 +1,6 @@
 USING: accessors arrays http.server http.server.rewrite kernel
 namespaces tools.test urls ;
-IN: http.server.rewrite.tests
+IN: http.server.rewrite+tests
 
 TUPLE: rewrite-test-default ;
 

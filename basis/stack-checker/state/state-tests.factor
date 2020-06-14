@@ -1,7 +1,7 @@
 USING: accessors assocs classes.tuple compiler.tree kernel namespaces sequences
 stack-checker.backend stack-checker.recursive-state stack-checker.state
 stack-checker.values stack-checker.visitor tools.test ;
-IN: stack-checker.state.tests
+IN: stack-checker.state+tests
 
 {
     V{ 1 2 3 }

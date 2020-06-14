@@ -4,7 +4,7 @@ compiler.cfg.linear-scan.numbering compiler.cfg.linear-scan.ranges
 compiler.cfg.liveness compiler.cfg.registers
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities cpu.architecture
 cpu.x86.assembler.operands fry kernel namespaces sequences tools.test ;
-IN: compiler.cfg.linear-scan.live-intervals.tests
+IN: compiler.cfg.linear-scan.live-intervals+tests
 
 : <live-interval-for-ranges> ( ranges -- live-interval )
     10 <live-interval> [ '[ first2 _ ranges>> add-range ] each ] keep ;

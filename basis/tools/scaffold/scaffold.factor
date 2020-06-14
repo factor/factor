@@ -310,7 +310,7 @@ PRIVATE>
     [
         scaffold-copyright
         "USING: tools.test " write dup write " ;" print
-        "IN: " write write ".tests" print
+        "IN: " write write "+tests" print
     ] with-string-writer ;
 
 : set-scaffold-tests-file ( vocab path -- )

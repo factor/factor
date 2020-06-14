@@ -1,6 +1,6 @@
 USING: accessors alien.strings alien.syntax
 compiler.codegen.relocation namespaces sequences tools.test ;
-IN: compiler.codegen.relocation.tests
+IN: compiler.codegen.relocation+tests
 
 {
     B{ 114 101 97 100 108 105 110 101 0 }

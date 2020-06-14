@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.endian classes.struct io
 io.encodings.binary io.streams.byte-array kernel tools.test ;
-IN: alien.endian.tests
+IN: alien.endian+tests
 
 STRUCT: endian-struct
     { a ule16 }

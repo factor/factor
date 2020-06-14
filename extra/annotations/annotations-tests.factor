@@ -1,6 +1,6 @@
 USING: accessors annotations combinators.short-circuit
 io.pathnames kernel math sequences sorting tools.test ;
-IN: annotations.tests
+IN: annotations+tests
 
 !NOTE testing toplevel form
 

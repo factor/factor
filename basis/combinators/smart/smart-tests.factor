@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.smart kernel locals
 math sequences stack-checker tools.test ;
-IN: combinators.smart.tests
+IN: combinators.smart+tests
 
 : test-bi ( -- 9 11 )
     10 [ 1 - ] [ 1 + ] bi ;

@@ -1,7 +1,7 @@
 USING: kernel tools.test namespaces sequences math
 compiler.tree.escape-analysis.recursive
 compiler.tree.escape-analysis.allocations ;
-IN: compiler.tree.escape-analysis.recursive.tests
+IN: compiler.tree.escape-analysis.recursive+tests
 
 H{ } clone allocations set
 <escaping-values> escaping-values set

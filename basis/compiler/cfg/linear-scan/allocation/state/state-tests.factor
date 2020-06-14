@@ -5,7 +5,7 @@ compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
 compiler.cfg.stack-frame compiler.cfg.utilities cpu.architecture
 cpu.x86.assembler.operands fry heaps kernel layouts literals
 namespaces sequences system tools.test ;
-IN: compiler.cfg.linear-scan.allocation.state.tests
+IN: compiler.cfg.linear-scan.allocation.state+tests
 
 ! active-intervals-for
 {

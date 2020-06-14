@@ -3,7 +3,7 @@ io.streams.null accessors inspector html.streams
 html.components html.forms namespaces
 xml.writer xml.syntax ;
 FROM: html.components => inspector ;
-IN: html.components.tests
+IN: html.components+tests
 
 { } [ begin-form ] unit-test
 

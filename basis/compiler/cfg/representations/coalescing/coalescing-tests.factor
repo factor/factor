@@ -1,7 +1,7 @@
 USING: compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.representations.coalescing compiler.cfg.utilities
 compiler.test kernel namespaces tools.test ;
-IN: compiler.cfg.representations.coalescing.tests
+IN: compiler.cfg.representations.coalescing+tests
 
 : test-scc ( -- )
     0 get block>cfg compute-components ;

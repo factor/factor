@@ -1,6 +1,6 @@
 USING: interpolate io io.encodings.ascii io.files io.files.temp
 io.launcher io.streams.string kernel locals sequences system ;
-IN: alien.remote-control.tests
+IN: alien.remote-control+tests
 
 : compile-file ( contents -- )
     "test.c" ascii set-file-contents

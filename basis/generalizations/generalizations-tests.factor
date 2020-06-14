@@ -1,6 +1,6 @@
 USING: tools.test generalizations kernel math arrays sequences
 ascii fry math.parser io io.streams.string ;
-IN: generalizations.tests
+IN: generalizations+tests
 
 { 1 2 3 4 1 } [ 1 2 3 4 4 npick ] unit-test
 { 1 2 3 4 2 } [ 1 2 3 4 3 npick ] unit-test

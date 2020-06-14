@@ -5,7 +5,7 @@ prettyprint math+private accessors slots+private sequences
 sequences+private strings sbufs compiler.tree.builder
 compiler.tree.normalization compiler.tree.debugger alien.accessors
 layouts combinators byte-arrays arrays ;
-IN: compiler.tree.modular-arithmetic.tests
+IN: compiler.tree.modular-arithmetic+tests
 
 : test-modular-arithmetic ( quot -- quot' )
     cleaned-up-tree nodes>quot ;

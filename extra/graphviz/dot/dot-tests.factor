@@ -1,5 +1,5 @@
 USING: graphviz.dot+private io.streams.string sequences tools.test ;
-IN: graphviz.dot.tests
+IN: graphviz.dot+tests
 
 ! Making sure strings are escaped properly
 {

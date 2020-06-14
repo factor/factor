@@ -1,7 +1,7 @@
 USING: tools.test quotations math kernel sequences
 assocs namespaces make compiler.units compiler.test
 locals random ;
-IN: compiler.tests.curry
+IN: compiler+tests.curry
 
 [ 3 ] [ 5 [ [ 2 - ] curry call ] compile-call ] unit-test
 [ 3 ] [ [ 5 [ 2 - ] curry call ] compile-call ] unit-test

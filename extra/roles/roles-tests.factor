@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes.tuple compiler.units kernel qw roles sequences
 tools.test ;
-IN: roles.tests
+IN: roles+tests
 
 ROLE: fork tines ;
 ROLE: spoon bowl ;

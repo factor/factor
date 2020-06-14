@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 USING: formatting kernel machine-learning.data-sets
 machine-learning.decision-trees sequences tools.test ;
-IN: machine-learning.decision-trees.tests
+IN: machine-learning.decision-trees+tests
 
 : monks-gains ( name -- seq )
     load-monks 6 <iota> [ average-gain "%.3f" sprintf ] with map ;

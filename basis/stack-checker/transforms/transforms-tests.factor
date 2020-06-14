@@ -1,4 +1,4 @@
-IN: stack-checker.transforms.tests
+IN: stack-checker.transforms+tests
 USING: sequences stack-checker.transforms tools.test math kernel
 quotations stack-checker stack-checker.errors accessors
 combinators words arrays classes classes.tuple macros ;

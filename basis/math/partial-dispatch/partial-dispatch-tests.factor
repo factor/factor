@@ -1,4 +1,4 @@
-IN: math.partial-dispatch.tests
+IN: math.partial-dispatch+tests
 USING: math.partial-dispatch math+private
 tools.test math kernel sequences ;
 

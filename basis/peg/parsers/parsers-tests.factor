@@ -1,5 +1,5 @@
 USING: kernel peg peg.parsers tools.test accessors ;
-IN: peg.parsers.tests
+IN: peg.parsers+tests
 
 { V{ "a" } }
 [ "a" "a" token "," token list-of parse ] unit-test

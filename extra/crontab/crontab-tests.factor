@@ -1,7 +1,7 @@
 USING: calendar calendar.format crontab kernel math.order
 sequences tools.test ;
 
-IN: crontab.tests
+IN: crontab+tests
 
 { +lt+ } [
     now "*/1 * * * *" parse-cronentry next-time <=>

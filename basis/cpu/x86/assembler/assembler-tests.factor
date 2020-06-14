@@ -1,6 +1,6 @@
 USING: cpu.x86.assembler cpu.x86.assembler.operands
 kernel tools.test namespaces make layouts ;
-IN: cpu.x86.assembler.tests
+IN: cpu.x86.assembler+tests
 
 ! small registers
 { { 128 192 12 } } [ [ AL 12 <byte> ADD ] { } make ] unit-test

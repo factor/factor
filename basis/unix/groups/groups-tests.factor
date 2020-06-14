@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences strings tools.test unix.groups ;
-IN: unix.groups.tests
+IN: unix.groups+tests
 
 { } [ all-groups drop ] unit-test
 

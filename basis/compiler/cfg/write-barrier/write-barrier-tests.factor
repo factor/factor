@@ -1,6 +1,6 @@
 USING: compiler.cfg.instructions compiler.cfg.write-barrier
 tools.test ;
-IN: compiler.cfg.write-barrier.tests
+IN: compiler.cfg.write-barrier+tests
 
 ! Do need a write barrier on a random store.
 {

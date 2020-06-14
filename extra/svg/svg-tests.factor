@@ -2,7 +2,7 @@
 USING: accessors literals math math.affine-transforms
 math.functions math.trig multiline sequences svg tools.test xml
 xml.traversal ;
-IN: svg.tests
+IN: svg+tests
 
 ${ { 1.0 2.25 } { -3.0 4.0 } { 5.5 0.5 } <affine-transform> } [
     "matrix ( 1 +2.25 -3  , 0.4e+1  ,5.5, 5e-1 )" svg-transform>affine-transform

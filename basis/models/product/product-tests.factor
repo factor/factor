@@ -1,6 +1,6 @@
 USING: arrays generic kernel math models namespaces sequences assocs
 tools.test models.product accessors locals ;
-IN: models.product.tests
+IN: models.product+tests
 
 { } [
     1 <model> "a" set

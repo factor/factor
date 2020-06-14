@@ -1,4 +1,4 @@
-IN: cpu.arm.assembler.tests
+IN: cpu.arm.assembler+tests
 USING: cpu.arm.assembler math tools.test namespaces make
 sequences kernel quotations ;
 FROM: cpu.arm.assembler => B ;

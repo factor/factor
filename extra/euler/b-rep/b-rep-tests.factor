@@ -1,7 +1,7 @@
 USING: accessors euler.b-rep euler.modeling euler.operators
 euler.b-rep.examples kernel locals math.vectors.simd.cords
 namespaces sequences tools.test ;
-IN: euler.b-rep.tests
+IN: euler.b-rep+tests
 
 { double-4{ 0.0 0.0 -1.0 0.0 } }
 [ valid-cube-b-rep edges>> first face-normal ] unit-test

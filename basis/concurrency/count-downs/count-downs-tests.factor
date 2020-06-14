@@ -1,5 +1,5 @@
 USING: concurrency.count-downs threads kernel tools.test ;
-IN: concurrency.count-downs.tests
+IN: concurrency.count-downs+tests
 
 { } [ 0 <count-down> await ] unit-test
 

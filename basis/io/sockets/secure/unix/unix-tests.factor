@@ -4,7 +4,7 @@ destructors io io.backend.unix io.encodings.ascii io.sockets
 io.sockets.secure io.sockets.secure.debug io.streams.duplex
 io.timeouts kernel locals namespaces threads tools.test ;
 QUALIFIED-WITH: concurrency.messaging qm
-IN: io.sockets.secure.tests
+IN: io.sockets.secure+tests
 
 { 1 0 } [ [ ] with-secure-context ] must-infer-as
 

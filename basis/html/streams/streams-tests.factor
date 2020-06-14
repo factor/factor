@@ -2,7 +2,7 @@ USING: html.streams html.streams+private accessors io
 io.streams.string io.styles kernel namespaces tools.test
 sbufs sequences inspector colors xml.writer
 classes.predicate prettyprint ;
-IN: html.streams.tests
+IN: html.streams+tests
 
 : make-html-string ( quot -- string )
     [ with-html-writer write-xml ] with-string-writer ; inline

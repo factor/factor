@@ -1,6 +1,6 @@
 USING: accessors bootstrap.image fry grouping io.files io.pathnames kernel
 sequences system tools.deploy.backend tools.image-analyzer tools.test ;
-IN: tools.image-analyzer.tests
+IN: tools.image-analyzer+tests
 
 : boot-image-path ( arch -- path )
     boot-image-name resource-path ;

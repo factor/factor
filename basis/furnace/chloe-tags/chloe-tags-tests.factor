@@ -1,5 +1,5 @@
 USING: html.forms furnace.chloe-tags tools.test ;
-IN: furnace.chloe-tags.tests
+IN: furnace.chloe-tags+tests
 
 { f } [ f parse-query-attr ] unit-test
 

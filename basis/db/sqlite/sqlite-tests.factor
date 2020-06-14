@@ -2,7 +2,7 @@ USING: accessors arrays db db.errors db.sqlite db.tuples
 db.types io.directories io.files.temp kernel layouts literals
 math.parser namespaces sequences sorting splitting tools.test ;
 
-IN: db.sqlite.tests
+IN: db.sqlite+tests
 
 : normalize ( str -- str' )
     " \n" split harvest " " join ;

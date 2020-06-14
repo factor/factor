@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license.
 USING: llvm.examples.kaleidoscope tools.test ;
-IN: llvm.examples.kaleidoscope.tests
+IN: llvm.examples.kaleidoscope+tests
 
 
 {

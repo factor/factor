@@ -1,4 +1,4 @@
-IN: logging.tests
+IN: logging+tests
 USING: tools.test logging logging.analysis logging.server io
 io.files.temp math ;
 

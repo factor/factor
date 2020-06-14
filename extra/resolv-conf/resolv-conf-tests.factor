@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test resolv-conf ;
-IN: resolv-conf.tests
+IN: resolv-conf+tests
 {
     T{ resolv.conf
         { nameserver V{ "127.0.0.53" } }

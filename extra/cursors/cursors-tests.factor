@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors cursors kernel make math sequences sorting tools.test ;
 FROM: cursors => each map assoc-each assoc>map ;
-IN: cursors.tests
+IN: cursors+tests
 
 { { 1 2 3 4 } } [
     [ T{ linear-cursor f 1 1 } T{ linear-cursor f 5 1 } [ value>> , ] -each ]

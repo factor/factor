@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: gpu.shaders gpu.shaders+private io.pathnames tools.test ;
-IN: gpu.shaders.tests
+IN: gpu.shaders+tests
 
 { "ERROR: foo.factor:20: Bad command or filename
 INFO: foo.factor:30: The operation completed successfully

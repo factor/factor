@@ -1,6 +1,6 @@
 USING: compiler.cfg.utilities compiler.codegen compiler.codegen.labels
 compiler.constants cpu.architecture kernel make math tools.test ;
-IN: compiler.codegen.tests
+IN: compiler.codegen+tests
 
 ! useless-branch?
 { t f } [

@@ -1,7 +1,7 @@
 USING: accessors continuations http.client http.server io.servers
 io.sockets.secure io.sockets.secure.openssl io.timeouts kernel
 tools.test ;
-IN: io.sockets.secure.openssl.tests
+IN: io.sockets.secure.openssl+tests
 
 { 200 } [ "https://www.google.se" http-get drop code>> ] unit-test
 

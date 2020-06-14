@@ -1,4 +1,4 @@
-IN: tr.tests
+IN: tr+tests
 USING: tr tools.test ascii ;
 
 TR: tr-test ch>upper "ABC" "XYZ" ;

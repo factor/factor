@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 USING: calendar formatting kernel literals math math.functions
 sequences strings system tools.test ;
-IN: formatting.tests
+IN: formatting+tests
 
 [ "%s" printf ] must-infer
 [ "%s" sprintf ] must-infer

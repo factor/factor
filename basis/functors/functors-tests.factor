@@ -1,7 +1,7 @@
 USING: classes.struct classes.tuple functors tools.test math
 words kernel multiline parser io.streams.string generic ;
 QUALIFIED-WITH: alien.c-types c
-IN: functors.tests
+IN: functors+tests
 
 <<
 
@@ -105,7 +105,7 @@ M: integer W 1 + ;
 
 ! Does replacing an ordinary word with a functor-generated one work?
 [ [ ] ] [
-    "IN: functors.tests
+    "IN: functors+tests
 
     TUPLE: some-tuple ;
     : some-word ( -- ) ;
@@ -115,14 +115,14 @@ M: integer W 1 + ;
 ] unit-test
 
 : test-redefinition ( -- )
-    [ t ] [ "some-word" "functors.tests" lookup-word >boolean ] unit-test
-    [ t ] [ "some-tuple" "functors.tests" lookup-word >boolean ] unit-test
-    [ t ] [ "some-generic" "functors.tests" lookup-word >boolean ] unit-test
+    [ t ] [ "some-word" "functors+tests" lookup-word >boolean ] unit-test
+    [ t ] [ "some-tuple" "functors+tests" lookup-word >boolean ] unit-test
+    [ t ] [ "some-generic" "functors+tests" lookup-word >boolean ] unit-test
     [ t ] [
-        "some-tuple" "functors.tests" lookup-word
-        "some-generic" "functors.tests" lookup-word lookup-method >boolean
+        "some-tuple" "functors+tests" lookup-word
+        "some-generic" "functors+tests" lookup-word lookup-method >boolean
     ] unit-test ;
-    [ t ] [ "some-symbol" "functors.tests" lookup-word >boolean ] unit-test
+    [ t ] [ "some-symbol" "functors+tests" lookup-word >boolean ] unit-test
 
 test-redefinition
 
@@ -144,7 +144,7 @@ SYMBOL: W-symbol
 ;FUNCTOR>
 
 [ [ ] ] [
-    "IN: functors.tests
+    "IN: functors+tests
     << \"some\" redefine-test >>" <string-reader> "functors-test" parse-stream
 ] unit-test
 

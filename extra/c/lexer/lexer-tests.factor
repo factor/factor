@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors c.lexer kernel sequences.parser tools.test ;
-IN: c.lexer.tests
+IN: c.lexer+tests
 
 { 36 }
 [

@@ -1,7 +1,7 @@
 USING: accessors arrays assocs compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.stacks.padding compiler.cfg.utilities compiler.test kernel
 sequences sorting vectors tools.test ;
-IN: compiler.cfg.stacks.padding.tests
+IN: compiler.cfg.stacks.padding+tests
 
 ! classify-read: initialized locations
 { 0 0 0 } [

@@ -1,6 +1,6 @@
 USING: fry io.directories io.files.links io.pathnames kernel
 math math.parser namespaces sequences tools.test ;
-IN: io.files.links.unix.tests
+IN: io.files.links.unix+tests
 
 : make-test-links ( n path -- )
     [ '[ [ 1 + ] keep [ number>string _ prepend ] bi@ make-link ] each-integer ]

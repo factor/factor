@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Yun, Jonghyouk.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: simple-flat-file tools.test memoize assocs ;
-IN: simple-flat-file.tests
+IN: simple-flat-file+tests
 
 
 MEMO: <test1> ( -- code-table )

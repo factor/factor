@@ -1,6 +1,6 @@
 USING: accessors alien destructors io.pathnames kernel llvm.ffi
 llvm.reader llvm.wrappers tools.test ;
-IN: llvm.wrappers.tests
+IN: llvm.wrappers+tests
 
 : add.bc ( -- path )
     "resource:extra/llvm/wrappers/add.bc" absolute-path ;

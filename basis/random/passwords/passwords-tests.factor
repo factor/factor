@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math math.parser random.passwords sequences tools.test ;
-IN: random.passwords.tests
+IN: random.passwords+tests
 
 { "aaaaaaaaaa" } [ 10 "a" password ] unit-test
 { 10 } [ 10 "ab" password length ] unit-test

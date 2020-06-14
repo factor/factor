@@ -1,7 +1,7 @@
 USING: compiler.units continuations definitions eval io
 io.streams.string kernel listener listener+private math namespaces
 parser parser.notes tools.test vocabs vocabs.parser words ;
-IN: listener.tests
+IN: listener+tests
 
 SYNTAX: hello "Hi" print ;
 
@@ -10,7 +10,7 @@ SYNTAX: hello "Hi" print ;
 
 [
     [ [ ] ] [
-        "USE: listener.tests hello" parse-interactive
+        "USE: listener+tests hello" parse-interactive
     ] unit-test
 ] with-file-vocabs
 
@@ -48,7 +48,7 @@ SYNTAX: hello "Hi" print ;
 
 [
     [ ] [
-        "IN: listener.tests : hello ( -- string )\n\"world\" ;" parse-interactive
+        "IN: listener+tests : hello ( -- string )\n\"world\" ;" parse-interactive
         drop
     ] unit-test
 ] with-file-vocabs

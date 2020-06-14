@@ -8,7 +8,7 @@ FROM: specialized-arrays+private => specialized-array-vocab ;
 FROM: alien.c-types => int float bool uchar char float ulonglong ushort uint
 heap-size ;
 FROM: alien.data => little-endian? ;
-IN: specialized-arrays.tests
+IN: specialized-arrays+tests
 
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAYS: bool uchar ushort char uint float ulonglong ;
@@ -137,7 +137,7 @@ SYMBOL: __does_not_exist__
 
 [
     "
-IN: specialized-arrays.tests
+IN: specialized-arrays+tests
 USING: specialized-arrays ;
 
 SPECIALIZED-ARRAY: __does_not_exist__ " eval( -- )
@@ -145,7 +145,7 @@ SPECIALIZED-ARRAY: __does_not_exist__ " eval( -- )
 
 { } [
     "
-IN: specialized-arrays.tests
+IN: specialized-arrays+tests
 USING: alien.c-types classes.struct specialized-arrays ;
 
 STRUCT: __does_not_exist__ { x int } ;
@@ -180,7 +180,7 @@ SPECIALIZED-ARRAY: struct-resize-test
 
 { { 10 20 30 } } [ { 10 20 30 } struct-resize-test-usage ] unit-test
 
-{ } [ "IN: specialized-arrays.tests USE: classes.struct USE: alien.c-types STRUCT: struct-resize-test { x int } { y int } ;" eval( -- ) ] unit-test
+{ } [ "IN: specialized-arrays+tests USE: classes.struct USE: alien.c-types STRUCT: struct-resize-test { x int } { y int } ;" eval( -- ) ] unit-test
 
 { 80 } [ 10 <struct-resize-test-array> byte-length ] unit-test
 

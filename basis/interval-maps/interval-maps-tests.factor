@@ -1,5 +1,5 @@
 USING: kernel namespaces interval-maps tools.test ;
-IN: interval-maps.tests
+IN: interval-maps+tests
 
 SYMBOL: test
 

@@ -5,7 +5,7 @@ compiler.tree compiler.tree.builder compiler.tree.debugger
 compiler.tree.optimizer compiler.tree.propagation.call-effect
 compiler.units effects eval fry kernel kernel+private math sequences
 tools.test ;
-IN: compiler.tree.propagation.call-effect.tests
+IN: compiler.tree.propagation.call-effect+tests
 
 ! cached-effect
 { t } [ [ + ] cached-effect ( a b -- c ) effect= ] unit-test
@@ -133,7 +133,7 @@ TUPLE: a-tuple x ;
 
 { t } [ test-quotatation cached-effect ( a -- b ) effect<= ] unit-test
 
-{ } [ "IN: compiler.tree.propagation.call-effect.tests USE: math : call(-redefine-test ( a b -- c ) + ;" eval( -- ) ] unit-test
+{ } [ "IN: compiler.tree.propagation.call-effect+tests USE: math : call(-redefine-test ( a b -- c ) + ;" eval( -- ) ] unit-test
 
 { t } [ test-quotatation cached-effect ( a b -- c ) effect<= ] unit-test
 
@@ -141,7 +141,7 @@ TUPLE: a-tuple x ;
 
 { 4 } [ 1 3 test-quotatation inline-cache-invalidation-test ] unit-test
 
-{ } [ "IN: compiler.tree.propagation.call-effect.tests USE: math : call(-redefine-test ( a -- c ) 1 + ;" eval( -- ) ] unit-test
+{ } [ "IN: compiler.tree.propagation.call-effect+tests USE: math : call(-redefine-test ( a -- c ) 1 + ;" eval( -- ) ] unit-test
 
 [ 1 3 test-quotatation inline-cache-invalidation-test ] [ T{ wrong-values f [ call(-redefine-test ] ( a b -- c ) } = ] must-fail-with
 
@@ -154,6 +154,6 @@ TUPLE: my-tuple a b c ;
 
 { T{ my-tuple f 1 2 3 } } [ 1 2 3 my-quot my-word ] unit-test
 
-{ } [ "IN: compiler.tree.propagation.call-effect.tests TUPLE: my-tuple a b ;" eval( -- ) ] unit-test
+{ } [ "IN: compiler.tree.propagation.call-effect+tests TUPLE: my-tuple a b ;" eval( -- ) ] unit-test
 
 [ 1 2 3 my-quot my-word ] [ wrong-values? ] must-fail-with

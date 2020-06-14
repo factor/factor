@@ -4,7 +4,7 @@ USING: accessors assocs calendar classes combinators
 concurrency.mailboxes destructors io io.streams.duplex irc.client.base
 irc.client.chats irc.client.internals irc.client.participants
 irc.messages irc.messages.parser kernel sequences threads tools.test ;
-IN: irc.client.internals.tests
+IN: irc.client.internals+tests
 
 ! Streams for testing
 TUPLE: mb-writer lines last-line disposed ;

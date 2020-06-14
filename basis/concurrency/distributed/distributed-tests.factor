@@ -2,7 +2,7 @@ USING: accessors arrays calendar concurrency.distributed
 concurrency.messaging io.sockets kernel math namespaces
 sequences threads tools.test ;
 FROM: concurrency.messaging => receive send ;
-IN: concurrency.distributed.tests
+IN: concurrency.distributed+tests
 
 CONSTANT: test-ip "127.0.0.1"
 CONSTANT: test-port 57234

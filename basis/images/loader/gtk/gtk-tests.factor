@@ -1,7 +1,7 @@
 USING: accessors arrays continuations gdk.pixbuf.ffi glib.ffi gobject.ffi
 images.loader images.loader.gtk images.loader.gtk+private io
 io.encodings.binary io.files kernel tools.test destructors ;
-IN: images.loader.gtk.tests
+IN: images.loader.gtk+tests
 
 : open-png-image ( -- image )
     "vocab:images/testing/png/basi0g01.png" load-image ;

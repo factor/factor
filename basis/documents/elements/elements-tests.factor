@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test namespaces documents documents.elements ;
-IN: document.elements.tests
+IN: document.elements+tests
 
 SYMBOL: doc
 <document> doc set

@@ -4,7 +4,7 @@ USING: xml io kernel math sequences strings xml.traversal
 tools.test math.parser xml.syntax xml.data xml.syntax+private
 accessors multiline locals inverse xml.writer splitting classes
 xml+private ;
-IN: xml.syntax.tests
+IN: xml.syntax+tests
 
 ! TAGS test
 

@@ -1,7 +1,7 @@
 USING: accessors bootstrap.image fry graphviz io.files io.pathnames
 kernel sequences system tools.image-analyzer
 tools.image-analyzer.graphviz tools.test ;
-IN: tools.image-analyzer.graphviz.tests
+IN: tools.image-analyzer.graphviz+tests
 
 ! Copy paste!
 : boot-image-path ( arch -- path )

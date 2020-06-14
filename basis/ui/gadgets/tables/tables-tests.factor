@@ -1,4 +1,4 @@
-IN: ui.gadgets.tables.tests
+IN: ui.gadgets.tables+tests
 USING: ui.gadgets.tables ui.gadgets.scrollers ui.gadgets.debug accessors
 models namespaces tools.test kernel combinators prettyprint arrays ;
 

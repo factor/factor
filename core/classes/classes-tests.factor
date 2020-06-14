@@ -1,7 +1,7 @@
 USING: assocs classes classes+private compiler.units definitions
 eval generic io.streams.string kernel math multiline namespaces
 parser sequences sets sorting tools.test vocabs words ;
-IN: classes.tests
+IN: classes+tests
 
 { t } [ 3 object instance? ] unit-test
 { t } [ 3 fixnum instance? ] unit-test
@@ -109,7 +109,7 @@ TUPLE: forgotten-predicate-test ;
 
 GENERIC: generic-predicate? ( a -- b )
 
-{ } [ "IN: classes.tests TUPLE: generic-predicate ;" eval( -- ) ] unit-test
+{ } [ "IN: classes+tests TUPLE: generic-predicate ;" eval( -- ) ] unit-test
 
 { f } [ \ generic-predicate? generic? ] unit-test
 

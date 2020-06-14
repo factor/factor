@@ -2,7 +2,7 @@ USING: accessors alien.c-types alien.syntax classes
 classes.struct compiler.units eval io.encodings.ascii kernel
 math.constants tools.test ;
 FROM: alien.c-types => short ;
-IN: alien.c-types.tests
+IN: alien.c-types+tests
 
 CONSTANT: xyz 123
 
@@ -78,7 +78,7 @@ C-TYPE: opaque
 
 [ "
     USING: alien.syntax ;
-    IN: alien.c-types.tests
+    IN: alien.c-types+tests
     FUNCTION: opaque return_opaque ( ) ;
 " eval( -- ) ] [ no-c-type? ] must-fail-with
 
@@ -96,14 +96,14 @@ DEFER: struct-redefined
 
     "
     USING: alien.c-types classes.struct ;
-    IN: alien.c-types.tests
+    IN: alien.c-types+tests
 
     STRUCT: struct-redefined { x int } ;
     " eval( -- )
 
     "
     USING: alien.syntax ;
-    IN: alien.c-types.tests
+    IN: alien.c-types+tests
 
     C-TYPE: struct-redefined
     " eval( -- )
@@ -112,7 +112,7 @@ DEFER: struct-redefined
 ] unit-test
 
 [
-    "IN: alien.c-types.tests
+    "IN: alien.c-types+tests
     USE: alien.syntax
     USE: alien.c-types
     TYPEDEF: int type-redefinition-test
@@ -122,7 +122,7 @@ DEFER: struct-redefined
 must-fail-with
 
 [
-    "IN: alien.c-types.tests
+    "IN: alien.c-types+tests
     USE: alien.syntax
     USE: alien.c-types
     CALLBACK: void cb987 ( )
@@ -132,7 +132,7 @@ must-fail-with
 must-fail-with
 
 [
-    "IN: alien.c-types.tests
+    "IN: alien.c-types+tests
     USE: alien.syntax
     USE: alien.c-types
     FUNCTION: void func987 ( )
@@ -142,26 +142,26 @@ must-fail-with
 must-fail-with
 
 ! generic -> callback
-"IN: alien.c-types.tests
+"IN: alien.c-types+tests
 USE: alien.syntax
 USE: alien.c-types
 GENERIC: foo-func ( x -- )
 " eval( -- )
 
-"IN: alien.c-types.tests
+"IN: alien.c-types+tests
 USE: alien.syntax
 USE: alien.c-types
 CALLBACK: void foo-func ( )
 " eval( -- )
 
 ! generic -> typedef
-"IN: alien.c-types.tests
+"IN: alien.c-types+tests
 USE: alien.syntax
 USE: alien.c-types
 GENERIC: foo-func ( x -- )
 " eval( -- )
 
-"IN: alien.c-types.tests
+"IN: alien.c-types+tests
 USE: alien.syntax
 USE: alien.c-types
 TYPEDEF: void* foo-func

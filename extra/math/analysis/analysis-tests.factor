@@ -1,6 +1,6 @@
 USING: kernel math math.functions tools.test math.analysis
 math.constants ;
-IN: math.analysis.tests
+IN: math.analysis+tests
 
 CONSTANT: eps .00000001
 

@@ -1,7 +1,7 @@
 USING: io memory namespaces tools.test threads threads+private kernel
 concurrency.combinators concurrency.promises locals math
 words calendar sequences fry ;
-IN: threads.tests
+IN: threads+tests
 
 ! Bug #1319
 ! The start-context-and-delete primitive calls reset_context which

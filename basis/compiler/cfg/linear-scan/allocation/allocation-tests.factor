@@ -3,7 +3,7 @@ compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.ranges
 compiler.cfg.registers cpu.architecture cpu.x86.assembler.operands heaps kernel
 namespaces system tools.test ;
-IN: compiler.cfg.linear-scan.allocation.tests
+IN: compiler.cfg.linear-scan.allocation+tests
 
 : interval-[30,46] ( -- live-interval )
     T{ live-interval-state

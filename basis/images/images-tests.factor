@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: images tools.test kernel accessors ;
-IN: images.tests
+IN: images+tests
 
 { B{ 57 57 57 255 } } [ 1 1 T{ image f { 2 3 } RGBA ubyte-components f f B{
     0 0 0 0

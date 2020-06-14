@@ -1,6 +1,6 @@
 USING: math+private kernel combinators accessors arrays
 generalizations sequences.generalizations tools.test words ;
-IN: compiler.tests.spilling
+IN: compiler+tests.spilling
 
 ! These tests are stupid and don't trigger spilling anymore
 

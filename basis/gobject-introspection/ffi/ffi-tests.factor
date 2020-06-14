@@ -1,7 +1,7 @@
 USING: accessors alien.c-types compiler.units
 gobject-introspection.ffi gobject-introspection.repository kernel
 tools.test ;
-IN: gobject-introspection.ffi.tests
+IN: gobject-introspection.ffi+tests
 
 ! callback
 <<

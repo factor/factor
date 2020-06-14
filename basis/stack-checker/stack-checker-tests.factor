@@ -8,7 +8,7 @@ classes.tuple classes.union classes.predicate debugger
 threads+private io.streams.string io.timeouts io.thread
 sequences+private destructors combinators eval locals.backend
 system compiler.units shuffle vocabs combinators.smart ;
-IN: stack-checker.tests
+IN: stack-checker+tests
 
 [ 1234 infer ] must-fail
 

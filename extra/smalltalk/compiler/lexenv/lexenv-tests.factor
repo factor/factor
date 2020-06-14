@@ -1,5 +1,5 @@
 USING: smalltalk.compiler.lexenv tools.test kernel namespaces accessors ;
-IN: smalltalk.compiler.lexenv.tests
+IN: smalltalk.compiler.lexenv+tests
 
 TUPLE: some-class x y z ;
 

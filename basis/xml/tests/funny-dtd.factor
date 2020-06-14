@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: xml.tests
+IN: xml+tests
 USING: xml xml.writer io.files io.encodings.utf8 tools.test kernel ;
 
 [ t ] [

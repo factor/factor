@@ -1,14 +1,14 @@
 USING: eval tools.test compiler.units vocabs words
 kernel classes.mixin arrays ;
-IN: compiler.tests.redefine11
+IN: compiler+tests.redefine11
 
 ! Mixin redefinition did not recompile all necessary words.
 
-[ ] [ [ "compiler.tests.redefine11" forget-vocab ] with-compilation-unit ] unit-test
+[ ] [ [ "compiler+tests.redefine11" forget-vocab ] with-compilation-unit ] unit-test
 
 [ ] [
     "USING: kernel math classes arrays ;
-    IN: compiler.tests.redefine11
+    IN: compiler+tests.redefine11
     MIXIN: my-mixin
     INSTANCE: array my-mixin
     INSTANCE: fixnum my-mixin
@@ -21,11 +21,11 @@ IN: compiler.tests.redefine11
 
 [ ] [
     [
-        array "my-mixin" "compiler.tests.redefine11" lookup-word
+        array "my-mixin" "compiler+tests.redefine11" lookup-word
         remove-mixin-instance
     ] with-compilation-unit
 ] unit-test
 
 [ 1 ] [
-    "my-inline" "compiler.tests.redefine11" lookup-word execute
+    "my-inline" "compiler+tests.redefine11" lookup-word execute
 ] unit-test

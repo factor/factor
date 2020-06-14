@@ -1,7 +1,7 @@
 USING: alien alien.c-types assocs compiler.cfg.registers
 cpu.architecture cpu.x86.64 cpu.x86.assembler cpu.x86.assembler.operands make
 sequences tools.test ;
-IN: cpu.x86.64.tests
+IN: cpu.x86.64+tests
 
 : assembly-test-1 ( -- x ) int { } cdecl [ RAX 3 MOV ] alien-assembly ;
 

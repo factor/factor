@@ -1,7 +1,7 @@
 USING: http http.server.dispatchers http.server.responses
 http.server furnace furnace.utilities tools.test kernel
 namespaces accessors io.streams.string urls xml.writer ;
-IN: furnace.tests
+IN: furnace+tests
 
 TUPLE: funny-dispatcher < dispatcher ;
 

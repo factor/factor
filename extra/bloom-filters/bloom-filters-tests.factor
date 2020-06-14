@@ -1,6 +1,6 @@
 USING: accessors bit-arrays bloom-filters bloom-filters+private kernel layouts
 math random sequences tools.test ;
-IN: bloom-filters.tests
+IN: bloom-filters+tests
 
 { { 200 5 } } [ { 100 7 } { 200 5 } smaller-second ] unit-test
 { { 200 5 } } [ { 200 5 } { 100 7 } smaller-second ] unit-test

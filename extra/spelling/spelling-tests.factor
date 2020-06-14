@@ -1,5 +1,5 @@
 USING: kernel sequences spelling tools.test memoize ;
-IN: spelling.tests
+IN: spelling+tests
 
 { { "bc" "ac" "ab" } } [ "abc" deletes ] unit-test
 { { "bac" "acb" } } [ "abc" transposes ] unit-test

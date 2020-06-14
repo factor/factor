@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays continuations gdbm io.directories
 io.files.temp kernel sequences sets system tools.test ;
-IN: gdbm.tests
+IN: gdbm+tests
 
 : db-path ( -- filename ) cpu name>> "-test.db" append temp-file ;
 

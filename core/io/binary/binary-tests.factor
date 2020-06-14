@@ -1,5 +1,5 @@
 USING: io.binary tools.test classes math ;
-IN: io.binary.tests
+IN: io.binary+tests
 
 { 0x03020100 } [ B{ 0 1 2 3 } le> ] unit-test
 { 0x00010203 } [ B{ 0 1 2 3 } be> ] unit-test

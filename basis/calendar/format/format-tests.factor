@@ -1,5 +1,5 @@
 USING: accessors calendar calendar.format sequences tools.test ;
-IN: calendar.format.tests
+IN: calendar.format+tests
 
 CONSTANT: testtime T{ timestamp
     { year 2018 }

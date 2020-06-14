@@ -1,6 +1,6 @@
 USING: alien compiler.cfg.builder.alien.params cpu.architecture
 cpu.x86.assembler.operands kernel literals system tools.test ;
-IN: compiler.cfg.builder.alien.params.tests
+IN: compiler.cfg.builder.alien.params+tests
 
 ! next-reg-param
 cpu x86.64? [

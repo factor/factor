@@ -1,6 +1,6 @@
 USING: accessors combinators.short-circuit kernel math
 tools.test ;
-IN: combinators.short-circuit.tests
+IN: combinators.short-circuit+tests
 
 { 3 } [ { [ 1 ] [ 2 ] [ 3 ] } 0&& ] unit-test
 { 5 } [ 3 { [ 0 > ] [ odd? ] [ 2 + ] } 1&& ] unit-test

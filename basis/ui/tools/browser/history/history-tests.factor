@@ -1,6 +1,6 @@
 USING: namespaces ui.tools.browser.history sequences tools.test
 accessors kernel ;
-IN: ui.tools.browser.history.tests
+IN: ui.tools.browser.history+tests
 
 TUPLE: dummy obj ;
 

@@ -9,7 +9,7 @@ classes.tuple namespaces
 compiler.tree.propagation.info stack-checker.errors
 compiler.tree.checker compiler.tree.def-use compiler.tree.dead-code
 kernel+private vectors ;
-IN: compiler.tree.escape-analysis.tests
+IN: compiler.tree.escape-analysis+tests
 
 GENERIC: count-unboxed-allocations* ( m node -- n )
 

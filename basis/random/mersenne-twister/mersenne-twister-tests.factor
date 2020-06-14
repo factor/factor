@@ -1,6 +1,6 @@
 USING: kernel math random namespaces make
 random.mersenne-twister sequences tools.test math.order ;
-IN: random.mersenne-twister.tests
+IN: random.mersenne-twister+tests
 
 : check-random ( max -- ? )
     [ random 0 ] keep between? ;

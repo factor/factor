@@ -5,7 +5,7 @@ compiler.tree.recursive compiler.tree.normalization
 compiler.tree.propagation compiler.tree.cleanup
 compiler.tree.def-use arrays kernel+private sorting math.order
 binary-search compiler.tree.checker ;
-IN: compiler.tree.def-use.tests
+IN: compiler.tree.def-use+tests
 
 { t } [
     [ 1 2 3 ] build-tree compute-def-use drop

@@ -1,6 +1,6 @@
 USING: descriptive kernel math tools.test continuations prettyprint io.streams.string see
 math.ratios ;
-IN: descriptive.tests
+IN: descriptive+tests
 
 DESCRIPTIVE: divide ( num denom -- fraction ) / ;
 
@@ -16,7 +16,7 @@ DESCRIPTIVE: divide ( num denom -- fraction ) / ;
     [ 3 0 divide ] [ ] recover
 ] unit-test
 
-{ "USING: descriptive math ;\nIN: descriptive.tests\nDESCRIPTIVE: divide ( num denom -- fraction ) / ;\n" }
+{ "USING: descriptive math ;\nIN: descriptive+tests\nDESCRIPTIVE: divide ( num denom -- fraction ) / ;\n" }
 [ \ divide [ see ] with-string-writer ] unit-test
 
 DESCRIPTIVE:: divide* ( num denom -- fraction ) num denom / ;
@@ -31,4 +31,4 @@ DESCRIPTIVE:: divide* ( num denom -- fraction ) num denom / ;
     }
 } [ [ 3 0 divide* ] [ ] recover ] unit-test
 
-{ "USING: descriptive math ;\nIN: descriptive.tests\nDESCRIPTIVE:: divide* ( num denom -- fraction ) num denom / ;\n" } [ \ divide* [ see ] with-string-writer ] unit-test
+{ "USING: descriptive math ;\nIN: descriptive+tests\nDESCRIPTIVE:: divide* ( num denom -- fraction ) num denom / ;\n" } [ \ divide* [ see ] with-string-writer ] unit-test

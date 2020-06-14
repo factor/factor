@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 John Benediktsson, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test escape-strings ;
-IN: escape-strings.tests
+IN: escape-strings+tests
 
 { "[[asdf]]" } [ "asdf" escape-string ] unit-test
 { "[[[[]]" } [ "[[" escape-string ] unit-test

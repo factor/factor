@@ -1,7 +1,7 @@
 USING: accessors alien.c-types compiler.cfg.instructions
 compiler.cfg.intrinsics.strings compiler.test cpu.architecture kernel make
 sequences tools.test ;
-IN: compiler.cfg.intrinsics.strings.tests
+IN: compiler.cfg.intrinsics.strings+tests
 
 {
     V{

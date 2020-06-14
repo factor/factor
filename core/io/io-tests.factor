@@ -1,10 +1,10 @@
 USING: accessors io io.streams.string kernel math namespaces
 parser sbufs sequences strings tools.test words ;
-IN: io.tests
+IN: io+tests
 
 { f } [
     "vocab:io/test/no-trailing-eol.factor" run-file
-    "foo" "io.tests" lookup-word
+    "foo" "io+tests" lookup-word
 ] unit-test
 
 ! Make sure we use correct to_c_string form when writing

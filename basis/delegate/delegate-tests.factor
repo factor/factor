@@ -2,7 +2,7 @@ USING: delegate kernel arrays tools.test words math definitions
 compiler.units parser generic prettyprint io.streams.string
 accessors eval multiline generic.single delegate.protocols
 delegate+private assocs see make ;
-IN: delegate.tests
+IN: delegate+tests
 
 TUPLE: hello this that ;
 C: <hello> hello
@@ -35,11 +35,11 @@ M: hello bing hello-test ;
 { 3 } [ 1 0 <hello> 2 whoa ] unit-test
 { 3 } [ 1 0 <hello> f <goodbye> 2 whoa ] unit-test
 
-{ } [ 3 [ "USING: accessors delegate ; IN: delegate.tests CONSULT: baz goodbye these>> ;" eval( -- ) ] times ] unit-test
+{ } [ 3 [ "USING: accessors delegate ; IN: delegate+tests CONSULT: baz goodbye these>> ;" eval( -- ) ] times ] unit-test
 { H{ { goodbye T{ consultation f baz goodbye [ these>> ] } } } } [ baz protocol-consult ] unit-test
 { H{ } } [ bee protocol-consult ] unit-test
 
-{ "USING: delegate ;\nIN: delegate.tests\nPROTOCOL: baz foo bar { whoa 1 } ; inline\n" } [ [ baz see ] with-string-writer ] unit-test
+{ "USING: delegate ;\nIN: delegate+tests\nPROTOCOL: baz foo bar { whoa 1 } ; inline\n" } [ [ baz see ] with-string-writer ] unit-test
 
 GENERIC: one ( a -- b )
 M: integer one ;
@@ -63,22 +63,22 @@ CONSULT: beta hey value>> 1 - ;
 { 0 } [ 1 <hey> three ] unit-test
 { { hey } } [ alpha protocol-users ] unit-test
 { { hey } } [ beta protocol-users ] unit-test
-{ } [ "USE: delegate IN: delegate.tests PROTOCOL: alpha one ;" eval( -- ) ] unit-test
+{ } [ "USE: delegate IN: delegate+tests PROTOCOL: alpha one ;" eval( -- ) ] unit-test
 { f } [ hey \ two ?lookup-method ] unit-test
 { f } [ hey \ four ?lookup-method ] unit-test
-{ } [ "USE: delegate IN: delegate.tests PROTOCOL: beta two three four ;" eval( -- ) ] unit-test
+{ } [ "USE: delegate IN: delegate+tests PROTOCOL: beta two three four ;" eval( -- ) ] unit-test
 { { hey } } [ alpha protocol-users ] unit-test
 { { hey } } [ beta protocol-users ] unit-test
 { 2 } [ 1 <hey> one ] unit-test
 { 0 } [ 1 <hey> two ] unit-test
 { 0 } [ 1 <hey> three ] unit-test
 { 0 } [ 1 <hey> four ] unit-test
-{ } [ "USING: math accessors delegate ; IN: delegate.tests CONSULT: beta hey value>> 2 - ;" eval( -- ) ] unit-test
+{ } [ "USING: math accessors delegate ; IN: delegate+tests CONSULT: beta hey value>> 2 - ;" eval( -- ) ] unit-test
 { 2 } [ 1 <hey> one ] unit-test
 { -1 } [ 1 <hey> two ] unit-test
 { -1 } [ 1 <hey> three ] unit-test
 { -1 } [ 1 <hey> four ] unit-test
-{ } [ "IN: delegate.tests FORGET: alpha" eval( -- ) ] unit-test
+{ } [ "IN: delegate+tests FORGET: alpha" eval( -- ) ] unit-test
 { f } [ hey \ one ?lookup-method ] unit-test
 
 TUPLE: slot-protocol-test-1 a b ;
@@ -116,7 +116,7 @@ PROTOCOL: silly-protocol do-me ;
 
 ! Replacing a method definition with a consultation would cause problems
 { [ ] } [
-    "IN: delegate.tests
+    "IN: delegate+tests
     USE: kernel
 
     M: a-tuple do-me drop ;" <string-reader> "delegate-test" parse-stream
@@ -126,7 +126,7 @@ PROTOCOL: silly-protocol do-me ;
 
 ! Change method definition to consultation
 { [ ] } [
-    "IN: delegate.tests
+    "IN: delegate+tests
     USE: kernel
     USE: delegate
     CONSULT: silly-protocol a-tuple drop f ; " <string-reader> "delegate-test" parse-stream
@@ -137,7 +137,7 @@ PROTOCOL: silly-protocol do-me ;
 
 ! Now try removing the consultation
 { [ ] } [
-    "IN: delegate.tests" <string-reader> "delegate-test" parse-stream
+    "IN: delegate+tests" <string-reader> "delegate-test" parse-stream
 ] unit-test
 
 ! Method should be gone
@@ -150,7 +150,7 @@ SLOT: y
 { f } [ \ slot-protocol-test-3 \ y>> ?lookup-method >boolean ] unit-test
 
 { [ ] } [
-    "IN: delegate.tests
+    "IN: delegate+tests
 USING: accessors delegate ;
 TUPLE: slot-protocol-test-3 x ;
 CONSULT: y>> slot-protocol-test-3 x>> ;"
@@ -160,7 +160,7 @@ CONSULT: y>> slot-protocol-test-3 x>> ;"
 { t } [ \ slot-protocol-test-3 \ y>> ?lookup-method >boolean ] unit-test
 
 { [ ] } [
-    "IN: delegate.tests
+    "IN: delegate+tests
 TUPLE: slot-protocol-test-3 x y ;"
     <string-reader> "delegate-test-1" parse-stream
 ] unit-test
@@ -171,7 +171,7 @@ TUPLE: slot-protocol-test-3 x y ;"
 
 ! We want to be able to override methods after consultation
 { [ ] } [
-    "IN: delegate.tests
+    "IN: delegate+tests
     USING: delegate kernel sequences delegate.protocols accessors ;
     TUPLE: override-method-test seq ;
     CONSULT: sequence-protocol override-method-test seq>> ;
@@ -183,7 +183,7 @@ DEFER: seq-delegate
 
 ! See if removing a consultation updates protocol-consult word prop
 { [ ] } [
-    "IN: delegate.tests
+    "IN: delegate+tests
     USING: accessors delegate delegate.protocols ;
     TUPLE: seq-delegate seq ;
     CONSULT: sequence-protocol seq-delegate seq>> ;"
@@ -197,7 +197,7 @@ DEFER: seq-delegate
 ] unit-test
 
 { [ ] } [
-    "IN: delegate.tests
+    "IN: delegate+tests
     USING: delegate delegate.protocols ;
     TUPLE: seq-delegate seq ;"
     <string-reader> "remove-consult-test" parse-stream
@@ -218,7 +218,7 @@ BROADCAST: broadcastable broadcaster targets>> ;
 
 M: integer broadcastable 1 + , ;
 
-[ "USING: accessors delegate ; IN: delegate.tests BROADCAST: nonbroadcastable broadcaster targets>> ;" eval( -- ) ]
+[ "USING: accessors delegate ; IN: delegate+tests BROADCAST: nonbroadcastable broadcaster targets>> ;" eval( -- ) ]
 [ error>> broadcast-words-must-have-no-outputs? ] must-fail-with
 
 { { 2 3 4 } }

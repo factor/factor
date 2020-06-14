@@ -1,4 +1,4 @@
-IN: promises.tests
+IN: promises+tests
 USING: promises math tools.test ;
 
 LAZY: lazy-test ( a -- b ) 1 + ;

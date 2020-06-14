@@ -4,7 +4,7 @@ USING: accessors alien.c-types arrays kernel math math.order math.vectors
 sequences specialized-arrays tensors tools.test ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
-IN: tensors.tests
+IN: tensors+tests
 
 ! Test zeros
 { float-array{ 0.0 0.0 0.0 0.0 } } [

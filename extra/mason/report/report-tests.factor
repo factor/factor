@@ -1,7 +1,7 @@
 USING: io.directories io.directories.hierarchy io.files
 io.files.temp kernel mason.common mason.config mason.report
 namespaces tools.test xml xml.writer ;
-IN: mason.report.tests
+IN: mason.report+tests
 
 { 0 0 } [ [ ] with-report ] must-infer-as
 

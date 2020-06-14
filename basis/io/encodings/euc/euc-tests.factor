@@ -3,7 +3,7 @@
 USING: arrays byte-arrays io io.encodings io.encodings.euc-kr assocs
 io.encodings.string io.streams.string io.encodings.euc+private words
 kernel locals multiline namespaces sequences strings tools.test ;
-IN: io.encodings.euc.tests
+IN: io.encodings.euc+tests
 
 : euc-kr>unicode ( ch -- ch/f )
     euc-kr euc-table word-prop at ;

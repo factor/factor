@@ -1,4 +1,4 @@
-IN: io.buffers.tests
+IN: io.buffers+tests
 USING: accessors alien alien.data arrays byte-arrays destructors
 io.buffers kernel libc namespaces sequences strings tools.test ;
 

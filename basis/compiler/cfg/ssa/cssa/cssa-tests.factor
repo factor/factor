@@ -1,6 +1,6 @@
 USING: accessors compiler.cfg compiler.cfg.instructions compiler.cfg.ssa.cssa
 compiler.cfg.utilities kernel namespaces tools.test ;
-IN: compiler.cfg.ssa.cssa.tests
+IN: compiler.cfg.ssa.cssa+tests
 
 ! insert-phi-copies
 {

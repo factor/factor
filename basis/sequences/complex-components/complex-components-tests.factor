@@ -1,6 +1,6 @@
 USING: sequences.complex-components
 kernel sequences tools.test arrays accessors ;
-IN: sequences.complex-components.tests
+IN: sequences.complex-components+tests
 
 : test-array ( -- x )
     { C{ 1.0 2.0 } 3.0 C{ 5.0 6.0 } } <complex-components> ;

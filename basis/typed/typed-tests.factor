@@ -2,7 +2,7 @@ USING: accessors compiler.units effects eval kernel kernel+private layouts
 literals math namespaces quotations tools.test typed words words.symbol
 combinators.short-circuit compiler.tree.debugger prettyprint definitions
 sequences classes.intersection strings classes.union ;
-IN: typed.tests
+IN: typed+tests
 
 TYPED: f+ ( a: float b: float -- c: float )
     + ;
@@ -67,7 +67,7 @@ TYPED: unboxy ( in: unboxable -- out: unboxable2 )
 [
 "
 USING: kernel math ;
-IN: typed.tests
+IN: typed+tests
 
 TUPLE: unboxable
     { x fixnum read-only }
@@ -77,7 +77,7 @@ TUPLE: unboxable
 
 "
 USING: accessors kernel math ;
-IN: typed.tests
+IN: typed+tests
 T{ unboxable f 12 3 4.0 } unboxy xy>>
 " eval( -- xy )
 ] unit-test
@@ -128,7 +128,7 @@ TYPED: recompile-fail ( a: subclass -- ? ) buh get eq? ;
 
 { f } [ subclass new [ buh set ] [ recompile-fail ] bi ] unit-test
 
-{ } [ "IN: typed.tests TUPLE: subclass < superclass { y read-only } ;" eval( -- ) ] unit-test
+{ } [ "IN: typed+tests TUPLE: subclass < superclass { y read-only } ;" eval( -- ) ] unit-test
 
 { t } [ subclass new [ buh set ] [ recompile-fail ] bi ] unit-test
 

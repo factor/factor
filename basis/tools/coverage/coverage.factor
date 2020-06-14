@@ -131,7 +131,7 @@ PRIVATE>
     ] bi ;
 
 : coverage-vocab? ( vocab -- ? )
-    { [ "+private" tail? ] [ ".tests" tail? ] } 1|| not ;
+    { [ "+private" tail? ] [ "+tests" tail? ] } 1|| not ;
 
 : test-coverage-recursively ( prefix -- assoc )
     loaded-child-vocab-names [ coverage-vocab? ] filter
