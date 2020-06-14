@@ -1,4 +1,4 @@
-USING: help.syntax help.markup ui.pixel-formats ;
+USING: help.syntax help.markup ui.pixel-formats cocoa.views ;
 IN: cocoa.views+docs
 
 HELP: <GLView>

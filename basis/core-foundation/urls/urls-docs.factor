@@ -1,4 +1,4 @@
-USING: help.syntax help.markup ;
+USING: core-foundation.urls help.syntax help.markup ;
 IN: core-foundation.urls+docs
 
 HELP: <CFFileSystemURL>

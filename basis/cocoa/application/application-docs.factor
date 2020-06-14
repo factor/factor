@@ -1,5 +1,6 @@
 USING: debugger quotations help.markup help.syntax strings alien
-core-foundation core-foundation.strings core-foundation.arrays ;
+core-foundation core-foundation.strings core-foundation.arrays
+cocoa.application ;
 IN: cocoa.application+docs
 
 HELP: <NSString>

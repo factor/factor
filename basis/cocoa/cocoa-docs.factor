@@ -1,4 +1,4 @@
-USING: cocoa.messages help.markup help.syntax strings
+USING: cocoa cocoa.messages help.markup help.syntax strings
 alien core-foundation ;
 IN: cocoa+docs
 

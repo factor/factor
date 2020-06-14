@@ -1,4 +1,4 @@
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax cocoa.windows ;
 IN: cocoa.windows+docs
 
 HELP: <NSWindow>

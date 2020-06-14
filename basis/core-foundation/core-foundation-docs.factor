@@ -1,4 +1,5 @@
-USING: alien strings arrays help.markup help.syntax destructors ;
+USING: alien strings arrays help.markup help.syntax destructors
+core-foundation ;
 IN: core-foundation+docs
 
 HELP: &CFRelease

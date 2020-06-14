@@ -1,4 +1,4 @@
-USING: help.syntax help.markup arrays alien ;
+USING: core-foundation.arrays help.syntax help.markup arrays alien ;
 IN: core-foundation.arrays+docs
 
 HELP: CF>array

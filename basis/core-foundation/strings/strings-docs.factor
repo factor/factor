@@ -1,4 +1,4 @@
-USING: help.syntax help.markup strings ;
+USING: core-foundation.strings help.syntax help.markup strings ;
 IN: core-foundation.strings+docs
 
 HELP: <CFString>

@@ -1,4 +1,4 @@
-USING: help.syntax help.markup ;
+USING: core-foundation.bundles help.syntax help.markup ;
 IN: core-foundation.bundles+docs
 
 HELP: <CFBundle>

@@ -1,4 +1,4 @@
-USING: help.markup help.syntax strings alien ;
+USING: cocoa.messages help.markup help.syntax strings alien ;
 IN: cocoa.messages+docs
 
 HELP: send

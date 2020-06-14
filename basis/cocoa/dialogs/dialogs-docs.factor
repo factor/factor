@@ -1,4 +1,4 @@
-USING: help.markup help.syntax ;
+USING: cocoa.dialogs help.markup help.syntax ;
 IN: cocoa.dialogs+docs
 
 HELP: <NSOpenPanel>

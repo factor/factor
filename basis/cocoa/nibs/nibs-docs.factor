@@ -1,4 +1,4 @@
-USING: help.markup help.syntax sequences strings ;
+USING: cocoa.nibs help.markup help.syntax sequences strings ;
 IN: cocoa.nibs+docs
 
 HELP: load-nib

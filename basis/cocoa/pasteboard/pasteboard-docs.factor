@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel strings ;
+USING: cocoa.pasteboard help.markup help.syntax kernel strings ;
 IN: cocoa.pasteboard+docs
 
 HELP: pasteboard-string?
