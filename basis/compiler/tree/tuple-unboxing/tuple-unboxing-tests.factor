@@ -4,8 +4,8 @@ compiler.tree.normalization compiler.tree.propagation
 compiler.tree.cleanup compiler.tree.escape-analysis
 compiler.tree.tuple-unboxing compiler.tree.checker
 compiler.tree.def-use kernel accessors sequences math
-math.private sorting math.order binary-search sequences.private
-slots.private alien alien.c-types ;
+math+private sorting math.order binary-search sequences+private
+slots+private alien alien.c-types ;
 IN: compiler.tree.tuple-unboxing.tests
 
 : test-unboxing ( quot -- )

@@ -1,4 +1,4 @@
-USING: destructors kernel libc libc.private namespaces
+USING: destructors kernel libc libc+private namespaces
 tools.test ;
 
 100 malloc "block" set

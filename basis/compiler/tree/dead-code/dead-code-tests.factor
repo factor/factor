@@ -6,8 +6,8 @@ compiler.tree.tuple-unboxing compiler.tree.debugger
 compiler.tree.recursive compiler.tree.normalization
 compiler.tree.checker tools.test kernel math stack-checker.state
 accessors combinators io prettyprint words sequences.deep
-sequences.private arrays classes kernel.private shuffle
-math.private ;
+sequences+private arrays classes kernel+private shuffle
+math+private ;
 IN: compiler.tree.dead-code.tests
 
 : count-live-values ( quot -- n )

@@ -6,7 +6,7 @@ math.parser math.vectors mirrors models models.arrow namespaces
 prettyprint sequences sorting strings ui ui.commands ui.gadgets
 ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tables
-ui.gadgets.tables.private ui.gadgets.toolbar ui.gadgets.tracks
+ui.gadgets.tables+private ui.gadgets.toolbar ui.gadgets.tracks
 ui.gestures ui.operations ui.theme ui.tools.browser
 ui.tools.common ui.tools.inspector.slots unicode ;
 

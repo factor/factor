@@ -1,6 +1,6 @@
 USING: accessors arrays compiler.crossref compiler.units definitions
 eval generic io.streams.string kernel math namespaces parser sequences
-tools.test vocabs words words.private words.symbol ;
+tools.test vocabs words words+private words.symbol ;
 IN: words.tests
 
 { 4 } [

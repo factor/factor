@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes classes.tuple classes.tuple.parser
-classes.tuple.private combinators generalizations kernel math
+classes.tuple+private combinators generalizations kernel math
 namespaces parser sequences vocabs.loader words xml.state ;
 IN: xml.errors
 

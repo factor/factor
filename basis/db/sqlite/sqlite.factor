@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes.tuple combinators db db.private db.queries
+USING: accessors classes.tuple combinators db db+private db.queries
 db.sqlite.errors db.sqlite.ffi db.sqlite.lib db.tuples
-db.tuples.private db.types destructors interpolate kernel locals math
+db.tuples+private db.types destructors interpolate kernel locals math
 math.parser namespaces nmake random sequences sequences.deep ;
 IN: db.sqlite
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators fry kernel math math.bits math.constants
-math.libm math.order math.private sequences ;
+math.libm math.order math+private sequences ;
 IN: math.functions
 
 GENERIC: sqrt ( x -- y ) foldable

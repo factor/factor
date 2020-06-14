@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2008 Ryan Murphy, Doug Coleman,
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs fry kernel kernel.private locals
-math math.order math.private sequences sequences.private summary
+USING: accessors arrays assocs fry kernel kernel+private locals
+math math.order math+private sequences sequences+private summary
 vectors ;
 IN: heaps
 

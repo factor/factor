@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.libraries
-alien.private arrays assocs combinators effects fry kernel math
+alien+private arrays assocs combinators effects fry kernel math
 namespaces quotations sequences stack-checker.backend
 stack-checker.dependencies stack-checker.state
 stack-checker.visitor strings words ;
-FROM: kernel.private => declare ;
+FROM: kernel+private => declare ;
 IN: stack-checker.alien
 
 TUPLE: alien-node-params

@@ -1,4 +1,4 @@
-USING: sequences sequences.private math
+USING: sequences sequences+private math
 accessors alien.c-types ;
 IN: game.input.dinput.keys-array
 

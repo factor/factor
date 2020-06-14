@@ -3,7 +3,7 @@ alien.parser effects kernel windows.ole32 parser lexer splitting
 grouping sequences namespaces assocs quotations generalizations
 accessors words macros alien.syntax fry arrays layouts math
 classes.struct windows.kernel32 locals ;
-FROM: alien.parser.private => parse-pointers ;
+FROM: alien.parser+private => parse-pointers ;
 IN: windows.com.syntax
 
 <PRIVATE

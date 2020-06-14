@@ -1,4 +1,4 @@
-USING: accessors ui.gadgets.editors ui.gadgets.editors.private
+USING: accessors ui.gadgets.editors ui.gadgets.editors+private
 tools.test kernel io io.streams.plain definitions namespaces
 ui.gadgets ui.gadgets.grids prettyprint documents ui.gestures
 ui.gadgets.debug models documents.elements ui.gadgets.scrollers

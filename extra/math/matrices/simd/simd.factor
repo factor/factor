@@ -3,10 +3,10 @@
 USING: accessors classes.struct fry generalizations kernel
 locals math math.combinatorics math.functions math.matrices.simd
 math.vectors math.vectors.simd math.quaternions sequences
-sequences.generalizations sequences.private specialized-arrays
+sequences.generalizations sequences+private specialized-arrays
 typed ;
-FROM: sequences.private => nth-unsafe ;
-FROM: math.quaternions.private => (q*sign) ;
+FROM: sequences+private => nth-unsafe ;
+FROM: math.quaternions+private => (q*sign) ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: float-4
 IN: math.matrices.simd

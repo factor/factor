@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators.short-circuit
 compiler.units debugger init io io.streams.null kernel
 namespaces prettyprint sequences sets source-files.errors
-summary tools.crossref tools.crossref.private tools.errors
+summary tools.crossref tools.crossref+private tools.errors
 words ;
 IN: tools.deprecation
 

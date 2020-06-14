@@ -1,4 +1,4 @@
-USING: bootstrap.image.private effects help.markup help.syntax strings ;
+USING: bootstrap.image+private effects help.markup help.syntax strings ;
 IN: bootstrap.primitives
 
 ARTICLE: "bootstrap.primitives" "Bootstrap primitives"

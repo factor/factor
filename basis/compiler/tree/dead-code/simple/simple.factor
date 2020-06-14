@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes.algebra combinators
 compiler.tree compiler.tree.dead-code.liveness
-compiler.tree.propagation.info fry kernel locals math math.private
+compiler.tree.propagation.info fry kernel locals math math+private
 namespaces sequences stack-checker.backend stack-checker.dependencies
 words ;
 IN: compiler.tree.dead-code.simple

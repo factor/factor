@@ -4,7 +4,7 @@
 ! Factor port of
 ! http://shootout.alioth.debian.org/gp4/benchmark.php?test=spectralnorm&lang=all
 USING: alien.c-types io kernel math math.functions math.parser
-math.vectors sequences sequences.private specialized-arrays
+math.vectors sequences sequences+private specialized-arrays
 typed locals ;
 SPECIALIZED-ARRAY: double
 IN: benchmark.spectral-norm

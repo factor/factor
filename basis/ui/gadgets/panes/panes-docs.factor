@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io kernel models quotations ui.gadgets
-ui.gadgets.panes.private ;
+ui.gadgets.panes+private ;
 IN: ui.gadgets.panes
 
 HELP: pane

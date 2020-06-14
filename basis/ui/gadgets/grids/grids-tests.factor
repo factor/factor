@@ -1,5 +1,5 @@
 USING: ui.gadgets ui.gadgets.grids tools.test kernel arrays
-namespaces math.rectangles accessors ui.gadgets.grids.private
+namespaces math.rectangles accessors ui.gadgets.grids+private
 ui.gadgets.debug sequences classes ;
 IN: ui.gadgets.grids.tests
 

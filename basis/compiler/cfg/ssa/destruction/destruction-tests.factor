@@ -1,6 +1,6 @@
 USING: alien.syntax compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.ssa.destruction compiler.cfg.ssa.destruction.leaders
-compiler.cfg.ssa.destruction.private compiler.cfg.utilities
+compiler.cfg.ssa.destruction+private compiler.cfg.utilities
 cpu.architecture cpu.x86.assembler.operands kernel make namespaces
 sequences tools.test ;
 IN: compiler.cfg.ssa.destruction.tests

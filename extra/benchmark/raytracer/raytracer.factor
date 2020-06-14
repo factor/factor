@@ -3,7 +3,7 @@
 USING: arrays accessors specialized-arrays io
 io.files io.files.temp io.encodings.binary kernel math
 math.constants math.functions math.vectors math.parser make
-sequences sequences.private words hints ;
+sequences sequences+private words hints ;
 FROM: alien.c-types => double ;
 SPECIALIZED-ARRAY: double
 IN: benchmark.raytracer

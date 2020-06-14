@@ -1,6 +1,6 @@
 USING: accessors alien alien.c-types alien.data alien.strings
 calendar combinators combinators.short-circuit destructors io
-io.encodings.utf8 io.ports io.sockets.private io.sockets.secure
+io.encodings.utf8 io.ports io.sockets+private io.sockets.secure
 io.sockets.secure.openssl io.sockets.windows kernel libc locals
 math math.order openssl openssl.libcrypto openssl.libssl system
 windows.crypt32 windows.errors windows.time windows.winsock ;

@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel kernel.private math math.private
-math.functions arrays math.functions.private sequences
-sequences.private parser ;
+USING: accessors kernel kernel+private math math+private
+math.functions arrays math.functions+private sequences
+sequences+private parser ;
 IN: math.complex
 
 <PRIVATE

@@ -1,4 +1,4 @@
-USING: classes.private help.markup help.syntax kernel quotations
+USING: classes+private help.markup help.syntax kernel quotations
 sequences words ;
 IN: classes
 

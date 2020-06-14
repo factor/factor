@@ -1,5 +1,5 @@
 USING: arrays checksums checksums.common checksums.sha
-checksums.sha.private io.encodings.binary io.streams.byte-array
+checksums.sha+private io.encodings.binary io.streams.byte-array
 kernel math.parser sequences tools.test random ;
 IN: checksums.sha.tests
 

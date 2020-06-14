@@ -3,7 +3,7 @@
 USING: accessors arrays classes.algebra combinators
 compiler.cfg.instructions compiler.cfg.instructions.syntax
 compiler.cfg.value-numbering.graph generic.parser kernel make
-math namespaces quotations sequences sequences.private sets
+math namespaces quotations sequences sequences+private sets
 slots words ;
 IN: compiler.cfg.value-numbering.expressions
 

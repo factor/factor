@@ -1,5 +1,5 @@
-USING: help.markup help.syntax math math.private
-math.ratios.private math.functions ;
+USING: help.markup help.syntax math math+private
+math.ratios+private math.functions ;
 IN: math.ratios
 
 ARTICLE: "rationals" "Rational numbers"

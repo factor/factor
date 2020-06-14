@@ -1,4 +1,4 @@
-USING: help help.lint.coverage help.lint.coverage.private
+USING: help help.lint.coverage help.lint.coverage+private
 help.markup help.syntax io kernel sequences strings vocabs words ;
 IN: help.lint.coverage
 
@@ -108,11 +108,11 @@ HELP: prefix-help-coverage.
 [english] pluralize: full help coverage
 [english] singular?: full help coverage
 [english] singularize: full help coverage
-[english.private] $0-plurality: needs help sections: $values, $description, and $examples
-[english.private] $keep-case: needs help sections: $values, $description, and $examples
-[english.private] match-case: needs help sections: $values, $description, and $examples
-[english.private] plural-to-singular: needs help sections: $values, $description, and $examples
-[english.private] singular-to-plural: needs help sections: $values, $description, and $examples
+[english+private] $0-plurality: needs help sections: $values, $description, and $examples
+[english+private] $keep-case: needs help sections: $values, $description, and $examples
+[english+private] match-case: needs help sections: $values, $description, and $examples
+[english+private] plural-to-singular: needs help sections: $values, $description, and $examples
+[english+private] singular-to-plural: needs help sections: $values, $description, and $examples
 
 70.6% of words have complete documentation"
     }
@@ -120,7 +120,7 @@ HELP: prefix-help-coverage.
 
 HELP: <prefix-help-coverage>
 { $values { "prefix" string } { "private?" boolean } { "coverage" sequence } }
-{ $description "Runs the help coverage checker on every child vocabulary of the given " { $snippet "prefix" } ", including the base vocabulary. If " { $snippet "private?" } " is " { $snippet "f" } ", the prefix's child " { $snippet ".private" } " vocabularies are not checked. If " { $snippet "private?" } " is " { $snippet "t" } ", " { $emphasis "all" } " child vocabularies are checked." }
+{ $description "Runs the help coverage checker on every child vocabulary of the given " { $snippet "prefix" } ", including the base vocabulary. If " { $snippet "private?" } " is " { $snippet "f" } ", the prefix's child " { $snippet "+private" } " vocabularies are not checked. If " { $snippet "private?" } " is " { $snippet "t" } ", " { $emphasis "all" } " child vocabularies are checked." }
 { $examples
     { $example
         "USING: help.lint.coverage prettyprint ;"

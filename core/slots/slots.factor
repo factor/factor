@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays assocs byte-arrays classes
-classes.algebra classes.algebra.private classes.maybe
+classes.algebra classes.algebra+private classes.maybe
 combinators generic generic.standard hashtables kernel
-kernel.private make math quotations sequences sequences.private
-slots.private strings words ;
+kernel+private make math quotations sequences sequences+private
+slots+private strings words ;
 IN: slots
 
 <PRIVATE

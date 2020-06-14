@@ -1,4 +1,4 @@
-USING: accessors continuations destructors destructors.private
+USING: accessors continuations destructors destructors+private
 kernel namespaces sequences tools.test ;
 IN: destructors.tests
 

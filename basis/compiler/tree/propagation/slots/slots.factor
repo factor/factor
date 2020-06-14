@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays classes
-classes.algebra classes.tuple classes.tuple.private combinators
+classes.algebra classes.tuple classes.tuple+private combinators
 combinators.short-circuit compiler.tree.propagation.info kernel
-math sequences slots.private strings words ;
+math sequences slots+private strings words ;
 IN: compiler.tree.propagation.slots
 
 : sequence-constructor? ( word -- ? )

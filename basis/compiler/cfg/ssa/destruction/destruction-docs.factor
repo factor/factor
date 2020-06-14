@@ -1,5 +1,5 @@
 USING: compiler.cfg compiler.cfg.instructions
-compiler.cfg.ssa.destruction.private compiler.cfg.ssa.destruction.leaders
+compiler.cfg.ssa.destruction+private compiler.cfg.ssa.destruction.leaders
 compiler.cfg.ssa.interference help.markup help.syntax kernel sequences ;
 IN: compiler.cfg.ssa.destruction
 

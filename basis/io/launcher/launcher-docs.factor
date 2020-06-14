@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs calendar help.markup help.syntax io io.files
-io.launcher.private kernel literals quotations sequences ;
+io.launcher+private kernel literals quotations sequences ;
 IN: io.launcher
 
 ARTICLE: "io.launcher.command" "Specifying a command"

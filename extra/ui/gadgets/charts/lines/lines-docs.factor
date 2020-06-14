@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: binary-search colors help.markup help.syntax kernel
 sequences splitting.monotonic ui.gadgets ui.gadgets.charts
-ui.gadgets.charts.lines.private ui.render ;
+ui.gadgets.charts.lines+private ui.render ;
 IN: ui.gadgets.charts.lines
 
 ABOUT: { "ui.gadgets.charts.lines" "about" }
@@ -65,17 +65,17 @@ HELP: y-at
 }
 { $examples
     { $example
-        "USING: ui.gadgets.charts.lines.private prettyprint ;"
+        "USING: ui.gadgets.charts.lines+private prettyprint ;"
         "0 { 1 1 } { 5 5 } y-at ."
         "0"
     }
     { $example
-        "USING: ui.gadgets.charts.lines.private prettyprint ;"
+        "USING: ui.gadgets.charts.lines+private prettyprint ;"
         "3 { 0 5 } { 5 5 } y-at ."
         "5"
     }
     { $example
-        "USING: ui.gadgets.charts.lines.private prettyprint ;"
+        "USING: ui.gadgets.charts.lines+private prettyprint ;"
         "12 { 12 50 } { 15 15 } y-at ."
         "50"
     }
@@ -91,12 +91,12 @@ HELP: calc-x
 }
 { $examples
     { $example
-        "USING: ui.gadgets.charts.lines.private prettyprint ;"
+        "USING: ui.gadgets.charts.lines+private prettyprint ;"
         "1 5 { 1 1 } calc-x ."
         "5"
     }
     { $example
-        "USING: ui.gadgets.charts.lines.private prettyprint ;"
+        "USING: ui.gadgets.charts.lines+private prettyprint ;"
         "0.5 10 { 0 0 } calc-x ."
         "20.0"
     }
@@ -112,12 +112,12 @@ HELP: calc-y
 }
 { $examples
     { $example
-        "USING: ui.gadgets.charts.lines.private prettyprint ;"
+        "USING: ui.gadgets.charts.lines+private prettyprint ;"
         "1 5 { 1 1 } calc-y ."
         "5"
     }
     { $example
-        "USING: ui.gadgets.charts.lines.private prettyprint ;"
+        "USING: ui.gadgets.charts.lines+private prettyprint ;"
         "0.5 20 { 0 0 } calc-y ."
         "10.0"
     }
@@ -134,12 +134,12 @@ $nl
 "The formula for the calculation is " { $snippet "slope = (y1-y2) / (x1-x2)" } ", therefore it'll throw a division by zero error if both points have the same " { $snippet "x" } " coordinate." }
 { $examples
     { $example
-        "USING: ui.gadgets.charts.lines.private prettyprint ;"
+        "USING: ui.gadgets.charts.lines+private prettyprint ;"
         "{ 1 1 } { 10 10 } calc-line-slope ."
         "1"
     }
     { $example
-        "USING: ui.gadgets.charts.lines.private prettyprint ;"
+        "USING: ui.gadgets.charts.lines+private prettyprint ;"
         "{ 0 0 } { 10 20 } calc-line-slope ."
         "2"
     }

@@ -1,12 +1,12 @@
 USING: accessors arrays generic stack-checker
 stack-checker.backend stack-checker.errors kernel classes
-kernel.private math math.parser math.private namespaces
-namespaces.private parser sequences strings vectors words
+kernel+private math math.parser math+private namespaces
+namespaces+private parser sequences strings vectors words
 quotations effects tools.test continuations generic.standard
 sorting assocs definitions prettyprint io inspector
 classes.tuple classes.union classes.predicate debugger
-threads.private io.streams.string io.timeouts io.thread
-sequences.private destructors combinators eval locals.backend
+threads+private io.streams.string io.timeouts io.thread
+sequences+private destructors combinators eval locals.backend
 system compiler.units shuffle vocabs combinators.smart ;
 IN: stack-checker.tests
 

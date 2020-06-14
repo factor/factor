@@ -1,5 +1,5 @@
 USING: accessors compiler compiler.units tools.test math parser
-kernel sequences sequences.private classes.mixin generic
+kernel sequences sequences+private classes.mixin generic
 definitions arrays words assocs eval strings ;
 IN: compiler.tests.redefine1
 

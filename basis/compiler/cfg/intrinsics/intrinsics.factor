@@ -9,18 +9,18 @@ cpu.architecture kernel words ;
 QUALIFIED: alien
 QUALIFIED: alien.accessors
 QUALIFIED: alien.c-types
-QUALIFIED: alien.data.private
+QUALIFIED: alien.data+private
 QUALIFIED: arrays
 QUALIFIED: byte-arrays
-QUALIFIED: classes.tuple.private
-QUALIFIED: kernel.private
-QUALIFIED: math.bitwise.private
-QUALIFIED: math.floats.private
-QUALIFIED: math.integers.private
+QUALIFIED: classes.tuple+private
+QUALIFIED: kernel+private
+QUALIFIED: math.bitwise+private
+QUALIFIED: math.floats+private
+QUALIFIED: math.integers+private
 QUALIFIED: math.libm
-QUALIFIED: math.private
-QUALIFIED: slots.private
-QUALIFIED: strings.private
+QUALIFIED: math+private
+QUALIFIED: slots+private
+QUALIFIED: strings+private
 IN: compiler.cfg.intrinsics
 
 ERROR: inline-intrinsics-not-supported word quot ;
@@ -32,39 +32,39 @@ ERROR: inline-intrinsics-not-supported word quot ;
     ] assoc-each ;
 
 {
-    { kernel.private:tag [ drop emit-tag ] }
-    { kernel.private:context-object [ emit-context-object ] }
-    { kernel.private:special-object [ emit-special-object ] }
-    { kernel.private:set-special-object [ emit-set-special-object ] }
-    { kernel.private:(identity-hashcode) [ drop emit-identity-hashcode ] }
-    { math.private:both-fixnums? [ drop emit-both-fixnums? ] }
-    { math.private:fixnum+ [ drop emit-fixnum+ ] }
-    { math.private:fixnum- [ drop emit-fixnum- ] }
-    { math.private:fixnum* [ drop emit-fixnum* ] }
-    { math.private:fixnum+fast [ drop [ ^^add ] binary-op ] }
-    { math.private:fixnum-fast [ drop [ ^^sub ] binary-op ] }
-    { math.private:fixnum*fast [ drop [ ^^mul ] binary-op ] }
-    { math.private:fixnum-bitand [ drop [ ^^and ] binary-op ] }
-    { math.private:fixnum-bitor [ drop [ ^^or ] binary-op ] }
-    { math.private:fixnum-bitxor [ drop [ ^^xor ] binary-op ] }
-    { math.private:fixnum-shift-fast [ emit-fixnum-shift-fast ] }
-    { math.private:fixnum-bitnot [ drop [ ^^not ] unary-op ] }
-    { math.private:fixnum< [ drop cc< emit-fixnum-comparison ] }
-    { math.private:fixnum<= [ drop cc<= emit-fixnum-comparison ] }
-    { math.private:fixnum>= [ drop cc>= emit-fixnum-comparison ] }
-    { math.private:fixnum> [ drop cc> emit-fixnum-comparison ] }
+    { kernel+private:tag [ drop emit-tag ] }
+    { kernel+private:context-object [ emit-context-object ] }
+    { kernel+private:special-object [ emit-special-object ] }
+    { kernel+private:set-special-object [ emit-set-special-object ] }
+    { kernel+private:(identity-hashcode) [ drop emit-identity-hashcode ] }
+    { math+private:both-fixnums? [ drop emit-both-fixnums? ] }
+    { math+private:fixnum+ [ drop emit-fixnum+ ] }
+    { math+private:fixnum- [ drop emit-fixnum- ] }
+    { math+private:fixnum* [ drop emit-fixnum* ] }
+    { math+private:fixnum+fast [ drop [ ^^add ] binary-op ] }
+    { math+private:fixnum-fast [ drop [ ^^sub ] binary-op ] }
+    { math+private:fixnum*fast [ drop [ ^^mul ] binary-op ] }
+    { math+private:fixnum-bitand [ drop [ ^^and ] binary-op ] }
+    { math+private:fixnum-bitor [ drop [ ^^or ] binary-op ] }
+    { math+private:fixnum-bitxor [ drop [ ^^xor ] binary-op ] }
+    { math+private:fixnum-shift-fast [ emit-fixnum-shift-fast ] }
+    { math+private:fixnum-bitnot [ drop [ ^^not ] unary-op ] }
+    { math+private:fixnum< [ drop cc< emit-fixnum-comparison ] }
+    { math+private:fixnum<= [ drop cc<= emit-fixnum-comparison ] }
+    { math+private:fixnum>= [ drop cc>= emit-fixnum-comparison ] }
+    { math+private:fixnum> [ drop cc> emit-fixnum-comparison ] }
     { kernel:eq? [ emit-eq ] }
-    { slots.private:slot [ emit-slot ] }
-    { slots.private:set-slot [ emit-set-slot ] }
-    { strings.private:string-nth-fast [ drop emit-string-nth-fast ] }
-    { strings.private:set-string-nth-fast [ drop emit-set-string-nth-fast ] }
-    { classes.tuple.private:<tuple-boa> [ emit-<tuple-boa> ] }
+    { slots+private:slot [ emit-slot ] }
+    { slots+private:set-slot [ emit-set-slot ] }
+    { strings+private:string-nth-fast [ drop emit-string-nth-fast ] }
+    { strings+private:set-string-nth-fast [ drop emit-set-string-nth-fast ] }
+    { classes.tuple+private:<tuple-boa> [ emit-<tuple-boa> ] }
     { arrays:<array> [ emit-<array> ] }
     { byte-arrays:<byte-array> [ emit-<byte-array> ] }
     { byte-arrays:(byte-array) [ emit-(byte-array) ] }
     { kernel:<wrapper> [ emit-simple-allot ] }
-    { alien.data.private:(local-allot) [ emit-local-allot ] }
-    { alien.data.private:(cleanup-allot) [ emit-cleanup-allot ] }
+    { alien.data+private:(local-allot) [ emit-local-allot ] }
+    { alien.data+private:(cleanup-allot) [ emit-cleanup-allot ] }
     { alien:<displaced-alien> [ emit-<displaced-alien> ] }
     { alien.accessors:alien-unsigned-1 [ int-rep alien.c-types:uchar emit-load-memory ] }
     { alien.accessors:set-alien-unsigned-1 [ int-rep alien.c-types:uchar emit-store-memory ] }
@@ -88,22 +88,22 @@ ERROR: inline-intrinsics-not-supported word quot ;
 
 : enable-float-intrinsics ( -- )
     {
-        { math.private:float+ [ drop [ ^^add-float ] binary-op ] }
-        { math.private:float- [ drop [ ^^sub-float ] binary-op ] }
-        { math.private:float* [ drop [ ^^mul-float ] binary-op ] }
-        { math.private:float/f [ drop [ ^^div-float ] binary-op ] }
-        { math.private:float< [ drop cc< emit-float-ordered-comparison ] }
-        { math.private:float<= [ drop cc<= emit-float-ordered-comparison ] }
-        { math.private:float>= [ drop cc>= emit-float-ordered-comparison ] }
-        { math.private:float> [ drop cc> emit-float-ordered-comparison ] }
-        { math.private:float-u< [ drop cc< emit-float-unordered-comparison ] }
-        { math.private:float-u<= [ drop cc<= emit-float-unordered-comparison ] }
-        { math.private:float-u>= [ drop cc>= emit-float-unordered-comparison ] }
-        { math.private:float-u> [ drop cc> emit-float-unordered-comparison ] }
-        { math.private:float= [ drop cc= emit-float-unordered-comparison ] }
-        { math.private:float>fixnum [ drop [ ^^float>integer ] unary-op ] }
-        { math.private:fixnum>float [ drop [ ^^integer>float ] unary-op ] }
-        { math.floats.private:float-unordered? [ drop cc/<>= emit-float-unordered-comparison ] }
+        { math+private:float+ [ drop [ ^^add-float ] binary-op ] }
+        { math+private:float- [ drop [ ^^sub-float ] binary-op ] }
+        { math+private:float* [ drop [ ^^mul-float ] binary-op ] }
+        { math+private:float/f [ drop [ ^^div-float ] binary-op ] }
+        { math+private:float< [ drop cc< emit-float-ordered-comparison ] }
+        { math+private:float<= [ drop cc<= emit-float-ordered-comparison ] }
+        { math+private:float>= [ drop cc>= emit-float-ordered-comparison ] }
+        { math+private:float> [ drop cc> emit-float-ordered-comparison ] }
+        { math+private:float-u< [ drop cc< emit-float-unordered-comparison ] }
+        { math+private:float-u<= [ drop cc<= emit-float-unordered-comparison ] }
+        { math+private:float-u>= [ drop cc>= emit-float-unordered-comparison ] }
+        { math+private:float-u> [ drop cc> emit-float-unordered-comparison ] }
+        { math+private:float= [ drop cc= emit-float-unordered-comparison ] }
+        { math+private:float>fixnum [ drop [ ^^float>integer ] unary-op ] }
+        { math+private:fixnum>float [ drop [ ^^integer>float ] unary-op ] }
+        { math.floats+private:float-unordered? [ drop cc/<>= emit-float-unordered-comparison ] }
         { alien.accessors:alien-float [ float-rep f emit-load-memory ] }
         { alien.accessors:set-alien-float [ float-rep f emit-store-memory ] }
         { alien.accessors:alien-double [ double-rep f emit-load-memory ] }
@@ -117,27 +117,27 @@ ERROR: inline-intrinsics-not-supported word quot ;
 
 : enable-float-min/max ( -- )
     {
-        { math.floats.private:float-min [ drop [ ^^min-float ] binary-op ] }
-        { math.floats.private:float-max [ drop [ ^^max-float ] binary-op ] }
+        { math.floats+private:float-min [ drop [ ^^min-float ] binary-op ] }
+        { math.floats+private:float-max [ drop [ ^^max-float ] binary-op ] }
     } enable-intrinsics ;
 
 : enable-min/max ( -- )
     {
-        { math.integers.private:fixnum-min [ drop [ ^^min ] binary-op ] }
-        { math.integers.private:fixnum-max [ drop [ ^^max ] binary-op ] }
+        { math.integers+private:fixnum-min [ drop [ ^^min ] binary-op ] }
+        { math.integers+private:fixnum-max [ drop [ ^^max ] binary-op ] }
     } enable-intrinsics ;
 
 : enable-log2 ( -- )
     {
-        { math.integers.private:fixnum-log2 [ drop [ ^^log2 ] unary-op ] }
+        { math.integers+private:fixnum-log2 [ drop [ ^^log2 ] unary-op ] }
     } enable-intrinsics ;
 
 : enable-bit-count ( -- )
     {
-        { math.bitwise.private:fixnum-bit-count [ drop [ ^^bit-count ] unary-op ] }
+        { math.bitwise+private:fixnum-bit-count [ drop [ ^^bit-count ] unary-op ] }
     } enable-intrinsics ;
 
 : enable-bit-test ( -- )
     {
-        { math.integers.private:fixnum-bit? [ drop [ ^^bit-test ] binary-op ] }
+        { math.integers+private:fixnum-bit? [ drop [ ^^bit-test ] binary-op ] }
     } enable-intrinsics ;

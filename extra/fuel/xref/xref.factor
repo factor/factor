@@ -53,7 +53,7 @@ PRIVATE>
 : apropos-xref ( str -- seq ) words-matching keys format-xrefs group-xrefs ;
 
 : vocab-xref ( vocab -- seq )
-    dup ".private" append [ vocab-words ] bi@ append
+    dup "+private" append [ vocab-words ] bi@ append
     format-xrefs group-xrefs ;
 
 : word-location ( word -- loc ) where get-loc ;

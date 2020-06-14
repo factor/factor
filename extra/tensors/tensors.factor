@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien alien.c-types alien.data arrays byte-arrays combinators
-grouping kernel locals kernel.private math math.functions math.ranges math.vectors
+grouping kernel locals kernel+private math math.functions math.ranges math.vectors
 math.vectors.simd multi-methods parser prettyprint.custom sequences sequences.extras
-sequences.private specialized-arrays typed ;
+sequences+private specialized-arrays typed ;
 
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float

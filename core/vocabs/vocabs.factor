@@ -150,13 +150,13 @@ M: vocab require name>> require ;
 
 M: vocab-link require name>> require ;
 
-! When calling "foo.private" require, load "foo" instead, but
-! only when "foo.private" does not exist. The reason for this is
-! that stage1 bootstrap starts out with some .private vocabs
+! When calling "foo+private" require, load "foo" instead, but
+! only when "foo+private" does not exist. The reason for this is
+! that stage1 bootstrap starts out with some +private vocabs
 ! that contain primitives, and loading the public vocabs would
 ! cause circularity issues.
 M: string require
-    [ ".private" ?tail ] keep swap [ lookup-vocab not ] when
+    [ "+private" ?tail ] keep swap [ lookup-vocab not ] when
     [ require-hook get call( name -- ) ] [ drop ] if ;
 
 : load-vocab ( name -- vocab )

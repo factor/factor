@@ -59,6 +59,8 @@ CONSTANT: default-components
     "math compiler threads io tools ui ui.tools unicode help handbook"
 
 [
+        "lol1" print flush
+
     ! We time bootstrap
     nano-count
 

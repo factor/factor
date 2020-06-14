@@ -1,14 +1,14 @@
 ! Copyright (C) 2009, 2010, 2011 Joe Groff, Slava Pestov, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.syntax
-assocs byte-arrays classes classes.private classes.struct
-classes.struct.prettyprint.private classes.tuple
-classes.tuple.parser classes.tuple.private combinators
+assocs byte-arrays classes classes+private classes.struct
+classes.struct.prettyprint+private classes.tuple
+classes.tuple.parser classes.tuple+private combinators
 compiler.tree.debugger compiler.units definitions delegate
 destructors eval generic generic.single io.encodings.utf8
 io.streams.string kernel layouts lexer libc literals math
 mirrors namespaces parser prettyprint prettyprint.config see
-sequences specialized-arrays specialized-arrays.private
+sequences specialized-arrays specialized-arrays+private
 system tools.test vocabs ;
 FROM: math => float ;
 QUALIFIED-WITH: alien.c-types c

@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays byte-vectors
-classes classes.algebra.private classes.builtin classes.error
+classes classes.algebra classes.algebra+private classes.builtin classes.error
 classes.intersection classes.maybe classes.mixin classes.parser
 classes.predicate classes.singleton classes.tuple classes.tuple.parser
 classes.union combinators compiler.units definitions effects
@@ -9,7 +9,7 @@ effects.parser generic generic.hook generic.math generic.parser
 generic.standard hash-sets hashtables io.pathnames kernel lexer
 math namespaces parser quotations sbufs sequences slots
 source-files splitting strings strings.parser
-strings.parser.private vectors vocabs vocabs.parser words
+strings.parser+private vectors vocabs vocabs.parser words
 words.alias words.constant words.symbol ;
 IN: bootstrap.syntax
 

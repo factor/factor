@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators continuations deques
 dlists fry io.backend io.directories io.files.info io.pathnames
-kernel kernel.private locals math namespaces sequences sorting
+kernel kernel+private locals math namespaces sequences sorting
 strings system unicode vocabs ;
 IN: io.directories.search
 

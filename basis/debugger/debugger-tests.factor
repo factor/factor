@@ -1,5 +1,5 @@
 USING: accessors alien.syntax continuations debugger kernel
-kernel.private literals namespaces tools.test ;
+kernel+private literals namespaces tools.test ;
 IN: debugger.tests
 
 { } [ [ drop ] [ error. ] recover ] unit-test

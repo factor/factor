@@ -208,20 +208,20 @@ ARTICLE: "http.proxy-variables" "HTTP(S) proxy variables"
 { $notes "The dynamic variables are keyed by strings. This allows to use Factor's command line support to define them (see in the examples below)." }
 
 { $heading "no_proxy" }
-"The no_proxy list must be a string containing of comma-separated list of IP addresses (eg " { $snippet "127.0.0.1" } "), hostnames (eg " { $snippet "bar.private" } ") or domain suffixes (eg " { $snippet ".private" } "). A match happens when a value of the list is the same or a suffix of the target for each full subdomain."
+"The no_proxy list must be a string containing of comma-separated list of IP addresses (eg " { $snippet "127.0.0.1" } "), hostnames (eg " { $snippet "bar+private" } ") or domain suffixes (eg " { $snippet "+private" } "). A match happens when a value of the list is the same or a suffix of the target for each full subdomain."
 { $example
-    "USING: http.client http.client.private namespaces prettyprint ;"
-    "\"bar.private\" \"no_proxy\" ["
-         "\"bar.private\" <get-request> no-proxy? ."
+    "USING: http.client http.client+private namespaces prettyprint ;"
+    "\"bar+private\" \"no_proxy\" ["
+         "\"bar+private\" <get-request> no-proxy? ."
     "] with-variable"
-    "\"bar.private\" \"no_proxy\" ["
-         "\"baz.bar.private\" <get-request> no-proxy? ."
+    "\"bar+private\" \"no_proxy\" ["
+         "\"baz.bar+private\" <get-request> no-proxy? ."
     "] with-variable"
-    "\"bar.private\" \"no_proxy\" ["
-         "\"foobar.private\" <get-request> no-proxy? ."
+    "\"bar+private\" \"no_proxy\" ["
+         "\"foobar+private\" <get-request> no-proxy? ."
     "] with-variable"
-    "\".private\" \"no_proxy\" ["
-         "\"foobar.private\" <get-request> no-proxy? ."
+    "\"+private\" \"no_proxy\" ["
+         "\"foobar+private\" <get-request> no-proxy? ."
     "] with-variable"
 "t
 t
@@ -246,7 +246,7 @@ t"
 { $example "USING: http http.client urls ; URL\" http://localhost:3128\" <request> proxy-url<<" "" }
 
 { $subheading "Full example:" }
-"$ no_proxy=\"localhost,127.0.0.1,.private\" http_proxy=\"http://proxy.private:3128\" https_proxy=\"http://proxysec.private:3128\" ./factor"
+"$ no_proxy=\"localhost,127.0.0.1,+private\" http_proxy=\"http://proxy+private:3128\" https_proxy=\"http://proxysec+private:3128\" ./factor"
 }
 }
 ;

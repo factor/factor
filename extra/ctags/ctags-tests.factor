@@ -1,4 +1,4 @@
-USING: arrays ctags.private io.backend kernel sequences
+USING: arrays ctags+private io.backend kernel sequences
 tools.test ;
 
 { t } [

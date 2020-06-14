@@ -1,5 +1,5 @@
 USING: arrays generic.single help.markup help.syntax kernel math
-math.matrices math.matrices.private math.matrices.extras
+math.matrices math.matrices+private math.matrices.extras
 math.order math.ratios math.vectors opengl.gl random sequences
 urls ;
 IN: math.matrices.extras

@@ -1,4 +1,4 @@
-USING: kernel layouts make math math.private tools.test ;
+USING: kernel layouts make math math+private tools.test ;
 IN: math.tests
 
 { } [ 5 [ ] times ] unit-test

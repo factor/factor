@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types alien.data alien.parser arrays
 byte-arrays combinators effects.parser fry generalizations grouping kernel
 lexer locals macros make math math.ranges parser sequences
-sequences.generalizations sequences.private ;
+sequences.generalizations sequences+private ;
 FROM: alien.arrays => array-length ;
 IN: alien.data.map
 

@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel classes io io.styles mirrors
-inspector.private ;
+inspector+private ;
 IN: inspector
 
 ARTICLE: "inspector" "The inspector"

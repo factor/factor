@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes classes.struct gpu.buffers gpu.shaders.private
+USING: classes classes.struct gpu.buffers gpu.shaders+private
 help.markup help.syntax images math sequences strings words ;
 IN: gpu.shaders
 

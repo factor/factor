@@ -11,7 +11,7 @@ compiler.tree.propagation compiler.tree.propagation.info
 compiler.tree.recursive compiler.tree.tuple-unboxing effects fry
 generic hints io kernel macros make match math namespaces
 prettyprint prettyprint.config prettyprint.custom
-prettyprint.sections quotations sequences sequences.private sets
+prettyprint.sections quotations sequences sequences+private sets
 sorting words ;
 FROM: fry => _ ;
 RENAME: _ match => __

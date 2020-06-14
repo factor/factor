@@ -107,10 +107,16 @@ TUPLE: no-current-vocab-error ;
 ERROR: unbalanced-private-declaration vocab ;
 
 : begin-private ( -- )
-    private add-manifest-section ;
+    private add-manifest-section
+    current-vocab name>> "+private" ?tail
+    [ unbalanced-private-declaration ]
+    [ "+private" append set-current-vocab ] if ;
 
 : end-private ( -- )
-    private remove-manifest-section ;
+    private remove-manifest-section
+    current-vocab name>> "+private" ?tail
+    [ set-current-vocab ]
+    [ unbalanced-private-declaration ] if ;
 
 : using-vocab? ( vocab -- ? )
     vocab-name manifest get search-vocab-names>> in? ;

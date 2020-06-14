@@ -1,5 +1,5 @@
 USING: accessors compiler.cfg.loop-detection
-compiler.cfg.loop-detection.private compiler.cfg.utilities
+compiler.cfg.loop-detection+private compiler.cfg.utilities
 compiler.test kernel namespaces sequences sets tools.test ;
 IN: compiler.cfg.loop-detection.tests
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors fry kernel macros math namespaces sequences
 source-files.errors tools.test tools.test.fuzz
-tools.test.fuzz.private tools.test.private ;
+tools.test.fuzz+private tools.test+private ;
 IN: tools.test.fuzz.tests
 
 SYMBOL: generator-stack

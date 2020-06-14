@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Dmitry Shubin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: gdbm.ffi gdbm.private help.markup help.syntax kernel math
+USING: gdbm.ffi gdbm+private help.markup help.syntax kernel math
 quotations strings ;
 IN: gdbm
 

@@ -3,7 +3,7 @@
 USING: accessors arrays ascii assocs boxes calendar classes columns
 combinators combinators.short-circuit deques fry kernel make math
 math.order math.parser math.vectors namespaces sequences sets system
-timers ui.gadgets ui.gadgets.private words locals ;
+timers ui.gadgets ui.gadgets+private words locals ;
 IN: ui.gestures
 
 : get-gesture-handler ( gesture gadget -- quot )

@@ -1,4 +1,4 @@
-USING: arrays assocs classes classes.tuple.private
+USING: arrays assocs classes classes.tuple+private
 compiler.units growable help.markup help.syntax kernel math
 sbufs sequences slots strings vectors words ;
 IN: classes.tuple

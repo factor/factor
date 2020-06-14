@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cocoa cocoa.messages cocoa.application cocoa.nibs assocs
-namespaces kernel kernel.private words compiler.units sequences
+namespaces kernel kernel+private words compiler.units sequences
 init vocabs memoize accessors ;
 IN: tools.deploy.shaker.cocoa
 

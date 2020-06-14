@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.parser classes.predicate fry
 kernel math parser sequences splitting unicode.data
-unicode.data.private ;
+unicode.data+private ;
 IN: unicode.categories
 
 ! For use in CATEGORY:

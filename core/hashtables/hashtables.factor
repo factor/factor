@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2011 John Benediktsson, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel kernel.private math
-math.private sequences sequences.private slots.private vectors ;
+USING: accessors arrays assocs kernel kernel+private math
+math+private sequences sequences+private slots+private vectors ;
 IN: hashtables
 
 TUPLE: hashtable

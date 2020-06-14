@@ -7,7 +7,7 @@ IN: compiler.tests.redefine6
 [ ] [ [ "compiler.tests.redefine6" forget-vocab ] with-compilation-unit ] unit-test
 
 [ ] [
-    "USING: kernel kernel.private ;
+    "USING: kernel kernel+private ;
     IN: compiler.tests.redefine6
     GENERIC: my-generic ( a -- b )
     MIXIN: my-mixin

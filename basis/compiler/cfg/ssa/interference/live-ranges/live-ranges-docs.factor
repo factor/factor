@@ -1,5 +1,5 @@
 USING: compiler.cfg compiler.cfg.instructions
-compiler.cfg.ssa.interference.live-ranges.private help.markup
+compiler.cfg.ssa.interference.live-ranges+private help.markup
 help.syntax math ;
 IN: compiler.cfg.ssa.interference.live-ranges
 

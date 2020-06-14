@@ -5,7 +5,7 @@ classes.tuple.parser combinators combinators.short-circuit
 concurrency.flags concurrency.promises continuations deques
 destructors dlists fry init kernel lexer make math
 math.functions namespaces parser sequences sets strings threads
-ui.backend ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.backend ui.gadgets ui.gadgets+private ui.gadgets.worlds
 ui.gestures ui.render vectors vocabs.parser words ;
 IN: ui
 

@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors byte-arrays fry io.binary
-kernel kernel.private locals math math.bitwise parser sequences
-sequences.private vocabs.loader ;
+kernel kernel+private locals math math.bitwise parser sequences
+sequences+private vocabs.loader ;
 IN: bit-arrays
 
 TUPLE: bit-array

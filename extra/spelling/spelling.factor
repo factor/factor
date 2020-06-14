@@ -3,7 +3,7 @@
 USING: arrays ascii assocs combinators combinators.smart fry
 http.client io.encodings.ascii io.files io.files.temp kernel
 locals math math.ranges math.statistics memoize sequences
-sequences.private sorting splitting urls ;
+sequences+private sorting splitting urls ;
 IN: spelling
 
 ! http://norvig.com/spell-correct.html

@@ -4,7 +4,7 @@ USING: accessors arrays combinators game.input game.loop
 game.input.scancodes grouping kernel literals locals
 math math.constants math.functions math.order math.trig
 math.vectors opengl opengl.capabilities opengl.gl
-opengl.shaders opengl.textures opengl.textures.private
+opengl.shaders opengl.textures opengl.textures+private
 sequences sequences.product specialized-arrays
 terrain.generation terrain.shaders typed ui ui.gadgets
 ui.gadgets.worlds ui.pixel-formats game.worlds

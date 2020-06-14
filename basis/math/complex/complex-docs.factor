@@ -1,5 +1,5 @@
-USING: help.markup help.syntax math math.private math.functions
-math.complex.private ;
+USING: help.markup help.syntax math math+private math.functions
+math.complex+private ;
 IN: math.complex
 
 ARTICLE: "complex-numbers-zero" "Embedding of real numbers in complex numbers"

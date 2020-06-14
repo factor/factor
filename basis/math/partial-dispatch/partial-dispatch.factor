@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes.algebra combinators
 compiler.units fry generic generic.math hashtables kernel make
-math math.private namespaces quotations sequences words ;
+math math+private namespaces quotations sequences words ;
 IN: math.partial-dispatch
 
 PREDICATE: math-partial < word

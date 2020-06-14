@@ -1,4 +1,4 @@
-USING: images images.loader.gdiplus.private tools.test ;
+USING: images images.loader.gdiplus+private tools.test ;
 IN: images.loader.gdiplus.tests
 
 { } [

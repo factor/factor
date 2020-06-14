@@ -1,5 +1,5 @@
 USING: alien alien.c-types help.syntax help.markup libc
-kernel.private byte-arrays math strings hashtables alien.syntax
+kernel+private byte-arrays math strings hashtables alien.syntax
 alien.strings sequences io.encodings.string debugger destructors
 vocabs.loader classes.struct quotations kernel ;
 IN: alien.data

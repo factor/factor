@@ -3,9 +3,9 @@
 USING: accessors arrays assocs byte-arrays byte-vectors classes
 combinators definitions effects fry generic generic.single
 generic.standard hashtables io.binary io.encodings
-io.streams.string kernel kernel.private math math.parser
-namespaces parser sbufs sequences sequences.private splitting
-splitting.private strings vectors words ;
+io.streams.string kernel kernel+private math math.parser
+namespaces parser sbufs sequences sequences+private splitting
+splitting+private strings vectors words ;
 IN: hints
 
 GENERIC: specializer-predicate ( spec -- quot )

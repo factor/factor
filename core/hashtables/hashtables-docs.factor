@@ -1,8 +1,8 @@
-USING: assocs hashtables.private help.markup help.syntax kernel
+USING: assocs hashtables+private help.markup help.syntax kernel
 sequences ;
 IN: hashtables
 
-ARTICLE: "hashtables.private" "Hashtable implementation details"
+ARTICLE: "hashtables+private" "Hashtable implementation details"
 "This hashtable implementation uses only one auxiliary array in addition to the hashtable tuple itself. The array stores keys in even slots and values in odd slots. Values are looked up with a hashing strategy that uses quadratic probing to resolve collisions."
 $nl
 "There are two special objects: the " { $link +tombstone+ } " marker and the " { $link +empty+ } " marker. Neither of these markers can be used as hashtable keys."
@@ -35,7 +35,7 @@ $nl
 { $subsections
     "hashtables.keys"
     "hashtables.utilities"
-    "hashtables.private"
+    "hashtables+private"
 } ;
 
 ARTICLE: "hashtables.keys" "Hashtable keys"
@@ -81,7 +81,7 @@ HELP: new-key@
 HELP: set-nth-pair
 { $values { "value" "the second element of the pair" } { "key" "the first element of the pair" } { "array" "the underlying array of the hashtable" } { "n" "an index in the sequence" } }
 { $description "Stores a pair of values into the elements with index " { $snippet "n" } " and " { $snippet "n+1" } ", respectively." }
-{ $warning "This word is in the " { $vocab-link "hashtables.private" } " vocabulary because it does not perform bounds checks." }
+{ $warning "This word is in the " { $vocab-link "hashtables+private" } " vocabulary because it does not perform bounds checks." }
 { $side-effects "seq" } ;
 
 HELP: reset-hash

@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Daniel Ehrenberg, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators destructors io
-io.streams.plain kernel kernel.private math namespaces sbufs
-sequences sequences.private splitting strings strings.private ;
+io.streams.plain kernel kernel+private math namespaces sbufs
+sequences sequences+private splitting strings strings+private ;
 IN: io.encodings
 
 ! The encoding descriptor protocol

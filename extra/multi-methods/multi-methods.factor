@@ -4,7 +4,7 @@ USING: kernel math sequences vectors classes classes.algebra
 combinators arrays words assocs parser namespaces make
 definitions prettyprint prettyprint.backend prettyprint.custom
 quotations generalizations sequences.generalizations debugger io
-compiler.units kernel.private effects accessors hashtables
+compiler.units kernel+private effects accessors hashtables
 sorting shuffle math.order sets see effects.parser ;
 FROM: namespaces => set ;
 IN: multi-methods

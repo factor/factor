@@ -3,7 +3,7 @@ kernel models models.product models.range ui.gadgets.viewports
 ui.gadgets.labels ui.gadgets.grids ui.gadgets.sliders math
 math.vectors arrays sequences ui.gadgets.debug math.rectangles
 accessors ui.gadgets.buttons ui.gadgets.packs
-ui.gadgets.scrollers.private ;
+ui.gadgets.scrollers+private ;
 
 { } [
     <gadget> "g" set

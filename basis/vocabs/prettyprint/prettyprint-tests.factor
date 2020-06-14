@@ -1,4 +1,4 @@
-USING: vocabs.prettyprint vocabs.prettyprint.private tools.test
+USING: vocabs.prettyprint vocabs.prettyprint+private tools.test
 io.streams.string eval ;
 IN: vocabs.prettyprint.tests
 

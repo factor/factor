@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2011, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators destructors io.backend.unix
-io.files io.sockets.private io.sockets.secure
+io.files io.sockets+private io.sockets.secure
 io.sockets.secure.openssl io.timeouts kernel math openssl
 openssl.libssl system ;
 FROM: io.ports => shutdown ;

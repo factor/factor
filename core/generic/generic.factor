@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.algebra
-classes.algebra.private classes.maybe classes.private
+classes.algebra+private classes.maybe classes+private
 combinators definitions kernel make math namespaces sequences
 sets words ;
 IN: generic

@@ -3,7 +3,7 @@
 
 USING: kernel tools.test peg peg.javascript.ast
 peg.javascript.parser accessors sequences math peg.ebnf
-peg.ebnf.private ;
+peg.ebnf+private ;
 
 {
   T{

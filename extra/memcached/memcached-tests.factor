@@ -3,7 +3,7 @@
 
 USING: arrays assocs calendar io io.encodings.binary io.sockets
 io.timeouts kernel math math.functions memcached
-memcached.private namespaces present sequences sorting system
+memcached+private namespaces present sequences sorting system
 threads tools.test ;
 
 IN: memcached.tests

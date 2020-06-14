@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs classes classes.tuple
-classes.tuple.private kernel math sequences sequences.private
-slots.private ;
+classes.tuple+private kernel math sequences sequences+private
+slots+private ;
 
 IN: named-tuples
 

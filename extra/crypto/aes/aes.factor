@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators crypto.aes.utils
 generalizations grouping kernel locals math math.bitwise
-math.ranges memoize namespaces sequences sequences.private
+math.ranges memoize namespaces sequences sequences+private
 sequences.unrolled ;
 IN: crypto.aes
 

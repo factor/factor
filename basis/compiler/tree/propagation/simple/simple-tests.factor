@@ -1,7 +1,7 @@
 USING: accessors arrays assocs compiler.tree
 compiler.tree.propagation.constraints compiler.tree.propagation.copy
 compiler.tree.propagation.info compiler.tree.propagation.simple hashtables
-kernel math math.intervals math.private namespaces sequences system tools.test
+kernel math math.intervals math+private namespaces sequences system tools.test
 words ;
 IN: compiler.tree.propagation.simple.tests
 

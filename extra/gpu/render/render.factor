@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data arrays
 assocs classes classes.mixin classes.parser classes.singleton classes.struct
-classes.tuple classes.tuple.private combinators combinators.tuple destructors fry
+classes.tuple classes.tuple+private combinators combinators.tuple destructors fry
 generic generic.parser gpu gpu.buffers gpu.framebuffers
-gpu.framebuffers.private gpu.shaders gpu.shaders.private gpu.state
-gpu.textures gpu.textures.private math.floats.half images kernel
+gpu.framebuffers+private gpu.shaders gpu.shaders+private gpu.state
+gpu.textures gpu.textures+private math.floats.half images kernel
 lexer locals math math.order math.parser namespaces opengl
 opengl.gl parser quotations sequences slots sorting
 specialized-arrays strings ui.gadgets.worlds variants

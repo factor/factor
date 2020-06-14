@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel arrays namespaces sequences continuations
-io.pools db fry db.private ;
+io.pools db fry db+private ;
 IN: db.pools
 
 TUPLE: db-pool < pool db ;

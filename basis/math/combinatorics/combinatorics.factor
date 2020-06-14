@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs binary-search classes.tuple
-combinators fry hints kernel kernel.private locals math
+combinators fry hints kernel kernel+private locals math
 math.functions math.order math.ranges namespaces sequences
-sequences.private sorting strings vectors ;
+sequences+private sorting strings vectors ;
 IN: math.combinatorics
 
 <PRIVATE

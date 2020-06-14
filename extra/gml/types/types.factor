@@ -1,5 +1,5 @@
 ! Copyright (C) 2010 Slava Pestov.
-USING: accessors kernel math sequences sequences.private
+USING: accessors kernel math sequences sequences+private
 hashtables assocs locals arrays combinators classes.struct
 math.vectors math.vectors.simd math.vectors.simd.cords ;
 IN: gml.types

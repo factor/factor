@@ -1,4 +1,4 @@
-USING: accessors arrays assocs continuations destructors destructors.private
+USING: accessors arrays assocs continuations destructors destructors+private
 fry io.files.temp kernel math namespaces python python.ffi
 python.modules.__builtin__ python.modules.argparse python.modules.datetime
 python.modules.os python.modules.os.path python.modules.sys

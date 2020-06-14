@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors ascii assocs combinators formatting fry
-hashtables io io.encodings.utf16.private io.streams.string json
+hashtables io io.encodings.utf16+private io.streams.string json
 kernel locals math math.parser mirrors namespaces sequences
 strings tr words ;
 IN: json.writer

@@ -1,5 +1,5 @@
 USING: accessors kernel math math.functions
-sequences sequences.private ;
+sequences sequences+private ;
 IN: sequences.complex
 
 TUPLE: complex-sequence seq ;

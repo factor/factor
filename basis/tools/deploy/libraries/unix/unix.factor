@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files io.pathnames io.pathnames.private kernel
+USING: io.files io.pathnames io.pathnames+private kernel
 sequences system tools.deploy.libraries ;
 IN: tools.deploy.libraries.unix
 

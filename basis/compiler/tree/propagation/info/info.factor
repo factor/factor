@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays classes
 classes.algebra classes.singleton classes.tuple
-classes.tuple.private combinators combinators.short-circuit
+classes.tuple+private combinators combinators.short-circuit
 compiler.tree.propagation.copy compiler.utilities kernel layouts math
-math.intervals namespaces sequences sequences.private strings
+math.intervals namespaces sequences sequences+private strings
 words ;
 IN: compiler.tree.propagation.info
 

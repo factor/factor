@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs definitions hashtables kernel
-kernel.private math math.order namespaces quotations sequences
-sets slots.private strings vocabs ;
+kernel+private math math.order namespaces quotations sequences
+sets slots+private splitting strings vocabs ;
 IN: words
 
 BUILTIN: word
@@ -80,7 +80,7 @@ ERROR: invalid-primitive vocabulary word effect ;
 : lookup-word ( name vocab -- word ) vocab-words-assoc at ;
 
 : target-word ( word -- target )
-    [ name>> ] [ vocabulary>> ] bi lookup-word ;
+    [ name>> ] [ vocabulary>> ".private" ?tail [ "+private" append ] when ] bi lookup-word ;
 
 SYMBOL: bootstrapping?
 

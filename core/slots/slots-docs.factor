@@ -1,6 +1,6 @@
-USING: help.markup help.syntax generic kernel.private parser
+USING: help.markup help.syntax generic kernel+private parser
 kernel quotations namespaces sequences arrays effects
-generic.standard classes.builtin slots.private classes strings math
+generic.standard classes.builtin slots+private classes strings math
 assocs byte-arrays alien classes.tuple ;
 IN: slots
 
@@ -182,12 +182,12 @@ $low-level-note ;
 HELP: slot
 { $values { "obj" object } { "m" "a non-negative fixnum" } { "value" object } }
 { $description "Reads the object stored at the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
-{ $warning "This word is in the " { $vocab-link "slots.private" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
+{ $warning "This word is in the " { $vocab-link "slots+private" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
 
 HELP: set-slot
 { $values { "value" object } { "obj" object } { "n" "a non-negative fixnum" } }
 { $description "Writes " { $snippet "value" } " to the " { $snippet "n" } "th slot of " { $snippet "obj" } "." }
-{ $warning "This word is in the " { $vocab-link "slots.private" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
+{ $warning "This word is in the " { $vocab-link "slots+private" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
 
 HELP: slot-named
 { $values { "name" string } { "specs" { $sequence slot-spec } } { "spec/f" { $maybe slot-spec } } }

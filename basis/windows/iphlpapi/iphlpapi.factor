@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types alien.data alien.strings
 alien.syntax arrays byte-arrays classes.struct combinators
 combinators.smart destructors io.encodings.string
-io.encodings.utf8 io.sockets io.sockets.private kernel libc
+io.encodings.utf8 io.sockets io.sockets+private kernel libc
 make refs sequences windows.errors windows.kernel32
 windows.types windows.winsock ;
 IN: windows.iphlpapi

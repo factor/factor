@@ -1,6 +1,6 @@
 USING: accessors arrays combinators fry grouping
-grouping.private kernel locals macros math math.ranges sequences
-sequences.generalizations sequences.private vectors ;
+grouping+private kernel locals macros math math.ranges sequences
+sequences.generalizations sequences+private vectors ;
 
 IN: grouping.extras
 

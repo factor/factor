@@ -187,7 +187,7 @@ forget-junk
 { t } [ "vocabs.loader.test.n" lookup-vocab >boolean ] unit-test
 
 { f } [ "vocabs.loader.test.p" lookup-vocab ] unit-test
-{ } [ "vocabs.loader.test.p.private" require ] unit-test
+{ } [ "vocabs.loader.test.p+private" require ] unit-test
 { { "foo" } } [ "vocabs.loader.test.p" vocab-words [ name>> ] map ] unit-test
 
 [

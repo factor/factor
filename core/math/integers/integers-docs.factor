@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel math math.private ;
+USING: help.markup help.syntax kernel math math+private ;
 IN: math.integers
 
 ARTICLE: "integers" "Integers"

@@ -1,14 +1,14 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays classes
-classes.builtin classes.private classes.tuple
-classes.tuple.private combinators combinators.short-circuit
+classes.builtin classes+private classes.tuple
+classes.tuple+private combinators combinators.short-circuit
 combinators.smart command-line compiler.codegen.relocation
-compiler.units fry generic generic.single.private grouping
-hashtables hashtables.private io io.binary io.encodings.binary
-io.files io.pathnames kernel kernel.private layouts locals make
-math math.order namespaces namespaces.private parser
-parser.notes prettyprint quotations sequences sequences.private
+compiler.units fry generic generic.single+private grouping
+hashtables hashtables+private io io.binary io.encodings.binary
+io.files io.pathnames kernel kernel+private layouts locals make
+math math.order namespaces namespaces+private parser
+parser.notes prettyprint quotations sequences sequences+private
 source-files strings system vectors vocabs words ;
 IN: bootstrap.image
 
@@ -377,7 +377,7 @@ M: tuple prepare-object emit-tuple ;
 
 M: tombstone prepare-object
     state>> "+tombstone+" "+empty+" ?
-    "hashtables.private" lookup-word def>> first
+    "hashtables+private" lookup-word def>> first
     [ emit-tuple ] cache-eql-object ;
 
 ! Arrays

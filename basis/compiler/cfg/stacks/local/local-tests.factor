@@ -1,7 +1,7 @@
 USING: accessors compiler.cfg compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.stacks.local
 compiler.cfg.utilities compiler.test cpu.architecture kernel
-kernel.private make math namespaces sequences.private slots.private
+kernel+private make math namespaces sequences+private slots+private
 tools.test ;
 QUALIFIED: sets
 IN: compiler.cfg.stacks.local.tests

@@ -1,4 +1,4 @@
-USING: combinators help.markup help.syntax kernel kernel.private sequences
+USING: combinators help.markup help.syntax kernel kernel+private sequences
 words ;
 IN: stack-checker.known-words
 

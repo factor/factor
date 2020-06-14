@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs grouping kernel linked-assocs literals locals
 namespaces sequences tools.test yaml yaml.config yaml.ffi
-yaml.private calendar yaml.conversion ;
+yaml+private calendar yaml.conversion ;
 IN: yaml.tests
 
 ! TODO real conformance tests here

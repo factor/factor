@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel locals math sequences
-sequences.private ;
+sequences+private ;
 IN: sequences.product
 
 TUPLE: product-sequence { sequences array read-only } { lengths array read-only } ;

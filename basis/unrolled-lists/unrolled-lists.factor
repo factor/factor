@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays math kernel accessors sequences sequences.private
+USING: arrays math kernel accessors sequences sequences+private
 deques search-deques hashtables ;
 IN: unrolled-lists
 

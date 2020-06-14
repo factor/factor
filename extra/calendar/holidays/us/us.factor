@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar calendar.holidays
-calendar.holidays.private combinators combinators.short-circuit
+calendar.holidays+private combinators combinators.short-circuit
 fry kernel lexer math namespaces parser sequences
 vocabs words ;
 IN: calendar.holidays.us

@@ -1,4 +1,4 @@
-USING: heaps.private help.markup help.syntax kernel math assocs
+USING: heaps+private help.markup help.syntax kernel math assocs
 math.order quotations ;
 IN: heaps
 

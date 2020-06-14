@@ -51,7 +51,7 @@ PRIVATE>
 
 : find-vocab-root ( vocab -- path/f )
     vocab-name root-cache get [
-        dup ".private" tail? [ drop f ] [
+        dup "+private" tail? [ drop f ] [
             ".factor" append-vocab-dir find-root-for
         ] if
     ] cache ;

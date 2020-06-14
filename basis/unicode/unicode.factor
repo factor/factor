@@ -1,8 +1,8 @@
 USING: accessors arrays assocs combinators.short-circuit fry
 hints interval-maps kernel math math.order sequences sorting
-strings unicode.breaks.private unicode.case.private
-unicode.categories unicode.collation unicode.collation.private
-unicode.data unicode.data.private unicode.normalize.private
+strings unicode.breaks+private unicode.case+private
+unicode.categories unicode.collation unicode.collation+private
+unicode.data unicode.data+private unicode.normalize+private
 unicode.script locals math.ranges ;
 IN: unicode
 

@@ -4,7 +4,7 @@
 USING: arrays assocs classes db kernel namespaces
 classes.tuple words sequences slots math accessors
 math.parser io prettyprint continuations
-destructors mirrors sets db.types db.private fry
+destructors mirrors sets db.types db+private fry
 combinators.short-circuit db.errors ;
 IN: db.tuples
 

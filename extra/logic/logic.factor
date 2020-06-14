@@ -370,7 +370,7 @@ SYMBOL: *anonymouse-var-no*
 : proxy-var-for-'__' ( -- var-symbol )
     [
         *anonymouse-var-no* counter "ANON-%d_" sprintf
-        "logic.private" create-word dup dup
+        "logic+private" create-word dup dup
         define-symbol
         ANONYMOUSE-LOGIC-VAR swap set-global
     ] with-compilation-unit ;

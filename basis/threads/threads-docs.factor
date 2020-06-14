@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel kernel.private io
-threads.private init quotations strings assocs heaps boxes
+USING: help.markup help.syntax kernel kernel+private io
+threads+private init quotations strings assocs heaps boxes
 namespaces deques dlists system ;
 IN: threads
 

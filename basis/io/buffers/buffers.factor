@@ -2,8 +2,8 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors alien.data byte-arrays
-combinators destructors kernel libc math math.order math.private
-sequences sequences.private typed ;
+combinators destructors kernel libc math math.order math+private
+sequences sequences+private typed ;
 IN: io.buffers
 
 TUPLE: buffer

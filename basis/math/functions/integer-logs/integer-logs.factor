@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private math math.functions
-math.functions.private math.private sequences.private ;
+USING: kernel kernel+private math math.functions
+math.functions+private math+private sequences+private ;
 IN: math.functions.integer-logs
 
 <PRIVATE

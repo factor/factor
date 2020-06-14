@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes kernel help.markup help.syntax sequences
-alien assocs strings math quotations db.private ;
+alien assocs strings math quotations db+private ;
 IN: db
 
 HELP: db-connection

@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io.backend io.directories
-io.files io.pathnames.private kernel sequences strings system ;
+io.files io.pathnames+private kernel sequences strings system ;
 IN: io.pathnames
 
 HELP: path-separator?

@@ -1,5 +1,5 @@
 USING: assocs help.markup help.syntax kernel math sets
-tools.crossref.private words ;
+tools.crossref+private words ;
 IN: tools.crossref
 
 ARTICLE: "tools.crossref" "Definition cross referencing"

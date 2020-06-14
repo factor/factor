@@ -1,5 +1,5 @@
 IN: benchmark.nsieve-bytes
-USING: math math.parser sequences sequences.private kernel
+USING: math math.parser sequences sequences+private kernel
 byte-arrays make io ;
 
 : clear-flags ( step i seq -- )

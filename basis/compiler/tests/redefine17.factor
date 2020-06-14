@@ -1,4 +1,4 @@
-USING: tools.test classes.mixin compiler.units arrays kernel.private
+USING: tools.test classes.mixin compiler.units arrays kernel+private
 strings sequences vocabs definitions kernel ;
 IN: compiler.tests.redefine17
 

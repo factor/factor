@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml io kernel math sequences strings xml.traversal
-tools.test math.parser xml.syntax xml.data xml.syntax.private
+tools.test math.parser xml.syntax xml.data xml.syntax+private
 accessors multiline locals inverse xml.writer splitting classes
-xml.private ;
+xml+private ;
 IN: xml.syntax.tests
 
 ! TAGS test

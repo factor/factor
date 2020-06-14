@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types alien.data alien.parser
 byte-arrays classes combinators fry functors kernel lexer locals
 make math math.vectors parser prettyprint.custom sequences
-sequences.private vocabs.generated vocabs.loader vocabs.parser
+sequences+private vocabs.generated vocabs.loader vocabs.parser
 words ;
 IN: specialized-arrays
 

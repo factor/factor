@@ -1,5 +1,5 @@
 USING: cpu.x86.assembler cpu.x86.assembler.operands
-cpu.x86.assembler.operands.private make tools.test ;
+cpu.x86.assembler.operands+private make tools.test ;
 IN: cpu.x86.assembler.operands.tests
 
 [ RCX RSP 2 0 <indirect> ] [ bad-index? ] must-fail-with

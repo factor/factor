@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs byte-arrays combinators fry growable io
-io.encodings.binary io.streams.byte-array kernel kernel.private
+io.encodings.binary io.streams.byte-array kernel kernel+private
 literals locals math math.bitwise namespaces sbufs sequences
-sequences.private ;
+sequences+private ;
 IN: base64
 
 ERROR: malformed-base64 ;

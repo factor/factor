@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Daniel Ehrenberg, Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: byte-vectors io io.private kernel locals math namespaces
+USING: byte-vectors io io+private kernel locals math namespaces
 sbufs sequences splitting ;
 IN: io.crlf
 

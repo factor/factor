@@ -1,4 +1,4 @@
-USING: graphviz.dot.private io.streams.string sequences tools.test ;
+USING: graphviz.dot+private io.streams.string sequences tools.test ;
 IN: graphviz.dot.tests
 
 ! Making sure strings are escaped properly

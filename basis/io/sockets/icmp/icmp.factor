@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays combinators generic kernel io.sockets
-io.sockets.private memoize sequences system vocabs.parser ;
+io.sockets+private memoize sequences system vocabs.parser ;
 
 IN: io.sockets.icmp
 

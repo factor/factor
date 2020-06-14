@@ -7,8 +7,8 @@ cocoa.types cocoa.views combinators core-foundation.strings
 core-graphics core-graphics.types core-text io.encodings.utf8
 kernel literals locals math math.order math.parser
 math.rectangles namespaces opengl sequences splitting threads
-ui.commands ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.private words sorting math.vectors
+ui.commands ui.gadgets ui.gadgets+private ui.gadgets.worlds
+ui.gestures ui+private words sorting math.vectors
 ui.baseline-alignment ui.gadgets.line-support
 ui.gadgets.editors ui.backend.cocoa.input-methods
 ui.backend.cocoa.input-methods.editors io.encodings.utf16n

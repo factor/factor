@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types alien.data alien.strings
 byte-arrays classes.struct combinators destructors io.backend.unix
 io.encodings.ascii io.encodings.utf8 io.files io.pathnames io.sockets
-io.sockets.private kernel libc locals math namespaces sequences system
+io.sockets+private kernel libc locals math namespaces sequences system
 unix unix.ffi vocabs ;
 IN: io.sockets.unix
 

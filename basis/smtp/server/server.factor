@@ -3,7 +3,7 @@
 USING: combinators kernel prettyprint io io.timeouts sequences
 namespaces io.sockets io.sockets.secure continuations calendar
 io.encodings.ascii io.streams.duplex destructors locals
-concurrency.promises threads accessors smtp.private
+concurrency.promises threads accessors smtp+private
 io.sockets.secure.debug io.crlf ;
 IN: smtp.server
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2014 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays debugger fonts fry gopher gopher.private
+USING: accessors arrays debugger fonts fry gopher gopher+private
 kernel math.vectors models present sequences ui ui.commands ui.gadgets
 ui.gadgets.editors ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.tracks

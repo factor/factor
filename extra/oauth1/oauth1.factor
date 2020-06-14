@@ -3,7 +3,7 @@
 USING: accessors assocs base64 calendar checksums.hmac
 checksums.sha combinators fry http http.client kernel locals
 make math math.parser namespaces present random sequences
-sorting strings urls urls.encoding urls.private ;
+sorting strings urls urls.encoding urls+private ;
 IN: oauth1
 
 SYMBOL: consumer-token

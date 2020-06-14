@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays columns combinators generalizations grouping
 kernel locals math math.bitwise prettyprint sequences
-sequences.private ;
+sequences+private ;
 IN: crypto.aes.utils
 : gb0 ( a -- a0 ) 0xff bitand ; inline
 : gb1 ( a -- a1 ) -8 shift gb0 ; inline

@@ -1,6 +1,6 @@
 ! Copyright (C) 2012 John Benediktsson, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license
-USING: arrays assocs assocs.private fry generalizations kernel
+USING: arrays assocs assocs+private fry generalizations kernel
 math math.statistics sequences sequences.extras ;
 IN: assocs.extras
 

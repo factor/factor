@@ -1,5 +1,5 @@
 USING: hashtables io.streams.string json json.reader
-json.reader.private kernel literals math strings tools.test ;
+json.reader+private kernel literals math strings tools.test ;
 
 { f } [ "false" json> ] unit-test
 { t } [ "true" json> ] unit-test

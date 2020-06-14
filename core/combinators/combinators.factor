@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays hashtables kernel
-kernel.private make math math.order math.private quotations
-sequences sequences.private sets sorting words ;
+kernel+private make math math.order math+private quotations
+sequences sequences+private sets sorting words ;
 IN: combinators
 
 ! Most of these combinators have compile-time expansions in

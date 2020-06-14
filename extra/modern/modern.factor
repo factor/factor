@@ -473,7 +473,7 @@ ERROR: compound-syntax-disallowed n seq obj ;
     ] { } make 2nip ;
 
 : vocab>literals ( vocab -- sequence )
-    ".private" ?tail drop
+    "+private" ?tail drop
     vocab-source-path utf8 file-contents string>literals ;
 
 : path>literals ( path -- sequence )

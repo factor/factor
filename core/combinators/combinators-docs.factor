@@ -1,6 +1,6 @@
 USING: arrays help.markup help.syntax strings sbufs vectors
 kernel quotations generic generic.standard classes
-math assocs sequences sequences.private combinators.private
+math assocs sequences sequences+private combinators+private
 effects words ;
 IN: combinators
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays assocs colors.hex combinators formatting
-http.client images.http images.loader images.loader.private
+http.client images.http images.loader images.loader+private
 images.viewer kernel math math.order present sequences splitting
 urls ;
 

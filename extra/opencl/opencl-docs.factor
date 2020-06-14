@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel quotations strings opencl.private
+USING: help.markup help.syntax kernel quotations strings opencl+private
 math byte-arrays alien ;
 IN: opencl
 

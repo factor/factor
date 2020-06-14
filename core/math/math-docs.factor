@@ -513,7 +513,7 @@ ARTICLE: "bitwise-arithmetic" "Bitwise arithmetic"
 ARTICLE: "arithmetic" "Arithmetic"
 "Factor attempts to preserve natural mathematical semantics for numbers. Multiplying two large integers never results in overflow, and dividing two integers yields an exact ratio. Floating point numbers are also supported, along with complex numbers."
 $nl
-"Math words are in the " { $vocab-link "math" } " vocabulary. Implementation details are in the " { $vocab-link "math.private" } " vocabulary."
+"Math words are in the " { $vocab-link "math" } " vocabulary. Implementation details are in the " { $vocab-link "math+private" } " vocabulary."
 { $subsections
     "number-protocol"
     "modular-arithmetic"

@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.files io.files.temp io.streams.duplex kernel
-sequences sequences.private strings vectors words memoize
+sequences sequences+private strings vectors words memoize
 splitting grouping hints tr continuations io.encodings.ascii
 ascii ;
 IN: benchmark.reverse-complement

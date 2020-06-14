@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml.data xml.writer tools.test fry xml xml.syntax kernel multiline
-xml.writer.private io.streams.string xml.traversal sequences
+xml.writer+private io.streams.string xml.traversal sequences
 io.encodings.utf8 io.files io.files.temp accessors io.directories math
 math.parser ;
 IN: xml.writer.tests

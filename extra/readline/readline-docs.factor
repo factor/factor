@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays help.markup help.syntax math
-sequences.private vectors strings kernel math.order layouts
+sequences+private vectors strings kernel math.order layouts
 quotations generic.single ;
 IN: readline
 

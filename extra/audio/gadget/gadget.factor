@@ -1,8 +1,8 @@
 USING: accessors audio audio.engine combinators destructors
 images.loader images.viewer init kernel locals namespaces
 ui.gadgets ui.gadgets.buttons ui.gadgets.panes ;
-FROM: ui.gadgets.buttons.private => border-button-theme ;
-FROM: audio.engine.private => make-engine-current ;
+FROM: ui.gadgets.buttons+private => border-button-theme ;
+FROM: audio.engine+private => make-engine-current ;
 IN: audio.gadget
 
 TUPLE: audio-gadget < button

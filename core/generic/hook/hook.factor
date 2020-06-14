@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors definitions generic generic.single kernel
-kernel.private namespaces quotations sequences words ;
-QUALIFIED-WITH: generic.single.private gsp
+kernel+private namespaces quotations sequences words ;
+QUALIFIED-WITH: generic.single+private gsp
 IN: generic.hook
 
 TUPLE: hook-combination < single-combination var ;

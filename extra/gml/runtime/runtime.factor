@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 USING: accessors arrays assocs fry generic.parser kernel locals
 locals.parser macros math math.ranges memoize parser sequences
-sequences.private strings strings.parser lexer namespaces
+sequences+private strings strings.parser lexer namespaces
 vectors words generalizations sequences.generalizations
 effects.parser gml.types ;
 IN: gml.runtime
@@ -26,7 +26,7 @@ TUPLE: gml { operand-stack vector } { dictionary-stack vector } ;
 GENERIC: (exec) ( registers gml obj -- registers gml )
 
 ! A bit of efficiency
-FROM: kernel.private => declare ;
+FROM: kernel+private => declare ;
 
 : is-gml ( registers gml obj -- registers gml obj )
     { array gml object } declare ; inline
@@ -69,7 +69,7 @@ M:: proc exec-proc ( registers gml proc -- registers gml )
     proc array>> [ (exec) ] each 2drop
     registers gml ;
 
-FROM: combinators.private => execute-effect-unsafe ;
+FROM: combinators+private => execute-effect-unsafe ;
 
 CONSTANT: primitive-effect ( registers gml -- registers gml )
 

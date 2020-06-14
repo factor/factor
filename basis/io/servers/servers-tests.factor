@@ -1,6 +1,6 @@
 USING: accessors arrays concurrency.flags fry io
 io.encodings.ascii io.encodings.utf8 io.servers
-io.servers.private io.sockets kernel namespaces sequences sets
+io.servers+private io.sockets kernel namespaces sequences sets
 threads tools.test ;
 
 { t } [ ascii <threaded-server> listen-on empty? ] unit-test

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types classes.struct classes.struct.vectored
 kernel sequences specialized-arrays tools.test vocabs compiler.units ;
-FROM: specialized-arrays.private => specialized-array-vocab ;
+FROM: specialized-arrays+private => specialized-array-vocab ;
 SPECIALIZED-ARRAYS: int ushort float ;
 IN: classes.struct.vectored.tests
 

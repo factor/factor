@@ -1,13 +1,13 @@
 USING: accessors alien alien.accessors alien.c-types alien.data arrays
 assocs byte-arrays classes classes.algebra classes.struct
-classes.tuple.private combinators.short-circuit compiler.test
+classes.tuple+private combinators.short-circuit compiler.test
 compiler.tree compiler.tree.builder compiler.tree.debugger
 compiler.tree.optimizer compiler.tree.propagation.info effects fry
-generic.single hashtables kernel kernel.private layouts literals
-locals math math.floats.private math.functions math.integers.private
-math.intervals math.libm math.order math.private quotations sequences
-sequences.private sets slots.private sorting specialized-arrays
-strings strings.private system tools.test vectors vocabs words ;
+generic.single hashtables kernel kernel+private layouts literals
+locals math math.floats+private math.functions math.integers+private
+math.intervals math.libm math.order math+private quotations sequences
+sequences+private sets slots+private sorting specialized-arrays
+strings strings+private system tools.test vectors vocabs words ;
 FROM: math => float ;
 SPECIALIZED-ARRAY: double
 SPECIALIZED-ARRAY: void*

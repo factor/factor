@@ -3,7 +3,7 @@
 USING: accessors classes classes.algebra combinators compiler.tree
 compiler.tree.combinators compiler.tree.propagation.branches
 compiler.tree.propagation.info compiler.utilities fry kernel layouts
-math math.intervals math.partial-dispatch math.private namespaces
+math math.intervals math.partial-dispatch math+private namespaces
 sequences stack-checker.branches stack-checker.dependencies words ;
 IN: compiler.tree.cleanup
 

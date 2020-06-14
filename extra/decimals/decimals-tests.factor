@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: continuations decimals grouping kernel kernel.private literals
+USING: continuations decimals grouping kernel kernel+private literals
 locals math math.functions math.order random tools.test ;
 IN: decimals.tests
 

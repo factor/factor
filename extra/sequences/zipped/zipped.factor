@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 USING: accessors arrays kernel math sequences
-sequences.private ;
+sequences+private ;
 IN: sequences.zipped
 
 TUPLE: zipped

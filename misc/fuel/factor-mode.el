@@ -621,8 +621,8 @@ these lines in your .emacs:
       (string= (match-string-no-properties 0) "<PRIVATE"))))
 
 (defun factor-find-vocab-name ()
-  "Name of the vocab with possible .private suffix"
-  (concat (factor-find-in) (if (factor-in-private?) ".private" "")))
+  "Name of the vocab with possible +private suffix"
+  (concat (factor-find-in) (if (factor-in-private?) "+private" "")))
 
 
 (defvar-local factor-usings-function 'factor-find-usings)
@@ -646,7 +646,7 @@ these lines in your .emacs:
           (push u usings)))
       (when (and (not no-private) (factor-file-has-private))
         (goto-char (point-max))
-        (push (concat (factor-find-in) ".private") usings))
+        (push (concat (factor-find-in) "+private") usings))
       usings)))
 
 

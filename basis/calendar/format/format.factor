@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar calendar.english combinators
 fry io io.streams.string kernel macros math math.order
-math.parser math.parser.private present quotations sequences
+math.parser math.parser+private present quotations sequences
 typed words ;
 IN: calendar.format
 

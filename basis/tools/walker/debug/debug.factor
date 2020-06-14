@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: concurrency.promises models tools.walker tools.continuations
 kernel sequences concurrency.messaging locals continuations threads
-namespaces namespaces.private assocs accessors ;
+namespaces namespaces+private assocs accessors ;
 IN: tools.walker.debug
 
 :: test-walker ( quot -- data )

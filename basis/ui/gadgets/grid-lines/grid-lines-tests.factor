@@ -1,5 +1,5 @@
 USING: accessors arrays kernel sorting tools.test ui.gadgets
-ui.gadgets.grid-lines.private ui.gadgets.grids ;
+ui.gadgets.grid-lines+private ui.gadgets.grids ;
 IN: ui.gadgets.grid-lines.tests
 
 : 100x100 ( -- gadget )

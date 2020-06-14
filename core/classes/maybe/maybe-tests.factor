@@ -1,6 +1,6 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes classes.algebra classes.algebra.private
+USING: accessors classes classes.algebra classes.algebra+private
 classes.maybe eval generic.single kernel math slots tools.test ;
 IN: classes.maybe.tests
 

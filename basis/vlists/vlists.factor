@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs grouping kernel math parser
 persistent.assocs persistent.sequences sequences
-sequences.private vectors vocabs.loader ;
+sequences+private vectors vocabs.loader ;
 IN: vlists
 
 TUPLE: vlist

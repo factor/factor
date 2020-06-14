@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Yun, Jonghyouk.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays byte-arrays io io.encodings io.encodings.johab assocs
-io.encodings.string io.streams.string io.encodings.euc.private words
+io.encodings.string io.streams.string io.encodings.euc+private words
 kernel locals multiline namespaces sequences strings tools.test ;
 IN: io.encodings.johab.tests
 

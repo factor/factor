@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: slots.private ;
+USING: slots slots+private ;
 IN: locals.backend
 
 PRIMITIVE: drop-locals ( n -- )

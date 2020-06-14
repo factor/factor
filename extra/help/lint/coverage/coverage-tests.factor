@@ -1,5 +1,5 @@
 USING: accessors english eval help.lint.coverage
-help.lint.coverage.private help.markup help.syntax kernel
+help.lint.coverage+private help.markup help.syntax kernel
 literals math math.matrices multiline sequences sorting
 tools.test vocabs ;
 IN: help.lint.coverage.tests
@@ -23,7 +23,7 @@ PRIVATE>
 { { $description $values } } [ \ a-defined-word missing-sections natural-sort ] unit-test
 { { } } [ \ keep missing-sections ] unit-test
 
-{ { "a.b" "a.b.c" } } [ { "a.b" "a.b.private" "a.b.c.private" "a.b.c" } filter-private ] unit-test
+{ { "a.b" "a.b.c" } } [ { "a.b" "a.b+private" "a.b.c+private" "a.b.c" } filter-private ] unit-test
 
 { "sections" } [ 0 "section" ?pluralize ] unit-test
 { "section" } [ 1 "section" ?pluralize ] unit-test
@@ -75,7 +75,7 @@ PRIVATE>
 [
     [[
         USING: assocs definitions math kernel namespaces help.syntax
-        help.lint help.lint.private continuations compiler.units ;
+        help.lint help.lint+private continuations compiler.units ;
         IN: help.lint.tests
         <<
         : add-stuff ( x y -- z ) + ;
@@ -99,7 +99,7 @@ PRIVATE>
 ! clean up broken words
 [[
   USING: definitions compiler.units ;
-  IN: help.lint.coverage.tests.private
+  IN: help.lint.coverage.tests+private
 [
     \ an-empty-word-with-a-unique-name forget
     \ a-nonexistent-word forget

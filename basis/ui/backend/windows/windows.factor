@@ -6,8 +6,8 @@ calendar classes classes.struct colors combinators continuations fry
 io io.crlf io.encodings.utf16n kernel libc literals locals make math
 math.bitwise namespaces sequences sets specialized-arrays strings
 threads ui ui.backend ui.clipboards ui.event-loop ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
-ui.private windows.dwmapi windows.errors windows.gdi32
+ui.gadgets+private ui.gadgets.worlds ui.gestures ui.pixel-formats
+ui+private windows.dwmapi windows.errors windows.gdi32
 windows.kernel32 windows.messages windows.offscreen windows.opengl32
 windows.types windows.user32 assocs.extras byte-arrays
 io.encodings.string ;

@@ -1,5 +1,5 @@
 USING: compiler.cfg compiler.tree help.markup help.syntax kernel
-kernel.private ;
+kernel+private ;
 IN: compiler.cfg.intrinsics.misc
 
 HELP: emit-context-object

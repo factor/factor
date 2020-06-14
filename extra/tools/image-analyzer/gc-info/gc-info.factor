@@ -1,4 +1,4 @@
-USING: accessors alien.c-types assocs bit-arrays.private
+USING: accessors alien.c-types assocs bit-arrays+private
 classes.struct fry grouping io io.encodings.binary
 io.streams.byte-array kernel math sequences tools.image-analyzer.utils
 vm ;

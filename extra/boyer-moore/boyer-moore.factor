@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Dmitry Shubin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel locals math math.order
-math.ranges sequences sequences.private z-algorithm ;
+math.ranges sequences sequences+private z-algorithm ;
 IN: boyer-moore
 
 <PRIVATE

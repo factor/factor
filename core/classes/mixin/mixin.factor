@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.algebra
-classes.algebra.private classes.private classes.union
-classes.union.private combinators definitions kernel sequences
+classes.algebra+private classes+private classes.union
+classes.union+private combinators definitions kernel sequences
 words ;
 IN: classes.mixin
 

@@ -1,5 +1,5 @@
-USING: classes.tuple.private cpu.architecture help.markup
-help.syntax kernel.private math math.vectors math.vectors.simd.intrinsics
+USING: classes.tuple+private cpu.architecture help.markup
+help.syntax kernel+private math math.vectors math.vectors.simd.intrinsics
 sequences ;
 IN: math.vectors.simd
 
@@ -96,7 +96,7 @@ SYMBOLS: x y ;
 ] optimizer-report." }
 "The following word benefits from SIMD optimization, because it begins with an unsafe declaration:"
 { $code
-"USING: compiler.tree.debugger kernel.private
+"USING: compiler.tree.debugger kernel+private
 math.vectors math.vectors.simd ;
 IN: simd-demo
 

@@ -5,7 +5,7 @@ USING: accessors ascii byte-arrays byte-vectors combinators
 command-line destructors fry io io.encodings io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files io.streams.string
 kernel literals locals math math.parser namespaces sequences
-sequences.private strings typed ;
+sequences+private strings typed ;
 
 IN: tools.hexdump
 

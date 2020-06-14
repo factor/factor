@@ -3,8 +3,8 @@
 USING: accessors alien alien.c-types alien.data arrays assocs
 classes classes.struct combinators combinators.short-circuit
 concurrency.flags continuations debugger destructors init io
-io.backend io.backend.windows io.files io.files.private
-io.files.windows io.launcher io.launcher.private io.pathnames
+io.backend io.backend.windows io.files io.files+private
+io.files.windows io.launcher io.launcher+private io.pathnames
 io.pipes io.pipes.windows io.ports kernel libc literals locals
 make math namespaces prettyprint sequences specialized-arrays
 splitting splitting.monotonic strings system threads windows

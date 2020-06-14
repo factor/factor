@@ -6,9 +6,9 @@ combinators combinators.short-circuit compiler.errors
 compiler.units continuations definitions destructors
 effects.parser fry generic generic.math generic.parser
 generic.single grouping io io.encodings io.styles kernel
-kernel.private lexer libc make math math.order math.parser
+kernel+private lexer libc make math math.order math.parser
 math.ratios namespaces parser prettyprint sequences
-sequences.private slots source-files.errors strings
+sequences+private slots source-files.errors strings
 strings.parser summary system vocabs vocabs.loader vocabs.parser
 words ;
 IN: debugger

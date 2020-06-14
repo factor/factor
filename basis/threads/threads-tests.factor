@@ -1,4 +1,4 @@
-USING: io memory namespaces tools.test threads threads.private kernel
+USING: io memory namespaces tools.test threads threads+private kernel
 concurrency.combinators concurrency.promises locals math
 words calendar sequences fry ;
 IN: threads.tests

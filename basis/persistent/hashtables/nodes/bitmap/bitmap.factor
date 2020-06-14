@@ -1,7 +1,7 @@
 ! Based on Clojure's PersistentHashMap by Rich Hickey.
 
 USING: math math.bitwise arrays kernel accessors locals sequences
-sequences.private
+sequences+private
 persistent.sequences
 persistent.hashtables.config
 persistent.hashtables.nodes ;

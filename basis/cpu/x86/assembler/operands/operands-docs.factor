@@ -1,4 +1,4 @@
-USING: cpu.x86.assembler.operands.private help.markup help.syntax math ;
+USING: cpu.x86.assembler.operands+private help.markup help.syntax math ;
 IN: cpu.x86.assembler.operands
 
 HELP: indirect

@@ -1,4 +1,4 @@
-USING: bootstrap.image.primitives kernel.private sequences tools.test
+USING: bootstrap.image.primitives kernel+private sequences tools.test
 vocabs words ;
 IN: bootstrap.image.primitives.tests
 

@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! Copyright (C) 2008, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel kernel.private math math.order
-math.private ;
+USING: combinators kernel kernel+private math math.order
+math+private ;
 IN: math.integers
 
 <PRIVATE

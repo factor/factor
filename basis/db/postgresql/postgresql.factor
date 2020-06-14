@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes.tuple combinators db
 db.postgresql.errors db.postgresql.ffi db.postgresql.lib
-db.private db.queries db.tuples db.tuples.private db.types
+db+private db.queries db.tuples db.tuples+private db.types
 destructors kernel make math math.parser namespaces nmake random
 sequences splitting ;
 IN: db.postgresql

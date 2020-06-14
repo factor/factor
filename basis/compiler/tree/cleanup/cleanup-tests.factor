@@ -5,9 +5,9 @@ compiler.tree.combinators compiler.tree.debugger
 compiler.tree.normalization compiler.tree.propagation
 compiler.tree.propagation.info generalizations grouping hashtables
 io.encodings io.encodings.ascii io.encodings.utf8 kernel
-kernel.private layouts math math.functions math.intervals math.order
-math.partial-dispatch math.private prettyprint quotations sequences
-sequences.private slots slots.private sorting.private tools.test
+kernel+private layouts math math.functions math.intervals math.order
+math.partial-dispatch math+private prettyprint quotations sequences
+sequences+private slots slots+private sorting+private tools.test
 vectors ;
 FROM: math => float ;
 QUALIFIED-WITH: alien.c-types c

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: slides help.markup math math.private kernel sequences
-slots.private ;
+USING: slides help.markup math math+private kernel sequences
+slots+private ;
 IN: talks.jvm-summit-talk
 
 CONSTANT: jvm-summit-slides

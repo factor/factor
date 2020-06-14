@@ -44,7 +44,7 @@ IN: prettyprint
 
 : stack. ( seq -- )
     [
-        [ short. ] [
+        [ ... ] [
             drop [ error-in-pprint ] keep write-object nl
         ] recover
     ] each ;

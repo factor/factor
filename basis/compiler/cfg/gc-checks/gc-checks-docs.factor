@@ -1,5 +1,5 @@
 USING: compiler.cfg compiler.cfg.instructions help.markup help.syntax kernel
-layouts math sequences slots.private ;
+layouts math sequences slots+private ;
 IN: compiler.cfg.gc-checks
 
 <PRIVATE
@@ -13,7 +13,7 @@ HELP: allocation-size
 { $description "Calculates the total number of bytes allocated by the instructions in a block." }
 { $examples
   { $unchecked-example
-    "USING: accessors compiler.cfg.debugger compiler.cfg.gc-checks.private kernel prettyprint sequences ;"
+    "USING: accessors compiler.cfg.debugger compiler.cfg.gc-checks+private kernel prettyprint sequences ;"
     "[ V{ } clone ] test-ssa first entry>> successors>> first instructions>> allocation-size ."
     "32 ! 16 on 32-bit"
   }

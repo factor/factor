@@ -60,7 +60,7 @@ DEFER: edit
 <PRIVATE
 
 : public-vocab-name ( vocab-spec -- name )
-    vocab-name ".private" ?tail drop ;
+    vocab-name "+private" ?tail drop ;
 
 PRIVATE>
 

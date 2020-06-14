@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays checksums checksums.common
 combinators combinators.smart fry grouping io.binary kernel
-kernel.private literals locals math math.bitwise math.ranges
-sequences sequences.generalizations sequences.private
+kernel+private literals locals math math.bitwise math.ranges
+sequences sequences.generalizations sequences+private
 specialized-arrays ;
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: ulong

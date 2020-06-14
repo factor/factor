@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types alien.enums alien.strings
 alien.syntax arrays assocs combinators combinators.short-circuit
 definitions effects kernel math.parser prettyprint.backend
-prettyprint.custom prettyprint.sections see see.private sequences
+prettyprint.custom prettyprint.sections see see+private sequences
 words ;
 IN: alien.prettyprint
 

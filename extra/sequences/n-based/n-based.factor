@@ -1,6 +1,6 @@
 ! (c)2008 Joe Groff, see BSD license etc.
 USING: accessors assocs kernel math math.ranges sequences
-sequences.private ;
+sequences+private ;
 IN: sequences.n-based
 
 TUPLE: n-based-assoc seq base ;

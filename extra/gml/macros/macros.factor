@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.tuple combinators.short-circuit
 effects.parser fry generalizations gml.runtime kernel
-kernel.private lexer locals macros namespaces parser
+kernel+private lexer locals macros namespaces parser
 prettyprint sequences system words ;
 IN: gml.macros
 

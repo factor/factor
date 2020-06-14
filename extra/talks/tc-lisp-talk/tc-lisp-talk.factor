@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs combinators constructors eval help.markup kernel
-multiline namespaces parser sequences sequences.private slides
+multiline namespaces parser sequences sequences+private slides
 vocabs.refresh words fry ;
 IN: talks.tc-lisp-talk
 

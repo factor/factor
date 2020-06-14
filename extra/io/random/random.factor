@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: fry io kernel locals math random sequences
-sequences.private ;
+sequences+private ;
 
 IN: io.random
 

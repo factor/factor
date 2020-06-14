@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces combinators.short-circuit vocabs sequences
-compiler.units tools.annotations tools.annotations.private fry words
+compiler.units tools.annotations tools.annotations+private fry words
 opengl calendar accessors ascii ;
 IN: opengl.annotations
 

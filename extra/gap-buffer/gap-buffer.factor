@@ -5,7 +5,7 @@
 ! for a good introduction see:
 ! https://common-lisp.net/project/flexichain/download/StrandhVilleneuveMoore.pdf
 USING: accessors arrays circular fry kernel locals math
-math.functions math.order multiline sequences sequences.private ;
+math.functions math.order multiline sequences sequences+private ;
 IN: gap-buffer
 
 ! gap-start     -- the first element of the gap

@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators continuations io.backend io.directories io.files
-io.files.temp io.files.windows io.pathnames kernel kernel.private libc
+io.files.temp io.files.windows io.pathnames kernel kernel+private libc
 literals memory sequences splitting tools.test windows.kernel32
 io.files.unique destructors ;
 

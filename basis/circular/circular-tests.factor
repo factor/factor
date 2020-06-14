@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Alex Chapman, Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license
-USING: arrays circular kernel math sequences sequences.private
+USING: arrays circular kernel math sequences sequences+private
 strings tools.test ;
 IN: circular.tests
 

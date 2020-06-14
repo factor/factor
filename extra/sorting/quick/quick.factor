@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: arrays combinators kernel locals math math.order
-math.private sequences sequences.private strings vectors ;
+math+private sequences sequences+private strings vectors ;
 
 IN: sorting.quick
 

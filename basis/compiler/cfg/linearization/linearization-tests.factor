@@ -1,5 +1,5 @@
 USING: accessors assocs compiler.cfg.linearization
-compiler.cfg.linearization.private compiler.cfg.utilities
+compiler.cfg.linearization+private compiler.cfg.utilities
 compiler.test kernel make namespaces sequences tools.test ;
 IN: compiler.cfg.linearization.tests
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data fry kernel literals
 locals math random sequences specialized-arrays namespaces
-sequences.private ;
+sequences+private ;
 SPECIALIZED-ARRAY: double
 IN: random.lagged-fibonacci
 

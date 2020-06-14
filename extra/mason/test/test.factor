@@ -6,7 +6,7 @@ help.html help.lint io io.directories io.encodings.utf8 io.files
 io.styles kernel locals mason.common math memory namespaces
 parser.notes sequences sets sorting source-files.errors system
 threads tools.errors tools.test tools.time vocabs
-vocabs.hierarchy.private vocabs.loader vocabs.refresh words ;
+vocabs.hierarchy+private vocabs.loader vocabs.refresh words ;
 IN: mason.test
 
 : vocab-heading. ( vocab -- )

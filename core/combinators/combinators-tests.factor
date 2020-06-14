@@ -1,4 +1,4 @@
-USING: accessors arrays combinators combinators.private io
+USING: accessors arrays combinators combinators+private io
 kernel math math.functions prettyprint sequences stack-checker
 tools.test words ;
 IN: combinators.tests

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators concurrency.count-downs
 concurrency.futures fry generalizations kernel macros sequences
-sequences.private sequences.product ;
+sequences+private sequences.product ;
 IN: concurrency.combinators
 
 <PRIVATE

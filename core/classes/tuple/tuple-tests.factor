@@ -1,9 +1,9 @@
 USING: accessors arrays assocs calendar classes classes.algebra
-classes.private classes.tuple classes.tuple.private columns
+classes+private classes.tuple classes.tuple+private columns
 combinators.short-circuit compiler.errors compiler.units
 definitions eval generic generic.single io.streams.string kernel
-kernel.private literals math math.constants memory namespaces
-parser parser.notes see sequences sequences.private slots
+kernel+private literals math math.constants memory namespaces
+parser parser.notes see sequences sequences+private slots
 splitting strings threads tools.test vectors vocabs words
 words.symbol ;
 IN: classes.tuple.tests

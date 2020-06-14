@@ -1,5 +1,5 @@
 USING: compiler.cfg compiler.cfg.instructions
-compiler.cfg.ssa.construction.private help.markup help.syntax ;
+compiler.cfg.ssa.construction+private help.markup help.syntax ;
 IN: compiler.cfg.ssa.construction
 
 HELP: <##phi>

@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors crypto.aes crypto.aes.private crypto.aes.utils
+USING: accessors crypto.aes crypto.aes+private crypto.aes.utils
 grouping kernel sequences tools.test ;
 IN: crypto.aes.tests
 

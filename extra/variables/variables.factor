@@ -3,8 +3,8 @@
 USING: accessors arrays combinators definitions fry kernel
 locals.types namespaces parser quotations see sequences slots
 words ;
-FROM: kernel.private => declare ;
-FROM: help.markup.private => link-effect? ;
+FROM: kernel+private => declare ;
+FROM: help.markup+private => link-effect? ;
 IN: variables
 
 PREDICATE: variable < word

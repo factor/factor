@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces prettyprint classes.struct
-vm tools.dispatch.private ;
+vm tools.dispatch+private ;
 IN: tools.dispatch
 
 <PRIVATE

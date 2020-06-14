@@ -33,7 +33,7 @@ SYMBOL: auto-use?
 : ignore-forwards ( seq -- seq' )
     [ forward-reference? ] reject ;
 
-: private? ( word -- ? ) vocabulary>> ".private" tail? ;
+: private? ( word -- ? ) vocabulary>> "+private" tail? ;
 
 : use-first-word? ( words -- ? )
     [ length 1 = ] [ ?first dup [ private? not ] [ ] ?if ] bi and

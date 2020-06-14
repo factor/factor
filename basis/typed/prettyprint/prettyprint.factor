@@ -1,4 +1,4 @@
-USING: definitions kernel locals.definitions see see.private typed
+USING: definitions kernel locals.definitions see see+private typed
 words summary make accessors classes prettyprint ;
 IN: typed.prettyprint
 

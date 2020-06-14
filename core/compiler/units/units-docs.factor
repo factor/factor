@@ -1,5 +1,5 @@
-USING: classes.tuple.private compiler.units.private definitions
-help.markup help.syntax kernel kernel.private parser quotations
+USING: classes.tuple+private compiler.units+private definitions
+help.markup help.syntax kernel kernel+private parser quotations
 sequences source-files stack-checker.errors words ;
 IN: compiler.units
 

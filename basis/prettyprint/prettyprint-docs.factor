@@ -1,6 +1,6 @@
 USING: help.markup help.syntax io kernel math
 prettyprint.backend prettyprint.config prettyprint.custom
-prettyprint.private prettyprint.sections sequences ;
+prettyprint+private prettyprint.sections sequences ;
 IN: prettyprint
 
 ARTICLE: "prettyprint-numbers" "Prettyprinting numbers"

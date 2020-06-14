@@ -6,7 +6,7 @@ kernel macros math math.functions math.parser namespaces
 peg.ebnf present prettyprint quotations sequences
 sequences.generalizations strings unicode vectors
 math.functions.integer-logs splitting multiline ;
-FROM: math.parser.private => format-float ;
+FROM: math.parser+private => format-float ;
 IN: formatting
 
 ERROR: unknown-format-directive value ;

@@ -1,13 +1,13 @@
 ! Copyright (C) 2008, 2011 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types assocs classes classes.algebra
-classes.tuple classes.tuple.private combinators
+classes.tuple classes.tuple+private combinators
 combinators.short-circuit compiler.tree.propagation.info effects
 fry generalizations generic generic.single growable hash-sets
-hashtables kernel layouts locals math math.integers.private
-math.intervals math.order math.partial-dispatch math.private
+hashtables kernel layouts locals math math.integers+private
+math.intervals math.order math.partial-dispatch math+private
 namespaces quotations sequences sequences.generalizations
-sequences.private sets sets.private stack-checker
+sequences+private sets sets+private stack-checker
 stack-checker.dependencies vectors words ;
 FROM: math => float ;
 IN: compiler.tree.propagation.transforms

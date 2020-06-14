@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators fry generalizations grouping
 kernel locals math math.functions math.order math.vectors
-sequences sequences.private sorting ;
+sequences sequences+private sorting ;
 IN: math.statistics
 
 : power-mean ( seq p -- x )
