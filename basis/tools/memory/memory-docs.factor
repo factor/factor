@@ -1,5 +1,5 @@
-USING: help.markup help.syntax memory sequences vm ;
-IN: tools.memory
+USING: help.markup help.syntax memory tools.memory vm ;
+IN: tools.memory+docs
 
 ARTICLE: "tools.memory" "Object memory tools"
 "You can print object heap status information:"

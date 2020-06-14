@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax quotations kernel ;
-IN: irc.client.chats
+USING: help.markup help.syntax quotations irc.client.chats kernel ;
+IN: irc.client.chats+docs
 
 HELP: irc-client "IRC Client object" ;
 

@@ -1,6 +1,6 @@
 USING: help.syntax help.markup kernel math classes classes.tuple
-calendar models ;
-IN: models.delay
+calendar models models.delay ;
+IN: models.delay+docs
 
 HELP: delay
 { $class-description "Delay models have the same value as their underlying model, however the value only changes after a timer expires. If the underlying model's value changes again before the timer expires, the timer restarts. Delay models are constructed by " { $link <delay> } "." }

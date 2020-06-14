@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel math ;
-IN: math.primes.safe
+USING: help.markup help.syntax kernel math math.primes.safe ;
+IN: math.primes.safe+docs
 
 HELP: next-safe-prime
 { $values

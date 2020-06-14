@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax multiline ;
-IN: qw
+USING: help.markup help.syntax multiline qw ;
+IN: qw+docs
 
 HELP: qw{
 { $syntax "qw{ lorem ipsum }" }

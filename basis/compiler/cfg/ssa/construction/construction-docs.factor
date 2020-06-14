@@ -1,6 +1,6 @@
 USING: compiler.cfg compiler.cfg.instructions
 compiler.cfg.ssa.construction+private help.markup help.syntax ;
-IN: compiler.cfg.ssa.construction
+IN: compiler.cfg.ssa.construction+docs
 
 HELP: <##phi>
 { $values { "vreg" "vreg" } { "bb" basic-block } { "##phi" ##phi } }

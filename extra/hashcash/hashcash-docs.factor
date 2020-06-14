@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel math strings ;
-IN: hashcash
+USING: hashcash help.markup help.syntax kernel math strings ;
+IN: hashcash+docs
 
 ARTICLE: "hashcash" "Hashcash"
 "Hashcash is a denial-of-service counter measure tool."

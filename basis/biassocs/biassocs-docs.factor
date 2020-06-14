@@ -1,5 +1,5 @@
-IN: biassocs
-USING: help.markup help.syntax assocs kernel ;
+USING: assocs biassocs help.markup help.syntax kernel ;
+IN: biassocs+docs
 
 HELP: biassoc
 { $class-description "The class of bidirectional assocs. Bidirectional assoc are implemented by combining two assocs, with one the transpose of the other." } ;

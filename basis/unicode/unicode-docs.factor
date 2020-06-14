@@ -1,5 +1,5 @@
-USING: help.markup help.syntax strings ;
-IN: unicode
+USING: help.markup help.syntax strings unicode ;
+IN: unicode+docs
 
 ARTICLE: "unicode" "Unicode support"
 "The " { $vocab-link "unicode" } " vocabulary and its sub-vocabularies implement support for the Unicode 5.2 character set."

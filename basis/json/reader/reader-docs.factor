@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel ;
-IN: json.reader
+USING: help.markup help.syntax json.reader kernel ;
+IN: json.reader+docs
 
 HELP: json>
 { $values { "string" "a string in JSON format" } { "object" "a deserialized object" } }

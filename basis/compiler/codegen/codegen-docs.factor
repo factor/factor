@@ -1,8 +1,8 @@
 USING: alien byte-arrays compiler.cfg compiler.cfg.instructions
 compiler.codegen.labels compiler.codegen.relocation cpu.architecture
 hashtables help.markup help.syntax literals make multiline quotations
-sequences ;
-IN: compiler.codegen
+sequences compiler.codegen ;
+IN: compiler.codegen+docs
 
 <<
 STRING: generate-ex

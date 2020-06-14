@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ;
-IN: colors.cmyk
+USING: colors.cmyk help.markup help.syntax ;
+IN: colors.cmyk+docs
 
 HELP: cmyka
 { $class-description "The class of CMYK (Cyan, Magenta, Yellow, Black) colors with an alpha channel. All slots store values in the interval " { $snippet "[0,1]" } "." } ;

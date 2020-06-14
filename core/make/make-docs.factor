@@ -1,6 +1,6 @@
-IN: make
-USING: assocs help.markup help.syntax kernel math.parser
+USING: assocs help.markup help.syntax kernel make math.parser
 quotations sequences ;
+IN: make+docs
 
 ARTICLE: "make-philosophy" "Make philosophy"
 { $heading "When to use make" }

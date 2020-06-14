@@ -1,7 +1,7 @@
-USING: compiler.cfg.registers cpu.x86.assembler
+USING: compiler.cfg.registers cpu.x86 cpu.x86.assembler
 cpu.x86.assembler.operands cpu.x86.assembler.operands+private
 help.markup help.syntax layouts math sequences system ;
-IN: cpu.x86
+IN: cpu.x86+docs
 
 HELP: %boolean
 { $values

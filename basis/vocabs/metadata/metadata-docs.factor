@@ -1,5 +1,5 @@
-USING: help.markup help.syntax sequences strings ;
-IN: vocabs.metadata
+USING: help.markup help.syntax strings vocabs.metadata ;
+IN: vocabs.metadata+docs
 
 ARTICLE: "vocabs.metadata" "Vocabulary metadata"
 "Vocabulary directories can contain text files with metadata:"

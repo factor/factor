@@ -1,5 +1,5 @@
-IN: json
 USING: help.markup help.syntax ;
+IN: json+docs
 
 ARTICLE: "json" "JSON serialization"
 { $subsections

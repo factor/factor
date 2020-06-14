@@ -1,5 +1,5 @@
-USING: byte-arrays checksums help.markup help.syntax kernel ;
-IN: cuckoo-filters
+USING: byte-arrays checksums cuckoo-filters help.markup help.syntax kernel ;
+IN: cuckoo-filters+docs
 
 HELP: cuckoo-insert
 { $values { "bytes" byte-array } { "cuckoo-filter" cuckoo-filter } { "?" boolean } }

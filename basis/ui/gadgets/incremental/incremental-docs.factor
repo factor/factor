@@ -1,5 +1,6 @@
-USING: help.markup help.syntax ui.gadgets ui.gadgets.packs ;
-IN: ui.gadgets.incremental
+USING: help.markup help.syntax ui.gadgets ui.gadgets.incremental
+ui.gadgets.packs ;
+IN: ui.gadgets.incremental+docs
 
 HELP: incremental
 { $class-description "Incremental layout gadgets inherit from " { $link pack } " and implement an optimization where the relayout operation after adding a child to be done in constant time."

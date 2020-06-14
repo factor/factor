@@ -1,5 +1,5 @@
-IN: io.timeouts
-USING: help.markup help.syntax math kernel calendar ;
+USING: calendar help.markup help.syntax io.timeouts kernel math ;
+IN: io.timeouts+docs
 
 HELP: timeout
 { $values { "obj" object } { "dt/f" { $maybe duration } } }

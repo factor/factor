@@ -1,5 +1,5 @@
 USING: help help.syntax help.markup ;
-IN: editors.emacs
+IN: editors.emacs+docs
 
 ARTICLE: "editors.emacs" "Integration with Emacs"
 "Basic Emacs integration with Factor requires the use of two executable files -- " { $snippet "emacs" } " and " { $snippet "emacsclient" } ", which act as a client/server pair. To start the server, run the " { $snippet "emacs" } " binary and execute " { $snippet "M-x server-start" } " or start " { $snippet "emacs" } " with the following line in your " { $snippet ".emacs" } " file:"

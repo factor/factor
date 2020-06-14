@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs help.markup help.syntax io.streams.string sequences ;
-IN: mime.types
+USING: assocs help.markup help.syntax mime.types sequences ;
+IN: mime.types+docs
 
 HELP: mime-db
 { $values

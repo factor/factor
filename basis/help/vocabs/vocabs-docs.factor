@@ -1,5 +1,6 @@
-USING: help help.topics help.markup help.syntax io strings ;
-IN: help.vocabs
+USING: help help.topics help.markup help.syntax help.vocabs io
+strings ;
+IN: help.vocabs+docs
 
 ARTICLE: "vocab-tags" "Vocabulary tags"
 { $all-tags } ;

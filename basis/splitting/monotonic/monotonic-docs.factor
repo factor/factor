@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel quotations classes sequences ;
-IN: splitting.monotonic
+USING: classes help.markup help.syntax kernel quotations
+sequences splitting.monotonic ;
+IN: splitting.monotonic+docs
 
 HELP: monotonic-split-slice
 { $values

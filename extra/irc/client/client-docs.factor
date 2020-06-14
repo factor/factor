@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax quotations kernel
-irc.messages irc.messages.base irc.messages.parser irc.client.chats ;
-IN: irc.client
+irc.messages irc.messages.base irc.messages.parser irc.client irc.client.chats ;
+IN: irc.client+docs
 
 HELP: connect-irc "Connecting to an irc server"
 { $values { "irc-client" "an irc client object" } }

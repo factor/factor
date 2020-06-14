@@ -1,6 +1,6 @@
-USING: help.markup help.syntax strings byte-arrays alien libc
-debugger io.encodings.string sequences ;
-IN: alien.strings
+USING: alien alien.strings byte-arrays debugger help.markup
+help.syntax io.encodings.string libc sequences strings ;
+IN: alien.strings+docs
 
 HELP: string>alien
 { $values { "string" string } { "encoding" "an encoding descriptor" } { "byte-array" byte-array } }

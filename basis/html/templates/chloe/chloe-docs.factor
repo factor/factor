@@ -1,9 +1,9 @@
-IN: html.templates.chloe
 USING: help.markup help.syntax html.components html.forms
-html.templates html.templates.chloe.syntax
+html.templates html.templates.chloe
 html.templates.chloe.compiler html.templates.chloe.components
-math strings quotations namespaces ;
+html.templates.chloe.syntax math namespaces quotations strings ;
 FROM: xml.data => tag ;
+IN: html.templates.chloe+docs
 
 HELP: <chloe>
 { $values { "path" "a pathname string without the trailing " { $snippet ".xml" } " extension" } { "chloe" chloe } }

@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup
+USING: concurrency.messaging help.syntax help.markup
 threads kernel arrays quotations strings ;
-IN: concurrency.messaging
+IN: concurrency.messaging+docs
 
 HELP: send
 { $values { "message" object }

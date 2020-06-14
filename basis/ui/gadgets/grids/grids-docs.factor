@@ -1,5 +1,6 @@
-USING: ui.gadgets help.markup help.syntax arrays ;
-IN: ui.gadgets.grids
+USING: help.markup help.syntax models ui.gadgets
+ui.gadgets.books ui.gadgets.grids ;
+IN: ui.gadgets.books+docs
 
 ARTICLE: "ui-grid-layout" "Grid layouts"
 "Grid gadgets layout their children in a rectangular grid. The grid is represented as a sequence of sequences of gadgets. Every child sequence is a row of gadgets. Every row must have an equal number of gadgets in it."

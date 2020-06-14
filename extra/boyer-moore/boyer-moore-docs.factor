@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Dmitry Shubin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: boyer-moore+private help.markup help.syntax kernel sequences ;
-IN: boyer-moore
+USING: boyer-moore boyer-moore+private help.markup help.syntax kernel
+sequences ;
+IN: boyer-moore+docs
 
 HELP: <boyer-moore>
 { $values

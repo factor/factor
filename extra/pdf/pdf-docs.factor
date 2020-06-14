@@ -1,9 +1,7 @@
 ! Copyright (C) 2011-2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-
-USING: help.markup help.syntax strings ;
-
-IN: pdf
+USING: help.markup help.syntax pdf strings ;
+IN: pdf+docs
 
 HELP: text-to-pdf
 { $values { "str" string } { "pdf" string } }

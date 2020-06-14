@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel sequences byte-arrays
-strings ;
-IN: tools.hexdump
+USING: byte-arrays help.markup help.syntax strings tools.hexdump ;
+IN: tools.hexdump+docs
 
 HELP: hexdump.
 { $values { "byte-array" byte-array } }

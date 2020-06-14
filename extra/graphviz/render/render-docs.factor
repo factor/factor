@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: graphviz help.markup help.syntax images.viewer
 io.encodings.latin1 io.encodings.utf8 io.launcher kernel
-strings ;
-IN: graphviz.render
+strings graphviz.render ;
+IN: graphviz.render+docs
 
 { cannot-find-graphviz-installation default-graphviz-program ?default-graphviz-program } related-words
 { unsupported-encoding graph-encoding } related-words

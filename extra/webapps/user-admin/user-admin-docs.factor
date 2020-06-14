@@ -1,5 +1,5 @@
-USING: help.markup help.syntax db strings ;
-IN: webapps.user-admin
+USING: help.markup help.syntax db strings webapps.user-admin ;
+IN: webapps.user-admin+docs
 
 HELP: <user-admin>
 { $values { "responder" "a new responder" } }

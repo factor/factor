@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ui.commands ;
-IN: ui.tools.browser
+USING: help.markup help.syntax ui.commands ui.tools.browser ;
+IN: ui.tools.browser+docs
 
 ARTICLE: "ui-browser" "UI browser"
 "The browser is used to display Factor code, documentation, and vocabularies. The browser is opened when a word or article link presentation is clicked. It can also be opened using words:"

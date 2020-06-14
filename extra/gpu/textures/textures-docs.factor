@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien byte-arrays classes gpu.buffers help.markup help.syntax
-images kernel math ;
-IN: gpu.textures
+images kernel math gpu.textures ;
+IN: gpu.textures+docs
 
 HELP: +X
 { $class-description "This " { $link cube-map-axis } " references the positive X face of a " { $link texture-cube-map } "." } ;

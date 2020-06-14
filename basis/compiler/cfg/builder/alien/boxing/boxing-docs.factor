@@ -1,6 +1,6 @@
 USING: alien.c-types compiler.cfg.instructions help.markup help.syntax
-math sequences ;
-IN: compiler.cfg.builder.alien.boxing
+math sequences compiler.cfg.builder.alien.boxing ;
+IN: compiler.cfg.builder.alien.boxing+docs
 
 HELP: box
 { $values

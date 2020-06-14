@@ -1,5 +1,5 @@
 USING: help.syntax help.markup ;
-IN: core-foundation.urls
+IN: core-foundation.urls+docs
 
 HELP: <CFFileSystemURL>
 { $values { "string" "a pathname string" } { "dir?" "a boolean indicating if the pathname is a directory" } { "url" "a " { $snippet "CFURL" } } }

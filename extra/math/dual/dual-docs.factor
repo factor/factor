@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Jason W. Merrill.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel words math math.functions math.derivatives.syntax ;
-IN: math.dual
+USING: help.markup help.syntax kernel words math math.dual math.functions
+math.derivatives.syntax ;
+IN: math.dual+docs
 
 HELP: <dual>
 { $values

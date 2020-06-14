@@ -1,5 +1,5 @@
-USING: furnace.actions help.markup help.syntax ;
-IN: webapps.mason.status-update
+USING: furnace.actions help.markup help.syntax webapps.mason.status-update ;
+IN: webapps.mason.status-update+docs
 
 HELP: <status-update-action>
 { $values { "action" action } }

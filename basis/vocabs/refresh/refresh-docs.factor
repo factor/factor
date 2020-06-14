@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel strings ;
-IN: vocabs.refresh
+USING: help.markup help.syntax kernel strings vocabs.refresh ;
+IN: vocabs.refresh+docs
 
 HELP: source-modified?
 { $values { "path" "a pathname string" } { "?" boolean } }

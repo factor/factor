@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel quotations math.order
-sequences ;
-IN: sorting.slots
+USING: help.markup help.syntax kernel math.order quotations
+sequences sorting.slots ;
+IN: sorting.slots+docs
 
 HELP: compare-slots
 { $values

@@ -1,8 +1,8 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types assocs help.markup help.syntax kernel quotations
-sequences strings ;
-IN: tools.coverage
+USING: alien.c-types assocs help.markup help.syntax kernel
+quotations sequences strings tools.coverage ;
+IN: tools.coverage+docs
 
 HELP: <coverage-state>
 { $values

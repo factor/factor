@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Elie Chaftari.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs help.markup help.syntax kernel math
-sequences strings ;
-IN: pop3
+pop3 sequences strings ;
+QUALIFIED-WITH: pop3 p
+IN: pop3+docs
 
 HELP: <pop3-account>
 { $values
@@ -134,7 +135,7 @@ HELP: retrieve
 HELP: reset
 { $description "Resets the status of the remote POP3 server. This includes resetting the status of all messages to not be deleted." } ;
 
-HELP: count
+HELP: p:count
 { $values
 
     { "n" fixnum }
@@ -210,7 +211,7 @@ $nl
 }
 $nl
 "For the message count:"
-{ $subsections count }
+{ $subsections p:count }
 { $examples
     { $code
     "count ."

@@ -1,6 +1,6 @@
 USING: help.syntax help.markup kernel math classes classes.tuple
-calendar models ;
-IN: models.history
+calendar models models.history ;
+IN: models.history+docs
 
 HELP: history
 { $class-description "History models record a timeline of previous values on calls to " { $link add-history } ", and can travel back and forth on the timeline with " { $link go-back } " and " { $link go-forward } ". History models are constructed by " { $link <history> } "." } ;

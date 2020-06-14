@@ -1,5 +1,5 @@
 USING: help.syntax help.markup arrays alien ;
-IN: core-foundation.arrays
+IN: core-foundation.arrays+docs
 
 HELP: CF>array
 { $values { "alien" "a " { $snippet "CFArray" } } { "array" "an array of " { $link alien } " instances" } }

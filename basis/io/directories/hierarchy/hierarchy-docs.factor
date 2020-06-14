@@ -1,5 +1,6 @@
-USING: help.markup help.syntax quotations io.pathnames ;
-IN: io.directories.hierarchy
+USING: help.markup help.syntax io.directories.hierarchy
+io.pathnames quotations ;
+IN: io.directories.hierarchy+docs
 
 HELP: directory-tree-files
 { $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }

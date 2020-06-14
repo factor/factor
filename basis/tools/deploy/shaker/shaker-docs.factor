@@ -1,5 +1,6 @@
-USING: help.markup help.syntax kernel tools.deploy.config ;
-IN: tools.deploy.shaker
+USING: help.markup help.syntax kernel tools.deploy.config
+tools.deploy.shaker ;
+IN: tools.deploy.shaker+docs
 
 HELP: (deploy)
 { $values

@@ -1,5 +1,6 @@
-USING: help.markup help.syntax math.rectangles ;
-IN: math.rectangles.positioning
+USING: help.markup help.syntax math.rectangles
+math.rectangles.positioning ;
+IN: math.rectangles.positioning+docs
 
 HELP: popup-rect
 { $values { "visible-rect" rect } { "popup-dim" "a pair of real numbers" } { "screen-dim" "a pair of real numbers" } { "rect" rect } }

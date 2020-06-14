@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup words quotations effects ;
-IN: memoize
+USING: effects help.markup help.syntax memoize quotations words ;
+IN: memoize+docs
 
 ARTICLE: "memoize" "Memoization"
 "The " { $vocab-link "memoize" } " vocabulary implements a simple form of memoization, which is when a word caches results for every unique set of inputs that is supplied. Calling a memoized word with the same inputs more than once does not recalculate anything."

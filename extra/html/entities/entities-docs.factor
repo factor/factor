@@ -1,5 +1,5 @@
-USING: help.markup help.syntax strings ;
-IN: html.entities
+USING: html.entities help.markup help.syntax strings ;
+IN: html.entities+docs
 
 HELP: html-escape
 { $values { "str" string } { "newstr" string } }

@@ -1,6 +1,6 @@
-USING: compiler.cfg.instructions compiler.tree help.markup help.syntax
-math.vectors ;
-IN: compiler.cfg.intrinsics.simd
+USING: compiler.cfg.instructions compiler.cfg.intrinsics.simd
+compiler.tree help.markup help.syntax math.vectors ;
+IN: compiler.cfg.intrinsics.simd+docs
 
 HELP: emit-simd-v+
 { $values { "node" node } }

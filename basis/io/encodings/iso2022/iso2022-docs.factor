@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup ;
-IN: io.encodings.iso2022
+USING: help.syntax help.markup io.encodings.iso2022 ;
+IN: io.encodings.iso2022+docs
 
 HELP: iso2022
 { $class-description "This encoding class implements ISO 2022-JP-1, a Japanese text encoding commonly used for email." }

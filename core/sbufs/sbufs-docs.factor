@@ -1,6 +1,6 @@
-USING: strings arrays byte-arrays help.markup
+USING: sbufs strings arrays byte-arrays help.markup
 help.syntax kernel vectors ;
-IN: sbufs
+IN: sbufs+docs
 
 ARTICLE: "sbufs" "String buffers"
 "The " { $vocab-link "sbufs" } " vocabulary implements resizable mutable sequence of characters. The literal syntax is covered in " { $link "syntax-sbufs" } "."

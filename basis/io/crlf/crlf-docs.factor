@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup sequences ;
-IN: io.crlf
+USING: help.markup help.syntax io.crlf sequences ;
+IN: io.crlf+docs
 
 HELP: crlf
 { $values }

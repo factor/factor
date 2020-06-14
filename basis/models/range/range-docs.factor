@@ -1,6 +1,6 @@
 USING: help.syntax help.markup kernel math classes classes.tuple
-calendar models ;
-IN: models.range
+calendar models models.range ;
+IN: models.range+docs
 
 HELP: range
 { $class-description "Range models implement the " { $link "range-model-protocol" } " with real numbers as the minimum, current, maximum, and page size. Range models are created with " { $link <range> } "." }

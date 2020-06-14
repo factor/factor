@@ -1,6 +1,6 @@
 USING: calendar help.markup help.syntax sequences strings
-quotations ;
-IN: imap
+quotations imap ;
+IN: imap+docs
 
 ARTICLE: "imap" "IMAP library"
 "The " { $vocab-link "imap" } " vocab implements a large part of the IMAP4rev1 client protocol."

@@ -1,6 +1,7 @@
-USING: classes classes.builtin classes.union+private compiler.units
-help.markup help.syntax kernel ;
-IN: classes.union
+USING: classes classes.builtin classes.union
+classes.union+private compiler.units help.markup help.syntax
+kernel ;
+IN: classes.union+docs
 
 ARTICLE: "unions" "Union classes"
 "An object is an instance of a union class if it is an instance of one of its members."

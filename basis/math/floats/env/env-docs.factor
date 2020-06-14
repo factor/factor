@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help help.markup help.syntax kernel quotations ;
-IN: math.floats.env
+USING: help help.markup help.syntax kernel math.floats.env
+quotations ;
+IN: math.floats.env+docs
 
 HELP: fp-exception
 { $class-description "Symbols of this type represent floating-point exceptions. They are used to get and set the floating-point unit's exception flags (using " { $link fp-exception-flags } " and " { $link set-fp-exception-flags } ") and to control processor traps (using " { $link with-fp-traps } "). The following symbols are defined:"

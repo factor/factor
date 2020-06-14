@@ -1,5 +1,6 @@
-USING: compiler.cfg compiler.tree help.markup help.syntax quotations ;
-IN: compiler.cfg.intrinsics.alien
+USING: compiler.cfg compiler.cfg.intrinsics.alien compiler.tree
+help.markup help.syntax quotations ;
+IN: compiler.cfg.intrinsics.alien+docs
 
 HELP: inline-accessor
 { $values

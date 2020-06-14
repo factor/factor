@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel help.markup help.syntax ;
-IN: prettyprint.custom
+USING: kernel help.markup help.syntax prettyprint.custom ;
+IN: prettyprint.custom+docs
 
 HELP: pprint*
 { $values { "obj" object } }

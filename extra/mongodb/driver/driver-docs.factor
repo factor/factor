@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Sascha Matzke.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs help.markup help.syntax kernel quotations ;
-IN: mongodb.driver
+USING: assocs help.markup help.syntax kernel mongodb.driver quotations ;
+IN: mongodb.driver+docs
 
 HELP: <mdb-collection>
 { $values

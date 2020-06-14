@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs help.markup help.syntax quotations sequences ;
-IN: sequences.product
+USING: assocs help.markup help.syntax quotations sequences
+sequences.product ;
+IN: sequences.product+docs
 
 HELP: product-sequence
 { $class-description "A class of virtual sequences that present the cartesian product of their underlying set of sequences. Product sequences are constructed with the " { $link <product-sequence> } " word." }

@@ -1,5 +1,5 @@
-USING: help.markup help.syntax math strings ;
-IN: vm
+USING: help.markup help.syntax math strings vm ;
+IN: vm+docs
 
 HELP: zone
 { $class-description "A struct that defines the memory layout for an allocation zone in the virtual machine. Factor code cannot directly access allocation zones, but the struct is used by the compiler to calculate memory addresses. Its slots are:"

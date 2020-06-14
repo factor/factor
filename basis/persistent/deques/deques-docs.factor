@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel sequences ;
-IN: persistent.deques
+USING: help.markup help.syntax kernel sequences persistent.deques ;
+IN: persistent.deques+docs
 
 ARTICLE: "persistent.deques" "Persistent deques"
 "A deque is a data structure that can be used as both a queue and a stack. That is, there are two ends, the front and the back, and values can be pushed onto and popped off of both ends. These operations take O(1) amortized time and space in a normal usage pattern."

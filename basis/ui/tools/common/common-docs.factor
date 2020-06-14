@@ -1,5 +1,6 @@
-USING: classes help.markup help.syntax sequences ui.gadgets ;
-IN: ui.tools.common
+USING: classes help.markup help.syntax sequences ui.gadgets
+ui.tools.common ;
+IN: ui.tools.common+docs
 
 HELP: set-tool-dim
 { $values { "class" class } { "dim" sequence } }

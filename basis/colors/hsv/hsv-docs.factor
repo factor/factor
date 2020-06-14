@@ -1,5 +1,5 @@
-IN: colors.hsv
-USING: help.markup help.syntax ;
+USING: colors.hsv help.markup help.syntax ;
+IN: colors.hsv+docs
 
 HELP: hsva
 { $class-description "The class of HSV (Hue, Saturation, Value) colors with an alpha channel. The " { $slot "hue" } " slot stores a value in the interval " { $snippet "[0,360]" } " and the remaining slots store values in the interval " { $snippet "[0,1]" } "." } ;

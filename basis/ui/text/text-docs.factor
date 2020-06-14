@@ -1,5 +1,6 @@
-IN: ui.text
-USING: help.markup help.syntax kernel ui.text+private strings math fonts images ;
+USING: fonts help.markup help.syntax images math strings ui.text
+ui.text+private ;
+IN: ui.text+docs
 
 HELP: flush-layout-cache
 { $description "Flushes the cache of pre-rendered layouts." } ;

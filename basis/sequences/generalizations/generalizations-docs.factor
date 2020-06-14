@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup kernel sequences quotations
-math arrays combinators ;
-IN: sequences.generalizations
+USING: arrays help.markup help.syntax kernel math sequences
+sequences.generalizations ;
+IN: sequences.generalizations+docs
 
 HELP: nsequence
 { $values { "n" integer } { "seq" "an exemplar" } }

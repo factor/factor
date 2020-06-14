@@ -1,5 +1,6 @@
-USING: help.markup help.syntax kernel strings urls ;
-IN: furnace.auth.features.recover-password
+USING: furnace.auth.features.recover-password help.markup
+help.syntax kernel strings urls ;
+IN: furnace.auth.features.recover-password+docs
 
 HELP: allow-password-recovery
 { $values { "realm" "an authentication realm" } }

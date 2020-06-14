@@ -1,5 +1,5 @@
-USING: help.markup help.syntax sequences ;
-IN: concurrency.combinators
+USING: concurrency.combinators help.markup help.syntax sequences ;
+IN: concurrency.combinators+docs
 
 HELP: parallel-map
 { $values { "seq" sequence } { "quot" { $quotation ( elt -- newelt ) } } { "newseq" sequence } }

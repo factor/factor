@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax multiline ;
-IN: pair-rocket
+USING: help.markup help.syntax multiline pair-rocket ;
+IN: pair-rocket+docs
 
 HELP: =>
 { $syntax "a => b" }

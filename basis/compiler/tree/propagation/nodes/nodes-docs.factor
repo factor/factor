@@ -1,5 +1,6 @@
-USING: assocs compiler.tree help.markup help.syntax sequences ;
-IN: compiler.tree.propagation.nodes
+USING: assocs compiler.tree compiler.tree.propagation.nodes
+help.markup help.syntax sequences ;
+IN: compiler.tree.propagation.nodes+docs
 
 HELP: annotate-node
 { $values { "node" node } }

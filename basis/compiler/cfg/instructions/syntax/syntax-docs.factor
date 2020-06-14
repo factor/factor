@@ -1,5 +1,6 @@
-USING: help.markup help.syntax literals multiline sequences splitting ;
-IN: compiler.cfg.instructions.syntax
+USING: compiler.cfg.instructions.syntax help.markup help.syntax
+literals multiline sequences splitting ;
+IN: compiler.cfg.instructions.syntax+docs
 
 <<
 STRING: parse-insn-slot-specs-code

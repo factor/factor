@@ -1,5 +1,5 @@
-USING: help.markup help.syntax db http.server ;
-IN: furnace.db
+USING: db furnace.db help.markup help.syntax http.server ;
+IN: furnace.db+docs
 
 HELP: <db-persistence>
 { $values

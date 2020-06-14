@@ -1,6 +1,6 @@
 USING: byte-arrays help.syntax help.markup kernel math.order
-strings unicode ;
-IN: unicode.collation
+strings unicode unicode.collation ;
+IN: unicode.collation+docs
 
 ARTICLE: "unicode.collation" "Collation and weak comparison"
 "The " { $vocab-link "unicode.collation" } " vocabulary implements the Unicode Collation Algorithm. The Unicode Collation Algorithm (UTS #10) forms a reasonable way to sort strings when accounting for all of the characters in Unicode. It is far preferred over code point order when sorting for human consumption, in user interfaces. At the moment, only the default Unicode collation element table (DUCET) is used, but a more accurate collation would take locale into account. The following words are useful for collation directly:"

@@ -1,7 +1,7 @@
 
-USING: help.syntax help.markup kernel prettyprint sequences strings ;
+USING: help.syntax help.markup kernel prettyprint sequences strings uuid ;
 
-IN: uuid
+IN: uuid+docs
 
 HELP: uuid1
 { $values { "string" "a UUID string" } }

@@ -1,8 +1,8 @@
 ! Copyright (C) 2017 Björn Lindqvist.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax llvm.wrappers strings ;
+USING: help.markup help.syntax llvm.reader llvm.wrappers strings ;
 
-IN: llvm.reader
+IN: llvm.reader+docs
 
 HELP: buffer>module
 { $values { "buffer" buffer } { "module" module } }

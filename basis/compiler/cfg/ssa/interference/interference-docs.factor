@@ -1,5 +1,6 @@
-USING: compiler.cfg help.markup help.syntax kernel sequences ;
-IN: compiler.cfg.ssa.interference
+USING: compiler.cfg compiler.cfg.ssa.interference help.markup
+help.syntax kernel sequences ;
+IN: compiler.cfg.ssa.interference+docs
 
 HELP: sets-interfere?
 { $values { "seq1" sequence } { "seq2" sequence } { "merged/f" object } { "?" boolean } }

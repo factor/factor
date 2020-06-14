@@ -1,6 +1,6 @@
-USING: help.markup help.syntax kernel sequences
+USING: growable help.markup help.syntax kernel sequences
 sequences+private ;
-IN: growable
+IN: growable+docs
 
 ARTICLE: "growable" "Resizable sequence implementation"
 "Resizable sequences are implemented by having a wrapper object hold a reference to an underlying sequence, together with a fill pointer indicating how many elements of the underlying sequence are occupied. When the fill pointer exceeds the underlying sequence capacity, the underlying sequence grows."

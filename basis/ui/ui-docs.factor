@@ -1,9 +1,8 @@
-USING: classes colors debugger fonts help.markup help.syntax kernel
-math.rectangles namespaces quotations sequences strings ui.backend
-ui.gadgets ui.gadgets.books ui.gadgets.grids ui.gadgets.packs
-ui.gadgets+private ui.gadgets.tracks ui.gadgets.worlds ui+private ui.text
-vocabs.loader ;
-IN: ui
+USING: classes colors fonts help.markup help.syntax kernel
+math.rectangles quotations sequences strings ui ui+private
+ui.backend ui.gadgets ui.gadgets+private ui.gadgets.grids
+ui.gadgets.worlds vocabs.loader ;
+IN: ui+docs
 
 HELP: close-window
 { $values { "gadget" gadget } }
@@ -369,7 +368,7 @@ HELP: WINDOW:
 "From the " { $vocab-link "hello-ui" } " vocabulary. Creates a window with the title \"Hi\" containing a label reading \"Hello world\":"
 { $code
 "USING: accessors ui ui.gadgets.labels ;
-IN: hello-ui
+IN: ui+examples
 
 WINDOW: hello { { title \"Hi\" } }
     \"Hello world\" <label> >>gadgets ;"
@@ -383,7 +382,7 @@ HELP: MAIN-WINDOW:
 "From the " { $vocab-link "hello-ui" } " vocabulary. Creates a window with the title \"Hi\" containing a label reading \"Hello world\":"
 { $code
 "USING: accessors ui ui.gadgets.labels ;
-IN: hello-ui
+IN: ui+examples
 
 MAIN-WINDOW: hello { { title \"Hi\" } }
     \"Hello world\" <label> >>gadgets ;"

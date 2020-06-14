@@ -1,5 +1,6 @@
-USING: help.markup help.syntax literals sequences strings ;
-IN: vocabs.files
+USING: help.markup help.syntax literals sequences strings
+vocabs.files ;
+IN: vocabs.files+docs
 
 HELP: vocab-tests-path
 { $values { "vocab" "a vocabulary specifier" } { "path/f" { $maybe "pathname string to test file" } } }

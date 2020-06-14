@@ -1,6 +1,5 @@
-USING: help.syntax help.markup kernel math classes classes.tuple
-calendar models ;
-IN: models.arrow
+USING: help.markup help.syntax math models models.arrow ;
+IN: models.arrow+docs
 
 HELP: arrow
 { $class-description "Arrow model values are computed by applying a quotation to the value of another model. Arrows are automatically updated when the underlying model changes. Arrows are constructed by " { $link <arrow> } "." }

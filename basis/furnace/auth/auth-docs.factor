@@ -1,7 +1,7 @@
-USING: byte-arrays checksums.sha furnace.auth.providers
-furnace.auth.providers.db help.markup help.syntax http kernel
-math strings vocabs words.symbol ;
-IN: furnace.auth
+USING: byte-arrays checksums.sha furnace.auth
+furnace.auth.providers furnace.auth.providers.db+docs
+help.markup help.syntax http kernel math strings words.symbol ;
+IN: furnace.auth+docs
 
 HELP: <protected>
 { $values

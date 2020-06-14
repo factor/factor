@@ -1,6 +1,6 @@
 USING: arrays colors fonts help.markup help.syntax
-ui.gadgets.scrollers ;
-IN: ui.gadgets.line-support
+ui.gadgets.line-support ui.gadgets.scrollers ;
+IN: ui.gadgets.line-support+docs
 
 HELP: line-gadget
 { $class-description "Base class for gadgets that implements display of sequences of text."

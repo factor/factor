@@ -1,5 +1,5 @@
-USING: help.markup help.syntax math ;
-IN: checksums.crc16
+USING: checksums.crc16 help.markup help.syntax math ;
+IN: checksums.crc16+docs
 
 HELP: crc16
 { $class-description "The crc16 checksum algorithm." } ;

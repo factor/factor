@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
-IN: parser-combinators
+USING: help.markup help.syntax parser-combinators ;
+IN: parser-combinators+docs
 
 HELP: list-of
 { $values

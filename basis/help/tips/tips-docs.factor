@@ -1,7 +1,7 @@
 USING: debugger editors help help.apropos help.markup
-help.syntax help.vocabs memory see stack-checker
+help.syntax help.tips help.vocabs memory see stack-checker
 tools.destructors tools.time ;
-IN: help.tips
+IN: help.tips+docs
 
 TIP: "To look at the most recent error, run " { $link :error } ". To look at the most recent error's callstack, run " { $link :c } "." ;
 

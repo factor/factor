@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel multiline sequences ;
-IN: literals
+USING: help.markup help.syntax kernel literals multiline sequences ;
+IN: literals+docs
 
 HELP: $
 { $syntax "$ word" }
@@ -10,7 +10,7 @@ HELP: $
 { $examples
     { $example
         "USING: kernel literals prettyprint ;"
-        "IN: scratchpad"
+        "IN: literals+examples"
         ""
         "CONSTANT: five 5"
         "{ $ five } ."
@@ -18,7 +18,7 @@ HELP: $
     }
     { $example
         "USING: kernel literals prettyprint ;"
-        "IN: scratchpad"
+        "IN: literals+examples"
         ""
         ": seven-eleven ( -- a b ) 7 11 ;"
         "{ $ seven-eleven } ."
@@ -33,7 +33,7 @@ HELP: $[
 { $examples
     { $example
         "USING: kernel literals math prettyprint ;"
-        "IN: scratchpad"
+        "IN: literals+examples"
         ""
         "<< CONSTANT: five 5 >>"
         "{ $[ five dup 1 + dup 2 + ] } ."
@@ -48,7 +48,7 @@ HELP: ${
 { $examples
     { $example
         "USING: kernel literals math prettyprint ;"
-        "IN: scratchpad"
+        "IN: literals+examples"
         ""
         "CONSTANT: five 5"
         "CONSTANT: six 6"
@@ -65,7 +65,7 @@ HELP: flags{
 { $examples
     { $example
         "USING: literals kernel prettyprint ;"
-        "IN: scratchpad"
+        "IN: literals+examples"
         "CONSTANT: x 0x1"
         "flags{ 0x20 x 0b100 } .h"
         "0x25"
@@ -77,7 +77,7 @@ ARTICLE: "literals" "Interpolating code results into literal values"
 "The " { $vocab-link "literals" } " vocabulary contains words to run code at parse time and insert the results into more complex literal values."
 { $example
     "USING: kernel literals math prettyprint ;"
-    "IN: scratchpad"
+    "IN: literals+examples"
     ""
     "<< CONSTANT: five 5 >>"
     "{ $ five $[ five dup 1 + dup 2 + ] } ."

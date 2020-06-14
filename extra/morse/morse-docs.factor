@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
-IN: morse
+USING: help.markup help.syntax morse ;
+IN: morse+docs
 
 HELP: ch>morse
 { $values

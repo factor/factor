@@ -1,5 +1,5 @@
-USING: help.markup help.syntax strings ;
-IN: furnace.auth.providers
+USING: help.markup help.syntax ;
+IN: furnace.auth.providers.db+docs
 
 HELP: user
 { $class-description "The class of users. Instances have the following slots:"

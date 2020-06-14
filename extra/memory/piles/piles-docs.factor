@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien destructors help.markup help.syntax kernel math ;
-IN: memory.piles
+USING: alien destructors help.markup help.syntax kernel math
+memory.piles ;
+IN: memory.piles+docs
 
 HELP: <pile>
 { $values

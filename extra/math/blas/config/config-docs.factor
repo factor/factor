@@ -1,5 +1,5 @@
 USING: alien.fortran help.markup help.syntax math.blas.config ;
-IN: math.blas.config
+IN: math.blas.config+docs
 
 ARTICLE: "math.blas.config" "Configuring the BLAS interface"
 "The " { $link "math.blas-summary" } " chooses the underlying BLAS interface to use based on the values of the following global variables:"

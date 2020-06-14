@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup math sequences ;
-IN: math.bits
+USING: help.syntax help.markup math math.bits sequences ;
+IN: math.bits+docs
 
 ABOUT: "math.bits"
 

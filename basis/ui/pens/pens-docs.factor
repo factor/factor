@@ -1,5 +1,5 @@
-IN: ui.pens
-USING: help.markup help.syntax kernel ui.gadgets ;
+USING: help.markup help.syntax kernel ui.gadgets ui.pens ;
+IN: ui.pens+docs
 
 HELP: draw-interior
 { $values { "gadget" gadget } { "pen" object } }

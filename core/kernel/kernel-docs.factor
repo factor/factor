@@ -1,6 +1,7 @@
-USING: alien arrays classes combinators heaps help.markup help.syntax
-kernel+private layouts math quotations sequences system threads words ;
-IN: kernel
+USING: alien arrays classes combinators heaps help.markup
+help.syntax kernel kernel+private layouts math quotations
+sequences system threads words ;
+IN: kernel+docs
 
 HELP: OBJ-CURRENT-THREAD
 { $description "Contains a reference to the running " { $link thread } " instance." } ;

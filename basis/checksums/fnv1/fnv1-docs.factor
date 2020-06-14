@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ;
-IN: checksums.fnv1
+USING: checksums.fnv1 help.markup help.syntax ;
+IN: checksums.fnv1+docs
 
 HELP: fnv1-32
 { $class-description "Fowler-Noll-Vo checksum algorithm, v1, 32-bit." } ;

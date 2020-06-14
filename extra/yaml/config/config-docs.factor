@@ -1,7 +1,7 @@
 ! Copyright (C) 2014 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax yaml.ffi yaml.conversion ;
-IN: yaml.config
+USING: help.markup help.syntax yaml.ffi yaml.config yaml.conversion ;
+IN: yaml.config+docs
 
 HELP: +libyaml-default+
 { $var-description "Setting a variable in the following list to " { $link +libyaml-default+ } " leaves libyaml's default options:" }

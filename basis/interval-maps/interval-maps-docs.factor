@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs help.markup help.syntax kernel sequences ;
-IN: interval-maps
+USING: assocs help.markup help.syntax interval-maps kernel
+sequences ;
+IN: interval-maps+docs
 
 HELP: interval-at*
 { $values { "key" object } { "map" interval-map } { "value" "the value for the key, or f" } { "?" "whether the key is present" } }

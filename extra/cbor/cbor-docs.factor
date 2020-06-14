@@ -1,6 +1,6 @@
-USING: byte-arrays help.markup help.syntax io kernel sequences strings ;
+USING: byte-arrays cbor help.markup help.syntax io kernel sequences strings ;
 
-IN: cbor
+IN: cbor+docs
 
 HELP: read-cbor
 { $values { "obj" object } }

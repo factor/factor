@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel ;
-IN: classes.maybe
+IN: classes.maybe+docs
 
 ABOUT: "maybes"
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel ;
-IN: unix.signals
+USING: help.markup help.syntax kernel unix.signals ;
+IN: unix.signals+docs
 
 HELP: add-signal-handler
 { $values

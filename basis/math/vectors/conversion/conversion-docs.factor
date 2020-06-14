@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes help.markup help.syntax kernel quotations ;
-IN: math.vectors.conversion
+USING: classes help.markup help.syntax kernel math.vectors.conversion
+quotations ;
+IN: math.vectors.conversion+docs
 
 HELP: bad-vconvert
 { $values

@@ -1,5 +1,5 @@
-IN: definitions.icons
-USING: help.markup help.syntax ;
+USING: definitions.icons help.markup help.syntax ;
+IN: definitions.icons+docs
 
 ARTICLE: "definitions.icons" "Definition icons"
 "The " { $vocab-link "definitions.icons" } " vocabulary associates common definition types with icons."

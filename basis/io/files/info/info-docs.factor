@@ -1,5 +1,6 @@
-USING: arrays help.markup help.syntax kernel io.files ;
-IN: io.files.info
+USING: arrays help.markup help.syntax io.files io.files.info
+kernel ;
+IN: io.files.info+docs
 
 HELP: file-info
 { $values { "path" "a pathname string" } { "info" file-info-tuple } }

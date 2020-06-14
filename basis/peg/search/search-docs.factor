@@ -1,7 +1,8 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel peg sequences strings ;
-IN: peg.search
+USING: help.markup help.syntax kernel peg peg.search sequences
+strings ;
+IN: peg.search+docs
 
 HELP: tree-write
 { $values

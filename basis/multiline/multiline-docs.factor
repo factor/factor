@@ -1,5 +1,5 @@
-USING: help.markup help.syntax strings ;
-IN: multiline
+USING: help.markup help.syntax multiline strings ;
+IN: multiline+docs
 
 HELP: STRING:
 { $syntax "STRING: name\nfoo\n;" }

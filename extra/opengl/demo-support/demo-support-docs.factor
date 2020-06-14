@@ -1,5 +1,5 @@
-USING: help.markup help.syntax opengl.gl quotations ;
-IN: opengl.demo-support
+USING: help.markup help.syntax opengl.gl opengl.demo-support quotations ;
+IN: opengl.demo-support+docs
 
 HELP: do-state
 { $values

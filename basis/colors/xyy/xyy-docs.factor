@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ;
-IN: colors.xyy
+USING: colors.xyy help.markup help.syntax ;
+IN: colors.xyy+docs
 
 HELP: xyYa
 { $class-description "The class of CIE 1931 xyY colors with an alpha channel." } ;

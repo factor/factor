@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel ;
-IN: math.primes.lucas-lehmer
+USING: help.markup help.syntax kernel math.primes.lucas-lehmer ;
+IN: math.primes.lucas-lehmer+docs
 
 HELP: lucas-lehmer
 { $values

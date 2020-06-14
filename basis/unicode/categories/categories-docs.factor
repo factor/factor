@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup ;
-IN: unicode.categories
+USING: help.markup help.syntax unicode.categories ;
+IN: unicode.categories+docs
 
 ABOUT: "unicode.categories"
 

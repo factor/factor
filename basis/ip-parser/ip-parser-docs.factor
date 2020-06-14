@@ -1,5 +1,5 @@
-USING: byte-arrays help.markup help.syntax strings ;
-IN: ip-parser
+USING: byte-arrays help.markup help.syntax ip-parser strings ;
+IN: ip-parser+docs
 
 HELP: parse-ipv4
 { $values { "str" string } { "byte-array" byte-array } }

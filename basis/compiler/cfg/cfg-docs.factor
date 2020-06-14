@@ -1,8 +1,8 @@
-USING: compiler.cfg.instructions compiler.cfg.rpo
+USING: compiler.cfg compiler.cfg.instructions compiler.cfg.rpo
 compiler.cfg.stack-frame compiler.cfg.stacks.local compiler.tree
 cpu.x86.assembler.operands help.markup help.syntax kernel math
 namespaces sequences vectors words ;
-IN: compiler.cfg
+IN: compiler.cfg+docs
 
 HELP: basic-block
 { $class-description

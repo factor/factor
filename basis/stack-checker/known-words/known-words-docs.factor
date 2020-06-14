@@ -1,6 +1,6 @@
-USING: combinators help.markup help.syntax kernel kernel+private sequences
-words ;
-IN: stack-checker.known-words
+USING: combinators help.markup help.syntax kernel kernel+private
+sequences stack-checker.known-words words ;
+IN: stack-checker.known-words+docs
 
 HELP: check-declaration
 { $values { "declaration" sequence } }

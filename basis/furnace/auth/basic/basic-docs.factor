@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ;
-IN: furnace.auth.basic
+USING: furnace.auth.basic help.markup help.syntax ;
+IN: furnace.auth.basic+docs
 
 HELP: <basic-auth-realm>
 { $values { "responder" "a responder" } { "name" "an authentication realm name" } { "realm" basic-auth-realm } }

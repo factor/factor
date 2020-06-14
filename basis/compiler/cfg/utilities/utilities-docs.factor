@@ -1,6 +1,6 @@
-USING: assocs compiler.cfg hashtables help.markup help.syntax
-sequences ;
-IN: compiler.cfg.utilities
+USING: assocs compiler.cfg compiler.cfg.utilities hashtables
+help.markup help.syntax sequences ;
+IN: compiler.cfg.utilities+docs
 
 HELP: connect-Nto1-bbs
 { $values { "froms" sequence } { "to" basic-block } }

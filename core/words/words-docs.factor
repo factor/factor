@@ -1,6 +1,7 @@
 USING: classes compiler.units definitions effects help.markup
-help.syntax kernel parser quotations sequences strings vocabs ;
-IN: words
+help.syntax kernel parser quotations sequences strings vocabs
+words ;
+IN: words+docs
 
 ARTICLE: "interned-words" "Looking up and creating words"
 "A word is said to be " { $emphasis "interned" } " if it is a member of the vocabulary named by its vocabulary slot. Otherwise, the word is " { $emphasis "uninterned" } "."

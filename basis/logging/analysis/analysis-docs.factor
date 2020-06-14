@@ -1,5 +1,6 @@
-USING: help.markup help.syntax assocs logging math ;
-IN: logging.analysis
+USING: assocs help.markup help.syntax logging logging.analysis
+math ;
+IN: logging.analysis+docs
 
 HELP: analyze-entries
 { $values { "entries" "a sequence of log entries" } { "word-names" "a sequence of strings" } { "errors" "a sequence of log entries" } { "word-histogram" assoc } { "message-histogram" assoc } }

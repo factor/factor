@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ;
-IN: checksums.ripemd
+USING: checksums.ripemd help.markup help.syntax ;
+IN: checksums.ripemd+docs
 
 HELP: ripemd-160
 { $class-description "RIPEMD-160 checksum algorithm." } ;

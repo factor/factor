@@ -1,6 +1,6 @@
-USING: compiler.cfg.instructions cpu.architecture help.markup help.syntax
-math ;
-IN: compiler.cfg.registers
+USING: compiler.cfg.instructions compiler.cfg.registers
+cpu.architecture help.markup help.syntax math ;
+IN: compiler.cfg.registers+docs
 
 HELP: loc
 { $class-description "Represents a location on the stack. 'n' is an index starting from the top of the stack going down. So 0 is the top of the stack, 1 is what would be the top of the stack after a 'drop', and so on. It has two subclasses, " { $link ds-loc } " for data stack location and " { $link rs-loc } " for locations on the retain stack." } ;

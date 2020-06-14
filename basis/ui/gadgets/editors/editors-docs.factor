@@ -1,7 +1,7 @@
-USING: colors documents fonts help.markup help.syntax help.tips models
-sequences strings ui.commands ui.gadgets ui.gadgets.line-support
-ui.gadgets.scrollers ;
-IN: ui.gadgets.editors
+USING: colors documents fonts help.markup help.syntax help.tips
+models sequences strings ui.commands ui.gadgets
+ui.gadgets.editors ui.gadgets.line-support ui.gadgets.scrollers ;
+IN: ui.gadgets.editors+docs
 
 HELP: <multiline-editor>
 { $values { "editor" multiline-editor } }

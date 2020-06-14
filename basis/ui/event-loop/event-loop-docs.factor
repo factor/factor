@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel ;
-IN: ui.event-loop
+USING: help.markup help.syntax kernel ui.event-loop ;
+IN: ui.event-loop+docs
 
 HELP: event-loop?
 { $values { "?" boolean } }

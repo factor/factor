@@ -1,5 +1,5 @@
-USING: help.markup help.syntax math math.vectors vectors ;
-IN: math.quaternions
+USING: help.markup help.syntax math math.quaternions math.vectors vectors ;
+IN: math.quaternions+docs
 
 HELP: q+
 { $values { "u" "a quaternion" } { "v" "a quaternion" } { "u+v" "a quaternion" } }

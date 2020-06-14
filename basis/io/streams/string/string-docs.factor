@@ -1,5 +1,6 @@
-USING: help.markup help.syntax io strings quotations sequences ;
-IN: io.streams.string
+USING: help.markup help.syntax io io.streams.string quotations
+sequences strings ;
+IN: io.streams.string+docs
 
 ARTICLE: "io.streams.string" "String streams"
 "String streams:"

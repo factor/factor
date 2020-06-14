@@ -1,5 +1,5 @@
-USING: help.markup help.syntax slots kernel assocs sequences ;
-IN: mirrors
+USING: assocs help.markup help.syntax kernel mirrors ;
+IN: mirrors+docs
 
 ARTICLE: "mirrors" "Mirrors"
 "The " { $vocab-link "mirrors" } " vocabulary defines data types which present an object's slots and slot values as an associative structure. This enables idioms such as iteration over all slots in a tuple, or editing of tuples, sequences and assocs in a generic fashion. This functionality is used by developer tools and meta-programming utilities."

@@ -1,5 +1,5 @@
-USING: help.markup help.syntax io ;
-IN: io.streams.plain
+USING: help.markup help.syntax io io.streams.plain ;
+IN: io.streams.plain+docs
 
 ABOUT: "io.streams.plain"
 

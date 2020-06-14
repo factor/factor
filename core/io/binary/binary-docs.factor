@@ -1,5 +1,5 @@
-USING: help.markup help.syntax io math byte-arrays ;
-IN: io.binary
+USING: byte-arrays help.markup help.syntax io io.binary math ;
+IN: io.binary+docs
 
 ARTICLE: "stream-binary" "Working with binary data"
 "Stream words on binary streams only read and write byte arrays. Packed binary integers can be read and written by converting to and from sequences of bytes. Floating point numbers can be read and written by converting them into a their bitwise integer representation (" { $link "floats" } ")."

@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel strings ;
-IN: toml
+USING: help.markup help.syntax kernel strings toml ;
+IN: toml+docs
 
 HELP: toml>
 { $values { "string" string } { "assoc" object } }

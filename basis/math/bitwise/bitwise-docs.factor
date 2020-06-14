@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs help.markup help.syntax math sequences kernel ;
-IN: math.bitwise
+USING: assocs help.markup help.syntax kernel math math.bitwise
+sequences ;
+IN: math.bitwise+docs
 
 HELP: bitfield
 { $values { "values..." "a series of objects on the stack" } { "bitspec" "an array" } { "n" integer } }

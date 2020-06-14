@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax xml.data io strings byte-arrays ;
-IN: xml
+USING: byte-arrays help.markup help.syntax io strings xml
+xml.data ;
+IN: xml+docs
 
 HELP: string>xml
 { $values { "string" string } { "xml" xml } }

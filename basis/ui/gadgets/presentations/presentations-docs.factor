@@ -1,7 +1,7 @@
-USING: help.markup help.syntax ui.gadgets.buttons
-ui.gadgets.menus models ui.operations summary kernel
-ui.gadgets.worlds ui.gadgets ui.gadgets.status-bar ;
-IN: ui.gadgets.presentations
+USING: help.markup help.syntax kernel models summary ui.gadgets
+ui.gadgets.buttons ui.gadgets.menus ui.gadgets.presentations
+ui.gadgets.status-bar ui.gadgets.worlds ui.operations ;
+IN: ui.gadgets.presentations+docs
 
 HELP: presentation
 { $class-description "A presentation is a " { $link button } " which represents an object. Left-clicking a presentation invokes the default " { $link operation } ", and right-clicking displays a menu of possible operations output by " { $link object-operations } "."

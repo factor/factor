@@ -1,6 +1,6 @@
 USING: assocs help.markup help.syntax kernel
 quotations sequences strings urls xml.data http ;
-IN: furnace
+IN: furnace+docs
 
 ARTICLE: "furnace.persistence" "Furnace persistence layer"
 { $subsections "furnace.db" }

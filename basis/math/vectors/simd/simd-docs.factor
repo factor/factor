@@ -1,7 +1,7 @@
 USING: classes.tuple+private cpu.architecture help.markup
 help.syntax kernel+private math math.vectors math.vectors.simd.intrinsics
 sequences ;
-IN: math.vectors.simd
+IN: math.vectors.simd+docs
 
 ARTICLE: "math.vectors.simd.intro" "Introduction to SIMD support"
 "Modern CPUs support a form of data-level parallelism, where arithmetic operations on fixed-size short vectors can be done on all components in parallel. This is known as single-instruction-multiple-data (SIMD)."
@@ -97,8 +97,8 @@ SYMBOLS: x y ;
 "The following word benefits from SIMD optimization, because it begins with an unsafe declaration:"
 { $code
 "USING: compiler.tree.debugger kernel+private
-math.vectors math.vectors.simd ;
-IN: simd-demo
+math.vectors math.vectors.simd simd-demo ;
+IN: simd-demo+docs
 
 : interpolate ( v a b -- w )
     { float-4 float-4 float-4 } declare
@@ -111,7 +111,7 @@ $nl
 { $code
 "USING: compiler.tree.debugger hints
 math.vectors math.vectors.simd ;
-IN: simd-demo
+IN: simd-demo+docs
 
 : interpolate ( v a b -- w )
     [ v* ] [ [ 1.0 ] dip n-v v* ] bi-curry* bi v+ ;
@@ -126,7 +126,7 @@ $nl
 "In the " { $snippet "interpolate" } " word, there is still a call to the " { $link <tuple-boa> } " primitive, because the return value at the end is being boxed on the heap. In the next example, no memory allocation occurs at all because the SIMD vectors are stored inside a struct class (see " { $link "classes.struct" } "); also note the use of inlining:"
 { $code
 "USING: compiler.tree.debugger math.vectors math.vectors.simd ;
-IN: simd-demo
+IN: simd-demo+docs
 
 STRUCT: actor
 { id int }

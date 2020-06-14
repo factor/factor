@@ -1,6 +1,6 @@
 USING: kernel generic help.markup help.syntax math classes
-sequences quotations generic.math+private ;
-IN: generic.math
+sequences quotations generic.math generic.math+private ;
+IN: generic.math+docs
 
 HELP: math-class-max
 { $values { "class1" class } { "class2" class } { "class" class } }

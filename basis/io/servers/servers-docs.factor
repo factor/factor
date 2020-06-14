@@ -1,7 +1,7 @@
-USING: calendar classes concurrency.semaphores help.markup help.syntax
-io io.servers+private io.sockets io.sockets.secure quotations
-sequences ;
-IN: io.servers
+USING: calendar classes concurrency.semaphores help.markup
+help.syntax io io.servers io.servers+private io.sockets
+io.sockets.secure quotations sequences ;
+IN: io.servers+docs
 
 ARTICLE: "server-config" "Threaded server configuration"
 "The " { $link threaded-server } " tuple has a variety of slots which can be set before starting the server with " { $link start-server } "."

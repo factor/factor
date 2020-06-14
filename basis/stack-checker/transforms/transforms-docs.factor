@@ -1,5 +1,6 @@
-IN: stack-checker.transforms
-USING: help.markup help.syntax combinators words kernel ;
+USING: combinators help.markup help.syntax kernel
+stack-checker.transforms words ;
+IN: stack-checker.transforms+docs
 
 HELP: define-transform
 { $values { "word" word } { "quot" "a quotation taking " { $snippet "n" } " inputs from the stack and producing another quotation as output" } { "n" "a non-negative integer" } }

@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs help.markup help.syntax io.streams.string
-libc sequences strings ;
-IN: environment
+USING: assocs environment help.markup help.syntax
+io.streams.string libc sequences strings ;
+IN: environment+docs
 
 HELP: (os-envs)
 { $values

@@ -1,6 +1,7 @@
-USING: ui.gadgets help.markup help.syntax ui.gadgets.viewports
-ui.gadgets.sliders math.rectangles ui.gadgets.scrollers+private ;
-IN: ui.gadgets.scrollers
+USING: help.markup help.syntax math.rectangles ui.gadgets
+ui.gadgets.scrollers ui.gadgets.scrollers+private
+ui.gadgets.sliders ui.gadgets.viewports ;
+IN: ui.gadgets.scrollers+docs
 
 HELP: scroller
 { $class-description "A scroller consists of a " { $link viewport } " containing a child, together with horizontal and vertical " { $link slider } " gadgets which scroll the viewport's child. Scroller gadgets also support using a mouse scroll wheel."

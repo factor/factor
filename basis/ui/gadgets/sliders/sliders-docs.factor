@@ -1,6 +1,6 @@
 USING: help.markup help.syntax math math.ranges ui.gadgets
-ui.gadgets.sliders+private ;
-IN: ui.gadgets.sliders
+ui.gadgets.sliders ui.gadgets.sliders+private ;
+IN: ui.gadgets.sliders+docs
 
 HELP: elevator
 { $class-description "An elevator is the part of a " { $link slider } " between the up/down arrow buttons, where a " { $link thumb } " may be moved up and down." } ;

@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ;
-IN: http.server.remapping
+USING: help.markup help.syntax http.server.remapping ;
+IN: http.server.remapping+docs
 
 HELP: port-remapping
 { $var-description "An assoc mapping port numbers that the HTTP server listens on to external port numbers presented to the user." } ;

@@ -1,6 +1,6 @@
-USING: help.markup help.syntax io.streams.plain io strings
-hashtables kernel quotations colors assocs ;
-IN: io.styles
+USING: assocs colors hashtables help.markup help.syntax io
+io.streams.plain io.styles kernel quotations strings ;
+IN: io.styles+docs
 
 HELP: stream-format
 { $values { "str" string } { "style" assoc } { "stream" "an output stream" } }

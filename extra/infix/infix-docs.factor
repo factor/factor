@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Philipp Brüschweiler
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup math math.functions prettyprint locals sequences ;
-IN: infix
+USING: help.syntax help.markup infix math math.functions prettyprint locals sequences ;
+IN: infix+docs
 
 HELP: [infix
 { $syntax "[infix ... infix]" }
@@ -9,14 +9,14 @@ HELP: [infix
 { $examples
     { $example
         "USING: infix prettyprint ;"
-        "IN: scratchpad"
+        "IN: infix+examples"
         "[infix 8+2*3 infix] ."
         "14"
     } $nl
     { $link POSTPONE: [infix } " isn't that useful by itself, as it can only access literal numbers and no variables. It is designed to be used together with locals; for example with " { $link POSTPONE: :: } " :"
     { $example
         "USING: infix locals math.functions prettyprint ;"
-        "IN: scratchpad"
+        "IN: infix+examples"
         ":: quadratic-equation ( a b c -- z- z+ )"
         "    [infix (-b-sqrt(b*b-4*a*c)) / (2*a) infix]"
         "    [infix (-b+sqrt(b*b-4*a*c)) / (2*a) infix] ;"

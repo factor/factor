@@ -1,7 +1,8 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel quotations threads ;
-IN: progress-bars.models
+USING: help.markup help.syntax kernel quotations threads
+progress-bars.models ;
+IN: progress-bars.models+docs
 
 HELP: set-progress-bar
 { $values

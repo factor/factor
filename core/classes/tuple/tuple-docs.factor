@@ -1,7 +1,7 @@
-USING: arrays assocs classes classes.tuple+private
+USING: arrays assocs classes classes.tuple classes.tuple+private
 compiler.units growable help.markup help.syntax kernel math
 sbufs sequences slots strings vectors words ;
-IN: classes.tuple
+IN: classes.tuple+docs
 
 ARTICLE: "slot-read-only-declaration" "Read-only slots"
 "By default, all slots are writable. If a slot is explicitly declared " { $link read-only } ", then no writer method is generated for the slot, and the only way to set it to a value other than its initial value is to construct an instance of the tuple with " { $link boa } ", passing the initial value for the read-only slot on the stack; the common idiom of calling " { $link new } " and then immediately filling in slot values with setter words will not work with read-only slots." ;

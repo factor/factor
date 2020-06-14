@@ -1,8 +1,8 @@
 USING: alien alien.libraries compiler.cfg compiler.cfg.builder
-compiler.cfg.instructions compiler.errors compiler.tree help.markup
-help.syntax literals make multiline sequences stack-checker.alien
-strings ;
-IN: compiler.cfg.builder.alien
+compiler.cfg.builder.alien compiler.cfg.instructions
+compiler.errors compiler.tree help.markup help.syntax literals
+make multiline sequences stack-checker.alien strings ;
+IN: compiler.cfg.builder.alien+docs
 
 <<
 STRING: ex-caller-return

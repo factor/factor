@@ -1,5 +1,6 @@
-USING: help.markup help.syntax kernel math ;
-IN: compiler.cfg.value-numbering.rewrite
+USING: compiler.cfg.value-numbering.rewrite help.markup
+help.syntax kernel math ;
+IN: compiler.cfg.value-numbering.rewrite+docs
 
 HELP: vreg-immediate-arithmetic?
 { $values { "vreg" "vreg" } { "?" boolean } }

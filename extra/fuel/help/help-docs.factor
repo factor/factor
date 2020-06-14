@@ -1,5 +1,5 @@
-USING: fuel.help+private help.markup help.syntax sequences strings ;
-IN: fuel.help
+USING: fuel.help fuel.help+private help.markup help.syntax sequences strings ;
+IN: fuel.help+docs
 
 HELP: article-parents
 { $values { "article-name" string } {  "parents" sequence } }

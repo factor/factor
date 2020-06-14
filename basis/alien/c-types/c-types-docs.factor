@@ -1,8 +1,9 @@
 USING: alien help.syntax help.markup libc kernel+private
 byte-arrays strings hashtables alien.syntax alien.strings
 sequences io.encodings.string debugger destructors vocabs.loader
-classes.struct math kernel ;
-IN: alien.c-types
+classes.struct math kernel alien.c-types ;
+QUALIFIED-WITH: alien.c-types c
+IN: alien.c-types+docs
 
 HELP: heap-size
 { $values { "name" c-type-name } { "size" math:integer } }
@@ -40,7 +41,7 @@ HELP: char
 { $description "This C type represents a one-byte signed integer type. Input values will be converted to " { $link math:integer } "s and truncated to eight bits; output values will be returned as " { $link math:fixnum } "s." } ;
 HELP: uchar
 { $description "This C type represents a one-byte unsigned integer type. Input values will be converted to " { $link math:integer } "s and truncated to eight bits; output values will be returned as " { $link math:fixnum } "s." } ;
-HELP: short
+HELP: c:short
 { $description "This C type represents a two-byte signed integer type. Input values will be converted to " { $link math:integer } "s and truncated to sixteen bits; output values will be returned as " { $link math:fixnum } "s." } ;
 HELP: ushort
 { $description "This C type represents a two-byte unsigned integer type. Input values will be converted to " { $link math:integer } "s and truncated to sixteen bits; output values will be returned as " { $link math:fixnum } "s." } ;
@@ -70,7 +71,7 @@ HELP: void*
 { $description "This C type represents a generic pointer to C memory. See " { $link pointer } " for information on pointer C types." } ;
 HELP: c-string
 { $description "This C type represents a pointer to a C string. See " { $link "c-strings" } " for details about using strings with the FFI." } ;
-HELP: float
+HELP: c:float
 { $description "This C type represents a single-precision IEEE 754 floating-point type. Input values will be converted to Factor " { $link math:float } "s and demoted to single-precision; output values will be returned as Factor " { $link math:float } "s." } ;
 HELP: double
 { $description "This C type represents a double-precision IEEE 754 floating-point type. Input values will be converted to Factor " { $link math:float } "s; output values will be returned as Factor " { $link math:float } "s." } ;
@@ -108,7 +109,7 @@ ARTICLE: "c-types.primitives" "Primitive C types"
     { { $strong "C type" } { $strong "Notes" } }
     { { $link char } "always 1 byte" }
     { { $link uchar } { } }
-    { { $link short } "always 2 bytes" }
+    { { $link c:short } "always 2 bytes" }
     { { $link ushort } { } }
     { { $link int } "always 4 bytes" }
     { { $link uint } { } }
@@ -116,7 +117,7 @@ ARTICLE: "c-types.primitives" "Primitive C types"
     { { $link ulong } { } }
     { { $link longlong } "always 8 bytes" }
     { { $link ulonglong } { } }
-    { { $link float } { "single-precision float (not the same as Factor's " { $link math:float } " class!)" } }
+    { { $link c:float } { "single-precision float (not the same as Factor's " { $link math:float } " class!)" } }
     { { $link double } { "double-precision float (the same format as Factor's " { $link math:float } " objects)" } }
 }
 "C99 complex number types are defined in the " { $vocab-link "alien.complex" } " vocabulary."
@@ -133,8 +134,8 @@ $nl
 ARTICLE: "c-types.ambiguity" "Word name clashes with C types"
 "Note that some of the C type word names clash with commonly-used Factor words:"
 { $list
-  { { $link short } " clashes with the " { $link sequences:short } " word in the " { $vocab-link "sequences" } " vocabulary" }
-  { { $link float } " clashes with the " { $link math:float } " word in the " { $vocab-link "math" } " vocabulary" }
+  { { $link c:short } " clashes with the " { $link sequences:short } " word in the " { $vocab-link "sequences" } " vocabulary" }
+  { { $link c:float } " clashes with the " { $link math:float } " word in the " { $vocab-link "math" } " vocabulary" }
 }
 "If you use the wrong vocabulary, you will see a " { $link no-c-type } " error. For example, the following is " { $strong "not" } " valid, and will raise an error because the " { $link math:float } " word from the " { $vocab-link "math" } " vocabulary is not a C type:"
 { $code

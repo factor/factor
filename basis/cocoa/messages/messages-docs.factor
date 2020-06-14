@@ -1,5 +1,5 @@
 USING: help.markup help.syntax strings alien ;
-IN: cocoa.messages
+IN: cocoa.messages+docs
 
 HELP: send
 { $values { "receiver" alien } { "args..." "method arguments" } { "signature" "signature" } { "selector" string } { "return..." "value returned by method, if any" } }

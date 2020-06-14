@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup math kernel ;
-IN: wrap.words
+USING: help.markup help.syntax kernel math wrap.words ;
+IN: wrap.words+docs
 
 ABOUT: "wrap.words"
 

@@ -1,6 +1,6 @@
-USING: classes compiler.tree help.markup help.syntax kernel sequences
-;
-IN: compiler.tree.cleanup
+USING: classes compiler.tree compiler.tree.cleanup help.markup
+help.syntax kernel sequences ;
+IN: compiler.tree.cleanup+docs
 
 HELP: (cleanup-folding)
 { $values { "#call" #call } { "nodes" sequence } }

@@ -1,7 +1,7 @@
-USING: help.markup help.syntax io kernel math
-prettyprint.backend prettyprint.config prettyprint.custom
-prettyprint+private prettyprint.sections sequences ;
-IN: prettyprint
+USING: help.markup help.syntax io kernel math prettyprint
+prettyprint+private prettyprint.backend prettyprint.config
+prettyprint.custom prettyprint.sections sequences ;
+IN: prettyprint+docs
 
 ARTICLE: "prettyprint-numbers" "Prettyprinting numbers"
 "The " { $link . } " word prints numbers in decimal. A set of words in the " { $vocab-link "prettyprint" } " vocabulary is provided to print integers using another base."

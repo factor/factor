@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.data byte-arrays destructors help.markup help.syntax
-kernel math quotations ;
-IN: gpu.buffers
+kernel math quotations gpu.buffers ;
+IN: gpu.buffers+docs
 
 HELP: <buffer-ptr>
 { $values

@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ;
-IN: math.continued-fractions
+USING: help.markup help.syntax math.continued-fractions ;
+IN: math.continued-fractions+docs
 
 HELP: approx
 { $values { "epsilon" "a positive floating point number representing the absolute acceptable error" } { "float" "a positive floating point number to approximate" } { "a/b" "a fractional number containing the approximation" } }

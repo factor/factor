@@ -1,7 +1,7 @@
 USING: help.markup help.syntax io kernel math quotations
 alien windows.com windows.com.syntax continuations
-destructors ;
-IN: windows.com.wrapper
+destructors windows.com.wrapper ;
+IN: windows.com.wrapper+docs
 
 HELP: <com-wrapper>
 { $values { "implementations" "an assoc relating COM interface names to arrays of quotations implementing that interface" } { "wrapper" "a " { $link com-wrapper } " tuple" } }

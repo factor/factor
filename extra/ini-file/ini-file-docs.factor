@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: assocs hashtables help.syntax help.markup io strings ;
+USING: assocs hashtables help.syntax help.markup io ini-file strings ;
 
-IN: ini-file
+IN: ini-file+docs
 
 HELP: read-ini
 { $values { "assoc" assoc } }

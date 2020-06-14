@@ -1,7 +1,8 @@
 USING: assocs compiler.cfg compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.stacks hash-sets hashtables
-help.markup help.syntax kernel math sequences ;
-IN: compiler.cfg.stacks.local
+compiler.cfg.registers compiler.cfg.stacks
+compiler.cfg.stacks.local hash-sets hashtables help.markup
+help.syntax kernel math sequences ;
+IN: compiler.cfg.stacks.local+docs
 
 HELP: begin-local-analysis
 { $values { "basic-block" basic-block } }

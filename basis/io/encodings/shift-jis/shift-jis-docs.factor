@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
-IN: io.encodings.shift-jis
+USING: help.markup help.syntax io.encodings.shift-jis ;
+IN: io.encodings.shift-jis+docs
 
 ARTICLE: "io.encodings.shift-jis" "Shift JIS"
 "Shift JIS is a text encoding for Japanese. There are multiple versions, depending on whether the official standard or the modified Microsoft version is required."

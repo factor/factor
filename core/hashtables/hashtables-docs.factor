@@ -1,6 +1,6 @@
 USING: assocs hashtables+private help.markup help.syntax kernel
-sequences ;
-IN: hashtables
+sequences hashtables ;
+IN: hashtables+docs
 
 ARTICLE: "hashtables+private" "Hashtable implementation details"
 "This hashtable implementation uses only one auxiliary array in addition to the hashtable tuple itself. The array stores keys in even slots and values in odd slots. Values are looked up with a hashing strategy that uses quadratic probing to resolve collisions."

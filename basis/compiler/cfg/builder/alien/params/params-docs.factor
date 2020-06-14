@@ -1,5 +1,6 @@
-USING: cpu.architecture help.markup help.syntax kernel math vectors ;
-IN: compiler.cfg.builder.alien.params
+USING: compiler.cfg.builder.alien.params cpu.architecture
+help.markup help.syntax kernel math vectors ;
+IN: compiler.cfg.builder.alien.params+docs
 
 HELP: alloc-stack-param
 { $values { "rep" representation } { "n" integer } }

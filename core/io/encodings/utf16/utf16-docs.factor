@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax io.encodings strings ;
-IN: io.encodings.utf16
+USING: help.markup help.syntax io.encodings io.encodings.utf16
+strings ;
+IN: io.encodings.utf16+docs
 
 ARTICLE: "io.encodings.utf16" "UTF-16 encoding"
 "The UTF-16 encoding is a variable-width encoding. Unicode code points are encoded as 2 or 4 byte sequences. There are three encoding descriptor classes for working with UTF-16, depending on endianness or the presence of a BOM:"

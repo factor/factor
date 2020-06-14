@@ -1,5 +1,5 @@
 USING: help.syntax help.markup strings ;
-IN: core-foundation.strings
+IN: core-foundation.strings+docs
 
 HELP: <CFString>
 { $values { "string" string } { "alien" "a " { $snippet "CFString" } } }

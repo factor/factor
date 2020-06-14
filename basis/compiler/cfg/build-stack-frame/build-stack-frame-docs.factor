@@ -1,6 +1,7 @@
-USING: assocs compiler.cfg compiler.cfg.instructions compiler.cfg.stack-frame
-help.markup help.syntax kernel ;
-IN: compiler.cfg.build-stack-frame
+USING: assocs compiler.cfg compiler.cfg.build-stack-frame
+compiler.cfg.instructions compiler.cfg.stack-frame cpu.x86
+help.markup help.syntax kernel layouts math ;
+IN: compiler.cfg.build-stack-frame+docs
 
 HELP: build-stack-frame
 { $values { "cfg" cfg } }

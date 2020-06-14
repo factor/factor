@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup math ;
-IN: interval-sets
+USING: help.markup help.syntax interval-sets math ;
+IN: interval-sets+docs
 
 ABOUT: "interval-sets"
 

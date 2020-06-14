@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays biassocs help.syntax help.markup interval-maps
-strings ;
-IN: simple-flat-file
+USING: arrays biassocs help.markup help.syntax interval-maps
+simple-flat-file strings ;
+IN: simple-flat-file+docs
 
 ABOUT: "simple-flat-file"
 

@@ -1,5 +1,5 @@
-USING: math help.markup help.syntax python.ffi ;
-IN: python.errors
+USING: math help.markup help.syntax python.errors python.ffi ;
+IN: python.errors+docs
 
 HELP: check-zero
 { $values { "code" integer } }

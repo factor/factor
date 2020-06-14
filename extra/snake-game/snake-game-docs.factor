@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ;
-IN: snake-game
+USING: help.markup help.syntax snake-game ;
+IN: snake-game+docs
 
 ARTICLE: "snake-game" "Snake Game"
 "A remake of the popular Snake game. To start the game:"

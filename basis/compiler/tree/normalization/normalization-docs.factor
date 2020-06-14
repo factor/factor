@@ -1,5 +1,5 @@
 USING: assocs compiler.tree help.markup help.syntax kernel ;
-IN: compiler.tree.normalization
+IN: compiler.tree.normalization+docs
 
 ARTICLE: "compiler.tree.normalization" "Normalize IR created by high level IR builder to simplify subsequent passes"
 "A transform pass done before optimization can begin to fix up some oddities in the tree output by the stack checker:"

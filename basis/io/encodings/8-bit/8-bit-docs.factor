@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup strings ;
-IN: io.encodings.8-bit
+USING: io.encodings.8-bit help.syntax help.markup strings ;
+IN: io.encodings.8-bit+docs
 
 HELP: ebcdic
 { $var-description "EBCDIC is an 8-bit legacy encoding designed for IBM mainframes like System/360 in the 1960s. It has since fallen into disuse. It contains large unallocated regions, and the version included here (code page 37) contains auxiliary characters in this region for English- and Portugese-speaking countries." }

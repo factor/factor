@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs help.markup help.syntax math sequences ;
-IN: path-finding
+USING: assocs help.markup help.syntax math path-finding sequences ;
+IN: path-finding+docs
 
 { <astar> <bfs> <dijkstra> } related-words
 

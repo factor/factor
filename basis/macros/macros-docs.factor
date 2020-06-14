@@ -1,6 +1,6 @@
-USING: help.markup help.syntax quotations kernel
-stack-checker.transforms sequences combinators ;
-IN: macros
+USING: combinators help.markup help.syntax kernel macros
+stack-checker.transforms ;
+IN: macros+docs
 
 HELP: MACRO:
 { $syntax "MACRO: word ( inputs... -- quot ) definition... ;" }

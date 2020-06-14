@@ -1,7 +1,8 @@
 ! Copyright (C) 2018 Cat Stevens
 USING: arrays assocs help.markup help.syntax kernel math multiline
-sequences strings ;
-IN: english
+sequences strings english ;
+QUALIFIED-WITH: english e
+IN: english+docs
 
 <PRIVATE
 : $0-plurality ( children -- )
@@ -28,13 +29,13 @@ $nl
 { $subsections plural? pluralize ?pluralize count-of-things singular? singularize }
 
 "Toy grammatical words:"
-{ $subsections a/an ?plural-article a10n comma-list }
+{ $subsections e:a/an ?plural-article a10n comma-list }
 
 "An example application:"
 { $subsections or-markup-example $or-markup-example } ;
 
 { pluralize ?pluralize plural? count-of-things singularize singular? } related-words
-{ a/an ?plural-article a10n comma-list $or-markup-example or-markup-example } related-words
+{ e:a/an ?plural-article a10n comma-list $or-markup-example or-markup-example } related-words
 
 HELP: singularize
 { $values { "word" string } { "singular" string } }
@@ -143,21 +144,21 @@ HELP: a10n
     }
 } ;
 
-HELP: a/an
+HELP: e:a/an
 { $values { "word" string } { "article" { $or-markup-example "\"a\"" "\"an\"" } } }
 { $description "Gives the proper indefinite singular article (" { $emphasis "a" } " or " { $emphasis "an" } ") for the word. For words which begin with a vowel sound, " { $emphasis "an" } " is used, whereas " { $emphasis "a" } " is used for words which begin with a consonant sound." }
 { $notes "The output does not contain the input. The output of this word is always a singular article, regardless of the plurality of the input." }
 { $examples
     { $example
         "USING: english kernel combinators sequences io ;"
-        "\"object\" [ a/an ] keep \" \" glue print"
+        "\"object\" [ e:a/an ] keep \" \" glue print"
         "an object"
     }
 } ;
 
 HELP: ?plural-article
 { $values { "word" string } { "article" { $or-markup-example "\"a\"" "\"an\"" "\"the\"" } } }
-{ $description "Output the proper article given the plurality and first letter of the input. Unlike " { $link a/an } " this word handles plural inputs by outputting the definite " { $emphasis "\"the\"" } ". If the input is singular as determined by " { $link singular? } " this word operates like " { $link a/an } "." }
+{ $description "Output the proper article given the plurality and first letter of the input. Unlike " { $link e:a/an } " this word handles plural inputs by outputting the definite " { $emphasis "\"the\"" } ". If the input is singular as determined by " { $link singular? } " this word operates like " { $link e:a/an } "." }
 { $notes { $list "English lacks a plural indefinite article, so the plural definite is used here instead." $keep-case $0-plurality } }
 { $examples
     { $example

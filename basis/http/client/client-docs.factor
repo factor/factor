@@ -1,8 +1,9 @@
-USING: assocs byte-arrays destructors help.markup help.syntax http
-http.client.post-data+private http.client+private
-io.encodings.binary io.encodings.latin1 io.pathnames kernel
-sequences strings urls urls.encoding ;
-IN: http.client
+USING: assocs byte-arrays destructors help.markup help.syntax
+http http.client http.client+private
+http.client.post-data+private io.encodings.binary
+io.encodings.latin1 io.pathnames kernel sequences strings urls
+urls.encoding ;
+IN: http.client+docs
 
 HELP: download-failed
 { $error-description "Thrown by " { $link http-request } " if the server returns a status code other than 200. The " { $slot "response" } " slot can be inspected for the underlying cause of the problem." } ;

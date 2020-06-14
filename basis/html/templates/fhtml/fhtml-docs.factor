@@ -1,5 +1,5 @@
-IN: html.templates.fhtml
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax html.templates.fhtml ;
+IN: html.templates.fhtml+docs
 
 HELP: <fhtml>
 { $values { "path" "a pathname string" } { "fhtml" fhtml } }

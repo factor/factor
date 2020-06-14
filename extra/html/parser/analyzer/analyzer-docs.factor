@@ -1,6 +1,6 @@
 USING: help.syntax help.markup html.parser html.parser.analyzer
 kernel sequences strings ;
-IN: html.parser.analyzer
+IN: html.parser.analyzer+docs
 
 HELP: html-class?
 { $values { "tag" tag } { "string" "a classname" } { "?" boolean } }

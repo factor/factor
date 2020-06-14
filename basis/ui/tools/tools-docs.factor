@@ -1,9 +1,6 @@
-USING: editors help.markup help.syntax summary inspector io io.styles
-listener parser prettyprint tools.walker ui.commands
-ui.gadgets.panes ui.gadgets.presentations ui.gestures
-ui.operations ui.tools.operations ui.tools.common
-vocabs see help.tips ;
-IN: ui.tools
+USING: help.markup help.syntax help.tips see summary ui.commands
+ui.tools.common ;
+IN: ui.tools+docs
 
 ARTICLE: "starting-ui-tools" "Starting the UI tools"
 "The UI tools start automatically where possible:"

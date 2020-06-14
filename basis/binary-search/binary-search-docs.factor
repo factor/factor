@@ -1,5 +1,5 @@
-IN: binary-search
-USING: help.markup help.syntax sequences kernel math.order ;
+USING: binary-search help.markup help.syntax sequences kernel math.order ;
+IN: binary-search+docs
 
 HELP: search
 { $values { "seq" "a sorted sequence" } { "quot" { $quotation ( elt -- <=> ) } } { "i" "an index, or " { $link f } } { "elt" "an element, or " { $link f } } }

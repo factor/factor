@@ -1,7 +1,8 @@
 ! Copyright (C) 2017 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel windows.ole32 ;
-IN: windows.dragdrop-listener
+USING: help.markup help.syntax kernel windows.dragdrop-listener
+windows.ole32 ;
+IN: windows.dragdrop-listener+docs
 
 ABOUT: "windows.dragdrop-listener"
 

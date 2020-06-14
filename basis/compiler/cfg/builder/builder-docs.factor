@@ -1,8 +1,9 @@
-USING: arrays assocs compiler.cfg compiler.cfg.builder.blocks
-compiler.cfg.instructions compiler.cfg.stacks.local
-compiler.tree help.markup help.syntax kernel literals math
-multiline quotations sequences vectors words ;
-IN: compiler.cfg.builder
+USING: arrays assocs compiler.cfg compiler.cfg.builder
+compiler.cfg.builder.blocks compiler.cfg.instructions
+compiler.cfg.stacks.local compiler.tree help.markup help.syntax
+kernel literals math multiline quotations sequences vectors
+words ;
+IN: compiler.cfg.builder+docs
 
 <<
 STRING: ex-emit-call

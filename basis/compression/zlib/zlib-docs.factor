@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 Benjamin Pollack.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel math strings byte-arrays ;
-IN: compression.zlib
+USING: byte-arrays compression.zlib help.markup help.syntax ;
+IN: compression.zlib+docs
 
 HELP: compress
 { $values

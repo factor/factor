@@ -1,6 +1,6 @@
-USING: help.markup help.syntax io.files+private io.pathnames
-quotations ;
-IN: io.directories
+USING: help.markup help.syntax io.directories io.files+private
+io.pathnames quotations ;
+IN: io.directories+docs
 
 HELP: cwd
 { $values { "path" "a pathname string" } }

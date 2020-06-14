@@ -1,5 +1,5 @@
-IN: colors
-USING: accessors help.markup help.syntax ;
+USING: accessors colors help.markup help.syntax ;
+IN: colors+docs
 
 HELP: color
 { $class-description "The class of colors. Implementations include " { $link rgba } ", " { $vocab-link "colors.gray" } " and " { $vocab-link "colors.hsv" } "." } ;

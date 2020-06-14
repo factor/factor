@@ -1,7 +1,7 @@
 USING: ui.gadgets help.markup help.syntax generic kernel
-classes.tuple quotations ui.gadgets.packs+private
+classes.tuple quotations ui.gadgets.packs ui.gadgets.packs+private
 ui.baseline-alignment ;
-IN: ui.gadgets.packs
+IN: ui.gadgets.packs+docs
 
 ARTICLE: "ui-pack-layout" "Pack layouts"
 "Pack gadgets layout their children along a single axis."

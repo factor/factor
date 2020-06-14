@@ -1,6 +1,7 @@
-USING: compiler.cfg compiler.cfg.instructions help.markup
-help.syntax kernel sequences strings ;
-IN: compiler.cfg.stacks.clearing
+USING: compiler.cfg compiler.cfg.instructions
+compiler.cfg.stacks.clearing help.markup help.syntax kernel
+sequences strings ;
+IN: compiler.cfg.stacks.clearing+docs
 
 ARTICLE: "compiler.cfg.stacks.clearing" "Uninitialized stack location clearing"
 "A compiler pass that inserts " { $link ##clear } " instructions front of instructions which requires the whole stack to be initialized. Consider the following sequence of instructions:"

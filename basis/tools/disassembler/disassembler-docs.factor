@@ -1,5 +1,6 @@
-IN: tools.disassembler
-USING: help.markup help.syntax sequences+private ;
+USING: help.markup help.syntax sequences+private
+tools.disassembler ;
+IN: tools.disassembler+docs
 
 HELP: disassemble
 { $values { "obj" "a word or a pair of addresses" } }

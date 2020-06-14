@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Erik Charlebois
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs game.models.obj+private help.markup help.syntax
-io.pathnames kernel sequences strings ;
-IN: game.models.obj
+USING: assocs game.models.obj game.models.obj+private help.markup
+help.syntax io.pathnames kernel sequences strings ;
+IN: game.models.obj+docs
 
 ABOUT: "game.models.obj"
 

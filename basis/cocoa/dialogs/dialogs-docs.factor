@@ -1,5 +1,5 @@
 USING: help.markup help.syntax ;
-IN: cocoa.dialogs
+IN: cocoa.dialogs+docs
 
 HELP: <NSOpenPanel>
 { $values { "panel" "an " { $snippet "NSOpenPanel" } } }

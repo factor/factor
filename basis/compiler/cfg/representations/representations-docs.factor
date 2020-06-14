@@ -1,6 +1,7 @@
-USING: compiler.cfg compiler.cfg.registers cpu.architecture
-help.markup help.syntax ;
-IN: compiler.cfg.representations
+USING: compiler.cfg compiler.cfg.registers
+compiler.cfg.representations cpu.architecture help.markup
+help.syntax ;
+IN: compiler.cfg.representations+docs
 
 HELP: select-representations
 { $values { "cfg" cfg } }

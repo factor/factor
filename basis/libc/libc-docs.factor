@@ -1,5 +1,5 @@
-USING: help.markup help.syntax alien destructors ;
-IN: libc
+USING: alien destructors help.markup help.syntax libc ;
+IN: libc+docs
 
 HELP: malloc
 { $values { "size" "a non-negative integer" } { "alien" c-ptr } }

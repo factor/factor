@@ -1,6 +1,6 @@
-USING: help.markup help.syntax words parser quotations strings
-system sequences ;
-IN: tools.annotations
+USING: help.markup help.syntax parser quotations sequences
+strings system tools.annotations words ;
+IN: tools.annotations+docs
 
 ARTICLE: "tools.annotations" "Word annotations"
 "The word annotation feature modifies word definitions to add debugging code. You can restore the old definition by calling " { $link reset } " on the word in question."

@@ -1,6 +1,6 @@
-USING: alien help.markup help.syntax io kernel math quotations
-opengl.gl assocs vocabs.loader sequences accessors colors words ;
-IN: opengl
+USING: colors help.markup help.syntax math opengl opengl.gl
+quotations ;
+IN: opengl+docs
 
 HELP: gl-color
 { $values { "color" color } }

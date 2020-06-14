@@ -1,6 +1,6 @@
-USING: help.markup help.syntax words alien.c-types alien.data assocs
-kernel math ;
-IN: tools.deploy.config
+USING: alien.c-types alien.data assocs help.markup help.syntax
+kernel math tools.deploy.config words ;
+IN: tools.deploy.config+docs
 
 ARTICLE: "deploy-flags" "Deployment flags"
 "There are three sets of deployment flags. The first set controls the major subsystems which are to be included in the deployment image:"

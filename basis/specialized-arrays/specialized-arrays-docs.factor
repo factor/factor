@@ -1,5 +1,6 @@
-USING: help.markup help.syntax byte-arrays alien math sequences ;
-IN: specialized-arrays
+USING: help.markup help.syntax byte-arrays alien math sequences
+specialized-arrays ;
+IN: specialized-arrays+docs
 
 HELP: SPECIALIZED-ARRAY:
 { $syntax "SPECIALIZED-ARRAY: type" }

@@ -1,5 +1,6 @@
-USING: hashtables help.markup help.syntax math quotations sequences words ;
-IN: stack-checker.values
+USING: hashtables help.markup help.syntax math quotations
+sequences stack-checker.values words ;
+IN: stack-checker.values+docs
 
 HELP: curried-effect
 { $class-description "Result of curry." } ;

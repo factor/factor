@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ;
-IN: help.lint
+USING: help.markup help.syntax help.lint ;
+IN: help.lint+docs
 
 HELP: help-lint-all
 { $description "Checks all word help and articles in all loaded vocabularies." } ;

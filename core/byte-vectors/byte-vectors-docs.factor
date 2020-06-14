@@ -1,5 +1,5 @@
-USING: help.markup help.syntax sequences ;
-IN: byte-vectors
+USING: byte-vectors help.markup help.syntax sequences ;
+IN: byte-vectors+docs
 
 ARTICLE: "byte-vectors" "Byte vectors"
 "The " { $vocab-link "byte-vectors" } " vocabulary implements resizable mutable sequence of unsigned bytes. Byte vectors implement the " { $link "sequence-protocol" } " and thus all " { $link "sequences" } " can be used with them."

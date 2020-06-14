@@ -1,6 +1,7 @@
-USING: byte-arrays classes.tuple+private compiler.cfg compiler.tree
-help.markup help.syntax ;
-IN: compiler.cfg.intrinsics.allot
+USING: byte-arrays classes.tuple+private compiler.cfg
+compiler.cfg.intrinsics.allot compiler.tree help.markup
+help.syntax ;
+IN: compiler.cfg.intrinsics.allot+docs
 
 HELP: emit-<byte-array>
 { $values

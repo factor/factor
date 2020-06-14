@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes help.markup help.syntax kernel math ;
-IN: memory.pools
+USING: classes help.markup help.syntax kernel math memory.pools ;
+IN: memory.pools+docs
 
 HELP: <pool>
 { $values

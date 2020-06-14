@@ -1,6 +1,7 @@
-USING: help.syntax help.markup ui.gadgets kernel arrays math help sequences
-quotations classes.tuple ui.gadgets.grids ;
-IN: ui.gadgets.frames
+USING: arrays classes.tuple help help.markup help.syntax kernel
+math quotations sequences ui.gadgets ui.gadgets.frames
+ui.gadgets.grids ;
+IN: ui.gadgets.frames+docs
 
 ARTICLE: "ui-frame-layout" "Frame layouts"
 "Frames extend " { $link "ui-grid-layout" } " with the ability to give all remaining space to a distinguished filled cell."

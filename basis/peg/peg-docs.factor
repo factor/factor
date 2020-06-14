@@ -1,7 +1,8 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel quotations strings words ;
-IN: peg
+USING: help.markup help.syntax kernel peg quotations strings
+words ;
+IN: peg+docs
 
 HELP: parse
 { $values

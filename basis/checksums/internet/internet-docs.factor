@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ;
-IN: checksums.internet
+USING: checksums.internet help.markup help.syntax ;
+IN: checksums.internet+docs
 
 HELP: internet
 { $class-description "Internet (RFC1071) checksum algorithm." } ;

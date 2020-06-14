@@ -1,6 +1,6 @@
-IN: io.monitors
 USING: concurrency.mailboxes destructors help.markup help.syntax
-kernel quotations ;
+io.monitors kernel quotations ;
+IN: io.monitors+docs
 
 HELP: with-monitors
 { $values { "quot" quotation } }

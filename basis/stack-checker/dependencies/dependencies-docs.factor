@@ -1,5 +1,6 @@
-USING: classes help.markup help.syntax ;
-IN: stack-checker.dependencies
+USING: classes help.markup help.syntax
+stack-checker.dependencies ;
+IN: stack-checker.dependencies+docs
 
 HELP: +conditional+
 { $description "Word that indicates that the dependency is a conditional dependency." } ;

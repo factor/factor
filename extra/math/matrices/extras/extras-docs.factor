@@ -1,8 +1,8 @@
 USING: arrays generic.single help.markup help.syntax kernel math
-math.matrices math.matrices+private math.matrices.extras
+math.matrices math.matrices+docs+private math.matrices.extras
 math.order math.ratios math.vectors opengl.gl random sequences
 urls ;
-IN: math.matrices.extras
+IN: math.matrices.extras+docs
 
 ABOUT: "math.matrices.extras"
 

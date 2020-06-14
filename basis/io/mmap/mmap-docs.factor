@@ -1,7 +1,6 @@
-USING: alien alien.c-types continuations destructors
-help.markup help.syntax kernel math quotations
-specialized-arrays ;
-IN: io.mmap
+USING: alien alien.c-types destructors help.markup help.syntax
+io.mmap quotations specialized-arrays ;
+IN: io.mmap+docs
 
 HELP: mapped-file
 { $class-description "The class of memory-mapped files, opened by " { $link <mapped-file> } " and closed by " { $link close-mapped-file } ". The following two slots are of interest to users:"

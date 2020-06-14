@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: help.syntax help.markup kernel assocs sequences quotations ;
+USING: help.syntax help.markup kernel assocs sequences quotations
+math.binpack ;
 
-IN: math.binpack
+IN: math.binpack+docs
 
 HELP: binpack
 { $values { "items" sequence } { "#bins" "number of bins" } { "bins" "packed bins" } }

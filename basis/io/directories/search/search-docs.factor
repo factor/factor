@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax io.directories kernel quotations
-sequences ;
-IN: io.directories.search
+USING: help.markup help.syntax io.directories
+io.directories.search kernel quotations sequences ;
+IN: io.directories.search+docs
 
 HELP: +depth-first+
 { $description "Method of directory traversal that fully recurses as far as possible before backtracking." } ;

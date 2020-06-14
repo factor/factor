@@ -1,5 +1,5 @@
-USING: help.markup help.syntax math ;
-IN: math.primes.lists
+USING: help.markup help.syntax math math.primes.lists ;
+IN: math.primes.lists+docs
 
 HELP: lprimes
 { $values { "list" "a lazy list" } }

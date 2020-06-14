@@ -1,7 +1,7 @@
-USING: help.markup help.syntax io.streams.string quotations
-strings calendar serialize furnace.db words words.symbol
-kernel ;
-IN: furnace.sessions
+USING: calendar furnace.db furnace.sessions help.markup
+help.syntax io.streams.string kernel quotations serialize
+strings words words.symbol ;
+IN: furnace.sessions+docs
 
 HELP: <sessions>
 { $values

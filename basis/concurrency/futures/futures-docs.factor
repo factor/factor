@@ -1,8 +1,9 @@
 ! Copyright (C) 2005, 2008 Chris Double, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: concurrency.promises concurrency.messaging kernel arrays
-continuations help.markup help.syntax quotations calendar ;
-IN: concurrency.futures
+USING: arrays calendar concurrency.futures concurrency.messaging
+concurrency.promises continuations help.markup help.syntax
+kernel quotations ;
+IN: concurrency.futures+docs
 
 HELP: future
 { $values { "quot" { $quotation ( -- value ) } } { "future" future } }

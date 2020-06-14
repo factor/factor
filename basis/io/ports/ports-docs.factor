@@ -1,7 +1,7 @@
-USING: io io.buffers io.backend help.markup help.syntax kernel
-byte-arrays sbufs words continuations destructors
-byte-vectors classes ;
-IN: io.ports
+USING: byte-arrays byte-vectors classes continuations
+destructors help.markup help.syntax io io.backend io.buffers
+io.ports kernel sbufs words ;
+IN: io.ports+docs
 
 ARTICLE: "io.ports" "Non-blocking I/O implementation"
 "On Windows and Unix, Factor implements blocking file and network streams on top of a non-blocking I/O substrate, ensuring that Factor threads will yield when performing I/O. This substrate is implemented in the " { $vocab-link "io.ports" } " vocabulary."

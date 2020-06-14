@@ -1,5 +1,6 @@
-USING: compiler.cfg compiler.cfg.instructions help.markup help.syntax kernel ;
-IN: compiler.cfg.block-joining
+USING: compiler.cfg compiler.cfg.block-joining
+compiler.cfg.instructions help.markup help.syntax kernel ;
+IN: compiler.cfg.block-joining+docs
 
 HELP: join-block?
 { $values { "bb" basic-block } { "?" boolean } }

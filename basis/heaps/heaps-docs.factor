@@ -1,6 +1,6 @@
-USING: heaps+private help.markup help.syntax kernel math assocs
-math.order quotations ;
-IN: heaps
+USING: assocs heaps heaps+private help.markup help.syntax kernel
+math math.order quotations ;
+IN: heaps+docs
 
 ARTICLE: "heaps" "Heaps"
 "A heap is an implementation of a " { $emphasis "priority queue" } ", which is a structure that maintains a sorted set of elements. The key property is that insertion of an arbitrary element and removal of the first element (determined by order) is performed in O(log n) time."

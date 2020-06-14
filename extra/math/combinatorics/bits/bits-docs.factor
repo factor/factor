@@ -1,5 +1,5 @@
-USING: help.markup help.syntax math sequences ;
-IN: math.combinatorics.bits
+USING: help.markup help.syntax math math.combinatorics.bits sequences ;
+IN: math.combinatorics.bits+docs
 
 HELP: next-permutation-bits
 { $values { "v" integer } { "w" integer } }

@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg, Slava Pestov, and Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs+private help.markup help.syntax kernel math
+USING: assocs assocs+private help.markup help.syntax kernel math
 namespaces quotations sequences ;
-IN: assocs
+IN: assocs+docs
 
 ARTICLE: "alists" "Association lists"
 "An " { $emphasis "association list" } ", abbreviated " { $emphasis "alist" } ", is an association represented as a sequence where all elements are key/value pairs. The " { $link sequence } " mixin is an instance of the " { $link assoc } " mixin, hence all sequences support the " { $link "assocs-protocol" } " in this way."

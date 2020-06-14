@@ -1,9 +1,7 @@
 ! Copyright (C) 2011 John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-
 USING: help.markup help.syntax successor strings ;
-
-IN: succesor
+IN: succesor+docs
 
 HELP: successor
 { $values { "str" string } { "str'" string } }

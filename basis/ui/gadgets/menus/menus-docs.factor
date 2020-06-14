@@ -1,6 +1,6 @@
-USING: ui.gadgets help.markup help.syntax ui.gadgets.worlds
-kernel ;
-IN: ui.gadgets.menus
+USING: help.markup help.syntax kernel ui.gadgets
+ui.gadgets.menus ui.gadgets.worlds ;
+IN: ui.gadgets.menus+docs
 
 HELP: <commands-menu>
 { $values { "target" object } { "hook" { $quotation ( button -- ) } } { "commands" "a sequence of commands" } { "menu" "a new " { $link gadget } } }

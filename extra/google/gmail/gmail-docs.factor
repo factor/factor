@@ -1,7 +1,7 @@
 ! Copyright (C) 2018 Björn Lindqvist.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
-IN: google.gmail
+USING: google.gmail help.markup help.syntax ;
+IN: google.gmail+docs
 
 ARTICLE: "google.gmail" "GMail Client"
 "This vocab implements an api to GMail based on " { $vocab-link "oauth2" } "."

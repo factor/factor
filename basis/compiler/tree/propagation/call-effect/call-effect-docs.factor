@@ -1,6 +1,7 @@
-USING: combinators+private compiler.units debugger effects help.markup
-help.syntax kernel quotations words ;
-IN: compiler.tree.propagation.call-effect
+USING: combinators+private compiler.tree.propagation.call-effect
+compiler.units debugger effects help.markup help.syntax kernel
+quotations words ;
+IN: compiler.tree.propagation.call-effect+docs
 
 HELP: already-inlined-quot?
 { $values { "quot" quotation } { "?" boolean } }

@@ -1,5 +1,5 @@
-USING: io help.markup help.syntax quotations ;
-IN: io.streams.null
+USING: help.markup help.syntax io io.streams.null quotations ;
+IN: io.streams.null+docs
 
 HELP: null-reader
 { $class-description "Singleton class of null reader streams." } ;

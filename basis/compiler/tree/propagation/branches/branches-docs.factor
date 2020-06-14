@@ -1,5 +1,6 @@
-USING: compiler.tree help.markup help.syntax sequences ;
-IN: compiler.tree.propagation.branches
+USING: compiler.tree compiler.tree.propagation.branches
+help.markup help.syntax sequences ;
+IN: compiler.tree.propagation.branches+docs
 
 HELP: child-constraints
 { $values { "node" node } { "seq" sequence } }

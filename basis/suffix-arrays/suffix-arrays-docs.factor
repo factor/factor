@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays help.markup help.syntax io.streams.string
-sequences strings math suffix-arrays+private ;
-IN: suffix-arrays
+sequences strings math suffix-arrays suffix-arrays+private ;
+IN: suffix-arrays+docs
 
 HELP: >suffix-array
 { $values

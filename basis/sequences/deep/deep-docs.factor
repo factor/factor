@@ -1,5 +1,5 @@
-USING: help.syntax help.markup kernel sequences ;
-IN: sequences.deep
+USING: help.markup help.syntax kernel sequences sequences.deep ;
+IN: sequences.deep+docs
 
 HELP: deep-each
 { $values { "obj" object } { "quot" { $quotation ( ... elt -- ... ) } } }

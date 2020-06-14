@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes.mixin help.markup help.syntax kernel multiline roles ;
-IN: roles
+IN: roles+docs
 
 HELP: ROLE:
 { $syntax "ROLE: name slots... ;

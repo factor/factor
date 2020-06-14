@@ -1,5 +1,6 @@
-USING: help.markup help.syntax io kernel quotations sequences ;
-IN: io.files
+USING: help.markup help.syntax io io.files kernel quotations
+sequences ;
+IN: io.files+docs
 
 ARTICLE: "io.files.examples" "Examples of reading and writing files"
 "Sort the lines in a file and write them back to the same file:"

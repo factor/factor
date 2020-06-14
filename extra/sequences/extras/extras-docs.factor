@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel math sequences ;
-IN: sequences.extras
+USING: help.markup help.syntax kernel math sequences sequences.extras ;
+IN: sequences.extras+docs
 
 HELP: ?supremum
 { $values

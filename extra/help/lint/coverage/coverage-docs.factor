@@ -1,6 +1,6 @@
 USING: help help.lint.coverage help.lint.coverage+private
 help.markup help.syntax io kernel sequences strings vocabs words ;
-IN: help.lint.coverage
+IN: help.lint.coverage+docs
 
 <PRIVATE
 : $related-subsections ( element -- )

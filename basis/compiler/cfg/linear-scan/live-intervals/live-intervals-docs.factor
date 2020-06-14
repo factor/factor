@@ -1,7 +1,8 @@
-USING: compiler.cfg compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.linear-scan.allocation cpu.architecture help.markup
-help.syntax kernel math sequences ;
-IN: compiler.cfg.linear-scan.live-intervals
+USING: compiler.cfg compiler.cfg.def-use
+compiler.cfg.instructions compiler.cfg.linear-scan.allocation
+compiler.cfg.linear-scan.live-intervals cpu.architecture
+help.markup help.syntax kernel math sequences ;
+IN: compiler.cfg.linear-scan.live-intervals+docs
 
 HELP: <live-interval>
 { $values

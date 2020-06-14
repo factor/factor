@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ;
-IN: checksums.md5
+USING: checksums.md5 help.markup help.syntax ;
+IN: checksums.md5+docs
 
 HELP: md5
 { $class-description "MD5 checksum algorithm." } ;

@@ -1,6 +1,5 @@
-USING: byte-arrays help.markup help.syntax io kernel sequences strings ;
-
-IN: msgpack
+USING: byte-arrays help.markup help.syntax io kernel msgpack sequences strings ;
+IN: msgpack+docs
 
 HELP: read-msgpack
 { $values { "obj" object } }

@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes.tuple help.markup help.syntax kernel math
-quotations sequences stack-checker arrays ;
-IN: combinators.smart
+USING: arrays classes.tuple combinators.smart help.markup
+help.syntax kernel math quotations sequences stack-checker ;
+IN: combinators.smart+docs
 
 HELP: input<sequence
 { $values

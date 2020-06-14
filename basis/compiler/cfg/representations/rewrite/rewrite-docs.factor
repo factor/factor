@@ -1,6 +1,7 @@
-USING: compiler.cfg compiler.cfg.instructions help.markup help.syntax
+USING: compiler.cfg compiler.cfg.instructions
+compiler.cfg.representations.rewrite help.markup help.syntax
 sequences ;
-IN: compiler.cfg.representations.rewrite
+IN: compiler.cfg.representations.rewrite+docs
 
 HELP: alternatives
 { $var-description "Mapping from vreg,rep pairs to vregs." } ;

@@ -1,7 +1,7 @@
 USING: alien assocs help.markup help.syntax kernel kernel+private
 quotations sequences stack-checker.alien stack-checker.inlining
-stack-checker.values stack-checker.visitor words ;
-IN: compiler.tree
+stack-checker.values stack-checker.visitor words compiler.tree ;
+IN: compiler.tree+docs
 
 HELP: node
 { $class-description "Base class for all SSA tree nodes. The node is an " { $link identity-tuple } " which means that two different node instances with the same attributes are not equal." } ;

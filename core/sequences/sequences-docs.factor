@@ -1,6 +1,7 @@
-USING: assocs arrays generic.single help.markup help.syntax kernel
-layouts math math.order quotations sequences+private vectors ;
-IN: sequences
+USING: arrays assocs generic.single help.markup help.syntax
+kernel layouts math math.order quotations sequences
+sequences+private vectors ;
+IN: sequences+docs
 
 HELP: sequence
 { $class-description "A mixin class whose instances are sequences. Custom implementations of the sequence protocol should be declared as instances of this mixin for all sequence functionality to work correctly:"

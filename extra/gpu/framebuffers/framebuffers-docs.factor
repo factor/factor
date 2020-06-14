@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien byte-arrays gpu.buffers gpu.textures help.markup
-help.syntax images kernel math math.rectangles sequences ;
-IN: gpu.framebuffers
+help.syntax images kernel math math.rectangles sequences gpu.framebuffers ;
+IN: gpu.framebuffers+docs
 
 HELP: <color-attachment>
 { $values

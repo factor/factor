@@ -1,6 +1,6 @@
-USING: help.markup help.syntax sequences splitting strings ;
+USING: grouping.extras help.markup help.syntax sequences splitting strings ;
 
-IN: grouping.extras
+IN: grouping.extras+docs
 
 HELP: group-by
 { $values { "seq" sequence } { "quot" { $quotation ( elt -- key ) } } { "groups" "a new assoc" } }

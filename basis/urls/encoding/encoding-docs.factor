@@ -1,5 +1,6 @@
-USING: assocs help.markup help.syntax kernel strings ;
-IN: urls.encoding
+USING: assocs help.markup help.syntax kernel strings
+urls.encoding ;
+IN: urls.encoding+docs
 
 HELP: url-decode
 { $values { "str" string } { "decoded" string } }

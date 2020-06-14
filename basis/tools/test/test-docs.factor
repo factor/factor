@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel quotations io ;
-IN: tools.test
+USING: help.markup help.syntax io kernel quotations tools.test ;
+IN: tools.test+docs
 
 ARTICLE: "tools.test" "Unit testing"
 "A unit test is a piece of code which starts with known input values, then compares the output of a word with an expected output, where the expected output is defined by the word's contract."

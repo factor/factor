@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel sequences sets ;
-IN: sets.extras
+USING: help.markup help.syntax kernel sequences sets sets.extras ;
+IN: sets.extras+docs
 
 HELP: setwise-xor
 { $values

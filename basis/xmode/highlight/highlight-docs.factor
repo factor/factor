@@ -4,7 +4,7 @@
 USING: help.markup help.syntax sequences strings words
 xmode.catalog xmode.highlight xmode.tokens ;
 
-IN: xmode.highlight
+IN: xmode.highlight+docs
 
 HELP: highlight-tokens
 { $values { "tokens" sequence } }

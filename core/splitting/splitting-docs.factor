@@ -1,5 +1,6 @@
-USING: help.markup help.syntax kernel sequences strings ;
-IN: splitting
+USING: help.markup help.syntax kernel sequences splitting
+strings ;
+IN: splitting+docs
 
 ARTICLE: "sequences-split" "Splitting sequences"
 "Splitting sequences at occurrences of subsequences:"

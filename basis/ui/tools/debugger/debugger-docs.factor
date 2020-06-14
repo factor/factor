@@ -1,6 +1,6 @@
-USING: ui.gadgets help.markup help.syntax kernel quotations
-continuations debugger ui ;
-IN: ui.tools.debugger
+USING: continuations debugger help.markup help.syntax kernel
+quotations ui ui.gadgets ui.tools.debugger ;
+IN: ui.tools.debugger+docs
 
 HELP: <debugger>
 { $values { "error" "an error" } { "continuation" continuation } { "restarts" "a sequence of " { $link restart } " instances" } { "restart-hook" { $quotation ( debugger -- ) } } { "debugger" "a new " { $link debugger } } }

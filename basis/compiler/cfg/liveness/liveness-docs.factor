@@ -1,8 +1,8 @@
 USING: assocs compiler.cfg compiler.cfg.def-use
-compiler.cfg.instructions compiler.cfg.representations
-cpu.architecture hash-sets help.markup help.syntax kernel math
-sequences ;
-IN: compiler.cfg.liveness
+compiler.cfg.instructions compiler.cfg.liveness
+compiler.cfg.representations cpu.architecture hash-sets
+help.markup help.syntax kernel math sequences ;
+IN: compiler.cfg.liveness+docs
 
 HELP: base-pointers
 { $var-description "Mapping from vregs to base pointer vregs. If the vreg doesn't have a base pointer, then it will be mapped to " { $link f } "." }

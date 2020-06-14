@@ -1,6 +1,6 @@
 USING: help.markup help.syntax math sequences
 sequences.complex ;
-IN: sequences.complex
+IN: sequences.complex+docs
 
 ARTICLE: "sequences.complex" "Complex virtual sequences"
 "The " { $link complex-sequence } " class wraps a sequence of " { $link real } " number values, presenting a sequence of " { $link complex } " values made by treating the underlying sequence as pairs of alternating real and imaginary values."

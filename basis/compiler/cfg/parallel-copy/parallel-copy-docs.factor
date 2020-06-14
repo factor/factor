@@ -1,7 +1,8 @@
-USING: assocs arrays compiler.cfg compiler.cfg.instructions
-compiler.cfg.parallel-copy+private compiler.cfg.registers
-help.markup help.syntax kernel math quotations sequences ;
-IN: compiler.cfg.parallel-copy
+USING: arrays assocs compiler.cfg compiler.cfg.instructions
+compiler.cfg.parallel-copy compiler.cfg.parallel-copy+private
+compiler.cfg.registers help.markup help.syntax kernel math
+quotations sequences ;
+IN: compiler.cfg.parallel-copy+docs
 
 HELP: process-to-do
 { $values { "b" object } { "temp" quotation } { "quot" quotation } }

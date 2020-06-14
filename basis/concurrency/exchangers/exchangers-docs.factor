@@ -1,5 +1,5 @@
-USING: help.markup help.syntax sequences kernel ;
-IN: concurrency.exchangers
+USING: concurrency.exchangers help.markup help.syntax kernel ;
+IN: concurrency.exchangers+docs
 
 HELP: exchanger
 { $class-description "The class of object exchange points." } ;

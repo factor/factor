@@ -1,8 +1,8 @@
 ! Copyright (C) 2019-2020 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays help.markup help.syntax kernel quotations sequences
-    prettyprint assocs math make lists urls logic+private ;
-IN: logic
+    prettyprint assocs math make lists urls logic logic+private ;
+IN: logic+docs
 
 HELP: !!
 { $var-description "The cut operator.\nUse the cut operator to suppress backtracking." }
@@ -10,7 +10,7 @@ HELP: !!
   "In the following example, it is used to define that cats generally eat mice, but Tom does not."
   { $example
     "USING: logic prettyprint ;"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "LOGIC-PREDS: is-ao consumeso ;"
     "LOGIC-VARS: X Y ;"
@@ -113,7 +113,7 @@ HELP: LOGIC-PRED:
 { $examples
   { $code
     "USE: logic"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "LOGIC-PRED: cato"
     "SYMBOL: Tom"
@@ -129,7 +129,7 @@ HELP: LOGIC-PREDS:
 { $examples
   { $code
     "USE: logic"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "LOGIC-PREDS: cato mouseo ;"
     "SYMBOLS: Tom Jerry ;"
@@ -146,7 +146,7 @@ HELP: LOGIC-VAR:
 { $examples
   { $example
     "USING: logic prettyprint ;"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "LOGIC-PRED: mouseo"
     "LOGIC-VAR: X"
@@ -164,7 +164,7 @@ HELP: LOGIC-VARS:
 { $examples
   { $example
     "USING: logic prettyprint ;"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "LOGIC-PRED: mouseo"
     "LOGIC-VARS: X ;"
@@ -193,7 +193,7 @@ HELP: \+
 { $examples
   { $example
     "USING: logic prettyprint ;"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "LOGIC-PREDS: cato mouseo creatureo ;"
     "LOGIC-VARS: X Y ;"
@@ -224,7 +224,7 @@ HELP: __
 { $examples
   { $example
     "USING: logic prettyprint ;"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "SYMBOLS: Tom Jerry Nibbles ;"
     "TUPLE: house living dining kitchen in-the-wall ;"
@@ -257,7 +257,7 @@ HELP: appendo
 { $examples
   { $example
     "USING: logic lists prettyprint ;"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "SYMBOLS: Tom Jerry Nibbles ;"
     "LOGIC-VARS: X Y ;"
@@ -305,7 +305,7 @@ HELP: clear-pred
 { $examples
   { $example
     "USING: logic prettyprint ;"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "LOGIC-PRED: mouseo"
     "SYMBOLS: Jerry Nibbles ;"
@@ -330,7 +330,7 @@ HELP: fact
 { $examples
   { $code
     "USE: logic"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "LOGIC-PREDS: cato mouseo ;"
     "SYMBOLS: Tom Jerry ;"
@@ -355,7 +355,7 @@ HELP: facts
 { $examples
   { $code
     "USE: logic"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "LOGIC-PREDS: cato mouseo ;"
     ""
@@ -386,7 +386,7 @@ HELP: invoke
   "In this example, the calculated values are memorized to eliminate recalculation."
   { $example
     "USING: logic kernel lists assocs locals math prettyprint ;"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "LOGIC-PRED: fibo"
     "LOGIC-VARS: F F1 F2 N N1 N2 ;"
@@ -425,7 +425,7 @@ HELP: lengtho
 { $examples
   { $example
     "USING: logic lists prettyprint ;"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "SYMBOLS: Tom Jerry Nibbles ;"
     "LOGIC-VAR: X"
@@ -442,7 +442,7 @@ HELP: listo
 { $examples
   { $example
     "USING: logic lists prettyprint ;"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "SYMBOLS: Tom Jerry Nibbles ;"
     ""
@@ -458,7 +458,7 @@ HELP: membero
 { $examples
   { $example
     "USING: logic lists prettyprint ;"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "SYMBOLS: Tom Jerry Nibbles Spike ;"
     ""
@@ -504,7 +504,7 @@ When you query with logic variable(s), you will get the answer for the logic var
 { $examples
   { $example
     "USING: logic prettyprint ;"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "LOGIC-PREDS: cato mouseo creatureo ;"
     "LOGIC-VARS: X Y ;"
@@ -539,7 +539,7 @@ HELP: retract
 { $examples
   { $example
     "USING: logic prettyprint ;"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "LOGIC-PRED: mouseo"
     "SYMBOLS: Jerry Nibbles ;"
@@ -563,7 +563,7 @@ HELP: retract-all
 { $examples
   { $example
     "USING: logic prettyprint ;"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "LOGIC-PRED: mouseo"
     "SYMBOLS: Jerry Nibbles ;"
@@ -596,7 +596,7 @@ If the body array contains only one goal definition, you can write it instead of
 { $examples
   { $example
     "USING: logic prettyprint ;"
-    "IN: scratchpad"
+    "IN: logic+examples"
     ""
     "LOGIC-PREDS: mouseo youngo young-mouseo ;"
     "SYMBOLS: Jerry Nibbles ;"

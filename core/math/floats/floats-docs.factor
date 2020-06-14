@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel math math+private ;
-IN: math.floats
+IN: math.floats+docs
 
 HELP: float
 { $class-description "The class of double-precision floating point numbers." } ;

@@ -1,7 +1,7 @@
 USING: arrays byte-arrays help.markup help.syntax
-kernel kernel+private strings+private sequences vectors
-sbufs math help.vocabs ;
-IN: strings
+kernel kernel+private strings strings+private sequences
+vectors sbufs math help.vocabs ;
+IN: strings+docs
 
 ARTICLE: "strings" "Strings"
 "The " { $vocab-link "strings" } " vocabulary implements a data type for storing text. Strings are represented as fixed-size mutable sequences of Unicode code points. Code points are represented as integers in the range [0,2,097,152]."

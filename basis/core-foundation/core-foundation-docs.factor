@@ -1,5 +1,5 @@
 USING: alien strings arrays help.markup help.syntax destructors ;
-IN: core-foundation
+IN: core-foundation+docs
 
 HELP: &CFRelease
 { $values { "alien" "Pointer to a Core Foundation object" } }

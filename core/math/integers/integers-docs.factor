@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel math math+private ;
-IN: math.integers
+IN: math.integers+docs
 
 ARTICLE: "integers" "Integers"
 { $subsections integer }

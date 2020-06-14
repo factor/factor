@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: graphviz help.markup help.syntax kernel strings ;
-IN: graphviz.attributes
+USING: graphviz graphviz.attributes help.markup help.syntax kernel strings ;
+IN: graphviz.attributes+docs
 
 {
     node-attributes

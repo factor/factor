@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax math ;
-IN: math.splines
+USING: help.markup help.syntax math math.splines ;
+IN: math.splines+docs
 
 HELP: <bezier-curve>
 { $values

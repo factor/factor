@@ -1,6 +1,6 @@
-IN: html.streams
-USING: help.markup help.syntax kernel strings io io.styles
-quotations xml.data ;
+USING: help.markup help.syntax html.streams io io.styles kernel
+quotations strings xml.data ;
+IN: html.streams+docs
 
 HELP: url-of
 { $values { "object" object } { "url" string } }

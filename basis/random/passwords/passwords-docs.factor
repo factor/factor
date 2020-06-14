@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel random strings ;
-IN: random.passwords
+USING: help.markup help.syntax kernel random random.passwords strings ;
+IN: random.passwords+docs
 
 ABOUT: "random.passwords"
 

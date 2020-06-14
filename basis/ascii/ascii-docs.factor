@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel strings ;
-IN: ascii
+USING: ascii help.markup help.syntax kernel strings ;
+IN: ascii+docs
 
 HELP: blank?
 { $values { "ch" "a character" } { "?" boolean } }

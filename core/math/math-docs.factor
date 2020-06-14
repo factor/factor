@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel quotations sequences ;
-IN: math
+USING: help.markup help.syntax kernel math quotations sequences ;
+IN: math+docs
 
 HELP: number=
 { $values { "x" number } { "y" number } { "?" boolean } }

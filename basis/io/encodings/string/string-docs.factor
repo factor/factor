@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays help.markup help.syntax io.encodings.string
 strings ;
-IN: io.encodings.string
+IN: io.encodings.string+docs
 
 ARTICLE: "io.encodings.string" "Encoding and decoding strings"
 "Strings can be encoded or decoded to and from byte arrays through an encoding by passing "

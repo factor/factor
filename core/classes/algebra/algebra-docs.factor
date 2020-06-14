@@ -1,6 +1,6 @@
-USING: classes classes.algebra+private classes+private help.markup
-help.syntax kernel math sequences ;
-IN: classes.algebra
+USING: classes classes.algebra classes.algebra+private classes+private
+help.markup help.syntax kernel math sequences ;
+IN: classes.algebra+docs
 
 ARTICLE: "class-operations" "Class operations"
 "Set-theoretic operations on classes:"

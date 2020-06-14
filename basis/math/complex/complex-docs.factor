@@ -1,6 +1,5 @@
-USING: help.markup help.syntax math math+private math.functions
-math.complex+private ;
-IN: math.complex
+USING: help.markup help.syntax math math.complex ;
+IN: math.complex+docs
 
 ARTICLE: "complex-numbers-zero" "Embedding of real numbers in complex numbers"
 "Constructing a complex number with an imaginary component equal to an integer zero simply returns the real number corresponding to the real component:"

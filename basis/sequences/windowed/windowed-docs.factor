@@ -1,7 +1,8 @@
 ! Copyright (C) 2012 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel math sequences ;
-IN: sequences.windowed
+USING: help.markup help.syntax kernel math sequences
+sequences.windowed ;
+IN: sequences.windowed+docs
 
 HELP: <windowed-sequence>
 { $values

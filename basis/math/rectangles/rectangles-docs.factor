@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel ;
-IN: math.rectangles
+USING: help.markup help.syntax kernel math.rectangles ;
+IN: math.rectangles+docs
 
 HELP: rect
 { $class-description "A rectangle with the following slots:"

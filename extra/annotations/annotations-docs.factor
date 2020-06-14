@@ -1,7 +1,7 @@
-USING: accessors arrays combinators definitions generalizations
-help help.markup help.topics kernel sequences sorting vocabs
-words combinators.smart tools.crossref ;
-IN: annotations
+USING: accessors annotations arrays combinators
+combinators.smart help help.markup help.topics kernel sequences
+sorting tools.crossref vocabs words ;
+IN: annotations+docs
 
 <PRIVATE
 : comment-word ( base -- word ) "!" prepend "annotations" lookup-word ;

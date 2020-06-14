@@ -1,6 +1,6 @@
-USING: destructors help.markup help.syntax kernel math sequences
-vocabs vocabs.parser words namespaces ;
-IN: ui.pixel-formats
+USING: destructors help.markup help.syntax kernel sequences
+ui.pixel-formats vocabs vocabs.parser words ;
+IN: ui.pixel-formats+docs
 
 ! break circular dependency
 <<
@@ -46,7 +46,7 @@ ARTICLE: "ui.pixel-formats-attributes" "Pixel format attributes"
 { $examples
 "The following " { $link world } " subclass will request a double-buffered window with minimum 24-bit color and depth buffers, and will throw an error if the requirements aren't met:"
 { $code "USING: kernel ui.gadgets.worlds ui.pixel-formats ;
-IN: ui.pixel-formats.examples
+IN: ui.pixel-formats+examples
 
 TUPLE: picky-depth-buffered-world < world ;
 

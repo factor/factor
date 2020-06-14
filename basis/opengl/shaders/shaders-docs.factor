@@ -1,6 +1,6 @@
-USING: help.markup help.syntax kernel opengl.gl quotations sequences
+USING: help.markup help.syntax kernel opengl.gl opengl.shaders quotations sequences
 strings ;
-IN: opengl.shaders
+IN: opengl.shaders+docs
 
 HELP: (gl-program)
 { $values

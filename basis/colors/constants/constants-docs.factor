@@ -1,5 +1,5 @@
-IN: colors.constants
-USING: help.markup help.syntax strings colors ;
+USING: colors colors.constants help.markup help.syntax strings ;
+IN: colors.constants+docs
 
 HELP: named-color
 { $values { "name" string } { "color" color } }

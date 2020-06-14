@@ -1,6 +1,6 @@
-IN: tools.errors
-USING: help.markup help.syntax source-files.errors words io
-compiler.errors classes strings ;
+USING: classes compiler.errors help.markup help.syntax
+source-files.errors strings tools.errors words ;
+IN: tools.errors+docs
 
 ARTICLE: "compiler-errors" "Compiler errors"
 "After loading a vocabulary, you might see a message like:"

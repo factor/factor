@@ -1,7 +1,7 @@
 USING: generic help.markup help.syntax kernel math
 memory namespaces sequences kernel+private classes
-classes.builtin sequences+private ;
-IN: layouts
+classes.builtin sequences+private layouts ;
+IN: layouts+docs
 
 HELP: tag-bits
 { $var-description "Number of least significant bits reserved for a type tag in a tagged pointer." }

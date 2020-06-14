@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: audio.engine destructors help.markup help.syntax
+USING: audio.engine audio.vorbis destructors help.markup help.syntax
 io.files kernel math strings ;
-IN: audio.vorbis
+IN: audio.vorbis+docs
 
 HELP: <vorbis-stream>
 { $values

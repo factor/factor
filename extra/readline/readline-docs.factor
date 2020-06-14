@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays help.markup help.syntax math
 sequences+private vectors strings kernel math.order layouts
-quotations generic.single ;
-IN: readline
+quotations generic.single readline ;
+IN: readline+docs
 
 HELP: readline
 { $values

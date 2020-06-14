@@ -1,5 +1,6 @@
-USING: arrays help.markup help.syntax math sequences ;
-IN: compiler.cfg.linear-scan.ranges
+USING: arrays compiler.cfg.linear-scan.ranges help.markup
+help.syntax math sequences ;
+IN: compiler.cfg.linear-scan.ranges+docs
 
 HELP: add-range
 { $values { "from" integer } { "to" integer } { "ranges" sequence } }

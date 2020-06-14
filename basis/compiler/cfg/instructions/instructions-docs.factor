@@ -1,10 +1,12 @@
 USING: alien arrays assocs byte-arrays classes combinators
-compiler.cfg compiler.cfg.builder compiler.cfg.intrinsics.fixnum
+compiler.cfg compiler.cfg.builder compiler.cfg.instructions
+compiler.cfg.intrinsics.fixnum
 compiler.cfg.linear-scan.assignment compiler.cfg.liveness
 compiler.cfg.ssa.destruction compiler.cfg.value-numbering
-compiler.codegen.gc-maps compiler.tree cpu.architecture help.markup
-help.syntax kernel layouts math sequences slots+private system vm ;
-IN: compiler.cfg.instructions
+compiler.codegen.gc-maps compiler.tree cpu.architecture
+help.markup help.syntax kernel layouts math sequences
+slots+private system vm ;
+IN: compiler.cfg.instructions+docs
 
 HELP: ##alien-invoke
 { $class-description

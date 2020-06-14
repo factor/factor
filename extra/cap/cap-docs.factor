@@ -1,5 +1,5 @@
 USING: cap help.markup help.syntax images opengl ui.gadgets.worlds ;
-IN: cap
+IN: cap+docs
 
 HELP: screenshot.
   { $values { "window" world } }

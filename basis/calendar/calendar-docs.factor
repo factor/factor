@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math strings help.markup help.syntax
-math.order ;
-IN: calendar
+USING: arrays calendar help.markup help.syntax kernel math
+math.order strings ;
+IN: calendar+docs
 
 HELP: duration
 { $description "A duration is a period of time years, months, days, hours, minutes, and seconds. All duration slots can store " { $link real } " numbers. Compare two durations with the " { $link <=> } " word." } ;

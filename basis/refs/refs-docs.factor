@@ -1,7 +1,8 @@
 ! Copyright (C) 2007 Slava Pestov, 2009 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: boxes help.markup help.syntax kernel math namespaces assocs ;
-IN: refs
+USING: assocs boxes help.markup help.syntax kernel math
+namespaces refs ;
+IN: refs+docs
 
 ARTICLE: "refs" "References"
 "References provide a uniform way of accessing and changing values. Some examples of referenced values are variables, tuple slots, and keys or values of assocs. References can be read, written, and deleted. References are defined in the " { $vocab-link "refs" } " vocabulary, and new reference types can be made by implementing a protocol."

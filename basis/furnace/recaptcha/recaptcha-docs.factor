@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax http.server.filters kernel
-multiline furnace.actions furnace.alloy furnace.conversations ;
-IN: furnace.recaptcha
+USING: furnace.actions furnace.alloy furnace.conversations
+furnace.recaptcha help.markup help.syntax http.server.filters
+kernel multiline ;
+IN: furnace.recaptcha+docs
 
 HELP: <recaptcha>
 { $values

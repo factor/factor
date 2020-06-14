@@ -1,5 +1,6 @@
-USING: compiler.tree help.markup help.syntax ;
-IN: compiler.tree.escape-analysis.nodes
+USING: compiler.tree compiler.tree.escape-analysis.nodes
+help.markup help.syntax ;
+IN: compiler.tree.escape-analysis.nodes+docs
 
 HELP: escape-analysis*
 { $values { "node" node } }

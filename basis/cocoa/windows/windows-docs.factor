@@ -1,5 +1,5 @@
 USING: help.markup help.syntax ;
-IN: cocoa.windows
+IN: cocoa.windows+docs
 
 HELP: <NSWindow>
 { $values { "rect" "an " { $snippet "NSRect" } } { "style" "a style mask" } { "class" "an Objective-C class" } { "window" "an " { $snippet "NSWindow" } } }

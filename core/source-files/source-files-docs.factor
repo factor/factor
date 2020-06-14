@@ -1,6 +1,6 @@
 USING: help.markup help.syntax vocabs.loader io.pathnames strings
-definitions quotations compiler.units ;
-IN: source-files
+definitions quotations compiler.units source-files ;
+IN: source-files+docs
 
 ARTICLE: "source-files" "Source files"
 "Words in the " { $vocab-link "source-files" } " vocabulary are used to keep track of loaded source files. This is used to implement " { $link "vocabs.refresh" } "."

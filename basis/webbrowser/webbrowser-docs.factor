@@ -1,9 +1,7 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-
-USING: help.markup help.syntax kernel present strings ;
-
-IN: webbrowser
+USING: help.markup help.syntax kernel present strings webbrowser ;
+IN: webbrowser+docs
 
 HELP: open-item
 { $values { "item" object } }

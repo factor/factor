@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup ;
-IN: io.encodings.strict
+USING: help.syntax help.markup io.encodings.strict ;
+IN: io.encodings.strict+docs
 
 HELP: strict
 { $values { "code" "an encoding descriptor" } { "strict-state" "a strict encoding descriptor" } }

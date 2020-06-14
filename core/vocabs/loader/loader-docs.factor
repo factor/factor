@@ -1,6 +1,6 @@
-USING: vocabs vocabs.loader+private help.markup help.syntax
+USING: vocabs vocabs.loader vocabs.loader+private help.markup help.syntax
 words strings io hashtables ;
-IN: vocabs.loader
+IN: vocabs.loader+docs
 
 ARTICLE: "add-vocab-roots" "Working with code outside of the Factor source tree"
 "You can work with code outside of the Factor source tree by adding additional directories to the list of vocabulary roots."

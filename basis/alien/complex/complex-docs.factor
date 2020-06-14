@@ -1,5 +1,5 @@
-USING: help.markup help.syntax math ;
-IN: alien.complex
+USING: alien.complex help.markup help.syntax math ;
+IN: alien.complex+docs
 
 HELP: complex-float
 { $description "This C type represents a single-precision IEEE 754 floating-point complex type. Input values will be converted from Factor " { $link complex } " objects into a single-precision complex float type; output values will be returned as Factor " { $link complex } " objects." } ;

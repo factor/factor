@@ -1,5 +1,5 @@
-USING: help.syntax help.markup strings unicode ;
-IN: unicode.breaks
+USING: help.syntax help.markup strings unicode unicode.breaks ;
+IN: unicode.breaks+docs
 
 ABOUT: "unicode.breaks"
 

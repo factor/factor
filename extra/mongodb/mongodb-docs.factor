@@ -1,5 +1,5 @@
-USING: assocs help.markup help.syntax kernel quotations ;
-IN: mongodb
+USING: assocs help.markup help.syntax kernel mongodb quotations ;
+IN: mongodb+docs
 
 ARTICLE: "mongodb" "MongoDB factor integration"
 "The " { $vocab-link "mongodb" } " vocabulary provides two different interfaces to the MongoDB document-oriented database"

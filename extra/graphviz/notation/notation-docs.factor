@@ -1,8 +1,8 @@
 ! Copyright (C) 2011 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: graphviz graphviz.attributes help.markup help.syntax
-kernel present sequences ;
-IN: graphviz.notation
+kernel present sequences graphviz.notation ;
+IN: graphviz.notation+docs
 
 { add-edge [add-edge -- ~-- [-- } related-words
 { add-edge [add-edge -> ~-> [-> } related-words

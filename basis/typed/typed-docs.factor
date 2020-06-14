@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays effects help.markup help.syntax locals math quotations words ;
-IN: typed
+USING: arrays effects help.markup help.syntax locals math
+quotations typed words ;
+IN: typed+docs
 
 HELP: TYPED:
 { $syntax
@@ -13,7 +14,7 @@ HELP: TYPED:
 "A version of " { $link + } " specialized for floats, converting other real number types:"
 { $example
 "USING: math prettyprint typed ;
-IN: scratchpad
+IN: typed+examples
 
 TYPED: add-floats ( a: float b: float -- c: float )
     + ;
@@ -31,7 +32,7 @@ HELP: TYPED::
 "A version of the quadratic formula specialized for floats, converting other real number types:"
 { $example
 "USING: kernel math math.libm prettyprint typed ;
-IN: scratchpad
+IN: typed+examples
 <<
 TYPED:: quadratic-roots ( a: float b: float c: float -- q1: float q2: float )
     b neg

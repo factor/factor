@@ -1,5 +1,5 @@
-IN: tuple-arrays
-USING: help.markup help.syntax sequences ;
+USING: help.markup help.syntax sequences tuple-arrays ;
+IN: tuple-arrays+docs
 
 HELP: TUPLE-ARRAY:
 { $syntax "TUPLE-ARRAY: class" }

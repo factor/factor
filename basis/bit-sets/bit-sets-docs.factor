@@ -1,5 +1,5 @@
-USING: help.markup help.syntax sequences math ;
-IN: bit-sets
+USING: bit-sets help.markup help.syntax math sequences ;
+IN: bit-sets+docs
 
 ARTICLE: "bit-sets" "Bit sets"
 "The " { $vocab-link "bit-sets" } " vocabulary implements bit-array-backed sets. Bitsets are efficient for implementing relatively dense sets whose members are in a contiguous range of integers starting from 0. One bit is required for each integer in this range in the underlying representation." $nl

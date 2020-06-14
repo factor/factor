@@ -1,5 +1,6 @@
-USING: help.syntax help.markup io byte-arrays quotations ;
-IN: io.streams.byte-array
+USING: byte-arrays help.markup help.syntax io
+io.streams.byte-array quotations ;
+IN: io.streams.byte-array+docs
 
 ABOUT: "io.streams.byte-array"
 

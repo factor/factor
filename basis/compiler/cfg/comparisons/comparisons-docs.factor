@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ;
-IN: compiler.cfg.comparisons
+USING: compiler.cfg.comparisons help.markup help.syntax ;
+IN: compiler.cfg.comparisons+docs
 
 HELP: cc/o
 { $description "Not overflow condition." } ;

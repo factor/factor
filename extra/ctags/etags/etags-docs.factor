@@ -1,5 +1,6 @@
-USING: help.syntax help.markup kernel prettyprint sequences strings words math ;
-IN: ctags.etags
+USING: ctags.etags help.syntax help.markup kernel prettyprint sequences
+strings words math ;
+IN: ctags.etags+docs
 
 ARTICLE: "etags" "Etags file"
 { $emphasis "Etags" } " generates a index file of every factor word in etags format as supported by emacs and other editors. More information can be found at " { $url "http://en.wikipedia.org/wiki/Ctags#Etags_2" } "."

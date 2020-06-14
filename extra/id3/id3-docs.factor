@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Tim Wawrzynczak
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax sequences kernel accessors
-id3+private strings ;
-IN: id3
+id3+private strings id3 ;
+IN: id3+docs
 
 HELP: mp3>id3
 { $values

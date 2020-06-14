@@ -1,5 +1,7 @@
-USING: compiler.cfg.instructions cpu.x86 help.markup help.syntax layouts math ;
-IN: compiler.cfg.stack-frame
+USING: assocs compiler.cfg compiler.cfg.build-stack-frame
+compiler.cfg.instructions compiler.cfg.stack-frame cpu.x86
+help.markup help.syntax kernel layouts math ;
+IN: compiler.cfg.build-stack-frame+docs
 
 HELP: stack-frame
 { $class-description "Counts in bytes of the various sizes of the blocks of the stack frame. The stack frame is organized in the following fashion, from bottom to top:"

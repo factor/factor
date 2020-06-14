@@ -1,5 +1,5 @@
-USING: help.markup help.syntax math ;
-IN: math.combinators
+USING: help.markup help.syntax math math.combinators ;
+IN: math.combinators+docs
 
 HELP: when-negative
 { $values { "n" real } { "quot" "the first quotation of an " { $link if-negative } } }

@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ;
-IN: colors.hsl
+USING: colors.hsl help.markup help.syntax ;
+IN: colors.hsl+docs
 
 HELP: hsla
 { $class-description "The class of HSL (Hue, Saturation, Lightness) colors with an alpha channel. All slots store values in the interval " { $snippet "[0,1]" } "." } ;

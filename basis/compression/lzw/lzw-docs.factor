@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Keith Lazuka
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bitstreams byte-arrays classes help.markup help.syntax
-kernel math quotations sequences ;
-IN: compression.lzw
+USING: bitstreams byte-arrays classes compression.lzw
+help.markup help.syntax kernel math quotations sequences ;
+IN: compression.lzw+docs
 
 HELP: gif-lzw-uncompress
 { $values

@@ -1,6 +1,6 @@
-USING: help.markup help.syntax ui.gadgets ui.gadgets.labels
-ui.gadgets.toolbar ui.pens kernel models classes ;
-IN: ui.gadgets.buttons
+USING: classes help.markup help.syntax kernel models ui.gadgets
+ui.gadgets.buttons ui.gadgets.labels ui.gadgets.toolbar ui.pens ;
+IN: ui.gadgets.buttons+docs
 
 HELP: button
 { $class-description "A button is a " { $link gadget } " which responds to mouse clicks by invoking a quotation."

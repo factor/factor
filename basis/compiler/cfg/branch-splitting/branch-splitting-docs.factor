@@ -1,5 +1,7 @@
-USING: compiler.cfg compiler.cfg.utilities help.markup help.syntax ;
-IN: compiler.cfg.branch-splitting
+USING: compiler.cfg compiler.cfg.branch-splitting
+compiler.cfg.utilities help.markup help.syntax kernel sequences
+splitting strings ;
+IN: compiler.cfg.branch-splitting+docs
 
 HELP: clone-basic-block
 { $values { "bb" basic-block } { "bb'" basic-block } }

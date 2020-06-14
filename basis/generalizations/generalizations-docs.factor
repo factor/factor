@@ -1,6 +1,6 @@
-USING: help.syntax help.markup kernel sequences quotations
-math arrays combinators ;
-IN: generalizations
+USING: arrays combinators generalizations help.markup
+help.syntax kernel math quotations sequences ;
+IN: generalizations+docs
 
 HELP: nsum
 { $values { "n" integer } }

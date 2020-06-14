@@ -1,2 +1,2 @@
 USING: compiler.tree help.markup help.syntax words ;
-IN: compiler.cfg.intrinsics
+IN: compiler.cfg.intrinsics+docs

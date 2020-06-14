@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup kernel ;
-IN: channels
+USING: channels help.markup help.syntax kernel ;
+IN: channels+docs
 
 HELP: <channel>
 { $values { "channel" channel }

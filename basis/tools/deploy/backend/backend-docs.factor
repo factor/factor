@@ -1,5 +1,6 @@
-USING: assocs help.markup help.syntax strings ;
-IN: tools.deploy.backend
+USING: assocs help.markup help.syntax strings
+tools.deploy.backend ;
+IN: tools.deploy.backend+docs
 
 HELP: make-deploy-image
 { $values

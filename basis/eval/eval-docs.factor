@@ -1,6 +1,6 @@
-IN: eval
-USING: help.markup help.syntax strings io effects parser
-listener vocabs.parser debugger combinators ;
+USING: combinators debugger effects eval help.markup help.syntax
+io listener parser strings vocabs.parser ;
+IN: eval+docs
 
 HELP: (eval)
 { $values { "str" string } { "effect" effect } }

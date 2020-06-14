@@ -1,5 +1,6 @@
-IN: tools.walker
-USING: help.syntax help.markup tools.annotations tools.continuations sequences math words ;
+USING: help.markup help.syntax math sequences tools.annotations
+tools.continuations tools.walker words ;
+IN: tools.walker+docs
 
 HELP: breakpoint
 { $values { "word" word } }

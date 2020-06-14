@@ -1,6 +1,7 @@
 USING: help.markup help.syntax kernel math.rectangles models
-opengl.gl ui.gadgets ui.gadgets.worlds ui.gestures ui.pens ;
-IN: ui.render
+opengl.gl ui.gadgets ui.gadgets.worlds ui.gestures ui.pens
+ui.render ;
+IN: ui.render+docs
 
 HELP: clip
 { $var-description "The current clipping rectangle." } ;

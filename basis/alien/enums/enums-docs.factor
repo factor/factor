@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax help.markup help.syntax words ;
-IN: alien.enums
+USING: alien.c-types alien.enums alien.syntax help.markup help.syntax
+words ;
+IN: alien.enums+docs
 
 HELP: define-enum
 { $values

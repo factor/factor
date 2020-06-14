@@ -1,6 +1,6 @@
-USING: help.markup help.syntax ui.commands
-ui.gadgets.panes ui.gadgets.editors ui.tools.inspector.slots kernel ;
-IN: ui.tools.inspector
+USING: help.markup help.syntax kernel ui.commands
+ui.gadgets.panes ui.tools.inspector ui.tools.inspector.slots ;
+IN: ui.tools.inspector+docs
 
 ARTICLE: "ui-inspector-edit" "Editing slot values in the inspector"
 "Slot values can be edited in the inspector. Clicking the ellipsis to the left of the slot's textual representation displays a slot editor gadget. A text representation of the object can be edited in the slot editor. The parser is used to turn the text representation back into an object. Keep in mind that some structure is lost in the conversion; see " { $link "prettyprint-limitations" } "."

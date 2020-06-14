@@ -1,5 +1,6 @@
-IN: logging.parser
-USING: help.markup help.syntax assocs logging math calendar ;
+USING: assocs calendar help.markup help.syntax logging
+logging.parser math ;
+IN: logging.parser+docs
 
 HELP: parse-log
 { $values { "lines" "a sequence of strings" } { "entries" "a sequence of log entries" } }

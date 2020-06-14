@@ -1,5 +1,6 @@
-IN: hints
-USING: help.markup help.syntax words quotations sequences kernel ;
+USING: help.markup help.syntax hints kernel quotations sequences
+words ;
+IN: hints+docs
 
 ARTICLE: "hints" "Compiler specialization hints"
 "Specialization hints help the compiler generate efficient code."

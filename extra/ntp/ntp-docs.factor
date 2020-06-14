@@ -1,9 +1,7 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-
 USING: help.syntax help.markup ntp ntp+private strings ;
-
-IN: ntp
+IN: ntp+docs
 
 HELP: <ntp>
 { $values { "host" string } { "ntp" ntp } }

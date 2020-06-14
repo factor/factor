@@ -1,6 +1,6 @@
-USING: assocs help.markup help.syntax kernel
-tools.deploy.config ;
-IN: tools.deploy.config.editor
+USING: assocs help.markup help.syntax kernel tools.deploy.config
+tools.deploy.config.editor ;
+IN: tools.deploy.config.editor+docs
 
 ARTICLE: "deploy-config" "Deployment configuration"
 "The deployment configuration is a key/value mapping stored in the " { $snippet "deploy.factor" } " file in the vocabulary's directory. If this file does not exist, the default deployment configuration is used:"

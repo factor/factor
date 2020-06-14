@@ -1,6 +1,6 @@
-USING: assocs help.markup help.syntax kernel quotations strings
-;
-IN: html.forms
+USING: assocs help.markup help.syntax html.forms kernel
+quotations strings ;
+IN: html.forms+docs
 
 HELP: <form>
 { $values { "form" form } }

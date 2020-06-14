@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel strings ;
-IN: db.types
+USING: db.types help.markup help.syntax kernel strings ;
+IN: db.types+docs
 
 HELP: +db-assigned-id+
 { $description "The database assigns a primary key to the object. The primary key is most likely a big integer, but is database-dependent." } ;

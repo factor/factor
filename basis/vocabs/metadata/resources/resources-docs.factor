@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax strings ;
-IN: vocabs.metadata.resources
+USING: help.markup help.syntax kernel present strings
+vocabs.metadata.resources webbrowser ;
+IN: vocabs.metadata.resources+docs
 
 HELP: copy-vocab-resources
 { $values { "dir" string } { "vocab" string } }

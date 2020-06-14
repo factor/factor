@@ -1,8 +1,8 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel math quotations
-classes.struct ;
-IN: alien.endian
+USING: alien.endian classes.struct help.markup help.syntax
+kernel math quotations ;
+IN: alien.endian+docs
 
 HELP: BE-PACKED-STRUCT:
 { $description "Defines a packed " { $link struct } " where endian-unaware types become big-endian types. Note that endian-aware types will override the big-endianness of this " { $link struct } " declaration; little-endian types will stay little-endian. On big-endian platforms, the endian-unaware types will not change since they are the correct endianness already." }

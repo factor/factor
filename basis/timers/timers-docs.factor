@@ -1,5 +1,5 @@
-USING: help.markup help.syntax calendar quotations system ;
-IN: timers
+USING: calendar help.markup help.syntax quotations system timers ;
+IN: timers+docs
 
 HELP: timer
 { $class-description "A timer. Can be passed to " { $link start-timer } ", " { $link stop-timer } " and " { $link restart-timer } "." } ;

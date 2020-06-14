@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Joe Groff
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel quotations sequences strings words.symbol classes.struct ;
+USING: alien.fortran classes.struct help.markup help.syntax
+sequences strings words.symbol ;
 QUALIFIED-WITH: alien.syntax c
-IN: alien.fortran
+IN: alien.fortran+docs
 
 ARTICLE: "alien.fortran-abis" "Fortran ABIs"
 "Fortran does not have a standard ABI like C does. Factor supports the following Fortran ABIs:"

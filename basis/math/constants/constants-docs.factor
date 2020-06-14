@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel ;
-IN: math.constants
+USING: help.markup help.syntax kernel math.constants ;
+IN: math.constants+docs
 
 ARTICLE: "math-constants" "Constants"
 "Standard mathematical constants:"

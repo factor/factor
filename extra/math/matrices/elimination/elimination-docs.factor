@@ -1,6 +1,6 @@
-USING: help.markup help.syntax math sequences ;
+USING: help.markup help.syntax math math.matrices.elimination sequences ;
 
-IN: math.matrices.elimination
+IN: math.matrices.elimination+docs
 
 HELP: inverse
 { $values { "matrix" sequence } }

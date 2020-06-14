@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
-IN: env
+USING: env help.markup help.syntax ;
+IN: env+docs
 
 HELP: env
 { $class-description "A singleton that implements the " { $link "assocs-protocol" } " over " { $link "environment" } "." } ;

@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel quotations help.syntax help.markup
-io.sockets strings calendar io.encodings.utf8 ;
-IN: smtp
+USING: help.markup help.syntax io.encodings.utf8 io.sockets
+quotations smtp strings ;
+IN: smtp+docs
 
 HELP: smtp-config
 { $class-description "An SMTP configuration object, with the following slots:"

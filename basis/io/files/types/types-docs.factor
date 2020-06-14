@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ;
-IN: io.files.types
+USING: help.markup help.syntax io.files.types ;
+IN: io.files.types+docs
 
 HELP: +regular-file+
 { $description "A regular file. This type exists on all platforms. See " { $link "io.files" } " for words operating on files." } ;

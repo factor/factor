@@ -4,7 +4,7 @@
 USING: help.syntax help.markup io.sockets math memcached
 quotations sequences strings ;
 
-IN: memcached
+IN: memcached+docs
 
 HELP: memcached-server
 { $var-description

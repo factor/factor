@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 Björn Lindqvist.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax strings ;
-IN: ldcache
+USING: help.markup help.syntax ldcache strings ;
+IN: ldcache+docs
 
 HELP: search
 { $values

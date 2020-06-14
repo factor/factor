@@ -1,5 +1,6 @@
-USING: compiler.cfg help.markup help.syntax ;
-IN: compiler.cfg.loop-detection
+USING: compiler.cfg compiler.cfg.loop-detection help.markup
+help.syntax ;
+IN: compiler.cfg.loop-detection+docs
 
 HELP: needs-loops
 { $values { "cfg" cfg } }

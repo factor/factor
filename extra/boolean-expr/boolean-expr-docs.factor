@@ -1,7 +1,8 @@
 ! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays help.markup help.syntax kernel quotations sequences ;
-IN: boolean-expr
+USING: arrays boolean-expr help.markup help.syntax kernel quotations
+sequences ;
+IN: boolean-expr+docs
 
 ABOUT: "boolean-expr"
 

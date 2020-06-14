@@ -1,6 +1,6 @@
-USING: help.markup help.syntax kernel quotations
-deques search-deques hashtables ;
-IN: dlists
+USING: deques dlists hashtables help.markup help.syntax kernel
+quotations search-deques ;
+IN: dlists+docs
 
 ARTICLE: "dlists" "Double-linked lists"
 "A double-linked list is the canonical implementation of a " { $link deque } "."

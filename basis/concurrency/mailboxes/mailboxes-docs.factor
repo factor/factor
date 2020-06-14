@@ -1,5 +1,6 @@
-USING: help.markup help.syntax kernel calendar sequences ;
-IN: concurrency.mailboxes
+USING: calendar concurrency.mailboxes help.markup help.syntax
+kernel sequences ;
+IN: concurrency.mailboxes+docs
 
 HELP: <mailbox>
 { $values { "mailbox" mailbox } }

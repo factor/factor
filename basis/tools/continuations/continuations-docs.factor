@@ -1,5 +1,5 @@
-IN: tools.continuations
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax tools.continuations ;
+IN: tools.continuations+docs
 
 HELP: break
 { $description "A breakpoint. When this word is executed, the walker tool opens with execution suspended at the breakpoint's location." }

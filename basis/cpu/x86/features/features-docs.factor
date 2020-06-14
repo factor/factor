@@ -1,7 +1,8 @@
 ! Copyright (C) 2017 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel math quotations strings ;
-IN: cpu.x86.features
+USING: cpu.x86.features help.markup help.syntax kernel math
+quotations strings ;
+IN: cpu.x86.features+docs
 
 HELP: instruction-count
 { $values

@@ -1,5 +1,5 @@
-USING: assocs help.markup help.syntax trees ;
-IN: trees.avl
+USING: assocs help.markup help.syntax trees trees.avl ;
+IN: trees.avl+docs
 
 HELP: AVL{
 { $syntax "AVL{ { key value }... }" }

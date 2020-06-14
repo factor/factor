@@ -1,5 +1,5 @@
-USING: help.markup help.syntax io.files.info math ;
-IN: io.files.links
+USING: help.markup help.syntax io.files.info io.files.links math ;
+IN: io.files.links+docs
 
 HELP: make-link
 { $values { "target" "a path to the symbolic link's target" } { "symlink" "a path to new symbolic link" } }

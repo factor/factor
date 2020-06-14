@@ -1,7 +1,7 @@
 ! Copyright (C) 2018 Björn Lindqvist.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
-IN: oauth2
+USING: help.markup help.syntax oauth2 ;
+IN: oauth2+docs
 
 ARTICLE: "oauth2" "Oauth2 Support"
 "The " { $vocab-link "oauth2" } " vocab implements client support for the Oauth2 protocol."

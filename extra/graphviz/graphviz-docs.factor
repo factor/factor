@@ -1,8 +1,8 @@
 ! Copyright (C) 2011 Alex Vondrak.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays graphviz.attributes help.markup
-help.syntax kernel present sequences strings ;
-IN: graphviz
+help.syntax kernel present sequences strings graphviz ;
+IN: graphviz+docs
 
 { subgraph <subgraph> <anon> <cluster> } related-words
 { graph <graph> <digraph> <strict-graph> <strict-digraph> } related-words

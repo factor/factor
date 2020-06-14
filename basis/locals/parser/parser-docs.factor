@@ -1,6 +1,6 @@
-USING: help.markup help.syntax locals locals.types quotations strings
-vocabs.parser ;
-IN: locals.parser
+USING: help.markup help.syntax locals locals.parser locals.types
+quotations strings vocabs.parser ;
+IN: locals.parser+docs
 
 HELP: in-lambda?
 { $var-description { $link t } " if we're currently parsing a lambda with lexical variables." } ;

@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax io.streams.string kernel
-strings ;
-IN: crypto.passwd-md5
+USING: crypto.passwd-md5 help.markup help.syntax io.streams.string
+kernel strings ;
+IN: crypto.passwd-md5+docs
 
 HELP: authenticate-password
 { $values

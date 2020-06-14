@@ -1,5 +1,6 @@
-USING: help.markup help.syntax math sequences ;
-IN: compiler.cfg.representations.selection
+USING: compiler.cfg.representations.selection help.markup
+help.syntax math sequences ;
+IN: compiler.cfg.representations.selection+docs
 
 HELP: costs
 { $var-description "Maps vreg to representation to cost. The costs for each vreg is represented as a hashtable where the keys are representation singletons and the values the costs of using that representation." } ;

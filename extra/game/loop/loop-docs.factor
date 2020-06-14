@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel math ui.gadgets.worlds ;
-IN: game.loop
+USING: help.markup help.syntax kernel math ui.gadgets.worlds game.loop ;
+IN: game.loop+docs
 
 HELP: fps
 { $values { "fps" real } { "nanos" integer } }

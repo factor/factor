@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel words ;
-IN: tools.deprecation
+USING: help.markup help.syntax kernel tools.deprecation words ;
+IN: tools.deprecation+docs
 
 HELP: :deprecations
 { $description "Prints all deprecation notes." } ;

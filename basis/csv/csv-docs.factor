@@ -1,5 +1,6 @@
-USING: help.markup help.syntax io.pathnames quotations strings ;
-IN: csv
+USING: csv help.markup help.syntax io.pathnames quotations
+strings ;
+IN: csv+docs
 
 HELP: read-row
 { $values { "row" "an array of fields" } }

@@ -1,5 +1,5 @@
-USING: arrays assocs help.markup help.syntax kernel math ;
-IN: trees
+USING: arrays assocs help.markup help.syntax kernel math trees ;
+IN: trees+docs
 
 HELP: TREE{
 { $syntax "TREE{ { key value }... }" }

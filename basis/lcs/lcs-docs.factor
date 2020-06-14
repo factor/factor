@@ -1,5 +1,5 @@
-USING: help.syntax help.markup sequences ;
-IN: lcs
+USING: help.syntax help.markup lcs sequences ;
+IN: lcs+docs
 
 HELP: levenshtein
 { $values { "old" sequence } { "new" sequence } { "n" "the Levenshtein distance" } }

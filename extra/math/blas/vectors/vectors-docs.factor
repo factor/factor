@@ -1,5 +1,6 @@
-USING: alien byte-arrays help.markup help.syntax math sequences ;
-IN: math.blas.vectors
+USING: alien byte-arrays help.markup help.syntax math math.blas.vectors
+sequences ;
+IN: math.blas.vectors+docs
 
 ARTICLE: "math.blas.vectors" "BLAS interface vector operations"
 "Slicing vectors:"

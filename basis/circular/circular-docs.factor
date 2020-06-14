@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax io.streams.string sequences
-math kernel quotations ;
-IN: circular
+USING: circular help.markup help.syntax io.streams.string kernel
+math quotations sequences ;
+IN: circular+docs
 
 HELP: <circular-string>
 { $values

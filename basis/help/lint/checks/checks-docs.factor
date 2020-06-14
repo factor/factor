@@ -1,5 +1,5 @@
-USING: help.markup help.syntax sequences words ;
-IN: help.lint.checks
+USING: help.lint.checks help.markup help.syntax sequences words ;
+IN: help.lint.checks+docs
 
 HELP: check-example
 { $values { "element" sequence } }

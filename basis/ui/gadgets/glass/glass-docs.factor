@@ -1,6 +1,6 @@
-USING: help.markup help.syntax kernel math.rectangles
-ui.gadgets ;
-IN: ui.gadgets.glass
+USING: help.markup help.syntax kernel math.rectangles ui.gadgets
+ui.gadgets.glass ;
+IN: ui.gadgets.glass+docs
 
 HELP: show-glass
 { $values { "owner" gadget } { "child" gadget } { "visible-rect" rect } }

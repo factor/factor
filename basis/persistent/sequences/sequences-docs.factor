@@ -1,5 +1,6 @@
-IN: persistent.sequences
-USING: help.markup help.syntax math sequences kernel ;
+USING: help.markup help.syntax math persistent.sequences sequences
+kernel ;
+IN: persistent.sequences+docs
 
 HELP: new-nth
 { $values { "val" object } { "i" integer } { "seq" sequence } { "seq'" sequence } }

@@ -1,7 +1,7 @@
 USING: alien alien.libraries arrays continuations generic.math
 generic.single help help.markup help.syntax io kernel math
-quotations sbufs strings vectors ;
-IN: debugger
+quotations sbufs strings vectors debugger ;
+IN: debugger+docs
 
 ARTICLE: "debugger" "The debugger"
 "Caught errors can be logged in human-readable form:"

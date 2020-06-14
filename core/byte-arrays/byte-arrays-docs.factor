@@ -1,5 +1,5 @@
-USING: kernel help.markup help.syntax sequences ;
-IN: byte-arrays
+USING: byte-arrays kernel help.markup help.syntax sequences ;
+IN: byte-arrays+docs
 
 ARTICLE: "byte-arrays" "Byte arrays"
 "Byte arrays are fixed-size mutable sequences (" { $link "sequence-protocol" } ") whose elements are integers in the range 0-255, inclusive. Each element only uses one byte of storage, hence the name. The literal syntax is covered in " { $link "syntax-byte-arrays" } "."

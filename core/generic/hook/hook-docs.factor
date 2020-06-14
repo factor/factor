@@ -1,6 +1,6 @@
-USING: generic generic.single generic.standard help.markup help.syntax sequences math
-math.parser effects ;
-IN: generic.hook
+USING: generic generic.hook generic.single generic.standard help.markup
+help.syntax sequences math math.parser effects ;
+IN: generic.hook+docs
 
 HELP: hook-combination
 { $class-description

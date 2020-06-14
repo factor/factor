@@ -1,7 +1,7 @@
-USING: arrays help.crossref help.lint help.markup
+USING: arrays help help.crossref help.lint help.markup
 help.stylesheet help.syntax help.topics io kernel math
 prettyprint quotations see sequences strings summary vocabs ;
-IN: help
+IN: help+docs
 
 ARTICLE: "printing-elements" "Printing markup elements"
 "When writing documentation, it is useful to be able to print markup elements for testing purposes. Markup elements which are strings or arrays of elements are printed in the obvious way. Markup elements of the form " { $snippet "{ $directive content... }" } " are printed by executing the " { $snippet "$directive" } " word with the element content on the stack."
@@ -83,7 +83,7 @@ ARTICLE: "element-types" "Element types"
     "markup-utils"
 } ;
 
-IN: help.markup
+IN: help.markup+docs
 ABOUT: "element-types"
 
 ARTICLE: "writing-help" "Writing documentation"
@@ -157,7 +157,7 @@ ARTICLE: "help" "Help system"
     "help-impl"
 } ;
 
-IN: help
+IN: help+docs
 ABOUT: "help"
 
 HELP: $title

@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien byte-arrays help.markup help.syntax kernel math
+USING: alien audio byte-arrays help.markup help.syntax kernel math
 memory ;
-IN: audio
+IN: audio+docs
 
 HELP: <audio>
 { $values

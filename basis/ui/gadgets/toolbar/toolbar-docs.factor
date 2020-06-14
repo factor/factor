@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel ui.gadgets
-ui.gadgets.buttons ;
-IN: ui.gadgets.toolbar
+ui.gadgets.buttons ui.gadgets.toolbar ;
+IN: ui.gadgets.toolbar+docs
 
 HELP: <toolbar>
 { $values { "target" object } { "toolbar" gadget } }

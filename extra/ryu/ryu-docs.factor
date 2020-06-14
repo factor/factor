@@ -1,7 +1,7 @@
 ! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel math strings ;
-IN: ryu
+USING: help.markup help.syntax kernel math strings ryu ;
+IN: ryu+docs
 
 ABOUT: "ryu"
 

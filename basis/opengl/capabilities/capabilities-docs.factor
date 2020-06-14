@@ -1,6 +1,6 @@
-USING: help.markup help.syntax io kernel math quotations
-opengl.gl assocs ;
-IN: opengl.capabilities
+USING: assocs help.markup help.syntax io kernel math
+opengl.capabilities opengl.gl quotations ;
+IN: opengl.capabilities+docs
 
 HELP: gl-version
 { $values { "version" "The version string from the OpenGL implementation" } }

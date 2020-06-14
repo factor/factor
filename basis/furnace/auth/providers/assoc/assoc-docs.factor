@@ -1,5 +1,6 @@
-USING: help.markup help.syntax io.streams.string ;
-IN: furnace.auth.providers.assoc
+USING: furnace.auth.providers.assoc help.markup help.syntax
+io.streams.string ;
+IN: furnace.auth.providers.assoc+docs
 
 HELP: <users-in-memory>
 { $values { "provider" users-in-memory } }

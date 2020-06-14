@@ -1,5 +1,5 @@
-USING: help.markup help.syntax io math strings ;
-IN: interpolate
+USING: help.markup help.syntax interpolate io math strings ;
+IN: interpolate+docs
 
 HELP: interpolate
 { $values { "str" string } }

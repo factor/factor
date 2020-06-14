@@ -1,5 +1,5 @@
-USING: help.markup help.syntax images strings ;
-IN: images.loader
+USING: help.markup help.syntax images images.loader strings ;
+IN: images.loader+docs
 
 HELP: save-graphic-image
 { $values { "image" image } { "path" string } }

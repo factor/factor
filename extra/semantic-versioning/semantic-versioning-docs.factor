@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Maximilian Lupke.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays help.markup help.syntax kernel strings ;
-IN: semantic-versioning
+USING: arrays help.markup help.syntax kernel strings semantic-versioning ;
+IN: semantic-versioning+docs
 
 HELP: version<
 { $values

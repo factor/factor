@@ -1,5 +1,5 @@
-IN: effects.parser
-USING: strings effects help.markup help.syntax ;
+USING: effects effects.parser help.markup help.syntax strings ;
+IN: effects.parser+docs
 
 HELP: parse-effect
 { $values { "end" string } { "effect" "an instance of " { $link effect } } }

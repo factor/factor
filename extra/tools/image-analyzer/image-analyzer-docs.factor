@@ -1,5 +1,6 @@
-USING: assocs help.markup help.syntax sequences strings ;
-IN: tools.image-analyzer
+USING: assocs help.markup help.syntax sequences strings
+tools.image-analyzer ;
+IN: tools.image-analyzer+docs
 
 HELP: load-image
 { $values

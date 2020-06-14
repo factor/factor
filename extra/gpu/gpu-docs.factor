@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: gpu+private help.markup help.syntax ui.gadgets.worlds ;
-IN: gpu
+USING: gpu+private help.markup help.syntax ui.gadgets.worlds gpu ;
+IN: gpu+docs
 
 HELP: finish-gpu
 { $description "Waits for all outstanding GPU commands in the current graphics context to complete." } ;

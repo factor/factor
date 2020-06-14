@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
-IN: method-chains
+USING: help.markup help.syntax method-chains ;
+IN: method-chains+docs
 
 HELP: AFTER:
 { $syntax "AFTER: class generic

@@ -1,12 +1,12 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
-IN: slots.syntax
+USING: help.markup help.syntax slots.syntax ;
+IN: slots.syntax+docs
 
 HELP: slots[
 { $description "Outputs several slot values to the stack." }
 { $example "USING: kernel prettyprint slots.syntax ;"
-           "IN: slots.syntax.example"
+           "IN: slots.syntax+examples"
            "TUPLE: rectangle width height ;"
            "T{ rectangle { width 3 } { height 5 } } slots[ width height ] [ . ] bi@"
            "3
@@ -16,7 +16,7 @@ HELP: slots[
 HELP: slots{
 { $description "Outputs an array of slot values from a tuple." }
 { $example "USING: prettyprint slots.syntax ;"
-           "IN: slots.syntax.example"
+           "IN: slots.syntax+example"
            "TUPLE: rectangle width height ;"
            "T{ rectangle { width 3 } { height 5 } } slots{ width height } ."
            "{ 3 5 }"
@@ -25,7 +25,7 @@ HELP: slots{
 HELP: set-slots{
 { $description "Sets slot values in a tuple from an array." }
 { $example "USING: prettyprint slots.syntax kernel ;"
-           "IN: slots.syntax.example"
+           "IN: slots.syntax+example"
            "TUPLE: rectangle width height ;"
            "rectangle new { 3 5 } set-slots{ width height } ."
            "T{ rectangle { width 3 } { height 5 } }"
@@ -34,7 +34,7 @@ HELP: set-slots{
 HELP: set-slots[
 { $description "Sets slot values in a tuple from the stack." }
 { $example "USING: prettyprint slots.syntax kernel ;"
-           "IN: slots.syntax.example"
+           "IN: slots.syntax+example"
            "TUPLE: rectangle width height ;"
            "rectangle new 3 5 set-slots[ width height ] ."
            "T{ rectangle { width 3 } { height 5 } }"
@@ -43,7 +43,7 @@ HELP: set-slots[
 HELP: copy-slots{
 { $description "Copy slots from the first object to the second and return the second object." }
 { $example "USING: prettyprint slots.syntax kernel ;"
-           "IN: slots.syntax.example"
+           "IN: slots.syntax+example"
            "TUPLE: thing1 a b ;"
            "TUPLE: thing2 a b c ;"
            "1 2 thing1 boa 11 22 33 thing2 boa copy-slots{ a b } ."

@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ;
-IN: checksums.xxhash
+USING: checksums.xxhash help.markup help.syntax ;
+IN: checksums.xxhash+docs
 
 HELP: xxhash
 { $class-description "xxHash 32-bit checksum algorithm." } ;

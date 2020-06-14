@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax io.streams.string kernel quotations sequences strings math ;
-IN: unix.users
+USING: help.markup help.syntax kernel math quotations sequences
+strings unix.users ;
+IN: unix.users+docs
 
 HELP: all-users
 { $values { "seq" sequence } }

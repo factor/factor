@@ -1,5 +1,6 @@
-USING: help.markup help.syntax io.styles ;
-IN: ui.tools.listener.history
+USING: help.markup help.syntax io.styles
+ui.tools.listener.history ;
+IN: ui.tools.listener.history+docs
 
 HELP: history-add
 { $values { "history" history } { "input" input } }

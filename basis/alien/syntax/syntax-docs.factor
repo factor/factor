@@ -1,6 +1,6 @@
-IN: alien.syntax
 USING: alien alien.c-types alien.enums alien.libraries classes.struct
-help.markup help.syntax see ;
+help.markup help.syntax see alien.syntax ;
+IN: alien.syntax+docs
 
 HELP: DLL"
 { $syntax "DLL\" path\"" }

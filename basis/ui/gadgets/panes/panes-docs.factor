@@ -1,6 +1,6 @@
-USING: help.markup help.syntax io kernel models quotations ui.gadgets
-ui.gadgets.panes+private ;
-IN: ui.gadgets.panes
+USING: help.markup help.syntax io kernel models quotations
+ui.gadgets ui.gadgets.panes ui.gadgets.panes+private ;
+IN: ui.gadgets.panes+docs
 
 HELP: pane
 { $class-description "A pane " { $link gadget } " displays formatted text which is written to a " { $link pane-stream } " targetting the pane. Panes are created by calling " { $link <pane> } " or " { $link <pane-control> } ". Panes have the following slots"

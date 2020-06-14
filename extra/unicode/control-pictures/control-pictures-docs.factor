@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 Pi.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax strings ;
-IN: unicode.control-pictures
+USING: help.markup help.syntax strings unicode.control-pictures ;
+IN: unicode.control-pictures+docs
 
 HELP: control-pictures
 { $values

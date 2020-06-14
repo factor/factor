@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel ;
-IN: boxes
+USING: help.markup help.syntax kernel boxes ;
+IN: boxes+docs
 
 HELP: box
 { $class-description "A data type holding a single value in the " { $snippet "value" } " slot. The " { $snippet "occupied" } " slot indicates if the value is set." } ;

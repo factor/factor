@@ -1,5 +1,5 @@
-IN: disjoint-sets
-USING: help.markup help.syntax kernel assocs math ;
+USING: assocs disjoint-sets help.markup help.syntax kernel math ;
+IN: disjoint-sets+docs
 
 HELP: <disjoint-set>
 { $values { "disjoint-set" disjoint-set } }

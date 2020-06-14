@@ -1,7 +1,7 @@
 USING: compiler.tree effects help.markup help.syntax kernel math
-quotations sequences stack-checker.state stack-checker.values
-stack-checker.visitor words ;
-IN: stack-checker.backend
+quotations sequences stack-checker.backend stack-checker.state
+stack-checker.values stack-checker.visitor words ;
+IN: stack-checker.backend+docs
 
 HELP: consume-d
 { $values { "n" integer } { "seq" sequence } }

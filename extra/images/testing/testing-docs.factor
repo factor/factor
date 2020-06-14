@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Keith Lazuka.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax images images.viewer kernel
-quotations strings ;
-IN: images.testing
+quotations strings images.testing ;
+IN: images.testing+docs
 
 HELP: decode-test
 { $values

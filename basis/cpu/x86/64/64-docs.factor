@@ -1,5 +1,5 @@
-USING: help.markup help.syntax math vm ;
-IN: cpu.x86.64
+USING: cpu.x86.64 help.markup help.syntax math vm ;
+IN: cpu.x86.64+docs
 
 HELP: vm-reg
 { $values { "reg" "a register symbol" } }

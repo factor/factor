@@ -1,5 +1,6 @@
-USING: help.markup help.syntax ui.commands kernel ;
-IN: ui.gadgets.tables
+USING: help.markup help.syntax kernel ui.commands
+ui.gadgets.tables ;
+IN: ui.gadgets.tables+docs
 
 ARTICLE: "ui.gadgets.tables.renderers" "Table row renderer protocol"
 "Table gadgets use a row renderer to display rows and do a few other things."

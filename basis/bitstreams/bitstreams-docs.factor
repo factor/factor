@@ -1,7 +1,7 @@
-USING: help.markup help.syntax kernel strings math byte-arrays accessors ;
-IN: bitstreams
-
-
+USING: accessors bitstreams byte-arrays help.markup help.syntax
+kernel math ;
+QUALIFIED-WITH: bitstreams b
+IN: bitstreams+docs
 
 HELP: <lsb0-bit-reader>
 { $values { "bytes" byte-array } { "bs" bit-reader } }
@@ -23,7 +23,7 @@ HELP: seek
 { $values { "n" integer } { "bitstream" bit-reader } }
 { $description "Moves the read cursor of the bit-reader forward by n bits. Use a negative value of n to move the cursor back." } ;
 
-HELP: align
+HELP: b:align
 { $values { "n" integer } { "bitstream" bit-reader } }
 { $description "Moves the read cursor of the bit-reader forward until its position in bits from the start of the stream is an even multiple of n. If it is already such a multiple, the cursor is not moved at all." } ;
 

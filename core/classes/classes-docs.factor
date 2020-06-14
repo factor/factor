@@ -1,6 +1,6 @@
-USING: classes+private help.markup help.syntax kernel quotations
-sequences words ;
-IN: classes
+USING: classes classes+private help.markup help.syntax kernel
+quotations sequences words ;
+IN: classes+docs
 
 ARTICLE: "class-predicates" "Class predicate words"
 "With a handful of exceptions, each class has a membership predicate word, named " { $snippet { $emphasis "class" } "?" } ". A quotation calling this predicate is stored in the " { $snippet "\"predicate\"" } " word property."

@@ -1,5 +1,6 @@
-USING: help.markup help.syntax kernel sequences ;
-IN: compiler.tree.escape-analysis.check
+USING: compiler.tree.escape-analysis.check help.markup
+help.syntax kernel sequences ;
+IN: compiler.tree.escape-analysis.check+docs
 
 HELP: run-escape-analysis?
 { $values { "nodes" sequence } { "?" boolean } }

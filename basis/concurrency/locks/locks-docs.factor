@@ -1,6 +1,6 @@
-USING: help.markup help.syntax sequences kernel quotations
-calendar ;
-IN: concurrency.locks
+USING: calendar concurrency.locks help.markup help.syntax kernel
+quotations sequences ;
+IN: concurrency.locks+docs
 
 HELP: lock
 { $class-description "The class of mutual exclusion locks." } ;

@@ -1,5 +1,5 @@
-IN: io.pools
-USING: help.markup help.syntax destructors quotations ;
+USING: destructors help.markup help.syntax io.pools quotations ;
+IN: io.pools+docs
 
 HELP: pool
 { $class-description "A connection pool. Instances of this class are not intended to be instantiated directly, only subclasses should be instantiated, for example " { $link datagram-pool } "." } ;

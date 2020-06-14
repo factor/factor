@@ -1,6 +1,6 @@
 USING: help.syntax help.markup kernel math classes classes.tuple
-calendar models ;
-IN: models.product
+calendar models models.product ;
+IN: models.product+docs
 
 HELP: product
 { $class-description "Product model values are computed by collecting the values from a sequence of underlying models into a new sequence. Product models are automatically updated when underlying models change. Product models are constructed by " { $link <product> } "."

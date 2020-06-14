@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup regexp strings ;
-IN: regexp.combinators
+USING: help.syntax help.markup regexp regexp.combinators strings ;
+IN: regexp.combinators+docs
 
 ABOUT: "regexp.combinators"
 

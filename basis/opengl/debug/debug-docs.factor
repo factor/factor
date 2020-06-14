@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax tools.continuations ;
-IN: opengl.debug
+USING: help.markup help.syntax tools.continuations opengl.debug ;
+IN: opengl.debug+docs
 
 HELP: G
 { $description "Makes the OpenGL context associated with " { $link G-world } " active for subsequent OpenGL calls. This is intended to be used from the listener, where interactively entered OpenGL calls can be directed to any window. Note that the Factor UI resets the OpenGL context every time a window is updated, so every code snippet entered in the listener must be prefixed with " { $snippet "G" } " in this use case." }

@@ -1,5 +1,6 @@
-USING: help.markup help.syntax ui.gadgets models ;
-IN: ui.gadgets.books
+USING: help.markup help.syntax models ui.gadgets
+ui.gadgets.books ;
+IN: ui.gadgets.books+docs
 
 HELP: book
 { $class-description "A book is a control containing one or more children. The " { $link control-value } " is the index of exactly one child to be visible at any one time, the rest being hidden by having their " { $snippet "visible?" } " slots set to " { $link f } ". The sole visible child assumes the dimensions of the book gadget."

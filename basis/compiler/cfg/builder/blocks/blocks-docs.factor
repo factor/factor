@@ -1,6 +1,7 @@
-USING: compiler.cfg compiler.cfg.stacks.local compiler.tree help.markup
-help.syntax literals make math multiline quotations sequences ;
-IN: compiler.cfg.builder.blocks
+USING: compiler.cfg compiler.cfg.builder.blocks
+compiler.cfg.stacks.local compiler.tree help.markup help.syntax
+literals make math multiline quotations sequences ;
+IN: compiler.cfg.builder.blocks+docs
 
 <<
 STRING: ex-emit-trivial-block

@@ -1,8 +1,10 @@
-USING: alien assocs byte-arrays classes compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.stack-frame cpu.x86.assembler
-cpu.x86.assembler.operands help.markup help.syntax kernel layouts
-literals math multiline sequences strings system vm words ;
-IN: cpu.architecture
+USING: alien assocs byte-arrays classes
+compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.stack-frame cpu.architecture cpu.x86.assembler
+cpu.x86.assembler.operands help.markup help.syntax kernel
+layouts literals math multiline sequences strings system vm
+words ;
+IN: cpu.architecture+docs
 
 <<
 STRING: ex-%allot

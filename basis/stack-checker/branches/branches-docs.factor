@@ -1,5 +1,5 @@
-USING: assocs help.markup help.syntax ;
-IN: stack-checker.branches
+USING: assocs help.markup help.syntax stack-checker.branches ;
+IN: stack-checker.branches+docs
 
 HELP: collect-variables
 { $values { "hash" assoc } }

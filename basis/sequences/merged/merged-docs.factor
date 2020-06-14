@@ -1,5 +1,5 @@
-USING: help.markup help.syntax sequences ;
-IN: sequences.merged
+USING: help.markup help.syntax sequences sequences.merged ;
+IN: sequences.merged+docs
 
 ARTICLE: "sequences-merge" "Merging sequences"
 "When multiple sequences are merged into one sequence, the new sequence takes an element from each input sequence in turn. For example, if we merge " { $code "{ 1 2 3 }" } "and" { $code "{ \"a\" \"b\" \"c\" }" } "we get:" { $code "{ 1 \"a\" 2 \"b\" 3 \"c\" }" } "."

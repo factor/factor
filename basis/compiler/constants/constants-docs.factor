@@ -1,5 +1,6 @@
-USING: compiler.codegen.relocation help.markup help.syntax math vm ;
-IN: compiler.constants
+USING: compiler.codegen.relocation compiler.constants
+help.markup help.syntax math vm ;
+IN: compiler.constants+docs
 
 HELP: context-callstack-save-offset
 { $values { "n" integer } }

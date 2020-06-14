@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs byte-arrays hash-sets hashtables calendar
 help.markup help.syntax kernel linked-assocs math sequences sets
-strings yaml.ffi yaml.config yaml.conversion ;
-IN: yaml
+strings yaml yaml.ffi yaml.config yaml.conversion ;
+IN: yaml+docs
 
 HELP: >yaml
 { $values

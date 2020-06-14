@@ -1,5 +1,5 @@
-USING: help.markup help.syntax strings ;
-IN: simple-tokenizer
+USING: help.markup help.syntax simple-tokenizer strings ;
+IN: simple-tokenizer+docs
 
 HELP: tokenize
 { $values { "input" string } { "ast" "a sequence of strings" } }

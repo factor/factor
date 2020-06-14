@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Dmitry Shubin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays help.markup help.syntax sequences ;
-IN: z-algorithm
+USING: arrays help.markup help.syntax sequences z-algorithm ;
+IN: z-algorithm+docs
 
 HELP: lcp
 { $values

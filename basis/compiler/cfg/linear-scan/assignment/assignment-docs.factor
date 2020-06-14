@@ -3,8 +3,9 @@ compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals compiler.cfg.liveness
 compiler.cfg.registers heaps help.markup help.syntax math quotations
-sequences ;
-IN: compiler.cfg.linear-scan.assignment
+sequences compiler.cfg.linear-scan.assignment ;
+QUALIFIED-WITH: compiler.cfg.linear-scan.assignment clsa
+IN: compiler.cfg.linear-scan.assignment+docs
 
 HELP: add-pending
 { $values { "live-interval" live-interval-state } }
@@ -26,7 +27,7 @@ HELP: change-insn-gc-roots
 { $values { "gc-map-insn" gc-map-insn } { "quot" quotation } }
 { $description "Applies the quotation to all vregs in the instructions " { $link gc-map } "." } ;
 
-HELP: compute-live-in
+HELP: clsa:compute-live-in
 { $values { "bb" basic-block } }
 { $description "Computes the live in registers for a basic block." }
 { $see-also machine-live-ins } ;

@@ -1,7 +1,6 @@
-USING: assocs help.markup help.syntax kernel math prettyprint
-sequences strings ;
-
-IN: formatting
+USING: assocs formatting help.markup help.syntax kernel math
+prettyprint sequences strings ;
+IN: formatting+docs
 
 HELP: printf
 { $values { "format-string" string } }

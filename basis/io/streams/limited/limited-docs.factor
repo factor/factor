@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel math io ;
-IN: io.streams.limited
+USING: help.markup help.syntax kernel math io io.streams.limited  ;
+IN: io.streams.limited+docs
 
 HELP: <limited-stream>
 { $values

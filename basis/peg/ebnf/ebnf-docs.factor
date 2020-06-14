@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup peg peg.search words
-multiline ;
-IN: peg.ebnf
+USING: help.markup help.syntax multiline peg peg.ebnf peg.search
+words ;
+IN: peg.ebnf+docs
 
 HELP: EBNF[[
 { $syntax "EBNF[[ ...ebnf... ]]" }

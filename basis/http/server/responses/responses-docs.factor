@@ -1,6 +1,6 @@
-USING: help.markup help.syntax io.streams.string strings
-http math furnace.json ;
-IN: http.server.responses
+USING: furnace.json help.markup help.syntax http
+http.server.responses io.streams.string math strings ;
+IN: http.server.responses+docs
 
 HELP: <content>
 { $values { "body" "a response body" } { "content-type" string } { "response" response } }

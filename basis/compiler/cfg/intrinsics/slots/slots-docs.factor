@@ -1,7 +1,8 @@
-USING: classes classes.builtin compiler.cfg compiler.cfg.instructions
-compiler.tree compiler.tree.propagation.info help.markup help.syntax
-kernel layouts math slots+private ;
-IN: compiler.cfg.intrinsics.slots
+USING: classes classes.builtin compiler.cfg
+compiler.cfg.instructions compiler.cfg.intrinsics.slots
+compiler.tree compiler.tree.propagation.info help.markup
+help.syntax kernel layouts math slots+private ;
+IN: compiler.cfg.intrinsics.slots+docs
 
 HELP: class-tag
 { $values { "class" class } { "tag/f" { $maybe number } } }

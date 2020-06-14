@@ -1,8 +1,9 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs calendar help.markup help.syntax io io.files
-io.launcher+private kernel literals quotations sequences ;
-IN: io.launcher
+io.launcher io.launcher+private kernel literals quotations
+sequences ;
+IN: io.launcher+docs
 
 ARTICLE: "io.launcher.command" "Specifying a command"
 "The " { $snippet "command" } " slot of a " { $link process } " can contain either a string or a sequence of strings. In the first case, the string is processed in an operating system-specific manner. In the second case, the first element is a program name and the remaining elements are passed to the program as command-line arguments." ;

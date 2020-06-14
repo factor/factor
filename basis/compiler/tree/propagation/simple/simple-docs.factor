@@ -1,7 +1,7 @@
 USING: classes compiler.tree compiler.tree.propagation.info
-help.markup help.syntax quotations sequences
-stack-checker.dependencies words ;
-IN: compiler.tree.propagation.simple
+compiler.tree.propagation.simple help.markup help.syntax
+quotations sequences stack-checker.dependencies words ;
+IN: compiler.tree.propagation.simple+docs
 
 HELP: call-outputs-quot
 { $values { "#call" #call } { "word" word } { "infos" sequence } }

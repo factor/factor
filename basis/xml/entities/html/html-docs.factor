@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax xml.entities ;
-IN: xml.entities.html
+USING: help.markup help.syntax xml.entities xml.entities.html ;
+IN: xml.entities.html+docs
 
 ARTICLE: "xml.entities.html" "HTML entities"
 { $vocab-link "xml.entities.html" } " defines words for using entities defined in HTML/XHTML."

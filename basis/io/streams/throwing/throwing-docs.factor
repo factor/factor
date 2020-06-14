@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax io kernel quotations words
-math ;
-IN: io.streams.throwing
+USING: help.markup help.syntax io io.streams.throwing kernel
+quotations words math ;
+IN: io.streams.throwing+docs
 
 HELP: stream-exhausted
 { $values

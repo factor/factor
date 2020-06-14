@@ -1,5 +1,6 @@
-USING: help.syntax help.markup help.vocabs furnace.auth.providers ;
-IN: furnace.auth.providers.couchdb
+USING: furnace.auth.providers furnace.auth.providers.couchdb
+help.markup help.syntax help.vocabs ;
+IN: furnace.auth.providers.couchdb+docs
 
 HELP: couchdb-auth-provider
 {

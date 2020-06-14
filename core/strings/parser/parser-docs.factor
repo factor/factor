@@ -1,5 +1,5 @@
-USING: help.markup help.syntax strings lexer ;
-IN: strings.parser
+USING: help.markup help.syntax lexer strings strings.parser ;
+IN: strings.parser+docs
 
 HELP: bad-escape
 { $error-description "Indicates the parser encountered an invalid escape code following a backslash (" { $snippet "\\" } ") in a string literal. See " { $link "escape" } " for a list of valid escape codes." } ;

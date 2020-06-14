@@ -1,6 +1,6 @@
-IN: unrolled-lists
-USING: help.markup help.syntax hashtables search-deques dlists
-deques ;
+USING: deques dlists hashtables help.markup help.syntax
+search-deques unrolled-lists ;
+IN: unrolled-lists+docs
 
 HELP: unrolled-list
 { $class-description "The class of unrolled lists." } ;

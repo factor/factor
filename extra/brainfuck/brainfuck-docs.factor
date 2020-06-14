@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: help.syntax help.markup brainfuck strings ;
+USING: brainfuck help.syntax help.markup strings ;
 
-IN: brainfuck
+IN: brainfuck+docs
 
 HELP: run-brainfuck
 { $values { "code" string } }

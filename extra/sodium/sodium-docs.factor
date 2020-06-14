@@ -1,7 +1,7 @@
 ! Copyright (C) 2020 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien help.markup help.syntax kernel sodium.ffi ;
-IN: sodium
+USING: alien help.markup help.syntax kernel sodium sodium.ffi ;
+IN: sodium+docs
 
 HELP: check-malloc
 { $values

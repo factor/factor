@@ -1,6 +1,6 @@
 USING: alien byte-arrays gdk.ffi gtk.ffi help.markup help.syntax
-kernel strings ui.backend.x11.keys ;
-IN: ui.backend.gtk
+kernel strings ui.backend.gtk ui.backend.x11.keys ;
+IN: ui.backend.gtk+docs
 
 HELP: configure-im
 { $values { "win" GtkWindow } { "im" GtkIMContext } }

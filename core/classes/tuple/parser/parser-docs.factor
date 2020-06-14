@@ -1,5 +1,5 @@
-IN: classes.tuple.parser
-USING: strings help.markup help.syntax ;
+USING: classes.tuple.parser help.markup help.syntax strings ;
+IN: classes.tuple.parser+docs
 
 HELP: invalid-slot-name
 { $values { "name" string } }

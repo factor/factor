@@ -1,5 +1,5 @@
-USING: help.markup help.syntax http.server ;
-IN: http.server.filters
+USING: help.markup help.syntax http.server http.server.filters ;
+IN: http.server.filters+docs
 
 HELP: filter-responder
 { $class-description "The class of filter responders. This class is intended to be subclassed." } ;

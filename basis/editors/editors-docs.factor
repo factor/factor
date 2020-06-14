@@ -1,6 +1,6 @@
 USING: help.markup help.syntax parser source-files
-source-files.errors vocabs.loader kernel ;
-IN: editors
+source-files.errors vocabs.loader kernel editors ;
+IN: editors+docs
 
 ARTICLE: "editor" "Editor integration"
 "Factor development is best done with one of the supported editors; this allows you to quickly jump to definitions from the Factor environment."

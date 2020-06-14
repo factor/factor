@@ -1,6 +1,7 @@
 ! (c)2008 Joe Groff, see BSD license etc.
-USING: help.markup help.syntax kernel math sequences ;
-IN: sequences.n-based
+USING: help.markup help.syntax kernel math sequences
+sequences.n-based ;
+IN: sequences.n-based+docs
 
 HELP: <n-based-assoc>
 { $values { "seq" sequence } { "base" integer } { "n-based-assoc" n-based-assoc } }

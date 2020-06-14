@@ -1,5 +1,5 @@
-IN: tools.threads
-USING: help.markup help.syntax threads ;
+USING: help.markup help.syntax threads tools.threads ;
+IN: tools.threads+docs
 
 HELP: threads.
 { $description "Prints a list of running threads and their state. The “Waiting on” column displays one of the following:"

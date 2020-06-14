@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel math strings ;
-IN: progress-bars
+USING: help.markup help.syntax kernel math progress-bars strings ;
+IN: progress-bars+docs
 
 HELP: make-progress-bar
 { $values

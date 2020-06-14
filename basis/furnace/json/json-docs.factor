@@ -1,6 +1,6 @@
-USING: kernel http.server help.markup help.syntax http
-vocabs.loader ;
-IN: furnace.json
+USING: furnace.json help.markup help.syntax http http.server
+kernel vocabs.loader ;
+IN: furnace.json+docs
 
 HELP: <json-content>
 { $values { "body" object } { "response" response } }

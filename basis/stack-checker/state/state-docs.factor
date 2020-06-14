@@ -1,6 +1,7 @@
 USING: compiler.tree effects help.markup help.syntax sequences
-stack-checker.backend stack-checker.values stack-checker.visitor ;
-IN: stack-checker.state
+stack-checker.backend stack-checker.state stack-checker.values
+stack-checker.visitor ;
+IN: stack-checker.state+docs
 
 HELP: (meta-d)
 { $var-description "Compile-time datastack." } ;

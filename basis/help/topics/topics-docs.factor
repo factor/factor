@@ -1,6 +1,6 @@
 USING: help help.crossref help.markup help.syntax io.styles
-sequences strings words ;
-IN: help.topics
+sequences strings words help.topics ;
+IN: help.topics+docs
 
 HELP: articles
 { $var-description "Hashtable mapping article names to " { $link article } " instances." } ;

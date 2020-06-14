@@ -1,5 +1,5 @@
-IN: present
-USING: help.markup help.syntax kernel strings ;
+USING: help.markup help.syntax kernel present strings ;
+IN: present+docs
 
 ARTICLE: "present" "Converting objects to human-readable strings"
 "A word for converting an object into a human-readable string:"

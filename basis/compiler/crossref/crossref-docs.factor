@@ -1,5 +1,6 @@
-USING: assocs help.markup help.syntax kernel sequences words ;
-IN: compiler.crossref
+USING: assocs compiler.crossref help.markup help.syntax kernel
+sequences words ;
+IN: compiler.crossref+docs
 
 HELP: compiled-crossref
 { $var-description "A hashtable that maps words to other words that depend on them and their dependency types." } ;

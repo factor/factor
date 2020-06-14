@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel colors ;
-IN: fonts
+USING: colors fonts help.markup help.syntax kernel ;
+IN: fonts+docs
 
 HELP: <font>
 { $values { "font" font } }

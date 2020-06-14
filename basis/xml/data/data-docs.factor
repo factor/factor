@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel sequences strings ;
-IN: xml.data
+USING: help.markup help.syntax kernel sequences strings xml.data ;
+IN: xml.data+docs
 
 ABOUT: "xml.data"
 

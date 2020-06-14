@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax xml.data sequences strings ;
-IN: xml.traversal
+USING: help.markup help.syntax sequences strings xml.data
+xml.traversal ;
+IN: xml.traversal+docs
 
 ABOUT: "xml.traversal"
 

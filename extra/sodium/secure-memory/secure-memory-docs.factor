@@ -1,8 +1,8 @@
 ! Copyright (C) 2020 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: destructors help.markup help.syntax kernel math sodium sodium.ffi
-quotations ;
-IN: sodium.secure-memory
+quotations sodium.secure-memory ;
+IN: sodium.secure-memory+docs
 
 ABOUT: "sodium.secure-memory"
 

@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs help.markup help.syntax kernel math quotations sequences
-sequences+private ;
-IN: sequences.unrolled
+USING: assocs help.markup help.syntax kernel math quotations
+sequences sequences+private sequences.unrolled ;
+IN: sequences.unrolled+docs
 
 HELP: unrolled-collect
 { $values

@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ;
-IN: io.encodings.utf8
+USING: help.markup help.syntax io.encodings.utf8 ;
+IN: io.encodings.utf8+docs
 
 HELP: utf8
 { $class-description "Encoding descriptor for UTF-8 encoding." } ;

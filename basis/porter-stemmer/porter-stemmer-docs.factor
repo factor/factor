@@ -1,5 +1,5 @@
-USING: help.markup help.syntax strings ;
-IN: porter-stemmer
+USING: help.markup help.syntax porter-stemmer strings ;
+IN: porter-stemmer+docs
 
 HELP: step1a
 { $values { "str" string } { "newstr" "a new string" } }

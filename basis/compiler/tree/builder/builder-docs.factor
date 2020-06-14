@@ -1,6 +1,7 @@
-USING: compiler.tree help.markup help.syntax literals quotations sequences
-stack-checker.errors words ;
-IN: compiler.tree.builder
+USING: compiler.tree compiler.tree.builder help.markup
+help.syntax literals quotations sequences stack-checker.errors
+words ;
+IN: compiler.tree.builder+docs
 
 HELP: build-tree
 { $values { "word/quot" { $or word quotation } } { "nodes" "a sequence of nodes" } }

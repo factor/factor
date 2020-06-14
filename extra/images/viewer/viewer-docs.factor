@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel strings io.pathnames images
-models opengl.textures classes ui.gadgets ;
-IN: images.viewer
+models opengl.textures classes ui.gadgets images.viewer ;
+IN: images.viewer+docs
 
 HELP: <image-gadget>
 { $values

@@ -1,5 +1,6 @@
-USING: assocs help.markup help.syntax quotations strings words ;
-IN: bootstrap.image.primitives
+USING: assocs bootstrap.image.primitives help.markup help.syntax
+quotations strings words ;
+IN: bootstrap.image.primitives+docs
 
 HELP: all-primitives
 { $description "A constant " { $link assoc } " containing all primitives. Keys are vocab names and values are sequences of tuples declaring words. The format of the tuples are { name effect vm-func inputs outputs extra-props }:"

@@ -1,7 +1,5 @@
-
-USING: help.syntax help.markup ;
-
-IN: opengl.gl
+USING: help.markup help.syntax opengl.gl ;
+IN: opengl.gl+docs
 
 ARTICLE: "opengl-low-level" "OpenGL binding"
 { $subsections

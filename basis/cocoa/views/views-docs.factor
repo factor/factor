@@ -1,5 +1,5 @@
 USING: help.syntax help.markup ui.pixel-formats ;
-IN: cocoa.views
+IN: cocoa.views+docs
 
 HELP: <GLView>
 { $values { "class" "an subclass of " { $snippet "NSOpenGLView" } } { "dim" "a pair of real numbers" } { "pixel-format" pixel-format } { "view" "a new " { $snippet "NSOpenGLView" } } }

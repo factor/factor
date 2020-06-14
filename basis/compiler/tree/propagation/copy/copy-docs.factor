@@ -1,5 +1,6 @@
-USING: help.markup help.syntax math sequences ;
-IN: compiler.tree.propagation.copy
+USING: compiler.tree.propagation.copy help.markup help.syntax
+math sequences ;
+IN: compiler.tree.propagation.copy+docs
 
 HELP: compute-phi-equiv
 { $values { "inputs" sequence } { "outputs" sequence } }

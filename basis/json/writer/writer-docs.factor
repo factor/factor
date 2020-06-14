@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: json help.markup help.syntax kernel ;
-IN: json.writer
+USING: help.markup help.syntax json json.writer kernel ;
+IN: json.writer+docs
 
 HELP: >json
 { $values { "obj" object } { "string" "the object converted to JSON format" } }

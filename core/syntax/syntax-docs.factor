@@ -2,7 +2,7 @@ USING: arrays assocs classes.algebra+private classes.tuple combinators
 command-line effects generic generic.math generic.single help.markup
 help.syntax io.pathnames kernel math parser sequences vocabs.loader
 vocabs.parser words words.alias words.constant words.symbol ;
-IN: syntax
+IN: syntax+docs
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
 "At the most abstract level, Factor syntax consists of whitespace-separated tokens. The parser tokenizes the input on whitespace boundaries. The parser is case-sensitive and whitespace between tokens is significant, so the following three expressions tokenize differently:"
@@ -272,7 +272,7 @@ HELP: deprecated
 HELP: SYNTAX:
 { $syntax "SYNTAX: foo ... ;" }
 { $description "Defines a parsing word." }
-{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "IN: scratchpad" "<< SYNTAX: HELLO \"Hello parser!\" print ; >>\n: world ( -- ) HELLO ;" "Hello parser!" } } ;
+{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "IN: syntax+examples" "<< SYNTAX: HELLO \"Hello parser!\" print ; >>\n: world ( -- ) HELLO ;" "Hello parser!" } } ;
 
 HELP: inline
 { $syntax ": foo ... ; inline" }
@@ -445,7 +445,7 @@ HELP: SYMBOL:
 { $syntax "SYMBOL: word" }
 { $values { "word" "a new word to define" } }
 { $description "Defines a new symbol word in the current vocabulary. Symbols push themselves on the stack when executed, and are used to identify variables (see " { $link "namespaces" } ") as well as for storing crufties in word properties (see " { $link "word-props" } ")." }
-{ $examples { $example "USE: prettyprint" "IN: scratchpad" "SYMBOL: foo\nfoo ." "foo" } } ;
+{ $examples { $example "USE: prettyprint" "IN: syntax+examples" "SYMBOL: foo\nfoo ." "foo" } } ;
 
 { define-symbol POSTPONE: SYMBOL: POSTPONE: SYMBOLS: } related-words
 
@@ -453,7 +453,7 @@ HELP: SYMBOLS:
 { $syntax "SYMBOLS: words... ;" }
 { $values { "words" { $sequence "new words to define" } } }
 { $description "Creates a new symbol for every token until the " { $snippet ";" } "." }
-{ $examples { $example "USING: prettyprint ;" "IN: scratchpad" "SYMBOLS: foo bar baz ;\nfoo . bar . baz ." "foo\nbar\nbaz" } } ;
+{ $examples { $example "USING: prettyprint ;" "IN: syntax+examples" "SYMBOLS: foo bar baz ;\nfoo . bar . baz ." "foo\nbar\nbaz" } } ;
 
 HELP: SINGLETON:
 { $syntax "SINGLETON: class" }
@@ -642,7 +642,7 @@ HELP: (
 { $examples
     { $example
         "USING: compiler.units kernel math prettyprint random words ;"
-        "IN: scratchpad"
+        "IN: syntax+examples"
         ""
         "SYMBOL: my-dynamic-word"
         ""
@@ -697,7 +697,7 @@ HELP: HOOK:
 { $examples
     { $example
         "USING: io namespaces ;"
-        "IN: scratchpad"
+        "IN: syntax+examples"
         "SYMBOL: transport"
         "TUPLE: land-transport ;"
         "TUPLE: air-transport ;"
@@ -735,7 +735,7 @@ HELP: MIXIN:
 { $examples
     { $example
         "USING: prettyprint ;"
-        "IN: scratchpad"
+        "IN: syntax+examples"
         "MIXIN: movie-robot"
         "SINGLETONS: crow-t-robot tom-servo cambot ;"
         "INSTANCE: crow-t-robot movie-robot"
@@ -754,7 +754,7 @@ HELP: INSTANCE:
 { $examples
     { $example
         "USING: prettyprint ;"
-        "IN: scratchpad"
+        "IN: syntax+examples"
         "MIXIN: movie-robot"
         "SINGLETONS: crow-t-robot tom-servo cambot ;"
         "INSTANCE: crow-t-robot movie-robot"
@@ -917,7 +917,7 @@ HELP: execute(
 { $description "Calls the word on the top of the stack, asserting that it has the given stack effect. The word does not need to be known at compile time." }
 { $examples
   { $code
-    "IN: scratchpad"
+    "IN: syntax+examples"
     ""
     ": eat ( -- ) ; : sleep ( -- ) ; : hack ( -- ) ;"
     "{ eat sleep hack } [ execute( -- ) ] each"

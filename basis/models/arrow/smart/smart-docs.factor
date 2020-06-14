@@ -1,5 +1,5 @@
-IN: models.arrow.smart
-USING: help.syntax help.markup models.product ;
+USING: help.markup help.syntax models.arrow.smart models.product ;
+IN: models.arrow.smart+docs
 
 HELP: <smart-arrow>
 { $values { "quot" { $quotation ( ... -- output ) } } }

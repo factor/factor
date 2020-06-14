@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel sequences ;
-IN: vectors
+USING: help.markup help.syntax kernel sequences vectors ;
+IN: vectors+docs
 
 ARTICLE: "vectors" "Vectors"
 "The " { $vocab-link "vectors" } " vocabulary implements resizable mutable sequence which support the " { $link "sequence-protocol" } "."

@@ -1,6 +1,6 @@
-USING: help.markup help.syntax kernel math models sequences
-strings ;
-IN: documents
+USING: documents help.markup help.syntax kernel math models
+sequences strings ;
+IN: documents+docs
 
 HELP: +col
 { $values { "loc" "a pair of integers" } { "n" integer } { "newloc" "a pair of integers" } }

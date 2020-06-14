@@ -1,5 +1,5 @@
-USING: help.markup help.syntax vocabs ;
-IN: ctags
+USING: ctags help.markup help.syntax vocabs ;
+IN: ctags+docs
 
 ARTICLE: "ctags" "Ctags file"
 { $emphasis "ctags" } " generates a index file of every factor word in ctags format as supported by vi and other editors. More information can be found at " { $url "http://en.wikipedia.org/wiki/Ctags" } "."

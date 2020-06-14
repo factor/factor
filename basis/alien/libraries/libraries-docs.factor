@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax assocs help.markup help.syntax kernel
-strings ;
-IN: alien.libraries
+strings alien.libraries ;
+IN: alien.libraries+docs
 
 HELP: add-library
 { $values { "name" string } { "path" string } { "abi" "one of " { $link cdecl } " or " { $link stdcall } } }

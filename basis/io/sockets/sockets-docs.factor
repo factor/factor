@@ -1,6 +1,6 @@
-USING: help.markup help.syntax io io.backend threads
+USING: help.markup help.syntax io io.backend threads io.sockets
 strings byte-arrays continuations destructors quotations math ;
-IN: io.sockets
+IN: io.sockets+docs
 
 ARTICLE: "network-addressing" "Address specifiers"
 "The networking words are quite general and work with " { $emphasis "address specifiers" } " rather than concrete concepts such as host names. There are four types of address specifiers."

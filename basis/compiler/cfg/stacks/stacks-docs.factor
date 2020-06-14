@@ -1,7 +1,8 @@
-USING: compiler.cfg compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.stacks.local compiler.tree help.markup help.syntax math
-sequences ;
-IN: compiler.cfg.stacks
+USING: compiler.cfg compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.stacks
+compiler.cfg.stacks.local compiler.tree help.markup help.syntax
+math sequences ;
+IN: compiler.cfg.stacks+docs
 
 HELP: ds-push
 { $values { "vreg" "a virtual register" } }

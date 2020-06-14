@@ -1,7 +1,7 @@
 USING: help.markup help.syntax quotations hashtables kernel
 classes strings continuations destructors math byte-arrays
-alien specialized-arrays sequences ;
-IN: io
+alien specialized-arrays sequences io ;
+IN: io+docs
 
 ARTICLE: "stream-types" "Binary and text streams"
 "A word which outputs the stream element type:"

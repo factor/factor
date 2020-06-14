@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup byte-arrays io ;
-IN: serialize
+USING: byte-arrays help.markup help.syntax io serialize ;
+IN: serialize+docs
 
 HELP: serialize
 { $values { "obj" "object to serialize" } }

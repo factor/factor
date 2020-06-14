@@ -1,5 +1,5 @@
-IN: help.apropos
-USING: help.markup help.syntax strings help.tips ;
+USING: help.apropos help.markup help.syntax help.tips strings ;
+IN: help.apropos+docs
 
 HELP: apropos
 { $values { "str" string } }

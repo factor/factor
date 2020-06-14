@@ -1,5 +1,6 @@
-USING: compiler.tree help.markup help.syntax sequences ;
-IN: compiler.tree.def-use
+USING: compiler.tree compiler.tree.def-use help.markup
+help.syntax sequences ;
+IN: compiler.tree.def-use+docs
 
 HELP: node-defs-values
 { $values { "node" node } { "values" sequence } }

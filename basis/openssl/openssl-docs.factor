@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ;
-IN: openssl
+USING: help.markup help.syntax openssl ;
+IN: openssl+docs
 
 HELP: maybe-init-ssl
 { $description "Word that initializes openssl if it isn't already initialized." }

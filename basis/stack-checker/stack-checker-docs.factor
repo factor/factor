@@ -1,6 +1,6 @@
 USING: classes continuations effects help.markup help.syntax io
-kernel quotations sequences stack-checker.errors ;
-IN: stack-checker
+kernel quotations sequences stack-checker stack-checker.errors ;
+IN: stack-checker+docs
 
 ARTICLE: "inference-simple" "Straight-line stack effects"
 "The simplest case is when a piece of code does not have any branches or recursion, and just pushes literals and calls words."

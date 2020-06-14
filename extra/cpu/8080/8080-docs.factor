@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax sequences strings cpu.8080.emulator ;
-IN: cpu.8080
+USING: cpu.8080 help.markup help.syntax sequences strings cpu.8080.emulator ;
+IN: cpu.8080+docs
 
 
 ARTICLE: "cpu.8080" "Intel 8080 CPU Emulator"

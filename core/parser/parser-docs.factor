@@ -1,7 +1,7 @@
 USING: arrays compiler.units definitions help.markup help.syntax
 kernel lexer math namespaces quotations sequences source-files strings
-vectors vocabs vocabs.parser words words.symbol ;
-IN: parser
+vectors vocabs vocabs.parser words words.symbol parser ;
+IN: parser+docs
 
 ARTICLE: "reading-ahead" "Reading ahead"
 "Parsing words can consume input from the input stream. Words come in two flavors: words that throw upon finding end of file, and words that return " { $link f } " upon the same." $nl

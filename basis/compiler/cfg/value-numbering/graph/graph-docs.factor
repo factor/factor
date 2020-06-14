@@ -1,5 +1,6 @@
-USING: help.markup help.syntax ;
-IN: compiler.cfg.value-numbering.graph
+USING: compiler.cfg.value-numbering.graph help.markup
+help.syntax ;
+IN: compiler.cfg.value-numbering.graph+docs
 
 HELP: vregs>vns
 { $var-description "assoc mapping vregs to value numbers this is the identity on canonical representatives." } ;

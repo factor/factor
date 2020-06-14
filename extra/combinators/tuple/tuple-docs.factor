@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs classes help.markup help.syntax kernel math
-quotations strings ;
-IN: combinators.tuple
+USING: assocs classes combinators.tuple help.markup help.syntax kernel
+math quotations strings ;
+IN: combinators.tuple+docs
 
 HELP: 2make-tuple
 { $values
@@ -27,7 +27,7 @@ HELP: make-tuple
 { $examples
     { $example
         "USING: combinators.tuple math prettyprint ;"
-        "IN: scratchpad"
+        "IN: combinators.tuple+examples"
         "TUPLE: demo x y z ;"
         "5 demo {"
         "   { \"x\" [ 10 + ] }"

@@ -1,6 +1,7 @@
-USING: continuations help.markup help.syntax io kernel parser
-prettyprint quotations system threads vocabs vocabs.loader ;
-IN: listener
+USING: continuations help.markup help.syntax io kernel listener
+parser prettyprint quotations system threads vocabs
+vocabs.loader ;
+IN: listener+docs
 
 ARTICLE: "listener-watch" "Watching variables in the listener"
 "The listener prints values of dynamic variables which are added to a watch list:"

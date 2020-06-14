@@ -1,5 +1,6 @@
-IN: concurrency.semaphores
-USING: help.markup help.syntax kernel quotations calendar ;
+USING: calendar concurrency.semaphores help.markup help.syntax
+kernel quotations ;
+IN: concurrency.semaphores+docs
 
 HELP: semaphore
 { $class-description "The class of counting semaphores. New instances can be created by calling " { $link <semaphore> } "." } ;

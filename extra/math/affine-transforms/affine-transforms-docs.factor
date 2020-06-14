@@ -1,7 +1,7 @@
 ! Copyright (C) 2018 Björn Lindqvist
 ! See http://factorcode.org/license.txt for BSD license
-USING: help.markup help.syntax ;
-IN: math.affine-transforms
+USING: help.markup help.syntax math.affine-transforms ;
+IN: math.affine-transforms+docs
 
 ARTICLE: "math.affine-transforms" "Affine Transformations of 2d Vectors"
 "This vocab provides words for affine transformations of 2d vectors. It can sometimes be more suitable to use the words in this vocab, than setting up the affine transformation matrices manually."

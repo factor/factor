@@ -1,8 +1,8 @@
 ! Copyright (C) 2016 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ascii checksums checksums.common destructors help.markup
-help.syntax kernel strings ;
-IN: checksums.process
+USING: ascii checksums checksums.common checksums.process destructors
+help.markup help.syntax kernel strings ;
+IN: checksums.process+docs
 
 ABOUT: "checksums.process"
 

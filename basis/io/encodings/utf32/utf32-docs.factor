@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax io.encodings strings ;
-IN: io.encodings.utf32
+USING: help.markup help.syntax io.encodings strings io.encodings.utf32 ;
+IN: io.encodings.utf32+docs
 
 ARTICLE: "io.encodings.utf32" "UTF-32 encoding"
 "The UTF-32 encoding is a fixed-width encoding. Unicode code points are encoded as 4 byte sequences. There are three encoding descriptor classes for working with UTF-32, depending on endianness or the presence of a BOM:"

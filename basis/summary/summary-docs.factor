@@ -1,5 +1,5 @@
-IN: summary
-USING: kernel strings help.markup help.syntax ;
+USING: kernel strings help.markup help.syntax summary ;
+IN: summary+docs
 
 ARTICLE: "summary" "Converting objects to summary strings"
 "A word for getting very brief descriptions of words and general objects:"

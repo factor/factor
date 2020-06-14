@@ -1,5 +1,6 @@
-IN: alien.destructors
-USING: help.markup help.syntax alien destructors ;
+USING: alien alien.destructors destructors help.markup
+help.syntax ;
+IN: alien.destructors+docs
 
 HELP: DESTRUCTOR:
 { $syntax "DESTRUCTOR: word" }

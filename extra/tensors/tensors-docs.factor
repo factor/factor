@@ -1,7 +1,8 @@
 ! Copyright (C) 2019 HMC Clinic.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays help.markup help.syntax lexer math sequences ;
-IN: tensors
+USING: arrays help.markup help.syntax lexer math sequences
+tensors ;
+IN: tensors+docs
 
 ARTICLE: "tensors" "Tensors"
 "A " { $snippet "tensor" } " is a sequence of floating point numbers "

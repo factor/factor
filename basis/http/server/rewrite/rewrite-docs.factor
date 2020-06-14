@@ -1,5 +1,5 @@
-IN: http.server.rewrite
-USING: help.syntax help.markup http.server ;
+USING: help.syntax help.markup http.server http.server.rewrite ;
+IN: http.server.rewrite+docs
 
 HELP: rewrite
 { $class-description "The class of directory rewrite responders. The slots are as follows:"

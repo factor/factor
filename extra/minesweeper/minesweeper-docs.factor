@@ -1,6 +1,6 @@
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax minesweeper  ;
 
-IN: minesweeper
+IN: minesweeper+docs
 
 ARTICLE: "minesweeper" "Minesweeper"
 "The game starts with a grid of cells. Some cells contain a mine, others do not. If you click on a cell containing a mine, you " { $strong "lose" } " (it blows up!). If you click on all the cells (without clicking on any mines), you " { $strong "win" } "!"

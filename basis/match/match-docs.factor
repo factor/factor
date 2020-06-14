@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax namespaces assocs sequences
-kernel combinators ;
-IN: match
+USING: assocs combinators help.markup help.syntax kernel match
+namespaces sequences ;
+IN: match+docs
 
 HELP: match
 { $values { "value1" object } { "value2" object } { "bindings" assoc }

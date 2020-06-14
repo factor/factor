@@ -1,6 +1,7 @@
 USING: hashtables help.markup help.syntax io kernel math
-prettyprint.config quotations strings ;
-IN: prettyprint.sections
+prettyprint.config prettyprint.sections quotations strings ;
+QUALIFIED-WITH: prettyprint.sections ps
+IN: prettyprint.sections+docs
 
 HELP: position
 { $var-description "The prettyprinter's current character position." } ;
@@ -61,7 +62,7 @@ HELP: section
 { $list
     { $link text }
     { $link line-break }
-    { $link block }
+    { $link ps:block }
     { $link inset }
     { $link flow }
     { $link colon }
@@ -114,7 +115,7 @@ HELP: line-break
 { $description "Adds a section introducing a line break to the current block. If the block is output as a " { $link short-section } ", all breaks are ignored. Otherwise, hard breaks introduce unconditional newlines, and soft breaks introduce a newline if the position is more than half of the " { $link margin } "." }
 $prettyprinting-note ;
 
-HELP: block
+HELP: ps:block
 { $class-description "A block is a section containing child sections. Blocks are introduced by calling " { $link <block } " and " { $link block> } "." } ;
 
 HELP: pprinter-block
@@ -139,11 +140,11 @@ HELP: advance
 $prettyprinting-note ;
 
 HELP: save-end-position
-{ $values { "block" block } }
+{ $values { "block" ps:block } }
 { $description "Save the current position as the end position of the block." } ;
 
 HELP: pprint-sections
-{ $values { "block" block } { "advancer" { $quotation ( block -- ) } } }
+{ $values { "block" ps:block } { "advancer" { $quotation ( block -- ) } } }
 { $description "Prints child sections of a block, ignoring any " { $link line-break } " sections. The " { $snippet "advancer" } " quotation is called between every pair of sections." } ;
 
 HELP: do-break
@@ -151,15 +152,15 @@ HELP: do-break
 { $description "Prints a break section as per the policy outlined in " { $link line-break } "." } ;
 
 HELP: empty-block?
-{ $values { "block" block } { "?" boolean } }
+{ $values { "block" ps:block } { "?" boolean } }
 { $description "Tests if the block has no child sections." } ;
 
 HELP: unless-empty-block
-{ $values { "block" block } { "quot" { $quotation ( block -- ) } } }
+{ $values { "block" ps:block } { "quot" { $quotation ( block -- ) } } }
 { $description "If the block has child sections, calls the quotation, otherwise does nothing." } ;
 
 HELP: (<block)
-{ $values { "block" block } }
+{ $values { "block" ps:block } }
 { $description "Begins constructing a nested block." } ;
 
 HELP: <block
@@ -180,7 +181,7 @@ HELP: styled-text
 $prettyprinting-note ;
 
 HELP: inset
-{ $class-description "A " { $link block } " section which indents every line when printed as a " { $link long-section } "." } ;
+{ $class-description "A " { $link ps:block } " section which indents every line when printed as a " { $link long-section } "." } ;
 
 HELP: <inset
 { $values { "narrow?" boolean } }
@@ -190,13 +191,13 @@ HELP: <inset
 } ;
 
 HELP: flow
-{ $class-description "A " { $link block } " section printed on its own line if it can fit entirely on one line." } ;
+{ $class-description "A " { $link ps:block } " section printed on its own line if it can fit entirely on one line." } ;
 
 HELP: <flow
 { $description "Begins a " { $link flow } " section." } ;
 
 HELP: colon
-{ $class-description "A " { $link block } " section. When printed as a " { $link long-section } ", indents every line except the first." }
+{ $class-description "A " { $link ps:block } " section. When printed as a " { $link long-section } ", indents every line except the first." }
 { $notes "Colon sections are used to enclose word definitions when " { $link "see" } "." } ;
 
 HELP: <colon
@@ -207,7 +208,7 @@ HELP: block>
 $prettyprinting-note ;
 
 HELP: do-pprint
-{ $values { "block" block } }
+{ $values { "block" ps:block } }
 { $description "Recursively output all children of the given block. The continuation is restored and output terminates if the line length is exceeded; this test is performed in " { $link fresh-line } "." } ;
 
 HELP: with-pprint

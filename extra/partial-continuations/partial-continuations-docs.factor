@@ -1,5 +1,5 @@
-IN: partial-continuations
-USING: help.markup help.syntax kernel ;
+USING: help.markup help.syntax kernel partial-continuations ;
+IN: partial-continuations+docs
 
 HELP: breset
 { $values { "quot" { $quotation ( r -- v ) } } }

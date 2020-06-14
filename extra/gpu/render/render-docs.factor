@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax byte-arrays classes
 gpu.buffers gpu.framebuffers gpu.shaders gpu.textures help.markup
-help.syntax images kernel math sequences
+help.syntax images kernel math sequences gpu.render
 specialized-arrays strings ;
 QUALIFIED-WITH: alien.c-types c
 QUALIFIED-WITH: math m
@@ -11,7 +11,7 @@ SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: ulong
 SPECIALIZED-ARRAY: void*
-IN: gpu.render
+IN: gpu.render+docs
 
 HELP: <index-elements>
 { $values

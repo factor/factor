@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 Björn Lindqvist.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
-IN: llvm.wrappers
+USING: help.markup help.syntax llvm.wrappers ;
+IN: llvm.wrappers+docs
 
 HELP: <provider>
 { $values { "module" module } { "provider" provider } }

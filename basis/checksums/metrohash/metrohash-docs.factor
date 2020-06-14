@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ;
-IN: checksums.metrohash
+USING: checksums.metrohash help.markup help.syntax ;
+IN: checksums.metrohash+docs
 
 HELP: metrohash-64
 { $class-description "MetroHash 64-bit checksum algorithm." } ;

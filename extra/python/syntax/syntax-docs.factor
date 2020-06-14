@@ -1,5 +1,5 @@
-IN: python.syntax
 USING: hashtables python.syntax help.markup help.syntax ;
+IN: python.syntax+docs
 
 HELP: PY-FROM:
 { $syntax "PY-FROM: module => name-effects ;" }

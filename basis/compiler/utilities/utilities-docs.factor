@@ -1,6 +1,6 @@
-USING: assocs compiler.cfg.ssa.destruction.leaders help.markup help.syntax
-kernel math sequences ;
-IN: compiler.utilities
+USING: assocs compiler.cfg.ssa.destruction.leaders
+compiler.utilities help.markup help.syntax kernel math sequences ;
+IN: compiler.utilities+docs
 
 HELP: compress-path
 { $values { "source" integer } { "assoc" assoc } { "destination" integer } }

@@ -1,8 +1,8 @@
 USING: help.markup help.syntax words classes classes.algebra
 definitions kernel alien sequences math quotations
 generic.single generic.standard generic.hook generic.math
-combinators prettyprint effects ;
-IN: generic
+combinators prettyprint effects generic ;
+IN: generic+docs
 
 ARTICLE: "method-order" "Method precedence"
 "Conceptually, method dispatch is implemented by testing the object against the predicate word for every class, in linear order (" { $link "class-linearization" } ")."

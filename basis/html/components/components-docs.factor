@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax io.streams.string kernel strings
-urls lcs inspector present io ;
-IN: html.components
+USING: help.markup help.syntax html.components inspector io
+kernel lcs present strings urls ;
+QUALIFIED-WITH: html.components hc
+IN: html.components+docs
 
 HELP: checkbox
 { $class-description "Checkbox components render a boolean value. The " { $slot "label" } " slot must be set to a string." } ;
@@ -64,7 +65,7 @@ HELP: html
 HELP: xml
 { $description "XML components render XML verbatim, from an XML chunk. Care must be taken to only render trusted input, to avoid cross-site scripting attacks." } ;
 
-HELP: inspector
+HELP: hc:inspector
 { $description "Inspector components render an arbitrary object by passing it to the " { $link describe } " word." } ;
 
 HELP: label
@@ -93,7 +94,7 @@ $nl
 { $subsections
     hidden
     link
-    inspector
+    hc:inspector
     comparison
     html
     xml

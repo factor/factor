@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs help.markup help.syntax kernel strings ;
-IN: s3
+USING: assocs help.markup help.syntax kernel strings s3 ;
+QUALIFIED: s3
+IN: s3+docs
 
 HELP: buckets
 { $values
@@ -38,7 +39,7 @@ HELP: delete-bucket
 }
 ;
 
-HELP: keys
+HELP: s3:keys
 { $values
   { "bucket" string }
   { "seq" "a sequence of " { $link key } " objects" }
@@ -47,7 +48,7 @@ HELP: keys
     "Returns a sequence of " { $link key } " objects. Each object in the sequence has information about the keys contained within the bucket."
 }
 { $examples
-  { $unchecked-example "USING: s3 ;" "\"testbucket\" keys . " "{ }" }
+  { $unchecked-example "USING: s3 ;" "\"testbucket\" s3:keys . " "{ }" }
 }
 ;
 
@@ -111,7 +112,7 @@ $nl
 { $subsections buckets
     create-bucket
     delete-bucket
-    keys
+    s3:keys
     get-object
     put-object
     delete-object

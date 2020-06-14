@@ -1,9 +1,7 @@
 ! Copyright (C) 2013 John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: help.markup help.syntax kernel strings ;
-
-IN: tools.which
+USING: help.markup help.syntax kernel strings tools.which ;
+IN: tools.which+docs
 
 HELP: which
 { $values { "command" string } { "file/f" "the first matching path or " { $link f } } }

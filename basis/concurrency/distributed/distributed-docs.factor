@@ -1,5 +1,6 @@
-USING: help.markup help.syntax concurrency.messaging io.servers threads ;
-IN: concurrency.distributed
+USING: concurrency.distributed concurrency.messaging help.markup
+help.syntax io.servers threads ;
+IN: concurrency.distributed+docs
 
 HELP: local-node
 { $var-description "A variable containing the " { $link threaded-server } " the current node is running on." } ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays help.markup help.syntax kernel math strings ;
-IN: wrap
+USING: arrays help.markup help.syntax kernel math strings wrap ;
+IN: wrap+docs
 
 ABOUT: "wrap"
 

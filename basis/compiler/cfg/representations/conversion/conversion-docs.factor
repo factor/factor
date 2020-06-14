@@ -1,5 +1,8 @@
-USING: cpu.architecture help.markup help.syntax make ;
-IN: compiler.cfg.representations.conversion
+USING: compiler.cfg compiler.cfg.registers
+compiler.cfg.representations
+compiler.cfg.representations.conversion cpu.architecture
+help.markup help.syntax make ;
+IN: compiler.cfg.representations.conversion+docs
 
 HELP: emit-conversion
 { $values

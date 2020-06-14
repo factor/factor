@@ -1,5 +1,6 @@
-USING: help.syntax help.markup kernel strings unicode ;
-IN: unicode.case
+USING: help.markup help.syntax kernel strings unicode
+unicode.case ;
+IN: unicode.case+docs
 
 ABOUT: "unicode.case"
 

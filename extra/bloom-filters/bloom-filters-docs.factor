@@ -1,5 +1,5 @@
-USING: help.markup help.syntax kernel math ;
-IN: bloom-filters
+USING: bloom-filters help.markup help.syntax kernel math ;
+IN: bloom-filters+docs
 
 HELP: <bloom-filter>
 { $values { "error-rate" "The desired false positive rate. A " { $link float } " between 0 and 1." }

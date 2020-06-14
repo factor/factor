@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2010, 2018, 2020 Slava Pestov, Joe Groff, and Cat Stevens.
-USING: accessors arrays assocs generic.single formatting locals help.markup help.markup+private help.syntax io
-kernel math math.functions math.order math.ratios math.vectors opengl.gl prettyprint
-sequences sequences.generalizations urls ;
-IN: math.matrices
+USING: arrays assocs help.markup help.markup+private help.syntax
+kernel math math.functions math.matrices math.order sequences
+sequences.generalizations urls ;
+IN: math.matrices+docs
 
 <PRIVATE
 ! like $subsections but skip the extra blank line
