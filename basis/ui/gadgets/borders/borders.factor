@@ -40,7 +40,8 @@ M: border pref-dim*
     [ border-major-dim ] [ border-minor-dim ] [ fill>> ] tri scale ;
 
 : border-loc ( border dim -- loc )
-    [ [ size>> ] [ align>> ] [ border-major-dim ] tri ] dip v- v* v+ ;
+    [ [ size>> ] [ align>> ] [ border-major-dim ] tri ] dip
+    v- v* v+ [ >fixnum ] map ;
 
 : border-child-rect ( border -- rect )
     dup border-dim [ border-loc ] keep <rect> ;
