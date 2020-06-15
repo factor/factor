@@ -304,6 +304,10 @@ find_architecture() {
        iPhone5*[3-9]) ARCH=arm64;;
        iPhone[6-9]*) ARCH=arm64;;
        iPhone[1-9][0-9]*) ARCH=arm64;;
+       iPad[4-9]*) ARCH=arm64;;
+       iPad[1-9][0-9]*) ARCH=arm64;;
+       AppleTV[5-9]*) ARCH=arm64;;
+       AppleTV[1-9][0-9]*) ARCH=arm64;;
        "Power Macintosh") ARCH=ppc;;
     esac
 }
