@@ -1,14 +1,6 @@
-USING: hashtables help.markup help.syntax kernel quotations
-sequences strings ui.commands ui.gestures ui.operations words ;
+USING: hashtables help.markup help.syntax kernel sequences
+strings ui.commands ui.operations words ;
 IN: ui.operations+docs
-
-: $operations ( element -- )
-    >quotation call( -- obj )
-    f operations>commands
-    command-map. ;
-
-: $operation ( element -- )
-    first +keyboard+ word-prop gesture>string $snippet ;
 
 HELP: +keyboard+
 { $description "A key which may be set in the hashtable passed to " { $link define-operation } ". The value is a gesture." } ;

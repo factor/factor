@@ -1,6 +1,5 @@
 USING: furnace.asides furnace.db furnace.redirection
-furnace.sessions help.markup help.syntax http io.streams.string
-urls ;
+furnace.sessions help.markup help.syntax http urls ;
 IN: furnace.asides+docs
 
 HELP: <asides>

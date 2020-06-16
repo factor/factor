@@ -1,7 +1,8 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit fry
-kernel linked-assocs namespaces sequences ui.commands words ;
+help.markup kernel linked-assocs namespaces quotations sequences
+ui.commands ui.gestures words ;
 IN: ui.operations
 
 SYMBOL: +keyboard+
@@ -93,3 +94,11 @@ operations [ <linked-hash> ] initialize
 
 M: operation invoke-command ( target command -- )
     operation-quot call( -- ) ;
+
+: $operations ( element -- )
+    >quotation call( -- obj )
+    f operations>commands
+    command-map. ;
+
+: $operation ( element -- )
+    first +keyboard+ word-prop gesture>string $snippet ;

@@ -1,4 +1,5 @@
-USING: furnace.auth.providers help.markup help.syntax strings ;
+USING: accessors db db.tuples db.types
+furnace.auth.providers.db help.markup help.syntax kernel strings ;
 IN: furnace.auth.providers.db+docs
 
 HELP: users-in-db

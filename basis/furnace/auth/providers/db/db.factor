@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: furnace.auth.providers furnace.auth.providers.db
-help.markup help.syntax strings ;
-IN: furnace.auth.providers.db+docs
+USING: accessors db db.tuples db.types furnace.auth.providers
+kernel ;
+IN: furnace.auth.providers.db
 
 user "USERS"
 {

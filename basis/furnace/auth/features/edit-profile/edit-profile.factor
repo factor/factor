@@ -1,10 +1,8 @@
 ! Copyright (c) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors namespaces sequences assocs
-validators urls html.forms http.server.dispatchers
-furnace.auth
-furnace.asides
-furnace.actions ;
+USING: accessors assocs furnace.actions furnace.asides
+furnace.auth html.forms http.server.dispatchers kernel
+namespaces sequences urls validators ;
 IN: furnace.auth.features.edit-profile
 
 : <edit-profile-action> ( -- action )

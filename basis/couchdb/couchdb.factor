@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2009 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs continuations debugger fry hashtables http
-http.client io io.encodings.string io.encodings.utf8 json.reader
-json.writer kernel locals make math math.parser namespaces sequences
-strings urls.encoding vectors ;
+USING: accessors assocs continuations debugger fry hashtables
+http http.client io io.encodings.string io.encodings.utf8
+json.reader json.writer kernel locals make math math.parser
+namespaces sequences strings urls.encoding vectors ;
 IN: couchdb
 
 ! NOTE: This code only works with the latest couchdb (0.9.*), because old

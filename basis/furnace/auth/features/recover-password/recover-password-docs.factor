@@ -1,5 +1,5 @@
 USING: furnace.auth.features.recover-password help.markup
-help.syntax kernel strings urls ;
+help.syntax kernel ;
 IN: furnace.auth.features.recover-password+docs
 
 HELP: allow-password-recovery

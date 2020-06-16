@@ -1,7 +1,6 @@
-USING: help.markup help.syntax ui.commands ui.operations
-editors vocabs.loader kernel sequences prettyprint tools.test
-vocabs.refresh strings unicode ui.tools.browser ui.tools.common
-ui.operations+docs ;
+USING: help.markup help.syntax kernel prettyprint sequences
+tools.test ui.commands ui.operations ui.tools.browser
+ui.tools.common unicode vocabs.refresh ;
 IN: help.tutorial
 
 ARTICLE: "first-program-start" "Creating a vocabulary for your first program"

@@ -1,7 +1,13 @@
-USING: byte-arrays checksums.sha furnace.auth
-furnace.auth.providers furnace.auth.providers.db+docs
-help.markup help.syntax http kernel math strings words.symbol ;
-IN: furnace.auth+docs
+USING: accessors assocs byte-arrays checksums checksums.sha
+combinators destructors fry furnace.actions
+furnace.auth.providers furnace.auth.providers.db
+furnace.auth.providers.db+docs furnace.boilerplate
+furnace.redirection furnace.utilities help.markup help.syntax
+html.forms http http.server http.server.dispatchers
+http.server.filters io.binary io.encodings.string
+io.encodings.utf8 io.sockets.secure kernel logging math
+namespaces random sequences sets strings urls words.symbol ;
+IN: furnace.auth
 
 HELP: <protected>
 { $values
