@@ -1,4 +1,4 @@
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax io.files.windows ;
 IN: io.files.windows+docs
 
 HELP: open-read
