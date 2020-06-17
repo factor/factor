@@ -1,8 +1,8 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors fry io.directories io.files.types io.pathnames
-kernel sequences sequences.extras sets splitting system vocabs
-words ;
+USING: accessors assocs fry io.directories io.files.types
+io.pathnames kernel sequences sequences.extras sets splitting
+system vocabs words ;
 IN: sections
 
 ! <{ private linux }
@@ -50,9 +50,35 @@ INSTANCE: 64-bit section
         [ name>> ] map
         [ ".factor" tail? ] filter
     ] [ vocab-name ] bi
-    '[ file-stem _ head? ] filter ;
+    [ head? ] curry
+    [ file-stem ] prepose filter ;
+
+: vocab/stem>sections ( vocab stem -- sections )
+    ?head drop "-" ?head drop "," split harvest ;
 
 : vocab>section-paths ( vocab -- assoc )
     [ vocab-section-paths ]
     [ vocab-name ] bi
-    '[ file-stem _ ?head drop "-" ?head drop "," split harvest ] map-zip ;
+    [ vocab/stem>sections ] curry
+    [ file-stem ] prepose map-zip ;
+
+HOOK: platform-sections os ( -- seq )
+M: linux platform-sections { "linux" "unix" } ;
+M: macosx platform-sections { "macosx" "unix" } ;
+M: freebsd platform-sections { "freebsd" "unix" } ;
+
+: default-load-sections ( -- seq )
+    platform-sections { "docs" "private" } append ;
+
+: default-test-sections ( -- seq )
+    platform-sections { "docs" "private" "tests" } append ;
+
+: default-use-sections ( -- seq )
+    platform-sections { "docs" "tests" } append ;
+
+: load-section-file? ( required-sections -- ? )
+    default-load-sections diff empty? ;
+
+: vocab>loadable-paths ( vocab -- paths )
+    vocab>section-paths
+    [ nip load-section-file? ] assoc-filter keys ;
