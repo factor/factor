@@ -28,7 +28,8 @@ current-vocab
 { search-vocabs vector }
 { qualified-vocabs vector }
 { auto-used vector }
-{ sections hash-set } ;
+{ sections hash-set }
+{ load-sections hash-set } ;
 
 : <manifest> ( -- manifest )
     manifest new
@@ -36,7 +37,8 @@ current-vocab
         V{ } clone >>search-vocabs
         V{ } clone >>qualified-vocabs
         V{ } clone >>auto-used
-        HS{ } clone >>sections ;
+        HS{ } clone >>sections
+        default-load-sections clone >>load-sections ;
 
 M: manifest clone
     call-next-method
@@ -44,7 +46,8 @@ M: manifest clone
         [ clone ] change-search-vocabs
         [ clone ] change-qualified-vocabs
         [ clone ] change-auto-used
-        [ clone ] change-sections ;
+        [ clone ] change-sections
+        [ clone ] change-load-sections ;
 
 TUPLE: extra-words words ;
 
@@ -107,16 +110,19 @@ TUPLE: no-current-vocab-error ;
 ERROR: unbalanced-private-declaration vocab ;
 
 : begin-private ( -- )
-    private add-manifest-section
+    "private" add-manifest-section
     current-vocab name>> "+private" ?tail
     [ unbalanced-private-declaration ]
     [ "+private" append set-current-vocab ] if ;
 
 : end-private ( -- )
-    private remove-manifest-section
+    "private" remove-manifest-section
     current-vocab name>> "+private" ?tail
     [ set-current-vocab ]
     [ unbalanced-private-declaration ] if ;
+
+: sections-ok? ( sections -- ? )
+    manifest get load-sections>> diff null? ;
 
 : using-vocab? ( vocab -- ? )
     vocab-name manifest get search-vocab-names>> in? ;
