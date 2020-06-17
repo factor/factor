@@ -608,9 +608,6 @@ PRIVATE>
 : count-subseq* ( subseq seq -- n )
     start-all* length ; inline
 
-: map-zip ( quot: ( x -- y ) -- alist )
-    '[ _ keep swap ] map>alist ; inline
-
 : map-keys ( assoc quot: ( key -- key' ) -- assoc )
     '[ _ dip ] assoc-map ; inline
 

@@ -1,1 +1,0 @@
-File types for file-info and directory listing

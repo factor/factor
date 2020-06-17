@@ -241,6 +241,17 @@ M: parsing-word definer drop \ SYNTAX: \ ; ;
 
 : deprecated? ( obj -- ? ) "deprecated" word-prop? ;
 
+: word-sections ( word -- hs ) "sections" word-prop ;
+
+: add-word-section ( obj word -- ) word-sections adjoin ;
+
+: remove-word-section ( obj word -- ) word-sections delete ;
+
+: in-section? ( obj word -- ? ) word-sections member? ;
+
+: private-words ( vocab -- words )
+    vocab-words [ word-sections "private" swap in? ] filter ;
+
 ! Definition protocol
 M: word where "loc" word-prop ;
 

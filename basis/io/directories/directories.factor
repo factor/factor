@@ -5,12 +5,6 @@ continuations destructors fry io io.backend io.encodings.binary
 io.files io.pathnames kernel namespaces sequences system vocabs ;
 IN: io.directories
 
-: set-current-directory ( path -- )
-    absolute-path current-directory set ;
-
-: with-directory ( path quot -- )
-    [ absolute-path current-directory ] dip with-variable ; inline
-
 : with-resource-directory ( quot -- )
     [ "resource:" ] dip with-directory ; inline
 
@@ -35,41 +29,6 @@ DEFER: make-parent-directories
 
 : with-ensure-directory ( path quot -- )
     [ absolute-path dup make-directories current-directory ] dip with-variable ; inline
-
-! Listing directories
-TUPLE: directory-entry name type ;
-
-C: <directory-entry> directory-entry
-
-HOOK: (directory-entries) os ( path -- seq )
-
-: directory-entries ( path -- seq )
-    normalize-path
-    (directory-entries)
-    [ name>> { "." ".." } member? ] reject ;
-
-: directory-files ( path -- seq )
-    directory-entries [ name>> ] map! ;
-
-: with-directory-entries ( path quot -- )
-    '[ "" directory-entries @ ] with-directory ; inline
-
-: with-directory-files ( path quot -- )
-    '[ "" directory-files @ ] with-directory ; inline
-
-: qualified-directory-entries ( path -- seq )
-    absolute-path
-    dup directory-entries [ [ append-path ] change-name ] with map! ;
-
-: qualified-directory-files ( path -- seq )
-    absolute-path
-    dup directory-files [ append-path ] with map! ;
-
-: with-qualified-directory-files ( path quot -- )
-    '[ "" qualified-directory-files @ ] with-directory ; inline
-
-: with-qualified-directory-entries ( path quot -- )
-    '[ "" qualified-directory-entries @ ] with-directory ; inline
 
 ! Touching files
 HOOK: touch-file io-backend ( path -- )

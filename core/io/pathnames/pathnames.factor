@@ -166,6 +166,12 @@ M: string absolute-path
 M: object normalize-path ( path -- path' )
     absolute-path ;
 
+: set-current-directory ( path -- )
+    absolute-path current-directory set ;
+
+: with-directory ( path quot -- )
+    [ absolute-path current-directory ] dip with-variable ; inline
+
 : root-path* ( path -- path' )
     dup absolute-path? [
         dup [ path-separator? ] find

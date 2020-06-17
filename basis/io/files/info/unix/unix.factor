@@ -3,7 +3,7 @@
 USING: accessors alien.c-types alien.data arrays calendar
 calendar.unix classes.struct combinators
 combinators.short-circuit io.backend io.files.info
-io.files.types kernel libc literals math math.bitwise
+io.files kernel libc literals math math.bitwise
 sequences specialized-arrays strings system unix unix.ffi
 unix.groups unix.stat unix.time unix.users vocabs ;
 IN: io.files.info.unix

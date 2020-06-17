@@ -47,4 +47,4 @@ M: unix new-utmpx-record
         produce nip
     ] with-utmpx ;
 
-"unix.utmpx." os name>> append require
+! "unix.utmpx." os name>> append require

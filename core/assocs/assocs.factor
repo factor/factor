@@ -210,6 +210,9 @@ M: assoc values [ nip ] { } assoc>map ;
 : map>alist ( ... seq quot: ( ... elt -- ... key value ) -- ... alist )
     { } map>assoc ; inline
 
+: map-zip ( quot: ( x -- y ) -- alist )
+    [ keep swap ] curry map>alist ; inline
+
 : extract-keys ( seq assoc -- subassoc )
     [ [ dupd at ] curry ] keep map>assoc ;
 

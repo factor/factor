@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel sequences combinators fry
-io.directories io.pathnames io.files.info io.files.types
+io.directories io.pathnames io.files.info io.files
 io.files.links io.backend make ;
 IN: io.directories.hierarchy
 

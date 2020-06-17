@@ -4,7 +4,7 @@
 USING: accessors calendar combinators.short-circuit environment
 formatting io io.backend io.directories io.encodings.utf8
 io.files io.files.info io.files.info.unix io.files.trash
-io.files.types io.pathnames kernel math math.parser sequences
+io.files io.pathnames kernel math math.parser sequences
 system unix.stat unix.users xdg ;
 
 IN: io.files.trash.unix

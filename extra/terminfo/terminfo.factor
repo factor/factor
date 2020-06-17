@@ -3,7 +3,7 @@
 
 USING: accessors assocs combinators formatting fry grouping hashtables
 io io.binary io.directories io.encodings.binary io.files
-io.files.types io.pathnames kernel math math.parser memoize pack
+io.files io.pathnames kernel math math.parser memoize pack
 sequences sequences.generalizations splitting strings system ;
 
 IN: terminfo

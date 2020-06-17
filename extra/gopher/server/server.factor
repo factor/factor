@@ -4,7 +4,7 @@
 USING: accessors calendar combinators combinators.short-circuit
 formatting fry io io.directories io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files io.files.info
-io.files.types io.pathnames io.servers kernel locals math
+io.files io.pathnames io.servers kernel locals math
 mime.types sequences splitting strings urls.encoding ;
 
 IN: gopher.server

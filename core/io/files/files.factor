@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.strings init io io.backend io.encodings
+USING: accessors alien.strings init io io.backend io.encodings
 io.pathnames kernel kernel+private namespaces sequences
 splitting system ;
 IN: io.files
@@ -72,6 +72,54 @@ HOOK: (file-appender) io-backend ( path -- stream )
 
 : exists? ( path -- ? )
     normalize-path native-string>alien (exists?) ;
+
+SYMBOL: +regular-file+
+SYMBOL: +directory+
+SYMBOL: +symbolic-link+
+SYMBOL: +character-device+
+SYMBOL: +block-device+
+SYMBOL: +fifo+
+SYMBOL: +socket+
+SYMBOL: +whiteout+
+SYMBOL: +unknown+
+
+! Listing directories
+: set-current-directory ( path -- )
+    absolute-path current-directory set ;
+
+TUPLE: directory-entry name type ;
+
+C: <directory-entry> directory-entry
+
+HOOK: (directory-entries) os ( path -- seq )
+
+: directory-entries ( path -- seq )
+    normalize-path
+    (directory-entries)
+    [ name>> { "." ".." } member? ] reject ;
+
+: directory-files ( path -- seq )
+    directory-entries [ name>> ] map! ;
+
+: with-directory-entries ( path quot -- )
+    [ "" directory-entries ] prepose with-directory ; inline
+
+: with-directory-files ( path quot -- )
+    [ "" directory-files ] prepose with-directory ; inline
+
+: qualified-directory-entries ( path -- seq )
+    absolute-path
+    dup directory-entries [ [ append-path ] change-name ] with map! ;
+
+: qualified-directory-files ( path -- seq )
+    absolute-path
+    dup directory-files [ append-path ] with map! ;
+
+: with-qualified-directory-files ( path quot -- )
+    [ "" qualified-directory-files ] prepose with-directory ; inline
+
+: with-qualified-directory-entries ( path quot -- )
+    [ "" qualified-directory-entries ] prepose with-directory ; inline
 
 ! Current directory
 <PRIVATE

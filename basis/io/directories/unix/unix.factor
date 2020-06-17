@@ -3,7 +3,7 @@
 USING: accessors alien.c-types alien.data alien.strings assocs
 classes.struct continuations fry io.backend io.backend.unix
 io.directories io.files io.files.info io.files.info.unix
-io.files.types kernel libc literals math sequences system unix
+io.pathnames kernel libc literals math sequences system unix
 unix.ffi vocabs ;
 IN: io.directories.unix
 
