@@ -165,6 +165,7 @@ $(info TEST_SRCS is $(TEST_SRCS))
 $(info TEST_OBJS is $(TEST_OBJS))
 $(info EXECUTABLE_FILES is $(EXECUTABLE_FILES))
 $(info default goal $(.DEFAULT_GOAL))
+# make -pnr
 
 default: $(OUTPUT_DIR)
 	$(MAKE) `./build.sh make-target`

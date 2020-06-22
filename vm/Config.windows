@@ -5,8 +5,8 @@ SHARED_DLL_EXTENSION=.dll
 
 LIBS = -lm
 
-PLAF_DLL_OBJS += "$(OUTPUT_DIR)/os-windows.o" "$(OUTPUT_DIR)/mvm-windows.o"
-PLAF_EXE_OBJS += "$(OUTPUT_DIR)/resources.o" "$(OUTPUT_DIR)/main-windows.o"
+PLAF_DLL_SRCS += vm/os-windows.cpp vm/mvm-windows.cpp
+PLAF_EXE_SRCS += vm/resources.cpp vm/main-windows.cpp
 PLAF_MASTER_HEADERS += vm/os-windows.hpp
 
 EXE_SUFFIX=

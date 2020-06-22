@@ -2,7 +2,7 @@ include vm/Config.unix
 
 SITE_CFLAGS += -mmacosx-version-min=10.9
 
-PLAF_DLL_OBJS += "$(OUTPUT_DIR)/os-macosx.o" "$(OUTPUT_DIR)/mach_signal.o" "$(OUTPUT_DIR)/mvm-unix.o"
+PLAF_DLL_SRCS += vm/os-macosx.cpp vm/mach_signal.cpp vm/mvm-unix.cpp
 PLAF_MASTER_HEADERS += vm/os-macosx.hpp vm/mach_signal.hpp
 
 DLL_EXTENSION = .dylib

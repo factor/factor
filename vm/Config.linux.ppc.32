@@ -1,3 +1,3 @@
 include vm/Config.linux
-PLAF_DLL_OBJS += "$(OUTPUT_DIR)/cpu-ppc.linux.o"
+PLAF_DLL_SRCS += vm/cpu-ppc.linux.cpp
 SITE_CFLAGS += -m32
