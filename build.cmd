@@ -7,6 +7,8 @@ if not defined GIT_BRANCH (
     set GIT_BRANCH=master
 )
 
+rem PROCESSOR_ARCHITECTURE
+
 if "%1"=="/?" (
     goto usage
 ) else if "%1"=="" (

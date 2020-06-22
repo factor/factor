@@ -1,6 +1,12 @@
 ifdef CONFIG
 	VERSION = 0.99
 	GIT_LABEL = $(shell echo `git describe --all`-`git rev-parse HEAD`)
+	GIT_BRANCH = $(shell git describe --all --exact-match 2>/dev/null | sed 's=.*/==')
+	#$(info GIT_BRANCH123 is $(GIT_BRANCH))
+	ARCH=$(shell uname -m)
+	#$(info ARCH IS $(ARCH))
+	OUTPUT_DIR ?= $(GIT_BRANCH)_$(ARCH)
+	#$(info OBJECT_DIR is $(OBJECT_DIR))
 	BUNDLE = Factor.app
 	DEBUG ?= 0
 	REPRODUCIBLE ?= 0
@@ -36,52 +42,54 @@ ifdef CONFIG
 		CFLAGS += -DFACTOR_REPRODUCIBLE
 	endif
 
-	ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
-	EXECUTABLE = factor$(EXE_SUFFIX)$(EXE_EXTENSION)
-	CONSOLE_EXECUTABLE = factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION)
+	ENGINE = $(OUTPUT_DIR)/$(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
+	EXECUTABLE = $(OUTPUT_DIR)/factor$(EXE_SUFFIX)$(EXE_EXTENSION)
+	CONSOLE_EXECUTABLE = $(OUTPUT_DIR)/factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION)
 
-	DLL_OBJS = $(PLAF_DLL_OBJS) \
-		vm/aging_collector.o \
-		vm/alien.o \
-		vm/arrays.o \
-		vm/bignum.o \
-		vm/byte_arrays.o \
-		vm/callbacks.o \
-		vm/callstack.o \
-		vm/code_blocks.o \
-		vm/code_heap.o \
-		vm/compaction.o \
-		vm/contexts.o \
-		vm/data_heap.o \
-		vm/data_heap_checker.o \
-		vm/debug.o \
-		vm/dispatch.o \
-		vm/entry_points.o \
-		vm/errors.o \
-		vm/factor.o \
-		vm/full_collector.o \
-		vm/gc.o \
-		vm/image.o \
-		vm/inline_cache.o \
-		vm/instruction_operands.o \
-		vm/io.o \
-		vm/jit.o \
-		vm/math.o \
-		vm/mvm.o \
-		vm/nursery_collector.o \
-		vm/object_start_map.o \
-		vm/objects.o \
-		vm/primitives.o \
-		vm/quotations.o \
-		vm/run.o \
-		vm/safepoints.o \
-		vm/sampling_profiler.o \
-		vm/strings.o \
-		vm/to_tenured_collector.o \
-		vm/tuples.o \
-		vm/utilities.o \
-		vm/vm.o \
-		vm/words.o
+	DLL_SRCS = $(PLAF_DLL_SRCS) \
+		vm/aging_collector.cpp \
+		vm/alien.cpp \
+		vm/arrays.cpp \
+		vm/bignum.cpp \
+		vm/byte_arrays.cpp \
+		vm/callbacks.cpp \
+		vm/callstack.cpp \
+		vm/code_blocks.cpp \
+		vm/code_heap.cpp \
+		vm/compaction.cpp \
+		vm/contexts.cpp \
+		vm/data_heap.cpp \
+		vm/data_heap_checker.cpp \
+		vm/debug.cpp \
+		vm/dispatch.cpp \
+		vm/entry_points.cpp \
+		vm/errors.cpp \
+		vm/factor.cpp \
+		vm/full_collector.cpp \
+		vm/gc.cpp \
+		vm/image.cpp \
+		vm/inline_cache.cpp \
+		vm/instruction_operands.cpp \
+		vm/io.cpp \
+		vm/jit.cpp \
+		vm/math.cpp \
+		vm/mvm.cpp \
+		vm/nursery_collector.cpp \
+		vm/object_start_map.cpp \
+		vm/objects.cpp \
+		vm/primitives.cpp \
+		vm/quotations.cpp \
+		vm/run.cpp \
+		vm/safepoints.cpp \
+		vm/sampling_profiler.cpp \
+		vm/strings.cpp \
+		vm/to_tenured_collector.cpp \
+		vm/tuples.cpp \
+		vm/utilities.cpp \
+		vm/vm.cpp \
+		vm/words.cpp
+	
+	DLL_OBJS = $(DLL_SRCS:vm/%.cpp=$(OUTPUT_DIR)/%.o)
 
 	MASTER_HEADERS = $(PLAF_MASTER_HEADERS) \
 		vm/aging_space.hpp \
@@ -137,14 +145,28 @@ ifdef CONFIG
 		vm/vm.hpp \
 		vm/write_barrier.hpp
 
-	EXE_OBJS = $(PLAF_EXE_OBJS)
+	EXE_SRCS = $(PLAF_EXE_SRCS)
+
+	EXE_OBJS = $(EXE_SRCS:vm/%.cpp=$(OUTPUT_DIR)/%.o)
 
 	FFI_TEST_LIBRARY = libfactor-ffi-test$(SHARED_DLL_EXTENSION)
 
-	TEST_OBJS = vm/ffi_test.o
+	TEST_SRCS = vm/ffi_test.c
+	TEST_OBJS = $(TEST_SRCS:vm/%.c=$(OUTPUT_DIR)/%.o)
+
 endif
 
-default:
+$(info OUTPUT_DIR is $(OUTPUT_DIR))
+$(info EXE_SRCS is $(EXE_SRCS))
+$(info EXE_OBJS is $(EXE_OBJS))
+$(info DLL_SRCS is $(DLL_SRCS))
+$(info DLL_OBJS is $(DLL_OBJS))
+$(info TEST_SRCS is $(TEST_SRCS))
+$(info TEST_OBJS is $(TEST_OBJS))
+$(info EXECUTABLE_FILES is $(EXECUTABLE_FILES))
+$(info default goal $(.DEFAULT_GOAL))
+
+default: $(OUTPUT_DIR)
 	$(MAKE) `./build.sh make-target`
 
 help:
@@ -223,7 +245,8 @@ $(ENGINE): $(DLL_OBJS)
 
 factor-lib: $(ENGINE)
 
-factor: $(EXE_OBJS) $(DLL_OBJS)
+$(OUTPUT_DIR)/factor: $(EXE_OBJS) $(DLL_OBJS)
+	echo hi
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
 		$(CFLAGS) $(CXXFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
@@ -236,23 +259,36 @@ factor-ffi-test: $(FFI_TEST_LIBRARY)
 $(FFI_TEST_LIBRARY): vm/ffi_test.o
 	$(TOOLCHAIN_PREFIX)$(CC) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o $(FFI_TEST_LIBRARY) $(TEST_OBJS)
 
-vm/resources.o:
-	$(TOOLCHAIN_PREFIX)$(WINDRES) vm/factor.rs vm/resources.o
-
-vm/ffi_test.o: vm/ffi_test.c
-	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
+$(OUTPUT_DIR)/resources.o:
+	$(TOOLCHAIN_PREFIX)$(WINDRES) vm/factor.rs $(OUTPUT_DIR)/resources.o
 
 vm/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c -x c++-header $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
 %.o: %.cpp vm/master.hpp.gch
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $(OUTPUT_DIR)/$@ $<
 
 %.o: %.S
-	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(CXXFLAGS) -o $(OUTPUT_DIR)/$@ $<
 
 %.o: %.mm vm/master.hpp.gch
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $(OUTPUT_DIR)/$@ $<
+
+$(DLL_OBJS): $(OUTPUT_DIR)/%.o: vm/%.cpp vm/master.hpp.gch
+	mkdir -p $(OUTPUT_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
+
+$(EXE_OBJS): $(OUTPUT_DIR)/%.o: vm/%.cpp vm/master.hpp.gch
+	mkdir -p $(OUTPUT_DIR)
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
+
+$(TEST_OBJS): $(OUTPUT_DIR)/%.o: vm/%.c
+	mkdir -p $(OUTPUT_DIR)
+	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
+
+$(OUTPUT_DIR):
+	mkdir -p $(OUTPUT_DIR)
+
 
 .SUFFIXES: .mm
 
