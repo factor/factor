@@ -28,3 +28,6 @@ CONSTANT: verizon-dns-servers {
     "4.2.2.6"
 }
 : verizon-host ( domain -- ) [ verizon-dns-servers ] dip dns-host ;
+
+CONSTANT: cloudflare-dns-servers { "1.1.1.1" }
+: cloudflare-host ( domain -- ) [ cloudflare-dns-servers ] dip dns-host ;
