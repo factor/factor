@@ -48,7 +48,8 @@ TUPLE: processor-info
     { address-sizes array }
     { power-management string }
     { tlb-size string }
-    { bugs string } ;
+    { bugs string }
+    { vmx-flags string } ;
 
 
 ERROR: unknown-cpuinfo-line string ;
@@ -94,6 +95,7 @@ ERROR: unknown-cpuinfo-line string ;
         { "wp" [ "yes" = >>wp? ] }
         { "TLB size" [ >>tlb-size ] }
         { "bugs" [ >>bugs ] }
+        { "vmx flags" [ >>vmx-flags ] }
         [ unknown-cpuinfo-line ]
     } case ;
 
