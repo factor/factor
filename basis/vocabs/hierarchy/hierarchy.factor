@@ -29,7 +29,7 @@ ERROR: vocab-root-required root ;
     [ ensure-vocab-root ] [ check-vocab-name ] bi* ;
 
 : vocab-directory-entries ( root prefix -- vocab-path vocab-name entries )
-    [ ensure-vocab-root ] dip [ vocab-dir append-path ] keep
+    ensure-vocab-root/prefix [ vocab-dir append-path ] keep
     over dup exists? [ directory-entries ] [ drop { } ] if ;
 
 : (disk-vocabs) ( root prefix -- seq )
