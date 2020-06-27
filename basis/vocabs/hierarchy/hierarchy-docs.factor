@@ -46,7 +46,7 @@ HELP: load-all
 
 HELP: load-from-root
 { $values
-    { "root" "a vocaulary root" } { "prefix" string }
+    { "root" "a vocabulary root" } { "prefix" string }
 }
 { $description "Attempts to load all of the vocabularies with a certain prefix from a vocabulary root." } ;
 
