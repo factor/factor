@@ -1,6 +1,7 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry globs io.directories io.directories.hierarchy io.files.info
+USING: fry globs io.directories io.directories.hierarchy io.files
+io.files.info
 io.pathnames kernel regexp sequences sets vocabs.loader
 vocabs.metadata ;
 IN: vocabs.metadata.resources

@@ -1,8 +1,11 @@
 ! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs definitions kernel namespaces
-sequences sorting splitting strings ;
+USING: accessors assocs definitions
+ kernel namespaces sequences sorting splitting
+strings ;
 IN: vocabs
+
+SYMBOL: vocab-roots
 
 SYMBOL: dictionary
 
@@ -165,3 +168,7 @@ M: string require
 
 : ?load-vocab ( name -- vocab )
     [ require ] [ ?lookup-vocab ] bi ;
+
+SYMBOL: root-cache
+root-cache [ H{ } clone ] initialize
+

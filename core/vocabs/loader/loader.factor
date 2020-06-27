@@ -5,8 +5,6 @@ hashtables init io io.files io.pathnames kernel make namespaces
 parser sequences sets splitting strings system vocabs words ;
 IN: vocabs.loader
 
-SYMBOL: vocab-roots
-
 SYMBOL: add-vocab-root-hook
 
 CONSTANT: default-vocab-roots {
@@ -25,9 +23,6 @@ CONSTANT: default-vocab-roots {
 : add-vocab-root ( root -- )
     trim-tail-separators dup vocab-roots get ?adjoin
     [ add-vocab-root-hook get-global call( root -- ) ] [ drop ] if ;
-
-SYMBOL: root-cache
-root-cache [ H{ } clone ] initialize
 
 ERROR: not-found-in-roots path ;
 
@@ -178,6 +173,60 @@ PRIVATE>
 ] require-hook set-global
 
 M: vocab-spec where vocab-source-path dup [ 1 2array ] when ;
+
+
+
+
+ERROR: not-a-vocab-root string ;
+
+: vocab-root? ( string -- ? )
+    trim-tail-separators vocab-roots get member? ;
+
+: check-root ( string -- string )
+    dup vocab-root? [ not-a-vocab-root ] unless ;
+
+: check-vocab-root/vocab ( vocab-root string -- vocab-root string )
+    [ check-root ] [ check-vocab-name ] bi* ;
+
+: replace-vocab-separators ( vocab -- path )
+    path-separator first CHAR: . associate substitute ;
+
+: vocab-root/vocab>path ( vocab-root vocab -- path )
+    check-vocab-root/vocab
+    [ ] [ replace-vocab-separators ] bi* append-path ;
+
+: vocab>path ( vocab -- path )
+    ! check-vocab
+    [ find-vocab-root ] keep vocab-root/vocab>path ;
+
+: ?vocab>path ( vocab -- path )
+    ! check-vocab
+    [ find-vocab-root ] keep
+    over [ vocab-root/vocab>path ] [ 2drop f ] if ;
+
+: vocab-entries ( vocab -- entries )
+    vocab>path qualified-directory-entries ;
+
+: ?vocab-entries ( vocab -- entries )
+    ?vocab>path [ qualified-directory-entries ] [ { } ] if* ;
+
+: vocab-name-last ( vocab-name -- last )
+    vocab-name "." split1-last swap or ;
+
+: vocab-section-paths ( vocab -- paths )
+    [
+        ?vocab-entries
+        [ type>> +regular-file+ = ] filter
+        [ name>> ] map
+        [ ".factor" tail? ] filter
+    ] [ vocab-name-last ] bi
+    [ head? ] curry
+    [ file-stem ] prepose filter ;
+
+: vocab/stem>sections ( vocab stem -- sections )
+    ?head drop "-" ?head drop "," split harvest ;
+
+
 
 ! put here to avoid circularity between vocabs.loader and source-files.errors
 { "source-files.errors" "debugger" } "source-files.errors.debugger" require-when

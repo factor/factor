@@ -36,47 +36,6 @@ HELP: with-directory
 $nl
 "If " { $snippet "path" } " is relative, it is first resolved relative to the current directory. If " { $snippet "path" } " is absolute, it becomes the new current directory." } ;
 
-HELP: (directory-entries)
-{ $values { "path" "a pathname string" } { "seq" "a sequence of " { $link directory-entry } " objects" } }
-{ $description "Outputs the contents of a directory named by " { $snippet "path" } "." }
-{ $notes "This is a low-level word, and user code should call one of the related words instead." } ;
-
-HELP: directory-entries
-{ $values { "path" "a pathname string" } { "seq" "a sequence of " { $link directory-entry } " objects" } }
-{ $description "Outputs the contents of a directory named by " { $snippet "path" } "." } ;
-
-HELP: qualified-directory-entries
-{ $values { "path" "a pathname string" } { "seq" "a sequence of " { $link directory-entry } " objects" } }
-{ $description "Outputs the contents of a directory named by " { $snippet "path" } " using absolute file paths." } ;
-
-HELP: directory-files
-{ $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }
-{ $description "Outputs the contents of a directory named by " { $snippet "path" } " as a sequence of filenames." } ;
-
-HELP: qualified-directory-files
-{ $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }
-{ $description "Outputs the contents of a directory named by " { $snippet "path" } " as a sequence of absolute paths." } ;
-
-HELP: with-directory-files
-{ $values { "path" "a pathname string" } { "quot" quotation } }
-{ $description "Calls the quotation with the directory file names on the stack and with the directory set as the " { $link current-directory } ". Restores the current directory after the quotation is called." }
-{ $examples
-    "Print all files in your home directory which are larger than a megabyte:"
-    { $code
-        "USING: io.directories io.files.info io.pathnames ;
-home [
-    [
-        dup link-info size>> 20 2^ >
-        [ print ] [ drop ] if
-    ] each
-] with-directory-files"
-    }
-} ;
-
-HELP: with-directory-entries
-{ $values { "path" "a pathname string" } { "quot" quotation } }
-{ $description "Calls the quotation with the directory entries on the stack and with the directory set as the " { $link current-directory } ". Restores the current directory after the quotation is called." } ;
-
 HELP: delete-file
 { $values { "path" "a pathname string" } }
 { $description "Deletes a file." }
@@ -153,19 +112,6 @@ ARTICLE: "current-directory" "Current working directory"
 { $subsections
     cd
     cwd
-} ;
-
-ARTICLE: "io.directories.listing" "Directory listing"
-"Directory listing:"
-{ $subsections
-    directory-entries
-    directory-files
-    with-directory-entries
-    with-directory-files
-    qualified-directory-entries
-    qualified-directory-files
-    with-qualified-directory-files
-    with-qualified-directory-entries
 } ;
 
 ARTICLE: "io.directories.create" "Creating directories"

@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.data classes.struct fry
+USING: alien.c-types alien.data classes.struct fry io.files
 io.directories io.directories.unix kernel libc math sequences
 system unix.ffi ;
 IN: io.directories.unix.linux

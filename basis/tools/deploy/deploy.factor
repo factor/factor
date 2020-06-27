@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators command-line io.directories kernel namespaces
 sequences system tools.deploy.backend tools.deploy.config
-tools.deploy.config.editor vocabs vocabs.loader ;
+tools.deploy.config.editor vocabs vocabs.loader io.pathnames ;
 IN: tools.deploy
 
 ERROR: no-vocab-main vocab ;
