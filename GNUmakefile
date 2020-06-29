@@ -1,12 +1,11 @@
+ARCH = $(shell uname -m)
+OUTPUT_DIR ?= vm$(ARCH)
+
 ifdef CONFIG
 	VERSION = 0.99
 	GIT_LABEL = $(shell echo `git describe --all`-`git rev-parse HEAD`)
 	GIT_BRANCH = $(shell git describe --all --exact-match 2>/dev/null | sed 's=.*/==')
 	#$(info GIT_BRANCH123 is $(GIT_BRANCH))
-	ARCH=$(shell uname -m)
-	#$(info ARCH IS $(ARCH))
-	OUTPUT_DIR ?= $(GIT_BRANCH)_$(ARCH)
-	#$(info OBJECT_DIR is $(OBJECT_DIR))
 	BUNDLE = Factor.app
 	DEBUG ?= 0
 	REPRODUCIBLE ?= 0
@@ -149,14 +148,18 @@ ifdef CONFIG
 
 	EXE_OBJS = $(EXE_SRCS:vm/%.cpp=$(OUTPUT_DIR)/%.o)
 
-	FFI_TEST_LIBRARY = libfactor-ffi-test$(SHARED_DLL_EXTENSION)
+	FFI_TEST_LIBRARY = $(OUTPUT_DIR)/libfactor-ffi-test$(SHARED_DLL_EXTENSION)
 
 	TEST_SRCS = vm/ffi_test.c
 	TEST_OBJS = $(TEST_SRCS:vm/%.c=$(OUTPUT_DIR)/%.o)
 
+	EXECUTABLE_FILES = $(EXECUTABLE) $(CONSOLE_EXECUTABLE)
 endif
 
 $(info OUTPUT_DIR is $(OUTPUT_DIR))
+$(info ENGINE is $(ENGINE))
+$(info FFI_TEST_LIBRARY is $(FFI_TEST_LIBRARY))
+
 $(info EXE_SRCS is $(EXE_SRCS))
 $(info EXE_OBJS is $(EXE_OBJS))
 $(info DLL_SRCS is $(DLL_SRCS))
@@ -164,11 +167,19 @@ $(info DLL_OBJS is $(DLL_OBJS))
 $(info TEST_SRCS is $(TEST_SRCS))
 $(info TEST_OBJS is $(TEST_OBJS))
 $(info EXECUTABLE_FILES is $(EXECUTABLE_FILES))
+$(info CONFIG is $(CONFIG))
 $(info default goal $(.DEFAULT_GOAL))
+$(info MAKECMDGOALS is $(MAKECMDGOALS))
 # make -pnr
 
-default: $(OUTPUT_DIR)
+default: $(OUTPUT_DIR) printvars
 	$(MAKE) `./build.sh make-target`
+
+$(OUTPUT_DIR):
+	mkdir -p $(OUTPUT_DIR)
+
+printvars:
+	@$(foreach V,$(sort $(.VARIABLES)), $(if $(filter-out environment% default automatic, $(origin $V)),$(warning $V=$($V) ($(value $V)))))
 
 help:
 	@echo "Run '$(MAKE)' with one of the following parameters:"
@@ -193,7 +204,10 @@ help:
 	@echo "SITE_CFLAGS=...  additional optimization flags"
 	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on Mac OS X)"
 
-ALL = factor factor-ffi-test factor-lib
+ALL = $(OUTPUT_DIR)/factor $(OUTPUT_DIR)/factor-ffi-test $(OUTPUT_DIR)/factor-lib
+
+$(info ALL is $(ALL))
+
 
 freebsd-x86-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.32
@@ -222,7 +236,8 @@ linux-ppc-32:
 linux-ppc-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc.64
 
-linux-arm-64:
+linux-arm-64: printvars
+	$(info calling make with: $(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.64)
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.64
 
 windows-x86-32:
@@ -233,31 +248,32 @@ windows-x86-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.64
 	$(MAKE) factor-console CONFIG=vm/Config.windows.x86.64
 
+
 ifdef CONFIG
 
-macosx.app: factor
+macosx.app: $(OUTPUT_DIR)/factor
 	mkdir -p $(BUNDLE)/Contents/MacOS
 	mkdir -p $(BUNDLE)/Contents/Frameworks
 	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
 	ln -s Factor.app/Contents/MacOS/factor ./factor
 
-$(ENGINE): $(DLL_OBJS)
+$(OUTPUT_DIR)/$(ENGINE): $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(DLL_OBJS)
 
-factor-lib: $(ENGINE)
+$(OUTPUT_DIR)/factor-lib: $(ENGINE)
 
 $(OUTPUT_DIR)/factor: $(EXE_OBJS) $(DLL_OBJS)
-	echo hi
+	$(info OMGgggggggggggggggggggggggggggggg)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
 		$(CFLAGS) $(CXXFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
-factor-console: $(EXE_OBJS) $(DLL_OBJS)
+$(OUTPUT_DIR)/factor-console: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
 		$(CFLAGS) $(CXXFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
-factor-ffi-test: $(FFI_TEST_LIBRARY)
+$(OUTPUT_DIR)/factor-ffi-test: $(FFI_TEST_LIBRARY)
 
-$(FFI_TEST_LIBRARY): vm/ffi_test.o
+$(FFI_TEST_LIBRARY): $(OUTPUT_DIR)/ffi_test.o
 	$(TOOLCHAIN_PREFIX)$(CC) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o $(FFI_TEST_LIBRARY) $(TEST_OBJS)
 
 $(OUTPUT_DIR)/resources.o:
@@ -266,14 +282,14 @@ $(OUTPUT_DIR)/resources.o:
 vm/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c -x c++-header $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
-%.o: %.cpp vm/master.hpp.gch
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $(OUTPUT_DIR)/$@ $<
+#%.o: %.cpp vm/master.hpp.gch
+#	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $(OUTPUT_DIR)/$@ $<
 
-%.o: %.S
-	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(CXXFLAGS) -o $(OUTPUT_DIR)/$@ $<
+#%.o: %.S
+#	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(CXXFLAGS) -o $(OUTPUT_DIR)/$@ $<
 
-%.o: %.mm vm/master.hpp.gch
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $(OUTPUT_DIR)/$@ $<
+#%.o: %.mm vm/master.hpp.gch
+#	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $(OUTPUT_DIR)/$@ $<
 
 $(DLL_OBJS): $(OUTPUT_DIR)/%.o: vm/%.cpp vm/master.hpp.gch
 	mkdir -p $(OUTPUT_DIR)
@@ -286,10 +302,6 @@ $(EXE_OBJS): $(OUTPUT_DIR)/%.o: vm/%.cpp vm/master.hpp.gch
 $(TEST_OBJS): $(OUTPUT_DIR)/%.o: vm/%.c
 	mkdir -p $(OUTPUT_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
-
-$(OUTPUT_DIR):
-	mkdir -p $(OUTPUT_DIR)
-
 
 .SUFFIXES: .mm
 
@@ -305,4 +317,4 @@ clean:
 	rm -f libfactor-ffi-test.*
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
 
-.PHONY: factor factor-lib factor-console factor-ffi-test tags clean macosx.app
+.PHONY: factor factor-lib factor-console factor-ffi-test tags clean macosx.app printvars
