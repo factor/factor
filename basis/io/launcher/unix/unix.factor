@@ -79,7 +79,7 @@ IN: io.launcher.unix
 : reset-ignored-signals ( process -- process )
     SIGPIPE SIG_DFL signal drop ;
 
-: spawn-process ( process -- * )
+: fork-process ( process -- pid )
     [ reset-ignored-signals ] [ 2drop 248 _exit ] recover
     [ setup-process-group ] [ 2drop 249 _exit ] recover
     [ setup-priority ] [ 2drop 250 _exit ] recover
@@ -90,10 +90,19 @@ IN: io.launcher.unix
     255 _exit
     f throw ;
 
+: spawn-process ( process -- pid )
+    [ reset-ignored-signals ] [ 2drop 248 _exit ] recover
+    [ setup-process-group ] [ 2drop 249 _exit ] recover
+    [ setup-priority ] [ 2drop 250 _exit ] recover
+    [ setup-redirection ] [ 2drop 251 _exit ] recover
+    [ current-directory get cd ] [ 2drop 252 _exit ] recover
+    [ setup-environment ] [ 2drop 253 _exit ] recover
+    [ get-arguments posix-spawn ] [ drop ] recover ;
+
 M: unix (current-process) ( -- handle ) getpid ;
 
 M: unix (run-process) ( process -- pid )
-    '[ _ spawn-process ] [ ] with-fork ;
+    '[ _ fork-process ] [ ] with-fork ;
 
 M: unix (kill-process) ( process -- )
     [ handle>> SIGTERM ] [ group>> ] bi {
