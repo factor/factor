@@ -290,16 +290,13 @@ vm/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS)
 #%.o: %.mm vm/master.hpp.gch
 #	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $(OUTPUT_DIR)/$@ $<
 
-$(DLL_OBJS): $(OUTPUT_DIR)/%.o: vm/%.cpp vm/master.hpp.gch
-	mkdir -p $(OUTPUT_DIR)
+$(DLL_OBJS): $(OUTPUT_DIR)/%.o: vm/%.cpp vm/master.hpp.gch $(OUTPUT_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
-$(EXE_OBJS): $(OUTPUT_DIR)/%.o: vm/%.cpp vm/master.hpp.gch
-	mkdir -p $(OUTPUT_DIR)
+$(EXE_OBJS): $(OUTPUT_DIR)/%.o: vm/%.cpp vm/master.hpp.gch $(OUTPUT_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
-$(TEST_OBJS): $(OUTPUT_DIR)/%.o: vm/%.c
-	mkdir -p $(OUTPUT_DIR)
+$(TEST_OBJS): $(OUTPUT_DIR)/%.o: vm/%.c $(OUTPUT_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
 
 .SUFFIXES: .mm
