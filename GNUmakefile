@@ -1,5 +1,5 @@
 ARCH = $(shell uname -m)
-OUTPUT_DIR ?= vm$(ARCH)
+OUTPUT_DIR ?= vm-$(ARCH)
 
 ifdef CONFIG
 	VERSION = 0.99
@@ -260,10 +260,9 @@ macosx.app: $(OUTPUT_DIR)/factor
 $(OUTPUT_DIR)/$(ENGINE): $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(DLL_OBJS)
 
-$(OUTPUT_DIR)/factor-lib: $(ENGINE)
+$(OUTPUT_DIR)/factor-lib: $(OUTPUT_DIR)/$(ENGINE)
 
 $(OUTPUT_DIR)/factor: $(EXE_OBJS) $(DLL_OBJS)
-	$(info OMGgggggggggggggggggggggggggggggg)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
 		$(CFLAGS) $(CXXFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
