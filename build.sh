@@ -784,7 +784,7 @@ usage() {
     $ECHO "  net-bootstrap - recompile, download a boot image, bootstrap"
     $ECHO "  make-target - find and print the os-arch-cpu string"
     $ECHO "  report|info - print the build variables"
-    $ECHO "  update-boot-image - get the boot image for the current branch of for master"
+    $ECHO "  update-boot-image - get the boot image for the current branch"
     $ECHO ""
     $ECHO "If you are behind a firewall, invoke as:"
     $ECHO "env GIT_PROTOCOL=http $0 <command>"
