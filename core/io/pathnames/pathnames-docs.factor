@@ -57,7 +57,7 @@ HELP: append-path
 
 HELP: prepend-path
 { $values { "path1" "a pathname string" } { "path2" "a pathname string" } { "path" "a pathname string" } }
-{ $description "Appends " { $snippet "path2" } " and " { $snippet "path1" } " to form a pathname." }
+{ $description "Prepends " { $snippet "path2" } " and " { $snippet "path1" } " to form a pathname." }
 { $examples
     { $unchecked-example "USING: io.pathnames prettyprint ;
 \"second.txt\" \"first\" prepend-path ."
