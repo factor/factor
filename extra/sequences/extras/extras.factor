@@ -617,6 +617,18 @@ PRIVATE>
 : map-values ( assoc quot: ( value -- value' ) -- assoc )
     '[ swap _ dip swap ] assoc-map ; inline
 
+: filter-keys ( assoc quot: ( key -- key' ) -- assoc' )
+    '[ drop @ ] assoc-filter ; inline
+
+: filter-values ( assoc quot: ( value -- value' ) -- assoc' )
+    '[ nip @ ] assoc-filter ; inline
+
+: reject-keys ( assoc quot: ( key -- key' ) -- assoc' )
+    '[ drop @ ] assoc-reject ; inline
+
+: reject-values ( assoc quot: ( value -- value' ) -- assoc' )
+    '[ nip @ ] assoc-reject ; inline
+
 : take-while ( ... seq quot: ( ... elt -- ... ? ) -- head-slice )
     [ '[ @ not ] find drop ] keepd swap
     [ dup length ] unless* head-slice ; inline
