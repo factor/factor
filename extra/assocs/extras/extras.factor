@@ -23,6 +23,24 @@ IN: assocs.extras
 
 : sum-values ( assoc -- n ) 0 [ + ] reduce-values ; inline
 
+: map-keys ( assoc quot: ( key -- key' ) -- assoc )
+    '[ _ dip ] assoc-map ; inline
+
+: map-values ( assoc quot: ( value -- value' ) -- assoc )
+    '[ swap _ dip swap ] assoc-map ; inline
+
+: filter-keys ( assoc quot: ( key -- key' ) -- assoc' )
+    '[ drop @ ] assoc-filter ; inline
+
+: filter-values ( assoc quot: ( value -- value' ) -- assoc' )
+    '[ nip @ ] assoc-filter ; inline
+
+: reject-keys ( assoc quot: ( key -- key' ) -- assoc' )
+    '[ drop @ ] assoc-reject ; inline
+
+: reject-values ( assoc quot: ( value -- value' ) -- assoc' )
+    '[ nip @ ] assoc-reject ; inline
+
 : if-assoc-empty ( ..a assoc quot1: ( ..a -- ..b ) quot2: ( ..a assoc -- ..b ) -- ..b )
     [ dup assoc-empty? ] [ [ drop ] prepose ] [ ] tri* if ; inline
 
