@@ -608,26 +608,8 @@ PRIVATE>
 : count-subseq* ( subseq seq -- n )
     start-all* length ; inline
 
-: map-zip ( quot: ( x -- y ) -- alist )
+: map-zip ( quot: ( key -- value ) -- alist )
     '[ _ keep swap ] map>alist ; inline
-
-: map-keys ( assoc quot: ( key -- key' ) -- assoc )
-    '[ _ dip ] assoc-map ; inline
-
-: map-values ( assoc quot: ( value -- value' ) -- assoc )
-    '[ swap _ dip swap ] assoc-map ; inline
-
-: filter-keys ( assoc quot: ( key -- key' ) -- assoc' )
-    '[ drop @ ] assoc-filter ; inline
-
-: filter-values ( assoc quot: ( value -- value' ) -- assoc' )
-    '[ nip @ ] assoc-filter ; inline
-
-: reject-keys ( assoc quot: ( key -- key' ) -- assoc' )
-    '[ drop @ ] assoc-reject ; inline
-
-: reject-values ( assoc quot: ( value -- value' ) -- assoc' )
-    '[ nip @ ] assoc-reject ; inline
 
 : take-while ( ... seq quot: ( ... elt -- ... ? ) -- head-slice )
     [ '[ @ not ] find drop ] keepd swap
