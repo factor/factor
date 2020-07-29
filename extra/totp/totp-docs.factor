@@ -22,7 +22,7 @@ $nl
 HELP: totp-hash
 { $var-description "A cryptographically secure " { $link checksum } " to be used by " { $link totp } " for the HMAC. See " { $url "https://en.wikipedia.org/wiki/HMAC" } " for more information."
 $nl
-"Default value is " { $link sha-256 } "." } ;
+"Default value is " { $link sha1 } ", same as used by Google Authenticator." } ;
 
 HELP: totp-digits
 { $var-description "The number of digits returned by " { $link totp } "."
