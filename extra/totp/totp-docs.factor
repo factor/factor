@@ -31,10 +31,10 @@ $nl
 
 HELP: totp
 { $values
-    { "key" byte-array }
+    { "key" object }
     { "string" string }
 }
-{ $description "Generate a one-time password for the " { $snippet "key" } " based on the current system time. The " { $snippet "string" } " length is " { $link totp-digits } ", and the hash used for HMAC is " { $link totp-hash } "." } ;
+{ $description "Generate a one-time password for the " { $snippet "key" } " based on the current system time. If " { $snippet "key" } " is a " { $link string } ", it is expected to contain the key data in Base 32 encoding, otherwise it should be a " { $link byte-array } ". The " { $snippet "string" } " length is " { $link totp-digits } ", and the hash used for HMAC is " { $link totp-hash } "." } ;
 
 { totp totp* } related-words
 
