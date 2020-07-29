@@ -5,7 +5,7 @@ math math.bitwise math.parser namespaces sequences ;
 IN: totp
 
 SYMBOLS: totp-hash totp-digits ;
-totp-hash [ sha-256 ] initialize
+totp-hash [ sha1 ] initialize
 totp-digits [ 6 ] initialize
 
 <PRIVATE
