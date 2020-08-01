@@ -523,8 +523,7 @@ HELP: USE:
 HELP: UNUSE:
 { $syntax "UNUSE: vocabulary" }
 { $values { "vocabulary" "a vocabulary name" } }
-{ $description "Removes a vocabulary from the search path." }
-{ $errors "Throws an error if the vocabulary does not exist." } ;
+{ $description "Removes a vocabulary from the search path." } ;
 
 HELP: USING:
 { $syntax "USING: vocabularies... ;" }
