@@ -517,8 +517,19 @@ HELP: USE:
 { $syntax "USE: vocabulary" }
 { $values { "vocabulary" "a vocabulary name" } }
 { $description "Adds a new vocabulary to the search path, loading it first if necessary." }
-{ $notes "If adding the vocabulary introduces ambiguity, referencing the ambiguous names will throw a " { $link ambiguous-use-error } "." }
-{ $errors "Throws an error if the vocabulary does not exist or could not be loaded." } ;
+{ $notes "If adding the vocabulary introduces ambiguity, referencing the ambiguous names will throw an " { $link ambiguous-use-error } ". You can disambiguate the names by prefixing them with their vocabulary name and a colon: " { $snippet "vocabulary:word" } "." }
+{ $errors "Throws an error if the vocabulary does not exist or could not be loaded." }
+{ $examples "The following two code snippets are equivalent."
+    { $example
+    "USE: math USE: prettyprint"
+    "1 2 + ."
+    "3" }
+    { $example
+    "USE: math USE: prettyprint"
+    "1 2 math:+ prettyprint:."
+    "3" }
+}
+{ $see-also \ USING: \ QUALIFIED: } ;
 
 HELP: UNUSE:
 { $syntax "UNUSE: vocabulary" }
@@ -529,8 +540,19 @@ HELP: USING:
 { $syntax "USING: vocabularies... ;" }
 { $values { "vocabularies" "a list of vocabulary names" } }
 { $description "Adds a list of vocabularies to the search path." }
-{ $notes "If adding the vocabularies introduces ambiguity, referencing the ambiguous names will throw a " { $link ambiguous-use-error } "." }
-{ $errors "Throws an error if one of the vocabularies does not exist." } ;
+{ $notes "If adding the vocabulary introduces ambiguity, referencing the ambiguous names will throw an " { $link ambiguous-use-error } ". You can disambiguate the names by prefixing them with their vocabulary name and a colon: " { $snippet "vocabulary:word" } "." }
+{ $errors "Throws an error if one of the vocabularies does not exist." }
+{ $examples "The following two code snippets are equivalent."
+    { $example
+    "USING: math prettyprint ;"
+    "1 2 + ."
+    "3" }
+    { $example
+    "USING: math prettyprint ;"
+    "1 2 math:+ prettyprint:."
+    "3" }
+}
+{ $see-also \ USE: \ QUALIFIED: } ;
 
 HELP: QUALIFIED:
 { $syntax "QUALIFIED: vocab" }
