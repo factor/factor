@@ -11,16 +11,16 @@ HELP: editor
 { $class-description "An editor is a control for editing a multi-line passage of text stored in a " { $link document } " model. Editors are created by calling " { $link <editor> } "."
 $nl
 "Editors have the following slots:"
-{ $list
-    { { $snippet "caret" } " - a " { $link model } " storing a line/column pair." }
-    { { $snippet "mark" } " - a " { $link model } " storing a line/column pair. If there is no selection, the mark is equal to the caret, otherwise the mark is located at the opposite end of the selection from the caret." }
-    { { $snippet "focused?" } " - a boolean." }
-    { { $snippet "preedit-start" } " - a line/column pair or " { $link f } ". It represents the starting point of the string being edited by an input method." }
-    { { $snippet "preedit-end" } " - a line/column pair or " { $link f } ". It represents the end point of the string being edited by an input method." }
-    { { $snippet "preedit-selected-start" } " - a line/column pair or " { $link f } ". It represents the starting point of the string being selected by an input method." }
-    { { $snippet "preedit-selected-end" } " - a line/column pair or " { $link f } ". It represents the end point of the string being selected by an input method." }
-    { { $snippet "preedit-selection-mode?" } " - a boolean. It means the mode of selecting convertion canditate word. The caret in an editor is not drawn if it is true." }
-    { { $snippet "preedit-underlines" } " - an array or " { $link f } ". It stores underline attributes for its preedit area." }
+{ $slots
+    { "caret" { "a " { $link model } " storing a line/column pair." } }
+    { "mark" { "a " { $link model } " storing a line/column pair. If there is no selection, the mark is equal to the caret, otherwise the mark is located at the opposite end of the selection from the caret." } }
+    { "focused?" { "a boolean." } }
+    { "preedit-start" { "a line/column pair or " { $link f } ". It represents the starting point of the string being edited by an input method." } }
+    { "preedit-end" { "a line/column pair or " { $link f } ". It represents the end point of the string being edited by an input method." } }
+    { "preedit-selected-start" { "a line/column pair or " { $link f } ". It represents the starting point of the string being selected by an input method." } }
+    { "preedit-selected-end" { "a line/column pair or " { $link f } ". It represents the end point of the string being selected by an input method." } }
+    { "preedit-selection-mode?" { "a boolean. It means the mode of selecting convertion canditate word. The caret in an editor is not drawn if it is true." } }
+    { "preedit-underlines" { "an array or " { $link f } ". It stores underline attributes for its preedit area." } }
 }
 $nl
 " Slots that are prefixed with \"preedit-\" should not be modified directly. They are changed by the platform-dependent backend."

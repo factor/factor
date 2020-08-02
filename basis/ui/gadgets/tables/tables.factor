@@ -326,10 +326,9 @@ M: table model-changed
 PRIVATE>
 
 : row-action ( table -- )
-    dup selected-row
-    [ swap [ dup hook>> call( table -- ) ] [ action>> call( value -- ) ] bi ]
-    [ 2drop ]
-    if ;
+    dup selected-row [
+        over action>> call( value -- )
+    ] [ drop ] if dup hook>> call( table -- ) ;
 
 : row-action? ( table -- ? )
     single-click?>> hand-click# get 2 = or ;

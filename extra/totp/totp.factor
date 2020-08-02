@@ -1,11 +1,12 @@
 ! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: calendar checksums.hmac checksums.sha io.binary kernel
-math math.bitwise math.parser namespaces sequences ;
+USING: base32 calendar checksums.hmac checksums.sha io.binary
+kernel math math.bitwise math.parser namespaces sequences
+strings unicode ;
 IN: totp
 
 SYMBOLS: totp-hash totp-digits ;
-totp-hash [ sha-256 ] initialize
+totp-hash [ sha1 ] initialize
 totp-digits [ 6 ] initialize
 
 <PRIVATE
@@ -28,4 +29,5 @@ PRIVATE>
     [ number>string ] dip [ char: 0 pad-head ] keep tail* ;
 
 : totp ( key -- string )
+    dup string? [ >upper base32> ] when
     now timestamp>count swap totp-hash get totp* totp-digits get digits ;

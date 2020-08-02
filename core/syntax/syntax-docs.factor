@@ -517,26 +517,47 @@ HELP: \USE:
 { $syntax "USE: vocabulary" }
 { $values { "vocabulary" "a vocabulary name" } }
 { $description "Adds a new vocabulary to the search path, loading it first if necessary." }
-{ $notes "If adding the vocabulary introduces ambiguity, referencing the ambiguous names will throw a " { $link ambiguous-use-error } "." }
-{ $errors "Throws an error if the vocabulary does not exist or could not be loaded." } ;
+{ $notes "If adding the vocabulary introduces ambiguity, referencing the ambiguous names will throw an " { $link ambiguous-use-error } ". You can disambiguate the names by prefixing them with their vocabulary name and a colon: " { $snippet "vocabulary:word" } "." }
+{ $errors "Throws an error if the vocabulary does not exist or could not be loaded." }
+{ $examples "The following two code snippets are equivalent."
+    { $example
+    "USE: math USE: prettyprint"
+    "1 2 + ."
+    "3" }
+    { $example
+    "USE: math USE: prettyprint"
+    "1 2 math:+ prettyprint:."
+    "3" }
+}
+{ $see-also \ USING: \ QUALIFIED: } ;
 
 HELP: \UNUSE:
 { $syntax "UNUSE: vocabulary" }
 { $values { "vocabulary" "a vocabulary name" } }
-{ $description "Removes a vocabulary from the search path." }
-{ $errors "Throws an error if the vocabulary does not exist." } ;
+{ $description "Removes a vocabulary from the search path." } ;
 
 HELP: \USING:
 { $syntax "USING: vocabularies... ;" }
 { $values { "vocabularies" "a list of vocabulary names" } }
 { $description "Adds a list of vocabularies to the search path." }
-{ $notes "If adding the vocabularies introduces ambiguity, referencing the ambiguous names will throw a " { $link ambiguous-use-error } "." }
-{ $errors "Throws an error if one of the vocabularies does not exist." } ;
+{ $notes "If adding the vocabulary introduces ambiguity, referencing the ambiguous names will throw an " { $link ambiguous-use-error } ". You can disambiguate the names by prefixing them with their vocabulary name and a colon: " { $snippet "vocabulary:word" } "." }
+{ $errors "Throws an error if one of the vocabularies does not exist." }
+{ $examples "The following two code snippets are equivalent."
+    { $example
+    "USING: math prettyprint ;"
+    "1 2 + ."
+    "3" }
+    { $example
+    "USING: math prettyprint ;"
+    "1 2 math:+ prettyprint:."
+    "3" }
+}
+{ $see-also \ USE: \ QUALIFIED: } ;
 
 HELP: \QUALIFIED:
 { $syntax "QUALIFIED: vocab" }
 { $description "Adds the vocabulary's words, prefixed with the vocabulary name, to the search path." }
-{ $notes "If adding the vocabulary introduces ambiguity, the vocabulary will take precedence when resolving any ambiguous names. This is a rare case; for example, suppose a vocabulary " { $snippet "fish" } " defines a word named " { $snippet "go:fishing" } ", and a vocabulary named " { $snippet "go" } " defines a word named " { $snippet "fishing" } ". Then, the following will call the latter word:"
+{ $notes "If adding a vocabulary introduces ambiguity, the vocabulary will take precedence when resolving any ambiguous names. This is a rare case; for example, suppose a vocabulary " { $snippet "fish" } " defines a word named " { $snippet "go:fishing" } ", and a vocabulary named " { $snippet "go" } " defines a word named " { $snippet "fishing" } ". Then, the following will call the latter word:"
   { $code
   "USE: fish"
   "QUALIFIED: go"

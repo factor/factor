@@ -198,7 +198,7 @@ $nl
 io.pathnames tools.files sequences kernel ;
 
 command-line get [
-    \".\". directory.
+    \".\" directory.
 ] [
     dup length 1 = [ first directory. ] [
         [ [ nl write \":\" print ] [ directory. ] bi ] each

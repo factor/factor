@@ -284,6 +284,7 @@ find_os() {
         *linux*) OS=linux;;
         *Linux*) OS=linux;;
         FreeBSD) OS=freebsd;;
+        Haiku) OS=haiku;;
     esac
 }
 
@@ -300,6 +301,13 @@ find_architecture() {
        ppc64) ARCH=ppc;;
        *86) ARCH=x86;;
        *86_64) ARCH=x86;;
+       iPhone5*[3-9]) ARCH=arm64;;
+       iPhone[6-9]*) ARCH=arm64;;
+       iPhone[1-9][0-9]*) ARCH=arm64;;
+       iPad[4-9]*) ARCH=arm64;;
+       iPad[1-9][0-9]*) ARCH=arm64;;
+       AppleTV[5-9]*) ARCH=arm64;;
+       AppleTV[1-9][0-9]*) ARCH=arm64;;
        "Power Macintosh") ARCH=ppc;;
     esac
 }
@@ -311,8 +319,8 @@ find_num_cores() {
     check_ret uname
     case $uname_s in
         CYGWIN_NT-5.2-WOW64 | *CYGWIN_NT* | *CYGWIN* | MINGW32*) NUM_CORES=$NUMBER_OF_PROCESSORS;;
-        *darwin* | *Darwin* | *linux* | *Linux*) NUM_CORES=$(getconf _NPROCESSORS_ONLN);;
-        freebsd) NUM_CORES=$(sysctl -n hw.ncpu);;
+        *linux* | *Linux*) NUM_CORES=$(getconf _NPROCESSORS_ONLN || nproc);;
+        *darwin* | *Darwin* | freebsd) NUM_CORES=$(sysctl -n hw.ncpu);;
     esac
 }
 
@@ -327,7 +335,7 @@ c_find_word_size() {
     echo_test_program | $CC -o $C_WORD -xc -
     check_ret $CC
     ./$C_WORD
-    WORD=$?
+    WORD_OUT=$?
     case $WORD in
         32) ;;
         64) ;;
@@ -335,8 +343,8 @@ c_find_word_size() {
             echo "Word size should be 32/64, got $WORD"
             exit_script 15;;
     esac
-
     $DELETE -f $C_WORD
+    echo "$WORD_OUT"
 }
 
 intel_macosx_word_size() {
@@ -357,8 +365,14 @@ find_word_size() {
     if [[ $OS == macosx && $ARCH == x86 ]] ; then
         intel_macosx_word_size
     else
-        c_find_word_size
+        WORD=$(find_word_size_cpp || c_find_word_size)
     fi
+}
+
+find_word_size_cpp() {
+    SIXTY_FOUR='defined(__aarch64__) || defined(__x86_64__) || defined(_M_AMD64) || defined(__PPC64__) || defined(__64BIT__)'
+    THIRTY_TWO='defined(i386) || defined(__i386) || defined(__i386__) || defined(_MIX86)'
+    cc -E -xc <(echo -e "#if ${SIXTY_FOUR}\n64\n#elif ${THIRTY_TWO}\n32\n#endif") | tail -1
 }
 
 set_factor_binary() {
@@ -770,7 +784,7 @@ usage() {
     $ECHO "  net-bootstrap - recompile, download a boot image, bootstrap"
     $ECHO "  make-target - find and print the os-arch-cpu string"
     $ECHO "  report|info - print the build variables"
-    $ECHO "  update-boot-image - get the boot image for the current branch of for master"
+    $ECHO "  update-boot-image - get the boot image for the current branch"
     $ECHO ""
     $ECHO "If you are behind a firewall, invoke as:"
     $ECHO "env GIT_PROTOCOL=http $0 <command>"

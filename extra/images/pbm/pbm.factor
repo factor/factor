@@ -48,7 +48,7 @@ SINGLETON: pbm-image
     bitmap width <groups> [
         width 8 align 255 pad-tail
         8 <groups> [
-            [ 255 = [ f ] [ t ] if ] { } map-as
+            [ 255 = not ] { } map-as
             >bit-array reverse bit-array>integer
             1array >byte-array write
         ] each

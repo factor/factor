@@ -115,7 +115,7 @@ ERROR: unbalanced-private-declaration vocab ;
         vocab-name "Already using ``" "'' vocabulary" surround note.
     ] [
         manifest get
-        [ [ load-vocab ] dip search-vocabs>> push ]
+        [ [ ?load-vocab ] dip search-vocabs>> push ]
         [ [ vocab-name ] dip search-vocab-names>> adjoin ]
         2bi
     ] if ;

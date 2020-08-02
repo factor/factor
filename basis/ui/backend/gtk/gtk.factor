@@ -164,13 +164,13 @@ CONSTANT: events-mask
     ] tri ;
 
 : on-key-press/release ( win event user-data -- ? )
-    drop swap [ key-event>gesture ] [ window ] bi* propagate-key-gesture t ;
+    drop swap [ key-event>gesture ] [ window ] bi* propagate-key-gesture f ;
 
 : on-focus-in ( win event user-data -- ? )
-    2drop window focus-world t ;
+    2drop window focus-world f ;
 
 : on-focus-out ( win event user-data -- ? )
-    2drop window unfocus-world t ;
+    2drop window unfocus-world f ;
 
 CONSTANT: default-icon-path "resource:misc/icons/Factor_128x128.png"
 
@@ -438,9 +438,9 @@ M:: gtk-ui-backend (open-window) ( world -- )
     win gtk_widget_realize
 
     ! And this must be done after and in this order due to #1307
-    win im configure-im
     win connect-user-input-signals
     win connect-win-state-signals
+    win im configure-im
     world handle>> connect-configure-signal
     drawable connect-expose-sigal
 

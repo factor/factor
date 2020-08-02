@@ -145,8 +145,7 @@ GENERIC#: accept-completion-hook 1 ( item popup -- )
     find-completion-popup
     [ insert-completion ]
     [ accept-completion-hook ]
-    [ nip hide-glass ]
-    2tri ;
+    2bi ;
 
 : <completion-table> ( interactor completion-mode -- table )
     [ completion-element ] [ completion-quot ] [ nip ] 2tri
@@ -157,7 +156,8 @@ GENERIC#: accept-completion-hook 1 ( item popup -- )
         30 >>min-cols
         10 >>min-rows
         10 >>max-rows
-        dup '[ _ accept-completion ] >>action ;
+        dup '[ _ accept-completion ] >>action
+        [ hide-glass ] >>hook ;
 
 : <completion-scroller> ( completion-popup -- scroller )
     table>> <scroller> white-interior ;
@@ -188,15 +188,6 @@ completion-popup H{
 
 : recall-next ( interactor -- )
     history>> history-recall-next ;
-
-: completion-gesture ( gesture completion -- value/f operation/f )
-    table>> selected-row
-    [ [ nip ] [ gesture>operation ] 2bi ] [ drop f ] if ;
-
-M: completion-popup handle-gesture ( gesture completion -- ? )
-    2dup completion-gesture [
-        [ nip hide-glass ] [ invoke-command ] 2bi* f
-    ] [ drop call-next-method ] if* ;
 
 : ?check-popup ( interactor -- interactor )
     dup popup>> [
