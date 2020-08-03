@@ -1,10 +1,10 @@
 
-USING: accessors arrays assocs calendar colors
-combinators.short-circuit help.markup help.syntax kernel locals
-math math.functions math.matrices math.order math.parser
-math.trig math.vectors opengl opengl.demo-support opengl.gl
-sbufs sequences strings threads ui.gadgets ui.gadgets.worlds
-ui.gestures ui.render ui.tools.workspace ;
+USING: accessors arrays assocs calendar colors colors.constants
+combinators.short-circuit help help.markup help.syntax kernel
+locals math math.functions math.matrices
+math.order math.parser math.trig math.vectors opengl
+opengl.demo-support opengl.gl opengl.glu sbufs sequences strings
+threads ui.gadgets ui.gadgets.worlds ui.gestures ui.render ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -18,7 +18,7 @@ DEFER: default-L-parser-values
 
 : reset-turtle ( turtle -- turtle )
   { 0 0 0 } clone   >>pos
-  3 identity-matrix >>ori
+  3 <identity-matrix> >>ori
   V{ } clone >>vertices
   V{ } clone >>saved
 
@@ -31,61 +31,61 @@ DEFER: default-L-parser-values
 :: step-turtle ( TURTLE LENGTH -- turtle )
 
   TURTLE
-    TURTLE pos>>   TURTLE ori>> { 0 0 LENGTH } m.v   v+
+    TURTLE pos>>   TURTLE ori>> { 0 0 LENGTH } mdotv v+
   >>pos ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-:: Rx ( ANGLE -- Rx )
+: Rx ( ANGLE -- Rx )
   
-  [let | ANGLE [ ANGLE deg>rad ] |
+  [let deg>rad :> ANGLE
 
-    [let | A [ ANGLE cos     ]
-           B [ ANGLE sin neg ]
-           C [ ANGLE sin     ]
-           D [ ANGLE cos     ] |
+    ANGLE cos     :> A
+    ANGLE sin neg :> B
+    ANGLE sin     :> C
+    ANGLE cos     :> D
 
       { { 1 0 0 }
         { 0 A B }
         { 0 C D } }
 
-    ] ] ;
+    ] ;
 
-:: Ry ( ANGLE -- Ry )
+: Ry ( ANGLE -- Ry )
   
-  [let | ANGLE [ ANGLE deg>rad ] |
+  [let deg>rad :> ANGLE
 
-    [let | A [ ANGLE cos     ]
-           B [ ANGLE sin     ]
-           C [ ANGLE sin neg ]
-           D [ ANGLE cos     ] |
+    ANGLE cos     :> A
+    ANGLE sin     :> B
+    ANGLE sin neg :> C
+    ANGLE cos     :> D
 
       { { A 0 B }
         { 0 1 0 }
         { C 0 D } }
 
-    ] ] ;
+    ] ;
 
-:: Rz ( ANGLE -- Rz )
+: Rz ( ANGLE -- Rz )
   
-  [let | ANGLE [ ANGLE deg>rad ] |
+  [let deg>rad :> ANGLE
 
-    [let | A [ ANGLE cos     ]
-           B [ ANGLE sin neg ]
-           C [ ANGLE sin     ]
-           D [ ANGLE cos     ] |
+    ANGLE cos     :> A
+    ANGLE sin neg :> B
+    ANGLE sin     :> C
+    ANGLE cos     :> D
 
       { { A B 0 }
         { C D 0 }
         { 0 0 1 } }
 
-    ] ] ;
+    ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 :: apply-rotation ( TURTLE ROTATION -- turtle )
   
-  TURTLE  TURTLE ori>> ROTATION m.  >>ori ;
+  TURTLE  TURTLE ori>> ROTATION mdot >>ori ;
 
 : rotate-x ( turtle angle -- turtle ) Rx apply-rotation ;
 : rotate-y ( turtle angle -- turtle ) Ry apply-rotation ;
@@ -197,7 +197,8 @@ DEFER: default-L-parser-values
 !   GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE rot gl-material ;
 
 : material-color ( color -- )
-  GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE rot color>raw 4array gl-material ;
+  GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE rot >rgba-components 4array
+  gl-material ;
 
 : set-color ( turtle i -- turtle )
   dup color-table nth dup gl-color material-color >>color ;
@@ -304,7 +305,7 @@ TUPLE: <L-system> < gadget
     [
       STRING read-instruction
     
-      [let | REST [ ] NEXT [ ] |
+      [let :> ( NEXT REST )
 
         NEXT 1 head RULES at  NEXT  or  ACCUM push-all
 
@@ -316,7 +317,7 @@ TUPLE: <L-system> < gadget
 
 :: iterate-string ( STRING RULES -- string )
 
-  [let | ACCUM [ STRING length  10 *  <sbuf> ] |
+  [let STRING length 10 * <sbuf> :> ACCUM
 
     STRING RULES ACCUM iterate-string-loop
 
@@ -324,32 +325,33 @@ TUPLE: <L-system> < gadget
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-:: interpret-string ( STRING COMMANDS -- )
+:: interpret-string ( TURTLE STRING COMMANDS -- turtle )
 
   STRING empty? not
     [
       STRING read-instruction
 
-      [let | REST [ ] NEXT [ ] |
+      [let :> ( NEXT REST )
 
-        [let | COMMAND [ NEXT 1 head COMMANDS at ] |
+          NEXT 1 head COMMANDS at :> COMMAND
 
           COMMAND
             [
               NEXT length 1 =
-                [ COMMAND call ]
+                [ TURTLE COMMAND call( turtle -- turtle ) drop ]
                 [
+                  TURTLE
                   NEXT 2 tail 1 head* string>number
                   COMMAND 1 tail*
-                  call
+                  call( turtle x -- turtle ) drop
                 ]
               if
             ]
-          when ]
+          when
 
-        REST COMMANDS interpret-string ]
+        TURTLE REST COMMANDS interpret-string drop ]
     ]
-  when ;
+  when TURTLE ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -363,10 +365,10 @@ TUPLE: <L-system> < gadget
 
 :: do-camera-look-at ( CAMERA -- )
 
-  [let | EYE   [ CAMERA pos>> ]
-         FOCUS [ CAMERA clone 1 step-turtle pos>> ]
-         UP    [ CAMERA clone 90 pitch-up 1 step-turtle pos>> CAMERA pos>> v- ]
-       |
+  [let
+      CAMERA pos>> :> EYE
+      CAMERA clone 1 step-turtle pos>> :> FOCUS
+      CAMERA clone 90 pitch-up 1 step-turtle pos>> CAMERA pos>> v- :> UP
 
     EYE FOCUS UP gl-look-at ] ;
 
@@ -379,7 +381,7 @@ TUPLE: <L-system> < gadget
   L-SYSTEM display-list>> GL_COMPILE glNewList
 
     turtle
-    L-SYSTEM turtle-values>> [ ] or call
+    L-SYSTEM turtle-values>> [ ] or call( turtle -- turtle )
     L-SYSTEM string>> L-SYSTEM axiom>> or
     L-SYSTEM commands>>
     interpret-string
@@ -391,7 +393,7 @@ TUPLE: <L-system> < gadget
 
 M:: <L-system> draw-gadget* ( L-SYSTEM -- )
 
-  black gl-clear
+  COLOR: black gl-clear
 
   GL_FLAT glShadeModel
 
@@ -408,7 +410,8 @@ M:: <L-system> draw-gadget* ( L-SYSTEM -- )
   GL_FRONT_AND_BACK GL_LINE glPolygonMode
 
   ! draw axis
-  white gl-color GL_LINES glBegin { 0 0 0 } gl-vertex { 0 0 1 } gl-vertex glEnd
+  COLOR: white gl-color GL_LINES
+  glBegin { 0 0 0 } gl-vertex { 0 0 1 } gl-vertex glEnd
 
   ! rotate pedestal
 
@@ -432,7 +435,7 @@ M:: <L-system> pref-dim* ( L-SYSTEM -- dim ) { 400 400 } ;
 
 :: with-camera ( L-SYSTEM QUOT -- )
   L-SYSTEM camera>> QUOT call drop
-  L-SYSTEM relayout-1 ;
+  L-SYSTEM relayout-1 ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -466,7 +469,7 @@ H{
     ]
   }
 
-  { T{ key-down f f "F1" } [ drop "L-system" help-window ] }
+  { T{ key-down f f "F1" } [ drop "L-system" help ] }
     
 }
 set-gestures
@@ -475,7 +478,7 @@ set-gestures
 
 : L-system ( -- L-system )
 
-  <L-system> new-gadget
+  <L-system> new
 
     0 >>pedestal
   
