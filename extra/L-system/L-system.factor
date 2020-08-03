@@ -173,22 +173,22 @@ DEFER: default-L-parser-values
 
 : color-table ( -- colors )
   {
-    T{ rgba f 0    0    0    1 } ! black
-    T{ rgba f 0.5  0.5  0.5  1 } ! grey
-    T{ rgba f 1    0    0    1 } ! red
-    T{ rgba f 1    1    0    1 } ! yellow
-    T{ rgba f 0    1    0    1 } ! green
-    T{ rgba f 0.25 0.88 0.82 1 } ! turquoise
-    T{ rgba f 0    0    1    1 } ! blue
-    T{ rgba f 0.63 0.13 0.94 1 } ! purple
-    T{ rgba f 0.00 0.50 0.00 1 } ! dark green
-    T{ rgba f 0.00 0.82 0.82 1 } ! dark turquoise
-    T{ rgba f 0.00 0.00 0.50 1 } ! dark blue
+    COLOR: black
+    COLOR: grey50
+    COLOR: red
+    COLOR: yellow
+    COLOR: green
+    COLOR: turquoise
+    COLOR: blue
+    COLOR: purple
+    COLOR: green4
+    COLOR: dark-turquoise
+    COLOR: dark-blue
     T{ rgba f 0.58 0.00 0.82 1 } ! dark purple
-    T{ rgba f 0.50 0.00 0.00 1 } ! dark red
-    T{ rgba f 0.25 0.25 0.25 1 } ! dark grey
-    T{ rgba f 0.75 0.75 0.75 1 } ! medium grey
-    T{ rgba f 1    1    1    1 } ! white
+    COLOR: dark-red
+    COLOR: grey25
+    COLOR: grey75
+    COLOR: white
   } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
