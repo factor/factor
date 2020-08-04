@@ -5,7 +5,7 @@ IN: L-system.models.abop-5
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: abop-5 ( <L-system> -- <L-system> )
+: abop-5 ( L-system -- L-system )
 
   L-parser-dialect >>commands
 
@@ -29,7 +29,7 @@ IN: L-system.models.abop-5
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: main ( -- ) [ L-system abop-5 "L-system" open-window ] with-ui ;
+: main ( -- ) [ <L-system> abop-5 "L-system" open-window ] with-ui ;
 
 MAIN: main
 
