@@ -303,9 +303,8 @@ TUPLE: <L-system> < gadget
 :: iterate-string-loop ( STRING RULES ACCUM -- )
   STRING empty? not
     [
-      STRING read-instruction
-    
-      [let :> ( NEXT REST )
+      [let
+        STRING read-instruction :> ( NEXT REST )
 
         NEXT 1 head RULES at  NEXT  or  ACCUM push-all
 
@@ -329,12 +328,9 @@ TUPLE: <L-system> < gadget
 
   STRING empty? not
     [
-      STRING read-instruction
-
-      [let :> ( NEXT REST )
-
+      [let
+          STRING read-instruction :> ( NEXT REST )
           NEXT 1 head COMMANDS at :> COMMAND
-
           COMMAND
             [
               NEXT length 1 =
