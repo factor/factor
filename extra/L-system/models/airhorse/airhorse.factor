@@ -5,7 +5,7 @@ IN: L-system.models.airhorse
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: airhorse ( <L-system> -- <L-system> )
+: airhorse ( L-system -- L-system )
 
   L-parser-dialect >>commands
 
@@ -47,6 +47,6 @@ IN: L-system.models.airhorse
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: main ( -- ) [ L-system airhorse "L-system" open-window ] with-ui ;
+: main ( -- ) [ <L-system> airhorse "L-system" open-window ] with-ui ;
 
 MAIN: main

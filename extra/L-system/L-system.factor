@@ -12,7 +12,7 @@ IN: L-system
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: <turtle> pos ori angle length thickness color vertices saved ;
+TUPLE: turtle pos ori angle length thickness color vertices saved ;
 
 DEFER: default-L-parser-values
 
@@ -24,7 +24,7 @@ DEFER: default-L-parser-values
 
   default-L-parser-values ;
 
-: turtle ( -- turtle ) <turtle> new reset-turtle ;
+: <turtle> ( -- turtle ) turtle new reset-turtle ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -257,7 +257,7 @@ DEFER: default-L-parser-values
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: <L-system> < gadget
+TUPLE: L-system < gadget
   camera display-list pedestal paused
   turtle-values
   commands axiom rules string ;
@@ -376,7 +376,7 @@ TUPLE: <L-system> < gadget
 
   L-SYSTEM display-list>> GL_COMPILE glNewList
 
-    turtle
+    <turtle>
     L-SYSTEM turtle-values>> [ ] or call( turtle -- turtle )
     L-SYSTEM string>> L-SYSTEM axiom>> or
     L-SYSTEM commands>>
@@ -387,7 +387,7 @@ TUPLE: <L-system> < gadget
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-M:: <L-system> draw-gadget* ( L-SYSTEM -- )
+M:: L-system draw-gadget* ( L-SYSTEM -- )
 
   COLOR: black gl-clear
 
@@ -417,7 +417,7 @@ M:: <L-system> draw-gadget* ( L-SYSTEM -- )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-M:: <L-system> graft* ( L-SYSTEM -- )
+M:: L-system graft* ( L-SYSTEM -- )
 
   L-SYSTEM find-gl-context
 
@@ -425,7 +425,7 @@ M:: <L-system> graft* ( L-SYSTEM -- )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-M:: <L-system> pref-dim* ( L-SYSTEM -- dim ) { 400 400 } ;
+M:: L-system pref-dim* ( L-SYSTEM -- dim ) { 400 400 } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -435,7 +435,7 @@ M:: <L-system> pref-dim* ( L-SYSTEM -- dim ) { 400 400 } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-<L-system>
+L-system
 H{
   { T{ key-down f f "LEFT"  } [ [  5 turn-left   ] with-camera ] }
   { T{ key-down f f "RIGHT" } [ [  5 turn-right  ] with-camera ] }
@@ -472,15 +472,15 @@ set-gestures
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: L-system ( -- L-system )
+: <L-system> ( -- L-system )
 
-  <L-system> new
+  L-system new
 
     0 >>pedestal
   
-    ! turtle 45 turn-left 45 pitch-up 5 step-turtle 180 turn-left >>camera ;
+    ! <turtle> 45 turn-left 45 pitch-up 5 step-turtle 180 turn-left >>camera ;
 
-    turtle 90 pitch-down -5 step-turtle 2 strafe-up >>camera
+    <turtle> 90 pitch-down -5 step-turtle 2 strafe-up >>camera
 
     dup start-rotation-thread
 
