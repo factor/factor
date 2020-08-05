@@ -68,18 +68,16 @@ M: pair (bitfield-quot) ( spec -- quot )
         '[ _ _ shift ]
     ] if ;
 
+: (bitfield) ( bitspec -- quot )
+    [ [ 0 ] ] [
+        [ (bitfield-quot) ] [ '[ @ _ dip bitor ] ] map-reduce
+    ] if-empty ;
+
 PRIVATE>
 
-MACRO: bitfield ( bitspec -- quot )
-    [ [ 0 ] ] [
-        [ (bitfield-quot) ] [ '[ @ _ dip bitor ] ] map-reduce
-    ] if-empty ;
+MACRO: bitfield ( bitspec -- quot ) (bitfield) ;
 
-MACRO: bitfield* ( bitspec -- quot )
-    reverse
-    [ [ 0 ] ] [
-        [ (bitfield-quot) ] [ '[ @ _ dip bitor ] ] map-reduce
-    ] if-empty ;
+MACRO: bitfield* ( bitspec -- quot ) reverse (bitfield) ;
 
 ! bit-count
 <PRIVATE
