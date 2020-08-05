@@ -44,4 +44,4 @@ PRIVATE>
 
 M: linux find-library*
     "lib" prepend load-ldconfig-cache
-    [ ldconfig-matches? ] with find nip ?first ;
+    [ ldconfig-matches? ] with find nip ?last ;
