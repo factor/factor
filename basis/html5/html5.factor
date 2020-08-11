@@ -389,12 +389,6 @@ MEMO: entities-suffix-array ( -- assoc )
     [ entities-suffix-array query f like ]
     [ last CHAR: ; = ] bi ;
 
-: temporary-buffer-attribute-on ( document -- )
-    t >>temporary-buffer-attribute? drop ;
-
-: temporary-buffer-attribute-off ( document -- )
-    f >>temporary-buffer-attribute? drop ;
-
 ERROR: unknown-named-entity entity ;
 : take-named-character ( document -- )
     dup
