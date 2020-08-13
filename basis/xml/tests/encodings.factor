@@ -1,5 +1,7 @@
 USING: xml xml.data xml.traversal tools.test accessors kernel ;
 
+"io.encodings.8-bit" require ! for latin encodings
+
 [ "\u000131" ] [ "vocab:xml/tests/latin5.xml" file>xml children>string ] unit-test
 [ "\u0000e9" ] [ "vocab:xml/tests/latin1.xml" file>xml children>string ] unit-test
 [ "\u0000e9" ] [ "vocab:xml/tests/spaces.xml" file>xml children>string ] unit-test
