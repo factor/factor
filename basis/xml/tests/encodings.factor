@@ -1,4 +1,4 @@
-USING: xml xml.data xml.traversal tools.test accessors kernel ;
+USING: xml xml.data xml.traversal tools.test accessors kernel vocabs ;
 
 "io.encodings.8-bit" require ! for latin encodings
 
