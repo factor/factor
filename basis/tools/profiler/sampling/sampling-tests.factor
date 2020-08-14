@@ -49,7 +49,7 @@ gc
 { t t } [
     ! Seed the samples data
     [ "resource:basis/tools/memory/memory.factor" run-file ] profile
-    (get-samples) length 0 >
+    get-samples length 0 >
     OBJ-SAMPLE-CALLSTACKS special-object first 0 >
 ] unit-test
 
@@ -57,5 +57,5 @@ gc
     ! On x86.64, [ ] profile doesn't generate any samples at all
     ! because it runs so quickly. On x86.32, one spurious sample is
     ! sometimes generated for some unknown reason.
-    gc [ ] profile (get-samples) length 1 <=
+    gc [ ] profile get-samples length 1 <=
 ] unit-test
