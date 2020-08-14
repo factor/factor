@@ -8,8 +8,8 @@ sequences.generalizations sets sorting ;
 IN: tools.profiler.sampling
 
 <PRIVATE
-PRIMITIVE: (get-samples) ( -- samples/f )
-PRIMITIVE: profiling ( n -- )
+PRIMITIVE: get-samples ( -- samples/f )
+PRIMITIVE: set-profiling ( n -- )
 PRIVATE>
 
 SYMBOL: samples-per-second
@@ -28,8 +28,8 @@ PRIVATE>
     raw-profile-data get-global [ "No profile data" throw ] unless* ;
 
 : profile ( quot -- )
-    samples-per-second get-global profiling
-    [ 0 profiling (get-samples) raw-profile-data set-global ]
+    samples-per-second get-global set-profiling
+    [ 0 set-profiling get-samples raw-profile-data set-global ]
     finally ; inline
 
 : total-sample-count ( sample -- count ) 0 swap nth ;

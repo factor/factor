@@ -93,7 +93,7 @@ void factor_vm::record_sample(bool prolog_p) {
 }
 
 // Allocates memory
-void factor_vm::set_sampling_profiler(fixnum rate) {
+void factor_vm::set_profiling(fixnum rate) {
   bool running_p = atomic::load(&sampling_profiler_p);
   if (rate > 0 && !running_p)
     start_sampling_profiler(rate);
@@ -121,8 +121,8 @@ void factor_vm::end_sampling_profiler() {
 }
 
 // Allocates memory
-void factor_vm::primitive_sampling_profiler() {
-  set_sampling_profiler(to_fixnum(ctx->pop()));
+void factor_vm::primitive_set_profiling() {
+  set_profiling(to_fixnum(ctx->pop()));
 }
 
 // Allocates memory

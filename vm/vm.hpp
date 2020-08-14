@@ -189,8 +189,8 @@ struct factor_vm {
   void record_sample(bool prolog_p);
   void start_sampling_profiler(fixnum rate);
   void end_sampling_profiler();
-  void set_sampling_profiler(fixnum rate);
-  void primitive_sampling_profiler();
+  void set_profiling(fixnum rate);
+  void primitive_set_profiling();
   void primitive_get_samples();
   array* allot_growarr();
   void growarr_add(array *growarr_, cell value);
