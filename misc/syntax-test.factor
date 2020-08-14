@@ -87,6 +87,7 @@ drop ! wrong
     MATH: + ( x y -- z ) foldable flushable
     C: <foo> foo
     CONSTRUCTOR: <circle> circle ( radius -- obj ) ;
+    CONSTRUCTOR: <circle> circle ( radius -- obj ) definition...  ;
 
 ! Private definitions
 
@@ -105,6 +106,8 @@ drop ! wrong
     GENERIC#: word 1 ( stack -- effect )
     MATH: + ( x y -- z ) foldable flushable
     C: <foo> foo
+    CONSTRUCTOR: <circle> circle ( radius -- obj ) ;
+    CONSTRUCTOR: <circle> circle ( radius -- obj ) definition...  ;
 
 PRIVATE>
 
