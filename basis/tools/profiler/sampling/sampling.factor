@@ -19,7 +19,7 @@ samples-per-second [ 1,000 ] initialize
 <PRIVATE
 SYMBOL: raw-profile-data
 CONSTANT: ignore-words
-    { signal-handler leaf-signal-handler profiling minor-gc }
+    { signal-handler leaf-signal-handler set-profiling minor-gc }
 
 : ignore-word? ( word -- ? ) ignore-words member? ; inline
 PRIVATE>
