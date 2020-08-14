@@ -245,7 +245,7 @@ syn region  factorRename          start=/\v<RENAME:>/      skip=/\v<!>.*/   end=
 syn region  factorSingletons      start=/\v<SINGLETONS:>/                   end=/\v<;>/     contains=@factorComment
 syn region  factorSymbol          start=/\v<SYMBOL:>/                       end=/\v<\S+>/   contains=@factorComment
 syn region  factorSymbols         start=/\v<SYMBOLS:>/                      end=/\v<;>/     contains=@factorComment
-syn region  factorConstructor2    start=/\v<CONSTRUCTOR:>/                  end=/\v<;>/     contains=@factorComment
+syn region  factorConstructor2    start=/\v<CONSTRUCTOR:>/                  end=/\v<;>/     contains=@factorComment,factorStackEffect
 syn region  factorIntersection    start=/\v<INTERSECTION:>/                 end=/\v<;>/     contains=@factorComment
 syn cluster factorSlotAttr              contains=factorSlotAttrInitial,factorSlotAttrReadOnly
 syn cluster factorTupleSlotAttr         contains=@factorSlotAttr
@@ -256,6 +256,7 @@ syn match   factorTupleSlotClass        /\v<\S+>/ nextgroup=factorTupleSlotAttrS
 syn match   factorTupleSlotClassSkip    /\v%(\_\s+%(!>.*)?)*/ contains=@factorComment nextgroup=factorTupleSlotClass,@factorTupleSlotAttr transparent contained
 syn region  factorTupleSlot matchgroup=factorTupleSlotDelims  start=/\v<\{>/                end=/\v<\}>/    contains=@factorComment,factorTupleSlotName,@factorTupleSlotAttr contained
 syn region  factorTuple matchgroup=factorTupleDelims          start=/\v<%(TUPLE|BUILTIN):>/ end=/\v<;>/     contains=@factorComment,factorTupleSlotName,factorTupleSlot
+syn region  factorPredicate matchgroup=factorPredicateDelims  start=/\v<%(PREDICATE):>/     end=/\v<;>/     contains=@factorComment,factorTupleSlotName
 " Abnormally named because factor*Error is reserved for syntax errors.
 syn region  factorErrorSyn        start=/\v<ERROR:>/            end=/\v<;>/     contains=@factorComment
 syn region  factorUnion           start=/\v<UNION:>/            end=/\v<;>/     contains=@factorComment
@@ -486,8 +487,8 @@ if !exists('g:factor_syn_no_init')
   HiLink   factorSymbols                Define
   HiLink   factorConstant               Define
   HiLink   factorAlias                  Define
-  HiLink   factorSingleton              Define
-  HiLink   factorSingletons             Define
+  HiLink   factorSingleton              Typedef
+  HiLink   factorSingletons             Typedef
   HiLink   factorMixin                  Typedef
   HiLink   factorInstance               Typedef
   HiLink   factorHook                   Typedef
@@ -508,6 +509,8 @@ if !exists('g:factor_syn_no_init')
   HiLink   factorSlotAttrReadOnly       factorSlotAttr
   HiLink   factorStructSlotAttr         factorSlotAttr
   HiLink   factorStructSlotAttrBits     factorStructSlotAttr
+  HiLink   factorPredicate              Typedef
+  HiLink   factorPredicateDelims        factorTuple
   HiLink   factorTuple                  Typedef
   HiLink   factorTupleDelims            factorTuple
   HiLink   factorTupleSlot              factorSlot
