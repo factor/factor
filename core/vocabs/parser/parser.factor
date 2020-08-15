@@ -182,17 +182,24 @@ TUPLE: ambiguous-use-error name words ;
 
 <PRIVATE
 
-: (vocab-search) ( name assocs -- words )
-    [ words>> (lookup) ] with map sift ;
+: (lookup-word) ( words name vocab -- words )
+    words>> (lookup) [ suffix! ] when* ; inline
 
-: (vocab-search-qualified) ( name assocs -- words )
-    [ ":" split1 swap ] dip [ name>> = ] with filter (vocab-search) ;
+: (vocab-search) ( name assocs -- words )
+    [ V{ } clone ] 2dip [ (lookup-word) ] with each ;
+
+: (vocab-search-qualified) ( words name assocs -- words )
+    [ ":" split1 swap ] dip pick [
+        [ name>> = ] with find nip [ (lookup-word) ] with when*
+    ] [
+        3drop
+    ] if ;
 
 : (vocab-search-full) ( name assocs -- words )
-    [ (vocab-search-qualified) ] [ (vocab-search) ] 2bi append ;
+    [ (vocab-search) ] [ (vocab-search-qualified) ] 2bi ;
 
 : vocab-search ( name manifest -- word/f )
-    dupd search-vocabs>> sift (vocab-search-full) dup length {
+    dupd search-vocabs>> (vocab-search-full) dup length {
         { 0 [ 2drop f ] }
         { 1 [ first nip ] }
         [

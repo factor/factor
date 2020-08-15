@@ -8,8 +8,8 @@ sequences.generalizations sets sorting ;
 IN: tools.profiler.sampling
 
 <PRIVATE
-PRIMITIVE: (get-samples) ( -- samples/f )
-PRIMITIVE: profiling ( n -- )
+PRIMITIVE: get-samples ( -- samples/f )
+PRIMITIVE: set-profiling ( n -- )
 PRIVATE>
 
 INITIALIZED-SYMBOL: samples-per-second [ 1,000 ]
@@ -17,7 +17,7 @@ INITIALIZED-SYMBOL: samples-per-second [ 1,000 ]
 <PRIVATE
 SYMBOL: raw-profile-data
 CONSTANT: ignore-words
-    { signal-handler leaf-signal-handler profiling minor-gc }
+    { signal-handler leaf-signal-handler set-profiling minor-gc }
 
 : ignore-word? ( word -- ? ) ignore-words member? ; inline
 PRIVATE>
@@ -26,8 +26,8 @@ PRIVATE>
     raw-profile-data get-global [ "No profile data" throw ] unless* ;
 
 : profile ( quot -- )
-    samples-per-second get-global profiling
-    [ 0 profiling (get-samples) raw-profile-data set-global ]
+    samples-per-second get-global set-profiling
+    [ 0 set-profiling get-samples raw-profile-data set-global ]
     finally ; inline
 
 : total-sample-count ( sample -- count ) 0 swap nth ;

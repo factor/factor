@@ -29,6 +29,7 @@
     DEFER: word
     FORGET: word
     POSTPONE: word
+    SLOT: name
 
 ! Classes
 
@@ -84,8 +85,9 @@ drop ! wrong
     GENERIC#: word 1 ! comment
         drop ! wrong
     MATH: + ( x y -- z ) foldable flushable
-    SLOT: name
     C: <foo> foo
+    CONSTRUCTOR: <circle> circle ( radius -- obj ) ;
+    CONSTRUCTOR: <circle> circle ( radius -- obj ) definition...  ;
 
 ! Private definitions
 
@@ -103,8 +105,9 @@ drop ! wrong
     HOOK: word variable ( stack -- effect )
     GENERIC#: word 1 ( stack -- effect )
     MATH: + ( x y -- z ) foldable flushable
-    SLOT: name
     C: <foo> foo
+    CONSTRUCTOR: <circle> circle ( radius -- obj ) ;
+    CONSTRUCTOR: <circle> circle ( radius -- obj ) definition...  ;
 
 PRIVATE>
 
@@ -127,8 +130,6 @@ PRIVATE>
     CONSTANT: word value
     SYMBOL: word
     SYMBOLS: words ... ;
-
-    C: <foo> foo
 
 ! Math
 
@@ -227,15 +228,34 @@ PRIVATE>
     { char: c char: H }
     { char: d char: C }
 
-! New number literals:
+! Bin
+
+    0b10101
+    0B10101
+
+! Oct
+
+    0o432
+    0O1234567
+    0o1234567
+    0o7
+
+! Hex
 
     0xCAFEBABE
-    0o432
-    0b10101
+    0XCAFEBABE
+    0x1AB4p30
+
+! Dec
+
     1,000
     10,000
+
+! Float
+
     1e10
     -1.5e-5
+
 
 ! Weird numbers
 
@@ -250,17 +270,12 @@ PRIVATE>
     -1.5e30
     1.5e-30
     1,000.1,2
-    0XCAFEBABE
-    0x1AB4p30
-    0B10101
-    0O1234567
     NAN: CAFE1234 0,. ! third token wrong
     0,. ! wrong, next line also wrong
     0,.
     NAN: ! ff 0xff comment
         xCAFE1234 ! wrong
         ff ! shouldn't match as a hex number
-    0o7
     NAN: 0
     drop
     NAN: !
@@ -269,9 +284,13 @@ PRIVATE>
 
     NAN:
 f,
+    NAN: ALKSJDflKJ ! XXX: should error
 
 ! Not numbers
 
+    ,0.1
+    .
+    -.
     1foo
     1.5bar
     +foo
@@ -321,7 +340,6 @@ boolean -- q: boolean )
     flushablething
     flushable
     <PRIVATEfoo
-
     "asdf"foo
 
 << 5 1 + . >> 1
@@ -335,7 +353,6 @@ pair?
 tail?
 
 0.1
-,0.1 ! wrong
 10,0.1
 1.23
 .1
@@ -343,8 +360,6 @@ tail?
 -0.1
 -0,1.1
 1.
-.  ! other
--. ! other
 
 ! Numeral comma separator parsing (!: wrong, ~: other):
   ! int

@@ -25,4 +25,4 @@ M: multi-state get-checksum
         dup states>> [ get-checksum ] map [ >>results ] keep
     ] unless* nip ;
 
-INSTANCE: multi-checksum checksum
+INSTANCE: multi-checksum block-checksum

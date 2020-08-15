@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators command-line eval io io.pathnames kernel
-namespaces system vocabs.loader ;
+layouts math math.parser namespaces system vocabs.loader ;
 IN: command-line.startup
 
 : help? ( -- ? )
@@ -14,21 +14,21 @@ IN: command-line.startup
 Factor arguments:
     -help               print this message and exit
     -version            print the Factor version and exit
-    -i=<image>          load Factor image file <image> (default " write vm-path file-stem write ".image)
+    -i=<image>          load Factor image file <image> [" write vm-path file-stem write ".image]
     -run=<vocab>        run the MAIN: entry point of <vocab>
         -run=listener   run terminal listener
         -run=ui.tools   run Factor development UI
     -e=<code>           evaluate <code>
     -no-user-init       suppress loading of .factor-rc
-    -datastack=<int>    datastack size in KiB
-    -retainstack=<int>  retainstack size in KiB
-    -callstack=<int>    callstack size in KiB
-    -callbacks=<int>    callback heap size in KiB
-    -young=<int>        young gc generation 0 size in MiB
-    -aging=<int>        aging gc generation 1 size in MiB
-    -tenured=<int>      tenured gc generation 2 size in MiB
-    -codeheap=<int>     codeheap size in MiB
-    -pic=<int>          max pic size
+    -datastack=<int>    datastack size in KiB [" write cell 32 * number>string write "]
+    -retainstack=<int>  retainstack size in KiB [" write cell 32 * number>string write "]
+    -callstack=<int>    callstack size in KiB [" write cell cpu ppc? 256 128 ? * number>string write "]
+    -callbacks=<int>    callback heap size in KiB [256]
+    -young=<int>        young gc generation 0 size in MiB [" write cell 4 / number>string write "]
+    -aging=<int>        aging gc generation 1 size in MiB [" write cell 2 / number>string write "]
+    -tenured=<int>      tenured gc generation 2 size in MiB [" write cell 24 * number>string write "]
+    -codeheap=<int>     codeheap size in MiB [64]
+    -pic=<int>          max pic size [3]
     -fep                enter fep mode immediately
     -no-signals         turn off OS signal handling
     -console            open console if possible
