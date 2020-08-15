@@ -123,6 +123,6 @@ ERROR: sodium-malloc-error ;
     byte-array (base64-buffer) dup :> b64 swap
     byte-array dup length sodium_base64_VARIANT_URLSAFE_NO_PADDING
     sodium_bin2base64 0 = [ call-fail ] when b64 ascii decode unclip-last
-    CHAR: \0 = [ call-fail ] unless ;
+    char: \0 = [ call-fail ] unless ;
 
 [ sodium-init ] "sodium" add-startup-hook

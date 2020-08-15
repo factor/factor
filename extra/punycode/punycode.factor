@@ -104,8 +104,8 @@ ERROR: invalid-digit char ;
 
 :: decode-digit ( ch -- digit )
     {
-        { [ ch CHAR: A CHAR: Z between? ] [ ch CHAR: A - ] }
-        { [ ch CHAR: 0 CHAR: 9 between? ] [ ch CHAR: 0 26 - - ] }
+        { [ ch char: A char: Z between? ] [ ch char: A - ] }
+        { [ ch char: 0 char: 9 between? ] [ ch char: 0 26 - - ] }
         [ ch invalid-digit ]
     } cond ;
 
@@ -144,7 +144,7 @@ ERROR: invalid-character char ;
 PRIVATE>
 
 : punycode> ( punycode -- str )
-    CHAR: - over last-index [
+    char: - over last-index [
         ! FIXME: assert all non-basic code-points
         [ head >sbuf ] [ 1 + tail ] 2bi >upper
     ] [

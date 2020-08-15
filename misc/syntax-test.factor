@@ -217,15 +217,15 @@ PRIVATE>
 
     f
 
-    CHAR: -
-    CHAR: a
-    CHAR: symbol-for-end-of-transmission
-    CHAR: snowman
+    char: -
+    char: a
+    char: symbol-for-end-of-transmission
+    char: snowman
 
-    { CHAR: a CHAR: S }
-    { CHAR: b CHAR: D }
-    { CHAR: c CHAR: H }
-    { CHAR: d CHAR: C }
+    { char: a char: S }
+    { char: b char: D }
+    { char: c char: H }
+    { char: d char: C }
 
 ! New number literals:
 
