@@ -23,9 +23,9 @@ CONSTANT: DIGITS $[ "abcdefghijklmnopqrstuvwxyz0123456789" >byte-array ]
 : threshold ( j bias -- T )
     [ BASE * ] [ - ] bi* TMIN TMAX clamp ;
 
-:: adapt ( delta! #chars first? -- bias )
+:: adapt ( delta! num-chars first? -- bias )
     delta first? DAMP 2 ? /i delta!
-    delta dup #chars /i + delta!
+    delta dup num-chars /i + delta!
     0 [ delta $[ BASE TMIN - TMAX * 2 /i ] > ] [
         delta $[ BASE TMIN - ] /i delta!
         BASE +
