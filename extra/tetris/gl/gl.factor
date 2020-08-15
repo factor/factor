@@ -36,8 +36,8 @@ IN: tetris.gl
 
 : set-background-color ( tetris -- )
     dup running?>> [
-        paused?>> COLOR: light-gray COLOR: white ?
-    ] [ drop COLOR: black ] if gl-color ;
+        paused?>> color: light-gray color: white ?
+    ] [ drop color: black ] if gl-color ;
 
 : draw-background ( board -- )
     [ 0 0 ] dip [ width>> ] [ height>> ] bi glRectf ;

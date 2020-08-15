@@ -38,7 +38,7 @@ DEFER: default-L-parser-values
 
 : Rx ( ANGLE -- Rx )
   
-  [let deg>rad :> ANGLE
+  let[ deg>rad :> ANGLE
 
     ANGLE cos     :> A
     ANGLE sin neg :> B
@@ -53,7 +53,7 @@ DEFER: default-L-parser-values
 
 : Ry ( ANGLE -- Ry )
   
-  [let deg>rad :> ANGLE
+  let[ deg>rad :> ANGLE
 
     ANGLE cos     :> A
     ANGLE sin     :> B
@@ -68,7 +68,7 @@ DEFER: default-L-parser-values
 
 : Rz ( ANGLE -- Rz )
   
-  [let deg>rad :> ANGLE
+  let[ deg>rad :> ANGLE
 
     ANGLE cos     :> A
     ANGLE sin neg :> B
@@ -173,22 +173,22 @@ DEFER: default-L-parser-values
 
 : color-table ( -- colors )
   {
-    COLOR: black
-    COLOR: grey50
-    COLOR: red
-    COLOR: yellow
-    COLOR: green
-    COLOR: turquoise
-    COLOR: blue
-    COLOR: purple
-    COLOR: green4
-    COLOR: dark-turquoise
-    COLOR: dark-blue
+    color: black
+    color: grey50
+    color: red
+    color: yellow
+    color: green
+    color: turquoise
+    color: blue
+    color: purple
+    color: green4
+    color: dark-turquoise
+    color: dark-blue
     T{ rgba f 0.58 0.00 0.82 1 } ! dark purple
-    COLOR: dark-red
-    COLOR: grey25
-    COLOR: grey75
-    COLOR: white
+    color: dark-red
+    color: grey25
+    color: grey75
+    color: white
   } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -283,8 +283,8 @@ TUPLE: L-system < gadget
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: open-paren  ( -- ch ) CHAR: ( ;
-: close-paren ( -- ch ) CHAR: ) ;
+: open-paren  ( -- ch ) char: \( ;
+: close-paren ( -- ch ) char: \) ;
 
 : open-paren?  ( obj -- ? ) open-paren  = ;
 : close-paren? ( obj -- ? ) close-paren = ;
@@ -303,7 +303,7 @@ TUPLE: L-system < gadget
 :: iterate-string-loop ( STRING RULES ACCUM -- )
   STRING empty? not
     [
-      [let
+      let[
         STRING read-instruction :> ( NEXT REST )
 
         NEXT 1 head RULES at  NEXT  or  ACCUM push-all
@@ -316,7 +316,7 @@ TUPLE: L-system < gadget
 
 :: iterate-string ( STRING RULES -- string )
 
-  [let STRING length 10 * <sbuf> :> ACCUM
+  let[ STRING length 10 * <sbuf> :> ACCUM
 
     STRING RULES ACCUM iterate-string-loop
 
@@ -328,7 +328,7 @@ TUPLE: L-system < gadget
 
   STRING empty? not
     [
-      [let
+      let[
           STRING read-instruction :> ( NEXT REST )
           NEXT 1 head COMMANDS at :> COMMAND
           COMMAND
@@ -361,7 +361,7 @@ TUPLE: L-system < gadget
 
 :: do-camera-look-at ( CAMERA -- )
 
-  [let
+  let[
       CAMERA pos>> :> EYE
       CAMERA clone 1 step-turtle pos>> :> FOCUS
       CAMERA clone 90 pitch-up 1 step-turtle pos>> CAMERA pos>> v- :> UP
@@ -389,7 +389,7 @@ TUPLE: L-system < gadget
 
 M:: L-system draw-gadget* ( L-SYSTEM -- )
 
-  COLOR: black gl-clear
+  color: black gl-clear
 
   GL_FLAT glShadeModel
 
@@ -406,7 +406,7 @@ M:: L-system draw-gadget* ( L-SYSTEM -- )
   GL_FRONT_AND_BACK GL_LINE glPolygonMode
 
   ! draw axis
-  COLOR: white gl-color GL_LINES
+  color: white gl-color GL_LINES
   glBegin { 0 0 0 } gl-vertex { 0 0 1 } gl-vertex glEnd
 
   ! rotate pedestal
