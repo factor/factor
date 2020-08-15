@@ -18,7 +18,7 @@ ARTICLE: "creation" "Creating Tensors"
 "They can be converted to/from the corresponding N-dimensional array with"
 { $subsections tensor>array >tensor }
 "There is also a tensor parsing word"
-{ $subsections POSTPONE: t{ } ;
+{ $subsections postpone: \t{ } ;
 
 ARTICLE: "manipulation" "Manipulating Tensors"
 "The number of dimensions can be extracted with:"

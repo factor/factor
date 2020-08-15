@@ -263,31 +263,31 @@ TYPED:: t-uop ( tensor: tensor quot: ( x -- y ) -- tensor: tensor )
 PRIVATE>
 
 ! Add a tensor to either another tensor or a scalar
-multi-methods:GENERIC: t+ ( x y -- tensor )
+MULTI-GENERIC: t+ ( x y -- tensor )
 METHOD: t+ { tensor tensor } [ v+ ] [ + ] t-bop-simd ;
 METHOD: t+ { tensor number } >float [ v+ ] [ + ] t-uop-simd ;
 METHOD: t+ { number tensor } swap >float [ swap v+ ] [ swap + ] t-uop-simd ;
 
 ! Subtraction between two tensors or a tensor and a scalar
-multi-methods:GENERIC: t- ( x y -- tensor )
+MULTI-GENERIC: t- ( x y -- tensor )
 METHOD: t- { tensor tensor } [ v- ] [ - ] t-bop-simd ;
 METHOD: t- { tensor number } >float [ v- ] [ - ] t-uop-simd ;
 METHOD: t- { number tensor } swap >float [ swap v- ] [ swap - ] t-uop-simd ;
 
 ! Multiply a tensor with either another tensor or a scalar
-multi-methods:GENERIC: t* ( x y -- tensor )
+MULTI-GENERIC: t* ( x y -- tensor )
 METHOD: t* { tensor tensor } [ v* ] [ * ] t-bop-simd ;
 METHOD: t* { tensor number } >float [ v* ] [ * ] t-uop-simd ;
 METHOD: t* { number tensor } swap >float [ swap v* ] [ swap * ] t-uop-simd ;
 
 ! Divide two tensors or a tensor and a scalar
-multi-methods:GENERIC: t/ ( x y -- tensor )
+MULTI-GENERIC: t/ ( x y -- tensor )
 METHOD: t/ { tensor tensor } [ v/ ] [ / ] t-bop-simd ;
 METHOD: t/ { tensor number } >float [ v/ ] [ / ] t-uop-simd ;
 METHOD: t/ { number tensor } swap >float [ swap v/ ] [ swap / ] t-uop-simd ;
 
 ! Mod two tensors or a tensor and a scalar
-multi-methods:GENERIC: t% ( x y -- tensor )
+MULTI-GENERIC: t% ( x y -- tensor )
 METHOD: t% { tensor tensor } [ mod ] t-bop ;
 METHOD: t% { tensor number } >float [ mod ] curry t-uop ;
 METHOD: t% { number tensor } [ >float ] dip [ mod ] with t-uop ;

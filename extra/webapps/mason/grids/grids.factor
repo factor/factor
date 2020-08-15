@@ -9,8 +9,8 @@ IN: webapps.mason.grids
 : render-grid-cell ( cpu os quot -- xml )
     call( cpu os -- url label )
     2dup and
-    [ link XML[ <td class="supported"><-></td> XML] ]
-    [ 2drop XML[ <td class="doesnotexist" /> XML] ]
+    [ link XML-CHUNK[[ <td class="supported"><-></td> ]] ]
+    [ 2drop XML-CHUNK[[ <td class="doesnotexist" /> ]] ]
     if ;
 
 CONSTANT: oses
@@ -27,16 +27,16 @@ CONSTANT: cpus
 }
 
 : render-grid-header ( -- xml )
-    oses values [ XML[ <th scope='col'><-></th> XML] ] map ;
+    oses values [ XML-CHUNK[[ <th scope='col'><-></th> ]] ] map ;
 
 :: render-grid-row ( cpu quot -- xml )
     cpu second oses keys |[ os | cpu os quot render-grid-cell ] map
-    XML[ <tr><th scope='row'><-></th><-></tr> XML] ;
+    XML-CHUNK[[ <tr><th scope='row'><-></th><-></tr> ]] ;
 
 :: render-grid ( quot -- xml )
     render-grid-header
     cpus [ quot render-grid-row ] map
-    XML[
+    XML-CHUNK[[
         <table class="downloads" cellspacing="0">
             <tr><th class="nobg">OS/CPU</th><-></tr>
             <->
