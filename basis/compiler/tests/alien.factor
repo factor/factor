@@ -977,7 +977,7 @@ FUNCTION: ulong ffi_test_70 ( test_struct_68 a test_struct_68 b, test_struct_66 
 
 : callback-14 ( -- callback )
     ulong { ulong ulong ulong test_struct_66 test_struct_66 } cdecl
-    [| a b c d e |
+    |[ a b c d e |
         a b + c +
         d [ mem1>> + ] [ mem2>> + ] bi
         e [ mem1>> + ] [ mem2>> + ] bi
@@ -996,7 +996,7 @@ FUNCTION: ulong ffi_test_70 ( test_struct_68 a test_struct_68 b, test_struct_66 
 
 : callback-15 ( -- callback )
     ulong { ulong ulong ulong test_struct_66 test_struct_66 ulong } cdecl
-    [| a b c d e _f |
+    |[ a b c d e _f |
         a b + c +
         d [ mem1>> + ] [ mem2>> + ] bi
         e [ mem1>> + ] [ mem2>> + ] bi
@@ -1018,7 +1018,7 @@ FUNCTION: ulong ffi_test_70 ( test_struct_68 a test_struct_68 b, test_struct_66 
 
 : callback-16 ( -- callback )
     ulong { ulong ulong ulong test_struct_66 test_struct_68 test_struct_66 } cdecl
-    [| a b c d e _f |
+    |[ a b c d e _f |
         a b + c +
         d [ mem1>> + ] [ mem2>> + ] bi
         e [ mem1>> + ] [ mem2>> + ] [ mem3>> + ] tri
@@ -1040,7 +1040,7 @@ FUNCTION: ulong ffi_test_70 ( test_struct_68 a test_struct_68 b, test_struct_66 
 
 : callback-17 ( -- callback )
     ulong { ulong ulong ulong test_struct_66 test_struct_69 test_struct_66 } cdecl
-    [| a b c d e _f |
+    |[ a b c d e _f |
         a b + c +
         d [ mem1>> + ] [ mem2>> + ] bi
         e [ mem1>> >integer + ] [ mem2>> + ] [ mem3>> + ] tri
@@ -1062,7 +1062,7 @@ FUNCTION: ulong ffi_test_70 ( test_struct_68 a test_struct_68 b, test_struct_66 
 
 : callback-18 ( -- callback )
     ulong { test_struct_68 test_struct_68 test_struct_66 } cdecl
-    [| a b c |
+    |[ a b c |
         a [ mem1>> ] [ mem2>> + ] [ mem3>> + ] tri
         b [ mem1>> + ] [ mem2>> + ] [ mem3>> + ] tri
         c [ mem1>> + ] [ mem2>> + ] bi

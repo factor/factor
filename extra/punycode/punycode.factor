@@ -47,7 +47,7 @@ CONSTANT: DIGITS $[ "abcdefghijklmnopqrstuvwxyz0123456789" >byte-array ]
     V{ } clone :> accum
     N :> oldch!
     -1 :> oldi!
-    extended [| ch |
+    extended |[ ch |
         -1 :> i!
         -1 :> pos!
         str [ ch < ] count :> curlen
@@ -68,7 +68,7 @@ CONSTANT: DIGITS $[ "abcdefghijklmnopqrstuvwxyz0123456789" >byte-array ]
     ] each accum ;
 
 :: encode-delta ( delta! bias -- seq )
-    SBUF" " clone :> accum
+    sbuf"" clone :> accum
     0 :> j!
     [
         j 1 + j!
@@ -83,9 +83,9 @@ CONSTANT: DIGITS $[ "abcdefghijklmnopqrstuvwxyz0123456789" >byte-array ]
     ] loop accum ;
 
 :: encode-deltas ( baselen deltas -- seq )
-    SBUF" " clone :> accum
+    sbuf"" clone :> accum
     BIAS :> bias!
-    deltas [| delta i |
+    deltas |[ delta i |
         delta bias encode-delta accum push-all
         delta baselen i + 1 + i 0 = adapt bias!
     ] each-index accum ;
@@ -148,7 +148,7 @@ PRIVATE>
         ! FIXME: assert all non-basic code-points
         [ head >sbuf ] [ 1 + tail ] 2bi >upper
     ] [
-        SBUF" " clone swap >upper
+        sbuf"" clone swap >upper
     ] if* insertion-sort "" like ;
 
 : idna> ( punycode -- str )

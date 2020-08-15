@@ -42,7 +42,7 @@ IN: project-euler.common
     >lower [ char: a - 1 + ] map-sum ;
 
 : mediant ( a/c b/d -- (a+b)/(c+d) )
-    2>fraction [ + ] 2bi@ / ;
+    2fraction>parts [ + ] 2bi@ / ;
 
 <PRIVATE
 
@@ -50,12 +50,6 @@ IN: project-euler.common
     [ dup length 1 - <iota> [ nth-pair max , ] with each ] { } make ;
 
 PRIVATE>
-
-: alpha-value ( str -- n )
-    >lower [ char: a - 1 + ] map-sum ;
-
-: mediant ( a/c b/d -- (a+b)/(c+d) )
-    2fraction>parts [ + ] 2bi@ / ;
 
 : max-path ( triangle -- n )
     dup length 1 > [

@@ -401,7 +401,7 @@ HELP: invoke
     "    ["
     "        ["
     "            [ N of ] [ F of ] bi"
-    "            [let :> ( nv fv ) { fibo nv fv } !! rule* ]"
+    "            let[ :> ( nv fv ) { fibo nv fv } !! rule* ]"
     "        ] invoke ]"
     "} rule"
     ""

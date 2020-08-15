@@ -4,7 +4,7 @@ USING: io.streams.string multiline logic lists
 logic.examples.hanoi2 sequences tools.test ;
 
 {
-    t [=[ move Top from Left to Center
+    t [=[move Top from Left to Center
 move 2nd from Left to Right
 move Top from Center to Right
 move Base from Left to Center

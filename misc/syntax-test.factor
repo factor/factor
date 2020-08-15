@@ -156,15 +156,15 @@ PRIVATE>
 
     ""
     "test"
-    SBUF" foo"
-    SBUF" hello world "
+    sbuf"foo"
+    sbuf"hello world "
     "\s"
     "\\foo"
     "\"hello\""
     "\a\b\e\f\n\r\t\s\v\s\0\\\""
     "\x01\xaF\uffffff"
 
-    URL" http://google.com"
+    url"http://google.com"
     R" asdf"
 
     """">json""""
@@ -205,7 +205,7 @@ PRIVATE>
 
 ! SBUF is colored wrong:
 
-    SBUF" " clone swap [ " " append ] [ number>string append ] interleave
+    sbuf"" clone swap [ " " append ] [ number>string append ] interleave
 
 ! Update to new library words:
 
@@ -270,21 +270,21 @@ PRIVATE>
     -1.5e30
     1.5e-30
     1,000.1,2
-    NAN: CAFE1234 0,. ! third token wrong
+    nan: CAFE1234 0,. ! third token wrong
     0,. ! wrong, next line also wrong
     0,.
-    NAN: ! ff 0xff comment
+    nan: ! ff 0xff comment
         xCAFE1234 ! wrong
         ff ! shouldn't match as a hex number
-    NAN: 0
+    nan: 0
     drop
-    NAN: !
+    nan: !
         ! a 1 comment 1
         f
 
-    NAN:
+    nan:
 f,
-    NAN: ALKSJDflKJ ! XXX: should error
+    nan: ALKSJDflKJ ! XXX: should error
 
 ! Not numbers
 

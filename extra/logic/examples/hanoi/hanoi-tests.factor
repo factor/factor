@@ -4,7 +4,7 @@ USING: io.streams.string literals logic logic.examples.hanoi
 multiline tools.test ;
 
 ${
-    t [=[ move disk from left to center
+    t [=[move disk from left to center
 move disk from left to right
 move disk from center to right
 move disk from left to center

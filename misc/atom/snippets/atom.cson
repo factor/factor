@@ -57,7 +57,7 @@
     body: ":: $1 ( $2 -- $3 ) $0 ;"
   let:
     prefix: "let"
-    body: "[let $0 ]"
+    body: "let[ $0 ]"
   spread:
     prefix: "spread"
     body: '''

@@ -117,7 +117,7 @@ LOGIC-PREDS: likes-cheeseo dislikes-cheeseo ;
 { likes-cheeseo X } { mouseo X } rule
 { dislikes-cheeseo Y } {
     { creatureo Y }
-    \+ { likes-cheeseo Y }
+    ~+ { likes-cheeseo Y }
 } rule
 
 { f } [ { dislikes-cheeseo Jerry } query ] unit-test

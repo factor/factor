@@ -6,10 +6,11 @@ gpu.buffers gpu.framebuffers gpu.render gpu.shaders gpu.state
 gpu.util.wasd growable images kernel literals locals math
 math.order math.ranges math.vectors math.vectors.conversion
 math.vectors.simd math.vectors.simd.cords method-chains models
-namespaces sequences sets specialized-vectors typed ui
-ui.gadgets ui.gadgets.worlds ui.gestures ui.pixel-formats
+namespaces sequences sets specialized-arrays specialized-vectors
+typed ui ui.gadgets ui.gadgets.worlds ui.gestures ui.pixel-formats
 vectors ;
 FROM: models => change-model ;
+SPECIALIZED-ARRAYS: ushort ;
 SPECIALIZED-VECTORS: ushort float-4 ;
 IN: gml.viewer
 

@@ -30,7 +30,7 @@ CONSTANT: cpus
     oses values [ XML[ <th scope='col'><-></th> XML] ] map ;
 
 :: render-grid-row ( cpu quot -- xml )
-    cpu second oses keys [| os | cpu os quot render-grid-cell ] map
+    cpu second oses keys |[ os | cpu os quot render-grid-cell ] map
     XML[ <tr><th scope='row'><-></th><-></tr> XML] ;
 
 :: render-grid ( quot -- xml )

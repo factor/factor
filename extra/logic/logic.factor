@@ -13,7 +13,7 @@ IN: logic
 SYMBOL: !!    ! cut operator         in prolog: !
 SYMBOL: __    ! anonymous variable   in prolog: _
 SYMBOL: ;;    ! disjunction, or      in prolog: ;
-SYMBOL: \+    ! negation             in prolog: not, \+
+SYMBOL: ~+    ! negation             in prolog: not, ~+
 
 <PRIVATE
 
@@ -176,13 +176,13 @@ DEFER: unify*
             {
                 { [ x y [ tuple? ] both? ] [
                       x y [ class-of ] same? [
-                          x y [ tuple-slots ] bi@ [| x-item y-item |
+                          x y [ tuple-slots ] bi@ |[ x-item y-item |
                               x-item x-env y-item y-env trail tmp-env unify* not
                           ] 2each-until
                       ] [ f ] if ret-value! ] }
                 { [ x y [ sequence? ] both? ] [
                       x y [ class-of ] same? x y [ length ] same? and [
-                          x y [| x-item y-item |
+                          x y |[ x-item y-item |
                               x-item x-env y-item y-env trail tmp-env unify* not
                           ] 2each-until
                       ] [ f ] if ret-value! ] }
@@ -265,7 +265,7 @@ M:: resolver-gen next ( resolver -- yield? )
                       t resolver cut>> set-info
                       s-end: resolver state<<
                   ] if ] }
-            { s-not-cut: [
+            { \s-not-cut: [
                   resolver first-goal>> callable? [
                       resolver first-goal>> call( -- goal ) resolver first-goal<<
                   ] when
@@ -285,7 +285,7 @@ M:: resolver-gen next ( resolver -- yield? )
                       drop
                       s-end: resolver state<<
                   ] if ] }
-            { s-defs-loop: [
+            { \s-defs-loop: [
                   resolver [ i>> ] [ defs>> ] bi nth
                   first2 [ resolver d-head<< ] [ resolver d-body<< ] bi*
                   resolver d-cut>> cut? resolver cut>> cut? or [
@@ -309,7 +309,7 @@ M:: resolver-gen next ( resolver -- yield? )
                           s-unify?-exit: resolver state<<
                       ] if
                   ] if ] }
-            { s-callable: [
+            { \s-callable: [
                   resolver [ d-env>> ] [ trail>> ] bi <callback-env>
                   resolver d-body>> call( cb-env -- ? ) [
                       resolver [ rest-goals>> ] [ env>> ] [ cut>> ] tri <resolver>
@@ -318,17 +318,17 @@ M:: resolver-gen next ( resolver -- yield? )
                   ] [
                       s-unify?-exit: resolver state<<
                   ] if ] }
-            { s-callable/iter: [
+            { \s-callable/iter: [
                   resolver sub-resolver1>> next [
                       t resolver yield?<<
                   ] [
                       s-unify?-exit: resolver state<<
                   ] if ] }
-            { s-not-callable: [
+            { \s-not-callable: [
                   resolver [ d-body>> ] [ d-env>> ] [ d-cut>> ] tri <resolver>
                   resolver sub-resolver1<<
                   s-not-callable/outer-iter: resolver state<< ] }
-            { s-not-callable/outer-iter: [
+            { \s-not-callable/outer-iter: [
                   resolver sub-resolver1>> next [
                       resolver [ rest-goals>> ] [ env>> ] [ cut>> ] tri <resolver>
                       resolver sub-resolver2<<
@@ -336,25 +336,25 @@ M:: resolver-gen next ( resolver -- yield? )
                   ] [
                       s-unify?-exit: resolver state<<
                   ] if ] }
-            { s-not-callable/inner-iter: [
+            { \s-not-callable/inner-iter: [
                   resolver sub-resolver2>> next [
                       t resolver yield?<<
                   ] [
                       resolver cut>> cut? resolver d-cut>> set-info-if-f
                       s-not-callable/outer-iter: resolver state<<
                   ] if ] }
-            { s-unify?-exit: [
+            { \s-unify?-exit: [
                   resolver trail>> [ first2 env-delete ] each
                   resolver d-env>> env-clear
                   s-defs-loop-end: resolver state<< ] }
-            { s-defs-loop-end: [
+            { \s-defs-loop-end: [
                   resolver [ i>> ] [ loop-end>> ] bi >= [
                       s-end: resolver state<<
                   ] [
                       resolver [ 1 + ] change-i drop
                       s-defs-loop: resolver state<<
                   ] if ] }
-            { s-end: [
+            { \s-end: [
                   t resolver return?<< ] }
         } case
         resolver [ yield?>> ] [ return?>> ] bi or not
@@ -367,7 +367,7 @@ SYMBOL: *anonymouse-var-no*
 
 : reset-anonymouse-var-no ( -- ) 0 *anonymouse-var-no* set-global ;
 
-: proxy-var-for-'__' ( -- var-symbol )
+: proxy-var-for-underscores ( -- var-symbol )
     [
         *anonymouse-var-no* counter "ANON-%d_" sprintf
         "logic.private" create-word dup dup
@@ -375,12 +375,12 @@ SYMBOL: *anonymouse-var-no*
         ANONYMOUSE-LOGIC-VAR swap set-global
     ] with-compilation-unit ;
 
-: replace-'__' ( before -- after )
+: replace-underscores ( before -- after )
     {
-        { [ dup __ = ] [ drop proxy-var-for-'__' ] }
-        { [ dup sequence? ] [ [ replace-'__' ] map ] }
+        { [ dup __ = ] [ drop proxy-var-for-underscores ] }
+        { [ dup sequence? ] [ [ replace-underscores ] map ] }
         { [ dup tuple? ] [
-              [ tuple-slots [ replace-'__' ] map ]
+              [ tuple-slots [ replace-underscores ] map ]
               [ class-of slots>tuple ] bi ] }
         [ ]
     } cond ;
@@ -394,11 +394,11 @@ SYMBOL: dummy-item
     "failo_" <pred> :> f-pred
     f-pred { } clone logic-goal boa :> f-goal
     V{ { f-goal [ drop f ] } } f-pred defs<<
-    goal pred>> name>> "\\+%s_" sprintf <pred> :> negation-pred
+    goal pred>> name>> "~+%s_" sprintf <pred> :> negation-pred
     negation-pred goal args>> clone logic-goal boa :> negation-goal
     V{
-        { negation-goal { goal !! f-goal } } ! \+P_ { P !! { failo_ } } rule
-        { negation-goal { } }                ! \+P_ fact
+        { negation-goal { goal !! f-goal } } ! ~+P_ { P !! { failo_ } } rule
+        { negation-goal { } }                ! ~+P_ fact
     } negation-pred defs<<
     negation-goal ;
 
@@ -406,8 +406,8 @@ SYMBOLS: at-the-beginning at-the-end ;
 
 :: (rule) ( head body pos -- )
     reset-anonymouse-var-no
-    head replace-'__' def>goal :> head-goal
-    body replace-'__' normalize
+    head replace-underscores def>goal :> head-goal
+    body replace-underscores normalize
     split-body pos at-the-beginning = [ reverse ] when  ! disjunction
     dup empty? [
         head-goal swap 2array 1vector
@@ -419,7 +419,7 @@ SYMBOLS: at-the-beginning at-the-end ;
         [
             [
                 {
-                    { [ dup \+ = ] [ drop dummy-item t negation?! ] }
+                    { [ dup ~+ = ] [ drop dummy-item t negation?! ] }
                     { [ dup array? ] [
                           def>goal negation? [ negation-goal ] when
                           f negation?! ] }
@@ -469,14 +469,14 @@ PRIVATE>
 : callbacks ( defs -- ) [ first2 callback ] each ; inline
 
 :: retract ( head-def -- )
-    head-def replace-'__' def>goal :> head-goal
+    head-def replace-underscores def>goal :> head-goal
     head-goal pred>> defs>> :> defs
     defs [ first <env> head-goal <env> V{ } clone <env> (unify*) ] find [
         head-goal pred>> [ remove-nth! ] change-defs drop
     ] [ drop ] if ;
 
 :: retract-all ( head-def -- )
-    head-def replace-'__' def>goal :> head-goal
+    head-def replace-underscores def>goal :> head-goal
     head-goal pred>> defs>> :> defs
     defs [
         first <env> head-goal <env> V{ } clone <env> (unify*)
@@ -496,7 +496,7 @@ PRIVATE>
     V{
         {
             is-goal
-            [| env | env dist env quot call( env -- value ) unify ]
+            |[ env | env dist env quot call( env -- value ) unify ]
         }
     } is-pred defs<<
     is-goal ;
@@ -508,7 +508,7 @@ PRIVATE>
     V{
         {
             =:=-goal
-            [| env |
+            |[ env |
                 env quot call( env -- n m )
                 2dup [ number? ] both? [ = ] [ 2drop f ] if ]
         }
@@ -522,7 +522,7 @@ PRIVATE>
     V{
         {
             =\=-goal
-            [| env |
+            |[ env |
                 env quot call( env -- n m )
                 2dup [ number? ] both? [ = not ] [ 2drop f ] if ]
         }
@@ -534,7 +534,7 @@ PRIVATE>
     quot "[ %u invoke ]" sprintf <pred> :> invoke-pred
     invoke-pred args logic-goal boa :> invoke-goal
     V{
-        { invoke-goal [| env | env quot call( env -- ) t ] }
+        { invoke-goal |[ env | env quot call( env -- ) t ] }
     } invoke-pred defs<<
     invoke-goal ;
 
@@ -543,7 +543,7 @@ PRIVATE>
     quot "[ %u invoke* ]" sprintf <pred> :> invoke*-pred
     invoke*-pred args logic-goal boa :> invoke*-goal
     V{
-        { invoke*-goal [| env | env quot call( env -- ? ) ] }
+        { invoke*-goal |[ env | env quot call( env -- ? ) ] }
     } invoke*-pred defs<<
     invoke*-goal ;
 
@@ -553,7 +553,7 @@ PRIVATE>
     f :> success?!
     V{ } clone :> bindings
     <env> :> env
-    goal-def/defs replace-'__' normalize [ def>goal ] map
+    goal-def/defs replace-underscores normalize [ def>goal ] map
     env f <cut>
     <resolver> :> resolver
     [
@@ -571,7 +571,7 @@ PRIVATE>
             ] when
         ] loop
     ] with-return
-     bindings dup {
+    bindings dup {
         [ empty? ]
         [ first keys empty? ]
     } 1|| [ drop success? ] [ >array ] if ;
@@ -634,7 +634,7 @@ PRIVATE>
     ] if ;
 
 :: (resolve) ( goal-def/defs quot: ( env -- ) -- )
-    goal-def/defs replace-'__' normalize [ def>goal ] map :> goals
+    goal-def/defs replace-underscores normalize [ def>goal ] map :> goals
     <env> :> env
     goals env f <cut> [ env quot call( env -- ) ] resolve-body ;
 
@@ -646,7 +646,7 @@ PRIVATE>
     f :> success?!
     V{ } clone :> bindings
     [
-        goal-def/defs normalize [| env |
+        goal-def/defs normalize |[ env |
             env table>> keys [ get NORMAL-LOGIC-VAR? ] filter
             [ dup env at ] H{ } map>assoc
             trace? get-global [ dup [ "%u: %u\n" printf ] assoc-each ] when

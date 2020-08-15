@@ -90,7 +90,7 @@ USING: combinators io kernel locals
 math.functions math.parser math.ranges
 sequences ;
 
-100 [1,b] [| i |
+100 [1,b] |[ i |
     {
         { [ i 15 divisor? ] [ "FizzBuzz" ] }
         { [ i  3 divisor? ] [ "Fizz" ] }

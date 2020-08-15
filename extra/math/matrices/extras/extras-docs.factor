@@ -152,7 +152,7 @@ HELP: <random-unit-matrix>
 HELP: <hankel-matrix>
 { $values { "n" integer } { "matrix" matrix } }
 { $description
-    "A Hankel matrix is a symmetric, " { $link square-matrix } " in which each ascending skew-diagonal from left to right is constant. See " { $url URL" https://en.wikipedia.org/wiki/Hankel_matrix" "hankel matrix" } "."
+    "A Hankel matrix is a symmetric, " { $link square-matrix } " in which each ascending skew-diagonal from left to right is constant. See " { $url url"https://en.wikipedia.org/wiki/Hankel_matrix" "hankel matrix" } "."
     $nl
     "The following is true of any Hankel matrix" { $snippet "A" } ": " { $snippet "A[i][j] = A[j][i] = a[i+j-2]" } "."
     $nl
@@ -173,7 +173,7 @@ HELP: <hilbert-matrix>
 { $description
     "A Hilbert matrix is a " { $link square-matrix } " " { $snippet "A" } " in which entries are the unit fractions "
     { $snippet "A[i][j] = 1/(i+j-1)" }
-    ". See " { $url URL" https://en.wikipedia.org/wiki/Hilbert_matrix" "hilbert matrix" } "."
+    ". See " { $url url"https://en.wikipedia.org/wiki/Hilbert_matrix" "hilbert matrix" } "."
     $nl
     "A Hilbert matrix is a special case of the " { $link <hankel-matrix> } "."
 }
@@ -196,7 +196,7 @@ HELP: <hilbert-matrix>
 
 HELP: <toeplitz-matrix>
 { $values { "n" integer } { "matrix" matrix } }
-{ $description "A Toeplitz matrix is an upside-down " { $link <hankel-matrix> } ". Unlike the Hankel matrix, a Toeplitz matrix can be non-square. See " { $url URL" https://en.wikipedia.org/wiki/Hankel_matrix" "hankel matrix" } "."
+{ $description "A Toeplitz matrix is an upside-down " { $link <hankel-matrix> } ". Unlike the Hankel matrix, a Toeplitz matrix can be non-square. See " { $url url"https://en.wikipedia.org/wiki/Hankel_matrix" "hankel matrix" } "."
 }
 { $examples
     { $example
@@ -239,7 +239,7 @@ HELP: <box-matrix>
 
 HELP: <scale-matrix3>
 { $values { "factors" sequence } { "matrix" matrix } }
-{ $description "Make a " { $snippet "3 x 3" } " scaling matrix, used to scale an object in 3 dimensions. See " { $url URL" https://en.wikipedia.org/wiki/Scaling_(geometry)#Matrix_representation" "scaling matrix on Wikipedia" } "." }
+{ $description "Make a " { $snippet "3 x 3" } " scaling matrix, used to scale an object in 3 dimensions. See " { $url url"https://en.wikipedia.org/wiki/Scaling_(geometry)#Matrix_representation" "scaling matrix on Wikipedia" } "." }
 { $notelist
     { $finite-input-note "three" "factors" }
     { $equiv-word-note "3-matrix" <scale-matrix4> }
@@ -259,7 +259,7 @@ HELP: <scale-matrix3>
 
 HELP: <scale-matrix4>
 { $values { "factors" sequence } { "matrix" matrix } }
-{ $description "Make a " { $snippet "4 x 4" } " scaling matrix, used to scale an object in 3 or more dimensions. See " { $url URL" https://en.wikipedia.org/wiki/Scaling_(geometry)#Matrix_representation" "scaling matrix on Wikipedia" } "." }
+{ $description "Make a " { $snippet "4 x 4" } " scaling matrix, used to scale an object in 3 or more dimensions. See " { $url url"https://en.wikipedia.org/wiki/Scaling_(geometry)#Matrix_representation" "scaling matrix on Wikipedia" } "." }
 { $notelist
     { $finite-input-note "three" "factors" }
     { $equiv-word-note "4-matrix" <scale-matrix3> }
@@ -299,7 +299,7 @@ HELP: <ortho-matrix4>
 
 HELP: <frustum-matrix4>
 { $values { "xy-dim" pair } { "near" number } { "far" number } { "matrix" matrix } }
-{ $description "Make a " { $snippet "4 x 4" } " matrix suitable for representing an occlusion frustum. A viewing or occlusion frustum is the three-dimensional region of a three-dimensional object which is visible on the screen. See " { $url URL" https://en.wikipedia.org/wiki/Frustum" "frustum on Wikipedia" } "." }
+{ $description "Make a " { $snippet "4 x 4" } " matrix suitable for representing an occlusion frustum. A viewing or occlusion frustum is the three-dimensional region of a three-dimensional object which is visible on the screen. See " { $url url"https://en.wikipedia.org/wiki/Frustum" "frustum on Wikipedia" } "." }
 { $notes { $finite-input-note "two" "xy-dim" } }
 { $examples
     { $example
@@ -417,7 +417,7 @@ HELP: n^m
 
 HELP: kronecker-product
 { $values { "m1" matrix } { "m2" matrix } { "m" matrix } }
-{ $description "Calculates the " { $url URL" http://enwp.org/Kronecker_product" "Kronecker product" } " of two matrices. This product can be described as a generalization of the vector-based " { $link outer-product } " to matrices. The Kronecker product gives the matrix of the tensor product with respect to a standard choice of basis." }
+{ $description "Calculates the " { $url url"http://enwp.org/Kronecker_product" "Kronecker product" } " of two matrices. This product can be described as a generalization of the vector-based " { $link outer-product } " to matrices. The Kronecker product gives the matrix of the tensor product with respect to a standard choice of basis." }
 { $notelist
     { $equiv-word-note "matrix" outer-product }
     $2d-only-note
@@ -443,7 +443,7 @@ HELP: kronecker-product
 
 HELP: outer-product
 { $values { "u" sequence } { "v" sequence } { "matrix" matrix } }
-{ $description "Computes the " { $url URL" http://  enwp.org/Outer_product" "outer-product product" } " of " { $snippet "u" } " and " { $snippet "v" } "." }
+{ $description "Computes the " { $url url"http://  enwp.org/Outer_product" "outer-product product" } " of " { $snippet "u" } " and " { $snippet "v" } "." }
 { $examples
     { $example
         "USING: math.matrices.extras prettyprint ;"
@@ -547,7 +547,7 @@ HELP: m*1/det
 
 HELP: >minors
 { $values { "matrix" square-matrix } { "matrix'" square-matrix } }
-{ $description "Calculate the " { $emphasis "matrix of minors" } " of the input matrix. See " { $url URL" https://en.wikipedia.org/wiki/Minor_(linear_algebra)" "minor on Wikipedia" } "." }
+{ $description "Calculate the " { $emphasis "matrix of minors" } " of the input matrix. See " { $url url"https://en.wikipedia.org/wiki/Minor_(linear_algebra)" "minor on Wikipedia" } "." }
 { $notelist
     $keep-shape-note
     $2d-only-note
@@ -574,7 +574,7 @@ HELP: >minors
 
 HELP: >cofactors
 { $values { "matrix" matrix } { "matrix'" matrix } }
-{ $description "Calculate the " { $emphasis "matrix of cofactors" } " of the input matrix. See " { $url URL" https://en.wikipedia.org/wiki/Minor_(linear_algebra)#Inverse_of_a_matrix" "matrix of cofactors on Wikipedia" } ". Alternating elements of the input matrix have their signs inverted." $nl "On odd rows, the even elements have their signs inverted. On even rows, odd elements have their signs inverted." }
+{ $description "Calculate the " { $emphasis "matrix of cofactors" } " of the input matrix. See " { $url url"https://en.wikipedia.org/wiki/Minor_(linear_algebra)#Inverse_of_a_matrix" "matrix of cofactors on Wikipedia" } ". Alternating elements of the input matrix have their signs inverted." $nl "On odd rows, the even elements have their signs inverted. On even rows, odd elements have their signs inverted." }
 { $notelist
     $keep-shape-note
     $2d-only-note

@@ -72,7 +72,7 @@ C: <cont-frac> cont-frac
 : step ( n cont-frac -- n cont-frac )
     swap dup
     ! Store n
-    [let :> n
+    let[ :> n
         ! Extract the constant
         swap dup num-const>>
         :> num-const

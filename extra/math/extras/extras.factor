@@ -365,7 +365,7 @@ M: iota sum-cubes sum sq ;
         bit-length 1 - 2 /i :> c
         1 :> a!
         0 :> d!
-        c bit-length <iota> <reversed> [| s |
+        c bit-length <iota> <reversed> |[ s |
             d :> e
             c s neg shift d!
             a d e - 1 - shift

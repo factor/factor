@@ -453,7 +453,7 @@ PRIVATE>
 
 ! Check that the tensor has an acceptable shape for matrix multiplication
 : check-matmul-shape ( tensor1 tensor2 -- )
-    [let [ shape>> ] bi@ :> shape2 :> shape1
+    let[ [ shape>> ] bi@ :> shape2 :> shape1
     ! Check that the matrices can be multiplied
     shape1 last shape2 [ length 2 - ] keep nth =
     ! Check that the other dimensions are equal

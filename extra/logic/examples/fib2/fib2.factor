@@ -16,6 +16,6 @@ LOGIC-VARS: F F1 F2 N N1 N2 ;
     [
         [
             [ N of ] [ F of ] bi
-            [let :> ( nv fv ) { fibo nv fv } !! rule* ]
+            let[ :> ( nv fv ) { fibo nv fv } !! rule* ]
         ] invoke ]
 } rule
