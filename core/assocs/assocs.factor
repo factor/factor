@@ -195,6 +195,9 @@ M: assoc values [ nip ] { } assoc>map ;
 : change-at ( ..a key assoc quot: ( ..a value -- ..b newvalue ) -- ..b )
     [ [ at ] dip call ] [ drop ] 3bi set-at ; inline
 
+: ?change-at ( ..a key assoc quot: ( ..a value -- ..b newvalue ) -- ..b )
+    2over [ set-at ] 2curry compose [ at* ] dip [ drop ] if ; inline
+
 : at+ ( n key assoc -- ) [ 0 or + ] change-at ; inline
 
 : inc-at ( key assoc -- ) [ 1 ] 2dip at+ ; inline
