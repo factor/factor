@@ -481,7 +481,12 @@ HELP: change-at
 { $description "Applies the quotation to the value associated with " { $snippet "key" } ", storing the new value back in the assoc." }
 { $side-effects "assoc" } ;
 
-{ change-at change-nth change } related-words
+HELP: ?change-at
+{ $values { "key" object } { "assoc" assoc } { "quot" { $quotation ( ..a value -- ..b newvalue ) } } }
+{ $description "If the " { $snippet "key" } " exists in the " { $snippet "assoc" } ", applies the quotation to the value associated with " { $snippet "key" } ", storing the new value back in the assoc." }
+{ $side-effects "assoc" } ;
+
+{ change-at ?change-at change-nth change } related-words
 
 HELP: at+
 { $values { "n" number } { "key" object } { "assoc" assoc } }
