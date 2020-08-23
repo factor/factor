@@ -1,8 +1,23 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov, 2020 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.directories io.encodings.utf8 io.launcher io.pathnames
-math.statistics prettyprint sequences sorting system ;
+USING: assocs fry io io.directories io.encodings.utf8
+io.launcher io.pathnames kernel math.statistics prettyprint
+sequences sorting system ;
 IN: contributors
+
+CONSTANT: aliases {
+    { "Björn Lindqvist" "bjourne@gmail.com" }
+    { "Cat Stevens" "catb0t" }
+    { "Daniel Ehrenberg" "Dan Ehrenberg" }
+    { "Doug Coleman" "U-FROGGER\\erg" "erg" }
+    { "Erik Charlebois" "erikc" }
+    { "KUSUMOTO Norio" "kusumotonorio" }
+    { "Mighty Sheeple" "sheeple" "U-ENCHILADA\\sheeple" }
+    { "Nicolas Pénet" "nicolas-p" }
+    { "Slava Pestov" "slava" "Slava"
+        "U-SLAVA-FB3999113\\Slava" "U-SLAVA-DFB8FF805\\Slava" }
+    { "dharmatech" "U-CUTLER\\dharmatech" }
+}
 
 : changelog ( -- authors )
     image-path parent-directory [
@@ -10,8 +25,13 @@ IN: contributors
         utf8 [ lines ] with-process-reader
     ] with-directory ;
 
+: merge-aliases ( authors -- authors' )
+    aliases [
+        unclip '[ over delete-at* [ _ pick at+ ] [ drop ] if ] each
+    ] each ;
+
 : contributors ( -- )
-    changelog histogram
+    changelog histogram merge-aliases
     sort-values <reversed>
     simple-table. ;
 
