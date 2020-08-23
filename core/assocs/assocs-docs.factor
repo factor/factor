@@ -409,6 +409,8 @@ HELP: delete-at*
 { $description "Removes an entry from the assoc and outputs the previous value together with a boolean indicating whether it was present." }
 { $side-effects "assoc" } ;
 
+{ delete-at delete-at* ?delete-at } related-words
+
 HELP: rename-at
 { $values { "newkey" object } { "key" object } { "assoc" assoc } }
 { $description "Removes the values associated to " { $snippet "key" } " and re-adds it as " { $snippet "newkey" } ". Does nothing if the assoc does not contain " { $snippet "key" } "." }
