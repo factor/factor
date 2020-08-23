@@ -128,10 +128,10 @@ M: assoc keys [ drop ] { } assoc>map ;
 
 M: assoc values [ nip ] { } assoc>map ;
 
-: delete-at* ( key assoc -- old ? )
+: delete-at* ( key assoc -- value/f ? )
     [ at* ] 2keep delete-at ;
 
-: ?delete-at ( key assoc -- old ? )
+: ?delete-at ( key assoc -- value/key ? )
     [ ?at ] 2keep delete-at ;
 
 : rename-at ( newkey key assoc -- )
