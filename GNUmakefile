@@ -304,8 +304,8 @@ $(TEST_OBJS): $(OUTPUT_DIR)/%.o: vm/%.c $(OUTPUT_DIR)
 endif
 
 clean:
-	rm -f vm/*.gch
-	rm -f vm/*.o
+	rm -f $(OUTPUT_DIR)/*.gch
+	rm -f $(OUTPUT_DIR)/*.o
 	rm -f factor.dll
 	rm -f factor.lib
 	rm -f factor.dll.lib
