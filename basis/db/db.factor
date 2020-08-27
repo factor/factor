@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs classes continuations destructors kernel math
-namespaces sequences classes.tuple words strings
-tools.walker accessors combinators fry db.errors ;
+USING: accessors assocs continuations destructors fry kernel
+namespaces sequences strings ;
 IN: db
 
 TUPLE: db-connection
