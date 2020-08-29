@@ -628,8 +628,8 @@ set_boot_image_vars() {
         CHECKSUM_URL="$url"
         BOOT_IMAGE_URL="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/${BOOT_IMAGE}"
     else
-        CHECKSUM_URL="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/checksums.txt"
-        BOOT_IMAGE_URL="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/${BOOT_IMAGE}"
+        CHECKSUM_URL="http://downloads.factorcode.org/images/master/checksums.txt"
+        BOOT_IMAGE_URL="http://downloads.factorcode.org/images/master/${BOOT_IMAGE}"
     fi
 }
 
