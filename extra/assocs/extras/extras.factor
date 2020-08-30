@@ -42,7 +42,7 @@ IN: assocs.extras
     '[ nip @ ] assoc-reject ; inline
 
 : rekey-new-assoc ( assoc keys -- newassoc )
-    [ [ of ] keep swap ] with H{ } map>assoc ; inline
+    [ tuck of ] with H{ } map>assoc ; inline
 
 : rekey-assoc ( assoc keys -- assoc )
     [ dup keys ] dip diff over [ delete-at ] curry each ; inline
