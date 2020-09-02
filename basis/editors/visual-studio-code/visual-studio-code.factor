@@ -31,6 +31,7 @@ ERROR: can't-find-visual-studio-code ;
 
 M: linux find-visual-studio-code-invocation
     {
+        [ "code-insiders" which ]
         [ "code" which ]
         [ "Code" which ]
         [ home "VSCode-linux-x64/Code" append-path ]
@@ -39,7 +40,7 @@ M: linux find-visual-studio-code-invocation
 
 M: windows find-visual-studio-code-invocation
     {
-        [ { "Microsoft VS Code" } "code.exe" find-in-applications ]
+        [ { "Microsoft VS Code Insiders" } "code-insiders.cmd" find-in-applications ]
         [ "code.cmd" ]
     } 0|| ;
 
