@@ -21,7 +21,8 @@ HOOK: find-visual-studio-code-invocation os ( -- array )
     } 0|| ;
 
 M: macosx find-visual-studio-code-invocation
-    "com.microsoft.VSCode" find-native-bundle [
+    { "com.microsoft.VSCodeInsiders" "com.microsoft.VSCode" }
+    [ find-native-bundle ] map-find drop [
         "Contents/MacOS/Electron" append-path
     ] [
         f
