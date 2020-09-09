@@ -88,7 +88,7 @@ M: long-long-type unbox
     int-rep long-long-on-stack? long-long-odd-register? 3array
     int-rep long-long-on-stack? f 3array 2array record-reg-reps ;
 
-M: struct-c-type unbox ( src c-type -- vregs reps )
+M: struct-c-type unbox
     [ ^^unbox-any-c-ptr ] dip explode-struct ;
 
 : frob-struct ( c-type -- c-type )

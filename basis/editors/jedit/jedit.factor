@@ -27,7 +27,7 @@ M: windows find-jedit-path
         find-jedit-path [ "jedit" ?find-in-path ] unless*
     ] unless* ;
 
-M: jedit editor-command ( file line -- command/f )
+M: jedit editor-command
     [
         find-jedit-path ,
         "-reuseview" ,

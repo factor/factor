@@ -11,7 +11,7 @@ notepad2 editor-class set-global
         [ "notepad.exe" ] unless*
     ] unless* ;
 
-M: notepad2 editor-command ( file line -- command )
+M: notepad2 editor-command
     [
         notepad2-path ,
         "/g" , number>string , ,

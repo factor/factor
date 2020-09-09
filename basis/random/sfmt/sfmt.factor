@@ -150,10 +150,10 @@ M:: sfmt generate ( sfmt -- )
 
 PRIVATE>
 
-M: sfmt random-32* ( sfmt -- n )
+M: sfmt random-32*
     dup refill-sfmt? [ dup generate ] when next ; inline
 
-M: sfmt seed-random ( sfmt seed -- sfmt )
+M: sfmt seed-random
     [ [ state>> ] dip >>seed drop ]
     [ drop init-sfmt ] 2bi ;
 

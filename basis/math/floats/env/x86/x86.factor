@@ -63,24 +63,24 @@ CONSTANT: sse-rounding-mode>bit
 
 CONSTANT: sse-denormal-mode-bits 0x8040
 
-M: sse-env (get-exception-flags) ( register -- exceptions )
+M: sse-env (get-exception-flags)
     mxcsr>> sse-exception-flag>bit mask> ; inline
-M: sse-env (set-exception-flags) ( register exceptions -- register' )
+M: sse-env (set-exception-flags)
     [ sse-exception-flag>bit >mask sse-exception-flag-bits remask ] curry change-mxcsr ; inline
 
-M: sse-env (get-fp-traps) ( register -- exceptions )
+M: sse-env (get-fp-traps)
     mxcsr>> bitnot sse-fp-traps>bit mask> ; inline
-M: sse-env (set-fp-traps) ( register exceptions -- register' )
+M: sse-env (set-fp-traps)
     [ sse-fp-traps>bit >mask bitnot sse-fp-traps-bits remask ] curry change-mxcsr ; inline
 
-M: sse-env (get-rounding-mode) ( register -- mode )
+M: sse-env (get-rounding-mode)
     mxcsr>> sse-rounding-mode-bits mask sse-rounding-mode>bit value-at ; inline
-M: sse-env (set-rounding-mode) ( register mode -- register' )
+M: sse-env (set-rounding-mode)
     [ sse-rounding-mode>bit at sse-rounding-mode-bits remask ] curry change-mxcsr ; inline
 
-M: sse-env (get-denormal-mode) ( register -- mode )
+M: sse-env (get-denormal-mode)
     mxcsr>> sse-denormal-mode-bits mask zero? +denormal-keep+ +denormal-flush+ ? ; inline
-M: sse-env (set-denormal-mode) ( register mode -- register' )
+M: sse-env (set-denormal-mode)
     [
         {
             { +denormal-keep+  [ sse-denormal-mode-bits unmask ] }
@@ -110,24 +110,24 @@ CONSTANT: x87-rounding-mode>bit
         { +round-zero+    0x0c00 }
     } >biassoc ]
 
-M: x87-env (get-exception-flags) ( register -- exceptions )
+M: x87-env (get-exception-flags)
     status>> x87-exception>bit mask> ; inline
-M: x87-env (set-exception-flags) ( register exceptions -- register' )
+M: x87-env (set-exception-flags)
     drop ;
 
-M: x87-env (get-fp-traps) ( register -- exceptions )
+M: x87-env (get-fp-traps)
     control>> bitnot x87-exception>bit mask> ; inline
-M: x87-env (set-fp-traps) ( register exceptions -- register' )
+M: x87-env (set-fp-traps)
     [ x87-exception>bit >mask bitnot x87-exception-bits remask ] curry change-control ; inline
 
-M: x87-env (get-rounding-mode) ( register -- mode )
+M: x87-env (get-rounding-mode)
     control>> x87-rounding-mode-bits mask x87-rounding-mode>bit value-at ; inline
-M: x87-env (set-rounding-mode) ( register mode -- register' )
+M: x87-env (set-rounding-mode)
     [ x87-rounding-mode>bit at x87-rounding-mode-bits remask ] curry change-control ; inline
 
-M: x87-env (get-denormal-mode) ( register -- mode )
+M: x87-env (get-denormal-mode)
     drop +denormal-keep+ ; inline
-M: x87-env (set-denormal-mode) ( register mode -- register' )
+M: x87-env (set-denormal-mode)
     drop ;
 
 cpu {

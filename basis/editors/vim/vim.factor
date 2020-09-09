@@ -20,7 +20,7 @@ M: vim find-vim-path "vim" ?find-in-path ;
 : actual-vim-path ( -- path )
     \ vim-path get [ find-vim-path ] unless* ;
 
-M: vim editor-command ( file line -- command )
+M: vim editor-command
     [
         actual-vim-path dup string? [ , ] [ % ] if
         vim-ui? [ "-g" , ] when

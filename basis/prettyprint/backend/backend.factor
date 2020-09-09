@@ -36,7 +36,7 @@ M: anonymous-union word-name*
 M: anonymous-intersection word-name*
     class-name "intersection{ " " }" surround ;
 
-M: word word-name* ( word -- str )
+M: word word-name*
     [ name>> "( no name )" or ] [ record-vocab ] bi ;
 
 : pprint-word ( word -- )
@@ -251,7 +251,7 @@ M: vector pprint-narrow? drop t ;
 M: hashtable pprint-narrow? drop t ;
 M: tuple pprint-narrow? drop t ;
 
-M: object pprint-object ( obj -- )
+M: object pprint-object
     [
         <flow
         dup pprint-delims [

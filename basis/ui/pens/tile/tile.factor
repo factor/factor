@@ -38,7 +38,7 @@ M: tile-pen pen-pref-dim
        swap draw-scaled-image
    ] with-translation ;
 
-M: tile-pen draw-interior ( gadget pen -- )
+M: tile-pen draw-interior
     {
         [ nip >tile-pen< ]
         [ compute-tile-xs ]

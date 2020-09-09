@@ -39,7 +39,7 @@ M: callable quot-uses seq-uses ;
 
 M: wrapper quot-uses [ wrapped>> ] dip quot-uses ;
 
-M: callable uses ( quot -- seq )
+M: callable uses
     IHS{ } clone visited [
         HS{ } clone [ quot-uses ] keep members
     ] with-variable ;

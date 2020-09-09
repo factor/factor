@@ -26,7 +26,7 @@ HOOK: parse-db-error db-connection ( error -- error' )
 
 : dispose-statements ( assoc -- ) values dispose-each ;
 
-M: db-connection dispose ( db-connection -- )
+M: db-connection dispose
     dup db-connection [
         [ dispose-statements H{ } clone ] change-insert-statements
         [ dispose-statements H{ } clone ] change-update-statements
@@ -76,7 +76,7 @@ GENERIC: bind-tuple ( tuple statement -- )
 
 GENERIC: execute-statement* ( statement type -- )
 
-M: object execute-statement* ( statement type -- )
+M: object execute-statement*
     '[
         _ _ drop query-results dispose
     ] [
@@ -138,9 +138,9 @@ HOOK: begin-transaction db-connection ( -- )
 HOOK: commit-transaction db-connection ( -- )
 HOOK: rollback-transaction db-connection ( -- )
 
-M: db-connection begin-transaction ( -- ) "BEGIN" sql-command ;
-M: db-connection commit-transaction ( -- ) "COMMIT" sql-command ;
-M: db-connection rollback-transaction ( -- ) "ROLLBACK" sql-command ;
+M: db-connection begin-transaction "BEGIN" sql-command ;
+M: db-connection commit-transaction "COMMIT" sql-command ;
+M: db-connection rollback-transaction "ROLLBACK" sql-command ;
 
 : in-transaction? ( -- ? ) in-transaction get ;
 

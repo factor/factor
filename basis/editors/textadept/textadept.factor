@@ -37,7 +37,7 @@ M: windows find-textadept-path
         find-textadept-path [ "textadept" ?find-in-path ] unless*
     ] unless* ;
 
-M: textadept editor-command ( file line -- command )
+M: textadept editor-command
     swap [
         textadept-path , "-f" , , "-e" ,
         1 - number>string "goto_line(" ")" surround ,

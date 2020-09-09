@@ -92,7 +92,7 @@ ascii <file-reader> xml>gb-data
         [ ufirst>> - ] [ bfirst>> ] bi + unlinear
     ] [ encode-error ] if* ;
 
-M: gb18030 encode-char ( char stream encoding -- )
+M: gb18030 encode-char
     drop [
         dup mapping get-global at
         [ ] [ lookup-range ] ?if
@@ -128,7 +128,7 @@ M: gb18030 encode-char ( char stream encoding -- )
         [ 3drop replacement-char ]
     } cond ;
 
-M: gb18030 decode-char ( stream encoding -- char )
+M: gb18030 decode-char
     drop dup stream-read1 {
         { [ dup not ] [ 2drop f ] }
         { [ dup ascii? ] [ nip 1byte-array mapping get-global value-at ] }

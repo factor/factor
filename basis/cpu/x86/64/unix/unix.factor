@@ -38,14 +38,14 @@ M: x86.64 reserved-stack-space 0 ;
         ] [ reps ] if
     ] [ reps ] if ;
 
-M: x86.64 flatten-struct-type ( c-type -- seq )
+M: x86.64 flatten-struct-type
     dup heap-size 16 <=
     [ flatten-small-struct record-reg-reps ] [
         call-next-method unrecord-reg-reps
         [ first t f 3array ] map
     ] if ;
 
-M: x86.64 return-struct-in-registers? ( c-type -- ? )
+M: x86.64 return-struct-in-registers?
     heap-size 2 cells <= ;
 
 M: x86.64 dummy-stack-params? f ;
@@ -54,6 +54,6 @@ M: x86.64 dummy-int-params? f ;
 
 M: x86.64 dummy-fp-params? f ;
 
-M: x86.64 %prepare-var-args ( reg-inputs -- )
+M: x86.64 %prepare-var-args
     [ second reg-class-of float-regs? ] count 8 min
     [ EAX EAX XOR ] [ <byte> AL swap MOV ] if-zero ;

@@ -95,24 +95,24 @@ CONSTANT: ppc-rounding-mode>bit
 
 CONSTANT: ppc-denormal-mode-bits 0x4
 
-M: ppc-fpu-env (get-exception-flags) ( register -- exceptions )
+M: ppc-fpu-env (get-exception-flags)
     fpscr>> ppc-exception-flag>bit mask> ; inline
-M: ppc-fpu-env (set-exception-flags) ( register exceptions -- register' )
+M: ppc-fpu-env (set-exception-flags)
     [ ppc-exception-flag>bit >mask ppc-exception-flag-bits remask ] curry change-fpscr ; inline
 
-M: ppc-fpu-env (get-fp-traps) ( register -- exceptions )
+M: ppc-fpu-env (get-fp-traps)
     fpscr>> ppc-fp-traps>bit mask> ; inline
-M: ppc-fpu-env (set-fp-traps) ( register exceptions -- register' )
+M: ppc-fpu-env (set-fp-traps)
     [ ppc-fp-traps>bit >mask ppc-fp-traps-bits remask ] curry change-fpscr ; inline
 
-M: ppc-fpu-env (get-rounding-mode) ( register -- mode )
+M: ppc-fpu-env (get-rounding-mode)
     fpscr>> ppc-rounding-mode-bits mask ppc-rounding-mode>bit value-at ; inline
-M: ppc-fpu-env (set-rounding-mode) ( register mode -- register' )
+M: ppc-fpu-env (set-rounding-mode)
     [ ppc-rounding-mode>bit at ppc-rounding-mode-bits remask ] curry change-fpscr ; inline
 
-M: ppc-fpu-env (get-denormal-mode) ( register -- mode )
+M: ppc-fpu-env (get-denormal-mode)
     fpscr>> ppc-denormal-mode-bits mask zero? +denormal-keep+ +denormal-flush+ ? ; inline
-M: ppc-fpu-env (set-denormal-mode) ( register mode -- register' )
+M: ppc-fpu-env (set-denormal-mode)
     [
         {
             { +denormal-keep+  [ ppc-denormal-mode-bits unmask ] }
@@ -122,24 +122,24 @@ M: ppc-fpu-env (set-denormal-mode) ( register mode -- register' )
 
 CONSTANT: vmx-denormal-mode-bits 0x10000
 
-M: ppc-vmx-env (get-exception-flags) ( register -- exceptions )
+M: ppc-vmx-env (get-exception-flags)
     drop { } ; inline
-M: ppc-vmx-env (set-exception-flags) ( register exceptions -- register' )
+M: ppc-vmx-env (set-exception-flags)
     drop ;
 
-M: ppc-vmx-env (get-fp-traps) ( register -- exceptions )
+M: ppc-vmx-env (get-fp-traps)
     drop { } ; inline
-M: ppc-vmx-env (set-fp-traps) ( register exceptions -- register' )
+M: ppc-vmx-env (set-fp-traps)
     drop ;
 
-M: ppc-vmx-env (get-rounding-mode) ( register -- mode )
+M: ppc-vmx-env (get-rounding-mode)
     drop +round-nearest+ ;
-M: ppc-vmx-env (set-rounding-mode) ( register mode -- register' )
+M: ppc-vmx-env (set-rounding-mode)
     drop ;
 
-M: ppc-vmx-env (get-denormal-mode) ( register -- mode )
+M: ppc-vmx-env (get-denormal-mode)
     vscr>> vmx-denormal-mode-bits mask zero? +denormal-keep+ +denormal-flush+ ? ; inline
-M: ppc-vmx-env (set-denormal-mode) ( register mode -- register )
+M: ppc-vmx-env (set-denormal-mode)
     [
         {
             { +denormal-keep+  [ vmx-denormal-mode-bits unmask ] }

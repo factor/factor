@@ -35,11 +35,9 @@ TUPLE: max-heap < heap ;
 
 : <max-heap> ( -- max-heap ) max-heap <heap> ;
 
-M: heap heap-empty? ( heap -- ? )
-    data>> empty? ; inline
+M: heap heap-empty? data>> empty? ; inline
 
-M: heap heap-size ( heap -- n )
-    data>> length ; inline
+M: heap heap-size data>> length ; inline
 
 <PRIVATE
 
@@ -75,7 +73,7 @@ PRIVATE>
 : >entry< ( entry -- value key )
     [ value>> ] [ key>> ] bi ; inline
 
-M: heap heap-peek ( heap -- value key )
+M: heap heap-peek
     data>> first >entry< ;
 
 <PRIVATE

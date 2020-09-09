@@ -96,5 +96,5 @@ M: pack cap-height* pack-cap-height ;
 M: pack layout*
     dup children>> pref-dims pack-layout ;
 
-M: pack children-on ( rect gadget -- seq )
+M: pack children-on
     [ orientation>> ] [ children>> ] bi [ loc>> ] fast-children-on ;

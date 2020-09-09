@@ -35,9 +35,9 @@ ERROR: no-random-number-generator ;
 M: no-random-number-generator summary
     drop "Random number generator is not defined." ;
 
-M: f random-bytes* ( n obj -- * ) no-random-number-generator ;
+M: f random-bytes* no-random-number-generator ;
 
-M: f random-32* ( obj -- * ) no-random-number-generator ;
+M: f random-32* no-random-number-generator ;
 
 : random-32 ( -- n )
     random-generator get random-32* ;
@@ -77,8 +77,8 @@ PRIVATE>
     ] while drop [ m * ] [ neg shift ] bi* ; inline
 
 GENERIC#: (random-integer) 1 ( m obj -- n )
-M: fixnum (random-integer) ( m obj -- n ) random-integer-loop ;
-M: bignum (random-integer) ( m obj -- n ) random-integer-loop ;
+M: fixnum (random-integer) random-integer-loop ;
+M: bignum (random-integer) random-integer-loop ;
 
 : random-integer ( m -- n )
     random-generator get (random-integer) ;

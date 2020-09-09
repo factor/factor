@@ -31,11 +31,11 @@ GENERIC: from ( channel -- value )
 
 PRIVATE>
 
-M: channel to ( value channel -- )
+M: channel to
     dup receivers>>
     [ dup wait to ] [ nip (to) ] if-empty ;
 
-M: channel from ( channel -- value )
+M: channel from
     [ self ] dip
     notify senders>>
     [ (from) ] unless-empty

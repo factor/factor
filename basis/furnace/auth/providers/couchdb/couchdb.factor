@@ -194,19 +194,19 @@ PRIVATE>
 : <couchdb-auth-provider> ( base-url username-view -- couchdb-auth-provider )
     couchdb-auth-provider new swap >>username-view swap >>base-url ;
 
-M: couchdb-auth-provider get-user ( username provider -- user/f )
+M: couchdb-auth-provider get-user
     couchdb-auth-provider [
         (get-user) [ user-hash>user ] [ f ] if*
     ] with-variable ;
 
-M: couchdb-auth-provider new-user ( user provider -- user/f )
+M: couchdb-auth-provider new-user
     couchdb-auth-provider [
         dup (new-user) [
             username>> couchdb-auth-provider get get-user
         ] [ drop f ] if
     ] with-variable ;
 
-M: couchdb-auth-provider update-user ( user provider -- )
+M: couchdb-auth-provider update-user
     couchdb-auth-provider [
         [ username>> (get-user)/throw-on-no-user dup ]
         [ drop "_id" of get-url ]

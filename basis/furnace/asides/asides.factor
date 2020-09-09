@@ -87,7 +87,7 @@ ERROR: end-aside-in-get-error ;
 : end-aside ( default -- response )
     aside-id get aside-id off get-aside [ move-on ] [ <redirect> ] ?if ;
 
-M: asides link-attr ( tag responder -- )
+M: asides link-attr
     drop
     "aside" optional-attr {
         { "none" [ aside-id off ] }
@@ -96,13 +96,13 @@ M: asides link-attr ( tag responder -- )
         { f [ ] }
     } case ;
 
-M: asides modify-query ( query asides -- query' )
+M: asides modify-query
     drop
     aside-id get [
         aside-id-key associate assoc-union
     ] when* ;
 
-M: asides modify-form ( asides -- xml/f )
+M: asides modify-form
     drop
     aside-id get
     aside-id-key
