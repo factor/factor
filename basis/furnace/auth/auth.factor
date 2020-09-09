@@ -97,7 +97,7 @@ M: user-saver dispose
 
 \ init-user DEBUG add-input-logging
 
-M: realm call-responder* ( path responder -- response )
+M: realm call-responder*
     dup realm namespaces:set
     logged-in? [
         dup init-realm
@@ -146,7 +146,7 @@ TUPLE: protected < filter-responder description capabilities ;
         } cond
     ] if ;
 
-M: protected call-responder* ( path responder -- response )
+M: protected call-responder*
     dup protected namespaces:set
     dup capabilities>> have-capabilities?
     [ call-next-method ] [

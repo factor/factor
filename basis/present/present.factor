@@ -8,7 +8,7 @@ GENERIC: present ( object -- string )
 
 M: real present number>string ;
 
-M: complex present ( c -- str )
+M: complex present
     [ real>> number>string ]
     [
         imaginary>>

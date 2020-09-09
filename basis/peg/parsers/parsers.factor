@@ -14,7 +14,7 @@ CONSTANT: just-pattern [
     ] when
 ]
 
-M: just-parser (compile) ( parser -- quot )
+M: just-parser (compile)
     p1>> compile-parser-quot just-pattern compose ;
 
 : just ( parser -- parser )

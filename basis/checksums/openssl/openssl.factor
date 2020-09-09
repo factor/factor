@@ -38,13 +38,13 @@ M: evp-md-context dispose*
 : set-digest ( name ctx -- )
     handle>> swap digest-named f EVP_DigestInit_ex ssl-error ;
 
-M: openssl-checksum initialize-checksum-state ( checksum -- evp-md-context )
+M: openssl-checksum initialize-checksum-state
     maybe-init-ssl name>> <evp-md-context> [ set-digest ] keep ;
 
-M: evp-md-context add-checksum-bytes ( ctx bytes -- ctx' )
+M: evp-md-context add-checksum-bytes
     [ dup handle>> ] dip dup length EVP_DigestUpdate ssl-error ;
 
-M: evp-md-context get-checksum ( ctx -- value )
+M: evp-md-context get-checksum
     handle>>
     { { int EVP_MAX_MD_SIZE } int }
     [ EVP_DigestFinal_ex ssl-error ] with-out-parameters

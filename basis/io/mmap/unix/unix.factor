@@ -21,6 +21,6 @@ M: unix (mapped-file-reader)
     flags{ MAP_FILE MAP_SHARED }
     O_RDONLY mmap-open ;
 
-M: unix close-mapped-file ( mmap -- )
+M: unix close-mapped-file
     [ [ address>> ] [ length>> ] bi munmap io-error ]
     [ handle>> close-file ] bi ;

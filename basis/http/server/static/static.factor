@@ -178,7 +178,7 @@ TUPLE: file-responder root hook special index-names allow-listings ;
     [ drop <404> ]
     if ;
 
-M: file-responder call-responder* ( path responder -- response )
+M: file-responder call-responder*
     file-responder set
     ".." over member?
     [ drop <400> ] [ "/" join serve-object ] if ;

@@ -11,7 +11,7 @@ ted-notepad editor-class set-global
         [ "TedNPad.exe" ] unless*
     ] unless* ;
 
-M: ted-notepad editor-command ( file line -- command )
+M: ted-notepad editor-command
     [
         ted-notepad-path ,
         number>string "/l" prepend , ,

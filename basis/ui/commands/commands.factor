@@ -82,13 +82,13 @@ TR: convert-command-name "-" " " ;
     swap pick commands set-at
     update-gestures ;
 
-M: word command-name ( word -- str )
+M: word command-name
     name>>
     "com-" ?head drop "." ?tail drop
     dup first Letter? [ rest ] unless
     (command-name) ;
 
-M: word command-description ( word -- str )
+M: word command-description
     +description+ word-prop ;
 
 : default-flags ( -- assoc )
@@ -102,9 +102,9 @@ M: word command-description ( word -- str )
     [ 1quotation ] [ +nullary+ word-prop ] bi
     [ nip ] [ curry ] if ;
 
-M: word invoke-command ( target command -- )
+M: word invoke-command
     command-quot call( -- ) ;
 
 M: word command-word ;
 
-M: f invoke-command ( target command -- ) 2drop ;
+M: f invoke-command 2drop ;

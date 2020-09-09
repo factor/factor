@@ -391,12 +391,12 @@ M: gtk-ui-backend (make-pixel-format)
 M: gtk-ui-backend (free-pixel-format)
     handle>> g_object_unref ;
 
-M: window-handle select-gl-context ( handle -- )
+M: window-handle select-gl-context
     drawable>>
     [ gtk_widget_get_gl_window ] [ gtk_widget_get_gl_context ] bi
     gdk_gl_drawable_make_current drop ;
 
-M: window-handle flush-gl-context ( handle -- )
+M: window-handle flush-gl-context
     drawable>> gtk_widget_get_gl_window
     gdk_gl_drawable_swap_buffers ;
 
@@ -448,7 +448,7 @@ M:: gtk-ui-backend (open-window) ( world -- )
     win world window-controls>> configure-window-controls
     win gtk_widget_show_all ;
 
-M: gtk-ui-backend (close-window) ( handle -- )
+M: gtk-ui-backend (close-window)
     window>> [ gtk_widget_destroy ] [ unregister-window ] bi
     event-loop? [ gtk_main_quit ] unless ;
 

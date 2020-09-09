@@ -12,9 +12,9 @@ IN: io.files.info.unix.freebsd
 
 TUPLE: freebsd-file-info < unix-file-info birth-time flags gen ;
 
-M: freebsd new-file-info ( -- class ) freebsd-file-info new ;
+M: freebsd new-file-info freebsd-file-info new ;
 
-M: freebsd stat>file-info ( stat -- file-info )
+M: freebsd stat>file-info
     [ call-next-method ] keep
     {
         [ st_flags>> >>flags ]
@@ -25,20 +25,20 @@ M: freebsd stat>file-info ( stat -- file-info )
 TUPLE: freebsd-file-system-info < unix-file-system-info
 io-size owner type-id filesystem-subtype ;
 
-M: freebsd file-systems ( -- array )
+M: freebsd file-systems
     f void* <ref> dup 0 getmntinfo dup io-error
     [ void* deref ] dip \ statfs <c-direct-array>
     [ f_mntonname>> utf8 alien>string file-system-info ] { } map-as ;
 
 M: freebsd new-file-system-info freebsd-file-system-info new ;
 
-M: freebsd file-system-statfs ( normalized-path -- statfs )
+M: freebsd file-system-statfs
     \ statfs <struct> [ statfs-func io-error ] keep ;
 
-M: freebsd file-system-statvfs ( normalized-path -- statvfs )
+M: freebsd file-system-statvfs
     \ statvfs <struct> [ statvfs-func io-error ] keep ;
 
-M: freebsd statfs>file-system-info ( file-system-info byte-array -- file-system-info' )
+M: freebsd statfs>file-system-info
     {
         [ f_bsize>> >>block-size ]
         [ f_iosize>> >>io-size ]
@@ -56,7 +56,7 @@ M: freebsd statfs>file-system-info ( file-system-info byte-array -- file-system-
         [ f_mntfromname>> utf8 alien>string >>device-name ]
     } cleave ;
 
-M: freebsd statvfs>file-system-info ( file-system-info byte-array -- file-system-info' )
+M: freebsd statvfs>file-system-info
     {
         [ f_frsize>> >>preferred-block-size ]
         [ f_favail>> >>files-available ]

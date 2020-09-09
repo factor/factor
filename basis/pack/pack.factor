@@ -7,10 +7,10 @@ IN: pack
 
 GENERIC: >n-byte-array ( obj n -- byte-array )
 
-M: integer >n-byte-array ( m n -- byte-array ) >endian ;
+M: integer >n-byte-array >endian ;
 
 ! for doing native, platform-dependent sized values
-M: object >n-byte-array ( n string -- byte-array ) heap-size >n-byte-array ;
+M: object >n-byte-array heap-size >n-byte-array ;
 
 : s8>byte-array ( n -- byte-array ) 1 >n-byte-array ;
 : u8>byte-array ( n -- byte-array ) 1 >n-byte-array ;

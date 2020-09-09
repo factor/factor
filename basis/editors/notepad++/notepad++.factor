@@ -11,7 +11,7 @@ notepad++ editor-class set-global
         [ "notepad++.exe" ] unless*
     ] unless* ;
 
-M: notepad++ editor-command ( file line -- command )
+M: notepad++ editor-command
     [
         notepad++-path ,
         number>string "-n" prepend , ,

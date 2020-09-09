@@ -524,7 +524,7 @@ HOOK: immediate-bitwise? cpu ( n -- ? )
 HOOK: immediate-comparand? cpu ( n -- ? )
 HOOK: immediate-store? cpu ( n -- ? )
 
-M: object immediate-comparand? ( n -- ? )
+M: object immediate-comparand?
     {
         { [ dup fixnum? ] [ tag-fixnum immediate-arithmetic? ] }
         { [ dup not ] [ drop t ] }

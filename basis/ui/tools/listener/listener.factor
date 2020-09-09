@@ -173,7 +173,7 @@ M: interactor stream-read1
         [ nip first first ]
     } cond ;
 
-M: interactor stream-read-until ( seps stream -- seq sep/f )
+M: interactor stream-read-until
     swap '[
         _ interactor-read [
             "\n" join CHAR: \n suffix
@@ -289,10 +289,10 @@ M: string listener-input
         [ (call-listener) ] with-ctrl-break
     ] "Listener call" spawn drop ;
 
-M: listener-command invoke-command ( target command -- )
+M: listener-command invoke-command
     [ command-quot ] [ nip ] 2bi call-listener ;
 
-M: listener-operation invoke-command ( target command -- )
+M: listener-operation invoke-command
     [ operation-quot ] [ nip command>> ] 2bi call-listener ;
 
 : eval-listener ( string -- )
@@ -362,7 +362,7 @@ M: object accept-completion-hook 2drop ;
 : try-parse ( lines -- quot/f )
     [ parse-lines-interactive ] [ nip '[ _ rethrow ] ] recover ;
 
-M: interactor stream-read-quot ( stream -- quot/f )
+M: interactor stream-read-quot
     dup interactor-yield dup array? [
         over interactor-finish try-parse
         [ ] [ stream-read-quot ] ?if

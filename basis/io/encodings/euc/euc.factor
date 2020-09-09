@@ -12,7 +12,7 @@ TUPLE: euc { table biassoc read-only } ;
 : byte? ( ch -- ? )
     0x0 0xff between? ;
 
-M: euc encode-char ( char stream encoding -- )
+M: euc encode-char
     swapd table>> value-at [
         dup byte?
         [ swap stream-write1 ] [

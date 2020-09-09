@@ -6,7 +6,7 @@ IN: random.windows
 
 TUPLE: windows-crypto-context < win32-handle provider type ;
 
-M: windows-crypto-context dispose* ( tuple -- )
+M: windows-crypto-context dispose*
     [ handle>> 0 CryptReleaseContext win32-error=0/f ]
     [ f >>handle drop ] bi ;
 
@@ -45,7 +45,7 @@ ERROR: acquire-crypto-context-failed provider type error ;
         swap >>provider
         initialize-crypto-context ; inline
 
-M: windows-crypto-context random-bytes* ( n windows-crypto-context -- bytes )
+M: windows-crypto-context random-bytes*
     handle>> swap dup <byte-array>
     [ CryptGenRandom win32-error=0/f ] keep ;
 

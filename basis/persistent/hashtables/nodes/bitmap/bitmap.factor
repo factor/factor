@@ -76,4 +76,4 @@ M:: bitmap-node (pluck-at) ( key hashcode bitmap-node -- node' )
         ] if
     ] if ;
 
-M: bitmap-node >alist% ( node -- ) nodes>> >alist-each% ;
+M: bitmap-node >alist% nodes>> >alist-each% ;

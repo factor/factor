@@ -41,7 +41,7 @@ M: core-text-renderer string-dim
 M: core-text-renderer flush-layout-cache
     cached-lines get-global purge-cache ;
 
-M: core-text-renderer string>image ( font string -- image loc )
+M: core-text-renderer string>image
     cached-line [ line>image ] [ loc>> scale-dim ] bi ;
 
 M:: core-text-renderer x>offset ( x font string -- n )
@@ -59,10 +59,10 @@ M:: core-text-renderer offset>x ( n font string -- x )
     f
     CTLineGetOffsetForStringIndex unscale ;
 
-M: core-text-renderer font-metrics ( font -- metrics )
+M: core-text-renderer font-metrics
     cache-font-metrics ;
 
-M: core-text-renderer line-metrics ( font string -- metrics )
+M: core-text-renderer line-metrics
     [ " " line-metrics clone 0 >>width ]
     [ cached-line metrics>> scale-metrics ]
     if-empty ;

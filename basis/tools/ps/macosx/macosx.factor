@@ -145,6 +145,6 @@ STRUCT: kinfo_proc
 
 PRIVATE>
 
-M: macosx ps ( -- assoc )
+M: macosx ps
     procs [ kp_proc>> p_pid>> 0 > ] filter
     [ kp_proc>> [ p_pid>> ] [ ps-arg ] bi ] { } map>assoc ;

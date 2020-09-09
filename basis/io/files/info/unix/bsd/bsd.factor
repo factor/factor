@@ -7,9 +7,9 @@ IN: io.files.info.unix.bsd
 
 TUPLE: bsd-file-info < unix-file-info birth-time flags gen ;
 
-M: bsd new-file-info ( -- class ) bsd-file-info new ;
+M: bsd new-file-info bsd-file-info new ;
 
-M: bsd stat>file-info ( stat -- file-info )
+M: bsd stat>file-info
     [ call-next-method ] keep
     {
         [ st_flags>> >>flags ]

@@ -7,17 +7,17 @@ windows.kernel32 alien.c-types sequences splitting
 fry continuations classes.struct windows.time ;
 IN: io.directories.windows
 
-M: windows touch-file ( path -- )
+M: windows touch-file
     [
         normalize-path
         maybe-create-file [ &dispose ] dip
         [ drop ] [ handle>> f now dup (set-file-times) ] if
     ] with-destructors ;
 
-M: windows move-file ( from to -- )
+M: windows move-file
     [ normalize-path ] bi@ MoveFile win32-error=0/f ;
 
-M: windows move-file-atomically ( from to -- )
+M: windows move-file-atomically
     [ normalize-path ] bi@ 0 MoveFileEx win32-error=0/f ;
 
 ERROR: file-delete-failed path error ;
@@ -34,16 +34,16 @@ ERROR: file-delete-failed path error ;
         [ delete-read-only-file ] [ drop win32-error ] if
     ] [ drop ] if ;
 
-M: windows delete-file ( path -- )
+M: windows delete-file
     absolute-path
     [ (delete-file) ]
     [ file-delete-failed boa rethrow ] recover ;
 
-M: windows make-directory ( path -- )
+M: windows make-directory
     normalize-path
     f CreateDirectory win32-error=0/f ;
 
-M: windows delete-directory ( path -- )
+M: windows delete-directory
     normalize-path
     RemoveDirectory win32-error=0/f ;
 
@@ -71,7 +71,7 @@ C: <windows-directory-entry> windows-directory-entry
     [ [ nFileSizeLow>> ] [ nFileSizeHigh>> ] bi >64bit ] tri
     <windows-directory-entry> ; inline
 
-M: windows (directory-entries) ( path -- seq )
+M: windows (directory-entries)
     "\\" ?tail drop "\\*" append
     WIN32_FIND_DATA <struct>
     find-first-file over

@@ -48,13 +48,13 @@ GENERIC: write-full-response ( request response -- )
 : write-response-body ( response -- response )
     dup body>> call-template ;
 
-M: response write-response ( respose -- )
+M: response write-response
     write-response-line
     write-response-header
     flush
     drop ;
 
-M: response write-full-response ( request response -- )
+M: response write-full-response
     dup write-response
     swap method>> "HEAD" = [
         [ content-encoding>> encode-output ]
@@ -62,12 +62,12 @@ M: response write-full-response ( request response -- )
         bi
     ] unless drop ;
 
-M: raw-response write-response ( respose -- )
+M: raw-response write-response
     write-response-line
     write-response-body
     drop ;
 
-M: raw-response write-full-response ( request response -- )
+M: raw-response write-full-response
     nip write-response ;
 
 : post-request? ( -- ? ) request get method>> "POST" = ;

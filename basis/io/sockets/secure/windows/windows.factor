@@ -57,14 +57,14 @@ M: openssl ssl-certificate-verification-supported? f ;
 
 M: windows socket-handle handle>> alien-address ;
 
-M: secure remote>handle ( addrspec -- handle )
+M: secure remote>handle
     [ addrspec>> remote>handle ] [ hostname>> ] bi <ssl-socket> ;
 
 GENERIC: windows-socket-handle ( obj -- handle )
 M: ssl-handle windows-socket-handle file>> ;
 M: win32-socket windows-socket-handle ;
 
-M: secure (get-local-address) ( handle remote -- sockaddr )
+M: secure (get-local-address)
     [ windows-socket-handle ] [ addrspec>> ] bi* (get-local-address) ;
 
 M: secure parse-sockaddr addrspec>> parse-sockaddr f <secure> ;
