@@ -95,4 +95,4 @@ IN: tools.ps.windows
         ] map sift
     ] with-destructors ;
 
-M: windows ps ( -- assoc ) process-list ;
+M: windows ps process-list ;

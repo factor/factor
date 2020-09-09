@@ -24,7 +24,7 @@ TUPLE: gradient < caching-pen colors last-vertices last-colors ;
     [ >rgba-components 4array dup 2array ] map concat concat
     float >c-array ;
 
-M: gradient recompute-pen ( gadget gradient -- )
+M: gradient recompute-pen
     [ nip ] [ [ [ orientation>> ] [ dim>> ] bi ] [ colors>> ] bi* ] 2bi
     [ gradient-vertices >>last-vertices ]
     [ gradient-colors >>last-colors ]

@@ -216,7 +216,7 @@ M: table draw-gadget*
         ] with-variable
     ] if ;
 
-M: table line-height* ( table -- y )
+M: table line-height*
     [ font>> ] [ renderer>> prototype-row ] bi
     [ cell-dim + nip ] with [ max ] map-reduce ;
 

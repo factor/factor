@@ -29,19 +29,19 @@ M: kqueue-mx dispose* fd>> close-file ;
 : register-kevent ( kevent mx -- )
     fd>> swap 1 f 0 f kevent-func io-error ;
 
-M: kqueue-mx add-input-callback ( thread fd mx -- )
+M: kqueue-mx add-input-callback
     [ call-next-method ] [
         [ EVFILT_READ flags{ EV_ADD EV_ONESHOT } make-kevent ] dip
         register-kevent
     ] 2bi ;
 
-M: kqueue-mx add-output-callback ( thread fd mx -- )
+M: kqueue-mx add-output-callback
     [ call-next-method ] [
         [ EVFILT_WRITE flags{ EV_ADD EV_ONESHOT } make-kevent ] dip
         register-kevent
     ] 2bi ;
 
-M: kqueue-mx remove-input-callbacks ( fd mx -- seq )
+M: kqueue-mx remove-input-callbacks
     2dup reads>> key? [
         [ call-next-method ] [
             [ EVFILT_READ EV_DELETE make-kevent ] dip
@@ -49,7 +49,7 @@ M: kqueue-mx remove-input-callbacks ( fd mx -- seq )
         ] 2bi
     ] [ 2drop f ] if ;
 
-M: kqueue-mx remove-output-callbacks ( fd mx -- seq )
+M: kqueue-mx remove-output-callbacks
     2dup writes>> key? [
         [
             [ EVFILT_WRITE EV_DELETE make-kevent ] dip
@@ -73,6 +73,6 @@ M: kqueue-mx remove-output-callbacks ( fd mx -- seq )
     [ dup events>> ] dip head-slice
     [ handle-kevent ] with each ;
 
-M: kqueue-mx wait-for-events ( nanos mx -- )
+M: kqueue-mx wait-for-events
     swap dup [ make-timespec ] when
     dupd wait-kevent handle-kevents ;

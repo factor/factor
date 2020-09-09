@@ -14,7 +14,7 @@ editpadpro editor-class set-global
         } 0||
     ] unless* ;
 
-M: editpadpro editor-command ( file line -- command )
+M: editpadpro editor-command
     [
         editpadpro-path , number>string "/l" prepend , ,
     ] { } make ;

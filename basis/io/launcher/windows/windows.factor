@@ -146,7 +146,7 @@ TUPLE: CreateProcess-args
     fill-startup-info
     nip ;
 
-M: windows (current-process) ( -- handle )
+M: windows (current-process)
     GetCurrentProcessId ;
 
 ERROR: launch-error process error ;
@@ -157,7 +157,7 @@ M: launch-error error.
     "Launch descriptor:" print nl
     process>> . ;
 
-M: windows (kill-process) ( process -- )
+M: windows (kill-process)
     handle>> hProcess>> 255 TerminateProcess win32-error=0/f ;
 
 : dispose-process ( process-information -- )
@@ -176,7 +176,7 @@ M: windows (kill-process) ( process -- )
     over handle>> dispose-process
     notify-exit ;
 
-M: windows (wait-for-processes) ( -- ? )
+M: windows (wait-for-processes)
     processes get keys dup
     [ handle>> hProcess>> ] void*-array{ } map-as
     [ length ] keep 0 0
@@ -285,7 +285,7 @@ M: windows (wait-for-processes) ( -- ? )
     [ [ redirect-stderr ] dip hStdError<< ]
     [ [ redirect-stdin ] dip hStdInput<< ] 3tri ;
 
-M: windows (run-process) ( process -- handle )
+M: windows (run-process)
     [
         [
             dup make-CreateProcess-args

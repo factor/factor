@@ -99,12 +99,12 @@ IN: io.launcher.unix
     [ setup-environment ] [ 2drop 253 _exit ] recover
     [ get-arguments posix-spawn ] [ drop ] recover ;
 
-M: unix (current-process) ( -- handle ) getpid ;
+M: unix (current-process) getpid ;
 
-M: unix (run-process) ( process -- pid )
+M: unix (run-process)
     '[ _ fork-process ] [ ] with-fork ;
 
-M: unix (kill-process) ( process -- )
+M: unix (kill-process)
     [ handle>> SIGTERM ] [ group>> ] bi {
         { +same-group+ [ kill ] }
         { +new-group+ [ killpg ] }
@@ -117,7 +117,7 @@ M: unix (kill-process) ( process -- )
 : code>status ( code -- obj )
     dup WIFSIGNALED [ WTERMSIG sig:signal boa ] [ WEXITSTATUS ] if ;
 
-M: unix (wait-for-processes) ( -- ? )
+M: unix (wait-for-processes)
     { int } [ -1 swap WNOHANG waitpid ] with-out-parameters
     swap dup 0 <= [
         2drop t

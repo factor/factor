@@ -45,7 +45,7 @@ M: windows find-visual-studio-code-invocation
         [ "code.cmd" ]
     } 0|| ;
 
-M: visual-studio-code editor-command ( file line -- command )
+M: visual-studio-code editor-command
     [
         visual-studio-code-invocation
         [ , ] [ can't-find-visual-studio-code ] if*

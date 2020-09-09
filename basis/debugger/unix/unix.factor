@@ -4,6 +4,6 @@ USING: debugger io kernel prettyprint sequences system
 unix.signals ;
 IN: debugger.unix
 
-M: unix signal-error. ( obj -- )
+M: unix signal-error.
     "Unix signal #" write
     third [ pprint ] [ signal-name. ] bi nl ;

@@ -14,9 +14,9 @@ TUPLE: cons-state { car read-only } { cdr read-only } ;
 
 C: cons cons-state
 
-M: cons-state car ( cons -- car ) car>> ;
+M: cons-state car car>> ;
 
-M: cons-state cdr ( cons -- cdr ) cdr>> ;
+M: cons-state cdr cdr>> ;
 
 SINGLETON: +nil+
 M: +nil+ nil? drop t ;

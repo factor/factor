@@ -35,7 +35,7 @@ PRIVATE>
 
 HOOK: close-mapped-file io-backend ( mmap -- )
 
-M: mapped-file dispose* ( mmap -- ) close-mapped-file ;
+M: mapped-file dispose* close-mapped-file ;
 
 : with-mapped-file ( path quot -- )
     [ <mapped-file> ] dip with-disposal ; inline

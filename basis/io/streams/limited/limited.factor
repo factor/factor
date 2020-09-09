@@ -22,11 +22,11 @@ INSTANCE: limited-stream input-stream
 
 GENERIC#: limit-stream 1 ( stream limit -- stream' )
 
-M: decoder limit-stream ( stream limit -- stream' )
+M: decoder limit-stream
     '[ stream>> _ limit-stream ] [ code>> ] [ cr>> ] tri
     decoder boa ; inline
 
-M: object limit-stream ( stream limit -- stream' )
+M: object limit-stream
     <limited-stream> ;
 
 : limited-input ( limit -- )
@@ -147,10 +147,10 @@ M: limited-stream stream-element-type
 
 GENERIC: unlimit-stream ( stream -- stream' )
 
-M: decoder unlimit-stream ( stream -- stream' )
+M: decoder unlimit-stream
     [ stream>> stream>> ] [ code>> ] [ cr>> ] tri decoder boa ;
 
-M: limited-stream unlimit-stream ( stream -- stream' ) stream>> ;
+M: limited-stream unlimit-stream stream>> ;
 
 : unlimited-input ( -- )
     input-stream [ unlimit-stream ] change ;

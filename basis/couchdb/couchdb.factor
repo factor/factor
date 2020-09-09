@@ -18,7 +18,7 @@ SYMBOL: couch
 TUPLE: couchdb-error { data assoc } ;
 C: <couchdb-error> couchdb-error
 
-M: couchdb-error error. ( error -- )
+M: couchdb-error error.
     "CouchDB Error: " write data>>
     "error" over at [ print ] when*
     "reason" of [ print ] when* ;

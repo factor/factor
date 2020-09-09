@@ -13,7 +13,7 @@ M: thread mailbox-of
     [ { mailbox } declare ]
     [ <mailbox> [ >>mailbox drop ] keep ] ?if ; inline
 
-M: thread send ( message thread -- )
+M: thread send
     mailbox-of mailbox-put ;
 
 : my-mailbox ( -- mailbox ) self mailbox-of ; inline

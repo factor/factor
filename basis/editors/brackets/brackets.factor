@@ -16,7 +16,7 @@ M: macosx brackets-path
         f
     ] if* ;
 
-M: brackets-editor editor-command ( file line -- command )
+M: brackets-editor editor-command
     [ brackets-path "brackets" or , drop , ] { } make ;
 
 os windows? [ "editors.brackets.windows" require ] when

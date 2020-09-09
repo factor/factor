@@ -11,7 +11,7 @@ textpad editor-class set-global
         [ "TextPad.exe" ] unless*
     ] unless* ;
 
-M: textpad editor-command ( file line -- command )
+M: textpad editor-command
     [
         textpad-path ,
         [ , ] [ number>string "(" ",0)" surround , ] bi*

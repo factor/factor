@@ -9,5 +9,5 @@ wordpad editor-class set-global
         { "Windows NT\\Accessories" } "wordpad.exe" find-in-applications
     ] unless* ;
 
-M: wordpad editor-command ( file line -- command )
+M: wordpad editor-command
     drop [ wordpad-path ] dip 2array ;

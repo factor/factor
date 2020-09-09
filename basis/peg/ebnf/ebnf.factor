@@ -354,10 +354,10 @@ SYMBOL: ignore-ws
         main set
     ] with-variables ;
 
-M: ebnf (transform) ( ast -- parser )
+M: ebnf (transform)
     rules>> [ (transform) ] map last ;
 
-M: ebnf-tokenizer (transform) ( ast -- parser )
+M: ebnf-tokenizer (transform)
     elements>> dup "default" = [
         drop default-tokenizer \ tokenizer set-global any-char
     ] [
@@ -370,13 +370,13 @@ ERROR: redefined-rule name ;
 M: redefined-rule summary
     name>> "Rule '" "' defined more than once" surround ;
 
-M: ebnf-rule (transform) ( ast -- parser )
+M: ebnf-rule (transform)
     dup elements>>
     (transform) [
         swap symbol>> dup get parser? [ redefined-rule ] [ set ] if
     ] keep ;
 
-M: ebnf-sequence (transform) ( ast -- parser )
+M: ebnf-sequence (transform)
     ! If ignore-ws is set then each element of the sequence
     ! ignores leading whitespace. This is not inherited by
     ! subelements of the sequence.
@@ -385,43 +385,43 @@ M: ebnf-sequence (transform) ( ast -- parser )
         ignore-ws get [ sp ] when
     ] map seq [ dup length 1 = [ first ] when ] action ;
 
-M: ebnf-choice (transform) ( ast -- parser )
+M: ebnf-choice (transform)
     options>> [ (transform) ] map choice ;
 
-M: ebnf-any-character (transform) ( ast -- parser )
+M: ebnf-any-character (transform)
     drop tokenizer any>> call( -- parser ) ;
 
-M: ebnf-range (transform) ( ast -- parser )
+M: ebnf-range (transform)
     pattern>> range-pattern ;
 
 : transform-group ( ast -- parser )
     ! convert a ast node with groups to a parser for that group
     group>> (transform) ;
 
-M: ebnf-ensure (transform) ( ast -- parser )
+M: ebnf-ensure (transform)
     transform-group ensure ;
 
-M: ebnf-ensure-not (transform) ( ast -- parser )
+M: ebnf-ensure-not (transform)
     transform-group ensure-not ;
 
-M: ebnf-ignore (transform) ( ast -- parser )
+M: ebnf-ignore (transform)
     transform-group [ drop ignore ] action ;
 
-M: ebnf-repeat0 (transform) ( ast -- parser )
+M: ebnf-repeat0 (transform)
     transform-group repeat0 ;
 
-M: ebnf-repeat1 (transform) ( ast -- parser )
+M: ebnf-repeat1 (transform)
     transform-group repeat1 ;
 
-M: ebnf-optional (transform) ( ast -- parser )
+M: ebnf-optional (transform)
     transform-group optional ;
 
-M: ebnf-whitespace (transform) ( ast -- parser )
+M: ebnf-whitespace (transform)
     t ignore-ws [ transform-group ] with-variable ;
 
 GENERIC: build-locals ( code ast -- code )
 
-M: ebnf-sequence build-locals ( code ast -- code )
+M: ebnf-sequence build-locals
     ! Note the need to filter out this ebnf items that
     ! leave nothing in the AST
     elements>> filter-hidden dup length 1 = [
@@ -447,7 +447,7 @@ M: ebnf-sequence build-locals ( code ast -- code )
         ] if
     ] if ;
 
-M: ebnf-var build-locals ( code ast -- code )
+M: ebnf-var build-locals
     [
         "[let dup :> " % name>> %
         " " %
@@ -455,7 +455,7 @@ M: ebnf-var build-locals ( code ast -- code )
         " nip ]" %
     ] "" make ;
 
-M: object build-locals ( code ast -- code )
+M: object build-locals
     drop ;
 
 ERROR: bad-effect quot effect ;
@@ -481,16 +481,16 @@ ERROR: bad-effect quot effect ;
     [ string-lines parse-lines ] dip
     dup 3 + qualified-vocabs delete-slice ;
 
-M: ebnf-action (transform) ( ast -- parser )
+M: ebnf-action (transform)
     ebnf-transform check-action-effect action ;
 
-M: ebnf-semantic (transform) ( ast -- parser )
+M: ebnf-semantic (transform)
     ebnf-transform semantic ;
 
-M: ebnf-var (transform) ( ast -- parser )
+M: ebnf-var (transform)
     parser>> (transform) ;
 
-M: ebnf-terminal (transform) ( ast -- parser )
+M: ebnf-terminal (transform)
     symbol>> tokenizer one>> call( symbol -- parser ) ;
 
 ERROR: ebnf-foreign-not-found name ;
@@ -498,7 +498,7 @@ ERROR: ebnf-foreign-not-found name ;
 M: ebnf-foreign-not-found summary
     name>> "Foreign word '" "' not found" surround ;
 
-M: ebnf-foreign (transform) ( ast -- parser )
+M: ebnf-foreign (transform)
     dup word>> search [ word>> ebnf-foreign-not-found ] unless*
     swap rule>> [ main ] unless* over rule [
         nip
@@ -508,7 +508,7 @@ M: ebnf-foreign (transform) ( ast -- parser )
 
 ERROR: parser-not-found name ;
 
-M: ebnf-non-terminal (transform) ( ast -- parser )
+M: ebnf-non-terminal (transform)
     symbol>> [
         , \ dup , parser get , \ at ,
         [ parser-not-found ] , \ unless* , \ nip ,

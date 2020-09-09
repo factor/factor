@@ -8,7 +8,7 @@ IN: io.pipes
 
 TUPLE: pipe in out ;
 
-M: pipe dispose ( pipe -- )
+M: pipe dispose
     [
         [ in>> &dispose drop ]
         [ out>> &dispose drop ] bi
@@ -42,7 +42,7 @@ M: callable run-pipeline-element
 
 GENERIC: <pipes> ( obj -- pipes )
 
-M: integer <pipes> ( n -- pipes )
+M: integer <pipes>
     [
         [ (pipe) |dispose ] replicate
         T{ pipe } [ prefix ] [ suffix ] bi

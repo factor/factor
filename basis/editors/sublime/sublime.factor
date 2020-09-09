@@ -31,7 +31,7 @@ M: windows find-sublime-path
         find-sublime-path [ "subl" ?find-in-path ] unless*
     ] unless* ;
 
-M: sublime editor-command ( file line -- command )
+M: sublime editor-command
     [
         sublime-path , "-a" , number>string ":" glue ,
     ] { } make ;

@@ -10,7 +10,7 @@ TUPLE: book < gadget ;
 
 : current-page ( book -- gadget ) [ control-value ] keep nth-gadget ;
 
-M: book model-changed ( model book -- )
+M: book model-changed
     nip
     dup hide-all
     dup current-page show-gadget
@@ -26,9 +26,9 @@ M: book model-changed ( model book -- )
 : <empty-book> ( model -- book )
     book new-book ;
 
-M: book pref-dim* ( book -- dim ) children>> pref-dims max-dims ;
+M: book pref-dim* children>> pref-dims max-dims ;
 
-M: book layout* ( book -- )
+M: book layout*
     [ children>> ] [ dim>> ] bi '[ _ >>dim drop ] each ;
 
-M: book focusable-child* ( book -- child/t ) current-page ;
+M: book focusable-child* current-page ;

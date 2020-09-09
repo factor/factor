@@ -47,7 +47,7 @@ CONSTANT: n 0xe6546b64
 
 PRIVATE>
 
-M: murmur3-32 checksum-bytes ( bytes checksum -- value )
+M: murmur3-32 checksum-bytes
     seed>> 32 bits main-loop end-case avalanche ;
 
 INSTANCE: murmur3-32 checksum

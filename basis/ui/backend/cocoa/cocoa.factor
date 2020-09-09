@@ -82,7 +82,7 @@ M: pasteboard set-clipboard-contents
         ] if
     ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
 
-M: cocoa-ui-backend set-title ( string world -- )
+M: cocoa-ui-backend set-title
     handle>> window>> swap <NSString> -> setTitle: ;
 
 : enter-fullscreen ( world -- )
@@ -96,10 +96,10 @@ M: cocoa-ui-backend set-title ( string world -- )
     [ view>> f -> exitFullScreenModeWithOptions: ]
     [ [ window>> ] [ view>> ] bi -> makeFirstResponder: drop ] bi ;
 
-M: cocoa-ui-backend (set-fullscreen) ( world ? -- )
+M: cocoa-ui-backend (set-fullscreen)
     [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
-M: cocoa-ui-backend (fullscreen?) ( world -- ? )
+M: cocoa-ui-backend (fullscreen?)
     handle>> view>> -> isInFullScreenMode zero? not ;
 
 ! XXX: Until someone tests OSX with a tiling window manager,
@@ -138,14 +138,14 @@ M:: cocoa-ui-backend (open-window) ( world -- )
     window f -> makeKeyAndOrderFront:
     t world active?<< ;
 
-M: cocoa-ui-backend (close-window) ( handle -- )
+M: cocoa-ui-backend (close-window)
     [
         view>> dup -> isInFullScreenMode zero?
         [ drop ]
         [ f -> exitFullScreenModeWithOptions: ] if
     ] [ window>> -> release ] bi ;
 
-M: cocoa-ui-backend (grab-input) ( handle -- )
+M: cocoa-ui-backend (grab-input)
     0 CGAssociateMouseAndMouseCursorPosition drop
     CGMainDisplayID CGDisplayHideCursor drop
     window>> -> frame CGRect>rect rect-center
@@ -154,31 +154,31 @@ M: cocoa-ui-backend (grab-input) ( handle -- )
     [ GetCurrentButtonState zero? not ] [ yield ] while
     CGWarpMouseCursorPosition drop ;
 
-M: cocoa-ui-backend (ungrab-input) ( handle -- )
+M: cocoa-ui-backend (ungrab-input)
     drop
     CGMainDisplayID CGDisplayShowCursor drop
     1 CGAssociateMouseAndMouseCursorPosition drop ;
 
-M: cocoa-ui-backend close-window ( gadget -- )
+M: cocoa-ui-backend close-window
     find-world [
         handle>> [
             window>> -> close
         ] when*
     ] when* ;
 
-M: cocoa-ui-backend raise-window* ( world -- )
+M: cocoa-ui-backend raise-window*
     handle>> [
         window>> dup f -> orderFront: -> makeKeyWindow
         NSApp 1 -> activateIgnoringOtherApps:
     ] when* ;
 
-M: window-handle select-gl-context ( handle -- )
+M: window-handle select-gl-context
     view>> -> openGLContext -> makeCurrentContext ;
 
-M: window-handle flush-gl-context ( handle -- )
+M: window-handle flush-gl-context
     view>> -> openGLContext -> flushBuffer ;
 
-M: cocoa-ui-backend beep ( -- )
+M: cocoa-ui-backend beep
     NSBeep ;
 
 M: cocoa-ui-backend resize-window

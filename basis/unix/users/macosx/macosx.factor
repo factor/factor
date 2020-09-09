@@ -6,9 +6,9 @@ IN: unix.users.macosx
 
 TUPLE: macosx-passwd < passwd change class expire fields ;
 
-M: macosx new-passwd ( -- macosx-passwd ) macosx-passwd new ;
+M: macosx new-passwd macosx-passwd new ;
 
-M: macosx passwd>new-passwd ( passwd -- macosx-passwd )
+M: macosx passwd>new-passwd
     [ call-next-method ] keep
     {
         [ pw_change>> >>change ]

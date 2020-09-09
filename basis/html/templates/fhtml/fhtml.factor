@@ -71,7 +71,7 @@ TUPLE: fhtml path ;
 
 C: <fhtml> fhtml
 
-M: fhtml call-template* ( filename -- )
+M: fhtml call-template*
     path>> utf8 file-contents eval-template ;
 
 INSTANCE: fhtml template

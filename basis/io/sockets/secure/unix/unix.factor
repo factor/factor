@@ -14,14 +14,14 @@ M: ssl-handle handle-fd file>> handle-fd ;
 
 M: unix socket-handle fd>> ;
 
-M: secure remote>handle ( secure -- handle )
+M: secure remote>handle
     [ addrspec>> remote>handle ] [ hostname>> ] bi <ssl-socket> ;
 
 M: secure parse-sockaddr addrspec>> parse-sockaddr f <secure> ;
 
 M: secure (get-local-address) addrspec>> (get-local-address) ;
 
-M: secure establish-connection ( client-out remote -- )
+M: secure establish-connection
     addrspec>> [ establish-connection ] [ secure-connection ] 2bi ;
 
 M: secure (accept)
@@ -52,4 +52,4 @@ M: ssl-handle shutdown
         f >>connected [ (shutdown) ] with-timeout
     ] [ drop ] if ;
 
-M: unix non-ssl-socket? ( obj -- ? ) fd? ;
+M: unix non-ssl-socket? fd? ;

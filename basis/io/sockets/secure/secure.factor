@@ -66,7 +66,7 @@ M: secure (server) addrspec>> (server) ;
 
 CONSULT: inet secure addrspec>> ;
 
-M: secure resolve-host ( secure -- seq )
+M: secure resolve-host
     [ addrspec>> resolve-host ] [ hostname>> ] bi
     [ <secure> ] curry map ;
 
