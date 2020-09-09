@@ -21,7 +21,7 @@ SYMBOL: current-directory
 
 HOOK: root-directory? io-backend ( path -- ? )
 
-M: object root-directory? ( path -- ? )
+M: object root-directory?
     [ f ] [ [ path-separator? ] all? ] if-empty ;
 
 ERROR: no-parent-directory path ;
@@ -163,7 +163,7 @@ M: string absolute-path
         ] if ] if
     ] if ;
 
-M: object normalize-path ( path -- path' )
+M: object normalize-path
     absolute-path ;
 
 : root-path* ( path -- path' )

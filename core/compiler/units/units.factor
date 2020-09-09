@@ -49,13 +49,13 @@ HOOK: update-call-sites compiler-impl ( class generic -- words )
 : changed-call-sites ( class generic -- )
     update-call-sites [ changed-definition ] each ;
 
-M: generic update-generic ( class generic -- )
+M: generic update-generic
     [ changed-call-sites ]
     [ remake-generic drop ]
     [ changed-conditionally drop ]
     2tri ;
 
-M: sequence update-methods ( class seq -- )
+M: sequence update-methods
     implementors [ update-generic ] with each ;
 
 HOOK: recompile compiler-impl ( words -- alist )

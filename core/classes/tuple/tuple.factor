@@ -93,7 +93,7 @@ PRIVATE>
 
 GENERIC: slots>tuple ( seq class -- tuple )
 
-M: tuple-class slots>tuple ( seq class -- tuple )
+M: tuple-class slots>tuple
     check-slots pad-slots
     tuple-layout <tuple> [
         [ tuple-size <iota> ]

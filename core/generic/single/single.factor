@@ -39,7 +39,7 @@ SYMBOL: combination
 
 HOOK: picker combination ( -- quot )
 
-M: single-combination next-method-quot* ( class generic combination -- quot )
+M: single-combination next-method-quot*
     [
         2dup next-method dup [
             [
