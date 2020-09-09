@@ -32,12 +32,12 @@ PRIVATE>
 
 GENERIC: contract ( len seq -- )
 
-M: growable contract ( len seq -- )
+M: growable contract
     [ length ] keep
     [ [ 0 ] 2dip set-nth-unsafe ] curry
     (each-integer) ; inline
 
-M: growable set-length ( n seq -- )
+M: growable set-length
     bounds-check-head
     2dup length < [
         2dup contract
@@ -62,13 +62,13 @@ M: growable set-nth ensure set-nth-unsafe ; inline
 
 M: growable clone (clone) [ clone ] change-underlying ; inline
 
-M: growable lengthen ( n seq -- )
+M: growable lengthen
     2dup length > [
         2dup capacity > [ over new-size over expand ] when
         2dup length<<
     ] when 2drop ; inline
 
-M: growable shorten ( n seq -- )
+M: growable shorten
     bounds-check-head
     2dup length < [
         2dup contract

@@ -120,7 +120,7 @@ PRIVATE>
 : of ( assoc key -- value/f )
     swap at ; inline
 
-M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
+M: assoc assoc-clone-like
     [ dup assoc-size ] dip new-assoc
     [ [ set-at ] with-assoc assoc-each ] keep ; inline
 
@@ -299,7 +299,7 @@ M: enumerated set-at seq>> set-nth ; inline
 
 M: enumerated delete-at seq>> remove-nth! drop ; inline
 
-M: enumerated >alist ( enumerated -- alist ) ; inline
+M: enumerated >alist ; inline
 
 M: enumerated keys seq>> length <iota> >array ; inline
 
