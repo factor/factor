@@ -53,7 +53,7 @@ ERROR: bounds-error index seq ;
 
 GENERIC#: bounds-check? 1 ( n seq -- ? )
 
-M: integer bounds-check? ( n seq -- ? )
+M: integer bounds-check?
     dupd length < [ 0 >= ] [ drop f ] if ; inline
 
 : bounds-check ( n seq -- n seq )
