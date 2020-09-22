@@ -9,7 +9,7 @@ IN: benchmark.completion
             nth ?nth nths set-nth insert-nth
             remove-nth remove-nth! change-nth
         }
-    ] replicate concat [ name-completions ] keep
+    ] replicate concat [ named completions ] keep
     [ length ] bi@ assert= ;
 
 MAIN: completion-benchmark
