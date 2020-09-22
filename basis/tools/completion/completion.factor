@@ -97,6 +97,9 @@ PRIVATE>
     [ qualified-named [ append ] unless-empty ] bi
     completions ;
 
+: chars-matching ( str -- seq )
+    name-map keys dup zip completions ;
+
 : colors-matching ( str -- seq )
     named-colors dup zip completions ;
 
