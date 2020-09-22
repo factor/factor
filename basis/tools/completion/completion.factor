@@ -78,14 +78,22 @@ PRIVATE>
 : name-completions ( str seq -- seq' )
     [ dup name>> ] { } map>assoc completions ;
 
+: vocab-words-matching ( str vocab -- seq )
+    vocab-words name-completions ;
+
+: qualified-matching ( str -- seq/f )
+    ":" split1 [
+        swap
+        [ vocab-words-matching ]
+        [ ":" append [ prepend ] curry assoc-map ] bi
+    ] [ drop f ] if* ;
+
 : words-matching ( str -- seq )
-    all-words name-completions ;
+    [ all-words name-completions ]
+    [ qualified-matching [ prepend ] unless-empty ] bi ;
 
 : vocabs-matching ( str -- seq )
     all-disk-vocabs-recursive filter-vocabs name-completions ;
-
-: vocab-words-matching ( str vocab -- seq )
-    vocab-words name-completions ;
 
 : chars-matching ( str -- seq )
     name-map keys dup zip completions ;
