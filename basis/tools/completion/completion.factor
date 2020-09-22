@@ -75,29 +75,27 @@ PRIVATE>
         rank-completions
     ] bi-curry if-empty ;
 
-: name-completions ( str seq -- seq' )
-    [ dup name>> ] { } map>assoc completions ;
+: named ( seq -- seq' )
+    [ dup name>> ] { } map>assoc ;
 
 : vocabs-matching ( str -- seq )
-    all-disk-vocabs-recursive filter-vocabs name-completions ;
+    all-disk-vocabs-recursive filter-vocabs named completions ;
 
 : vocab-words-matching ( str vocab -- seq )
-    vocab-words name-completions ;
+    vocab-words named completions ;
 
-: qualified-matching ( str -- seq/f )
+: qualified-named ( str -- seq/f )
     ":" split1 [
-        swap vocabs-matching keys [
+        drop vocabs-matching keys [
             [ vocab-words ] [ vocab-name ] bi ":" append
             [ over name>> append ] curry { } map>assoc
-        ] map! concat completions
+        ] map! concat
     ] [ drop f ] if* ;
 
 : words-matching ( str -- seq )
-    [ all-words name-completions ]
-    [ qualified-matching [ prepend ] unless-empty ] bi ;
-
-: chars-matching ( str -- seq )
-    name-map keys dup zip completions ;
+    [ all-words named ]
+    [ qualified-named [ append ] unless-empty ] bi
+    completions ;
 
 : colors-matching ( str -- seq )
     named-colors dup zip completions ;
