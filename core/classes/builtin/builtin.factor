@@ -13,8 +13,6 @@ PREDICATE: builtin-class < class
 
 : type>class ( n -- class ) builtins get-global nth ; foldable
 
-: bootstrap-type>class ( n -- class ) builtins get nth ;
-
 M: object class-of tag type>class ; inline
 
 M: builtin-class rank-class drop 0 ;
