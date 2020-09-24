@@ -1,11 +1,18 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+IN: classes.tuple
+! for classes.union mutual dependency
+DEFER: tuple-class?
+<PRIVATE
+DEFER: echelon-of
+DEFER: layout-of
+DEFER: layout-class-offset
+PRIVATE>
 USING: accessors arrays assocs classes classes.algebra
 classes.algebra.private classes.builtin classes.private
 combinators definitions effects generic kernel kernel.private
 make math math.private memory namespaces quotations
 sequences sequences.private slots slots.private strings words ;
-IN: classes.tuple
 
 <PRIVATE
 PRIMITIVE: <tuple> ( layout -- tuple )
