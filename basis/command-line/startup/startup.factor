@@ -31,7 +31,6 @@ Options:
     -pic=<int>          max pic size [3]
     -fep                enter fep mode immediately
     -no-signals         turn off OS signal handling
-    -console            open console if possible
     -roots=<paths>      '" write os windows? ";" ":" ? write "'-separated list of extra vocab root directories
 
 Enter
