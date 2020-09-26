@@ -94,8 +94,6 @@ void vm_parameters::init_from_args(int argc, vm_char** argv) {
       fep = true;
     else if (STRCMP(arg, STRING_LITERAL("-no-signals")) == 0)
       signals = false;
-    else if (STRCMP(arg, STRING_LITERAL("-console")) == 0)
-      console = true;
   }
 }
 
