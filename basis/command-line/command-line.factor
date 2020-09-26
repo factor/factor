@@ -24,9 +24,6 @@ SYMBOL: command-line
 : (command-line) ( -- args )
     OBJ-ARGS special-object sift [ alien>native-string ] map ;
 
-: rc-path ( name -- path )
-    home prepend-path ;
-
 : try-user-init ( file -- )
     "user-init" get swap '[
         _ [ ?run-file ] [
@@ -37,14 +34,14 @@ SYMBOL: command-line
     ] when ;
 
 : run-bootstrap-init ( -- )
-    ".factor-boot-rc" rc-path try-user-init ;
+    "~/.factor-boot-rc" try-user-init ;
 
 : run-user-init ( -- )
-    ".factor-rc" rc-path try-user-init ;
+    "~/.factor-rc" try-user-init ;
 
 : load-vocab-roots ( -- )
     "user-init" get [
-        ".factor-roots" rc-path dup exists? [
+        "~/.factor-roots" dup exists? [
             utf8 file-lines harvest [ add-vocab-root ] each
         ] [ drop ] if
         "roots" get [
