@@ -9,9 +9,9 @@ IN: command-line.startup
     os windows? [ script get "/?" = or ] when ;
 
 : help. ( -- )
-"Usage: " write vm-path file-name write " [Factor arguments] [script] [script arguments]
+"Usage: " write vm-path file-name write " [options] [script] [arguments]
 
-Factor arguments:
+Options:
     -help               print this message and exit
     -version            print the Factor version and exit
     -i=<image>          load Factor image file <image> [" write vm-path file-stem write ".image]
@@ -32,12 +32,11 @@ Factor arguments:
     -fep                enter fep mode immediately
     -no-signals         turn off OS signal handling
     -console            open console if possible
-    -roots=<paths>      a list of \"" write os windows? ";" ":" ? write "\"-delimited extra vocab roots
+    -roots=<paths>      '" write os windows? ";" ":" ? write "'-separated list of extra vocab root directories
 
 Enter
     \"command-line\" help
 from within Factor for more information.
-
 " write ;
 
 : version? ( -- ? ) "version" get ;
