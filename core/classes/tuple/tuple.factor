@@ -82,15 +82,13 @@ M: tuple class-of layout-of 2 slot { word } declare ; inline
         ] 2each
     ] if-bootstrapping ; inline
 
-: initial-values ( class -- seq )
-    all-slots [ initial>> ] map ; inline
-
 : pad-slots ( seq class -- seq' class )
-    [ initial-values ] keep
-    2over [ length ] bi@ 2dup > [
+    [ all-slots ] keep 2over [ length ] bi@ 2dup > [
         [ nip swap ] 2dip too-many-slots
     ] [
-        drop [ tail append ] curry dip
+        drop [
+            tail-slice [ [ initial>> ] map append ] unless-empty
+        ] curry dip
     ] if ; inline
 
 PRIVATE>
@@ -173,6 +171,9 @@ M: object final-class? drop f ;
 
 : define-boa-check ( class -- )
     dup boa-check-quot "boa-check" set-word-prop ;
+
+: initial-values ( class -- seq )
+    all-slots [ initial>> ] map ; inline
 
 : tuple-prototype ( class -- prototype )
     [ initial-values ] keep over [ ] any?
