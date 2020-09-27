@@ -21,7 +21,7 @@ H{ } clone sub-primitives set
 
 architecture get asm-file parse-file
 
-"vocab:bootstrap/layouts/layouts.factor" parse-file
+"vocab:bootstrap/layouts.factor" parse-file
 
 ! Now we have ( syntax-quot arch-quot layouts-quot ) on the stack
 
