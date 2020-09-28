@@ -33,12 +33,12 @@ IN: sequences.extras
 : map-like ( seq exemplar -- seq' )
     '[ _ like ] map ; inline
 
-: filter-all-subseqs-range ( ... seq range quot: ( ... subseq -- ... ) -- seq )
+: filter-all-subseqs-range ( ... seq range quot: ( ... subseq -- ... ? ) -- seq )
     [
         '[ <clumps> _ filter ] with map concat
     ] keepdd map-like ; inline
 
-: filter-all-subseqs ( ... seq quot: ( ... subseq -- ... ) -- seq )
+: filter-all-subseqs ( ... seq quot: ( ... subseq -- ... ? ) -- seq )
     [ dup length [1,b] ] dip filter-all-subseqs-range ; inline
 
 :: longest-subseq ( seq1 seq2 -- subseq )
