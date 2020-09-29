@@ -25,3 +25,7 @@ augroup END
 
 " Teach Vim what comments look like.
 setlocal comments+=b:!,b:#!
+
+" Make all of these characters part of a word (useful for skipping
+" over words with w, e, and b)
+setlocal iskeyword=33-126,128-255
