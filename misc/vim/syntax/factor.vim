@@ -57,12 +57,6 @@ endif
 " Factor is case sensitive.
 syn case match
 
-" Make all of these characters part of a word (useful for skipping over words with w, e, and b)
-let s:iskeyword = '!,@,33-35,%,$,38-64,A-Z,91-96,a-z,123-126,128-255'
-let s:set_iskeyword = has('patch-7.4.1142') ? 'syn iskeyword ' :
-      \ 'setlocal iskeyword='
-execute s:set_iskeyword . s:iskeyword
-
 syn match   factorWord   /\v<\S+>/  contains=@factorWord transparent display
 syn cluster factorClusterNoComment  contains=factorWord,@factorMultilineComment,@factorClusterValue,factorBoolean,factorBreakpoint,factorDeclaration,factorCallQuotation,factorExecute,factorCallNextMethod,@factorWordOps,factorAlien,factorSlot,factorTuple,factorErrorSyn,factorStruct
 syn cluster factorCluster           contains=@factorComment,@factorClusterNoComment
@@ -139,7 +133,7 @@ syn region  factorPLocalsMethodDelims   start=/\v<M::>/        skip=/\v<!>.*/   
 syn region  factorPGeneric        start=/\v<%(GENERIC|MATH|PRIMITIVE):>/                        end=/\v<\S+>/   contains=@factorComment nextgroup=factorStackEffectSkip skipempty contained
 syn region  factorPGenericN matchgroup=factorPGenericN    start=/\v<GENERIC\#:>/   skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\d+>/ contains=@factorComment nextgroup=factorStackEffectSkip skipempty keepend contained
 
-syn region  factorPrivate matchgroup=factorPrivate start=/\v<\<PRIVATE>/ end=/\v<PRIVATE\>>/ contains=@factorDefnContents,factorPDefn,factorPMethod,factorPLocalsMethod,factorPGeneric,factorPGenericN transparent
+syn region  factorPrivate matchgroup=factorPrivate start=/\v<\<PRIVATE>/ end=/\v<PRIVATE\>>/ contains=@factorDefnContents,factorPDefn,factorPMethod,factorPLocalsMethod,factorPGeneric,factorPGenericN skipempty keepend
 
 syn cluster factorClusterValue      contains=factorBreakpoint,factorBoolean,factorFrySpecifier,factorChar,@factorString,@factorNumber,factorBackslash,factorMBackslash,factorLiteral,factorLiteralBlock,@factorStackEffect,@factorQuotation,@factorArray
 
