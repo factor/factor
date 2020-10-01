@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
-" Last Change: 2020 Jun 05
+" Last Change: 2020 Sep 30
 " Minimum Version: 600
 
 " Factor |syntax| file guide & conventions:
@@ -243,13 +243,15 @@ syn region  factorConstructor2    start=/\v<CONSTRUCTOR:>/                  end=
 syn region  factorIntersection    start=/\v<INTERSECTION:>/                 end=/\v<;>/     contains=@factorComment
 syn cluster factorSlotAttr              contains=factorSlotAttrInitial,factorSlotAttrReadOnly
 syn cluster factorTupleSlotAttr         contains=@factorSlotAttr
-syn match   factorTupleSlotName         /\v<\S+>/ nextgroup=factorTupleSlotClassSkip skipempty contained
+syn match   factorTupleSlotName         /\v<\S+;@1<!>/ nextgroup=factorTupleSlotClassSkip skipempty contained
 syn match   factorTupleSlotNameSkip     /\v%(\_\s+%(!>.*)?)*/ contains=@factorComment nextgroup=factorTupleSlotName transparent contained
 syn match   factorTupleSlotClass        /\v<\S+>/ nextgroup=factorTupleSlotAttrSkip skipempty contained
 " a class is optional, so let an attribute take priority if present
 syn match   factorTupleSlotClassSkip    /\v%(\_\s+%(!>.*)?)*/ contains=@factorComment nextgroup=factorTupleSlotClass,@factorTupleSlotAttr transparent contained
 syn region  factorTupleSlot matchgroup=factorTupleSlotDelims  start=/\v<\{>/                end=/\v<\}>/    contains=@factorComment,factorTupleSlotName,@factorTupleSlotAttr contained
-syn region  factorTuple matchgroup=factorTupleDelims          start=/\v<%(TUPLE|BUILTIN):>/ end=/\v<;>/     contains=@factorComment,factorTupleSlotName,factorTupleSlot
+syn match   factorTupleHeader           /\v%(\_\s+%(!>.*)?)*\S+%(%(\_\s+%(!>.*)?)+\<%(\_\s+%(!>.*)?)+\S+)?>/  contains=@factorComment,@factorWord contained transparent
+syn match   factorTupleDelims           /\v<%(TUPLE|BUILTIN):>/ nextgroup=factorTupleHeader skipempty contained
+syn region  factorTuple           start=/\v<%(TUPLE|BUILTIN):>/ end=/\v<;>/     contains=@factorComment,factorTupleSlotName,factorTupleSlot,factorTupleDelims
 syn region  factorPredicate matchgroup=factorPredicateDelims  start=/\v<%(PREDICATE):>/     end=/\v<;>/     contains=@factorComment,factorTupleSlotName
 " Abnormally named because factor*Error is reserved for syntax errors.
 syn region  factorErrorSyn        start=/\v<ERROR:>/            end=/\v<;>/     contains=@factorComment
