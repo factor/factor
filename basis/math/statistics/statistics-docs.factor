@@ -1,5 +1,5 @@
-USING: assocs debugger hashtables help.markup help.syntax
-kernel quotations sequences math ;
+USING: debugger hashtables help.markup help.syntax kernel math
+sequences ;
 IN: math.statistics
 
 HELP: geometric-mean
@@ -235,6 +235,28 @@ HELP: z-score
 { $values { "seq" sequence } { "n" number } }
 { $description "Calculates the Z-Score for " { $snippet "seq" } "." } ;
 
+HELP: dcg
+{ $values
+    { "scores" sequence }
+    { "dcg" number }
+}
+{ $description "Calculates the discounted cumulative gain from a list of scores. The discounted cumulative gain can be used to compare two lists of results against each other given scores for each of the results."
+$nl
+" See " { $url "https://en.wikipedia.org/wiki/Discounted_cumulative_gain" }
+} ;
+
+HELP: ndcg
+{ $values
+    { "scores" sequence }
+    { "ndcg" number }
+}
+{ $description "Calculates the normalized discounted cumulative gain from a list of scores. The ndcg is the discounted cumulative gain divided by the theoretical maximum dcg for the given list."
+$nl
+"See " { $url "https://en.wikipedia.org/wiki/Discounted_cumulative_gain" }
+} ;
+
+{ dcg ndcg } related-words
+
 ARTICLE: "histogram" "Computing histograms"
 "Counting elements in a sequence:"
 { $subsections
@@ -284,7 +306,9 @@ ARTICLE: "math.statistics" "Statistics"
 "Counting the frequency of occurrence of elements:"
 { $subsections "histogram" }
 "Computing cumulative sequences:"
-{ $subsections "cumulative" } ;
+{ $subsections "cumulative" }
+"Calculating discounted cumulative gain:"
+{ $subsections dcg ndcg } ;
 
 ABOUT: "math.statistics"
 
