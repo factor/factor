@@ -220,7 +220,10 @@ IN: math.statistics
 { 15+1/2 } [ { 4 8 15 16 23 42 } trimean ] unit-test
 
 { 0 } [ { } dcg ] unit-test
-{ 0 } [ { } ndcg ] unit-test
+{ 0.0 } [ { } ndcg ] unit-test
+
+{ 0.0 } [ { 0 } dcg ] unit-test
+{ 0.0 } [ { 0 } ndcg ] unit-test
 
 { t } [ { 3 2 3 0 1 2 } dcg 6.861126688593501 1e-6 ~ ] unit-test
 { t } [ { 3 2 3 0 1 2 } ndcg 0.9608081943360615 1e-6 ~ ] unit-test
