@@ -376,6 +376,10 @@ PRIVATE>
     dup length 1 + 2 swap [a,b] [ log 2 log /f ] map v/ sum ;
 
 : ndcg ( scores -- ndcg )
-    [ 0 ] [
-        [ dcg ] [ natural-sort <reversed> dcg ] bi /f
+    [ 0.0 ] [
+        dup dcg [
+            drop 0.0
+        ] [
+            swap natural-sort <reversed> dcg /f
+        ] if-zero
     ] if-empty ;
