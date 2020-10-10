@@ -3,7 +3,7 @@
 USING: accessors arrays assocs bit-arrays byte-arrays classes
 classes.tuple combinators combinators.short-circuit
 combinators.smart continuations effects fry generalizations
-kernel locals macros make math math.functions namespaces
+kernel locals macros make math math.functions namespaces parser
 quotations sbufs sequences sequences.generalizations slots
 splitting stack-checker strings summary vectors words
 words.symbol ;
@@ -287,3 +287,7 @@ M: no-match summary drop "Fall through in switch" ;
     recover-chain ;
 
 MACRO: switch ( quot-alist -- quot ) [switch] ;
+
+SYNTAX: INVERSE: scan-word parse-definition define-inverse ;
+
+SYNTAX: DUAL: scan-word scan-word define-dual ;
