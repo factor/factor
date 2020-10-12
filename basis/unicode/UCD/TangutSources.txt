@@ -1,6 +1,6 @@
-# TangutSources-12.1.0.txt
-# Date: 2019-03-08, 23:59:00 GMT [MS, KW]
-# © 2019 Unicode®, Inc.
+# TangutSources-13.0.0.txt
+# Date: 2020-01-28, 15:31:00 GMT [MS, KW]
+# © 2020 Unicode®, Inc.
 # Unicode and the Unicode Logo are registered trademarks of Unicode, Inc. in the U.S. and other countries.
 # For terms of use, see http://www.unicode.org/terms_of_use.html
 #
@@ -10,8 +10,8 @@
 # This file is a normative contributory data file in the
 # Unicode Character Database.
 #
-#	Data values match those for ISO/IEC 10646:2017 + Amd 1 + Amd 2
-#	Original Date: 2017-11-21
+#	Data values match those for ISO/IEC 10646:2020
+#	Original Date: 2020-NN-NN (TBD)
 #
 #	Format information:
 #
@@ -669,7 +669,7 @@ U+17132	kTGT_MergedSrc	H2004-B-0284
 U+17132	kRSTUnicode	17.7
 U+17133	kTGT_MergedSrc	L2008-3762
 U+17133	kRSTUnicode	17.7
-U+17134	kTGT_MergedSrc	L2008-3488-3489
+U+17134	kTGT_MergedSrc	L2008-3488
 U+17134	kRSTUnicode	17.7
 U+17135	kTGT_MergedSrc	L2008-3477
 U+17135	kRSTUnicode	17.7
@@ -3105,7 +3105,7 @@ U+175F4	kTGT_MergedSrc	L2008-0311
 U+175F4	kRSTUnicode	87.9
 U+175F5	kTGT_MergedSrc	L2008-1195
 U+175F5	kRSTUnicode	87.9
-U+175F6	kTGT_MergedSrc	L2008-1666-1667
+U+175F6	kTGT_MergedSrc	L2008-1666
 U+175F6	kRSTUnicode	87.9
 U+175F7	kTGT_MergedSrc	L2008-1691
 U+175F7	kRSTUnicode	87.9
@@ -7759,7 +7759,7 @@ U+17F0B	kTGT_MergedSrc	L2008-3442
 U+17F0B	kRSTUnicode	262.9
 U+17F0C	kTGT_MergedSrc	L2008-2348
 U+17F0C	kRSTUnicode	262.10
-U+17F0D	kTGT_MergedSrc	L2008-3435-3436
+U+17F0D	kTGT_MergedSrc	L2008-3436
 U+17F0D	kRSTUnicode	262.10
 U+17F0E	kTGT_MergedSrc	L2008-3752
 U+17F0E	kRSTUnicode	262.10
@@ -8009,7 +8009,7 @@ U+17F88	kTGT_MergedSrc	L2008-3294
 U+17F88	kRSTUnicode	267.8
 U+17F89	kTGT_MergedSrc	L2008-3186
 U+17F89	kRSTUnicode	267.8
-U+17F8A	kTGT_MergedSrc	L2008-2252-2253
+U+17F8A	kTGT_MergedSrc	L2008-2253
 U+17F8A	kRSTUnicode	267.9
 U+17F8B	kTGT_MergedSrc	L2008-2742
 U+17F8B	kRSTUnicode	267.9
@@ -8063,7 +8063,7 @@ U+17FA3	kTGT_MergedSrc	L2008-2655
 U+17FA3	kRSTUnicode	267.11
 U+17FA4	kTGT_MergedSrc	L2008-3600
 U+17FA4	kRSTUnicode	267.11
-U+17FA5	kTGT_MergedSrc	L2008-3683-3684
+U+17FA5	kTGT_MergedSrc	L2008-3683
 U+17FA5	kRSTUnicode	267.11
 U+17FA6	kTGT_MergedSrc	L2008-2759
 U+17FA6	kRSTUnicode	267.11
@@ -8674,7 +8674,7 @@ U+180D4	kRSTUnicode	301.12
 U+180D5	kTGT_MergedSrc	L2008-5792
 U+180D5	kRSTUnicode	301.13
 U+180D6	kTGT_MergedSrc	L2008-5191
-U+180D6	kRSTUnicode	301.13
+U+180D6	kRSTUnicode	412.14
 U+180D7	kTGT_MergedSrc	L2008-5681
 U+180D7	kRSTUnicode	301.14
 U+180D8	kTGT_MergedSrc	L2008-6059
@@ -8871,7 +8871,7 @@ U+18137	kTGT_MergedSrc	L2008-1721
 U+18137	kRSTUnicode	316.10
 U+18138	kTGT_MergedSrc	L2008-1708
 U+18138	kRSTUnicode	316.10
-U+18139	kTGT_MergedSrc	L2008-1317-1318
+U+18139	kTGT_MergedSrc	L2008-1317
 U+18139	kRSTUnicode	316.10
 U+1813A	kTGT_MergedSrc	L2008-0312
 U+1813A	kRSTUnicode	316.10
@@ -8899,7 +8899,7 @@ U+18145	kTGT_MergedSrc	L2008-1865
 U+18145	kRSTUnicode	316.11
 U+18146	kTGT_MergedSrc	L2008-1670
 U+18146	kRSTUnicode	316.11
-U+18147	kTGT_MergedSrc	L2008-1734-1735
+U+18147	kTGT_MergedSrc	L2008-1734
 U+18147	kRSTUnicode	316.11
 U+18148	kTGT_MergedSrc	L1997-5997
 U+18148	kRSTUnicode	316.11
@@ -10775,7 +10775,7 @@ U+184EF	kTGT_MergedSrc	L2008-1105
 U+184EF	kRSTUnicode	485.11
 U+184F0	kTGT_MergedSrc	L2008-0230
 U+184F0	kRSTUnicode	485.12
-U+184F1	kTGT_MergedSrc	L2008-1106-1107
+U+184F1	kTGT_MergedSrc	L2008-1107
 U+184F1	kRSTUnicode	485.12
 U+184F2	kTGT_MergedSrc	L2008-0654
 U+184F2	kRSTUnicode	485.12
@@ -11937,7 +11937,7 @@ U+18734	kTGT_MergedSrc	L2008-4449
 U+18734	kRSTUnicode	674.11
 U+18735	kTGT_MergedSrc	L2008-4439
 U+18735	kRSTUnicode	674.13
-U+18736	kTGT_MergedSrc	L2008-4456-4457
+U+18736	kTGT_MergedSrc	L2008-4457
 U+18736	kRSTUnicode	674.14
 U+18737	kTGT_MergedSrc	L2008-4445
 U+18737	kRSTUnicode	674.16
@@ -12325,5 +12325,23 @@ U+187F6	kTGT_MergedSrc	UTN42-010
 U+187F6	kRSTUnicode	79.14
 U+187F7	kTGT_MergedSrc	UTN42-011
 U+187F7	kRSTUnicode	79.19
+U+18D00	kTGT_MergedSrc	L2008-3489
+U+18D00	kRSTUnicode	17.7
+U+18D01	kTGT_MergedSrc	L2008-1667
+U+18D01	kRSTUnicode	87.9
+U+18D02	kTGT_MergedSrc	L2008-3435
+U+18D02	kRSTUnicode	262.10
+U+18D03	kTGT_MergedSrc	L2008-2252
+U+18D03	kRSTUnicode	267.9
+U+18D04	kTGT_MergedSrc	L2008-3684
+U+18D04	kRSTUnicode	267.11
+U+18D05	kTGT_MergedSrc	L2008-1318
+U+18D05	kRSTUnicode	316.10
+U+18D06	kTGT_MergedSrc	L2008-1735
+U+18D06	kRSTUnicode	316.11
+U+18D07	kTGT_MergedSrc	L2008-1106
+U+18D07	kRSTUnicode	485.12
+U+18D08	kTGT_MergedSrc	L2008-4456
+U+18D08	kRSTUnicode	674.14
 
 # EOF
