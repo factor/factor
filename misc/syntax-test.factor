@@ -45,6 +45,8 @@
 ! Examples
 
     TUPLE: interval-map { array array read-only } ;
+    TUPLE: foo a b c ;
+    TUPLE: foo < bar d e f ;
     BUILTIN: string { length array-capacity read-only initial: 0 } aux ;
 
 ! Definitions
@@ -222,6 +224,7 @@ PRIVATE>
     CHAR: a
     CHAR: symbol-for-end-of-transmission
     CHAR: snowman
+    CHAR: ☃
 
     { CHAR: a CHAR: S }
     { CHAR: b CHAR: D }
