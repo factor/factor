@@ -66,6 +66,7 @@ SYMBOL: command-line
 : (parse-command-line) ( args -- )
     [
         unclip "-" ?head [
+            [ CHAR: - = ] trim-head
             [ param ] [ "run=" head? ] bi
             [ command-line set ]
             [ (parse-command-line) ] if
