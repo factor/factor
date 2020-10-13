@@ -25,8 +25,8 @@ CONSTANT: mach-map {
     ] map ;
 
 : load-ldconfig-cache ( -- seq )
-    "/sbin/ldconfig -p" utf8 [ lines ] with-process-reader
-    rest parse-ldconfig-lines ;
+    "/sbin/ldconfig -p" utf8 [ lines ] with-process-reader*
+    2drop [ f ] [ rest parse-ldconfig-lines ] if-empty ;
 
 : ldconfig-arch ( -- str )
     mach-map cpu of { "libc6" } or ;
