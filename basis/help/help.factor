@@ -29,8 +29,8 @@ PRIVATE>
     [ dup "help" word-prop [ ] [ word-help* ] ?if ]
     [ inputs-and-outputs drop ] bi ;
 
-M: word word-help*
-    stack-effect [ in>> ] [ out>> ] bi [
+: effect-help ( effect -- content )
+    [ in>> ] [ out>> ] bi [
         [
             dup pair? [
                 first2 dup effect? [ \ $quotation swap 2array ] when
@@ -38,7 +38,9 @@ M: word word-help*
                 object
             ] if [ effect>string ] dip
         ] { } map>assoc
-    ] bi@ append members \ $values prefix 1array ;
+    ] bi@ \ $inputs \ $outputs [ prefix ] bi-curry@ bi* 2array ;
+
+M: word word-help* stack-effect effect-help ;
 
 : $predicate ( element -- )
     { { "object" object } { "?" boolean } } $values
