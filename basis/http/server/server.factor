@@ -141,7 +141,9 @@ LOG: httpd-header NOTICE
     dup method>> {
         { "GET" [ url>> query>> ] }
         { "HEAD" [ url>> query>> ] }
+        { "OPTIONS" [ url>> query>> ] }
         { "POST" [ post-data>> params>> ] }
+        { "PUT" [ post-data>> params>> ] }
     } case ;
 
 SYMBOL: params
