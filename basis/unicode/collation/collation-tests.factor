@@ -46,13 +46,17 @@ IN: unicode.collation.tests
 : xfailed-collation-tests ( -- seq )
     HS{
         { 3958 3953 820 }
+
         { 4018 820 3953 3968 }
         { 4018 820 3968 3953 }
+        { 4018 3953 1 3968 97 }
         { 4018 820 3969 }
+
         { 3960 3953 820 }
         { 4019 820 3953 3968 }
         { 4019 820 3968 3953 }
         { 4019 3953 820 3968 }
+        { 4019 3953 1 3968 97 }
     } ;
 
 : parse-collation-test-weights ( -- weights )
@@ -75,9 +79,12 @@ IN: unicode.collation.tests
 
     ! Remove these two expected-fail Tibetan collation comparison tests
     ! They are bad tests once you fix up the ducet table with { 0x0FB2 0x0F71 } and { 0x0FB3 0x0F71 }
-    { 4018 820 3969 } { 3959 33 } [ >string ] bi@ 2array
-    { 4019 3953 820 3968 } { 3961 33 } [ >string ] bi@ 2array
-    2array >hash-set diff members
+    {
+        { { 4018 820 3969 } { 3959 33 } }
+        { { 4019 3953 820 3968 } { 3961 33 } }
+        { { 4019 98 } { 4019 3953 1 3968 97 } }
+        { { 4028 98 } { 4018 3953 1 3968 97 } }
+    } [ [ >string ] bi@ ] assoc-map >hash-set diff members
 
     [ string<=> { +lt+ +eq+ } member? ] assoc-reject
 ] unit-test
