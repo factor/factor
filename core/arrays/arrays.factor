@@ -14,6 +14,7 @@ M: array nth-unsafe [ integer>fixnum ] dip array-nth ; inline
 M: array set-nth-unsafe [ integer>fixnum ] dip set-array-nth ; inline
 M: array resize resize-array ; inline
 M: array equal? over array? [ sequence= ] [ 2drop f ] if ;
+M: array hashcode* [ sequence-hashcode ] recursive-hashcode ;
 M: object new-sequence drop 0 <array> ; inline
 M: f new-sequence drop [ f ] [ 0 <array> ] if-zero ; inline
 

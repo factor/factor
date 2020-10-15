@@ -171,6 +171,12 @@ M: hashtable clone
 M: hashtable equal?
     over hashtable? [ assoc= ] [ 2drop f ] if ;
 
+M: hashtable hashcode*
+    [
+        dup assoc-size 1 eq?
+        [ assoc-hashcode ] [ nip assoc-size ] if
+    ] recursive-hashcode ;
+
 ! Default method
 M: assoc new-assoc drop <hashtable> ; inline
 
