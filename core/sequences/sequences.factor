@@ -698,6 +698,10 @@ ERROR: assert-sequence got expected ;
 : assert-sequence= ( a b -- )
     2dup sequence= [ 2drop ] [ assert-sequence ] if ;
 
+M: reversed equal? over reversed? [ sequence= ] [ 2drop f ] if ;
+
+M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
+
 <PRIVATE
 
 : sequence-hashcode-step ( oldhash newpart -- newhash )
@@ -711,9 +715,16 @@ PRIVATE>
 : sequence-hashcode ( n seq -- x )
     [ 0 ] 2dip [ hashcode* sequence-hashcode-step ] with each ; inline
 
-M: reversed equal? over reversed? [ sequence= ] [ 2drop f ] if ;
+M: sequence hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
-M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
+M: iota hashcode*
+    over 0 <= [ 2drop 0 ] [
+        nip length 0 swap [ sequence-hashcode-step ] each-integer
+    ] if ;
+
+M: reversed hashcode* [ sequence-hashcode ] recursive-hashcode ;
+
+M: slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
 : move ( to from seq -- )
     2over =
