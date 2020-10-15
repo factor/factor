@@ -373,10 +373,6 @@ HELP: no-case
 { $description "Throws a " { $link no-case } " error." }
 { $error-description "Thrown by " { $link case } " if the object at the top of the stack does not match any case, and no default case is given." } ;
 
-HELP: recursive-hashcode
-{ $values { "n" integer } { "obj" object } { "quot" { $quotation ( n obj -- code ) } } { "code" integer } }
-{ $description "A combinator used to implement methods for the " { $link hashcode* } " generic word. If " { $snippet "n" } " is less than or equal to zero, outputs 0, otherwise calls the quotation." } ;
-
 HELP: deep-spread>quot
 { $values { "seq" sequence } { "quot" quotation } }
 { $description "Creates a new quotation from a sequence of quotations that applies each quotation to a stack element in turn." }
