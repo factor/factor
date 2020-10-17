@@ -1,7 +1,8 @@
 ! Copyright (C) 2017 John Benediktsson, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ascii assocs combinators kernel math math.order
-math.statistics sequences sets strings ;
+USING: ascii assocs combinators kernel math math.functions
+math.parser math.ranges math.statistics sequences sets sorting
+strings ;
 IN: escape-strings
 
 : find-escapes ( str -- set )
@@ -29,19 +30,41 @@ IN: escape-strings
         } cond
     ] each 0 > [ >string over adjoin ] [ drop ] if ;
 
+: lowest-missing-number ( string-set -- min )
+    members dup
+    [ length ] histogram-by
+    dup keys length [0,b]
+    [ [ of ] keep over [ 10^ < ] [ nip ] if ] with find nip
+    [ '[ length _ = ] filter natural-sort ] keep ! remove natural-sort here
+    [
+        [ drop "" ] [
+            10^ <iota> [
+                [ swap ?nth dup [ string>number ] when ] keep = not
+            ] with find nip number>string
+        ] if-zero
+    ] keep char: 0 pad-head ;
+
 : lowest-missing ( set -- min )
     members dup [ = not ] find-index
     [ nip ] [ drop length ] if ;
 
-: escape-string* ( str n -- str' )
-    char: = <repetition>
+: surround-by-brackets ( str delim -- str' )
     [ "[" dup surround ] [ "]" dup surround ] bi surround ;
 
+: surround-by-equals-brackets ( str n -- str' )
+    char: = <repetition> surround-by-brackets ;
+
 : escape-string ( str -- str' )
-    dup find-escapes lowest-missing escape-string* ;
+    dup find-escapes lowest-missing surround-by-equals-brackets ;
 
 : escape-strings ( strs -- str )
     [ escape-string ] map concat escape-string ;
+
+: number-escape-string ( str -- str' )
+    dup find-number-escapes lowest-missing-number surround-by-brackets ;
+
+: number-escape-strings ( strs -- str )
+    [ number-escape-string ] map concat number-escape-string ;
 
 : tag-payload ( str tag -- str' )
     [ escape-string ] dip prepend ;
