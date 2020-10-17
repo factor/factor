@@ -3,6 +3,7 @@
 USING: accessors combinators combinators.private compiler.test
 compiler.tree compiler.tree.builder compiler.tree.debugger
 compiler.tree.optimizer compiler.tree.propagation.call-effect
+compiler.tree.propagation.info
 compiler.units effects eval fry kernel kernel.private math sequences
 tools.test ;
 IN: compiler.tree.propagation.call-effect.tests
@@ -157,3 +158,8 @@ TUPLE: my-tuple a b c ;
 { } [ "IN: compiler.tree.propagation.call-effect.tests TUPLE: my-tuple a b ;" eval( -- ) ] unit-test
 
 [ 1 2 3 my-quot my-word ] [ wrong-values? ] must-fail-with
+
+! Regression
+[ composed <class-info> (infer-value) ] [ uninferable? ] must-fail-with
+{ t } [ [ 1 ] [ 2 ] compose <literal-info> (infer-value) ( -- x x ) effect= ] unit-test
+{ } [ "IN: compiler.tree.propagation.call-effect.tests USE: kernel.private : blub ( x -- ) { composed } declare call( -- ) ;" eval( -- ) ] unit-test
