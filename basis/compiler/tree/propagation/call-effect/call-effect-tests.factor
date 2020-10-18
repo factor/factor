@@ -162,4 +162,5 @@ TUPLE: my-tuple a b c ;
 ! Regression
 [ composed <class-info> (infer-value) ] [ uninferable? ] must-fail-with
 { t } [ [ 1 ] [ 2 ] compose <literal-info> (infer-value) ( -- x x ) effect= ] unit-test
-{ } [ "IN: compiler.tree.propagation.call-effect.tests USE: kernel.private : blub ( x -- ) { composed } declare call( -- ) ;" eval( -- ) ] unit-test
+{ } [ "IN: compiler.tree.propagation.call-effect.tests USING:
+kernel kernel.private ; : blub ( x -- ) { composed } declare call( -- ) ;" eval( -- ) ] unit-test
