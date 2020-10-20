@@ -115,6 +115,31 @@ CONSTANT: urls {
          }
         "t1000://www.google.com/"
     }
+    {
+        T{ url
+            { protocol "no-auth" }
+            { path "/some/random/path" }
+        }
+        "no-auth:/some/random/path"
+    }
+    {
+        T{ url
+            { protocol "https" }
+            { host "www.google.com" }
+            { path "/" }
+        }
+        "https://www.google.com:/"
+    }
+    {
+        T{ url
+            { protocol "http" }
+            { host "example.org" }
+            { path "/" }
+            { username "user" }
+            { password "" }
+        }
+        "http://user:@example.org/"
+    }
 }
 
 urls [
