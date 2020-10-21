@@ -130,11 +130,8 @@ DEFER: (read-json-string)
 : json-read-input ( stream -- objects )
     V{ } clone over '[ _ stream-read1 ] [ scan ] while* nip ;
 
-! If there are no json objects, return an empty hashtable
-! This happens for empty files.
-: first-json-object ( objects -- obj )
-    [ H{ } clone ] [ first ] if-empty ;
 
+! A properly formed JSON file should contain exactly one object with balanced brackets.
 : get-json-object ( objects  --  obj  )
     { 
       { [ dup length 1 = counter get 0 = and ] [ first ] }
