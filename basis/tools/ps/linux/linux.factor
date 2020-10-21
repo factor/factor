@@ -17,7 +17,7 @@ IN: tools.ps.linux
 : safe-ps-cmdline ( path -- string/f )
     [ ps-cmdline ] [ 2drop f ] recover ;
 
-M: linux ps ( -- assoc )
+M: linux ps
     "/proc" [
         "." directory-files [ string>number ] filter
         [ dup safe-ps-cmdline 2array ] map sift-values

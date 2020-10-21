@@ -5,7 +5,7 @@ IN: checksums.bsd
 
 SINGLETON: bsd
 
-M: bsd checksum-bytes ( bytes checksum -- value )
+M: bsd checksum-bytes
     drop 0 [
         [ [ -1 shift ] [ 1 bitand 15 shift ] bi + ] dip
         + 0xffff bitand

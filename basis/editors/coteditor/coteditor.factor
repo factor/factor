@@ -12,5 +12,5 @@ coteditor editor-class set-global
         f
     ] if* ;
 
-M: coteditor editor-command ( file line -- command )
+M: coteditor editor-command
     [ find-cot-bundle-path , "-l" , number>string , , ] { } make ;

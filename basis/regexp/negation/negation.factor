@@ -52,5 +52,5 @@ CONSTANT: fail-state -1
 : ast>dfa ( parse-tree -- minimal-dfa )
     ast>nfa construct-dfa minimize ;
 
-M: negation nfa-node ( node -- start end )
+M: negation nfa-node
     term>> ast>dfa negate-table adjoin-dfa ;

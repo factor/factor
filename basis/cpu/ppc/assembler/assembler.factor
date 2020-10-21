@@ -115,16 +115,16 @@ IN: cpu.ppc.assembler
 
 ! 2.4 Branch Instructions
 GENERIC: B ( target_addr/label -- )
-M: integer B ( target_addr -- ) -2 shift 0 0 18 i-insn ;
+M: integer B -2 shift 0 0 18 i-insn ;
 
 GENERIC: BL ( target_addr/label -- )
-M: integer BL ( target_addr -- ) -2 shift 0 1 18 i-insn ;
+M: integer BL -2 shift 0 1 18 i-insn ;
 
 : BA  ( target_addr -- ) -2 shift 1 0 18 i-insn ;
 : BLA ( target_addr -- ) -2 shift 1 1 18 i-insn ;
 
 GENERIC: BC ( bo bi target_addr/label -- )
-M: integer BC ( bo bi target_addr -- ) -2 shift 0 0 16 b-insn ;
+M: integer BC -2 shift 0 0 16 b-insn ;
 
 : BCA  ( bo bi target_addr -- ) -2 shift 1 0 16 b-insn ;
 : BCL  ( bo bi target_addr -- ) -2 shift 0 1 16 b-insn ;

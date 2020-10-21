@@ -4,7 +4,7 @@ USING: accessors arrays assocs classes classes.error combinators
 combinators.short-circuit continuations debugger effects fry
 generic help.crossref help.markup help.stylesheet help.topics io
 io.styles kernel make namespaces prettyprint sequences sets
-sorting vocabs words words.symbol ;
+sorting vocabs words words.alias words.symbol ;
 IN: help
 
 GENERIC: word-help* ( word -- content )
@@ -29,8 +29,8 @@ PRIVATE>
     [ dup "help" word-prop [ ] [ word-help* ] ?if ]
     [ inputs-and-outputs drop ] bi ;
 
-M: word word-help*
-    stack-effect [ in>> ] [ out>> ] bi [
+: effect-help ( effect -- content )
+    [ in>> ] [ out>> ] bi [
         [
             dup pair? [
                 first2 dup effect? [ \ $quotation swap 2array ] when
@@ -38,7 +38,9 @@ M: word word-help*
                 object
             ] if [ effect>string ] dip
         ] { } map>assoc
-    ] bi@ append members \ $values prefix 1array ;
+    ] bi@ \ $inputs \ $outputs [ prefix ] bi-curry@ bi* 2array ;
+
+M: word word-help* stack-effect effect-help ;
 
 : $predicate ( element -- )
     { { "object" object } { "?" boolean } } $values
@@ -51,6 +53,12 @@ M: word word-help*
 M: predicate word-help* \ $predicate swap 2array 1array ;
 
 M: class word-help* drop f ;
+
+M: alias word-help*
+    [
+        \ $description ,
+        "An alias for " , def>> first <$link> , "." ,
+    ] { } make 1array ;
 
 : all-articles ( -- seq )
     articles get keys

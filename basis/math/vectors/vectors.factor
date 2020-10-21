@@ -131,7 +131,7 @@ M: object vshuffle2-elements
 GENERIC#: vshuffle-bytes 1 ( v perm -- w )
 
 GENERIC: vshuffle ( v perm -- w )
-M: array vshuffle ( v perm -- w )
+M: array vshuffle
     vshuffle-elements ; inline
 
 GENERIC#: vlshift 1 ( v n -- w )

@@ -68,11 +68,11 @@ C: <connection> connection
 : send-to-connection ( message connection -- )
     stream>> [ serialize flush ] with-stream* ;
 
-M: remote-thread send ( message thread -- )
+M: remote-thread send
     [ id>> 2array ] [ node>> ] [ thread-connections at ] tri
     [ nip send-to-connection ] [ send-remote-message ] if* ;
 
-M: thread (serialize) ( obj -- )
+M: thread (serialize)
     id>> [ local-node get insecure>> ] dip <remote-thread> (serialize) ;
 
 : stop-node ( -- )

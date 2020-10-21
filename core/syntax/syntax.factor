@@ -105,7 +105,6 @@ IN: bootstrap.syntax
     "BV{" [ \ } [ >byte-vector ] parse-literal ] define-core-syntax
     "H{" [ \ } [ parse-hashtable ] parse-literal ] define-core-syntax
     "T{" [ parse-tuple-literal suffix! ] define-core-syntax
-    "TH{" [ parse-tuple-hash-literal suffix! ] define-core-syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-core-syntax
     "HS{" [ \ } [ >hash-set ] parse-literal ] define-core-syntax
 

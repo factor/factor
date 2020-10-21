@@ -21,7 +21,8 @@ HOOK: find-visual-studio-code-invocation os ( -- array )
     } 0|| ;
 
 M: macosx find-visual-studio-code-invocation
-    "com.microsoft.VSCode" find-native-bundle [
+    { "com.microsoft.VSCodeInsiders" "com.microsoft.VSCode" }
+    [ find-native-bundle ] map-find drop [
         "Contents/MacOS/Electron" append-path
     ] [
         f
@@ -31,6 +32,7 @@ ERROR: can't-find-visual-studio-code ;
 
 M: linux find-visual-studio-code-invocation
     {
+        [ "code-insiders" which ]
         [ "code" which ]
         [ "Code" which ]
         [ home "VSCode-linux-x64/Code" append-path ]
@@ -39,11 +41,11 @@ M: linux find-visual-studio-code-invocation
 
 M: windows find-visual-studio-code-invocation
     {
-        [ { "Microsoft VS Code" } "code.exe" find-in-applications ]
+        [ { "Microsoft VS Code Insiders" } "code-insiders.cmd" find-in-applications ]
         [ "code.cmd" ]
     } 0|| ;
 
-M: visual-studio-code editor-command ( file line -- command )
+M: visual-studio-code editor-command
     [
         visual-studio-code-invocation
         [ , ] [ can't-find-visual-studio-code ] if*

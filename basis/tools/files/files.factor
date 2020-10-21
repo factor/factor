@@ -58,7 +58,7 @@ ERROR: unknown-file-spec symbol ;
 
 HOOK: file-spec>string os ( file-listing spec -- string )
 
-M: object file-spec>string ( file-listing spec -- string )
+M: object file-spec>string
     {
         { +file-name+ [ directory-entry>> name>> ] }
         { +directory-or-size+ [ file-info>> dir-or-size ] }

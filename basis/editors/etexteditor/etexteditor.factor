@@ -13,7 +13,7 @@ etexteditor editor-class set-global
         [ "e.exe" ] unless*
     ] unless* ;
 
-M: etexteditor editor-command ( file line -- command )
+M: etexteditor editor-command
     [
         etexteditor-path ,
         [ , ] [ "--line" , number>string , ] bi*

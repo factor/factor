@@ -11,24 +11,32 @@
 <link rel="stylesheet" type="text/css" href="http://www.unicode.org/reports/reports-v2.css">
 </head>
 
-<body bgcolor="#ffffff">
+<body>
 
-<table class="header">
-  <tr>
-    <td class="icon"><a href="http://www.unicode.org"><img border="0" src="http://www.unicode.org/webscripts/logo60s2.gif" align="middle" alt="[Unicode]" width="34" height="33"></a>&nbsp;&nbsp;<a class="bar" href="http://www.unicode.org/ucd/">Unicode    
-      Character Database</a></td>   
-  </tr>
-  <tr>
-    <td class="gray">&nbsp;</td>
-  </tr>
-</table>
+	<table class="header">
+		<tr>
+          <td class="icon" style="width:38px; height:35px">
+          <a href="http://www.unicode.org/">
+          <img border="0" src="http://www.unicode.org/webscripts/logo60s2.gif" align="middle" 
+          alt="[Unicode]" width="34" height="33"></a>
+          </td>
+
+          <td class="icon" style="vertical-align:middle">
+          <a class="bar"> </a>
+          <a class="bar" href="https://www.unicode.org/ucd/"><font size="3">Unicode Character Database</font></a>
+          </td>
+		</tr>
+		<tr>
+			<td colspan="2" class="gray">&nbsp;</td>
+		</tr>
+	</table>
 <div class="body">
   <h1>Unicode® NamesList File Format</h1>   
   <table class="simple" width="90%">
     <tbody>
       <tr>
         <td valign="top" width="144">Revision</td>
-        <td valign="top">12.1.0</td>
+        <td valign="top">13.0.0</td>
       </tr>
       <tr>
         <td valign="top" width="144">Authors</td>
@@ -36,19 +44,19 @@
       </tr>
       <tr>
         <td valign="top" width="144">Date</td>
-        <td valign="top">2019-03-08</td>
+        <td valign="top">2020-02-12</td>
       </tr>
       <tr>
         <td valign="top" width="144">This Version</td>
         <td valign="top">
-		<a href="http://www.unicode.org/Public/12.1.0/ucd/NamesList.html">
-		http://www.unicode.org/Public/12.1.0/ucd/NamesList.html</a></td>
+		<a href="http://www.unicode.org/Public/13.0.0/ucd/NamesList.html">
+		http://www.unicode.org/Public/13.0.0/ucd/NamesList.html</a></td>
       </tr>
       <tr>
         <td valign="top" width="144">Previous Version</td>
         <td valign="top">
-		<a href="http://www.unicode.org/Public/12.0.0/ucd/NamesList.html">
-		http://www.unicode.org/Public/12.0.0/ucd/NamesList.html</a></td>
+		<a href="http://www.unicode.org/Public/12.1.0/ucd/NamesList.html">
+		http://www.unicode.org/Public/12.1.0/ucd/NamesList.html</a></td>
       </tr>
       <tr>
         <td valign="top" width="144">Latest Version</td>
@@ -329,14 +337,18 @@ is machine generated and will always explicitly provide any summary subheaders.<
 <strong>SIDEBAR_LINE: 	&quot;;;&quot; LINE</strong>
 			// Output LINE as marginal note
 
-<strong>DECOMPOSITION:	TAB &quot;:&quot; SP EXPAND_LINE</strong>       
-			// Replace ':' by EQUIV, expand line into 
-			// decomposition 
+<strong>DECOMPOSITION:	TAB &quot;:&quot; SP EXPAND_LINE       
+		| TAB &quot;:&quot; SP &quot;&lt;&quot; TAG &quot;&gt;&quot; SP EXPAND_LINE</strong>       
+			// Replace ':' by EQUIV, expand line into decomposition
+			// The &lt;tag&gt; gives optional information,
+			// e.g., about composition exclusion. 
+			// by convention the tag has initial lowercase
 
 <strong>COMPAT_MAPPING:	TAB &quot;#&quot; SP EXPAND_LINE       
 		| TAB &quot;#&quot; SP &quot;&lt;&quot; TAG &quot;&gt;&quot; SP EXPAND_LINE</strong>    
-			// Replace '#' by APPROX, output line as mapping;
-			// check for balanced &lt; &gt;
+			// Replace '#' by APPROX, output line as mapping
+			// The &lt;tag&gt; is the optional compatibility decomposition tag.
+			// by convention the tag has initial lowercase
 
 <strong>NOTICE_LINE:	&quot;@+&quot; TAB LINE</strong>       
 			// Output LINE as notice
@@ -527,6 +539,13 @@ COMMENT:	&quot;(&quot; LABEL &quot;)&quot;
 </ul>
   <h2><a name="Modifications" href="#Modifications">Modifications</a></h2>
 
+    <p><b>Version 13.0.0</b></p>
+        <ul>
+        <li>Reissued for Unicode 13.0.0.</li>
+        <li>Added a second expansion for DECOMPOSITION, for possible future
+        	use to designate specific subtypes of canonical decompositions
+        	in the names list output.</li>
+    	</ul>
     <p><b>Version 12.1.0</b></p>
         <ul>
         <li>Reissued for Unicode 12.1.0.</li>
@@ -653,8 +672,6 @@ COMMENT:	&quot;(&quot; LABEL &quot;)&quot;
         <img src="http://www.unicode.org/img/hb_notice.gif" border="0" alt="Access to Copyright and terms of use" width="216" height="50"></a></td>
       </tr>
     </table>
-<script language="Javascript" type="text/javascript" src="http://www.unicode.org/webscripts/lastModified.js">
-                </script>
     </center>
   </div>
 </div>

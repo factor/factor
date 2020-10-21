@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs byte-arrays hashtables kernel
-kernel.private make math math.order math.private quotations
-sequences sequences.private sets sorting words ;
+USING: accessors arrays assocs kernel kernel.private make math
+math.order math.private quotations sequences sequences.private
+sets sorting words ;
 IN: combinators
 
 ! Most of these combinators have compile-time expansions in
@@ -188,32 +188,6 @@ PRIVATE>
         { [ dup [ wrapper? ] all? ] [ drop [ [ wrapped>> ] dip ] assoc-map hash-case-quot ] }
         [ drop linear-case-quot ]
     } cond ;
-
-: recursive-hashcode ( n obj quot -- code )
-    pick 0 <= [ 3drop 0 ] [ [ 1 - ] 2dip call ] if ; inline
-
-! These go here, not in sequences and hashtables, since those
-! two cannot depend on us
-M: sequence hashcode* [ sequence-hashcode ] recursive-hashcode ;
-
-M: array hashcode* [ sequence-hashcode ] recursive-hashcode ;
-
-M: byte-array hashcode* [ sequence-hashcode ] recursive-hashcode ;
-
-M: reversed hashcode* [ sequence-hashcode ] recursive-hashcode ;
-
-M: slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
-
-M: iota hashcode*
-    over 0 <= [ 2drop 0 ] [
-        nip length 0 swap [ sequence-hashcode-step ] each-integer
-    ] if ;
-
-M: hashtable hashcode*
-    [
-        dup assoc-size 1 eq?
-        [ assoc-hashcode ] [ nip assoc-size ] if
-    ] recursive-hashcode ;
 
 : to-fixed-point ( ... object quot: ( ... object(n) -- ... object(n+1) ) -- ... object(n) )
     [ keep over = ] keep [ to-fixed-point ] curry unless ; inline recursive

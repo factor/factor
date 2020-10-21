@@ -156,6 +156,12 @@ INSTANCE: +win32-nt-executable+ windows-executable   ! pe
 : application-data ( -- str )
     CSIDL_APPDATA shell32-directory ;
 
+: local-application-data ( -- str )
+    CSIDL_LOCAL_APPDATA shell32-directory ;
+
+: common-application-data ( -- str )
+    CSIDL_COMMON_APPDATA shell32-directory ;
+
 : windows-directory ( -- str )
     CSIDL_WINDOWS shell32-directory ;
 

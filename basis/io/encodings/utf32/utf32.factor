@@ -53,10 +53,10 @@ CONSTANT: bom-be B{ 0 0 0xfe 0xff }
         bom-be sequence= [ utf32be ] [ missing-bom ] if
     ] if ;
 
-M: utf32 <decoder> ( stream utf32 -- decoder )
+M: utf32 <decoder>
     drop 4 over stream-read bom>le/be <decoder> ;
 
-M: utf32 <encoder> ( stream utf32 -- encoder )
+M: utf32 <encoder>
     drop bom-le over stream-write utf32le <encoder> ;
 
 PRIVATE>

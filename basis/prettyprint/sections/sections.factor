@@ -100,7 +100,7 @@ style overhang ;
         ] change
         0 >>overhang ; inline
 
-M: section section-fits? ( section -- ? )
+M: section section-fits?
     [ end>> 1 - pprinter get last-newline>> - ]
     [ overhang>> ] bi + text-fits? ;
 
@@ -189,7 +189,7 @@ TUPLE: block < section sections ;
 
 : add-line-break ( type -- ) [ <line-break> add-section ] when* ;
 
-M: block section-fits? ( section -- ? )
+M: block section-fits?
     line-limit? [ drop t ] [ call-next-method ] if ;
 
 : pprint-sections ( block advancer -- )
@@ -199,7 +199,7 @@ M: block section-fits? ( section -- ? )
     ] dip
     [ [ pprint-section ] bi ] curry each ; inline
 
-M: block short-section ( block -- )
+M: block short-section
     [ advance ] pprint-sections ;
 
 : do-break ( break -- )
@@ -262,7 +262,7 @@ TUPLE: flow < block ;
 : <flow> ( -- block )
     flow new-block ;
 
-M: flow short-section? ( section -- ? )
+M: flow short-section?
     ! If we can make room for this entire block by inserting
     ! a newline, do it; otherwise, don't bother, print it as
     ! a short section
@@ -339,7 +339,7 @@ SYMBOL: next
 : ?break-group ( seq -- )
     dup break-group? [ first <fresh-line ] [ drop ] if ;
 
-M: block long-section ( block -- )
+M: block long-section
     [
         sections>> chop-break group-flow [
             dup ?break-group [

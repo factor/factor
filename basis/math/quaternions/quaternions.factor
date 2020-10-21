@@ -26,7 +26,7 @@ PRIVATE>
     } 2cleave (q*sign) ; inline
 
 GENERIC: qconjugate ( u -- u' )
-M: object qconjugate ( u -- u' )
+M: object qconjugate
     { 1 -1 -1 -1 } v* ; inline
 
 : qrecip ( u -- 1/u )

@@ -17,5 +17,5 @@ TUPLE: win32-handle < disposable handle ;
 : <win32-handle> ( handle -- win32-handle )
     win32-handle new-win32-handle ;
 
-M: win32-handle dispose* ( handle -- )
+M: win32-handle dispose*
     handle>> CloseHandle win32-error=0/f ;

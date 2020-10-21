@@ -20,7 +20,7 @@ GENERIC: signal-name ( obj -- str/f )
 
 M: signal signal-name n>> signal-name ;
 
-M: integer signal-name ( n -- str/f ) 1 - signal-names ?nth ;
+M: integer signal-name 1 - signal-names ?nth ;
 
 : signal-name. ( n -- )
     signal-name [ " (" ")" surround write ] when* ;

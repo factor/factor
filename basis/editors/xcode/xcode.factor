@@ -5,6 +5,6 @@ IN: editors.xcode
 SINGLETON: xcode
 xcode editor-class set-global
 
-M: xcode editor-command ( file line -- command )
+M: xcode editor-command
     drop
     [ "open" , "-a" , "XCode" , , ] { } make ;

@@ -140,7 +140,7 @@ M: browser-gadget handle-gesture
         [ [ dup vocab-link? [ lookup-vocab ] when ] dip in? ]
     } 2|| ;
 
-M: browser-gadget definitions-changed ( set browser -- )
+M: browser-gadget definitions-changed
     [ control-value swap showing-definition? ] keep
     '[ _ [ history-value ] keep set-history-value ] when ;
 

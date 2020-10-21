@@ -61,7 +61,7 @@ C: <ryba> ryba
 
 PRIVATE>
 
-M: ryba >rgba ( ryba -- rgba )
+M: ryba >rgba
     [
         [ red>> ] [ yellow>> ] [ blue>> ] tri
         [ ryb>rgb ] normalized

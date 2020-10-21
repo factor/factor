@@ -14,5 +14,5 @@ notepad editor-class set-global
         [ "notepad.exe" tail? ] find-file
     ] unless* ;
 
-M: notepad editor-command ( file line -- command )
+M: notepad editor-command
     drop [ notepad-path ] dip 2array ;

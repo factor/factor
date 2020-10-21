@@ -7,7 +7,7 @@ io.streams.memory io.encodings io specialized-arrays ;
 SPECIALIZED-ARRAY: TCHAR
 IN: environment.windows
 
-M: windows os-env ( key -- value )
+M: windows os-env
     MAX_UNICODE_PATH TCHAR <c-array>
     [ dup length GetEnvironmentVariable ] keep over 0 = [
         2drop f
@@ -15,16 +15,16 @@ M: windows os-env ( key -- value )
         nip alien>native-string
     ] if ;
 
-M: windows set-os-env ( value key -- )
+M: windows set-os-env
     swap SetEnvironmentVariable win32-error=0/f ;
 
-M: windows unset-os-env ( key -- )
+M: windows unset-os-env
     f SetEnvironmentVariable 0 = [
         GetLastError ERROR_ENVVAR_NOT_FOUND =
         [ win32-error ] unless
     ] when ;
 
-M: windows (os-envs) ( -- seq )
+M: windows (os-envs)
     GetEnvironmentStrings [
         [
             utf16n decode-input

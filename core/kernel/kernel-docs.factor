@@ -97,8 +97,6 @@ HELP: hashcode*
 { $contract "Outputs the hashcode of an object. The hashcode operation must satisfy the following properties:"
 { $list
     { "If two objects are equal under " { $link = } ", they must have equal hashcodes." }
-    { "If the hashcode of an object depends on the values of its slots, the hashcode of the slots must be computed recursively by calling " { $link hashcode* } " with a " { $snippet "level" } " parameter decremented by one. This avoids excessive work while still computing well-distributed hashcodes. The " { $link recursive-hashcode } " combinator can help with implementing this logic," }
-    { "The hashcode should be a " { $link fixnum } ", however returning a " { $link bignum } " will not cause any problems other than potential performance degradation." }
     { "The hashcode is only permitted to change between two invocations if the object or one of its slot values was mutated." }
 }
 "If mutable objects are used as hashtable keys, they must not be mutated in such a way that their hashcode changes. Doing so will violate bucket sorting invariants and result in undefined behavior. See " { $link "hashtables.keys" } " for details." } ;
@@ -106,6 +104,10 @@ HELP: hashcode*
 HELP: hashcode
 { $values { "obj" object } { "code" fixnum } }
 { $description "Computes the hashcode of an object with a default hashing depth. See " { $link hashcode* } " for the hashcode contract." } ;
+
+HELP: recursive-hashcode
+{ $values { "n" integer } { "obj" object } { "quot" { $quotation ( n obj -- code ) } } { "code" integer } }
+{ $description "A combinator used to implement methods for the " { $link hashcode* } " generic word. If " { $snippet "n" } " is less than or equal to zero, outputs 0, otherwise calls the quotation." } ;
 
 HELP: identity-hashcode
 { $values { "obj" object } { "code" fixnum } }

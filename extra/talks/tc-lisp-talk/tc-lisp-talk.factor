@@ -172,7 +172,7 @@ computer-name"
         }
     }
 
-    { $slide "Speciailzied arrays are implemented using functors"
+    { $slide "Specialized arrays are implemented using functors"
         "Like C++ templates"
         "Eliminate boilerplate in ways other abstractions don't"
         "Contains a definition section and a functor body"

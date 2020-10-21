@@ -7,7 +7,7 @@ TUPLE: gray < color { gray read-only } { alpha read-only } ;
 
 C: <gray> gray
 
-M: gray >rgba ( gray -- rgba )
+M: gray >rgba
     [ gray>> dup dup ] [ alpha>> ] bi <rgba> ; inline
 
 M: gray red>> gray>> ;

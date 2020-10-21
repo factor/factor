@@ -44,7 +44,7 @@ M: windows (mapped-file-reader)
         -rot <win32-mapped-file>
     ] with-destructors ;
 
-M: windows close-mapped-file ( mapped-file -- )
+M: windows close-mapped-file
     [
         [ handle>> &dispose drop ]
         [ address>> UnmapViewOfFile win32-error=0/f ] bi

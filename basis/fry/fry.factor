@@ -141,7 +141,7 @@ TUPLE: dredge-fry-state
 
 PRIVATE>
 
-M: callable fry ( quot -- quot' )
+M: callable fry
     [ [ [ ] ] ] [
         0 swap <dredge-fry>
         [ dredge-fry ] [

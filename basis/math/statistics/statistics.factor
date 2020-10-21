@@ -3,6 +3,7 @@
 USING: arrays assocs combinators fry generalizations grouping
 kernel locals math math.functions math.order math.vectors
 sequences sequences.private sorting ;
+FROM: math.ranges => [a,b] ;
 IN: math.statistics
 
 : power-mean ( seq p -- x )
@@ -370,3 +371,15 @@ PRIVATE>
 
 : z-score ( seq -- n )
     [ demean ] [ sample-std ] bi v/n ;
+
+: dcg ( scores -- dcg )
+    dup length 1 + 2 swap [a,b] [ log 2 log /f ] map v/ sum ;
+
+: ndcg ( scores -- ndcg )
+    [ 0.0 ] [
+        dup dcg [
+            drop 0.0
+        ] [
+            swap natural-sort <reversed> dcg /f
+        ] if-zero
+    ] if-empty ;

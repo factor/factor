@@ -29,7 +29,7 @@ C: <hsva> hsva
 
 PRIVATE>
 
-M: hsva >rgba ( hsva -- rgba )
+M: hsva >rgba
     [
         dup Hi
         {

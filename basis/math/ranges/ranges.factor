@@ -21,9 +21,9 @@ PRIVATE>
     [ sign/mod 0 < [ 1 + ] unless 0 max ] keep
     range boa ; inline
 
-M: range length ( seq -- n ) length>> ; inline
+M: range length length>> ; inline
 
-M: range nth-unsafe ( n range -- obj )
+M: range nth-unsafe
     [ step>> * ] keep from>> + ; inline
 
 ! We want M\ tuple hashcode, not M\ sequence hashcode here!

@@ -60,10 +60,10 @@ C: <remote-channel> remote-channel
 
 PRIVATE>
 
-M: remote-channel to ( value remote-channel -- )
+M: remote-channel to
     [ id>> swap to-message boa ] keep send-message drop ;
 
-M: remote-channel from ( remote-channel -- value )
+M: remote-channel from
     [ id>> from-message boa ] keep send-message ;
 
 [

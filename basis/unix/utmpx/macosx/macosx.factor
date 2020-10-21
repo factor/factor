@@ -4,7 +4,7 @@ USING: accessors calendar.unix combinators kernel system
 unix.ffi unix.utmpx ;
 IN: unix.utmpx.macosx
 
-M: macosx utmpx>utmpx-record ( utmpx -- utmpx-record )
+M: macosx utmpx>utmpx-record
     [ new-utmpx-record ] dip {
         [ ut_user>> _UTX_USERSIZE memory>string >>user ]
         [ ut_id>>   _UTX_IDSIZE memory>string >>id ]

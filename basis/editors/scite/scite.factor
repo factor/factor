@@ -21,7 +21,7 @@ M: windows find-scite-path
     } "scite.exe" find-in-applications
     [ "scite.exe" ] unless* ;
 
-M: scite editor-command ( file line -- cmd )
+M: scite editor-command
     swap
     [
         scite-path get [ find-scite-path ] unless* ,

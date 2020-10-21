@@ -89,10 +89,10 @@ PRIVATE>
 
 : <ipv4> ( host -- ipv4 ) dup check-ipv4 ipv4 boa ;
 
-M: ipv4 inet-ntop ( data addrspec -- str )
+M: ipv4 inet-ntop
     drop 4 memory>byte-array join-ipv4 ;
 
-M: ipv4 inet-pton ( str addrspec -- data )
+M: ipv4 inet-pton
     drop [ ?parse-ipv4 ] [ invalid-ipv4 ] recover ;
 
 M: ipv4 address-size drop 4 ;
@@ -109,17 +109,17 @@ M: ipv4 empty-sockaddr drop sockaddr-in <struct> ;
         swap
         port>> 0 or htons >>port ; inline
 
-M: ipv4 make-sockaddr ( inet -- sockaddr )
+M: ipv4 make-sockaddr
     [ make-sockaddr-part ]
     [ host>> "0.0.0.0" or ]
     [ inet-pton uint deref >>addr ] tri ;
 
-M: ipv4 make-sockaddr-outgoing ( inet -- sockaddr )
+M: ipv4 make-sockaddr-outgoing
     [ make-sockaddr-part ]
     [ host>> dup { f "0.0.0.0" } member? [ drop "127.0.0.1" ] when ]
     [ inet-pton uint deref >>addr ] tri ;
 
-M: ipv4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
+M: ipv4 parse-sockaddr
     [ addr>> uint <ref> ] dip inet-ntop <ipv4> ;
 
 TUPLE: inet4 < ipv4 { port maybe{ integer } read-only } ;
@@ -129,7 +129,7 @@ TUPLE: inet4 < ipv4 { port maybe{ integer } read-only } ;
 
 M: ipv4 with-port [ host>> ] dip <inet4> ;
 
-M: inet4 parse-sockaddr ( sockaddr-in addrspec -- newaddrspec )
+M: inet4 parse-sockaddr
     [ call-next-method ] [ drop port>> ntohs ] 2bi with-port ;
 
 M: inet4 present
@@ -154,7 +154,7 @@ PRIVATE>
 
 : <ipv6> ( host -- ipv6 ) dup check-ipv6 0 ipv6 boa ;
 
-M: ipv6 inet-ntop ( data addrspec -- str )
+M: ipv6 inet-ntop
     drop 16 memory>byte-array 2 <groups> [ be> >hex ] map ":" join ;
 
 <PRIVATE
@@ -164,7 +164,7 @@ M: ipv6 inet-ntop ( data addrspec -- str )
 
 PRIVATE>
 
-M: ipv6 inet-pton ( str addrspec -- data )
+M: ipv6 inet-pton
     drop [ parse-ipv6 ipv6-bytes ] [ invalid-ipv6 ] recover ;
 
 M: ipv6 address-size drop 16 ;
@@ -181,13 +181,13 @@ M: ipv6 empty-sockaddr drop sockaddr-in6 <struct> ;
         swap
         port>> 0 or htons >>port ; inline
 
-M: ipv6 make-sockaddr ( inet -- sockaddr )
+M: ipv6 make-sockaddr
     [ make-sockaddr-in6-part ]
     [ [ host>> "::" or ] keep inet-pton >>addr ]
     [ scope-id>> >>scopeid ]
     tri ;
 
-M: ipv6 make-sockaddr-outgoing ( inet -- sockaddr )
+M: ipv6 make-sockaddr-outgoing
     [ make-sockaddr-in6-part ]
     [ [ host>> dup { f "::" } member? [ drop "::1" ] when ] keep inet-pton >>addr ]
     [ scope-id>> >>scopeid ]
@@ -247,7 +247,7 @@ GENERIC: (client) ( remote -- client-in client-out local )
 
 M: array (client) [ (client) 3array ] attempt-all first3 ;
 
-M: object (client) ( remote -- client-in client-out local )
+M: object (client)
     [
         [ remote>handle ] keep
         [

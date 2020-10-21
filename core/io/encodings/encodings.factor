@@ -109,7 +109,7 @@ M: decoder stream-element-type
         over cr- dup CHAR: \n eq? [ drop (read1) ] [ nip ] if
     ] [ nip ] if ; inline
 
-M: decoder stream-read1 ( decoder -- ch )
+M: decoder stream-read1
     dup (read1) fix-cr ; inline
 
 : (read-first) ( n buf decoder -- buf stream encoding n c )
