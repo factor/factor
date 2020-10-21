@@ -58,7 +58,8 @@ auth     = (username (":" password  => [[ second ]])? "@"
                                     => [[ first2 2array ]])?
 
 url      = (((protocol "://") => [[ first ]] auth hostname)
-                    | (("//") => [[ f ]] auth hostname))?
+                    | (("//") => [[ f ]] auth hostname)
+                    | ((protocol ":") => [[ first V{ V{ f f } } swap prefix ]]))?
            (pathname)?
            ("?" query               => [[ second ]])?
            ("#" anchor              => [[ second ]])?
