@@ -59,7 +59,7 @@ auth     = (username (":" password  => [[ second ]])? "@"
 
 url      = (((protocol "://") => [[ first ]] auth hostname)
                     | (("//") => [[ f ]] auth hostname)
-                    | ((protocol ":") => [[ first V{ V{ f f } } swap prefix ]]))?
+                    | ((protocol ":") => [[ first V{ f f } V{ } 2sequence ]]))?
            (pathname)?
            ("?" query               => [[ second ]])?
            ("#" anchor              => [[ second ]])?
@@ -118,20 +118,22 @@ M: pathname >url string>> >url ;
 
 ! URL" //foo.com" takes on the protocol of the url it's derived from
 : unparse-protocol ( url -- )
-    dup protocol>> [
-        % "://" % unparse-host-part
+    protocol>> [
+        % ":" %
+    ] when* ;
+
+: unparse-authority ( url -- )
+    dup host>> [
+        "//" % unparse-host-part
     ] [
-        dup host>> [
-            "//" % unparse-host-part
-        ] [
-            drop
-        ] if
-    ] if* ;
+        drop
+    ] if ;
 
 M: url present
     [
         {
             [ unparse-protocol ]
+            [ unparse-authority ]
             [ path>> url-encode % ]
             [ query>> dup assoc-empty? [ drop ] [ "?" % assoc>query % ] if ]
             [ anchor>> [ "#" % present url-encode % ] when* ]
