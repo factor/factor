@@ -84,4 +84,11 @@ ${ { 0xabcd } >string } [ " \"\\uaBCd\" " json> ] unit-test
 [ "<!doctype html>\n<html>\n<head>\n   " json> ]
 [ not-a-json-number? ] must-fail-with
 
-{ H{ } } [ "" json> ] unit-test
+! unclosed objects and mismatched brackets are not allowed
+ [ "[\"a\",
+4
+,1," json> ] must-fail
+
+[ "[]]]" json> ]  must-fail
+
+[ "{[: \"x\"}" json> ] must-fail
