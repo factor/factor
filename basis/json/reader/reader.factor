@@ -131,7 +131,7 @@ DEFER: (read-json-string)
     V{ } clone over '[ _ stream-read1 ] [ scan ] while* nip ;
 
 
-! A properly formed JSON file should contain exactly one object with balanced brackets.
+! A properly formed JSON input should contain exactly one object with balanced brackets.
 : get-json-object ( objects  --  obj  )
     dup length 1 = counter get 0 = and [ first ] [ json-error ] if ;
 
