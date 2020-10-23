@@ -111,9 +111,9 @@ DEFER: (read-json-string)
     { object vector object } declare
     {
         { CHAR: \" [ over read-json-string suffix! ] }
-        { CHAR: [  [ counter get 1 + counter set json-open-array ] }
+        { CHAR: [  [ 1 counter +@ json-open-array ] }
         { CHAR: ,  [ v-over-push ] }
-        { CHAR: ]  [ counter get 1 - counter set json-close-array ] }
+        { CHAR: ]  [ -1 counter +@ json-close-array ] }
         { CHAR: {  [ json-open-hash ] }
         { CHAR: :  [ v-pick-push ] }
         { CHAR: }  [ json-close-hash ] }
@@ -133,21 +133,17 @@ DEFER: (read-json-string)
 
 ! A properly formed JSON file should contain exactly one object with balanced brackets.
 : get-json-object ( objects  --  obj  )
-    { 
-      { [ dup length 1 = counter get 0 = and ] [ first ] }
-       [ json-error ]
-     }
-     cond ;
-     
+    dup length 1 = counter get 0 = and [ first ] [ json-error ] if ;
+
 PRIVATE>
 
 : read-json-objects ( -- objects )
-    input-stream get 0 counter set json-read-input ;
+    input-stream get json-read-input ;
 
 GENERIC: json> ( string -- object )
 
 M: string json>
-    [ read-json-objects get-json-object ] with-string-reader ;
+    [ 0 counter [ read-json-objects get-json-object ] with-variable ] with-string-reader  ;
 
 : path>json ( path -- json )
-    utf8 [ read-json-objects get-json-object ] with-file-reader ;
+    utf8 [ 0 counter [ read-json-objects get-json-object ] with-variable ] with-file-reader ;
