@@ -143,7 +143,7 @@ PRIVATE>
 GENERIC: json> ( string -- object )
 
 M: string json>
-    [ 0 counter [ read-json-objects get-json-object ] with-variable ] with-string-reader  ;
+    [ 0 counter [ read-json-objects get-json-object ] with-variable ] with-string-reader ;
 
 : path>json ( path -- json )
     utf8 [ 0 counter [ read-json-objects get-json-object ] with-variable ] with-file-reader ;
