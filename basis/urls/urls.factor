@@ -5,7 +5,7 @@ USING: accessors arrays ascii assocs combinators fry
 io.pathnames io.sockets io.sockets.secure kernel lexer
 linked-assocs make math.parser multiline namespaces peg.ebnf
 present sequences splitting strings strings.parser urls.encoding
-vocabs.loader math ;
+vocabs.loader math math.order ;
 
 IN: urls
 
@@ -30,10 +30,10 @@ ERROR: malformed-port ;
 : parse-host ( string -- host/f port/f )
     [
         ":" split1-last [ url-decode ]
-        [ dup [ dup empty? [ drop f ] [ string>number [
-        malformed-port ] unless* dup 65535 > over 0 < or [
-        malformed-port ]
-        when ] if ] when ] bi*
+        [ [ f ]
+          [ string>number [ malformed-port ] unless*
+            dup 0 65535 between? [ malformed-port ] unless ]
+          if-empty ] bi*
     ] [ f f ] if* ;
 
 GENERIC: >url ( obj -- url )
@@ -121,16 +121,10 @@ M: pathname >url string>> >url ;
 
 ! URL" //foo.com" takes on the protocol of the url it's derived from
 : unparse-protocol ( url -- )
-    protocol>> [
-        % ":" %
-    ] when* ;
+    protocol>> [ % ":" % ] when* ;
 
 : unparse-authority ( url -- )
-    dup host>> [
-        "//" % unparse-host-part
-    ] [
-        drop
-    ] if ;
+    dup host>> [ "//" % unparse-host-part ] [ drop ] if ;
 
 M: url present
     [
