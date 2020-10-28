@@ -5,7 +5,7 @@ USING: accessors arrays ascii assocs combinators fry
 io.pathnames io.sockets io.sockets.secure kernel lexer
 linked-assocs make math.parser multiline namespaces peg.ebnf
 present sequences splitting strings strings.parser urls.encoding
-vocabs.loader ;
+vocabs.loader math ;
 
 IN: urls
 
