@@ -47,7 +47,7 @@ M: url >url ;
 EBNF: parse-url [=[
 
 protocol = [a-zA-Z0-9.+-]+          => [[ url-decode ]]
-username = [^/:@#?]+                => [[ url-decode ]]
+username = [^/:@#?]*                => [[ url-decode ]]
 password = [^/:@#?]*                => [[ url-decode ]]
 pathname = [^#?]+                   => [[ url-decode ]]
 query    = [^#]+                    => [[ query>assoc ]]
