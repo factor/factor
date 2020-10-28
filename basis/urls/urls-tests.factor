@@ -124,14 +124,6 @@ CONSTANT: urls {
     }
     {
         T{ url
-            { protocol "https" }
-            { host "www.google.com" }
-            { path "/" }
-        }
-        "https://www.google.com:/"
-    }
-    {
-        T{ url
             { protocol "http" }
             { host "example.org" }
             { path "/" }
@@ -139,6 +131,16 @@ CONSTANT: urls {
             { password "" }
         }
         "http://user:@example.org/"
+    }
+    {
+        T{ url
+            { protocol "http" }
+            { host "example.org" }
+            { path "/" }
+            { username "" }
+            { password "pass" }
+        }
+        "http://:pass@example.org/"
     }
 }
 
@@ -149,6 +151,20 @@ urls [
 urls [
     swap [ 1array ] [ [ present ] curry ] bi* unit-test
 ] assoc-each
+
+{ T{ url
+    { protocol "https" }
+    { host "www.google.com" }
+    { path "/" }
+   } }
+[ "https://www.google.com:/" >url ] unit-test
+
+{ "https://www.google.com/" } 
+[ T{ url
+    { protocol "https" }
+    { host "www.google.com" }
+    { path "/" }
+} present ] unit-test
 
 { "b" } [ "a" "b" url-append-path ] unit-test
 
