@@ -1,9 +1,13 @@
 ! Copyright (C) 2020 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: ascii byte-arrays combinators kernel literals locals math
-math.order sbufs sequences sequences.extras sets sorting
-splitting ;
+USING: accessors arrays ascii assocs byte-arrays combinators
+io.encodings.string io.encodings.utf8 kernel lexer literals
+locals make math math.order math.parser multiline namespaces
+peg.ebnf present prettyprint.backend prettyprint.custom
+prettyprint.sections regexp sbufs sequences sequences.extras
+sets sorting splitting strings strings.parser urls urls.encoding
+urls.encoding.private urls.private ;
 
 IN: punycode
 
@@ -162,3 +166,121 @@ PRIVATE>
             >punycode "xn--" prepend
         ] unless
     ] map "." join ;
+
+TUPLE: irl < url ;
+
+: <irl> ( -- irl ) irl new ;
+
+GENERIC: >irl ( obj -- irl )
+
+M: f >irl drop <irl> ;
+
+<PRIVATE
+
+: irl-decode ( str -- str' )
+    "" like R/ (%[a-fA-F0-9]{2})+/ [ url-decode ] re-replace-with ;
+
+! RFC 3987
+EBNF: parse-irl [=[
+
+protocol = [a-zA-Z0-9.+-]+          => [[ irl-decode ]]
+username = [^/:@#?]+                => [[ irl-decode ]]
+password = [^/:@#?]+                => [[ irl-decode ]]
+pathname = [^#?]+                   => [[ irl-decode ]]
+query    = [^#]+                    => [[ query>assoc ]]
+anchor   = .+                       => [[ irl-decode ]]
+
+hostname = [^/#?]+                  => [[ irl-decode ]]
+
+hostname-spec = hostname ("/"|!(.)) => [[ first ]]
+
+auth     = (username (":" password  => [[ second ]])? "@"
+                                    => [[ first2 2array ]])?
+
+url      = (((protocol "://") => [[ first ]] auth hostname)
+                    | (("//") => [[ f ]] auth hostname))?
+           (pathname)?
+           ("?" query               => [[ second ]])?
+           ("#" anchor              => [[ second ]])?
+
+]=]
+
+: unparse-ihost-part ( url -- )
+    {
+        [ unparse-username-password ]
+        [ host>> % ]
+        [ url-port [ ":" % # ] when* ]
+        [ path>> "/" head? [ "/" % ] unless ]
+    } cleave ;
+
+: unparse-iauthority ( url -- )
+    dup host>> [ "//" % unparse-ihost-part ] [ drop ] if ;
+
+M: irl present
+    [
+        {
+            [ unparse-protocol ]
+            [ unparse-iauthority ]
+            [ path>> % ]
+            [ query>> dup assoc-empty? [ drop ] [ "?" % assoc>query % ] if ]
+            [ anchor>> [ "#" % present % ] when* ]
+        } cleave
+    ] "" make ;
+
+: parse-ihost ( string -- host/f port/f )
+    [
+        ":" split1-last [ irl-decode ] [
+            [ f ] [ string>number [ malformed-port ] unless* ] if-empty
+        ] bi*
+    ] [ f f ] if* ;
+
+PRIVATE>
+
+M: string >irl
+    [ <irl> ] dip
+    parse-irl {
+        [
+            first [
+                [ first >lower >>protocol ]
+                [
+                    second
+                    [ first [ first2 [ >>username ] [ >>password ] bi* ] when* ]
+                    [ second parse-ihost [ >>host ] [ >>port ] bi* ] bi
+                ] bi
+            ] when*
+        ]
+        [ second >>path ]
+        [ third >>query ]
+        [ fourth >>anchor ]
+    } cleave
+    dup host>> [ [ "/" or ] change-path ] when ;
+
+M: irl >url
+    [ <url> ] dip {
+        [ protocol>> >>protocol ]
+        [ username>> >>username ]
+        [ password>> >>password ]
+        [ host>> [ >idna url-encode ] [ f ] if* >>host ]
+        [ port>> >>port ]
+        [ path>> [ url-encode ] [ f ] if* >>path ]
+        [ query>> [ url-encode ] [ f ] if* >>query ]
+        [ anchor>> [ url-encode ] [ f ] if* >>anchor ]
+    } cleave ;
+
+M: url >irl
+    [ <irl> ] dip {
+        [ protocol>> >>protocol ]
+        [ username>> >>username ]
+        [ password>> >>password ]
+        [ host>> [ url-decode idna> ] [ f ] if* >>host ]
+        [ port>> >>port ]
+        [ path>> [ url-decode ] [ f ] if* >>path ]
+        [ query>> [ url-decode ] [ f ] if* >>query ]
+        [ anchor>> [ url-decode ] [ f ] if* >>anchor ]
+    } cleave ;
+
+SYNTAX: IRL" lexer get skip-blank parse-string >irl suffix! ;
+
+M: irl pprint*
+    \ IRL" record-vocab
+    dup present "IRL\" " "\"" pprint-string ;
