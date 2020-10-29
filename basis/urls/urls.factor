@@ -30,10 +30,10 @@ ERROR: malformed-port ;
 : parse-host ( string -- host/f port/f )
     [
         ":" split1-last [ url-decode ]
-        [ [ f ]
-          [ string>number [ malformed-port ] unless*
-            dup 0 65535 between? [ malformed-port ] unless ]
-          if-empty ] bi*
+        [ [ f ] 
+          [ string>number [ malformed-port ] unless* ]
+          if-empty 
+        ] bi*
     ] [ f f ] if* ;
 
 GENERIC: >url ( obj -- url )
