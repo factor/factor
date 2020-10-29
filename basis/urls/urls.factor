@@ -5,7 +5,7 @@ USING: accessors arrays ascii assocs combinators fry
 io.pathnames io.sockets io.sockets.secure kernel lexer
 linked-assocs make math.parser multiline namespaces peg.ebnf
 present sequences splitting strings strings.parser urls.encoding
-vocabs.loader ;
+vocabs.loader math math.order ;
 
 IN: urls
 
@@ -30,7 +30,10 @@ ERROR: malformed-port ;
 : parse-host ( string -- host/f port/f )
     [
         ":" split1-last [ url-decode ]
-        [ dup [ string>number [ malformed-port ] unless* ] when ] bi*
+        [ [ f ] 
+          [ string>number [ malformed-port ] unless* ]
+          if-empty 
+        ] bi*
     ] [ f f ] if* ;
 
 GENERIC: >url ( obj -- url )
@@ -44,8 +47,8 @@ M: url >url ;
 EBNF: parse-url [=[
 
 protocol = [a-zA-Z0-9.+-]+          => [[ url-decode ]]
-username = [^/:@#?]+                => [[ url-decode ]]
-password = [^/:@#?]+                => [[ url-decode ]]
+username = [^/:@#?]*                => [[ url-decode ]]
+password = [^/:@#?]*                => [[ url-decode ]]
 pathname = [^#?]+                   => [[ url-decode ]]
 query    = [^#]+                    => [[ query>assoc ]]
 anchor   = .+                       => [[ url-decode ]]
@@ -58,7 +61,8 @@ auth     = (username (":" password  => [[ second ]])? "@"
                                     => [[ first2 2array ]])?
 
 url      = (((protocol "://") => [[ first ]] auth hostname)
-                    | (("//") => [[ f ]] auth hostname))?
+                    | (("//") => [[ f ]] auth hostname)
+                    | ((protocol ":") => [[ first V{ f f } V{ } 2sequence ]]))?
            (pathname)?
            ("?" query               => [[ second ]])?
            ("#" anchor              => [[ second ]])?
@@ -117,20 +121,16 @@ M: pathname >url string>> >url ;
 
 ! URL" //foo.com" takes on the protocol of the url it's derived from
 : unparse-protocol ( url -- )
-    dup protocol>> [
-        % "://" % unparse-host-part
-    ] [
-        dup host>> [
-            "//" % unparse-host-part
-        ] [
-            drop
-        ] if
-    ] if* ;
+    protocol>> [ % ":" % ] when* ;
+
+: unparse-authority ( url -- )
+    dup host>> [ "//" % unparse-host-part ] [ drop ] if ;
 
 M: url present
     [
         {
             [ unparse-protocol ]
+            [ unparse-authority ]
             [ path>> url-encode % ]
             [ query>> dup assoc-empty? [ drop ] [ "?" % assoc>query % ] if ]
             [ anchor>> [ "#" % present url-encode % ] when* ]
