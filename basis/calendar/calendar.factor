@@ -396,26 +396,46 @@ M: timestamp days-in-year year>> days-in-year ;
 : day-of-year ( timestamp -- n )
     >date< (day-of-year) ;
 
+: midnight! ( timestamp -- new-timestamp )
+    0 >>hour 0 >>minute 0 >>second ; inline
+
 : midnight ( timestamp -- new-timestamp )
-    clone 0 >>hour 0 >>minute 0 >>second ; inline
+    clone midnight! ; inline
 
 : noon ( timestamp -- new-timestamp )
     midnight 12 >>hour ; inline
 
 : today ( -- timestamp )
-    now midnight ; inline
+    now midnight! ; inline
 
 : tomorrow ( -- timestamp )
-    1 days hence midnight ; inline
+    1 days hence midnight! ; inline
 
 : yesterday ( -- timestamp )
-    1 days ago midnight ; inline
+    1 days ago midnight! ; inline
+
+GENERIC: beginning-of-day ( object -- new-timestamp )
+M: timestamp beginning-of-day midnight ;
+
+: end-of-day! ( timestamp -- timestamp )
+    23 >>hour 59 >>minute 59+999/1000 >>second ;
+
+GENERIC: end-of-day ( object -- new-timestamp )
+M: timestamp end-of-day clone end-of-day! ;
 
 : beginning-of-month ( timestamp -- new-timestamp )
     midnight 1 >>day ; inline
 
 : end-of-month ( timestamp -- new-timestamp )
-    [ midnight ] [ days-in-month ] bi >>day ;
+    [ end-of-day ] [ days-in-month ] bi >>day ;
+
+GENERIC: beginning-of-year ( object -- new-timestamp )
+M: timestamp beginning-of-year beginning-of-month 1 >>month ;
+M: integer beginning-of-year <year> ;
+
+GENERIC: end-of-year ( object -- new-timestamp )
+M: timestamp end-of-year end-of-day 12 >>month 31 >>day ;
+M: integer end-of-year 12 31 <date> end-of-day! ;
 
 <PRIVATE
 
@@ -474,6 +494,19 @@ M: timestamp october clone 10 >>month ;
 M: timestamp november clone 11 >>month ;
 M: timestamp december clone 12 >>month ;
 
+: <january> ( year day -- timestamp ) 1 swap <date> ; inline
+: <february> ( year day -- timestamp ) 2 swap <date> ; inline
+: <march> ( year day -- timestamp ) 3 swap <date> ; inline
+: <april> ( year day -- timestamp ) 4 swap <date> ; inline
+: <may> ( year day -- timestamp ) 5 swap <date> ; inline
+: <june> ( year day -- timestamp ) 6 swap <date> ; inline
+: <july> ( year day -- timestamp ) 7 swap <date> ; inline
+: <august> ( year day -- timestamp ) 8 swap <date> ; inline
+: <september> ( year day -- timestamp ) 9 swap <date> ; inline
+: <october> ( year day -- timestamp ) 10 swap <date> ; inline
+: <november> ( year day -- timestamp ) 11 swap <date> ; inline
+: <december> ( year day -- timestamp ) 12 swap <date> ; inline
+
 : sunday ( timestamp -- new-timestamp ) 0 day-this-week ;
 : monday ( timestamp -- new-timestamp ) 1 day-this-week ;
 : tuesday ( timestamp -- new-timestamp ) 2 day-this-week ;
@@ -518,14 +551,6 @@ M: timestamp december clone 12 >>month ;
 : pm ( timestamp n -- new-timestamp )
     0 12 [a,b] check-interval 12 + o'clock ;
 
-GENERIC: beginning-of-year ( object -- new-timestamp )
-M: timestamp beginning-of-year beginning-of-month 1 >>month ;
-M: integer beginning-of-year <year> ;
-
-GENERIC: end-of-year ( object -- new-timestamp )
-M: timestamp end-of-year 12 >>month 31 >>day ;
-M: integer end-of-year 12 31 <date> ;
-
 : time-since-midnight ( timestamp -- duration )
     dup midnight time- ; inline
 
@@ -547,6 +572,16 @@ M: integer end-of-year 12 31 <date> ;
         { 53 [ year>> 1 + <year> (week-number) 1 = 1 53 ? ] }
         [ nip ]
     } case ;
+
+: quarter ( timestamp -- [1,4] )
+    month>> 3 /mod [ drop 1 + ] unless-zero ; inline
+
+GENERIC: weeks-in-week-year ( obj -- n )
+M: integer weeks-in-week-year
+    { [ 1 1 <date> thursday? ] [ 12 31 <date> thursday? ] } 1|| 53 52 ? ;
+
+M: timestamp weeks-in-week-year
+    { [ january 1 >>day thursday? ] [ december 31 >>day thursday? ] } 1|| 53 52 ? ;
 
 {
     { [ os unix? ] [ "calendar.unix" ] }

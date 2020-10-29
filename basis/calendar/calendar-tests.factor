@@ -200,3 +200,17 @@ IN: calendar
 { 16 } [ 2019 4 17 <date> week-number ] unit-test
 
 { 53 } [ 2021 1 1 <date> week-number ] unit-test
+
+{ 53 } [ 2004 weeks-in-week-year ] unit-test
+{ 52 } [ 2013 weeks-in-week-year ] unit-test
+
+{ f } [ now dup beginning-of-day eq? ] unit-test
+{ f } [ now dup end-of-day eq? ] unit-test
+{ t } [ now dup end-of-day! eq? ] unit-test
+{ f } [ now dup beginning-of-month eq? ] unit-test
+{ f } [ now dup end-of-month eq? ] unit-test
+{ f } [ now dup beginning-of-year eq? ] unit-test
+{ f } [ now dup end-of-year eq? ] unit-test
+
+{ f } [ now dup midnight eq? ] unit-test
+{ t } [ now dup midnight! eq? ] unit-test
