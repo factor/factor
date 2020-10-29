@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar.english combinators
 combinators.smart io.encodings.utf8 io.files kernel math.parser
-memoize namespaces sequences splitting unicode ;
+memoize namespaces sequences sorting splitting unicode ;
 IN: zoneinfo
 
 CONSTANT: zoneinfo-paths
@@ -15,8 +15,10 @@ CONSTANT: zoneinfo-paths
     "vocab:zoneinfo/northamerica"
     "vocab:zoneinfo/pacificnew"
     "vocab:zoneinfo/southamerica"
-    "vocab:zoneinfo/systemv"
+    "vocab:zoneinfo/etcetera"
+    "vocab:zoneinfo/factory"
     "vocab:zoneinfo/leapseconds"
+    "vocab:zoneinfo/systemv"
 }
 
 SYMBOL: last-zone
@@ -119,6 +121,11 @@ MEMO: zoneinfo-array ( -- seq )
 
 : raw-zone-map ( -- assoc )
     zoneinfo-array [ raw-zone? ] filter [ name>> ] collect-by ;
+
+: zoneinfo-zones ( -- seq )
+    raw-zone-map keys
+    [ "/" swap subseq? ] partition
+    [ natural-sort ] bi@ append ;
 
 GENERIC: zone-matches? ( string rule -- ? )
 
