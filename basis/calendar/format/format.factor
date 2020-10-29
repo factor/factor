@@ -159,6 +159,25 @@ M: timestamp year.
 : timestamp>rfc3339 ( timestamp -- str )
     [ (timestamp>rfc3339) ] with-string-writer ;
 
+: (write-rfc2822-gmt-offset) ( duration -- )
+    [ hh ":" write ] [ mm ] bi ;
+
+: write-rfc2822-gmt-offset ( duration -- )
+    dup instant <=> {
+        { +lt+ [ "-" write before (write-rfc2822-gmt-offset) ] }
+        { +gt+ [ "+" write (write-rfc2822-gmt-offset) ] }
+        { +eq+ [ "+" write (write-rfc2822-gmt-offset) ] }
+    } case ;
+
+: (timestamp>rfc2822) ( timestamp -- )
+    {
+        DAY ", " DD " " MONTH " " YYYY " " hh ":" mm ":" ss " "
+        [ gmt-offset>> write-rfc2822-gmt-offset ]
+    } formatted ;
+
+: timestamp>rfc2822 ( timestamp -- str )
+    [ (timestamp>rfc2822) ] with-string-writer ;
+
 : (timestamp>ymd) ( timestamp -- )
     { YYYY "-" MM "-" DD } formatted ;
 
