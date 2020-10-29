@@ -33,12 +33,41 @@
 # assumes rules from other files.  In the tz distribution, use
 # 'make PACKRATDATA=backzone zones' to compile and install this file.
 
+
+# From Paul Eggert (2020-04-15):
+# The following remarks should be incorporated into this table sometime.
+# Patches in 'git format-patch' format would be welcome.
+#
+# From Phake Nick (2020-04-15):
+# ... the historical timezone data for those China zones seems to be
+# incorrect.  The transition to GMT+8 date given there for these zones
+# were 1980 which also contradict the file description that they do
+# not disagree with normal zone after 1970.  According to sources that
+# have also been cited in the asia file, except Xinjiang and Tibet,
+# they should have adopted the Beijing Time from around 1949/1950
+# depends on exactly when each of those cities were taken over by the
+# communist army.  And they should also follow the DST setting of
+# Asia/Shanghai after that point of time.  In addition,
+# http://gaz.ncl.edu.tw/detail.jsp?sysid=E1091792 the document from
+# Chongqing Nationalist government say in year 1945 all of China
+# should adopt summer time due to the war (not sure whether it
+# continued after WWII ends)(Probably only enforced in area under
+# their rule at the time?)  The Asia/Harbin's 1932 and 1940 entry
+# should also be incorrect.  As per sources recorded at
+# https://wiki.suikawiki.org/n/%E6%BA%80%E5%B7%9E%E5%9B%BD%E3%81%AE%E6%A8%99%E6%BA%96%E6%99%82
+# , in 1932 Harbin should have adopted UTC+8:00 instead of data
+# currently listed in the tz database according to official
+# announcement from Manchuko.  And they should have adopted GMT+9 in
+# 1937 January 1st according to official announcement at the time
+# being cited on the webpage.
+
+
 # Zones are sorted by zone name.  Each zone is preceded by the
 # name of the country that the zone is in, along with any other
 # commentary and rules associated with the entry.
 #
 # As explained in the zic man page, the zone columns are:
-# Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
+# Zone	NAME		STDOFF	RULES	FORMAT	[UNTIL]
 
 # Ethiopia
 # From Paul Eggert (2014-07-31):
@@ -121,7 +150,7 @@ Zone	Africa/Douala	0:38:48	-	LMT	1912
 # Whitman gives Mar 31 - Aug 31 for 1931 on.
 # The International Hydrographic Bulletin, 1932-33, p 63 says that
 # Sierra Leone would advance its clocks by 20 minutes on 1933-10-01.
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	SL	1935	1942	-	Jun	 1	0:00	0:40	-0020
 Rule	SL	1935	1942	-	Oct	 1	0:00	0	-01
 Rule	SL	1957	1962	-	Jun	 1	0:00	1:00	+01
@@ -204,7 +233,7 @@ Zone	Africa/Maseru	1:50:00 -	LMT	1903 Mar
 			2:00	1:00	SAST	1944 Mar 19  2:00
 			2:00	-	SAST
 
-# Swaziland
+# Eswatini (formerly Swaziland)
 Zone	Africa/Mbabane	2:04:24 -	LMT	1903 Mar
 			2:00	-	SAST
 
@@ -322,7 +351,7 @@ Zone America/Guadeloupe	-4:06:08 -	LMT	1911 Jun  8 # Pointe-à-Pitre
 # Pottenger data.  The post-1970 entries have been corrected, but the
 # pre-1970 entries are unchecked and probably have errors.
 #
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
+# Rule	NAME	FROM	TO	-	IN	ON	AT	SAVE	LETTER/S
 Rule	Mont	1917	only	-	Mar	25	2:00	1:00	D
 Rule	Mont	1917	only	-	Apr	24	0:00	0	S
 Rule	Mont	1919	only	-	Mar	31	2:30	1:00	D
@@ -430,7 +459,34 @@ Zone	Asia/Aden	2:59:54	-	LMT	1950
 			3:00	-	+03
 
 # Bahrain
-Zone	Asia/Bahrain	3:22:20 -	LMT	1920     # Manamah
+#
+# From Paul Eggert (2020-07-23):
+# Most of this data comes from:
+# Stewart A. Why Gulf Standard Time is far from standard: the fascinating story
+# behind the time zone's invention. The National (Abu Dhabi). 2020-07-22.
+# https://www.thenational.ae/arts-culture/why-gulf-standard-time-is-far-from-standard-the-fascinating-story-behind-the-time-zone-s-invention-1.1052589
+# Stewart writes that before 1941 some companies in Bahrain were at +0330 and
+# others at +0323.  Reginald George Alban, a British political agent based in
+# Manama, worked to standardize this, and from 1941-07-20 Bahrain was at
+# +0330.  However, BOAC asked that clocks be moved to gain more light at day's
+# end, so Bahrain switched to +04 on 1944-01-01.
+#
+# Re the 1941 transition, Stewart privately sent me this citation:
+# "File 16/53 Enquiries Re: Calculation of Local Time", British Library: India
+# Office Records and Private Papers, IOR/R/15/2/1564, in Qatar Digital Library
+# https://www.qdl.qa/archive/81055/vdc_100000000282.0x00012b
+# It says there was no real standard in Bahrain before 1941-07-20.
+# +0330 was used by steamers of the British India Co, by Petroleum Concessions
+# and by Cable & Wireless; +0323 was used by the Eastern Bank Ltd, BOAC, and
+# Bahrein Petroleum (Bapco), and California Arabian Standard Oil Co (Casoc)
+# adopted DST effective 1941-05-24.  Alban suggested adopting DST, R.B. Coomb
+# of C&W countersuggested +0330, and although C.A. Rodstrom of Casoc (formerly
+# of Bapco) stated that Bahrain had formerly used +0330 before Bapco arrived
+# but Bapco switched to +0323 because of "constant confusion", the consensus
+# was +0330.  The government adopted +0330 in 1941-07-20 and companies seem to
+# have switched by 08-01.  No time of day was given for the 1940s transitions.
+Zone	Asia/Bahrain	3:22:20 -	LMT	1941 Jul 20  # Manamah
+			3:30	-	+0330	1944 Jan  1
 			4:00	-	+04	1972 Jun
 			3:00	-	+03
 
@@ -507,19 +563,35 @@ Zone	Asia/Muscat	3:54:24 -	LMT	1920
 #Zone	Asia/Panaji	[not enough info to complete]
 
 # Cambodia
-# From Paul Eggert (2014-10-11):
-# See Asia/Ho_Chi_Minh for the source for most of this data.  Also, guess
-# (1) Cambodia reverted to UT +07 on 1945-09-02, when Vietnam did, and
-# (2) they also reverted to +07 on 1953-11-09, the date of independence.
-# These guesses are probably wrong but they're better than guessing no
-# transitions there.
+
+# From an adoptive daughter of the late Cambodian ruler Prince Sihanouk,
+# via Alois Treindl (2019-08-08):
+#
+# King Sihanouk said that, during the Japanese occupation, starting with
+# what historians refer to as "le coup de force du 9 mars 1945", Cambodia,
+# like the entire French Indochina, used Tokyo time zone. After Japan
+# surrendered, 2 September 1945, Cambodia fell under French rule again and
+# adopted Hanoi time zone again.
+#
+# However, on 7 January 1946, Sihanouk and Tioulong managed to obtain a
+# status of "internal autonomy" from the government of Charles de Gaulle.
+# Although many fields remained under the administration of the French
+# (customs, taxes, justice, defence, foreign affairs, etc.), the Cambodian
+# administration was responsible for religious matters and traditional
+# celebrations, which included our calendar and time.  The time zone was GMT
+# + 7 and _no_ DST was applied.
+#
+# After Sihanouk and Tioulong achieved full independence, on 9 November 1953,
+# GMT + 7 was maintained.
+
+# From Paul Eggert (2019-08-26):
+# See Asia/Ho_Chi_Minh for the source for most of rest of this data.
+
 Zone	Asia/Phnom_Penh	6:59:40 -	LMT	1906 Jul  1
 			7:06:30	-	PLMT	1911 May  1
 			7:00	-	+07	1942 Dec 31 23:00
 			8:00	-	+08	1945 Mar 14 23:00
 			9:00	-	+09	1945 Sep  2
-			7:00	-	+07	1947 Apr  1
-			8:00	-	+08	1953 Nov  9
 			7:00	-	+07
 
 # Israel
@@ -625,7 +697,7 @@ Zone	Europe/Sarajevo	1:13:40	-	LMT	1884
 			1:00	-	CET	1982 Nov 27
 			1:00	EU	CE%sT
 
-# Macedonia
+# North Macedonia
 Zone	Europe/Skopje	1:25:44	-	LMT	1884
 			1:00	-	CET	1941 Apr 18 23:00
 			1:00	C-Eur	CE%sT	1945 May  8  2:00s
@@ -646,7 +718,7 @@ Zone	Europe/Tiraspol	1:58:32	-	LMT	1880
 
 # Liechtenstein
 Zone	Europe/Vaduz	0:38:04 -	LMT	1894 Jun
-			1:00	-	CET	1981
+			1:00	Swiss	CE%sT	1981
 			1:00	EU	CE%sT
 
 # Croatia
