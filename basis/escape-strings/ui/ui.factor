@@ -1,7 +1,8 @@
 ! Copyright (C) 2019 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors documents escape-strings kernel locals models
-ui ui.gadgets ui.gadgets.editors ui.gadgets.labeled
+USING: accessors checksums checksums.sha documents
+escape-strings kernel locals math.parser models sequences ui
+ui.gadgets ui.gadgets.editors ui.gadgets.labeled
 ui.gadgets.scrollers ui.gadgets.tracks ;
 IN: escape-strings.ui
 
@@ -24,6 +25,17 @@ M: escape-string-editor model-changed
         [ quot>> call( str -- str' ) ] [ set-editor-string ] bi
     ] [ call-next-method ] if ;
 
+: cake ( string delim -- string' )
+    dup surround ; inline
+
+: containerize ( string tag opeb-delim close-delim -- string' )
+    overd [ cake ] 2bi@ surround ;
+
+: checksum-escape-string ( string checksum -- string' )
+    [ drop ]
+    [ checksum-bytes bytes>hex-string ] 2bi
+    "[" "]" containerize ;
+
 :: <escape-string-ui> ( -- gadget )
     vertical <track>
         1 >>fill
@@ -31,15 +43,19 @@ M: escape-string-editor model-changed
 
     <source-editor> dup model>> :> source-model
     <scroller> "Plain Text" <labeled-gadget>
-        1/3 track-add
+        1/4 track-add
 
     source-model [ number-escape-string ] <escape-string-editor>
     <scroller> "Number Escape" <labeled-gadget>
-        1/3 track-add
+        1/4 track-add
 
     source-model [ escape-string ] <escape-string-editor>
-    <scroller> "Lua Escape" <labeled-gadget>
-        1/3 track-add ;
+    <scroller> "Escape" <labeled-gadget>
+        1/4 track-add
+
+    source-model [ sha-256 checksum-escape-string ] <escape-string-editor>
+    <scroller> "SHA256 Escape" <labeled-gadget>
+        1/4 track-add ;
 
 MAIN-WINDOW: escape-string-ui
     {
