@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar.english combinators
 combinators.smart io.encodings.utf8 io.files kernel math.parser
-memoize namespaces sequences sorting splitting unicode ;
+memoize namespaces sequences sequences.extras sorting splitting
+unicode ;
 IN: zoneinfo
 
 CONSTANT: zoneinfo-paths
@@ -40,19 +41,18 @@ TUPLE: rule name from to at-time ;
 
 : parse-rule ( seq -- rule )
     [
-        {
-            [ drop ]
-            [ ]
-            [ ]
-            [ ]
-            [ ]
-            [ ]
-            [ ]
-            [ ]
-            [ ]
-            [ ]
-        } spread
+        { [ drop ] [ ] [ ] [ ] [ ] [ ] [ ] [ ] [ ] [ ] } spread
     ] input<sequence raw-rule boa ;
+
+: parse-link ( seq -- link )
+    [
+        { [ drop ] [ ] [ ] } spread
+    ] input<sequence raw-link boa ;
+
+: parse-leap ( seq -- link )
+    [
+        { [ drop ] [ ] [ ] [ ] [ ] [ ] [ ] } spread
+    ] input<sequence raw-leap boa ;
 
 : parse-zone ( seq -- zone )
     {
@@ -72,35 +72,13 @@ TUPLE: rule name from to at-time ;
         [ 3 tail harvest ]
     } cleave raw-zone boa ;
 
-: parse-link ( seq -- link )
-    [
-        {
-            [ drop ]
-            [ ]
-            [ ]
-        } spread
-    ] input<sequence raw-link boa ;
-
-: parse-leap ( seq -- link )
-    [
-        {
-            [ drop ]
-            [ ]
-            [ ]
-            [ ]
-            [ ]
-            [ ]
-            [ ]
-        } spread
-    ] input<sequence raw-leap boa ;
-
 : parse-line ( seq -- tuple )
     dup first >lower
     {
-        { "zone" [ parse-zone dup last-zone set ] }
         { "rule" [ parse-rule ] }
         { "link" [ parse-link ] }
         { "leap" [ parse-leap ] }
+        { "zone" [ parse-zone dup last-zone set ] }
         [ drop harvest parse-partial-zone ]
     } case ;
 
@@ -130,9 +108,9 @@ MEMO: zoneinfo-array ( -- seq )
 GENERIC: zone-matches? ( string rule -- ? )
 
 M: raw-rule zone-matches? name>> = ;
-M: raw-zone zone-matches? name>> = ;
 M: raw-link zone-matches? from>> = ;
 M: raw-leap zone-matches? 2drop f ;
+M: raw-zone zone-matches? name>> = ;
 
 : find-rules ( string -- rules )
     raw-rule-map
@@ -140,12 +118,20 @@ M: raw-leap zone-matches? 2drop f ;
 
 ERROR: zone-not-found name ;
 
-: find-zone ( string -- rules )
+: find-zone ( string -- zone )
     raw-zone-map
     [ last ] assoc-map ?at [ zone-not-found ] unless ;
 
 : find-zone-rules ( string -- zone rules )
     find-zone dup rules/save>> find-rules ;
+
+: zone-abbrevs ( -- assoc )
+    zoneinfo-zones [
+        find-zone-rules [ format>> ] dip
+        [
+            letters>> swap "%" split1 dup [ 1 tail ] when surround
+        ] with V{ } map-as
+    ] map-zip ;
 
 : number>value ( n -- n' )
     {
@@ -171,31 +157,3 @@ ERROR: zone-not-found name ;
         [ in>> month-abbreviation-index ]
         [ on>> on>value ]
     } cleave>array ;
-
-! "Europe/Helsinki" find-zone-rules
-
-! Rule
-! name - string
-! from - year or "min"
-! name    "France"
-! from    "1938"  or "min"
-! to      "1945" or "max" or "only"
-! type    "-"  always "-"
-! in      "Mar"  -- 3-letter month name
-! on      "26"  or "Mon>=15"  or lastSun lastFri
-! at      "23:00s"  "12:13:00s" "1:00s" "1:00u"
-! save    "-0:00:05" "1:00" "0:14:15"
-! letters "S" or "-" or "AMT" "BDST"
-
-! Zone
-! name       "Indian/Maldives"
-! gmt-offset "4:54:00" "9:55:56" "-9:55:56"
-! rules/save "-" "0:20" "0:30" "1:00" "AN" "W-Eur" "Winn" "Zion" "sol87" "sol88"
-! format     "LMT" "%s" "%sT" "A%sT" "AC%sT" "ACT"
-! until      { "1880" }
-    ! { "1847" "Dec" "1" "0:00s" }
-    ! { "1883" "Nov" "18" "12:12:57" }
-    ! { "1989" "Sep" "lastSun" "2:00s" }
-
-! Link
-! T{ link { from "Asia/Riyadh88" } { to "Mideast/Riyadh88" } }
