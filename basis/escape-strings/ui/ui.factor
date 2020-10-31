@@ -28,7 +28,7 @@ M: escape-string-editor model-changed
 : cake ( string delim -- string' )
     dup surround ; inline
 
-: containerize ( string tag opeb-delim close-delim -- string' )
+: containerize ( string tag open-delim close-delim -- string' )
     overd [ cake ] 2bi@ surround ;
 
 : checksum-escape-string ( string checksum -- string' )
