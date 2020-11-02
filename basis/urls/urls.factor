@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays ascii assocs combinators fry
-io.pathnames io.sockets io.sockets.secure kernel lexer
-linked-assocs make math.parser multiline namespaces peg.ebnf
-present sequences splitting strings strings.parser urls.encoding
-vocabs.loader math math.order ;
+USING: accessors ascii assocs combinators fry io.pathnames
+io.sockets io.sockets.secure kernel lexer linked-assocs make
+math.parser multiline namespaces peg.ebnf present sequences
+sequences.generalizations splitting strings strings.parser
+urls.encoding vocabs.loader ;
 
 IN: urls
 
@@ -27,13 +27,12 @@ TUPLE: url protocol username password host port path query anchor ;
 
 ERROR: malformed-port ;
 
+: parse-port ( string -- port/f )
+    [ f ] [ string>number [ malformed-port ] unless* ] if-empty ;
+
 : parse-host ( string -- host/f port/f )
     [
-        ":" split1-last [ url-decode ]
-        [ [ f ] 
-          [ string>number [ malformed-port ] unless* ]
-          if-empty 
-        ] bi*
+        ":" split1-last [ url-decode ] [ parse-port ] bi*
     ] [ f f ] if* ;
 
 GENERIC: >url ( obj -- url )
@@ -46,49 +45,41 @@ M: url >url ;
 
 EBNF: parse-url [=[
 
-protocol = [a-zA-Z0-9.+-]+          => [[ url-decode ]]
-username = [^/:@#?]*                => [[ url-decode ]]
-password = [^/:@#?]*                => [[ url-decode ]]
-pathname = [^#?]+                   => [[ url-decode ]]
-query    = [^#]+                    => [[ query>assoc ]]
-anchor   = .+                       => [[ url-decode ]]
+protocol = [a-zA-Z0-9.+-]+ => [[ url-decode ]]
+username = [^/:@#?]*       => [[ url-decode ]]
+password = [^/:@#?]*       => [[ url-decode ]]
+path     = [^#?]+          => [[ url-decode ]]
+query    = [^#]+           => [[ query>assoc ]]
+anchor   = .+              => [[ url-decode ]]
+hostname = [^/#?:]+        => [[ url-decode ]]
+port     = [^/#?]+         => [[ url-decode parse-port ]]
 
-hostname = [^/#?]+                  => [[ url-decode ]]
+auth     = username (":"~ password?)? "@"~
+host     = hostname (":"~ port?)?
 
-hostname-spec = hostname ("/"|!(.)) => [[ first ]]
-
-auth     = (username (":" password  => [[ second ]])? "@"
-                                    => [[ first2 2array ]])?
-
-url      = (((protocol "://") => [[ first ]] auth hostname)
-                    | (("//") => [[ f ]] auth hostname)
-                    | ((protocol ":") => [[ first V{ f f } V{ } 2sequence ]]))?
-           (pathname)?
-           ("?" query               => [[ second ]])?
-           ("#" anchor              => [[ second ]])?
+url      = (protocol ":"~)?
+           ("//"~ auth? host?)?
+           path?
+           ("?"~ query)?
+           ("#"~ anchor)?
 
 ]=]
 
 PRIVATE>
 
 M: string >url
-    [ <url> ] dip
-    parse-url {
+    [ <url> ] dip parse-url 5 firstn {
+        [ >lower >>protocol ]
         [
-            first [
-                [ first >lower >>protocol ]
-                [
-                    second
-                    [ first [ first2 [ >>username ] [ >>password ] bi* ] when* ]
-                    [ second parse-host [ >>host ] [ >>port ] bi* ] bi
-                ] bi
+            [
+                [ first [ first2 [ >>username ] [ >>password ] bi* ] when* ]
+                [ second [ first2 [ >>host ] [ >>port ] bi* ] when* ] bi
             ] when*
         ]
-        [ second >>path ]
-        [ third >>query ]
-        [ fourth >>anchor ]
-    } cleave
-    dup host>> [ [ "/" or ] change-path ] when ;
+        [ >>path ]
+        [ >>query ]
+        [ >>anchor ]
+    } spread dup host>> [ [ "/" or ] change-path ] when ;
 
 M: pathname >url string>> >url ;
 
