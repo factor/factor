@@ -2,11 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays ascii assocs byte-arrays combinators
-io.encodings.string io.encodings.utf8 kernel lexer literals
-locals make math math.order math.parser multiline namespaces
-peg.ebnf present prettyprint.backend prettyprint.custom
-prettyprint.sections regexp sbufs sequences sequences.extras
-sets sorting splitting strings strings.parser urls urls.encoding
+io.encodings.string io.encodings.utf8 kernel lexer linked-assocs
+literals locals make math math.order math.parser multiline
+namespaces peg.ebnf present prettyprint.backend
+prettyprint.custom prettyprint.sections regexp sbufs sequences
+sequences.extras sequences.generalizations sets sorting
+splitting strings strings.parser urls urls.encoding
 urls.encoding.private urls.private ;
 
 IN: punycode
@@ -180,28 +181,49 @@ M: f >irl drop <irl> ;
 : irl-decode ( str -- str' )
     "" like R/ (%[a-fA-F0-9]{2})+/ [ url-decode ] re-replace-with ;
 
+: iquery-decode ( str -- decoded )
+    "+" split "%20" join irl-decode ;
+
+: iquery>assoc ( query -- assoc )
+    dup [
+        "&;" split <linked-hash> [
+            [
+                [ "=" split1 [ dup [ iquery-decode ] when ] bi@ swap ] dip
+                add-query-param
+            ] curry each
+        ] keep
+    ] when ;
+
+: assoc>iquery ( assoc -- str )
+    [
+        [
+            [
+                dup array? [ 1array ] unless
+                [ "=" glue , ] with each
+            ] [ , ] if*
+        ] assoc-each
+    ] { } make "&" join ;
+
 ! RFC 3987
 EBNF: parse-irl [=[
 
-protocol = [a-zA-Z0-9.+-]+          => [[ irl-decode ]]
-username = [^/:@#?]+                => [[ irl-decode ]]
-password = [^/:@#?]+                => [[ irl-decode ]]
-pathname = [^#?]+                   => [[ irl-decode ]]
-query    = [^#]+                    => [[ query>assoc ]]
-anchor   = .+                       => [[ irl-decode ]]
+protocol = [a-zA-Z0-9.+-]+ => [[ irl-decode ]]
+username = [^/:@#?]+       => [[ irl-decode ]]
+password = [^/:@#?]+       => [[ irl-decode ]]
+path     = [^#?]+          => [[ irl-decode ]]
+query    = [^#]+           => [[ iquery>assoc ]]
+anchor   = .+              => [[ irl-decode ]]
+hostname = [^/#?:]+        => [[ irl-decode ]]
+port     = [^/#?]+         => [[ url-decode parse-port ]]
 
-hostname = [^/#?]+                  => [[ irl-decode ]]
+auth     = username (":"~ password)? "@"~
+host     = hostname (":"~ port)?
 
-hostname-spec = hostname ("/"|!(.)) => [[ first ]]
-
-auth     = (username (":" password  => [[ second ]])? "@"
-                                    => [[ first2 2array ]])?
-
-url      = (((protocol "://") => [[ first ]] auth hostname)
-                    | (("//") => [[ f ]] auth hostname))?
-           (pathname)?
-           ("?" query               => [[ second ]])?
-           ("#" anchor              => [[ second ]])?
+url      = (protocol ":"~)?
+           ("//"~ auth? host?)?
+           path?
+           ("?"~ query)?
+           ("#"~ anchor)?
 
 ]=]
 
@@ -222,38 +244,26 @@ M: irl present
             [ unparse-protocol ]
             [ unparse-iauthority ]
             [ path>> % ]
-            [ query>> dup assoc-empty? [ drop ] [ "?" % assoc>query % ] if ]
+            [ query>> dup assoc-empty? [ drop ] [ "?" % assoc>iquery % ] if ]
             [ anchor>> [ "#" % present % ] when* ]
         } cleave
     ] "" make ;
 
-: parse-ihost ( string -- host/f port/f )
-    [
-        ":" split1-last [ irl-decode ] [
-            [ f ] [ string>number [ malformed-port ] unless* ] if-empty
-        ] bi*
-    ] [ f f ] if* ;
-
 PRIVATE>
 
 M: string >irl
-    [ <irl> ] dip
-    parse-irl {
+    [ <irl> ] dip parse-irl 5 firstn {
+        [ >lower >>protocol ]
         [
-            first [
-                [ first >lower >>protocol ]
-                [
-                    second
-                    [ first [ first2 [ >>username ] [ >>password ] bi* ] when* ]
-                    [ second parse-ihost [ >>host ] [ >>port ] bi* ] bi
-                ] bi
+            [
+                [ first [ first2 [ >>username ] [ >>password ] bi* ] when* ]
+                [ second [ first2 [ >>host ] [ >>port ] bi* ] when* ] bi
             ] when*
         ]
-        [ second >>path ]
-        [ third >>query ]
-        [ fourth >>anchor ]
-    } cleave
-    dup host>> [ [ "/" or ] change-path ] when ;
+        [ >>path ]
+        [ >>query ]
+        [ >>anchor ]
+    } spread dup host>> [ [ "/" or ] change-path ] when ;
 
 M: irl >url
     [ <url> ] dip {
@@ -263,7 +273,7 @@ M: irl >url
         [ host>> [ >idna url-encode ] [ f ] if* >>host ]
         [ port>> >>port ]
         [ path>> [ url-encode ] [ f ] if* >>path ]
-        [ query>> [ url-encode ] [ f ] if* >>query ]
+        [ query>> >>query ]
         [ anchor>> [ url-encode ] [ f ] if* >>anchor ]
     } cleave ;
 
@@ -275,7 +285,7 @@ M: url >irl
         [ host>> [ url-decode idna> ] [ f ] if* >>host ]
         [ port>> >>port ]
         [ path>> [ url-decode ] [ f ] if* >>path ]
-        [ query>> [ url-decode ] [ f ] if* >>query ]
+        [ query>> >>query ]
         [ anchor>> [ url-decode ] [ f ] if* >>anchor ]
     } cleave ;
 
