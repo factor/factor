@@ -2,9 +2,6 @@ USING: accessors http http.client http.client.private
 io.streams.string kernel namespaces sequences tools.test urls ;
 IN: http.client.tests
 
-{ "localhost" f } [ "localhost" parse-host ] unit-test
-{ "localhost" 8888 } [ "localhost:8888" parse-host ] unit-test
-
 { "foo.txt" } [ "http://www.paulgraham.com/foo.txt" download-name ] unit-test
 { "foo.txt" } [ "http://www.arc.com/foo.txt?xxx" download-name ] unit-test
 { "foo.txt" } [ "http://www.arc.com/foo.txt/" download-name ] unit-test
