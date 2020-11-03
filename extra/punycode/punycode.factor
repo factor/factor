@@ -270,11 +270,11 @@ M: irl >url
         [ protocol>> >>protocol ]
         [ username>> >>username ]
         [ password>> >>password ]
-        [ host>> [ >idna url-encode ] [ f ] if* >>host ]
+        [ host>> [ >idna ] [ f ] if* >>host ]
         [ port>> >>port ]
-        [ path>> [ url-encode ] [ f ] if* >>path ]
+        [ path>> >>path ]
         [ query>> >>query ]
-        [ anchor>> [ url-encode ] [ f ] if* >>anchor ]
+        [ anchor>> >>anchor ]
     } cleave ;
 
 M: url >irl
@@ -282,11 +282,11 @@ M: url >irl
         [ protocol>> >>protocol ]
         [ username>> >>username ]
         [ password>> >>password ]
-        [ host>> [ url-decode idna> ] [ f ] if* >>host ]
+        [ host>> [ idna> ] [ f ] if* >>host ]
         [ port>> >>port ]
-        [ path>> [ url-decode ] [ f ] if* >>path ]
+        [ path>> >>path ]
         [ query>> >>query ]
-        [ anchor>> [ url-decode ] [ f ] if* >>anchor ]
+        [ anchor>> >>anchor ]
     } cleave ;
 
 SYNTAX: IRL" lexer get skip-blank parse-string >irl suffix! ;
