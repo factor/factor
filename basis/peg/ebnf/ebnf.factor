@@ -161,7 +161,10 @@ C: <ebnf> ebnf
     ! Match the syntax for declaring character ranges
     [
         [ "[" syntax , "[" token ensure-not , ] seq* hide ,
-        [ CHAR: ] = not ] satisfy repeat1 ,
+        [
+            "\\]" token [ second ] action ,
+            [ CHAR: ] = not ] satisfy ,
+        ] choice* repeat0 ,
         "]" syntax ,
     ] seq* [ first >string unescape-string <ebnf-range> ] action ;
 

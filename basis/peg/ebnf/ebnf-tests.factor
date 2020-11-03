@@ -602,3 +602,17 @@ Tok                = Spaces (Number | Special )
     EBNF: foo2 [=[  Bar = "a":a-1 "a":a-2 => [[ a-1 a-2 2array ]] ]=]
     "aa" foo2
 ] unit-test
+
+{ "abc" } [
+    EBNF: parse-til-right-bracket [=[
+    foo = [^\]]+
+    ]=]
+    "abc]" parse-til-right-bracket >string
+] unit-test
+
+! Doesn't match anything, don't run it.
+{ } [
+    EBNF: parse-empty-range [=[
+    foo = []+
+    ]=]
+] unit-test
