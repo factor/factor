@@ -91,6 +91,13 @@ M: tuple class-of layout-of 2 slot { word } declare ; inline
         ] curry dip
     ] if ; inline
 
+: make-tuple ( seq class -- tuple )
+    tuple-layout <tuple> [
+        [ tuple-size <iota> ]
+        [ [ set-array-nth ] curry ]
+        bi 2each
+    ] keep ; inline
+
 PRIVATE>
 
 : tuple-slots ( tuple -- seq )
@@ -99,12 +106,7 @@ PRIVATE>
 GENERIC: slots>tuple ( seq class -- tuple )
 
 M: tuple-class slots>tuple
-    check-slots pad-slots
-    tuple-layout <tuple> [
-        [ tuple-size <iota> ]
-        [ [ set-array-nth ] curry ]
-        bi 2each
-    ] keep ;
+    check-slots pad-slots make-tuple ;
 
 : tuple>array ( tuple -- array )
     [ tuple-slots ] [ class-of prefix ] bi ;
