@@ -373,3 +373,6 @@ urls [
 { URL" https://host:1234/path" } [ URL" https://host:1234/path" redacted-url ] unit-test
 { URL" https://user@host:1234/path" } [ URL" https://user@host:1234/path" redacted-url ] unit-test
 { URL" https://user:xxxxx@host:1234/path" } [ URL" https://user:password@host:1234/path" redacted-url ] unit-test
+
+{ "https://foo.com/Profile%20Images%2F3XDmp9Ev01ab" }
+[ "https://foo.com/Profile%20Images%2F3XDmp9Ev01ab" >url present ] unit-test
