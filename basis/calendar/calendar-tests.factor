@@ -1,5 +1,5 @@
 USING: accessors grouping kernel math math.order math.ranges
-random sequences threads tools.test ;
+math.vectors random sequences threads tools.test ;
 IN: calendar
 
 [ 2004 12 32 0   0  0 instant <timestamp> ] [ not-in-interval? ] must-fail-with
@@ -170,7 +170,7 @@ IN: calendar
 
 { f } [ now dup midnight eq? ] unit-test
 { f } [ now dup easter eq? ] unit-test
-{ f } [ now dup beginning-of-year eq? ] unit-test
+{ f } [ now dup start-of-year eq? ] unit-test
 
 { t } [ 1325376000 unix-time>timestamp 2012 <year-gmt> = ] unit-test
 { t } [ 1356998399 unix-time>timestamp 2013 <year-gmt> 1 seconds time- = ] unit-test
@@ -205,12 +205,12 @@ IN: calendar
 { 53 } [ 2004 weeks-in-week-year ] unit-test
 { 52 } [ 2013 weeks-in-week-year ] unit-test
 
-{ f } [ now dup beginning-of-day eq? ] unit-test
+{ f } [ now dup start-of-day eq? ] unit-test
 { f } [ now dup end-of-day eq? ] unit-test
 { t } [ now dup end-of-day! eq? ] unit-test
-{ f } [ now dup beginning-of-month eq? ] unit-test
+{ f } [ now dup start-of-month eq? ] unit-test
 { f } [ now dup end-of-month eq? ] unit-test
-{ f } [ now dup beginning-of-year eq? ] unit-test
+{ f } [ now dup start-of-year eq? ] unit-test
 { f } [ now dup end-of-year eq? ] unit-test
 
 { f } [ now dup midnight eq? ] unit-test
@@ -249,4 +249,66 @@ IN: calendar
         <year-gmt> timestamp>year-dates
         [ >date< ymd>ordinal ] map [ < ] monotonic?
     ] map [ ] all?
+] unit-test
+
+{ 136 } [ 2014 1 10 <date>  2014 7 20 <date>  weekdays-between ] unit-test
+{ 137 } [ 2014 1 10 <date>  2014 7 21 <date>  weekdays-between ] unit-test
+{ 138 } [ 2014 1 10 <date>  2014 7 22 <date>  weekdays-between ] unit-test
+{ 139 } [ 2014 1 10 <date>  2014 7 23 <date>  weekdays-between ] unit-test
+{ 140 } [ 2014 1 10 <date>  2014 7 24 <date>  weekdays-between ] unit-test
+{ 141 } [ 2014 1 10 <date>  2014 7 25 <date>  weekdays-between ] unit-test
+{ 141 } [ 2014 1 10 <date>  2014 7 26 <date>  weekdays-between ] unit-test
+{ 141 } [ 2014 1 10 <date>  2014 7 27 <date>  weekdays-between ] unit-test
+{ 142 } [ 2014 1 10 <date>  2014 7 28 <date>  weekdays-between ] unit-test
+{ 143 } [ 2014 1 10 <date>  2014 7 29 <date>  weekdays-between ] unit-test
+{ 144 } [ 2014 1 10 <date>  2014 7 30 <date>  weekdays-between ] unit-test
+{ 145 } [ 2014 1 10 <date>  2014 7 31 <date>  weekdays-between ] unit-test
+{ 146 } [ 2014 1 10 <date>  2014 8 1 <date>  weekdays-between ] unit-test
+{ 146 } [ 2014 1 10 <date>  2014 8 2 <date>  weekdays-between ] unit-test
+{ 146 } [ 2014 1 10 <date>  2014 8 3 <date>  weekdays-between ] unit-test
+{ 147 } [ 2014 1 10 <date>  2014 8 4 <date>  weekdays-between ] unit-test
+{ 148 } [ 2014 1 10 <date>  2014 8 5 <date>  weekdays-between ] unit-test
+{ 149 } [ 2014 1 10 <date>  2014 8 6 <date>  weekdays-between ] unit-test
+{ 150 } [ 2014 1 10 <date>  2014 8 7 <date>  weekdays-between ] unit-test
+{ 151 } [ 2014 1 10 <date>  2014 8 8 <date>  weekdays-between ] unit-test
+{ 151 } [ 2014 1 10 <date>  2014 8 9 <date>  weekdays-between ] unit-test
+{ 151 } [ 2014 1 10 <date>  2014 8 10 <date>  weekdays-between ] unit-test
+
+
+{ t } [
+    2014 1 1 <date-gmt>
+    2014 <year-gmt> timestamp>year-dates
+    [ weekdays-between ] with map [ <= ] monotonic?
+] unit-test
+
+{ t } [
+    2020 1 1 <date-gmt>
+    2020 <year-gmt> timestamp>year-dates
+    [ weekdays-between ] with map [ <= ] monotonic?
+] unit-test
+
+{ t } [
+    2014 1 1 <date-gmt>
+    2014 <year-gmt> timestamp>year-dates
+    [ weekdays-between ] with map
+    dup 1 tail swap v- [ 1 <= ] all?
+] unit-test
+
+{ t } [
+    2020 1 1 <date-gmt>
+    2020 <year-gmt> timestamp>year-dates
+    [ weekdays-between ] with map
+    dup 1 tail swap v- [ 1 <= ] all?
+] unit-test
+
+{ 0 } [
+    2014 1 1 <date-gmt>
+    2014 <year-gmt> timestamp>year-dates
+    [ weekdays-between2 ] with map
+
+    2014 1 1 <date-gmt>
+    2014 <year-gmt> timestamp>year-dates
+    [ weekdays-between ] with map
+
+    v- sum
 ] unit-test

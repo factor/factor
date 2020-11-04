@@ -459,15 +459,15 @@ HELP: today
 { $values { "timestamp" timestamp } }
 { $description "Returns a timestamp that represents today at midnight." } ;
 
-HELP: beginning-of-month
+HELP: start-of-month
 { $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
 { $description "Returns a new timestamp with the day set to one." } ;
 
-HELP: beginning-of-week
+HELP: start-of-week
 { $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
 { $description "Returns a new timestamp where the day of the week is Sunday." } ;
 
-HELP: beginning-of-year
+HELP: start-of-year
 { $values { "object" object } { "new-timestamp" timestamp } }
 { $description "Returns a new timestamp with the month and day set to one, or January 1 of the input timestamp, given a year or a timestamp." } ;
 
@@ -570,9 +570,9 @@ ARTICLE: "relative-timestamps" "Relative timestamps"
 }
 "New timestamps relative to calendar events:"
 { $subsections
-    beginning-of-year
-    beginning-of-month
-    beginning-of-week
+    start-of-year
+    start-of-month
+    start-of-week
     midnight
     noon
 } ;

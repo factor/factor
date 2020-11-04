@@ -1,10 +1,10 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes.tuple combinators
+USING: accessors arrays classes.tuple combinators
 combinators.short-circuit kernel locals math math.functions
-math.intervals math.order math.parser sequences splitting system
-vocabs vocabs.loader ;
-QUALIFIED-WITH: math.ranges R
+math.intervals math.order math.parser sequences
+slots.syntax splitting system vocabs vocabs.loader ;
+FROM: math.ranges => [a..b) ;
 IN: calendar
 
 ERROR: not-in-interval value interval ;
@@ -186,31 +186,29 @@ M: integer +year
     [ + ] curry change-year adjust-leap-year ;
 
 M: real +year
-    [ float>whole-part swapd days-per-year * +day swap +year ] unless-zero ;
+    float>whole-part swapd days-per-year * +day swap +year ;
 
 : months/years ( n -- months years )
     12 /rem [ 1 - 12 ] when-zero swap ; inline
 
 M: integer +month
-    [ over month>> + months/years [ >>month ] dip +year ] unless-zero ;
+    over month>> + months/years [ >>month ] dip +year ;
 
 M: real +month
-    [ float>whole-part swapd average-month * +day swap +month ] unless-zero ;
+    float>whole-part swapd average-month * +day swap +month ;
 
 M: integer +day
-    [
-        over >date< julian-day-number + julian-day-number>date
-        [ >>year ] [ >>month ] [ >>day ] tri*
-    ] unless-zero ;
+    over >date< julian-day-number + julian-day-number>date
+    [ >>year ] [ >>month ] [ >>day ] tri* ;
 
 M: real +day
-    [ float>whole-part swapd 24 * +hour swap +day ] unless-zero ;
+    float>whole-part swapd 24 * +hour swap +day ;
 
 : hours/days ( n -- hours days )
     24 /rem swap ;
 
 M: integer +hour
-    [ over hour>> + hours/days [ >>hour ] dip +day ] unless-zero ;
+    over hour>> + hours/days [ >>hour ] dip +day ;
 
 M: real +hour
     float>whole-part swapd 60 * +minute swap +hour ;
@@ -219,16 +217,16 @@ M: real +hour
     60 /rem swap ;
 
 M: integer +minute
-    [ over minute>> + minutes/hours [ >>minute ] dip +hour ] unless-zero ;
+    over minute>> + minutes/hours [ >>minute ] dip +hour ;
 
 M: real +minute
-    [ float>whole-part swapd 60 * +second swap +minute ] unless-zero ;
+    float>whole-part swapd 60 * +second swap +minute ;
 
 : seconds/minutes ( n -- seconds minutes )
     60 /rem swap >integer ;
 
 M: number +second
-    [ over second>> + seconds/minutes [ >>second ] dip +minute ] unless-zero ;
+    over second>> + seconds/minutes [ >>second ] dip +minute ;
 
 : (time+) ( timestamp duration -- timestamp' duration )
     [ second>> +second ] keep
@@ -308,8 +306,67 @@ GENERIC: time- ( time1 time2 -- time3 )
 
 M: timestamp <=> [ >gmt tuple-slots ] compare ;
 
+: same-year? ( ts1 ts2 -- ? )
+    [ >gmt slots{ year } ] same? ;
+
+: quarter ( timestamp -- [1,4] )
+    month>> 3 /mod [ drop 1 + ] unless-zero ; inline
+
+: same-quarter? ( ts1 ts2 -- ? )
+    [ >gmt [ year>> ] [ quarter ] bi 2array ] same? ;
+
+: same-month? ( ts1 ts2 -- ? )
+    [ >gmt slots{ year month } ] same? ;
+
+:: (day-of-year) ( year month day -- n )
+    day-counts month head-slice sum day +
+    year leap-year? [
+        year month day <date>
+        year 3 1 <date>
+        after=? [ 1 + ] when
+    ] when ;
+
+: day-of-year ( timestamp -- n )
+    >date< (day-of-year) ;
+
 : same-day? ( ts1 ts2 -- ? )
-    [ >gmt >date< <date> ] same? ;
+    [ >gmt slots{ year month day } ] same? ;
+
+: zeller-congruence ( year month day -- n )
+    ! Zeller Congruence
+    ! http://web.textfiles.com/computers/formulas.txt
+    ! good for any date since October 15, 1582
+    [
+        dup 2 <= [ [ 1 - ] [ 12 + ] bi* ] when
+        [ dup [ 4 /i + ] [ 100 /i - ] [ 400 /i + ] tri ] dip
+        [ 1 + 3 * 5 /i + ] keep 2 * +
+    ] dip 1 + + 7 mod ;
+
+: day-of-week ( timestamp -- n )
+    >date< zeller-congruence ;
+
+: (week-number) ( timestamp -- [0,53] )
+    [ day-of-year ] [ day-of-week [ 7 ] when-zero ] bi - 10 + 7 /i ;
+
+DEFER: end-of-year
+: week-number ( timestamp -- [1,53] )
+    dup (week-number) {
+        {  0 [ year>> 1 - end-of-year (week-number) ] }
+        { 53 [ year>> 1 + <year> (week-number) 1 = 1 53 ? ] }
+        [ nip ]
+    } case ;
+
+: same-week? ( ts1 ts2 -- ? )
+    [ >gmt [ year>> ] [ week-number ] bi 2array ] same? ;
+
+: same-hour? ( ts1 ts2 -- ? )
+    [ >gmt slots{ year month day hour } ] same? ;
+
+: same-minute? ( ts1 ts2 -- ? )
+    [ >gmt slots{ year month day hour minute } ] same? ;
+
+: same-second? ( ts1 ts2 -- ? )
+    [ >gmt slots{ year month day hour minute second } ] same? ;
 
 : (time-) ( timestamp timestamp -- n )
     [ >gmt ] bi@
@@ -378,16 +435,6 @@ M: duration time-
 
 : ago ( duration -- timestamp ) now swap time- ;
 
-: zeller-congruence ( year month day -- n )
-    ! Zeller Congruence
-    ! http://web.textfiles.com/computers/formulas.txt
-    ! good for any date since October 15, 1582
-    [
-        dup 2 <= [ [ 1 - ] [ 12 + ] bi* ] when
-        [ dup [ 4 /i + ] [ 100 /i - ] [ 400 /i + ] tri ] dip
-        [ 1 + 3 * 5 /i + ] keep 2 * +
-    ] dip 1 + + 7 mod ;
-
 GENERIC: days-in-year ( obj -- n )
 
 M: integer days-in-year leap-year? 366 365 ? ;
@@ -396,20 +443,6 @@ M: timestamp days-in-year year>> days-in-year ;
 
 : days-in-month ( timestamp -- n )
     >date< drop (days-in-month) ;
-
-: day-of-week ( timestamp -- n )
-    >date< zeller-congruence ;
-
-:: (day-of-year) ( year month day -- n )
-    day-counts month head-slice sum day +
-    year leap-year? [
-        year month day <date>
-        year 3 1 <date>
-        after=? [ 1 + ] when
-    ] when ;
-
-: day-of-year ( timestamp -- n )
-    >date< (day-of-year) ;
 
 : midnight! ( timestamp -- new-timestamp )
     0 >>hour 0 >>minute 0 >>second ; inline
@@ -429,8 +462,8 @@ M: timestamp days-in-year year>> days-in-year ;
 : yesterday ( -- timestamp )
     1 days ago midnight! ; inline
 
-GENERIC: beginning-of-day ( object -- new-timestamp )
-M: timestamp beginning-of-day midnight ;
+GENERIC: start-of-day ( object -- new-timestamp )
+M: timestamp start-of-day midnight ;
 
 : end-of-day! ( timestamp -- timestamp )
     23 >>hour 59 >>minute 59+999/1000 >>second ;
@@ -438,19 +471,53 @@ M: timestamp beginning-of-day midnight ;
 GENERIC: end-of-day ( object -- new-timestamp )
 M: timestamp end-of-day clone end-of-day! ;
 
-: beginning-of-month ( timestamp -- new-timestamp )
+: start-of-month ( timestamp -- new-timestamp )
     midnight 1 >>day ; inline
 
 : end-of-month ( timestamp -- new-timestamp )
     [ end-of-day ] [ days-in-month ] bi >>day ;
 
-GENERIC: beginning-of-year ( object -- new-timestamp )
-M: timestamp beginning-of-year beginning-of-month 1 >>month ;
-M: integer beginning-of-year <year> ;
+: start-of-quarter ( timestamp -- new-timestamp )
+    [ start-of-day ] [ quarter 1 - 3 * ] bi >>month ; inline
+
+: end-of-quarter ( timestamp -- new-timestamp )
+    [ clone ] [ quarter 1 - 3 * 3 + ] bi >>month end-of-month ; inline
+
+GENERIC: start-of-year ( object -- new-timestamp )
+M: timestamp start-of-year start-of-month 1 >>month ;
+M: integer start-of-year <year> ;
 
 GENERIC: end-of-year ( object -- new-timestamp )
 M: timestamp end-of-year end-of-day 12 >>month 31 >>day ;
 M: integer end-of-year 12 31 <date> end-of-day! ;
+
+GENERIC: start-of-decade ( object -- new-timestamp )
+M: timestamp start-of-decade start-of-year [ dup 10 mod - ] change-year ;
+M: integer start-of-decade start-of-year [ dup 10 mod - ] change-year ;
+
+GENERIC: end-of-decade ( object -- new-timestamp )
+M: timestamp end-of-decade end-of-year [ dup 10 mod - 9 + ] change-year ;
+M: integer end-of-decade end-of-year [ dup 10 mod - 9 + ] change-year ;
+
+: last-day-of-decade ( object -- new-timestamp )
+    end-of-decade end-of-decade midnight ;
+
+: last-day-of-year ( object -- new-timestamp )
+    end-of-year midnight ;
+
+: start-of-hour ( timestamp -- new-timestamp ) clone 0 >>minute 0 >>second ;
+: end-of-hour ( timestamp -- new-timestamp ) clone 59 >>minute 59+999/1000 >>second ;
+
+: start-of-minute ( timestamp -- new-timestamp ) clone 0 >>second ;
+: end-of-minute ( timestamp -- new-timestamp ) clone 59+999/1000 >>second ;
+
+GENERIC: start-of-second ( object -- new-timestamp )
+M: timestamp start-of-second clone [ floor ] change-second ;
+M: real start-of-second floor ;
+
+GENERIC: end-of-second ( object -- new-timestamp )
+M: timestamp end-of-second clone [ floor 999/1000 + ] change-second ;
+M: real end-of-second floor 999/1000 + ;
 
 <PRIVATE
 
@@ -461,7 +528,7 @@ M: integer end-of-year 12 31 <date> end-of-day! ;
     day-offset days time+ ;
 
 :: nth-day-this-month ( timestamp n day -- new-timestamp )
-    timestamp beginning-of-month day day-this-week
+    timestamp start-of-month day day-this-week
     dup timestamp [ month>> ] same? [ 1 weeks time+ ] unless ;
 
 : last-day-this-month ( timestamp day -- new-timestamp )
@@ -537,6 +604,46 @@ M: timestamp december clone 12 >>month ;
 : friday? ( timestamp -- ? ) day-of-week 5 = ;
 : saturday? ( timestamp -- ? ) day-of-week 6 = ;
 
+GENERIC: weekend? ( obj -- ? )
+M: timestamp weekend? day-of-week weekend? ;
+M: integer weekend? { 0 6 } member? ;
+
+GENERIC: weekday? ( obj -- ? )
+M: timestamp weekday? day-of-week weekday? ;
+M: integer weekday? weekend? not ;
+
+: same-or-next-business-day ( timestamp -- timestamp' )
+    dup day-of-week {
+        { 0 [ monday ] }
+        { 6 [ 2 days time+ ] }
+        [ drop ]
+    } case ;
+
+: same-or-previous-business-day ( timestamp -- timestamp' )
+    dup day-of-week {
+        { 0 [ 2 days time- ] }
+        { 6 [ friday ] }
+        [ drop ]
+    } case ;
+
+: weekdays-between ( date1 date2 -- n )
+    [
+        [ swap time- duration>days 5 * ]
+        [ [ day-of-week ] bi@ - 2 * ] 2bi - 7 /i 1 +
+    ] 2keep
+    day-of-week 6 = [ [ 1 - ] dip ] when
+    day-of-week 0 = [ 1 - ] when ;
+
+CONSTANT: weekday-offsets { 0 0 1 2 3 4 5 }
+
+: weekdays-between2 ( date1 date2 -- n )
+    [ swap time- duration>days 1 + ]
+    [ [ day-of-week ] bi@ 6 swap - ] 2bi
+
+    [ + + 1.4 /i ]
+    [ [ weekday-offsets nth ] bi@ + ] 2bi - ;
+
+
 : sunday-of-month ( timestamp n -- new-timestamp ) 0 nth-day-this-month ;
 : monday-of-month ( timestamp n -- new-timestamp ) 1 nth-day-this-month ;
 : tuesday-of-month ( timestamp n -- new-timestamp ) 2 nth-day-this-month ;
@@ -553,7 +660,7 @@ M: timestamp december clone 12 >>month ;
 : last-friday-of-month ( timestamp -- new-timestamp ) 5 last-day-this-month ;
 : last-saturday-of-month ( timestamp -- new-timestamp ) 6 last-day-this-month ;
 
-: beginning-of-week ( timestamp -- new-timestamp )
+: start-of-week ( timestamp -- new-timestamp )
     midnight sunday ;
 
 : o'clock ( timestamp n -- new-timestamp )
@@ -577,19 +684,6 @@ M: timestamp december clone 12 >>month ;
 : unix-time>timestamp ( seconds -- timestamp )
     [ unix-1970 ] dip +second ; inline
 
-: (week-number) ( timestamp -- [0,53] )
-    [ day-of-year ] [ day-of-week [ 7 ] when-zero ] bi - 10 + 7 /i ;
-
-: week-number ( timestamp -- [1,53] )
-    dup (week-number) {
-        {  0 [ year>> 1 - end-of-year (week-number) ] }
-        { 53 [ year>> 1 + <year> (week-number) 1 = 1 53 ? ] }
-        [ nip ]
-    } case ;
-
-: quarter ( timestamp -- [1,4] )
-    month>> 3 /mod [ drop 1 + ] unless-zero ; inline
-
 ! January and February need a fixup with this algorithm.
 ! Find a better algorithm.
 : ymd>ordinal ( year month day -- ordinal )
@@ -599,10 +693,10 @@ M: timestamp december clone 12 >>month ;
     swap 367 366 ? mod ;
 
 : timestamp>year-dates ( timestamp -- seq )
-    [ beginning-of-year >date< julian-day-number ]
+    [ start-of-year >date< julian-day-number ]
     [ days-in-year ] bi
     [ drop ] [ + ] 2bi
-    R:[a,b) [ julian-day-number>date <date> ] map ;
+    [a..b) [ julian-day-number>date <date> ] map ;
 
 : year-ordinal>timestamp ( year ordinal -- timestamp )
     [ 1 1 julian-day-number ] dip
