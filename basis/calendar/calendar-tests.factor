@@ -1,4 +1,5 @@
-USING: accessors kernel math.order random threads tools.test ;
+USING: accessors grouping kernel math math.order math.ranges
+random sequences threads tools.test ;
 IN: calendar
 
 [ 2004 12 32 0   0  0 instant <timestamp> ] [ not-in-interval? ] must-fail-with
@@ -214,3 +215,38 @@ IN: calendar
 
 { f } [ now dup midnight eq? ] unit-test
 { t } [ now dup midnight! eq? ] unit-test
+
+{
+    T{ timestamp { year 2019 } { month 11 } { day 4 } }
+} [ 2019 308 year-ordinal>timestamp >gmt midnight ] unit-test
+
+{
+    T{ timestamp { year 2020 } { month 11 } { day 3 } }
+} [ 2020 308 year-ordinal>timestamp >gmt midnight ] unit-test
+
+{
+    T{ timestamp { year 2019 } { month 12 } { day 31 } }
+} [ 2019 365 year-ordinal>timestamp >gmt midnight ] unit-test
+
+{
+    T{ timestamp { year 2020 } { month 12 } { day 31 } }
+} [ 2020 366 year-ordinal>timestamp >gmt midnight ] unit-test
+
+{ t } [
+    2020 <year> timestamp>year-dates
+    [ >date< ymd>ordinal ] map [ < ] monotonic?
+] unit-test
+
+{ t } [
+    1999 2025 [a,b] [
+        <year> timestamp>year-dates
+        [ >date< ymd>ordinal ] map [ < ] monotonic?
+    ] map [ ] all?
+] unit-test
+
+{ t } [
+    1999 2025 [a,b] [
+        <year-gmt> timestamp>year-dates
+        [ >date< ymd>ordinal ] map [ < ] monotonic?
+    ] map [ ] all?
+] unit-test
