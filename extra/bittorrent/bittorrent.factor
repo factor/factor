@@ -470,14 +470,4 @@ M:: piece handle-message ( peer message -- peer )
     peer request-piece ;
 
 : read-messages ( peer -- peer )
-    [ read-message dup ] [ handle-message ] while drop ;
-
-
-\ write-message [
-    '[ [ "write-message: " write dup . ] with-debug @ ]
-] annotate
-
-
-\ handle-message [
-    '[ [ "handle-message: " write dup . ] with-debug @ ]
-] annotate
+    [ read-message ] [ handle-message ] while* drop ;
