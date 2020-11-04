@@ -594,10 +594,9 @@ M: timestamp december clone 12 >>month ;
 ! Find a better algorithm.
 : ymd>ordinal ( year month day -- ordinal )
     [ leap-year? dup -2 -3 ? ]
-    [ tuck dup 3 < [ 12 + ] when [ 1 - 30 * ] [ 1 + .6 * floor ] bi + ]
+    [ dup 3 < [ 12 + ] when [ 1 - 30 * ] [ 1 + .6 * floor ] bi + ]
     [ ] tri* + + >integer
-    rot 366 365 ?
-    rot 3 < [ - ] [ drop ] if ;
+    swap 367 366 ? mod ;
 
 : timestamp>year-dates ( timestamp -- seq )
     [ beginning-of-year >date< julian-day-number ]
