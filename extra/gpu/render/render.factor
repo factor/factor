@@ -1,15 +1,13 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data arrays
-assocs classes classes.mixin classes.parser classes.singleton classes.struct
-classes.tuple classes.tuple.private combinators combinators.tuple destructors fry
-generic generic.parser gpu gpu.buffers gpu.framebuffers
-gpu.framebuffers.private gpu.shaders gpu.shaders.private gpu.state
-gpu.textures gpu.textures.private math.floats.half images kernel
-lexer locals math math.order math.parser namespaces opengl
-opengl.gl parser quotations sequences slots sorting
-specialized-arrays strings ui.gadgets.worlds variants
-vocabs.parser words math.vectors.simd ;
+USING: accessors alien alien.c-types alien.data arrays assocs
+classes classes.parser classes.struct classes.tuple
+classes.tuple.private combinators combinators.tuple fry generic
+generic.parser gpu.buffers gpu.framebuffers
+gpu.framebuffers.private gpu.shaders gpu.shaders.private
+gpu.textures gpu.textures.private kernel lexer locals math
+math.parser math.vectors.simd opengl.gl parser quotations
+sequences slots sorting specialized-arrays strings variants words ;
 FROM: math => float ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAYS: c:float c:int c:uchar c:ushort c:uint c:void* ;
@@ -594,7 +592,7 @@ TUPLE: render-set
     { transform-feedback-output transform-feedback-output initial: f read-only } ;
 
 : <render-set> ( x quot-assoc -- render-set )
-    render-set swap make-tuple ; inline
+    render-set swap 1make-tuple ; inline
 
 : 2<render-set> ( x y quot-assoc -- render-set )
     render-set swap 2make-tuple ; inline
