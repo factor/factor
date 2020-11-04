@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar.english combinators
-combinators.smart io.encodings.utf8 io.files kernel math.parser
-memoize namespaces sequences sequences.extras sorting splitting
-unicode ;
+USING: accessors arrays ascii assocs calendar calendar.english
+combinators combinators.smart io.encodings.utf8 io.files kernel
+math.parser memoize namespaces sequences sequences.extras
+sorting splitting splitting.extras ;
 IN: zoneinfo
 
 CONSTANT: zoneinfo-paths
@@ -150,6 +150,32 @@ ERROR: zone-not-found name ;
         { [ dup "last" head? ] [ 4 tail day-abbreviation3-index ] }
         [ string>number ]
     } cond ;
+
+: zone-month ( timestamp month -- timestamp' )
+    month-abbreviation-index >>month ;
+
+: zone-day ( timestamp day -- timestamp' )
+    {
+        { "Sun>=1" [ 0 sunday-of-month ] }
+        { "lastSun" [ last-sunday-of-month ] }
+        [ string>number >>day ]
+    } case ;
+
+! XXX: Don't just drop the s/u, e.g. 2:00:00s
+: zone-time ( timestamp time -- timestamp' )
+    [ Letter? ] split-tail drop
+    time>offset first3 set-time ;
+
+: until>timestamp ( seq -- timestamp )
+    [ 9999 <year-gmt> ]
+    [
+        4 f pad-tail first4 {
+            [ string>number <year-gmt> ]
+            [ [ zone-month ] when* ]
+            [ [ zone-day ] when* ]
+            [ [ zone-time ] when* ]
+        } spread
+    ] if-empty ;
 
 : raw-rule>triple ( raw-rule -- quot )
     {
