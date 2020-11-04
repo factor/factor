@@ -1,9 +1,10 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes.tuple combinators
+USING: accessors classes.tuple combinators
 combinators.short-circuit kernel locals math math.functions
-math.intervals math.order sequences summary system vocabs vocabs.loader
-assocs ;
+math.intervals math.order math.parser sequences splitting system
+vocabs vocabs.loader ;
+QUALIFIED-WITH: math.ranges R
 IN: calendar
 
 ERROR: not-in-interval value interval ;
@@ -134,6 +135,20 @@ M: timestamp easter
 
 : >time< ( timestamp -- hour minute second )
     [ hour>> ] [ minute>> ] [ second>> ] tri ;
+
+: set-time! ( timestamp hours minutes seconds -- timestamp )
+    [ >>hour ] [ >>minute ] [ >>second ] tri* ;
+
+: set-time ( timestamp hours minutes seconds -- timestamp )
+    clone set-time! ;
+
+: time>hms ( str -- hms-seq )
+    ":" split [ string>number ] map
+    3 0 pad-tail ;
+
+: time>offset ( str -- hms-seq )
+    "-" ?head [ time>hms ] dip
+    [ [ neg ] map ] when ;
 
 : years ( x -- duration ) instant swap >>year ;
 : months ( x -- duration ) instant swap >>month ;
@@ -447,8 +462,7 @@ M: integer end-of-year 12 31 <date> end-of-day! ;
 
 :: nth-day-this-month ( timestamp n day -- new-timestamp )
     timestamp beginning-of-month day day-this-week
-    dup timestamp [ month>> ] same? [ 1 weeks time+ ] unless
-    n 1 - [ weeks time+ ] unless-zero ;
+    dup timestamp [ month>> ] same? [ 1 weeks time+ ] unless ;
 
 : last-day-this-month ( timestamp day -- new-timestamp )
     [ 1 months time+ 1 ] dip nth-day-this-month 1 weeks time- ;
@@ -575,6 +589,25 @@ M: timestamp december clone 12 >>month ;
 
 : quarter ( timestamp -- [1,4] )
     month>> 3 /mod [ drop 1 + ] unless-zero ; inline
+
+! January and February need a fixup with this algorithm.
+! Find a better algorithm.
+: ymd>ordinal ( year month day -- ordinal )
+    [ leap-year? dup -2 -3 ? ]
+    [ tuck dup 3 < [ 12 + ] when [ 1 - 30 * ] [ 1 + .6 * floor ] bi + ]
+    [ ] tri* + + >integer
+    rot 366 365 ?
+    rot 3 < [ - ] [ drop ] if ;
+
+: timestamp>year-dates ( timestamp -- seq )
+    [ beginning-of-year >date< julian-day-number ]
+    [ days-in-year ] bi
+    [ drop ] [ + ] 2bi
+    R:[a,b) [ julian-day-number>date <date> ] map ;
+
+: year-ordinal>timestamp ( year ordinal -- timestamp )
+    [ 1 1 julian-day-number ] dip
+    + 1 - julian-day-number>date <date> ;
 
 GENERIC: weeks-in-week-year ( obj -- n )
 M: integer weeks-in-week-year
