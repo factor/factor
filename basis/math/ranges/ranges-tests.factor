@@ -1,19 +1,19 @@
 USING: arrays kernel math math.ranges sequences sets tools.test ;
 
-{ { } } [ 1 1 (a,b) >array ] unit-test
-{ { } } [ 1 1 (a,b] >array ] unit-test
-{ { } } [ 1 1 [a,b) >array ] unit-test
-{ { 1 } } [ 1 1 [a,b] >array ] unit-test
+{ { } } [ 1 1 (a..b) >array ] unit-test
+{ { } } [ 1 1 (a..b] >array ] unit-test
+{ { } } [ 1 1 [a..b) >array ] unit-test
+{ { 1 } } [ 1 1 [a..b] >array ] unit-test
 
-{ { }  } [ 1 2 (a,b) >array ] unit-test
-{ { 2 } } [ 1 2 (a,b] >array ] unit-test
-{ { 1 } } [ 1 2 [a,b) >array ] unit-test
-{ { 1 2 } } [ 1 2 [a,b] >array ] unit-test
+{ { }  } [ 1 2 (a..b) >array ] unit-test
+{ { 2 } } [ 1 2 (a..b] >array ] unit-test
+{ { 1 } } [ 1 2 [a..b) >array ] unit-test
+{ { 1 2 } } [ 1 2 [a..b] >array ] unit-test
 
-{ { } } [ 2 1 (a,b) >array ] unit-test
-{ { 1 } } [ 2 1 (a,b] >array ] unit-test
-{ { 2 } } [ 2 1 [a,b) >array ] unit-test
-{ { 2 1 } } [ 2 1 [a,b] >array ] unit-test
+{ { } } [ 2 1 (a..b) >array ] unit-test
+{ { 1 } } [ 2 1 (a..b] >array ] unit-test
+{ { 2 } } [ 2 1 [a..b) >array ] unit-test
+{ { 2 1 } } [ 2 1 [a..b] >array ] unit-test
 
 { { 1 2 3 4 5 } } [ 1 5 1 <range> >array ] unit-test
 { { 5 4 3 2 1 } } [ 5 1 -1 <range> >array ] unit-test
@@ -48,7 +48,7 @@ USING: arrays kernel math math.ranges sequences sets tools.test ;
 { 0 } [ -2 0 -4 <range> length ] unit-test
 
 { 100 } [
-    1 100 [a,b] [ 2^ [1,b] ] map members length
+    1 100 [a..b] [ 2^ [1..b] ] map members length
 ] unit-test
 
 { t } [ -10 10 1 <range> [ sum ] [ >array sum ] bi = ] unit-test
