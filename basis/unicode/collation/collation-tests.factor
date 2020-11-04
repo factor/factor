@@ -1,4 +1,5 @@
-USING: arrays assocs fry grouping hash-sets io.encodings.utf8
+USING: arrays assocs compression.zlib fry grouping hash-sets
+io.encodings.binary io.encodings.string io.encodings.utf8
 io.files kernel math math.order math.parser sequences sets
 splitting strings tools.test unicode ;
 IN: unicode.collation.tests
@@ -17,7 +18,8 @@ IN: unicode.collation.tests
 [ { "HELLO" "goodbye" "good bye" "hello" } sort-strings ] unit-test
 
 : collation-test-lines ( -- lines )
-    "vocab:unicode/UCA/CollationTest/CollationTest_SHIFTED.txt" utf8 file-lines
+    "vocab:unicode/UCA/CollationTest_SHIFTED.txt.zip"
+    binary file-contents uncompress utf8 decode string-lines
     [ "#" head? ] reject harvest ;
 
 : parse-collation-test-shifted ( -- lines )
