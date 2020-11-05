@@ -19,6 +19,7 @@ IN: calendar
 { t } [ 2000 leap-year? ] unit-test
 { f } [ 2001 leap-year? ] unit-test
 { f } [ 2006 leap-year? ] unit-test
+{ t } [ 2020 leap-year? ] unit-test
 
 { t } [ 2006 10 10 0 0 0 instant <timestamp> 1 seconds time+
         2006 10 10 0 0 1 instant <timestamp> = ] unit-test
@@ -187,6 +188,58 @@ IN: calendar
     2008 2 29 <date> =
 ] unit-test
 
+{
+    T{ timestamp
+        { year 2020 }
+        { month 1 }
+        { day 1 }
+        { hour 2 }
+        { minute 46 }
+        { second 40 }
+    }
+} [
+    2020 <year-gmt> 10000 >>second normalize-timestamp
+] unit-test
+
+{
+    T{ timestamp
+        { year 2020 }
+        { month 1 }
+        { day 1 }
+        { hour 2 }
+        { minute 46 }
+        { second 40 }
+    }
+} [
+    2020 <year-gmt> 10000 >>second normalize-timestamp!
+] unit-test
+
+{ f } [
+    2020 <year-gmt> dup 10000 >>second normalize-timestamp eq?
+] unit-test
+
+{ t } [
+    2020 <year-gmt> dup 10000 >>second normalize-timestamp! eq?
+] unit-test
+
+{ +eq+ } [
+    2020 <year-gmt> 10000 >>second
+    dup normalize-timestamp <=>
+] unit-test
+
+{ +eq+ } [
+    2020 <year-gmt> 10000 >>second
+    dup normalize-timestamp <=>
+] unit-test
+
+{ f } [
+    2020 <year-gmt> dup 10000 >>second [ >gmt ] bi@ eq?
+] unit-test
+
+{ t } [
+    2020 <year-gmt> dup 10000 >>second [ >gmt! ] bi@ eq?
+] unit-test
+
 { 0 }
 [ gmt gmt-offset>> duration>seconds ] unit-test
 
@@ -311,4 +364,56 @@ IN: calendar
     [ weekdays-between ] with map
 
     v- sum
+] unit-test
+
+{ 1 2 3 } [
+    2020 1 1 <date-gmt> 1 2 3 set-time >time<
+] unit-test
+
+{ f } [
+    2020 1 1 <date-gmt> dup 1 2 3 set-time eq?
+] unit-test
+
+{ t } [
+    2020 1 1 <date-gmt> dup 1 2 3 set-time! eq?
+] unit-test
+
+
+{
+    {
+        T{ timestamp { year 2020 } { month 3 } { day 1 } }
+        T{ timestamp { year 2020 } { month 3 } { day 8 } }
+        T{ timestamp { year 2020 } { month 3 } { day 15 } }
+        T{ timestamp { year 2020 } { month 3 } { day 22 } }
+        T{ timestamp { year 2020 } { month 3 } { day 29 } }
+    }
+} [
+    2020 march-gmt 5 <iota> [ sunday-of-month ] with map
+] unit-test
+
+
+{
+    {
+        T{ timestamp { year 2020 } { month 2 } { day 1 } }
+        T{ timestamp { year 2020 } { month 2 } { day 8 } }
+        T{ timestamp { year 2020 } { month 2 } { day 15 } }
+        T{ timestamp { year 2020 } { month 2 } { day 22 } }
+        T{ timestamp { year 2020 } { month 2 } { day 29 } }
+    }
+} [
+    2020 february-gmt 5 <iota> [ saturday-of-month ] with map
+] unit-test
+
+
+! 5th monday of dec 2020 is in january, why not
+{
+    {
+        T{ timestamp { year 2020 } { month 12 } { day 7 } }
+        T{ timestamp { year 2020 } { month 12 } { day 14 } }
+        T{ timestamp { year 2020 } { month 12 } { day 21 } }
+        T{ timestamp { year 2020 } { month 12 } { day 28 } }
+        T{ timestamp { year 2021 } { month 1 } { day 4 } }
+    }
+} [
+    2020 december-gmt 5 <iota> [ monday-of-month ] with map
 ] unit-test
