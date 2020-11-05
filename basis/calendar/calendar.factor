@@ -691,6 +691,43 @@ M: timestamp december-gmt >gmt 12 >>month ;
 : friday-gmt ( timestamp -- new-timestamp ) friday >gmt! ;
 : saturday-gmt ( timestamp -- new-timestamp ) saturday >gmt! ;
 
+: day< ( quot -- new-timestamp ) keep over before=? [ 7 days time- ] when ; inline
+: day<= ( quot -- new-timestamp ) keep over before? [ 7 days time- ] when ; inline
+: day> ( quot -- new-timestamp ) keep over after=? [ 7 days time+ ] when ; inline
+: day>= ( quot -- new-timestamp ) keep over after? [ 7 days time+ ] when ; inline
+
+: sunday< ( timestamp -- new-timestamp ) [ sunday ] day< ;
+: monday< ( timestamp -- new-timestamp ) [ monday ] day< ;
+: tuesday< ( timestamp -- new-timestamp ) [ tuesday ] day< ;
+: wednesday< ( timestamp -- new-timestamp ) [ wednesday ] day< ;
+: thursday< ( timestamp -- new-timestamp ) [ thursday ] day< ;
+: friday< ( timestamp -- new-timestamp ) [ friday ] day< ;
+: saturday< ( timestamp -- new-timestamp ) [ saturday ] day< ;
+
+: sunday<= ( timestamp -- new-timestamp ) [ sunday ] day<= ;
+: monday<= ( timestamp -- new-timestamp ) [ monday ] day<= ;
+: tuesday<= ( timestamp -- new-timestamp ) [ tuesday ] day<= ;
+: wednesday<= ( timestamp -- new-timestamp ) [ wednesday ] day<= ;
+: thursday<= ( timestamp -- new-timestamp ) [ thursday ] day<= ;
+: friday<= ( timestamp -- new-timestamp ) [ friday ] day<= ;
+: saturday<= ( timestamp -- new-timestamp ) [ saturday ] day<= ;
+
+: sunday> ( timestamp -- new-timestamp ) [ sunday ] day> ;
+: monday> ( timestamp -- new-timestamp ) [ monday ] day> ;
+: tuesday> ( timestamp -- new-timestamp ) [ tuesday ] day> ;
+: wednesday> ( timestamp -- new-timestamp ) [ wednesday ] day> ;
+: thursday> ( timestamp -- new-timestamp ) [ thursday ] day> ;
+: friday> ( timestamp -- new-timestamp ) [ friday ] day> ;
+: saturday> ( timestamp -- new-timestamp ) [ saturday ] day> ;
+
+: sunday>= ( timestamp -- new-timestamp ) [ sunday ] day>= ;
+: monday>= ( timestamp -- new-timestamp ) [ monday ] day>= ;
+: tuesday>= ( timestamp -- new-timestamp ) [ tuesday ] day>= ;
+: wednesday>= ( timestamp -- new-timestamp ) [ wednesday ] day>= ;
+: thursday>= ( timestamp -- new-timestamp ) [ thursday ] day>= ;
+: friday>= ( timestamp -- new-timestamp ) [ friday ] day>= ;
+: saturday>= ( timestamp -- new-timestamp ) [ saturday ] day>= ;
+
 : sunday? ( timestamp -- ? ) day-of-week 0 = ;
 : monday? ( timestamp -- ? ) day-of-week 1 = ;
 : tuesday? ( timestamp -- ? ) day-of-week 2 = ;
@@ -750,7 +787,6 @@ CONSTANT: weekday-offsets { 0 0 1 2 3 4 5 }
 
     [ + + 1.4 /i ]
     [ [ weekday-offsets nth ] bi@ + ] 2bi - ;
-
 
 : sunday-of-month ( timestamp n -- new-timestamp ) 0 nth-day-this-month ;
 : monday-of-month ( timestamp n -- new-timestamp ) 1 nth-day-this-month ;
