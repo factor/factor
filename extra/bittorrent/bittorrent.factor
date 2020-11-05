@@ -470,4 +470,4 @@ M:: piece handle-message ( peer message -- peer )
     peer request-piece ;
 
 : read-messages ( peer -- peer )
-    [ read-message ] [ handle-message ] while* drop ;
+    [ read-message ] [ handle-message ] while* ;
