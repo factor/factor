@@ -31,7 +31,8 @@ nonce ;
 : present-base-url ( url -- string )
     [
         [ unparse-protocol ]
-        [ path>> url-encode % ] bi
+        [ unparse-authority ]
+        [ path>> url-encode % ] tri
     ] "" make ;
 
 :: signature-base-string ( url request-method params -- string )
