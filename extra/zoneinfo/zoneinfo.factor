@@ -1,9 +1,10 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ascii assocs calendar calendar.english
-combinators combinators.smart io.encodings.utf8 io.files kernel
-math.parser memoize namespaces sequences sequences.extras
-sorting splitting splitting.extras ;
+USING: accessors arrays ascii assocs assocs.extras calendar
+calendar.english combinators combinators.smart grouping
+interval-maps io.encodings.utf8 io.files kernel math math.parser
+memoize namespaces sequences sequences.extras sorting splitting
+splitting.extras ;
 IN: zoneinfo
 
 CONSTANT: zoneinfo-paths
@@ -154,32 +155,124 @@ ERROR: zone-not-found name ;
 : zone-month ( timestamp month -- timestamp' )
     month-abbreviation-index >>month ;
 
-: zone-day ( timestamp day -- timestamp' )
+ERROR: unknown-day-abbrev day ;
+: day-abbrev>= ( timestamp day -- timestamp' )
     {
-        { "Sun>=1" [ 0 sunday-of-month ] }
-        { "lastSun" [ last-sunday-of-month ] }
-        [ string>number >>day ]
+        { "Sun" [ sunday>= ] }
+        { "Mon" [ monday>= ] }
+        { "Tue" [ tuesday>= ] }
+        { "Wed" [ wednesday>= ] }
+        { "Thu" [ thursday>= ] }
+        { "Fri" [ friday>= ] }
+        { "Sat" [ saturday>= ] }
+        [ unknown-day-abbrev ]
     } case ;
+
+: day-abbrev<= ( timestamp day -- timestamp' )
+    {
+        { "Sun" [ sunday<= ] }
+        { "Mon" [ monday<= ] }
+        { "Tue" [ tuesday<= ] }
+        { "Wed" [ wednesday<= ] }
+        { "Thu" [ thursday<= ] }
+        { "Fri" [ friday<= ] }
+        { "Sat" [ saturday<= ] }
+        [ unknown-day-abbrev ]
+    } case ;
+
+: comparison-day-string ( timestamp string -- timestamp )
+    {
+        { [ ">=" over subseq? ] [ ">=" split1 swap [ string>number >>day ] dip day-abbrev>= ] }
+        { [ "<=" over subseq? ] [ "<=" split1 swap [ string>number >>day ] dip day-abbrev<= ] }
+        [ string>number >>day ]
+    } cond ;
+        
+ERROR: unknown-last-day string ;
+
+: last-day-string ( timestamp string -- timestamp )
+    {
+        { "lastSun" [ last-sunday-of-month ] }
+        { "lastMon" [ last-monday-of-month ] }
+        { "lastTue" [ last-tuesday-of-month ] }
+        { "lastWed" [ last-wednesday-of-month ] }
+        { "lastThu" [ last-thursday-of-month ] }
+        { "lastFri" [ last-friday-of-month ] }
+        { "lastSat" [ last-saturday-of-month ] }
+        [ unknown-last-day ]
+    } case ;
+
+!  "lastFri" | "Fri<=1" | "Sat>=2" | "15"
+: zone-day ( timestamp text -- timestamp' )
+    dup "last" head? [
+        last-day-string
+    ] [
+        comparison-day-string
+    ] if ;
+
+: string>year ( str -- year )
+    string>number <year-gmt> ;
+
+: rule-year>years ( rule -- from to )
+    [ from>> ] [ to>> ] bi
+    {
+        { [ over "min" = ] [ [ drop -1/0. ] [ string>year ] bi* ] }
+        { [ dup "max" = ] [ [ string>year ] [ drop 1/0. ] bi* ] }
+        { [ dup "only" = ] [ drop dup [ string>year ] bi@ ] }
+        [ [ string>year ] bi@ ]
+    } cond ;
 
 ! XXX: Don't just drop the s/u, e.g. 2:00:00s
 : zone-time ( timestamp time -- timestamp' )
     [ Letter? ] split-tail drop
     time>offset first3 set-time ;
 
-: until>timestamp ( seq -- timestamp )
-    [ 9999 <year-gmt> ]
-    [
+: hm>duration ( str -- duration )
+    ":" split1 "0" or [ string>number ] bi@
+    [ instant ] 2dip 0 set-time! ;
+
+: rule>timestamp-rest ( timestamp zone -- from )
+    {
+        [ over fp-infinity? [ drop ] [ in>> month-abbreviation-index >>month ] if ]
+        [ over fp-infinity? [ drop ] [ on>> zone-day ] if ]
+        [ over fp-infinity? [ drop ] [ at-time>> zone-time ] if ]
+    } cleave ;
+
+: rule>timestamps ( zone -- from to )
+    [ rule-year>years ] keep
+    [ nip rule>timestamp-rest ]
+    [ nipd rule>timestamp-rest ] 3bi ;
+
+: until>timestamp ( seq -- unix-time )
+    [ 1/0. ] [
         4 f pad-tail first4 {
             [ string>number <year-gmt> ]
             [ [ zone-month ] when* ]
             [ [ zone-day ] when* ]
             [ [ zone-time ] when* ]
-        } spread
+        } spread timestamp>unix-time
     ] if-empty ;
 
-: raw-rule>triple ( raw-rule -- quot )
-    {
-        [ from>> string>number ]
-        [ in>> month-abbreviation-index ]
-        [ on>> on>value ]
-    } cleave>array ;
+: zones>interval-map ( zones -- interval-map )
+    [
+        [ until>> until>timestamp ] map
+        -1/0. prefix 2 <clumps> [ >array ] map
+    ] keep zip
+    [ first2 1 - 2array ] map-keys <interval-map> ;
+
+: name>zones ( name -- interval-map )
+    raw-zone-map at zones>interval-map ;
+
+: gmt-offset ( timestamp name -- gmt-offset )
+    [ timestamp>unix-time ]
+    [ zones>interval-map ] bi* interval-at ;
+
+: name>rules ( name -- rules )
+    raw-rule-map at [
+        [
+            [ rule>timestamps [ dup fp-infinity? [ timestamp>unix-time ] unless ] bi@ 2array ]
+            [ [ save>> hm>duration ] [ letters>> ] bi 2array ] bi 2array
+        ] map
+    ] keep zip ;
+
+: chicago-zones ( -- interval-map ) "America/Chicago" name>zones ;
+ : us-rules ( -- rules ) "US" name>rules ;
