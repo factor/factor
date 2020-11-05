@@ -154,6 +154,11 @@ M: timestamp easter
 : bienniums ( x -- duration ) instant swap 2 * >>year ;
 : trienniums ( x -- duration ) instant swap 3 * >>year ;
 : quadrenniums ( x -- duration ) instant swap 4 * >>year ;
+: quinquenniums ( x -- duration ) instant swap 5 * >>year ;
+: sexenniums ( x -- duration ) instant swap 6 * >>year ;
+: septenniums ( x -- duration ) instant swap 7 * >>year ;
+: octenniums ( x -- duration ) instant swap 8 * >>year ;
+: novenniums ( x -- duration ) instant swap 9 * >>year ;
 : lustrums ( x -- duration ) instant swap 5 * >>year ;
 : decades ( x -- duration ) instant swap 10 * >>year ;
 : indictions ( x -- duration ) instant swap 15 * >>year ;
