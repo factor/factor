@@ -3,7 +3,8 @@
 USING: accessors arrays classes.tuple combinators
 combinators.short-circuit kernel locals math math.functions
 math.intervals math.order math.parser sequences
-slots.syntax splitting system vocabs vocabs.loader ;
+sequences.rotated slots.syntax splitting system vocabs
+vocabs.loader ;
 FROM: math.ranges => [a..b) ;
 IN: calendar
 
@@ -499,14 +500,14 @@ M: timestamp days-in-year year>> days-in-year ;
 : ereyesterday ( -- timestamp ) 2 days ago midnight! ; inline
 : ereyesterday-gmt ( -- timestamp ) 2 days ago midnight-gmt! ; inline
 
-GENERIC: start-of-day ( object -- new-timestamp )
-M: timestamp start-of-day midnight ;
+: start-of-day! ( timestamp -- timestamp ) midnight! ; inline
+: start-of-day ( object -- new-timestamp ) midnight ; inline
 
 : end-of-day! ( timestamp -- timestamp )
-    23 >>hour 59 >>minute 59+999/1000 >>second ;
+    23 >>hour 59 >>minute 59+999/1000 >>second ; inline
 
-GENERIC: end-of-day ( object -- new-timestamp )
-M: timestamp end-of-day clone end-of-day! ;
+: end-of-day ( object -- new-timestamp )
+    clone end-of-day! ; inline
 
 : start-of-month ( timestamp -- new-timestamp )
     midnight 1 >>day ; inline
@@ -520,49 +521,64 @@ M: timestamp end-of-day clone end-of-day! ;
 : end-of-quarter ( timestamp -- new-timestamp )
     [ clone ] [ quarter 1 - 3 * 3 + ] bi >>month end-of-month ; inline
 
-GENERIC: start-of-year ( object -- new-timestamp )
-M: timestamp start-of-year start-of-month 1 >>month ;
-M: integer start-of-year <year> ;
+: first-day-of-month ( object -- new-timestamp )
+    clone 1 >>day ;
 
-GENERIC: end-of-year ( object -- new-timestamp )
-M: timestamp end-of-year end-of-day 12 >>month 31 >>day ;
-M: integer end-of-year 12 31 <date> end-of-day! ;
+: last-day-of-month ( object -- new-timestamp )
+    clone dup days-in-month >>day ; inline
 
-GENERIC: start-of-decade ( object -- new-timestamp )
-M: timestamp start-of-decade start-of-year [ dup 10 mod - ] change-year ;
-M: integer start-of-decade start-of-year [ dup 10 mod - ] change-year ;
+GENERIC: first-day-of-year ( object -- new-timestamp )
+M: timestamp first-day-of-year first-day-of-month 1 >>month ;
+M: integer first-day-of-year <year> ;
 
-GENERIC: end-of-decade ( object -- new-timestamp )
-M: timestamp end-of-decade end-of-year [ dup 10 mod - 9 + ] change-year ;
-M: integer end-of-decade end-of-year [ dup 10 mod - 9 + ] change-year ;
+GENERIC: last-day-of-year ( object -- new-timestamp )
+M: timestamp last-day-of-year clone 12 >>month 31 >>day ;
+M: integer last-day-of-year 12 31 <date> ;
 
-GENERIC: start-of-century ( object -- new-timestamp )
-M: timestamp start-of-century start-of-year [ dup 100 mod - ] change-year ;
-M: integer start-of-century start-of-year [ dup 100 mod - ] change-year ;
+GENERIC: first-day-of-decade ( object -- new-timestamp )
+M: timestamp first-day-of-decade first-day-of-year [ dup 10 mod - ] change-year ;
+M: integer first-day-of-decade first-day-of-year [ dup 10 mod - ] change-year ;
 
-GENERIC: end-of-century ( object -- new-timestamp )
-M: timestamp end-of-century end-of-year [ dup 100 mod - 99 + ] change-year ;
-M: integer end-of-century end-of-year [ dup 100 mod - 99 + ] change-year ;
+GENERIC: last-day-of-decade ( object -- new-timestamp )
+M: timestamp last-day-of-decade last-day-of-year [ dup 10 mod - 9 + ] change-year ;
+M: integer last-day-of-decade last-day-of-year [ dup 10 mod - 9 + ] change-year ;
 
-GENERIC: start-of-millennium ( object -- new-timestamp )
-M: timestamp start-of-millennium start-of-year [ dup 1000 mod - ] change-year ;
-M: integer start-of-millennium start-of-year [ dup 1000 mod - ] change-year ;
+GENERIC: first-day-of-century ( object -- new-timestamp )
+M: timestamp first-day-of-century first-day-of-year [ dup 100 mod - ] change-year ;
+M: integer first-day-of-century first-day-of-year [ dup 100 mod - ] change-year ;
 
-GENERIC: end-of-millennium ( object -- new-timestamp )
-M: timestamp end-of-millennium end-of-year [ dup 1000 mod - 999 + ] change-year ;
-M: integer end-of-millennium end-of-year [ dup 1000 mod - 999 + ] change-year ;
+GENERIC: last-day-of-century ( object -- new-timestamp )
+M: timestamp last-day-of-century last-day-of-year [ dup 100 mod - 99 + ] change-year ;
+M: integer last-day-of-century last-day-of-year [ dup 100 mod - 99 + ] change-year ;
 
-: last-day-of-year ( object -- new-timestamp )
-    end-of-year midnight! ;
+GENERIC: first-day-of-millennium ( object -- new-timestamp )
+M: timestamp first-day-of-millennium first-day-of-year [ dup 1000 mod - ] change-year ;
+M: integer first-day-of-millennium first-day-of-year [ dup 1000 mod - ] change-year ;
 
-: last-day-of-decade ( object -- new-timestamp )
-    end-of-decade midnight! ;
+GENERIC: last-day-of-millennium ( object -- new-timestamp )
+M: timestamp last-day-of-millennium last-day-of-year [ dup 1000 mod - 999 + ] change-year ;
+M: integer last-day-of-millennium last-day-of-year [ dup 1000 mod - 999 + ] change-year ;
 
-: last-day-of-century ( object -- new-timestamp )
-    end-of-century midnight! ;
+: start-of-year ( object -- new-timestamp )
+    first-day-of-year start-of-day! ;
 
-: last-day-of-millennium ( object -- new-timestamp )
-    end-of-millennium midnight! ;
+: end-of-year ( object -- new-timestamp )
+    last-day-of-year end-of-day! ;
+
+: start-of-decade ( object -- new-timestamp )
+    first-day-of-decade start-of-day! ;
+
+: end-of-decade ( object -- new-timestamp )
+    last-day-of-decade end-of-day! ;
+
+: end-of-century ( object -- new-timestamp )
+    last-day-of-century end-of-day! ;
+
+: start-of-millennium ( object -- new-timestamp )
+    first-day-of-millennium start-of-day! ;
+
+: end-of-millennium ( object -- new-timestamp )
+    last-day-of-millennium end-of-day! ;
 
 : start-of-hour ( timestamp -- new-timestamp ) clone 0 >>minute 0 >>second ;
 : end-of-hour ( timestamp -- new-timestamp ) clone 59 >>minute 59+999/1000 >>second ;
@@ -586,14 +602,16 @@ M: real end-of-second floor 999/1000 + ;
 : day-this-week ( timestamp n -- new-timestamp )
     day-offset days time+ ;
 
+: closest-day ( timestamp n -- new-timestamp )
+    [ dup day-of-week ] dip
+    { 0 1 2 3 -3 -2 -1 }
+    rot 7 swap - <rotated> nth days time+ ;
+
 :: nth-day-this-month ( timestamp n day -- new-timestamp )
     timestamp start-of-month day day-this-week
     dup timestamp [ month>> ] same?
     [ 1 weeks time+ ] unless
     n [ weeks time+ ] unless-zero ;
-
-: last-day-this-month ( timestamp day -- new-timestamp )
-    [ 1 months time+ 1 ] dip nth-day-this-month 1 weeks time- ;
 
 PRIVATE>
 
@@ -675,6 +693,14 @@ M: timestamp october-gmt >gmt 10 >>month ;
 M: timestamp november-gmt >gmt 11 >>month ;
 M: timestamp december-gmt >gmt 12 >>month ;
 
+: closest-sunday ( timestamp -- new-timestamp ) 0 closest-day ;
+: closest-monday ( timestamp -- new-timestamp ) 1 closest-day ;
+: closest-tuesday ( timestamp -- new-timestamp ) 2 closest-day ;
+: closest-wednesday ( timestamp -- new-timestamp ) 3 closest-day ;
+: closest-thursday ( timestamp -- new-timestamp ) 4 closest-day ;
+: closest-friday ( timestamp -- new-timestamp ) 5 closest-day ;
+: closest-saturday ( timestamp -- new-timestamp ) 6 closest-day ;
+
 : sunday ( timestamp -- new-timestamp ) 0 day-this-week ;
 : monday ( timestamp -- new-timestamp ) 1 day-this-week ;
 : tuesday ( timestamp -- new-timestamp ) 2 day-this-week ;
@@ -690,6 +716,9 @@ M: timestamp december-gmt >gmt 12 >>month ;
 : thursday-gmt ( timestamp -- new-timestamp ) thursday >gmt! ;
 : friday-gmt ( timestamp -- new-timestamp ) friday >gmt! ;
 : saturday-gmt ( timestamp -- new-timestamp ) saturday >gmt! ;
+
+: first-day-of-week ( object -- new-timestamp ) sunday ; inline
+: last-day-of-week ( object -- new-timestamp ) saturday ; inline
 
 : day< ( quot -- new-timestamp ) keep over before=? [ 7 days time- ] when ; inline
 : day<= ( quot -- new-timestamp ) keep over before? [ 7 days time- ] when ; inline
@@ -727,6 +756,22 @@ M: timestamp december-gmt >gmt 12 >>month ;
 : thursday>= ( timestamp -- new-timestamp ) [ thursday ] day>= ;
 : friday>= ( timestamp -- new-timestamp ) [ friday ] day>= ;
 : saturday>= ( timestamp -- new-timestamp ) [ saturday ] day>= ;
+
+: next-sunday ( timestamp -- new-timestamp ) closest-sunday sunday> ;
+: next-monday ( timestamp -- new-timestamp ) closest-monday monday> ;
+: next-tuesday ( timestamp -- new-timestamp ) closest-tuesday tuesday> ;
+: next-wednesday ( timestamp -- new-timestamp ) closest-wednesday wednesday> ;
+: next-thursday ( timestamp -- new-timestamp ) closest-thursday thursday> ;
+: next-friday ( timestamp -- new-timestamp ) closest-friday friday> ;
+: next-saturday ( timestamp -- new-timestamp ) closest-saturday saturday> ;
+
+: last-sunday ( timestamp -- new-timestamp ) closest-sunday sunday< ;
+: last-monday ( timestamp -- new-timestamp ) closest-monday monday< ;
+: last-tuesday ( timestamp -- new-timestamp ) closest-tuesday tuesday< ;
+: last-wednesday ( timestamp -- new-timestamp ) closest-wednesday wednesday< ;
+: last-thursday ( timestamp -- new-timestamp ) closest-thursday thursday< ;
+: last-friday ( timestamp -- new-timestamp ) closest-friday friday< ;
+: last-saturday ( timestamp -- new-timestamp ) closest-saturday saturday< ;
 
 : sunday? ( timestamp -- ? ) day-of-week 0 = ;
 : monday? ( timestamp -- ? ) day-of-week 1 = ;
@@ -796,16 +841,19 @@ CONSTANT: weekday-offsets { 0 0 1 2 3 4 5 }
 : friday-of-month ( timestamp n -- new-timestamp ) 5 nth-day-this-month ;
 : saturday-of-month ( timestamp n -- new-timestamp ) 6 nth-day-this-month ;
 
-: last-sunday-of-month ( timestamp -- new-timestamp ) 0 last-day-this-month ;
-: last-monday-of-month ( timestamp -- new-timestamp ) 1 last-day-this-month ;
-: last-tuesday-of-month ( timestamp -- new-timestamp ) 2 last-day-this-month ;
-: last-wednesday-of-month ( timestamp -- new-timestamp ) 3 last-day-this-month ;
-: last-thursday-of-month ( timestamp -- new-timestamp ) 4 last-day-this-month ;
-: last-friday-of-month ( timestamp -- new-timestamp ) 5 last-day-this-month ;
-: last-saturday-of-month ( timestamp -- new-timestamp ) 6 last-day-this-month ;
+: last-sunday-of-month ( timestamp -- new-timestamp ) last-day-of-month sunday<= ;
+: last-monday-of-month ( timestamp -- new-timestamp ) last-day-of-month monday<= ;
+: last-tuesday-of-month ( timestamp -- new-timestamp ) last-day-of-month tuesday<= ;
+: last-wednesday-of-month ( timestamp -- new-timestamp ) last-day-of-month wednesday<= ;
+: last-thursday-of-month ( timestamp -- new-timestamp ) last-day-of-month thursday<= ;
+: last-friday-of-month ( timestamp -- new-timestamp ) last-day-of-month friday<= ;
+: last-saturday-of-month ( timestamp -- new-timestamp ) last-day-of-month saturday<= ;
 
 : start-of-week ( timestamp -- new-timestamp )
-    midnight sunday ;
+    sunday midnight! ;
+
+: end-of-week ( timestamp -- new-timestamp )
+    saturday end-of-day! ;
 
 : o'clock ( timestamp n -- new-timestamp )
     [ midnight ] dip >>hour ;
