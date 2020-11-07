@@ -884,11 +884,11 @@ CONSTANT: weekday-offsets { 0 0 1 2 3 4 5 }
     [ ] tri* + + >integer
     swap 367 366 ? mod ;
 
-: timestamp>year-dates ( timestamp -- seq )
+: timestamp>year-dates-gmt ( timestamp -- seq )
     [ start-of-year >date< julian-day-number ]
     [ days-in-year ] bi
     [ drop ] [ + ] 2bi
-    [a..b) [ julian-day-number>date <date> ] map ;
+    [a..b) [ julian-day-number>date <date-gmt> ] map ;
 
 : year-ordinal>timestamp ( year ordinal -- timestamp )
     [ 1 1 julian-day-number ] dip
