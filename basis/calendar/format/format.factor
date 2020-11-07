@@ -79,8 +79,7 @@ GENERIC: year. ( obj -- )
 M: integer year.
     12 [ 1 + 2array month. nl ] with each-integer ;
 
-M: timestamp year.
-    year>> year. ;
+M: timestamp year. year>> year. ;
 
 : timestamp>mdtm ( timestamp -- str )
     [ { YYYY MM DD hh mm ss } formatted ] with-string-writer ;
