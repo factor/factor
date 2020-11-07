@@ -172,3 +172,9 @@ ${ os windows? "3" "2" ? } [ 5/2 "%.0f" sprintf ] unit-test
 ${ os windows? "2.500000e+00" "2e+00" ? } [ 5/2 "%.0e" sprintf ] unit-test
 ${ os windows? "3.500000e+00" "4e+00" ? } [ 7/2 "%.0e" sprintf ] unit-test
 ${ os windows? "1.000000e+00" "1e+00" ? } [ 1.0 "%.0e" sprintf ] unit-test
+
+{ "00" } [ 2020 1 1 <date> "%U" strftime ] unit-test
+{ "00" } [ 2020 1 1 <date> "%W" strftime ] unit-test
+
+{ "44" } [ 2020 11 6 <date> "%U" strftime ] unit-test
+{ "44" } [ 2020 11 6 <date> "%W" strftime ] unit-test
