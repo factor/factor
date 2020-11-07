@@ -286,20 +286,20 @@ IN: calendar
 } [ 2020 366 year-ordinal>timestamp >gmt midnight ] unit-test
 
 { t } [
-    2020 <year> timestamp>year-dates
+    2020 <year> timestamp>year-dates-gmt
     [ >date< ymd>ordinal ] map [ < ] monotonic?
 ] unit-test
 
 { t } [
     1999 2025 [a,b] [
-        <year> timestamp>year-dates
+        <year> timestamp>year-dates-gmt
         [ >date< ymd>ordinal ] map [ < ] monotonic?
     ] map [ ] all?
 ] unit-test
 
 { t } [
     1999 2025 [a,b] [
-        <year-gmt> timestamp>year-dates
+        <year-gmt> timestamp>year-dates-gmt
         [ >date< ymd>ordinal ] map [ < ] monotonic?
     ] map [ ] all?
 ] unit-test
@@ -330,37 +330,37 @@ IN: calendar
 
 { t } [
     2014 1 1 <date-gmt>
-    2014 <year-gmt> timestamp>year-dates
+    2014 <year-gmt> timestamp>year-dates-gmt
     [ weekdays-between ] with map [ <= ] monotonic?
 ] unit-test
 
 { t } [
     2020 1 1 <date-gmt>
-    2020 <year-gmt> timestamp>year-dates
+    2020 <year-gmt> timestamp>year-dates-gmt
     [ weekdays-between ] with map [ <= ] monotonic?
 ] unit-test
 
 { t } [
     2014 1 1 <date-gmt>
-    2014 <year-gmt> timestamp>year-dates
+    2014 <year-gmt> timestamp>year-dates-gmt
     [ weekdays-between ] with map
     dup 1 tail swap v- [ 1 <= ] all?
 ] unit-test
 
 { t } [
     2020 1 1 <date-gmt>
-    2020 <year-gmt> timestamp>year-dates
+    2020 <year-gmt> timestamp>year-dates-gmt
     [ weekdays-between ] with map
     dup 1 tail swap v- [ 1 <= ] all?
 ] unit-test
 
 { 0 } [
     2014 1 1 <date-gmt>
-    2014 <year-gmt> timestamp>year-dates
+    2014 <year-gmt> timestamp>year-dates-gmt
     [ weekdays-between2 ] with map
 
     2014 1 1 <date-gmt>
-    2014 <year-gmt> timestamp>year-dates
+    2014 <year-gmt> timestamp>year-dates-gmt
     [ weekdays-between ] with map
 
     v- sum
