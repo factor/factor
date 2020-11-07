@@ -30,13 +30,13 @@ HOLIDAY: new-years-day january 1 >>day ;
 HOLIDAY-NAME: new-years-day world "New Year's Day"
 HOLIDAY-NAME: new-years-day us-federal "New Year's Day"
 
-HOLIDAY: martin-luther-king-day january 3 monday-of-month ;
+HOLIDAY: martin-luther-king-day january 2 monday-of-month ;
 HOLIDAY-NAME: martin-luther-king-day us-federal "Martin Luther King Day"
 
 HOLIDAY: inauguration-day january 20 >>day [ dup 4 neg rem + ] change-year ;
 HOLIDAY-NAME: inauguration-day us "Inauguration Day"
 
-HOLIDAY: washingtons-birthday february 3 monday-of-month ;
+HOLIDAY: washingtons-birthday february 2 monday-of-month ;
 HOLIDAY-NAME: washingtons-birthday us-federal "Washington's Birthday"
 
 HOLIDAY: memorial-day may last-monday-of-month ;
@@ -45,15 +45,15 @@ HOLIDAY-NAME: memorial-day us-federal "Memorial Day"
 HOLIDAY: independence-day july 4 >>day ;
 HOLIDAY-NAME: independence-day us-federal "Independence Day"
 
-HOLIDAY: labor-day september 1 monday-of-month ;
+HOLIDAY: labor-day september 0 monday-of-month ;
 HOLIDAY-NAME: labor-day us-federal "Labor Day"
 
-HOLIDAY: columbus-day october 2 monday-of-month ;
+HOLIDAY: columbus-day october 1 monday-of-month ;
 HOLIDAY-NAME: columbus-day us-federal "Columbus Day"
 
 HOLIDAY-NAME: armistice-day us-federal "Veterans Day"
 
-HOLIDAY: thanksgiving-day november 4 thursday-of-month ;
+HOLIDAY: thanksgiving-day november 3 thursday-of-month ;
 HOLIDAY-NAME: thanksgiving-day us-federal "Thanksgiving Day"
 
 HOLIDAY: christmas-day december 25 >>day ;
@@ -86,15 +86,15 @@ HOLIDAY: administrative-professionals-day april last-saturday-of-month wednesday
 
 HOLIDAY: cinco-de-mayo may 5 >>day ;
 
-HOLIDAY: mothers-day may 2 sunday-of-month ;
+HOLIDAY: mothers-day may 1 sunday-of-month ;
 
-HOLIDAY: armed-forces-day may 3 saturday-of-month ;
+HOLIDAY: armed-forces-day may 2 saturday-of-month ;
 
-HOLIDAY: national-donut-day june 1 friday-of-month ;
+HOLIDAY: national-donut-day june 0 friday-of-month ;
 
 HOLIDAY: flag-day june 14 >>day ;
 
-HOLIDAY: parents-day july 4 sunday-of-month ;
+HOLIDAY: parents-day july 3 sunday-of-month ;
 
 HOLIDAY: grandparents-day labor-day 1 weeks time+ ;
 
@@ -106,11 +106,11 @@ HOLIDAY: citizenship-day september 17 >>day ;
 
 HOLIDAY: bosss-day october 16 >>day ;
 
-HOLIDAY: sweetest-day october 3 saturday-of-month ;
+HOLIDAY: sweetest-day october 2 saturday-of-month ;
 
 HOLIDAY: halloween october 31 >>day ;
 
-HOLIDAY: election-day november 1 monday-of-month 1 days time+ ;
+HOLIDAY: election-day november 0 monday-of-month 1 days time+ ;
 
 HOLIDAY: black-friday thanksgiving-day 1 days time+ ;
 
