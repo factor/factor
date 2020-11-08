@@ -98,10 +98,6 @@ M: model set-image [ value>> >>image drop ] [ >>model ] 2bi ;
     \ image-control new-image-gadget* ;
 : image-window ( object -- ) <image-gadget> "Image" open-window ;
 
-! move these words to ui.gadgets because they affect all controls ?
-: stop-control ( gadget -- ) dup model>> [ remove-connection ] [ drop ] if* ;
-: start-control ( gadget -- ) dup model>> [ add-connection ] [ drop ] if* ;
-
 : image. ( object -- ) <image-gadget> gadget. ;
 
 M: image content-gadget
