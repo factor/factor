@@ -220,6 +220,17 @@ GENERIC: ungraft* ( gadget -- )
 
 M: gadget ungraft* drop ;
 
+: activate-control ( gadget -- )
+    dup model>> dup [
+        2dup add-connection
+        swap model-changed
+    ] [
+        2drop
+    ] if ;
+
+: deactivate-control ( gadget -- )
+    dup model>> dup [ 2dup remove-connection ] when 2drop ;
+
 <PRIVATE
 
 : graft-queue ( -- dlist )
@@ -261,17 +272,6 @@ M: gadget ungraft* drop ;
 
 : ungraft ( gadget -- )
     dup [ ungraft ] each-child ungraft-later ;
-
-: activate-control ( gadget -- )
-    dup model>> dup [
-        2dup add-connection
-        swap model-changed
-    ] [
-        2drop
-    ] if ;
-
-: deactivate-control ( gadget -- )
-    dup model>> dup [ 2dup remove-connection ] when 2drop ;
 
 : notify ( gadget -- )
     dup graft-state>>

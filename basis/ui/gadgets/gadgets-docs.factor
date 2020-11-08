@@ -205,6 +205,18 @@ HELP: ui-notify-flag
 { $var-description "A " { $link flag } " raised to notify the UI thread that there is work to do." }
 { $see-also notify-ui-thread } ;
 
+HELP: activate-control
+{ $values
+  { "gadget" gadget }
+}
+{ $description "Adds a connection between the gadget and it's model." } ;
+
+HELP: deactivate-control
+{ $values
+  { "gadget" gadget }
+}
+{ $description "Removes the connection between the gadget and it's model" } ;
+
 ARTICLE: "ui-control-impl" "Implementing controls"
 "A " { $emphasis "control" } " is a gadget which is linked to an underlying " { $link model } " by having its " { $snippet "model" } " slot set to a " { $link model } " instance."
 $nl
