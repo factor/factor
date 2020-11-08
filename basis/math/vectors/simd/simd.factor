@@ -94,7 +94,7 @@ DEFER: simd-construct-op
 
 : (vvx->v-op) ( a b obj rep quot: ( (a) (b) obj rep -- (c) ) -- c )
     [ [ simd-unbox ] [ underlying>> ] bi* ] 3dip 2curry 2curry make-underlying ; inline
-    
+
 : vv->v-op ( a b rep quot: ( (a) (b) rep -- (c) ) fallback-quot -- c )
     [ '[ _ (vv->v-op) ] ] [ '[ drop @ ] ] bi* if-both-vectors-match ; inline
 
