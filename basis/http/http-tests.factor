@@ -240,7 +240,7 @@ http.server.dispatchers db.tuples ;
     [ main-responder ] dip '[
         <http-server> 0 >>insecure f >>secure
         [
-            server-addrs [ ipv4? ] filter random "addr" set @
+            server-addrs random "addr" set @
         ] with-threaded-server
     ] with-variable ; inline
 
