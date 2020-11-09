@@ -54,7 +54,7 @@ IN: memory.tests
 
 : leak-loop ( -- ) 100 [ leak-step ] times ;
 
-{ } [ leak-loop ] unit-test
+{ } [ leak-loop ] long-unit-test
 
 ! Bug: allocation of large objects directly into tenured space
 ! can proceed past the high water mark.
@@ -80,7 +80,7 @@ SYMBOL: foo
 
     data-room tenured>> size>>
     assert=
-] unit-test
+] long-unit-test
 
 ! Perform one gc cycle. Then increase the stack height by 100 and
 ! force a gc cycle again.
