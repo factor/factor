@@ -6,8 +6,6 @@ os:
   - linux
   - osx
 sudo: required
-dist: trusty
-group: deprecated-2017Q4
 services:
   - postgresql
   - redis-server
@@ -35,23 +33,23 @@ addons:
       - gtk2-engines-pixbuf
 before_install:
   - uname -s
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export HOMEBREW_NO_AUTO_UPDATE=1 ; fi # Don't let homebrew upgrade itself
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm -rf ~/.gnupg/; fi  # https://github.com/rvm/rvm/issues/3110
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/mpapis.asc | gpg --import - ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/pkuczynski.asc | gpg --import - ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://get.rvm.io | bash -s stable; fi  # https://github.com/travis-ci/travis-ci/issues/6307
+  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export HOMEBREW_NO_AUTO_UPDATE=1 ; fi # Don't let homebrew upgrade itself
+  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm -rf ~/.gnupg/; fi  # https://github.com/rvm/rvm/issues/3110
+  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/mpapis.asc | gpg --import - ; fi
+  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/pkuczynski.asc | gpg --import - ; fi
+  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://get.rvm.io | bash -s stable; fi  # https://github.com/travis-ci/travis-ci/issues/6307
   #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm reload ; fi # for homebrew to have 2.6.3, which takes too long. instead we just use HOMEBREW_NO_AUTO_UPDATE=1
   #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm install ruby-2.6.3 ; fi # for homebrew
   #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm use 2.6 ; fi # for homebrew
 
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build.sh deps-macosx ; else ./build.sh deps-apt-get ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions snappy > /dev/null || brew install snappy; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions cmake > /dev/null || brew install cmake; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions libmagic > /dev/null || brew install libmagic; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions memcached > /dev/null || brew install memcached; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions redis > /dev/null || brew install redis; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions zeromq > /dev/null || brew install zeromq; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew ls --versions postgresql > /dev/null || brew install postgresql; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; brew update ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install snappy; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install cmake; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install libmagic; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install memcached; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install redis; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install zeromq; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install postgresql; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start memcached; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start redis; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start postgresql; fi
