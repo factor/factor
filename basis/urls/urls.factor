@@ -190,7 +190,8 @@ PRIVATE>
     ] bi ;
 
 : set-url-addr ( url addr -- url )
-    [ host>> >>host ] [ port>> >>port ] bi ;
+    [ [ host>> ] [ inet6? ] bi [ "[" "]" surround ] when >>host ]
+    [ port>> >>port ] bi ;
 
 : ensure-port ( url -- url' )
     clone dup protocol>> '[ _ protocol-port or ] change-port ;
