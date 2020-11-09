@@ -78,4 +78,4 @@ script:
   - './factor -run=zealot.cli-changed-vocabs'
   - './factor -run=tools.test `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`'
   - './factor -run=zealot.help-lint `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`'
-  - "./factor -e='USING: modern.paths tools.test sequences system kernel math random ; core-vocabs os macosx? [ dup length 3 /i sample ] when [ test ] each'"
+  - "./factor -e='USING: modern.paths sequences tools.test.private ; core-vocabs [ test-vocab ] each'"
