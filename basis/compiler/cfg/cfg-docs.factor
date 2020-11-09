@@ -30,7 +30,7 @@ HELP: basic-block
     }
     {
         "height"
-        "Block's height as a " { $link height-state } ". What the heights of the block was at entry and how much they were increased in the block."
+        { "Block's height as a " { $link height-state } ". What the heights of the block was at entry and how much they were increased in the block." }
     }
     {
         "replaces"
