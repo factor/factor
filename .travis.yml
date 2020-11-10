@@ -10,6 +10,29 @@ sudo: required
 services:
   - postgresql
   - redis-server
+addons:
+  apt:
+    packages:
+      - links
+      - libblas-dev
+      - libmagic-dev
+      - libsnappy-dev
+      - libzmq-dev
+      - libpq-dev
+      - cmake
+      - libaio-dev
+      - libsnappy-dev
+      - libgtk2.0-dev
+      - gtk2-engines-pixbuf
+  homebrew:
+    packages:
+      - snappy
+      - libmagic
+      - memcached
+      - redis
+      - zeromq
+      - postgresql
+      - udis86
 branches:
   except:
   - clean-windows-x86-64
@@ -22,28 +45,11 @@ before_install:
   - uname -s
   - case $TRAVIS_OS_NAME in
       osx)
-        brew update
-        brew install snappy
-        brew install libmagic
-        brew install memcached
-        brew install redis
-        brew install zeromq
-        brew install postgresql
-        brew install udis86
         brew services start memcached
         brew services start redis
         brew services start postgresql
         ;;
       linux)
-        apt-get install libpango1.0-dev
-        apt-get install libgtk2.0-dev
-        apt-get install gtk2-engines-pixbuf
-        apt-get install libgtkglext1-dev
-        apt-get install libblas-dev
-        apt-get install libmagic-dev
-        apt-get install libsnappy-dev
-        apt-get install libzmq-dev
-        apt-get install libpq-dev
         wget https://github.com/vmt/udis86/archive/v1.7.2.tar.gz && tar xzvf v1.7.2.tar.gz && cd udis86-1.7.2/ && ./autogen.sh && ./configure --enable-shared=yes && make && sudo make install && cd ..
         ;;
     esac
