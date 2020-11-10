@@ -17,43 +17,32 @@ branches:
   - clean-linux-x86-32
   - clean-macosx-x86-64
   - clean-macosx-x86-32
-addons:
-  apt:
-    packages:
-      - links
-      - libblas-dev
-      - libmagic-dev
-      - libsnappy-dev
-      - libzmq-dev
-      - libpq-dev
-      - cmake
-      - libaio-dev
-      - libsnappy-dev
-      - libgtk2.0-dev
-      - gtk2-engines-pixbuf
 before_install:
   - uname -s
-  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export HOMEBREW_NO_AUTO_UPDATE=1 ; fi # Don't let homebrew upgrade itself
-  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm -rf ~/.gnupg/; fi  # https://github.com/rvm/rvm/issues/3110
-  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/mpapis.asc | gpg --import - ; fi
-  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://rvm.io/pkuczynski.asc | gpg --import - ; fi
-  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -sSL https://get.rvm.io | bash -s stable; fi  # https://github.com/travis-ci/travis-ci/issues/6307
-  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm reload ; fi # for homebrew to have 2.6.3, which takes too long. instead we just use HOMEBREW_NO_AUTO_UPDATE=1
-  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm install ruby-2.6.3 ; fi # for homebrew
-  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rvm use 2.6 ; fi # for homebrew
-
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install snappy; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install cmake; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install libmagic; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install memcached; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install redis; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install zeromq; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install postgresql; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start memcached; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start redis; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start postgresql; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start memcached; fi
+  - |-
+    case $TRAVIS_OS_NAME in
+      osx)
+        ./build.sh deps-macosx
+        brew update
+        brew install snappy
+        brew install libmagic
+        brew install memcached
+        brew install redis
+        brew install zeromq
+        brew install postgresql
+        brew services start memcached
+        brew services start redis
+        brew services start postgresql
+        ;;
+      linux)
+        ./build.sh deps-apt
+        apt-get install libblas-dev
+        apt-get install libmagic-dev
+        apt-get install libsnappy-dev
+        apt-get install libzmq-dev
+        apt-get install libpq-dev
+        ;;
+    esac
   - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then
       wget https://github.com/vmt/udis86/archive/v1.7.2.tar.gz && tar xzvf v1.7.2.tar.gz &&
       ( cd udis86-1.7.2/ && ./autogen.sh && ./configure --enable-shared=yes && make && sudo make install ) &&
