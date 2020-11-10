@@ -74,8 +74,8 @@ script:
         ./build.cmd
         ;;
     esac
-  - ./factor -e='USING: memory vocabs.hierarchy tools.test namespaces ; \"zealot\" load f long-unit-tests-enabled? set-global save'
-  #- ./factor -run=zealot.cli-changed-vocabs
-  #- ./factor -run=tools.test `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`
-  #- ./factor -run=zealot.help-lint `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`
-  - ./factor -e='USING: modern.paths sequences tools.test.private ; core-vocabs [ test-vocab ] each'
+  - "./factor -e='USING: memory vocabs.hierarchy tools.test namespaces ; \"zealot\" load f long-unit-tests-enabled? set-global save'"
+  #- "./factor -run=zealot.cli-changed-vocabs"
+  #- "./factor -run=tools.test `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`"
+  #- "./factor -run=zealot.help-lint `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`"
+  - "./factor -e='USING: modern.paths sequences tools.test.private ; core-vocabs [ test-vocab ] each'"
