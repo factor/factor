@@ -45,6 +45,8 @@ before_install:
   - uname -s
   - case $TRAVIS_OS_NAME in
       osx)
+        export HOMEBREW_NO_AUTO_UPDATE=1
+        brew update-reset
         brew services start memcached
         brew services start redis
         brew services start postgresql
