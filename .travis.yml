@@ -46,7 +46,6 @@ before_install:
   - case $TRAVIS_OS_NAME in
       osx)
         export HOMEBREW_NO_AUTO_UPDATE=1
-        brew update-reset
         brew services start memcached
         brew services start redis
         brew services start postgresql
@@ -75,7 +74,6 @@ script:
         ./build.cmd
         ;;
     esac
-    fi
   - ./factor -e='USING: memory vocabs.hierarchy tools.test namespaces ; \"zealot\" load f long-unit-tests-enabled? set-global save'
   #- ./factor -run=zealot.cli-changed-vocabs
   #- ./factor -run=tools.test `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`
