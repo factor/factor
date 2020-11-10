@@ -20,10 +20,8 @@ branches:
   - clean-macosx-x86-32
 before_install:
   - uname -s
-  - |-
-    case $TRAVIS_OS_NAME in
+  - case $TRAVIS_OS_NAME in
       osx)
-        ./build.sh deps-macosx
         brew update
         brew install snappy
         brew install libmagic
@@ -37,7 +35,10 @@ before_install:
         brew services start postgresql
         ;;
       linux)
-        ./build.sh deps-apt
+        apt-get install libpango1.0-dev
+        apt-get install libgtk2.0-dev
+        apt-get install gtk2-engines-pixbuf
+        apt-get install libgtkglext1-dev
         apt-get install libblas-dev
         apt-get install libmagic-dev
         apt-get install libsnappy-dev
@@ -58,8 +59,7 @@ script:
   - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, TRAVIS_PULL_REQUEST_BRANCH=$TRAVIS_PULL_REQUEST_BRANCH"
   - export CI_BRANCH="${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}"
   - echo "CI_BRANCH=${CI_BRANCH}"
-  - |-
-    case $TRAVIS_OS_NAME in
+  - case $TRAVIS_OS_NAME in
       osx | linux)
         DEBUG=1 build.sh net-bootstrap < /dev/null
         ;;
