@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.extras io.files kernel math sequences
-tools.test ;
+splitting tools.test ;
 
 { "a b" }
 [ "a" "b" [ " " glue ] once ] unit-test
@@ -59,4 +59,9 @@ tools.test ;
         { [ "bar" over subseq-start ] [ cut ] }
         [ f ]
     } cond*
+] unit-test
+
+{ f } [ f { } ?call ] unit-test
+{ 5 } [
+    "hello factor!" { [ " " split ] [ first ] [ length ] } ?call
 ] unit-test
