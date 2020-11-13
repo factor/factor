@@ -282,12 +282,12 @@ TUPLE: proc-uptime up idle ;
 
 GENERIC#: proc-pid-path 1 ( object string -- path )
 
-M: integer proc-pid-path ( pid string -- path )
+M: integer proc-pid-path
     [ "/proc/" ] 2dip
     [ number>string "/" append ] dip
     3append ;
 
-M: string proc-pid-path ( pid-string string -- path )
+M: string proc-pid-path
     [ "/proc/" ] 2dip [ append-path ] dip append-path ;
 
 : proc-file-lines ( path -- strings ) utf8 file-lines ;

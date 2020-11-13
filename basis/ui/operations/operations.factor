@@ -89,5 +89,5 @@ INITIALIZED-SYMBOL: operations [ <linked-hash> ]
 : operation-quot ( target operation -- quot )
     [ translator>> ] [ command>> ] bi '[ _ @ _ execute ] ;
 
-M: operation invoke-command ( target command -- )
+M: operation invoke-command
     operation-quot call( -- ) ;

@@ -175,7 +175,7 @@ GENERIC: handle-passive-command ( stream obj -- )
 : finish-directory ( -- )
     "Directory send OK." 226 server-response ;
 
-M: ftp-list handle-passive-command ( stream obj -- )
+M: ftp-list handle-passive-command
     drop
     start-directory [
         utf8 encode-output [
@@ -184,7 +184,7 @@ M: ftp-list handle-passive-command ( stream obj -- )
         harvest [ ftp-send ] each
     ] with-output-stream finish-directory ;
 
-M: ftp-get handle-passive-command ( stream obj -- )
+M: ftp-get handle-passive-command
     [
         path>>
         [ transfer-outgoing-file ]
@@ -194,7 +194,7 @@ M: ftp-get handle-passive-command ( stream obj -- )
         3drop "File transfer failed" ftp-error
     ] recover ;
 
-M: ftp-put handle-passive-command ( stream obj -- )
+M: ftp-put handle-passive-command
     [
         path>>
         [ transfer-incoming-file ]
@@ -204,7 +204,7 @@ M: ftp-put handle-passive-command ( stream obj -- )
         3drop "File transfer failed" ftp-error
     ] recover ;
 
-M: ftp-disconnect handle-passive-command ( stream obj -- )
+M: ftp-disconnect handle-passive-command
     drop dispose ;
 
 : fulfill-client ( obj -- )
@@ -344,7 +344,7 @@ M: ftp-disconnect handle-passive-command ( stream obj -- )
         handle-client-loop
     ] with-directory ;
 
-M: ftp-server handle-client* ( server -- )
+M: ftp-server handle-client*
     [
         "New client" \ handle-client* DEBUG log-message
         ftp-client new client set

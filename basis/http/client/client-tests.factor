@@ -2,9 +2,6 @@ USING: accessors http http.client http.client.private
 io.streams.string kernel namespaces sequences tools.test urls ;
 IN: http.client.tests
 
-{ "localhost" f } [ "localhost" parse-host ] unit-test
-{ "localhost" 8888 } [ "localhost:8888" parse-host ] unit-test
-
 { "foo.txt" } [ "http://www.paulgraham.com/foo.txt" download-name ] unit-test
 { "foo.txt" } [ "http://www.arc.com/foo.txt?xxx" download-name ] unit-test
 { "foo.txt" } [ "http://www.arc.com/foo.txt/" download-name ] unit-test
@@ -195,20 +192,21 @@ CONSTANT: classic-proxy-settings H{
     ] with-variables
 ] unit-test
 
-{ url"http://localhost:3128" } [
-    { { "http.proxy" "localhost:3128" } } [
+
+{ url"//localhost:3128" } [
+    { { "http.proxy" "//localhost:3128" } } [
        "google.com" "GET" <client-request> ?default-proxy proxy-url>>
     ] with-variables
 ] unit-test
 
-{ url"http://localhost:3128" } [
+{ url"//localhost:3128" } [
     "google.com" "GET" <client-request>
-    url"localhost:3128" >>proxy-url ?default-proxy proxy-url>>
+    URL" //localhost:3128" >>proxy-url ?default-proxy proxy-url>>
 ] unit-test
 
-{ url"http://localhost:3128" } [
+{ url"//localhost:3128" } [
     "google.com" "GET" <client-request>
-    "localhost:3128" >>proxy-url ?default-proxy proxy-url>>
+    "//localhost:3128" >>proxy-url ?default-proxy proxy-url>>
 ] unit-test
 
 { url"http://proxysec.private:3128" } [

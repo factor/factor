@@ -234,7 +234,7 @@ TUPLE: selected-line start end first? last? ;
 
 PRIVATE>
 
-M: editor draw-line ( line index editor -- )
+M: editor draw-line
     [ selected-lines get at ] dip over
     [ draw-selected-line ] [ nip draw-unselected-line ] if ;
 

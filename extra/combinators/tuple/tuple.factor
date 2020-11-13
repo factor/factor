@@ -19,7 +19,7 @@ MACRO:: nmake-tuple ( class assoc n -- quot )
     class <wrapper> :> \class
     { quots n ncleave \class boa } >quotation ;
 
-: make-tuple ( x class assoc -- tuple )
+: 1make-tuple ( x class assoc -- tuple )
     1 nmake-tuple ; inline
 
 : 2make-tuple ( x y class assoc -- tuple )

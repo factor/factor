@@ -1,5 +1,6 @@
 
-USING: arrays assocs fry kernel punycode tools.test ;
+USING: arrays assocs fry kernel linked-assocs punycode
+tools.test urls ;
 
 {
     ! Wikipedia Examples
@@ -147,3 +148,19 @@ USING: arrays assocs fry kernel punycode tools.test ;
     [ [ 1array ] dip '[ _ idna> ] unit-test ]
     [ 1array swap '[ _ >idna ] unit-test ] 2bi
 ] assoc-each
+
+{ IRL" http://例子.卷筒纸" } [ URL" http://xn--fsqu00a.xn--3lr804guic/" >irl ] unit-test
+{ URL" http://xn--fsqu00a.xn--3lr804guic/" } [ IRL" http://例子.卷筒纸" >url ] unit-test
+
+{
+    T{ irl
+        { protocol "http" }
+        { username f }
+        { password f }
+        { host "März.com" }
+        { port f }
+        { path "/päth" }
+        { query LH{ { "query" "Dürst" } } }
+        { anchor "☃" }
+    }
+} [ "http://März.com/päth?query=Dürst#☃" >irl ] unit-test

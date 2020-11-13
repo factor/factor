@@ -160,7 +160,7 @@ M: bio dispose* handle>> BIO_free ssl-error ;
         V{ } clone >>aliens
         H{ } clone >>sessions ;
 
-M: openssl <secure-context> ( config -- context )
+M: openssl <secure-context>
     maybe-init-ssl
     [
         dup method>> ssl-method SSL_CTX_new
@@ -276,7 +276,7 @@ SYMBOL: default-secure-context
         { { SSL_ERROR_ZERO_RETURN [ drop f ] } } check-ssl-error
     ] keep swap [ 2nip ] [ swap buffer+ f ] if* ;
 
-M: ssl-handle refill ( port handle -- event/f )
+M: ssl-handle refill
     dup maybe-handshake [ buffer>> ] [ handle>> ] bi* do-ssl-read ;
 
 ! Output ports
@@ -284,7 +284,7 @@ M: ssl-handle refill ( port handle -- event/f )
     2dup swap [ buffer@ ] [ buffer-length ] bi SSL_write
     [ f check-ssl-error ] keep swap [ 2nip ] [ swap buffer-consume f ] if* ;
 
-M: ssl-handle drain ( port handle -- event/f )
+M: ssl-handle drain
     dup maybe-handshake [ buffer>> ] [ handle>> ] bi* do-ssl-write ;
 
 ! Connect
@@ -380,7 +380,7 @@ M: ssl-handle dispose*
         [ 2drop ] [ subject-name-verify-error ] if
     ] [ certificate-missing-error ] if* ;
 
-M: openssl check-certificate ( host ssl -- )
+M: openssl check-certificate
     current-secure-context config>> verify>> [
         handle>>
         [ nip check-verify-result ]
@@ -413,7 +413,7 @@ M: openssl send-secure-handshake
         host>> swap handle>> check-certificate
     ] [ 2drop ] if ;
 
-M: openssl accept-secure-handshake ( -- )
+M: openssl accept-secure-handshake
     input/output-ports
     make-input/output-secure ;
 

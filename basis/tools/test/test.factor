@@ -381,7 +381,11 @@ M: test-failure error. ( error -- )
     loaded-vocab-names [ do-not-test? ] reject test-vocabs ;
 
 : test-main ( -- )
-    command-line get [ [ load ] [ test ] bi ] each
+    command-line get dup first "--only" = [
+        rest [ [ require ] [ test-vocab ] bi ] each
+    ] [
+        [ [ load ] [ test ] bi ] each
+    ] if
     test-failures get empty?
     [ [ "==== FAILING TESTS" print flush :test-failures ] unless ]
     [ 0 1 ? exit ] bi ;

@@ -18,7 +18,7 @@ M: object handle-gesture
 
 GENERIC: handles-gesture? ( gesture gadget -- ? )
 
-M: object handles-gesture? ( gesture gadget -- ? )
+M: object handles-gesture?
     get-gesture-handler >boolean ;
 
 : parents-handle-gesture? ( gesture gadget -- ? )

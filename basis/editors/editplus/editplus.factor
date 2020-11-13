@@ -11,7 +11,7 @@ editplus editor-class set-global
         [ "editplus.exe" ] unless*
     ] unless* ;
 
-M: editplus editor-command ( file line -- command )
+M: editplus editor-command
     [
         editplus-path , "-cursor" , number>string , ,
     ] { } make ;

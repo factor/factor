@@ -26,30 +26,30 @@ ERROR: read-only-slot slot ;
         [ offset>> ]
     } cond ; inline
 
-M: mirror set-at ( val key mirror -- )
+M: mirror set-at
     [ object-slots slot-named check-set-slot ] [ object>> ] bi
     swap set-slot ;
 
 ERROR: mirror-slot-removal slots mirror method ;
 
-M: mirror delete-at ( key mirror -- )
+M: mirror delete-at
     \ delete-at mirror-slot-removal ;
 
-M: mirror clear-assoc ( mirror -- )
+M: mirror clear-assoc
     [ object-slots ] keep \ clear-assoc mirror-slot-removal ;
 
 M: mirror-slot-removal summary
     drop "Slots cannot be removed from a tuple or a mirror of it" ;
 
-M: mirror >alist ( mirror -- alist )
+M: mirror >alist
     [ object-slots ] [ object>> ] bi '[
         [ name>> ] [ offset>> _ swap slot ] bi
     ] { } map>assoc ;
 
-M: mirror keys ( mirror -- keys )
+M: mirror keys
     object-slots [ name>> ] map ;
 
-M: mirror values ( mirror -- values )
+M: mirror values
     [ object-slots ] [ object>> ] bi
     '[ offset>> _ swap slot ] map ;
 

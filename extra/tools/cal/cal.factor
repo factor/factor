@@ -8,7 +8,7 @@ IN: tools.cal
 <PRIVATE
 
 : days ( timestamp -- days )
-    beginning-of-month
+    start-of-month
     [ day-of-week "  " <repetition> ]
     [ days-in-month [1,b] [ "%2d" sprintf ] map ] bi append
     42 "  " pad-tail ;

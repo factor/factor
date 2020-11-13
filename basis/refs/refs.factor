@@ -60,7 +60,7 @@ INSTANCE: box ref
 
 TUPLE: assoc-ref assoc key ;
 : >assoc-ref< ( assoc-ref -- key value ) [ key>> ] [ assoc>> ] bi ; inline
-M: assoc-ref delete-ref ( assoc-ref -- ) >assoc-ref< delete-at ;
+M: assoc-ref delete-ref >assoc-ref< delete-at ;
 
 TUPLE: key-ref < assoc-ref ;
 C: <key-ref> key-ref

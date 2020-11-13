@@ -29,7 +29,7 @@ M: login-realm init-realm
 M: login-realm logged-in-username
     drop permit-id get dup [ get-permit-uid ] when ;
 
-M: login-realm modify-form ( responder -- xml/f )
+M: login-realm modify-form
     drop permit-id get realm get name>> permit-id-key hidden-form-field ;
 
 : <permit-cookie> ( -- cookie )
@@ -95,7 +95,7 @@ CONSTANT: flashed-variables { description capabilities }
     <action>
         [ logout ] >>submit ;
 
-M: login-realm login-required* ( description capabilities login -- response )
+M: login-realm login-required*
     begin-conversation
     [ description cset ] [ capabilities cset ] [ secure>> ] tri*
     [
@@ -106,7 +106,7 @@ M: login-realm login-required* ( description capabilities login -- response )
         url"$realm/login" <continue-conversation>
     ] if ;
 
-M: login-realm user-registered ( user realm -- response )
+M: login-realm user-registered
     drop successful-login ;
 
 : <login-realm> ( responder name -- realm )

@@ -57,25 +57,14 @@ HELP: image.
     { "object" { $or pathname string image } }
 }
 { $description "Displays the image in the listener." } ;
-HELP: start-control
-{ $values
-    { "gadget" gadget }
-}
-{ $description "Adds a connection between the gadget and it's model." } ;
 
-HELP: stop-control
-{ $values
-    { "gadget" gadget }
-}
-{ $description "Removes the connection between the gadget and it's model" } ;
 ARTICLE: "images.viewer" "Displaying Images"
 "The " { $vocab-link "images.viewer" } " vocabulary uses the " { $vocab-link "opengl.textures" }
 " vocabulary to display any instance of " { $link image } "." $nl
 "An " { $link image-gadget } " can be used for static images and " { $instance image-control }
 " for changing images (for example a video feed). For changing images, the image should be contained in " { $instance model }
 ". Change the model value with " { $link set-model } " or mutate the image and call "
-{ $link notify-connections } " when you want to update the image. To stop refreshing the image, call " { $link stop-control } "."
-" To start refreshing again, call " { $link start-control } "."
+{ $link notify-connections } " when you want to update the image."
 
 $nl
 "If the " { $link image } " or " { $link model } " containing the image "

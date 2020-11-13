@@ -44,11 +44,11 @@ $nl
 ARTICLE: "ui.gadgets.tables.config" "Table gadget configuration"
 "Various slots in the table gadget can be set to change the appearance and behavior of the table gadget."
 { $slots
-  { "gap" }
-  { "focus-border-color" }
-  { "mouse-color" }
-  { "column-line-color" }
-  { "takes-focus?" }
+  { "gap" f }
+  { "focus-border-color" f }
+  { "mouse-color" f }
+  { "column-line-color" f }
+  { "takes-focus?" f }
 } ;
 
 ARTICLE: "ui.gadgets.tables.example" "Table gadget example"

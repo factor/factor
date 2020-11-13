@@ -21,9 +21,9 @@ PRIVATE>
     [ sign/mod 0 < [ 1 + ] unless 0 max ] keep
     range boa ; inline
 
-M: range length ( seq -- n ) length>> ; inline
+M: range length length>> ; inline
 
-M: range nth-unsafe ( n range -- obj )
+M: range nth-unsafe
     [ step>> * ] keep from>> + ; inline
 
 ! We want M\ tuple hashcode, not M\ sequence hashcode here!
@@ -38,24 +38,34 @@ M: range sum [ length ] [ first ] [ last ] tri + * 2 / ;
 
 : twiddle ( a b -- a b step ) 2dup > -1 1 ? ; inline
 
-: (a, ( a b step -- a' b' step ) dup [ + ] curry 2dip ; inline
+: (a.. ( a b step -- a' b' step ) dup [ + ] curry 2dip ; inline
 
-: ,b) ( a b step -- a' b' step ) dup [ - ] curry dip ; inline
+: ..b) ( a b step -- a' b' step ) dup [ - ] curry dip ; inline
 
 PRIVATE>
 
-: [a,b] ( a b -- range ) twiddle <range> ; inline
+: [a..b] ( a b -- range ) twiddle <range> ; inline
 
-: (a,b] ( a b -- range ) twiddle (a, <range> ; inline
+: (a..b] ( a b -- range ) twiddle (a.. <range> ; inline
 
-: [a,b) ( a b -- range ) twiddle ,b) <range> ; inline
+: [a..b) ( a b -- range ) twiddle ..b) <range> ; inline
 
-: (a,b) ( a b -- range ) twiddle (a, ,b) <range> ; inline
+: (a..b) ( a b -- range ) twiddle (a.. ..b) <range> ; inline
 
-: [0,b] ( b -- range ) 0 swap [a,b] ; inline
+: [0..b] ( b -- range ) 0 swap [a..b] ; inline
 
-: [1,b] ( b -- range ) 1 swap [a,b] ; inline
+: [1..b] ( b -- range ) 1 swap [a..b] ; inline
 
-: [0,b) ( b -- range ) 0 swap [a,b) ; inline
+: [0..b) ( b -- range ) 0 swap [a..b) ; inline
 
-: [1,b) ( b -- range ) 1 swap [a,b) ; inline
+: [1..b) ( b -- range ) 1 swap [a..b) ; inline
+
+! backwards compatibility for new syntax
+ALIAS: [a,b] [a..b]
+ALIAS: (a,b] (a..b]
+ALIAS: [a,b) [a..b)
+ALIAS: (a,b) (a..b)
+ALIAS: [0,b] [0..b]
+ALIAS: [1,b] [1..b]
+ALIAS: [0,b) [0..b)
+ALIAS: [1,b) [1..b)

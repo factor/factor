@@ -361,7 +361,7 @@ SIMD-128-TYPE: double-2
 
 ! misc
 
-M: simd-128 vshuffle ( u perm -- v )
+M: simd-128 vshuffle
     vshuffle-bytes ; inline
 
 M: uchar-16 v*hs+

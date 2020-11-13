@@ -102,10 +102,10 @@ SYMBOL: master-completion-port
 M: win32-handle cancel-operation
     [ handle>> CancelIo win32-error=0/f ] unless-disposed ;
 
-M: windows io-multiplex ( nanos -- )
+M: windows io-multiplex
     handle-overlapped [ 0 io-multiplex ] when ;
 
-M: windows init-io ( -- )
+M: windows init-io
     <master-completion-port> master-completion-port set-global
     H{ } clone pending-overlapped set-global ;
 
@@ -125,9 +125,9 @@ ERROR: seek-before-start n ;
 : set-seek-ptr ( n handle -- )
     [ dup 0 < [ seek-before-start ] when ] dip ptr<< ;
 
-M: windows tell-handle ( handle -- n ) ptr>> ;
+M: windows tell-handle ptr>> ;
 
-M: windows seek-handle ( n seek-type handle -- )
+M: windows seek-handle
     swap {
         { seek-absolute [ set-seek-ptr ] }
         { seek-relative [ [ ptr>> + ] keep set-seek-ptr ] }
@@ -135,10 +135,10 @@ M: windows seek-handle ( n seek-type handle -- )
         [ bad-seek-type ]
     } case ;
 
-M: windows can-seek-handle? ( handle -- ? )
+M: windows can-seek-handle?
     handle>> handle>file-size >boolean ;
 
-M: windows handle-length ( handle -- n/f )
+M: windows handle-length
     handle>> handle>file-size
     dup { 0 f } member? [ drop f ] when ;
 
@@ -182,7 +182,7 @@ M: windows handle-length ( handle -- n/f )
 : finish-write ( n port -- )
     [ update-file-ptr ] [ buffer>> buffer-consume ] 2bi ;
 
-M: object drain ( port handle -- event/f )
+M: object drain
     [ make-FileArgs dup setup-write WriteFile ]
     [ drop [ wait-for-file ] [ finish-write ] bi ] 2bi f ;
 
@@ -197,14 +197,14 @@ M: object drain ( port handle -- event/f )
 : finish-read ( n port -- )
     [ update-file-ptr ] [ buffer>> buffer+ ] 2bi ;
 
-M: object refill ( port handle -- event/f )
+M: object refill
     [ make-FileArgs dup setup-read ReadFile ]
     [ drop [ wait-for-file ] [ finish-read ] bi ] 2bi f ;
 
-M: windows (wait-to-write) ( port -- )
+M: windows (wait-to-write)
     [ dup handle>> drain ] with-destructors drop ;
 
-M: windows (wait-to-read) ( port -- )
+M: windows (wait-to-read)
     [ dup handle>> refill ] with-destructors drop ;
 
 : make-fd-set ( socket -- fd_set )
@@ -215,7 +215,7 @@ M: windows (wait-to-read) ( port -- )
 
 CONSTANT: select-timeval S{ timeval { sec 0 } { usec 1000 } }
 
-M: windows wait-for-fd ( handle event -- )
+M: windows wait-for-fd
     [ file>> handle>> 1 swap ] dip select-sets select-timeval
     select drop yield ;
 
@@ -255,13 +255,13 @@ M: windows init-stdio
     [ [ handle>> ] dip d>w/w LONG <ref> ] dip SetFilePointer
     INVALID_SET_FILE_POINTER = [ "SetFilePointer failed" throw ] when ;
 
-M: windows (file-reader) ( path -- stream )
+M: windows (file-reader)
     open-read <input-port> ;
 
-M: windows (file-writer) ( path -- stream )
+M: windows (file-writer)
     open-write <output-port> ;
 
-M: windows (file-appender) ( path -- stream )
+M: windows (file-appender)
     open-append <output-port> ;
 
 SYMBOLS: +read-only+ +hidden+ +system+
@@ -314,7 +314,7 @@ M: windows cd
 
 CONSTANT: unicode-prefix "\\\\?\\"
 
-M: windows root-directory? ( path -- ? )
+M: windows root-directory?
     {
         { [ dup empty? ] [ drop f ] }
         { [ dup [ path-separator? ] all? ] [ drop t ] }
@@ -354,7 +354,7 @@ M: windows root-path remove-unicode-prefix root-path* ;
 
 M: windows relative-path remove-unicode-prefix relative-path* ;
 
-M: windows normalize-path ( string -- string' )
+M: windows normalize-path
     dup unc-path? [
         normalize-separators
     ] [

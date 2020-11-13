@@ -219,7 +219,7 @@ PRIVATE>
 PRIVATE>
 
 : linspace[a,b) ( a b length -- seq )
-    steps ,b) <range> ;
+    steps ..b) <range> ;
 
 : linspace[a,b] ( a b length -- seq )
     {

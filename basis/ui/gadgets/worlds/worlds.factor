@@ -112,7 +112,7 @@ ERROR: no-world-found ;
         [ (request-focus) ] keep
     ] unless focus-child ;
 
-M: world request-focus-on ( child gadget -- )
+M: world request-focus-on
     2dup eq?
     [ 2drop ] [ dup focused?>> (request-focus) ] if ;
 
@@ -245,7 +245,7 @@ PREDICATE: specific-drag < drag n>> ;
 : generalize-gesture ( gesture -- )
     clone f >>n button-gesture ;
 
-M: world handle-gesture ( gesture gadget -- ? )
+M: world handle-gesture
     2dup call-next-method [
         {
             { [ over specific-button-up? ] [ drop generalize-gesture f ] }

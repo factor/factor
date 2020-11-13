@@ -18,9 +18,6 @@ INITIALIZED-SYMBOL: cuda-libraries [ H{ } clone ]
 
 SYMBOL: current-cuda-library
 
-: ?delete-at ( key assoc -- old/key ? )
-    2dup delete-at* [ 2nip t ] [ 2drop f ] if ; inline
-
 : cuda-param-size ( function n -- )
     cuParamSetSize cuda-error ; inline
 

@@ -1,12 +1,11 @@
 ! Copyright (C) 2013 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data arrays assocs byte-arrays
-classes.struct combinators combinators.extras
-combinators.short-circuit destructors fry generalizations
-hashtables hashtables.identity io.encodings.string
-io.encodings.utf8 kernel libc linked-assocs locals make math
-math.parser namespaces sequences sets strings yaml.config
-yaml.conversion yaml.ffi hash-sets.identity ;
+classes.struct combinators combinators.short-circuit destructors
+generalizations hash-sets.identity hashtables
+io.encodings.string io.encodings.utf8 kernel libc linked-assocs
+make math math.parser namespaces sequences sets strings
+yaml.config yaml.conversion yaml.ffi ;
 IN: yaml
 
 ERROR: libyaml-parser-error

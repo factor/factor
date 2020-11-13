@@ -1,11 +1,18 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+IN: classes.tuple
+! for classes.union mutual dependency
+DEFER: tuple-class?
+<PRIVATE
+DEFER: echelon-of
+DEFER: layout-of
+DEFER: layout-class-offset
+PRIVATE>
 USING: accessors arrays assocs classes classes.algebra
 classes.algebra.private classes.builtin classes.private
 combinators definitions effects generic kernel kernel.private
 make math math.private memory namespaces quotations
 sequences sequences.private slots slots.private strings words ;
-IN: classes.tuple
 
 <PRIVATE
 PRIMITIVE: <tuple> ( layout -- tuple )
@@ -75,16 +82,21 @@ M: tuple class-of layout-of 2 slot { word } declare ; inline
         ] 2each
     ] if-bootstrapping ; inline
 
-: initial-values ( class -- seq )
-    all-slots [ initial>> ] map ; inline
-
 : pad-slots ( seq class -- seq' class )
-    [ initial-values ] keep
-    2over [ length ] bi@ 2dup > [
+    [ all-slots ] keep 2over [ length ] bi@ 2dup > [
         [ nip swap ] 2dip too-many-slots
     ] [
-        drop [ tail append ] curry dip
+        drop [
+            tail-slice [ [ initial>> ] map append ] unless-empty
+        ] curry dip
     ] if ; inline
+
+: make-tuple ( seq class -- tuple )
+    tuple-layout <tuple> [
+        [ tuple-size <iota> ]
+        [ [ set-array-nth ] curry ]
+        bi 2each
+    ] keep ; inline
 
 PRIVATE>
 
@@ -93,13 +105,8 @@ PRIVATE>
 
 GENERIC: slots>tuple ( seq class -- tuple )
 
-M: tuple-class slots>tuple ( seq class -- tuple )
-    check-slots pad-slots
-    tuple-layout <tuple> [
-        [ tuple-size <iota> ]
-        [ [ set-array-nth ] curry ]
-        bi 2each
-    ] keep ;
+M: tuple-class slots>tuple
+    check-slots pad-slots make-tuple ;
 
 : tuple>array ( tuple -- array )
     [ tuple-slots ] [ class-of prefix ] bi ;
@@ -166,6 +173,9 @@ M: object final-class? drop f ;
 
 : define-boa-check ( class -- )
     dup boa-check-quot "boa-check" set-word-prop ;
+
+: initial-values ( class -- seq )
+    all-slots [ initial>> ] map ; inline
 
 : tuple-prototype ( class -- prototype )
     [ initial-values ] keep over [ ] any?

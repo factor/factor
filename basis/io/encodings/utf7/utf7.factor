@@ -45,7 +45,7 @@ TUPLE: utf7codec dialect buffer ;
         ] until
     ] B{ } make 3nip ;
 
-M: utf7codec encode-string ( str stream codec -- )
+M: utf7codec encode-string
     swapd encode-utf7-string swap stream-write ;
 
 DEFER: emit-char
@@ -65,7 +65,7 @@ DEFER: emit-char
 : replace-all! ( src dst -- )
     [ delete-all ] keep push-all ;
 
-M: utf7codec decode-char ( stream codec -- char/f )
+M: utf7codec decode-char
     swap [
         [ dialect>> ] [ buffer>> ] bi [ emit-char ] keep replace-all!
     ] with-input-stream ;

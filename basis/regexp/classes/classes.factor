@@ -32,53 +32,53 @@ C: <script-class> script-class
 
 GENERIC: class-member? ( obj class -- ? )
 
-M: t class-member? ( obj class -- ? ) 2drop t ; inline
+M: t class-member? 2drop t ; inline
 
-M: integer class-member? ( obj class -- ? ) = ; inline
+M: integer class-member? = ; inline
 
-M: range-class class-member? ( obj class -- ? )
+M: range-class class-member?
     [ from>> ] [ to>> ] bi between? ; inline
 
-M: letter-class class-member? ( obj class -- ? )
+M: letter-class class-member?
     drop letter? ; inline
 
-M: LETTER-class class-member? ( obj class -- ? )
+M: LETTER-class class-member?
     drop LETTER? ; inline
 
-M: Letter-class class-member? ( obj class -- ? )
+M: Letter-class class-member?
     drop Letter? ; inline
 
-M: ascii-class class-member? ( obj class -- ? )
+M: ascii-class class-member?
     drop ascii? ; inline
 
-M: digit-class class-member? ( obj class -- ? )
+M: digit-class class-member?
     drop digit? ; inline
 
 : c-identifier-char? ( ch -- ? )
     { [ alpha? ] [ char: _ = ] } 1|| ;
 
-M: c-identifier-class class-member? ( obj class -- ? )
+M: c-identifier-class class-member?
     drop c-identifier-char? ; inline
 
-M: alpha-class class-member? ( obj class -- ? )
+M: alpha-class class-member?
     drop alpha? ; inline
 
 : punct? ( ch -- ? )
     "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" member? ;
 
-M: punctuation-class class-member? ( obj class -- ? )
+M: punctuation-class class-member?
     drop punct? ; inline
 
 : java-printable? ( ch -- ? )
     { [ alpha? ] [ punct? ] } 1|| ;
 
-M: java-printable-class class-member? ( obj class -- ? )
+M: java-printable-class class-member?
     drop java-printable? ; inline
 
 M: non-newline-blank-class class-member? ( obj class -- ? )
     drop { [ blank? ] [ char: \n = not ] } 1&& ; inline
 
-M: control-character-class class-member? ( obj class -- ? )
+M: control-character-class class-member?
     drop control? ; inline
 
 : hex-digit? ( ch -- ? )
@@ -88,7 +88,7 @@ M: control-character-class class-member? ( obj class -- ? )
         [ char: 0 char: 9 between? ]
     } 1|| ;
 
-M: hex-digit-class class-member? ( obj class -- ? )
+M: hex-digit-class class-member?
     drop hex-digit? ; inline
 
 : java-blank? ( ch -- ? )
@@ -97,13 +97,13 @@ M: hex-digit-class class-member? ( obj class -- ? )
         char: \v char: \a char: \r
     } member? ;
 
-M: java-blank-class class-member? ( obj class -- ? )
+M: java-blank-class class-member?
     drop java-blank? ; inline
 
-M: unmatchable-class class-member? ( obj class -- ? )
+M: unmatchable-class class-member?
     2drop f ; inline
 
-M: terminator-class class-member? ( obj class -- ? )
+M: terminator-class class-member?
     drop "\r\n\u000085\u002029\u002028" member? ; inline
 
 M: f class-member? 2drop f ; inline

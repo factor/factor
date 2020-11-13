@@ -87,7 +87,7 @@ M: utf16le decode-char
         [ [ encode-second ] dip stream-write2 ] 2bi
     ] [ [ h>b/b swap ] dip stream-write2 ] if ; inline
 
-M: utf16be encode-char ( char stream encoding -- )
+M: utf16be encode-char
     drop char>utf16be ;
 
 : char>utf16le ( char stream -- )
@@ -97,7 +97,7 @@ M: utf16be encode-char ( char stream encoding -- )
         [ [ encode-second swap ] dip stream-write2 ] 2bi
     ] [ [ h>b/b ] dip stream-write2 ] if ; inline
 
-M: utf16le encode-char ( char stream encoding -- )
+M: utf16le encode-char
     drop char>utf16le ;
 
 : ascii-char>utf16-byte-array ( off n byte-array string -- )
@@ -155,10 +155,10 @@ CONSTANT: bom-be B{ 0xfe 0xff }
         bom-be sequence= [ utf16be ] [ missing-bom ] if
     ] if ;
 
-M: utf16 <decoder> ( stream utf16 -- decoder )
+M: utf16 <decoder>
     drop 2 over stream-read bom>le/be <decoder> ;
 
-M: utf16 <encoder> ( stream utf16 -- encoder )
+M: utf16 <encoder>
     drop bom-le over stream-write utf16le <encoder> ;
 
 PRIVATE>

@@ -187,19 +187,19 @@ M: pango-renderer string-dim
 M: pango-renderer flush-layout-cache
     cached-layouts get-global purge-cache ;
 
-M: pango-renderer string>image ( font string -- image loc )
+M: pango-renderer string>image
     cached-layout [ layout>image ] [ text-position vneg ] bi ;
 
-M: pango-renderer x>offset ( x font string -- n )
+M: pango-renderer x>offset
     cached-layout swap x>line-offset ;
 
-M: pango-renderer offset>x ( n font string -- x )
+M: pango-renderer offset>x
     cached-layout swap line-offset>x ;
 
-M: pango-renderer font-metrics ( font -- metrics )
+M: pango-renderer font-metrics
     " " cached-layout metrics>> clone f >>width ;
 
-M: pango-renderer line-metrics ( font string -- metrics )
+M: pango-renderer line-metrics
     [ " " line-metrics clone 0 >>width ]
     [ cached-layout metrics>> ]
     if-empty ;

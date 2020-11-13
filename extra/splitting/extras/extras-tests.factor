@@ -37,3 +37,11 @@ tools.test ;
 { { "a" "b" "c" } } [ "a  b  c" " " split-harvest ] unit-test
 { { "a" "b" "c" } } [ " a  b  c" " " split-harvest ] unit-test
 { { "a" "b" "c" } } [ " a  b  c " " " split-harvest ] unit-test
+
+{ "s" "1:2:3s" } [
+    "s1:2:3s" [ letter? ] split-head
+] unit-test
+
+{ "s1:2:3" "s" } [
+    "s1:2:3s" [ letter? ] split-tail
+] unit-test

@@ -404,9 +404,11 @@ HELP: value?
 { $description "Tests if an assoc contains at least one key with the given value." } ;
 
 HELP: delete-at*
-{ $values { "key" "a key" } { "assoc" assoc } { "old" { $maybe "the previous value" } } { "?" boolean } }
+{ $values { "key" "a key" } { "assoc" assoc } { "value/f" { $maybe "the previous value" } } { "?" boolean } }
 { $description "Removes an entry from the assoc and outputs the previous value together with a boolean indicating whether it was present." }
 { $side-effects "assoc" } ;
+
+{ delete-at delete-at* ?delete-at } related-words
 
 HELP: rename-at
 { $values { "newkey" object } { "key" object } { "assoc" assoc } }
@@ -478,7 +480,12 @@ HELP: change-at
 { $description "Applies the quotation to the value associated with " { $snippet "key" } ", storing the new value back in the assoc." }
 { $side-effects "assoc" } ;
 
-{ change-at change-nth change } related-words
+HELP: ?change-at
+{ $values { "key" object } { "assoc" assoc } { "quot" { $quotation ( ..a value -- ..b newvalue ) } } }
+{ $description "If the " { $snippet "key" } " exists in the " { $snippet "assoc" } ", applies the quotation to the value associated with " { $snippet "key" } ", storing the new value back in the assoc." }
+{ $side-effects "assoc" } ;
+
+{ change-at ?change-at change-nth change } related-words
 
 HELP: at+
 { $values { "n" number } { "key" object } { "assoc" assoc } }

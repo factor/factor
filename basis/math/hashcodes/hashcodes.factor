@@ -37,13 +37,13 @@ M: integer number-hashcode 1 hash-fraction ;
 
 M: ratio number-hashcode fraction>parts hash-fraction ;
 
-M: float number-hashcode ( x -- h )
+M: float number-hashcode
     {
         { [ dup fp-nan? ] [ drop 0 ] }
         { [ dup fp-infinity? ] [ 0 > 314159 -314159 ? ] }
         [ double>ratio number-hashcode ]
     } cond ;
 
-M: complex number-hashcode ( x -- h )
+M: complex number-hashcode
     >rect [ number-hashcode ] bi@ 1000003 * +
     cell-bits on-bits bitand dup -1 = [ drop -2 ] when ;

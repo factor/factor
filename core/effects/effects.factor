@@ -69,7 +69,7 @@ M: pair effect>string
 : var-picture% ( var -- )
     [ ".." % % char: \s , ] when* ;
 
-M: effect effect>string ( effect -- string )
+M: effect effect>string
     [
         "( " %
         dup in-var>> var-picture%

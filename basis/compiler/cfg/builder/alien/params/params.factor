@@ -8,11 +8,11 @@ SYMBOL: stack-params
 
 GENERIC: alloc-stack-param ( rep -- n )
 
-M: object alloc-stack-param ( rep -- n )
+M: object alloc-stack-param
     stack-params get
     [ rep-size cell align stack-params +@ ] dip ;
 
-M: float-rep alloc-stack-param ( rep -- n )
+M: float-rep alloc-stack-param
     stack-params get swap rep-size
     [ cell align stack-params +@ ] keep
     float-right-align-on-stack? [ + ] [ drop ] if ;

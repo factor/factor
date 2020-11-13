@@ -204,22 +204,31 @@ fixup-ducet-for-tibetan
 
 : tangut-block? ( char -- ? )
     ! Tangut Block, Tangut Components Block
-    { [ 0x17000 0x187FF between? ] [ 0x18800 0x18AFF between? ] } 1|| ; inline
+    {
+        [ 0x17000 0x187FF between? ]
+        [ 0x18800 0x18AFF between? ]
+        [ 0x18D00 0x18D08 between? ]
+    } 1|| ; inline
 
 : nushu-block? ( char -- ? )
     0x1b170 0x1B2FB between? ; inline
+
+: khitan-block? ( char -- ? )
+    0x18b00 0x18cd5 between? ; inline
 
 ! https://wiki.computercraft.cc/Module:Unicode_data
 ! Unicode TR10 - Computing Implicit Weights
 : base ( char -- base )
     {
-        { [ dup 0x03400 0x04DB5 between? ] [ drop 0xFB80 ] } ! Extension A
-        { [ dup 0x20000 0x2A6D6 between? ] [ drop 0xFB80 ] } ! Extension B
+        { [ dup 0x03400 0x04DBF between? ] [ drop 0xFB80 ] } ! Extension A
+        { [ dup 0x20000 0x2A6DD between? ] [ drop 0xFB80 ] } ! Extension B
         { [ dup 0x2A700 0x2B734 between? ] [ drop 0xFB80 ] } ! Extension C
         { [ dup 0x2B740 0x2B81D between? ] [ drop 0xFB80 ] } ! Extension D
         { [ dup 0x2B820 0x2CEA1 between? ] [ drop 0xFB80 ] } ! Extension E
         { [ dup 0x2CEB0 0x2EBE0 between? ] [ drop 0xFB80 ] } ! Extension F
-        { [ dup 0x04E00 0x09FEF between? ] [ drop 0xFB40 ] } ! CJK
+        { [ dup 0x30000 0x3134A between? ] [ drop 0xFB80 ] } ! Extension G
+        { [ dup 0x03400 0x04DBF between? ] [ drop 0xFB40 ] } ! CJK
+        { [ dup 0x04E00 0x09FFC between? ] [ drop 0xFB40 ] } ! CJK
         [ drop 0xFBC0 ] ! Other
     } cond ;
 
@@ -235,6 +244,12 @@ fixup-ducet-for-tibetan
 : nushu-BBBB ( char -- weight-levels )
     0x1B170 - 0x8000 bitor 0 0 <weight-levels> ; inline
 
+: khitan-AAAA ( char -- weight-levels )
+    drop 0xfb02 0x0020 0x0002 <weight-levels> ; inline
+
+: khitan-BBBB ( char -- weight-levels )
+    0x18b00 - 0x8000 bitor 0 0 <weight-levels> ; inline
+
 : AAAA ( char -- weight-levels )
     [ base ] [ -15 shift ] bi + 0x0020 0x0002 <weight-levels> ; inline
 
@@ -246,6 +261,7 @@ fixup-ducet-for-tibetan
     {
         { [ dup tangut-block? ] [ [ tangut-AAAA ] [ tangut-BBBB ] bi 2array ] }
         { [ dup nushu-block? ] [ [ nushu-AAAA ] [ nushu-BBBB ] bi 2array ] }
+        { [ dup khitan-block? ] [ [ khitan-AAAA ] [ khitan-BBBB ] bi 2array ] }
         [ [ AAAA ] [ BBBB ] bi 2array ]
     } cond ;
 

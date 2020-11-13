@@ -35,7 +35,7 @@ GENERIC: visit-insn ( live-set insn -- )
 : gen-uses ( live-set insn -- )
     uses-vregs [ swap conjoin ] with each ; inline
 
-M: vreg-insn visit-insn ( live-set insn -- )
+M: vreg-insn visit-insn
     [ kill-defs ] [ gen-uses ] 2bi ;
 
 DEFER: lookup-base-pointer
@@ -98,7 +98,7 @@ M: vreg-insn lookup-base-pointer* 2drop f ;
 : fill-gc-map ( live-set gc-map -- )
     [ gc-roots ] dip [ gc-roots<< ] [ derived-roots<< ] bi ;
 
-M: gc-map-insn visit-insn ( live-set insn -- )
+M: gc-map-insn visit-insn
     [ kill-defs ] [ gc-map>> fill-gc-map ] [ gen-uses ] 2tri ;
 
 M: phi## visit-insn kill-defs ;

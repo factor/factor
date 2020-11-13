@@ -79,8 +79,7 @@ GENERIC: year. ( obj -- )
 M: integer year.
     12 [ 1 + 2array month. nl ] with each-integer ;
 
-M: timestamp year.
-    year>> year. ;
+M: timestamp year. year>> year. ;
 
 : timestamp>mdtm ( timestamp -- str )
     [ { YYYY MM DD hh mm ss } formatted ] with-string-writer ;
@@ -158,6 +157,25 @@ M: timestamp year.
 
 : timestamp>rfc3339 ( timestamp -- str )
     [ (timestamp>rfc3339) ] with-string-writer ;
+
+: (write-rfc2822-gmt-offset) ( duration -- )
+    [ hh ":" write ] [ mm ] bi ;
+
+: write-rfc2822-gmt-offset ( duration -- )
+    dup instant <=> {
+        { +lt+ [ "-" write before (write-rfc2822-gmt-offset) ] }
+        { +gt+ [ "+" write (write-rfc2822-gmt-offset) ] }
+        { +eq+ [ "+" write (write-rfc2822-gmt-offset) ] }
+    } case ;
+
+: (timestamp>rfc2822) ( timestamp -- )
+    {
+        DAY ", " DD " " MONTH " " YYYY " " hh ":" mm ":" ss " "
+        [ gmt-offset>> write-rfc2822-gmt-offset ]
+    } formatted ;
+
+: timestamp>rfc2822 ( timestamp -- str )
+    [ (timestamp>rfc2822) ] with-string-writer ;
 
 : (timestamp>ymd) ( timestamp -- )
     { YYYY "-" MM "-" DD } formatted ;

@@ -68,7 +68,7 @@ SYMBOL: serialized
 M: f (serialize) ( obj -- )
     drop char: n write1 ;
 
-M: integer (serialize) ( obj -- )
+M: integer (serialize)
     [
         char: z write1
     ] [
@@ -88,7 +88,7 @@ M: float (serialize) ( obj -- )
         [ [ (serialize) ] each ] tri
     ] curry serialize-shared ;
 
-M: tuple (serialize) ( obj -- )
+M: tuple (serialize)
     [
         char: T write1
         [ class-of (serialize) ]
@@ -100,19 +100,19 @@ M: tuple (serialize) ( obj -- )
 M: array (serialize) ( obj -- )
     char: a serialize-seq ;
 
-M: quotation (serialize) ( obj -- )
+M: quotation (serialize)
     [
         char: q write1
         [ >array (serialize) ] [ add-object ] bi
     ] serialize-shared ;
 
-M: hashtable (serialize) ( obj -- )
+M: hashtable (serialize)
     [
         char: h write1
         [ add-object ] [ >alist (serialize) ] bi
     ] serialize-shared ;
 
-M: byte-array (serialize) ( obj -- )
+M: byte-array (serialize)
     [
         char: A write1
         [ add-object ]
@@ -120,7 +120,7 @@ M: byte-array (serialize) ( obj -- )
         [ write ] tri
     ] serialize-shared ;
 
-M: string (serialize) ( obj -- )
+M: string (serialize)
     [
         char: s write1
         [ add-object ]
@@ -149,7 +149,7 @@ M: string (serialize) ( obj -- )
     [ vocabulary>> (serialize) ]
     bi ;
 
-M: word (serialize) ( obj -- )
+M: word (serialize)
     {
         { [ dup t eq? ] [ serialize-true ] }
         { [ dup vocabulary>> not ] [ serialize-gensym ] }

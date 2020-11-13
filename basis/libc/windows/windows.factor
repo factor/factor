@@ -108,7 +108,7 @@ LIBRARY: libc
 
 FUNCTION: int strerror_s ( char *buffer, size_t numberOfElements, int errnum )
 
-M: windows strerror ( errno -- str )
+M: windows strerror
     [
         [ 1024 [ malloc &free ] keep ] dip
         [ strerror_s drop ] keepdd

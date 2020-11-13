@@ -22,9 +22,9 @@
 </tbody></table>
 <div class="body">
   <h1>Unicode® Collation Algorithm<br>Conformance Tests</h1>
-  <h2 align="center">Version 11.0.0<br>2018-05-23</h2>
+  <h2 align="center">Version 13.0.0<br>2020-02-12</h2>
 <p>The following files provide conformance tests for the Unicode Collation Algorithm
-  (<a href="http://www.unicode.org/reports/tr10/tr10-38.html">UTS #10: Unicode Collation Algorithm</a>).</p>
+  (<a href="http://www.unicode.org/reports/tr10/tr10-43.html">UTS #10: Unicode Collation Algorithm</a>).</p>
   <ul>
     <li>CollationTest_SHIFTED.txt</li>
     <li>CollationTest_NON_IGNORABLE.txt</li>
@@ -37,7 +37,7 @@
   <p>There are four different files:</p>
   <ul>
     <li>The shifted vs non-ignorable files correspond to the two alternate
-      <a href="http://www.unicode.org/reports/tr10/tr10-38.html#Variable_Weighting">Variable Weighting</a> values.</li>
+      <a href="http://www.unicode.org/reports/tr10/tr10-43.html#Variable_Weighting">Variable Weighting</a> values.</li>
     <li>The SHORT versions omit the comments, for more compact storage.</li>
   </ul>
 <p>The format is illustrated by the following example:</p>
@@ -64,7 +64,7 @@
   <h2>Testing</h2>
   <p>The files are designed so each line in the file will order as being greater than or equal to 
   the previous one, when using the UCA and the
-  <a href="http://www.unicode.org/reports/tr10/tr10-38.html#Default_Unicode_Collation_Element_Table">Default
+  <a href="http://www.unicode.org/reports/tr10/tr10-43.html#Default_Unicode_Collation_Element_Table">Default
   Unicode Collation Element Table</a>.
   A test program can read in each line, compare it to 
   the last line, and signal an error if order is not correct. The exact comparison that should be 
@@ -115,17 +115,17 @@
     <li>S2.1.1 loops over each of the following three characters C,
     but there is no table entry for any of those three S+C.
     In particular, there is no DUCET mapping for 0FB2+0F71
-    (see <i><a href="http://www.unicode.org/reports/tr10/tr10-38.html#Well_Formed_DUCET">Tibetan and
+    (see <i><a href="http://www.unicode.org/reports/tr10/tr10-43.html#Well_Formed_DUCET">Tibetan and
     Well-Formedness of DUCET</a></i>).</li>
     <li>The loop exits without finding any match beyond S=0FB2.</li>
   </ul>
 
   <p>See “Also note that the Algorithm employs two distinct contraction matching methods:”
   at the end of <i>Section 7.2,
-  <a href="http://www.unicode.org/reports/tr10/tr10-38.html#Step_2">Produce Collation Element Arrays</a></i>.</p>
+  <a href="http://www.unicode.org/reports/tr10/tr10-43.html#Step_2">Produce Collation Element Arrays</a></i>.</p>
 
   <hr width="50%">
-  <p class="copyright">© 2018 Unicode, Inc. All Rights Reserved.
+  <p class="copyright">© 2020 Unicode, Inc. All Rights Reserved.
   The Unicode Consortium makes no expressed or implied warranty 
   of any kind, and assumes no liability for errors or omissions. No liability 
   is assumed for incidental and consequential damages in connection with or arising 

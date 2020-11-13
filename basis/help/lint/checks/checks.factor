@@ -148,6 +148,10 @@ M: array example>strings dup length 1 = [ first example>strings ] when ;
         ] unless
     ] each ;
 
+: check-slots-tables ( element -- )
+    \ $slots swap elements [ rest [ length 2 = ] all?  ] all?
+    [ "$slots have too many values in at least one row" simple-lint-error ] unless ;
+
 : check-rendering ( element -- )
     [ print-content ] with-string-writer drop ;
 
@@ -223,6 +227,7 @@ M: array example>strings dup length 1 = [ first example>strings ] when ;
         [ check-examples ]
         [ check-modules ]
         [ check-descriptions ]
+        [ check-slots-tables ]
     } cleave ;
 
 : files>vocabs ( -- assoc )

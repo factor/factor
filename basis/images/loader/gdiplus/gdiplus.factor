@@ -106,5 +106,5 @@ M: gdi+-image stream>image*
     gdi+-bitmap>data
     data>image ;
 
-M: gdi+-image image>stream ( image extension class -- )
+M: gdi+-image image>stream
     drop startup-gdi+ output-stream get swap write-image-to-stream ;

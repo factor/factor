@@ -45,7 +45,7 @@ IN: tools.files.unix
         [ drop "" ]
     } cond ;
 
-M: unix (directory.) ( path -- lines )
+M: unix (directory.)
     <listing-tool>
         {
             +permissions+ +nlinks+ +user+ +group+
@@ -54,7 +54,7 @@ M: unix (directory.) ( path -- lines )
         { { directory-entry>> name>> <=> } } >>sort
     [ [ list-files ] with-group-cache ] with-user-cache ;
 
-M: unix file-spec>string ( file-listing spec -- string )
+M: unix file-spec>string
     {
         { +file-name/type+ [
             directory-entry>> [ name>> ] [ file-type>trailing ] bi append

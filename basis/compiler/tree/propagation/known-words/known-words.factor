@@ -358,7 +358,7 @@ generic-comparison-ops [
 
 \ instance? [
     ! We need to force the caller word to recompile when the class
-    ! is redefined, since now we're making assumptions but the
+    ! is redefined, since now we're making assumptions about the
     ! class definition itself.
     dup literal>> classoid?
     [

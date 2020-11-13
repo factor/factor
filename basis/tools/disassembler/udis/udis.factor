@@ -84,7 +84,7 @@ SINGLETON: udis-disassembler
         ] loop
     ] { } make ;
 
-M: udis-disassembler disassemble* ( from to -- buffer )
+M: udis-disassembler disassemble*
     '[
         _ _
         [ drop ud_set_pc ]

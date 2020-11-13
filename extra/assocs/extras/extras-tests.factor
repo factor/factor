@@ -55,3 +55,30 @@ USING: assocs.extras kernel math sequences tools.test ;
 } [
     { { { 1 2 { 1 } { 2 } { 1 1 } } [ sq ] } } flatten-keys
 ] unit-test
+
+{
+    H{ { "1" 1 } { "2" 2 } }
+} [
+    H{ { "1" 1 } { "2" 2 } { "3" 3 } }
+    { "1" "2" "2" }
+    rekey-new-assoc
+] unit-test
+
+{ f } [
+    H{ { "1" 1 } { "2" 2 } { "3" 3 } }
+    [ { "1" "2" "2" } rekey-new-assoc ] keep eq?
+] unit-test
+
+{
+    H{ { "1" 1 } { "2" 2 } }
+} [
+    H{ { "1" 1 } { "2" 2 } { "3" 3 } }
+    { "1" "2" "2" }
+    rekey-assoc
+] unit-test
+
+{ t } [
+    H{ { "1" 1 } { "2" 2 } { "3" 3 } }
+    [ { "1" "2" "2" } rekey-assoc ] keep eq?
+] unit-test
+

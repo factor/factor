@@ -12,7 +12,7 @@ TUPLE: label < aligned-gadget text font ;
 
 SLOT: string
 
-M: label string>> ( label -- string )
+M: label string>>
     text>> dup string? [ "\n" join ] unless ; inline
 
 <PRIVATE
@@ -24,7 +24,7 @@ PRIVATE>
 : ?string-lines ( string -- string/array )
     char: \n over member-eq? [ string-lines ] when ;
 
-M: label string<< ( string label -- )
+M: label string<<
     [
         dup string-array? [
             string check-instance ?string-lines

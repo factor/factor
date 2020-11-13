@@ -79,7 +79,7 @@ ERROR: log-expects-positive x ;
 
 GENERIC: (integer-log2) ( x -- n ) foldable
 
-M: integer (integer-log2) ( x -- n ) (log2) ; inline
+M: integer (integer-log2) (log2) ; inline
 
 : (ratio-integer-log) ( ratio quot -- log )
     [ >integer ] dip call ; inline

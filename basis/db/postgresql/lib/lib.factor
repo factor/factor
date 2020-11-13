@@ -31,7 +31,7 @@ IN: db.postgresql.lib
 
 ERROR: postgresql-result-null ;
 
-M: postgresql-result-null summary ( obj -- str )
+M: postgresql-result-null summary
     drop "PQexec returned f." ;
 
 : postgresql-result-ok? ( res -- ? )
@@ -126,7 +126,7 @@ M: postgresql-result-null summary ( obj -- str )
 TUPLE: postgresql-malloc-destructor alien ;
 C: <postgresql-malloc-destructor> postgresql-malloc-destructor
 
-M: postgresql-malloc-destructor dispose ( obj -- )
+M: postgresql-malloc-destructor dispose
     alien>> PQfreemem ;
 
 : &postgresql-free ( alien -- alien )

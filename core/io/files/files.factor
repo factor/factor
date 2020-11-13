@@ -80,7 +80,7 @@ HOOK: cd io-backend ( path -- )
 
 HOOK: cwd io-backend ( -- path )
 
-M: object cwd ( -- path ) "." ;
+M: object cwd "." ;
 
 PRIVATE>
 

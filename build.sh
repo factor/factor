@@ -301,6 +301,7 @@ find_architecture() {
        ppc64) ARCH=ppc;;
        *86) ARCH=x86;;
        *86_64) ARCH=x86;;
+       aarch64) ARCH=arm64;;
        iPhone5*[3-9]) ARCH=arm64;;
        iPhone[6-9]*) ARCH=arm64;;
        iPhone[1-9][0-9]*) ARCH=arm64;;
@@ -627,6 +628,8 @@ set_boot_image_vars() {
         CHECKSUM_URL="$url"
         BOOT_IMAGE_URL="http://downloads.factorcode.org/images/${CURRENT_BRANCH}/${BOOT_IMAGE}"
     else
+        $ECHO "boot image for branch \`${CURRENT_BRANCH}\` is not on server, trying master instead"
+        $ECHO "  tried nonexistent url: ${url}"
         CHECKSUM_URL="http://downloads.factorcode.org/images/master/checksums.txt"
         BOOT_IMAGE_URL="http://downloads.factorcode.org/images/master/${BOOT_IMAGE}"
     fi

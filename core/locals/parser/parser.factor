@@ -59,7 +59,7 @@ SINGLETON: lambda-parser
 : parse-def ( name/paren -- def )
     dup "(" = [ drop parse-multi-def ] [ parse-single-def ] if update-locals ;
 
-M: lambda-parser parse-quotation ( -- quotation )
+M: lambda-parser parse-quotation
     H{ } clone (parse-lambda) ;
 
 : parse-let ( -- form )

@@ -5,7 +5,7 @@ io.backend.unix io.backend.unix.multiplexers
 io.backend.unix.multiplexers.epoll init ;
 IN: io.backend.unix.linux
 
-M: linux init-io ( -- )
+M: linux init-io
     <epoll-mx> mx set-global ;
 
 linux set-io-backend

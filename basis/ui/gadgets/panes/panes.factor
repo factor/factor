@@ -201,7 +201,7 @@ M: pane-stream write-gadget
 
 TUPLE: pane-control < pane quot ;
 
-M: pane-control model-changed ( model pane-control -- )
+M: pane-control model-changed
     [ value>> ] [ dup quot>> ] bi*
     '[ _ call( value -- ) ] with-pane ;
 
@@ -364,7 +364,7 @@ M: paragraph pane-line
 
 GENERIC: sloppy-pick-up* ( loc gadget -- n )
 
-M: pack sloppy-pick-up* ( loc gadget -- n )
+M: pack sloppy-pick-up*
     [ orientation>> ] [ children>> ] bi
     [ loc>> ] (fast-children-on) ;
 

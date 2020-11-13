@@ -96,11 +96,13 @@ M: cocoa-ui-backend set-title ( string world -- )
     [ view>> f send: \exitFullScreenModeWithOptions: ]
     [ [ window>> ] [ view>> ] bi send: \makeFirstResponder: drop ] bi ;
 
-M: cocoa-ui-backend (set-fullscreen) ( world ? -- )
+M: cocoa-ui-backend (set-fullscreen)
     [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
+! Handle can be ``f`` sometimes, like if you hold ``w``
+! when you loop in the debugger.
 M: cocoa-ui-backend (fullscreen?) ( world -- ? )
-    handle>> view>> send: isInFullScreenMode zero? not ;
+    handle>> [ view>> send: isInFullScreenMode zero? not ] [ f ] if* ;
 
 ! XXX: Until someone tests OSX with a tiling window manager,
 ! dialog-window is the same as normal-title-window
@@ -138,14 +140,14 @@ M:: cocoa-ui-backend (open-window) ( world -- )
     window f send: \makeKeyAndOrderFront:
     t world active?<< ;
 
-M: cocoa-ui-backend (close-window) ( handle -- )
+M: cocoa-ui-backend (close-window)
     [
         view>> dup send: isInFullScreenMode zero?
         [ drop ]
         [ f send: \exitFullScreenModeWithOptions: ] if
     ] [ window>> send: release ] bi ;
 
-M: cocoa-ui-backend (grab-input) ( handle -- )
+M: cocoa-ui-backend (grab-input)
     0 CGAssociateMouseAndMouseCursorPosition drop
     CGMainDisplayID CGDisplayHideCursor drop
     window>> send: frame CGRect>rect rect-center
@@ -154,19 +156,19 @@ M: cocoa-ui-backend (grab-input) ( handle -- )
     [ GetCurrentButtonState zero? not ] [ yield ] while
     CGWarpMouseCursorPosition drop ;
 
-M: cocoa-ui-backend (ungrab-input) ( handle -- )
+M: cocoa-ui-backend (ungrab-input)
     drop
     CGMainDisplayID CGDisplayShowCursor drop
     1 CGAssociateMouseAndMouseCursorPosition drop ;
 
-M: cocoa-ui-backend close-window ( gadget -- )
+M: cocoa-ui-backend close-window
     find-world [
         handle>> [
             window>> send: close
         ] when*
     ] when* ;
 
-M: cocoa-ui-backend raise-window* ( world -- )
+M: cocoa-ui-backend raise-window*
     handle>> [
         window>> dup f send: \orderFront: send: makeKeyWindow
         NSApp 1 send: \activateIgnoringOtherApps:
@@ -178,7 +180,7 @@ M: window-handle select-gl-context ( handle -- )
 M: window-handle flush-gl-context ( handle -- )
     view>> send: openGLContext send: flushBuffer ;
 
-M: cocoa-ui-backend beep ( -- )
+M: cocoa-ui-backend beep
     NSBeep ;
 
 M: cocoa-ui-backend resize-window

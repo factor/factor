@@ -24,12 +24,12 @@ GENERIC: group-struct ( obj -- group/f )
 : check-group-struct ( group-struct ptr -- group-struct/f )
     void* deref [ drop f ] unless ;
 
-M: integer group-struct ( id -- group/f )
+M: integer group-struct
     (group-struct)
     [ [ unix.ffi:getgrgid_r ] unix-system-call drop ] keep
     check-group-struct ;
 
-M: string group-struct ( string -- group/f )
+M: string group-struct
     (group-struct)
     [ [ unix.ffi:getgrnam_r ] unix-system-call drop ] keep
     check-group-struct ;
@@ -79,10 +79,10 @@ PRIVATE>
 
 GENERIC: user-groups ( string/id -- seq )
 
-M: string user-groups ( string -- seq )
+M: string user-groups
     (user-groups) ;
 
-M: integer user-groups ( id -- seq )
+M: integer user-groups
     user-name (user-groups) ;
 
 : all-groups ( -- seq )
@@ -137,14 +137,14 @@ GENERIC: set-effective-group ( obj -- )
 
 PRIVATE>
 
-M: integer set-real-group ( id -- )
+M: integer set-real-group
     (set-real-group) ;
 
-M: string set-real-group ( string -- )
+M: string set-real-group
     ?group-id (set-real-group) ;
 
-M: integer set-effective-group ( id -- )
+M: integer set-effective-group
     (set-effective-group) ;
 
-M: string set-effective-group ( string -- )
+M: string set-effective-group
     ?group-id (set-effective-group) ;

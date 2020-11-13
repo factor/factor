@@ -100,7 +100,7 @@ CONSTANT: revalidate-url-key "__u"
     begin-form
     handle-rest ;
 
-M: action call-responder* ( path action -- response )
+M: action call-responder*
     [ init-action ] keep
     request get method>> {
         { "GET"   [ handle-get ] }

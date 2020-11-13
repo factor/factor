@@ -27,7 +27,7 @@ IN: vocabs.prettyprint
 
 GENERIC: pprint-qualified ( qualified -- )
 
-M: qualified pprint-qualified ( qualified -- )
+M: qualified pprint-qualified
     [
         dup [ vocab>> vocab-name ] [ prefix>> ] bi = [
             \ \QUALIFIED: pprint-word
@@ -38,7 +38,7 @@ M: qualified pprint-qualified ( qualified -- )
         ] if
     ] with-pprint ;
 
-M: from pprint-qualified ( from -- )
+M: from pprint-qualified
     [
         \ \FROM: pprint-word
         [ vocab>> pprint-vocab "=>" text ]
@@ -46,7 +46,7 @@ M: from pprint-qualified ( from -- )
         \ \; pprint-word
     ] with-pprint ;
 
-M: exclude pprint-qualified ( exclude -- )
+M: exclude pprint-qualified
     [
         \ \EXCLUDE: pprint-word
         [ vocab>> pprint-vocab "=>" text ]
@@ -54,7 +54,7 @@ M: exclude pprint-qualified ( exclude -- )
         \ \; pprint-word
     ] with-pprint ;
 
-M: rename pprint-qualified ( rename -- )
+M: rename pprint-qualified
     [
         \ \RENAME: pprint-word
         [ word>> text ]

@@ -89,7 +89,7 @@ M: object expand-macros* literal ;
 M: callable expand-macros*
     expand-macros literal ;
 
-M: callable expand-macros ( quot -- quot' )
+M: callable expand-macros
     [ begin [ expand-macros* ] each end ] [ ] make ;
 
 M: array expand-macros ( quot -- quot' )

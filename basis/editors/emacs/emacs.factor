@@ -10,7 +10,7 @@ SYMBOL: emacsclient-args
 
 HOOK: find-emacsclient os ( -- path )
 
-M: object find-emacsclient ( -- path )
+M: object find-emacsclient
     "emacsclient" ?find-in-path ;
 
 M: windows find-emacsclient
@@ -20,7 +20,7 @@ M: windows find-emacsclient
         [ "emacsclient.exe" ]
     } 0|| ;
 
-M: emacsclient editor-command ( file line -- command )
+M: emacsclient editor-command
     [
         emacsclient-path get [ find-emacsclient ] unless* ,
         emacsclient-args get [ { "-a=emacs" "--no-wait" } ] unless* %

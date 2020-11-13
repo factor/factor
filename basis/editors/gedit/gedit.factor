@@ -12,7 +12,7 @@ gedit editor-class set-global
         "gedit" ?find-in-path
     ] unless* ;
 
-M: gedit editor-command ( file line -- command )
+M: gedit editor-command
     [
         gedit-path , number>string "+" prepend , ,
     ] { } make ;

@@ -8,7 +8,7 @@ IN: editors.visual-studio-code
 ! Command line arguments
 ! https://code.visualstudio.com/docs/editor/command-line
 
-SINGLETON: visual-studio-code
+SINGLETONS: visual-studio-code visual-studio-code-insiders ;
 visual-studio-code editor-class set-global
 
 HOOK: find-visual-studio-code-invocation os ( -- array )
@@ -21,7 +21,10 @@ HOOK: find-visual-studio-code-invocation os ( -- array )
     } 0|| ;
 
 M: macosx find-visual-studio-code-invocation
-    "com.microsoft.VSCode" find-native-bundle [
+    editor-class get visual-studio-code-insiders =
+    { "com.microsoft.VSCodeInsiders" }
+    { "com.microsoft.VSCode" }
+    ? [ find-native-bundle ] map-find drop [
         "Contents/MacOS/Electron" append-path
     ] [
         f
@@ -30,23 +33,34 @@ M: macosx find-visual-studio-code-invocation
 ERROR: cannot-find-visual-studio-code ;
 
 M: linux find-visual-studio-code-invocation
-    {
-        [ "code" which ]
-        [ "Code" which ]
-        [ home "VSCode-linux-x64/Code" append-path ]
-        [ "/usr/share/code/code" ]
-    } [ dup exists? [ drop f ] unless ] map-compose 0|| ;
+    editor-class get visual-studio-code-insiders = [
+        "code-insiders" which
+    ] [
+        {
+            [ "code" which ]
+            [ "Code" which ]
+            [ home "VSCode-linux-x64/Code" append-path ]
+            [ "/usr/share/code/code" ]
+        } [ dup exists? [ drop f ] unless ] map-compose 0||
+    ] if ;
 
 M: windows find-visual-studio-code-invocation
-    {
-        [ { "Microsoft VS Code" } "code.exe" find-in-applications ]
-        [ "code.cmd" ]
-    } 0|| ;
+    editor-class get visual-studio-code-insiders = [
+        [ { "Microsoft VS Code Insiders" } "code-insiders.cmd" find-in-applications ]
+    ] [
+        "code.cmd"
+    ] if ;
 
-M: visual-studio-code editor-command ( file line -- command )
+: visual-studio-code-editor-command ( file line -- seq )
     [
         visual-studio-code-invocation
         [ , ] [ cannot-find-visual-studio-code ] if*
         "-g" , "-r" ,
         number>string ":" glue ,
     ] { } make ;
+
+M: visual-studio-code editor-command
+    visual-studio-code-editor-command ;
+
+M: visual-studio-code-insiders editor-command
+    visual-studio-code-editor-command ;

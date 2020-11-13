@@ -11,7 +11,7 @@ ultraedit editor-class set-global
         [ "uedit32.exe" ] unless*
     ] unless* ;
 
-M: ultraedit editor-command ( file line -- command )
+M: ultraedit editor-command
     [
         ultraedit-path , [ swap % "/" % # "/1" % ] "" make ,
     ] { } make ;

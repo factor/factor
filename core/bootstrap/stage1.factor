@@ -38,7 +38,8 @@ load-help? off
     "vocabs.loader" require
 
     "syntax" require
-    "bootstrap.layouts" require
+
+    "vocab:bootstrap/layouts.factor" parse-file %
 
     ! need this
     "locals" load

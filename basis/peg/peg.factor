@@ -345,7 +345,7 @@ TUPLE: token-parser symbol ;
         [ seq>> pos get swap ] dip "'" "'" surround 1vector add-error f
     ] if ;
 
-M: token-parser (compile) ( peg -- quot )
+M: token-parser (compile)
     symbol>> '[ input-slice _ parse-token ] ;
 
 TUPLE: satisfy-parser quot ;

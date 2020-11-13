@@ -334,28 +334,30 @@ M: iokit-game-input-backend (close-game-input)
         f +controller-states+ set-global
     ] when ;
 
-M: iokit-game-input-backend get-controllers ( -- sequence )
+M: iokit-game-input-backend get-controllers
     +controller-states+ get-global keys [ controller boa ] map ;
 
 : ?join ( pre post sep -- string )
     2over subseq-start [ swap 2nip ] [ [ 2array ] dip join ] if ;
 
-M: iokit-game-input-backend product-string ( controller -- string )
+M: iokit-game-input-backend product-string
     handle>>
     [ kIOHIDManufacturerKey device-property ]
     [ kIOHIDProductKey      device-property ] bi " " ?join ;
-M: iokit-game-input-backend product-id ( controller -- integer )
+
+M: iokit-game-input-backend product-id
     handle>>
     [ kIOHIDVendorIDKey  device-property ]
     [ kIOHIDProductIDKey device-property ] bi 2array ;
-M: iokit-game-input-backend instance-id ( controller -- integer )
+
+M: iokit-game-input-backend instance-id
     handle>> kIOHIDLocationIDKey device-property ;
 
-M: iokit-game-input-backend read-controller ( controller -- controller-state )
+M: iokit-game-input-backend read-controller
     handle>> +controller-states+ get-global at clone ;
 
-M: iokit-game-input-backend read-keyboard ( -- keyboard-state )
+M: iokit-game-input-backend read-keyboard
     +keyboard-state+ get-global clone keyboard-state boa ;
 
-M: iokit-game-input-backend calibrate-controller ( controller -- )
+M: iokit-game-input-backend calibrate-controller
     drop ;

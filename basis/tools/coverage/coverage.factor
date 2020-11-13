@@ -84,7 +84,7 @@ GENERIC: coverage ( object -- seq )
 M: string coverage
     [ dup coverage 2array ] map-words ;
 
-M: word coverage ( word -- seq )
+M: word coverage
     "coverage" word-prop
     [ drop executed?>> ] assoc-reject values ;
 

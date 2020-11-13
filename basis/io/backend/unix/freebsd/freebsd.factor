@@ -2,9 +2,9 @@ USING: io.backend io.backend.unix system namespaces kernel accessors assocs cont
 
 << "io.files.unix" require >> ! needed for deploy
 
-M: freebsd init-io ( -- )
+M: freebsd init-io
    <kqueue-mx> mx set-global ;
-   
+
 freebsd set-io-backend
 
 [ start-signal-pipe-thread ]

@@ -158,10 +158,10 @@ STRUCT: timeval
 
 GENERIC: sockaddr>ip ( sockaddr -- string )
 
-M: sockaddr-in sockaddr>ip ( sockaddr -- string )
+M: sockaddr-in sockaddr>ip
     addr>> uint <ref> [ number>string ] { } map-as "." join ;
 
-M: sockaddr-in6 sockaddr>ip ( uchar-array -- string )
+M: sockaddr-in6 sockaddr>ip
     addr>> [ >hex ] { } map-as 2 group [ concat ] map ":" join ;
 
 STRUCT: fd_set

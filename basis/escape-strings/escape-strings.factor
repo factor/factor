@@ -1,6 +1,6 @@
 ! Copyright (C) 2017 John Benediktsson, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ascii assocs combinators kernel math math.functions
+USING: ascii assocs combinators fry kernel math math.functions
 math.parser math.ranges math.statistics sequences sets sorting
 strings ;
 IN: escape-strings

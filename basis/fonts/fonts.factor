@@ -34,8 +34,8 @@ TUPLE: font name size bold? italic? foreground background ;
 
 : reverse-video-font ( font -- font )
     clone dup
-    [ foreground>> ] [ background>> ] bi
-    [ >>background ] [ >>foreground ] bi* ;
+    [ foreground>> >>background ]
+    [ background>> >>foreground ] bi ;
 
 : derive-font ( base font -- font' )
     [

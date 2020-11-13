@@ -8,10 +8,10 @@ IN: io.backend.unix.macosx
 
 SINGLETON: macosx-kqueue
 
-M: macosx-kqueue init-io ( -- )
+M: macosx-kqueue init-io
     <kqueue-mx> mx set-global ;
 
-M: macosx init-io ( -- )
+M: macosx init-io
     <run-loop-mx> mx set-global ;
 
 macosx set-io-backend

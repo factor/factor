@@ -72,7 +72,7 @@ ERROR: bad-slot-value value class ;
 
 GENERIC: instance-check-quot ( obj -- quot )
 
-M: class instance-check-quot ( class -- quot )
+M: class instance-check-quot
     {
         { [ dup object bootstrap-word eq? ] [ drop [ ] ] }
         { [ dup "coercer" word-prop ] [ "coercer" word-prop ] }

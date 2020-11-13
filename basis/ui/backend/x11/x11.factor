@@ -196,7 +196,7 @@ M: world selection-request-event
         [ drop send-notify-failure ]
     } cond ;
 
-M: x11-ui-backend (close-window) ( handle -- )
+M: x11-ui-backend (close-window)
     [ xic>> XDestroyIC ]
     [ glx>> destroy-glx ]
     [ window>> [ unregister-window ] [ destroy-window ] bi ]
@@ -249,7 +249,7 @@ M: x-clipboard paste-clipboard
     XA_WM_CLASS XA_UTF8_STRING 8 PropModeReplace "Factor"
     utf8 encode dup length XChangeProperty drop ;
 
-M: x11-ui-backend set-title ( string world -- )
+M: x11-ui-backend set-title
     handle>> window>> swap
     [ dpy get ] 2dip [ set-title-old ] [ set-title-new ] 3bi ;
 
@@ -271,14 +271,14 @@ M: x11-ui-backend set-title ( string world -- )
         flags{ SubstructureNotifyMask SubstructureRedirectMask }
     ] dip XSendEvent drop ;
 
-M: x11-ui-backend (set-fullscreen) ( world ? -- )
+M: x11-ui-backend (set-fullscreen)
     [ handle>> window>> ] dip make-fullscreen-msg send-event ;
 
-M: x11-ui-backend (fullscreen?) ( world -- ? )
+M: x11-ui-backend (fullscreen?)
     handle>> window>> XA_NET_WM_STATE get-atom-properties
     XA_NET_WM_STATE_FULLSCREEN swap member? ;
 
-M: x11-ui-backend (open-window) ( world -- )
+M: x11-ui-backend (open-window)
     dup gadget-window handle>> window>>
     [ set-closable ]
     [ [ dpy get ] dip set-class ]
@@ -303,22 +303,22 @@ M: x11-ui-backend (open-window) ( world -- )
     [ XRaiseWindow drop ]
     2bi ;
 
-M: x11-ui-backend raise-window* ( world -- )
+M: x11-ui-backend raise-window*
     handle>> [
         window>>
         XA_NET_ACTIVE_WINDOW net-wm-hint-supported?
         [ raise-window-new ] [ raise-window-old ] if
     ] when* ;
 
-M: x11-handle select-gl-context ( handle -- )
+M: x11-handle select-gl-context
     dpy get swap
     [ window>> ] [ glx>> ] bi glXMakeCurrent
     [ "Failed to set current GLX context" throw ] unless ;
 
-M: x11-handle flush-gl-context ( handle -- )
+M: x11-handle flush-gl-context
     dpy get swap window>> glXSwapBuffers ;
 
-M: x11-ui-backend (with-ui) ( quot -- )
+M: x11-ui-backend (with-ui)
     f [
         [
             init-clipboard
@@ -327,7 +327,7 @@ M: x11-ui-backend (with-ui) ( quot -- )
         ] with-xim
     ] with-x ;
 
-M: x11-ui-backend beep ( -- )
+M: x11-ui-backend beep
     dpy get 100 XBell drop ;
 
 <PRIVATE

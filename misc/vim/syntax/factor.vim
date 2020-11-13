@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language: Factor
 " Maintainer: Alex Chapman <chapman.alex@gmail.com>
-" Last Change: 2020 Jun 05
+" Last Change: 2020 Sep 30
 " Minimum Version: 600
 
 " Factor |syntax| file guide & conventions:
@@ -56,12 +56,6 @@ endif
 
 " Factor is case sensitive.
 syn case match
-
-" Make all of these characters part of a word (useful for skipping over words with w, e, and b)
-let s:iskeyword = '!,@,33-35,%,$,38-64,A-Z,91-96,a-z,123-126,128-255'
-let s:set_iskeyword = has('patch-7.4.1142') ? 'syn iskeyword ' :
-      \ 'setlocal iskeyword='
-execute s:set_iskeyword . s:iskeyword
 
 syn match   factorWord   /\v<\S+>/  contains=@factorWord transparent display
 syn cluster factorClusterNoComment  contains=factorWord,@factorMultilineComment,@factorClusterValue,factorBoolean,factorBreakpoint,factorDeclaration,factorCallQuotation,factorExecute,factorCallNextMethod,@factorWordOps,factorAlien,factorSlot,factorTuple,factorErrorSyn,factorStruct
@@ -139,7 +133,7 @@ syn region  factorPLocalsMethodDelims   start=/\v<M::>/        skip=/\v<!>.*/   
 syn region  factorPGeneric        start=/\v<%(GENERIC|MATH|PRIMITIVE):>/                        end=/\v<\S+>/   contains=@factorComment nextgroup=factorStackEffectSkip skipempty contained
 syn region  factorPGenericN matchgroup=factorPGenericN    start=/\v<GENERIC\#:>/   skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\d+>/ contains=@factorComment nextgroup=factorStackEffectSkip skipempty keepend contained
 
-syn region  factorPrivate matchgroup=factorPrivate start=/\v<\<PRIVATE>/ end=/\v<PRIVATE\>>/ contains=@factorDefnContents,factorPDefn,factorPMethod,factorPLocalsMethod,factorPGeneric,factorPGenericN transparent
+syn region  factorPrivate matchgroup=factorPrivate start=/\v<\<PRIVATE>/ end=/\v<PRIVATE\>>/ contains=@factorDefnContents,factorPDefn,factorPMethod,factorPLocalsMethod,factorPGeneric,factorPGenericN skipempty keepend
 
 syn cluster factorClusterValue      contains=factorBreakpoint,factorBoolean,factorFrySpecifier,factorChar,@factorString,@factorNumber,factorBackslash,factorMBackslash,factorLiteral,factorLiteralBlock,@factorStackEffect,@factorQuotation,@factorArray
 
@@ -249,13 +243,15 @@ syn region  factorConstructor2    start=/\v<CONSTRUCTOR:>/                  end=
 syn region  factorIntersection    start=/\v<INTERSECTION:>/                 end=/\v<;>/     contains=@factorComment
 syn cluster factorSlotAttr              contains=factorSlotAttrInitial,factorSlotAttrReadOnly
 syn cluster factorTupleSlotAttr         contains=@factorSlotAttr
-syn match   factorTupleSlotName         /\v<\S+>/ nextgroup=factorTupleSlotClassSkip skipempty contained
+syn match   factorTupleSlotName         /\v<\S+;@1<!>/ nextgroup=factorTupleSlotClassSkip skipempty contained
 syn match   factorTupleSlotNameSkip     /\v%(\_\s+%(!>.*)?)*/ contains=@factorComment nextgroup=factorTupleSlotName transparent contained
 syn match   factorTupleSlotClass        /\v<\S+>/ nextgroup=factorTupleSlotAttrSkip skipempty contained
 " a class is optional, so let an attribute take priority if present
 syn match   factorTupleSlotClassSkip    /\v%(\_\s+%(!>.*)?)*/ contains=@factorComment nextgroup=factorTupleSlotClass,@factorTupleSlotAttr transparent contained
 syn region  factorTupleSlot matchgroup=factorTupleSlotDelims  start=/\v<\{>/                end=/\v<\}>/    contains=@factorComment,factorTupleSlotName,@factorTupleSlotAttr contained
-syn region  factorTuple matchgroup=factorTupleDelims          start=/\v<%(TUPLE|BUILTIN):>/ end=/\v<;>/     contains=@factorComment,factorTupleSlotName,factorTupleSlot
+syn match   factorTupleHeader           /\v%(\_\s+%(!>.*)?)*\S+%(%(\_\s+%(!>.*)?)+\<%(\_\s+%(!>.*)?)+\S+)?>/  contains=@factorComment,@factorWord contained transparent
+syn match   factorTupleDelims           /\v<%(TUPLE|BUILTIN):>/ nextgroup=factorTupleHeader skipempty contained
+syn region  factorTuple           start=/\v<%(TUPLE|BUILTIN):>/ end=/\v<;>/     contains=@factorComment,factorTupleSlotName,factorTupleSlot,factorTupleDelims
 syn region  factorPredicate matchgroup=factorPredicateDelims  start=/\v<%(PREDICATE):>/     end=/\v<;>/     contains=@factorComment,factorTupleSlotName
 " Abnormally named because factor*Error is reserved for syntax errors.
 syn region  factorErrorSyn        start=/\v<ERROR:>/            end=/\v<;>/     contains=@factorComment

@@ -6,12 +6,15 @@ lexer math math.parser sequences ;
 
 IN: colors.hex
 
+ERROR: invalid-hex-color hex ;
+
 : hex>rgba ( hex -- rgba )
     dup length {
         { 6 [ 2 group [ hex> 255 /f ] map first3 1.0 ] }
         { 8 [ 2 group [ hex> 255 /f ] map first4 ] }
         { 3 [ [ digit> 15 /f ] { } map-as first3 1.0 ] }
         { 4 [ [ digit> 15 /f ] { } map-as first4 ] }
+        [ drop invalid-hex-color ]
     } case <rgba> ;
 
 : rgba>hex ( rgba -- hex )

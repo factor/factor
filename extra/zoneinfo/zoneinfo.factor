@@ -1,8 +1,10 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar.english combinators
-combinators.smart io.encodings.utf8 io.files kernel math.parser
-memoize namespaces sequences splitting unicode ;
+USING: accessors arrays ascii assocs assocs.extras calendar
+calendar.english combinators combinators.smart grouping
+interval-maps io.encodings.utf8 io.files kernel math math.parser
+memoize namespaces sequences sequences.extras sorting splitting
+splitting.extras ;
 IN: zoneinfo
 
 CONSTANT: zoneinfo-paths
@@ -15,8 +17,10 @@ CONSTANT: zoneinfo-paths
     "vocab:zoneinfo/northamerica"
     "vocab:zoneinfo/pacificnew"
     "vocab:zoneinfo/southamerica"
-    "vocab:zoneinfo/systemv"
+    "vocab:zoneinfo/etcetera"
+    "vocab:zoneinfo/factory"
     "vocab:zoneinfo/leapseconds"
+    "vocab:zoneinfo/systemv"
 }
 
 SYMBOL: last-zone
@@ -38,19 +42,18 @@ TUPLE: rule name from to at-time ;
 
 : parse-rule ( seq -- rule )
     [
-        {
-            [ drop ]
-            [ ]
-            [ ]
-            [ ]
-            [ ]
-            [ ]
-            [ ]
-            [ ]
-            [ ]
-            [ ]
-        } spread
+        { [ drop ] [ ] [ ] [ ] [ ] [ ] [ ] [ ] [ ] [ ] } spread
     ] input<sequence raw-rule boa ;
+
+: parse-link ( seq -- link )
+    [
+        { [ drop ] [ ] [ ] } spread
+    ] input<sequence raw-link boa ;
+
+: parse-leap ( seq -- link )
+    [
+        { [ drop ] [ ] [ ] [ ] [ ] [ ] [ ] } spread
+    ] input<sequence raw-leap boa ;
 
 : parse-zone ( seq -- zone )
     {
@@ -70,35 +73,13 @@ TUPLE: rule name from to at-time ;
         [ 3 tail harvest ]
     } cleave raw-zone boa ;
 
-: parse-link ( seq -- link )
-    [
-        {
-            [ drop ]
-            [ ]
-            [ ]
-        } spread
-    ] input<sequence raw-link boa ;
-
-: parse-leap ( seq -- link )
-    [
-        {
-            [ drop ]
-            [ ]
-            [ ]
-            [ ]
-            [ ]
-            [ ]
-            [ ]
-        } spread
-    ] input<sequence raw-leap boa ;
-
 : parse-line ( seq -- tuple )
     dup first >lower
     {
-        { "zone" [ parse-zone dup last-zone set ] }
         { "rule" [ parse-rule ] }
         { "link" [ parse-link ] }
         { "leap" [ parse-leap ] }
+        { "zone" [ parse-zone dup last-zone set ] }
         [ drop harvest parse-partial-zone ]
     } case ;
 
@@ -120,12 +101,17 @@ MEMO: zoneinfo-array ( -- seq )
 : raw-zone-map ( -- assoc )
     zoneinfo-array [ raw-zone? ] filter [ name>> ] collect-by ;
 
+: zoneinfo-zones ( -- seq )
+    raw-zone-map keys
+    [ "/" swap subseq? ] partition
+    [ natural-sort ] bi@ append ;
+
 GENERIC: zone-matches? ( string rule -- ? )
 
 M: raw-rule zone-matches? name>> = ;
-M: raw-zone zone-matches? name>> = ;
 M: raw-link zone-matches? from>> = ;
 M: raw-leap zone-matches? 2drop f ;
+M: raw-zone zone-matches? name>> = ;
 
 : find-rules ( string -- rules )
     raw-rule-map
@@ -133,12 +119,20 @@ M: raw-leap zone-matches? 2drop f ;
 
 ERROR: zone-not-found name ;
 
-: find-zone ( string -- rules )
+: find-zone ( string -- zone )
     raw-zone-map
     [ last ] assoc-map ?at [ zone-not-found ] unless ;
 
 : find-zone-rules ( string -- zone rules )
     find-zone dup rules/save>> find-rules ;
+
+: zone-abbrevs ( -- assoc )
+    zoneinfo-zones [
+        find-zone-rules [ format>> ] dip
+        [
+            letters>> swap "%" split1 dup [ 1 tail ] when surround
+        ] with V{ } map-as
+    ] map-zip ;
 
 : number>value ( n -- n' )
     {
@@ -158,37 +152,127 @@ ERROR: zone-not-found name ;
         [ string>number ]
     } cond ;
 
-: raw-rule>triple ( raw-rule -- quot )
+: zone-month ( timestamp month -- timestamp' )
+    month-abbreviation-index >>month ;
+
+ERROR: unknown-day-abbrev day ;
+: day-abbrev>= ( timestamp day -- timestamp' )
     {
-        [ from>> string>number ]
-        [ in>> month-abbreviation-index ]
-        [ on>> on>value ]
-    } cleave>array ;
+        { "Sun" [ sunday>= ] }
+        { "Mon" [ monday>= ] }
+        { "Tue" [ tuesday>= ] }
+        { "Wed" [ wednesday>= ] }
+        { "Thu" [ thursday>= ] }
+        { "Fri" [ friday>= ] }
+        { "Sat" [ saturday>= ] }
+        [ unknown-day-abbrev ]
+    } case ;
 
-! "Europe/Helsinki" find-zone-rules
+: day-abbrev<= ( timestamp day -- timestamp' )
+    {
+        { "Sun" [ sunday<= ] }
+        { "Mon" [ monday<= ] }
+        { "Tue" [ tuesday<= ] }
+        { "Wed" [ wednesday<= ] }
+        { "Thu" [ thursday<= ] }
+        { "Fri" [ friday<= ] }
+        { "Sat" [ saturday<= ] }
+        [ unknown-day-abbrev ]
+    } case ;
 
-! Rule
-! name - string
-! from - year or "min"
-! name    "France"
-! from    "1938"  or "min"
-! to      "1945" or "max" or "only"
-! type    "-"  always "-"
-! in      "Mar"  -- 3-letter month name
-! on      "26"  or "Mon>=15"  or lastSun lastFri
-! at      "23:00s"  "12:13:00s" "1:00s" "1:00u"
-! save    "-0:00:05" "1:00" "0:14:15"
-! letters "S" or "-" or "AMT" "BDST"
+: comparison-day-string ( timestamp string -- timestamp )
+    {
+        { [ ">=" over subseq? ] [ ">=" split1 swap [ string>number >>day ] dip day-abbrev>= ] }
+        { [ "<=" over subseq? ] [ "<=" split1 swap [ string>number >>day ] dip day-abbrev<= ] }
+        [ string>number >>day ]
+    } cond ;
+        
+ERROR: unknown-last-day string ;
 
-! Zone
-! name       "Indian/Maldives"
-! gmt-offset "4:54:00" "9:55:56" "-9:55:56"
-! rules/save "-" "0:20" "0:30" "1:00" "AN" "W-Eur" "Winn" "Zion" "sol87" "sol88"
-! format     "LMT" "%s" "%sT" "A%sT" "AC%sT" "ACT"
-! until      { "1880" }
-    ! { "1847" "Dec" "1" "0:00s" }
-    ! { "1883" "Nov" "18" "12:12:57" }
-    ! { "1989" "Sep" "lastSun" "2:00s" }
+: last-day-string ( timestamp string -- timestamp )
+    {
+        { "lastSun" [ last-sunday-of-month ] }
+        { "lastMon" [ last-monday-of-month ] }
+        { "lastTue" [ last-tuesday-of-month ] }
+        { "lastWed" [ last-wednesday-of-month ] }
+        { "lastThu" [ last-thursday-of-month ] }
+        { "lastFri" [ last-friday-of-month ] }
+        { "lastSat" [ last-saturday-of-month ] }
+        [ unknown-last-day ]
+    } case ;
 
-! Link
-! T{ link { from "Asia/Riyadh88" } { to "Mideast/Riyadh88" } }
+!  "lastFri" | "Fri<=1" | "Sat>=2" | "15"
+: zone-day ( timestamp text -- timestamp' )
+    dup "last" head? [
+        last-day-string
+    ] [
+        comparison-day-string
+    ] if ;
+
+: string>year ( str -- year )
+    string>number <year-gmt> ;
+
+: rule-year>years ( rule -- from to )
+    [ from>> ] [ to>> ] bi
+    {
+        { [ over "min" = ] [ [ drop -1/0. ] [ string>year ] bi* ] }
+        { [ dup "max" = ] [ [ string>year ] [ drop 1/0. ] bi* ] }
+        { [ dup "only" = ] [ drop dup [ string>year ] bi@ ] }
+        [ [ string>year ] bi@ ]
+    } cond ;
+
+! XXX: Don't just drop the s/u, e.g. 2:00:00s
+: zone-time ( timestamp time -- timestamp' )
+    [ Letter? ] split-tail drop
+    time>offset first3 set-time ;
+
+: hm>duration ( str -- duration )
+    ":" split1 "0" or [ string>number ] bi@
+    [ instant ] 2dip 0 set-time! ;
+
+: rule>timestamp-rest ( timestamp zone -- from )
+    {
+        [ over fp-infinity? [ drop ] [ in>> month-abbreviation-index >>month ] if ]
+        [ over fp-infinity? [ drop ] [ on>> zone-day ] if ]
+        [ over fp-infinity? [ drop ] [ at-time>> zone-time ] if ]
+    } cleave ;
+
+: rule>timestamps ( zone -- from to )
+    [ rule-year>years ] keep
+    [ nip rule>timestamp-rest ]
+    [ nipd rule>timestamp-rest ] 3bi ;
+
+: until>timestamp ( seq -- unix-time )
+    [ 1/0. ] [
+        4 f pad-tail first4 {
+            [ string>number <year-gmt> ]
+            [ [ zone-month ] when* ]
+            [ [ zone-day ] when* ]
+            [ [ zone-time ] when* ]
+        } spread timestamp>unix-time
+    ] if-empty ;
+
+: zones>interval-map ( zones -- interval-map )
+    [
+        [ until>> until>timestamp ] map
+        -1/0. prefix 2 <clumps> [ >array ] map
+    ] keep zip
+    [ first2 1 - 2array ] map-keys <interval-map> ;
+
+: name>zones ( name -- interval-map )
+    raw-zone-map at zones>interval-map ;
+
+: gmt-offset ( timestamp name -- gmt-offset )
+    [ timestamp>unix-time ]
+    [ zones>interval-map ] bi* interval-at ;
+
+: name>rules ( name -- rules )
+    raw-rule-map at [
+        [
+            [ rule>timestamps [ dup fp-infinity? [ timestamp>unix-time ] unless ] bi@ 2array ]
+            [ [ save>> hm>duration ] [ letters>> ] bi 2array ] bi 2array
+        ] map
+    ] keep zip ;
+
+: chicago-zones ( -- interval-map ) "America/Chicago" name>zones ;
+ : us-rules ( -- rules ) "US" name>rules ;

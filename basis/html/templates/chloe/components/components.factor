@@ -15,7 +15,7 @@ IN: html.templates.chloe.components
 
 GENERIC: component-tag ( tag class -- )
 
-M: singleton-class component-tag ( tag class -- )
+M: singleton-class component-tag
     [ "name" required-attr compile-attr ]
     [ literalize render-quot [code-with] ]
     bi* ;
@@ -26,7 +26,7 @@ M: singleton-class component-tag ( tag class -- )
     [ [ boa ] [code-with] ]
     bi ;
 
-M: tuple-class component-tag ( tag class -- )
+M: tuple-class component-tag
     [ drop "name" required-attr compile-attr ]
     [ compile-component-attrs ] 2bi
     render-quot [code] ;

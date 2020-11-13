@@ -253,7 +253,7 @@ PRIVATE>
 M: class metaclass-changed
     swap class? [ drop ] [ forget-class ] if ;
 
-M: class forget* ( class -- )
+M: class forget*
     [ call-next-method ] [ forget-class ] bi ;
 
 ERROR: not-an-instance obj class ;

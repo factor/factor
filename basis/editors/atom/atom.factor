@@ -21,7 +21,7 @@ M: macosx find-atom
         f
     ] if* ;
 
-M: atom-editor editor-command ( file line -- command )
+M: atom-editor editor-command
     [
         atom-path get [ find-atom ] unless* ,
         number>string ":" glue ,

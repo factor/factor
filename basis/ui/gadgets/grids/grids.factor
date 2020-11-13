@@ -113,7 +113,7 @@ M: grid pref-dim* <grid-layout> grid-pref-dim ;
 
 M: grid layout* [ grid>> ] [ <grid-layout> ] bi layout-grid ;
 
-M: grid children-on ( rect gadget -- seq )
+M: grid children-on
     dup children>> empty? [ 2drop f ] [
         [ { 0 1 } ] dip
         [ grid>> ] [ dim>> ] bi

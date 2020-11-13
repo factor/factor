@@ -1,11 +1,13 @@
 ! Copyright (C) 2020 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors arrays assocs bencode byte-arrays checksums
-checksums.sha combinators fry grouping http.client io io.binary
-io.encodings.binary io.files io.pathnames io.sockets
-io.streams.byte-array kernel literals make math math.bitwise
-math.parser math.ranges namespaces random sequences splitting
-strings urls ;
+USING: accessors arrays assocs bencode byte-arrays byte-vectors
+calendar checksums checksums.sha combinators destructors fry
+grouping http.client io io.binary io.encodings.binary io.files
+io.pathnames io.sockets io.streams.byte-array io.streams.duplex
+kernel literals locals make math math.bitwise math.functions
+math.order math.parser math.ranges multiline namespaces
+prettyprint random sequences splitting strings timers
+tools.annotations ui ui.gadgets.panes ui.tools.listener urls ;
 
 IN: bittorrent
 
@@ -275,3 +277,197 @@ M: unknown write-message
 
 : message> ( message -- bytes )
     binary [ write-message ] with-byte-writer ;
+
+
+
+
+SYMBOL: torrent-max-block-size
+torrent-max-block-size [ 16384 ] initialize
+
+SYMBOL: torrent-directory
+torrent-directory [ "~/Desktop" ] initialize
+
+
+
+: with-debug ( quot -- )
+    ui-running? [
+        get-listener output>> <pane-stream> swap
+        '[ @ flush ] with-output-stream*
+    ] [
+        '[ @ flush ] with-global
+    ] if ; inline
+
+
+! connection
+
+TUPLE: torrent metainfo tracker peers ;
+
+:: <torrent> ( metainfo -- torrent )
+    torrent new
+        metainfo >>metainfo
+        metainfo load-tracker >>tracker
+        V{ } clone >>peers
+    ;
+
+: torrent-path ( torrent -- path )
+    metainfo>> { "info" "name" } [ of ] each
+    torrent-directory get prepend-path ;
+
+
+DEFER: <peer>
+
+: random-peer ( torrent -- peer )
+    dup tracker>> "peers" of random <peer> ;
+
+: update-tracker ( client -- client )
+    dup metainfo>> load-tracker >>tracker ;
+
+
+! peers
+
+TUPLE: peer < disposable torrent remote stream local handshake
+self-choking self-interested peer-choking peer-interested timer
+num-pieces piece-length bitfield current-index current-piece ;
+
+DEFER: with-peer
+
+:: <peer> ( torrent remote -- peer )
+    peer new
+        torrent >>torrent
+        remote >>remote
+
+        t >>self-choking
+        f >>self-interested
+        t >>peer-choking
+        f >>peer-interested
+
+        dup '[
+            _ [ T{ keep-alive } write-message flush ] with-peer
+        ] 30 seconds dup <timer> >>timer
+
+        torrent metainfo>> "info" of
+        "pieces" of length 20 / [ >>num-pieces ] keep
+
+        8 / ceiling <byte-array> >>bitfield
+
+        torrent metainfo>> "info" of
+        "piece length" of [ >>piece-length ] keep
+
+        <byte-vector> >>current-piece
+    ;
+
+M: peer dispose
+    dup timer>> stop-timer
+    [ dispose f ] change-stream
+    f >>local f >>remote drop ;
+
+:: with-peer ( peer quot -- )
+    [
+        peer remote>> remote-address set
+        peer local>> local-address set
+        peer stream>> quot with-stream*
+    ] with-scope ; inline
+
+: connect-peer ( peer -- peer )
+    dup remote>> binary <client> [ >>stream ] [ >>local ] bi* ;
+
+: handshake-peer ( peer -- peer )
+    dup torrent>> metainfo>> info-hash
+    torrent-peer-id get <handshake> write-handshake
+    read-handshake >>handshake ;
+
+: fast-peer? ( peer -- ? )
+    handshake>> reserved>> 7 swap nth 3 swap bit? ;
+
+: unchoke-peer ( peer -- peer )
+    T{ unchoke } write-message f >>self-choking
+    T{ interested } write-message t >>self-interested
+    flush ;
+
+: choke-peer ( peer -- peer )
+    T{ choke } write-message t >>self-choking
+    T{ not-interested } write-message f >>self-interested
+    flush ;
+
+:: verify-block ( peer -- peer )
+    peer current-piece>> sha1 checksum-bytes
+    peer current-index>> 20 * dup 20 +
+    peer torrent>> metainfo>>
+    { "info" "pieces" } [ of ] each
+    B{ } subseq-as assert=
+    peer ;
+
+:: save-block ( peer -- peer )
+    peer torrent>> torrent-path binary [
+        peer current-index>>
+        peer piece-length>> *
+        seek-absolute seek-output
+        peer current-piece>> write
+    ] with-file-appender peer ;
+
+:: next-block ( peer -- peer )
+    peer current-index>> [ 1 + ] [ 0 ] if*
+    peer num-pieces>>
+    peer bitfield>> '[ _ check-bitfield ] find-integer
+    peer current-index<<
+    0 peer current-piece>> set-length
+    peer ;
+
+:: request-piece ( peer -- peer )
+    peer current-index>>
+    [ peer next-block current-index>> ] unless*
+    peer current-piece>> length
+    peer piece-length>> over - torrent-max-block-size get min
+    [
+        2drop
+        peer
+        verify-block
+        save-block
+        next-block
+        request-piece
+    ] [
+        request boa write-message flush peer
+    ] if-zero ;
+
+GENERIC: handle-message ( peer message -- peer )
+
+M: object handle-message drop ;
+
+M: choke handle-message
+    drop t >>peer-choking ;
+
+M: unchoke handle-message
+    drop f >>peer-choking
+    dup self-choking>> [ next-block request-piece ] unless ;
+
+M: interested handle-message
+    drop t >>peer-interested ;
+
+M: not-interested handle-message
+    drop f >>peer-interested ;
+
+M: have handle-message
+    t swap index>> pick bitfield>> set-nth ;
+
+M: bitfield handle-message
+    2dup [ bitfield>> length ] bi@ assert=
+    bitfield>> >>bitfield ;
+
+M: request handle-message
+    [ index>> ] [ begin>> ] [ length>> ] tri
+    reject-request boa write-message ;
+
+M: have-all handle-message
+    drop [ length [ 255 ] B{ } replicate-as ] change-bitfield ;
+
+M: have-none handle-message
+    drop [ length <byte-array> ] change-bitfield ;
+
+M:: piece handle-message ( peer message -- peer )
+    peer current-index>> message index>> assert=
+    peer current-piece>> length message begin>> assert=
+    message [ block>> ] [ begin>> ] bi peer current-piece>> copy
+    peer request-piece ;
+
+: read-messages ( peer -- peer )
+    [ read-message ] [ handle-message ] while* ;

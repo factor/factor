@@ -5,5 +5,5 @@ USING: arrays io.launcher kernel present system webbrowser ;
 
 IN: webbrowser.linux
 
-M: linux open-item ( item -- )
+M: linux open-item
     present "xdg-open" swap 2array run-detached drop ;

@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.algebra
 classes.algebra.private classes.builtin classes.private
-combinators definitions kernel kernel.private math math.private
-quotations sequences sets sorting words ;
+classes.tuple classes.tuple.private combinators definitions
+kernel kernel.private math math.private quotations sequences
+slots.private sorting words ;
 IN: classes.union
 
 PREDICATE: union-class < class
@@ -24,32 +25,66 @@ M: class union-of-builtins?
 : empty-union-predicate-quot ( class -- quot )
     drop [ drop f ] ;
 
-: fast-union-mask ( class/builtin-classes -- n )
-    dup sequence? [ flatten-class ] unless
+: flatten-builtins ( class/builtin-classes -- seq )
+    dup sequence? [
+        [ flatten-class ] map concat
+    ] [
+        flatten-class
+    ] if ;
+
+: builtin-union-mask ( builtin-classes -- n )
     0 [ class>type 2^ bitor ] reduce ;
 
-: fast-union-predicate-quot ( class/builtin-classes -- quot )
-    fast-union-mask 1quotation
-    [ tag 1 swap fixnum-shift-fast ]
-    [ fixnum-bitand 0 eq? not ]
-    surround ;
-
-: slow-union-predicate-quot ( class -- quot )
-    class-members
-    dup [ builtin-class? ] count 1 > [
-        [ builtin-class? ] partition
-        [ predicate-def ] map swap
-        [ fast-union-predicate-quot suffix ] unless-empty
+: builtin-union-predicate-quot ( class/builtin-classes -- quot )
+    flatten-builtins dup length 1 = [
+        first class>type [ eq? ] curry [ tag ] prepose
     ] [
-        [ predicate-def ] map
-    ] if unclip swap
+        builtin-union-mask 1quotation
+        [ tag 1 swap fixnum-shift-fast ]
+        [ fixnum-bitand 0 eq? not ]
+        surround
+    ] if ;
+
+: predicate-quot ( predicates -- quot )
+    unclip swap
     [ [ dup ] prepend [ drop t ] ] { } map>assoc alist>quot ;
+
+! this replicates logic in classes.tuple, keep in sync
+: tuple-union-predicate-quot/1 ( tuple-classes -- quot )
+    [ [ eq? ] curry ] map predicate-quot
+    [ 7 slot ] prepose ;
+
+: tuple-union-predicate-quot/n ( echelon tuple-classes -- quot )
+    [ layout-class-offset ] dip
+    [ [ eq? ] curry ] map predicate-quot
+    over [ slot ] curry prepose [ drop f ] [ if ] 2curry
+    swap [ fixnum>= ] curry [ dup 1 slot ] prepose prepose ;
+
+: tuple-union-predicate-quot ( tuple-classes -- quot )
+    [ echelon-of 1 = ] partition
+    [ [ f ] [ tuple-union-predicate-quot/1 ] if-empty ] dip
+    [ echelon-of ] collect-by sort-keys
+    [ tuple-union-predicate-quot/n ] { } assoc>map
+    swap [ suffix ] when* predicate-quot
+    [ layout-of ] prepose [ drop f ] [ if ] 2curry
+    [ dup tuple? ] prepose ;
+
+: full-union-predicate-quot ( class -- quot )
+    class-members
+    [ union-of-builtins? ] partition
+    [ [ f ] [ builtin-union-predicate-quot ] if-empty ] dip
+    [ tuple-class? ] partition
+    [ [ f ] [ tuple-union-predicate-quot ] if-empty ] dip
+    [ predicate-def ] map
+    swap [ suffix ] when*
+    swap [ suffix ] when*
+    predicate-quot ;
 
 : union-predicate-quot ( class -- quot )
     {
         { [ dup class-members empty? ] [ empty-union-predicate-quot ] }
-        { [ dup union-of-builtins? ] [ fast-union-predicate-quot ] }
-        [ slow-union-predicate-quot ]
+        { [ dup union-of-builtins? ] [ builtin-union-predicate-quot ] }
+        [ full-union-predicate-quot ]
     } cond ;
 
 : define-union-predicate ( class -- )

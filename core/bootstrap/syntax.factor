@@ -53,7 +53,6 @@ IN: bootstrap.syntax
         "final"
         "SLOT:"
         "T{"
-        "TH{"
         "UNION:"
         "INTERSECTION:"
         "USE:"

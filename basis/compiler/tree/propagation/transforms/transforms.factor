@@ -196,7 +196,8 @@ ERROR: bad-partial-eval quot word ;
     dup classoid?
     [
         predicate-def
-        ! union{ and intersection{ have useless expansions, and recurse infinitely
+        ! union{ and intersection{ and not{ have useless
+        ! expansions, and recurse infinitely
         dup { [ length 2 >= ] [ second \ instance? = ] } 1&& [
             drop f
         ] when

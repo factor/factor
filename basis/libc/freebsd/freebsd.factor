@@ -39,7 +39,7 @@ CONSTANT: SIGTHR    32
 
 FUNCTION: int strerror_r ( int errno, char* buf, size_t buflen )
 
-M: freebsd strerror ( errno -- str )
+M: freebsd strerror
     [
         1024 [ malloc &free ] keep [ strerror_r ] keepd nip
         alien>native-string

@@ -2,6 +2,9 @@ USING: accessors arrays assocs io.sockets io.sockets.secure kernel
 linked-assocs present prettyprint sequences tools.test urls ;
 IN: urls.tests
 
+{ "localhost" f } [ "localhost" parse-host ] unit-test
+{ "localhost" 8888 } [ "localhost:8888" parse-host ] unit-test
+
 CONSTANT: urls {
     {
         T{ url
@@ -115,6 +118,33 @@ CONSTANT: urls {
          }
         "t1000://www.google.com/"
     }
+    {
+        T{ url
+            { protocol "no-auth" }
+            { path "/some/random/path" }
+        }
+        "no-auth:/some/random/path"
+    }
+    {
+        T{ url
+            { protocol "http" }
+            { host "example.org" }
+            { path "/" }
+            { username "user" }
+            { password "" }
+        }
+        "http://user:@example.org/"
+    }
+    {
+        T{ url
+            { protocol "http" }
+            { host "example.org" }
+            { path "/" }
+            { username "" }
+            { password "pass" }
+        }
+        "http://:pass@example.org/"
+    }
 }
 
 urls [
@@ -124,6 +154,20 @@ urls [
 urls [
     swap [ 1array ] [ [ present ] curry ] bi* unit-test
 ] assoc-each
+
+{ T{ url
+    { protocol "https" }
+    { host "www.google.com" }
+    { path "/" }
+   } }
+[ "https://www.google.com:/" >url ] unit-test
+
+{ "https://www.google.com/" } 
+[ T{ url
+    { protocol "https" }
+    { host "www.google.com" }
+    { path "/" }
+} present ] unit-test
 
 { "b" } [ "a" "b" url-append-path ] unit-test
 

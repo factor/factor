@@ -1,4 +1,5 @@
-USING: arrays assocs fry grouping hash-sets io.encodings.utf8
+USING: arrays assocs compression.zlib fry grouping hash-sets
+io.encodings.binary io.encodings.string io.encodings.utf8
 io.files kernel math math.order math.parser sequences sets
 splitting strings tools.test unicode ;
 IN: unicode.collation.tests
@@ -17,7 +18,8 @@ IN: unicode.collation.tests
 [ { "HELLO" "goodbye" "good bye" "hello" } sort-strings ] unit-test
 
 : collation-test-lines ( -- lines )
-    "vocab:unicode/UCA/CollationTest/CollationTest_SHIFTED.txt" utf8 file-lines
+    "vocab:unicode/UCA/CollationTest_SHIFTED.txt.zip"
+    binary file-contents uncompress utf8 decode string-lines
     [ "#" head? ] reject harvest ;
 
 : parse-collation-test-shifted ( -- lines )
@@ -46,13 +48,17 @@ IN: unicode.collation.tests
 : xfailed-collation-tests ( -- seq )
     HS{
         { 3958 3953 820 }
+
         { 4018 820 3953 3968 }
         { 4018 820 3968 3953 }
+        { 4018 3953 1 3968 97 }
         { 4018 820 3969 }
+
         { 3960 3953 820 }
         { 4019 820 3953 3968 }
         { 4019 820 3968 3953 }
         { 4019 3953 820 3968 }
+        { 4019 3953 1 3968 97 }
     } ;
 
 : parse-collation-test-weights ( -- weights )
@@ -76,9 +82,12 @@ IN: unicode.collation.tests
 
     ! Remove these two expected-fail Tibetan collation comparison tests
     ! They are bad tests once you fix up the ducet table with { 0x0FB2 0x0F71 } and { 0x0FB3 0x0F71 }
-    { 4018 820 3969 } { 3959 33 } [ >string ] bi@ 2array
-    { 4019 3953 820 3968 } { 3961 33 } [ >string ] bi@ 2array
-    2array >hash-set diff members
+    {
+        { { 4018 820 3969 } { 3959 33 } }
+        { { 4019 3953 820 3968 } { 3961 33 } }
+        { { 4019 98 } { 4019 3953 1 3968 97 } }
+        { { 4028 98 } { 4018 3953 1 3968 97 } }
+    } [ [ >string ] bi@ ] assoc-map >hash-set diff members
 
     [ string<=> { +lt+ +eq+ } member? ] assoc-reject
 ] unit-test
