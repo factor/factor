@@ -61,10 +61,10 @@ splitting tools.test ;
     } cond*
 ] unit-test
 
-{ f } [ f { } ?call ] unit-test
-{ 3 } [ H{ { 1 H{ { 2 3 } } } } { [ 1 of ] [ 2 of ] } ?call ] unit-test
-{ f } [ H{ { 1 H{ { 3 4 } } } } { [ 1 of ] [ 2 of ] } ?call ] unit-test
-{ f } [ H{ { 2 H{ { 3 4 } } } } { [ 1 of ] [ 2 of ] } ?call ] unit-test
+{ f } [ f { } chain ] unit-test
+{ 3 } [ H{ { 1 H{ { 2 3 } } } } { [ 1 of ] [ 2 of ] } chain ] unit-test
+{ f } [ H{ { 1 H{ { 3 4 } } } } { [ 1 of ] [ 2 of ] } chain ] unit-test
+{ f } [ H{ { 2 H{ { 3 4 } } } } { [ 1 of ] [ 2 of ] } chain ] unit-test
 { 5 } [
-    "hello factor!" { [ " " split ] [ first ] [ length ] } ?call
+    "hello factor!" { [ " " split ] [ first ] [ length ] } chain
 ] unit-test
