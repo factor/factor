@@ -47,7 +47,7 @@ HELP: deactivate-model
 { $warning "Calls to " { $link activate-model } " and " { $link deactivate-model } " should be balanced to keep the reference counting consistent, otherwise " { $link model-changed } " might be called at the wrong time or not at all." } ;
 
 HELP: compute-model
-{ $values { "model" model } { "value" object} }
+{ $values { "model" model } { "value" object } }
 { $description "Activate and immediately deactivate the model, forcing recomputation of its value, which is returned. If the model is already activated, no dependencies are recalculated.  Useful when using models outside of gadget context or for testing." } ;
 
 HELP: model-changed
