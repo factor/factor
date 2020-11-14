@@ -46,6 +46,10 @@ HELP: deactivate-model
 { $description "Decrements the reference count of the model. If it reaches zero, this model is removed as a connection from all models registered as dependencies by " { $link add-dependency } "." }
 { $warning "Calls to " { $link activate-model } " and " { $link deactivate-model } " should be balanced to keep the reference counting consistent, otherwise " { $link model-changed } " might be called at the wrong time or not at all." } ;
 
+HELP: compute-model
+{ $values { "model" model } { "value" object} }
+{ $description "Activate and immediately deactivate the model, forcing recomputation of its value, which is returned. If the model is already activated, no dependencies are recalculated.  Useful when using models outside of gadget context or for testing." } ;
+
 HELP: model-changed
 { $values { "model" model } { "observer" object } }
 { $contract "Called to notify observers of a model that the model value has changed as a result of a call to " { $link set-model } ". Observers can be registered with " { $link add-connection } "." } ;
