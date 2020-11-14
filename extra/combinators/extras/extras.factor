@@ -104,5 +104,5 @@ DEFER: cond*
     [ dup callable? [ nip call ] [ second call ] if ]
     [ no-cond ] if* ;
 
-MACRO: ?call ( quot -- quot )
+MACRO: chain ( quots -- quot )
     <reversed> [ ] [ swap '[ [ @ @ ] [ f ] if* ] ] reduce ;
