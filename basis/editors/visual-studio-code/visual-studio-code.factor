@@ -1,55 +1,41 @@
 ! Copyright (C) 2015 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit editors
+USING: combinators combinators.short-circuit editors
 generalizations io.files io.pathnames io.standard-paths kernel
-make math.parser memoize namespaces sequences system tools.which ;
+make math.parser namespaces sequences system tools.which ;
 IN: editors.visual-studio-code
 
 ! Command line arguments
 ! https://code.visualstudio.com/docs/editor/command-line
 
-SINGLETONS: visual-studio-code visual-studio-code-insiders ;
-visual-studio-code editor-class set-global
+TUPLE:  visual-studio-code ;
+T{ visual-studio-code } editor-class set-global
 
-HOOK: find-visual-studio-code-invocation os ( -- array )
+HOOK: find-visual-studio-code-path editor-class ( -- path )
 
-: visual-studio-code-invocation ( -- array )
+M: visual-studio-code find-visual-studio-code-path
+    os {
+        { linux [
+            {
+                [ "code" which ]
+                [ "Code" which ]
+                [ home "VSCode-linux-x64/Code" append-path ]
+                [ "/usr/share/code/code" ]
+            } [ dup exists? [ drop f ] unless ] map-compose 0|| ] }
+        { macosx [
+            "com.microsoft.VSCode" find-native-bundle
+            [ "Contents/MacOS/Electron" append-path ] [ f ] if* ] }
+        { windows [ "code.cmd" ] }
+    } case ;
+
+: visual-studio-code-invocation ( -- path )
     {
         [ \ visual-studio-code-invocation get ]
-        [ find-visual-studio-code-invocation ]
+        [ find-visual-studio-code-path ]
         [ "code" ]
     } 0|| ;
 
-M: macosx find-visual-studio-code-invocation
-    editor-class get visual-studio-code-insiders =
-    { "com.microsoft.VSCodeInsiders" }
-    { "com.microsoft.VSCode" }
-    ? [ find-native-bundle ] map-find drop [
-        "Contents/MacOS/Electron" append-path
-    ] [
-        f
-    ] if* ;
-
 ERROR: can't-find-visual-studio-code ;
-
-M: linux find-visual-studio-code-invocation
-    editor-class get visual-studio-code-insiders = [
-        "code-insiders" which
-    ] [
-        {
-            [ "code" which ]
-            [ "Code" which ]
-            [ home "VSCode-linux-x64/Code" append-path ]
-            [ "/usr/share/code/code" ]
-        } [ dup exists? [ drop f ] unless ] map-compose 0||
-    ] if ;
-
-M: windows find-visual-studio-code-invocation
-    editor-class get visual-studio-code-insiders = [
-        { "Microsoft VS Code Insiders" } "code-insiders.cmd" find-in-applications
-    ] [
-        "code.cmd"
-    ] if ;
 
 : visual-studio-code-editor-command ( file line -- seq )
     [
@@ -60,7 +46,4 @@ M: windows find-visual-studio-code-invocation
     ] { } make ;
 
 M: visual-studio-code editor-command
-    visual-studio-code-editor-command ;
-
-M: visual-studio-code-insiders editor-command
     visual-studio-code-editor-command ;
