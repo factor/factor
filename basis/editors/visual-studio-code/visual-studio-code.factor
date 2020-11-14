@@ -46,7 +46,7 @@ M: linux find-visual-studio-code-invocation
 
 M: windows find-visual-studio-code-invocation
     editor-class get visual-studio-code-insiders = [
-        [ { "Microsoft VS Code Insiders" } "code-insiders.cmd" find-in-applications ]
+        { "Microsoft VS Code Insiders" } "code-insiders.cmd" find-in-applications
     ] [
         "code.cmd"
     ] if ;
