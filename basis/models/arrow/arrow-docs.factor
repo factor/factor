@@ -23,7 +23,7 @@ HELP: <arrow>
 { $examples "See the example in the documentation for " { $link arrow } "." } ;
 
 HELP: <?arrow>
-{ $values { "model" model } { "quot" { $quotation ( obj -- newobj ) } } { "arrow" "a new " { $link ?arrow } } }
+{ $values { "model" model } { "quot" { $quotation ( obj -- newobj ) } } { "?arrow" "a new " { $link ?arrow } } }
 { $description "Creates a new instance of " { $link ?arrow } ". The value of the new arrow model is computed by applying the quotation to the value, but only set if the value actually changed. This prevents connected observers from being updated if the value did not change since the last update." }
 { $examples "See the example in the documentation for " { $link arrow } "." } ;
 
