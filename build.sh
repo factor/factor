@@ -303,6 +303,7 @@ find_architecture() {
        *86) ARCH=x86;;
        *86_64) ARCH=x86;;
        aarch64) ARCH=arm64;;
+       arm64) ARCH=arm64;;
        iPhone5*[3-9]) ARCH=arm64;;
        iPhone[6-9]*) ARCH=arm64;;
        iPhone[1-9][0-9]*) ARCH=arm64;;
