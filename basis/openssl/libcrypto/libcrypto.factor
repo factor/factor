@@ -1,13 +1,13 @@
 ! Copyright (C) 2007 Elie CHAFTARI, 2009 Maxim Savchenko
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.libraries.finder alien.syntax classes.struct combinators system ;
+alien.syntax classes.struct combinators system ;
 
 IN: openssl.libcrypto
 
 << "libcrypto" {
     { [ os windows? ] [ "libcrypto-37.dll" ] }
-    { [ os macosx? ] [ "/usr/lib/libcrypto.44.dylib" ] }
+    { [ os macosx? ] [ "libcrypto.44.dylib" ] }
     { [ os unix? ] [ "libcrypto.so" ] }
 } cond cdecl add-library >>
 
