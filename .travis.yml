@@ -67,4 +67,4 @@ script:
   #- "./factor -run=zealot.cli-changed-vocabs"
   #- "./factor -run=tools.test --only `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`"
   #- "./factor -run=zealot.help-lint `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`"
-  - "./factor -e='USING: sequences tools.test.private vocabs.loader ; \"resource:core\" disk-vocabs-in-root test-vocabs'"
+  - "./factor -e='USING: sequences tools.test.private vocabs.hierarchy ; \"resource:core\" disk-vocabs-in-root test-vocabs'"
