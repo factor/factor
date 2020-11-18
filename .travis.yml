@@ -62,8 +62,9 @@ script:
   - export CI_BRANCH="${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}"
   - echo "CI_BRANCH=${CI_BRANCH}"
   - DEBUG=1 ./build.sh net-bootstrap < /dev/null
-  - "./factor -e='USING: memory vocabs.hierarchy tools.test namespaces ; \"zealot\" load f long-unit-tests-enabled? set-global save'"
+  - "./factor -e='USING: memory tools.test namespaces ; f long-unit-tests-enabled? set-global save'"
+  #- "./factor -e='USING: memory vocabs.hierarchy ; \"zealot\" load save"
   #- "./factor -run=zealot.cli-changed-vocabs"
   #- "./factor -run=tools.test --only `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`"
   #- "./factor -run=zealot.help-lint `./factor -run=zealot.cli-changed-vocabs | paste -s -d " " -`"
-  - "./factor -e='USING: modern.paths sequences tools.test.private ; core-vocabs [ test-vocab ] each'"
+  - "./factor -e='USING: sequences tools.test.private vocabs.loader ; \"resource:core\" disk-vocabs-in-root test-vocabs'"
