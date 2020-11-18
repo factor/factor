@@ -285,15 +285,6 @@ $(OUTPUT_DIR)/resources.o:
 vm/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c -x c++-header $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
-#%.o: %.cpp vm/master.hpp.gch
-#	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $(OUTPUT_DIR)/$@ $<
-
-#%.o: %.S
-#	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(CXXFLAGS) -o $(OUTPUT_DIR)/$@ $<
-
-#%.o: %.mm vm/master.hpp.gch
-#	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $(OUTPUT_DIR)/$@ $<
-
 $(DLL_OBJS): $(OUTPUT_DIR)/%.o: vm/%.cpp vm/master.hpp.gch $(OUTPUT_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
