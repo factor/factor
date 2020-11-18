@@ -1,5 +1,7 @@
 # Factor
 
+[![](https://api.travis-ci.org/factor/factor.svg)](https://travis-ci.org/factor/factor)
+
 Factor is a [concatenative](https://www.concatenative.org), stack-based
 programming language with [high-level
 features](https://concatenative.org/wiki/view/Factor/Features/The%20language)
