@@ -1,0 +1,4 @@
+include vm/Config.macosx
+include vm/Config.arm64.64
+
+PLAF_MASTER_HEADERS += vm/os-macosx-arm64.64.hpp

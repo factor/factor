@@ -194,6 +194,7 @@ help:
 	@echo "macosx-x86-32"
 	@echo "macosx-x86-64"
 	@echo "macosx-x86-fat"
+	@echo "macosx-arm64-64"
 	@echo "windows-x86-32"
 	@echo "windows-x86-64"
 	@echo ""
@@ -223,6 +224,9 @@ macosx-x86-64:
 
 macosx-x86-fat:
 	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.fat
+
+macosx-arm64-64:
+	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.arm64.64
 
 linux-x86-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.32

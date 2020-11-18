@@ -22,6 +22,8 @@
       #include "os-macosx-x86.32.hpp"
     #elif defined(FACTOR_AMD64)
       #include "os-macosx-x86.64.hpp"
+    #elif defined(FACTOR_ARM64)
+      #include "os-macosx-arm64.64.hpp"
     #else
       #error "Unsupported Mac OS X flavor"
     #endif
