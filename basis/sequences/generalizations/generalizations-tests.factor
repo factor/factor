@@ -10,6 +10,13 @@ IN: sequences.generalizations.tests
 { } [ { } 0 firstn ] unit-test
 { "a" } [ { "a" } 1 firstn ] unit-test
 
+{ } [ { } 0 ?firstn ] unit-test
+{ f } [ { } 1 ?firstn ] unit-test
+{ f f } [ { } 2 ?firstn ] unit-test
+{ 1 f } [ { 1 } 2 ?firstn ] unit-test
+{ 1 2 } [ { 1 2 } 2 ?firstn ] unit-test
+{ 1 2 } [ { 1 2 3 } 2 ?firstn ] unit-test
+
 { [ 1 2 ] } [ 1 2 2 [ ] nsequence ] unit-test
 { { 1 2 3 4 5 } } [ 1 2 3 4 5 { 0 0 0 0 0 } 5 (nsequence) ] unit-test
 
