@@ -36,6 +36,9 @@ MACRO: set-firstn ( n -- quot )
         bi-curry '[ _ _ bi ]
     ] if-zero ;
 
+MACRO: ?firstn ( n -- quot )
+    dup '[ _ f pad-tail _ firstn-unsafe ] ;
+
 : nappend ( n -- seq ) narray concat ; inline
 
 : nappend-as ( n exemplar -- seq )
