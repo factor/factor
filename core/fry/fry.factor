@@ -31,7 +31,7 @@ MIXIN: fried
 PREDICATE: fried-sequence < sequence count-inputs 0 > ;
 INSTANCE: fried-sequence fried
 
-: (ncurry) ( quot n -- quot )
+: (ncurry) ( accum n -- accum )
     {
         { 0 [ ] }
         { 1 [ \ curry  suffix! ] }
@@ -58,19 +58,13 @@ INSTANCE: fried-sequence fried
 : (make-curry) ( tail quot -- quot' )
     swap [ncurry] curry [ compose ] compose ;
 
-: make-compose ( consecutive quot -- consecutive quot' )
-    [
-        [ [ ] ]
-        [ [ncurry] ] if-zero
-    ] [
-        [ [ compose ] ]
-        [ [ compose compose ] curry ] if-empty
-    ] bi* compose
-    0 swap ;
+: make-compose ( consecutive quot -- consecutive' quot' )
+    [ [ [ ] ] [ [ncurry] ] if-zero ]
+    [ [ [ compose ] ] [ [ compose compose ] curry ] if-empty ]
+    bi* compose 0 swap ;
 
 : make-curry ( consecutive quot -- consecutive' quot' )
-    [ 1 + ] dip
-    [ [ ] ] [ (make-curry) 0 swap ] if-empty ;
+    [ 1 + ] dip [ [ ] ] [ (make-curry) 0 swap ] if-empty ;
 
 : convert-curry ( consecutive quot -- consecutive' quot' )
     [ [ ] make-curry ] [
@@ -81,8 +75,7 @@ INSTANCE: fried-sequence fried
 
 : prune-curries ( seq -- seq' )
     dup [ empty? not ] find
-    [ [ 1 + tail ] dip but-last prefix ]
-    [ 2drop { } ] if* ;
+    [ [ 1 + tail ] dip but-last prefix ] [ 2drop { } ] if* ;
 
 : convert-curries ( seq -- tail seq' )
     unclip-slice [ 0 swap [ convert-curry ] map ] dip
@@ -104,66 +97,51 @@ INSTANCE: fried-sequence fried
     [ shallow-spread>quot swap [ [ ] (make-curry) compose ] unless-zero ] if-empty ;
 
 TUPLE: dredge-fry-state
-    { in-quot sequence read-only }
+    { input sequence read-only }
     { prequot vector read-only }
     { quot vector read-only } ;
 
 : <dredge-fry> ( quot -- dredge-fry )
     V{ } clone V{ } clone dredge-fry-state boa ; inline
 
-: in-quot-slices ( n i state -- head tail )
-    in-quot>> [ <slice> ] [ nipd swap 1 + tail-slice ] 3bi ; inline
+: input-slices ( n i state -- head tail )
+    input>> [ <slice> ] [ nipd swap 1 + tail-slice ] 3bi ; inline
 
 : push-head-slice ( head state -- )
     quot>> [ push-all ] [ \ _ swap push ] bi ; inline
 
 : push-subquot ( tail elt state -- )
-    [ fry swap >quotation count-inputs [ndip] ] dip prequot>> push-all ; inline
+    [ fry swap count-inputs [ndip] ] dip prequot>> push-all ; inline
 
 DEFER: dredge-fry
 
 : dredge-fry-subquot ( n state i elt -- )
     rot {
-        [ nip in-quot-slices ] ! head tail i elt state
+        [ nip input-slices ] ! head tail i elt state
         [ [ 2drop swap ] dip push-head-slice ]
         [ nipd push-subquot ]
-        [ [ 1 + ] [ drop ] [ ] tri* dredge-fry ]
+        [ [ drop 1 + ] dip dredge-fry ]
     } 3cleave ; inline recursive
 
 : dredge-fry-simple ( n state -- )
-    [ in-quot>> swap tail-slice ] [ quot>> ] bi push-all ; inline recursive
+    [ input>> swap tail-slice ] [ quot>> ] bi push-all ; inline recursive
 
 : dredge-fry ( n dredge-fry -- )
-    2dup in-quot>> [ fried? ] find-from
+    2dup input>> [ fried? ] find-from
     [ dredge-fry-subquot ]
     [ drop dredge-fry-simple ] if* ; inline recursive
 
-! We can't use n*quot, narray and firstn from generalizations because
-! they're macros, and macros use memoize!
-: (n*quot) ( n quot -- quotquot )
-    <repetition> [ ] concat-as ;
-
-: [nsequence] ( length exemplar -- quot )
-    [ [ [ 1 - ] keep ] dip '[ _ _ _ new-sequence ] ]
-    [ drop [ [ set-nth-unsafe ] 2keep [ 1 - ] dip ] (n*quot) ] 2bi
-    [ nip ] 3append ;
+: (fry) ( sequence -- quot )
+    <dredge-fry>
+    [ 0 swap dredge-fry ]
+    [ prequot>> >quotation ]
+    [ quot>> >quotation shallow-fry ] tri append ;
 
 PRIVATE>
 
 M: callable fry
-    [ [ [ ] ] ] [
-        <dredge-fry>
-        [ 0 swap dredge-fry ]
-        [ prequot>> >quotation ]
-        [ quot>> >quotation shallow-fry ] tri append
-    ] if-empty ;
+    [ [ [ ] ] ] [ (fry) ] if-empty ;
 
 M: sequence fry
     [ 0 swap new-sequence ] keep
-    [ 1quotation ] [
-        <dredge-fry>
-        [ 0 swap dredge-fry ]
-        [ prequot>> >quotation ]
-        [ quot>> >quotation shallow-fry ]
-        tri rot [ like ] curry 3append
-    ] if-empty ;
+    [ 1quotation ] [ (fry) swap [ like ] curry append ] if-empty ;
