@@ -1,17 +1,13 @@
 ! Copyright (C) 2007 Elie CHAFTARI, 2009 Maxim Savchenko
 ! See http://factorcode.org/license.txt for BSD license.
-!
-! Tested with OpenSSL 0.9.8a_0 on Mac OS X 10.4.9 PowerPC
-!
-! export LD_LIBRARY_PATH=/opt/local/lib
 USING: alien alien.c-types alien.destructors alien.libraries
-alien.libraries.finder alien.syntax classes.struct combinators system ;
+alien.syntax classes.struct combinators system ;
 
 IN: openssl.libcrypto
 
 << "libcrypto" {
     { [ os windows? ] [ "libcrypto-37.dll" ] }
-    { [ os macosx? ] [ { "libcrypto.46.dylib" "libcrypto.44.dylib" "libcrypto.dylib" } find-library-from-list ] }
+    { [ os macosx? ] [ "libcrypto.44.dylib" ] }
     { [ os unix? ] [ "libcrypto.so" ] }
 } cond cdecl add-library >>
 

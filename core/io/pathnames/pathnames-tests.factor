@@ -10,45 +10,95 @@ namespaces sequences system tools.test ;
 { "freetype6.dll" } [ "resource:freetype6.dll" file-name ] unit-test
 { "freetype6.dll" } [ "resource:/freetype6.dll" file-name ] unit-test
 
-{ "/usr/lib" } [ "/usr" "lib" append-path ] unit-test
-{ "/usr/lib" } [ "/usr/" "lib" append-path ] unit-test
-{ "/usr/lib" } [ "/usr" "./lib" append-path ] unit-test
-{ "/usr/lib/" } [ "/usr" "./lib/" append-path ] unit-test
-{ "/lib" } [ "/usr" "../lib" append-path ] unit-test
-{ "/lib/" } [ "/usr" "../lib/" append-path ] unit-test
+os windows?
+    [
+        { "C:\\usr\\lib" } [ "C:\\usr" "lib" append-path ] unit-test
+        { "C:\\usr\\lib" } [ "C:\\usr\\" "lib" append-path ] unit-test
+        { "C:\\usr\\lib" } [ "C:\\usr" ".\\lib" append-path ] unit-test
+        { "C:\\usr\\lib\\" } [ "C:\\usr" ".\\lib\\" append-path ] unit-test
+        { "C:\\lib" } [ "C:\\usr" "..\\lib" append-path ] unit-test
+        { "C:\\lib\\" } [ "C:\\usr" "..\\lib\\" append-path ] unit-test
+    ]
+    [
+        { "/usr/lib" } [ "/usr" "lib" append-path ] unit-test
+        { "/usr/lib" } [ "/usr/" "lib" append-path ] unit-test
+        { "/usr/lib" } [ "/usr" "./lib" append-path ] unit-test
+        { "/usr/lib/" } [ "/usr" "./lib/" append-path ] unit-test
+        { "/lib" } [ "/usr" "../lib" append-path ] unit-test
+        { "/lib/" } [ "/usr" "../lib/" append-path ] unit-test
+    ]
+    if
 
 { "" } [ "" "." append-path ] unit-test
 [ "" ".." append-path ] must-fail
 
-{ "/" } [ "/" "./." append-path ] unit-test
-{ "/" } [ "/" "././" append-path ] unit-test
-{ "/a/b/lib" } [ "/a/b/c/d/e/f/" "../../../../lib" append-path ] unit-test
-{ "/a/b/lib/" } [ "/a/b/c/d/e/f/" "../../../../lib/" append-path ] unit-test
+os windows?
+    [
+        { "C:\\" } [ "C:\\" ".\\." append-path ] unit-test
+        { "C:\\" } [ "C:\\" ".\\.\\" append-path ] unit-test
+        { "C:\\a\\b\\lib" } [ "C:\\a\\b\\c\\d\\e\\f\\" "..\\..\\..\\..\\lib" append-path ] unit-test
+        { "C:\\a\\b\\lib\\" } [ "C:\\a\\b\\c\\d\\e\\f\\" "..\\..\\..\\..\\lib\\" append-path ] unit-test
+    ]
+    [
+        { "/" } [ "/" "./." append-path ] unit-test
+        { "/" } [ "/" "././" append-path ] unit-test
+        { "/a/b/lib" } [ "/a/b/c/d/e/f/" "../../../../lib" append-path ] unit-test
+        { "/a/b/lib/" } [ "/a/b/c/d/e/f/" "../../../../lib/" append-path ] unit-test
+    ]
+    if
 
 [ "" "../lib/" append-path ] must-fail
 { "lib" } [ "" "lib" append-path ] unit-test
 { "lib" } [ "" "./lib" append-path ] unit-test
 
-[ "foo/bar/." parent-directory ] must-fail
-[ "foo/bar/./" parent-directory ] must-fail
-[ "foo/bar/baz/.." parent-directory ] must-fail
-[ "foo/bar/baz/../" parent-directory ] must-fail
+os windows?
+    [
+        [ "    \\bar\\." parent-directory ] must-fail
+        [ "    \\bar\\.\\" parent-directory ] must-fail
+        [ "    \\bar\\baz\\.." parent-directory ] must-fail
+        [ "    \\bar\\baz\\..\\" parent-directory ] must-fail
+        [ "." parent-directory ] must-fail
+        [ ".\\" parent-directory ] must-fail
+        [ ".." parent-directory ] must-fail
+        [ "..\\" parent-directory ] must-fail
+        [ "..\\..\\" parent-directory ] must-fail
+        [ "    \\.." parent-directory ] must-fail
+        [ "    \\..\\" parent-directory ] must-fail
+        [ "" parent-directory ] must-fail
+    ]
+    [
+        [ "    /bar/." parent-directory ] must-fail
+        [ "    /bar/./" parent-directory ] must-fail
+        [ "    /bar/baz/.." parent-directory ] must-fail
+        [ "    /bar/baz/../" parent-directory ] must-fail
+        [ "." parent-directory ] must-fail
+        [ "./" parent-directory ] must-fail
+        [ ".." parent-directory ] must-fail
+        [ "../" parent-directory ] must-fail
+        [ "../../" parent-directory ] must-fail
+        [ "    /.." parent-directory ] must-fail
+        [ "    /../" parent-directory ] must-fail
+        [ "" parent-directory ] must-fail
+    ]
+    if
 
-[ "." parent-directory ] must-fail
-[ "./" parent-directory ] must-fail
-[ ".." parent-directory ] must-fail
-[ "../" parent-directory ] must-fail
-[ "../../" parent-directory ] must-fail
-[ "foo/.." parent-directory ] must-fail
-[ "foo/../" parent-directory ] must-fail
-[ "" parent-directory ] must-fail
 { "." } [ "boot.x86.64.image" parent-directory ] unit-test
 
-{ "bar/foo" } [ "bar/baz" "..///foo" append-path ] unit-test
-{ "bar/baz/foo" } [ "bar/baz" ".///foo" append-path ] unit-test
-{ "bar/foo" } [ "bar/baz" "./..//foo" append-path ] unit-test
-{ "bar/foo" } [ "bar/baz" "./../././././././///foo" append-path ] unit-test
-
+os windows?
+    [
+        { "bar\\    " } [ "bar\\baz" "..\\\\\\    " append-path ] unit-test
+        { "bar\\baz\\    " } [ "bar\\baz" ".\\\\\\    " append-path ] unit-test
+        { "bar\\    " } [ "bar\\baz" ".\\..\\\\    " append-path ] unit-test
+        { "bar\\    " } [ "bar\\baz" ".\\..\\.\\.\\.\\.\\.\\.\\\\\\\\    " append-path ] unit-test
+    ]
+    [
+        { "bar/    " } [ "bar/baz" "..///    " append-path ] unit-test
+        { "bar/baz/    " } [ "bar/baz" ".///    " append-path ] unit-test
+        { "bar/    " } [ "bar/baz" "./..//    " append-path ] unit-test
+        { "bar/    " } [ "bar/baz" "./../././././././///    " append-path ] unit-test
+    ]
+    if
+    
 { t } [ "resource:core" absolute-path? ] unit-test
 { f } [ "" absolute-path? ] unit-test
 
@@ -57,14 +107,28 @@ namespaces sequences system tools.test ;
 ] with-test-file
 
 ! aum's bug
-H{
-    { current-directory "." }
-    { "resource-path" ".." }
-} [
-    [ "../core/bootstrap/stage2.factor" ]
-    [ "resource:core/bootstrap/stage2.factor" absolute-path ]
-    unit-test
-] with-variables
+os windows?
+    [
+        H{
+            { current-directory "." }
+            { "resource-path" ".." }
+        } [
+            [ "..\\core\\bootstrap\\stage2.factor" ]
+            [ "resource:core\\bootstrap\\stage2.factor" absolute-path ]
+            unit-test
+        ] with-variables
+    ]
+    [
+        H{
+            { current-directory "." }
+            { "resource-path" ".." }
+        } [
+            [ "../core/bootstrap/stage2.factor" ]
+            [ "resource:core/bootstrap/stage2.factor" absolute-path ]
+            unit-test
+        ] with-variables
+    ]
+if
 
 { t } [ cwd "misc" resource-path [ ] with-directory cwd = ] unit-test
 

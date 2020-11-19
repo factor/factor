@@ -3,9 +3,9 @@
 ! These should be complete bindings to the Raylib library. (v2.5)
 ! Most of the comments are included from the original header
 ! for your convenience.
-USING: alien alien.c-types alien.enums alien.libraries
-alien.libraries.finder alien.syntax classes.struct combinators
-kernel quotations system vocabs ;
+USING: accessors alien alien.c-types alien.enums alien.libraries
+alien.syntax classes.struct combinators kernel quotations system
+vocabs ;
 IN: raylib.ffi
 <<
 "raylib" {
@@ -1023,7 +1023,7 @@ FUNCTION-ALIAS:  set-audio-stream-volume void SetAudioStreamVolume ( AudioStream
 FUNCTION-ALIAS:  set-audio-stream-pitch void SetAudioStreamPitch ( AudioStream stream, float pitch )                               ! Set pitch for audio stream  ( 1.0 is base level ) 
 
 ! Load modules depending on what the installed dll/so supports
-"raylib" find-library dlopen dup
+"raylib" lookup-library dll>> dup
 ! Check for ricons symbols
 "DrawIcon" swap dlsym  [ "raylib.modules.ricons" require ] when
 ! Check for gui symbols

@@ -89,7 +89,7 @@ PRIVATE>
 
 : append-relative-path ( path1 path2 -- path )
     [ trim-tail-separators ]
-    [ trim-head-separators ] bi* "/" glue ;
+    [ trim-head-separators ] bi* path-separator glue ;
 
 : append-path ( path1 path2 -- path )
     {

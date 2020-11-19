@@ -103,3 +103,6 @@ DEFER: cond*
     [ dup callable? [ drop t ] [ first call ] if ] map-find
     [ dup callable? [ nip call ] [ second call ] if ]
     [ no-cond ] if* ;
+
+MACRO: chain ( quots -- quot )
+    <reversed> [ ] [ swap '[ [ @ @ ] [ f ] if* ] ] reduce ;
