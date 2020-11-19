@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs bootstrap.image.private hash-sets hashtables init
 io io.files kernel kernel.private make memory namespaces parser
-parser.notes sequences system vocabs vocabs.hierarchy
-vocabs.loader ;
+parser.notes sequences system vocabs vocabs.loader ;
 IN: bootstrap.stage1
 
 "Bootstrap stage 1..." print flush
@@ -38,11 +37,6 @@ load-help? off
     "locals" require
     "locals.fry" require
     "locals.macros" require
-
-!     "resource:core" disk-vocabs-in-root
-!     [ vocab-prefix? ] reject
-!     [ vocab-name "test" swap subseq? ] reject
-!     require-all
 
     "vocab:bootstrap/layouts.factor" parse-file %
 
