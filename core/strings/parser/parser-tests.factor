@@ -18,6 +18,8 @@ USING: accessors kernel eval strings.parser tools.test ;
 [ "\"abc" eval( -- string ) ] [ error>> "Unterminated string" = ] must-fail-with
 [ "\"abc\n\n" eval( -- string ) ] [ error>> "Unterminated string" = ] must-fail-with
 
+[ "\"hello\"length" eval( -- string ) ] [ error>> "Invalid string" = ] must-fail-with
+
 { "\"\\" } [ "\"\\" ] unit-test
 
 { "\e" } [ "\u00001b" ] unit-test
