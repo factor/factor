@@ -478,7 +478,7 @@ ERROR: bad-effect quot effect ;
     ! so we don't pollute the manifest qualified-vocabs
     ! and also so restarts don't add multiple times
     qualified-vocabs length
-    "locals" { "[let" ":>" } add-words-from
+    "syntax" { "[let" ":>" } add-words-from
     "kernel" { "dup" "nip" "over" } add-words-from
     "sequences" { "nth" } add-words-from
     [ string-lines parse-lines ] dip
