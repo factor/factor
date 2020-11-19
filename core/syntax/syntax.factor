@@ -1,16 +1,17 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays byte-arrays byte-vectors
-classes classes.algebra.private classes.builtin classes.error
+USING: accessors arrays byte-arrays byte-vectors classes
+classes.algebra.private classes.builtin classes.error
 classes.intersection classes.maybe classes.mixin classes.parser
-classes.predicate classes.singleton classes.tuple classes.tuple.parser
-classes.union combinators compiler.units definitions effects
-effects.parser generic generic.hook generic.math generic.parser
-generic.standard hash-sets hashtables io.pathnames kernel lexer
-math namespaces parser quotations sbufs sequences slots
-source-files splitting strings strings.parser
-strings.parser.private vectors vocabs vocabs.parser words
-words.alias words.constant words.symbol ;
+classes.predicate classes.singleton classes.tuple
+classes.tuple.parser classes.union combinators compiler.units
+definitions effects effects.parser fry generic generic.hook
+generic.math generic.parser generic.standard hash-sets
+hashtables hashtables.identity io.pathnames kernel lexer
+locals.errors locals.parser macros math memoize namespaces
+parser quotations sbufs sequences slots source-files splitting
+strings strings.parser strings.parser.private vectors vocabs
+vocabs.parser words words.alias words.constant words.symbol ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -104,6 +105,7 @@ IN: bootstrap.syntax
     "B{" [ \ } [ >byte-array ] parse-literal ] define-core-syntax
     "BV{" [ \ } [ >byte-vector ] parse-literal ] define-core-syntax
     "H{" [ \ } [ parse-hashtable ] parse-literal ] define-core-syntax
+    "IH{" [ \ } [ >identity-hashtable ] parse-literal ] define-core-syntax
     "T{" [ parse-tuple-literal suffix! ] define-core-syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-core-syntax
     "HS{" [ \ } [ >hash-set ] parse-literal ] define-core-syntax
@@ -295,4 +297,34 @@ IN: bootstrap.syntax
     "<<<<<<" [ version-control-merge-conflict ] define-core-syntax
     "======" [ version-control-merge-conflict ] define-core-syntax
     ">>>>>>" [ version-control-merge-conflict ] define-core-syntax
+
+    "'[" [
+         t in-fry? [ parse-quotation ] with-variable fry append!
+    ] define-core-syntax
+
+    "_" [
+        in-fry? get [ \ syntax:_ suffix! ] [ not-in-a-fry ] if
+    ] define-core-syntax
+
+    "@" [
+        in-fry? get [ \ syntax:@ suffix! ] [ not-in-a-fry ] if
+    ] define-core-syntax
+
+    "MACRO:" [ (:) define-macro ] define-core-syntax
+
+    "MEMO:" [ (:) define-memoized ] define-core-syntax
+    "IDENTITY-MEMO:" [ (:) define-identity-memoized ] define-core-syntax
+
+    ":>" [
+        in-lambda? get [ :>-outside-lambda-error ] unless
+        scan-token parse-def suffix!
+    ] define-core-syntax
+    "[|" [ parse-lambda append! ] define-core-syntax
+    "[let" [ parse-let append! ] define-core-syntax
+
+    "::" [ (::) define-declared ] define-core-syntax
+    "M::" [ (M::) define ] define-core-syntax
+    "MACRO::" [ (::) define-macro ] define-core-syntax
+    "MEMO::" [ (::) define-memoized ] define-core-syntax
+    "IDENTITY-MEMO::" [ (::) define-identity-memoized ] define-core-syntax
 ] with-compilation-unit

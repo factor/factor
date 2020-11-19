@@ -25,6 +25,7 @@ IN: bootstrap.syntax
         "HOOK:"
         "H{"
         "HS{"
+        "IH{"
         "IN:"
         "INSTANCE:"
         "M:"
@@ -94,6 +95,20 @@ IN: bootstrap.syntax
         "<<<<<<<"
         "======="
         ">>>>>>>"
+        "'["
+        "_"
+        "@"
+        "MACRO:"
+        "MEMO:"
+        "IDENTITY-MEMO:"
+        ":>"
+        "[|"
+        "[let"
+        "::"
+        "M::"
+        "MACRO::"
+        "MEMO::"
+        "IDENTITY-MEMO::"
     } [ "syntax" create-word drop ] each
 
     "t" "syntax" lookup-word define-symbol
