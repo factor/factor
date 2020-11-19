@@ -10,8 +10,8 @@ generic.math generic.parser generic.standard hash-sets
 hashtables hashtables.identity io.pathnames kernel lexer
 locals.errors locals.parser macros math memoize namespaces
 parser quotations sbufs sequences slots source-files splitting
-strings strings.parser strings.parser.private vectors vocabs
-vocabs.parser words words.alias words.constant words.symbol ;
+strings strings.parser vectors vocabs.parser words words.alias
+words.constant words.symbol ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -302,12 +302,26 @@ IN: bootstrap.syntax
          t in-fry? [ parse-quotation ] with-variable fry append!
     ] define-core-syntax
 
+    "'{" [
+         t in-fry? [ \ } parse-until >array ] with-variable fry append!
+    ] define-core-syntax
+
+    "'HS{" [
+         t in-fry? [ \ } parse-until >array ] with-variable fry
+         [ >hash-set ] compose append!
+    ] define-core-syntax
+
+    "'H{" [
+         t in-fry? [ \ } parse-until >array ] with-variable fry
+         [ parse-hashtable ] compose append!
+    ] define-core-syntax
+
     "_" [
-        in-fry? get [ \ syntax:_ suffix! ] [ not-in-a-fry ] if
+        in-fry? get [ \ _ suffix! ] [ not-in-a-fry ] if
     ] define-core-syntax
 
     "@" [
-        in-fry? get [ \ syntax:@ suffix! ] [ not-in-a-fry ] if
+        in-fry? get [ \ @ suffix! ] [ not-in-a-fry ] if
     ] define-core-syntax
 
     "MACRO:" [ (:) define-macro ] define-core-syntax
