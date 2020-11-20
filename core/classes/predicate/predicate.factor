@@ -12,12 +12,9 @@ PREDICATE: predicate-class < class
 GENERIC: predicate-quot ( class -- quot )
 
 M: predicate-class predicate-quot
-    [
-        \ dup ,
-        [ superclass-of predicate-def % ]
-        [ "predicate-definition" word-prop , ] bi
-        [ drop f ] , \ if ,
-    ] [ ] make ;
+    [ superclass-of predicate-def ]
+    [ "predicate-definition" word-prop ] bi
+    '[ dup @ _ [ drop f ] if ] ;
 
 PRIVATE>
 
