@@ -512,10 +512,8 @@ M: ebnf-foreign (transform)
 ERROR: parser-not-found name ;
 
 M: ebnf-non-terminal (transform)
-    symbol>> [
-        , \ dup , parser get , \ at ,
-        [ parser-not-found ] , \ unless* , \ nip ,
-    ] [ ] make box ;
+    symbol>> parser get
+    '[ _ dup _ at [ parser-not-found ] unless* nip ] box ;
 
 : transform-ebnf ( string -- object )
     ebnf-parser parse transform ;
