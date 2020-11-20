@@ -1,12 +1,7 @@
 include vm/Config.unix
 
 # $(info $$ARCH is [${ARCH}])
-
-ifeq (${ARCH},arm64)
-	PLAF_DLL_SRCS += vm/cpu-arm.64.cpp
-else
-	SITE_CFLAGS += -mmacosx-version-min=10.9
-endif
+# $(info $$TARGET is [${TARGET}])
 
 PLAF_DLL_SRCS += vm/os-macosx.mm vm/mach_signal.cpp vm/mvm-unix.cpp
 PLAF_MASTER_HEADERS += vm/os-macosx.hpp vm/mach_signal.hpp
@@ -22,7 +17,7 @@ else
 	LIBS = -lm -framework Cocoa -framework AppKit
 endif
 
-LINKER = $(CXX) $(CFLAGS) $(CXXFLAGS) $(SHARED_FLAG) -single_module \
+LINKER = $(CXX) $(TARGET) $(CFLAGS) $(CXXFLAGS) $(SHARED_FLAG) -single_module \
 	-current_version $(VERSION) \
 	-compatibility_version $(VERSION) \
 	-fvisibility=hidden \

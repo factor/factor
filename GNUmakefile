@@ -1,12 +1,27 @@
 ARCH = $(shell uname -m)
-OUTPUT_DIR ?= vm-$(ARCH)
+$(info TARGET is $(TARGET))
+
+
+ifdef $$TARGET
+	OUTPUT_DIR ?= vm-$(TARGET)
+else
+	OUTPUT_DIR ?= vm-$(ARCH)
+endif
 
 ifdef CONFIG
 	VERSION = 0.99
 	GIT_LABEL = $(shell echo `git describe --all`-`git rev-parse HEAD`)
 	GIT_BRANCH = $(shell git describe --all --exact-match 2>/dev/null | sed 's=.*/==')
 	#$(info GIT_BRANCH123 is $(GIT_BRANCH))
-	BUNDLE = Factor.app
+
+	ifeq (${ARCH},arm64)
+		BUNDLE = Factor-arm64.app
+		FACTOR = factor-arm64
+	else
+		BUNDLE = Factor.app
+		FACTOR = factor
+	endif
+
 	DEBUG ?= 0
 	REPRODUCIBLE ?= 0
 
@@ -29,6 +44,7 @@ ifdef CONFIG
 		-DFACTOR_GIT_LABEL="$(GIT_LABEL)" \
 		$(SITE_CFLAGS)
 
+	# c++2a if supported
 	CXXFLAGS += -std=c++11
 
 	ifneq ($(DEBUG), 0)
@@ -41,9 +57,9 @@ ifdef CONFIG
 		CFLAGS += -DFACTOR_REPRODUCIBLE
 	endif
 
-	ENGINE = $(OUTPUT_DIR)/$(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
-	EXECUTABLE = $(OUTPUT_DIR)/factor$(EXE_SUFFIX)$(EXE_EXTENSION)
-	CONSOLE_EXECUTABLE = $(OUTPUT_DIR)/factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION)
+	ENGINE = $(OUTPUT_DIR)/$(DLL_PREFIX)$(FACTOR)$(DLL_SUFFIX)$(DLL_EXTENSION)
+	EXECUTABLE = $(OUTPUT_DIR)/$(FACTOR)$(EXE_SUFFIX)$(EXE_EXTENSION)
+	CONSOLE_EXECUTABLE = $(OUTPUT_DIR)/$(FACTOR)$(EXE_SUFFIX)$(CONSOLE_EXTENSION)
 
 	DLL_SRCS = $(PLAF_DLL_SRCS) \
 		vm/aging_collector.cpp \
@@ -170,6 +186,10 @@ $(info EXECUTABLE_FILES is $(EXECUTABLE_FILES))
 $(info CONFIG is $(CONFIG))
 $(info default goal $(.DEFAULT_GOAL))
 $(info MAKECMDGOALS is $(MAKECMDGOALS))
+$(info BUNDLE is $(BUNDLE))
+$(info FACTOR is $(FACTOR))
+$(info $$ARCH is [[${ARCH}]])
+$(info $$TARGET is [[${TARGET}]])
 # make -pnr
 
 default: $(OUTPUT_DIR) printvars
@@ -258,8 +278,8 @@ ifdef CONFIG
 macosx.app: $(OUTPUT_DIR)/factor
 	mkdir -p $(BUNDLE)/Contents/MacOS
 	mkdir -p $(BUNDLE)/Contents/Frameworks
-	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
-	ln -s Factor.app/Contents/MacOS/factor ./factor
+	cp $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
+	ln -s $(BUNDLE)/Contents/MacOS/factor ./$(FACTOR)
 
 $(OUTPUT_DIR)/$(ENGINE): $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(DLL_OBJS)
@@ -268,11 +288,11 @@ $(OUTPUT_DIR)/factor-lib: $(OUTPUT_DIR)/$(ENGINE)
 
 $(OUTPUT_DIR)/factor: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
-		$(CFLAGS) $(CXXFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
+		$(TARGET) $(CFLAGS) $(CXXFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
 $(OUTPUT_DIR)/factor-console: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
-		$(CFLAGS) $(CXXFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
+		$(TARGET) $(CFLAGS) $(CXXFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
 $(OUTPUT_DIR)/factor-ffi-test: $(FFI_TEST_LIBRARY)
 
@@ -286,15 +306,15 @@ vm/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c -x c++-header $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
 $(DLL_OBJS): $(OUTPUT_DIR)/%.o: vm/%.cpp vm/master.hpp.gch $(OUTPUT_DIR)
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(TARGET) $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
 $(EXE_OBJS): $(OUTPUT_DIR)/%.o: vm/%.cpp vm/master.hpp.gch $(OUTPUT_DIR)
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(TARGET) $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
 $(TEST_OBJS): $(OUTPUT_DIR)/%.o: vm/%.c $(OUTPUT_DIR)
-	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CC) -c $(TARGET) $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
 
-.SUFFIXES: .mm
+#.SUFFIXES: .mm
 
 endif
 
@@ -306,6 +326,10 @@ clean:
 	rm -f factor.dll.lib
 	rm -f libfactor.*
 	rm -f libfactor-ffi-test.*
+	rm -f factor
+	rm -f factor-arm64
+	rm -f factor-intel
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
+	rm -f Factor-arm64.app/Contents/Frameworks/libfactor.dylib
 
 .PHONY: factor factor-lib factor-console factor-ffi-test tags clean macosx.app printvars
