@@ -163,7 +163,7 @@ HELP: square-matrix
 
 HELP: zero-matrix
 { $class-description "The class of zero matrices. A zero matrix is a matrix whose only elements are the scalar " { $snippet "0" } "." }
-{ $notes "In mathematics, a zero-filled matrix is called a null matrix. In Factor, a "{ $link null-matrix } " is an empty matrix." } ;
+{ $notes "In mathematics, a zero-filled matrix is called a null matrix. In Factor, a " { $link null-matrix } " is an empty matrix." } ;
 
 HELP: zero-square-matrix
 { $class-description "The class of square zero matrices. This predicate is a composition of " { $link zero-matrix } " and " { $link square-matrix } "." } ;
