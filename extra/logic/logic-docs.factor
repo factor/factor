@@ -474,7 +474,7 @@ HELP: nlo
 { $see-also writeo writenlo } ;
 
 HELP: nonvaro
-{ $var-description "A logic predicate. "{ $snippet "nonvaro" } " takes a single argument and is true if its argument is not a logic variable or is a concrete logic variable." }
+{ $var-description "A logic predicate. " { $snippet "nonvaro" } " takes a single argument and is true if its argument is not a logic variable or is a concrete logic variable." }
 { $syntax "{ nonvaro X }" }
 { $see-also varo } ;
 
