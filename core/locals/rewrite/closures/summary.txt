@@ -1,0 +1,1 @@
+Rewriting closures to not have any free variables
