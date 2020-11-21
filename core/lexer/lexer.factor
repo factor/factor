@@ -60,6 +60,11 @@ ERROR: unexpected want got ;
         ] [ f ] if
     ] [ f ] if ; inline
 
+: skip ( i seq ? -- n )
+    over length [
+        [ swap forbid-tab CHAR: \s eq? xor ] curry find-from drop
+    ] dip or ; inline
+
 PRIVATE>
 
 GENERIC: skip-blank ( lexer -- )
@@ -68,20 +73,14 @@ M: lexer skip-blank
     shebang? [
         [ nip length ] change-lexer-column
     ] [
-        [
-            [ [ forbid-tab CHAR: \s eq? not ] find-from drop ]
-            [ length or ] bi
-        ] change-lexer-column
+        [ t skip ] change-lexer-column
     ] if ;
 
 GENERIC: skip-word ( lexer -- )
 
 M: lexer skip-word
     [
-        2dup nth CHAR: \" eq? [ drop 1 + ] [
-            [ [ forbid-tab CHAR: \s eq? ] find-from drop ]
-            [ length or ] bi
-        ] if
+        2dup nth CHAR: \" eq? [ drop 1 + ] [ f skip ] if
     ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )
