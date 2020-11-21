@@ -44,7 +44,7 @@ INSTANCE: fried-sequence fried
     dup callable? [ ] [ [ call ] curry ] if ; inline
 
 : [ncurry] ( n -- quot )
-    [ V{ dup callable? [ >quotation ] unless } clone ] dip (ncurry) >quotation ;
+    [ V{ } clone ] dip (ncurry) >quotation ;
 
 : [ndip] ( quot n -- quot' )
     {
