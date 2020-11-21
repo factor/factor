@@ -689,7 +689,7 @@ HELP: writeo
 
 ARTICLE: "logic" "Logic"
 { $vocab-link "logic" }
-" is a vocab for an embedded language that runs on "{ $url "https://github.com/factor/factor" "Factor" } " with the capabilities of a subset of Prolog." $nl
+" is a vocab for an embedded language that runs on " { $url "https://github.com/factor/factor" "Factor" } " with the capabilities of a subset of Prolog." $nl
 "It is an extended port from tiny_prolog and its descendants, " { $url "https://github.com/preston/ruby-prolog" "ruby-prolog" } "." $nl
 { $code
 "USE: logic

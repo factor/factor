@@ -22,7 +22,7 @@ ${
     {
         { "table-name" "TREE" }
         { "table-id" "NODE" }
-        { "foreign-table-name" "NODE"}
+        { "foreign-table-name" "NODE" }
         { "foreign-table-id" "ID" }
     } [ delete-trigger-restrict ] with-variables
     normalize

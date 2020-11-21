@@ -7,7 +7,7 @@ MACRO: see-test ( a b -- quot ) + ;
 
 { t } [ \ see-test macro? ] unit-test
 
-{ "USING: macros math ;\nIN: macros.tests\nMACRO: see-test ( a b -- quot ) + ;\n" }
+{ "USING: math ;\nIN: macros.tests\nMACRO: see-test ( a b -- quot ) + ;\n" }
 [ [ \ see-test see ] with-string-writer ]
 unit-test
 
@@ -20,13 +20,13 @@ unit-test
 
 { f } [ \ see-test macro? ] unit-test
 
-{ } [ "USING: macros stack-checker kernel ; IN: hanging-macro MACRO: c ( quot -- quot ) infer drop [ ] ;" eval( -- ) ] unit-test
-{ } [ "USING: macros kernel ; IN: hanging-macro : a ( -- ) [ a ] c ;" eval( -- ) ] unit-test
+{ } [ "USING: stack-checker kernel ; IN: hanging-macro MACRO: c ( quot -- quot ) infer drop [ ] ;" eval( -- ) ] unit-test
+{ } [ "USING: kernel ; IN: hanging-macro : a ( -- ) [ a ] c ;" eval( -- ) ] unit-test
 
 { } [ [ "hanging-macro" forget-vocab ] with-compilation-unit ] unit-test
 
-{ } [ "IN: macros.tests USE: macros MACRO: foo ( -- x ) [ ] ;" eval( -- ) ] unit-test
-    [ "IN: macros.tests USE: macros MACRO: foo ( -- x ) [ ] ; inline" eval( -- ) ] must-fail
+{ } [ "IN: macros.tests MACRO: foo ( -- x ) [ ] ;" eval( -- ) ] unit-test
+    [ "IN: macros.tests MACRO: foo ( -- x ) [ ] ; inline" eval( -- ) ] must-fail
 
 ! The macro expander code should infer
 MACRO: bad-macro ( a -- b ) 1 2 3 [ ] ;
