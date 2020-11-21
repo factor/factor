@@ -10,8 +10,8 @@ HELP: @
 { $examples "See " { $link "fry.examples" } "." } ;
 
 HELP: fry
-{ $values { "quot" quotation } { "quot'" quotation } }
-{ $description "Outputs a quotation that when called, fries " { $snippet "quot" } " by taking values from the stack and substituting them in." }
+{ $values { "object" object } { "quot'" quotation } }
+{ $description "Outputs a quotation that when called, fries " { $snippet "object" } " by taking values from the stack and substituting them in." }
 { $notes "This word is used to implement " { $link POSTPONE: '[ } "; the following two lines are equivalent:"
     { $code "[ X ] fry call" "'[ X ]" }
 }
