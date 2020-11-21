@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes classes.algebra classes.algebra.private
-classes.private kernel make words ;
+classes.private kernel words ;
 IN: classes.predicate
 
 PREDICATE: predicate-class < class
