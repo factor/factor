@@ -30,8 +30,6 @@ M: gadget equal? 2drop f ;
 
 M: gadget hashcode* nip identity-hashcode ;
 
-M: gadget model-changed 2drop ;
-
 : gadget-child ( gadget -- child ) children>> first ; inline
 
 : nth-gadget ( n gadget -- child ) children>> nth ; inline
@@ -202,7 +200,7 @@ M: gadget pref-dim* dim>> ;
 
 GENERIC: layout* ( gadget -- )
 
-M: gadget layout* drop ;
+M: object layout* drop ;
 
 : prefer ( gadget -- ) dup pref-dim >>dim drop ;
 
@@ -215,11 +213,11 @@ M: gadget layout* drop ;
 
 GENERIC: graft* ( gadget -- )
 
-M: gadget graft* drop ;
+M: object graft* drop ;
 
 GENERIC: ungraft* ( gadget -- )
 
-M: gadget ungraft* drop ;
+M: object ungraft* drop ;
 
 <PRIVATE
 
