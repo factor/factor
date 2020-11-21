@@ -48,6 +48,9 @@ ERROR: unexpected want got ;
     [ lexer check-instance [ column>> ] [ line-text>> ] bi ] prepose
     keep column<< ; inline
 
+: forbid-tab ( c -- c )
+    [ CHAR: \t eq? [ "[space]" "[tab]" unexpected ] when ] keep ; inline
+
 <PRIVATE
 
 : shebang? ( lexer -- lexer ? )
@@ -57,13 +60,7 @@ ERROR: unexpected want got ;
         ] [ f ] if
     ] [ f ] if ; inline
 
-: forbid-tab ( c -- c )
-    [ CHAR: \t eq? [ "[space]" "[tab]" unexpected ] when ] keep ; inline
-
 PRIVATE>
-
-SBUF""
-URL"google.com"
 
 GENERIC: skip-blank ( lexer -- )
 
@@ -81,8 +78,10 @@ GENERIC: skip-word ( lexer -- )
 
 M: lexer skip-word
     [
-        [ [ forbid-tab " \"" member-eq? ] find-from CHAR: \" eq? [ 1 + ] when ]
-        [ length or ] bi
+        2dup nth CHAR: \" eq? [ drop 1 + ] [
+            [ [ forbid-tab CHAR: \s eq? ] find-from drop ]
+            [ length or ] bi
+        ] if
     ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )
