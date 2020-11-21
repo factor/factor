@@ -200,7 +200,7 @@ HELP: <prefix-help-coverage>
 
 HELP: <word-help-coverage>
 { $values { "word" { $or string word } } { "coverage" word-help-coverage } }
-{ $contract "Looks up a word in the current scope and generates a documentation coverage report for it."}
+{ $contract "Looks up a word in the current scope and generates a documentation coverage report for it." }
 { $examples
     { $example
         "USING: help.lint.coverage prettyprint ;"
