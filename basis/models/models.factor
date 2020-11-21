@@ -58,6 +58,7 @@ DEFER: remove-connection
     [ activate-model ] [ deactivate-model ] [ value>> ] tri ;
 
 GENERIC: model-changed ( model observer -- )
+M: object model-changed 2drop ;
 
 : add-connection ( observer model -- )
     dup connections>>
