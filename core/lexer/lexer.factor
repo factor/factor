@@ -51,6 +51,11 @@ ERROR: unexpected want got ;
 : forbid-tab ( c -- c )
     [ CHAR: \t eq? [ "[space]" "[tab]" unexpected ] when ] keep ; inline
 
+: skip ( i seq ? -- n )
+    over length [
+        [ swap forbid-tab CHAR: \s eq? xor ] curry find-from drop
+    ] dip or ; inline
+
 <PRIVATE
 
 : shebang? ( lexer -- lexer ? )
@@ -59,11 +64,6 @@ ERROR: unexpected want got ;
             dup line-text>> "#!" head?
         ] [ f ] if
     ] [ f ] if ; inline
-
-: skip ( i seq ? -- n )
-    over length [
-        [ swap forbid-tab CHAR: \s eq? xor ] curry find-from drop
-    ] dip or ; inline
 
 PRIVATE>
 
