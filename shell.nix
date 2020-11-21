@@ -14,6 +14,9 @@ let
     openssl
     udis86 # available since NixOS 19.09
     openal
+    libogg
+    libvorbis
+    zlib
   ];
   runtimeLibPath = lib.makeLibraryPath runtimeLibs;
 in
