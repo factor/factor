@@ -9,7 +9,8 @@ let
     gdk_pixbuf
     gnome2.gtkglext
     pcre
-    mesa_glu
+    libGL
+    libGLU
     freealut
     openssl
     udis86 # available since NixOS 19.09
@@ -18,11 +19,11 @@ let
     libvorbis
     zlib
   ];
-  runtimeLibPath = lib.makeLibraryPath runtimeLibs;
+  runtimeLibPath = "/run/opengl-driver/lib:" + lib.makeLibraryPath runtimeLibs;
 in
 (mkClangShell {
   name = "factor-shell-env";
-  LD_LIBRARY_PATH = "/run/opengl-driver/lib:${runtimeLibPath}" ;
+  LD_LIBRARY_PATH = runtimeLibPath ;
   buildInputs = runtimeLibs ++ [
     # for building factor
     git
