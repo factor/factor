@@ -737,7 +737,7 @@ HELP: m-n
 
 HELP: n*m
 { $values { "n" object } { "m" matrix }  }
-{ $description "Every element in the input matrix " { $snippet "m" } " is multiplied by the scalar "{ $snippet "n" } "." }
+{ $description "Every element in the input matrix " { $snippet "m" } " is multiplied by the scalar " { $snippet "n" } "." }
 { $notelist
     $keep-shape-note
     { $equiv-word-note "swapped" m*n }
@@ -754,7 +754,7 @@ HELP: n*m
 
 HELP: m*n
 { $values { "m" matrix } { "n" object } }
-{ $description "Every element in the input matrix " { $snippet "m" } " is multiplied by the scalar "{ $snippet "n" } "." }
+{ $description "Every element in the input matrix " { $snippet "m" } " is multiplied by the scalar " { $snippet "n" } "." }
 { $notelist
     $keep-shape-note
     { $equiv-word-note "swapped" n*m }
@@ -772,7 +772,7 @@ HELP: m*n
 
 HELP: n/m
 { $values { "n" object } { "m" matrix }  }
-{ $description "Every element in the input matrix " { $snippet "m" } " is divided by the scalar "{ $snippet "n" } "." }
+{ $description "Every element in the input matrix " { $snippet "m" } " is divided by the scalar " { $snippet "n" } "." }
 { $notelist
     $keep-shape-note
     { $equiv-word-note "swapped" m/n }
@@ -789,7 +789,7 @@ HELP: n/m
 
 HELP: m/n
 { $values { "m" matrix } { "n" object } }
-{ $description "Every element in the input matrix " { $snippet "m" } " is divided by the scalar "{ $snippet "n" } "." }
+{ $description "Every element in the input matrix " { $snippet "m" } " is divided by the scalar " { $snippet "n" } "." }
 { $notelist
     $keep-shape-note
     { $equiv-word-note "swapped" n/m }
@@ -1246,7 +1246,7 @@ HELP: all-submatrices
 
 HELP: dimension
 { $values { "matrix" matrix } { "dimension" pair } }
-{ $description "Find the dimension of the input matrix, in the order of " { $snippet "{ rows cols }"} "." }
+{ $description "Find the dimension of the input matrix, in the order of " { $snippet "{ rows cols }" } "." }
 { $notelist $2d-only-note "Not to be confused with dimensionality, or the number of dimension scalars needed to describe a matrix." }
 { $examples
     { $example
