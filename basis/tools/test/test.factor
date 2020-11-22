@@ -1,15 +1,14 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators command-line
-compiler.units continuations debugger effects fry
-generalizations io io.files.temp io.files.unique kernel lexer
-locals macros math math.functions math.vectors namespaces parser
-prettyprint quotations sequences sequences.generalizations
-source-files source-files.errors source-files.errors.debugger
-splitting stack-checker summary system tools.errors tools.time
-unicode vocabs vocabs.files vocabs.hierarchy vocabs.loader
+compiler.units continuations debugger effects generalizations io
+io.files.temp io.files.unique kernel lexer math math.functions
+math.vectors namespaces parser prettyprint quotations sequences
+sequences.generalizations source-files source-files.errors
+source-files.errors.debugger splitting stack-checker summary
+system tools.errors tools.time unicode vocabs vocabs.files
+vocabs.hierarchy vocabs.hierarchy.private vocabs.loader
 vocabs.metadata vocabs.parser words ;
-FROM: vocabs.hierarchy => load ;
 IN: tools.test
 
 TUPLE: test-failure < source-file-error continuation ;
@@ -231,12 +230,7 @@ M: test-failure error. ( error -- )
 : test-main ( -- )
     command-line get dup first "--only" = [
         V{ } clone swap rest [
-            dup "resource:" head? [
-                disk-vocabs-in-root
-                [ vocab-prefix? ] reject
-                [ vocab-name "test" swap subseq? ] reject
-                append!
-            ] [ suffix! ] if
+            dup "resource:" head? [ "" vocabs-to-load append! ] [ suffix! ] if
         ] each [ require-all ] [ test-vocabs ] bi
     ] [
         [ [ load ] [ test ] bi ] each

@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs classes combinators command-line continuations fry
-help help.lint.checks help.topics io kernel listener locals
-namespaces parser sequences source-files.errors system
-tools.errors vocabs vocabs.hierarchy vocabs.loader words ;
+USING: assocs classes combinators command-line continuations
+help help.lint.checks help.topics io kernel listener namespaces
+parser sequences source-files.errors system tools.errors vocabs
+vocabs.hierarchy vocabs.hierarchy.private vocabs.loader words ;
 IN: help.lint
 
 SYMBOL: lint-failures
@@ -104,12 +104,7 @@ PRIVATE>
 : test-lint-main ( -- )
     command-line get dup first "--only" = [
         V{ } clone swap rest [
-            dup "resource:" head? [
-                disk-vocabs-in-root
-                [ vocab-prefix? ] reject
-                [ vocab-name "test" swap subseq? ] reject
-                append!
-            ] [ suffix! ] if
+            dup "resource:" head? [ "" vocabs-to-load append! ] [ suffix! ] if
         ] each [ require-all ] [ help-lint-vocabs ] bi
     ] [
         [ [ load ] [ help-lint ] bi ] each
