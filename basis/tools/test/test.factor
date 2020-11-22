@@ -231,7 +231,7 @@ M: test-failure error. ( error -- )
         V{ } clone swap rest [
             dup vocab-roots get member?
             [ "" vocabs-to-load append! ] [ suffix! ] if
-        ] each [ require-all ] [ test-vocabs ] bi
+        ] each [ don't-test? ] reject [ require-all ] [ test-vocabs ] bi
     ] [
         [ [ load ] [ test ] bi ] each
     ] if
