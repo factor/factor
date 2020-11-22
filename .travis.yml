@@ -46,5 +46,6 @@ script:
   - export CI_BRANCH="${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}"
   - echo "CI_BRANCH=${CI_BRANCH}"
   - DEBUG=1 ./build.sh net-bootstrap < /dev/null
-  - "./factor -e='USING: memory tools.test namespaces ; f long-unit-tests-enabled? set-global save'"
+  - "./factor -e='USING: memory tools.test namespaces ; f long-unit-tests-enabled? set-global \"resource:basis\" \"\" load-from-root save'"
   - "./factor -run=tools.test --only resource:core"
+  - "./factor -run=help.lint --only resource:core resource:basis"
