@@ -29,6 +29,10 @@ SYMBOL: vocab-articles
             "linux-monitor" ! github issue #2014, race condition in disposing of child monitors
             "event-stream"
             "macosx-monitor"
+            "recursive-monitor"
+            "input-port"
+            "malloc-ptr"
+            "fd"
         } member?
     ] reject ;
 
