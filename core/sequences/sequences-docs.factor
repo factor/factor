@@ -749,7 +749,7 @@ HELP: join-as
 { $examples
     "Join a list of strings as a string buffer:"
     { $example "USING: sequences prettyprint ;"
-        "{ \"a\" \"b\" \"c\" } \"1\" SBUF\" \"join-as ."
+        "{ \"a\" \"b\" \"c\" } \"1\" SBUF\" \" join-as ."
         "SBUF\" a1b1c\""
     }
 }
