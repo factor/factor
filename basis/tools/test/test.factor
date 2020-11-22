@@ -7,8 +7,8 @@ locals macros math math.functions math.vectors namespaces parser
 prettyprint quotations sequences sequences.generalizations
 source-files source-files.errors source-files.errors.debugger
 splitting stack-checker summary system tools.errors tools.time
-unicode vocabs vocabs.files vocabs.metadata vocabs.parser words
-;
+unicode vocabs vocabs.files vocabs.hierarchy vocabs.loader
+vocabs.metadata vocabs.parser words ;
 FROM: vocabs.hierarchy => load ;
 IN: tools.test
 
@@ -230,7 +230,14 @@ M: test-failure error. ( error -- )
 
 : test-main ( -- )
     command-line get dup first "--only" = [
-        rest [ require-all ] [ test-vocabs ] bi
+        V{ } clone swap rest [
+            dup "resource:" head? [
+                disk-vocabs-in-root
+                [ vocab-prefix? ] reject
+                [ vocab-name "test" swap subseq? ] reject
+                append!
+            ] [ suffix! ] if
+        ] each [ require-all ] [ test-vocabs ] bi
     ] [
         [ [ load ] [ test ] bi ] each
     ] if

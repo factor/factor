@@ -3,7 +3,7 @@
 USING: assocs classes combinators command-line continuations fry
 help help.lint.checks help.topics io kernel listener locals
 namespaces parser sequences source-files.errors system
-tools.errors vocabs vocabs.hierarchy words ;
+tools.errors vocabs vocabs.hierarchy vocabs.loader words ;
 IN: help.lint
 
 SYMBOL: lint-failures
@@ -22,7 +22,6 @@ T{ error-type-holder
    { quot [ lint-failures get values ] }
    { forget-quot [ lint-failures get delete-at ] }
 } define-error-type
-
 M: help-lint-error error-type drop +help-lint-failure+ ;
 
 <PRIVATE
@@ -71,13 +70,13 @@ PRIVATE>
     '[ _ vocab-help [ lookup-article drop ] when* ] check-something ;
 
 : help-lint-vocab ( vocab -- )
-    "Checking " write dup write "..." print flush
+    "Checking " write dup vocab-name write "..." print flush
     [ check-about ]
     [ vocab-words [ check-word ] each ]
     [ vocab-articles get at [ check-article ] each ]
     tri ;
 
-: help-lint-vocabs ( vocabs -- ) [ help-lint-vocabs ] each ;
+: help-lint-vocabs ( vocabs -- ) [ help-lint-vocab ] each ;
 
 PRIVATE>
 
@@ -104,7 +103,14 @@ PRIVATE>
 
 : test-lint-main ( -- )
     command-line get dup first "--only" = [
-        rest [ require-all ] [ help-lint-vocabs ] bi
+        V{ } clone swap rest [
+            dup "resource:" head? [
+                disk-vocabs-in-root
+                [ vocab-prefix? ] reject
+                [ vocab-name "test" swap subseq? ] reject
+                append!
+            ] [ suffix! ] if
+        ] each [ require-all ] [ help-lint-vocabs ] bi
     ] [
         [ [ load ] [ help-lint ] bi ] each
     ] if
