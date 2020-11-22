@@ -222,15 +222,15 @@ M: test-failure error. ( error -- )
 : :test-failures ( -- ) test-failures get errors. ;
 
 : test ( prefix -- )
-    loaded-child-vocab-names test-vocabs ;
+    loaded-child-vocab-names [ don't-test? ] reject test-vocabs ;
 
-: test-all ( -- )
-    loaded-vocab-names [ don't-test? ] reject test-vocabs ;
+: test-all ( -- ) "" test ;
 
 : test-main ( -- )
     command-line get dup first "--only" = [
         V{ } clone swap rest [
-            dup "resource:" head? [ "" vocabs-to-load append! ] [ suffix! ] if
+            dup vocab-roots get member?
+            [ "" vocabs-to-load append! ] [ suffix! ] if
         ] each [ require-all ] [ test-vocabs ] bi
     ] [
         [ [ load ] [ test ] bi ] each

@@ -104,7 +104,8 @@ PRIVATE>
 : test-lint-main ( -- )
     command-line get dup first "--only" = [
         V{ } clone swap rest [
-            dup "resource:" head? [ "" vocabs-to-load append! ] [ suffix! ] if
+            dup vocab-roots get member?
+            [ "" vocabs-to-load append! ] [ suffix! ] if
         ] each [ require-all ] [ help-lint-vocabs ] bi
     ] [
         [ [ load ] [ help-lint ] bi ] each
