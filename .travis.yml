@@ -47,4 +47,4 @@ script:
   - echo "CI_BRANCH=${CI_BRANCH}"
   - DEBUG=1 ./build.sh net-bootstrap < /dev/null
   - "./factor -e='USING: memory tools.test namespaces ; f long-unit-tests-enabled? set-global save'"
-  - "./factor -e='USING: sequences tools.test.private vocabs.hierarchy ; \"resource:core\" disk-vocabs-in-root test-vocabs'"
+  - "./factor -run=tools.test --only resource:core"
