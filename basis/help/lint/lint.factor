@@ -77,6 +77,8 @@ PRIVATE>
     [ vocab-articles get at [ check-article ] each ]
     tri ;
 
+: help-lint-vocabs ( vocabs -- ) [ help-lint-vocabs ] each ;
+
 PRIVATE>
 
 : help-lint ( prefix -- )
@@ -84,7 +86,7 @@ PRIVATE>
         auto-use? off
         group-articles vocab-articles set
         loaded-child-vocab-names
-        [ help-lint-vocab ] each
+        help-lint-vocabs
     ] with-scope ;
 
 : help-lint-all ( -- ) "" help-lint ;
@@ -102,7 +104,7 @@ PRIVATE>
 
 : test-lint-main ( -- )
     command-line get dup first "--only" = [
-        rest [ [ require ] [ help-lint-vocab ] bi ] each
+        rest [ require-all ] [ help-lint-vocabs ] bi
     ] [
         [ [ load ] [ help-lint ] bi ] each
     ] if

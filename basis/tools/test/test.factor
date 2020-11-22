@@ -230,7 +230,7 @@ M: test-failure error. ( error -- )
 
 : test-main ( -- )
     command-line get dup first "--only" = [
-        rest [ [ require ] [ test-vocab ] bi ] each
+        rest [ require-all ] [ test-vocabs ] bi
     ] [
         [ [ load ] [ test ] bi ] each
     ] if
