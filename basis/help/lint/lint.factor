@@ -70,7 +70,7 @@ PRIVATE>
     <vocab-link> dup
     '[ _ vocab-help [ lookup-article drop ] when* ] check-something ;
 
-: check-vocab ( vocab -- )
+: help-lint-vocab ( vocab -- )
     "Checking " write dup write "..." print flush
     [ check-about ]
     [ vocab-words [ check-word ] each ]
@@ -84,7 +84,7 @@ PRIVATE>
         auto-use? off
         group-articles vocab-articles set
         loaded-child-vocab-names
-        [ check-vocab ] each
+        [ help-lint-vocab ] each
     ] with-scope ;
 
 : help-lint-all ( -- ) "" help-lint ;
@@ -101,8 +101,11 @@ PRIVATE>
     [ predicate? ] reject ;
 
 : test-lint-main ( -- )
-    command-line get [ load ] each
-    help-lint-all
+    command-line get dup first "--only" = [
+        rest [ [ require ] [ help-lint-vocab ] bi ] each
+    ] [
+        [ [ load ] [ help-lint ] bi ] each
+    ] if
     lint-failures get assoc-empty?
     [ [ "==== FAILING LINT" print :lint-failures flush ] unless ]
     [ 0 1 ? exit ] bi ;
