@@ -8,14 +8,12 @@ IN: peg.parsers
 
 TUPLE: just-parser p1 ;
 
-CONSTANT: just-pattern [
-    dup [
-        dup remaining>> empty? [ drop f ] unless
-    ] when
-]
-
 M: just-parser (compile)
-    p1>> compile-parser-quot just-pattern compose ;
+    p1>> compile-parser-quot [
+        dup [
+            dup remaining>> empty? [ drop f ] unless
+        ] when
+    ] compose ;
 
 : just ( parser -- parser )
     just-parser boa wrap-peg ;
@@ -102,7 +100,8 @@ PRIVATE>
     ! range of characters from the first to the second,
     ! inclusive.
     "^" ?head [
-        (range-pattern) '[ _ member? not ] satisfy
+        (range-pattern) dup length 1 =
+        [ first '[ _ = ] ] [ '[ _ member? ] ] if
     ] [
-        (range-pattern) '[ _ member? ] satisfy
-    ] if ;
+        [ [ not ] compose ] when satisfy
+    ] bi* ;
