@@ -7,7 +7,8 @@ io.pathnames io.sockets io.streams.byte-array io.streams.duplex
 kernel literals locals make math math.bitwise math.functions
 math.order math.parser math.ranges multiline namespaces
 prettyprint random sequences splitting strings timers
-tools.annotations ui ui.gadgets.panes ui.tools.listener urls ;
+tools.annotations ui ui.gadgets.panes ui.tools.listener urls
+urls.encoding ;
 
 IN: bittorrent
 
@@ -97,6 +98,24 @@ M: string load-metainfo
             { "info" "length" } [ of ] each
             "left" set-query-param
         ]
+    } cleave ;
+
+TUPLE: magnet display-name exact-length exact-topic
+web-seed acceptable-source exact-source keyword-topic
+manifest-topic address-tracker ;
+
+: magnet-link>magnet ( url -- magnet-url )
+    [ magnet new ] dip
+    >url query>> {
+        [ "dn" of >>display-name ]
+        [ "xl" of >>exact-length ]
+        [ "xt" of >>exact-topic ]
+        [ "ws" of >>web-seed ]
+        [ "as" of >>acceptable-source ]
+        [ "xs" of >>exact-source ]
+        [ "kt" of >>keyword-topic ]
+        [ "mt" of >>manifest-topic ]
+        [ "tr" of >>address-tracker ]
     } cleave ;
 
 : parse-peer4 ( peerbin -- inet4 )
