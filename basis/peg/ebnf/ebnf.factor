@@ -18,7 +18,7 @@ ERROR: no-rule rule parser ;
 <PRIVATE
 
 : lookup-rule ( rule parser -- rule' )
-        2dup rule [ 2nip ] [ no-rule ] if* ;
+    2dup rule [ 2nip ] [ no-rule ] if* ;
 
 TUPLE: tokenizer-tuple any one many ;
 
@@ -478,11 +478,10 @@ ERROR: bad-effect quot effect ;
     ! so we don't pollute the manifest qualified-vocabs
     ! and also so restarts don't add multiple times
     qualified-vocabs length
-    "syntax" { "[let" ":>" } add-words-from
     "kernel" { "dup" "nip" "over" } add-words-from
     "sequences" { "nth" } add-words-from
     [ string-lines parse-lines ] dip
-    dup 3 + qualified-vocabs delete-slice ;
+    dup 2 + qualified-vocabs delete-slice ;
 
 M: ebnf-action (transform)
     ebnf-transform check-action-effect action ;
