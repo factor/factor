@@ -401,7 +401,7 @@ M: choice-parser (compile)
 
 TUPLE: repeat0-parser parser ;
 
-: (repeat) ( quot: ( -- result ) result -- result )
+: (repeat) ( quot: ( -- result/f ) result -- result )
     over call [
         [ remaining>> >>remaining ] [ ast>> ] bi
         over ast>> push (repeat)
