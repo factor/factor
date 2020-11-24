@@ -15,7 +15,6 @@ ifdef CONFIG
 
 	XCODE_PATH ?= /Applications/Xcode.app
 	MACOSX_32_SDK ?= MacOSX10.11.sdk
-	MACOSX_SDK ?= MacOSX10.13.sdk
 
 	include $(CONFIG)
 
@@ -155,12 +154,13 @@ help:
 	@echo "linux-x86-64"
 	@echo "linux-ppc-32"
 	@echo "linux-ppc-64"
-	@echo "linux-arm"
+	@echo "linux-arm-64"
 	@echo "freebsd-x86-32"
 	@echo "freebsd-x86-64"
 	@echo "macosx-x86-32"
 	@echo "macosx-x86-64"
 	@echo "macosx-x86-fat"
+	@echo "macosx-arm64"
 	@echo "windows-x86-32"
 	@echo "windows-x86-64"
 	@echo ""
@@ -187,6 +187,12 @@ macosx-x86-64:
 
 macosx-x86-fat:
 	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.fat
+
+macosx-arm64-64:
+	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.arm64
+
+linux-arm-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.64
 
 linux-x86-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.32
