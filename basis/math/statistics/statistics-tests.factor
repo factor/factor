@@ -24,12 +24,18 @@ IN: math.statistics
 
 { 2470 } [ 20 <iota> sum-of-squares ] unit-test
 { 2470 } [ 20 <iota> >array sum-of-squares ] unit-test
+{ 371 } [ 4 10 [a,b] sum-of-squares ] unit-test
+{ 371 } [ 4 10 [a,b] >array sum-of-squares ] unit-test
 
 { 36100 } [ 20 <iota> sum-of-cubes ] unit-test
 { 36100 } [ 20 <iota> >array sum-of-cubes ] unit-test
+{ 2989 } [ 4 10 [a,b] sum-of-cubes ] unit-test
+{ 2989 } [ 4 10 [a,b] >array sum-of-cubes ] unit-test
 
 { 562666 } [ 20 <iota> sum-of-quads ] unit-test
 { 562666 } [ 20 <iota> >array sum-of-quads ] unit-test
+{ 25235 } [ 4 10 [a,b] sum-of-quads ] unit-test
+{ 25235 } [ 4 10 [a,b] >array sum-of-quads ] unit-test
 
 { 0 } [ { 1 } range ] unit-test
 { 89 } [ { 1 2 30 90 } range ] unit-test
