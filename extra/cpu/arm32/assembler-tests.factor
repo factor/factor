@@ -1,7 +1,7 @@
-IN: cpu.arm.assembler.tests
-USING: cpu.arm.assembler math tools.test namespaces make
+IN: cpu.arm32.assembler.tests
+USING: cpu.arm32.assembler math tools.test namespaces make
 sequences kernel quotations ;
-FROM: cpu.arm.assembler => B ;
+FROM: cpu.arm32.assembler => B ;
 
 : test-opcode ( expect quot -- ) [ { } make first ] curry unit-test ;
 
