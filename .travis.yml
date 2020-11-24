@@ -47,5 +47,5 @@ script:
   - echo "CI_BRANCH=${CI_BRANCH}"
   - DEBUG=1 ./build.sh net-bootstrap < /dev/null
   - "./factor -e='USING: memory tools.test namespaces vocabs.hierarchy ; f long-unit-tests-enabled? set-global \"resource:basis\" \"\" load-from-root save'"
-  - "./factor -run=tools.test --only resource:core resource:basis"
+  - "./factor -run=tools.test --only resource:core"
   - "./factor -run=help.lint --only resource:core resource:basis"
