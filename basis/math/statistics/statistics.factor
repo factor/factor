@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman, Michael Judge, Loryn Jenkins.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators fry generalizations
-grouping kernel locals math math.functions math.order
-math.vectors sequences sequences.private sorting ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit fry generalizations grouping kernel
+locals math math.functions math.order math.ranges math.vectors
+sequences sequences.private sorting ;
 FROM: math.ranges => [a,b] ;
 IN: math.statistics
 
@@ -24,10 +25,20 @@ GENERIC: sum-of-squares ( seq -- x )
 M: object sum-of-squares [ sq ] map-sum ;
 M: iota sum-of-squares
     n>> 1 - [ ] [ 1 + ] [ 1/2 + ] tri * * 3 / ;
+M: math.ranges:range sum-of-squares
+    dup { [ step>> 1 = ] [ from>> integer? ] } 1&& [
+        [ from>> ] [ length>> ] bi dupd +
+        [ <iota> sum-of-squares ] bi@ swap -
+    ] [ call-next-method ] if ;
 
 GENERIC: sum-of-cubes ( seq -- x )
 M: object sum-of-cubes [ 3 ^ ] map-sum ;
 M: iota sum-of-cubes sum sq ;
+M: math.ranges:range sum-of-cubes
+    dup { [ step>> 1 = ] [ from>> integer? ] } 1&& [
+        [ from>> ] [ length>> ] bi dupd +
+        [ <iota> sum-of-cubes ] bi@ swap -
+    ] [ call-next-method ] if ;
 
 GENERIC: sum-of-quads ( seq -- x )
 M: object sum-of-quads [ 4 ^ ] map-sum ;
@@ -41,6 +52,11 @@ M: iota sum-of-quads
             * * * 30 /
         ] [ 0 ] if
     ] ;
+M: math.ranges:range sum-of-quads
+    dup { [ step>> 1 = ] [ from>> integer? ] } 1&& [
+        [ from>> ] [ length>> ] bi dupd +
+        [ <iota> sum-of-quads ] bi@ swap -
+    ] [ call-next-method ] if ;
 
 : sum-of-squared-errors ( seq -- x )
     [ mean ] keep [ - sq ] with map-sum ; inline
