@@ -133,12 +133,6 @@ tools.test ;
 { 4.0 } [ { 1e-30 1 3 -1e-30 } sum-floats ] unit-test
 { 1.0000000000000002e16 } [ { 1e-16 1 1e16 } sum-floats ] unit-test
 
-{ 2470 } [ 20 <iota> sum-squares ] unit-test
-{ 2470 } [ 20 <iota> >array sum-squares ] unit-test
-
-{ 36100 } [ 20 <iota> sum-cubes ] unit-test
-{ 36100 } [ 20 <iota> >array sum-cubes ] unit-test
-
 {
     {
         1 -1 -1 0 -1 1 -1 0 0 1 -1 0 -1 1 1
