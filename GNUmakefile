@@ -188,7 +188,7 @@ macosx-x86-64:
 macosx-x86-fat:
 	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.fat
 
-macosx-arm64-64:
+macosx-arm64:
 	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.arm64
 
 linux-arm-64:
