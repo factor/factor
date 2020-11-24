@@ -1,7 +1,7 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cpu.arm64.assembler.opcodes math math.bitwise tools.test ;
-IN: cpu.arm64.assembler.opcodes.tests
+USING: cpu.arm.assembler.opcodes math math.bitwise tools.test ;
+IN: cpu.arm.assembler.opcodes.tests
 
 { 0b00011010000000110000000001000001 } [ X3 X2 X1 ADC32-encode ] unit-test
 { 0b00111010000000110000000001000001 } [ X3 X2 X1 ADCS32-encode ] unit-test
