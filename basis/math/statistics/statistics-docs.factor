@@ -317,3 +317,5 @@ ABOUT: "math.statistics"
 { ste-ddof population-ste sample-ste } related-words
 { corr-ddof population-corr sample-corr } related-words
 { cov-ddof population-cov sample-cov } related-words
+
+{ sum-of-squares sum-of-cubes sum-of-quads } related-words
