@@ -461,7 +461,7 @@ M: ensure-not-parser (compile)
 TUPLE: action-parser parser quot ;
 
 : check-action ( result quot -- result )
-    dupd '[ _ change-ast ] when ; inline
+    dupd '[ [ _ call( ast -- ast ) ] change-ast ] when ;
 
 M: action-parser (compile)
     [ parser>> compile-parser-quot ] [ quot>> ] bi
