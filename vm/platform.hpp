@@ -22,6 +22,8 @@
       #include "os-macosx-x86.32.hpp"
     #elif defined(FACTOR_AMD64)
       #include "os-macosx-x86.64.hpp"
+    #elif defined(FACTOR_ARM64)
+      #include "os-macosx-arm64.hpp"
     #else
       #error "Unsupported Mac OS X flavor"
     #endif
@@ -66,6 +68,9 @@
 #elif defined(FACTOR_PPC)
   #include "cpu-ppc.hpp"
 #elif defined(FACTOR_ARM)
+  #include "cpu-arm.hpp"
+#elif defined(FACTOR_ARM64)
+  #include "cpu-arm.64.hpp"
   #include "cpu-arm.hpp"
 #else
   #error "Unsupported CPU"
