@@ -437,6 +437,9 @@ set_build_info() {
     if [[ $OS == linux && $ARCH == ppc ]] ; then
         MAKE_IMAGE_TARGET=linux-ppc.32
         MAKE_TARGET=linux-ppc-32
+    elif [[ $OS == linux && $ARCH == arm64 ]] ; then
+        MAKE_IMAGE_TARGET=unix-arm.64
+        MAKE_TARGET=linux-arm-64
     elif [[ $OS == windows && $ARCH == x86 && $WORD == 64 ]] ; then
         MAKE_IMAGE_TARGET=windows-x86.64
         MAKE_TARGET=windows-x86-64
