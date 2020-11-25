@@ -50,6 +50,8 @@
         #include "os-linux-ppc.32.hpp"
       #elif defined(FACTOR_ARM)
         #include "os-linux-arm.hpp"
+      #elif defined(FACTOR_ARM64)
+        #include "os-linux-arm.64.hpp"
       #elif defined(FACTOR_AMD64)
         #include "os-linux-x86.64.hpp"
       #else
