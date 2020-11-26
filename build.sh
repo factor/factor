@@ -301,6 +301,7 @@ find_architecture() {
        ppc64) ARCH=ppc;;
        *86) ARCH=x86;;
        *86_64) ARCH=x86;;
+       arm64) ARCH=arm64;;
        aarch64) ARCH=arm64;;
        iPhone5*[3-9]) ARCH=arm64;;
        iPhone[6-9]*) ARCH=arm64;;
@@ -440,6 +441,9 @@ set_build_info() {
     elif [[ $OS == linux && $ARCH == arm64 ]] ; then
         MAKE_IMAGE_TARGET=unix-arm.64
         MAKE_TARGET=linux-arm-64
+    elif [[ $OS == macosx && $ARCH == arm64 ]] ; then
+        MAKE_IMAGE_TARGET=unix-arm.64
+        MAKE_TARGET=macosx-arm64
     elif [[ $OS == windows && $ARCH == x86 && $WORD == 64 ]] ; then
         MAKE_IMAGE_TARGET=windows-x86.64
         MAKE_TARGET=windows-x86-64

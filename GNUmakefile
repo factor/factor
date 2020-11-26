@@ -191,6 +191,9 @@ macosx-x86-fat:
 macosx-arm64:
 	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.arm64
 
+linux-arm-32:
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.32
+
 linux-arm-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.64
 
@@ -205,9 +208,6 @@ linux-ppc-32:
 
 linux-ppc-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc.64
-
-linux-arm:
-	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm
 
 windows-x86-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.32
@@ -276,3 +276,4 @@ clean:
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
 
 .PHONY: factor factor-lib factor-console factor-ffi-test tags clean macosx.app
+.PHONY: linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 macosx-x86-32 macosx-x86-64 macosx-x86-fat macosx-arm64 windows-x86-32 windows-x86-64
