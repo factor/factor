@@ -53,7 +53,7 @@ HELP: stable-slices
     { "seq" sequence }
     { "slices" "a sequence of stable-slices" }
 }
-{ $description "Returns an array of monotonically decreasing slices of type " { $link downward-slice } ". Slices of one element are discarded." } ;
+{ $description "Returns an array of monotonically stable slices of type " { $link stable-slice } ". Slices of one element are discarded." } ;
 
 HELP: upward-slices
 { $values
