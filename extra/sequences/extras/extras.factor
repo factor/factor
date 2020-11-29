@@ -447,14 +447,28 @@ PRIVATE>
 : loop>sequence ( quot: ( ..a -- ..a obj/f ) exemplar -- seq )
    [ '[ [ @ [ [ , ] when* ] keep ] loop ] ] dip make ; inline
 
-: loop>array ( quot: ( ..a -- ..a obj/f ) -- seq )
+: loop>array ( quot: ( ..a -- ..a obj/f ) -- array )
    { } loop>sequence ; inline
 
 : loop>sequence* ( quot: ( ..a -- ..a obj ? ) exemplar -- seq )
     [ '[ [ @ [ [ , ] when* ] [ ] bi* ] loop ] ] dip make ; inline
 
-: loop>array* ( quot: ( ..a -- ..a obj ? ) -- seq )
+: loop>array* ( quot: ( ..a -- ..a obj ? ) -- array )
    { } loop>sequence* ; inline
+
+: loop>sequence** ( quot: ( ..a -- ..a obj ? ) exemplar -- seq )
+    [
+        '[
+            [
+                @
+                [ [ , ] [ drop ] if ]
+                [ nip ] 2bi
+            ] loop
+        ]
+    ] dip make ; inline
+
+: loop>array** ( quot: ( ..a -- ..a obj ? ) -- array )
+   { } loop>sequence** ; inline
 
 : with-pre-incrementer ( quot: ( ..a n -- ..a obj/f ) seq -- quot: ( ..a n -- ..a obj/f ) )
     [ -1 ] 2dip

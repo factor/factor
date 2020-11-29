@@ -1,4 +1,5 @@
-USING: help.markup help.syntax kernel math sequences ;
+USING: arrays help.markup help.syntax kernel math multiline
+quotations sequences ;
 IN: sequences.extras
 
 HELP: ?supremum
@@ -260,3 +261,156 @@ HELP: count-subseq*
     } } ;
 
 { start-all start-all* count-subseq count-subseq* } related-words
+
+HELP: loop>array
+{ $values
+    { "quot" quotation }
+    { "array" array }
+}
+{ $description "Call the " { $snippet "quot" } ", which should output an object or " { $snippet "f" } ", and collect the objects in " { $snippet "array" } " until " { $snippet "quot" } " outputs " { $snippet "f" } "." }
+{ $examples
+    "Example:"
+    { $example "USING: sequences.extras prettyprint io.encodings.binary"
+    "io.streams.byte-array io ;"
+        "B{ 10 20 30 } binary ["
+        "   [ read1 ] loop>array"
+        "] with-byte-reader ."
+        "{ 10 20 30 }"
+    }
+} ;
+
+HELP: loop>array*
+{ $values
+    { "quot" quotation }
+    { "array" array }
+}
+{ $description "Call the " { $snippet "quot" } ", which should output an object and a " { $snippet "bool" } ", and collect the objects in " { $snippet "array" } " until " { $snippet "quot" } " outputs " { $snippet "f" } ". Do collect the last object." }
+{ $examples
+    "Example:"
+    { $example "USING: sequences.extras prettyprint io.encodings.binary"
+               "random random.mersenne-twister kernel math ;"
+    "123 <mersenne-twister> ["
+    "   ["
+    "      10 random dup 5 >"
+    "   ] loop>array* ."
+    "] with-random"
+    "{ 6 7 2 }"
+    }
+} ;
+
+HELP: loop>array**
+{ $values
+    { "quot" quotation }
+    { "array" array }
+}
+{ $description "Call the " { $snippet "quot" } ", which should output an object and a " { $snippet "bool" } ", and collect the objects in " { $snippet "array" } " until " { $snippet "quot" } " outputs " { $snippet "f" } ". Do not collect the last object." }
+{ $examples
+    "Example:"
+    { $example "USING: sequences.extras prettyprint io.encodings.binary"
+               "random random.mersenne-twister kernel math ;"
+    "123 <mersenne-twister> ["
+    "   ["
+    "      10 random dup 5 >"
+    "   ] loop>array** ."
+    "] with-random"
+    "{ 6 7 }"
+    }
+} ;
+
+
+HELP: loop>sequence
+{ $values
+    { "quot" quotation } { "exemplar" object }
+    { "seq" sequence }
+}
+{ $description "Call " { $snippet "quot" } ", which should output an object or " { $snippet "f" } ", and collect the objects in " { $snippet "seq" } " of type " { $snippet "exemplar" } " until " { $snippet "quot" } " outputs " { $snippet "f" } "." }
+{ $examples
+    "Example:"
+    { $example "USING: sequences.extras prettyprint io.encodings.binary"
+               "random random.mersenne-twister kernel math ;"
+    "! Get random numbers until one of them is greater than 5"
+    "! but also output the last number"
+    "123 <mersenne-twister> ["
+    "   ["
+    "      10 random dup 5 >"
+    "   ] loop>array*"
+    "] with-random ."
+    "{ 6 7 2 }"
+    }
+} ;
+
+HELP: loop>sequence*
+{ $values
+    { "quot" quotation } { "exemplar" object }
+    { "seq" sequence }
+}
+{ $description "Call " { $snippet "quot" } ", which should output an object and a " { $snippet "bool" } ", and collect the objects in " { $snippet "seq" } " of type " { $snippet "exemplar" } " until " { $snippet "quot" } " outputs " { $snippet "f" } ". Do collect the last object." }
+{ $examples
+    "Example:"
+    { $example "USING: sequences.extras prettyprint io.encodings.binary"
+               "random random.mersenne-twister kernel math ;"
+    "! Get random numbers until one of them is greater than 5"
+    "! but also output the last number"
+    "123 <mersenne-twister> ["
+    "   ["
+    "      10 random dup 5 >"
+    "   ] V{ } loop>sequence*"
+    "] with-random ."
+    "V{ 6 7 2 }"
+    }
+} ;
+
+HELP: loop>sequence**
+{ $values
+    { "quot" quotation } { "exemplar" object }
+    { "seq" sequence }
+}
+{ $description "Call " { $snippet "quot" } ", which should output an object and a " { $snippet "bool" } ", and collect the objects in " { $snippet "seq" } " of type " { $snippet "exemplar" } " until " { $snippet "quot" } " outputs " { $snippet "f" } ". Do not collect the last object." }
+{ $examples
+    "Example:"
+    { $example "USING: sequences.extras prettyprint io.encodings.binary"
+               "random random.mersenne-twister kernel math ;"
+    "! Get random numbers until one of them is greater than 5"
+    "! but also output the last number"
+    "123 <mersenne-twister> ["
+    "   ["
+    "      10 random dup 5 >"
+    "   ] V{ } loop>sequence**"
+    "] with-random ."
+    "V{ 6 7 }"
+    }
+} ;
+
+{
+    loop>array loop>array* loop>array**
+    loop>sequence loop>sequence* loop>sequence**
+    zero-loop>array zero-loop>sequence
+} related-words
+
+HELP: zero-loop>array
+{ $values
+    { "quot" quotation }
+    { "seq" sequence }
+}
+{ $description "Call " { $snippet "quot" } ", which takes an integer starting from zero and incrementing on every loop, and should output an object, and collect the objects in " { $snippet "array" } " until " { $snippet "quot" } " outputs " { $snippet "f" } "." }
+{ $examples
+    "Example:"
+    { $example "USING: sequences.extras prettyprint math.text.english math kernel ;"
+        "[ dup 5 < [ number>text ] [ drop f ] if ] zero-loop>array ."
+        [[ { "zero" "one" "two" "three" "four" }]]
+    }
+} ;
+
+HELP: zero-loop>sequence
+{ $values
+    { "quot" quotation } { "exemplar" object }
+    { "seq" sequence }
+}
+{ $description "Call the " { $snippet "quot" } ", which takes an integer starting from zero and incrementing on every loop, and should output an object or " { $snippet "f" } ", and collect the objects in " { $snippet "array" } " until " { $snippet "quot" } " outputs " { $snippet "f" } "." }
+{ $examples
+    "Example:"
+    { $example "USING: sequences.extras prettyprint math.text.english math kernel ;"
+        "[ dup 5 < [ number>text ] [ drop f ] if ] V{ } zero-loop>sequence ."
+        [[ V{ "zero" "one" "two" "three" "four" }]]
+    }
+} ;
