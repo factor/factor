@@ -456,6 +456,17 @@ PRIVATE>
 : loop>array* ( quot: ( ..a -- ..a obj ? ) -- seq )
    { } loop>sequence* ; inline
 
+: with-pre-incrementer ( quot: ( ..a n -- ..a obj/f ) seq -- quot: ( ..a n -- ..a obj/f ) )
+    [ -1 ] 2dip
+    [ [ 1 + dup ] prepose ] dip
+    call nip ; inline
+
+: zero-loop>array ( quot: ( ..a n -- ..a obj ) -- seq )
+    [ loop>array ] with-pre-incrementer ; inline
+
+: zero-loop>sequence ( quot: ( ..a n -- ..a obj ) exemplar -- seq )
+    '[ _ loop>sequence ] with-pre-incrementer ; inline
+
 <PRIVATE
 
 : (reverse) ( seq -- newseq )
