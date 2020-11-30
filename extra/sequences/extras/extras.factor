@@ -457,7 +457,7 @@ PRIVATE>
     { } loop>sequence* ; inline
 
 : loop>sequence ( ... quot: ( ... -- ... obj/f ) exemplar -- ... seq )
-    [ [ dup ] compose ] dip loop>sequence** ; inline
+    [ [ dup ] compose [ ] ] dip produce-as nip ; inline
 
 : loop>array ( ... quot: ( ... -- ... obj/f ) -- ... array )
    { } loop>sequence ; inline
