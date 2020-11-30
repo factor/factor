@@ -451,7 +451,7 @@ PRIVATE>
     { } loop>sequence** ; inline
 
 : loop>sequence* ( ... quot: ( ... -- ... obj ? ) exemplar -- ... seq )
-    [ '[ [ @ [ [ , ] when* ] [ ] bi* ] loop ] ] dip make ; inline
+    [ t ] [ '[ [ _ dip ] [ f f f ] if* ] [ swap ] ] [ produce-as 2nip ] tri* ; inline
 
 : loop>array* ( ... quot: ( ... -- ... obj ? ) -- ... array )
     { } loop>sequence* ; inline
