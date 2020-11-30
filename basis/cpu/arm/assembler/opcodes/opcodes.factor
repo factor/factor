@@ -1,9 +1,8 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes.error classes.parser effects
-effects.parser fry kernel lexer math math.bitwise math.parser
-multiline parser sequences sequences.extras vocabs.parser words
-words.symbol ;
+effects.parser kernel lexer math math.bitwise math.parser
+multiline parser sequences vocabs.parser words words.symbol ;
 IN: cpu.arm.assembler.opcodes
 
 ! https://static.docs.arm.com/ddi0487/fb/DDI0487F_b_armv8_arm.pdf
@@ -297,7 +296,7 @@ M: object value ;
 
 : arm-bitfield ( seq -- assoc )
     [ current-vocab name>> ?lookup-word ] map
-    [ width ] map-zip
+    [ dup width ] map>alist
     dup values [ f = ] any? [ throw ] when ;
 
 ERROR: bad-instruction values ;
