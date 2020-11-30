@@ -65,14 +65,12 @@ syn cluster factorCluster           contains=@factorComment,@factorClusterNoComm
 "
 " The "lexer" vocabulary parses lines (arrays of strings) into tokens.
 " Tokens are non-space strings, effectively words.
-" "[ f skip ] call( i seq -- n )" finds the next space, erroring on tabs.
-"   "t skip" finds the next non-space.
 " The "lexer" class holds lex state.
-" Lexer method "skip-word" advances to the next space (via "f skip"),
+" Lexer method "skip-word" advances to the next space
 "     while also counting leading double quotation marks as their own words.
 "   I.e., this advances to the end of the current token
 "     (if currently at a token, otherwise nothing changes).
-" Method "skip-blank" advances to the next non-space (via "t skip"),
+" Method "skip-blank" advances to the next non-space
 "     while also skipping shebangs at the beginning of the first line.
 "   I.e., this advances to the start of the next token
 "     (if one is present, otherwise it advances to the line's end).
@@ -152,7 +150,7 @@ syn match   factorEscape            /\v\\([\\astnrbvf0e\"]|u\x{6}|u\{\S+}|x\x{2}
 syn region  factorString            matchgroup=factorStringDelims         start=/\v<"/                 skip=/\v\\"/ end=/\v"/   contains=factorEscape
 " Removed Factor syntax.
 syn region  factorTriString         matchgroup=factorTriStringDelims      start=/\v<"""/               skip=/\v\\"/ end=/\v"""/ contains=factorEscape
-syn region  factorPrefixedString    matchgroup=factorPrefixedStringDelims start=/\v<[^[:blank:]"]+">/  skip=/\v\\"/ end=/\v"/   contains=factorEscape
+syn region  factorPrefixedString    matchgroup=factorPrefixedStringDelims start=/\v<[^[:blank:]"]+"/   skip=/\v\\"/ end=/\v"/   contains=factorEscape
 
 " Vocabulary: multiline
 " This vocabulary reads the ambient lexer without "parse-raw".
