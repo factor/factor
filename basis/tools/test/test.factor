@@ -191,7 +191,8 @@ SYMBOL: forget-tests?
         ] [ drop ] if
     ] when* ;
 
-: test-vocabs ( vocabs -- ) [ test-vocab ] each ;
+: test-vocabs ( vocabs -- )
+    [ don't-test? ] reject [ test-vocab ] each ;
 
 PRIVATE>
 
@@ -221,20 +222,18 @@ M: test-failure error. ( error -- )
 
 : :test-failures ( -- ) test-failures get errors. ;
 
-: test ( prefix -- )
-    loaded-child-vocab-names [ don't-test? ] reject test-vocabs ;
+: test ( prefix -- ) loaded-child-vocab-names test-vocabs ;
 
 : test-all ( -- ) "" test ;
 
 : test-main ( -- )
-    command-line get dup first "--only" = [
-        V{ } clone swap rest [
-            dup vocab-roots get member?
-            [ "" vocabs-to-load append! ] [ suffix! ] if
-        ] each [ don't-test? ] reject [ require-all ] [ test-vocabs ] bi
-    ] [
-        [ [ load ] [ test ] bi ] each
-    ] if
+    command-line get [
+        dup vocab-roots get member? [
+            "" vocabs-to-load [ require-all ] keep
+        ] [
+            [ load ] [ loaded-child-vocab-names ] bi
+        ] if test-vocabs
+    ] each
     test-failures get empty?
     [ [ "==== FAILING TESTS" print flush :test-failures ] unless ]
     [ 0 1 ? exit ] bi ;
