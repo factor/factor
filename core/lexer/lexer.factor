@@ -51,11 +51,6 @@ ERROR: unexpected want got ;
 : forbid-tab ( c -- c )
     [ CHAR: \t eq? [ "[space]" "[tab]" unexpected ] when ] keep ; inline
 
-: skip ( i seq ? -- n )
-    over length [
-        [ swap forbid-tab CHAR: \s eq? xor ] curry find-from drop
-    ] dip or ; inline
-
 <PRIVATE
 
 : shebang? ( lexer -- lexer ? )
@@ -65,6 +60,14 @@ ERROR: unexpected want got ;
         ] [ f ] if
     ] [ f ] if ; inline
 
+: (skip-blank) ( col line -- newcol )
+    [ [ forbid-tab CHAR: \s eq? not ] find-from drop ]
+    [ length or ] bi ;
+
+: (skip-word) ( col line -- newcol )
+    [ [ forbid-tab " \"" member-eq? ] find-from CHAR: \" eq? [ 1 + ] when ]
+    [ length or ] bi ;
+
 PRIVATE>
 
 GENERIC: skip-blank ( lexer -- )
@@ -73,15 +76,13 @@ M: lexer skip-blank
     shebang? [
         [ nip length ] change-lexer-column
     ] [
-        [ t skip ] change-lexer-column
+        [ (skip-blank) ] change-lexer-column
     ] if ;
 
 GENERIC: skip-word ( lexer -- )
 
 M: lexer skip-word
-    [
-        2dup nth CHAR: \" eq? [ drop 1 + ] [ f skip ] if
-    ] change-lexer-column ;
+    [ (skip-word) ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )
     lexer check-instance [ line>> ] [ text>> length ] bi <= ;
