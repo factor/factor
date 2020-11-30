@@ -76,17 +76,17 @@ PRIVATE>
     [ vocab-articles get at [ check-article ] each ]
     tri ;
 
-: help-lint-vocabs ( vocabs -- ) [ help-lint-vocab ] each ;
+: help-lint-vocabs ( vocabs -- )
+    [
+        auto-use? off
+        group-articles vocab-articles set
+        [ help-lint-vocab ] each
+    ] with-scope ;
 
 PRIVATE>
 
 : help-lint ( prefix -- )
-    [
-        auto-use? off
-        group-articles vocab-articles set
-        loaded-child-vocab-names
-        help-lint-vocabs
-    ] with-scope ;
+    loaded-child-vocab-names help-lint-vocabs ;
 
 : help-lint-all ( -- ) "" help-lint ;
 
@@ -102,14 +102,13 @@ PRIVATE>
     [ predicate? ] reject ;
 
 : test-lint-main ( -- )
-    command-line get dup first "--only" = [
-        V{ } clone swap rest [
-            dup vocab-roots get member?
-            [ "" vocabs-to-load append! ] [ suffix! ] if
-        ] each [ require-all ] [ help-lint-vocabs ] bi
-    ] [
-        [ [ load ] [ help-lint ] bi ] each
-    ] if
+    command-line get [
+        dup vocab-roots get member? [
+            "" vocabs-to-load [ require-all ] keep
+        ] [
+            [ load ] [ loaded-child-vocab-names ] bi
+        ] if help-lint-vocabs
+    ] each
     lint-failures get assoc-empty?
     [ [ "==== FAILING LINT" print :lint-failures flush ] unless ]
     [ 0 1 ? exit ] bi ;
