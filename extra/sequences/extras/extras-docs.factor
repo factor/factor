@@ -269,7 +269,6 @@ HELP: loop>array
 }
 { $description "Call the " { $snippet "quot" } ", which should output an object or " { $snippet "f" } ", and collect the objects in " { $snippet "array" } " until " { $snippet "quot" } " outputs " { $snippet "f" } "." }
 { $examples
-    "Example:"
     { $example "USING: sequences.extras prettyprint io.encodings.binary"
     "io.streams.byte-array io ;"
         "B{ 10 20 30 } binary ["
@@ -286,7 +285,6 @@ HELP: loop>array*
 }
 { $description "Call the " { $snippet "quot" } ", which should output an object and a " { $snippet "bool" } ", and collect the objects in " { $snippet "array" } " until " { $snippet "quot" } " outputs " { $snippet "f" } ". Do collect the last object." }
 { $examples
-    "Example:"
     { $example "USING: sequences.extras prettyprint io.encodings.binary"
                "random random.mersenne-twister kernel math ;"
     "123 <mersenne-twister> ["
@@ -305,7 +303,6 @@ HELP: loop>array**
 }
 { $description "Call the " { $snippet "quot" } ", which should output an object and a " { $snippet "bool" } ", and collect the objects in " { $snippet "array" } " until " { $snippet "quot" } " outputs " { $snippet "f" } ". Do not collect the last object." }
 { $examples
-    "Example:"
     { $example "USING: sequences.extras prettyprint io.encodings.binary"
                "random random.mersenne-twister kernel math ;"
     "123 <mersenne-twister> ["
@@ -325,17 +322,12 @@ HELP: loop>sequence
 }
 { $description "Call " { $snippet "quot" } ", which should output an object or " { $snippet "f" } ", and collect the objects in " { $snippet "seq" } " of type " { $snippet "exemplar" } " until " { $snippet "quot" } " outputs " { $snippet "f" } "." }
 { $examples
-    "Example:"
     { $example "USING: sequences.extras prettyprint io.encodings.binary"
-               "random random.mersenne-twister kernel math ;"
-    "! Get random numbers until one of them is greater than 5"
-    "! but also output the last number"
-    "123 <mersenne-twister> ["
-    "   ["
-    "      10 random dup 5 >"
-    "   ] loop>array*"
-    "] with-random ."
-    "{ 6 7 2 }"
+    "io.streams.byte-array io ;"
+        "B{ 10 20 30 } binary ["
+        "   [ read1 ] V{ } loop>sequence"
+        "] with-byte-reader ."
+        "V{ 10 20 30 }"
     }
 } ;
 
@@ -346,7 +338,6 @@ HELP: loop>sequence*
 }
 { $description "Call " { $snippet "quot" } ", which should output an object and a " { $snippet "bool" } ", and collect the objects in " { $snippet "seq" } " of type " { $snippet "exemplar" } " until " { $snippet "quot" } " outputs " { $snippet "f" } ". Do collect the last object." }
 { $examples
-    "Example:"
     { $example "USING: sequences.extras prettyprint io.encodings.binary"
                "random random.mersenne-twister kernel math ;"
     "! Get random numbers until one of them is greater than 5"
@@ -367,7 +358,6 @@ HELP: loop>sequence**
 }
 { $description "Call " { $snippet "quot" } ", which should output an object and a " { $snippet "bool" } ", and collect the objects in " { $snippet "seq" } " of type " { $snippet "exemplar" } " until " { $snippet "quot" } " outputs " { $snippet "f" } ". Do not collect the last object." }
 { $examples
-    "Example:"
     { $example "USING: sequences.extras prettyprint io.encodings.binary"
                "random random.mersenne-twister kernel math ;"
     "! Get random numbers until one of them is greater than 5"
