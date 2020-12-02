@@ -21,7 +21,7 @@ IN: mason.test
 : load-failures. ( failures -- ) [ load-error. nl ] each ;
 
 : require-all-no-restarts ( vocabs -- failures )
-    V{ } clone blacklist [
+    V{ } clone errorlist [
         V{ } clone [
             '[
                 [ require ]
