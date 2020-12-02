@@ -17,24 +17,31 @@ inline cell log2(cell x) {
   asm("bsr %1, %0;" : "=r"(n) : "r"(x));
 #endif
 
+#elif defined(FACTOR_ARM)
+#if defined(_MSC_VER)
+  _BitScanReverse((unsigned long*)&n, x);
+#else
+  n = (31 - __builtin_clz(x));
+#endif
+
 #elif defined(FACTOR_ARM64)
 #if defined(_MSC_VER)
   n = 0;
   _BitScanReverse64((unsigned long*)&n, x);
 #else
-  asm("bsr %1, %0;" : "=r"(n) : "r"(x));
-#endif
-
-#elif defined(FACTOR_PPC64)
-#if defined(__GNUC__)
   n = (63 - __builtin_clzll(x));
-#else
-#error Unsupported compiler
 #endif
 
 #elif defined(FACTOR_PPC32)
 #if defined(__GNUC__)
   n = (31 - __builtin_clz(x));
+#else
+#error Unsupported compiler
+#endif
+
+#elif defined(FACTOR_PPC64)
+#if defined(__GNUC__)
+  n = (63 - __builtin_clzll(x));
 #else
 #error Unsupported compiler
 #endif
