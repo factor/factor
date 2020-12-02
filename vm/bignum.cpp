@@ -1723,7 +1723,8 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
   data_root<bignum> a(a_, this);
   data_root<bignum> b(b_, this);
   bignum_twodigit_type x, y, q, s, t, A, B, C, D;
-  int nbits, k;
+  unsigned long nbits;
+  int k;
   bignum_length_type size_a, size_b, size_c;
   bignum_digit_type* scan_a, *scan_b, *scan_c, *scan_d;
   bignum_digit_type* a_end, *b_end, *c_end;
