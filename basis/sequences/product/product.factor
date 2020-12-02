@@ -81,7 +81,7 @@ M: product-sequence nth
 
 :: product-find ( ... sequences quot: ( ... seq -- ... ? ) -- ... sequence )
     sequences start-product-iter :> ( ns lengths )
-    lengths [ 0 = ] any? [
+    lengths [ 0 = ] any? [ f ] [
         f [ ns lengths end-product-iter? over or ]
         [ drop ns sequences nths quot keep and ns lengths product-iter ] until
-    ] unless ; inline
+    ] if ; inline
