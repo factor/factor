@@ -238,10 +238,10 @@ void factor_vm::primitive_format_float() {
     localized_stream << std::setfill(fill[0]);
   }
   if (width >= 0) {
-    localized_stream << std::setw(width);
+    localized_stream << std::setw(static_cast<int>(width));
   }
   if (precision >= 0) {
-    localized_stream << std::setprecision(precision);
+    localized_stream << std::setprecision(static_cast<int>(precision));
   }
   localized_stream << value;
   const std::string& tmp = localized_stream.str();
