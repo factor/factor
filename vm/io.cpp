@@ -109,7 +109,7 @@ size_t factor_vm::safe_fwrite(void* ptr, size_t size, size_t nitems,
   return items_written;
 }
 
-int factor_vm::safe_ftell(FILE* stream) {
+off_t factor_vm::safe_ftell(FILE* stream) {
   off_t offset;
   for (;;) {
     if ((offset = FTELL(stream)) == -1)
