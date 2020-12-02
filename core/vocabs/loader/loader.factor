@@ -135,15 +135,12 @@ PRIVATE>
         "To define one, refer to \\ MAIN: help" print
     ] ?if ;
 
-SYMBOL: blacklist
-
-: require-all ( vocabs -- )
-    V{ } clone blacklist [ [ require ] each ] with-variable ;
-
 <PRIVATE
 
-: add-to-blacklist ( error vocab -- )
-    vocab-name blacklist get [ set-at ] [ 2drop ] if* ;
+SYMBOL: errorlist
+
+: add-to-errorlist ( error vocab -- )
+    vocab-name errorlist get [ set-at ] [ 2drop ] if* ;
 
 GENERIC: (require) ( name -- )
 
@@ -154,7 +151,7 @@ M: vocab (require)
             dup docs-loaded?>> [ dup load-docs ] unless
             drop
         ] if
-    ] [ [ swap add-to-blacklist ] keep rethrow ] recover ;
+    ] [ [ swap add-to-errorlist ] keep rethrow ] recover ;
 
 M: vocab-link (require)
     vocab-name (require) ;
@@ -165,8 +162,11 @@ M: string (require)
 
 PRIVATE>
 
+: require-all ( vocabs -- )
+    V{ } clone errorlist [ [ require ] each ] with-variable ;
+
 [
-    dup vocab-name blacklist get at*
+    dup vocab-name errorlist get at*
     [ rethrow ]
     [
         drop dup find-vocab-root
