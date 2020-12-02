@@ -300,8 +300,6 @@ M: f hashcode* 2drop 31337 ; inline
 
 : hashcode ( obj -- code ) 3 swap hashcode* ; inline
 
-IN: kernel
-
 : recursive-hashcode ( n obj quot -- code )
     pick 0 <= [ 3drop 0 ] [ [ 1 - ] 2dip call ] if ; inline
 
