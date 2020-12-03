@@ -135,9 +135,9 @@ PRIVATE>
         "To define one, refer to \\ MAIN: help" print
     ] ?if ;
 
-<PRIVATE
-
 SYMBOL: errorlist
+
+<PRIVATE
 
 : add-to-errorlist ( error vocab -- )
     vocab-name errorlist get [ set-at ] [ 2drop ] if* ;
