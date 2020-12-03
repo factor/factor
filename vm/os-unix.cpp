@@ -86,8 +86,13 @@ segment::segment(cell size_, bool executable_p) {
     prot = PROT_READ | PROT_WRITE;
 
   cell alloc_size = 2 * pagesize + size;
+#if defined(__APPLE__) && defined(FACTOR_ARM64)  // FIXME: could be in header file
+  char* array = (char*)mmap(NULL, alloc_size, prot,
+                            MAP_ANON | MAP_PRIVATE | MAP_JIT, -1, 0);
+#else
   char* array = (char*)mmap(NULL, alloc_size, prot,
                             MAP_ANON | MAP_PRIVATE, -1, 0);
+#endif
 
   if (array == (char*)-1)
     fatal_error("Out of memory in mmap", alloc_size);
