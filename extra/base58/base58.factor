@@ -1,8 +1,8 @@
 ! Copyright (C) 2020 John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: base64.private byte-arrays io.binary kernel
-kernel.private literals math sequences ;
+USING: base64.private byte-arrays checksums checksums.sha
+io.binary kernel kernel.private literals math sequences ;
 
 IN: base58
 
@@ -42,3 +42,16 @@ PRIVATE>
     [ dup zero? ] [ 256 /mod accum push ] until drop
     i [ 0 accum push ] times
     accum reverse! B{ } like ;
+
+<PRIVATE
+
+: base58-check ( base58 -- base58-check )
+    2 [ sha-256 checksum-bytes ] times ;
+
+PRIVATE>
+
+: >base58-check ( seq -- base58-check )
+    dup base58-check 4 head-slice append >base58 ;
+
+: base58-check> ( base58-check -- seq )
+    base58> 4 cut* [ dup base58-check 4 head-slice ] [ assert-sequence= ] bi* ;
