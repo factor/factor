@@ -223,7 +223,7 @@ macosx.app: factor
 	mkdir -p $(BUNDLE)/Contents/MacOS
 	mkdir -p $(BUNDLE)/Contents/Frameworks
 	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
-	ln -s Factor.app/Contents/MacOS/factor ./factor
+	ln -s $(BUNDLE)/Contents/MacOS/factor ./factor
 
 $(ENGINE): $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(DLL_OBJS)
