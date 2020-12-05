@@ -5,13 +5,7 @@ namespace factor {
 // void c_to_factor(cell quot);
 // void lazy_jit_compile(cell quot);
 
-static const fixnum xt_tail_pic_offset = 4 + 1; // or 4 or whatever else...
-
-
-static const unsigned char call_opcode = 0xe8; // omg, these are x86 values
-static const unsigned char jmp_opcode = 0xe9; // omg
-
-static const unsigned SIGNAL_HANDLER_STACK_FRAME_SIZE = 64; // omg
+// static const fixnum xt_tail_pic_offset = 4 + 1; // or 4 or whatever else...
 
 
 // omg
