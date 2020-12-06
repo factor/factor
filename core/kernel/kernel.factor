@@ -163,13 +163,13 @@ DEFER: if
 : 4keep ( ..a w x y z quot: ( ..a w x y z -- ..b ) -- ..b w x y z )
     [ 4dup ] dip 4dip ; inline
 
-: keepd ( ..a x y quot: ( ..a x y -- ..b x ) -- ..b x )
+: keepd ( ..a x y quot: ( ..a x y -- ..b ) -- ..b x )
     2keep drop ; inline
 
-: keepdd ( ..a x y z quot: ( ..a x y z -- ..b x ) -- ..b x )
+: keepdd ( ..a x y z quot: ( ..a x y z -- ..b ) -- ..b x )
     3keep 2drop ; inline
 
-: 2keepd ( ..a x y z quot: ( ..a x y z -- ..b x y ) -- ..b x y )
+: 2keepd ( ..a x y z quot: ( ..a x y z -- ..b ) -- ..b x y )
     3keep drop ; inline
 
 ! Cleavers
