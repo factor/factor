@@ -30,7 +30,7 @@ PRIVATE>
     BV{ } clone :> accum
     seq [ zero? not ] find [ drop seq length ] unless :> i
     seq i tail-slice be>
-    [ dup zero? ] [ 58 /mod ch>base58 accum push ] until drop
+    [ 58 /mod ch>base58 accum push ] until-zero
     i alphabet first '[ _ accum push ] times
     accum reverse! B{ } like ;
 
@@ -39,7 +39,7 @@ PRIVATE>
     base58 alphabet first '[ _ = not ] find
     [ drop base58 length ] unless :> i
     0 base58 [ [ 58 * ] dip base58>ch + ] i each-from
-    [ dup zero? ] [ 256 /mod accum push ] until drop
+    [ 256 /mod accum push ] until-zero
     i [ 0 accum push ] times
     accum reverse! B{ } like ;
 
