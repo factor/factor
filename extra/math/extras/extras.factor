@@ -161,9 +161,6 @@ PRIVATE>
 : sinc ( x -- y )
     [ 1 ] [ pi * [ sin ] [ / ] bi ] if-zero ;
 
-: until-zero ( n quot -- )
-    [ dup zero? ] swap until drop ; inline
-
 : cum-reduce ( seq identity quot: ( prev elt -- next ) -- result cum-result )
     [ dup rot ] dip dup '[ _ curry dip dupd @ ] each ; inline
 
