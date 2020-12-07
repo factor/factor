@@ -321,6 +321,8 @@ HELP: until-zero
     }
 } ;
 
+{ if-zero when-zero unless-zero until-zero } related-words
+
 HELP: times
 { $values { "n" integer } { "quot" quotation } }
 { $description "Calls the quotation " { $snippet "n" } " times." }
