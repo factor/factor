@@ -123,7 +123,7 @@ DEFER: (parse-string)
         dup current-char forbid-tab {
             { CHAR: \s [ advance-char ] }
             { f [ drop ] }
-            [ "[space]" swap 1string unexpected ]
+            [ "[space]" swap 1string "'" dup surround unexpected ]
         } case drop
     ] if ;
  
@@ -138,7 +138,7 @@ DEFER: (parse-string)
             (parse-string)
         ] if*
     ] [
-        "\"" "[eof]" unexpected
+        "'\"'" "[eof]" unexpected
     ] if ;
 
 PRIVATE>
