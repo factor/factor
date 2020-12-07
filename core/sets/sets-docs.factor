@@ -198,9 +198,9 @@ HELP: set=
 
 HELP: gather
 { $values
-     { "seq" sequence } { "quot" quotation }
+     { "seq" sequence } { "quot" { $quotation ( ... elt -- ... elts ) } }
      { "newseq" sequence } }
-{ $description "Maps a quotation onto a sequence, concatenates the results of the mapping, and removes duplicates." } ;
+{ $description "Maps a quotation over a sequence, concatenates the results of the mapping, and removes duplicates." } ;
 
 HELP: set-like
 { $values { "set" set } { "exemplar" set } { "set'" set } }

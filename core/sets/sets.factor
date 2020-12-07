@@ -141,7 +141,7 @@ M: sequence clear-set
 : refine ( sets -- set/f )
     [ f ] [ [ ] [ intersect ] map-reduce ] if-empty ;
 
-: gather ( ... seq quot: ( ... elt -- ... elt' ) -- ... newseq )
+: gather ( ... seq quot: ( ... elt -- ... elts ) -- ... newseq )
     map concat members ; inline
 
 : adjoin-at ( value key assoc -- )
