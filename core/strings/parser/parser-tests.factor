@@ -1,4 +1,4 @@
-USING: accessors kernel eval strings.parser tools.test ;
+USING: accessors eval kernel lexer strings.parser tools.test ;
 
 { "Hello\n\rworld" } [ "Hello\\n\\rworld" unescape-string ] unit-test
 
@@ -14,11 +14,10 @@ USING: accessors kernel eval strings.parser tools.test ;
 { "foobarbaz" } [ "\"foo\\\nbar\\\r\nbaz\"" eval( -- obj ) ] unit-test
 
 { "\"abc\"" } [ "\"\\\"abc\\\"\"" eval( -- string ) ] unit-test
-[ "\"" eval( -- string ) ] [ error>> "Unterminated string" = ] must-fail-with
-[ "\"abc" eval( -- string ) ] [ error>> "Unterminated string" = ] must-fail-with
-[ "\"abc\n\n" eval( -- string ) ] [ error>> "Unterminated string" = ] must-fail-with
-
-[ "\"hello\"length" eval( -- string ) ] [ error>> "Invalid string" = ] must-fail-with
+[ "\"" eval( -- string ) ] [ error>> unexpected? ] must-fail-with
+[ "\"abc" eval( -- string ) ] [ error>> unexpected? ] must-fail-with
+[ "\"abc\n\n" eval( -- string ) ] [ error>> unexpected? ] must-fail-with
+[ "\"hello\"length" eval( -- string ) ] [ error>> unexpected? ] must-fail-with
 
 { "\"\\" } [ "\"\\" ] unit-test
 
