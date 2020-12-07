@@ -138,9 +138,6 @@ M: sequence clear-set
     [ [ [ ?members ] map concat ] [ first ] bi set-like ]
     if-empty ;
 
-: intersection ( sets -- set/f )
-    [ f ] [ [ ] [ intersect ] map-reduce ] if-empty ;
-
 : refine ( sets -- set/f )
     [ f ] [ [ ] [ intersect ] map-reduce ] if-empty ;
 

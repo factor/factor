@@ -43,6 +43,11 @@ ARTICLE: "set-operations" "Operations on sets"
     subset?
     set=
 }
+"Operations on groups of sets:"
+{ $subsections
+    combine
+    refine
+}
 "An optional generic word for creating sets of the same class as a given set:"
 { $subsections set-like }
 "An optional generic word for creating a set with a fast lookup operation, if the set itself has a slow lookup operation:"
@@ -153,10 +158,6 @@ HELP: intersect
     { $example "USING: sets prettyprint ;" "{ 1 2 3 } { 2 3 4 } intersect ." "{ 2 3 }" }
 } ;
 
-HELP: intersection
-{ $values { "sets" sequence } { "set/f" { $maybe set } } }
-{ $description "Outputs the intersection of all the sets of the sequence " { $snippet "sets" } ", or " { $link f } " if " { $snippet "sets" } " is empty." } ;
-
 HELP: union
 { $values { "set1" set } { "set2" set } { "set" set } }
 { $description "Outputs a set consisting of elements present in either " { $snippet "set1" } " or " { $snippet "set2" } " which does not contain duplicate values." $nl "This word has a default definition which works for all sets, but set implementations may override the default for efficiency." }
@@ -224,10 +225,10 @@ HELP: cardinality
 { $values { "set" set } { "n" "a non-negative integer" } }
 { $description "Returns the number of elements in the set. All sets support this operation." } ;
 
+HELP: refine
+{ $values { "sets" sequence } { "set/f" { $maybe set } } }
+{ $description "Outputs the intersection of all the sets of the sequence " { $snippet "sets" } ", or " { $link f } " if " { $snippet "sets" } " is empty." } ;
+
 HELP: combine
 { $values { "sets" { $sequence set } } { "set/f" { $maybe set } } }
 { $description "Outputs the union of a sequence of sets, or " { $link f } " if the sequence is empty." } ;
-
-HELP: refine
-{ $values { "sets" { $sequence set } } { "set/f" { $maybe set } } }
-{ $description "Outputs the intersection of a sequence of sets, or " { $link f } " if the sequence is empty." } ;
