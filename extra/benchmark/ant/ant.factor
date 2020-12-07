@@ -21,7 +21,7 @@ IN: benchmark.ant
 ! including (1000, 1000) itself?
 
 : sum-digits ( n -- x )
-    0 swap [ dup zero? ] [ 10 /mod swap [ + ] dip ] until drop ;
+    0 swap [ 10 /mod swap [ + ] dip ] until-zero ;
 
 TUPLE: point x y ;
 C: <point> point

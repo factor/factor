@@ -88,11 +88,10 @@ TUPLE: float-parse
     [ store-exponent ] [ drop f ] if* ; inline
 
 : pow-until ( base x -- base^x )
-    [ 1 ] 2dip
-    [ dup zero? ] [
+    [ 1 ] 2dip [
         dup odd? [ [ [ * ] keep ] [ 1 - ] bi* ] when
         [ sq ] [ 2/ ] bi*
-    ] until 2drop ; inline
+    ] until-zero drop ; inline
 
 : (pow) ( base x -- base^x )
     integer>fixnum-strict
