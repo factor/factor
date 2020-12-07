@@ -232,6 +232,7 @@ HELP: same?
 HELP: execute
 { $values { "word" word } }
 { $description "Executes a word. Words which " { $link execute } " an input parameter must be declared " { $link POSTPONE: inline } " so that a caller which passes in a literal word can have a static stack effect." }
+{ $notes "To execute a non-literal word, you can use " { $link POSTPONE: execute( } " to check the stack effect before calling at runtime." }
 { $examples
     { $example "USING: kernel io words ;" "IN: scratchpad" ": twice ( word -- ) dup execute execute ; inline\n: hello ( -- ) \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
 } ;
@@ -246,6 +247,7 @@ HELP: (execute)
 HELP: call
 { $values { "callable" callable } }
 { $description "Calls a quotation. Words which " { $link call } " an input parameter must be declared " { $link POSTPONE: inline } " so that a caller which passes in a literal quotation can have a static stack effect." }
+{ $notes "To call a non-literal quotation you can use " { $link POSTPONE: call( } " to check the stack effect before calling at runtime." }
 { $examples
     "The following two lines are equivalent:"
     { $code "2 [ 2 + 3 * ] call" "2 2 + 3 *" }
