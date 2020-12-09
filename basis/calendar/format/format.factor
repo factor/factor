@@ -168,10 +168,11 @@ ALIAS: timestamp>rfc822 timestamp>rfc2822
 : timestamp>cookie-string ( timestamp -- str )
     >gmt timestamp>rfc1036 ;
 
+: write-timestamp ( timestamp -- )
+    { DAY ", " D " " MONTH " " YYYY " " hh ":" mm ":" ss } formatted ;
+
 : timestamp>string ( timestamp -- str )
-    [
-        { DAY ", " D " " MONTH " " YYYY " " hh ":" mm ":" ss } formatted
-    ] with-string-writer ;
+    [ write-timestamp ] with-string-writer ;
 
 M: timestamp present timestamp>string ;
 
