@@ -136,7 +136,7 @@ CONSTRUCTOR: <tree> tree ( -- obj ) ;
     last2
     [ string>number unix-time>timestamp ]
     [ gmt-offset>duration [ time+ ] [ >>gmt-offset ] bi ] bi*
-    timestamp>git-time ;
+    timestamp>git-string ;
 
 : commit. ( commit -- )
     {
