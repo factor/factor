@@ -1,9 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays calendar calendar.english combinators
-fry io io.streams.string kernel macros math math.order
-math.parser math.parser.private present quotations sequences
-typed words ;
+USING: accessors arrays calendar calendar.english combinators io
+io.streams.string kernel math math.parser math.parser.private
+present quotations sequences words ;
 IN: calendar.format
 
 MACRO: formatted ( spec -- quot )
@@ -15,40 +14,46 @@ MACRO: formatted ( spec -- quot )
         } cond
     ] map [ cleave ] curry ;
 
-: formatted>string ( spec -- string )
-    '[ _ formatted ] with-string-writer ; inline
-
 : pad-00 ( n -- str ) number>string 2 CHAR: 0 pad-head ;
 
 : pad-0000 ( n -- str ) number>string 4 CHAR: 0 pad-head ;
-
-: pad-00000 ( n -- str ) number>string 5 CHAR: 0 pad-head ;
 
 : write-00 ( n -- ) pad-00 write ;
 
 : write-0000 ( n -- ) pad-0000 write ;
 
-: write-00000 ( n -- ) pad-00000 write ;
+: hh ( timestamp -- ) hour>> write-00 ;
 
-: hh ( time -- ) hour>> write-00 ;
+: mm ( timestamp -- ) minute>> write-00 ;
 
-: mm ( time -- ) minute>> write-00 ;
+: ss ( timestamp -- ) second>> >integer write-00 ;
 
-: ss ( time -- ) second>> >integer write-00 ;
+! Should be enough for anyone, allows to not do a fancy
+! algorithm to detect infinite decimals (e.g 1/3)
+: ss.SSSSSS ( timestamp -- )
+    second>> >float "0" 9 6 "f" "C" format-float write ;
 
-: D ( time -- ) day>> number>string write ;
+: hhmm ( timestamp -- ) [ hh ] [ mm ] bi ;
 
-: DD ( time -- ) day>> write-00 ;
+: hh:mm ( timestamp -- ) { hh ":" mm } formatted ;
 
-: DAY ( time -- ) day-of-week day-abbreviation3 write ;
+: hh:mm:ss ( timestamp -- ) { hh ":" mm ":" ss } formatted ;
 
-: MM ( time -- ) month>> write-00 ;
+: hh:mm:ss.SSSSSS ( timestamp -- ) { hh ":" mm ":" ss.SSSSSS } formatted ;
 
-: MONTH ( time -- ) month>> month-abbreviation write ;
+: D ( timestamp -- ) day>> number>string write ;
 
-: YYYY ( time -- ) year>> write-0000 ;
+: DD ( timestamp -- ) day>> write-00 ;
 
-: YYYYY ( time -- ) year>> write-00000 ;
+: DAY ( timestamp -- ) day-of-week day-abbreviation3 write ;
+
+: MM ( timestamp -- ) month>> write-00 ;
+
+: MONTH ( timestamp -- ) month>> month-abbreviation write ;
+
+: YYYY ( timestamp -- ) year>> write-0000 ;
+
+: YYYY-MM-DD ( timestamp -- ) { YYYY "-" MM "-" DD } formatted ;
 
 GENERIC: day. ( obj -- )
 
@@ -84,139 +89,100 @@ M: timestamp year. year>> year. ;
 : timestamp>mdtm ( timestamp -- str )
     [ { YYYY MM DD hh mm ss } formatted ] with-string-writer ;
 
-: (timestamp>string) ( timestamp -- )
-    { DAY ", " D " " MONTH " " YYYY " " hh ":" mm ":" ss } formatted ;
+: timestamp>ymd ( timestamp -- str )
+    [ YYYY-MM-DD ] with-string-writer ;
 
-: timestamp>string ( timestamp -- str )
-    [ (timestamp>string) ] with-string-writer ;
+: timestamp>hms ( timestamp -- str )
+    [ hh:mm:ss ] with-string-writer ;
 
-: write-hhmm ( duration -- )
-    [ hh ] [ mm ] bi ;
+: timestamp>ymdhms ( timestamp -- str )
+    [ >gmt YYYY-MM-DD " " hh:mm:ss ] with-string-writer ;
+
+: write-gmt-offset-hhmm ( gmt-offset -- )
+    [ hour>> dup 0 < "-" "+" ? write abs write-00 ] [ mm ] bi ;
+
+: write-gmt-offset-hh:mm ( gmt-offset -- )
+    [ hour>> dup 0 < "-" "+" ? write abs write-00 ":" write ] [ mm ] bi ;
 
 : write-gmt-offset ( gmt-offset -- )
-    dup instant <=> {
-        { +eq+ [ drop "GMT" write ] }
-        { +lt+ [ "-" write before write-hhmm ] }
-        { +gt+ [ "+" write write-hhmm ] }
-    } case ;
+    dup instant = [ drop "GMT" write ] [ write-gmt-offset-hhmm ] if ;
 
-: write-gmt-offset-number ( gmt-offset -- )
-    dup instant <=> {
-        { +eq+ [ drop "+0000" write ] }
-        { +lt+ [ "-" write before write-hhmm ] }
-        { +gt+ [ "+" write write-hhmm ] }
-    } case ;
+: write-gmt-offset-z ( gmt-offset -- )
+    dup instant = [ drop "Z" write ] [ write-gmt-offset-hh:mm ] if ;
 
-: timestamp>rfc822 ( timestamp -- str )
-    ! RFC822 timestamp format
-    ! Example: Tue, 15 Nov 1994 08:12:31 +0200
-    [
-        [ (timestamp>string) bl ]
-        [ gmt-offset>> write-gmt-offset ]
-        bi
-    ] with-string-writer ;
-
-: timestamp>git-time ( timestamp -- str )
-    [
-        [ { DAY " " MONTH " " D " " hh ":" mm ":" ss " " YYYY " " } formatted ]
-        [ gmt-offset>> write-gmt-offset-number ] bi
-    ] with-string-writer ;
-
-: timestamp>http-string ( timestamp -- str )
-    ! http timestamp format
-    ! Example: Tue, 15 Nov 1994 08:12:31 GMT
-    >gmt timestamp>rfc822 ;
-
-: (timestamp>cookie-string) ( timestamp -- )
-    >gmt
-    { DAY ", " DD "-" MONTH "-" YYYY " " hh ":" mm ":" ss " GMT" } formatted ;
-
-: timestamp>cookie-string ( timestamp -- str )
-    [ (timestamp>cookie-string) ] with-string-writer ;
-
-: (write-rfc3339-gmt-offset) ( duration -- )
-    [ hh ":" write ] [ mm ] bi ;
-
-: write-rfc3339-gmt-offset ( duration -- )
-    dup instant <=> {
-        { +eq+ [ drop "Z" write ] }
-        { +lt+ [ "-" write before (write-rfc3339-gmt-offset) ] }
-        { +gt+ [ "+" write (write-rfc3339-gmt-offset) ] }
-    } case ;
-
-! Should be enough for anyone, allows to not do a fancy
-! algorithm to detect infinite decimals (e.g 1/3)
-: ss.SSSSSS ( timestamp -- )
-    second>> >float "0" 9 6 "f" "C" format-float write ;
-
-: (timestamp>rfc3339) ( timestamp -- )
+: write-rfc1036 ( timestamp -- )
     {
-        YYYY "-" MM "-" DD "T" hh ":" mm ":" ss.SSSSSS
-        [ gmt-offset>> write-rfc3339-gmt-offset ]
+        DAY ", " DD "-" MONTH "-" YYYY " " hh ":" mm ":" ss " "
+        [ gmt-offset>> write-gmt-offset ]
     } formatted ;
 
-: timestamp>rfc3339 ( timestamp -- str )
-    [ (timestamp>rfc3339) ] with-string-writer ;
+: timestamp>rfc1036 ( timestamp -- str )
+    [ write-rfc1036 ] with-string-writer ;
 
-: (write-rfc2822-gmt-offset) ( duration -- )
-    [ hh ":" write ] [ mm ] bi ;
+! RFC850 obsoleted by RFC1036
+ALIAS: write-rfc850 write-rfc1036
+ALIAS: timestamp>rfc850 timestamp>rfc1036
 
-: write-rfc2822-gmt-offset ( duration -- )
-    dup instant <=> {
-        { +lt+ [ "-" write before (write-rfc2822-gmt-offset) ] }
-        { +gt+ [ "+" write (write-rfc2822-gmt-offset) ] }
-        { +eq+ [ "+" write (write-rfc2822-gmt-offset) ] }
-    } case ;
-
-: (timestamp>rfc2822) ( timestamp -- )
+: write-rfc2822 ( timestamp -- )
     {
-        DAY ", " DD " " MONTH " " YYYY " " hh ":" mm ":" ss " "
-        [ gmt-offset>> write-rfc2822-gmt-offset ]
+        DAY ", " D " " MONTH " " YYYY " " hh ":" mm ":" ss " "
+        [ gmt-offset>> write-gmt-offset ]
     } formatted ;
 
 : timestamp>rfc2822 ( timestamp -- str )
-    [ (timestamp>rfc2822) ] with-string-writer ;
+    [ write-rfc2822 ] with-string-writer ;
 
-: (timestamp>ymd) ( timestamp -- )
-    { YYYY "-" MM "-" DD } formatted ;
+! RFC822 obsoleted by RFC2822
+ALIAS: write-rfc822 write-rfc2822
+ALIAS: timestamp>rfc822 timestamp>rfc2822
 
-TYPED: timestamp>ymd ( timestamp: timestamp -- str )
-    [ (timestamp>ymd) ] with-string-writer ;
+: write-rfc3339 ( timestamp -- )
+    {
+        YYYY "-" MM "-" DD "T" hh ":" mm ":" ss.SSSSSS
+        [ gmt-offset>> write-gmt-offset-z ]
+    } formatted ;
 
-: (timestamp>hms) ( timestamp -- )
-    { hh ":" mm ":" ss } formatted ;
+: timestamp>rfc3339 ( timestamp -- str )
+    [ write-rfc3339 ] with-string-writer ;
 
-TYPED: timestamp>hms ( timestamp: timestamp -- str )
-    [ (timestamp>hms) ] with-string-writer ;
+: write-iso8601 ( timestamp -- )
+    {
+        YYYY "-" MM "-" DD "T" hh ":" mm ":" ss.SSSSSS
+        [ gmt-offset>> write-gmt-offset-hh:mm ]
+    } formatted ;
 
-TYPED: timestamp>ymdhms ( timestamp: timestamp -- str )
-    [
-        >gmt
-        { (timestamp>ymd) " " (timestamp>hms) } formatted
-    ] with-string-writer ;
+: timestamp>iso8601 ( timestamp -- str )
+    [ write-iso8601 ] with-string-writer ;
 
-: file-time-string ( timestamp -- string )
+: timestamp>git-string ( timestamp -- str )
     [
         {
-            MONTH " " DD " "
-            [
-                dup now [ year>> ] same?
-                [ [ hh ":" write ] [ mm ] bi ] [ YYYYY ] if
-            ]
+            DAY " " MONTH " " D " " hh ":" mm ":" ss " " YYYY " "
+            [ gmt-offset>> write-gmt-offset-hhmm ]
         } formatted
+    ] with-string-writer ;
+
+: timestamp>http-string ( timestamp -- str )
+    >gmt timestamp>rfc2822 ;
+
+: timestamp>cookie-string ( timestamp -- str )
+    >gmt timestamp>rfc1036 ;
+
+: timestamp>string ( timestamp -- str )
+    [
+        { DAY ", " D " " MONTH " " YYYY " " hh ":" mm ":" ss } formatted
     ] with-string-writer ;
 
 M: timestamp present timestamp>string ;
 
-! Duration formatting
-TYPED: duration>hm ( duration: duration -- str )
+: duration>hm ( duration -- str )
     [ duration>hours >integer 24 mod pad-00 ]
     [ duration>minutes >integer 60 mod pad-00 ] bi ":" glue ;
 
-TYPED: duration>hms ( duration: duration -- str )
+: duration>hms ( duration -- str )
     [ duration>hm ] [ second>> >integer 60 mod pad-00 ] bi ":" glue ;
 
-TYPED: duration>human-readable ( duration: duration -- string )
+: duration>human-readable ( duration -- string )
     [
         [
             duration>years >integer
