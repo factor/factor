@@ -1,8 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar calendar.english combinators
-formatting io io.streams.string kernel make math math.parser
-math.parser.private present quotations sequences words ;
+formatting grouping io io.streams.string kernel make math
+math.order math.parser math.parser.private math.ranges present
+quotations sequences splitting strings words ;
 IN: calendar.format
 
 MACRO: formatted ( spec -- quot )
@@ -63,18 +64,29 @@ M: integer day.
 M: timestamp day.
     day>> day. ;
 
+<PRIVATE
+
+: center. ( str n -- )
+    over length [-] 2/ CHAR: \s <string> write print ;
+
+: month-header. ( year month -- )
+    [ number>string ] [ month-name ] bi* swap " " glue 20 center. ;
+
+: days-header. ( -- )
+    day-abbreviations2 " " join print ;
+
+: days. ( year month -- )
+    [ 1 zeller-congruence dup [ "   " write ] times ]
+    [ (days-in-month) ] 2bi [1,b] [
+        [ day. ] [ + 7 mod zero? [ nl ] [ bl ] if ] bi
+    ] with each nl ;
+
+PRIVATE>
+
 GENERIC: month. ( obj -- )
 
 M: array month.
-    first2
-    [ month-name write bl number>string print ]
-    [ 1 zeller-congruence ]
-    [ (days-in-month) day-abbreviations2 " " join print ] 2tri
-    over "   " <repetition> "" concat-as write
-    [
-        [ 1 + day. ] keep
-        1 + + 7 mod zero? [ nl ] [ bl ] if
-    ] with each-integer nl ;
+    first2 [ month-header. ] [ days-header. days. ] 2bi ;
 
 M: timestamp month.
     [ year>> ] [ month>> ] bi 2array month. ;
@@ -82,7 +94,13 @@ M: timestamp month.
 GENERIC: year. ( obj -- )
 
 M: integer year.
-    12 [ 1 + 2array month. nl ] with each-integer ;
+    dup number>string 64 center. nl 12 [1,b] [
+        [
+            [ month-name 20 center. ]
+            [ days-header. days. nl nl ] bi
+        ] with-string-writer string-lines
+    ] with map 3 <groups>
+    [ first3 [ "%-20s  %-20s  %-20s\n" printf ] 3each ] each ;
 
 M: timestamp year. year>> year. ;
 
