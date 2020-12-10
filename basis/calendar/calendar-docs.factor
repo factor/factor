@@ -141,7 +141,7 @@ HELP: leap-year?
 } ;
 
 HELP: time+
-{ $values { "time1" "timestamp or duration" } { "time2" "timestamp or duration" } { "time3" "timestamp or duration" } }
+{ $values { "time1" { $or timestamp duration } } { "time2" { $or timestamp duration } } { "time3" { $or timestamp duration } } }
 { $description "Adds two durations to produce a duration or adds a timestamp and a duration to produce a timestamp. The calculation takes timezones into account." }
 { $examples
     { $example "USING: calendar math.order prettyprint ;"
@@ -246,7 +246,7 @@ HELP: duration>nanoseconds
 
 
 HELP: time-
-{ $values { "time1" "timestamp or duration" } { "time2" "timestamp or duration" } { "time3" "timestamp or duration" } }
+{ $values { "time1" { $or timestamp duration } } { "time2" { $or timestamp duration } } { "time3" { $or timestamp duration } } }
 { $description "Subtracts two durations to produce a duration or subtracts a duration from a timestamp to produce a timestamp. The calculation takes timezones into account." }
 { $examples
     { $example "USING: calendar math.order prettyprint ;"
@@ -279,6 +279,8 @@ HELP: >local-time
     }
 } ;
 
+{ >local-time >local-time! } related-words
+
 HELP: >gmt
 { $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Converts the " { $snippet "timestamp" } " to the GMT timezone." }
@@ -288,6 +290,8 @@ HELP: >gmt
                "0"
     }
 } ;
+
+{ >gmt >gmt! } related-words
 
 HELP: time*
 { $values { "obj1" object } { "obj2" object } { "obj3" object } }
@@ -362,7 +366,7 @@ HELP: (day-of-week)
 { $notes "User code should use the " { $link day-of-week } " word, which takes a " { $snippet "timestamp" } " instead of integers." } ;
 
 HELP: days-in-year
-{ $values { "obj" "a timestamp or an integer" } { "n" integer } }
+{ $values { "obj" { $or timestamp integer } } { "n" integer } }
 { $description "Calculates the number of days in a given year." }
 { $examples
     { $example "USING: calendar prettyprint ;"

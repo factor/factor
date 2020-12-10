@@ -253,7 +253,7 @@ M: real +minute
 M: number +second
     over second>> + seconds/minutes [ >>second ] dip +minute ;
 
-: (time+) ( timestamp duration -- timestamp' duration )
+: (time+) ( timestamp duration -- timestamp duration )
     {
         [ second>> +second ]
         [ minute>> +minute ]
@@ -312,8 +312,11 @@ DEFER: time-
 : convert-timezone! ( timestamp duration -- timestamp )
     [ over gmt-offset>> time- (time+) drop ] [ >>gmt-offset ] bi ;
 
+: >local-time! ( timestamp -- timestamp )
+    gmt-offset-duration convert-timezone! ;
+
 : >local-time ( timestamp -- timestamp' )
-    clone gmt-offset-duration convert-timezone! ;
+    clone >local-time! ;
 
 : >gmt! ( timestamp -- timestamp )
     instant convert-timezone! ;
@@ -366,6 +369,7 @@ M: timestamp <=> [ >gmt tuple-slots ] compare ;
     [ day-of-year ] [ day-of-week [ 7 ] when-zero ] bi - 10 + 7 /i ;
 
 DEFER: end-of-year
+
 : week-number ( timestamp -- [1,53] )
     dup (week-number) {
         {  0 [ year>> 1 - end-of-year (week-number) ] }
@@ -880,6 +884,7 @@ CONSTANT: weekday-offsets { 0 0 1 2 3 4 5 }
     + 1 - julian-day-number>date <date> ;
 
 GENERIC: weeks-in-week-year ( obj -- n )
+
 M: integer weeks-in-week-year
     { [ 1 1 <date> thursday? ] [ 12 31 <date> thursday? ] } 1|| 53 52 ? ;
 
