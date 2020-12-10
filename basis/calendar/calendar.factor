@@ -284,14 +284,6 @@ M: timestamp time+
 M: duration time+
     dup timestamp? [ swap time+ ] [ duration+ ] if ;
 
-GENERIC#: time+! 1 ( time1 time2 -- time3 )
-
-M: timestamp time+!
-    (time+) drop ;
-
-M: duration time+!
-    dup timestamp? [ swap time+! ] [ duration+ ] if ;
-
 : duration>years ( duration -- x )
     ! Uses average month/year length since duration loses calendar data
     0 swap
@@ -315,32 +307,19 @@ M: duration <=> [ duration>years ] compare ;
 : duration>microseconds ( duration -- x ) duration>seconds 1000000 * ;
 : duration>nanoseconds ( duration -- x ) duration>seconds 1000000000 * ;
 
-GENERIC: time- ( time1 time2 -- time3 )
+DEFER: time-
 
-: convert-timezone ( timestamp duration -- timestamp' )
-    over gmt-offset>> over = [ drop ] [
-        [ over gmt-offset>> time- time+ ] keep >>gmt-offset
-    ] if ;
+: convert-timezone! ( timestamp duration -- timestamp )
+    [ over gmt-offset>> time- (time+) drop ] [ >>gmt-offset ] bi ;
 
 : >local-time ( timestamp -- timestamp' )
-    clone gmt-offset-duration convert-timezone ;
+    clone gmt-offset-duration convert-timezone! ;
 
-: normalize-timestamp! ( timestamp -- timestamp ) 0 seconds time+! ;
-: normalize-timestamp ( timestamp -- timestamp' ) 0 seconds time+ ;
+: >gmt! ( timestamp -- timestamp )
+    instant convert-timezone! ;
 
-: (>gmt) ( timestamp -- timestamp' )
-    dup gmt-offset>> dup instant =
-    [ drop ] [
-        [ neg +second 0 ] change-second
-        [ neg +minute 0 ] change-minute
-        [ neg +hour   0 ] change-hour
-        [ neg +day    0 ] change-day
-        [ neg +month  0 ] change-month
-        [ neg +year   0 ] change-year drop
-    ] if ; inline
-
-: >gmt! ( timestamp -- timestamp ) normalize-timestamp! (>gmt) ;
-: >gmt ( timestamp -- timestamp' ) normalize-timestamp (>gmt) ;
+: >gmt ( timestamp -- timestamp' )
+    clone >gmt! ;
 
 M: timestamp <=> [ >gmt tuple-slots ] compare ;
 
@@ -406,10 +385,16 @@ DEFER: end-of-year
 : same-second? ( ts1 ts2 -- ? )
     [ >gmt slots{ year month day hour minute second } ] same? ;
 
+<PRIVATE
+
 : (time-) ( timestamp timestamp -- n )
     [ >gmt ] bi@
     [ [ >date< julian-day-number ] bi@ - 86400 * ] 2keep
     [ >time< [ [ 3600 * ] [ 60 * ] bi* ] dip + + ] bi@ - + ;
+
+PRIVATE>
+
+GENERIC: time- ( time1 time2 -- time3 )
 
 M: timestamp time-
     ! Exact calendar-time difference

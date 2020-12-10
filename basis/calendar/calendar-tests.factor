@@ -188,50 +188,6 @@ IN: calendar
     2008 2 29 <date> =
 ] unit-test
 
-{
-    T{ timestamp
-        { year 2020 }
-        { month 1 }
-        { day 1 }
-        { hour 2 }
-        { minute 46 }
-        { second 40 }
-    }
-} [
-    2020 <year-gmt> 10000 >>second normalize-timestamp
-] unit-test
-
-{
-    T{ timestamp
-        { year 2020 }
-        { month 1 }
-        { day 1 }
-        { hour 2 }
-        { minute 46 }
-        { second 40 }
-    }
-} [
-    2020 <year-gmt> 10000 >>second normalize-timestamp!
-] unit-test
-
-{ f } [
-    2020 <year-gmt> dup 10000 >>second normalize-timestamp eq?
-] unit-test
-
-{ t } [
-    2020 <year-gmt> dup 10000 >>second normalize-timestamp! eq?
-] unit-test
-
-{ +eq+ } [
-    2020 <year-gmt> 10000 >>second
-    dup normalize-timestamp <=>
-] unit-test
-
-{ +eq+ } [
-    2020 <year-gmt> 10000 >>second
-    dup normalize-timestamp <=>
-] unit-test
-
 { f } [
     2020 <year-gmt> dup 10000 >>second [ >gmt ] bi@ eq?
 ] unit-test
