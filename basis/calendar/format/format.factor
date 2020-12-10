@@ -154,6 +154,14 @@ ALIAS: timestamp>rfc822 timestamp>rfc2822
 : timestamp>iso8601 ( timestamp -- str )
     [ write-iso8601 ] with-string-writer ;
 
+: write-ctime ( timestamp -- )
+    {
+        DAY " " MONTH " " DD " " hh ":" mm ":" ss " " YYYY
+    } formatted ;
+
+: timestamp>ctime-string ( timestamp -- str )
+    [ write-ctime ] with-string-writer ;
+
 : timestamp>git-string ( timestamp -- str )
     [
         {
