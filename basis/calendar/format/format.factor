@@ -83,13 +83,9 @@ M: timestamp day.
 
 PRIVATE>
 
-GENERIC: month. ( obj -- )
-
-M: array month.
-    first2 [ month-header. ] [ days-header. days. ] 2bi ;
-
-M: timestamp month.
-    [ year>> ] [ month>> ] bi 2array month. ;
+: month. ( timestamp -- )
+    [ year>> ] [ month>> ] bi
+    [ month-header. ] [ days-header. days. ] 2bi ;
 
 GENERIC: year. ( obj -- )
 
