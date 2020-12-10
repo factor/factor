@@ -8,7 +8,7 @@ IN: calendar.elapsed
 
 GENERIC: elapsed-time ( seconds -- string )
 
-M: real elapsed-time
+M: integer elapsed-time
     dup 0 < [ "negative seconds" throw ] when [
         {
             { 60 "s" }
@@ -23,8 +23,14 @@ M: real elapsed-time
         ] each drop
     ] { } make [ "0s" ] [ reverse " " join ] if-empty ;
 
+M: real elapsed-time
+    >integer elapsed-time ;
+
 M: duration elapsed-time
     duration>seconds elapsed-time ;
+
+M: timestamp elapsed-time
+    now swap time- elapsed-time ;
 
 ! XXX: Anything up to 2 hours is "about an hour"
 : relative-time-offset ( seconds -- string )
@@ -32,11 +38,11 @@ M: duration elapsed-time
         { [ dup 1 < ] [ drop "just now" ] }
         { [ dup 60 < ] [ drop "less than a minute" ] }
         { [ dup 120 < ] [ drop "about a minute" ] }
-        { [ dup 2700 < ] [ 60 / "%d minutes" sprintf ] }
+        { [ dup 2700 < ] [ 60 /i "%d minutes" sprintf ] }
         { [ dup 7200 < ] [ drop "about an hour" ] }
         { [ dup 86400 < ] [ 3600 /i "%d hours" sprintf ] }
         { [ dup 172800 < ] [ drop "1 day" ] }
-        [ 86400 / "%d days" sprintf ]
+        [ 86400 /i "%d days" sprintf ]
     } cond ;
 
 GENERIC: relative-time ( seconds -- string )
