@@ -370,7 +370,7 @@ M: timestamp <=> [ >gmt tuple-slots ] compare ;
 : same-day? ( ts1 ts2 -- ? )
     [ >gmt slots{ year month day } ] same? ;
 
-: zeller-congruence ( year month day -- n )
+: (day-of-week) ( year month day -- n )
     ! Zeller Congruence
     ! http://web.textfiles.com/computers/formulas.txt
     ! good for any date since October 15, 1582
@@ -381,7 +381,7 @@ M: timestamp <=> [ >gmt tuple-slots ] compare ;
     ] dip 1 + + 7 mod ;
 
 : day-of-week ( timestamp -- n )
-    >date< zeller-congruence ;
+    >date< (day-of-week) ;
 
 : (week-number) ( timestamp -- [0,53] )
     [ day-of-year ] [ day-of-week [ 7 ] when-zero ] bi - 10 + 7 /i ;
