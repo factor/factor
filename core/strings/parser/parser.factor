@@ -126,7 +126,7 @@ DEFER: (parse-string)
             [ "[space]" swap 1string "'" dup surround unexpected ]
         } case drop
     ] if ;
- 
+
 : (parse-string) ( accum lexer -- )
     { sbuf lexer } declare
     dup still-parsing? [
