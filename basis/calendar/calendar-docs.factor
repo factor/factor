@@ -356,9 +356,9 @@ HELP: ago
     }
 } ;
 
-HELP: zeller-congruence
+HELP: (day-of-week)
 { $values { "year" integer } { "month" integer } { "day" integer } { "n" integer } }
-{ $description "An implementation of an algorithm that computes the day of the week given a date. Days are indexed starting from Sunday, which is index 0." }
+{ $description "An implementation of the Zeller's congruence algorithm that computes the day of the week given a date. Days are indexed starting from Sunday, which is index 0." }
 { $notes "User code should use the " { $link day-of-week } " word, which takes a " { $snippet "timestamp" } " instead of integers." } ;
 
 HELP: days-in-year

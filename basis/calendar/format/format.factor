@@ -76,7 +76,7 @@ M: timestamp day.
     day-abbreviations2 " " join print ;
 
 : days. ( year month -- )
-    [ 1 zeller-congruence dup [ "   " write ] times ]
+    [ 1 (day-of-week) dup [ "   " write ] times ]
     [ (days-in-month) ] 2bi [1,b] [
         [ day. ] [ + 7 mod zero? [ nl ] [ bl ] if ] bi
     ] with each nl ;
