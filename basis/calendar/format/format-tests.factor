@@ -22,6 +22,8 @@ CONSTANT: testtime T{ timestamp
     3 hours 1 >>minute 59 >>second duration>hms
 ] unit-test
 
+{ "01:31:29" } [ 1.525 hours duration>hms ] unit-test
+
 [ -1 elapsed-time ] [ "negative seconds" = ] must-fail-with
 
 { "0s" } [ 0 elapsed-time ] unit-test
