@@ -126,7 +126,7 @@ M: timestamp year. year>> year. ;
 
 : write-rfc1036 ( timestamp -- )
     {
-        DAY ", " DD "-" MONTH "-" YYYY " " hh ":" mm ":" ss " "
+        DAY ", " DD "-" MONTH "-" YYYY " " hh:mm:ss " "
         [ gmt-offset>> write-gmt-offset ]
     } formatted ;
 
@@ -139,7 +139,7 @@ ALIAS: timestamp>rfc850 timestamp>rfc1036
 
 : write-rfc2822 ( timestamp -- )
     {
-        DAY ", " D " " MONTH " " YYYY " " hh ":" mm ":" ss " "
+        DAY ", " D " " MONTH " " YYYY " " hh:mm:ss " "
         [ gmt-offset>> write-gmt-offset ]
     } formatted ;
 
@@ -152,7 +152,7 @@ ALIAS: timestamp>rfc822 timestamp>rfc2822
 
 : write-rfc3339 ( timestamp -- )
     {
-        YYYY "-" MM "-" DD "T" hh ":" mm ":" ss.SSSSSS
+        YYYY-MM-DD "T" hh:mm:ss.SSSSSS
         [ gmt-offset>> write-gmt-offset-z ]
     } formatted ;
 
@@ -161,7 +161,7 @@ ALIAS: timestamp>rfc822 timestamp>rfc2822
 
 : write-iso8601 ( timestamp -- )
     {
-        YYYY "-" MM "-" DD "T" hh ":" mm ":" ss.SSSSSS
+        YYYY-MM-DD "T" hh:mm:ss.SSSSSS
         [ gmt-offset>> write-gmt-offset-hh:mm ]
     } formatted ;
 
@@ -170,7 +170,7 @@ ALIAS: timestamp>rfc822 timestamp>rfc2822
 
 : write-ctime ( timestamp -- )
     {
-        DAY " " MONTH " " DD " " hh ":" mm ":" ss " " YYYY
+        DAY " " MONTH " " DD " " hh:mm:ss " " YYYY
     } formatted ;
 
 : timestamp>ctime-string ( timestamp -- str )
@@ -179,7 +179,7 @@ ALIAS: timestamp>rfc822 timestamp>rfc2822
 : timestamp>git-string ( timestamp -- str )
     [
         {
-            DAY " " MONTH " " D " " hh ":" mm ":" ss " " YYYY " "
+            DAY " " MONTH " " D " " hh:mm:ss " " YYYY " "
             [ gmt-offset>> write-gmt-offset-hhmm ]
         } formatted
     ] with-string-writer ;
@@ -191,7 +191,7 @@ ALIAS: timestamp>rfc822 timestamp>rfc2822
     >gmt timestamp>rfc1036 ;
 
 : write-timestamp ( timestamp -- )
-    { DAY ", " D " " MONTH " " YYYY " " hh ":" mm ":" ss } formatted ;
+    { DAY ", " D " " MONTH " " YYYY " " hh:mm:ss } formatted ;
 
 : timestamp>string ( timestamp -- str )
     [ write-timestamp ] with-string-writer ;
@@ -203,7 +203,8 @@ M: timestamp present timestamp>string ;
     [ duration>minutes >integer 60 mod pad-00 ] bi ":" glue ;
 
 : duration>hms ( duration -- str )
-    [ duration>hm ] [ second>> >integer 60 mod pad-00 ] bi ":" glue ;
+    [ duration>hm ]
+    [ duration>seconds >integer 60 mod pad-00 ] bi ":" glue ;
 
 : duration>human-readable ( duration -- string )
     [
