@@ -27,12 +27,12 @@ IN: project-euler.019
 ! --------
 
 ! Use Zeller congruence, which is implemented in the "calendar" module
-! already, as "zeller-congruence ( year month day -- n )" where n is
+! already, as "(day-of-week) ( year month day -- n )" where n is
 ! the day of the week (Sunday is 0).
 
 : euler019 ( -- answer )
     1901 2000 [a,b] [
-        12 [1,b] [ 1 zeller-congruence ] with map
+        12 [1,b] [ 1 (day-of-week) ] with map
     ] map concat [ 0 = ] count ;
 
 ! [ euler019 ] 100 ave-time
