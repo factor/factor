@@ -1,7 +1,7 @@
 ! Copyright (C) 2011-2012 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs calendar calendar.elapsed
+USING: accessors assocs calendar calendar.format
 colors.constants colors.hex combinators formatting fry
 http.client io io.styles json json.reader kernel make math
 sequences urls ;
