@@ -271,12 +271,12 @@ HELP: convert-timezone
     }
 } ;
 
-HELP: >local-time
+HELP: >local
 { $values { "timestamp" timestamp } }
 { $description "Converts the " { $snippet "timestamp" } " to the timezone of your computer." }
 { $examples
     { $example "USING: accessors calendar kernel prettyprint ;"
-               "now now-gmt >local-time [ gmt-offset>> ] same? ."
+               "now now-gmt >local [ gmt-offset>> ] same? ."
                "t"
     }
 } ;
@@ -291,17 +291,17 @@ HELP: >gmt
     }
 } ;
 
-HELP: local-time
+HELP: local
 { $values { "timestamp" timestamp } }
 { $description "Set the time zone to the computer's local timezone." }
-{ $notes "The time is not converted, if you want that then call " { $link >local-time } "." } ;
+{ $notes "The time is not converted, if you want that then call " { $link >local } "." } ;
 
 HELP: gmt
 { $values { "timestamp" timestamp } }
 { $description "Set the time zone to GMT." }
 { $notes "The time is not converted, if you want that then call " { $link >gmt } "." } ;
 
-{ local-time >local-time gmt >gmt convert-timezone } related-words
+{ local >local gmt >gmt convert-timezone } related-words
 
 HELP: duration*
 { $values { "obj1" object } { "obj2" object } { "obj3" object } }
@@ -511,7 +511,7 @@ ARTICLE: "calendar" "Calendar"
 }
 "Time zones:"
 { $subsections
-    >local-time
+    >local
     >gmt
     convert-timezone
 }

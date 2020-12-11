@@ -194,10 +194,10 @@ GENERIC: +second ( timestamp x -- timestamp )
 
 : /rem ( f n -- q r )
     ! q is positive or negative, r is positive from 0 <= r < n
-    [ /mod ] keep over 0 < [ + [ -1 + ] dip ] [ drop ] if ;
+    [ /mod ] keep over 0 < [ + [ -1 + ] dip ] [ drop ] if ; inline
 
 : float>whole-part ( float -- int float )
-    [ floor >integer ] keep over - ;
+    [ floor >integer ] keep over - ; inline
 
 : adjust-leap-year ( timestamp -- timestamp )
     dup
@@ -214,41 +214,40 @@ M: real +year
     12 /rem [ 1 - 12 ] when-zero swap ; inline
 
 M: integer +month
-    over month>> + months/years [ >>month ] dip +year ;
+    [ over month>> + months/years [ >>month ] dip +year ] unless-zero ;
 
 M: real +month
     float>whole-part swapd average-month * +day swap +month ;
 
 M: integer +day
-    over >date< julian-day-number + julian-day-number>date
-    [ >>year ] [ >>month ] [ >>day ] tri* ;
+    [ over >date< julian-day-number + julian-day-number>date set-date ] unless-zero ;
 
 M: real +day
     float>whole-part swapd 24 * +hour swap +day ;
 
 : hours/days ( n -- hours days )
-    24 /rem swap ;
+    24 /rem swap ; inline
 
 M: integer +hour
-    over hour>> + hours/days [ >>hour ] dip +day ;
+    [ over hour>> + hours/days [ >>hour ] dip +day ] unless-zero ;
 
 M: real +hour
     float>whole-part swapd 60 * +minute swap +hour ;
 
 : minutes/hours ( n -- minutes hours )
-    60 /rem swap ;
+    60 /rem swap ; inline
 
 M: integer +minute
-    over minute>> + minutes/hours [ >>minute ] dip +hour ;
+    [ over minute>> + minutes/hours [ >>minute ] dip +hour ] unless-zero ;
 
 M: real +minute
     float>whole-part swapd 60 * +second swap +minute ;
 
 : seconds/minutes ( n -- seconds minutes )
-    60 /rem swap >integer ;
+    60 /rem swap ; inline
 
 M: number +second
-    over second>> + seconds/minutes [ >>second ] dip +minute ;
+    [ over second>> + seconds/minutes [ >>second ] dip +minute ] unless-zero ;
 
 : (time+) ( timestamp duration -- timestamp )
     {
@@ -307,13 +306,13 @@ DEFER: time-
 : gmt ( timestamp -- timestamp )
     instant >>gmt-offset ; inline
 
-: local-time ( timestamp -- timestamp )
+: local ( timestamp -- timestamp )
     gmt-offset-duration >>gmt-offset ; inline
 
 : convert-timezone ( timestamp duration -- timestamp )
     [ over gmt-offset>> time- (time+) ] [ >>gmt-offset ] bi ;
 
-: >local-time ( timestamp -- timestamp )
+: >local ( timestamp -- timestamp )
     gmt-offset-duration convert-timezone ;
 
 : >gmt ( timestamp -- timestamp )
