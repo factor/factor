@@ -3,8 +3,7 @@
 USING: accessors arrays classes.tuple combinators
 combinators.short-circuit kernel literals math math.functions
 math.intervals math.order math.parser math.statistics sequences
-sequences.rotated slots.syntax splitting system vocabs
-vocabs.loader ;
+slots.syntax splitting system vocabs vocabs.loader ;
 FROM: math.ranges => [a..b) ;
 IN: calendar
 
@@ -559,8 +558,8 @@ M: integer last-day-of-year 12 31 <date> ;
     day-offset days (time+) ;
 
 : closest-day ( timestamp n -- timestamp )
-    { 0 1 2 3 -3 -2 -1 } pick day-of-week 7 swap -
-    <rotated> nth days (time+) ;
+    [ dup day-of-week 7 swap - ] [ + 7 mod ] bi*
+    { 0 1 2 3 -3 -2 -1 } nth days (time+) ;
 
 :: nth-day-this-month ( timestamp n day -- timestamp )
     timestamp clone
