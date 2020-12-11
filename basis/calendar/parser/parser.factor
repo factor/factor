@@ -29,7 +29,7 @@ ERROR: invalid-timestamp-format ;
 : read-sp ( -- token ) " " read-token ;
 
 : signed-gmt-offset ( dt ch -- dt' )
-    { { CHAR: + [ 1 ] } { CHAR: - [ -1 ] } } case time* ;
+    { { CHAR: + [ 1 ] } { CHAR: - [ -1 ] } } case duration* ;
 
 : read-rfc3339-gmt-offset ( ch -- dt )
     {
