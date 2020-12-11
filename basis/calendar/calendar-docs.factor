@@ -264,25 +264,23 @@ HELP: convert-timezone
 { $description "Converts the " { $snippet "timestamp" } "'s " { $snippet "gmt-offset" } " to the GMT offset represented by the " { $snippet "duration" } "." }
 { $examples
     { $example "USING: accessors calendar prettyprint ;"
-               "gmt noon instant -5 >>hour convert-timezone gmt-offset>> hour>> ."
+               "now-gmt noon instant -5 >>hour convert-timezone gmt-offset>> hour>> ."
                "-5"
     }
 } ;
 
 HELP: >local-time
-{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
+{ $values { "timestamp" timestamp } }
 { $description "Converts the " { $snippet "timestamp" } " to the timezone of your computer." }
 { $examples
     { $example "USING: accessors calendar kernel prettyprint ;"
-               "now gmt >local-time [ gmt-offset>> ] same? ."
+               "now now-gmt >local-time [ gmt-offset>> ] same? ."
                "t"
     }
 } ;
 
-{ >local-time >local-time! } related-words
-
 HELP: >gmt
-{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
+{ $values { "timestamp" timestamp } }
 { $description "Converts the " { $snippet "timestamp" } " to the GMT timezone." }
 { $examples
     { $example "USING: accessors calendar kernel prettyprint ;"
@@ -291,7 +289,17 @@ HELP: >gmt
     }
 } ;
 
-{ >gmt >gmt! } related-words
+HELP: local-time
+{ $values { "timestamp" timestamp } }
+{ $description "Set the time zone to the computer's local timezone." }
+{ $notes "The time is not converted, if you want that then call " { $link >local-time } "." } ;
+
+HELP: gmt
+{ $values { "timestamp" timestamp } }
+{ $description "Set the time zone to GMT." }
+{ $notes "The time is not converted, if you want that then call " { $link >gmt } "." } ;
+
+{ local-time >local-time gmt >gmt convert-timezone } related-words
 
 HELP: time*
 { $values { "obj1" object } { "obj2" object } { "obj3" object } }
@@ -322,11 +330,11 @@ HELP: micros>timestamp
     }
 } ;
 
-HELP: gmt
+HELP: now-gmt
 { $values { "timestamp" timestamp } }
 { $description "Returns the time right now, but in the GMT timezone." } ;
 
-{ gmt now } related-words
+{ now now-gmt } related-words
 
 HELP: now
 { $values { "timestamp" timestamp } }
@@ -422,58 +430,58 @@ HELP: week-number
 } ;
 
 HELP: sunday
-{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $values { "timestamp" timestamp } }
 { $description "Returns the Sunday from the current week, which starts on a Sunday." } ;
 
 HELP: monday
-{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $values { "timestamp" timestamp } }
 { $description "Returns the Monday from the current week, which starts on a Sunday." } ;
 
 HELP: tuesday
-{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $values { "timestamp" timestamp } }
 { $description "Returns the Tuesday from the current week, which starts on a Sunday." } ;
 
 HELP: wednesday
-{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $values { "timestamp" timestamp } }
 { $description "Returns the Wednesday from the current week, which starts on a Sunday." } ;
 
 HELP: thursday
-{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $values { "timestamp" timestamp } }
 { $description "Returns the Thursday from the current week, which starts on a Sunday." } ;
 
 HELP: friday
-{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $values { "timestamp" timestamp } }
 { $description "Returns the Friday from the current week, which starts on a Sunday." } ;
 
 HELP: saturday
-{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $values { "timestamp" timestamp } }
 { $description "Returns the Saturday from the current week, which starts on a Sunday." } ;
 
 { sunday monday tuesday wednesday thursday friday saturday } related-words
 
 HELP: midnight
-{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
-{ $description "Returns a new timestamp that represents the day at midnight, or the beginning of the day." } ;
+{ $values { "timestamp" timestamp } }
+{ $description "Sets the timestamp to represent the day at midnight, or the beginning of the day." } ;
 
 HELP: noon
-{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
-{ $description "Returns a new timestamp that represents the day at noon, or the middle of the day." } ;
+{ $values { "timestamp" timestamp } }
+{ $description "Sets the timestamp to represent the day at noon, or the middle of the day." } ;
 
 HELP: today
 { $values { "timestamp" timestamp } }
-{ $description "Returns a timestamp that represents today at midnight." } ;
+{ $description "Sets the timestamp to represents today at midnight." } ;
 
 HELP: start-of-month
-{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
-{ $description "Returns a new timestamp with the day set to one." } ;
+{ $values { "timestamp" timestamp } }
+{ $description "Sets the timestamp with the day set to one." } ;
 
 HELP: start-of-week
-{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
-{ $description "Returns a new timestamp where the day of the week is Sunday." } ;
+{ $values { "timestamp" timestamp } }
+{ $description "Sets the timestamp with the day of the week set to Sunday." } ;
 
 HELP: start-of-year
-{ $values { "object" object } { "new-timestamp" timestamp } }
-{ $description "Returns a new timestamp with the month and day set to one, or January 1 of the input timestamp, given a year or a timestamp." } ;
+{ $values { "object" object } { "timestamp" timestamp } }
+{ $description "Sets the timestamp with the month and day set to one, or January 1 of the input timestamp, given a year or a timestamp." } ;
 
 HELP: time-since-midnight
 { $values { "timestamp" timestamp } { "duration" duration } }

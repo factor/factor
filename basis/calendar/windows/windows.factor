@@ -37,5 +37,5 @@ M: windows gmt-offset
         { TIME_ZONE_ID_DAYLIGHT [ [ Bias>> ] [ DaylightBias>> ] bi + ] }
     } case neg 60 /mod 0 ;
 
-M: windows gmt
+M: windows now-gmt
     SYSTEMTIME <struct> [ GetSystemTime ] keep SYSTEMTIME>timestamp ;
