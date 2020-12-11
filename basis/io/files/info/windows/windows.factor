@@ -227,7 +227,7 @@ M: windows file-systems
         { FILETIME FILETIME FILETIME }
         [ GetFileTime win32-error=0/f ]
         with-out-parameters
-        [ FILETIME>timestamp >local-time ] tri@
+        [ FILETIME>timestamp >local ] tri@
     ] with-destructors ;
 
 : set-file-times ( path timestamp/f timestamp/f timestamp/f -- )
