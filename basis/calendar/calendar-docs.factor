@@ -154,6 +154,22 @@ HELP: time+
     }
 } ;
 
+HELP: time-
+{ $values { "time1" { $or timestamp duration } } { "time2" { $or timestamp duration } } { "time3" { $or timestamp duration } } }
+{ $description "Subtracts two durations to produce a duration or subtracts a duration from a timestamp to produce a timestamp. The calculation takes timezones into account." }
+{ $examples
+    { $example "USING: calendar math.order prettyprint ;"
+               "10 months 2 months time- 8 months <=> ."
+               "+eq+"
+    }
+    { $example "USING: accessors calendar math.order prettyprint ;"
+               "2010 1 1 <date> 3 days time- day>> ."
+               "29"
+    }
+} ;
+
+{ time+ time- } related-words
+
 HELP: duration>years
 { $values { "duration" duration } { "x" number } }
 { $description "Calculates the length of a duration in years." }
@@ -245,20 +261,6 @@ HELP: duration>nanoseconds
 { duration>years duration>months duration>days duration>hours duration>minutes duration>seconds duration>milliseconds duration>microseconds duration>nanoseconds } related-words
 
 
-HELP: time-
-{ $values { "time1" { $or timestamp duration } } { "time2" { $or timestamp duration } } { "time3" { $or timestamp duration } } }
-{ $description "Subtracts two durations to produce a duration or subtracts a duration from a timestamp to produce a timestamp. The calculation takes timezones into account." }
-{ $examples
-    { $example "USING: calendar math.order prettyprint ;"
-               "10 months 2 months time- 8 months <=> ."
-               "+eq+"
-    }
-    { $example "USING: accessors calendar math.order prettyprint ;"
-               "2010 1 1 <date> 3 days time- day>> ."
-               "29"
-    }
-} ;
-
 HELP: convert-timezone
 { $values { "timestamp" timestamp } { "duration" duration } }
 { $description "Converts the " { $snippet "timestamp" } "'s " { $snippet "gmt-offset" } " to the GMT offset represented by the " { $snippet "duration" } "." }
@@ -301,10 +303,9 @@ HELP: gmt
 
 { local-time >local-time gmt >gmt convert-timezone } related-words
 
-HELP: time*
+HELP: duration*
 { $values { "obj1" object } { "obj2" object } { "obj3" object } }
 { $description "Multiplies each time slot of a timestamp or duration by a number and make a new duration from the result. Used in the implementation of " { $link before } "." } ;
-{ time+ time- time* } related-words
 
 HELP: before
 { $values { "duration" duration } { "-duration" duration } }
@@ -532,8 +533,8 @@ ARTICLE: "timestamp-arithmetic" "Timestamp arithmetic"
 { $subsections time+ }
 "Subtracting:"
 { $subsections time- }
-"Element-wise multiplication:"
-{ $subsections time* } ;
+"Multiplying durations:"
+{ $subsections duration* } ;
 
 ARTICLE: "using-durations" "Using durations"
 "Creating a duration object:"
