@@ -1769,7 +1769,9 @@ ARTICLE: "sequences-appending" "Appending sequences"
     3append
     3append-as
     surround
+    surround-as
     glue
+    glue-as
 }
 "Collapse a sequence unto itself:"
 { $subsections concat join }

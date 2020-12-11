@@ -913,11 +913,15 @@ PRIVATE>
 : join ( seq glue -- newseq )
     dup join-as ; inline
 
+<PRIVATE
+
 : padding ( ... seq n elt quot: ( ... seq1 seq2 -- ... newseq ) -- ... newseq )
     [
         [ over length [-] dup 0 = [ drop ] ] dip
         [ <repetition> ] curry
     ] dip compose if ; inline
+
+PRIVATE>
 
 : pad-head ( seq n elt -- padded )
     [ swap dup append-as ] padding ;
