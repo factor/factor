@@ -404,7 +404,7 @@ M: timestamp time-
     ! Exact calendar-time difference
     (time-) seconds ;
 
-: time* ( obj1 obj2 -- obj3 )
+: duration* ( obj1 obj2 -- obj3 )
     dup real? [ swap ] when
     dup real? [ * ] [
         {
@@ -418,7 +418,7 @@ M: timestamp time-
     ] if ;
 
 : before ( duration -- -duration )
-    -1 time* ;
+    -1 duration* ;
 
 : duration- ( duration1 duration2 -- duration3 )
     {
