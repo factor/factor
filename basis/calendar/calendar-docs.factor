@@ -154,8 +154,6 @@ HELP: time+
     }
 } ;
 
-{ time+ time- } related-words
-
 HELP: duration>years
 { $values { "duration" duration } { "x" number } }
 { $description "Calculates the length of a duration in years." }
@@ -266,7 +264,7 @@ HELP: convert-timezone
 { $description "Converts the " { $snippet "timestamp" } "'s " { $snippet "gmt-offset" } " to the GMT offset represented by the " { $snippet "duration" } "." }
 { $examples
     { $example "USING: accessors calendar prettyprint ;"
-               "now >gmt noon -5 hours convert-timezone gmt-offset>> hour>> ."
+               "now-gmt noon instant -5 >>hour convert-timezone gmt-offset>> hour>> ."
                "-5"
     }
 } ;
@@ -276,7 +274,7 @@ HELP: >local-time
 { $description "Converts the " { $snippet "timestamp" } " to the timezone of your computer." }
 { $examples
     { $example "USING: accessors calendar kernel prettyprint ;"
-               "now dup clone >gmt >local-time [ gmt-offset>> ] same? ."
+               "now now-gmt >local-time [ gmt-offset>> ] same? ."
                "t"
     }
 } ;
@@ -303,9 +301,10 @@ HELP: gmt
 
 { local-time >local-time gmt >gmt convert-timezone } related-words
 
-HELP: duration*
+HELP: time*
 { $values { "obj1" object } { "obj2" object } { "obj3" object } }
-{ $description "Multiplies each time slot of a duration by a number and make a new duration from the result. Used in the implementation of " { $link before } "." } ;
+{ $description "Multiplies each time slot of a timestamp or duration by a number and make a new duration from the result. Used in the implementation of " { $link before } "." } ;
+{ time+ time- time* } related-words
 
 HELP: before
 { $values { "duration" duration } { "-duration" duration } }
@@ -330,6 +329,12 @@ HELP: micros>timestamp
                "1970"
     }
 } ;
+
+HELP: now-gmt
+{ $values { "timestamp" timestamp } }
+{ $description "Returns the time right now, but in the GMT timezone." } ;
+
+{ now now-gmt } related-words
 
 HELP: now
 { $values { "timestamp" timestamp } }
@@ -527,8 +532,8 @@ ARTICLE: "timestamp-arithmetic" "Timestamp arithmetic"
 { $subsections time+ }
 "Subtracting:"
 { $subsections time- }
-"Multiplying durations:"
-{ $subsections duration* } ;
+"Element-wise multiplication:"
+{ $subsections time* } ;
 
 ARTICLE: "using-durations" "Using durations"
 "Creating a duration object:"
