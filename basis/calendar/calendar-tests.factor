@@ -130,6 +130,26 @@ IN: calendar
 { t } [ 2004 1 1 23 0 0 9+1/2 hours <timestamp> >gmt
         2004 1 1 13 30 0 instant <timestamp> = ] unit-test
 
+{ t } [
+    2004 1 1 3 0 0 instant <timestamp>
+    2004 1 1 1 0 0 instant <timestamp> 3 am =
+] unit-test
+
+{ t } [
+    2004 1 1 0 0 0 instant <timestamp>
+    2004 1 1 1 0 0 instant <timestamp> 12 am =
+] unit-test
+
+{ t } [
+    2004 1 1 12 0 0 instant <timestamp>
+    2004 1 1 1 0 0 instant <timestamp> 12 pm =
+] unit-test
+
+{ t } [
+    2004 1 1 23 0 0 instant <timestamp>
+    2004 1 1 1 0 0 instant <timestamp> 11 pm =
+] unit-test
+
 { +eq+ } [ 2004 1 1 13 30 0 instant <timestamp>
         2004 1 1 12 30 0 -1 hours <timestamp> <=> ] unit-test
 
