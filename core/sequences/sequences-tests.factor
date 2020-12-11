@@ -210,8 +210,8 @@ unit-test
 { 5 } [ 1 >bignum { 1 5 7 } nth-unsafe ] unit-test
 { 5 } [ 1 >bignum "\u000001\u000005\u000007" nth-unsafe ] unit-test
 
-{ SBUF" before&after" } [
-    "&" 6 11 SBUF" before and after" replace-slice
+{ "before&after" } [
+    "&" 6 11 "before and after" replace-slice
 ] unit-test
 
 { 3 "a" } [ { "a" "b" "c" "a" "d" } [ "a" = ] find-last ] unit-test
