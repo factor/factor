@@ -566,8 +566,9 @@ M: integer last-day-of-year 12 31 <date> ;
     <rotated> nth days (time+) drop ;
 
 :: nth-day-this-month ( timestamp n day -- timestamp )
-    timestamp clone start-of-month day day-this-week
-    dup timestamp [ month>> ] same?
+    timestamp clone
+    timestamp start-of-month day day-this-week
+    [ [ month>> ] same? ] keep swap
     [ 1 weeks (time+) drop ] unless
     n [ weeks (time+) drop ] unless-zero ;
 
