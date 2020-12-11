@@ -505,29 +505,23 @@ GENERIC: last-day-of-year ( object -- timestamp )
 M: timestamp last-day-of-year 12 >>month 31 >>day ;
 M: integer last-day-of-year 12 31 <date> ;
 
-GENERIC: first-day-of-decade ( object -- timestamp )
-M: timestamp first-day-of-decade first-day-of-year [ dup 10 mod - ] change-year ;
-M: integer first-day-of-decade first-day-of-year [ dup 10 mod - ] change-year ;
+: first-day-of-decade ( object -- timestamp )
+    first-day-of-year [ dup 10 mod - ] change-year ;
 
-GENERIC: last-day-of-decade ( object -- timestamp )
-M: timestamp last-day-of-decade last-day-of-year [ dup 10 mod - 9 + ] change-year ;
-M: integer last-day-of-decade last-day-of-year [ dup 10 mod - 9 + ] change-year ;
+: last-day-of-decade ( object -- timestamp )
+    last-day-of-year [ dup 10 mod - 9 + ] change-year ;
 
-GENERIC: first-day-of-century ( object -- timestamp )
-M: timestamp first-day-of-century first-day-of-year [ dup 100 mod - ] change-year ;
-M: integer first-day-of-century first-day-of-year [ dup 100 mod - ] change-year ;
+: first-day-of-century ( object -- timestamp )
+    first-day-of-year [ dup 100 mod - ] change-year ;
 
-GENERIC: last-day-of-century ( object -- timestamp )
-M: timestamp last-day-of-century last-day-of-year [ dup 100 mod - 99 + ] change-year ;
-M: integer last-day-of-century last-day-of-year [ dup 100 mod - 99 + ] change-year ;
+: last-day-of-century ( object -- timestamp )
+    last-day-of-year [ dup 100 mod - 99 + ] change-year ;
 
-GENERIC: first-day-of-millennium ( object -- timestamp )
-M: timestamp first-day-of-millennium first-day-of-year [ dup 1000 mod - ] change-year ;
-M: integer first-day-of-millennium first-day-of-year [ dup 1000 mod - ] change-year ;
+: first-day-of-millennium ( object -- timestamp )
+    first-day-of-year [ dup 1000 mod - ] change-year ;
 
-GENERIC: last-day-of-millennium ( object -- timestamp )
-M: timestamp last-day-of-millennium last-day-of-year [ dup 1000 mod - 999 + ] change-year ;
-M: integer last-day-of-millennium last-day-of-year [ dup 1000 mod - 999 + ] change-year ;
+: last-day-of-millennium ( object -- timestamp )
+    last-day-of-year [ dup 1000 mod - 999 + ] change-year ;
 
 : start-of-year ( object -- timestamp )
     first-day-of-year start-of-day ;
@@ -556,13 +550,8 @@ M: integer last-day-of-millennium last-day-of-year [ dup 1000 mod - 999 + ] chan
 : start-of-minute ( timestamp -- timestamp ) 0 >>second ;
 : end-of-minute ( timestamp -- timestamp ) 59+999/1000 >>second ;
 
-GENERIC: start-of-second ( object -- timestamp )
-M: timestamp start-of-second [ floor ] change-second ;
-M: real start-of-second floor ;
-
-GENERIC: end-of-second ( object -- timestamp )
-M: timestamp end-of-second [ floor 999/1000 + ] change-second ;
-M: real end-of-second floor 999/1000 + ;
+: start-of-second ( timestamp -- timestamp ) [ floor ] change-second ;
+: end-of-second ( timestamp -- timestamp ) [ floor 999/1000 + ] change-second ;
 
 <PRIVATE
 
@@ -572,10 +561,9 @@ M: real end-of-second floor 999/1000 + ;
 : day-this-week ( timestamp n -- new-timestamp )
     day-offset days time+ ;
 
-: closest-day ( timestamp n -- timestamp )
-    [ dup day-of-week ] dip
-    { 0 1 2 3 -3 -2 -1 }
-    rot 7 swap - <rotated> nth days time+ ;
+: closest-day ( timestamp n -- new-timestamp )
+    { 0 1 2 3 -3 -2 -1 } pick day-of-week 7 swap -
+    <rotated> nth days time+ ;
 
 :: nth-day-this-month ( timestamp n day -- new-timestamp )
     timestamp clone start-of-month day day-this-week
@@ -704,26 +692,21 @@ ALIAS: last-day-of-week saturday
 : friday? ( timestamp -- ? ) day-of-week 5 = ;
 : saturday? ( timestamp -- ? ) day-of-week 6 = ;
 
-: january? ( obj -- ? ) month>> 1 = ;
-: february? ( obj -- ? ) month>> 2 = ;
-: march? ( obj -- ? ) month>> 3  = ;
-: april? ( obj -- ? ) month>> 4 = ;
-: may? ( obj -- ? ) month>> 5 = ;
-: june? ( obj -- ? ) month>> 6 = ;
-: july? ( obj -- ? ) month>> 7 = ;
-: august? ( obj -- ? ) month>> 8 = ;
-: september? ( obj -- ? ) month>> 9 = ;
-: october? ( obj -- ? ) month>> 10 = ;
-: november? ( obj -- ? ) month>> 11 = ;
-: december? ( obj -- ? ) month>> 12 = ;
+: january? ( timestamp -- ? ) month>> 1 = ;
+: february? ( timestamp -- ? ) month>> 2 = ;
+: march? ( timestamp -- ? ) month>> 3  = ;
+: april? ( timestamp -- ? ) month>> 4 = ;
+: may? ( timestamp -- ? ) month>> 5 = ;
+: june? ( timestamp -- ? ) month>> 6 = ;
+: july? ( timestamp -- ? ) month>> 7 = ;
+: august? ( timestamp -- ? ) month>> 8 = ;
+: september? ( timestamp -- ? ) month>> 9 = ;
+: october? ( timestamp -- ? ) month>> 10 = ;
+: november? ( timestamp -- ? ) month>> 11 = ;
+: december? ( timestamp -- ? ) month>> 12 = ;
 
-GENERIC: weekend? ( obj -- ? )
-M: timestamp weekend? day-of-week weekend? ;
-M: integer weekend? { 0 6 } member? ;
-
-GENERIC: weekday? ( obj -- ? )
-M: timestamp weekday? day-of-week weekday? ;
-M: integer weekday? weekend? not ;
+: weekend? ( timestamp -- ? ) day-of-week { 0 6 } member? ;
+: weekday? ( timestamp -- ? ) day-of-week weekend? not ;
 
 : same-or-next-business-day ( timestamp -- timestamp' )
     dup day-of-week {
