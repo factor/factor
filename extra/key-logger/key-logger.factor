@@ -12,7 +12,7 @@ CONSTANT: path "resource:key-log.txt"
 : update-key-caps-state ( -- )
     read-keyboard keys>>
     path binary [
-        [ now-gmt unix-1970 time- duration>nanoseconds >integer ]
+        [ now unix-1970 time- duration>nanoseconds >integer ]
         [ bit-array>integer ] bi*
         [ 8 >be write ] bi@ flush
     ] with-file-appender ;

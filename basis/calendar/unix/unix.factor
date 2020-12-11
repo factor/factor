@@ -14,7 +14,7 @@ IN: calendar.unix
     timeval>seconds seconds ; inline
 
 : timeval>unix-time ( timeval -- timestamp )
-    [ unix-1970 ] dip timeval>seconds +second ; inline
+    unix-1970 swap timeval>seconds +second ; inline
 
 : timespec>seconds ( timespec -- seconds )
     [ sec>> ] [ nsec>> 1,000,000,000 / ] bi + ; inline
@@ -23,7 +23,7 @@ IN: calendar.unix
     timespec>seconds seconds ; inline
 
 : timespec>unix-time ( timespec -- timestamp )
-    [ unix-1970 ] dip timespec>seconds +second ; inline
+    unix-1970 swap timespec>seconds +second ; inline
 
 : get-time ( -- alien )
     f time time_t <ref> localtime ; inline
@@ -40,5 +40,8 @@ M: unix gmt-offset
 : system-micros ( -- n )
     current-timeval timeval>micros ;
 
-M: unix now-gmt
-    current-timeval timeval>unix-time ;
+M: unix now
+    timeval <struct> timezone <struct>
+    [ gettimeofday io-error ] 2keep
+    [ timeval>unix-time dup gmt-offset>> ]
+    [ tz_minuteswest>> 60 /mod [ >>hour ] [ >>minute ] bi* drop ] bi* ;
