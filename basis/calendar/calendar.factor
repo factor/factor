@@ -309,17 +309,17 @@ M: duration <=> [ duration>years ] compare ;
 
 DEFER: time-
 
-: convert-timezone! ( timestamp duration -- timestamp )
+: convert-timezone ( timestamp duration -- timestamp )
     [ over gmt-offset>> time- (time+) drop ] [ >>gmt-offset ] bi ;
 
 : >local-time! ( timestamp -- timestamp )
-    gmt-offset-duration convert-timezone! ;
+    gmt-offset-duration convert-timezone ;
 
 : >local-time ( timestamp -- timestamp' )
     clone >local-time! ;
 
 : >gmt! ( timestamp -- timestamp )
-    instant convert-timezone! ;
+    instant convert-timezone ;
 
 : >gmt ( timestamp -- timestamp' )
     clone >gmt! ;

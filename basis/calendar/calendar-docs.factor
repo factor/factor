@@ -259,12 +259,12 @@ HELP: time-
     }
 } ;
 
-HELP: convert-timezone!
+HELP: convert-timezone
 { $values { "timestamp" timestamp } { "duration" duration } }
 { $description "Converts the " { $snippet "timestamp" } "'s " { $snippet "gmt-offset" } " to the GMT offset represented by the " { $snippet "duration" } "." }
 { $examples
     { $example "USING: accessors calendar prettyprint ;"
-               "gmt noon instant -5 >>hour convert-timezone! gmt-offset>> hour>> ."
+               "gmt noon instant -5 >>hour convert-timezone gmt-offset>> hour>> ."
                "-5"
     }
 } ;
@@ -504,7 +504,7 @@ ARTICLE: "calendar" "Calendar"
 { $subsections
     >local-time
     >gmt
-    convert-timezone!
+    convert-timezone
 }
 "Timestamps relative to each other:"
 { $subsections "relative-timestamps" }
