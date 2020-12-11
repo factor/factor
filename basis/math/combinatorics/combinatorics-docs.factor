@@ -134,7 +134,7 @@ HELP: all-subsets
 } ;
 
 HELP: all-selections
-{ $values { "seq" sequence } { "n" integer } { "selections" sequence } }
+{ $values { "seq" sequence } { "n" integer } { "seq'" sequence } }
 { $description
     "Returns all the ways to take n (possibly the same) items from the "
     "sequence of items."
