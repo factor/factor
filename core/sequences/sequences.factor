@@ -844,7 +844,7 @@ PRIVATE>
     [ swap head-slice ] [ swap tail-slice ] bi-curry bi* ; inline
 
 : replace-slice ( new from to seq -- seq' )
-    snip-slice surround ;
+    snip-slice swapd 3append ;
 
 : remove-nth ( n seq -- seq' )
     [ [ dup 1 + ] dip snip-slice ] keep append-as ;
