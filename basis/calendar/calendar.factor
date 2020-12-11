@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.tuple combinators
-combinators.short-circuit kernel locals math math.functions
-math.intervals math.order math.parser sequences
+combinators.short-circuit kernel literals math math.functions
+math.intervals math.order math.parser math.statistics sequences
 sequences.rotated slots.syntax splitting system vocabs
 vocabs.loader ;
 FROM: math.ranges => [a..b) ;
@@ -15,7 +15,7 @@ ERROR: not-in-interval value interval ;
 
 HOOK: gmt-offset os ( -- hours minutes seconds )
 
-HOOK: gmt os ( -- timestamp )
+HOOK: now-gmt os ( -- timestamp )
 
 TUPLE: duration
     { year real }
@@ -38,7 +38,13 @@ TUPLE: timestamp
     { second real }
     { gmt-offset duration } ;
 
+<PRIVATE
+<<
 CONSTANT: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 }
+>>
+CONSTANT: days-until $[ day-counts cum-sum0 ]
+
+PRIVATE>
 
 GENERIC: leap-year? ( obj -- ? )
 
@@ -127,29 +133,20 @@ M: integer easter
     dup easter-month-day <date> ;
 
 M: timestamp easter
-    clone
     dup year>> easter-month-day
     swapd >>day swap >>month ;
 
 : >date< ( timestamp -- year month day )
     [ year>> ] [ month>> ] [ day>> ] tri ;
 
+: set-date ( timestamp year month day -- timestamp )
+    [ >>year ] [ >>month ] [ >>day ] tri* ;
+
 : >time< ( timestamp -- hour minute second )
     [ hour>> ] [ minute>> ] [ second>> ] tri ;
 
-: set-time! ( timestamp hours minutes seconds -- timestamp )
+: set-time ( timestamp hour minute second -- timestamp )
     [ >>hour ] [ >>minute ] [ >>second ] tri* ;
-
-: set-time ( timestamp hours minutes seconds -- timestamp )
-    [ clone ] 3dip set-time! ;
-
-: time>hms ( str -- hms-seq )
-    ":" split [ string>number ] map
-    3 0 pad-tail ;
-
-: time>offset ( str -- hms-seq )
-    "-" ?head [ time>hms ] dip
-    [ [ neg ] map ] when ;
 
 : years ( x -- duration ) instant swap >>year ;
 : bienniums ( x -- duration ) instant swap 2 * >>year ;
@@ -309,48 +306,53 @@ M: duration <=> [ duration>years ] compare ;
 
 DEFER: time-
 
+: gmt ( timestamp -- timestamp )
+    instant >>gmt-offset ; inline
+
+: local-time ( timestamp -- timestamp )
+    gmt-offset-duration >>gmt-offset ; inline
+
 : convert-timezone ( timestamp duration -- timestamp )
     [ over gmt-offset>> time- (time+) drop ] [ >>gmt-offset ] bi ;
 
-: >local-time! ( timestamp -- timestamp )
+: >local-time ( timestamp -- timestamp )
     gmt-offset-duration convert-timezone ;
 
-: >local-time ( timestamp -- timestamp' )
-    clone >local-time! ;
-
-: >gmt! ( timestamp -- timestamp )
+: >gmt ( timestamp -- timestamp )
     instant convert-timezone ;
 
-: >gmt ( timestamp -- timestamp' )
-    clone >gmt! ;
+M: timestamp <=> [ clone >gmt tuple-slots ] compare ;
 
-M: timestamp <=> [ >gmt tuple-slots ] compare ;
+<PRIVATE
+
+: same-times? ( timestamp1 timestamp2 quot -- ? )
+    [ clone >gmt ] prepose same? ; inline
+
+PRIVATE>
 
 : same-year? ( ts1 ts2 -- ? )
-    [ >gmt slots{ year } ] same? ;
+    [ slots{ year } ] same-times? ;
 
 : quarter ( timestamp -- [1,4] )
-    month>> 3 /mod [ drop 1 + ] unless-zero ; inline
+    month>> 3 /i 1 + ; inline
 
 : same-quarter? ( ts1 ts2 -- ? )
-    [ >gmt [ year>> ] [ quarter ] bi 2array ] same? ;
+    [ [ year>> ] [ quarter ] bi 2array ] same-times? ;
 
 : same-month? ( ts1 ts2 -- ? )
-    [ >gmt slots{ year month } ] same? ;
+    [ slots{ year month } ] same-times? ;
 
 :: (day-of-year) ( year month day -- n )
-    day-counts month head-slice sum day +
-    year leap-year? [
-        year month day <date>
-        year 3 1 <date>
-        after=? [ 1 + ] when
-    ] when ;
+    month days-until nth day + {
+        [ year leap-year? ]
+        [ month 3 >= ]
+    } 0&& [ 1 + ] when ;
 
 : day-of-year ( timestamp -- n )
     >date< (day-of-year) ;
 
 : same-day? ( ts1 ts2 -- ? )
-    [ >gmt slots{ year month day } ] same? ;
+    [ slots{ year month day } ] same-times? ;
 
 : (day-of-week) ( year month day -- n )
     ! Zeller Congruence
@@ -378,21 +380,21 @@ DEFER: end-of-year
     } case ;
 
 : same-week? ( ts1 ts2 -- ? )
-    [ >gmt [ year>> ] [ week-number ] bi 2array ] same? ;
+    [ [ year>> ] [ week-number ] bi 2array ] same-times? ;
 
 : same-hour? ( ts1 ts2 -- ? )
-    [ >gmt slots{ year month day hour } ] same? ;
+    [ slots{ year month day hour } ] same-times? ;
 
 : same-minute? ( ts1 ts2 -- ? )
-    [ >gmt slots{ year month day hour minute } ] same? ;
+    [ slots{ year month day hour minute } ] same-times? ;
 
 : same-second? ( ts1 ts2 -- ? )
-    [ >gmt slots{ year month day hour minute second } ] same? ;
+    [ slots{ year month day hour minute second } ] same-times? ;
 
 <PRIVATE
 
 : (time-) ( timestamp timestamp -- n )
-    [ >gmt ] bi@
+    [ clone >gmt ] bi@
     [ [ >date< julian-day-number ] bi@ - 86400 * ] 2keep
     [ >time< [ [ 3600 * ] [ 60 * ] bi* ] dip + + ] bi@ - + ;
 
@@ -437,27 +439,22 @@ M: duration time-
     1970 <year-gmt> ; inline
 
 : millis>timestamp ( x -- timestamp )
-    [ unix-1970 ] dip 1000 / +second ;
+    unix-1970 swap 1000 / +second ;
 
 : timestamp>millis ( timestamp -- n )
     unix-1970 (time-) 1000 * >integer ;
 
 : micros>timestamp ( x -- timestamp )
-    [ unix-1970 ] dip 1000000 / +second ;
+    unix-1970 swap 1000000 / +second ;
 
 : timestamp>micros ( timestamp -- n )
     unix-1970 (time-) 1000000 * >integer ;
 
 : now ( -- timestamp )
-    gmt gmt-offset-duration (time+) >>gmt-offset ;
-
-: now-gmt ( -- timestamp ) gmt ;
+    now-gmt gmt-offset-duration (time+) >>gmt-offset ;
 
 : hence ( duration -- timestamp ) now swap time+ ;
-: hence-gmt ( duration -- timestamp ) now-gmt swap time+ ;
-
 : ago ( duration -- timestamp ) now swap time- ;
-: ago-gmt ( duration -- timestamp ) now-gmt swap time- ;
 
 GENERIC: days-in-year ( obj -- n )
 
@@ -468,136 +465,120 @@ M: timestamp days-in-year year>> days-in-year ;
 : days-in-month ( timestamp -- n )
     >date< drop (days-in-month) ;
 
-: midnight! ( timestamp -- timestamp ) 0 0 0 set-time! ; inline
-: midnight ( timestamp -- new-timestamp ) clone midnight! ; inline
-: midnight-gmt! ( timestamp -- timestamp ) 0 0 0 set-time! instant >>gmt-offset ; inline
-: midnight-gmt ( timestamp -- new-timestamp ) clone midnight-gmt! ; inline
+: midnight ( timestamp -- timestamp ) 0 0 0 set-time ; inline
+: noon ( timestamp -- timestamp ) 12 0 0 set-time ; inline
 
-: noon! ( timestamp -- timestamp ) 12 0 0 set-time! ; inline
-: noon ( timestamp -- new-timestamp ) clone noon! ; inline
-: noon-gmt! ( timestamp -- timestamp ) 12 0 0 set-time! instant >>gmt-offset ; inline
-: noon-gmt ( timestamp -- new-timestamp ) clone noon-gmt! ; inline
+: today ( -- timestamp ) now midnight ; inline
+: tomorrow ( -- timestamp ) 1 days hence midnight ; inline
+: overtomorrow ( -- timestamp ) 2 days hence midnight ; inline
+: yesterday ( -- timestamp ) 1 days ago midnight ; inline
+: ereyesterday ( -- timestamp ) 2 days ago midnight ; inline
 
-: today ( -- timestamp ) now midnight! ; inline
-: today-gmt ( -- timestamp ) now midnight-gmt! ; inline
-: tomorrow ( -- timestamp ) 1 days hence midnight! ; inline
-: tomorrow-gmt ( -- timestamp ) 1 days hence midnight-gmt! ; inline
-: overtomorrow ( -- timestamp ) 2 days hence midnight! ; inline
-: overtomorrow-gmt ( -- timestamp ) 2 days hence midnight-gmt! ; inline
-: yesterday ( -- timestamp ) 1 days ago midnight! ; inline
-: yesterday-gmt ( -- timestamp ) 1 days ago midnight-gmt! ; inline
-: ereyesterday ( -- timestamp ) 2 days ago midnight! ; inline
-: ereyesterday-gmt ( -- timestamp ) 2 days ago midnight-gmt! ; inline
+ALIAS: start-of-day midnight
 
-: start-of-day! ( timestamp -- timestamp ) midnight! ; inline
-: start-of-day ( object -- new-timestamp ) midnight ; inline
-
-: end-of-day! ( timestamp -- timestamp )
+: end-of-day ( timestamp -- timestamp )
     23 >>hour 59 >>minute 59+999/1000 >>second ; inline
 
-: end-of-day ( object -- new-timestamp )
-    clone end-of-day! ; inline
-
-: start-of-month ( timestamp -- new-timestamp )
+: start-of-month ( timestamp -- timestamp )
     midnight 1 >>day ; inline
 
-: end-of-month ( timestamp -- new-timestamp )
+: end-of-month ( timestamp -- timestamp )
     [ end-of-day ] [ days-in-month ] bi >>day ;
 
-: start-of-quarter ( timestamp -- new-timestamp )
+: start-of-quarter ( timestamp -- timestamp )
     [ start-of-day ] [ quarter 1 - 3 * ] bi >>month ; inline
 
-: end-of-quarter ( timestamp -- new-timestamp )
-    [ clone ] [ quarter 1 - 3 * 3 + ] bi >>month end-of-month ; inline
+: end-of-quarter ( timestamp -- timestamp )
+    dup quarter 1 - 3 * 3 + >>month end-of-month ; inline
 
-: first-day-of-month ( object -- new-timestamp )
-    clone 1 >>day ;
+: first-day-of-month ( timestamp -- timestamp )
+    1 >>day ;
 
-: last-day-of-month ( object -- new-timestamp )
-    clone dup days-in-month >>day ; inline
+: last-day-of-month ( timestamp -- timestamp )
+    dup days-in-month >>day ; inline
 
-GENERIC: first-day-of-year ( object -- new-timestamp )
+GENERIC: first-day-of-year ( object -- timestamp )
 M: timestamp first-day-of-year first-day-of-month 1 >>month ;
 M: integer first-day-of-year <year> ;
 
-GENERIC: last-day-of-year ( object -- new-timestamp )
-M: timestamp last-day-of-year clone 12 >>month 31 >>day ;
+GENERIC: last-day-of-year ( object -- timestamp )
+M: timestamp last-day-of-year 12 >>month 31 >>day ;
 M: integer last-day-of-year 12 31 <date> ;
 
-GENERIC: first-day-of-decade ( object -- new-timestamp )
+GENERIC: first-day-of-decade ( object -- timestamp )
 M: timestamp first-day-of-decade first-day-of-year [ dup 10 mod - ] change-year ;
 M: integer first-day-of-decade first-day-of-year [ dup 10 mod - ] change-year ;
 
-GENERIC: last-day-of-decade ( object -- new-timestamp )
+GENERIC: last-day-of-decade ( object -- timestamp )
 M: timestamp last-day-of-decade last-day-of-year [ dup 10 mod - 9 + ] change-year ;
 M: integer last-day-of-decade last-day-of-year [ dup 10 mod - 9 + ] change-year ;
 
-GENERIC: first-day-of-century ( object -- new-timestamp )
+GENERIC: first-day-of-century ( object -- timestamp )
 M: timestamp first-day-of-century first-day-of-year [ dup 100 mod - ] change-year ;
 M: integer first-day-of-century first-day-of-year [ dup 100 mod - ] change-year ;
 
-GENERIC: last-day-of-century ( object -- new-timestamp )
+GENERIC: last-day-of-century ( object -- timestamp )
 M: timestamp last-day-of-century last-day-of-year [ dup 100 mod - 99 + ] change-year ;
 M: integer last-day-of-century last-day-of-year [ dup 100 mod - 99 + ] change-year ;
 
-GENERIC: first-day-of-millennium ( object -- new-timestamp )
+GENERIC: first-day-of-millennium ( object -- timestamp )
 M: timestamp first-day-of-millennium first-day-of-year [ dup 1000 mod - ] change-year ;
 M: integer first-day-of-millennium first-day-of-year [ dup 1000 mod - ] change-year ;
 
-GENERIC: last-day-of-millennium ( object -- new-timestamp )
+GENERIC: last-day-of-millennium ( object -- timestamp )
 M: timestamp last-day-of-millennium last-day-of-year [ dup 1000 mod - 999 + ] change-year ;
 M: integer last-day-of-millennium last-day-of-year [ dup 1000 mod - 999 + ] change-year ;
 
-: start-of-year ( object -- new-timestamp )
-    first-day-of-year start-of-day! ;
+: start-of-year ( object -- timestamp )
+    first-day-of-year start-of-day ;
 
-: end-of-year ( object -- new-timestamp )
-    last-day-of-year end-of-day! ;
+: end-of-year ( object -- timestamp )
+    last-day-of-year end-of-day ;
 
-: start-of-decade ( object -- new-timestamp )
-    first-day-of-decade start-of-day! ;
+: start-of-decade ( object -- timestamp )
+    first-day-of-decade start-of-day ;
 
-: end-of-decade ( object -- new-timestamp )
-    last-day-of-decade end-of-day! ;
+: end-of-decade ( object -- timestamp )
+    last-day-of-decade end-of-day ;
 
-: end-of-century ( object -- new-timestamp )
-    last-day-of-century end-of-day! ;
+: end-of-century ( object -- timestamp )
+    last-day-of-century end-of-day ;
 
-: start-of-millennium ( object -- new-timestamp )
-    first-day-of-millennium start-of-day! ;
+: start-of-millennium ( object -- timestamp )
+    first-day-of-millennium start-of-day ;
 
-: end-of-millennium ( object -- new-timestamp )
-    last-day-of-millennium end-of-day! ;
+: end-of-millennium ( object -- timestamp )
+    last-day-of-millennium end-of-day ;
 
-: start-of-hour ( timestamp -- new-timestamp ) clone 0 >>minute 0 >>second ;
-: end-of-hour ( timestamp -- new-timestamp ) clone 59 >>minute 59+999/1000 >>second ;
+: start-of-hour ( timestamp -- timestamp ) 0 >>minute 0 >>second ;
+: end-of-hour ( timestamp -- timestamp ) 59 >>minute 59+999/1000 >>second ;
 
-: start-of-minute ( timestamp -- new-timestamp ) clone 0 >>second ;
-: end-of-minute ( timestamp -- new-timestamp ) clone 59+999/1000 >>second ;
+: start-of-minute ( timestamp -- timestamp ) 0 >>second ;
+: end-of-minute ( timestamp -- timestamp ) 59+999/1000 >>second ;
 
-GENERIC: start-of-second ( object -- new-timestamp )
-M: timestamp start-of-second clone [ floor ] change-second ;
+GENERIC: start-of-second ( object -- timestamp )
+M: timestamp start-of-second [ floor ] change-second ;
 M: real start-of-second floor ;
 
-GENERIC: end-of-second ( object -- new-timestamp )
-M: timestamp end-of-second clone [ floor 999/1000 + ] change-second ;
+GENERIC: end-of-second ( object -- timestamp )
+M: timestamp end-of-second [ floor 999/1000 + ] change-second ;
 M: real end-of-second floor 999/1000 + ;
 
 <PRIVATE
 
-: day-offset ( timestamp m -- new-timestamp n )
+: day-offset ( timestamp m -- timestamp n )
     over day-of-week - ; inline
 
 : day-this-week ( timestamp n -- new-timestamp )
     day-offset days time+ ;
 
-: closest-day ( timestamp n -- new-timestamp )
+: closest-day ( timestamp n -- timestamp )
     [ dup day-of-week ] dip
     { 0 1 2 3 -3 -2 -1 }
     rot 7 swap - <rotated> nth days time+ ;
 
 :: nth-day-this-month ( timestamp n day -- new-timestamp )
-    timestamp start-of-month day day-this-week
+    timestamp clone start-of-month day day-this-week
     dup timestamp [ month>> ] same?
     [ 1 weeks time+ ] unless
     n [ weeks time+ ] unless-zero ;
@@ -630,84 +611,37 @@ M: integer october 10 1 <date> ;
 M: integer november 11 1 <date> ;
 M: integer december 12 1 <date> ;
 
-M: timestamp january clone 1 >>month ;
-M: timestamp february clone 2 >>month ;
-M: timestamp march clone 3 >>month ;
-M: timestamp april clone 4 >>month ;
-M: timestamp may clone 5 >>month ;
-M: timestamp june clone 6 >>month ;
-M: timestamp july clone 7 >>month ;
-M: timestamp august clone 8 >>month ;
-M: timestamp september clone 9 >>month ;
-M: timestamp october clone 10 >>month ;
-M: timestamp november clone 11 >>month ;
-M: timestamp december clone 12 >>month ;
+M: timestamp january 1 >>month ;
+M: timestamp february 2 >>month ;
+M: timestamp march 3 >>month ;
+M: timestamp april 4 >>month ;
+M: timestamp may 5 >>month ;
+M: timestamp june 6 >>month ;
+M: timestamp july 7 >>month ;
+M: timestamp august 8 >>month ;
+M: timestamp september 9 >>month ;
+M: timestamp october 10 >>month ;
+M: timestamp november 11 >>month ;
+M: timestamp december 12 >>month ;
 
-GENERIC: january-gmt ( obj -- timestamp )
-GENERIC: february-gmt ( obj -- timestamp )
-GENERIC: march-gmt ( obj -- timestamp )
-GENERIC: april-gmt ( obj -- timestamp )
-GENERIC: may-gmt ( obj -- timestamp )
-GENERIC: june-gmt ( obj -- timestamp )
-GENERIC: july-gmt ( obj -- timestamp )
-GENERIC: august-gmt ( obj -- timestamp )
-GENERIC: september-gmt ( obj -- timestamp )
-GENERIC: october-gmt ( obj -- timestamp )
-GENERIC: november-gmt ( obj -- timestamp )
-GENERIC: december-gmt ( obj -- timestamp )
+: closest-sunday ( timestamp -- timestamp ) 0 closest-day ;
+: closest-monday ( timestamp -- timestamp ) 1 closest-day ;
+: closest-tuesday ( timestamp -- timestamp ) 2 closest-day ;
+: closest-wednesday ( timestamp -- timestamp ) 3 closest-day ;
+: closest-thursday ( timestamp -- timestamp ) 4 closest-day ;
+: closest-friday ( timestamp -- timestamp ) 5 closest-day ;
+: closest-saturday ( timestamp -- timestamp ) 6 closest-day ;
 
-M: integer january-gmt 1 1 <date-gmt> ;
-M: integer february-gmt 2 1 <date-gmt> ;
-M: integer march-gmt 3 1 <date-gmt> ;
-M: integer april-gmt 4 1 <date-gmt> ;
-M: integer may-gmt 5 1 <date-gmt> ;
-M: integer june-gmt 6 1 <date-gmt> ;
-M: integer july-gmt 7 1 <date-gmt> ;
-M: integer august-gmt 8 1 <date-gmt> ;
-M: integer september-gmt 9 1 <date-gmt> ;
-M: integer october-gmt 10 1 <date-gmt> ;
-M: integer november-gmt 11 1 <date-gmt> ;
-M: integer december-gmt 12 1 <date-gmt> ;
+: sunday ( timestamp -- timestamp ) 0 day-this-week ;
+: monday ( timestamp -- timestamp ) 1 day-this-week ;
+: tuesday ( timestamp -- timestamp ) 2 day-this-week ;
+: wednesday ( timestamp -- timestamp ) 3 day-this-week ;
+: thursday ( timestamp -- timestamp ) 4 day-this-week ;
+: friday ( timestamp -- timestamp ) 5 day-this-week ;
+: saturday ( timestamp -- timestamp ) 6 day-this-week ;
 
-M: timestamp january-gmt >gmt 1 >>month ;
-M: timestamp february-gmt >gmt 2 >>month ;
-M: timestamp march-gmt >gmt 3 >>month ;
-M: timestamp april-gmt >gmt 4 >>month ;
-M: timestamp may-gmt >gmt 5 >>month ;
-M: timestamp june-gmt >gmt 6 >>month ;
-M: timestamp july-gmt >gmt 7 >>month ;
-M: timestamp august-gmt >gmt 8 >>month ;
-M: timestamp september-gmt >gmt 9 >>month ;
-M: timestamp october-gmt >gmt 10 >>month ;
-M: timestamp november-gmt >gmt 11 >>month ;
-M: timestamp december-gmt >gmt 12 >>month ;
-
-: closest-sunday ( timestamp -- new-timestamp ) 0 closest-day ;
-: closest-monday ( timestamp -- new-timestamp ) 1 closest-day ;
-: closest-tuesday ( timestamp -- new-timestamp ) 2 closest-day ;
-: closest-wednesday ( timestamp -- new-timestamp ) 3 closest-day ;
-: closest-thursday ( timestamp -- new-timestamp ) 4 closest-day ;
-: closest-friday ( timestamp -- new-timestamp ) 5 closest-day ;
-: closest-saturday ( timestamp -- new-timestamp ) 6 closest-day ;
-
-: sunday ( timestamp -- new-timestamp ) 0 day-this-week ;
-: monday ( timestamp -- new-timestamp ) 1 day-this-week ;
-: tuesday ( timestamp -- new-timestamp ) 2 day-this-week ;
-: wednesday ( timestamp -- new-timestamp ) 3 day-this-week ;
-: thursday ( timestamp -- new-timestamp ) 4 day-this-week ;
-: friday ( timestamp -- new-timestamp ) 5 day-this-week ;
-: saturday ( timestamp -- new-timestamp ) 6 day-this-week ;
-
-: sunday-gmt ( timestamp -- new-timestamp ) sunday >gmt! ;
-: monday-gmt ( timestamp -- new-timestamp ) monday >gmt! ;
-: tuesday-gmt ( timestamp -- new-timestamp ) tuesday >gmt! ;
-: wednesday-gmt ( timestamp -- new-timestamp ) wednesday >gmt! ;
-: thursday-gmt ( timestamp -- new-timestamp ) thursday >gmt! ;
-: friday-gmt ( timestamp -- new-timestamp ) friday >gmt! ;
-: saturday-gmt ( timestamp -- new-timestamp ) saturday >gmt! ;
-
-: first-day-of-week ( object -- new-timestamp ) sunday ; inline
-: last-day-of-week ( object -- new-timestamp ) saturday ; inline
+ALIAS: first-day-of-week sunday
+ALIAS: last-day-of-week saturday
 
 : day< ( quot -- new-timestamp ) keep over before=? [ 7 days time- ] when ; inline
 : day<= ( quot -- new-timestamp ) keep over before? [ 7 days time- ] when ; inline
@@ -770,18 +704,18 @@ M: timestamp december-gmt >gmt 12 >>month ;
 : friday? ( timestamp -- ? ) day-of-week 5 = ;
 : saturday? ( timestamp -- ? ) day-of-week 6 = ;
 
-: january? ( obj -- timestamp ) month>> 1 = ;
-: february? ( obj -- timestamp ) month>> 2 = ;
-: march? ( obj -- timestamp ) month>> 3  = ;
-: april? ( obj -- timestamp ) month>> 4 = ;
-: may? ( obj -- timestamp ) month>> 5 = ;
-: june? ( obj -- timestamp ) month>> 6 = ;
-: july? ( obj -- timestamp ) month>> 7 = ;
-: august? ( obj -- timestamp ) month>> 8 = ;
-: september? ( obj -- timestamp ) month>> 9 = ;
-: october? ( obj -- timestamp ) month>> 10 = ;
-: november? ( obj -- timestamp ) month>> 11 = ;
-: december? ( obj -- timestamp ) month>> 12 = ;
+: january? ( obj -- ? ) month>> 1 = ;
+: february? ( obj -- ? ) month>> 2 = ;
+: march? ( obj -- ? ) month>> 3  = ;
+: april? ( obj -- ? ) month>> 4 = ;
+: may? ( obj -- ? ) month>> 5 = ;
+: june? ( obj -- ? ) month>> 6 = ;
+: july? ( obj -- ? ) month>> 7 = ;
+: august? ( obj -- ? ) month>> 8 = ;
+: september? ( obj -- ? ) month>> 9 = ;
+: october? ( obj -- ? ) month>> 10 = ;
+: november? ( obj -- ? ) month>> 11 = ;
+: december? ( obj -- ? ) month>> 12 = ;
 
 GENERIC: weekend? ( obj -- ? )
 M: timestamp weekend? day-of-week weekend? ;
@@ -838,23 +772,23 @@ CONSTANT: weekday-offsets { 0 0 1 2 3 4 5 }
 : last-friday-of-month ( timestamp -- new-timestamp ) last-day-of-month friday<= ;
 : last-saturday-of-month ( timestamp -- new-timestamp ) last-day-of-month saturday<= ;
 
-: start-of-week ( timestamp -- new-timestamp )
-    sunday midnight! ;
+: start-of-week ( timestamp -- timestamp )
+    sunday midnight ;
 
-: end-of-week ( timestamp -- new-timestamp )
-    saturday end-of-day! ;
+: end-of-week ( timestamp -- timestamp )
+    saturday end-of-day ;
 
-: o'clock ( timestamp n -- new-timestamp )
+: o'clock ( timestamp n -- timestamp )
     [ midnight ] dip >>hour ;
 
-: am ( timestamp n -- new-timestamp )
+: am ( timestamp n -- timestamp )
     0 12 [a,b] check-interval o'clock ;
 
-: pm ( timestamp n -- new-timestamp )
+: pm ( timestamp n -- timestamp )
     0 12 [a,b] check-interval 12 + o'clock ;
 
 : time-since-midnight ( timestamp -- duration )
-    dup midnight time- ; inline
+    dup clone midnight time- ; inline
 
 : since-1970 ( duration -- timestamp )
     unix-1970 time+ ; inline
