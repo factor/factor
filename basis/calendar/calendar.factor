@@ -768,10 +768,10 @@ CONSTANT: weekday-offsets { 0 0 1 2 3 4 5 }
     [ midnight ] dip >>hour ;
 
 : am ( timestamp n -- timestamp )
-    1 12 [a,b] check-interval dup 12 = [ drop 0 ] when o'clock ;
+    1 12 [a,b] check-interval 12 mod o'clock ;
 
 : pm ( timestamp n -- timestamp )
-    1 12 [a,b] check-interval dup 12 = [ drop 0 ] when 12 + o'clock ;
+    1 12 [a,b] check-interval 12 mod 12 + o'clock ;
 
 : time-since-midnight ( timestamp -- duration )
     instant swap >time< set-time ;
