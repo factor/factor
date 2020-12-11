@@ -11,7 +11,7 @@ IN: uuid
     ! 0x01b21dd213814000L is the number of 100-ns intervals
     ! between the UUID epoch 1582-10-15 00:00:00 and the
     ! Unix epoch 1970-01-01 00:00:00.
-    now timestamp>micros 10 * 0x01b21dd213814000 +
+    now-gmt timestamp>micros 10 * 0x01b21dd213814000 +
     [ -48 shift 0x0fff bitand ]
     [ -32 shift 0xffff bitand ]
     [ 0xffffffff bitand ]

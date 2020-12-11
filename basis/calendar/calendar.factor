@@ -15,7 +15,7 @@ ERROR: not-in-interval value interval ;
 
 HOOK: gmt-offset os ( -- hours minutes seconds )
 
-HOOK: now os ( -- timestamp )
+HOOK: now-gmt os ( -- timestamp )
 
 TUPLE: duration
     { year real }
@@ -447,6 +447,9 @@ M: duration time-
 
 : timestamp>micros ( timestamp -- n )
     unix-1970 (time-) 1000000 * >integer ;
+
+: now ( -- timestamp )
+    now-gmt gmt-offset-duration [ (time+) ] [ >>gmt-offset ] bi ;
 
 : hence ( duration -- timestamp ) now swap time+ ;
 : ago ( duration -- timestamp ) now swap time- ;
