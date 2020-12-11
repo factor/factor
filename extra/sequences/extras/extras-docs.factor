@@ -2,6 +2,11 @@ USING: arrays help.markup help.syntax kernel math multiline
 quotations sequences ;
 IN: sequences.extras
 
+HELP: pad-center
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "elt" object } { "padded" "a new sequence" } }
+{ $description "Outputs a new sequence consisting of " { $snippet "seq" } " padded on the left and right with enough repetitions of " { $snippet "elt" } " to have the result be of length " { $snippet "n" } "." }
+{ $examples { $example "USING: io sequences ;" "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-center print ] each" "-ab--\nquux-" } } ;
+
 HELP: ?supremum
 { $values
     { "seq/f" { $maybe sequence } }

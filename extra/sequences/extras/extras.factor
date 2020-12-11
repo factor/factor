@@ -61,12 +61,10 @@ IN: sequences.extras
 : pad-longest ( seq1 seq2 elt -- seq1 seq2 )
     [ 2dup max-length ] dip [ pad-tail ] 2curry bi@ ;
 
-:: pad-center ( seq n elt -- padded )
-    n seq length [-] :> extra
-    extra 2/ :> left
-    extra left - :> right
-    left elt <repetition> seq right elt <repetition>
-    seq 3append-as ;
+: pad-center ( seq n elt -- padded )
+    swap pick length [-] [ drop ] [
+        [ 2/ ] [ over - ] bi rot '[ _ <repetition> ] bi@ surround
+    ] if-zero ;
 
 : change-nths ( ... indices seq quot: ( ... elt -- ... elt' ) -- ... )
     [ change-nth ] 2curry each ; inline
