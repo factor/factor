@@ -975,6 +975,18 @@ HELP: surround
     }
 } ;
 
+HELP: surround-as
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "exemplar" sequence } { "newseq" sequence } }
+{ $description "Outputs a new sequence with " { $snippet "seq1" } " inserted between " { $snippet "seq2" } " and " { $snippet "seq3" } " of the same type as " { $snippet "exemplar" } "." }
+{ $examples
+    { $example "USING: sequences prettyprint ;"
+               "\"sssssh\" \"(\" \")\" SBUF\" \" surround-as ."
+               "SBUF\" (sssssh)\""
+    }
+} ;
+
+{ surround surround-as } related-words
+
 HELP: glue
 { $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "newseq" sequence } }
 { $description "Outputs a new sequence with " { $snippet "seq3" } " inserted between " { $snippet "seq1" } " and " { $snippet "seq2" } "." }
@@ -984,6 +996,18 @@ HELP: glue
                "\"a,b\""
     }
 } ;
+
+HELP: glue-as
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "exemplar" sequence } { "newseq" sequence } }
+{ $description "Outputs a new sequence with " { $snippet "seq3" } " inserted between " { $snippet "seq1" } " and " { $snippet "seq2" } " of the same type as " { $snippet "exemplar" } "." }
+{ $examples
+    { $example "USING: sequences prettyprint ;"
+               "\"a\" \"b\" \",\" SBUF\" \" glue-as ."
+               "SBUF\" a,b\""
+    }
+} ;
+
+{ glue glue-as } related-words
 
 HELP: subseq
 { $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq" sequence } { "subseq" "a new sequence" } }
