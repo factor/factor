@@ -250,7 +250,7 @@ M: real +minute
 M: number +second
     over second>> + seconds/minutes [ >>second ] dip +minute ;
 
-: (time+) ( timestamp duration -- timestamp duration )
+: (time+) ( timestamp duration -- timestamp )
     {
         [ second>> +second ]
         [ minute>> +minute ]
@@ -258,15 +258,13 @@ M: number +second
         [ day>>    +day    ]
         [ month>>  +month  ]
         [ year>>   +year   ]
-        [ ]
      } cleave ; inline
 
 PRIVATE>
 
 GENERIC#: time+ 1 ( time1 time2 -- time3 )
 
-M: timestamp time+
-    [ clone ] dip (time+) drop ;
+M: timestamp time+ [ clone ] dip (time+) ;
 
 : duration+ ( duration1 duration2 -- duration3 )
     {
@@ -313,7 +311,7 @@ DEFER: time-
     gmt-offset-duration >>gmt-offset ; inline
 
 : convert-timezone ( timestamp duration -- timestamp )
-    [ over gmt-offset>> time- (time+) drop ] [ >>gmt-offset ] bi ;
+    [ over gmt-offset>> time- (time+) ] [ >>gmt-offset ] bi ;
 
 : >local-time ( timestamp -- timestamp )
     gmt-offset-duration convert-timezone ;
@@ -451,7 +449,7 @@ M: duration time-
     unix-1970 (time-) 1000000 * >integer ;
 
 : now ( -- timestamp )
-    now-gmt gmt-offset-duration (time+) >>gmt-offset ;
+    now-gmt gmt-offset-duration [ (time+) ] [ >>gmt-offset ] bi ;
 
 : hence ( duration -- timestamp ) now swap time+ ;
 : ago ( duration -- timestamp ) now swap time- ;
@@ -559,18 +557,18 @@ M: integer last-day-of-year 12 31 <date> ;
     over day-of-week - ; inline
 
 : day-this-week ( timestamp n -- timestamp )
-    day-offset days (time+) drop ;
+    day-offset days (time+) ;
 
 : closest-day ( timestamp n -- timestamp )
     { 0 1 2 3 -3 -2 -1 } pick day-of-week 7 swap -
-    <rotated> nth days (time+) drop ;
+    <rotated> nth days (time+) ;
 
 :: nth-day-this-month ( timestamp n day -- timestamp )
     timestamp clone
     timestamp start-of-month day day-this-week
     [ [ month>> ] same? ] keep swap
-    [ 1 weeks (time+) drop ] unless
-    n [ weeks (time+) drop ] unless-zero ;
+    [ 1 weeks (time+) ] unless
+    n [ weeks (time+) ] unless-zero ;
 
 PRIVATE>
 
@@ -633,13 +631,13 @@ ALIAS: first-day-of-week sunday
 ALIAS: last-day-of-week saturday
 
 : day< ( timestamp quot -- timestamp )
-    over clone [ call dup ] dip after=? [ -7 days (time+) drop ] when ; inline
+    over clone [ call dup ] dip after=? [ -7 days (time+) ] when ; inline
 : day<= ( timestamp quot -- timestamp )
-    over clone [ call dup ] dip after? [ -7 days (time+) drop ] when ; inline
+    over clone [ call dup ] dip after? [ -7 days (time+) ] when ; inline
 : day> ( timestamp quot -- timestamp )
-    over clone [ call dup ] dip before=? [ 7 days (time+) drop ] when ; inline
+    over clone [ call dup ] dip before=? [ 7 days (time+) ] when ; inline
 : day>= ( timestamp quot -- timestamp )
-    over clone [ call dup ] dip before? [ 7 days (time+) drop ] when ; inline
+    over clone [ call dup ] dip before? [ 7 days (time+) ] when ; inline
 
 : sunday< ( timestamp -- timestamp ) [ sunday ] day< ;
 : monday< ( timestamp -- timestamp ) [ monday ] day< ;
@@ -716,13 +714,13 @@ ALIAS: last-day-of-week saturday
 : same-or-next-business-day ( timestamp -- timestamp )
     dup day-of-week {
         { 0 [ monday ] }
-        { 6 [ 2 days (time+) drop ] }
+        { 6 [ 2 days (time+) ] }
         [ drop ]
     } case ;
 
 : same-or-previous-business-day ( timestamp -- timestamp )
     dup day-of-week {
-        { 0 [ -2 days (time+) drop ] }
+        { 0 [ -2 days (time+) ] }
         { 6 [ friday ] }
         [ drop ]
     } case ;
@@ -779,7 +777,7 @@ CONSTANT: weekday-offsets { 0 0 1 2 3 4 5 }
     instant swap >time< set-time ;
 
 : since-1970 ( duration -- timestamp )
-    unix-1970 swap (time+) drop ; inline
+    unix-1970 swap (time+) ; inline
 
 : timestamp>unix-time ( timestamp -- seconds )
     unix-1970 (time-) ; inline
