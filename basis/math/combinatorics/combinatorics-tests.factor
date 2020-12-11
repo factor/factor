@@ -67,20 +67,20 @@ math.combinatorics.private tools.test sequences ;
 { { { } { 1 } { 2 } { 3 } { 1 2 } { 1 3 } { 2 3 } { 1 2 3 } } }
 [ { 1 2 3 } all-subsets ] unit-test
 
-{ { } } [ { 1 2 } 0 selections ] unit-test
+{ { } } [ { 1 2 } 0 all-selections ] unit-test
 
-{ { { 1 } { 2 } } } [ { 1 2 } 1 selections ] unit-test
-{ { { { 1 } } { 2 } } } [ { { 1 } 2 } 1 selections ] unit-test
+{ { { 1 } { 2 } } } [ { 1 2 } 1 all-selections ] unit-test
+{ { { { 1 } } { 2 } } } [ { { 1 } 2 } 1 all-selections ] unit-test
 
 { { { 1 1 } { 1 2 } { 2 1 } { 2 2 } } }
-[ { 1 2 } 2 selections ] unit-test
+[ { 1 2 } 2 all-selections ] unit-test
 
 { { { 1 1 1 } { 1 1 2 } { 1 2 1 } { 1 2 2 }
     { 2 1 1 } { 2 1 2 } { 2 2 1 } { 2 2 2 } } }
-[ { 1 2 } 3 selections ] unit-test
+[ { 1 2 } 3 all-selections ] unit-test
 
 { { "aa" "ab" "ac" "ba" "bb" "bc" "ca" "cb" "cc" } }
-[ "abc" 2 selections ] unit-test
+[ "abc" 2 all-selections ] unit-test
 
 { V{ { 1 2 } { 1 3 } } }
 [ { 1 2 3 } 2 [ { 1 } head? ] filter-combinations ] unit-test

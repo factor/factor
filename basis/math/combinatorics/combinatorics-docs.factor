@@ -133,7 +133,7 @@ HELP: all-subsets
     }
 } ;
 
-HELP: selections
+HELP: all-selections
 { $values { "seq" sequence } { "n" integer } { "selections" sequence } }
 { $description
     "Returns all the ways to take n (possibly the same) items from the "
@@ -142,7 +142,7 @@ HELP: selections
 { $examples
     { $example
         "USING: math.combinatorics prettyprint ;"
-        "{ 1 2 } 2 selections ."
+        "{ 1 2 } 2 all-selections ."
         "{ { 1 1 } { 1 2 } { 2 1 } { 2 2 } }"
     }
 } ;
