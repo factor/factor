@@ -194,7 +194,7 @@ GENERIC: +second ( timestamp x -- timestamp )
 
 : /rem ( f n -- q r )
     ! q is positive or negative, r is positive from 0 <= r < n
-    [ / floor >integer ] 2keep rem ;
+    [ /mod ] keep over 0 < [ + [ -1 + ] dip ] [ drop ] if ;
 
 : float>whole-part ( float -- int float )
     [ floor >integer ] keep over - ;
