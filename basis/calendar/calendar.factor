@@ -558,18 +558,18 @@ M: integer last-day-of-year 12 31 <date> ;
 : day-offset ( timestamp m -- timestamp n )
     over day-of-week - ; inline
 
-: day-this-week ( timestamp n -- new-timestamp )
-    day-offset days time+ ;
+: day-this-week ( timestamp n -- timestamp )
+    day-offset days (time+) drop ;
 
-: closest-day ( timestamp n -- new-timestamp )
+: closest-day ( timestamp n -- timestamp )
     { 0 1 2 3 -3 -2 -1 } pick day-of-week 7 swap -
-    <rotated> nth days time+ ;
+    <rotated> nth days (time+) drop ;
 
-:: nth-day-this-month ( timestamp n day -- new-timestamp )
+:: nth-day-this-month ( timestamp n day -- timestamp )
     timestamp clone start-of-month day day-this-week
     dup timestamp [ month>> ] same?
-    [ 1 weeks time+ ] unless
-    n [ weeks time+ ] unless-zero ;
+    [ 1 weeks (time+) drop ] unless
+    n [ weeks (time+) drop ] unless-zero ;
 
 PRIVATE>
 
@@ -631,58 +631,62 @@ M: timestamp december 12 >>month ;
 ALIAS: first-day-of-week sunday
 ALIAS: last-day-of-week saturday
 
-: day< ( quot -- new-timestamp ) keep over before=? [ 7 days time- ] when ; inline
-: day<= ( quot -- new-timestamp ) keep over before? [ 7 days time- ] when ; inline
-: day> ( quot -- new-timestamp ) keep over after=? [ 7 days time+ ] when ; inline
-: day>= ( quot -- new-timestamp ) keep over after? [ 7 days time+ ] when ; inline
+: day< ( timestamp quot -- timestamp )
+    over clone [ call dup ] dip after=? [ -7 days (time+) drop ] when ; inline
+: day<= ( timestamp quot -- timestamp )
+    over clone [ call dup ] dip after? [ -7 days (time+) drop ] when ; inline
+: day> ( timestamp quot -- timestamp )
+    over clone [ call dup ] dip before=? [ 7 days (time+) drop ] when ; inline
+: day>= ( timestamp quot -- timestamp )
+    over clone [ call dup ] dip before? [ 7 days (time+) drop ] when ; inline
 
-: sunday< ( timestamp -- new-timestamp ) [ sunday ] day< ;
-: monday< ( timestamp -- new-timestamp ) [ monday ] day< ;
-: tuesday< ( timestamp -- new-timestamp ) [ tuesday ] day< ;
-: wednesday< ( timestamp -- new-timestamp ) [ wednesday ] day< ;
-: thursday< ( timestamp -- new-timestamp ) [ thursday ] day< ;
-: friday< ( timestamp -- new-timestamp ) [ friday ] day< ;
-: saturday< ( timestamp -- new-timestamp ) [ saturday ] day< ;
+: sunday< ( timestamp -- timestamp ) [ sunday ] day< ;
+: monday< ( timestamp -- timestamp ) [ monday ] day< ;
+: tuesday< ( timestamp -- timestamp ) [ tuesday ] day< ;
+: wednesday< ( timestamp -- timestamp ) [ wednesday ] day< ;
+: thursday< ( timestamp -- timestamp ) [ thursday ] day< ;
+: friday< ( timestamp -- timestamp ) [ friday ] day< ;
+: saturday< ( timestamp -- timestamp ) [ saturday ] day< ;
 
-: sunday<= ( timestamp -- new-timestamp ) [ sunday ] day<= ;
-: monday<= ( timestamp -- new-timestamp ) [ monday ] day<= ;
-: tuesday<= ( timestamp -- new-timestamp ) [ tuesday ] day<= ;
-: wednesday<= ( timestamp -- new-timestamp ) [ wednesday ] day<= ;
-: thursday<= ( timestamp -- new-timestamp ) [ thursday ] day<= ;
-: friday<= ( timestamp -- new-timestamp ) [ friday ] day<= ;
-: saturday<= ( timestamp -- new-timestamp ) [ saturday ] day<= ;
+: sunday<= ( timestamp -- timestamp ) [ sunday ] day<= ;
+: monday<= ( timestamp -- timestamp ) [ monday ] day<= ;
+: tuesday<= ( timestamp -- timestamp ) [ tuesday ] day<= ;
+: wednesday<= ( timestamp -- timestamp ) [ wednesday ] day<= ;
+: thursday<= ( timestamp -- timestamp ) [ thursday ] day<= ;
+: friday<= ( timestamp -- timestamp ) [ friday ] day<= ;
+: saturday<= ( timestamp -- timestamp ) [ saturday ] day<= ;
 
-: sunday> ( timestamp -- new-timestamp ) [ sunday ] day> ;
-: monday> ( timestamp -- new-timestamp ) [ monday ] day> ;
-: tuesday> ( timestamp -- new-timestamp ) [ tuesday ] day> ;
-: wednesday> ( timestamp -- new-timestamp ) [ wednesday ] day> ;
-: thursday> ( timestamp -- new-timestamp ) [ thursday ] day> ;
-: friday> ( timestamp -- new-timestamp ) [ friday ] day> ;
-: saturday> ( timestamp -- new-timestamp ) [ saturday ] day> ;
+: sunday> ( timestamp -- timestamp ) [ sunday ] day> ;
+: monday> ( timestamp -- timestamp ) [ monday ] day> ;
+: tuesday> ( timestamp -- timestamp ) [ tuesday ] day> ;
+: wednesday> ( timestamp -- timestamp ) [ wednesday ] day> ;
+: thursday> ( timestamp -- timestamp ) [ thursday ] day> ;
+: friday> ( timestamp -- timestamp ) [ friday ] day> ;
+: saturday> ( timestamp -- timestamp ) [ saturday ] day> ;
 
-: sunday>= ( timestamp -- new-timestamp ) [ sunday ] day>= ;
-: monday>= ( timestamp -- new-timestamp ) [ monday ] day>= ;
-: tuesday>= ( timestamp -- new-timestamp ) [ tuesday ] day>= ;
-: wednesday>= ( timestamp -- new-timestamp ) [ wednesday ] day>= ;
-: thursday>= ( timestamp -- new-timestamp ) [ thursday ] day>= ;
-: friday>= ( timestamp -- new-timestamp ) [ friday ] day>= ;
-: saturday>= ( timestamp -- new-timestamp ) [ saturday ] day>= ;
+: sunday>= ( timestamp -- timestamp ) [ sunday ] day>= ;
+: monday>= ( timestamp -- timestamp ) [ monday ] day>= ;
+: tuesday>= ( timestamp -- timestamp ) [ tuesday ] day>= ;
+: wednesday>= ( timestamp -- timestamp ) [ wednesday ] day>= ;
+: thursday>= ( timestamp -- timestamp ) [ thursday ] day>= ;
+: friday>= ( timestamp -- timestamp ) [ friday ] day>= ;
+: saturday>= ( timestamp -- timestamp ) [ saturday ] day>= ;
 
-: next-sunday ( timestamp -- new-timestamp ) closest-sunday sunday> ;
-: next-monday ( timestamp -- new-timestamp ) closest-monday monday> ;
-: next-tuesday ( timestamp -- new-timestamp ) closest-tuesday tuesday> ;
-: next-wednesday ( timestamp -- new-timestamp ) closest-wednesday wednesday> ;
-: next-thursday ( timestamp -- new-timestamp ) closest-thursday thursday> ;
-: next-friday ( timestamp -- new-timestamp ) closest-friday friday> ;
-: next-saturday ( timestamp -- new-timestamp ) closest-saturday saturday> ;
+: next-sunday ( timestamp -- timestamp ) closest-sunday sunday> ;
+: next-monday ( timestamp -- timestamp ) closest-monday monday> ;
+: next-tuesday ( timestamp -- timestamp ) closest-tuesday tuesday> ;
+: next-wednesday ( timestamp -- timestamp ) closest-wednesday wednesday> ;
+: next-thursday ( timestamp -- timestamp ) closest-thursday thursday> ;
+: next-friday ( timestamp -- timestamp ) closest-friday friday> ;
+: next-saturday ( timestamp -- timestamp ) closest-saturday saturday> ;
 
-: last-sunday ( timestamp -- new-timestamp ) closest-sunday sunday< ;
-: last-monday ( timestamp -- new-timestamp ) closest-monday monday< ;
-: last-tuesday ( timestamp -- new-timestamp ) closest-tuesday tuesday< ;
-: last-wednesday ( timestamp -- new-timestamp ) closest-wednesday wednesday< ;
-: last-thursday ( timestamp -- new-timestamp ) closest-thursday thursday< ;
-: last-friday ( timestamp -- new-timestamp ) closest-friday friday< ;
-: last-saturday ( timestamp -- new-timestamp ) closest-saturday saturday< ;
+: last-sunday ( timestamp -- timestamp ) closest-sunday sunday< ;
+: last-monday ( timestamp -- timestamp ) closest-monday monday< ;
+: last-tuesday ( timestamp -- timestamp ) closest-tuesday tuesday< ;
+: last-wednesday ( timestamp -- timestamp ) closest-wednesday wednesday< ;
+: last-thursday ( timestamp -- timestamp ) closest-thursday thursday< ;
+: last-friday ( timestamp -- timestamp ) closest-friday friday< ;
+: last-saturday ( timestamp -- timestamp ) closest-saturday saturday< ;
 
 : sunday? ( timestamp -- ? ) day-of-week 0 = ;
 : monday? ( timestamp -- ? ) day-of-week 1 = ;
@@ -708,16 +712,16 @@ ALIAS: last-day-of-week saturday
 : weekend? ( timestamp -- ? ) day-of-week { 0 6 } member? ;
 : weekday? ( timestamp -- ? ) day-of-week weekend? not ;
 
-: same-or-next-business-day ( timestamp -- timestamp' )
+: same-or-next-business-day ( timestamp -- timestamp )
     dup day-of-week {
         { 0 [ monday ] }
-        { 6 [ 2 days time+ ] }
+        { 6 [ 2 days (time+) drop ] }
         [ drop ]
     } case ;
 
-: same-or-previous-business-day ( timestamp -- timestamp' )
+: same-or-previous-business-day ( timestamp -- timestamp )
     dup day-of-week {
-        { 0 [ 2 days time- ] }
+        { 0 [ -2 days (time+) drop ] }
         { 6 [ friday ] }
         [ drop ]
     } case ;
@@ -739,21 +743,21 @@ CONSTANT: weekday-offsets { 0 0 1 2 3 4 5 }
     [ + + 1.4 /i ]
     [ [ weekday-offsets nth ] bi@ + ] 2bi - ;
 
-: sunday-of-month ( timestamp n -- new-timestamp ) 0 nth-day-this-month ;
-: monday-of-month ( timestamp n -- new-timestamp ) 1 nth-day-this-month ;
-: tuesday-of-month ( timestamp n -- new-timestamp ) 2 nth-day-this-month ;
-: wednesday-of-month ( timestamp n -- new-timestamp ) 3 nth-day-this-month ;
-: thursday-of-month ( timestamp n -- new-timestamp ) 4 nth-day-this-month ;
-: friday-of-month ( timestamp n -- new-timestamp ) 5 nth-day-this-month ;
-: saturday-of-month ( timestamp n -- new-timestamp ) 6 nth-day-this-month ;
+: sunday-of-month ( timestamp n -- timestamp ) 0 nth-day-this-month ;
+: monday-of-month ( timestamp n -- timestamp ) 1 nth-day-this-month ;
+: tuesday-of-month ( timestamp n -- timestamp ) 2 nth-day-this-month ;
+: wednesday-of-month ( timestamp n -- timestamp ) 3 nth-day-this-month ;
+: thursday-of-month ( timestamp n -- timestamp ) 4 nth-day-this-month ;
+: friday-of-month ( timestamp n -- timestamp ) 5 nth-day-this-month ;
+: saturday-of-month ( timestamp n -- timestamp ) 6 nth-day-this-month ;
 
-: last-sunday-of-month ( timestamp -- new-timestamp ) last-day-of-month sunday<= ;
-: last-monday-of-month ( timestamp -- new-timestamp ) last-day-of-month monday<= ;
-: last-tuesday-of-month ( timestamp -- new-timestamp ) last-day-of-month tuesday<= ;
-: last-wednesday-of-month ( timestamp -- new-timestamp ) last-day-of-month wednesday<= ;
-: last-thursday-of-month ( timestamp -- new-timestamp ) last-day-of-month thursday<= ;
-: last-friday-of-month ( timestamp -- new-timestamp ) last-day-of-month friday<= ;
-: last-saturday-of-month ( timestamp -- new-timestamp ) last-day-of-month saturday<= ;
+: last-sunday-of-month ( timestamp -- timestamp ) last-day-of-month sunday<= ;
+: last-monday-of-month ( timestamp -- timestamp ) last-day-of-month monday<= ;
+: last-tuesday-of-month ( timestamp -- timestamp ) last-day-of-month tuesday<= ;
+: last-wednesday-of-month ( timestamp -- timestamp ) last-day-of-month wednesday<= ;
+: last-thursday-of-month ( timestamp -- timestamp ) last-day-of-month thursday<= ;
+: last-friday-of-month ( timestamp -- timestamp ) last-day-of-month friday<= ;
+: last-saturday-of-month ( timestamp -- timestamp ) last-day-of-month saturday<= ;
 
 : start-of-week ( timestamp -- timestamp )
     sunday midnight ;
