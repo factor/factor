@@ -361,23 +361,28 @@ PRIVATE>
     [ 2dup [ length ] bi@ + ] dip
     [ (append) ] new-like ; inline
 
-: 3append-as ( seq1 seq2 seq3 exemplar -- newseq )
-    [ 3dup [ length ] tri@ + + ] dip [
-        [ [ 2over [ length ] bi@ + ] dip copy-unsafe ]
-        [ (append) ] bi
-    ] new-like ; inline
-
 : append ( seq1 seq2 -- newseq ) over append-as ;
 
 : prepend-as ( seq1 seq2 exemplar -- newseq ) swapd append-as ; inline
 
 : prepend ( seq1 seq2 -- newseq ) over prepend-as ;
 
+: 3append-as ( seq1 seq2 seq3 exemplar -- newseq )
+    [ 3dup [ length ] tri@ + + ] dip [
+        [ [ 2over [ length ] bi@ + ] dip copy-unsafe ]
+        [ (append) ] bi
+    ] new-like ; inline
+
 : 3append ( seq1 seq2 seq3 -- newseq ) pick 3append-as ;
 
-: surround ( seq1 seq2 seq3 -- newseq ) swapd 3append ; inline
+: surround-as ( seq1 seq2 seq3 exemplar -- newseq )
+    [ swap ] 2dip 3append-as ; inline
 
-: glue ( seq1 seq2 seq3 -- newseq ) swap 3append ; inline
+: surround ( seq1 seq2 seq3 -- newseq ) pick surround-as ; inline
+
+: glue-as ( seq1 seq2 seq3 exemplar -- newseq ) swapd 3append-as ; inline
+
+: glue ( seq1 seq2 seq3 -- newseq ) pick glue-as ; inline
 
 : change-nth ( ..a i seq quot: ( ..a elt -- ..b newelt ) -- ..b )
     [ [ nth ] dip call ] 2keepd set-nth-unsafe ; inline
