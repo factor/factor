@@ -305,17 +305,20 @@ DEFER: time-
 : gmt ( timestamp -- timestamp )
     instant >>gmt-offset ; inline
 
-: local ( timestamp -- timestamp )
+: local-time ( timestamp -- timestamp )
     gmt-offset-duration >>gmt-offset ; inline
 
 : convert-timezone ( timestamp duration -- timestamp )
     [ over gmt-offset>> time- (time+) ] [ >>gmt-offset ] bi ;
 
-: >local ( timestamp -- timestamp )
+: >local-time ( timestamp -- timestamp )
     gmt-offset-duration convert-timezone ;
 
 : >gmt ( timestamp -- timestamp )
     instant convert-timezone ;
+
+ALIAS: utc gmt
+ALIAS: >utc >gmt
 
 M: timestamp <=> [ clone >gmt tuple-slots ] compare ;
 
@@ -390,9 +393,9 @@ DEFER: end-of-year
 <PRIVATE
 
 : (time-) ( timestamp timestamp -- n )
-    [ clone >gmt ] bi@
-    [ [ >date< julian-day-number ] bi@ - 86400 * ] 2keep
-    [ >time< [ [ 3600 * ] [ 60 * ] bi* ] dip + + ] bi@ - + ;
+    [ [ >date< julian-day-number ] bi@ - 86400 * ]
+    [ [ >time< [ 3600 * ] [ 60 * + ] [ + ] tri* ] bi@ - + ]
+    [ [ gmt-offset>> duration>seconds ] bi@ swap - + ] 2tri ;
 
 PRIVATE>
 
