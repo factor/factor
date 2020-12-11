@@ -776,16 +776,16 @@ CONSTANT: weekday-offsets { 0 0 1 2 3 4 5 }
     0 12 [a,b] check-interval 12 + o'clock ;
 
 : time-since-midnight ( timestamp -- duration )
-    dup clone midnight time- ; inline
+    instant swap >time< set-time ;
 
 : since-1970 ( duration -- timestamp )
-    unix-1970 time+ ; inline
+    unix-1970 swap (time+) drop ; inline
 
 : timestamp>unix-time ( timestamp -- seconds )
     unix-1970 (time-) ; inline
 
 : unix-time>timestamp ( seconds -- timestamp )
-    [ unix-1970 ] dip +second ; inline
+    unix-1970 swap +second ; inline
 
 ! January and February need a fixup with this algorithm.
 ! Find a better algorithm.
