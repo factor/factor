@@ -1755,7 +1755,7 @@ ARTICLE: "sequences-reshape" "Reshaping sequences"
 { $subsections repetition <repetition> }
 "Reversing a sequence:"
 { $subsections reverse }
-"A " { $emphasis "reversal" } " presents a reversed view of an underlying sequence:"
+"A " { $emphasis "reversed" } " is a virtual sequence presenting a reversed view of an underlying sequence:"
 { $subsections reversed <reversed> }
 "Transposing a matrix:"
 { $subsections flip } ;
