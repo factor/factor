@@ -1657,16 +1657,34 @@ HELP: cartesian-map
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation ( ... elt1 elt2 -- ... newelt ) } } { "newseq" "a new sequence of sequences" } }
 { $description "Applies the quotation to every possible pairing of elements from the two sequences, collecting results into a new sequence of sequences." } ;
 
+HELP: cartesian-product-as
+{ $values { "seq1" sequence } { "seq2" sequence } { "exemplar" sequence } { "newseq" "a new sequence of sequences of pairs" } }
+{ $description "Outputs a sequence of all possible pairings of elements from the two sequences so that the output sequence is the exemplar's type." }
+{ $examples
+    { $example
+        "USING: bit-arrays prettyprint sequences ;"
+        "\"ab\" ?{ t f } { } cartesian-product-as ."
+        "{ { { 97 t } { 97 f } } { { 98 t } { 98 f } } }"
+    }
+} ;
+
 HELP: cartesian-product
 { $values { "seq1" sequence } { "seq2" sequence } { "newseq" "a new sequence of sequences of pairs" } }
-{ $description "Outputs a sequence of all possible pairings of elements from the two sequences." }
+{ $description "Outputs a sequence of all possible pairings of elements from the two sequences, using the type of " { $snippet "seq2" } "." }
 { $examples
     { $example
         "USING: prettyprint sequences ;"
         "{ 1 2 } { 3 4 } cartesian-product ."
         "{ { { 1 3 } { 1 4 } } { { 2 3 } { 2 4 } } }"
     }
+    { $example
+        "USING: prettyprint sequences ;"
+        "\"abc\" \"def\" cartesian-product ."
+        "{ { \"ad\" \"ae\" \"af\" } { \"bd\" \"be\" \"bf\" } { \"cd\" \"ce\" \"cf\" } }"
+    }
 } ;
+
+{ cartesian-find cartesian-each cartesian-map cartesian-product cartesian-product-as } related-words
 
 ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
 "The " { $link nth-unsafe } " and " { $link set-nth-unsafe } " sequence protocol bypasses bounds checks for increased performance."
