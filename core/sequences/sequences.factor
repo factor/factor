@@ -1097,10 +1097,13 @@ M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
     [ with each ] 2curry each ; inline
 
 : cartesian-map ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) -- ... newseq )
-    [ with map ] 2curry map ; inline
+    [ with { } map-as ] 2curry { } map-as ; inline
+
+: cartesian-product-as ( seq1 seq2 exemplar -- newseq )
+    [ 2sequence ] curry cartesian-map ; inline
 
 : cartesian-product ( seq1 seq2 -- newseq )
-    [ { } 2sequence ] cartesian-map ;
+    dup cartesian-product-as ; inline
 
 : cartesian-find ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... elt1 elt2 )
     [ f ] 3dip [ with find swap ] 2curry [ nip ] prepose find nip swap ; inline
