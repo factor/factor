@@ -110,7 +110,7 @@ M: timestamp year. year>> year. ;
     [ hh:mm:ss ] with-string-writer ;
 
 : timestamp>ymdhms ( timestamp -- str )
-    [ >gmt YYYY-MM-DD " " hh:mm:ss ] with-string-writer ;
+    [ clone >gmt YYYY-MM-DD " " hh:mm:ss ] with-string-writer ;
 
 : write-gmt-offset-hhmm ( gmt-offset -- )
     [ hour>> dup 0 < "-" "+" ? write abs write-00 ] [ mm ] bi ;
@@ -185,10 +185,10 @@ ALIAS: timestamp>rfc822 timestamp>rfc2822
     ] with-string-writer ;
 
 : timestamp>http-string ( timestamp -- str )
-    >gmt timestamp>rfc2822 ;
+    clone >gmt timestamp>rfc2822 ;
 
 : timestamp>cookie-string ( timestamp -- str )
-    >gmt timestamp>rfc1036 ;
+    clone >gmt timestamp>rfc1036 ;
 
 : write-timestamp ( timestamp -- )
     { DAY ", " D " " MONTH " " YYYY " " hh:mm:ss } formatted ;
