@@ -400,7 +400,7 @@ DEFER: end-of-year
 PRIVATE>
 
 GENERIC: time- ( time1 time2 -- time3 )
-surround
+
 M: timestamp time-
     ! Exact calendar-time difference
     (time-) seconds ;
