@@ -63,7 +63,7 @@ ${ { 0xabcd } >string } [ " \"\\uaBCd\" " json> ] unit-test
 { 0 } [ "   0   " json> ] unit-test
 
 { V{ H{ { "a" "b" } } H{ { "c" "d" } } } }
-[ "{\"a\": \"b\"} {\"c\": \"d\"}" [ read-json-objects ] with-string-reader ] unit-test
+[ "{\"a\": \"b\"} {\"c\": \"d\"}" [ read-json ] with-string-reader ] unit-test
 
 ! empty objects are allowed as values in objects
 { H{ { "foo" H{ } } } } [ "{ \"foo\" : {}}" json> ] unit-test
