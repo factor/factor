@@ -1,6 +1,7 @@
 USING: compiler.cfg compiler.cfg.gc-checks compiler.cfg.gc-checks.private
 compiler.cfg.instructions help.markup help.syntax kernel layouts math sequences
 slots.private ;
+IN: compiler.cfg.gc-checks
 
 HELP: add-gc-checks
 { $values { "insns-seq" "a sequence of instruction sequences" } }
