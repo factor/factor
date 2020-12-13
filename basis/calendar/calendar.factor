@@ -400,7 +400,7 @@ DEFER: end-of-year
 PRIVATE>
 
 GENERIC: time- ( time1 time2 -- time3 )
-
+surround
 M: timestamp time-
     ! Exact calendar-time difference
     (time-) seconds ;
@@ -795,8 +795,7 @@ CONSTANT: weekday-offsets { 0 0 1 2 3 4 5 }
     swap 367 366 ? mod ;
 
 : timestamp>year-dates-gmt ( timestamp -- seq )
-    [ start-of-year >date< julian-day-number ]
-    [ days-in-year ] bi
+    [ year>> 1 1 julian-day-number ] [ days-in-year ] bi
     [ drop ] [ + ] 2bi
     [a..b) [ julian-day-number>date <date-gmt> ] map ;
 
