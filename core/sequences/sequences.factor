@@ -378,7 +378,7 @@ PRIVATE>
 : surround-as ( seq1 seq2 seq3 exemplar -- newseq )
     [ swap ] 2dip 3append-as ; inline
 
-: surround ( seq1 seq2 seq3 -- newseq ) pick surround-as ; inline
+: surround ( seq1 seq2 seq3 -- newseq ) over surround-as ; inline
 
 : glue-as ( seq1 seq2 seq3 exemplar -- newseq ) swapd 3append-as ; inline
 
@@ -844,7 +844,7 @@ PRIVATE>
     [ swap head-slice ] [ swap tail-slice ] bi-curry bi* ; inline
 
 : replace-slice ( new from to seq -- seq' )
-    snip-slice swapd 3append ;
+    snip-slice surround ;
 
 : remove-nth ( n seq -- seq' )
     [ [ dup 1 + ] dip snip-slice ] keep append-as ;
