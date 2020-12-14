@@ -63,7 +63,8 @@ IN: sequences.extras
 
 : pad-center ( seq n elt -- padded )
     swap pick length [-] [ drop ] [
-        [ 2/ ] [ over - ] bi rot '[ _ <repetition> ] bi@ surround
+        [ 2/ ] [ over - ] bi rot '[ _ <repetition> ] bi@
+        pick surround-as
     ] if-zero ;
 
 : change-nths ( ... indices seq quot: ( ... elt -- ... elt' ) -- ... )
