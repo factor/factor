@@ -31,6 +31,7 @@ addons:
       - libsnappy-dev
       - libzmq-dev
       - libpq-dev
+      - libsodium-dev
   homebrew:
     packages:
       - snappy
@@ -40,6 +41,7 @@ addons:
       - zeromq
       - postgresql
       - udis86
+      - libsodium
 before_install:
   - uname -s
   - case $TRAVIS_OS_NAME in
