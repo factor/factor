@@ -29,8 +29,14 @@ IN: easy-help
             ] when
         ] dip [
             [
-                [ push-help-space ] dip
-                dup string? [ append! ] [ push-help-text ] if
+                dup string? [
+                    dup ?first ".,;:" member? [
+                        [ push-help-space ] dip
+                    ] unless append!
+                ] [
+                    [ push-help-space ]
+                    [ push-help-text ] bi*
+                ] if
             ] when*
         ] keep
     ] loop [ >string suffix! ] unless-empty >array ; inline
