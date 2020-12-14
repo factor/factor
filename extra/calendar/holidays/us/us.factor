@@ -10,18 +10,19 @@ SINGLETONS: us us-federal ;
 
 <PRIVATE
 
-: adjust-federal-holiday ( timestamp -- timestamp' )
+: adjust-federal-holiday ( timestamp -- timestamp )
     {
-        { [ dup saturday? ] [ 1 days time- ] }
-        { [ dup sunday? ] [ 1 days time+ ] }
+        { [ dup saturday? ] [ -1 days (time+) ] }
+        { [ dup sunday? ] [ 1 days (time+) ] }
         [ ]
     } cond ;
 
 PRIVATE>
 
 M: us-federal holidays
-    (holidays)
-    [ execute( timestamp -- timestamp' ) adjust-federal-holiday ] with map ;
+    (holidays) [
+        [ clone ] dip execute( timestamp -- timestamp ) adjust-federal-holiday
+    ] with map ;
 
 : us-post-office-open? ( timestamp -- ? )
     { [ sunday? not ] [ us-federal holiday? not ] } 1&& ;
