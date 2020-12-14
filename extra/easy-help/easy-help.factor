@@ -10,28 +10,27 @@ IN: easy-help
 :: parse-help-token ( end -- str/obj/f )
     ?scan-token dup search {
         { [ dup end eq? ] [ 2drop f ] }
-        { [ dup parsing-word? ] [
-            nip V{ } clone swap execute-parsing first
-            dup wrapper? [ wrapped>> \ $link swap 2array ] when ] }
+        { [ dup parsing-word? ] [ nip V{ } clone swap execute-parsing first ] }
         [ drop ]
     } cond ;
 
+: push-help-text ( accum sbuf obj -- accum sbuf' )
+    [ dup empty? [ >string suffix! SBUF" " clone ] unless ]
+    [ [ suffix! ] curry dip ] bi* ;
+
+: push-help-space ( accum sbuf -- accum sbuf )
+    2dup [ empty? ] both? [ CHAR: \s suffix! ] unless ;
+
 :: parse-help-text ( end -- seq )
     V{ } clone SBUF" " clone [
-        lexer get line>> end parse-help-token
-        [ lexer get line>> swap - 1 > [ CHAR: \n suffix! ] when ] dip
-        [
+        lexer get line>> end parse-help-token [
+            lexer get line>> swap - 1 > [
+                \ $nl push-help-text
+            ] when
+        ] dip [
             [
-                [
-                    2dup [ empty? ] both? not
-                    over ?last CHAR: \n eq? not and
-                    [ CHAR: \s suffix! ] when
-                ] [
-                    dup string? [ append! ] [
-                        [ dup empty? [ >string suffix! SBUF" " clone ] unless ]
-                        [ [ suffix! ] curry dip ] bi*
-                    ] if
-                ] bi*
+                [ push-help-space ] dip
+                dup string? [ append! ] [ push-help-text ] if
             ] when*
         ] keep
     ] loop [ >string suffix! ] unless-empty >array ; inline
