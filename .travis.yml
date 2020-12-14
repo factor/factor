@@ -59,6 +59,12 @@ script:
   - echo "CI_BRANCH=${CI_BRANCH}"
   - DEBUG=1 ./build.sh net-bootstrap < /dev/null
   - "./factor -e='USING: memory tools.test namespaces vocabs.hierarchy ; f long-unit-tests-enabled? set-global \"resource:basis\" \"\" load-from-root save'"
+  - "./factor -e='USING: memory tools.test namespaces vocabs.hierarchy ; f long-unit-tests-enabled? set-global \"resource:extra\" \"benchmark\" load-from-root save'"
+  - "./factor -e='USING: memory tools.test namespaces vocabs.hierarchy ; f long-unit-tests-enabled? set-global \"resource:extra\" \"compiler\" load-from-root save'"
+  - "./factor -e='USING: memory tools.test namespaces vocabs.hierarchy ; f long-unit-tests-enabled? set-global \"resource:extra\" \"game\" load-from-root save'"
+  - "./factor -e='USING: memory tools.test namespaces vocabs.hierarchy ; f long-unit-tests-enabled? set-global \"resource:extra\" \"math\" load-from-root save'"
+  - "./factor -e='USING: memory tools.test namespaces vocabs.hierarchy ; f long-unit-tests-enabled? set-global \"resource:extra\" \"sequences\" load-from-root save'"
+  - "./factor -e='USING: memory tools.test namespaces vocabs.hierarchy ; f long-unit-tests-enabled? set-global \"resource:extra\" \"webapps\" load-from-root save'"
   - "./factor -e='USING: memory tools.test namespaces vocabs.hierarchy ; f long-unit-tests-enabled? set-global \"resource:extra\" \"\" load-from-root save'"
   - "./factor -run=tools.test resource:core"
   - "./factor -run=help.lint resource:core resource:basis resource:extra"
