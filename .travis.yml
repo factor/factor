@@ -58,7 +58,7 @@ script:
   - export CI_BRANCH="${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}"
   - echo "CI_BRANCH=${CI_BRANCH}"
   - DEBUG=1 ./build.sh net-bootstrap < /dev/null
-  - "./factor -e='USING: memory tools.test namespaces vocabs.hierarchy ; f long-unit-tests-enabled? set-global \"resource:basis\" load-from-root save'"
-  - "./factor -e='USING: memory tools.test namespaces vocabs.hierarchy ; f long-unit-tests-enabled? set-global \"resource:extra\" load-from-root save'"
+  - "./factor -e='USING: memory tools.test namespaces vocabs.hierarchy ; f long-unit-tests-enabled? set-global \"resource:basis\" \"\" load-from-root save'"
+  - "./factor -e='USING: memory tools.test namespaces vocabs.hierarchy ; f long-unit-tests-enabled? set-global \"resource:extra\" \"\" load-from-root save'"
   - "./factor -run=tools.test resource:core"
   - "./factor -run=help.lint resource:core resource:basis resource:extra"
