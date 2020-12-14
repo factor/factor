@@ -62,6 +62,6 @@ script:
   - DEBUG=1 ./build.sh net-bootstrap < /dev/null
   - "./factor -e='USING: memory namespaces tools.test ; f long-unit-tests-enabled? set-global save'"
   - "./factor -e='USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off \"resource:basis\" \"\" load-from-root save'"
-  - "./factor -e='USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off \"resource:extra\" \"\" load-from-root save'"
+  #- "./factor -e='USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off \"resource:extra\" \"\" load-from-root save'"
   - "./factor -run=tools.test resource:core"
   - "./factor -run=help.lint resource:core resource:basis resource:extra"
