@@ -59,13 +59,11 @@ IN: help.syntax
 : example-lines ( seq -- seq' )
     dup string? [ string-lines [ [ blank? ] trim ] map harvest ] when ;
 
-: make-example ( str type -- seq )
-    over string? [
-        [ example-lines ] [ prefix ] bi*
-    ] [ drop ] if ;
+: make-example ( seq -- seq )
+    dup string? [ example-lines \ $example prefix ] when ;
 
 : parse-help-examples ( -- seq )
-    \ } parse-until [ \ $example make-example ] { } map-as ;
+    \ } parse-until [ make-example ] { } map-as ;
 
 : parse-help-example ( -- seq )
     \ } parse-until dup { [ length 1 = ] [ first string? ] } 1&&
