@@ -14,6 +14,7 @@ IN: help.syntax
         { [ dup parsing-word? ] [
             nip V{ } clone swap execute-parsing first
             dup wrapper? [ wrapped>> \ $link swap 2array ] when ] }
+        { [ dup [ vocabulary>> "help.markup" = ] when ] [ nip ] }
         [ drop ]
     } cond ;
 
