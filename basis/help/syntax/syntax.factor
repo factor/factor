@@ -66,23 +66,27 @@ DEFER: help-block?
         ] if
     ] produce nip ;
 
-: example-lines ( seq -- seq' )
-    dup string? [
+: code-lines ( seq -- seq' )
+    dup { [ string? ] [ [ blank? not ] member? ] } 1&& [
         string-lines [ [ blank? ] trim ] map harvest
-        dup length 1 - over [ unescape-string ] change-nth
+        dup length 1 = [ first ] when
     ] when ;
 
 : make-example ( seq -- seq )
     dup string? [
-        example-lines dup length 1 > [ \ $example prefix ] when
+        code-lines
+        dup { [ array? ] [ length 1 > ] } 1&& [
+            dup length 1 - over [ unescape-string ] change-nth
+            \ $example prefix
+        ] when
     ] when ;
 
 : parse-help-examples ( -- seq )
     \ } parse-until [ make-example ] { } map-as ;
 
-: parse-help-example ( -- seq )
+: parse-help-code ( -- seq )
     \ } parse-until dup { [ length 1 = ] [ first string? ] } 1&&
-    [ first example-lines ] [ >array ] if ;
+    [ first code-lines ] [ >array ] if ;
 
 : help-text? ( word -- ? )
     {
@@ -92,6 +96,9 @@ DEFER: help-block?
         $curious $deprecated $errors $side-effects $content
         $slot $image $warning
     } member-eq? ;
+
+: help-code? ( word -- ? )
+    { $example $unchecked-example $code } member-eq? ;
 
 : help-block? ( word -- ? )
     {
@@ -107,17 +114,14 @@ DEFER: help-block?
 : help-examples? ( word -- ? )
     { $examples } member-eq? ;
 
-: help-example? ( word -- ? )
-    { $example $unchecked-example $code } member-eq? ;
-
 PRIVATE>
 
 SYNTAX: HELP{
     scan-object dup \ } eq? [ drop { } ] [
         {
             { [ dup help-text? ] [ \ } parse-help-text ] }
+            { [ dup help-code? ] [ parse-help-code ] }
             { [ dup help-values? ] [ parse-help-values ] }
-            { [ dup help-example? ] [ parse-help-example ] }
             { [ dup help-examples? ] [ parse-help-examples ] }
             [ \ } parse-until >array ]
         } cond swap prefix
