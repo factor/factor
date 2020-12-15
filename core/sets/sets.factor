@@ -133,12 +133,12 @@ M: sequence cardinality
 M: sequence clear-set
     delete-all ; inline
 
-: combine ( sets -- set/f )
+: union-all ( sets -- set/f )
     [ f ]
     [ [ [ ?members ] map concat ] [ first ] bi set-like ]
     if-empty ;
 
-: refine ( sets -- set/f )
+: intersect-all ( sets -- set/f )
     [ f ] [ [ ] [ intersect ] map-reduce ] if-empty ;
 
 : gather ( ... seq quot: ( ... elt -- ... elts ) -- ... newseq )

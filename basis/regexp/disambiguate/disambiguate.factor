@@ -28,7 +28,7 @@ TUPLE: parts in out ;
 
 : meaningful-integers ( partition table -- integers )
     [ [ in>> ] [ out>> ] bi ] dip
-    '[ [ _ at ] map refine ] bi@ diff ;
+    '[ [ _ at ] map intersect-all ] bi@ diff ;
 
 : class-integers ( classes integers -- table )
     '[ _ over '[ _ class-member? ] filter ] H{ } map>assoc ;

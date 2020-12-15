@@ -32,7 +32,7 @@ M: keyword-map >alist
     assoc>> >alist ;
 
 : (keyword-map-no-word-sep) ( assoc -- str )
-    keys combine [ alpha? ] reject natural-sort ;
+    keys union-all [ alpha? ] reject natural-sort ;
 
 : keyword-map-no-word-sep* ( keyword-map -- str )
     dup no-word-sep>> [ ] [
