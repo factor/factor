@@ -50,3 +50,11 @@ tools.test vocabs ;
 { { $description "this, " { $snippet "that" } ", and the other." } } [
     HELP{ $description this, { $snippet "that" } , and the other. }
 ] unit-test
+
+{ { $description "this" $nl "that" $nl "the other" } } [
+    HELP{ $description this
+
+    that
+
+    the other }
+] unit-test

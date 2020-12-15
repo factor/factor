@@ -8,9 +8,9 @@ IN: help.syntax
 
 <PRIVATE
 
-:: parse-help-token ( -- str/obj/f )
+:: parse-help-token ( end -- str/obj/f )
     ?scan-token dup search {
-        { [ dup \ } eq? ] [ 2drop f ] }
+        { [ dup end eq? ] [ 2drop f ] }
         { [ dup parsing-word? ] [
             nip V{ } clone swap execute-parsing first
             dup wrapper? [ wrapped>> \ $link swap 2array ] when ] }
@@ -28,13 +28,18 @@ IN: help.syntax
         dup last CHAR: \s eq? not
     ] if [ CHAR: \s suffix! ] when ;
 
-:: parse-help-text ( -- seq )
+:: parse-help-text ( end -- seq )
     V{ } clone SBUF" " clone [
-        lexer get line>> parse-help-token [
-            lexer get line>> swap - 1 > [
-                \ $nl push-help-text
-            ] when
-        ] dip [
+        lexer get line>> :> m
+        end parse-help-token :> obj
+        lexer get line>> :> n
+
+        obj string? n m - 1 > and [
+            { [ dup empty? not ] [ over ?last string? ] } 0||
+            [ \ $nl push-help-text ] when
+        ] when
+
+        obj [
             [
                 dup string? [
                     dup ?first " .,;:" member? [
@@ -98,7 +103,7 @@ PRIVATE>
 SYNTAX: HELP{
     scan-object dup \ } eq? [ drop { } ] [
         {
-            { [ dup help-text? ] [ parse-help-text ] }
+            { [ dup help-text? ] [ \ } parse-help-text ] }
             { [ dup help-values? ] [ parse-help-values ] }
             { [ dup help-example? ] [ parse-help-example ] }
             { [ dup help-examples? ] [ parse-help-examples ] }
@@ -114,13 +119,10 @@ SYNTAX: HELP:
         bi
     ] with-words ;
 
-ERROR: article-expects-name-and-title got ;
-
 SYNTAX: ARTICLE:
     location [
-        parse-array-def
-        dup length 2 < [ article-expects-name-and-title ] when
-        [ first2 ] [ 2 tail ] bi <article>
+        scan-object scan-object
+        \ ; parse-help-text <article>
         over add-article >link
     ] dip remember-definition ;
 
