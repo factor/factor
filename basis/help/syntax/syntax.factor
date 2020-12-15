@@ -60,7 +60,9 @@ IN: help.syntax
     dup string? [ string-lines [ [ blank? ] trim ] map harvest ] when ;
 
 : make-example ( seq -- seq )
-    dup string? [ example-lines \ $example prefix ] when ;
+    dup string? [
+        example-lines dup length 1 > [ \ $example prefix ] when
+    ] when ;
 
 : parse-help-examples ( -- seq )
     \ } parse-until [ make-example ] { } map-as ;
