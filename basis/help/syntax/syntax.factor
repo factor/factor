@@ -92,7 +92,7 @@ IN: help.syntax
 PRIVATE>
 
 SYNTAX: HELP{
-    scan-word dup \ } eq? [ drop { } ] [
+    scan-object dup \ } eq? [ drop { } ] [
         {
             { [ dup help-text? ] [ parse-help-text ] }
             { [ dup help-values? ] [ parse-help-values ] }
