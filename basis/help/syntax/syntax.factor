@@ -3,7 +3,7 @@
 USING: accessors arrays ascii combinators
 combinators.short-circuit compiler.units definitions help
 help.markup help.topics kernel lexer math namespaces parser
-sequences splitting strings vocabs.parser words ;
+sequences splitting strings strings.parser vocabs.parser words ;
 IN: help.syntax
 
 <PRIVATE
@@ -58,7 +58,10 @@ IN: help.syntax
     ] produce nip ;
 
 : example-lines ( seq -- seq' )
-    dup string? [ string-lines [ [ blank? ] trim ] map harvest ] when ;
+    dup string? [
+        string-lines [ [ blank? ] trim ] map harvest
+        dup length 1 - over [ unescape-string ] change-nth
+    ] when ;
 
 : make-example ( seq -- seq )
     dup string? [
