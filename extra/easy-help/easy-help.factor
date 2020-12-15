@@ -1,16 +1,19 @@
 ! Copyright (C) 2020 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays ascii combinators help.markup kernel
+USING: accessors arrays ascii combinators
+combinators.short-circuit help help.markup help.topics kernel
 lexer math namespaces parser sequences splitting strings vectors
 vocabs.parser words ;
 
 IN: easy-help
 
-:: parse-help-token ( end -- str/obj/f )
+:: parse-help-token ( -- str/obj/f )
     ?scan-token dup search {
-        { [ dup end eq? ] [ 2drop f ] }
-        { [ dup parsing-word? ] [ nip V{ } clone swap execute-parsing first ] }
+        { [ dup \ } eq? ] [ 2drop f ] }
+        { [ dup parsing-word? ] [
+            nip V{ } clone swap execute-parsing first
+            dup wrapper? [ wrapped>> \ $link swap 2array ] when ] }
         [ drop ]
     } cond ;
 
@@ -19,11 +22,14 @@ IN: easy-help
     [ [ suffix! ] curry dip ] bi* ;
 
 : push-help-space ( accum sbuf -- accum sbuf )
-    2dup [ empty? ] both? [ CHAR: \s suffix! ] unless ;
+    {
+        [ dup empty? not ]
+        [ over empty? not pick ?last \ $nl eq? not and ]
+    } 0|| [ CHAR: \s suffix! ] when ;
 
-:: parse-help-text ( end -- seq )
+:: parse-help-text ( -- seq )
     V{ } clone SBUF" " clone [
-        lexer get line>> end parse-help-token [
+        lexer get line>> parse-help-token [
             lexer get line>> swap - 1 > [
                 \ $nl push-help-text
             ] when
@@ -44,7 +50,7 @@ IN: easy-help
 <<
 SYNTAX: HELP-TEXT:
     scan-new dup name>> but-last parse-word
-    '[ \ } parse-help-text _ prefix suffix! ] define-syntax ;
+    '[ parse-help-text _ prefix suffix! ] define-syntax ;
 >>
 
 HELP-TEXT: $description{
@@ -86,6 +92,8 @@ SYNTAX: HELP-WORD:
     '[ \ } parse-help-words _ prefix suffix! ] define-syntax ;
 >>
 
+
+
 HELP-WORD: $subsection{
 HELP-WORD: $subsections{
 HELP-WORD: $link{
@@ -114,12 +122,12 @@ HELP-WORD: $related{
         [ prefix ] bi*
     ] [ drop ] if ;
 
+: parse-help-examples ( -- seq )
+    \ } parse-until [ \ $example make-example ] { } map-as ;
+
 PRIVATE>
 
-SYNTAX: $examples{
-    \ } [
-        [ \ $example make-example ] { } map-as \ $examples prefix
-    ] parse-literal ;
+SYNTAX: $examples{ parse-help-examples \ $examples prefix suffix! ;
 
 SYNTAX: $example:
     scan-object \ $example make-example suffix! ;
@@ -129,15 +137,21 @@ SYNTAX: $unchecked-example:
 
 <PRIVATE
 
-: parse-values ( -- seq )
-    [ scan-token dup "}" = not ]
-    [ ":" ?tail drop scan-object 2array ] produce nip ;
+: parse-help-values ( -- seq )
+    [ scan-token dup "}" = not ] [
+        dup "{" = [
+            parse-datum dup parsing-word?
+            [ V{ } clone swap execute-parsing first ] when
+        ] [
+            ":" ?tail drop scan-object 2array
+        ] if
+    ] produce nip ;
 
 PRIVATE>
 
-SYNTAX: $values{ parse-values \ $values prefix suffix! ;
-SYNTAX: $inputs{ parse-values \ $inputs prefix suffix! ;
-SYNTAX: $outputs{ parse-values \ $outputs prefix suffix! ;
+SYNTAX: $values{ parse-help-values \ $values prefix suffix! ;
+SYNTAX: $inputs{ parse-help-values \ $inputs prefix suffix! ;
+SYNTAX: $outputs{ parse-help-values \ $outputs prefix suffix! ;
 
 ! XXX: more syntax to consider
 
@@ -158,10 +172,38 @@ SYNTAX: $outputs{ parse-values \ $outputs prefix suffix! ;
 ! HELP-SYNTAX: $prettyprinting-note{
 ! HELP-SYNTAX: $definition-icons{
 
+: help-text? ( word -- ? )
+    {
+        $description $snippet $emphasis $strong $url $heading
+        $subheading $code $syntax $class-description
+        $error-description $var-description $contract $notes
+        $curious $deprecated $errors $side-effects $content
+        $slot $image
+    } member-eq? ;
+
+: help-values? ( word -- ? )
+    { $values $inputs $outputs } member-eq? ;
+
+: help-examples? ( word -- ? )
+    { $examples } member-eq? ;
+
 <<
 SYNTAX: HELP{
-        scan-word dup \ } eq?
-        [ drop { } ] [ \ } parse-help-text swap prefix ] if suffix! ;
+    scan-word dup \ } eq? [ drop { } ] [
+        {
+            { [ dup help-text? ] [ parse-help-text ] }
+            { [ dup help-values? ] [ parse-help-values ] }
+            { [ dup help-examples? ] [ parse-help-examples ] }
+            [ \ } parse-until >array ]
+        } cond swap prefix
+    ] if suffix! ;
 >>
 
 ! HELP{ $description something blah blah \ execute }
+
+SYNTAX: EASY-HELP:
+    H{ { "{" POSTPONE: HELP{ } } [
+        scan-word bootstrap-word
+        [ >link save-location ]
+        [ [ parse-array-def ] dip set-word-help ] bi
+    ] with-words ;
