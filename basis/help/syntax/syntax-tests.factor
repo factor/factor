@@ -1,6 +1,5 @@
-USING: kernel tools.test parser vocabs help.syntax namespaces
-eval accessors ;
-IN: help.syntax.tests
+USING: accessors eval help.markup help.syntax kernel parser
+tools.test vocabs ;
 
 [
     [ "foobar" ] [
@@ -17,6 +16,12 @@ IN: help.syntax.tests
 ] with-file-vocabs
 
 { { $description } } [ HELP{ $description } ] unit-test
+
+{ { $description "test" } } [ HELP{ $description "test" } ] unit-test
+
+{ { $description "test " { $snippet "and" } " that" } } [
+    HELP{ $description "test " { $snippet "and" } " that" }
+] unit-test
 
 { { $description "this and that" } } [
     HELP{ $description this and that }
