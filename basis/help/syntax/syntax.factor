@@ -72,7 +72,7 @@ IN: help.syntax
 : help-text? ( word -- ? )
     {
         $description $snippet $emphasis $strong $url $heading
-        $subheading $code $syntax $class-description
+        $subheading $syntax $class-description
         $error-description $var-description $contract $notes
         $curious $deprecated $errors $side-effects $content
         $slot $image
@@ -85,7 +85,7 @@ IN: help.syntax
     { $examples } member-eq? ;
 
 : help-example? ( word -- ? )
-    { $example $unchecked-example } member-eq? ;
+    { $example $unchecked-example $code } member-eq? ;
 
 PRIVATE>
 
