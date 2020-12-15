@@ -15,3 +15,29 @@ IN: help.syntax.tests
 
     [ ] [ "help.syntax.tests" lookup-vocab f >>help drop ] unit-test
 ] with-file-vocabs
+
+{ { $description } } [ HELP{ $description } ] unit-test
+
+{ { $description "this and that" } } [
+    HELP{ $description this and that }
+] unit-test
+
+{ { $description { $snippet "this" } " and that" } } [
+    HELP{ $description { $snippet "this" } and that }
+] unit-test
+
+{ { $description "this " { $snippet "and" } " that" } } [
+    HELP{ $description this { $snippet "and" } that }
+] unit-test
+
+{ { $description "this and " { $snippet "that" } } } [
+    HELP{ $description this and { $snippet "that" } }
+] unit-test
+
+{ { $description "this and " { $snippet "that" } "." } } [
+    HELP{ $description this and { $snippet "that" } . }
+] unit-test
+
+{ { $description "this, " { $snippet "that" } ", and the other." } } [
+    HELP{ $description this, { $snippet "that" } , and the other. }
+] unit-test
