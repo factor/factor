@@ -104,19 +104,19 @@ M: f print-element drop ;
 : $syntax ( element -- ) "Syntax" $heading $code ;
 
 : $description ( element -- )
-    "Word Description" $heading print-element ;
+    "Word description" $heading print-element ;
 
 : $class-description ( element -- )
-    "Class Description" $heading print-element ;
+    "Class description" $heading print-element ;
 
 : $error-description ( element -- )
-    "Error Description" $heading print-element ;
+    "Error description" $heading print-element ;
 
 : $var-description ( element -- )
-    "Variable Description" $heading print-element ;
+    "Variable description" $heading print-element ;
 
 : $contract ( element -- )
-    "Generic Word Contract" $heading print-element ;
+    "Generic word contract" $heading print-element ;
 
 : $examples ( element -- )
     "Examples" $heading print-element ;
@@ -146,7 +146,7 @@ M: f print-element drop ;
     [
         deprecated-style get [
             last-element off
-            "Deprecated" $heading print-element
+            "This word is deprecated" $heading print-element
         ] with-nesting
     ] ($heading) ;
 
@@ -280,7 +280,7 @@ PRIVATE>
     [ [ ($link) ] " » " (textual-list) ] ($span) ;
 
 : $see-also ( topics -- )
-    "See Also" $heading $links ;
+    "See also" $heading $links ;
 
 <PRIVATE
 :: update-related-words ( words -- affected-words )
@@ -404,10 +404,10 @@ M: f ($instance) ($link) ;
     "Outputs" $heading ($values) ;
 
 : $values ( element -- )
-    "Inputs and Outputs" $heading ($values) ;
+    "Inputs and outputs" $heading ($values) ;
 
 : $side-effects ( element -- )
-    "Side Effects" $heading "Modifies " print-element
+    "Side effects" $heading "Modifies " print-element
     [ $snippet ] textual-list ;
 
 : $errors ( element -- )
@@ -433,7 +433,7 @@ M: f ($instance) ($link) ;
     ] unless-empty ;
 
 : $value ( object -- )
-    "Variable" $heading
+    "Variable value" $heading
     "Current value in global namespace:" print-element
     check-first dup [ pprint-short ] ($code) ;
 
