@@ -66,11 +66,8 @@ DEFER: help-block?
         ] if
     ] produce nip ;
 
-: code-lines ( seq -- seq' )
-    dup { [ string? ] [ [ blank? not ] member? ] } 1&& [
-        string-lines [ [ blank? ] trim ] map harvest
-        dup length 1 = [ first ] when
-    ] when ;
+: code-lines ( str -- seq )
+    string-lines [ [ blank? ] trim ] map harvest ;
 
 : make-example ( seq -- seq )
     dup string? [
