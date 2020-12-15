@@ -21,9 +21,13 @@ IN: help.syntax
     [ dup empty? [ >string suffix! SBUF" " clone ] unless ]
     [ [ suffix! ] curry dip ] bi* ;
 
+DEFER: help-block?
+
 : push-help-space ( accum sbuf -- accum sbuf )
     dup empty? [
-        over empty? not pick ?last \ $nl eq? not and
+        over empty? not
+        pick ?last dup array? [ ?first ] when
+        help-block? not and
     ] [
         dup last CHAR: \s eq? not
     ] if [ CHAR: \s suffix! ] when ;
@@ -86,7 +90,15 @@ IN: help.syntax
         $subheading $syntax $class-description
         $error-description $var-description $contract $notes
         $curious $deprecated $errors $side-effects $content
-        $slot $image
+        $slot $image $warning
+    } member-eq? ;
+
+: help-block? ( word -- ? )
+    {
+        $description $heading $subheading $syntax
+        $class-description $error-description $var-description
+        $contract $notes $curious $deprecated $errors
+        $side-effects $content $warning $subsections $nl
     } member-eq? ;
 
 : help-values? ( word -- ? )
