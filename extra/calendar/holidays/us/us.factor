@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs calendar calendar.holidays
-calendar.holidays.private combinators combinators.short-circuit
-fry kernel lexer math namespaces parser sequences
-vocabs words ;
+USING: accessors calendar calendar.holidays
+calendar.holidays.private calendar.private combinators
+combinators.short-circuit kernel math sequences ;
 IN: calendar.holidays.us
 
 SINGLETONS: us us-federal ;
