@@ -23,6 +23,10 @@ tools.test vocabs ;
     HELP{ $description "test " { $snippet "and" } " that" }
 ] unit-test
 
+{ { $description "test " { $snippet "and" } " that " { $snippet "the other" } "." } } [
+    HELP{ $description "test " { $snippet "and" } " that " { $snippet "the other" } "." }
+] unit-test
+
 { { $description "this and that" } } [
     HELP{ $description this and that }
 ] unit-test

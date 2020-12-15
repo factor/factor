@@ -22,10 +22,11 @@ IN: help.syntax
     [ [ suffix! ] curry dip ] bi* ;
 
 : push-help-space ( accum sbuf -- accum sbuf )
-    {
-        [ dup empty? not over ?last CHAR: \s eq? not and ]
-        [ over empty? not pick ?last \ $nl eq? not and ]
-    } 0|| [ CHAR: \s suffix! ] when ;
+    dup empty? [
+        over empty? not pick ?last \ $nl eq? not and
+    ] [
+        dup last CHAR: \s eq? not
+    ] if [ CHAR: \s suffix! ] when ;
 
 :: parse-help-text ( -- seq )
     V{ } clone SBUF" " clone [
