@@ -50,8 +50,7 @@ IN: help.syntax
 : parse-help-values ( -- seq )
     [ scan-token dup "}" = not ] [
         dup "{" = [
-            parse-datum dup parsing-word?
-            [ V{ } clone swap execute-parsing first ] when
+            drop \ } parse-until >array
         ] [
             ":" ?tail drop scan-object 2array
         ] if
