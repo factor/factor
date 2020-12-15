@@ -116,7 +116,8 @@ HELP: clear-set
 
 HELP: members
 { $values { "set" set } { "seq" sequence } }
-{ $description "Creates a sequence with a single copy of each member of the set." $nl "Each set type is expected to implement a method on this generic word." } ;
+{ $description "Creates a sequence with a single copy of each member of the set." $nl "Each set type is expected to implement a method on this generic word." }
+{ $notes "This will preserve the ordering of unique elements when called on a " { $link sequence } "." } ;
 
 HELP: in?
 { $values { "elt" object } { "set" set } { "?" boolean } }
