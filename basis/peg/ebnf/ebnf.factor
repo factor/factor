@@ -474,14 +474,10 @@ ERROR: bad-effect quot effect ;
     [ parser>> (transform) ]
     [ code>> insert-escapes ]
     [ parser>> ] tri build-locals
-    ! Add words we need for build-locals, then remove them
-    ! so we don't pollute the manifest qualified-vocabs
-    ! and also so restarts don't add multiple times
-    qualified-vocabs length
-    "kernel" { "dup" "nip" "over" } add-words-from
-    "sequences" { "nth" } add-words-from
-    [ string-lines parse-lines ] dip
-    dup 2 + qualified-vocabs delete-slice ;
+    H{
+        { "dup" dup } { "nip" nip } { "over" over } ! kernel
+        { "nth" nth } ! sequences
+    } [ string-lines parse-lines ] with-words ;
 
 M: ebnf-action (transform)
     ebnf-transform check-action-effect action ;
