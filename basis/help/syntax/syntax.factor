@@ -10,11 +10,12 @@ IN: help.syntax
 
 :: parse-help-token ( end -- str/obj/f )
     ?scan-token dup search {
+        { [ dup not ] [ drop ] }
         { [ dup end eq? ] [ 2drop f ] }
         { [ dup parsing-word? ] [
             nip V{ } clone swap execute-parsing first
             dup wrapper? [ wrapped>> \ $link swap 2array ] when ] }
-        { [ dup [ vocabulary>> "help.markup" = ] when ] [ nip ] }
+        { [ dup vocabulary>> "help.markup" = ] [ nip ] }
         [ drop ]
     } cond ;
 
