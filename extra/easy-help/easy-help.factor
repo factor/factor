@@ -125,6 +125,10 @@ HELP-WORD: $related{
 : parse-help-examples ( -- seq )
     \ } parse-until [ \ $example make-example ] { } map-as ;
 
+: parse-help-example ( -- seq )
+    \ } parse-until dup { [ length 1 = ] [ first string? ] } 1&&
+    [ first string-lines [ [ blank? ] trim ] map harvest ] when ;
+
 PRIVATE>
 
 SYNTAX: $examples{ parse-help-examples \ $examples prefix suffix! ;
@@ -187,12 +191,16 @@ SYNTAX: $outputs{ parse-help-values \ $outputs prefix suffix! ;
 : help-examples? ( word -- ? )
     { $examples } member-eq? ;
 
+: help-example? ( word -- ? )
+    { $example $unchecked-example } member-eq? ;
+
 <<
 SYNTAX: HELP{
     scan-word dup \ } eq? [ drop { } ] [
         {
             { [ dup help-text? ] [ parse-help-text ] }
             { [ dup help-values? ] [ parse-help-values ] }
+            { [ dup help-example? ] [ parse-help-example ] }
             { [ dup help-examples? ] [ parse-help-examples ] }
             [ \ } parse-until >array ]
         } cond swap prefix
