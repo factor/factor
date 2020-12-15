@@ -23,7 +23,7 @@ IN: help.syntax
 
 : push-help-space ( accum sbuf -- accum sbuf )
     {
-        [ dup empty? not ]
+        [ dup empty? not over ?last CHAR: \s eq? not and ]
         [ over empty? not pick ?last \ $nl eq? not and ]
     } 0|| [ CHAR: \s suffix! ] when ;
 
@@ -36,7 +36,7 @@ IN: help.syntax
         ] dip [
             [
                 dup string? [
-                    dup ?first ".,;:" member? [
+                    dup ?first " .,;:" member? [
                         [ push-help-space ] dip
                     ] unless append!
                 ] [
