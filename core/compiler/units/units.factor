@@ -142,7 +142,7 @@ M: object always-bump-effect-counter? drop f ;
     maybe-changed get members
     changed-definitions get members
     [ always-bump-effect-counter? ] filter
-    3array combine new-words get [ in? not ] curry any? ;
+    3array union-all new-words get [ in? not ] curry any? ;
 
 : bump-effect-counter ( -- )
     bump-effect-counter? [

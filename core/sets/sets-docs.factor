@@ -45,8 +45,8 @@ ARTICLE: "set-operations" "Operations on sets"
 }
 "Operations on groups of sets:"
 { $subsections
-    combine
-    refine
+    union-all
+    intersect-all
 }
 "An optional generic word for creating sets of the same class as a given set:"
 { $subsections set-like }
@@ -226,10 +226,10 @@ HELP: cardinality
 { $values { "set" set } { "n" "a non-negative integer" } }
 { $description "Returns the number of elements in the set. All sets support this operation." } ;
 
-HELP: refine
+HELP: intersect-all
 { $values { "sets" sequence } { "set/f" { $maybe set } } }
 { $description "Outputs the intersection of all the sets of the sequence " { $snippet "sets" } ", or " { $link f } " if " { $snippet "sets" } " is empty." } ;
 
-HELP: combine
+HELP: union-all
 { $values { "sets" { $sequence set } } { "set/f" { $maybe set } } }
 { $description "Outputs the union of a sequence of sets, or " { $link f } " if the sequence is empty." } ;
