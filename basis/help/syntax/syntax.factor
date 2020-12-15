@@ -69,7 +69,7 @@ IN: help.syntax
 
 : parse-help-example ( -- seq )
     \ } parse-until dup { [ length 1 = ] [ first string? ] } 1&&
-    [ first example-lines ] when ;
+    [ first example-lines ] [ >array ] if ;
 
 : help-text? ( word -- ? )
     {
