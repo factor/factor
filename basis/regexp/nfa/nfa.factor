@@ -63,10 +63,10 @@ M: object modify-epsilon ;
         drop [ unix-lines option? ] 2dip swap ?
     ] [ 2nip ] if ;
 
-M: $ modify-epsilon
+M: $crlf modify-epsilon
     $unix end-of-input line-option ;
 
-M: ^ modify-epsilon
+M: ^crlf modify-epsilon
     ^unix beginning-of-input line-option ;
 
 M: tagged-epsilon nfa-node
