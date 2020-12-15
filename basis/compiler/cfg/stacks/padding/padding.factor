@@ -15,7 +15,7 @@ IN: compiler.cfg.stacks.padding
     first2 swapd remove 2array ;
 
 : combine-stacks ( stacks -- stack )
-    [ first first ] [ [ second ] map sets:combine ] bi 2array ;
+    [ first first ] [ [ second ] map sets:union-all ] bi 2array ;
 
 : classify-read ( stack n -- val )
     swap 2dup second member? [ 2drop 2 ] [ first >= [ 1 ] [ 0 ] if ] if ;
