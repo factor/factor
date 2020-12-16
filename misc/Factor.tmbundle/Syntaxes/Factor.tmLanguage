@@ -175,7 +175,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>(^|(?&lt;=\s))(&gt;alist|&lt;enum&gt;|2cache|\?at|\?of|assoc|assoc&gt;map|assoc-all\?|assoc-any\?|assoc-clone-like|assoc-combine|assoc-diff|assoc-diff!|assoc-differ|assoc-each|assoc-empty\?|assoc-filter|assoc-filter!|assoc-filter-as|assoc-find|assoc-hashcode|assoc-intersect|assoc-like|assoc-map|assoc-map-as|assoc-partition|assoc-refine|assoc-size|assoc-stack|assoc-subset\?|assoc-union|assoc-union!|assoc=|assoc\?|at|at\*|at\+|cache|change-at|clear-assoc|delete-at|delete-at\*|enum|enum\?|extract-keys|inc-at|key\?|keys|map&gt;assoc|maybe-set-at|new-assoc|of|push-at|rename-at|set-at|sift-keys|sift-values|substitute|unzip|value-at|value-at\*|value\?|values|zip|zip-as|zip-index|zip-index-as)(\s|$)</string>
+			<string>(^|(?&lt;=\s))(&gt;alist|&lt;enum&gt;|2cache|\?at|\?of|assoc|assoc&gt;map|assoc-all\?|assoc-any\?|assoc-clone-like|assoc-union-all|assoc-diff|assoc-diff!|assoc-differ|assoc-each|assoc-empty\?|assoc-filter|assoc-filter!|assoc-filter-as|assoc-find|assoc-hashcode|assoc-intersect|assoc-like|assoc-map|assoc-map-as|assoc-partition|assoc-intersect-all|assoc-size|assoc-stack|assoc-subset\?|assoc-union|assoc-union!|assoc=|assoc\?|at|at\*|at\+|cache|change-at|clear-assoc|delete-at|delete-at\*|enum|enum\?|extract-keys|inc-at|key\?|keys|map&gt;assoc|maybe-set-at|new-assoc|of|push-at|rename-at|set-at|sift-keys|sift-values|substitute|unzip|value-at|value-at\*|value\?|values|zip|zip-as|zip-index|zip-index-as)(\s|$)</string>
 			<key>name</key>
 			<string>keyword.control.assocs.factor</string>
 		</dict>

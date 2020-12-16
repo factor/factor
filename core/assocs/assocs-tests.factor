@@ -200,7 +200,7 @@ unit-test
         H{ { 1 3 } }
         H{ { 2 3 } }
         H{ { 1 2 } }
-    } assoc-combine
+    } assoc-union-all
 ] unit-test
 
 { H{ { 1 7 } } } [
@@ -208,7 +208,7 @@ unit-test
         H{ { 1 2 } { 2 4 } { 5 6 } }
         H{ { 1 3 } { 2 5 } }
         H{ { 1 7 } { 5 6 } }
-    } assoc-refine
+    } assoc-intersect-all
 ] unit-test
 
 { f } [ "a" { } assoc-stack ] unit-test
