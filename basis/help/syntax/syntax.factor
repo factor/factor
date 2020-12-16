@@ -9,14 +9,16 @@ IN: help.syntax
 <PRIVATE
 
 :: parse-help-token ( end -- str/obj/f )
-    ?scan-token dup search {
+    ?scan-token {
+        [ dup "syntax" lookup-word ]
+        [ dup "help.markup" lookup-word ]
+    } 0|| {
         { [ dup not ] [ drop ] }
         { [ dup end eq? ] [ 2drop f ] }
         { [ dup parsing-word? ] [
             nip V{ } clone swap execute-parsing first
             dup wrapper? [ wrapped>> \ $link swap 2array ] when ] }
-        { [ dup vocabulary>> "help.markup" = ] [ nip ] }
-        [ drop ]
+        { [ dup ] [ nip ] }
     } cond ;
 
 : push-help-text ( accum sbuf obj -- accum sbuf' )
