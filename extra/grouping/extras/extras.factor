@@ -24,9 +24,15 @@ MACRO:: clump-map-as ( quot exemplar n -- result )
 :: short-groups ( seq n -- seq' )
     seq dup length dup n mod [ drop ] [ - head-slice ] if-zero ;
 
-:: group-map-as ( seq quot exemplar n -- result )
-    seq n short-groups n <groups>
-    [ n firstn quot call ] exemplar map-as ; inline
+MACRO:: group-map-as ( quot exemplar n -- result )
+    n 1 + :> n+1
+    [
+        [ length n /i ] [ '[ _ nth-unsafe ] ] bi
+        [ n <iota> n firstn ] 2dip '[
+            [ _ n napply quot call ] n nkeep
+            [ n + ] n napply n+1 nrot
+        ] exemplar replicate-as n nnip
+    ] ;
 
 : group-map ( seq quot n -- result )
     { } swap group-map-as ; inline
