@@ -1,29 +1,22 @@
-USING: accessors arrays combinators fry grouping
-grouping.private kernel locals macros math math.ranges sequences
-sequences.generalizations sequences.private vectors ;
+USING: accessors arrays combinators fry generalizations grouping
+grouping.private kernel locals macros math math.order math.ranges
+sequences sequences.generalizations sequences.private vectors ;
 
 IN: grouping.extras
 
-: 2clump-map-as ( seq quot: ( elt1 elt2 -- newelt ) exemplar -- seq' )
-    [ dup 1 short tail-slice ] 2dip 2map-as ; inline
-
-: 2clump-map ( seq quot: ( elt1 elt2 -- newelt ) -- seq' )
-    { } 2clump-map-as ; inline
-
-: 3clump-map-as ( seq quot: ( elt1 elt2 elt3 -- newelt ) exemplar -- seq' )
+MACRO:: clump-map-as ( quot exemplar n -- result )
+    n 1 - :> n-1
     [
-        dup [ 1 short tail-slice ] [ 2 short tail-slice ] bi
-    ] 2dip 3map-as ; inline
+        dup length n < [
+            drop { } exemplar like
+        ] [
+            [ n-1 firstn ] [ n-1 tail-slice ] bi
+            [ quot n-1 nkeep n nrot ] exemplar map-as n-1 nnip
+        ] if
+    ] ;
 
-: 3clump-map ( seq quot: ( elt1 elt2 elt3 -- newelt ) -- seq' )
-    { } 3clump-map-as ; inline
-
-MACRO: nclump-map-as ( seq quot exemplar n -- result )
-    [ nip [1,b) [ [ short tail-slice ] curry ] map swap ] 2keep
-    '[ _ dup _ cleave _ _ _ nmap-as ] ;
-
-: nclump-map ( seq quot n -- result )
-    { } swap nclump-map-as ; inline
+: clump-map ( seq quot n -- result )
+    { } swap clump-map-as ; inline
 
 :: pad-groups ( seq n elt -- padded )
     seq dup length dup n mod [ drop ] [ n swap - + elt pad-tail ] if-zero ;
@@ -31,11 +24,12 @@ MACRO: nclump-map-as ( seq quot exemplar n -- result )
 :: short-groups ( seq n -- seq' )
     seq dup length dup n mod [ drop ] [ - head-slice ] if-zero ;
 
-MACRO:: ngroup-map-as ( seq quot exemplar n -- result )
-    [ seq n short-groups n <groups> [ n firstn quot call ] exemplar map-as ] ;
+:: group-map-as ( seq quot exemplar n -- result )
+    seq n short-groups n <groups>
+    [ n firstn quot call ] exemplar map-as ; inline
 
-: ngroup-map ( seq quot n -- result )
-    { } swap ngroup-map-as ; inline
+: group-map ( seq quot n -- result )
+    { } swap group-map-as ; inline
 
 TUPLE: head-clumps seq ;
 C: <head-clumps> head-clumps
