@@ -46,7 +46,7 @@ DEFER: name/values
 
 : name/values ( string -- remain terms )
     [ dup { [ empty? not ] [ first CHAR: ` = not ] } 1&& ]
-    [ name=value ] produce assoc-combine ;
+    [ name=value ] produce assoc-union-all ;
 
 : parse-txon ( string -- objects )
     [ dup empty? not ] [ name=value ] produce nip ;

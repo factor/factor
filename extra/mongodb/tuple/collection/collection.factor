@@ -67,10 +67,10 @@ GENERIC: mdb-index-map ( tuple -- sequence )
     [ superclass-of [ (mdb-collection) ] [ f ] if* ] if* ; inline recursive
 
 : (mdb-slot-map) ( class -- slot-map )
-    superclasses-of [ MDB_SLOTDEF_MAP word-prop ] map assoc-combine  ; inline
+    superclasses-of [ MDB_SLOTDEF_MAP word-prop ] map assoc-union-all  ; inline
 
 : (mdb-index-map) ( class -- index-map )
-    superclasses-of [ MDB_INDEX_MAP word-prop ] map assoc-combine ; inline
+    superclasses-of [ MDB_INDEX_MAP word-prop ] map assoc-union-all ; inline
 
 : split-optl ( seq -- key options )
     [ first ] [ rest ] bi ; inline
@@ -120,7 +120,7 @@ PRIVATE>
 
 : set-index-map ( class index-list -- )
     [ dup user-defined-key-index ] dip index-list>map 2array
-    assoc-combine MDB_INDEX_MAP set-word-prop ; inline
+    assoc-union-all MDB_INDEX_MAP set-word-prop ; inline
 
 M: tuple-class tuple-collection ( tuple -- mdb-collection )
     (mdb-collection) ;
@@ -135,14 +135,14 @@ M: tuple-class mdb-slot-map ( class -- assoc )
     (mdb-slot-map) ;
 
 M: mdb-collection mdb-slot-map ( collection -- assoc )
-    classes>> [ mdb-slot-map ] map assoc-combine ;
+    classes>> [ mdb-slot-map ] map assoc-union-all ;
 
 M: mdb-persistent mdb-index-map
     class-of (mdb-index-map) ;
 M: tuple-class mdb-index-map
     (mdb-index-map) ;
 M: mdb-collection mdb-index-map
-    classes>> [ mdb-index-map ] map assoc-combine ;
+    classes>> [ mdb-index-map ] map assoc-union-all ;
 
 <PRIVATE
 
