@@ -1,19 +1,10 @@
-USING: accessors arrays combinators fry generalizations grouping
-grouping.private kernel locals macros math math.order math.ranges
+USING: accessors arrays grouping grouping.private kernel math
 sequences sequences.generalizations sequences.private vectors ;
 
 IN: grouping.extras
 
-MACRO:: clump-map-as ( quot exemplar n -- result )
-    n 1 - :> n-1
-    [
-        dup length n < [
-            drop { } exemplar like
-        ] [
-            [ n-1 firstn ] [ n-1 tail-slice ] bi
-            [ quot n-1 nkeep n nrot ] exemplar map-as n-1 nnip
-        ] if
-    ] ;
+:: clump-map-as ( seq quot exemplar n -- result )
+    seq n <clumps> [ n firstn-unsafe quot call ] exemplar map-as ; inline
 
 : clump-map ( seq quot n -- result )
     { } swap clump-map-as ; inline
@@ -24,15 +15,9 @@ MACRO:: clump-map-as ( quot exemplar n -- result )
 :: short-groups ( seq n -- seq' )
     seq dup length dup n mod [ drop ] [ - head-slice ] if-zero ;
 
-MACRO:: group-map-as ( quot exemplar n -- result )
-    n 1 + :> n+1
-    [
-        [ length n /i ] [ '[ _ nth-unsafe ] ] bi
-        [ n <iota> n firstn ] 2dip '[
-            [ _ n napply quot call ] n nkeep
-            [ n + ] n napply n+1 nrot
-        ] exemplar replicate-as n nnip
-    ] ;
+:: group-map-as ( seq quot exemplar n -- result )
+    seq n short-groups n <groups>
+    [ n firstn-unsafe quot call ] exemplar map-as ; inline
 
 : group-map ( seq quot n -- result )
     { } swap group-map-as ; inline
