@@ -5,5 +5,5 @@ windows.kernel32 kernel classes.struct calendar ;
 IN: time.windows
 
 M: windows set-system-time
-    >gmt
+    clone >gmt
     timestamp>SYSTEMTIME SetSystemTime win32-error=0/f ;
