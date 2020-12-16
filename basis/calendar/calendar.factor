@@ -311,35 +311,38 @@ DEFER: time-
 : convert-timezone ( timestamp duration -- timestamp )
     [ over gmt-offset>> time- (time+) ] [ >>gmt-offset ] bi ;
 
-: >local-time ( timestamp -- timestamp )
+: convert-local-time ( timestamp -- timestamp )
     gmt-offset-duration convert-timezone ;
 
-: >gmt ( timestamp -- timestamp )
+: convert-gmt ( timestamp -- timestamp )
     instant convert-timezone ;
 
+: >local-time ( timestamp -- timestamp' )
+    clone convert-local-time ;
+
+: >gmt ( timestamp -- timestamp' )
+    clone convert-gmt ;
+
+: >timezone ( timestamp duration -- timestamp' )
+    [ clone ] [ convert-timezone ] bi* ;
+
 ALIAS: utc gmt
+ALIAS: convert-utc convert-gmt
 ALIAS: >utc >gmt
 
-M: timestamp <=> [ clone >gmt tuple-slots ] compare ;
-
-<PRIVATE
-
-: same-times? ( timestamp1 timestamp2 quot -- ? )
-    [ clone >gmt ] prepose same? ; inline
-
-PRIVATE>
+M: timestamp <=> [ >gmt tuple-slots ] compare ;
 
 : same-year? ( ts1 ts2 -- ? )
-    [ slots{ year } ] same-times? ;
+    [ >gmt slots{ year } ] same? ;
 
 : quarter ( timestamp -- [1,4] )
     month>> 3 /i 1 + ; inline
 
 : same-quarter? ( ts1 ts2 -- ? )
-    [ [ year>> ] [ quarter ] bi 2array ] same-times? ;
+    [ >gmt [ year>> ] [ quarter ] bi 2array ] same? ;
 
 : same-month? ( ts1 ts2 -- ? )
-    [ slots{ year month } ] same-times? ;
+    [ >gmt slots{ year month } ] same? ;
 
 :: (day-of-year) ( year month day -- n )
     month days-until nth day + {
@@ -351,7 +354,7 @@ PRIVATE>
     >date< (day-of-year) ;
 
 : same-day? ( ts1 ts2 -- ? )
-    [ slots{ year month day } ] same-times? ;
+    [ >gmt slots{ year month day } ] same? ;
 
 : (day-of-week) ( year month day -- n )
     ! Zeller Congruence
@@ -379,16 +382,16 @@ DEFER: end-of-year
     } case ;
 
 : same-week? ( ts1 ts2 -- ? )
-    [ [ year>> ] [ week-number ] bi 2array ] same-times? ;
+    [ >gmt [ year>> ] [ week-number ] bi 2array ] same? ;
 
 : same-hour? ( ts1 ts2 -- ? )
-    [ slots{ year month day hour } ] same-times? ;
+    [ >gmt slots{ year month day hour } ] same? ;
 
 : same-minute? ( ts1 ts2 -- ? )
-    [ slots{ year month day hour minute } ] same-times? ;
+    [ >gmt slots{ year month day hour minute } ] same? ;
 
 : same-second? ( ts1 ts2 -- ? )
-    [ slots{ year month day hour minute second } ] same-times? ;
+    [ >gmt slots{ year month day hour minute second } ] same? ;
 
 <PRIVATE
 

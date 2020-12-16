@@ -22,14 +22,14 @@ IN: windows.time
 
 : timestamp>windows-time ( timestamp -- n )
     ! 64bit number representing # of nanoseconds since Jan 1, 1601 (UTC)
-    clone >gmt windows-1601 (time-) 10,000,000 * >integer ;
+    >gmt windows-1601 (time-) 10,000,000 * >integer ;
 
 : windows-time>FILETIME ( n -- FILETIME )
     [ FILETIME <struct> ] dip
     [ 32 bits >>dwLowDateTime ] [ -32 shift >>dwHighDateTime ] bi ;
 
 : timestamp>FILETIME ( timestamp -- FILETIME/f )
-    dup [ clone >gmt timestamp>windows-time windows-time>FILETIME ] when ;
+    dup [ >gmt timestamp>windows-time windows-time>FILETIME ] when ;
 
 : FILETIME>timestamp ( FILETIME -- timestamp/f )
     FILETIME>windows-time windows-time>timestamp ;
