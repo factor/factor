@@ -26,7 +26,14 @@ IN: help.syntax
     [ dup empty? [ >string suffix! SBUF" " clone ] unless ]
     [ [ suffix! ] curry dip ] bi* ;
 
-DEFER: help-block?
+: help-block? ( word -- ? )
+    {
+        $description $heading $subheading $syntax
+        $class-description $error-description $var-description
+        $contract $notes $curious $deprecated $errors
+        $side-effects $content $warning $subsections $nl
+        $list $table $example $unchecked-example $code
+    } member-eq? ;
 
 : push-help-space ( accum sbuf -- accum sbuf )
     dup empty? [
@@ -101,14 +108,6 @@ DEFER: help-block?
 
 : help-code? ( word -- ? )
     { $example $unchecked-example $code } member-eq? ;
-
-: help-block? ( word -- ? )
-    {
-        $description $heading $subheading $syntax
-        $class-description $error-description $var-description
-        $contract $notes $curious $deprecated $errors
-        $side-effects $content $warning $subsections $nl
-    } member-eq? ;
 
 : help-values? ( word -- ? )
     { $values $inputs $outputs } member-eq? ;
