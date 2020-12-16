@@ -81,17 +81,15 @@ IN: help.syntax
 : code-lines ( str -- seq )
     string-lines [ [ blank? ] trim ] map harvest ;
 
-: make-example ( seq -- seq )
-    dup string? [
-        code-lines
-        dup { [ array? ] [ length 1 > ] } 1&& [
-            dup length 1 - over [ unescape-string ] change-nth
-            \ $example prefix
-        ] when
+: make-example ( str -- seq )
+    code-lines dup { [ array? ] [ length 1 > ] } 1&& [
+        dup length 1 - over [ unescape-string ] change-nth
+        \ $example prefix
     ] when ;
 
 : parse-help-examples ( -- seq )
-    \ } parse-until [ make-example ] { } map-as ;
+    \ } parse-until dup [ string? ] all?
+    [ [ make-example ] { } map-as ] [ >array ] if ;
 
 : parse-help-code ( -- seq )
     \ } parse-until dup { [ length 1 = ] [ first string? ] } 1&&
