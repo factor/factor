@@ -272,8 +272,8 @@ HELP: convert-timezone
 } ;
 
 HELP: >local-time
-{ $values { "timestamp" timestamp } }
-{ $description "Converts the " { $snippet "timestamp" } " to the timezone of your computer." }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
+{ $description "Converts the " { $snippet "timestamp" } " to the timezone of your computer, returning a new " { $link timestamp } " instance." }
 { $examples
     { $example "USING: accessors calendar kernel prettyprint ;"
                "now now-gmt >local-time [ gmt-offset>> ] same? ."
@@ -282,8 +282,8 @@ HELP: >local-time
 } ;
 
 HELP: >gmt
-{ $values { "timestamp" timestamp } }
-{ $description "Converts the " { $snippet "timestamp" } " to the GMT timezone." }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
+{ $description "Converts the " { $snippet "timestamp" } " to the GMT timezone, returning a new " { $link timestamp } " instance." }
 { $examples
     { $example "USING: accessors calendar kernel prettyprint ;"
                "now >gmt gmt-offset>> hour>> ."
@@ -301,7 +301,7 @@ HELP: gmt
 { $description "Set the time zone to GMT." }
 { $notes "The time is not converted, if you want that then call " { $link >gmt } "." } ;
 
-{ local-time >local-time gmt >gmt utc >utc convert-timezone } related-words
+{ local-time >local-time convert-local-time gmt >gmt convert-gmt utc >utc convert-utc convert-timezone } related-words
 
 HELP: duration*
 { $values { "obj1" object } { "obj2" object } { "obj3" object } }
