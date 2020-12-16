@@ -16,6 +16,11 @@ sequences tools.test ;
 { { { 1 2 3 4 } } } [ { 1 2 3 4 } [ 4array ] 4 nclump-map ] unit-test
 { { { 1 2 3 4 } { 2 3 4 5 } } } [ { 1 2 3 4 5 } [ 4array ] 4 nclump-map ] unit-test
 
+{ { } } [ { 1 } [ 3array ] 3 ngroup-map ] unit-test
+{ { } } [ { 1 2 } [ 3array ] 3 ngroup-map ] unit-test
+{ { { 1 2 3 } } } [ { 1 2 3 } [ 3array ] 3 ngroup-map ] unit-test
+{ { { 1 2 3 } } } [ { 1 2 3 4 } [ 3array ] 3 ngroup-map ] unit-test
+
 { { "tail" "ail" "il" "l" } } [ "tail" tail-clump ] unit-test
 { { "h" "he" "hea" "head" } } [ "head" head-clump ] unit-test
 

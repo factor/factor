@@ -25,6 +25,18 @@ MACRO: nclump-map-as ( seq quot exemplar n -- result )
 : nclump-map ( seq quot n -- result )
     { } swap nclump-map-as ; inline
 
+:: pad-groups ( seq n elt -- padded )
+    seq dup length dup n mod [ drop ] [ n swap - + elt pad-tail ] if-zero ;
+
+:: short-groups ( seq n -- seq' )
+    seq dup length dup n mod [ drop ] [ - head-slice ] if-zero ;
+
+MACRO:: ngroup-map-as ( seq quot exemplar n -- result )
+    [ seq n short-groups n <groups> [ n firstn quot call ] exemplar map-as ] ;
+
+: ngroup-map ( seq quot n -- result )
+    { } swap ngroup-map-as ; inline
+
 TUPLE: head-clumps seq ;
 C: <head-clumps> head-clumps
 M: head-clumps length seq>> length ;
