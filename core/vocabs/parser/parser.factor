@@ -176,7 +176,7 @@ TUPLE: rename word vocab words ;
     <extra-words> qualified-vocabs remove! drop ;
 
 : with-words ( assoc quot -- )
-    [ use-words ] prepose over '[ _ unuse-words ] finally ; inline
+    '[ use-words @ ] over '[ _ unuse-words ] finally ; inline
 
 TUPLE: ambiguous-use-error name words ;
 
