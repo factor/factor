@@ -176,7 +176,7 @@ TUPLE: rename word vocab words ;
     <extra-words> qualified-vocabs remove! drop ;
 
 : with-words ( assoc quot -- )
-    [ use-words ] prepose over '[ _ unuse-words ] [ ] cleanup ; inline
+    [ use-words ] prepose over '[ _ unuse-words ] finally ; inline
 
 TUPLE: ambiguous-use-error name words ;
 
@@ -274,7 +274,6 @@ PRIVATE>
         [ call ] [
             [ manifest get add-definition-observer call ]
             [ manifest get remove-definition-observer ]
-            [ ]
-            cleanup
+            finally
         ] if-bootstrapping
     ] with-variable ; inline
