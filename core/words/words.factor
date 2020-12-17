@@ -227,9 +227,6 @@ ERROR: bad-create name vocab ;
         dup changed-definition
     ] if* ;
 
-: constructor-word ( name vocab -- word )
-    [ "<" ">" surround ] dip create-word ;
-
 PREDICATE: parsing-word < word "parsing" word-prop ;
 
 M: parsing-word definer drop \ SYNTAX: \ ; ;
