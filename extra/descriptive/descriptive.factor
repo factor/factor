@@ -45,11 +45,18 @@ M: descriptive definer drop \ DESCRIPTIVE: \ ; ;
 M: descriptive definition
     "descriptive-definition" word-prop ;
 
+M: descriptive reset-word
+    [ call-next-method ]
+    [ f "descriptive-definition" set-word-prop ] bi ;
+
 SYNTAX: DESCRIPTIVE:: (::) define-descriptive ;
 
-INTERSECTION: descriptive-lambda descriptive lambda-word ;
+PREDICATE: descriptive-lambda < descriptive lambda-word? ;
 
 M: descriptive-lambda definer drop \ DESCRIPTIVE:: \ ; ;
 
 M: descriptive-lambda definition
     "lambda" word-prop body>> ;
+
+M: descriptive-lambda reset-word
+    [ call-next-method ] [ f "lambda" set-word-prop ] bi ;
