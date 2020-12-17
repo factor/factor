@@ -110,7 +110,7 @@ M: timestamp year. year>> year. ;
     [ hh:mm:ss ] with-string-writer ;
 
 : timestamp>ymdhms ( timestamp -- str )
-    [ >gmt YYYY-MM-DD " " hh:mm:ss ] with-string-writer ;
+    [ >gmt { YYYY-MM-DD " " hh:mm:ss } formatted ] with-string-writer ;
 
 : write-gmt-offset-hhmm ( gmt-offset -- )
     [ hour>> dup 0 < "-" "+" ? write abs write-00 ] [ mm ] bi ;
