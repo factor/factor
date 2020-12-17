@@ -336,7 +336,7 @@ M: timestamp <=> [ >gmt tuple-slots ] compare ;
     [ >gmt slots{ year } ] same? ;
 
 : quarter ( timestamp -- [1,4] )
-    month>> 3 /i 1 + ; inline
+    month>> 3 /mod [ drop 1 + ] unless-zero ; inline
 
 : same-quarter? ( ts1 ts2 -- ? )
     [ >gmt [ year>> ] [ quarter ] bi 2array ] same? ;
