@@ -12,7 +12,7 @@ IN: help.syntax
     ?scan-token dup {
         [ "syntax" lookup-word ]
         [ "help.markup" lookup-word ]
-        [ dup ?last ":{[(" member-eq? [ search ] [ drop f ] if ]
+        [ dup ?last ":{[(/\"" member-eq? [ search ] [ drop f ] if ]
     } 1|| {
         { [ dup not ] [ drop ] }
         { [ dup end eq? ] [ 2drop f ] }
