@@ -207,6 +207,8 @@ IN: calendar
     2008 2 29 <date> =
 ] unit-test
 
+{ { 1 1 1 2 2 2 3 3 3 4 4 4 } } [ 12 [1,b] [ quarter ] map ] unit-test
+
 { 0 }
 [ now-gmt gmt-offset>> duration>seconds ] unit-test
 
