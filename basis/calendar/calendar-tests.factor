@@ -207,10 +207,6 @@ IN: calendar
     2008 2 29 <date> =
 ] unit-test
 
-{ t } [
-    2020 <year-gmt> dup 10000 >>second [ >gmt ] bi@ eq?
-] unit-test
-
 { 0 }
 [ now-gmt gmt-offset>> duration>seconds ] unit-test
 
