@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs bootstrap.image.private hash-sets hashtables init
 io io.files kernel kernel.private make memory namespaces parser
-parser.notes sequences system vocabs.hierarchy vocabs.loader ;
+parser.notes sequences system vocabs.hierarchy vocabs ;
 
 "Bootstrap stage 1..." print flush
 
@@ -22,7 +22,20 @@ load-help? off
         boot
     ] %
 
-    load-all
+    "math.integers" require
+    "math.ratios" require
+    "math.floats" require
+    "memory" require
+
+    "io.streams.c" require
+    "io.streams.byte-array" require ! for utf16 on Windows
+    "vocabs.loader" require
+
+    "syntax" require
+
+    "locals" require
+    "locals.fry" require
+    "locals.macros" require
 
     "vocab:bootstrap/layouts.factor" parse-file %
 
