@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs bootstrap.image.private hash-sets hashtables init
 io io.files kernel kernel.private make memory namespaces parser
-parser.notes sequences system vocabs.hierarchy vocabs ;
+parser.notes sequences system vocabs vocabs.loader ;
 
 "Bootstrap stage 1..." print flush
 
