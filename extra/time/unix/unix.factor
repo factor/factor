@@ -8,6 +8,6 @@ IN: time.unix
     gmt-offset>> duration>minutes 1 \ timezone <struct-boa> ; inline
 
 M: unix set-system-time
-    [ unix-1970 (time-) 1000000 * >integer make-timeval ]
+    [ unix-1970 time- duration>microseconds >integer make-timeval ]
     [ timestamp>timezone ] bi
     settimeofday io-error ;
