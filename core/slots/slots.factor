@@ -1,6 +1,5 @@
 ! Copyright (C) 2005, 2011 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: alien DEFER: pinned-alien DEFER: <bad-alien> ! for bootstrap
 USING: accessors alien arrays assocs byte-arrays classes
 classes.algebra classes.algebra.private classes.maybe
 combinators generic generic.standard hashtables kernel
