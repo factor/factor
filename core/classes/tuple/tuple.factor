@@ -3,6 +3,7 @@
 IN: classes.tuple
 ! for classes.union mutual dependency
 DEFER: tuple-class?
+DEFER: tuple-layout
 <PRIVATE
 DEFER: echelon-of
 DEFER: layout-of
