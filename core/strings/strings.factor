@@ -22,7 +22,12 @@ PRIMITIVE: string-nth-fast ( n string -- ch )
     f swap set-string-hashcode ; inline
 
 : rehash-string ( str -- )
-    1 over sequence-hashcode swap set-string-hashcode ; inline
+    0 over [
+        swap [
+            [ -2 fixnum-shift-fast ] [ 5 fixnum-shift-fast ] bi
+            fixnum+fast fixnum+fast
+        ] keep fixnum-bitxor
+    ] each swap set-string-hashcode ; inline
 
 : (aux) ( n string -- byte-array m )
     aux>> { byte-array } declare swap 1 fixnum-shift-fast ; inline
