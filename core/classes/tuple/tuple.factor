@@ -3,11 +3,11 @@
 IN: classes.tuple
 ! for classes.union mutual dependency
 DEFER: tuple-class?
-DEFER: tuple-layout
 <PRIVATE
 DEFER: echelon-of
 DEFER: layout-of
 DEFER: layout-class-offset
+DEFER: tuple-layout
 PRIVATE>
 USING: accessors arrays assocs classes classes.algebra
 classes.algebra.private classes.builtin classes.private
