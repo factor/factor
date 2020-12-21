@@ -29,16 +29,16 @@ PRIVATE>
     [ drop [ second ] bi@ pre-release<=> ] [ 2nip ] if ;
 
 : version< ( version1 version2 -- ? )
-    version<=> +lt+ = ;
+    version<=> +lt+ eq? ;
 
 : version<= ( version1 version2 -- ? )
-    version<=> [ +lt+ = ] [ +eq+ = ] either? ;
+    version<=> { +lt+ +eq+ } member-eq? ;
 
 : version= ( version1 version2 -- ? )
-    version<=> +eq+ = ;
+    version<=> +eq+ eq? ;
 
 : version>= ( version1 version2 -- ? )
-    version<=> [ +gt+ = ] [ +eq+ = ] either? ;
+    version<=> { +gt+ +eq+ } member-eq? ;
 
 : version> ( version1 version2 -- ? )
-    version<=> +gt+ = ;
+    version<=> +gt+ eq? ;
