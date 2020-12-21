@@ -329,7 +329,7 @@ find_num_cores() {
 find_word_size() {
     if [[ -n $WORD ]] ; then return; fi
     $ECHO "Finding WORD..."
-    WORD=$(find_word_size_cpp || find_word_size_c)
+    WORD=$(getconf LONG_BIT || find_word_size_cpp || find_word_size_c)
 }
 
 find_word_size_cpp() {
