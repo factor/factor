@@ -409,3 +409,13 @@ HELP: zero-loop>sequence
         [[ V{ "zero" "one" "two" "three" "four" }]]
     }
 } ;
+
+HELP: find-pred
+{ $values seq: sequence quot: quotation pred: quotation calc/f: object i/f: object elt/f: object }
+{ $description A version of \ find that saves the calculation done by the first quotation and returns the calulation, element, and index if the calculation matches a predicate quotation. }
+{ $examples
+    [=[ USING: math kernel sequences.extras prettyprint ;
+        { 4 5 6 } [ sq ] [ 20 > ] find-pred [ . ] tri@
+        25\n5\n1
+    ]=]
+} ;

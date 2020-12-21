@@ -1,7 +1,7 @@
 USING: accessors arrays assocs combinators fry generalizations
 grouping growable kernel locals make math math.order math.ranges
-sequences sequences.deep sequences.private sorting splitting
-vectors ;
+sequences sequences.deep sequences.private shuffle sorting
+splitting vectors ;
 IN: sequences.extras
 
 : find-all ( ... seq quot: ( ... elt -- ... ? ) -- ... elts )
@@ -622,6 +622,9 @@ PRIVATE>
 : map-zip ( quot: ( key -- value ) -- alist )
     '[ _ keep swap ] map>alist ; inline
 
+: assoc-map-zip ( quot: ( key value -- calc ) -- alist )
+    '[ _ 2keep 2array swap ] assoc-map ; inline
+
 : take-while ( ... seq quot: ( ... elt -- ... ? ) -- head-slice )
     [ '[ @ not ] find drop ] keepd swap
     [ dup length ] unless* head-slice ; inline
@@ -649,3 +652,18 @@ PRIVATE>
 : extract! ( ... seq quot: ( ... elt -- ... ? ) -- ... seq )
     [ dup ] compose over [ length ] keep new-resizable
     [ [ push-if ] 2curry reject! ] keep swap like ; inline
+
+: find-pred-loop ( ... i n seq quot: ( ... elt -- ... calc ? ) -- ... calc/f i/f elt/f )
+    2pick < [
+        [ nipd call ] 4keep
+        7 nrot 7 nrot 7 nrot
+        [ [ 3drop ] 2dip rot ]
+        [ 2drop [ 1 + ] 3dip find-pred-loop ] if
+    ] [
+        4drop f f f
+    ] if ; inline recursive
+
+: find-pred ( ... seq quot: ( ... elt -- ... calc ) pred: ( ... calc -- ... ? ) -- ... calc/f i/f elt/f )
+    [ 0 ] 3dip
+    [ [ length check-length ] keep ] 2dip
+    '[ nth-unsafe _ keep swap _ keep swap ] find-pred-loop swapd ; inline
