@@ -360,27 +360,28 @@ PRIVATE>
     [ 2dup [ length ] bi@ + ] dip
     [ (append) ] new-like ; inline
 
-: 3append-as ( seq1 seq2 seq3 exemplar -- newseq )
-    [ 3dup [ length ] tri@ + + ] dip [
-        [ [ 2over [ length ] bi@ + ] dip copy-unsafe ]
-        [ (append) ] bi
-    ] new-like ; inline
-
 : append ( seq1 seq2 -- newseq ) over append-as ;
 
 : prepend-as ( seq1 seq2 exemplar -- newseq ) swapd append-as ; inline
 
 : prepend ( seq1 seq2 -- newseq ) over prepend-as ;
 
+: 3append-as ( seq1 seq2 seq3 exemplar -- newseq )
+    [ 3dup [ length ] tri@ + + ] dip [
+        [ [ 2over [ length ] bi@ + ] dip copy-unsafe ]
+        [ (append) ] bi
+    ] new-like ; inline
+
 : 3append ( seq1 seq2 seq3 -- newseq ) pick 3append-as ;
 
-: surround ( seq1 seq2 seq3 -- newseq ) swapd 3append ; inline
+: surround-as ( seq1 seq2 seq3 exemplar -- newseq )
+    [ swap ] 2dip 3append-as ; inline
 
-: surround-as ( seq1 seq2 seq3 exemplar -- newseq ) [ swapd ] dip 3append-as ; inline
-
-: glue ( seq1 seq2 seq3 -- newseq ) swap 3append ; inline
+: surround ( seq1 seq2 seq3 -- newseq ) over surround-as ; inline
 
 : glue-as ( seq1 seq2 seq3 exemplar -- newseq ) swapd 3append-as ; inline
+
+: glue ( seq1 seq2 seq3 -- newseq ) pick glue-as ; inline
 
 : change-nth ( ..a i seq quot: ( ..a elt -- ..b newelt ) -- ..b )
     [ [ nth ] dip call ] 2keepd set-nth-unsafe ; inline
@@ -936,11 +937,15 @@ PRIVATE>
 : join ( seq glue -- newseq )
     dup join-as ; inline
 
+<PRIVATE
+
 : padding ( ... seq n elt quot: ( ... seq1 seq2 -- ... newseq ) -- ... newseq )
     [
         [ over length [-] dup 0 = [ drop ] ] dip
         [ <repetition> ] curry
     ] dip compose if ; inline
+
+PRIVATE>
 
 : pad-head ( seq n elt -- padded )
     [ swap dup append-as ] padding ;
@@ -1128,10 +1133,13 @@ M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
     [ with each ] 2curry each ; inline
 
 : cartesian-map ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) -- ... newseq )
-    [ with map ] 2curry map ; inline
+    [ with { } map-as ] 2curry { } map-as ; inline
+
+: cartesian-product-as ( seq1 seq2 exemplar -- newseq )
+    [ 2sequence ] curry cartesian-map ; inline
 
 : cartesian-product ( seq1 seq2 -- newseq )
-    [ { } 2sequence ] cartesian-map ;
+    dup cartesian-product-as ; inline
 
 : cartesian-find ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... elt1 elt2 )
     [ f ] 3dip [ with find swap ] 2curry [ nip ] prepose find nip swap ; inline

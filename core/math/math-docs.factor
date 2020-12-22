@@ -309,6 +309,20 @@ HELP: unless-zero
     }
 } ;
 
+HELP: until-zero
+{ $values
+     { "n" number } { "quot" { $quotation ( ... x -- ... y ) } } }
+{ $description "Makes a check if the number is zero, and repeatedly calls " { $snippet "quot" } " until the value on the stack is zero." }
+{ $examples
+    { $example
+    "USING: kernel math prettyprint ;"
+    "15 [ dup . 2/ ] until-zero"
+    "15\n7\n3\n1"
+    }
+} ;
+
+{ if-zero when-zero unless-zero until-zero } related-words
+
 HELP: times
 { $values { "n" integer } { "quot" quotation } }
 { $description "Calls the quotation " { $snippet "n" } " times." }

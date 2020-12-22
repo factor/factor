@@ -161,9 +161,6 @@ PRIVATE>
 : sinc ( x -- y )
     [ 1 ] [ pi * [ sin ] [ / ] bi ] if-zero ;
 
-: until-zero ( n quot -- )
-    [ dup zero? ] swap until drop ; inline
-
 : cum-reduce ( seq identity quot: ( prev elt -- next ) -- result cum-result )
     [ dup rot ] dip dup '[ _ curry dip dupd @ ] each ; inline
 
@@ -340,15 +337,6 @@ PRIVATE>
 
 ! SYNTAX: .. dup pop scan-object [a,b) suffix! ;
 ! SYNTAX: ... dup pop scan-object [a,b] suffix! ;
-
-GENERIC: sum-squares ( seq -- n )
-M: object sum-squares [ sq ] map-sum ;
-M: iota sum-squares
-    length 1 - [ ] [ 1 + ] [ 1/2 + ] tri * * 3 / ;
-
-GENERIC: sum-cubes ( seq -- n )
-M: object sum-cubes [ 3 ^ ] map-sum ;
-M: iota sum-cubes sum sq ;
 
 : mobius ( n -- x )
     group-factors values [ 1 ] [

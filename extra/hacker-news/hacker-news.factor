@@ -1,9 +1,11 @@
 ! Copyright (C) 2012 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs calendar calendar.elapsed
-calendar.holidays.us colors.constants colors.hex combinators
-concurrency.combinators formatting hashtables http.client io
-io.styles json.reader kernel make math sequences ui urls ;
+
+USING: accessors assocs calendar calendar.format
+colors.constants colors.hex combinators concurrency.combinators
+formatting fry hashtables http.client io io.styles json.reader
+kernel make math math.parser sequences ui urls vocabs ;
+
 IN: hacker-news
 
 <PRIVATE

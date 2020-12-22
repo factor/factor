@@ -27,10 +27,6 @@ HELP: <lexer-error>
 { $values { "msg" "an error" } { "error" lexer-error } }
 { $description "Creates a new " { $link lexer-error } ", filling in the location information from the current " { $link lexer } "." } ;
 
-HELP: skip
-{ $values { "i" "a starting index" } { "seq" sequence } { "?" boolean } { "n" integer } }
-{ $description "Skips to the first space character (if " { $snippet "boolean" } " is " { $link f } ") or the first non-space character (otherwise). Tabulations used as separators instead of spaces will be flagged as an error." } ;
-
 HELP: change-lexer-column
 { $values { "lexer" lexer } { "quot" { $quotation ( ..a col line -- ..b newcol ) } } }
 { $description "Applies a quotation to the current column and line text to produce a new column, and moves the lexer position." } ;

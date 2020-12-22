@@ -13,7 +13,7 @@ TUPLE: process-autopsy
 : ci-run-process ( process -- timestamp os-envs cwd uid euid gid egid out elapsed os-envs' process )
     [
         [
-            gmt os-envs current-directory get
+            now-gmt os-envs current-directory get
             real-user-id effective-user-id
             real-group-id effective-group-id
         ] dip [

@@ -74,7 +74,7 @@ Displays the documentation for a command."
 Shows the list of connected users."
 "who" add-command
 
-[ drop gmt timestamp>rfc822 send-line ]
+[ drop now-gmt timestamp>rfc822 send-line ]
 "Syntax: /time
 Returns the current GMT time." "time" add-command
 

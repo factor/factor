@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: math DEFER: <= DEFER: - ! for bootstrap since math uses kernel
+IN: math DEFER: <= DEFER: - ! for bootstrap
 USING: kernel.private slots.private math.private ;
 IN: kernel
 
@@ -171,13 +171,13 @@ DEFER: if
 : 4keep ( ..a w x y z quot: ( ..a w x y z -- ..b ) -- ..b w x y z )
     [ 4dup ] dip 4dip ; inline
 
-: keepd ( ..a x y quot: ( ..a x y -- ..b x ) -- ..b x )
+: keepd ( ..a x y quot: ( ..a x y -- ..b ) -- ..b x )
     2keep drop ; inline
 
-: keepdd ( ..a x y z quot: ( ..a x y z -- ..b x ) -- ..b x )
+: keepdd ( ..a x y z quot: ( ..a x y z -- ..b ) -- ..b x )
     3keep 2drop ; inline
 
-: 2keepd ( ..a x y z quot: ( ..a x y z -- ..b x y ) -- ..b x y )
+: 2keepd ( ..a x y z quot: ( ..a x y z -- ..b ) -- ..b x y )
     3keep drop ; inline
 
 ! Cleavers
@@ -325,8 +325,6 @@ M: object hashcode* 2drop 0 ; inline
 M: f hashcode* 2drop 31337 ; inline
 
 : hashcode ( obj -- code ) 3 swap hashcode* ; inline
-
-IN: kernel
 
 : recursive-hashcode ( n obj quot -- code )
     pick 0 <= [ 3drop 0 ] [ [ 1 - ] 2dip call ] if ; inline

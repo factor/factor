@@ -23,8 +23,8 @@ STRUCT: timespec
     ] unless-zero ;
 
 STRUCT: timezone
-    { tz_minuteswest int }
-    { tz_dsttime int } ;
+    { minuteswest int }
+    { dsttime int } ;
 
 STRUCT: tm
     { sec int }

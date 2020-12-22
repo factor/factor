@@ -149,6 +149,7 @@ IN: bootstrap.syntax
     "B{" [ \ \} [ >byte-array ] parse-literal ] define-core-syntax
     "BV{" [ \ \} [ >byte-vector ] parse-literal ] define-core-syntax
     "H{" [ \ \} [ parse-hashtable ] parse-literal ] define-core-syntax
+    "IH{" [ \ \} [ >identity-hashtable ] parse-literal ] define-core-syntax
     "T{" [ parse-tuple-literal suffix! ] define-core-syntax
     "W{" [ \ \} [ first <wrapper> ] parse-literal ] define-core-syntax
     "HS{" [ \ \} [ >hash-set ] parse-literal ] define-core-syntax
@@ -350,8 +351,6 @@ IN: bootstrap.syntax
 
     "execute(" [ \ execute-effect parse-call-paren ] define-core-syntax
 
-    "IH{" [ \ \} [ >identity-hashtable ] parse-literal ] define-core-syntax
-
     "::" [ (::) apply-inlined-effects define-declared ] define-core-syntax
     "M::" [ (M::) define ] define-core-syntax
     "MACRO:" [ (:) apply-inlined-effects define-macro ] define-core-syntax
@@ -359,7 +358,6 @@ IN: bootstrap.syntax
     "TYPED:" [ (:) apply-inlined-effects define-typed ] define-core-syntax
     "TYPED::" [ (::) apply-inlined-effects define-typed ] define-core-syntax
     "MEMO:" [ (:) apply-inlined-effects define-memoized ] define-core-syntax
-    "MEMO::" [ (::) apply-inlined-effects define-memoized ] define-core-syntax
     "MEMO[" [ parse-quotation dup infer memoize-quot suffix! ] define-core-syntax
     "IDENTITY-MEMO:" [ (:) apply-inlined-effects define-identity-memoized ] define-core-syntax
     "IDENTITY-MEMO::" [ (::) apply-inlined-effects define-identity-memoized ] define-core-syntax
@@ -507,4 +505,48 @@ IN: bootstrap.syntax
         <fryable> suffix!
     ] define-core-syntax
 
+    "'[" [
+         t in-fry? [ parse-quotation ] with-variable fry append!
+    ] define-core-syntax
+
+    "'{" [
+         t in-fry? [ \ } parse-until >array ] with-variable fry append!
+    ] define-core-syntax
+
+    "'HS{" [
+        \ } parse-until >array fry
+        [ >hash-set ] compose append!
+    ] define-core-syntax
+
+    "'H{" [
+        \ } parse-until >array fry
+        [ parse-hashtable ] compose append!
+    ] define-core-syntax
+
+    "_" [
+        \ _ suffix!
+    ] define-core-syntax
+
+    "@" [
+        \ @ suffix!
+    ] define-core-syntax
+
+    "MACRO:" [ (:) define-macro ] define-core-syntax
+
+    "MEMO:" [ (:) define-memoized ] define-core-syntax
+    "IDENTITY-MEMO:" [ (:) define-identity-memoized ] define-core-syntax
+
+    ":>" [
+        in-lambda? get [ :>-outside-lambda-error ] unless
+        scan-token parse-def suffix!
+    ] define-core-syntax
+    "|[" [ parse-lambda append! ] define-core-syntax
+    "let[" [ parse-let append! ] define-core-syntax
+
+    ! "::" [ (::) define-declared ] define-core-syntax
+    ! "M::" [ (M::) define ] define-core-syntax
+    ! "MACRO::" [ (::) define-macro ] define-core-syntax
+    ! "MEMO:" [ (::) define-memoized ] define-core-syntax
+    "MEMO::" [ (::) apply-inlined-effects define-memoized ] define-core-syntax
+    ! "IDENTITY-MEMO::" [ (::) define-identity-memoized ] define-core-syntax
 ] with-compilation-unit

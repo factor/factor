@@ -36,7 +36,7 @@ SYMBOL: log-files
     finally ; inline
 
 : timestamp-header. ( -- )
-    "[" write now (timestamp>rfc3339) "] " write ;
+    "[" write now write-rfc3339 "] " write ;
 
 : multiline-header ( -- str ) 20 char: - <string> ; foldable
 

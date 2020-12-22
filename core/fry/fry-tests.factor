@@ -88,3 +88,7 @@ SYMBOLS: a b c d e f g h ;
 { { { "a" 1 } { "b" 2 } { "c" 3 } { "d" 4 } } } [
     1 2 3 4 '[ "a" _ 2array "b" _ 2array "c" _ 2array "d" _ 2array 4array ] call
 ] unit-test
+
+{ { 1 [ 2 { 3 4 } ] } } [ 1 2 3 4 '{ _ [ _ { _ _ } ] } ] unit-test
+{ H{ { 1 1 } { 2 2 } { 3 4 } } } [ 1 2 3 4 'H{ { 1 _ } { _ 2 } { _ _ } } ] unit-test
+{ HS{ 1 [ 2 { 3 } ] } } [ 1 2 3 'HS{ _ [ _ { _ } ] } ] unit-test

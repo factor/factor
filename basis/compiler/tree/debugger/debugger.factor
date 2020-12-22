@@ -13,6 +13,8 @@ generic hints io kernel macros make match math namespaces
 prettyprint prettyprint.config prettyprint.custom
 prettyprint.sections quotations sequences sequences.private sets
 sorting words ;
+FROM: syntax => _ ;
+RENAME: _ match => __
 IN: compiler.tree.debugger
 
 ! A simple tool for turning tree IR into quotations and

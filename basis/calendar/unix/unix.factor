@@ -40,5 +40,5 @@ M: unix gmt-offset
 : system-micros ( -- n )
     current-timeval timeval>micros ;
 
-M: unix gmt
+M: unix now-gmt
     current-timeval timeval>unix-time ;

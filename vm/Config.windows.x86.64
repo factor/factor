@@ -1,5 +1,5 @@
 PLAF_DLL_OBJS += vm/os-windows-x86.64.o
-PLAF_MASTER_HEADERS += vm/os-windows.64.hpp
+PLAF_MASTER_HEADERS += vm/os-windows.64.hpp vm/atomic-cl-64.hpp vm/atomic.hpp
 DLL_PATH=http://factorcode.org/dlls/64
 CC=$(WIN64_PATH)-gcc.exe
 WINDRES=$(WIN64_PATH)-windres.exe

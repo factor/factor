@@ -240,8 +240,7 @@ PRIVATE>
     combinations-quot all? ; inline
 
 : find-combination ( ... seq k quot: ( ... elt -- ... ? ) -- ... elt/f )
-    [ combinations-quot find drop ]
-    [ drop pick [ combination ] [ 3drop f ] if ] 3bi ; inline
+    [ f ] 3dip '[ nip _ keep swap ] combinations-quot find drop swap and ; inline
 
 : reduce-combinations ( ... seq k identity quot: ( ... prev elt -- ... next ) -- ... result )
     -rotd each-combination ; inline
@@ -258,15 +257,34 @@ PRIVATE>
         [ seq [ + n /mod ] change-nth-unsafe ] keep 1 -
     ] do until 2drop ; inline
 
-:: (selections) ( seq n -- selections )
+:: selections-quot ( seq n quot -- seq quot' )
     seq length :> len
     n 0 <array> :> idx
-    len n ^ [
-        idx seq nths-unsafe
+    n [ 0 ] [ len swap ^ ] if-zero <iota> [
+        drop
+        idx seq nths-unsafe quot call
         idx len next-selection
-    ] replicate ;
+    ] ; inline
 
 PRIVATE>
 
-: selections ( seq n -- selections )
-    dup 0 > [ (selections) ] [ 2drop { } ] if ;
+: each-selection ( ... seq n quot: ( ... elt -- ... ) -- ... )
+    selections-quot each ; inline
+
+: map-selections ( ... seq n quot: ( ... elt -- ... newelt ) -- ... newseq )
+    selections-quot map ; inline
+
+: filter-selections ( ... seq n quot: ( ... elt -- ... newelt ) -- ... newseq )
+    selector [ each-selection ] dip ; inline
+
+: all-selections ( seq n -- seq' )
+    [ ] map-selections ;
+
+: all-selections? ( seq n -- ? )
+    selections-quot all? ; inline
+
+: find-selection ( ... seq n quot: ( ... elt -- ... ? ) -- ... elt/f )
+    [ f ] 3dip '[ nip _ keep swap ] selections-quot find drop swap and ; inline
+
+: reduce-selections ( ... seq n identity quot: ( ... prev elt -- ... next ) -- ... result )
+    -rotd each-selection ; inline

@@ -46,3 +46,5 @@ M: identity-hashtable new-assoc drop <identity-hashtable> ;
 
 ! { "hashtables.identity" "prettyprint" } "hashtables.identity.prettyprint" require-when
 ! { "hashtables.identity" "mirrors" } "hashtables.identity.mirrors" require-when
+{ "hashtables.identity" "prettyprint" } "hashtables.identity.prettyprint" require-when
+{ "hashtables.identity" "mirrors" } "hashtables.identity.mirrors" require-when

@@ -30,10 +30,10 @@ M: end-of-file question>quot
         } 2&&
     ] ;
 
-M: $ question>quot
+M: $crlf question>quot
     drop [ { [ length = ] [ ?nth "\r\n" member? ] } 2|| ] ;
 
-M: ^ question>quot
+M: ^crlf question>quot
     drop [ { [ drop zero? ] [ [ 1 - ] dip ?nth "\r\n" member? ] } 2|| ] ;
 
 M: $unix question>quot

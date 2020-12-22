@@ -9,6 +9,18 @@ sudo: required
 services:
   - postgresql
   - redis-server
+branches:
+  except:
+    - clean-linux-x86-32
+    - clean-linux-x86-64
+    - clean-macosx-x86-32
+    - clean-macosx-x86-64
+    - clean-windows-x86-32
+    - clean-windows-x86-64
+    - cvs
+    - darcs
+    - main
+    - release
 addons:
   apt:
     packages:
@@ -19,6 +31,7 @@ addons:
       - libsnappy-dev
       - libzmq-dev
       - libpq-dev
+      - libsodium-dev
   homebrew:
     packages:
       - snappy
@@ -28,6 +41,7 @@ addons:
       - zeromq
       - postgresql
       - udis86
+      - libsodium
 before_install:
   - uname -s
   - case $TRAVIS_OS_NAME in
@@ -46,5 +60,8 @@ script:
   - export CI_BRANCH="${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}"
   - echo "CI_BRANCH=${CI_BRANCH}"
   - DEBUG=1 ./build.sh net-bootstrap < /dev/null
-  - "./factor -e='USING: memory tools.test namespaces ; f long-unit-tests-enabled? set-global save'"
-  - "./factor -e='USING: sequences tools.test.private vocabs.hierarchy ; \"resource:core\" disk-vocabs-in-root test-vocabs'"
+  - "./factor -e='USING: memory namespaces tools.test ; f long-unit-tests-enabled? set-global save'"
+  - "./factor -e='USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off \"resource:basis\" \"\" load-from-root save'"
+  #- "./factor -e='USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off \"resource:extra\" \"\" load-from-root save'"
+  - "./factor -run=tools.test resource:core"
+  - "./factor -run=help.lint resource:core resource:basis"

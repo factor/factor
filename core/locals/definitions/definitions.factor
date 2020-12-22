@@ -33,7 +33,7 @@ M: lambda-word definition
 M: lambda-word reset-word
     [ call-next-method ] [ f "lambda" set-word-prop ] bi ;
 
-INTERSECTION: lambda-macro macro lambda-word ;
+PREDICATE: lambda-macro < macro lambda-word? ;
 
 M: lambda-macro definer drop \ \MACRO:: \ \; ;
 
@@ -43,7 +43,7 @@ M: lambda-macro definition
 M: lambda-macro reset-word
     [ call-next-method ] [ f "lambda" set-word-prop ] bi ;
 
-INTERSECTION: lambda-method method lambda-word ;
+PREDICATE: lambda-method < method lambda-word? ;
 
 M: lambda-method definer drop \ \M:: \ \; ;
 
@@ -53,7 +53,7 @@ M: lambda-method definition
 M: lambda-method reset-word
     [ call-next-method ] [ f "lambda" set-word-prop ] bi ;
 
-INTERSECTION: lambda-memoized memoized lambda-word ;
+PREDICATE: lambda-memoized < memoized lambda-word? ;
 
 M: lambda-memoized definer drop \ \MEMO:: \ \; ;
 

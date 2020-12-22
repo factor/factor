@@ -367,12 +367,6 @@ HELP: create-word
 { $description "Creates a new word. If the vocabulary already contains a word with the requested name, outputs the existing word. The vocabulary must exist already; if it does not, you must call " { $link create-vocab } " first." }
 { $notes "This word must be called from inside " { $link with-compilation-unit } ". Parsing words should call " { $link create-word-in } " instead of this word." } ;
 
-HELP: constructor-word
-{ $values { "name" string } { "vocab" string } { "word" word } }
-{ $description "Creates a new word, surrounding " { $snippet "name" } " in angle brackets." }
-{ $notes "This word must be called from inside " { $link with-compilation-unit } "." }
-{ $examples { $example "USING: compiler.units prettyprint words ;" "[ \"salmon\" \"scratchpad\" constructor-word ] with-compilation-unit ." "<salmon>" } } ;
-
 { \ \FORGET: forget forget* forget-vocab } related-words
 
 HELP: target-word

@@ -130,6 +130,26 @@ IN: calendar
 { t } [ 2004 1 1 23 0 0 9+1/2 hours <timestamp> >gmt
         2004 1 1 13 30 0 instant <timestamp> = ] unit-test
 
+{ t } [
+    2004 1 1 3 0 0 instant <timestamp>
+    2004 1 1 1 0 0 instant <timestamp> 3 am =
+] unit-test
+
+{ t } [
+    2004 1 1 0 0 0 instant <timestamp>
+    2004 1 1 1 0 0 instant <timestamp> 12 am =
+] unit-test
+
+{ t } [
+    2004 1 1 12 0 0 instant <timestamp>
+    2004 1 1 1 0 0 instant <timestamp> 12 pm =
+] unit-test
+
+{ t } [
+    2004 1 1 23 0 0 instant <timestamp>
+    2004 1 1 1 0 0 instant <timestamp> 11 pm =
+] unit-test
+
 { +eq+ } [ 2004 1 1 13 30 0 instant <timestamp>
         2004 1 1 12 30 0 -1 hours <timestamp> <=> ] unit-test
 
@@ -169,12 +189,11 @@ IN: calendar
 { 4 12 } [ 2009 easter [ month>> ] [ day>> ] bi ] unit-test
 { 4 2 } [ 1961 easter [ month>> ] [ day>> ] bi ] unit-test
 
-{ f } [ now dup midnight eq? ] unit-test
-{ f } [ now dup easter eq? ] unit-test
-{ f } [ now dup start-of-year eq? ] unit-test
-
 { t } [ 1325376000 unix-time>timestamp 2012 <year-gmt> = ] unit-test
 { t } [ 1356998399 unix-time>timestamp 2013 <year-gmt> 1 seconds time- = ] unit-test
+
+{ t } [ now now-gmt time- duration>seconds 1/5 < ] unit-test
+{ t } [ now-gmt now time- duration>seconds 1/5 < ] unit-test
 
 { t } [ 1500000000 random [ unix-time>timestamp timestamp>unix-time ] keep = ] unit-test
 
@@ -188,60 +207,12 @@ IN: calendar
     2008 2 29 <date> =
 ] unit-test
 
-{
-    T{ timestamp
-        { year 2020 }
-        { month 1 }
-        { day 1 }
-        { hour 2 }
-        { minute 46 }
-        { second 40 }
-    }
-} [
-    2020 <year-gmt> 10000 >>second normalize-timestamp
-] unit-test
-
-{
-    T{ timestamp
-        { year 2020 }
-        { month 1 }
-        { day 1 }
-        { hour 2 }
-        { minute 46 }
-        { second 40 }
-    }
-} [
-    2020 <year-gmt> 10000 >>second normalize-timestamp!
-] unit-test
-
-{ f } [
-    2020 <year-gmt> dup 10000 >>second normalize-timestamp eq?
-] unit-test
-
-{ t } [
-    2020 <year-gmt> dup 10000 >>second normalize-timestamp! eq?
-] unit-test
-
-{ +eq+ } [
-    2020 <year-gmt> 10000 >>second
-    dup normalize-timestamp <=>
-] unit-test
-
-{ +eq+ } [
-    2020 <year-gmt> 10000 >>second
-    dup normalize-timestamp <=>
-] unit-test
-
-{ f } [
-    2020 <year-gmt> dup 10000 >>second [ >gmt ] bi@ eq?
-] unit-test
-
-{ t } [
-    2020 <year-gmt> dup 10000 >>second [ >gmt! ] bi@ eq?
+{ { 1 1 1 2 2 2 3 3 3 4 4 4 } } [
+    12 [1,b] [ 2020 swap 1 <date> quarter ] map
 ] unit-test
 
 { 0 }
-[ gmt gmt-offset>> duration>seconds ] unit-test
+[ now-gmt gmt-offset>> duration>seconds ] unit-test
 
 ! am
 [ now 30 am ] [ not-in-interval? ] must-fail-with
@@ -257,17 +228,6 @@ IN: calendar
 
 { 53 } [ 2004 weeks-in-week-year ] unit-test
 { 52 } [ 2013 weeks-in-week-year ] unit-test
-
-{ f } [ now dup start-of-day eq? ] unit-test
-{ f } [ now dup end-of-day eq? ] unit-test
-{ t } [ now dup end-of-day! eq? ] unit-test
-{ f } [ now dup start-of-month eq? ] unit-test
-{ f } [ now dup end-of-month eq? ] unit-test
-{ f } [ now dup start-of-year eq? ] unit-test
-{ f } [ now dup end-of-year eq? ] unit-test
-
-{ f } [ now dup midnight eq? ] unit-test
-{ t } [ now dup midnight! eq? ] unit-test
 
 {
     T{ timestamp { year 2019 } { month 11 } { day 4 } }
@@ -366,19 +326,6 @@ IN: calendar
     v- sum
 ] unit-test
 
-{ 1 2 3 } [
-    2020 1 1 <date-gmt> 1 2 3 set-time >time<
-] unit-test
-
-{ f } [
-    2020 1 1 <date-gmt> dup 1 2 3 set-time eq?
-] unit-test
-
-{ t } [
-    2020 1 1 <date-gmt> dup 1 2 3 set-time! eq?
-] unit-test
-
-
 {
     {
         T{ timestamp { year 2020 } { month 3 } { day 1 } }
@@ -388,7 +335,7 @@ IN: calendar
         T{ timestamp { year 2020 } { month 3 } { day 29 } }
     }
 } [
-    2020 march-gmt 5 <iota> [ sunday-of-month ] with map
+    2020 march gmt 5 <iota> [ [ clone ] dip sunday-of-month ] with map
 ] unit-test
 
 
@@ -401,7 +348,7 @@ IN: calendar
         T{ timestamp { year 2020 } { month 2 } { day 29 } }
     }
 } [
-    2020 february-gmt 5 <iota> [ saturday-of-month ] with map
+    2020 february gmt 5 <iota> [ [ clone ] dip saturday-of-month ] with map
 ] unit-test
 
 
@@ -415,5 +362,5 @@ IN: calendar
         T{ timestamp { year 2021 } { month 1 } { day 4 } }
     }
 } [
-    2020 december-gmt 5 <iota> [ monday-of-month ] with map
+    2020 december gmt 5 <iota> [ [ clone ] dip monday-of-month ] with map
 ] unit-test

@@ -1,7 +1,7 @@
 USING: accessors arrays assocs combinators fry generalizations
 grouping growable kernel locals make math math.order math.ranges
-sequences sequences.deep sequences.private sorting splitting
-vectors ;
+sequences sequences.deep sequences.private shuffle sorting
+splitting vectors ;
 IN: sequences.extras
 
 : find-all ( ... seq quot: ( ... elt -- ... ? ) -- ... elts )
@@ -61,12 +61,11 @@ IN: sequences.extras
 : pad-longest ( seq1 seq2 elt -- seq1 seq2 )
     [ 2dup max-length ] dip [ pad-tail ] 2curry bi@ ;
 
-:: pad-center ( seq n elt -- padded )
-    n seq length [-] :> extra
-    extra 2/ :> left
-    extra left - :> right
-    left elt <repetition> seq right elt <repetition>
-    seq 3append-as ;
+: pad-center ( seq n elt -- padded )
+    swap pick length [-] [ drop ] [
+        [ 2/ ] [ over - ] bi rot '[ _ <repetition> ] bi@
+        pick surround-as
+    ] if-zero ;
 
 : change-nths ( ... indices seq quot: ( ... elt -- ... elt' ) -- ... )
     [ change-nth ] 2curry each ; inline
@@ -445,17 +444,29 @@ PRIVATE>
 : last? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? ) [ last ] dip call ; inline
 : nth? ( ... n seq quot: ( ... elt -- ... ? ) -- ... ? ) [ nth ] dip call ; inline
 
-: loop>sequence ( quot: ( ..a -- ..a obj/f ) exemplar -- seq )
-   [ '[ [ @ [ [ , ] when* ] keep ] loop ] ] dip make ; inline
+: loop>sequence** ( ... quot: ( ... -- ... obj ? ) exemplar -- ... seq )
+    [ ] swap produce-as nip ; inline
 
-: loop>array ( quot: ( ..a -- ..a obj/f ) -- seq )
+: loop>array** ( ... quot: ( ... -- ... obj ? ) -- ... array )
+    { } loop>sequence** ; inline
+
+: loop>sequence* ( ... quot: ( ... -- ... obj ? ) exemplar -- ... seq )
+    [ t ] [ '[ [ _ dip ] [ f f f ] if* ] [ swap ] ] [ produce-as 2nip ] tri* ; inline
+
+: loop>array* ( ... quot: ( ... -- ... obj ? ) -- ... array )
+    { } loop>sequence* ; inline
+
+: loop>sequence ( ... quot: ( ... -- ... obj/f ) exemplar -- ... seq )
+    [ [ dup ] compose [ ] ] dip produce-as nip ; inline
+
+: loop>array ( ... quot: ( ... -- ... obj/f ) -- ... array )
    { } loop>sequence ; inline
 
-: loop>sequence* ( quot: ( ..a -- ..a obj ? ) exemplar -- seq )
-    [ '[ [ @ [ [ , ] when* ] [ ] bi* ] loop ] ] dip make ; inline
+: zero-loop>sequence ( ... quot: ( ... n -- ... obj/f ) exemplar -- ... seq )
+    [ 0 ] [ '[ _ keep 1 + swap ] ] [ loop>sequence ] tri* nip ; inline
 
-: loop>array* ( quot: ( ..a -- ..a obj ? ) -- seq )
-   { } loop>sequence* ; inline
+: zero-loop>array ( quot: ( ..a n -- ..a obj ) -- seq )
+    { } zero-loop>sequence ; inline
 
 <PRIVATE
 
@@ -618,6 +629,9 @@ PRIVATE>
 : map-zip ( quot: ( key -- value ) -- alist )
     '[ _ keep swap ] map>alist ; inline
 
+: assoc-map-zip ( quot: ( key value -- calc ) -- alist )
+    '[ _ 2keep 2array swap ] assoc-map ; inline
+
 : take-while ( ... seq quot: ( ... elt -- ... ? ) -- head-slice )
     [ '[ @ not ] find drop ] keepd swap
     [ dup length ] unless* head-slice ; inline
@@ -645,3 +659,18 @@ PRIVATE>
 : extract! ( ... seq quot: ( ... elt -- ... ? ) -- ... seq )
     [ dup ] compose over [ length ] keep new-resizable
     [ [ push-if ] 2curry reject! ] keep swap like ; inline
+
+: find-pred-loop ( ... i n seq quot: ( ... elt -- ... calc ? ) -- ... calc/f i/f elt/f )
+    2pick < [
+        [ nipd call ] 4keep
+        7 nrot 7 nrot 7 nrot
+        [ [ 3drop ] 2dip rot ]
+        [ 2drop [ 1 + ] 3dip find-pred-loop ] if
+    ] [
+        4drop f f f
+    ] if ; inline recursive
+
+: find-pred ( ... seq quot: ( ... elt -- ... calc ) pred: ( ... calc -- ... ? ) -- ... calc/f i/f elt/f )
+    [ 0 ] 3dip
+    [ [ length ensure-integer ] keep ] 2dip
+    '[ nth-unsafe _ keep swap _ keep swap ] find-pred-loop swapd ; inline

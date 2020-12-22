@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! USING: fry kernel lexer locals.errors locals.parser locals.types
 ! macros memoize namespaces sequences vocabs vocabs.loader words ;
+USING: sequences vocabs vocabs.loader ;
 IN: locals
 
 ! SYNTAX: :>
@@ -27,3 +28,16 @@ IN: locals
 
 ! { "locals" "prettyprint" } "locals.definitions" require-when
 ! { "locals" "prettyprint" } "locals.prettyprint" require-when
+
+
+
+{
+    "locals.parser"
+    "locals.types"
+    "locals.errors"
+    "locals.macros"
+    "locals.fry"
+} [ require ] each
+
+{ "locals" "prettyprint" } "locals.definitions" require-when
+{ "locals" "prettyprint" } "locals.prettyprint" require-when

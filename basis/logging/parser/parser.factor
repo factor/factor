@@ -86,7 +86,7 @@ PEG: parse-log-line ( string -- entry ) log-line-parser ;
 
 GENERIC: log-timestamp. ( date -- )
 
-M: timestamp log-timestamp. (timestamp>string) ;
+M: timestamp log-timestamp. write-timestamp ;
 M: word log-timestamp. drop "multiline" write ;
 
 : log-entry. ( entry -- )

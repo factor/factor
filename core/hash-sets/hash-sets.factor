@@ -74,14 +74,14 @@ TUPLE: hash-set
     ] if ; inline
 
 : (rehash) ( seq hash -- )
-    [ (adjoin) drop ] curry each ; inline
+    '[ _ (adjoin) drop ] each ; inline
 
 : hash-large? ( hash -- ? )
     [ count>> 1 fixnum+fast 3 fixnum*fast ]
     [ array>> length>> 1 fixnum-shift-fast ] bi fixnum>= ; inline
 
 : each-member ( ... array quot: ( ... elt -- ... ) -- ... )
-    [ if ] curry [ dup tombstone? [ drop ] ] prepose each ; inline
+    '[ dup tombstone? [ drop ] _ if ] each ; inline
 
 : grow-hash ( hash -- )
     { hash-set } declare [
@@ -147,18 +147,17 @@ INSTANCE: hash-set set
 <PRIVATE
 
 : and-tombstones ( quot: ( elt -- ? ) -- quot: ( elt -- ? ) )
-    [ if ] curry [ dup tombstone? [ drop t ] ] prepose ; inline
+    '[ dup tombstone? [ drop t ] _ if ] ; inline
 
 : not-tombstones ( quot: ( elt -- ? ) -- quot: ( elt -- ? ) )
-    [ if ] curry [ dup tombstone? [ drop f ] ] prepose ; inline
+    '[ dup tombstone? [ drop f ] _ if ] ; inline
 
 : array/tester ( hash-set1 hash-set2 -- array quot )
-    [ array>> ] dip [ in? ] curry ; inline
+    [ array>> ] dip '[ _ in? ] ; inline
 
 : filter-members ( hash-set array quot: ( elt -- ? ) -- accum )
-    [ dup ] prepose rot cardinality <vector> [
-        [ push-unsafe ] curry [ [ drop ] if ] curry
-        compose each
+    rot cardinality <vector> [
+        '[ dup @ [ _ push-unsafe ] [ drop ] if ] each
     ] keep ; inline
 
 PRIVATE>
@@ -213,7 +212,7 @@ M: f fast-set drop 0 <hash-set> ;
 M: sequence fast-set >hash-set ;
 
 M: sequence duplicates
-    dup length <hash-set> [ ?adjoin ] curry reject ;
+    dup length <hash-set> '[ _ ?adjoin ] reject ;
 
 M: sequence all-unique?
-    dup length <hash-set> [ ?adjoin ] curry all? ;
+    dup length <hash-set> '[ _ ?adjoin ] all? ;

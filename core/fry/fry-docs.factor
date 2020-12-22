@@ -11,7 +11,7 @@ HELP: @
 
 HELP: fry
 { $values { "quot" quotation } { "quot'" quotation } }
-{ $description "Outputs a quotation that when called, fries " { $snippet "quot" } " by taking values from the stack and substituting them in." }
+{ $description "Outputs a quotation that when called, fries " { $snippet "object" } " by taking values from the stack and substituting them in." }
 { $notes "This word is used to implement " { $link \ \'[ } "; the following two lines are equivalent:"
     { $code "[ X ] fry call" "'[ X ]" }
 }

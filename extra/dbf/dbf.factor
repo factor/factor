@@ -203,7 +203,7 @@ TUPLE: dbf file-header field-headers records ;
 
 : parse-date ( byte-array -- date/f )
     dup [ " \0" member? ] all? [ drop f ] [
-        binary [ (ymd>timestamp) ] with-byte-reader
+        binary [ read-ymd <date-gmt> ] with-byte-reader
     ] if ;
 
 : parse-float ( byte-array -- n )

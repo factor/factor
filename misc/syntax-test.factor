@@ -28,7 +28,7 @@
     ALIAS: new-word existing-word
     DEFER: word
     FORGET: word
-    POSTPONE: word
+    postpone: word
     SLOT: name
 
 ! Classes

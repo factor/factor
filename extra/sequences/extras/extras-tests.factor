@@ -279,3 +279,6 @@ tools.test vectors vocabs ;
 { 4 } [ { 1 2 3 4 } [ 5 < ] count-tail ] unit-test
 
 { sbuf"aco" sbuf"ftr"  } [ sbuf"factor" dup [ even? ] extract! ] unit-test
+
+{ 25 5 1 } [ { 4 5 6 } [ sq ] [ 20 > ] find-pred ] unit-test
+{ f f f } [ { 4 5 6 } [ sq ] [ 200 > ] find-pred ] unit-test

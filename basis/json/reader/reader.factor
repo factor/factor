@@ -132,18 +132,18 @@ DEFER: (read-json-string)
 
 
 ! A properly formed JSON input should contain exactly one object with balanced brackets.
-: get-json-object ( objects  --  obj  )
+: get-json ( objects  --  obj  )
     dup length 1 = counter get 0 = and [ first ] [ json-error ] if ;
 
 PRIVATE>
 
-: read-json-objects ( -- objects )
+: read-json ( -- objects )
     input-stream get json-read-input ;
 
 GENERIC: json> ( string -- object )
 
 M: string json>
-    [ 0 counter [ read-json-objects get-json-object ] with-variable ] with-string-reader ;
+    [ 0 counter [ read-json get-json ] with-variable ] with-string-reader ;
 
 : path>json ( path -- json )
-    utf8 [ 0 counter [ read-json-objects get-json-object ] with-variable ] with-file-reader ;
+    utf8 [ 0 counter [ read-json get-json ] with-variable ] with-file-reader ;

@@ -1,27 +1,27 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs calendar calendar.holidays
-calendar.holidays.private combinators combinators.short-circuit
-fry kernel lexer math namespaces parser sequences
-vocabs words ;
+USING: accessors calendar calendar.holidays
+calendar.holidays.private calendar.private combinators
+combinators.short-circuit kernel math sequences ;
 IN: calendar.holidays.us
 
 SINGLETONS: us us-federal ;
 
 <PRIVATE
 
-: adjust-federal-holiday ( timestamp -- timestamp' )
+: adjust-federal-holiday ( timestamp -- timestamp )
     {
-        { [ dup saturday? ] [ 1 days time- ] }
-        { [ dup sunday? ] [ 1 days time+ ] }
+        { [ dup saturday? ] [ -1 days (time+) ] }
+        { [ dup sunday? ] [ 1 days (time+) ] }
         [ ]
     } cond ;
 
 PRIVATE>
 
 M: us-federal holidays
-    (holidays)
-    [ execute( timestamp -- timestamp' ) adjust-federal-holiday ] with map ;
+    (holidays) [
+        [ clone ] dip execute( timestamp -- timestamp ) adjust-federal-holiday
+    ] with map ;
 
 : us-post-office-open? ( timestamp -- ? )
     { [ sunday? not ] [ us-federal holiday? not ] } 1&& ;

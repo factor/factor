@@ -144,7 +144,7 @@ formats   = "%" (types|fmt-%|lists|assocs|unknown) => [[ second ]]
 
 plain-text = (!("%").)+          => [[ >string ]]
 
-text      = (formats|plain-text)* => [[ ]]
+text      = (formats|plain-text)*
 
 ]=]
 
@@ -245,7 +245,7 @@ formats   = "%" (formats_)       => [[ second ]]
 
 plain-text = (!("%").)+          => [[ >string ]]
 
-text      = (formats|plain-text)* => [[ ]]
+text      = (formats|plain-text)*
 
 ]=]
 

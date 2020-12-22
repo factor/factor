@@ -50,7 +50,7 @@ M: irc-message post-process-irc-message drop ;
 
 GENERIC: fill-irc-message-slots ( irc-message -- )
 M: irc-message fill-irc-message-slots
-    gmt >>timestamp
+    now-gmt >>timestamp
     {
         [ process-irc-trailing ]
         [ process-irc-prefix ]

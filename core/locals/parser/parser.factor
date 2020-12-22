@@ -35,9 +35,7 @@ SINGLETON: lambda-parser
     H{
         { in-lambda? t }
         { quotation-parser lambda-parser }
-    } swap '[
-        [ use-words @ ] [ unuse-words ] bi
-    ] with-variables ; inline
+    } -rot '[ _ _ with-words ] with-variables ; inline
 
 : (parse-lambda) ( assoc -- quot )
     [ \ \] parse-until >quotation ] with-lambda-scope ;

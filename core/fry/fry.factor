@@ -1,15 +1,19 @@
 ! Copyright (C) 2009 Slava Pestov, Eduardo Cavazos, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel locals.backend math
-math.parser quotations sequences sets splitting words ;
+math.parser quotations sequences sets splitting vectors words ;
 IN: fry
 
 TUPLE: fryable quot ;
 C: <fryable> fryable
 
+ERROR: not-in-a-fry ;
+
+SYMBOL: in-fry?
+
 ERROR: >r/r>-in-fry-error ;
 
-GENERIC: fry ( quot -- quot' )
+GENERIC: fry ( object -- quot )
 
 <PRIVATE
 
@@ -21,16 +25,15 @@ PREDICATE: fry-specifier < word { _ @ } member-eq? ;
 
 GENERIC: count-inputs ( quot -- n )
 
-M: callable count-inputs [ count-inputs ] map-sum ;
+M: sequence count-inputs [ count-inputs ] map-sum ;
 M: fry-specifier count-inputs drop 1 ;
 M: object count-inputs drop 0 ;
 
 MIXIN: fried
-PREDICATE: fried-callable < callable
-    count-inputs 0 > ;
-INSTANCE: fried-callable fried
+PREDICATE: fried-sequence < sequence count-inputs 0 > ;
+INSTANCE: fried-sequence fried
 
-: (ncurry) ( quot n -- quot )
+: (ncurry) ( accum n -- accum )
     {
         { 0 [ ] }
         { 1 [ \ curry  suffix! ] }
@@ -57,19 +60,13 @@ INSTANCE: fried-callable fried
 : (make-curry) ( tail quot -- quot' )
     swap [ncurry] curry [ compose ] compose ;
 
-: make-compose ( consecutive quot -- consecutive quot' )
-    [
-        [ [ ] ]
-        [ [ncurry] ] if-zero
-    ] [
-        [ [ compose ] ]
-        [ [ compose compose ] curry ] if-empty
-    ] bi* compose
-    0 swap ;
+: make-compose ( consecutive quot -- consecutive' quot' )
+    [ [ [ ] ] [ [ncurry] ] if-zero ]
+    [ [ [ compose ] ] [ [ compose compose ] curry ] if-empty ]
+    bi* compose 0 swap ;
 
 : make-curry ( consecutive quot -- consecutive' quot' )
-    [ 1 + ] dip
-    [ [ ] ] [ (make-curry) 0 swap ] if-empty ;
+    [ 1 + ] dip [ [ ] ] [ (make-curry) 0 swap ] if-empty ;
 
 : convert-curry ( consecutive quot -- consecutive' quot' )
     [ [ ] make-curry ] [
@@ -80,16 +77,21 @@ INSTANCE: fried-callable fried
 
 : prune-curries ( seq -- seq' )
     dup [ empty? not ] find
-    [ [ 1 + tail ] dip but-last prefix ]
-    [ 2drop { } ] if* ;
+    [ [ 1 + tail ] dip but-last prefix ] [ 2drop { } ] if* ;
 
 : convert-curries ( seq -- tail seq' )
     unclip-slice [ 0 swap [ convert-curry ] map ] dip
-    [ prune-curries ]
-    [ >quotation 1quotation prefix ] if-empty ;
+    [ prune-curries ] [ >quotation 1quotation prefix ] if-empty ;
 
 : mark-composes ( quot -- quot' )
-    [ dup \ @ = [ drop [ _ @ ] ] [ 1quotation ] if ] map concat ; inline
+    ! [ dup \ @ = [ drop [ _ @ ] ] [ 1quotation ] if ] map concat ; inline
+    [
+        dup \ @ = [
+            drop [ postpone: _ postpone: @ ]
+        ] [
+            1quotation
+        ] if
+    ] map concat ; inline
 
 : shallow-fry ( quot -- quot' )
     check-fry mark-composes
@@ -97,92 +99,52 @@ INSTANCE: fried-callable fried
     [ [ [ ] ] [ [ ] (make-curry) but-last ] if-zero ]
     [ shallow-spread>quot swap [ [ ] (make-curry) compose ] unless-zero ] if-empty ;
 
-DEFER: dredge-fry
-
 TUPLE: dredge-fry-state
-    { in-quot read-only }
-    { prequot read-only }
-    { quot read-only } ;
+    { input sequence read-only }
+    { prequot vector read-only }
+    { quot vector read-only } ;
 
 : <dredge-fry> ( quot -- dredge-fry )
     V{ } clone V{ } clone dredge-fry-state boa ; inline
 
-: in-quot-slices ( n i state -- head tail )
-    in-quot>>
-    [ <slice> ]
-    [ nipd swap 1 + tail-slice ] 3bi ; inline
+: input-slices ( n i state -- head tail )
+    input>> [ <slice> ] [ nipd swap 1 + tail-slice ] 3bi ; inline
 
 : push-head-slice ( head state -- )
     quot>> [ push-all ] [ \ _ swap push ] bi ; inline
 
 : push-subquot ( tail elt state -- )
-    [ fry swap >quotation count-inputs [ndip] ] dip prequot>> push-all ; inline
+    [ fry swap count-inputs [ndip] ] dip prequot>> push-all ; inline
+
+DEFER: dredge-fry
 
 : dredge-fry-subquot ( n state i elt -- )
     rot {
-        [ nip in-quot-slices ] ! head tail i elt state
+        [ nip input-slices ] ! head tail i elt state
         [ [ 2drop swap ] dip push-head-slice ]
         [ nipd push-subquot ]
-        [ [ 1 + ] [ drop ] [ ] tri* dredge-fry ]
+        [ [ drop 1 + ] dip dredge-fry ]
     } 3cleave ; inline recursive
 
 : dredge-fry-simple ( n state -- )
-    [ in-quot>> swap tail-slice ] [ quot>> ] bi push-all ; inline recursive
+    [ input>> swap tail-slice ] [ quot>> ] bi push-all ; inline recursive
 
 : dredge-fry ( n dredge-fry -- )
-    2dup in-quot>> [ fried? ] find-from
+    2dup input>> [ fried? ] find-from
     [ dredge-fry-subquot ]
     [ drop dredge-fry-simple ] if* ; inline recursive
 
+: (fry) ( sequence -- quot )
+    <dredge-fry>
+    [ 0 swap dredge-fry ]
+    [ prequot>> >quotation ]
+    [ quot>> >quotation shallow-fry ] tri append ;
+
 PRIVATE>
 
-M: callable fry ( quot -- quot' )
-    [
-        [ [ ] ]
-    ] [
-        0 swap <dredge-fry>
-        [ dredge-fry ] [
-            [ prequot>> >quotation ]
-            [ quot>> >quotation shallow-fry ] bi append
-        ] bi
-    ] if-empty ;
+M: callable fry
+    [ [ [ ] ] ] [ (fry) ] if-empty ;
 
-: number-underscores ( quot -- quot' )
-    0 swap [
-        dup \ _ eq? [
-            drop [ 1 + ] keep
-            number>string "_" append
-        ] [
-
-        ] if
-    ] map nip ;
-
-![[
-: fry-to-locals ( quot -- quot' )
-    check-fry mark-composes ;
-
-!    [ dup fryable? [ fry-to-lambda ] when ] map
-
-: fry-quotation ( quot -- quot' )
-    ;
-
-: fry-array ( array -- lambda )
-    ;
-
-: fry-anything ( obj -- obj' )
-    dup fryable? [
-        quot>> {
-            { [ dup quotation? [ fry-quotation ] }
-            { [ dup array? ] [ fry-array ] }
-        } cond
-    ] when ;
-
-: fry-to-lambda ( quot -- lambda )
-    [
-        [ fry-specifier? ] count
-        <iota> [ number>string "_" append ] map [ make-locals ] with-compilation-unit
-        drop dup
-    ] keep ! { _ 1 2 3 _ }
-    [ [ \ _ eq? ] find-all keys ] keep
-    set-nths* 1quotation <lambda> [ call ] curry ;
-    ]]
+M: sequence fry
+    [ 0 swap new-sequence ] keep
+    [ 1quotation ] [ (fry) swap [ like ] curry append ] if-empty ;

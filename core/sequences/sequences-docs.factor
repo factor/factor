@@ -749,7 +749,7 @@ HELP: join-as
 { $examples
     "Join a list of strings as a string buffer:"
     { $example "USING: sequences prettyprint ;"
-        "{ \"a\" \"b\" \"c\" } \"1\" sbuf\"\"join-as ."
+        "{ \"a\" \"b\" \"c\" } \"1\" sbuf\"\" join-as ."
         "sbuf\"a1b1c\""
     }
 }
@@ -974,6 +974,18 @@ HELP: surround
     }
 } ;
 
+HELP: surround-as
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "exemplar" sequence } { "newseq" sequence } }
+{ $description "Outputs a new sequence with " { $snippet "seq1" } " inserted between " { $snippet "seq2" } " and " { $snippet "seq3" } " of the same type as " { $snippet "exemplar" } "." }
+{ $examples
+    { $example "USING: sequences prettyprint ;"
+               "\"sssssh\" \"(\" \")\" SBUF\" \" surround-as ."
+               "SBUF\" (sssssh)\""
+    }
+} ;
+
+{ surround surround-as } related-words
+
 HELP: glue
 { $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "newseq" sequence } }
 { $description "Outputs a new sequence with " { $snippet "seq3" } " inserted between " { $snippet "seq1" } " and " { $snippet "seq2" } "." }
@@ -983,6 +995,18 @@ HELP: glue
                "\"a,b\""
     }
 } ;
+
+HELP: glue-as
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "exemplar" sequence } { "newseq" sequence } }
+{ $description "Outputs a new sequence with " { $snippet "seq3" } " inserted between " { $snippet "seq1" } " and " { $snippet "seq2" } " of the same type as " { $snippet "exemplar" } "." }
+{ $examples
+    { $example "USING: sequences prettyprint ;"
+               "\"a\" \"b\" \",\" SBUF\" \" glue-as ."
+               "SBUF\" a,b\""
+    }
+} ;
+
+{ glue glue-as } related-words
 
 HELP: subseq
 { $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq" sequence } { "subseq" "a new sequence" } }
@@ -1632,16 +1656,34 @@ HELP: cartesian-map
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation ( ... elt1 elt2 -- ... newelt ) } } { "newseq" "a new sequence of sequences" } }
 { $description "Applies the quotation to every possible pairing of elements from the two sequences, collecting results into a new sequence of sequences." } ;
 
+HELP: cartesian-product-as
+{ $values { "seq1" sequence } { "seq2" sequence } { "exemplar" sequence } { "newseq" "a new sequence of sequences of pairs" } }
+{ $description "Outputs a sequence of all possible pairings of elements from the two sequences so that the output sequence is the exemplar's type." }
+{ $examples
+    { $example
+        "USING: bit-arrays prettyprint sequences ;"
+        "\"ab\" ?{ t f } { } cartesian-product-as ."
+        "{ { { 97 t } { 97 f } } { { 98 t } { 98 f } } }"
+    }
+} ;
+
 HELP: cartesian-product
 { $values { "seq1" sequence } { "seq2" sequence } { "newseq" "a new sequence of sequences of pairs" } }
-{ $description "Outputs a sequence of all possible pairings of elements from the two sequences." }
+{ $description "Outputs a sequence of all possible pairings of elements from the two sequences, using the type of " { $snippet "seq2" } "." }
 { $examples
     { $example
         "USING: prettyprint sequences ;"
         "{ 1 2 } { 3 4 } cartesian-product ."
         "{ { { 1 3 } { 1 4 } } { { 2 3 } { 2 4 } } }"
     }
+    { $example
+        "USING: prettyprint sequences ;"
+        "\"abc\" \"def\" cartesian-product ."
+        "{ { \"ad\" \"ae\" \"af\" } { \"bd\" \"be\" \"bf\" } { \"cd\" \"ce\" \"cf\" } }"
+    }
 } ;
+
+{ cartesian-find cartesian-each cartesian-map cartesian-product cartesian-product-as } related-words
 
 ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
 "The " { $link nth-unsafe } " and " { $link set-nth-unsafe } " sequence protocol bypasses bounds checks for increased performance."
@@ -1730,7 +1772,7 @@ ARTICLE: "sequences-reshape" "Reshaping sequences"
 { $subsections repetition <repetition> }
 "Reversing a sequence:"
 { $subsections reverse }
-"A " { $emphasis "reversal" } " presents a reversed view of an underlying sequence:"
+"A " { $emphasis "reversed" } " is a virtual sequence presenting a reversed view of an underlying sequence:"
 { $subsections reversed <reversed> }
 "Transposing a matrix:"
 { $subsections flip } ;
@@ -1744,7 +1786,9 @@ ARTICLE: "sequences-appending" "Appending sequences"
     3append
     3append-as
     surround
+    surround-as
     glue
+    glue-as
 }
 "Collapse a sequence unto itself:"
 { $subsections concat join }

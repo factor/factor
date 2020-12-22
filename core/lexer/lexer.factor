@@ -57,8 +57,6 @@ ERROR: unexpected want got ;
     [ lexer check-instance [ column>> ] [ line-text>> ] bi ] prepose
     keep column<< ; inline
 
-GENERIC: skip-blank ( lexer -- )
-
 <PRIVATE
 
 : shebang? ( lexer -- lexer ? )
@@ -68,13 +66,23 @@ GENERIC: skip-blank ( lexer -- )
         ] [ f ] if
     ] [ f ] if ; inline
 
+: (skip-blank) ( col line -- newcol )
+    [ [ forbid-tab char: \s eq? not ] find-from drop ]
+    [ length or ] bi ;
+
+: (skip-word) ( col line -- newcol )
+    [ [ forbid-tab " \"" member-eq? ] find-from char: \" eq? [ 1 + ] when ]
+    [ length or ] bi ;
+
 PRIVATE>
+
+GENERIC: skip-blank ( lexer -- )
 
 M: lexer skip-blank
     shebang? [
         [ nip length ] change-lexer-column
     ] [
-        [ t skip ] change-lexer-column
+        [ (skip-blank) ] change-lexer-column
     ] if ;
 
 GENERIC: skip-word ( lexer -- )
@@ -106,6 +114,7 @@ M: lexer skip-word
             [ 2drop f skip ]
         } case
     ] change-lexer-column ;
+!    [ (skip-word) ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )
     lexer check-instance [ line>> ] [ text>> length ] bi <= ;

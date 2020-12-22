@@ -253,9 +253,9 @@ check_gtk_libraries() {
 
 check_libraries() {
     case $OS in
-            linux) check_X11_libraries
-                   check_gtk_libraries;;
-            unix) check_gtk_libraries;;
+        linux) check_X11_libraries
+               check_gtk_libraries;;
+        unix) check_gtk_libraries;;
     esac
 }
 
@@ -302,6 +302,7 @@ find_architecture() {
        *86) ARCH=x86;;
        *86_64) ARCH=x86;;
        aarch64) ARCH=arm64;;
+       arm64) ARCH=arm64;;
        iPhone5*[3-9]) ARCH=arm64;;
        iPhone[6-9]*) ARCH=arm64;;
        iPhone[1-9][0-9]*) ARCH=arm64;;
@@ -314,7 +315,7 @@ find_architecture() {
 }
 
 find_num_cores() {
-    $ECHO "Finding num cores..."
+    $ECHO "Finding NUM_CORES..."
     NUM_CORES=1
     uname_s=$(uname -s)
     check_ret uname
@@ -325,55 +326,34 @@ find_num_cores() {
     esac
 }
 
-echo_test_program() {
-    #! Must be 'echo'
-    echo -e "int main(){ return (long)(8*sizeof(void*)); }"
-}
-
-c_find_word_size() {
-    $ECHO "Finding WORD..."
-    C_WORD="factor-word-size"
-    echo_test_program | $CC -o $C_WORD -xc -
-    check_ret $CC
-    ./$C_WORD
-    WORD_OUT=$?
-    case $WORD in
-        32) ;;
-        64) ;;
-        *)
-            echo "Word size should be 32/64, got $WORD"
-            exit_script 15;;
-    esac
-    $DELETE -f $C_WORD
-    echo "$WORD_OUT"
-}
-
-intel_macosx_word_size() {
-    ensure_program_installed sysctl
-    $ECHO -n "Testing if your Intel Mac supports 64bit binaries..."
-    sysctl machdep.cpu.extfeatures | grep EM64T >/dev/null
-    if [[ $? -eq 0 ]] ; then
-        WORD=64
-        $ECHO "yes!"
-    else
-        WORD=32
-        $ECHO "no."
-    fi
-}
-
 find_word_size() {
     if [[ -n $WORD ]] ; then return; fi
-    if [[ $OS == macosx && $ARCH == x86 ]] ; then
-        intel_macosx_word_size
-    else
-        WORD=$(find_word_size_cpp || c_find_word_size)
-    fi
+    $ECHO "Finding WORD..."
+    WORD=$(find_word_size_cpp || find_word_size_c)
 }
 
 find_word_size_cpp() {
     SIXTY_FOUR='defined(__aarch64__) || defined(__x86_64__) || defined(_M_AMD64) || defined(__PPC64__) || defined(__64BIT__)'
     THIRTY_TWO='defined(i386) || defined(__i386) || defined(__i386__) || defined(_MIX86)'
-    cc -E -xc <(echo -e "#if ${SIXTY_FOUR}\n64\n#elif ${THIRTY_TWO}\n32\n#endif") | tail -1
+    $CC -E -xc <(echo -e "#if ${SIXTY_FOUR}\n64\n#elif ${THIRTY_TWO}\n32\n#endif") | tail -1
+}
+
+find_word_size_c() {
+    C_WORD="factor-word-size"
+    TEST_PROGRAM="int main(){ return (long)(8*sizeof(void*)); }"
+    echo $TEST_PROGRAM | $CC -o $C_WORD -xc -
+    check_ret $CC
+    ./$C_WORD
+    WORD_OUT=$?
+    case $WORD_OUT in
+        32) ;;
+        64) ;;
+        *)
+            echo "Word size should be 32/64, got '$WORD_OUT'"
+            exit_script 15;;
+    esac
+    $DELETE -f $C_WORD
+    echo "$WORD_OUT"
 }
 
 set_factor_binary() {
@@ -437,6 +417,12 @@ set_build_info() {
     if [[ $OS == linux && $ARCH == ppc ]] ; then
         MAKE_IMAGE_TARGET=linux-ppc.32
         MAKE_TARGET=linux-ppc-32
+    elif [[ $OS == linux && $ARCH == arm64 ]] ; then
+        MAKE_IMAGE_TARGET=unix-arm.64
+        MAKE_TARGET=linux-arm-64
+    elif [[ $OS == macosx && $ARCH == arm64 ]] ; then
+        MAKE_IMAGE_TARGET=unix-arm.64
+        MAKE_TARGET=macosx-arm64
     elif [[ $OS == windows && $ARCH == x86 && $WORD == 64 ]] ; then
         MAKE_IMAGE_TARGET=windows-x86.64
         MAKE_TARGET=windows-x86-64

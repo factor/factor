@@ -8,7 +8,8 @@ namespaces parser prettyprint quotations sequences
 sequences.generalizations source-files source-files.errors
 source-files.errors.debugger splitting stack-checker summary
 system tools.errors tools.time unicode vocabs vocabs.files
-vocabs.metadata vocabs.parser words ;
+vocabs.hierarchy.private
+vocabs.loader vocabs.metadata vocabs.parser words ;
 FROM: vocabs.hierarchy => load ;
 IN: tools.test
 
@@ -235,7 +236,8 @@ PRIVATE>
         ] [ drop ] if
     ] when* ;
 
-: test-vocabs ( vocabs -- ) [ test-vocab ] each ;
+: test-vocabs ( vocabs -- )
+    [ do-not-test? ] reject [ test-vocab ] each ;
 
 : with-test-file ( ..a quot: ( ..a path -- ..b ) -- ..b )
     '[ "" "" _ cleanup-unique-file ] with-temp-directory ; inline
@@ -374,18 +376,19 @@ M: test-failure error. ( error -- )
 
 : :test-failures ( -- ) test-failures get errors. ;
 
-: test ( prefix -- )
-    loaded-child-vocab-names test-vocabs ;
+: test ( prefix -- ) loaded-child-vocab-names test-vocabs ;
 
 : test-all ( -- )
     loaded-vocab-names [ do-not-test? ] reject test-vocabs ;
 
 : test-main ( -- )
-    command-line get dup first "--only" = [
-        rest [ [ require ] [ test-vocab ] bi ] each
-    ] [
-        [ [ load ] [ test ] bi ] each
-    ] if
+    command-line get [
+        dup vocab-roots get member? [
+            "" vocabs-to-load [ require-all ] keep
+        ] [
+            [ load ] [ loaded-child-vocab-names ] bi
+        ] if test-vocabs
+    ] each
     test-failures get empty?
     [ [ "==== FAILING TESTS" print flush :test-failures ] unless ]
     [ 0 1 ? exit ] bi ;

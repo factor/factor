@@ -29,6 +29,7 @@ IN: bootstrap.syntax
         "HOOK:"
         "H{"
         "HS{"
+        "IH{"
         "IN:"
         "INSTANCE:"
         "M:"
@@ -164,6 +165,9 @@ IN: bootstrap.syntax
         "STARTUP-HOOK:"
         "SHUTDOWN-HOOK:"
 
+        "'{"
+        "'H{"
+        "'HS{"
         "]]"
         "}}"
         ":::"

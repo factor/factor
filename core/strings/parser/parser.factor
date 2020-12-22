@@ -115,20 +115,25 @@ PRIVATE>
 : find-next-token ( lexer -- i elt )
     { lexer } declare
     [ column>> ] [ line-text>> ] bi
-    [ "\"\\" member? ] find-from ;
+    [ "\"\\" member-eq? ] find-from ;
 
 DEFER: (parse-string)
 
 : parse-found-token ( accum lexer i elt -- )
     { sbuf lexer fixnum fixnum } declare
     [ over lexer-subseq pick push-all ] dip
-    char: \\ = [
+    char: \\ eq? [
         dup dup [ next-char ] bi@
         [ [ pick push ] bi@ ]
         [ drop 2dup next-line% ] if*
         (parse-string)
     ] [
-        advance-char drop
+        dup advance-char
+        dup current-char forbid-tab {
+            { char: \s [ advance-char ] }
+            { f [ drop ] }
+            [ "[space]" swap 1string "'" dup surround unexpected ]
+        } case drop
     ] if ;
 
 : (parse-string) ( accum lexer -- )
@@ -142,24 +147,15 @@ DEFER: (parse-string)
             (parse-string)
         ] if*
     ] [
-        "Unterminated string" throw
+        "'\"'" "[eof]" unexpected
     ] if ;
-
-: rewind-lexer-on-error ( quot -- )
-    lexer get [ line>> ] [ line-text>> ] [ column>> ] tri
-    [
-        lexer get [ column<< ] [ line-text<< ] [ line<< ] tri
-        rethrow
-    ] 3curry recover ; inline
 
 PRIVATE>
 
 : parse-string ( -- str )
-    [
-        sbuf"" clone [
-            lexer get (parse-string)
-        ] keep unescape-string
-    ] rewind-lexer-on-error ;
+    sbuf"" clone [
+        lexer get (parse-string)
+    ] keep unescape-string ;
 
 : lookup-char ( char -- obj )
     {
