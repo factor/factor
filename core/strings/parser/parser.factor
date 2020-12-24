@@ -50,6 +50,7 @@ name>char-hook [
     unclip-slice {
         { CHAR: u [ unicode-escape ] }
         { CHAR: x [ hex-escape ] }
+        { CHAR: \n [ f swap ] }
         [ escape swap ]
     } case ;
 
@@ -59,7 +60,7 @@ name>char-hook [
     { sbuf object object } declare
     [
         cut-slice [ append! ] dip
-        rest-slice next-escape [ suffix! ] dip
+        rest-slice next-escape [ [ suffix! ] when* ] dip
         CHAR: \\ over index (unescape-string)
     ] [
         append!
