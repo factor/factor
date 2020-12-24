@@ -54,9 +54,14 @@ EBNF: tokenize-javascript [=[
 Letter            = [a-zA-Z]
 Digit             = [0-9]
 Digits            = Digit+
-SingleLineComment = "//" (!("\n") .)* "\n" => [[ ignore ]]
+HexDigit          = [0-9a-fA-F]
+OctDigit          = [0-7]
+LineTerminator    = [\r\n\u002028\u002029]
+WhiteSpace        = [ \t\v\f\xa0\u00feff\u001680\u002000\u002001\u002002\u002003\u002004\u002005\u002006\u002007\u002008\u002009\u00200a\u00202f\u00205f\u003000]
+SingleLineComment = "//" (!(LineTerminator) .)* "\n" => [[ ignore ]]
 MultiLineComment  = "/*" (!("*/") .)* "*/" => [[ ignore ]]
-Space             = [ \t\r\n] | SingleLineComment | MultiLineComment
+Comment           = SingleLineComment | MultiLineComment
+Space             = WhiteSpace | LineTerminator | Comment
 Spaces            = Space* => [[ ignore ]]
 NameFirst         = Letter | "$" => [[ CHAR: $ ]] | "_" => [[ CHAR: _ ]]
 NameRest          = NameFirst | Digit
@@ -65,6 +70,7 @@ Keyword           =  ("break"
                     | "case"
                     | "catch"
                     | "continue"
+                    | "debugger"
                     | "default"
                     | "delete"
                     | "do"
@@ -86,9 +92,21 @@ Keyword           =  ("break"
                     | "void"
                     | "while"
                     | "with") !(NameRest)
+FutureReserved    =  ("class"
+                    | "const"
+                    | "enum"
+                    | "export"
+                    | "extends"
+                    | "import"
+                    | "super")
 Name              = !(Keyword) iName  => [[ ast-name boa ]]
-Number            =   Digits:ws '.' Digits:fs => [[ ws "." fs 3array "" concat-as string>number ast-number boa ]]
-                    | Digits => [[ >string string>number ast-number boa ]]
+HexInteger        = "0"~ [xX]~ HexDigit+ => [[ hex> ]]
+OctInteger        = "0"~ OctDigit+ => [[ oct> ]]
+ExponentPart      = ("e"|"E") ("+"|"-")? Digits => [[ concat ]]
+Decimal           =  (Digits "." Digits? ExponentPart?
+                    | "." Digits ExponentPart?
+                    | Digits ExponentPart?) => [[ concat string>number ]]
+Number            = HexInteger | OctInteger | Decimal => [[ ast-number boa ]]
 
 SingleEscape      =   "b"  => [[ CHAR: \b ]]
                     | "f"  => [[ CHAR: \f ]]
@@ -97,38 +115,40 @@ SingleEscape      =   "b"  => [[ CHAR: \b ]]
                     | "t"  => [[ CHAR: \t ]]
                     | "v"  => [[ CHAR: \v ]]
                     | "'"  => [[ CHAR: '  ]]
-                    | "\"" => [[ CHAR: \"  ]]
+                    | "\"" => [[ CHAR: \" ]]
                     | "\\" => [[ CHAR: \\ ]]
-HexDigit          = [0-9a-fA-F]
-HexEscape         = "x" (HexDigit HexDigit):d => [[ d hex> ]]
-UnicodeEscape     = "u" (HexDigit HexDigit HexDigit HexDigit):d => [[ d hex> ]]
-                    | "u{" HexDigit+:d "}" => [[ d hex> ]]
-EscapeChar         = "\\" (SingleEscape | HexEscape | UnicodeEscape):c => [[ c ]]
-StringChars1       = (EscapeChar | !('"""') .)* => [[ >string ]]
-StringChars2       = (EscapeChar | !('"') .)* => [[ >string ]]
-StringChars3       = (EscapeChar | !("'") .)* => [[ >string ]]
-Str                =   '"""' StringChars1:cs '"""' => [[ cs ast-string boa ]]
-                     | '"' StringChars2:cs '"' => [[ cs ast-string boa ]]
-                     | "'" StringChars3:cs "'" => [[ cs ast-string boa ]]
-RegExpFlags        = NameRest* => [[ >string ]]
-NonTerminator      = !([\n\r]) .
-BackslashSequence  = "\\" NonTerminator => [[ second ]]
-RegExpFirstChar    =   !([*\\/]) NonTerminator
-                     | BackslashSequence
-RegExpChar         =   !([\\/]) NonTerminator
-                     | BackslashSequence
-RegExpChars        = RegExpChar*
-RegExpBody         = RegExpFirstChar RegExpChars => [[ first2 swap prefix >string ]]
-RegExp             = "/" RegExpBody:b "/" RegExpFlags:fl => [[ b fl ast-regexp boa ]]
-Special            =   "("    | ")"   | "{"   | "}"   | "["   | "]"   | ","   | ";"
-                     | "?"    | ":"   | "!==" | "!="  | "===" | "=="  | "="   | ">="
-                     | ">>>=" | ">>>" | ">>=" | ">>"  | ">"   | "<="  | "<<=" | "<<"
-                     | "<"    | "++"  | "+="  | "+"   | "--"  | "-="  | "-"   | "*="
-                     | "*"    | "/="  | "/"   | "%="  | "%"   | "&&=" | "&&"  | "||="
-                     | "||"   | "."   | "!"   | "&="  | "&"   | "|="  | "|"   | "^="
-                     | "^"
-Tok                = Spaces (Name | Keyword | Number | Str | RegExp | Special )
-Toks               = Tok* Spaces
+OctEscape         =  ([0-3] OctDigit OctDigit?
+                    | [4-7] OctDigit) [[ sift oct> ]]
+HexEscape         = "x"~ (HexDigit HexDigit) => [[ hex> ]]
+UnicodeEscape     =  ("u"~ (HexDigit HexDigit HexDigit HexDigit)
+                    | "u{"~ HexDigit+ "}"~) => [[ hex> ]]
+EscapeChar        = "\\" (SingleEscape | OctEscape | HexEscape | UnicodeEscape):c => [[ c ]]
+LineContinuation  = "\\" LineTerminator => [[ drop f ]]
+StringChars1      = (EscapeChar | LineContinuation | !('"""') .)
+StringChars2      = (EscapeChar | LineContinuation | !('"') .)
+StringChars3      = (EscapeChar | LineContinuation | !("'") .)
+Str               = ( '"""'~ StringChars1* '"""'~
+                    | '"'~ StringChars2* '"'~
+                    | "'"~ StringChars3* "'"~ ) => [[ sift >string ast-string boa ]]
+RegExpFlags       = NameRest* => [[ >string ]]
+NonTerminator     = !(LineTerminator) .
+BackslashSequence = "\\" NonTerminator => [[ second ]]
+RegExpFirstChar   =   !([*\\/]) NonTerminator
+                    | BackslashSequence
+RegExpChar        =   !([\\/]) NonTerminator
+                    | BackslashSequence
+RegExpChars       = RegExpChar*
+RegExpBody        = RegExpFirstChar RegExpChars => [[ first2 swap prefix >string ]]
+RegExp            = "/" RegExpBody:b "/" RegExpFlags:fl => [[ b fl ast-regexp boa ]]
+Special           =   "("    | ")"   | "{"   | "}"   | "["   | "]"   | ","   | ";"
+                    | "?"    | ":"   | "!==" | "!="  | "===" | "=="  | "="   | ">="
+                    | ">>>=" | ">>>" | ">>=" | ">>"  | ">"   | "<="  | "<<=" | "<<"
+                    | "<"    | "++"  | "+="  | "+"   | "--"  | "-="  | "-"   | "*="
+                    | "*"    | "/="  | "/"   | "%="  | "%"   | "&&=" | "&&"  | "||="
+                    | "||"   | "."   | "!"   | "&="  | "&"   | "|="  | "|"   | "^="
+                    | "^"    | "~"
+Tok               = Spaces (Name | Keyword | Number | Str | RegExp | Special )
+Toks              = Tok* Spaces
 ]=]
 
 ! Grammar for JavaScript. Based on OMeta-JS example from:
