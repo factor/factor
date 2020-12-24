@@ -174,7 +174,6 @@ tokenizer         = <foreign tokenize-javascript Tok>
 End               = !(.)
 Space             = [ \t\r\n]
 Spaces            = Space* => [[ ignore ]]
-Comment           = "/*" [^*/]* "*/" => [[ ignore ]]
 Name               = . ?[ ast-name?   ]?   => [[ value>> ]]
 Number             = . ?[ ast-number? ]?
 String             = . ?[ ast-string? ]?
@@ -309,7 +308,7 @@ Sc                 = SpacesNoNl (nl | &("}") | End)| ";"
 Binding            =   Name:n "=" Expr:v                      => [[ n v ast-var boa ]]
                      | Name:n                                 => [[ n "undefined" ast-get boa ast-var boa ]]
 Block              = "{" SrcElems:ss "}"                      => [[ ss ]]
-Bindings           = (Binding ("," Binding => [[ second ]])* => [[ first2 swap prefix ]])?
+Bindings           = (Binding (","~ Binding)* => [[ first2 swap prefix ]])?
 For1               =   "var" Bindings => [[ second ]] 
                      | ExprNoIn 
                      | Spaces => [[ "undefined" ast-get boa ]] 
@@ -345,5 +344,5 @@ Stmt               =   Block
 SrcElem            =   "function" Name:n FuncRest:f                  => [[ n f ast-var boa ]]
                      | Stmt
 SrcElems           = SrcElem*                                      => [[ ast-begin boa ]]
-TopLevel           = SrcElems Spaces Comment
+TopLevel           = SrcElems Spaces
 ]=]
