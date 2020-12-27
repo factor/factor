@@ -472,9 +472,13 @@ M: timestamp days-in-year year>> days-in-year ;
 
 : today ( -- timestamp ) now midnight ; inline
 : tomorrow ( -- timestamp ) 1 days hence midnight ; inline
-: overtomorrow ( -- timestamp ) 2 days hence midnight ; inline
 : yesterday ( -- timestamp ) 1 days ago midnight ; inline
+: overtomorrow ( -- timestamp ) 2 days hence midnight ; inline
 : ereyesterday ( -- timestamp ) 2 days ago midnight ; inline
+
+: today? ( timestamp -- ? ) now same-day? ; inline
+: tomorrow? ( timestamp -- ? ) 1 days hence same-day? ; inline
+: yesterday? ( timestamp -- ? ) 1 days ago same-day? ; inline
 
 ALIAS: start-of-day midnight
 
