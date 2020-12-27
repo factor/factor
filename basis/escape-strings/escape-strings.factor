@@ -1,8 +1,8 @@
 ! Copyright (C) 2017 John Benediktsson, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ascii assocs combinators fry kernel math math.functions
-math.parser math.ranges math.statistics sequences sets sorting
-strings ;
+USING: ascii assocs checksums checksums.sha combinators fry
+kernel math math.functions math.parser math.ranges
+math.statistics sequences sets sorting splitting strings uuid ;
 IN: escape-strings
 
 : find-escapes ( str -- set )
@@ -75,3 +75,20 @@ IN: escape-strings
         { [ dup CHAR: " of not ] [ drop "\"" "\"" surround ] }
         [ drop escape-string ]
     } cond ;
+
+: uuid1-escape-string ( str -- str' ) uuid1 surround-by-brackets ;
+: uuid4-escape-string ( str -- str' ) uuid4 surround-by-brackets ;
+
+: sha1-escape-string ( str -- str' )
+    [ ] [ sha1 checksum-bytes bytes>hex-string ] bi surround-by-brackets ;
+
+: sha256-escape-string ( str -- str' )
+    [ ] [ sha-256 checksum-bytes bytes>hex-string ] bi surround-by-brackets ;
+
+GENERIC: sha1-escape-strings ( obj -- strs )
+
+M: sequence sha1-escape-strings ( seq -- strs )
+    [ sha1-escape-string ] { } map-as ;
+
+M: string sha1-escape-strings ( str -- strs )
+    string-lines sha1-escape-strings ;
