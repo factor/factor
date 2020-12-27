@@ -11,8 +11,14 @@ IN: http.parsers
 : except-these ( quots -- parser )
     [ 1|| ] curry except ; inline
 
+: cookie-key-disallow? ( ch -- ? )
+    " \t,;=" member? ;
+
 : tspecial? ( ch -- ? )
     "()<>@,;:\\\"/[]?={} \t" member? ;
+
+: cookie-key-parser ( -- parser )
+    { [ control? ] [ cookie-key-disallow? ] } except-these repeat1 ;
 
 : token-parser ( -- parser )
     { [ control? ] [ tspecial? ] } except-these repeat1 ;
@@ -144,7 +150,7 @@ PEG: parse-header-line ( string -- pair )
     2choice case-sensitive ;
 
 : attr-parser ( -- parser )
-    token-parser case-sensitive ;
+    cookie-key-parser case-sensitive ;
 
 : av-pair-parser ( -- parser )
     [
