@@ -300,7 +300,7 @@ ARTICLE: "io.launcher.launch" "Launching processes"
 ARTICLE: "io.launcher.examples" "Launcher examples"
 "Starting a command and waiting for it to finish:"
 { $code
-    "\"ls /etc\" run-process"
+    "\"ls /etc\" run-process wait-for-process"
 }
 "Starting a program in the background:"
 { $code
