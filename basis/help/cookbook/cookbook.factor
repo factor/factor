@@ -240,9 +240,14 @@ command-line get [
 "It is also possible to make executable scripts. A Factor file can begin with a 'shebang' like the following:"
 { $code "#!/usr/bin/env factor" }
 "If the text file is made executable, then it can be run, assuming the " { $snippet "factor" } " binary is in your " { $snippet "$PATH" } "."
+$nl
+"Note: To suppress any undesired output from code you have loaded from your " { $snippet ".factor-rc" } " file you can specify " { $snippet "-no-user-init" } " as in:"
+{ $code "#!/usr/bin/env factor -no-user-init" }
+
 { $references
     { }
     "command-line"
+    "bootstrap-cli-args"
     "cookbook-application"
     "images"
 } ;
