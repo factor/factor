@@ -107,28 +107,14 @@ os windows?
 ] with-test-file
 
 ! aum's bug
-os windows?
-    [
-        H{
-            { current-directory "." }
-            { "resource-path" ".." }
-        } [
-            [ "..\\core\\bootstrap\\stage2.factor" ]
-            [ "resource:core\\bootstrap\\stage2.factor" absolute-path ]
-            unit-test
-        ] with-variables
-    ]
-    [
-        H{
-            { current-directory "." }
-            { "resource-path" ".." }
-        } [
-            [ "../core/bootstrap/stage2.factor" ]
-            [ "resource:core/bootstrap/stage2.factor" absolute-path ]
-            unit-test
-        ] with-variables
-    ]
-if
+H{
+    { current-directory "." }
+    { "resource-path" ".." }
+} [
+    [ "..\\core\\bootstrap\\stage2.factor" ]
+    [ "resource:core\\bootstrap\\stage2.factor" absolute-path ]
+    unit-test
+] with-variables
 
 { t } [ cwd "misc" resource-path [ ] with-directory cwd = ] unit-test
 
