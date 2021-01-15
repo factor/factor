@@ -30,10 +30,15 @@ IN: prettyprint
 : pprint-short ( obj -- )
     [ pprint ] with-short-limits ;
 
+: pprint-short-if-unset ( obj -- )
+    [ pprint ] defaulting-with-short-limits ;
+
 : unparse-short ( obj -- str )
     [ pprint-short ] with-string-writer ;
 
 : short. ( obj -- ) pprint-short nl ;
+
+: short-if-unset. ( obj -- ) pprint-short-if-unset nl ;
 
 : error-in-pprint ( obj -- str )
     class-of name>> "~pprint error: " "~" surround ;
@@ -44,7 +49,7 @@ IN: prettyprint
 
 : stack. ( seq -- )
     [
-        [ short. ] [
+        [ short-if-unset. ] [
             drop [ error-in-pprint ] keep write-object nl
         ] recover
     ] each ;
