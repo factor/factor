@@ -1,3 +1,5 @@
+! Copyright (C) 2021 KUSUMOTO Norio.
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators formatting io kernel math math.ranges
 memory multi-generic namespaces prettyprint quotations sequences
 tools.test tools.time ;
