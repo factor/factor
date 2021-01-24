@@ -1,10 +1,12 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes classes.algebra combinators compiler.tree
-compiler.tree.combinators compiler.tree.propagation.branches
-compiler.tree.propagation.info compiler.utilities fry kernel layouts
-math math.intervals math.partial-dispatch math.private namespaces
-sequences stack-checker.branches stack-checker.dependencies words ;
+USING: accessors classes classes.algebra combinators
+combinators.short-circuit compiler.tree compiler.tree.combinators
+compiler.tree.propagation.branches compiler.tree.propagation.info
+compiler.utilities fry kernel layouts math math.intervals
+math.partial-dispatch math.private multi-generic namespaces sequences
+stack-checker.branches stack-checker.dependencies words ;
+
 IN: compiler.tree.cleanup
 
 GENERIC: delete-node ( node -- )
@@ -60,9 +62,18 @@ GENERIC: cleanup-tree* ( node -- node/nodes )
 ! Method inlining
 : add-method-dependency ( #call -- )
     dup method>> word? [
-        [ [ class>> ] [ word>> ] bi add-depends-on-generic ]
-        [ [ class>> ] [ word>> ] [ method>> ] tri add-depends-on-method ]
-        bi
+        dup method>> {
+            [ multi-method? ]
+            [ "multi-generic" word-prop multi-dispatch-generic? ]
+        } 1&& [
+            [ [ class>> ] [ word>> ] bi add-depends-on-multi-dispatch-generic ]
+            [ [ class>> ] [ word>> ] [ method>> ] tri add-depends-on-multi-method ]
+            bi
+        ] [
+            [ [ class>> ] [ word>> ] bi add-depends-on-generic ]
+            [ [ class>> ] [ word>> ] [ method>> ] tri add-depends-on-method ]
+            bi
+        ] if
     ] [ drop ] if ;
 
 : record-inlining ( #call -- )

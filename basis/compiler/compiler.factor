@@ -9,6 +9,7 @@ compiler.units compiler.utilities continuations definitions fry
 generic generic.single io kernel macros make namespaces
 sequences sets stack-checker.dependencies stack-checker.errors
 stack-checker.inlining vocabs.loader words ;
+FROM: multi-generic => multi-single-generic? ;
 IN: compiler
 
 SYMBOL: compiled
@@ -101,6 +102,7 @@ M: word combinator? inline? ;
 : optimize? ( word -- ? )
     {
         [ single-generic? ]
+        [ multi-single-generic? ]
         [ primitive? ]
     } 1|| not ;
 

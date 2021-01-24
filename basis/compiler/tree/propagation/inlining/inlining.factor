@@ -5,7 +5,8 @@ combinators.short-circuit compiler.tree compiler.tree.builder
 compiler.tree.normalization compiler.tree.propagation.info
 compiler.tree.propagation.nodes compiler.tree.recursive generic
 generic.math generic.single generic.standard kernel locals math
-math.partial-dispatch namespaces quotations sequences words ;
+math.order math.partial-dispatch multi-generic namespaces
+quotations sequences words ;
 IN: compiler.tree.propagation.inlining
 
 : splicing-call ( #call word -- nodes )
@@ -102,12 +103,75 @@ SYMBOL: history
     call( #call -- word/quot/f )
     object swap eliminate-dispatch ;
 
+: multi-math-method* ( word left right -- quot )
+    3dup math-op [ 3nip 1quotation ] [ drop multi-math-method ] if ;
+
+: inlining-multi-math-method ( #call word -- class/f quot/f )
+    swap in-d>> first2
+    [ value-info class>> normalize-math-class ] bi@
+    3dup math-both-known? [ multi-math-method* ] [ 3drop f ] if
+    number swap ;
+
+: inlining-multi-standard-method ( #call word -- class/f method/f )
+    dup "dispatch-type" word-prop methods>> assoc-empty?
+    [ 2drop f f ] [
+        2dup [ in-d>> length ] [ single-dispatch# ] bi* <=
+        [ 2drop f f ] [
+            [ in-d>> <reversed> ] [ [ single-dispatch# ] keep ] bi*
+            [ swap nth value-info class>> dup ] dip
+            single-method-for-class
+        ] if
+    ] if ;
+
+::  worst-literal-length ( methods -- len )
+    methods first first length :> len
+    methods 0 [
+        first [ object = not ] find drop dup [ len swap - ] [ drop 0 ] if
+        max
+    ] reduce ;
+
+: spec-boolean-table ( methods -- array )
+    keys dup first length f <array> [
+        [ object = not ] map [ or ] 2map
+    ] reduce ;
+
+:: inlining-multi-dispatch-method ( #call word -- classes/f method/f )
+    word "hooks" word-prop empty? [
+        word methods :> word-methods
+        word-methods empty? [ f f ] [
+            word-methods first first length :> len1
+            word-methods worst-literal-length :> len2
+            #call in-d>> length len2 < [ f f ] [
+                len1 len2 - object <array>
+                #call in-d>> >array [ value-info class>> ] map
+                [ length dup len2 - swap ] keep subseq
+                append
+                word-methods spec-boolean-table [
+                    [ drop object ] unless
+                ] 2map
+                dup word ?lookup-multi-method dup [ 2drop f f ] unless
+            ] if
+        ] if
+    ] [ f f ] if ;
+
+: inline-multi-standard-method ( #call word -- ? )
+    dupd inlining-multi-standard-method eliminate-dispatch ;
+
+: inline-multi-math-method ( #call word -- ? )
+    dupd inlining-multi-math-method eliminate-dispatch ;
+
+: inline-multi-dispatch-method ( #call word -- ? )
+    dupd inlining-multi-dispatch-method eliminate-dispatch ;
+
 : (do-inlining) ( #call word -- ? )
     {
         { [ dup never-inline-word? ] [ 2drop f ] }
         { [ dup always-inline-word? ] [ inline-word ] }
         { [ dup standard-generic? ] [ inline-standard-method ] }
         { [ dup math-generic? ] [ inline-math-method ] }
+        { [ dup multi-standard-generic? ] [ inline-multi-standard-method ] }
+        { [ dup multi-math-generic? ] [ inline-multi-math-method ] }
+        { [ dup multi-dispatch-generic? ] [ inline-multi-dispatch-method ] }
         { [ dup inline? ] [ inline-word ] }
         [ 2drop f ]
     } cond ;
