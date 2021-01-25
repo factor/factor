@@ -836,17 +836,21 @@ MM: method-inlining-3 ( a b c -- z ) 3drop "default" ;
    "1" "2" 3 method-inlining-3 .
 
 [ method-inlining-3 ] optimized.
-
 [ { string string } declare method-inlining-3 ] optimized.
 [ { object string string } declare method-inlining-3 ] optimized.
 [ { fixnum string string } declare method-inlining-3 ] optimized.
 [ { string string string } declare method-inlining-3 ] optimized.
-
 [ { fixnum fixnum } declare method-inlining-3 ] optimized.
 [ { object fixnum fixnum } declare method-inlining-3 ] optimized.
 [ { fixnum fixnum fixnum } declare method-inlining-3 ] optimized.
 [ { string fixnum fixnum } declare method-inlining-3 ] optimized.
-
 [ { fixnum fixnum string } declare method-inlining-3 ] optimized.
 [ { string array fixnum } declare method-inlining-3 ] optimized.
 
+[ my-plus ] optimized.
+[ { fixnum fixnum } declare my-plus ] optimized.
+[ { float float } declare my-plus ] optimized.
+[ { bignum fixnum } declare my-plus ] optimized.
+[ { string string } declare my-plus ] optimized.
+[ { character string } declare my-plus ] optimized.
+[ { character character } declare my-plus ] optimized.

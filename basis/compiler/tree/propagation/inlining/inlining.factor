@@ -103,26 +103,6 @@ SYMBOL: history
     call( #call -- word/quot/f )
     object swap eliminate-dispatch ;
 
-: multi-math-method* ( word left right -- quot )
-    3dup math-op [ 3nip 1quotation ] [ drop multi-math-method ] if ;
-
-: inlining-multi-math-method ( #call word -- class/f quot/f )
-    swap in-d>> first2
-    [ value-info class>> normalize-math-class ] bi@
-    3dup math-both-known? [ multi-math-method* ] [ 3drop f ] if
-    number swap ;
-
-: inlining-multi-standard-method ( #call word -- class/f method/f )
-    dup "dispatch-type" word-prop methods>> assoc-empty?
-    [ 2drop f f ] [
-        2dup [ in-d>> length ] [ single-dispatch# ] bi* <=
-        [ 2drop f f ] [
-            [ in-d>> <reversed> ] [ [ single-dispatch# ] keep ] bi*
-            [ swap nth value-info class>> dup ] dip
-            single-method-for-class
-        ] if
-    ] if ;
-
 ::  worst-literal-length ( methods -- len )
     methods first first length :> len
     methods 0 [
@@ -153,6 +133,36 @@ SYMBOL: history
             ] if
         ] if
     ] [ f f ] if ;
+
+: multi-math-both-known? ( word left right -- ? )
+    3dup math-op
+    [ 4drop t ]
+    [ drop multi-generic:math-class-max
+      swap single-method-for-class >boolean ] if ;
+
+: multi-math-method* ( word left right -- quot )
+    3dup math-op [ 3nip 1quotation ] [ drop multi-math-method ] if ;
+
+:: inlining-multi-math-method ( #call word -- class/f quot/f )
+    #call word
+    swap in-d>> first2
+    [ value-info class>> normalize-math-class ] bi@
+    3dup multi-math-both-known? [ multi-math-method* ] [ 3drop f ] if
+    number swap [
+        ! Extended mathematical dispatch 
+        drop #call word inlining-multi-dispatch-method
+    ] unless* ;
+
+: inlining-multi-standard-method ( #call word -- class/f method/f )
+    dup "dispatch-type" word-prop methods>> assoc-empty?
+    [ 2drop f f ] [
+        2dup [ in-d>> length ] [ single-dispatch# ] bi* <=
+        [ 2drop f f ] [
+            [ in-d>> <reversed> ] [ [ single-dispatch# ] keep ] bi*
+            [ swap nth value-info class>> dup ] dip
+            single-method-for-class
+        ] if
+    ] if ;
 
 : inline-multi-standard-method ( #call word -- ? )
     dupd inlining-multi-standard-method eliminate-dispatch ;
