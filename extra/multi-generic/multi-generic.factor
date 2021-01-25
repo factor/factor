@@ -22,12 +22,6 @@ PREDICATE: multi-generic < word
 PREDICATE: multi-method < word
     "multi-generic" word-prop >boolean ;
 
-M: multi-method no-compile?
-    "multi-generic" word-prop no-compile? ;
-
-M: multi-method combinator?
-    "multi-generic" word-prop combinator? ;
-
 TUPLE: dispatch ;
 
 TUPLE: multi-dispatch < dispatch ;
@@ -760,10 +754,6 @@ M: tuple-dispatch-engine compile-engine
 
 PREDICATE: predicate-engine-word < word "owner-generic" word-prop ;
 
-M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
-
-M: predicate-engine-word combinator? "owner-generic" word-prop combinator? ;
-
 SYMBOL: predicate-engines
 
 : sort-single-methods ( assoc -- assoc' )
@@ -1083,7 +1073,7 @@ M: math-dispatch perform-dispatch
     ] with-variable ;
 
 ! ! ! call-next-multi-method ! ! !
-SYMBOL: next-multi-method-quot-cache
+! SYMBOL: next-multi-method-quot-cache
 
 H{ } clone next-method-quot-cache set-global
 
@@ -1112,11 +1102,13 @@ M:: math-dispatch next-multi-method-quot* ( classes generic dispatch -- quot )
 
 : next-multi-method-quot ( method -- quot )
     ! TODO: use next-multi-method-quot-cache
-    [ "method-specializer" word-prop ]
-    [
-        "multi-generic" word-prop
-        dup "dispatch-type" word-prop
-    ] bi next-multi-method-quot* ;
+    next-multi-method-quot-cache get [
+        [ "method-specializer" word-prop ]
+        [
+            "multi-generic" word-prop
+            dup "dispatch-type" word-prop
+        ] bi next-multi-method-quot*
+    ] cache ;
 
 ERROR: no-next-multi-method method ;
 

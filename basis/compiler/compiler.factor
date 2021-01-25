@@ -6,9 +6,9 @@ compiler.cfg.builder.alien compiler.cfg.finalization
 compiler.cfg.optimizer compiler.codegen compiler.crossref
 compiler.errors compiler.tree.builder compiler.tree.optimizer
 compiler.units compiler.utilities continuations definitions fry
-generic generic.single io kernel macros make namespaces
-sequences sets stack-checker.dependencies stack-checker.errors
-stack-checker.inlining vocabs.loader words ;
+generic generic.single io kernel macros make multi-generic
+namespaces sequences sets stack-checker.dependencies
+stack-checker.errors stack-checker.inlining vocabs.loader words ;
 FROM: multi-generic => multi-single-generic? ;
 IN: compiler
 
@@ -47,6 +47,16 @@ M: method combinator? "method-generic" word-prop combinator? ;
 M: predicate-engine-word combinator? "owner-generic" word-prop combinator? ;
 
 M: word combinator? inline? ;
+
+M: multi-method no-compile?
+    "multi-generic" word-prop no-compile? ;
+
+M: multi-method combinator?
+    "multi-generic" word-prop combinator? ;
+
+M: multi-generic:predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
+
+M: multi-generic:predicate-engine-word combinator? "owner-generic" word-prop combinator? ;
 
 : ignore-error? ( word error -- ? )
     ! Ignore some errors on inline combinators, macros, and special
