@@ -22,6 +22,7 @@ SYMBOL: classes-intersect-cache
 SYMBOL: class-and-cache
 SYMBOL: class-or-cache
 SYMBOL: next-method-quot-cache
+SYMBOL: next-multi-method-quot-cache
 
 : init-caches ( -- )
     H{ } clone class<=-cache namespaces:set
@@ -29,7 +30,8 @@ SYMBOL: next-method-quot-cache
     H{ } clone classes-intersect-cache namespaces:set
     H{ } clone class-and-cache namespaces:set
     H{ } clone class-or-cache namespaces:set
-    H{ } clone next-method-quot-cache namespaces:set ;
+    H{ } clone next-method-quot-cache namespaces:set
+    H{ } clone next-multi-method-quot-cache namespaces:set ;
 
 : reset-caches ( -- )
     class<=-cache get clear-assoc
@@ -37,7 +39,8 @@ SYMBOL: next-method-quot-cache
     classes-intersect-cache get clear-assoc
     class-and-cache get clear-assoc
     class-or-cache get clear-assoc
-    next-method-quot-cache get clear-assoc ;
+    next-method-quot-cache get clear-assoc
+    next-multi-method-quot-cache get clear-assoc ;
 
 SYMBOL: update-map
 

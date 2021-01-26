@@ -103,12 +103,12 @@ PREDICATE: math-class < class
     ] map
     vars append ;
 
-: picker ( n -- quot )
+: (picker) ( n -- quot )
     {
         { 0 [ [ dup ] ] }
         { 1 [ [ over ] ] }
         { 2 [ [ pick ] ] }
-        [ 1 - picker [ dip swap ] curry ]
+        [ 1 - (picker) [ dip swap ] curry ]
     } case ;
 
 
@@ -210,7 +210,7 @@ SYMBOL: total
 
 : multi-predicate ( classes -- quot )
     dup length <iota> <reversed>
-    [ picker 2array ] 2map
+    [ (picker) 2array ] 2map
     [ drop object eq? ] assoc-reject
     [ [ t ] ] [
         [ (multi-predicate) ] { } assoc>map
@@ -421,6 +421,18 @@ M: anonymous-intersection implementor-classes participants>> ;
         drop [ effect -rot <method> dup ] 2keep reveal-method
     ] if ;
 
+:: ?lookup-multi-method ( classes generic  -- method/f )
+    generic methods sort-methods [
+        first classes swap t [ class<= and ] 2reduce
+    ] find nip dup [ second ] when ;
+
+:: ?lookup-next-multi-method ( classes generic  -- method/f )
+    generic methods sort-methods
+    [ drop classes classes< +gt+ = ] assoc-filter [
+        first classes swap t [ class<= and ] 2reduce
+    ] find nip dup [ second ] when ;
+! TODO: write unit-test for ?lookup-next-multi-method
+
 : niceify-method ( seq -- seq )
     [ dup \ f eq? [ drop f ] when ] map ;
 
@@ -575,7 +587,7 @@ SYMBOL: dispatch-type
 : with-dispatch-type ( dispatch-type quot -- )
      [ dispatch-type ] dip with-variable ; inline
 
-HOOK: [picker] dispatch-type ( -- quot )
+HOOK: picker dispatch-type ( -- quot )
 
 
 <PRIVATE
@@ -607,9 +619,6 @@ ERROR: method-lookup-failed class generic ;
 : ?lookup-method ( class generic -- method/f )
     "dispatch-type" word-prop methods>> at ;
 
-: lookup-method' ( class generic -- method )
-    2dup ?lookup-method [ 2nip ] [ method-lookup-failed ] if* ;
-
 : method-for-object ( obj word -- method )
     [
         [ method-classes [ instance? ] with filter smallest-class ] keep
@@ -623,7 +632,7 @@ ERROR: method-lookup-failed class generic ;
 
 M: single-dispatch make-single-default-method
     [
-        [ [picker] ] dip '[ @ _ no-single-method ]
+        [ picker ] dip '[ @ _ no-single-method ]
     ] with-dispatch-type ;
 
 
@@ -806,7 +815,7 @@ M: predicate-engine-word stack-effect "owner-generic" word-prop stack-effect ;
     quote-methods
     prune-redundant-predicates
     class-predicates
-    [ last ] [ alist>quot [picker] prepend define-predicate-engine ] if-empty ;
+    [ last ] [ alist>quot picker prepend define-predicate-engine ] if-empty ;
 
 M: predicate-engine compile-engine
     [ compile-predicate-engine ] [ class>> ] bi
@@ -907,8 +916,8 @@ CONSTANT: single-simple-dispatch
 : define-multi-simple-generic ( word effect -- )
     [ single-simple-dispatch ] dip define-single-generic ;
 
-M: single-standard-dispatch [picker]
-    dispatch-type get #>> picker ;
+M: single-standard-dispatch picker
+    dispatch-type get #>> (picker) ;
 
 M: single-standard-dispatch single-dispatch# #>> ;
 
@@ -938,13 +947,13 @@ M: single-standard-dispatch mega-cache-quot
 PREDICATE: single-hook-generic < multi-generic
     "dispatch-type" word-prop single-hook-dispatch? ;
 
-M: single-hook-dispatch [picker]
+M: single-hook-dispatch picker
     dispatch-type get var>> [ get ] curry ;
 
 M: single-hook-dispatch single-dispatch# drop 0 ;
 
 M: single-hook-dispatch mega-cache-quot
-    1quotation [picker] [ gsp:lookup-method (execute) ] surround ;
+    1quotation picker [ gsp:lookup-method (execute) ] surround ;
 
 M: single-hook-generic effective-method
     [ "dispatch-type" word-prop var>> get ] keep method-for-object ;
@@ -1072,9 +1081,55 @@ M: math-dispatch perform-dispatch
         define
     ] with-variable ;
 
-! ! ! call-next-multi-method ! ! !
-! SYMBOL: next-multi-method-quot-cache
 
+! ! ! dependencies ! ! !
+:: add-depends-on-multi-dispatch-generic ( classes generic -- )
+    generic-dependencies get dup :> dependences
+    [
+        classes [
+            generic dependences [ ?class-or ] change-at
+        ] each
+    ] when ;
+
+TUPLE: depends-on-next-multi-method classes generic next-multi-method ;
+
+: add-depends-on-next-multi-method ( classes generic next-multi-method -- )
+    over +conditional+ depends-on
+    depends-on-next-multi-method add-conditional-dependency ;
+
+M: depends-on-next-multi-method satisfied?
+    {
+        [ classes>> [ classoid? ] all? ]
+        [
+            [ [ classes>> ] [ generic>> ] bi ?lookup-next-multi-method ]
+            [ next-multi-method>> ] bi eq?
+        ]
+    } 1&& ;
+
+: add-next-multi-method-dependency ( method -- )
+    [ "method-specializer" word-prop ]
+    [ "multi-generic" word-prop ]
+    bi
+    2dup ?lookup-next-multi-method
+    add-depends-on-next-multi-method ;
+
+TUPLE: depends-on-multi-method classes generic multi-method ;
+
+: add-depends-on-multi-method ( classes generic multi-method -- )
+    over +conditional+ depends-on
+    depends-on-multi-method add-conditional-dependency ;
+
+M: depends-on-multi-method satisfied?
+    {
+        [ classes>> [ classoid? ] all? ]
+        [
+            [ [ classes>> ] [ generic>> ] bi ?lookup-multi-method ]
+            [ multi-method>> ] bi eq?
+        ]
+    } 1&& ;
+
+
+! ! ! call-next-multi-method ! ! !
 H{ } clone next-method-quot-cache set-global
 
 GENERIC: next-multi-method-quot* ( classes generic dispatch -- quot )
@@ -1128,39 +1183,8 @@ M: not-in-a-multi-method-error summary
         call-next-multi-method-quot
     ] [ no-next-multi-method ] ?if ;
 
-:: next-multi-method ( classes generic  -- method/f )
-    generic methods sort-methods
-    [ drop classes classes< +gt+ = ] assoc-filter [
-        first classes swap t [ class<= and ] 2reduce
-    ] find nip dup [ second ] when ;
-! TODO: write unit-test for next-multi-method
 
-:: ?lookup-multi-method ( classes generic  -- method/f )
-    generic methods sort-methods [
-        first classes swap t [ class<= and ] 2reduce
-    ] find nip dup [ second ] when ;
-
-TUPLE: depends-on-next-multi-method classes generic next-multi-method ;
-
-: add-depends-on-next-multi-method ( classes generic next-multi-method -- )
-    over +conditional+ depends-on
-    depends-on-next-multi-method add-conditional-dependency ;
-
-M: depends-on-next-multi-method satisfied?
-    {
-        [ classes>> [ classoid? ] all? ]
-        [
-            [ [ classes>> ] [ generic>> ] bi next-multi-method ]
-            [ next-multi-method>> ] bi eq?
-        ]
-    } 1&& ;
-
-: add-next-multi-method-dependency ( method -- )
-    [ "method-specializer" word-prop ]
-    [ "multi-generic" word-prop ]
-    bi
-    2dup next-multi-method
-    add-depends-on-next-multi-method ;
+! DEFER: add-next-multi-method-dependency
 
 \ (call-next-multi-method) [
     [ add-next-multi-method-dependency ]
@@ -1176,27 +1200,3 @@ SYNTAX: call-next-multi-method
    current-method get
    [ literalize suffix! \ (call-next-multi-method) suffix! ]
    [ not-in-a-multi-method-error ] if* ;
-
-
-:: add-depends-on-multi-dispatch-generic ( classes generic -- )
-    generic-dependencies get dup :> dependences
-    [
-        classes [
-            generic dependences [ ?class-or ] change-at
-        ] each
-    ] when ;
-
-TUPLE: depends-on-multi-method classes generic multi-method ;
-
-: add-depends-on-multi-method ( classes generic multi-method -- )
-    over +conditional+ depends-on
-    depends-on-multi-method add-conditional-dependency ;
-
-M: depends-on-multi-method satisfied?
-    {
-        [ classes>> [ classoid? ] all? ]
-        [
-            [ [ classes>> ] [ generic>> ] bi ?lookup-multi-method ]
-            [ multi-method>> ] bi eq?
-        ]
-    } 1&& ;

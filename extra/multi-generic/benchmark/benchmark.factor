@@ -26,10 +26,10 @@ SYMBOLS: thing1 thing2 ;
 ! multi-dispatch
 MGENERIC: md-beats? ( obj1 obj2 -- ? )
 
-MM:: md-beats? ( obj1: paper obj2: scissors -- ? ) obj1 obj2 2drop t ;
-MM:: md-beats? ( :scissors :rock -- ? ) t ;
-MM:: md-beats? ( :rock :paper -- ? ) t ;
-MM:: md-beats? ( :thing :thing -- ? ) f ;
+MM: md-beats? ( :paper :scissors -- ? ) 2drop t ;
+MM: md-beats? ( :scissors :rock -- ? )  2drop t ;
+MM: md-beats? ( :rock :paper -- ? )  2drop t ;
+MM: md-beats? ( :thing :thing -- ? )  2drop f ;
 
 
 ! multi-hook-dispatch
