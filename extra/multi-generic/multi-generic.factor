@@ -364,14 +364,14 @@ M: multi-method parent-word
 : method-word-name ( specializer generic -- string )
     [ name>> % " " % unparse % ] "" make ;
 
-: method-word-props ( described-effect specializer generic -- assoc )
+: method-word-props ( multi-method-effect specializer generic -- assoc )
     [
         "multi-generic" ,,
         "method-specializer" ,,
-        "described-effect" ,,
+        "multi-method-effect" ,,
     ] H{ } make ;
 
-: <method> ( described-effect specializer generic -- word )
+: <method> ( multi-method-effect specializer generic -- word )
     [ method-word-props ] 3keep nip
     method-word-name f <word>
     swap >>props ;
@@ -508,7 +508,7 @@ M: invalid-math-method-parameter summary
     ] with-definition ;
 
 : extract-locals ( method -- effect vars assoc )
-    "described-effect" word-prop
+    "multi-method-effect" word-prop
     dup in>> [ dup pair? [ first ] when ] map
     make-locals ;
 
@@ -550,7 +550,7 @@ M: multi-method forget*
 M: multi-method synopsis*
     dup definer.
     [ "multi-generic" word-prop pprint-word ]
-    [ "described-effect" word-prop pprint* ]
+    [ "multi-method-effect" word-prop pprint* ]
     bi ;
 
 SYNTAX: MM\
@@ -561,7 +561,7 @@ M: multi-method pprint*
     <block
     \ MM\ pprint-word
     [ "multi-generic" word-prop pprint-word ]
-    [ "described-effect" word-prop pprint* ]
+    [ "multi-method-effect" word-prop pprint* ]
     bi
     block> ;
 
@@ -875,7 +875,7 @@ PREDICATE: default-method < word "default" word-prop ;
 
 :: <single-default-method> ( generic dispatch-type -- method )
     f f <word> dup generic single-default-method-word-props >>props
-    dup "described-effect" word-prop generic method-word-name
+    dup "multi-method-effect" word-prop generic method-word-name
     swap name<<
     generic dispatch-type make-single-default-method
     [ define ] [ drop t "default" set-word-prop ] [ drop ] 2tri ;
@@ -1182,9 +1182,6 @@ M: not-in-a-multi-method-error summary
     dup next-multi-method-quot [
         call-next-multi-method-quot
     ] [ no-next-multi-method ] ?if ;
-
-
-! DEFER: add-next-multi-method-dependency
 
 \ (call-next-multi-method) [
     [ add-next-multi-method-dependency ]
