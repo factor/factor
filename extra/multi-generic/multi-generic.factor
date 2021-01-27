@@ -78,7 +78,20 @@ PREDICATE: math-class < class
     bi :> ( in out hooks )
     hooks [ in ] [ { "|" } in 3append ] if-empty out <effect> ;
 
+ERROR: separator-syntax-error effect ;
+
+M: separator-syntax-error error.
+    "Up to one separator “|” can be used before a stack effect."
+    print
+    effect>> pprint ;
+
+: separator-error? ( effect -- ? )
+    [ in>>  [ "|" = ] count 1 > ]
+    [ out>> [ "|" = ] count 0 > ]
+    bi or ;
+
 : parse-variable-effect ( effect -- effect' hooks )
+    dup separator-error? [ separator-syntax-error ] when
     [
         in>> { "|" } split1 [
             [
@@ -93,7 +106,8 @@ PREDICATE: math-class < class
     bi <effect> swap ;
 
 :: effect>specializer ( effect -- specializer )
-    effect parse-variable-effect :> ( eff vars )
+    effect dup separator-error? [ separator-syntax-error ] when
+    parse-variable-effect :> ( eff vars )
     eff in>> [
         dup array? [
             second dup effect? [ drop callable ] when
