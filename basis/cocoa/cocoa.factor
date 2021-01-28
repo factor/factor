@@ -13,7 +13,7 @@ sent-messages [ H{ } clone ] initialize
 
 SYNTAX: ->
     scan-token dup remember-send
-    [ lookup-method suffix! ] [ suffix! ] bi \ send suffix! ;
+    [ lookup-objc-method suffix! ] [ suffix! ] bi \ send suffix! ;
 
 SYNTAX: ?->
     dup last cache-stubs
@@ -33,7 +33,7 @@ super-sent-messages [ H{ } clone ] initialize
 
 SYNTAX: SUPER->
     scan-token dup remember-super-send
-    [ lookup-method suffix! ] [ suffix! ] bi \ super-send suffix! ;
+    [ lookup-objc-method suffix! ] [ suffix! ] bi \ super-send suffix! ;
 
 SYMBOL: frameworks
 
@@ -80,6 +80,7 @@ SYNTAX: IMPORT: scan-token [ ] import-objc-class ;
         "NSOpenPanel"
         "NSPanel"
         "NSPasteboard"
+        "NSPopover"
         "NSPropertyListSerialization"
         "NSResponder"
         "NSSavePanel"
