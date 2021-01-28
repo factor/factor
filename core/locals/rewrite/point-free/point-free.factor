@@ -1,8 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays fry kernel math quotations sequences
-words combinators make locals.backend locals.types
-locals.errors ;
+USING: accessors arrays combinators kernel locals.backend
+locals.errors locals.types make math quotations sequences words ;
 IN: locals.rewrite.point-free
 
 ! Step 3: rewrite locals usage within a single quotation into

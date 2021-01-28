@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs fry hashtables kernel math sequences vectors ;
+USING: assocs hashtables kernel math sequences vectors ;
 IN: sets
 
 ! Set protocol

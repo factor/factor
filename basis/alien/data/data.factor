@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.arrays alien.c-types alien.strings
 arrays byte-arrays combinators combinators.short-circuit
-cpu.architecture fry generalizations io io.streams.memory kernel
-libc locals macros math math.functions parser sequences
-stack-checker.dependencies summary words ;
+cpu.architecture generalizations io io.streams.memory kernel
+libc math parser sequences stack-checker.dependencies summary
+words ;
 IN: alien.data
 
 : <ref> ( value c-type -- c-ptr )

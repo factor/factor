@@ -1,10 +1,9 @@
 ! Copyright (c) 2007-2010 Slava Pestov, Doug Coleman, Aaron Schaefer, John Benediktsson.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays assocs binary-search classes.tuple
-combinators fry hints kernel kernel.private locals math
-math.functions math.order math.ranges namespaces sequences
-sequences.private sorting strings vectors ;
+USING: accessors arrays assocs classes.tuple combinators hints
+kernel kernel.private math math.functions math.order math.ranges
+sequences sequences.private sorting strings vectors ;
 IN: math.combinatorics
 
 <PRIVATE

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
 classes.algebra.private classes.maybe classes.private
-classes.tuple combinators continuations effects fry generic
+classes.tuple combinators continuations effects generic
 hash-sets hashtables io.pathnames io.styles kernel lists make
 math math.order math.parser namespaces prettyprint.config
 prettyprint.custom prettyprint.sections prettyprint.stylesheet
