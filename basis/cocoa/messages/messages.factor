@@ -67,11 +67,11 @@ objc-methods [ H{ } clone ] initialize
 
 ERROR: no-objc-method name ;
 
-: ?lookup-method ( selector -- signature/f )
+: ?lookup-objc-method ( name -- signature/f )
     objc-methods get at ;
 
-: lookup-method ( selector -- signature )
-    dup ?lookup-method [ ] [ no-objc-method ] ?if ;
+: lookup-objc-method ( name -- signature )
+    dup ?lookup-objc-method [ ] [ no-objc-method ] ?if ;
 
 MEMO: make-prepare-send ( selector signature super? -- quot )
     [
