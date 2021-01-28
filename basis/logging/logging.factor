@@ -1,11 +1,11 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: logging.server sequences namespaces concurrency.messaging
-words kernel arrays shuffle tools.annotations
-prettyprint.config prettyprint debugger io.streams.string
-splitting continuations effects generalizations parser strings
-quotations fry accessors math assocs math.order
-sequences.generalizations ;
+USING: accessors arrays assocs concurrency.messaging
+continuations debugger effects generalizations io.streams.string
+kernel math.order namespaces parser prettyprint
+prettyprint.config quotations sequences
+sequences.generalizations splitting strings tools.annotations
+vocabs words ;
 IN: logging
 
 SYMBOLS: DEBUG NOTICE WARNING ERROR CRITICAL ;

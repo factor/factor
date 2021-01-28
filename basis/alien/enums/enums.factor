@@ -1,8 +1,7 @@
 ! Copyright (C) 2010 Joe Groff, Erik Charlebois.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs classes.singleton
-combinators delegate fry kernel macros math parser sequences
-words ;
+combinators delegate kernel math parser sequences words ;
 IN: alien.enums
 
 <PRIVATE
