@@ -824,6 +824,10 @@ MM: method-inlining-2 ( :fixnum :fixnum -- z ) + ; inline
 [ { fixnum fixnum } declare method-inlining-2 ] optimized.
 [ { string fixnum } declare method-inlining-2 ] optimized.
 
+{ "12" 3 } [
+    "1" "2" method-inlining-2
+    1 2 method-inlining-2
+] unit-test
 
 MGENERIC: method-inlining-3 ( a b c -- z )
 MM: method-inlining-3 ( a b: string c: string -- z ) [ drop ] 2dip append ;
@@ -854,3 +858,29 @@ MM: method-inlining-3 ( a b c -- z ) 3drop "default" ;
 [ { string string } declare my-plus ] optimized.
 [ { character string } declare my-plus ] optimized.
 [ { character character } declare my-plus ] optimized.
+
+[ method-inlining-2 ] optimized.
+[ { string string } declare method-inlining-2 ] optimized.
+[ { fixnum fixnum } declare method-inlining-2 ] optimized.
+[ { string fixnum } declare method-inlining-2 ] optimized.
+
+
+USING: multi-generic kernel.private compiler.tree.debugger ;
+
+MGENERIC: partial-1 ( x y -- z ) partial-inline
+MM: partial-1 ( :string :string -- z ) append ;
+MM: partial-1 ( :fixnum :fixnum -- z ) fixnum+ ; inline
+MM: partial-1 ( x y -- z ) 2drop f ;
+
+[ partial-1 ] optimized.
+[ { string string } declare partial-1 ] optimized.
+[ { string } declare partial-1 ] optimized.
+[ { fixnum fixnum } declare partial-1 ] optimized.
+[ { fixnum } declare partial-1 ] optimized.
+
+SYMBOL: box1 "2" box1 set 
+SYMBOL: box2 2   box2 set 
+{ "12" 3 } [
+    "1" box1 get partial-1
+    1   box2 get partial-1
+] unit-test

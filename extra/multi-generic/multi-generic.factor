@@ -492,6 +492,13 @@ SYNTAX: MGENERIC: scan-new-word scan-effect
 
 SYNTAX: mathematical last-word make-mathematical ;
 
+: make-partial-inline ( word -- )
+    dup multi-generic? [
+        t "partial-inline" set-word-prop
+    ] [ drop ] if ;
+
+SYNTAX: partial-inline last-word make-partial-inline ;
+
 ERROR: invalid-math-method-parameter ;
 
 M: invalid-math-method-parameter summary

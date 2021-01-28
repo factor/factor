@@ -115,13 +115,35 @@ SYMBOL: history
         [ object = not ] map [ or ] 2map
     ] reduce ;
 
+! :: inlining-multi-dispatch-method ( #call word -- classes/f method/f )
+!     word "hooks" word-prop empty? [
+!         word methods :> word-methods
+!         word-methods empty? [ f f ] [
+!             word-methods first first length :> len1
+!             word-methods worst-literal-length :> len2
+!             #call in-d>> length len2 < [ f f ] [
+!                 len1 len2 - object <array>
+!                 #call in-d>> >array [ value-info class>> ] map
+!                 [ length dup len2 - swap ] keep subseq
+!                 append
+!                 word-methods spec-boolean-table [
+!                     [ drop object ] unless
+!                 ] 2map
+!                 dup word ?lookup-multi-method dup [ 2drop f f ] unless
+!             ] if
+!         ] if
+!     ] [ f f ] if ;
+
+
+USING: prettyprint effects ;
 :: inlining-multi-dispatch-method ( #call word -- classes/f method/f )
     word "hooks" word-prop empty? [
         word methods :> word-methods
         word-methods empty? [ f f ] [
             word-methods first first length :> len1
             word-methods worst-literal-length :> len2
-            #call in-d>> length len2 < [ f f ] [
+            #call in-d>> [ value-info class>> ] map [ object = ] reject length
+            len2 >= [
                 len1 len2 - object <array>
                 #call in-d>> >array [ value-info class>> ] map
                 [ length dup len2 - swap ] keep subseq
@@ -130,9 +152,29 @@ SYMBOL: history
                     [ drop object ] unless
                 ] 2map
                 dup word ?lookup-multi-method dup [ 2drop f f ] unless
+            ] [
+                ! partical inline
+                word "partial-inline" word-prop [
+                    #call in-d>> >array [ value-info class>> ] map :> spec
+                    word-methods [
+                        drop spec swap t [ [ drop object = ] [ class<= ] 2bi or and ] 2reduce
+                    ] assoc-filter [
+                        [
+                            spec [| c1 c2 |
+                                  c2 object = [ c1 ] [ object ] if
+                                 ] 2map
+                        ] dip
+                    ] assoc-map multi-generic:sort-methods prepare-methods drop
+                    dup empty? [ drop f f ] [
+                        word multi-dispatch-quot
+                        f ! spec reverse
+                        swap
+                    ] if
+                ] [ f f ] if
             ] if
         ] if
     ] [ f f ] if ;
+
 
 : multi-math-both-known? ( word left right -- ? )
     3dup math-op
@@ -149,7 +191,7 @@ SYMBOL: history
     [ value-info class>> normalize-math-class ] bi@
     3dup multi-math-both-known? [ multi-math-method* ] [ 3drop f ] if
     number swap [
-        ! Extended mathematical dispatch 
+        ! Extended mathematical dispatch
         drop #call word inlining-multi-dispatch-method
     ] unless* ;
 
