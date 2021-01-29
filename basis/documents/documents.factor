@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays fry kernel locals math math.order
-math.ranges models sequences splitting ;
+USING: accessors arrays kernel math math.order math.ranges
+models sequences splitting ;
 IN: documents
 
 : +col ( loc n -- newloc ) [ first2 ] dip + 2array ;

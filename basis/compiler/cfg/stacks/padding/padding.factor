@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs compiler.cfg.dataflow-analysis
 compiler.cfg.instructions compiler.cfg.linearization
-compiler.cfg.stacks.local fry kernel math math.order namespaces
+compiler.cfg.stacks.local kernel math math.order namespaces
 sequences ;
 QUALIFIED: sets
 IN: compiler.cfg.stacks.padding

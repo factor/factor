@@ -4,12 +4,12 @@ USING: accessors arrays assocs byte-arrays classes
 classes.builtin classes.private classes.tuple
 classes.tuple.private combinators combinators.short-circuit
 combinators.smart command-line compiler.codegen.relocation
-compiler.units fry generic generic.single.private grouping
+compiler.units generic generic.single.private grouping
 hashtables hashtables.private io io.binary io.encodings.binary
-io.files io.pathnames kernel kernel.private layouts locals make
-math math.order namespaces namespaces.private parser
-parser.notes prettyprint quotations sequences sequences.private
-source-files strings system vectors vocabs words ;
+io.files io.pathnames kernel kernel.private layouts make math
+math.order namespaces namespaces.private parser parser.notes
+prettyprint quotations sequences sequences.private source-files
+strings system vectors vocabs words ;
 IN: bootstrap.image
 
 : arch-name ( os cpu -- arch )

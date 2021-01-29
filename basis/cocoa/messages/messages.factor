@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs classes.struct cocoa.runtime cocoa.types
-combinators core-graphics.types fry generalizations
-io.encodings.utf8 kernel layouts libc locals macros make math
-memoize namespaces quotations sequences sets specialized-arrays
-splitting stack-checker strings words ;
+combinators core-graphics.types generalizations
+io.encodings.utf8 kernel layouts libc make math namespaces
+sequences sets specialized-arrays splitting stack-checker
+strings words ;
 QUALIFIED-WITH: alien.c-types c
 IN: cocoa.messages
 

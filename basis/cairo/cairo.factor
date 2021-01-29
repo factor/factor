@@ -1,9 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: colors fonts cairo.ffi alien alien.c-types kernel accessors
-sequences namespaces fry continuations destructors math images
-images.memory math.rectangles ;
+USING: accessors alien alien.c-types cairo.ffi colors images
+images.memory kernel math math.rectangles sequences ;
 IN: cairo
 
 ERROR: cairo-error n message ;

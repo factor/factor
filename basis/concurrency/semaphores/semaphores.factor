@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: dlists kernel threads math concurrency.conditions
-continuations accessors summary locals fry ;
+USING: accessors concurrency.conditions continuations dlists
+kernel math summary ;
 IN: concurrency.semaphores
 
 TUPLE: semaphore count threads ;
