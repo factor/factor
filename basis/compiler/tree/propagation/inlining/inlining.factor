@@ -3,10 +3,10 @@
 USING: accessors arrays assocs classes.algebra combinators
 combinators.short-circuit compiler.tree compiler.tree.builder
 compiler.tree.normalization compiler.tree.propagation.info
-compiler.tree.propagation.nodes compiler.tree.recursive generic
-generic.math generic.single generic.standard kernel locals math
-math.order math.partial-dispatch multi-generic namespaces
-quotations sequences words ;
+compiler.tree.propagation.nodes compiler.tree.recursive effects
+generic generic.math generic.single generic.standard kernel
+locals math math.order math.partial-dispatch multi-generic
+namespaces quotations sequences words ;
 IN: compiler.tree.propagation.inlining
 
 : splicing-call ( #call word -- nodes )
@@ -115,38 +115,21 @@ SYMBOL: history
         [ object = not ] map [ or ] 2map
     ] reduce ;
 
-! :: inlining-multi-dispatch-method ( #call word -- classes/f method/f )
-!     word "hooks" word-prop empty? [
-!         word methods :> word-methods
-!         word-methods empty? [ f f ] [
-!             word-methods first first length :> len1
-!             word-methods worst-literal-length :> len2
-!             #call in-d>> length len2 < [ f f ] [
-!                 len1 len2 - object <array>
-!                 #call in-d>> >array [ value-info class>> ] map
-!                 [ length dup len2 - swap ] keep subseq
-!                 append
-!                 word-methods spec-boolean-table [
-!                     [ drop object ] unless
-!                 ] 2map
-!                 dup word ?lookup-multi-method dup [ 2drop f f ] unless
-!             ] if
-!         ] if
-!     ] [ f f ] if ;
-
-
-USING: prettyprint effects ;
 :: inlining-multi-dispatch-method ( #call word -- classes/f method/f )
     word "hooks" word-prop empty? [
         word methods :> word-methods
+        #call in-d>> >array [ value-info class>> ] map
+        dup length :> stack-len
+        dup [ object = ] find-last [| classes i |
+            i object <array> 0 i classes replace-slice
+        ] [ drop ] if :> stack-info
         word-methods empty? [ f f ] [
             word-methods first first length :> len1
             word-methods worst-literal-length :> len2
-            #call in-d>> [ value-info class>> ] map [ object = ] reject length
-            len2 >= [
+            stack-info [ object = ] reject length len2 >= [
+                ! method inlining
                 len1 len2 - object <array>
-                #call in-d>> >array [ value-info class>> ] map
-                [ length dup len2 - swap ] keep subseq
+                stack-info [ length dup len2 - swap ] keep subseq
                 append
                 word-methods spec-boolean-table [
                     [ drop object ] unless
@@ -155,26 +138,24 @@ USING: prettyprint effects ;
             ] [
                 ! partical inline
                 word "partial-inline" word-prop [
-                    #call in-d>> >array [ value-info class>> ] map :> spec
-                    word-methods [
-                        drop spec swap t [ [ drop object = ] [ class<= ] 2bi or and ] 2reduce
+                    word-methods multi-generic:sort-methods [
+                        drop stack-info swap t [
+                            [ drop object = ] [ class<= ] 2bi or and
+                        ] 2reduce
                     ] assoc-filter [
                         [
-                            spec [| c1 c2 |
-                                  c2 object = [ c1 ] [ object ] if
-                                 ] 2map
+                            stack-info [| c1 c2 |
+                                c2 object = [ c1 ] [ object ] if
+                            ] 2map
                         ] dip
-                    ] assoc-map multi-generic:sort-methods prepare-methods drop
+                    ] assoc-map prepare-methods drop
                     dup empty? [ drop f f ] [
-                        word multi-dispatch-quot
-                        f ! spec reverse
-                        swap
+                        word multi-dispatch-quot f swap
                     ] if
                 ] [ f f ] if
             ] if
         ] if
     ] [ f f ] if ;
-
 
 : multi-math-both-known? ( word left right -- ? )
     3dup math-op
