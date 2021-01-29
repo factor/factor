@@ -499,6 +499,13 @@ SYNTAX: mathematical last-word make-mathematical ;
 
 SYNTAX: partial-inline last-word make-partial-inline ;
 
+ERROR: parameter-composition-mismatch ;
+
+M: parameter-composition-mismatch summary
+    drop
+    "The composition of the parameters must be the same as \
+that of the multi-generic word." ;
+
 ERROR: invalid-math-method-parameter ;
 
 M: invalid-math-method-parameter summary
@@ -506,6 +513,12 @@ M: invalid-math-method-parameter summary
     "Mathematical multi-method's parameters are two stack parameters." ;
 
 :: create-method-in ( effect specializer generic -- method )
+    effect parse-variable-effect :> ( method-effect method-hooks )
+    generic stack-effect method-effect [ in>> length ] bi@ =
+    generic "hooks" word-prop method-hooks [ length ] bi@ = and
+    generic stack-effect method-effect [ out>> length ] bi@ = and [
+        parameter-composition-mismatch
+    ] unless
     generic "mathematical" word-prop [
         specializer {
             [ t [ array? not and ] reduce ]
