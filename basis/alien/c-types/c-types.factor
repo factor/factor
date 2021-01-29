@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.accessors arrays classes combinators
-compiler.units cpu.architecture delegate fry kernel layouts macros
-math math.order math.parser quotations sequences summary system words
-words.symbol ;
+USING: accessors alien alien.accessors arrays classes
+combinators compiler.units cpu.architecture delegate kernel
+layouts math math.order math.parser quotations sequences summary
+system words words.symbol ;
 IN: alien.c-types
 
 SYMBOLS:
