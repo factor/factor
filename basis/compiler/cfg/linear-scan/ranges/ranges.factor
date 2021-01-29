@@ -1,4 +1,4 @@
-USING: accessors arrays fry grouping kernel math math.order sequences ;
+USING: arrays grouping kernel math math.order sequences ;
 IN: compiler.cfg.linear-scan.ranges
 
 ! Range utilities
