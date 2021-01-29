@@ -40,7 +40,7 @@ TUPLE: hash-set
 : reset-hash ( n hash -- )
     swap <hash-array> >>array init-hash ; inline
 
-: (new-key@) ( key array i probe# j -- array i j empty? )
+: (new-key@) ( array key i probe# j -- array i j empty? )
     [ 2dup swap array-nth ] 2dip pick tombstone?
     [
         rot +empty+ eq?
