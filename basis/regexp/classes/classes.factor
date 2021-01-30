@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators
-combinators.short-circuit combinators.smart fry kernel locals
-math math.order sequences sets unicode unicode.data ;
+combinators.short-circuit combinators.smart kernel math
+math.order sequences sets unicode unicode.data ;
 FROM: ascii => ascii? ;
 IN: regexp.classes
 

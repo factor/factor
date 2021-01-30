@@ -1,6 +1,5 @@
-USING: calendar namespaces alien.c-types system
-windows.kernel32 kernel math combinators windows.errors
-accessors classes.struct calendar.format math.functions ;
+USING: accessors calendar classes.struct combinators kernel math
+math.functions system windows.errors windows.kernel32 ;
 IN: calendar.windows
 
 : timestamp>SYSTEMTIME ( timestamp -- SYSTEMTIME )

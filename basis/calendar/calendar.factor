@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.tuple combinators
 combinators.short-circuit kernel literals math math.functions
-math.intervals math.order math.parser math.statistics sequences
-slots.syntax splitting system vocabs vocabs.loader ;
+math.intervals math.order math.statistics sequences slots.syntax
+system vocabs vocabs.loader ;
 FROM: math.ranges => [a..b) ;
 IN: calendar
 
