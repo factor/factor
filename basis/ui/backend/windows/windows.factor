@@ -1,16 +1,17 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! Portions copyright (C) 2007, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.data alien.strings arrays ascii assocs
-calendar classes classes.struct colors combinators continuations fry
-io io.crlf io.encodings.utf16n kernel libc literals locals make math
-math.bitwise namespaces sequences sets specialized-arrays strings
-threads ui ui.backend ui.clipboards ui.event-loop ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.gestures ui.pixel-formats
-ui.private windows.dwmapi windows.errors windows.gdi32
-windows.kernel32 windows.messages windows.offscreen windows.opengl32
-windows.types windows.user32 assocs.extras byte-arrays
-io.encodings.string ;
+USING: accessors alien alien.c-types alien.data alien.strings
+arrays ascii assocs assocs.extras byte-arrays calendar classes
+classes.struct colors combinators continuations io io.crlf
+io.encodings.string io.encodings.utf16n io.encodings.utf8 kernel
+libc literals make math math.bitwise namespaces sequences sets
+specialized-arrays strings threads ui ui.backend ui.clipboards
+ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.gestures ui.pixel-formats ui.private windows.dwmapi
+windows.errors windows.gdi32 windows.kernel32 windows.messages
+windows.offscreen windows.opengl32 windows.shell32 windows.types
+windows.user32 ;
 FROM: unicode => upper-surrogate? under-surrogate? ;
 SPECIALIZED-ARRAY: POINT
 QUALIFIED-WITH: alien.c-types c
@@ -798,6 +799,27 @@ CONSTANT: fullscreen-flags flags{ WS_CAPTION WS_BORDER WS_THICKFRAME }
         ]
         [ drop SW_RESTORE ShowWindow win32-error=0/f ]
     } 2cleave ;
+
+: ensure-null-terminated ( str -- str' )
+    dup ?last 0 = [ "\0" append ] unless ; inline
+
+: add-tray-icon ( title -- )
+    NIM_ADD
+    NOTIFYICONDATA <struct>
+        NOTIFYICONDATA heap-size >>cbSize
+        NOTIFYICON_VERSION_4 over timeout-version>> uVersion<<
+        NIF_TIP NIF_ICON bitor >>uFlags
+        world get handle>> hWnd>> >>hWnd
+        f GetModuleHandle "APPICON" native-string>alien LoadIcon >>hIcon
+        rot ensure-null-terminated utf8 encode >>szTip
+        Shell_NotifyIcon win32-error=0/f ;
+
+: remove-tray-icon ( -- )
+    NIM_DELETE
+    NOTIFYICONDATA <struct>
+        NOTIFYICONDATA heap-size >>cbSize
+        world get handle>> hWnd>> >>hWnd
+    Shell_NotifyIcon win32-error=0/f ;
 
 M: windows-ui-backend (set-fullscreen)
     [ enter-fullscreen ] [ exit-fullscreen ] if ;
