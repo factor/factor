@@ -1,8 +1,9 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays binary-search combinators concurrency.flags
-deques fry kernel locals make math math.order math.rectangles
-math.vectors models namespaces sequences threads vectors ;
+USING: accessors arrays binary-search combinators
+concurrency.flags deques kernel make math math.order
+math.rectangles math.vectors models namespaces sequences threads
+vectors vocabs.loader ;
 IN: ui.gadgets
 
 ! Values for orientation slot
