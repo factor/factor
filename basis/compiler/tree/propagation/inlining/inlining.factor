@@ -138,19 +138,27 @@ SYMBOL: history
             ] [
                 ! partical inline
                 word "partial-inline" word-prop [
-                    word-methods multi-generic:sort-methods [
-                        drop stack-info swap t [
-                            [ drop object = ] [ class<= ] 2bi or and
-                        ] 2reduce
-                    ] assoc-filter [
-                        [
-                            stack-info [| c1 c2 |
-                                c2 object = [ c1 ] [ object ] if
-                            ] 2map
-                        ] dip
-                    ] assoc-map prepare-methods drop
-                    dup empty? [ drop f f ] [
-                        word multi-dispatch-quot f swap
+                    stack-info [ object = ] all? [ f f ] [
+                        word-methods
+                        word multi-math-generic? [
+                            [
+                                drop first2 [ multi-generic:math-class? ] both?
+                            ] assoc-reject
+                        ] when
+                        multi-generic:sort-methods [
+                            drop stack-info swap t [
+                                [ drop object = ] [ class<= ] 2bi or and
+                            ] 2reduce
+                        ] assoc-filter [
+                            [
+                                stack-info [| c1 c2 |
+                                    c2 object = [ c1 ] [ object ] if
+                                ] 2map
+                            ] dip
+                        ] assoc-map prepare-methods drop
+                        dup empty? [ drop f f ] [
+                            word multi-dispatch-quot f swap
+                        ] if
                     ] if
                 ] [ f f ] if
             ] if
