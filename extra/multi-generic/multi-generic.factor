@@ -470,7 +470,30 @@ M: no-method error.
     [ "method-specializer" word-prop ]
     [ "multi-generic" word-prop ] bi prefix ;
 
+
+! M: multi-generic subwords
+!    [
+!        "multi-methods" word-prop values %
+!    ] { } make ;
+
+! M: multi-generic (reset) subwords [ (reset) ] each ;
+
+! : reset-multi-generic ( word -- )
+!     [ subwords forget-all ]
+!     [ reset-word ]
+!     [
+!         f >>pic-def f >>pic-tail-def
+!         {
+!             "multi-methods"
+!             "hooks"
+!             "dispatch-type"
+!             "mathematical"
+!             "patial-inline"
+!         } remove-word-props
+!     ] tri ;
+
 : define-generic ( word effect hooks -- )
+!    pick reset-multi-generic
     [ over swap set-stack-effect ] dip
     over swap "hooks" set-word-prop
     dup "multi-methods" word-prop [ drop ] [
