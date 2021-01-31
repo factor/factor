@@ -75,15 +75,23 @@ SINGLETONS: command data ;
         computer-name "computer-name" ,,
         os unparse "os" ,,
         os-version "os-version" ,,
-        username "username" ,,
         cell-bits "cell-bits" ,,
-        physical-mem "physical-mem" ,,
+        username "username" ,,
+
         build "build" ,,
-        vm-path "vm-path" ,,
-        vm-path file-info size>> "vm-size" ,,
         vm-git-id "git-id" ,,
         version-info "version-info" ,,
+        vm-path "vm-path" ,,
+        vm-path file-info size>> "vm-size" ,,
+        image-path "image-path" ,,
         image-path file-info size>> "image-size" ,,
+
+        cpus "cpus" ,,
+        cpu-mhz "cpu-mhz" ,,
+        physical-mem "physical-mem" ,,
+        vm-path file-system-info
+        [ total-space>> "disk-total-size" ,, ]
+        [ free-space>> "disk-free-size" ,, ] bi
     ] { } make ;
 
 : send-loop ( broadcast-server -- )
