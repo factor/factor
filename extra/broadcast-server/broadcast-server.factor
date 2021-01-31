@@ -75,7 +75,7 @@ SINGLETONS: command data ;
         computer-name "computer-name" ,,
         os unparse "os" ,,
         os-version "os-version" ,,
-        cpu "cpu" ,,
+        cpu unparse "cpu" ,,
         cell-bits "cell-bits" ,,
         username "username" ,,
 
