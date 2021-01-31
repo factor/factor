@@ -82,51 +82,51 @@ TYPEDEF: GUID NET_IF_NETWORK_GUID
 
 ENUM: IP_DAD_STATE
   IpDadStateInvalid
-  IpDadStateTentative,
-  IpDadStateDuplicate,
-  IpDadStateDeprecated,
+  IpDadStateTentative
+  IpDadStateDuplicate
+  IpDadStateDeprecated
   IpDadStatePreferred ;
 
 ENUM: IP_PREFIX_ORIGIN
-    IpPrefixOriginOther,
-    IpPrefixOriginManual,
-    IpPrefixOriginWellKnown,
-    IpPrefixOriginDhcp,
-    IpPrefixOriginRouterAdvertisement,
+    IpPrefixOriginOther
+    IpPrefixOriginManual
+    IpPrefixOriginWellKnown
+    IpPrefixOriginDhcp
+    IpPrefixOriginRouterAdvertisement
     { IpPrefixOriginUnchanged 16 } ;
 
 ENUM: IP_SUFFIX_ORIGIN
     IpSuffixOriginOther
-    IpSuffixOriginManual,
-    IpSuffixOriginWellKnown,
-    IpSuffixOriginDhcp,
-    IpSuffixOriginLinkLayerAddress,
-    IpSuffixOriginRandom,
+    IpSuffixOriginManual
+    IpSuffixOriginWellKnown
+    IpSuffixOriginDhcp
+    IpSuffixOriginLinkLayerAddress
+    IpSuffixOriginRandom
     { IpSuffixOriginUnchanged 16 } ;
 
 ENUM: IF_OPER_STATUS
     { IfOperStatusUp 1 }
-    IfOperStatusDown,
-    IfOperStatusTesting,
-    IfOperStatusUnknown,
-    IfOperStatusDormant,
-    IfOperStatusNotPresent,
+    IfOperStatusDown
+    IfOperStatusTesting
+    IfOperStatusUnknown
+    IfOperStatusDormant
+    IfOperStatusNotPresent
     IfOperStatusLowerLayerDown ;
 
 ENUM: NET_IF_CONNECTION_TYPE
     { NET_IF_CONNECTION_DEDICATED 1 }
-    NET_IF_CONNECTION_PASSIVE,
-    NET_IF_CONNECTION_DEMAND,
+    NET_IF_CONNECTION_PASSIVE
+    NET_IF_CONNECTION_DEMAND
     NET_IF_CONNECTION_MAXIMUM ;
 
 
 ENUM: TUNNEL_TYPE
-    TUNNEL_TYPE_NONE,
-    TUNNEL_TYPE_OTHER,
-    TUNNEL_TYPE_DIRECT,
-    TUNNEL_TYPE_6TO4,
-    TUNNEL_TYPE_ISATAP,
-    TUNNEL_TYPE_TEREDO,
+    TUNNEL_TYPE_NONE
+    TUNNEL_TYPE_OTHER
+    TUNNEL_TYPE_DIRECT
+    TUNNEL_TYPE_6TO4
+    TUNNEL_TYPE_ISATAP
+    TUNNEL_TYPE_TEREDO
     TUNNEL_TYPE_IPHTTPS ;
 
 
