@@ -101,7 +101,7 @@ M: windows computer-name
     [ <byte-array> dup ] keep uint <ref>
     GetComputerName win32-error=0/f alien>native-string ;
 
-: username ( -- string )
+M: windows username ( -- string )
     UNLEN 1 +
     [ <byte-array> dup ] keep uint <ref>
     GetUserName win32-error=0/f alien>native-string ;
