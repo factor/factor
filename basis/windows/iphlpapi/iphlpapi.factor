@@ -385,6 +385,28 @@ FUNCTION: DWORD GetAdaptersInfo (
 
 FUNCTION: DWORD GetNetworkParams ( PFIXED_INFO pFixedInfo, PULONG pOutBufLen )
 
+ENUM: TCP_TABLE_CLASS
+    TCP_TABLE_BASIC_LISTENER
+    TCP_TABLE_BASIC_CONNECTIONS
+    TCP_TABLE_BASIC_ALL
+    TCP_TABLE_OWNER_PID_LISTENER
+    TCP_TABLE_OWNER_PID_CONNECTIONS
+    TCP_TABLE_OWNER_PID_ALL
+    TCP_TABLE_OWNER_MODULE_LISTENER
+    TCP_TABLE_OWNER_MODULE_CONNECTIONS
+    TCP_TABLE_OWNER_MODULE_ALL ;
+TYPEDEF: TCP_TABLE_CLASS* PTCP_TABLE_CLASS
+
+FUNCTION: DWORD GetExtendedTcpTable (
+    PVOID           pTcpTable,
+    PDWORD          pdwSize,
+    BOOL            bOrder,
+    ULONG           ulAf,
+    TCP_TABLE_CLASS TableClass,
+    ULONG           Reserved
+)
+
+
 : get-fixed-info ( -- FIXED_INFO )
     FIXED_INFO <struct> dup byte-length ulong <ref>
     [ GetNetworkParams n>win32-error-check ] keepd ;
