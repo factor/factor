@@ -254,7 +254,7 @@ HELP: broadcast-once
         ""
     }
     "Receive a datagram on port 7777:"
-    { $example "USING: destructors kernel io.sockets ;"
+    { $unchecked-example "USING: destructors kernel io.sockets ;"
         "f 7777 <inet4> <datagram> [ receive ] [ dispose ] bi"
         ""
     }
