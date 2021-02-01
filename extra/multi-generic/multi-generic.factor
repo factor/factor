@@ -10,7 +10,7 @@ math.private namespaces parser prettyprint prettyprint.backend
 prettyprint.custom prettyprint.sections quotations see sequences
 sequences.generalizations sets shuffle sorting splitting
 stack-checker.dependencies stack-checker.transforms summary
-vectors words words.symbol ;
+typed vectors words words.symbol ;
 FROM: namespaces => set ;
 FROM: generic.parser => current-method with-method-definition ;
 QUALIFIED-WITH: generic.single.private gsp
@@ -360,7 +360,25 @@ SYMBOL: second-math-dispatch
                 multi-dispatch-quot %
             ] [ ] make generic swap define
         ] if
-    ] if ;
+    ] if
+    ! ! typed
+    ! generic stack-effect :> effect
+    ! effect [ in>> ] [ out>> ] bi [
+    !     f [ array? or ] reduce
+    ! ] bi@ or [
+    !     generic generic def>> effect define-typed
+    ! ] when
+
+    generic methods dup empty? [ drop ] [
+        values t [
+            "multi-method-effect" word-prop
+            out>> [ dup array? [ second ] [ drop object ] if ] map
+            over t = [ nip ] [ dup swap = not [ drop f ] when ] if
+        ] reduce [
+            \ declare 2array >quotation generic def>> prepend generic def<<
+        ] when*
+    ] if
+ ;
 
 : update-generic ( word -- )
     make-generic ;
@@ -580,10 +598,17 @@ M: invalid-math-method-parameter summary
         ] with-method-definition
     ] with-definition ;
 
-SYNTAX: MM: (MM:) define ;
+: define-typed-method ( method def -- )
+    over "multi-method-effect" word-prop parse-variable-effect drop
+    dup out>> f [ array? or ] reduce [
+        [ in>> [ dup array? [ first ] when ] map ]
+        [ out>> ]
+        bi <effect> define-typed
+    ] [ drop define ] if ;
 
-SYNTAX: MM:: (MM::) define ;
+SYNTAX: MM: (MM:) define-typed-method ;
 
+SYNTAX: MM:: (MM::) define-typed-method ;
 
 ! Definition protocol. We qualify core generics here
 

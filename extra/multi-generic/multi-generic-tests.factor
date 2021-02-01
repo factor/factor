@@ -41,10 +41,10 @@ SYMBOLS: thing1 thing2 ;
 ! multi-dispatch
 MGENERIC: md-beats? ( obj1 obj2 -- ? )
 
-MM:: md-beats? ( obj1: paper obj2: scissors -- ? ) obj1 obj2 2drop t ;
-MM:: md-beats? ( :scissors :rock -- ? ) t ;
-MM:: md-beats? ( :rock :paper -- ? ) t ;
-MM:: md-beats? ( :thing :thing -- ? ) f ;
+MM:: md-beats? ( obj1: paper obj2: scissors -- ?: boolean ) obj1 obj2 2drop t ;
+MM:: md-beats? ( :scissors :rock -- ?: boolean ) t ;
+MM:: md-beats? ( :rock :paper -- ?: boolean ) t ;
+MM:: md-beats? ( :thing :thing -- ?: boolean ) f ;
 
 
 { f t f  f f t  t f f } [
@@ -227,7 +227,7 @@ MM: hook-beats-stack? ( thing1: thing    | :thing :thing -- ? )
 ] unit-test
 
 
-MGENERIC: hook-beats-stack?-2 ( thing1 thing2 | a: thing1 b: thing2 -- ? )
+MGENERIC: hook-beats-stack?-2 ( thing1 thing2 | a: thing b: thing -- ? )
 
 MM: hook-beats-stack?-2 ( thing1: paper thing2: paper | a: rock b: rock -- ? )
     2drop t ;
@@ -801,7 +801,7 @@ gc
     ] times
 ] benchmark
 [ 1.0e9 / ] [ ref get / ] bi
-"single spec multi-dispatch: %.6f　seconds (%.2f times slower)\n" printf
+"single spec multi-dispatch: %.6f seconds (%.2f times slower)\n" printf
 
 USING: kernel.private compiler.tree.debugger ;
 
@@ -865,7 +865,7 @@ MM: method-inlining-3 ( a b c -- z ) 3drop "default" ;
 [ { string fixnum } declare method-inlining-2 ] optimized.
 
 
-USING: multi-generic kernel.private compiler.tree.debugger ;
+! USING: multi-generic kernel.private compiler.tree.debugger ;
 
 MGENERIC: partial-1 ( x y -- z ) partial-inline
 MM: partial-1 ( :string :string -- z ) append ;
@@ -878,9 +878,20 @@ MM: partial-1 ( x y -- z ) 2drop f ;
 [ { fixnum fixnum } declare partial-1 ] optimized.
 [ { fixnum } declare partial-1 ] optimized.
 
-SYMBOL: box1 "2" box1 set 
-SYMBOL: box2 2   box2 set 
+SYMBOL: box1 "2" box1 set
+SYMBOL: box2 2   box2 set
 { "12" 3 } [
     "1" box1 get partial-1
     1   box2 get partial-1
 ] unit-test
+
+MGENERIC: test2 ( a b -- c )
+MM: test2 ( :fixnum b -- c ) 2drop 1 ;
+MM: test2 ( :integer b -- c ) 2drop 2 ;
+MM: test2 ( a :array -- c ) 2drop "3" ;
+
+MGENERIC: partial+ ( a b -- c ) mathematical partial-inline
+MM: partial+ ( :fixnum :fixnum -- c: fixnum ) fixnum+ ;
+MM: partial+ ( :bignum :bignum -- c: bignum ) bignum+ ;
+MM: partial+ ( :string :string -- c: string ) append ;
+MM: partial+ ( :integer :string -- c: string ) "int+" nip swap append ;

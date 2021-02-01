@@ -32,6 +32,15 @@ MM: md-beats? ( :rock :paper -- ? )  2drop t ;
 MM: md-beats? ( :thing :thing -- ? )  2drop f ;
 
 
+! typed multi-dispatch
+MGENERIC: md-beats2? ( obj1 obj2 -- ? )
+
+MM: md-beats2? ( :paper :scissors -- :boolean ) 2drop t ;
+MM: md-beats2? ( :scissors :rock -- :boolean )  2drop t ;
+MM: md-beats2? ( :rock :paper -- :boolean )  2drop t ;
+MM: md-beats2? ( :thing :thing -- :boolean )  2drop f ;
+
+
 ! multi-hook-dispatch
 MGENERIC: mhd-beats? ( thing1 thing2 | -- ? )
 
@@ -290,6 +299,25 @@ SYMBOL: ref
     gc
     [
         TIMES [
+            paper paper       md-beats2? drop
+            paper scissors    md-beats2? drop
+            paper rock        md-beats2? drop
+
+            scissors paper    md-beats2? drop
+            scissors scissors md-beats2? drop
+            scissors rock     md-beats2? drop
+
+            rock paper        md-beats2? drop
+            rock scissors     md-beats2? drop
+            rock rock         md-beats2? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "multi-dispatch (typed):     %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        TIMES [
             paper paper       smd-beats? drop
             paper scissors    smd-beats? drop
             paper rock        smd-beats? drop
@@ -483,4 +511,61 @@ SYMBOL: ref
     [ 1.0e9 / ] [ ref get / ] bi
     "single spec multi-dispatch: %.6f seconds (%.2f times slower)\n" printf
 ;
+
+USE: strings
+
+! MGENERIC: partial-test ( x y -- z ) partial-inline
+! MM: partial-test ( :string :string -- z ) append ;
+! MM: partial-test ( :fixnum :fixnum -- z ) + ; inline
+! MM: partial-test ( :fixnum :string -- z ) nip "num+" swap append ;
+! MM: partial-test ( x y -- z ) 2drop f ;
+
+! : partial-test-1 ( x y -- z )      partial-test ;
+! : partial-test-2 ( y -- z )    "2" partial-test ;
+! : partial-test-3 ( -- z )  "1" "2" partial-test ;
+
+USE: math.private
+MGENERIC: partial+ ( a b -- c ) mathematical partial-inline inline
+MM: partial+ ( :fixnum :fixnum -- c ) fixnum+ ;
+MM: partial+ ( :bignum :bignum -- c ) bignum+ ;
+MM: partial+ ( :string :string -- c ) append ;
+MM: partial+ ( :integer :string -- c ) nip "int+" swap append ;
+
+: math-partial-test-1 ( x y -- z )         partial+ ;
+: math-partial-test-2 (   y -- z )      2  partial+ ;
+: math-partial-test-3 (     -- z )  1   2  partial+ ;
+: math-partial-test-4 (   y -- z )     "2" partial+ ;
+: math-partial-test-5 (     -- z ) "1" "2" partial+ ;
+
+USING: multi-generic math math.private typed ;
+
+TYPED: add-floats ( a: float b: float -- c: float ) float+ ;
+: add-somethings ( a b -- c ) + ; inline foldable flushable
+: add-floats2 ( a b -- c ) float+ ;
+
+MGENERIC: partial-test ( x y -- z ) partial-inline ! It is not specified "mathematical".
+MM: partial-test ( :string :string -- z: string ) append ;
+MM: partial-test ( :fixnum :fixnum -- z: fixnum ) fixnum+ ;
+MM: partial-test ( :float :float -- z: float ) float+ ;
+MM: partial-test ( :fixnum :float -- z: float ) [ >float ] dip float+ ;
+MM: partial-test ( x y -- z: float  ) 2drop 0.0 ;
+
+MGENERIC: float+float ( a b -- c )
+MM: float+float ( a: float b: float -- c: float ) float+ ;
+MM: float+float ( a: fixnum b: fixnum -- c: float ) fixnum+ >float ;
+
+MGENERIC: float+float2 ( a b -- c )
+MM: float+float2 ( a: float b: float -- c ) float+ ;
+MM: float+float2 ( a: fixnum b: fixnum -- c ) fixnum+ >float ;
+
+: partial-test-1 ( x -- z ) 2.0 3.0 + partial-test ;
+: partial-test-2 ( x -- z ) 2.0 3.0 add-floats partial-test ;
+: partial-test-3 ( x -- z ) 2.0 3.0 add-somethings partial-test ;
+: partial-test-4 ( x -- z ) 2.0 3.0 add-floats2 partial-test ;
+: partial-test-5 ( x -- z ) 2.0 3.0 float+float partial-test ;
+: partial-test-6 ( x -- z ) 2.0 3.0 float+float2 partial-test ;
+: partial-test-7 ( x -- z ) 2.0 float+float 3.0 partial-test ;
+: partial-test-8 ( x -- z ) 2.0 float+float2 3.0 partial-test ;
+
+
 
