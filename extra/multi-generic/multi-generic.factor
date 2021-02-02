@@ -375,7 +375,9 @@ SYMBOL: second-math-dispatch
             out>> [ dup array? [ second ] [ drop object ] if ] map
             over t = [ nip ] [ dup swap = not [ drop f ] when ] if
         ] reduce [
-            \ declare 2array >quotation generic def>> prepend generic def<<
+            dup [ object = ] all? [ drop ] [
+                \ declare 2array >quotation generic def>> prepend generic def<<
+            ] if
         ] when*
     ] if
  ;

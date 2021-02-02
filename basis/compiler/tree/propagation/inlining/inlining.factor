@@ -5,8 +5,8 @@ combinators.short-circuit compiler.tree compiler.tree.builder
 compiler.tree.normalization compiler.tree.propagation.info
 compiler.tree.propagation.nodes compiler.tree.recursive effects
 generic generic.math generic.single generic.standard kernel
-locals math math.order math.partial-dispatch multi-generic
-namespaces quotations sequences words ;
+kernel.private locals math math.order math.partial-dispatch
+multi-generic namespaces quotations sequences words ;
 IN: compiler.tree.propagation.inlining
 
 : splicing-call ( #call word -- nodes )
@@ -115,10 +115,11 @@ SYMBOL: history
         [ object = not ] map [ or ] 2map
     ] reduce ;
 
+USE: prettyprint
 :: inlining-multi-dispatch-method ( #call word -- classes/f method/f )
     word "hooks" word-prop empty? [
         word methods :> word-methods
-        #call in-d>> >array [ value-info class>> ] map
+        #call in-d>> >array [ value-info class>> ] map ! dup .
         dup length :> stack-len
         dup [ object = ] find-last [| classes i |
             i object <array> 0 i classes replace-slice
@@ -157,7 +158,20 @@ SYMBOL: history
                             ] dip
                         ] assoc-map prepare-methods drop
                         dup empty? [ drop f f ] [
-                            word multi-dispatch-quot f swap
+                            word multi-dispatch-quot
+                            ! declare output classes
+                            word methods dup empty? [ drop ] [
+                                values t [
+                                    "multi-method-effect" word-prop
+                                    out>> [ dup array? [ second ] [ drop object ] if ] map
+                                    over t = [ nip ] [ dup swap = not [ drop f ] when ] if
+                                ] reduce [
+                                    dup [ object = ] all? [ drop ] [
+                                        \ declare 2array >quotation append
+                                    ] if
+                                ] when*
+                            ] if
+                            f swap
                         ] if
                     ] if
                 ] [ f f ] if
