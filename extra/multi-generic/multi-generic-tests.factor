@@ -496,14 +496,14 @@ TUPLE: test-tuple3 < test-tuple2 ;
 
 MGENERIC: next-method-test ( class -- who-i-am )
 
-MM: next-method-test ( class: test-tuple1 -- who-i-am )
-    drop "test-tuple1" ;
+MM: next-method-test ( class: test-tuple3 -- who-i-am )
+    call-next-multi-method "a nice subclass of " prepend ;
 
 MM: next-method-test ( class: test-tuple2 -- who-i-am )
     call-next-multi-method "a cool subclass of " prepend ;
 
-MM: next-method-test ( class: test-tuple3 -- who-i-am )
-    call-next-multi-method "a nice subclass of " prepend ;
+MM: next-method-test ( class: test-tuple1 -- who-i-am )
+    drop "test-tuple1" ;
 
 {
     "test-tuple1"

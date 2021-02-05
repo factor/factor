@@ -10,7 +10,8 @@ math.private namespaces parser prettyprint prettyprint.backend
 prettyprint.custom prettyprint.sections quotations see sequences
 sequences.generalizations sets shuffle sorting splitting
 stack-checker.dependencies stack-checker.transforms summary
-typed vectors words words.symbol ;
+tools.annotations tools.annotations.private typed vectors words
+words.symbol ;
 FROM: namespaces => set ;
 FROM: generic.parser => current-method with-method-definition ;
 QUALIFIED-WITH: generic.single.private gsp
@@ -282,14 +283,14 @@ ERROR: check-method-error class generic ;
         check-method-error
     ] unless ; inline
 
-: remake-single-generic ( generic -- )
-    outdated-generics get add-to-unit ;
+: remake-multi-generic ( generic -- )
+    outdated-multi-generics get add-to-unit ;
 
 DEFER: make-generic
 
-: remake-single-generics ( -- )
-    outdated-generics get members [ non-multi-generic? ] filter
-    [ make-single-generic ] each ;
+: remake-multi-generics ( -- )
+    outdated-multi-generics get members [ multi-generic? ] filter
+    [ make-generic ] each ;
 
 :: ?single-generic-spec ( generic -- n/var/f )
     generic methods specializers :> ( stack-specs hook-specs )
@@ -301,9 +302,9 @@ DEFER: make-generic
         ] [ f ] if
     ] if ;
 
-: update-single-generic ( class generic -- )
-    [ changed-call-sites ] [ remake-single-generic drop ]
-    [ changed-conditionally drop ] 2tri ;
+! : update-single-generic ( class generic -- )
+!     [ changed-call-sites ] [ remake-single-generic drop ]
+!     [ changed-conditionally drop ] 2tri ;
 
 DEFER: define-single-default-method
 
@@ -431,15 +432,15 @@ M: anonymous-intersection implementor-classes participants>> ;
         swap implementor-classes [ implementors-map get at ] map
     ] dip call ; inline
 
-: with-single-methods ( class generic quot -- )
-    [ "dispatch-type" word-prop methods>> ] prepose
-    [ update-single-generic ]
-    2bi ; inline
+! : with-single-methods ( class generic quot -- )
+!     [ "dispatch-type" word-prop methods>> ] prepose
+!     [ update-single-generic ]
+!     2bi ; inline
 
-: reveal-single-method ( method classes generic -- )
-    [ [ [ adjoin ] with each ] with-implementors ]
-    [ [ set-at ] with-single-methods ]
-    2bi ;
+! : reveal-single-method ( method classes generic -- )
+!     [ [ [ adjoin ] with each ] with-implementors ]
+!     [ [ set-at ] with-single-methods ]
+!     2bi ;
 
 : reveal-method ( method classes generic -- )
     [ set-at ] with-methods ;
@@ -496,24 +497,22 @@ M: no-method error.
 !        "multi-methods" word-prop values %
 !    ] { } make ;
 
-! M: multi-generic (reset) subwords [ (reset) ] each ;
-
-! : reset-multi-generic ( word -- )
-!     [ subwords forget-all ]
-!     [ reset-word ]
-!     [
-!         f >>pic-def f >>pic-tail-def
-!         {
-!             "multi-methods"
-!             "hooks"
-!             "dispatch-type"
-!             "mathematical"
-!             "patial-inline"
-!         } remove-word-props
-!     ] tri ;
+: reset-multi-generic ( word -- )
+    [ "multi-methods" word-prop values forget-all ]
+    [ reset-word ]
+    [
+        f >>pic-def f >>pic-tail-def
+        {
+            "multi-methods"
+            "hooks"
+            "dispatch-type"
+            "mathematical"
+            "patial-inline"
+        } remove-word-props
+    ] tri ;
 
 : define-generic ( word effect hooks -- )
-!    pick reset-multi-generic
+    ! pick reset-multi-generic
     [ over swap set-stack-effect ] dip
     over swap "hooks" set-word-prop
     dup "multi-methods" word-prop [ drop ] [
@@ -967,20 +966,20 @@ PREDICATE: default-method < word "default" word-prop ;
 : define-single-default-method ( generic dispatch -- )
     dupd <single-default-method> "default-method" set-word-prop ;
 
-: define-single-generic ( word dispatch effect -- )
-    [ [ check-dispatch-effect ] keep set-stack-effect ]
-    [
-        drop
-        2dup [ "dispatch-type" word-prop ] dip = [ 2drop ] [
-            {
-                [ drop reset-generic ]
-                [ "dispatch-type" set-word-prop ]
-                [ drop H{ } clone swap "dispatch-type" word-prop methods<< ]
-                [ define-single-default-method ]
-            }
-            2cleave
-        ] if ]
-    [ 2drop remake-single-generic ] 3tri ;
+! : define-single-generic ( word dispatch effect -- )
+!     [ [ check-dispatch-effect ] keep set-stack-effect ]
+!     [
+!         drop
+!         2dup [ "dispatch-type" word-prop ] dip = [ 2drop ] [
+!             {
+!                 [ drop reset-generic ]
+!                 [ "dispatch-type" set-word-prop ]
+!                 [ drop H{ } clone swap "dispatch-type" word-prop methods<< ]
+!                 [ define-single-default-method ]
+!             }
+!             2cleave
+!         ] if ]
+!     [ 2drop remake-single-generic ] 3tri ;
 
 
 ! ! ! standard ! ! ! !
@@ -994,11 +993,11 @@ PREDICATE: multi-standard-generic < multi-generic
 PREDICATE: multi-simple-generic < multi-standard-generic
     "dispatch-type" word-prop #>> 0 = ;
 
-CONSTANT: single-simple-dispatch
-    T{ single-standard-dispatch f 0 }
+! CONSTANT: single-simple-dispatch
+!     T{ single-standard-dispatch f 0 }
 
-: define-multi-simple-generic ( word effect -- )
-    [ single-simple-dispatch ] dip define-single-generic ;
+! : define-multi-simple-generic ( word effect -- )
+!     [ single-simple-dispatch ] dip define-single-generic ;
 
 M: single-standard-dispatch picker
     dispatch-type get #>> (picker) ;
@@ -1214,20 +1213,28 @@ M: depends-on-multi-method satisfied?
 
 
 ! ! ! call-next-multi-method ! ! !
-H{ } clone next-method-quot-cache set-global
-
-GENERIC: next-multi-method-quot* ( classes generic dispatch -- quot )
+GENERIC: next-multi-method-quot* ( classes generic dispatch -- quot/f )
 
 ERROR: inconsistent-next-multi-method classes generic ;
 
-M:: dispatch next-multi-method-quot*
-    ( classes generic dispatch -- quot )
-    dispatch [
-        [ classes generic inconsistent-next-multi-method ]
-        generic methods prepare-methods drop sort-methods
-        [ drop classes classes< +gt+ = ] assoc-filter
-        [ [ multi-predicate ] dip ] assoc-map reverse!
-        alist>quot
+! M:: dispatch next-multi-method-quot* ( classes generic dispatch -- quot )
+!     dispatch [
+!         [ classes generic inconsistent-next-multi-method ]
+!         generic methods prepare-methods drop sort-methods
+!         [ drop classes classes< +gt+ = ] assoc-filter
+!         [ [ multi-predicate ] dip ] assoc-map reverse!
+!         alist>quot
+!     ] with-dispatch-type ;
+
+M: dispatch next-multi-method-quot* ( classes generic dispatch -- quot/f )
+    [
+        2dup ?lookup-next-multi-method [
+            [
+                pick multi-predicate %
+                1quotation , '[ _ _ inconsistent-next-multi-method ] ,
+                \ if ,
+            ] [ ] make
+        ] [ 2drop f ] if*
     ] with-dispatch-type ;
 
 ERROR: call-next-multi-method-in-a-math-generic generic ;
@@ -1236,11 +1243,10 @@ M: call-next-multi-method-in-a-math-generic summary
     drop
     "call-next-multi-method can not be used in mathematical multi-methods" ;
 
-M:: math-dispatch next-multi-method-quot* ( classes generic dispatch -- quot )
+M:: math-dispatch next-multi-method-quot* ( classes generic dispatch -- * )
     generic call-next-multi-method-in-a-math-generic ;
 
-: next-multi-method-quot ( method -- quot )
-    ! TODO: use next-multi-method-quot-cache
+: next-multi-method-quot ( method -- quot/f )
     next-multi-method-quot-cache get [
         [ "method-specializer" word-prop ]
         [
@@ -1281,3 +1287,17 @@ SYNTAX: call-next-multi-method
    current-method get
    [ literalize suffix! \ (call-next-multi-method) suffix! ]
    [ not-in-a-multi-method-error ] if* ;
+
+
+! ! ! annotations ! ! !
+M: multi-generic (reset)
+    "multi-methods" word-prop values [ (reset) ] each ;
+
+: annotate-multi-generic ( word quot -- )
+    [ "multi-methods" word-prop values ] dip each ; inline
+
+M: multi-generic (annotate)
+    '[ _ (annotate) ] annotate-multi-generic ;
+
+M: multi-generic (deep-annotate)
+    '[ _ (deep-annotate) ] annotate-generic ;
