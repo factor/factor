@@ -17,6 +17,8 @@ TYPEDEF: ushort __uint16_t
 TYPEDEF: uint __uint32_t
 TYPEDEF: ulonglong __uint64_t
 
+TYPEDEF: u_int32_t __u32
+TYPEDEF: u_int32_t __be32
 TYPEDEF: void* caddr_t
 TYPEDEF: uint in_addr_t
 TYPEDEF: uint socklen_t

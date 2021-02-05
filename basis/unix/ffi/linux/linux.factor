@@ -63,6 +63,32 @@ STRUCT: sockaddr-in6
     { addr uchar[16] }
     { scopeid uint } ;
 
+STRUCT: group_req
+    { gr_interface __u32 }                   ! interface index
+    { gr_group __kernel_sockaddr_storage } ; ! group address
+
+CONSTANT: _K_SS_MAXSIZE   128     ! Implementation specific max size
+
+TYPEDEF: ushort __kernel_sa_family_t
+
+STRUCT: __kernel_sockaddr_storage
+    { ss_family __kernel_sa_family_t }             ! address family
+    ! _K_SS_MAXSIZE - sizeof(unsigned short)
+    { __data char[126] } ;
+
+STRUCT: group_source_req
+    { gsr_interface __u32 }                     ! interface index
+    { gsr_group __kernel_sockaddr_storage }     ! group address
+    { gsr_source __kernel_sockaddr_storage }    ! source address
+};
+
+STRUCT: group_filter
+    { gf_interface __u32 }                      ! interface index
+    { gf_group __kernel_sockaddr_storage }      ! multicast address
+    { gf_fmode __u32 }                          ! filter mode
+    { gf_numsrc __u32 }                         ! number of sources
+    { gf_slist __kernel_sockaddr_storage[1] } ; ! interface index
+
 CONSTANT: max-un-path 108
 
 STRUCT: sockaddr-un

@@ -71,6 +71,117 @@ STRUCT: servent
     { port int }
     { proto c-string } ;
 
+
+CONSTANT: IP_TOS          1
+CONSTANT: IP_TTL          2
+CONSTANT: IP_HDRINCL      3
+CONSTANT: IP_OPTIONS      4
+CONSTANT: IP_ROUTER_ALERT 5
+CONSTANT: IP_RECVOPTS     6
+CONSTANT: IP_RETOPTS      7
+CONSTANT: IP_PKTINFO      8
+CONSTANT: IP_PKTOPTIONS   9
+CONSTANT: IP_MTU_DISCOVER 10
+CONSTANT: IP_RECVERR      11
+CONSTANT: IP_RECVTTL      12
+CONSTANT: IP_RECVTOS      13
+CONSTANT: IP_MTU          14
+CONSTANT: IP_FREEBIND     15
+CONSTANT: IP_IPSEC_POLICY 16
+CONSTANT: IP_XFRM_POLICY  17
+CONSTANT: IP_PASSSEC      18
+CONSTANT: IP_TRANSPARENT  19
+
+CONSTANT: IP_RECVRETOPTS  IP_RETOPTS
+CONSTANT: IP_ORIGDSTADDR       20
+CONSTANT: IP_RECVORIGDSTADDR   IP_ORIGDSTADDR
+CONSTANT: IP_MINTTL       21
+CONSTANT: IP_NODEFRAG     22
+CONSTANT: IP_CHECKSUM     23
+CONSTANT: IP_BIND_ADDRESS_NO_PORT 24
+CONSTANT: IP_RECVFRAGSIZE 25
+
+CONSTANT: IP_PMTUDISC_DONT                0
+CONSTANT: IP_PMTUDISC_WANT                1
+CONSTANT: IP_PMTUDISC_DO                  2
+CONSTANT: IP_PMTUDISC_PROBE               3
+CONSTANT: IP_PMTUDISC_INTERFACE           4
+CONSTANT: IP_PMTUDISC_OMIT                5
+
+CONSTANT: IP_MULTICAST_IF                 32
+CONSTANT: IP_MULTICAST_TTL                33
+CONSTANT: IP_MULTICAST_LOOP               34
+CONSTANT: IP_ADD_MEMBERSHIP               35
+CONSTANT: IP_DROP_MEMBERSHIP              36
+CONSTANT: IP_UNBLOCK_SOURCE               37
+CONSTANT: IP_BLOCK_SOURCE                 38
+CONSTANT: IP_ADD_SOURCE_MEMBERSHIP        39
+CONSTANT: IP_DROP_SOURCE_MEMBERSHIP       40
+CONSTANT: IP_MSFILTER                     41
+CONSTANT: MCAST_JOIN_GROUP                42
+CONSTANT: MCAST_BLOCK_SOURCE              43
+CONSTANT: MCAST_UNBLOCK_SOURCE            44
+CONSTANT: MCAST_LEAVE_GROUP               45
+CONSTANT: MCAST_JOIN_SOURCE_GROUP         46
+CONSTANT: MCAST_LEAVE_SOURCE_GROUP        47
+CONSTANT: MCAST_MSFILTER                  48
+CONSTANT: IP_MULTICAST_ALL                49
+CONSTANT: IP_UNICAST_IF                   50
+
+CONSTANT: MCAST_EXCLUDE   0
+CONSTANT: MCAST_INCLUDE   1
+
+CONSTANT: IP_DEFAULT_MULTICAST_TTL        1
+CONSTANT: IP_DEFAULT_MULTICAST_LOOP       1
+
+CONSTANT: IPPROTO_IP        0           ! Dummy protocol for TCP.
+CONSTANT: IPPROTO_ICMP      1           ! Internet Control Message Protocol.
+CONSTANT: IPPROTO_IGMP      2           ! Internet Group Management Protocol. */
+CONSTANT: IPPROTO_IPIP      4           ! IPIP tunnels (older KA9Q tunnels use 94).
+CONSTANT: IPPROTO_TCP       6           ! Transmission Control Protocol.
+CONSTANT: IPPROTO_EGP       8           ! Exterior Gateway Protocol.
+CONSTANT: IPPROTO_PUP      12           ! PUP protocol.
+CONSTANT: IPPROTO_UDP      17           ! User Datagram Protocol.
+CONSTANT: IPPROTO_IDP      22           ! XNS IDP protocol.
+CONSTANT: IPPROTO_TP       29           ! SO Transport Protocol Class 4.
+CONSTANT: IPPROTO_DCCP     33           ! Datagram Congestion Control Protocol.
+CONSTANT: IPPROTO_IPV6     41           ! IPv6 header.
+CONSTANT: IPPROTO_RSVP     46           ! Reservation Protocol.
+CONSTANT: IPPROTO_GRE      47           ! General Routing Encapsulation.
+CONSTANT: IPPROTO_ESP      50           ! encapsulating security payload.
+CONSTANT: IPPROTO_AH       51           ! authentication header.
+CONSTANT: IPPROTO_MTP      92           ! Multicast Transport Protocol.
+CONSTANT: IPPROTO_BEETPH   94           ! IP option pseudo header for BEET.
+CONSTANT: IPPROTO_ENCAP    98           ! Encapsulation Header.
+CONSTANT: IPPROTO_PIM     103           ! Protocol Independent Multicast.
+CONSTANT: IPPROTO_COMP    108           ! Compression Header Protocol.
+CONSTANT: IPPROTO_RM      113           ! Reliable Multicast aka PGM
+CONSTANT: IPPROTO_SCTP    132           ! Stream Control Transmission Protocol.
+CONSTANT: IPPROTO_UDPLITE 136           ! UDP-Lite protocol.
+CONSTANT: IPPROTO_MPLS    137           ! MPLS in IP.
+CONSTANT: IPPROTO_RAW     255           ! Raw IP packets.
+
+STRUCT: ip_mreq
+    { imr_multiaddr in_addr_t }   ! IP multicast address of group
+    { imr_interface in_addr_t } ; ! local IP address of interface
+
+STRUCT: ip_mreqn
+    { imr_multiaddr in_addr_t }   ! IP multicast address of group
+    { imr_address in_addr_t }     ! local IP address of interface
+    { imr_ifindex int } ;         ! Interface index
+
+STRUCT: ip_mreq_source
+    { imr_multiaddr in_addr_t }   ! IP multicast address of group
+    { imr_sourceaddr in_addr_t }  ! IP address of source
+    { imr_interface in_addr_t } ; ! local IP address of interface
+
+STRUCT: ip_msfilter
+    { imsf_multiaddr __be32 }
+    { imsf_interface __be32 }
+    { imsf_fmode __u32 }
+    { imsf_numsrc __u32 }
+    { imsf_slist __be32[1] } ;
+
 CONSTANT: F_OK 0 ! test for existence of file
 CONSTANT: X_OK 1 ! test for execute or search permission
 CONSTANT: W_OK 2 ! test for write permission

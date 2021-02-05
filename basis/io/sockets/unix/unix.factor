@@ -1,10 +1,10 @@
 ! Copyright (C) 2004, 2008 Slava Pestov, Ivan Tikhonov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-byte-arrays classes.struct combinators destructors io.backend.unix
-io.encodings.ascii io.encodings.utf8 io.files io.pathnames io.sockets
-io.sockets.private kernel libc locals math namespaces sequences system
-unix unix.ffi vocabs ;
+byte-arrays classes.struct combinators destructors
+io.backend.unix io.encodings.ascii io.encodings.utf8 io.files
+io.pathnames io.sockets io.sockets.private ip-parser kernel libc
+math namespaces sequences system unix unix.ffi vocabs ;
 IN: io.sockets.unix
 
 : socket-fd ( domain type protocol -- fd )
@@ -17,6 +17,9 @@ IN: io.sockets.unix
 
 : set-socket-option ( fd level opt -- )
     [ handle-fd ] 2dip 1 int <ref> dup byte-length setsockopt io-error ;
+
+: set-socket-option-struct ( fd level opt struct -- )
+    [ handle-fd ] 3dip dup byte-length setsockopt io-error ;
 
 M: unix addrinfo-error-string
     gai_strerror ;
@@ -121,6 +124,15 @@ M: unix (raw)
 
 M: unix (broadcast)
     dup handle>> SOL_SOCKET SO_BROADCAST set-socket-option ;
+
+M: unix (multicast)
+    dup handle>> SOL_SOCKET SO_REUSEADDR set-socket-option ;
+
+M: unix set-multicast-interface
+    [ dup handle>> IPPROTO_IP IP_MULTICAST_IF ] dip parse-ipv4 set-socket-option-struct ;
+
+M: unix add-multicast-group ( socket ip -- socket )
+    drop ;
 
 :: do-receive ( n buf port -- count sockaddr )
     port addr>> empty-sockaddr/size :> ( sockaddr len )

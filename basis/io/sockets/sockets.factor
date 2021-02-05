@@ -274,6 +274,12 @@ HOOK: (raw) io-backend ( addr -- raw )
 
 HOOK: (broadcast) io-backend ( datagram -- datagram )
 
+HOOK: (multicast) io-backend ( datagram -- datagram )
+
+HOOK: set-multicast-interface io-backend ( datagram multicast-interface-ip -- datagram )
+
+HOOK: add-multicast-group io-backend ( datagram ip -- datagram )
+
 HOOK: (receive-unsafe) io-backend ( n buf datagram -- count addrspec )
 
 ERROR: invalid-port object ;
@@ -358,6 +364,9 @@ SYMBOL: remote-address
 
 : <broadcast> ( addrspec -- datagram )
     <datagram> (broadcast) ;
+
+: <multicast> ( addrspec -- datagram )
+    <datagram> (multicast) ;
 
 : receive-unsafe ( n buf datagram -- count addrspec )
     check-receive

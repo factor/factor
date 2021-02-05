@@ -96,6 +96,9 @@ M: windows (raw)
 M: windows (broadcast)
     dup handle>> SOL_SOCKET SO_BROADCAST set-socket-option ;
 
+! M: windows (multicast)
+!    dup handle>> IPPROTO_IP IP_MULTICAST_IF set-socket-option ;
+
 : malloc-int ( n -- alien )
     int <ref> malloc-byte-array ; inline
 
