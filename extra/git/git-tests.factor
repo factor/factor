@@ -22,8 +22,9 @@ IN: git.tests
     ] with-empty-test-git-repo ; inline
 
 { "hello" } [
-    commit new "author" "hello\r\n"
-    [ parse-commit-field ] with-string-reader
+    commit new
+    "author hello\n"
+    [ parse-git-lines ] with-string-reader
     author>>
 ] unit-test
 
