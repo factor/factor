@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs assocs.extras calendar
 calendar.format checksums checksums.sha combinators
-combinators.smart compression.zlib constructors fry grouping io
+combinators.smart compression.zlib constructors grouping io
 io.binary io.directories io.encodings.binary io.encodings.string
 io.encodings.utf8 io.files io.files.info io.pathnames
 io.streams.byte-array io.streams.peek kernel math math.bitwise
-math.parser math.statistics memoize namespaces random sequences
-sequences.extras splitting strings ;
+math.parser namespaces random sequences sequences.extras
+splitting splitting.monotonic strings ;
 IN: git
 
 ERROR: byte-expected offset ;
@@ -68,12 +68,8 @@ CONSTRUCTOR: <index-entry> index-entry ( ctime mtime dev ino mode uid gid size s
 : read-index-entry-v2 ( -- seq )
     4 read be> 4 read be> 2array
     4 read be> 4 read be> 2array
-    4 read be>
-    4 read be>
-    4 read be>
-    4 read be>
-    4 read be>
-    4 read be>
+    4 read be> 4 read be> 4 read be>
+    4 read be> 4 read be> 4 read be>
     20 read bytes>hex-string
     2 read be> { 0 } read-until drop [ utf8 decode ] [ length ] bi
     7 + 8 mod dup zero? [ 8 swap - ] unless read drop
@@ -83,7 +79,6 @@ TUPLE: git-index magic version entries checksum ;
 CONSTRUCTOR: <git-index> git-index ( magic version entries checksum -- obj ) ;
 
 ERROR: unhandled-git-version n ;
-ERROR: unhandled-git-index-trailing-bytes bytes ;
 
 : git-index-contents ( -- git-index )
     "index" make-git-path binary [
@@ -131,7 +126,7 @@ CONSTRUCTOR: <tree> tree ( -- obj ) ;
     3 cut [ string>number ] bi@
     [ hours ] [ minutes ] bi* time+ ;
 
-: date>string ( seq -- string )
+: git-date>string ( seq -- string )
     last2
     [ string>number unix-time>timestamp ]
     [ gmt-offset>duration [ time+ ] [ >>gmt-offset ] bi ] bi*
@@ -141,7 +136,7 @@ CONSTRUCTOR: <tree> tree ( -- obj ) ;
     {
         [ hash>> "commit " prepend print ]
         [ author>> "Author: " prepend " " split 2 head* " " join print ]
-        [ author>> " " split date>string "Date:   " prepend print ]
+        [ author>> " " split git-date>string "Date:   " prepend print ]
         [ message>> "\n" split [ "    " prepend ] map "\n" join nl print nl ]
     } cleave ;
 
@@ -154,75 +149,41 @@ ERROR: unknown-field name parameter ;
         { "author" [ >>author ] }
         { "committer" [ >>committer ] }
         { "gpgsig" [ >>gpgsig ] }
-        { "" [ >>message ] }
+        { "message" [ >>message ] }
         [ unknown-field ]
-    } case ;
+    } case ; inline
 
-: parse-git-value ( accum -- value next-key ch )
-    "\n" read-until drop
-    over push "\s\n" read-until 2dup 2array { "" CHAR: \s } = [
-        2drop parse-git-value
+: git-string>assoc ( string -- assoc )
+    "\n\n" split1 [
+        string-lines [ nip first CHAR: \s = ] monotonic-split
+        [
+            dup length 1 = [
+                first " " split1 2array
+            ] [
+                [ first " " split1 ]
+                [ rest [ rest ] map ] bi
+                swap prefix "\n" join 2array
+            ] if
+        ] map
     ] [
-        [ "\n" join ] 2dip
-    ] if ;
+        "message" swap 2array
+    ] bi* suffix ;
 
-: parse-git-key-vals ( obj key ch -- obj )
-    {
-        { CHAR: \s [ V{ } clone parse-git-value [ set-git-object-field ] 2dip parse-git-key-vals ] }
-        { CHAR: \n [ contents set-git-object-field ] }
-        { f [ drop ] }
-    } case ;
-
-: parse-git-lines ( obj -- obj )
-    "\s\n" read-until parse-git-key-vals ;
-
-: parse-commit ( bytes -- commit )
-    " " split1
-    [ "commit" assert= ] [ string>number read ] bi*
-    utf8 [
-        commit new parse-git-lines
-    ] with-byte-reader ;
-
-ERROR: key-already-set value key assoc ;
-: set-at-once ( value key assoc -- )
-    2dup key? [ key-already-set ] [ set-at ] if ;
-
-: parse-object-line>assoc ( hashtable -- hashtable )
-    "\s\n" read-until {
-        { CHAR: \s [ [ "\r\n" read-until* ] dip pick over "parent" = [ push-at ] [ set-at-once ] if parse-object-line>assoc ] }
-        { CHAR: \n [ drop contents "message" pick set-at ] }
-    } case ;
-
-: assoc>commit ( assoc -- commit )
-    [ commit new ] dip {
-        [ "tree" of >>tree ]
-        [ "parent" of >>parents ]
-        [ "author" of >>author ]
-        [ "committer" of >>committer ]
-        [ "message" of >>message ]
-    } cleave ;
+: parse-new-git-object ( string class -- commit )
+    new swap git-string>assoc [ first2 set-git-object-field ] each ; inline
 
 ERROR: unknown-git-object obj ;
-: assoc>git-object ( assoc -- git-object )
-    {
-        { [ "committer" over key? ] [ assoc>commit ] }
-        [ unknown-git-object ]
-    } cond ;
-
-: parse-object-bytes>assoc ( obj -- hashtable )
-    utf8 [
-        H{ } clone parse-object-line>assoc assoc>git-object
-    ] with-byte-reader ;
-
-: parse-tree ( bytes -- commit )
-    utf8 [ tree new parse-git-lines ] with-byte-reader ;
 
 : parse-object ( bytes -- git-obj )
     utf8 [
         { 0 } read-until 0 = drop dup " " split1 drop {
             { "blob" [ "unimplemented blob parsing" throw ] }
-            { "commit" [ parse-commit ] }
-            { "tree" [ parse-tree ] }
+            { "commit" [
+                " " split1
+                [ "commit" assert= ] [ string>number read ] bi*
+                commit parse-new-git-object
+            ] }
+            { "tree" [ tree parse-new-git-object ] }
             [ unknown-git-object ]
         } case
     ] with-byte-reader ;
@@ -299,37 +260,14 @@ CONSTRUCTOR: <copy> copy ( offset size -- copy ) ;
             7 bits read <insert>
         ] [
             [ 0 0 ] dip
-
-            dup 0x01 mask? [
-                [ read1* bitor ] 2dip
-            ] when
-
-            dup 0x02 mask? [
-                [ read1* 8 shift bitor ] 2dip
-            ] when
-
-            dup 0x04 mask? [
-                [ read1* 16 shift bitor ] 2dip
-            ] when
-
-            dup 0x08 mask? [
-                [ read1* 24 shift bitor ] 2dip
-            ] when
-
-            dup 0x10 mask? [
-                [ read1* bitor ] dip
-            ] when
-
-            dup 0x20 mask? [
-                [ read1* 8 shift bitor ] dip
-            ] when
-
-            dup 0x40 mask? [
-                [ read1* 16 shift bitor ] dip
-            ] when
-
-            drop [ 65536 ] when-zero
-            <copy>
+            dup 0x01 mask? [ [ read1* bitor ] 2dip ] when
+            dup 0x02 mask? [ [ read1* 8 shift bitor ] 2dip ] when
+            dup 0x04 mask? [ [ read1* 16 shift bitor ] 2dip ] when
+            dup 0x08 mask? [ [ read1* 24 shift bitor ] 2dip ] when
+            dup 0x10 mask? [ [ read1* bitor ] dip ] when
+            dup 0x20 mask? [ [ read1* 8 shift bitor ] dip ] when
+            dup 0x40 mask? [ [ read1* 16 shift bitor ] dip ] when
+            drop [ 65536 ] when-zero <copy>
         ] if
     ] [
         f
@@ -382,7 +320,7 @@ SYMBOL: initial-offset
     tell-input initial-offset [
         read-type-length first2 swap {
             { 1 [ 256 + read uncompress parse-object ] }
-            { 6 [ read-offset-delta first2 do-deltas parse-object-bytes>assoc ] }
+            { 6 [ read-offset-delta first2 do-deltas parse-object ] }
             ! { 7 [ B read-sha1-delta ] }
             [ number>string "unknown packed type: " prepend throw ]
         } case
@@ -405,8 +343,7 @@ TUPLE: pack magic version count objects sha1 ;
         [ peek1 ] [ read-packed ] produce 2array
     ] with-file-reader ;
 
-: git-read-idx ( sha -- obj )
-    make-idx-path parse-idx ;
+: git-read-idx ( sha -- obj ) make-idx-path parse-idx ;
 
 ! Broken for now
 ! : git-read-pack ( sha -- obj ) make-pack-path parse-pack ;
@@ -473,9 +410,7 @@ ERROR: expected-ref got ;
 : git-head-ref ( -- sha1 ) "HEAD" git-ref ;
 : git-log-for-ref ( ref -- log ) git-line git-read-object ;
 : git-head-object ( -- commit ) git-head-ref git-log-for-ref ;
-: git-config ( -- config )
-    "config" make-git-path ;
-
+: git-config ( -- config ) "config" make-git-path ;
 
 SYMBOL: parents
 ERROR: repeated-parent-hash hash ;
