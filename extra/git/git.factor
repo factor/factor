@@ -120,10 +120,10 @@ ERROR: unhandled-git-index-trailing-bytes bytes ;
         [ name>> file-info modified>> timestamp>unix-time >integer ] bi = not
     ] filter ;
 
-TUPLE: commit hash tree parents author committer message ;
+TUPLE: commit hash tree parents author committer gpgsig message ;
 CONSTRUCTOR: <commit> commit ( tree parents author committer -- obj ) ;
 
-TUPLE: tree hash tree parents author committer message ;
+TUPLE: tree hash tree parents author committer gpgsig message ;
 CONSTRUCTOR: <tree> tree ( -- obj ) ;
 
 : last2 ( seq -- penultimate ultimate ) 2 tail* first2 ;
@@ -146,51 +146,42 @@ CONSTRUCTOR: <tree> tree ( -- obj ) ;
         [ message>> "\n" split [ "    " prepend ] map "\n" join nl print nl ]
     } cleave ;
 
-ERROR: unknown-commit-line line name ;
+ERROR: unknown-field name parameter ;
 
-ERROR: eof-too-early ;
-ERROR: unknown-field field ;
-
-: parse-commit-field ( obj parameter -- obj )
-    [ "\r\n" read-until [ eof-too-early ] unless ] dip {
+: set-git-object-field ( obj name parameter -- obj )
+    swap {
         { "tree" [ >>tree ] }
         { "parent" [ >>parents ] }
         { "author" [ >>author ] }
         { "committer" [ >>committer ] }
+        { "gpgsig" [ >>gpgsig ] }
+        { "" [ >>message ] }
         [ unknown-field ]
     } case ;
 
-ERROR: unexpected-text text ;
+: parse-git-value ( accum -- value next-key ch )
+    "\n" read-until drop
+    over push "\s\n" read-until 2dup 2array { "" CHAR: \s } = [
+        2drop parse-git-value
+    ] [
+        [ "\n" join ] 2dip
+    ] if ;
 
-: parse-commit-lines ( obj -- obj )
-    " \n" read-until {
-        { CHAR: \s [ parse-commit-field parse-commit-lines ] }
-        { CHAR: \n [ drop contents >>message ] }
-        [ unexpected-text ]
+: parse-git-key-vals ( obj key ch -- obj )
+    {
+        { CHAR: \s [ V{ } clone parse-git-value [ set-git-object-field ] 2dip parse-git-key-vals ] }
+        { CHAR: \n [ contents set-git-object-field ] }
     } case ;
+
+: parse-git-lines ( obj -- obj )
+    "\s\n" read-until parse-git-key-vals ;
 
 : parse-commit ( bytes -- commit )
-    " " split1 [ "commit" assert= ] [ string>number read ] bi*
+    " " split1
+    [ "commit" assert= ] [ string>number read ] bi*
     utf8 [
-        commit new parse-commit-lines
+        commit new parse-git-lines
     ] with-byte-reader ;
-
-: parse-tree-field ( obj parameter -- obj )
-    [ "\r\n" read-until* ] dip {
-        { "tree" [ >>tree ] }
-        { "parent" [ >>parents ] }
-        { "author" [ >>author ] }
-        { "committer" [ >>committer ] }
-        [ unknown-field ]
-    } case ;
-
-: parse-tree-lines ( obj -- obj )
-    "\s\n" read-until {
-        { CHAR: \s [ parse-tree-field parse-tree-lines ] }
-        { CHAR: \n [ drop contents >>message ] }
-        [ unexpected-text ]
-    } case ;
-
 
 ERROR: key-already-set value key assoc ;
 : set-at-once ( value key assoc -- )
@@ -223,12 +214,8 @@ ERROR: unknown-git-object obj ;
         H{ } clone parse-object-line>assoc assoc>git-object
     ] with-byte-reader ;
 
-
 : parse-tree ( bytes -- commit )
-    [ tree new ] dip
-    utf8 [
-        parse-tree-lines
-    ] with-byte-reader ;
+    utf8 [ tree new parse-git-lines ] with-byte-reader ;
 
 : parse-object ( bytes -- git-obj )
     utf8 [
