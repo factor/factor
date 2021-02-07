@@ -110,12 +110,6 @@ SYMBOL: history
         max
     ] reduce ;
 
-: spec-boolean-table ( methods -- array )
-    keys dup first length f <array> [
-        [ object = not ] map [ or ] 2map
-    ] reduce ;
-
-USE: prettyprint
 :: inlining-multi-dispatch-method ( #call word -- classes/f method/f )
     word "hooks" word-prop empty? [
         word methods :> word-methods
@@ -171,7 +165,7 @@ USE: prettyprint
                                     ] if
                                 ] when*
                             ] if
-                            f swap
+                            #call in-d>> >array [ value-info class>> ] map swap
                         ] if
                     ] if
                 ] [ f f ] if

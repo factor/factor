@@ -62,6 +62,12 @@ SYMBOL: generic-dependencies
     generic-dependencies get
     [ [ ?class-or ] change-at ] [ 2drop ] if* ;
 
+SYMBOL: multi-generic-dependencies ! don't use it now
+
+: add-depends-on-multi-generic ( class generic -- ) ! don't use it now
+    generic-dependencies get
+    [ [ ?class-or ] change-at ] [ 2drop ] if* ;
+
 SYMBOL: conditional-dependencies
 
 GENERIC: satisfied? ( dependency -- ? )

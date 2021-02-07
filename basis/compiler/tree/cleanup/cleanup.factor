@@ -73,7 +73,13 @@ GENERIC: cleanup-tree* ( node -- node/nodes )
             [ [ class>> ] [ word>> ] [ method>> ] tri add-depends-on-method ]
             bi
         ] if
-    ] [ drop ] if ;
+    ] [
+        dup word>> multi-dispatch-generic? [
+            [ [ class>> ] [ word>> ] bi add-depends-on-multi-dispatch-generic ]
+            [ [ class>> ] [ word>> ] [ method>> ] tri add-depends-on-partial-inline ]
+            bi
+        ] [ drop ] if
+    ] if ;
 
 : record-inlining ( #call -- )
     dup method>>

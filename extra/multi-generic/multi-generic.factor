@@ -1147,12 +1147,19 @@ M: math-dispatch perform-dispatch
         define
     ] with-variable ;
 
-
 ! ! ! dependencies ! ! !
+: spec-boolean-table ( methods -- array )
+    keys dup first length f <array> [
+        [ object = not ] map [ or ] 2map
+    ] reduce ;
+
 :: add-depends-on-multi-dispatch-generic ( classes generic -- )
+    classes generic methods spec-boolean-table [
+        [ drop object ] unless
+    ] 2map [ object = ] reject :> classes'
     generic-dependencies get dup :> dependences
     [
-        classes [
+        classes' [
             generic dependences [ ?class-or ] change-at
         ] each
     ] when ;
@@ -1191,6 +1198,37 @@ M: depends-on-multi-method satisfied?
         [
             [ [ classes>> ] [ generic>> ] bi ?lookup-multi-method ]
             [ multi-method>> ] bi eq?
+        ]
+    } 1&& ;
+
+TUPLE: depends-on-partial-inline classes generic partial-inline-quot ;
+
+: add-depends-on-partial-inline ( classes generic partial-inline-quot -- )
+    over +conditional+ depends-on
+    depends-on-partial-inline add-conditional-dependency ;
+
+M:: depends-on-partial-inline satisfied? ( dependency -- ? )
+    dependency {
+        [ classes>> [ classoid? ] all? ]
+        [
+            [ classes>> ] [ generic>> ] bi :> ( classes generic )
+            generic methods
+            generic multi-math-generic? [
+                [ drop first2 [ math-class? ] both? ] assoc-reject
+            ] when
+            sort-methods [
+                drop classes swap t [
+                    [ drop object = ] [ class<= ] 2bi or and
+                ] 2reduce
+            ] assoc-filter [
+                [
+                    classes [| c1 c2 |
+                        c2 object = [ c1 ] [ object ] if
+                    ] 2map
+                ] dip
+            ] assoc-map prepare-methods drop
+            generic multi-dispatch-quot
+            dependency partial-inline-quot>> =
         ]
     } 1&& ;
 
