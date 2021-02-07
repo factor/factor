@@ -119,7 +119,7 @@ USE: prettyprint
 :: inlining-multi-dispatch-method ( #call word -- classes/f method/f )
     word "hooks" word-prop empty? [
         word methods :> word-methods
-        #call in-d>> >array [ value-info class>> ] map ! dup .
+        #call in-d>> >array [ value-info class>> ] map
         dup length :> stack-len
         dup [ object = ] find-last [| classes i |
             i object <array> 0 i classes replace-slice

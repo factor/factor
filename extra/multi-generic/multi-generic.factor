@@ -264,9 +264,9 @@ ERROR: no-method arguments generic ;
     [ argument-count ] dip [ [ narray ] dip no-method ] 2curry ;
 
 :: multi-dispatch-quot ( methods generic -- quot )
-        methods generic make-default-method
-        methods [ [ multi-predicate ] dip ] assoc-map reverse!
-        alist>quot ;
+    methods generic make-default-method
+    methods [ [ multi-predicate ] dip ] assoc-map reverse!
+    alist>quot ;
 
 : make-single-generic ( word -- )
     [ "unannotated-def" remove-word-prop ]
@@ -301,10 +301,6 @@ DEFER: make-generic
             stack-specs length 0 = [ hook-specs first ] [ f ] if
         ] [ f ] if
     ] if ;
-
-! : update-single-generic ( class generic -- )
-!     [ changed-call-sites ] [ remake-single-generic drop ]
-!     [ changed-conditionally drop ] 2tri ;
 
 DEFER: define-single-default-method
 
@@ -349,8 +345,8 @@ SYMBOL: second-math-dispatch
                 bi
             ] if
             generic dup "dispatch-type" word-prop
-            generic make-single-generic
             define-single-default-method
+            generic make-single-generic
         ] [
             ! multi-dispach
             drop
@@ -384,7 +380,11 @@ SYMBOL: second-math-dispatch
  ;
 
 : update-generic ( word -- )
-    make-generic ;
+!    make-generic ;
+
+   [ remake-multi-generic ]
+   [ changed-conditionally ]
+   bi ;
 
 ! Methods
 M: multi-method stack-effect
@@ -454,6 +454,7 @@ M: anonymous-intersection implementor-classes participants>> ;
         2nip
     ] [
         drop [ effect -rot <method> dup ] 2keep reveal-method
+        reset-caches
     ] if ;
 
 :: ?lookup-multi-method ( classes generic  -- method/f )
@@ -498,29 +499,33 @@ M: no-method error.
 !    ] { } make ;
 
 : reset-multi-generic ( word -- )
-    [ "multi-methods" word-prop values forget-all ]
-    [ reset-word ]
-    [
-        f >>pic-def f >>pic-tail-def
-        {
-            "multi-methods"
-            "hooks"
-            "dispatch-type"
-            "mathematical"
-            "patial-inline"
-        } remove-word-props
-    ] tri ;
+    {
+        [ "multi-methods" word-prop values forget-all ]
+        [ reset-word ]
+        [
+            f >>pic-def f >>pic-tail-def
+            {
+                "multi-methods"
+                "hooks"
+                "dispatch-type"
+                "mathematical"
+                "patial-inline"
+            } remove-word-props ]
+        [ H{ } clone "multi-methods" set-word-prop ]
+    } cleave ;
 
 : define-generic ( word effect hooks -- )
-    ! pick reset-multi-generic
     [ over swap set-stack-effect ] dip
     over swap "hooks" set-word-prop
+    dup
     dup "multi-methods" word-prop [ drop ] [
+        ! reset-multi-generic
         [ H{ } clone "multi-methods" set-word-prop ]
         [ "mathematical" remove-word-prop ]
-        [ update-generic ]
-        tri
-    ] if ;
+        ! ! [ update-generic ]
+        bi ! tri
+    ] if
+    remake-multi-generic ;
 
 ! ! ! Syntax ! ! !
 SYNTAX: MGENERIC: scan-new-word scan-effect
@@ -966,22 +971,6 @@ PREDICATE: default-method < word "default" word-prop ;
 : define-single-default-method ( generic dispatch -- )
     dupd <single-default-method> "default-method" set-word-prop ;
 
-! : define-single-generic ( word dispatch effect -- )
-!     [ [ check-dispatch-effect ] keep set-stack-effect ]
-!     [
-!         drop
-!         2dup [ "dispatch-type" word-prop ] dip = [ 2drop ] [
-!             {
-!                 [ drop reset-generic ]
-!                 [ "dispatch-type" set-word-prop ]
-!                 [ drop H{ } clone swap "dispatch-type" word-prop methods<< ]
-!                 [ define-single-default-method ]
-!             }
-!             2cleave
-!         ] if ]
-!     [ 2drop remake-single-generic ] 3tri ;
-
-
 ! ! ! standard ! ! ! !
 M: single-standard-dispatch check-dispatch-effect
     [ single-dispatch# ] [ in>> length ] bi* over >
@@ -992,12 +981,6 @@ PREDICATE: multi-standard-generic < multi-generic
 
 PREDICATE: multi-simple-generic < multi-standard-generic
     "dispatch-type" word-prop #>> 0 = ;
-
-! CONSTANT: single-simple-dispatch
-!     T{ single-standard-dispatch f 0 }
-
-! : define-multi-simple-generic ( word effect -- )
-!     [ single-simple-dispatch ] dip define-single-generic ;
 
 M: single-standard-dispatch picker
     dispatch-type get #>> (picker) ;
@@ -1211,20 +1194,10 @@ M: depends-on-multi-method satisfied?
         ]
     } 1&& ;
 
-
 ! ! ! call-next-multi-method ! ! !
 GENERIC: next-multi-method-quot* ( classes generic dispatch -- quot/f )
 
 ERROR: inconsistent-next-multi-method classes generic ;
-
-! M:: dispatch next-multi-method-quot* ( classes generic dispatch -- quot )
-!     dispatch [
-!         [ classes generic inconsistent-next-multi-method ]
-!         generic methods prepare-methods drop sort-methods
-!         [ drop classes classes< +gt+ = ] assoc-filter
-!         [ [ multi-predicate ] dip ] assoc-map reverse!
-!         alist>quot
-!     ] with-dispatch-type ;
 
 M: dispatch next-multi-method-quot* ( classes generic dispatch -- quot/f )
     [
