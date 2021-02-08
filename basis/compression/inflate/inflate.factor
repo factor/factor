@@ -24,18 +24,24 @@ ERROR: bad-zlib-header ;
     2 data bs:seek                      ! compression level; ignore
     ;
 
+
+: read-until-terminated ( data -- data ) 
+   [ dup 8 swap bs:read 0 =  ] [  ]  until ;
+
+:: interpret-flag ( flg data  -- )
+ 28 data bs:seek 
+ flg first 1 = [ 8 data bs:read data bs:seek  ] when
+ flg second 1 = [ data read-until-terminated drop ] when
+ flg fourth 1 = [ data read-until-terminated drop ] when
+ flg second 1 = [ 1 data bs:read drop  ] when ;
+
 :: check-gzip-header ( data -- )
     8 data bs:read 31 assert=   ! ID 1
     8 data bs:read 139 assert=  ! ID 2 
     8 data bs:read 8 assert=    ! compression method: deflate
-    ! 8 data bs:read execute-flag  ! Skip ahead appropriately based on flag-byte
-
+    1 data bs:seek ! ignore textbit
+    1 data bs:read 1 data bs:read 1 data bs:read 1 data bs:read 4array data interpret-flag
     ;
-
-
-: read-until-terminated ( data -- data )
-
-   [ dup 8 swap bs:read 0 =  ] [  ]  until ;
 
 
 CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
@@ -179,6 +185,11 @@ CONSTANT: dist-table
 PRIVATE>
 
 : zlib-inflate ( bytes -- bytes )
+    bs:<lsb0-bit-reader>
+    [ check-zlib-header ] [ inflate-loop ] bi
+    inflate-lz77 ;
+
+: gzip-inflate ( bytes -- bytes )
     bs:<lsb0-bit-reader>
     [ check-zlib-header ] [ inflate-loop ] bi
     inflate-lz77 ;
