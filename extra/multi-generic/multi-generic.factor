@@ -102,7 +102,8 @@ M: separator-syntax-error error.
                     ] [ parse-word ] if
                 ] map
             ] dip
-        ] [ { } clone swap ] if* ]
+        ] [ { } clone swap ] if*
+    ]
     [ out>> ]
     bi <effect> swap ;
 
@@ -336,13 +337,14 @@ SYMBOL: second-math-dispatch
                 ! single-dispatch
                 [
                     <single-standard-dispatch>
-                    generic swap "dispatch-type" set-word-prop ]
+                    generic swap "dispatch-type" set-word-prop
+                ]
                 [| # |
                     generic "multi-methods" word-prop [
                         [ dup length 1 - # - swap nth ] dip
-                 ] assoc-map
-                 generic "dispatch-type" word-prop methods<< ]
-                bi
+                    ] assoc-map
+                 generic "dispatch-type" word-prop methods<<
+                ] bi
             ] if
             generic dup "dispatch-type" word-prop
             define-single-default-method
@@ -376,8 +378,7 @@ SYMBOL: second-math-dispatch
                 \ declare 2array >quotation generic def>> prepend generic def<<
             ] if
         ] when*
-    ] if
- ;
+    ] if ;
 
 GENERIC: update-generic ( class/classes generic -- )
 
@@ -420,12 +421,6 @@ M: multi-method parent-word
     [ "multi-methods" word-prop ] prepose [ update-generic ] 2bi ;
     inline
 
-! : with-methods ( word quot -- )
-!     over [
-!         [ "multi-methods" word-prop ] dip call
-!     ] dip
-!     update-generic ; inline
-
 GENERIC: implementor-classes ( obj -- class )
 
 M: maybe implementor-classes class>> 1array ;
@@ -466,7 +461,6 @@ M: anonymous-intersection implementor-classes participants>> ;
     [ drop classes classes< +gt+ = ] assoc-filter [
         first classes swap t [ class<= and ] 2reduce
     ] find nip dup [ second ] when ;
-! TODO: write unit-test for ?lookup-next-multi-method
 
 : niceify-method ( seq -- seq )
     [ dup \ f eq? [ drop f ] when ] map ;
@@ -491,7 +485,6 @@ M: no-method error.
     [ "method-specializer" word-prop ]
     [ "multi-generic" word-prop ] bi prefix ;
 
-
 ! M: multi-generic subwords
 !    [
 !        "multi-methods" word-prop values %
@@ -508,23 +501,24 @@ M: no-method error.
                 "hooks"
                 "dispatch-type"
                 "mathematical"
+                "inline"
                 "patial-inline"
-            } remove-word-props ]
+            } remove-word-props
+        ]
         [ H{ } clone "multi-methods" set-word-prop ]
     } cleave ;
 
 : define-generic ( word effect hooks -- )
-    [ over swap set-stack-effect ] dip
-    over swap "hooks" set-word-prop
-    dup
-    dup "multi-methods" word-prop [ drop ] [
-        ! reset-multi-generic
-        [ H{ } clone "multi-methods" set-word-prop ]
-        [ "mathematical" remove-word-prop ]
-        ! ! [ update-generic ]
-        bi ! tri
-    ] if
-    remake-multi-generic ;
+    {
+        [
+            2drop dup "multi-methods" word-prop [ drop ] [
+                reset-multi-generic
+            ] if
+        ]
+        [ drop set-stack-effect ]
+        [ nip "hooks" set-word-prop ]
+        [ 2drop remake-multi-generic ]
+    } 3cleave ;
 
 ! ! ! Syntax ! ! !
 SYNTAX: MGENERIC: scan-new-word scan-effect
@@ -630,7 +624,8 @@ M: multi-method definer
 M: multi-method forget*
     [
         "method-specializer" "multi-generic"
-        [ word-prop ] bi-curry@ bi forget-method ]
+        [ word-prop ] bi-curry@ bi forget-method
+    ]
     [ call-next-method ]
     bi ;
 
