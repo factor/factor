@@ -379,12 +379,17 @@ SYMBOL: second-math-dispatch
     ] if
  ;
 
-: update-generic ( word -- )
-!    make-generic ;
+GENERIC: update-generic ( class/classes generic -- )
 
-   [ remake-multi-generic ]
-   [ changed-conditionally ]
-   bi ;
+M: multi-generic update-generic
+    [
+        dup array? [
+          swap '[ _ changed-call-sites ] each
+        ] [ changed-call-sites ] if
+    ]
+    [ remake-multi-generic drop ]
+    [ changed-conditionally drop ]
+    2tri ;
 
 ! Methods
 M: multi-method stack-effect
@@ -411,11 +416,15 @@ M: multi-method parent-word
     method-word-name f <word>
     swap >>props ;
 
-: with-methods ( word quot -- )
-    over [
-        [ "multi-methods" word-prop ] dip call
-    ] dip
-    update-generic ; inline
+: with-methods ( classes generic quot -- )
+    [ "multi-methods" word-prop ] prepose [ update-generic ] 2bi ;
+    inline
+
+! : with-methods ( word quot -- )
+!     over [
+!         [ "multi-methods" word-prop ] dip call
+!     ] dip
+!     update-generic ; inline
 
 GENERIC: implementor-classes ( obj -- class )
 
@@ -431,16 +440,6 @@ M: anonymous-intersection implementor-classes participants>> ;
     [
         swap implementor-classes [ implementors-map get at ] map
     ] dip call ; inline
-
-! : with-single-methods ( class generic quot -- )
-!     [ "dispatch-type" word-prop methods>> ] prepose
-!     [ update-single-generic ]
-!     2bi ; inline
-
-! : reveal-single-method ( method classes generic -- )
-!     [ [ [ adjoin ] with each ] with-implementors ]
-!     [ [ set-at ] with-single-methods ]
-!     2bi ;
 
 : reveal-method ( method classes generic -- )
     [ set-at ] with-methods ;
