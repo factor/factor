@@ -15,6 +15,8 @@ words.symbol ;
 FROM: namespaces => set ;
 FROM: generic.parser => current-method with-method-definition ;
 QUALIFIED-WITH: generic.single.private gsp
+QUALIFIED-WITH: generic g
+
 IN: multi-generic
 
 PREDICATE: multi-generic < word
@@ -114,7 +116,7 @@ M: separator-syntax-error error.
         dup array? [
             second dup effect? [ drop callable ] when
         ] [
-            drop object
+            drop object bootstrap-word ! object
         ] if
     ] map
     vars append ;
@@ -160,25 +162,20 @@ SYMBOL: total
     ] assoc-map ;
 
 : canonicalize-specializer-3 ( specializer -- specializer' )
-    [ total get object <array> <enumerated> ] dip assoc-union! seq>> ;
+    [
+        total get object bootstrap-word <array> <enumerated>
+    ] dip assoc-union! seq>> ;
 
 : canonicalize-specializers ( methods -- methods' hooks )
     [
         [ [ canonicalize-specializer-0 ] dip ] assoc-map
-
         0 args set
         V{ } clone hooks set
-
         [ [ canonicalize-specializer-1 ] dip ] assoc-map
-
         hooks [ natural-sort ] change
-
         [ [ canonicalize-specializer-2 ] dip ] assoc-map
-
         args get hooks get length + total set
-
         [ [ canonicalize-specializer-3 ] dip ] assoc-map
-
         hooks get
     ] with-scope ;
 
@@ -227,7 +224,7 @@ SYMBOL: total
 : multi-predicate ( classes -- quot )
     dup length <iota> <reversed>
     [ (picker) 2array ] 2map
-    [ drop object eq? ] assoc-reject
+    [ drop object bootstrap-word eq? ] assoc-reject
     [ [ t ] ] [
         [ (multi-predicate) ] { } assoc>map
         unclip [ swap [ f ] \ if 3array append [ ] like ] reduce
@@ -248,7 +245,7 @@ SYMBOL: total
                 ] if
             ] [
                 ! stack-specializer
-                dup object = [ 2drop ] [
+                dup object bootstrap-word = [ 2drop ] [
                     drop
                     dup stack-specializers in? [ drop ] [
                         stack-specializers push
@@ -371,21 +368,21 @@ SYMBOL: second-math-dispatch
     generic methods dup empty? [ drop ] [
         values t [
             "multi-method-effect" word-prop
-            out>> [ dup array? [ second ] [ drop object ] if ] map
+            out>> [
+                dup array? [ second ] [ drop object bootstrap-word ] if
+            ] map
             over t = [ nip ] [ dup swap = not [ drop f ] when ] if
         ] reduce [
-            dup [ object = ] all? [ drop ] [
+            dup [ object bootstrap-word = ] all? [ drop ] [
                 \ declare 2array >quotation generic def>> prepend generic def<<
             ] if
         ] when*
     ] if ;
 
-GENERIC: update-generic ( class/classes generic -- )
-
-M: multi-generic update-generic
+M: multi-generic g:update-generic ( class/classes generic -- )
     [
-        dup array? [
-          swap '[ _ changed-call-sites ] each
+        over array? [
+            '[ _ changed-call-sites ] each
         ] [ changed-call-sites ] if
     ]
     [ remake-multi-generic drop ]
@@ -418,7 +415,7 @@ M: multi-method parent-word
     swap >>props ;
 
 : with-methods ( classes generic quot -- )
-    [ "multi-methods" word-prop ] prepose [ update-generic ] 2bi ;
+    [ "multi-methods" word-prop ] prepose [ g:update-generic ] 2bi ;
     inline
 
 GENERIC: implementor-classes ( obj -- class )
@@ -889,7 +886,10 @@ M: predicate-engine-word stack-effect "owner-generic" word-prop stack-effect ;
 
 : define-predicate-engine ( alist -- word )
     [ <predicate-engine-word> ] dip
-    [ define ] [ drop generic-word get "engines" word-prop push ] [ drop ] 2tri ;
+    [ define ]
+    [ drop generic-word get "engines" word-prop push ]
+    [ drop ]
+    2tri ;
 
 : compile-predicate-engine ( engine -- word )
     methods-with-default
@@ -948,9 +948,13 @@ PREDICATE: default-method < word "default" word-prop ;
 
 :: single-default-method-word-props ( generic -- assoc )
     generic "declared-effect" word-prop :> effect
-    effect in>> [ dup array? [ first ] when object 2array ] map
+    effect in>> [
+        dup array? [ first ] when object bootstrap-word 2array
+    ] map
     generic "hooks" word-prop dup empty? [ drop ] [
-        [ object 2array ] map { "|" } clone append swap append
+        [
+            object bootstrap-word 2array
+        ] map { "|" } clone append swap append
     ] if
     effect out>>
     <effect> f generic method-word-props ; ! dummy spacializer
@@ -982,11 +986,14 @@ M: single-standard-dispatch picker
 M: single-standard-dispatch single-dispatch# #>> ;
 
 M: multi-standard-generic effective-method
-    [ get-datastack ] dip [ "dispatch-type" word-prop #>> swap <reversed> nth ] keep
+    [ get-datastack ] dip
+    [ "dispatch-type" word-prop #>> swap <reversed> nth ] keep
     method-for-object ;
 
 : inline-cache-quot ( word methods miss-word -- quot )
-    [ [ literalize , ] [ , ] [ dispatch-type get #>> , { } , , ] tri* ] [ ] make ;
+    [
+        [ literalize , ] [ , ] [ dispatch-type get #>> , { } , , ] tri*
+    ] [ ] make ;
 
 M: single-standard-dispatch inline-cache-quots
     ! Direct calls to the generic word (not tail calls or indirect calls)
@@ -1000,7 +1007,8 @@ M: single-standard-dispatch inline-cache-quots
     mega-cache-size get f <array> ;
 
 M: single-standard-dispatch mega-cache-quot
-    dispatch-type get #>> make-empty-cache \ gsp:mega-cache-lookup [ ] 4sequence ;
+    dispatch-type get #>> make-empty-cache \ gsp:mega-cache-lookup
+    [ ] 4sequence ;
 
 
 ! ! ! hook ! ! ! !
@@ -1062,7 +1070,7 @@ ERROR: no-multi-math-method left right generic ;
             ] assoc-reject >alist
             prepare-methods % sort-methods ] keep
         multi-dispatch-quot %
-    ] [ ] make  ;
+    ] [ ] make ;
 
 <PRIVATE
 
@@ -1144,13 +1152,13 @@ M: math-dispatch perform-dispatch
 ! ! ! dependencies ! ! !
 : spec-boolean-table ( methods -- array )
     keys dup first length f <array> [
-        [ object = not ] map [ or ] 2map
+        [ object bootstrap-word = not ] map [ or ] 2map
     ] reduce ;
 
 :: add-depends-on-multi-dispatch-generic ( classes generic -- )
     classes generic methods spec-boolean-table [
-        [ drop object ] unless
-    ] 2map [ object = ] reject :> classes'
+        [ drop object bootstrap-word ] unless
+    ] 2map [ object bootstrap-word = ] reject :> classes'
     generic-dependencies get dup :> dependences
     [
         classes' [
@@ -1212,12 +1220,16 @@ M:: depends-on-partial-inline satisfied? ( dependency -- ? )
             ] when
             sort-methods [
                 drop classes swap t [
-                    [ drop object = ] [ class<= ] 2bi or and
+                    [ drop object bootstrap-word = ]
+                    [ class<= ]
+                    2bi or and
                 ] 2reduce
             ] assoc-filter [
                 [
                     classes [| c1 c2 |
-                        c2 object = [ c1 ] [ object ] if
+                        c2 object bootstrap-word = [ c1 ] [
+                            object bootstrap-word
+                        ] if
                     ] 2map
                 ] dip
             ] assoc-map prepare-methods drop

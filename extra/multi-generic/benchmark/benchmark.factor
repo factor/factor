@@ -33,12 +33,12 @@ MM: md-beats? ( :thing :thing -- ? )  2drop f ;
 
 
 ! typed multi-dispatch
-MGENERIC: md-beats2? ( obj1 obj2 -- ? )
+MGENERIC: md-beats-t? ( obj1 obj2 -- ? )
 
-MM: md-beats2? ( :paper :scissors -- :boolean ) 2drop t ;
-MM: md-beats2? ( :scissors :rock -- :boolean )  2drop t ;
-MM: md-beats2? ( :rock :paper -- :boolean )  2drop t ;
-MM: md-beats2? ( :thing :thing -- :boolean )  2drop f ;
+MM: md-beats-t? ( :paper :scissors -- :boolean ) 2drop t ;
+MM: md-beats-t? ( :scissors :rock -- :boolean )  2drop t ;
+MM: md-beats-t? ( :rock :paper -- :boolean )  2drop t ;
+MM: md-beats-t? ( :thing :thing -- :boolean )  2drop f ;
 
 
 ! multi-hook-dispatch
@@ -299,17 +299,17 @@ SYMBOL: ref
     gc
     [
         TIMES [
-            paper paper       md-beats2? drop
-            paper scissors    md-beats2? drop
-            paper rock        md-beats2? drop
+            paper paper       md-beats-t? drop
+            paper scissors    md-beats-t? drop
+            paper rock        md-beats-t? drop
 
-            scissors paper    md-beats2? drop
-            scissors scissors md-beats2? drop
-            scissors rock     md-beats2? drop
+            scissors paper    md-beats-t? drop
+            scissors scissors md-beats-t? drop
+            scissors rock     md-beats-t? drop
 
-            rock paper        md-beats2? drop
-            rock scissors     md-beats2? drop
-            rock rock         md-beats2? drop
+            rock paper        md-beats-t? drop
+            rock scissors     md-beats-t? drop
+            rock rock         md-beats-t? drop
         ] times
     ] benchmark
     [ 1.0e9 / ] [ no-dispatch-time get / ] bi
@@ -443,7 +443,7 @@ SYMBOL: ref
         ] times
     ] benchmark dup ref namespaces:set
     1.0e9 /
-    "single-dispatch:            %.6f　seconds (reference)\n" printf
+    "single-dispatch:            %.6f seconds (reference)\n" printf
 
     gc
     [
@@ -512,60 +512,255 @@ SYMBOL: ref
     "single spec multi-dispatch: %.6f seconds (%.2f times slower)\n" printf
 ;
 
-USE: strings
-
-! MGENERIC: partial-test ( x y -- z ) partial-inline
-! MM: partial-test ( :string :string -- z ) append ;
-! MM: partial-test ( :fixnum :fixnum -- z ) + ; inline
-! MM: partial-test ( :fixnum :string -- z ) nip "num+" swap append ;
-! MM: partial-test ( x y -- z ) 2drop f ;
-
-! : partial-test-1 ( x y -- z )      partial-test ;
-! : partial-test-2 ( y -- z )    "2" partial-test ;
-! : partial-test-3 ( -- z )  "1" "2" partial-test ;
-
-USE: math.private
-MGENERIC: partial+ ( a b -- c ) mathematical partial-inline inline
-MM: partial+ ( :fixnum :fixnum -- c ) fixnum+ ;
-MM: partial+ ( :bignum :bignum -- c ) bignum+ ;
-MM: partial+ ( :string :string -- c ) append ;
-MM: partial+ ( :integer :string -- c ) nip "int+" swap append ;
-
-: math-partial-test-1 ( x y -- z )         partial+ ;
-: math-partial-test-2 (   y -- z )      2  partial+ ;
-: math-partial-test-3 (     -- z )  1   2  partial+ ;
-: math-partial-test-4 (   y -- z )     "2" partial+ ;
-: math-partial-test-5 (     -- z ) "1" "2" partial+ ;
-
-USING: multi-generic math math.private typed ;
-
-TYPED: add-floats ( a: float b: float -- c: float ) float+ ;
-: add-somethings ( a b -- c ) + ; inline foldable flushable
-: add-floats2 ( a b -- c ) float+ ;
-
-MGENERIC: partial-test ( x y -- z ) partial-inline ! It is not specified "mathematical".
-MM: partial-test ( :string :string -- z: string ) append ;
-MM: partial-test ( :fixnum :fixnum -- z: fixnum ) fixnum+ ;
-MM: partial-test ( :float :float -- z: float ) float+ ;
-MM: partial-test ( :fixnum :float -- z: float ) [ >float ] dip float+ ;
-MM: partial-test ( x y -- z: float  ) 2drop 0.0 ;
-
-MGENERIC: float+float ( a b -- c )
-MM: float+float ( a: float b: float -- c: float ) float+ ;
-MM: float+float ( a: fixnum b: fixnum -- c: float ) fixnum+ >float ;
-
-MGENERIC: float+float2 ( a b -- c )
-MM: float+float2 ( a: float b: float -- c ) float+ ;
-MM: float+float2 ( a: fixnum b: fixnum -- c ) fixnum+ >float ;
-
-: partial-test-1 ( x -- z ) 2.0 3.0 + partial-test ;
-: partial-test-2 ( x -- z ) 2.0 3.0 add-floats partial-test ;
-: partial-test-3 ( x -- z ) 2.0 3.0 add-somethings partial-test ;
-: partial-test-4 ( x -- z ) 2.0 3.0 add-floats2 partial-test ;
-: partial-test-5 ( x -- z ) 2.0 3.0 float+float partial-test ;
-: partial-test-6 ( x -- z ) 2.0 3.0 float+float2 partial-test ;
-: partial-test-7 ( x -- z ) 2.0 float+float 3.0 partial-test ;
-: partial-test-8 ( x -- z ) 2.0 float+float2 3.0 partial-test ;
 
 
+TUPLE: t-thing ;
+TUPLE: t-paper    < t-thing ;
+TUPLE: t-scissors < t-thing ;
+TUPLE: t-rock     < t-thing ;
 
+CONSTANT: c-t-paper    T{ t-paper }
+CONSTANT: c-t-scissors T{ t-scissors }
+CONSTANT: c-t-rock     T{ t-rock }
+
+! no-dispatch
+: beats2? ( obj1 obj2 -- ? )
+    {
+        { [ dup t-rock? ]     [ drop t-scissors? [ t ] [ f ] if ] }
+        { [ dup t-paper? ]    [ drop t-rock?     [ t ] [ f ] if ] }
+        { [ dup t-scissors? ] [ drop t-paper?    [ t ] [ f ] if ] }
+        [ 2drop f ]
+    } cond ;
+
+
+! multi-dispatch
+MGENERIC: md-beats2? ( obj1 obj2 -- ? )
+
+MM: md-beats2? ( :t-paper :t-scissors -- ? ) 2drop t ;
+MM: md-beats2? ( :t-scissors :t-rock -- ? )  2drop t ;
+MM: md-beats2? ( :t-rock :t-paper -- ? )     2drop t ;
+MM: md-beats2? ( :t-thing :t-thing -- ? )    2drop f ;
+
+
+! typed multi-dispatch
+MGENERIC: md-beats-t2? ( obj1 obj2 -- ? )
+
+MM: md-beats-t2? ( :t-paper :t-scissors -- :boolean ) 2drop t ;
+MM: md-beats-t2? ( :t-scissors :t-rock -- :boolean )  2drop t ;
+MM: md-beats-t2? ( :t-rock :t-paper -- :boolean )     2drop t ;
+MM: md-beats-t2? ( :t-thing :t-thing -- :boolean )    2drop f ;
+
+
+! multi-hook-dispatch
+MGENERIC: mhd-beats2? ( thing1 thing2 | -- ? )
+
+MM: mhd-beats2? ( thing1: t-paper thing2: t-scissors | -- ? ) t ;
+MM: mhd-beats2? ( thing1: t-scissors thing2: t-rock | -- ? ) t ;
+MM: mhd-beats2? ( thing1: t-rock thing2: t-paper | -- ? ) t ;
+MM: mhd-beats2? ( thing1: t-thing thing2: t-thing | -- ? ) f ;
+
+
+! sigle-dispach
+GENERIC: sd-beats2? ( obj1 obj2 -- ? )
+
+M: t-paper sd-beats2? drop t-rock? [ t ] [ f ] if ;
+M: t-scissors sd-beats2? drop t-paper? [ t ] [ f ] if ;
+M: t-rock sd-beats2? drop t-scissors? [ t ] [ f ] if ;
+
+
+! multi-sigle-dispach
+MGENERIC: smd-beats2? ( obj1 obj2 -- ? )
+
+MM: smd-beats2? ( obj1 obj2: t-paper -- ? )    drop t-rock? [ t ] [ f ] if ;
+MM: smd-beats2? ( obj1 obj2: t-scissors -- ? ) drop t-paper? [ t ] [ f ] if ;
+MM: smd-beats2? ( obj1 obj2: t-rock -- ? )     drop t-scissors? [ t ] [ f ] if ;
+
+
+! sigle-hook-dispatch
+HOOK: shd-beats2? thing2 ( -- ? )
+
+M: t-paper shd-beats2? thing1 get t-rock? [ t ] [ f ] if ;
+M: t-scissors shd-beats2? thing1 get t-paper? [ t ] [ f ] if ;
+M: t-rock shd-beats2? thing1 get t-scissors? [ t ] [ f ] if ;
+
+
+! sigle-spac-hook-multi-dispatch
+MGENERIC: shmd-beats2? ( thing2 | -- ? )
+
+MM: shmd-beats2? ( thing2: t-scissors | -- ? ) thing1 get t-paper? [ t ] [ f ] if ;
+MM: shmd-beats2? ( thing2: t-rock | -- ? ) thing1 get t-scissors? [ t ] [ f ] if ;
+MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
+
+: bm2 ( -- )
+    "\n"
+    TIMES {
+        { [ dup 1,000,000 >= ] [
+              [ 1,000,000 / >integer ]
+              [ 1,000,000 mod 1,000 / >integer ]
+              [ 1,000 mod ]
+              tri "%d,%03d,%03d" sprintf ] }
+        { [ dup 1,000 >= ] [
+              [ 1,000 / >integer ]
+              [ 1,000 mod ]
+              bi "%d,%03d" sprintf ] }
+        [ "%d" sprintf ]
+    } cond
+    " repetitions of all combinations of rock-paper-scissors (tuple version)\n" 3append write
+
+    gc
+    [
+        TIMES [
+            c-t-paper c-t-paper       beats2? drop
+            c-t-paper c-t-scissors    beats2? drop
+            c-t-paper c-t-rock        beats2? drop
+
+            c-t-scissors c-t-paper    beats2? drop
+            c-t-scissors c-t-scissors beats2? drop
+            c-t-scissors c-t-rock     beats2? drop
+
+            c-t-rock c-t-paper        beats2? drop
+            c-t-rock c-t-scissors     beats2? drop
+            c-t-rock c-t-rock         beats2? drop
+        ] times
+    ] benchmark dup no-dispatch-time set
+    1.0e9 /
+    "no-dispatch:                %.6f seconds (reference)\n" printf
+
+    gc
+    [
+        TIMES [
+            c-t-paper c-t-paper       sd-beats2? drop
+            c-t-paper c-t-scissors    sd-beats2? drop
+            c-t-paper c-t-rock        sd-beats2? drop
+
+            c-t-scissors c-t-paper    sd-beats2? drop
+            c-t-scissors c-t-scissors sd-beats2? drop
+            c-t-scissors c-t-rock     sd-beats2? drop
+
+            c-t-rock c-t-paper        sd-beats2? drop
+            c-t-rock c-t-scissors     sd-beats2? drop
+            c-t-rock c-t-rock         sd-beats2? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "single-dispatch:            %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        TIMES [
+            c-t-paper c-t-paper       md-beats2? drop
+            c-t-paper c-t-scissors    md-beats2? drop
+            c-t-paper c-t-rock        md-beats2? drop
+
+            c-t-scissors c-t-paper    md-beats2? drop
+            c-t-scissors c-t-scissors md-beats2? drop
+            c-t-scissors c-t-rock     md-beats2? drop
+
+            c-t-rock c-t-paper        md-beats2? drop
+            c-t-rock c-t-scissors     md-beats2? drop
+            c-t-rock c-t-rock         md-beats2? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "multi-dispatch:             %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        TIMES [
+            c-t-paper c-t-paper       md-beats-t2? drop
+            c-t-paper c-t-scissors    md-beats-t2? drop
+            c-t-paper c-t-rock        md-beats-t2? drop
+
+            c-t-scissors c-t-paper    md-beats-t2? drop
+            c-t-scissors c-t-scissors md-beats-t2? drop
+            c-t-scissors c-t-rock     md-beats-t2? drop
+
+            c-t-rock c-t-paper        md-beats-t2? drop
+            c-t-rock c-t-scissors     md-beats-t2? drop
+            c-t-rock c-t-rock         md-beats-t2? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "multi-dispatch (typed):     %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        TIMES [
+            c-t-paper c-t-paper       smd-beats2? drop
+            c-t-paper c-t-scissors    smd-beats2? drop
+            c-t-paper c-t-rock        smd-beats2? drop
+
+            c-t-scissors c-t-paper    smd-beats2? drop
+            c-t-scissors c-t-scissors smd-beats2? drop
+            c-t-scissors c-t-rock     smd-beats2? drop
+
+            c-t-rock c-t-paper        smd-beats2? drop
+            c-t-rock c-t-scissors     smd-beats2? drop
+            c-t-rock c-t-rock         smd-beats2? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "single spec multi-dispatch: %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        TIMES [
+            c-t-paper    thing1 set
+            c-t-paper    thing2 set shd-beats2? drop
+            c-t-scissors thing2 set shd-beats2? drop
+            c-t-rock     thing2 set shd-beats2? drop
+
+            c-t-scissors thing1 set c-t-paper thing2 set shd-beats2? drop c-t-scissors
+            thing2 set shd-beats2? drop c-t-rock thing2 set shd-beats2? drop
+
+            c-t-rock     thing1 set
+            c-t-paper    thing2 set shd-beats2? drop
+            c-t-scissors thing2 set shd-beats2? drop
+            c-t-rock     thing2 set shd-beats2? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "single-hook-dispatch:       %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        TIMES [
+            c-t-paper    thing1 set
+            c-t-paper    thing2 set mhd-beats2? drop
+            c-t-scissors thing2 set mhd-beats2? drop
+            c-t-rock     thing2 set mhd-beats2? drop
+
+            c-t-scissors thing1 set
+            c-t-paper    thing2 set mhd-beats2? drop
+            c-t-scissors thing2 set mhd-beats2? drop
+            c-t-rock     thing2 set mhd-beats2? drop
+
+            c-t-rock     thing1 set
+            c-t-paper    thing2 set mhd-beats2? drop
+            c-t-scissors thing2 set mhd-beats2? drop
+            c-t-rock     thing2 set mhd-beats2? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "multi-hook-dispatch:        %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        TIMES [
+            c-t-paper    thing1 set
+            c-t-paper    thing2 set shmd-beats2? drop
+            c-t-scissors thing2 set shmd-beats2? drop
+            c-t-rock     thing2 set shmd-beats2? drop
+
+            c-t-scissors thing1 set c-t-paper thing2 set shd-beats2? drop c-t-scissors
+            thing2 set shd-beats2? drop c-t-rock thing2 set shd-beats2? drop
+
+            c-t-rock     thing1 set
+            c-t-paper    thing2 set shmd-beats2? drop
+            c-t-scissors thing2 set shmd-beats2? drop
+            c-t-rock     thing2 set shmd-beats2? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "single-hook-multi-dispatch: %.6f seconds (%.2f times slower)\n" printf
+;
