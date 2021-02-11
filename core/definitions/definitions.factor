@@ -24,8 +24,6 @@ SYMBOL: changed-effects
 
 SYMBOL: outdated-generics
 
-SYMBOL: outdated-multi-generics
-
 SYMBOL: new-words
 
 : new-word ( word -- )

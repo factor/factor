@@ -5,7 +5,6 @@ classes.tuple.private continuations definitions generic
 hash-sets init kernel kernel.private math namespaces sequences
 sets source-files.errors vocabs words ;
 QUALIFIED-WITH: multi-generic mg
-
 IN: compiler.units
 
 PRIMITIVE: modify-code-heap ( alist update-existing? reset-pics? -- )
@@ -144,7 +143,7 @@ M: object always-bump-effect-counter? drop f ;
     maybe-changed get members
     changed-definitions get members
     [ always-bump-effect-counter? ] filter
-    3array combine new-words get [ in? not ] curry any? ;
+    3array union-all new-words get [ in? not ] curry any? ;
 
 : bump-effect-counter ( -- )
     bump-effect-counter? [
@@ -195,7 +194,6 @@ PRIVATE>
     HS{ } clone maybe-changed pick set-at
     HS{ } clone changed-effects pick set-at
     HS{ } clone outdated-generics pick set-at
-    HS{ } clone outdated-multi-generics pick set-at
     H{ } clone outdated-tuples pick set-at
     HS{ } clone new-words pick set-at [
         add-nesting-observer

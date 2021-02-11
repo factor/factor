@@ -282,12 +282,12 @@ ERROR: check-method-error class generic ;
     ] unless ; inline
 
 : remake-multi-generic ( generic -- )
-    outdated-multi-generics get add-to-unit ;
+    outdated-generics get add-to-unit ;
 
 DEFER: make-generic
 
 : remake-multi-generics ( -- )
-    outdated-multi-generics get members [ multi-generic? ] filter
+    outdated-generics get members [ multi-generic? ] filter
     [ make-generic ] each ;
 
 :: ?single-generic-spec ( generic -- n/var/f )
