@@ -13,7 +13,6 @@ stack-checker.dependencies stack-checker.transforms summary
 tools.annotations tools.annotations.private typed vectors words
 words.symbol ;
 FROM: namespaces => set ;
-FROM: generic.parser => current-method with-method-definition ;
 QUALIFIED-WITH: generic.single.private gsp
 QUALIFIED-WITH: generic g
 
@@ -571,11 +570,16 @@ M: invalid-math-method-parameter summary
     scan-word scan-effect
     dup effect>specializer rot create-method-in ;
 
+SYMBOL: current-multi-method
+
+: with-multi-method-definition ( method quot -- )
+    over current-multi-method set call current-multi-method off ; inline
+
 : (MM:) ( -- method def )
     [
         scan-new-method [
             parse-definition
-        ] with-method-definition
+        ] with-multi-method-definition
     ] with-definition ;
 
 : extract-locals ( method -- effect vars assoc )
@@ -591,7 +595,7 @@ M: invalid-math-method-parameter summary
         scan-new-method [
             [ parse-definition ] extract-locals-definition
             drop
-        ] with-method-definition
+        ] with-multi-method-definition
     ] with-definition ;
 
 : define-typed-method ( method def -- )
@@ -1301,7 +1305,7 @@ M: not-in-a-multi-method-error summary
 \ (call-next-multi-method) t "no-compile" set-word-prop
 
 SYNTAX: call-next-multi-method
-   current-method get
+   current-multi-method get
    [ literalize suffix! \ (call-next-multi-method) suffix! ]
    [ not-in-a-multi-method-error ] if* ;
 
