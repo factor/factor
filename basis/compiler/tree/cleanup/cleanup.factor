@@ -66,7 +66,7 @@ GENERIC: cleanup-tree* ( node -- node/nodes )
             [ "multi-generic" word-prop multi-dispatch-generic? ]
         } 1&& [
             [ [ class>> ] [ word>> ] bi add-depends-on-multi-dispatch-generic ]
-            [ [ class>> ] [ word>> ] [ method>> ] tri add-depends-on-method ]
+            [ [ class>> ] [ word>> ] [ method>> ] tri add-depends-on-multi-method ]
             bi
         ] [
             [ [ class>> ] [ word>> ] bi add-depends-on-generic ]
