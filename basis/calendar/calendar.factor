@@ -333,16 +333,16 @@ ALIAS: >utc >gmt
 M: timestamp <=> [ >gmt tuple-slots ] compare ;
 
 : same-year? ( ts1 ts2 -- ? )
-    [ >gmt slots{ year } ] same? ;
+    [ year>> ] bi@ = ; inline
 
 : quarter ( timestamp -- [1,4] )
     month>> 3 /mod [ drop 1 + ] unless-zero ; inline
 
 : same-quarter? ( ts1 ts2 -- ? )
-    [ >gmt [ year>> ] [ quarter ] bi 2array ] same? ;
+    [ [ year>> ] [ quarter ] bi 2array ] same? ;
 
 : same-month? ( ts1 ts2 -- ? )
-    [ >gmt slots{ year month } ] same? ;
+    [ slots{ year month } ] same? ;
 
 :: (day-of-year) ( year month day -- n )
     month days-until nth day + {
@@ -354,7 +354,10 @@ M: timestamp <=> [ >gmt tuple-slots ] compare ;
     >date< (day-of-year) ;
 
 : same-day? ( ts1 ts2 -- ? )
-    [ >gmt slots{ year month day } ] same? ;
+    [ slots{ year month day } ] same? ;
+
+: same-day-of-year? ( ts1 ts2 -- ? )
+    [ slots{ month day } ] same? ;
 
 : (day-of-week) ( year month day -- n )
     ! Zeller Congruence
@@ -382,7 +385,7 @@ DEFER: end-of-year
     } case ;
 
 : same-week? ( ts1 ts2 -- ? )
-    [ >gmt [ year>> ] [ week-number ] bi 2array ] same? ;
+    [ [ year>> ] [ week-number ] bi 2array ] same? ;
 
 : same-hour? ( ts1 ts2 -- ? )
     [ >gmt slots{ year month day hour } ] same? ;
@@ -391,7 +394,11 @@ DEFER: end-of-year
     [ >gmt slots{ year month day hour minute } ] same? ;
 
 : same-second? ( ts1 ts2 -- ? )
-    [ >gmt slots{ year month day hour minute second } ] same? ;
+    [ >gmt ] bi@
+    {
+        [ [ second>> floor ] bi@ = ]
+        [ [ slots{ year month day hour minute } ] same? ]
+    } 2&& ;
 
 <PRIVATE
 
@@ -467,8 +474,11 @@ M: timestamp days-in-year year>> days-in-year ;
 : days-in-month ( timestamp -- n )
     >date< drop (days-in-month) ;
 
-: midnight ( timestamp -- timestamp ) 0 0 0 set-time ; inline
-: noon ( timestamp -- timestamp ) 12 0 0 set-time ; inline
+: midnight! ( timestamp -- timestamp ) 0 0 0 set-time ; inline
+: noon! ( timestamp -- timestamp ) 12 0 0 set-time ; inline
+
+: midnight ( timestamp -- timestamp ) clone midnight! ; inline
+: noon ( timestamp -- timestamp ) clone noon! ; inline
 
 : today ( -- timestamp ) now midnight ; inline
 : tomorrow ( -- timestamp ) 1 days hence midnight ; inline
@@ -482,8 +492,11 @@ M: timestamp days-in-year year>> days-in-year ;
 
 ALIAS: start-of-day midnight
 
-: end-of-day ( timestamp -- timestamp )
+: end-of-day! ( timestamp -- timestamp )
     23 >>hour 59 >>minute 59+999/1000 >>second ; inline
+
+: end-of-day ( timestamp -- timestamp )
+    clone end-of-day! ; inline
 
 : start-of-month ( timestamp -- timestamp )
     midnight 1 >>day ; inline
@@ -497,18 +510,30 @@ ALIAS: start-of-day midnight
 : end-of-quarter ( timestamp -- timestamp )
     dup quarter 1 - 3 * 3 + >>month end-of-month ; inline
 
-: first-day-of-month ( timestamp -- timestamp )
+: first-day-of-month! ( timestamp -- timestamp )
     1 >>day ;
 
-: last-day-of-month ( timestamp -- timestamp )
+: first-day-of-month ( timestamp -- timestamp )
+    clone first-day-of-month! ;
+
+: last-day-of-month! ( timestamp -- timestamp )
     dup days-in-month >>day ; inline
 
+: last-day-of-month ( timestamp -- timestamp )
+    clone last-day-of-month! ; inline
+
+: first-day-of-year! ( timestamp -- timestamp )
+    first-day-of-month! 1 >>month ; inline
+
 GENERIC: first-day-of-year ( object -- timestamp )
-M: timestamp first-day-of-year first-day-of-month 1 >>month ;
+M: timestamp first-day-of-year clone first-day-of-year! ;
 M: integer first-day-of-year <year> ;
 
+: last-day-of-year! ( timestamp -- timestamp )
+    12 >>month 31 >>day ; inline
+
 GENERIC: last-day-of-year ( object -- timestamp )
-M: timestamp last-day-of-year 12 >>month 31 >>day ;
+M: timestamp last-day-of-year clone last-day-of-year! ;
 M: integer last-day-of-year 12 31 <date> ;
 
 : first-day-of-decade ( object -- timestamp )
@@ -550,14 +575,20 @@ M: integer last-day-of-year 12 31 <date> ;
 : end-of-millennium ( object -- timestamp )
     last-day-of-millennium end-of-day ;
 
-: start-of-hour ( timestamp -- timestamp ) 0 >>minute 0 >>second ;
-: end-of-hour ( timestamp -- timestamp ) 59 >>minute 59+999/1000 >>second ;
+: start-of-hour! ( timestamp -- timestamp ) 0 >>minute 0 >>second ;
+: end-of-hour! ( timestamp -- timestamp ) 59 >>minute 59+999/1000 >>second ;
+: start-of-hour ( timestamp -- timestamp ) clone start-of-hour! ;
+: end-of-hour ( timestamp -- timestamp ) clone end-of-hour! ;
 
-: start-of-minute ( timestamp -- timestamp ) 0 >>second ;
-: end-of-minute ( timestamp -- timestamp ) 59+999/1000 >>second ;
+: start-of-minute! ( timestamp -- timestamp ) 0 >>second ;
+: end-of-minute! ( timestamp -- timestamp ) 59+999/1000 >>second ;
+: start-of-minute ( timestamp -- timestamp ) clone start-of-minute! ;
+: end-of-minute ( timestamp -- timestamp ) clone end-of-minute! ;
 
-: start-of-second ( timestamp -- timestamp ) [ floor ] change-second ;
-: end-of-second ( timestamp -- timestamp ) [ floor 999/1000 + ] change-second ;
+: start-of-second! ( timestamp -- timestamp ) [ floor ] change-second ;
+: end-of-second! ( timestamp -- timestamp ) [ floor 999/1000 + ] change-second ;
+: start-of-second ( timestamp -- timestamp ) clone start-of-second! ;
+: end-of-second ( timestamp -- timestamp ) clone end-of-second! ;
 
 <PRIVATE
 
