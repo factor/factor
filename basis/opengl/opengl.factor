@@ -3,9 +3,9 @@
 ! Portions copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data assocs colors
-combinators.smart continuations fry init io kernel locals macros
-math math.parser namespaces opengl.gl sequences
-sequences.generalizations specialized-arrays system words ;
+combinators.smart continuations init io kernel math math.parser
+namespaces opengl.gl sequences sequences.generalizations
+specialized-arrays system words ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-ARRAY: uint

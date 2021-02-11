@@ -71,11 +71,11 @@ void inline_cache_jit::emit_inline_cache(fixnum index, cell generic_word_,
   cell ic_type = determine_inline_cache_type(cache_entries.untagged());
   parent->update_pic_count(ic_type);
 
-  // Generate machine code to determine the object's class.
+  // Put the tag of the object, or class of the tuple in a register.
   emit_with_literal(parent->special_objects[PIC_LOAD],
                     tag_fixnum(-index * sizeof(cell)));
 
-  // Put the tag of the object, or class of the tuple in a register.
+  // Generate machine code to determine the object's class.
   emit(parent->special_objects[ic_type]);
 
   // Generate machine code to check, in turn, if the class is one of the cached

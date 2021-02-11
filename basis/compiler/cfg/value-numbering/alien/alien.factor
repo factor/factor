@@ -4,7 +4,7 @@ USING: accessors combinators combinators.short-circuit
 compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.utilities compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.math
-compiler.cfg.value-numbering.rewrite cpu.architecture fry kernel
+compiler.cfg.value-numbering.rewrite cpu.architecture kernel
 make math sequences ;
 IN: compiler.cfg.value-numbering.alien
 

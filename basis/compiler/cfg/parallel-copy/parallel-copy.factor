@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.ssa.destruction.leaders compiler.utilities
-cpu.architecture deques dlists fry kernel locals make namespaces
-sequences ;
+cpu.architecture deques dlists kernel make namespaces sequences ;
 IN: compiler.cfg.parallel-copy
 
 <PRIVATE

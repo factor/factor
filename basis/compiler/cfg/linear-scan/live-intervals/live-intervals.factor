@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs binary-search combinators compiler.cfg.def-use
-compiler.cfg.instructions compiler.cfg.linear-scan.ranges
-compiler.cfg.linearization compiler.cfg.liveness
-compiler.cfg.registers compiler.cfg.ssa.destruction.leaders
-cpu.architecture fry kernel locals math math.order namespaces
-sequences vectors ;
+USING: accessors assocs binary-search combinators
+compiler.cfg.def-use compiler.cfg.instructions
+compiler.cfg.linear-scan.ranges compiler.cfg.linearization
+compiler.cfg.liveness compiler.cfg.registers
+compiler.cfg.ssa.destruction.leaders cpu.architecture kernel
+math math.order namespaces sequences vectors ;
 IN: compiler.cfg.linear-scan.live-intervals
 
 TUPLE: vreg-use n def-rep use-rep spill-slot? ;

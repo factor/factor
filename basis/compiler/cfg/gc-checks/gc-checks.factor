@@ -3,8 +3,8 @@
 USING: accessors assocs compiler.cfg compiler.cfg.comparisons
 compiler.cfg.instructions compiler.cfg.predecessors
 compiler.cfg.registers compiler.cfg.rpo compiler.cfg.utilities
-cpu.architecture grouping kernel layouts locals make math
-namespaces sequences ;
+cpu.architecture grouping kernel layouts make math namespaces
+sequences ;
 IN: compiler.cfg.gc-checks
 
 <PRIVATE

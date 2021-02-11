@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators combinators.short-circuit
+USING: accessors combinators combinators.short-circuit
 compiler.cfg.loop-detection compiler.cfg.predecessors
-compiler.cfg.rpo compiler.cfg.utilities deques dlists fry kernel
+compiler.cfg.rpo compiler.cfg.utilities deques dlists kernel
 make math namespaces sequences sets sorting ;
 IN: compiler.cfg.linearization
 

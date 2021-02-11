@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel kernel.private make math
+USING: accessors arrays assocs kernel kernel.private math
 math.order math.private quotations sequences sequences.private
 sets sorting words ;
 IN: combinators

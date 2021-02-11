@@ -1,5 +1,5 @@
 USING: alien alien.c-types alien.data arrays classes.struct
-compiler.units continuations destructors fry generic.single io
+compiler.units continuations destructors generic.single io
 io.backend io.directories io.encodings io.encodings.ascii
 io.encodings.binary io.encodings.latin1 io.encodings.string
 io.encodings.utf16 io.encodings.utf8 io.files io.files.private

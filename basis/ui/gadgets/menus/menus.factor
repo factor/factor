@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel locals math math.rectangles
-math.vectors memoize models namespaces opengl sequences sorting
+USING: accessors combinators kernel math math.rectangles
+math.vectors models namespaces opengl sequences sorting
 ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.glass ui.gadgets.packs ui.gadgets.worlds
 ui.gadgets.wrappers ui.gestures ui.operations ui.pens

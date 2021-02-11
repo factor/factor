@@ -248,6 +248,16 @@ HELP: broadcast-once
         "B{ 1 2 3 } f 7777 <inet4> broadcast-once"
         ""
     }
+    "Send a datagram to the broadcast address, port 7777:"
+    { $example "USING: io.sockets prettyprint ;"
+        "B{ 1 2 3 } \"192.168.88.255\" 7777 <inet4> broadcast-once"
+        ""
+    }
+    "Receive a datagram on port 7777:"
+    { $unchecked-example "USING: destructors kernel io.sockets ;"
+        "f 7777 <inet4> <datagram> [ receive ] [ dispose ] bi"
+        ""
+    }
 }
 { $description "Broadcasts a packet one time to the address and closes the sending broadcast port." } ;
 
