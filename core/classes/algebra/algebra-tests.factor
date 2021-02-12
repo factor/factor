@@ -1,4 +1,4 @@
-USING: accessors arrays assocs classes classes.algebra
+USING: accessors arrays assocs classes classes.algebra classes.algebra.private
 classes.tuple classes.union generic generic.private growable
 kernel math prettyprint quotations random sbufs sequences
 stack-checker strings tools.test vectors words ;
@@ -361,3 +361,12 @@ TUPLE: xh < xb ;
 { sa } [ sa { sa sb sc } min-class ] unit-test
 
 [ \ + flatten-class ] must-fail
+
+{ t } [ { tuple tuple } { tuple object } [ <covariant-tuple> ] bi@ covariant-tuple<= ] unit-test
+{ t } [ { tuple object } { tuple object } [ <covariant-tuple> ] bi@ covariant-tuple<= ] unit-test
+{ f } [ { tuple object } { tuple tuple } [ <covariant-tuple> ] bi@ covariant-tuple<= ] unit-test
+{ t } [ { tuple tuple } { tuple } [ <covariant-tuple> ] bi@ covariant-tuple<= ] unit-test
+{ f } [ { tuple } { tuple tuple } [ <covariant-tuple> ] bi@ covariant-tuple<= ] unit-test
+{ t } [ { tuple tuple } { object } [ <covariant-tuple> ] bi@ covariant-tuple<= ] unit-test
+{ f } [ { object object } { tuple } [ <covariant-tuple> ] bi@ covariant-tuple<= ] unit-test
+{ f } [ { object } { tuple tuple } [ <covariant-tuple> ] bi@ covariant-tuple<= ] unit-test

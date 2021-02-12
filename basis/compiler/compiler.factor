@@ -34,9 +34,7 @@ GENERIC: no-compile? ( word -- ? )
 
 M: method no-compile? "method-generic" word-prop no-compile? ;
 
-M: predicate-engine-word no-compile?
-    { [ call-next-method ]
-      [ "owner-generic" word-prop no-compile? ] } 1|| ;
+M: predicate-engine-word no-compile? "owner-generic" word-prop no-compile? ;
 
 M: word no-compile?
     { [ macro? ] [ "special" word-prop ] [ "no-compile" word-prop ] } 1|| ;
@@ -104,6 +102,8 @@ M: word combinator? inline? ;
     {
         [ single-generic? ]
         [ primitive? ]
+        [ multi-generic? ]
+        [ nested-dispatch-engine-word? ]
     } 1|| not ;
 
 : contains-breakpoints? ( -- ? )

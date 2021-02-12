@@ -138,6 +138,8 @@ M: anonymous-union implementor-classes members>> ;
 
 M: anonymous-intersection implementor-classes participants>> ;
 
+M: covariant-tuple implementor-classes classes>> ;
+
 : with-implementors ( class generic quot -- )
     [ swap implementor-classes [ implementors-map get at ] map ] dip call ; inline
 
@@ -147,6 +149,14 @@ M: anonymous-intersection implementor-classes participants>> ;
     2bi ;
 
 : create-method ( class generic -- method )
+    2dup ?lookup-method dup [ 2nip dup reset-generic ] [
+        drop
+        [ <method> dup ] 2keep
+        reveal-method
+        reset-caches
+    ] if ;
+
+: create-multi-method ( classes generic -- method )
     2dup ?lookup-method dup [ 2nip dup reset-generic ] [
         drop
         [ <method> dup ] 2keep

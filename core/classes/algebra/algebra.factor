@@ -2,10 +2,19 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.private
 combinators kernel make math math.order namespaces sequences
+sequences.extras
 sets sorting vectors words ;
 IN: classes.algebra
 
 DEFER: sort-classes
+
+TUPLE: covariant-tuple { classes read-only } ;
+INSTANCE: covariant-tuple classoid
+M: covariant-tuple rank-class drop 9 ;
+M: covariant-tuple class-name
+    classes>> [ class-name ] map "-" join ;
+: <covariant-tuple> ( classes -- classoid )
+    [ classoid check-instance ] map covariant-tuple boa ;
 
 <PRIVATE
 
@@ -165,6 +174,20 @@ PREDICATE: empty-union < anonymous-union members>> empty? ;
 
 PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
 
+: covariant-tuple<= ( first second -- ? )
+    [ classes>> ] bi@ object pad-longest [ class<= ] 2all? ;
+
+    ! 2dup [ length ] bi@
+    ! 2dup =
+    ! [ 2drop [ class<= ] 2all? ]
+    ! [ > 2nip ] if ;
+    ! ! {
+    ! !     { [ 2dup [ length ] same? ] [ [ classes>> ] bi@ [ class<= ] 2all? ] }
+    ! !     [ longer ]
+    ! ! }
+
+    ! ! ;
+
 : (class<=) ( first second -- ? )
     2dup eq? [ 2drop t ] [
         [ normalize-class ] bi@
@@ -181,6 +204,7 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
                 { [ dup anonymous-union? ] [ right-anonymous-union<= ] }
                 { [ dup anonymous-intersection? ] [ right-anonymous-intersection<= ] }
                 { [ dup anonymous-complement? ] [ class>> classes-intersect? not ] }
+                ! { [ 2dup [ covariant-tuple? ] both? ] [ covariant-tuple<= ] }
                 [ 2drop f ]
             } cond
         ] if
@@ -194,6 +218,13 @@ M: anonymous-intersection (classes-intersect?)
 
 M: anonymous-complement (classes-intersect?)
     class>> class<= not ;
+
+: 2any? ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... ? )
+    [ not ] compose 2all? not ; inline
+
+M: covariant-tuple (classes-intersect?)
+    { [ [ covariant-tuple? ] both? ]
+      [ [ classes>> ] bi@ [ classes-intersect? ] 2any? ] } 2&& ;
 
 : anonymous-union-and ( first second -- class )
     members>> [ class-and ] with map <anonymous-union> ;
@@ -256,6 +287,10 @@ M: anonymous-complement (classes-intersect?)
 
 M: anonymous-union (flatten-class)
     members>> [ (flatten-class) ] each ;
+
+! NOTE: Unsure if this is correct semantically, but this can be used to get the
+! most specific class for dispatch
+M: covariant-tuple (flatten-class) classes>> first (flatten-class) ;
 
 PRIVATE>
 

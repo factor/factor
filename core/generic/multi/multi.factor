@@ -1,17 +1,20 @@
 USING: accessors arrays assocs classes.algebra classes.algebra.private
 classes.private combinators combinators.short-circuit
-combinators.short-circuit.smart effects generic generic.single
-generic.single.private generic.standard kernel layouts math math.order
-namespaces see sequences sequences.zipped sets sorting vectors words ;
+combinators.short-circuit.smart definitions effects effects.parser generic
+generic.parser generic.single generic.single.private generic.standard kernel
+layouts math math.order namespaces parser see sequences sequences.zipped sets
+sorting vectors words ;
 
 IN: generic.multi
 
-PREDICATE: multi-method < method "method-effect" word-prop ;
+FROM: namespaces => set ;
+
+PREDICATE: multi-method < method "method-class" word-prop covariant-tuple? ;
 
 GENERIC: method-types ( method -- seq )
 M: method method-types "method-class" word-prop 1array ;
 M: multi-method method-types
-    "method-effect" word-prop effect-in-types ! reverse
+    "method-class" word-prop classes>>
     ;
 
 : tuple-echelon ( class -- n ) "layout" word-prop third ;
@@ -254,10 +257,9 @@ M: tuple-dispatcher compile-dispatcher*
         methods ?first
     ] if ;
 
-: methods>multi-methods ( assoc -- assoc )
-    values [ f ]
-    [ dup first stack-effect in>> length 1 - multi-methods ] if-empty ;
-
+:: methods>multi-methods ( arity assoc -- assoc )
+    assoc values [ f ]
+    [ arity 1 -  multi-methods ] if-empty ;
 
 SYMBOL: current-index
 current-index [ 0 ] initialize
@@ -274,9 +276,12 @@ DEFER: flatten-multi-methods
       [ <nested-dispatch-engine> ] when
     ] assoc-map ;
 
+PREDICATE: nested-dispatch-engine-word < predicate-engine-word
+    "nested-dispatch-engine" word-prop ;
+
 : <nested-dispatch-engine-word> ( -- word )
     "/dispatch" <engine-word>
-    dup t "no-compile" set-word-prop
+    dup t "nested-dispatch-engine" set-word-prop
     ;
 
 : define-nested-dispatch-engine ( quot -- word )
@@ -290,3 +295,78 @@ M: nested-dispatch-engine compile-engine
     [ call-next-method ]
     [ index>> make-empty-cache \ mega-cache-lookup [ ] 4sequence ] bi
     define-nested-dispatch-engine ;
+
+! This should be usable without the need to run the tree transformer, as
+! flatten-method should distribute the methods over the dispatch tuple.
+M: multi-method compile-engine
+
+! * Method combination interface
+TUPLE: multi-combination ;
+CONSTANT: nary-combination T{ multi-combination f }
+M: multi-combination mega-cache-quot
+    0 make-empty-cache \ mega-cache-lookup [ ] 4sequence ;
+! TODO: implement after testing
+M: multi-combination inline-cache-quots
+    2drop f f ;
+
+PREDICATE: multi-generic < generic
+    "combination" word-prop multi-combination? ;
+
+ERROR: not-single-dispatch generic ;
+M: multi-generic dispatch# not-single-dispatch ;
+
+! * Build Decision Tree
+: multi-generic-arity ( generic -- n )
+    "methods" word-prop values [ method-types length ] map supremum ;
+
+GENERIC: promote-method ( arity  )
+
+! FIXME: almost copy-paste from single-combination, need abstraction
+: build-multi-decision-tree ( generic -- mega-cache-assoc )
+    [ "engines" word-prop forget-all ]
+    [ V{ } clone "engines" set-word-prop ]
+    [
+        [ multi-generic-arity ]
+        [ "methods" word-prop clone
+          dup find-default default set
+        ] bi methods>multi-methods
+        flatten-multi-methods
+        <engine> compile-engine 
+    ] tri ;
+
+! FIXME: almost copy-paste from single-combination, need abstraction
+M: multi-combination perform-combination
+    [
+        H{ } clone predicate-engines set
+        dup generic-word set
+        dup build-multi-decision-tree
+        [ "decision-tree" set-word-prop ]
+        [ mega-cache-quot define ]
+        [ define-inline-cache-quot ]
+        2tri
+    ] with-combination ;
+
+! * Syntax
+ERROR: empty-dispatch-spec seq ;
+: assert-dispatch-types ( seq -- seq )
+    dup empty? [ empty-dispatch-spec ] when ;
+
+: >multi-combination ( combination -- )
+    dup multi-combination?
+    [ drop ] [ nary-combination "combination" set-word-prop ] if ;
+
+: create-multi-method-in ( class generic -- method )
+    [ create-method-in ] keep >multi-combination ;
+
+: scan-new-multi-method ( -- method )
+    scan-word
+    scan-effect effect-in-types assert-dispatch-types
+    [ bootstrap-word ] map <covariant-tuple> swap create-multi-method-in ;
+
+
+: (MM:) ( -- method def )
+    [
+        scan-new-multi-method [ parse-definition ] with-method-definition
+    ] with-definition ;
+
+SYNTAX: MM: (MM:) define ;

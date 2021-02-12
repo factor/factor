@@ -51,7 +51,8 @@ M: object specializer-declaration class-of ;
     specializer [ specialize-quot ] when* ;
 
 : standard-method? ( method -- ? )
-    dup method? [
+    dup { [ method? ] [ multi-method? not ] } 1&&
+    [
         "method-generic" word-prop standard-generic?
     ] [ drop f ] if ;
 
