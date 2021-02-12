@@ -431,41 +431,41 @@ HELP: week-number
 } ;
 
 HELP: sunday
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Returns the Sunday from the current week, which starts on a Sunday." } ;
 
 HELP: monday
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Returns the Monday from the current week, which starts on a Sunday." } ;
 
 HELP: tuesday
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Returns the Tuesday from the current week, which starts on a Sunday." } ;
 
 HELP: wednesday
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Returns the Wednesday from the current week, which starts on a Sunday." } ;
 
 HELP: thursday
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Returns the Thursday from the current week, which starts on a Sunday." } ;
 
 HELP: friday
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Returns the Friday from the current week, which starts on a Sunday." } ;
 
 HELP: saturday
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Returns the Saturday from the current week, which starts on a Sunday." } ;
 
 { sunday monday tuesday wednesday thursday friday saturday } related-words
 
 HELP: midnight
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Sets the timestamp to represent the day at midnight, or the beginning of the day." } ;
 
 HELP: noon
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Sets the timestamp to represent the day at noon, or the middle of the day." } ;
 
 HELP: today
@@ -473,11 +473,11 @@ HELP: today
 { $description "Sets the timestamp to represents today at midnight." } ;
 
 HELP: start-of-month
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Sets the timestamp with the day set to one." } ;
 
 HELP: start-of-week
-{ $values { "timestamp" timestamp } }
+{ $values { "timestamp" timestamp } { "timestamp'" timestamp } }
 { $description "Sets the timestamp with the day of the week set to Sunday." } ;
 
 HELP: start-of-year
