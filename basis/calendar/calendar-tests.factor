@@ -335,7 +335,7 @@ IN: calendar
         T{ timestamp { year 2020 } { month 3 } { day 29 } }
     }
 } [
-    2020 march gmt 5 <iota> [ [ clone ] dip sunday-of-month ] with map
+    2020 march gmt 5 <iota> [ sunday-of-month ] with map
 ] unit-test
 
 
@@ -348,7 +348,7 @@ IN: calendar
         T{ timestamp { year 2020 } { month 2 } { day 29 } }
     }
 } [
-    2020 february gmt 5 <iota> [ [ clone ] dip saturday-of-month ] with map
+    2020 february gmt 5 <iota> [ saturday-of-month ] with map
 ] unit-test
 
 
@@ -362,7 +362,7 @@ IN: calendar
         T{ timestamp { year 2021 } { month 1 } { day 4 } }
     }
 } [
-    2020 december gmt 5 <iota> [ [ clone ] dip monday-of-month ] with map
+    2020 december gmt 5 <iota> [ monday-of-month ] with map
 ] unit-test
 
 { t } [
