@@ -319,8 +319,9 @@ PREDICATE: nested-dispatch-engine-word < predicate-engine-word
     2tri ;
 
 M: nested-dispatch-engine compile-engine
-    [ flatten-methods convert-tuple-methods ] change-methods
-    [ call-next-method ]
+    [ ! compile-engines*
+      flatten-methods convert-tuple-methods ] change-methods
+    [ dup index>> current-index [ call-next-method ] with-variable ]
     [ index>> make-empty-cache \ mega-cache-lookup [ ] 4sequence ] bi
     define-nested-dispatch-engine ;
 
@@ -332,6 +333,7 @@ M: multi-combination mega-cache-quot
 ! TODO: implement after testing
 M: multi-combination inline-cache-quots
     2drop f f ;
+M: multi-combination picker current-index get (picker) ;
 
 PREDICATE: multi-generic < generic
     "combination" word-prop multi-combination? ;
@@ -353,6 +355,7 @@ M: multi-generic dispatch# not-single-dispatch ;
           dup find-default default set
         ] bi methods>multi-methods
         flatten-multi-methods
+        compile-engines*
         <engine> compile-engine 
     ] tri ;
 
