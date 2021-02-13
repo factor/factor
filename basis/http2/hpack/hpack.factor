@@ -1,4 +1,4 @@
-USING: combinators fry locals kernel math multiline sequences ;
+USING: accessors combinators fry locals kernel math multiline sequences ;
 
 IN: hpack
 
@@ -32,7 +32,47 @@ CONSTANT: static-table {
     { "accept-ranges" f }
     { "accept" f }
     { "access-control-allow-origin" f }
-    ! TODO: finish transcribing the static table
+    { "age" f }
+    { "allow" f }
+    { "authorization" f }
+    { "cache-control" f }
+    { "content-disposition" f }
+    { "content-encoding" f }
+    { "content-language" f }
+    { "content-length" f }
+    { "content-location" f }
+    { "content-range" f }
+    { "content-type" f }
+    { "cookie" f }
+    { "date" f }
+    { "etag" f }
+    { "expect" f }
+    { "expires" f }
+    { "from" f }
+    { "host" f }
+    { "if-match" f }
+    { "if-modified-since" f }
+    { "if-none-match" f }
+    { "if-range" f }
+    { "if-unmodified-since" f }
+    { "last-modified" f }
+    { "link" f }
+    { "location" f }
+    { "max-forwards" f }
+    { "proxy-authenticate" f }
+    { "proxy-authorization" f }
+    { "range" f }
+    { "referer" f }
+    { "refresh" f }
+    { "retry-after" f }
+    { "server" f }
+    { "set-cookie" f }
+    { "strict-transport-security" f }
+    { "transfer-encoding" f }
+    { "user-agent" f }
+    { "vary" f }
+    { "via" f }
+    { "www-authenticate" f }
 }
 
 ! block will be a byte array
@@ -50,14 +90,20 @@ CONSTANT: static-table {
     ! check bounds: i < len(static-table++decode-context) and i > 0
     dup pick dynamic-table>> length static-table length + < 
     over 0 > 
-    and [ ] unless ! if not valid throw error
+    and [ ] unless ! if not valid throw error TODO: add error
     dup static-table length <  ! check if in static table
     [ nip static-table nth ] [ swap dynamic-table>> nth ] if
     ;
 
 : add-header-to-table ( decode-context header -- updated-context )
+    drop ! minimial definition that should stack check.
 
     ;
+
+: header-entry-size ( table-entry -- size )
+
+;
+
 
 PRIVATE>
 
