@@ -175,25 +175,15 @@ PREDICATE: empty-union < anonymous-union members>> empty? ;
 
 PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
 
-! Returns either two regular classoids and f, or two sequences of classes and t
-: covariant-classes ( first second -- first second ? )
-    2dup [ covariant-tuple? ] both?
-    [ [ classes>> ] bi@
-      object [ 2dup max-length ] dip [ pad-head ] 2curry bi@
-      t ]
-    [ [ dup covariant-tuple? [ classes>> last ] when ] bi@ f ] if ;
-    ! [ dup covariant-tuple? [ classes>> ] [ 1array ] if ] bi@
-    ! object [ 2dup max-length ] dip [ pad-head ] 2curry bi@ ; inline
-
-M: covariant-tuple <=>
-    covariant-classes
-    [ <reversed> <=> ]
-    [ <=> ] if ;
+: covariant-classes ( first second -- first second )
+    [ dup covariant-tuple? [ classes>> ] [ 1array ] if ] bi@
+    object [ 2dup max-length ] dip [ pad-head ] 2curry bi@ ; inline
 
 : covariant-tuple<= ( first second -- ? )
-    covariant-classes
-    [ [ class<= ] 2all? ]
-    [ class<= ] if ;
+    covariant-classes [ class<= ] 2all? ;
+
+M: covariant-tuple <=>
+    covariant-classes <reversed> <=> ;
 
 : (class<=) ( first second -- ? )
     2dup eq? [ 2drop t ] [
@@ -230,12 +220,10 @@ M: anonymous-complement (classes-intersect?)
 : 2any? ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... ? )
     [ not ] compose 2all? not ; inline
 
+! TODO: Check if semantics are correct here!
 M: covariant-tuple (classes-intersect?)
     covariant-classes
-    [ [ classes-intersect? ] 2any? ]
-    [ classes-intersect? ] if ;
-    ! { [ [ covariant-tuple? ] both? ]
-    !   [ [ classes>> ] bi@ [ classes-intersect? ] 2any? ] } 2&& ;
+    [ classes-intersect? ] 2any? ;
 
 : anonymous-union-and ( first second -- class )
     members>> [ class-and ] with map <anonymous-union> ;
@@ -298,10 +286,6 @@ M: covariant-tuple (classes-intersect?)
 
 M: anonymous-union (flatten-class)
     members>> [ (flatten-class) ] each ;
-
-! NOTE: Unsure if this is correct semantically, but this can be used to get the
-! most specific class for dispatch
-M: covariant-tuple (flatten-class) classes>> first (flatten-class) ;
 
 PRIVATE>
 
