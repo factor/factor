@@ -1,4 +1,5 @@
-USING: assocs generic.multi kernel math sequences tools.test words ;
+USING: assocs generic.multi kernel math sequences tools.test words
+compiler.test ;
 IN: generic.multi.tests
 
 TUPLE: thing ;
@@ -35,3 +36,5 @@ CONSTANT: the-rock1 T{ the-rock f }
 { t } [ paper1 the-rock1 beats ] unit-test
 { t } [ the-rock1 paper1 beats ] unit-test
 { 42 } [ the-rock1 1 beats ] unit-test
+
+{ f } [ [ rock1 rock1 beats ] compile-call ] unit-test

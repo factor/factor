@@ -175,12 +175,25 @@ PREDICATE: empty-union < anonymous-union members>> empty? ;
 
 PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
 
-: covariant-classes ( first second -- first second )
-    [ dup covariant-tuple? [ classes>> ] [ 1array ] if ] bi@
-    object [ 2dup max-length ] dip [ pad-head ] 2curry bi@ ; inline
+! Returns either two regular classoids and f, or two sequences of classes and t
+: covariant-classes ( first second -- first second ? )
+    2dup [ covariant-tuple? ] both?
+    [ [ classes>> ] bi@
+      object [ 2dup max-length ] dip [ pad-head ] 2curry bi@
+      t ]
+    [ [ dup covariant-tuple? [ classes>> last ] when ] bi@ f ] if ;
+    ! [ dup covariant-tuple? [ classes>> ] [ 1array ] if ] bi@
+    ! object [ 2dup max-length ] dip [ pad-head ] 2curry bi@ ; inline
+
+M: covariant-tuple <=>
+    covariant-classes
+    [ <reversed> <=> ]
+    [ <=> ] if ;
 
 : covariant-tuple<= ( first second -- ? )
-    covariant-classes [ class<= ] 2all? ;
+    covariant-classes
+    [ [ class<= ] 2all? ]
+    [ class<= ] if ;
 
 : (class<=) ( first second -- ? )
     2dup eq? [ 2drop t ] [
@@ -218,8 +231,11 @@ M: anonymous-complement (classes-intersect?)
     [ not ] compose 2all? not ; inline
 
 M: covariant-tuple (classes-intersect?)
-    { [ [ covariant-tuple? ] both? ]
-      [ [ classes>> ] bi@ [ classes-intersect? ] 2any? ] } 2&& ;
+    covariant-classes
+    [ [ classes-intersect? ] 2any? ]
+    [ classes-intersect? ] if ;
+    ! { [ [ covariant-tuple? ] both? ]
+    !   [ [ classes>> ] bi@ [ classes-intersect? ] 2any? ] } 2&& ;
 
 : anonymous-union-and ( first second -- class )
     members>> [ class-and ] with map <anonymous-union> ;

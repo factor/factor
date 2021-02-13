@@ -2,8 +2,8 @@ USING: accessors arrays assocs classes classes.algebra classes.algebra.private
 classes.private combinators combinators.short-circuit
 combinators.short-circuit.smart combinators.smart definitions effects
 effects.parser generic generic.parser generic.single generic.single.private
-generic.standard kernel layouts math math.order namespaces parser see sequences
-sequences.zipped sets sorting vectors words ;
+generic.standard kernel layouts make math math.order namespaces parser
+quotations see sequences sequences.zipped sets sorting vectors words ;
 
 IN: generic.multi
 
@@ -330,16 +330,25 @@ TUPLE: multi-combination ;
 CONSTANT: nary-combination T{ multi-combination f }
 M: multi-combination mega-cache-quot
     0 make-empty-cache \ mega-cache-lookup [ ] 4sequence ;
-! TODO: implement after testing
+
+
+! FIXME: almost copy-paste from standard-combination
+
+: multi-inline-cache-quot ( word methods miss-word -- quot )
+    [ [ literalize , ] [ , ] [ current-index get , { } , , ] tri* ] [ ] make ;
+
 M: multi-combination inline-cache-quots
-    2drop f f ;
+    [ \ inline-cache-miss multi-inline-cache-quot ]
+    [ \ inline-cache-miss-tail multi-inline-cache-quot ] 2bi ;
+
 M: multi-combination picker current-index get (picker) ;
 
 PREDICATE: multi-generic < generic
     "combination" word-prop multi-combination? ;
 
 ERROR: not-single-dispatch generic ;
-M: multi-generic dispatch# not-single-dispatch ;
+! For now, this is to support dispatch inlining on the top-most element
+M: multi-generic dispatch# drop 0 ;
 
 ! * Build Decision Tree
 : multi-generic-arity ( generic -- n )
