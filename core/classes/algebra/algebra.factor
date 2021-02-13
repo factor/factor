@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.private
 combinators kernel make math math.order namespaces sequences
+combinators.short-circuit
 sequences.extras
 sets sorting vectors words ;
 IN: classes.algebra
@@ -174,19 +175,12 @@ PREDICATE: empty-union < anonymous-union members>> empty? ;
 
 PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
 
+: covariant-classes ( first second -- first second )
+    [ dup covariant-tuple? [ classes>> ] [ 1array ] if ] bi@
+    object [ 2dup max-length ] dip [ pad-head ] 2curry bi@ ; inline
+
 : covariant-tuple<= ( first second -- ? )
-    [ classes>> ] bi@ object pad-longest [ class<= ] 2all? ;
-
-    ! 2dup [ length ] bi@
-    ! 2dup =
-    ! [ 2drop [ class<= ] 2all? ]
-    ! [ > 2nip ] if ;
-    ! ! {
-    ! !     { [ 2dup [ length ] same? ] [ [ classes>> ] bi@ [ class<= ] 2all? ] }
-    ! !     [ longer ]
-    ! ! }
-
-    ! ! ;
+    covariant-classes [ class<= ] 2all? ;
 
 : (class<=) ( first second -- ? )
     2dup eq? [ 2drop t ] [
@@ -204,7 +198,8 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
                 { [ dup anonymous-union? ] [ right-anonymous-union<= ] }
                 { [ dup anonymous-intersection? ] [ right-anonymous-intersection<= ] }
                 { [ dup anonymous-complement? ] [ class>> classes-intersect? not ] }
-                ! { [ 2dup [ covariant-tuple? ] both? ] [ covariant-tuple<= ] }
+                { [ dup covariant-tuple? ] [ covariant-tuple<= ] }
+                { [ over covariant-tuple? ] [ covariant-tuple<= ] }
                 [ 2drop f ]
             } cond
         ] if

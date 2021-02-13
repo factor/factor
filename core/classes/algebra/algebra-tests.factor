@@ -370,3 +370,7 @@ TUPLE: xh < xb ;
 { t } [ { tuple tuple } { object } [ <covariant-tuple> ] bi@ covariant-tuple<= ] unit-test
 { f } [ { object object } { tuple } [ <covariant-tuple> ] bi@ covariant-tuple<= ] unit-test
 { f } [ { object } { tuple tuple } [ <covariant-tuple> ] bi@ covariant-tuple<= ] unit-test
+{ t } [ { tuple tuple } <covariant-tuple> tuple covariant-tuple<= ] unit-test
+{ f } [ { tuple object } <covariant-tuple> tuple covariant-tuple<= ] unit-test
+{ t } [ tuple { object tuple } <covariant-tuple> covariant-tuple<= ] unit-test
+{ f } [ object { tuple object } <covariant-tuple> covariant-tuple<= ] unit-test

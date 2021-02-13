@@ -1,9 +1,9 @@
-USING: accessors arrays assocs classes.algebra classes.algebra.private
+USING: accessors arrays assocs classes classes.algebra classes.algebra.private
 classes.private combinators combinators.short-circuit
-combinators.short-circuit.smart definitions effects effects.parser generic
-generic.parser generic.single generic.single.private generic.standard kernel
-layouts math math.order namespaces parser see sequences sequences.zipped sets
-sorting vectors words ;
+combinators.short-circuit.smart combinators.smart definitions effects
+effects.parser generic generic.parser generic.single generic.single.private
+generic.standard kernel layouts math math.order namespaces parser see sequences
+sequences.zipped sets sorting vectors words ;
 
 IN: generic.multi
 
@@ -11,14 +11,23 @@ FROM: namespaces => set ;
 
 PREDICATE: multi-method < method "method-class" word-prop covariant-tuple? ;
 
+TUPLE: method-dispatch class method ;
+C: <method-dispatch> method-dispatch
+
 GENERIC: method-types ( method -- seq )
-M: method method-types "method-class" word-prop 1array ;
-M: multi-method method-types
-    "method-class" word-prop classes>>
-    ;
+! TODO: maybe don't use covariant dispatch tuple here anymore?  We may need
+! sorting, though...
+M: method-dispatch method-types class>> classes>> ;
+M: object method-types "nope" throw ;
+
+GENERIC: dispatch-arity ( method -- n )
+M: class dispatch-arity drop 1 ;
+M: covariant-tuple dispatch-arity classes>> length ;
 
 : tuple-echelon ( class -- n ) "layout" word-prop third ;
 
+! DOING: wrapping class/method pairs into a wrapper because we need to modify
+! the class
 : nth-type ( n method -- seq ) method-types nth ;
 
 : echelon-method? ( class index method -- ? ) nth-type [ tuple-echelon ] same? ;
@@ -242,6 +251,7 @@ M: tuple-dispatcher compile-dispatcher*
 
 ! * Dispatch engine implementation
 
+! TODO: check sorting
 : method-dispatch-classes ( n methods -- seq )
     [ nth-type ] with map members ;
 
@@ -251,14 +261,32 @@ M: tuple-dispatcher compile-dispatcher*
     [ dup n methods applicable-methods
       dup length 1 >
       [ n 1 - multi-methods ]
-      [ ?first ] if
+      ! TODO check sorting
+      [ ?first method>> ] if
     ] map>alist ] [
         ! NOTE: This is where we rely on correct non-ambigutiy
-        methods ?first
+        methods ?first method>>
     ] if ;
 
+GENERIC: promote-dispatch-class ( arity class -- class )
+M: class promote-dispatch-class
+    1array swap object pad-head <covariant-tuple> ;
+ERROR: too-many-dispatch-args arity class ;
+M: covariant-tuple promote-dispatch-class
+    dup classes>> length pick <=> {
+        { +lt+ [ classes>> swap object pad-head <covariant-tuple> ] }
+        { +eq+ [ nip ] }
+        { +gt+ [ too-many-dispatch-args ] }
+    } case ;
+
+: methods>dispatch ( arity assoc -- seq )
+    [ [ promote-dispatch-class ] dip <method-dispatch> ] smart-with { } assoc>map ;
+
+
 :: methods>multi-methods ( arity assoc -- assoc )
-    assoc values [ f ]
+    ! assoc [ [ arity swap promote-dispatch-class ] dip ] assoc-map
+    arity assoc methods>dispatch
+    [ f ]
     [ arity 1 -  multi-methods ] if-empty ;
 
 SYMBOL: current-index
@@ -296,10 +324,6 @@ M: nested-dispatch-engine compile-engine
     [ index>> make-empty-cache \ mega-cache-lookup [ ] 4sequence ] bi
     define-nested-dispatch-engine ;
 
-! This should be usable without the need to run the tree transformer, as
-! flatten-method should distribute the methods over the dispatch tuple.
-M: multi-method compile-engine
-
 ! * Method combination interface
 TUPLE: multi-combination ;
 CONSTANT: nary-combination T{ multi-combination f }
@@ -317,9 +341,7 @@ M: multi-generic dispatch# not-single-dispatch ;
 
 ! * Build Decision Tree
 : multi-generic-arity ( generic -- n )
-    "methods" word-prop values [ method-types length ] map supremum ;
-
-GENERIC: promote-method ( arity  )
+    "methods" word-prop keys [ dispatch-arity ] map supremum ;
 
 ! FIXME: almost copy-paste from single-combination, need abstraction
 : build-multi-decision-tree ( generic -- mega-cache-assoc )
