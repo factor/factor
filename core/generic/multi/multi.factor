@@ -347,12 +347,20 @@ PREDICATE: multi-generic < generic
     "combination" word-prop multi-combination? ;
 
 ERROR: not-single-dispatch generic ;
-! For now, this is to support dispatch inlining on the top-most element
-M: multi-generic dispatch# drop 0 ;
+M: multi-generic dispatch# not-single-dispatch ;
+
+! We ensure that the "methods" word property is always sorted.
+! The idea is to not have to do this again during compilation or lookup.
+: sort-generic-methods ( generic -- )
+    "methods" [ sort-methods >vector ] change-word-prop ;
+
+M: multi-generic update-generic
+    [ nip sort-generic-methods ]
+    [ call-next-method ] 2bi ;
 
 ! * Build Decision Tree
 : multi-generic-arity ( generic -- n )
-    "methods" word-prop keys [ dispatch-arity ] map supremum ;
+    "methods" word-prop keys [ dispatch-arity ] map [ 1 ] [ supremum ] if-empty ;
 
 ! FIXME: almost copy-paste from single-combination, need abstraction
 : build-multi-decision-tree ( generic -- mega-cache-assoc )
@@ -379,6 +387,19 @@ M: multi-combination perform-combination
         [ define-inline-cache-quot ]
         2tri
     ] with-combination ;
+
+! * TODO Next-method, method lookup and compiler support
+ERROR: ambiguous-multi-dispatch classes ;
+: assert-non-ambiguity ( sorted-methods -- )
+    { [ length 1 > ]
+      [ <reversed> first2 [ first ] bi@ class< not ]
+      [ ambiguous-multi-dispatch ] } && drop ;
+
+! Relies on "methods" being a sorted assoc
+: multi-method-for-class ( class generic -- method/f )
+    "methods" word-prop [ first class<= ] with filter
+    dup assert-non-ambiguity
+    ?last [ second ] [ f ] if*  ;
 
 ! * Syntax
 ERROR: empty-dispatch-spec seq ;

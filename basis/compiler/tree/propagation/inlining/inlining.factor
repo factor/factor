@@ -52,6 +52,20 @@ M: callable splicing-nodes splicing-body ;
 : inline-standard-method ( #call word -- ? )
     dupd inlining-standard-method eliminate-dispatch ;
 
+! FIXME: Almost copy/paste from inlining-standard-method, abstract
+! dispatch-classes or something
+: inlining-multi-method ( #call word -- class/f method/f )
+    dup "methods" word-prop assoc-empty? [ 2drop f f ] [
+        2dup [ in-d>> length ] [ multi-generic-arity ] bi* < [ 2drop f f ] [
+            [ in-d>> ] [ [ multi-generic-arity ] keep ] bi*
+            [ tail* [ value-info class>> ] map <covariant-tuple> dup ] dip
+            multi-method-for-class
+        ] if
+    ] if ;
+
+: inline-multi-method ( #call word -- ? )
+    dupd inlining-multi-method eliminate-dispatch ;
+
 : normalize-math-class ( class -- class' )
     {
         null
@@ -107,7 +121,7 @@ SYMBOL: history
         { [ dup never-inline-word? ] [ 2drop f ] }
         { [ dup always-inline-word? ] [ inline-word ] }
         { [ dup standard-generic? ] [ inline-standard-method ] }
-        { [ dup multi-generic? ] [ inline-standard-method ] }
+        { [ dup multi-generic? ] [ inline-multi-method ] }
         { [ dup math-generic? ] [ inline-math-method ] }
         { [ dup inline? ] [ inline-word ] }
         [ 2drop f ]

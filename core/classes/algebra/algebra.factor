@@ -221,9 +221,13 @@ M: anonymous-complement (classes-intersect?)
     [ not ] compose 2all? not ; inline
 
 ! TODO: Check if semantics are correct here!
+! It is stated that the intersection is empty, if no object can be an instance
+! of both classes at the same time.  With dispatch in mind, I would say that if
+! there is any position that can not be an instance of both, two dispatches are
+! exclusive.
 M: covariant-tuple (classes-intersect?)
     covariant-classes
-    [ classes-intersect? ] 2any? ;
+    [ classes-intersect? ] 2all? ;
 
 : anonymous-union-and ( first second -- class )
     members>> [ class-and ] with map <anonymous-union> ;

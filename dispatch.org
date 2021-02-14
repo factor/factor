@@ -102,7 +102,7 @@ fixnum could then never be a hit? (or only if it is the exact number?)
 *** Generic word call site
 - =primitive_modify_code_heap= → =update_code_heap_words= →
   =update_word_references= is called on the complete code heap, which iterates
-  over (TODD: what exactly???) some instruction-operands of a code-block, where
+  over a sequence of relocation specifiers code-block, where
   it dispatches on a relocation type
 - In addition to =RT_ENTRY_POINT=, which seems to compute and return the entry
   point of the thing being called, there is =RT_ENTRY_POINT_PIC= and

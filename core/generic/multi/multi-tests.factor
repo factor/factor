@@ -1,5 +1,6 @@
-USING: assocs generic.multi kernel math sequences tools.test words
-compiler.test ;
+USING: accessors classes.algebra compiler.test generic.multi kernel literals
+math math.combinatorics random sequences tools.dispatch tools.test tools.time
+words ;
 IN: generic.multi.tests
 
 TUPLE: thing ;
@@ -38,3 +39,28 @@ CONSTANT: the-rock1 T{ the-rock f }
 { 42 } [ the-rock1 1 beats ] unit-test
 
 { f } [ [ rock1 rock1 beats ] compile-call ] unit-test
+{ t } [ [ rock1 scissors1 beats ] compile-call ] unit-test
+{ t } [ [ scissors1 paper1 beats ] compile-call ] unit-test
+{ t } [ [ paper1 rock1 beats ] compile-call ] unit-test
+{ t } [ [ paper1 the-rock1 beats ] compile-call ] unit-test
+{ t } [ [ the-rock1 paper1 beats ] compile-call ] unit-test
+{ 42 } [ [ the-rock1 1 beats ] compile-call ] unit-test
+
+{ { thing thing } } [ { rock rock } <covariant-tuple> \ beats
+        multi-method-for-class "method-class" word-prop
+        classes>>
+      ] unit-test
+
+: make-test-input ( n -- seq )
+    ${ rock1 scissors1 paper1 the-rock1 } 2 all-selections
+    [ clone randomize ] curry replicate concat ;
+
+: play1 ( x x -- ? ) beats ;
+
+: play ( n -- )
+    make-test-input [ [ first2 play1 drop ] each ] curry time
+    dispatch-stats.
+    ;
+
+
+{  } [ 1000 play ] unit-test
