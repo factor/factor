@@ -289,6 +289,9 @@ M: covariant-tuple promote-dispatch-class
     [ f ]
     [ arity 1 -  multi-methods ] if-empty ;
 
+! This is used to keep track of nesting during engine tree construction, as well
+! as to be able to use inline-cache-quots, where it has to be set to the correct
+! index.  That last part is a bit of a workaround just to avoid code duplication.
 SYMBOL: current-index
 current-index [ 0 ] initialize
 TUPLE: nested-dispatch-engine < tag-dispatch-engine index ;
@@ -312,18 +315,35 @@ PREDICATE: nested-dispatch-engine-word < predicate-engine-word
     dup t "nested-dispatch-engine" set-word-prop
     ;
 
-: define-nested-dispatch-engine ( quot -- word )
-    [ <nested-dispatch-engine-word> ] dip
-    [ define ]
-    [ drop generic-word get "engines" word-prop push ] [ drop ]
-    2tri ;
+! This is one level of indirection to ensure that we have a PIC in the nested
+! dispatch calls, which would not be compiled in otherwise.
+: <pic-callsite-wrapper> ( -- word )
+    "/callsite" <engine-word> ;
+
+: add-engine ( quot word -- word )
+    swap [ define ]
+    [ drop [ generic-word get "engines" word-prop push ] keep ] 2bi ;
+
+: wrap-nested-dispatch-call-site ( word -- word )
+    1quotation <pic-callsite-wrapper> add-engine ;
+
+: engine-cache-quotation ( engine -- quot )
+    [ methods>> ] [ index>> ] bi make-empty-cache \ mega-cache-lookup [ ] 4sequence ;
+
+: define-nested-dispatch-engine ( engine -- word )
+    ! TODO: Why no fry? Dependencies?
+    dup engine-cache-quotation <nested-dispatch-engine-word> add-engine
+    ! setting current-index here for inline-cache-quots
+    over index>> current-index
+    [ [ swap methods>> define-inline-cache-quot ] keep ] with-variable ;
 
 M: nested-dispatch-engine compile-engine
-    [ ! compile-engines*
-      flatten-methods convert-tuple-methods ] change-methods
-    [ dup index>> current-index [ call-next-method ] with-variable ]
-    [ index>> make-empty-cache \ mega-cache-lookup [ ] 4sequence ] bi
-    define-nested-dispatch-engine ;
+    [ flatten-methods convert-tuple-methods ] change-methods
+    dup dup index>> current-index [ call-next-method ] with-variable
+    >>methods
+    define-nested-dispatch-engine
+    wrap-nested-dispatch-call-site
+    ;
 
 ! * Method combination interface
 TUPLE: multi-combination ;
