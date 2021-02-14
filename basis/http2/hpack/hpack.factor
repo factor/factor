@@ -86,23 +86,28 @@ CONSTANT: static-table {
         [ /* default action quote */ ]
     } cond ;
 
-: get-header-from-table ( decode-context table-index -- field/f )
+: get-header-from-table ( decode-context table-index -- field )
     ! check bounds: i < len(static-table++decode-context) and i > 0
     dup pick dynamic-table>> length static-table length + < 
     over 0 > 
     and [ ] unless ! if not valid throw error TODO: add error
     dup static-table length <  ! check if in static table
-    [ nip static-table nth ] [ swap dynamic-table>> nth ] if
+    [ nip static-table nth ]
+    [ static-table length - 1 - swap dynamic-table>> nth ]
+    if ;
+
+: header-entry-size ( table-entry -- size )
+
+;
+
+: >>max-size ( decode-context new-size -- updated-context )
+    drop ! minimial definition that should stack check.
     ;
 
 : add-header-to-table ( decode-context header -- updated-context )
     drop ! minimial definition that should stack check.
 
     ;
-
-: header-entry-size ( table-entry -- size )
-
-;
 
 
 PRIVATE>
