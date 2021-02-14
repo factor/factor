@@ -24,6 +24,7 @@ MM: beats ( x: the-rock y: thing -- ? ) 2drop t ;
 
 M: fixnum beats ( x y -- ? ) 2drop 42 ;
 
+CONSTANT: thing1 T{ thing f }
 CONSTANT: rock1 T{ rock f  }
 CONSTANT: paper1 T{ paper f }
 CONSTANT: scissors1 T{ scissors f }
@@ -62,5 +63,13 @@ CONSTANT: the-rock1 T{ the-rock f }
     dispatch-stats.
     ;
 
-
 {  } [ 1000 play ] unit-test
+
+
+GENERIC: broken ( x x -- x )
+MM: broken ( x: thing y: paper -- x ) 2drop 1 ;
+MM: broken ( x: paper y: thing -- x ) 2drop 2 ;
+
+{ 1 } [ [ thing1 paper1 broken ] compile-call ] unit-test
+{ 2 } [ [ paper1 thing1 broken ] compile-call ] unit-test
+[ [ paper1 paper1 broken ] compile-call ] [ ambiguous-multi-dispatch? ] must-fail-with
