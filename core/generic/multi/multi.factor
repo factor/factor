@@ -9,6 +9,12 @@ IN: generic.multi
 
 FROM: namespaces => set ;
 
+! If set to true, create a level of nesting for nested dispatchers to generate
+! PIC-enabled call sites.  Naive test indicated that the additional level was
+! more overhead, and that the megamorphic hit was faster.  This could change
+! significantly depending on dispatch complexity though
+SYMBOL: nested-dispatch-pics
+
 PREDICATE: multi-method < method "method-class" word-prop covariant-tuple? ;
 
 TUPLE: method-dispatch class method ;
@@ -342,7 +348,7 @@ M: nested-dispatch-engine compile-engine
     dup dup index>> current-index [ call-next-method ] with-variable
     >>methods
     define-nested-dispatch-engine
-    wrap-nested-dispatch-call-site
+    nested-dispatch-pics get [ wrap-nested-dispatch-call-site ] when
     ;
 
 ! * Method combination interface
