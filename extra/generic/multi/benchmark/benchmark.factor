@@ -10,8 +10,6 @@ SINGLETON: paper    INSTANCE: paper thing
 SINGLETON: scissors INSTANCE: scissors thing
 SINGLETON: rock     INSTANCE: rock thing
 
-SYMBOLS: thing1 thing2 ;
-
 
 ! no-dispatch
 : beats? ( obj1 obj2 -- ? )
@@ -71,6 +69,8 @@ MM: smd-beats? ( obj1 obj2: paper -- ? )    drop rock? [ t ] [ f ] if ;
 MM: smd-beats? ( obj1 obj2: scissors -- ? ) drop paper? [ t ] [ f ] if ;
 MM: smd-beats? ( obj1 obj2: rock -- ? )     drop scissors? [ t ] [ f ] if ;
 
+SYMBOLS: thing1 thing2 ;
+
 
 ! sigle-hook-dispatch
 HOOK: shd-beats? thing2 ( -- ? )
@@ -87,6 +87,34 @@ M: rock shd-beats? thing1 get scissors? [ t ] [ f ] if ;
 ! MM: shmd-beats? ( thing2: rock | -- ? ) thing1 get scissors? [ t ] [ f ] if ;
 ! MM: shmd-beats? ( thing2: paper | -- ? ) thing1 get rock? [ t ] [ f ] if ;
 
+! tuple class dispatch
+
+TUPLE: thingt ;
+TUPLE: rockt < thingt ;
+TUPLE: scissorst < thingt ;
+TUPLE: papert < thingt ;
+
+GENERIC: tsd-beats? ( obj1 obj2 -- ? )
+
+M: papert tsd-beats? drop rockt? [ t ] [ f ] if ;
+M: scissorst tsd-beats? drop papert? [ t ] [ f ] if ;
+M: rockt tsd-beats? drop scissorst? [ t ] [ f ] if ;
+
+: wrapped-tsd-beats? ( obj1 obj2 -- ? )
+    tsd-beats? ;
+
+GENERIC: tmd-beats? ( x x -- ? )
+CONSTANT: rock1 T{ rockt f }
+CONSTANT: paper1 T{ papert f }
+CONSTANT: scissors1 T{ scissorst f }
+
+MM: tmd-beats? ( o: thingt o: thingt -- ? )  2drop f ;
+MM: tmd-beats? ( o: papert o: scissorst -- ? ) 2drop t ;
+MM: tmd-beats? ( o: scissorst o: rockt -- ? )  2drop t ;
+MM: tmd-beats? ( o: rockt o: papert -- ? )  2drop t ;
+
+: wrapped-tmd-beats? ( obj1 obj2 -- ? )
+    tmd-beats? ;
 
 MIXIN: man
 
@@ -224,8 +252,8 @@ MM: smd-ln-beats? ( man :the-man-No.029 -- ? ) 2drop t ;
 MM: smd-ln-beats? ( man :the-man-No.030 -- ? ) 2drop t ;
 
 
-CONSTANT: TIMES       100,000
-CONSTANT: COMBI-TIMES 100,000
+CONSTANT: TIMES       1000,000
+CONSTANT: COMBI-TIMES 1000,000
 SYMBOL: no-dispatch-time
 SYMBOL: ref
 
@@ -305,6 +333,44 @@ SYMBOL: ref
     gc
     [
         TIMES [
+            paper1 paper1       tsd-beats? drop
+            paper1 scissors1    tsd-beats? drop
+            paper1 rock1        tsd-beats? drop
+
+            scissors1 paper1    tsd-beats? drop
+            scissors1 scissors1 tsd-beats? drop
+            scissors1 rock1     tsd-beats? drop
+
+            rock1 paper1        tsd-beats? drop
+            rock1 scissors1     tsd-beats? drop
+            rock1 rock1         tsd-beats? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "tuple sd:             %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        TIMES [
+            paper1 paper1       wrapped-tsd-beats? drop
+            paper1 scissors1    wrapped-tsd-beats? drop
+            paper1 rock1        wrapped-tsd-beats? drop
+
+            scissors1 paper1    wrapped-tsd-beats? drop
+            scissors1 scissors1 wrapped-tsd-beats? drop
+            scissors1 rock1     wrapped-tsd-beats? drop
+
+            rock1 paper1        wrapped-tsd-beats? drop
+            rock1 scissors1     wrapped-tsd-beats? drop
+            rock1 rock1         wrapped-tsd-beats? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "non-inline tuple sd:             %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        TIMES [
             paper paper       md-beats? drop
             paper scissors    md-beats? drop
             paper rock        md-beats? drop
@@ -339,6 +405,44 @@ SYMBOL: ref
     ] benchmark
     [ 1.0e9 / ] [ no-dispatch-time get / ] bi
     "non-inlined md:             %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        TIMES [
+            paper1 paper1       tmd-beats? drop
+            paper1 scissors1    tmd-beats? drop
+            paper1 rock1        tmd-beats? drop
+
+            scissors1 paper1    tmd-beats? drop
+            scissors1 scissors1 tmd-beats? drop
+            scissors1 rock1     tmd-beats? drop
+
+            rock1 paper1        tmd-beats? drop
+            rock1 scissors1     tmd-beats? drop
+            rock1 rock1         tmd-beats? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "tuple md:             %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        TIMES [
+            paper1 paper1       wrapped-tmd-beats? drop
+            paper1 scissors1    wrapped-tmd-beats? drop
+            paper1 rock1        wrapped-tmd-beats? drop
+
+            scissors1 paper1    wrapped-tmd-beats? drop
+            scissors1 scissors1 wrapped-tmd-beats? drop
+            scissors1 rock1     wrapped-tmd-beats? drop
+
+            rock1 paper1        wrapped-tmd-beats? drop
+            rock1 scissors1     wrapped-tmd-beats? drop
+            rock1 rock1         wrapped-tmd-beats? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "non-inline tuple md:             %.6f seconds (%.2f times slower)\n" printf
 
     gc
     [
