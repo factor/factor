@@ -1,6 +1,6 @@
-USING: accessors classes.algebra compiler.test generic.multi kernel literals
-math math.combinatorics random sequences tools.dispatch tools.test tools.time
-words ;
+USING: accessors classes.algebra compiler.test generic.multi kernel
+kernel.private literals math math.combinatorics random sequences tools.dispatch
+tools.test tools.time words ;
 IN: generic.multi.tests
 
 TUPLE: thing ;
@@ -20,7 +20,7 @@ MM: beats ( x: paper y: rock -- ? ) 2drop t ;
 ! m3(paper, scissors)
 MM: beats ( x: scissors y: paper -- ? ) 2drop t ;
 ! m5(thing, the-rock)
-MM: beats ( x: the-rock y: thing -- ? ) 2drop t ;
+MM: beats ( x: the-rock y: thing -- ? ) 2drop 47 ;
 
 M: fixnum beats ( x y -- ? ) 2drop 42 ;
 
@@ -36,7 +36,7 @@ CONSTANT: the-rock1 T{ the-rock f }
 { t } [ scissors1 paper1 beats ] unit-test
 { t } [ paper1 rock1 beats ] unit-test
 { t } [ paper1 the-rock1 beats ] unit-test
-{ t } [ the-rock1 paper1 beats ] unit-test
+{ 47 } [ the-rock1 paper1 beats ] unit-test
 { 42 } [ the-rock1 1 beats ] unit-test
 
 { f } [ [ rock1 rock1 beats ] compile-call ] unit-test
@@ -44,8 +44,22 @@ CONSTANT: the-rock1 T{ the-rock f }
 { t } [ [ scissors1 paper1 beats ] compile-call ] unit-test
 { t } [ [ paper1 rock1 beats ] compile-call ] unit-test
 { t } [ [ paper1 the-rock1 beats ] compile-call ] unit-test
-{ t } [ [ the-rock1 paper1 beats ] compile-call ] unit-test
+{ 47 } [ [ the-rock1 paper1 beats ] compile-call ] unit-test
 { 42 } [ [ the-rock1 1 beats ] compile-call ] unit-test
+
+GENERIC: test1 ( x x -- x )
+M: rock test1 2drop 11 ;
+M: the-rock test1 2drop 22 ;
+
+: call-test1 ( x x -- x ) { rock } declare test1 ;
+{ 22 } [ [ { rock } declare test1 ] [ 1 the-rock1 ] dip call ] unit-test
+{ 22 } [ 1 the-rock1 call-test1 ] unit-test
+
+
+: call-beats ( x x -- x ) { rock rock } declare beats ;
+{ 47 } [ [ { rock rock } declare beats ] [ the-rock1 paper1 ] dip call ] unit-test
+{ 47 } [ the-rock1 paper1 call-beats ] unit-test
+
 
 { { thing thing } } [ { rock rock } <covariant-tuple> \ beats
         multi-method-for-class "method-class" word-prop
@@ -66,10 +80,16 @@ CONSTANT: the-rock1 T{ the-rock f }
 {  } [ 1000 play ] unit-test
 
 
+{ +incomparable+ }
+[ { thing paper } <covariant-tuple>
+  { paper thing } <covariant-tuple> compare-classes ] unit-test
+
 GENERIC: broken ( x x -- x )
 MM: broken ( x: thing y: paper -- x ) 2drop 1 ;
 MM: broken ( x: paper y: thing -- x ) 2drop 2 ;
 
 { 1 } [ [ thing1 paper1 broken ] compile-call ] unit-test
 { 2 } [ [ paper1 thing1 broken ] compile-call ] unit-test
-[ [ paper1 paper1 broken ] compile-call ] [ ambiguous-multi-dispatch? ] must-fail-with
+
+! This should probably fail at definition time already?
+! [ [ paper1 paper1 broken ] compile-call ] must-fail

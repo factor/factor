@@ -222,12 +222,6 @@ ERROR: ambiguous-multi-dispatch classes ;
       [ drop ] if
     ] [ drop ] if ;
 
-! Relies on "methods" being a sorted assoc
-: multi-method-for-class ( class generic -- method/f )
-    "methods" word-prop [ first class<= ] with filter
-    dup assert-non-ambiguity
-    ?last [ second ] [ f ] if*  ;
-
 ! * Syntax
 ERROR: empty-dispatch-spec seq ;
 : assert-dispatch-types ( seq -- seq )

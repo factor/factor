@@ -59,7 +59,7 @@ M: callable splicing-nodes splicing-body ;
         2dup [ in-d>> length ] [ multi-generic-arity ] bi* < [ 2drop f f ] [
             [ in-d>> ] [ [ multi-generic-arity ] keep ] bi*
             [ tail* [ value-info class>> ] map <covariant-tuple> dup ] dip
-            multi-method-for-class
+            method-for-class
         ] if
     ] if ;
 
