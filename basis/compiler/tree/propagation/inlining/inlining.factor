@@ -3,9 +3,9 @@
 USING: accessors arrays assocs classes.algebra combinators
 combinators.short-circuit compiler.tree compiler.tree.builder
 compiler.tree.normalization compiler.tree.propagation.info
-compiler.tree.propagation.nodes compiler.tree.recursive generic generic.math
-generic.multi generic.single generic.standard kernel math math.partial-dispatch
-namespaces quotations sequences words ;
+compiler.tree.propagation.nodes compiler.tree.recursive generic
+generic.math generic.multi generic.single generic.standard kernel math
+math.partial-dispatch namespaces quotations sequences words ;
 IN: compiler.tree.propagation.inlining
 
 : splicing-call ( #call word -- nodes )

@@ -2,8 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.private
 combinators kernel make math math.order namespaces sequences
-combinators.short-circuit
-sequences.extras
 sets sorting vectors words ;
 IN: classes.algebra
 

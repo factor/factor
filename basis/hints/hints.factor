@@ -1,9 +1,11 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs byte-arrays byte-vectors classes combinators
-combinators.short-circuit definitions generic generic.multi generic.single
-generic.standard hashtables io.binary kernel kernel.private math math.parser
-parser sbufs sequences sequences.private splitting strings vectors words ;
+USING: accessors arrays assocs byte-arrays byte-vectors classes
+combinators definitions fry
+generic generic.multi generic.single
+generic.standard hashtables io.binary kernel kernel.private math
+math.parser parser sbufs sequences sequences.private splitting
+strings vectors words ;
 IN: hints
 
 GENERIC: specializer-predicate ( spec -- quot )
@@ -50,8 +52,7 @@ M: object specializer-declaration class-of ;
     specializer [ specialize-quot ] when* ;
 
 : standard-method? ( method -- ? )
-    dup { [ method? ] [ multi-method? not ] } 1&&
-    [
+    dup method? [
         "method-generic" word-prop standard-generic?
     ] [ drop f ] if ;
 

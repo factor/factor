@@ -1,8 +1,8 @@
 USING: accessors arrays assocs classes classes.algebra classes.algebra.private
-classes.private combinators combinators.short-circuit.smart combinators.smart
-definitions effects effects.parser generic generic.parser generic.single
-generic.single.private generic.standard kernel make math math.order namespaces
-parser quotations sequences sets sorting vectors words ;
+classes.private combinators definitions effects effects.parser
+generic generic.parser generic.single generic.single.private generic.standard
+kernel make math math.order namespaces parser quotations sequences sets sorting
+vectors words ;
 
 IN: generic.multi
 
@@ -79,7 +79,9 @@ M: covariant-tuple promote-dispatch-class
     } case ;
 
 : methods>dispatch ( arity assoc -- seq )
-    [ [ promote-dispatch-class ] dip <method-dispatch> ] smart-with { } assoc>map ;
+    ! NOTE: not using smart-with due to dependency issues
+    ! [ [ promote-dispatch-class ] dip <method-dispatch> ] smart-with { } assoc>map ;
+    [ swapd [ promote-dispatch-class ] dip <method-dispatch> ] with { } assoc>map ;
 
 
 :: methods>multi-methods ( arity assoc -- assoc )
@@ -210,9 +212,15 @@ M: multi-combination perform-combination
 ! * TODO Next-method, method lookup and compiler support
 ERROR: ambiguous-multi-dispatch classes ;
 : assert-non-ambiguity ( sorted-methods -- )
-    { [ length 1 > ]
-      [ <reversed> first2 [ first ] bi@ class< not ]
-      [ ambiguous-multi-dispatch ] } && drop ;
+    ! NOTE: simulating && combinator here due to dependency issues
+    ! { [ length 1 > ]
+    !   [ <reversed> first2 [ first ] bi@ class< not ]
+    !   [ ambiguous-multi-dispatch ] } && drop ;
+    dup length 1 >
+    [ dup <reversed> first2 [ first ] bi@ class< not
+      [ ambiguous-multi-dispatch ]
+      [ drop ] if
+    ] [ drop ] if ;
 
 ! Relies on "methods" being a sorted assoc
 : multi-method-for-class ( class generic -- method/f )
