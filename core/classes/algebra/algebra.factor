@@ -173,6 +173,12 @@ PREDICATE: empty-union < anonymous-union members>> empty? ;
 
 PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
 
+! NOTE: This word is used to enable comparisons between covariant-tuples and
+! regular classes, by interpreting a regular class as a covariant-tuple with
+! object wildcards.  This is mostly used as convenience, since when comparing
+! only in dispatch contexts, this is what is important.  Should this lead to
+! problems because of some other context comparisons, covariant tuple
+! comparisons may only be defined and performed between covariant tuples.
 : covariant-classes ( first second -- first second )
     [ dup covariant-tuple? [ classes>> ] [ 1array ] if ] bi@
     object [ 2dup max-length ] dip [ pad-head ] 2curry bi@ ; inline
@@ -180,8 +186,27 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
 : covariant-tuple<= ( first second -- ? )
     covariant-classes [ class<= ] 2all? ;
 
+! TODO Dispatch falls back to this to call a lexicographically ordered more
+! specific method right now, although this should never happen if ambiguity
+! errors are caught correctly.
 M: covariant-tuple <=>
     covariant-classes <reversed> <=> ;
+
+! Union and intersection should (union definitely) be distributive over
+! covariant tuples.
+PREDICATE: covariant-tuple-intersection < anonymous-intersection
+    participants>> [ f ] [ [ covariant-tuple? ] all? ] if-empty ;
+
+M: covariant-tuple-intersection normalize-class
+    participants>> [ classes>> ] map flip
+    [ <anonymous-intersection> ] map <covariant-tuple> ;
+
+PREDICATE: covariant-tuple-union < anonymous-union
+    members>> [ f ] [ [ covariant-tuple? ] all? ] if-empty ;
+
+M: covariant-tuple-union normalize-class
+    members>> [ classes>> ] map flip
+    [ <anonymous-union> ] map <covariant-tuple> ;
 
 : (class<=) ( first second -- ? )
     2dup eq? [ 2drop t ] [

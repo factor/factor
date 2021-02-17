@@ -376,3 +376,21 @@ TUPLE: xh < xb ;
 { t } [ tuple { object tuple } <covariant-tuple> covariant-tuple<= ] unit-test
 { f } [ object { tuple object } <covariant-tuple> covariant-tuple<= ] unit-test
 { f } [ object { tuple tuple } <covariant-tuple> covariant-tuple<= ] unit-test
+
+{ t } [ { fixnum object } <covariant-tuple> { tuple tuple } <covariant-tuple> 2array
+        <anonymous-union> covariant-tuple-union?
+      ] unit-test
+
+{ t } [ { fixnum object } <covariant-tuple> { tuple tuple } <covariant-tuple> 2array
+        <anonymous-intersection> covariant-tuple-intersection?
+      ] unit-test
+
+{ T{ covariant-tuple f
+   { union{ tuple fixnum } object } } }
+[ union{ T{ covariant-tuple f { tuple object } } T{ covariant-tuple f { fixnum object } } }
+  normalize-class ] unit-test
+
+{ T{ covariant-tuple f
+     { union{ tuple fixnum } object } } }
+[ union{ T{ covariant-tuple f { tuple object } } T{ covariant-tuple f { fixnum object } } }
+  normalize-class ] unit-test
