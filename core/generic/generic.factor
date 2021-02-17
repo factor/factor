@@ -11,6 +11,10 @@ GENERIC: perform-combination ( word combination -- )
 
 GENERIC: make-default-method ( generic combination -- method )
 
+! Called in compiler context when generic word is encountered, can throw errors.
+GENERIC: check-generic ( generic -- )
+M: word check-generic drop ;
+
 PREDICATE: generic < word
     "combination" word-prop >boolean ;
 
