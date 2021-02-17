@@ -1,4 +1,5 @@
-USING: accessors combinators fry locals kernel math multiline sequences ;
+USING: accessors combinators fry locals kernel math
+math.functions math.bitwise multiline sequences strings ;
 
 IN: hpack
 
@@ -75,26 +76,35 @@ CONSTANT: static-table {
     { "www-authenticate" f }
 }
 
-! block will be a byte array
-:: decode-field ( decode-context block index -- updated-context block new-index field/f )
-    {
-        ! the action quote will leave the consumed/new-index,
-        ! the field decoded or f
-        { [ index block nth 0 bit? ] [ /* action quote */ ] } 
-        { [ index block nth 1 bit? ] [ /* action quote */ ] } 
-        { [ index block nth 2 bit? ] [ /* action quote */ ] } 
-        [ /* default action quote */ ]
-    } cond ;
+: decode-integer ( block current-index prefix-length -- block new-index number )
+    ! get the current octet, compute mask, apply mask
+    [ 2dup swap nth ] dip 2 swap ^ 1 - [ mask ] keep
+    over = 
+    ! stack should be block index I loop?
+    [ 0 [ 7 bit? ] 
+        [ rot 1 + -rot ! increment index
+          [ 2dup swap nth ] 2dip
+          ! stack: block index Byte I M
+          overd 127 mask
+          2 overd ^ *
+          '[ _ + ] dip
+          7 + rot
+          ! stack: block index I M Byte
+          ] 
+        do while 
+        ! stack: block index I M
+        drop ]
+    when ! the prefix matches the mask (exactly all 1s), must loop
+    [ 1 + ] dip ! increment the index properly before return
+    ;
 
-: get-header-from-table ( decode-context table-index -- field )
-    ! check bounds: i < len(static-table++decode-context) and i > 0
-    dup pick dynamic-table>> length static-table length + < 
-    over 0 > 
-    and [ ] unless ! if not valid throw error TODO: add error
-    dup static-table length <  ! check if in static table
-    [ nip static-table nth ]
-    [ static-table length - 1 - swap dynamic-table>> nth ]
-    if ;
+: decode-string ( block current-index -- block new-index string )
+    2dup swap nth 7 bit?
+    [ 7 decode-integer ] dip
+    [ + "" ] ! Huffman encoding, currently just a stub for stack effects
+    [ over + dup ! compute the last index and the new index
+      [ overd subseq >string ] dip swap ]
+    if ; 
 
 : header-entry-size ( table-entry -- size )
 
@@ -108,6 +118,27 @@ CONSTANT: static-table {
     drop ! minimial definition that should stack check.
 
     ;
+
+: get-header-from-table ( decode-context table-index -- field )
+    ! check bounds: i < len(static-table++decode-context) and i > 0
+    dup pick dynamic-table>> length static-table length + < 
+    over 0 > 
+    and [ ] unless ! if not valid throw error TODO: add error
+    dup static-table length <  ! check if in static table
+    [ nip static-table nth ]
+    [ static-table length - 1 - swap dynamic-table>> nth ]
+    if ;
+
+! block will be a byte array
+:: decode-field ( decode-context block index -- updated-context block new-index field/f )
+    {
+        ! the action quote will leave the consumed/new-index,
+        ! the field decoded or f
+        { [ index block nth 7 bit? ] [ /* action quote */ ] } 
+        { [ index block nth 6 bit? ] [ /* action quote */ ] } 
+        { [ index block nth 5 bit? ] [ /* action quote */ ] } 
+        [ /* default action quote */ ]
+    } cond ;
 
 
 PRIVATE>
