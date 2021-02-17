@@ -1,8 +1,8 @@
 USING: accessors arrays assocs classes classes.algebra classes.algebra.private
-classes.private combinators definitions effects effects.parser
-generic generic.parser generic.single generic.single.private generic.standard
-kernel make math math.order namespaces parser quotations sequences sets sorting
-vectors words ;
+classes.private combinators definitions effects effects.parser generic
+generic.parser generic.single generic.single.private generic.standard kernel
+make math math.order namespaces parser quotations sequences sets sorting vectors
+words ;
 
 IN: generic.multi
 
@@ -77,6 +77,10 @@ M: covariant-tuple promote-dispatch-class
         { +eq+ [ nip ] }
         { +gt+ [ too-many-dispatch-args ] }
     } case ;
+
+! NOTE: Single use, should be generic if ever used to promote generally?
+: class>dispatch ( class -- dispatch-class )
+    dup covariant-tuple? [ 1array <covariant-tuple> ] unless ;
 
 : methods>dispatch ( arity assoc -- seq )
     ! NOTE: not using smart-with due to dependency issues
@@ -170,8 +174,38 @@ PREDICATE: multi-generic < generic
 ERROR: not-single-dispatch generic ;
 M: multi-generic dispatch# not-single-dispatch ;
 
+
+! Dispatch is ambiguous if there is an intersection but no strict local order.
+! In the case of symmetric dispatch, these pairs may exist, but only if they are
+! never called or a more-specific tie-breaker also exists.
+! FIXME: used cartesian-map instead of map-combinations because of bootstrapping
+! dependency problems.  This means we have a lot of unnecessary comparisons.
+: ambiguous-dispatch-classes ( dispatch-classes -- dispatch-classes )
+    dup [
+        2dup classes-intersect?
+        [ 2dup compare-classes +incomparable+ =
+          [ 2array ] [ 2drop f ] if
+        ] [ 2drop f ] if
+    ] cartesian-map concat sift
+    [ first2 [ classes>> ] bi@ [ class-and ] 2map <covariant-tuple> ] map
+    members
+    ;
+
+ERROR: ambiguous-method-specializations classes ;
+
+! Check all dispatch tuple specs for ambiguous intersections.  Keep those that
+! do not have a resolver and add a compilation error.
+: check-ambiguity ( generic -- )
+    "methods" word-prop keys [ class>dispatch ] map
+    [ ambiguous-dispatch-classes ] keep
+    [ [ class= ] with any? ] curry reject
+    [ ambiguous-method-specializations ] unless-empty ;
+
+M: multi-generic check-generic check-ambiguity ;
+
 ! We ensure that the "methods" word property is always sorted.
 ! The idea is to not have to do this again during compilation or lookup.
+! TODO: currently not taken advantage of
 : sort-generic-methods ( generic -- )
     "methods" [ sort-methods >vector ] change-word-prop ;
 

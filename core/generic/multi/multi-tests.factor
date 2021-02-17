@@ -1,6 +1,6 @@
-USING: accessors classes.algebra compiler.test generic.multi kernel
-kernel.private literals math math.combinatorics random sequences tools.dispatch
-tools.test tools.time words ;
+USING: classes.algebra compiler.test generic generic.multi kernel kernel.private
+literals math math.combinatorics random sequences tools.dispatch tools.test
+tools.time ;
 IN: generic.multi.tests
 
 TUPLE: thing ;
@@ -21,6 +21,8 @@ MM: beats ( x: paper y: rock -- ? ) 2drop t ;
 MM: beats ( x: scissors y: paper -- ? ) 2drop t ;
 ! m5(thing, the-rock)
 MM: beats ( x: the-rock y: thing -- ? ) 2drop 47 ;
+! tie-breaker
+MM: beats ( x: the-rock y: scissors -- ? ) 2drop "tie-breaker" ;
 
 M: fixnum beats ( x y -- ? ) 2drop 42 ;
 
@@ -61,10 +63,15 @@ M: the-rock test1 2drop 22 ;
 { 47 } [ the-rock1 paper1 call-beats ] unit-test
 
 
-{ { thing thing } } [ { rock rock } <covariant-tuple> \ beats
-        multi-method-for-class "method-class" word-prop
-        classes>>
-      ] unit-test
+! Only most-specific calls can be expanded at call-sites
+{ f } [ { rock rock } <covariant-tuple> \ beats
+        method-for-class method? ] unit-test
+{ t } [ { paper paper } <covariant-tuple> \ beats
+        method-for-class method? ] unit-test
+{ t } [ { the-rock rock } <covariant-tuple> \ beats
+        method-for-class method? ] unit-test
+{ t } [ { thing fixnum } <covariant-tuple> \ beats
+        method-for-class method? ] unit-test
 
 : make-test-input ( n -- seq )
     ${ rock1 scissors1 paper1 the-rock1 } 2 all-selections
@@ -84,12 +91,14 @@ M: the-rock test1 2drop 22 ;
 [ { thing paper } <covariant-tuple>
   { paper thing } <covariant-tuple> compare-classes ] unit-test
 
-GENERIC: broken ( x x -- x )
-MM: broken ( x: thing y: paper -- x ) 2drop 1 ;
-MM: broken ( x: paper y: thing -- x ) 2drop 2 ;
 
-{ 1 } [ [ thing1 paper1 broken ] compile-call ] unit-test
-{ 2 } [ [ paper1 thing1 broken ] compile-call ] unit-test
+! TODO: test this in a way to catch the expected compiler error
+! GENERIC: broken ( x x -- x )
+! MM: broken ( x: thing y: paper -- x ) 2drop 1 ;
+! MM: broken ( x: paper y: thing -- x ) 2drop 2 ;
+
+! { 1 } [ [ thing1 paper1 broken ] compile-call ] unit-test
+! { 2 } [ [ paper1 thing1 broken ] compile-call ] unit-test
 
 ! This should probably fail at definition time already?
 ! [ [ paper1 paper1 broken ] compile-call ] must-fail
