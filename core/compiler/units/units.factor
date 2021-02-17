@@ -219,13 +219,3 @@ PRIVATE>
     HS{ } clone forgotten-definitions pick set-at [
         with-nested-compilation-unit
     ] with-variables ; inline
-
-! M: mg:multi-generic generic:update-generic ( class/classes generic -- )
-!     [
-!         over array? [
-!             '[ _ mg:changed-call-sites ] each
-!         ] [ mg:changed-call-sites ] if
-!     ]
-!     [ mg:remake-multi-generic drop ]
-!     [ changed-conditionally drop ]
-!     2tri ;
