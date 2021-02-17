@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators formatting io kernel math math.ranges
 memory multi-generic namespaces prettyprint quotations sequences
-tools.test tools.time ;
+tools.dispatch tools.test tools.time ;
 IN: multi-generic.benchmark
 
 MIXIN: thing
@@ -80,6 +80,16 @@ MGENERIC: shmd-beats? ( thing2 | -- ? )
 MM: shmd-beats? ( thing2: scissors | -- ? ) thing1 get paper? [ t ] [ f ] if ;
 MM: shmd-beats? ( thing2: rock | -- ? ) thing1 get scissors? [ t ] [ f ] if ;
 MM: shmd-beats? ( thing2: paper | -- ? ) thing1 get rock? [ t ] [ f ] if ;
+
+! wrapped
+: wrapped-md-beats? ( obj1 obj2 -- ? )
+    md-beats? ;
+
+: wrapped-sd-beats? ( obj1 obj2 -- ? )
+    sd-beats? ;
+
+: wrapped-smd-beats? ( obj1 obj2 -- ? )
+    smd-beats? ;
 
 
 MIXIN: man
@@ -222,6 +232,94 @@ CONSTANT: TIMES       100,000
 CONSTANT: COMBI-TIMES 100,000
 SYMBOL: no-dispatch-time
 SYMBOL: ref
+
+
+TUPLE: t-thing ;
+TUPLE: t-paper    < t-thing ;
+TUPLE: t-scissors < t-thing ;
+TUPLE: t-rock     < t-thing ;
+
+CONSTANT: c-t-paper    T{ t-paper }
+CONSTANT: c-t-scissors T{ t-scissors }
+CONSTANT: c-t-rock     T{ t-rock }
+
+! no-dispatch
+: beats2? ( obj1 obj2 -- ? )
+    {
+        { [ dup t-rock? ]     [ drop t-scissors? [ t ] [ f ] if ] }
+        { [ dup t-paper? ]    [ drop t-rock?     [ t ] [ f ] if ] }
+        { [ dup t-scissors? ] [ drop t-paper?    [ t ] [ f ] if ] }
+        [ 2drop f ]
+    } cond ;
+
+
+! multi-dispatch
+MGENERIC: md-beats2? ( obj1 obj2 -- ? )
+
+MM: md-beats2? ( :t-paper :t-scissors -- ? ) 2drop t ;
+MM: md-beats2? ( :t-scissors :t-rock -- ? )  2drop t ;
+MM: md-beats2? ( :t-rock :t-paper -- ? )     2drop t ;
+MM: md-beats2? ( :t-thing :t-thing -- ? )    2drop f ;
+
+
+! typed multi-dispatch
+MGENERIC: md-beats-t2? ( obj1 obj2 -- ? )
+
+MM: md-beats-t2? ( :t-paper :t-scissors -- :boolean ) 2drop t ;
+MM: md-beats-t2? ( :t-scissors :t-rock -- :boolean )  2drop t ;
+MM: md-beats-t2? ( :t-rock :t-paper -- :boolean )     2drop t ;
+MM: md-beats-t2? ( :t-thing :t-thing -- :boolean )    2drop f ;
+
+
+! multi-hook-dispatch
+MGENERIC: mhd-beats2? ( thing1 thing2 | -- ? )
+
+MM: mhd-beats2? ( thing1: t-paper thing2: t-scissors | -- ? ) t ;
+MM: mhd-beats2? ( thing1: t-scissors thing2: t-rock | -- ? ) t ;
+MM: mhd-beats2? ( thing1: t-rock thing2: t-paper | -- ? ) t ;
+MM: mhd-beats2? ( thing1: t-thing thing2: t-thing | -- ? ) f ;
+
+
+! sigle-dispach
+GENERIC: sd-beats2? ( obj1 obj2 -- ? )
+
+M: t-paper sd-beats2? drop t-rock? [ t ] [ f ] if ;
+M: t-scissors sd-beats2? drop t-paper? [ t ] [ f ] if ;
+M: t-rock sd-beats2? drop t-scissors? [ t ] [ f ] if ;
+
+
+! multi-sigle-dispach
+MGENERIC: smd-beats2? ( obj1 obj2 -- ? )
+
+MM: smd-beats2? ( obj1 obj2: t-paper -- ? )    drop t-rock? [ t ] [ f ] if ;
+MM: smd-beats2? ( obj1 obj2: t-scissors -- ? ) drop t-paper? [ t ] [ f ] if ;
+MM: smd-beats2? ( obj1 obj2: t-rock -- ? )     drop t-scissors? [ t ] [ f ] if ;
+
+
+! sigle-hook-dispatch
+HOOK: shd-beats2? thing2 ( -- ? )
+
+M: t-paper shd-beats2? thing1 get t-rock? [ t ] [ f ] if ;
+M: t-scissors shd-beats2? thing1 get t-paper? [ t ] [ f ] if ;
+M: t-rock shd-beats2? thing1 get t-scissors? [ t ] [ f ] if ;
+
+
+! sigle-spac-hook-multi-dispatch
+MGENERIC: shmd-beats2? ( thing2 | -- ? )
+
+MM: shmd-beats2? ( thing2: t-scissors | -- ? ) thing1 get t-paper? [ t ] [ f ] if ;
+MM: shmd-beats2? ( thing2: t-rock | -- ? ) thing1 get t-scissors? [ t ] [ f ] if ;
+MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
+
+! wrapped
+: wrapped-md-beats2? ( obj1 obj2 -- ? )
+    md-beats2? ;
+
+: wrapped-sd-beats2? ( obj1 obj2 -- ? )
+    sd-beats2? ;
+
+: wrapped-smd-beats2? ( obj1 obj2 -- ? )
+    smd-beats2? ;
 
 : bm ( -- )
     "\n"
@@ -396,216 +494,64 @@ SYMBOL: ref
     [ 1.0e9 / ] [ no-dispatch-time get / ] bi
     "single-hook-multi-dispatch: %.6f seconds (%.2f times slower)\n" printf
 
-    "\n"
-    COMBI-TIMES {
-        { [ dup 1,000,000 >= ] [
-              [ 1,000,000 / >integer ]
-              [ 1,000,000 mod 1,000 / >integer ]
-              [ 1,000 mod ]
-              tri "%d,%03d,%03d" sprintf ] }
-        { [ dup 1,000 >= ] [
-              [ 1,000 / >integer ]
-              [ 1,000 mod ]
-              bi "%d,%03d" sprintf ] }
-        [ "%d" sprintf ]
-    } cond
-    " repetitions of the showdown of the all combinations of No.001 to No.005\n"
-    3append write
-
     gc
     [
-        COMBI-TIMES [
-            the-man-No.001 the-man-No.001 sd-ln-beats? drop
-            the-man-No.001 the-man-No.002 sd-ln-beats? drop
-            the-man-No.001 the-man-No.003 sd-ln-beats? drop
-            the-man-No.001 the-man-No.004 sd-ln-beats? drop
-            the-man-No.001 the-man-No.005 sd-ln-beats? drop
-            the-man-No.002 the-man-No.001 sd-ln-beats? drop
-            the-man-No.002 the-man-No.002 sd-ln-beats? drop
-            the-man-No.002 the-man-No.003 sd-ln-beats? drop
-            the-man-No.002 the-man-No.004 sd-ln-beats? drop
-            the-man-No.002 the-man-No.005 sd-ln-beats? drop
-            the-man-No.003 the-man-No.001 sd-ln-beats? drop
-            the-man-No.003 the-man-No.002 sd-ln-beats? drop
-            the-man-No.003 the-man-No.003 sd-ln-beats? drop
-            the-man-No.003 the-man-No.004 sd-ln-beats? drop
-            the-man-No.003 the-man-No.005 sd-ln-beats? drop
-            the-man-No.004 the-man-No.001 sd-ln-beats? drop
-            the-man-No.004 the-man-No.002 sd-ln-beats? drop
-            the-man-No.004 the-man-No.003 sd-ln-beats? drop
-            the-man-No.004 the-man-No.004 sd-ln-beats? drop
-            the-man-No.004 the-man-No.005 sd-ln-beats? drop
-            the-man-No.005 the-man-No.001 sd-ln-beats? drop
-            the-man-No.005 the-man-No.002 sd-ln-beats? drop
-            the-man-No.005 the-man-No.003 sd-ln-beats? drop
-            the-man-No.005 the-man-No.004 sd-ln-beats? drop
-            the-man-No.005 the-man-No.005 sd-ln-beats? drop
-        ] times
-    ] benchmark dup ref namespaces:set
-    1.0e9 /
-    "single-dispatch:            %.6f seconds (reference)\n" printf
+        TIMES [
+            paper paper       wrapped-sd-beats? drop
+            paper scissors    wrapped-sd-beats? drop
+            paper rock        wrapped-sd-beats? drop
 
-    gc
-    [
-        COMBI-TIMES [
-            the-man-No.001 the-man-No.001 md-ln-beats? drop
-            the-man-No.001 the-man-No.002 md-ln-beats? drop
-            the-man-No.001 the-man-No.003 md-ln-beats? drop
-            the-man-No.001 the-man-No.004 md-ln-beats? drop
-            the-man-No.001 the-man-No.005 md-ln-beats? drop
-            the-man-No.002 the-man-No.001 md-ln-beats? drop
-            the-man-No.002 the-man-No.002 md-ln-beats? drop
-            the-man-No.002 the-man-No.003 md-ln-beats? drop
-            the-man-No.002 the-man-No.004 md-ln-beats? drop
-            the-man-No.002 the-man-No.005 md-ln-beats? drop
-            the-man-No.003 the-man-No.001 md-ln-beats? drop
-            the-man-No.003 the-man-No.002 md-ln-beats? drop
-            the-man-No.003 the-man-No.003 md-ln-beats? drop
-            the-man-No.003 the-man-No.004 md-ln-beats? drop
-            the-man-No.003 the-man-No.005 md-ln-beats? drop
-            the-man-No.004 the-man-No.001 md-ln-beats? drop
-            the-man-No.004 the-man-No.002 md-ln-beats? drop
-            the-man-No.004 the-man-No.003 md-ln-beats? drop
-            the-man-No.004 the-man-No.004 md-ln-beats? drop
-            the-man-No.004 the-man-No.005 md-ln-beats? drop
-            the-man-No.005 the-man-No.001 md-ln-beats? drop
-            the-man-No.005 the-man-No.002 md-ln-beats? drop
-            the-man-No.005 the-man-No.003 md-ln-beats? drop
-            the-man-No.005 the-man-No.004 md-ln-beats? drop
-            the-man-No.005 the-man-No.005 md-ln-beats? drop
+            scissors paper    wrapped-sd-beats? drop
+            scissors scissors wrapped-sd-beats? drop
+            scissors rock     wrapped-sd-beats? drop
+
+            rock paper        wrapped-sd-beats? drop
+            rock scissors     wrapped-sd-beats? drop
+            rock rock         wrapped-sd-beats? drop
         ] times
     ] benchmark
-    [ 1.0e9 / ] [ ref get / ] bi
-    "multi-dispatch:             %.6f seconds (%.2f times slower)\n" printf
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "non-inlined sd (wrapped):   %.6f seconds (%.2f times slower)\n" printf
 
     gc
     [
-        COMBI-TIMES [
-            the-man-No.001 the-man-No.001 smd-ln-beats? drop
-            the-man-No.001 the-man-No.002 smd-ln-beats? drop
-            the-man-No.001 the-man-No.003 smd-ln-beats? drop
-            the-man-No.001 the-man-No.004 smd-ln-beats? drop
-            the-man-No.001 the-man-No.005 smd-ln-beats? drop
-            the-man-No.002 the-man-No.001 smd-ln-beats? drop
-            the-man-No.002 the-man-No.002 smd-ln-beats? drop
-            the-man-No.002 the-man-No.003 smd-ln-beats? drop
-            the-man-No.002 the-man-No.004 smd-ln-beats? drop
-            the-man-No.002 the-man-No.005 smd-ln-beats? drop
-            the-man-No.003 the-man-No.001 smd-ln-beats? drop
-            the-man-No.003 the-man-No.002 smd-ln-beats? drop
-            the-man-No.003 the-man-No.003 smd-ln-beats? drop
-            the-man-No.003 the-man-No.004 smd-ln-beats? drop
-            the-man-No.003 the-man-No.005 smd-ln-beats? drop
-            the-man-No.004 the-man-No.001 smd-ln-beats? drop
-            the-man-No.004 the-man-No.002 smd-ln-beats? drop
-            the-man-No.004 the-man-No.003 smd-ln-beats? drop
-            the-man-No.004 the-man-No.004 smd-ln-beats? drop
-            the-man-No.004 the-man-No.005 smd-ln-beats? drop
-            the-man-No.005 the-man-No.001 smd-ln-beats? drop
-            the-man-No.005 the-man-No.002 smd-ln-beats? drop
-            the-man-No.005 the-man-No.003 smd-ln-beats? drop
-            the-man-No.005 the-man-No.004 smd-ln-beats? drop
-            the-man-No.005 the-man-No.005 smd-ln-beats? drop
+        TIMES [
+            paper paper       wrapped-md-beats? drop
+            paper scissors    wrapped-md-beats? drop
+            paper rock        wrapped-md-beats? drop
+
+            scissors paper    wrapped-md-beats? drop
+            scissors scissors wrapped-md-beats? drop
+            scissors rock     wrapped-md-beats? drop
+
+            rock paper        wrapped-md-beats? drop
+            rock scissors     wrapped-md-beats? drop
+            rock rock         wrapped-md-beats? drop
         ] times
     ] benchmark
-    [ 1.0e9 / ] [ ref get / ] bi
-    "single spec multi-dispatch: %.6f seconds (%.2f times slower)\n" printf
-;
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "non-inlined md (wrapped):   %.6f seconds (%.2f times slower)\n" printf
 
+    gc
+    [
+        TIMES [
+            paper paper       wrapped-smd-beats? drop
+            paper scissors    wrapped-smd-beats? drop
+            paper rock        wrapped-smd-beats? drop
 
+            scissors paper    wrapped-smd-beats? drop
+            scissors scissors wrapped-smd-beats? drop
+            scissors rock     wrapped-smd-beats? drop
 
-TUPLE: t-thing ;
-TUPLE: t-paper    < t-thing ;
-TUPLE: t-scissors < t-thing ;
-TUPLE: t-rock     < t-thing ;
+            rock paper        wrapped-smd-beats? drop
+            rock scissors     wrapped-smd-beats? drop
+            rock rock         wrapped-smd-beats? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "non-inlined smd (wrapped):  %.6f seconds (%.2f times slower)\n" printf
 
-CONSTANT: c-t-paper    T{ t-paper }
-CONSTANT: c-t-scissors T{ t-scissors }
-CONSTANT: c-t-rock     T{ t-rock }
-
-! no-dispatch
-: beats2? ( obj1 obj2 -- ? )
-    {
-        { [ dup t-rock? ]     [ drop t-scissors? [ t ] [ f ] if ] }
-        { [ dup t-paper? ]    [ drop t-rock?     [ t ] [ f ] if ] }
-        { [ dup t-scissors? ] [ drop t-paper?    [ t ] [ f ] if ] }
-        [ 2drop f ]
-    } cond ;
-
-
-! multi-dispatch
-MGENERIC: md-beats2? ( obj1 obj2 -- ? )
-
-MM: md-beats2? ( :t-paper :t-scissors -- ? ) 2drop t ;
-MM: md-beats2? ( :t-scissors :t-rock -- ? )  2drop t ;
-MM: md-beats2? ( :t-rock :t-paper -- ? )     2drop t ;
-MM: md-beats2? ( :t-thing :t-thing -- ? )    2drop f ;
-
-
-! typed multi-dispatch
-MGENERIC: md-beats-t2? ( obj1 obj2 -- ? )
-
-MM: md-beats-t2? ( :t-paper :t-scissors -- :boolean ) 2drop t ;
-MM: md-beats-t2? ( :t-scissors :t-rock -- :boolean )  2drop t ;
-MM: md-beats-t2? ( :t-rock :t-paper -- :boolean )     2drop t ;
-MM: md-beats-t2? ( :t-thing :t-thing -- :boolean )    2drop f ;
-
-
-! multi-hook-dispatch
-MGENERIC: mhd-beats2? ( thing1 thing2 | -- ? )
-
-MM: mhd-beats2? ( thing1: t-paper thing2: t-scissors | -- ? ) t ;
-MM: mhd-beats2? ( thing1: t-scissors thing2: t-rock | -- ? ) t ;
-MM: mhd-beats2? ( thing1: t-rock thing2: t-paper | -- ? ) t ;
-MM: mhd-beats2? ( thing1: t-thing thing2: t-thing | -- ? ) f ;
-
-
-! sigle-dispach
-GENERIC: sd-beats2? ( obj1 obj2 -- ? )
-
-M: t-paper sd-beats2? drop t-rock? [ t ] [ f ] if ;
-M: t-scissors sd-beats2? drop t-paper? [ t ] [ f ] if ;
-M: t-rock sd-beats2? drop t-scissors? [ t ] [ f ] if ;
-
-
-! multi-sigle-dispach
-MGENERIC: smd-beats2? ( obj1 obj2 -- ? )
-
-MM: smd-beats2? ( obj1 obj2: t-paper -- ? )    drop t-rock? [ t ] [ f ] if ;
-MM: smd-beats2? ( obj1 obj2: t-scissors -- ? ) drop t-paper? [ t ] [ f ] if ;
-MM: smd-beats2? ( obj1 obj2: t-rock -- ? )     drop t-scissors? [ t ] [ f ] if ;
-
-
-! sigle-hook-dispatch
-HOOK: shd-beats2? thing2 ( -- ? )
-
-M: t-paper shd-beats2? thing1 get t-rock? [ t ] [ f ] if ;
-M: t-scissors shd-beats2? thing1 get t-paper? [ t ] [ f ] if ;
-M: t-rock shd-beats2? thing1 get t-scissors? [ t ] [ f ] if ;
-
-
-! sigle-spac-hook-multi-dispatch
-MGENERIC: shmd-beats2? ( thing2 | -- ? )
-
-MM: shmd-beats2? ( thing2: t-scissors | -- ? ) thing1 get t-paper? [ t ] [ f ] if ;
-MM: shmd-beats2? ( thing2: t-rock | -- ? ) thing1 get t-scissors? [ t ] [ f ] if ;
-MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
-
-: bm2 ( -- )
-    "\n"
-    TIMES {
-        { [ dup 1,000,000 >= ] [
-              [ 1,000,000 / >integer ]
-              [ 1,000,000 mod 1,000 / >integer ]
-              [ 1,000 mod ]
-              tri "%d,%03d,%03d" sprintf ] }
-        { [ dup 1,000 >= ] [
-              [ 1,000 / >integer ]
-              [ 1,000 mod ]
-              bi "%d,%03d" sprintf ] }
-        [ "%d" sprintf ]
-    } cond
-    " repetitions of all combinations of rock-paper-scissors (tuple version)\n" 3append write
+    "\nrepetitions of all combinations of rock-paper-scissors (tuple version)\n" write
 
     gc
     [
@@ -622,9 +568,9 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
             c-t-rock c-t-scissors     beats2? drop
             c-t-rock c-t-rock         beats2? drop
         ] times
-    ] benchmark dup no-dispatch-time set
-    1.0e9 /
-    "no-dispatch:                %.6f seconds (reference)\n" printf
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "no-dispatch:                %.6f seconds (%.2f times slower)\n" printf
 
     gc
     [
@@ -752,8 +698,10 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
             c-t-scissors thing2 set shmd-beats2? drop
             c-t-rock     thing2 set shmd-beats2? drop
 
-            c-t-scissors thing1 set c-t-paper thing2 set shd-beats2? drop c-t-scissors
-            thing2 set shd-beats2? drop c-t-rock thing2 set shd-beats2? drop
+            c-t-scissors thing1 set 
+            c-t-paper    thing2 set shmd-beats2? drop
+            c-t-scissors thing2 set shmd-beats2? drop
+            c-t-rock     thing2 set shmd-beats2? drop
 
             c-t-rock     thing1 set
             c-t-paper    thing2 set shmd-beats2? drop
@@ -763,4 +711,235 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
     ] benchmark
     [ 1.0e9 / ] [ no-dispatch-time get / ] bi
     "single-hook-multi-dispatch: %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        TIMES [
+            c-t-paper c-t-paper       wrapped-sd-beats2? drop
+            c-t-paper c-t-scissors    wrapped-sd-beats2? drop
+            c-t-paper c-t-rock        wrapped-sd-beats2? drop
+
+            c-t-scissors c-t-paper    wrapped-sd-beats2? drop
+            c-t-scissors c-t-scissors wrapped-sd-beats2? drop
+            c-t-scissors c-t-rock     wrapped-sd-beats2? drop
+
+            c-t-rock c-t-paper        wrapped-sd-beats2? drop
+            c-t-rock c-t-scissors     wrapped-sd-beats2? drop
+            c-t-rock c-t-rock         wrapped-sd-beats2? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "non-inlined sd (wrapped):   %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        TIMES [
+            c-t-paper c-t-paper       wrapped-md-beats2? drop
+            c-t-paper c-t-scissors    wrapped-md-beats2? drop
+            c-t-paper c-t-rock        wrapped-md-beats2? drop
+
+            c-t-scissors c-t-paper    wrapped-md-beats2? drop
+            c-t-scissors c-t-scissors wrapped-md-beats2? drop
+            c-t-scissors c-t-rock     wrapped-md-beats2? drop
+
+            c-t-rock c-t-paper        wrapped-md-beats2? drop
+            c-t-rock c-t-scissors     wrapped-md-beats2? drop
+            c-t-rock c-t-rock         wrapped-md-beats2? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "non-inlined md (wrapped):   %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        TIMES [
+            c-t-paper c-t-paper       wrapped-smd-beats2? drop
+            c-t-paper c-t-scissors    wrapped-smd-beats2? drop
+            c-t-paper c-t-rock        wrapped-smd-beats2? drop
+
+            c-t-scissors c-t-paper    wrapped-smd-beats2? drop
+            c-t-scissors c-t-scissors wrapped-smd-beats2? drop
+            c-t-scissors c-t-rock     wrapped-smd-beats2? drop
+
+            c-t-rock c-t-paper        wrapped-smd-beats2? drop
+            c-t-rock c-t-scissors     wrapped-smd-beats2? drop
+            c-t-rock c-t-rock         wrapped-smd-beats2? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "non-inlined smd (wrapped):  %.6f seconds (%.2f times slower)\n" printf
+;
+
+
+: bm2 ( -- )
+   "\n"
+    COMBI-TIMES {
+        { [ dup 1,000,000 >= ] [
+              [ 1,000,000 / >integer ]
+              [ 1,000,000 mod 1,000 / >integer ]
+              [ 1,000 mod ]
+              tri "%d,%03d,%03d" sprintf ] }
+        { [ dup 1,000 >= ] [
+              [ 1,000 / >integer ]
+              [ 1,000 mod ]
+              bi "%d,%03d" sprintf ] }
+        [ "%d" sprintf ]
+    } cond
+    " repetitions of the showdown of the all combinations of No.001 to No.005\n"
+    3append write
+
+    gc
+    [
+        COMBI-TIMES [
+            the-man-No.001 the-man-No.001 sd-ln-beats? drop
+            the-man-No.001 the-man-No.002 sd-ln-beats? drop
+            the-man-No.001 the-man-No.003 sd-ln-beats? drop
+            the-man-No.001 the-man-No.004 sd-ln-beats? drop
+            the-man-No.001 the-man-No.005 sd-ln-beats? drop
+            the-man-No.002 the-man-No.001 sd-ln-beats? drop
+            the-man-No.002 the-man-No.002 sd-ln-beats? drop
+            the-man-No.002 the-man-No.003 sd-ln-beats? drop
+            the-man-No.002 the-man-No.004 sd-ln-beats? drop
+            the-man-No.002 the-man-No.005 sd-ln-beats? drop
+            the-man-No.003 the-man-No.001 sd-ln-beats? drop
+            the-man-No.003 the-man-No.002 sd-ln-beats? drop
+            the-man-No.003 the-man-No.003 sd-ln-beats? drop
+            the-man-No.003 the-man-No.004 sd-ln-beats? drop
+            the-man-No.003 the-man-No.005 sd-ln-beats? drop
+            the-man-No.004 the-man-No.001 sd-ln-beats? drop
+            the-man-No.004 the-man-No.002 sd-ln-beats? drop
+            the-man-No.004 the-man-No.003 sd-ln-beats? drop
+            the-man-No.004 the-man-No.004 sd-ln-beats? drop
+            the-man-No.004 the-man-No.005 sd-ln-beats? drop
+            the-man-No.005 the-man-No.001 sd-ln-beats? drop
+            the-man-No.005 the-man-No.002 sd-ln-beats? drop
+            the-man-No.005 the-man-No.003 sd-ln-beats? drop
+            the-man-No.005 the-man-No.004 sd-ln-beats? drop
+            the-man-No.005 the-man-No.005 sd-ln-beats? drop
+        ] times
+    ] benchmark dup ref namespaces:set
+    1.0e9 /
+    "single-dispatch:            %.6f seconds (reference)\n" printf
+
+    gc
+    [
+        COMBI-TIMES [
+            the-man-No.001 the-man-No.001 md-ln-beats? drop
+            the-man-No.001 the-man-No.002 md-ln-beats? drop
+            the-man-No.001 the-man-No.003 md-ln-beats? drop
+            the-man-No.001 the-man-No.004 md-ln-beats? drop
+            the-man-No.001 the-man-No.005 md-ln-beats? drop
+            the-man-No.002 the-man-No.001 md-ln-beats? drop
+            the-man-No.002 the-man-No.002 md-ln-beats? drop
+            the-man-No.002 the-man-No.003 md-ln-beats? drop
+            the-man-No.002 the-man-No.004 md-ln-beats? drop
+            the-man-No.002 the-man-No.005 md-ln-beats? drop
+            the-man-No.003 the-man-No.001 md-ln-beats? drop
+            the-man-No.003 the-man-No.002 md-ln-beats? drop
+            the-man-No.003 the-man-No.003 md-ln-beats? drop
+            the-man-No.003 the-man-No.004 md-ln-beats? drop
+            the-man-No.003 the-man-No.005 md-ln-beats? drop
+            the-man-No.004 the-man-No.001 md-ln-beats? drop
+            the-man-No.004 the-man-No.002 md-ln-beats? drop
+            the-man-No.004 the-man-No.003 md-ln-beats? drop
+            the-man-No.004 the-man-No.004 md-ln-beats? drop
+            the-man-No.004 the-man-No.005 md-ln-beats? drop
+            the-man-No.005 the-man-No.001 md-ln-beats? drop
+            the-man-No.005 the-man-No.002 md-ln-beats? drop
+            the-man-No.005 the-man-No.003 md-ln-beats? drop
+            the-man-No.005 the-man-No.004 md-ln-beats? drop
+            the-man-No.005 the-man-No.005 md-ln-beats? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ ref get / ] bi
+    "multi-dispatch:             %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        COMBI-TIMES [
+            the-man-No.001 the-man-No.001 smd-ln-beats? drop
+            the-man-No.001 the-man-No.002 smd-ln-beats? drop
+            the-man-No.001 the-man-No.003 smd-ln-beats? drop
+            the-man-No.001 the-man-No.004 smd-ln-beats? drop
+            the-man-No.001 the-man-No.005 smd-ln-beats? drop
+            the-man-No.002 the-man-No.001 smd-ln-beats? drop
+            the-man-No.002 the-man-No.002 smd-ln-beats? drop
+            the-man-No.002 the-man-No.003 smd-ln-beats? drop
+            the-man-No.002 the-man-No.004 smd-ln-beats? drop
+            the-man-No.002 the-man-No.005 smd-ln-beats? drop
+            the-man-No.003 the-man-No.001 smd-ln-beats? drop
+            the-man-No.003 the-man-No.002 smd-ln-beats? drop
+            the-man-No.003 the-man-No.003 smd-ln-beats? drop
+            the-man-No.003 the-man-No.004 smd-ln-beats? drop
+            the-man-No.003 the-man-No.005 smd-ln-beats? drop
+            the-man-No.004 the-man-No.001 smd-ln-beats? drop
+            the-man-No.004 the-man-No.002 smd-ln-beats? drop
+            the-man-No.004 the-man-No.003 smd-ln-beats? drop
+            the-man-No.004 the-man-No.004 smd-ln-beats? drop
+            the-man-No.004 the-man-No.005 smd-ln-beats? drop
+            the-man-No.005 the-man-No.001 smd-ln-beats? drop
+            the-man-No.005 the-man-No.002 smd-ln-beats? drop
+            the-man-No.005 the-man-No.003 smd-ln-beats? drop
+            the-man-No.005 the-man-No.004 smd-ln-beats? drop
+            the-man-No.005 the-man-No.005 smd-ln-beats? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ ref get / ] bi
+    "single spec multi-dispatch: %.6f seconds (%.2f times slower)\n" printf
+;
+
+: bm3 ( -- )
+    "\n"
+    TIMES {
+        { [ dup 1,000,000 >= ] [
+              [ 1,000,000 / >integer ]
+              [ 1,000,000 mod 1,000 / >integer ]
+              [ 1,000 mod ]
+              tri "%d,%03d,%03d" sprintf ] }
+        { [ dup 1,000 >= ] [
+              [ 1,000 / >integer ]
+              [ 1,000 mod ]
+              bi "%d,%03d" sprintf ] }
+        [ "%d" sprintf ]
+    } cond
+    " repetitions of all combinations of rock-paper-scissors\n" 3append write
+
+    gc
+    [
+        TIMES [
+            paper paper       wrapped-sd-beats? drop
+            paper scissors    wrapped-sd-beats? drop
+            paper rock        wrapped-sd-beats? drop
+
+            scissors paper    wrapped-sd-beats? drop
+            scissors scissors wrapped-sd-beats? drop
+            scissors rock     wrapped-sd-beats? drop
+
+            rock paper        wrapped-sd-beats? drop
+            rock scissors     wrapped-sd-beats? drop
+            rock rock         wrapped-sd-beats? drop
+        ] times
+    ] collect-dispatch-stats . ! dispatch-stats.
+
+    gc
+    [
+        [
+        TIMES [
+            paper paper       wrapped-smd-beats? drop
+            paper scissors    wrapped-smd-beats? drop
+            paper rock        wrapped-smd-beats? drop
+
+            scissors paper    wrapped-smd-beats? drop
+            scissors scissors wrapped-smd-beats? drop
+            scissors rock     wrapped-smd-beats? drop
+
+            rock paper        wrapped-smd-beats? drop
+            rock scissors     wrapped-smd-beats? drop
+            rock rock         wrapped-smd-beats? drop
+        ] times
+    ] collect-dispatch-stats . ! dispatch-stats.
+
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "non-inlined smd:            %.6f seconds (%.2f times slower)\n" printf
 ;
