@@ -26,6 +26,8 @@ SYMBOL: effect-var
     [ ":" ?tail [ row-variable-can't-have-type ] when ] curry
     [ invalid-row-variable ] if ;
 
+USE: parser
+
 : parse-effect-value ( token -- value )
     ":" ?tail [ scan-object 2array ] when ;
 

@@ -10,6 +10,7 @@ io.files io.pathnames kernel kernel.private layouts make math
 math.order namespaces namespaces.private parser parser.notes
 prettyprint quotations sequences sequences.private source-files
 strings system vectors vocabs words ;
+! QUALIFIED-WITH: multi-generic mg
 IN: bootstrap.image
 
 : arch-name ( os cpu -- arch )

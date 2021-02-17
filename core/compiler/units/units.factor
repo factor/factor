@@ -4,7 +4,6 @@ USING: accessors arrays assocs classes classes.private
 classes.tuple.private continuations definitions generic
 hash-sets init kernel kernel.private math namespaces sequences
 sets source-files.errors vocabs words ;
-QUALIFIED-WITH: multi-generic mg
 IN: compiler.units
 
 PRIMITIVE: modify-code-heap ( alist update-existing? reset-pics? -- )
@@ -161,10 +160,20 @@ M: object always-bump-effect-counter? drop f ;
 : reset-pics? ( -- ? )
     outdated-generics get null? not ;
 
+: multi-generic? ( word -- ? )
+    "multi-methods" word-prop >boolean ;
+
+: remake-multi-generic ( generic -- )
+    outdated-generics get add-to-unit ;
+
+: remake-multi-generics ( -- )
+    outdated-generics get members [ multi-generic? ] filter
+    [ make-generic ] each ;
+
 : finish-compilation-unit ( -- )
     [ ] [
         remake-generics
-        mg:remake-multi-generics
+        remake-multi-generics
         to-recompile [
             recompile
             outdated-tuples get update-tuples
@@ -210,3 +219,13 @@ PRIVATE>
     HS{ } clone forgotten-definitions pick set-at [
         with-nested-compilation-unit
     ] with-variables ; inline
+
+! M: mg:multi-generic generic:update-generic ( class/classes generic -- )
+!     [
+!         over array? [
+!             '[ _ mg:changed-call-sites ] each
+!         ] [ mg:changed-call-sites ] if
+!     ]
+!     [ mg:remake-multi-generic drop ]
+!     [ changed-conditionally drop ]
+!     2tri ;

@@ -3,19 +3,18 @@
 USING: accessors arrays assocs classes classes.algebra
 classes.algebra.private classes.maybe classes.private
 combinators combinators.private combinators.short-circuit
-compiler compiler.units debugger definitions effects
-effects.parser fry generalizations hashtables io kernel
-kernel.private layouts locals locals.parser make math math.order
-math.private namespaces parser prettyprint prettyprint.backend
-prettyprint.custom prettyprint.sections quotations see sequences
-sequences.generalizations sets shuffle sorting splitting
-stack-checker.dependencies stack-checker.transforms summary
-tools.annotations tools.annotations.private typed vectors words
-words.symbol ;
+compiler.units debugger definitions effects effects.parser
+generalizations hashtables io kernel kernel.private
+layouts locals.parser make math math.order math.private
+namespaces parser prettyprint prettyprint.backend
+prettyprint.custom prettyprint.sections quotations see
+sequences sequences.generalizations sets shuffle sorting
+splitting stack-checker.dependencies stack-checker.transforms
+summary tools.annotations tools.annotations.private typed
+vectors vocabs words words.symbol ;
 FROM: namespaces => set ;
 QUALIFIED-WITH: generic.single.private gsp
 QUALIFIED-WITH: generic g
-
 IN: multi-generic
 
 PREDICATE: multi-generic < word
@@ -280,15 +279,6 @@ ERROR: check-method-error class generic ;
         check-method-error
     ] unless ; inline
 
-: remake-multi-generic ( generic -- )
-    outdated-generics get add-to-unit ;
-
-DEFER: make-generic
-
-: remake-multi-generics ( -- )
-    outdated-generics get members [ multi-generic? ] filter
-    [ make-generic ] each ;
-
 :: ?single-generic-spec ( generic -- n/var/f )
     generic methods specializers :> ( stack-specs hook-specs )
     hook-specs length 0 = [
@@ -303,7 +293,7 @@ DEFER: define-single-default-method
 
 SYMBOL: second-math-dispatch
 
-:: make-generic ( generic -- )
+M:: multi-generic g:make-generic ( generic -- )
     generic "mathematical" word-prop [
         ! math-dispatch
         <math-dispatch> dup
@@ -377,6 +367,13 @@ SYMBOL: second-math-dispatch
             ] if
         ] when*
     ] if ;
+
+: remake-multi-generic ( generic -- )
+    outdated-generics get add-to-unit ;
+
+: remake-multi-generics ( -- )
+    outdated-generics get members [ multi-generic? ] filter
+    [ g:make-generic ] each ;
 
 M: multi-generic g:update-generic ( class/classes generic -- )
     [
@@ -516,7 +513,7 @@ M: no-method error.
         [ 2drop remake-multi-generic ]
     } 3cleave ;
 
-! ! ! Syntax ! ! !
+! ! Syntax ! ! !
 SYNTAX: MGENERIC: scan-new-word scan-effect
     parse-variable-effect
     define-generic ;
@@ -1267,6 +1264,8 @@ M: call-next-multi-method-in-a-math-generic summary
 M:: math-dispatch next-multi-method-quot* ( classes generic dispatch -- * )
     generic call-next-multi-method-in-a-math-generic ;
 
+! DEFER: next-multi-method-quot-cache
+
 : next-multi-method-quot ( method -- quot/f )
     next-multi-method-quot-cache get [
         [ "method-specializer" word-prop ]
@@ -1274,7 +1273,8 @@ M:: math-dispatch next-multi-method-quot* ( classes generic dispatch -- * )
             "multi-generic" word-prop
             dup "dispatch-type" word-prop
         ] bi next-multi-method-quot*
-    ] cache ;
+    ] cache
+ ;
 
 ERROR: no-next-multi-method method ;
 
@@ -1322,3 +1322,4 @@ M: multi-generic (annotate)
 
 M: multi-generic (deep-annotate)
     '[ _ (deep-annotate) ] annotate-generic ;
+
