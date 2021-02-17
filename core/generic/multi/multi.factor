@@ -1,8 +1,8 @@
 USING: accessors arrays assocs classes classes.algebra classes.algebra.private
-classes.private combinators definitions effects effects.parser generic
-generic.parser generic.single generic.single.private generic.standard kernel
-make math math.order namespaces parser quotations sequences sets sorting vectors
-words ;
+classes.private combinators definitions effects effects.parser generalizations
+generic generic.parser generic.single generic.single.private generic.standard
+kernel make math math.order namespaces parser quotations sequences sets sorting
+vectors words ;
 
 IN: generic.multi
 
@@ -190,6 +190,21 @@ M: multi-generic dispatch# not-single-dispatch ;
     [ first2 [ classes>> ] bi@ [ class-and ] 2map <covariant-tuple> ] map
     members
     ;
+
+! This is the equivalent of predicate-def but for covariant-tuples in dispatch
+! context
+: dispatch-predicate-def ( covariant-tuple -- quot )
+    classes>> <reversed>
+    [ 1 + swap '{ [ _ npick _ instance? not ] [ f ] } ] map-index
+    [ t ] suffix
+    '[ _ cond ] ;
+
+M: multi-combination next-method-quot*
+    drop [ class>dispatch ] dip
+    { [ drop dispatch-predicate-def ]
+      [ next-method 1quotation ]
+    } 2cleave
+    '[ _ _ [ inconsistent-next-method ] if ] ;
 
 ERROR: ambiguous-method-specializations classes ;
 

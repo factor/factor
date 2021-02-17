@@ -102,3 +102,15 @@ M: the-rock test1 2drop 22 ;
 
 ! This should probably fail at definition time already?
 ! [ [ paper1 paper1 broken ] compile-call ] must-fail
+
+
+! Testing call-next-method
+GENERIC: foo ( x x -- x )
+MM: foo ( x: number x: number -- x ) 2drop 42 ;
+MM: foo ( x: fixnum x: fixnum -- x ) 2drop 47 ;
+MM: foo ( x: float x: number -- x ) call-next-method ;
+
+{ 47 } [ 1 1 foo ] unit-test
+{ 47 } [ [ 1 1 foo ] compile-call ] unit-test
+{ 42 } [ 1.1 1 foo ] unit-test
+{ 42 } [ [ 1.1 1 foo ] compile-call ] unit-test
