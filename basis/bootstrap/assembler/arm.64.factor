@@ -101,7 +101,7 @@ big-endian off
     ! arg1 arg1s MOVr64
     ! name jit-call ;
 
-:: jit-call-2arg ( arg1s arg2s name -- ) 3drop ;
+:: jit-call-2arg ( arg1s arg2s name -- )
     arg1s arg1 MOVr64
     arg2s arg2 MOVr64
     name jit-call ;
