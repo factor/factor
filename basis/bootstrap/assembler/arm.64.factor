@@ -133,7 +133,7 @@ big-endian off
     ! ctx-reg context-retainstack-offset [+] rs-reg MOV ;
 
 ! ctx-reg must already have been loaded
-: jit-restore-context ( -- )
+: jit-restore-context ( -- ) ;
     ! ds-reg ctx-reg context-datastack-offset [+] MOV
     ! rs-reg ctx-reg context-retainstack-offset [+] MOV ;
 
