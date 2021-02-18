@@ -522,6 +522,9 @@ PRIVATE>
 : 2all? ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... ? )
     (2each) all-integers? ; inline
 
+: 2any? ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... ? )
+    [ not ] compose 2all? not ; inline
+
 : 3each ( ... seq1 seq2 seq3 quot: ( ... elt1 elt2 elt3 -- ... ) -- ... )
     (3each) each-integer ; inline
 
