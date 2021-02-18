@@ -560,7 +560,9 @@ big-endian off
     ! temp1/32 0x7f CMP f rc-absolute-1 rel-untagged
 ] PIC-CHECK-TAG jit-define
 
-[ 0 JE f rc-relative rel-word ] PIC-HIT jit-define
+[
+    ! 0 JE f rc-relative rel-word
+] PIC-HIT jit-define
 
 ! ! ! Megamorphic caches
 
