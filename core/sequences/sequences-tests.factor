@@ -421,3 +421,7 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 } [ { 11 22 33 } [ + ] BV{ } map-index-as ] unit-test
 
 { t } [ { } { 99 88 } [ <= ] 2all? ] unit-test
+
+{ f } [ { } { 99 88 } [ <= ] 2any? ] unit-test
+{ t } [ { 2 4 5 8 } { 2 4 6 8 } [ < ] 2any? ] unit-test
+{ f } [ { 2 4 6 8 } { 2 4 6 8 } [ < ] 2any? ] unit-test
