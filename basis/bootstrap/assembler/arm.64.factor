@@ -540,22 +540,24 @@ big-endian off
 
 ! Load a value from a stack position
 [
-    temp1 ds-reg 0x7f [+] MOV f rc-absolute-1 rel-untagged
+    ! temp1 ds-reg 0x7f [+] MOV f rc-absolute-1 rel-untagged
 ] PIC-LOAD jit-define
 
-[ temp1/32 tag-mask get AND ] PIC-TAG jit-define
+[
+    ! temp1/32 tag-mask get AND
+] PIC-TAG jit-define
 
 [
-    temp0 temp1 MOV
-    temp1/32 tag-mask get AND
-    temp1/32 tuple type-number CMP
-    [ JNE ]
-    [ temp1 temp0 tuple-class-offset [+] MOV ]
-    jit-conditional
+    ! temp0 temp1 MOV
+    ! temp1/32 tag-mask get AND
+    ! temp1/32 tuple type-number CMP
+    ! [ JNE ]
+    ! [ temp1 temp0 tuple-class-offset [+] MOV ]
+    ! jit-conditional
 ] PIC-TUPLE jit-define
 
 [
-    temp1/32 0x7f CMP f rc-absolute-1 rel-untagged
+    ! temp1/32 0x7f CMP f rc-absolute-1 rel-untagged
 ] PIC-CHECK-TAG jit-define
 
 [ 0 JE f rc-relative rel-word ] PIC-HIT jit-define
