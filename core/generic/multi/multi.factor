@@ -1,8 +1,8 @@
-USING: accessors arrays assocs classes classes.algebra classes.algebra.private
-classes.private combinators definitions effects effects.parser fry
-generalizations generic generic.parser generic.single generic.single.private
-generic.standard kernel make math math.order namespaces parser
-prettyprint.custom quotations sequences sets sorting vectors words ;
+USING: accessors arrays assocs classes classes.algebra classes.dispatch
+classes.dispatch.covariant-tuples classes.dispatch.order combinators definitions
+effects effects.parser generalizations generic generic.parser generic.single
+generic.single.private generic.standard kernel make math namespaces parser
+quotations sequences sets vectors words ;
 
 IN: generic.multi
 
@@ -16,7 +16,7 @@ SYMBOL: nested-dispatch-pics
 
 PREDICATE: multi-method < method "method-class" word-prop covariant-tuple? ;
 
-TUPLE: method-dispatch class method ;
+TUPLE: method-dispatch { class maybe{ dispatch-type } read-only } { method read-only } ;
 C: <method-dispatch> method-dispatch
 
 GENERIC: method-types ( method -- seq )
@@ -25,74 +25,60 @@ GENERIC: method-types ( method -- seq )
 M: method-dispatch method-types class>> classes>> ;
 M: object method-types "nope" throw ;
 
-GENERIC: dispatch-arity ( method -- n )
-M: class dispatch-arity drop 1 ;
-M: covariant-tuple dispatch-arity classes>> length ;
+! : nth-type ( n method -- seq ) method-types nth ;
 
-: nth-type ( n method -- seq ) method-types nth ;
-
-: method-applicable? ( class index method -- ? ) nth-type class<= ;
+! : method-applicable? ( class index method -- ? ) nth-type class<= ;
 
 ! TODO: this should probably be replaced with functionality from classes.algebra
-:: dispatch<=> ( class1 class2 -- <=> )
-    class1 class2 [ normalize-class ] bi@ :> ( c1 c2 )
-    c1 c2 compare-classes dup +incomparable+ =
-    [ drop c1 c2 [ rank-class ] compare dup +eq+ =
-      [ drop c1 c2 [ class-name ] compare ] when
-    ] when ;
+! :: dispatch<=> ( class1 class2 -- <=> )
+!     class1 class2 [ normalize-class ] bi@ :> ( c1 c2 )
+!     c1 c2 compare-classes dup +incomparable+ =
+!     [ drop c1 c2 [ rank-class ] compare dup +eq+ =
+!       [ drop c1 c2 [ class-name ] compare ] when
+!     ] when ;
 
 ! sort methods for applicability on specific index
-:: sort-methods-index ( methods index -- methods )
-    methods [ [ index swap nth-type ] bi@ dispatch<=> ] sort ;
+! :: sort-methods-index ( methods index -- methods )
+!     methods [ [ index swap nth-type ] bi@ dispatch<=> ] sort ;
 
-: applicable-methods ( class index methods -- seq )
-    [ [ method-applicable? ] 2with filter ] keepd sort-methods-index ;
+:: applicable-methods ( class index methods -- assoc )
+    methods [ class>> :> dispatch-type
+              class index dispatch-type nth-dispatch-applicable?
+              [ index dispatch-type nth-dispatch-class ] [ f ] if
+    ] sort-dispatch values concat ;
+    ! [ [ method-applicable? ] 2with filter ] keepd sort-methods-index ;
 
 ! * Dispatch engine implementation
 
 ! TODO: check sorting
 : method-dispatch-classes ( n methods -- seq )
-    [ nth-type ] with map members ;
+    [ class>> nth-dispatch-class ] with map members ;
 
-:: multi-methods ( methods n -- assoc )
-    n 0 >=
+! FIXME: input is seq of method-dispatches
+:: multi-methods ( methods n arity -- assoc )
+    n arity <
     [ n methods method-dispatch-classes
     [ dup n methods applicable-methods
       dup length 1 >
-      [ n 1 - multi-methods ]
+      [ n 1 + arity multi-methods ]
       ! TODO check sorting
-      [ ?first method>> ] if
+      [ last method>> ] if
     ] map>alist ] [
         ! NOTE: This is where we rely on correct non-ambigutiy
-        methods ?first method>>
+        methods last method>>
     ] if ;
 
-GENERIC: promote-dispatch-class ( arity class -- class )
-M: class promote-dispatch-class
-    1array swap object pad-head <covariant-tuple> ;
-ERROR: too-many-dispatch-args arity class ;
-M: covariant-tuple promote-dispatch-class
-    dup classes>> length pick <=> {
-        { +lt+ [ classes>> swap object pad-head <covariant-tuple> ] }
-        { +eq+ [ nip ] }
-        { +gt+ [ too-many-dispatch-args ] }
-    } case ;
-
-! NOTE: Single use, should be generic if ever used to promote generally?
-: class>dispatch ( class -- dispatch-class )
-    dup covariant-tuple? [ 1array <covariant-tuple> ] unless ;
-
-: methods>dispatch ( arity assoc -- seq )
+: methods>dispatch ( assoc -- seq )
     ! NOTE: not using smart-with due to dependency issues
     ! [ [ promote-dispatch-class ] dip <method-dispatch> ] smart-with { } assoc>map ;
-    [ swapd [ promote-dispatch-class ] dip <method-dispatch> ] with { } assoc>map ;
-
+    [ [ class>dispatch ] dip <method-dispatch> ] {  } assoc>map ;
+    ! [ swapd  dip <method-dispatch> ] with { } assoc>map ;
 
 :: methods>multi-methods ( arity assoc -- assoc )
     ! assoc [ [ arity swap promote-dispatch-class ] dip ] assoc-map
-    arity assoc methods>dispatch
+    assoc methods>dispatch
     [ f ]
-    [ arity 1 -  multi-methods ] if-empty ;
+    [ 0 arity multi-methods ] if-empty ;
 
 ! This is used to keep track of nesting during engine tree construction, as well
 ! as to be able to use inline-cache-quots, where it has to be set to the correct
@@ -295,21 +281,3 @@ ERROR: empty-dispatch-spec seq ;
     ] with-definition ;
 
 SYNTAX: MM: (MM:) define ;
-
-! * Literal syntax for dispatch specifiers
-
-! Currently only covariant-tuple. For the moment just some convenience to
-! identify and print multi-methods using the existing single method code with
-! something like M\ D{ class1 class2 } generic
-! But defining with M: D{ class1 class2 } generic ... ; does not turn the generic
-! into a multi-generic !
-
-SYNTAX: D{
-  \ } [ <covariant-tuple> ] parse-literal ;
-
-M: covariant-tuple pprint* pprint-object ;
-
-M: covariant-tuple pprint-delims
-    drop \ D{ \ } ;
-
-M: covariant-tuple >pprint-sequence classes>> ;

@@ -1,7 +1,8 @@
-USING: classes.algebra compiler.test generic generic.multi kernel kernel.private
-literals math math.combinatorics random sequences tools.dispatch tools.test
-tools.time ;
+USING: arrays classes.algebra classes.dispatch.covariant-tuples compiler.test
+generic generic.multi kernel kernel.private literals math math.combinatorics
+random sequences tools.dispatch tools.test tools.time words ;
 IN: generic.multi.tests
+
 
 TUPLE: thing ;
 TUPLE: rock < thing ;
@@ -31,6 +32,17 @@ CONSTANT: rock1 T{ rock f  }
 CONSTANT: paper1 T{ paper f }
 CONSTANT: scissors1 T{ scissors f }
 CONSTANT: the-rock1 T{ the-rock f }
+
+: test-methods ( -- seq )
+    M\ D{ thing thing } beats [ "method-class" word-prop ] keep <method-dispatch>
+    M\ D{ rock scissors } beats [ "method-class" word-prop ] keep <method-dispatch>
+    2array ;
+
+{ 2 } [ scissors 0 test-methods applicable-methods length ] unit-test
+{ 1 } [ thing 0 test-methods applicable-methods length ] unit-test
+{ 0 } [ fixnum 0 test-methods applicable-methods length ] unit-test
+
+
 
 
 { f } [ rock1 rock1 beats ] unit-test
