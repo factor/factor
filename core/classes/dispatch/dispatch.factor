@@ -9,10 +9,16 @@ IN: classes.dispatch
 
 MIXIN: dispatch-type
 INSTANCE: dispatch-type classoid
-GENERIC: dispatch<= ( dispatch-type1 dispatch-type2 -- ? )
+! Workaround for not having multi-methods here.  Left dispatch is checked first
+GENERIC#: left-dispatch<= 1 ( class1 class2 -- ? )
+GENERIC: right-dispatch<= ( class1 class2 -- ? )
 
 ! Dispatch types per default not comparable to concrete types
-M: classoid dispatch<= 2drop f ;
+M: dispatch-type left-dispatch<=
+    dup dispatch-type?
+    [ right-dispatch<= ] [ 2drop f ] if ;
+
+! TODO: used?  This should probably something specific during parsing/construction...
 GENERIC: class>dispatch ( class -- dispatch-type )
 M: dispatch-type class>dispatch ;
 ! This is used when building a decision tree to find the most specific method

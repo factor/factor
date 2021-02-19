@@ -38,15 +38,13 @@ M: covariant-tuple implementor-classes classes>>
     [ dup covariant-tuple? [ classes>> ] [ 1array ] if ] bi@
     object [ 2dup max-length ] dip [ pad-head ] 2curry bi@ ; inline
 
-GENERIC#: covariant-tuple<= 1 ( class1 class2 -- ? )
-M: covariant-tuple covariant-tuple<=
-    covariant-classes [ class<= ] 2all? ;
+M: covariant-tuple right-dispatch<=
+    over covariant-tuple?
+    [ covariant-classes [ class<= ] 2all? ]
+    [ 2drop f ] if ;
 
-M: classoid covariant-tuple<= 2drop f ;
 
-M: covariant-tuple dispatch<= covariant-tuple<= ;
-
-! TODO Dispatch falls back to this to call a lexicographically ordered more
+! NOTE: Dispatch falls back to this to call a lexicographically ordered more
 ! specific method right now, although this should never happen if ambiguity
 ! errors are caught correctly.  It is always done as a first step of sorting
 ! classes though.

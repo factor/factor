@@ -64,6 +64,8 @@ DEFER: flatten-multi-methods
     [ current-index [ flatten-multi-methods ] with-variable
     ] keep nested-dispatch-engine boa ;
 
+! Preprocessing step.  Creates nested engine words so that flatten methods can
+! then operate and create the predicate engines
 : flatten-multi-methods ( methods -- methods' )
     [ dup assoc?
       [ <nested-dispatch-engine> ] when
