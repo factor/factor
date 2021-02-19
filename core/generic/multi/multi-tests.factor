@@ -135,9 +135,13 @@ MM: bar ( x: number -- x ) 2drop 43 ;
 M: D{ fixnum } bar 2drop 42 ;
 M: D{ \ fixnum } bar 2drop 47 ;
 M: D{ \ fixnum float } bar 2drop 66 ;
+M: D{ \ float float } bar 2drop 67 ;
 
 [ "asdf" "asdf" bar ] [ no-method? ] must-fail-with
 { 42 } [ "asdf" 1 bar ] unit-test
 { 43 } [ "asdf" 2.2 bar ] unit-test
 { 47 } [ "asdf" 1 class-of bar ] unit-test
 { 66 } [ 1 class-of 3.3 bar ] unit-test
+{ 67 } [ 2.2 class-of 3.3 bar ] unit-test
+{ 43 } [ "asdf" class-of 3.3 bar ] unit-test
+[ "asdf" 3.3 class-of bar ] must-fail
