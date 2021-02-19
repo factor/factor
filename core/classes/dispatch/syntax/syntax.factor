@@ -11,8 +11,13 @@ IN: classes.dispatch.syntax
 ! But defining with M: D{ class1 class2 } generic ... ; does not turn the generic
 ! into a multi-generic !
 
+: interpret-dispatch-spec ( seq -- dispatch-type )
+    [ dup wrapper? [ wrapped>> <eql-specializer> ] when ] map
+    <covariant-tuple> ;
+
+
 SYNTAX: D{
-        \ } [ <covariant-tuple> ] parse-literal ;
+        \ } [ interpret-dispatch-spec ] parse-literal ;
 
 M: covariant-tuple pprint* pprint-object ;
 M: covariant-tuple pprint-delims

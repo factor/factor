@@ -127,3 +127,17 @@ MM: foo ( x: float x: number -- x ) call-next-method ;
 { 47 } [ [ 1 1 foo ] compile-call ] unit-test
 { 42 } [ 1.1 1 foo ] unit-test
 { 42 } [ [ 1.1 1 foo ] compile-call ] unit-test
+
+! Testing eql specializers
+GENERIC: bar ( x x -- x )
+! FIXME: need one MM: right now to turn this into multi-generic
+MM: bar ( x: number -- x ) 2drop 43 ;
+M: D{ fixnum } bar 2drop 42 ;
+M: D{ \ fixnum } bar 2drop 47 ;
+M: D{ \ fixnum float } bar 2drop 66 ;
+
+[ "asdf" "asdf" bar ] [ no-method? ] must-fail-with
+{ 42 } [ "asdf" 1 bar ] unit-test
+{ 43 } [ "asdf" 2.2 bar ] unit-test
+{ 47 } [ "asdf" 1 class-of bar ] unit-test
+{ 66 } [ 1 class-of 3.3 bar ] unit-test
