@@ -11,8 +11,6 @@ MIXIN: dispatch-type
 GENERIC: dispatch<= ( dispatch-type1 dispatch-type2 -- ? )
 GENERIC: class>dispatch ( class -- dispatch-type )
 M: dispatch-type class>dispatch ;
-! Not comparing dispatch-classes with anything else right now
-GENERIC: promote-dispatch-class ( arity class -- class )
 ! This is used when building a decision tree to find the most specific method
 ! for a specific stack position
 GENERIC: nth-dispatch-class ( index dispatch-type -- class )

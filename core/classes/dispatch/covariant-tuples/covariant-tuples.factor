@@ -1,6 +1,6 @@
 USING: accessors arrays classes classes.algebra classes.algebra.private
-classes.dispatch classes.private combinators kernel math.order parser
-prettyprint.custom sequences ;
+classes.dispatch classes.private combinators generalizations kernel math
+math.order sequences ;
 
 IN: classes.dispatch.covariant-tuples
 
@@ -23,12 +23,6 @@ M: covariant-tuple class>dispatch ;
 M: covariant-tuple dispatch-arity classes>>
     remove-redundant length ;
 
-! M: class nth-dispatch-class
-!     swap 0 = [ drop object ] unless ;
-
-! M: class nth-dispatch-applicable?
-!     swap 0 = [ class<= ] [ 2drop t ] if ;
-
 M: covariant-tuple nth-dispatch-class
     classes>> <reversed> ?nth object or ;
 
@@ -50,7 +44,8 @@ M: covariant-tuple dispatch<=
 
 ! TODO Dispatch falls back to this to call a lexicographically ordered more
 ! specific method right now, although this should never happen if ambiguity
-! errors are caught correctly.
+! errors are caught correctly.  It is always done as a first step of sorting
+! classes though.
 M: covariant-tuple <=>
     covariant-classes <reversed> <=> ;
 
@@ -78,13 +73,3 @@ M: covariant-tuple-union normalize-class
 M: covariant-tuple (classes-intersect?)
     covariant-classes
     [ classes-intersect? ] 2all? ;
-
-M: class promote-dispatch-class
-    1array swap object pad-head <covariant-tuple> ;
-ERROR: too-many-dispatch-args arity class ;
-M: covariant-tuple promote-dispatch-class
-    dup classes>> length pick <=> {
-        { +lt+ [ classes>> swap object pad-head <covariant-tuple> ] }
-        { +eq+ [ nip ] }
-        { +gt+ [ too-many-dispatch-args ] }
-    } case ;

@@ -244,19 +244,6 @@ M: multi-combination perform-combination
         2tri
     ] with-combination ;
 
-! * TODO Next-method, method lookup and compiler support
-ERROR: ambiguous-multi-dispatch classes ;
-: assert-non-ambiguity ( sorted-methods -- )
-    ! NOTE: simulating && combinator here due to dependency issues
-    ! { [ length 1 > ]
-    !   [ <reversed> first2 [ first ] bi@ class< not ]
-    !   [ ambiguous-multi-dispatch ] } && drop ;
-    dup length 1 >
-    [ dup <reversed> first2 [ first ] bi@ class< not
-      [ ambiguous-multi-dispatch ]
-      [ drop ] if
-    ] [ drop ] if ;
-
 ! * Syntax
 ERROR: empty-dispatch-spec seq ;
 : assert-dispatch-types ( seq -- seq )
