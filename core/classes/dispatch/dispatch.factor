@@ -15,5 +15,5 @@ M: dispatch-type class>dispatch ;
 ! for a specific stack position
 GENERIC: nth-dispatch-class ( index dispatch-type -- class )
 GENERIC: dispatch-arity ( dispatch-type -- n )
-M: class dispatch-arity drop 1 ;
 GENERIC: nth-dispatch-applicable? ( class index dispatch-type -- ? )
+GENERIC: dispatch-predicate-def ( dispatch-type -- quot )

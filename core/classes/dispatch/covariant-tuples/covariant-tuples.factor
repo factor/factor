@@ -73,3 +73,10 @@ M: covariant-tuple-union normalize-class
 M: covariant-tuple (classes-intersect?)
     covariant-classes
     [ classes-intersect? ] 2all? ;
+
+
+M: covariant-tuple dispatch-predicate-def
+    classes>> <reversed>
+    [ 1 + swap '{ [ _ npick _ instance? not ] [ f ] } ] map-index
+    [ t ] suffix
+    '[ _ cond ] ;

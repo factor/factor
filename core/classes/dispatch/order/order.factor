@@ -4,9 +4,21 @@ IN: classes.dispatch.order
 
 ! * Ordering Dispatch Types
 ! ** Ordering as whole
-! This is used for ordering methods.
-! : dispatch<=> ( dispatch-type1 dispatch-type2 -- <=> )
-!     [ class<= +lt+ or ] [ swap class<= +gt+ or ] 2bi
+! Ordering is done via class<=
+
+! Dispatch is ambiguous if there is an intersection but no strict local order.
+! FIXME: used cartesian-map instead of map-combinations because of bootstrapping
+! dependency problems.  This means we have a lot of unnecessary comparisons.
+: ambiguous-dispatch-types ( dispatch-types -- classes )
+    dup [
+        2dup classes-intersect?
+        [ 2dup compare-classes +incomparable+ =
+          [ 2array ] [ 2drop f ] if
+        ] [ 2drop f ] if
+    ] cartesian-map concat sift
+    [ first2 [ classes>> ] bi@ [ class-and ] 2map <covariant-tuple> ] map
+    members
+    ;
 
 
 ! ** Ordering locally per position

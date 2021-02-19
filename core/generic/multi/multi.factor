@@ -1,6 +1,6 @@
-USING: accessors arrays assocs classes classes.algebra classes.dispatch
+USING: accessors assocs classes.algebra classes.dispatch
 classes.dispatch.covariant-tuples classes.dispatch.order combinators definitions
-effects effects.parser generalizations generic generic.parser generic.single
+effects effects.parser generic generic.parser generic.single
 generic.single.private generic.standard kernel make math namespaces parser
 quotations sequences sets vectors words ;
 
@@ -19,38 +19,14 @@ PREDICATE: multi-method < method "method-class" word-prop covariant-tuple? ;
 TUPLE: method-dispatch { class maybe{ dispatch-type } read-only } { method read-only } ;
 C: <method-dispatch> method-dispatch
 
-GENERIC: method-types ( method -- seq )
-! TODO: maybe don't use covariant dispatch tuple here anymore?  We may need
-! sorting, though...
-M: method-dispatch method-types class>> classes>> ;
-M: object method-types "nope" throw ;
-
-! : nth-type ( n method -- seq ) method-types nth ;
-
-! : method-applicable? ( class index method -- ? ) nth-type class<= ;
-
-! TODO: this should probably be replaced with functionality from classes.algebra
-! :: dispatch<=> ( class1 class2 -- <=> )
-!     class1 class2 [ normalize-class ] bi@ :> ( c1 c2 )
-!     c1 c2 compare-classes dup +incomparable+ =
-!     [ drop c1 c2 [ rank-class ] compare dup +eq+ =
-!       [ drop c1 c2 [ class-name ] compare ] when
-!     ] when ;
-
-! sort methods for applicability on specific index
-! :: sort-methods-index ( methods index -- methods )
-!     methods [ [ index swap nth-type ] bi@ dispatch<=> ] sort ;
-
 :: applicable-methods ( class index methods -- assoc )
     methods [ class>> :> dispatch-type
               class index dispatch-type nth-dispatch-applicable?
               [ index dispatch-type nth-dispatch-class ] [ f ] if
     ] sort-dispatch values concat ;
-    ! [ [ method-applicable? ] 2with filter ] keepd sort-methods-index ;
 
 ! * Dispatch engine implementation
 
-! TODO: check sorting
 : method-dispatch-classes ( n methods -- seq )
     [ class>> nth-dispatch-class ] with map members ;
 
@@ -61,7 +37,6 @@ M: object method-types "nope" throw ;
     [ dup n methods applicable-methods
       dup length 1 >
       [ n 1 + arity multi-methods ]
-      ! TODO check sorting
       [ last method>> ] if
     ] map>alist ] [
         ! NOTE: This is where we rely on correct non-ambigutiy
@@ -69,16 +44,11 @@ M: object method-types "nope" throw ;
     ] if ;
 
 : methods>dispatch ( assoc -- seq )
-    ! NOTE: not using smart-with due to dependency issues
-    ! [ [ promote-dispatch-class ] dip <method-dispatch> ] smart-with { } assoc>map ;
     [ [ class>dispatch ] dip <method-dispatch> ] {  } assoc>map ;
-    ! [ swapd  dip <method-dispatch> ] with { } assoc>map ;
 
 :: methods>multi-methods ( arity assoc -- assoc )
-    ! assoc [ [ arity swap promote-dispatch-class ] dip ] assoc-map
     assoc methods>dispatch
-    [ f ]
-    [ 0 arity multi-methods ] if-empty ;
+    [ f ] [ 0 arity multi-methods ] if-empty ;
 
 ! This is used to keep track of nesting during engine tree construction, as well
 ! as to be able to use inline-cache-quots, where it has to be set to the correct
@@ -160,31 +130,6 @@ PREDICATE: multi-generic < generic
 ERROR: not-single-dispatch generic ;
 M: multi-generic dispatch# not-single-dispatch ;
 
-
-! Dispatch is ambiguous if there is an intersection but no strict local order.
-! In the case of symmetric dispatch, these pairs may exist, but only if they are
-! never called or a more-specific tie-breaker also exists.
-! FIXME: used cartesian-map instead of map-combinations because of bootstrapping
-! dependency problems.  This means we have a lot of unnecessary comparisons.
-: ambiguous-dispatch-classes ( dispatch-classes -- dispatch-classes )
-    dup [
-        2dup classes-intersect?
-        [ 2dup compare-classes +incomparable+ =
-          [ 2array ] [ 2drop f ] if
-        ] [ 2drop f ] if
-    ] cartesian-map concat sift
-    [ first2 [ classes>> ] bi@ [ class-and ] 2map <covariant-tuple> ] map
-    members
-    ;
-
-! This is the equivalent of predicate-def but for covariant-tuples in dispatch
-! context
-: dispatch-predicate-def ( covariant-tuple -- quot )
-    classes>> <reversed>
-    [ 1 + swap '{ [ _ npick _ instance? not ] [ f ] } ] map-index
-    [ t ] suffix
-    '[ _ cond ] ;
-
 M: multi-combination next-method-quot*
     drop [ class>dispatch ] dip
     { [ drop dispatch-predicate-def ]
@@ -198,7 +143,7 @@ ERROR: ambiguous-method-specializations classes ;
 ! do not have a resolver and add a compilation error.
 : check-ambiguity ( generic -- )
     "methods" word-prop keys [ class>dispatch ] map
-    [ ambiguous-dispatch-classes ] keep
+    [ ambiguous-dispatch-types ] keep
     [ [ class= ] with any? ] curry reject
     [ ambiguous-method-specializations ] unless-empty ;
 
@@ -232,10 +177,16 @@ M: multi-generic update-generic
         <engine> compile-engine 
     ] tri ;
 
+! Since we decided that dispatch types cannot be ordered with regular classes,
+! all regularly defined single method classes need to be promoted.
+: ensure-method-dispatch-types ( generic -- )
+    "methods" [ [ [ class>dispatch ] dip ] assoc-map ] change-word-prop ;
+
 ! FIXME: almost copy-paste from single-combination, need abstraction
 M: multi-combination perform-combination
     [
         H{ } clone predicate-engines set
+        dup ensure-method-dispatch-types
         dup generic-word set
         dup build-multi-decision-tree
         [ "decision-tree" set-word-prop ]
