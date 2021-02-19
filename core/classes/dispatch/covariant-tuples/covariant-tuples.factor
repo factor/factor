@@ -1,11 +1,10 @@
 USING: accessors arrays classes classes.algebra classes.algebra.private
-classes.dispatch classes.private combinators generalizations kernel math
-math.order sequences ;
+classes.dispatch classes.private combinators generalizations generic kernel math
+math.order sequences sets ;
 
 IN: classes.dispatch.covariant-tuples
 
 TUPLE: covariant-tuple { classes read-only } ;
-INSTANCE: covariant-tuple classoid
 INSTANCE: covariant-tuple dispatch-type
 
 M: covariant-tuple class-name
@@ -27,9 +26,12 @@ M: covariant-tuple nth-dispatch-class
     classes>> <reversed> ?nth object or ;
 
 M: covariant-tuple nth-dispatch-applicable?
-    classes>> <reversed> ?nth [ class<= ] [ drop t ] if* ;
+    nth-dispatch-class class<= ;
 
 M: class class>dispatch 1array <covariant-tuple> ;
+
+M: covariant-tuple implementor-classes classes>>
+    [ implementor-classes ] gather ;
 
 ! * Sorting
 : covariant-classes ( first second -- first second )
@@ -39,8 +41,10 @@ M: class class>dispatch 1array <covariant-tuple> ;
 GENERIC#: covariant-tuple<= 1 ( class1 class2 -- ? )
 M: covariant-tuple covariant-tuple<=
     covariant-classes [ class<= ] 2all? ;
-M: covariant-tuple dispatch<=
-    covariant-tuple<= ;
+
+M: classoid covariant-tuple<= 2drop f ;
+
+M: covariant-tuple dispatch<= covariant-tuple<= ;
 
 ! TODO Dispatch falls back to this to call a lexicographically ordered more
 ! specific method right now, although this should never happen if ambiguity

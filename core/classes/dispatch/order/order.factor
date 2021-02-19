@@ -1,4 +1,5 @@
-USING: assocs classes.algebra classes.dispatch kernel sequences ;
+USING: accessors arrays assocs classes.algebra classes.dispatch.covariant-tuples
+kernel sequences sets ;
 
 IN: classes.dispatch.order
 

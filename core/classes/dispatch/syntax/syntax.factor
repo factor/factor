@@ -1,5 +1,5 @@
-USING: accessors classes.dispatch.covariant-tuples kernel parser
-prettyprint.custom ;
+USING: accessors classes.dispatch.covariant-tuples classes.dispatch.eql kernel
+parser prettyprint.custom sequences ;
 
 IN: classes.dispatch.syntax
 

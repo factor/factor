@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.algebra classes.algebra.private
-classes.dispatch.covariant-tuples classes.maybe classes.private combinators
-definitions kernel make namespaces sequences sets words ;
+classes.maybe classes.private combinators definitions kernel make namespaces
+sequences sets words ;
 IN: generic
 
 ! Method combination protocol
@@ -140,8 +140,6 @@ M: class implementor-classes 1array ;
 M: anonymous-union implementor-classes members>> ;
 
 M: anonymous-intersection implementor-classes participants>> ;
-
-M: covariant-tuple implementor-classes classes>> ;
 
 : with-implementors ( class generic quot -- )
     [ swap implementor-classes [ implementors-map get at ] map ] dip call ; inline

@@ -1,6 +1,7 @@
-USING: arrays classes.algebra classes.dispatch.covariant-tuples compiler.test
-generic generic.multi kernel kernel.private literals math math.combinatorics
-random sequences tools.dispatch tools.test tools.time words ;
+USING: arrays classes classes.algebra classes.dispatch.covariant-tuples
+classes.dispatch.syntax compiler.test generic generic.multi generic.single
+kernel kernel.private literals math math.combinatorics random sequences
+tools.dispatch tools.test tools.time words ;
 IN: generic.multi.tests
 
 

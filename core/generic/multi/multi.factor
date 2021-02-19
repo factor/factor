@@ -1,8 +1,8 @@
-USING: accessors assocs classes.algebra classes.dispatch
+USING: accessors arrays assocs classes.algebra classes.dispatch
 classes.dispatch.covariant-tuples classes.dispatch.order combinators definitions
 effects effects.parser generic generic.parser generic.single
-generic.single.private generic.standard kernel make math namespaces parser
-quotations sequences sets vectors words ;
+generic.single.private generic.standard hashtables kernel make math namespaces
+parser quotations sequences sets vectors words ;
 
 IN: generic.multi
 
@@ -37,14 +37,14 @@ C: <method-dispatch> method-dispatch
     [ dup n methods applicable-methods
       dup length 1 >
       [ n 1 + arity multi-methods ]
-      [ last method>> ] if
+      [ ?last [ method>> ] [ f ] if* ] if
     ] map>alist ] [
         ! NOTE: This is where we rely on correct non-ambigutiy
-        methods last method>>
+        methods ?last [ method>> ] [ f ] if*
     ] if ;
 
 : methods>dispatch ( assoc -- seq )
-    [ [ class>dispatch ] dip <method-dispatch> ] {  } assoc>map ;
+    [ <method-dispatch> ] {  } assoc>map ;
 
 :: methods>multi-methods ( arity assoc -- assoc )
     assoc methods>dispatch
@@ -60,6 +60,7 @@ TUPLE: nested-dispatch-engine < tag-dispatch-engine index ;
 DEFER: flatten-multi-methods
 : <nested-dispatch-engine> ( methods -- obj )
     current-index get 1 +
+    ! setting current-index here for picker
     [ current-index [ flatten-multi-methods ] with-variable
     ] keep nested-dispatch-engine boa ;
 
@@ -92,26 +93,34 @@ PREDICATE: nested-dispatch-engine-word < predicate-engine-word
     [ methods>> ] [ index>> ] bi make-empty-cache \ mega-cache-lookup [ ] 4sequence ;
 
 : define-nested-dispatch-engine ( engine -- word )
-    ! TODO: Why no fry? Dependencies?
     dup engine-cache-quotation <nested-dispatch-engine-word> add-engine
     ! setting current-index here for inline-cache-quots
     over index>> current-index
     [ [ swap methods>> define-inline-cache-quot ] keep ] with-variable ;
 
+! In nested context, we reset the predicate-engines table so it will be
+! populated with the default method of this subtree.
+! NOTE: not pruning the tree here like find-default does, though
+:: with-nested-engine ( engine quot: ( ..a engine -- ..b ) -- ..b )
+    engine index>>
+    dup 0 > [ engine methods>> object of default get or ] [ default get ] if
+    H{ } clone 3array { current-index default predicate-engines } swap zip >hashtable
+    [ engine quot call ] with-variables ; inline
+
 M: nested-dispatch-engine compile-engine
-    [ flatten-methods convert-tuple-methods ] change-methods
-    dup dup index>> current-index [ call-next-method ] with-variable
+    dup [
+        [ flatten-methods convert-tuple-methods ] change-methods
+        call-next-method
+    ] with-nested-engine
     >>methods
     define-nested-dispatch-engine
-    nested-dispatch-pics get [ wrap-nested-dispatch-call-site ] when
-    ;
+    nested-dispatch-pics get [ wrap-nested-dispatch-call-site ] when ;
 
 ! * Method combination interface
 TUPLE: multi-combination ;
 CONSTANT: nary-combination T{ multi-combination f }
 M: multi-combination mega-cache-quot
     0 make-empty-cache \ mega-cache-lookup [ ] 4sequence ;
-
 
 ! FIXME: almost copy-paste from standard-combination
 
@@ -131,7 +140,7 @@ ERROR: not-single-dispatch generic ;
 M: multi-generic dispatch# not-single-dispatch ;
 
 M: multi-combination next-method-quot*
-    drop [ class>dispatch ] dip
+    drop
     { [ drop dispatch-predicate-def ]
       [ next-method 1quotation ]
     } 2cleave
@@ -142,7 +151,7 @@ ERROR: ambiguous-method-specializations classes ;
 ! Check all dispatch tuple specs for ambiguous intersections.  Keep those that
 ! do not have a resolver and add a compilation error.
 : check-ambiguity ( generic -- )
-    "methods" word-prop keys [ class>dispatch ] map
+    "methods" word-prop keys
     [ ambiguous-dispatch-types ] keep
     [ [ class= ] with any? ] curry reject
     [ ambiguous-method-specializations ] unless-empty ;
