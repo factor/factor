@@ -1638,6 +1638,8 @@ M: covariant-tuple-dispatch make-single-default-method
         [ argument-count ] dip [ [ narray ] dip no-method ] 2curry
     ] with-dispatch-type ;
 
+M: covariant-tuple add-depends-on-class
+    classes>> [ add-depends-on-class ] each ;
 
 : make-cached-multi ( word -- )
     dup multi-generic? [
