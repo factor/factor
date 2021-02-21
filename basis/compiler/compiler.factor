@@ -113,6 +113,8 @@ M: mg:predicate-engine-word combinator? "owner-generic" word-prop combinator? ;
     {
         [ single-generic? ]
         [ mg:multi-single-generic? ]
+        [ mg:covariant-tuple-multi-generic? ]
+        [ mg:nested-dispatch-engine-word? ]
         [ primitive? ]
     } 1|| not ;
 
@@ -137,12 +139,20 @@ M: mg:predicate-engine-word combinator? "owner-generic" word-prop combinator? ;
         ] with-cfg
     ] each ;
 
+! NOTE: this uses a mechanism which is normally only used in the code path of
+! optimized word in the compiler vocab.  The methods will still be compiled.  I
+! suppose this is more of a warning kind of thing.
+: detect-generic-errors ( generic -- )
+     [ mg:check-generic ]
+     [ swap <compiler-error> save-compiler-error ] recover ;
+
 : compile-word ( word -- )
     ! We return early if the word has breakpoints or if it
     ! failed to infer.
     '[
         _ {
             [ start-compilation ]
+            [ detect-generic-errors ]
             [ frontend ]
             [ backend ]
             [ finish-compilation ]

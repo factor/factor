@@ -37,8 +37,13 @@ TUPLE: single-hook-dispatch < single-dispatch var ;
 
 TUPLE: math-dispatch < non-multi-dispatch ;
 
+TUPLE: covariant-tuple-dispatch < non-multi-dispatch ;
+
 PREDICATE: multi-dispatch-generic < multi-generic
     "dispatch-type" word-prop multi-dispatch? ;
+
+PREDICATE: covariant-tuple-dispatch-generic < multi-generic
+    "dispatch-type" word-prop covariant-tuple-dispatch? ;
 
 C: <multi-dispatch> multi-dispatch
 
@@ -291,6 +296,8 @@ ERROR: check-method-error class generic ;
 
 DEFER: define-single-default-method
 
+DEFER: sort-generic-methods
+
 SYMBOL: second-math-dispatch
 
 M:: multi-generic g:make-generic ( generic -- )
@@ -338,12 +345,30 @@ M:: multi-generic g:make-generic ( generic -- )
         ] [
             ! multi-dispach
             drop
-            generic <multi-dispatch> "dispatch-type" set-word-prop
-            generic
-            [
-                [ methods prepare-methods % sort-methods ] keep
-                multi-dispatch-quot %
-            ] [ ] make generic swap define
+            generic {
+                [ "cached-multi" word-prop ]
+                [ "hooks" word-prop empty? ]
+                [ "inline" word-prop not ]
+                [ "partial-inline" word-prop not ]
+            } 1&& [
+                covariant-tuple-dispatch new
+                generic swap "dispatch-type" set-word-prop
+                generic "multi-methods" word-prop [
+                    [
+                        [ bootstrap-word ] map <covariant-tuple> 
+                    ] dip
+                ] assoc-map
+                generic "dispatch-type" word-prop methods<<
+                generic sort-generic-methods
+                generic dup "dispatch-type" word-prop define-single-default-method
+                generic make-single-generic
+            ] [
+                generic <multi-dispatch> "dispatch-type" set-word-prop
+                generic [
+                    [ methods prepare-methods % sort-methods ] keep
+                    multi-dispatch-quot %
+                ] [ ] make generic swap define
+            ] if
         ] if
     ] if
     ! ! typed
@@ -366,7 +391,8 @@ M:: multi-generic g:make-generic ( generic -- )
                 \ declare 2array >quotation generic def>> prepend generic def<<
             ] if
         ] when*
-    ] if ;
+    ] if
+ ;
 
 : remake-multi-generic ( generic -- )
     outdated-generics get add-to-unit ;
@@ -496,6 +522,7 @@ M: no-method error.
                 "mathematical"
                 "inline"
                 "patial-inline"
+                "cached-multi"
             } remove-word-props
         ]
         [ H{ } clone "multi-methods" set-word-prop ]
@@ -879,9 +906,16 @@ ERROR: unreachable ;
 : class-predicates ( assoc -- assoc )
     [ [ predicate-def [ dup ] prepend ] dip ] assoc-map ;
 
-: <predicate-engine-word> ( -- word )
-    generic-word get name>> "/predicate-engine" append f <word>
+: <engine-word> ( suffix -- word )
+    generic-word get name>> prepend f <word>
     dup generic-word get "owner-generic" set-word-prop ;
+
+! : <predicate-engine-word> ( -- word )
+!     generic-word get name>> "/predicate-engine" append f <word>
+!     dup generic-word get "owner-generic" set-word-prop ;
+
+: <predicate-engine-word> ( -- word )
+     "/predicate-engine" <engine-word> ;
 
 M: predicate-engine-word stack-effect "owner-generic" word-prop stack-effect ;
 
@@ -1264,8 +1298,6 @@ M: call-next-multi-method-in-a-math-generic summary
 M:: math-dispatch next-multi-method-quot* ( classes generic dispatch -- * )
     generic call-next-multi-method-in-a-math-generic ;
 
-! DEFER: next-multi-method-quot-cache
-
 : next-multi-method-quot ( method -- quot/f )
     next-multi-method-quot-cache get [
         [ "method-specializer" word-prop ]
@@ -1323,3 +1355,293 @@ M: multi-generic (annotate)
 M: multi-generic (deep-annotate)
     '[ _ (deep-annotate) ] annotate-generic ;
 
+
+! ! ! covariant-tuple ! ! !
+! Most of the code is copied from Timor's PR #2430 "Multiple dispatch with existing
+! inline cache infrastructure and abstractions for dispatch specifciers"
+
+! Called in compiler context when generic word is encountered, can throw errors.
+GENERIC: check-generic ( generic -- )
+
+M: word check-generic drop ;
+
+M: covariant-tuple implementor-classes classes>> ;
+
+! If set to true, create a level of nesting for nested dispatchers to generate
+! PIC-enabled call sites.  Naive test indicated that the additional level was
+! more overhead, and that the megamorphic hit was faster.  This could change
+! significantly depending on dispatch complexity though
+SYMBOL: nested-dispatch-pics
+
+PREDICATE: covariant-tuple-multi-method < multi-method "method-class" word-prop covariant-tuple? ;
+
+TUPLE: method-dispatch class method ;
+C: <method-dispatch> method-dispatch
+
+GENERIC: method-types ( method -- seq )
+! TODO: maybe don't use covariant dispatch tuple here anymore?  We may need
+! sorting, though...
+M: method-dispatch method-types class>> classes>> ;
+M: object method-types "nope" throw ;
+
+GENERIC: dispatch-arity ( method -- n )
+M: class dispatch-arity drop 1 ;
+M: covariant-tuple dispatch-arity classes>> length ;
+
+: nth-type ( n method -- seq ) method-types nth ;
+
+: method-applicable? ( class index method -- ? ) nth-type class<= ;
+
+! TODO: this should probably be replaced with functionality from classes.algebra
+:: dispatch<=> ( class1 class2 -- <=> )
+    class1 class2 [ normalize-class ] bi@ :> ( c1 c2 )
+    c1 c2 compare-classes dup +incomparable+ =
+    [ drop c1 c2 [ rank-class ] compare dup +eq+ =
+      [ drop c1 c2 [ class-name ] compare ] when
+    ] when ;
+
+! sort methods for applicability on specific index
+:: sort-methods-index ( methods index -- methods )
+    methods [ [ index swap nth-type ] bi@ dispatch<=> ] sort ;
+
+: applicable-methods ( class index methods -- seq )
+    [ [ method-applicable? ] 2with filter ] keepd sort-methods-index ;
+
+! * Dispatch engine implementation
+
+! TODO: check sorting
+: method-dispatch-classes ( n methods -- seq )
+    [ nth-type ] with map members ;
+
+:: covariant-tuple-multi-methods ( methods n -- assoc )
+    n 0 >=
+    [ n methods method-dispatch-classes
+      [ dup n methods applicable-methods
+        dup length 1 >
+        [ n 1 - covariant-tuple-multi-methods ]
+        ! TODO check sorting
+        [ ?first method>> ] if
+      ] map>alist ] [
+        ! NOTE: This is where we rely on correct non-ambigutiy
+        methods ?first method>>
+    ] if ;
+
+GENERIC: promote-dispatch-class ( arity class -- class )
+M: class promote-dispatch-class
+    1array swap object pad-head <covariant-tuple> ;
+ERROR: too-many-dispatch-args arity class ;
+M: covariant-tuple promote-dispatch-class
+    dup classes>> length pick <=> {
+        { +lt+ [ classes>> swap object pad-head <covariant-tuple> ] }
+        { +eq+ [ nip ] }
+        { +gt+ [ too-many-dispatch-args ] }
+    } case ;
+
+! NOTE: Single use, should be generic if ever used to promote generally?
+: class>dispatch ( class -- dispatch-class )
+    dup covariant-tuple? [ 1array <covariant-tuple> ] unless ;
+
+: methods>dispatch ( arity assoc -- seq )
+    ! NOTE: not using smart-with due to dependency issues
+    ! [ [ promote-dispatch-class ] dip <method-dispatch> ] smart-with { } assoc>map ;
+    [ swapd [ promote-dispatch-class ] dip <method-dispatch> ] with { } assoc>map ;
+
+
+:: methods>multi-methods ( arity assoc -- assoc )
+    ! assoc [ [ arity swap promote-dispatch-class ] dip ] assoc-map
+    arity assoc methods>dispatch
+    [ f ]
+    [ arity 1 -  covariant-tuple-multi-methods ] if-empty ;
+
+! This is used to keep track of nesting during engine tree construction, as well
+! as to be able to use inline-cache-quots, where it has to be set to the correct
+! index.  That last part is a bit of a workaround just to avoid code duplication.
+SYMBOL: current-index
+current-index [ 0 ] initialize
+TUPLE: nested-dispatch-engine < tag-dispatch-engine index ;
+
+DEFER: flatten-multi-methods
+: <nested-dispatch-engine> ( methods -- obj )
+    current-index get 1 +
+    [ current-index [ flatten-multi-methods ] with-variable
+    ] keep nested-dispatch-engine boa ;
+
+: flatten-multi-methods ( methods -- methods' )
+    [ dup assoc?
+      [ <nested-dispatch-engine> ] when
+    ] assoc-map ;
+
+PREDICATE: nested-dispatch-engine-word < predicate-engine-word
+    "nested-dispatch-engine" word-prop ;
+
+: <nested-dispatch-engine-word> ( -- word )
+    "/dispatch" <engine-word>
+    dup t "nested-dispatch-engine" set-word-prop
+    ;
+
+! This is one level of indirection to ensure that we have a PIC in the nested
+! dispatch calls, which would not be compiled in otherwise.
+: <pic-callsite-wrapper> ( -- word )
+    "/callsite" <engine-word> ;
+
+: add-engine ( quot word -- word )
+    swap [ define ]
+    [ drop [ generic-word get "engines" word-prop push ] keep ] 2bi ;
+
+: wrap-nested-dispatch-call-site ( word -- word )
+    1quotation <pic-callsite-wrapper> add-engine ;
+
+: engine-cache-quotation ( engine -- quot )
+    [ methods>> ] [ index>> ] bi make-empty-cache \ gsp:mega-cache-lookup [ ] 4sequence ;
+
+: define-nested-dispatch-engine ( engine -- word )
+    ! TODO: Why no fry? Dependencies?
+    dup engine-cache-quotation <nested-dispatch-engine-word> add-engine
+    ! setting current-index here for inline-cache-quots
+    over index>> current-index
+    [ [ swap methods>> define-inline-cache-quot ] keep ] with-variable ;
+
+M: nested-dispatch-engine compile-engine
+    [ flatten-methods convert-tuple-methods ] change-methods
+    dup dup index>> current-index [ call-next-method ] with-variable
+    >>methods
+    define-nested-dispatch-engine
+    nested-dispatch-pics get [ wrap-nested-dispatch-call-site ] when
+    ;
+
+! * Method combination interface
+! TUPLE: covariant-tuple-dispatch < non-multi-dispatch ;
+CONSTANT: nary-combination T{ covariant-tuple-dispatch f f }
+M: covariant-tuple-dispatch mega-cache-quot
+    0 make-empty-cache \ gsp:mega-cache-lookup [ ] 4sequence ;
+
+
+! FIXME: almost copy-paste from standard-combination
+
+: multi-inline-cache-quot ( word methods miss-word -- quot )
+    [ [ literalize , ] [ , ] [ current-index get , { } , , ] tri* ] [ ] make ;
+
+M: covariant-tuple-dispatch inline-cache-quots
+    [ \ gsp:inline-cache-miss multi-inline-cache-quot ]
+    [ \ gsp:inline-cache-miss-tail multi-inline-cache-quot ] 2bi ;
+
+M: covariant-tuple-dispatch picker current-index get (picker) ;
+
+PREDICATE: covariant-tuple-multi-generic < multi-generic
+    "dispatch-type" word-prop covariant-tuple-dispatch? ;
+
+ERROR: not-single-dispatch generic ;
+M: covariant-tuple-multi-generic single-dispatch# not-single-dispatch ;
+
+
+! Dispatch is ambiguous if there is an intersection but no strict local order.
+! In the case of symmetric dispatch, these pairs may exist, but only if they are
+! never called or a more-specific tie-breaker also exists.
+! FIXME: used cartesian-map instead of map-combinations because of bootstrapping
+! dependency problems.  This means we have a lot of unnecessary comparisons.
+: ambiguous-dispatch-classes ( dispatch-classes -- dispatch-classes )
+    dup [
+        2dup classes-intersect?
+        [ 2dup compare-classes +incomparable+ =
+          [ 2array ] [ 2drop f ] if
+        ] [ 2drop f ] if
+    ] cartesian-map concat sift
+    [ first2 [ classes>> ] bi@ [ class-and ] 2map <covariant-tuple> ] map
+    members
+    ;
+
+! This is the equivalent of predicate-def but for covariant-tuples in dispatch
+! context
+: dispatch-predicate-def ( covariant-tuple -- quot )
+    classes>> <reversed>
+    [ 1 + swap '{ [ _ npick _ instance? not ] [ f ] } ] map-index
+    [ t ] suffix
+    '[ _ cond ] ;
+
+! M: covariant-tuple-dispatch next-method-quot*
+!     drop [ class>dispatch ] dip
+!     { [ drop dispatch-predicate-def ]
+!       [ next-method 1quotation ]
+!     } 2cleave
+!     '[ _ _ [ inconsistent-next-method ] if ] ;
+
+ERROR: ambiguous-method-specializations classes ;
+
+! Check all dispatch tuple specs for ambiguous intersections.  Keep those that
+! do not have a resolver and add a compilation error.
+: check-ambiguity ( generic -- )
+    "dispatch-type" word-prop methods>> keys [ class>dispatch ] map
+    [ ambiguous-dispatch-classes ] keep
+    [ [ class= ] with any? ] curry reject
+    [ ambiguous-method-specializations ] unless-empty ;
+
+M: covariant-tuple-multi-generic check-generic check-ambiguity ;
+
+! We ensure that the "methods" word property is always sorted.
+! The idea is to not have to do this again during compilation or lookup.
+! TODO: currently not taken advantage of
+: sort-generic-methods ( generic -- )
+    "dispatch-type" word-prop [
+        sort-single-methods >vector
+    ] change-methods drop ;
+
+! M: covariant-tuple-multi-generic update-generic
+!     [ nip sort-generic-methods ]
+!     [ call-next-method ] 2bi ;
+
+! * Build Decision Tree
+: multi-generic-arity ( generic -- n )
+    "dispatch-type" word-prop methods>> keys [ dispatch-arity ] map [ 1 ] [ supremum ] if-empty ;
+
+! FIXME: almost copy-paste from single-combination, need abstraction
+: build-multi-decision-tree ( generic -- mega-cache-assoc )
+    [ "engines" word-prop forget-all ]
+    [ V{ } clone "engines" set-word-prop ]
+    [
+        [ multi-generic-arity ]
+        [ "dispatch-type" word-prop methods>> clone
+          dup find-default default set
+        ] bi methods>multi-methods
+        flatten-multi-methods
+        compile-engines*
+        <engine> compile-engine 
+    ] tri ;
+
+! FIXME: almost copy-paste from single-combination, need abstraction
+M: covariant-tuple-dispatch perform-dispatch
+    [
+        H{ } clone predicate-engines set
+        dup generic-word set
+        dup build-multi-decision-tree
+        [ "decision-tree" set-word-prop ]
+        [ mega-cache-quot define ]
+        [ define-inline-cache-quot ]
+        2tri
+    ] with-dispatch-type ;
+
+! * TODO Next-method, method lookup and compiler support
+ERROR: ambiguous-multi-dispatch classes ;
+: assert-non-ambiguity ( sorted-methods -- )
+    ! NOTE: simulating && combinator here due to dependency issues
+    ! { [ length 1 > ]
+    !   [ <reversed> first2 [ first ] bi@ class< not ]
+    !   [ ambiguous-multi-dispatch ] } && drop ;
+    dup length 1 >
+    [ dup <reversed> first2 [ first ] bi@ class< not
+      [ ambiguous-multi-dispatch ]
+      [ drop ] if
+    ] [ drop ] if ;
+
+M: covariant-tuple-dispatch make-single-default-method
+    [
+        [ methods ] keep
+        [ argument-count ] dip [ [ narray ] dip no-method ] 2curry
+    ] with-dispatch-type ;
+
+
+: make-cached-multi ( word -- )
+    dup multi-generic? [
+        t "cached-multi" set-word-prop
+    ] [ drop ] if ;
+
+SYNTAX: cached-multi last-word make-cached-multi ;

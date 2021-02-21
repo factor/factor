@@ -31,6 +31,14 @@ MM: md-beats? ( :scissors :rock -- ? )  2drop t ;
 MM: md-beats? ( :rock :paper -- ? )  2drop t ;
 MM: md-beats? ( :thing :thing -- ? )  2drop f ;
 
+! multi-dispatch cached-version
+MGENERIC: cached-md-beats? ( obj1 obj2 -- ? ) cached-multi
+
+MM: cached-md-beats? ( :paper :scissors -- ? ) 2drop t ;
+MM: cached-md-beats? ( :scissors :rock -- ? )  2drop t ;
+MM: cached-md-beats? ( :rock :paper -- ? )  2drop t ;
+MM: cached-md-beats? ( :thing :thing -- ? )  2drop f ;
+
 
 ! typed multi-dispatch
 MGENERIC: md-beats-t? ( obj1 obj2 -- ? )
@@ -84,6 +92,9 @@ MM: shmd-beats? ( thing2: paper | -- ? ) thing1 get rock? [ t ] [ f ] if ;
 ! wrapped
 : wrapped-md-beats? ( obj1 obj2 -- ? )
     md-beats? ;
+
+: wrapped-cached-md-beats? ( obj1 obj2 -- ? )
+    cached-md-beats? ;
 
 : wrapped-sd-beats? ( obj1 obj2 -- ? )
     sd-beats? ;
@@ -261,6 +272,14 @@ MM: md-beats2? ( :t-scissors :t-rock -- ? )  2drop t ;
 MM: md-beats2? ( :t-rock :t-paper -- ? )     2drop t ;
 MM: md-beats2? ( :t-thing :t-thing -- ? )    2drop f ;
 
+! multi-dispatch cached version
+MGENERIC: cached-md-beats2? ( obj1 obj2 -- ? ) cached-multi
+
+MM: cached-md-beats2? ( :t-paper :t-scissors -- ? ) 2drop t ;
+MM: cached-md-beats2? ( :t-scissors :t-rock -- ? )  2drop t ;
+MM: cached-md-beats2? ( :t-rock :t-paper -- ? )     2drop t ;
+MM: cached-md-beats2? ( :t-thing :t-thing -- ? )    2drop f ;
+
 
 ! typed multi-dispatch
 MGENERIC: md-beats-t2? ( obj1 obj2 -- ? )
@@ -314,6 +333,9 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
 ! wrapped
 : wrapped-md-beats2? ( obj1 obj2 -- ? )
     md-beats2? ;
+
+: wrapped-cached-md-beats2? ( obj1 obj2 -- ? )
+    cached-md-beats2? ;
 
 : wrapped-sd-beats2? ( obj1 obj2 -- ? )
     sd-beats2? ;
@@ -393,6 +415,25 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
     ] benchmark
     [ 1.0e9 / ] [ no-dispatch-time get / ] bi
     "multi-dispatch:             %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        TIMES [
+            paper paper       cached-md-beats? drop
+            paper scissors    cached-md-beats? drop
+            paper rock        cached-md-beats? drop
+
+            scissors paper    cached-md-beats? drop
+            scissors scissors cached-md-beats? drop
+            scissors rock     cached-md-beats? drop
+
+            rock paper        cached-md-beats? drop
+            rock scissors     cached-md-beats? drop
+            rock rock         cached-md-beats? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "cached multi-dispatch:      %.6f seconds (%.2f times slower)\n" printf
 
     gc
     [
@@ -511,7 +552,7 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
         ] times
     ] benchmark
     [ 1.0e9 / ] [ no-dispatch-time get / ] bi
-    "non-inlined sd (wrapped):   %.6f seconds (%.2f times slower)\n" printf
+    "wrapped sd:                 %.6f seconds (%.2f times slower)\n" printf
 
     gc
     [
@@ -530,7 +571,26 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
         ] times
     ] benchmark
     [ 1.0e9 / ] [ no-dispatch-time get / ] bi
-    "non-inlined md (wrapped):   %.6f seconds (%.2f times slower)\n" printf
+    "wrapped md:                 %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        TIMES [
+            paper paper       wrapped-cached-md-beats? drop
+            paper scissors    wrapped-cached-md-beats? drop
+            paper rock        wrapped-cached-md-beats? drop
+
+            scissors paper    wrapped-cached-md-beats? drop
+            scissors scissors wrapped-cached-md-beats? drop
+            scissors rock     wrapped-cached-md-beats? drop
+
+            rock paper        wrapped-cached-md-beats? drop
+            rock scissors     wrapped-cached-md-beats? drop
+            rock rock         wrapped-cached-md-beats? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "wrapped cached md:          %.6f seconds (%.2f times slower)\n" printf
 
     gc
     [
@@ -549,7 +609,7 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
         ] times
     ] benchmark
     [ 1.0e9 / ] [ no-dispatch-time get / ] bi
-    "non-inlined smd (wrapped):  %.6f seconds (%.2f times slower)\n" printf
+    "wrapped smd:                %.6f seconds (%.2f times slower)\n" printf
 
     "\nrepetitions of all combinations of rock-paper-scissors (tuple version)\n" write
 
@@ -609,6 +669,25 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
     ] benchmark
     [ 1.0e9 / ] [ no-dispatch-time get / ] bi
     "multi-dispatch:             %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        TIMES [
+            c-t-paper c-t-paper       cached-md-beats2? drop
+            c-t-paper c-t-scissors    cached-md-beats2? drop
+            c-t-paper c-t-rock        cached-md-beats2? drop
+
+            c-t-scissors c-t-paper    cached-md-beats2? drop
+            c-t-scissors c-t-scissors cached-md-beats2? drop
+            c-t-scissors c-t-rock     cached-md-beats2? drop
+
+            c-t-rock c-t-paper        cached-md-beats2? drop
+            c-t-rock c-t-scissors     cached-md-beats2? drop
+            c-t-rock c-t-rock         cached-md-beats2? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "cached multi-dispatch:      %.6f seconds (%.2f times slower)\n" printf
 
     gc
     [
@@ -729,7 +808,7 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
         ] times
     ] benchmark
     [ 1.0e9 / ] [ no-dispatch-time get / ] bi
-    "non-inlined sd (wrapped):   %.6f seconds (%.2f times slower)\n" printf
+    "wrapped sd:                 %.6f seconds (%.2f times slower)\n" printf
 
     gc
     [
@@ -748,7 +827,26 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
         ] times
     ] benchmark
     [ 1.0e9 / ] [ no-dispatch-time get / ] bi
-    "non-inlined md (wrapped):   %.6f seconds (%.2f times slower)\n" printf
+    "wrapped md:                 %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        TIMES [
+            c-t-paper c-t-paper       wrapped-cached-md-beats2? drop
+            c-t-paper c-t-scissors    wrapped-cached-md-beats2? drop
+            c-t-paper c-t-rock        wrapped-cached-md-beats2? drop
+
+            c-t-scissors c-t-paper    wrapped-cached-md-beats2? drop
+            c-t-scissors c-t-scissors wrapped-cached-md-beats2? drop
+            c-t-scissors c-t-rock     wrapped-cached-md-beats2? drop
+
+            c-t-rock c-t-paper        wrapped-cached-md-beats2? drop
+            c-t-rock c-t-scissors     wrapped-cached-md-beats2? drop
+            c-t-rock c-t-rock         wrapped-cached-md-beats2? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
+    "wrapped cached md:          %.6f seconds (%.2f times slower)\n" printf
 
     gc
     [
@@ -767,7 +865,7 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
         ] times
     ] benchmark
     [ 1.0e9 / ] [ no-dispatch-time get / ] bi
-    "non-inlined smd (wrapped):  %.6f seconds (%.2f times slower)\n" printf
+    "wrapped smd:                %.6f seconds (%.2f times slower)\n" printf
 ;
 
 

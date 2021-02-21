@@ -212,6 +212,18 @@ SYMBOL: history
 : inline-multi-dispatch-method ( #call word -- ? )
     dupd inlining-multi-dispatch-method eliminate-dispatch ;
 
+: inlining-covariant-tuple-dispatch-method ( #call word -- class/f method/f )
+     dup "dispatch-type" word-prop methods>> assoc-empty? [ 2drop f f ] [
+         2dup [ in-d>> length ] [ multi-generic-arity ] bi* < [ 2drop f f ] [
+             [ in-d>> ] [ [ multi-generic-arity ] keep ] bi*
+             [ tail* [ value-info class>> ] map <covariant-tuple> dup ] dip
+             single-method-for-class
+         ] if
+     ] if ;
+
+ : inline-covariant-tuple-dispatch-method ( #call word -- ? )
+     dupd inlining-covariant-tuple-dispatch-method eliminate-dispatch ;
+
 : (do-inlining) ( #call word -- ? )
     {
         { [ dup never-inline-word? ] [ 2drop f ] }
@@ -221,6 +233,7 @@ SYMBOL: history
         { [ dup multi-standard-generic? ] [ inline-multi-standard-method ] }
         { [ dup multi-math-generic? ] [ inline-multi-math-method ] }
         { [ dup multi-dispatch-generic? ] [ inline-multi-dispatch-method ] }
+        { [ dup covariant-tuple-dispatch-generic? ] [ inline-covariant-tuple-dispatch-method ] }
         { [ dup inline? ] [ inline-word ] }
         [ 2drop f ]
     } cond ;
