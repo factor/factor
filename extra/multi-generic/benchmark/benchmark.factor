@@ -103,142 +103,6 @@ MM: shmd-beats? ( thing2: paper | -- ? ) thing1 get rock? [ t ] [ f ] if ;
     smd-beats? ;
 
 
-MIXIN: man
-
-SINGLETON: the-man-No.001 INSTANCE: the-man-No.001 man
-SINGLETON: the-man-No.002 INSTANCE: the-man-No.002 man
-SINGLETON: the-man-No.003 INSTANCE: the-man-No.003 man
-SINGLETON: the-man-No.004 INSTANCE: the-man-No.004 man
-SINGLETON: the-man-No.005 INSTANCE: the-man-No.005 man
-SINGLETON: the-man-No.006 INSTANCE: the-man-No.006 man
-SINGLETON: the-man-No.007 INSTANCE: the-man-No.007 man
-SINGLETON: the-man-No.008 INSTANCE: the-man-No.008 man
-SINGLETON: the-man-No.009 INSTANCE: the-man-No.009 man
-SINGLETON: the-man-No.010 INSTANCE: the-man-No.010 man
-SINGLETON: the-man-No.011 INSTANCE: the-man-No.011 man
-SINGLETON: the-man-No.012 INSTANCE: the-man-No.012 man
-SINGLETON: the-man-No.013 INSTANCE: the-man-No.013 man
-SINGLETON: the-man-No.014 INSTANCE: the-man-No.014 man
-SINGLETON: the-man-No.015 INSTANCE: the-man-No.015 man
-SINGLETON: the-man-No.016 INSTANCE: the-man-No.016 man
-SINGLETON: the-man-No.017 INSTANCE: the-man-No.017 man
-SINGLETON: the-man-No.018 INSTANCE: the-man-No.018 man
-SINGLETON: the-man-No.019 INSTANCE: the-man-No.019 man
-SINGLETON: the-man-No.020 INSTANCE: the-man-No.020 man
-SINGLETON: the-man-No.021 INSTANCE: the-man-No.021 man
-SINGLETON: the-man-No.022 INSTANCE: the-man-No.022 man
-SINGLETON: the-man-No.023 INSTANCE: the-man-No.023 man
-SINGLETON: the-man-No.024 INSTANCE: the-man-No.024 man
-SINGLETON: the-man-No.025 INSTANCE: the-man-No.025 man
-SINGLETON: the-man-No.026 INSTANCE: the-man-No.026 man
-SINGLETON: the-man-No.027 INSTANCE: the-man-No.027 man
-SINGLETON: the-man-No.028 INSTANCE: the-man-No.028 man
-SINGLETON: the-man-No.029 INSTANCE: the-man-No.029 man
-SINGLETON: the-man-No.030 INSTANCE: the-man-No.030 man
-
-
-GENERIC: sd-ln-beats? ( man1 man2 -- ? )
-
-M: the-man-No.001 sd-ln-beats? 2drop t ;
-M: the-man-No.002 sd-ln-beats? 2drop t ;
-M: the-man-No.003 sd-ln-beats? 2drop t ;
-M: the-man-No.004 sd-ln-beats? 2drop t ;
-M: the-man-No.005 sd-ln-beats? 2drop t ;
-M: the-man-No.006 sd-ln-beats? 2drop t ;
-M: the-man-No.007 sd-ln-beats? 2drop t ;
-M: the-man-No.008 sd-ln-beats? 2drop t ;
-M: the-man-No.009 sd-ln-beats? 2drop t ;
-M: the-man-No.010 sd-ln-beats? 2drop t ;
-M: the-man-No.011 sd-ln-beats? 2drop t ;
-M: the-man-No.012 sd-ln-beats? 2drop t ;
-M: the-man-No.013 sd-ln-beats? 2drop t ;
-M: the-man-No.014 sd-ln-beats? 2drop t ;
-M: the-man-No.015 sd-ln-beats? 2drop t ;
-M: the-man-No.016 sd-ln-beats? 2drop t ;
-M: the-man-No.017 sd-ln-beats? 2drop t ;
-M: the-man-No.018 sd-ln-beats? 2drop t ;
-M: the-man-No.019 sd-ln-beats? 2drop t ;
-M: the-man-No.020 sd-ln-beats? 2drop t ;
-M: the-man-No.021 sd-ln-beats? 2drop t ;
-M: the-man-No.022 sd-ln-beats? 2drop t ;
-M: the-man-No.023 sd-ln-beats? 2drop t ;
-M: the-man-No.024 sd-ln-beats? 2drop t ;
-M: the-man-No.025 sd-ln-beats? 2drop t ;
-M: the-man-No.026 sd-ln-beats? 2drop t ;
-M: the-man-No.027 sd-ln-beats? 2drop t ;
-M: the-man-No.028 sd-ln-beats? 2drop t ;
-M: the-man-No.029 sd-ln-beats? 2drop t ;
-M: the-man-No.030 sd-ln-beats? 2drop t ;
-
-
-MGENERIC: md-ln-beats? ( man man -- ? )
-
-MM: md-ln-beats? ( :man :the-man-No.001 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.002 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.003 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.004 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.005 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.006 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.007 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.008 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.009 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.010 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.011 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.012 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.013 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.014 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.015 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.016 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.017 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.018 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.019 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.020 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.021 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.022 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.023 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.024 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.025 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.026 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.027 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.028 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.029 -- ? ) 2drop t ;
-MM: md-ln-beats? ( :man :the-man-No.030 -- ? ) 2drop t ;
-
-
-MGENERIC: smd-ln-beats? ( man man -- ? )
-
-MM: smd-ln-beats? ( man :the-man-No.001 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.002 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.003 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.004 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.005 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.006 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.007 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.008 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.009 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.010 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.011 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.012 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.013 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.014 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.015 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.016 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.017 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.018 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.019 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.020 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.021 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.022 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.023 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.024 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.025 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.026 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.027 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.028 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.029 -- ? ) 2drop t ;
-MM: smd-ln-beats? ( man :the-man-No.030 -- ? ) 2drop t ;
-
-
 CONSTANT: TIMES       100,000
 CONSTANT: COMBI-TIMES 100,000
 SYMBOL: no-dispatch-time
@@ -869,6 +733,362 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
 ;
 
 
+MIXIN: man
+SINGLETON: the-man-No.001 INSTANCE: the-man-No.001 man
+SINGLETON: the-man-No.002 INSTANCE: the-man-No.002 man
+SINGLETON: the-man-No.003 INSTANCE: the-man-No.003 man
+SINGLETON: the-man-No.004 INSTANCE: the-man-No.004 man
+SINGLETON: the-man-No.005 INSTANCE: the-man-No.005 man
+SINGLETON: the-man-No.006 INSTANCE: the-man-No.006 man
+SINGLETON: the-man-No.007 INSTANCE: the-man-No.007 man
+SINGLETON: the-man-No.008 INSTANCE: the-man-No.008 man
+SINGLETON: the-man-No.009 INSTANCE: the-man-No.009 man
+SINGLETON: the-man-No.010 INSTANCE: the-man-No.010 man
+SINGLETON: the-man-No.011 INSTANCE: the-man-No.011 man
+SINGLETON: the-man-No.012 INSTANCE: the-man-No.012 man
+SINGLETON: the-man-No.013 INSTANCE: the-man-No.013 man
+SINGLETON: the-man-No.014 INSTANCE: the-man-No.014 man
+SINGLETON: the-man-No.015 INSTANCE: the-man-No.015 man
+SINGLETON: the-man-No.016 INSTANCE: the-man-No.016 man
+SINGLETON: the-man-No.017 INSTANCE: the-man-No.017 man
+SINGLETON: the-man-No.018 INSTANCE: the-man-No.018 man
+SINGLETON: the-man-No.019 INSTANCE: the-man-No.019 man
+SINGLETON: the-man-No.020 INSTANCE: the-man-No.020 man
+SINGLETON: the-man-No.021 INSTANCE: the-man-No.021 man
+SINGLETON: the-man-No.022 INSTANCE: the-man-No.022 man
+SINGLETON: the-man-No.023 INSTANCE: the-man-No.023 man
+SINGLETON: the-man-No.024 INSTANCE: the-man-No.024 man
+SINGLETON: the-man-No.025 INSTANCE: the-man-No.025 man
+SINGLETON: the-man-No.026 INSTANCE: the-man-No.026 man
+SINGLETON: the-man-No.027 INSTANCE: the-man-No.027 man
+SINGLETON: the-man-No.028 INSTANCE: the-man-No.028 man
+SINGLETON: the-man-No.029 INSTANCE: the-man-No.029 man
+SINGLETON: the-man-No.030 INSTANCE: the-man-No.030 man
+
+
+TUPLE: t-man ;
+TUPLE: t-the-man-No.001 < t-man ; CONSTANT: c-t-the-man-No.001 T{ t-the-man-No.001 }
+TUPLE: t-the-man-No.002 < t-man ; CONSTANT: c-t-the-man-No.002 T{ t-the-man-No.002 }
+TUPLE: t-the-man-No.003 < t-man ; CONSTANT: c-t-the-man-No.003 T{ t-the-man-No.003 }
+TUPLE: t-the-man-No.004 < t-man ; CONSTANT: c-t-the-man-No.004 T{ t-the-man-No.004 }
+TUPLE: t-the-man-No.005 < t-man ; CONSTANT: c-t-the-man-No.005 T{ t-the-man-No.005 }
+TUPLE: t-the-man-No.006 < t-man ; CONSTANT: c-t-the-man-No.006 T{ t-the-man-No.006 }
+TUPLE: t-the-man-No.007 < t-man ; CONSTANT: c-t-the-man-No.007 T{ t-the-man-No.007 }
+TUPLE: t-the-man-No.008 < t-man ; CONSTANT: c-t-the-man-No.008 T{ t-the-man-No.008 }
+TUPLE: t-the-man-No.009 < t-man ; CONSTANT: c-t-the-man-No.009 T{ t-the-man-No.009 }
+TUPLE: t-the-man-No.010 < t-man ; CONSTANT: c-t-the-man-No.010 T{ t-the-man-No.010 }
+TUPLE: t-the-man-No.011 < t-man ; CONSTANT: c-t-the-man-No.011 T{ t-the-man-No.011 }
+TUPLE: t-the-man-No.012 < t-man ; CONSTANT: c-t-the-man-No.012 T{ t-the-man-No.012 }
+TUPLE: t-the-man-No.013 < t-man ; CONSTANT: c-t-the-man-No.013 T{ t-the-man-No.013 }
+TUPLE: t-the-man-No.014 < t-man ; CONSTANT: c-t-the-man-No.014 T{ t-the-man-No.014 }
+TUPLE: t-the-man-No.015 < t-man ; CONSTANT: c-t-the-man-No.015 T{ t-the-man-No.015 }
+TUPLE: t-the-man-No.016 < t-man ; CONSTANT: c-t-the-man-No.016 T{ t-the-man-No.016 }
+TUPLE: t-the-man-No.017 < t-man ; CONSTANT: c-t-the-man-No.017 T{ t-the-man-No.017 }
+TUPLE: t-the-man-No.018 < t-man ; CONSTANT: c-t-the-man-No.018 T{ t-the-man-No.018 }
+TUPLE: t-the-man-No.019 < t-man ; CONSTANT: c-t-the-man-No.019 T{ t-the-man-No.019 }
+TUPLE: t-the-man-No.020 < t-man ; CONSTANT: c-t-the-man-No.020 T{ t-the-man-No.020 }
+TUPLE: t-the-man-No.021 < t-man ; CONSTANT: c-t-the-man-No.021 T{ t-the-man-No.021 }
+TUPLE: t-the-man-No.022 < t-man ; CONSTANT: c-t-the-man-No.022 T{ t-the-man-No.022 }
+TUPLE: t-the-man-No.023 < t-man ; CONSTANT: c-t-the-man-No.023 T{ t-the-man-No.023 }
+TUPLE: t-the-man-No.024 < t-man ; CONSTANT: c-t-the-man-No.024 T{ t-the-man-No.024 }
+TUPLE: t-the-man-No.025 < t-man ; CONSTANT: c-t-the-man-No.025 T{ t-the-man-No.025 }
+TUPLE: t-the-man-No.026 < t-man ; CONSTANT: c-t-the-man-No.026 T{ t-the-man-No.026 }
+TUPLE: t-the-man-No.027 < t-man ; CONSTANT: c-t-the-man-No.027 T{ t-the-man-No.027 }
+TUPLE: t-the-man-No.028 < t-man ; CONSTANT: c-t-the-man-No.028 T{ t-the-man-No.028 }
+TUPLE: t-the-man-No.029 < t-man ; CONSTANT: c-t-the-man-No.029 T{ t-the-man-No.029 }
+TUPLE: t-the-man-No.030 < t-man ; CONSTANT: c-t-the-man-No.030 T{ t-the-man-No.030 }
+
+
+GENERIC: sd-ln-beats? ( man1 man2 -- ? )
+
+M: the-man-No.001 sd-ln-beats? 2drop t ;
+M: the-man-No.002 sd-ln-beats? 2drop t ;
+M: the-man-No.003 sd-ln-beats? 2drop t ;
+M: the-man-No.004 sd-ln-beats? 2drop t ;
+M: the-man-No.005 sd-ln-beats? 2drop t ;
+M: the-man-No.006 sd-ln-beats? 2drop t ;
+M: the-man-No.007 sd-ln-beats? 2drop t ;
+M: the-man-No.008 sd-ln-beats? 2drop t ;
+M: the-man-No.009 sd-ln-beats? 2drop t ;
+M: the-man-No.010 sd-ln-beats? 2drop t ;
+M: the-man-No.011 sd-ln-beats? 2drop t ;
+M: the-man-No.012 sd-ln-beats? 2drop t ;
+M: the-man-No.013 sd-ln-beats? 2drop t ;
+M: the-man-No.014 sd-ln-beats? 2drop t ;
+M: the-man-No.015 sd-ln-beats? 2drop t ;
+M: the-man-No.016 sd-ln-beats? 2drop t ;
+M: the-man-No.017 sd-ln-beats? 2drop t ;
+M: the-man-No.018 sd-ln-beats? 2drop t ;
+M: the-man-No.019 sd-ln-beats? 2drop t ;
+M: the-man-No.020 sd-ln-beats? 2drop t ;
+M: the-man-No.021 sd-ln-beats? 2drop t ;
+M: the-man-No.022 sd-ln-beats? 2drop t ;
+M: the-man-No.023 sd-ln-beats? 2drop t ;
+M: the-man-No.024 sd-ln-beats? 2drop t ;
+M: the-man-No.025 sd-ln-beats? 2drop t ;
+M: the-man-No.026 sd-ln-beats? 2drop t ;
+M: the-man-No.027 sd-ln-beats? 2drop t ;
+M: the-man-No.028 sd-ln-beats? 2drop t ;
+M: the-man-No.029 sd-ln-beats? 2drop t ;
+M: the-man-No.030 sd-ln-beats? 2drop t ;
+
+: wrapped-sd-ln-beats? ( man1 man2 -- ? ) sd-ln-beats? ;
+
+
+MGENERIC: md-ln-beats? ( man man -- ? )
+
+MM: md-ln-beats? ( :man :the-man-No.001 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.002 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.003 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.004 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.005 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.006 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.007 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.008 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.009 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.010 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.011 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.012 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.013 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.014 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.015 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.016 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.017 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.018 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.019 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.020 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.021 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.022 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.023 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.024 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.025 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.026 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.027 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.028 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.029 -- ? ) 2drop t ;
+MM: md-ln-beats? ( :man :the-man-No.030 -- ? ) 2drop t ;
+
+: wrapped-md-ln-beats? ( man1 man2 -- ? ) md-ln-beats? ;
+
+
+MGENERIC: cached-md-ln-beats? ( man man -- ? ) cached-multi
+
+MM: cached-md-ln-beats? ( :man :the-man-No.001 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.002 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.003 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.004 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.005 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.006 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.007 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.008 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.009 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.010 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.011 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.012 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.013 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.014 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.015 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.016 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.017 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.018 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.019 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.020 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.021 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.022 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.023 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.024 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.025 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.026 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.027 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.028 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.029 -- ? ) 2drop t ;
+MM: cached-md-ln-beats? ( :man :the-man-No.030 -- ? ) 2drop t ;
+
+: wrapped-cached-md-ln-beats? ( man1 man2 -- ? ) cached-md-ln-beats? ;
+
+
+MGENERIC: smd-ln-beats? ( man man -- ? )
+
+MM: smd-ln-beats? ( man :the-man-No.001 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.002 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.003 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.004 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.005 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.006 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.007 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.008 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.009 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.010 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.011 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.012 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.013 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.014 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.015 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.016 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.017 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.018 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.019 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.020 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.021 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.022 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.023 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.024 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.025 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.026 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.027 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.028 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.029 -- ? ) 2drop t ;
+MM: smd-ln-beats? ( man :the-man-No.030 -- ? ) 2drop t ;
+
+: wrapped-smd-ln-beats? ( man man -- ? ) smd-ln-beats? ;
+
+
+! tuple version
+
+GENERIC: sd-ln-beats2? ( t-man1 t-man2 -- ? )
+
+M: t-the-man-No.001 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.002 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.003 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.004 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.005 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.006 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.007 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.008 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.009 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.010 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.011 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.012 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.013 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.014 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.015 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.016 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.017 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.018 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.019 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.020 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.021 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.022 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.023 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.024 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.025 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.026 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.027 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.028 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.029 sd-ln-beats2? 2drop t ;
+M: t-the-man-No.030 sd-ln-beats2? 2drop t ;
+
+: wrapped-sd-ln-beats2? ( t-man1 t-man2 -- ? ) sd-ln-beats2? ;
+
+
+MGENERIC: md-ln-beats2? ( t-man t-man -- ? )
+
+MM: md-ln-beats2? ( :t-man :t-the-man-No.001 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.002 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.003 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.004 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.005 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.006 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.007 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.008 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.009 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.010 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.011 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.012 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.013 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.014 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.015 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.016 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.017 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.018 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.019 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.020 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.021 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.022 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.023 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.024 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.025 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.026 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.027 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.028 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.029 -- ? ) 2drop t ;
+MM: md-ln-beats2? ( :t-man :t-the-man-No.030 -- ? ) 2drop t ;
+
+: wrapped-md-ln-beats2? ( t-man1 t-man2 -- ? ) md-ln-beats2? ;
+
+
+MGENERIC: cached-md-ln-beats2? ( t-man t-man -- ? ) cached-multi
+
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.001 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.002 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.003 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.004 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.005 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.006 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.007 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.008 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.009 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.010 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.011 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.012 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.013 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.014 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.015 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.016 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.017 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.018 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.019 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.020 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.021 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.022 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.023 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.024 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.025 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.026 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.027 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.028 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.029 -- ? ) 2drop t ;
+MM: cached-md-ln-beats2? ( :t-man :t-the-man-No.030 -- ? ) 2drop t ;
+
+: wrapped-cached-md-ln-beats2? ( t-man1 t-man2 -- ? ) cached-md-ln-beats2? ;
+
+
+MGENERIC: smd-ln-beats2? ( t-man t-man -- ? )
+
+MM: smd-ln-beats2? ( t-man :t-the-man-No.001 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.002 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.003 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.004 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.005 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.006 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.007 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.008 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.009 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.010 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.011 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.012 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.013 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.014 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.015 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.016 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.017 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.018 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.019 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.020 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.021 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.022 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.023 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.024 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.025 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.026 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.027 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.028 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.029 -- ? ) 2drop t ;
+MM: smd-ln-beats2? ( t-man :t-the-man-No.030 -- ? ) 2drop t ;
+
+: wrapped-smd-ln-beats2? ( t-man t-man -- ? ) smd-ln-beats2? ;
+
+
 : bm2 ( -- )
    "\n"
     COMBI-TIMES {
@@ -885,35 +1105,36 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
     } cond
     " repetitions of the showdown of the all combinations of No.001 to No.005\n"
     3append write
+    "(All methods are wrapped in words.)\n" write
 
     gc
     [
         COMBI-TIMES [
-            the-man-No.001 the-man-No.001 sd-ln-beats? drop
-            the-man-No.001 the-man-No.002 sd-ln-beats? drop
-            the-man-No.001 the-man-No.003 sd-ln-beats? drop
-            the-man-No.001 the-man-No.004 sd-ln-beats? drop
-            the-man-No.001 the-man-No.005 sd-ln-beats? drop
-            the-man-No.002 the-man-No.001 sd-ln-beats? drop
-            the-man-No.002 the-man-No.002 sd-ln-beats? drop
-            the-man-No.002 the-man-No.003 sd-ln-beats? drop
-            the-man-No.002 the-man-No.004 sd-ln-beats? drop
-            the-man-No.002 the-man-No.005 sd-ln-beats? drop
-            the-man-No.003 the-man-No.001 sd-ln-beats? drop
-            the-man-No.003 the-man-No.002 sd-ln-beats? drop
-            the-man-No.003 the-man-No.003 sd-ln-beats? drop
-            the-man-No.003 the-man-No.004 sd-ln-beats? drop
-            the-man-No.003 the-man-No.005 sd-ln-beats? drop
-            the-man-No.004 the-man-No.001 sd-ln-beats? drop
-            the-man-No.004 the-man-No.002 sd-ln-beats? drop
-            the-man-No.004 the-man-No.003 sd-ln-beats? drop
-            the-man-No.004 the-man-No.004 sd-ln-beats? drop
-            the-man-No.004 the-man-No.005 sd-ln-beats? drop
-            the-man-No.005 the-man-No.001 sd-ln-beats? drop
-            the-man-No.005 the-man-No.002 sd-ln-beats? drop
-            the-man-No.005 the-man-No.003 sd-ln-beats? drop
-            the-man-No.005 the-man-No.004 sd-ln-beats? drop
-            the-man-No.005 the-man-No.005 sd-ln-beats? drop
+            the-man-No.001 the-man-No.001 wrapped-sd-ln-beats? drop
+            the-man-No.001 the-man-No.002 wrapped-sd-ln-beats? drop
+            the-man-No.001 the-man-No.003 wrapped-sd-ln-beats? drop
+            the-man-No.001 the-man-No.004 wrapped-sd-ln-beats? drop
+            the-man-No.001 the-man-No.005 wrapped-sd-ln-beats? drop
+            the-man-No.002 the-man-No.001 wrapped-sd-ln-beats? drop
+            the-man-No.002 the-man-No.002 wrapped-sd-ln-beats? drop
+            the-man-No.002 the-man-No.003 wrapped-sd-ln-beats? drop
+            the-man-No.002 the-man-No.004 wrapped-sd-ln-beats? drop
+            the-man-No.002 the-man-No.005 wrapped-sd-ln-beats? drop
+            the-man-No.003 the-man-No.001 wrapped-sd-ln-beats? drop
+            the-man-No.003 the-man-No.002 wrapped-sd-ln-beats? drop
+            the-man-No.003 the-man-No.003 wrapped-sd-ln-beats? drop
+            the-man-No.003 the-man-No.004 wrapped-sd-ln-beats? drop
+            the-man-No.003 the-man-No.005 wrapped-sd-ln-beats? drop
+            the-man-No.004 the-man-No.001 wrapped-sd-ln-beats? drop
+            the-man-No.004 the-man-No.002 wrapped-sd-ln-beats? drop
+            the-man-No.004 the-man-No.003 wrapped-sd-ln-beats? drop
+            the-man-No.004 the-man-No.004 wrapped-sd-ln-beats? drop
+            the-man-No.004 the-man-No.005 wrapped-sd-ln-beats? drop
+            the-man-No.005 the-man-No.001 wrapped-sd-ln-beats? drop
+            the-man-No.005 the-man-No.002 wrapped-sd-ln-beats? drop
+            the-man-No.005 the-man-No.003 wrapped-sd-ln-beats? drop
+            the-man-No.005 the-man-No.004 wrapped-sd-ln-beats? drop
+            the-man-No.005 the-man-No.005 wrapped-sd-ln-beats? drop
         ] times
     ] benchmark dup ref namespaces:set
     1.0e9 /
@@ -922,31 +1143,31 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
     gc
     [
         COMBI-TIMES [
-            the-man-No.001 the-man-No.001 md-ln-beats? drop
-            the-man-No.001 the-man-No.002 md-ln-beats? drop
-            the-man-No.001 the-man-No.003 md-ln-beats? drop
-            the-man-No.001 the-man-No.004 md-ln-beats? drop
-            the-man-No.001 the-man-No.005 md-ln-beats? drop
-            the-man-No.002 the-man-No.001 md-ln-beats? drop
-            the-man-No.002 the-man-No.002 md-ln-beats? drop
-            the-man-No.002 the-man-No.003 md-ln-beats? drop
-            the-man-No.002 the-man-No.004 md-ln-beats? drop
-            the-man-No.002 the-man-No.005 md-ln-beats? drop
-            the-man-No.003 the-man-No.001 md-ln-beats? drop
-            the-man-No.003 the-man-No.002 md-ln-beats? drop
-            the-man-No.003 the-man-No.003 md-ln-beats? drop
-            the-man-No.003 the-man-No.004 md-ln-beats? drop
-            the-man-No.003 the-man-No.005 md-ln-beats? drop
-            the-man-No.004 the-man-No.001 md-ln-beats? drop
-            the-man-No.004 the-man-No.002 md-ln-beats? drop
-            the-man-No.004 the-man-No.003 md-ln-beats? drop
-            the-man-No.004 the-man-No.004 md-ln-beats? drop
-            the-man-No.004 the-man-No.005 md-ln-beats? drop
-            the-man-No.005 the-man-No.001 md-ln-beats? drop
-            the-man-No.005 the-man-No.002 md-ln-beats? drop
-            the-man-No.005 the-man-No.003 md-ln-beats? drop
-            the-man-No.005 the-man-No.004 md-ln-beats? drop
-            the-man-No.005 the-man-No.005 md-ln-beats? drop
+            the-man-No.001 the-man-No.001 wrapped-md-ln-beats? drop
+            the-man-No.001 the-man-No.002 wrapped-md-ln-beats? drop
+            the-man-No.001 the-man-No.003 wrapped-md-ln-beats? drop
+            the-man-No.001 the-man-No.004 wrapped-md-ln-beats? drop
+            the-man-No.001 the-man-No.005 wrapped-md-ln-beats? drop
+            the-man-No.002 the-man-No.001 wrapped-md-ln-beats? drop
+            the-man-No.002 the-man-No.002 wrapped-md-ln-beats? drop
+            the-man-No.002 the-man-No.003 wrapped-md-ln-beats? drop
+            the-man-No.002 the-man-No.004 wrapped-md-ln-beats? drop
+            the-man-No.002 the-man-No.005 wrapped-md-ln-beats? drop
+            the-man-No.003 the-man-No.001 wrapped-md-ln-beats? drop
+            the-man-No.003 the-man-No.002 wrapped-md-ln-beats? drop
+            the-man-No.003 the-man-No.003 wrapped-md-ln-beats? drop
+            the-man-No.003 the-man-No.004 wrapped-md-ln-beats? drop
+            the-man-No.003 the-man-No.005 wrapped-md-ln-beats? drop
+            the-man-No.004 the-man-No.001 wrapped-md-ln-beats? drop
+            the-man-No.004 the-man-No.002 wrapped-md-ln-beats? drop
+            the-man-No.004 the-man-No.003 wrapped-md-ln-beats? drop
+            the-man-No.004 the-man-No.004 wrapped-md-ln-beats? drop
+            the-man-No.004 the-man-No.005 wrapped-md-ln-beats? drop
+            the-man-No.005 the-man-No.001 wrapped-md-ln-beats? drop
+            the-man-No.005 the-man-No.002 wrapped-md-ln-beats? drop
+            the-man-No.005 the-man-No.003 wrapped-md-ln-beats? drop
+            the-man-No.005 the-man-No.004 wrapped-md-ln-beats? drop
+            the-man-No.005 the-man-No.005 wrapped-md-ln-beats? drop
         ] times
     ] benchmark
     [ 1.0e9 / ] [ ref get / ] bi
@@ -955,40 +1176,71 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
     gc
     [
         COMBI-TIMES [
-            the-man-No.001 the-man-No.001 smd-ln-beats? drop
-            the-man-No.001 the-man-No.002 smd-ln-beats? drop
-            the-man-No.001 the-man-No.003 smd-ln-beats? drop
-            the-man-No.001 the-man-No.004 smd-ln-beats? drop
-            the-man-No.001 the-man-No.005 smd-ln-beats? drop
-            the-man-No.002 the-man-No.001 smd-ln-beats? drop
-            the-man-No.002 the-man-No.002 smd-ln-beats? drop
-            the-man-No.002 the-man-No.003 smd-ln-beats? drop
-            the-man-No.002 the-man-No.004 smd-ln-beats? drop
-            the-man-No.002 the-man-No.005 smd-ln-beats? drop
-            the-man-No.003 the-man-No.001 smd-ln-beats? drop
-            the-man-No.003 the-man-No.002 smd-ln-beats? drop
-            the-man-No.003 the-man-No.003 smd-ln-beats? drop
-            the-man-No.003 the-man-No.004 smd-ln-beats? drop
-            the-man-No.003 the-man-No.005 smd-ln-beats? drop
-            the-man-No.004 the-man-No.001 smd-ln-beats? drop
-            the-man-No.004 the-man-No.002 smd-ln-beats? drop
-            the-man-No.004 the-man-No.003 smd-ln-beats? drop
-            the-man-No.004 the-man-No.004 smd-ln-beats? drop
-            the-man-No.004 the-man-No.005 smd-ln-beats? drop
-            the-man-No.005 the-man-No.001 smd-ln-beats? drop
-            the-man-No.005 the-man-No.002 smd-ln-beats? drop
-            the-man-No.005 the-man-No.003 smd-ln-beats? drop
-            the-man-No.005 the-man-No.004 smd-ln-beats? drop
-            the-man-No.005 the-man-No.005 smd-ln-beats? drop
+            the-man-No.001 the-man-No.001 wrapped-cached-md-ln-beats? drop
+            the-man-No.001 the-man-No.002 wrapped-cached-md-ln-beats? drop
+            the-man-No.001 the-man-No.003 wrapped-cached-md-ln-beats? drop
+            the-man-No.001 the-man-No.004 wrapped-cached-md-ln-beats? drop
+            the-man-No.001 the-man-No.005 wrapped-cached-md-ln-beats? drop
+            the-man-No.002 the-man-No.001 wrapped-cached-md-ln-beats? drop
+            the-man-No.002 the-man-No.002 wrapped-cached-md-ln-beats? drop
+            the-man-No.002 the-man-No.003 wrapped-cached-md-ln-beats? drop
+            the-man-No.002 the-man-No.004 wrapped-cached-md-ln-beats? drop
+            the-man-No.002 the-man-No.005 wrapped-cached-md-ln-beats? drop
+            the-man-No.003 the-man-No.001 wrapped-cached-md-ln-beats? drop
+            the-man-No.003 the-man-No.002 wrapped-cached-md-ln-beats? drop
+            the-man-No.003 the-man-No.003 wrapped-cached-md-ln-beats? drop
+            the-man-No.003 the-man-No.004 wrapped-cached-md-ln-beats? drop
+            the-man-No.003 the-man-No.005 wrapped-cached-md-ln-beats? drop
+            the-man-No.004 the-man-No.001 wrapped-cached-md-ln-beats? drop
+            the-man-No.004 the-man-No.002 wrapped-cached-md-ln-beats? drop
+            the-man-No.004 the-man-No.003 wrapped-cached-md-ln-beats? drop
+            the-man-No.004 the-man-No.004 wrapped-cached-md-ln-beats? drop
+            the-man-No.004 the-man-No.005 wrapped-cached-md-ln-beats? drop
+            the-man-No.005 the-man-No.001 wrapped-cached-md-ln-beats? drop
+            the-man-No.005 the-man-No.002 wrapped-cached-md-ln-beats? drop
+            the-man-No.005 the-man-No.003 wrapped-cached-md-ln-beats? drop
+            the-man-No.005 the-man-No.004 wrapped-cached-md-ln-beats? drop
+            the-man-No.005 the-man-No.005 wrapped-cached-md-ln-beats? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ ref get / ] bi
+    "cached-multi-dispatch:      %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        COMBI-TIMES [
+            the-man-No.001 the-man-No.001 wrapped-smd-ln-beats? drop
+            the-man-No.001 the-man-No.002 wrapped-smd-ln-beats? drop
+            the-man-No.001 the-man-No.003 wrapped-smd-ln-beats? drop
+            the-man-No.001 the-man-No.004 wrapped-smd-ln-beats? drop
+            the-man-No.001 the-man-No.005 wrapped-smd-ln-beats? drop
+            the-man-No.002 the-man-No.001 wrapped-smd-ln-beats? drop
+            the-man-No.002 the-man-No.002 wrapped-smd-ln-beats? drop
+            the-man-No.002 the-man-No.003 wrapped-smd-ln-beats? drop
+            the-man-No.002 the-man-No.004 wrapped-smd-ln-beats? drop
+            the-man-No.002 the-man-No.005 wrapped-smd-ln-beats? drop
+            the-man-No.003 the-man-No.001 wrapped-smd-ln-beats? drop
+            the-man-No.003 the-man-No.002 wrapped-smd-ln-beats? drop
+            the-man-No.003 the-man-No.003 wrapped-smd-ln-beats? drop
+            the-man-No.003 the-man-No.004 wrapped-smd-ln-beats? drop
+            the-man-No.003 the-man-No.005 wrapped-smd-ln-beats? drop
+            the-man-No.004 the-man-No.001 wrapped-smd-ln-beats? drop
+            the-man-No.004 the-man-No.002 wrapped-smd-ln-beats? drop
+            the-man-No.004 the-man-No.003 wrapped-smd-ln-beats? drop
+            the-man-No.004 the-man-No.004 wrapped-smd-ln-beats? drop
+            the-man-No.004 the-man-No.005 wrapped-smd-ln-beats? drop
+            the-man-No.005 the-man-No.001 wrapped-smd-ln-beats? drop
+            the-man-No.005 the-man-No.002 wrapped-smd-ln-beats? drop
+            the-man-No.005 the-man-No.003 wrapped-smd-ln-beats? drop
+            the-man-No.005 the-man-No.004 wrapped-smd-ln-beats? drop
+            the-man-No.005 the-man-No.005 wrapped-smd-ln-beats? drop
         ] times
     ] benchmark
     [ 1.0e9 / ] [ ref get / ] bi
     "single spec multi-dispatch: %.6f seconds (%.2f times slower)\n" printf
-;
 
-: bm3 ( -- )
     "\n"
-    TIMES {
+    COMBI-TIMES {
         { [ dup 1,000,000 >= ] [
               [ 1,000,000 / >integer ]
               [ 1,000,000 mod 1,000 / >integer ]
@@ -1000,44 +1252,141 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
               bi "%d,%03d" sprintf ] }
         [ "%d" sprintf ]
     } cond
-    " repetitions of all combinations of rock-paper-scissors\n" 3append write
+    " repetitions of the showdown of the all combinations of No.001 to No.005 (tuple version)\n"
+    3append write
+    "(All methods are wrapped in words.)\n" write
 
     gc
     [
-        TIMES [
-            paper paper       wrapped-sd-beats? drop
-            paper scissors    wrapped-sd-beats? drop
-            paper rock        wrapped-sd-beats? drop
-
-            scissors paper    wrapped-sd-beats? drop
-            scissors scissors wrapped-sd-beats? drop
-            scissors rock     wrapped-sd-beats? drop
-
-            rock paper        wrapped-sd-beats? drop
-            rock scissors     wrapped-sd-beats? drop
-            rock rock         wrapped-sd-beats? drop
+        COMBI-TIMES [
+            c-t-the-man-No.001 c-t-the-man-No.001 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.001 c-t-the-man-No.002 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.001 c-t-the-man-No.003 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.001 c-t-the-man-No.004 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.001 c-t-the-man-No.005 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.001 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.002 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.003 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.004 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.005 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.001 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.002 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.003 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.004 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.005 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.001 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.002 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.003 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.004 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.005 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.001 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.002 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.003 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.004 wrapped-sd-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.005 wrapped-sd-ln-beats2? drop
         ] times
-    ] collect-dispatch-stats . ! dispatch-stats.
-
-    gc
-    [
-        [
-        TIMES [
-            paper paper       wrapped-smd-beats? drop
-            paper scissors    wrapped-smd-beats? drop
-            paper rock        wrapped-smd-beats? drop
-
-            scissors paper    wrapped-smd-beats? drop
-            scissors scissors wrapped-smd-beats? drop
-            scissors rock     wrapped-smd-beats? drop
-
-            rock paper        wrapped-smd-beats? drop
-            rock scissors     wrapped-smd-beats? drop
-            rock rock         wrapped-smd-beats? drop
-        ] times
-    ] collect-dispatch-stats . ! dispatch-stats.
-
     ] benchmark
-    [ 1.0e9 / ] [ no-dispatch-time get / ] bi
-    "non-inlined smd:            %.6f seconds (%.2f times slower)\n" printf
+    [ 1.0e9 / ]  [ ref get / ] bi
+    "single-dispatch:            %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        COMBI-TIMES [
+            c-t-the-man-No.001 c-t-the-man-No.001 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.001 c-t-the-man-No.002 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.001 c-t-the-man-No.003 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.001 c-t-the-man-No.004 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.001 c-t-the-man-No.005 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.001 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.002 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.003 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.004 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.005 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.001 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.002 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.003 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.004 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.005 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.001 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.002 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.003 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.004 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.005 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.001 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.002 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.003 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.004 wrapped-md-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.005 wrapped-md-ln-beats2? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ ref get / ] bi
+    "multi-dispatch:             %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        COMBI-TIMES [
+            c-t-the-man-No.001 c-t-the-man-No.001 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.001 c-t-the-man-No.002 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.001 c-t-the-man-No.003 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.001 c-t-the-man-No.004 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.001 c-t-the-man-No.005 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.001 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.002 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.003 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.004 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.005 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.001 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.002 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.003 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.004 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.005 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.001 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.002 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.003 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.004 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.005 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.001 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.002 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.003 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.004 wrapped-cached-md-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.005 wrapped-cached-md-ln-beats2? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ ref get / ] bi
+    "cached-multi-dispatch:      %.6f seconds (%.2f times slower)\n" printf
+
+    gc
+    [
+        COMBI-TIMES [
+            c-t-the-man-No.001 c-t-the-man-No.001 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.001 c-t-the-man-No.002 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.001 c-t-the-man-No.003 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.001 c-t-the-man-No.004 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.001 c-t-the-man-No.005 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.001 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.002 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.003 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.004 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.002 c-t-the-man-No.005 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.001 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.002 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.003 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.004 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.003 c-t-the-man-No.005 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.001 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.002 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.003 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.004 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.004 c-t-the-man-No.005 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.001 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.002 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.003 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.004 wrapped-smd-ln-beats2? drop
+            c-t-the-man-No.005 c-t-the-man-No.005 wrapped-smd-ln-beats2? drop
+        ] times
+    ] benchmark
+    [ 1.0e9 / ] [ ref get / ] bi
+    "single spec multi-dispatch: %.6f seconds (%.2f times slower)\n" printf
+
+
 ;
