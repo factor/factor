@@ -145,3 +145,41 @@ M: D{ \ float float } bar 2drop 67 ;
 { 67 } [ 2.2 class-of 3.3 bar ] unit-test
 { 43 } [ "asdf" class-of 3.3 bar ] unit-test
 [ "asdf" 3.3 class-of bar ] must-fail
+
+
+SINGLETONS: hi ha ho ;
+UNION: hihaho-u hi ha ho ;
+GENERIC: frob1 ( x -- x )
+MM: frob1 ( x: hihaho-u -- x ) drop 42 ;
+MM: frob1 ( x: hi -- x ) drop 43 ;
+MM: frob1 ( x: ha -- x ) drop 44 ;
+MM: frob1 ( x: ho -- x ) drop 45 ;
+
+{ 43 } [ hi frob1 ] unit-test
+{ 45 } [ ho frob1 ] unit-test
+[ 99 frob1 ] [ no-method? ] must-fail-with
+
+MIXIN: m1
+INSTANCE: hi m1
+INSTANCE: ha m1
+INSTANCE: ho m1
+
+GENERIC: frob2 ( x -- x )
+MM: frob2 ( x: m1 -- x ) drop 42 ;
+MM: frob2 ( x: hi -- x ) drop 43 ;
+MM: frob2 ( x: ha -- x ) drop 44 ;
+MM: frob2 ( x: ho -- x ) drop 45 ;
+
+{ 43 } [ hi frob2 ] unit-test
+{ 45 } [ ho frob2 ] unit-test
+[ 99 frob2 ] [ no-method? ] must-fail-with
+
+GENERIC: frob3 ( x x -- x )
+MM: frob3 ( x: hihaho-u x: hi -- x ) 2drop 42 ;
+MM: frob3 ( x: hihaho-u x: ha -- x ) 2drop 43 ;
+MM: frob3 ( x: hihaho-u x: ho -- x ) 2drop 44 ;
+
+{ 42 } [ hi hi frob3 ] unit-test
+{ 44 } [ hi ho frob3 ] unit-test
+[ hi 99 frob3 ] [ no-method? ] must-fail-with
+[ 99 hi frob3 ] [ no-method? ] must-fail-with

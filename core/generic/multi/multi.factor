@@ -35,9 +35,7 @@ C: <method-dispatch> method-dispatch
     n arity <
     [ n methods method-dispatch-classes
     [ dup n methods applicable-methods
-      dup length 1 >
-      [ n 1 + arity multi-methods ]
-      [ ?last [ method>> ] [ f ] if* ] if
+      n 1 + arity multi-methods
     ] map>alist ] [
         ! NOTE: This is where we rely on correct non-ambigutiy
         methods ?last [ method>> ] [ f ] if*
