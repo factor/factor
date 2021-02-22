@@ -221,7 +221,7 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
               bi "%d,%03d" sprintf ] }
         [ "%d" sprintf ]
     } cond
-    " repetitions of all combinations of rock-paper-scissors\n" 3append write
+    " repetitions of all combinations of rock-paper-scissors (singleton version)\n" 3append write
 
     gc
     [
@@ -475,7 +475,21 @@ MM: shmd-beats2? ( thing2: t-paper | -- ? ) thing1 get t-rock? [ t ] [ f ] if ;
     [ 1.0e9 / ] [ no-dispatch-time get / ] bi
     "wrapped smd:                %.6f seconds (%.2f times slower)\n" printf
 
-    "\nrepetitions of all combinations of rock-paper-scissors (tuple version)\n" write
+
+    "\n"
+    TIMES {
+        { [ dup 1,000,000 >= ] [
+              [ 1,000,000 / >integer ]
+              [ 1,000,000 mod 1,000 / >integer ]
+              [ 1,000 mod ]
+              tri "%d,%03d,%03d" sprintf ] }
+        { [ dup 1,000 >= ] [
+              [ 1,000 / >integer ]
+              [ 1,000 mod ]
+              bi "%d,%03d" sprintf ] }
+        [ "%d" sprintf ]
+    } cond
+    " repetitions of all combinations of rock-paper-scissors (tuple version)\n" 3append write
 
     gc
     [
@@ -1088,6 +1102,7 @@ MM: smd-ln-beats2? ( t-man :t-the-man-No.030 -- ? ) 2drop t ;
 
 : wrapped-smd-ln-beats2? ( t-man t-man -- ? ) smd-ln-beats2? ;
 
+USE: tools.dispatch.private
 
 : bm2 ( -- )
    "\n"
@@ -1103,9 +1118,9 @@ MM: smd-ln-beats2? ( t-man :t-the-man-No.030 -- ? ) 2drop t ;
               bi "%d,%03d" sprintf ] }
         [ "%d" sprintf ]
     } cond
-    " repetitions of the showdown of the all combinations of No.001 to No.005\n"
+    " repetitions of the showdown of the all combinations of No.001 to No.005 (singleton version)\n"
     3append write
-    "(All methods are wrapped in words.)\n" write
+    "(All methods/words are wrapped in words.)\n" write
 
     gc
     [
@@ -1254,8 +1269,8 @@ MM: smd-ln-beats2? ( t-man :t-the-man-No.030 -- ? ) 2drop t ;
     } cond
     " repetitions of the showdown of the all combinations of No.001 to No.005 (tuple version)\n"
     3append write
-    "(All methods are wrapped in words.)\n" write
-
+    "(All methods/words are wrapped in words.)\n" write
+    
     gc
     [
         COMBI-TIMES [
