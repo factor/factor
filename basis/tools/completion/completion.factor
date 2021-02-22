@@ -56,8 +56,9 @@ PRIVATE>
     ] if ;
 
 : rank-completions ( results -- newresults )
-    [ 0 [ first max ] reduce 3 /f ] keep
-    [ first-unsafe < ] with filter
+    [ 0 [ first max ] reduce 4 /f ] keep
+    dup length 25 >
+    [ [ first-unsafe < ] with filter ] [ nip ] if
     sort-keys <reversed> values ;
 
 : complete ( full short -- score )
