@@ -353,13 +353,11 @@ M:: multi-generic g:make-generic ( generic -- )
             } 1&& [
                 covariant-tuple-dispatch new
                 generic swap "dispatch-type" set-word-prop
-                generic "multi-methods" word-prop [
-                    [
-                        [ bootstrap-word ] map <covariant-tuple> 
-                    ] dip
-                ] assoc-map
-                generic "dispatch-type" word-prop methods<<
-                generic sort-generic-methods
+                ! generic "multi-methods" word-prop [
+                generic methods sort-methods [
+                    [ [ bootstrap-word ] map <covariant-tuple> ] dip
+                ] assoc-map generic "dispatch-type" word-prop methods<<
+                ! generic sort-generic-methods
                 generic dup "dispatch-type" word-prop define-single-default-method
                 generic make-single-generic
             ] [
@@ -371,14 +369,6 @@ M:: multi-generic g:make-generic ( generic -- )
             ] if
         ] if
     ] if
-    ! ! typed
-    ! generic stack-effect :> effect
-    ! effect [ in>> ] [ out>> ] bi [
-    !     f [ array? or ] reduce
-    ! ] bi@ or [
-    !     generic generic def>> effect define-typed
-    ! ] when
-
     generic methods dup empty? [ drop ] [
         values t [
             "multi-method-effect" word-prop
