@@ -1407,13 +1407,15 @@ M: covariant-tuple dispatch-arity classes>> length ;
     n 0 >=
     [ n methods method-dispatch-classes
       [ dup n methods applicable-methods
-        dup length 1 >
-        [ n 1 - covariant-tuple-multi-methods ]
-        ! TODO check sorting
-        [ ?first method>> ] if
+        ! dup length 1 >
+        ! [ n 1 - covariant-tuple-multi-methods ]
+        ! ! TODO check sorting
+        ! [ ?first method>> ] if
+        n 1 - covariant-tuple-multi-methods
       ] map>alist ] [
         ! NOTE: This is where we rely on correct non-ambigutiy
-        methods ?first method>>
+!         methods ?first method>>
+        methods ?last [ method>> ] [ f ] if*
     ] if ;
 
 GENERIC: promote-dispatch-class ( arity class -- class )
@@ -1436,9 +1438,9 @@ M: covariant-tuple promote-dispatch-class
     ! [ [ promote-dispatch-class ] dip <method-dispatch> ] smart-with { } assoc>map ;
     [ swapd [ promote-dispatch-class ] dip <method-dispatch> ] with { } assoc>map ;
 
-
 :: methods>multi-methods ( arity assoc -- assoc )
     ! assoc [ [ arity swap promote-dispatch-class ] dip ] assoc-map
+
     arity assoc methods>dispatch
     [ f ]
     [ arity 1 -  covariant-tuple-multi-methods ] if-empty ;
@@ -1491,13 +1493,25 @@ PREDICATE: nested-dispatch-engine-word < predicate-engine-word
     over index>> current-index
     [ [ swap methods>> define-inline-cache-quot ] keep ] with-variable ;
 
+! In nested context, we reset the predicate-engines table so it will be
+! populated with the default method of this subtree.
+! NOTE: not pruning the tree here like find-default does, though
+:: with-nested-engine ( engine quot: ( ..a engine -- ..b ) -- ..b )
+    engine index>>
+    dup 0 > [ engine methods>> object of default get or ] [ default get ] if
+    H{ } clone 3array { current-index default predicate-engines } swap zip >hashtable
+    [ engine quot call ] with-variables ; inline
+
 M: nested-dispatch-engine compile-engine
-    [ flatten-methods convert-tuple-methods ] change-methods
-    dup dup index>> current-index [ call-next-method ] with-variable
+!     [ flatten-methods convert-tuple-methods ] change-methods
+!     dup dup index>> current-index [ call-next-method ] with-variable
+    dup [
+        [ flatten-methods convert-tuple-methods ] change-methods
+        call-next-method
+    ] with-nested-engine
     >>methods
     define-nested-dispatch-engine
-    nested-dispatch-pics get [ wrap-nested-dispatch-call-site ] when
-    ;
+    nested-dispatch-pics get [ wrap-nested-dispatch-call-site ] when ;
 
 ! * Method combination interface
 ! TUPLE: covariant-tuple-dispatch < non-multi-dispatch ;
