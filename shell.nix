@@ -37,7 +37,7 @@ in
     local binary="''${root}/factor"
     local wrapped="''${root}/.factor-wrapped"
     # Remove the wrapped binary if a new VM has been compiled
-    ${lib.getBin file}/bin/file $binary |grep ELF >/dev/null && rm -f "$wrapped"
+    ${lib.getBin file}/bin/file "$binary" |grep ELF >/dev/null && rm -f "$wrapped"
     # Restore the factor binary if it was already wrapped
     [ -e "$wrapped" ] && { mv "$wrapped" "$binary" ; }
     wrapProgram "$binary" --prefix LD_LIBRARY_PATH : ${runtimeLibPath} \
