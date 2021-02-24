@@ -5,10 +5,10 @@ IN: hpack
 
 : hpack-encode ( -- ) ;
 
-<PRIVATE
-
 TUPLE: decode-context
-    { max-size } { dynamic-table initial: { } } ;
+    { max-size integer initial: 0 } { dynamic-table initial: { } } ;
+
+<PRIVATE
 
 ! The static table for hpack compression/decompression
 CONSTANT: static-table {
@@ -111,17 +111,38 @@ CONSTANT: static-table {
       [ pick subseq >string ] dip swap ]
     if ; 
 
-: header-entry-size ( table-entry -- size )
-
-;
-
-: >>max-size ( decode-context new-size -- updated-context )
-    drop ! minimial definition that should stack check.
+: header-size ( header -- size )
+    sum-lengths 32 +
     ;
 
-: add-header-to-table ( decode-context header -- updated-context )
-    drop ! minimial definition that should stack check.
+: dynamic-table-size ( decode-context -- table-size )
+    [ header-size ] map sum
+    ;
 
+! gives the index in the dynamic table such that the sum of the
+! size of the elements before the index is less than or equal to
+! the desired-size, or f if no entries need to be removed to
+! attain the desired size
+:: dynamic-table-remove-index ( dynamic-table desired-size -- i/f )
+    0 dynamic-table [ header-size + dup desired-size >= ] find drop nip
+    ;
+
+! shrinks the dynamic table size to the given size (size, *not*
+! length) (doesn't affect the max-size of the context)
+: shrink-dynamic-table ( dynamic-table shrink-to -- shrunk-dynamic-table )
+    dupd dynamic-table-remove-index [ head ] when*
+    ;
+
+:: add-header-to-table ( decode-context header -- updated-context )
+    decode-context dynamic-table>> decode-context max-size>>
+    header header-size - shrink-dynamic-table
+    header header-size decode-context max-size>> <= [ header prefix ] when
+    decode-context swap >>dynamic-table
+    ;
+
+: set-dynamic-table-size ( decode-context new-size -- updated-decode-context )
+    [ >>max-size ] keep
+    [ dup dynamic-table>> ] dip shrink-dynamic-table >>dynamic-table
     ;
 
 : get-header-from-table ( decode-context table-index -- field )
@@ -159,10 +180,11 @@ CONSTANT: static-table {
         ! Literal header field with incremental indexing
         { [ index block nth 6 bit? ] [ decode-context block
                 index 6 decode-literal-header 
-            /* TODO: add table modification effects! */ ] } 
+                [ 2nip add-header-to-table ] 3keep ] } 
         ! dynamic table size update
         { [ index block nth 5 bit? ] [ decode-context block
-        index f /* action quote */ ] } ! TODO: actually modify the table
+                index 5 decode-integer -rot f
+                [ set-dynamic-table-size ] 3dip ] }
         ! literal header field without indexing
         [ decode-context block index 4 decode-literal-header ]
     } cond ;
