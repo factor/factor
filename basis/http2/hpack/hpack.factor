@@ -3,10 +3,12 @@ math.functions math.bitwise multiline sequences strings ;
 
 IN: hpack
 
-<PRIVATE
-
 TUPLE: decode-context
-    { max-size } { dynamic-table initial: { } } ;
+    { max-size integer initial: 0 } { dynamic-table initial: { } } ;
+
+ERROR: hpack-decode-error error-msg ;
+
+<PRIVATE
 
 ! The static table for hpack compression/decompression
 CONSTANT: static-table {
@@ -122,24 +124,45 @@ CONSTANT: static-table {
       [ pick subseq >string ] dip swap ]
     if ; 
 
-: header-entry-size ( table-entry -- size )
-
-;
-
-: >>max-size ( decode-context new-size -- updated-context )
-    drop ! minimial definition that should stack check.
+: header-size ( header -- size )
+    sum-lengths 32 +
     ;
 
-: add-header-to-table ( decode-context header -- updated-context )
-    drop ! minimial definition that should stack check.
+: dynamic-table-size ( decode-context -- table-size )
+    [ header-size ] map sum
+    ;
 
+! gives the index in the dynamic table such that the sum of the
+! size of the elements before the index is less than or equal to
+! the desired-size, or f if no entries need to be removed to
+! attain the desired size
+:: dynamic-table-remove-index ( dynamic-table desired-size -- i/f )
+    0 dynamic-table [ header-size + dup desired-size >= ] find drop nip
+    ;
+
+! shrinks the dynamic table size to the given size (size, *not*
+! length) (doesn't affect the max-size of the context)
+: shrink-dynamic-table ( dynamic-table shrink-to -- shrunk-dynamic-table )
+    dupd dynamic-table-remove-index [ head ] when*
+    ;
+
+:: add-header-to-table ( decode-context header -- updated-context )
+    decode-context dynamic-table>> decode-context max-size>>
+    header header-size - shrink-dynamic-table
+    header header-size decode-context max-size>> <= [ header prefix ] when
+    decode-context swap >>dynamic-table
+    ;
+
+: set-dynamic-table-size ( decode-context new-size -- updated-decode-context )
+    [ >>max-size ] keep
+    [ dup dynamic-table>> ] dip shrink-dynamic-table >>dynamic-table
     ;
 
 : get-header-from-table ( decode-context table-index -- field )
     ! check bounds: i < len(static-table++decode-context) and i > 0
     dup pick dynamic-table>> length static-table length + < 
     over 0 > 
-    and [ ] unless ! if not valid throw error TODO: add error
+    and [ "invalid index given" hpack-decode-error ] unless ! if not valid throw error
     dup static-table length <  ! check if in static table
     [ nip static-table nth ]
     [ static-table length - 1 - swap dynamic-table>> nth ]
@@ -170,10 +193,11 @@ CONSTANT: static-table {
         ! Literal header field with incremental indexing
         { [ index block nth 6 bit? ] [ decode-context block
                 index 6 decode-literal-header 
-            /* TODO: add table modification effects! */ ] } 
+                [ 2nip add-header-to-table ] 3keep ] } 
         ! dynamic table size update
         { [ index block nth 5 bit? ] [ decode-context block
-        index f /* action quote */ ] } ! TODO: actually modify the table
+                index 5 decode-integer -rot f
+                [ set-dynamic-table-size ] 3dip ] }
         ! literal header field without indexing
         [ decode-context block index 4 decode-literal-header ]
     } cond ;
@@ -206,11 +230,10 @@ PRIVATE>
     [ dup decoded-list length < ]
     ! call decode-field and add the (possibly) decoded field to the list
     ! (if the list has stuff, then we have to add...)
-    ! TODO: throw error if the field is f when the decode list
-    ! is nonempty
     [ decode-field [ decoded-list swap suffix decoded-list! ]
-                   [ decoded-list empty? [ ] unless ] if* ]
-! if the table was not empty, and we didn't get a header, throw an error. TODO: add error
+                   [ decoded-list empty? [ "Table size update not at start of header block"
+                   hpack-decode-error ] unless ] if* ]
+! if the table was not empty, and we didn't get a header, throw an error.
     while
     2drop decoded-list
     ! double check the table size
