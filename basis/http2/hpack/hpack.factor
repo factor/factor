@@ -3,8 +3,6 @@ math.functions math.bitwise multiline sequences strings ;
 
 IN: hpack
 
-: hpack-encode ( -- ) ;
-
 <PRIVATE
 
 TUPLE: decode-context
@@ -75,6 +73,19 @@ CONSTANT: static-table {
     { "via" f }
     { "www-authenticate" f }
 }
+
+! headers will be a list of tuples
+:: encode-field ( encode-context headers index -- updated-context block new-index field/f )
+    {
+        ! first search if the header is in the header table
+
+        ! TODO if not encode it as a literal and then add it to table 
+
+        ! TODO if in table, if perfect match, use it, else, use indexed literal
+        ;
+: search-table ( - ) ;
+
+: encode-literal ( - ) ;    
 
 : decode-integer-fragment ( block index I M -- block index+1 I' M+7 block[index+1] )
     ! increment index and get block[index]
@@ -169,6 +180,21 @@ CONSTANT: static-table {
 
 
 PRIVATE>
+! headers is a sequence of tuples represented the unencoded headers
+! 
+: hpack-encode ( encode-context headers -- updated-context block ) 
+    [let V{} :> block!
+    0
+    [ dup block length < ]
+    ! while the index is less than the length
+    [ encode-field [ block swap suffix block! ] 
+                   [ block empty? [] unless ] if* ]
+    while
+    2drop block
+    ]
+    ! convert block sequence into a bytestring for sending over http
+    >byte-array
+;
 
 
 ! should give the updated dtable, and the list of decoded
