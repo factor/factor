@@ -8,6 +8,8 @@ IN: hpack
 TUPLE: decode-context
     { max-size integer initial: 0 } { dynamic-table initial: { } } ;
 
+ERROR: hpack-decode-error error-msg ;
+
 <PRIVATE
 
 ! The static table for hpack compression/decompression
@@ -149,7 +151,7 @@ CONSTANT: static-table {
     ! check bounds: i < len(static-table++decode-context) and i > 0
     dup pick dynamic-table>> length static-table length + < 
     over 0 > 
-    and [ ] unless ! if not valid throw error TODO: add error
+    and [ "invalid index given" hpack-decode-error ] unless ! if not valid throw error
     dup static-table length <  ! check if in static table
     [ nip static-table nth ]
     [ static-table length - 1 - swap dynamic-table>> nth ]
@@ -202,11 +204,10 @@ PRIVATE>
     [ dup decoded-list length < ]
     ! call decode-field and add the (possibly) decoded field to the list
     ! (if the list has stuff, then we have to add...)
-    ! TODO: throw error if the field is f when the decode list
-    ! is nonempty
     [ decode-field [ decoded-list swap suffix decoded-list! ]
-                   [ decoded-list empty? [ ] unless ] if* ]
-! if the table was not empty, and we didn't get a header, throw an error. TODO: add error
+                   [ decoded-list empty? [ "Table size update not at start of header block"
+                   hpack-decode-error ] unless ] if* ]
+! if the table was not empty, and we didn't get a header, throw an error.
     while
     2drop decoded-list
     ! double check the table size
