@@ -1,7 +1,7 @@
 USING: accessors arrays combinators fry locals kernel math
 math.functions math.bitwise multiline sequences strings ;
 
-IN: hpack
+IN: http2.hpack
 
 : hpack-encode ( -- ) ;
 
@@ -201,13 +201,13 @@ PRIVATE>
     [let V{ } clone :> decoded-list!
     0 ! index in the block
     ! check that the block is longer than the index
-    [ dup decoded-list length < ]
+    [ 2dup swap length < ]
     ! call decode-field and add the (possibly) decoded field to the list
     ! (if the list has stuff, then we have to add...)
     [ decode-field [ decoded-list swap suffix decoded-list! ]
                    [ decoded-list empty? [ "Table size update not at start of header block"
                    hpack-decode-error ] unless ] if* ]
-! if the table was not empty, and we didn't get a header, throw an error.
+    ! if the table was not empty, and we didn't get a header, throw an error.
     while
     2drop decoded-list
     ! double check the table size
