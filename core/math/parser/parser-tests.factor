@@ -200,11 +200,19 @@ unit-test
 
 { "0/0." } [ 0.0 0.0 / number>string ] unit-test
 
+{  "0/0." } [ 0.0 0.0 / ?pos number>string ] unit-test
+{ "-0/0." } [ 0.0 0.0 / ?neg number>string ] unit-test
+
+{ t } [  "0/0." string>number fp-nan? ] unit-test
+{ t } [ "-0/0." string>number fp-nan? ] unit-test
+
+{ f } [  "0/0." string>number fp-sign ] unit-test
+{ t } [ "-0/0." string>number fp-sign ] unit-test
+
 { "1/0." } [ 1.0 0.0 / number>string ] unit-test
 
 { "-1/0." } [ -1.0 0.0 / number>string ] unit-test
 
-{ t } [ "0/0." string>number fp-nan? ] unit-test
 
 { 1/0. } [ "1/0." string>number ] unit-test
 

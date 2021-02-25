@@ -19,6 +19,10 @@ IN: prettyprint.tests
 { "0o1.1p4" } [ 8 number-base [ 18.0 unparse ] with-variable ] unit-test
 { "0x1.2p4" } [ 16 number-base [ 18.0 unparse ] with-variable ] unit-test
 { "1267650600228229401496703205376" } [ 1 100 shift unparse ] unit-test
+{ "1/0." } [ 1/0. unparse ] unit-test
+{ "-1/0." } [ -1/0. unparse ] unit-test
+{ "0/0." } [ 0/0. unparse ] unit-test
+{ "-0/0." } [ -0/0. unparse ] unit-test
 
 { "+" } [ \ + unparse ] unit-test
 
