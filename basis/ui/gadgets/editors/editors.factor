@@ -248,10 +248,11 @@ M: editor draw-gadget*
     ] if ;
 
 M: editor pref-dim*
+    [ call-next-method ] keep ! at least as big as our min-rows/min-cols
     ! Add some space for the caret.
     [ font>> ] keep dup draw-default-text?
     [ default-text>> ] [ control-value ] if
-    text-dim { 1 0 } v+ ;
+    text-dim { 1 0 } v+ vmax ;
 
 M: editor baseline font>> font-metrics ascent>> ;
 

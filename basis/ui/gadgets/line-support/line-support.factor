@@ -87,7 +87,7 @@ GENERIC: draw-line ( line index gadget -- )
 <PRIVATE
 
 : clamp ( dim unit min max -- dim' )
-    [ -1/0. or * ] [ 1/0. or * ] bi-curry* bi
+    [ -1/0. or 1 max * ] [ 1/0. or 1 max * ] bi-curry* bi
     [ max ] [ min ] bi* ;
 
 : em ( font -- x ) "m" text-width ;
@@ -112,6 +112,8 @@ M: line-gadget pref-viewport-dim
         [ pref-viewport-dim* ] [ ] [ layout-state>> ] tri
         [ drop ] [ dupd pref-viewport-dim<< ] if
     ] ?if ;
+
+M: line-gadget pref-dim* pref-viewport-dim ;
 
 : visible-lines ( gadget -- n )
     [ visible-dim second ] [ line-height ] bi /i ;
