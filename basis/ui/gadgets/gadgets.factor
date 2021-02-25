@@ -408,6 +408,4 @@ GENERIC: preedit? ( gadget -- ? )
 
 M: gadget preedit? drop f ;
 
-USE: vocabs.loader
-
 { "ui.gadgets" "prettyprint" } "ui.gadgets.prettyprint" require-when
