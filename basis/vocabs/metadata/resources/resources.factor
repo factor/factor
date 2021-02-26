@@ -19,8 +19,10 @@ PRIVATE>
 
 : expand-resource ( resource-path -- filenames )
     dup dup file-info directory? [
-        dup directory-tree-files [ append-path ] with map
-    ] [ drop { } ] if swap prefix ;
+        recursive-directory-files
+    ] [
+        drop { }
+    ] if swap prefix ;
 
 ERROR: resource-missing pattern ;
 
