@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar calendar.format
 combinators combinators.short-circuit fry io io.backend
-io.directories io.directories.hierarchy io.encodings.binary
-io.encodings.detect io.encodings.utf8 io.files io.files.info
-io.files.temp io.files.types io.files.unique io.launcher
-io.pathnames kernel locals math math.parser namespaces sequences
-sorting strings system unicode xml.syntax xml.writer
-xmode.catalog xmode.marker xmode.tokens ;
+io.directories io.encodings.binary io.encodings.detect
+io.encodings.utf8 io.files io.files.info io.files.temp
+io.files.types io.files.unique io.launcher io.pathnames kernel
+locals math math.parser namespaces sequences sorting strings
+system unicode xml.syntax xml.writer xmode.catalog xmode.marker
+xmode.tokens ;
 IN: codebook
 
 ! Usage: "my/source/tree" codebook
