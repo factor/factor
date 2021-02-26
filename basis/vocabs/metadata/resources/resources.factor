@@ -1,8 +1,7 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: globs io.directories io.directories.hierarchy
-io.files.info io.pathnames kernel regexp sequences sets
-vocabs.loader vocabs.metadata ;
+USING: globs io.directories io.files.info io.pathnames kernel
+regexp sequences sets vocabs.loader vocabs.metadata ;
 IN: vocabs.metadata.resources
 
 <PRIVATE

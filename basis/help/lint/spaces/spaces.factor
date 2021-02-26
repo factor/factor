@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators.short-circuit formatting io
-io.directories.search io.encodings.utf8 io.files io.pathnames
+io.directories io.encodings.utf8 io.files io.pathnames
 kernel math namespaces prettyprint sequences ui.gadgets.panes
 vocabs.loader ;
 
