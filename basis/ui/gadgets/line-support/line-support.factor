@@ -100,11 +100,11 @@ PRIVATE>
 : line-gadget-height ( pref-dim gadget -- h )
     [ second ] [ [ line-height ] [ min-rows>> ] [ max-rows>> ] tri ] bi* clamp ;
 
+: line-gadget-dim ( pref-dim gadget -- dim )
+    [ line-gadget-width ] [ line-gadget-height ] 2bi 2array ;
+
 : pref-viewport-dim* ( gadget -- dim )
-    [ pref-dim ] [ ] bi
-    [ line-gadget-width ]
-    [ line-gadget-height ]
-    2bi 2array ; inline
+    [ pref-dim ] [ line-gadget-dim ] bi ;
 
 M: line-gadget pref-viewport-dim
     dup pref-viewport-dim>>
@@ -113,7 +113,7 @@ M: line-gadget pref-viewport-dim
         [ drop ] [ dupd pref-viewport-dim<< ] if
     ] ?if ;
 
-M: line-gadget pref-dim* pref-viewport-dim ;
+M: line-gadget pref-dim* { 0 0 } swap line-gadget-dim ;
 
 : visible-lines ( gadget -- n )
     [ visible-dim second ] [ line-height ] bi /i ;
