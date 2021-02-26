@@ -248,23 +248,6 @@ M: object copy-file
 : copy-files-into ( files to -- )
     '[ _ copy-file-into ] each ;
 
-<PRIVATE
-
-: directory-tree-files% ( path prefix -- )
-    [ dup directory-entries ] dip '[
-        [ name>> [ append-path ] [ _ prepend-path ] bi ]
-        [ directory? ] bi over ,
-        [ directory-tree-files% ] [ 2drop ] if
-    ] with each ;
-
-PRIVATE>
-
-: directory-tree-files ( path -- seq )
-    [ "" directory-tree-files% ] { } make ;
-
-: with-directory-tree-files ( path quot -- )
-    '[ "" directory-tree-files @ ] with-directory ; inline
-
 : delete-tree ( path -- )
     dup link-info directory? [
         [ [ [ delete-tree ] each ] with-directory-files ]

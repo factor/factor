@@ -50,13 +50,12 @@ TUPLE: code-file
     } 1&& ;
 
 : code-files ( dir -- files )
-    '[
-        [ include-file-name? ] filter [
-            dup detect-file dup binary?
-            [ f ] [ 2dup dupd first-line find-mode ] if
-            code-file boa
-        ] map [ mode>> ] filter [ name>> ] sort-with
-    ] with-directory-tree-files ;
+    recursive-directory-files
+    [ include-file-name? ] filter [
+        dup detect-file dup binary?
+        [ f ] [ 2dup dupd first-line find-mode ] if
+        code-file boa
+    ] map [ mode>> ] filter [ name>> ] sort-with ;
 
 : html-name-char ( char -- str )
     {
