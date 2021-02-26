@@ -3,11 +3,10 @@
 USING: accessors arrays assocs assocs.extras calendar
 calendar.format checksums checksums.sha combinators
 combinators.smart compression.zlib constructors fry grouping io
-io.binary io.directories io.directories.search
-io.encodings.binary io.encodings.string io.encodings.utf8
-io.files io.files.info io.pathnames io.streams.byte-array
-io.streams.peek kernel math math.bitwise math.parser
-math.statistics memoize namespaces random sequences
+io.binary io.directories io.encodings.binary io.encodings.string
+io.encodings.utf8 io.files io.files.info io.pathnames
+io.streams.byte-array io.streams.peek kernel math math.bitwise
+math.parser math.statistics memoize namespaces random sequences
 sequences.extras splitting strings ;
 IN: git
 
