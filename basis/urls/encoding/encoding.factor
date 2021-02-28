@@ -79,16 +79,6 @@ PRIVATE>
         ] if url-decode-iter
     ] if ;
 
-PRIVATE>
-
-: url-decode ( str -- decoded )
-    [ 0 swap url-decode-iter ] "" make utf8 decode ;
-
-: query-decode ( str -- decoded )
-    "+" split "%20" join url-decode ;
-
-<PRIVATE
-
 : add-query-param ( value key assoc -- )
     [
         {
@@ -99,6 +89,61 @@ PRIVATE>
     ] change-at ;
 
 PRIVATE>
+
+: escape-uri-component-char? ( ch -- ? )
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.!~*'()" member? not ; inline
+
+: encode-uri-component ( str -- str' )
+    [
+        [ dup escape-uri-component-char? [ push-utf8 ] [ , ] if ] each
+    ] "" make ;
+
+: escape-uri-char? ( ch -- ? )
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789;,/?:@&=+$-_.!~*'()#" member? not ; inline
+
+: encode-uri ( str -- str' )
+    [
+        [ dup escape-uri-char? [ push-utf8 ] [ , ] if ] each
+    ] "" make ;
+
+<PRIVATE
+
+: decode-uri-hex ( index str quot: ( ch -- ? ) -- )
+    '[
+        2dup length 2 - >= [
+            2drop
+        ] [
+            [ 1 + dup 2 + ] dip subseq
+            dup hex> dup @ [ nip , ] [ CHAR: % , drop % ] if
+        ] if
+    ] call ; inline
+
+: decode-uri-iter ( index str quot: ( ch -- ? ) -- )
+    dup '[
+        2dup length >= [
+            2drop
+        ] [
+            2dup nth dup CHAR: % = [
+                drop 2dup _ decode-uri-hex [ 3 + ] dip
+            ] [
+                , [ 1 + ] dip
+            ] if _ decode-uri-iter
+        ] if
+    ] call ; inline recursive
+
+PRIVATE>
+
+: decode-uri-component ( str -- decoded )
+    [ 0 swap [ escape-uri-component-char? ] decode-uri-iter ] "" make utf8 decode ;
+
+: decode-uri ( str -- decoded )
+    [ 0 swap [ escape-uri-char? ] decode-uri-iter ] "" make utf8 decode ;
+
+: url-decode ( str -- decoded )
+    [ 0 swap url-decode-iter ] "" make utf8 decode ;
+
+: query-decode ( str -- decoded )
+    "+" split "%20" join url-decode ;
 
 : query>assoc ( query -- assoc )
     dup [
