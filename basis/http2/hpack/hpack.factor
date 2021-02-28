@@ -131,9 +131,7 @@ CONSTANT: static-table {
         ! TODO if not encode it as a literal and then add it to table 
 
         ! TODO if in table, if perfect match, use it, else, use indexed literal
-        ;
-
-: encode-literal ( -- ) ;    
+        ;   
 
 : decode-integer-fragment ( block index I M -- block index+1 I' M+7 block[index+1] )
     ! increment index and get block[index]
