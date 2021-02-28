@@ -4,7 +4,7 @@ math.functions math.bitwise multiline sequences ;
 
 IN: http2.hpack
 
-TUPLE: decode-context
+TUPLE: hpack-context
     { max-size integer initial: 0 } { dynamic-table initial: { } } ;
 
 ERROR: hpack-decode-error error-msg ;
@@ -77,55 +77,6 @@ CONSTANT: static-table {
     { "www-authenticate" f }
 }
 
-! headers will be a list of tuples
-:: encode-field ( encode-context headers index -- updated-context block new-index field/f )
-    { }
-        ! first search if the header is in the header table
-
-        ! TODO if not encode it as a literal and then add it to table 
-
-        ! TODO if in table, if perfect match, use it, else, use indexed literal
-        ;
-
-: search-table ( -- ) ;
-
-: encode-literal ( -- ) ;    
-
-: decode-integer-fragment ( block index I M -- block index+1 I' M+7 block[index+1] )
-    ! increment index and get block[index]
-    [ 1 + ] 2dip [ 2dup swap nth ] 2dip
-    ! stack: block index+1 block[index+1] I M
-    ! compute I' = (block[index+1] & 127) * 2^M + I
-    pick 127 mask 2 pick ^ * '[ _ + ] dip
-    7 + rot ;
-
-
-: decode-integer ( block current-index prefix-length -- block new-index number )
-    ! get the current octet, compute mask, apply mask
-    [ 2dup swap nth ] dip 2 swap ^ 1 - [ mask ] keep
-    over = 
-    ! stack: block index I loop?
-    [ 0
-        ! TODO: consider rewriting this loop using sequence
-        ! words and clever thinking (maybe something like
-        ! finding the index of the next byte starting with 0,
-        ! mapping each byte to the corresponding integer,
-        ! reducing in a clever way and adding the offset
-      [ 7 bit? ] [ decode-integer-fragment ] do while 
-      ! stack: block index I M, get rid of M, we don't need it
-      drop ]
-    when ! the prefix matches the mask (exactly all 1s), must loop
-    [ 1 + ] dip ! increment the index before return
-    ;
-
-: decode-string ( block current-index -- block new-index string )
-    2dup swap nth 7 bit?
-    [ 7 decode-integer ] dip
-    [ + "" ] ! Huffman encoding case, currently just a stub for stack effects
-    [ over + dup ! compute the last index and the new index
-      [ pick subseq utf8 decode ] dip swap ]
-    if ; 
-
 : header-size ( header -- size )
     sum-lengths 32 +
     ;
@@ -169,6 +120,55 @@ CONSTANT: static-table {
     [ nip static-table nth ]
     [ static-table length - 1 - swap dynamic-table>> nth ]
     if ;
+
+: search-table ( -- ) ;
+
+! headers will be a list of tuples
+:: encode-field ( encode-context headers index -- updated-context block new-index field/f )
+    { }
+        ! first search if the header is in the header table
+
+        ! TODO if not encode it as a literal and then add it to table 
+
+        ! TODO if in table, if perfect match, use it, else, use indexed literal
+        ;
+
+: encode-literal ( -- ) ;    
+
+: decode-integer-fragment ( block index I M -- block index+1 I' M+7 block[index+1] )
+    ! increment index and get block[index]
+    [ 1 + ] 2dip [ 2dup swap nth ] 2dip
+    ! stack: block index+1 block[index+1] I M
+    ! compute I' = (block[index+1] & 127) * 2^M + I
+    pick 127 mask 2 pick ^ * '[ _ + ] dip
+    7 + rot ;
+
+
+: decode-integer ( block current-index prefix-length -- block new-index number )
+    ! get the current octet, compute mask, apply mask
+    [ 2dup swap nth ] dip 2 swap ^ 1 - [ mask ] keep
+    over = 
+    ! stack: block index I loop?
+    [ 0
+        ! TODO: consider rewriting this loop using sequence
+        ! words and clever thinking (maybe something like
+        ! finding the index of the next byte starting with 0,
+        ! mapping each byte to the corresponding integer,
+        ! reducing in a clever way and adding the offset
+      [ 7 bit? ] [ decode-integer-fragment ] do while 
+      ! stack: block index I M, get rid of M, we don't need it
+      drop ]
+    when ! the prefix matches the mask (exactly all 1s), must loop
+    [ 1 + ] dip ! increment the index before return
+    ;
+
+: decode-string ( block current-index -- block new-index string )
+    2dup swap nth 7 bit?
+    [ 7 decode-integer ] dip
+    [ + "" ] ! Huffman encoding case, currently just a stub for stack effects
+    [ over + dup ! compute the last index and the new index
+      [ pick subseq utf8 decode ] dip swap ]
+    if ; 
 
 : decode-literal-header ( decode-context block index index-length -- decode-context block new-index field )
     decode-integer dup 0 = 
