@@ -47,6 +47,11 @@ TUPLE: huffman-code
    tdesc [ n table update-reverse-table ] huffman-each
    table seq>> ;
 
+TUPLE: huffman-tree
+    { symbol  fixnum }
+    { left maybe{ huffman-tree } }
+    { right maybe{ huffman-tree } } ;
+
 PRIVATE>
 
 TUPLE: huffman-decoder
