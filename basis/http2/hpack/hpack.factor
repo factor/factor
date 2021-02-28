@@ -1,5 +1,6 @@
-USING: accessors arrays combinators fry locals kernel math
-math.functions math.bitwise multiline sequences strings ;
+USING: accessors arrays byte-arrays combinators fry
+io.encodings.string io.encodings.utf8 locals kernel math
+math.functions math.bitwise multiline sequences ;
 
 IN: http2.hpack
 
@@ -122,7 +123,7 @@ CONSTANT: static-table {
     [ 7 decode-integer ] dip
     [ + "" ] ! Huffman encoding case, currently just a stub for stack effects
     [ over + dup ! compute the last index and the new index
-      [ pick subseq >string ] dip swap ]
+      [ pick subseq utf8 decode ] dip swap ]
     if ; 
 
 : header-size ( header -- size )
