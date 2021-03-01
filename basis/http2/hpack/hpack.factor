@@ -119,7 +119,7 @@ CONSTANT: static-table {
     and [ "invalid index given" hpack-decode-error ] unless ! if not valid throw error
     dup static-table length <  ! check if in static table
     [ nip static-table nth ]
-    [ static-table length - 1 - swap dynamic-table>> nth ]
+    [ static-table length - swap dynamic-table>> nth ]
     if ;
 
 : search-table ( -- ) ;
@@ -252,7 +252,7 @@ PRIVATE>
                    hpack-decode-error ] unless ] if* ]
     ! if the table was not empty, and we didn't get a header, throw an error.
     while
-    2drop decoded-list
+    2drop decoded-list >array
     ! double check the table size
     ]
     ;
