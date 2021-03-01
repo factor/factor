@@ -1,4 +1,4 @@
-USING: accessors arrays byte-arrays combinators fry
+USING: accessors arrays byte-arrays byte-vectors combinators fry
 io.encodings.string io.encodings.utf8 locals kernel math
 math.functions math.bitwise multiline sequences ;
 
@@ -123,6 +123,22 @@ CONSTANT: static-table {
 
 : search-table ( -- ) ;
 
+! assumes the first-byte respects the prefix-length, such that
+! the last prefix-length bits are all 0.
+: encode-integer ( first-byte int prefix-length -- bytes )
+    2^ 1 - 2dup < 
+    [ drop bitor 1byte-array ]
+    [ swap over [ bitor 1byte-array >byte-vector ] [ - ] 2bi* 
+      [ dup 128 >= ] [ [ 128 mod 128 + suffix ] [ 128 /i ] bi ]
+      while suffix
+    ] if ;
+
+! encodes a string without huffman encoding.
+: encode-string ( string -- bytes )
+    [ 0 swap length 7 encode-integer ] keep
+    utf8 encode append
+    ;
+
 ! headers will be a list of tuples
 :: encode-field ( encode-context headers index -- updated-context block new-index field/f )
     { }
@@ -135,7 +151,7 @@ CONSTANT: static-table {
 
 : decode-integer-fragment ( block index I M -- block index+1 I' M+7 block[index+1] )
     ! increment index and get block[index]
-    [ 1 + ] 2dip [ 2dup swap nth ] 2dip
+    [ 1 + 2dup swap nth ] 2dip
     ! stack: block index+1 block[index+1] I M
     ! compute I' = (block[index+1] & 127) * 2^M + I
     pick 127 mask 2 pick ^ * '[ _ + ] dip
