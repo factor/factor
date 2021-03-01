@@ -1,11 +1,12 @@
 ! Copyright (C) 2009 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs fry
-hashtables io kernel locals math math.order math.parser
-math.ranges multiline sequences bitstreams bit-arrays ;
+USING: accessors arrays assocs bit-arrays bitstreams fry
+hashtables heaps io kernel locals math math.order math.parser
+math.ranges multiline namespaces sequences ;
+QUALIFIED-WITH: bitstreams bs
 IN: compression.huffman
 
-QUALIFIED-WITH: bitstreams bs
+
 
 <PRIVATE
 
@@ -48,9 +49,34 @@ TUPLE: huffman-code
    table seq>> ;
 
 TUPLE: huffman-tree
-    { symbol  fixnum }
+    { code maybe{ fixnum } }
     { left maybe{ huffman-tree } }
     { right maybe{ huffman-tree } } ;
+
+: <huffman-tree> ( code left right -- huffman-tree )
+    huffman-tree boa ;
+
+: <huffman-internal> ( left right -- huffman-tree )
+    huffman-tree new swap >>left swap >>right ;
+
+SYMBOL: leaf-table
+SYMBOL: node-heap
+
+
+: gen-leaves ( lit-seq -- leaves )
+     [ huffman-tree new swap >>code  ] map ;
+
+: build-leaf-table ( leaves --  )
+ dup empty? [ drop ] [ dup first leaf-table get inc-at rest build-leaf-table ] if ;
+ 
+: insert-leaves ( -- ) leaf-table get unzip swap zip node-heap get heap-push-all  ;
+
+: combine-two ( -- )
+    node-heap get heap-pop node-heap get heap-pop swap [ + ] dip pick <huffman-internal> swap node-heap get heap-push drop ;
+
+: build-tree ( lit-seq -- heap )
+    { { H{ } leaf-table } { <min-heap> node-heap } } [ gen-leaves build-leaf-table insert-leaves [ node-heap get heap-size 1 > ] [ combine-two ] while node-heap get ] 
+   with-variables  ;
 
 PRIVATE>
 
