@@ -177,13 +177,17 @@ CONSTANT: static-table {
     [ 1 + ] dip ! increment the index before return
     ;
 
+: decode-raw-string ( block current-index string-length -- block new-index string )
+    over + dup [ pick subseq utf8 decode ] dip swap ;
+
+: decode-huffman-string ( block current-index string-length -- block new-index string )
+    + "" ! Huffman encoding case, currently just a stub for stack effects
+    "Huffman decoding not implemented yet" hpack-decode-error
+    ;
+
 : decode-string ( block current-index -- block new-index string )
-    2dup swap nth 7 bit?
-    [ 7 decode-integer ] dip
-    [ + "" ] ! Huffman encoding case, currently just a stub for stack effects
-    [ over + dup ! compute the last index and the new index
-      [ pick subseq utf8 decode ] dip swap ]
-    if ; 
+    2dup swap nth 7 bit?  [ 7 decode-integer ] dip
+    [ decode-huffman-string ] [ decode-raw-string ] if ; 
 
 : decode-literal-header ( decode-context block index index-length -- decode-context block new-index field )
     decode-integer dup 0 = 
