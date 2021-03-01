@@ -25,19 +25,19 @@ CONSTANT: c24 B{ 0x82 }
 [ c21 1 decode-string nipd ] unit-test
 
 ! RFC7541 Appendix C.2.1
-{ T{ hpack-context f 64 { { "custom-key" "custom-header" } } } 
+{ T{ hpack-context f 4096 { { "custom-key" "custom-header" } } } 
    26 { "custom-key" "custom-header" } }
-[ hpack-context new 64 >>max-size c21 0 decode-field nipd ] unit-test
+[ hpack-context new c21 0 decode-field nipd ] unit-test
 
 ! RFC7541 Appendix C.2.2
-{ T{ hpack-context f 0 { } }  14 { ":path" "/sample/path" } }
+{ T{ hpack-context f 4096 { } }  14 { ":path" "/sample/path" } }
 [ hpack-context new c22 0 decode-field nipd ] unit-test
 
 ! RFC7541 Appendix C.2.3
-{ T{ hpack-context f 0 { } } 17 { "password" "secret" } }
+{ T{ hpack-context f 4096 { } } 17 { "password" "secret" } }
 [ hpack-context new c23 0 decode-field nipd ] unit-test
 
 ! RFC7541 Appendix C.2.4
-{ T{ hpack-context f 0 { } } 1 { ":method" "GET" } }
+{ T{ hpack-context f 4096 { } } 1 { ":method" "GET" } }
 [ hpack-context new c24 0 decode-field nipd ] unit-test
 

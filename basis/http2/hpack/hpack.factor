@@ -5,7 +5,8 @@ math.functions math.bitwise multiline sequences ;
 IN: http2.hpack
 
 TUPLE: hpack-context
-    { max-size integer initial: 0 } { dynamic-table initial: { } } ;
+    { max-size integer initial: 4096 } { dynamic-table initial: { } } ;
+    ! default the max size to 4096 according to RFC7540
 
 ERROR: hpack-decode-error error-msg ;
 
