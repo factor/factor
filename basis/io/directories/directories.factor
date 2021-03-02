@@ -63,11 +63,9 @@ HOOK: (directory-entries) os ( path -- seq )
 ! Finding directories
 
 : qualified-directory-entries ( path -- seq )
-    absolute-path
     dup directory-entries [ [ append-path ] change-name ] with map! ;
 
 : qualified-directory-files ( path -- seq )
-    absolute-path
     dup directory-files [ append-path ] with map! ;
 
 : with-qualified-directory-files ( path quot -- )
