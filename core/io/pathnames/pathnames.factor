@@ -147,21 +147,12 @@ GENERIC: vocab-path ( path -- newpath )
 GENERIC: absolute-path ( path -- path' )
 
 M: string absolute-path
-    "resource:" ?head [
-        trim-head-separators resource-path
-        absolute-path
-    ] [
-        "vocab:" ?head [
-            trim-head-separators vocab-path
-            absolute-path
-        ] [
-            "~" ?head [
-                trim-head-separators home prepend-path
-                absolute-path
-        ] [
-            current-directory get prepend-path
-        ] if ] if
-    ] if ;
+    {
+        { [ "resource:" ?head ] [ trim-head-separators resource-path absolute-path ] }
+        { [ "vocab:" ?head ] [ trim-head-separators vocab-path absolute-path ] }
+        { [ "~" ?head ] [ trim-head-separators home prepend-path absolute-path ] }
+        [ current-directory get prepend-path ]
+    } cond ;
 
 M: object normalize-path
     absolute-path ;
