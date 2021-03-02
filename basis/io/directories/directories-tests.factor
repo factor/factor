@@ -1,6 +1,8 @@
-USING: arrays destructors io io.directories io.encodings.ascii io.encodings.utf8
-io.files io.files.info io.launcher io.pathnames kernel sequences
-system tools.test ;
+USING: arrays combinators destructors grouping io io.directories
+io.encodings.ascii io.encodings.utf8 io.files io.files.info
+io.files.unique io.launcher io.pathnames kernel math namespaces
+sequences sorting splitting splitting.monotonic strings system
+tools.test ;
 
 { { "kernel" } } [
     "core" resource-path [
@@ -177,7 +179,7 @@ system tools.test ;
 { t } [
     [
         10 [ "io.paths.test" "gogogo" unique-file ] replicate
-        "." [ ] find-files [ natural-sort ] same?
+        "." [ ] find-files [ absolute-path ] map [ natural-sort ] same?
     ] with-test-directory
 ] unit-test
 
@@ -220,38 +222,38 @@ system tools.test ;
 
 [
     {
-        "/a"
-        "/a/a"
-        "/a/a/a"
-        "/a/b"
-        "/a/b/a"
-        "/b"
-        "/b/a"
-        "/b/a/a"
-        "/b/b"
-        "/b/b/a"
-        "/c"
-        "/c/a"
-        "/c/a/a"
-        "/c/b"
-        "/c/b/a"
+        "a"
+        "a/a"
+        "a/a/a"
+        "a/b"
+        "a/b/a"
+        "b"
+        "b/a"
+        "b/a/a"
+        "b/b"
+        "b/b/a"
+        "c"
+        "c/a"
+        "c/a/a"
+        "c/b"
+        "c/b/a"
     }
     {
-        "/a"
-        "/b"
-        "/c"
-        "/a/a"
-        "/a/b"
-        "/b/a"
-        "/b/b"
-        "/c/a"
-        "/c/b"
-        "/a/a/a"
-        "/a/b/a"
-        "/b/a/a"
-        "/b/b/a"
-        "/c/a/a"
-        "/c/b/a"
+        "a"
+        "b"
+        "c"
+        "a/a"
+        "a/b"
+        "b/a"
+        "b/b"
+        "c/a"
+        "c/b"
+        "a/a/a"
+        "a/b/a"
+        "b/a/a"
+        "b/b/a"
+        "c/a/a"
+        "c/b/a"
     }
 ] [
     [
