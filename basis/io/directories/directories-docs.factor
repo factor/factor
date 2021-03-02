@@ -47,7 +47,7 @@ HELP: directory-entries
 
 HELP: qualified-directory-entries
 { $values { "path" "a pathname string" } { "seq" "a sequence of " { $link directory-entry } " objects" } }
-{ $description "Outputs the contents of a directory named by " { $snippet "path" } " using absolute file paths." } ;
+{ $description "Outputs the contents of a directory named by " { $snippet "path" } " using relative file paths." } ;
 
 HELP: directory-files
 { $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }
@@ -55,7 +55,7 @@ HELP: directory-files
 
 HELP: qualified-directory-files
 { $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }
-{ $description "Outputs the contents of a directory named by " { $snippet "path" } " as a sequence of absolute paths." } ;
+{ $description "Outputs the contents of a directory named by " { $snippet "path" } " as a sequence of relative paths." } ;
 
 HELP: with-directory-files
 { $values { "path" "a pathname string" } { "quot" quotation } }
