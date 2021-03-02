@@ -132,7 +132,7 @@ ARTICLE: "math-vectors-simd-logic" "Componentwise logic with SIMD vectors"
 { $example
     "USING: math.vectors math.vectors.simd prettyprint ;"
     "float-4{ 1.0 2.0 3.0 0/0. } float-4{ 1.0 -2.0 3.0 0/0. } v= ."
-    "float-4{ NAN: fffffe0000000 0.0 NAN: fffffe0000000 0.0 }"
+    "float-4{ NAN: -20000000 0.0 NAN: -20000000 0.0 }"
 }
 "For an integer vector, false will manifest as " { $snippet "0" } " and true as " { $snippet "-1" } " (for signed vectors) or the largest representable value of the element type (for unsigned vectors):"
 { $example
