@@ -23,6 +23,8 @@ IN: prettyprint.tests
 { "-1/0." } [ -1/0. unparse ] unit-test
 { "0/0." } [ 0/0. unparse ] unit-test
 { "-0/0." } [ -0/0. unparse ] unit-test
+{ "NAN: 123" } [ NAN: 123 unparse ] unit-test
+{ "NAN: -123" } [ NAN: -123 unparse ] unit-test
 
 { "+" } [ \ + unparse ] unit-test
 
