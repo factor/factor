@@ -1,6 +1,7 @@
 ! Copyright (C) 2021 Your name.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test http2.hpack http2.hpack.private accessors kernel ;
+USING: tools.test http2.hpack http2.hpack.private accessors
+kernel sequences ;
 IN: http2.hpack.tests
 
 ! constants are from RFC 7541, appendix C, various sections
@@ -22,6 +23,15 @@ CONSTANT: c33 B{ 0x82 0x87 0x85 0xbf 0x40 0x0a 0x63 0x75 0x73
     0x74 0x6f 0x6d 0x2d 0x6b 0x65 0x79 0x0c 0x63 0x75 0x73
     0x74 0x6f 0x6d 0x2d 0x76 0x61 0x6c 0x75 0x65 }
 
+CONSTANT: c31h { { ":method" "GET" } { ":scheme" "http" }
+    { ":path" "/" } { ":authority" "www.example.com" } }
+CONSTANT: c32h { { ":method" "GET" } { ":scheme" "http" }
+    { ":path" "/" } { ":authority" "www.example.com" } 
+    { "cache-control" "no-cache" } }
+CONSTANT: c33h { { ":method" "GET" } { ":scheme" "https" }
+    { ":path" "/index.html" } { ":authority" "www.example.com" } 
+    { "custom-key" "custom-value" } }
+
 CONSTANT: c51 B{ 0x48 0x03 0x33 0x30 0x32 0x58 0x07 0x70 0x72
 0x69 0x76 0x61 0x74 0x65 0x61 0x1d 0x4d 0x6f 0x6e 0x2c 0x20 0x32
 0x31 0x20 0x4f 0x63 0x74 0x20 0x32 0x30 0x31 0x33 0x20 0x32
@@ -39,6 +49,22 @@ CONSTANT: c53 B{ 0x88 0xc1 0x61 0x1d 0x4d 0x6f 0x6e 0x2c 0x20
 0x3d 0x33 0x36 0x30 0x30 0x3b 0x20 0x76 0x65 0x72 0x73 0x69
 0x6f 0x6e 0x3d 0x31 }
 
+CONSTANT: c51h { { ":status" "302" }
+    { "cache-control" "private" }
+    { "date" "Mon, 21 Oct 2013 20:13:21 GMT" }
+    { "location" "https://www.example.com" } }
+CONSTANT: c52h { { ":status" "307" }
+    { "cache-control" "private" }
+    { "date" "Mon, 21 Oct 2013 20:13:21 GMT" }
+    { "location" "https://www.example.com" } }
+CONSTANT: c53h { { ":status" "200" }
+    { "cache-control" "private" }
+    { "date" "Mon, 21 Oct 2013 20:13:22 GMT" }
+    { "location" "https://www.example.com" }
+    { "content-encoding" "gzip" }
+    { "set-cookie" "foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1" } }
+
+
 ! tests come from RFC 7541, Appendix C
 
 ! RFC7541 Appendex C.1
@@ -46,9 +72,11 @@ CONSTANT: c53 B{ 0x88 0xc1 0x61 0x1d 0x4d 0x6f 0x6e 0x2c 0x20
 { 4 1337 } [ c1 1 5 decode-integer nipd ] unit-test
 { 5   42 } [ c1 4 8 decode-integer nipd ] unit-test
 
+
 ! RFC7541 Appendix C.2.1 subset
 { 12 "custom-key" }
 [ c21 1 decode-string nipd ] unit-test
+
 
 ! RFC7541 Appendix C.2.1
 { T{ hpack-context f 4096 { { "custom-key" "custom-header" } } } 
@@ -67,6 +95,7 @@ CONSTANT: c53 B{ 0x88 0xc1 0x61 0x1d 0x4d 0x6f 0x6e 0x2c 0x20
 { T{ hpack-context f 4096 { } } 1 { ":method" "GET" } }
 [ hpack-context new c24 0 decode-field nipd ] unit-test
 
+
 ! RFC7541 Appendix C.3
 {
     { { ":method" "GET" } { ":scheme" "http" }
@@ -82,6 +111,7 @@ CONSTANT: c53 B{ 0x88 0xc1 0x61 0x1d 0x4d 0x6f 0x6e 0x2c 0x20
                                 { ":authority" "www.example.com" } } }
 }
 [ hpack-context new c31 c32 c33 [ hpack-decode swap ] tri@ ] unit-test
+
 
 ! RFC7541 Appendix C.5
 {
@@ -112,7 +142,90 @@ CONSTANT: c53 B{ 0x88 0xc1 0x61 0x1d 0x4d 0x6f 0x6e 0x2c 0x20
 [ hpack-context new 256 >>max-size c51 c52 c53
     [ hpack-decode swap ] tri@ ] unit-test
 
+
 ! encoding can be tested primarily by ensuring the encoding and
 ! decoding of an object yields the same object (since encoding
 ! does not have a well defined output other then `decodable').
+
+
+! integer and string encoding tests
+{ B{ 0b00101010 } } [ 0b00100000 10 5 encode-integer ] unit-test
+{ B{ 0b01011111 0b10011010 0b00001010 } } [ 0b01000000 1337 5 encode-integer ] unit-test
+{ B{ 0b00101010 } } [ 0b00000000 42 8 encode-integer ] unit-test
+
+! assumes no huffman encoding
+{ B{ 0x0a 0x63 0x75 0x73 0x74 0x6f 0x6d 0x2d 0x6b 0x65 0x79 } }
+[ "custom-key" encode-string ] unit-test
+
+
+! single header encoding check, mirrors the tests from RFC 7541, Appendix C.2
+{ t t { "custom-key" "custom-header" } }
+[ hpack-context new { "custom-key" "custom-header" } encode-field 
+  hpack-context new swap 0 decode-field 
+  [ [ = ] [ swap length = ] 2bi* ] dip ! check contexts are the same and the entire block used for decoding 
+] unit-test
+
+{ t t { ":path" "/sample/path" } }
+[ hpack-context new { ":path" "/sample/path" } encode-field 
+  hpack-context new swap 0 decode-field 
+  [ [ = ] [ swap length = ] 2bi* ] dip ! check contexts are the same and the entire block used for decoding 
+] unit-test
+
+{ t t { "password" "secret" } }
+[ hpack-context new { "password" "secret" } encode-field 
+  hpack-context new swap 0 decode-field 
+  [ [ = ] [ swap length = ] 2bi* ] dip ! check contexts are the same and the entire block used for decoding 
+] unit-test
+
+{ t t { ":method" "GET" } }
+[ hpack-context new { ":method" "GET" } encode-field 
+  hpack-context new swap 0 decode-field 
+  [ [ = ] [ swap length = ] 2bi* ] dip ! check contexts are the same and the entire block used for decoding 
+] unit-test
+
+
+! many header encoding check, using same values from RFC7541 Appendix C.3 and C.5
+{
+    { { ":method" "GET" } { ":scheme" "http" }
+        { ":path" "/" } { ":authority" "www.example.com" } }
+    { { ":method" "GET" } { ":scheme" "http" }
+        { ":path" "/" } { ":authority" "www.example.com" } 
+        { "cache-control" "no-cache" } }
+    { { ":method" "GET" } { ":scheme" "https" }
+        { ":path" "/index.html" } { ":authority" "www.example.com" } 
+        { "custom-key" "custom-value" } }
+    t
+}
+[ hpack-context new c31h c32h c33h [ hpack-encode swap ] tri@ 
+  [ [ hpack-context new ] 3dip [ hpack-decode swap ] tri@ ] dip
+  = ! check that the encode and decode contexts are identical
+] unit-test
+
+{
+    {
+        { ":status" "302" }
+        { "cache-control" "private" }
+        { "date" "Mon, 21 Oct 2013 20:13:21 GMT" }
+        { "location" "https://www.example.com" }
+    }
+    {
+        { ":status" "307" }
+        { "cache-control" "private" }
+        { "date" "Mon, 21 Oct 2013 20:13:21 GMT" }
+        { "location" "https://www.example.com" }
+    }
+    {
+        { ":status" "200" }
+        { "cache-control" "private" }
+        { "date" "Mon, 21 Oct 2013 20:13:22 GMT" }
+        { "location" "https://www.example.com" }
+        { "content-encoding" "gzip" }
+        { "set-cookie" "foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1" }
+    }
+    t
+}
+[ hpack-context new c51h c52h c53h [ hpack-encode swap ] tri@ 
+  [ [ hpack-context new ] 3dip [ hpack-decode swap ] tri@ ] dip
+  = ! check that the encode and decode contexts are identical
+] unit-test
 
