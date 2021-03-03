@@ -5,7 +5,9 @@ IN: math.intervals.predicates
 ERROR: invalid-interval-definition stack ;
 
 <PRIVATE
+
 PREDICATE: empty-interval-class < word empty-interval eq? ;
+
 UNION: valid-interval interval full-interval empty-interval-class ;
 
 : evaluate-interval ( quot -- interval )
@@ -16,6 +18,7 @@ UNION: valid-interval interval full-interval empty-interval-class ;
 
 : interval>predicate ( interval -- quot )
     [ interval-contains? ] curry ;
+
 PRIVATE>
 
 : define-interval-predicate-class ( class superclass interval -- )
