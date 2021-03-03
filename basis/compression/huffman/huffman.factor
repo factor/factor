@@ -93,7 +93,7 @@ SYMBOL: node-heap
 
 ! Throws sequence is immutable error
 : generate-codes-broken ( lit-seq -- code-dict )
-   { {  H{ } broken leaf-table } { <min-heap> node-heap } } [ build-tree heap-pop swap (generate-codes) nip ] with-variables ;
+   { {  H{ } clone leaf-table } { <min-heap> node-heap } } [ build-tree heap-pop swap (generate-codes) nip ] with-variables ;
 
 :: canonical-order ( b1 b2  -- <=> )
     {
