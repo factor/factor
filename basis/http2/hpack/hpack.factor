@@ -130,7 +130,7 @@ CONSTANT: static-table {
     [ drop bitor 1byte-array ]
     [ swap over [ bitor 1byte-array >byte-vector ] [ - ] 2bi* 
       [ dup 128 >= ] [ [ 128 mod 128 + suffix ] [ 128 /i ] bi ]
-      while suffix
+      while suffix >byte-array
     ] if ;
 
 ! encodes a string without huffman encoding.
