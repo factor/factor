@@ -140,7 +140,7 @@ CONSTANT: static-table {
     ;
 
 ! headers will be a list of tuples
-:: encode-field ( encode-context headers -- updated-context block new-index field/f )
+:: encode-field ( encode-context headers -- updated-context block )
         ! first search if the header is in the header table
         encode-context name search-table
         ! TODO if not encode it as a literal and then add it to table 
