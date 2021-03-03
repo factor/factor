@@ -122,7 +122,6 @@ CONSTANT: static-table {
     [ static-table length - swap dynamic-table>> nth ]
     if ;
 
-: search-table ( -- ) ;
 
 ! assumes the first-byte respects the prefix-length, such that
 ! the last prefix-length bits are all 0.
@@ -141,12 +140,11 @@ CONSTANT: static-table {
     ;
 
 ! headers will be a list of tuples
-:: encode-field ( encode-context headers index -- updated-context block new-index field/f )
-    { }
+:: encode-field ( encode-context headers -- updated-context block new-index field/f )
         ! first search if the header is in the header table
-
+        encode-context name search-table
         ! TODO if not encode it as a literal and then add it to table 
-
+        [  ]
         ! TODO if in table, if perfect match, use it, else, use indexed literal
         ;   
 
