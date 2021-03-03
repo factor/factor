@@ -1,11 +1,10 @@
 ! Copyright (C) 2009 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs bit-arrays bitstreams fry
-hashtables heaps io kernel locals math math.order math.parser
-math.ranges multiline namespaces sequences ;
+USING: accessors arrays assocs bit-arrays bitstreams combinators
+fry hashtables heaps io kernel locals math math.order
+math.parser math.ranges multiline namespaces sequences vectors ;
 QUALIFIED-WITH: bitstreams bs
 IN: compression.huffman
-
 
 
 <PRIVATE
@@ -59,15 +58,18 @@ TUPLE: huffman-tree
 : <huffman-internal> ( left right -- huffman-tree )
     huffman-tree new swap >>left swap >>right ;
 
+: leaf? ( huff-tree -- ? )
+    [ left>> not ] [ right>> not ] bi and ;
+
 SYMBOL: leaf-table
 SYMBOL: node-heap
 
 
 : gen-leaves ( lit-seq -- leaves )
-     [ huffman-tree new swap >>code  ] map ;
+    [ huffman-tree new swap >>code ] map ;
 
 : build-leaf-table ( leaves --  )
- dup empty? [ drop ] [ dup first leaf-table get inc-at rest build-leaf-table ] if ;
+    dup empty? [ drop ] [ dup first leaf-table get inc-at rest build-leaf-table ] if ;
  
 : insert-leaves ( -- ) leaf-table get unzip swap zip node-heap get heap-push-all  ;
 
@@ -75,8 +77,46 @@ SYMBOL: node-heap
     node-heap get heap-pop node-heap get heap-pop swap [ + ] dip pick <huffman-internal> swap node-heap get heap-push drop ;
 
 : build-tree ( lit-seq -- heap )
-    { { H{ } leaf-table } { <min-heap> node-heap } } [ gen-leaves build-leaf-table insert-leaves [ node-heap get heap-size 1 > ] [ combine-two ] while node-heap get ] 
-   with-variables  ;
+    gen-leaves build-leaf-table insert-leaves [ node-heap get heap-size 1 > ] [ combine-two ] while node-heap get ; 
+
+! Walks down a huffman tree and outputs a dictionary of codes 
+: (generate-codes) ( huff-tree -- code-dict ) 
+    dup leaf? [ code>> ?{ } swap  H{ } clone ?set-at ] 
+              [ 
+                [ left>> (generate-codes) [ ?{ f } prepend ] assoc-map ] 
+                [ right>> (generate-codes) [ ?{ t } prepend ] assoc-map ] bi assoc-union! 
+              ] if ;
+
+! Works, but pollutes namespace
+: generate-codes ( lit-seq -- code-dict )
+  H{ } clone leaf-table set <min-heap> node-heap set  build-tree heap-pop swap (generate-codes) nip ;
+
+! Throws sequence is immutable error
+: generate-codes-broken ( lit-seq -- code-dict )
+   { {  H{ } broken leaf-table } { <min-heap> node-heap } } [ build-tree heap-pop swap (generate-codes) nip ] with-variables ;
+
+:: canonical-order ( b1 b2  -- <=> )
+    {
+      { [ b1 length  b2 length <  ] [ +lt+ ] }
+      { [ b2 length  b1 length  <  ] [ +gt+ ] }
+      { [ b1 reverse bit-array>integer b2 reverse bit-array>integer < ] [ +lt+ ] }
+      { [ b2 reverse bit-array>integer b1 reverse bit-array>integer < ] [ +gt+ ] }
+      [ +eq+ ]
+    } cond ;
+
+
+: get-next-code ( code current -- next )
+    reverse bit-array>integer 1 + integer>bit-array reverse dup length pick length swap - [ f ] replicate append nip ;
+
+
+: canonize-codes ( current codes  -- codes )
+    dup length 1 = [ swap f ?push nip ] [ 2dup first swap get-next-code swap 1 tail canonize-codes ?push ] if ;
+
+: generate-canonical-codes ( lit-seq -- ncode-dict )
+    generate-codes >alist [ second canonical-order ] sort values ?{ f } swap canonize-codes  ;
+
+
+
 
 PRIVATE>
 
