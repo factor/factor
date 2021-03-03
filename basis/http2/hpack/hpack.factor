@@ -226,15 +226,7 @@ PRIVATE>
 ! headers is a sequence of tuples represented the unencoded headers
 ! 
 : hpack-encode ( encode-context headers -- updated-context block ) 
-    [let V{ } :> block!
-    0
-    [ dup block length < ]
-    ! while the index is less than the length
-    [ encode-field [ block swap suffix block! ] 
-                   [ block empty? [ ] unless ] if* ]
-    while
-    2drop block
-    ]
+    [ encode-field ] map concat
     ! convert block sequence into a bytestring for sending over http
     >byte-array
 ;
