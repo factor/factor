@@ -149,11 +149,10 @@ tools.test urls ;
     [ 1array swap '[ _ >idna ] unit-test ] 2bi
 ] assoc-each
 
-{ IRL" http://例子.卷筒纸" } [ URL" http://xn--fsqu00a.xn--3lr804guic/" >irl ] unit-test
-{ URL" http://xn--fsqu00a.xn--3lr804guic/" } [ IRL" http://例子.卷筒纸" >url ] unit-test
-
+{ URL" http://例子.卷筒纸" } [ URL" http://xn--fsqu00a.xn--3lr804guic/" >idna ] unit-test
+{ URL" http://xn--fsqu00a.xn--3lr804guic/" } [ URL" http://例子.卷筒纸" idna> ] unit-test
 {
-    T{ irl
+    T{ url
         { protocol "http" }
         { username f }
         { password f }
