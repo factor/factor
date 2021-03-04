@@ -10,8 +10,10 @@ FROM: io => read ;
 IN: linux.input-events
 
 : input-events-assoc ( path -- assoc )
-    qualified-directory-files
-    [ read-link normalize-path ] map-zip ;
+    dup '[
+        _ qualified-directory-files
+        [ read-link normalize-path ] map-zip
+    ] with-directory ;
 
 : input-events-by-id-assoc ( -- assoc )
     "/dev/input/by-id/" input-events-assoc ;
