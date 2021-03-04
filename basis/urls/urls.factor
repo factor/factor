@@ -73,7 +73,7 @@ url      = (protocol ":"~)?
 PRIVATE>
 
 M: string >url
-    [ <url> ] dip utf8 encode parse-url 5 firstn {
+    [ <url> ] dip parse-url 5 firstn {
         [ >lower >>protocol ]
         [
             [
