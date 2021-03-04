@@ -112,13 +112,16 @@ CONSTANT: static-table {
     [ dup dynamic-table>> ] dip shrink-dynamic-table >>dynamic-table
     ;
 
-: get-header-from-table ( decode-context table-index -- field )
-    ! check bounds: i < len(static-table++decode-context) and i > 0
-    dup pick dynamic-table>> length static-table length + < 
-    over 0 > 
+! check bounds: i < len(static-table++decode-context) and i > 0
+: check-index-bounds ( decode-context index -- )
+    [ nip 0 > ] [ swap dynamic-table>> length static-table length + < ] 2bi
     and [ "invalid index given" hpack-decode-error ] unless ! if not valid throw error
+    ;
+
+: get-header-from-table ( decode-context table-index -- field )
+    [ check-index-bounds ] 2keep
     dup static-table length <  ! check if in static table
-    [ nip static-table nth ]
+    [ static-table nth nip ]
     [ static-table length - swap dynamic-table>> nth ]
     if ;
 
