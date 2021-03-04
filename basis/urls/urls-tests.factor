@@ -367,7 +367,7 @@ urls [
 ! Scheme characters are
 ! case-insensitive. https://tools.ietf.org/html/rfc3986#section-3.1
 { URL" http://www.google.com/" } [
-    URL" http://www.google.com/"
+    URL" HTTP://www.google.com/"
 ] unit-test
 
 { URL" https://host:1234/path" } [ URL" https://host:1234/path" redacted-url ] unit-test
