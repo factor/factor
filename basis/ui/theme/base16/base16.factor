@@ -1,21 +1,20 @@
 ! Copyright (C) 2021 Kevin Cope.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel io.encodings.utf8 io.files colors colors.constants.private colors.constants 
-       ui.theme namespaces assocs sequences arrays ;
+USING: arrays assocs colors.constants colors.constants.private
+io.encodings.utf8 io.files kernel namespaces sequences ui.theme ;
 IN: ui.theme.base16
 
 SYMBOL: base16-theme-name
-"greenscreen" base16-theme-name set
+base16-theme-name [ "greenscreen" ] initialize
 
 MEMO: base16colors ( name -- assoc )
-    "resource:basis/ui/theme/base16/base16-" swap ".txt" 3append
+    "vocab:ui/theme/base16/base16-" swap ".txt" 3append
     utf8 file-lines parse-colors ;
 
 : named-base16 ( name -- color )
     dup base16-theme-name get base16colors at [ ] [ no-such-color ] ?if ;
 
 SINGLETON: base16-theme
-theme [ base16-theme ] initialize
 
 M: base16-theme toolbar-background "base00" named-base16 ;
 M: base16-theme toolbar-button-pressed-background "base01" named-base16  ;
