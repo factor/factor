@@ -104,20 +104,22 @@ UNION: fixed-length array byte-array string ;
         [ drop 1/0. ]
     } case ;
 
+! : maybe-declared-interval ( classoid -- int )
+!     dup word?
+!     [ "declared-interval" word-prop full-interval or ]
+!     [ drop full-interval ] if ;
+
 GENERIC: declared-class-interval ( classoid -- int/f )
-
 M: object declared-class-interval drop full-interval ;
-
-M: class declared-class-interval
-    "declared-interval" word-prop full-interval or ;
-
+M: class declared-class-interval "declared-interval" word-prop full-interval or ;
 M: union-class declared-class-interval
-    class-members [ empty-interval ] [
+    class-members [ empty-interval ]
+    [
         [ declared-class-interval ] [ interval-union ] map-reduce
     ] if-empty ;
-
 M: intersection-class declared-class-interval
-    class-participants [ full-interval ] [
+    class-participants [ full-interval ]
+    [
         [ declared-class-interval ] [ interval-intersect ] map-reduce
     ] if-empty ;
 
