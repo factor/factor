@@ -196,8 +196,17 @@ SYMBOL: total
     [ dupd maximal-element [ over remove-nth! drop ] dip ] curry
     produce nip ; inline
 
+:: specs>seq ( specs -- seq )
+    specs dup [ array? ] find [
+        [ over [ length ] keep ] ! hook specs
+        [ 0 swap rot ]           ! stack specs
+        bi [ subseq ] bi@ reverse append
+    ] [
+        drop reverse
+    ] if ; inline
+
 : classes< ( seq1 seq2 -- lt/eq/gt )
-    [
+    [ specs>seq ] bi@ [
         {
             { [ 2dup eq? ] [ +eq+ ] }
             { [ 2dup [ class<= ] [ swap class<= ] 2bi and ] [ +eq+ ] }
@@ -343,7 +352,6 @@ M:: multi-generic g:make-generic ( generic -- )
             define-single-default-method
             generic make-single-generic
         ] [
-            ! multi-dispach
             drop
             generic {
                 [ "cached-multi" word-prop ]
@@ -351,16 +359,18 @@ M:: multi-generic g:make-generic ( generic -- )
                 [ "inline" word-prop not ]
                 [ "partial-inline" word-prop not ]
             } 1&& [
+                ! covariant-dispatch
                 covariant-tuple-dispatch new
                 generic swap "dispatch-type" set-word-prop
                 ! generic "multi-methods" word-prop [
-                generic methods sort-methods [
+                generic methods sort-methods reverse [
                     [ [ bootstrap-word ] map <covariant-tuple> ] dip
                 ] assoc-map generic "dispatch-type" word-prop methods<<
                 ! generic sort-generic-methods
                 generic dup "dispatch-type" word-prop define-single-default-method
                 generic make-single-generic
             ] [
+                ! multi-dispatch
                 generic <multi-dispatch> "dispatch-type" set-word-prop
                 generic [
                     [ methods prepare-methods % sort-methods ] keep

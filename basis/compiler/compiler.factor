@@ -152,7 +152,7 @@ M: mg:predicate-engine-word combinator? "owner-generic" word-prop combinator? ;
     '[
         _ {
             [ start-compilation ]
-            [ detect-generic-errors ]
+!            [ detect-generic-errors ]
             [ frontend ]
             [ backend ]
             [ finish-compilation ]
