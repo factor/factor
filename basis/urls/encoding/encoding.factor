@@ -75,7 +75,7 @@ PRIVATE>
         2dup nth dup CHAR: % = [
             drop 2dup url-decode-hex [ 3 + ] dip
         ] [
-            , [ 1 + ] dip
+            1string utf8 encode % [ 1 + ] dip
         ] if url-decode-iter
     ] if ;
 
