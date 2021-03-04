@@ -145,6 +145,14 @@ CONSTANT: urls {
         }
         "http://:pass@example.org/"
     }
+    {
+        T{ url
+            { protocol "http" }
+            { host "example.org" }
+            { path "/%2F/" }
+        }
+        "http://example.org/%2F/"
+    }
 }
 
 urls [

@@ -44,12 +44,15 @@ M: url >url ;
 
 <PRIVATE
 
+: parse-path ( string -- path )
+    "/" split [ url-decode "/" "%2F" replace ] map "/" join ;
+
 EBNF: parse-url [=[
 
 protocol = [a-zA-Z0-9.+-]+ => [[ url-decode ]]
 username = [^/:@#?]*       => [[ url-decode ]]
 password = [^/:@#?]*       => [[ url-decode ]]
-path     = [^#?]+          => [[ url-decode ]]
+path     = [^#?]+          => [[ parse-path ]]
 query    = [^#]+           => [[ query>assoc ]]
 anchor   = .+              => [[ url-decode ]]
 hostname = [^/#?:]+        => [[ url-decode ]]
@@ -127,12 +130,17 @@ M: pathname >url string>> >url ;
 : unparse-authority ( url -- )
     dup host>> [ "//" % unparse-host-part ] [ drop ] if ;
 
+: unparse-path ( url -- )
+    path>> "/" split [
+        "%2F" "/" replace url-encode "/" "%2F" replace
+    ] map "/" join % ;
+
 M: url present
     [
         {
             [ unparse-protocol ]
             [ unparse-authority ]
-            [ path>> url-encode % ]
+            [ unparse-path ]
             [ query>> dup assoc-empty? [ drop ] [ "?" % assoc>query % ] if ]
             [ anchor>> [ "#" % present url-encode % ] when* ]
         } cleave
