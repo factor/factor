@@ -14,7 +14,7 @@ ERROR: hpack-decode-error error-msg ;
 
 ! The static table for hpack compression/decompression
 CONSTANT: static-table {
-    { } ! empty so indexing works out properly
+    { f f } ! allows indexing to work out properly
     { ":authority" f }
     { ":method" "GET" }
     { ":method" "POST" }
@@ -194,43 +194,32 @@ CONSTANT: static-table {
     [ decode-huffman-string ] [ decode-raw-string ] if ; 
 
 : decode-literal-header ( decode-context block index index-length -- decode-context block new-index field )
-    decode-integer dup 0 = 
-    [ ! string name
-      drop decode-string
-      [ decode-string ] dip
-      swap 2array ]
-    [ ! indexed name
-      pickd get-header-from-table
-      [ decode-string ] dip
-      first swap 2array ]
-    if ;
+    decode-integer
+    ! string name if 0, else indexed
+    [ decode-string ] [ pickd get-header-from-table first ] if-zero
+    [ decode-string ] dip swap 2array
+    ;
 
 ! block will be a byte array
 :: decode-field ( decode-context block index -- updated-context block new-index field/f )
+    decode-context block index
     {
-        ! the action quote will leave the new context, the
-        ! block, the consumed/new-index, and the field decoded or f
-        
         ! indexed header field
-        { [ index block nth 7 bit? ] [ decode-context
-                block index 7 decode-integer 
+        { [ index block nth 7 bit? ] [ 7 decode-integer 
                 decode-context swap get-header-from-table ] } 
         ! Literal header field with incremental indexing
-        { [ index block nth 6 bit? ] [ decode-context block
-                index 6 decode-literal-header 
+        { [ index block nth 6 bit? ] [ 6 decode-literal-header 
                 [ 2nip add-header-to-table ] 3keep ] } 
         ! dynamic table size update
-        { [ index block nth 5 bit? ] [ decode-context block
-                index 5 decode-integer -rot f
+        { [ index block nth 5 bit? ] [ 5 decode-integer -rot f
                 [ set-dynamic-table-size ] 3dip ] }
         ! literal header field without indexing
-        [ decode-context block index 4 decode-literal-header ]
+        [ 4 decode-literal-header ]
     } cond ;
 
 
 PRIVATE>
 ! headers is a sequence of tuples represented the unencoded headers
-! 
 : hpack-encode ( encode-context headers -- updated-context block ) 
     [ encode-field ] map concat
     ! convert block sequence into a bytestring for sending over http
@@ -243,17 +232,15 @@ PRIVATE>
 : hpack-decode ( decode-context block -- updated-context decoded )
     [let V{ } clone :> decoded-list!
     0 ! index in the block
-    ! check that the block is longer than the index
-    [ 2dup swap length < ]
+    [ 2dup swap length < ] ! check that the block is longer than the index
     ! call decode-field and add the (possibly) decoded field to the list
-    ! (if the list has stuff, then we have to add...)
     [ decode-field [ decoded-list swap suffix decoded-list! ]
-                   [ decoded-list empty? [ "Table size update not at start of header block"
-                   hpack-decode-error ] unless ] if* ]
+                   [ decoded-list [ "Table size update not at start of header block"
+                   hpack-decode-error ] unless-empty ] if* ]
     ! if the table was not empty, and we didn't get a header, throw an error.
     while
     2drop decoded-list >array
-    ! double check the table size
+    ! double check the header list size?
     ]
     ;
 
