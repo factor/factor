@@ -1,8 +1,7 @@
 ! Copyright (C) 2021 Kevin Cope.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel io.encodings.utf8 io.files colors colors.constants.private
-       assocs colors.constants colors.hex namespaces ui.theme arrays
-       io io.directories io.pathnames splitting sequences ;
+USING: kernel io.encodings.utf8 io.files colors colors.constants.private colors.constants 
+       ui.theme namespaces assocs sequences arrays ;
 IN: ui.theme.base16
 
 SYMBOL: base16-theme-name
