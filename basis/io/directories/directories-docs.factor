@@ -164,8 +164,6 @@ ARTICLE: "io.directories.listing" "Directory listing"
     with-directory-files
     qualified-directory-entries
     qualified-directory-files
-    with-qualified-directory-files
-    with-qualified-directory-entries
 } ;
 
 ARTICLE: "io.directories.create" "Creating directories"

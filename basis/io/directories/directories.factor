@@ -68,12 +68,6 @@ HOOK: (directory-entries) os ( path -- seq )
 : qualified-directory-files ( path -- seq )
     dup directory-files [ append-path ] with map! ;
 
-: with-qualified-directory-files ( path quot -- )
-    '[ "" qualified-directory-files @ ] with-directory ; inline
-
-: with-qualified-directory-entries ( path quot -- )
-    '[ "" qualified-directory-entries @ ] with-directory ; inline
-
 SYMBOL: traversal-method
 
 SYMBOLS: +depth-first+ +breadth-first+ ;
@@ -189,12 +183,10 @@ ERROR: sequence-expected obj ;
     0 swap [ link-size/0 + ] each-file ;
 
 : directory-usage ( path -- assoc )
-    [
-        [
-            [ name>> dup ] [ directory? ] bi
-            [ directory-size ] [ link-size/0 ] if
-        ] { } map>assoc
-    ] with-qualified-directory-entries sort-values ;
+    qualified-directory-entries [
+        [ name>> dup ] [ directory? ] bi
+        [ directory-size ] [ link-size/0 ] if
+    ] { } map>assoc sort-values ;
 
 : find-files-by-extensions ( path extensions -- seq )
     [ >lower ] map
