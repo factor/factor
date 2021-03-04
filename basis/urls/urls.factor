@@ -62,8 +62,8 @@ host     = (ipv6 | hostname) (":"~ port?)?
 url      = (protocol ":"~)?
            ("//"~ auth? host?)?
            path?
-           ("?"~ query)?
-           ("#"~ anchor)?
+           ("?"~ query?)?
+           ("#"~ anchor?)?
 
 ]=]
 
