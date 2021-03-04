@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors ascii assocs combinators
-combinators.short-circuit fry io.pathnames io.sockets
-io.sockets.secure kernel lexer linked-assocs make math
-math.parser multiline namespaces peg.ebnf present sequences
-sequences.generalizations splitting strings strings.parser
-urls.encoding vocabs.loader ;
+combinators.short-circuit fry io.encodings.string
+io.encodings.utf8 io.pathnames io.sockets io.sockets.secure
+kernel lexer linked-assocs make math math.parser multiline
+namespaces peg.ebnf present sequences sequences.generalizations
+splitting strings strings.parser urls.encoding vocabs.loader ;
 
 IN: urls
 
@@ -73,7 +73,7 @@ url      = (protocol ":"~)?
 PRIVATE>
 
 M: string >url
-    [ <url> ] dip parse-url 5 firstn {
+    [ <url> ] dip utf8 encode parse-url 5 firstn {
         [ >lower >>protocol ]
         [
             [
@@ -100,7 +100,7 @@ M: pathname >url string>> >url ;
 
 : unparse-username-password ( url -- )
     dup username>> dup [
-        % password>> [ ":" % % ] when* "@" %
+        url-encode % password>> [ ":" % url-encode % ] when* "@" %
     ] [ 2drop ] if ;
 
 : url-port ( url -- port/f )

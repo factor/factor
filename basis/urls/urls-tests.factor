@@ -164,6 +164,18 @@ urls [
 ] assoc-each
 
 { T{ url
+    { protocol "http" }
+    { username "ш" }
+    { password "ш" }
+    { host "ш.com" }
+    { port 1234 }
+    { path "/ш" }
+    { query LH{ { "ш" "ш" } } }
+    { anchor "ш" }
+  } }
+[ "http://ш:ш@ш.com:1234/ш?ш=ш#ш" >url ] unit-test
+
+{ T{ url
     { protocol "https" }
     { host "www.google.com" }
     { path "/" }
