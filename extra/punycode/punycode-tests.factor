@@ -149,5 +149,5 @@ tools.test urls ;
     [ 1array swap '[ _ >idna ] unit-test ] 2bi
 ] assoc-each
 
-{ URL" http://例子.卷筒纸" } [ URL" http://xn--fsqu00a.xn--3lr804guic/" >idna ] unit-test
-{ URL" http://xn--fsqu00a.xn--3lr804guic/" } [ URL" http://例子.卷筒纸" idna> ] unit-test
+{ URL" http://例子.卷筒纸" } [ URL" http://xn--fsqu00a.xn--3lr804guic/" idna> ] unit-test
+{ URL" http://xn--fsqu00a.xn--3lr804guic/" } [ URL" http://例子.卷筒纸" >idna ] unit-test
