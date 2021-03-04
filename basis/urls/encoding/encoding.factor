@@ -65,7 +65,7 @@ PRIVATE>
     2dup length 2 - >= [
         2drop
     ] [
-        [ 1 + dup 2 + ] dip subseq hex> [ , ] when*
+        [ 1 + dup 2 + ] dip <slice> hex> [ , ] when*
     ] if ;
 
 : url-decode-iter ( index str -- )
@@ -79,6 +79,13 @@ PRIVATE>
         ] if url-decode-iter
     ] if ;
 
+PRIVATE>
+
+: url-decode ( str -- decoded )
+    [ 0 swap url-decode-iter ] "" make utf8 decode ;
+
+<PRIVATE
+
 : add-query-param ( value key assoc -- )
     [
         {
@@ -90,8 +97,36 @@ PRIVATE>
 
 PRIVATE>
 
+: query-decode ( str -- decoded )
+    "+" split "%20" join url-decode ;
+
+: query>assoc ( query -- assoc )
+    dup [
+        "&;" split <linked-hash> [
+            [
+                [ "=" split1 [ dup [ query-decode ] when ] bi@ swap ] dip
+                add-query-param
+            ] curry each
+        ] keep
+    ] when ;
+
+: assoc>query ( assoc -- str )
+    [
+        [
+            [ url-encode-full ] dip [
+                dup array? [ 1array ] unless
+                [ url-encode-full "=" glue , ] with each
+            ] [ , ] if*
+        ] assoc-each
+    ] { } make "&" join ;
+
 : escape-uri-component-char? ( ch -- ? )
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.!~*'()" member? not ; inline
+    {
+        [ letter? ]
+        [ LETTER? ]
+        [ digit? ]
+        [ "-_.!~*'()" member? ]
+    } 1|| not ; foldable
 
 : encode-uri-component ( str -- str' )
     [
@@ -99,7 +134,12 @@ PRIVATE>
     ] "" make ;
 
 : escape-uri-char? ( ch -- ? )
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789;,/?:@&=+$-_.!~*'()#" member? not ; inline
+    {
+        [ letter? ]
+        [ LETTER? ]
+        [ digit? ]
+        [ ";,/?:@&=+$-_.!~*'()#" member? ]
+    } 1|| not ; foldable
 
 : encode-uri ( str -- str' )
     [
@@ -113,7 +153,7 @@ PRIVATE>
         2dup length 2 - >= [
             2drop
         ] [
-            [ 1 + dup 2 + ] dip subseq
+            [ 1 + dup 2 + ] dip <slice>
             dup hex> dup @ [ nip , ] [ CHAR: % , drop % ] if
         ] if
     ] call ; inline
@@ -138,29 +178,3 @@ PRIVATE>
 
 : decode-uri ( str -- decoded )
     [ 0 swap [ escape-uri-char? ] decode-uri-iter ] "" make utf8 decode ;
-
-: url-decode ( str -- decoded )
-    [ 0 swap url-decode-iter ] "" make utf8 decode ;
-
-: query-decode ( str -- decoded )
-    "+" split "%20" join url-decode ;
-
-: query>assoc ( query -- assoc )
-    dup [
-        "&;" split <linked-hash> [
-            [
-                [ "=" split1 [ dup [ query-decode ] when ] bi@ swap ] dip
-                add-query-param
-            ] curry each
-        ] keep
-    ] when ;
-
-: assoc>query ( assoc -- str )
-    [
-        [
-            [ url-encode-full ] dip [
-                dup array? [ 1array ] unless
-                [ url-encode-full "=" glue , ] with each
-            ] [ , ] if*
-        ] assoc-each
-    ] { } make "&" join ;
