@@ -175,6 +175,19 @@ urls [
   } }
 [ "http://ш:ш@ш.com:1234/ш?ш=ш#ш" >url ] unit-test
 
+{
+    T{ url
+        { protocol "http" }
+        { username f }
+        { password f }
+        { host "März.com" }
+        { port f }
+        { path "/päth" }
+        { query LH{ { "query" "Dürst" } } }
+        { anchor "☃" }
+    }
+} [ "http://März.com/päth?query=Dürst#☃" >url ] unit-test
+
 { T{ url
     { protocol "https" }
     { host "www.google.com" }
