@@ -60,7 +60,6 @@ M: class reset-class
         "members"
         "participants"
         "predicate"
-        "declared-interval"
     } remove-word-props ;
 
 M: word reset-class drop ;
