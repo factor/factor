@@ -166,7 +166,7 @@ PRIVATE>
             2dup nth dup CHAR: % = [
                 drop 2dup _ decode-uri-hex [ 3 + ] dip
             ] [
-                , [ 1 + ] dip
+                1string utf8 encode % [ 1 + ] dip
             ] if _ decode-uri-iter
         ] if
     ] call ; inline recursive
