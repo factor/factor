@@ -15,15 +15,15 @@ HELP: link-info
 
 HELP: directory?
 { $values { "path/info" { $or "a pathname string" file-info-tuple } } { "?" boolean } }
-{ $description "Tests if " { $snippet "file-info" } " is a directory." } ;
+{ $description "Tests if " { $snippet "path/info" } " is a directory." } ;
 
 HELP: regular-file?
 { $values { "path/info" { $or "a pathname string" file-info-tuple } } { "?" boolean } }
-{ $description "Tests if " { $snippet "file-info" } " is a normal file." } ;
+{ $description "Tests if " { $snippet "path/info" } " is a normal file." } ;
 
 HELP: symbolic-link?
 { $values { "path/info" { $or "a pathname string" file-info-tuple } } { "?" boolean } }
-{ $description "Tests if " { $snippet "file-info" } " is a symbolic link." } ;
+{ $description "Tests if " { $snippet "path/info" } " is a symbolic link." } ;
 
 HELP: file-systems
 { $values { "array" array } }
