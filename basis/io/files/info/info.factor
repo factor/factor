@@ -11,16 +11,31 @@ accessed ;
 HOOK: file-info os ( path -- info )
 
 : ?file-info ( path -- info/f )
-    dup exists? [ file-info ] [ drop f ] if ; inline
+    dup exists? [ file-info ] [ drop f ] if ;
 
 HOOK: link-info os ( path -- info )
 
-: directory? ( file-info -- ? ) type>> +directory+ = ;
-: regular-file? ( file-info -- ? ) type>> +regular-file+ = ;
-: symbolic-link? ( file-info -- ? ) type>> +symbolic-link+ = ;
+: ?link-info ( path -- info/f )
+    dup exists? [ link-info ] [ drop f ] if ;
 
-: sparse-file? ( file-info -- ? )
-    [ size-on-disk>> ] [ size>> ] bi < ;
+<PRIVATE
+
+: >file-info ( path/info -- info )
+    dup file-info-tuple? [ file-info ] unless ; inline
+
+PRIVATE>
+
+: directory? ( path/info -- ? )
+    >file-info type>> +directory+ = ;
+
+: regular-file? ( path/info -- ? )
+    >file-info type>> +regular-file+ = ;
+
+: symbolic-link? ( path/info -- ? )
+    >file-info type>> +symbolic-link+ = ;
+
+: sparse-file? ( path/info -- ? )
+    >file-info [ size-on-disk>> ] [ size>> ] bi < ;
 
 ! File systems
 HOOK: file-systems os ( -- array )
