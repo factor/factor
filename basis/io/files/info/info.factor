@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators io.files io.files.types
-io.pathnames kernel math system vocabs ;
+USING: accessors assocs combinators combinators.short-circuit
+io.files io.files.types io.pathnames kernel math strings system
+vocabs ;
 IN: io.files.info
 
 ! File info
@@ -21,7 +22,7 @@ HOOK: link-info os ( path -- info )
 <PRIVATE
 
 : >file-info ( path/info -- info )
-    dup file-info-tuple? [ file-info ] unless ; inline
+    dup { [ string? ] [ pathname? ] } 1|| [ file-info ] when ;
 
 PRIVATE>
 
