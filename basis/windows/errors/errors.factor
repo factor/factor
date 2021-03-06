@@ -686,6 +686,7 @@ CONSTANT: ERROR_INC_BACKUP                         4003
 CONSTANT: ERROR_FULL_BACKUP                        4004
 CONSTANT: ERROR_REC_NON_EXISTENT                   4005
 CONSTANT: ERROR_RPL_NOT_ALLOWED                    4006
+CONSTANT: PEERDIST_ERROR_CONTENTINFO_VERSION_UNSUPPORTED 4050
 CONSTANT: ERROR_NO_BROWSER_SERVERS_FOUND           6118
 
 CONSTANT: SUBLANG_NEUTRAL 0
@@ -731,6 +732,16 @@ ERROR: windows-error n string ;
 : win32-error>0 ( n -- ) 0 > [ win32-error ] when ;
 : win32-error<0 ( n -- ) 0 < [ win32-error ] when ;
 : win32-error<>0 ( n -- ) zero? [ win32-error ] unless ;
+
+: win32-allow-errors ( n allowed -- n )
+    GetLastError 2dup swap member? [
+        2drop
+    ] [
+        throw-windows-error
+    ] if ;
+
+: win32-error=0/f-allowed ( n allowed-seq -- n )
+    over { 0 f } member? [ win32-allow-errors ] [ drop ] if ;
 
 : check-invalid-handle ( handle -- handle )
     dup INVALID_HANDLE_VALUE = [ win32-error ] when ;
