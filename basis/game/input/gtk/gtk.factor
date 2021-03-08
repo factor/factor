@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax arrays
 assocs bit-arrays destructors game.input gdk.ffi
-io.encodings.binary io.files kernel linux-input-events
-linux-input-events.ffi math namespaces sequences
+io.encodings.binary io.files kernel linux.input-events
+linux.input-events.ffi math namespaces sequences
 sequences.extras system unix.ffi x11.xlib ;
 IN: game.input.gtk
 
