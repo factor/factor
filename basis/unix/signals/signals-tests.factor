@@ -17,7 +17,7 @@ test-sigusr1-handler SIGUSR1 add-signal-handler
 
     [ 1 ] [
         sigusr1-count get-global
-        SIGUSR1 raise drop
+        SIGUSR1 raise yield drop
         1.0 seconds sleep
         sigusr1-count get-global
         swap -
@@ -27,7 +27,7 @@ test-sigusr1-handler SIGUSR1 add-signal-handler
 
 { 0 } [
     sigusr1-count get-global
-    SIGUSR1 raise drop
+    SIGUSR1 raise yield drop
     1.0 seconds sleep
     sigusr1-count get-global swap -
 ] unit-test
