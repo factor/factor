@@ -44,6 +44,6 @@ PRIVATE>
     signal-handlers get-global push-at ;
 
 : remove-signal-handler ( handler sig -- )
-    signal-handlers get-global at [ remove! drop ] [ drop ] if* ;
+    signal-handlers get-global at [ remove-eq! ] when* drop ;
 
 [ dispatch-signal ] dispatch-signal-hook set-global
