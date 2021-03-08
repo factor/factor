@@ -25,10 +25,6 @@ M: integer signal-name 1 - signal-names ?nth ;
 : signal-name. ( n -- )
     signal-name [ " (" ")" surround write ] when* ;
 
-SYMBOL: dispatch-signal-hook
-
-dispatch-signal-hook [ [ drop ] ] initialize
-
 <PRIVATE
 
 SYMBOL: signal-handlers
@@ -45,5 +41,7 @@ PRIVATE>
 
 : remove-signal-handler ( handler sig -- )
     signal-handlers get-global at [ remove-eq! ] when* drop ;
+
+SYMBOL: dispatch-signal-hook
 
 [ dispatch-signal ] dispatch-signal-hook set-global
