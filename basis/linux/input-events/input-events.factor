@@ -4,10 +4,10 @@ USING: accessors alien alien.c-types alien.data alien.enums
 arrays ascii assocs combinators combinators.smart grouping
 hashtables io io.backend io.directories io.encodings.binary
 io.files io.files.links io.pathnames kernel
-linux-input-events.ffi math namespaces pack prettyprint
+linux.input-events.ffi math namespaces pack prettyprint
 sequences sequences.extras splitting unix.time ;
 FROM: io => read ;
-IN: linux-input-events
+IN: linux.input-events
 
 : input-events-assoc ( path -- assoc )
     dup '[

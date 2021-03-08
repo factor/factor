@@ -4,7 +4,7 @@ USING: alien alien.c-types alien.data alien.syntax byte-arrays
 classes.struct combinators continuations io.encodings.string
 io.encodings.utf8 kernel libc math math.vectors sequences
 splitting unix.ffi unix.types ;
-IN: linux-input-events.ffi
+IN: linux.input-events.ffi
 
 ! IOCTLs 0x00-0x7f
 STRUCT: input_id
