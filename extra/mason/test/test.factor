@@ -46,12 +46,6 @@ IN: mason.test
     [ load-all-errors-file utf8 [ load-failures. ] with-file-writer ]
     bi ;
 
-GENERIC: word-vocabulary ( word -- vocabulary )
-
-M: word word-vocabulary vocabulary>> ;
-
-M: method word-vocabulary "method-generic" word-prop word-vocabulary ;
-
 :: do-step ( errors summary-file details-file -- )
     errors
     [ error-type +linkage-error+ eq? ] reject
