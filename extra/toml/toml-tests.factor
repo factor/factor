@@ -120,3 +120,13 @@ hosts = [
     ]=] toml>
 ] unit-test
 
+{
+    H{
+        { "deps" H{
+            { "temp_targets" H{ { "case" 72.0 } } } }
+        }
+    }
+} [
+    "[deps]
+    temp_targets = { case = 72.0 }" toml>
+] unit-test
