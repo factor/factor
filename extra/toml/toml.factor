@@ -176,6 +176,8 @@ DEFER: value-parser
 
 DEFER: key-value-parser
 
+DEFER: update-toml
+
 : inline-table-parser ( -- parser )
     [
         "{" token hide ,
@@ -184,7 +186,9 @@ DEFER: key-value-parser
         whitespace "," token whitespace pack list-of ,
         whitespace hide ,
         "}" token hide ,
-    ] seq* [ first >hashtable ] action ;
+    ] seq* [
+        first [ length <hashtable> ] keep [ update-toml ] each
+    ] action ;
 
 : value-parser ( -- parser )
     [
