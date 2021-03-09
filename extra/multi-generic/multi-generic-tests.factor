@@ -210,7 +210,7 @@ MM: shmd-beats? ( thing2: paper | -- ? ) thing1 get rock? [ t ] [ f ] if ;
 
 
 ! multi-dispatch cached version
-MGENERIC: cached-md-beats? ( obj1 obj2 -- ? ) cached-multi inline
+MGENERIC: cached-md-beats? ( obj1 obj2 -- ? ) cached-multi ! inline
 
 MM:: cached-md-beats? ( obj1: paper obj2: scissors -- ?: boolean ) obj1 obj2 2drop t ;
 MM:: cached-md-beats? ( :scissors :rock -- ?: boolean ) t ;

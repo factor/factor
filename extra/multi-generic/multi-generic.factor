@@ -196,17 +196,8 @@ SYMBOL: total
     [ dupd maximal-element [ over remove-nth! drop ] dip ] curry
     produce nip ; inline
 
-:: specs>seq ( specs -- seq )
-    specs dup [ array? ] find [
-        [ over [ length ] keep ] ! hook specs
-        [ 0 swap rot ]           ! stack specs
-        bi [ subseq ] bi@ reverse append
-    ] [
-        drop reverse
-    ] if ; inline
-
 : classes< ( seq1 seq2 -- lt/eq/gt )
-    [ specs>seq ] bi@ [
+    [
         {
             { [ 2dup eq? ] [ +eq+ ] }
             { [ 2dup [ class<= ] [ swap class<= ] 2bi and ] [ +eq+ ] }
@@ -352,6 +343,7 @@ M:: multi-generic g:make-generic ( generic -- )
             define-single-default-method
             generic make-single-generic
         ] [
+            ! multi-dispach
             drop
             generic {
                 [ "cached-multi" word-prop ]
@@ -359,18 +351,18 @@ M:: multi-generic g:make-generic ( generic -- )
                 [ "inline" word-prop not ]
                 [ "partial-inline" word-prop not ]
             } 1&& [
-                ! covariant-dispatch
                 covariant-tuple-dispatch new
                 generic swap "dispatch-type" set-word-prop
-                ! generic "multi-methods" word-prop [
-                generic methods sort-methods reverse [
-                    [ [ bootstrap-word ] map <covariant-tuple> ] dip
-                ] assoc-map generic "dispatch-type" word-prop methods<<
-                ! generic sort-generic-methods
+                generic "multi-methods" word-prop [
+                    [
+                        [ bootstrap-word ] map <covariant-tuple> 
+                    ] dip
+                ] assoc-map
+                generic "dispatch-type" word-prop methods<<
+                generic sort-generic-methods
                 generic dup "dispatch-type" word-prop define-single-default-method
                 generic make-single-generic
             ] [
-                ! multi-dispatch
                 generic <multi-dispatch> "dispatch-type" set-word-prop
                 generic [
                     [ methods prepare-methods % sort-methods ] keep
@@ -379,6 +371,14 @@ M:: multi-generic g:make-generic ( generic -- )
             ] if
         ] if
     ] if
+    ! ! typed
+    ! generic stack-effect :> effect
+    ! effect [ in>> ] [ out>> ] bi [
+    !     f [ array? or ] reduce
+    ! ] bi@ or [
+    !     generic generic def>> effect define-typed
+    ! ] when
+
     generic methods dup empty? [ drop ] [
         values t [
             "multi-method-effect" word-prop
@@ -1417,14 +1417,9 @@ M: covariant-tuple dispatch-arity classes>> length ;
     n 0 >=
     [ n methods method-dispatch-classes
       [ dup n methods applicable-methods
-        ! dup length 1 >
-        ! [ n 1 - covariant-tuple-multi-methods ]
-        ! ! TODO check sorting
-        ! [ ?first method>> ] if
         n 1 - covariant-tuple-multi-methods
       ] map>alist ] [
         ! NOTE: This is where we rely on correct non-ambigutiy
-!         methods ?first method>>
         methods ?last [ method>> ] [ f ] if*
     ] if ;
 
@@ -1448,9 +1443,9 @@ M: covariant-tuple promote-dispatch-class
     ! [ [ promote-dispatch-class ] dip <method-dispatch> ] smart-with { } assoc>map ;
     [ swapd [ promote-dispatch-class ] dip <method-dispatch> ] with { } assoc>map ;
 
+
 :: methods>multi-methods ( arity assoc -- assoc )
     ! assoc [ [ arity swap promote-dispatch-class ] dip ] assoc-map
-
     arity assoc methods>dispatch
     [ f ]
     [ arity 1 -  covariant-tuple-multi-methods ] if-empty ;
@@ -1513,8 +1508,6 @@ PREDICATE: nested-dispatch-engine-word < predicate-engine-word
     [ engine quot call ] with-variables ; inline
 
 M: nested-dispatch-engine compile-engine
-!     [ flatten-methods convert-tuple-methods ] change-methods
-!     dup dup index>> current-index [ call-next-method ] with-variable
     dup [
         [ flatten-methods convert-tuple-methods ] change-methods
         call-next-method
