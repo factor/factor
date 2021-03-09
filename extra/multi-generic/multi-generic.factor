@@ -1417,7 +1417,7 @@ M: covariant-tuple dispatch-arity classes>> length ;
     n 0 >=
     [ n methods method-dispatch-classes
       [ dup n methods applicable-methods
-        n 1 - covariant-tuple-multi-methods 
+        n 1 - covariant-tuple-multi-methods
       ] map>alist ] [
         ! NOTE: This is where we rely on correct non-ambigutiy
         methods ?last [ method>> ] [ f ] if*
