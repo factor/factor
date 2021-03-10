@@ -116,7 +116,7 @@ syn match   factorTodo              /\v(TODO|FIXME|XXX):=/ contained
 
 syn region  factorDefn            start=/\v<%(SYNTAX|%(MACRO|MEMO|TYPED)?:?):>/                 matchgroup=factorDefnDelims     end=/\v<;>/ contains=factorDefnDelims,@factorCluster
 syn region  factorDefnDelims      start=/\v<%(SYNTAX|%(MACRO|MEMO|TYPED)?:?):>/ end=/\v<\S+>/   contains=@factorComment nextgroup=factorStackEffectSkip skipempty contained
-syn region  factorMethod          start=/\v<M:>/                                                matchgroup=factorMethodDelims     end=/\v<;>/ contains=factorMethodDelims,@factorCluster
+syn region  factorMethod          start=/\v<M:>/                                                matchgroup=factorMethodDelims   end=/\v<;>/ contains=factorMethodDelims,@factorCluster
 syn region  factorMethodDelims    start=/\v<M:>/               skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment skipempty keepend contained
 syn region  factorLocalsMethod    start=/\v<M::>/                                               matchgroup=factorLocalsMethodDelims     end=/\v<;>/ contains=factorLocalsMethodDelims,@factorCluster
 syn region  factorLocalsMethodDelims    start=/\v<M::>/        skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment nextgroup=factorStackEffectSkip skipempty keepend contained
@@ -124,7 +124,7 @@ syn region  factorGeneric         start=/\v<%(GENERIC|MATH|PRIMITIVE):>/        
 syn region  factorGenericN        start=/\v<GENERIC\#:>/   skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\d+>/   contains=@factorComment nextgroup=factorStackEffectSkip skipempty keepend
 syn region  factorHook            start=/\v<HOOK:>/            skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment nextgroup=factorStackEffectSkip skipempty keepend
 
-syn region  factorPDefn           start=/\v<%(SYNTAX|%(MACRO|MEMO|TYPED)?:?):>/ skip=/\v<!>.*/  end=/\v<;>/ contains=factorPDefnDelims,@factorCluster contained
+syn region  factorPDefn           start=/\v<%(SYNTAX|%(MACRO|MEMO|TYPED)?:?):>/ skip=/\v<!>.*/  matchgroup=factorPDefnDelims    end=/\v<;>/ contains=factorPDefnDelims,@factorCluster contained
 syn region  factorPDefnDelims     start=/\v<%(SYNTAX|%(MACRO|MEMO|TYPED)?:?):>/ end=/\v<\S+>/   contains=@factorComment nextgroup=factorStackEffectSkip skipempty contained
 syn region  factorPMethod         start=/\v<M:>/                                                matchgroup=factorPMethodDelims  end=/\v<;>/ contains=factorPMethodDelims,@factorCluster contained
 syn region  factorPMethodDelims   start=/\v<M:>/               skip=/\v<!>.*/   end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment skipempty keepend contained
