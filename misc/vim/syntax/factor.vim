@@ -59,7 +59,7 @@ syn case match
 
 syn match   factorWord   /\v<\S+>/  contains=@factorWord transparent display
 syn cluster factorCluster           contains=factorWord,factorComment,factorMultilineComment,@factorClusterValue,factorDeclaration,factorCall,factorCallNextMethod,@factorWordOps,factorAlien,factorSlot,factorTuple,factorStruct
-syn cluster factorClusterValue      contains=factorBreakpoint,factorBoolean,factorFrySpecifier,factorChar,@factorString,@factorNumber,factorBackslash,factorMBackslash,factorLiteral,@factorStackEffect,@factorQuotation,@factorArray,factorRegexp
+syn cluster factorClusterValue      contains=factorBreakpoint,factorBoolean,factorFrySpecifier,factorChar,factorString,@factorNumber,factorBackslash,factorMBackslash,factorLiteral,@factorStackEffect,@factorQuotation,@factorArray,factorRegexp
 
 " A crash course on Factor's lexer:
 "
