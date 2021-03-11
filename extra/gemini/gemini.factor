@@ -1,10 +1,10 @@
 ! Copyright (C) 2021 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors ascii colors.constants continuations io
-io.encodings.utf8 io.pathnames io.sockets io.sockets.secure
-io.styles kernel make present sequences sequences.extras
-splitting urls wrap.strings ;
+USING: accessors ascii colors.constants combinators
+continuations io io.encodings.utf8 io.pathnames io.sockets
+io.sockets.secure io.styles kernel make math namespaces present
+sequences sequences.extras splitting urls wrap.strings ;
 
 IN: gemini
 
@@ -76,24 +76,43 @@ PRIVATE>
         read-response
     ] with-client ;
 
-:: gemini. ( url -- )
-    url gemini 2nip [
-        "=> " ?head [
-            [ blank? ] trim-head
-            [ blank? ] split1-when
-            [ blank? ] trim [ dup ] when-empty swap
-            "://" over subseq? [
-                >url
-            ] [
-                url clone swap '[ _ append-path ] change-path f >>query f >>anchor
-            ] if [
-                presented ,,
-                COLOR: blue foreground ,,
-            ] H{ } make format nl
-        ] [
-            60 wrap-string print
-        ] if
-    ] each ;
+DEFER: gemtext.
+
+: gemini. ( url -- )
+    dup gemini 2nip gemtext. ;
+
+<PRIVATE
+
+:: gemini-link. ( link-text base-url -- )
+    link-text
+    [ blank? ] trim-head
+    [ blank? ] split1-when
+    [ blank? ] trim [ dup ] when-empty swap
+    "://" over subseq? [
+        >url
+    ] [
+        base-url clone swap '[ _ append-path ] change-path f >>query f >>anchor
+    ] if [
+        presented ,,
+        COLOR: blue foreground ,,
+    ] H{ } make format nl ;
+
+: gemini-quoted. ( text -- )
+    70 wrap-lines [ "> " write print ] each ;
+
+PRIVATE>
+
+:: gemtext. ( base-url body -- )
+    f "pre" [
+        body [
+            {
+                { [ "```" ?head ] [ drop "pre" on ] }
+                { [ "=>" ?head ] [ base-url gemini-link. ] }
+                { [ "> " ?head ] [ gemini-quoted. ] }
+                [ "pre" get [ 80 wrap-string ] unless print ]
+            } cond
+        ] each
+    ] with-variable ;
 
 ! "gemtext"
 
