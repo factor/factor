@@ -83,7 +83,7 @@ M: gemini-gadget model-changed
         control-value dup [
             f >>query
             f >>anchor
-            [ "/" ?tail drop "/" split1-last drop ] change-path
+            [ "/" ?tail drop "/" split1-last drop "/" append ] change-path
         ] when
     ]
     [ show-gemini ] bi ;
