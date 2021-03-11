@@ -22,7 +22,7 @@ HELP: path>json
 HELP: path>jsons
 { $values
     { "path" "a pathname string" }
-    { "jsons" "a sequences of JSON objects" }
+    { "jsons" { $sequence "JSON objects" } }
 }
 { $description "Reads a file into a sequence of JSON objects and returns them all." } ;
 

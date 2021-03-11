@@ -10,7 +10,7 @@ IN: json.reader
 
 ERROR: not-a-json-number string ;
 
-SYMBOL: counter
+SYMBOL: json-depth
 
 : json-number ( char stream -- num char )
     [ 1string ] [ "\s\t\r\n,:}]" swap stream-read-until ] bi*
@@ -111,9 +111,9 @@ DEFER: (read-json-string)
     { object vector object } declare
     {
         { CHAR: \" [ over read-json-string suffix! ] }
-        { CHAR: [  [ 1 counter +@ json-open-array ] }
+        { CHAR: [  [ 1 json-depth +@ json-open-array ] }
         { CHAR: ,  [ v-over-push ] }
-        { CHAR: ]  [ -1 counter +@ json-close-array ] }
+        { CHAR: ]  [ -1 json-depth +@ json-close-array ] }
         { CHAR: {  [ json-open-hash ] }
         { CHAR: :  [ v-pick-push ] }
         { CHAR: }  [ json-close-hash ] }
@@ -128,12 +128,13 @@ DEFER: (read-json-string)
     } case ;
 
 : json-read-input ( stream -- objects )
-    V{ } clone over '[ _ stream-read1 ] [ scan ] while* nip ;
+    0 json-depth [
+        V{ } clone over '[ _ stream-read1 ] [ scan ] while* nip
+        json-depth get zero? [ json-error ] unless
+    ] with-variable ;
 
-
-! A properly formed JSON input should contain exactly one object with balanced brackets.
-: get-json ( objects  --  obj  )
-    dup length 1 = counter get 0 = and [ first ] [ json-error ] if ;
+: get-json ( objects  --  obj )
+    dup length 1 = [ first ] [ json-error ] if ;
 
 PRIVATE>
 
@@ -143,11 +144,10 @@ PRIVATE>
 GENERIC: json> ( string -- object )
 
 M: string json>
-    [ 0 counter [ read-json get-json ] with-variable ] with-string-reader ;
+    [ read-json get-json ] with-string-reader ;
 
 : path>json ( path -- json )
-    utf8 [ 0 counter [ read-json get-json ] with-variable ] with-file-reader ;
+    utf8 [ read-json get-json ] with-file-reader ;
 
-! Read a file with one json object per line
 : path>jsons ( path -- jsons )
     utf8 [ read-json ] with-file-reader ;
