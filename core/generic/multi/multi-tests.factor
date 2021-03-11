@@ -43,9 +43,6 @@ CONSTANT: the-rock1 T{ the-rock f }
 { 1 } [ thing 0 test-methods applicable-methods length ] unit-test
 { 0 } [ fixnum 0 test-methods applicable-methods length ] unit-test
 
-
-
-
 { f } [ rock1 rock1 beats ] unit-test
 { t } [ rock1 scissors1 beats ] unit-test
 { t } [ scissors1 paper1 beats ] unit-test
@@ -183,3 +180,31 @@ MM: frob3 ( x: hihaho-u x: ho -- x ) 2drop 44 ;
 { 44 } [ hi ho frob3 ] unit-test
 [ hi 99 frob3 ] [ no-method? ] must-fail-with
 [ 99 hi frob3 ] [ no-method? ] must-fail-with
+
+! Regression of dispatch order
+GENERIC: cached-md-beats? ( obj1 obj2 -- ? )
+MIXIN: m-thing
+SINGLETONS: s-paper s-scissors s-rock ;
+INSTANCE: s-paper m-thing
+INSTANCE: s-scissors m-thing
+INSTANCE: s-rock m-thing
+
+MM: cached-md-beats? ( obj1: s-paper obj2: s-scissors -- ?: boolean ) 2drop t ;
+MM: cached-md-beats? ( o: s-scissors o: s-rock -- ?: boolean ) 2drop t ;
+MM: cached-md-beats? ( o: s-rock o: s-paper -- ?: boolean ) 2drop t ;
+MM: cached-md-beats? ( o: m-thing o: m-thing -- ?: boolean ) 2drop f ;
+
+
+{ f t f  f f t  t f f } [
+    s-paper s-paper       cached-md-beats?
+    s-paper s-scissors    cached-md-beats?
+    s-paper s-rock        cached-md-beats?
+
+    s-scissors s-paper    cached-md-beats?
+    s-scissors s-scissors cached-md-beats?
+    s-scissors s-rock     cached-md-beats?
+
+    s-rock s-paper        cached-md-beats?
+    s-rock s-scissors     cached-md-beats?
+    s-rock s-rock         cached-md-beats?
+] unit-test
