@@ -1,9 +1,10 @@
 ! Copyright (C) 2021 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors ascii continuations io io.encodings.utf8
-io.sockets io.sockets.secure kernel present sequences
-sequences.extras splitting ;
+USING: accessors ascii colors.constants continuations io
+io.encodings.utf8 io.sockets io.sockets.secure io.styles kernel
+make present sequences sequences.extras splitting urls
+wrap.strings ;
 
 IN: gemini
 
@@ -68,15 +69,31 @@ CONSTANT: STATUS-CODES H{
 
 PRIVATE>
 
-: gemini-get ( url -- status meta body/f )
+: gemini ( url -- status meta body/f )
     dup gemini-addr utf8 [
         gemini-tls
         send-request
         read-response
     ] with-client ;
 
-: gemini. ( url -- )
-    gemini-get 2nip [ print ] each ;
+:: gemini. ( url -- )
+    url gemini 2nip [
+        "=> " ?head [
+            [ blank? ] trim-head
+            [ blank? ] split1-when
+            [ blank? ] trim [ dup ] when-empty swap
+            "://" over subseq? [
+                >url
+            ] [
+                url clone swap >>path f >>query f >>anchor
+            ] if [
+                presented ,,
+                COLOR: blue foreground ,,
+            ] H{ } make format nl
+        ] [
+            60 wrap-string print
+        ] if
+    ] each ;
 
 ! "gemtext"
 
