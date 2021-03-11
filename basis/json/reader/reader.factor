@@ -147,3 +147,7 @@ M: string json>
 
 : path>json ( path -- json )
     utf8 [ 0 counter [ read-json get-json ] with-variable ] with-file-reader ;
+
+! Read a file with one json object per line
+: path>jsons ( path -- jsons )
+    utf8 [ read-json ] with-file-reader ;
