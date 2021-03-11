@@ -2,9 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors ascii colors.constants combinators
-continuations io io.encodings.utf8 io.pathnames io.sockets
-io.sockets.secure io.styles kernel make math namespaces present
-sequences sequences.extras splitting urls wrap.strings ;
+continuations images.loader images.loader.private images.viewer
+io io.encodings.binary io.encodings.string io.encodings.utf8
+io.pathnames io.sockets io.sockets.secure io.styles kernel make
+math namespaces present sequences sequences.extras splitting
+urls wrap.strings ;
 
 IN: gemini
 
@@ -49,16 +51,16 @@ CONSTANT: STATUS-CODES H{
 }
 
 : read-body ( -- body )
-    [ readln ] loop>array ;
+    [ 1024 read ] loop>array concat ;
 
 : ?read-body ( status -- body/f )
     ?first CHAR: 2 = [ read-body ] [ f ] if ;
 
 : read-response ( -- status meta body/f )
-    readln [ blank? ] split1-when over ?read-body ;
+    readln utf8 decode "\r" ?tail drop [ blank? ] split1-when over ?read-body ;
 
 : send-request ( url -- )
-    present write "\r\n" write flush ;
+    present utf8 encode write B{ CHAR: \r CHAR: \n } write flush ;
 
 : gemini-addr ( url -- addr )
     [ host>> ] [ port>> 1965 or ] bi <inet> ;
@@ -70,7 +72,7 @@ CONSTANT: STATUS-CODES H{
 PRIVATE>
 
 : gemini ( url -- status meta body/f )
-    dup gemini-addr utf8 [
+    dup gemini-addr binary [
         gemini-tls
         send-request
         read-response
@@ -79,7 +81,11 @@ PRIVATE>
 DEFER: gemtext.
 
 : gemini. ( url -- )
-    dup gemini 2nip gemtext. ;
+    dup gemini [ drop ] 2dip swap {
+        { [ "text/" ?head ] [ drop utf8 decode gemtext. ] }
+        { [ "image/" ?head ] [ (image-class) load-image* image. drop ] }
+        [ 3drop ]
+    } cond ;
 
 <PRIVATE
 
@@ -104,7 +110,7 @@ PRIVATE>
 
 :: gemtext. ( base-url body -- )
     f "pre" [
-        body [
+        body string-lines [
             {
                 { [ "```" ?head ] [ drop "pre" on ] }
                 { [ "=>" ?head ] [ base-url gemini-link. ] }
