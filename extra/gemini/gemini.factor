@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors ascii colors.constants continuations io
-io.encodings.utf8 io.sockets io.sockets.secure io.styles kernel
-make present sequences sequences.extras splitting urls
-wrap.strings ;
+io.encodings.utf8 io.pathnames io.sockets io.sockets.secure
+io.styles kernel make present sequences sequences.extras
+splitting urls wrap.strings ;
 
 IN: gemini
 
@@ -85,7 +85,7 @@ PRIVATE>
             "://" over subseq? [
                 >url
             ] [
-                url clone swap >>path f >>query f >>anchor
+                url clone swap '[ _ append-path ] change-path f >>query f >>anchor
             ] if [
                 presented ,,
                 COLOR: blue foreground ,,
