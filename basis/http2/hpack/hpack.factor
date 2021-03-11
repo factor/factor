@@ -1,6 +1,6 @@
 USING: accessors arrays byte-arrays byte-vectors combinators fry
-io.encodings.string io.encodings.utf8 locals kernel math
-math.functions math.bitwise multiline sequences ;
+http2.hpack.huffman io.encodings.string io.encodings.utf8 locals
+kernel math math.functions math.bitwise multiline sequences ;
 
 IN: http2.hpack
 
@@ -188,12 +188,11 @@ CONSTANT: static-table {
     over + dup [ pick subseq utf8 decode ] dip swap ;
 
 : decode-huffman-string ( block current-index string-length -- block new-index string )
-    + "" ! Huffman encoding case, currently just a stub for stack effects
-    "Huffman decoding not implemented yet" hpack-decode-error
+    over + dup [ pick subseq huffman-decode ] dip swap 
     ;
 
 : decode-string ( block current-index -- block new-index string )
-    2dup swap nth 7 bit?  [ 7 decode-integer ] dip
+    [ 7 decode-integer ] [ swap nth 7 bit? ] 2bi
     [ decode-huffman-string ] [ decode-raw-string ] if ; 
 
 : decode-literal-header ( decode-context block index index-length -- decode-context block new-index field )
