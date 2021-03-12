@@ -144,8 +144,15 @@ CONSTANT: static-table {
 
 ! encodes a string without huffman encoding.
 : encode-string ( string -- bytes )
-    [ 0 swap length 7 encode-integer ] keep
-    utf8 encode append
+    utf8 encode
+    0 over length 7 encode-integer
+    prepend
+    ;
+
+: encode-string-huffman ( string -- bytes )
+    huffman-encode
+    128 over length 7 encode-integer
+    prepend
     ;
 
 ! headers will be a list of tuples
