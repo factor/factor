@@ -112,7 +112,7 @@ ERROR: unsupported-charset charset ;
 <PRIVATE
 
 CONSTANT: gemini-encodings H{
-    { "iso-8869-1" latin1 }
+    { "iso-8859-1" latin1 }
     { "utf-8" utf8 }
     { "us-ascii" ascii }
 }
