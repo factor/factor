@@ -186,7 +186,7 @@ M: stdin cancel-operation
 : signal-pipe-loop ( port -- )
     '[
         int heap-size _ io:stream-read
-        dup [ int deref dispatch-signal-hook get call( x -- ) ] when*
+        dup [ int deref dispatch-signal-hook get-global call( x -- ) ] when*
     ] loop ;
 
 : start-signal-pipe-thread ( -- )

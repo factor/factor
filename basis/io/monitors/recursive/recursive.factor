@@ -20,9 +20,7 @@ DEFER: add-child-monitor
 
 : add-child-monitors ( path -- )
     ! We yield since this directory scan might take a while.
-    [
-        [ add-child-monitor ] each yield
-    ] with-qualified-directory-files ;
+    qualified-directory-files [ add-child-monitor ] each yield ;
 
 : add-child-monitor ( path -- )
     notify? [ dup { +add-file+ } monitor tget queue-change ] when

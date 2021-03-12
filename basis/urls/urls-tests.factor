@@ -145,6 +145,14 @@ CONSTANT: urls {
         }
         "http://:pass@example.org/"
     }
+    {
+        T{ url
+            { protocol "http" }
+            { host "example.org" }
+            { path "/%2F/" }
+        }
+        "http://example.org/%2F/"
+    }
 }
 
 urls [
@@ -154,6 +162,31 @@ urls [
 urls [
     swap [ 1array ] [ [ present ] curry ] bi* unit-test
 ] assoc-each
+
+{ T{ url
+    { protocol "http" }
+    { username "ш" }
+    { password "ш" }
+    { host "ш.com" }
+    { port 1234 }
+    { path "/ш" }
+    { query LH{ { "ш" "ш" } } }
+    { anchor "ш" }
+  } }
+[ "http://ш:ш@ш.com:1234/ш?ш=ш#ш" >url ] unit-test
+
+{
+    T{ url
+        { protocol "http" }
+        { username f }
+        { password f }
+        { host "März.com" }
+        { port f }
+        { path "/päth" }
+        { query LH{ { "query" "Dürst" } } }
+        { anchor "☃" }
+    }
+} [ "http://März.com/päth?query=Dürst#☃" >url ] unit-test
 
 { T{ url
     { protocol "https" }
@@ -367,7 +400,7 @@ urls [
 ! Scheme characters are
 ! case-insensitive. https://tools.ietf.org/html/rfc3986#section-3.1
 { URL" http://www.google.com/" } [
-    URL" http://www.google.com/"
+    URL" HTTP://www.google.com/"
 ] unit-test
 
 { URL" https://host:1234/path" } [ URL" https://host:1234/path" redacted-url ] unit-test
