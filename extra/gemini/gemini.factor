@@ -169,7 +169,7 @@ PRIVATE>
     f "pre" [
         body string-lines [
             {
-                { [ "```" ?head ] [ drop "pre" on ] }
+                { [ "```" ?head ] [ drop "pre" toggle ] }
                 { [ "=>" ?head ] [ base-url gemini-link. ] }
                 { [ "> " ?head ] [ gemini-quoted. ] }
                 [ "pre" get [ gemini-pad 80 wrap-string ] unless print ]
