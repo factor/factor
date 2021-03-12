@@ -163,7 +163,7 @@ DEFER: gemtext.
     ] while drop ;
 
 : gemini-quoted. ( text -- )
-    78 gemini-pad 78 wrap-lines [ "> " write print ] each ;
+    76 gemini-pad 76 wrap-lines [ "> " write print ] each ;
 
 SYMBOL: pre
 
@@ -177,7 +177,7 @@ SYMBOL: pre
             { [ pre get ] [ print ] }
             { [ "=>" ?head ] [ base-url gemini-link. ] }
             { [ "> " ?head ] [ gemini-quoted. ] }
-            [ 80 gemini-pad 80 wrap-string print ]
+            [ 78 gemini-pad 78 wrap-string print ]
         } cond
     ] if ;
 
