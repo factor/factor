@@ -36,7 +36,23 @@ CONSTANT: COMMANDS H{
 
 CONSTANT: HISTORY V{ }
 CONSTANT: LINKS V{ }
+CONSTANT: STACK V{ }
 CONSTANT: URL V{ }
+
+: add-stack ( args -- )
+    URL ?first STACK index [
+        1 + dup STACK ?nth pick = [
+            2drop
+        ] [
+            STACK [ length ] [ delete-slice ] bi
+            STACK push
+            STACK length 10 > [
+                0 STACK remove-nth! drop
+            ] when
+        ] if
+    ] [
+        STACK push
+    ] if* ;
 
 : add-history ( args -- )
     HISTORY dup length 10 > [
@@ -75,20 +91,20 @@ CONSTANT: URL V{ }
     { [ "://" over subseq? ] [ "gemini://" head? ] } 1||
     [ "gemini://" prepend ] unless
     dup "gemini://" head? [
-        dup add-history gemini-get
+        [ add-history ] [ add-stack ] [ gemini-get ] tri
     ] [ open-url ] if ;
 
 : gemini-reload ( -- )
     HISTORY ?last gemini-go ;
 
 : gemini-back ( -- )
-    URL ?first HISTORY index [
-        1 - HISTORY ?nth [ gemini-get ] when*
+    URL ?first STACK index [
+        1 - STACK ?nth [ gemini-get ] when*
     ] when* ;
 
 : gemini-forward ( -- )
-    URL ?first HISTORY index [
-        1 + HISTORY ?nth [ gemini-get ] when*
+    URL ?first STACK index [
+        1 + STACK ?nth [ gemini-get ] when*
     ] when* ;
 
 : gemini-up ( -- )
