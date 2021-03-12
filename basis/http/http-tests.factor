@@ -173,6 +173,17 @@ ${ read-response-test-1' } [
     dup parse-set-cookie first unparse-set-cookie =
 ] unit-test
 
+{
+    {
+        T{ cookie
+            { name "lang" }
+            { value "en-US" }
+            { path "/" }
+            { domain "example.com" }
+        }
+    }
+} [ "lang=en-US; Path=/; Domain=example.com" parse-set-cookie ] unit-test
+
 { t } [
     "a="
     dup parse-set-cookie first unparse-set-cookie =

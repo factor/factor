@@ -52,7 +52,7 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
         f swap
         (parse-set-cookie)
         [
-            over >lower [ swapd ] dip {
+            swapd pick >lower {
                 { "version" [ >>version ] }
                 { "comment" [ >>comment ] }
                 { "expires" [ [ cookie-string>timestamp >>expires ] unless-empty ] }
@@ -62,8 +62,7 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
                 { "httponly" [ drop t >>http-only ] }
                 { "secure" [ drop t >>secure ] }
                 [ drop rot <cookie> dup , ]
-            } case
-            nip
+            } case nip
         ] assoc-each
         drop
     ] { } make ;
