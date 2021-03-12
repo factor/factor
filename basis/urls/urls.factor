@@ -146,13 +146,6 @@ M: url present
         } cleave
     ] "" make ;
 
-: remove-dot-segments ( path -- path' )
-    "/" split "." swap remove [
-        { ".." } split1 [
-            [ [ { } ] [ but-last ] if-empty ] dip append t
-        ] [ f ] if*
-    ] loop "/" join [ f ] when-empty ;
-
 PRIVATE>
 
 : url-append-path ( path1 path2 -- path )
@@ -162,7 +155,7 @@ PRIVATE>
         { [ over "/" tail? ] [ append ] }
         { [ "/" pick subseq-start not ] [ nip ] }
         [ [ "/" split1-last drop "/" ] dip 3append ]
-    } cond remove-dot-segments ;
+    } cond ;
 
 <PRIVATE
 
