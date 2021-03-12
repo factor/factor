@@ -154,16 +154,16 @@ DEFER: gemtext.
         COLOR: blue foreground ,,
     ] H{ } make format nl ;
 
-: gemini-pad ( text -- text' )
+:: gemini-pad ( text n -- text' )
     ! XXX: break on dashes and soft-hyphens
-    80 [ over length over > ] [
+    text n [ over length over > ] [
         dup pick [ blank? ] find-last-from drop
-        dup [ 2dup - 5 >= [ drop f ] when ] when
-        [ nip ] [ [ cut " " glue ] keep ] if* 81 +
+        dup [ 2dup - n >= [ drop f ] when ] when
+        [ nip ] [ [ cut " " glue ] keep ] if* n + 1 +
     ] while drop ;
 
 : gemini-quoted. ( text -- )
-    gemini-pad 78 wrap-lines [ "> " write print ] each ;
+    78 gemini-pad 78 wrap-lines [ "> " write print ] each ;
 
 SYMBOL: pre
 
@@ -177,7 +177,7 @@ SYMBOL: pre
             { [ pre get ] [ print ] }
             { [ "=>" ?head ] [ base-url gemini-link. ] }
             { [ "> " ?head ] [ gemini-quoted. ] }
-            [ gemini-pad 80 wrap-string print ]
+            [ 80 gemini-pad 80 wrap-string print ]
         } cond
     ] if ;
 
