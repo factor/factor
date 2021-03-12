@@ -15,7 +15,6 @@ MEMO: base16colors ( name -- assoc )
     dup base16-theme-name get base16colors at [ ] [ no-such-color ] ?if ;
 
 SINGLETON: base16-theme
-theme [ base16-theme ] initialize
 
 M: base16-theme toolbar-background "base00" named-base16 ;
 M: base16-theme toolbar-button-pressed-background "base01" named-base16  ;
