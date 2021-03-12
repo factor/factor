@@ -23,15 +23,15 @@ CONSTANT: ABBREVS H{
 }
 
 CONSTANT: COMMANDS H{
-    { "back" "Go back to the previous Gemini URL." }
+    { "back"    "Go back to the previous Gemini URL." }
     { "forward" "Go forward to the next Gemini URL." }
-    { "go" "Go to a Gemini URL" }
-    { "help" "Get help for commands." }
-    { "history" "Display recent history of Gemini URLs." }
-    { "less" "View the most recent Gemini URL in a pager." }
-    { "quit" "Quit the program." }
-    { "reload" "Reload the most recent Gemini URL." }
-    { "up" "Go up one directory from the recent Gemini URL." }
+    { "go"      "Go to a Gemini URL" }
+    { "help"    "Get help for commands." }
+    { "history" "Display recently viewed Gemini URLs." }
+    { "less"    "View the most recent Gemini URL in a pager." }
+    { "quit"    "Quit the program." }
+    { "reload"  "Reload the most recent Gemini URL." }
+    { "up"      "Go up one directory from the recent Gemini URL." }
 }
 
 CONSTANT: HISTORY V{ }
