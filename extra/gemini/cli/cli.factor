@@ -1,10 +1,11 @@
 ! Copyright (C) 2021 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors ascii assocs combinators
-combinators.short-circuit formatting gemini gemini.private io
-io.encodings.string kernel math math.parser namespaces present
-sequences splitting urls ;
+USING: accessors arrays ascii assocs combinators
+combinators.short-circuit formatting gemini gemini.private
+grouping io io.directories io.encodings.string io.encodings.utf8
+io.files io.files.temp io.launcher kernel math math.parser
+namespaces present sequences splitting system urls webbrowser ;
 
 IN: gemini.cli
 
@@ -14,9 +15,23 @@ CONSTANT: ABBREVS H{
      { "g"    "go" }
      { "h"    "history" }
      { "hist" "history" }
+     { "l"    "less" }
      { "q"    "quit" }
      { "r"    "reload" }
      { "u"    "up" }
+     { "?"    "help" }
+}
+
+CONSTANT: COMMANDS H{
+    { "back" "Go back to the previous Gemini URL." }
+    { "forward" "Go forward to the next Gemini URL." }
+    { "go" "Go to a Gemini URL" }
+    { "help" "Get help for commands." }
+    { "history" "Display recent history of Gemini URLs." }
+    { "less" "View the most recent Gemini URL in a pager." }
+    { "quit" "Quit the program." }
+    { "reload" "Reload the most recent Gemini URL." }
+    { "up" "Go up one directory from the recent Gemini URL." }
 }
 
 CONSTANT: HISTORY V{ }
@@ -28,61 +43,91 @@ CONSTANT: URL V{ }
         0 swap remove-nth!
     ] when dupd remove! push ;
 
-: gemini-history ( args -- )
-    drop HISTORY [ 1 + swap "[%s] %s\n" printf ] each-index
+: gemini-history ( -- )
+    HISTORY [ 1 + swap "[%s] %s\n" printf ] each-index
     LINKS delete-all HISTORY LINKS push-all ;
+
+: gemini-print ( url body meta -- )
+    f pre [
+        LINKS delete-all
+        gemini-charset decode string-lines [
+            { [ pre get not ] [ "=>" ?head ] } 0&& [
+                swap gemini-link present LINKS push
+                LINKS length swap "[%s] %s\n" printf
+            ] [
+                gemini-line.
+            ] if
+        ] with each
+    ] with-variable ;
 
 : gemini-get ( args -- )
     dup 0 URL set-nth
     >url dup gemini [ drop ] 2dip swap "text/" ?head [
-        f pre [
-            LINKS delete-all
-            gemini-charset decode string-lines [
-                { [ pre get not ] [ "=>" ?head ] } 0&& [
-                    swap gemini-link present LINKS push
-                    LINKS length swap "[%s] %s\n" printf
-                ] [
-                    gemini-line.
-                ] if
-            ] with each
-        ] with-variable
+        "gemini.txt" temp-file
+        [ utf8 [ gemini-print ] with-file-writer ]
+        [ utf8 file-contents print ] bi
     ] [
         "ERROR: Cannot display '" "'" surround print 2drop
     ] if ;
 
 : gemini-go ( args -- )
     [ "gemini://gemini.circumlunar.space" ] when-empty
-    dup "gemini://" head? [ "gemini://" prepend ] unless
-    dup add-history gemini-get ;
+    { [ "://" over subseq? ] [ "gemini://" head? ] } 1||
+    [ "gemini://" prepend ] unless
+    dup "gemini://" head? [
+        dup add-history gemini-get
+    ] [ open-url ] if ;
 
-: gemini-reload ( args -- )
-    drop HISTORY ?last gemini-go ;
+: gemini-reload ( -- )
+    HISTORY ?last gemini-go ;
 
-: gemini-back ( args -- )
-    drop URL ?first HISTORY index [
+: gemini-back ( -- )
+    URL ?first HISTORY index [
         1 - HISTORY ?nth [ gemini-get ] when*
     ] when* ;
 
-: gemini-forward ( args -- )
-    drop URL ?first HISTORY index [
+: gemini-forward ( -- )
+    URL ?first HISTORY index [
         1 + HISTORY ?nth [ gemini-get ] when*
     ] when* ;
 
-: gemini-up ( args -- )
-    drop URL ?first [
+: gemini-up ( -- )
+    URL ?first [
         >url f >>query f >>anchor
         [ "/" ?tail drop "/" split1-last drop "/" append ] change-path
         present gemini-go
     ] when* ;
 
+: gemini-less ( -- )
+    "less" "gemini.txt" temp-file 2array try-process ;
+
+: gemini-quit ( -- )
+    "gemini.txt" temp-file ?delete-file 0 exit ;
+
+: gemini-help ( args -- )
+    [
+        COMMANDS keys
+        [ 6 <groups> ] [ longest length 4 + ] bi
+        '[ [ _ CHAR: \s pad-tail write ] each nl ] each
+    ] [
+        ABBREVS ?at drop COMMANDS ?at [
+            print
+        ] [
+            "ERROR: Command '" "' not found" surround print
+        ] if
+    ] if-empty ;
+
 : gemini-cmd ( cmd -- )
     " " split1 swap >lower ABBREVS ?at drop {
-        { "history" [ gemini-history ] }
+        { "help" [ gemini-help ] }
+        { "history" [ drop gemini-history ] }
         { "go" [ gemini-go ] }
-        { "reload" [ gemini-reload ] }
-        { "back" [ gemini-back ] }
-        { "forward" [ gemini-forward ] }
-        { "up" [ gemini-up ] }
+        { "reload" [ drop gemini-reload ] }
+        { "back" [ drop gemini-back ] }
+        { "forward" [ drop gemini-forward ] }
+        { "up" [ drop gemini-up ] }
+        { "less" [ drop gemini-less ] }
+        { "quit" [ drop gemini-quit ] }
         { "" [ drop ] }
         [
             dup string>number [ 1 - LINKS ?nth ] [ f ] if* [
