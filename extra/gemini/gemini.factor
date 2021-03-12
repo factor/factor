@@ -1,9 +1,10 @@
 ! Copyright (C) 2021 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors ascii colors.constants combinators
-continuations images.loader images.loader.private images.viewer
-io io.encodings.binary io.encodings.latin1 io.encodings.string
+USING: accessors ascii assocs colors.constants combinators
+combinators.short-circuit continuations images.loader
+images.loader.private images.viewer io io.encodings.ascii
+io.encodings.binary io.encodings.latin1 io.encodings.string
 io.encodings.utf8 io.pathnames io.sockets io.sockets.secure
 io.styles kernel make math namespaces present sequences
 sequences.extras splitting urls wrap.strings ;
@@ -58,8 +59,13 @@ CONSTANT: STATUS-CODES H{
 : read-body ( -- body )
     [ 1024 read ] loop>array concat ;
 
+ERROR: invalid-status value ;
+
+: check-status ( status -- status )
+    dup length 1 > [ invalid-status ] unless ;
+
 : ?read-body ( status -- body/f )
-    ?first CHAR: 2 = [ read-body ] [ f ] if ;
+    check-status ?first CHAR: 2 = [ read-body ] [ f ] if ;
 
 : read-response ( -- status meta body/f )
     readln utf8 decode "\r" ?tail drop [ blank? ] split1-when over ?read-body ;
@@ -82,6 +88,7 @@ DEFER: gemini-request
     redirects inc
     redirects get max-redirects get < [
         ! XXX: detect cross-protocol redirects
+        ! XXX: detect redirect to same link
         drop nip gemini-request
     ] [ too-many-redirects ] if ;
 
@@ -104,14 +111,20 @@ ERROR: unsupported-charset charset ;
 
 <PRIVATE
 
+CONSTANT: gemini-encodings H{
+    { "iso-8869-1" latin1 }
+    { "utf-8" utf8 }
+    { "us-ascii" ascii }
+}
+
+: gemini-meta ( meta -- headers )
+    ";" split [ [ blank? ] trim "=" split1 [ >lower ] dip ] H{ } map>assoc ;
+
 : gemini-charset ( text-mime -- charset )
-    "; charset=" over subseq-start [
-        tail "; charset=" ?head drop >lower {
-            { "iso-8859-1" [ latin1 ] }
-            { "utf-8" [ utf8 ] }
-            [ unsupported-charset ]
-        } case
-    ] [ drop utf8 ] if* ;
+    gemini-meta "charset" of [
+        >lower gemini-encodings ?at
+        [ unsupported-charset ] unless
+    ] [ utf8 ] if* ;
 
 PRIVATE>
 
@@ -127,6 +140,7 @@ DEFER: gemtext.
 <PRIVATE
 
 :: gemini-link. ( link-text base-url -- )
+    ! XXX: handle data: urls (including base64)
     link-text
     [ blank? ] trim-head
     [ blank? ] split1-when
@@ -138,8 +152,16 @@ DEFER: gemtext.
         COLOR: blue foreground ,,
     ] H{ } make format nl ;
 
+: gemini-pad ( text -- text' )
+    ! XXX: break on dashes and soft-hyphens
+    80 [ over length over > ] [
+        dup pick [ blank? ] find-last-from drop
+        dup [ 2dup - 5 >= [ drop f ] when ] when
+        [ nip ] [ [ cut " " glue ] keep ] if* 81 +
+    ] while drop ;
+
 : gemini-quoted. ( text -- )
-    70 wrap-lines [ "> " write print ] each ;
+    gemini-pad 78 wrap-lines [ "> " write print ] each ;
 
 PRIVATE>
 
@@ -150,7 +172,7 @@ PRIVATE>
                 { [ "```" ?head ] [ drop "pre" on ] }
                 { [ "=>" ?head ] [ base-url gemini-link. ] }
                 { [ "> " ?head ] [ gemini-quoted. ] }
-                [ "pre" get [ 80 wrap-string ] unless print ]
+                [ "pre" get [ gemini-pad 80 wrap-string ] unless print ]
             } cond
         ] each
     ] with-variable ;
