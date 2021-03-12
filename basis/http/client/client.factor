@@ -133,11 +133,10 @@ SYMBOL: redirects
     hex> [ "Bad chunk size" throw ] unless* ;
 
 : read-chunked ( quot: ( chunk -- ) -- )
-    read-chunk-size dup zero?
-    [ 2drop ] [
+    read-chunk-size [ drop ] [
         read [ swap call ] [ drop ] 2bi
         read-crlf B{ } assert= read-chunked
-    ] if ; inline recursive
+    ] if-zero ; inline recursive
 
 : read-response-body ( quot: ( chunk -- ) response -- )
     binary decode-input
@@ -205,8 +204,7 @@ SYMBOL: redirects
     ] if ;
 
 : misparsed-url? ( url -- url' )
-    [ protocol>> not ] [ host>> not ] [ path>> ]
-    tri and and ;
+    [ protocol>> not ] [ host>> not ] [ path>> ] tri and and ;
 
 : request-url ( url -- url' )
     dup >url dup misparsed-url? [

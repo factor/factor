@@ -73,7 +73,7 @@ M: class union-of-builtins?
     class-members
     [ union-of-builtins? ] partition
     [ [ f ] [ builtin-union-predicate-quot ] if-empty ] dip
-    [ tuple-class? ] partition
+    [ [ tuple-class? ] [ tuple-layout ] bi and ] partition
     [ [ f ] [ tuple-union-predicate-quot ] if-empty ] dip
     [ predicate-def ] map
     swap [ suffix ] when*

@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel kernel.private make math
+USING: accessors arrays assocs kernel kernel.private math
 math.order math.private quotations sequences sequences.private
 sets sorting words ;
 IN: combinators
@@ -165,17 +165,16 @@ ERROR: no-case object ;
     ] [ drop f ] if ;
 
 : dispatch-case-quot ( default assoc -- quot )
-    [
-        \ dup , \ integer? , [
-            \ integer>fixnum-strict , \ dup ,
-            dup keys [ infimum , ] [ supremum , ] bi \ between? ,
-            [
-                dup keys infimum , \ - ,
-                sort-keys values [ >quotation ] map ,
-                \ dispatch ,
-            ] [ ] make , dup , \ if ,
-        ] [ ] make , , \ if ,
-    ] [ ] make ;
+    swap [
+        [ keys [ infimum ] [ supremum ] bi over ]
+        [ sort-keys values [ >quotation ] map ] bi
+    ] dip dup '[
+        dup integer? [
+            integer>fixnum-strict dup _ _ between? [
+                _ - _ dispatch
+            ] _ if
+        ] _ if
+    ] ;
 
 PRIVATE>
 

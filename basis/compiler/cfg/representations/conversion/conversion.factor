@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays byte-arrays combinators compiler.cfg.instructions
 compiler.cfg.registers compiler.constants cpu.architecture
-kernel layouts locals math namespaces ;
+kernel layouts math namespaces ;
 IN: compiler.cfg.representations.conversion
 
 ERROR: bad-conversion dst src dst-rep src-rep ;

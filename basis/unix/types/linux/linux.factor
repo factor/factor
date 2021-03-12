@@ -6,8 +6,14 @@ TYPEDEF: ulong     __ulongword_type
 TYPEDEF: long      __sword_type
 TYPEDEF: ulong     __uword_type
 TYPEDEF: long      __slongword_type
+TYPEDEF: uchar     __u8
+TYPEDEF: ushort    __u16
 TYPEDEF: uint      __u32
-TYPEDEF: ulonglong __u64
+TYPEDEF: longlong  __u64
+TYPEDEF: char      __s8
+TYPEDEF: short     __s16
+TYPEDEF: int       __s32
+TYPEDEF: longlong  __s64
 TYPEDEF: uint      __u32_type
 TYPEDEF: int       __s32_type
 

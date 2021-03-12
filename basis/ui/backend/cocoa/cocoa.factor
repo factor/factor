@@ -99,8 +99,10 @@ M: cocoa-ui-backend set-title
 M: cocoa-ui-backend (set-fullscreen)
     [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
+! Handle can be ``f`` sometimes, like if you hold ``w``
+! when you loop in the debugger.
 M: cocoa-ui-backend (fullscreen?)
-    handle>> view>> -> isInFullScreenMode zero? not ;
+    handle>> [ view>> -> isInFullScreenMode zero? not ] [ f ] if* ;
 
 ! XXX: Until someone tests OSX with a tiling window manager,
 ! dialog-window is the same as normal-title-window

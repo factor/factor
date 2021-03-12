@@ -1,9 +1,9 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel kernel.private math sequences
-sequences.private strings sets assocs make lexer namespaces parser
-arrays fry locals regexp.parser splitting sorting regexp.ast
-regexp.negation regexp.compiler compiler.units words math.ranges ;
+USING: accessors arrays compiler.units kernel kernel.private
+lexer make math math.ranges namespaces regexp.ast
+regexp.compiler regexp.negation regexp.parser sequences
+sequences.private splitting strings vocabs.loader words ;
 IN: regexp
 
 TUPLE: regexp
@@ -221,6 +221,5 @@ PRIVATE>
 
 SYNTAX: R/ parse-regexp ;
 
-USE: vocabs.loader
 
 { "prettyprint" "regexp" } "regexp.prettyprint" require-when

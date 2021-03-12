@@ -1,9 +1,14 @@
 ! Copyright (C) 2020 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: ascii byte-arrays combinators kernel literals locals math
-math.order sbufs sequences sequences.extras sets sorting
-splitting ;
+USING: accessors arrays ascii assocs byte-arrays combinators
+io.encodings.string io.encodings.utf8 kernel lexer linked-assocs
+literals locals make math math.order math.parser multiline
+namespaces peg.ebnf present prettyprint.backend
+prettyprint.custom prettyprint.sections regexp sbufs sequences
+sequences.extras sequences.generalizations sets sorting
+splitting strings strings.parser urls urls.encoding
+urls.encoding.private urls.private ;
 
 IN: punycode
 
@@ -151,14 +156,22 @@ PRIVATE>
         SBUF" " clone swap >upper
     ] if* insertion-sort "" like ;
 
-: idna> ( punycode -- str )
+GENERIC: idna> ( punycode -- obj )
+
+M: object idna>
     "." split [
         "xn--" ?head [ punycode> ] when
     ] map "." join ;
 
-: >idna ( str -- punycode )
+M: url idna> [ idna> ] change-host ;
+
+GENERIC: >idna ( obj -- punycode )
+
+M: object >idna
     "." split [
         dup [ N < ] all? [
             >punycode "xn--" prepend
         ] unless
     ] map "." join ;
+
+M: url >idna [ >idna ] change-host ;

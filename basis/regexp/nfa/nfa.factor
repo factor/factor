@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.short-circuit fry
-kernel locals math memoize namespaces regexp.ast regexp.classes
+USING: accessors arrays assocs combinators.short-circuit kernel
+math namespaces regexp.ast regexp.classes
 regexp.transition-tables sequences sets unicode vectors ;
 IN: regexp.nfa
 
@@ -63,10 +63,10 @@ M: object modify-epsilon ;
         drop [ unix-lines option? ] 2dip swap ?
     ] [ 2nip ] if ;
 
-M: $ modify-epsilon
+M: $crlf modify-epsilon
     $unix end-of-input line-option ;
 
-M: ^ modify-epsilon
+M: ^crlf modify-epsilon
     ^unix beginning-of-input line-option ;
 
 M: tagged-epsilon nfa-node

@@ -12,6 +12,11 @@ STRUCT: timespec
     { sec time_t }
     { nsec long } ;
 
+: <timeval> ( sec usec -- timeval )
+    timeval <struct>
+        swap >>usec
+        swap >>sec ; inline
+
 : make-timeval ( us -- timeval )
     [ timeval <struct> ] dip [
         1000000 /mod [ >>sec ] [ >>usec ] bi*
@@ -23,8 +28,8 @@ STRUCT: timespec
     ] unless-zero ;
 
 STRUCT: timezone
-    { tz_minuteswest int }
-    { tz_dsttime int } ;
+    { minuteswest int }
+    { dsttime int } ;
 
 STRUCT: tm
     { sec int }

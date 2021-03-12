@@ -1,11 +1,8 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs continuations debugger destructors generic
-hash-sets hashtables init io io.files kernel kernel.private
-make math memory namespaces parser parser.notes prettyprint
-sequences splitting system vectors vocabs vocabs.loader words ;
-QUALIFIED: bootstrap.image.private
-IN: bootstrap.stage1
+USING: assocs bootstrap.image.private hash-sets hashtables init
+io io.files kernel kernel.private make memory namespaces parser
+parser.notes sequences system vocabs vocabs.loader ;
 
 "Bootstrap stage 1..." print flush
 
@@ -35,6 +32,10 @@ load-help? off
     "vocabs.loader" require
 
     "syntax" require
+
+    "locals" require
+    "locals.fry" require
+    "locals.macros" require
 
     "vocab:bootstrap/layouts.factor" parse-file %
 

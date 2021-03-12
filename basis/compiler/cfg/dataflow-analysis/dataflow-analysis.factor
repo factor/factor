@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators.short-circuit compiler.cfg.predecessors
-compiler.cfg.rpo compiler.cfg.utilities deques dlists functors kernel lexer
-locals namespaces sequences ;
+USING: accessors assocs combinators.short-circuit
+compiler.cfg.predecessors compiler.cfg.rpo
+compiler.cfg.utilities deques dlists functors kernel lexer
+namespaces sequences ;
 IN: compiler.cfg.dataflow-analysis
 
 GENERIC: join-sets ( sets bb dfa -- set )

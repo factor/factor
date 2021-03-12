@@ -40,7 +40,7 @@ MACRO: cleave-array ( quots -- quot )
 : 4tri ( w x y z p q r -- )
     [ [ 4keep ] dip 4keep ] dip call ; inline
 
-: plox ( ... x/f quot: ( ... x -- ... ) -- ... )
+: plox ( ... x/f quot: ( ... x -- ... y ) -- ... y/f )
     dupd when ; inline
 
 MACRO: smart-plox ( true -- quot )
@@ -103,3 +103,6 @@ DEFER: cond*
     [ dup callable? [ drop t ] [ first call ] if ] map-find
     [ dup callable? [ nip call ] [ second call ] if ]
     [ no-cond ] if* ;
+
+MACRO: chain ( quots -- quot )
+    <reversed> [ ] [ swap '[ [ @ @ ] [ f ] if* ] ] reduce ;

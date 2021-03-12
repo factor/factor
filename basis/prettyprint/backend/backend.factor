@@ -2,11 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
 classes.algebra.private classes.maybe classes.private
-classes.tuple combinators continuations effects fry generic
-hash-sets hashtables io.pathnames io.styles kernel lists make
-math math.order math.parser namespaces prettyprint.config
-prettyprint.custom prettyprint.sections prettyprint.stylesheet
-quotations sbufs sequences strings vectors words ;
+classes.tuple combinators combinators.short-circuit
+continuations effects generic hash-sets hashtables io.pathnames
+io.styles kernel lists make math math.order math.parser
+namespaces prettyprint.config prettyprint.custom
+prettyprint.sections prettyprint.stylesheet quotations sbufs
+sequences strings vectors words ;
 QUALIFIED: sets
 IN: prettyprint.backend
 
@@ -81,9 +82,15 @@ M: real pprint*
         [ unsupported-number-base ]
     } case ;
 
+: pprint-nan? ( f -- ? )
+    { [ fp-nan? ] [ 0/0. fp-bitwise= not ] [ -0/0. fp-bitwise= not ] } 1&& ;
+
 M: float pprint*
-    dup fp-nan? [
-        \ NAN: [ fp-nan-payload >hex text ] pprint-prefix
+    dup pprint-nan? [
+        \ NAN: [
+            [ fp-nan-payload ] [ fp-sign ] bi
+            [ 0xfffffffffffff bitxor 1 + neg ] when >hex text
+        ] pprint-prefix
     ] [
         call-next-method
     ] if ;

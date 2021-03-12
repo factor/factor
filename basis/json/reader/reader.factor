@@ -10,6 +10,8 @@ IN: json.reader
 
 ERROR: not-a-json-number string ;
 
+SYMBOL: json-depth
+
 : json-number ( char stream -- num char )
     [ 1string ] [ "\s\t\r\n,:}]" swap stream-read-until ] bi*
     [
@@ -109,9 +111,9 @@ DEFER: (read-json-string)
     { object vector object } declare
     {
         { CHAR: \" [ over read-json-string suffix! ] }
-        { CHAR: [  [ json-open-array ] }
+        { CHAR: [  [ 1 json-depth +@ json-open-array ] }
         { CHAR: ,  [ v-over-push ] }
-        { CHAR: ]  [ json-close-array ] }
+        { CHAR: ]  [ -1 json-depth +@ json-close-array ] }
         { CHAR: {  [ json-open-hash ] }
         { CHAR: :  [ v-pick-push ] }
         { CHAR: }  [ json-close-hash ] }
@@ -126,22 +128,26 @@ DEFER: (read-json-string)
     } case ;
 
 : json-read-input ( stream -- objects )
-    V{ } clone over '[ _ stream-read1 ] [ scan ] while* nip ;
+    0 json-depth [
+        V{ } clone over '[ _ stream-read1 ] [ scan ] while* nip
+        json-depth get zero? [ json-error ] unless
+    ] with-variable ;
 
-! If there are no json objects, return an empty hashtable
-! This happens for empty files.
-: first-json-object ( objects -- obj )
-    [ H{ } clone ] [ first ] if-empty ;
+: get-json ( objects  --  obj )
+    dup length 1 = [ first ] [ json-error ] if ;
 
 PRIVATE>
 
-: read-json-objects ( -- objects )
+: read-json ( -- objects )
     input-stream get json-read-input ;
 
 GENERIC: json> ( string -- object )
 
 M: string json>
-    [ read-json-objects first-json-object ] with-string-reader ;
+    [ read-json get-json ] with-string-reader ;
 
 : path>json ( path -- json )
-    utf8 [ read-json-objects first-json-object ] with-file-reader ;
+    utf8 [ read-json get-json ] with-file-reader ;
+
+: path>jsons ( path -- jsons )
+    utf8 [ read-json ] with-file-reader ;

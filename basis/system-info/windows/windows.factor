@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays byte-arrays classes.struct combinators kernel math
-namespaces specialized-arrays system
-vocabs.loader windows windows.advapi32
-windows.errors windows.kernel32 words system-info ;
+namespaces sequences specialized-arrays
+specialized-arrays.instances.alien.c-types.ushort system
+system-info vocabs.loader windows windows.advapi32
+windows.errors windows.kernel32 windows.powrprof words ;
 SPECIALIZED-ARRAY: ushort
 IN: system-info.windows
 
@@ -70,6 +71,9 @@ M: windows os-version
 M: windows cpus
     system-info dwNumberOfProcessors>> ;
 
+M: windows cpu-mhz
+    get-processor-power-information first MaxMhz>> 1,000,000 * ;
+
 : memory-status ( -- MEMORYSTATUSEX )
     MEMORYSTATUSEX <struct>
     MEMORYSTATUSEX heap-size >>dwLength
@@ -101,7 +105,7 @@ M: windows computer-name
     [ <byte-array> dup ] keep uint <ref>
     GetComputerName win32-error=0/f alien>native-string ;
 
-: username ( -- string )
+M: windows username ( -- string )
     UNLEN 1 +
     [ <byte-array> dup ] keep uint <ref>
     GetUserName win32-error=0/f alien>native-string ;

@@ -7,12 +7,12 @@ IN: peg.expr
 
 EBNF: expr [=[
 number   = ([0-9])+         => [[ string>number ]]
-value    =   number 
+value    =   number
            | ("(" exp ")")  => [[ second ]]
 
 fac      =   fac "*" value  => [[ first3 nip * ]]
            | fac "/" value  => [[ first3 nip / ]]
-           | number
+           | value
 
 exp      =   exp "+" fac    => [[ first3 nip + ]]
            | exp "-" fac    => [[ first3 nip - ]]

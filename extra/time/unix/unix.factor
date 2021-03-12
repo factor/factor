@@ -7,7 +7,7 @@ IN: time.unix
 : timestamp>timezone ( timestamp -- timezone )
     gmt-offset>> duration>minutes 1 \ timezone <struct-boa> ; inline
 
-M: unix set-time
+M: unix set-system-time
     [ unix-1970 time- duration>microseconds >integer make-timeval ]
     [ timestamp>timezone ] bi
     settimeofday io-error ;

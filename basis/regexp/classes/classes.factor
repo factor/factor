@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators
-combinators.short-circuit combinators.smart fry kernel locals
-math math.order sequences sets unicode unicode.data ;
+combinators.short-circuit combinators.smart kernel math
+math.order sequences sets unicode unicode.data ;
 FROM: ascii => ascii? ;
 IN: regexp.classes
 
@@ -12,7 +12,7 @@ ascii-class punctuation-class java-printable-class blank-class
 control-character-class hex-digit-class java-blank-class c-identifier-class
 unmatchable-class terminator-class word-boundary-class ;
 
-SINGLETONS: beginning-of-input ^ end-of-input $ end-of-file
+SINGLETONS: beginning-of-input ^crlf end-of-input $crlf end-of-file
 ^unix $unix word-break ;
 
 TUPLE: range-class { from read-only } { to read-only } ;

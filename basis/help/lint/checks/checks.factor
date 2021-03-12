@@ -27,6 +27,12 @@ SYMBOL: vocab-articles
             "layout" ! ui.text.pango
             "script-string" ! windows.uniscribe
             "linux-monitor" ! github issue #2014, race condition in disposing of child monitors
+            "event-stream"
+            "macosx-monitor"
+            "recursive-monitor"
+            "input-port"
+            "malloc-ptr"
+            "fd"
         } member?
     ] reject ;
 
@@ -144,6 +150,10 @@ SYMBOL: vocab-articles
         ] unless
     ] each ;
 
+: check-slots-tables ( element -- )
+    \ $slots swap elements [ rest [ length 2 = ] all?  ] all?
+    [ "$slots have too many values in at least one row" simple-lint-error ] unless ;
+
 : check-rendering ( element -- )
     [ print-content ] with-string-writer drop ;
 
@@ -219,6 +229,7 @@ SYMBOL: vocab-articles
         [ check-examples ]
         [ check-modules ]
         [ check-descriptions ]
+        [ check-slots-tables ]
     } cleave ;
 
 : files>vocabs ( -- assoc )

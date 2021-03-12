@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs cache combinators images.loader kernel
-math memoize namespaces opengl opengl.textures sequences
-splitting system ui.gadgets.worlds vocabs ;
+USING: accessors assocs cache combinators images images.loader kernel math
+memoize namespaces opengl opengl.textures sequences splitting system
+ui.gadgets.worlds vocabs ;
 IN: ui.images
 
 TUPLE: image-name path ;
@@ -16,10 +16,14 @@ MEMO: cached-image-path ( path -- image )
 
 PRIVATE>
 
-: cached-image ( image-name -- image )
+GENERIC: cached-image ( image -- image )
+
+M: image-name cached-image
     path>> gl-scale-factor get-global [ 1.0 > ] [ f ] if* [
         "." split1-last "@2x." glue
     ] when cached-image-path ;
+
+M: image cached-image ;
 
 <PRIVATE
 
@@ -28,17 +32,17 @@ PRIVATE>
 
 PRIVATE>
 
-: rendered-image ( image-name -- texture )
+: rendered-image ( image -- texture )
     world get image-texture-cache
     [ cached-image { 0 0 } <texture> ] cache ;
 
-: draw-image ( image-name -- )
+: draw-image ( image -- )
     rendered-image draw-texture ;
 
-: draw-scaled-image ( dim image-name -- )
+: draw-scaled-image ( dim image -- )
     rendered-image draw-scaled-texture ;
 
-: image-dim ( image-name -- dim )
+: image-dim ( image -- dim )
     cached-image [ dim>> ] [ 2x?>> [ [ 2 / ] map ] when ] bi ;
 
 {

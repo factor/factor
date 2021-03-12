@@ -1,6 +1,5 @@
-USING: calendar namespaces alien.c-types system
-windows.kernel32 kernel math combinators windows.errors
-accessors classes.struct calendar.format math.functions ;
+USING: accessors calendar classes.struct combinators kernel math
+math.functions system windows.errors windows.kernel32 ;
 IN: calendar.windows
 
 : timestamp>SYSTEMTIME ( timestamp -- SYSTEMTIME )
@@ -37,5 +36,5 @@ M: windows gmt-offset
         { TIME_ZONE_ID_DAYLIGHT [ [ Bias>> ] [ DaylightBias>> ] bi + ] }
     } case neg 60 /mod 0 ;
 
-M: windows gmt
+M: windows now-gmt
     SYSTEMTIME <struct> [ GetSystemTime ] keep SYSTEMTIME>timestamp ;
