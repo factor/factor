@@ -139,15 +139,17 @@ DEFER: gemtext.
 
 <PRIVATE
 
-:: gemini-link. ( link-text base-url -- )
-    ! XXX: handle data: urls (including base64)
+:: gemini-link ( link-text base-url -- text url )
     link-text
     [ blank? ] trim-head
     [ blank? ] split1-when
     [ blank? ] trim [ dup ] when-empty swap >url
     dup protocol>> [
         base-url clone f >>query f >>anchor swap derive-url
-    ] unless [
+    ] unless ;
+
+: gemini-link. ( link-text base-url -- )
+    gemini-link [
         presented ,,
         COLOR: blue foreground ,,
     ] H{ } make format nl ;
@@ -163,19 +165,26 @@ DEFER: gemtext.
 : gemini-quoted. ( text -- )
     gemini-pad 78 wrap-lines [ "> " write print ] each ;
 
+SYMBOL: pre
+
+! quote and link in pre tag
+
+:: gemini-line. ( base-url line -- )
+    line "```" ?head [
+        drop pre toggle
+    ] [
+        {
+            { [ pre get ] [ print ] }
+            { [ "=>" ?head ] [ base-url gemini-link. ] }
+            { [ "> " ?head ] [ gemini-quoted. ] }
+            [ gemini-pad 80 wrap-string print ]
+        } cond
+    ] if ;
+
 PRIVATE>
 
-:: gemtext. ( base-url body -- )
-    f "pre" [
-        body string-lines [
-            {
-                { [ "```" ?head ] [ drop "pre" toggle ] }
-                { [ "=>" ?head ] [ base-url gemini-link. ] }
-                { [ "> " ?head ] [ gemini-quoted. ] }
-                [ "pre" get [ gemini-pad 80 wrap-string ] unless print ]
-            } cond
-        ] each
-    ] with-variable ;
+: gemtext. ( base-url body -- )
+    f pre [ string-lines [ gemini-line. ] with each ] with-variable ;
 
 ! "gemtext"
 
