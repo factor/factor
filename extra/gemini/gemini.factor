@@ -3,10 +3,10 @@
 
 USING: accessors ascii colors.constants combinators
 continuations images.loader images.loader.private images.viewer
-io io.encodings.binary io.encodings.string io.encodings.utf8
-io.pathnames io.sockets io.sockets.secure io.styles kernel make
-math namespaces present sequences sequences.extras splitting
-urls wrap.strings ;
+io io.encodings.binary io.encodings.latin1 io.encodings.string
+io.encodings.utf8 io.pathnames io.sockets io.sockets.secure
+io.styles kernel make math namespaces present sequences
+sequences.extras splitting urls wrap.strings ;
 
 IN: gemini
 
@@ -17,6 +17,11 @@ IN: gemini
 ! https://gemini.circumlunar.space/docs/specification.gmi
 
 ! URL" gemini://gemini.circumlunar.space"
+
+ERROR: too-many-redirects ;
+
+SYMBOL: max-redirects
+max-redirects [ 5 ] initialize
 
 <PRIVATE
 
@@ -69,20 +74,52 @@ CONSTANT: STATUS-CODES H{
     ! XXX: Implement Trust-On-First-Use
     [ send-secure-handshake ] [ certificate-verify-error? ] ignore-error ;
 
-PRIVATE>
+SYMBOL: redirects
 
-: gemini ( url -- status meta body/f )
-    dup gemini-addr binary [
+DEFER: gemini-request
+
+: gemini-redirect ( status meta body/f -- status' meta' body'/f )
+    redirects inc
+    redirects get max-redirects get < [
+        ! XXX: detect cross-protocol redirects
+        drop nip gemini-request
+    ] [ too-many-redirects ] if ;
+
+: ?gemini-redirect ( status meta body/f -- status' meta' body'/f )
+    pick ?first CHAR: 3 = [ gemini-redirect ] when ;
+
+: gemini-request ( url -- status meta body/f )
+    >url dup gemini-addr binary [
         gemini-tls
         send-request
         read-response
-    ] with-client ;
+    ] with-client ?gemini-redirect ;
+
+PRIVATE>
+
+: gemini ( url -- status meta body/f )
+    0 redirects [ gemini-request ] with-variable ;
+
+ERROR: unsupported-charset charset ;
+
+<PRIVATE
+
+: gemini-charset ( text-mime -- charset )
+    "; charset=" over subseq-start [
+        tail "; charset=" ?head drop >lower {
+            { "iso-8859-1" [ latin1 ] }
+            { "utf-8" [ utf8 ] }
+            [ unsupported-charset ]
+        } case
+    ] [ drop utf8 ] if* ;
+
+PRIVATE>
 
 DEFER: gemtext.
 
 : gemini. ( url -- )
     dup gemini [ drop ] 2dip swap {
-        { [ "text/" ?head ] [ drop utf8 decode gemtext. ] }
+        { [ "text/" ?head ] [ gemini-charset decode gemtext. ] }
         { [ "image/" ?head ] [ (image-class) load-image* image. drop ] }
         [ 3drop ]
     } cond ;
@@ -93,12 +130,10 @@ DEFER: gemtext.
     link-text
     [ blank? ] trim-head
     [ blank? ] split1-when
-    [ blank? ] trim [ dup ] when-empty swap
-    "://" over subseq? [
-        >url
-    ] [
-        base-url clone swap '[ _ append-path ] change-path f >>query f >>anchor
-    ] if [
+    [ blank? ] trim [ dup ] when-empty swap >url
+    dup protocol>> [
+        base-url clone f >>query f >>anchor swap derive-url
+    ] unless [
         presented ,,
         COLOR: blue foreground ,,
     ] H{ } make format nl ;
