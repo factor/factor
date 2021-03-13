@@ -1,7 +1,7 @@
 USING: arrays classes classes.algebra classes.dispatch.covariant-tuples
 classes.dispatch.syntax compiler.test generic generic.multi generic.single
-kernel kernel.private literals math math.combinatorics random sequences
-tools.dispatch tools.test tools.time words ;
+kernel kernel.private literals math math.combinatorics namespaces random
+sequences tools.dispatch tools.test tools.time words ;
 IN: generic.multi.tests
 
 
@@ -208,3 +208,28 @@ MM: cached-md-beats? ( o: m-thing o: m-thing -- ?: boolean ) 2drop f ;
     s-rock s-scissors     cached-md-beats?
     s-rock s-rock         cached-md-beats?
 ] unit-test
+
+! Checking behavior from https://github.com/factor/factor/pull/2431#issuecomment-797998735
+TUPLE: t0 ;
+TUPLE: t1 < t0 ;
+TUPLE: t2 < t1 ;
+TUPLE: t3 < t2 ;
+
+SYMBOL: acc
+
+: add-acc ( x -- ) acc get push ;
+
+GENERIC: mg ( o1 o2 o3 -- )
+MM: mg ( o: t3 o: t0 o: t2 -- ) 1 add-acc call-next-method ;
+MM: mg ( o: t2 o: t2 o: t2 -- ) 2 add-acc call-next-method ;
+MM: mg ( o: t2 o: t0 o: t0 -- ) 3 add-acc call-next-method ;
+MM: mg ( o: t0 o: t0 o: t0 -- ) 4 add-acc 3drop ;
+! TODO find way to test without the tie breaker
+! Comment out next line to test actual behavior!
+MM: mg ( o: t3 o: t2 o: t2 -- ) call-next-method ;
+
+: test-acc ( o1 o2 o3 -- acc )
+    V{ } clone acc [ mg acc get ] with-variable ;
+{ V{ 3 4 } } [ t3 new t2 new t0 new test-acc ] unit-test
+{ V{ 2 3 4 } } [ t2 new t2 new t2 new test-acc ] unit-test
+{ V{ 1 3 4 } } [ t3 new t2 new t2 new test-acc ] unit-test
