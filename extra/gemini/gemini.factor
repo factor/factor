@@ -170,16 +170,13 @@ SYMBOL: pre
 ! quote and link in pre tag
 
 :: gemini-line. ( base-url line -- )
-    line "```" ?head [
-        drop pre toggle
-    ] [
-        {
-            { [ pre get ] [ print ] }
-            { [ "=>" ?head ] [ base-url gemini-link. ] }
-            { [ "> " ?head ] [ gemini-quoted. ] }
-            [ 78 gemini-pad 78 wrap-string print ]
-        } cond
-    ] if ;
+    line {
+        { [ "```" ?head ] [ drop pre toggle ] }
+        { [ pre get ] [ print ] }
+        { [ "=>" ?head ] [ base-url gemini-link. ] }
+        { [ "> " ?head ] [ gemini-quoted. ] }
+        [ 78 gemini-pad 78 wrap-string print ]
+    } cond ;
 
 PRIVATE>
 
