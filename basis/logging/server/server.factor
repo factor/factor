@@ -68,9 +68,6 @@ SYMBOL: log-files
 
 CONSTANT: keep-logs 10
 
-: ?delete-file ( path -- )
-    dup exists? [ delete-file ] [ drop ] if ;
-
 : delete-oldest ( service -- )
     keep-logs log# ?delete-file ;
 
