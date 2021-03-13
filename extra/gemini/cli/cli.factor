@@ -1,38 +1,15 @@
 ! Copyright (C) 2021 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays ascii assocs combinators
-combinators.short-circuit formatting gemini gemini.private
-grouping io io.directories io.encodings.string io.encodings.utf8
-io.files io.files.temp io.launcher kernel math math.parser
-namespaces present sequences splitting system urls webbrowser ;
+USING: accessors arrays combinators.short-circuit
+command-line.loop formatting gemini gemini.private io
+io.directories io.encodings.string io.encodings.utf8 io.files
+io.files.temp io.launcher kernel math math.parser namespaces
+present sequences splitting system urls webbrowser ;
 
 IN: gemini.cli
 
-CONSTANT: ABBREVS H{
-     { "b"    "back" }
-     { "f"    "forward" }
-     { "g"    "go" }
-     { "h"    "history" }
-     { "hist" "history" }
-     { "l"    "less" }
-     { "q"    "quit" }
-     { "r"    "reload" }
-     { "u"    "up" }
-     { "?"    "help" }
-}
-
-CONSTANT: COMMANDS H{
-    { "back"    "Go back to the previous Gemini URL." }
-    { "forward" "Go forward to the next Gemini URL." }
-    { "go"      "Go to a Gemini URL" }
-    { "help"    "Get help for commands." }
-    { "history" "Display recently viewed Gemini URLs." }
-    { "less"    "View the most recent Gemini URL in a pager." }
-    { "quit"    "Quit the program." }
-    { "reload"  "Reload the most recent Gemini URL." }
-    { "up"      "Go up one directory from the recent Gemini URL." }
-}
+CONSTANT: DEFAULT-URL "gemini://gemini.circumlunar.space"
 
 CONSTANT: HISTORY V{ }
 CONSTANT: LINKS V{ }
@@ -87,7 +64,7 @@ CONSTANT: URL V{ }
     ] if ;
 
 : gemini-go ( args -- )
-    [ "gemini://gemini.circumlunar.space" ] when-empty
+    [ DEFAULT-URL ] when-empty
     { [ "://" over subseq? ] [ "gemini://" head? ] } 1||
     [ "gemini://" prepend ] unless
     dup "gemini://" head? [
@@ -120,44 +97,62 @@ CONSTANT: URL V{ }
 : gemini-quit ( -- )
     "gemini.txt" temp-file ?delete-file 0 exit ;
 
-: gemini-help ( args -- )
-    [
-        COMMANDS keys
-        [ 6 <groups> ] [ longest length 4 + ] bi
-        '[ [ _ CHAR: \s pad-tail write ] each nl ] each
-    ] [
-        ABBREVS ?at drop COMMANDS ?at [
-            print
-        ] [
-            "ERROR: Command '" "' not found" surround print
-        ] if
-    ] if-empty ;
+CONSTANT: COMMANDS {
+    T{ command
+        { name "back" }
+        { quot [ drop gemini-back ] }
+        { help "Go back to the previous Gemini URL." }
+        { abbrevs { "b" } } }
+    T{ command
+        { name "forward" }
+        { quot [ drop gemini-forward ] }
+        { help "Go forward to the next Gemini URL." }
+        { abbrevs { "f" } } }
+    T{ command
+        { name "history" }
+        { quot [ drop gemini-history ] }
+        { help "Display recently viewed Gemini URLs." }
+        { abbrevs { "h" "hist" } } }
+    T{ command
+        { name "less" }
+        { quot [ drop gemini-less ] }
+        { help "View the most recent Gemini URL in a pager." }
+        { abbrevs { "l" } } }
+    T{ command
+        { name "go" }
+        { quot [ gemini-go ] }
+        { help "Go to a Gemini URL" }
+        { abbrevs { "g" } } }
+    T{ command
+        { name "up" }
+        { quot [ drop gemini-up ] }
+        { help "Go up one directory from the recent Gemini URL." }
+        { abbrevs { "u" } } }
+    T{ command
+        { name "reload" }
+        { quot [ drop gemini-reload ] }
+        { help "Reload the most recent Gemini URL." }
+        { abbrevs { "r" } } }
+    T{ command
+        { name "quit" }
+        { quot [ drop gemini-quit ] }
+        { help "Quit the program." }
+        { abbrevs { "q" } } }
+}
 
-: gemini-cmd ( cmd -- )
-    " " split1 swap >lower ABBREVS ?at drop {
-        { "help" [ gemini-help ] }
-        { "history" [ drop gemini-history ] }
-        { "go" [ gemini-go ] }
-        { "reload" [ drop gemini-reload ] }
-        { "back" [ drop gemini-back ] }
-        { "forward" [ drop gemini-forward ] }
-        { "up" [ drop gemini-up ] }
-        { "less" [ drop gemini-less ] }
-        { "quit" [ drop gemini-quit ] }
-        { "" [ drop ] }
-        [
-            dup string>number [ 1 - LINKS ?nth ] [ f ] if* [
-                2nip gemini-go
-            ] [
-                "ERROR: Unknown command '" "'" surround print drop
-            ] if*
-        ]
-    } case flush ;
+TUPLE: gemini-command-loop < command-loop ;
+
+M: gemini-command-loop missing-command
+    over string>number [ 1 - LINKS ?nth ] [ f ] if* [
+        gemini-go 3drop
+    ] [
+        call-next-method
+    ] if* ;
 
 : gemini-main ( -- )
-    "Welcome to Project Gemini!" print flush [
-        "GEMINI> " write flush readln
-        [ gemini-cmd t ] [ f ] if*
-    ] loop ;
+    "Welcome to Project Gemini!" "GEMINI>"
+    gemini-command-loop new-command-loop
+    COMMANDS [ over add-command ] each
+    run-command-loop ;
 
 MAIN: gemini-main
