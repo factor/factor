@@ -4,8 +4,8 @@
 USING: accessors arrays combinators.short-circuit command-loop
 formatting gemini gemini.private io io.directories
 io.encodings.string io.encodings.utf8 io.files io.files.temp
-io.launcher kernel math math.parser namespaces present sequences
-splitting system urls webbrowser ;
+io.launcher io.pipes kernel math math.parser namespaces present
+sequences splitting system urls webbrowser ;
 
 IN: gemini.cli
 
@@ -110,6 +110,11 @@ CONSTANT: URL V{ }
 : gemini-root ( -- )
     URL ?first [ >url "/" >>path gemini-go ] when* ;
 
+: gemini-shell ( args -- )
+    "|" split "gemini.txt" temp-file dup exists? [
+        "cat" swap 2array prefix run-pipeline drop
+    ] [ 2drop ] if ;
+
 CONSTANT: COMMANDS {
     T{ command
         { name "back" }
@@ -161,6 +166,11 @@ CONSTANT: COMMANDS {
         { quot [ drop gemini-root ] }
         { help "Navigate to the most recent Gemini URL's root." }
         { abbrevs f } }
+    T{ command
+        { name "shell" }
+        { quot [ gemini-shell ] }
+        { help "'cat' the most recent Gemini URL through a shell." }
+        { abbrevs { "!" } } }
     T{ command
         { name "quit" }
         { quot [ drop gemini-quit ] }
