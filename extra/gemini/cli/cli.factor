@@ -54,7 +54,7 @@ CONSTANT: URL V{ }
     ] with-variable ;
 
 : gemini-get ( args -- )
-    dup 0 URL set-nth
+    dup URL set-first
     >url dup gemini [ drop ] 2dip swap "text/" ?head [
         "gemini.txt" temp-file
         [ utf8 [ gemini-print ] with-file-writer ]
@@ -64,7 +64,7 @@ CONSTANT: URL V{ }
     ] if ;
 
 : gemini-go ( args -- )
-    [ DEFAULT-URL ] when-empty
+    present [ DEFAULT-URL ] when-empty
     { [ "://" over subseq? ] [ "gemini://" head? ] } 1||
     [ "gemini://" prepend ] unless
     dup "gemini://" head? [
@@ -88,7 +88,7 @@ CONSTANT: URL V{ }
     URL ?first [
         >url f >>query f >>anchor
         [ "/" ?tail drop "/" split1-last drop "/" append ] change-path
-        present gemini-go
+        gemini-go
     ] when* ;
 
 : gemini-less ( -- )
@@ -96,8 +96,19 @@ CONSTANT: URL V{ }
         "less" swap 2array try-process
     ] [ drop ] if ;
 
+: gemini-ls ( -- )
+    LINKS [
+        1 + swap "[%d] %s\n" printf
+    ] each-index ;
+
 : gemini-quit ( -- )
     "gemini.txt" temp-file ?delete-file 0 exit ;
+
+: gemini-url ( -- )
+    URL ?first [ print ] when* ;
+
+: gemini-root ( -- )
+    URL ?first [ >url "/" >>path gemini-go ] when* ;
 
 CONSTANT: COMMANDS {
     T{ command
@@ -121,6 +132,11 @@ CONSTANT: COMMANDS {
         { help "View the most recent Gemini URL in a pager." }
         { abbrevs { "l" } } }
     T{ command
+        { name "ls" }
+        { quot [ drop gemini-ls ] }
+        { help "List the currently available links." }
+        { abbrevs f } }
+    T{ command
         { name "go" }
         { quot [ gemini-go ] }
         { help "Go to a Gemini URL" }
@@ -131,15 +147,25 @@ CONSTANT: COMMANDS {
         { help "Go up one directory from the recent Gemini URL." }
         { abbrevs { "u" } } }
     T{ command
+        { name "url" }
+        { quot [ drop gemini-url ] }
+        { help "Print the most recent Gemini URL." }
+        { abbrevs f } }
+    T{ command
         { name "reload" }
         { quot [ drop gemini-reload ] }
         { help "Reload the most recent Gemini URL." }
         { abbrevs { "r" } } }
     T{ command
+        { name "root" }
+        { quot [ drop gemini-root ] }
+        { help "Navigate to the most recent Gemini URL's root." }
+        { abbrevs f } }
+    T{ command
         { name "quit" }
         { quot [ drop gemini-quit ] }
         { help "Quit the program." }
-        { abbrevs { "q" } } }
+        { abbrevs { "q" "exit" } } }
 }
 
 TUPLE: gemini-command-loop < command-loop ;
