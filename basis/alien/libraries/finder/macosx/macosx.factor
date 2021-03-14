@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors alien.c-types alien.libraries.finder
-alien.syntax arrays assocs combinators.short-circuit environment
-io.files io.files.info io.pathnames kernel locals make
-math.order namespaces sequences splitting system system-info ;
+alien.syntax arrays assocs combinators environment io.files
+io.files.info io.pathnames kernel make math.order namespaces
+sequences splitting system system-info ;
 
 IN: alien.libraries.finder.macosx
 
@@ -114,15 +114,19 @@ SYMBOL: dyld-executable-path
 
 FUNCTION: bool _dyld_shared_cache_contains_path ( c-string name )
 
+: use-dyld-shared-cache? ( -- ? )
+    os-version { 11 0 0 } after=? ;
+
 PRIVATE>
 
 : dyld-find ( name -- path/f )
-    dyld-search-paths
-    os-version { 11 0 0 } after=? [
-        [ _dyld_shared_cache_contains_path ] find
-    ] [
-        [ { [ exists? ] [ file-info regular-file? ] } 1&& ] find
-    ] if [ nip ] when* ;
+    dyld-search-paths [
+        {
+            { [ dup exists? ] [ file-info regular-file? ] }
+            { [ use-dyld-shared-cache? ] [ _dyld_shared_cache_contains_path ] }
+            [ drop f ]
+        } cond
+    ] find [ nip ] when* ;
 
 : framework-find ( name -- path )
     dup dyld-find [ nip ] [
