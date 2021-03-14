@@ -89,7 +89,7 @@ big-endian off
 
 ! rc-absolute-cell is just CONSTANT: 0
 : jit-call ( name -- )
-    ! 0 X0 MOVwi64
+    0 X0 MOVwi64
     f rc-absolute-cell rel-dlsym
     X0 BR ;
     ! RAX 0 MOV f rc-absolute-cell rel-dlsym
@@ -286,6 +286,7 @@ big-endian off
 
     ! ## Entry points
     { c-to-factor [
+        ! dst src MOV
         ! arg2 arg1 MOV
         ! vm-reg "begin_callback" jit-call-1arg
 
@@ -295,7 +296,17 @@ big-endian off
 
         ! vm-reg "end_callback" jit-call-1arg
 
-        BL
+        [
+            ! Rn Rd MOVr64
+            arg1 arg2 MOVr64
+            vm-reg "begin_callback" jit-call-1arg
+
+            return-reg arg1 MOVr64 ! arg1 is return
+            jit-call-quot
+
+            vm-reg "end_callback" jit-call-1arg
+
+        ] assemble-arm %
 
     ] }
     ! { unwind-native-frames [ ] }
