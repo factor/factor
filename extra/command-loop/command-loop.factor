@@ -1,6 +1,8 @@
+! Copyright (C) 2021 John Benediktsson
+! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors ascii assocs combinators grouping io kernel
-math sequences sorting splitting ;
+USING: accessors ascii assocs combinators formatting grouping io
+kernel math sequences sorting splitting ;
 
 IN: command-loop
 
@@ -20,11 +22,12 @@ GENERIC: run-command-loop ( command-loop -- )
 
 : do-help ( args command-loop -- )
     over empty? [
-        "Available commands:" print
-        "-------------------" print
+        nl
+        "Commands available:" print
+        "===================" print
         nip commands>> [ name>> ] map natural-sort
         [ 6 <groups> ] [ longest length 4 + ] bi
-        '[ [ _ CHAR: \s pad-tail write ] each nl ] each
+        '[ [ _ CHAR: \s pad-tail write ] each nl ] each nl
     ] [
         dupd find-command [
             nip help>> print
@@ -38,6 +41,18 @@ GENERIC: run-command-loop ( command-loop -- )
     "List available commands with 'help' or detailed help with 'help cmd'"
     { "?" } <command> ;
 
+: do-abbrevs ( args command-loop -- )
+    nl
+    "Commands abbreviated:" print
+    "=====================" print
+    nip abbrevs>> sort-keys [
+        "%-7s %s\n" printf
+    ] assoc-each nl ;
+
+: <abbrevs-command> ( command-loop -- command )
+    "abbrevs" swap '[ _ do-abbrevs ]
+    "List abbreviated commands" f <command> ;
+
 PRIVATE>
 
 : new-command-loop ( intro prompt class -- command-loop )
@@ -45,8 +60,13 @@ PRIVATE>
         swap >>prompt
         swap >>intro
         V{ } clone >>commands
-        V{ } clone >>abbrevs
-    [ <help-command> ] [ add-command ] [ ] tri ;
+        V{ } clone >>abbrevs {
+        [ <help-command> ]
+        [ add-command ]
+        [ <abbrevs-command> ]
+        [ add-command ]
+        [ ]
+    } cleave ;
 
 : <command-loop> ( intro prompt -- command-loop )
     command-loop new-command-loop ;
