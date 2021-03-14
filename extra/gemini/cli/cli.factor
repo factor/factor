@@ -1,11 +1,11 @@
 ! Copyright (C) 2021 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays combinators.short-circuit
-command-line.loop formatting gemini gemini.private io
-io.directories io.encodings.string io.encodings.utf8 io.files
-io.files.temp io.launcher kernel math math.parser namespaces
-present sequences splitting system urls webbrowser ;
+USING: accessors arrays combinators.short-circuit command-loop
+formatting gemini gemini.private io io.directories
+io.encodings.string io.encodings.utf8 io.files io.files.temp
+io.launcher kernel math math.parser namespaces present sequences
+splitting system urls webbrowser ;
 
 IN: gemini.cli
 
