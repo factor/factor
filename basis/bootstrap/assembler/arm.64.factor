@@ -5,7 +5,7 @@ compiler.constants compiler.units cpu.arm.assembler
 cpu.arm.assembler.opcodes generic.single.private
 kernel kernel.private layouts locals locals.backend
 math math.private memory namespaces sequences slots.private
-strings.private threads.private vocabs ;
+strings.private threads.private vocabs make ;
 IN: bootstrap.arm
 
 8 \ cell set
@@ -75,13 +75,13 @@ big-endian off
 
 
 ! : pic-tail-reg ( -- reg ) RBX ;
-! : return-reg ( -- reg ) RAX ;
+: return-reg ( -- reg ) X0 ;
 ! : nv-reg ( -- reg ) RBX ;
 ! : stack-reg ( -- reg ) RSP ;
 ! : frame-reg ( -- reg ) RBP ;
 ! : link-reg ( -- reg ) R11 ;
 ! : ctx-reg ( -- reg ) R12 ;
-! : vm-reg ( -- reg ) R13 ;
+: vm-reg ( -- reg ) X7 ;
 : ds-reg ( -- reg ) X5 ;
 : rs-reg ( -- reg ) X6 ;
 ! : fixnum>slot@ ( -- ) temp0 1 SAR ;
@@ -153,7 +153,10 @@ big-endian off
 : jit-jump-quot ( -- ) ;
     ! arg1 quot-entry-point-offset [+] JMP ;
 
-: jit-call-quot ( -- ) ;
+: jit-call-quot ( -- )
+    quot-entry-point-offset arg1 ADR
+    arg1 BR ;
+
     ! arg1 quot-entry-point-offset [+] CALL ;
 
 : signal-handler-save-regs ( -- regs ) { } ;
