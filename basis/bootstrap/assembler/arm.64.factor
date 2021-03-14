@@ -304,10 +304,10 @@ big-endian off
             arg1 arg2 MOVr64
             vm-reg "begin_callback" jit-call-1arg
 
-            return-reg arg1 MOVr64 ! arg1 is return
-            jit-call-quot
+            ! return-reg arg1 MOVr64 ! arg1 is return
+            ! jit-call-quot
 
-            vm-reg "end_callback" jit-call-1arg
+            ! vm-reg "end_callback" jit-call-1arg
 
         ] assemble-arm %
 
