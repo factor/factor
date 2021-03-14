@@ -1,10 +1,10 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors alien.libraries.finder arrays assocs
-combinators.short-circuit environment io.files io.files.info
-io.pathnames kernel locals make namespaces sequences splitting
-system ;
+USING: accessors alien.c-types alien.libraries.finder
+alien.syntax arrays assocs combinators.short-circuit environment
+io.files io.files.info io.pathnames kernel locals make
+math.order namespaces sequences splitting system system-info ;
 
 IN: alien.libraries.finder.macosx
 
@@ -112,12 +112,17 @@ SYMBOL: dyld-executable-path
     [ dyld-default-search ] tri 3append
     dyld-image-suffix-search ;
 
+FUNCTION: bool _dyld_shared_cache_contains_path ( c-string name )
+
 PRIVATE>
 
 : dyld-find ( name -- path/f )
     dyld-search-paths
-    [ { [ exists? ] [ file-info regular-file? ] } 1&& ] find
-    [ nip ] when* ;
+    os-version { 11 0 0 } after=? [
+        [ _dyld_shared_cache_contains_path ] find
+    ] [
+        [ { [ exists? ] [ file-info regular-file? ] } 1&& ] find
+    ] if [ nip ] when* ;
 
 : framework-find ( name -- path )
     dup dyld-find [ nip ] [
