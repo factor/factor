@@ -92,7 +92,9 @@ CONSTANT: URL V{ }
     ] when* ;
 
 : gemini-less ( -- )
-    "less" "gemini.txt" temp-file 2array try-process ;
+    "gemini.txt" temp-file dup exists? [
+        "less" swap 2array try-process
+    ] [ drop ] if ;
 
 : gemini-quit ( -- )
     "gemini.txt" temp-file ?delete-file 0 exit ;
