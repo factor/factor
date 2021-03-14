@@ -2,7 +2,7 @@
 USING: accessors ascii assocs combinators grouping io kernel
 math sequences sorting splitting ;
 
-IN: command-line.loop
+IN: command-loop
 
 TUPLE: command name quot help abbrevs ;
 
