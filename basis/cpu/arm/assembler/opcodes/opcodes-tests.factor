@@ -1,6 +1,7 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cpu.arm.assembler.opcodes math math.bitwise tools.test ;
+USING: cpu.arm.assembler cpu.arm.assembler.opcodes math
+math.bitwise tools.test ;
 IN: cpu.arm.assembler.opcodes.tests
 
 { 0b00011010000000110000000001000001 } [ X3 X2 X1 ADC32-encode ] unit-test
@@ -16,3 +17,10 @@ IN: cpu.arm.assembler.opcodes.tests
 
 ! stp x29, x30, [sp,#-16]!
 { 0xa9bf7bfd } [ -16 8 / 7 bits X30 SP X29 STPpre64-encode ] unit-test
+
+
+{ B{ 0 0 0 0x10 } } [ [ 0 X0 ADR ] assemble-arm ] unit-test
+{ B{ 0 0 0 0x30 } } [ [ 1 X0 ADR ] assemble-arm ] unit-test
+
+{ B{ 0 0 0 0x90 } } [ [ 0 X0 ADRP ] assemble-arm ] unit-test
+{ B{ 0 0 0 0xb0 } } [ [ 1 X0 ADRP ] assemble-arm ] unit-test
