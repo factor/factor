@@ -112,7 +112,7 @@ PRIVATE>
 
 : gemini-server-main ( -- )
     command-line get ?first "." or
-    1234 <gemini-server> start-server wait-for-server ;
+    1965 <gemini-server> start-server wait-for-server ;
 
 MAIN: gemini-server-main
 
