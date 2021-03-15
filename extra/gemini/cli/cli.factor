@@ -18,13 +18,26 @@ CONSTANT: STACK V{ }
 CONSTANT: PAGE V{ }
 CONSTANT: URL V{ }
 
-! XXX: page titles and urls in history
+: find-url ( url items -- i item )
+    [ dup array? [ first ] when = ] with find ;
+
+: nth-url ( i items -- url )
+    ?nth dup array? [ first ] when ;
+
+: stack-url ( delta -- url )
+    URL ?first STACK find-url drop
+    [ + STACK nth-url ] [ drop f ] if* ;
 
 : add-stack ( args -- )
-    dup STACK index [ drop ] [
-        URL ?first STACK index [
-            over PAGE keys index [
-                1 + dup STACK ?nth pick = [ 2drop ] [
+    dup dup array? [ first ] when
+    dup STACK find-url drop [
+        2drop
+    ] [
+        URL ?first STACK find-url drop [
+            over PAGE find-url drop [
+                1 + dup STACK nth-url rot = [
+                    2drop
+                ] [
                     STACK [ length ] [ delete-slice ] bi
                     STACK push
                     STACK length 10 > [
@@ -32,9 +45,11 @@ CONSTANT: URL V{ }
                     ] when
                 ] if
             ] [
-                drop STACK push
+                2drop
+                STACK push
             ] if
         ] [
+            drop
             STACK delete-all
             STACK push
         ] if*
@@ -45,9 +60,20 @@ CONSTANT: URL V{ }
         0 swap remove-nth!
     ] when dupd remove! push ;
 
+: print-links ( links verbose? -- )
+    LINKS delete-all over LINKS push-all
+    '[
+        1 + swap [ dup array? [ first ] when URL ?first = [ drop "*" ] when ] keep
+        _ [ dup array? [ dup second empty? not ] [ f ] if ] [ f ] if [
+            first2 swap "[%s] %s (%s)\n" printf
+        ] [
+            dup array? [ first2 ] [ f ] if
+            dup empty? -rot ? "[%s] %s\n" printf
+        ] if
+    ] each-index ;
+
 : gemini-history ( -- )
-    HISTORY [ 1 + swap "[%d] %s\n" printf ] each-index
-    LINKS delete-all HISTORY LINKS push-all ;
+    HISTORY t print-links ;
 
 : gemini-print ( url body meta -- )
     f pre [
@@ -60,7 +86,7 @@ CONSTANT: URL V{ }
                 gemini-line.
             ] if
         ] with each
-        LINKS delete-all PAGE keys LINKS push-all
+        LINKS delete-all PAGE LINKS push-all
     ] with-variable ;
 
 : gemini-get ( args -- )
@@ -85,14 +111,10 @@ CONSTANT: URL V{ }
     HISTORY ?last gemini-go ;
 
 : gemini-back ( -- )
-    URL ?first STACK index [
-        1 - STACK ?nth [ gemini-get ] when*
-    ] when* ;
+    -1 stack-url [ gemini-get ] when* ;
 
 : gemini-forward ( -- )
-    URL ?first STACK index [
-        1 + STACK ?nth [ gemini-get ] when*
-    ] when* ;
+    1 stack-url [ gemini-get ] when* ;
 
 : gemini-up ( -- )
     URL ?first [
@@ -107,12 +129,7 @@ CONSTANT: URL V{ }
     ] [ drop ] if ;
 
  : gemini-ls ( args -- )
-    PAGE swap "-l" = '[
-        1 + swap first2 swap
-        _ [ " (" ")" surround ] [ drop f ] if
-        "[%d] %s%s\n" printf
-    ] each-index
-    LINKS delete-all PAGE keys LINKS push-all ;
+    [ PAGE ] [ "-l" = ] bi* print-links ;
 
 : gemini-quit ( -- )
     "gemini.txt" temp-file ?delete-file 0 exit ;
@@ -127,13 +144,6 @@ CONSTANT: URL V{ }
     "|" split "gemini.txt" temp-file dup exists? [
         "cat" swap 2array prefix run-pipeline drop
     ] [ 2drop ] if ;
-
-: gemini-stack ( -- )
-    STACK [
-        1 + swap dup URL ?first = " (*)" f ?
-        "[%d] %s%s\n" printf
-    ] each-index
-    LINKS delete-all STACK LINKS push-all ;
 
 CONSTANT: COMMANDS {
     T{ command
@@ -197,11 +207,6 @@ CONSTANT: COMMANDS {
         { help "'cat' the most recent Gemini URL through a shell." }
         { abbrevs { "!" } } }
     T{ command
-        { name "stack" }
-        { quot [ drop gemini-stack ] }
-        { help "Display the current navigation stack." }
-        { abbrevs f } }
-    T{ command
         { name "quit" }
         { quot [ drop gemini-quit ] }
         { help "Quit the program." }
@@ -212,7 +217,9 @@ TUPLE: gemini-command-loop < command-loop ;
 
 M: gemini-command-loop missing-command
     over string>number [ 1 - LINKS ?nth ] [ f ] if* [
-        gemini-go 3drop
+        [ add-history ]
+        [ add-stack ]
+        [ dup array? [ first ] when gemini-get 3drop ] tri
     ] [
         call-next-method
     ] if* ;
