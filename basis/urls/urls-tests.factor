@@ -411,6 +411,8 @@ urls [
 { URL" https://user:xxxxx@host:1234/path" } [ URL" https://user:password@host:1234/path" redacted-url ] unit-test
 
 {
+    { "/a/b/c"    "./////d"     "/a/b/d"    }
+    { "/a/b/c"    "./././././d" "/a/b/d"    }
     { "/a/b/c"    "/d"          "/d"        }
     { "/a/b/c"    "/./d"        "/d"        }
     { "/a/b/c"    "/../d"       "/d"        }
