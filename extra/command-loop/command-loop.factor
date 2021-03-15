@@ -1,8 +1,8 @@
 ! Copyright (C) 2021 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors ascii assocs combinators formatting grouping io
-kernel math sequences sorting splitting ;
+USING: accessors ascii assocs combinators continuations debugger
+formatting grouping io kernel math sequences sorting splitting ;
 
 IN: command-loop
 
@@ -94,8 +94,12 @@ M: command-loop missing-command ( args name command-loop -- )
 
 M: command-loop run-command-loop
     dup intro>> [ print ] when* [
-        dup prompt>> [ write bl flush ] when* readln
-        [ [ over handle-command ] unless-empty t ] [ f ] if*
+        dup prompt>> [ write bl flush ] when* readln [
+            [
+                [ over handle-command ]
+                [ "ERROR: " write print-error drop ] recover
+            ] unless-empty t
+        ] [ f ] if*
     ] loop drop ;
 
 : command-loop-main ( -- )
