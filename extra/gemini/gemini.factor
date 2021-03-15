@@ -143,7 +143,7 @@ DEFER: gemtext.
     link-text
     [ blank? ] trim-head
     [ blank? ] split1-when
-    [ blank? ] trim [ dup ] when-empty swap >url
+    [ blank? ] trim-head [ dup ] when-empty swap >url
     dup protocol>> [
         base-url clone f >>query f >>anchor swap derive-url
     ] unless ;
