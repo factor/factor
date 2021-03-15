@@ -125,11 +125,15 @@ CONSTANT: static-table {
     [ static-table length - swap dynamic-table>> nth ]
     if ;
 
-: search-table ( header encode-context -- perfect index/f )
+: search-stable ( header -- perfect/f imperfect/f )
+    static-table
+    ;
+: search-dtable ( header encode-context -- perfect index/f )
     ! index starts at 0
-    0
-    [ over nth ]
-    if ;
+    dynamic-table>> 
+    [ index ] 
+    [ [ first ] dip [ first over = ] find ] 2bi
+    ;
 
 
 ! assumes the first-byte respects the prefix-length, such that
