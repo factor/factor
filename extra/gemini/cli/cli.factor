@@ -118,7 +118,8 @@ CONSTANT: URL V{ }
 
 : gemini-up ( -- )
     URL ?first [
-        >url f >>query f >>anchor [ "../" url-append-path ] change-path
+        >url f >>query f >>anchor
+        [ dup "/" tail? "./../" "./" ? url-append-path ] change-path
         gemini-go
     ] when* ;
 
