@@ -163,10 +163,10 @@ DEFER: gemtext.
     ] while drop ;
 
 : gemini-quoted. ( text -- )
-    76 gemini-pad 76 wrap-lines [ "> " write print ] each ;
+    74 gemini-pad 74 wrap-lines [ "> " write print ] each ;
 
 : gemini-text. ( text -- )
-    78 gemini-pad 78 wrap-string print ;
+    76 gemini-pad 76 wrap-string print ;
 
 SYMBOL: pre
 
