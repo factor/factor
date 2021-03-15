@@ -147,11 +147,13 @@ M: url present
     ] "" make ;
 
 : remove-dot-segments ( path -- path' )
-    "/" split "." swap remove [
-        { ".." } split1 [
-            [ [ { } ] [ but-last ] if-empty ] dip append t
-        ] [ f ] if*
-    ] loop "/" join [ f ] when-empty ;
+    "/./" "/" replace
+    [ "/../" split1 ] [ [ "/" split1-last drop ] dip "/" glue ] while*
+    "/.." ?tail [ "/" split1-last drop "/" append ] when
+    "../" ?head [ "/" prepend ] when
+    "./" ?head [ "/" prepend ] when
+    "/." ?tail [ "/" append ] when
+    [ "/" ] when-empty ;
 
 PRIVATE>
 

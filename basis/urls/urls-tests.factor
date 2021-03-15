@@ -312,17 +312,20 @@ urls [
     T{ url
         { protocol "https" }
         { host "www.apple.com" }
+        { path "/" }
     }
 } [
     T{ url
         { protocol "http" }
         { host "www.apple.com" }
         { port 80 }
+        { path "/" }
     }
 
     T{ url
         { protocol "https" }
         { host "www.apple.com" }
+        { path "/" }
     }
 
     derive-url
@@ -406,3 +409,38 @@ urls [
 { URL" https://host:1234/path" } [ URL" https://host:1234/path" redacted-url ] unit-test
 { URL" https://user@host:1234/path" } [ URL" https://user@host:1234/path" redacted-url ] unit-test
 { URL" https://user:xxxxx@host:1234/path" } [ URL" https://user:password@host:1234/path" redacted-url ] unit-test
+
+{
+    { "/a/b/c"    "/d"          "/d"        }
+    { "/a/b/c"    "/./d"        "/d"        }
+    { "/a/b/c"    "/../d"       "/d"        }
+    { "/a/b/c"    "/d"          "/d"        }
+    { "/a/b/c"    "d"           "/a/b/d"    }
+    { "/a/b/c"    "./d"         "/a/b/d"    }
+    { "/a/b/c"    "d/"          "/a/b/d/"   }
+    { "/a/b/c"    "."           "/a/b/"     }
+    { "/a/b/c"    "./"          "/a/b/"     }
+    { "/a/b/c"    ".."          "/a/"       }
+    { "/a/b/c"    "../"         "/a/"       }
+    { "/a/b/c"    "../d"        "/a/d"      }
+    { "/a/b/c"    "../.."       "/"         }
+    { "/a/b/c"    "../../"      "/"         }
+    { "/a/b/c"    "../../d"     "/d"        }
+    { "/a/b/c"    "../../../d"  "/d"        }
+    { "/a/b/c"    "d."          "/a/b/d."   }
+    { "/a/b/c"    ".d"          "/a/b/.d"   }
+    { "/a/b/c"    "d.."         "/a/b/d.."  }
+    { "/a/b/c"    "..d"         "/a/b/..d"  }
+    { "/a/b/c"    "./../d"      "/a/d"      }
+    { "/a/b/c"    "./d/."       "/a/b/d/"   }
+    { "/a/b/c"    "d/./e"       "/a/b/d/e"  }
+    { "/a/b/c"    "d/../e"      "/a/b/e"    }
+    { "/a/b/c/d/" "../../e/f"   "/a/b/e/f"  }
+    { "/a/b/c/d"  "../../e/f"   "/a/e/f"    }
+    { "/a/b/c/d/" "../../e/f/"  "/a/b/e/f/" }
+    { "/a/b/c/d"  "../../e/f/"  "/a/e/f/"   }
+    { "/a/b/c/d/" "/../../e/f/" "/e/f/"     }
+    { "/a/b/c/d"  "/../../e/f/" "/e/f/"     }
+} [
+    1 cut* swap first2 '[ _ _ url-append-path ] unit-test
+] each
