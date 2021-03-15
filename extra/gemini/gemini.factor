@@ -131,7 +131,7 @@ PRIVATE>
 DEFER: gemtext.
 
 : gemini. ( url -- )
-    dup gemini [ drop ] 2dip swap {
+    >url dup gemini [ drop ] 2dip swap {
         { [ "text/" ?head ] [ gemini-charset decode gemtext. ] }
         { [ "image/" ?head ] [ (image-class) load-image* image. drop ] }
         [ 3drop ]
