@@ -147,6 +147,7 @@ M: url present
     ] "" make ;
 
 : remove-dot-segments ( path -- path' )
+    [ "//" split1 ] [ "/" glue ] while*
     [ "/./" split1 ] [ "/" glue ] while*
     [ "/../" split1 ] [ [ "/" split1-last drop ] dip "/" glue ] while*
     "/.." ?tail [ "/" split1-last drop "/" append ] when
