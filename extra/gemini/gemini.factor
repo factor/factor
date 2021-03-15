@@ -165,51 +165,30 @@ DEFER: gemtext.
 : gemini-quoted. ( text -- )
     76 gemini-pad 76 wrap-lines [ "> " write print ] each ;
 
+: gemini-text. ( text -- )
+    78 gemini-pad 78 wrap-string print ;
+
 SYMBOL: pre
 
-! quote and link in pre tag
+CONSTANT: h1-style H{ { font-size 16 } { font-style bold } }
+CONSTANT: h2-style H{ { font-size 14 } { font-style bold } }
+CONSTANT: h3-style H{ { font-size 12 } { font-style bold } }
+CONSTANT: text-style H{ { font-size 12 } { font-style plain } }
 
 :: gemini-line. ( base-url line -- )
     line {
         { [ "```" ?head ] [ drop pre toggle ] }
         { [ pre get ] [ print ] }
-        { [ "=>" ?head ] [ base-url gemini-link. ] }
+        { [ "=> " ?head ] [ base-url gemini-link. ] }
         { [ "> " ?head ] [ gemini-quoted. ] }
-        [ 78 gemini-pad 78 wrap-string print ]
+        { [ "* " ?head ] [ "• " write gemini-text. ] }
+        { [ "### " ?head ] [ h3-style [ gemini-text. ] with-style ] }
+        { [ "## " ?head ] [ h2-style [ gemini-text. ] with-style ] }
+        { [ "# " ?head ] [ h1-style [ gemini-text. ] with-style ] }
+        [ text-style [ gemini-text. ] with-style ]
     } cond ;
 
 PRIVATE>
 
 : gemtext. ( base-url body -- )
     f pre [ string-lines [ gemini-line. ] with each ] with-variable ;
-
-! "gemtext"
-
-! Text Lines
-! 
-! ... each line is a paragraph
-! ... each blank line is a vertical space
-! 
-! 
-! Link Lines
-! 
-! =>[<whitespace>]<URL>[<whitespace><USER-FRIENDLY LINK NAME>]<CR><LF>
-! 
-! Preformatted toggle lines
-! 
-! ```
-! 
-! Heading Lines
-! 
-! # 
-! ##
-! ###
-! 
-! Unordered list lines
-! 
-! * 
-!
-! Quote lines
-! 
-! >
-! >
