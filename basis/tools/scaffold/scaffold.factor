@@ -1,12 +1,13 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: accessors alien arrays assocs byte-arrays calendar
-classes classes.error combinators combinators.short-circuit fry
+classes classes.error combinators combinators.short-circuit
 hashtables help.markup interpolate io io.directories
 io.encodings.utf8 io.files io.pathnames io.streams.string kernel
-math math.parser namespaces prettyprint quotations sequences
-sets sorting splitting strings system timers unicode urls vocabs
-vocabs.loader vocabs.metadata words words.symbol ;
+math math.parser math.ranges namespaces prettyprint quotations
+sequences sets sorting splitting strings system timers unicode
+urls vocabs vocabs.loader vocabs.metadata words words.symbol ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -24,17 +25,17 @@ ERROR: vocab-must-not-exist string ;
 : ensure-vocab-exists ( string -- string )
     dup lookup-vocab [ no-vocab ] unless ;
 
-: check-root ( string -- string )
+: check-vocab-root ( string -- string )
     dup vocab-root? [ not-a-vocab-root ] unless ;
 
-: check-vocab-root/vocab ( vocab-root string -- vocab-root string )
-    [ check-root ] [ check-vocab-name ] bi* ;
+: check-vocab-root/name ( vocab-root string -- vocab-root string )
+    [ check-vocab-root ] [ check-vocab-name ] bi* ;
 
 : replace-vocab-separators ( vocab -- path )
     path-separator first CHAR: . associate substitute ;
 
 : vocab-root/vocab>path ( vocab-root vocab -- path )
-    check-vocab-root/vocab
+    check-vocab-root/name
     [ ] [ replace-vocab-separators ] bi* append-path ;
 
 : vocab>path ( vocab -- path )
@@ -287,7 +288,7 @@ PRIVATE>
 : delete-from-root-cache ( string -- )
     root-cache get delete-at ;
 
-: scaffold-vocab ( vocab-root string -- )
+: scaffold-vocab-in ( vocab-root string -- )
     dup delete-from-root-cache
     {
         [ scaffold-directory ]
@@ -296,13 +297,28 @@ PRIVATE>
         [ nip scaffold-authors ]
     } 2cleave ;
 
-: scaffold-core ( string -- ) "resource:core" swap scaffold-vocab ;
+: scaffold-core ( string -- )
+    "resource:core" swap scaffold-vocab-in ;
 
-: scaffold-basis ( string -- ) "resource:basis" swap scaffold-vocab ;
+: scaffold-basis ( string -- )
+    "resource:basis" swap scaffold-vocab-in ;
 
-: scaffold-extra ( string -- ) "resource:extra" swap scaffold-vocab ;
+: scaffold-extra ( string -- )
+    "resource:extra" swap scaffold-vocab-in ;
 
-: scaffold-work ( string -- ) "resource:work" swap scaffold-vocab ;
+: scaffold-work ( string -- )
+    "resource:work" swap scaffold-vocab-in  ;
+
+<PRIVATE
+
+: find-vocab-root-for  ( string -- vocab-root/f )
+    "." split dup length [1,b) [ head "." join ] with map
+    [ find-vocab-root ] map-find-last drop ;
+
+PRIVATE>
+
+: scaffold-vocab ( string -- )
+    [ find-vocab-root-for ] [ scaffold-vocab-in ] bi ;
 
 <PRIVATE
 
