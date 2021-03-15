@@ -81,7 +81,8 @@ M: gemini-gadget model-changed
 : com-up ( gemini -- )
     [
         control-value dup [
-            f >>query f >>anchor [ "../" url-append-path ] change-path
+            f >>query f >>anchor
+            [ dup "/" tail? "./../" "./" ? url-append-path ] change-path
         ] when
     ]
     [ show-gemini ] bi ;
