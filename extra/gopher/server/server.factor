@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors calendar combinators combinators.short-circuit
-formatting fry io io.directories io.encodings.binary
+command-line formatting io io.directories io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files io.files.info
-io.files.types io.pathnames io.servers kernel locals math
-mime.types sequences splitting strings urls.encoding ;
+io.files.types io.pathnames io.servers kernel math mime.types
+namespaces sequences sorting splitting strings urls.encoding ;
 
 IN: gopher.server
 
@@ -64,8 +64,9 @@ TUPLE: gopher-server < threaded-server
     path [
         [ name>> "." head? ] reject
         [ { [ directory? ] [ regular-file? ] } 1|| ] filter
+        [ name>> ] sort-with
         [
-            [ gopher-type ] [ name>> ] bi
+            [ gopher-type ] [ name>> ] [ directory? [ "/" append ] when ] tri
             [
                 dup file-info [ file-modified ] [ file-size ] bi
                 "%-40s %s %10s" sprintf
@@ -115,3 +116,9 @@ PRIVATE>
 
 : start-gopher-server ( directory port -- server )
     <gopher-server> start-server ;
+
+: gopher-server-main ( -- )
+    command-line get ?first "." or
+    70 <gopher-server> start-server wait-for-server ;
+
+MAIN: gopher-server-main
