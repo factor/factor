@@ -108,7 +108,7 @@ CONSTANT: URL V{ }
     ] [ open-url ] if ;
 
 : gemini-reload ( -- )
-    HISTORY ?last gemini-go ;
+    URL ?first gemini-go ;
 
 : gemini-back ( -- )
     -1 stack-url [ gemini-get ] when* ;
