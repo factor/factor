@@ -1,11 +1,12 @@
 ! Copyright (C) 2021 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays combinators.short-circuit command-loop
-formatting gemini gemini.private io io.directories
-io.encodings.string io.encodings.utf8 io.files io.files.temp
-io.launcher io.pipes kernel math math.parser namespaces present
-sequences splitting system urls webbrowser ;
+USING: accessors arrays assocs combinators
+combinators.short-circuit command-loop formatting gemini
+gemini.private io io.directories io.encodings.string
+io.encodings.utf8 io.files io.files.temp io.launcher io.pipes
+kernel math math.parser namespaces present sequences splitting
+system urls webbrowser ;
 
 IN: gemini.cli
 
@@ -14,9 +15,11 @@ CONSTANT: DEFAULT-URL "gemini://gemini.circumlunar.space"
 CONSTANT: HISTORY V{ }
 CONSTANT: LINKS V{ }
 CONSTANT: STACK V{ }
+CONSTANT: PAGE V{ }
 CONSTANT: URL V{ }
 
 : add-stack ( args -- )
+    dup PAGE keys index [ STACK delete-all ] unless
     URL ?first STACK index [
         1 + dup STACK ?nth pick = [
             2drop
@@ -37,20 +40,21 @@ CONSTANT: URL V{ }
     ] when dupd remove! push ;
 
 : gemini-history ( -- )
-    HISTORY [ 1 + swap "[%s] %s\n" printf ] each-index
+    HISTORY [ 1 + swap "[%d] %s\n" printf ] each-index
     LINKS delete-all HISTORY LINKS push-all ;
 
 : gemini-print ( url body meta -- )
     f pre [
-        LINKS delete-all
+        PAGE delete-all
         gemini-charset decode string-lines [
             { [ pre get not ] [ "=>" ?head ] } 0&& [
-                swap gemini-link present LINKS push
-                LINKS length swap "[%s] %s\n" printf
+                swap gemini-link present over 2array PAGE push
+                PAGE length swap "[%s] %s\n" printf
             ] [
                 gemini-line.
             ] if
         ] with each
+        LINKS delete-all PAGE keys LINKS push-all
     ] with-variable ;
 
 : gemini-get ( args -- )
@@ -96,10 +100,13 @@ CONSTANT: URL V{ }
         "less" swap 2array try-process
     ] [ drop ] if ;
 
-: gemini-ls ( -- )
-    LINKS [
-        1 + swap "[%d] %s\n" printf
-    ] each-index ;
+ : gemini-ls ( args -- )
+    PAGE swap "-l" = '[
+        1 + swap first2 swap
+        _ [ " (" ")" surround ] [ drop f ] if
+        "[%d] %s%s\n" printf
+    ] each-index
+    LINKS delete-all PAGE keys LINKS push-all ;
 
 : gemini-quit ( -- )
     "gemini.txt" temp-file ?delete-file 0 exit ;
@@ -114,6 +121,13 @@ CONSTANT: URL V{ }
     "|" split "gemini.txt" temp-file dup exists? [
         "cat" swap 2array prefix run-pipeline drop
     ] [ 2drop ] if ;
+
+: gemini-stack ( -- )
+    STACK [
+        1 + swap dup URL ?first = " (*)" f ?
+        "[%d] %s%s\n" printf
+    ] each-index
+    LINKS delete-all STACK LINKS push-all ;
 
 CONSTANT: COMMANDS {
     T{ command
@@ -138,7 +152,7 @@ CONSTANT: COMMANDS {
         { abbrevs { "l" } } }
     T{ command
         { name "ls" }
-        { quot [ drop gemini-ls ] }
+        { quot [ gemini-ls ] }
         { help "List the currently available links." }
         { abbrevs f } }
     T{ command
@@ -171,6 +185,11 @@ CONSTANT: COMMANDS {
         { quot [ gemini-shell ] }
         { help "'cat' the most recent Gemini URL through a shell." }
         { abbrevs { "!" } } }
+    T{ command
+        { name "stack" }
+        { quot [ drop gemini-stack ] }
+        { help "Display the current navigation stack." }
+        { abbrevs f } }
     T{ command
         { name "quit" }
         { quot [ drop gemini-quit ] }
