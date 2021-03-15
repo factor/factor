@@ -18,21 +18,27 @@ CONSTANT: STACK V{ }
 CONSTANT: PAGE V{ }
 CONSTANT: URL V{ }
 
+! XXX: page titles and urls in history
+
 : add-stack ( args -- )
-    dup PAGE keys index [ STACK delete-all ] unless
-    URL ?first STACK index [
-        1 + dup STACK ?nth pick = [
-            2drop
+    dup STACK index [ drop ] [
+        URL ?first STACK index [
+            over PAGE keys index [
+                1 + dup STACK ?nth pick = [ 2drop ] [
+                    STACK [ length ] [ delete-slice ] bi
+                    STACK push
+                    STACK length 10 > [
+                        0 STACK remove-nth! drop
+                    ] when
+                ] if
+            ] [
+                drop STACK push
+            ] if
         ] [
-            STACK [ length ] [ delete-slice ] bi
+            STACK delete-all
             STACK push
-            STACK length 10 > [
-                0 STACK remove-nth! drop
-            ] when
-        ] if
-    ] [
-        STACK push
-    ] if* ;
+        ] if*
+    ] if ;
 
 : add-history ( args -- )
     HISTORY dup length 10 > [
@@ -160,6 +166,11 @@ CONSTANT: COMMANDS {
         { quot [ gemini-go ] }
         { help "Go to a Gemini URL" }
         { abbrevs { "g" } } }
+    T{ command
+        { name "gus" }
+        { quot [ drop "gemini://gus.guru/search" gemini-go ] }
+        { help "Submit a query to the GUS search engine." }
+        { abbrevs f } }
     T{ command
         { name "up" }
         { quot [ drop gemini-up ] }
