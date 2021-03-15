@@ -147,7 +147,7 @@ M: url present
     ] "" make ;
 
 : remove-dot-segments ( path -- path' )
-    "/./" "/" replace
+    [ "/./" over subseq? ] [ "/./" "/" replace ] while
     [ "/../" split1 ] [ [ "/" split1-last drop ] dip "/" glue ] while*
     "/.." ?tail [ "/" split1-last drop "/" append ] when
     "../" ?head [ "/" prepend ] when
