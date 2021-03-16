@@ -31,6 +31,11 @@ in
     makeWrapper
   ];
   shellHook = ''
+    # Set Gdk pixbuf loaders file to the one from the build dependencies here
+    unset GDK_PIXBUF_MODULE_FILE
+    # Defined in gdk-pixbuf setup hook
+    findGdkPixbufLoaders "${pkgs.librsvg}"
+
     wrapFactor () {
     [ -n "$1" ] || { printf "Usage: wrapFactor <factor-root>" ; return; }
     local root="$(realpath $1)"
@@ -41,6 +46,7 @@ in
     # Restore the factor binary if it was already wrapped
     [ -e "$wrapped" ] && { mv "$wrapped" "$binary" ; }
     wrapProgram "$binary" --prefix LD_LIBRARY_PATH : ${runtimeLibPath} \
+      --set GDK_PIXBUF_MODULE_FILE "$GDK_PIXBUF_MODULE_FILE" \
       --argv0 factor
     ln -sf "''${root}/factor.image" "''${root}/.factor-wrapped.image"
     }
