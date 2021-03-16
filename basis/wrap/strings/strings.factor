@@ -5,11 +5,14 @@ IN: wrap.strings
 
 <PRIVATE
 
+: split-line ( string -- elements )
+    dup [ " \t" member? not ] find drop 0 or
+    [ f swap ] [ cut ] if-zero
+    " \t" split harvest [ dup length 1 <element> ] map!
+    swap [ 0 over length <element> prefix ] when* ;
+
 : split-lines ( string -- elements-lines )
-    string-lines [
-        " \t" split harvest
-        [ dup length 1 <element> ] map!
-    ] map! ;
+    string-lines [ split-line ] map! ;
 
 : join-elements ( wrapped-lines -- lines )
     [ " " join ] map! ;
