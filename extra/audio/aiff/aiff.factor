@@ -35,8 +35,7 @@ STRUCT: sound-data-chunk
 
 ! cheesy long-double>integer converter that assumes the long double is a positive integer
 : sample-rate>integer ( byte[10] -- sample-rate )
-    [ 2 tail-slice be> ]
-    [ 2 head-slice be> 16383 - 63 - ] bi shift ;
+    2 cut-slice [ be> ] bi@ swap 16383 - 63 - shift ;
 
 : read-form-chunk ( -- byte-array/f )
     form-chunk heap-size ensured-read* ;
