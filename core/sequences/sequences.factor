@@ -956,6 +956,9 @@ PRIVATE>
 : cut-slice ( seq n -- before-slice after-slice )
     [ head-slice ] [ tail-slice ] 2bi ; inline
 
+: cut-slice* ( seq n -- before-slice after-slice )
+    [ head-slice* ] [ tail-slice* ] 2bi ;
+
 : insert-nth ( elt n seq -- seq' )
     swap cut-slice [ swap suffix ] dip append ;
 

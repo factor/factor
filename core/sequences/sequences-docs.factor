@@ -1146,7 +1146,7 @@ HELP: tail*
 
 { tail tail* tail-slice tail-slice* } related-words
 { head head* head-slice head-slice* } related-words
-{ cut cut* cut-slice } related-words
+{ cut cut* cut-slice cut-slice* } related-words
 { unclip unclip-slice unclip-last unclip-last-slice } related-words
 { first last but-last but-last-slice rest rest-slice } related-words
 
@@ -1172,9 +1172,14 @@ HELP: tail?
 { remove remove-nth remove-eq remove-eq! remove! remove-nth! } related-words
 
 HELP: cut-slice
-{ $values { "seq" sequence } { "n" "a non-negative integer" } { "before-slice" sequence } { "after-slice" "a slice" } }
-{ $description "Outputs a pair of sequences, where " { $snippet "before" } " consists of the first " { $snippet "n" } " elements of " { $snippet "seq" } " and has the same type, while " { $snippet "after" } " is a slice of the remaining elements." }
-{ $notes "Unlike " { $link cut } ", the run time of this word is proportional to the length of " { $snippet "before" } ", not " { $snippet "after" } ", so it is suitable for use in an iterative algorithm which cuts successive pieces off a sequence." } ;
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "before-slice" "a slice" } { "after-slice" "a slice" } }
+{ $description "Outputs a pair of sequences, where " { $snippet "before-slice" } " is a slice of the first " { $snippet "n" } " elements of " { $snippet "seq" } ", while " { $snippet "after-slice" } " is a slice of the remaining elements." }
+{ $notes "Unlike " { $link cut } ", this is suitable for use in an iterative algorithm which cuts successive pieces off a sequence." } ;
+
+HELP: cut-slice*
+{ $values { "seq" sequence } { "n" "a non-negative integer" } { "before-slice" "a slice" } { "after-slice" "a slice" } }
+{ $description "Outputs a pair of sequences, where " { $snippet "after" } " consists of the last " { $snippet "n" } " elements of " { $snippet "seq" } ", while " { $snippet "before-slice" } " is a slice of the remaining elements." }
+{ $notes "Unlike " { $link cut* } ", this is suitable for use in an iterative algorithm which cuts successive pieces off a sequence." } ;
 
 HELP: cut
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "before" sequence } { "after" sequence } }

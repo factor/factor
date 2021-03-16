@@ -131,9 +131,6 @@ PRIVATE>
         [ seq <slice> ] keep len or swap
     ] produce nip ; inline
 
-: cut-slice* ( seq n -- before after )
-    [ head-slice* ] [ tail-slice* ] 2bi ;
-
 : ?<slice> ( from/f to/f sequence -- slice )
     [ [ 0 ] unless* ] 2dip
     over [ nip [ length ] [ ] bi ] unless
