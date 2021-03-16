@@ -125,14 +125,28 @@ CONSTANT: static-table {
     [ static-table length - swap dynamic-table>> nth ]
     if ;
 
-: search-stable ( header -- perfect/f imperfect/f )
-    static-table
+: search-imperfect ( header table -- imperfect/f )
+    [ first ] dip [ first over = ] find drop nip
     ;
-: search-dtable ( header encode-context -- perfect index/f )
+
+: search-stable ( header -- imperfect/f perfect/f )
+    static-table
+    [ search-imperfect ]
+    [ index ] 2bi
+    ;
+: search-dtable ( header encode-context --  imperfect/f perfect/f )
     ! index starts at 0
     dynamic-table>> 
-    [ index ] 
-    [ [ first ] dip [ first over = ] find ] 2bi
+    [ search-imperfect ] 
+    [ index ]
+    2bi
+    [ [ static-table length + ] [ f ] if* ] bi@
+    ;
+
+: search-table ( header encode-context -- imperfect/f perfect/f )
+    ! combine results from static and dynamic tables
+    [ search-dtable ] [ drop search-stable ] 2bi swapd 
+    [ or ] 2bi@
     ;
 
 
@@ -159,14 +173,16 @@ CONSTANT: static-table {
     prepend
     ;
 
-! headers will be a list of tuples
-:: encode-field ( encode-context headers -- updated-context block )
-        ! first search if the header is in the header table
-        encode-context name search-table
-        ! TODO if not encode it as a literal and then add it to table 
-        [  ]
-        ! TODO if in table, if perfect match, use it, else, use indexed literal
-        ;   
+:: encode-field ( encode-context header -- updated-context block )
+    header encode-context search-table
+    [ 128 swap 7 encode-integer encode-context swap nipd ]
+    [ [ 64 swap 6 encode-integer ]
+      [ 64 0 6 encode-integer header first encode-string-huffman append
+        ] if* 
+        header second encode-string-huffman append
+        encode-context header add-header-to-table swap ]
+    if*
+    ;   
 
 : decode-integer-fragment ( block index I M -- block index+1 I' M+7 block[index+1] )
     ! increment index and get block[index]
