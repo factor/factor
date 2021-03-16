@@ -136,3 +136,5 @@ ERROR: imm-out-of-range imm n ;
 : ADCS32 ( Rm Rn Rd -- ) ADCS32-encode >out ;
 : ADC64 ( Rm Rn Rd -- ) ADC64-encode >out ;
 : ADCS64 ( Rm Rn Rd -- ) ADCS64-encode >out ;
+
+: BRK ( imm16 -- ) BRK-encode >out ;
