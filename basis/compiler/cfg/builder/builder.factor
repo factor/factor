@@ -8,6 +8,7 @@ compiler.cfg.stacks.local compiler.cfg.utilities compiler.tree
 cpu.architecture kernel make math namespaces sequences words ;
 IN: compiler.cfg.builder
 
+SLOT: id
 SLOT: return
 SYMBOL: procedures
 SYMBOL: loops
