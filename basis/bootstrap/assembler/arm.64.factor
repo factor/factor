@@ -300,9 +300,23 @@ big-endian off
         ! vm-reg "end_callback" jit-call-1arg
 
         [
+
+            ! write()
+            ! 68 X8 MOVwi64
+            ! X2 MOVwi64
+            ! 0 SVC
+
+            ! exit(42)
+            9999 BRK
+            42 X0 MOVwi64
+            93 X8 MOVwi64
+            0 SVC
+
+            
+
             ! Rn Rd MOVr64
-            arg1 arg2 MOVr64
-            vm-reg "begin_callback" jit-call-1arg
+            ! arg1 arg2 MOVr64
+            ! vm-reg "begin_callback" jit-call-1arg
 
             ! return-reg arg1 MOVr64 ! arg1 is return
             ! jit-call-quot
