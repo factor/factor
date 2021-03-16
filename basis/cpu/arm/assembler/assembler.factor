@@ -131,3 +131,8 @@ ERROR: imm-out-of-range imm n ;
 
 : test-arm64-instruction ( quot -- instructions )
     0 swap offset-test-arm64-instruction ; inline
+
+: ADC32 ( Rm Rn Rd -- ) ADC32-encode >out ;
+: ADCS32 ( Rm Rn Rd -- ) ADCS32-encode >out ;
+: ADC64 ( Rm Rn Rd -- ) ADC64-encode >out ;
+: ADCS64 ( Rm Rn Rd -- ) ADCS64-encode >out ;
