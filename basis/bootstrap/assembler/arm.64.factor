@@ -50,16 +50,18 @@ big-endian off
 ! X8         Indirect result location register
 ! X9 -  X15  Temporary registers
 ! X16 - X17  Intra-procedure call temporary
-! X18        Platform register, otherwise temporary
+! X18        Platform register, otherwise temporary, DONT USE
 
 ! X19 - X29    Callee-saved register    Must preserve
+! X29 - frame pointer register, must always be valid
 ! X30    Link Register    Can Corrupt
+! 16-byte stack alignment
 
 : arg1 ( -- reg ) X0 ;
 : arg2 ( -- reg ) X1 ;
 : arg3 ( -- reg ) X2 ;
 : arg4 ( -- reg ) X3 ;
-: red-zone-size ( -- n ) 16 ;
+: red-zone-size ( -- n ) 128 ;
 
 : shift-arg ( -- reg ) X1 ;
 : div-arg ( -- reg ) X0 ;
