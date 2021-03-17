@@ -196,8 +196,19 @@ SYMBOL: total
     [ dupd maximal-element [ over remove-nth! drop ] dip ] curry
     produce nip ; inline
 
-: classes< ( seq1 seq2 -- lt/eq/gt )
-    [
+:: specs>seq ( specs -- seq )
+    specs dup empty? [
+        dup [ array? ] find [
+            [ over [ length ] keep ] ! hook specs
+            [ 0 swap rot ]           ! stack specs
+            bi [ subseq ] bi@ reverse append
+        ] [
+            drop reverse
+        ] if
+    ] when ; inline
+
+: classes< ( seq1 seq2x -- lt/eq/gt )
+    [ specs>seq ] bi@ [
         {
             { [ 2dup eq? ] [ +eq+ ] }
             { [ 2dup [ class<= ] [ swap class<= ] 2bi and ] [ +eq+ ] }
@@ -343,7 +354,6 @@ M:: multi-generic g:make-generic ( generic -- )
             define-single-default-method
             generic make-single-generic
         ] [
-            ! multi-dispach
             drop
             generic {
                 [ "cached-multi" word-prop ]
@@ -351,18 +361,18 @@ M:: multi-generic g:make-generic ( generic -- )
                 [ "inline" word-prop not ]
                 [ "partial-inline" word-prop not ]
             } 1&& [
+                ! covariant-tuple-dispatch
                 covariant-tuple-dispatch new
                 generic swap "dispatch-type" set-word-prop
-                generic "multi-methods" word-prop [
-                    [
-                        [ bootstrap-word ] map <covariant-tuple> 
-                    ] dip
-                ] assoc-map
-                generic "dispatch-type" word-prop methods<<
-                generic sort-generic-methods
+                generic "multi-methods" word-prop [ !
+                ! generic methods sort-methods [
+                    [ [ bootstrap-word ] map <covariant-tuple> ] dip
+                ] assoc-map generic "dispatch-type" word-prop methods<<
+                generic sort-generic-methods !
                 generic dup "dispatch-type" word-prop define-single-default-method
                 generic make-single-generic
             ] [
+                ! multi-dispatch
                 generic <multi-dispatch> "dispatch-type" set-word-prop
                 generic [
                     [ methods prepare-methods % sort-methods ] keep
@@ -371,14 +381,6 @@ M:: multi-generic g:make-generic ( generic -- )
             ] if
         ] if
     ] if
-    ! ! typed
-    ! generic stack-effect :> effect
-    ! effect [ in>> ] [ out>> ] bi [
-    !     f [ array? or ] reduce
-    ! ] bi@ or [
-    !     generic generic def>> effect define-typed
-    ! ] when
-
     generic methods dup empty? [ drop ] [
         values t [
             "multi-method-effect" word-prop
@@ -461,12 +463,15 @@ M: anonymous-intersection implementor-classes participants>> ;
 : method ( classes word -- method )
     "multi-methods" word-prop at ;
 
+DEFER: reset-multi-generic
+
 :: create-method ( effect classes generic -- method )
-    classes generic
-    2dup method dup [
-        2nip
+    classes generic 2dup method dup [
+        2nip dup reset-multi-generic
     ] [
-        drop [ effect -rot <method> dup ] 2keep reveal-method
+        drop
+        [ effect -rot <method> dup ] 2keep
+        reveal-method
         reset-caches
     ] if ;
 
@@ -504,14 +509,17 @@ M: no-method error.
     [ "method-specializer" word-prop ]
     [ "multi-generic" word-prop ] bi prefix ;
 
-! M: multi-generic subwords
-!    [
-!        "multi-methods" word-prop values %
-!    ] { } make ;
+M: multi-generic subwords
+    [
+        [ "default-method" word-prop , ]
+        [ "multi-methods" word-prop values % ]
+        [ "engines" word-prop % ]
+        tri
+    ] { } make ;
 
 : reset-multi-generic ( word -- )
     {
-        [ "multi-methods" word-prop values forget-all ]
+        [ subwords forget-all ]
         [ reset-word ]
         [
             f >>pic-def f >>pic-tail-def
@@ -525,20 +533,32 @@ M: no-method error.
                 "cached-multi"
             } remove-word-props
         ]
-        [ H{ } clone "multi-methods" set-word-prop ]
     } cleave ;
+
+: reset-modifier-word-info ( word -- )
+            {
+                "mathematical"
+                "inline"
+                "patial-inline"
+                "cached-multi"
+            } remove-word-props ;
 
 : define-generic ( word effect hooks -- )
     {
         [
-            2drop dup "multi-methods" word-prop [ drop ] [
-                reset-multi-generic
+            2drop dup "multi-methods" word-prop [
+                reset-modifier-word-info
+            ] [
+                [ reset-multi-generic ]
+                [ H{ } clone "multi-methods" set-word-prop ]
+                bi
             ] if
         ]
         [ drop set-stack-effect ]
         [ nip "hooks" set-word-prop ]
         [ 2drop remake-multi-generic ]
     } 3cleave ;
+
 
 ! ! Syntax ! ! !
 SYNTAX: MGENERIC: scan-new-word scan-effect
@@ -640,19 +660,43 @@ M: multi-generic definer drop \ MGENERIC: f ;
 
 M: multi-generic definition drop f ;
 
-M: multi-generic forget*
-    [ methods values [ forget ] each ] [ call-next-method ] bi ;
+! M: multi-generic forget*
+!     [ methods values [ forget ] each ] [ call-next-method ] bi ;
 
 M: multi-method definer
     drop \ MM: \ ; ;
 
+! M: multi-method forget*
+!     [
+!         "method-specializer" "multi-generic"
+!         [ word-prop ] bi-curry@ bi forget-method
+!     ]
+!     [ call-next-method ]
+!     bi ;
+
+DEFER: default-method?
+
+M: array implementor-classes ;
+
 M: multi-method forget*
-    [
-        "method-specializer" "multi-generic"
-        [ word-prop ] bi-curry@ bi forget-method
-    ]
-    [ call-next-method ]
-    bi ;
+    dup "forgotten" word-prop [ drop ] [
+        [
+            dup default-method? [ drop ] [
+                [
+                    [ "method-specializer" word-prop ]
+                    [ "multi-generic" word-prop ]
+                    bi
+                    2dup ?lookup-multi-method
+                ] keep eq? [
+                    [ [ delete-at ] with-methods ]
+                    [ [ [ delete ] with each ] with-implementors ]
+                    2bi
+                    reset-caches
+                ] [ 2drop ] if
+            ] if
+        ]
+        [ call-next-method ] bi
+    ] if ;
 
 M: multi-method synopsis*
     dup definer.
@@ -952,7 +996,7 @@ M: f compile-engine ;
     ] tri ;
 
 HOOK: inline-cache-quots dispatch-type
-        ( word methods -- pic-quot/f pic-tail-quot/f )
+    ( word methods -- pic-quot/f pic-tail-quot/f )
 
 M: single-dispatch inline-cache-quots 2drop f f ;
 
@@ -1417,16 +1461,29 @@ M: covariant-tuple dispatch-arity classes>> length ;
     n 0 >=
     [ n methods method-dispatch-classes
       [ dup n methods applicable-methods
+
+        ! dup length 1 >
+        ! [ n 1 - covariant-tuple-multi-methods ]
+        ! ! TODO check sorting
+        ! [ ?first method>> ] if
+
         n 1 - covariant-tuple-multi-methods
+
       ] map>alist ] [
         ! NOTE: This is where we rely on correct non-ambigutiy
-        methods ?last [ method>> ] [ f ] if*
+
+!        methods ?first method>>
+
+         methods ?last [ method>> ] [ f ] if*
     ] if ;
 
 GENERIC: promote-dispatch-class ( arity class -- class )
+
 M: class promote-dispatch-class
     1array swap object pad-head <covariant-tuple> ;
+
 ERROR: too-many-dispatch-args arity class ;
+
 M: covariant-tuple promote-dispatch-class
     dup classes>> length pick <=> {
         { +lt+ [ classes>> swap object pad-head <covariant-tuple> ] }
@@ -1442,7 +1499,6 @@ M: covariant-tuple promote-dispatch-class
     ! NOTE: not using smart-with due to dependency issues
     ! [ [ promote-dispatch-class ] dip <method-dispatch> ] smart-with { } assoc>map ;
     [ swapd [ promote-dispatch-class ] dip <method-dispatch> ] with { } assoc>map ;
-
 
 :: methods>multi-methods ( arity assoc -- assoc )
     ! assoc [ [ arity swap promote-dispatch-class ] dip ] assoc-map
@@ -1508,10 +1564,14 @@ PREDICATE: nested-dispatch-engine-word < predicate-engine-word
     [ engine quot call ] with-variables ; inline
 
 M: nested-dispatch-engine compile-engine
+!    [ flatten-methods convert-tuple-methods ] change-methods
+!    dup dup index>> current-index [ call-next-method ] with-variable
+
     dup [
         [ flatten-methods convert-tuple-methods ] change-methods
         call-next-method
     ] with-nested-engine
+
     >>methods
     define-nested-dispatch-engine
     nested-dispatch-pics get [ wrap-nested-dispatch-call-site ] when ;
@@ -1611,7 +1671,7 @@ M: covariant-tuple-multi-generic check-generic check-ambiguity ;
         ] bi methods>multi-methods
         flatten-multi-methods
         compile-engines*
-        <engine> compile-engine 
+        <engine> compile-engine
     ] tri ;
 
 ! FIXME: almost copy-paste from single-combination, need abstraction
