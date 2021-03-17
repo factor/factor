@@ -77,11 +77,11 @@ IN: compiler.tree.propagation.transforms
         in-d>> first2 [ value-info ] bi@ {
             {
                 [ 2dup zero-bitand? ]
-                [ nip class>> bignum = [ 2drop 0 >bignum ] [ 2drop 0 ] ? ]
+                [ nip class>> bignum = 0 >bignum 0 ? '[ 2drop _ ] ]
             }
             {
                 [ 2dup swap zero-bitand? ]
-                [ drop class>> bignum = [ 2drop 0 >bignum ] [ 2drop 0 ] ? ]
+                [ drop class>> bignum = 0 >bignum 0 ? [ 2drop _ ] ]
             }
             {
                 [ 2dup redundant-bitand? ]
