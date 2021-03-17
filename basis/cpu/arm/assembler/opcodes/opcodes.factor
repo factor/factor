@@ -246,25 +246,25 @@ SINGLETONS: SPSR_EL1 SPSR_EL2 SPSR_EL3 ;
 ! https://www.element14.com/community/servlet/JiveServlet/previewBody/41836-102-1-229511/ARM.Reference_Manual.pdf
 ! pg 16
 ! cond code set in prev arm assembler
-: >CC ( x -- x ) ; 
-: EQ ( -- n ) 0000 >CC ;
-: NE ( -- n ) 0001 >CC ;
-: CS ( -- n ) 0010 >CC ;
-: HS ( -- n ) 0010 >CC ;
-: CC ( -- n ) 0011 >CC ;
-: LO ( -- n ) 0011 >CC ;
-: MI ( -- n ) 0100 >CC ;
-: PL ( -- n ) 0101 >CC ;
-: VS ( -- n ) 0110 >CC ;
-: VC ( -- n ) 0111 >CC ;
-: HI ( -- n ) 1000 >CC ;
-: LS ( -- n ) 1001 >CC ;
-: GE ( -- n ) 1010 >CC ;
-: LT ( -- n ) 1011 >CC ;
-: GT ( -- n ) 1100 >CC ;
-: LE ( -- n ) 1101 >CC ;
-: AL ( -- n ) 1110 >CC ;
-: NV ( -- n ) 1111 >CC ;
+: >CC ( x -- x ) ; inline
+: EQ ( -- n ) 0000 >CC ; inline ! Z set equal
+: NE ( -- n ) 0001 >CC ; inline ! Z clear not equal
+: CS ( -- n ) 0010 >CC ; inline ! C set unsigned higher or same
+: HS ( -- n ) 0010 >CC ; inline !
+: CC ( -- n ) 0011 >CC ; inline ! C clear unsigned lower
+: LO ( -- n ) 0011 >CC ; inline !
+: MI ( -- n ) 0100 >CC ; inline ! N set negative
+: PL ( -- n ) 0101 >CC ; inline ! N clear positive or zero
+: VS ( -- n ) 0110 >CC ; inline ! V set overflow
+: VC ( -- n ) 0111 >CC ; inline ! V clear no overflow
+: HI ( -- n ) 1000 >CC ; inline ! C set and Z clear unsigned higher
+: LS ( -- n ) 1001 >CC ; inline ! C clear or Z set unsigned lower or same
+: GE ( -- n ) 1010 >CC ; inline ! N equals V greater or equal
+: LT ( -- n ) 1011 >CC ; inline ! N not equal to V less than
+: GT ( -- n ) 1100 >CC ; inline ! Z clear AND (N equals V) greater than
+: LE ( -- n ) 1101 >CC ; inline ! Z set OR (N not equal to V) less than or equal
+: AL ( -- n ) 1110 >CC ; inline ! AL (ignored) always
+: NV ( -- n ) 1111 >CC ; inline ! no value
 
 : imm13>parts-64 ( imm13 -- imms immr N )
     [ -4 shift 4 bits ] [ 4 bits ] [ -8 shift ] tri ;
@@ -423,7 +423,7 @@ ARM-INSTRUCTION: AXFlag-encode ( 1101010100 0 00 000 0100 0000 010 11111 -- inst
 ARM-INSTRUCTION: B-encode ( 0 00101 imm26 -- instruction )
 
 ! B.cond: Branch conditionally.
-ARM-INSTRUCTION: B.cond ( 0101010 0 imm19 0 cond4 -- instruction )
+ARM-INSTRUCTION: B.cond-encode ( 0101010 0 imm19 0 cond4 -- instruction )
 
 ! BFC: Bitfield Clear: an alias of BFM.
 ARM-INSTRUCTION: BFC32-encode ( 0 01 100110 0 immrimms 11111 Rd -- instruction )
