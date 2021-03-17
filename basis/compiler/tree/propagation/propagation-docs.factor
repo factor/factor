@@ -7,21 +7,21 @@ HELP: propagate
 { $examples {
     $unchecked-example
         "USING: compiler.tree.builder compiler.tree.propagation math prettyprint ;"
-        "[ 3 + ] build-tree propagate third ."
+        "[ 3 + ] build-tree propagate third ..."
         [[ T{ #call
     { word + }
-    { in-d V{ 9450187 9450186 } }
-    { out-d { 9450188 } }
+    { in-d V{ 25685700 25685699 } }
+    { out-d { 25685701 } }
     { info
         H{
             {
-                9450186
+                25685699
                 T{ value-info-state
                     { class fixnum }
                     { interval
                         T{ interval
-                            { from ~array~ }
-                            { to ~array~ }
+                            { from { 3 t } }
+                            { to { 3 t } }
                         }
                     }
                     { literal 3 }
@@ -29,14 +29,14 @@ HELP: propagate
                 }
             }
             {
-                9450187
+                25685700
                 T{ value-info-state
                     { class object }
                     { interval full-interval }
                 }
             }
             {
-                9450188
+                25685701
                 T{ value-info-state
                     { class number }
                     { interval full-interval }
