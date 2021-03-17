@@ -3,17 +3,18 @@
 
 USING: accessors alien.c-types alien.data byte-arrays checksums
 grouping io.binary kernel literals math math.bitwise math.order
-sequences sequences.generalizations ;
-
+sequences sequences.generalizations sequences.private
+specialized-arrays ;
+SPECIALIZED-ARRAY: uint64_t
 IN: checksums.wyhash
 
 <PRIVATE
 
 :: wymum ( a b -- a' b' )
-    a -32 shift 32 bits >bignum :> Ha
-    b -32 shift 32 bits >bignum :> Hb
-    a 32 bits >bignum :> La
-    b 32 bits >bignum :> Lb
+    a -32 shift 32 bits :> Ha
+    b -32 shift 32 bits :> Hb
+    a 32 bits :> La
+    b 32 bits :> Lb
     Ha Hb W* :> RH
     Ha Lb W* :> RM0
     Hb La W* :> RM1
@@ -91,7 +92,7 @@ M:: wyhash checksum-bytes ( bytes checksum -- value )
             seed :> see1!
             seed :> see2!
             6 <groups> [
-                6 firstn :> ( n0 n1 n2 n3 n4 n5 )
+                6 firstn-unsafe :> ( n0 n1 n2 n3 n4 n5 )
                 n0 P1 bitxor n1 seed bitxor wymix seed!
                 n2 P2 bitxor n3 see1 bitxor wymix see1!
                 n4 P3 bitxor n5 see2 bitxor wymix see2!
@@ -101,7 +102,7 @@ M:: wyhash checksum-bytes ( bytes checksum -- value )
 
         len/48 len/16 bytes uint64_t native-mapper [
             2 <groups> [
-                first2 :> ( n0 n1 )
+                first2-unsafe :> ( n0 n1 )
                 n0 P1 bitxor n1 seed bitxor wymix seed!
             ] each
         ] unless-empty

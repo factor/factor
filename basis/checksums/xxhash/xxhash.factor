@@ -3,7 +3,9 @@
 
 USING: accessors alien alien.c-types alien.data byte-arrays
 checksums combinators generalizations grouping io.binary kernel
-locals math math.bitwise math.ranges sequences ;
+locals math math.bitwise math.ranges sequences
+specialized-arrays ;
+SPECIALIZED-ARRAY: uint64_t
 
 IN: checksums.xxhash
 
