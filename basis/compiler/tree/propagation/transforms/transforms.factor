@@ -81,7 +81,7 @@ IN: compiler.tree.propagation.transforms
             }
             {
                 [ 2dup swap zero-bitand? ]
-                [ drop class>> bignum = 0 >bignum 0 ? [ 2drop _ ] ]
+                [ drop class>> bignum = 0 >bignum 0 ? '[ 2drop _ ] ]
             }
             {
                 [ 2dup redundant-bitand? ]
