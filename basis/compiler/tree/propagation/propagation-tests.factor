@@ -1024,6 +1024,8 @@ M: tuple-with-read-only-slot clone
 
 ! Could be bignum not integer but who cares
 { V{ integer } } [ [ 10 >bignum bitand ] final-classes ] unit-test
+{ V{ bignum } } [ [ { fixnum } declare 10 >bignum bitand ] final-classes ] unit-test
+{ V{ bignum } } [ [ { integer } declare 10 >bignum bitand ] final-classes ] unit-test
 
 { t } [ [ { fixnum fixnum } declare min ] { min } inlined? ] unit-test
 { f } [ [ { fixnum fixnum } declare min ] { fixnum-min } inlined? ] unit-test
