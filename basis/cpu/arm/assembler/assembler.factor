@@ -18,17 +18,17 @@ TUPLE: arm64-assembler ip labels out ;
         H{ } clone >>labels
         V{ } clone >>out ;
 
+ERROR: arm64-encoding-imm original n-bits-requested truncated ;
+: ?bits ( x n -- x ) 2dup bits dup reach = [ 2drop ] [ arm64-encoding-imm ] if ; inline
+
 : ip ( -- address ) arm64-assembler get ip>> ;
 : >out ( instruction -- ) arm64-assembler get out>> push ;
 
 : ADR ( imm21 Rd -- )
-    [ [ 2 bits ] [ -2 shift 19 bits ] bi ] dip ADR-encode >out ;
+    [ [ 2 bits ] [ -2 shift 19 ?bits ] bi ] dip ADR-encode >out ;
 
 : ADRP ( imm21 Rd -- )
-    [ [ 2 bits ] [ -2 shift 19 bits ] bi ] dip ADRP-encode >out ;
-
-: BL ( offset -- ) ip - 4 / BL-encode >out ;
-: BR ( register -- ) BR-encode >out ;
+    [ [ 2 bits ] [ -2 shift 19 ?bits ] bi ] dip ADRP-encode >out ;
 
 : LDR-pre ( imm9 Rn Rt -- ) LDRpre64-encode >out ;
 : LDR-post ( imm9 Rn Rt -- ) LDRpost64-encode >out ;
@@ -100,14 +100,14 @@ ERROR: imm-out-of-range imm n ;
 : STRr64 ( Rm Rn Rt -- )
     [ 0 0 ] 2dip STRr64-encode >out ;
 
-: ASRi32 ( imm6 Rn Rd -- ) ASRi32-encode >out ;
-: ASRi64 ( imm6 Rn Rd -- ) ASRi64-encode >out ;
-: LSLi32 ( imm6 Rn Rd -- ) LSLi32-encode >out ;
-: LSLi64 ( imm6 Rn Rd -- ) LSLi64-encode >out ;
-: LSRi32 ( imm6 Rn Rd -- ) LSRi32-encode >out ;
-: LSRi64 ( imm6 Rn Rd -- ) LSRi64-encode >out ;
+: ASRi32 ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip ASRi32-encode >out ;
+: ASRi64 ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip ASRi64-encode >out ;
+: LSLi32 ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip LSLi32-encode >out ;
+: LSLi64 ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip LSLi64-encode >out ;
+: LSRi32 ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip LSRi32-encode >out ;
+: LSRi64 ( imm6 Rn Rd -- ) [ 6 ?bits ] 2dip LSRi64-encode >out ;
 
-: SVC ( imm16 -- ) SVC-encode >out ;
+: SVC ( imm16 -- ) 16 ?bits SVC-encode >out ;
 
 : with-new-arm64-offset ( offset quot -- arm64-assembler )
     [ <arm64-assembler> \ arm64-assembler ] dip
@@ -137,4 +137,17 @@ ERROR: imm-out-of-range imm n ;
 : ADC64 ( Rm Rn Rd -- ) ADC64-encode >out ;
 : ADCS64 ( Rm Rn Rd -- ) ADCS64-encode >out ;
 
-: BRK ( imm16 -- ) BRK-encode >out ;
+: BRK ( imm16 -- ) 16 ?bits BRK-encode >out ;
+: HLT ( imm16 -- ) 16 ?bits HLT-encode >out ;
+
+: CBNZ ( imm19 Rt -- ) [ 19 ?bits ] dip CBNZ64-encode >out ;
+! cond4 is EQ NE CS HS CC LO MI PL VS VC HI LS GE LT GT LE AL NV
+: CSEL ( Rm Rn Rd cond4 -- ) -rot CSEL64-encode >out ;
+: CSET ( Rd cond4 -- ) swap CSET64-encode >out ;
+: CSETM ( Rd cond4 -- ) swap CSETM64-encode >out ;
+
+! B but that is breakpoint
+: Br ( imm26 -- ) 26 ?bits B-encode >out ;
+: B.cond ( imm19 cond4 -- ) [ 19 ?bits ] dip B.cond-encode >out ;
+: BL ( offset -- ) ip - 4 / BL-encode >out ;
+: BR ( Rn -- ) BR-encode >out ;
