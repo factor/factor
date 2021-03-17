@@ -413,8 +413,8 @@ ${ 0 0xff [a,b] } [ -0xff -1 [a,b] 0 0xff [a,b] interval-bitand ] unit-test
     [ 0 15 [a,b] interval-contains? ] all?
 ] unit-test
 
-${ 0 256 [a,b] } [ 0 255 [a,b] dup interval-bitor ] unit-test
-${ 0 512 [a,b] } [ 0 256 [a,b] dup interval-bitor ] unit-test
+${ 0 255 [a,b] } [ 0 255 [a,b] dup interval-bitor ] unit-test
+${ 0 511 [a,b] } [ 0 256 [a,b] dup interval-bitor ] unit-test
 
 ${ -128 127 [a,b] } [ -128 127 [a,b] dup interval-bitor ] unit-test
 ${ -256 255 [a,b] } [ -128 128 [a,b] dup interval-bitor ] unit-test
