@@ -141,7 +141,7 @@ TUPLE: and-class { seq read-only } ;
 M: and-class class-member?
     seq>> [ class-member? ] with all? ; inline
 
-DEFER: substitute
+DEFER: (substitute)
 
 : flatten ( seq class -- newseq )
     '[ dup _ instance? [ seq>> ] [ 1array ] if ] map concat ; inline
@@ -188,7 +188,7 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
 
 : answer-ors ( partition -- partition' )
     dup [ not-integers>> ] [ not-simples>> ] [ simples>> ] tri 3append
-    '[ [ _ [ t substitute ] each ] map ] change-or ;
+    '[ [ _ [ t (substitute) ] each ] map ] change-or ;
 
 : contradiction? ( partition -- ? )
     {
@@ -219,7 +219,7 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
 
 : answer-ands ( partition -- partition' )
     dup [ integers>> ] [ not-simples>> ] [ simples>> ] tri 3append
-    '[ [ _ [ f substitute ] each ] map ] change-and ;
+    '[ [ _ [ f (substitute) ] each ] map ] change-and ;
 
 : tautology? ( partition -- ? )
     {
@@ -291,12 +291,12 @@ M: or-class answer
 M: not-class answer
     [ class>> ] 2dip answer <not-class> ;
 
-GENERIC#: substitute 1 ( class from to -- new-class )
-M: object substitute answer ;
-M: not-class substitute [ <not-class> ] bi@ answer ;
+GENERIC#: (substitute) 1 ( class from to -- new-class )
+M: object (substitute) answer ;
+M: not-class (substitute) [ <not-class> ] bi@ answer ;
 
 : assoc-answer ( table question answer -- new-table )
-    '[ _ _ substitute ] assoc-map sift-values ;
+    '[ _ _ (substitute) ] assoc-map sift-values ;
 
 : assoc-answers ( table questions answer -- new-table )
     '[ _ assoc-answer ] each ;
