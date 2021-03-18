@@ -38,26 +38,28 @@ IN: ini-file
 : unescape-string ( str -- str' )
     [ (unescape-string) ] "" make ;
 
-USE: xml.entities
-
 : escape-string ( str -- str' )
-    H{
-        { CHAR: \a   "\\a"  }
-        { CHAR: \b   "\\b"  }
-        { CHAR: \f   "\\f"  }
-        { CHAR: \n   "\\n"  }
-        { CHAR: \r   "\\r"  }
-        { CHAR: \t   "\\t"  }
-        { CHAR: \b   "\\v"  }
-        { CHAR: '    "\\'"  }
-        { CHAR: \"   "\\\"" }
-        { CHAR: \\   "\\\\" }
-        { CHAR: ?    "\\?"  }
-        { CHAR: ;    "\\;"  }
-        { CHAR: [    "\\["  }
-        { CHAR: ]    "\\]"  }
-        { CHAR: =    "\\="  }
-    } escape-string-by ;
+    [
+        [
+            H{
+                { CHAR: \a   "\\a"  }
+                { CHAR: \b   "\\b"  }
+                { CHAR: \f   "\\f"  }
+                { CHAR: \n   "\\n"  }
+                { CHAR: \r   "\\r"  }
+                { CHAR: \t   "\\t"  }
+                { CHAR: \b   "\\v"  }
+                { CHAR: '    "\\'"  }
+                { CHAR: \"   "\\\"" }
+                { CHAR: \\   "\\\\" }
+                { CHAR: ?    "\\?"  }
+                { CHAR: ;    "\\;"  }
+                { CHAR: [    "\\["  }
+                { CHAR: ]    "\\]"  }
+                { CHAR: =    "\\="  }
+            } ?at [ % ] [ , ] if
+        ] each
+    ] "" make ;
 
 : space? ( ch -- ? )
     "\s\t\n\r\f\v" member-eq? ;
