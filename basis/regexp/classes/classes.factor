@@ -108,17 +108,14 @@ M: terminator-class class-member?
 
 M: f class-member? 2drop f ; inline
 
-: same? ( obj1 obj2 quot1: ( obj1 -- val1 ) quot2: ( obj2 -- val2 ) -- ? )
-    bi* = ; inline
-
 M: script-class class-member?
-    [ script-of ] [ script>> ] same? ; inline
+    [ script-of ] [ script>> ] bi* = ; inline
 
 M: category-class class-member?
-    [ category ] [ category>> ] same? ; inline
+    [ category ] [ category>> ] bi* = ; inline
 
 M: category-range-class class-member? inline
-    [ category first ] [ category>> ] same? ; inline
+    [ category first ] [ category>> ] bi* = ; inline
 
 TUPLE: not-class { class read-only } ;
 
