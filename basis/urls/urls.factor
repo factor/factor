@@ -44,8 +44,19 @@ M: url >url ;
 
 <PRIVATE
 
+: remove-dot-segments ( path -- path' )
+    [ "//" split1 ] [ "/" glue ] while*
+    [ "/./" split1 ] [ "/" glue ] while*
+    [ "/../" split1 ] [ [ "/" split1-last drop ] dip "/" glue ] while*
+    "/.." ?tail [ "/" split1-last drop "/" append ] when
+    "../" ?head [ "/" prepend ] when
+    "./" ?head [ "/" prepend ] when
+    "/." ?tail [ "/" append ] when
+    [ "/" ] when-empty ;
+
 : parse-path ( string -- path )
-    "/" split [ url-decode "/" "%2F" replace ] map "/" join ;
+    "/" split [ url-decode "/" "%2F" replace ] map "/" join
+    remove-dot-segments ;
 
 EBNF: parse-url [=[
 
@@ -145,16 +156,6 @@ M: url present
             [ anchor>> [ "#" % present url-encode % ] when* ]
         } cleave
     ] "" make ;
-
-: remove-dot-segments ( path -- path' )
-    [ "//" split1 ] [ "/" glue ] while*
-    [ "/./" split1 ] [ "/" glue ] while*
-    [ "/../" split1 ] [ [ "/" split1-last drop ] dip "/" glue ] while*
-    "/.." ?tail [ "/" split1-last drop "/" append ] when
-    "../" ?head [ "/" prepend ] when
-    "./" ?head [ "/" prepend ] when
-    "/." ?tail [ "/" append ] when
-    [ "/" ] when-empty ;
 
 PRIVATE>
 

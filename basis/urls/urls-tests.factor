@@ -446,3 +446,19 @@ urls [
 } [
     1 cut* swap first2 '[ _ _ url-append-path ] unit-test
 ] each
+
+! RFC 3986 6.2.2.  Syntax Normalization
+{ URL" example://a/b/c/%7Bfoo%7D" } [
+    URL" eXAMPLE://a/./b/../b/%63/%7bfoo%7d"
+] unit-test
+
+! RFC 3986 6.2.3. Scheme-Based Normalization
+{ t } [
+    {
+      "http://example.com"
+      "http://example.com/"
+      "http://example.com:/"
+      "http://example.com:80/"
+    } [ >url present "http://example.com/" = ] all?
+] unit-test
+
