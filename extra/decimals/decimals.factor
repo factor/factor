@@ -1,7 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators.short-circuit kernel lexer locals
-math math.functions math.order math.parser sequences splitting ;
+USING: accessors combinators.short-circuit formatting.private
+kernel lexer locals math math.functions math.order math.parser
+prettyprint.backend prettyprint.custom prettyprint.sections
+sequences splitting ;
 IN: decimals
 
 TUPLE: decimal { mantissa read-only } { exponent read-only } ;
@@ -81,3 +83,8 @@ M: decimal before?
 
 M: decimal <=>
     2dup before? [ 2drop +lt+ ] [ equal? +eq+ +gt+ ? ] if ; inline
+
+M: decimal pprint*
+    \ DECIMAL: [
+        >decimal< [ 10^ * ] [ abs format-decimal ] bi text
+    ] pprint-prefix ;
