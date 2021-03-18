@@ -9,7 +9,7 @@ IN: lru-cache
 TUPLE: lru-cache < linked-assoc max-size ;
 
 : <lru-cache> ( max-size exemplar -- assoc )
-    0 swap new-assoc <dlist> rot lru-cache boa ;
+    dupd new-assoc <dlist> rot lru-cache boa ;
 
 : <lru-hash> ( max-size -- assoc )
     H{ } <lru-cache> ;
