@@ -32,10 +32,6 @@ M: lru-cache set-at
         ] [ drop ] if
     ] [ drop ] if* ;
 
-M: lru-cache clone
-    [ assoc>> clone ] [ dlist>> clone ] [ max-size>> ] tri
-    lru-cache boa ;
-
 TUPLE: fifo-cache < linked-assoc max-size ;
 
 : <fifo-cache> ( max-size exemplar -- assoc )
@@ -53,6 +49,20 @@ M: fifo-cache set-at
         ] [ drop ] if
     ] [ drop ] if* ;
 
-M: fifo-cache clone
-    [ assoc>> clone ] [ dlist>> clone ] [ max-size>> ] tri
-    fifo-cache boa ;
+TUPLE: lifo-cache < linked-assoc max-size ;
+
+: <lifo-cache> ( max-size exemplar -- assoc )
+    dupd new-assoc <dlist> rot lifo-cache boa ;
+
+: <lifo-hash> ( max-size -- assoc )
+    H{ } <lifo-cache> ;
+
+M: lifo-cache set-at
+    dup max-size>> [
+        over assoc>> assoc-size <= [
+            dup
+            [ dlist>> pop-back first-unsafe ]
+            [ assoc>> ]
+            [ dlist>> ] tri (delete-at)
+        ] when
+    ] when* call-next-method ;
