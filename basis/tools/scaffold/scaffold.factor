@@ -7,7 +7,8 @@ hashtables help.markup interpolate io io.directories
 io.encodings.utf8 io.files io.pathnames io.streams.string kernel
 math math.parser math.ranges namespaces prettyprint quotations
 sequences sets sorting splitting strings system timers unicode
-urls vocabs vocabs.loader vocabs.metadata words words.symbol ;
+urls vocabs vocabs.loader vocabs.loader.private vocabs.metadata
+words words.symbol ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -312,8 +313,10 @@ PRIVATE>
 <PRIVATE
 
 : find-vocab-root-for  ( string -- vocab-root/f )
-    "." split dup length [1,b) [ head "." join ] with map
-    [ find-vocab-root ] map-find-last drop ;
+    "." split dup length [1,b) [ head "." join ] with map {
+        [ [ find-vocab-root ] map-find-last drop ]
+        [ [ "." "/" replace find-root-for ] map-find-last drop ]
+    } 1|| ;
 
 PRIVATE>
 
