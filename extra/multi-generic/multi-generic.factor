@@ -196,16 +196,16 @@ SYMBOL: total
     [ dupd maximal-element [ over remove-nth! drop ] dip ] curry
     produce nip ; inline
 
-:: specs>seq ( specs -- seq )
-    specs dup empty? [
+: specs>seq ( specs -- seq )
+    dup empty? [
         dup [ array? ] find [
-            [ over [ length ] keep ] ! hook specs
-            [ 0 swap rot ]           ! stack specs
-            bi [ subseq ] bi@ reverse append
+            [ [ dup length ] dip swap rot subseq ] ! hook specs
+            [ 0 swap rot subseq ] ! stack specs
+            2bi reverse prepend
         ] [
             drop reverse
         ] if
-    ] when ; inline
+    ] unless ;
 
 : classes< ( seq1 seq2x -- lt/eq/gt )
     [ specs>seq ] bi@ [
@@ -347,7 +347,7 @@ M:: multi-generic g:make-generic ( generic -- )
                     generic "multi-methods" word-prop [
                         [ dup length 1 - # - swap nth ] dip
                     ] assoc-map
-                 generic "dispatch-type" word-prop methods<<
+                    generic "dispatch-type" word-prop methods<<
                 ] bi
             ] if
             generic dup "dispatch-type" word-prop
@@ -685,8 +685,7 @@ M: multi-method forget*
                 [
                     [ "method-specializer" word-prop ]
                     [ "multi-generic" word-prop ]
-                    bi
-                    2dup ?lookup-multi-method
+                    bi 2dup ?lookup-multi-method
                 ] keep eq? [
                     [ [ delete-at ] with-methods ]
                     [ [ [ delete ] with each ] with-implementors ]
@@ -1462,19 +1461,19 @@ M: covariant-tuple dispatch-arity classes>> length ;
     [ n methods method-dispatch-classes
       [ dup n methods applicable-methods
 
-        ! dup length 1 >
-        ! [ n 1 - covariant-tuple-multi-methods ]
-        ! ! TODO check sorting
-        ! [ ?first method>> ] if
+        dup length 1 >
+        [ n 1 - covariant-tuple-multi-methods ]
+        ! TODO check sorting
+        [ ?first method>> ] if
 
-        n 1 - covariant-tuple-multi-methods
+!        n 1 - covariant-tuple-multi-methods
 
       ] map>alist ] [
         ! NOTE: This is where we rely on correct non-ambigutiy
 
-!        methods ?first method>>
+        methods ?first method>>
 
-         methods ?last [ method>> ] [ f ] if*
+!         methods ?last [ method>> ] [ f ] if*
     ] if ;
 
 GENERIC: promote-dispatch-class ( arity class -- class )
@@ -1564,13 +1563,13 @@ PREDICATE: nested-dispatch-engine-word < predicate-engine-word
     [ engine quot call ] with-variables ; inline
 
 M: nested-dispatch-engine compile-engine
-!    [ flatten-methods convert-tuple-methods ] change-methods
-!    dup dup index>> current-index [ call-next-method ] with-variable
+   [ flatten-methods convert-tuple-methods ] change-methods
+   dup dup index>> current-index [ call-next-method ] with-variable
 
-    dup [
-        [ flatten-methods convert-tuple-methods ] change-methods
-        call-next-method
-    ] with-nested-engine
+    ! dup [
+    !     [ flatten-methods convert-tuple-methods ] change-methods
+    !     call-next-method
+    ! ] with-nested-engine
 
     >>methods
     define-nested-dispatch-engine
