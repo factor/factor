@@ -1,8 +1,7 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.extras
-cpu.arm.assembler.opcodes io.binary kernel math
-math.bitwise namespaces sequences ;
+USING: accessors combinators cpu.arm.assembler.opcodes io.binary
+kernel make math math.bitwise namespaces sequences ;
 IN: cpu.arm.assembler
 
 ! pre-index mode: computed addres is the base-register + offset
@@ -21,8 +20,8 @@ TUPLE: arm64-assembler ip labels out ;
 ERROR: arm64-encoding-imm original n-bits-requested truncated ;
 : ?bits ( x n -- x ) 2dup bits dup reach = [ 2drop ] [ arm64-encoding-imm ] if ; inline
 
-: ip ( -- address ) arm64-assembler get ip>> ;
-: >out ( instruction -- ) arm64-assembler get out>> push ;
+! : ip ( -- address ) arm64-assembler get ip>> ;
+: >out ( instruction -- ) 4 >le % ;
 
 : ADR ( imm21 Rd -- )
     [ [ 2 bits ] [ -2 shift 19 ?bits ] bi ] dip ADR-encode >out ;
@@ -118,7 +117,7 @@ ERROR: imm-out-of-range imm n ;
     '[ @ \ arm64-assembler get ] with-variable ; inline
 
 : assemble-arm ( quot -- bytes )
-    with-new-arm64 out>> [ 4 >le ] map concat ; inline
+    call ; inline
 
 : offset-test-arm64 ( offset quot -- instuctions )
     with-new-arm64-offset out>> ; inline
@@ -149,5 +148,7 @@ ERROR: imm-out-of-range imm n ;
 ! B but that is breakpoint
 : Br ( imm26 -- ) 26 ?bits B-encode >out ;
 : B.cond ( imm19 cond4 -- ) [ 19 ?bits ] dip B.cond-encode >out ;
-: BL ( offset -- ) ip - 4 / BL-encode >out ;
+! : BL ( offset -- ) ip - 4 / BL-encode >out ;
+: BL ( offset -- ) BL-encode >out ;
 : BR ( Rn -- ) BR-encode >out ;
+: BLR ( Rn -- ) BLR-encode >out ;
