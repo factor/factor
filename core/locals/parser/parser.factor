@@ -45,17 +45,12 @@ SINGLETON: lambda-parser
     (parse-lambda) <lambda>
     ?rewrite-closures ;
 
-: parse-multi-def ( -- multi-def assoc )
-    ")" parse-tokens make-locals [ <multi-def> ] dip ;
-
-: parse-single-def ( name -- def assoc )
-    [ make-local <def> ] H{ } make ;
-
 : update-locals ( assoc -- )
     qualified-vocabs last words>> swap assoc-union! drop ;
 
 : parse-def ( name/paren -- def )
-    dup "(" = [ drop parse-multi-def ] [ parse-single-def ] if update-locals ;
+    dup "(" = [ drop ")" parse-tokens ] [ 1array ] if
+    make-locals [ <def> ] [ update-locals ] bi* ;
 
 M: lambda-parser parse-quotation
     H{ } clone (parse-lambda) ;
