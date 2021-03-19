@@ -1,7 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators kernel locals.backend
-locals.errors locals.types make math quotations sequences words ;
+USING: accessors arrays combinators fry.private kernel
+locals.backend locals.errors locals.types make math quotations
+sequences words ;
 IN: locals.rewrite.point-free
 
 ! Step 3: rewrite locals usage within a single quotation into
@@ -32,44 +33,16 @@ M: def localize
     [ local-reader? [ 1array load-local ] [ load-local ] ? ]
     bi ;
 
+M: multi-def localize
+    locals>> <reversed>
+    [ prepend ]
+    [ [ [ local-reader? ] dip '[ [ 1array ] _ [ndip] ] [ [ ] ] if ] map-index concat ]
+    [ length [ load-locals ] curry ] tri append ;
+
 M: object localize 1quotation ;
-
-! We special-case all the :> at the start of a quotation
-: load-locals-quot ( args -- quot )
-    [ [ ] ] [
-        dup [ local-reader? ] any? [
-            dup [ local-reader? [ 1array ] [ ] ? ] map
-            deep-spread>quot
-        ] [ [ ] ] if swap length [ load-locals ] curry append
-    ] if-empty ;
-
-: load-locals-index ( quot -- n )
-    [ [ dup def? [ local>> local-reader? ] [ drop t ] if ] find drop ]
-    [ length ] bi or ;
-
-: point-free-start ( quot -- args rest )
-    dup load-locals-index
-    cut [ [ local>> ] map dup <reversed> load-locals-quot % ] dip ;
-
-: point-free-body ( args quot -- args )
-    [ localize % ] each ;
 
 : drop-locals-quot ( args -- )
     [ length , [ drop-locals ] % ] unless-empty ;
 
-: point-free-end ( args obj -- )
-    dup special?
-    [ localize % drop-locals-quot ]
-    [ [ drop-locals-quot ] [ , ] bi* ]
-    if ;
-
 : point-free ( quot -- newquot )
-    [
-        point-free-start
-        [ drop-locals-quot ] [
-            unclip-last
-            [ point-free-body ]
-            [ point-free-end ]
-            bi*
-        ] if-empty
-    ] [ ] make ;
+    [ { } swap [ localize % ] each drop-locals-quot ] [ ] make ;

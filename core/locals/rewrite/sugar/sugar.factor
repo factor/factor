@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.tuple fry
 sequences.generalizations hashtables kernel locals locals.backend
-locals.errors locals.types make quotations sequences vectors
+locals.errors locals.types make math quotations sequences vectors
 words ;
 IN: locals.rewrite.sugar
 
@@ -19,11 +19,15 @@ GENERIC: quotation-rewrite ( form -- form' )
 
 M: callable quotation-rewrite [ [ rewrite-sugar* ] each ] [ ] make ;
 
-: var-defs ( vars -- defs ) <reversed> [ <def> ] [ ] map-as ;
+: var-defs ( vars -- defs )
+    dup length 1 > [
+        <multi-def> 1quotation
+    ] [
+        <reversed> [ <def> ] [ ] map-as
+    ] if ;
 
 M: lambda quotation-rewrite
-    [ body>> ] [ vars>> var-defs ] bi
-    prepend quotation-rewrite ;
+    [ body>> ] [ vars>> var-defs ] bi prepend quotation-rewrite ;
 
 M: callable rewrite-sugar* quotation-rewrite , ;
 
@@ -85,8 +89,7 @@ M: local-writer rewrite-element
 M: word rewrite-element <wrapper> , ;
 
 : rewrite-wrapper ( wrapper -- )
-    dup rewrite-literal?
-    [ wrapped>> rewrite-element ] [ , ] if ;
+    dup rewrite-literal? [ wrapped>> rewrite-element ] [ , ] if ;
 
 M: wrapper rewrite-element
     rewrite-wrapper \ <wrapper> , ;
@@ -101,7 +104,7 @@ M: tuple rewrite-sugar* rewrite-element ;
 
 M: def rewrite-sugar* , ;
 
-M: multi-def rewrite-sugar* locals>> <reversed> [ <def> , ] each ;
+M: multi-def rewrite-sugar* , ;
 
 M: hashtable rewrite-sugar* rewrite-element ;
 
