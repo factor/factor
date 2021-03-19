@@ -152,7 +152,6 @@ syn region  factorString            matchgroup=factorStringDelims   start=/\v<"/
 syn region  factorString            matchgroup=factorStringDelims   start=/\v<"""/               skip=/\v\\"/ end=/\v"""/         contains=factorEscape
 syn region  factorString            matchgroup=factorStringDelims   start=/\v<[^[:blank:]"]+"/   skip=/\v\\"/ end=/\v"/           contains=factorEscape
 syn region  factorString            matchgroup=factorStringDelims   start=/\v\[\z(\=*)\[/                     end=/\]\z1\]/       contains=factorEscape
-syn region  factorString            matchgroup=factorStringDelims   start=/\v<HEREDOC:\s+\z(.*)$>/            end=/\v^\z1$>/
 syn region  factorString            matchgroup=factorStringDelims   start=/\v<[^[\][:blank:]]+\[\z(\=*)\[>/   end=/\v\]\z1\]/
 
 syn region  factorNamedString       matchgroup=factorNamedStringDelims   start=/\v<STRING:\s+\S+$>/   end=/\v^<;>$/  contains=factorEscape
