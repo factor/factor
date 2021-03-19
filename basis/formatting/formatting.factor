@@ -254,10 +254,8 @@ PRIVATE>
 MACRO: strftime ( format-string -- quot )
     parse-strftime [
         dup string? [
-            '[ _ swap push-all ]
+            '[ _ append! ]
         ] [
-            '[ over @ swap push-all ]
+            '[ over @ append! ]
         ] if
-    ] map '[
-        SBUF" " clone [ _ cleave drop ] keep "" like
-    ] ;
+    ] map concat '[ SBUF" " clone @ nip "" like ] ;
