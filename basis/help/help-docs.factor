@@ -183,9 +183,9 @@ HELP: $subsection
 { $values { "element" "a markup element of the form " { $snippet "{ topic }" } } }
 { $description "Prints a large clickable link to the help topic named by the first item in " { $snippet "element" } ". The link is printed along with its associated definition icon." }
 { $examples
-    { $markup-example { $subsections "sequences" } }
-    { $markup-example { $subsections nth } }
-    { $markup-example { $subsections each } }
+    { $markup-example { $subsection "sequences" } }
+    { $markup-example { $subsection nth } }
+    { $markup-example { $subsection each } }
 } ;
 
 HELP: $subsections
