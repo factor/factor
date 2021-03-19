@@ -458,6 +458,10 @@ M:: integer lambda-method-forget-test ( a -- b ) a ;
     [| | 0 '[ [let 10 :> A A _ + ] ] call ] call
 ] unit-test
 
+{ { 1 2 3 4 } { 2 2 8 4 } } [
+    1 2 3 4 [| a! b c! d | { a b c d } a 1 + a! c 5 + c! { a b c d } ] call
+] unit-test
+
 ! littledan found this problem
 { "bar" } [ [let [let "bar" :> foo foo ] :> a a ] ] unit-test
 { 10 } [ [let 10 :> a [let a :> b b ] ] ] unit-test

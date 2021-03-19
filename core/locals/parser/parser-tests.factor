@@ -9,11 +9,22 @@ IN: locals.parser.tests
 ! (::)
 {
     "dobiedoo"
-    [ 1 load-locals 1 drop-locals ]
+    [ load-local 1 drop-locals ]
     ( x -- y )
 } [
     [
         { "dobiedoo ( x -- y ) ;" } <lexer> [ (::) ] with-lexer
+    ] with-compilation-unit
+    [ name>> ] 2dip
+] unit-test
+
+{
+    "dobiedoo"
+    [ 2 load-locals 2 drop-locals ]
+    ( x y -- z )
+} [
+    [
+        { "dobiedoo ( x y -- z ) ;" } <lexer> [ (::) ] with-lexer
     ] with-compilation-unit
     [ name>> ] 2dip
 ] unit-test
