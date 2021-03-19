@@ -115,7 +115,8 @@ syn cluster factorCommentContents   contains=factorTodo,@Spell
 syn match   factorTodo              /\v(TODO|FIXME|XXX):=/ contained
 
 syn region  factorDefn  matchgroup=NONE  start=/\v<%(SYNTAX|CONSTRUCTOR|%(M|MACRO|MEMO|TYPED)?:?):>/  skip=/\v<!>.*/  matchgroup=factorDefnDelims  end=/\v<;>/  contains=factorDefnDelims,@factorCluster keepend transparent
-syn region  factorDefnDelims        start=/\v<%(SYNTAX|%(MACRO|MEMO|TYPED)?:?):>/  skip=/\v<!>.*/  end=/\v<\S+>/  contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
+syn region  factorDefnDelims        start=/\v<SYNTAX:>/                            skip=/\v<!>.*/  end=/\v<\S+>/  contains=@factorComment skipempty keepend contained
+syn region  factorDefnDelims        start=/\v<%(MACRO|MEMO|TYPED)?:?:>/            skip=/\v<!>.*/  end=/\v<\S+>/  contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
 syn region  factorDefnDelims        start=/\v<M:>/                                 skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment skipempty keepend contained
 syn region  factorDefnDelims        start=/\v<M::>/                                skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
 syn region  factorDefnDelims        start=/\v<CONSTRUCTOR:>/                       skip=/\v<!>.*/  end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment nextgroup=factorEffectSkip skipempty keepend contained
