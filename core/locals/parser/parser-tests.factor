@@ -30,7 +30,7 @@ IN: locals.parser.tests
 { "um" t } [
     [
         "um" parse-def
-        local>> name>>
+        locals>> first name>>
         qualified-vocabs last words>> keys "um" swap member?
     ] with-compilation-unit
 ] unit-test
