@@ -4,13 +4,13 @@ USING: accessors arrays assocs calendar colors colors.constants
 combinators combinators.short-circuit definitions.icons
 documents documents.elements fonts fry generic help.vocabs
 kernel math math.vectors models.arrow models.delay parser
-present sequences sets splitting tools.completion ui.commands
-ui.gadgets ui.gadgets.editors ui.gadgets.glass
+present sequences sets splitting strings tools.completion
+ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.glass
 ui.gadgets.labeled ui.gadgets.scrollers ui.gadgets.tables
 ui.gadgets.tracks ui.gadgets.worlds ui.gadgets.wrappers
 ui.gestures ui.images ui.operations ui.pens.solid ui.theme
 ui.theme.images ui.tools.common ui.tools.listener.history
-ui.tools.listener.popups vocabs words ;
+ui.tools.listener.popups unicode.data vocabs words ;
 IN: ui.tools.listener.completion
 
 ! We don't directly depend on the listener tool but we use a few slots
@@ -69,6 +69,9 @@ M: history-completion completion-banner drop "Input history" ;
 
 ! Completion modes also implement the row renderer protocol
 M: listener-completion row-columns drop present 1array ;
+
+M: char-completion row-columns
+    drop [ name-map at 1string ] [ 2array ] bi ;
 
 M: definition-completion prototype-row
     drop \ + definition-icon <image-name> "" 2array ;
