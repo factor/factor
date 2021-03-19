@@ -78,14 +78,12 @@ big-endian off
 
 ! : pic-tail-reg ( -- reg ) RBX ;
 : return-reg ( -- reg ) X0 ;
-! : nv-reg ( -- reg ) RBX ;
-! : stack-reg ( -- reg ) RSP ;
-! : frame-reg ( -- reg ) RBP ;
+: stack-reg ( -- reg ) SP ;
 ! : link-reg ( -- reg ) R11 ;
 ! : ctx-reg ( -- reg ) R12 ;
-: vm-reg ( -- reg ) X7 ;
-: ds-reg ( -- reg ) X5 ;
-: rs-reg ( -- reg ) X6 ;
+: vm-reg ( -- reg ) X28 ;
+: ds-reg ( -- reg ) X27 ;
+: rs-reg ( -- reg ) X26 ;
 ! : fixnum>slot@ ( -- ) temp0 1 SAR ;
 ! : rex-length ( -- n ) 1 ;
 
@@ -93,7 +91,7 @@ big-endian off
 : jit-call ( name -- )
     0 X0 MOVwi64
     f rc-absolute-cell rel-dlsym
-    X0 BR ;
+    X0 BLR ;
     ! RAX 0 MOV f rc-absolute-cell rel-dlsym
     ! RAX CALL ;
 
@@ -152,13 +150,14 @@ big-endian off
 ] JIT-PRIMITIVE jit-define
 
 
-: jit-jump-quot ( -- ) ;
+: jit-jump-quot ( -- )
+    quot-entry-point-offset arg1 ADR
+    arg1 BR ;
     ! arg1 quot-entry-point-offset [+] JMP ;
 
 : jit-call-quot ( -- )
     quot-entry-point-offset arg1 ADR
-    arg1 BR ;
-
+    arg1 BLR ;
     ! arg1 quot-entry-point-offset [+] CALL ;
 
 : signal-handler-save-regs ( -- regs ) { } ;
@@ -278,8 +277,34 @@ big-endian off
 ] JIT-SAFEPOINT jit-define
 
 ! # All arm.64 subprimitives
-
 {
+    { c-to-factor [
+
+            ! write()
+            ! 68 X8 MOVwi64
+            ! X2 MOVwi64
+            ! 0 SVC
+
+            ! exit(42)
+
+            ! 9999 BRK
+            ! 42 X0 MOVwi64
+            ! 93 X8 MOVwi64
+            ! 0 SVC
+
+            ! Rn Rd MOVr64 ! comment
+            arg1 arg2 MOVr64
+            vm-reg "begin_callback" jit-call-1arg
+
+            return-reg arg1 MOVr64 ! arg1 is return
+            jit-call-quot
+
+            vm-reg "end_callback" jit-call-1arg
+     ] }
+} define-sub-primitives
+
+
+! {
     ! ## Contexts
     ! { (set-context) [ jit-set-context ] }
     ! { (set-context-and-delete) [
@@ -290,44 +315,44 @@ big-endian off
     ! { (start-context-and-delete) [ jit-start-context-and-delete ] }
 
     ! ## Entry points
-    { c-to-factor [
-        ! dst src MOV
-        ! arg2 arg1 MOV
-        ! vm-reg "begin_callback" jit-call-1arg
+    ! { c-to-factor [
+    !     ! dst src MOV
+    !     ! arg2 arg1 MOV
+    !     ! vm-reg "begin_callback" jit-call-1arg
 
-        ! ! call the quotation
-        ! arg1 return-reg MOV
-        ! jit-call-quot
+    !     ! ! call the quotation
+    !     ! arg1 return-reg MOV
+    !     ! jit-call-quot
 
-        ! vm-reg "end_callback" jit-call-1arg
+    !     ! vm-reg "end_callback" jit-call-1arg
 
-        [
+    !     [
 
-            ! write()
-            ! 68 X8 MOVwi64
-            ! X2 MOVwi64
-            ! 0 SVC
+    !         ! write()
+    !         ! 68 X8 MOVwi64
+    !         ! X2 MOVwi64
+    !         ! 0 SVC
 
-            ! exit(42)
-            9999 BRK
-            42 X0 MOVwi64
-            93 X8 MOVwi64
-            0 SVC
+    !         ! exit(42)
+    !         9999 BRK
+    !         42 X0 MOVwi64
+    !         93 X8 MOVwi64
+    !         0 SVC
 
             
 
-            ! Rn Rd MOVr64
-            ! arg1 arg2 MOVr64
-            ! vm-reg "begin_callback" jit-call-1arg
+    !         ! Rn Rd MOVr64
+    !         ! arg1 arg2 MOVr64
+    !         ! vm-reg "begin_callback" jit-call-1arg
 
-            ! return-reg arg1 MOVr64 ! arg1 is return
-            ! jit-call-quot
+    !         ! return-reg arg1 MOVr64 ! arg1 is return
+    !         ! jit-call-quot
 
-            ! vm-reg "end_callback" jit-call-1arg
+    !         ! vm-reg "end_callback" jit-call-1arg
 
-        ] assemble-arm %
+    !     ] assemble-arm %
 
-    ] }
+    ! ] }
     ! { unwind-native-frames [ ] }
 
     ! ## Math
@@ -392,7 +417,7 @@ big-endian off
     !     ! Return with new callstack
     !     0 RET
     ! ] }
-} define-sub-primitives
+! } define-sub-primitives
 
 
 
@@ -554,6 +579,7 @@ big-endian off
 
 [
     ! stack-reg stack-frame-size bootstrap-cell - SUB
+
 ] JIT-PROLOG jit-define
 
 [
@@ -561,7 +587,7 @@ big-endian off
 ] JIT-EPILOG jit-define
 
 [
-    ! 0 RET
+    f RET
 ] JIT-RETURN jit-define
 
 ! ! ! Polymorphic inline caches
