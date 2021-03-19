@@ -4,8 +4,6 @@ USING: accessors combinators kernel lexer locals make math
 namespaces parser quotations sequences words ;
 IN: multiline
 
-ERROR: bad-heredoc identifier ;
-
 <PRIVATE
 
 : rest-of-line ( lexer -- seq )
