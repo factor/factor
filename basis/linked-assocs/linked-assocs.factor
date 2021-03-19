@@ -4,8 +4,6 @@ USING: accessors arrays assocs classes deques dlists fry
 hashtables kernel parser sequences.private vocabs.loader ;
 IN: linked-assocs
 
-SLOT: dlist ! FIXME: needed for change-dlist for some reason
-
 TUPLE: linked-assoc { assoc read-only } { dlist dlist read-only } ;
 
 : <linked-assoc> ( exemplar -- assoc )
@@ -48,7 +46,7 @@ M: linked-assoc clear-assoc
     [ assoc>> clear-assoc ] [ dlist>> clear-deque ] bi ;
 
 M: linked-assoc clone
-    (clone) [ clone ] change-assoc [ clone ] change-dlist ;
+    [ assoc>> clone ] [ dlist>> clone ] bi linked-assoc boa ;
 
 INSTANCE: linked-assoc assoc
 
