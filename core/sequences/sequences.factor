@@ -1143,24 +1143,15 @@ PRIVATE>
 <PRIVATE
 
 : generic-flip ( matrix -- newmatrix )
-    [
-        [ first-unsafe length 1 ] keep
-        [ length min ] (each) (each-integer) <iota>
-    ] keep
-    [ [ nth-unsafe ] with { } map-as ] curry { } map-as ; inline
+    [ [ length ] [ min ] map-reduce ] keep
+    '[ _ [ nth-unsafe ] with { } map-as ] { } map-integers ; inline
 
 USE: arrays
 
-: array-length ( array -- len )
-    { array } declare length>> ; inline
-
 : array-flip ( matrix -- newmatrix )
     { array } declare
-    [
-        [ first-unsafe array-length 1 ] keep
-        [ array-length min ] (each) (each-integer) <iota>
-    ] keep
-    [ [ { array } declare array-nth ] with { } map-as ] curry { } map-as ;
+    [ [ { array } declare length>> ] [ min ] map-reduce ] keep
+    '[ _ [ { array } declare array-nth ] with { } map-as ] { } map-integers ;
 
 PRIVATE>
 
