@@ -28,11 +28,16 @@ M: local-writer localize
     read-local-quot [ set-local-value ] append ;
 
 M: def localize
+    local>>
+    [ prefix ]
+    [ local-reader? [ 1array load-local ] [ load-local ] ? ]
+    bi ;
+
+M: multi-def localize
     locals>> <reversed>
     [ prepend ]
     [ [ [ local-reader? ] dip '[ [ 1array ] _ [ndip] ] [ [ ] ] if ] map-index concat ]
-    [ length dup 1 > [ [ load-locals ] curry ] [ drop [ load-local ] ] if ]
-    tri append ;
+    [ length [ load-locals ] curry ] tri append ;
 
 M: object localize 1quotation ;
 

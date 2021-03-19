@@ -18,15 +18,19 @@ C: <quote> quote
 
 : unquote ( quote -- local ) dup quote? [ local>> ] when ; inline
 
-TUPLE: def locals ;
+TUPLE: def local ;
 
 C: <def> def
+
+TUPLE: multi-def locals ;
+
+C: <multi-def> multi-def
 
 PREDICATE: local < word "local?" word-prop ;
 
 : <local> ( name -- word )
     ! Create a local variable identifier
-    f <word>
+    <uninterned-word>
     dup t "local?" set-word-prop ;
 
 M: local literalize ;
@@ -34,7 +38,7 @@ M: local literalize ;
 PREDICATE: local-reader < word "local-reader?" word-prop ;
 
 : <local-reader> ( name -- word )
-    f <word>
+    <uninterned-word>
     dup t "local-reader?" set-word-prop ;
 
 M: local-reader literalize ;
@@ -42,7 +46,7 @@ M: local-reader literalize ;
 PREDICATE: local-writer < word "local-writer?" word-prop ;
 
 : <local-writer> ( reader -- word )
-    dup name>> "!" append f <word> {
+    dup name>> "!" append <uninterned-word> {
         [ nip t "local-writer?" set-word-prop ]
         [ swap "local-reader" set-word-prop ]
         [ "local-writer" set-word-prop ]
