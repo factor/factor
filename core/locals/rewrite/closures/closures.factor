@@ -20,9 +20,7 @@ GENERIC: defs-vars* ( seq form -- seq' )
 
 : defs-vars ( form -- vars ) { } [ defs-vars* ] reduce members ;
 
-M: def defs-vars* local>> unquote suffix ;
-
-M: multi-def defs-vars* locals>> [ unquote suffix ] each ;
+M: def defs-vars* locals>> [ unquote suffix ] each ;
 
 M: quotation defs-vars* [ defs-vars* ] each ;
 
@@ -50,7 +48,7 @@ M: callable rewrite-closures*
     ! onto the body
     dup free-vars [ <quote> ] map
     [ % ]
-    [ var-defs prepend (rewrite-closures) point-free , ]
+    [ [ <def> prefix ] unless-empty (rewrite-closures) point-free , ]
     [ length \ curry <repetition> % ]
     tri ;
 
