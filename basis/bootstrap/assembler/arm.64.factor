@@ -79,11 +79,13 @@ big-endian off
 ! : pic-tail-reg ( -- reg ) RBX ;
 : return-reg ( -- reg ) X0 ;
 : stack-reg ( -- reg ) SP ;
-! : link-reg ( -- reg ) R11 ;
-! : ctx-reg ( -- reg ) R12 ;
+! https://developer.arm.com/documentation/dui0801/a/Overview-of-AArch64-state/Link-registers
+: link-reg ( -- reg ) X30 ; ! LR
+! : stack-frame-reg ( -- reg ) X29 ; ! FP
 : vm-reg ( -- reg ) X28 ;
 : ds-reg ( -- reg ) X27 ;
 : rs-reg ( -- reg ) X26 ;
+! : ctx-reg ( -- reg ) R12 ;
 ! : fixnum>slot@ ( -- ) temp0 1 SAR ;
 ! : rex-length ( -- n ) 1 ;
 
@@ -578,8 +580,8 @@ big-endian off
 ] JIT-EXECUTE jit-define
 
 [
-    ! stack-reg stack-frame-size bootstrap-cell - SUB
-
+    ! stack-reg stack-framrcee-size bootstrap-cell - SUB
+    stack-frame-size bootstrap-cell - stack-reg stack-reg SUBi64
 ] JIT-PROLOG jit-define
 
 [
