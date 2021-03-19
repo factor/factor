@@ -20,11 +20,7 @@ GENERIC: quotation-rewrite ( form -- form' )
 M: callable quotation-rewrite [ [ rewrite-sugar* ] each ] [ ] make ;
 
 : var-defs ( vars -- defs )
-    dup length 1 > [
-        <multi-def> 1quotation
-    ] [
-        <reversed> [ <def> ] [ ] map-as
-    ] if ;
+    [ [ ] ] [ <multi-def> 1quotation ] if-empty ;
 
 M: lambda quotation-rewrite
     [ body>> ] [ vars>> var-defs ] bi prepend quotation-rewrite ;
@@ -101,8 +97,6 @@ M: array rewrite-sugar* rewrite-element ;
 M: vector rewrite-sugar* rewrite-element ;
 
 M: tuple rewrite-sugar* rewrite-element ;
-
-M: def rewrite-sugar* , ;
 
 M: multi-def rewrite-sugar* , ;
 

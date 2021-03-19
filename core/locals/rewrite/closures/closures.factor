@@ -20,8 +20,6 @@ GENERIC: defs-vars* ( seq form -- seq' )
 
 : defs-vars ( form -- vars ) { } [ defs-vars* ] reduce members ;
 
-M: def defs-vars* local>> unquote suffix ;
-
 M: multi-def defs-vars* locals>> [ unquote suffix ] each ;
 
 M: quotation defs-vars* [ defs-vars* ] each ;

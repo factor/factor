@@ -27,17 +27,17 @@ M: local-writer localize
     dupd "local-reader" word-prop
     read-local-quot [ set-local-value ] append ;
 
-M: def localize
-    local>>
-    [ prefix ]
-    [ local-reader? [ 1array load-local ] [ load-local ] ? ]
-    bi ;
-
 M: multi-def localize
     locals>> <reversed>
     [ prepend ]
     [ [ [ local-reader? ] dip '[ [ 1array ] _ [ndip] ] [ [ ] ] if ] map-index concat ]
-    [ length [ load-locals ] curry ] tri append ;
+    [
+        length {
+            { [ dup 1 > ] [ [ load-locals ] curry ] }
+            { [ dup 1 = ] [ drop [ load-local ] ] }
+            [ drop [ ] ]
+        } cond
+    ] tri append ;
 
 M: object localize 1quotation ;
 
