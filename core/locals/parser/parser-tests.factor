@@ -33,7 +33,7 @@ IN: locals.parser.tests
 { "um" t } [
     [
         "um" parse-def
-        locals>> first name>>
+        local>> name>>
         qualified-vocabs last words>> keys "um" swap member?
     ] with-compilation-unit
 ] unit-test
@@ -58,24 +58,15 @@ IN: locals.parser.tests
     nip values [ name>> ] map
 ] unit-test
 
-! parse-single-def
-{
-    { "tok1" }
-} [
-    [
-        { "tok1" } <lexer> [ scan-token parse-def ] with-lexer
-    ] with-compilation-unit
-    locals>> [ name>> ] map
-] unit-test
-
 ! parse-multi-def
 {
     { "tok1" "tok2" }
+    { "tok1" "tok2" }
 } [
     [
-        { "( tok1 tok2 )" } <lexer> [ scan-token parse-def ] with-lexer
+        { "tok1 tok2 )" } <lexer> [ parse-multi-def ] with-lexer
     ] with-compilation-unit
-    locals>> [ name>> ] map
+    [ locals>> [ name>> ] map ] [ keys ] bi*
 ] unit-test
 
 <<
