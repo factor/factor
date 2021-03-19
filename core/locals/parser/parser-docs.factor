@@ -8,7 +8,7 @@ HELP: in-lambda?
 HELP: parse-def
 { $values
   { "name/paren" string }
-  { "def" "a " { $link def } " or a " { $link multi-def } }
+  { "def" def }
 }
 { $description "Parses the lexical variable bindings following a " { $link POSTPONE: :> } " token." } ;
 
@@ -20,7 +20,7 @@ ARTICLE: "locals.parser" "Utility words used by locals parsing words"
 "Words for parsing local words."
 $nl
 "Words for parsing variable assignments:"
-{ $subsections parse-def parse-multi-def parse-single-def }
+{ $subsections parse-def }
 "Parsers for word and method definitions:"
 { $subsections (::) (M::) } ;
 
