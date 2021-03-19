@@ -3,12 +3,12 @@
 
 USING: accessors alien arrays assocs byte-arrays calendar
 classes classes.error combinators combinators.short-circuit
-hashtables help.markup interpolate io io.directories
-io.encodings.utf8 io.files io.pathnames io.streams.string kernel
-math math.parser math.ranges namespaces prettyprint quotations
-sequences sets sorting splitting strings system timers unicode
-urls vocabs vocabs.loader vocabs.loader.private vocabs.metadata
-words words.symbol ;
+continuations hashtables help.markup interpolate io
+io.directories io.encodings.utf8 io.files io.pathnames
+io.streams.string kernel math math.parser namespaces prettyprint
+quotations sequences sets sorting splitting strings system
+timers unicode urls vocabs vocabs.loader vocabs.metadata words
+words.symbol ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -310,18 +310,10 @@ PRIVATE>
 : scaffold-work ( string -- )
     "resource:work" swap scaffold-vocab-in  ;
 
-<PRIVATE
-
-: find-vocab-root-for  ( string -- vocab-root/f )
-    "." split dup length [1,b) [ head "." join ] with map {
-        [ [ find-vocab-root ] map-find-last drop ]
-        [ [ "." "/" replace find-root-for ] map-find-last drop ]
-    } 1|| ;
-
-PRIVATE>
-
 : scaffold-vocab ( string -- )
-    [ find-vocab-root-for ] [ scaffold-vocab-in ] bi ;
+    "Choose a vocabulary root:" vocab-roots get
+    '[ [ "Use " prepend ] keep ] { } map>assoc throw-restarts
+    swap scaffold-vocab-in ;
 
 <PRIVATE
 
