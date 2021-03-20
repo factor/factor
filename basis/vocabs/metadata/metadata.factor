@@ -98,6 +98,20 @@ TUPLE: unsupported-platform vocab requires ;
 M: unsupported-platform summary
     drop "Current operating system not supported by this vocabulary" ;
 
+: exists?, ( path -- )
+    [ dup exists? [ , ] [ drop ] if ] when* ;
+
+: vocab-metadata-files ( vocab -- paths )
+    [
+        {
+            [ vocab-summary-path exists?, ]
+            [ vocab-authors-path exists?, ]
+            [ vocab-tags-path exists?, ]
+            [ vocab-platforms-path exists?, ]
+            [ vocab-resources-path exists?, ]
+        } cleave
+    ] { } make ;
+
 [
     dup vocab-platforms dup supported-platform?
     [ 2drop ] [ [ vocab-name ] dip throw-unsupported-platform ] if
