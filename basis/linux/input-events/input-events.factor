@@ -5,14 +5,14 @@ arrays ascii assocs combinators combinators.smart grouping
 hashtables io io.backend io.directories io.encodings.binary
 io.files io.files.links io.pathnames kernel
 linux.input-events.ffi math namespaces pack prettyprint
-sequences sequences.extras splitting unix.time ;
+sequences splitting unix.time ;
 FROM: io => read ;
 IN: linux.input-events
 
 : input-events-assoc ( path -- assoc )
     dup '[
         _ qualified-directory-files
-        [ read-link normalize-path ] map-zip
+        [ read-link normalize-path ] zip-with
     ] with-directory ;
 
 : input-events-by-id-assoc ( -- assoc )
@@ -53,23 +53,23 @@ IN: linux.input-events
 
 : EV>seq ( handle EV -- seq )
     dup <INPUT_EVENT> {
-        { EV_SYN [ drop evdev-get-syn [ <INPUT_EVENT> ] map-zip ] }
-        { EV_KEY [ KEY_CNT evdev-explode-bitfield [ <INPUT_KEY> ] map-zip ] }
-        { EV_REL [ REL_CNT evdev-explode-bitfield [ <INPUT_REL> ] map-zip ] }
+        { EV_SYN [ drop evdev-get-syn [ <INPUT_EVENT> ] zip-with ] }
+        { EV_KEY [ KEY_CNT evdev-explode-bitfield [ <INPUT_KEY> ] zip-with ] }
+        { EV_REL [ REL_CNT evdev-explode-bitfield [ <INPUT_REL> ] zip-with ] }
         { EV_ABS [
             [ ABS_CNT evdev-explode-bitfield ]
             [ drop over [ evdev-get-abs ] with map ] 2bi
-            [ [ <INPUT_ABS> ] map-zip ] dip zip
+            [ [ <INPUT_ABS> ] zip-with ] dip zip
         ] }
-        { EV_MSC [ MSC_CNT evdev-explode-bitfield [ <INPUT_MSC> ] map-zip ] }
-        { EV_SW  [ SW_CNT evdev-explode-bitfield [ <INPUT_SW> ] map-zip ] }
-        { EV_LED [ LED_CNT evdev-explode-bitfield [ <INPUT_LED> ] map-zip ] }
-        { EV_SND [ SND_CNT evdev-explode-bitfield [ <INPUT_SND> ] map-zip ] }
+        { EV_MSC [ MSC_CNT evdev-explode-bitfield [ <INPUT_MSC> ] zip-with ] }
+        { EV_SW  [ SW_CNT evdev-explode-bitfield [ <INPUT_SW> ] zip-with ] }
+        { EV_LED [ LED_CNT evdev-explode-bitfield [ <INPUT_LED> ] zip-with ] }
+        { EV_SND [ SND_CNT evdev-explode-bitfield [ <INPUT_SND> ] zip-with ] }
         { EV_REP [
             drop evdev-get-repeat "II" unpack
             [ <INPUT_REP> swap 2array ] map-index
         ] }
-        { EV_FF [ FF_CNT evdev-explode-bitfield [ <INPUT_FF> ] map-zip ] }
+        { EV_FF [ FF_CNT evdev-explode-bitfield [ <INPUT_FF> ] zip-with ] }
         ! { EV_PWR [ PWR_CNT evdev-explode-bitfield ] }
         { EV_FF_STATUS [ FF_STATUS_MAX evdev-explode-bitfield ] }
         ! [ nip drop "broken" ]
@@ -110,10 +110,10 @@ IN: linux.input-events
                 [ evdev-get-unique "unique" named ]
                 [ evdev-get-prop "props" named ]
                 [ evdev-get-all-mt-slots "mt-slots" named ]
-                [ evdev-get-key seq>explode-positions [ <INPUT_KEY> ] map-zip "keys" named ]
-                [ evdev-get-led seq>explode-positions [ <INPUT_LED> ] map-zip "leds" named ]
-                [ evdev-get-sound seq>explode-positions [ <INPUT_SND> ] map-zip "sounds" named ]
-                [ evdev-get-switch seq>explode-positions [ <INPUT_SW> ] map-zip "switches" named ]
+                [ evdev-get-key seq>explode-positions [ <INPUT_KEY> ] zip-with "keys" named ]
+                [ evdev-get-led seq>explode-positions [ <INPUT_LED> ] zip-with "leds" named ]
+                [ evdev-get-sound seq>explode-positions [ <INPUT_SND> ] zip-with "sounds" named ]
+                [ evdev-get-switch seq>explode-positions [ <INPUT_SW> ] zip-with "switches" named ]
                 [ evdev-get-simulataneous-effects "effects" named ]
                 [ evdev-get-event-mask "event-mask" named ]
                 [ evdev-get-all-bits "capabilities" named ]
