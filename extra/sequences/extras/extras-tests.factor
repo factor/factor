@@ -242,17 +242,6 @@ tools.test vectors vocabs ;
 
 { 120000 } [ { 10 20 30 40 50 60 } 1 [ * ] 3 reduce-from ] unit-test
 
-{
-    {
-        { 2 4 }
-        { 3 6 }
-        { 4 8 }
-    }
-} [ { 2 3 4 } [ 2 * ] map-zip ] unit-test
-
-{ }
-[ "test:" all-words [ name>> over prepend ] map-zip 2drop ] unit-test
-
 { { 0 1 2 3 } } [ 8 <iota> [ 4 < ] take-while >array ] unit-test
 { { } } [ { 15 16 } [ 4 < ] take-while >array ] unit-test
 { { 0 1 2 } } [ 3 <iota> [ 4 < ] take-while >array ] unit-test
