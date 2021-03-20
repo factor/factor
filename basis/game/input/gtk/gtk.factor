@@ -4,7 +4,7 @@ USING: accessors alien.c-types alien.data alien.syntax arrays
 assocs bit-arrays destructors game.input gdk.ffi
 io.encodings.binary io.files kernel linux.input-events
 linux.input-events.ffi math namespaces sequences
-sequences.extras system unix.ffi x11.xlib ;
+system unix.ffi x11.xlib ;
 IN: game.input.gtk
 
 SINGLETON: gtk-game-input-backend
@@ -57,7 +57,7 @@ M: gtk-game-input-backend instance-id
 M: gtk-game-input-backend read-controller
     [ linux-controller-state new ] dip
     [ fd>> ] [ meta>> ] bi
-    [ drop evdev-get-key seq>explode-positions [ <INPUT_KEY> ] map-zip >>buttons ]
+    [ drop evdev-get-key seq>explode-positions [ <INPUT_KEY> ] zip-with >>buttons ]
     [ "capabilities" of EV_ABS of [ [ first first evdev-get-abs ] [ first ] bi swap 2array ] with map >>abs ] 2bi ;
 
 M: gtk-game-input-backend calibrate-controller
