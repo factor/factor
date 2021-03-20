@@ -8,7 +8,7 @@ IN: math.runge-kutta.examples
 
 : lorenz-dy/dt ( tx..n -- dy )
     rest first3
-    28 swap - [ swap ] dip * swap - ;
+    28 swap - swapd * swap - ;
 
 : lorenz-dz/dt ( tx..n -- dz )
     rest first3
@@ -36,7 +36,7 @@ IN: math.runge-kutta.examples
 
 :: rf-dz/dt ( tx..n alpha -- dz )
     tx..n rest first3 :> ( x y z )
-    2 neg z * alpha x y * + * ;
+    -2 z * alpha x y * + * ;
 
 :: <rabinovich-fabrikant> ( gamma alpha -- dx..n/dt delta tx..n t-limit )
     gamma '[ _ rf-dx/dt ] gamma '[ _ rf-dy/dt ] alpha '[ _ rf-dz/dt ]

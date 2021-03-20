@@ -9,17 +9,17 @@ IN: math.runge-kutta
     runge-kutta-2-transform ;
 
 : runge-kutta-4-transform ( rk3 tx..n delta -- tx..n' delta )
-    [ [ swap ] dip [ v*n ] keep prefix v+ ] keep ;
+    [ swapd [ v*n ] keep prefix v+ ] keep ;
 
 : (runge-kutta) ( delta tx..n dx..n/dt -- rk )
-    [ swap ] dip dup length>> [ cleave ] dip narray swap v*n
+    swapd dup length>> [ cleave ] dip narray swap v*n
     ; inline
 
 : runge-kutta-differentials ( dx..n/dt -- seq )
     '[ _ (runge-kutta) ] ;
 
 : runge-kutta-transforms ( tx..n delta dx..n/dt -- seq )
-    -rot swap
+    spin
     [ { [ ]
       [ runge-kutta-2-transform ]
       [ runge-kutta-3-transform ]
@@ -48,7 +48,7 @@ IN: math.runge-kutta
         call( -- rk1 rk2 rk3 rk4 rk4 ) drop 4array 
 
         ! make array of zeroes of appropriate length to reduce into
-        dup first length>> 0 <repetition> >array
+        dup first length>> 0 <array>
 
         ! reduce the results to the estimated change for the timestep
         [ v+ ] reduce
