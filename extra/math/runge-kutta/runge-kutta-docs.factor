@@ -5,9 +5,9 @@ HELP: <runge-kutta-4>
 { $description "Simple runge-kutta implementation for generating 4th-order approximated solutions for a set of first order differential equations" }
 { $examples
     "A lorenz attractor is a popular system to model with this: "
-    { $code "USING: runge-kutta runge-kutta.examples ;" "lorenz." }
+    { $code "USING: math.runge-kutta math.runge-kutta.examples ;" "lorenz." }
     "note that the produced chart is a 2 dimensional representation of a 3 dimensional solution. "
     "Similarly, the rabinovich-fabrikant system (stable alpha-gamma limit cycle): "
-    { $code "USING: runge-kutta runge-kutta.examples ;" "rabinovich-fabrikant." }
+    { $code "USING: math.runge-kutta math.runge-kutta.examples ;" "rabinovich-fabrikant." }
 } ;
 
