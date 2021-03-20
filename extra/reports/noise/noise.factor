@@ -120,7 +120,7 @@ M: lambda-word word-noise-factor
 
 : noisy-words ( -- alist )
     all-words flatten-generics
-    [ dup word-noise-factor ] { } map>assoc
+    [ word-noise-factor ] zip-with
     sort-values reverse ;
 
 : noise. ( alist -- )
@@ -140,7 +140,7 @@ M: lambda-word word-noise-factor
     ] if-empty ;
 
 : noisy-vocabs ( -- alist )
-    loaded-vocab-names [ dup vocab-noise-factor ] { } map>assoc
+    loaded-vocab-names [ vocab-noise-factor ] zip-with
     sort-values reverse ;
 
 : noise-report ( -- )

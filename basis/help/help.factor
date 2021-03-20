@@ -78,7 +78,7 @@ M: alias word-help*
     } 1|| ;
 
 : sort-articles ( seq -- newseq )
-    [ dup article-title ] { } map>assoc sort-values keys ;
+    [ article-title ] zip-with sort-values keys ;
 
 : all-errors ( -- seq )
     all-words [ error? ] filter sort-articles ;

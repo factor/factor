@@ -11,7 +11,7 @@ IN: ctags
 <PRIVATE
 
 : locations ( words -- alist )
-    [ dup where ] { } map>assoc sift-values ;
+    [ where ] zip-with sift-values ;
 
 : ctag ( word path lineno -- str )
     [
