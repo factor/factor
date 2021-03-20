@@ -63,9 +63,11 @@ PRIVATE>
     swap find-vocab-root [ prepend-path ] [ drop f ] if* ;
 
 : vocab-source-path ( vocab -- path/f )
+    vocab-name ".private" ?tail drop
     dup ".factor" append-vocab-dir vocab-append-path ;
 
 : vocab-docs-path ( vocab -- path/f )
+    vocab-name ".private" ?tail drop
     dup "-docs.factor" append-vocab-dir vocab-append-path ;
 
 SYMBOL: load-help?
