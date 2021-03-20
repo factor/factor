@@ -78,7 +78,7 @@ M: f to-recompile
     changed-definitions get filter-word-defs ;
 
 M: f recompile
-    [ dup def>> ] { } map>assoc ;
+    [ def>> ] zip-with ;
 
 M: f process-forgotten-words drop ;
 

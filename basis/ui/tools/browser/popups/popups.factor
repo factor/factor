@@ -20,8 +20,7 @@ TUPLE: links-popup < wrapper ;
 
 : <links-table> ( model quot -- table )
     '[
-        @ sort-articles
-        [ dup article-title ] { } map>assoc
+        @ sort-articles [ article-title ] zip-with
     ] <arrow> link-renderer [ second ] <search-table> dup table>>
         [ invoke-primary-operation ] >>action
         [ hide-glass ] >>hook

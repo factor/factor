@@ -283,7 +283,7 @@ GENERIC: run-lint ( obj -- obj )
     ] assoc-filter ;
 
 M: sequence run-lint ( seq -- seq )
-    [ dup lint ] { } map>assoc trim-self
+    [ lint ] zip-with trim-self
     [ second empty? ] reject filter-symbols ;
 
 M: word run-lint ( word -- seq ) 1array run-lint ;
