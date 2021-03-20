@@ -616,10 +616,7 @@ PRIVATE>
 : count-subseq* ( subseq seq -- n )
     start-all* length ; inline
 
-: map-zip ( quot: ( key -- value ) -- alist )
-    '[ _ keep swap ] map>alist ; inline
-
-: assoc-map-zip ( quot: ( key value -- calc ) -- alist )
+: assoc-zip-with ( quot: ( key value -- calc ) -- alist )
     '[ _ 2keep 2array swap ] assoc-map ; inline
 
 : take-while ( ... seq quot: ( ... elt -- ... ? ) -- head-slice )
