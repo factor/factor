@@ -82,6 +82,14 @@ C: <vocab-author> vocab-author
         ] ($block)
     ] unless-empty ;
 
+: describe-metadata-files ( vocab -- )
+    vocab-metadata-files [ <pathname> ] map [
+        "Meta-data files" $heading
+        [
+            files.
+        ] ($block)
+    ] unless-empty ;
+
 : describe-tuple-classes ( classes -- )
     [
         "Tuple classes" $subheading
@@ -254,6 +262,7 @@ C: <vocab-author> vocab-author
         [ describe-metadata ]
         [ describe-words ]
         [ describe-files ]
+        [ describe-metadata-files ]
         [ describe-children ]
     } cleave ;
 
