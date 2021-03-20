@@ -1,10 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs classes.algebra
+USING: accessors assocs classes.algebra combinators
 combinators.short-circuit continuations io.directories
 io.encodings.utf8 io.files io.pathnames kernel make math.parser
-memoize namespaces sequences summary system vocabs vocabs.loader
-words ;
+memoize namespaces sequences splitting summary system vocabs
+vocabs.loader words ;
 IN: vocabs.metadata
 
 : check-vocab ( vocab -- vocab )
@@ -37,12 +37,15 @@ MEMO: vocab-file-lines ( vocab name -- lines/f )
 : vocab-summary-path ( vocab -- path/f )
     "summary.txt" vocab-file-path ;
 
+: vocab-in-root-summary ( vocab -- string )
+    vocab-name dup
+    ".private" ?tail drop find-vocab-root
+    [ "`" "'" surround " in " glue ] when* ;
+
 : vocab-summary ( vocab -- summary )
-    dup "summary.txt" vocab-file-lines [
-        vocab-name " vocabulary" append
-    ] [
-        nip first
-    ] if-empty ;
+    [ "summary.txt" vocab-file-lines [ first ] [ f ] if* ]
+    [ vocab-in-root-summary ] bi
+    over [ ", " glue ] [ nip ] if ;
 
 M: vocab summary
     [
