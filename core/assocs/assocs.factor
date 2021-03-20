@@ -245,6 +245,12 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
 : unzip ( assoc -- keys values )
     dup assoc-empty? [ drop { } { } ] [ >alist flip first2 ] if ;
 
+: zip-with-as ( ... seq quot: ( ... key -- ... value ) exemplar -- ... assoc )
+    [ [ keep swap ] curry ] dip map>assoc ; inline
+
+: zip-with ( ... seq quot: ( ... key -- ... value ) -- ... alist )
+    { } zip-with-as ; inline
+
 : collect-by ( ... seq quot: ( ... obj -- ... key ) -- ... assoc )
     [ keep swap ] curry H{ } clone [
         [ push-at ] curry compose each

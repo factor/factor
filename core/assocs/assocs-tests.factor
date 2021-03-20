@@ -308,6 +308,19 @@ unit-test
     V{ { 11 0 } { 22 1 } { 33 2 } }
 } [ { 11 22 33 } V{ } zip-index-as ] unit-test
 
+! zip-with, zip-with-as
+{
+    { { "cat" 3 } { "food" 4 } { "is" 2 } { "yummy" 5 } }
+} [
+    { "cat" "food" "is" "yummy" } [ length ] zip-with
+] unit-test
+
+{
+    H{ { "cat" 3 } { "food" 4 } { "is" 2 } { "yummy" 5 } }
+} [
+    { "cat" "food" "is" "yummy" } [ length ] H{ } zip-with-as
+] unit-test
+
 {
     H{
         { 0 V{ 0 3 6 9 } }
