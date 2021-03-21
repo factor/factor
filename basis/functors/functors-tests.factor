@@ -1,7 +1,7 @@
 USING: classes.struct classes.tuple functors tools.test math
 words kernel multiline parser io.streams.string generic ;
 QUALIFIED-WITH: alien.c-types c
-IN: functors.tests
+IN: functors::tests
 
 <<
 
@@ -105,7 +105,7 @@ M: integer W 1 + ;
 
 ! Does replacing an ordinary word with a functor-generated one work?
 [ [ ] ] [
-    "IN: functors.tests
+    "IN: functors::tests
 
     TUPLE: some-tuple ;
     : some-word ( -- ) ;
@@ -144,7 +144,7 @@ SYMBOL: W-symbol
 ;FUNCTOR>
 
 [ [ ] ] [
-    "IN: functors.tests
+    "IN: functors::tests
     << \"some\" redefine-test >>" <string-reader> "functors-test" parse-stream
 ] unit-test
 

@@ -4,7 +4,7 @@ accessors generic eval combinators combinators.short-circuit
 combinators.short-circuit.smart math.order math.functions
 definitions compiler.units fry lexer words.symbol see multiline
 combinators.smart ;
-IN: locals.tests
+IN: locals::tests
 
 :: foo ( a b -- a a ) a a ;
 
@@ -150,14 +150,14 @@ M:: string lambda-generic ( a b -- c ) a b lambda-generic-2 ;
 DEFER: xyzzy
 
 { } [
-    "IN: locals.tests USE: math GENERIC: xyzzy ( a -- b ) M: integer xyzzy ;"
+    "IN: locals::tests USE: math GENERIC: xyzzy ( a -- b ) M: integer xyzzy ;"
     <string-reader> "lambda-generic-test" parse-stream drop
 ] unit-test
 
 { 10 } [ 10 xyzzy ] unit-test
 
 { } [
-    "IN: locals.tests USE: math USE: locals GENERIC: xyzzy ( a -- b ) M:: integer xyzzy ( n -- x ) 5 ;"
+    "IN: locals::tests USE: math USE: locals GENERIC: xyzzy ( a -- b ) M:: integer xyzzy ( n -- x ) 5 ;"
     <string-reader> "lambda-generic-test" parse-stream drop
 ] unit-test
 
@@ -185,7 +185,7 @@ M:: fixnum next-method-test ( a -- b ) a call-next-method 1 + ;
 
 :: a-word-with-locals ( a b -- ) ;
 
-CONSTANT: new-definition "USING: math ;\nIN: locals.tests\n: a-word-with-locals ( -- x ) 2 3 + ;\n"
+CONSTANT: new-definition "USING: math ;\nIN: locals::tests\n: a-word-with-locals ( -- x ) 2 3 + ;\n"
 
 { } [ new-definition eval( -- ) ] unit-test
 

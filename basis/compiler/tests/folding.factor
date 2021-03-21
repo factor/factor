@@ -1,6 +1,6 @@
 USING: eval tools.test compiler.units vocabs words
 kernel classes.mixin arrays ;
-IN: compiler.tests.folding
+IN: compiler::tests.folding
 
 ! Calls to generic words were not folded away.
 
@@ -8,7 +8,7 @@ IN: compiler.tests.folding
 
 [ ] [
     "USING: math arrays ;
-    IN: compiler.tests.folding
+    IN: compiler::tests.folding
     GENERIC: foldable-generic ( a -- b ) foldable
     M: integer foldable-generic f <array> ;"
     eval( -- )
@@ -16,7 +16,7 @@ IN: compiler.tests.folding
 
 [ ] [
     "USING: math arrays ;
-    IN: compiler.tests.folding
+    IN: compiler::tests.folding
     : fold-test ( -- x ) 10 foldable-generic ;"
     eval( -- )
 ] unit-test

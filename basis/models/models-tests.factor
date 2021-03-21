@@ -1,6 +1,6 @@
 USING: accessors arrays assocs generic kernel math models models.arrow
 models.product namespaces sequences tools.test ;
-IN: models.tests
+IN: models::tests
 
 TUPLE: model-tester hit? ;
 

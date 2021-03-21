@@ -3,7 +3,7 @@ help.syntax help.topics inspector io io.streams.string io.styles
 kernel literals math models namespaces prettyprint see sequences
 tools.test ui.gadgets ui.gadgets.debug ui.gadgets.panes
 ui.gadgets.panes::private ui.theme ;
-IN: ui.gadgets.panes.tests
+IN: ui.gadgets.panes::tests
 
 : #children ( -- n ) "pane" get children>> length ;
 

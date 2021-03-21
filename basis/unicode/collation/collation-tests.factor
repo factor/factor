@@ -2,7 +2,7 @@ USING: arrays assocs compression.zlib fry grouping hash-sets
 io.encodings.binary io.encodings.string io.encodings.utf8
 io.files kernel math math.order math.parser sequences sets
 splitting strings tools.test unicode ;
-IN: unicode.collation.tests
+IN: unicode.collation::tests
 
 : test-equality ( str1 str2 -- ? ? ? ? )
     { primary= secondary= tertiary= quaternary= }

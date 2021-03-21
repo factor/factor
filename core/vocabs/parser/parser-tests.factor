@@ -1,6 +1,6 @@
 USING: accessors compiler.units definitions eval kernel
 tools.test vocabs vocabs.parser words ;
-IN: vocabs.parser.tests
+IN: vocabs.parser::tests
 
 [ "FROM: kernel => doesnotexist ;" eval( -- ) ]
 [ error>> T{ no-word-in-vocab { word "doesnotexist" } { vocab "kernel" } } = ]

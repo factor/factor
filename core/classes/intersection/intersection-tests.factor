@@ -1,5 +1,5 @@
 USING: accessors generic kernel math math.order slots tools.test ;
-IN: classes.intersection.tests
+IN: classes.intersection::tests
 
 TUPLE: a ;
 TUPLE: a1 < a ; TUPLE: a2 < a ; TUPLE: a3 < a2 ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.enums alien.enums::private
 alien.syntax sequences tools.test words ;
-IN: alien.enums.tests
+IN: alien.enums::tests
 
 ENUM: color_t red { green 3 } blue ;
 ENUM: instrument_t < ushort trombone trumpet ;

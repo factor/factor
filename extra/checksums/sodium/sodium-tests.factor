@@ -1,7 +1,7 @@
 ! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test checksums checksums.sodium ;
-IN: checksums.sodium.tests
+IN: checksums.sodium::tests
 
 CONSTANT: test-lines { "Hello," "world!" }
 CONSTANT: key B{ 1 2 3 4 5 }

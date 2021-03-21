@@ -1,6 +1,6 @@
 USING: accessors alien.data io.encodings.utf16
 io.encodings.utf16n io.streams.byte-array kernel tools.test ;
-IN: io.encodings.utf16n.tests
+IN: io.encodings.utf16n::tests
 
 : correct-endian ( obj -- ? )
     code>> little-endian? [ utf16le = ] [ utf16be = ] if ;

@@ -3,7 +3,7 @@ definitions eval io.streams.string kernel math namespaces parser
 prettyprint sequences sets source-files system tools.test vocabs
 vocabs.files vocabs.loader vocabs.metadata vocabs.parser
 vocabs.refresh words ;
-IN: vocabs.loader.tests
+IN: vocabs.loader::tests
 
 ! This vocab should not exist, but just in case...
 { } [
@@ -24,7 +24,7 @@ IN: vocabs.loader.test.2
 
 MAIN: hello
 
-IN: vocabs.loader.tests
+IN: vocabs.loader::tests
 
 { } [
     "vocabs.loader.test.2" run

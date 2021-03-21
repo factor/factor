@@ -3,7 +3,7 @@ literals math math.parser math.ranges pcre pcre.ffi pcre::private
 random sequences system tools.test ;
 QUALIFIED: regexp
 QUALIFIED: splitting
-IN: pcre.tests
+IN: pcre::tests
 
 { { "Bords" "words" "word" } } [
     "Bords, words, word." { ", " ", " "." } split-subseqs

@@ -6,7 +6,7 @@ io.encodings.utf16 io.encodings.utf8 io.files io.files::private
 io.pathnames kernel locals make math sequences
 specialized-arrays system threads tools.test vocabs ;
 FROM: specialized-arrays::private => specialized-array-vocab ;
-IN: io.files.tests
+IN: io.files::tests
 
 SPECIALIZED-ARRAY: int
 

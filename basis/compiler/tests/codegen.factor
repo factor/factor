@@ -8,7 +8,7 @@ math.libm math.parser math.functions alien.syntax memory
 stack-checker ;
 FROM: math => float ;
 QUALIFIED: namespaces::private
-IN: compiler.tests.codegen
+IN: compiler::tests.codegen
 
 ! Originally, this file did black box testing of templating
 ! optimization. We now have a different codegen, but the tests

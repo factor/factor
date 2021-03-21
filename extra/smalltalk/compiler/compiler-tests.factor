@@ -1,7 +1,7 @@
 USING: smalltalk.compiler tools.test prettyprint smalltalk.ast
 smalltalk.compiler.lexenv stack-checker locals.rewrite
 kernel accessors compiler.units sequences arrays ;
-IN: smalltalk.compiler.tests
+IN: smalltalk.compiler::tests
 
 : test-compilation ( ast -- quot )
     [

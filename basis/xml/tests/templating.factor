@@ -1,6 +1,6 @@
 USING: kernel xml sequences assocs tools.test io arrays namespaces fry
 accessors xml.data xml.traversal xml.writer generic sequences.deep multiline ;
-IN: xml.tests
+IN: xml::tests
 
 CONSTANT: sub-tag
     T{ name f f "sub" "http://littledan.onigirihouse.com/namespaces/replace" }

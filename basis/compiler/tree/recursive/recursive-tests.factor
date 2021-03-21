@@ -4,7 +4,7 @@ compiler.tree.builder
 compiler.tree.combinators
 compiler.tree.recursive
 compiler.tree.recursive::private ;
-IN: compiler.tree.recursive.tests
+IN: compiler.tree.recursive::tests
 
 { { f f f f } } [ f { f t f f } (tail-calls) ] unit-test
 { { f f f t } } [ t { f t f f } (tail-calls) ] unit-test

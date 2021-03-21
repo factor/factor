@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors crypto.aes crypto.aes::private crypto.aes.utils
 grouping kernel sequences tools.test ;
-IN: crypto.aes.tests
+IN: crypto.aes::tests
 
 ! fips-197 test vectors
 CONSTANT: plaintext B{ 0x32 0x43 0xf6 0xa8 0x88 0x5a 0x30 0x8d 0x31 0x31 0x98 0xa2 0xe0 0x37 0x07 0x34 }

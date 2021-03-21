@@ -1,4 +1,4 @@
-IN: macros.expander.tests
+IN: macros.expander::tests
 USING: macros.expander tools.test math combinators.short-circuit
 kernel combinators ;
 

@@ -3,7 +3,7 @@ io.streams.string kernel math math.parser math.rectangles models
 namespaces prettyprint sequences threads tools.test ui ui.gadgets
 ui.gadgets::private ui::private ;
 FROM: sets => members ;
-IN: ui.gadgets.tests
+IN: ui.gadgets::tests
 
 { { 300 300 } }
 [

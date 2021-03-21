@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors fry git io io.directories io.encodings.utf8
 io.launcher io.streams.string kernel sequences tools.test ;
-IN: git.tests
+IN: git::tests
 
 : run-process-stdout ( process -- string )
     >process utf8 [ contents ] with-process-reader ;

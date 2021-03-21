@@ -3,7 +3,7 @@
 
 USING: math.functions math.similarity math.vectors tools.test ;
 
-IN: math.similarity.tests
+IN: math.similarity::tests
 
 CONSTANT: a { 1 2 1 5 1 0 0 }
 CONSTANT: b { 0 0 0 0 2 3 1 }

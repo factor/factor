@@ -1,4 +1,4 @@
-IN: windows.directx.dinput.constants.tests
+IN: windows.directx.dinput.constants::tests
 USING: tools.test windows.directx.dinput.constants::private ;
 
 [ ] [ define-constants ] unit-test

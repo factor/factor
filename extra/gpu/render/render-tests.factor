@@ -1,5 +1,5 @@
 USING: accessors combinators gpu.render gpu.render::private kernel sequences tools.test ;
-IN: gpu.render.tests
+IN: gpu.render::tests
 
 UNIFORM-TUPLE: two-textures
     { "argyle"       texture-uniform f }

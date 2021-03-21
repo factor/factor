@@ -2,7 +2,7 @@ USING: assocs byte-arrays calendar kernel kernel::private math
 memory namespaces parser random sequences threads
 tools.profiler.sampling tools.profiler.sampling::private
 tools.test ;
-IN: tools.profiler.sampling.tests
+IN: tools.profiler.sampling::tests
 
 ! collect-tops: top is the last element in the array
 { 5 } [

@@ -3,7 +3,7 @@ http.client::private http.server http.server.requests io.crlf
 io.streams.limited io.streams.string linked-assocs kernel math
 math.parser multiline namespaces peg sequences splitting
 tools.test urls ;
-IN: http.server.requests.tests
+IN: http.server.requests::tests
 
 : request>string ( request -- string )
     [ write-request ] with-string-writer ;

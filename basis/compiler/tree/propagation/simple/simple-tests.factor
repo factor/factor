@@ -3,7 +3,7 @@ compiler.tree.propagation.constraints compiler.tree.propagation.copy
 compiler.tree.propagation.info compiler.tree.propagation.simple hashtables
 kernel math math.intervals math::private namespaces sequences system tools.test
 words ;
-IN: compiler.tree.propagation.simple.tests
+IN: compiler.tree.propagation.simple::tests
 
 : make-value-infos ( classes intervals -- seq )
     [ <class/interval-info>  ] 2map ;

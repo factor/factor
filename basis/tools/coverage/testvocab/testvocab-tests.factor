@@ -1,7 +1,7 @@
 ! Copyright (C) 2014 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test tools.coverage.testvocab tools.coverage.testvocab::private ;
-IN: tools.coverage.testvocab.tests
+IN: tools.coverage.testvocab::tests
 
 { } [ t testifprivate ] unit-test
 { } [ f testifprivate ] unit-test

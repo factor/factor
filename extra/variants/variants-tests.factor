@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math tools.test variants slots ;
-IN: variants.tests
+IN: variants::tests
 
 VARIANT: list
     nil

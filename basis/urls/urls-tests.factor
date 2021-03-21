@@ -1,6 +1,6 @@
 USING: accessors arrays assocs io.sockets io.sockets.secure kernel
 linked-assocs present prettyprint sequences tools.test urls ;
-IN: urls.tests
+IN: urls::tests
 
 { "localhost" f } [ "localhost" parse-host ] unit-test
 { "localhost" 8888 } [ "localhost:8888" parse-host ] unit-test

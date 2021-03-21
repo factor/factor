@@ -1,7 +1,7 @@
 USING: concurrency.combinators tools.test random kernel math
 concurrency.mailboxes threads sequences accessors arrays
 math.parser ;
-IN: concurrency.combinators.tests
+IN: concurrency.combinators::tests
 
 [ [ drop ] parallel-each ] must-infer
 { 2 0 } [ [ 2drop ] 2parallel-each ] must-infer-as

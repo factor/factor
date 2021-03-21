@@ -5,7 +5,7 @@ tools.deploy.backend math sequences io.launcher arrays
 namespaces continuations layouts accessors urls math.parser
 io.directories splitting tools.deploy tools.deploy.test vocabs ;
 
-IN: tools.deploy.tests
+IN: tools.deploy::tests
 
 ! Delete all cached staging images in case syntax or
 ! other core vocabularies have changed and staging

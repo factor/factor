@@ -3,7 +3,7 @@ windows.types alien alien.data alien.syntax tools.test libc
 alien.c-types namespaces arrays continuations accessors math
 windows.com.wrapper windows.com.wrapper::private destructors
 effects compiler.units ;
-IN: windows.com.tests
+IN: windows.com::tests
 
 COM-INTERFACE: ISimple IUnknown {216fb341-0eb2-44b1-8edb-60b76e353abc}
     HRESULT returnOK ( )

@@ -1,6 +1,6 @@
 USING: accessors arrays compiler.units definitions kernel make
 sequences tools.test ui.traverse ;
-IN: ui.traverse.tests
+IN: ui.traverse::tests
 
 M: array children>> ;
 

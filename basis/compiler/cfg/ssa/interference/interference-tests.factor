@@ -5,7 +5,7 @@ compiler.cfg.ssa.interference.live-ranges
 compiler.cfg.ssa.interference::private compiler.cfg.utilities
 compiler.test cpu.architecture kernel namespaces sequences slots
 tools.test ;
-IN: compiler.cfg.ssa.interference.tests
+IN: compiler.cfg.ssa.interference::tests
 
 : test-interference ( -- )
     0 get block>cfg

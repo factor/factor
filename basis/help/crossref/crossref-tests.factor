@@ -2,10 +2,10 @@ USING: help.crossref help.topics help.markup tools.test words
 definitions assocs sequences kernel namespaces parser arrays
 io.streams.string continuations debugger compiler.units eval
 help.syntax ;
-IN: help.crossref.tests
+IN: help.crossref::tests
 
 { } [
-    "IN: help.crossref.tests USING: help.syntax help.markup ; : foo ( -- ) ; HELP: foo \"foo is great\" ; ARTICLE: \"foo\" \"Foo\" { $subsection foo } ;" eval( -- )
+    "IN: help.crossref::tests USING: help.syntax help.markup ; : foo ( -- ) ; HELP: foo \"foo is great\" ; ARTICLE: \"foo\" \"Foo\" { $subsection foo } ;" eval( -- )
 ] unit-test
 
 { $subsection } [
@@ -24,7 +24,7 @@ IN: help.crossref.tests
 ] unit-test
 
 { } [
-    "IN: help.crossref.tests USING: help.syntax help.markup ; : bar ( -- ) ; HELP: bar \"bar is great\" ; ARTICLE: \"bar\" \"Bar\" { $subsection bar } ;" eval( -- )
+    "IN: help.crossref::tests USING: help.syntax help.markup ; : bar ( -- ) ; HELP: bar \"bar is great\" ; ARTICLE: \"bar\" \"Bar\" { $subsection bar } ;" eval( -- )
 ] unit-test
 
 { } [

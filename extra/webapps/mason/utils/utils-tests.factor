@@ -1,6 +1,6 @@
 USING: accessors kernel namespaces present tools.test urls
 webapps.mason.backend webapps.mason.utils ;
-IN: webapps.mason.utils.tests
+IN: webapps.mason.utils::tests
 
 
 {

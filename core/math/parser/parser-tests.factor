@@ -1,6 +1,6 @@
 USING: kernel layouts literals math math.parser
 math.parser::private sequences strings tools.test ;
-IN: math.parser.tests
+IN: math.parser::tests
 
 { f }
 [ f string>number ]

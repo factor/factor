@@ -1,7 +1,7 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel multiline rocksdb.ffi tools.test ;
-IN: rocksdb.ffi.tests
+IN: rocksdb.ffi::tests
 
 ![[
 { } [

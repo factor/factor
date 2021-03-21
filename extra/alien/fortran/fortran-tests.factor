@@ -6,7 +6,7 @@ generalizations io.encodings.ascii kernel macros
 macros.expander namespaces sequences shuffle tools.test vocabs.parser ;
 FROM: alien.syntax => pointer: ;
 QUALIFIED-WITH: alien.c-types c
-IN: alien.fortran.tests
+IN: alien.fortran::tests
 
 << intel-unix-abi "(alien.fortran-tests)" (add-fortran-library) >>
 LIBRARY: (alien.fortran-tests)

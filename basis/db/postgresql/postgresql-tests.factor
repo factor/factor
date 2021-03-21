@@ -1,7 +1,7 @@
 USING: accessors alien continuations db db.errors db.queries db.postgresql
 db::private db.tester db.tuples db.types io classes kernel math namespaces
 prettyprint sequences system tools.test unicode ;
-IN: db.postgresql.tests
+IN: db.postgresql::tests
 
 : nonexistant-db ( -- db )
     <postgresql-db>

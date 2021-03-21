@@ -3,7 +3,7 @@
 USING: tools.test images.viewer images.viewer::private kernel accessors sequences images
 namespaces ui ui.gadgets.debug math opengl.textures opengl.textures::private
 models ;
-IN: images.viewer.tests
+IN: images.viewer::tests
 
 : (gen-image) ( dim -- bitmap )
     product 3 * [ 200 ] BV{ } replicate-as ;

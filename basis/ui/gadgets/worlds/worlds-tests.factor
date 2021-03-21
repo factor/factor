@@ -1,6 +1,6 @@
 USING: ui.gadgets ui.gadgets.packs ui.gadgets.worlds tools.test
 namespaces models kernel accessors arrays ;
-IN: ui.gadgets.worlds.tests
+IN: ui.gadgets.worlds::tests
 
 ! Test focus behavior
 <gadget> "g1" set

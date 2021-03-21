@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Philipp Brüschweiler
 ! See http://factorcode.org/license.txt for BSD license.
 USING: infix.ast infix.parser infix.tokenizer tools.test ;
-IN: infix.parser.tests
+IN: infix.parser::tests
 
 { T{ ast-value { value 1 } } } [ "1" build-infix-ast ] unit-test
 { T{ ast-negation f T{ ast-value { value 1 } } } }

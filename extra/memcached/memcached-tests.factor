@@ -6,7 +6,7 @@ io.timeouts kernel math math.functions memcached
 memcached::private namespaces present sequences sorting system
 threads tools.test ;
 
-IN: memcached.tests
+IN: memcached::tests
 
 ! Use a version of with-memcached that sets a timeout
 : with-memcached ( quot -- )

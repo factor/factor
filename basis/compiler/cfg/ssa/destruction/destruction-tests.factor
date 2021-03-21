@@ -3,7 +3,7 @@ compiler.cfg.ssa.destruction compiler.cfg.ssa.destruction.leaders
 compiler.cfg.ssa.destruction::private compiler.cfg.utilities
 cpu.architecture cpu.x86.assembler.operands kernel make namespaces
 sequences tools.test ;
-IN: compiler.cfg.ssa.destruction.tests
+IN: compiler.cfg.ssa.destruction::tests
 
 : setup-leader/reps-scenario ( -- )
     ! Note the differences in representation.

@@ -4,7 +4,7 @@ compiler.cfg.utilities compiler.test cpu.architecture kernel
 kernel::private make math namespaces sequences::private slots::private
 tools.test ;
 QUALIFIED: sets
-IN: compiler.cfg.stacks.local.tests
+IN: compiler.cfg.stacks.local::tests
 
 ! end-local-analysis
 {

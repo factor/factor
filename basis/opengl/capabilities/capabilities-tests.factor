@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: opengl.capabilities tools.test ;
-IN: opengl.capabilities.tests
+IN: opengl.capabilities::tests
 
 CONSTANT: test-extensions
     {

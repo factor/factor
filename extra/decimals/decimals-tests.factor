@@ -3,7 +3,7 @@
 USING: continuations decimals grouping kernel kernel::private
 literals locals math math.functions math.order prettyprint
 random tools.test ;
-IN: decimals.tests
+IN: decimals::tests
 
 { t } [
     DECIMAL: 12.34 DECIMAL: 00012.34000 =

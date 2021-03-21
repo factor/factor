@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test unix.users kernel strings math sequences ;
-IN: unix.users.tests
+IN: unix.users::tests
 
 { } [ all-users drop ] unit-test
 

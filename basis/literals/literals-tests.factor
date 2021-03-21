@@ -1,5 +1,5 @@
 USING: accessors kernel literals math tools.test ;
-IN: literals.tests
+IN: literals::tests
 
 <<
 : six-six-six ( -- a b c ) 6 6 6 ;

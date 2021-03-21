@@ -1,7 +1,7 @@
 USING: accessors assocs compiler.units kernel lexer
 locals.backend locals.parser parser prettyprint sequences
 tools.test vocabs.parser ;
-IN: locals.parser.tests
+IN: locals.parser::tests
 
 ! (::)
 {

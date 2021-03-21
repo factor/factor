@@ -4,7 +4,7 @@ USING: accessors alien.c-types classes.struct classes.struct.vectored
 kernel sequences specialized-arrays tools.test vocabs compiler.units ;
 FROM: specialized-arrays::private => specialized-array-vocab ;
 SPECIALIZED-ARRAYS: int ushort float ;
-IN: classes.struct.vectored.tests
+IN: classes.struct.vectored::tests
 
 STRUCT: foo
     { x int }

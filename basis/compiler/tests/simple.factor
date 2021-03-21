@@ -2,7 +2,7 @@ USING: compiler.test compiler.units tools.test kernel kernel::private
 sequences::private math::private math combinators strings alien
 arrays memory vocabs parser eval quotations compiler.errors
 definitions generic.single ;
-IN: compiler.tests.simple
+IN: compiler::tests.simple
 
 ! Test empty word
 [ ] [ [ ] compile-call ] unit-test
@@ -237,7 +237,7 @@ M: f single-combination-test-2 single-combination-test-4 ;
     [ "compiler.tests.foo" forget-vocab ] with-compilation-unit
     [ t ] [
         "USING: prettyprint words accessors ;
-        IN: compiler.tests.foo
+        IN: compiler::tests.foo
         : (recursive) ( -- ) (recursive) (recursive) ; inline recursive
         : recursive ( -- ) (recursive) ;
         \\ (recursive) word-optimized?" eval( -- obj )

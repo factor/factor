@@ -1,7 +1,7 @@
 ! Copyright (C) 2020 Fred Alger.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: editors.acme environment namespaces tools.test ;
-IN: editors.acme.tests
+IN: editors.acme::tests
 
 { "/plan9" } [ "/plan9" \ plan9-path [ plan9-path ] with-variable ] unit-test
 

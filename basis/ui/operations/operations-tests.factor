@@ -1,4 +1,4 @@
-IN: ui.operations.tests
+IN: ui.operations::tests
 USING: ui.operations ui.commands prettyprint kernel namespaces
 tools.test ui.gadgets ui.gadgets.editors parser io
 io.streams.string math help help.markup accessors ;

@@ -1,6 +1,6 @@
 USING: accessors io io.streams.string kernel math namespaces
 parser sbufs sequences strings tools.test words ;
-IN: io.tests
+IN: io::tests
 
 { f } [
     "vocab:io/test/no-trailing-eol.factor" run-file

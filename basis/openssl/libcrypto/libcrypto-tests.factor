@@ -1,6 +1,6 @@
 USING: byte-arrays kernel openssl.libcrypto sequences splitting
 strings tools.test ;
-IN: openssl.libcrypto.tests
+IN: openssl.libcrypto::tests
 
 { t 1 } [
     "factorcode.org:80" BIO_new_connect [

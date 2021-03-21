@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.encodings.string io.encodings.utf8 kernel rocksdb.lib
 tools.test multiline ;
-IN: rocksdb.lib.tests
+IN: rocksdb.lib::tests
 
 : with-my-rocksdb ( quot -- )
     [ "/Users/erg/my-rocks.db" ] dip with-rocksdb ; inline

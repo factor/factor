@@ -1,7 +1,7 @@
 USING: kernel literals math math.constants math.functions math.libm
 math.order math.ranges math::private sequences tools.test math.floats.env ;
 
-IN: math.functions.tests
+IN: math.functions::tests
 
 { t } [ 4 4 .00000001 ~ ] unit-test
 { t } [ 4.0000001 4.0000001 .000001 ~ ] unit-test

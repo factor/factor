@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien io io.streams.string kernel literals macho
 multiline sequences strings system tools.test ;
-IN: macho.tests
+IN: macho::tests
 
 STRING: validation-output
 0000000100000f1c __stub_helper    stub helpers

@@ -1,7 +1,7 @@
 USING: furnace.actions furnace.auth furnace.auth.providers
 furnace.auth.providers.assoc furnace.auth.login
 tools.test namespaces accessors kernel ;
-IN: furnace.auth.providers.assoc.tests
+IN: furnace.auth.providers.assoc::tests
 
 <action> "Test" <login-realm>
     <users-in-memory> >>users

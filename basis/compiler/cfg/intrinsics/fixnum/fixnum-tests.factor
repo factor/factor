@@ -3,7 +3,7 @@ compiler.cfg.comparisons compiler.cfg.instructions
 compiler.cfg.intrinsics.fixnum compiler.cfg.registers
 compiler.cfg.utilities compiler.test cpu.architecture kernel make
 namespaces sequences ;
-IN: compiler.cfg.intrinsics.fixnum.tests
+IN: compiler.cfg.intrinsics.fixnum::tests
 
 {
     V{

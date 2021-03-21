@@ -1,7 +1,7 @@
 USING: accessors arrays combinators combinators::private io
 kernel math math.functions prettyprint sequences stack-checker
 tools.test words ;
-IN: combinators.tests
+IN: combinators::tests
 
 { 3 } [ 1 2 [ + ] call( x y -- z ) ] unit-test
 [ 1 2 [ + ] call( -- z ) ] must-fail

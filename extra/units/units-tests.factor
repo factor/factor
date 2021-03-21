@@ -1,6 +1,6 @@
 USING: arrays kernel math sequences tools.test units.si
 units.imperial units inverse math.functions ;
-IN: units.tests
+IN: units::tests
 
 { T{ dimensioned f 3 { m } { } } } [ 3 m ] unit-test
 { T{ dimensioned f 3 { m } { s } } } [ 3 m/s ] unit-test

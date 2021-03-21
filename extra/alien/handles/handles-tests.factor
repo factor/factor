@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.handles alien.syntax
 destructors kernel math tools.test ;
-IN: alien.handles.tests
+IN: alien.handles::tests
 
 TUPLE: thingy { x integer } ;
 C: <thingy> thingy

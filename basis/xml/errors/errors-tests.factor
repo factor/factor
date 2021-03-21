@@ -1,6 +1,6 @@
 USING: continuations xml xml.errors tools.test kernel arrays
 xml.data quotations fry byte-arrays ;
-IN: xml.errors.tests
+IN: xml.errors::tests
 
 : xml-error-test ( expected-error xml-string -- )
     '[ _ string>xml ] swap '[ _ = ] must-fail-with ;

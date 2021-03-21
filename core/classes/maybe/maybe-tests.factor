@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes classes.algebra classes.algebra::private
 classes.maybe eval generic.single kernel math slots tools.test ;
-IN: classes.maybe.tests
+IN: classes.maybe::tests
 
 { t } [ 3 maybe{ integer } instance? ] unit-test
 { t } [ f maybe{ integer } instance? ] unit-test
@@ -62,5 +62,5 @@ M: f lol2 drop "lol22" ;
 { "lol22" } [ f lol2 ] unit-test
 [ 3 lol2 ] [ no-method? ] must-fail-with
 
-[ "IN: classes-tests maybe{ 1 2 3 }" eval( -- ) ]
+[ "IN: classes::tests maybe{ 1 2 3 }" eval( -- ) ]
 [ error>> not-an-instance? ] must-fail-with

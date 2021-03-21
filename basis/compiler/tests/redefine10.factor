@@ -1,6 +1,6 @@
 USING: eval tools.test compiler.units vocabs words kernel
 definitions sequences math classes classes.mixin kernel::private ;
-IN: compiler.tests.redefine10
+IN: compiler::tests.redefine10
 
 ! Mixin redefinition should update predicate call sites
 

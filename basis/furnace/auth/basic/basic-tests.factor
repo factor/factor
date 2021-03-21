@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors tools.test furnace.auth.basic http.server
 http.server.responses kernel http namespaces ;
-IN: furnace.auth.basic.tests
+IN: furnace.auth.basic::tests
 
 CONSTANT: GET-AUTH "Basic Zm9vOmJhcg=="
 { "foo" "bar" } [ GET-AUTH parse-basic-auth ] unit-test

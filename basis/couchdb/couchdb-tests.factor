@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs couchdb hashtables kernel namespaces
 random.data sequences strings tools.test ;
-IN: couchdb.tests
+IN: couchdb::tests
 
 ! You must have a CouchDB server (currently only the version from svn will
 ! work) running on localhost and listening on the default port for these tests

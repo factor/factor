@@ -4,7 +4,7 @@ USING: xml.data xml.writer tools.test fry xml xml.syntax kernel multiline
 xml.writer::private io.streams.string xml.traversal sequences
 io.encodings.utf8 io.files io.files.temp accessors io.directories math
 math.parser ;
-IN: xml.writer.tests
+IN: xml.writer::tests
 
 ! Add a test for pprint-xml with sensitive-tags
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: modern modern.slices multiline tools.test ;
-IN: modern.tests
+IN: modern::tests
 
 { f } [ "" upper-colon? ] unit-test
 { t } [ ":" upper-colon? ] unit-test

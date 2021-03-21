@@ -1,6 +1,6 @@
 USING: arrays generic generic.single growable kernel math
 namespaces sequences strings tools.test vectors words ;
-IN: generic.hook.tests
+IN: generic.hook::tests
 
 SYMBOL: my-var
 HOOK: my-hook my-var ( -- x )

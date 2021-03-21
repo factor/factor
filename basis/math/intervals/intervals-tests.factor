@@ -1,7 +1,7 @@
 USING: accessors combinators fry kernel literals math math.intervals
 math.intervals::private math.order math.statistics random sequences
 sequences.deep tools.test vocabs ;
-IN: math.intervals.tests
+IN: math.intervals::tests
 
 { empty-interval } [ 2 2 (a,b) ] unit-test
 

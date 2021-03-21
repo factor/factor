@@ -1,4 +1,4 @@
-IN: cpu.x86.32.tests
+IN: cpu.x86.32::tests
 USING: alien alien.c-types tools.test cpu.x86.assembler
 cpu.x86.assembler.operands ;
 

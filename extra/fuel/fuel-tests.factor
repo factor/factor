@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Nicholas Seckar.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations eval fuel fuel::private namespaces tools.test words ;
-IN: fuel.tests
+IN: fuel::tests
 
 : fake-continuation ( -- continuation )
     f f f "fake" f <continuation> ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.complex classes.struct math
 namespaces tools.test ;
-IN: alien.complex.tests
+IN: alien.complex::tests
 
 STRUCT: complex-holder
     { z complex-float } ;

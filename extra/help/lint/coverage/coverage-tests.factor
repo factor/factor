@@ -2,7 +2,7 @@ USING: accessors english eval help.lint.coverage
 help.lint.coverage::private help.markup help.syntax kernel
 literals math math.matrices multiline sequences sorting
 tools.test vocabs ;
-IN: help.lint.coverage.tests
+IN: help.lint.coverage::tests
 
 <PRIVATE
 : an-empty-word-with-a-unique-name ( a v -- x y ) ;
@@ -76,7 +76,7 @@ PRIVATE>
     [[
         USING: assocs definitions math kernel namespaces help.syntax
         help.lint help.lint::private continuations compiler.units ;
-        IN: help.lint.tests
+        IN: help.lint::tests
         <<
         : add-stuff ( x y -- z ) + ;
 
@@ -99,7 +99,7 @@ PRIVATE>
 ! clean up broken words
 [[
   USING: definitions compiler.units ;
-  IN: help.lint.coverage.tests::private
+  IN: help.lint.coverage::tests::private
 [
     \ an-empty-word-with-a-unique-name forget
     \ a-nonexistent-word forget

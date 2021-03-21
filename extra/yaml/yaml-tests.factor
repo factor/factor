@@ -3,7 +3,7 @@
 USING: assocs grouping kernel linked-assocs literals locals
 namespaces sequences tools.test yaml yaml.config yaml.ffi
 yaml::private calendar yaml.conversion ;
-IN: yaml.tests
+IN: yaml::tests
 
 ! TODO real conformance tests here
 

@@ -11,7 +11,7 @@ math.partial-dispatch math::private namespaces prettyprint sbufs
 sequences sequences::private slots::private strings strings::private
 tools.test vectors words ;
 FROM: alien.c-types => int ;
-IN: compiler.cfg.builder.tests
+IN: compiler.cfg.builder::tests
 
 ! Just ensure that various CFGs build correctly.
 : unit-test-builder ( quot -- )

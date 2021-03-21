@@ -1,5 +1,5 @@
 USING: kernel tools.test definitions compiler.units ;
-IN: compiler.tests.redefine21
+IN: compiler::tests.redefine21
 
 [ ] [ : a ( -- ) ; << : b ( quot -- ) call a ; inline >> [ ] b ] unit-test
 

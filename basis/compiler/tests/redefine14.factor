@@ -1,5 +1,5 @@
 USING: compiler.units definitions tools.test sequences ;
-IN: compiler.tests.redefine14
+IN: compiler::tests.redefine14
 
 TUPLE: bad ;
 

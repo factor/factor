@@ -1,7 +1,7 @@
 USING: bson.reader bson.writer bson.constants byte-arrays io.encodings.binary
 io.streams.byte-array tools.test literals calendar kernel math ;
 
-IN: bson.tests
+IN: bson::tests
 
 : turnaround ( value -- value )
     assoc>bv binary [ H{ } clone stream>assoc ] with-byte-reader ;

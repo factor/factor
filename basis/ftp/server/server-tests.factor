@@ -1,7 +1,7 @@
 USING: accessors fry ftp.server io.encodings.ascii io.files
 io.pathnames io.servers kernel tools.test urls ;
 FROM: ftp.client => ftp-get ;
-IN: ftp.server.tests
+IN: ftp.server::tests
 
 CONSTANT: test-file-contents "Files are so boring anymore."
 

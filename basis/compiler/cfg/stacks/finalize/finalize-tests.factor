@@ -2,7 +2,7 @@ USING: accessors compiler.cfg compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.stacks
 compiler.cfg.stacks.finalize compiler.cfg.stacks.local
 compiler.cfg.utilities kernel sequences tools.test ;
-IN: compiler.cfg.stacks.finalize.tests
+IN: compiler.cfg.stacks.finalize::tests
 
 {
     "there" "hi"

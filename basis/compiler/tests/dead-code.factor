@@ -1,6 +1,6 @@
 
 USING: kernel math tools.test ;
-IN: compiler.tests.dead-code
+IN: compiler::tests.dead-code
 
 : test-outputs0 ( a b -- ) /mod 2drop ;
 : test-outputs1 ( a b -- ) /i drop ;

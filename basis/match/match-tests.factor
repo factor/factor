@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel match namespaces tools.test ;
 FROM: match => _ ;
-IN: match.tests
+IN: match::tests
 
 MATCH-VARS: ?a ?b ;
 

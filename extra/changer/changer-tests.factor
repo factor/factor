@@ -1,7 +1,7 @@
 ! Copyright (C) 2015 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: changer math tools.test ;
-IN: changer.tests
+IN: changer::tests
 
 TUPLE: changer-tester test-slot ;
 

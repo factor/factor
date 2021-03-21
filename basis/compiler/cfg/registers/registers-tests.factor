@@ -1,5 +1,5 @@
 USING: compiler.cfg.registers io.streams.string prettyprint tools.test ;
-IN: compiler.cfg.registers.tests
+IN: compiler.cfg.registers::tests
 
 ! Ensure prettyprinting of ds/rs-loc is right
 
