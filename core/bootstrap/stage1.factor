@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs bootstrap.image.private hash-sets hashtables init
-io io.files kernel kernel.private make memory namespaces parser
+USING: assocs bootstrap.image::private hash-sets hashtables init
+io io.files kernel kernel::private make memory namespaces parser
 parser.notes sequences system vocabs vocabs.loader ;
 
 "Bootstrap stage 1..." print flush
@@ -56,4 +56,4 @@ load-help? off
     ] %
 ] [ ] make
 OBJ-STARTUP-QUOT
-bootstrap.image.private:special-objects get set-at
+bootstrap.image::private:special-objects get set-at

@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Dmitry Shubin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel locals math math.ranges sequences
-sequences.private ;
+sequences::private ;
 IN: z-algorithm
 
 : lcp ( seq1 seq2 -- n )

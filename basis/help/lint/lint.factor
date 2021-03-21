@@ -3,7 +3,7 @@
 USING: assocs classes combinators command-line continuations
 help help.lint.checks help.topics io kernel listener namespaces
 parser sequences source-files.errors system tools.errors vocabs
-vocabs.hierarchy vocabs.hierarchy.private vocabs.loader words ;
+vocabs.hierarchy vocabs.hierarchy::private vocabs.loader words ;
 IN: help.lint
 
 SYMBOL: lint-failures

@@ -243,7 +243,7 @@ PRIVATE>
 
 M: code-blocks length blocks>> length ; inline
 
-FROM: sequences.private => nth-unsafe ;
+FROM: sequences::private => nth-unsafe ;
 
 M: code-blocks nth-unsafe
     [ cache>> ] [ blocks>> ] bi

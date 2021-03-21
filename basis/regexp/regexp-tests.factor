@@ -1,5 +1,5 @@
 USING: arrays regexp tools.test kernel sequences regexp.parser
-regexp.private eval strings multiline accessors ;
+regexp::private eval strings multiline accessors ;
 IN: regexp.tests
 
 { f } [ "b" "a*" <regexp> matches? ] unit-test

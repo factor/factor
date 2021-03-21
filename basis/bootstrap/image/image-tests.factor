@@ -1,4 +1,4 @@
-USING: arrays assocs bootstrap.image.private kernel layouts math
+USING: arrays assocs bootstrap.image::private kernel layouts math
 math.bitwise namespaces sequences tools.test vectors ;
 IN: bootstrap.image.tests
 

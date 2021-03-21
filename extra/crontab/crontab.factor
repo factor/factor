@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays ascii assocs calendar calendar.english
-calendar.private combinators combinators.short-circuit io kernel
+calendar::private combinators combinators.short-circuit io kernel
 literals locals math math.order math.parser math.ranges
 sequences splitting ;
 

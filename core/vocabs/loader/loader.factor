@@ -51,7 +51,7 @@ PRIVATE>
 
 : find-vocab-root ( vocab -- path/f )
     vocab-name root-cache get [
-        dup ".private" tail? [ drop f ] [
+        dup "::private" tail? [ drop f ] [
             ".factor" append-vocab-dir find-root-for
         ] if
     ] cache ;
@@ -63,11 +63,11 @@ PRIVATE>
     swap find-vocab-root [ prepend-path ] [ drop f ] if* ;
 
 : vocab-source-path ( vocab -- path/f )
-    vocab-name ".private" ?tail drop
+    vocab-name "::private" ?tail drop
     dup ".factor" append-vocab-dir vocab-append-path ;
 
 : vocab-docs-path ( vocab -- path/f )
-    vocab-name ".private" ?tail drop
+    vocab-name "::private" ?tail drop
     dup "-docs.factor" append-vocab-dir vocab-append-path ;
 
 SYMBOL: load-help?

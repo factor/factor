@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors fry fry.private generalizations kernel
+USING: accessors fry fry::private generalizations kernel
 locals.types sequences ;
 IN: locals.fry
 

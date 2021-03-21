@@ -1,5 +1,5 @@
 USING: alien.c-types io io.streams.string kernel make namespaces
-pack pack.private strings tools.test ;
+pack pack::private strings tools.test ;
 
 { B{ 1 0 2 0 0 3 0 0 0 4 0 0 0 0 0 0 0 5 } } [
     { 1 2 3 4 5 }

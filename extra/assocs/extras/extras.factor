@@ -1,6 +1,6 @@
 ! Copyright (C) 2012 John Benediktsson, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license
-USING: arrays assocs assocs.private fry generalizations kernel
+USING: arrays assocs assocs::private fry generalizations kernel
 math math.statistics sequences sequences.extras sets ;
 IN: assocs.extras
 
@@ -189,7 +189,7 @@ PRIVATE>
     dup any-multi-value? [ expand-values-set-at flatten-values ] when ;
 
 : intersect-keys ( assoc seq -- elts )
-    [ of ] with map-zip sift-values ; inline
+    [ of ] with zip-with sift-values ; inline
 
 : values-of ( assoc seq -- elts )
     [ of ] with map sift ; inline

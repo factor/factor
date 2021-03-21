@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: unicode tools.test namespaces strings unicode.case
-unicode.case.private ;
+unicode.case::private ;
 
 ! FIXME: Unicode 12.1.0 capitalizes the M in I'M too on purpose
 ! Look into this

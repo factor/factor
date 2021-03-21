@@ -39,7 +39,7 @@ MEMO: vocab-file-lines ( vocab name -- lines/f )
 
 : vocab-in-root-summary ( vocab -- string )
     vocab-name dup
-    ".private" ?tail drop find-vocab-root
+    "::private" ?tail drop find-vocab-root
     [ "`" "'" surround " in " glue ] when* ;
 
 : vocab-summary ( vocab -- summary )

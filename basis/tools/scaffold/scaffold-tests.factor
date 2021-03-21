@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup io.streams.string kernel sequences
-tools.scaffold tools.scaffold.private tools.test unicode ;
+tools.scaffold tools.scaffold::private tools.test unicode ;
 IN: tools.scaffold.tests
 
 : undocumented-word ( obj1 obj2 -- obj3 obj4 )

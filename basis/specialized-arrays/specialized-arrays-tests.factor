@@ -1,10 +1,10 @@
 USING: tools.test alien.syntax specialized-arrays sequences
 alien accessors kernel arrays combinators compiler
 compiler.units classes.struct combinators.smart
-compiler.tree.debugger math libc destructors sequences.private
+compiler.tree.debugger math libc destructors sequences::private
 multiline eval words vocabs namespaces assocs prettyprint
 alien.data math.vectors definitions compiler.test ;
-FROM: specialized-arrays.private => specialized-array-vocab ;
+FROM: specialized-arrays::private => specialized-array-vocab ;
 FROM: alien.c-types => int float bool uchar char float ulonglong ushort uint
 heap-size ;
 FROM: alien.data => little-endian? ;

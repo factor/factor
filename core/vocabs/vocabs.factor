@@ -25,7 +25,7 @@ ERROR: bad-vocab-name name ;
 
 : check-vocab-name ( name -- name )
     dup string? [ bad-vocab-name ] unless
-    dup [ ":/\\ " member? ] any? [ bad-vocab-name ] when ;
+    dup [ "/\\ " member? ] any? [ bad-vocab-name ] when ;
 
 TUPLE: vocab-link name ;
 
@@ -141,8 +141,8 @@ PRIVATE>
 
 : forget-vocab ( vocab -- )
     [ (forget-vocab) ] [
-        vocab-name dup ".private" tail? [ drop ] [
-            ".private" append (forget-vocab)
+        vocab-name dup "::private" tail? [ drop ] [
+            "::private" append (forget-vocab)
         ] if
     ] bi ;
 
@@ -161,13 +161,13 @@ M: vocab require name>> require ;
 
 M: vocab-link require name>> require ;
 
-! When calling "foo.private" require, load "foo" instead, but
-! only when "foo.private" does not exist. The reason for this is
-! that stage1 bootstrap starts out with some .private vocabs
+! When calling "foo::private" require, load "foo" instead, but
+! only when "foo::private" does not exist. The reason for this is
+! that stage1 bootstrap starts out with some ::private vocabs
 ! that contain primitives, and loading the public vocabs would
 ! cause circularity issues.
 M: string require
-    [ ".private" ?tail ] keep swap [ lookup-vocab not ] when
+    [ "::private" ?tail ] keep swap [ lookup-vocab not ] when
     [ require-hook get call( name -- ) ] [ drop ] if ;
 
 : load-vocab ( name -- vocab )

@@ -93,7 +93,7 @@ M: word-help-coverage summary
     loaded-child-vocab-names natural-sort ; inline
 
 : filter-private ( seq -- no-private )
-    [ ".private" ?tail nip ] reject ; inline
+    [ "::private" ?tail nip ] reject ; inline
 
 : ?remove-$values ( word spec -- spec )
     \ $values over member? [

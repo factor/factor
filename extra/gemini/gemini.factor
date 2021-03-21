@@ -3,7 +3,7 @@
 
 USING: accessors ascii assocs colors.constants combinators
 combinators.short-circuit continuations images.loader
-images.loader.private images.viewer io io.encodings.ascii
+images.loader::private images.viewer io io.encodings.ascii
 io.encodings.binary io.encodings.latin1 io.encodings.string
 io.encodings.utf8 io.pathnames io.sockets io.sockets.secure
 io.styles kernel make math namespaces present sequences

@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes classes.tuple
-classes.tuple.private combinators combinators.smart fry functors
-kernel macros math parser sequences sequences.private ;
+classes.tuple::private combinators combinators.smart fry functors
+kernel macros math parser sequences sequences::private ;
 FROM: inverse => undo ;
 IN: tuple-arrays
 

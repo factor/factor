@@ -4,7 +4,7 @@ USING: accessors arrays assocs combinators compiler.units
 definitions.icons effects fry hashtables help.stylesheet
 help.topics io io.styles kernel locals make math namespaces
 present prettyprint prettyprint.stylesheet quotations see
-sequences sequences.private sets sorting strings urls vocabs
+sequences sequences::private sets sorting strings urls vocabs
 words words.symbol ;
 FROM: prettyprint.sections => with-pprint ;
 IN: help.markup

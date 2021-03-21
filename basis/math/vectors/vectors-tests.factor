@@ -1,5 +1,5 @@
 USING: math.vectors tools.test kernel specialized-arrays compiler
-kernel.private alien.c-types math.functions ;
+kernel::private alien.c-types math.functions ;
 SPECIALIZED-ARRAY: int
 
 { { 10 20 30 } } [ 10 { 1 2 3 } n*v ] unit-test

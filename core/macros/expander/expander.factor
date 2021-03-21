@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.short-circuit
 continuations effects generalizations kernel make math
-namespaces quotations sequences sequences.private vectors words ;
+namespaces quotations sequences sequences::private vectors words ;
 IN: macros.expander
 
 GENERIC: expand-macros ( quot -- quot' )

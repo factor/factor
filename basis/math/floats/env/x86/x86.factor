@@ -1,6 +1,6 @@
 USING: accessors alien.c-types arrays assocs biassocs
 classes.struct combinators cpu.x86.features kernel literals
-math math.bitwise math.floats.env math.floats.env.private
+math math.bitwise math.floats.env math.floats.env::private
 system vocabs ;
 IN: math.floats.env.x86
 

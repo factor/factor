@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays byte-vectors destructors io
 io.encodings io.streams.sequence kernel math namespaces
-sequences sequences.private ;
+sequences sequences::private ;
 IN: io.streams.byte-array
 
 INSTANCE: byte-vector output-stream

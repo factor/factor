@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types classes.struct game.loop
-game.loop.private kernel sequences specialized-vectors
+game.loop::private kernel sequences specialized-vectors
 tools.time.struct ;
 IN: game.loop.benchmark
 

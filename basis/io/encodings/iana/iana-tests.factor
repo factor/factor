@@ -1,4 +1,4 @@
-USING: io.encodings.iana io.encodings.iana.private
+USING: io.encodings.iana io.encodings.iana::private
 io.encodings.utf8 tools.test assocs namespaces ;
 IN: io.encodings.iana.tests
 

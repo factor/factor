@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types calendar calendar.private
+USING: accessors alien alien.c-types calendar calendar::private
 classes.struct kernel math math.bitwise namespaces
 windows.errors windows.handles windows.kernel32 windows.types ;
 IN: windows.time

@@ -1,4 +1,4 @@
-USING: accessors bit-arrays bloom-filters bloom-filters.private kernel layouts
+USING: accessors bit-arrays bloom-filters bloom-filters::private kernel layouts
 math random sequences tools.test ;
 IN: bloom-filters.tests
 

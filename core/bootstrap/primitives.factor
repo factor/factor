@@ -1,10 +1,10 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs bootstrap.image.primitives
-bootstrap.image.private classes classes.builtin classes.intersection
-classes.predicate classes.private classes.singleton classes.tuple
-classes.tuple.private classes.union combinators compiler.units io
-kernel kernel.private layouts make math math.private namespaces parser
+bootstrap.image::private classes classes.builtin classes.intersection
+classes.predicate classes::private classes.singleton classes.tuple
+classes.tuple::private classes.union combinators compiler.units io
+kernel kernel::private layouts make math math::private namespaces parser
 quotations sequences slots source-files splitting vocabs vocabs.loader
 words ;
 IN: bootstrap.primitives
@@ -57,52 +57,53 @@ call( -- ) ! syntax-quot
     "alien"
     "alien.accessors"
     "alien.libraries"
-    "alien.private"
+    "alien::private"
     "arrays"
     "byte-arrays"
-    "classes.private"
+    "classes::private"
     "classes.tuple"
-    "classes.tuple.private"
+    "classes.tuple::private"
     "classes.predicate"
     "compiler.units"
-    "continuations.private"
+    "continuations::private"
     "generic.single"
-    "generic.single.private"
+    "generic.single::private"
     "growable"
     "hashtables"
-    "hashtables.private"
+    "hashtables::private"
     "io"
     "io.files"
-    "io.files.private"
+    "io.files::private"
     "io.streams.c"
     "locals.backend"
     "kernel"
+    "kernel::private"
     "kernel.private"
     "math"
-    "math.parser.private"
-    "math.private"
+    "math.parser::private"
+    "math::private"
     "memory"
-    "memory.private"
+    "memory::private"
     "quotations"
-    "quotations.private"
+    "quotations::private"
     "sbufs"
-    "sbufs.private"
+    "sbufs::private"
     "scratchpad"
     "sequences"
-    "sequences.private"
-    "slots.private"
+    "sequences::private"
+    "slots::private"
     "strings"
-    "strings.private"
+    "strings::private"
     "system"
-    "system.private"
-    "threads.private"
-    "tools.dispatch.private"
-    "tools.memory.private"
-    "tools.profiler.sampling.private"
+    "system::private"
+    "threads::private"
+    "tools.dispatch::private"
+    "tools.memory::private"
+    "tools.profiler.sampling::private"
     "words"
-    "words.private"
+    "words::private"
     "vectors"
-    "vectors.private"
+    "vectors::private"
     "vm"
 } [ create-vocab drop ] each
 
@@ -167,7 +168,7 @@ call( -- ) ! syntax-quot
 define-union-class
 
 ! Two predicate classes used for declarations.
-"array-capacity" "sequences.private" create-word
+"array-capacity" "sequences::private" create-word
 "fixnum" "math" lookup-word
 [
     [ dup 0 fixnum>= ] %
@@ -176,11 +177,11 @@ define-union-class
 ] [ ] make
 define-predicate-class
 
-"array-capacity" "sequences.private" lookup-word
+"array-capacity" "sequences::private" lookup-word
 [ >fixnum ] bootstrap-max-array-capacity <fake-bignum> [ fixnum-bitand ] curry append
 "coercer" set-word-prop
 
-"integer-array-capacity" "sequences.private" create-word
+"integer-array-capacity" "sequences::private" create-word
 "integer" "math" lookup-word
 [
     [ dup 0 >= ] %
@@ -215,7 +216,7 @@ bi
 "float" "math" create-word ">float" "math" create-word 1quotation "coercer" set-word-prop
 
 "array" "arrays" create-word {
-    { "length" { "array-capacity" "sequences.private" } read-only }
+    { "length" { "array-capacity" "sequences::private" } read-only }
 } define-builtin
 
 "wrapper" "kernel" create-word {
@@ -223,7 +224,7 @@ bi
 } define-builtin
 
 "string" "strings" create-word {
-    { "length" { "array-capacity" "sequences.private" } read-only }
+    { "length" { "array-capacity" "sequences::private" } read-only }
     "aux"
 } define-builtin
 
@@ -254,7 +255,7 @@ bi
 } define-builtin
 
 "byte-array" "byte-arrays" create-word {
-    { "length" { "array-capacity" "sequences.private" } read-only }
+    { "length" { "array-capacity" "sequences::private" } read-only }
 } define-builtin
 
 "callstack" "kernel" create-word { } define-builtin
@@ -265,16 +266,16 @@ bi
 bi
 
 ! create-word special tombstone values
-"tombstone" "hashtables.private" create-word
+"tombstone" "hashtables::private" create-word
 tuple
 { "state" } define-tuple-class
 
-"+empty+" "hashtables.private" create-word
-{ f } "tombstone" "hashtables.private" lookup-word
+"+empty+" "hashtables::private" create-word
+{ f } "tombstone" "hashtables::private" lookup-word
 slots>tuple 1quotation ( -- value ) define-inline
 
-"+tombstone+" "hashtables.private" create-word
-{ t } "tombstone" "hashtables.private" lookup-word
+"+tombstone+" "hashtables::private" create-word
+{ t } "tombstone" "hashtables::private" lookup-word
 slots>tuple 1quotation ( -- value ) define-inline
 
 ! Some tuple classes

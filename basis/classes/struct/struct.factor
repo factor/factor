@@ -2,12 +2,12 @@
 ! John Benediktsson, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license
 USING: accessors alien alien.c-types alien.data alien.parser
-arrays byte-arrays classes classes.parser classes.private
+arrays byte-arrays classes classes.parser classes::private
 classes.struct.bit-accessors classes.tuple classes.tuple.parser
 combinators combinators.smart cpu.architecture definitions
-delegate.private functors.backend generalizations generic
-generic.parser io kernel kernel.private lexer libc math
-math.order parser quotations sequences slots slots.private
+delegate::private functors.backend generalizations generic
+generic.parser io kernel kernel::private lexer libc math
+math.order parser quotations sequences slots slots::private
 specialized-arrays stack-checker.dependencies summary vectors
 vocabs.loader vocabs.parser words ;
 IN: classes.struct

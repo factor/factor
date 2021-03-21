@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data alien.parser arrays assocs
-byte-arrays classes.struct classes.struct.private combinators
+byte-arrays classes.struct classes.struct::private combinators
 combinators.short-circuit cuda cuda.ffi fry generalizations
 io.backend kernel locals macros math namespaces sequences
 variants vocabs.loader words ;

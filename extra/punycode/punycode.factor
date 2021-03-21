@@ -8,7 +8,7 @@ namespaces peg.ebnf present prettyprint.backend
 prettyprint.custom prettyprint.sections regexp sbufs sequences
 sequences.extras sequences.generalizations sets sorting
 splitting strings strings.parser urls urls.encoding
-urls.encoding.private urls.private ;
+urls.encoding::private urls::private ;
 
 IN: punycode
 

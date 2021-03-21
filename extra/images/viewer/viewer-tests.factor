@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test images.viewer images.viewer.private kernel accessors sequences images
-namespaces ui ui.gadgets.debug math opengl.textures opengl.textures.private
+USING: tools.test images.viewer images.viewer::private kernel accessors sequences images
+namespaces ui ui.gadgets.debug math opengl.textures opengl.textures::private
 models ;
 IN: images.viewer.tests
 

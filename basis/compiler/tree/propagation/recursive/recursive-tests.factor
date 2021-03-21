@@ -1,7 +1,7 @@
 USING: accessors compiler.tree compiler.tree.builder
 compiler.tree.optimizer compiler.tree.propagation.info
-compiler.tree.propagation.recursive kernel kernel.private layouts
-literals math math.intervals sequences sequences.private tools.test ;
+compiler.tree.propagation.recursive kernel kernel::private layouts
+literals math math.intervals sequences sequences::private tools.test ;
 IN: compiler.tree.propagation.recursive.tests
 
 ! counter-class

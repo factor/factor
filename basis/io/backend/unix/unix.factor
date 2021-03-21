@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax classes
-classes.struct combinators destructors destructors.private fry
+classes.struct combinators destructors destructors::private fry
 io.backend io.backend.unix.multiplexers io.buffers io.files
-io.ports io.timeouts kernel kernel.private libc locals make math
+io.ports io.timeouts kernel kernel::private libc locals make math
 namespaces sequences summary system threads unix unix.ffi
 unix.signals unix.stat unix.types ;
 QUALIFIED: io

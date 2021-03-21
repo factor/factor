@@ -1,4 +1,4 @@
-USING: kernel locals math sequences sequences.private ;
+USING: kernel locals math sequences sequences::private ;
 IN: sorting.insertion
 
 <PRIVATE

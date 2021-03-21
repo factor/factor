@@ -1,10 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs classes classes.algebra
-classes.algebra.private classes.maybe classes.tuple
+classes.algebra::private classes.maybe classes.tuple
 combinators.short-circuit fry generic kernel math namespaces sequences
 sets words ;
-FROM: classes.tuple.private => tuple-layout ;
+FROM: classes.tuple::private => tuple-layout ;
 IN: stack-checker.dependencies
 
 SYMBOL: dependencies

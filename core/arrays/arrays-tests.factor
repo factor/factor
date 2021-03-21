@@ -1,4 +1,4 @@
-USING: accessors arrays kernel kernel.private layouts literals math
+USING: accessors arrays kernel kernel::private layouts literals math
 sequences tools.test vectors ;
 
 [ -2 { "a" "b" "c" } nth ] must-fail

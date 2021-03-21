@@ -1,5 +1,5 @@
 USING: math kernel sequences io.files io.pathnames
-tools.crossref tools.crossref.private tools.test parser
+tools.crossref tools.crossref::private tools.test parser
 namespaces source-files generic definitions words accessors
 compiler.units classes ;
 IN: tools.crossref.tests

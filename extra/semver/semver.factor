@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators
 combinators.short-circuit combinators.smart kernel math
 math.order math.parser multiline peg.ebnf sequences
-sequences.deep sequences.extras sequences.private sorting.human
+sequences.deep sequences.extras sequences::private sorting.human
 splitting strings ;
 IN: semver
 

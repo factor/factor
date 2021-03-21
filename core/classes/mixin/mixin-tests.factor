@@ -1,5 +1,5 @@
 USING: accessors arrays assocs classes classes.algebra classes.mixin
-classes.mixin.private classes.union.private compiler.units definitions
+classes.mixin::private classes.union::private compiler.units definitions
 eval hashtables kernel math parser sequences source-files strings
 tools.test vectors words ;
 IN: classes.mixin.tests

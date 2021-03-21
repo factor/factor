@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.strings assocs continuations fry init
-io.encodings.utf8 io.files io.pathnames kernel kernel.private
+io.encodings.utf8 io.files io.pathnames kernel kernel::private
 namespaces parser parser.notes sequences source-files
 source-files.errors splitting system vocabs.loader ;
 IN: command-line

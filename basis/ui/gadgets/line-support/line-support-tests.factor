@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel tools.test ui.gadgets.editors
-ui.gadgets.line-support ui.gadgets.line-support.private ui.text ;
+ui.gadgets.line-support ui.gadgets.line-support::private ui.text ;
 
 ! line-gadget-height
 { t } [

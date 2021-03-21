@@ -1,6 +1,6 @@
 IN: tools.trace.tests
 USING: combinators kernel math sequences tools.continuations
-tools.test tools.trace tools.trace.private ;
+tools.test tools.trace tools.trace::private ;
 
 { { 3 2 1 } } [ { 1 2 3 } [ reverse ] trace ] unit-test
 

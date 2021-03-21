@@ -1,4 +1,4 @@
-USING: math.private kernel combinators accessors arrays
+USING: math::private kernel combinators accessors arrays
 generalizations sequences.generalizations tools.test words ;
 IN: compiler.tests.spilling
 

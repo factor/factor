@@ -1,6 +1,6 @@
 IN: tools.test.tests
 USING: continuations debugger io.streams.string kernel namespaces
-sequences tools.test tools.test.private ;
+sequences tools.test tools.test::private ;
 
 { 1 } [
     [

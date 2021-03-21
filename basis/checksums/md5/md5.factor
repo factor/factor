@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data byte-arrays checksums
 checksums.common combinators fry grouping hints kernel
-kernel.private literals locals macros math math.bitwise
-math.functions sequences sequences.private specialized-arrays ;
+kernel::private literals locals macros math math.bitwise
+math.functions sequences sequences::private specialized-arrays ;
 SPECIALIZED-ARRAY: uint
 IN: checksums.md5
 

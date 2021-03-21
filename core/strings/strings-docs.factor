@@ -1,5 +1,5 @@
 USING: arrays byte-arrays help.markup help.syntax
-kernel kernel.private strings.private sequences vectors
+kernel kernel::private strings::private sequences vectors
 sbufs math help.vocabs ;
 IN: strings
 
@@ -32,12 +32,12 @@ HELP: string
 HELP: string-nth
 { $values { "n" fixnum } { "string" string } { "ch" "the character at the " { $snippet "n" } "th index" } }
 { $description "Unsafe string accessor, used to define " { $link nth } " on strings." }
-{ $warning "This word is in the " { $vocab-link "strings.private" } " vocabulary because it does not perform type or bounds checking. User code should call " { $link nth } " instead." } ;
+{ $warning "This word is in the " { $vocab-link "strings::private" } " vocabulary because it does not perform type or bounds checking. User code should call " { $link nth } " instead." } ;
 
 HELP: set-string-nth
 { $values { "ch" "a character" } { "n" fixnum } { "string" string } }
 { $description "Unsafe string mutator, used to define " { $link set-nth } " on strings." }
-{ $warning "This word is in the " { $vocab-link "strings.private" } " vocabulary because it does not perform type or bounds checking. User code should call " { $link set-nth } " instead." } ;
+{ $warning "This word is in the " { $vocab-link "strings::private" } " vocabulary because it does not perform type or bounds checking. User code should call " { $link set-nth } " instead." } ;
 
 HELP: <string>
 { $values { "n" "a positive integer specifying string length" } { "ch" "an initial character" } { "string" string } }

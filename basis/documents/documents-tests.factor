@@ -1,4 +1,4 @@
-USING: documents documents.private accessors sequences
+USING: documents documents::private accessors sequences
 namespaces tools.test make arrays kernel fry ;
 
 ! Tests

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators generalizations kernel math math.order
-memoize.private quotations sequences sequences.private ;
+memoize::private quotations sequences sequences::private ;
 IN: sequences.generalizations
 
 MACRO: (nsequence) ( n -- quot )

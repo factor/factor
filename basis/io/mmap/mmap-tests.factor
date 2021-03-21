@@ -1,6 +1,6 @@
 USING: alien.c-types alien.data compiler.tree.debugger
 io.encodings.ascii io.files io.mmap kernel locals math sequences
-sequences.private specialized-arrays tools.test ;
+sequences::private specialized-arrays tools.test ;
 
 SPECIALIZED-ARRAY: uint
 

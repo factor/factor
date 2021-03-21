@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators
 combinators.short-circuit fry generalizations grouping kernel
 locals math math.functions math.order math.ranges math.vectors
-sequences sequences.private sorting ;
+sequences sequences::private sorting ;
 FROM: math.ranges => [a,b] ;
 IN: math.statistics
 

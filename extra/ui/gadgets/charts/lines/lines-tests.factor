@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.ratios sequences tools.test
-ui.gadgets.charts.lines ui.gadgets.charts.lines.private
+ui.gadgets.charts.lines ui.gadgets.charts.lines::private
 ui.gadgets.charts.utils ;
 
 { -2/3 } [ { 1 3 } { -2 5 } calc-line-slope ] unit-test

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors cocoa cocoa.classes core-foundation
 core-foundation.data core-foundation.urls core-graphics
-core-graphics.private core-graphics.types destructors
+core-graphics::private core-graphics.types destructors
 images.loader io kernel locals math sequences system ;
 IN: images.loader.cocoa
 

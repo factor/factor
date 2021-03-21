@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien classes combinators destructors hints io
 io.backend io.buffers io.encodings io.files io.timeouts kernel
-kernel.private libc locals math math.order math.private
+kernel::private libc locals math math.order math::private
 namespaces sequences strings system ;
 IN: io.ports
 

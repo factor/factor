@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io io.encodings.ascii io.files io.files.temp
 io.launcher locals make math math.parser namespaces
-tools.disassembler.private ;
+tools.disassembler::private ;
 IN: tools.disassembler.gdb
 
 SINGLETON: gdb-disassembler

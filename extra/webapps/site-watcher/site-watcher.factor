@@ -7,7 +7,7 @@ furnace.auth.features.recover-password
 furnace.auth.features.registration furnace.auth.login
 furnace.boilerplate furnace.redirection html.forms http.server
 http.server.dispatchers kernel namespaces site-watcher site-watcher.db
-site-watcher.private urls sequences validators
+site-watcher::private urls sequences validators
 webapps.site-watcher.common webapps.site-watcher.watching
 webapps.site-watcher.spidering webapps.utils ;
 IN: webapps.site-watcher

@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.private compiler.test
+USING: accessors combinators combinators::private compiler.test
 compiler.tree compiler.tree.builder compiler.tree.debugger
 compiler.tree.optimizer compiler.tree.propagation.call-effect
 compiler.tree.propagation.info
-compiler.units effects eval fry kernel kernel.private math sequences
+compiler.units effects eval fry kernel kernel::private math sequences
 tools.test ;
 IN: compiler.tree.propagation.call-effect.tests
 
@@ -163,4 +163,4 @@ TUPLE: my-tuple a b c ;
 [ composed <class-info> (infer-value) ] [ uninferable? ] must-fail-with
 { t } [ [ 1 ] [ 2 ] compose <literal-info> (infer-value) ( -- x x ) effect= ] unit-test
 { } [ "IN: compiler.tree.propagation.call-effect.tests USING:
-kernel kernel.private ; : blub ( x -- ) { composed } declare call( -- ) ;" eval( -- ) ] unit-test
+kernel kernel::private ; : blub ( x -- ) { composed } declare call( -- ) ;" eval( -- ) ] unit-test

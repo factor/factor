@@ -98,12 +98,12 @@ TUPLE: no-current-vocab-error ;
 ERROR: unbalanced-private-declaration vocab ;
 
 : begin-private ( -- )
-    current-vocab name>> ".private" ?tail
+    current-vocab name>> "::private" ?tail
     [ unbalanced-private-declaration ]
-    [ ".private" append set-current-vocab ] if ;
+    [ "::private" append set-current-vocab ] if ;
 
 : end-private ( -- )
-    current-vocab name>> ".private" ?tail
+    current-vocab name>> "::private" ?tail
     [ set-current-vocab ]
     [ unbalanced-private-declaration ] if ;
 
@@ -207,7 +207,7 @@ TUPLE: ambiguous-use-error name words ;
     [ V{ } clone ] 2dip [ (lookup-word) ] with each ;
 
 : (vocab-search-qualified) ( words name assocs -- words )
-    [ ":" split1 swap ] dip pick [
+    [ ":" split1-last swap ] dip pick [
         [ name>> = ] with find nip [ (lookup-word) ] with when*
     ] [
         3drop

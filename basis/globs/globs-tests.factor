@@ -1,4 +1,4 @@
-USING: globs globs.private io.directories io.pathnames sorting
+USING: globs globs::private io.directories io.pathnames sorting
 tools.test ;
 
 { f } [ "abd" "fdf" glob-matches? ] unit-test

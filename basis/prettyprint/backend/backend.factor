@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
-classes.algebra.private classes.maybe classes.private
+classes.algebra::private classes.maybe classes::private
 classes.tuple combinators combinators.short-circuit
 continuations effects generic hash-sets hashtables io.pathnames
 io.styles kernel lists make math math.order math.parser

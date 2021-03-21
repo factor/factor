@@ -1,5 +1,5 @@
-USING: kernel.private kernel sequences math combinators
-sequences.private ;
+USING: kernel::private kernel sequences math combinators
+sequences::private ;
 IN: benchmark.dispatch4
 
 : dispatch4 ( n -- val )

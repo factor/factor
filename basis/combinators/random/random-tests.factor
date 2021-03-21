@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Jon Harper.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.random combinators.random.private tools.test ;
+USING: combinators.random combinators.random::private tools.test ;
 
 { 1 } [ 1 [ 1 ] [ 2 ] ifp ] unit-test
 { 2 } [ 0 [ 1 ] [ 2 ] ifp ] unit-test

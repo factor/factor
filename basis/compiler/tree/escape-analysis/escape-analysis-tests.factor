@@ -3,12 +3,12 @@ compiler.tree.escape-analysis.allocations compiler.tree.builder
 compiler.tree.recursive compiler.tree.normalization
 math.functions compiler.tree.propagation compiler.tree.cleanup
 compiler.tree.combinators compiler.tree sequences math
-math.private kernel tools.test accessors slots.private
-quotations.private prettyprint classes.tuple.private classes
+math::private kernel tools.test accessors slots::private
+quotations::private prettyprint classes.tuple::private classes
 classes.tuple namespaces
 compiler.tree.propagation.info stack-checker.errors
 compiler.tree.checker compiler.tree.def-use compiler.tree.dead-code
-kernel.private vectors ;
+kernel::private vectors ;
 IN: compiler.tree.escape-analysis.tests
 
 GENERIC: count-unboxed-allocations* ( m node -- n )

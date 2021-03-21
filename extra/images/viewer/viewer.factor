@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.short-circuit continuations
 destructors images images.loader io.pathnames kernel locals math
-models opengl.gl opengl.textures opengl.textures.private
+models opengl.gl opengl.textures opengl.textures::private
 sequences strings ui ui.gadgets ui.gadgets.panes
 ui.gadgets.worlds ui.render ;
 IN: images.viewer

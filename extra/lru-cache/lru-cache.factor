@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs deques dlists fry kernel linked-assocs
-linked-assocs.private math sequences.private ;
+linked-assocs::private math sequences::private ;
 
 IN: lru-cache
 

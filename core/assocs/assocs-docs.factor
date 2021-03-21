@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg, Slava Pestov, and Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs.private help.markup help.syntax kernel math
+USING: assocs::private help.markup help.syntax kernel math
 namespaces quotations sequences ;
 IN: assocs
 
@@ -554,10 +554,10 @@ HELP: search-alist
      { "pair/f" "a key/value pair" } { "i/f" integer } }
 { $description "Iterates over " { $snippet "alist" } " and stops when the key is matched or the end of the " { $snippet "alist" } " has been reached. If there is no match, both outputs are " { $link f } "." }
 { $notes "This word is used to implement " { $link at* } " and " { $link set-at } " on sequences, and should not be called directly." }
-{ $examples { $example "USING: prettyprint assocs.private kernel ;"
+{ $examples { $example "USING: prettyprint assocs::private kernel ;"
                         "3 { { 1 2 } { 3 4 } } search-alist [ . ] bi@"
                        "{ 3 4 }\n1"
-            } { $example "USING: prettyprint assocs.private kernel ;"
+            } { $example "USING: prettyprint assocs::private kernel ;"
                        "6 { { 1 2 } { 3 4 } } search-alist [ . ] bi@"
                        "f\nf"
             }

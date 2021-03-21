@@ -1,13 +1,13 @@
 USING: generalizations accessors arrays compiler.test kernel
-kernel.private math hashtables.private math.private namespaces
-sequences tools.test namespaces.private slots.private
-sequences.private byte-arrays alien alien.accessors layouts
+kernel::private math hashtables::private math::private namespaces
+sequences tools.test namespaces::private slots::private
+sequences::private byte-arrays alien alien.accessors layouts
 words definitions compiler.units io combinators vectors grouping
 make alien.c-types alien.data combinators.short-circuit math.order
 math.libm math.parser math.functions alien.syntax memory
 stack-checker ;
 FROM: math => float ;
-QUALIFIED: namespaces.private
+QUALIFIED: namespaces::private
 IN: compiler.tests.codegen
 
 ! Originally, this file did black box testing of templating
@@ -52,7 +52,7 @@ unit-test
 [ 3 ]
 [
     global [ 3 \ foo set ] with-variables
-    \ foo [ global >n get namespaces.private:ndrop ] compile-call
+    \ foo [ global >n get namespaces::private:ndrop ] compile-call
 ] unit-test
 
 : blech ( x -- ) drop ;
@@ -66,7 +66,7 @@ unit-test
 [ 3 ]
 [
     global [ 3 \ foo set ] with-variables
-    \ foo [ global [ get ] swap >n call namespaces.private:ndrop ] compile-call
+    \ foo [ global [ get ] swap >n call namespaces::private:ndrop ] compile-call
 ] unit-test
 
 [ 3 ]

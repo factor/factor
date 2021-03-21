@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.short-circuit compiler.errors
 compiler.units continuations definitions destructors editors
-help.topics io.pathnames io.styles kernel libc.private
+help.topics io.pathnames io.styles kernel libc::private
 macros.expander models parser prettyprint quotations see
 source-files.errors stack-checker threads tools.annotations
 tools.crossref tools.test tools.time tools.walker ui.commands

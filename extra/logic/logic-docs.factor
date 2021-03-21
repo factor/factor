@@ -1,7 +1,7 @@
 ! Copyright (C) 2019-2020 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays help.markup help.syntax kernel quotations sequences
-    prettyprint assocs math make lists urls logic.private ;
+    prettyprint assocs math make lists urls logic::private ;
 IN: logic
 
 HELP: !!

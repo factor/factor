@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays bit-arrays classes
-classes.tuple.private fry kernel locals math parser
-sequences sequences.private vectors words ;
+classes.tuple::private fry kernel locals math parser
+sequences sequences::private vectors words ;
 IN: memory.pools
 
 TUPLE: pool

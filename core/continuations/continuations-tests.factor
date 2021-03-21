@@ -1,4 +1,4 @@
-USING: accessors continuations debugger eval io kernel kernel.private
+USING: accessors continuations debugger eval io kernel kernel::private
 math math.ratios memory namespaces sequences tools.test vectors words
 ;
 IN: continuations.tests

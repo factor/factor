@@ -1,5 +1,5 @@
 USING: accessors arrays assocs compiler.cfg.dominance
-compiler.cfg.dominance.private compiler.cfg.utilities compiler.test
+compiler.cfg.dominance::private compiler.cfg.utilities compiler.test
 grouping kernel math.ranges namespaces sequences sets tools.test ;
 IN: compiler.cfg.dominance.tests
 

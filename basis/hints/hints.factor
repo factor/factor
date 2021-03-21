@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-arrays byte-vectors classes
 combinators definitions fry generic generic.single
-generic.standard hashtables io.binary kernel kernel.private math
-math.parser parser sbufs sequences sequences.private splitting
+generic.standard hashtables io.binary kernel kernel::private math
+math.parser parser sbufs sequences sequences::private splitting
 strings vectors words ;
 IN: hints
 

@@ -1,5 +1,5 @@
-USING: accessors arrays grouping grouping.private kernel math
-sequences sequences.generalizations sequences.private vectors ;
+USING: accessors arrays grouping grouping::private kernel math
+sequences sequences.generalizations sequences::private vectors ;
 
 IN: grouping.extras
 

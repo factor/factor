@@ -1,7 +1,7 @@
 USING: accessors alien arrays byte-arrays classes.algebra
 classes.struct compiler.tree.propagation.copy
 compiler.tree.propagation.info io.encodings.utf8 kernel literals math
-math.intervals namespaces sequences sequences.private tools.test ;
+math.intervals namespaces sequences sequences::private tools.test ;
 IN: compiler.tree.propagation.info.tests
 
 { f } [ 0.0 -0.0 eql? ] unit-test

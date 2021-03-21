@@ -1,5 +1,5 @@
 USING: kernel layouts literals math math.parser
-math.parser.private sequences strings tools.test ;
+math.parser::private sequences strings tools.test ;
 IN: math.parser.tests
 
 { f }

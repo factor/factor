@@ -3,7 +3,7 @@
 
 USING: accessors byte-arrays calendar colors.constants
 combinators formatting fry images images.loader
-images.loader.private images.viewer io io.encodings.binary
+images.loader::private images.viewer io io.encodings.binary
 io.encodings.string io.encodings.utf8 io.sockets io.styles
 io.timeouts kernel make math math.parser namespaces present
 prettyprint sequences splitting summary urls urls.encoding

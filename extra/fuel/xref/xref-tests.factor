@@ -1,4 +1,4 @@
-USING: arrays definitions fuel.xref fuel.xref.private io.pathnames kernel math
+USING: arrays definitions fuel.xref fuel.xref::private io.pathnames kernel math
 sequences sets tools.test ;
 QUALIFIED: tools.crossref
 IN: fuel.xref.tests

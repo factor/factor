@@ -1,5 +1,5 @@
-USING: compiler.units compiler.test kernel kernel.private memory
-math math.private tools.test math.floats.private math.order fry
+USING: compiler.units compiler.test kernel kernel::private memory
+math math::private tools.test math.floats::private math.order fry
 specialized-arrays sequences math.functions layouts literals ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float

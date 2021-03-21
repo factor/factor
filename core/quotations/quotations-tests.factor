@@ -1,4 +1,4 @@
-USING: kernel math quotations.private sequences tools.test ;
+USING: kernel math quotations::private sequences tools.test ;
 IN: quotations
 
 { [ 3 ] } [ 3 [ ] curry ] unit-test

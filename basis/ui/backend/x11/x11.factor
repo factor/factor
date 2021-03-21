@@ -5,8 +5,8 @@ assocs classes.struct combinators combinators.short-circuit
 environment io.encodings.ascii io.encodings.string io.encodings.utf8
 kernel literals locals math namespaces sequences specialized-arrays
 strings ui ui.backend ui.backend.x11.keys ui.clipboards ui.event-loop
-ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
-ui.pixel-formats ui.private x11 x11.X x11.clipboard x11.events x11.glx
+ui.gadgets ui.gadgets::private ui.gadgets.worlds ui.gestures
+ui.pixel-formats ui::private x11 x11.X x11.clipboard x11.events x11.glx
 x11.io x11.windows x11.xim x11.xlib ;
 FROM: libc => system ;
 SPECIALIZED-ARRAYS: uchar ulong ;

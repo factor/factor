@@ -1,5 +1,5 @@
 USING: arrays kernel sequences sequences.frozen
-sequences.private tools.test ;
+sequences::private tools.test ;
 
 { { 1 2 3 } } [ { 1 2 3 } <frozen> >array ] unit-test
 

@@ -1,5 +1,5 @@
 USING: compiler.units continuations definitions eval io
-io.streams.string kernel listener listener.private math namespaces
+io.streams.string kernel listener listener::private math namespaces
 parser parser.notes tools.test vocabs vocabs.parser words ;
 IN: listener.tests
 

@@ -2,7 +2,7 @@
 ! Copyright (C) 2017 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel locals math sequences
-sequences.private ;
+sequences::private ;
 IN: wrap
 
 TUPLE: element contents black white ;

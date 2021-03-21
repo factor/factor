@@ -1,7 +1,7 @@
 ! Copyright (c) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators kernel math.order parser
-prettyprint.custom sequences trees trees.private typed ;
+prettyprint.custom sequences trees trees::private typed ;
 IN: trees.splay
 
 TUPLE: splay < tree ;

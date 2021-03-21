@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel effects sequences
-sequences.private words combinators ;
+sequences::private words combinators ;
 IN: stack-checker.errors
 
 HELP: do-not-compile

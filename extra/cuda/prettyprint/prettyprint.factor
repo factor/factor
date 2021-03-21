@@ -1,7 +1,7 @@
 USING: accessors alien.prettyprint combinators
 combinators.short-circuit cuda.libraries cuda.syntax definitions
 effects kernel prettyprint.backend prettyprint.sections see
-see.private sequences words ;
+see::private sequences words ;
 IN: cuda.prettyprint
 
 PREDICATE: cuda-function-word < word

@@ -1,7 +1,7 @@
 USING: accessors arrays assocs concurrency.flags deques dlists io
 io.streams.string kernel math math.parser math.rectangles models
 namespaces prettyprint sequences threads tools.test ui ui.gadgets
-ui.gadgets.private ui.private ;
+ui.gadgets::private ui::private ;
 FROM: sets => members ;
 IN: ui.gadgets.tests
 

@@ -1,4 +1,4 @@
-USING: accessors compiler.units effects eval kernel kernel.private layouts
+USING: accessors compiler.units effects eval kernel kernel::private layouts
 literals math namespaces quotations tools.test typed words words.symbol
 combinators.short-circuit compiler.tree.debugger prettyprint definitions
 sequences classes.intersection strings classes.union ;

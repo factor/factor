@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.smart kernel locals math math.bitwise
 math.functions math.order math.parser ryu.data sequences
-sequences.private ;
+sequences::private ;
 
 IN: ryu
 

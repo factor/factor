@@ -1,5 +1,5 @@
 USING: random sequences tools.test kernel math math.constants
-math.functions sets grouping random.private math.statistics ;
+math.functions sets grouping random::private math.statistics ;
 
 { 4 } [ 4 random-bytes length ] unit-test
 { 7 } [ 7 random-bytes length ] unit-test

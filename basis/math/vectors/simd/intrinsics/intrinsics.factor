@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.data combinators cpu.architecture fry
 grouping kernel libc locals math math.libm math.order math.ranges
-sequences sequences.cords sequences.generalizations sequences.private
-sequences.unrolled sequences.unrolled.private specialized-arrays
+sequences sequences.cords sequences.generalizations sequences::private
+sequences.unrolled sequences.unrolled::private specialized-arrays
 vocabs ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAYS:

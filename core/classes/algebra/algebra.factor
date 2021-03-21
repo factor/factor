@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.private
+USING: accessors arrays assocs classes classes::private
 combinators kernel make math math.order namespaces sequences
 sets sorting vectors words ;
 IN: classes.algebra

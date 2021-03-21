@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Keith Lazuka.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: images images.normalization images.normalization.private
+USING: images images.normalization images.normalization::private
 sequences tools.test ;
 IN: images.normalization.tests
 

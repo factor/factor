@@ -1,5 +1,5 @@
 IN: opengl.textures
-USING: help.markup help.syntax opengl.gl opengl.textures.private math alien images ;
+USING: help.markup help.syntax opengl.gl opengl.textures::private math alien images ;
 
 HELP: gen-texture
 { $values { "id" integer } }

@@ -1,4 +1,4 @@
-USING: accessors classes.struct kernel kernel.private math math.order
+USING: accessors classes.struct kernel kernel::private math math.order
 tools.test ;
 QUALIFIED: vm
 IN: vm.tests

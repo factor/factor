@@ -2,9 +2,9 @@ USING: accessors arrays classes.intersection classes.maybe
 classes.union compiler.units continuations definitions effects
 eval generic generic.standard hashtables io io.streams.duplex
 io.streams.string kernel listener make math namespaces parser
-prettyprint prettyprint.backend prettyprint.config prettyprint.private
+prettyprint prettyprint.backend prettyprint.config prettyprint::private
 prettyprint.sections see sequences splitting
-strings tools.continuations tools.continuations.private
+strings tools.continuations tools.continuations::private
 tools.test vectors vocabs.parser words ;
 IN: prettyprint.tests
 

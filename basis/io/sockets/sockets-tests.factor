@@ -1,4 +1,4 @@
-USING: continuations io.sockets io.sockets.private sequences math
+USING: continuations io.sockets io.sockets::private sequences math
 tools.test namespaces accessors kernel destructors calendar io.timeouts
 io.encodings.utf8 io concurrency.promises threads
 io.streams.string present system ;

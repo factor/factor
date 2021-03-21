@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators kernel math math.order
 math.vectors sequences ui.baseline-alignment
-ui.baseline-alignment.private ui.gadgets ;
+ui.baseline-alignment::private ui.gadgets ;
 IN: ui.gadgets.packs
 
 TUPLE: pack < aligned-gadget

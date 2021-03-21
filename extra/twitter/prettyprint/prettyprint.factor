@@ -1,5 +1,5 @@
 USING: accessors continuations fry http.client images.loader
-images.loader.private images.viewer io io.styles kernel memoize
+images.loader::private images.viewer io io.styles kernel memoize
 prettyprint sequences twitter assocs ;
 IN: twitter.prettyprint
 

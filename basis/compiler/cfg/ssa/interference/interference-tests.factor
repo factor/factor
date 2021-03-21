@@ -2,7 +2,7 @@ USING: accessors alien.c-types compiler.cfg.comparisons
 compiler.cfg.def-use compiler.cfg.instructions compiler.cfg.liveness
 compiler.cfg.registers compiler.cfg.ssa.interference
 compiler.cfg.ssa.interference.live-ranges
-compiler.cfg.ssa.interference.private compiler.cfg.utilities
+compiler.cfg.ssa.interference::private compiler.cfg.utilities
 compiler.test cpu.architecture kernel namespaces sequences slots
 tools.test ;
 IN: compiler.cfg.ssa.interference.tests

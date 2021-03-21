@@ -1,6 +1,6 @@
 USING: accessors alien assocs classes classes.algebra
-classes.predicate classes.union classes.union.private
-compiler.units eval io.streams.string kernel math math.private
+classes.predicate classes.union classes.union::private
+compiler.units eval io.streams.string kernel math math::private
 parser quotations see sequences slots strings tools.test words ;
 IN: classes.union.tests
 

@@ -2,9 +2,9 @@ USING: accessors alien alien.c-types alien.complex alien.data alien.libraries
 alien.syntax arrays byte-arrays classes classes.struct combinators
 combinators.extras compiler compiler.test concurrency.promises continuations
 destructors effects generalizations io io.backend io.pathnames
-io.streams.string kernel kernel.private libc layouts locals math math.bitwise
-math.private memory namespaces namespaces.private random parser quotations
-sequences slots.private specialized-arrays stack-checker stack-checker.errors
+io.streams.string kernel kernel::private libc layouts locals math math.bitwise
+math::private memory namespaces namespaces::private random parser quotations
+sequences slots::private specialized-arrays stack-checker stack-checker.errors
 system threads tools.test words ;
 FROM: alien.c-types => float short ;
 SPECIALIZED-ARRAY: float

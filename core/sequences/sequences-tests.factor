@@ -1,6 +1,6 @@
 USING: arrays assocs byte-arrays generic.single kernel make math
 math.functions math.order math.parser math.vectors sbufs
-sequences sequences.private strings tools.test vectors ;
+sequences sequences::private strings tools.test vectors ;
 IN: sequences.tests
 
 { "empty" } [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test

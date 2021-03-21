@@ -1,4 +1,4 @@
-USING: alien.c-types assocs classes.struct kernel kernel.private vm ;
+USING: alien.c-types assocs classes.struct kernel kernel::private vm ;
 IN: tools.image-analyzer.vm
 
 ! These structs and words correspond to vm/image.hpp

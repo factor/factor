@@ -1,5 +1,5 @@
 USING: accessors concurrency.flags help.markup help.syntax kernel
-math.rectangles models strings ui.gadgets.private ;
+math.rectangles models strings ui.gadgets::private ;
 IN: ui.gadgets
 
 HELP: <gadget>

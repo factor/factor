@@ -1,4 +1,4 @@
-USING: libc.private ;
+USING: libc::private ;
 IN: libc
 
 : malloc ( size -- newalien ) (malloc) check-ptr ;

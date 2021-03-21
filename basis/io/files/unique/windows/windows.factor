@@ -1,4 +1,4 @@
-USING: destructors environment io.files.unique.private
+USING: destructors environment io.files.unique::private
 io.files.windows system windows.kernel32 ;
 IN: io.files.unique.windows
 

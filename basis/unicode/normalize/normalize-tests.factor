@@ -2,7 +2,7 @@ USING: arrays assocs combinators combinators.short-circuit
 grouping io.encodings.utf8 io.files io.streams.null kernel
 locals math math.parser quotations random sequences splitting
 splitting.extras strings tools.test unicode
-unicode.normalize.private ;
+unicode.normalize::private ;
 IN: unicode.normalize.tests
 
 { "ab\u000323\u000302cd" } [ "ab\u000302" "\u000323cd" string-append ] unit-test

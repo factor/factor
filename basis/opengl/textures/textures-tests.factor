@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors images kernel literals opengl.gl
-opengl.textures opengl.textures.private sequences tools.test ;
+opengl.textures opengl.textures::private sequences tools.test ;
 
 {
     {

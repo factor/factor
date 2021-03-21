@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math.primes.safe math.primes.safe.private tools.test ;
+USING: math.primes.safe math.primes.safe::private tools.test ;
 
 { 863 } [ 862 next-safe-prime ] unit-test
 { f } [ 862 safe-prime? ] unit-test
