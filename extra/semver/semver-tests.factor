@@ -131,12 +131,12 @@ CONSTANT: semver-gt-comparisons {
 
 { t } [
     semver-gt-comparisons
-    [ first2 [ parse-semver ] bi@ <=> ] map-zip
+    [ first2 [ parse-semver ] bi@ <=> ] zip-with
     values [ +gt+ = ] all?
 ] unit-test
 
 { t } [
     semver-gt-comparisons
-    [ first2 swap [ parse-semver ] bi@ <=> ] map-zip
+    [ first2 swap [ parse-semver ] bi@ <=> ] zip-with
     values [ +lt+ = ] all?
 ] unit-test

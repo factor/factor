@@ -85,7 +85,7 @@ DEFER: map-literals
 
 : strings-core-to-file ( -- )
     core-vocabs
-    [ "::private" ?tail drop vocab-source-path utf8 file-contents ] map-zip
+    [ "::private" ?tail drop vocab-source-path utf8 file-contents ] zip-with
     [ "[========[" dup matching-delimiter-string surround ] assoc-map
     [
         first2 [ "VOCAB: " prepend ] dip " " glue
@@ -96,7 +96,7 @@ DEFER: map-literals
 
 : parsed-core-to-file ( -- )
     core-vocabs
-    [ vocab>literals ] map-zip
+    [ vocab>literals ] zip-with
     [
         first2 [ "<VOCAB: " prepend ] dip
         >strings
