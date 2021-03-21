@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel math math.combinatorics
-math.combinatorics.private math.order sequences ;
+math.combinatorics::private math.order sequences ;
 
 HELP: factorial
 { $values { "n" "a non-negative integer" } { "n!" integer } }
@@ -104,13 +104,13 @@ HELP: each-combination
 HELP: factoradic
 { $values { "n" integer } { "factoradic" sequence } }
 { $description "Converts a positive integer " { $snippet "n" } " to factoradic form. The factoradic of an integer is its representation based on a mixed radix numerical system that corresponds to the values of " { $snippet "n" } " factorial." }
-{ $examples { $example "USING: math.combinatorics.private prettyprint ;" "859 factoradic ." "{ 1 1 0 3 0 1 0 }" } } ;
+{ $examples { $example "USING: math.combinatorics::private prettyprint ;" "859 factoradic ." "{ 1 1 0 3 0 1 0 }" } } ;
 
 HELP: >permutation
 { $values { "factoradic" sequence } { "permutation" sequence } }
 { $description "Converts an integer represented in factoradic form into its corresponding unique permutation (0-based)." }
 { $notes "For clarification, the following two statements are equivalent:" { $code "10 factoradic >permutation" "{ 1 2 0 0 } >permutation" } }
-{ $examples { $example "USING: math.combinatorics.private prettyprint ;" "{ 0 0 0 0 } >permutation ." "{ 0 1 2 3 }" } } ;
+{ $examples { $example "USING: math.combinatorics::private prettyprint ;" "{ 0 0 0 0 } >permutation ." "{ 0 1 2 3 }" } } ;
 
 HELP: next-permutation
 { $values { "seq" sequence } }

@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io.files.private io.pathnames
+USING: help.markup help.syntax io.files::private io.pathnames
 quotations sequences ;
 IN: io.directories
 

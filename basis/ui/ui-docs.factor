@@ -1,7 +1,7 @@
 USING: classes colors debugger fonts help.markup help.syntax kernel
 math.rectangles namespaces quotations sequences strings ui.backend
 ui.gadgets ui.gadgets.books ui.gadgets.grids ui.gadgets.packs
-ui.gadgets.private ui.gadgets.tracks ui.gadgets.worlds ui.private ui.text
+ui.gadgets::private ui.gadgets.tracks ui.gadgets.worlds ui::private ui.text
 vocabs.loader ;
 IN: ui
 

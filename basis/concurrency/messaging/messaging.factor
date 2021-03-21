@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2010 Chris Double, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors concurrency.mailboxes kernel kernel.private
+USING: accessors concurrency.mailboxes kernel kernel::private
 namespaces summary threads ;
 IN: concurrency.messaging
 

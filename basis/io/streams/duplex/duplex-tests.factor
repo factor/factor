@@ -1,6 +1,6 @@
 USING: io.streams.duplex io io.streams.string
 kernel continuations tools.test destructors accessors ;
-IN: io.streams.duplex.tests
+IN: io.streams.duplex::tests
 
 ! Test duplex stream close behavior
 TUPLE: closing-stream < disposable ;

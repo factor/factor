@@ -4,7 +4,7 @@ USING: accessors arrays assocs combinators
 combinators.short-circuit continuations deques destructors
 dlists fry io io.backend io.encodings.binary io.files
 io.files.info io.files.links io.files.types io.pathnames kernel
-kernel.private make math namespaces sequences sorting strings
+kernel::private make math namespaces sequences sorting strings
 system unicode vocabs ;
 IN: io.directories
 

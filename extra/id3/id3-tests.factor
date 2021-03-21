@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Tim Wawrzynczak
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test id3 combinators grouping id3.private
+USING: tools.test id3 combinators grouping id3::private
 sequences math ;
-IN: id3.tests
+IN: id3::tests
 
 : id3-params ( id3 -- title artist album year comment genre )
     {

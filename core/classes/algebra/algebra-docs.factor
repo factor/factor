@@ -1,4 +1,4 @@
-USING: classes classes.algebra.private classes.private help.markup
+USING: classes classes.algebra::private classes::private help.markup
 help.syntax kernel math sequences ;
 IN: classes.algebra
 

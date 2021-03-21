@@ -1,5 +1,5 @@
 USING: accessors alien arrays assocs calendar continuations destructors
-destructors.private fry kernel math memory namespaces python python.errors
+destructors::private fry kernel math memory namespaces python python.errors
 python.ffi python.objects sequences strings tools.test ;
 IN: python
 

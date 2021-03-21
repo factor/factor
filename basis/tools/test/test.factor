@@ -7,7 +7,7 @@ math.vectors namespaces parser prettyprint quotations sequences
 sequences.generalizations source-files source-files.errors
 source-files.errors.debugger splitting stack-checker summary
 system tools.errors tools.time unicode vocabs vocabs.files
-vocabs.hierarchy vocabs.hierarchy.private vocabs.loader
+vocabs.hierarchy vocabs.hierarchy::private vocabs.loader
 vocabs.metadata vocabs.parser words ;
 IN: tools.test
 

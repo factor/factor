@@ -1,5 +1,5 @@
-USING: continuations.private help.markup help.syntax kernel
-kernel.private lexer namespaces quotations sequences vectors ;
+USING: continuations::private help.markup help.syntax kernel
+kernel::private lexer namespaces quotations sequences vectors ;
 IN: continuations
 
 ARTICLE: "errors-restartable" "Restartable errors"
@@ -63,7 +63,7 @@ $nl
 "When Factor encounters a critical error, it calls the following word:"
 { $subsections die } ;
 
-ARTICLE: "continuations.private" "Continuation implementation details"
+ARTICLE: "continuations::private" "Continuation implementation details"
 "A continuation is simply a tuple holding the contents of the five stacks:"
 { $subsections
     continuation
@@ -86,7 +86,7 @@ ARTICLE: "continuations.private" "Continuation implementation details"
 ARTICLE: "continuations" "Continuations"
 "At any point in the execution of a program, the " { $emphasis "current continuation" } " represents the future of the computation."
 $nl
-"Words for working with continuations are found in the " { $vocab-link "continuations" } " vocabulary; implementation details are in " { $vocab-link "continuations.private" } "."
+"Words for working with continuations are found in the " { $vocab-link "continuations" } " vocabulary; implementation details are in " { $vocab-link "continuations::private" } "."
 $nl
 "Continuations can be reified with the following two words:"
 { $subsections
@@ -104,7 +104,7 @@ $nl
     with-return
 }
 "Continuations serve as the building block for a number of higher-level abstractions, such as " { $link "errors" } " and " { $link "threads" } "."
-{ $subsections "continuations.private" } ;
+{ $subsections "continuations::private" } ;
 
 ABOUT: "continuations"
 

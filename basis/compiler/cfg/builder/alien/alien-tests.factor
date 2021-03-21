@@ -6,7 +6,7 @@ compiler.errors compiler.test compiler.tree.builder
 compiler.tree.optimizer cpu.architecture cpu.x86.assembler
 cpu.x86.assembler.operands kernel literals make namespaces sequences
 stack-checker.alien system tools.test words ;
-IN: compiler.cfg.builder.alien.tests
+IN: compiler.cfg.builder.alien::tests
 
 : dummy-assembly ( -- ass )
     int { } cdecl [

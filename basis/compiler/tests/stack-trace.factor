@@ -1,7 +1,7 @@
 USING: accessors combinators continuations grouping io.backend
 io.encodings.utf8 io.files kernel math namespaces parser
 sequences tools.test ;
-IN: compiler.tests.stack-trace
+IN: compiler::tests.stack-trace
 
 : symbolic-stack-trace ( -- newseq )
     error-continuation get call>> callstack>array

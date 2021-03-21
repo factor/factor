@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays combinators io io.binary
-io.encodings kernel math math.private namespaces sbufs
-sequences sequences.private splitting strings strings.private
+io.encodings kernel math math::private namespaces sbufs
+sequences sequences::private splitting strings strings::private
 vectors ;
 IN: io.encodings.utf16
 

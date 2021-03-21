@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Alex Chapman, Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license
-USING: arrays circular kernel math sequences sequences.private
+USING: arrays circular kernel math sequences sequences::private
 strings tools.test ;
-IN: circular.tests
+IN: circular::tests
 
 { 0 } [ { 0 1 2 3 4 } <circular> 0 swap virtual@ drop ] unit-test
 { 2 } [ { 0 1 2 3 4 } <circular> 2 swap virtual@ drop ] unit-test

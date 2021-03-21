@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
-kernel kernel.private math namespaces regexp.classes
-regexp.transition-tables sequences sequences.private sets
+kernel kernel::private math namespaces regexp.classes
+regexp.transition-tables sequences sequences::private sets
 strings unicode words ;
 IN: regexp.compiler
 

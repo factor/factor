@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: namespaces ecdsa tools.test checksums checksums.sha ;
-IN: ecdsa.tests
+IN: ecdsa::tests
 
 SYMBOLS: priv-key pub-key signature ;
 

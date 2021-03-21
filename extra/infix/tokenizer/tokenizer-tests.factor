@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Philipp Brüschweiler
 ! See http://factorcode.org/license.txt for BSD license.
 USING: infix.ast infix.tokenizer tools.test ;
-IN: infix.tokenizer.tests
+IN: infix.tokenizer::tests
 
 { V{ T{ ast-value f 1 } } } [ "1" tokenize-infix ] unit-test
 { V{ T{ ast-value f 1.02 } CHAR: * T{ ast-value f 3 } } } [ "1.02*3" tokenize-infix ] unit-test

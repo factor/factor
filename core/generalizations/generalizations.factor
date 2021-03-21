@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2009 Chris Double, Doug Coleman, Eduardo
 ! Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private sequences sequences.private math
+USING: kernel kernel::private sequences sequences::private math
 combinators macros math.order math.ranges quotations effects
-memoize.private arrays ;
+memoize::private arrays ;
 IN: generalizations
 
 ! These words can be inline combinators the word does no math on

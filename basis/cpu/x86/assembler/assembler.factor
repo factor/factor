@@ -3,7 +3,7 @@
 USING: arrays io.binary kernel combinators
 combinators.short-circuit math math.bitwise locals namespaces
 make sequences words system layouts math.order accessors
-cpu.x86.assembler.operands cpu.x86.assembler.operands.private ;
+cpu.x86.assembler.operands cpu.x86.assembler.operands::private ;
 IN: cpu.x86.assembler
 
 ! A postfix assembler for x86-32 and x86-64.

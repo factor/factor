@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes.tuple kernel math math.order sequences
-sequences.private ;
+sequences::private ;
 IN: math.ranges
 
 TUPLE: range

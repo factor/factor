@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: threads kernel namespaces continuations combinators
-sequences math namespaces.private continuations.private
-concurrency.messaging quotations kernel.private words
-sequences.private assocs models models.arrow arrays accessors
+sequences math namespaces::private continuations::private
+concurrency.messaging quotations kernel::private words
+sequences::private assocs models models.arrow arrays accessors
 generic generic.standard definitions make sbufs
 tools.continuations parser tools.annotations fry ;
 IN: tools.walker

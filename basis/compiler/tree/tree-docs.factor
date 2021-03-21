@@ -1,4 +1,4 @@
-USING: alien assocs help.markup help.syntax kernel kernel.private
+USING: alien assocs help.markup help.syntax kernel kernel::private
 quotations sequences stack-checker.alien stack-checker.inlining
 stack-checker.values stack-checker.visitor words ;
 IN: compiler.tree

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: compiler.test compiler.tree.debugger kernel make math.parser sequences
 sequences.unrolled tools.test ;
-IN: sequences.unrolled.tests
+IN: sequences.unrolled::tests
 
 { { "0" "1" "2" } } [ { 0 1 2 } 3 [ number>string ] unrolled-map ] unit-test
 { { "0" "1" "2" } } [ { 0 1 2 } [ 3 [ number>string ] unrolled-map ] compile-call ] unit-test

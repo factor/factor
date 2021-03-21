@@ -6,7 +6,7 @@ compiler.cfg.intrinsics.simd compiler.cfg.intrinsics.simd.backend
 compiler.cfg.stacks.local compiler.test compiler.tree
 compiler.tree.propagation.info cpu.architecture fry kernel locals make
 namespaces sequences system tools.test words ;
-IN: compiler.cfg.intrinsics.simd.tests
+IN: compiler.cfg.intrinsics.simd::tests
 
 :: test-node ( rep -- node )
     T{ #call

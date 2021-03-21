@@ -1,7 +1,7 @@
 USING: accessors arrays bank calendar kernel math math.functions
 namespaces make tools.test tools.walker ;
 FROM: bank => balance>> ;
-IN: bank.tests
+IN: bank::tests
 
 SYMBOL: my-account
 "Alex's Take Over the World Fund" 0.07 1 2007 11 1 <date> 6101.94 open-account

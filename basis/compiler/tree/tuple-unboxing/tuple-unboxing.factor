@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes.tuple.private combinators
+USING: accessors arrays assocs classes.tuple::private combinators
 compiler.tree compiler.tree.builder compiler.tree.combinators
 compiler.tree.escape-analysis.allocations
 compiler.tree.escape-analysis.simple compiler.tree.propagation
-compiler.utilities fry kernel kernel.private math namespaces
-sequences slots.private stack-checker.branches
+compiler.utilities fry kernel kernel::private math namespaces
+sequences slots::private stack-checker.branches
 stack-checker.values vectors ;
 IN: compiler.tree.tuple-unboxing
 

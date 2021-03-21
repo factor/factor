@@ -2,7 +2,7 @@ USING: accessors alien alien.accessors alien.c-types
 alien.syntax byte-arrays continuations kernel layouts math
 namespaces prettyprint sequences tools.memory tools.test ;
 QUALIFIED: sets
-IN: alien.tests
+IN: alien::tests
 
 { t } [ -1 <alien> alien-address 0 > ] unit-test
 

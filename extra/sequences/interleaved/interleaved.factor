@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors kernel math math.order sequences
-sequences.private ;
+sequences::private ;
 
 IN: sequences.interleaved
 

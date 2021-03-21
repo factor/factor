@@ -1,5 +1,5 @@
 USING: assocs arrays generic.single help.markup help.syntax kernel
-layouts math math.order quotations sequences.private vectors ;
+layouts math math.order quotations sequences::private vectors ;
 IN: sequences
 
 HELP: sequence
@@ -269,31 +269,31 @@ HELP: first4
 HELP: array-capacity
 { $class-description "A predicate class whose instances are fixnums of valid array sizes for the current architecture. The minimum value is zero and the maximum value is " { $link max-array-capacity } "." }
 { $description "Low-level array length accessor." }
-{ $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." }
+{ $warning "This word is in the " { $vocab-link "sequences::private" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." }
 { $see-also integer-array-capacity } ;
 
 HELP: integer-array-capacity
 { $class-description "A predicate class whose instances are integer of valid array sizes for the current architecture. The minimum value is zero and the maximum value is " { $link max-array-capacity } "." }
 { $description "Low-level array length accessor." }
-{ $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." }
+{ $warning "This word is in the " { $vocab-link "sequences::private" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." }
 { $see-also array-capacity } ;
 
 HELP: array-nth
 { $values { "n" "a non-negative fixnum" } { "array" array } { "elt" object } }
 { $description "Low-level array element accessor." }
-{ $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory. User code must use " { $link nth } " instead." } ;
+{ $warning "This word is in the " { $vocab-link "sequences::private" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory. User code must use " { $link nth } " instead." } ;
 
 HELP: set-array-nth
 { $values { "elt" object } { "n" "a non-negative fixnum" } { "array" array } }
 { $description "Low-level array element mutator." }
-{ $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory. User code must use " { $link set-nth } " instead." } ;
+{ $warning "This word is in the " { $vocab-link "sequences::private" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory. User code must use " { $link set-nth } " instead." } ;
 
 HELP: collect
 { $values { "n" "a non-negative integer" } { "quot" { $quotation ( ... n -- ... value ) } } { "into" "a sequence of length at least " { $snippet "n" } } }
 { $description "A primitive mapping operation that applies a quotation to all integers from 0 up to but not including " { $snippet "n" } ", and collects the results in a new array. User code should use " { $link map } " instead." }
 { $examples
   { $example
-    "USING: kernel math.parser prettyprint sequences sequences.private ;"
+    "USING: kernel math.parser prettyprint sequences sequences::private ;"
     "10 [ number>string ] 10 f new-sequence [ collect ] keep ."
     "{ \"0\" \"1\" \"2\" \"3\" \"4\" \"5\" \"6\" \"7\" \"8\" \"9\" }"
   }

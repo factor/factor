@@ -9,7 +9,7 @@ HELP: base16-theme
     "Then switch to the base16 theme:"
     { $code "USING: ui.theme.switching ui.theme.base16 ;" "base16-theme switch-theme" }
     "This can also be changed while running the listener :"
-    { $code "USING: ui.theme.base16 namespaces ui.theme.switching.private ;"
+    { $code "USING: ui.theme.base16 namespaces ui.theme.switching::private ;"
             "\"embers\" base16-theme-name set update-stylesheet listener-window" }
     "To persist for that session you can set-global."
     "The following variations are implemented:"

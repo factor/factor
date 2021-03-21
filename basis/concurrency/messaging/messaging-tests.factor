@@ -4,7 +4,7 @@ USING: kernel threads vectors arrays sequences namespaces make
 tools.test continuations deques strings math words match
 quotations concurrency.messaging concurrency.mailboxes
 concurrency.count-downs accessors ;
-IN: concurrency.messaging.tests
+IN: concurrency.messaging::tests
 
 { } [ my-mailbox data>> clear-deque ] unit-test
 

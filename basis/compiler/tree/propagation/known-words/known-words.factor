@@ -1,15 +1,15 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.accessors alien.data.private arrays
+USING: accessors alien alien.accessors alien.data::private arrays
 assocs byte-arrays byte-vectors classes classes.algebra classes.tuple
-classes.tuple.private combinators compiler.tree.comparisons
+classes.tuple::private combinators compiler.tree.comparisons
 compiler.tree.propagation.constraints compiler.tree.propagation.info
 compiler.tree.propagation.simple compiler.tree.propagation.slots fry
-generic.math hashtables kernel kernel.private layouts locals math
-math.floats.private math.functions math.integers.private
+generic.math hashtables kernel kernel::private layouts locals math
+math.floats::private math.functions math.integers::private
 math.intervals math.libm math.parser math.partial-dispatch
-math.private namespaces sbufs sequences slots.private splitting
-stack-checker.dependencies strings strings.private vectors words ;
+math::private namespaces sbufs sequences slots::private splitting
+stack-checker.dependencies strings strings::private vectors words ;
 FROM: alien.c-types => (signed-interval) (unsigned-interval) ;
 IN: compiler.tree.propagation.known-words
 

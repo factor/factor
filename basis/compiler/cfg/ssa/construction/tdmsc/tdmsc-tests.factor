@@ -2,7 +2,7 @@ USING: accessors arrays compiler.cfg
 compiler.cfg.ssa.construction.tdmsc compiler.cfg.utilities
 compiler.test kernel namespaces sequences tools.test ;
 QUALIFIED: sets
-IN: compiler.cfg.ssa.construction.tdmsc.tests
+IN: compiler.cfg.ssa.construction.tdmsc::tests
 
 : test-tdmsc ( -- )
     0 get block>cfg dup cfg set

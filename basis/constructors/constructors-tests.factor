@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar combinators.short-circuit
 constructors eval kernel math strings tools.test ;
-IN: constructors.tests
+IN: constructors::tests
 
 TUPLE: stock-spread stock spread timestamp ;
 
@@ -69,7 +69,7 @@ SLOT-CONSTRUCTOR: a-monster
 
 [
     "USE: constructors
-IN: constructors.tests
+IN: constructors::tests
 TUPLE: foo a b ;
 CONSTRUCTOR: <foo> foo ( a a -- obj )" eval( -- )
 ] [
@@ -78,7 +78,7 @@ CONSTRUCTOR: <foo> foo ( a a -- obj )" eval( -- )
 
 [
     "USE: constructors
-IN: constructors.tests
+IN: constructors::tests
 TUPLE: foo a b ;
 CONSTRUCTOR: <foo> foo ( a c -- obj )" eval( -- )
 ] [

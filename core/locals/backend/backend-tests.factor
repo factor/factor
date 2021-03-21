@@ -1,4 +1,4 @@
-IN: locals.backend.tests
+IN: locals.backend::tests
 USING: tools.test locals.backend kernel arrays accessors ;
 
 : get-local-test-1 ( -- x ) 3 1 load-locals 0 get-local 1 drop-locals ;

@@ -1,5 +1,5 @@
-USING: ctags.etags.private kernel tools.test ;
-IN: ctags.etags.tests
+USING: ctags.etags::private kernel tools.test ;
+IN: ctags.etags::tests
 
 ! etag-hash
 { t }

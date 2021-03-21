@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private tools.test math math.partial-dispatch
-prettyprint math.private accessors slots.private sequences
-sequences.private strings sbufs compiler.tree.builder
+USING: kernel kernel::private tools.test math math.partial-dispatch
+prettyprint math::private accessors slots::private sequences
+sequences::private strings sbufs compiler.tree.builder
 compiler.tree.normalization compiler.tree.debugger alien.accessors
 layouts combinators byte-arrays arrays ;
 IN: compiler.tree.modular-arithmetic.tests

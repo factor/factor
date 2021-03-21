@@ -3,7 +3,7 @@
 USING: farkup kernel peg peg.ebnf tools.test namespaces xml
 urls.encoding assocs xml.traversal xml.data sequences random
 io continuations math ;
-IN: farkup.tests
+IN: farkup::tests
 
 relative-link-prefix off
 disable-images? off

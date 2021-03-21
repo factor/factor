@@ -1,5 +1,5 @@
 USING: boxes kernel namespaces refs tools.test ;
-IN: refs.tests
+IN: refs::tests
 
 ! assoc-refs
 { 3 } [

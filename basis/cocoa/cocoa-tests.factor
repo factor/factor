@@ -1,7 +1,7 @@
 USING: alien.c-types cocoa cocoa.classes cocoa.subclassing
 cocoa.types compiler.test core-graphics.types kernel math memory
 namespaces tools.test ;
-IN: cocoa.tests
+IN: cocoa::tests
 
 <CLASS: Foo < NSObject
     METHOD: void foo: NSRect rect [

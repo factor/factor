@@ -1,7 +1,7 @@
 USING: accessors arrays classes compiler.test compiler.tree.debugger
-effects fry io kernel kernel.private math math.functions
-math.private math.vectors math.vectors.simd math.ranges
-math.vectors.simd.private prettyprint random sequences system
+effects fry io kernel kernel::private math math.functions
+math::private math.vectors math.vectors.simd math.ranges
+math.vectors.simd::private prettyprint random sequences system
 tools.test vocabs assocs compiler.cfg.debugger words
 locals combinators cpu.architecture namespaces byte-arrays alien
 specialized-arrays classes.struct eval classes.algebra sets
@@ -10,7 +10,7 @@ math.vectors.simd.cords alien.data ;
 FROM: math.vectors.simd.intrinsics => alien-vector set-alien-vector ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
-IN: math.vectors.simd.tests
+IN: math.vectors.simd::tests
 
 ! Test type propagation
 { V{ float } } [ [ { float-4 } declare norm-sq ] final-classes ] unit-test

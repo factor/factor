@@ -1,8 +1,8 @@
 ! Copyright (C) 2019 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io.binary kernel math namespaces sequences
-strings tools.test ulid ulid.private ;
-IN: ulid.tests
+strings tools.test ulid ulid::private ;
+IN: ulid::tests
 
 { "0123456789ABCDEFGH1JK1MN0PQRSTUVWXYZ" }
 [ "0123456789abcdefghijklmnopqrstuvwxyz" normalize-ulid ] unit-test

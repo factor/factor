@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs classes classes.algebra
-classes.algebra.private classes.maybe classes.tuple.private
+classes.algebra::private classes.maybe classes.tuple::private
 combinators combinators.short-circuit compiler.tree
 compiler.tree.propagation.constraints compiler.tree.propagation.info
 compiler.tree.propagation.inlining compiler.tree.propagation.nodes

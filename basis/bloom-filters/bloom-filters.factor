@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Alec Berryman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays bit-arrays fry kernel kernel.private
-layouts locals math math.functions math.order math.private
-multiline sequences sequences.private typed ;
+USING: accessors arrays bit-arrays fry kernel kernel::private
+layouts locals math math.functions math.order math::private
+multiline sequences sequences::private typed ;
 FROM: math.ranges => [1,b] ;
 
 IN: bloom-filters

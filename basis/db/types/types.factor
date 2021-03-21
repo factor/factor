@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs db kernel math math.parser
 sequences continuations sequences.deep prettyprint
-words namespaces slots slots.private classes mirrors
+words namespaces slots slots::private classes mirrors
 classes.tuple combinators calendar.format classes.singleton
-accessors quotations random db.private ;
+accessors quotations random db::private ;
 IN: db.types
 
 HOOK: persistent-table db-connection ( -- hash )

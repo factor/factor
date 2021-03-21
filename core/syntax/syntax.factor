@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays byte-arrays byte-vectors classes
-classes.algebra.private classes.builtin classes.error
+USING: accessors arrays byte-arrays byte-vectors classes classes.algebra
+classes.algebra::private classes.builtin classes.error
 classes.intersection classes.maybe classes.mixin classes.parser
 classes.predicate classes.singleton classes.tuple
 classes.tuple.parser classes.union combinators compiler.units

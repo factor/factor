@@ -3,7 +3,7 @@ tools.test io.streams.string kernel sequences ascii boxes
 namespaces xml html.components html.forms
 splitting furnace accessors
 html.templates.chloe.compiler ;
-IN: html.templates.chloe.tests
+IN: html.templates.chloe::tests
 
 ! So that changes to code are reflected
 { } [ reset-cache ] unit-test

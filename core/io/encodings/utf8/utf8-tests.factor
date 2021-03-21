@@ -1,6 +1,6 @@
 USING: arrays io.encodings.string io.encodings.utf8 kernel
 sequences strings tools.test ;
-IN: io.encodings.utf8.tests
+IN: io.encodings.utf8::tests
 
 : decode-utf8-w/stream ( array -- newarray )
     utf8 decode >array ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs cpu.x86.assembler.syntax hashtables
-kernel kernel.private layouts math namespaces sequences words ;
+kernel kernel::private layouts math namespaces sequences words ;
 IN: cpu.x86.assembler.operands
 
 REGISTERS: 8 AL CL DL BL SPL BPL SIL DIL R8B R9B R10B R11B R12B R13B R14B R15B ;

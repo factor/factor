@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 continuations formatting fry generalizations hashtables.identity
-io kernel kernel.private layouts locals math math.parser
+io kernel kernel::private layouts locals math math.parser
 math.vectors memory namespaces prettyprint sequences
 sequences.generalizations sets sorting ;
 IN: tools.profiler.sampling

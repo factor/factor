@@ -1,4 +1,4 @@
-IN: cpu.arm32.assembler.tests
+IN: cpu.arm32.assembler::tests
 USING: cpu.arm32.assembler math tools.test namespaces make
 sequences kernel quotations ;
 FROM: cpu.arm32.assembler => B ;

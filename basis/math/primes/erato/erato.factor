@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private locals math math.bitwise
-math.functions math.order math.private math.ranges sequences
-sequences.private ;
+USING: kernel kernel::private locals math math.bitwise
+math.functions math.order math::private math.ranges sequences
+sequences::private ;
 IN: math.primes.erato
 
 <PRIVATE

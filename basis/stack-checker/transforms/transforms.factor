@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes.tuple classes.tuple.private combinators
+USING: accessors classes.tuple classes.tuple::private combinators
 combinators.short-circuit continuations generic kernel
 namespaces quotations sequences stack-checker.backend
 stack-checker.dependencies stack-checker.errors

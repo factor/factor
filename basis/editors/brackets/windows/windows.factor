@@ -3,7 +3,7 @@
 USING: alien.data alien.strings combinators editors
 editors.brackets kernel make math.parser namespaces quotations
 sequences system windows.advapi32 windows.registry
-windows.registry.private windows.types windows.errors ;
+windows.registry::private windows.types windows.errors ;
 
 IN: editors.brackets.windows
 

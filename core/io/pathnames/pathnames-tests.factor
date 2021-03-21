@@ -1,4 +1,4 @@
-USING: io.backend io.directories io.files.private io.files.temp
+USING: io.backend io.directories io.files::private io.files.temp
 io.files.unique io.pathnames kernel locals math multiline
 namespaces sequences system tools.test ;
 

@@ -1,4 +1,4 @@
-USING: combinators.private compiler.units debugger effects help.markup
+USING: combinators::private compiler.units debugger effects help.markup
 help.syntax kernel quotations words ;
 IN: compiler.tree.propagation.call-effect
 

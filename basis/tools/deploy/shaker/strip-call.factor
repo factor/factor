@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.private kernel ;
+USING: combinators::private kernel ;
 IN: combinators
 
 : call-effect ( word effect -- ) call-effect-unsafe ;

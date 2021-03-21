@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays checksums checksums.md5 checksums.multi
 checksums.sha tools.test ;
-IN: checksums.multi.tests
+IN: checksums.multi::tests
 
 {
     {

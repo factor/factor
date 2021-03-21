@@ -1,4 +1,4 @@
-USING: compiler.cfg compiler.cfg.dominance.private help.markup help.syntax
+USING: compiler.cfg compiler.cfg.dominance::private help.markup help.syntax
 sequences ;
 IN: compiler.cfg.dominance
 

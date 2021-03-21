@@ -29,8 +29,8 @@ SYMBOL: visionect-api-secret
     visionect-api-key get ":" rot 3append ;
 
 : set-visionect-headers ( request -- request )
-    now timestamp>http-string "date" set-header
-    dup visionect-authorization "authorization" set-header ;
+    now timestamp>http-string "Date" set-header
+    dup visionect-authorization "Authorization" set-header ;
 
 : visionect-request ( request -- data )
     set-visionect-headers http-request nip ;
@@ -50,7 +50,7 @@ SYMBOL: visionect-api-secret
 : visionect-post ( post-data path -- data )
     visionect-url <post-request>
     dup post-data>> dup post-data?
-    [ content-type>> "content-type" set-header ] [ drop ] if
+    [ content-type>> "Content-Type" set-header ] [ drop ] if
     visionect-request ;
 
 PRIVATE>

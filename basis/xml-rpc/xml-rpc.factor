@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs base64 calendar calendar.format
 combinators debugger generic hashtables http http.client
-http.client.private io io.encodings.string io.encodings.utf8
+http.client::private io io.encodings.string io.encodings.utf8
 kernel make math math.order math.parser namespaces sequences
 strings xml xml.data xml.syntax xml.traversal xml.writer ;
 IN: xml-rpc

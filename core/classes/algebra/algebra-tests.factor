@@ -1,8 +1,8 @@
 USING: accessors arrays assocs classes classes.algebra
-classes.tuple classes.union generic generic.private growable
+classes.tuple classes.union generic generic::private growable
 kernel math prettyprint quotations random sbufs sequences
 stack-checker strings tools.test vectors words ;
-IN: classes.algebra.tests
+IN: classes.algebra::tests
 
 TUPLE: first-one ;
 TUPLE: second-one ;

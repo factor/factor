@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2009 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private ;
+USING: kernel kernel::private ;
 IN: math
 
 BUILTIN: fixnum ;

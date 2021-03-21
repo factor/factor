@@ -1,13 +1,13 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes combinators destructors
-documents.private fonts io io.styles kernel math math.rectangles
+documents::private fonts io io.styles kernel math math.rectangles
 math.vectors models namespaces sequences sets sorting splitting
 strings ui.baseline-alignment ui.clipboards ui.gadgets
 ui.gadgets.borders ui.gadgets.grid-lines ui.gadgets.grids
 ui.gadgets.icons ui.gadgets.incremental ui.gadgets.labels
 ui.gadgets.menus ui.gadgets.packs ui.gadgets.paragraphs
-ui.gadgets.presentations ui.gadgets.private ui.gadgets.scrollers
+ui.gadgets.presentations ui.gadgets::private ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.images ui.pens.solid ui.render
 ui.theme ui.traverse unicode ;
 FROM: io.styles => foreground background ;

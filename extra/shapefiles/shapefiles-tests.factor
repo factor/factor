@@ -1,5 +1,5 @@
 USING: kernel sequences shapefiles tools.test ;
-IN: shapefiles.tests
+IN: shapefiles::tests
 
 : save-and-load? ( shapes -- ? )
     [

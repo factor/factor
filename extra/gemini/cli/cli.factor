@@ -3,7 +3,7 @@
 
 USING: accessors arrays assocs combinators
 combinators.short-circuit command-loop formatting gemini
-gemini.private io io.directories io.encodings.string
+gemini::private io io.directories io.encodings.string
 io.encodings.utf8 io.files io.files.temp io.launcher io.pipes
 kernel math math.parser namespaces present sequences splitting
 system urls webbrowser ;

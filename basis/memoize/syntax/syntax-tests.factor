@@ -1,7 +1,7 @@
 USING: calendar math.order memoize.syntax sequences threads
 tools.test tools.time ;
 
-IN: memoize.syntax.tests
+IN: memoize.syntax::tests
 
 [ t ] [
     { 1/8 1/8 1/8 1/8 1/16 1/16 1/16 }

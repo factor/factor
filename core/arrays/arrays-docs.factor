@@ -1,5 +1,5 @@
 USING: help.markup help.syntax
-kernel kernel.private prettyprint sequences.private sequences ;
+kernel kernel::private prettyprint sequences::private sequences ;
 IN: arrays
 
 ARTICLE: "arrays-unsafe" "Unsafe array operations"

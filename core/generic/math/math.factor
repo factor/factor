@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes classes.algebra combinators
-definitions generic kernel kernel.private math math.order
-math.private namespaces quotations sequences words ;
+definitions generic kernel kernel::private math math.order
+math::private namespaces quotations sequences words ;
 IN: generic.math
 
 PREDICATE: math-class < class

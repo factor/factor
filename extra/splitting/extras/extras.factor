@@ -1,4 +1,4 @@
-USING: hints kernel math sequences sequences.private strings ;
+USING: hints kernel math sequences sequences::private strings ;
 IN: splitting.extras
 
 <PRIVATE

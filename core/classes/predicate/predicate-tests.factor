@@ -1,6 +1,6 @@
 USING: accessors assocs classes classes.algebra compiler.units
 eval generic.single kernel math strings tools.test words ;
-IN: classes.predicate.tests
+IN: classes.predicate::tests
 
 PREDICATE: negative < integer 0 < ;
 PREDICATE: positive < integer 0 > ;
@@ -45,20 +45,20 @@ M: tuple-d ptest' drop tuple-d ;
 
 PREDICATE: bad-inheritance-predicate < string ;
 [
-    "IN: classes.predicate.tests PREDICATE: bad-inheritance-predicate < bad-inheritance-predicate ;" eval( -- )
+    "IN: classes.predicate::tests PREDICATE: bad-inheritance-predicate < bad-inheritance-predicate ;" eval( -- )
 ] [ error>> bad-inheritance? ] must-fail-with
 
 PREDICATE: bad-inheritance-predicate2 < string ;
 PREDICATE: bad-inheritance-predicate3 < bad-inheritance-predicate2 ;
 [
-    "IN: classes.predicate.tests PREDICATE: bad-inheritance-predicate2 < bad-inheritance-predicate3 ;" eval( -- )
+    "IN: classes.predicate::tests PREDICATE: bad-inheritance-predicate2 < bad-inheritance-predicate3 ;" eval( -- )
 ] [ error>> bad-inheritance? ] must-fail-with
 
 ! This must not fail
 PREDICATE: tup < string ;
 UNION: u tup ;
 
-{ } [ "IN: classes.predicate.tests PREDICATE: u < tup ;" eval( -- ) ] unit-test
+{ } [ "IN: classes.predicate::tests PREDICATE: u < tup ;" eval( -- ) ] unit-test
 
 ! Changing the metaclass of the predicate superclass should work
 GENERIC: change-meta-test ( a -- b )
@@ -74,7 +74,7 @@ M: change-meta-test-predicate change-meta-test length>> ;
 [ T{ change-meta-test-class f 0 } change-meta-test ] [ no-method? ] must-fail-with
 { 7 } [ T{ change-meta-test-class f 7 } change-meta-test ] unit-test
 
-{ } [ "IN: classes.predicate.tests USE: arrays UNION: change-meta-test-class array ;" eval( -- ) ] unit-test
+{ } [ "IN: classes.predicate::tests USE: arrays UNION: change-meta-test-class array ;" eval( -- ) ] unit-test
 
 ! Should not have changed
 { change-meta-test-class } [ change-meta-test-predicate superclass-of ] unit-test

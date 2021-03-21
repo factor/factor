@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax io.streams.string urls
-multiline spider.private quotations ;
+multiline spider::private quotations ;
 IN: spider
 
 HELP: <spider>

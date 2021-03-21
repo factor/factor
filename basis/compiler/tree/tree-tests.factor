@@ -1,5 +1,5 @@
 USING: accessors compiler.tree kernel tools.test ;
-IN: compiler.tree.tests
+IN: compiler.tree::tests
 
 {
     "label"

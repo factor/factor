@@ -3,7 +3,7 @@
 USING: accessors sequences assocs arrays continuations
 destructors combinators kernel threads concurrency.messaging
 concurrency.mailboxes concurrency.promises io.files io.files.info
-io.directories io.pathnames io.monitors io.monitors.private
+io.directories io.pathnames io.monitors io.monitors::private
 debugger fry ;
 IN: io.monitors.recursive
 

@@ -1,7 +1,7 @@
 USING: accessors alien alien.c-types alien.complex alien.data
 arrays ascii byte-arrays combinators combinators.short-circuit
 fry kernel math math.blas.ffi math.complex math.functions
-math.order sequences sequences.private functors words locals
+math.order sequences sequences::private functors words locals
 parser prettyprint.backend prettyprint.custom specialized-arrays ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float

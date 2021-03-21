@@ -1,4 +1,4 @@
-USING: vocabs vocabs.loader.private help.markup help.syntax
+USING: vocabs vocabs.loader::private help.markup help.syntax
 words strings io hashtables ;
 IN: vocabs.loader
 

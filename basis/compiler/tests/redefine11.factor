@@ -1,6 +1,6 @@
 USING: eval tools.test compiler.units vocabs words
 kernel classes.mixin arrays ;
-IN: compiler.tests.redefine11
+IN: compiler::tests.redefine11
 
 ! Mixin redefinition did not recompile all necessary words.
 
@@ -8,7 +8,7 @@ IN: compiler.tests.redefine11
 
 [ ] [
     "USING: kernel math classes arrays ;
-    IN: compiler.tests.redefine11
+    IN: compiler::tests.redefine11
     MIXIN: my-mixin
     INSTANCE: array my-mixin
     INSTANCE: fixnum my-mixin

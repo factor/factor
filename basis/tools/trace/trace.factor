@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes combinators.short-circuit effects
-generic.math io io.styles kernel kernel.private make math.parser
+generic.math io io.styles kernel kernel::private make math.parser
 namespaces prettyprint quotations sequences strings summary
 tools.continuations words ;
 IN: tools.trace

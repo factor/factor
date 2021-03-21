@@ -9,7 +9,7 @@ core-graphics.types destructors fry generalizations io.thread
 kernel libc literals locals math math.bitwise math.rectangles
 memory namespaces sequences threads ui colors ui.backend
 ui.backend.cocoa.views ui.clipboards ui.gadgets
-ui.gadgets.worlds ui.pixel-formats ui.private words.symbol ;
+ui.gadgets.worlds ui.pixel-formats ui::private words.symbol ;
 IN: ui.backend.cocoa
 
 TUPLE: window-handle view window ;

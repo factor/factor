@@ -1,5 +1,5 @@
 USING: compiler.cfg.registers cpu.x86.assembler
-cpu.x86.assembler.operands cpu.x86.assembler.operands.private
+cpu.x86.assembler.operands cpu.x86.assembler.operands::private
 help.markup help.syntax layouts math sequences system ;
 IN: cpu.x86
 

@@ -6,7 +6,7 @@ furnace.auth.providers.db tools.test
 namespaces db db.sqlite db.tuples continuations
 io.files io.files.temp io.directories accessors kernel
 sequences system ;
-IN: furnace.auth.providers.db.tests
+IN: furnace.auth.providers.db::tests
 
 <action> "test" <login-realm> realm set
 

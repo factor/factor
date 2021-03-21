@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays io.encodings.string io.encodings.utf8 kernel math
 sequences sodium tools.test ;
-IN: sodium.tests
+IN: sodium::tests
 
 { t } [
     "Encrypted message" dup utf8 encode

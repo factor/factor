@@ -1,10 +1,10 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test peg peg.ebnf peg.ebnf.private words
+USING: kernel tools.test peg peg.ebnf peg.ebnf::private words
 math math.parser sequences accessors peg.parsers parser
 namespaces arrays strings eval unicode multiline ;
-IN: peg.ebnf.tests
+IN: peg.ebnf::tests
 
 { T{ ebnf-non-terminal f "abc" } } [
   "abc" non-terminal-parser parse

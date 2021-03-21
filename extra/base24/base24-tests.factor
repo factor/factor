@@ -1,7 +1,7 @@
 USING: base24 grouping io.binary kernel math.parser sequences
 tools.test ;
 
-IN: base24.tests
+IN: base24::tests
 
 { 49894920630459842177293598641814316632 } [
     "2FC28KTA66WRST4XAHRRCF237S8Z" base24> be>

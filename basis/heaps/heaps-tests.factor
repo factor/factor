@@ -1,9 +1,9 @@
 ! Copyright 2007, 2008 Ryan Murphy, Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math namespaces tools.test
-heaps heaps.private math.parser random assocs sequences sorting
+heaps heaps::private math.parser random assocs sequences sorting
 accessors math.order locals ;
-IN: heaps.tests
+IN: heaps::tests
 
 [ <min-heap> heap-pop ] must-fail
 [ <max-heap> heap-pop ] must-fail

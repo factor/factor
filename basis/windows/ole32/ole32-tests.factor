@@ -2,7 +2,7 @@ USING: alien.c-types classes.struct kernel math sequences
 sets specialized-arrays tools.test windows.com.syntax
 windows.kernel32 windows.ole32 ;
 SPECIALIZED-ARRAY: uchar
-IN: windows.ole32.tests
+IN: windows.ole32::tests
 
 [ t ] [
     "{01234567-89ab-cdef-0123-456789abcdef}" string>guid

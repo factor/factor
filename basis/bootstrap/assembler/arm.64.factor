@@ -1,11 +1,11 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image.private compiler.codegen.relocation
+USING: bootstrap.image::private compiler.codegen.relocation
 compiler.constants compiler.units cpu.arm.assembler
-cpu.arm.assembler.opcodes generic.single.private
-kernel kernel.private layouts locals locals.backend
-math math.private memory namespaces sequences slots.private
-strings.private threads.private vocabs ;
+cpu.arm.assembler.opcodes generic.single::private
+kernel kernel::private layouts locals locals.backend
+math math::private memory namespaces sequences slots::private
+strings::private threads::private vocabs ;
 IN: bootstrap.arm
 
 8 \ cell set

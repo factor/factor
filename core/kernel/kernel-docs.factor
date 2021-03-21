@@ -1,5 +1,5 @@
 USING: alien arrays classes combinators heaps help.markup help.syntax
-kernel.private layouts math quotations sequences system threads words ;
+kernel::private layouts math quotations sequences system threads words ;
 IN: kernel
 
 HELP: OBJ-CURRENT-THREAD
@@ -242,7 +242,7 @@ HELP: execute
 HELP: (execute)
 { $values { "word" word } }
 { $description "Executes a word without checking if it is a word first." }
-{ $warning "This word is in the " { $vocab-link "kernel.private" } " vocabulary because it is unsafe. Calling with a parameter that is not a word will crash Factor. Use " { $link execute } " instead." } ;
+{ $warning "This word is in the " { $vocab-link "kernel::private" } " vocabulary because it is unsafe. Calling with a parameter that is not a word will crash Factor. Use " { $link execute } " instead." } ;
 
 HELP: call
 { $values { "callable" callable } }

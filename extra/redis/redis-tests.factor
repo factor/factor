@@ -4,7 +4,7 @@
 USING: continuations kernel redis math math.parser sequences
 sorting tools.test ;
 
-IN: redis.tests
+IN: redis::tests
 
 : with-redis-test ( quot -- )
     [ redis-flushdb ] prepose

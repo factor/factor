@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs classes.tuple combinators hints
-kernel kernel.private math math.functions math.order math.ranges
-sequences sequences.private sorting strings vectors ;
+kernel kernel::private math math.functions math.order math.ranges
+sequences sequences::private sorting strings vectors ;
 IN: math.combinatorics
 
 <PRIVATE

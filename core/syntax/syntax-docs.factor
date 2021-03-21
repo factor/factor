@@ -1,4 +1,4 @@
-USING: arrays assocs classes.algebra.private classes.tuple combinators
+USING: arrays assocs classes.algebra::private classes.tuple combinators
 command-line effects generic generic.math generic.single help.markup
 help.syntax io.pathnames kernel math parser sequences vocabs.loader
 vocabs.parser words words.alias words.constant words.symbol ;
@@ -880,7 +880,7 @@ HELP: MAIN:
 
 HELP: <PRIVATE
 { $syntax "<PRIVATE ... PRIVATE>" }
-{ $description "Begins a block of private word definitions. Private word definitions are placed in the current vocabulary name, suffixed with " { $snippet ".private" } "." }
+{ $description "Begins a block of private word definitions. Private word definitions are placed in the current vocabulary name, suffixed with " { $snippet "::private" } "." }
 { $notes
     "The following is an example of usage:"
     { $code
@@ -897,7 +897,7 @@ HELP: <PRIVATE
     }
     "The above is equivalent to:"
     { $code
-        "IN: factorial.private"
+        "IN: factorial::private"
         ""
         ": (fac) ( accum n -- n! )"
         "    dup 1 <= [ drop ] [ [ * ] keep 1 - (fac) ] if ;"

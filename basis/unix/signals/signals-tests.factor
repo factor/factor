@@ -1,6 +1,6 @@
 USING: calendar continuations io kernel libc math namespaces
 threads tools.test unix.ffi unix.process unix.signals ;
-IN: unix.signals.tests
+IN: unix.signals::tests
 
 SYMBOL: sigusr1-count
 0 sigusr1-count set-global

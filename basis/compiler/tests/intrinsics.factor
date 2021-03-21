@@ -1,14 +1,14 @@
-USING: accessors arrays compiler.units kernel kernel.private
-math math.constants math.private math.integers.private sequences
-strings tools.test words continuations sequences.private
-hashtables.private byte-arrays system random layouts vectors
-sbufs strings.private slots.private alien math.order
+USING: accessors arrays compiler.units kernel kernel::private
+math math.constants math::private math.integers::private sequences
+strings tools.test words continuations sequences::private
+hashtables::private byte-arrays system random layouts vectors
+sbufs strings::private slots::private alien math.order
 alien.accessors alien.c-types alien.data alien.syntax alien.strings
 namespaces libc io.encodings.ascii classes compiler.test ;
 FROM: math => float ;
 FROM: alien.c-types => short ;
 QUALIFIED-WITH: alien.c-types c
-IN: compiler.tests.intrinsics
+IN: compiler::tests.intrinsics
 
 ! Make sure that intrinsic ops compile to correct code.
 [ ] [ 1 [ drop ] compile-call ] unit-test

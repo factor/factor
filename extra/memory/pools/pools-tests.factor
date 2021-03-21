@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel memory.pools tools.test ;
-IN: memory.pools.tests
+IN: memory.pools::tests
 
 TUPLE: foo x ;
 

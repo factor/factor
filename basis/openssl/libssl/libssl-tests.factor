@@ -1,6 +1,6 @@
 USING: destructors kernel math namespaces openssl openssl.libssl
 sequences tools.test ;
-IN: openssl.libssl.tests
+IN: openssl.libssl::tests
 
 maybe-init-ssl
 

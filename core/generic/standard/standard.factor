@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators definitions generic
-generic.single generic.single.private kernel layouts make math
+generic.single generic.single::private kernel layouts make math
 namespaces quotations sequences words ;
 IN: generic.standard
 

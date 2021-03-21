@@ -7,11 +7,11 @@ compiler.cfg.intrinsics compiler.cfg.registers
 compiler.cfg.stack-frame compiler.codegen.gc-maps
 compiler.codegen.labels compiler.codegen.relocation compiler.constants
 compiler.units cpu.architecture cpu.x86.assembler
-cpu.x86.assembler.operands cpu.x86.assembler.private cpu.x86.features
-cpu.x86.features.private fry io kernel layouts locals make math
+cpu.x86.assembler.operands cpu.x86.assembler::private cpu.x86.features
+cpu.x86.features::private fry io kernel layouts locals make math
 math.order memory namespaces sequences system vm vocabs ;
 QUALIFIED-WITH: alien.c-types c
-FROM: kernel.private => declare ;
+FROM: kernel::private => declare ;
 FROM: math => float ;
 IN: cpu.x86
 

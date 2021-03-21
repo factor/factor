@@ -3,7 +3,7 @@
 
 ! Emacs Etags generator
 ! Alfredo Beaumont <alfredo.beaumont@gmail.com>
-USING: arrays assocs ctags.private fry io.backend
+USING: arrays assocs ctags::private fry io.backend
 io.encodings.ascii io.files kernel make math math.parser present
 sequences sorting strings vocabs ;
 IN: ctags.etags

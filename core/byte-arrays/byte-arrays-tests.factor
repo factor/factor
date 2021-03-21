@@ -1,4 +1,4 @@
-USING: byte-arrays kernel math sequences sequences.private
+USING: byte-arrays kernel math sequences sequences::private
 tools.test ;
 
 { 6 B{ 1 2 3 } } [

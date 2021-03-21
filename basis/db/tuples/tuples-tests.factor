@@ -5,7 +5,7 @@ USING: accessors calendar calendar.parser classes continuations
 db.tester db.tuples db.types kernel math math.intervals math.ranges
 namespaces random sequences sorting strings tools.test urls ;
 FROM: math.ranges => [a,b] ;
-IN: db.tuples.tests
+IN: db.tuples::tests
 
 TUPLE: person the-id the-name the-number the-real
     ts date time blob factor-blob url ;

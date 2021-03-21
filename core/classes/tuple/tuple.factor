@@ -10,10 +10,10 @@ DEFER: layout-class-offset
 DEFER: tuple-layout
 PRIVATE>
 USING: accessors arrays assocs classes classes.algebra
-classes.algebra.private classes.builtin classes.private
-combinators definitions effects generic kernel kernel.private
-make math math.private memory namespaces quotations
-sequences sequences.private slots slots.private strings words ;
+classes.algebra::private classes.builtin classes::private
+combinators definitions effects generic kernel kernel::private
+make math math::private memory namespaces quotations
+sequences sequences::private slots slots::private strings words ;
 
 <PRIVATE
 PRIMITIVE: <tuple> ( layout -- tuple )

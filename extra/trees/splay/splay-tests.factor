@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs fry grouping kernel math random sequences sets
 tools.test trees.splay ;
-IN: trees.splay.tests
+IN: trees.splay::tests
 
 : randomize-numeric-splay-tree ( splay-tree -- )
     100 <iota> [ drop 100 random of drop ] with each ;

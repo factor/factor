@@ -1,10 +1,10 @@
 ! Copyright (C) 2011 Erik Charlebois
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image.private kernel kernel.private namespaces
+USING: bootstrap.image::private kernel kernel::private namespaces
 system cpu.ppc.assembler compiler.units compiler.constants math
-math.private math.ranges layouts words vocabs slots.private
-locals locals.backend generic.single.private fry sequences
-threads.private strings.private ;
+math::private math.ranges layouts words vocabs slots::private
+locals locals.backend generic.single::private fry sequences
+threads::private strings::private ;
 FROM: cpu.ppc.assembler => B ;
 IN: bootstrap.ppc
 

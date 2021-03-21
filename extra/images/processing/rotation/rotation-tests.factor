@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors fry images.loader
 images.processing.rotation kernel literals math sequences
-tools.test images.processing.rotation.private ;
-IN: images.processing.rotation.tests
+tools.test images.processing.rotation::private ;
+IN: images.processing.rotation::tests
 
 : first-row ( seq^2 -- seq ) first ;
 : first-col ( seq^2 -- item ) harvest [ first ] map ;

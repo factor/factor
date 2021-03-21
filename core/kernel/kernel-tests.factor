@@ -1,8 +1,8 @@
 USING: accessors alien alien.accessors arrays assocs byte-arrays
 continuations debugger grouping io.streams.string kernel
-kernel.private literals locals.backend math memory namespaces
-prettyprint sequences sequences.private tools.test words ;
-IN: kernel.tests
+kernel::private literals locals.backend math memory namespaces
+prettyprint sequences sequences::private tools.test words ;
+IN: kernel::tests
 
 { 0 } [ f size ] unit-test
 { t } [ [ \ = \ = ] all-equal? ] unit-test

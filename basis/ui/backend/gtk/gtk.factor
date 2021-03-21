@@ -7,9 +7,9 @@ gtk.ffi gtk.gl.ffi io.encodings.binary io.encodings.utf8 io.files
 io.pathnames kernel libc literals locals math math.bitwise
 math.vectors namespaces sequences strings system threads ui ui.backend
 ui.backend.gtk.input-methods ui.backend.gtk.io ui.backend.x11.keys
-ui.clipboards ui.event-loop ui.gadgets ui.gadgets.private
+ui.clipboards ui.event-loop ui.gadgets ui.gadgets::private
 ui.gadgets.worlds ui.gestures ui.pixel-formats
-ui.private vocabs.loader ;
+ui::private vocabs.loader ;
 IN: ui.backend.gtk
 
 SINGLETON: gtk-ui-backend

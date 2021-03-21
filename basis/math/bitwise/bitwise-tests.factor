@@ -2,7 +2,7 @@ USING: accessors math math.bitwise tools.test kernel words
 specialized-arrays alien.c-types alien.data math.vectors.simd
 sequences destructors libc literals classes.struct ;
 SPECIALIZED-ARRAY: int
-IN: math.bitwise.tests
+IN: math.bitwise::tests
 
 { 0 } [ 1 0 0 bitroll ] unit-test
 { 1 } [ 1 0 1 bitroll ] unit-test

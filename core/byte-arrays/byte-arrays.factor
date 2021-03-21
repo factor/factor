@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors kernel math sequences
-sequences.private ;
+sequences::private ;
 IN: byte-arrays
 
 BUILTIN: byte-array

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators kernel lexer make
 namespaces parser sequences splitting xml.data xml.syntax
-xml.syntax.private xml.traversal xmode.rules xmode.tokens
+xml.syntax::private xml.traversal xmode.rules xmode.tokens
 xmode.utilities ;
 IN: xmode.loader.syntax
 

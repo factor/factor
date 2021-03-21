@@ -2,7 +2,7 @@ USING: accessors euler.operators euler.modeling euler.b-rep
 kernel tools.test game.models.half-edge combinators namespaces
 fry sequences make ;
 FROM: euler.b-rep => has-rings? ;
-IN: euler.operators.tests
+IN: euler.operators::tests
 
 { t } [ [ ] make-b-rep b-rep? ] unit-test
 

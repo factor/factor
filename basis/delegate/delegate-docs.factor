@@ -1,4 +1,4 @@
-USING: help.syntax help.markup delegate.private ;
+USING: help.syntax help.markup delegate::private ;
 IN: delegate
 
 HELP: define-protocol

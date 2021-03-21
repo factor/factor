@@ -5,7 +5,7 @@ namespaces quotations sequences stack-checker.backend
 stack-checker.errors stack-checker.recursive-state
 stack-checker.state stack-checker.values stack-checker.visitor
 vectors ;
-FROM: sequences.private => dispatch ;
+FROM: sequences::private => dispatch ;
 IN: stack-checker.branches
 
 : balanced? ( pairs -- ? )

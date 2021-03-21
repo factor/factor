@@ -1,5 +1,5 @@
-USING: kernel layouts make math math.private tools.test ;
-IN: math.tests
+USING: kernel layouts make math math::private tools.test ;
+IN: math::tests
 
 { } [ 5 [ ] times ] unit-test
 { } [ 0 [ ] times ] unit-test

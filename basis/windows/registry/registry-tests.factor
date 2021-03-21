@@ -4,7 +4,7 @@
 USING: byte-arrays io.encodings.string io.encodings.utf16n
 kernel sequences tools.test windows.advapi32 windows.kernel32
 windows.registry ;
-IN: windows.registry.tests
+IN: windows.registry::tests
 
 [ ]
 [ HKEY_CURRENT_USER "SOFTWARE\\\\Microsoft" read-registry drop ] unit-test

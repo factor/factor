@@ -5,7 +5,7 @@ math.vectors.conversion math math.vectors.simd math.ranges sequences
 specialized-arrays tools.test ;
 FROM: alien.c-types => uchar short int float ;
 SPECIALIZED-ARRAYS: int float float-4 uchar-16 ;
-IN: alien.data.map.tests
+IN: alien.data.map::tests
 
 { float-array{ 1.0 1.0 3.0 3.0 5.0 5.0 } }
 [

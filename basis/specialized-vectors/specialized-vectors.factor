@@ -4,8 +4,8 @@ USING: accessors alien alien.c-types alien.data alien.parser
 classes fry functors growable kernel lexer make math parser
 prettyprint.custom sequences specialized-arrays vocabs.generated
 vocabs.loader vocabs.parser ;
-FROM: sequences.private => nth-unsafe ;
-FROM: specialized-arrays.private => nth-c-ptr direct-like ;
+FROM: sequences::private => nth-unsafe ;
+FROM: specialized-arrays::private => nth-c-ptr direct-like ;
 QUALIFIED: vectors.functor
 IN: specialized-vectors
 

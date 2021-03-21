@@ -3,7 +3,7 @@
 USING: accessors arrays combinators combinators.short-circuit
 kernel math.rectangles math.vectors models models.product
 models.range namespaces sequences ui.gadgets ui.gadgets.frames
-ui.gadgets.grids ui.gadgets.private ui.gadgets.sliders
+ui.gadgets.grids ui.gadgets::private ui.gadgets.sliders
 ui.gadgets.viewports ui.gestures ;
 IN: ui.gadgets.scrollers
 

@@ -1,5 +1,5 @@
 USING: accessors assocs namespaces sequences vocabs vocabs.loader
-vocabs.loader.private ;
+vocabs.loader::private ;
 IN: bootstrap.help
 
 : load-help ( -- )

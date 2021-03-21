@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel math.order semver sequences
 sequences.extras tools.test ;
-IN: semver.tests
+IN: semver::tests
 
 CONSTANT: semver-ranges {
     { "1.0.0 - 2.0.0" ">=1.0.0 <=2.0.0" }
@@ -131,12 +131,12 @@ CONSTANT: semver-gt-comparisons {
 
 { t } [
     semver-gt-comparisons
-    [ first2 [ parse-semver ] bi@ <=> ] map-zip
+    [ first2 [ parse-semver ] bi@ <=> ] zip-with
     values [ +gt+ = ] all?
 ] unit-test
 
 { t } [
     semver-gt-comparisons
-    [ first2 swap [ parse-semver ] bi@ <=> ] map-zip
+    [ first2 swap [ parse-semver ] bi@ <=> ] zip-with
     values [ +lt+ = ] all?
 ] unit-test

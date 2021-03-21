@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test regexp.negation regexp.transition-tables regexp.classes ;
-IN: regexp.negation.tests
+IN: regexp.negation::tests
 
 {
     ! R/ |[^a]|.+/

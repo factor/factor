@@ -3,7 +3,7 @@
 
 USING: accessors alien.c-types alien.data byte-arrays checksums
 grouping io.binary kernel literals math math.bitwise math.order
-sequences sequences.generalizations sequences.private
+sequences sequences.generalizations sequences::private
 specialized-arrays ;
 SPECIALIZED-ARRAY: uint64_t
 IN: checksums.wyhash

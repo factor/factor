@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators combinators.smart fry
 generalizations kernel macros math quotations sequences locals
-math.order sequences.generalizations sequences.private
+math.order sequences.generalizations sequences::private
 stack-checker.transforms system words ;
 IN: combinators.extras
 

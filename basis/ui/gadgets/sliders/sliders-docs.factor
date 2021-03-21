@@ -1,5 +1,5 @@
 USING: help.markup help.syntax math math.ranges ui.gadgets
-ui.gadgets.sliders.private ;
+ui.gadgets.sliders::private ;
 IN: ui.gadgets.sliders
 
 HELP: elevator

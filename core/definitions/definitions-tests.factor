@@ -1,6 +1,6 @@
 USING: arrays bit-arrays byte-arrays compiler.units definitions
 tools.test ;
-IN: definitions.tests
+IN: definitions::tests
 
 GENERIC: some-generic ( a -- b )
 

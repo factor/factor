@@ -193,7 +193,7 @@ $nl
     { { $snippet "\"type\"" } { $link "builtin-classes" } }
 } ;
 
-ARTICLE: "word.private" "Word implementation details"
+ARTICLE: "word::private" "Word implementation details"
 "The " { $snippet "def" } " slot of a word holds a " { $link quotation } " instance that is called when the word is executed."
 $nl
 "A primitive to get the memory range storing the machine code for a word:"
@@ -219,7 +219,7 @@ $nl
     "interned-words"
     "uninterned-words"
     "word-props"
-    "word.private"
+    "word::private"
 } ;
 
 ARTICLE: "words" "Words"

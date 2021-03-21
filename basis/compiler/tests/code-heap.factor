@@ -1,6 +1,6 @@
 USING: accessors combinators.short-circuit compiler.units kernel
 locals math random sequences tools.memory tools.test vocabs words ;
-IN: compiler.tests.code-heap
+IN: compiler::tests.code-heap
 
 ! This is a test for filling up the code heap.
 !

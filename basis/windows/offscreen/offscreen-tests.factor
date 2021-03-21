@@ -1,4 +1,4 @@
-IN: windows.offscreen.tests
+IN: windows.offscreen::tests
 USING: windows.offscreen effects tools.test kernel images ;
 
 { 1 1 } [ [ [ ] make-bitmap-image ] with-memory-dc ] must-infer-as

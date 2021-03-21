@@ -3,7 +3,7 @@
 ! mersenne twister based on
 ! http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c
 USING: accessors alien.c-types alien.data fry init kernel math
-math.bitwise namespaces random sequences sequences.private
+math.bitwise namespaces random sequences sequences::private
 specialized-arrays system ;
 SPECIALIZED-ARRAY: uint
 IN: random.mersenne-twister

@@ -6,12 +6,12 @@ compiler.cfg.optimizer compiler.cfg.registers
 compiler.cfg.stacks.local compiler.cfg.utilities compiler.test
 compiler.tree compiler.tree.builder compiler.tree.optimizer
 compiler.tree.propagation.info cpu.architecture fry hashtables io
-kernel kernel.private locals make math math.intervals
-math.partial-dispatch math.private namespaces prettyprint sbufs
-sequences sequences.private slots.private strings strings.private
+kernel kernel::private locals make math math.intervals
+math.partial-dispatch math::private namespaces prettyprint sbufs
+sequences sequences::private slots::private strings strings::private
 tools.test vectors words ;
 FROM: alien.c-types => int ;
-IN: compiler.cfg.builder.tests
+IN: compiler.cfg.builder::tests
 
 ! Just ensure that various CFGs build correctly.
 : unit-test-builder ( quot -- )

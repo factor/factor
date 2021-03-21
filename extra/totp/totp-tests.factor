@@ -1,7 +1,7 @@
 ! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar checksums.sha tools.test totp ;
-IN: totp.tests
+IN: totp::tests
 
 CONSTANT: sha1-seed B{
     49 50 51 52 53 54 55 56 57 48 49 50 51 52 53 54 55 56 57 48

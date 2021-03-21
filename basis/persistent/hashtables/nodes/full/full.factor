@@ -1,6 +1,6 @@
 ! Based on Clojure's PersistentHashMap by Rich Hickey.
 
-USING: math accessors kernel arrays sequences sequences.private
+USING: math accessors kernel arrays sequences sequences::private
 locals
 persistent.sequences
 persistent.hashtables.config

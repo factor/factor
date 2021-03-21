@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cpu.arm.assembler cpu.arm.assembler.opcodes
 tools.test ;
-IN: cpu.arm.assembler.tests
+IN: cpu.arm.assembler::tests
 
 { 0x91000210 } [ [ 0 X16 X16 ADDi64 ] test-arm64-instruction ] unit-test
 { 0x91002210 } [ [ 8 X16 X16 ADDi64 ] test-arm64-instruction ] unit-test

@@ -3,7 +3,7 @@ tools.test words sets combinators.short-circuit
 stack-checker.state compiler.tree compiler.tree.builder
 compiler.tree.recursive compiler.tree.normalization
 compiler.tree.propagation compiler.tree.cleanup
-compiler.tree.def-use arrays kernel.private sorting math.order
+compiler.tree.def-use arrays kernel::private sorting math.order
 binary-search compiler.tree.checker ;
 IN: compiler.tree.def-use.tests
 

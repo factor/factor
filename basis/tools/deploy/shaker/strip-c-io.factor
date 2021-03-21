@@ -1,5 +1,5 @@
 USING: compiler.units definitions io.backend io.streams.c kernel
-math threads.private vocabs ;
+math threads::private vocabs ;
 
 [
     c-io-backend forget

@@ -3,7 +3,7 @@
 USING: alien alien.c-types alien.libraries alien.syntax arrays
 combinators destructors fry kernel layouts libc make math
 math.order math.parser namespaces sequences splitting system
-tools.disassembler.private tools.disassembler.utils tools.memory
+tools.disassembler::private tools.disassembler.utils tools.memory
 ;
 IN: tools.disassembler.udis
 

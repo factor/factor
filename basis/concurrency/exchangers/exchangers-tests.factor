@@ -2,7 +2,7 @@ USING: tools.test concurrency.exchangers
 concurrency.count-downs concurrency.promises locals kernel
 threads ;
 FROM: sequences => 3append ;
-IN: concurrency.exchangers.tests
+IN: concurrency.exchangers::tests
 
 :: exchanger-test ( -- string )
     <exchanger> :> ex

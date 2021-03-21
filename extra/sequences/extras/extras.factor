@@ -1,6 +1,6 @@
 USING: accessors arrays assocs combinators fry generalizations
 grouping growable kernel locals make math math.order math.ranges
-sequences sequences.deep sequences.private shuffle sorting
+sequences sequences.deep sequences::private shuffle sorting
 splitting vectors ;
 IN: sequences.extras
 

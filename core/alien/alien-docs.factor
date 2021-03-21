@@ -45,7 +45,7 @@ HELP: alien
 { $class-description "The class of alien pointers. See " { $link "syntax-aliens" } " for syntax and " { $link "c-data" } " for general information." } ;
 
 HELP: dll
-{ $class-description "The class of native library handles. See " { $link "syntax-aliens" } " for syntax and " { $link "dll.private" } " for general information."
+{ $class-description "The class of native library handles. See " { $link "syntax-aliens" } " for syntax and " { $link "dll::private" } " for general information."
 $nl
 "The dll tuple has one slot 'path' which holds the filesystem path to the library being loaded in the systems " { $link native-string-encoding } ", usually " { $link utf8 } " on unices and " { $link utf16n } " on windows." } ;
 
@@ -243,7 +243,7 @@ $nl
 "The combinator for generating arbitrary assembly by calling a quotation at compile time:"
 { $subsection alien-assembly } ;
 
-ARTICLE: "dll.private" "DLL handles"
+ARTICLE: "dll::private" "DLL handles"
 "DLL handles are a built-in class of objects which represent loaded native libraries. DLL handles are instances of the " { $link dll } " class, and have a literal syntax used for debugging printouts; see " { $link "syntax-aliens" } "."
 $nl
 "Usually one never has to deal with DLL handles directly; the C library interface creates them as required. However if direct access to these operating system facilities is required, the following primitives can be used:"
@@ -333,7 +333,7 @@ $nl
     "classes.struct"
     "alien-globals"
     "alien-assembly"
-    "dll.private"
+    "dll::private"
     "embedding"
 } ;
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel ryu math math.bitwise tools.test ;
-IN: ryu.tests
+IN: ryu::tests
 
 ! Basic
 { "0e0" } [ 0.0 d2s ] unit-test

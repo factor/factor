@@ -1,4 +1,4 @@
-USING: math math.parser sequences sequences.private kernel
+USING: math math.parser sequences sequences::private kernel
 arrays make io ;
 IN: benchmark.nsieve
 

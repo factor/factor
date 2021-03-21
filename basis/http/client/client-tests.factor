@@ -1,6 +1,6 @@
-USING: accessors http http.client http.client.private
+USING: accessors http http.client http.client::private
 io.streams.string kernel namespaces sequences tools.test urls ;
-IN: http.client.tests
+IN: http.client::tests
 
 { "foo.txt" } [ "http://www.paulgraham.com/foo.txt" download-name ] unit-test
 { "foo.txt" } [ "http://www.arc.com/foo.txt?xxx" download-name ] unit-test
@@ -14,7 +14,7 @@ IN: http.client.tests
         { method "GET" }
         { version "1.1" }
         { cookies V{ } }
-        { header H{ { "connection" "close" } { "user-agent" "Factor http.client" } } }
+        { header H{ { "Connection" "close" } { "User-Agent" "Factor http.client" } } }
         { redirects 10 }
     }
 } [
@@ -29,7 +29,7 @@ IN: http.client.tests
         { method "GET" }
         { version "1.1" }
         { cookies V{ } }
-        { header H{ { "connection" "close" } { "user-agent" "Factor http.client" } } }
+        { header H{ { "Connection" "close" } { "User-Agent" "Factor http.client" } } }
         { redirects 10 }
     }
 } [
@@ -127,8 +127,8 @@ IN: http.client.tests
 
 ! TODO support 192.168.0.16/4 ?
 CONSTANT: classic-proxy-settings H{
-    { "http.proxy" "http://proxy.private:3128" }
-    { "https.proxy" "http://proxysec.private:3128" }
+    { "http.proxy" "http://proxy::private:3128" }
+    { "https.proxy" "http://proxysec::private:3128" }
     { "no_proxy" "localhost,127.0.0.1,.allprivate,.a.subprivate,b.subprivate" }
 }
 
@@ -144,7 +144,7 @@ CONSTANT: classic-proxy-settings H{
     ] with-variables
 ] unit-test
 
-{ URL" http://proxy.private:3128" } [
+{ URL" http://proxy::private:3128" } [
     classic-proxy-settings [
        "27.0.0.1" "GET" <client-request> ?default-proxy proxy-url>>
     ] with-variables
@@ -162,7 +162,7 @@ CONSTANT: classic-proxy-settings H{
     ] with-variables
 ] unit-test
 
-{ URL" http://proxy.private:3128" } [
+{ URL" http://proxy::private:3128" } [
     classic-proxy-settings [
        "a.subprivate" "GET" <client-request> ?default-proxy proxy-url>>
     ] with-variables
@@ -180,13 +180,13 @@ CONSTANT: classic-proxy-settings H{
     ] with-variables
 ] unit-test
 
-{ URL" http://proxy.private:3128" } [
+{ URL" http://proxy::private:3128" } [
     classic-proxy-settings [
        "bara.subprivate" "GET" <client-request> ?default-proxy proxy-url>>
     ] with-variables
 ] unit-test
 
-{ URL" http://proxy.private:3128" } [
+{ URL" http://proxy::private:3128" } [
     classic-proxy-settings [
        "google.com" "GET" <client-request> ?default-proxy proxy-url>>
     ] with-variables
@@ -208,13 +208,13 @@ CONSTANT: classic-proxy-settings H{
     "//localhost:3128" >>proxy-url ?default-proxy proxy-url>>
 ] unit-test
 
-{ URL" http://proxysec.private:3128" } [
+{ URL" http://proxysec::private:3128" } [
     classic-proxy-settings [
        "https://google.com" "GET" <client-request> ?default-proxy proxy-url>>
     ] with-variables
 ] unit-test
 
-{ URL" http://proxy.private:3128" } [
+{ URL" http://proxy::private:3128" } [
     classic-proxy-settings [
        "allprivate.google.com" "GET" <client-request> ?default-proxy proxy-url>>
     ] with-variables

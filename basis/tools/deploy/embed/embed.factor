@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Joe Groff
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.data bootstrap.image.private
+USING: alien.c-types alien.data bootstrap.image::private
 destructors io io.directories io.encodings.binary io.files
 kernel locals system ;
 IN: tools.deploy.embed

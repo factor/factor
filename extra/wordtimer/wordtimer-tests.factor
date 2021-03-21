@@ -1,5 +1,5 @@
 USING: tools.test wordtimer math kernel tools.annotations prettyprint ;
-IN: wordtimer.tests
+IN: wordtimer::tests
 
 : testfn ( a b c d -- a+b c+d )
   + [ + ] dip ;

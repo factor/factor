@@ -2,7 +2,7 @@ USING: accessors io io.encodings io.encodings.ascii
 io.encodings.string io.encodings.utf8 io.files
 io.streams.byte-array io.streams.string kernel namespaces
 tools.test ;
-IN: io.encodings.tests
+IN: io.encodings::tests
 
 { { } }
 [ "vocab:io/test/empty-file.txt" ascii file-lines ]

@@ -1,6 +1,6 @@
 USING: compiler.tree.propagation.copy tools.test namespaces kernel
 assocs ;
-IN: compiler.tree.propagation.copy.tests
+IN: compiler.tree.propagation.copy::tests
 
 H{ } clone copies set
 

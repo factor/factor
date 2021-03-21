@@ -1,7 +1,7 @@
 USING: accessors alien.data alien.data.map byte-arrays combinators combinators.short-circuit
 fry generalizations images kernel locals math math.constants math.functions
 math.libm math.matrices.simd math.vectors math.vectors.conversion math.vectors.simd
-memoize random random.mersenne-twister sequences sequences.private specialized-arrays
+memoize random random.mersenne-twister sequences sequences::private specialized-arrays
 typed ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAYS: c:float c:uchar float-4 uchar-16 ;

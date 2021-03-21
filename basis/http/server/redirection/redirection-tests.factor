@@ -1,6 +1,6 @@
 USING: http http.server.redirection urls accessors
 namespaces tools.test present kernel ;
-IN: http.server.redirection.tests
+IN: http.server.redirection::tests
 
 [
     <request>

@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays compiler.test continuations generalizations
-kernel kernel.private locals math.vectors.conversion math.vectors.simd
+kernel kernel::private locals math.vectors.conversion math.vectors.simd
 sequences stack-checker tools.test sequences.generalizations ;
 FROM: alien.c-types => char uchar short ushort int uint longlong ulonglong float double ;
-IN: math.vectors.conversion.tests
+IN: math.vectors.conversion::tests
 
 ERROR: optimized-vconvert-inconsistent
     unoptimized-result

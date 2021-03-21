@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel random random.sfmt random.sfmt.private
+USING: accessors kernel random random.sfmt random.sfmt::private
 sequences tools.test ;
 
 ! Period certified by virtue of seed

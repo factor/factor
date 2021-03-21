@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 USING: fry kernel lexer macros math math.parser namespaces
-random random.private sequences splitting ;
+random random::private sequences splitting ;
 IN: dice
 
 : (random-roll) ( #dice #sides obj -- n )

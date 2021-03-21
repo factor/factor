@@ -1,9 +1,9 @@
 ! Copyright (C) 2009, 2010 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.private
+USING: accessors combinators combinators::private
 combinators.short-circuit compiler.tree.propagation.info
 compiler.tree.propagation.inlining compiler.units continuations
-effects fry kernel kernel.private namespaces quotations
+effects fry kernel kernel::private namespaces quotations
 sequences stack-checker stack-checker.dependencies
 stack-checker.transforms words ;
 IN: compiler.tree.propagation.call-effect

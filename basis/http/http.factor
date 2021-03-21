@@ -160,8 +160,8 @@ TUPLE: request
         <url> >>proxy-url
         H{ } clone >>header
         V{ } clone >>cookies
-        "close" "connection" set-header
-        "Factor http.client" "user-agent" set-header
+        "close" "Connection" set-header
+        "Factor http.client" "User-Agent" set-header
         max-redirects >>redirects ;
 
 : header ( request/response key -- value )
@@ -183,9 +183,9 @@ TUPLE: response
     response new
         "1.1" >>version
         H{ } clone >>header
-        "close" "connection" set-header
-        now timestamp>http-string "date" set-header
-        "Factor http.server" "server" set-header
+        "close" "Connection" set-header
+        now timestamp>http-string "Date" set-header
+        "Factor http.server" "Server" set-header
         utf8 >>content-encoding
         V{ } clone >>cookies ;
 

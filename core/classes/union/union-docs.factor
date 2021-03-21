@@ -1,4 +1,4 @@
-USING: classes classes.builtin classes.union.private compiler.units
+USING: classes classes.builtin classes.union::private compiler.units
 help.markup help.syntax kernel ;
 IN: classes.union
 

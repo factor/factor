@@ -1,4 +1,4 @@
-IN: compiler.tests.x87-regression
+IN: compiler::tests.x87-regression
 USING: math.floats.env alien.syntax alien.c-types compiler.test
 tools.test kernel math ;
 

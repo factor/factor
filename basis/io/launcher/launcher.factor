@@ -3,7 +3,7 @@
 
 USING: accessors assocs calendar combinators concurrency.flags
 debugger destructors environment fry init io io.backend
-io.encodings io.encodings.utf8 io.pipes io.pipes.private
+io.encodings io.encodings.utf8 io.pipes io.pipes::private
 io.ports io.streams.duplex io.timeouts kernel math math.order
 namespaces prettyprint sequences strings system threads vocabs ;
 

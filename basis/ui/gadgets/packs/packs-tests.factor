@@ -1,4 +1,4 @@
-USING: ui.gadgets.packs ui.gadgets.packs.private
+USING: ui.gadgets.packs ui.gadgets.packs::private
 ui.gadgets.labels ui.gadgets ui.gadgets.debug ui.render
 ui.baseline-alignment kernel namespaces tools.test math.parser
 sequences math.rectangles accessors math ;

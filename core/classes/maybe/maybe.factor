@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes classes.algebra
-classes.algebra.private classes.private classes.union.private
+classes.algebra::private classes::private classes.union::private
 kernel words ;
 IN: classes.maybe
 

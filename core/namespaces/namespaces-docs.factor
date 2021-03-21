@@ -1,5 +1,5 @@
 USING: assocs help.markup help.syntax kernel math
-namespaces.private quotations words words.symbol ;
+namespaces::private quotations words words.symbol ;
 IN: namespaces
 
 ARTICLE: "namespaces-combinators" "Namespace combinators"
@@ -30,7 +30,7 @@ ARTICLE: "namespaces-global" "Global variables"
     with-global
 } ;
 
-ARTICLE: "namespaces.private" "Namespace implementation details"
+ARTICLE: "namespaces::private" "Namespace implementation details"
 "The namestack holds namespaces."
 { $subsections
     get-namestack
@@ -59,7 +59,7 @@ $nl
     "namespaces-combinators"
 }
 "Implementation details your code probably does not care about:"
-{ $subsections "namespaces.private" }
+{ $subsections "namespaces::private" }
 "Dynamic variables complement " { $link "locals" } "." ;
 
 ABOUT: "namespaces"

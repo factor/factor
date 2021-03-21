@@ -1,5 +1,5 @@
-USING: bootstrap.image.private byte-arrays help.markup help.syntax
-io.pathnames kernel.private math quotations sequences strings vectors
+USING: bootstrap.image::private byte-arrays help.markup help.syntax
+io.pathnames kernel::private math quotations sequences strings vectors
 words ;
 IN: bootstrap.image
 

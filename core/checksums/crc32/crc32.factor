@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: checksums io.binary kernel math sequences
-sequences.private ;
+sequences::private ;
 IN: checksums.crc32
 
 CONSTANT: crc32-polynomial 0xedb88320

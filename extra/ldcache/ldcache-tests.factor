@@ -1,5 +1,5 @@
 USING: accessors ldcache system tools.test ;
-IN: ldcache.tests
+IN: ldcache::tests
 
 : entries ( -- entries )
     {

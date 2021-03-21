@@ -1,7 +1,7 @@
 ! Copyright (C) 2014 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays byte-arrays compression.snappy kernel tools.test ;
-IN: compression.snappy.tests
+IN: compression.snappy::tests
 
 { t } [
     1000 2 <array> >byte-array [ snappy-compress snappy-uncompress ] keep =

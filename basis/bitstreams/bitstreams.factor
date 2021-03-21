@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays byte-vectors
 combinators.short-circuit io.binary kernel math math.bitwise
-sequences sequences.private ;
+sequences sequences::private ;
 IN: bitstreams
 
 TUPLE: widthed

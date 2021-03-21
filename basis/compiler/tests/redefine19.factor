@@ -1,5 +1,5 @@
 USING: kernel classes.mixin compiler.units tools.test generic ;
-IN: compiler.tests.redefine19
+IN: compiler::tests.redefine19
 
 GENERIC: g ( a -- b )
 

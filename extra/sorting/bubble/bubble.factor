@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: kernel locals math math.order math.ranges sequences
-sequences.private ;
+sequences::private ;
 
 IN: sorting.bubble
 

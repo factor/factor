@@ -1,4 +1,4 @@
-USING: arrays classes fry kernel kernel.private locals macros
+USING: arrays classes fry kernel kernel::private locals macros
 namespaces ;
 IN: typed.namespaces
 

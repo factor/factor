@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test math kernel sets generic
-ui.baseline-alignment ui.baseline-alignment.private ;
+ui.baseline-alignment ui.baseline-alignment::private ;
 
 ! Test baseline calculations
 { 10 0 } [ 0 10 0 10 combine-metrics ] unit-test

@@ -1,5 +1,5 @@
 USING: arrays assocs kernel math memory namespaces parser sequences
-tools.memory tools.memory.private tools.test tools.time vm ;
+tools.memory tools.memory::private tools.test tools.time vm ;
 
 { } [ room. ] unit-test
 { } [ heap-stats. ] unit-test

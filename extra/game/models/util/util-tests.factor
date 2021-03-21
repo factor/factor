@@ -1,5 +1,5 @@
 USING: game.models.util tools.test make accessors kernel ;
-IN: game.models.util.tests
+IN: game.models.util::tests
 
 { V{ 1 2 3 4 } } [
     [ 1 , 1 , 2 , 3 , 3 , 4 , ]

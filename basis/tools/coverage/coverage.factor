@@ -3,7 +3,7 @@
 USING: accessors arrays assocs classes combinators.short-circuit
 continuations fry io kernel math namespaces prettyprint
 quotations sequences sequences.deep splitting strings
-tools.annotations tools.test.private vocabs words words.symbol ;
+tools.annotations tools.test::private vocabs words words.symbol ;
 IN: tools.coverage
 
 TUPLE: coverage-state < identity-tuple executed? ;
@@ -28,7 +28,7 @@ GENERIC: reset-coverage ( object -- )
 <PRIVATE
 
 : private-vocab-name ( string -- string' )
-    ".private" ?tail drop ".private" append ;
+    "::private" ?tail drop "::private" append ;
 
 : coverage-words ( string -- words )
     vocab-words [
@@ -42,7 +42,7 @@ GENERIC: reset-coverage ( object -- )
 PRIVATE>
 
 : each-word ( string quot -- )
-    over ".private" tail? [
+    over "::private" tail? [
         [ coverage-words ] dip each
     ] [
         [ [ private-vocab-name coverage-words ] dip each ]
@@ -50,7 +50,7 @@ PRIVATE>
     ] if ; inline
 
 : map-words ( string quot -- sequence )
-    over ".private" tail? [
+    over "::private" tail? [
         [ coverage-words ] dip map
     ] [
         [ [ private-vocab-name coverage-words ] dip map ]
@@ -131,7 +131,7 @@ PRIVATE>
     ] bi ;
 
 : coverage-vocab? ( vocab -- ? )
-    { [ ".private" tail? ] [ ".tests" tail? ] } 1|| not ;
+    { [ "::private" tail? ] [ ".tests" tail? ] } 1|| not ;
 
 : test-coverage-recursively ( prefix -- assoc )
     loaded-child-vocab-names [ coverage-vocab? ] filter

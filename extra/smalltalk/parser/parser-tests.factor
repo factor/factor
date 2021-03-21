@@ -1,6 +1,6 @@
 USING: smalltalk.parser smalltalk.ast peg.ebnf tools.test accessors
 io.files io.encodings.ascii kernel multiline ;
-IN: smalltalk.parser.tests
+IN: smalltalk.parser::tests
 
 EBNF: test-Character [=[
 test         = <foreign parse-smalltalk Character>

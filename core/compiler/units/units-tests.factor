@@ -1,6 +1,6 @@
 USING: arrays compiler compiler.units definitions eval fry
 kernel math namespaces quotations sequences tools.test words ;
-IN: compiler.units.tests
+IN: compiler.units::tests
 
 [ [ [ ] define-temp ] with-compilation-unit ] must-infer
 [ [ [ ] define-temp ] with-nested-compilation-unit ] must-infer
@@ -54,7 +54,7 @@ observer add-definition-observer
 
 DEFER: nesting-test
 
-{ } [ "IN: compiler.units.tests << : nesting-test ( -- ) ; >>" eval( -- ) ] unit-test
+{ } [ "IN: compiler.units::tests << : nesting-test ( -- ) ; >>" eval( -- ) ] unit-test
 
 observer remove-definition-observer
 

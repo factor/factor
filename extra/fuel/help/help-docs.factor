@@ -1,4 +1,4 @@
-USING: fuel.help.private help.markup help.syntax sequences strings ;
+USING: fuel.help::private help.markup help.syntax sequences strings ;
 IN: fuel.help
 
 HELP: article-parents

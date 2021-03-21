@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry tools.test math prettyprint kernel io arrays
 sequences eval accessors ;
-IN: fry.tests
+IN: fry::tests
 
 SYMBOLS: a b c d e f g h ;
 

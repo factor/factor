@@ -2,7 +2,7 @@ USING: specialized-arrays sequences.complex
 kernel sequences tools.test arrays accessors ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
-IN: sequences.complex.tests
+IN: sequences.complex::tests
 
 : test-array ( -- x )
     float-array{ 1.0 2.0 3.0 4.0 } clone <complex-sequence> ;

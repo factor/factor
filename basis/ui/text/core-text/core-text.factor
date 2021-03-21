@@ -3,7 +3,7 @@
 USING: accessors cache core-graphics.types core-text
 core-text.fonts io.encodings.string io.encodings.utf16n kernel
 locals math math.vectors namespaces sequences ui.text
-ui.text.private ;
+ui.text::private ;
 IN: ui.text.core-text
 
 SINGLETON: core-text-renderer

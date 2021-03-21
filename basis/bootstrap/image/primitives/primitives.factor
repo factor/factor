@@ -1,6 +1,6 @@
 USING: alien alien.strings arrays assocs byte-arrays
-io.encodings.ascii kernel kernel.private locals math quotations
-sequences sequences.generalizations sequences.private strings words ;
+io.encodings.ascii kernel kernel::private locals math quotations
+sequences sequences.generalizations sequences::private strings words ;
 IN: bootstrap.image.primitives
 
 CONSTANT: all-primitives {
@@ -23,7 +23,7 @@ CONSTANT: all-primitives {
         }
     }
     {
-        "alien.private"
+        "alien::private"
         {
             { "current-callback" ( -- n ) "current_callback" { } { fixnum } make-flushable }
         }
@@ -182,7 +182,7 @@ CONSTANT: all-primitives {
         }
     }
     {
-        "classes.tuple.private"
+        "classes.tuple::private"
         {
             {
                 "<tuple-boa>" ( slots... layout -- tuple ) "tuple_boa"
@@ -205,7 +205,7 @@ CONSTANT: all-primitives {
         }
     }
     {
-        "generic.single.private"
+        "generic.single::private"
         {
             { "inline-cache-miss" ( generic methods index cache -- ) f f f f }
             { "inline-cache-miss-tail" ( generic methods index cache -- ) f f f f }
@@ -218,7 +218,7 @@ CONSTANT: all-primitives {
         }
     }
     {
-        "io.files.private"
+        "io.files::private"
         {
             { "(exists?)" ( path -- ? ) "existsp" { string } { object } f }
         }
@@ -280,7 +280,7 @@ CONSTANT: all-primitives {
         }
     }
     {
-        "kernel.private"
+        "kernel::private"
         {
             { "(call)" ( quot -- ) f f f f }
             { "(execute)" ( word -- ) f f f f }
@@ -394,7 +394,7 @@ CONSTANT: all-primitives {
         }
     }
     {
-        "math.parser.private"
+        "math.parser::private"
         {
             {
                 "(format-float)" ( n fill width precision format locale -- byte-array )
@@ -405,7 +405,7 @@ CONSTANT: all-primitives {
         }
     }
     {
-        "math.private"
+        "math::private"
         {
             { "both-fixnums?" ( x y -- ? ) f { object object } { object } f }
             {
@@ -658,7 +658,7 @@ CONSTANT: all-primitives {
         }
     }
     {
-        "memory.private"
+        "memory::private"
         {
             {
                 "(save-image)" ( path1 path2 then-die? -- ) "save_image"
@@ -681,7 +681,7 @@ CONSTANT: all-primitives {
         }
     }
     {
-        "quotations.private"
+        "quotations::private"
         {
             {
                 "array>quotation" ( array -- quot ) "array_to_quotation"
@@ -690,7 +690,7 @@ CONSTANT: all-primitives {
         }
     }
     {
-        "slots.private"
+        "slots::private"
         {
             { "set-slot" ( value obj n -- ) "set_slot" { object object fixnum } { } f }
             { "slot" ( obj m -- value ) f { object fixnum } { object } make-flushable }
@@ -710,7 +710,7 @@ CONSTANT: all-primitives {
         }
     }
     {
-        "strings.private"
+        "strings::private"
         {
             {
                 "set-string-nth-fast" ( ch n string -- ) "set_string_nth_fast"
@@ -732,7 +732,7 @@ CONSTANT: all-primitives {
         }
     }
     {
-        "threads.private"
+        "threads::private"
         {
             { "(sleep)" ( nanos -- ) "sleep" { integer } { } f }
             { "(set-context)" ( obj context -- obj' ) f { object alien } { object } f }
@@ -746,14 +746,14 @@ CONSTANT: all-primitives {
         }
     }
     {
-        "tools.dispatch.private"
+        "tools.dispatch::private"
         {
             { "dispatch-stats" ( -- stats ) "dispatch_stats" { } { byte-array } f }
             { "reset-dispatch-stats" ( -- ) "reset_dispatch_stats" { } { } f }
         }
     }
     {
-        "tools.memory.private"
+        "tools.memory::private"
         {
             {
                 "(callback-room)" ( -- allocator-room ) "callback_room"
@@ -776,7 +776,7 @@ CONSTANT: all-primitives {
         }
     }
     {
-        "tools.profiler.sampling.private"
+        "tools.profiler.sampling::private"
         {
             { "set-profiling" ( n -- ) "set_profiling" { object } { } f }
             { "get-samples" ( -- samples/f ) "get_samples" { } { object } f }
@@ -793,7 +793,7 @@ CONSTANT: all-primitives {
         }
     }
     {
-        "words.private"
+        "words::private"
         {
             {
                 "(word)" ( name vocab hashcode -- word ) "word"

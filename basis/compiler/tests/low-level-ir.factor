@@ -4,7 +4,7 @@ compiler.cfg.linear-scan compiler.cfg.registers
 compiler.cfg.ssa.destruction compiler.cfg.utilities compiler.codegen
 compiler.test compiler.units cpu.architecture hashtables kernel
 layouts literals math namespaces sequences tools.test words ;
-IN: compiler.tests.low-level-ir
+IN: compiler::tests.low-level-ir
 
 : compile-cfg ( cfg -- word )
     gensym [

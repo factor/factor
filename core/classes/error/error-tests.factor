@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes classes.error classes.tuple
 compiler.units effects eval generic kernel tools.test words ;
-IN: classes.error.tests
+IN: classes.error::tests
 
 ! Test error classes
 ERROR: error-class-test a b c ;
@@ -10,14 +10,14 @@ ERROR: error-class-test a b c ;
 { "( a b c -- * )" } [ \ error-class-test stack-effect effect>string ] unit-test
 { f } [ \ error-class-test "inline" word-prop ] unit-test
 
-[ "IN: classes.error.tests ERROR: error-x ; : error-x 3 ;" eval( -- ) ]
+[ "IN: classes.error::tests ERROR: error-x ; : error-x 3 ;" eval( -- ) ]
 [ error>> error>> redefine-error? ] must-fail-with
 
 DEFER: error-y
 
 { } [ [ \ error-y dup class? [ forget-class ] [ drop ] if ] with-compilation-unit ] unit-test
 
-{ } [ "IN: classes.error.tests GENERIC: error-y ( a -- b )" eval( -- ) ] unit-test
+{ } [ "IN: classes.error::tests GENERIC: error-y ( a -- b )" eval( -- ) ] unit-test
 
 { f } [ \ error-y tuple-class? ] unit-test
 
@@ -25,7 +25,7 @@ DEFER: error-y
 
 { t } [ \ error-y generic? ] unit-test
 
-{ } [ "IN: classes.error.tests ERROR: error-y ;" eval( -- ) ] unit-test
+{ } [ "IN: classes.error::tests ERROR: error-y ;" eval( -- ) ] unit-test
 
 { t } [ \ error-y tuple-class? ] unit-test
 

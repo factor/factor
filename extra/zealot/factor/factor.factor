@@ -6,8 +6,8 @@ concurrency.combinators environment formatting fry http.client
 io io.directories io.launcher io.pathnames kernel math.parser
 memory modern.paths namespaces parser.notes prettyprint
 sequences sequences.extras sets splitting system system-info
-threads tools.test tools.test.private vocabs vocabs.hierarchy
-vocabs.hierarchy.private vocabs.loader vocabs.metadata zealot ;
+threads tools.test tools.test::private vocabs vocabs.hierarchy
+vocabs.hierarchy::private vocabs.loader vocabs.metadata zealot ;
 IN: zealot.factor
 
 : download-boot-checksums ( path branch -- )

@@ -1,7 +1,7 @@
 ! Copyright (C) 2016 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: checksums io.binary kernel math sequences
-sequences.private ;
+sequences::private ;
 IN: checksums.crc16
 
 CONSTANT: crc16-polynomial 0xa001

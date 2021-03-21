@@ -1,6 +1,6 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
-USING: accessors kernel math sequences sequences.private ;
+USING: accessors kernel math sequences sequences::private ;
 IN: sequences.shifted
 
 TUPLE: shifted

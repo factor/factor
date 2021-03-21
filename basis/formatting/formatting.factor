@@ -6,7 +6,7 @@ io.streams.string kernel math math.functions
 math.functions.integer-logs math.parser multiline namespaces
 peg.ebnf present prettyprint quotations sequences
 sequences.generalizations splitting strings unicode ;
-FROM: math.parser.private => format-float ;
+FROM: math.parser::private => format-float ;
 IN: formatting
 
 ERROR: unknown-format-directive value ;

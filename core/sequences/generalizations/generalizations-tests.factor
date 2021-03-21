@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.streams.string kernel math sequences
 sequences.generalizations tools.test ;
-IN: sequences.generalizations.tests
+IN: sequences.generalizations::tests
 
 { 1 2 3 4 } [ { 1 2 3 4 } 4 firstn ] unit-test
 { { 1 2 3 4 } } [ 1 2 3 4 { f f f f } [ 4 set-firstn ] keep ] unit-test

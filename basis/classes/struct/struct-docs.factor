@@ -1,6 +1,6 @@
 ! Copyright (C) Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien classes classes.struct.private help.markup help.syntax
+USING: alien classes classes.struct::private help.markup help.syntax
 kernel libc math sequences ;
 IN: classes.struct
 

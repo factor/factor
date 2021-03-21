@@ -1,7 +1,7 @@
 ! Copyback (C) 2008 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test persistent.deques kernel math ;
-IN: persistent.deques.tests
+IN: persistent.deques::tests
 
 { 3 2 1 t }
 [ { 1 2 3 } sequence>deque 3 [ pop-back ] times deque-empty? ] unit-test

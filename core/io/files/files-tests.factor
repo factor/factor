@@ -2,11 +2,11 @@ USING: alien alien.c-types alien.data arrays classes.struct
 compiler.units continuations destructors generic.single io
 io.backend io.directories io.encodings io.encodings.ascii
 io.encodings.binary io.encodings.latin1 io.encodings.string
-io.encodings.utf16 io.encodings.utf8 io.files io.files.private
+io.encodings.utf16 io.encodings.utf8 io.files io.files::private
 io.pathnames kernel locals make math sequences
 specialized-arrays system threads tools.test vocabs ;
-FROM: specialized-arrays.private => specialized-array-vocab ;
-IN: io.files.tests
+FROM: specialized-arrays::private => specialized-array-vocab ;
+IN: io.files::tests
 
 SPECIALIZED-ARRAY: int
 

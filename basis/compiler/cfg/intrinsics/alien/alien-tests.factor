@@ -3,7 +3,7 @@ compiler.cfg.builder.blocks compiler.cfg.instructions
 compiler.cfg.intrinsics.alien compiler.test compiler.tree
 compiler.tree.propagation.info cpu.architecture kernel make
 math.intervals sequences ;
-IN: compiler.cfg.intrinsics.alien.tests
+IN: compiler.cfg.intrinsics.alien::tests
 
 ! emit-<displaced-alien>
 

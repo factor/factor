@@ -3,7 +3,7 @@
 USING: accessors alien.enums alien.syntax arrays calendar
 combinators combinators.smart constructors destructors grouping
 io io.binary io.encodings.binary io.encodings.string
-io.encodings.utf8 io.sockets io.sockets.private
+io.encodings.utf8 io.sockets io.sockets::private
 io.streams.byte-array io.timeouts kernel make math math.bitwise
 math.parser namespaces random sequences slots.syntax splitting
 system vectors vocabs strings ascii ;
