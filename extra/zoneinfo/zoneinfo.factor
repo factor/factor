@@ -132,7 +132,7 @@ ERROR: zone-not-found name ;
         [
             letters>> swap "%" split1 dup [ 1 tail ] when surround
         ] with V{ } map-as
-    ] map-zip ;
+    ] zip-with ;
 
 : number>value ( n -- n' )
     {

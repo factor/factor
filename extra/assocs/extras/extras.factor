@@ -189,7 +189,7 @@ PRIVATE>
     dup any-multi-value? [ expand-values-set-at flatten-values ] when ;
 
 : intersect-keys ( assoc seq -- elts )
-    [ of ] with map-zip sift-values ; inline
+    [ of ] with zip-with sift-values ; inline
 
 : values-of ( assoc seq -- elts )
     [ of ] with map sift ; inline
