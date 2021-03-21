@@ -7,7 +7,7 @@ math.trig sequences specialized-arrays ui.gadgets.worlds
 ui.pixel-formats ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
-IN: game.debug::tests
+IN: game.debug.tests
 
 :: clear-screen ( color -- )
     system-framebuffer {
@@ -63,4 +63,4 @@ GAME: run-tests {
         { tick-interval-nanos $[ 60 fps ] }
     } ;
 
-MAIN: run::tests
+MAIN: run-tests
