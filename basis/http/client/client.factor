@@ -57,10 +57,10 @@ ERROR: download-failed response ;
     ] if ;
 
 : set-host-header ( request header -- request header )
-    over url>> unparse-host "host" pick set-at ;
+    over url>> unparse-host "Host" pick set-at ;
 
 : set-cookie-header ( header cookies -- header )
-    unparse-cookie "cookie" pick set-at ;
+    unparse-cookie "Cookie" pick set-at ;
 
 : ?set-basic-auth ( header url name -- header )
     swap [
