@@ -480,10 +480,10 @@ ERROR: compound-syntax-disallowed n seq obj ;
     utf8 file-contents string>literals ;
 
 : lex-paths ( vocabs -- assoc )
-    [ [ path>literals ] [ nip ] recover ] map-zip ;
+    [ [ path>literals ] [ nip ] recover ] zip-with ;
 
 : lex-vocabs ( vocabs -- assoc )
-    [ [ vocab>literals ] [ nip ] recover ] map-zip ;
+    [ [ vocab>literals ] [ nip ] recover ] zip-with ;
 
 : failed-lexing ( assoc -- assoc' ) [ nip array? ] assoc-reject ;
 

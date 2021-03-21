@@ -137,4 +137,4 @@ PRIVATE>
 
 : bucket>alist ( bucket -- alist )
     dup keys
-    [ name>> get-object nip ] with map-zip ;
+    [ name>> get-object nip ] with zip-with ;
