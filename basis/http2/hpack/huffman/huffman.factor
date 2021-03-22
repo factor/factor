@@ -266,11 +266,10 @@ CONSTANT: huffman-table {
         }
 
 ! The codes for each entry in the huffman table
-CONSTANT: huffman-encode-table $[
+MEMO: huffman-encode-table ( -- table )
     huffman-table [
         [ integer>bit-array ] dip f pad-tail reverse
-    ] { } assoc>map
-]
+    ] { } assoc>map ;
 
 CONSTANT: EOS 256
 
@@ -300,6 +299,8 @@ CONSTANT: bit-reverse-table $[
 : bits-to-bytes ( bits -- bytes )
     underlying>> reverse-bits ;
 
+ERROR: hpack-huffman-error message ;
+
 ! probably inefficient, but it works.
 ! just loops over the bits, adding each bit to the current code and searching for
 ! the current code, adding the corresponding symbol if the code
@@ -311,16 +312,16 @@ CONSTANT: bit-reverse-table $[
         [ 2 * ] 2dip 1 0 ? swap 1 [ + ] 2bi@ 
         2dup 2array huffman-table index
         [
-            dup EOS = [ "End of Stream in huffman encoded string" hpack-decode-error ] when
+            dup EOS = [ "End of Stream in huffman encoded string" hpack-huffman-error ] when
             byte-vector push 2drop 0 0
         ] when*
     ] each
 
-    7 > [ "Padding is too long in huffman encoded string" hpack-decode-error ] when
+    7 > [ "Padding is too long in huffman encoded string" hpack-huffman-error ] when
 
     EOS huffman-table nth first integer>bit-array
     swap integer>bit-array tail?
-    [ "Padding is not the most significant bits of the End of Stream code in huffman encoded string" hpack-decode-error ] unless
+    [ "Padding is not the most significant bits of the End of Stream code in huffman encoded string" hpack-huffman-error ] unless
 
     byte-vector utf8 decode ;
 
