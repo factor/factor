@@ -4,6 +4,7 @@ tools.test vocabs.parser ;
 IN: locals.parser.tests
 
 ! (::)
+<<
 {
     "dobiedoo"
     [ load-local 1 drop-locals ]
@@ -34,6 +35,7 @@ IN: locals.parser.tests
         qualified-vocabs last words>> keys "um" swap member?
     ] with-compilation-unit
 ] unit-test
+>>
 
 ! check-local-name
 { "hello" } [
@@ -65,6 +67,7 @@ IN: locals.parser.tests
     [ locals>> [ name>> ] map ] [ keys ] bi*
 ] unit-test
 
+<<
 {
     "V{ 99 :> kkk kkk }"
 } [
@@ -74,3 +77,4 @@ IN: locals.parser.tests
         ] with-lexer
     ] with-compilation-unit unparse
 ] unit-test
+>>
