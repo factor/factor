@@ -1,9 +1,10 @@
-USING: accessors arrays bit-arrays http2.hpack
-io.encodings.string io.encodings.utf8 kernel locals math
-sequences ;
+USING: accessors arrays assocs bit-arrays http2.hpack
+io.encodings.string io.encodings.utf8 kernel literals locals
+make math sequences ;
 
 IN: http2.hpack.huffman
 
+! Table contents from RFC 7541 Appendix B
 CONSTANT: huffman-table {
             {     0x1ff8  13 }
             {   0x7fffd8  23 }
@@ -264,54 +265,67 @@ CONSTANT: huffman-table {
             { 0x3fffffff  30 }
         }
 
+! The codes for each entry in the huffman table
+CONSTANT: huffman-encode-table $[
+    huffman-table [
+        [ integer>bit-array ] dip f pad-tail reverse
+    ] { } assoc>map
+]
+
 CONSTANT: EOS 256
+
+<<
+:: R2, ( n -- ) n ,     n 2 64 * + ,     n 1 64 * + ,     n 3 64 * + , ;
+:: R4, ( n -- ) n R2,   n 2 16 * + R2,   n 1 16 * + R2,   n 3 16 * + R2, ;
+:: R6, ( n -- ) n R4,   n 2 4 * + R4,    n 1 4 * + R4,    n 3 4 * + R4, ;
+>>
+
+CONSTANT: bit-reverse-table $[
+    [ 0 R6, 2 R6, 1 R6, 3 R6, ] B{ } make
+]
+
+: reverse-bits ( byte-array -- byte-array' )
+    [ bit-reverse-table nth ] B{ } map-as ;
+
+: byte-array>bit-array ( byte-array -- bit-array )
+    [ length 8 * ] [ bit-array boa ] bi ;
 
 ! converts a byte array/vector/sequence to a bit array, with
 ! each byte in descending order, such that the most significant
 ! bit of the first byte is the first bit in the sequence.
 : bytes-to-bits ( bytes -- bits )
-    [ integer>bit-array 8 f pad-tail reverse ] { } map-as concat ;
+    reverse-bits byte-array>bit-array ;
 
-! The first bit is the most significant bit of the number
-: code-to-bits ( code -- bits )
-    first2
-    [ integer>bit-array ] dip f pad-tail reverse  
-    ;
-
-! most significant bit first. 
+! most significant bit first.
 : bits-to-bytes ( bits -- bytes )
-    underlying>> bytes-to-bits underlying>>
-    ;
+    underlying>> reverse-bits ;
 
 ! probably inefficient, but it works.
 ! just loops over the bits, adding each bit to the current code and searching for
 ! the current code, adding the corresponding symbol if the code
 ! is found in the table.
-DEFER: hpack-decode-error
 :: huffman-decode ( bytes -- string )
-    bytes bytes-to-bits :> bits
-    0 :> i!
-    B{ } :> byte-string!
-    ! current code and length
-    0 0
-    [ i bits length < ]
-    [ [ 2 * ] dip
-      i bits nth [ 1 ] [ 0 ] if swap 1
-      [ + ] 2bi@ i 1 + i!
-      2dup 2array huffman-table index
-      [ dup EOS = [ "End of Stream in huffman encoded string" hpack-decode-error ] when
-        byte-string swap suffix byte-string! 2drop 0 0 ] when*
-    ] while
+    BV{ } clone :> byte-vector
+    0 0 ! current code and length
+    bytes bytes-to-bits [
+        [ 2 * ] 2dip 1 0 ? swap 1 [ + ] 2bi@ 
+        2dup 2array huffman-table index
+        [
+            dup EOS = [ "End of Stream in huffman encoded string" hpack-decode-error ] when
+            byte-vector push 2drop 0 0
+        ] when*
+    ] each
+
     7 > [ "Padding is too long in huffman encoded string" hpack-decode-error ] when
-    EOS huffman-table nth first integer>bit-array reverse
-    swap integer>bit-array reverse head?
+
+    EOS huffman-table nth first integer>bit-array
+    swap integer>bit-array tail?
     [ "Padding is not the most significant bits of the End of Stream code in huffman encoded string" hpack-decode-error ] unless
-    byte-string utf8 decode
-    ;
+
+    byte-vector utf8 decode ;
 
 : huffman-encode ( string -- bytes )
-    [ huffman-table nth code-to-bits ] { } map-as concat
-    EOS huffman-table nth code-to-bits over length neg 8 rem head
-    append bits-to-bytes
-    ;
+    [ huffman-encode-table nth ] { } map-as concat
+    EOS huffman-encode-table nth over length neg 8 rem head
+    append bits-to-bytes ;
 
