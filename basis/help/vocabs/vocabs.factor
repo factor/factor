@@ -84,7 +84,7 @@ C: <vocab-author> vocab-author
 
 : describe-metadata-files ( vocab -- )
     vocab-metadata-files [ <pathname> ] map [
-        "Meta-data files" $heading
+        "Metadata files" $heading
         [
             files.
         ] ($block)
@@ -254,7 +254,7 @@ C: <vocab-author> vocab-author
         [ vocab-platforms [ "Platforms:" swap \ $links prefix 2array , ] unless-empty ]
         tri
     ] { } make
-    [ "Meta-data" $heading $table ] unless-empty ;
+    [ "Metadata" $heading $table ] unless-empty ;
 
 : $vocab ( element -- )
     first {

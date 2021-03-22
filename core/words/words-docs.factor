@@ -207,7 +207,7 @@ $nl
     { { $snippet "name" } "a word name" }
     { { $snippet "vocabulary" } "a word vocabulary name" }
     { { $snippet "def" } "a definition quotation" }
-    { { $snippet "props" } "an assoc of word properties, including documentation and other meta-data" }
+    { { $snippet "props" } "an assoc of word properties, including documentation and other metadata" }
 }
 "Words are instances of a class."
 { $subsections
