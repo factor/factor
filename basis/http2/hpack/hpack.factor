@@ -183,6 +183,23 @@ CONSTANT: static-table {
     if*
     ;   
 
+! /*
+! version of decode integer that tries to be clever for less
+! stack stuff, but not sure if it actually is...
+:: decode-integer ( block current-index prefix-length -- block new-index number )
+    current-index 1 + :> end-index!
+    current-index block nth prefix-length 2^ 1 - [ mask ] keep over =
+    [
+        current-index 1 + block [ 7 bit? not ] find-from drop 1 + end-index!
+        current-index 1 + end-index block subseq reverse
+        0 [ 127 mask swap 128 * + ] reduce
+        +
+    ] when
+    [ block end-index ] dip ; ! */
+
+/*
+! initial version of decode-integer, which closely follows the
+! pseudocode from the rfc (RFC 7541, section 5.1)
 : decode-integer-fragment ( block index I M -- block index+1 I' M+7 block[index+1] )
     ! increment index and get block[index]
     [ 1 + 2dup swap nth ] 2dip
@@ -191,24 +208,18 @@ CONSTANT: static-table {
     pick 127 mask 2 pick ^ * '[ _ + ] dip
     7 + rot ;
 
-
 : decode-integer ( block current-index prefix-length -- block new-index number )
     ! get the current octet, compute mask, apply mask
-    [ 2dup swap nth ] dip 2 swap ^ 1 - [ mask ] keep
+    [ 2dup swap nth ] dip 2^ 1 - [ mask ] keep
     over = 
     ! stack: block index I loop?
     [ 0
-        ! TODO: consider rewriting this loop using sequence
-        ! words and clever thinking (maybe something like
-        ! finding the index of the next byte starting with 0,
-        ! mapping each byte to the corresponding integer,
-        ! reducing in a clever way and adding the offset
       [ 7 bit? ] [ decode-integer-fragment ] do while 
       ! stack: block index I M, get rid of M, we don't need it
       drop ]
     when ! the prefix matches the mask (exactly all 1s), must loop
     [ 1 + ] dip ! increment the index before return
-    ;
+    ; ! */
 
 : decode-raw-string ( block current-index string-length -- block new-index string )
     over + dup [ pick subseq utf8 decode ] dip swap ;
