@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.tuple combinators
 fry.private hashtables kernel locals.backend locals.errors
-locals.types macros.expander make math quotations sequences
-sequences.generalizations sets words ;
+locals.types macros.expander make math memoize.private
+quotations sequences sets words ;
 
 IN: locals.rewrite
 
@@ -52,7 +52,7 @@ GENERIC: rewrite-element ( obj -- )
     [ rewrite-element ] each ;
 
 : rewrite-sequence ( seq -- )
-    [ rewrite-elements ] [ length ] [ 0 head ] tri '[ _ _ nsequence ] % ;
+    [ rewrite-elements ] [ length ] [ 0 head ] tri [nsequence] % ;
 
 M: sequence rewrite-element
     dup rewrite-literal? [ rewrite-sequence ] [ , ] if ;
