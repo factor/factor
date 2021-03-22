@@ -52,7 +52,8 @@ GENERIC: rewrite-element ( obj -- )
     [ rewrite-element ] each ;
 
 : rewrite-sequence ( seq -- )
-    [ rewrite-elements ] [ length ] [ 0 head ] tri [nsequence] % ;
+    [ rewrite-elements ] [ length ] [ 0 head ] tri
+    [ [nsequence] % ] [ [ like ] curry % ] bi ;
 
 M: sequence rewrite-element
     dup rewrite-literal? [ rewrite-sequence ] [ , ] if ;
