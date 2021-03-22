@@ -224,9 +224,11 @@ CONSTANT: c53h { { ":status" "200" }
 { B{ 0b01011111 0b10011010 0b00001010 } } [ 0b01000000 1337 5 encode-integer ] unit-test
 { B{ 0b00101010 } } [ 0b00000000 42 8 encode-integer ] unit-test
 
-! assumes no huffman encoding
 { B{ 0x0a 0x63 0x75 0x73 0x74 0x6f 0x6d 0x2d 0x6b 0x65 0x79 } }
-[ "custom-key" encode-string ] unit-test
+[ "custom-key" encode-string-raw ] unit-test
+
+{ B{ 0x88 0x25 0xa8 0x49 0xe9 0x5b 0xa9 0x7d 0x7f } }
+[ "custom-key" encode-string-huffman ] unit-test
 
 
 ! single header encoding check, mirrors the tests from RFC 7541, Appendix C.2

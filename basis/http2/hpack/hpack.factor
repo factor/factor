@@ -12,7 +12,8 @@ ERROR: hpack-decode-error error-msg ;
 
 <PRIVATE
 
-! The static table for hpack compression/decompression
+! The static table for hpack compression/decompression,
+! from RFC 7541, Appendix A.
 CONSTANT: static-table {
     { f f } ! allows indexing to work out properly
     { ":authority" f }
@@ -82,10 +83,6 @@ CONSTANT: static-table {
     sum-lengths 32 +
     ;
 
-: dynamic-table-size ( decode-context -- table-size )
-    [ header-size ] map sum
-    ;
-
 ! gives the index in the dynamic table such that the sum of the
 ! size of the elements before the index is less than or equal to
 ! the desired-size, or f if no entries need to be removed to
@@ -100,53 +97,55 @@ CONSTANT: static-table {
     dupd dynamic-table-remove-index [ head ] when*
     ;
 
-:: add-header-to-table ( decode-context header -- updated-context )
-    decode-context dynamic-table>> decode-context max-size>>
+:: add-header-to-table ( hpack-context header -- updated-context )
+    hpack-context dynamic-table>> hpack-context max-size>>
     header header-size - shrink-dynamic-table
-    header header-size decode-context max-size>> <= [ header prefix ] when
-    decode-context swap >>dynamic-table
+    header header-size hpack-context max-size>> <= [ header prefix ] when
+    hpack-context swap >>dynamic-table
     ;
 
-: set-dynamic-table-size ( decode-context new-size -- updated-decode-context )
+: set-dynamic-table-size ( hpack-context new-size -- updated-decode-context )
     [ >>max-size ] keep
     [ dup dynamic-table>> ] dip shrink-dynamic-table >>dynamic-table
     ;
 
 ! check bounds: i < len(static-table++decode-context) and i > 0
-: check-index-bounds ( decode-context index -- )
-    [ nip 0 > ] [ swap dynamic-table>> length static-table length + < ] 2bi
+: check-index-bounds ( index decode-context -- )
+    [ drop 0 > ] [ dynamic-table>> length static-table length + < ] 2bi
     and [ "invalid index given" hpack-decode-error ] unless ! if not valid throw error
     ;
 
-: get-header-from-table ( decode-context table-index -- field )
-    [ check-index-bounds ] 2keep
+: get-header-from-table ( hpack-context table-index -- field )
+    [ swap check-index-bounds ] 2keep
     dup static-table length <  ! check if in static table
     [ static-table nth nip ]
     [ static-table length - swap dynamic-table>> nth ]
     if ;
 
 : search-imperfect ( header table -- imperfect/f )
-    [ first ] dip [ first over = ] find drop nip
+    swap first '[ _ first = ] find drop
     ;
 
-: search-stable ( header -- imperfect/f perfect/f )
-    static-table
-    [ search-imperfect ]
-    [ index ] 2bi
-    ;
-: search-dtable ( header encode-context --  imperfect/f perfect/f )
-    ! index starts at 0
-    dynamic-table>> 
-    [ search-imperfect ] 
-    [ index ]
-    2bi
-    [ [ static-table length + ] [ f ] if* ] bi@
+: search-given-table ( header table -- imperfect/f perfect/f )
+    [ search-imperfect ] [ index ] 2bi
     ;
 
-: search-table ( header encode-context -- imperfect/f perfect/f )
+: correct-dynamic-index ( dynamic-index/f -- whole-table-index/f )
+    [ static-table length + ] [ f ] if*
+    ;
+
+: search-static-table ( header -- imperfect/f perfect/f )
+    static-table search-given-table ;
+
+: search-dynamic-table ( header hpack-context --  imperfect/f perfect/f )
+    dynamic-table>> search-given-table
+    [ correct-dynamic-index ] bi@
+    ;
+
+: search-table ( header hpack-context -- imperfect/f perfect/f )
+    [ drop search-static-table ] [ search-dynamic-table ] 2bi
     ! combine results from static and dynamic tables
-    [ search-dtable ] [ drop search-stable ] 2bi swapd 
-    [ or ] 2bi@
+    swapd [ or ] 2bi@
     ;
 
 
@@ -156,12 +155,12 @@ CONSTANT: static-table {
     2^ 1 - 2dup < 
     [ drop bitor 1byte-array ]
     [ swap over [ bitor 1byte-array >byte-vector ] [ - ] 2bi* 
-      [ dup 128 >= ] [ [ 128 mod 128 + suffix ] [ 128 /i ] bi ]
-      while suffix >byte-array
+      [ dup 128 >= ] [ [ 128 mod 128 + over push ] [ 128 /i ] bi ]
+      while over push >byte-array
     ] if ;
 
 ! encodes a string without huffman encoding.
-: encode-string ( string -- bytes )
+: encode-string-raw ( string -- bytes )
     utf8 encode
     0 over length 7 encode-integer
     prepend
@@ -246,30 +245,26 @@ CONSTANT: static-table {
         [ 4 decode-literal-header ]
     } cond ;
 
-
 PRIVATE>
+
 ! headers is a sequence of tuples represented the unencoded headers
 : hpack-encode ( encode-context headers -- updated-context block ) 
-    [ encode-field ] map concat
-    ! convert block sequence into a bytestring for sending over http
-    >byte-array
-;
+    [ encode-field ] map concat ;
 
 
 ! should give the updated dtable, and the list of decoded
 ! header fields. block is the bytestring (byte array) for the header block
 : hpack-decode ( decode-context block -- updated-context decoded )
-    [let V{ } clone :> decoded-list!
+    [let V{ } clone :> decoded-list
     0 ! index in the block
     [ 2dup swap length < ] ! check that the block is longer than the index
     ! call decode-field and add the (possibly) decoded field to the list
-    [ decode-field [ decoded-list swap suffix decoded-list! ]
+    [ decode-field [ decoded-list push ]
                    [ decoded-list [ "Table size update not at start of header block"
                    hpack-decode-error ] unless-empty ] if* ]
     ! if the table was not empty, and we didn't get a header, throw an error.
     while
     2drop decoded-list >array
     ! double check the header list size?
-    ]
-    ;
+    ] ;
 
