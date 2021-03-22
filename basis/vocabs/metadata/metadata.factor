@@ -37,25 +37,25 @@ MEMO: vocab-file-lines ( vocab name -- lines/f )
 : vocab-summary-path ( vocab -- path/f )
     "summary.txt" vocab-file-path ;
 
-: vocab-in-root-summary ( vocab -- string )
-    vocab-name dup
-    ".private" ?tail drop find-vocab-root
-    [ "`" "'" surround " in " glue ] when* ;
-
 : vocab-summary ( vocab -- summary )
-    [ "summary.txt" vocab-file-lines [ first ] [ f ] if* ]
-    [ vocab-in-root-summary ] bi
-    over [ ", " glue ] [ nip ] if ;
+    "summary.txt" vocab-file-lines [ first ] [ f ] if* ;
+
+: vocab-in-root-summary ( vocab -- string )
+    [ vocab-summary ] [
+        vocab-name dup
+        ".private" ?tail drop find-vocab-root
+        [ "`" "'" surround " in " glue ] when*
+    ] bi over [ ", " glue ] [ nip ] if ;
 
 M: vocab summary
     [
-        dup vocab-summary %
+        dup vocab-in-root-summary %
         " (" %
         words>> assoc-size #
         " words)" %
     ] "" make ;
 
-M: vocab-link summary vocab-summary ;
+M: vocab-link summary vocab-in-root-summary ;
 
 : vocab-tags-path ( vocab -- path/f )
     "tags.txt" vocab-file-path ;
