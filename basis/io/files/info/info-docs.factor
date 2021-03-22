@@ -62,8 +62,8 @@ HELP: file-executable?
 { $description "Returns whether the file specified by " { $snippet "path" } " is executable by the current process." }
 { $errors "Throws an error if the file does not exist." } ;
 
-ARTICLE: "io.files.info" "File system meta-data"
-"File meta-data:"
+ARTICLE: "io.files.info" "File system metadata"
+"File metadata:"
 { $subsections
     file-info
     link-info
@@ -74,7 +74,7 @@ ARTICLE: "io.files.info" "File system meta-data"
 }
 "File types:"
 { $subsections "file-types" }
-"File system meta-data:"
+"File system metadata:"
 { $subsections
     file-system-info
     file-systems

@@ -1,1 +1,1 @@
-File and file system meta-data
+File and file system metadata

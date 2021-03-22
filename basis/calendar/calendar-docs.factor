@@ -526,7 +526,7 @@ ARTICLE: "calendar" "Calendar"
 }
 "Both " { $link timestamp } "s and " { $link duration } "s implement the " { $link "math.order" } "."
 $nl
-"Meta-data about the calendar:"
+"Metadata about the calendar:"
 { $subsections "calendar-facts" } ;
 
 ARTICLE: "timestamp-arithmetic" "Timestamp arithmetic"
