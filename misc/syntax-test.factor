@@ -214,6 +214,10 @@ PRIVATE>
 
     """>json"""
 
+    "{ 1 2 3 }"
+
+    [[{ 1 2 3 }]]
+
 ! Triple quote strings (old Factor)
 
     """hello, world"""
