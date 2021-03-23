@@ -628,10 +628,10 @@ PRIVATE>
     [ dup length ] unless* tail-slice ; inline
 
 : count-head ( seq quot -- n )
-    [ not ] compose [ find drop ] 2keep drop length or ; inline
+    [ not ] compose [ find drop ] keepd length or ; inline
 
 : count-tail ( seq quot -- n )
-    [ not ] compose [ find-last drop ] 2keep drop
+    [ not ] compose [ find-last drop ] keepd
     length swap [ - 1 - ] when* ; inline
 
 :: interleaved-as ( seq glue exemplar -- newseq )
