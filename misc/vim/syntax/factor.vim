@@ -327,19 +327,19 @@ endif
 
 if exists('g:factor_syn_no_rainbow')
   syn cluster factorArray       contains=factorArray
-  syn region  factorArray         matchgroup=factorDelimiter start=/\v<\S*\{>/         end=/\v<\}>/    contains=ALL
+  syn region  factorArray         matchgroup=factorDelimiter start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=ALL
 else
   syn cluster factorArray       contains=factorArray0
-  syn region  factorArray0               matchgroup=hlLevel0 start=/\v<\S*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray1,factorQuotation1
-  syn region  factorArray1     contained matchgroup=hlLevel1 start=/\v<\S*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray2,factorQuotation2
-  syn region  factorArray2     contained matchgroup=hlLevel2 start=/\v<\S*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray3,factorQuotation3
-  syn region  factorArray3     contained matchgroup=hlLevel3 start=/\v<\S*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray4,factorQuotation4
-  syn region  factorArray4     contained matchgroup=hlLevel4 start=/\v<\S*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray5,factorQuotation5
-  syn region  factorArray5     contained matchgroup=hlLevel5 start=/\v<\S*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray6,factorQuotation6
-  syn region  factorArray6     contained matchgroup=hlLevel6 start=/\v<\S*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray7,factorQuotation7
-  syn region  factorArray7     contained matchgroup=hlLevel7 start=/\v<\S*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray8,factorQuotation8
-  syn region  factorArray8     contained matchgroup=hlLevel8 start=/\v<\S*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray9,factorQuotation9
-  syn region  factorArray9     contained matchgroup=hlLevel9 start=/\v<\S*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray0,factorQuotation0
+  syn region  factorArray0               matchgroup=hlLevel0 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray1,factorQuotation1
+  syn region  factorArray1     contained matchgroup=hlLevel1 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray2,factorQuotation2
+  syn region  factorArray2     contained matchgroup=hlLevel2 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray3,factorQuotation3
+  syn region  factorArray3     contained matchgroup=hlLevel3 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray4,factorQuotation4
+  syn region  factorArray4     contained matchgroup=hlLevel4 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray5,factorQuotation5
+  syn region  factorArray5     contained matchgroup=hlLevel5 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray6,factorQuotation6
+  syn region  factorArray6     contained matchgroup=hlLevel6 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray7,factorQuotation7
+  syn region  factorArray7     contained matchgroup=hlLevel7 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray8,factorQuotation8
+  syn region  factorArray8     contained matchgroup=hlLevel8 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray9,factorQuotation9
+  syn region  factorArray9     contained matchgroup=hlLevel9 start=/\v<[^ \"\[]*\{>/         end=/\v<\}>/    contains=@factorCluster,factorArray0,factorQuotation0
 endif
 
 if !exists('g:factor_syn_no_error')
