@@ -1,4 +1,4 @@
-;;; fuel-edit.el -- utilities for file editing
+;;; fuel-edit.el -- utilities for file editing -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
