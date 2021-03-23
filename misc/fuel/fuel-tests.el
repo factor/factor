@@ -1,4 +1,4 @@
-;;; fuel-tests.el -- unit tests for fuel
+;;; fuel-tests.el -- unit tests for fuel -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014 Björn Lindqvist
 ;; See http://factorcode.org/license.txt for BSD license.

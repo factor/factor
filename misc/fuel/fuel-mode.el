@@ -1,4 +1,4 @@
-;;; fuel-mode.el --- Major mode for editing Factor programs.
+;;; fuel-mode.el --- Major mode for editing Factor programs. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008, 2009, 2010 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
