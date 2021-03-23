@@ -1,4 +1,4 @@
-;;; fuel-xref.el -- showing cross-reference info
+;;; fuel-xref.el -- showing cross-reference info -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008, 2009, 2010 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
