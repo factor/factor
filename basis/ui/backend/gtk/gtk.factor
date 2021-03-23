@@ -41,7 +41,7 @@ M: gtk-clipboard clipboard-contents
     clipboard get-global handle>> gtk_clipboard_store ;
 
 M: gtk-clipboard set-clipboard-contents
-    swap [ handle>> ] [ utf8 string>alien ] bi*
+    swap [ handle>> ] [ [ 0 = ] trim-tail utf8 string>alien ] bi*
     -1 gtk_clipboard_set_text
     save-global-clipboard ;
 
