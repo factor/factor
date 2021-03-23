@@ -64,7 +64,12 @@ M: windows factor-path "./factor.com" ;
         try-process
     ] with-directory ;
 
-: mason-child-test-cmd ( -- cmd ) mason-child-vm "-run=mason.test" 2array ;
+: mason-child-test-cmd ( -- cmd )
+    [
+        mason-child-vm ,
+        os windows? cpu x86.64? and [ "-codeheap=200" , ] when
+        "-run=mason.test" ,
+    ] { } make ;
 
 : test-mason-child ( -- )
     "factor" [
