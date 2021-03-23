@@ -67,7 +67,7 @@ DEFER: map-literals
 : rewrite-paths ( seq quot: ( obj -- obj' ) -- ) '[ _ rewrite-path ] each ; inline recursive
 
 : rewrite-vocab ( vocab quot: ( obj -- obj' ) -- )
-    [ [ vocab>literals ] dip map-literals ] 2keep drop write-modern-vocab ; inline recursive
+    [ [ vocab>literals ] dip map-literals ] keepd write-modern-vocab ; inline recursive
 
 : rewrite-string-exact ( string -- string' )
     string>literals write-modern-string ;

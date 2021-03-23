@@ -60,7 +60,7 @@ ERROR: unexpected-end n string ;
     [ to>> ] [ seq>> ] bi ?nth ;
 
 : find-from* ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt ? )
-    [ find-from ] 2keep drop
+    [ find-from ] keepd
     pick [ drop t ] [ length -rot nip f ] if ; inline
 
 : skip-blank-from ( n string -- n' string )
@@ -224,5 +224,5 @@ ERROR: subseq-expected-but-got-eof n string expected ;
     pick [
         length swap [ - ] dip
     ] [
-        [ nip ] dip [ [ length ] bi@ - ] 2keep drop
+        [ nip ] dip [ [ length ] bi@ - ] keepd
     ] if ; inline
