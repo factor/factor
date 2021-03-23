@@ -78,10 +78,10 @@ PRIVATE>
     [ 0 ] 3dip pick [
         swap curry [ keep 1 + swap ] curry [
             [ find-from drop dup ] 2curry [ keep -rot ] curry
-        ] dip produce nip
+        ] dip V{ } produce-as nip
     ] 2keep swap [
         [ length swapd ] keep
-    ] dip 2curry call suffix ; inline
+    ] dip 2curry call suffix! { } like ; inline
 
 PRIVATE>
 
