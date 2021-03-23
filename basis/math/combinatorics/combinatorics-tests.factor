@@ -1,5 +1,5 @@
 USING: arrays kernel math math.combinatorics
-math.combinatorics.private tools.test sequences ;
+math.combinatorics.private tools.test sequences sets ;
 
 { 1 } [ -1 factorial ] unit-test ! required by other math.combinatorics words
 { 1 } [ 0 factorial ] unit-test
@@ -99,6 +99,11 @@ math.combinatorics.private tools.test sequences ;
 
 { f } [ { 1 2 3 } [ last 4 = ] find-permutation ] unit-test
 { { 2 1 3 } } [ { 1 2 3 } [ first 2 = ] find-permutation ] unit-test
+
+{ t } [
+    { 1 1 1 1 1 1 1 1 2 }
+    [ all-permutations members ] [ all-unique-permutations ] bi =
+] unit-test
 
 { { { 0 1 2 } { 0 2 1 } { 1 0 2 } { 1 2 0 } { 2 0 1 } { 2 1 0 } } }
 [ 3 <iota> <permutations> >array ] unit-test
