@@ -216,23 +216,26 @@ HELP: unsurround
 
 HELP: start-all
 { $values
-     { "subseq" sequence } { "seq" sequence } { "indices" sequence } }
+     { "seq" sequence } { "subseq" sequence } { "indices" sequence } }
 { $description "Outputs the starting indices of the non-overlapping occurrences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
 { $examples
-    { $example "USING: prettyprint sequences.extras ; \"ABA\" \"ABABA\" start-all ."
+    { $example "USING: prettyprint sequences.extras ;"
+               "\"ABABA\" \"ABA\" start-all ."
                "{ 0 }"
     }
-    { $example "USING: prettyprint sequences.extras ; \"ABA\" \"ABAABA\" start-all ."
+    { $example "USING: prettyprint sequences.extras ;"
+               "\"ABAABA\" \"ABA\" start-all ."
       "{ 0 3 }"
     }
  } ;
 
 HELP: start-all*
 { $values
-    { "subseq" sequence } { "seq" sequence } { "indices" sequence } }
+    { "seq" sequence } { "subseq" sequence } { "indices" sequence } }
 { $description "Outputs the starting indices of the possibly overlapping occurrences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
 { $examples
-    { $example "USING: prettyprint sequences.extras ; \"ABA\" \"ABABA\" start-all* ."
+    { $example "USING: prettyprint sequences.extras ;"
+               "\"ABABA\" \"ABA\" start-all* ."
                "{ 0 2 }"
     } } ;
 
@@ -248,20 +251,22 @@ HELP: arg-min
 
 HELP: count-subseq
 { $values
-    { "subseq" sequence } { "seq" sequence } { "n" integer } }
+    { "seq" sequence } { "subseq" sequence } { "n" integer } }
 { $description "Outputs the number of non-overlapping occurrences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
 { $examples
-    { $example "USING: prettyprint sequences.extras ; \"ABA\" \"ABABA\" count-subseq ."
+    { $example "USING: prettyprint sequences.extras ;"
+               "\"ABABA\" \"ABA\" count-subseq ."
                "1"
     } } ;
 
 
 HELP: count-subseq*
 { $values
-    { "subseq" sequence } { "seq" sequence } { "n" integer } }
+    { "seq" sequence } { "subseq" sequence } { "n" integer } }
 { $description "Outputs the number of possibly overlapping occurrences of " { $snippet "subseq" } " in " { $snippet "seq" } "." }
 { $examples
-    { $example "USING: prettyprint sequences.extras ; \"ABA\" \"ABABA\" count-subseq* ."
+    { $example "USING: prettyprint sequences.extras ;"
+               "\"ABABA\" \"ABA\" count-subseq* ."
                "2"
     } } ;
 
