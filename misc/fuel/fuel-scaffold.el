@@ -1,4 +1,4 @@
-;;; fuel-scaffold.el -- interaction with tools.scaffold
+;;; fuel-scaffold.el -- interaction with tools.scaffold -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.

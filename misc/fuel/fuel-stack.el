@@ -1,4 +1,4 @@
-;;; fuel-stack.el -- stack inference help
+;;; fuel-stack.el -- stack inference help -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
