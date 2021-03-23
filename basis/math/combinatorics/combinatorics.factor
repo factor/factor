@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs classes.tuple combinators hints
-kernel kernel.private math math.functions math.order math.ranges
-sequences sequences.private sorting strings vectors ;
+kernel kernel.private make math math.functions math.order
+math.ranges sequences sequences.private sorting strings vectors ;
 IN: math.combinatorics
 
 <PRIVATE
@@ -154,6 +154,31 @@ PRIVATE>
 : next-permutation ( seq -- seq )
     dup empty? [ (next-permutation) ] unless ;
 
+<PRIVATE
+
+: should-swap? ( start curr seq -- ? )
+    [ nipd nth ] [ <slice> member? not ] 3bi ; inline
+
+:: unique-permutations ( ... seq i n quot: ( ... elt -- ... ) -- ... )
+    i n >= [
+        seq clone quot call
+    ] [
+        i n [a..b) [| j |
+            i j seq should-swap? [
+                i j seq exchange-unsafe
+                seq i 1 + n quot unique-permutations
+                i j seq exchange-unsafe
+            ] when
+        ] each
+    ] if ; inline recursive
+
+PRIVATE>
+
+: each-unique-permutation ( ... seq quot: ( ... elt -- ... ) -- ... )
+    [ 0 over length ] dip unique-permutations ; inline
+
+: all-unique-permutations ( seq -- seq' )
+    [ [ , ] each-unique-permutation ] { } make ;
 
 ! Combinadic-based combination methodology
 
