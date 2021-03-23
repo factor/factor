@@ -234,11 +234,11 @@ tools.test vectors vocabs ;
 
 { 3/10 } [ 10 <iota> [ 3 < ] count* ] unit-test
 
-{ { 0 } } [ "ABA" "ABABA" start-all ] unit-test
-{ { 0 2 } } [ "ABA" "ABABA" start-all* ] unit-test
-{ { 0 3 } } [ "ABA" "ABAABA" start-all ] unit-test
-{ 1 } [ "ABA" "ABABA" count-subseq ] unit-test
-{ 2 } [ "ABA" "ABABA" count-subseq* ] unit-test
+{ { 0 } } [ "ABABA" "ABA" start-all ] unit-test
+{ { 0 2 } } [ "ABABA" "ABA" start-all* ] unit-test
+{ { 0 3 } } [ "ABAABA" "ABA" start-all ] unit-test
+{ 1 } [ "ABABA" "ABA" count-subseq ] unit-test
+{ 2 } [ "ABABA" "ABA" count-subseq* ] unit-test
 
 { 120000 } [ { 10 20 30 40 50 60 } 1 [ * ] 3 reduce-from ] unit-test
 
