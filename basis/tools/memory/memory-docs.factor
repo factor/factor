@@ -1,4 +1,4 @@
-USING: help.markup help.syntax memory sequences vm ;
+USING: help.markup help.syntax memory tools.memory sequences vm ;
 IN: tools.memory
 
 ARTICLE: "tools.memory" "Object memory tools"
