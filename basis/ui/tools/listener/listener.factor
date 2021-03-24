@@ -5,13 +5,14 @@ combinators.short-circuit concurrency.flags
 concurrency.mailboxes continuations destructors documents
 documents.elements fonts fry hashtables help help.markup
 help.tips io io.styles kernel lexer listener literals locals
-math math.vectors models models.arrow models.delay namespaces
-parser prettyprint sequences source-files.errors strings system
-threads ui ui.commands ui.gadgets ui.gadgets.editors
-ui.gadgets.glass ui.gadgets.labeled ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.toolbar
-ui.gadgets.tracks ui.gestures ui.operations ui.pens.solid
-ui.theme ui.tools.browser ui.tools.common ui.tools.debugger
+math math.order math.vectors models models.arrow models.delay
+namespaces namespaces.private parser prettyprint sequences
+source-files.errors strings system threads ui ui.commands
+ui.gadgets ui.gadgets.editors ui.gadgets.glass
+ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
+ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.tracks
+ui.gestures ui.operations ui.pens.solid ui.theme
+ui.tools.browser ui.tools.common ui.tools.debugger
 ui.tools.error-list ui.tools.listener.completion
 ui.tools.listener.history ui.tools.listener.popups vocabs
 vocabs.loader vocabs.parser vocabs.refresh words ;
@@ -194,7 +195,7 @@ TUPLE: listener-gadget < tool error-summary output scroller input ;
 listener-gadget default-font-size  { 50 58 } n*v set-tool-dim
 
 : listener-streams ( listener -- input output )
-    [ input>> ] [ output>> <pane-stream> ] bi ;
+    [ input>> ] [ output>> <pane-stream> H{ } clone <style-stream> ] bi ;
 
 : init-input/output ( listener -- listener )
     <interactor>
@@ -406,7 +407,7 @@ interactor "completion" f {
     ] with-default-style nl nl ;
 
 : listener-thread ( listener -- )
-    dup listener-streams [
+    dup input>> dup output>> [
         [ com-browse ] help-hook set
         '[ [ _ input>> ] 2dip debugger-popup ] error-hook set
         error-summary? off
@@ -507,3 +508,28 @@ PRIVATE>
         size >>size
     ] change-font f >>line-height drop
     ostream output-stream set ;
+
+<PRIVATE
+
+:: adjust-listener-font-size ( listener delta -- )
+    listener input>> :> interactor
+    interactor output>> :> output
+    interactor
+        [ clone [ delta + ] change-size ] change-font
+        f >>line-height
+    font>> size>> font-size output style>> set-at ;
+
+PRIVATE>
+
+: com-font-size-plus ( listener -- )
+    2 adjust-listener-font-size ;
+
+: com-font-size-minus ( listener -- )
+    -2 adjust-listener-font-size ;
+
+listener-gadget "fonts" f {
+    { T{ key-down f { A+ } "+" } com-font-size-plus }
+    { T{ key-down f { A+ } "=" } com-font-size-plus }
+    { T{ key-down f { A+ } "_" } com-font-size-minus }
+    { T{ key-down f { A+ } "-" } com-font-size-minus }
+} define-command-map
