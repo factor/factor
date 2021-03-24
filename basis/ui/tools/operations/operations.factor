@@ -68,14 +68,14 @@ IN: ui.tools.operations
 } define-operation
 
 [ pathname? ] \ edit-file H{
-    { +keyboard+ T{ key-down f { C+ } "e" } }
+    { +keyboard+ T{ key-down f { C+ } "E" } }
     { +primary+ t }
     { +secondary+ t }
     { +listener+ t }
 } define-operation
 
 [ definition-mixin? ] \ edit H{
-    { +keyboard+ T{ key-down f { C+ } "e" } }
+    { +keyboard+ T{ key-down f { C+ } "E" } }
     { +listener+ t }
 } define-operation
 
@@ -100,17 +100,17 @@ IN: ui.tools.operations
 [ definition-mixin? ] \ com-forget H{ } define-operation
 
 [ topic? ] \ com-browse H{
-    { +keyboard+ T{ key-down f { C+ } "h" } }
+    { +keyboard+ T{ key-down f { C+ } "H" } }
     { +primary+ t }
 } define-operation
 
 [ word? ] \ usage. H{
-    { +keyboard+ T{ key-down f { C+ } "u" } }
+    { +keyboard+ T{ key-down f { C+ } "U" } }
     { +listener+ t }
 } define-operation
 
 [ word? ] \ fix H{
-    { +keyboard+ T{ key-down f { C+ } "f" } }
+    { +keyboard+ T{ key-down f { C+ } "F" } }
     { +listener+ t }
 } define-operation
 
@@ -155,24 +155,24 @@ M: word com-stack-effect 1quotation com-stack-effect ;
 
 ! Quotations
 [ quotation? ] \ com-stack-effect H{
-    { +keyboard+ T{ key-down f { C+ } "i" } }
+    { +keyboard+ T{ key-down f { C+ } "I" } }
     { +listener+ t }
 } define-operation
 
 [ quotation? ] \ walk H{
-    { +keyboard+ T{ key-down f { C+ } "w" } }
+    { +keyboard+ T{ key-down f { C+ } "W" } }
     { +listener+ t }
 } define-operation
 
 [ quotation? ] \ time H{
-    { +keyboard+ T{ key-down f { C+ } "t" } }
+    { +keyboard+ T{ key-down f { C+ } "T" } }
     { +listener+ t }
 } define-operation
 
 : com-expand-macros ( quot -- ) expand-macros . ;
 
 [ quotation? ] \ com-expand-macros H{
-    { +keyboard+ T{ key-down f { C+ } "m" } }
+    { +keyboard+ T{ key-down f { C+ } "M" } }
     { +listener+ t }
 } define-operation
 
@@ -189,8 +189,13 @@ PREDICATE: tracked-malloc-ptr < malloc-ptr
 : com-creation-traceback ( disposable -- )
     continuation>> traceback-window ;
 
-[ tracked-disposable? ] \ com-creation-traceback H{ { +primary+ t } } define-operation
-[ tracked-malloc-ptr? ] \ com-creation-traceback H{ { +primary+ t } } define-operation
+[ tracked-disposable? ] \ com-creation-traceback H{
+    { +primary+ t }
+} define-operation
+
+[ tracked-malloc-ptr? ] \ com-creation-traceback H{
+    { +primary+ t }
+} define-operation
 
 ! Operations -> commands
 interactor
