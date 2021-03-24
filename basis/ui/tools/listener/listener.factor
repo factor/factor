@@ -384,9 +384,13 @@ M: interactor handle-gesture
         [ call-next-method ]
     } cond ;
 
+: delete-next-character/eof ( interactor -- )
+    dup model>> doc-string empty?
+    [ interactor-eof ] [ delete-next-character ] if ;
+
 interactor "interactor" f {
     { T{ key-down f f "RET" } evaluate-input }
-    { T{ key-down f { C+ } "k" } clear-editor }
+    { T{ key-down f { C+ } "d" } delete-next-character/eof }
 } define-command-map
 
 interactor "completion" f {
@@ -394,6 +398,7 @@ interactor "completion" f {
     { T{ key-down f { C+ } "p" } recall-previous }
     { T{ key-down f { C+ } "n" } recall-next }
     { T{ key-down f { C+ } "r" } history-completion-popup }
+    { T{ key-down f { C+ } "s" } history-completion-popup }
 } define-command-map
 
 : introduction. ( -- )
@@ -453,7 +458,6 @@ listener-gadget "toolbar" f {
     { T{ key-down f { A+ } "u" } com-auto-use }
     { T{ key-down f { A+ } "k" } clear-output }
     { T{ key-down f { A+ } "K" } clear-stack }
-    { T{ key-down f { C+ } "d" } com-end }
     { T{ key-down f f "F1" } com-help }
 } define-command-map
 

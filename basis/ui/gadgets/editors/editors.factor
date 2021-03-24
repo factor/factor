@@ -435,6 +435,11 @@ editor "editing" f {
     { T{ key-down f { C+ } "BACKSPACE" } delete-previous-word }
     { T{ key-down f { A+ } "DELETE" } delete-to-end-of-line }
     { T{ key-down f { A+ } "BACKSPACE" } delete-to-start-of-line }
+    { T{ key-down f { C+ } "d" } delete-next-character }
+    { T{ key-down f { C+ } "h" } delete-previous-character }
+    { T{ key-down f { C+ } "u" } delete-to-start-of-line }
+    { T{ key-down f { C+ } "k" } delete-to-end-of-line }
+    { T{ key-down f { C+ } "w" } delete-previous-word }
 } define-command-map
 
 : com-paste ( editor -- ) clipboard get paste-clipboard ;
@@ -485,6 +490,10 @@ editor "caret-motion" f {
     { T{ key-down f f "END" } end-of-line }
     { T{ key-down f { C+ } "HOME" } start-of-document }
     { T{ key-down f { C+ } "END" } end-of-document }
+    { T{ key-down f { C+ } "b" } previous-character }
+    { T{ key-down f { C+ } "f" } next-character }
+    { T{ key-down f { C+ } "a" } start-of-line }
+    { T{ key-down f { C+ } "e" } end-of-line }
 } define-command-map
 
 : clear-editor ( editor -- )
@@ -651,6 +660,8 @@ multiline-editor "multiline" f {
     { T{ key-down f { S+ } "RET" } insert-newline }
     { T{ key-down f f "ENTER" } insert-newline }
     { T{ key-down f { C+ } "j" } com-join-lines }
+    { T{ key-down f { C+ } "p" } previous-line }
+    { T{ key-down f { C+ } "n" } next-line }
 } define-command-map
 
 TUPLE: source-editor < multiline-editor ;
