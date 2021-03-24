@@ -487,26 +487,16 @@ M: listener-gadget graft*
 M: listener-gadget ungraft*
     [ com-end ] [ call-next-method ] bi ;
 
-<PRIVATE
-
-:: make-font-style ( family size -- assoc )
-    H{ } clone
-        family font-name pick set-at
-        size font-size pick set-at ;
-
-PRIVATE>
-
 :: set-listener-font ( family size -- )
-    get-listener input>> :> inter
-    family size make-font-style
-    inter output>> make-span-stream :> ostream
-    ostream inter output<<
-    inter [
+    get-listener input>> :> interactor
+    interactor output>> :> output
+    interactor [
         clone
         family >>name
         size >>size
     ] change-font f >>line-height drop
-    ostream output-stream set ;
+    family font-name output style>> set-at
+    size font-size output style>> set-at ;
 
 <PRIVATE
 
