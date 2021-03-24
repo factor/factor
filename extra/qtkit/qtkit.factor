@@ -79,16 +79,14 @@ IMPORT: QTTrack
 : <movie> ( filename -- movie )
     QTMovie swap <NSString> f -> movieWithFile:error: -> retain ;
 
-: movie-attributes ( movie -- attributes )
-    -> movieAttributes plist> ;
-
-: play ( movie -- )
-    -> play ;
-: stop ( movie -- )
-    -> stop ;
-
-: movie-tracks ( movie -- tracks )
-    -> tracks NSFastEnumeration>vector ;
-
-: track-attributes ( track -- attributes )
-    -> trackAttributes plist> ;
+! XXX: comment these out to workaround build machine issue
+! : movie-attributes ( movie -- attributes )
+!     -> movieAttributes plist> ;
+! : play ( movie -- )
+!     -> play ;
+! : stop ( movie -- )
+!     -> stop ;
+! : movie-tracks ( movie -- tracks )
+!     -> tracks NSFastEnumeration>vector ;
+! : track-attributes ( track -- attributes )
+!     -> trackAttributes plist> ;
