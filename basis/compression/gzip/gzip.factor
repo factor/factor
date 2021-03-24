@@ -1,8 +1,13 @@
 ! Copyright (C) 2020 Jacob Fischer and Abtin Molavi.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs bit-arrays byte-arrays combinators fry
-kernel locals math math.bits sequences vectors ;
+USING: arrays assocs bit-arrays byte-arrays combinators
+compression.huffman fry kernel locals math math.bits math.ranges
+namespaces sequences splitting vectors ;
 IN: compression.gzip
+
+SYMBOL: lit-dict
+SYMBOL: dist-dict 
+SYMBOL: lit-vec
 
 ! :: deflate-lz77 ( byte-array -- seq )
 
@@ -75,7 +80,7 @@ cond ;
 { [ dup 4097 < ] [ [ 2049 - 1024 /i 22 + ] [ 2049 - 1024 mod  10 <bits> >bit-array reverse ] bi 2array ] }
 { [ dup 8193 < ] [ [ 4097 - 2048 /i 24 + ] [ 4097 - 2048 mod 11 <bits> >bit-array reverse ] bi 2array ] }
 { [ dup 16385 < ] [ [ 8193 - 4096 /i 26 + ] [ 8193 - 4096 mod 12 <bits> >bit-array reverse ] bi 2array ] }
-[ [ 8193 - 4096 /i 12 + ] [ 8193 - 4096 mod  13 <bits> >bit-array reverse ] bi 2array ] 
+[ [ 8193 - 4096 /i 28 + ] [ 8193 - 4096 mod  13 <bits> >bit-array reverse ] bi 2array ] 
 }
 cond ;
  
@@ -100,10 +105,10 @@ cond ;
 ! Gluing codes with their extra bits
 
 : dist-to-bits ( dist -- bits )
-    dup array? [ [ first 5 <bits> >bit-array  reverse ] [ second ] bi append ] [ 5 <bits> >bit-array reverse ] if  ;
+    dup array? [ [ first 5 <bits> >bit-array  reverse ] [ second ] bi 2array ] [ 5 <bits> >bit-array reverse ] if  ;
 
 : lit-to-bits ( lit -- bits )
-     dup array? [ [ first (lit-to-bits) ] [ second ] bi append ] [ (lit-to-bits) ] if  ;
+     dup array? [ [ first (lit-to-bits) ] [ second ] bi 2array ] [ (lit-to-bits) ] if  ;
  
 : pair-to-bits ( l,d -- bits )
     [ first lit-to-bits ] [ second dist-to-bits ] bi append ;
@@ -113,10 +118,72 @@ cond ;
 
 ! fixed huffman compression function 
 : compress-fixed ( bytes -- bits )
-compress-lz77 vec-to-lits vec-to-bits ;
+    compress-lz77 vec-to-lits vec-to-bits ;
 
 ! Dynamic Huffman
 
+! Given an lz77 compressed block, constructs the huffman code tables
+: build-dicts ( vec -- lit-dict dist-dict )
+    [ [ dup array? [ first ] when dup array? [ first ] when ] map generate-canonical-codes ]
+    [ [ dup array? [ second ] when dup array? [ first ] when ] map generate-canonical-codes ] bi ;
 
-! :: read-frequency-element ( element assoc -- dict )
-!       element assoc at* [ 1 + element assoc set-at ] [  1 element assoc set-at ] if ;
+
+! Use the given dictionary to replace the element with its code
+:: replace-one ( ele code-dict  --  new-ele )
+   ele array? [ ele first code-dict at ele second 2array ] [ ele code-dict at ] if ;
+
+! replace both elements of a length distance pair with their codes
+: replace-pair (  pair  -- new-pair  )
+    [ first lit-dict get replace-one ]  [ second dist-dict get replace-one ] bi 2array ;
+  
+: vec-to-codes ( vec -- new-vec )
+    [ dup array? [ replace-pair ] [ lit-dict get replace-one ] if ]  map ;
+
+: compress-dynamic ( lit-seq -- bits )
+    compress-lz77 vec-to-lits lit-vec set 
+    lit-vec get build-dicts  
+    dist-dict set 
+    lit-dict set
+    lit-vec get vec-to-codes ;
+
+
+! Dictionary encoding
+: lit-code-lengths ( -- len-seq )
+     285 [0..b] [ lit-dict get 2dup key? [ at length ] [ 2drop 0 ] if ] map  ;
+
+: dist-code-lengths ( -- len-seq )
+     31 [0..b] [ lit-dict get 2dup key? [ at length ] [ 2drop 0 ] if ] map  ;
+
+:: replace-0-single ( m len-seq  -- new-len-seq )
+    m 11 < [ len-seq m [ 0 ] replicate  17 m 3 - 3 <bits> >bit-array reverse 2array 1array replace ]
+           [ len-seq m [ 0 ] replicate 18 m 11 - 7 <bits> >bit-array reverse 2array 1array replace ]    
+    if ;
+
+:: replace-0-range ( range len-seq -- new-len-seq )
+    range empty? [ len-seq ] [ range first range 1 tail len-seq replace-0-range replace-0-single ] if ;
+
+: replace-0 ( len-seq -- new-len-seq )
+    2 139 (a..b) swap replace-0-range ;
+
+:: replace-runs ( n len-seq  -- new-len-seq )
+    len-seq 7 [ n ] replicate { n { 16 ?{ 1 1 } } } replace  
+    6 [ n ] replicate { n { 16 ?{ 1 0 } } } replace 
+    5 [ n ] replicate { n { 16 ?{ 0 1 } } } replace 
+    4 [ n ] replicate { n { 16 ?{ 0 0 } } }  replace  ;
+
+:: replace-all-runs ( range len-seq  -- new-len-seq )
+   range empty? [ len-seq ] [ range first range 1 tail len-seq replace-all-runs replace-runs ] if ;
+
+
+: run-free-codes ( -- len-seq )
+    -1 32 (a..b) dist-code-lengths replace-0 replace-all-runs -1 286 (a..b) lit-code-lengths replace-0 replace-all-runs concat ;
+
+: code-len-dict ( -- code-dict )
+    run-free-codes generate-canonical-codes ;
+
+: replace-lens ( -- len-seq )
+   run-free-codes  [ dup array? [ first code-len-dict at ] if ] map
+ 
+
+
+

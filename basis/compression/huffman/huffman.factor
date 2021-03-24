@@ -2,12 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bit-arrays bitstreams combinators
 fry hashtables heaps io kernel locals math math.order
-math.parser math.ranges multiline namespaces sequences vectors ;
+math.parser math.ranges multiline namespaces sequences sorting
+vectors ;
 QUALIFIED-WITH: bitstreams bs
 IN: compression.huffman
 
-
 <PRIVATE
+
+SYMBOL: leaf-table
+SYMBOL: node-heap
 
 TUPLE: huffman-code
     { value fixnum }
@@ -61,12 +64,8 @@ TUPLE: huffman-tree
 : leaf? ( huff-tree -- ? )
     [ left>> not ] [ right>> not ] bi and ;
 
-SYMBOL: leaf-table
-SYMBOL: node-heap
-
-
 : gen-leaves ( lit-seq -- leaves )
-    [ huffman-tree new swap >>code ] map ;
+    [ huffman-tree new swap >>code ] map ; 
 
 : build-leaf-table ( leaves --  )
     dup empty? [ drop ] [ dup first leaf-table get inc-at rest build-leaf-table ] if ;
@@ -87,15 +86,16 @@ SYMBOL: node-heap
                 [ right>> (generate-codes) [ ?{ t } prepend ] assoc-map ] bi assoc-union! 
               ] if ;
 
-! Works, but pollutes namespace
 : generate-codes ( lit-seq -- code-dict )
-  H{ } clone leaf-table set <min-heap> node-heap set  build-tree heap-pop swap (generate-codes) nip ;
+    [
+        H{ } clone leaf-table set
+        <min-heap> node-heap set
+        build-tree heap-pop swap (generate-codes) nip
+    ] with-scope ;
 
-! Throws sequence is immutable error
-: generate-codes-broken ( lit-seq -- code-dict )
-   { {  H{ } clone leaf-table } { <min-heap> node-heap } } [ build-tree heap-pop swap (generate-codes) nip ] with-variables ;
-
-:: canonical-order ( b1 b2  -- <=> )
+! Ordering of codes that is useful for generating canonical codes.
+! Sort by length, then lexicographically.
+:: <==> ( b1 b2  -- <=> )
     {
       { [ b1 length  b2 length <  ] [ +lt+ ] }
       { [ b2 length  b1 length  <  ] [ +gt+ ] }
@@ -104,16 +104,26 @@ SYMBOL: node-heap
       [ +eq+ ]
     } cond ;
 
+: compare! ( obj1 obj2 quot -- <==> )
+    bi@ <==> ; inline
+
+: sort-with! ( seq quot -- sortedseq )
+    [ compare! ] curry sort ; inline
+
+: sort-values! ( obj -- sortedseq )
+    >alist [ second ] sort-with! ;
 
 : get-next-code ( code current -- next )
-    reverse bit-array>integer 1 + integer>bit-array reverse dup length pick length swap - [ f ] replicate append nip ;
+   [ reverse bit-array>integer 1 + ] [ length ] bi <bits> >bit-array reverse dup length pick length swap - [ f ] replicate append nip ;
 
+! Does most of the work of converting a collection of codes to canonical ones. 
+: (canonize-codes) ( current codes  -- codes )
+    dup empty? [ 2drop V{ } clone ] [ dup first pick get-next-code dup pick 1 tail (canonize-codes) ?push 2nip ] if ;
 
-: canonize-codes ( current codes  -- codes )
-    dup length 1 = [ swap f ?push nip ] [ 2dup first swap get-next-code swap 1 tail canonize-codes ?push ] if ;
+! Basically a wrapper for the above recursive helper 
+: canonize-codes ( codes -- codes )
+    dup first dup pick 1 tail (canonize-codes) ?push nip reverse ;
 
-: generate-canonical-codes ( lit-seq -- ncode-dict )
-    generate-codes >alist [ second canonical-order ] sort values ?{ f } swap canonize-codes  ;
 
 
 
@@ -144,3 +154,8 @@ TUPLE: huffman-decoder
 : read1-huff2 ( huffman-decoder -- elt )
     16 over [ bs>> bs:peek 16 reverse-bits ] [ rtable>> nth ] bi
     [ size>> swap bs>> bs:seek ] [ value>> ] bi ; inline
+
+! Outputs a dictionary of canonical codes
+: generate-canonical-codes ( lit-seq -- code-dict )
+    generate-codes sort-values! unzip canonize-codes zip ;
+
