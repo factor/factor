@@ -79,9 +79,8 @@ IMPORT: QTTrack
 : <movie> ( filename -- movie )
     QTMovie swap <NSString> f -> movieWithFile:error: -> retain ;
 
-! XXX: this was breaking, commenting out for now
-! : movie-attributes ( movie -- attributes )
-!     -> movieAttributes plist> ;
+: movie-attributes ( movie -- attributes )
+    -> movieAttributes plist> ;
 
 : play ( movie -- )
     -> play ;
