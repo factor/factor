@@ -3,12 +3,11 @@
 USING: accessors arrays assocs calendar combinators
 combinators.short-circuit concurrency.flags
 concurrency.mailboxes continuations destructors documents
-documents.elements fonts fry hashtables help help.markup
-help.tips io io.styles kernel lexer listener literals locals
-math math.order math.vectors models models.arrow models.delay
-namespaces namespaces.private parser prettyprint sequences
-source-files.errors strings system threads ui ui.commands
-ui.gadgets ui.gadgets.editors ui.gadgets.glass
+documents.elements fonts hashtables help help.markup help.tips
+io io.styles kernel lexer listener literals math math.vectors
+models models.arrow models.delay namespaces parser prettyprint
+sequences source-files.errors strings system threads ui
+ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.glass
 ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.tracks
 ui.gestures ui.operations ui.pens.solid ui.theme
