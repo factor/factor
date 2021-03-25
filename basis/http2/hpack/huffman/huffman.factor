@@ -4,6 +4,7 @@ make math sequences ;
 
 IN: http2.hpack.huffman
 
+<<
 ! Table contents from RFC 7541 Appendix B
 CONSTANT: huffman-table {
             {     0x1ff8  13 }
@@ -265,19 +266,19 @@ CONSTANT: huffman-table {
             { 0x3fffffff  30 }
         }
 
-! The codes for each entry in the huffman table
-MEMO: huffman-encode-table ( -- table )
-    huffman-table [
-        [ integer>bit-array ] dip f pad-tail reverse
-    ] { } assoc>map ;
-
-CONSTANT: EOS 256
-
-<<
 :: R2, ( n -- ) n ,     n 2 64 * + ,     n 1 64 * + ,     n 3 64 * + , ;
 :: R4, ( n -- ) n R2,   n 2 16 * + R2,   n 1 16 * + R2,   n 3 16 * + R2, ;
 :: R6, ( n -- ) n R4,   n 2 4 * + R4,    n 1 4 * + R4,    n 3 4 * + R4, ;
 >>
+
+! The codes for each entry in the huffman table
+CONSTANT: huffman-encode-table $[
+    huffman-table [
+        [ integer>bit-array ] dip f pad-tail reverse
+    ] { } assoc>map
+]
+
+CONSTANT: EOS 256
 
 CONSTANT: bit-reverse-table $[
     [ 0 R6, 2 R6, 1 R6, 3 R6, ] B{ } make
