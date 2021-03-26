@@ -1,13 +1,15 @@
 ! Copyright (C) 2006, 2011 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar colors.constants combinators
-combinators.short-circuit documents documents.elements fonts fry
-grouping kernel locals make math math.functions math.order math.ranges
-math.rectangles math.vectors models models.arrow namespaces opengl
-sequences sorting splitting timers ui.baseline-alignment ui.clipboards
-ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.line-support
-ui.gadgets.menus ui.gadgets.scrollers ui.gestures ui.pens.solid
-ui.render ui.text ui.theme unicode opengl.gl ;
+USING: accessors arrays assocs calendar colors.constants
+combinators combinators.short-circuit documents
+documents.elements fonts fry grouping kernel locals make math
+math.functions math.order math.ranges math.rectangles
+math.vectors models models.arrow namespaces opengl sequences
+sorting splitting system timers ui.baseline-alignment
+ui.clipboards ui.commands ui.gadgets ui.gadgets.borders
+ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
+ui.gestures ui.pens.solid ui.render ui.text ui.theme unicode
+opengl.gl ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < line-gadget
@@ -435,12 +437,13 @@ editor "editing" f {
     { T{ key-down f { C+ } "BACKSPACE" } delete-previous-word }
     { T{ key-down f { A+ } "DELETE" } delete-to-end-of-line }
     { T{ key-down f { A+ } "BACKSPACE" } delete-to-start-of-line }
+} os unix? [ {
     { T{ key-down f { C+ } "d" } delete-next-character }
     { T{ key-down f { C+ } "h" } delete-previous-character }
     { T{ key-down f { C+ } "u" } delete-to-start-of-line }
     { T{ key-down f { C+ } "k" } delete-to-end-of-line }
     { T{ key-down f { C+ } "w" } delete-previous-word }
-} define-command-map
+} append ] when define-command-map
 
 : com-paste ( editor -- ) clipboard get paste-clipboard ;
 
@@ -490,11 +493,12 @@ editor "caret-motion" f {
     { T{ key-down f f "END" } end-of-line }
     { T{ key-down f { C+ } "HOME" } start-of-document }
     { T{ key-down f { C+ } "END" } end-of-document }
+} os unix? [ {
     { T{ key-down f { C+ } "b" } previous-character }
     { T{ key-down f { C+ } "f" } next-character }
     { T{ key-down f { C+ } "a" } start-of-line }
     { T{ key-down f { C+ } "e" } end-of-line }
-} define-command-map
+} append ] when define-command-map
 
 : clear-editor ( editor -- )
     model>> clear-doc ;
@@ -660,9 +664,10 @@ multiline-editor "multiline" f {
     { T{ key-down f { S+ } "RET" } insert-newline }
     { T{ key-down f f "ENTER" } insert-newline }
     { T{ key-down f { C+ } "j" } com-join-lines }
+} os unix? [ {
     { T{ key-down f { C+ } "p" } previous-line }
     { T{ key-down f { C+ } "n" } next-line }
-} define-command-map
+} append ] when define-command-map
 
 TUPLE: source-editor < multiline-editor ;
 
