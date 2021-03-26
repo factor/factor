@@ -241,7 +241,11 @@ TUPLE: document
 quirks-mode?
 fostering-parent?
 tree
-tree-insert-mode
+tree-insertion-mode
+original-insertion-mode
+last
+node
+context
 doctype
 tag
 end-tag
@@ -253,6 +257,31 @@ temporary-buffer
 comment-token
 open-elements
 return-state ;
+
+! "reset the insertion mode appropriately"
+! : reset-insertion-mode ( document -- document )
+!     f >>last
+!     dup open-elements>> ?last >>node
+!     dup [ open-elements>> ?first ] [ node>> ] bi = [
+!         t >>last dup node>> >>context
+!     ] when
+!     dup node>> {
+!         { [ dup name>> >lower "select" = ] [ drop in-select >>insertion-mode ] }
+!         { [
+!             dup name>> >lower { "td" "th" } member?
+!             pick last>> f = and
+!         ] [ drop in-select >>insertion-mode ] }
+!         { [ dup name>> >lower "select" = ] [ drop in-select >>insertion-mode ] }
+!         { [ dup name>> >lower "select" = ] [ drop in-select >>insertion-mode ] }
+!         { [ dup name>> >lower "select" = ] [ drop in-select >>insertion-mode ] }
+!         { [ dup name>> >lower "select" = ] [ drop in-select >>insertion-mode ] }
+!         { [ dup name>> >lower "select" = ] [ drop in-select >>insertion-mode ] }
+!         { [ dup name>> >lower "select" = ] [ drop in-select >>insertion-mode ] }
+!         { [ dup name>> >lower "select" = ] [ drop in-select >>insertion-mode ] }
+!         { [ dup name>> >lower "select" = ] [ drop in-select >>insertion-mode ] }
+!         { [ dup name>> >lower "select" = ] [ drop in-select >>insertion-mode ] }
+!     } cond
+!     ;
 
 : temporary-buffer-attribute? ( document -- ? )
     return-state>>
@@ -308,7 +337,7 @@ TUPLE: end-tag self-closing? name attributes ;
 : <document> ( -- document )
     document new
         V{ } clone >>tree
-        initial-mode >>tree-insert-mode
+        initial-mode >>tree-insertion-mode
         <doctype> >>doctype
         SBUF" " clone >>attribute-name
         SBUF" " clone >>attribute-value
@@ -338,7 +367,7 @@ TUPLE: end-tag self-closing? name attributes ;
 : push-doctype-system-identifier ( ch document -- )
     doctype>> system-identifier>> push ;
 
-GENERIC: tree-insert* ( document obj tree-insert-mode -- document )
+GENERIC: tree-insert* ( document obj tree-insertion-mode -- document )
 M: initial-mode tree-insert*
     drop {
         { CHAR: \t [ ] }
