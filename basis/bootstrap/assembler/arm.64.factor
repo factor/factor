@@ -25,7 +25,8 @@ big-endian off
 ! x29/fp	Non-volatile	Frame pointer
 ! x30/lr	Non-volatile	Link registers
 
-: stack-frame-size ( -- n ) 4 bootstrap-cells ;
+! varargs https://developer.arm.com/documentation/ihi0055/d/?lang=en
+: stack-frame-size ( -- n ) 8 bootstrap-cells ;
 : volatile-regs ( -- seq ) { X0 X1 X2 X3 X4 X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15 X16 X17 } ;
 ! windows arm - X18 is non-volatile https://docs.microsoft.com/en-us/cpp/build/arm64-windows-abi-conventions?view=msvc-160
 : nv-regs ( -- seq ) { X18 X19 X20 X21 X22 X23 X24 X25 X26 X27 X28 X29 X30 } ;
@@ -98,7 +99,7 @@ big-endian off
 : stack-reg ( -- reg ) SP ;
 ! https://developer.arm.com/documentation/dui0801/a/Overview-of-AArch64-state/Link-registers
 : link-reg ( -- reg ) X30 ; ! LR
-! : stack-frame-reg ( -- reg ) X29 ; ! FP
+: stack-frame-reg ( -- reg ) X29 ; ! FP
 : vm-reg ( -- reg ) X28 ;
 : ds-reg ( -- reg ) X27 ;
 : rs-reg ( -- reg ) X26 ;
@@ -598,12 +599,22 @@ big-endian off
 ] JIT-EXECUTE jit-define
 
 [
-    ! stack-reg stack-framrcee-size bootstrap-cell - SUB
-    stack-frame-size bootstrap-cell - stack-reg stack-reg SUBi64
+    ! x64 ! stack-reg stack-frame-size bootstrap-cell - SUB
+
+
+    ! : link-reg ( -- reg ) X30 ; ! LR
+    ! : stack-frame-reg ( -- reg ) X29 ; ! FP
+
+    ! ! make room for LR plus magic number of callback, 16byte align
+    stack-frame-size bootstrap-cell 2 * + stack-reg stack-reg SUBi64
+    ! link-reg X29 stack-reg STP
+    -16 SP link-reg X29 STP-pre
 ] JIT-PROLOG jit-define
 
 [
-    ! stack-reg stack-frame-size bootstrap-cell - ADD
+    ! x64 ! stack-reg stack-frame-size bootstrap-cell - ADD
+    -16 SP link-reg X29 LDP-pre
+    stack-frame-size bootstrap-cell 2 * + stack-reg stack-reg ADDi64
 ] JIT-EPILOG jit-define
 
 [
