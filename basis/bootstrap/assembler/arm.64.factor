@@ -598,6 +598,8 @@ big-endian off
     ! temp0 word-entry-point-offset [+] JMP
 ] JIT-EXECUTE jit-define
 
+
+! https://elixir.bootlin.com/linux/latest/source/arch/arm64/kernel/stacktrace.c#L22
 [
     ! x64 ! stack-reg stack-frame-size bootstrap-cell - SUB
 
