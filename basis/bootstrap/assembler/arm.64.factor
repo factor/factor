@@ -27,6 +27,7 @@ big-endian off
 
 : stack-frame-size ( -- n ) 4 bootstrap-cells ;
 : volatile-regs ( -- seq ) { X0 X1 X2 X3 X4 X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15 X16 X17 } ;
+! windows arm - X18 is non-volatile https://docs.microsoft.com/en-us/cpp/build/arm64-windows-abi-conventions?view=msvc-160
 : nv-regs ( -- seq ) { X18 X19 X20 X21 X22 X23 X24 X25 X26 X27 X28 X29 X30 } ;
 
 ! callee-save = non-volatile aka call-preserved
@@ -44,24 +45,41 @@ big-endian off
 
 
 ! https://en.wikichip.org/wiki/arm/aarch64
-! Generally, X0 through X18 can corrupt while X19-X29 must be preserved
+! Generally, X0 through X18 (volatile, can corrupt) while X19-X29 must be preserved (non-volatile)
+! Volatile registers' content may change over a subroutine call
+! non-volatile register is a type of register with contents that must be preserved over subroutine calls
 ! Register   Role    Requirement
-! X0 -  X7   Parameter/result registers   Can Corrupt
-! X8         Indirect result location register
-! X9 -  X15  Temporary registers
-! X16 - X17  Intra-procedure call temporary
-! X18        Platform register, otherwise temporary, DONT USE
+! X0 -  X7   Parameter/result registers   Can Corrupt (volatile)
+! X8         Indirect result location register (volatile)
+! X9 -  X15  Temporary registers (volatile)
+! X16 - X17  Intra-procedure call temporary (volatile)
+! x16 - syscall reg with SVC instructioin
+! X18        Platform register, otherwise temporary, DONT USE (volatile)
 
-! X19 - X29    Callee-saved register    Must preserve
+! X19 - X29    Callee-saved register    Must preserve (non-volatile)
 ! X29 - frame pointer register, must always be valid
-! X30    Link Register    Can Corrupt
+! X30    Link Register LR   Can Corrupt
+! X31  Stack Pointer SP
 ! 16-byte stack alignment
+
+! stack walking - {fp, lr} pairs if compiled with frame pointers enabled
 
 : arg1 ( -- reg ) X0 ;
 : arg2 ( -- reg ) X1 ;
 : arg3 ( -- reg ) X2 ;
 : arg4 ( -- reg ) X3 ;
-: red-zone-size ( -- n ) 128 ;
+
+! Red zone
+! windows arm64: 16 bytes https://devblogs.microsoft.com/oldnewthing/20190111-00/?p=100685
+! windows arm32: 8 bytes
+! x86/x64: 0 bytes
+! Apple arm64: 128 bytes https://developer.apple.com/documentation/xcode/writing_arm64_code_for_apple_platforms?language=objc
+: red-zone-size ( -- n ) 16 ; ! 16 bytes on windows, or 128 bytes on linux? or 0?
+! 0 or 16 likely
+! no red zone on x86/x64 windows
+
+
+! https://github.com/MicrosoftDocs/cpp-docs/blob/master/docs/build/arm64-windows-abi-conventions.md
 
 : shift-arg ( -- reg ) X1 ;
 : div-arg ( -- reg ) X0 ;
@@ -73,7 +91,6 @@ big-endian off
 : temp1 ( -- reg ) X10 ;
 : temp2 ( -- reg ) X11 ;
 : temp3 ( -- reg ) X12 ;
-
 
 
 ! : pic-tail-reg ( -- reg ) RBX ;
@@ -141,6 +158,7 @@ big-endian off
 
 
 [
+
     ! ! ctx-reg is preserved across the call because it is non-volatile
     ! ! in the C ABI
     ! jit-save-context
