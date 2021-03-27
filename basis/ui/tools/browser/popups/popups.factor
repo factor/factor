@@ -50,25 +50,3 @@ SLOT: model
 : com-show-incoming-links ( browser-gadget -- )
     [ usage ] "Incoming links" show-links-popup ;
 
-: <active-buttons-table> ( model -- table )
-    [ keys [ ">" swap 2array ] map ] <arrow> trivial-renderer [ second ] <search-table> 
-        dup table>>
-        active-buttons get '[ second _ at invoke-secondary ] >>action
-        [ hide-glass ] >>hook
-        t >>selection-required?
-        10 >>min-rows
-        10 >>max-rows
-        30 >>min-cols
-        30 >>max-cols drop
-    ;
-
-: <active-buttons-popup> ( model title -- gadget )
-    [ <active-buttons-table> white-interior ] dip
-    popup-color <framed-labeled-gadget> links-popup new-wrapper ;
-
-: show-active-buttons-popup ( browser-gadget model title -- )
-    <active-buttons-popup>
-    [ hand-loc get-global point>rect show-glass ] [ request-focus ] bi ; inline
-
-: com-show-active-buttons ( browser-gadget -- )
-    active-buttons get <model> "Active buttons" show-active-buttons-popup ;
