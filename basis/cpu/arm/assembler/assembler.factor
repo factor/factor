@@ -41,6 +41,16 @@ ERROR: arm64-encoding-imm original n-bits-requested truncated ;
 : STP-signed-offset ( offset register-offset register-mid register -- )
     [ 8 / 7 bits ] 3dip swapd STPsoff64-encode ;
 
+
+: LDP-pre ( offset register-offset register-mid register -- )
+    [ 8 / 7 bits ] 3dip swapd LDPpre64-encode ;
+
+: LDP-post ( offset register-offset register-mid register -- )
+    [ 8 / 7 bits ] 3dip swapd LDPpost64-encode ;
+
+: LDP-signed-offset ( offset register-offset register-mid register -- )
+    [ 8 / 7 bits ] 3dip swapd LDPsoff64-encode ;
+
 ! Some instructions allow an immediate literal of n bits
 ! or n bits shifted. This means there are invalid immediate
 ! values, e.g. imm12 of 1, 4096, but not 4097
