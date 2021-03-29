@@ -18,6 +18,7 @@ GENERIC: assoc-clone-like ( assoc exemplar -- newassoc )
 GENERIC: >alist ( assoc -- newassoc )
 GENERIC: keys ( assoc -- keys )
 GENERIC: values ( assoc -- values )
+GENERIC: unzip ( assoc -- keys values )
 
 M: assoc assoc-like drop ; inline
 
@@ -242,7 +243,7 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
 : zip-index ( values -- alist )
     { } zip-index-as ; inline
 
-: unzip ( assoc -- keys values )
+M: assoc unzip
     dup assoc-empty? [ drop { } { } ] [ >alist flip first2 ] if ;
 
 : zip-with-as ( ... seq quot: ( ... key -- ... value ) exemplar -- ... assoc )
@@ -310,6 +311,8 @@ M: enumerated >alist ; inline
 M: enumerated keys seq>> length <iota> >array ; inline
 
 M: enumerated values seq>> >array ; inline
+
+M: enumerated unzip seq>> [ length <iota> ] keep [ >array ] bi@ ;
 
 M: enumerated assoc-size seq>> length ; inline
 
