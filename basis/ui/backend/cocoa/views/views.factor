@@ -43,8 +43,8 @@ CONSTANT: NSFunctionKeyMask   0x800000
 CONSTANT: modifiers {
         { S+ $ NSShiftKeyMask }
         { C+ $ NSControlKeyMask }
-        { A+ $ NSCommandKeyMask }
-        { M+ $ NSAlternateKeyMask }
+        { M+ $ NSCommandKeyMask }
+        { A+ $ NSAlternateKeyMask }
     }
 
 CONSTANT: key-codes
