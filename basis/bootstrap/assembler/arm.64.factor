@@ -444,6 +444,7 @@ big-endian off
 
 ! C to Factor entry point
 [
+    0 BRK
     ! ! Optimizing compiler's side of callback accesses
     ! ! arguments that are on the stack via the frame pointer.
     ! ! On x86-32 fastcall, and x86-64, some arguments are passed
@@ -610,12 +611,12 @@ big-endian off
     ! ! make room for LR plus magic number of callback, 16byte align
     stack-frame-size bootstrap-cell 2 * + stack-reg stack-reg SUBi64
     ! link-reg X29 stack-reg STP
-    -16 SP link-reg X29 STP-pre
+    0 SP link-reg X29 STP-pre
 ] JIT-PROLOG jit-define
 
 [
     ! x64 ! stack-reg stack-frame-size bootstrap-cell - ADD
-    -16 SP link-reg X29 LDP-pre
+    0 SP link-reg X29 LDP-pre
     stack-frame-size bootstrap-cell 2 * + stack-reg stack-reg ADDi64
 ] JIT-EPILOG jit-define
 
