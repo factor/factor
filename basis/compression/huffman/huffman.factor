@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bit-arrays bitstreams combinators
-fry hashtables heaps io kernel locals math math.order
+fry hashtables heaps io kernel locals math math.bits math.order
 math.parser math.ranges multiline namespaces sequences sorting
 vectors ;
 QUALIFIED-WITH: bitstreams bs

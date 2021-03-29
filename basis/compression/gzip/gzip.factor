@@ -136,27 +136,20 @@ cond ;
 : replace-pair (  pair  -- new-pair  )
     [ first lit-dict get replace-one ]  [ second dist-dict get replace-one ] bi 2array ;
   
+! Replace all vector elements with their codes
 : vec-to-codes ( vec -- new-vec )
     [ dup array? [ replace-pair ] [ lit-dict get replace-one ] if ]  map ;
 
-: compress-dynamic ( lit-seq -- bits )
-    compress-lz77 vec-to-lits lit-vec set 
-    lit-vec get build-dicts  
-    dist-dict set 
-    lit-dict set
-    lit-vec get vec-to-codes ;
-
-
 ! Dictionary encoding
-: lit-code-lengths ( -- len-seq )
-     285 [0..b] [ lit-dict get 2dup key? [ at length ] [ 2drop 0 ] if ] map  ;
+: lit-code-lens ( -- len-seq )
+     285 [0..b] [ lit-dict get at* [ length ] [ drop 0 ] if ] map [ zero? ] trim-tail ;
 
-: dist-code-lengths ( -- len-seq )
-     31 [0..b] [ lit-dict get 2dup key? [ at length ] [ 2drop 0 ] if ] map  ;
+: dist-code-lens ( -- len-seq )
+     31 [0..b] [ lit-dict get at* [ length ] [ drop 0 ] if ] map [ zero? ] trim-tail ;
 
 :: replace-0-single ( m len-seq  -- new-len-seq )
-    m 11 < [ len-seq m [ 0 ] replicate  17 m 3 - 3 <bits> >bit-array reverse 2array 1array replace ]
-           [ len-seq m [ 0 ] replicate 18 m 11 - 7 <bits> >bit-array reverse 2array 1array replace ]    
+    m 11 < [ len-seq m 0 <array> 17 m 3 - 3 <bits> >bit-array reverse 2array 1array replace ]
+           [ len-seq m 0 <array> 18 m 11 - 7 <bits> >bit-array reverse 2array 1array replace ]    
     if ;
 
 :: replace-0-range ( range len-seq -- new-len-seq )
@@ -166,24 +159,55 @@ cond ;
     2 139 (a..b) swap replace-0-range ;
 
 :: replace-runs ( n len-seq  -- new-len-seq )
-    len-seq 7 [ n ] replicate { n { 16 ?{ 1 1 } } } replace  
-    6 [ n ] replicate { n { 16 ?{ 1 0 } } } replace 
-    5 [ n ] replicate { n { 16 ?{ 0 1 } } } replace 
-    4 [ n ] replicate { n { 16 ?{ 0 0 } } }  replace  ;
+    len-seq 7 n <array> { n { 16 ?{ 1 1 } } } replace  
+    6 n <array> { n { 16 ?{ t f } } } replace 
+    5 n <array> { n { 16 ?{ f t } } } replace 
+    4 n <array>  { n { 16 ?{ f f } } }  replace  ;
 
 :: replace-all-runs ( range len-seq  -- new-len-seq )
    range empty? [ len-seq ] [ range first range 1 tail len-seq replace-all-runs replace-runs ] if ;
 
+: run-free-lit ( -- len-seq )
+    0 285 [a..b] lit-code-lens replace-0 replace-all-runs ;
 
+: run-free-dist ( -- len-seq )
+   0 31 [a..b] dist-code-lens replace-0 replace-all-runs ;
+        
 : run-free-codes ( -- len-seq )
-    -1 32 (a..b) dist-code-lengths replace-0 replace-all-runs -1 286 (a..b) lit-code-lengths replace-0 replace-all-runs concat ;
+    run-free-lit run-free-dist append ;
 
 : code-len-dict ( -- code-dict )
-    run-free-codes generate-canonical-codes ;
+    run-free-codes [ dup array? [ first ] when ] map generate-canonical-codes ;
 
-: replace-lens ( -- len-seq )
-   run-free-codes  [ dup array? [ first code-len-dict at ] if ] map
+: compressed-lens ( -- len-seq )
+   run-free-codes  [ dup array? [ [ first code-len-dict at ] [ second ] bi 2array ] [ code-len-dict at ] if ] map ;
+
+CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
+
+: clen-seq ( -- len-seq )
+    clen-shuffle [ code-len-dict at* [ length ] [ drop 0 ] if ] map [ zero? ] trim-tail ;
+
+: clen-bits ( -- bit-arr )
+    clen-seq [ 3 <bits> >bit-array reverse ] map  ;
  
+: h-lit ( -- bit-arr )
+    lit-code-lens length 257 - 5 <bits> >bit-array reverse ;
 
+: h-dist ( -- bit-arr )
+    dist-code-lens length 1 - 5 <bits> >bit-array reverse ;
+
+: h-clen ( -- bit-arr )
+    clen-seq length 4 - 4 <bits> >bit-array reverse ;
+
+: dynamic-headers ( -- bit-arr-seq )
+    ?{ t f } h-lit h-dist h-clen 4array ;
+
+: compress-dynamic ( lit-seq -- bit-arr-seq  )
+    [ compress-lz77 vec-to-lits lit-vec set 
+    lit-vec get build-dicts  
+    dist-dict set 
+    lit-dict set
+    dynamic-headers clen-bits compressed-lens lit-vec get vec-to-codes 3array append ] with-scope ;
+    
 
 
