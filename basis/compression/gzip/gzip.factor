@@ -1,8 +1,13 @@
 ! Copyright (C) 2020 Jacob Fischer and Abtin Molavi.
 ! See http://factorcode.org/license.txt for BSD license.
+<<<<<<< HEAD
 USING: arrays assocs bit-arrays byte-arrays combinators
 compression.huffman fry kernel locals math math.bits math.ranges
 namespaces sequences splitting vectors ;
+=======
+USING: arrays assocs bit-arrays byte-arrays combinators fry
+kernel locals math math.bits sequences vectors accessors make literals ;
+>>>>>>> 1445356acc88d0a4ca3e7b37f576aba5a943165d
 IN: compression.gzip
 
 SYMBOL: lit-dict
@@ -116,9 +121,33 @@ cond ;
 : vec-to-bits ( vec -- bitarr )
     [ dup array? [ pair-to-bits ] [ (lit-to-bits) ] if ] map ;
 
+
 ! fixed huffman compression function 
 : compress-fixed ( bytes -- bits )
     compress-lz77 vec-to-lits vec-to-bits ;
+
+<<
+:: R2, ( n -- ) n ,     n 2 64 * + ,     n 1 64 * + ,     n 3 64 * + , ;
+:: R4, ( n -- ) n R2,   n 2 16 * + R2,   n 1 16 * + R2,   n 3 16 * + R2, ;
+:: R6, ( n -- ) n R4,   n 2 4 * + R4,    n 1 4 * + R4,    n 3 4 * + R4, ;
+>>
+CONSTANT: bit-reverse-table $[
+    [ 0 R6, 2 R6, 1 R6, 3 R6, ] B{ } make
+]
+: reverse-bits ( byte-array -- byte-array' )
+    [ bit-reverse-table nth ] B{ } map-as ;
+
+: byte-array>bit-array ( byte-array -- bit-array )
+    [ length 8 * ] [ bit-array boa ] bi ;
+
+: bytes-to-bits ( bytes -- bits )
+    reverse-bits byte-array>bit-array ;
+
+: bits-to-bytes ( bits -- bytes )
+    underlying>> reverse-bits ;
+
+: seq-of-bits-to-byte-arr ( seq -- byte-array )
+    concat bits-to-bytes ;
 
 ! Dynamic Huffman
 
@@ -184,6 +213,7 @@ cond ;
 
 CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
 
+! Data that precedes dictionary embedding to allow for decoding 
 : clen-seq ( -- len-seq )
     clen-shuffle [ code-len-dict at* [ length ] [ drop 0 ] if ] map [ zero? ] trim-tail ;
 
@@ -202,6 +232,7 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
 : dynamic-headers ( -- bit-arr-seq )
     ?{ t f } h-lit h-dist h-clen 4array ;
 
+! Compresses a block with dynamic huffman compression.
 : compress-dynamic ( lit-seq -- bit-arr-seq  )
     [ compress-lz77 vec-to-lits lit-vec set 
     lit-vec get build-dicts  
