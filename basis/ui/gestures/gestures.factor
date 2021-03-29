@@ -323,8 +323,8 @@ HOOK: modifiers>string os ( modifiers -- string )
 M: macosx modifiers>string
     [
         {
-            { A+ [ "\u002318" ] }
-            { M+ [ "\u002325" ] }
+            { M+ [ "\u002318" ] }
+            { A+ [ "\u002325" ] }
             { S+ [ "\u0021e7" ] }
             { C+ [ "\u002303" ] }
         } case
