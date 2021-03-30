@@ -1,9 +1,10 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs classes combinators destructors
-documents.private fonts io io.styles kernel math math.rectangles
-math.vectors models namespaces sequences sets sorting splitting
-strings ui.baseline-alignment ui.clipboards ui.gadgets
+USING: accessors assocs classes combinators
+combinators.short-circuit destructors documents.private fonts io
+io.styles kernel math math.rectangles math.vectors models
+namespaces sequences sets sorting splitting strings
+ui.baseline-alignment ui.clipboards ui.gadgets
 ui.gadgets.borders ui.gadgets.grid-lines ui.gadgets.grids
 ui.gadgets.icons ui.gadgets.incremental ui.gadgets.labels
 ui.gadgets.menus ui.gadgets.packs ui.gadgets.paragraphs
@@ -86,6 +87,9 @@ M: pane selected-children
 : scroll-pane ( pane -- )
     dup scrolls?>> [ scroll>bottom ] [ drop ] if ;
 
+M: pane handle-gesture
+    over key-gesture? [ dup scroll-pane ] when call-next-method ;
+
 : smash-line ( current -- gadget )
     dup children>> {
         { [ dup empty? ] [ 2drop "" <label> ] }
@@ -116,8 +120,16 @@ GENERIC: pane-line ( str style gadget -- )
 : pane-write1 ( char pane -- )
     [ 1string H{ } ] dip current>> pane-line ;
 
+: pane-scrolls? ( pane -- ? )
+    dup scrolls?>> [
+        find-scroller control-value [
+            second first4 nip [ + ] [ >= ] bi*
+        ] [ f ] if*
+    ] [ drop f ] if ;
+
 : do-pane-stream ( pane-stream quot -- )
-    [ pane>> ] dip keep scroll-pane ; inline
+    [ pane>> ] dip dup pane-scrolls? [ keep ] dip
+    [ scroll>bottom ] [ drop ] if ; inline
 
 M: pane-stream stream-nl
     [ pane-nl ] do-pane-stream ;
