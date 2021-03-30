@@ -36,11 +36,6 @@ M: gadget viewport-column-header drop f ;
     ] keep
     2dup control-value = [ 2drop ] [ set-control-value ] if ;
 
-: scroll-at-bottom? ( scroller -- ? )
-    control-value [
-        second first4 nip [ + ] [ >= ] bi*
-    ] [ f ] if* ;
-
 <PRIVATE
 
 : do-mouse-scroll ( scroller -- )
