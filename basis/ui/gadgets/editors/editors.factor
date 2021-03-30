@@ -486,6 +486,10 @@ editor "clipboard" f {
 
 : end-of-line ( editor -- ) one-line-elt editor-next ;
 
+: start-of-paragraph ( editor -- ) paragraph-elt editor-prev ;
+
+: end-of-paragraph ( editor -- ) paragraph-elt editor-next ;
+
 editor "caret-motion" f {
     { T{ button-down } position-caret }
     { T{ key-down f f "LEFT" } previous-character }
@@ -494,15 +498,15 @@ editor "caret-motion" f {
     { T{ key-down f ${ os macosx? A+ C+ ? } "RIGHT" } next-word }
     { T{ key-down f f "HOME" } start-of-line }
     { T{ key-down f f "END" } end-of-line }
-    ! { T{ key-down f ${ os macosx? A+ C+ ? } "UP" } start-of-paragraph }
-    ! { T{ key-down f ${ os macosx? A+ C+ ? } "DOWN" } end-of-paragraph }
+    { T{ key-down f ${ os macosx? A+ C+ ? } "UP" } start-of-paragraph }
+    { T{ key-down f ${ os macosx? A+ C+ ? } "DOWN" } end-of-paragraph }
     { T{ key-down f ${ os macosx? A+ C+ ? } "HOME" } start-of-document }
     { T{ key-down f ${ os macosx? A+ C+ ? } "END" } end-of-document }
 } os macosx? [ {
     { T{ key-down f { M+ } "LEFT" } start-of-line }
     { T{ key-down f { M+ } "RIGHT" } end-of-line }
-    ! { T{ key-down f { M+ } "UP" } start-of-paragraph }
-    ! { T{ key-down f { M+ } "DOWN" } end-of-paragraph }
+    { T{ key-down f { M+ } "UP" } start-of-paragraph }
+    { T{ key-down f { M+ } "DOWN" } end-of-paragraph }
     { T{ key-down f { M+ } "HOME" } start-of-document }
     { T{ key-down f { M+ } "END" } end-of-document }
     { T{ key-down f { C+ } "b" } previous-character }
@@ -543,6 +547,12 @@ editor "caret-motion" f {
 : select-end-of-line ( editor -- )
     one-line-elt editor-select-next ;
 
+: select-start-of-paragraph ( editor -- )
+    paragraph-elt editor-select-prev ;
+
+: select-end-of-paragraph ( editor -- )
+    paragraph-elt editor-select-next ;
+
 : select-start-of-document ( editor -- )
     doc-elt editor-select-prev ;
 
@@ -564,15 +574,15 @@ editor "selection" f {
     { T{ key-down f ${ S+ os macosx? A+ C+ ? } "RIGHT" } select-next-word }
     { T{ key-down f { S+ } "HOME" } select-start-of-line }
     { T{ key-down f { S+ } "END" } select-end-of-line }
-    ! { T{ key-down f ${ S+ os macosx? A+ C+ ? } "UP" } select-start-of-paragraph }
-    ! { T{ key-down f ${ S+ os macosx? A+ C+ ? } "DOWN" } select-end-of-paragraph }
+    { T{ key-down f ${ S+ os macosx? A+ C+ ? } "UP" } select-start-of-paragraph }
+    { T{ key-down f ${ S+ os macosx? A+ C+ ? } "DOWN" } select-end-of-paragraph }
     { T{ key-down f ${ S+ os macosx? A+ C+ ? } "HOME" } select-start-of-document }
     { T{ key-down f ${ S+ os macosx? A+ C+ ? } "END" } select-end-of-document }
 } os macosx? [ {
     { T{ key-down f { S+ M+ } "LEFT" } select-start-of-line }
     { T{ key-down f { S+ M+ } "RIGHT" } select-end-of-line }
-    ! { T{ key-down f ${ S+ M+ } "UP" } select-start-of-paragraph }
-    ! { T{ key-down f ${ S+ M+ } "DOWN" } select-end-of-paragraph }
+    { T{ key-down f ${ S+ M+ } "UP" } select-start-of-paragraph }
+    { T{ key-down f ${ S+ M+ } "DOWN" } select-end-of-paragraph }
     { T{ key-down f { S+ M+ } "HOME" } select-start-of-document }
     { T{ key-down f { S+ M+ } "END" } select-end-of-document }
 } append ] when define-command-map
