@@ -121,7 +121,11 @@ GENERIC: pane-line ( str style gadget -- )
     [ 1string H{ } ] dip current>> pane-line ;
 
 : pane-scrolls? ( pane -- ? )
-    dup scrolls?>> [ find-scroller scroll-at-bottom? ] [ drop f ] if ;
+    dup scrolls?>> [
+        find-scroller control-value [
+            second first4 nip [ + ] [ >= ] bi*
+        ] [ f ] if*
+    ] [ drop f ] if ;
 
 : do-pane-stream ( pane-stream quot -- )
     [ pane>> ] dip dup pane-scrolls? [ keep ] dip
