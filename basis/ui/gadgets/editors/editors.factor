@@ -440,7 +440,6 @@ editor "editing" f {
 } os macosx? [ {
     { T{ key-down f { C+ } "DELETE" } delete-next-character }
     { T{ key-down f { C+ } "BACKSPACE" } delete-previous-character }
-} append ] when os unix? [ {
     ! { T{ key-down f { C+ } "t" } transpose-character }
     { T{ key-down f { C+ } "d" } delete-next-character }
     { T{ key-down f { C+ } "h" } delete-previous-character }
@@ -506,7 +505,6 @@ editor "caret-motion" f {
     ! { T{ key-down f { M+ } "DOWN" } end-of-paragraph }
     { T{ key-down f { M+ } "HOME" } start-of-document }
     { T{ key-down f { M+ } "END" } end-of-document }
-} append ] when os unix? [ {
     { T{ key-down f { C+ } "b" } previous-character }
     { T{ key-down f { C+ } "f" } next-character }
     { T{ key-down f { C+ } "a" } start-of-line }
