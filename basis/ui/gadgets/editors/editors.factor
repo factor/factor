@@ -440,12 +440,6 @@ editor "editing" f {
 } os macosx? [ {
     { T{ key-down f { C+ } "DELETE" } delete-next-character }
     { T{ key-down f { C+ } "BACKSPACE" } delete-previous-character }
-    ! { T{ key-down f { C+ } "t" } transpose-character }
-    { T{ key-down f { C+ } "d" } delete-next-character }
-    { T{ key-down f { C+ } "h" } delete-previous-character }
-    { T{ key-down f { C+ } "u" } delete-to-start-of-line }
-    { T{ key-down f { C+ } "k" } delete-to-end-of-line }
-    { T{ key-down f { C+ } "w" } delete-previous-word }
 } append ] when define-command-map
 
 : com-paste ( editor -- ) clipboard get paste-clipboard ;
@@ -509,10 +503,6 @@ editor "caret-motion" f {
     { T{ key-down f { M+ } "DOWN" } end-of-paragraph }
     { T{ key-down f { M+ } "HOME" } start-of-document }
     { T{ key-down f { M+ } "END" } end-of-document }
-    { T{ key-down f { C+ } "b" } previous-character }
-    { T{ key-down f { C+ } "f" } next-character }
-    { T{ key-down f { C+ } "a" } start-of-line }
-    { T{ key-down f { C+ } "e" } end-of-line }
 } append ] when define-command-map
 
 : clear-editor ( editor -- )
@@ -695,10 +685,7 @@ multiline-editor "multiline" f {
     { T{ key-down f f "ENTER" } insert-newline }
     { T{ key-down f { S+ } "ENTER" } insert-newline }
     { T{ key-down f { C+ } "j" } com-join-lines }
-} os unix? [ {
-    { T{ key-down f { C+ } "p" } previous-line }
-    { T{ key-down f { C+ } "n" } next-line }
-} append ] when define-command-map
+} define-command-map
 
 TUPLE: source-editor < multiline-editor ;
 
@@ -777,3 +764,19 @@ TUPLE: action-field < field quot ;
 action-field H{
     { T{ key-down f f "RET" } [ invoke-action-field ] }
 } set-gestures
+
+: readline-bindings ( editor-class -- )
+    "readline" f {
+        { T{ key-down f { C+ } "p" } previous-line }
+        { T{ key-down f { C+ } "n" } next-line }
+        { T{ key-down f { C+ } "b" } previous-character }
+        { T{ key-down f { C+ } "f" } next-character }
+        { T{ key-down f { C+ } "a" } start-of-line }
+        { T{ key-down f { C+ } "e" } end-of-line }
+        ! { T{ key-down f { C+ } "t" } transpose-character }
+        { T{ key-down f { C+ } "d" } delete-next-character }
+        { T{ key-down f { C+ } "h" } delete-previous-character }
+        { T{ key-down f { C+ } "u" } delete-to-start-of-line }
+        { T{ key-down f { C+ } "k" } delete-to-end-of-line }
+        { T{ key-down f { C+ } "w" } delete-previous-word }
+    } define-command-map ;
