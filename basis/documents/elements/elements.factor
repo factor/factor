@@ -113,7 +113,7 @@ M: one-line-elt next-elt
     [ empty? ] find-last-from drop [ 1 + ] [ 0 ] if* :> line#
 
     loc first line# = loc second 0 = and [
-        line# 1 - 0 2array
+        line# 1 [-] 0 2array
     ] [
         line# 0 2array
     ] if ;
@@ -122,11 +122,12 @@ M: one-line-elt next-elt
     loc first 1 + document value>>
     [ empty? ] find-from drop :> line#
 
-    line# document value>> length or 1 [-]
-    dup document doc-line length
-    [ zero? [ 1 + ] when ] keep 2array
-
-    dup loc = [ first 1 + 0 2array ] when ;
+    line# [
+        1 - dup document doc-line length 2array
+        dup loc = [ first 1 + 0 2array ] when
+    ] [
+        document doc-end
+    ] if* ;
 
 PRIVATE>
 
@@ -149,7 +150,7 @@ M: page-elt next-elt
     3dup [ first ] [ last-line# ] [ #lines>> ] tri* - >
     [ drop nip doc-end ] [ nip #lines>> +line ] if ;
 
-CONSTANT: line-elt T{ page-elt f 1 }
+CONSTANT: line-elt T{ page-elt { #lines 1 } }
 
 SINGLETON: doc-elt
 
