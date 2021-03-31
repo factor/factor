@@ -68,14 +68,14 @@ IN: ui.tools.operations
 } define-operation
 
 [ pathname? ] \ edit-file H{
-    { +keyboard+ T{ key-down f { C+ } "E" } }
+    { +keyboard+ T{ key-down f { C+ } "e" } }
     { +primary+ t }
     { +secondary+ t }
     { +listener+ t }
 } define-operation
 
 [ definition-mixin? ] \ edit H{
-    { +keyboard+ T{ key-down f { C+ } "E" } }
+    { +keyboard+ T{ key-down f { C+ } "e" } }
     { +listener+ t }
 } define-operation
 
@@ -100,17 +100,17 @@ IN: ui.tools.operations
 [ definition-mixin? ] \ com-forget H{ } define-operation
 
 [ topic? ] \ com-browse H{
-    { +keyboard+ T{ key-down f { C+ } "H" } }
+    { +keyboard+ T{ key-down f { C+ } "h" } }
     { +primary+ t }
 } define-operation
 
 [ word? ] \ usage. H{
-    { +keyboard+ T{ key-down f { C+ } "U" } }
+    { +keyboard+ T{ key-down f { C+ } "u" } }
     { +listener+ t }
 } define-operation
 
 [ word? ] \ fix H{
-    { +keyboard+ T{ key-down f { C+ } "F" } }
+    { +keyboard+ T{ key-down f { C+ } "f" } }
     { +listener+ t }
 } define-operation
 
@@ -155,24 +155,24 @@ M: word com-stack-effect 1quotation com-stack-effect ;
 
 ! Quotations
 [ quotation? ] \ com-stack-effect H{
-    { +keyboard+ T{ key-down f { C+ } "I" } }
+    { +keyboard+ T{ key-down f { C+ } "i" } }
     { +listener+ t }
 } define-operation
 
 [ quotation? ] \ walk H{
-    { +keyboard+ T{ key-down f { C+ } "W" } }
+    { +keyboard+ T{ key-down f { C+ } "w" } }
     { +listener+ t }
 } define-operation
 
 [ quotation? ] \ time H{
-    { +keyboard+ T{ key-down f { C+ } "T" } }
+    { +keyboard+ T{ key-down f { C+ } "t" } }
     { +listener+ t }
 } define-operation
 
 : com-expand-macros ( quot -- ) expand-macros . ;
 
 [ quotation? ] \ com-expand-macros H{
-    { +keyboard+ T{ key-down f { C+ } "M" } }
+    { +keyboard+ T{ key-down f { C+ } "m" } }
     { +listener+ t }
 } define-operation
 
