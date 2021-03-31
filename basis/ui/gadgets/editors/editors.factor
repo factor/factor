@@ -630,9 +630,6 @@ PRIVATE>
 : insert-newline ( editor -- )
     "\n" swap user-input* drop ;
 
-: insert-newline-after ( editor -- )
-    [ insert-newline ] [ previous-character ] bi ;
-
 : change-selection ( editor quot -- )
     '[ gadget-selection @ ] [ user-input* drop ] bi ; inline
 
@@ -687,7 +684,6 @@ multiline-editor "multiline" f {
     { T{ key-down f { S+ } "RET" } insert-newline }
     { T{ key-down f f "ENTER" } insert-newline }
     { T{ key-down f { S+ } "ENTER" } insert-newline }
-    { T{ key-down f { C+ } "o" } insert-newline-after }
     { T{ key-down f { C+ } "j" } com-join-lines }
 } define-command-map
 
