@@ -581,8 +581,8 @@ editor "selection" f {
 } os macosx? [ {
     { T{ key-down f { S+ M+ } "LEFT" } select-start-of-line }
     { T{ key-down f { S+ M+ } "RIGHT" } select-end-of-line }
-    { T{ key-down f ${ S+ M+ } "UP" } select-start-of-paragraph }
-    { T{ key-down f ${ S+ M+ } "DOWN" } select-end-of-paragraph }
+    { T{ key-down f { S+ M+ } "UP" } select-start-of-paragraph }
+    { T{ key-down f { S+ M+ } "DOWN" } select-end-of-paragraph }
     { T{ key-down f { S+ M+ } "HOME" } select-start-of-document }
     { T{ key-down f { S+ M+ } "END" } select-end-of-document }
 } append ] when define-command-map
@@ -693,6 +693,7 @@ multiline-editor "multiline" f {
     { T{ key-down f f "RET" } insert-newline }
     { T{ key-down f { S+ } "RET" } insert-newline }
     { T{ key-down f f "ENTER" } insert-newline }
+    { T{ key-down f { S+ } "ENTER" } insert-newline }
     { T{ key-down f { C+ } "j" } com-join-lines }
 } os unix? [ {
     { T{ key-down f { C+ } "p" } previous-line }

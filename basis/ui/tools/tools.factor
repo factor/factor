@@ -22,8 +22,8 @@ tool "tool-switching" f {
 } define-command-map
 
 tool "common" f {
-    { T{ key-down f ${ os macosx? M+ C+ } "w" } close-window }
-    { T{ key-down f ${ os macosx? M+ C+ } "q" } com-exit }
+    { T{ key-down f ${ os macosx? M+ C+ ? } "w" } close-window }
+    { T{ key-down f ${ os macosx? M+ C+ ? } "q" } com-exit }
     { T{ key-down f f "F2" } refresh-all }
     { T{ key-down f f "F3" } show-error-list }
 } os macosx? {
