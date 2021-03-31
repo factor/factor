@@ -379,7 +379,7 @@ M: zoom-out-action gesture>string drop "Zoom out (pinch)" ;
 HOOK: action-modifier os ( -- mod )
 
 M: object action-modifier C+ ;
-M: macosx action-modifier A+ ;
+M: macosx action-modifier M+ ;
 
 M: action gesture>string
     action-gestures value-at
