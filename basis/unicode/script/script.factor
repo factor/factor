@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: interval-maps simple-flat-file ;
+USING: interval-maps literals simple-flat-file ;
 IN: unicode.script
 
 CONSTANT: script-table $[
