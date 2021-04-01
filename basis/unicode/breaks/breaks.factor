@@ -8,9 +8,13 @@ IN: unicode.breaks
 
 <PRIVATE
 
+<<
+
 :: load-interval-file-for ( filename n key -- table )
     filename load-data-file [ n swap nth key = ] filter
     intern-values expand-ranges ;
+
+>>
 
 CONSTANT: emoji-modifier-table $[
     "resource:basis/unicode/UCD/auxiliary/emoji-data.txt"
