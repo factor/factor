@@ -297,7 +297,9 @@ SYMBOL: check-RI-pair
     table get [
         [ { { 0 [ f ] } { 1 [ t ] } [ ] } case ] map
     ] map ;
+>>
 
+<<
 CONSTANT: word-table $[
     unicode-words init-table table
     [ make-word-table finish-word-table ] with-variable
