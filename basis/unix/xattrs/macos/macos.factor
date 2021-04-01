@@ -10,4 +10,4 @@ IN: unix.xattrs.macos
 
 : list-xattrs ( path flags -- out )
     '[ _ _ swapd list-xattrs-impl ]
-    ${ 512 16384 XATTR_MAXSIZE } <immediate> retries ;
+    <immediate> ${ 512 16384 XATTR_MAXSIZE } retries ;
