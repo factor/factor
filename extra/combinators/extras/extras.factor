@@ -109,3 +109,7 @@ MACRO: chain ( quots -- quot )
 
 : with-output-variable ( value variable quot -- value )
     over [ get ] curry compose with-variable ; inline
+
+: loop1 ( ..a quot: ( ..a -- ..a obj ? ) -- ..a obj )
+    [ call ] keep '[ drop _ loop1 ] when ; inline recursive
+
