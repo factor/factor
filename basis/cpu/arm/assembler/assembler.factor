@@ -1,7 +1,7 @@
 ! Copyright (C) 2020 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators cpu.arm.assembler.opcodes kernel
-math math.bitwise namespaces sequences ;
+math math.bitwise namespaces sequences combinators.extras ;
 IN: cpu.arm.assembler
 
 ! pre-index mode: computed addres is the base-register + offset
@@ -105,9 +105,6 @@ ERROR: imm-out-of-range imm n ;
 : LSLi64 ( imm6 Rn Rd -- ) LSLi64-encode >out ;
 : LSRi32 ( imm6 Rn Rd -- ) LSRi32-encode >out ;
 : LSRi64 ( imm6 Rn Rd -- ) LSRi64-encode >out ;
-
-: with-output-variable ( value variable quot -- value )
-    over [ get ] curry compose with-variable ; inline
 
 : with-new-arm64-offset ( offset quot -- arm64-assembler )
     [ <arm64-assembler> \ arm64-assembler ] dip with-output-variable ; inline
