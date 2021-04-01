@@ -6,23 +6,24 @@ namespaces prettyprint random sequences system threads ;
 IN: retries
 
 TUPLE: retries count time-strategy errors ;
-: new-retries ( time-strategy class -- obj )
+: new-retries ( class -- obj )
     new
-        swap >>time-strategy
         0 >>count
         V{ } clone >>errors ; inline
 
 TUPLE: counted-retries < retries max-retries ;
-: <counted-retries> ( max time-strategy -- retries )
+: <counted-retries> ( time-strategy max-retries -- retries )
     counted-retries new-retries
-        swap >>max-retries ;
+        swap >>max-retries
+        swap >>time-strategy ; inline
 
 TUPLE: sequence-retries < retries seq ;
-: <sequence-retries> ( seq time-strategy -- retries )
+: <sequence-retries> ( time-strategy seq -- retries )
     sequence-retries new-retries
-        swap >>seq ;
+        swap >>seq
+        swap >>time-strategy ; inline
 
-GENERIC#: retries* 1 ( seq/n time-strategy -- obj )
+GENERIC: retries* ( time-strategy seq/n -- obj )
 M: integer retries* <counted-retries> ;
 M: sequence retries* <sequence-retries> ;
 
@@ -72,5 +73,5 @@ ERROR: retries-failed retries quot ;
         ] loop1
     ] with-variable ; inline
 
-: retries ( quot time-strategy -- result )
+: retries ( quot time-strategy n/seq -- result )
     retries* swap with-retries ; inline
