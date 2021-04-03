@@ -1,5 +1,6 @@
-USING: accessors classes.dispatch.covariant-tuples classes.dispatch.eql kernel
-parser prettyprint.custom sequences ;
+USING: accessors classes.dispatch.class classes.dispatch.covariant-tuples
+classes.dispatch.eql effects.parser generic.parser kernel parser
+prettyprint.custom sequences words ;
 
 IN: classes.dispatch.syntax
 
@@ -23,3 +24,14 @@ M: covariant-tuple pprint* pprint-object ;
 M: covariant-tuple pprint-delims
     drop \ D{ \ } ;
 M: covariant-tuple >pprint-sequence classes>> ;
+
+: scan-new-class-method ( -- method )
+    scan-class
+    bootstrap-word <class-specializer> scan-word create-method-in ;
+
+: (CM:) ( -- method def ) [
+        scan-new-class-method
+        [ parse-method-definition ] with-method-definition
+    ] with-definition ;
+
+SYNTAX: CM: (CM:) define ;
