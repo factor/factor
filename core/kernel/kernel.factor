@@ -292,7 +292,7 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
     [ [ not ] compose ] dip while ; inline
 
 ! Object protocol
-GENERIC: hashcode* ( depth obj -- code )
+GENERIC: hashcode* ( depth obj -- code ) flushable
 
 M: object hashcode* 2drop 0 ; inline
 
