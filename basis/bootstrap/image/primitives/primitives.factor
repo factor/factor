@@ -407,7 +407,10 @@ CONSTANT: all-primitives {
     {
         "math.private"
         {
-            { "both-fixnums?" ( x y -- ? ) f { object object } { object } f }
+            {
+                "both-fixnums?" ( x y -- ? ) f
+                { object object } { object } make-foldable
+            }
             {
                 "fixnum+fast" ( x y -- z ) f
                 { fixnum fixnum } { fixnum } make-foldable
