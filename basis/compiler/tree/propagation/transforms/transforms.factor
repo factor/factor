@@ -57,7 +57,7 @@ IN: compiler.tree.propagation.transforms
     [ interval>> ] [ literal>> ] bi* {
         [ nip integer? ]
         [ nip all-ones? ]
-        [ 0 swap [a,b] interval-subset? ]
+        [ [0,b] interval-subset? ]
     } 2&& ;
 
 : zero-bitand? ( value1 value2 -- ? )
