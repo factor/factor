@@ -23,6 +23,10 @@ IN: math.intervals.tests
 
 { T{ interval f { 1 t } { 1 t } } } [ 1 [a,a] ] unit-test
 
+{ T{ interval f { 0 t } { 42 t } } } [ 42 [0,b] ] unit-test
+
+{ T{ interval f { 0 t } { 42 f } } } [ 42 [0,b) ] unit-test
+
 ! Not sure how to handle NaNs yet...
 ! [ 1 0/0. [a,b] ] must-fail
 ! [ 0/0. 1 [a,b] ] must-fail

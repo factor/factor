@@ -60,6 +60,10 @@ M: full-interval to>> drop { 1/0. t } ;
 
 : (a,inf] ( a -- interval ) 1/0. (a,b] ; inline
 
+: [0,b] ( b -- interval ) 0 swap [a,b] ; inline
+
+: [0,b) ( b -- interval ) 0 swap [a,b) ; inline
+
 MEMO: [0,inf] ( -- interval ) 0 [a,inf] ; foldable
 
 MEMO: fixnum-interval ( -- interval )
@@ -364,7 +368,7 @@ SYMBOL: incomparable
     } cond
     swap 0 [a,a] interval>= t eq? [ [0,inf] interval-intersect ] when ;
 
-: (rem-range) ( i -- i' ) interval-abs to>> first 0 swap [a,b) ;
+: (rem-range) ( i -- i' ) interval-abs to>> first [0,b) ;
 
 : interval-rem ( i1 i2 -- i3 )
     {
@@ -413,13 +417,13 @@ PRIVATE>
         {
             {
                 [ 2dup [ interval-nonnegative? ] both? ]
-                [ min-upper-bound 0 swap [a,b] ]
+                [ min-upper-bound [0,b] ]
             }
             {
                 [ 2dup [ interval-nonnegative? ] either? ]
                 [
                     dup interval-nonnegative? [ nip ] [ drop ] if
-                    to>> first 0 swap [a,b]
+                    to>> first [0,b]
                 ]
             }
             [
@@ -461,9 +465,9 @@ PRIVATE>
 : interval-bitxor ( i1 i2 -- i3 )
     [
         { { [ 2dup [ interval-nonnegative? ] both? ]
-            [ max-upper-bound bit-weight 1 - 0 swap [a,b] ] }
+            [ max-upper-bound bit-weight 1 - [0,b] ] }
           { [ 2dup [ interval-negative? ] both? ]
-            [ min-lower-bound bit-weight 1 - 0 swap [a,b] ] }
+            [ min-lower-bound bit-weight 1 - [0,b] ] }
           [ interval-union interval-bit-weight [ neg ] [ 1 - ] bi [a,b] ]
         } cond
     ] do-empty-interval ;
@@ -474,7 +478,7 @@ M: full-interval interval-log2 drop [0,inf] ;
 M: interval interval-log2
     to>> first 1 max dup most-positive-fixnum >
     [ drop full-interval interval-log2 ]
-    [ 1 + >integer log2 0 swap [a,b] ]
+    [ 1 + >integer log2 [0,b] ]
     if ;
 
 : assume< ( i1 i2 -- i3 )
