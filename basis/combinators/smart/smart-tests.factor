@@ -129,4 +129,3 @@ IN: combinators.smart.tests
 { { 1 2 } 3 4 5 6 } [ [ 1 2 3 4 5 6 ] 4 output>array-n ] unit-test
 
 { t } [ [ 10 random dup even? ] smart-loop odd? ] unit-test
-{ t } [ 10 [ random dup even? ] smart-loop odd? ] unit-test
