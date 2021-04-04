@@ -1,6 +1,6 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays calendar combinators combinators.extras
+USING: accessors arrays calendar combinators combinators.smart
 continuations kernel math math.functions math.parser math.ranges
 namespaces prettyprint random sequences system threads ;
 IN: retries
@@ -70,7 +70,7 @@ ERROR: retries-failed retries quot ;
             ] [
                 current-retries get _ retries-failed
             ] if
-        ] loop1
+        ] smart-loop
     ] with-variable ; inline
 
 : retries ( quot time-strategy n/seq -- result )
