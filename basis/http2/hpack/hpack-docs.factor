@@ -27,7 +27,7 @@ HELP: hpack-encode
 }
 { $description "Encodes the sequence of headers using the given context. Outputs the updated context and the encoded header block, as a byte array." } ;
 
-ARTICLE: "http2.hpack" "http2.hpack"
+ARTICLE: "http2.hpack" "HTTP/2 HPACK"
 { $vocab-link "http2.hpack" }
 ;
 
