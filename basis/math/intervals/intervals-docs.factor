@@ -146,6 +146,15 @@ HELP: [a,a]
 { $values { "a" real } { "interval" interval } }
 { $description "Creates a new interval consisting of a single point." } ;
 
+HELP: [0,b]
+{ $values { "b" real } { "interval" interval } }
+{ $description "Creates a new interval that includes lower endpoint 0 and includes the upper endpoint." } ;
+
+HELP: [0,b)
+{ $values { "b" real } { "interval" interval } }
+{ $description "Creates a new interval that includes lower endpoint 0 and excludes the upper endpoint." } ;
+
+
 HELP: [-inf,a]
 { $values { "a" real } { "interval" interval } }
 { $description "Creates a new interval containing all real numbers less than or equal to " { $snippet "a" } ", together with negative infinity." } ;
