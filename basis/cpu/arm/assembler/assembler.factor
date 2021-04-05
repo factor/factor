@@ -108,11 +108,11 @@ ERROR: imm-out-of-range imm n ;
 
 : with-new-arm64-offset ( offset quot -- arm64-assembler )
     [ <arm64-assembler> \ arm64-assembler ] dip
-    '[ _ \ arm64-assembler get ] with-variable ; inline
+    '[ @ \ arm64-assembler get ] with-variable ; inline
 
 : with-new-arm64 ( quot -- arm64-assembler )
     [ 0 <arm64-assembler> \ arm64-assembler ] dip
-    '[ _ \ arm64-assembler get ] with-variable ; inline
+    '[ @ \ arm64-assembler get ] with-variable ; inline
 
 : offset-test-arm64 ( offset quot -- instuctions )
     with-new-arm64-offset out>> ; inline
