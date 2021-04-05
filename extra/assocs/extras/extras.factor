@@ -56,12 +56,31 @@ IN: assocs.extras
 : assoc-invert ( assoc -- newassoc )
     dup assoc-invert-as ;
 
-: assoc-merge! ( assoc1 assoc2 -- assoc1 )
+: assoc-collect! ( assoc1 assoc2 -- assoc1 )
     over [ push-at ] with-assoc assoc-each ;
 
-: assoc-merge ( assoc1 assoc2 -- newassoc )
+: assoc-collect ( assoc1 assoc2 -- newassoc )
     [ [ [ assoc-size ] bi@ + ] [ drop ] 2bi new-assoc ] 2keep
-    [ assoc-merge! ] bi@ ;
+    [ assoc-collect! ] bi@ ;
+
+! iterate over assoc2, replace conflicting values
+! Modifies assoc1
+: assoc-merge! ( assoc1 assoc2 quot: ( value1 value2 -- new-value ) -- assoc1' )
+    [| key2 val2 quot | val2 key2 pick
+     at* [ swap quot call ] [ drop ] if
+     key2 pick set-at ] curry assoc-each ; inline
+
+! Same as above, non-destructive
+: assoc-merge ( assoc1 assoc2 quot: ( value1 value2 -- new-value ) -- new-assoc )
+    pick [ [ clone ] 2dip assoc-merge! ]
+    [ drop nip ] if
+    ; inline
+
+! Successively apply assoc-merge operation
+: assoc-collapse ( seq quot: ( value1 value2 -- new-value ) -- assoc )
+    over empty?
+    [ 2drop f ]
+    [ [ unclip-slice clone ] [ [ assoc-merge! ] curry ] bi* reduce ] if ; inline
 
 GENERIC: delete-value-at ( value assoc -- )
 
