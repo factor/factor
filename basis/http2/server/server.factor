@@ -4,9 +4,10 @@ io.sockets kernel namespaces ;
 IN: http2.server
 
 ! individual connection stuff
-TUPLE: http2-stream hpack-context ; ! do I even need this?
+TUPLE: http2-stream ; ! do I even need this?
 
-TUPLE: http2-connection streams settings ;
+TUPLE: http2-connection streams settings hpack-decode-context
+hpack-encode-context ;
 
 CONSTANT: client-connection-prefix B{ 0x50 0x52 0x49 0x20 0x2a
             0x20 0x48 0x54 0x54 0x50 0x2f 0x32 0x2e 0x30 0x0d
