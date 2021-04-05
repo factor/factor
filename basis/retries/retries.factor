@@ -60,7 +60,8 @@ ERROR: retries-failed retries quot ;
 
 : with-retries ( retries quot -- result )
     [ current-retries ] dip dup '[
-        [
+        f [
+            drop
             current-retries get next-retry [
                 [ sleep ] unless-zero
                 _ [ f ] compose [
@@ -70,7 +71,7 @@ ERROR: retries-failed retries quot ;
             ] [
                 current-retries get _ retries-failed
             ] if
-        ] smart-loop
+        ] loop
     ] with-variable ; inline
 
 : retries ( quot time-strategy n/seq -- result )
