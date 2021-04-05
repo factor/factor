@@ -15,12 +15,8 @@ M: covariant-tuple class>dispatch ;
 : <covariant-tuple> ( classes -- classoid )
     [ classoid check-instance ] { } map-as covariant-tuple boa ;
 
-: remove-redundant ( classes -- classes )
-    dup [ object class= not ] find
-    [ tail-slice ] [ 2drop f ] if ;
-
-M: covariant-tuple dispatch-arity classes>>
-    remove-redundant length ;
+M: covariant-tuple dispatch-arity
+    classes>> length ;
 
 M: covariant-tuple nth-dispatch-class
     classes>> <reversed> ?nth object or ;

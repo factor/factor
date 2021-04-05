@@ -178,12 +178,13 @@ M: multi-generic update-generic
     [ V{ } clone "engines" set-word-prop ]
     [
         [ multi-generic-arity ]
-        [ "methods" word-prop clone
-          dup find-default default set
-        ] bi methods>multi-methods
+        [ "methods" word-prop clone ] bi
+        generic-word get "default-method" word-prop default set
+        methods>multi-methods
         flatten-multi-methods
-        compile-engines*
-        <engine> compile-engine 
+        compile-engines* >hashtable
+        dup find-default default set
+        <engine> compile-engine
     ] tri ;
 
 ! Since we decided that dispatch types cannot be ordered with regular classes,

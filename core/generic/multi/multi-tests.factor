@@ -1,7 +1,7 @@
 USING: arrays classes classes.algebra classes.dispatch.covariant-tuples
 classes.dispatch.syntax compiler.test generic generic.multi generic.single
 kernel kernel.private literals math math.combinatorics namespaces random
-sequences tools.dispatch tools.test tools.time words ;
+sequences strings tools.dispatch tools.test tools.time words ;
 IN: generic.multi.tests
 
 
@@ -233,3 +233,42 @@ MM: mg ( o: t3 o: t2 o: t2 -- ) call-next-method ;
 { V{ 3 4 } } [ t3 new t2 new t0 new test-acc ] unit-test
 { V{ 2 3 4 } } [ t2 new t2 new t2 new test-acc ] unit-test
 { V{ 1 3 4 } } [ t3 new t2 new t2 new test-acc ] unit-test
+
+! Checking when first dispatch is defined on object
+
+GENERIC: tos-object ( obj obj -- obj )
+
+MM: tos-object ( o: array c: fixnum -- obj )
+    2drop 42 ;
+MM: tos-object ( o: integer c: object -- obj )
+    2drop 43 ;
+
+{ 42 } [ { 11 22 } 33 tos-object ] unit-test
+[ "haha" 33 tos-object ] must-fail
+[ { 11 22 } 44.0 tos-object ] must-fail
+{ 43 } [ 11 fixnum tos-object ] unit-test
+
+! Checking that overriding default method works
+GENERIC: gen-with-def ( o o -- o )
+
+MM: gen-with-def ( o: object o: object -- o ) 2drop 11 ;
+
+MM: gen-with-def ( o: string o: object -- o ) 2drop 22 ;
+
+MM: gen-with-def ( o: object o: fixnum -- o ) 2drop 33 ;
+
+! Tie-breaker
+MM: gen-with-def ( o: string o: fixnum -- o ) 2drop 44 ;
+
+{ 11 } [ {  } f gen-with-def ] unit-test
+{ 22 } [ "string" { 1 2 3 } gen-with-def ] unit-test
+{ 22 } [ "string" word gen-with-def ] unit-test
+{ 33 } [ 1 1 gen-with-def ] unit-test
+{ 33 } [ {  } 42 gen-with-def ] unit-test
+{ 44 } [ "1234" 1234 gen-with-def ] unit-test
+
+! Regression: Only one method on two objects
+
+GENERIC: only-one ( o o -- o )
+MM: only-one ( o: object o: object -- o ) 2drop 11 ;
+{ 11 } [ 1 2 only-one ] unit-test
