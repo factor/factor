@@ -11,7 +11,7 @@ IN: interval-sets
 ! Intervals are a pair of { start end }
 TUPLE: interval-set { array uint-array read-only } ;
 
-: in? ( key set -- ? )
+: interval-in? ( key set -- ? )
     interval-set check-instance array>>
     dupd [ <=> ] with search swap [
         even? [ >= ] [ 1 - <= ] if
