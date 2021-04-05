@@ -9,7 +9,9 @@ IN: classes.dispatch
 
 MIXIN: dispatch-type
 INSTANCE: dispatch-type classoid
-! Workaround for not having multi-methods here.  Left dispatch is checked first
+
+! Returns t if dispatching on class1 implies dispatching on class2
+! Workaround for not having multi-methods here.  Left dispatch is checked first.
 GENERIC#: left-dispatch<= 1 ( class1 class2 -- ? )
 GENERIC: right-dispatch<= ( class1 class2 -- ? )
 
