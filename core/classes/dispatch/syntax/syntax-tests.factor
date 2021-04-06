@@ -4,7 +4,7 @@ IN: classes.dispatch.syntax.tests
 
 
 { T{ covariant-tuple f {
-         T{ eql-specializer f fixnum }
+         T{ class-specializer f fixnum }
          float
      }
    } }
