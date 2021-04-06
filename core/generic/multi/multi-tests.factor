@@ -125,6 +125,7 @@ MM: foo ( x: float x: number -- x ) call-next-method ;
 { 42 } [ 1.1 1 foo ] unit-test
 { 42 } [ [ 1.1 1 foo ] compile-call ] unit-test
 
+! FIXME: actually testing class specializes now
 ! Testing eql specializers
 GENERIC: bar ( x x -- x )
 ! FIXME: need one MM: right now to turn this into multi-generic

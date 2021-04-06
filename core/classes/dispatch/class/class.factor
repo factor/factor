@@ -25,7 +25,10 @@ M: class-specializer implementor-classes class>> 1array ;
 ! The main point of this is to make sure that the methods are correctly assigned
 ! to built-in or tuple classes for dispatch decision tree building.  Since
 ! we want to dispatch on words, this needs to be a word, then...
-M: class-specializer (flatten-class) drop word , ;
+
+! NOTE: using classoid to make sure we install dispatchers for everything that
+! is comparable using class<=
+M: class-specializer (flatten-class) drop classoid (flatten-class) ;
 
 ! This implements the actual hierarchy.  For class methods, we want to delegate
 ! to superclasses.  Classes and objects are incomparable, so these live in their
