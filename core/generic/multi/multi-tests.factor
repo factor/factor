@@ -1,7 +1,8 @@
-USING: arrays classes classes.algebra classes.dispatch.covariant-tuples
-classes.dispatch.syntax compiler.test generic generic.multi generic.single
-kernel kernel.private literals math math.combinatorics namespaces random
-sequences strings tools.dispatch tools.test tools.time words ;
+USING: accessors arrays classes classes.algebra
+classes.dispatch.covariant-tuples classes.dispatch.syntax compiler.test generic
+generic.multi generic.single kernel kernel.private literals math
+math.combinatorics namespaces random sequences strings tools.dispatch tools.test
+tools.time words ;
 IN: generic.multi.tests
 
 
@@ -273,3 +274,15 @@ MM: gen-with-def ( o: string o: fixnum -- o ) 2drop 44 ;
 GENERIC: only-one ( o o -- o )
 MM: only-one ( o: object o: object -- o ) 2drop 11 ;
 { 11 } [ 1 2 only-one ] unit-test
+
+
+! Class method constructor test
+TUPLE: foo2 a b c ;
+TUPLE: foo2sub < foo2 ;
+GENERIC: <foo-subclass> ( a b c class -- obj )
+CM: foo2 <foo-subclass> new swap >>c swap >>b swap >>a ;
+{ T{ foo2 { a 1 } { b 2 } { c 3 } } } [ 1 2 3 foo2 <foo-subclass> ] unit-test
+{ T{ foo2sub { a 1 } { b 2 } { c 3 } } } [ 1 2 3 foo2sub <foo-subclass> ] unit-test
+TUPLE: foo2subsub < foo2sub d ;
+CM: foo2subsub <foo-subclass> call-next-method 42 >>d ;
+{ T{ foo2subsub f 1 2 3 42 } } [ 1 2 3 foo2subsub <foo-subclass> ] unit-test
