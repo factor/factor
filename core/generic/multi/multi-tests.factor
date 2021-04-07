@@ -1,8 +1,8 @@
 USING: accessors arrays classes classes.algebra
-classes.dispatch.covariant-tuples classes.dispatch.syntax compiler.test generic
-generic.multi generic.single kernel kernel.private literals math
-math.combinatorics namespaces random sequences strings tools.dispatch tools.test
-tools.time words ;
+classes.dispatch.covariant-tuples classes.dispatch.syntax classes.predicate
+compiler.test generic generic.multi generic.single kernel kernel.private
+literals math math.combinatorics namespaces random sequences strings
+tools.dispatch tools.test tools.time words ;
 IN: generic.multi.tests
 
 
@@ -284,3 +284,19 @@ CM: foo2 <foo-subclass> new swap >>c swap >>b swap >>a ;
 TUPLE: foo2subsub < foo2sub d ;
 CM: foo2subsub <foo-subclass> call-next-method 42 >>d ;
 { T{ foo2subsub f 1 2 3 42 } } [ 1 2 3 foo2subsub <foo-subclass> ] unit-test
+
+! After declaring two predicate classes disjoint, no ambiguity error should persist
+
+PREDICATE: num42 < fixnum 42 = ;
+PREDICATE: num47 < fixnum 47 = ;
+GENERIC: 2frob ( x x -- x ) multi
+M: D( num42 fixnum ) 2frob 2drop f ;
+M: D( num47 object ) 2frob 2drop t ;
+! At this point, a non-fatal ambiguity error should exist
+! TODO test for this somehow
+
+DISJOINT: num42 num47 ;
+! And now it should be gone, the generic working
+{ f } [ 42 11 2frob ] unit-test
+[ 42 "haha" 2frob ] must-fail
+{ t } [ 47 "haha" 2frob ] unit-test
