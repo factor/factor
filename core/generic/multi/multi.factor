@@ -229,3 +229,6 @@ ERROR: empty-dispatch-spec seq ;
     ] with-definition ;
 
 SYNTAX: MM: (MM:) define ;
+
+! Use to turn a GENERIC: into a multi-combination when only using D( ) things
+SYNTAX: multi last-word >multi-combination ;
