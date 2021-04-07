@@ -30,7 +30,7 @@ IN: bootstrap.syntax
     define-syntax ;
 
 [
-    { "]" "}" ";" ">>" } [ define-delimiter ] each
+    { "]" "}" ";" ">>" ")" } [ define-delimiter ] each
 
     "PRIMITIVE:" [
         current-vocab name>>
