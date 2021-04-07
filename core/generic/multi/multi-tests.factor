@@ -36,8 +36,8 @@ CONSTANT: scissors1 T{ scissors f }
 CONSTANT: the-rock1 T{ the-rock f }
 
 : test-methods ( -- seq )
-    M\ D{ thing thing } beats [ "method-class" word-prop ] keep <method-dispatch>
-    M\ D{ rock scissors } beats [ "method-class" word-prop ] keep <method-dispatch>
+    M\ D( thing thing ) beats [ "method-class" word-prop ] keep <method-dispatch>
+    M\ D( rock scissors ) beats [ "method-class" word-prop ] keep <method-dispatch>
     2array ;
 
 { 2 } [ scissors 0 test-methods applicable-methods length ] unit-test
@@ -126,15 +126,14 @@ MM: foo ( x: float x: number -- x ) call-next-method ;
 { 42 } [ 1.1 1 foo ] unit-test
 { 42 } [ [ 1.1 1 foo ] compile-call ] unit-test
 
-! FIXME: actually testing class specializes now
 ! Testing eql specializers
 GENERIC: bar ( x x -- x )
 ! FIXME: need one MM: right now to turn this into multi-generic
 MM: bar ( x: number -- x ) 2drop 43 ;
-M: D{ fixnum } bar 2drop 42 ;
-M: D{ \ fixnum } bar 2drop 47 ;
-M: D{ \ fixnum float } bar 2drop 66 ;
-M: D{ \ float float } bar 2drop 67 ;
+M: D( fixnum ) bar 2drop 42 ;
+M: D( \= fixnum ) bar 2drop 47 ;
+M: D( \= fixnum float ) bar 2drop 66 ;
+M: D( \= float float ) bar 2drop 67 ;
 
 [ "asdf" "asdf" bar ] [ no-method? ] must-fail-with
 { 42 } [ "asdf" 1 bar ] unit-test

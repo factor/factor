@@ -1,6 +1,7 @@
 USING: accessors arrays classes.dispatch.class classes.dispatch.covariant-tuples
-classes.dispatch.eql effects.parser generic.multi generic.parser kernel parser
-prettyprint.custom sequences words ;
+classes.dispatch.eql effects.parser generic.multi generic.parser kernel
+namespaces parser prettyprint.backend prettyprint.custom prettyprint.sections
+sequences words ;
 
 IN: classes.dispatch.syntax
 
@@ -12,17 +13,36 @@ IN: classes.dispatch.syntax
 ! But defining with M: D{ class1 class2 } generic ... ; does not turn the generic
 ! into a multi-generic !
 
+! For use as eql specializer definition inside the D(  ) construct
+<< SYNTAX: \= scan-object <eql-specializer> suffix! ; >>
+
+SYMBOL: in-dispatch-pprint
+: in-dispatch-pprint? ( -- ? ) in-dispatch-pprint get >boolean ; inline
+
+M: eql-specializer pprint*
+    in-dispatch-pprint?
+    [ <block \ \= pprint-word obj>> pprint* block> ]
+    [ call-next-method ] if ;
+
+M: class-specializer pprint*
+    in-dispatch-pprint?
+    [ <block \ \ pprint-word class>> pprint* block> ]
+    [ call-next-method ] if ;
+
 : interpret-dispatch-spec ( seq -- dispatch-type )
-    [ dup wrapper? [ wrapped>> <eql-specializer> ] when ] map
+    [ dup wrapper? [ wrapped>> <class-specializer> ] when ] map
     <covariant-tuple> ;
 
-
+! TODO TBR
 SYNTAX: D{
         \ } [ interpret-dispatch-spec ] parse-literal ;
 
-M: covariant-tuple pprint* pprint-object ;
+SYNTAX: D(
+        \ ) [ interpret-dispatch-spec ] parse-literal ;
+
+M: covariant-tuple pprint* in-dispatch-pprint [ pprint-object ] with-variable-on ;
 M: covariant-tuple pprint-delims
-    drop \ D{ \ } ;
+    drop \ D( \ ) ;
 M: covariant-tuple >pprint-sequence classes>> ;
 
 : scan-new-class-method ( -- method )
