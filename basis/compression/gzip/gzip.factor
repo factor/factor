@@ -106,20 +106,20 @@ cond ;
 ! Gluing codes with their extra bits
 
 : dist-to-bits ( dist -- bits )
-    dup array? [ [ first 5 <bits> >bit-array  reverse ] [ second ] bi 2array ] [ 5 <bits> >bit-array reverse ] if  ;
+    dup array? [ [ first 5 <bits> >bit-array reverse ] [ second ] bi 2array ] [ 5 <bits> >bit-array reverse ] if  ;
 
 : lit-to-bits ( lit -- bits )
      dup array? [ [ first (lit-to-bits) ] [ second ] bi 2array ] [ (lit-to-bits) ] if  ;
  
 : pair-to-bits ( l,d -- bits )
-    [ first lit-to-bits ] [ second dist-to-bits ] bi append ;
+    [ first lit-to-bits ] [ second dist-to-bits ] bi 2array ;
 
 : vec-to-bits ( vec -- bitarr )
     [ dup array? [ pair-to-bits ] [ (lit-to-bits) ] if ] map ;
 
 
 ! fixed huffman compression function 
-: compress-fixed ( bytes -- bits )
+: (compress-fixed) ( bytes -- bits )
     compress-lz77 vec-to-lits vec-to-bits ;
 
 <<
@@ -229,13 +229,13 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
     ?{ t t f } h-lit h-dist h-clen 4array concat ;
 
 ! Compresses a block with dynamic huffman compression.
-: compress-dynamic ( lit-seq -- bit-arr-seq  )
-    compress-lz77 vec-to-lits lit-vec set 
+: (compress-dynamic) ( lit-seq -- bit-arr-seq  )
+   [ compress-lz77 vec-to-lits lit-vec set 
     lit-vec get build-dicts  
     dist-dict set 
     lit-dict set
     dynamic-headers clen-bits compressed-lens 
-    lit-vec get vec-to-codes 4array ;
+    lit-vec get vec-to-codes 4array ] with-scope ;
 
 : flatten-single ( ele -- bits )
     dup array? [ concat ] when ;
@@ -250,4 +250,9 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
     { [ first ] [ second concat ] [ third flatten-lens ] [ fourth [ flatten-pair ] map concat ] } cleave 4array concat underlying>> ;
 
 ! : write-dynamic-compressed  
+: compress-dynamic ( byte-array -- byte-array )
+    (compress-dynamic) compressed>byte-array ;
+
+: compress-fixed ( byte-array -- byte-array )
+    (compress-fixed) [ flatten-pair ] map concat ?{ t f t } swap append ;
 
