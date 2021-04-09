@@ -146,6 +146,9 @@ PRIVATE>
         { CHAR: / CHAR: _ }
     } substitute ;
 
+: >urlsafe-base64-jwt ( seq -- base64 )
+    >urlsafe-base64 [ CHAR: = = ] trim-tail ;
+
 : urlsafe-base64> ( base64 -- seq )
     H{
         { CHAR: - CHAR: + }
