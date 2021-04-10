@@ -166,10 +166,10 @@ M: assoc values [ nip ] { } assoc>map ;
 : assoc-union ( assoc1 assoc2 -- union )
     over assoc-union-as ;
 
-: assoc-combine ( seq -- union )
+: assoc-union-all ( seq -- union )
     H{ } clone [ assoc-union! ] reduce ;
 
-: assoc-refine ( seq -- assoc )
+: assoc-intersect-all ( seq -- assoc )
     [ f ] [ [ ] [ assoc-intersect ] map-reduce ] if-empty ;
 
 : assoc-differ ( key -- quot )

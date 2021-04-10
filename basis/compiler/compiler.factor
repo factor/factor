@@ -167,7 +167,7 @@ M: optimizing-compiler to-recompile ( -- words )
         outdated-conditional-usages %
 
         changed-definitions get filter-word-defs dup zip ,
-    ] { } make assoc-combine keys ;
+    ] { } make assoc-union-all keys ;
 
 M: optimizing-compiler process-forgotten-words
     [ delete-compiled-xref ] each ;

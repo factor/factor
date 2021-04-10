@@ -55,7 +55,7 @@ MIXIN: dataflow-analysis
     in-sets
     out-sets ; inline
 
-M: dataflow-analysis join-sets 2drop assoc-refine ;
+M: dataflow-analysis join-sets 2drop assoc-intersect-all ;
 M: dataflow-analysis ignore-block? drop kill-block?>> ;
 
 <FUNCTOR: define-analysis ( name -- )
