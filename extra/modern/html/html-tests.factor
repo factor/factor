@@ -30,3 +30,6 @@ IN: modern.html.tests
 [
     [[ <html><head>omg<body></body></html>]] string>html html>string
 ] [ unmatched-open-tags-error? ] must-fail-with
+
+{ [[ <!-- omg omg -->]] }
+[ [[ <!-- omg omg -->]] string>html html>string ] unit-test

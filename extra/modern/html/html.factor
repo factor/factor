@@ -14,6 +14,13 @@ TUPLE: doctype open close values ;
         swap >string >>close
         swap >string >>open ;
 
+TUPLE: comment open payload close ;
+: <comment> ( open payload close -- comment )
+    comment new
+        swap >>close
+        swap >>payload
+        swap >>open ;
+
 TUPLE: close-tag name ;
 : <close-tag> ( name -- tag )
     close-tag new
@@ -99,10 +106,16 @@ C: <dquote> dquote
     [ 5 npick push ] when*
     [ ] [ read-props ] if* ;
 
-: read-doctype ( n string opening -- n string doctype )
-    "!" expect-and-span "DOCTYPE" expect-and-span
-    [ V{ } clone -rot read-props ] dip
-    swap 5 nrot <doctype> ;
+: read-doctype ( n string opening -- n string doctype/comment )
+    "!" expect-and-span
+    2over 2 peek-from "--" sequence= [
+        "--" expect-and-span >string
+        [ "-->" slice-til-string [ >string ] bi@ ] dip -rot <comment>
+    ] [
+        "DOCTYPE" expect-and-span
+        [ V{ } clone -rot read-props ] dip
+        swap 5 nrot <doctype>
+    ] if ;
 
 : read-open-tag ( n string opening -- n' string tag )
     [ take-tag-name ] dip drop ! B span-slices
@@ -145,7 +158,7 @@ ERROR: unmatched-closing-tag-error stack tag ;
     skip-whitespace "<" slice-til-either {
         { CHAR: < [
             1 split-slice-back [ >string f like [ reach push ] when* ] dip
-            [ 2dup peek-from ] dip
+            [ 2dup peek1-from ] dip
             swap {
                 { CHAR: / [
                     read-close-tag reach over name>> find-last-open-tag unclip
@@ -194,6 +207,11 @@ M: self-close-tag write-html
         [ "<" % name>> % ]
         [ props>> write-props "/>" % ]
     } cleave ;
+
+M: comment write-html
+    [ open>> % ]
+    [ payload>> % ]
+    [ close>> % ] tri ;
 
 M: string write-html % ;
 
