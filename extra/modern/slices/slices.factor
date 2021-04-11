@@ -71,7 +71,9 @@ ERROR: unexpected-end n string ;
 : skip-til-eol-from ( n string -- n' string )
     [ [ "\r\n" member? ] find-from* 2drop ] keep ; inline
 
-:: take-slice ( n string count -- n' string slice )
+ERROR: take-slice-error n string count ;
+:: take-slice ( n string count -- n'/f string slice )
+    n [ n string count take-slice-error ] unless
     n count + :> to
     to
     string
