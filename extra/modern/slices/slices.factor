@@ -30,8 +30,11 @@ ERROR: unexpected-end n string ;
 : nth-check-eof ( n string -- nth )
     2dup ?nth [ 2nip ] [ unexpected-end ] if* ;
 
-: peek-from ( n/f string -- ch )
+: peek1-from ( n/f string -- ch )
     over [ ?nth ] [ 2drop f ] if ;
+
+: peek-from ( n/f string m -- string )
+    over [ [ swap tail-slice ] dip head-slice ] [ 3drop f ] if ;
 
 : previous-from ( n/f string -- ch )
     over [ [ 1 - ] dip ?nth ] [ 2drop f ] if ;

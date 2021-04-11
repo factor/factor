@@ -450,7 +450,7 @@ ERROR: compound-syntax-disallowed n seq obj ;
     dup length 1 > [ compound-syntax-disallowed ] when ;
 
 : check-compound-loop ( n/f string -- n/f string ? )
-    [ ] [ peek-from ] [ previous-from ] 2tri
+    [ ] [ peek1-from ] [ previous-from ] 2tri
     [ blank? ] bi@ or not ! no blanks between tokens
     pick and ; ! and a valid index
 
