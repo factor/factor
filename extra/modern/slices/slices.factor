@@ -71,6 +71,25 @@ ERROR: unexpected-end n string ;
 : skip-til-eol-from ( n string -- n' string )
     [ [ "\r\n" member? ] find-from* 2drop ] keep ; inline
 
+:: take-slice ( n string count -- n' string slice )
+    n count + :> to
+    to
+    string
+    n to string <slice> ;
+
+ERROR: expected-sequence-error expected actual ;
+: check-sequence ( expected actual -- actual/* )
+    2dup sequence= [ nip ] [ expected-sequence-error ] if ;
+
+: expect-and-span ( n string slice expected-string -- n' string slice' )
+    dup length '[ _ take-slice ] 2dip
+    rot check-sequence span-slices ;
+
+:: split-slice-back ( slice n -- slice1 slice2 )
+    slice [ from>> ] [ to>> ] [ seq>> ] tri :> ( from to seq )
+    from to n - seq <slice>
+    to n - to seq <slice> ;
+
 ! Don't include the whitespace in the slice
 :: slice-til-whitespace ( n string -- n' string slice/f ch/f )
     n [
