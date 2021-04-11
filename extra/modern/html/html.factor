@@ -35,6 +35,11 @@ TUPLE: self-close-tag < tag ;
         swap >string >>name
         V{ } clone >>children ;
 
+TUPLE: squote payload ;
+C: <squote> squote
+TUPLE: dquote payload ;
+C: <dquote> dquote
+
 : read-squote-string-payload ( n string -- n' string )
     over [
         { CHAR: \\ CHAR: ' } slice-til-separator-inclusive {
@@ -68,8 +73,8 @@ TUPLE: self-close-tag < tag ;
 
 : read-value ( n string -- n' string value )
     skip-whitespace next-char-from {
-        { CHAR: ' [ CHAR: ' read-string ] }
-        { CHAR: " [ CHAR: " read-string ] }
+        { CHAR: ' [ CHAR: ' read-string >string <squote> ] }
+        { CHAR: " [ CHAR: " read-string >string <dquote> ] }
         { CHAR: [ [ "[" throw ] }
         { CHAR: { [ "{" throw ] }
         [ [ take-tag-name ] dip prefix ]
@@ -78,11 +83,11 @@ TUPLE: self-close-tag < tag ;
 : read-prop ( n string -- n' string closing/f prop/f )
     skip-whitespace "\s\n\r\"'<=/>" slice-til-either {
         { CHAR: < [ "< error" throw ] }
-        { CHAR: = [ 1 split-slice-back drop [ read-value ] dip [ >string ] bi@ swap 2array f swap ] }
+        { CHAR: = [ 1 split-slice-back drop >string [ read-value ] dip swap 2array f swap ] }
         { CHAR: / [ ">" expect-and-span 2 split-slice-back swap >string f like ] }
         { CHAR: > [ 1 split-slice-back swap >string f like ] }
-        { CHAR: " [ first read-string >string f swap ] }
-        { CHAR: ' [ first read-string >string f swap ] }
+        { CHAR: ' [ first read-string >string <squote> f swap ] }
+        { CHAR: " [ first read-string >string <dquote> f swap ] }
         { CHAR: \s [ f swap >string ] }
         { CHAR: \r [ f swap >string ] }
         { CHAR: \n [ f swap >string ] }
@@ -122,6 +127,12 @@ TUPLE: self-close-tag < tag ;
     [ find-last drop ] keepd swap
     [ shorten* ] [ drop f ] if* ; inline
 
+ERROR: unmatched-open-tags-error stack seq ;
+: check-tag-stack ( stack -- stack )
+    dup [
+        { [ open-tag? ] [ close-tag>> not ] } 1&&
+    ] filter [ unmatched-open-tags-error ] unless-empty ;
+
 ERROR: unmatched-closing-tag-error stack tag ;
 :: find-last-open-tag ( stack name -- seq )
     stack [ { [ tag? ] [ name>> name = ] } 1&& ] find-last drop [
@@ -138,7 +149,7 @@ ERROR: unmatched-closing-tag-error stack tag ;
             swap {
                 { CHAR: / [
                     read-close-tag reach over name>> find-last-open-tag unclip
-                    swap >>children
+                    swap check-tag-stack >>children
                     swap >>close-tag
                     ] }
                 { CHAR: ! [ read-doctype ] }
@@ -149,11 +160,42 @@ ERROR: unmatched-closing-tag-error stack tag ;
         [ drop >string ]
     } case [ reach push lex-html ] when* ;
 
-ERROR: unmatched-open-tags stack seq ;
-: check-final-stack ( stack -- stack )
-    dup [
-        { [ open-tag? ] [ close-tag>> not ] } 1&&
-    ] filter [ unmatched-open-tags ] unless-empty ;
-
 : string>html ( string -- sequence )
-    [ V{ } clone 0 ] dip lex-html 2drop check-final-stack ;
+    [ V{ } clone 0 ] dip lex-html 2drop check-tag-stack ;
+
+GENERIC: write-html ( tag -- )
+
+: >value ( obj -- string )
+    {
+        { [ dup squote? ] [ payload>> "'" dup surround ] }
+        { [ dup dquote? ] [ payload>> "\"" dup surround ] }
+        [ ]
+    } cond ;
+
+M: doctype write-html
+    [ open>> % ]
+    [ values>> [ >value ] map " " join [ " " % % ] unless-empty ]
+    [ close>> % ] tri ;
+
+
+: write-props ( seq -- )
+    [ dup array? [ first2 >value "=" glue ] [ >value ] if ] map " " join [ " " % % ] unless-empty ;
+
+M: open-tag write-html
+    {
+        [ "<" % name>> % ]
+        [ props>> write-props ">" % ]
+        [ children>> [ write-html ] each ]
+        [ close-tag>> name>> "</" ">" surround % ]
+    } cleave ;
+
+M: self-close-tag write-html
+    {
+        [ "<" % name>> % ]
+        [ props>> write-props "/>" % ]
+    } cleave ;
+
+M: string write-html % ;
+
+: html>string ( sequence -- string )
+    [ [ write-html ] each ] "" make ;
