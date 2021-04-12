@@ -23,17 +23,6 @@ SYMBOL: lit-vec
 :: offset ( ind seq -- o )
     ind ind ind seq longest-prefix-end seq subseq seq subseq-start - ;
 
-:: create-triple ( ind seq -- array )
-    {
-    ! no match
-    { [ ind seq subseq-length 0 = ]  [ ind seq nth 0 0 3array ] } 
-    ! end of sequence
-    { [ ind seq longest-prefix-end seq length = ] [ ind seq offset ind seq subseq-length 1 -  seq last 3array ]  }
-    ! general case
-     [ ind seq offset ind seq subseq-length ind seq longest-prefix-end seq nth 3array ] 
-    }
-    cond ;
-
 :: create-pair ( ind seq -- array )
     ! no match
      ind seq subseq-length 3 < 
@@ -48,8 +37,8 @@ SYMBOL: lit-vec
 :: compress-lz77 ( seq -- vec )
 0 seq create-pair seq length <vector> ?push [ dup sum-vec seq length < ] [ dup sum-vec seq create-pair swap ?push ] while ;
 
-: create-gzip-header ( -- header )
-    { 31 139 8 0 0 0 255 0 } >byte-array ;
+: gzip-header ( -- header )
+    { 31 139 8 0 0 0 255 } >byte-array ;
 
 ! Huffman Coding
 
@@ -167,10 +156,10 @@ CONSTANT: bit-reverse-table $[
 
 ! Dictionary encoding
 : lit-code-lens ( -- len-seq )
-     285 [0..b] [ lit-dict get at* [ length ] [ drop 0 ] if ] map [ zero? ] trim-tail ;
+     285 [0..b] [ lit-dict get at length ] map [ zero? ] trim-tail ;
 
 : dist-code-lens ( -- len-seq )
-     31 [0..b] [ lit-dict get at* [ length ] [ drop 0 ] if ] map [ zero? ] trim-tail ;
+     31 [0..b] [ lit-dict get at length ] map [ zero? ] trim-tail ;
 
 :: replace-0-single ( m len-seq  -- new-len-seq )
     m 11 < [ len-seq m 0 <array> 17 m 3 - 3 <bits> >bit-array 2array 1array replace ]
@@ -254,5 +243,5 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
     (compress-dynamic) compressed>byte-array ;
 
 : compress-fixed ( byte-array -- byte-array )
-    (compress-fixed) [ flatten-pair ] map concat ?{ t f t } swap append ;
+  (compress-fixed) [ flatten-pair ] map concat ?{ t t f } swap append underlying>> gzip-header swap append  ;
 

@@ -29,7 +29,7 @@ ERROR: bad-zlib-header ;
    [ dup 8 swap bs:read 0 =  ] [  ]  until ;
 
 :: interpret-flag ( flg data  -- )
- 28 data bs:seek 
+ 27 data bs:seek 
  flg first 1 = [ 8 data bs:read data bs:seek  ] when
  flg second 1 = [ data read-until-terminated drop ] when
  flg fourth 1 = [ data read-until-terminated drop ] when
@@ -191,5 +191,5 @@ PRIVATE>
 
 : gzip-inflate ( bytes -- bytes )
     bs:<lsb0-bit-reader>
-    [ check-zlib-header ] [ inflate-loop ] bi
+    [ check-gzip-header ] [ inflate-loop ] bi
     inflate-lz77 ;
