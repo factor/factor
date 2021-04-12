@@ -1,6 +1,6 @@
 USING: assocs sequences.abbrev tools.test ;
 
-{ { "hello" "help" } } [
+{ V{ "hello" "help" } } [
     "he" { "apple" "hello" "help" } abbrev at
 ] unit-test
 
@@ -8,11 +8,11 @@ USING: assocs sequences.abbrev tools.test ;
     "he" { "apple" "hello" "help" } unique-abbrev at
 ] unit-test
 
-{ { "apple" } } [
+{ V{ "apple" } } [
     "a" { "apple" "hello" "help" } abbrev at
 ] unit-test
 
-{ { "apple" } } [
+{ V{ "apple" } } [
     "a" { "apple" "hello" "help" } unique-abbrev at
 ] unit-test
 
