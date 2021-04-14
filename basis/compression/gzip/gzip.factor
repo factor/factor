@@ -28,11 +28,11 @@ SYMBOL: lit-vec
      ind seq subseq-length 3 < 
     [ ind seq nth ] 
     ! match
-    [ ind seq offset ind seq subseq-length  2array ] 
+    [ ind seq subseq-length ind seq offset 2array ] 
     if ;
 
 : sum-vec ( vec -- n )
- [ dup array?  [ second  ] [ drop 1 ] if ] map-sum ;
+ [ dup array?  [ first  ] [ drop 1 ] if ] map-sum ;
 
 :: compress-lz77 ( seq -- vec )
 0 seq create-pair seq length <vector> ?push [ dup sum-vec seq length < ] [ dup sum-vec seq create-pair swap ?push ] while ;
@@ -86,8 +86,8 @@ cond ;
 : (lit-to-bits) ( lit  -- bitarr  )
  {
     { [ dup 144 <  ] [ 48 + 8 <bits> >bit-array reverse ] }
-    { [ dup 265 <  ] [ 144 - 400 + 9 <bits> >bit-array reverse ] }
-    { [ dup 280 <  ] [ 265 - 7 <bits> >bit-array reverse ] }
+    { [ dup 256 <  ] [ 144 - 400 + 9 <bits> >bit-array reverse ] }
+    { [ dup 280 <  ] [ 256 - 7 <bits> >bit-array reverse ] }
     [ 280 - 192 + 8 <bits> >bit-array reverse ]
  }
  cond ;
@@ -215,7 +215,7 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
     clen-seq length 4 - 4 <bits> >bit-array  ;
 
 : dynamic-headers ( -- bit-arr-seq )
-    ?{ t t f } h-lit h-dist h-clen 4array concat ;
+    ?{ t f t } h-lit h-dist h-clen 4array concat ;
 
 ! Compresses a block with dynamic huffman compression.
 : (compress-dynamic) ( lit-seq -- bit-arr-seq  )
@@ -236,12 +236,12 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
   dup array? [ [ first flatten-single ] [ second flatten-single ] bi append ] when ; 
 
 : compressed>byte-array ( bit-arr-seq  -- byte-array )
-    { [ first ] [ second concat ] [ third flatten-lens ] [ fourth [ flatten-pair ] map concat ] } cleave 4array concat underlying>> ;
+    { [ first ] [ second concat ] [ third flatten-lens ] [ fourth [ flatten-pair ] map concat ] } cleave 4array concat underlying>> gzip-header swap append ;
 
 ! : write-dynamic-compressed  
 : compress-dynamic ( byte-array -- byte-array )
     (compress-dynamic) compressed>byte-array ;
 
 : compress-fixed ( byte-array -- byte-array )
-  (compress-fixed) [ flatten-pair ] map concat ?{ t t f } swap append underlying>> gzip-header swap append  ;
+  (compress-fixed) [ flatten-pair ] map concat ?{ t t f } swap append underlying>> gzip-header swap append B{ 0 0 } append ;
 
