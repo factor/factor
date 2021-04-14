@@ -171,3 +171,8 @@ M: hashtable sort-values
     >alist [ { array } declare second-unsafe ] sort-with ;
 
 : sort-pair ( a b -- c d ) 2dup after? [ swap ] when ;
+
+MACRO: compare-with ( quots -- <=> )
+    [ '[ _ bi@ <=> ] ]
+    [ '[ _ 2keep rot dup +eq+ eq? [ drop @ ] [ 2nip ] if ] ]
+    map-reduce ;
