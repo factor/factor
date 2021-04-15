@@ -136,6 +136,9 @@ M: multi-combination picker current-index get (picker) ;
 PREDICATE: multi-generic < generic
     "combination" word-prop multi-combination? ;
 
+M: multi-generic lookup-methods ( class generic -- seq )
+    "methods" word-prop [ first dispatch-depends-on? ] with filter values ;
+
 ERROR: not-single-dispatch generic ;
 M: multi-generic dispatch# not-single-dispatch ;
 

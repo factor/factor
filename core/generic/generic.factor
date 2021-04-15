@@ -29,6 +29,9 @@ PREDICATE: method < word
 
 ERROR: method-lookup-failed class generic ;
 
+! Multi-methods can return more than one result here
+GENERIC: lookup-methods ( class generic -- seq )
+
 : ?lookup-method ( class generic -- method/f )
     "methods" word-prop at ;
 
@@ -225,5 +228,9 @@ M: generic subwords
         tri
     ] { } make ;
 
+: lookup-all-methods ( class -- seq )
+    dup implementors
+    [ lookup-methods ] with gather ;
+
 M: class forget-methods
-    [ implementors ] [ [ swap ?lookup-method ] curry ] bi map forget-all ;
+    lookup-all-methods forget-all ;

@@ -1,8 +1,8 @@
 USING: accessors arrays classes classes.algebra
 classes.dispatch.covariant-tuples classes.dispatch.syntax classes.predicate
-compiler.test generic generic.multi generic.single kernel kernel.private
-literals math math.combinatorics namespaces random sequences strings
-tools.dispatch tools.test tools.time words ;
+compiler.test compiler.units definitions generic generic.multi generic.single
+kernel kernel.private literals math math.combinatorics namespaces random
+sequences strings tools.dispatch tools.test tools.time vectors words ;
 IN: generic.multi.tests
 
 
@@ -300,3 +300,36 @@ DISJOINT: num42 num47 ;
 { f } [ 42 11 2frob ] unit-test
 [ 42 "haha" 2frob ] must-fail
 { t } [ 47 "haha" 2frob ] unit-test
+
+! Forgetting methods on dispatch classes must work
+
+<<
+TUPLE: forgettable ;
+GENERIC: forget-me ( x x -- ) multi
+M: number forget-me 2drop ;
+M: D( forgettable fixnum ) forget-me 2drop ;
+>>
+
+{ t }
+[ \ forget-me "methods" word-prop
+  D( number ) M\ number forget-me 2array
+  D( forgettable fixnum ) M\ D( forgettable fixnum ) forget-me 2array 2array >vector =
+] unit-test
+
+{ t }
+[ forgettable lookup-all-methods
+  M\ D( forgettable fixnum ) forget-me 1array =
+] unit-test
+
+{ t }
+[ number lookup-all-methods
+  [ "method-generic" word-prop \ forget-me = ] filter
+  M\ number forget-me 1array =
+] unit-test
+
+{  } [ [ forgettable forget ] with-compilation-unit ] unit-test
+
+{ 1 t }
+[ \ forget-me "methods" word-prop [ length ] keep
+  D( number ) M\ number forget-me 2array 1vector =
+] unit-test

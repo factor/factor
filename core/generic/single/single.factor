@@ -25,6 +25,9 @@ PREDICATE: single-generic < generic
 
 M: single-generic make-inline cannot-be-inline ;
 
+M: single-generic lookup-methods ( class generic -- sequence )
+    ?lookup-method [ 1array ] [ f ] if* ;
+
 GENERIC: dispatch# ( word -- n )
 
 M: generic dispatch# "combination" word-prop dispatch# ;
