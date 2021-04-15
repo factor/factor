@@ -51,3 +51,6 @@ M: class-specializer (classes-intersect?)
 
 M: class-specializer add-depends-on-class
     class>> add-depends-on-class ;
+
+M: class-specializer dispatch-depends-on?
+    class>> class= ;

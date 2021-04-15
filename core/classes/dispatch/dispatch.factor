@@ -31,3 +31,6 @@ GENERIC: dispatch-arity ( dispatch-type -- n )
 ! type at index.
 GENERIC: nth-dispatch-applicable? ( class index dispatch-type -- ? )
 GENERIC: dispatch-predicate-def ( dispatch-type -- quot )
+
+! Return whether the dispatch specifier depends on the given class
+GENERIC: dispatch-depends-on? ( class dispatch-type -- ? )

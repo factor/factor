@@ -78,3 +78,6 @@ M: covariant-tuple dispatch-predicate-def
     [ 1 + swap '{ [ _ npick _ instance? not ] [ f ] } ] map-index
     [ t ] suffix
     '[ _ cond ] ;
+
+M: covariant-tuple dispatch-depends-on?
+    classes>> member? ;

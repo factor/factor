@@ -37,3 +37,6 @@ M: eql-specializer left-dispatch<=
 M: eql-specializer (classes-intersect?)
     { { [ over eql-specializer? ] [ [ obj>> ] same? ] }
       [ obj>> class-of classes-intersect? ] } cond ;
+
+M: eql-specializer dispatch-depends-on?
+    obj>> class-of class= ;
