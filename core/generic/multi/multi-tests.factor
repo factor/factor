@@ -12,7 +12,7 @@ TUPLE: paper < thing ;
 TUPLE: scissors < thing ;
 TUPLE: the-rock < rock ;
 
-GENERIC: beats ( x x -- x )
+MGENERIC: beats ( x x -- x )
 ! Specializers are bogus here
 ! m4(thing, thing)
 MM: beats ( x: thing y: thing -- ? ) 2drop f ;
@@ -116,7 +116,7 @@ M: the-rock test1 2drop 22 ;
 
 
 ! Testing call-next-method
-GENERIC: foo ( x x -- x )
+MGENERIC: foo ( x x -- x )
 MM: foo ( x: number x: number -- x ) 2drop 42 ;
 MM: foo ( x: fixnum x: fixnum -- x ) 2drop 47 ;
 MM: foo ( x: float x: number -- x ) call-next-method ;
@@ -127,7 +127,7 @@ MM: foo ( x: float x: number -- x ) call-next-method ;
 { 42 } [ [ 1.1 1 foo ] compile-call ] unit-test
 
 ! Testing eql specializers
-GENERIC: bar ( x x -- x ) multi
+MGENERIC: bar ( x x -- x )
 M: D( number ) bar 2drop 43 ;
 M: D( fixnum ) bar 2drop 42 ;
 M: D( \= fixnum ) bar 2drop 47 ;
@@ -146,7 +146,7 @@ M: D( \= float float ) bar 2drop 67 ;
 
 SINGLETONS: hi ha ho ;
 UNION: hihaho-u hi ha ho ;
-GENERIC: frob1 ( x -- x )
+MGENERIC: frob1 ( x -- x )
 MM: frob1 ( x: hihaho-u -- x ) drop 42 ;
 MM: frob1 ( x: hi -- x ) drop 43 ;
 MM: frob1 ( x: ha -- x ) drop 44 ;
@@ -161,7 +161,7 @@ INSTANCE: hi m1
 INSTANCE: ha m1
 INSTANCE: ho m1
 
-GENERIC: frob2 ( x -- x )
+MGENERIC: frob2 ( x -- x )
 MM: frob2 ( x: m1 -- x ) drop 42 ;
 MM: frob2 ( x: hi -- x ) drop 43 ;
 MM: frob2 ( x: ha -- x ) drop 44 ;
@@ -171,7 +171,7 @@ MM: frob2 ( x: ho -- x ) drop 45 ;
 { 45 } [ ho frob2 ] unit-test
 [ 99 frob2 ] [ no-method? ] must-fail-with
 
-GENERIC: frob3 ( x x -- x )
+MGENERIC: frob3 ( x x -- x )
 MM: frob3 ( x: hihaho-u x: hi -- x ) 2drop 42 ;
 MM: frob3 ( x: hihaho-u x: ha -- x ) 2drop 43 ;
 MM: frob3 ( x: hihaho-u x: ho -- x ) 2drop 44 ;
@@ -182,7 +182,7 @@ MM: frob3 ( x: hihaho-u x: ho -- x ) 2drop 44 ;
 [ 99 hi frob3 ] [ no-method? ] must-fail-with
 
 ! Regression of dispatch order
-GENERIC: cached-md-beats? ( obj1 obj2 -- ? )
+MGENERIC: cached-md-beats? ( obj1 obj2 -- ? )
 MIXIN: m-thing
 SINGLETONS: s-paper s-scissors s-rock ;
 INSTANCE: s-paper m-thing
@@ -219,7 +219,7 @@ SYMBOL: acc
 
 : add-acc ( x -- ) acc get push ;
 
-GENERIC: mg ( o1 o2 o3 -- )
+MGENERIC: mg ( o1 o2 o3 -- )
 MM: mg ( o: t3 o: t0 o: t2 -- ) 1 add-acc call-next-method ;
 MM: mg ( o: t2 o: t2 o: t2 -- ) 2 add-acc call-next-method ;
 MM: mg ( o: t2 o: t0 o: t0 -- ) 3 add-acc call-next-method ;
@@ -236,7 +236,7 @@ MM: mg ( o: t3 o: t2 o: t2 -- ) call-next-method ;
 
 ! Checking when first dispatch is defined on object
 
-GENERIC: tos-object ( obj obj -- obj )
+MGENERIC: tos-object ( obj obj -- obj )
 
 MM: tos-object ( o: array c: fixnum -- obj )
     2drop 42 ;
@@ -249,7 +249,7 @@ MM: tos-object ( o: integer c: object -- obj )
 { 43 } [ 11 fixnum tos-object ] unit-test
 
 ! Checking that overriding default method works
-GENERIC: gen-with-def ( o o -- o )
+MGENERIC: gen-with-def ( o o -- o )
 
 MM: gen-with-def ( o: object o: object -- o ) 2drop 11 ;
 
@@ -269,7 +269,7 @@ MM: gen-with-def ( o: string o: fixnum -- o ) 2drop 44 ;
 
 ! Regression: Only one method on two objects
 
-GENERIC: only-one ( o o -- o )
+MGENERIC: only-one ( o o -- o )
 MM: only-one ( o: object o: object -- o ) 2drop 11 ;
 { 11 } [ 1 2 only-one ] unit-test
 
@@ -277,7 +277,7 @@ MM: only-one ( o: object o: object -- o ) 2drop 11 ;
 ! Class method constructor test
 TUPLE: foo2 a b c ;
 TUPLE: foo2sub < foo2 ;
-GENERIC: <foo-subclass> ( a b c class -- obj )
+MGENERIC: <foo-subclass> ( a b c class -- obj )
 CM: foo2 <foo-subclass> new swap >>c swap >>b swap >>a ;
 { T{ foo2 { a 1 } { b 2 } { c 3 } } } [ 1 2 3 foo2 <foo-subclass> ] unit-test
 { T{ foo2sub { a 1 } { b 2 } { c 3 } } } [ 1 2 3 foo2sub <foo-subclass> ] unit-test
@@ -289,7 +289,7 @@ CM: foo2subsub <foo-subclass> call-next-method 42 >>d ;
 
 PREDICATE: num42 < fixnum 42 = ;
 PREDICATE: num47 < fixnum 47 = ;
-GENERIC: 2frob ( x x -- x ) multi
+MGENERIC: 2frob ( x x -- x )
 M: D( num42 fixnum ) 2frob 2drop f ;
 M: D( num47 object ) 2frob 2drop t ;
 ! At this point, a non-fatal ambiguity error should exist
@@ -305,7 +305,7 @@ DISJOINT: num42 num47 ;
 
 <<
 TUPLE: forgettable ;
-GENERIC: forget-me ( x x -- ) multi
+MGENERIC: forget-me ( x x -- )
 M: number forget-me 2drop ;
 M: D( forgettable fixnum ) forget-me 2drop ;
 >>

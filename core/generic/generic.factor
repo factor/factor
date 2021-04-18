@@ -32,7 +32,10 @@ ERROR: method-lookup-failed class generic ;
 ! Multi-methods can return more than one result here
 GENERIC: lookup-methods ( class generic -- seq )
 
-: ?lookup-method ( class generic -- method/f )
+! Multi-methods need to wrap the class in a dispatch to see if it is defined
+GENERIC: ?lookup-method ( class generic -- method/f )
+
+M: generic ?lookup-method
     "methods" word-prop at ;
 
 : lookup-method ( class generic -- method )

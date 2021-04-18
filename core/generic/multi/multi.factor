@@ -1,4 +1,4 @@
-USING: accessors arrays assocs classes.algebra classes.dispatch
+USING: accessors arrays assocs classes classes.algebra classes.dispatch
 classes.dispatch.covariant-tuples classes.dispatch.order combinators definitions
 effects effects.parser generic generic.parser generic.single
 generic.single.private generic.standard hashtables kernel make math namespaces
@@ -133,11 +133,17 @@ M: multi-combination inline-cache-quots
 
 M: multi-combination picker current-index get (picker) ;
 
+M: multi-combination make-default-method
+    M\ single-combination make-default-method execute ;
+
 PREDICATE: multi-generic < generic
     "combination" word-prop multi-combination? ;
 
 M: multi-generic lookup-methods ( class generic -- seq )
     "methods" word-prop [ first dispatch-depends-on? ] with filter values ;
+
+M: multi-generic ?lookup-method ( class generic -- method )
+    [ dup class? [ 1array <covariant-tuple> ] when ] dip call-next-method ;
 
 ERROR: not-single-dispatch generic ;
 M: multi-generic dispatch# not-single-dispatch ;
@@ -213,12 +219,9 @@ ERROR: empty-dispatch-spec seq ;
 : assert-dispatch-types ( seq -- seq )
     dup empty? [ empty-dispatch-spec ] when ;
 
-: >multi-combination ( combination -- )
-    dup multi-combination?
-    [ drop ] [ nary-combination "combination" set-word-prop ] if ;
-
 : create-multi-method-in ( class generic -- method )
-    [ create-method-in ] keep >multi-combination ;
+    multi-generic check-instance
+    create-method-in ;
 
 : scan-new-multi-method ( -- method )
     scan-word
@@ -231,7 +234,5 @@ ERROR: empty-dispatch-spec seq ;
         scan-new-multi-method [ parse-definition ] with-method-definition
     ] with-definition ;
 
+SYNTAX: MGENERIC: [ nary-combination ] [ scan-new-generic ] dip call scan-effect define-generic ;
 SYNTAX: MM: (MM:) define ;
-
-! Use to turn a GENERIC: into a multi-combination when only using D( ) things
-SYNTAX: multi last-word >multi-combination ;
