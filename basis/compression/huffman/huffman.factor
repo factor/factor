@@ -101,21 +101,15 @@ TUPLE: huffman-tree
 ! Sort by length, then lexicographically.
 :: <==> ( b1 b2  -- <=> )
     {
-      { [ b1 length  b2 length <  ] [ +lt+ ] }
-      { [ b2 length  b1 length  <  ] [ +gt+ ] }
-      { [ b1 reverse bit-array>integer b2 reverse bit-array>integer < ] [ +lt+ ] }
-      { [ b2 reverse bit-array>integer b1 reverse bit-array>integer < ] [ +gt+ ] }
+      { [ b1 second length  b2 second length <  ] [ +lt+ ] }
+      { [ b2 second length b1 second length  <  ] [ +gt+ ] }
+      { [ b1 first  b2 first  < ] [ +lt+ ] }
+      { [ b2 first b1 first < ] [ +gt+ ] }
       [ +eq+ ]
     } cond ;
 
-: compare! ( obj1 obj2 quot -- <==> )
-    bi@ <==> ; inline
-
-: sort-with! ( seq quot -- sortedseq )
-    [ compare! ] curry sort ; inline
-
 : sort-values! ( obj -- sortedseq )
-    >alist [ second ] sort-with! ;
+    >alist [ <==> ] sort ;
 
 : get-next-code ( code current -- next )
    [ reverse bit-array>integer 1 + ] [ length ] bi <bits> >bit-array reverse dup length pick length swap - [ f ] replicate append nip ;

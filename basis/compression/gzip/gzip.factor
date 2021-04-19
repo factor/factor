@@ -163,7 +163,7 @@ CONSTANT: bit-reverse-table $[
      285 [0..b] [ lit-dict get at length ] map [ zero? ] trim-tail ;
 
 : dist-code-lens ( -- len-seq )
-     31 [0..b] [ lit-dict get at length ] map [ zero? ] trim-tail ;
+     31 [0..b] [ dist-dict get at length ] map [ zero? ] trim-tail ;
 
 :: replace-0-single ( m len-seq  -- new-len-seq )
     m 11 < [ len-seq m 0 <array> 17 m 3 - 3 <bits> >bit-array 2array 1array replace ]
@@ -223,12 +223,12 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
 
 ! Compresses a block with dynamic huffman compression.
 : (compress-dynamic) ( lit-seq -- bit-arr-seq  )
-   [ compress-lz77 vec-to-lits { 256 } append lit-vec set 
+   compress-lz77 vec-to-lits { 256 } append lit-vec set 
     lit-vec get build-dicts  
     dist-dict set 
     lit-dict set
     dynamic-headers clen-bits compressed-lens 
-    lit-vec get vec-to-codes 4array ] with-scope ;
+    lit-vec get vec-to-codes 4array ;
 
 : flatten-single ( ele -- bits )
     dup array? [ concat ] when ;
@@ -240,7 +240,7 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
   dup array? [ [ first flatten-single ] [ second flatten-single ] bi append ] when ; 
 
 : compressed>byte-array ( bit-arr-seq  -- byte-array )
-    { [ first ] [ second concat ] [ third flatten-lens ] [ fourth [ flatten-pair ] map concat ] } cleave 4array concat underlying>> gzip-header prepend ;
+    { [ first ] [ second concat ] [ third flatten-lens ] [ fourth [ flatten-pair ] map concat ] } cleave 4array concat underlying>> gzip-header prepend B{ 0 0 } append  ;
 
 ! : write-dynamic-compressed  
 : compress-dynamic ( byte-array -- byte-array )
