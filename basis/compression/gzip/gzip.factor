@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bit-arrays byte-arrays
 combinators compression.huffman fry kernel literals locals make
-math math.bits math.ranges namespaces sequences splitting
-vectors ;
+math math.bits math.order math.ranges namespaces sequences
+splitting vectors ;
 IN: compression.gzip
 
 SYMBOL: lit-dict
@@ -14,22 +14,19 @@ SYMBOL: lit-vec
 
 ! LZ77 compression
 
-:: longest-prefix-end ( ind seq -- i )
-     seq length  [ ind swap seq subseq 0 ind seq subseq subseq? ] find-last-integer  ;
-
-: subseq-length ( ind seq -- n )
-    [ longest-prefix-end ] 2keep drop - ;
-
-:: offset ( ind seq -- o )
-    ind ind ind seq longest-prefix-end seq subseq seq subseq-start - ;
+:: longest-prefix ( ind seq -- start end )
+    ind dup ind + seq length min [a..b]
+    seq ind head-slice '[
+        ind swap seq <slice> _ subseq-start
+    ] map-find-last ;
 
 :: create-pair ( ind seq -- array )
-    ! no match
-     ind seq subseq-length 3 < 
-    [ ind seq nth ] 
-    ! match
-    [ ind seq subseq-length ind seq offset 2array ] 
-    if ;
+     ind seq longest-prefix :> ( start end )
+     end ind - :> n
+     n 3 < 
+     [ ind seq nth ]
+     [ n ind start - 2array ]
+     if ;
 
 : sum-vec ( vec -- n )
  [ dup array?  [ first  ] [ drop 1 ] if ] map-sum ;
@@ -45,7 +42,7 @@ SYMBOL: lit-vec
 ! Fixed Huffman table encoding specified in section 3.2.5 of RFC 1951
 : length-to-code ( length -- code )
 {
-{ [ dup 10 <  ] [ 254 + ] }
+{ [ dup 11 <  ] [ 254 + ] }
 { [ dup 19 < ]  [ [ 11 - 2 /i 265 + ] [ 11 - 2 mod 1 <bits> >bit-array  ] bi 2array ] }
 { [ dup 35 < ]  [ [ 19 - 4 /i 269 + ] [ 19 - 4 mod 2 <bits> >bit-array  ] bi 2array ] }
 { [ dup 67 < ]  [ [ 35 - 8 /i 273 + ] [ 35 - 8 mod 3 <bits> >bit-array  ] bi 2array ] }
@@ -136,10 +133,17 @@ CONSTANT: bit-reverse-table $[
 
 ! Dynamic Huffman
 
+! using distance code 31 to represent no distance code for particular elements because it cannot occur
+: dists ( vec -- seq )
+    [ dup array? [ second dup array? [ first ] when ]  [ drop 31 ] if ] map 31 swap remove ;
+
+: len-lits ( vec -- seq )
+    [ dup array? [ first ] when dup array? [ first ] when ] map ;
+
 ! Given an lz77 compressed block, constructs the huffman code tables
 : build-dicts ( vec -- lit-dict dist-dict )
-    [ [ dup array? [ first ] when dup array? [ first ] when ] map generate-canonical-codes ]
-    [ [ dup array? [ second ] when dup array? [ first ] when ] map generate-canonical-codes ] bi ;
+    [ len-lits generate-canonical-codes ]
+    [ dists generate-canonical-codes ] bi ;
 
 
 ! Use the given dictionary to replace the element with its code
@@ -200,7 +204,7 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
 
 ! Data that precedes dictionary embedding to allow for decoding 
 : clen-seq ( -- len-seq )
-    clen-shuffle [ code-len-dict at* [ length ] [ drop 0 ] if ] map [ zero? ] trim-tail ;
+    clen-shuffle [ code-len-dict at length ] map [ zero? ] trim-tail ;
 
 : clen-bits ( -- bit-arr )
     clen-seq [ 3 <bits> >bit-array  ] map  ;
@@ -219,7 +223,7 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
 
 ! Compresses a block with dynamic huffman compression.
 : (compress-dynamic) ( lit-seq -- bit-arr-seq  )
-   [ compress-lz77 vec-to-lits lit-vec set 
+   [ compress-lz77 vec-to-lits { 256 } append lit-vec set 
     lit-vec get build-dicts  
     dist-dict set 
     lit-dict set
@@ -236,12 +240,12 @@ CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
   dup array? [ [ first flatten-single ] [ second flatten-single ] bi append ] when ; 
 
 : compressed>byte-array ( bit-arr-seq  -- byte-array )
-    { [ first ] [ second concat ] [ third flatten-lens ] [ fourth [ flatten-pair ] map concat ] } cleave 4array concat underlying>> gzip-header swap append ;
+    { [ first ] [ second concat ] [ third flatten-lens ] [ fourth [ flatten-pair ] map concat ] } cleave 4array concat underlying>> gzip-header prepend ;
 
 ! : write-dynamic-compressed  
 : compress-dynamic ( byte-array -- byte-array )
     (compress-dynamic) compressed>byte-array ;
 
 : compress-fixed ( byte-array -- byte-array )
-  (compress-fixed) [ flatten-pair ] map concat ?{ t t f } swap append underlying>> gzip-header swap append B{ 0 0 } append ;
+  (compress-fixed) [ flatten-pair ] map concat ?{ t t f } prepend underlying>> gzip-header prepend B{ 0 0 } append ;
 

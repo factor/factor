@@ -80,11 +80,15 @@ TUPLE: huffman-tree
 
 ! Walks down a huffman tree and outputs a dictionary of codes 
 : (generate-codes) ( huff-tree -- code-dict ) 
-    dup leaf? [ code>> ?{ } swap  H{ } clone ?set-at ] 
-              [ 
-                [ left>> (generate-codes) [ ?{ f } prepend ] assoc-map ] 
-                [ right>> (generate-codes) [ ?{ t } prepend ] assoc-map ] bi assoc-union! 
-              ] if ;
+    {
+        { [ dup leaf? ] [ code>> ?{ } swap  H{ } clone ?set-at ] }
+        { [ dup left>> not ] [ right>> (generate-codes) [ ?{ t } prepend ] assoc-map ] }
+        { [ dup right>> not ] [ left>> (generate-codes) [ ?{ f } prepend ] assoc-map ] }
+          [ 
+            [ left>> (generate-codes) [ ?{ f } prepend ] assoc-map ] 
+            [ right>> (generate-codes) [ ?{ t } prepend ] assoc-map ] bi assoc-union! 
+          ] 
+     } cond ;
 
 : generate-codes ( lit-seq -- code-dict )
     [
@@ -122,9 +126,7 @@ TUPLE: huffman-tree
 
 ! Basically a wrapper for the above recursive helper 
 : canonize-codes ( codes -- codes )
-    dup first dup pick 1 tail (canonize-codes) ?push nip reverse ;
-
-
+    dup first length <bit-array> dup pick 1 tail (canonize-codes) ?push nip reverse ;
 
 
 
