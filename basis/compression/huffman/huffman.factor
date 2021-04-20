@@ -122,7 +122,8 @@ TUPLE: huffman-tree
 : canonize-codes ( codes -- codes )
     dup first length <bit-array> dup pick 1 tail (canonize-codes) ?push nip reverse ;
 
-
+:: length-limit-codes ( max-len old-codes -- new-codes )
+    old-codes [ length ] assoc-map  [ dup length max-len < [ drop max-len ] when ] assoc-map ;
 
 PRIVATE>
 
