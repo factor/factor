@@ -29,7 +29,7 @@ TUPLE: question obj question-quot answer-quot answer input input-answer correct?
         dup question-quot>> call( -- answer ) >>answer ;
 
 : score-question ( question input -- question/f )
-    dup "q" = [
+    dup { f "q" } member? [
         2drop f
     ] [
         >>input
