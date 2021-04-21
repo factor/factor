@@ -1,4 +1,4 @@
-! Copyright (C) 2020 Jacob Fischer and Abtin Molavi.
+! Copyright (C) 2020 Jacob Fischer, Abtin Molavi.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bit-arrays byte-arrays
 combinators compression.huffman fry kernel literals locals make

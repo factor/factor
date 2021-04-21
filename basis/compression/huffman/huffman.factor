@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Marc Fauconneau.
+! Copyright (C) 2009, 2020 Marc Fauconneau, Abtin Molavi, and Jacob Fischer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bit-arrays bitstreams combinators
 fry hashtables heaps io kernel locals math math.bits math.order

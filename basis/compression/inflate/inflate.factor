@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Marc Fauconneau.
+! Copyright (C) 2009, 2020 Marc Fauconneau, Abtin Molavi, Jacob Fischer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-vectors combinators
 combinators.smart compression.huffman fry hashtables io.binary
