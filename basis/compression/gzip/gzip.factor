@@ -6,11 +6,11 @@ math math.bits math.order math.ranges namespaces sequences
 sequences.deep splitting vectors ;
 IN: compression.gzip
 
+<PRIVATE
+
 SYMBOL: lit-dict
 SYMBOL: dist-dict 
 SYMBOL: lit-vec
-
-<PRIVATE
 
 ! LZ77 compression
 
@@ -210,7 +210,7 @@ TUPLE: deflate-block
         lit-vec get build-dicts  
         dist-dict set 
         lit-dict set
-        clen-seq supremum 8 < 
+        lit-code-lens supremum 16 < clen-seq supremum 8 < and 
         [ drop dynamic-headers clen-bits compressed-lens 
         lit-vec get vec-to-codes deflate-block boa ]
         [ halves [ (compress-dynamic) ] bi@ 2array ] if 
@@ -230,7 +230,7 @@ TUPLE: deflate-block
     { [ headers>> ] [ clen>> concat ] [ compressed-lens>> flatten-lens ] [ compressed-data>> [ flatten-pair ] map concat ] } cleave 4array concat ;
 
 : flatten-blocks ( blocks  -- byte-array )
-    [ flatten-block ] map unclip-last [ [ ?{ f } prepend ] map ] dip ?{ t } prepend 1array append concat ; 
+    [ flatten-block ] map unclip-last [ [ ?{ f } prepend ] map ] dip ?{ t } prepend suffix concat ; 
 
 PRIVATE>
  
@@ -239,4 +239,3 @@ PRIVATE>
 
 : compress-fixed ( byte-array -- byte-array )
     (compress-fixed) [ flatten-pair ] map concat ?{ t t f } prepend underlying>> gzip-header prepend B{ 0 0 } append ;
-

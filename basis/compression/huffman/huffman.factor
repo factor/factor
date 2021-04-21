@@ -155,4 +155,3 @@ TUPLE: huffman-decoder
 ! Outputs a dictionary of canonical codes
 : generate-canonical-codes ( lit-seq -- code-dict )
     generate-codes sort-values! unzip canonize-codes zip ;
-
