@@ -92,9 +92,11 @@ TUPLE: huffman-tree
 
 : generate-codes ( lit-seq -- code-dict )
     [
-        H{ } clone leaf-table set
+       [ H{ } clone ]
+       [ H{ } clone leaf-table set
         <min-heap> node-heap set
-        build-tree heap-pop swap (generate-codes) nip
+        build-tree heap-pop swap (generate-codes) nip ]
+        if-empty
     ] with-scope ;
 
 ! Ordering of codes that is useful for generating canonical codes.
@@ -120,7 +122,7 @@ TUPLE: huffman-tree
 
 ! Basically a wrapper for the above recursive helper 
 : canonize-codes ( codes -- codes )
-    dup first length <bit-array> dup pick 1 tail (canonize-codes) ?push nip reverse ;
+    [ V{ } clone ] [ dup first length <bit-array> dup pick 1 tail (canonize-codes) ?push nip reverse ] if-empty ;
 
 :: length-limit-codes ( max-len old-codes -- new-codes )
     old-codes [ length ] assoc-map  [ dup length max-len < [ drop max-len ] when ] assoc-map ;
