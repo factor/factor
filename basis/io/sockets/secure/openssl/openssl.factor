@@ -219,6 +219,9 @@ SYMBOL: default-secure-context
     winsock socket-handle BIO_NOCLOSE BIO_new_socket dup ssl-error :> bio
     winsock <ssl-handle> :> handle
     handle handle>> :> native-handle
+    current-secure-context config>> alpn-supported-protocols>>
+    [ drop native-handle ctx>> alpn_select_cb_func f SSL_CTX_set_alpn_select_cb ]
+    unless-empty
     hostname [
         utf8 string>alien
         native-handle swap SSL_set_tlsext_host_name ssl-error
