@@ -2,16 +2,22 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators combinators.smart
 continuations io kernel math math.functions math.parser
-prettyprint random sequences sequences.extras splitting strings
-unicode ;
-IN: math-quiz
+prettyprint quotations random sequences sequences.extras
+splitting strings unicode ;
+IN: quiz
 
 GENERIC: generate-question* ( question -- quot )
 GENERIC: parse-response ( input question -- answer )
 GENERIC: ask-question ( question -- )
+GENERIC: check-response ( question -- correct? )
 GENERIC: >question ( obj -- question )
 
 TUPLE: question generator generated answer response parsed-response correct? ;
+
+TUPLE: true-false-question < question ;
+: <true-false-question> ( generator -- question )
+    true-false-question new
+        swap >>generator ;
 
 TUPLE: string-question < question ;
 : <string-question> ( generator -- question )
@@ -30,15 +36,17 @@ TUPLE: multiple-choice-question < question n choices ;
         swap >>n
         swap >>generator ;
 
+TUPLE: true-false-response ;
 TUPLE: string-response ;
 TUPLE: number-response ;
 
+M: true-false-response >question <true-false-question> ;
 M: string-response >question <string-question> ;
 M: number-response >question <number-question> ;
 M: object >question clone ;
 
-M: number-question generate-question* generator>> generate-question* ;
-M: string-question generate-question* generator>> generate-question* ;
+M: callable generate-question* call( -- quot ) ;
+M: question generate-question* generator>> generate-question* ;
 M: multiple-choice-question generate-question*
     [ n>> ] [ generator>> ] bi
     '[ _ generate-question* ] replicate ;
@@ -46,9 +54,9 @@ M: multiple-choice-question generate-question*
 : trim-blanks ( seq -- seq' ) " " split harvest " " join ;
 : first-n-letters ( n -- seq ) <iota> [ CHAR: a + 1string ] map ;
 : alphabet-zip ( seq -- zip ) [ length <iota> [ CHAR: a + 1string ] { } map-as ] keep zip ;
+M: question parse-response drop trim-blanks ;
+M: true-false-question parse-response drop trim-blanks >lower "t" = ;
 M: number-question parse-response drop string>number ;
-M: string-question parse-response drop trim-blanks ;
-M: multiple-choice-question parse-response drop trim-blanks ;
 
 TUPLE: multiplication < number-response count n ;
 TUPLE: sqrt-question < number-response random-choices ;
@@ -89,7 +97,6 @@ M: stack-shuffler generate-question*
     n-shufflers>> [ stack-shufflers random ] [ ] replicate-as
     [ inputs first-n-letters ] keep
     '[ _ _ with-datastack " " join ] ;
-M: stack-shuffler parse-response drop trim-blanks ;
 
 M: question ask-question generated>> . ;
 M: string-response ask-question generated>> . ;
@@ -98,13 +105,19 @@ M: number-response ask-question generated>> . ;
 M: multiple-choice-question ask-question
     [ generated>> . ] [ choices>> [ ... ] each ] bi ;
 
+M: question check-response
+    [ parsed-response>> ] [ answer>> ] bi = ;
+M: multiple-choice-question check-response
+    [ parsed-response>> ] [ answer>> ] bi member? ;
+
+
 : score-question ( question input -- question/f )
     dup { f "q" } member? [
         2drop f
     ] [
         >>response
         dup [ response>> ] keep parse-response >>parsed-response
-        dup [ parsed-response>> ] [ answer>> ] bi dup sequence? [ member? ] [ = ] if >>correct?
+        dup check-response >>correct?
         dup answer>> dup string? [ print ] [ . ] if
     ] if ;
 
