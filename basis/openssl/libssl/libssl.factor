@@ -1,9 +1,11 @@
 ! Copyright (C) 2007 Elie CHAFTARI
 ! Portions copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.destructors alien.libraries
-alien.parser alien.syntax classes.struct combinators kernel
-literals namespaces openssl.libcrypto system ;
+USING: accessors alien alien.c-types alien.data
+alien.destructors alien.libraries alien.parser alien.syntax
+classes.struct combinators io.encodings.string io.encodings.utf8
+io.sockets.secure.openssl kernel literals namespaces
+openssl.libcrypto sequences system ;
 
 IN: openssl.libssl
 
@@ -518,6 +520,78 @@ FUNCTION: ulong SSL_get_options ( SSL* ssl )
 
 FUNCTION: ulong SSL_get_secure_renegotiation_support ( SSL* ssl )
 
+! -----------------------------
+! tls alpn extension
+! -----------------------------
+
+! values from https://github.com/openssl/openssl/blob/master/include/openssl/tls1.h
+CONSTANT: SSL_TLSEXT_ERR_OK 0
+CONSTANT: SSL_TLSEXT_ERR_ALERT_FATAL 2
+CONSTANT: SSL_TLSEXT_ERR_NOACK 3
+! values from https://github.com/openssl/openssl/blob/master/include/openssl/ssl.h.in
+CONSTANT: OPENSSL_NPN_UNSUPPORTED 0
+CONSTANT: OPENSSL_NPN_NEGOTIATED 1
+CONSTANT: OPENSSL_NPN_NO_OVERLAP 2
+
+! callback type
+! CALLBACK: int SSL_CTX_alpn_select_cb_func ( SSL* ssl, const
+! unsigned c-string* out, uchar* outlen, const unsigned c-string
+! in, uint inlen, void* arg )
+CALLBACK: int SSL_CTX_alpn_select_cb_func ( SSL* ssl,
+c-string* out, uchar* outlen, c-string in, uint inlen, void* arg )
+FUNCTION: void SSL_CTX_set_alpn_select_cb ( SSL_CTX* ctx,
+SSL_CTX_alpn_select_cb_func cb, void* arg )
+FUNCTION: int SSL_select_next_proto ( c-string* out, uchar*
+outlen, c-string server, uint server_len, c-string client, uint
+client_len )
+
+FUNCTION: void SSL_get0_alpn_selected ( SSL* s,
+c-string* data, uint* len )
+
+: alpn_select_cb_func ( -- alien )
+    [|  ssl out outlen in inlen arg |
+        B
+        ! if alpn-protocols is empty return err noack
+        ! current-secure-context relies on secure-context
+        ! variable being set. if this is not set in a callback,
+        ! we need some other way of accessing it (probably
+        ! passing it as arg to SSL_CTX_set_alpn_select_cb, but
+        ! need to make sure that stays defined as long as the
+        ! callback can be called)
+        current-secure-context config>> alpn-supported-protocols>>
+        [ SSL_TLSEXT_ERR_NOACK ]
+        [ ! set up out parameters
+          ! "" c-string <ref> :> outlocal
+          [ out outlen ] dip
+          ! convert alpn-protocols from list of strings to
+          ! c-string in wire format and length.
+          ! see https://www.openssl.org/docs/manmaster/man3/SSL_set_alpn_protos.html
+          [ utf8 encode dup length prefix ] map
+          concat dup length
+          ! call SSL_select_next_proto, with out parameters
+          in inlen SSL_select_next_proto
+          ! the function returns OPENSSL_NPN_NO_OVERLAP when no
+          ! match is found, otherwise OPENSSL_NPN_NEGOTIATED
+          OPENSSL_NPN_NEGOTIATED =
+          [ ! DOUBLECHECK: The value in out is already copied
+            ! from the original, so we can just leave it and
+            ! return... otherwise this detail needs to be ironed
+            ! out, probably by finding the entry in in that out
+            ! is identical to. (out needs to point directly into
+            ! in, or a buffer that will outlive the tls
+            ! handshake.)
+
+            ! return err ok.
+            SSL_TLSEXT_ERR_OK ]
+          [ SSL_TLSEXT_ERR_ALERT_FATAL ] if 
+        ] if-empty
+    ] SSL_CTX_alpn_select_cb_func ;
+
+: get_alpn_selected_wrapper ( ssl* -- alpn_string/f )
+    { c-string int } [ SSL_get0_alpn_selected ] with-out-parameters
+    drop ! how do we unbox the c-string?
+    ! also, the string is not null-terminated, is that problematic?
+    ;
 
 ! ------------------------------------------------------------------------------
 ! Misc
