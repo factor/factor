@@ -36,7 +36,8 @@ verify
 verify-depth
 ca-file ca-path
 dh-file
-ephemeral-key-bits ;
+ephemeral-key-bits 
+alpn-supported-protocols ;
 
 : <secure-config> ( -- config )
     secure-config new
