@@ -1,6 +1,6 @@
 USING: accessors continuations http http.server http.server.requests
 io io.servers io.sockets io.streams.peek
-io.streams.limited kernel namespaces ;
+io.streams.limited kernel namespaces openssl.libssl ; 
 
 IN: http2.server
 
@@ -31,7 +31,7 @@ M: http2-server handle-client*
     ?refresh-all
     request-limit get limited-input
     secure-addr dup port>> local-address get port>> = and
-    [ t ! get tls(1.2?) negotiated thing
+    [ t ! get tls(1.2?) negotiated thing: replace with get_alpn_selected
       [ f start-http2-connection ] ! if h2, send prefix and start full http2
       [ call-next-method ] ! else, revert to http1?
       if ] ! secure case
@@ -51,10 +51,10 @@ M: http2-server handle-client*
             nip
             [ do-request ] ?benchmark 
             [ do-response ] ?benchmark 
-          ]
+          ] if 
         ]
         [ nip handle-client-error ] recover 
-        if ]
+        ]
       if ] ! insecure case
     if
     ;
