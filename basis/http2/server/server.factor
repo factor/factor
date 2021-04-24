@@ -40,7 +40,14 @@ M: http2-server handle-client*
         t ! check if it asks for upgrade
         [ start-http2-connection ] ! if so, send 101 switching protocols response, start http2,
             ! including sending prefix and response to initial request.
-        [ 2drop ] ! else, finish processing as http1.
+        [ 
+            ?refresh-all
+            request-limit get limited-input
+            [ read-request ] ?benchmark 
+            [ do-request ] ?benchmark 
+            [ do-response ] ?benchmark 
+          [ handle-client-error ] recover ! else, finish processing as http1.
+        ]
         if ]
       if ] ! insecure case
     if
