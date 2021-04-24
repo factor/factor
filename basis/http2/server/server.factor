@@ -1,5 +1,5 @@
 USING: accessors continuations http http.server http.server.requests
-io io.servers io.sockets io.streams.peek
+io io.encodings.ascii io.servers io.sockets io.streams.peek
 io.streams.limited kernel namespaces openssl.libssl ; 
 
 IN: http2.server
@@ -58,4 +58,10 @@ M: http2-server handle-client*
       if ] ! insecure case
     if
     ;
+
+: <http2-server> ( -- server )
+    ascii http2-server new-threaded-server
+        "http2.server" >>name
+        "http" protocol-port >>insecure
+        "https" protocol-port >>secure ;
 
