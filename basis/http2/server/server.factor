@@ -1,5 +1,6 @@
-USING: accessors http http.server io io.servers io.streams.peek
-io.sockets kernel namespaces ;
+USING: accessors continuations http http.server http.server.requests
+io io.servers io.sockets io.streams.peek
+io.streams.limited kernel namespaces ;
 
 IN: http2.server
 
@@ -18,7 +19,7 @@ CONSTANT: client-connection-prefix B{ 0x50 0x52 0x49 0x20 0x2a
     ! TODO: establish http2 connection and carry out requests
     ! send settings frame.
     ! listen for connection prefix and settings from client.
-    ! save settings and send ack.
+    ! save settings and send ack.  
     ;
 
 ! the server stuff
@@ -27,6 +28,8 @@ TUPLE: http2-server < http-server ;
 ! stack effect: ( threaded-server -- )
 M: http2-server handle-client*
     ! check if this is a secure connection or not
+    ?refresh-all
+    request-limit get limited-input
     secure-addr dup port>> local-address get port>> = and
     [ t ! get tls(1.2?) negotiated thing
       [ f start-http2-connection ] ! if h2, send prefix and start full http2
@@ -36,20 +39,21 @@ M: http2-server handle-client*
       ! if so, start connection
       24 peek client-connection-prefix =
       [ f start-http2-connection ]
-      [ f ! read initial request as http1
-        t ! check if it asks for upgrade
-        [ start-http2-connection ] ! if so, send 101 switching protocols response, start http2,
-            ! including sending prefix and response to initial request.
-        [ 
+      [ 
         [
-            ?refresh-all
-            request-limit get limited-input
-            [ read-request ] ?benchmark 
+          [ read-request ] ?benchmark 
+          dup "Upgrade" header 
+          "h2c" =
+          [ start-http2-connection ] ! if so, send 101 switching protocols response, start http2,
+          ! including sending prefix and response to initial request.
+          [ 
+            ! else, finish processing as http1.
+            nip
             [ do-request ] ?benchmark 
             [ do-response ] ?benchmark 
+          ]
         ]
-          [ handle-client-error ] recover ! else, finish processing as http1.
-        ]
+        [ nip handle-client-error ] recover 
         if ]
       if ] ! insecure case
     if
