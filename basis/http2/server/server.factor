@@ -10,9 +10,7 @@ TUPLE: http2-stream ; ! do I even need this?
 TUPLE: http2-connection streams settings hpack-decode-context
 hpack-encode-context ;
 
-CONSTANT: client-connection-prefix B{ 0x50 0x52 0x49 0x20 0x2a
-            0x20 0x48 0x54 0x54 0x50 0x2f 0x32 0x2e 0x30 0x0d
-            0x0a 0x0d 0x0a 0x53 0x4d 0x0d 0x0a 0x0d 0x0a } 
+CONSTANT: client-connection-prefix "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n"
 
 : start-http2-connection ( threaded-server prev-req/f -- )
     2drop
@@ -37,7 +35,10 @@ M: http2-server handle-client*
       if ] ! secure case
     [ ! first, check if the thing sent is connection prefix, and
       ! if so, start connection
-      24 peek client-connection-prefix =
+      ! this line should check for the connection prefix, but
+      ! seems to mess up the stream for when the the request is
+      ! read in read-request.
+      f ! 24 input-stream get <peek-stream> stream-peek client-connection-prefix =
       [ f start-http2-connection ]
       [ 
         [
