@@ -550,8 +550,8 @@ c-string* data, uint* len )
 
 : alpn_select_cb_func ( -- alien )
     [|  ssl out outlen in inlen arg |
-        B
         ! if alpn-protocols is empty return err noack
+
         ! current-secure-context relies on secure-context
         ! variable being set. if this is not set in a callback,
         ! we need some other way of accessing it (probably
@@ -560,15 +560,12 @@ c-string* data, uint* len )
         ! callback can be called)
         current-secure-context config>> alpn-supported-protocols>>
         [ SSL_TLSEXT_ERR_NOACK ]
-        [ ! set up out parameters
-          ! "" c-string <ref> :> outlocal
-          [ out outlen ] dip
+        [ [ out outlen ] dip
           ! convert alpn-protocols from list of strings to
           ! c-string in wire format and length.
           ! see https://www.openssl.org/docs/manmaster/man3/SSL_set_alpn_protos.html
           [ utf8 encode dup length prefix ] map
           concat dup length
-          ! call SSL_select_next_proto, with out parameters
           in inlen SSL_select_next_proto
           ! the function returns OPENSSL_NPN_NO_OVERLAP when no
           ! match is found, otherwise OPENSSL_NPN_NEGOTIATED
@@ -580,10 +577,8 @@ c-string* data, uint* len )
             ! is identical to. (out needs to point directly into
             ! in, or a buffer that will outlive the tls
             ! handshake.)
-
-            ! return err ok.
             SSL_TLSEXT_ERR_OK ]
-          [ SSL_TLSEXT_ERR_ALERT_FATAL ] if 
+          [ SSL_TLSEXT_ERR_ALERT_FATAL ] if
         ] if-empty
     ] SSL_CTX_alpn_select_cb_func ;
 
