@@ -1,4 +1,4 @@
-! Copyright (C) 2009 Marc Fauconneau.
+! Copyright (C) 2009, 2020 Marc Fauconneau, Abtin Molavi, Jacob Fischer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs byte-vectors combinators
 combinators.smart compression.huffman fry hashtables io.binary
@@ -12,6 +12,7 @@ IN: compression.inflate
 ERROR: bad-zlib-data ;
 ERROR: bad-zlib-header ;
 
+
 :: check-zlib-header ( data -- )
     16 data bs:peek 2 >le be> 31 mod    ! checksum
     0 assert=
@@ -22,6 +23,26 @@ ERROR: bad-zlib-header ;
     1 data bs:read 0 assert=            ! dictionary - not allowed in png
     2 data bs:seek                      ! compression level; ignore
     ;
+
+
+: read-until-terminated ( data -- data ) 
+   [ dup 8 swap bs:read 0 =  ] [  ]  until ;
+
+:: interpret-flag ( flg data  -- )
+   27 data bs:seek 
+   flg first 1 = [ 8 data bs:read data bs:seek  ] when
+   flg second 1 = [ data read-until-terminated drop ] when
+   flg fourth 1 = [ data read-until-terminated drop ] when
+   flg second 1 = [ 1 data bs:read drop  ] when ;
+
+:: check-gzip-header ( data -- )
+    8 data bs:read 31 assert=   ! ID 1
+    8 data bs:read 139 assert=  ! ID 2 
+    8 data bs:read 8 assert=    ! compression method: deflate
+    1 data bs:seek ! ignore textbit
+    1 data bs:read 1 data bs:read 1 data bs:read 1 data bs:read 4array data interpret-flag
+    ;
+
 
 CONSTANT: clen-shuffle { 16 17 18 0 8 7 9 6 10 5 11 4 12 3 13 2 14 1 15 }
 
@@ -166,4 +187,9 @@ PRIVATE>
 : zlib-inflate ( bytes -- bytes )
     bs:<lsb0-bit-reader>
     [ check-zlib-header ] [ inflate-loop ] bi
+    inflate-lz77 ;
+
+: gzip-inflate ( bytes -- bytes )
+    bs:<lsb0-bit-reader>
+    [ check-gzip-header ] [ inflate-loop ] bi
     inflate-lz77 ;
