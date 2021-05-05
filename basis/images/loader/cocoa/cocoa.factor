@@ -5,7 +5,7 @@ cocoa.enumeration cocoa.plists.private core-foundation
 core-foundation.data core-foundation.dictionaries
 core-foundation.strings core-foundation.urls core-graphics
 core-graphics.private core-graphics.types destructors
-images.loader io kernel math sequences system ;
+images.loader io kernel math sequences system system-info ;
 IN: images.loader.cocoa
 
 SINGLETON: ns-image
@@ -29,8 +29,11 @@ FUNCTION: CFDictionaryRef UTTypeCopyDeclaration ( CFStringRef inUTI )
 >>
 
 os macosx? [
-    ! { "png" "tif" "tiff" "gif" "jpg" "jpeg" "bmp" "ico" "webp" }
-    supported-ns-image-extensions [ ns-image register-image-class ] each
+    os-version first 11 < [
+        { "png" "tif" "tiff" "gif" "jpg" "jpeg" "bmp" "ico" "webp" }
+    ] [
+        supported-ns-image-extensions
+     ] if [ ns-image register-image-class ] each
 ] when
 
 : <CGImage> ( byte-array -- image-rep )
