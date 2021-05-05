@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs compiler.cfg compiler.cfg.def-use
+USING: accessors assocs compiler.cfg.def-use
 compiler.cfg.instructions compiler.cfg.predecessors
 compiler.cfg.renaming compiler.cfg.rpo compiler.cfg.utilities
 grouping kernel namespaces sequences ;
