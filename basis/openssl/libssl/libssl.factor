@@ -1,13 +1,10 @@
 ! Copyright (C) 2007 Elie CHAFTARI
 ! Portions copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data
-alien.destructors alien.libraries alien.parser alien.syntax
-classes.struct combinators io.encodings.string io.encodings.utf8
-io.sockets.secure.openssl kernel literals namespaces
-openssl.libcrypto sequences system ;
+USING: alien alien.c-types alien.destructors alien.libraries
+alien.parser alien.syntax classes.struct combinators kernel
+literals namespaces openssl.libcrypto system ;
 SLOT: alpn-supported-protocols
-
 IN: openssl.libssl
 
 << "libssl" {
