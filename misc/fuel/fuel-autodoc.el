@@ -46,7 +46,7 @@
         (let* ((ret (fuel-eval--send/wait cmd fuel-autodoc--timeout))
                (res (fuel-eval--retort-result ret)))
           (if (not res)
-              (message "No synposis for '%s'" word)
+              (message "No synopsis for '%s'" word)
             (if fuel-autodoc-minibuffer-font-lock
                 (factor-font-lock-string res)
               res)))))))
