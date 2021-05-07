@@ -19,6 +19,7 @@ ifdef CONFIG
 	include $(CONFIG)
 
 	CFLAGS += -Wall \
+		-Wextra \
 		-pedantic \
 		-DFACTOR_VERSION="$(VERSION)" \
 		-DFACTOR_GIT_LABEL="$(GIT_LABEL)" \
