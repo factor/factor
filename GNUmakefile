@@ -29,7 +29,7 @@ ifdef CONFIG
 
 	# SANITIZER=address ./build.sh compile
 	# address,thread,undefined,leak
-	ifneq ($(SANITIZER), 0)
+	ifdef SANITIZER
 		CFLAGS += -fsanitize=$(SANITIZER)
 		CXXFLAGS += -fsanitize=$(SANITIZER)
 	endif
