@@ -27,6 +27,13 @@ ifdef CONFIG
 
 	CXXFLAGS += -std=c++11
 
+	# SANITIZER=address ./build.sh compile
+	# address,thread,undefined,leak
+	ifneq ($(SANITIZER), 0)
+		CFLAGS += -fsanitize=$(SANITIZER)
+		CXXFLAGS += -fsanitize=$(SANITIZER)
+	endif
+
 	ifneq ($(DEBUG), 0)
 		CFLAGS += -g -DFACTOR_DEBUG
 	else
