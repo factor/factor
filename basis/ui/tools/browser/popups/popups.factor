@@ -49,4 +49,3 @@ SLOT: model
 
 : com-show-incoming-links ( browser-gadget -- )
     [ usage ] "Incoming links" show-links-popup ;
-
