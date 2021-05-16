@@ -38,6 +38,28 @@ tool "common" f {
     { T{ key-down f f "F11" } toggle-fullscreen }
 } ? prepend define-command-map
 
+
+tool "tool-switching" f {
+    { T{ key-down f ${ os macosx? M+ A+ ? } "l" } show-listener }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "L" } listener-window }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "b" } show-browser }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "B" } browser-window }
+} define-command-map
+
+tool "common" f {
+    { T{ key-down f ${ os macosx? M+ C+ ? } "w" } close-window }
+    { T{ key-down f ${ os macosx? M+ C+ ? } "q" } com-exit }
+    { T{ key-down f { A+ } "f" } com-show-active-buttons }
+    { T{ key-down f f "F2" } refresh-all }
+    { T{ key-down f f "F3" } show-error-list }
+} os macosx? {
+    { T{ key-down f { C+ M+ } "f" } toggle-fullscreen }
+} {
+    { T{ key-down f { C+ } "F4" } close-window }
+    { T{ key-down f { A+ } "F4" } com-exit }
+    { T{ key-down f f "F11" } toggle-fullscreen }
+} ? prepend define-command-map
+
 : ui-tools-main ( -- )
     f ui-stop-after-last-window? set-global
     listener-window ;
