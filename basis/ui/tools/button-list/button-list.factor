@@ -4,12 +4,31 @@ USING: accessors arrays assocs classes kernel math.rectangles
 models models.arrow namespaces sequences ui ui.gadgets
 ui.gadgets.buttons ui.gadgets.glass ui.gadgets.labeled 
 ui.gadgets.presentations ui.gadgets.search-tables
-ui.gadgets.tables ui.gadgets.wrappers ui.gestures ui.theme 
-ui.tools.browser.popups ui.tools.common ;
+ui.gadgets.labels ui.gadgets.tables ui.gadgets.wrappers ui.gestures
+ui.theme ui.tools.browser.popups ui.tools.common ;
 FROM: ui.gadgets.wrappers => wrapper ;
 IN: ui.tools.button-list
 
 TUPLE: button-list-popup < wrapper ;
+
+MIXIN: clickable
+
+SYMBOL: active-buttons
+active-buttons [ H{ } ] initialize
+
+: label-from-button ( button -- str/f )
+    children>> [ label? ] find swap [ text>> ] [ drop f ] if ;
+
+: store-labelled-button ( button -- str/f )
+    dup label-from-button [ [ active-buttons get set-at ] keep ] [ drop f ] if* ;
+
+: remove-labelled-button ( button -- str/f )
+    label-from-button [ dup active-buttons get delete-at ] [ f ] if* ;
+
+M: clickable graft* [ store-labelled-button drop ] [ call-next-method ] bi ;
+M: button ungraft* [ remove-labelled-button drop ] [ call-next-method ] bi ;
+
+INSTANCE: button clickable
 
 : <active-buttons-table> ( model -- table )
     [ keys [ ">" swap 2array ] map ] <arrow> trivial-renderer [ second ] <search-table> 

@@ -11,16 +11,6 @@ IN: ui.gadgets.buttons
 
 TUPLE: button < border pressed? selected? quot tooltip ;
 
-SYMBOL: active-buttons
-active-buttons [ H{ } ] initialize
-
-: label-from-button ( button -- str )
-    children>> [ label? ] find swap [ text>> ] [ drop "unknown" ] if ;
-
-M: button graft* dup label-from-button active-buttons get set-at ;
-
-M: button ungraft* label-from-button active-buttons get delete-at ;
-
 <PRIVATE
 
 : find-button ( gadget -- button )
