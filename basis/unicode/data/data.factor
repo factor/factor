@@ -33,7 +33,7 @@ CONSTANT: name-map H{ }
 : combining-class ( char -- n ) class-map at ; inline
 : non-starter? ( char -- ? ) combining-class { 0 f } member? not ; inline
 : property ( property -- interval-map ) properties at ; foldable
-: property? ( char property -- ? ) property interval-sets:in? ; inline
+: property? ( char property -- ? ) property interval-in? ; inline
 : special-case ( ch -- casing-tuple ) special-casing at ; inline
 
 ! For non-existent characters, use Cn

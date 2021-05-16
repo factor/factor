@@ -161,3 +161,6 @@ MACRO: smart-2map-reduce ( 2map-reduce-quots -- quot )
         [ @ _ [ cleave-curry ] [ cleave-curry ] bi _ spread* ]
         1 2each-from
     ] ;
+
+: smart-loop ( ..a quot: ( ..a -- ..b ? ) -- ..b )
+    dup outputs [ ndrop ] curry while* ; inline

@@ -19,12 +19,20 @@ ifdef CONFIG
 	include $(CONFIG)
 
 	CFLAGS += -Wall \
+		-Wextra \
 		-pedantic \
 		-DFACTOR_VERSION="$(VERSION)" \
 		-DFACTOR_GIT_LABEL="$(GIT_LABEL)" \
 		$(SITE_CFLAGS)
 
 	CXXFLAGS += -std=c++11
+
+	# SANITIZER=address ./build.sh compile
+	# address,thread,undefined,leak
+	ifdef SANITIZER
+		CFLAGS += -fsanitize=$(SANITIZER)
+		CXXFLAGS += -fsanitize=$(SANITIZER)
+	endif
 
 	ifneq ($(DEBUG), 0)
 		CFLAGS += -g -DFACTOR_DEBUG

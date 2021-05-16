@@ -179,7 +179,7 @@ CONSTANT: text-style H{ { font-size 12 } { font-style plain } }
     line {
         { [ "```" ?head ] [ drop pre toggle ] }
         { [ pre get ] [ print ] }
-        { [ "=> " ?head ] [ base-url gemini-link. ] }
+        { [ "=>" ?head ] [ base-url gemini-link. ] }
         { [ "> " ?head ] [ gemini-quoted. ] }
         { [ "* " ?head ] [ "• " write gemini-text. ] }
         { [ "### " ?head ] [ h3-style [ gemini-text. ] with-style ] }

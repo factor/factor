@@ -106,14 +106,13 @@ ERROR: imm-out-of-range imm n ;
 : LSRi32 ( imm6 Rn Rd -- ) LSRi32-encode >out ;
 : LSRi64 ( imm6 Rn Rd -- ) LSRi64-encode >out ;
 
-: with-output-variable ( value variable quot -- value )
-    over [ get ] curry compose with-variable ; inline
-
 : with-new-arm64-offset ( offset quot -- arm64-assembler )
-    [ <arm64-assembler> \ arm64-assembler ] dip with-output-variable ; inline
+    [ <arm64-assembler> \ arm64-assembler ] dip
+    '[ @ \ arm64-assembler get ] with-variable ; inline
 
 : with-new-arm64 ( quot -- arm64-assembler )
-    [ 0 <arm64-assembler> \ arm64-assembler ] dip with-output-variable ; inline
+    [ 0 <arm64-assembler> \ arm64-assembler ] dip
+    '[ @ \ arm64-assembler get ] with-variable ; inline
 
 : offset-test-arm64 ( offset quot -- instuctions )
     with-new-arm64-offset out>> ; inline

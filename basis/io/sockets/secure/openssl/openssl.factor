@@ -3,11 +3,13 @@
 USING: accessors alien alien.c-types alien.data alien.enums
 alien.strings assocs byte-arrays classes.struct combinators
 combinators.short-circuit destructors fry io io.backend
-io.binary io.buffers io.encodings.latin1 io.encodings.utf8
-io.files io.pathnames io.ports io.sockets io.sockets.secure
-io.timeouts kernel libc locals math math.functions math.order
-math.parser memoize namespaces openssl openssl.libcrypto
-openssl.libssl random sequences sets splitting unicode ;
+io.binary io.buffers io.encodings.latin1 io.encodings.string
+io.encodings.utf8 io.files io.pathnames io.ports io.sockets
+io.sockets.secure io.timeouts kernel libc locals math
+math.functions math.order math.parser memoize namespaces openssl
+openssl.libcrypto openssl.libssl random sequences sets splitting
+unicode ;
+SLOT: alpn-supported-protocols
 IN: io.sockets.secure.openssl
 
 GENERIC: ssl-method ( symbol -- method )
@@ -215,10 +217,57 @@ SYMBOL: default-secure-context
         set-secure-cipher-list-only
     ] with-destructors ;
 
+<PRIVATE
+
+: alpn_select_cb_func ( -- alien )
+    [|  ssl out outlen in inlen arg |
+        ! if alpn-protocols is empty return err noack
+
+        ! current-secure-context relies on secure-context
+        ! variable being set. if this is not set in a callback,
+        ! we need some other way of accessing it (probably
+        ! passing it as arg to SSL_CTX_set_alpn_select_cb, but
+        ! need to make sure that stays defined as long as the
+        ! callback can be called)
+        current-secure-context config>> alpn-supported-protocols>>
+        [ SSL_TLSEXT_ERR_NOACK ]
+        [ [ out outlen ] dip
+          ! convert alpn-protocols from list of strings to
+          ! c-string in wire format and length.
+          ! see https://www.openssl.org/docs/manmaster/man3/SSL_set_alpn_protos.html
+          [ utf8 encode dup length prefix ] map
+          concat dup length
+          in inlen SSL_select_next_proto
+          ! the function returns OPENSSL_NPN_NO_OVERLAP when no
+          ! match is found, otherwise OPENSSL_NPN_NEGOTIATED
+          OPENSSL_NPN_NEGOTIATED =
+          [ ! DOUBLECHECK: The value in out is already copied
+            ! from the original, so we can just leave it and
+            ! return... otherwise this detail needs to be ironed
+            ! out, probably by finding the entry in in that out
+            ! is identical to. (out needs to point directly into
+            ! in, or a buffer that will outlive the tls
+            ! handshake.)
+            SSL_TLSEXT_ERR_OK ]
+          [ SSL_TLSEXT_ERR_ALERT_FATAL ] if
+        ] if-empty
+    ] SSL_CTX_alpn_select_cb_func ;
+
+: get_alpn_selected_wrapper ( ssl* -- alpn_string/f )
+    { c-string int } [ SSL_get0_alpn_selected ] with-out-parameters
+    drop ! how do we unbox the c-string?
+    ! also, the string is not null-terminated, is that problematic?
+    ;
+
+PRIVATE>
+
 :: <ssl-socket> ( winsock hostname -- ssl )
     winsock socket-handle BIO_NOCLOSE BIO_new_socket dup ssl-error :> bio
     winsock <ssl-handle> :> handle
     handle handle>> :> native-handle
+    current-secure-context config>> alpn-supported-protocols>>
+    [ drop native-handle ctx>> alpn_select_cb_func f SSL_CTX_set_alpn_select_cb ]
+    unless-empty
     hostname [
         utf8 string>alien
         native-handle swap SSL_set_tlsext_host_name ssl-error

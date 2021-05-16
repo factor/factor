@@ -455,19 +455,19 @@ interactor "completion" f {
 
 listener-gadget "toolbar" f {
     { f restart-listener }
-    { T{ key-down f { A+ } "u" } com-auto-use }
-    { T{ key-down f { A+ } "k" } clear-output }
-    { T{ key-down f { A+ } "K" } clear-stack }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "u" } com-auto-use }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "k" } clear-output }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "K" } clear-stack }
     { T{ key-down f f "F1" } com-help }
 } define-command-map
 
 listener-gadget "scrolling"
 "The listener's scroller can be scrolled from the keyboard."
 {
-    { T{ key-down f { A+ } "UP" } com-scroll-up }
-    { T{ key-down f { A+ } "DOWN" } com-scroll-down }
-    { T{ key-down f { A+ } "PAGE_UP" } com-page-up }
-    { T{ key-down f { A+ } "PAGE_DOWN" } com-page-down }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "UP" } com-scroll-up }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "DOWN" } com-scroll-down }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "PAGE_UP" } com-page-up }
+    { T{ key-down f ${ os macosx? M+ A+ ? } "PAGE_DOWN" } com-page-down }
 } define-command-map
 
 listener-gadget "multi-touch" f {
@@ -520,9 +520,14 @@ PRIVATE>
 : com-font-size-minus ( listener -- )
     -2 adjust-listener-font-size ;
 
+: com-font-size-normal ( listener -- )
+    default-font-size over input>> font>> size>> -
+    adjust-listener-font-size ;
+
 listener-gadget "fonts" f {
-    { T{ key-down f { A+ } "+" } com-font-size-plus }
-    { T{ key-down f { A+ } "=" } com-font-size-plus }
-    { T{ key-down f { A+ } "_" } com-font-size-minus }
-    { T{ key-down f { A+ } "-" } com-font-size-minus }
+    { T{ key-down f ${ os macosx? M+ C+ ? } "+" } com-font-size-plus }
+    { T{ key-down f ${ os macosx? M+ C+ ? } "=" } com-font-size-plus }
+    { T{ key-down f ${ os macosx? M+ C+ ? } "_" } com-font-size-minus }
+    { T{ key-down f ${ os macosx? M+ C+ ? } "-" } com-font-size-minus }
+    { T{ key-down f ${ os macosx? M+ C+ ? } "0" } com-font-size-normal }
 } define-command-map

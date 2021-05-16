@@ -4,7 +4,7 @@
 USING: alien alien.c-types alien.destructors alien.libraries
 alien.parser alien.syntax classes.struct combinators kernel
 literals namespaces openssl.libcrypto system ;
-
+SLOT: alpn-supported-protocols
 IN: openssl.libssl
 
 << "libssl" {
@@ -518,6 +518,33 @@ FUNCTION: ulong SSL_get_options ( SSL* ssl )
 
 FUNCTION: ulong SSL_get_secure_renegotiation_support ( SSL* ssl )
 
+! -----------------------------
+! tls alpn extension
+! -----------------------------
+
+! values from https://github.com/openssl/openssl/blob/master/include/openssl/tls1.h
+CONSTANT: SSL_TLSEXT_ERR_OK 0
+CONSTANT: SSL_TLSEXT_ERR_ALERT_FATAL 2
+CONSTANT: SSL_TLSEXT_ERR_NOACK 3
+! values from https://github.com/openssl/openssl/blob/master/include/openssl/ssl.h.in
+CONSTANT: OPENSSL_NPN_UNSUPPORTED 0
+CONSTANT: OPENSSL_NPN_NEGOTIATED 1
+CONSTANT: OPENSSL_NPN_NO_OVERLAP 2
+
+! callback type
+! CALLBACK: int SSL_CTX_alpn_select_cb_func ( SSL* ssl, const
+! unsigned c-string* out, uchar* outlen, const unsigned c-string
+! in, uint inlen, void* arg )
+CALLBACK: int SSL_CTX_alpn_select_cb_func ( SSL* ssl,
+c-string* out, uchar* outlen, c-string in, uint inlen, void* arg )
+FUNCTION: void SSL_CTX_set_alpn_select_cb ( SSL_CTX* ctx,
+SSL_CTX_alpn_select_cb_func cb, void* arg )
+FUNCTION: int SSL_select_next_proto ( c-string* out, uchar*
+outlen, c-string server, uint server_len, c-string client, uint
+client_len )
+
+FUNCTION: void SSL_get0_alpn_selected ( SSL* s,
+c-string* data, uint* len )
 
 ! ------------------------------------------------------------------------------
 ! Misc
