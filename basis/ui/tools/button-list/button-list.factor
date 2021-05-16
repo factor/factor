@@ -12,6 +12,7 @@ IN: ui.tools.button-list
 TUPLE: button-list-popup < wrapper ;
 
 MIXIN: clickable
+INSTANCE: button clickable
 
 SYMBOL: active-buttons
 active-buttons [ H{ } ] initialize
@@ -27,8 +28,6 @@ active-buttons [ H{ } ] initialize
 
 M: clickable graft* [ store-labelled-button drop ] [ call-next-method ] bi ;
 M: button ungraft* [ remove-labelled-button drop ] [ call-next-method ] bi ;
-
-INSTANCE: button clickable
 
 : <active-buttons-table> ( model -- table )
     [ keys [ ">" swap 2array ] map ] <arrow> trivial-renderer [ second ] <search-table> 
