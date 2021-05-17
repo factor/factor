@@ -27,7 +27,7 @@ active-buttons [ H{ } ] initialize
     label-from-button [ dup active-buttons get delete-at ] [ f ] if* ;
 
 M: clickable graft* [ store-labelled-button drop ] [ call-next-method ] bi ;
-M: button ungraft* [ remove-labelled-button drop ] [ call-next-method ] bi ;
+M: clickable ungraft* [ remove-labelled-button drop ] [ call-next-method ] bi ;
 
 : <active-buttons-table> ( model -- table )
     [ keys [ ">" swap 2array ] map ] <arrow> trivial-renderer [ second ] <search-table> 
