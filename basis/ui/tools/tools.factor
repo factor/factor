@@ -1,9 +1,8 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel literals memory namespaces sequences system ui
-ui.backend ui.commands ui.gestures ui.tools.browser
-ui.tools.common ui.tools.error-list ui.tools.listener
-vocabs.refresh ;
+USING: kernel literals memory namespaces sequences system ui ui.backend
+ui.commands ui.gestures ui.tools.browser ui.tools.common ui.tools.error-list
+ui.tools.listener vocabs.refresh ;
 IN: ui.tools
 
 \ refresh-all H{ { +nullary+ t } { +listener+ t } } define-command
@@ -24,6 +23,7 @@ tool "tool-switching" f {
 tool "common" f {
     { T{ key-down f ${ os macosx? M+ C+ ? } "w" } close-window }
     { T{ key-down f ${ os macosx? M+ C+ ? } "q" } com-exit }
+    { T{ key-down f { A+ } "f" } com-show-active-buttons }
     { T{ key-down f f "F2" } refresh-all }
     { T{ key-down f f "F3" } show-error-list }
 } os macosx? {
