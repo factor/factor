@@ -100,14 +100,10 @@ TUPLE: directory-iterator
         [ nip ] if
     ] if ;
 
-: iterate-directory-entries ( ... iter quot: ( ... obj -- ... stop? ) -- ... directory-entry/f )
+: iterate-directory-entries ( ... iter quot: ( ... directory-entry -- ... obj/f ) -- ... obj/f )
     over next-directory-entry [
-        [
-            nipd swap
-            call
-        ] 3keep drop rot
-        [ 2nip ]
-        [ iterate-directory-entries ] if*
+        over curry 2dip
+        [ iterate-directory-entries ] 2curry unless*
     ] [
         2drop f
     ] if* ; inline recursive
