@@ -4,8 +4,10 @@
 ! Most of the comments are included from the original header
 ! for your convenience.
 USING: accessors alien alien.c-types alien.destructors alien.libraries
-alien.syntax classes.struct combinators kernel system vocabs ;
+alien.syntax classes.struct combinators kernel math sequences
+sequences.private system vocabs ;
 IN: raylib.ffi
+FROM: alien.c-types => float ;
 <<
 "raylib" {
     { [ os windows? ] [ "raylib.dll" ] }
@@ -40,6 +42,69 @@ STRUCT: Vector4
     { z float }
     { w float } ;
 TYPEDEF: Vector4 Quaternion ! Same as Vector4
+
+ERROR: invalid-vector-length obj exemplar ;
+
+: <Vector2> ( x y -- obj ) Vector2 <struct-boa> ; inline
+INSTANCE: Vector2 sequence
+M: Vector2 length drop 2 ; inline
+M: Vector2 nth-unsafe
+    swap 0 = [ x>> ] [ y>> ] if ;
+M: Vector2 set-nth-unsafe
+    swap 0 = [ x<< ] [ y<< ] if ;
+M: Vector2 like
+    over length 2 =
+    [ drop dup Vector2?
+      [ first2 <Vector2> ] unless
+    ] [ invalid-vector-length ] if ; inline
+M: Vector2 new-sequence
+    over 2 = [
+        2drop Vector2 (struct)
+    ] [ invalid-vector-length ] if ; inline
+
+: <Vector3> ( x y z -- obj ) Vector3 <struct-boa> ; inline
+INSTANCE: Vector3 sequence
+M: Vector3 length drop 3 ; inline
+M: Vector3 nth-unsafe
+    swap { { 0 [ x>> ] }
+           { 1 [ y>> ] }
+           { 2 [ z>> ] } } case ;
+M: Vector3 set-nth-unsafe
+    swap { { 0 [ x<< ] }
+           { 1 [ y<< ] }
+           { 2 [ z<< ] } } case ;
+M: Vector3 like
+    over length 3 =
+    [ drop dup Vector3?
+      [ first3 <Vector3> ] unless
+    ] [ invalid-vector-length ] if ; inline
+M: Vector3 new-sequence
+    over 3 = [
+        2drop Vector3 (struct)
+    ] [ invalid-vector-length ] if ; inline
+
+: <Vector4> ( x y z w -- obj ) Vector4 <struct-boa> ; inline
+INSTANCE: Vector4 sequence
+M: Vector4 length drop 4 ; inline
+M: Vector4 nth-unsafe
+    swap { { 0 [ x>> ] }
+           { 1 [ y>> ] }
+           { 2 [ z>> ] }
+           { 3 [ w>> ] } } case ;
+M: Vector4 set-nth-unsafe
+    swap { { 0 [ x<< ] }
+           { 1 [ y<< ] }
+           { 2 [ z<< ] }
+           { 3 [ w<< ] } } case ;
+M: Vector4 like
+    over length 4 =
+    [ drop dup Vector4?
+      [ first4 <Vector4> ] unless
+    ] [ invalid-vector-length ] if ; inline
+M: Vector4 new-sequence
+    over 4 = [
+        2drop Vector4 (struct)
+    ] [ invalid-vector-length ] if ; inline
 
 STRUCT: Rectangle
     { x float }
@@ -592,8 +657,8 @@ FUNCTION-ALIAS:  get-time double GetTime ( )                                    
 
 ! Misc. functions
 FUNCTION-ALIAS:  set-config-flags void SetConfigFlags ( uchar flags )                      ! Setup window configuration flags  (view FLAGS) 
-FUNCTION-ALIAS:  set-trace-log-level void SetTraceLogLevel ( int logType )                 ! Set the current threshold  (minimum)  log level
-FUNCTION-ALIAS:  set-trace-log-exit void SetTraceLogExit ( int logType )                   ! Set the exit threshold  (minimum)  log level
+FUNCTION-ALIAS:  set-trace-log-level void SetTraceLogLevel ( TraceLogType logType )                 ! Set the current threshold  (minimum)  log level
+FUNCTION-ALIAS:  set-trace-log-exit void SetTraceLogExit ( TraceLogType logType )                   ! Set the exit threshold  (minimum)  log level
 FUNCTION-ALIAS:  take-screenshot void TakeScreenshot ( c-string fileName )                 ! Takes a screenshot of current screen  ( saved a .png ) 
 FUNCTION-ALIAS:  get-random-value int GetRandomValue ( int min, int max )                  ! Returns a random value between min and max  ( both included ) 
 
