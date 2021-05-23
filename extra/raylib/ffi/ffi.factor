@@ -1023,7 +1023,7 @@ FUNCTION-ALIAS:  check-collision-box-sphere bool CheckCollisionBoxSphere ( Bound
 FUNCTION-ALIAS:  check-collision-ray-sphere bool CheckCollisionRaySphere ( Ray ray, Vector3 spherePosition, float sphereRadius )                               ! Detect collision between ray and sphere
 FUNCTION-ALIAS:  check-collision-ray-sphere-ex bool CheckCollisionRaySphereEx ( Ray ray, Vector3 spherePosition, float sphereRadius, Vector3* collisionPoint ) ! Detect collision between ray and sphere, returns collision point
 FUNCTION-ALIAS:  check-collision-ray-box bool CheckCollisionRayBox ( Ray ray, BoundingBox box )                                                                ! Detect collision between ray and box
-FUNCTION-ALIAS:  get-collision-ray-model RayHitInfo GetCollisionRayModel ( Ray ray, Model* model )                                                             ! Get collision info between ray and model
+FUNCTION-ALIAS:  get-collision-ray-model RayHitInfo GetCollisionRayModel ( Ray ray, Model model )                                                             ! Get collision info between ray and model
 FUNCTION-ALIAS:  get-collision-ray-triangle RayHitInfo GetCollisionRayTriangle ( Ray ray, Vector3 p1, Vector3 p2, Vector3 p3 )                                 ! Get collision info between ray and triangle
 FUNCTION-ALIAS:  get-collision-ray-ground RayHitInfo GetCollisionRayGround ( Ray ray, float groundHeight )                                                     ! Get collision info between ray and ground plane  ( Y-normal plane ) 
 
