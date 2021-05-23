@@ -3,8 +3,8 @@
 ! These should be complete bindings to the Raylib library. (v2.5)
 ! Most of the comments are included from the original header
 ! for your convenience.
-USING: accessors alien alien.c-types alien.enums alien.libraries
-alien.syntax classes.struct combinators kernel quotations system
+USING: accessors alien alien.c-types alien.libraries
+alien.syntax classes.struct combinators kernel system
 vocabs ;
 IN: raylib.ffi
 <<
@@ -95,12 +95,17 @@ STRUCT: Font
     { recs Rectangle* }   ! Characters rectangles in texture
     { chars CharInfo* } ; ! Characters info data
     
+! Camera projection modes
+ENUM: CameraType
+    CAMERA_PERSPECTIVE
+    CAMERA_ORTHOGRAPHIC ;
+
 STRUCT: Camera3D
     { position Vector3 }  ! Camera postion
     { target Vector3 }    ! Camera target it looks-at
     { up Vector3 }        ! Camera up vector (rotation over its axis)
     { fovy float }        ! camera field-of-view apperature in Y (degrees) in perspective, used as near plane width in orthographic
-    { type int } ;        ! Camera type, defines projection type: CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC
+    { type CameraType } ;        ! Camera type, defines projection type: CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC
 
 STRUCT: Camera2D
     { offset Vector2 }    ! Camera offset (displacement from target)
@@ -492,11 +497,6 @@ ENUM: CameraMode
     CAMERA_ORBITAL
     CAMERA_FIRST_PERSON
     CAMERA_THIRD_PERSON ;
-
-! Camera projection modes
-ENUM: CameraType
-    CAMERA_PERSPECTIVE
-    CAMERA_ORTHOGRAPHIC ;
 
 ENUM: NPatchType
     NPT_9PATCH
