@@ -487,7 +487,7 @@ ENUM: ShaderUniformDataType
     UNIFORM_SAMPLER2D ;
     
 ! Material map type
-ENUM: TexmapIndex
+ENUM: MaterialMapType
     MAP_ALBEDO    
     MAP_METALNESS 
     MAP_NORMAL    
@@ -499,6 +499,9 @@ ENUM: TexmapIndex
     MAP_IRRADIANCE          
     MAP_PREFILTER           
     MAP_BRDF ;
+
+ALIAS: MAP_DIFFUSE MAP_ALBEDO
+ALIAS: MAP_SPECULAR MAP_METALNESS
 
 ! Pixel formats
 ! NOTE: Support depends on OpenGL version and platform
