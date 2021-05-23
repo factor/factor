@@ -3,9 +3,8 @@
 ! These should be complete bindings to the Raylib library. (v2.5)
 ! Most of the comments are included from the original header
 ! for your convenience.
-USING: accessors alien alien.c-types alien.libraries
-alien.syntax classes.struct combinators kernel system
-vocabs ;
+USING: accessors alien alien.c-types alien.destructors alien.libraries
+alien.syntax classes.struct combinators kernel system vocabs ;
 IN: raylib.ffi
 <<
 "raylib" {
@@ -601,9 +600,11 @@ FUNCTION-ALIAS:  get-random-value int GetRandomValue ( int min, int max )       
 ! Files management functions
 FUNCTION-ALIAS:  load-file-data c-string LoadFileData ( c-string fileName, uint* bytesRead )                    ! Load file data as byte array  ( read)
 FUNCTION-ALIAS:  unload-file-data void UnloadFileData ( c-string data )                                ! Unload file data allocated by LoadFileData ( )
+DESTRUCTOR: unload-file-data
 FUNCTION-ALIAS:  save-file-data bool SaveFileData ( c-string fileName, void *data, uint bytesToWrite )  ! Save data to file from byte array  ( write), returns true on success
 FUNCTION-ALIAS:  load-file-text c-string LoadFileText ( c-string fileName )                                     ! Load text data from file  ( read), returns a '\0' terminated string
 FUNCTION-ALIAS:  unload-file-text void UnloadFileText ( c-string text )                                ! Unload file text data allocated by LoadFileText ( )
+DESTRUCTOR: unload-file-text
 FUNCTION-ALIAS:  save-file-text bool SaveFileText ( c-string fileName, c-string text )                          ! Save text data to file  ( write), string must be '\0' terminated, returns true on success
 FUNCTION-ALIAS:  file-exists bool FileExists ( c-string fileName )                                              ! Check if file exists
 FUNCTION-ALIAS:  directory-exists bool DirectoryExists ( c-string dirPath )                                     ! Check if a directory path exists
@@ -750,8 +751,11 @@ FUNCTION-ALIAS:  load-texture Texture2D LoadTexture ( c-string fileName )       
 FUNCTION-ALIAS:  load-texture-from-image Texture2D LoadTextureFromImage ( Image image )                                     ! Load texture from image data
 FUNCTION-ALIAS:  load-render-texture RenderTexture2D LoadRenderTexture ( int width, int height )                            ! Load texture for rendering  ( framebuffer ) 
 FUNCTION-ALIAS:  unload-image void UnloadImage ( Image image )                                                              ! Unload image from CPU memory  ( RAM ) 
+DESTRUCTOR: unload-image
 FUNCTION-ALIAS:  unload-texture void UnloadTexture ( Texture2D texture )                                                    ! Unload texture from GPU memory  ( VRAM ) 
+DESTRUCTOR: unload-texture
 FUNCTION-ALIAS:  unload-render-texture void UnloadRenderTexture ( RenderTexture2D target )                                  ! Unload render texture from GPU memory  ( VRAM ) 
+DESTRUCTOR: unload-render-texture
 FUNCTION-ALIAS:  get-image-data Color* GetImageData ( Image image )                                                         ! Get pixel data from image as a Color struct array
 FUNCTION-ALIAS:  get-image-data-normalized Vector4* GetImageDataNormalized ( Image image )                                  ! Get pixel data from image as Vector4 array  ( float normalized ) 
 FUNCTION-ALIAS:  get-pixel-datasize int GetPixelDataSize ( int width, int height, int format )                              ! Get pixel data size in bytes  ( image or texture ) 
@@ -823,6 +827,7 @@ FUNCTION-ALIAS:  load-font-ex Font LoadFontEx ( c-string fileName, int fontSize,
 FUNCTION-ALIAS:  load-font-data CharInfo* LoadFontData ( c-string fileName, int fontSize, int* fontChars, int charsCount, bool sdf )         ! Load font data for further use
 FUNCTION-ALIAS:  gen-image-font-atlas Image GenImageFontAtlas ( CharInfo* chars, int fontSize, int charsCount, int padding, int packMethod ) ! Generate image font atlas using chars info
 FUNCTION-ALIAS:  unload-font void UnloadFont ( Font font )                                                                                   ! Unload Font from GPU memory  ( VRAM ) 
+DESTRUCTOR: unload-font
 
 ! Text drawing functions
 FUNCTION-ALIAS:  draw-fps void DrawFPS ( int posX, int posY )                                                                                         ! Shows current FPS
@@ -881,10 +886,12 @@ FUNCTION-ALIAS:  draw-gizmo void DrawGizmo ( Vector3 position )                 
 FUNCTION-ALIAS:  load-model Model LoadModel ( c-string fileName )           ! Load model from files  ( mesh and material ) 
 FUNCTION-ALIAS:  load-model-from-mesh Model LoadModelFromMesh ( Mesh mesh ) ! Load model from generated mesh
 FUNCTION-ALIAS:  unload-model void UnloadModel ( Model model )              ! Unload model from memory  ( RAM and/or VRAM ) 
+DESTRUCTOR: unload-model
 
 ! Mesh loading/unloading functions
 FUNCTION-ALIAS:  load-mesh Mesh* LoadMeshes ( c-string fileName, int* meshCount  )                ! Load meshes from model file
 FUNCTION-ALIAS:  unload-mesh void UnloadMesh ( Mesh* mesh )                                       ! Unload mesh from memory  ( RAM and/or VRAM ) 
+DESTRUCTOR: unload-mesh
 FUNCTION-ALIAS:  export-mesh void ExportMesh ( c-string fileName, Mesh mesh )                     ! Export mesh as an OBJ file
 
 ! Mesh manipulation functions
@@ -908,6 +915,7 @@ FUNCTION-ALIAS:  gen-mesh-cubicmap Mesh GenMeshCubicmap ( Image cubicmap, Vector
 FUNCTION-ALIAS:  load-material Material LoadMaterial ( c-string fileName )                                           ! Load material from file
 FUNCTION-ALIAS:  load-material-default Material LoadMaterialDefault ( )                                              ! Load default material  ( Supports: DIFFUSE, SPECULAR, NORMAL maps ) 
 FUNCTION-ALIAS:  unload-material void UnloadMaterial ( Material material )                                           ! Unload material from GPU memory  ( VRAM ) 
+DESTRUCTOR: unload-material
 FUNCTION-ALIAS:  set-material-texture void SetMaterialTexture ( Material *material, int mapType, Texture2D texture ) ! Set texture for a material map type  ( MAP_DIFFUSE, MAP_SPECULAR... ) 
 FUNCTION-ALIAS:  set-model-mesh-material void SetModelMeshMaterial ( Model *model, int meshId, int materialId )      ! Set material for a mesh
 
@@ -915,6 +923,7 @@ FUNCTION-ALIAS:  set-model-mesh-material void SetModelMeshMaterial ( Model *mode
 FUNCTION-ALIAS:  load-model-animations ModelAnimation* LoadModelAnimations ( c-string fileName, int* animsCount ) ! Load model animations from file
 FUNCTION-ALIAS:  update-model-animation void UpdateModelAnimation ( Model model, ModelAnimation anim, int frame ) ! Update model animation pose
 FUNCTION-ALIAS:  unload-model-animation void UnloadModelAnimation ( ModelAnimation anim )                         ! Unload animation data
+DESTRUCTOR: unload-model-animation
 FUNCTION-ALIAS:  is-model-animation-valid bool IsModelAnimationValid ( Model model, ModelAnimation anim )         ! Check model animation skeleton match
 
 ! Model drawing functions
@@ -947,6 +956,7 @@ FUNCTION-ALIAS:  load-text c-string LoadText ( c-string fileName )              
 FUNCTION-ALIAS:  load-shader Shader LoadShader ( c-string vsFileName, c-string fsFileName ) ! Load shader from files and bind default locations
 FUNCTION-ALIAS:  load-shader-code Shader LoadShaderCode ( c-string vsCode, c-string fsCode )      ! Load shader from code strings and bind default locations
 FUNCTION-ALIAS:  unload-shader void UnloadShader ( Shader shader )                          ! Unload shader from GPU memory  ( VRAM ) 
+DESTRUCTOR: unload-shader
 FUNCTION-ALIAS:  get-shader-default Shader GetShaderDefault ( )                             ! Get default shader
 FUNCTION-ALIAS:  get-texture-default Texture2D GetTextureDefault ( )                        ! Get default texture
 
@@ -1000,7 +1010,9 @@ FUNCTION-ALIAS:  load-sound Sound LoadSound ( c-string fileName )               
 FUNCTION-ALIAS:  load-sound-from-wave Sound LoadSoundFromWave ( Wave wave )                                                 ! Load sound from wave data
 FUNCTION-ALIAS:  update-sound void UpdateSound ( Sound sound, void* data, int samplesCount )                                ! Update sound buffer with new data
 FUNCTION-ALIAS:  unload-wave void UnloadWave ( Wave wave )                                                                  ! Unload wave data
+DESTRUCTOR: unload-wave
 FUNCTION-ALIAS:  unload-sound void UnloadSound ( Sound sound )                                                              ! Unload sound
+DESTRUCTOR: unload-sound
 FUNCTION-ALIAS:  export-wave void ExportWave ( Wave wave, c-string fileName )                                               ! Export wave data to file
 FUNCTION-ALIAS:  export-wave-as-code void ExportWaveAsCode ( Wave wave, c-string fileName )                                 ! Export wave sample data to code  ( .h ) 
 
@@ -1020,6 +1032,7 @@ FUNCTION-ALIAS:  get-wave-data float* GetWaveData ( Wave wave )                 
 ! Music management functions
 FUNCTION-ALIAS:  load-music-stream Music LoadMusicStream ( c-string fileName )          ! Load music stream from file
 FUNCTION-ALIAS:  unload-music-stream void UnloadMusicStream ( Music music )             ! Unload music stream
+DESTRUCTOR: unload-music-stream
 FUNCTION-ALIAS:  play-music-stream void PlayMusicStream ( Music music )                 ! Start music playing
 FUNCTION-ALIAS:  update-music-stream void UpdateMusicStream ( Music music )             ! Updates buffers for music streaming
 FUNCTION-ALIAS:  stop-music-stream void StopMusicStream ( Music music )                 ! Stop music playing
@@ -1065,7 +1078,9 @@ FUNCTION-ALIAS:  load-image-from-memory Image LoadImageFromMemory ( char* fileTy
 FUNCTION-ALIAS:  load-image-colors Color* LoadImageColors ( Image image )                                                                                               ! Load color data from image as a Color array  ( RGBA - 32bit)
 FUNCTION-ALIAS:  load-image-palette Color* LoadImagePalette ( Image image, int maxPaletteSize, int* colorsCount )                                                       ! Load colors palette from image as a Color array  ( RGBA - 32bit)
 FUNCTION-ALIAS:  unload-image-colors void UnloadImageColors ( Color* colors )                                                                                           ! Unload color data loaded with LoadImageColors ( )
+DESTRUCTOR: unload-image-colors
 FUNCTION-ALIAS:  unload-image-palette void UnloadImagePalette ( Color* colors )                                                                                         ! Unload colors palette loaded with LoadImagePalette ( )
+DESTRUCTOR: unload-image-palette
 FUNCTION-ALIAS:  get-image-alpha-border Rectangle GetImageAlphaBorder ( Image image, float threshold )                                                                  ! Get image alpha border rectangle
 
 
@@ -1112,6 +1127,7 @@ FUNCTION-ALIAS:  get-shapes-texture-rec Rectangle GetShapesTextureRec ( )       
 FUNCTION-ALIAS:  get-matrix-projection Matrix GetMatrixProjection ( )                                   ! Get internal projection matrix
 FUNCTION-ALIAS:  load-wave-samples float* LoadWaveSamples ( Wave wave )                                 ! Load samples data from wave as a floats array
 FUNCTION-ALIAS:  unload-wave-samples void UnloadWaveSamples ( float* samples )                          ! Unload samples data loaded with LoadWaveSamples ( )
+DESTRUCTOR: unload-wave-samples
 FUNCTION-ALIAS:  set-audiostream-buffersize-default void SetAudioStreamBufferSizeDefault ( int size )   ! Default size for new audio streams
 
 
