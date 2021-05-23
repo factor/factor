@@ -119,16 +119,16 @@ STRUCT: BoundingBox
     { max Vector3 } ;     ! Maximum vertex box-corner
 
 STRUCT: Mesh
-    { vertexCount int }   ! Number of verticles stored in arrays
+    { vertexCount int }   ! Number of vertices stored in arrays
     { triangleCount int } ! Number of triangles stored (indexed or not )
-    { verticles float* }  ! Vertex position (XYZ - 3 components per vertex)
     { texcoords float* }  ! Vertex texture coordinates (UV - 2 components per vertex )
+    { vertices float* }  ! Vertex position (XYZ - 3 components per vertex)
     { texcoords2 float* } ! Vertex second texture coordinates (useful for lightmaps)
     { normals float* }    ! Vertex normals (XYZ - 3 components per vertex)
     { tangents float* }   ! Vertex tangents (XYZW - 4 components per vertex )
     { colors uchar* }     ! Vertex colors (RGBA - 4 components per vertex)
     { indices ushort* }   ! Vertex indices (in case vertex data comes indexed)
-    { animVerticles float* }
+    { animVertices float* }
     { animNormals float* }
     { boneIds int* }
     { boneWeights float* }
