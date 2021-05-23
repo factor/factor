@@ -21,12 +21,6 @@ FROM: alien.c-types => float ;
 LIBRARY: raylib
 
 ! Structs ----------------------------------------------------------------
-STRUCT: Color
-    { r uchar }
-    { g uchar }
-    { b uchar }
-    { a uchar } ;
-
 STRUCT: Vector2
     { x float }
     { y float } ;
@@ -106,6 +100,19 @@ M: Vector4 new-sequence
         2drop Vector4 (struct)
     ] [ invalid-vector-length ] if ; inline
 
+! Matrix type (OpenGL style 4x4 - right handed, column major)
+STRUCT: Matrix
+    { m0 float } { m4 float } { m8 float } { m12 float }
+    { m1 float } { m5 float } { m9 float } { m13 float }
+    { m2 float } { m6 float } { m10 float } { m14 float }
+    { m3 float } { m7 float } { m11 float } { m15 float } ;
+
+STRUCT: Color
+    { r uchar }
+    { g uchar }
+    { b uchar }
+    { a uchar } ;
+
 STRUCT: Rectangle
     { x float }
     { y float }
@@ -118,7 +125,7 @@ STRUCT: Image
     { data void* }                     ! Image raw data
     { width int }                      ! Image base width
     { height int }                     ! Image base height
-    { mipmaps int }                    ! Mipmap levels, 1 by default 
+    { mipmaps int }                    ! Mipmap levels, 1 by default
     { format int } ;                   ! Data format (PixelFormat type)
 
 STRUCT: Texture2D
@@ -138,7 +145,7 @@ STRUCT: RenderTexture2D
 TYPEDEF: RenderTexture2D RenderTexture ! Same as RenderTexture2D
 
 STRUCT: NPatchInfo
-    { sourceRec Rectangle }
+    { source Rectangle }
     { left int }
     { top int }
     { right int }
@@ -158,6 +165,8 @@ STRUCT: Font
     { texture Texture2D } ! Characters texture atlas
     { recs Rectangle* }   ! Characters rectangles in texture
     { chars CharInfo* } ; ! Characters info data
+
+TYPEDEF: Font SpriteFont
     
 ! Camera projection modes
 ENUM: CameraType
@@ -177,10 +186,6 @@ STRUCT: Camera2D
     { rotation float }    ! Camera rotation in degrees
     { zoom float } ;      ! Camera zoom (scaling), should be 1.0f by default
 TYPEDEF: Camera3D Camera  ! Default to 3D Camera
-
-STRUCT: BoundingBox
-    { min Vector3 }       ! Minimum vertex box-corner
-    { max Vector3 } ;     ! Maximum vertex box-corner
 
 STRUCT: Mesh
     { vertexCount int }   ! Number of vertices stored in arrays
@@ -207,7 +212,6 @@ STRUCT: Shader
     { id uint }              ! Shader program id
     { locs int* } ;          ! Shader locations array
                              ! This is dependant on MAX_SHADER_LOCATIONS.  Default is 32
-
 STRUCT: MaterialMap
     { texture Texture2D }    ! Material map Texture
     { color Color }          ! Material map color
@@ -229,13 +233,6 @@ STRUCT: BoneInfo
     { name char[32] }        ! Bone Name
     { parent int } ;         ! Bone parent
 
-! Matrix type (OpenGL style 4x4 - right handed, column major)
-STRUCT: Matrix
-    { m0 float } { m4 float } { m8 float } { m12 float }
-    { m1 float } { m5 float } { m9 float } { m13 float }
-    { m2 float } { m6 float } { m10 float } { m14 float }
-    { m3 float } { m7 float } { m11 float } { m15 float } ;
-
 STRUCT: Model
     { transform Matrix }
     { meshCount int }
@@ -253,8 +250,8 @@ ARRAY-SLOT: Model BoneInfo _bones [ boneCount>> ] bones
 
 STRUCT: ModelAnimation
     { boneCount int }
-    { _bones BoneInfo* }
     { frameCount int }
+    { _bones BoneInfo* }
     { framePoses Transform** } ;
 ARRAY-SLOT: ModelAnimation BoneInfo _bones [ boneCount>> ] bones
 
@@ -267,6 +264,10 @@ STRUCT: RayHitInfo
     { distance float }      ! Distance to nearest hit
     { position Vector3 }    ! Position of nearest hit
     { normal Vector3 } ;    ! Surface normal of hit
+
+STRUCT: BoundingBox
+    { min Vector3 }       ! Minimum vertex box-corner
+    { max Vector3 } ;     ! Maximum vertex box-corner
 
 STRUCT: Wave
     { sampleCount uint }    ! Number of samples
@@ -317,6 +318,16 @@ ENUM: raylibConfigFlags
     {  FLAG_WINDOW_HIDDEN        128   }
     {  FLAG_MSAA_4X_HINT          32   }   !  Set to try enabling MSAA 4X
     {  FLAG_VSYNC_HINT            64   } ; !  Set to try enabling V-Sync on GPU
+
+ENUM: TraceLogType
+    LOG_ALL
+    LOG_TRACE
+    LOG_DEBUG
+    LOG_INFO
+    LOG_WARNING
+    LOG_ERROR
+    LOG_FATAL
+    LOG_NONE ;
     
 ENUM: KeyboardFunctionKeys
     {  KEY_SPACE            32 } 
@@ -399,33 +410,33 @@ ENUM: KeyboardAlphaNumericKeys
     {  KEY_Y                89 } 
     {  KEY_Z                90 } ;
 
-: LIGHTGRAY  ( -- Color ) 200  200  200  255 Color <struct-boa> ; !  Light Gray
-: GRAY       ( -- Color ) 130  130  130  255 Color <struct-boa> ; !  Gray
-: DARKGRAY   ( -- Color ) 80  80  80  255 Color <struct-boa>    ; !  Dark Gray
-: YELLOW     ( -- Color ) 253  249  0  255 Color <struct-boa>   ; !  Yellow
-: GOLD       ( -- Color ) 255  203  0  255 Color <struct-boa>   ; !  Gold
-: ORANGE     ( -- Color ) 255  161  0  255 Color <struct-boa>   ; !  Orange
-: PINK       ( -- Color ) 255  109  194  255 Color <struct-boa> ; !  Pink
-: RED        ( -- Color ) 230  41  55  255 Color <struct-boa>   ; !  Red
-: MAROON     ( -- Color ) 190  33  55  255 Color <struct-boa>   ; !  Maroon
-: GREEN      ( -- Color ) 0  228  48  255 Color <struct-boa>    ; !  Green
-: LIME       ( -- Color ) 0  158  47  255 Color <struct-boa>    ; !  Lime
-: DARKGREEN  ( -- Color ) 0  117  44  255 Color <struct-boa>    ; !  Dark Green
-: SKYBLUE    ( -- Color ) 102  191  255  255 Color <struct-boa> ; !  Sky Blue
-: BLUE       ( -- Color ) 0  121  241  255 Color <struct-boa>   ; !  Blue
-: DARKBLUE   ( -- Color ) 0  82  172  255 Color <struct-boa>    ; !  Dark Blue
-: PURPLE     ( -- Color ) 200  122  255  255 Color <struct-boa> ; !  Purple
-: VIOLET     ( -- Color ) 135  60  190  255 Color <struct-boa>  ; !  Violet
-: DARKPURPLE ( -- Color ) 112  31  126  255 Color <struct-boa>  ; !  Dark Purple
-: BEIGE      ( -- Color ) 211  176  131  255 Color <struct-boa> ; !  Beige
-: BROWN      ( -- Color ) 127  106  79  255 Color <struct-boa>  ; !  Brown
-: DARKBROWN  ( -- Color ) 76  63  47  255 Color <struct-boa>    ; !  Dark Brown
+CONSTANT: LIGHTGRAY  S{ Color f 200  200  200  255  } !  Light Gray
+CONSTANT: GRAY       S{ Color f 130  130  130  255  } !  Gray
+CONSTANT: DARKGRAY   S{ Color f 80  80  80  255     } !  Dark Gray
+CONSTANT: YELLOW     S{ Color f 253  249  0  255    } !  Yellow
+CONSTANT: GOLD       S{ Color f 255  203  0  255    } !  Gold
+CONSTANT: ORANGE     S{ Color f 255  161  0  255    } !  Orange
+CONSTANT: PINK       S{ Color f 255  109  194  255  } !  Pink
+CONSTANT: RED        S{ Color f 230  41  55  255    } !  Red
+CONSTANT: MAROON     S{ Color f 190  33  55  255    } !  Maroon
+CONSTANT: GREEN      S{ Color f 0  228  48  255     } !  Green
+CONSTANT: LIME       S{ Color f 0  158  47  255     } !  Lime
+CONSTANT: DARKGREEN  S{ Color f 0  117  44  255     } !  Dark Green
+CONSTANT: SKYBLUE    S{ Color f 102  191  255  255  } !  Sky Blue
+CONSTANT: BLUE       S{ Color f 0  121  241  255    } !  Blue
+CONSTANT: DARKBLUE   S{ Color f 0  82  172  255     } !  Dark Blue
+CONSTANT: PURPLE     S{ Color f 200  122  255  255  } !  Purple
+CONSTANT: VIOLET     S{ Color f 135  60  190  255   } !  Violet
+CONSTANT: DARKPURPLE S{ Color f 112  31  126  255   } !  Dark Purple
+CONSTANT: BEIGE      S{ Color f 211  176  131  255  } !  Beige
+CONSTANT: BROWN      S{ Color f 127  106  79  255   } !  Brown
+CONSTANT: DARKBROWN  S{ Color f 76  63  47  255     } !  Dark Brown
 
-: WHITE      ( -- Color ) 255  255  255  255 Color <struct-boa> ; !  White
-: BLACK      ( -- Color ) 0  0  0  255 Color <struct-boa>       ; !  Black
-: BLANK      ( -- Color ) 0  0  0  0 Color <struct-boa>         ; !  Blank (Transparent)
-: MAGENTA    ( -- Color ) 255  0  255  255 Color <struct-boa>   ; !  Magenta
-: RAYWHITE   ( -- Color ) 245  245  245  255 Color <struct-boa> ; !  My own White (raylib logo)
+CONSTANT: WHITE      S{ Color f 255  255  255  255  } !  White
+CONSTANT: BLACK      S{ Color f 0  0  0  255        } !  Black
+CONSTANT: BLANK      S{ Color f 0  0  0  0          } !  Blank (Transparent)
+CONSTANT: MAGENTA    S{ Color f 255  0  255  255    } !  Magenta
+CONSTANT: RAYWHITE   S{ Color f 245  245  245  255  } !  My own White (raylib logo)
 
 ! Leaving Android Enum out because Factor doesn't run on it
 ENUM: MouseButtons
@@ -438,14 +449,6 @@ ENUM: GamepadNumber
     GAMEPAD_PLAYER2
     GAMEPAD_PLAYER3
     GAMEPAD_PLAYER4 ;
-
-! Trace log type
-ENUM: LogType
-    { LOG_INFO 1 }
-    { LOG_WARNING 2 }
-    { LOG_ERROR 4 }
-    { LOG_DEBUG 8 }
-    { LOG_OTHER 16 } ;
 
 ! Shader location point type
 ENUM: ShaderLocationIndex
