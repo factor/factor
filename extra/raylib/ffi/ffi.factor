@@ -763,7 +763,7 @@ FUNCTION-ALIAS:  get-gesture-pinch-angle float GetGesturePinchAngle ( )         
 ! ------------------------------------------------------------------------------------ 
 ! Camera System Functions  ( Module: camera ) 
 ! ------------------------------------------------------------------------------------
-FUNCTION-ALIAS:  set-camera-mode void SetCameraMode ( Camera camera, int mode )                                                                       ! Set camera mode  ( multiple camera modes available ) 
+FUNCTION-ALIAS:  set-camera-mode void SetCameraMode ( Camera camera, CameraMode mode )                                                                       ! Set camera mode  ( multiple camera modes available ) 
 FUNCTION-ALIAS:  update-camera void UpdateCamera ( Camera* camera )                                                                                   ! Update camera position for selected mode
 FUNCTION-ALIAS:  set-camera-pan-control void SetCameraPanControl ( int panKey )                                                                       ! Set camera pan key to combine with mouse movement  ( free camera ) 
 FUNCTION-ALIAS:  set-camera-alt-control void SetCameraAltControl ( int altKey )                                                                       ! Set camera alt key to combine with mouse movement  ( free camera ) 
