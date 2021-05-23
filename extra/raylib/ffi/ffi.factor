@@ -4,7 +4,7 @@
 ! Most of the comments are included from the original header
 ! for your convenience.
 USING: accessors alien alien.c-types alien.destructors alien.libraries
-alien.syntax classes.struct combinators kernel math sequences
+alien.syntax classes.struct combinators kernel raylib.ffi.util sequences
 sequences.private system vocabs ;
 IN: raylib.ffi
 FROM: alien.c-types => float ;
@@ -185,10 +185,10 @@ STRUCT: BoundingBox
 STRUCT: Mesh
     { vertexCount int }   ! Number of vertices stored in arrays
     { triangleCount int } ! Number of triangles stored (indexed or not )
-    { texcoords float* }  ! Vertex texture coordinates (UV - 2 components per vertex )
-    { vertices float* }  ! Vertex position (XYZ - 3 components per vertex)
+    { _vertices float* }  ! Vertex position (XYZ - 3 components per vertex)
+    { _texcoords float* }  ! Vertex texture coordinates (UV - 2 components per vertex )
     { texcoords2 float* } ! Vertex second texture coordinates (useful for lightmaps)
-    { normals float* }    ! Vertex normals (XYZ - 3 components per vertex)
+    { _normals float* }    ! Vertex normals (XYZ - 3 components per vertex)
     { tangents float* }   ! Vertex tangents (XYZW - 4 components per vertex )
     { colors uchar* }     ! Vertex colors (RGBA - 4 components per vertex)
     { indices ushort* }   ! Vertex indices (in case vertex data comes indexed)
@@ -199,6 +199,9 @@ STRUCT: Mesh
     { vaoId uint }        ! OpenGL Vertex Array Object id
     { vboId uint* } ;     ! OpenGL Vertex Buffer Objects id (7  types of vertex data)
 
+ARRAY-SLOT: Mesh Vector3 _vertices [ vertexCount>> ] vertices
+ARRAY-SLOT: Mesh Vector2 _texcoords [ vertexCount>> ] texcoords
+ARRAY-SLOT: Mesh Vector3 _normals [ vertexCount>> ] normals
 
 STRUCT: Shader
     { id uint }              ! Shader program id
@@ -210,10 +213,12 @@ STRUCT: MaterialMap
     { color Color }          ! Material map color
     { value float } ;        ! Material map value
 
+CONSTANT: MAX_MATERIAL_MAPS 12 ! NOTE: This seems to be a compile-time constant!
 STRUCT: Material
     { shader Shader }        ! Material shader
-    { maps MaterialMap* } ! Material maps.  Uses MAX_MATERIAL_MAPS.
+    { _maps MaterialMap* }    ! Material maps.  Uses MAX_MATERIAL_MAPS.
     { params float* } ;      ! Material generic parameters (if required)
+ARRAY-SLOT: Material MaterialMap _maps [ drop 12 ] maps
 
 STRUCT: Transform
     { translation Vector3 }
@@ -235,18 +240,23 @@ STRUCT: Model
     { transform Matrix }
     { meshCount int }
     { materialCount int }
-    { meshes Mesh* }
-    { materials Material* }
+    { _meshes Mesh* }
+    { _materials Material* }
     { meshMaterial int* }
     { boneCount int }
-    { bones BoneInfo* }
+    { _bones BoneInfo* }
     { bindPose Transform* } ;
+
+ARRAY-SLOT: Model Material _materials [ materialCount>> ] materials
+ARRAY-SLOT: Model Mesh _meshes [ meshCount>> ] meshes
+ARRAY-SLOT: Model BoneInfo _bones [ boneCount>> ] bones
 
 STRUCT: ModelAnimation
     { boneCount int }
-    { bones BoneInfo* }
+    { _bones BoneInfo* }
     { frameCount int }
     { framePoses Transform** } ;
+ARRAY-SLOT: ModelAnimation BoneInfo _bones [ boneCount>> ] bones
 
 STRUCT: Ray
     { position Vector3 }    ! Ray position (origin)
