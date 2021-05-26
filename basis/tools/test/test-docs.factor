@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel quotations io ;
+USING: help.markup help.syntax kernel quotations io strings vocabs.refresh ;
 IN: tools.test
 
 ARTICLE: "tools.test" "Unit testing"
@@ -82,6 +82,16 @@ HELP: test
 
 HELP: test-all
 { $description "Runs unit tests for all loaded vocabularies." } ;
+
+HELP: refresh-and-test
+{ $values { "prefix" string } }
+{ $description "Like " { $link refresh } ", but runs unit tests for all reloaded vocabularies afterwards." } ;
+
+HELP: refresh-and-test-all
+{ $values { "prefix" string } }
+{ $description "Like " { $link refresh-all } ", but runs unit tests for all reloaded vocabularies afterwards." } ;
+
+{ refresh-and-test refresh-and-test-all } related-words
 
 HELP: :test-failures
 { $description "Prints all pending unit test failures." } ;
