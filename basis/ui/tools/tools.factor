@@ -1,12 +1,14 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel literals memory namespaces sequences system ui
+USING: kernel literals memory namespaces sequences system
+tools.test ui
 ui.backend ui.commands ui.gestures ui.tools.browser
 ui.tools.common ui.tools.error-list ui.tools.listener
 vocabs.refresh ;
 IN: ui.tools
 
 \ refresh-all H{ { +nullary+ t } { +listener+ t } } define-command
+\ refresh-and-test-all H{ { +nullary+ t } { +listener+ t } } define-command
 
 \ save H{ { +nullary+ t } } define-command
 
@@ -25,6 +27,7 @@ tool "common" f {
     { T{ key-down f ${ os macosx? M+ C+ ? } "w" } close-window }
     { T{ key-down f ${ os macosx? M+ C+ ? } "q" } com-exit }
     { T{ key-down f f "F2" } refresh-all }
+    { T{ key-down f { S+ } "F2" } refresh-and-test-all }
     { T{ key-down f f "F3" } show-error-list }
 } os macosx? {
     { T{ key-down f { C+ M+ } "f" } toggle-fullscreen }
