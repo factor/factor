@@ -226,6 +226,7 @@ interacting with a factor listener is at your disposal.
   ("Run file" ("\C-c\C-k" "\C-c\C-l" "\C-c\C-e\C-k") fuel-run-file)
   ("Run unit tests" "\C-c\C-t" fuel-test-vocab)
   ("Refresh vocabs" "\C-c\C-r" fuel-refresh-all)
+  ("Refresh vocabs and test" "\C-c\M-r" fuel-refresh-and-test-all)
   --
   (menu "Switch to"
         ("Listener" "\C-c\C-z" run-factor)
