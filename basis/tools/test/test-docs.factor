@@ -88,7 +88,6 @@ HELP: refresh-and-test
 { $description "Like " { $link refresh } ", but runs unit tests for all reloaded vocabularies afterwards." } ;
 
 HELP: refresh-and-test-all
-{ $values { "prefix" string } }
 { $description "Like " { $link refresh-all } ", but runs unit tests for all reloaded vocabularies afterwards." } ;
 
 { refresh-and-test refresh-and-test-all } related-words
