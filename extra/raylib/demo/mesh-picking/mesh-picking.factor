@@ -1,8 +1,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.enums arrays classes.struct combinators.short-circuit
-continuations destructors formatting grouping io.backend io.pathnames kernel math
-math.functions.private math.vectors namespaces raylib.ffi sequences threads
-vocabs.metadata ;
+continuations destructors formatting grouping io.backend io.pathnames kernel
+math math.functions.private math.vectors raylib.ffi raylib.glfw.ffi sequences
+threads vocabs.metadata ;
 
 IN: raylib.demo.mesh-picking
 
@@ -120,7 +120,15 @@ TUPLE: tower model bbox position ;
     [ make-window ] prepose [ with-destructors ] curry
     [ close-window ] [ ] cleanup ; inline
 
-SYMBOL: mesh-picking-frame
+: (window-handle) ( -- handle )
+    glfw-get-current-context ; inline
+
+: yield-from-raylib ( -- )
+    (window-handle)
+    f glfw-make-context-current
+    yield
+    glfw-make-context-current ;
+
 :: main ( -- )
     ! LOG_ALL set-trace-log-level
     [
@@ -132,13 +140,9 @@ SYMBOL: mesh-picking-frame
         camera CAMERA_FREE set-camera-mode
 
         60 set-target-fps
-        0 mesh-picking-frame set-global
         <hit-state> :> the-hit-state
         f :> hit-mesh-bbox!
         [
-            ! NOTE: This doesn't work, probably because GL context is not handled correctly for switching?
-            ! mesh-picking-frame counter 100 mod 0 = [ yield ] when
-
             camera update-camera
 
             get-mouse-position camera get-mouse-ray :> ray
@@ -182,6 +186,7 @@ SYMBOL: mesh-picking-frame
 
             10 10 draw-fps
             end-drawing
+            yield-from-raylib
         ] while-raylib-window
     ] with-window ;
 
