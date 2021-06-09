@@ -36,9 +36,12 @@ ARTICLE: "prettyprint-variables" "Prettyprint control variables"
     string-limit?
     boa-tuples?
     c-object-pointers?
+    limits-set?
 }
-"The default limits are meant to strike a balance between readability, and not producing too much output when large structures are given. There are two combinators that override the defaults:"
+"The default limits are meant to strike a balance between readability, and not producing too much output when large structures are given. There are two combinators that override any settings:"
 { $subsections with-short-limits without-limits }
+"And two combinators that override settings if they are not already overridden:"
+{ $subsections defaulting-with-short-limits defaulting-without-limits }
 "That the " { $link short. } " and " { $link pprint-short } " words wrap calls to " { $link . } " and " { $link pprint } " in " { $link with-short-limits } ". Code that uses the prettyprinter for serialization should use " { $link without-limits } " to avoid producing unreadable output." ;
 
 ARTICLE: "prettyprint-limitations" "Prettyprinter limitations"
@@ -226,9 +229,17 @@ HELP: pprint-short
 { $values { "obj" object } }
 { $description "Prettyprints an object to " { $link output-stream } ". This word rebinds printer control variables to enforce “shorter” output. See " { $link "prettyprint-variables" } "." } ;
 
+HELP: pprint-short-if-unset
+{ $values { "obj" object } }
+{ $description "Prettyprints an object to " { $link output-stream } ". This word rebinds printer control variables to enforce “shorter” output if they are not already rebound. See " { $link "prettyprint-variables" } "." } ;
+
 HELP: short.
 { $values { "obj" object } }
-{ $description "Prettyprints an object to " { $link output-stream } " with a trailing line break. This word rebinds printer control variables to enforce “shorter” output." } ;
+{ $description "Prettyprints an object to " { $link output-stream } " with a trailing line break. This word rebinds printer control variables to enforce “shorter” output. See " { $link "prettyprint-variables" } "." } ;
+
+HELP: short-if-unset.
+{ $values { "obj" object } }
+{ $description "Prettyprints an object to " { $link output-stream } " with a trailing line break. This word rebinds printer control variables to enforce “shorter” output if they are not already rebound. See " { $link "prettyprint-variables" } "." } ;
 
 HELP: .b
 { $values { "n" integer } }

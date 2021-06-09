@@ -32,10 +32,22 @@ HELP: boa-tuples?
 HELP: c-object-pointers?
 { $var-description "Toggles whether C objects such as structs and direct arrays only print their underlying address. If this flag isn't set, C objects will attempt to print their contents. If a C object points to invalid memory, it will display only its address regardless." } ;
 
+HELP: limits-set?
+{ $var-description "Flags whether or not prettyprinter configurations have been set. When true, " { $link defaulting-with-short-limits } " and " { $link defaulting-without-limits } " will not modify prettyprinter configuration. " { $link with-short-limits } " and " { $link without-limits } " will always modify prettyprinter configuration." } ;
+
 HELP: with-short-limits
 { $values { "quot" quotation } }
 { $description "Calls a quotation in a new dynamic scope with prettyprinter limits set to produce a single line of output." } ;
 
+HELP: defaulting-with-short-limits
+{ $values { "quot" quotation } }
+{ $description "Calls a quotation in a new dynamic scope. If " { $link limits-set? } " is " { $link t } " then all existing prettyprinter config will be preserved. If it's " { $link f } " then it defaults to behave like " { $link with-short-limits } "." } ;
+
 HELP: without-limits
 { $values { "quot" quotation } }
 { $description "Calls a quotation in a new dynamic scope with prettyprinter limits set to produce unlimited output." } ;
+
+HELP: defaulting-without-limits
+{ $values { "quot" quotation } }
+{ $description "Calls a quotation in a new dynamic scope. If " { $link limits-set? } " is " { $link t } " then all existing prettyprinter config will be preserved. If it's " { $link f } " then it defaults to behave like " { $link without-limits } "." } ;
+

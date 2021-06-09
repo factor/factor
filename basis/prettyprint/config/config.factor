@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces ;
+USING: kernel locals namespaces ;
 IN: prettyprint.config
 
 ! Configuration
@@ -13,6 +13,7 @@ SYMBOL: number-base
 SYMBOL: string-limit?
 SYMBOL: boa-tuples?
 SYMBOL: c-object-pointers?
+SYMBOL: limits-set?
 
 4 tab-size set-global
 64 margin set-global
@@ -20,6 +21,7 @@ SYMBOL: c-object-pointers?
 100 length-limit set-global
 10 number-base set-global
 t string-limit? set-global
+f limits-set? set-global
 
 : with-short-limits ( quot -- )
     H{
@@ -29,7 +31,11 @@ t string-limit? set-global
         { string-limit? t }
         { boa-tuples? t }
         { c-object-pointers? f }
+        { limits-set? t }
     } clone swap with-variables ; inline
+
+:: defaulting-with-short-limits ( quot -- )
+    limits-set? get [ quot call ] [ quot with-short-limits ] if ; inline
 
 : without-limits ( quot -- )
     H{
@@ -38,4 +44,8 @@ t string-limit? set-global
         { line-limit f }
         { string-limit? f }
         { c-object-pointers? f }
+        { limits-set? t }
     } clone swap with-variables ; inline
+
+:: defaulting-without-limits ( quot -- )
+    limits-set? get [ quot call ] [ quot without-limits ] if ; inline
