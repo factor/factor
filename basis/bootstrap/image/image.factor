@@ -437,6 +437,7 @@ M: quotation prepare-object
     {
         class<=-cache class-not-cache classes-intersect-cache
         class-and-cache class-or-cache next-method-quot-cache
+        next-multi-method-quot-cache
     } [ H{ } clone global-box boa ] H{ } map>assoc assoc-union
     global-hashtable boa ;
 

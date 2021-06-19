@@ -7,6 +7,18 @@ IN: classes.algebra
 
 DEFER: sort-classes
 
+TUPLE: covariant-tuple { classes read-only } ;
+
+INSTANCE: covariant-tuple classoid
+
+M: covariant-tuple rank-class drop 9 ;
+
+M: covariant-tuple class-name
+    classes>> [ class-name ] map "-" join ;
+
+: <covariant-tuple> ( classes -- classoid )
+    [ classoid check-instance ] map covariant-tuple boa ;
+
 <PRIVATE
 
 TUPLE: anonymous-union { members read-only } ;
@@ -165,6 +177,41 @@ PREDICATE: empty-union < anonymous-union members>> empty? ;
 
 PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
 
+! NOTE: This word is used to enable comparisons between covariant-tuples and
+! regular classes, by interpreting a regular class as a covariant-tuple with
+! object wildcards.  This is mostly used as convenience, since when comparing
+! only in dispatch contexts, this is what is important.  Should this lead to
+! problems because of some other context comparisons, covariant tuple
+! comparisons may only be defined and performed between covariant tuples.
+: covariant-classes ( first second -- first second )
+     [ dup covariant-tuple? [ classes>> ] [ 1array ] if ] bi@
+     object [ 2dup max-length ] dip [ pad-head ] 2curry bi@ ; inline
+
+ : covariant-tuple<= ( first second -- ? )
+     covariant-classes [ class<= ] 2all? ;
+
+ ! TODO Dispatch falls back to this to call a lexicographically ordered more
+ ! specific method right now, although this should never happen if ambiguity
+ ! errors are caught correctly.
+ M: covariant-tuple <=>
+     covariant-classes <reversed> <=> ;
+
+ ! Union and intersection should (union definitely) be distributive over
+ ! covariant tuples.
+ PREDICATE: covariant-tuple-intersection < anonymous-intersection
+     participants>> [ f ] [ [ covariant-tuple? ] all? ] if-empty ;
+
+ M: covariant-tuple-intersection normalize-class
+     participants>> [ classes>> ] map flip
+     [ <anonymous-intersection> ] map <covariant-tuple> ;
+
+ PREDICATE: covariant-tuple-union < anonymous-union
+     members>> [ f ] [ [ covariant-tuple? ] all? ] if-empty ;
+
+ M: covariant-tuple-union normalize-class
+     members>> [ classes>> ] map flip
+     [ <anonymous-union> ] map <covariant-tuple> ;
+
 : (class<=) ( first second -- ? )
     2dup eq? [ 2drop t ] [
         [ normalize-class ] bi@
@@ -181,6 +228,8 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
                 { [ dup anonymous-union? ] [ right-anonymous-union<= ] }
                 { [ dup anonymous-intersection? ] [ right-anonymous-intersection<= ] }
                 { [ dup anonymous-complement? ] [ class>> classes-intersect? not ] }
+                { [ dup covariant-tuple? ] [ covariant-tuple<= ] }
+                { [ over covariant-tuple? ] [ covariant-tuple<= ] }
                 [ 2drop f ]
             } cond
         ] if
@@ -194,6 +243,18 @@ M: anonymous-intersection (classes-intersect?)
 
 M: anonymous-complement (classes-intersect?)
     class>> class<= not ;
+
+: 2any? ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... ? )
+     [ not ] compose 2all? not ; inline
+
+ ! TODO: Check if semantics are correct here!
+ ! It is stated that the intersection is empty, if no object can be an instance
+ ! of both classes at the same time.  With dispatch in mind, I would say that if
+ ! there is any position that can not be an instance of both, two dispatches are
+ ! exclusive.
+ M: covariant-tuple (classes-intersect?)
+     covariant-classes
+     [ classes-intersect? ] 2all? ;
 
 : anonymous-union-and ( first second -- class )
     members>> [ class-and ] with map <anonymous-union> ;

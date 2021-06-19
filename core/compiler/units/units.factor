@@ -160,9 +160,20 @@ M: object always-bump-effect-counter? drop f ;
 : reset-pics? ( -- ? )
     outdated-generics get null? not ;
 
+: multi-generic? ( word -- ? )
+    "multi-methods" word-prop >boolean ;
+
+: remake-multi-generic ( generic -- )
+    outdated-generics get add-to-unit ;
+
+: remake-multi-generics ( -- )
+    outdated-generics get members [ multi-generic? ] filter
+    [ make-generic ] each ;
+
 : finish-compilation-unit ( -- )
     [ ] [
         remake-generics
+        remake-multi-generics
         to-recompile [
             recompile
             outdated-tuples get update-tuples
