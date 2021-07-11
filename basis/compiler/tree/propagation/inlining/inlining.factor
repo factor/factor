@@ -1,11 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes.algebra combinators
-combinators.short-circuit compiler.tree compiler.tree.builder
+USING: accessors arrays assocs classes.algebra classes.dispatch.covariant-tuples
+combinators combinators.short-circuit compiler.tree compiler.tree.builder
 compiler.tree.normalization compiler.tree.propagation.info
-compiler.tree.propagation.nodes compiler.tree.recursive generic
-generic.math generic.single generic.standard kernel locals math
-math.partial-dispatch namespaces quotations sequences words ;
+compiler.tree.propagation.nodes compiler.tree.recursive generic generic.math
+generic.multi generic.single generic.standard kernel math math.partial-dispatch
+namespaces quotations sequences words ;
 IN: compiler.tree.propagation.inlining
 
 : splicing-call ( #call word -- nodes )
@@ -51,6 +51,20 @@ M: callable splicing-nodes splicing-body ;
 
 : inline-standard-method ( #call word -- ? )
     dupd inlining-standard-method eliminate-dispatch ;
+
+! FIXME: Almost copy/paste from inlining-standard-method, abstract
+! dispatch-classes or something
+: inlining-multi-method ( #call word -- class/f method/f )
+    dup "methods" word-prop assoc-empty? [ 2drop f f ] [
+        2dup [ in-d>> length ] [ multi-generic-arity ] bi* < [ 2drop f f ] [
+            [ in-d>> ] [ [ multi-generic-arity ] keep ] bi*
+            [ tail* [ value-info class>> ] map <covariant-tuple> dup ] dip
+            method-for-class
+        ] if
+    ] if ;
+
+: inline-multi-method ( #call word -- ? )
+    dupd inlining-multi-method eliminate-dispatch ;
 
 : normalize-math-class ( class -- class' )
     {
@@ -107,6 +121,7 @@ SYMBOL: history
         { [ dup never-inline-word? ] [ 2drop f ] }
         { [ dup always-inline-word? ] [ inline-word ] }
         { [ dup standard-generic? ] [ inline-standard-method ] }
+        { [ dup multi-generic? ] [ inline-multi-method ] }
         { [ dup math-generic? ] [ inline-math-method ] }
         { [ dup inline? ] [ inline-word ] }
         [ 2drop f ]

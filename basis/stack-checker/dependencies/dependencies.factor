@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs classes classes.algebra
-classes.algebra.private classes.maybe classes.tuple
-combinators.short-circuit fry generic kernel math namespaces sequences
+classes.algebra.private classes.dispatch.covariant-tuples classes.maybe
+classes.tuple combinators.short-circuit fry generic kernel math namespaces sequences
 sets words ;
 FROM: classes.tuple.private => tuple-layout ;
 IN: stack-checker.dependencies
@@ -40,6 +40,9 @@ M: anonymous-union add-depends-on-class
 
 M: anonymous-intersection add-depends-on-class
     participants>> [ add-depends-on-class ] each ;
+
+M: covariant-tuple add-depends-on-class
+    classes>> [ add-depends-on-class ] each ;
 
 GENERIC: add-depends-on-c-type ( c-type -- )
 

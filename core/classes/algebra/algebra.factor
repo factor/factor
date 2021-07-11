@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.private
+USING: accessors arrays assocs classes classes.private classes.dispatch
 combinators kernel make math math.order namespaces sequences
 sets sorting vectors words ;
 IN: classes.algebra
@@ -45,6 +45,8 @@ M: anonymous-complement instance?
 
 M: anonymous-complement class-name
     class>> class-name ;
+
+M: dispatch-type rank-class drop 9 ;
 
 DEFER: (class<=)
 
@@ -181,6 +183,8 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
                 { [ dup anonymous-union? ] [ right-anonymous-union<= ] }
                 { [ dup anonymous-intersection? ] [ right-anonymous-intersection<= ] }
                 { [ dup anonymous-complement? ] [ class>> classes-intersect? not ] }
+                { [ over dispatch-type? ] [ left-dispatch<= ] }
+                { [ dup dispatch-type? ] [ right-dispatch<= ] }
                 [ 2drop f ]
             } cond
         ] if

@@ -5,8 +5,8 @@ combinators.short-circuit compiler.cfg compiler.cfg.builder
 compiler.cfg.builder.alien compiler.cfg.finalization
 compiler.cfg.optimizer compiler.codegen compiler.crossref
 compiler.errors compiler.tree.builder compiler.tree.optimizer
-compiler.units compiler.utilities continuations definitions fry
-generic generic.single io kernel macros make namespaces
+compiler.units compiler.utilities continuations definitions
+generic generic.single generic.multi io kernel macros make namespaces
 sequences sets stack-checker.dependencies stack-checker.errors
 stack-checker.inlining vocabs.loader words ;
 IN: compiler
@@ -102,6 +102,8 @@ M: word combinator? inline? ;
     {
         [ single-generic? ]
         [ primitive? ]
+        [ multi-generic? ]
+        [ nested-dispatch-engine-word? ]
     } 1|| not ;
 
 : contains-breakpoints? ( -- ? )
@@ -125,12 +127,20 @@ M: word combinator? inline? ;
         ] with-cfg
     ] each ;
 
+! NOTE: this uses a mechanism which is normally only used in the code path of
+! optimized word in the compiler vocab.  The methods will still be compiled.  I
+! suppose this is more of a warning kind of thing.
+: detect-generic-errors ( generic -- )
+    [ check-generic ]
+    [ swap <compiler-error> save-compiler-error ] recover ;
+
 : compile-word ( word -- )
     ! We return early if the word has breakpoints or if it
     ! failed to infer.
     '[
         _ {
             [ start-compilation ]
+            [ detect-generic-errors ]
             [ frontend ]
             [ backend ]
             [ finish-compilation ]
