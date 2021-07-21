@@ -184,3 +184,7 @@ H{ } "x" set
 
 ! Random test case
 { "A" } [ 100 <iota> [ dup ] H{ } map>assoc 32 over delete-at "A" 32 pick set-at 32 of ] unit-test
+
+! Alists have prefix priority
+{ 42 } [ { { 1 42 } { 2 10 } { 1 20 } } 1 of ] unit-test
+{ 42 } [ { { 1 42 } { 2 10 } { 1 20 } } >hashtable 1 of ] unit-test
