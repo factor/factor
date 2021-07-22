@@ -82,6 +82,13 @@ IN: assocs.extras
     [ 2drop f ]
     [ [ unclip-slice H{ } or clone ] [ [ assoc-merge! ] curry ] bi* reduce ] if ; inline
 
+: assoc-collapse! ( assoc seq quot: ( value1 value2 -- new-value ) -- assoc )
+    [ assoc-merge! ] curry each ; inline
+
+: assoc-collapse-as ( seq quot: ( value1 value2 -- new-value ) exemplar -- assoc )
+    pick first assoc-size swap new-assoc
+    -rot assoc-collapse! ; inline
+
 GENERIC: delete-value-at ( value assoc -- )
 
 M: assoc delete-value-at
