@@ -145,3 +145,22 @@ USING: arrays assocs.extras kernel math math.order sequences tools.test ;
     H{ { 3 30 } { 4 40 } } 3array
     [ min ] assoc-collapse
 ] unit-test
+
+{
+    H{ { 1 11 } { 2 20 } { 3 30 } { 4 40 } }
+} [
+    H{ { 1 11 } { 2 20 } } dup
+    H{ { 2 22 } { 3 33 } }
+    H{ { 3 30 } { 4 40 } } 3array
+    [ min ] assoc-collapse!
+] unit-test
+
+{
+    H{ { 1 11 } { 2 20 } }
+    V{ { 1 11 } { 2 20 } { 3 30 } { 4 40 } }
+} [
+    H{ { 1 11 } { 2 20 } } dup
+    H{ { 2 22 } { 3 33 } }
+    H{ { 3 30 } { 4 40 } } 3array
+    [ min ] V{ } assoc-collapse-as
+] unit-test
