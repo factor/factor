@@ -80,7 +80,7 @@ IN: assocs.extras
 : assoc-collapse ( seq quot: ( value1 value2 -- new-value ) -- assoc )
     over empty?
     [ 2drop f ]
-    [ [ unclip-slice clone ] [ [ assoc-merge! ] curry ] bi* reduce ] if ; inline
+    [ [ unclip-slice H{ } or clone ] [ [ assoc-merge! ] curry ] bi* reduce ] if ; inline
 
 GENERIC: delete-value-at ( value assoc -- )
 
