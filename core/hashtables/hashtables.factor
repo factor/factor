@@ -91,7 +91,7 @@ TUPLE: hashtable
     dupd new-key@ set-nth-pair ; inline
 
 : (rehash) ( alist hash -- )
-    [ <reversed> ] dip [ swapd (set-at) ] curry assoc-each ; inline
+    [ swapd (set-at) ] curry assoc-each ; inline
 
 : hash-large? ( hash -- ? )
     [ count>> 1 fixnum+fast 3 fixnum*fast ]
