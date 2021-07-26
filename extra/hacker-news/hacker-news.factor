@@ -16,7 +16,7 @@ IN: hacker-news
 : hacker-news-id>json-url ( n -- url )
     "https://hacker-news.firebaseio.com/v0/item/%d.json?print=pretty" sprintf ;
 
-: hacker-news-items ( n endpoint -- seq' )
+: hacker-news-items ( n endpoint -- seq )
     hacker-news-ids swap short head
     [ hacker-news-id>json-url http-get nip json> ] parallel-map ;
 
