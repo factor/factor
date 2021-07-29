@@ -35,6 +35,15 @@ IN: compiler.tree.propagation.tests
     [ dup "foo" <array> drop ] final-info first
 ] unit-test
 
+{ t } [
+    [ resize-array length ] final-info first
+    array-capacity <class-info> =
+] unit-test
+
+{ 42 } [
+    [ 42 swap resize-array length ] final-literals first
+] unit-test
+
 ! Byte arrays
 { V{ 3 } } [
     [ 3 <byte-array> length ] final-literals
@@ -46,13 +55,26 @@ IN: compiler.tree.propagation.tests
 ] unit-test
 
 { t } [
-    [ dupd resize-byte-array drop ] final-info first
-    integer-array-capacity <class-info> =
+    [ resize-byte-array length ] final-info first
+    array-capacity <class-info> =
+] unit-test
+
+{ 43 } [
+    [ 43 swap resize-byte-array length ] final-literals first
 ] unit-test
 
 ! Strings
 { V{ 3 } } [
     [ 3 f <string> length ] final-literals
+] unit-test
+
+{ t } [
+    [ resize-string length ] final-info first
+    array-capacity <class-info> =
+] unit-test
+
+{ V{ 44 } } [
+    [ 44 swap resize-string length ] final-literals
 ] unit-test
 
 { V{ t } } [
