@@ -44,6 +44,22 @@ IN: compiler.tree.propagation.tests
     [ 42 swap resize-array length ] final-literals first
 ] unit-test
 
+{ f } [
+    [ resize-array ] { resize-array } inlined?
+] unit-test
+
+{ t } [
+    [ 3 { 1 2 3 } resize-array ] { resize-array } inlined?
+] unit-test
+
+{ f } [
+    [ 4 { 1 2 3 } resize-array ] { resize-array } inlined?
+] unit-test
+
+{ f } [
+    [ 4 swap { array } declare resize-array ] { resize-array } inlined?
+] unit-test
+
 ! Byte arrays
 { V{ 3 } } [
     [ 3 <byte-array> length ] final-literals
@@ -63,6 +79,10 @@ IN: compiler.tree.propagation.tests
     [ 43 swap resize-byte-array length ] final-literals first
 ] unit-test
 
+{ t } [
+    [ 3 B{ 1 2 3 } resize-byte-array ] { resize-byte-array } inlined?
+] unit-test
+
 ! Strings
 { V{ 3 } } [
     [ 3 f <string> length ] final-literals
@@ -75,6 +95,10 @@ IN: compiler.tree.propagation.tests
 
 { V{ 44 } } [
     [ 44 swap resize-string length ] final-literals
+] unit-test
+
+{ t } [
+    [ 3 "123" resize-string ] { resize-string } inlined?
 ] unit-test
 
 { V{ t } } [
