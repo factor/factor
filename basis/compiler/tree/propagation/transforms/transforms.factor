@@ -1,14 +1,12 @@
 ! Copyright (C) 2008, 2011 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types assocs classes classes.algebra
-classes.tuple classes.tuple.private combinators
-combinators.short-circuit compiler.tree.propagation.info effects
-fry generalizations generic generic.single growable hash-sets
-hashtables kernel layouts locals math math.integers.private
-math.intervals math.order math.partial-dispatch math.private
-namespaces quotations sequences sequences.generalizations
-sequences.private sets sets.private stack-checker
-stack-checker.dependencies vectors words ;
+USING: accessors alien.c-types arrays assocs byte-arrays classes classes.algebra
+classes.tuple classes.tuple.private combinators combinators.short-circuit
+compiler.tree.propagation.info effects generalizations generic generic.single
+growable hash-sets hashtables kernel layouts math math.integers.private
+math.intervals math.order math.partial-dispatch math.private namespaces
+quotations sequences sequences.generalizations sequences.private sets
+sets.private stack-checker stack-checker.dependencies strings vectors words ;
 FROM: math => float ;
 IN: compiler.tree.propagation.transforms
 
@@ -353,3 +351,13 @@ M\ sets:set intersects? [ intersects?-quot ] 1 define-partial-eval
         [ f ]
     } cond 2nip
 ] "custom-inlining" set-word-prop
+
+: constant-number-info? ( info -- ? )
+    { [ value-info-state? ] [ literal?>> ] [ class>> integer class<= ] } 1&& ;
+
+! Resize-sequences to existing length can be optimized out
+{ resize-array resize-string resize-byte-array } [
+    in-d>> first2 [ value-info ] bi@ slots>> ?first
+    { [ [ constant-number-info? ] both? ] [ [ literal>> ] bi@ = ] } 2&&
+    [ [ nip ] ] [ f ] if
+] [ "custom-inlining" set-word-prop ] curry each
