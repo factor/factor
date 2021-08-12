@@ -14,15 +14,15 @@ HELP: test-word
     "Useful for checking the behaviour of words under different inputs"
 }
 { $examples
-    { $unchecked-example
+    { $example
         "USING: test-word math prettyprint ;" 
         "{ { 1 2 } { 3 4 } { 2 3 } { 1 4 } } [ + ] test-word ."
-        "{
-            { { 1 2 } { 3 } }
-            { { 3 4 } { 7 } }
-            { { 2 3 } { 5 } }
-            { { 1 4 } { 5 } }
-        }"
+"{
+    { { 1 2 } { 3 } }
+    { { 3 4 } { 7 } }
+    { { 2 3 } { 5 } }
+    { { 1 4 } { 5 } }
+}"
     }
 } ;
 
@@ -32,7 +32,6 @@ HELP: before-word
     { $quotation ( ... -- ... ) } 
     { "stack" array } 
     { "seq" array } 
-
 }
 { $description
     "Executes an array of words with an input, preserving intermediary values"
@@ -43,12 +42,17 @@ HELP: before-word
     "Can be used together with simple-table. as a form of super simple printf debugging."
 }
 { $examples
-    { $unchecked-example
+    { $example
         "USE: ascii"
         ": palindrome? ( string -- ? ) [ Letter? ] filter >lower dup reverse = ;"
-        "{ \"Hello World!\" } \ palindrome? definition before-after simple-table." 
+        "{ \"Hello World!\" } \\ palindrome? definition before-after simple-table." 
+"{ \"Hello World!\" }             [ Letter? ]
+{ \"Hello World!\" ~quotation~ } filter
+{ \"HelloWorld\" }               >lower
+{ \"helloworld\" }               dup
+{ \"helloworld\" \"helloworld\" }  reverse
+{ \"helloworld\" \"dlrowolleh\" }  ="
     }
 } ;
-
 
 ABOUT: "test-word"
