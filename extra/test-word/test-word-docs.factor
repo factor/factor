@@ -26,4 +26,26 @@ HELP: test-word
     }
 } ;
 
+HELP: before-word
+{ $values 
+    { "stack" array } 
+    { $quotation ( ... -- ... ) } 
+    { "stack" array } 
+    { "seq" array } 
+
+}
+{ $description
+    "Given an array of words (for example: produced by \ palindrome? definition)"
+    "it will execute those words and show any intermediary values"
+    "Can be used together with simple-table. as a form of super simple printf debugging."
+}
+{ $examples
+    { $unchecked-example
+        "USE: ascii"
+        ": palindrome? ( string -- ? ) [ Letter? ] filter >lower dup reverse = ;"
+        "{ \"Hello World!\" } \ palindrome? definition before-after simple-table." 
+    }
+} ;
+
+
 ABOUT: "test-word"
