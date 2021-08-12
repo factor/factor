@@ -35,8 +35,11 @@ HELP: before-word
 
 }
 { $description
-    "Given an array of words (for example: produced by \ palindrome? definition)"
-    "it will execute those words and show any intermediary values"
+    "Executes an array of words with an input, preserving intermediary values"
+    "Takes an array of words and a seq containing inputs for the quote"
+    "The array of words can be produced with definition. For example: \ palindrome? definition"
+    "before-after will execute the words in the array and store any intermediary values into the outputted seq"
+    "Returns a seq containing the words executed as well as any produced output"
     "Can be used together with simple-table. as a form of super simple printf debugging."
 }
 { $examples
