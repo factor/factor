@@ -4,10 +4,10 @@
 IN: test-word
 USING: kernel sequences continuations arrays  ;
 
-: (test-word) ( seq quot -- seq ) dupd with-datastack 2array ;
-: test-word ( seq quot -- seq ) [ (test-word) ] curry map ;    
+: (gather-results) ( seq quot -- seq ) dupd with-datastack 2array ;
+: gather-results ( seq quot -- seq ) [ (gather-results) ] curry map ;    
 
 : (get-row) ( stack quot -- stack seq ) [ with-datastack ] 2keep first 2array;
-: before-after ( stack quot -- stack seq ) [ 1quotation (get-row) ] map ;
+: gather-intermediates ( stack quot -- stack seq ) [ 1quotation (get-row) ] map ;
 
-MAIN: test-word
+MAIN: gather-results
