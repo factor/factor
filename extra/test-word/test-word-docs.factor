@@ -24,6 +24,30 @@ HELP: gather-results
     { { 1 4 } { 5 } }
 }"
     }
+    { $example
+        "! generating inputs using math.combinatorics"
+        "USING: test-word math math.combinatorics prettyprint ;" 
+        "{ t f } 2 all-selections [ xor ] gather-results ."
+"{
+    { { t t } { f } }
+    { { t f } { t } }
+    { { f t } { t } }
+    { { f f } { f } }
+}"
+    }
+    { $example
+        "! generating inputs using math.combinatorics and math.ranges"
+        "USING: test-word math math.combinatorics math.ranges prettyprint ;" 
+        "4 [1..b] 2 all-combinations [ + ] gather-results ."
+"{
+    { { 1 2 } { 3 } }
+    { { 1 3 } { 4 } }
+    { { 1 4 } { 5 } }
+    { { 2 3 } { 5 } }
+    { { 2 4 } { 6 } }
+    { { 3 4 } { 7 } }
+}"
+    }    
 } ;
 
 HELP: gather-intermediates
