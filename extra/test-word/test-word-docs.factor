@@ -34,12 +34,13 @@ HELP: before-word
     { "seq" array } 
 }
 { $description
-    "Executes an array of words with an input, preserving intermediary values"
-    "Takes an array of words and a seq containing inputs for the quote"
-    "The array of words can be produced with definition. For example: \ palindrome? definition"
-    "before-after will execute the words in the array and store any intermediary values into the outputted seq"
-    "Returns a seq containing the words executed as well as any produced output"
-    "Can be used together with simple-table. as a form of super simple printf debugging."
+    "Executes an array of words with an input, preserving intermediary values \n"
+    "Takes an array of words and a seq containing inputs for the quote \n"
+    "The array of words can be produced with " { $link definition } ".\n"
+    "For example:" { $code "\\ palindrome? definition" } "\n"
+    "before-after will execute the words in the array and store any intermediary values into the outputted seq \n"
+    "Returns a seq containing the words executed as well as any produced output \n"
+    "Can be used together with " { $link simple-table. } " as a form of super simple printf debugging. \n"
 }
 { $examples
     { $example
