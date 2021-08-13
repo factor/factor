@@ -8,8 +8,8 @@ HELP: gather-results
     { "seq" array } 
 }
 { $description
-    "Executes a quote with inputs, preserving inputs and outputs"
-    "Takes a quote and a seq containing inputs for the quote"
+    "Executes a quotation with inputs, preserving inputs and outputs"
+    "Takes a quotation and a seq containing inputs for the quotation"
     "Returns a seq containing the inputs as well as any produced output"
     "Useful for checking the behaviour of words under different inputs"
 }
@@ -35,7 +35,7 @@ HELP: gather-intermediates
 }
 { $description
     "Executes an array of words with an input, preserving intermediary values \n"
-    "Takes an array of words and a seq containing inputs for the quote \n"
+    "Takes an array of words and a seq containing inputs for the quotation \n"
     "The array of words can be produced with " { $link definition } ".\n"
     "For example:" { $code "\\ palindrome? definition" } "\n"
     "gather-intermediates will execute the words in the array and store any intermediary values into the outputted seq \n"
