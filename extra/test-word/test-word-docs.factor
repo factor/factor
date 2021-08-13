@@ -1,7 +1,7 @@
 USING: arrays help.markup help.syntax kernel math ;
 IN: test-word
 
-HELP: test-word
+HELP: gather-results
 { $values 
     { "seq" array } 
     { $quotation ( ... -- ... ) } 
@@ -16,7 +16,7 @@ HELP: test-word
 { $examples
     { $example
         "USING: test-word math prettyprint ;" 
-        "{ { 1 2 } { 3 4 } { 2 3 } { 1 4 } } [ + ] test-word ."
+        "{ { 1 2 } { 3 4 } { 2 3 } { 1 4 } } [ + ] gather-results ."
 "{
     { { 1 2 } { 3 } }
     { { 3 4 } { 7 } }
@@ -26,7 +26,7 @@ HELP: test-word
     }
 } ;
 
-HELP: before-word
+HELP: gather-intermediates
 { $values 
     { "stack" array } 
     { $quotation ( ... -- ... ) } 
@@ -38,7 +38,7 @@ HELP: before-word
     "Takes an array of words and a seq containing inputs for the quote \n"
     "The array of words can be produced with " { $link definition } ".\n"
     "For example:" { $code "\\ palindrome? definition" } "\n"
-    "before-after will execute the words in the array and store any intermediary values into the outputted seq \n"
+    "gather-intermediates will execute the words in the array and store any intermediary values into the outputted seq \n"
     "Returns a seq containing the words executed as well as any produced output \n"
     "Can be used together with " { $link simple-table. } " as a form of super simple printf debugging. \n"
 }
@@ -46,7 +46,7 @@ HELP: before-word
     { $example
         "USE: ascii"
         ": palindrome? ( string -- ? ) [ Letter? ] filter >lower dup reverse = ;"
-        "{ \"Hello World!\" } \\ palindrome? definition before-after simple-table." 
+        "{ \"Hello World!\" } \\ palindrome? definition gather-intermediates simple-table." 
 "{ \"Hello World!\" }             [ Letter? ]
 { \"Hello World!\" ~quotation~ } filter
 { \"HelloWorld\" }               >lower
@@ -56,4 +56,4 @@ HELP: before-word
     }
 } ;
 
-ABOUT: "test-word"
+ABOUT: "gather-results"
