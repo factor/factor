@@ -86,36 +86,29 @@ UNION: fixed-length array byte-array string ;
         [ [ interval>> empty-interval? ] [ class>> real class<= ] bi and ]
     } 1|| ;
 
-! Hardcoding classes is kind of a hack.
-: min-value ( class -- n )
-    {
-        { fixnum [ most-negative-fixnum ] }
-        { array-capacity [ 0 ] }
-        { integer-array-capacity [ 0 ] }
-        [ drop -1/0. ]
-    } case ;
+GENERIC: min-value ( class -- n )
+GENERIC: max-value ( class -- n )
+GENERIC: class-interval ( class -- i )
+GENERIC: fix-capacity-class ( class -- class' )
 
-: max-value ( class -- n )
-    {
-        { fixnum [ most-positive-fixnum ] }
-        { array-capacity [ max-array-capacity ] }
-        { integer-array-capacity [ max-array-capacity ] }
-        [ drop 1/0. ]
-    } case ;
+M: classoid min-value drop -1/0. ;
+M: classoid max-value drop 1/0. ;
+M: classoid class-interval drop full-interval ;
+M: classoid fix-capacity-class ;
 
-: class-interval ( class -- i )
-    {
-        { fixnum [ fixnum-interval ] }
-        { array-capacity [ array-capacity-interval ] }
-        { integer-array-capacity [ array-capacity-interval ] }
-        [ drop full-interval ]
-    } case ;
+M: \ fixnum min-value drop most-negative-fixnum ;
+M: \ fixnum max-value drop most-positive-fixnum ;
+M: \ fixnum class-interval drop fixnum-interval ;
 
-: fix-capacity-class ( class -- class' )
-    {
-        { array-capacity fixnum }
-        { integer-array-capacity integer }
-    } ?at drop ;
+M: \ array-capacity min-value drop 0 ;
+M: \ array-capacity max-value drop max-array-capacity ;
+M: \ array-capacity class-interval drop array-capacity-interval ;
+M: \ array-capacity fix-capacity-class drop fixnum ;
+
+M: \ integer-array-capacity min-value drop 0 ;
+M: \ integer-array-capacity max-value drop max-array-capacity ;
+M: \ integer-array-capacity class-interval drop array-capacity-interval ;
+M: \ integer-array-capacity fix-capacity-class drop integer ;
 
 : wrap-interval ( interval class -- interval' )
     class-interval 2dup interval-subset? [ drop ] [ nip ] if ;
