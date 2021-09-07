@@ -1,10 +1,9 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes combinators compiler.units
-continuations definitions effects io io.encodings.utf8 io.files
-kernel lexer math.parser namespaces parser.notes quotations
-sequences sets slots source-files vectors vocabs vocabs.parser
-words words.symbol ;
+USING: accessors arrays classes classes.predicate combinators compiler.units
+continuations definitions effects io io.encodings.utf8 io.files kernel lexer
+math.parser namespaces parser.notes quotations sequences sets slots source-files
+vectors vocabs vocabs.parser words words.symbol ;
 IN: parser
 
 : location ( -- loc )
@@ -110,9 +109,31 @@ ERROR: staging-violation word ;
 
 ERROR: classoid-expected object ;
 
+: get/create-singleton-vocab ( word -- vocab )
+    vocabulary>> ".singletons" append create-vocab ;
+
+! NOTE: As convenience, define words which are classes as predicates of class
+! class, so that M: class will be a catch-all for them
+: get/create-word-singleton ( word -- class )
+    {
+        [ name>> "-klass" append ]
+        [ get/create-singleton-vocab create-word ]
+        [ class? class word ? ]
+        [ '[ _ eq? ] [ define-predicate-class ] keepdd ]
+    } cleave ;
+
+: maybe-define-word-singleton ( word -- classoid )
+    dup "singleton-class" word-prop
+    [ nip ]
+    [ dup get/create-word-singleton "singleton-class" [ set-word-prop ] keepd ] if* ;
+
 : scan-class ( -- class )
     scan-object \ f or
-    dup classoid? [ classoid-expected ] unless ;
+    dup classoid? [
+        dup wrapper?
+        [ wrapped>> maybe-define-word-singleton ]
+        [ classoid-expected ] if
+    ] unless ;
 
 : parse-until-step ( accum end -- accum ? )
     ?scan-datum {

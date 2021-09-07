@@ -652,3 +652,19 @@ EXCLUDE: qualified.tests.bar => x ;
         { "10 20 30 ;" } <lexer> [ parse-array-def ] with-lexer
     ] with-file-vocabs
 ] unit-test
+
+! Test jit-singletons
+
+IN: generic.parser.tests
+
+: frobhaha ( x -- x ) drop 42 ;
+: flubhaha ( x -- ) drop ;
+: bazhaha ( x -- x ) ;
+
+
+GENERIC: is-a-cool-word ( word -- ? )
+M: word is-a-cool-word drop t ;
+M: \ frobhaha is-a-cool-word drop f ;
+
+{ t } [ \ flubhaha is-a-cool-word ] unit-test
+{ f } [ \ frobhaha is-a-cool-word ] unit-test

@@ -97,7 +97,7 @@ M: word crossref?
 
 GENERIC: subwords ( word -- seq )
 
-M: word subwords drop f ;
+M: word subwords "singleton-class" word-prop [ 1array ] [ f ] if* ;
 
 GENERIC: parent-word ( word -- word/f )
 
@@ -179,6 +179,7 @@ M: word reset-word
         "unannotated-def" "parsing" "inline" "recursive"
         "foldable" "flushable" "reading" "writing" "reader"
         "writer" "delimiter" "deprecated"
+        "singleton-class"
     } remove-word-props ;
 
 : reset-generic ( word -- )
