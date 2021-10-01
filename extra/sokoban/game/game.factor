@@ -15,11 +15,11 @@ TUPLE: sokoban
     { paused? initial: f }
     { running? initial: t } ;
 
-CONSTANT: default-width 10
-CONSTANT: default-height 10
+CONSTANT: default-width 5
+CONSTANT: default-height 5
 
 : <sokoban> ( width height -- sokoban )
-    dupd <board> swap <piece-llist>
+    dupd <board> swap <player-llist>
     sokoban new swap >>pieces swap >>board ;
 
 : <default-sokoban> ( -- sokoban )
@@ -27,6 +27,12 @@ CONSTANT: default-height 10
 
 : <new-sokoban> ( old -- new )
     board>> [ width>> ] [ height>> ] bi <sokoban> ;
+
+: add-wall-block ( sokoban block -- )
+    [ board>> ] dip default-width <board-piece> tetromino>> colour>> set-block ;
+
+: add-walls ( sokoban -- ) 
+    default-width <board-piece> piece-blocks [ add-wall-block ] with each ;
 
 : current-piece ( sokoban -- piece ) pieces>> car ;
 

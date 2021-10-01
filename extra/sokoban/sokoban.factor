@@ -45,7 +45,7 @@ sokoban-gadget H{
     { T{ key-down f f "LEFT" }   [ [ sokoban>> move-left ] unless-paused ] }
     { T{ key-down f f "RIGHT" }  [ [ sokoban>> move-right ] unless-paused ] }
     { T{ key-down f f "DOWN" }   [ [ sokoban>> move-down ] unless-paused ] }
- !   { T{ key-down f f " " }      [ [ sokoban>> move-drop ] unless-paused ] }
+    { T{ key-down f f " " }      [ [ sokoban>> add-walls ] unless-paused ] }
     { T{ key-down f f "p" }      [ sokoban>> toggle-pause ] }
     { T{ key-down f f "n" }      [ new-sokoban drop ] }
 } set-gestures
