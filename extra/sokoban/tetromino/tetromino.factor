@@ -14,7 +14,7 @@ SYMBOL: players
   [
     { 
       {
-        { 0 0 }
+        { 0 1 }
       }
     } COLOR: green
   ]
