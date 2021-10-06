@@ -50,7 +50,7 @@ IN: sokoban.gl
             [ set-background-color ]
             [ board>> draw-background ]
             [ board>> draw-board ]
-            ! [ next-piece draw-next-piece ]
+            [ next-piece draw-next-piece ]
             [ current-piece draw-piece ]
         } cleave
     ] do-matrix ;

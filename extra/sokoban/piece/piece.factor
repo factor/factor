@@ -40,14 +40,17 @@ TUPLE: piece
 : <player-piece> ( board-width -- piece )
     get-player <piece> swap set-start-location ;
 
+: <box-piece> ( board-width -- piece )
+    get-box <piece> swap set-start-location ;
 
 : <player-llist> ( board-width -- llist )
     [ [ <player-piece> ] curry ] keep [ <player-llist> ] curry lazy-cons ;
 
 : <piece-llist> ( board-width -- llist )
-    [ [ <board-piece> ] curry ] keep [ <player-llist> ] curry lazy-cons ;
+    [ [ <board-piece> ] curry ] keep [ <piece-llist> ] curry lazy-cons ;
 
-
+: <box-llist> ( board-width -- llist )
+    [ [ <box-piece> ] curry ] keep [ <box-llist> ] curry lazy-cons ;
 
 : (rotate-piece) ( rotation inc n-states -- rotation' )
     [ + ] dip rem ;
