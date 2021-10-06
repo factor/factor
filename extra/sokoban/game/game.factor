@@ -40,6 +40,8 @@ CONSTANT: default-height 9
 
 : current-piece ( sokoban -- piece ) pieces>> car ;
 
+: current-box ( sokoban -- box ) boxes>> car ;
+
 : next-piece ( sokoban -- piece ) pieces>> cdr car ;
 
 : toggle-pause ( sokoban -- )
