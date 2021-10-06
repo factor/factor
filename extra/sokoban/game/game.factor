@@ -9,6 +9,7 @@ IN: sokoban.game
 TUPLE: sokoban
     { board board }
     { pieces }
+    { boxes }
     { last-update integer initial: 0 }
     { rows integer initial: 0 }
     { score integer initial: 0 }
@@ -26,8 +27,9 @@ CONSTANT: default-height 9
     default-width <board-piece> piece-blocks [ add-wall-block ] with each ;
 
 : <sokoban> ( width height -- sokoban )
-    dupd <board> swap <player-llist>
+    dupd dupd <board> swap <player-llist>
     sokoban new swap >>pieces swap >>board 
+    swap <box-llist> >>boxes
     dup add-walls ;
 
 : <default-sokoban> ( -- sokoban )

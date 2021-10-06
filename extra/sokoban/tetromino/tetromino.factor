@@ -40,6 +40,17 @@ SYMBOL: boards
   ]
 } [ first2 <tetromino> ] map boards set-global
 
+SYMBOL: box
+{
+  [
+    { 
+      {
+        { 1 2 }
+      }
+    } COLOR: orange
+  ]
+} [ first2 <tetromino> ] map box set-global
+
 : random-tetromino ( -- tetromino )
     boards get random ;
 
@@ -48,6 +59,9 @@ SYMBOL: boards
 
 : get-player ( -- tetromino )
     players get first ;
+
+: get-box ( -- tetromino )
+    box get first ;
 
 : blocks-max ( blocks quot -- max )
     map supremum 1 + ; inline
