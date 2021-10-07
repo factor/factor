@@ -8,23 +8,11 @@ TUPLE: tetromino states colour ;
 
 C: <tetromino> tetromino
 
-SYMBOL: players
+SYMBOL: component
 
 {
-  [
-    { 
-      {
-        { -2 2 }
-      }
-    } COLOR: green
-  ]
-} [ first2 <tetromino> ] map players set-global
-
-SYMBOL: boards
-
-{
-  [
-    { 
+  [ ! walls
+    {
       {
         { 0 0 } { 1 0 } { 2 0 } { 3 0 } { 4 0 } { 5 0 } { 6 0 } { 7 0 } { 8 0 }
         { 0 1 } { 1 1 } { 2 1 }                         { 6 1 }         { 8 1 }
@@ -36,32 +24,43 @@ SYMBOL: boards
         { 0 7 }                                                 { 7 7 } { 8 7 }
         { 0 8 } { 1 8 } { 2 8 } { 3 8 } { 4 8 } { 5 8 } { 6 8 } { 7 8 } { 8 8 }
       }
+      { ! new level (access it by rotating the level piece)
+        { 0 0 } { 1 0 } { 2 0 } { 3 0 } { 4 0 } { 5 0 } { 6 0 } { 7 0 } { 8 0 }
+        { 0 1 } { 1 1 } { 2 1 }                         { 6 1 } { 7 1 } { 8 1 }
+        { 0 2 }                                         { 6 2 } { 7 2 } { 8 2 }
+        { 0 3 } { 1 3 } { 2 3 }                         { 6 3 } { 7 3 } { 8 3 }
+        { 0 4 }         { 2 4 } { 3 4 }                 { 6 4 } { 7 4 } { 8 4 }
+        { 0 5 }         { 2 5 }                         { 6 5 } { 7 5 } { 8 5 }
+        { 0 6 }                                                 { 7 6 } { 8 6 }
+        { 0 7 }                                                 { 7 7 } { 8 7 }
+        { 0 8 } { 1 8 } { 2 8 } { 3 8 } { 4 8 } { 5 8 } { 6 8 } { 7 8 } { 8 8 }
+      }
     } COLOR: gray
   ]
-} [ first2 <tetromino> ] map boards set-global
-
-SYMBOL: box
-{
-  [
-    { 
+  [ ! player
+    { ! player locations (per level)
+      {
+        { -2 2 }
+      }
+    } COLOR: green
+  ]
+  [ ! boxes
+    {
       {
         { 1 2 }
       }
     } COLOR: orange
   ]
-} [ first2 <tetromino> ] map box set-global
-
-: random-tetromino ( -- tetromino )
-    boards get random ;
+} [ first2 <tetromino> ] map component set-global
 
 : get-board ( -- tetromino )
-    boards get first ;
+    component get first ;
 
 : get-player ( -- tetromino )
-    players get first ;
+    component get second ;
 
 : get-box ( -- tetromino )
-    box get first ;
+    component get third ;
 
 : blocks-max ( blocks quot -- max )
     map supremum 1 + ; inline
