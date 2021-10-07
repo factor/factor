@@ -13,6 +13,7 @@ TUPLE: sokoban
     { last-update integer initial: 0 }
     { rows integer initial: 0 }
     { score integer initial: 0 }
+    { level integer initial: 1 }
     { paused? initial: f }
     { running? initial: t } ;
 
@@ -21,10 +22,10 @@ CONSTANT: default-height 9
 
 
 : add-wall-block ( sokoban block -- )
-    [ board>> ] dip default-width <board-piece> tetromino>> colour>> set-block ;
+    over [ board>> ] 2dip default-width <board-piece> swap level>> rotate-piece tetromino>> colour>> set-block ;
 
 : add-walls ( sokoban -- ) 
-    default-width <board-piece> piece-blocks [ add-wall-block ] with each ;
+    dup default-width <board-piece> swap level>> rotate-piece piece-blocks [ add-wall-block ] with each ;
 
 : <sokoban> ( width height -- sokoban )
     dupd dupd <board> swap <player-llist>
