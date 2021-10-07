@@ -7,7 +7,7 @@ sequences system sokoban.board sokoban.piece sokoban.tetromino ;
 IN: sokoban.game
 
 TUPLE: sokoban
-    { board board }
+    { board }
     { pieces }
     { boxes }
     { last-update integer initial: 0 }

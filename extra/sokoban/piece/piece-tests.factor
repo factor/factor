@@ -7,8 +7,8 @@ USING: accessors kernel sokoban.tetromino sokoban.piece tools.test sequences arr
 { 4 } [ tetrominoes get first states>> first blocks-width ] unit-test
 { 1 } [ tetrominoes get first states>> first blocks-height ] unit-test
 
-{ { 0 0 } } [ random-tetromino <piece> location>> ] unit-test
-{ 0 } [ 10 <random-piece> rotation>> ] unit-test
+! { { 0 0 } } [ random-tetromino <piece> location>> ] unit-test
+! { 0 } [ 10 <random-piece> rotation>> ] unit-test
 
 { { { 0 0 } { 1 0 } { 2 0 } { 3 0 } } }
 [ tetrominoes get first <piece> piece-blocks ] unit-test

@@ -31,9 +31,6 @@ TUPLE: piece
 : set-start-location ( piece board-width -- piece )
     over piece-width [ 2 /i ] bi@ - 0 2array >>location ;
 
-: <random-piece> ( board-width -- piece )
-    random-tetromino <piece> swap set-start-location ;
-
 : <board-piece> ( board-width -- piece )
     get-board <piece> swap set-start-location ;
 
