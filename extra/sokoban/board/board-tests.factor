@@ -16,8 +16,8 @@ USING: accessors arrays colors colors.constants kernel sokoban.board sokoban.pie
 { f } [ 2 3 <board> { 2 2 } block-in-bounds? ] unit-test
 { t } [ 2 3 <board> { 1 1 } location-valid? ] unit-test
 { f } [ 2 3 <board> dup { 1 1 } COLOR: red set-block { 1 1 } location-valid? ] unit-test
-{ t } [ 10 10 <board> 10 <random-piece> piece-valid? ] unit-test
-{ f } [ 2 3 <board> 10 <random-piece> { 1 2 } >>location piece-valid? ] unit-test
+! { t } [ 10 10 <board> 10 <random-piece> piece-valid? ] unit-test
+! { f } [ 2 3 <board> 10 <random-piece> { 1 2 } >>location piece-valid? ] unit-test
 { { { f } { f } } } [ 1 1 <board> add-row rows>> ] unit-test
 { { { f } } } [ 1 2 <board> dup { 0 1 } COLOR: red set-block remove-full-rows rows>> ] unit-test
 { { { f } { f } } } [ 1 2 <board> dup { 0 1 } COLOR: red set-block dup check-rows drop rows>> ] unit-test
