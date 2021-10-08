@@ -27,11 +27,18 @@ CONSTANT: default-height 9
 : add-walls ( sokoban -- ) 
     dup default-width <board-piece> swap level>> rotate-piece piece-blocks [ add-wall-block ] with each ;
 
+: add-box-block ( sokoban block -- )
+    [ board>> ] dip default-width <box-piece> tetromino>> colour>> set-block ;
+
+: add-box ( sokoban -- )
+    default-width <box-piece> piece-blocks [ add-box-block ] with each ;
+
 : <sokoban> ( width height -- sokoban )
     dupd dupd <board> swap <player-llist>
     sokoban new swap >>pieces swap >>board 
     swap <box-llist> >>boxes
-    dup add-walls ;
+    dup add-walls 
+    dup add-box ;
 
 : <default-sokoban> ( -- sokoban )
     default-width default-height <sokoban> ;
@@ -56,6 +63,9 @@ CONSTANT: default-height 9
 
 : add-block ( sokoban block -- )
     over [ board>> ] 2dip current-piece tetromino>> colour>> set-block ;
+
+: add-current-box-block ( sokoban block -- )
+    over [ board>> ] 2dip current-box tetromino>> colour>> set-block ;
 
 : game-over? ( sokoban -- ? )
     [ board>> ] [ next-piece ] bi piece-valid? not ;
@@ -89,6 +99,9 @@ CONSTANT: default-height 9
     [ dup current-piece piece-blocks [ add-block ] with each ]
     [ new-current-piece dup board>> check-rows score-rows ] bi ;
 
+: lock-box ( sokoban -- )
+    dup current-box piece-blocks [ add-current-box-block ] with each ;
+
 : can-rotate? ( sokoban -- ? )
     [ board>> ] [ current-piece clone 1 rotate-piece ] bi piece-valid? ;
 
@@ -102,21 +115,23 @@ CONSTANT: default-height 9
 : can-move? ( sokoban move -- ? )
     [ drop board>> ] [ [ current-piece clone ] dip move-piece ] 2bi piece-valid? ;
 
-: is-box? ( sokoban move -- ? )
-    dupd [ current-piece ] dip swap location>> v+ [ current-box ] dip swap location>> = ;
+: will-push? ( sokoban move -- ? )
+    [ drop board>> ] [ [ current-piece clone ] dip move-piece ] 2bi piece-will-push? ;
 
 : sokoban-move ( sokoban move -- ? )
-    2dup 2dup 2dup can-move? [
-        is-box? [
-            ! if there exists a box in the location the player wants to move to, 
-            ! move both the player and box
-            [ current-piece ] dip move-piece drop [ current-box ] dip move-piece drop t
-        ] [ ! if the location thep layer wants to move to is empty, just move the player
-            [ current-piece ] dip move-piece 3drop t
-        ] if 
+    ! moves the piece if possible, returns whether the piece was moved
+    2dup can-move? [
+        2dup will-push? [
+            2dup [ current-box ] dip move-piece drop
+            over lock-box
+            [ current-piece ] dip move-piece drop t 
+        ] [
+            [ current-piece ] dip move-piece drop t 
+        ] if
+
     ] [
         ! if piece cannot be moved, do nothing and return false
-        4drop 2drop f 
+        2drop f 
     ] if ;
 
 
