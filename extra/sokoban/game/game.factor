@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors combinators kernel lists math math.functions
+USING: accessors combinators kernel lists math math.functions math.vectors
 sequences system sokoban.board sokoban.piece sokoban.tetromino ;
 
 IN: sokoban.game
@@ -102,13 +102,23 @@ CONSTANT: default-height 9
 : can-move? ( sokoban move -- ? )
     [ drop board>> ] [ [ current-piece clone ] dip move-piece ] 2bi piece-valid? ;
 
+: is-box? ( sokoban move -- ? )
+    dupd [ current-piece ] dip swap location>> v+ [ current-box ] dip swap location>> = ;
+
 : sokoban-move ( sokoban move -- ? )
-    ! moves the piece if possible, returns whether the piece was moved
-    2dup can-move? [
-        [ current-piece ] dip move-piece drop t
+    2dup 2dup 2dup can-move? [
+        is-box? [
+            ! if there exists a box in the location the player wants to move to, 
+            ! move both the player and box
+            [ current-piece ] dip move-piece drop [ current-box ] dip move-piece drop t
+        ] [ ! if the location thep layer wants to move to is empty, just move the player
+            [ current-piece ] dip move-piece 3drop t
+        ] if 
     ] [
-        2drop f
+        ! if piece cannot be moved, do nothing and return false
+        4drop 2drop f 
     ] if ;
+
 
 : move-left ( sokoban -- ) { -1 0 } sokoban-move drop ;
 

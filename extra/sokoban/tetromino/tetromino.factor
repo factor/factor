@@ -47,7 +47,7 @@ SYMBOL: component
   [ ! boxes
     {
       {
-        { 1 2 }
+        { 0 2 }
       }
     } COLOR: orange
   ]
