@@ -27,18 +27,11 @@ CONSTANT: default-height 9
 : add-walls ( sokoban -- ) 
     dup default-width <board-piece> swap level>> rotate-piece piece-blocks [ add-wall-block ] with each ;
 
-: add-box-block ( sokoban block -- )
-    [ board>> ] dip default-width <box-piece> tetromino>> colour>> set-block ;
-
-: add-box ( sokoban -- )
-    default-width <box-piece> piece-blocks [ add-box-block ] with each ;
-
 : <sokoban> ( width height -- sokoban )
     dupd dupd <board> swap <player-llist>
     sokoban new swap >>pieces swap >>board 
     swap <box-llist> >>boxes
-    dup add-walls 
-    dup add-box ;
+    dup add-walls ;
 
 : <default-sokoban> ( -- sokoban )
     default-width default-height <sokoban> ;
@@ -63,9 +56,6 @@ CONSTANT: default-height 9
 
 : add-block ( sokoban block -- )
     over [ board>> ] 2dip current-piece tetromino>> colour>> set-block ;
-
-: add-current-box-block ( sokoban block -- )
-    over [ board>> ] 2dip current-box tetromino>> colour>> set-block ;
 
 : game-over? ( sokoban -- ? )
     [ board>> ] [ next-piece ] bi piece-valid? not ;
@@ -99,9 +89,6 @@ CONSTANT: default-height 9
     [ dup current-piece piece-blocks [ add-block ] with each ]
     [ new-current-piece dup board>> check-rows score-rows ] bi ;
 
-: lock-box ( sokoban -- )
-    dup current-box piece-blocks [ add-current-box-block ] with each ;
-
 : can-rotate? ( sokoban -- ? )
     [ board>> ] [ current-piece clone 1 rotate-piece ] bi piece-valid? ;
 
@@ -115,20 +102,10 @@ CONSTANT: default-height 9
 : can-move? ( sokoban move -- ? )
     [ drop board>> ] [ [ current-piece clone ] dip move-piece ] 2bi piece-valid? ;
 
-: will-push? ( sokoban move -- ? )
-    [ drop board>> ] [ [ current-piece clone ] dip move-piece ] 2bi piece-will-push? ;
-
 : sokoban-move ( sokoban move -- ? )
     ! moves the piece if possible, returns whether the piece was moved
     2dup can-move? [
-        2dup will-push? [
-            2dup [ current-box ] dip move-piece drop
-            over lock-box
-            [ current-piece ] dip move-piece drop t 
-        ] [
-            [ current-piece ] dip move-piece drop t 
-        ] if
-
+        [ current-piece ] dip move-piece drop t
     ] [
         ! if piece cannot be moved, do nothing and return false
         2drop f 

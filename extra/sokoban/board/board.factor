@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.short-circuit fry kernel
-math sequences colors colors.constants sokoban.piece sokoban.tetromino ;
+math sequences sokoban.piece sokoban.tetromino ;
 IN: sokoban.board
 
 TUPLE: board
@@ -32,26 +32,15 @@ TUPLE: board
 
 : block-free? ( board block -- ? ) block not ;
 
-: block-pushable? ( board block -- ? ) 
-    2dup block-free? [
-        2drop f
-    ] [
-        block "orange" named-color = 
-    ]
-    if ;
-
 : block-in-bounds? ( board block -- ? )
     [ first swap width>> <iota> bounds-check? ]
     [ second swap height>> <iota> bounds-check? ] 2bi and ;
 
 : location-valid? ( board block -- ? )
-    { [ block-in-bounds? ] [ 2dup block-free? -rot block-pushable? or ] } 2&& ;
+    { [ block-in-bounds? ] [ block-free? ] } 2&& ;
 
 : piece-valid? ( board piece -- ? )
     piece-blocks [ location-valid? ] with all? ;
-
-: piece-will-push? ( board piece -- ? )
-    piece-blocks [ block-pushable? ] with all? ;
 
 : row-not-full? ( row -- ? ) f swap member? ;
 

@@ -38,7 +38,7 @@ TUPLE: piece
     get-player <piece> swap set-start-location ;
 
 : <box-piece> ( board-width -- piece )
-    0 get-box <piece> swap set-start-location ;
+    get-box <piece> swap set-start-location ;
 
 : <player-llist> ( board-width -- llist )
     [ [ <player-piece> ] curry ] keep [ <player-llist> ] curry lazy-cons ;
