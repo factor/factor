@@ -44,24 +44,14 @@ SYMBOL: component
       }
     } COLOR: green
   ]
-} [ first2 <tetromino> ] map component set-global
-
-SYMBOL: movable
-
-{ ! boxes 
-  [ 
+  [ ! boxes
     {
       {
         { 1 2 }
       }
     } COLOR: orange
-    {
-      {
-        { 2 3 }
-      }
-    } COLOR: orange
   ]
-} [ first2 <tetromino> ] map movable set-global
+} [ first2 <tetromino> ] map component set-global
 
 : get-board ( -- tetromino )
     component get first ;
@@ -69,12 +59,9 @@ SYMBOL: movable
 : get-player ( -- tetromino )
     component get second ;
 
-: get-boxes ( -- tetromino )
-    movable get ;
+: get-box ( -- tetromino )
+    component get third ;
 
-: get-box ( n -- tetromino )
-    get-boxes nth ;
-    
 : blocks-max ( blocks quot -- max )
     map supremum 1 + ; inline
 
