@@ -40,11 +40,14 @@ PRIVATE>
 : button-leave ( button -- )
     [ hide-status ] [ button-update ] bi ;
 
+: button-invoke ( button -- )
+    dup quot>> call( button -- ) ;
+
 : button-clicked ( button -- )
     [ ]
     [ button-update ]
     [ button-rollover? ] tri
-    [ dup quot>> call( button -- ) ] [ drop ] if ;
+    [ button-invoke ] [ drop ] if ;
 
 button H{
     { T{ button-up } [ button-clicked ] }

@@ -369,10 +369,12 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 [ { } [ string>digits sum ] [ + ] map-reduce ] must-infer
 [ { } [ ] [ + ] map-reduce ] must-fail
 { 4 } [ { 1 1 } [ 1 + ] [ + ] map-reduce ] unit-test
+{ 2 18 } [ 2 { 3 3 3 } [ dupd * ] [ + ] map-reduce ] unit-test
 
 [ { } { } [ [ string>digits product ] bi@ + ] [ + ] 2map-reduce ] must-infer
 [ { } { } [ + ] [ + ] 2map-reduce ] must-fail
 { 24 } [ { 1 2 } { 3 4 } [ + ] [ * ] 2map-reduce ] unit-test
+{ 2 96 } [ 2 { 3 3 3 3 } { 4 4 4 4 } [ [ dup ] 2dip * * ] [ + ] 2map-reduce ] unit-test
 
 { 4 } [ 5 <iota> [ ] supremum-by ] unit-test
 { 0 } [ 5 <iota> [ ] infimum-by ] unit-test

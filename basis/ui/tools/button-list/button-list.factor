@@ -5,7 +5,7 @@ models models.arrow namespaces sequences ui ui.gadgets
 ui.gadgets.buttons ui.gadgets.glass ui.gadgets.labeled 
 ui.gadgets.presentations ui.gadgets.search-tables
 ui.gadgets.labels ui.gadgets.tables ui.gadgets.wrappers ui.gestures
-ui.theme ui.tools.browser.popups ui.tools.common ;
+ui.theme ui.pens.solid ui.tools.browser.popups ui.tools.common ;
 FROM: ui.gadgets.wrappers => wrapper ;
 IN: ui.tools.button-list
 
@@ -32,7 +32,7 @@ M: clickable ungraft* [ remove-labelled-button drop ] [ call-next-method ] bi ;
 : <active-buttons-table> ( model -- table )
     [ keys [ ">" swap 2array ] map ] <arrow> trivial-renderer [ second ] <search-table> 
     dup table>>
-        [ second active-buttons get at invoke-primary ] >>action
+        [ second active-buttons get at dup presentation? [ invoke-primary ] [ button-invoke ] if ] >>action
         [ hide-glass ] >>hook
         t >>selection-required?
         10 >>min-rows
@@ -43,7 +43,7 @@ M: clickable ungraft* [ remove-labelled-button drop ] [ call-next-method ] bi ;
     ;
 
 : <active-buttons-popup> ( model title -- gadget )
-    [ <active-buttons-table> white-interior ] dip
+    [ <active-buttons-table> content-background <solid> >>interior ] dip
     popup-color <framed-labeled-gadget> button-list-popup new-wrapper ;
 
 button-list-popup H{
