@@ -99,24 +99,35 @@ CONSTANT: default-height 9
 
 : rotate-right ( sokoban -- ) 1 swap (rotate) ;
 
-: can-move? ( sokoban move -- ? )
+: can-player-move? ( sokoban move -- ? )
     [ drop board>> ] [ [ current-piece clone ] dip move-piece ] 2bi piece-valid? ;
+
+: can-box-move? ( sokoban move -- ? )
+    [ drop board>> ] [ [ current-box clone ] dip move-piece ] 2bi piece-valid? ;
 
 : is-box? ( sokoban move -- ? )
     dupd [ current-piece ] dip swap location>> v+ [ current-box ] dip swap location>> = ;
 
+
+
+
 : sokoban-move ( sokoban move -- ? )
-    2dup 2dup 2dup can-move? [
-        is-box? [
-            ! if there exists a box in the location the player wants to move to, 
-            ! move both the player and box
-            [ current-piece ] dip move-piece drop [ current-box ] dip move-piece drop t
-        ] [ ! if the location thep layer wants to move to is empty, just move the player
-            [ current-piece ] dip move-piece 3drop t
+    2dup can-player-move? [
+        2dup is-box? [
+            2dup can-box-move? [
+                ! next location is a box and box can be moved
+                2dup [ current-piece ] dip move-piece drop [ current-box ] dip move-piece drop t
+            ] [
+                ! next location is a box and box cannot be moved
+                2drop f
+            ] if
+        ] [
+        ! next location is not a box
+            [ current-piece ] dip move-piece drop t
         ] if 
     ] [
-        ! if piece cannot be moved, do nothing and return false
-        4drop 2drop f 
+        ! player cannot move
+        2drop f
     ] if ;
 
 
