@@ -99,16 +99,35 @@ CONSTANT: default-height 9
 
 : rotate-right ( sokoban -- ) 1 swap (rotate) ;
 
-: can-move? ( sokoban move -- ? )
+: can-player-move? ( sokoban move -- ? )
     [ drop board>> ] [ [ current-piece clone ] dip move-piece ] 2bi piece-valid? ;
 
+: can-box-move? ( sokoban move -- ? )
+    [ drop board>> ] [ [ current-box clone ] dip move-piece ] 2bi piece-valid? ;
+
+: is-box? ( sokoban move -- ? )
+    dupd [ current-piece ] dip swap location>> v+ [ current-box ] dip swap location>> = ;
+
+
+
+
 : sokoban-move ( sokoban move -- ? )
-    ! moves the piece if possible, returns whether the piece was moved
-    2dup can-move? [
-        [ current-piece ] dip move-piece drop t
+    2dup can-player-move? [
+        2dup is-box? [
+            2dup can-box-move? [
+                ! next location is a box and box can be moved
+                2dup [ current-piece ] dip move-piece drop [ current-box ] dip move-piece drop t
+            ] [
+                ! next location is a box and box cannot be moved
+                2drop f
+            ] if
+        ] [
+        ! next location is not a box
+            [ current-piece ] dip move-piece drop t
+        ] if 
     ] [
-        ! if piece cannot be moved, do nothing and return false
-        2drop f 
+        ! player cannot move
+        2drop f
     ] if ;
 
 
