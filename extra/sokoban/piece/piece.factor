@@ -38,7 +38,14 @@ TUPLE: piece
     drop 0 startinglocs get first nth >>location ;
 
 : set-box-location ( piece board-width -- piece )
-    drop 0 startinglocs get second nth >>location ;
+    ! sets the location of the boxes to where they are defined in tetromino
+    !                               this first will be replaced with nth for levels
+    drop 0 over tetromino>> states>> nth first >>location ;
+    ! {0,0} o >>states  ; 
+    ! sets the local position (in tetromino) to 0,0
+    
+    ! 0 here is the level number 
+    ! TODO: add level arg, remove board-width arg from all of these
 
 : set-goal-location ( piece board-width -- piece )
     drop 0 startinglocs get third nth >>location ;

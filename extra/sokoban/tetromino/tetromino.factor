@@ -60,6 +60,33 @@ SYMBOL: component
   ]
 } [ first2 <tetromino> ] map component set-global
 
+SYMBOL: boxes
+{
+  [ ! first box on each level
+    {
+      { ! level 0
+        { 3 2 }
+      }
+
+      { ! level 1
+        { 4 3 }
+      }
+    } COLOR: orange
+  ]
+
+  [ ! second box on each level
+    { ! level 0
+      { 4 2 }
+    }
+
+    { ! level 1
+      { 4 3 }
+    } COLOR: orange
+  ]
+
+  ! etc
+} [ first2 <tetromino> ] map boxes set-global
+
 SYMBOL: startinglocs
 {
   { ! player
@@ -81,7 +108,8 @@ SYMBOL: startinglocs
     component get second ;
 
 : get-box ( -- tetromino )
-    component get third ;
+    boxes get first ;
+    ! TODO add an n argument and get (n + 1)th
 
 : get-goal ( -- tetromino )
     component get fourth ;
