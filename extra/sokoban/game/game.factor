@@ -14,7 +14,7 @@ TUPLE: sokoban
     { last-update integer initial: 0 }
     { rows integer initial: 0 }
     { score integer initial: 0 }
-    { level integer initial: 1 }
+    { level integer initial: 0 }
     { paused? initial: f }
     { running? initial: t } ;
 
