@@ -38,20 +38,30 @@ SYMBOL: component
     } COLOR: gray
   ]
   [ ! player
-    { ! player locations (per level)
+    {
       {
-        { -2 2 }
+        { 0 0 }
       }
     } COLOR: green
   ]
   [ ! boxes
     {
       {
-        { -2 2 }
+        { 0 0 }
       }
     } COLOR: orange
   ]
 } [ first2 <tetromino> ] map component set-global
+
+SYMBOL: startinglocs
+{
+  { ! player
+    { 2 2 }
+  }
+  { ! box
+    { 4 2 }
+  }
+} startinglocs set-global
 
 : get-board ( -- tetromino )
     component get first ;

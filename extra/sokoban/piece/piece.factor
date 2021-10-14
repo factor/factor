@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math math.vectors sequences
-sokoban.tetromino lists.lazy ;
+sokoban.tetromino lists.lazy namespaces ;
 IN: sokoban.piece
 
 ! The rotation is an index into the tetromino's states array,
@@ -31,14 +31,23 @@ TUPLE: piece
 : set-start-location ( piece board-width -- piece )
     over piece-width [ 2 /i ] bi@ - 0 2array >>location ;
 
+: set-board-location ( piece board-width -- piece )
+    drop ;
+
+: set-player-location ( piece board-width -- piece )
+    drop 0 startinglocs get first nth >>location ;
+
+: set-box-location ( piece board-width -- piece )
+    drop 0 startinglocs get second nth >>location ;
+
 : <board-piece> ( board-width -- piece )
-    get-board <piece> swap set-start-location ;
+    get-board <piece> swap set-board-location ;
 
 : <player-piece> ( board-width -- piece )
-    get-player <piece> swap set-start-location ;
+    get-player <piece> swap set-player-location ;
 
 : <box-piece> ( board-width -- piece )
-    get-box <piece> swap set-start-location ;
+    get-box <piece> swap set-box-location ;
 
 : <player-llist> ( board-width -- llist )
     [ [ <player-piece> ] curry ] keep [ <player-llist> ] curry lazy-cons ;
