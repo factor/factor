@@ -40,6 +40,10 @@ TUPLE: piece
 : set-box-location ( piece board-width -- piece )
     drop 0 startinglocs get second nth >>location ;
 
+: set-goal-location ( piece board-width -- piece )
+    drop 0 startinglocs get third nth >>location ;
+
+
 : <board-piece> ( board-width -- piece )
     get-board <piece> swap set-board-location ;
 
@@ -49,6 +53,9 @@ TUPLE: piece
 : <box-piece> ( board-width -- piece )
     get-box <piece> swap set-box-location ;
 
+: <goal-piece> ( board-width -- piece )
+    get-goal <piece> swap set-goal-location ;
+
 : <player-llist> ( board-width -- llist )
     [ [ <player-piece> ] curry ] keep [ <player-llist> ] curry lazy-cons ;
 
@@ -57,6 +64,9 @@ TUPLE: piece
 
 : <box-llist> ( board-width -- llist )
     [ [ <box-piece> ] curry ] keep [ <box-llist> ] curry lazy-cons ;
+
+: <goal-llist> ( board-width -- llist )
+    [ [ <goal-piece> ] curry ] keep [ <box-llist> ] curry lazy-cons ;
 
 : (rotate-piece) ( rotation inc n-states -- rotation' )
     [ + ] dip rem ;
