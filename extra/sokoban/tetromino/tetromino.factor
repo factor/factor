@@ -51,6 +51,13 @@ SYMBOL: component
       }
     } COLOR: orange
   ]
+  [ ! goals
+    {
+      {
+        { 0 0 }
+      }
+    } COLOR: pink
+  ]
 } [ first2 <tetromino> ] map component set-global
 
 SYMBOL: startinglocs
@@ -60,6 +67,10 @@ SYMBOL: startinglocs
   }
   { ! box
     { 4 2 }
+  }
+  {
+    ! goal
+    { 5 3 }
   }
 } startinglocs set-global
 
@@ -71,6 +82,9 @@ SYMBOL: startinglocs
 
 : get-box ( -- tetromino )
     component get third ;
+
+: get-goal ( -- tetromino )
+    component get fourth ;
 
 : blocks-max ( blocks quot -- max )
     map supremum 1 + ; inline
