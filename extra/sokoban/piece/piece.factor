@@ -31,23 +31,23 @@ TUPLE: piece
 : set-start-location ( piece board-width -- piece )
     over piece-width [ 2 /i ] bi@ - 0 2array >>location ;
 
-: <random-piece> ( board-width -- piece )
-    random-tetromino <piece> swap set-start-location ;
-
 : <board-piece> ( board-width -- piece )
     get-board <piece> swap set-start-location ;
 
 : <player-piece> ( board-width -- piece )
     get-player <piece> swap set-start-location ;
 
+: <box-piece> ( board-width -- piece )
+    get-box <piece> swap set-start-location ;
 
 : <player-llist> ( board-width -- llist )
     [ [ <player-piece> ] curry ] keep [ <player-llist> ] curry lazy-cons ;
 
 : <piece-llist> ( board-width -- llist )
-    [ [ <board-piece> ] curry ] keep [ <player-llist> ] curry lazy-cons ;
+    [ [ <board-piece> ] curry ] keep [ <piece-llist> ] curry lazy-cons ;
 
-
+: <box-llist> ( board-width -- llist )
+    [ [ <box-piece> ] curry ] keep [ <box-llist> ] curry lazy-cons ;
 
 : (rotate-piece) ( rotation inc n-states -- rotation' )
     [ + ] dip rem ;

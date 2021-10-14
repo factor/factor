@@ -1,17 +1,19 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors combinators kernel lists math math.functions
+USING: accessors combinators kernel lists math math.functions math.vectors
 sequences system sokoban.board sokoban.piece sokoban.tetromino ;
 
 IN: sokoban.game
 
 TUPLE: sokoban
-    { board board }
+    { board }
     { pieces }
+    { boxes }
     { last-update integer initial: 0 }
     { rows integer initial: 0 }
     { score integer initial: 0 }
+    { level integer initial: 1 }
     { paused? initial: f }
     { running? initial: t } ;
 
@@ -20,14 +22,15 @@ CONSTANT: default-height 9
 
 
 : add-wall-block ( sokoban block -- )
-    [ board>> ] dip default-width <board-piece> tetromino>> colour>> set-block ;
+    over [ board>> ] 2dip default-width <board-piece> swap level>> rotate-piece tetromino>> colour>> set-block ;
 
 : add-walls ( sokoban -- ) 
-    default-width <board-piece> piece-blocks [ add-wall-block ] with each ;
+    dup default-width <board-piece> swap level>> rotate-piece piece-blocks [ add-wall-block ] with each ;
 
 : <sokoban> ( width height -- sokoban )
-    dupd <board> swap <player-llist>
+    dupd dupd <board> swap <player-llist>
     sokoban new swap >>pieces swap >>board 
+    swap <box-llist> >>boxes
     dup add-walls ;
 
 : <default-sokoban> ( -- sokoban )
@@ -37,6 +40,8 @@ CONSTANT: default-height 9
     board>> [ width>> ] [ height>> ] bi <sokoban> ;
 
 : current-piece ( sokoban -- piece ) pieces>> car ;
+
+: current-box ( sokoban -- box ) boxes>> car ;
 
 : next-piece ( sokoban -- piece ) pieces>> cdr car ;
 
@@ -94,16 +99,37 @@ CONSTANT: default-height 9
 
 : rotate-right ( sokoban -- ) 1 swap (rotate) ;
 
-: can-move? ( sokoban move -- ? )
+: can-player-move? ( sokoban move -- ? )
     [ drop board>> ] [ [ current-piece clone ] dip move-piece ] 2bi piece-valid? ;
 
+: can-box-move? ( sokoban move -- ? )
+    [ drop board>> ] [ [ current-box clone ] dip move-piece ] 2bi piece-valid? ;
+
+: is-box? ( sokoban move -- ? )
+    dupd [ current-piece ] dip swap location>> v+ [ current-box ] dip swap location>> = ;
+
+
+
+
 : sokoban-move ( sokoban move -- ? )
-    ! moves the piece if possible, returns whether the piece was moved
-    2dup can-move? [
-        [ current-piece ] dip move-piece drop t
+    2dup can-player-move? [
+        2dup is-box? [
+            2dup can-box-move? [
+                ! next location is a box and box can be moved
+                2dup [ current-piece ] dip move-piece drop [ current-box ] dip move-piece drop t
+            ] [
+                ! next location is a box and box cannot be moved
+                2drop f
+            ] if
+        ] [
+        ! next location is not a box
+            [ current-piece ] dip move-piece drop t
+        ] if 
     ] [
+        ! player cannot move
         2drop f
     ] if ;
+
 
 : move-left ( sokoban -- ) { -1 0 } sokoban-move drop ;
 
