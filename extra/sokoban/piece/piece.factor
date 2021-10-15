@@ -40,8 +40,8 @@ TUPLE: piece
 : set-box-location ( piece board-width -- piece )
     ! sets the location of the boxes to where they are defined in tetromino
     !                               this first will be replaced with nth for levels
-    drop 0 over tetromino>> states>> nth first >>location ;
-    ! {0,0} o >>states  ; 
+    drop 0 over tetromino>> states>> nth first >>location 
+    dup tetromino>> dup states>> 0 swap remove-nth { { 0 0 } } prefix >>states >>tetromino ; 
     ! sets the local position (in tetromino) to 0,0
     
     ! 0 here is the level number 
