@@ -119,9 +119,17 @@ CONSTANT: default-height 9
     soko mov can-player-move?
     [   soko mov is-box?
         [   soko mov can-box-move?
-            [   ! next location is a box and box can be moved
-                soko current-piece mov move-piece drop
-                soko current-box mov move-piece drop t
+            [   soko mov is-goal?
+                [   ! next location is a box and box can be moved to a goal point
+                    soko current-piece mov move-piece drop
+                    soko current-box mov move-piece
+                    tetromino>> COLOR: blue >>colour drop t
+                ]
+                [   ! next location is a box and box can be moved to a non-goal point
+                    soko current-piece mov move-piece drop
+                    soko current-box mov move-piece
+                    tetromino>> COLOR: orange >>colour drop t
+                ] if
             ]
             [   ! next location is a box and box cannot be moved
                 f
