@@ -15,10 +15,20 @@ IN: sokoban.gl
     piece-blocks [ draw-block ] each ;
 
 : draw-piece ( piece -- )
-    dup tetromino>> colour>> gl-color draw-piece-blocks ;
+    dup tetromino>> color>> gl-color draw-piece-blocks ;
+
+: draw-goal ( block -- )
+    { .25 .25 } gl-fill-rect ;
+
+: draw-goal-blocks ( piece -- )
+    piece-blocks [ draw-goal ] each ;
+
+: draw-goal-piece ( piece -- )
+    dup tetromino>> color>> gl-color draw-goal-blocks ;
+
 
 ! : draw-next-piece ( piece -- )
-    ! dup tetromino>> colour>>
+    ! dup tetromino>> color>>
     ! >rgba-components drop 0.2 <rgba> gl-color draw-piece-blocks ;
 
 ! TODO: move implementation specific stuff into sokoban-board
@@ -53,5 +63,6 @@ IN: sokoban.gl
             ! [ next-piece draw-next-piece ]
             [ current-piece draw-piece ]
             [ current-box draw-piece ]
+            [ current-goal draw-goal-piece ]
         } cleave
     ] do-matrix ;

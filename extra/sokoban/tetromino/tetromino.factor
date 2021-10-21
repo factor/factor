@@ -4,7 +4,7 @@ USING: kernel arrays namespaces sequences math math.order
 math.vectors colors colors.constants random ;
 IN: sokoban.tetromino
 
-TUPLE: tetromino states colour ;
+TUPLE: tetromino states color ;
 
 C: <tetromino> tetromino
 
@@ -38,20 +38,41 @@ SYMBOL: component
     } COLOR: gray
   ]
   [ ! player
-    { ! player locations (per level)
+    {
       {
-        { -2 2 }
+        { 0 0 }
       }
     } COLOR: green
   ]
   [ ! boxes
     {
       {
-        { -2 2 }
+        { 0 0 }
       }
     } COLOR: orange
   ]
+  [ ! goals
+    {
+      {
+        { 0 0 }
+      }
+    } COLOR: pink
+  ]
 } [ first2 <tetromino> ] map component set-global
+
+SYMBOL: startinglocs
+{
+  { ! player
+    { 2 2 }
+  }
+  { ! box
+    { 4 2 }
+  }
+  {
+    ! goal
+    { 5 3 }
+  }
+} startinglocs set-global
 
 : get-board ( -- tetromino )
     component get first ;
@@ -61,6 +82,9 @@ SYMBOL: component
 
 : get-box ( -- tetromino )
     component get third ;
+
+: get-goal ( -- tetromino )
+    component get fourth ;
 
 : blocks-max ( blocks quot -- max )
     map supremum 1 + ; inline

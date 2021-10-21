@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors combinators kernel lists math math.functions math.vectors
-sequences system sokoban.board sokoban.piece sokoban.tetromino ;
+sequences system sokoban.board sokoban.piece sokoban.tetromino colors colors.constants ;
 
 IN: sokoban.game
 
@@ -10,6 +10,7 @@ TUPLE: sokoban
     { board }
     { pieces }
     { boxes }
+    { goals }
     { last-update integer initial: 0 }
     { rows integer initial: 0 }
     { score integer initial: 0 }
@@ -22,15 +23,16 @@ CONSTANT: default-height 9
 
 
 : add-wall-block ( sokoban block -- )
-    over [ board>> ] 2dip default-width <board-piece> swap level>> rotate-piece tetromino>> colour>> set-block ;
+    over [ board>> ] 2dip default-width <board-piece> swap level>> rotate-piece tetromino>> color>> set-block ;
 
 : add-walls ( sokoban -- ) 
     dup default-width <board-piece> swap level>> rotate-piece piece-blocks [ add-wall-block ] with each ;
 
 : <sokoban> ( width height -- sokoban )
-    dupd dupd <board> swap <player-llist>
+    dupd dupd dupd <board> swap <player-llist>
     sokoban new swap >>pieces swap >>board 
     swap <box-llist> >>boxes
+    swap <goal-llist> >>goals
     dup add-walls ;
 
 : <default-sokoban> ( -- sokoban )
@@ -42,6 +44,8 @@ CONSTANT: default-height 9
 : current-piece ( sokoban -- piece ) pieces>> car ;
 
 : current-box ( sokoban -- box ) boxes>> car ;
+
+: current-goal ( sokoban -- box ) goals>> car ;
 
 : next-piece ( sokoban -- piece ) pieces>> cdr car ;
 
@@ -55,7 +59,7 @@ CONSTANT: default-height 9
     level 1 - 60 * 1,000,000,000 swap - ;
 
 : add-block ( sokoban block -- )
-    over [ board>> ] 2dip current-piece tetromino>> colour>> set-block ;
+    over [ board>> ] 2dip current-piece tetromino>> color>> set-block ;
 
 : game-over? ( sokoban -- ? )
     [ board>> ] [ next-piece ] bi piece-valid? not ;
@@ -108,26 +112,35 @@ CONSTANT: default-height 9
 : is-box? ( sokoban move -- ? )
     dupd [ current-piece ] dip swap location>> v+ [ current-box ] dip swap location>> = ;
 
+: is-goal? ( sokoban move -- ? )
+    dupd [ current-box ] dip swap location>> v+ [ current-goal ] dip swap location>> = ;
 
-
-
-: sokoban-move ( sokoban move -- ? )
-    2dup can-player-move? [
-        2dup is-box? [
-            2dup can-box-move? [
-                ! next location is a box and box can be moved
-                2dup [ current-piece ] dip move-piece drop [ current-box ] dip move-piece drop t
-            ] [
-                ! next location is a box and box cannot be moved
-                2drop f
+:: sokoban-move ( soko mov -- ? )
+    soko mov can-player-move?
+    [   soko mov is-box?
+        [   soko mov can-box-move?
+            [   soko mov is-goal?
+                [   ! next location is a box and box can be moved to a goal point
+                    soko current-piece mov move-piece drop
+                    soko current-box mov move-piece
+                    tetromino>> COLOR: blue >>color drop t
+                ]
+                [   ! next location is a box and box can be moved to a non-goal point
+                    soko current-piece mov move-piece drop
+                    soko current-box mov move-piece
+                    tetromino>> COLOR: orange >>color drop t
+                ] if
+            ]
+            [   ! next location is a box and box cannot be moved
+                f
             ] if
-        ] [
-        ! next location is not a box
-            [ current-piece ] dip move-piece drop t
+        ]
+        [   ! next location is not a box
+            soko current-piece mov move-piece drop t
         ] if 
-    ] [
-        ! player cannot move
-        2drop f
+    ]
+    [   ! player cannot move
+        f
     ] if ;
 
 
