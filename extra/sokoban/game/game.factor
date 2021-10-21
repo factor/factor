@@ -111,23 +111,24 @@ CONSTANT: default-height 9
 
 
 
-: sokoban-move ( sokoban move -- ? )
-    2dup can-player-move? [
-        2dup is-box? [
-            2dup can-box-move? [
-                ! next location is a box and box can be moved
-                2dup [ current-piece ] dip move-piece drop [ current-box ] dip move-piece drop t
-            ] [
-                ! next location is a box and box cannot be moved
-                2drop f
+:: sokoban-move ( soko mov -- ? )
+    soko mov can-player-move?
+    [   soko mov is-box?
+        [   soko mov can-box-move?
+            [   ! next location is a box and box can be moved
+                soko current-piece mov move-piece drop
+                soko current-box mov move-piece drop t
+            ]
+            [   ! next location is a box and box cannot be moved
+                f
             ] if
-        ] [
-        ! next location is not a box
-            [ current-piece ] dip move-piece drop t
+        ]
+        [   ! next location is not a box
+            soko current-piece mov move-piece drop t
         ] if 
-    ] [
-        ! player cannot move
-        2drop f
+    ]
+    [   ! player cannot move
+        f
     ] if ;
 
 
