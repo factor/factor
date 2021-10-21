@@ -26,9 +26,9 @@ TUPLE: board
 : board@block ( board block -- n row )
     [ second swap rows>> nth ] keep first swap ;
 
-: set-block ( board block colour -- ) -rot board@block set-nth ;
+: set-block ( board block color -- ) -rot board@block set-nth ;
 
-: block ( board block -- colour ) board@block nth ;
+: block ( board block -- color ) board@block nth ;
 
 : block-free? ( board block -- ? ) block not ;
 
