@@ -4,7 +4,7 @@ USING: kernel arrays namespaces sequences math math.order
 math.vectors colors colors.constants random ;
 IN: sokoban.tetromino
 
-TUPLE: tetromino states colour ;
+TUPLE: tetromino states color ;
 
 C: <tetromino> tetromino
 

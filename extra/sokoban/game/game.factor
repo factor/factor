@@ -23,7 +23,7 @@ CONSTANT: default-height 9
 
 
 : add-wall-block ( sokoban block -- )
-    over [ board>> ] 2dip default-width <board-piece> swap level>> rotate-piece tetromino>> colour>> set-block ;
+    over [ board>> ] 2dip default-width <board-piece> swap level>> rotate-piece tetromino>> color>> set-block ;
 
 : add-walls ( sokoban -- ) 
     dup default-width <board-piece> swap level>> rotate-piece piece-blocks [ add-wall-block ] with each ;
@@ -59,7 +59,7 @@ CONSTANT: default-height 9
     level 1 - 60 * 1,000,000,000 swap - ;
 
 : add-block ( sokoban block -- )
-    over [ board>> ] 2dip current-piece tetromino>> colour>> set-block ;
+    over [ board>> ] 2dip current-piece tetromino>> color>> set-block ;
 
 : game-over? ( sokoban -- ? )
     [ board>> ] [ next-piece ] bi piece-valid? not ;
@@ -123,12 +123,12 @@ CONSTANT: default-height 9
                 [   ! next location is a box and box can be moved to a goal point
                     soko current-piece mov move-piece drop
                     soko current-box mov move-piece
-                    tetromino>> COLOR: blue >>colour drop t
+                    tetromino>> COLOR: blue >>color drop t
                 ]
                 [   ! next location is a box and box can be moved to a non-goal point
                     soko current-piece mov move-piece drop
                     soko current-box mov move-piece
-                    tetromino>> COLOR: orange >>colour drop t
+                    tetromino>> COLOR: orange >>color drop t
                 ] if
             ]
             [   ! next location is a box and box cannot be moved
