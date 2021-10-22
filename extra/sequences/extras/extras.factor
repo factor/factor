@@ -661,3 +661,9 @@ PRIVATE>
     [ 0 ] 3dip
     [ [ length check-length ] keep ] 2dip
     '[ nth-unsafe _ keep swap _ keep swap ] find-pred-loop swapd ; inline
+
+! https://en.wikipedia.org/wiki/Maximum_subarray_problem
+! Kadane's algorithm O(n) largest sum in subarray
+: max-subarray-sum ( seq -- sum )
+    [ -1/0. 0 ] dip
+    [ [ + ] keep max [ max ] keep ] each drop ;
