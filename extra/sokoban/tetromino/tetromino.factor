@@ -75,12 +75,14 @@ SYMBOL: boxes
   ]
 
   [ ! second box on each level
-    { ! level 0
-      { 4 2 }
-    }
+    {
+      { ! level 0
+        { 4 2 }
+      }
 
-    { ! level 1
-      { 4 3 }
+      { ! level 1
+        { 4 3 }
+      }
     } COLOR: orange
   ]
 
@@ -93,7 +95,7 @@ SYMBOL: startinglocs
     { 2 2 }
   }
   { ! box
-    { 4 2 }
+    { 3 2 }
   }
   {
     ! goal
