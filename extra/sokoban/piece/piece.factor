@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math math.vectors sequences
-sokoban.tetromino lists.lazy namespaces ;
+sokoban.tetromino lists.lazy namespaces colors colors.constants ;
 IN: sokoban.piece
 
 ! The rotation is an index into the tetromino's states array,
@@ -37,15 +37,19 @@ TUPLE: piece
 : set-player-location ( piece board-width -- piece )
     drop 0 startinglocs get first nth >>location ;
 
-: set-box-location ( piece board-width -- piece )
+: set-box-location ( piece -- piece )
     ! sets the location of the boxes to where they are defined in tetromino
     !                               this first will be replaced with nth for levels
-    drop 0 over tetromino>> states>> nth first >>location 
+    0 over tetromino>> states>> nth first >>location 
     dup tetromino>> dup states>> 0 swap remove-nth { { 0 0 } } prefix >>states >>tetromino ; 
     ! sets the local position (in tetromino) to 0,0
     
     ! 0 here is the level number 
     ! TODO: add level arg, remove board-width arg from all of these
+
+: reset-box-location ( piece -- piece )
+    ! resets box location using startinglocs symbol
+    dup tetromino>> dup states>> 0 swap remove-nth startinglocs get second prefix >>states >>tetromino ; 
 
 : set-goal-location ( piece board-width -- piece )
     drop 0 startinglocs get third nth >>location ;
@@ -58,7 +62,7 @@ TUPLE: piece
     get-player <piece> swap set-player-location ;
 
 : <box-piece> ( board-width -- piece )
-    get-box <piece> swap set-box-location ;
+    get-box <piece> swap drop reset-box-location set-box-location dup tetromino>> COLOR: orange >>colour drop ;
 
 : <goal-piece> ( board-width -- piece )
     get-goal <piece> swap set-goal-location ;
