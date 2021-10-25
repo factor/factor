@@ -23,7 +23,7 @@ CONSTANT: default-height 9
 
 
 : add-wall-block ( sokoban block -- )
-    over [ board>> ] 2dip default-width <board-piece> swap level>> rotate-piece tetromino>> colour>> set-block ;
+    over [ board>> ] 2dip default-width <board-piece> swap level>> rotate-piece tetromino>> color>> set-block ;
 
 : add-walls ( sokoban -- ) 
     dup default-width <board-piece> swap level>> rotate-piece piece-blocks [ add-wall-block ] with each ;
@@ -59,7 +59,7 @@ CONSTANT: default-height 9
     level 1 - 60 * 1,000,000,000 swap - ;
 
 : add-block ( sokoban block -- )
-    over [ board>> ] 2dip current-piece tetromino>> colour>> set-block ;
+    over [ board>> ] 2dip current-piece tetromino>> color>> set-block ;
 
 : game-over? ( sokoban -- ? )
     [ board>> ] [ next-piece ] bi piece-valid? not ;
@@ -115,29 +115,32 @@ CONSTANT: default-height 9
 : is-goal? ( sokoban move -- ? )
     dupd [ current-box ] dip swap location>> v+ [ current-goal ] dip swap location>> = ;
 
-: sokoban-move ( sokoban move -- ? )
-    2dup can-player-move? [
-        2dup is-box? [
-            2dup can-box-move? [
-                2dup is-goal? [
-                    2dup [ current-piece ] dip move-piece drop 
-                    [ current-box ] dip move-piece tetromino>> COLOR: blue >>colour drop t
-                ] [
-                ! next location is a box and box can be moved
-                    2dup [ current-piece ] dip move-piece drop 
-                    [ current-box ] dip move-piece tetromino>> COLOR: orange >>colour drop t
+:: sokoban-move ( soko mov -- ? )
+    soko mov can-player-move?
+    [   soko mov is-box?
+        [   soko mov can-box-move?
+            [   soko mov is-goal?
+                [   ! next location is a box and box can be moved to a goal point
+                    soko current-piece mov move-piece drop
+                    soko current-box mov move-piece
+                    tetromino>> COLOR: blue >>color drop t
+                ]
+                [   ! next location is a box and box can be moved to a non-goal point
+                    soko current-piece mov move-piece drop
+                    soko current-box mov move-piece
+                    tetromino>> COLOR: orange >>color drop t
                 ] if
-            ] [
-                ! next location is a box and box cannot be moved
-                2drop f
+            ]
+            [   ! next location is a box and box cannot be moved
+                f
             ] if
-        ] [
-        ! next location is not a box
-            [ current-piece ] dip move-piece drop t
+        ]
+        [   ! next location is not a box
+            soko current-piece mov move-piece drop t
         ] if 
-    ] [
-        ! player cannot move
-        2drop f
+    ]
+    [   ! player cannot move
+        f
     ] if ;
 
 
