@@ -62,7 +62,7 @@ TUPLE: piece
     get-player <piece> swap set-player-location ;
 
 : <box-piece> ( board-width -- piece )
-    get-box <piece> swap drop reset-box-location set-box-location dup tetromino>> COLOR: orange >>colour drop ;
+    get-box <piece> swap drop reset-box-location set-box-location dup tetromino>> COLOR: orange >>color drop ;
 
 : <goal-piece> ( board-width -- piece )
     get-goal <piece> swap set-goal-location ;
