@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors combinators kernel lists math math.functions math.vectors
-sequences system sokoban.board sokoban.piece sokoban.tetromino colors colors.constants ;
+sequences system sokoban.board sokoban.piece sokoban.tetromino colors colors.constants namespaces ;
 
 IN: sokoban.game
 
@@ -112,14 +112,14 @@ CONSTANT: default-height 9
 : is-box? ( sokoban move -- ? )
     dupd [ current-piece ] dip swap location>> v+ [ current-box ] dip swap location>> = ;
 
-: is-goal? ( sokoban move -- ? )
-    dupd [ current-box ] dip swap location>> v+ [ current-goal ] dip swap location>> = ;
+: is-goal? ( location move -- ? )
+    v+ startinglocs get third member? ;
 
 :: sokoban-move ( soko mov -- ? )
     soko mov can-player-move?
     [   soko mov is-box?
         [   soko mov can-box-move?
-            [   soko mov is-goal?
+            [   soko current-box location>> mov is-goal?
                 [   ! next location is a box and box can be moved to a goal point
                     soko current-piece mov move-piece drop
                     soko current-box mov move-piece

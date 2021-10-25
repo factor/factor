@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math math.vectors sequences
-sokoban.tetromino lists.lazy namespaces colors colors.constants ;
+sokoban.tetromino lists.lazy namespaces colors colors.constants sokoban.game ;
 IN: sokoban.piece
 
 ! The rotation is an index into the tetromino's states array,
@@ -62,7 +62,15 @@ TUPLE: piece
     get-player <piece> swap set-player-location ;
 
 : <box-piece> ( board-width -- piece )
-    get-box <piece> swap drop reset-box-location set-box-location dup tetromino>> COLOR: orange >>color drop ;
+    drop get-box <piece> reset-box-location set-box-location dup [ tetromino>> ] [ location>> ] bi
+    { 0 0 } is-goal?
+    [
+        COLOR: blue
+    ]
+    [
+        COLOR: orange
+    ] if
+    >>color drop ;
 
 : <goal-piece> ( board-width -- piece )
     get-goal <piece> swap set-goal-location ;
