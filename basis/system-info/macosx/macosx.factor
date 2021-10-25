@@ -23,6 +23,7 @@ FUNCTION: OSErr Gestalt ( OSType selector, SInt32* response )
 : system-version-bugfix ( -- n ) "sys3" be> gestalt ;
 
 CONSTANT: system-code-names H{
+    { { 12 0 } "Monterey" }
     { { 11 0 } "Big Sur" }
     { { 10 16 } "Big Sur" }
     { { 10 15 } "Catalina" }
