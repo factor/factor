@@ -97,8 +97,7 @@ SYMBOL: startinglocs
   { ! box
     { 3 2 }
   }
-  {
-    ! goal
+  { ! goal
     { 5 3 }
   }
 } startinglocs set-global
