@@ -112,9 +112,6 @@ CONSTANT: default-height 9
 : is-box? ( sokoban move -- ? )
     dupd [ current-piece ] dip swap location>> v+ [ current-box ] dip swap location>> = ;
 
-: is-goal? ( location move -- ? )
-    v+ startinglocs get third member? ;
-
 :: sokoban-move ( soko mov -- ? )
     soko mov can-player-move?
     [   soko mov is-box?
