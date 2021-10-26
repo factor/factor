@@ -39,11 +39,14 @@ CLEANUP
 
 { f f } [ [ "unknown" fetch* ] with-test.db ] unit-test
 
-[
+! XXX: different behavior on macOS Big Sur and Monterey?
+os macosx? [
     [
-        300 set-cache-size 300 set-cache-size
-    ] with-test.db
-] [ gdbm-option-already-set = ] must-fail-with
+        [
+            300 set-cache-size 300 set-cache-size
+        ] with-test.db
+    ] [ gdbm-option-already-set = ] must-fail-with
+] unless
 
 { t }
 [
