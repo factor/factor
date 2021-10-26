@@ -2,10 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays ascii assocs calendar calendar.format
-combinators command-line continuations csv formatting fry
-grouping http.client io io.encodings.ascii io.files io.styles
-kernel math math.extras math.parser memoize namespaces regexp
-sequences sorting.human splitting strings urls wrap.strings ;
+classes.tuple combinators command-line continuations csv
+formatting fry grouping http.client io io.encodings.ascii
+io.files io.styles kernel math math.extras math.parser memoize
+namespaces regexp sequences sorting.human splitting strings urls
+wrap.strings ;
 
 IN: metar
 
@@ -56,6 +57,21 @@ MEMO: all-stations ( -- seq )
             [ 8 swap nth string>longitude ]
         } cleave <station>
     ] map ;
+
+: all-stations. ( -- )
+    all-stations standard-table-style [
+        [
+            [
+                tuple-slots [
+                    [
+                        [
+                            dup string? [ "%.2f" sprintf ] unless write
+                        ] when*
+                    ] with-cell
+                ] each
+            ] with-row
+        ] each
+    ] tabular-output nl ;
 
 : find-by-cccc ( cccc -- station )
     all-stations swap '[ cccc>> _ = ] find nip ;
