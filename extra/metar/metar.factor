@@ -199,14 +199,13 @@ CONSTANT: compass-directions H{
     "V" split1 [ parse-compass ] bi@
     ", variable from %s to %s" sprintf ;
 
-! FIXME: "1 1/2SM" visibility doesn't work
 : parse-visibility ( str -- str' )
     dup first {
         { CHAR: M [ rest "less than " ] }
         { CHAR: P [ rest "more than " ] }
         [ drop "" ]
     } case swap "SM" ?tail drop
-    CHAR: / over index [ 1 > [ 1 cut "+" glue ] when ] when*
+    CHAR: \s over index [ " " "+" replace ] when
     string>number "%s%s statute miles" sprintf ;
 
 : parse-rvr ( str -- str' )
@@ -287,7 +286,7 @@ CONSTANT: re-station R/ \w{4}/
 CONSTANT: re-temperature R/ [M]?\d{2}\/([M]?\d{2})?/
 CONSTANT: re-wind R/ (VRB|\d{3})\d{2,3}(G\d{2,3})?KT/
 CONSTANT: re-wind-variable R/ \d{3}V\d{3}/
-CONSTANT: re-visibility R/ [MP]?\d+(\/\d+)?SM/
+CONSTANT: re-visibility R/ (\d+ )?[MP]?\d+(\/\d+)?SM/
 CONSTANT: re-rvr R/ R\d{2}[RLC]?\/\d{4}(V\d{4})?FT/
 CONSTANT: re-weather R/ [+-]?(VC)?(\w{2}|\w{4})/
 CONSTANT: re-sky-condition R/ (\w{2,3}\d{3}(\w+)?|\w{3}|CAVOK)/
@@ -301,8 +300,15 @@ CONSTANT: re-altimeter R/ [AQ]\d{4}/
         dup [ f ] [ first @ ] if-empty
     ] [ unclip ] produce rot [ prefix ] when* ; inline
 
-: metar-body ( report seq -- report )
+: fix-visibility ( seq -- seq' )
+    dup [ re-visibility matches? ] find drop [
+        dup 1 - pick ?nth [ R/ \d+/ matches? ] [ f ] if* [
+            cut [ unclip-last ] [ unclip swap ] bi*
+            [ " " glue 1array ] [ 3append ] bi*
+        ] [ drop ] if
+    ] when* ;
 
+: metar-body ( report seq -- report )
     [ { "METAR" "SPECI" } member? ] find-one
     [ pick type<< ] when*
 
@@ -321,6 +327,7 @@ CONSTANT: re-altimeter R/ [AQ]\d{4}/
     [ re-wind-variable matches? ] find-one
     [ parse-wind-variable pick wind>> prepend pick wind<< ] when*
 
+    fix-visibility
     [ re-visibility matches? ] find-one
     [ parse-visibility pick visibility<< ] when*
 
