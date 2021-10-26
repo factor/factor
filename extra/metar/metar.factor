@@ -9,6 +9,13 @@ sequences sorting.human splitting strings urls wrap.strings ;
 
 IN: metar
 
+! FIXME: International METAR
+! https://mediawiki.ivao.aero/index.php?title=METAR_explanation
+! METAR YUDO 221630Z 24004MPS 0800 R12/1000U DZ FG SCT010 OVC020 17/16 Q1018
+! SPECI YUDO 151115Z 05025G37KT 2000 1000S R12/1200N +TSRA BKN005CB 25/22 Q1008
+! LFPO 041300Z 36020KT 320V040 1200 R26/0400 +RASH BKN040TCU 17/15 Q1015 RETS 26791299
+
+
 TUPLE: station cccc name state country latitude longitude ;
 
 C: <station> station
@@ -292,13 +299,15 @@ CONSTANT: re-weather R/ [+-]?(VC)?(\w{2}|\w{4})/
 CONSTANT: re-sky-condition R/ (\w{2,3}\d{3}(\w+)?|\w{3}|CAVOK)/
 CONSTANT: re-altimeter R/ [AQ]\d{4}/
 
-: find-one ( seq quot: ( elt -- ? ) -- seq elt/f )
-    dupd find drop [ tail unclip ] [ f ] if* ; inline
+: find-one ( seq quot: ( elt -- ? ) -- seq' elt/f )
+    dupd find [ [ swap remove-nth ] when* ] dip ; inline
 
 : find-all ( seq quot: ( elt -- ? ) -- seq elts )
-    [ find-one swap ] keep '[
-        dup [ f ] [ first @ ] if-empty
-    ] [ unclip ] produce rot [ prefix ] when* ; inline
+    [ dupd find drop ] keep '[
+        cut
+        [ dup ?first _ [ f ] if* ] [ unclip ] produce
+        [ append ] dip
+    ] [ f ] if* ; inline
 
 : fix-visibility ( seq -- seq' )
     dup [ re-visibility matches? ] find drop [
