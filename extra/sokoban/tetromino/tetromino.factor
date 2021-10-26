@@ -95,7 +95,7 @@ SYMBOL: startinglocs
     { 2 2 }
   }
   { ! box
-    { 3 2 }
+    { 5 3 }
   }
   { ! goal
     { 5 3 }
