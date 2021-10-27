@@ -78,11 +78,25 @@ SYMBOL: boxes
   [ ! second box on each level
     {
       { ! level 0
-        { 4 2 }
+        { 4 3 }
       }
 
       { ! level 1
         { 4 3 }
+      }
+    } COLOR: orange
+  ]
+  [ ! second box on each level
+    {
+      { ! level 0
+        { 4 4 }
+      }
+    } COLOR: orange
+  ]
+  [ ! second box on each level
+    {
+      { ! level 0
+        { 4 6 }
       }
     } COLOR: orange
   ]
@@ -105,7 +119,7 @@ SYMBOL: startinglocs
 
 SYMBOL: num-boxes
 {
-  1 ! number of boxes -1  
+  3 ! number of boxes -1  
   1
 } num-boxes set-global
 
