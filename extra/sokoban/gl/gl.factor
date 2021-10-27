@@ -6,13 +6,20 @@ kernel math opengl opengl.gl sequences sokoban.game sokoban.piece
 
 IN: sokoban.gl
 
-! OpenGL rendering for sokoban
+! OpenGL rendering for sokoban 
 
 : draw-block ( block -- )
     { 1 1 } gl-fill-rect ;
 
+
+: draw-wall-blocks ( piece -- )
+    wall-blocks [ draw-block ] each ;
+
 : draw-piece-blocks ( piece -- )
     piece-blocks [ draw-block ] each ;
+
+: draw-walls ( piece -- )
+    dup tetromino>> color>> gl-color draw-wall-blocks ;
 
 : draw-piece ( piece -- )
     dup tetromino>> color>> gl-color draw-piece-blocks ;

@@ -22,9 +22,13 @@ TUPLE: piece
     ! rotates the piece
     [ rotation>> ] [ tetromino>> states>> ] bi nth ;
 
+: wall-blocks ( piece -- blocks )
+    [ (piece-blocks) ] [ location>> ] bi [ v+ ] curry map ;
+
 : piece-blocks ( piece -- blocks )
     ! rotates and positions the piece
-    [ (piece-blocks) ] [ location>> ] bi [ v+ ] curry map ;
+    ! [ (piece-blocks) ] [ location>> ] bi [ v+ ] curry map ;
+    location>> { } 1sequence ; ! literally just returns the location in a sequence
 
 : piece-width ( piece -- width )
     piece-blocks blocks-width ;
@@ -41,8 +45,7 @@ TUPLE: piece
 : set-box-location ( piece -- piece )
     ! sets the location of the boxes to where they are defined in tetromino
     !                               this first will be replaced with nth for levels
-    0 over tetromino>> states>> nth first >>location 
-    dup tetromino>> dup states>> 0 swap remove-nth { { 0 0 } } prefix >>states >>tetromino ; 
+    0 over tetromino>> states>> nth first >>location ; 
     ! sets the local position (in tetromino) to 0,0
     
     ! 0 here is the level number 
@@ -65,7 +68,7 @@ TUPLE: piece
     get-player <piece> swap set-player-location ;
 
 : <box-piece> ( n -- piece )
-    get-box <piece> reset-box-location set-box-location dup [ tetromino>> ] [ location>> ] bi
+    get-box <piece> set-box-location dup [ tetromino>> ] [ location>> ] bi
     { 0 0 } is-goal?
     [
         COLOR: blue
