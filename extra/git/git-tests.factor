@@ -21,8 +21,9 @@ IN: git.tests
         @
     ] with-empty-test-git-repo ; inline
 
-{ "refs/heads/master" } [
+{ t } [
     [ git-head-ref ] with-empty-test-git-repo
+    { "refs/heads/master" "refs/heads/main" } member?
 ] unit-test
 
 
