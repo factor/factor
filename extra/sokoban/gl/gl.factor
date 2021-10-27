@@ -62,7 +62,7 @@ IN: sokoban.gl
             [ board>> draw-board ]
             ! [ next-piece draw-next-piece ]
             [ current-piece draw-piece ]
-            [ current-box draw-piece ]
+            [ boxes>> [ draw-piece ] each ]
             [ current-goal draw-goal-piece ]
         } cleave
     ] do-matrix ;

@@ -1,7 +1,8 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math math.vectors sequences
-sokoban.tetromino lists.lazy namespaces colors colors.constants ;
+sokoban.tetromino lists.lazy namespaces colors colors.constants 
+math.ranges random ;
 IN: sokoban.piece
 
 ! The rotation is an index into the tetromino's states array,
@@ -63,8 +64,8 @@ TUPLE: piece
 : <player-piece> ( board-width -- piece )
     get-player <piece> swap set-player-location ;
 
-: <box-piece> ( board-width -- piece )
-    drop get-box <piece> reset-box-location set-box-location dup [ tetromino>> ] [ location>> ] bi
+: <box-piece> ( n -- piece )
+    get-box <piece> reset-box-location set-box-location dup [ tetromino>> ] [ location>> ] bi
     { 0 0 } is-goal?
     [
         COLOR: blue
@@ -82,6 +83,10 @@ TUPLE: piece
 
 : <piece-llist> ( board-width -- llist )
     [ [ <board-piece> ] curry ] keep [ <piece-llist> ] curry lazy-cons ;
+
+: <box-seq> ( board-width -- seq )
+    drop 0 get-num-boxes [0,b] [ <box-piece> ] map ;
+    ! TODO replace the 0 with level func at some point
 
 : <box-llist> ( board-width -- llist )
     [ [ <box-piece> ] curry ] keep [ <box-llist> ] curry lazy-cons ;

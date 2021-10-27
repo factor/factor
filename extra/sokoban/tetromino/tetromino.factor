@@ -49,6 +49,7 @@ SYMBOL: component
       {
         { 0 0 }
       }
+      
     } COLOR: orange
   ]
   [ ! goals
@@ -94,13 +95,19 @@ SYMBOL: startinglocs
   { ! player
     { 2 2 }
   }
-  { ! box
-    { 5 3 }
+  { ! boxes
+    { 3 2 }
   }
-  { ! goal
+  { ! goals
     { 5 3 }
   }
 } startinglocs set-global
+
+SYMBOL: num-boxes
+{
+  1 ! number of boxes -1  
+  1
+} num-boxes set-global
 
 : get-board ( -- tetromino )
     component get first ;
@@ -108,12 +115,15 @@ SYMBOL: startinglocs
 : get-player ( -- tetromino )
     component get second ;
 
-: get-box ( -- tetromino )
-    boxes get first ;
+: get-box ( n -- tetromino )
+    boxes get nth ;
     ! TODO add an n argument and get (n + 1)th
 
 : get-goal ( -- tetromino )
     component get fourth ;
+
+: get-num-boxes ( n -- m )
+    num-boxes get nth ;
 
 : blocks-max ( blocks quot -- max )
     map supremum 1 + ; inline
