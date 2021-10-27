@@ -27,7 +27,7 @@ CONSTANT: default-height 9
     over [ board>> ] 2dip default-width <board-piece> swap level>> rotate-piece tetromino>> color>> set-block ;
 
 : add-walls ( sokoban -- ) 
-    dup default-width <board-piece> swap level>> rotate-piece piece-blocks [ add-wall-block ] with each ;
+    dup default-width <board-piece> swap level>> rotate-piece wall-blocks [ add-wall-block ] with each ;
 
 : <sokoban> ( width height -- sokoban )
     dupd dupd dupd <board> swap <player-llist>
@@ -91,7 +91,7 @@ CONSTANT: default-height 9
     [ add-score ] keep add-rows drop ;
 
 : lock-piece ( sokoban -- )
-    [ dup current-piece piece-blocks [ add-block ] with each ]
+    [ dup current-piece wall-blocks [ add-block ] with each ]
     [ new-current-piece dup board>> check-rows score-rows ] bi ;
 
 : can-rotate? ( sokoban -- ? )
