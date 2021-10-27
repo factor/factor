@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors combinators kernel lists math math.functions math.vectors
-sequences system sokoban.board sokoban.piece sokoban.tetromino colors colors.constants namespaces ;
+sequences system sokoban.board sokoban.piece sokoban.tetromino colors 
+colors.constants namespaces locals ;
 
 IN: sokoban.game
 
@@ -31,7 +32,7 @@ CONSTANT: default-height 9
 : <sokoban> ( width height -- sokoban )
     dupd dupd dupd <board> swap <player-llist>
     sokoban new swap >>pieces swap >>board 
-    swap <box-llist> >>boxes
+    swap <box-seq> >>boxes
     swap <goal-llist> >>goals
     dup add-walls ;
 
@@ -43,7 +44,7 @@ CONSTANT: default-height 9
 
 : current-piece ( sokoban -- piece ) pieces>> car ;
 
-: current-box ( sokoban -- box ) boxes>> car ;
+: current-box ( sokoban -- box ) boxes>> first ;
 
 : current-goal ( sokoban -- box ) goals>> car ;
 
