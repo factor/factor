@@ -271,3 +271,8 @@ tools.test vectors vocabs ;
 
 { 25 5 1 } [ { 4 5 6 } [ sq ] [ 20 > ] find-pred ] unit-test
 { f f f } [ { 4 5 6 } [ sq ] [ 200 > ] find-pred ] unit-test
+
+{ -1/0. } [ { } max-subarray-sum ] unit-test
+{ -2 } [ { -3 -2 } max-subarray-sum ] unit-test
+{ 7 } [ { 1 2 3 -4 5 } max-subarray-sum ] unit-test
+{ 6 } [ { 1 2 3 -4 1 1 } max-subarray-sum ] unit-test

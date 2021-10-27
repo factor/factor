@@ -4,7 +4,6 @@ USING: alien.c-types alien.data alien.strings alien.syntax
 arrays assocs byte-arrays core-foundation io.binary
 io.encodings.utf8 kernel libc sequences specialized-arrays
 splitting system system-info unix.users ;
-IN: system-info.macosx
 SPECIALIZED-ARRAY: int
 IN: system-info.macosx
 
@@ -23,6 +22,7 @@ FUNCTION: OSErr Gestalt ( OSType selector, SInt32* response )
 : system-version-bugfix ( -- n ) "sys3" be> gestalt ;
 
 CONSTANT: system-code-names H{
+    { { 12 0 } "Monterey" }
     { { 11 0 } "Big Sur" }
     { { 10 16 } "Big Sur" }
     { { 10 15 } "Catalina" }
