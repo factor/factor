@@ -14,15 +14,15 @@ SYMBOL: component
   [ ! walls
     {
       {
-        { 0 0 } { 1 0 } { 2 0 } { 3 0 } { 4 0 } { 5 0 } { 6 0 } { 7 0 } { 8 0 }
-        { 0 1 } { 1 1 } { 2 1 }                         { 6 1 }         { 8 1 }
-        { 0 2 }                                         { 6 2 }         { 8 2 }
-        { 0 3 } { 1 3 } { 2 3 }                         { 6 3 }         { 8 3 }
-        { 0 4 }         { 2 4 } { 3 4 }                 { 6 4 }         { 8 4 }
-        { 0 5 }         { 2 5 }                         { 6 5 } { 7 5 } { 8 5 }
-        { 0 6 }                                                 { 7 6 } { 8 6 }
-        { 0 7 }                                                 { 7 7 } { 8 7 }
-        { 0 8 } { 1 8 } { 2 8 } { 3 8 } { 4 8 } { 5 8 } { 6 8 } { 7 8 } { 8 8 }
+                        { 2 0 } { 3 0 } { 4 0 } { 5 0 } { 6 0 }
+        { 0 1 } { 1 1 } { 2 1 }                         { 6 1 }
+        { 0 2 }                                         { 6 2 }
+        { 0 3 } { 1 3 } { 2 3 }                         { 6 3 }
+        { 0 4 }         { 2 4 } { 3 4 }                 { 6 4 }
+        { 0 5 }         { 2 5 }                         { 6 5 } { 7 5 }
+        { 0 6 }                                                 { 7 6 }
+        { 0 7 }                                                 { 7 7 }
+        { 0 8 } { 1 8 } { 2 8 } { 3 8 } { 4 8 } { 5 8 } { 6 8 } { 7 8 }
       }
       { ! new level (access it by rotating the level piece)
         { 0 0 } { 1 0 } { 2 0 } { 3 0 } { 4 0 } { 5 0 } { 6 0 } { 7 0 } { 8 0 }
@@ -49,7 +49,6 @@ SYMBOL: component
       {
         { 0 0 }
       }
-      
     } COLOR: orange
   ]
   [ ! goals
@@ -63,7 +62,7 @@ SYMBOL: component
 
 SYMBOL: boxes
 {
-  [ ! first box on each level
+  { ! first box on each level
     {
       { ! level 0
         { 3 2 }
@@ -73,9 +72,9 @@ SYMBOL: boxes
         { 4 3 }
       }
     } COLOR: orange
-  ]
+  }
 
-  [ ! second box on each level
+  { ! second box on each level
     {
       { ! level 0
         { 4 3 }
@@ -85,21 +84,23 @@ SYMBOL: boxes
         { 4 3 }
       }
     } COLOR: orange
-  ]
-  [ ! second box on each level
+  }
+
+  { ! third box on each level
     {
       { ! level 0
         { 4 4 }
       }
     } COLOR: orange
-  ]
-  [ ! second box on each level
+  }
+
+  { ! fourth box on each level
     {
       { ! level 0
         { 4 6 }
       }
     } COLOR: orange
-  ]
+  }
 
   ! etc
 } [ first2 <tetromino> ] map boxes set-global
