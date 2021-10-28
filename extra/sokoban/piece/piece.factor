@@ -5,14 +5,14 @@ sokoban.tetromino lists.lazy namespaces colors colors.constants
 math.ranges random ;
 IN: sokoban.piece
 
-! The rotation is an index into the tetromino's states array,
+! The level_num is an index into the tetromino's states array,
 ! and the position is added to the tetromino's blocks to give
 ! them their location on the sokoban board. If the location is f
 ! then the piece is not yet on the board.
 
 TUPLE: piece
     { tetromino tetromino }
-    { rotation integer initial: 0 }
+    { level_num integer initial: 0 }
     { location array initial: { 0 0 } } ;
 
 : <piece> ( tetromino -- piece )
@@ -20,7 +20,7 @@ TUPLE: piece
 
 : (piece-blocks) ( piece -- blocks )
     ! rotates the piece
-    [ rotation>> ] [ tetromino>> states>> ] bi nth ;
+    [ level_num>> ] [ tetromino>> states>> ] bi nth ;
 
 : wall-blocks ( piece -- blocks )
     [ (piece-blocks) ] [ location>> ] bi [ v+ ] curry map ;
@@ -97,12 +97,12 @@ TUPLE: piece
 : <goal-llist> ( board-width -- llist )
     [ [ <goal-piece> ] curry ] keep [ <box-llist> ] curry lazy-cons ;
 
-: (rotate-piece) ( rotation inc n-states -- rotation' )
+: (rotate-piece) ( level_num inc n-states -- level_num' )
     [ + ] dip rem ;
 
 : rotate-piece ( piece inc -- piece )
     over tetromino>> states>> length
-    [ (rotate-piece) ] 2curry change-rotation ;
+    [ (rotate-piece) ] 2curry change-level_num ;
 
 : move-piece ( piece move -- piece )
     [ v+ ] curry change-location ;
