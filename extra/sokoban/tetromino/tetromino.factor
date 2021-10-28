@@ -77,8 +77,7 @@ SYMBOL: boxes
   { ! second box on each level
     {
       { ! level 0
-        ! { 4 3 }
-        { -1 -1 }
+        { 4 3 }
       }
 
       { ! level 1
@@ -90,8 +89,7 @@ SYMBOL: boxes
   { ! third box on each level
     {
       { ! level 0
-        ! { 4 4 }
-        { -1 -1 }
+        { 4 4 }
       }
     } COLOR: orange
   }
@@ -99,8 +97,7 @@ SYMBOL: boxes
   { ! fourth box on each level
     {
       { ! level 0
-        ! { 4 6 }
-        { -1 -1 }
+        { 4 6 }
       }
     } COLOR: orange
   }
