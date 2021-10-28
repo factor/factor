@@ -11,7 +11,6 @@ TUPLE: sokoban
     { board }
     { pieces }
     { boxes }
-    { box2move integer }
     { goals }
     { last-update integer initial: 0 }
     { rows integer initial: 0 }
@@ -109,35 +108,28 @@ CONSTANT: default-height 9
     [ drop board>> ] [ [ current-piece clone ] dip move-piece ] 2bi piece-valid? ;
 
 : can-box-move? ( sokoban move -- ? )
-    [ drop board>> ] [ [ current-box clone ] dip move-piece ] 2bi piece-valid? ;
+    [ drop board>> ] [ [ drop current-box clone ] dip move-piece ] 2bi piece-valid? ;
 
-:: get-adj-box ( soko mov -- n ) ! returns the box number if the next spot has a box, and -1 otherwise
+:: get-adj-box ( soko mov -- box ) ! returns the box if the next spot has a box, and ??? otherwise
     soko current-piece location>> :> player_loc
     player_loc mov v+ :> next_loc
     soko boxes>> :> box_list
-    box_list [ location>> ] map :> box_loc_list
-    next_loc box_loc_list index :> box_num
-    box_num not
-    [
-        -1
-    ]
-    [
-        box_num
-    ] if ;
+    box_list [ location>> next_loc = ] find swap drop ;
 
 :: sokoban-move ( soko mov -- ? )
     soko mov can-player-move?
-    [   soko mov get-adj-box dup soko swap >>box2move drop -1 >
+    [   soko mov get-adj-box :> box2move
+        box2move not not
         [   soko mov can-box-move?
-            [   soko current-box location>> mov is-goal?
+            [   box2move location>> mov is-goal?
                 [   ! next location is a box and box can be moved to a goal point
                     soko current-piece mov move-piece drop
-                    soko current-box mov move-piece
+                    box2move mov move-piece
                     tetromino>> COLOR: blue >>color drop t
                 ]
                 [   ! next location is a box and box can be moved to a non-goal point
                     soko current-piece mov move-piece drop
-                    soko current-box mov move-piece
+                    box2move mov move-piece
                     tetromino>> COLOR: orange >>color drop t
                 ] if
             ]
