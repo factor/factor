@@ -11,6 +11,7 @@ TUPLE: sokoban
     { board }
     { pieces }
     { boxes }
+    { moved_box integer }
     { goals }
     { last-update integer initial: 0 }
     { rows integer initial: 0 }
@@ -110,15 +111,23 @@ CONSTANT: default-height 9
 : can-box-move? ( sokoban move -- ? )
     [ drop board>> ] [ [ current-box clone ] dip move-piece ] 2bi piece-valid? ;
 
-:: is-box? ( soko mov -- ? )
-    soko current-piece location>> :> playerLoc
-    soko current-box location>> :> boxLoc
-    playerLoc mov v+ :> playerNextLoc
-    playerNextLoc boxLoc = ;
+:: get-adj-box ( soko mov -- n ) ! returns the box number if the next spot has a box, and -1 otherwise
+    soko current-piece location>> :> player_loc
+    player_loc mov v+ :> next_loc
+    soko boxes>> :> box_list
+    box_list [ location>> ] map :> box_loc_list
+    next_loc box_loc_list index :> box_num
+    box_num not
+    [
+        -1
+    ]
+    [
+        box_num
+    ] if ;
 
 :: sokoban-move ( soko mov -- ? )
     soko mov can-player-move?
-    [   soko mov is-box?
+    [   soko mov get-adj-box dup soko swap >>moved_box drop -1 >
         [   soko mov can-box-move?
             [   soko current-box location>> mov is-goal?
                 [   ! next location is a box and box can be moved to a goal point
