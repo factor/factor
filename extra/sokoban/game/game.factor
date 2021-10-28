@@ -19,7 +19,7 @@ TUPLE: sokoban
     { paused? initial: f }
     { running? initial: t } ;
 
-CONSTANT: default-width 9
+CONSTANT: default-width 8
 CONSTANT: default-height 9
 
 
@@ -110,8 +110,11 @@ CONSTANT: default-height 9
 : can-box-move? ( sokoban move -- ? )
     [ drop board>> ] [ [ current-box clone ] dip move-piece ] 2bi piece-valid? ;
 
-: is-box? ( sokoban move -- ? )
-    dupd [ current-piece ] dip swap location>> v+ [ current-box ] dip swap location>> = ;
+:: is-box? ( soko mov -- ? )
+    soko current-piece location>> :> playerLoc
+    soko current-box location>> :> boxLoc
+    playerLoc mov v+ :> playerNextLoc
+    playerNextLoc boxLoc = ;
 
 :: sokoban-move ( soko mov -- ? )
     soko mov can-player-move?
