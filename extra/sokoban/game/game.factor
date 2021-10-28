@@ -11,7 +11,7 @@ TUPLE: sokoban
     { board }
     { pieces }
     { boxes }
-    { moved_box integer }
+    { box2move integer }
     { goals }
     { last-update integer initial: 0 }
     { rows integer initial: 0 }
@@ -127,7 +127,7 @@ CONSTANT: default-height 9
 
 :: sokoban-move ( soko mov -- ? )
     soko mov can-player-move?
-    [   soko mov get-adj-box dup soko swap >>moved_box drop -1 >
+    [   soko mov get-adj-box dup soko swap >>box2move drop -1 >
         [   soko mov can-box-move?
             [   soko current-box location>> mov is-goal?
                 [   ! next location is a box and box can be moved to a goal point
