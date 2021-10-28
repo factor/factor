@@ -141,7 +141,7 @@ CONSTANT: default-height 9
                     tetromino>> COLOR: orange >>color drop t
                 ] if
             ]
-            [   ! next location is a box and box cannot be moved
+            [   ! next location is a box or wall and box cannot be moved
                 f
             ] if
         ]
