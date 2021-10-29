@@ -32,8 +32,8 @@ CONSTANT: default-height 9
 : <sokoban> ( width height -- sokoban )
     dupd dupd dupd <board> swap <player-llist>
     sokoban new swap >>pieces swap >>board 
-    swap dupd <box-seq> >>boxes
     swap <goal-piece> >>goals
+    swap dupd [ goals>> ] dip <box-seq> >>boxes
     dup add-walls ;
 
 : <default-sokoban> ( -- sokoban )
@@ -130,7 +130,7 @@ CONSTANT: default-height 9
     [   soko dup current-piece mov get-adj-box :> box2move
         box2move
         [   soko box2move mov can-box-move?
-            [   soko box2move location>> mov is-goal?
+            [   soko goals>> box2move location>> mov is-goal?
                 [   ! next location is a box and box can be moved to a goal point
                     soko current-piece mov move-piece drop
                     box2move mov move-piece
