@@ -55,11 +55,11 @@ TUPLE: piece
     ! resets box location using startinglocs symbol
     dup tetromino>> dup states>> 0 swap remove-nth startinglocs get second prefix >>states >>tetromino ; 
 
-: set-goal-location ( piece board-width -- piece )
-    drop 0 startinglocs get third nth >>location ;
+! : set-goal-location ( piece -- piece )
+    ! 0 startinglocs get third nth >>location ;
 
-: is-goal? ( location move -- ? )
-    v+ startinglocs get third member? ;
+: is-goal? ( sokoban location move -- ? )
+    v+ swap goals>> member? ;
 
 : <board-piece> ( board-width -- piece )
     get-board <piece> swap set-board-location ;
@@ -67,7 +67,7 @@ TUPLE: piece
 : <player-piece> ( board-width -- piece )
     get-player <piece> swap set-player-location ;
 
-: <box-piece> ( n -- piece )
+: <box-piece> ( sokoban n -- piece )
     get-box <piece> set-box-location dup [ tetromino>> ] [ location>> ] bi
     { 0 0 } is-goal?
     [
@@ -79,7 +79,7 @@ TUPLE: piece
     >>color drop ;
 
 : <goal-piece> ( board-width -- piece )
-    get-goal <piece> swap set-goal-location ;
+    drop get-goal <piece> ;
 
 : <player-llist> ( board-width -- llist )
     [ [ <player-piece> ] curry ] keep [ <player-llist> ] curry lazy-cons ;
@@ -87,15 +87,13 @@ TUPLE: piece
 : <piece-llist> ( board-width -- llist )
     [ [ <board-piece> ] curry ] keep [ <piece-llist> ] curry lazy-cons ;
 
-: <box-seq> ( board-width -- seq )
-    drop 0 get-num-boxes [0,b] [ <box-piece> ] map ;
+:: <box-seq> ( soko bw -- seq )
+    0 get-num-boxes [0,b] [ soko <box-piece> ] map ;
     ! TODO replace the 0 with level func at some point
 
-: <box-llist> ( board-width -- llist )
-    [ [ <box-piece> ] curry ] keep [ <box-llist> ] curry lazy-cons ;
-
-: <goal-llist> ( board-width -- llist )
-    [ [ <goal-piece> ] curry ] keep [ <box-llist> ] curry lazy-cons ;
+! : <goal> ( board-width -- seq )
+    
+    ! [ [ <goal-piece> ] curry ] keep [ <box-llist> ] curry lazy-cons ;
 
 : (rotate-piece) ( level_num inc n-states -- level_num' )
     [ + ] dip rem ;

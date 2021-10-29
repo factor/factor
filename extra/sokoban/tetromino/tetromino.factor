@@ -54,7 +54,7 @@ SYMBOL: component
   [ ! goals
     {
       {
-        { 0 0 }
+        { 5 3 } { 4 2 }
       }
     } COLOR: pink
   ]

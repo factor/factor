@@ -28,7 +28,8 @@ IN: sokoban.gl
     { .25 .25 } gl-fill-rect ;
 
 : draw-goal-blocks ( piece -- )
-    piece-blocks [ draw-goal ] each ;
+    ! implement goals the same way we do as walls
+    wall-blocks [ draw-goal ] each ;
 
 : draw-goal-piece ( piece -- )
     dup tetromino>> color>> gl-color draw-goal-blocks ;
@@ -70,6 +71,6 @@ IN: sokoban.gl
             ! [ next-piece draw-next-piece ]
             [ current-piece draw-piece ]
             [ boxes>> [ draw-piece ] each ]
-            [ current-goal draw-goal-piece ]
+            [ goals>> draw-goal-piece ]
         } cleave
     ] do-matrix ;
