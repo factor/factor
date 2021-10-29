@@ -58,8 +58,8 @@ TUPLE: piece
 ! : set-goal-location ( piece -- piece )
     ! 0 startinglocs get third nth >>location ;
 
-: is-goal? ( sokoban location move -- ? )
-    v+ swap goals>> member? ;
+: is-goal? ( goal-piece location move -- ? )
+    v+ swap tetromino>> states>> first member? ;
 
 : <board-piece> ( board-width -- piece )
     get-board <piece> swap set-board-location ;
@@ -67,9 +67,9 @@ TUPLE: piece
 : <player-piece> ( board-width -- piece )
     get-player <piece> swap set-player-location ;
 
-: <box-piece> ( sokoban n -- piece )
-    get-box <piece> set-box-location dup [ tetromino>> ] [ location>> ] bi
-    { 0 0 } is-goal?
+:: <box-piece> ( n goal-piece -- piece )
+    n get-box <piece> set-box-location dup [ tetromino>> ] [ location>> ] bi
+    goal-piece swap { 0 0 } is-goal?
     [
         COLOR: blue
     ]
@@ -87,8 +87,8 @@ TUPLE: piece
 : <piece-llist> ( board-width -- llist )
     [ [ <board-piece> ] curry ] keep [ <piece-llist> ] curry lazy-cons ;
 
-:: <box-seq> ( soko bw -- seq )
-    0 get-num-boxes [0,b] [ soko <box-piece> ] map ;
+:: <box-seq> ( goal-piece bw -- seq )
+    0 get-num-boxes [0,b] [ goal-piece <box-piece> ] map ;
     ! TODO replace the 0 with level func at some point
 
 ! : <goal> ( board-width -- seq )

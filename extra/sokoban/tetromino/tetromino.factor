@@ -54,7 +54,7 @@ SYMBOL: component
   [ ! goals
     {
       {
-        { 5 3 } { 4 2 }
+        { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
       }
     } COLOR: pink
   ]
@@ -102,6 +102,30 @@ SYMBOL: boxes
     } COLOR: orange
   }
 
+  { ! fifth box on each level
+    {
+      { ! level 0
+        { 3 6 }
+      }
+    } COLOR: orange
+  }
+
+  { ! sixth box on each level
+    {
+      { ! level 0
+        { 5 6 }
+      }
+    } COLOR: orange
+  }
+
+    { ! seventh box on each level
+    {
+      { ! level 0
+        { 1 6 }
+      }
+    } COLOR: orange
+  }
+
   ! etc
 } [ first2 <tetromino> ] map boxes set-global
 
@@ -120,7 +144,7 @@ SYMBOL: startinglocs
 
 SYMBOL: num-boxes
 {
-  3 ! number of boxes -1  
+  6 ! number of boxes -1  
   1
 } num-boxes set-global
 
