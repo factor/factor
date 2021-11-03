@@ -71,7 +71,10 @@ CONSTANT: default-height 9
 : can-player-move? ( sokoban move -- ? )
     [ drop board>> ] [ [ current-piece clone ] dip move-piece ] 2bi piece-valid? ;
 
-:: get-adj-box ( soko piece mov -- box ) ! returns the box if the next spot has a box, and ??? otherwise
+: get-adj-box2 ( sokoban piece move -- box )
+    swap location>> v+ swap boxes>> swap '[ location>> _ = ] find swap drop ;
+
+:: get-adj-box ( soko piece mov -- box ) ! If the next spot has a box, return the box. Otherwise, return f.
     piece location>> :> player_loc
     player_loc mov v+ :> next_loc
     soko boxes>> :> box_list
@@ -80,12 +83,10 @@ CONSTANT: default-height 9
 :: can-box-move? ( soko box mov -- ? )
     soko box mov get-adj-box :> box2move
     box2move
-    [ 
-        ! yes box next to box
+    [   ! yes box next to box
         f
     ]
-    [
-        ! no box next to box (can first box move)
+    [   ! no box next to box (can first box move)
         soko board>> box clone mov move-piece piece-valid?
     ] if ;
 
