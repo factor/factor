@@ -13,9 +13,6 @@ TUPLE: board
 : make-rows ( width height -- rows )
     swap '[ _ f <array> ] replicate ;
 
-! : make-walls ( -- walls) 
-
-
 : <board> ( width height -- board )
     2dup make-rows board boa ;
 
@@ -41,23 +38,3 @@ TUPLE: board
 
 : piece-valid? ( board piece -- ? )
     piece-blocks [ location-valid? ] with all? ;
-
-: row-not-full? ( row -- ? ) f swap member? ;
-
-: add-row ( board -- board )
-    dup rows>> over width>> f <array> prefix >>rows ;
-
-: top-up-rows ( board -- )
-    dup height>> over rows>> length = [
-        drop
-    ] [
-        add-row top-up-rows
-    ] if ;
-
-: remove-full-rows ( board -- board )
-    [ [ row-not-full? ] filter ] change-rows ;
-
-: check-rows ( board -- n )
-    ! remove full rows, then add blank ones at the top,
-    ! returning the number of rows removed (and added)
-    remove-full-rows dup height>> over rows>> length - swap top-up-rows ;

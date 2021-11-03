@@ -44,11 +44,7 @@ CONSTANT: default-height 9
 
 : current-piece ( sokoban -- piece ) pieces>> car ;
 
-! : current-box ( sokoban -- box ) boxes>> first ;
-
 : current-goal ( sokoban -- box ) goals>> car ;
-
-: next-piece ( sokoban -- piece ) pieces>> cdr car ;
 
 : toggle-pause ( sokoban -- )
     [ not ] change-paused? drop ;
@@ -61,38 +57,6 @@ CONSTANT: default-height 9
 
 : add-block ( sokoban block -- )
     over [ board>> ] 2dip current-piece tetromino>> color>> set-block ;
-
-: game-over? ( sokoban -- ? )
-    [ board>> ] [ next-piece ] bi piece-valid? not ;
-
-: new-current-piece ( sokoban -- sokoban )
-    dup game-over? [
-        f >>running?
-    ] [
-        [ cdr ] change-pieces
-    ] if ;
-
-: rows-score ( level n -- score )
-    {
-        { 0 [ 0 ] }
-        { 1 [ 40 ] }
-        { 2 [ 100 ] }
-        { 3 [ 300 ] }
-        { 4 [ 1200 ] }
-    } case swap 1 + * ;
-
-: add-score ( sokoban n-rows -- sokoban )
-    over level swap rows-score swap [ + ] change-score ;
-
-: add-rows ( sokoban rows -- sokoban )
-    swap [ + ] change-rows ;
-
-: score-rows ( sokoban n -- )
-    [ add-score ] keep add-rows drop ;
-
-: lock-piece ( sokoban -- )
-    [ dup current-piece wall-blocks [ add-block ] with each ]
-    [ new-current-piece dup board>> check-rows score-rows ] bi ;
 
 : can-rotate? ( sokoban -- ? )
     [ board>> ] [ current-piece clone 1 rotate-piece ] bi piece-valid? ;
@@ -163,10 +127,25 @@ CONSTANT: default-height 9
 
 : move-up ( sokoban -- ) { 0 -1 } sokoban-move drop ;
 
-! : move-drop ( sokoban -- )
-    ! dup { 0 1 } sokoban-move [ move-drop ] [ lock-piece ] if ;
+: update-level? ( sokoban -- ? )
+    ! get color item of each box
+    boxes>> [ tetromino>> ] map [ color>> ] map 
+    ! update if there are no orange pieces left
+    [ COLOR: orange ] first swap member? not ;
+
+: update-level ( sokoban -- sokoban )
+    ! 
+    dup update-level? 
+    [
+        1 >>level
+        dup add-walls ! needs to be called again to set walls wrt current level
+        <new-sokoban> ! not useful if we want to change size of board
+    ] [
+        
+    ] if ;
 
 : update ( sokoban -- )
+    update-level
     nano-count over last-update>> -
     over update-interval > [
         ! dup move-down
