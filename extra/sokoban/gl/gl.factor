@@ -35,10 +35,6 @@ IN: sokoban.gl
     dup tetromino>> color>> gl-color draw-goal-blocks ;
 
 
-! : draw-next-piece ( piece -- )
-    ! dup tetromino>> color>>
-    ! >rgba-components drop 0.2 <rgba> gl-color draw-piece-blocks ;
-
 ! TODO: move implementation specific stuff into sokoban-board
 : (draw-row) ( x y row -- )
     overd nth [ gl-color 2array draw-block ] [ 2drop ] if* ;
@@ -68,9 +64,8 @@ IN: sokoban.gl
             [ set-background-color ]
             [ board>> draw-background ]
             [ board>> draw-board ]
-            ! [ next-piece draw-next-piece ]
             [ current-piece draw-piece ]
-            [ boxes>> [ draw-piece ] each ]
             [ goals>> draw-goal-piece ]
+            [ boxes>> [ draw-piece ] each ]
         } cleave
     ] do-matrix ;

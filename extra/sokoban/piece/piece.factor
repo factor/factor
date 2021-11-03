@@ -30,15 +30,6 @@ TUPLE: piece
     ! [ (piece-blocks) ] [ location>> ] bi [ v+ ] curry map ;
     location>> { } 1sequence ; ! literally just returns the location in a sequence
 
-: piece-width ( piece -- width )
-    piece-blocks blocks-width ;
-
-: set-start-location ( piece board-width -- piece )
-    over piece-width [ 2 /i ] bi@ - 0 2array >>location ;
-
-: set-board-location ( piece board-width -- piece )
-    drop ;
-
 : set-player-location ( piece board-width -- piece )
     drop 0 startinglocs get first nth >>location ;
 
@@ -55,14 +46,11 @@ TUPLE: piece
     ! resets box location using startinglocs symbol
     dup tetromino>> dup states>> 0 swap remove-nth startinglocs get second prefix >>states >>tetromino ; 
 
-! : set-goal-location ( piece -- piece )
-    ! 0 startinglocs get third nth >>location ;
-
 : is-goal? ( goal-piece location move -- ? )
     v+ swap tetromino>> states>> first member? ;
 
 : <board-piece> ( board-width -- piece )
-    get-board <piece> swap set-board-location ;
+    get-board <piece> swap drop ;
 
 : <player-piece> ( board-width -- piece )
     get-player <piece> swap set-player-location ;
@@ -90,10 +78,6 @@ TUPLE: piece
 :: <box-seq> ( goal-piece bw -- seq )
     0 get-num-boxes [0,b] [ goal-piece <box-piece> ] map ;
     ! TODO replace the 0 with level func at some point
-
-! : <goal> ( board-width -- seq )
-    
-    ! [ [ <goal-piece> ] curry ] keep [ <box-llist> ] curry lazy-cons ;
 
 : (rotate-piece) ( level_num inc n-states -- level_num' )
     [ + ] dip rem ;
