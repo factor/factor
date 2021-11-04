@@ -19,15 +19,18 @@ TUPLE: sokoban
     { paused? initial: f }
     { running? initial: t } ;
 
-CONSTANT: default-width 8
-CONSTANT: default-height 9
+SYMBOL: default-width
+8 default-width set-global
+
+SYMBOL: default-height
+9 default-height set-global
 
 
 : add-wall-block ( sokoban block -- )
-    over [ board>> ] 2dip default-width <board-piece> swap level>> rotate-piece tetromino>> color>> set-block ;
+    over [ board>> ] 2dip default-width get <board-piece> swap level>> rotate-piece tetromino>> color>> set-block ;
 
 : add-walls ( sokoban -- ) 
-    dup default-width <board-piece> swap level>> rotate-piece wall-blocks [ add-wall-block ] with each ;
+    dup default-width get <board-piece> swap level>> rotate-piece wall-blocks [ add-wall-block ] with each ;
 
 : <sokoban> ( width height -- sokoban )
     dupd dupd dupd <board> swap <player-llist>
@@ -37,9 +40,10 @@ CONSTANT: default-height 9
     dup add-walls ;
 
 : <default-sokoban> ( -- sokoban )
-    default-width default-height <sokoban> ;
+    default-width get default-height get <sokoban> ;
 
 : <new-sokoban> ( old -- new )
+
     board>> [ width>> ] [ height>> ] bi <sokoban> ;
 
 : current-piece ( sokoban -- piece ) pieces>> car ;
@@ -50,7 +54,7 @@ CONSTANT: default-height 9
     [ not ] change-paused? drop ;
 
 : level ( sokoban -- level )
-    rows>> 1 + 10 / ceiling ;
+    level>> ;
 
 : update-interval ( sokoban -- interval )
     level 1 - 60 * 1,000,000,000 swap - ;
@@ -134,16 +138,25 @@ CONSTANT: default-height 9
     ! update if there are no orange pieces left
     [ COLOR: orange ] first swap member? not ;
 
-: update-level ( sokoban -- sokoban )
+:: update-level ( soko -- sokoban )
     ! 
-    dup update-level? 
+    soko update-level? 
     [
-        1 >>level
-        dup add-walls ! needs to be called again to set walls wrt current level
+        soko level>> 1 + :> new_level ! increment level by one
+        soko new_level >>level
+        new_level component get first states>> nth :> new_board
+        new_board [ first ] map :> x_vals
+        new_board [ second ] map :> y_vals
+        x_vals supremum :> x_max
+        y_vals supremum :> y_max
+        y_max default-height set
+        x_max default-width set
+        soko board>> x_max >>width drop
+        soko board>> y_max >>height drop
+        soko add-walls ! needs to be called again to set walls wrt current level
         <new-sokoban> ! not useful if we want to change size of board
-    ] [
-        
-    ] if ;
+    ]
+    [ soko ] if ;
 
 : update ( sokoban -- )
     update-level
