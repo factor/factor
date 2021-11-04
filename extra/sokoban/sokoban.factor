@@ -11,7 +11,7 @@ TUPLE: sokoban-gadget < gadget { sokoban sokoban } { timer } ;
 : <sokoban-gadget> ( sokoban -- gadget )
     sokoban-gadget new swap >>sokoban ;
 
-M: sokoban-gadget pref-dim* drop { 700 800 } ;
+M: sokoban-gadget pref-dim* drop { 700 800 } ; ! needs to be changed as well
 
 : update-status ( gadget -- )
     dup sokoban>> [
