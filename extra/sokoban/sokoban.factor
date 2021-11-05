@@ -26,7 +26,7 @@ M: sokoban-gadget draw-gadget* ( gadget -- )
     ] keep update-status ;
 
 : new-sokoban ( gadget -- gadget )
-    [ <new-sokoban> ] change-sokoban ;
+    [ dup level>> <new-sokoban> ] change-sokoban ;
 
 : unless-paused ( sokoban quot -- )
     over sokoban>> paused?>> [

@@ -32,19 +32,34 @@ SYMBOL: default-height
 : add-walls ( sokoban -- ) 
     dup default-width get <board-piece> swap level>> rotate-piece wall-blocks [ add-wall-block ] with each ;
 
-: <sokoban> ( width height -- sokoban )
-    dupd dupd dupd <board> swap <player-llist>
-    sokoban new swap >>pieces swap >>board 
-    swap <goal-piece> >>goals
-    swap dupd [ goals>> ] dip <box-seq> >>boxes
-    dup add-walls ;
+! : <sokoban> ( width height -- sokoban )
+!     dupd dupd dupd <board> swap <player-llist>
+!     sokoban new  1 >>level swap >>pieces swap >>board 
+!     swap <goal-piece> >>goals
+!     swap dupd [ goals>> ] dip <box-seq> >>boxes
+!     dup add-walls ;
+
+:: <sokoban> ( lev w h -- sokoban )
+    ! make components
+    w h <board> :> board
+    h <player-llist> :> player
+    h <goal-piece> :> goals
+    ! put components into sokoban instance
+    sokoban new :> soko
+    soko player >>pieces
+    lev >>level
+    board >>board
+    goals >>goals
+
+    goals h lev <box-seq> >>boxes
+    soko add-walls ;
+    
 
 : <default-sokoban> ( -- sokoban )
-    default-width get default-height get <sokoban> ;
+    0 default-width get default-height get <sokoban> ;
 
-: <new-sokoban> ( old -- new )
-
-    board>> [ width>> ] [ height>> ] bi <sokoban> ;
+: <new-sokoban> ( old level -- new )
+    swap board>> [ width>> ] [ height>> ] bi <sokoban> ;
 
 : current-piece ( sokoban -- piece ) pieces>> car ;
 
@@ -85,6 +100,7 @@ SYMBOL: default-height
     box_list [ location>> next_loc = ] find swap drop ;
 
 :: can-box-move? ( soko box mov -- ? )
+    ! takes in a box and uses get-adj-box to check if there is a box next to the input box
     soko box mov get-adj-box :> box2move
     box2move
     [   ! yes box next to box
@@ -100,12 +116,12 @@ SYMBOL: default-height
         box2move
         [   soko box2move mov can-box-move?
             [   soko goals>> box2move location>> mov is-goal?
-                [   ! next location is a box and box can be moved to a goal point
+                [   ! box can be moved onto goal point
                     soko current-piece mov move-piece drop
                     box2move mov move-piece
-                    tetromino>> COLOR: blue >>color drop t
+                    tetromino>> COLOR: blue >>color drop t ! change color once box is on goal
                 ]
-                [   ! next location is a box and box can be moved to a non-goal point
+                [   ! box can be moved onto free tile
                     soko current-piece mov move-piece drop
                     box2move mov move-piece
                     tetromino>> COLOR: orange >>color drop t
@@ -136,33 +152,42 @@ SYMBOL: default-height
     ! get color item of each box
     boxes>> [ tetromino>> ] map [ color>> ] map 
     ! update if there are no orange pieces left
-    [ COLOR: orange ] first swap member? not ;
+    [ COLOR: blue ] first swap member? not ;
 
-:: update-level ( soko -- sokoban )
+! :: update-level ( soko -- sokoban )
+!     ! 
+!     soko update-level? 
+!     [
+!         soko level>> 1 + :> new_level ! increment level by one
+!         soko new_level >>level
+!         ! gets and sets height and width of new board at next level
+!         new_level component get first states>> nth :> new_board
+!         new_board [ first ] map :> x_vals
+!         new_board [ second ] map :> y_vals
+!         x_vals supremum :> x_max
+!         y_vals supremum :> y_max
+!         y_max default-height set
+!         x_max default-width set
+!         soko board>> x_max >>width drop
+!         soko board>> y_max >>height drop
+!         soko add-walls ! needs to be called again to set walls wrt current level
+!         <new-sokoban> ! not useful if we want to change size of board
+!     ]
+!     [ soko ] if ;
+
+: update-level ( sokoban -- sokoban )
     ! 
-    soko update-level? 
+    dup update-level? 
     [
-        soko level>> 1 + :> new_level ! increment level by one
-        soko new_level >>level
-        new_level component get first states>> nth :> new_board
-        new_board [ first ] map :> x_vals
-        new_board [ second ] map :> y_vals
-        x_vals supremum :> x_max
-        y_vals supremum :> y_max
-        y_max default-height set
-        x_max default-width set
-        soko board>> x_max >>width drop
-        soko board>> y_max >>height drop
-        soko add-walls ! needs to be called again to set walls wrt current level
-        <new-sokoban> ! not useful if we want to change size of board
-    ]
-    [ soko ] if ;
+        1 <new-sokoban>
+    ] [
+
+    ] if ;
 
 : update ( sokoban -- )
     update-level
     nano-count over last-update>> -
     over update-interval > [
-        ! dup move-down
         nano-count >>last-update
     ] when drop ;
 
