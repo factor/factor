@@ -81,7 +81,7 @@ SYMBOL: boxes
       }
 
       { ! level 1
-        { 4 3 }
+        { 4 5 }
       }
     } COLOR: orange
   }
@@ -91,6 +91,9 @@ SYMBOL: boxes
       { ! level 0
         { 4 4 }
       }
+      {
+        { 5 4 }
+      }
     } COLOR: orange
   }
 
@@ -98,6 +101,9 @@ SYMBOL: boxes
     {
       { ! level 0
         { 4 6 }
+      }
+      {
+        { 6 4 }
       }
     } COLOR: orange
   }
@@ -107,6 +113,9 @@ SYMBOL: boxes
       { ! level 0
         { 3 6 }
       }
+      {
+        { 6 6 }
+      }
     } COLOR: orange
   }
 
@@ -115,6 +124,9 @@ SYMBOL: boxes
       { ! level 0
         { 5 6 }
       }
+      {
+        { 3 5 }
+      }
     } COLOR: orange
   }
 
@@ -122,6 +134,9 @@ SYMBOL: boxes
     {
       { ! level 0
         { 1 6 }
+      }
+      {
+        { 3 8 }
       }
     } COLOR: orange
   }

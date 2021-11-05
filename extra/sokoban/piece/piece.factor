@@ -33,10 +33,10 @@ TUPLE: piece
 : set-player-location ( piece board-width -- piece )
     drop 0 startinglocs get first nth >>location ;
 
-: set-box-location ( piece -- piece )
+: set-box-location ( piece level -- piece )
     ! sets the location of the boxes to where they are defined in tetromino
     !                               this first will be replaced with nth for levels
-    0 over tetromino>> states>> nth first >>location ; 
+    over tetromino>> states>> nth first >>location ; 
     ! sets the local position (in tetromino) to 0,0
     
     ! 0 here is the level number 
@@ -55,8 +55,8 @@ TUPLE: piece
 : <player-piece> ( board-width -- piece )
     get-player <piece> swap set-player-location ;
 
-:: <box-piece> ( n goal-piece -- piece )
-    n get-box <piece> set-box-location dup [ tetromino>> ] [ location>> ] bi
+:: <box-piece> ( n goal-piece level  -- piece )
+    n get-box <piece> level set-box-location dup [ tetromino>> ] [ location>> ] bi
     goal-piece swap { 0 0 } is-goal?
     [
         COLOR: blue
@@ -75,8 +75,8 @@ TUPLE: piece
 : <piece-llist> ( board-width -- llist )
     [ [ <board-piece> ] curry ] keep [ <piece-llist> ] curry lazy-cons ;
 
-:: <box-seq> ( goal-piece bw -- seq )
-    0 get-num-boxes [0,b] [ goal-piece <box-piece> ] map ;
+:: <box-seq> ( goal-piece bw level -- seq )
+    level get-num-boxes [0,b] [ goal-piece level <box-piece> ] map ;
     ! TODO replace the 0 with level func at some point
 
 : (rotate-piece) ( level_num inc n-states -- level_num' )
