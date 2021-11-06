@@ -28,6 +28,9 @@ M: sokoban-gadget draw-gadget* ( gadget -- )
 : new-sokoban ( gadget -- gadget )
     [ dup level>> <new-sokoban> ] change-sokoban ;
 
+: update-sokoban ( gadget -- gadget )
+    [ dup level>> 1 + <new-sokoban> ] change-sokoban ;
+
 : unless-paused ( sokoban quot -- )
     over sokoban>> paused?>> [
         2drop
@@ -45,13 +48,15 @@ sokoban-gadget H{
     { T{ key-down f f "LEFT" }   [ [ sokoban>> move-left ] unless-paused ] }
     { T{ key-down f f "RIGHT" }  [ [ sokoban>> move-right ] unless-paused ] }
     { T{ key-down f f "DOWN" }   [ [ sokoban>> move-down ] unless-paused ] }
-    { T{ key-down f f " " }      [ [ sokoban>> add-walls ] unless-paused ] }
     { T{ key-down f f "p" }      [ sokoban>> toggle-pause ] }
     { T{ key-down f f "n" }      [ new-sokoban drop ] }
 } set-gestures
 
 : tick ( gadget -- )
-    [ sokoban>> ?update ] [ relayout-1 ] bi ;
+    dup sokoban>> update-level? [
+        update-sokoban
+    ] [ ] if 
+    relayout-1 ;
 
 M: sokoban-gadget graft* ( gadget -- )
     [ [ tick ] curry 100 milliseconds every ] keep timer<< ;
