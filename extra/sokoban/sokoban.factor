@@ -15,9 +15,8 @@ M: sokoban-gadget pref-dim* drop { 700 800 } ; ! needs to be changed as well
 
 : update-status ( gadget -- )
     dup sokoban>> [
-        [ "Level: " % level # ]
-        [ " Score: " % score>> # ]
-        [ paused?>> [ " (Paused)" % ] when ] tri
+        [ "Level: " % level>> # ]
+        [ paused?>> [ " (Paused)" % ] when ] bi
     ] "" make swap show-status ;
 
 M: sokoban-gadget draw-gadget* ( gadget -- )
@@ -26,15 +25,18 @@ M: sokoban-gadget draw-gadget* ( gadget -- )
     ] keep update-status ;
 
 :: get-dim ( sokoban level -- level w h )
+    ! Look for maximum height and width of wall tetromino to determine size of board
     level component get first states>> nth :> new_board
     level
     new_board [ first ] map supremum 1 +
     new_board [ second ] map supremum 1 + ;
 
 : new-sokoban ( gadget -- gadget )
+    ! Restarts sokoban without changing levels
     [ dup level>> get-dim <sokoban> ] change-sokoban ;
 
 : update-sokoban ( gadget -- gadget )
+    ! Changes to the next level of sokoban
     [ dup level>> 1 + get-dim <sokoban> ] change-sokoban ;
 
 : unless-paused ( sokoban quot -- )
