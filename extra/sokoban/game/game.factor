@@ -32,13 +32,6 @@ SYMBOL: default-height
 : add-walls ( sokoban -- ) 
     dup default-width get <board-piece> swap level>> rotate-piece wall-blocks [ add-wall-block ] with each ;
 
-! : <sokoban> ( width height -- sokoban )
-!     dupd dupd dupd <board> swap <player-llist>
-!     sokoban new  1 >>level swap >>pieces swap >>board 
-!     swap <goal-piece> >>goals
-!     swap dupd [ goals>> ] dip <box-seq> >>boxes
-!     dup add-walls ;
-
 :: <sokoban> ( lev w h -- sokoban )
     ! make components
     w h <board> :> board
@@ -58,9 +51,6 @@ SYMBOL: default-height
 : <default-sokoban> ( -- sokoban )
     0 default-width get default-height get <sokoban> ;
 
-: <new-sokoban> ( old level -- new )
-    swap board>> [ width>> ] [ height>> ] bi <sokoban> ;
-
 : current-piece ( sokoban -- piece ) pieces>> car ;
 
 : current-goal ( sokoban -- box ) goals>> car ;
@@ -68,11 +58,8 @@ SYMBOL: default-height
 : toggle-pause ( sokoban -- )
     [ not ] change-paused? drop ;
 
-: level ( sokoban -- level )
-    level>> ;
-
 : update-interval ( sokoban -- interval )
-    level 1 - 60 * 1,000,000,000 swap - ;
+    level>> 1 - 60 * 1,000,000,000 swap - ;
 
 : add-block ( sokoban block -- )
     over [ board>> ] 2dip current-piece tetromino>> color>> set-block ;
@@ -150,26 +137,4 @@ SYMBOL: default-height
     boxes>> [ tetromino>> ] map [ color>> ] map 
     ! update if there are no orange pieces left
     [ COLOR: orange ] first swap member? not ;
-
-! :: update-level ( soko -- sokoban )
-!     ! 
-!     soko update-level? 
-!     [
-!         soko level>> 1 + :> new_level ! increment level by one
-!         soko new_level >>level
-!         ! gets and sets height and width of new board at next level
-!         new_level component get first states>> nth :> new_board
-!         new_board [ first ] map :> x_vals
-!         new_board [ second ] map :> y_vals
-!         x_vals supremum :> x_max
-!         y_vals supremum :> y_max
-!         y_max default-height set
-!         x_max default-width set
-!         soko board>> x_max >>width drop
-!         soko board>> y_max >>height drop
-!         soko add-walls ! needs to be called again to set walls wrt current level
-!         <new-sokoban> ! not useful if we want to change size of board
-!     ]
-!     [ soko ] if ;
-! TODO: reimplement changing height and width with new update implementation
 
