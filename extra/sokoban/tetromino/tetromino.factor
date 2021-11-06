@@ -11,7 +11,7 @@ C: <tetromino> tetromino
 SYMBOL: component
 
 {
-  [ ! walls
+  [ ! walls on each level
     {
       {
                         { 2 0 } { 3 0 } { 4 0 } { 5 0 } { 6 0 }
@@ -38,21 +38,17 @@ SYMBOL: component
       }
     } COLOR: gray
   ]
-  [ ! player
+  [ ! player position on each level
     {
       {
-        { 0 0 }
+        { 2 2 }
+      }
+      {
+        { 1 2 }
       }
     } COLOR: green
   ]
-  [ ! boxes
-    {
-      {
-        { 0 0 }
-      }
-    } COLOR: orange
-  ]
-  [ ! goals
+  [ ! goals on each level (doesn't work yet)
     {
       {
         { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
@@ -133,22 +129,11 @@ SYMBOL: boxes
   ! etc
 } [ first2 <tetromino> ] map boxes set-global
 
-SYMBOL: startinglocs
-{
-  { ! player
-    { 2 2 }
-  }
-  { ! boxes
-    { 3 2 }
-  }
-  { ! goals
-    { 5 3 }
-  }
-} startinglocs set-global
 
 SYMBOL: num-boxes
 {
-  6 ! number of boxes -1  
+  ! number of boxes -1 of each level
+  6
   1
 } num-boxes set-global
 
@@ -163,9 +148,10 @@ SYMBOL: num-boxes
     ! TODO add an n argument and get (n + 1)th
 
 : get-goal ( -- tetromino )
-    component get fourth ;
+    component get third ;
 
 : get-num-boxes ( n -- m )
+    ! outputs how many boxes are on each level, allows for different numbers of boxes per level
     num-boxes get nth ;
 
 : blocks-max ( blocks quot -- max )
