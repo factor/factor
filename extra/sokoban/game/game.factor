@@ -37,7 +37,6 @@ TUPLE: sokoban
     goals >>goals
     goals lev <box-seq> >>boxes
     soko add-walls ; ! draw walls
-    
 
 : <default-sokoban> ( -- sokoban )
     ! Level 0 sokoban
@@ -45,23 +44,7 @@ TUPLE: sokoban
 
 : toggle-pause ( sokoban -- )
     [ not ] change-paused? drop ;
-
-: update-interval ( sokoban -- interval )
-    level>> 1 - 60 * 1,000,000,000 swap - ;
-
-: add-block ( sokoban block -- )
-    over [ board>> ] 2dip player>> tetromino>> color>> set-block ;
-
-: can-rotate? ( sokoban -- ? )
-    [ board>> ] [ player>> clone 1 rotate-piece ] bi piece-valid? ;
-
-: (rotate) ( inc sokoban -- )
-    dup can-rotate? [ player>> swap rotate-piece drop ] [ 2drop ] if ;
-
-: rotate-left ( sokoban -- ) -1 swap (rotate) ;
-
-: rotate-right ( sokoban -- ) 1 swap (rotate) ;
-
+    
 : can-player-move? ( sokoban move -- ? )
     [ drop board>> ] [ [ player>> clone ] dip move-piece ] 2bi piece-valid? ;
 
