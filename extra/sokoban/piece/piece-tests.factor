@@ -2,13 +2,13 @@ USING: accessors kernel sokoban.tetromino sokoban.piece tools.test sequences arr
 
 ! Tests for sokoban.tetromino and sokoban.piece, since there's not much to test in sokoban.tetromino
 
-! these two tests rely on the first rotation of the first tetromino being the
+! these two tests rely on the first level_num of the first tetromino being the
 ! 'I' tetromino in its vertical orientation.
 { 4 } [ tetrominoes get first states>> first blocks-width ] unit-test
 { 1 } [ tetrominoes get first states>> first blocks-height ] unit-test
 
 ! { { 0 0 } } [ random-tetromino <piece> location>> ] unit-test
-! { 0 } [ 10 <random-piece> rotation>> ] unit-test
+! { 0 } [ 10 <random-piece> level_num>> ] unit-test
 
 { { { 0 0 } { 1 0 } { 2 0 } { 3 0 } } }
 [ tetrominoes get first <piece> piece-blocks ] unit-test

@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors colors.constants combinators
+USING: accessors arrays colors colors.constants combinators math.vectors
 kernel math opengl opengl.gl sequences sokoban.game sokoban.piece
 ;
 
@@ -25,18 +25,15 @@ IN: sokoban.gl
     dup tetromino>> color>> gl-color draw-piece-blocks ;
 
 : draw-goal ( block -- )
-    { .25 .25 } gl-fill-rect ;
+    { 0.38 0.38 } v+ { 0.24 0.24 } gl-fill-rect ;
 
 : draw-goal-blocks ( piece -- )
-    piece-blocks [ draw-goal ] each ;
+    ! implement goals the same way we do as walls
+    wall-blocks [ draw-goal ] each ;
 
 : draw-goal-piece ( piece -- )
     dup tetromino>> color>> gl-color draw-goal-blocks ;
 
-
-! : draw-next-piece ( piece -- )
-    ! dup tetromino>> color>>
-    ! >rgba-components drop 0.2 <rgba> gl-color draw-piece-blocks ;
 
 ! TODO: move implementation specific stuff into sokoban-board
 : (draw-row) ( x y row -- )
@@ -67,9 +64,8 @@ IN: sokoban.gl
             [ set-background-color ]
             [ board>> draw-background ]
             [ board>> draw-board ]
-            ! [ next-piece draw-next-piece ]
             [ current-piece draw-piece ]
+            [ goals>> draw-goal-piece ]
             [ boxes>> [ draw-piece ] each ]
-            [ current-goal draw-goal-piece ]
         } cleave
     ] do-matrix ;
