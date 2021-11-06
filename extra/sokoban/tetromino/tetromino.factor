@@ -34,6 +34,7 @@ SYMBOL: component
         { 0 6 }                                                 { 7 6 }
         { 0 7 }                                                 { 7 7 }
         { 0 8 } { 1 8 } { 2 8 } { 3 8 } { 4 8 } { 5 8 } { 6 8 } { 7 8 }
+        { 1 9 }
       }
     } COLOR: gray
   ]
@@ -55,6 +56,9 @@ SYMBOL: component
     {
       {
         { 1 2 } { 5 3 } { 1 4 } { 4 5 } { 3 6 } { 6 6 } { 4 7 } 
+      }
+      {
+        { 4 4 } { 6 4 }
       }
     } COLOR: pink
   ]
@@ -91,9 +95,6 @@ SYMBOL: boxes
       { ! level 0
         { 4 4 }
       }
-      {
-        { 5 4 }
-      }
     } COLOR: orange
   }
 
@@ -101,9 +102,6 @@ SYMBOL: boxes
     {
       { ! level 0
         { 4 6 }
-      }
-      {
-        { 6 4 }
       }
     } COLOR: orange
   }
@@ -113,9 +111,6 @@ SYMBOL: boxes
       { ! level 0
         { 3 6 }
       }
-      {
-        { 6 6 }
-      }
     } COLOR: orange
   }
 
@@ -124,9 +119,6 @@ SYMBOL: boxes
       { ! level 0
         { 5 6 }
       }
-      {
-        { 3 5 }
-      }
     } COLOR: orange
   }
 
@@ -134,9 +126,6 @@ SYMBOL: boxes
     {
       { ! level 0
         { 1 6 }
-      }
-      {
-        { 3 8 }
       }
     } COLOR: orange
   }
