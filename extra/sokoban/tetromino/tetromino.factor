@@ -153,12 +153,3 @@ SYMBOL: num-boxes
 : get-num-boxes ( n -- m )
     ! outputs how many boxes are on each level, allows for different numbers of boxes per level
     num-boxes get nth ;
-
-: blocks-max ( blocks quot -- max )
-    map supremum 1 + ; inline
-
-: blocks-width ( blocks -- width )
-    [ first ] blocks-max ;
-
-: blocks-height ( blocks -- height )
-    [ second ] blocks-max ;

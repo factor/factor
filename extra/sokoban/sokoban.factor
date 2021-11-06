@@ -48,10 +48,6 @@ M: sokoban-gadget draw-gadget* ( gadget -- )
 
 sokoban-gadget H{
     { T{ button-down f f 1 }     [ request-focus ] }
-    { T{ key-down f f "d" }      [ [ sokoban>> rotate-left ] unless-paused ] }
-    { T{ key-down f f "f" }      [ [ sokoban>> rotate-right ] unless-paused ] }
-    { T{ key-down f f "e" }      [ [ sokoban>> rotate-left ] unless-paused ] }
-    { T{ key-down f f "u" }      [ [ sokoban>> rotate-right ] unless-paused ] }
     { T{ key-down f f "UP" }     [ [ sokoban>> move-up ] unless-paused ] }
     { T{ key-down f f "LEFT" }   [ [ sokoban>> move-left ] unless-paused ] }
     { T{ key-down f f "RIGHT" }  [ [ sokoban>> move-right ] unless-paused ] }
