@@ -30,8 +30,8 @@ TUPLE: piece
     ! [ (piece-blocks) ] [ location>> ] bi [ v+ ] curry map ;
     location>> { } 1sequence ; ! literally just returns the location in a sequence
 
-: set-player-location ( piece board-width -- piece )
-    drop 0 startinglocs get first nth >>location ;
+: set-player-location ( piece -- piece )
+    0 startinglocs get first nth >>location ;
 
 : set-box-location ( piece level -- piece )
     ! sets the location of the boxes to where they are defined in tetromino
@@ -42,10 +42,6 @@ TUPLE: piece
     ! 0 here is the level number 
     ! TODO: add level arg, remove board-width arg from all of these
 
-: reset-box-location ( piece -- piece )
-    ! resets box location using startinglocs symbol
-    dup tetromino>> dup states>> 0 swap remove-nth startinglocs get second prefix >>states >>tetromino ; 
-
 : is-goal? ( goal-piece location move -- ? )
     v+ swap tetromino>> states>> first member? ;
 
@@ -53,7 +49,7 @@ TUPLE: piece
     get-board <piece> swap drop ;
 
 : <player-piece> ( board-width -- piece )
-    get-player <piece> swap set-player-location ;
+    drop get-player <piece> set-player-location ;
 
 :: <box-piece> ( n goal-piece level  -- piece )
     n get-box <piece> level set-box-location dup [ tetromino>> ] [ location>> ] bi
