@@ -152,7 +152,7 @@ SYMBOL: default-height
     ! get color item of each box
     boxes>> [ tetromino>> ] map [ color>> ] map 
     ! update if there are no orange pieces left
-    [ COLOR: blue ] first swap member? not ;
+    [ COLOR: orange ] first swap member? not ;
 
 ! :: update-level ( soko -- sokoban )
 !     ! 
@@ -174,22 +174,5 @@ SYMBOL: default-height
 !         <new-sokoban> ! not useful if we want to change size of board
 !     ]
 !     [ soko ] if ;
+! TODO: reimplement changing height and width with new update implementation
 
-: update-level ( sokoban -- sokoban )
-    ! 
-    dup update-level? 
-    [
-        1 <new-sokoban>
-    ] [
-
-    ] if ;
-
-: update ( sokoban -- )
-    update-level
-    nano-count over last-update>> -
-    over update-interval > [
-        nano-count >>last-update
-    ] when drop ;
-
-: ?update ( sokoban -- )
-    dup [ paused?>> ] [ running?>> not ] bi or [ drop ] [ update ] if ;
