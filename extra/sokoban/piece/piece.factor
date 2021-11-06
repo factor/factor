@@ -28,11 +28,8 @@ TUPLE: piece
 : piece-blocks ( piece -- blocks )
     location>> { } 1sequence ; ! literally just returns the location in a sequence
 
-: set-player-location ( piece -- piece )
-    0 startinglocs get first nth >>location ;
-
-: set-box-location ( piece level -- piece )
-    ! sets the location of the boxes to where they are defined in tetromino
+: set-location ( piece level -- piece )
+    ! sets the location of piece to where they are defined in tetromino
     over tetromino>> states>> nth first >>location ; 
 
 : is-goal? ( goal-piece location move -- ? )
@@ -42,11 +39,15 @@ TUPLE: piece
 : <board-piece> ( -- piece )
     get-board <piece> ;
 
-: <player-piece> ( board-width -- piece )
-    drop get-player <piece> set-player-location ;
+: <player-piece> ( level -- piece )
+    get-player <piece> swap set-location ;
 
-:: <box-piece> ( n goal-piece level  -- piece )
-    n get-box <piece> level set-box-location dup [ tetromino>> ] [ location>> ] bi
+: <goal-piece> ( -- piece )
+    ! TODO: rotate goal according to level, right now it is only using the goals of the first level
+    get-goal <piece> ;
+
+:: <box-piece> ( box-number goal-piece level  -- piece )
+    box-number get-box <piece> level set-location dup [ tetromino>> ] [ location>> ] bi
     goal-piece swap { 0 0 } is-goal?
     [
         COLOR: blue
@@ -56,14 +57,7 @@ TUPLE: piece
     ] if
     >>color drop ;
 
-: <goal-piece> ( board-width -- piece )
-    ! TODO: rotate goal according to level, right now it is only using the goals of the first level
-    drop get-goal <piece> ;
-
-: <player-llist> ( board-width -- llist )
-    [ [ <player-piece> ] curry ] keep [ <player-llist> ] curry lazy-cons ;
-
-:: <box-seq> ( goal-piece bw level -- seq )
+:: <box-seq> ( goal-piece level -- seq )
     ! get list of boxes on corresponding level
     level get-num-boxes [0,b] [ goal-piece level <box-piece> ] map ;
 
