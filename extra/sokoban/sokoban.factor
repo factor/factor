@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors timers arrays calendar kernel make math math.rectangles
-math.parser namespaces sequences system sokoban.game sokoban.gl ui.gadgets
+math.parser namespaces sequences system sokoban.game sokoban.tetromino sokoban.gl ui.gadgets
 ui.gadgets.labels ui.gadgets.worlds ui.gadgets.status-bar ui.gestures
 ui.render ui ;
 IN: sokoban
@@ -25,11 +25,17 @@ M: sokoban-gadget draw-gadget* ( gadget -- )
         [ dim>> first2 ] [ sokoban>> ] bi draw-sokoban
     ] keep update-status ;
 
+:: get-dim ( sokoban level -- level w h )
+    level component get first states>> nth :> new_board
+    level
+    new_board [ first ] map supremum 1 +
+    new_board [ second ] map supremum 1 + ;
+
 : new-sokoban ( gadget -- gadget )
-    [ dup level>> <new-sokoban> ] change-sokoban ;
+    [ dup level>> get-dim <sokoban> ] change-sokoban ;
 
 : update-sokoban ( gadget -- gadget )
-    [ dup level>> 1 + <new-sokoban> ] change-sokoban ;
+    [ dup level>> 1 + get-dim <sokoban> ] change-sokoban ;
 
 : unless-paused ( sokoban quot -- )
     over sokoban>> paused?>> [
