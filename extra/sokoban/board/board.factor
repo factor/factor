@@ -8,7 +8,6 @@ TUPLE: board
     { width integer }
     { height integer }
     { rows array } ;
-!    { walls piece } ;
 
 : make-rows ( width height -- rows )
     swap '[ _ f <array> ] replicate ;

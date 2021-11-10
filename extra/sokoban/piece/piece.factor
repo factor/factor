@@ -26,33 +26,28 @@ TUPLE: piece
     [ (piece-blocks) ] [ location>> ] bi [ v+ ] curry map ;
 
 : piece-blocks ( piece -- blocks )
-    ! rotates and positions the piece
-    ! [ (piece-blocks) ] [ location>> ] bi [ v+ ] curry map ;
     location>> { } 1sequence ; ! literally just returns the location in a sequence
 
-: set-player-location ( piece -- piece )
-    0 startinglocs get first nth >>location ;
-
-: set-box-location ( piece level -- piece )
-    ! sets the location of the boxes to where they are defined in tetromino
-    !                               this first will be replaced with nth for levels
+: set-location ( piece level -- piece )
+    ! sets the location of piece to where they are defined in tetromino
     over tetromino>> states>> nth first >>location ; 
-    ! sets the local position (in tetromino) to 0,0
-    
-    ! 0 here is the level number 
-    ! TODO: add level arg, remove board-width arg from all of these
 
 : is-goal? ( goal-piece location move -- ? )
+    ! check if next move is a goal or not
     v+ swap tetromino>> states>> first member? ;
 
-: <board-piece> ( board-width -- piece )
-    get-board <piece> swap drop ;
+: <board-piece> ( -- piece )
+    get-board <piece> ;
 
-: <player-piece> ( board-width -- piece )
-    drop get-player <piece> set-player-location ;
+: <player-piece> ( level -- piece )
+    get-player <piece> swap set-location ;
+    
+: <goal-piece> ( -- piece )
+    ! TODO: rotate goal according to level, right now it is only using the goals of the first level
+    get-goal <piece> ;
 
-:: <box-piece> ( n goal-piece level  -- piece )
-    n get-box <piece> level set-box-location dup [ tetromino>> ] [ location>> ] bi
+:: <box-piece> ( box-number goal-piece level  -- piece )
+    box-number get-box <piece> level set-location dup [ tetromino>> ] [ location>> ] bi
     goal-piece swap { 0 0 } is-goal?
     [
         COLOR: blue
@@ -62,18 +57,9 @@ TUPLE: piece
     ] if
     >>color drop ;
 
-: <goal-piece> ( board-width -- piece )
-    drop get-goal <piece> ;
-
-: <player-llist> ( board-width -- llist )
-    [ [ <player-piece> ] curry ] keep [ <player-llist> ] curry lazy-cons ;
-
-: <piece-llist> ( board-width -- llist )
-    [ [ <board-piece> ] curry ] keep [ <piece-llist> ] curry lazy-cons ;
-
-:: <box-seq> ( goal-piece bw level -- seq )
+:: <box-seq> ( goal-piece level -- seq )
+    ! get list of boxes on corresponding level
     level get-num-boxes [0,b] [ goal-piece level <box-piece> ] map ;
-    ! TODO replace the 0 with level func at some point
 
 : (rotate-piece) ( level_num inc n-states -- level_num' )
     [ + ] dip rem ;
