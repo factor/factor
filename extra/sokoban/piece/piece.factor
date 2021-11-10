@@ -41,7 +41,7 @@ TUPLE: piece
 
 : <player-piece> ( level -- piece )
     get-player <piece> swap set-location ;
-
+    
 : <goal-piece> ( -- piece )
     ! TODO: rotate goal according to level, right now it is only using the goals of the first level
     get-goal <piece> ;
