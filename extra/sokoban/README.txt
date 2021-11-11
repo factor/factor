@@ -12,6 +12,6 @@ p:                  pause/unpause
 n:                  start a new game
 
 TODO:
-- rotation of pieces when they're on the far right of the board
+- level_num of pieces when they're on the far right of the board
 - make blocks prettier
 - possibly make piece inherit from tetromino

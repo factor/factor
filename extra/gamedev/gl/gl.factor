@@ -1,18 +1,17 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors colors.constants combinators math.vectors
-kernel math opengl opengl.gl sequences sokoban.game sokoban.piece
+USING: opengl opengl.gl
 ;
 
-IN: sokoban.gl
+IN: gamedev.gl
 
-! OpenGL rendering for sokoban 
+! OpenGL rendering 
 
 : draw-block ( block -- )
     { 1 1 } gl-fill-rect ;
 
+
 : draw-wall-blocks ( piece -- )
-    ! walls isn't actually drawn here! TODO: change functions names to clarify
     wall-blocks [ draw-block ] each ;
 
 : draw-piece-blocks ( piece -- )
@@ -64,7 +63,7 @@ IN: sokoban.gl
             [ set-background-color ]
             [ board>> draw-background ]
             [ board>> draw-board ]
-            [ player>> draw-piece ]
+            [ current-piece draw-piece ]
             [ goals>> draw-goal-piece ]
             [ boxes>> [ draw-piece ] each ]
         } cleave

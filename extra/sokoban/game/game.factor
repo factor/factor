@@ -9,135 +9,94 @@ IN: sokoban.game
 
 TUPLE: sokoban
     { board }
-    { pieces }
+    { player }
     { boxes }
     { goals }
     { last-update integer initial: 0 }
-    { rows integer initial: 0 }
-    { score integer initial: 0 }
     { level integer initial: 0 }
     { paused? initial: f }
     { running? initial: t } ;
 
-CONSTANT: default-width 9
-CONSTANT: default-height 9
-
-
 : add-wall-block ( sokoban block -- )
-    over [ board>> ] 2dip default-width <board-piece> swap level>> rotate-piece tetromino>> color>> set-block ;
+    over [ board>> ] 2dip <board-piece> swap level>> rotate-piece tetromino>> color>> set-block ;
 
 : add-walls ( sokoban -- ) 
-    dup default-width <board-piece> swap level>> rotate-piece wall-blocks [ add-wall-block ] with each ;
+    dup <board-piece> swap level>> rotate-piece wall-blocks [ add-wall-block ] with each ;
 
-: <sokoban> ( width height -- sokoban )
-    dupd dupd dupd <board> swap <player-llist>
-    sokoban new swap >>pieces swap >>board 
-    swap <box-seq> >>boxes
-    swap <goal-llist> >>goals
-    dup add-walls ;
+:: <sokoban> ( lev w h -- sokoban )
+    ! make components
+    w h <board> :> board
+    lev <player-piece> :> player
+    <goal-piece> :> goals
+
+    ! put components into sokoban instance
+    sokoban new :> soko
+    soko player >>player
+    lev >>level
+    board >>board
+    goals >>goals
+    goals lev <box-seq> >>boxes
+    soko add-walls ; ! draw walls
 
 : <default-sokoban> ( -- sokoban )
-    default-width default-height <sokoban> ;
-
-: <new-sokoban> ( old -- new )
-    board>> [ width>> ] [ height>> ] bi <sokoban> ;
-
-: current-piece ( sokoban -- piece ) pieces>> car ;
-
-: current-box ( sokoban -- box ) boxes>> first ;
-
-: current-goal ( sokoban -- box ) goals>> car ;
-
-: next-piece ( sokoban -- piece ) pieces>> cdr car ;
+    ! Level 0 sokoban
+    0 8 9 <sokoban> ;
 
 : toggle-pause ( sokoban -- )
     [ not ] change-paused? drop ;
+    
+: can-player-move? ( sokoban move -- ? )
+    [ drop board>> ] [ [ player>> clone ] dip move-piece ] 2bi piece-valid? ;
 
-: level ( sokoban -- level )
-    rows>> 1 + 10 / ceiling ;
+:: get-adj-box ( soko piece mov -- box ) 
+    ! If the input piece (either a player or another box) has a box at its move location,
+    ! return the box at the move location. Otherwise, return false
+    piece location>> :> player_loc
+    player_loc mov v+ :> next_loc
+    soko boxes>> :> box_list
+    box_list [ location>> next_loc = ] find swap drop ;
 
-: update-interval ( sokoban -- interval )
-    level 1 - 60 * 1,000,000,000 swap - ;
-
-: add-block ( sokoban block -- )
-    over [ board>> ] 2dip current-piece tetromino>> color>> set-block ;
-
-: game-over? ( sokoban -- ? )
-    [ board>> ] [ next-piece ] bi piece-valid? not ;
-
-: new-current-piece ( sokoban -- sokoban )
-    dup game-over? [
-        f >>running?
-    ] [
-        [ cdr ] change-pieces
+:: can-box-move? ( soko box mov -- ? )
+    soko box mov get-adj-box :> box2move ! Checks if input box has a box at its move location
+    box2move
+    [   ! If there is another box at the move location, the current box is unable to move
+        f
+    ]
+    [   ! Otherwise, we check if there is a wall blocking the box
+        soko board>> box clone mov move-piece piece-valid?
     ] if ;
 
-: rows-score ( level n -- score )
-    {
-        { 0 [ 0 ] }
-        { 1 [ 40 ] }
-        { 2 [ 100 ] }
-        { 3 [ 300 ] }
-        { 4 [ 1200 ] }
-    } case swap 1 + * ;
-
-: add-score ( sokoban n-rows -- sokoban )
-    over level swap rows-score swap [ + ] change-score ;
-
-: add-rows ( sokoban rows -- sokoban )
-    swap [ + ] change-rows ;
-
-: score-rows ( sokoban n -- )
-    [ add-score ] keep add-rows drop ;
-
-: lock-piece ( sokoban -- )
-    [ dup current-piece wall-blocks [ add-block ] with each ]
-    [ new-current-piece dup board>> check-rows score-rows ] bi ;
-
-: can-rotate? ( sokoban -- ? )
-    [ board>> ] [ current-piece clone 1 rotate-piece ] bi piece-valid? ;
-
-: (rotate) ( inc sokoban -- )
-    dup can-rotate? [ current-piece swap rotate-piece drop ] [ 2drop ] if ;
-
-: rotate-left ( sokoban -- ) -1 swap (rotate) ;
-
-: rotate-right ( sokoban -- ) 1 swap (rotate) ;
-
-: can-player-move? ( sokoban move -- ? )
-    [ drop board>> ] [ [ current-piece clone ] dip move-piece ] 2bi piece-valid? ;
-
-: can-box-move? ( sokoban move -- ? )
-    [ drop board>> ] [ [ current-box clone ] dip move-piece ] 2bi piece-valid? ;
-
-: is-box? ( sokoban move -- ? )
-    dupd [ current-piece ] dip swap location>> v+ [ current-box ] dip swap location>> = ;
-
 :: sokoban-move ( soko mov -- ? )
+    ! Collision logic -- checks if player can move and moves the player accordingly
+    ! TODO: make function more readable by using cond (?)
     soko mov can-player-move?
-    [   soko mov is-box?
-        [   soko mov can-box-move?
-            [   soko current-box location>> mov is-goal?
-                [   ! next location is a box and box can be moved to a goal point
-                    soko current-piece mov move-piece drop
-                    soko current-box mov move-piece
-                    tetromino>> COLOR: blue >>color drop t
+    [   ! Player can move
+        soko dup player>> mov get-adj-box :> box2move
+        box2move
+        [   ! Next location of player is a box
+            soko box2move mov can-box-move?
+            [   ! Next location of player is a box and box is able to move
+                soko goals>> box2move location>> mov is-goal?
+                [   ! Next location of box is a goal point
+                    soko player>> mov move-piece drop
+                    box2move mov move-piece
+                    tetromino>> COLOR: blue >>color drop t ! change color once box is on goal
                 ]
-                [   ! next location is a box and box can be moved to a non-goal point
-                    soko current-piece mov move-piece drop
-                    soko current-box mov move-piece
+                [   ! Next location of box is a free space
+                    soko player>> mov move-piece drop
+                    box2move mov move-piece
                     tetromino>> COLOR: orange >>color drop t
                 ] if
             ]
-            [   ! next location is a box and box cannot be moved
+            [   ! Next location of player is a box but box cannot move
                 f
             ] if
         ]
-        [   ! next location is not a box
-            soko current-piece mov move-piece drop t
+        [   ! Next location of player is a free space, move the player onto the free space
+            soko player>> mov move-piece drop t
         ] if 
     ]
-    [   ! player cannot move
+    [   ! Player cannot move
         f
     ] if ;
 
@@ -150,15 +109,9 @@ CONSTANT: default-height 9
 
 : move-up ( sokoban -- ) { 0 -1 } sokoban-move drop ;
 
-! : move-drop ( sokoban -- )
-    ! dup { 0 1 } sokoban-move [ move-drop ] [ lock-piece ] if ;
+: update-level? ( sokoban -- ? )
+    ! Get color color of each box
+    boxes>> [ tetromino>> ] map [ color>> ] map 
+    ! All boxes are on correct spots if there are no orange boxes left and level should be updated
+    [ COLOR: orange ] first swap member? not ;
 
-: update ( sokoban -- )
-    nano-count over last-update>> -
-    over update-interval > [
-        ! dup move-down
-        nano-count >>last-update
-    ] when drop ;
-
-: ?update ( sokoban -- )
-    dup [ paused?>> ] [ running?>> not ] bi or [ drop ] [ update ] if ;
