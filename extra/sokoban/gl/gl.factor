@@ -11,8 +11,8 @@ IN: sokoban.gl
 : draw-block ( block -- )
     { 1 1 } gl-fill-rect ;
 
-
 : draw-wall-blocks ( piece -- )
+    ! walls isn't actually drawn here! TODO: change functions names to clarify
     wall-blocks [ draw-block ] each ;
 
 : draw-piece-blocks ( piece -- )
@@ -64,7 +64,7 @@ IN: sokoban.gl
             [ set-background-color ]
             [ board>> draw-background ]
             [ board>> draw-board ]
-            [ current-piece draw-piece ]
+            [ player>> draw-piece ]
             [ goals>> draw-goal-piece ]
             [ boxes>> [ draw-piece ] each ]
         } cleave
