@@ -90,9 +90,6 @@ SYMBOL: default-height
 : can-player-move? ( sokoban move -- ? )
     [ drop board>> ] [ [ current-piece clone ] dip move-piece ] 2bi piece-valid? ;
 
-: get-adj-box2 ( sokoban piece move -- box )
-    swap location>> v+ swap boxes>> swap '[ location>> _ = ] find swap drop ;
-
 :: get-adj-box ( soko piece mov -- box ) ! If the next spot has a box, return the box. Otherwise, return f.
     piece location>> :> player_loc
     player_loc mov v+ :> next_loc
