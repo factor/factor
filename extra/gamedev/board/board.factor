@@ -4,7 +4,7 @@ IN: gamedev.board
 
 TUPLE: board width height cells ;
 
-:: make-cells ( width height cell -- cells )
+:: make-cells ( cell width height -- cells )
     height [ width [ cell ] replicate ] replicate ;
 
 :: make-board ( cells -- board )
@@ -12,8 +12,20 @@ TUPLE: board width height cells ;
     cells first length :> width
     width height cells board boa ;
 
-:: get-cell ( location board -- cell )
+:: get-cell ( board location -- cell )
     location first :> x
     location second :> y
     board cells>> :> cells
     x y cells nth nth ;
+
+:: set-cell ( board location new-cell -- )
+    location first :> x
+    location second :> y
+    board cells>> :> cells
+    new-cell x y cells nth set-nth ;
+
+:: modify-cell ( board location quot -- )
+    location first :> x
+    location second :> y
+    board cells>> :> cells
+    x y cells nth quot change-nth ;
