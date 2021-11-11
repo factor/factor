@@ -18,14 +18,8 @@ TUPLE: board width height cells ;
     board cells>> :> cells
     x y cells nth nth ;
 
-:: set-cell ( board location new-cell -- )
+:: set-cell ( new-cell board location -- )
     location first :> x
     location second :> y
     board cells>> :> cells
     new-cell x y cells nth set-nth ;
-
-:: modify-cell ( board location quot -- )
-    location first :> x
-    location second :> y
-    board cells>> :> cells
-    x y cells nth quot change-nth ;
