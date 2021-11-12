@@ -27,7 +27,7 @@ TUPLE: sokoban
     ! make components
     w h <board> :> board
     lev <player-piece> :> player
-    <goal-piece> :> goals
+    lev <goal-piece> :> goals
 
     ! put components into sokoban instance
     sokoban new :> soko

@@ -41,10 +41,7 @@ TUPLE: piece
 
 : <player-piece> ( level -- piece )
     get-player <piece> swap set-location ;
-
-: <goal-piece> ( -- piece )
-    ! TODO: rotate goal according to level, right now it is only using the goals of the first level
-    get-goal <piece> ;
+    
 
 :: <box-piece> ( box-number goal-piece level  -- piece )
     box-number get-box <piece> level set-location dup [ tetromino>> ] [ location>> ] bi
@@ -67,6 +64,11 @@ TUPLE: piece
 : rotate-piece ( piece inc -- piece )
     over tetromino>> states>> length
     [ (rotate-piece) ] 2curry change-level_num ;
+
+: <goal-piece> ( level -- piece )
+    ! rotate goal according to level
+    get-goal <piece> swap rotate-piece ;
+
 
 : move-piece ( piece move -- piece )
     [ v+ ] curry change-location ;
