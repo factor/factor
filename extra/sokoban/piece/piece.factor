@@ -34,7 +34,7 @@ TUPLE: piece
 
 : is-goal? ( goal-piece location move -- ? )
     ! check if next move is a goal or not
-    v+ swap tetromino>> states>> first member? ;
+    v+ swap [ level_num>> ] [ tetromino>> ] bi states>> nth member? ;
 
 : <board-piece> ( -- piece )
     get-board <piece> ;
