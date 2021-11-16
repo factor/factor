@@ -6,23 +6,10 @@ ui.gadgets.labels ui.gadgets.worlds ui.gadgets.status-bar ui.gestures
 ui.render ui ;
 IN: sokoban
 
-TUPLE: sokoban-gadget < gadget { sokoban sokoban } { timer } ;
+TUPLE: sokoban-gadget < gadget { sokoban sokoban } { timer } { window-dims array initial: { 700 800 } } ;
 
 : <sokoban-gadget> ( sokoban -- gadget )
     sokoban-gadget new swap >>sokoban ;
-
-M: sokoban-gadget pref-dim* drop { 700 800 } ; ! needs to be changed as well
-
-: update-status ( gadget -- )
-    dup sokoban>> [
-        [ "Level: " % level>> # ]
-        [ paused?>> [ " (Paused)" % ] when ] bi
-    ] "" make swap show-status ;
-
-M: sokoban-gadget draw-gadget* ( gadget -- )
-    [
-        [ dim>> first2 ] [ sokoban>> ] bi draw-sokoban
-    ] keep update-status ;
 
 :: get-dim ( sokoban level -- level w h )
     ! Look for maximum height and width of wall tetromino to determine size of board
@@ -35,9 +22,34 @@ M: sokoban-gadget draw-gadget* ( gadget -- )
     ! Restarts sokoban without changing levels
     [ dup level>> get-dim <sokoban> ] change-sokoban ;
 
+:: window-size ( sokoban -- window-size )
+    sokoban level>> :> level
+    sokoban level get-dim :> ( lev w h )
+    100 w * :> xpix
+    100 h * :> ypix
+    { xpix ypix } ;
+
+
 : update-sokoban ( gadget -- gadget )
     ! Changes to the next level of sokoban
-    [ dup level>> 1 + get-dim <sokoban> ] change-sokoban ;
+    [ dup level>> 1 + get-dim <sokoban> ] change-sokoban 
+    dup sokoban>> window-size >>window-dims ;
+
+M: sokoban-gadget pref-dim* ( gadget -- dim ) 
+    sokoban>> window-size ;
+    ! drop { 700 800 } ; ! needs to be changed as well
+
+
+: update-status ( gadget -- )
+    dup sokoban>> [
+        [ "Level: " % level>> # ]
+        [ paused?>> [ " (Paused)" % ] when ] bi
+    ] "" make swap show-status ;
+
+M: sokoban-gadget draw-gadget* ( gadget -- )
+    [
+        [ dim>> first2 ] [ sokoban>> ] bi draw-sokoban
+    ] keep update-status ;
 
 : unless-paused ( sokoban quot -- )
     over sokoban>> paused?>> [
@@ -59,8 +71,11 @@ sokoban-gadget H{
 : tick ( gadget -- )
     dup sokoban>> update-level? [
         update-sokoban
-    ] [ ] if 
-    relayout-1 ;
+        relayout-window
+    ] [ 
+        relayout-1
+    ] if 
+     ;
 
 M: sokoban-gadget graft* ( gadget -- )
     [ [ tick ] curry 100 milliseconds every ] keep timer<< ;
