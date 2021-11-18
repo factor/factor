@@ -13,7 +13,8 @@ IN: sokoban.piece
 TUPLE: piece
     { tetromino tetromino }
     { level_num integer initial: 0 }
-    { location array initial: { 0 0 } } ;
+    { location array initial: { 0 0 } }
+    { path } ;
 
 : <piece> ( tetromino -- piece )
     piece new swap >>tetromino ;
@@ -40,11 +41,11 @@ TUPLE: piece
     get-board <piece> ;
 
 : <player-piece> ( level -- piece )
-    get-player <piece> swap set-location ;
+    get-player <piece> swap set-location "vocab:minesweeper/_resources/smileyuhoh.gif" >>path ;
     
 
 :: <box-piece> ( box-number goal-piece level  -- piece )
-    box-number get-box <piece> level set-location dup [ tetromino>> ] [ location>> ] bi
+    box-number get-box <piece> level set-location "vocab:minesweeper/_resources/smileylost.gif" >>path dup [ tetromino>> ] [ location>> ] bi
     goal-piece swap { 0 0 } is-goal?
     [
         COLOR: blue
