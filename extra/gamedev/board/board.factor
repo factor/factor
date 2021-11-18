@@ -7,9 +7,8 @@ TUPLE: board width height cells default-cell ;
 :: make-cells ( cell width height -- cells )
     height [ width [ cell ] replicate ] replicate ;
 
-:: make-board ( cells default-cell -- board )
-    cells length :> height
-    cells first length :> width
+:: make-board ( width height default-cell -- board )
+    default-cell width height make-cells :> cells
     width height default-cell cells board boa ;
 
 :: get-cell ( board location -- cell )
@@ -30,3 +29,11 @@ TUPLE: board width height cells default-cell ;
 
 :: duplicate-cell ( board start dest -- board )
     board start get-cell board dest set-cell ;
+
+:: swap-cells ( board loc1 loc2 -- board )
+    board loc1 get-cell :> cell1
+    board loc2 get-cell :> cell2
+    cell1 board loc2 set-cell
+    cell2 swap loc1 set-cell ;
+
+
