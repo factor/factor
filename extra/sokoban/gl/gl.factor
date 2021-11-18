@@ -8,25 +8,14 @@ IN: sokoban.gl
 
 ! OpenGL rendering for sokoban ;
 
-! : draw-cached-texture ( path gadget -- )
-!    textures>> [ load-image { 0 0 } <texture> ] cache
-!     [ dim>> [ 2 /i ] map ] [ draw-scaled-texture ] bi ;
-
 : draw-block ( block -- )
     { 1 1 } gl-fill-rect ;
 
 : draw-sprite ( block path -- )
     load-image swap <texture> { 1 1 } swap draw-scaled-texture ;
 
-: draw-wall-blocks ( piece -- )
-    ! walls isn't actually drawn here! TODO: change functions names to clarify
-    wall-blocks [ "vocab:minesweeper/_resources/smileyuhoh.gif" draw-sprite ] each ;
-
-: draw-piece-blocks ( piece -- )
-    piece-blocks [ "vocab:minesweeper/_resources/smileyuhoh.gif" draw-sprite ] each ;
-
-! : draw-walls ( piece -- )
-!    dup tetromino>> color>> gl-color draw-wall-blocks ;
+:: draw-piece-blocks ( piece -- )
+    piece piece-blocks [ piece path>> draw-sprite ] each ;
 
 : draw-piece ( piece -- )
     dup tetromino>> color>> gl-color draw-piece-blocks ;
@@ -40,7 +29,6 @@ IN: sokoban.gl
 
 : draw-goal-piece ( piece -- )
     dup tetromino>> color>> gl-color draw-goal-blocks ;
-
 
 ! TODO: move implementation specific stuff into sokoban-board
 : (draw-row) ( x y row -- )
