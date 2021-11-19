@@ -29,6 +29,10 @@ TUPLE: board width height cells default-cell ;
 :: duplicate-cell ( board start dest -- board )
     board dup start get-cell dest set-cell ;
 
+:: move-cell ( board start dest -- board )
+    board start dest duplicate-cell
+    start delete-cell ;
+
 :: swap-cells ( board loc1 loc2 -- board )
     board loc1 get-cell :> cell1
     board loc2 get-cell :> cell2
