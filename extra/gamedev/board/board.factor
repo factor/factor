@@ -12,8 +12,7 @@ TUPLE: board width height cells default-cell ;
     width height cells default-cell board boa ;
 
 :: get-cell ( board location -- cell )
-    location first :> x
-    location second :> y
+    location first2 :> ( x y )
     board cells>> :> cells
     x y cells nth nth ;
 
