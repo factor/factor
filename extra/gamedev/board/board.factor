@@ -4,8 +4,10 @@ IN: gamedev.board
 
 TUPLE: board width height cells default-cell ;
 
+! use clone so the cells don't all point to the same location in memory
+
 :: make-cells ( cell width height -- cells )
-    height [ width [ cell ] replicate ] replicate ;
+    height [ width [ cell clone ] replicate ] replicate ;
 
 :: make-board ( width height default-cell -- board )
     default-cell width height make-cells :> cells
@@ -40,3 +42,13 @@ TUPLE: board width height cells default-cell ;
 
 :: is-empty? ( board location -- ? )
     board location get-cell board default-cell>> = ;
+
+:: change-cell ( board location quot -- board )
+    location first2 :> ( x y )
+    board cells>> :> cells
+    y x cells nth quot change-nth
+    board ; inline
+
+! :: reset-board ( board )
+
+! implement parent-piece
