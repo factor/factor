@@ -55,4 +55,9 @@ TUPLE: board width height cells default-cell ;
 :: find-row ( board quot -- index row )
     board cells>> [ quot find swap drop not not ] find ; inline
 
+:: find-cell ( board quot -- x y cell )
+    board quot find-row swap :> y
+    quot find swap :> x
+    { x y } swap ; inline
+
 ! implement parent-piece
