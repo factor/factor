@@ -4,7 +4,6 @@ IN: gamedev.board
 
 TUPLE: board width height cells default-cell ;
 
-! use clone so the cells don't all point to the same location in memory
 :: make-cells ( width height cell -- cells )
     height [ width [ cell clone ] replicate ] replicate ;
 
@@ -12,6 +11,7 @@ TUPLE: board width height cells default-cell ;
     width height default-cell make-cells :> cells
     width height cells default-cell board boa ;
 
+! Sets all cells to the default cell
 :: reset-board ( board -- board )
     board width>> board height>> board default-cell>> make-board ;
 
@@ -26,6 +26,7 @@ TUPLE: board width height cells default-cell ;
     new-cell x y cells nth set-nth
     board ;
 
+! Sets a cell back to the default cell
 :: delete-cell ( board location -- board )
     board location board default-cell>> set-cell ;
 
@@ -42,9 +43,11 @@ TUPLE: board width height cells default-cell ;
     board loc2 cell1 set-cell
     loc1 cell2 set-cell ;
 
+! Returns true if all cells are the default cell
 :: is-empty? ( board location -- ? )
     board location get-cell board default-cell>> = ;
 
+! Applies a quotation to a specific cell
 :: change-cell ( board location quot -- board )
     location first2 :> ( x y )
     board cells>> :> cells
