@@ -5,27 +5,29 @@ IN: gamedev.board
 TUPLE: board width height cells default-cell ;
 
 ! use clone so the cells don't all point to the same location in memory
-
-:: make-cells ( cell width height -- cells )
+:: make-cells ( width height cell -- cells )
     height [ width [ cell clone ] replicate ] replicate ;
 
 :: make-board ( width height default-cell -- board )
-    default-cell width height make-cells :> cells
+    width height default-cell make-cells :> cells
     width height cells default-cell board boa ;
+
+:: reset-board ( board -- board )
+    board width>> board height>> board default-cell>> make-board ;
 
 :: get-cell ( board location -- cell )
     location first2 :> ( x y )
     board cells>> :> cells
     x y cells nth nth ;
 
-:: set-cell ( board new-cell location -- board )
+:: set-cell ( board location new-cell -- board )
     location first2 :> ( x y )
     board cells>> :> cells
     new-cell x y cells nth set-nth
     board ;
 
 :: delete-cell ( board location -- board )
-    board dup default-cell>> location set-cell ;
+    board location board default-cell>> set-cell ;
 
 :: duplicate-cell ( board start dest -- board )
     board dup start get-cell dest set-cell ;
@@ -37,8 +39,8 @@ TUPLE: board width height cells default-cell ;
 :: swap-cells ( board loc1 loc2 -- board )
     board loc1 get-cell :> cell1
     board loc2 get-cell :> cell2
-    board cell1 loc2 set-cell
-    cell2 loc1 set-cell ;
+    board loc2 cell1 set-cell
+    loc1 cell2 set-cell ;
 
 :: is-empty? ( board location -- ? )
     board location get-cell board default-cell>> = ;
@@ -49,6 +51,8 @@ TUPLE: board width height cells default-cell ;
     y x cells nth quot change-nth
     board ; inline
 
-! :: reset-board ( board )
+! Return row and index that contains the first cell that satisfies quot
+:: find-row ( board quot -- index row )
+    board cells>> [ quot find swap drop not not ] find ; inline
 
 ! implement parent-piece
