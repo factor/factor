@@ -51,10 +51,11 @@ TUPLE: board width height cells default-cell ;
     y x cells nth quot change-nth
     board ; inline
 
-! Return row and index that contains the first cell that satisfies quot
+! Return index and row that contains the first cell that satisfies quot
 :: find-row ( board quot -- index row )
     board cells>> [ quot find swap drop not not ] find ; inline
 
+! Return location and cell that satisfies quot
 :: find-cell ( board quot -- x y cell )
     board quot find-row swap :> y
     quot find swap :> x
