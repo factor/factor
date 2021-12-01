@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors combinators kernel lists math math.functions math.vectors
-sequences system sokoban.board sokoban.piece sokoban.tetromino colors 
+sequences system sokoban.board sokoban.piece sokoban.tetromino sokoban.sound colors 
 colors.constants namespaces locals ;
 
 IN: sokoban.game
@@ -80,6 +80,7 @@ TUPLE: sokoban
                 [   ! Next location of box is a goal point
                     soko player>> mov move-piece drop
                     box2move mov move-piece
+                    play-beep
                     "vocab:minesweeper/_resources/smileywon.gif" >>path
                     tetromino>> COLOR: blue >>color drop t ! change color once box is on goal
                 ]
