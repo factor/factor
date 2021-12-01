@@ -1507,7 +1507,7 @@ HELP: virtual@
 
 HELP: 2map-reduce
 { $values
-     { "seq1" sequence } { "seq2" sequence } { "map-quot" { $quotation ( ..a elt1 elt2 -- ..b intermediate ) } } { "reduce-quot" { $quotation ( ..b prev intermediate -- ..a next ) } }
+     { "seq1" sequence } { "seq2" sequence } { "map-quot" { $quotation ( ..a elt1 elt2 -- ..a intermediate ) } } { "reduce-quot" { $quotation ( ..a prev intermediate -- ..a next ) } }
      { "result" object } }
  { $description "Calls " { $snippet "map-quot" } " on each pair of elements from " { $snippet "seq1" } " and " { $snippet "seq2" } " and combines the results using " { $snippet "reduce-quot" } " in the same manner as " { $link reduce } ", except that there is no identity element, and the sequence must have a length of at least 1." }
 { $errors "Throws an error if the sequence is empty." }
@@ -1587,7 +1587,7 @@ HELP: insert-nth
 
 HELP: map-reduce
 { $values
-     { "seq" sequence } { "map-quot" { $quotation ( ..a elt -- ..b intermediate ) } } { "reduce-quot" { $quotation ( ..b prev intermediate -- ..a next ) } }
+     { "seq" sequence } { "map-quot" { $quotation ( ..a elt -- ..a intermediate ) } } { "reduce-quot" { $quotation ( ..a prev intermediate -- ..a next ) } }
      { "result" object } }
 { $description "Calls " { $snippet "map-quot" } " on each element and combines the results using " { $snippet "reduce-quot" } " in the same manner as " { $link reduce } ", except that there is no identity element, and the sequence must have a length of at least 1." }
 { $errors "Throws an error if the sequence is empty." }
