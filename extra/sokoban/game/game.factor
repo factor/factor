@@ -40,6 +40,7 @@ TUPLE: sokoban
 
 : <default-sokoban> ( -- sokoban )
     ! Level 0 sokoban
+    play-music
     0 8 9 <sokoban> ;
 
 : toggle-pause ( sokoban -- )
