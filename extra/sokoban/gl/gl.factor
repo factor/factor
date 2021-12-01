@@ -1,25 +1,21 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors colors.constants combinators math.vectors
-kernel math opengl opengl.gl sequences sokoban.game sokoban.piece
+kernel math opengl opengl.gl opengl.textures sequences sokoban.game sokoban.piece images.loader
 ;
 
 IN: sokoban.gl
 
-! OpenGL rendering for sokoban 
+! OpenGL rendering for sokoban ;
 
 : draw-block ( block -- )
     { 1 1 } gl-fill-rect ;
 
-: draw-wall-blocks ( piece -- )
-    ! walls isn't actually drawn here! TODO: change functions names to clarify
-    wall-blocks [ draw-block ] each ;
+: draw-sprite ( block path -- )
+    load-image swap <texture> { 1 1 } swap draw-scaled-texture ;
 
-: draw-piece-blocks ( piece -- )
-    piece-blocks [ draw-block ] each ;
-
-: draw-walls ( piece -- )
-    dup tetromino>> color>> gl-color draw-wall-blocks ;
+:: draw-piece-blocks ( piece -- )
+    piece piece-blocks [ piece path>> draw-sprite ] each ;
 
 : draw-piece ( piece -- )
     dup tetromino>> color>> gl-color draw-piece-blocks ;
@@ -33,7 +29,6 @@ IN: sokoban.gl
 
 : draw-goal-piece ( piece -- )
     dup tetromino>> color>> gl-color draw-goal-blocks ;
-
 
 ! TODO: move implementation specific stuff into sokoban-board
 : (draw-row) ( x y row -- )

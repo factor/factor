@@ -80,6 +80,7 @@ TUPLE: sokoban
                 [   ! Next location of box is a goal point
                     soko player>> mov move-piece drop
                     box2move mov move-piece
+                    "vocab:minesweeper/_resources/smileywon.gif" >>path
                     tetromino>> COLOR: blue >>color drop t ! change color once box is on goal
                 ]
                 [   ! Next location of box is a free space
