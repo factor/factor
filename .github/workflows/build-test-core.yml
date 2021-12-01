@@ -16,5 +16,5 @@ jobs:
     - name: build
       run: ./build.sh update
     - name: test-core
-      run: ./factor -e="USE: zealot.factor USE: tools.test USE: tools.test.private [ zealot-core-vocabs test-vocabs ] with-child-options"
+      run: "./factor -e=\"USE: zealot.factor USE: tools.test USE: tools.test.private [ zealot-core-vocabs test-vocabs ] with-child-options\""
   
