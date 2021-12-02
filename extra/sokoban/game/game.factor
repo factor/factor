@@ -12,6 +12,7 @@ TUPLE: sokoban
     { player }
     { boxes }
     { goals }
+    { engine }
     { last-update integer initial: 0 }
     { level integer initial: 0 }
     { paused? initial: f }
@@ -36,12 +37,14 @@ TUPLE: sokoban
     board >>board
     goals >>goals
     goals lev <box-seq> >>boxes
+    create-engine >>engine ! make audio engine
     soko add-walls ; ! draw walls
+
 
 : <default-sokoban> ( -- sokoban )
     ! Level 0 sokoban
-    play-music
-    0 8 9 <sokoban> ;
+    0 8 9 <sokoban> 
+    dup engine>> play-music ;
 
 : toggle-pause ( sokoban -- )
     [ not ] change-paused? drop ;
@@ -81,7 +84,7 @@ TUPLE: sokoban
                 [   ! Next location of box is a goal point
                     soko player>> mov move-piece drop
                     box2move mov move-piece
-                    play-beep
+                    soko engine>> play-beep
                     "vocab:minesweeper/_resources/smileywon.gif" >>path
                     tetromino>> COLOR: blue >>color drop t ! change color once box is on goal
                 ]

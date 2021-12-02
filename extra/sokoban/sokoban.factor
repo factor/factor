@@ -39,7 +39,6 @@ M: sokoban-gadget pref-dim* ( gadget -- dim )
     sokoban>> window-size ;
     ! drop { 700 800 } ; ! needs to be changed as well
 
-
 : update-status ( gadget -- )
     dup sokoban>> [
         [ "Level: " % level>> # ]
