@@ -8,13 +8,20 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: build
       run: ./build.sh update
+    - name: test-core
+      run: "./factor -e=\"USE: zealot.factor USE: tools.test USE: tools.test.private [ zealot-core-vocabs test-vocabs ] with-child-options\""
+  
+  build-macos:
+    runs-on: macos-11
+    steps:
+    - uses: actions/checkout@v2
+    - name: build
+      run: arch -x86_64 ./build.sh update
     - name: test-core
       run: "./factor -e=\"USE: zealot.factor USE: tools.test USE: tools.test.private [ zealot-core-vocabs test-vocabs ] with-child-options\""
   
