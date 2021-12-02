@@ -7,18 +7,18 @@ sequences random math.vectors audio.engine ;
 
 IN: sokoban.sound
 
-:: play-beep ( -- )
+: create-engine ( -- engine )
+    f 10 <audio-engine> ;
+
+:: play-beep ( engine -- )
     "vocab:sokoban/resources/once.wav" read-audio :> once-sound
-    f 4 <audio-engine> :> engine
     engine start-audio*
     
     engine T{ audio-source f { 0.0 0.0 0.0 } 1.0 { 0.0 0.0 0.0 } f } once-sound f
-        play-static-audio-clip drop
-    [ engine dispose ] 1 seconds later drop ;
+        play-static-audio-clip drop ;
 
-:: play-music ( -- )
+:: play-music ( engine -- )
     "vocab:sokoban/resources/Tetris.wav" read-audio :> loop-sound
-    f 4 <audio-engine> :> engine
     engine start-audio*
     
     engine T{ audio-source f { 0.0 0.0 0.0 } 1.0 { 0.0 0.0 0.0 } f } loop-sound t
