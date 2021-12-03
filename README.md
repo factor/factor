@@ -161,7 +161,7 @@ anything related to Factor or language design in general.
 
 * [Factor homepage](https://factorcode.org)
 * [Concatenative languages wiki](https://concatenative.org)
-* [Mailing list](factor-talk@lists.sourceforge.net)
+* [Join the mailing list](https://concatenative.org/wiki/view/Factor/Mailing%20list)
 * Search for "factorcode" on [Gitter](https://gitter.im/)
 * Search for "Factor" on [Discord](https://discord.com/)
 * [Join the Slack group](https://factorcode.slack.com/)
