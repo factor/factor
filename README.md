@@ -163,6 +163,7 @@ anything related to Factor or language design in general.
 * [Concatenative languages wiki](https://concatenative.org)
 * [Mailing list](factor-talk@lists.sourceforge.net)
 * Search for "factorcode" on [Gitter](https://gitter.im/)
+* Search for "Factor" on [Discord](https://discord.com/)
 * [Join the Slack group](https://factorcode.slack.com/)
 
 Have fun!
