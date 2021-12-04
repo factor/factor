@@ -32,6 +32,9 @@ GENERIC: add-depends-on-class ( classoid -- )
 M: class add-depends-on-class
     +conditional+ depends-on ;
 
+M: wrapper add-depends-on-class
+    superclass-of +conditional+ depends-on ;
+
 M: maybe add-depends-on-class
     class>> add-depends-on-class ;
 

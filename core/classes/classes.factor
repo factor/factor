@@ -153,6 +153,8 @@ GENERIC: implementors ( class/classes -- seq )
 
 M: class implementors implementors-map get at members ;
 
+M: wrapper implementors implementors-map get at members ;
+
 M: sequence implementors [ implementors ] gather ;
 
 <PRIVATE
@@ -166,8 +168,18 @@ M: sequence implementors [ implementors ] gather ;
 : implementors-map+ ( class -- )
     [ HS{ } clone ] dip implementors-map get set-at ;
 
+: ensure-singleton-type ( wrapper -- )
+    [ implementors-map get [ drop HS{ } clone ] cache drop ]
+    [ update-map+ ] bi
+    ;
+
 : implementors-map- ( class -- )
     implementors-map get delete-at ;
+
+: maybe-remove-singleton-type ( wrapper -- )
+    dup implementors empty?
+    [ [ update-map- ] [ implementors-map- ] bi ]
+    [ drop ] if ;
 
 : make-class-props ( superclass members participants metaclass -- assoc )
     [
