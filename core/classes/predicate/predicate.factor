@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes classes.algebra classes.algebra.private
-classes.private kernel words ;
+USING: accessors classes classes.algebra classes.algebra.private classes.private
+kernel words ;
 IN: classes.predicate
 
 PREDICATE: predicate-class < class
@@ -42,4 +42,9 @@ M: predicate-class (flatten-class)
     superclass-of (flatten-class) ;
 
 M: predicate-class (classes-intersect?)
-    superclass-of classes-intersect? ;
+    2dup superclass-of classes-intersect?
+    [ over wrapper?
+      [ [ wrapped>> ] dip instance? ]
+      [ 2drop t ] if ]
+    [ 2drop f ] if
+    ;

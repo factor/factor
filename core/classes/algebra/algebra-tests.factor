@@ -361,3 +361,78 @@ TUPLE: xh < xb ;
 { sa } [ sa { sa sb sc } min-class ] unit-test
 
 [ \ + flatten-class ] must-fail
+
+! Wrappers as singleton types
+PREDICATE: zero < integer 0 = ;
+{
+    {
+        t
+        f
+        t
+
+        f
+        f
+        f
+
+        t
+        f
+
+        t
+        f ! imprecise
+
+        f
+        f
+    }
+}
+[ {
+        { W{ "st" } string }
+        { W{ "st" } number }
+        { W{ "st" } object }
+
+        { string W{ "st" } }
+        { number W{ "st" } }
+        { object W{ "st" } }
+
+        { W{ 1 } fixnum }
+        { fixnum W{ 1 } }
+
+        { W{ 0 } zero }
+        { zero W{ 0 } }
+
+        { W{ 1 } zero }
+        { zero W{ 1 } }
+     } [ first2 class<= ] map
+] unit-test
+
+{ { number integer zero fixnum \= 5 W{ 42 } \= 1 bignum \= 99999999999999999999 } }
+[ { integer zero \= 1 fixnum W{ 42 } number \= 5 \= 99999999999999999999 bignum } sort-classes ] unit-test
+
+{ f }
+[ \= W{ 42 } bignum classes-intersect? ] unit-test
+
+{ t }
+[ \= W{ 42 } fixnum classes-intersect? ] unit-test
+
+{ t }
+[ \= W{ 42 } integer classes-intersect? ] unit-test
+
+{ null }
+[ \= W{ 42 } \= \= 33 class-and ] unit-test
+
+{ W{ 42 } }
+[ \= W{ 42 } fixnum class-and ] unit-test
+
+{ W{ 42 } }
+[ \= W{ 42 } integer class-and ] unit-test
+
+{ W{ 42 } }
+[ \= W{ 42 } 41 1 + <wrapper> class-and ] unit-test
+
+{ integer }
+[ \= W{ 42 } integer class-or ] unit-test
+
+{ null }
+[ \= W{ 42 } zero class-and ] unit-test
+
+{ union{ zero W{ 42 } } }
+[ \= W{ 42 } zero class-or ] unit-test
