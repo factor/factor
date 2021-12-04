@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors timers arrays calendar kernel make math math.rectangles
-math.parser namespaces sequences system sokoban.game sokoban.tetromino sokoban.gl ui.gadgets
+USING: accessors timers arrays calendar destructors kernel make math math.rectangles
+math.parser namespaces sequences system sokoban.game sokoban.tetromino sokoban.gl sokoban.sound ui.gadgets
 ui.gadgets.labels ui.gadgets.worlds ui.gadgets.status-bar ui.gestures
 ui.render ui ;
 IN: sokoban
@@ -9,6 +9,7 @@ IN: sokoban
 TUPLE: sokoban-gadget < gadget { sokoban sokoban } { timer } { window-dims array initial: { 700 800 } } ;
 
 : <sokoban-gadget> ( sokoban -- gadget )
+    create-engine >>engine
     sokoban-gadget new swap >>sokoban ;
 
 :: get-dim ( sokoban level -- level w h )
@@ -20,7 +21,9 @@ TUPLE: sokoban-gadget < gadget { sokoban sokoban } { timer } { window-dims array
 
 : new-sokoban ( gadget -- gadget )
     ! Restarts sokoban without changing levels
-    [ dup level>> get-dim <sokoban> ] change-sokoban ;
+    dup sokoban>> engine>> swap
+    [ dup level>> get-dim <sokoban> ] change-sokoban
+    swap over sokoban>> swap >>engine >>sokoban ;
 
 :: window-size ( sokoban -- window-size )
     sokoban level>> :> level
@@ -32,13 +35,14 @@ TUPLE: sokoban-gadget < gadget { sokoban sokoban } { timer } { window-dims array
 
 : update-sokoban ( gadget -- gadget )
     ! Changes to the next level of sokoban
+    dup sokoban>> engine>> swap
     [ dup level>> 1 + get-dim <sokoban> ] change-sokoban 
-    dup sokoban>> window-size >>window-dims ;
+    dup sokoban>> window-size >>window-dims 
+    swap over sokoban>> swap >>engine >>sokoban ;
 
 M: sokoban-gadget pref-dim* ( gadget -- dim ) 
     sokoban>> window-size ;
     ! drop { 700 800 } ; ! needs to be changed as well
-
 
 : update-status ( gadget -- )
     dup sokoban>> [
@@ -78,9 +82,11 @@ sokoban-gadget H{
      ;
 
 M: sokoban-gadget graft* ( gadget -- )
+    dup sokoban>> engine>> play-music
     [ [ tick ] curry 100 milliseconds every ] keep timer<< ;
 
 M: sokoban-gadget ungraft* ( gadget -- )
+    dup sokoban>> engine>> dispose
     [ stop-timer f ] change-timer drop ;
 
 : sokoban-window ( -- )

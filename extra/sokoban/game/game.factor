@@ -12,6 +12,7 @@ TUPLE: sokoban
     { player }
     { boxes }
     { goals }
+    { engine }
     { last-update integer initial: 0 }
     { level integer initial: 0 }
     { paused? initial: f }
@@ -36,12 +37,14 @@ TUPLE: sokoban
     board >>board
     goals >>goals
     goals lev <box-seq> >>boxes
+    ! create-engine >>engine ! make audio engine
     soko add-walls ; ! draw walls
+
 
 : <default-sokoban> ( -- sokoban )
     ! Level 0 sokoban
-    play-music
     0 8 9 <sokoban> ;
+    ! dup engine>> play-music ;
 
 : toggle-pause ( sokoban -- )
     [ not ] change-paused? drop ;
@@ -81,8 +84,8 @@ TUPLE: sokoban
                 [   ! Next location of box is a goal point
                     soko player>> mov move-piece drop
                     box2move mov move-piece
-                    play-beep
-                    "vocab:minesweeper/_resources/smileywon.gif" >>path
+                    soko engine>> play-beep
+                    "vocab:sokoban/resources/CrateDark_Yellow.png" >>path
                     tetromino>> COLOR: blue >>color drop t ! change color once box is on goal
                 ]
                 [   ! Next location of box is a free space
@@ -104,13 +107,13 @@ TUPLE: sokoban
     ] if ;
 
 
-: move-left ( sokoban -- ) { -1 0 } sokoban-move drop ;
+: move-left ( sokoban -- ) dup player>> "vocab:sokoban/resources/CharL.png" >>path drop { -1 0 } sokoban-move drop ;
 
-: move-right ( sokoban -- ) { 1 0 } sokoban-move drop ;
+: move-right ( sokoban -- ) dup player>> "vocab:sokoban/resources/CharR.png" >>path drop { 1 0 } sokoban-move drop ;
 
-: move-down ( sokoban -- ) { 0 1 } sokoban-move drop ;
+: move-down ( sokoban -- ) dup player>> "vocab:sokoban/resources/CharF.png" >>path drop { 0 1 } sokoban-move drop ;
 
-: move-up ( sokoban -- ) { 0 -1 } sokoban-move drop ;
+: move-up ( sokoban -- ) dup player>> "vocab:sokoban/resources/CharB.png" >>path drop { 0 -1 } sokoban-move drop ;
 
 : update-level? ( sokoban -- ? )
     ! Get color color of each box
