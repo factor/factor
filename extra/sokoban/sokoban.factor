@@ -21,7 +21,9 @@ TUPLE: sokoban-gadget < gadget { sokoban sokoban } { timer } { window-dims array
 
 : new-sokoban ( gadget -- gadget )
     ! Restarts sokoban without changing levels
-    [ dup level>> get-dim <sokoban> ] change-sokoban ;
+    dup sokoban>> engine>> swap
+    [ dup level>> get-dim <sokoban> ] change-sokoban
+    swap over sokoban>> swap >>engine >>sokoban ;
 
 :: window-size ( sokoban -- window-size )
     sokoban level>> :> level
@@ -33,8 +35,10 @@ TUPLE: sokoban-gadget < gadget { sokoban sokoban } { timer } { window-dims array
 
 : update-sokoban ( gadget -- gadget )
     ! Changes to the next level of sokoban
+    dup sokoban>> engine>> swap
     [ dup level>> 1 + get-dim <sokoban> ] change-sokoban 
-    dup sokoban>> window-size >>window-dims ;
+    dup sokoban>> window-size >>window-dims 
+    swap over sokoban>> swap >>engine >>sokoban ;
 
 M: sokoban-gadget pref-dim* ( gadget -- dim ) 
     sokoban>> window-size ;
