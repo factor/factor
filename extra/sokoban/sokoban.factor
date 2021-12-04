@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors timers arrays calendar kernel make math math.rectangles
-math.parser namespaces sequences system sokoban.game sokoban.tetromino sokoban.gl ui.gadgets
+USING: accessors timers arrays calendar destructors kernel make math math.rectangles
+math.parser namespaces sequences system sokoban.game sokoban.tetromino sokoban.gl sokoban.sound ui.gadgets
 ui.gadgets.labels ui.gadgets.worlds ui.gadgets.status-bar ui.gestures
 ui.render ui ;
 IN: sokoban
@@ -9,6 +9,7 @@ IN: sokoban
 TUPLE: sokoban-gadget < gadget { sokoban sokoban } { timer } { window-dims array initial: { 700 800 } } ;
 
 : <sokoban-gadget> ( sokoban -- gadget )
+    create-engine >>engine
     sokoban-gadget new swap >>sokoban ;
 
 :: get-dim ( sokoban level -- level w h )
@@ -77,9 +78,11 @@ sokoban-gadget H{
      ;
 
 M: sokoban-gadget graft* ( gadget -- )
+    dup sokoban>> engine>> play-music
     [ [ tick ] curry 100 milliseconds every ] keep timer<< ;
 
 M: sokoban-gadget ungraft* ( gadget -- )
+    dup sokoban>> engine>> dispose
     [ stop-timer f ] change-timer drop ;
 
 : sokoban-window ( -- )

@@ -41,11 +41,11 @@ TUPLE: piece
     get-board <piece> ;
 
 : <player-piece> ( level -- piece )
-    get-player <piece> swap set-location "vocab:minesweeper/_resources/smileyuhoh.gif" >>path ;
+    get-player <piece> swap set-location "vocab:sokoban/resources/CharR.png" >>path ;
     
 
 :: <box-piece> ( box-number goal-piece level  -- piece )
-    box-number get-box <piece> level set-location "vocab:minesweeper/_resources/smileylost.gif" >>path dup [ tetromino>> ] [ location>> ] bi
+    box-number get-box <piece> level set-location "vocab:sokoban/resources/Crate_Yellow.png" >>path dup [ tetromino>> ] [ location>> ] bi
     goal-piece swap { 0 0 } is-goal?
     [
         COLOR: blue
