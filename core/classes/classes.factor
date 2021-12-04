@@ -100,9 +100,13 @@ M: predicate reset-word
 : define-predicate ( class quot -- )
     [ predicate-word ] dip ( object -- ? ) define-declared ;
 
-: superclass-of ( class -- super )
-    ! Output f for non-classes to work with algebra code
-    dup class? [ "superclass" word-prop ] [ drop f ] if ;
+GENERIC: superclass-of ( class -- super )
+
+M: class superclass-of
+    "superclass" word-prop ;
+
+! Output f for non-classes to work with algebra code
+M: object superclass-of drop f ;
 
 : superclasses-of ( class -- supers )
     [ superclass-of ] follow reverse! ;
