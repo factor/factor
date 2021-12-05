@@ -26,7 +26,7 @@ M: windowed-sequence length
 
 :: rolling-map ( ... seq n quot: ( ... slice -- ... elt ) -- ... newseq )
     seq length [
-        [ n [-] ] [ seq <slice-unsafe> ] bi quot call
+        1 + [ n [-] ] [ seq <slice-unsafe> ] bi quot call
     ] { } map-integers ; inline
 
 : rolling-sum ( seq n -- newseq )
