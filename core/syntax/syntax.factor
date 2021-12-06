@@ -188,7 +188,7 @@ IN: bootstrap.syntax
 
     "INSTANCE:" [
         location [
-            scan-word scan-word 2dup add-mixin-instance
+            scan-class scan-word 2dup add-mixin-instance
             <mixin-instance>
         ] dip remember-definition
     ] define-core-syntax
