@@ -18,7 +18,7 @@ SYMBOL: current-day
 SYMBOL: current-stream
 
 : bot-profile ( -- obj )
-    "irc.freenode.org" 6667
+    "irc.libera.chat" 6697
     nickserv-handle get default-nickserv-handle or
     nickserv-password get <irc-profile> ;
 

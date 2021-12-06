@@ -9,7 +9,7 @@ SYMBOL: nickserv-handle
 SYMBOL: nickserv-password
 
 : bot-profile ( -- obj )
-    "irc.freenode.org" 6667
+    "irc.libera.chat" 6697
     nickserv-handle get "stackoid2" or
     nickserv-password get <irc-profile> ;
 
