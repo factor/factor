@@ -83,6 +83,9 @@ GENERIC: predicate-def ( obj -- quot )
 M: word predicate-def
     "predicate" word-prop ;
 
+M: wrapper predicate-def
+    wrapped>> [ = ] curry ;
+
 M: object predicate-def
     [ instance? ] curry ;
 
@@ -129,6 +132,11 @@ GENERIC: contained-classes ( obj -- members )
 
 M: object contained-classes
     "members" word-prop ;
+
+! We allow self-reference semantically.  I.e. UNION: foo \ foo ; is considered
+! valid, because \ foo will not be treated as a union class, but can only be
+! compared for symbolic equality.
+M: wrapper contained-classes drop f ;
 
 : all-contained-classes ( members -- members' )
     dup dup [ contained-classes ] map concat sift append

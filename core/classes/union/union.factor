@@ -22,6 +22,8 @@ M: union-class union-of-builtins?
 M: class union-of-builtins?
     drop f ;
 
+M: wrapper union-of-builtins? drop f ;
+
 : empty-union-predicate-quot ( class -- quot )
     drop [ drop f ] ;
 
@@ -73,7 +75,7 @@ M: class union-of-builtins?
     class-members
     [ union-of-builtins? ] partition
     [ [ f ] [ builtin-union-predicate-quot ] if-empty ] dip
-    [ [ tuple-class? ] [ tuple-layout ] bi and ] partition
+    [ dup tuple-class? [ tuple-layout ] [ drop f ] if ] partition
     [ [ f ] [ tuple-union-predicate-quot ] if-empty ] dip
     [ predicate-def ] map
     swap [ suffix ] when*
