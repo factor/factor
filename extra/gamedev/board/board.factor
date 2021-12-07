@@ -1,4 +1,4 @@
-USING: sequences kernel accessors ;
+USING: sequences kernel accessors sequences.extras ;
 
 IN: gamedev.board
 
@@ -54,14 +54,37 @@ TUPLE: board width height cells default-cell ;
     y x cells nth quot change-nth
     board ; inline
 
-! Return index and row that contains the first cell that satisfies quot
+! Return index and row that contains the first cell that satisfies the quot
 :: find-row ( board quot -- index row )
     board cells>> [ quot find swap drop not not ] find ; inline
 
-! Return location and cell that satisfies quot
+! Return first location and cell that satisfies the quot
 :: find-cell ( board quot -- x y cell )
     board quot find-row swap :> y
     quot find swap :> x
     { x y } swap ; inline
 
-! implement parent-piece
+! Return first cell that satisfies the quot
+:: find-cell-nopos ( board quot -- index row )
+    board cells>> [ quot find swap drop ] map-find drop ; inline
+
+! Returns a vector containing index row pairs
+:: find-all-rows ( board quot -- index row )
+    board cells>> [ quot find swap drop not not ] find-all ; inline
+
+
+! Helper function that formats a position cell pair
+:: label-cell ( y cell x -- seq )
+    { { x y } cell } ;
+
+! Helper function that finds all cells in an given row that satisfy the quot 
+:: row-to-cells ( seq quot -- cells )
+    seq first2 :> ( x row )
+    row quot find-all :> indexed-cells
+    indexed-cells [ first2 x label-cell ] map ; inline
+
+! Return a vector of position cell pairs of all cells in the board that satisfy the quot
+:: find-all-cells ( board quot -- assoc )
+    board quot find-all-rows :> row-list ! find-all - returns vector w/ index/elt
+    row-list [ quot row-to-cells ] map concat ; inline
+    
