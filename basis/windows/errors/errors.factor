@@ -726,12 +726,18 @@ ERROR: windows-error n string ;
 : n>win32-error-check ( n -- )
     [ throw-windows-error ] unless-zero ;
 
+: win32-error-ignore-timeout ( -- )
+    GetLastError
+    dup 258 = [ drop ] [ throw-windows-error ] if ;
+
 ! Note that win32-error* words throw GetLastError code.
 : win32-error ( -- ) GetLastError n>win32-error-check ;
 : win32-error=0/f ( n -- ) { 0 f } member? [ win32-error ] when ;
 : win32-error>0 ( n -- ) 0 > [ win32-error ] when ;
 : win32-error<0 ( n -- ) 0 < [ win32-error ] when ;
 : win32-error<>0 ( n -- ) zero? [ win32-error ] unless ;
+: win32-error=0/f-ignore-timeout ( n -- )
+    { 0 f } member? [ win32-error-ignore-timeout ] when ;
 
 : win32-allow-errors ( n allowed -- n )
     GetLastError 2dup swap member? [

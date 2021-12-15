@@ -701,8 +701,10 @@ M: windows-ui-backend (open-window)
     [ dup handle>> hWnd>> register-window ]
     [ handle>> hWnd>> show-window ] tri ;
 
+! https://github.com/factor/factor/issues/2173
+! ignore timeout (error 258)
 M: win-base select-gl-context
-    [ hDC>> ] [ hRC>> ] bi wglMakeCurrent win32-error=0/f
+    [ hDC>> ] [ hRC>> ] bi wglMakeCurrent win32-error=0/f-ignore-timeout
     GdiFlush drop ;
 
 M: win-base flush-gl-context
