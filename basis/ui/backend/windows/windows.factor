@@ -492,7 +492,7 @@ SYMBOL: nc-buttons
     over make-TRACKMOUSEEVENT
         TME_LEAVE >>dwFlags
         0 >>dwHoverTime
-    TrackMouseEvent drop
+    TrackMouseEvent win32-error=0/f
     >lo-hi swap window move-hand fire-motion ;
 
 :: handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
@@ -705,7 +705,7 @@ M: windows-ui-backend (open-window)
 ! ignore timeout (error 258)
 M: win-base select-gl-context
     [ hDC>> ] [ hRC>> ] bi wglMakeCurrent win32-error=0/f-ignore-timeout
-    GdiFlush drop ;
+    GdiFlush win32-error=0/f ;
 
 M: win-base flush-gl-context
     hDC>> SwapBuffers win32-error=0/f ;
