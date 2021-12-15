@@ -10,8 +10,8 @@ specialized-arrays strings threads ui ui.backend ui.clipboards
 ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
 ui.gestures ui.pixel-formats ui.private windows.dwmapi
 windows.errors windows.gdi32 windows.kernel32 windows.messages
-windows.offscreen windows.opengl32 windows.shell32 windows.types
-windows.user32 ;
+windows.offscreen windows.ole32 windows.opengl32 windows.shell32
+windows.types windows.user32 ;
 FROM: unicode => upper-surrogate? under-surrogate? ;
 SPECIALIZED-ARRAY: POINT
 QUALIFIED-WITH: alien.c-types c
@@ -512,7 +512,7 @@ SYMBOL: nc-buttons
 : ?make-glass ( world hwnd -- )
     over window-controls>> textured-background swap member-eq? [
         composition-enabled? [
-            full-window-margins DwmExtendFrameIntoClientArea drop
+            full-window-margins DwmExtendFrameIntoClientArea check-hresult
             T{ rgba f 0.0 0.0 0.0 0.0 }
         ] [ drop system-background-color ] if >>background-color
         drop
