@@ -40,7 +40,7 @@ if not errorlevel 1 (
 echo Deleting staging images from temp/...
 del temp\staging.*.image
 
-if "%1"!="net-bootstrap" (
+if not "%1"=="net-bootstrap" (
   echo Updating working copy from %GIT_BRANCH%...
   call git pull https://github.com/factor/factor %GIT_BRANCH%
   if errorlevel 1 goto fail
