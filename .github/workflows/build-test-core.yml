@@ -14,6 +14,11 @@ jobs:
     - name: dependencies
       run: |
         sudo apt-get update
+        sudo apt-get -y install libmagic-dev
+        sudo apt-get -y install libpango1.0-dev
+        sudo apt-get -y install libsnappy-dev
+        sudo apt-get -y install libzstd-dev
+        wget https://github.com/vmt/udis86/archive/v1.7.2.tar.gz && tar xzvf v1.7.2.tar.gz && ( cd udis86-1.7.2/ && ./autogen.sh && ./configure --enable-shared=yes && make && sudo make install ) && sudo ldconfig
     - name: bootstrap
       run: ./build.sh net-bootstrap
     - name: load
