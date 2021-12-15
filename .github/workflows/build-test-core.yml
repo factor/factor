@@ -7,20 +7,20 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: bootstrap
       run: ./build.sh net-bootstrap
     - name: load
-      run: "./factor -e='USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off \"resource:basis\" \"\" load-from-root save'"
+      run: './factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off \"resource:basis\" \"\" load-from-root save"'
     - name: configure
-      run: "./factor -e='USING: memory namespaces tools.test ; f long-unit-tests-enabled? set-global save'"
+      run: './factor -e="USING: memory namespaces tools.test ; f long-unit-tests-enabled? set-global save"'
     - name: test
-      run: "./factor -run=tools.test resource:core"
+      run: './factor -run=tools.test resource:core'
     - name: help-lint
-      run: "./factor -run=help.lint resource:core resource:basis"
+      run: './factor -run=help.lint resource:core resource:basis'
 
   build-macos:
     runs-on: macos-11
@@ -29,10 +29,30 @@ jobs:
     - name: build
       run: arch -x86_64 ./build.sh net-bootstrap
     - name: load
-      run: "./factor -e='USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off \"resource:basis\" \"\" load-from-root save'"
+      run: './factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off \"resource:basis\" \"\" load-from-root save"'
     - name: configure
-      run: "./factor -e='USING: memory namespaces tools.test ; f long-unit-tests-enabled? set-global save'"
+      run: './factor -e="USING: memory namespaces tools.test ; f long-unit-tests-enabled? set-global save"'
     - name: test
-      run: "./factor -run=tools.test resource:core"
+      run: './factor -run=tools.test resource:core'
     - name: help-lint
-      run: "./factor -run=help.lint resource:core resource:basis"
+      run: './factor -run=help.lint resource:core resource:basis'
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: build
+      shell: cmd
+      run: build.cmd net-bootstrap
+    - name: load
+      shell: cmd
+      run: 'factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off \"resource:basis\" \"\" load-from-root save"'
+    - name: configure
+      shell: cmd
+      run: 'factor -e="USING: memory namespaces tools.test ; f long-unit-tests-enabled? set-global save"'
+    - name: test
+      shell: cmd
+      run: 'factor -run=tools.test resource:core'
+    - name: help-lint
+      shell: cmd
+      run: 'factor -run=help.lint resource:core resource:basis'
