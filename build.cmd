@@ -15,6 +15,8 @@ if "%1"=="/?" (
     set _bootimage_version=%GIT_BRANCH%
 ) else if "%1"=="update" (
     set _bootimage_version=%GIT_BRANCH%
+) else if "%1"=="net-bootstrap" (
+    set _bootimage_version=%GIT_BRANCH%
 ) else if "%1"=="clean" (
     set _bootimage_version=clean
 ) else goto usage
@@ -38,9 +40,11 @@ if not errorlevel 1 (
 echo Deleting staging images from temp/...
 del temp\staging.*.image
 
-echo Updating working copy from %GIT_BRANCH%...
-call git pull https://github.com/factor/factor %GIT_BRANCH%
-if errorlevel 1 goto fail
+if "%1"!="net-bootstrap" (
+  echo Updating working copy from %GIT_BRANCH%...
+  call git pull https://github.com/factor/factor %GIT_BRANCH%
+  if errorlevel 1 goto fail
+)
 
 echo Building vm...
 nmake /nologo /f Nmakefile clean
