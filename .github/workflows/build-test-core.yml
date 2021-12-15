@@ -43,7 +43,9 @@ jobs:
     - uses: actions/checkout@v2
     - name: build
       shell: cmd
-      run: build.cmd net-bootstrap
+      run: |
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        build.cmd net-bootstrap
     - name: load
       shell: cmd
       run: 'factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off \"resource:basis\" \"\" load-from-root save"'
