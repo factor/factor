@@ -18,7 +18,7 @@ jobs:
         sudo apt-get -y install libpango1.0-dev
         sudo apt-get -y install libsnappy-dev
         sudo apt-get -y install libzstd-dev
-        wget https://github.com/vmt/udis86/archive/v1.7.2.tar.gz && tar xzvf v1.7.2.tar.gz && ( cd udis86-1.7.2/ && ./autogen.sh && ./configure --enable-shared=yes && make && sudo make install ) && sudo ldconfig
+        wget https://github.com/vmt/udis86/archive/v1.7.2.tar.gz && tar xzvf v1.7.2.tar.gz && ( cd udis86-1.7.2/ && perl -pi -e "s/ \/ 32/ \/\/ 32/g" scripts/ud_opcode.py && perl -pi -e "s/keys.sort()/keys = sorted(keys)/g" scripts/ud_opcode.py && ./autogen.sh && ./configure --enable-shared=yes && make && sudo make install ) && sudo ldconfig
     - name: bootstrap
       run: ./build.sh net-bootstrap
     - name: load
