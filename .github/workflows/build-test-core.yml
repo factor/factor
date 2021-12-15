@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: dependencies
+      run: |
+        sudo apt-get update
     - name: bootstrap
       run: ./build.sh net-bootstrap
     - name: load
@@ -18,7 +21,7 @@ jobs:
     - name: configure
       run: './factor -e="USING: memory namespaces tools.test ; f long-unit-tests-enabled? set-global save"'
     - name: test
-      run: './factor -run=tools.test resource:core'
+      run: './factor -run=tools.test resource:core resource:basis'
     - name: help-lint
       run: './factor -run=help.lint resource:core resource:basis'
 
