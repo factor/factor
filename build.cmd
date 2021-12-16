@@ -12,37 +12,37 @@ if "%1"=="/?" (
 ) else if "%1"=="" (
     set _git_pull=1
     set _compile_vm=1
-    set _bootimage=download
+    set _bootimage_type=download
     set _bootstrap_factor=1
 ) else if "%1"=="latest" (
     set _git_pull=1
     set _compile_vm=1
-    set _bootimage=download
+    set _bootimage_type=download
     set _bootstrap_factor=1
 ) else if "%1"=="update" (
     set _git_pull=1
     set _compile_vm=1
-    set _bootimage=download
+    set _bootimage_type=download
     set _bootstrap_factor=1
 ) else if "%1"=="compile" (
     set _git_pull=0
     set _compile_vm=1
-    set _bootimage=current
+    set _bootimage_type=current
     set _bootstrap_factor=0
 ) else if "%1"=="self-bootstrap" (
     set _git_pull=1
     set _compile_vm=0
-    set _bootimage=make
+    set _bootimage_type=make
     set _bootstrap_factor=1
 ) else if "%1"=="bootstrap" (
     set _git_pull=0
     set _compile_vm=0
-    set _bootimage=current
+    set _bootimage_type=current
     set _bootstrap_factor=1
 ) else if "%1"=="net-bootstrap" (
     set _git_pull=0
     set _compile_vm=1
-    set _bootimage=download
+    set _bootimage_type=download
     set _bootstrap_factor=1
 ) else goto usage
 
@@ -80,13 +80,13 @@ if "%_compile_vm%"=="1" (
     if errorlevel 1 goto fail
 )
 
-if "%_bootimage%"=="download" (
+if "%_bootimage_type%"=="download" (
     echo Fetching %GIT_BRANCH% boot image...
     set boot_image_url=http://downloads.factorcode.org/images/%GIT_BRANCH%/%_bootimage% %_bootimage%
     echo URL: %boot_image_url%
     cscript /nologo misc\http-get.vbs %boot_image_url% %_bootimage%
     if errorlevel 1 goto fail
-) else if "%_bootimage%"=="make" (
+) else if "%_bootimage_type%"=="make" (
     echo Making boot image...
     .\factor.com -run=bootstrap.image %_bootimage%
     if errorlevel 1 goto fail
