@@ -38,7 +38,7 @@ jobs:
     - name: configure tests
       run: './factor -e="USING: memory namespaces tools.test ; f long-unit-tests-enabled? set-global save"'
     - name: configure postgres
-      run: './factor -e="USING: memory db.postgresql db.tester ; <postgresql-db> \"localhost\" >>host postgresql-test-db-name >>database \"postgres\" >>username \"postgres\" >>password \ postgresql-db set-global save"'
+      run: './factor -e="USING: accessors memory db.postgresql db.tester ; <postgresql-db> \"localhost\" >>host postgresql-test-db-name >>database \"postgres\" >>username \"postgres\" >>password \ postgresql-db set-global save"'
     - name: test
       run: './factor -run=tools.test resource:core resource:basis'
     - name: help-lint
