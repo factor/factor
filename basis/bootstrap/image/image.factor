@@ -9,7 +9,7 @@ hashtables hashtables.private io io.binary io.encodings.binary
 io.files io.pathnames kernel kernel.private layouts make math
 math.order namespaces namespaces.private parser parser.notes
 prettyprint quotations sequences sequences.private source-files
-strings system vectors vocabs words ;
+splitting strings system vectors vocabs words ;
 IN: bootstrap.image
 
 : arch-name ( os cpu -- arch )
@@ -543,6 +543,10 @@ PRIVATE>
     my-arch-name make-image ;
 
 : make-image-main ( -- )
-    command-line get [ make-my-image ] [ [ make-image ] each ] if-empty ;
+    command-line get [
+        make-my-image
+    ] [
+        [ "boot." ?head drop ".image" ?tail drop make-image ] each
+    ] if-empty ;
 
 MAIN: make-image-main
