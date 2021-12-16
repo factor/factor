@@ -9,6 +9,18 @@ on:
 jobs:
   build-linux:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
     - uses: actions/checkout@v2
     - name: dependencies
@@ -23,8 +35,10 @@ jobs:
       run: ./build.sh net-bootstrap
     - name: load
       run: './factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off \"resource:basis\" \"\" load-from-root save"'
-    - name: configure
+    - name: configure tests
       run: './factor -e="USING: memory namespaces tools.test ; f long-unit-tests-enabled? set-global save"'
+    - name: configure postgres
+      run: './factor -e="USING: db.postgresql db.tester ; <postgresql-db> \"localhost\" >>host postgresql-test-db-name >>database \"postgres\" >>username \"postgres\" >>password \ postgresql-db set-global save'
     - name: test
       run: './factor -run=tools.test resource:core resource:basis'
     - name: help-lint
