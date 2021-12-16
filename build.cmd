@@ -12,22 +12,22 @@ if "%1"=="/?" (
 ) else if "%1"=="" (
     set _git_pull=1
     set _compile_vm=1
-    set _bootimage="download"
+    set _bootimage=download
     set _bootstrap_factor=1
 ) else if "%1"=="latest" (
     set _git_pull=1
     set _compile_vm=1
-    set _bootimage="download"
+    set _bootimage=download
     set _bootstrap_factor=1
 ) else if "%1"=="update" (
     set _git_pull=1
     set _compile_vm=1
-    set _bootimage="download"
+    set _bootimage=download
     set _bootstrap_factor=1
 ) else if "%1"=="compile" (
     set _git_pull=0
     set _compile_vm=1
-    set _bootimage="current"
+    set _bootimage=current
     set _bootstrap_factor=0
 ) else if "%1"=="self-bootstrap" (
     set _git_pull=1
@@ -37,12 +37,12 @@ if "%1"=="/?" (
 ) else if "%1"=="bootstrap" (
     set _git_pull=0
     set _compile_vm=0
-    set _bootimage="current"
+    set _bootimage=current
     set _bootstrap_factor=1
 ) else if "%1"=="net-bootstrap" (
     set _git_pull=0
     set _compile_vm=1
-    set _bootimage="download"
+    set _bootimage=download
     set _bootstrap_factor=1
 ) else goto usage
 
@@ -122,9 +122,9 @@ goto :EOF
 echo Usage: build.cmd [command]
 echo     Updates the working copy, cleans and builds the vm using nmake,
 echo     fetches a boot image, and bootstraps factor.
-echo
+echo:
 echo     The branch that bootstraps is the one that is checked out locally.
-echo
+echo:
 echo     compile - recompile vm
 echo     update - git pull, recompile vm, download a boot image, bootstrap
 echo     self-bootstrap - git pull, make a boot image, bootstrap
