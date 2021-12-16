@@ -32,7 +32,7 @@ if "%1"=="/?" (
 ) else if "%1"=="self-bootstrap" (
     set _git_pull=1
     set _compile_vm=0
-    set _bootimage="make"
+    set _bootimage=make
     set _bootstrap_factor=1
 ) else if "%1"=="bootstrap" (
     set _git_pull=0
