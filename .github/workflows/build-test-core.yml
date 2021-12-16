@@ -9,38 +9,14 @@ on:
 jobs:
   build-linux:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: postgres
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
     steps:
     - uses: actions/checkout@v2
-    - name: dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get -y install libmagic-dev
-        sudo apt-get -y install libpango1.0-dev
-        sudo apt-get -y install libsnappy-dev
-        sudo apt-get -y install libzstd-dev
-        wget https://github.com/vmt/udis86/archive/v1.7.2.tar.gz && tar xzvf v1.7.2.tar.gz && ( cd udis86-1.7.2/ && perl -pi -e "s/ \/ 32/ \/\/ 32/g" scripts/ud_opcode.py && perl -pi -e "s/keys.sort()/keys = sorted(keys)/g" scripts/ud_opcode.py && ./autogen.sh && ./configure --enable-shared=yes && make && sudo make install ) && sudo ldconfig
     - name: bootstrap
       run: ./build.sh net-bootstrap
-    - name: load
-      run: './factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off \"resource:basis\" \"\" load-from-root save"'
-    - name: configure tests
-      run: './factor -e="USING: memory namespaces tools.test ; f long-unit-tests-enabled? set-global save"'
-    - name: configure postgres
-      run: './factor -e="USING: accessors memory db.postgresql db.tester ; <postgresql-db> \"localhost\" >>host postgresql-test-db-name >>database \"postgres\" >>username \"postgres\" >>password \ postgresql-db set-global save"'
+    - name: load-all
+      run: './factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off load-all save"'
     - name: test
-      run: './factor -run=tools.test resource:core resource:basis'
+      run: './factor -run=tools.test resource:core'
     - name: help-lint
       run: './factor -run=help.lint resource:core resource:basis'
 
@@ -50,10 +26,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: build
       run: arch -x86_64 ./build.sh net-bootstrap
-    - name: load
-      run: './factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off \"resource:basis\" \"\" load-from-root save"'
-    - name: configure
-      run: './factor -e="USING: memory namespaces tools.test ; f long-unit-tests-enabled? set-global save"'
+    - name: load-all
+      run: './factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off load-all save"'
     - name: test
       run: './factor -run=tools.test resource:core'
     - name: help-lint
@@ -68,12 +42,9 @@ jobs:
       run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
         build.cmd net-bootstrap
-    - name: load
+    - name: load-all
       shell: cmd
-      run: 'factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off \"resource:basis\" \"\" load-from-root save"'
-    - name: configure
-      shell: cmd
-      run: 'factor -e="USING: memory namespaces tools.test ; f long-unit-tests-enabled? set-global save"'
+      run: 'factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off load-all save"'
     - name: test
       shell: cmd
       run: 'factor -run=tools.test resource:core'
