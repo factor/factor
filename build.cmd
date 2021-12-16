@@ -82,9 +82,9 @@ if "%_compile_vm%"=="1" (
 
 if "%_bootimage_type%"=="download" (
     echo Fetching %GIT_BRANCH% boot image...
-    set boot_image_url=http://downloads.factorcode.org/images/%GIT_BRANCH%/%_bootimage% %_bootimage%
-    echo URL: %boot_image_url%
-    cscript /nologo misc\http-get.vbs %boot_image_url% %_bootimage%
+    set _bootimage_url=http://downloads.factorcode.org/images/%GIT_BRANCH%/%_bootimage%
+    echo URL: %_bootimage_url%
+    cscript /nologo misc\http-get.vbs %_bootimage_url% %_bootimage%
     if errorlevel 1 goto fail
 ) else if "%_bootimage_type%"=="make" (
     echo Making boot image...
