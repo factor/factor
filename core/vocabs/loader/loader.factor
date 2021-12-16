@@ -50,11 +50,12 @@ PRIVATE>
     "/" join ;
 
 : find-vocab-root ( vocab -- path/f )
-    vocab-name root-cache get [
-        dup ".private" tail? [ drop f ] [
-            ".factor" append-vocab-dir find-root-for
-        ] if
-    ] cache ;
+    vocab-name dup ".private" tail? [ drop f ] [
+        root-cache get 2dup at [ 2nip ] [
+            over ".factor" append-vocab-dir find-root-for
+            [ [ -rot set-at ] [ 2drop ] if* ] keep
+        ] if*
+    ] if ;
 
 : vocab-exists? ( name -- ? )
     dup lookup-vocab [ ] [ find-vocab-root ] ?if ;
