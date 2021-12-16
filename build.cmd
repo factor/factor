@@ -128,6 +128,6 @@ echo:
 echo     compile - recompile vm
 echo     update - git pull, recompile vm, download a boot image, bootstrap
 echo     self-bootstrap - git pull, make a boot image, bootstrap
-echo     bootstrap - git pull, existing boot image, bootstrap
+echo     bootstrap - existing boot image, bootstrap
 echo     net-bootstrap - recompile vm, download a boot image, bootstrap
 goto :EOF
