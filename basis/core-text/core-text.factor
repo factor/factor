@@ -5,7 +5,7 @@ assocs cache classes colors combinators core-foundation
 core-foundation.attributed-strings core-foundation.strings
 core-graphics core-graphics.types core-text.fonts destructors
 fonts init io.encodings.string io.encodings.utf16n kernel make
-math math.functions math.order math.vectors namespaces opengl
+math math.functions math.order math.vectors namespaces
 sequences strings ;
 IN: core-text
 
@@ -78,7 +78,7 @@ render-loc render-dim ;
 
 : metrics>dim ( bounds -- dim )
     [ width>> ] [ [ ascent>> ] [ descent>> ] bi + ] bi
-    gl-scale ceiling >integer gl-unscale 2array ;
+    ceiling >integer 2array ;
 
 : fill-background ( context font dim -- )
     [ background>> >rgba-components CGContextSetRGBFillColor ]
