@@ -80,9 +80,9 @@ if "%_compile_vm%"=="1" (
     if errorlevel 1 goto fail
 )
 
+set _bootimage_url=http://downloads.factorcode.org/images/%GIT_BRANCH%/%_bootimage%
 if "%_bootimage_type%"=="download" (
     echo Fetching %GIT_BRANCH% boot image...
-    set _bootimage_url=http://downloads.factorcode.org/images/%GIT_BRANCH%/%_bootimage%
     echo URL: %_bootimage_url%
     cscript /nologo misc\http-get.vbs %_bootimage_url% %_bootimage%
     if errorlevel 1 goto fail
