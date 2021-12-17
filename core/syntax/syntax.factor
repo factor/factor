@@ -104,7 +104,9 @@ IN: bootstrap.syntax
 
     "POSTPONE:" [ scan-word suffix! ] define-core-syntax
     "\\" [ scan-word <wrapper> suffix! ] define-core-syntax
+    "\\=" [ scan-object <wrapper> suffix! ] define-core-syntax
     "M\\" [ scan-word scan-word lookup-method <wrapper> suffix! ] define-core-syntax
+    "M\\=" [ scan-object <wrapper> scan-word lookup-method <wrapper> suffix! ] define-core-syntax
     "inline" [ last-word make-inline ] define-core-syntax
     "recursive" [ last-word make-recursive ] define-core-syntax
     "foldable" [ last-word make-foldable ] define-core-syntax
@@ -186,7 +188,7 @@ IN: bootstrap.syntax
 
     "INSTANCE:" [
         location [
-            scan-word scan-word 2dup add-mixin-instance
+            scan-class scan-word 2dup add-mixin-instance
             <mixin-instance>
         ] dip remember-definition
     ] define-core-syntax

@@ -86,3 +86,8 @@ M: change-meta-test-predicate change-meta-test length>> ;
 { f } [ change-meta-test-predicate class? ] unit-test
 
 { t } [ \ change-meta-test "methods" word-prop assoc-empty? ] unit-test
+
+[
+    "IN: classes.predicate.tests DEFER: p4 DEFER: v DEFER: foo FORGET: p3 FORGET: v FORGET: foo UNION: v generic ; PREDICATE: p3 < word v? not ; GENERIC: foo ( x -- )  M: p3 foo drop ; M: \\ if foo drop ; "
+    eval( -- )
+] [ compile-time-predicate-uses-undefined-words? ] must-fail-with

@@ -60,9 +60,10 @@ M: mixin-class rank-class drop 8 ;
     } 3cleave ;
 
 PRIVATE>
+UNION: dispatchable-class class wrapper ;
 
 : check-types ( class mixin -- class mixin )
-    [ class check-instance ] [ mixin-class check-instance ] bi* ;
+    [ dispatchable-class check-instance ] [ mixin-class check-instance ] bi* ;
 
 : add-mixin-instance ( class mixin -- )
     check-types [ 2drop ] [ (add-mixin-instance) ] if-mixin-member? ;

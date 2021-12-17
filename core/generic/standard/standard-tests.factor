@@ -1,9 +1,8 @@
-USING: accessors arrays assocs bit-arrays bit-vectors
-byte-arrays classes.tuple classes.union compiler.crossref
-compiler.units definitions eval generic generic.single
-generic.standard io.streams.string kernel make math
-math.constants math.functions namespaces parser quotations
-sequences specialized-vectors strings tools.test words ;
+USING: accessors arrays assocs bit-arrays bit-vectors byte-arrays classes.tuple
+classes.union compiler.crossref compiler.units definitions eval generic
+generic.single generic.standard io.streams.string kernel literals make math
+math.constants math.functions namespaces parser quotations sequences
+specialized-vectors strings tools.test words ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-VECTOR: c:double
 IN: generic.standard.tests
@@ -573,3 +572,24 @@ M: amb-predicate-a amb-generic-8 drop "a" ;
     4 amb-generic-8
     4 \ amb-generic-8 effective-method execute( a -- b ) assert=
 ] unit-test
+
+! Some tests with singleton types
+GENERIC: foo ( x -- x )
+M: fixnum foo 1 + ;
+M: number foo 1 - ;
+M: \ fixnum foo drop "class-level" ;
+M: \= 42 foo drop 69 ;
+
+{ 11 }
+[ 10 foo ] unit-test
+
+${ 2.0 1.0 - }
+[ 2.0 foo ] unit-test
+
+{ "class-level" }
+[ \ fixnum foo ] unit-test
+
+{ 69 }
+[ 42 foo ] unit-test
+
+[ \ number foo ] [ no-method? ] must-fail-with

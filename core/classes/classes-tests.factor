@@ -20,7 +20,7 @@ M: method-forget-class method-forget-test ;
 
 { { } { } } [
     all-words [ class? ] filter
-    implementors-map get keys
+    implementors-map get keys [ wrapper? ] reject
     [ natural-sort ] bi@
     [ diff ] [ swap diff ] 2bi
 ] unit-test

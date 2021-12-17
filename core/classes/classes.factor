@@ -83,6 +83,9 @@ GENERIC: predicate-def ( obj -- quot )
 M: word predicate-def
     "predicate" word-prop ;
 
+M: wrapper predicate-def
+    wrapped>> [ = ] curry ;
+
 M: object predicate-def
     [ instance? ] curry ;
 
@@ -100,9 +103,13 @@ M: predicate reset-word
 : define-predicate ( class quot -- )
     [ predicate-word ] dip ( object -- ? ) define-declared ;
 
-: superclass-of ( class -- super )
-    ! Output f for non-classes to work with algebra code
-    dup class? [ "superclass" word-prop ] [ drop f ] if ;
+GENERIC: superclass-of ( class -- super )
+
+M: class superclass-of
+    "superclass" word-prop ;
+
+! Output f for non-classes to work with algebra code
+M: object superclass-of drop f ;
 
 : superclasses-of ( class -- supers )
     [ superclass-of ] follow reverse! ;
@@ -125,6 +132,11 @@ GENERIC: contained-classes ( obj -- members )
 
 M: object contained-classes
     "members" word-prop ;
+
+! We allow self-reference semantically.  I.e. UNION: foo \ foo ; is considered
+! valid, because \ foo will not be treated as a union class, but can only be
+! compared for symbolic equality.
+M: wrapper contained-classes drop f ;
 
 : all-contained-classes ( members -- members' )
     dup dup [ contained-classes ] map concat sift append
@@ -149,6 +161,8 @@ GENERIC: implementors ( class/classes -- seq )
 
 M: class implementors implementors-map get at members ;
 
+M: wrapper implementors implementors-map get at members ;
+
 M: sequence implementors [ implementors ] gather ;
 
 <PRIVATE
@@ -162,8 +176,18 @@ M: sequence implementors [ implementors ] gather ;
 : implementors-map+ ( class -- )
     [ HS{ } clone ] dip implementors-map get set-at ;
 
+: ensure-singleton-type ( wrapper -- )
+    [ implementors-map get [ drop HS{ } clone ] cache drop ]
+    [ update-map+ ] bi
+    ;
+
 : implementors-map- ( class -- )
     implementors-map get delete-at ;
+
+: maybe-remove-singleton-type ( wrapper -- )
+    dup implementors empty?
+    [ [ update-map- ] [ implementors-map- ] bi ]
+    [ drop ] if ;
 
 : make-class-props ( superclass members participants metaclass -- assoc )
     [

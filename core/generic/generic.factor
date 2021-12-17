@@ -125,6 +125,7 @@ M: method crossref?
 
 : <method> ( class generic -- method )
     check-method
+    over dup wrapper? [ ensure-singleton-type ] [ drop ] if
     [ method-word-name f <word> ] [ method-word-props ] 2bi
     >>props ;
 
@@ -137,6 +138,8 @@ M: class implementor-classes 1array ;
 M: anonymous-union implementor-classes members>> ;
 
 M: anonymous-intersection implementor-classes participants>> ;
+
+M: wrapper implementor-classes 1array ;
 
 : with-implementors ( class generic quot -- )
     [ swap implementor-classes [ implementors-map get at ] map ] dip call ; inline
@@ -167,6 +170,9 @@ PREDICATE: default-method < word "default" word-prop ;
 M: method definer
     drop \ M: \ ; ;
 
+: forget-singleton-type ( obj -- )
+    dup wrapper? [ maybe-remove-singleton-type ] [ drop ] if ;
+
 M: method forget*
     dup "forgotten" word-prop [ drop ] [
         [
@@ -179,7 +185,8 @@ M: method forget*
                 [
                     [ [ delete-at ] with-methods ]
                     [ [ [ delete ] with each ] with-implementors ]
-                    2bi reset-caches
+                    [ drop forget-singleton-type ]
+                    2tri reset-caches
                 ] [ 2drop ] if
             ] if
         ]

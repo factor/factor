@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.private
-combinators kernel make math math.order namespaces sequences
+combinators kernel make math math.order math.parser namespaces sequences
 sets sorting vectors words ;
 IN: classes.algebra
 
@@ -67,6 +67,31 @@ M: object normalize-class ;
 
 PRIVATE>
 
+! Wrapper semantics: singleton class of any value.  The only instance is the
+! value.  It's superclass is the class of the value.  It describes the arrow
+! type of a word that pushes the object when evaluated.  The rank is set
+! slightly above the other atomic classes but below predicate classes because
+! their intersection checks only test the superclass level.  Nevertheless, they
+! should be ordered before predicate classes in method dispatch, because they
+! are more specific in general.
+INSTANCE: wrapper classoid
+M: wrapper instance?
+    wrapped>> = ;
+M: wrapper rank-class drop 1+1/2 ;
+
+M: wrapper superclass-of wrapped>> class-of  ; inline
+M: wrapper (flatten-class) superclass-of (flatten-class) ;
+
+GENERIC: singleton-suffix ( object -- str )
+M: object singleton-suffix
+    identity-hashcode number>string ;
+M: word singleton-suffix
+    name>> ;
+
+M: wrapper class-name
+    [ superclass-of class-name "_" append ]
+    [ wrapped>> singleton-suffix append ] bi ;
+
 : only-classoid? ( obj -- ? )
     dup classoid? [ class? not ] [ drop f ] if ;
 
@@ -90,6 +115,11 @@ PRIVATE>
     [ normalize-class ] bi@
     classes-intersect-cache get [ (classes-intersect?) ] symmetric-class-op ;
 
+M: wrapper (classes-intersect?)
+    { { [ over wrapper? ] [ = ] }
+      [ superclass-of classes-intersect? ]
+    } cond ;
+
 : class-and ( first second -- class )
     class-and-cache get [ (class-and) ] symmetric-class-op ;
 
@@ -111,8 +141,10 @@ SYMBOL: +incomparable+
 
 <PRIVATE
 
+! Special-case wrappers here to delegate class<= check to algebra
 : superclass<= ( first second -- ? )
-    swap superclass-of [ swap class<= ] [ drop f ] if* ;
+    swap dup wrapper? [ drop f ] [ superclass-of ] if
+    [ swap class<= ] [ drop f ] if* ;
 
 : left-anonymous-union<= ( first second -- ? )
     [ members>> ] dip [ class<= ] curry all? ;
@@ -165,6 +197,13 @@ PREDICATE: empty-union < anonymous-union members>> empty? ;
 
 PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
 
+
+: left-wrapper<= ( wrapper non-wrapper -- ? )
+    classes-intersect? ;
+
+: right-wrapper<= ( non-wrapper wrapper -- ? )
+    2drop f ;
+
 : (class<=) ( first second -- ? )
     2dup eq? [ 2drop t ] [
         [ normalize-class ] bi@
@@ -181,6 +220,9 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
                 { [ dup anonymous-union? ] [ right-anonymous-union<= ] }
                 { [ dup anonymous-intersection? ] [ right-anonymous-intersection<= ] }
                 { [ dup anonymous-complement? ] [ class>> classes-intersect? not ] }
+                { [ 2dup [ wrapper? ] both? ] [ = ] }
+                { [ over wrapper? ] [ left-wrapper<= ] }
+                { [ dup wrapper? ] [ right-wrapper<= ] }
                 [ 2drop f ]
             } cond
         ] if
