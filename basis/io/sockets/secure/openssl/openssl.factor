@@ -291,7 +291,7 @@ PRIVATE>
         } case
     ] [ nip (ssl-error) ] if-zero ;
 
-: check-ssl-error ( ssl ret exra-cases/f -- event/f )
+: check-ssl-error ( ssl ret extra-cases/f -- event/f )
     [ tuck SSL_get_error ] dip
     {
         { SSL_ERROR_NONE [ drop f ] }
