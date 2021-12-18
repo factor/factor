@@ -76,17 +76,8 @@ PRIVATE>
 : <struct> ( class -- struct )
     [ >c-ptr clone ] [ heap-size <byte-array> ] init-struct ; inline
 
-MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
-    [
-        [ <wrapper> \ (struct) [ ] 2sequence ]
-        [
-            struct-slots
-            [ length \ ndip ]
-            [ [ name>> setter-word 1quotation ] map \ spread ] bi
-        ] bi
-    ] [ ] output>sequence ;
-
 <PRIVATE
+
 : pad-struct-slots ( values class -- values' class )
     [ struct-slots [ initial>> ] map over length tail append ] keep ;
 
@@ -98,7 +89,7 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
 : sign-extender ( signed? bits -- quot )
     '[ _ [ _ sign-extend ] when ] ;
 
-GENERIC: (reader-quot) ( slot -- quot )
+GENERIC: (reader-quot) ( slot -- quot: ( struct -- value ) )
 
 M: struct-slot-spec (reader-quot)
     [ offset>> ] [ type>> ] bi '[ >c-ptr _ _ alien-value ] ;
@@ -109,7 +100,7 @@ M: struct-bit-slot-spec (reader-quot)
     bi compose
     [ >c-ptr ] prepose ;
 
-GENERIC: (writer-quot) ( slot -- quot )
+GENERIC: (writer-quot) ( slot -- quot: ( value struct -- ) )
 
 M: struct-slot-spec (writer-quot)
     [ offset>> ] [ type>> ] bi '[ >c-ptr _ _ set-alien-value ] ;
@@ -123,18 +114,24 @@ M: struct-bit-slot-spec (writer-quot)
 : (unboxer-quot) ( class -- quot )
     drop [ >c-ptr ] ;
 
-MACRO: read-struct-slot ( slot -- quot )
+MACRO: read-struct-slot ( slot -- quot: ( struct -- value ) )
     dup type>> add-depends-on-c-type
     (reader-quot) ;
 
-MACRO: write-struct-slot ( slot -- quot )
+MACRO: write-struct-slot ( slot -- quot: ( value struct -- ) )
     dup type>> add-depends-on-c-type
     (writer-quot) ;
+
 PRIVATE>
+
+MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
+    dup struct-slots
+    [ length ] [ [ (writer-quot) '[ over @ ] ] map ] bi
+    '[ [ _ (struct) ] _ ndip _ spread ] ;
 
 M: struct-class boa>object
     swap pad-struct-slots
-    [ <struct> ] [ struct-slots ] bi
+    [ (struct) ] [ struct-slots ] bi
     [ [ (writer-quot) call( value struct -- ) ] with 2each ] keepd ;
 
 M: struct-class initial-value* <struct> t ; inline
