@@ -131,7 +131,7 @@ MACRO: <struct-boa> ( class -- quot: ( ... -- struct ) )
 
 M: struct-class boa>object
     swap pad-struct-slots
-    [ (struct) ] [ struct-slots ] bi
+    [ <struct> ] [ struct-slots ] bi
     [ [ (writer-quot) call( value struct -- ) ] with 2each ] keepd ;
 
 M: struct-class initial-value* <struct> t ; inline
