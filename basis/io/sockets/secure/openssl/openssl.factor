@@ -294,8 +294,10 @@ PRIVATE>
         { SSL_ERROR_WANT_READ [ drop +input+ ] }
         { SSL_ERROR_WANT_WRITE [ drop +output+ ] }
         { SSL_ERROR_SYSCALL [ ssl-error-syscall ] }
-        { SSL_ERROR_SSL [ drop (ssl-error) ] }
-        { SSL_ERROR_ZERO_RETURN [ drop f ] }
+        { SSL_ERROR_SSL [ drop throw-ssl-error ] }
+        ! https://stackoverflow.com/questions/50223224/ssl-read-returns-ssl-error-zero-return-but-err-get-error-is-0
+        ! we got disconnected
+        { SSL_ERROR_ZERO_RETURN [ t >>terminated f >>connected drop f ] }
         { SSL_ERROR_WANT_ACCEPT [ drop +input+ ] }
     } case ;
 
