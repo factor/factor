@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs assocs.extras base64 calendar
-checksums.hmac checksums.sha http http.client kernel make math
-math.parser namespaces present random sequences sorting strings
+USING: accessors assocs base64 calendar checksums.hmac
+checksums.sha http http.client kernel make math math.parser
+namespaces present random sequences sorting strings
 urls.encoding urls.private ;
 IN: oauth1
 
@@ -68,7 +68,7 @@ nonce ;
     consumer-token secret>> request-token dup [ secret>> ] when hmac-key :> key
     sbs key sha1 hmac-bytes >base64 >string :> signature
     params { "oauth_signature" signature } prefix
-    [ "oauth_" head? ] filter-keys ;
+    [ drop "oauth_" head? ] assoc-filter ;
 
 : extract-user-data ( assoc -- assoc' )
     [
