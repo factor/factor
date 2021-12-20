@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators fry io
 io.encodings.binary io.files io.pathnames kernel lexer make math
 math.parser namespaces parser peg peg.ebnf peg.parsers
-quotations sequences sequences.deep words multiline ;
+quotations sequences sequences.deep words multiline splitting ;
 IN: cpu.8080.emulator
 
 TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles
