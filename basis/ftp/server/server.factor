@@ -66,11 +66,11 @@ C: <ftp-disconnect> ftp-disconnect
     resolve-symlinks server get serving-directory>> head? ;
 
 : can-serve-directory? ( path -- ? )
-    { [ exists? ] [ file-info directory? ] [ serving? ] } 1&& ;
+    { [ file-exists? ] [ file-info directory? ] [ serving? ] } 1&& ;
 
 : can-serve-file? ( path -- ? )
     {
-        [ exists? ]
+        [ file-exists? ]
         [ file-info regular-file? ]
         [ serving? ]
     } 1&& ;

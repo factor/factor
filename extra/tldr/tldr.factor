@@ -31,7 +31,7 @@ CONSTANT: tldr-zip URL" https://tldr-pages.github.io/assets/tldr.zip"
     ] with-directory ;
 
 : ?download-tldr ( -- )
-    "tldr/tldr.zip" cache-file exists? [ download-tldr ] unless ;
+    "tldr/tldr.zip" cache-file file-exists? [ download-tldr ] unless ;
 
 MEMO: tldr-index ( -- index )
     "tldr/index.json" cache-file path>json ;

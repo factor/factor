@@ -111,6 +111,6 @@ HELP: file-contents
 
 { set-file-lines file-lines change-file-lines set-file-contents file-contents change-file-contents } related-words
 
-HELP: exists?
+HELP: file-exists?
 { $values { "path" "a pathname string" } { "?" boolean } }
 { $description "Tests if the file named by " { $snippet "path" } " exists." } ;

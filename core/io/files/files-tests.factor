@@ -160,7 +160,7 @@ CONSTANT: pt-array-1
 
     { } [ "test.txt" "test2.txt" move-file ] unit-test
 
-    { t } [ "test2.txt" exists? ] unit-test
+    { t } [ "test2.txt" file-exists? ] unit-test
 
     { } [ "test2.txt" delete-file ] unit-test
 ] with-test-directory

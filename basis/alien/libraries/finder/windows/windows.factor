@@ -32,7 +32,7 @@ IN: alien.libraries.finder.windows
 
 : find-library-paths ( name -- path/f )
     candidate-paths [
-        { [ exists? ] [ file-info regular-file? ] } 1&&
+        { [ file-exists? ] [ file-info regular-file? ] } 1&&
     ] find nip ;
 
 : find-library-file ( name -- path/f )

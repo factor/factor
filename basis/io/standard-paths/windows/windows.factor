@@ -24,4 +24,4 @@ M: windows find-in-applications
 
 M: windows find-in-path*
     [ "PATH" os-env ";" split ] dip
-    '[ _ append-path exists? ] find nip ;
+    '[ _ append-path file-exists? ] find nip ;

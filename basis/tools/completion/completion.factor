@@ -122,7 +122,7 @@ PRIVATE>
 
 : paths-matching ( str -- seq )
     dup last-path-separator [ 1 + cut ] [ drop "" ] if swap
-    dup { [ exists? ] [ file-info directory? ] } 1&&
+    dup { [ file-exists? ] [ file-info directory? ] } 1&&
     [ directory-paths completions ] [ 2drop { } ] if ;
 
 <PRIVATE

@@ -86,7 +86,7 @@ ENUM: fcgi-protocol-status
     ] loop ;
 
 : delete-if-exists ( file -- )
-    dup exists? [ delete-file ] [ drop ] if ;
+    dup file-exists? [ delete-file ] [ drop ] if ;
 
 : make-local-socket ( socket-path -- socket )
     [ delete-if-exists ] keep

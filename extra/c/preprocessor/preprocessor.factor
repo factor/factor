@@ -49,7 +49,7 @@ ERROR: header-file-missing path ;
 
 :: read-standard-include ( preprocessor-state path -- )
     preprocessor-state dup library-paths>>
-    [ path append-path exists? ] find nip
+    [ path append-path file-exists? ] find nip
     [
         dup [
             path append-path
@@ -61,7 +61,7 @@ ERROR: header-file-missing path ;
     ] if* ;
 
 : read-local-include ( preprocessor-state path -- )
-    dup exists? [ preprocess-file ] [ 2drop ] if ;
+    dup file-exists? [ preprocess-file ] [ 2drop ] if ;
 
 : skip-whitespace/comments ( sequence-parser -- sequence-parser )
     skip-whitespace

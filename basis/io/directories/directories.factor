@@ -27,7 +27,7 @@ DEFER: make-parent-directories
         [ "." = ]
         [ root-directory? ]
         [ empty? ]
-        [ exists? ]
+        [ file-exists? ]
     } 1|| [
         make-parent-directories
         dup make-directory

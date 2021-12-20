@@ -11,7 +11,7 @@ IN: tools.which
 
 : executable? ( path -- ? )
     {
-        [ exists? ]
+        [ file-exists? ]
         [ file-executable? ]
         [ file-info directory? not ]
     } 1&& ;

@@ -11,18 +11,18 @@ sequences threads tools.test ;
         { } [ "a2" make-directory ] unit-test
         { } [ "a1" "a2" move-file-into ] unit-test
 
-        { t } [ "a2/a1" exists? ] unit-test
+        { t } [ "a2/a1" file-exists? ] unit-test
 
         { } [ "a2/a1/a3.txt" touch-file ] unit-test
 
-        { t } [ "a2/a1/a3.txt" exists? ] unit-test
+        { t } [ "a2/a1/a3.txt" file-exists? ] unit-test
 
         { } [ "a2/a1/a4.txt" touch-file ] unit-test
         { } [ "a2/a1/a5.txt" touch-file ] unit-test
         { } [ "a2/a1/a4.txt" delete-file ] unit-test
         { } [ "a2/a1/a5.txt" "a2/a1/a4.txt" move-file ] unit-test
 
-        { t } [ "a2/a1/a4.txt" exists? ] unit-test
+        { t } [ "a2/a1/a4.txt" file-exists? ] unit-test
 
         { } [ "m" get dispose ] unit-test
     ] with-monitors

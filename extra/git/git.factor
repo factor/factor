@@ -60,7 +60,7 @@ ERROR: expected-one-line lines ;
     [ first ] [ expected-one-line ] if ;
 
 : git-unpacked-object-exists? ( hash -- ? )
-    make-object-path exists? ;
+    make-object-path file-exists? ;
 
 TUPLE: index-entry ctime mtime dev ino mode uid gid size sha1 flags name ;
 CONSTRUCTOR: <index-entry> index-entry ( ctime mtime dev ino mode uid gid size sha1 flags name -- obj ) ;

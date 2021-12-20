@@ -6,7 +6,7 @@ splitting system ;
 IN: io.files
 
 <PRIVATE
-PRIMITIVE: (exists?) ( path -- ? )
+PRIMITIVE: (file-exists?) ( path -- ? )
 PRIVATE>
 
 SYMBOL: +retry+ ! just try the operation again without blocking
@@ -70,8 +70,10 @@ HOOK: (file-appender) io-backend ( path -- stream )
 : with-file-appender ( path encoding quot -- )
     [ <file-appender> ] dip with-output-stream ; inline
 
-: exists? ( path -- ? )
-    normalize-path native-string>alien (exists?) ;
+: file-exists? ( path -- ? )
+    normalize-path native-string>alien (file-exists?) ;
+
+ALIAS: exists? file-exists?
 
 ! Current directory
 <PRIVATE

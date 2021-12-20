@@ -25,10 +25,10 @@ tools.test ;
 [
     { t t f } [
         "blahblah" make-directory
-        "blahblah" exists?
+        "blahblah" file-exists?
         "blahblah" file-info directory?
         "blahblah" delete-directory
-        "blahblah" exists?
+        "blahblah" file-exists?
     ] unit-test
 
     { "file1 contents" } [
@@ -84,8 +84,8 @@ tools.test ;
     { } [ "test-foo.txt" delete-file ] unit-test
     { } [ "test-bar.txt" delete-file ] unit-test
 
-    { f } [ "test-foo.txt" exists? ] unit-test
-    { f } [ "test-bar.txt" exists? ] unit-test
+    { f } [ "test-foo.txt" file-exists? ] unit-test
+    { f } [ "test-bar.txt" file-exists? ] unit-test
 
     { } [ "test-blah" make-directory ] unit-test
 
@@ -94,13 +94,13 @@ tools.test ;
     ] unit-test
 
     { t } [
-        "test-blah/fooz" exists?
+        "test-blah/fooz" file-exists?
     ] unit-test
 
     { } [ "test-blah/fooz" delete-file ] unit-test
     { } [ "test-blah" delete-directory ] unit-test
 
-    { f } [ "test-blah" exists? ] unit-test
+    { f } [ "test-blah" file-exists? ] unit-test
 
     { } [ "delete-tree-test/a/b/c" make-directories ] unit-test
 
@@ -164,14 +164,14 @@ tools.test ;
     { f t } [
         "foo" [ make-directories ] keep
         [
-            "bar" exists?
+            "bar" file-exists?
             vm-path "-e=USE: io.directories \"bar\" touch-file" 2array try-output-process
-            "bar" exists?
+            "bar" file-exists?
         ] with-directory
     ] unit-test
 
     { t } [
-        "one/two/three" make-parent-directories parent-directory exists?
+        "one/two/three" make-parent-directories parent-directory file-exists?
     ] unit-test
 
 ] with-test-directory

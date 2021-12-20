@@ -5,7 +5,7 @@ mason.config mason.platform namespaces ;
 IN: mason.cleanup
 
 : compress ( filename -- )
-    dup exists? [
+    dup file-exists? [
         "bzip2" swap 2array short-running-process
     ] [ drop ] if ;
 
