@@ -39,7 +39,7 @@ M: object handle-message drop ;
         "--pretty=format:%h %an: %s" ,
         ".." glue ,
     ] { } make
-    utf8 [ lines ] with-process-reader ;
+    utf8 [ read-lines ] with-process-reader ;
 
 : updates ( from to -- lines )
     git-log reverse

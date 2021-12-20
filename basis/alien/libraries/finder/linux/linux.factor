@@ -25,7 +25,7 @@ CONSTANT: mach-map {
     ] map ;
 
 : load-ldconfig-cache ( -- seq )
-    "/sbin/ldconfig -p" utf8 [ lines ] with-process-reader*
+    "/sbin/ldconfig -p" utf8 [ read-lines ] with-process-reader*
     2drop [ f ] [ rest parse-ldconfig-lines ] if-empty ;
 
 : ldconfig-arch ( -- str )
@@ -49,7 +49,7 @@ CONSTANT: mach-map {
         [
             "ld" , "-t" , ":" split [ "-L" , , ] each
             "-o" , "/dev/null" , "-l" name append ,
-        ] { } make utf8 [ lines ] with-process-reader* 2drop
+        ] { } make utf8 [ read-lines ] with-process-reader* 2drop
         "lib" name append '[ _ swap subseq? ] find nip
     ] [ f ] if* ;
 
