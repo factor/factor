@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays kernel make math
-math.parser prettyprint sequences smalltalk.ast strings ;
+math.parser prettyprint sequences smalltalk.ast strings
+splitting ;
 IN: smalltalk.printer
 
 GENERIC: smalltalk>string ( object -- string )
