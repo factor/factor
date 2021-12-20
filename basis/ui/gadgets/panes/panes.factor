@@ -129,7 +129,7 @@ M: pane-stream stream-write1
     '[
         dup length 3639 >
         [ 3639 over last-grapheme-from cut-slice ] [ f ] if
-        swap "" like split-lines @ dup
+        swap "" like ?split-lines @ dup
     ] loop drop ; inline
 
 M: pane-stream stream-write
@@ -353,7 +353,7 @@ M: paragraph pane-line
     { presented image-style } pick '[ _ key? ] any? [
         pane-text
     ] [
-        [ words ] 2dip
+        [ split-words ] 2dip
         [ pane-bl ] [ pane-text ] bi-curry bi-curry
         interleave
     ] if ;

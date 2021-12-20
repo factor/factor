@@ -135,9 +135,9 @@ CONSTRUCTOR: <tree> tree ( -- obj ) ;
 : commit. ( commit -- )
     {
         [ hash>> "commit " prepend print ]
-        [ author>> "Author: " prepend words 2 head* unwords print ]
-        [ author>> words git-date>string "Date:   " prepend print ]
-        [ message>> "\n" split [ "    " prepend ] map unlines nl print nl ]
+        [ author>> "Author: " prepend split-words 2 head* join-words print ]
+        [ author>> split-words git-date>string "Date:   " prepend print ]
+        [ message>> "\n" split [ "    " prepend ] map join-lines nl print nl ]
     } cleave ;
 
 ERROR: unknown-field name parameter ;
@@ -155,14 +155,14 @@ ERROR: unknown-field name parameter ;
 
 : git-string>assoc ( string -- assoc )
     "\n\n" split1 [
-        lines [ nip first CHAR: \s = ] monotonic-split
+        split-lines [ nip first CHAR: \s = ] monotonic-split
         [
             dup length 1 = [
                 first " " split1 2array
             ] [
                 [ first " " split1 ]
                 [ rest [ rest ] map ] bi
-                swap prefix unlines 2array
+                swap prefix join-lines 2array
             ] if
         ] map
     ] [

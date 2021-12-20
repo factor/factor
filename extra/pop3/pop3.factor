@@ -45,14 +45,14 @@ TUPLE: raw-source top headers content ;
 : get-ok-and-total ( -- total )
     stream [
         readln dup "+OK" head? [
-            words second string>number dup account count<<
+            split-words second string>number dup account count<<
         ] [ throw ] if
     ] with-stream* ;
 
 : get-ok-and-uidl ( -- uidl )
     stream [
         readln dup "+OK" head? [
-            words last
+            split-words last
         ] [ throw ] if
     ] with-stream* ;
 

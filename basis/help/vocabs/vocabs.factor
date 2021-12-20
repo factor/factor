@@ -95,7 +95,7 @@ C: <vocab-author> vocab-author
         [
             [ <$pretty-link> ]
             [ superclass-of <$pretty-link> ]
-            [ "slots" word-prop [ name>> ] map unwords <$snippet> ]
+            [ "slots" word-prop [ name>> ] map join-words <$snippet> ]
             tri 3array
         ] map
         { { $strong "Class" } { $strong "Superclass" } { $strong "Slots" } } prefix

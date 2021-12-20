@@ -56,7 +56,7 @@ PRIVATE>
 : unix-factor ( string -- )
     dup string>number [
         [ ": " append write ]
-        [ factors [ number>string ] map unwords print ] bi*
+        [ factors [ number>string ] map join-words print ] bi*
     ] [
         "factor: `" "' is not a valid positive integer" surround print
     ] if* flush ;

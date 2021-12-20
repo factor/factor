@@ -36,7 +36,7 @@ IN: text-to-pdf
         "/Author " "USER" os-env "unknown" or pdf-string append ,
         "/Creator (created with Factor)" ,
         ">>" ,
-    ] { } make unlines ;
+    ] { } make join-lines ;
 
 : pdf-catalog ( -- str )
     {
@@ -44,7 +44,7 @@ IN: text-to-pdf
         "/Type /Catalog"
         "/Pages 4 0 R"
         ">>"
-    } unlines ;
+    } join-lines ;
 
 : pdf-font ( -- str )
     {
@@ -53,7 +53,7 @@ IN: text-to-pdf
         "/Subtype /Type1"
         "/BaseFont /Courier"
         ">>"
-    } unlines ;
+    } join-lines ;
 
 : pdf-pages ( n -- str )
     [
@@ -67,7 +67,7 @@ IN: text-to-pdf
             "/Kids [ " "]" surround ,
         ] bi
         ">>" ,
-    ] { } make unlines ;
+    ] { } make join-lines ;
 
 : pdf-text ( lines -- str )
     [
@@ -77,7 +77,7 @@ IN: text-to-pdf
         "12 TL" ,
         [ pdf-string "'" append , ] each
         "ET" ,
-    ] { } make unlines pdf-stream ;
+    ] { } make join-lines pdf-stream ;
 
 : pdf-page ( n -- page )
     [
@@ -87,7 +87,7 @@ IN: text-to-pdf
         1 + "/Contents %d 0 R" sprintf ,
         "/Resources << /Font << /F1 3 0 R >> >>" ,
         ">>" ,
-    ] { } make unlines ;
+    ] { } make join-lines ;
 
 : pdf-trailer ( objects -- str )
     [
@@ -106,10 +106,10 @@ IN: text-to-pdf
         "startxref" ,
         [ length 1 + ] map-sum 9 + "%d" sprintf ,
         "%%EOF" ,
-    ] { } make unlines ;
+    ] { } make join-lines ;
 
 : string>lines ( str -- lines )
-    "\t" split "    " join lines
+    "\t" split "    " join split-lines
     [ [ " " ] when-empty ] map ;
 
 : lines>pages ( lines -- pages )
@@ -127,7 +127,7 @@ IN: text-to-pdf
     dup length [1,b] zip [ first2 pdf-object ] map ;
 
 : objects>pdf ( objects -- str )
-    [ unlines "\n" append "%PDF-1.4\n" ]
+    [ join-lines "\n" append "%PDF-1.4\n" ]
     [ pdf-trailer ] bi surround ;
 
 PRIVATE>

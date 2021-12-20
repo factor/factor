@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators.smart debugger fry io.encodings.utf8
-io.files io.streams.string kernel literals locals mason.common
-mason.config mason.disk mason.test math namespaces sequences
+USING: assocs combinators.smart debugger io.encodings.utf8
+io.files io.streams.string kernel literals mason.common
+mason.config mason.disk math namespaces sequences splitting
 xml.syntax xml.writer ;
 IN: mason.report
 
@@ -37,7 +37,7 @@ IN: mason.report
     ] with-file-writer ; inline
 
 : file-tail ( file encoding lines -- seq )
-    [ file-lines ] dip short tail* unlines ;
+    [ file-lines ] dip short tail* join-lines ;
 
 :: failed-report ( error file what -- status )
     [

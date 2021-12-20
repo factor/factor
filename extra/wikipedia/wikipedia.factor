@@ -75,7 +75,7 @@ PRIVATE>
 : article. ( name -- )
     wikipedia-url http-get nip parse-html
     "content" find-by-id-between
-    html-text lines
-    [ [ blank? ] trim ] map harvest [
+    html-text split-lines
+    [ [ ascii:blank? ] trim ] map harvest [
         html-unescape 72 wrap-string print nl
     ] each ;

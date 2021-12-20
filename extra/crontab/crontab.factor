@@ -133,4 +133,4 @@ PRIVATE>
     now next-times-after ;
 
 : read-crontab ( -- entries )
-    lines harvest [ parse-cronentry ] map ;
+    read-lines harvest [ parse-cronentry ] map ;

@@ -20,13 +20,13 @@ GENERIC: array-element>string ( object -- string )
 M: object array-element>string smalltalk>string ;
 
 M: array array-element>string
-    [ array-element>string ] map unwords "(" ")" surround ;
+    [ array-element>string ] map join-words "(" ")" surround ;
 
 M: array smalltalk>string
     array-element>string "#" prepend ;
 
 M: byte-array smalltalk>string
-    [ number>string ] { } map-as unwords "#[" "]" surround ;
+    [ number>string ] { } map-as join-words "#[" "]" surround ;
 
 M: symbol smalltalk>string
     name>> smalltalk>string "#" prepend ;

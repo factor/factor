@@ -33,7 +33,7 @@ C: <mime-variable> mime-variable
     >byte-array write ;
 
 : parse-headers ( string -- hashtable )
-    lines harvest [ parse-header-line ] map >hashtable ;
+    split-lines harvest [ parse-header-line ] map >hashtable ;
 
 : fill-bytes ( multipart -- multipart )
     buffer-size read

@@ -86,7 +86,7 @@ TUPLE: CreateProcess-args
     ] when ;
 
 : join-arguments ( args -- cmd-line )
-    [ escape-argument ] map unwords ;
+    [ escape-argument ] map join-words ;
 
 : lookup-priority ( process -- n )
     priority>> {

@@ -639,7 +639,7 @@ PRIVATE>
     "\n" split
     [ rest-slice [ [ blank? ] trim-head-slice ] map! drop ]
     [ but-last-slice [ [ blank? ] trim-tail-slice ] map! drop ]
-    [ unwords ]
+    [ join-words ]
     tri ;
 
 : last-line? ( document line -- ? )

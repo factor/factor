@@ -191,4 +191,4 @@ CONSTANT: text-style H{ { font-size 12 } { font-style plain } }
 PRIVATE>
 
 : gemtext. ( base-url body -- )
-    f pre [ lines [ gemini-line. ] with each ] with-variable ;
+    f pre [ split-lines [ gemini-line. ] with each ] with-variable ;
