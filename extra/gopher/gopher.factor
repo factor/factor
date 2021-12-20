@@ -88,7 +88,7 @@ M: gopher-link >url
     ] if ;
 
 : gopher-text ( object -- lines )
-    utf8 decode string-lines { "." } split1 drop ;
+    utf8 decode lines { "." } split1 drop ;
 
 : gopher-text. ( object -- )
     gopher-text [ print ] each ;

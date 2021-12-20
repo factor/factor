@@ -14,7 +14,7 @@ IN: strings.tables
 PRIVATE>
 
 : format-table ( table -- seq )
-    [ [ string-lines ] map format-row flip ] map concat flip
+    [ [ lines ] map format-row flip ] map concat flip
     [ { } ] [
         [ but-last-slice [ format-column ] map! drop ] keep
         flip [ " " join ] map!

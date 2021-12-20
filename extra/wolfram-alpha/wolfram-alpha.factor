@@ -43,7 +43,7 @@ PRIVATE>
         [ "title" attr "%s:\n" printf ]
         [
             "plaintext" deep-tags-named [
-                children>string string-lines
+                children>string lines
                 [ "  %s\n" printf ] each
             ] each
         ] bi

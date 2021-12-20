@@ -11,7 +11,7 @@ IN: pdf.streams
 ! FIXME: what about "proper" tab support?
 
 : string>texts ( string style -- seq )
-    [ string-lines ] dip '[ _ <text> 1array ] map
+    [ lines ] dip '[ _ <text> 1array ] map
     <br> 1array join ;
 
 PRIVATE>

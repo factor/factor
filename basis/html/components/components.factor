@@ -150,11 +150,11 @@ TUPLE: code mode ;
 : <code> ( -- code )
     code new ;
 
-: ?string-lines ( str/f -- seq )
-    [ { } ] [ string-lines ] if-empty ;
+: ?lines ( str/f -- seq )
+    [ { } ] [ lines ] if-empty ;
 
 M: code render*
-    [ ?string-lines ] [ drop ] [ mode>> value ] tri* htmlize-lines ;
+    [ ?lines ] [ drop ] [ mode>> value ] tri* htmlize-lines ;
 
 ! Farkup component
 TUPLE: farkup no-follow disable-images parsed ;

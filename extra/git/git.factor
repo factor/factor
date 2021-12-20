@@ -155,7 +155,7 @@ ERROR: unknown-field name parameter ;
 
 : git-string>assoc ( string -- assoc )
     "\n\n" split1 [
-        string-lines [ nip first CHAR: \s = ] monotonic-split
+        lines [ nip first CHAR: \s = ] monotonic-split
         [
             dup length 1 = [
                 first " " split1 2array

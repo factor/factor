@@ -94,7 +94,7 @@ M: integer year.
         [
             [ month-name 20 center. ]
             [ days-header. days. nl nl ] bi
-        ] with-string-writer string-lines
+        ] with-string-writer lines
     ] with map 3 <groups>
     [ first3 [ "%-20s  %-20s  %-20s\n" printf ] 3each ] each ;
 
