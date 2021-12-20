@@ -187,7 +187,7 @@ M: openssl-context dispose*
         tri
     ] with-destructors ;
 
-TUPLE: ssl-handle < disposable file handle connected ;
+TUPLE: ssl-handle < disposable file handle connected terminated ;
 
 SYMBOL: default-secure-context
 
@@ -275,7 +275,8 @@ PRIVATE>
     handle ;
 
 : ssl-error-syscall ( ssl-handle -- event/f )
-    f >>connected drop
+    f >>connected
+    t >>terminated drop
     ERR_get_error {
         { -1 [
             errno { [ ECONNRESET = ] [ EPIPE = ] } 1||
@@ -308,8 +309,12 @@ PRIVATE>
 
 : maybe-handshake ( ssl-handle -- )
     dup connected>> [ drop ] [
-        [ [ do-ssl-accept ] with-timeout ]
-        [ t swap connected<< ] bi
+        dup terminated>> [
+            drop
+        ] [
+            [ [ do-ssl-accept ] with-timeout ]
+            [ t swap connected<< ] bi
+        ] if
     ] if ;
 
 ! Input ports
