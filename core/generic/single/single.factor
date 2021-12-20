@@ -25,6 +25,9 @@ PREDICATE: single-generic < generic
 
 M: single-generic make-inline cannot-be-inline ;
 
+M: single-generic lookup-methods ( class generic -- sequence )
+    ?lookup-method [ 1array ] [ f ] if* ;
+
 GENERIC: dispatch# ( word -- n )
 
 M: generic dispatch# "combination" word-prop dispatch# ;
@@ -225,13 +228,19 @@ ERROR: unreachable ;
 : class-predicates ( assoc -- assoc )
     [ [ predicate-def [ dup ] prepend ] dip ] assoc-map ;
 
-: <predicate-engine-word> ( -- word )
-    generic-word get name>> "/predicate-engine" append f <word>
+: <engine-word> ( suffix -- word )
+    generic-word get name>> prepend f <word>
     dup generic-word get "owner-generic" set-word-prop ;
+
+: <predicate-engine-word> ( -- word )
+    "/predicate-engine" <engine-word> ;
+! : <predicate-engine-word> ( -- word )
+!     generic-word get name>> "/predicate-engine" append f <word>
+!     dup generic-word get "owner-generic" set-word-prop ;
 
 M: predicate-engine-word stack-effect "owner-generic" word-prop stack-effect ;
 
-: define-predicate-engine ( alist -- word )
+: define-predicate-engine ( quot -- word )
     [ <predicate-engine-word> ] dip
     [ define ] [ drop generic-word get "engines" word-prop push ] [ drop ] 2tri ;
 

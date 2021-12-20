@@ -1,15 +1,18 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.algebra
-classes.algebra.private classes.maybe classes.private
-combinators definitions kernel make math namespaces sequences
-sets words ;
+USING: accessors arrays assocs classes classes.algebra classes.algebra.private
+classes.maybe classes.private combinators definitions kernel make namespaces
+sequences sets words ;
 IN: generic
 
 ! Method combination protocol
 GENERIC: perform-combination ( word combination -- )
 
 GENERIC: make-default-method ( generic combination -- method )
+
+! Called in compiler context when generic word is encountered, can throw errors.
+GENERIC: check-generic ( generic -- )
+M: word check-generic drop ;
 
 PREDICATE: generic < word
     "combination" word-prop >boolean ;
@@ -26,7 +29,13 @@ PREDICATE: method < word
 
 ERROR: method-lookup-failed class generic ;
 
-: ?lookup-method ( class generic -- method/f )
+! Multi-methods can return more than one result here
+GENERIC: lookup-methods ( class generic -- seq )
+
+! Multi-methods need to wrap the class in a dispatch to see if it is defined
+GENERIC: ?lookup-method ( class generic -- method/f )
+
+M: generic ?lookup-method
     "methods" word-prop at ;
 
 : lookup-method ( class generic -- method )
@@ -154,6 +163,14 @@ M: anonymous-intersection implementor-classes participants>> ;
         reset-caches
     ] if ;
 
+: create-multi-method ( classes generic -- method )
+    2dup ?lookup-method dup [ 2nip dup reset-generic ] [
+        drop
+        [ <method> dup ] 2keep
+        reveal-method
+        reset-caches
+    ] if ;
+
 PREDICATE: default-method < word "default" word-prop ;
 
 : <default-method> ( generic combination -- method )
@@ -214,5 +231,9 @@ M: generic subwords
         tri
     ] { } make ;
 
+: lookup-all-methods ( class -- seq )
+    dup implementors
+    [ lookup-methods ] with gather ;
+
 M: class forget-methods
-    [ implementors ] [ [ swap ?lookup-method ] curry ] bi map forget-all ;
+    lookup-all-methods forget-all ;
