@@ -445,6 +445,7 @@ FUNCTION: int SSL_accept ( SSL* ssl )
 FUNCTION: int SSL_connect ( SSL* ssl )
 FUNCTION: int SSL_read ( SSL* ssl, void* buf, int num )
 FUNCTION: int SSL_write ( SSL* ssl, void* buf, int num )
+FUNCTION: int SSL_write_ex ( SSL* ssl, void* buf, size_t num, size_t* written )
 FUNCTION: long SSL_ctrl ( SSL* ssl, int cmd, long larg, void* parg )
 
 FUNCTION: int SSL_shutdown ( SSL* ssl )
