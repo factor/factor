@@ -79,7 +79,7 @@ IN: help.syntax
     ] produce nip ;
 
 : code-lines ( str -- seq )
-    split-lines [ [ blank? ] trim ] map harvest ;
+    split-lines [ [ ascii:blank? ] trim ] map harvest ;
 
 : make-example ( str -- seq )
     code-lines dup { [ array? ] [ length 1 > ] } 1&& [

@@ -34,14 +34,14 @@ DEFER: name/values
     dup find-` [
         dup 1 - pick ?nth CHAR: : =
         [ drop name/values ] [ cut swap (parse-value) ] if
-        [ rest [ blank? ] trim-head ] dip
+        [ rest [ unicode:blank? ] trim-head ] dip
     ] [ f swap ] if* ;
 
 : (name=value) ( string -- remain term )
     parse-name [ parse-value ] dip associate ;
 
 : name=value ( string -- remain term )
-    [ blank? ] trim
+    [ unicode:blank? ] trim
     ":`" over subseq? [ (name=value) ] [ f swap ] if ;
 
 : name/values ( string -- remain terms )

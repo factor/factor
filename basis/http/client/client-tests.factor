@@ -1,5 +1,6 @@
 USING: accessors http http.client http.client.private
-io.streams.string kernel namespaces sequences tools.test urls ;
+io.streams.string kernel namespaces sequences splitting
+tools.test urls ;
 IN: http.client.tests
 
 { "foo.txt" } [ "http://www.paulgraham.com/foo.txt" download-name ] unit-test

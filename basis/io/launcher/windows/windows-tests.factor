@@ -97,7 +97,7 @@ SYMBOLS: out-path err-path ;
         console-vm-path "-run=listener" 2array >>command
         +closed+ >>stdin
         +stdout+ >>stderr
-    utf8 [ lines last ] with-process-reader
+    utf8 [ read-lines last ] with-process-reader
 ] unit-test
 
 : launcher-test-path ( -- str )
@@ -231,7 +231,7 @@ SYMBOLS: out-path err-path ;
 
 [ "IN: scratchpad " ] [
     console-vm-path "-run=listener" 2array
-    ascii [ "USE: system 0 exit" print flush lines last ] with-process-stream
+    ascii [ "USE: system 0 exit" print flush read-lines last ] with-process-stream
 ] unit-test
 
 [ ] [

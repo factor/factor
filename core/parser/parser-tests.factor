@@ -2,7 +2,7 @@ USING: accessors arrays assocs classes compiler.units effects
 eval generic grouping io.pathnames io.streams.string kernel
 lexer math multiline namespaces parser sequences sets
 source-files source-files.errors strings tools.crossref
-tools.test vocabs vocabs.parser words words.symbol ;
+tools.test vocabs vocabs.parser words words.symbol splitting ;
 IN: parser.tests
 
 { 1 [ 2 [ 3 ] 4 ] 5 }

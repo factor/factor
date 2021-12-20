@@ -56,10 +56,10 @@ M: one-char-elt next-elt 2drop ;
 <PRIVATE
 
 : blank-at? ( n seq -- n seq ? )
-    2dup ?nth blank? ;
+    2dup ?nth unicode:blank? ;
 
 : break-detector ( ? -- quot )
-    '[ blank? _ xor ] ; inline
+    '[ unicode:blank? _ xor ] ; inline
 
 : prev-word ( col str ? -- col )
     break-detector find-last-from drop ?1+ ;

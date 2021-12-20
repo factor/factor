@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs combinators.extras io.files kernel math sequences
-splitting tools.test ;
+splitting tools.test splitting ;
 
 { "a b" }
 [ "a" "b" [ " " glue ] once ] unit-test
@@ -66,5 +66,5 @@ splitting tools.test ;
 { f } [ H{ { 1 H{ { 3 4 } } } } { [ 1 of ] [ 2 of ] } chain ] unit-test
 { f } [ H{ { 2 H{ { 3 4 } } } } { [ 1 of ] [ 2 of ] } chain ] unit-test
 { 5 } [
-    "hello factor!" { [ words ] [ first ] [ length ] } chain
+    "hello factor!" { [ split-words ] [ first ] [ length ] } chain
 ] unit-test

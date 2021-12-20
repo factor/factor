@@ -98,7 +98,7 @@ HELP: split-lines
 { $values { "seq" sequence } { "seq'" { $sequence string } } }
 { $description "Splits a string along line breaks." }
 { $examples
-    { $example "USING: prettyprint splitting ;" "\"Hello\\r\\nworld\\n\" lines ." "{ \"Hello\" \"world\" }" }
+    { $example "USING: prettyprint splitting ;" "\"Hello\\r\\nworld\\n\" split-lines ." "{ \"Hello\" \"world\" }" }
 } ;
 
 HELP: replace
