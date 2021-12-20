@@ -41,7 +41,7 @@ TUPLE: srt-chunk id begin-time end-time rect text ;
     [ parse-srt-chunk ] { } map-as ;
 
 : parse-srt-string ( seq -- seq' )
-    string-lines parse-srt-lines ;
+    lines parse-srt-lines ;
 
 : parse-srt-file ( path -- seq )
     utf8 file-lines parse-srt-lines ;

@@ -237,7 +237,7 @@ HELP: with-process-reader
 { $examples
   { $unchecked-example
     "USING: io.launcher prettyprint io.encodings.utf8 ;"
-    "\"ls -dl /etc\" utf8 [ contents ] with-process-reader ."
+    "\"ls -dl /etc\" utf8 [ read-contents ] with-process-reader ."
     "\"drwxr-xr-x 213 root root 12288 mar 11 18:52 /etc\\n\""
   }
 } ;

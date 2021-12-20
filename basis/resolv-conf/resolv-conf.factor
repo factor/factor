@@ -94,7 +94,7 @@ PRIVATE>
     [ parse-resolv.conf-line ] each ;
 
 : string>resolv.conf ( string -- resolv.conf )
-    string-lines lines>resolv.conf ;
+    lines lines>resolv.conf ;
 
 : path>resolv.conf ( path -- resolv.conf )
     utf8 file-lines lines>resolv.conf ;

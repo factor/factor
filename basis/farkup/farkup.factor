@@ -203,7 +203,7 @@ DEFER: (parse-paragraph)
     } case ;
 
 : parse-farkup ( string -- farkup )
-    string-lines [ dup empty? not ] [ parse-item ] produce nip sift ;
+    lines [ dup empty? not ] [ parse-item ] produce nip sift ;
 
 CONSTANT: invalid-url "javascript:alert('Invalid URL in farkup');"
 
@@ -217,7 +217,7 @@ CONSTANT: invalid-url "javascript:alert('Invalid URL in farkup');"
     } cond ;
 
 : render-code ( string mode -- xml )
-    [ string-lines ] dip htmlize-lines
+    [ lines ] dip htmlize-lines
     [XML <pre><-></pre> XML] ;
 
 GENERIC: (write-farkup) ( farkup -- xml )

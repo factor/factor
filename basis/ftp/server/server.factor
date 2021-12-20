@@ -180,7 +180,7 @@ M: ftp-list handle-passive-command
     start-directory [
         utf8 encode-output [
             "." directory.
-        ] with-string-writer string-lines
+        ] with-string-writer lines
         harvest [ ftp-send ] each
     ] with-output-stream finish-directory ;
 

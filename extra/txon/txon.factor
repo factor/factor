@@ -27,7 +27,7 @@ IN: txon
 DEFER: name/values
 
 : (parse-value) ( string -- values )
-    decode-value string-lines
+    decode-value lines
     [ "" ] [ dup length 1 = [ first ] when ] if-empty ;
 
 : parse-value ( string -- remain value )

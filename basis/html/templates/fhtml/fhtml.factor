@@ -58,7 +58,7 @@ SYNTAX: %> lexer get parse-%> ;
         [
             parser-quiet? on
             "html.templates.fhtml" use-vocab
-            string-lines parse-template-lines
+            lines parse-template-lines
         ] with-file-vocabs
     ] with-compilation-unit ;
 

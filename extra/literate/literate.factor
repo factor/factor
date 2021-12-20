@@ -20,6 +20,6 @@ M: literate-lexer skip-blank
     ] [ call-next-method ] if ;
 
 SYNTAX: <LITERATE
-    "LITERATE>" parse-multiline-string string-lines [
+    "LITERATE>" parse-multiline-string lines [
         <literate-lexer> (parse-lines) append!
     ] with-nested-compilation-unit ;

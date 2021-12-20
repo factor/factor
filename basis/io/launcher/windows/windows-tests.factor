@@ -158,7 +158,7 @@ SYMBOLS: out-path err-path ;
     launcher-test-path [
         <process>
             console-vm-path "-script" "env.factor" 3array >>command
-        utf8 [ contents ] with-process-reader
+        utf8 [ read-contents ] with-process-reader
     ] with-directory eval( -- alist )
 
     os-envs =
@@ -170,7 +170,7 @@ SYMBOLS: out-path err-path ;
             console-vm-path "-script" "env.factor" 3array >>command
             +replace-environment+ >>environment-mode
             os-envs >>environment
-        utf8 [ contents ] with-process-reader
+        utf8 [ read-contents ] with-process-reader
     ] with-directory eval( -- alist )
 
     os-envs =
@@ -181,7 +181,7 @@ SYMBOLS: out-path err-path ;
         <process>
             console-vm-path "-script" "env.factor" 3array >>command
             { { "A" "B" } } >>environment
-        utf8 [ contents ] with-process-reader
+        utf8 [ read-contents ] with-process-reader
     ] with-directory eval( -- alist )
 
     "A" of
@@ -193,7 +193,7 @@ SYMBOLS: out-path err-path ;
             console-vm-path "-script" "env.factor" 3array >>command
             { { "USERPROFILE" "XXX" } } >>environment
             +prepend-environment+ >>environment-mode
-        utf8 [ contents ] with-process-reader
+        utf8 [ read-contents ] with-process-reader
     ] with-directory eval( -- alist )
 
     "USERPROFILE" of "XXX" =
