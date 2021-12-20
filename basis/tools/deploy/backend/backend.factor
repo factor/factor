@@ -68,7 +68,7 @@ ERROR: can't-deploy-library-file library ;
         [
             "-staging" , "-no-user-init" , "-pic=0" ,
             [ staging-image-name "-output-image=" prepend , ]
-            [ " " join "-include=" prepend , ] bi
+            [ unwords "-include=" prepend , ] bi
         ] [
             input-image-name "-i=" prepend ,
             "-resource-path=" "" resource-path append ,

@@ -13,7 +13,7 @@ TUPLE: label < aligned-gadget text font ;
 SLOT: string
 
 M: label string>>
-    text>> dup string? [ "\n" join ] unless ; inline
+    text>> dup string? [ unlines ] unless ; inline
 
 <PRIVATE
 

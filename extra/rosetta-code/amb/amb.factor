@@ -38,6 +38,6 @@ CONSTANT: words {
 : select ( seq -- seq' ) [ amb-lazy ] map ;
 
 : search ( -- )
-    words select dup sentence-match? [ " " join ] [ fail ] if . ;
+    words select dup sentence-match? [ unwords ] [ fail ] if . ;
 
 MAIN: search

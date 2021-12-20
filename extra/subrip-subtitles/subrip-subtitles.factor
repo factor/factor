@@ -26,7 +26,7 @@ TUPLE: srt-chunk id begin-time end-time rect text ;
         ?second "  " split1
         [ "-->" split1 [ [ blank? ] trim parse-srt-timestamp ] bi@ ]
         [
-            [ blank? ] trim " " split sift [
+            [ blank? ] trim words sift [
                 f
             ] [
                 [ ":" split1 nip string>number ] map
@@ -34,7 +34,7 @@ TUPLE: srt-chunk id begin-time end-time rect text ;
             ] if-empty
         ] bi*
     ]
-    [ 2 tail "\n" join ] tri srt-chunk boa ;
+    [ 2 tail unlines ] tri srt-chunk boa ;
 
 : parse-srt-lines ( seq -- seq' )
     { "" } split harvest

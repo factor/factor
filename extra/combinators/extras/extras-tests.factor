@@ -66,5 +66,5 @@ splitting tools.test ;
 { f } [ H{ { 1 H{ { 3 4 } } } } { [ 1 of ] [ 2 of ] } chain ] unit-test
 { f } [ H{ { 2 H{ { 3 4 } } } } { [ 1 of ] [ 2 of ] } chain ] unit-test
 { 5 } [
-    "hello factor!" { [ " " split ] [ first ] [ length ] } chain
+    "hello factor!" { [ words ] [ first ] [ length ] } chain
 ] unit-test

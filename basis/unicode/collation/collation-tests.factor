@@ -24,19 +24,19 @@ IN: unicode.collation.tests
 
 : parse-collation-test-shifted ( -- lines )
     collation-test-lines
-    [ ";" split first " " split [ hex> ] "" map-as ] map ;
+    [ ";" split first words [ hex> ] "" map-as ] map ;
 
 : tail-from-last ( string char -- string' )
     '[ _ = ] dupd find-last drop 1 + tail ; inline
 
 : line>test-weights ( string -- pair )
     ";" split1 [
-        " " split [ hex> ] map
+        words [ hex> ] map
     ] [
         "#" split1 nip CHAR: [ tail-from-last
         "]" split1 drop
         "|" split 4 head
-        [ " " split harvest [ hex> ] map ] map
+        [ words harvest [ hex> ] map ] map
     ] bi* 2array ;
 
 ! These tests actually would pass if I didn't fix up

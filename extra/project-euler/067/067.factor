@@ -39,7 +39,7 @@ IN: project-euler.067
 
 : source-067 ( -- seq )
     "resource:extra/project-euler/067/triangle.txt"
-    ascii file-lines [ " " split [ string>number ] map ] map ;
+    ascii file-lines [ words [ string>number ] map ] map ;
 
 PRIVATE>
 

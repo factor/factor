@@ -121,7 +121,7 @@ M: pathname url-of
 : css-classes ( classes -- stylesheet )
     [
         [ css-style " { " "}" surround ] [ "." prepend ] bi* prepend
-    ] { } assoc>map "\n" join ;
+    ] { } assoc>map unlines ;
 
 :: css-styles-to-classes ( body -- stylesheet body )
     H{ } clone :> classes

@@ -221,7 +221,7 @@ TUPLE: post-data data params content-type content-encoding ;
         swap >>content-type ;
 
 : parse-content-type-attributes ( string -- attributes )
-    " " split harvest [
+    words harvest [
         "=" split1
         "\"" ?head drop "\"" ?tail drop
     ] { } map>assoc ;

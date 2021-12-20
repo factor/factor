@@ -21,16 +21,16 @@ IN: help.search
             { \ $vocab-link [ second ] }
             { \ $emphasis [ second ] }
             { \ $subsection [ second article-name ] }
-            { \ $subsections [ rest [ article-name ] map " " join ] }
-            { \ $description [ rest [ element-value ] map " " join ] }
-            { \ $notes [ rest [ element-value ] map " " join ] }
-            { \ $snippet [ rest [ element-value ] map " " join ] }
+            { \ $subsections [ rest [ article-name ] map unwords ] }
+            { \ $description [ rest [ element-value ] map unwords ] }
+            { \ $notes [ rest [ element-value ] map unwords ] }
+            { \ $snippet [ rest [ element-value ] map unwords ] }
             [ 2drop f ]
         } case
     ] [ dup string? [ drop f ] unless ] if ;
 
 MEMO: article-words ( name -- words )
-    article-content [ element-value ] map " " join search-words
+    article-content [ element-value ] map unwords search-words
     [ [ digit? ] all? ] reject
     [ [ { [ letter? ] [ digit? ] } 1|| not ] trim ] map! harvest  ;
 

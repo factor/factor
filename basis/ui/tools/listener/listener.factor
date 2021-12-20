@@ -6,8 +6,8 @@ concurrency.mailboxes continuations destructors documents
 documents.elements fonts hashtables help help.markup help.tips
 io io.styles kernel lexer listener literals math math.vectors
 models models.arrow models.delay namespaces parser prettyprint
-sequences source-files.errors strings system threads ui
-ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.glass
+sequences source-files.errors splitting strings system threads
+ui ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.glass
 ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.tracks
 ui.gestures ui.operations ui.pens.solid ui.theme
@@ -161,7 +161,7 @@ M: interactor stream-readln
 M:: interactor stream-read-unsafe ( n buf interactor -- count )
     n [ 0 ] [
         drop
-        interactor interactor-read dup [ "\n" join ] when
+        interactor interactor-read dup [ unlines ] when
         n short [ head-slice 0 buf copy ] keep
     ] if-zero ;
 
@@ -176,7 +176,7 @@ M: interactor stream-read1
 M: interactor stream-read-until
     swap '[
         _ interactor-read [
-            "\n" join CHAR: \n suffix
+            unlines CHAR: \n suffix
             [ _ member? ] dupd find
             [ [ head ] when* ] dip dup not
         ] [ f f f ] if*

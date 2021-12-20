@@ -13,7 +13,7 @@ IN: webapps.mason.version.binary
     ] "" make ;
 
 : binary-release-script ( version builders -- string )
-    [ binary-release-command ] with map "\n" join ;
+    [ binary-release-command ] with map unlines ;
 
 : do-binary-release ( version builders -- )
     "Copying binary releases to release directory..." print flush

@@ -66,7 +66,7 @@ CHLOE: base
     compile-a-url [ [XML <base href=<->/> XML] ] [xml-code] ;
 
 : hidden-nested-fields ( -- xml )
-    nested-forms get " " join f like nested-forms-key
+    nested-forms get unwords f like nested-forms-key
     hidden-form-field ;
 
 : render-hidden ( for -- xml )

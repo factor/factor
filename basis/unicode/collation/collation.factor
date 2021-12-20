@@ -25,7 +25,7 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
     ] map ;
 
 : parse-keys ( string -- chars )
-    " " split [ hex> ] "" map-as ;
+    words [ hex> ] "" map-as ;
 
 : parse-ducet ( file -- ducet )
     load-data-file [ [ parse-keys ] [ parse-weight ] bi* ] H{ } assoc-map-as ;

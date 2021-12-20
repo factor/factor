@@ -123,3 +123,6 @@ M: sbuf lines "" like lines ;
 
 : unlines-as ( seq exemplar -- seq ) "\n" swap join-as ; inline
 : unlines ( seq -- seq ) "" unlines-as ; inline
+: words ( seq -- seq ) " " split ; inline
+: unwords-as ( seq exemplar -- seq ) " " swap join-as ; inline
+: unwords ( seq -- seq ) " " unwords-as ; inline

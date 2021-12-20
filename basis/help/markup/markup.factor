@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.units
-definitions.icons effects fry hashtables help.stylesheet
-help.topics io io.styles kernel locals make math namespaces
-present prettyprint prettyprint.stylesheet quotations see
-sequences sequences.private sets sorting strings urls vocabs
+definitions.icons effects hashtables help.stylesheet help.topics
+io io.styles kernel make math namespaces present prettyprint
+prettyprint.stylesheet quotations see sequences
+sequences.private sets sorting splitting strings urls vocabs
 words words.symbol ;
 FROM: prettyprint.sections => with-pprint ;
 IN: help.markup
@@ -99,7 +99,7 @@ M: f print-element drop ;
     ] ($block) ; inline
 
 : $code ( element -- )
-    "\n" join dup <input> [ write ] ($code) ;
+    unlines dup <input> [ write ] ($code) ;
 
 : $syntax ( element -- ) "Syntax" $heading $code ;
 
@@ -122,7 +122,7 @@ M: f print-element drop ;
     "Examples" $heading print-element ;
 
 : $example ( element -- )
-    unclip-last [ "\n" join ] dip over <input> [
+    unclip-last [ unlines ] dip over <input> [
         [ print ] [ output-style get format ] bi*
     ] ($code) ;
 

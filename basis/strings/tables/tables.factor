@@ -17,5 +17,5 @@ PRIVATE>
     [ [ lines ] map format-row flip ] map concat flip
     [ { } ] [
         [ but-last-slice [ format-column ] map! drop ] keep
-        flip [ " " join ] map!
+        flip [ unwords ] map!
     ] if-empty ;
