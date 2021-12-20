@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel prettyprint io io.styles colors.constants compiler.units
 fry debugger sequences locals.rewrite smalltalk.ast
-smalltalk.eval smalltalk.printer smalltalk.listener ;
+smalltalk.eval smalltalk.printer smalltalk.listener splitting ;
 IN: smalltalk.listener
 
 : eval-interactively ( string -- )
