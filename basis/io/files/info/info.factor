@@ -12,12 +12,12 @@ accessed ;
 HOOK: file-info os ( path -- info )
 
 : ?file-info ( path -- info/f )
-    dup exists? [ file-info ] [ drop f ] if ;
+    dup file-exists? [ file-info ] [ drop f ] if ;
 
 HOOK: link-info os ( path -- info )
 
 : ?link-info ( path -- info/f )
-    dup exists? [ link-info ] [ drop f ] if ;
+    dup file-exists? [ link-info ] [ drop f ] if ;
 
 <PRIVATE
 

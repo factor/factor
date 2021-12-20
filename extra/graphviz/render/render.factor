@@ -72,7 +72,7 @@ M: cannot-find-graphviz-installation summary
     [ unsupported-encoding ] unless ;
 
 : ?delete-file ( path -- )
-    dup exists? [ delete-file ] [ drop ] if ;
+    dup file-exists? [ delete-file ] [ drop ] if ;
 
 PRIVATE>
 

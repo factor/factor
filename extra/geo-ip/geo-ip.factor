@@ -11,7 +11,7 @@ IN: geo-ip
 CONSTANT: db-url "http://software77.net/geo-ip/?DL=1"
 
 : download-db ( -- path )
-    db-path dup exists? [
+    db-path dup file-exists? [
         db-url over ".gz" append download-to
         { "gunzip" } over ".gz" append absolute-path suffix try-process
     ] unless ;

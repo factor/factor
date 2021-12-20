@@ -44,7 +44,7 @@ IN: io.files.trash.unix
     top-directory dup trash-home top-directory = [
         drop trash-home
     ] [
-        dup ".Trash" append-path exists?
+        dup ".Trash" append-path file-exists?
         [ trash-1 ] [ trash-2 ] if
         [ make-user-directory ] keep
     ] if ;
@@ -57,7 +57,7 @@ IN: io.files.trash.unix
     ] dip swap "%s%s %s%s" sprintf ;
 
 : safe-file-name ( path -- path' )
-    dup 0 [ over exists? ] [
+    dup 0 [ over file-exists? ] [
         [ parent-directory to-directory ] [ 1 + ] bi*
         [ (safe-file-name) ] keep
     ] while drop nip ;

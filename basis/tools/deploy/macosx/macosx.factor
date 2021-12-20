@@ -49,7 +49,7 @@ IN: tools.deploy.macosx
     vocab-dir "icon.icns" append-path ;
 
 : copy-icns ( vocab bundle-name -- icon? )
-    swap dup vocab-mac-icon-path vocab-append-path dup exists?
+    swap dup vocab-mac-icon-path vocab-append-path dup file-exists?
     [ swap "Contents/Resources/Icon.icns" append-path copy-file t ]
     [ 2drop f ] if ;
 
@@ -74,7 +74,7 @@ IN: tools.deploy.macosx
     [ % "/Contents/Resources/" % % ".image" % ] "" make ;
 
 : deploy-app-bundle ( vocab -- )
-    bundle-name dup exists? [ delete-tree ] [ drop ] if
+    bundle-name dup file-exists? [ delete-tree ] [ drop ] if
     [ bundle-name create-app-dir ] keep
     [ bundle-name deploy.app-image-name ] keep
     namespace make-deploy-image

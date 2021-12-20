@@ -72,7 +72,7 @@ CONSTANT: keep-logs 10
     keep-logs log# ?delete-file ;
 
 : ?move-file ( old new -- )
-    over exists? [ move-file ] [ 2drop ] if ;
+    over file-exists? [ move-file ] [ 2drop ] if ;
 
 : advance-log ( path n -- )
     [ 1 - log# ] 2keep log# ?move-file ;

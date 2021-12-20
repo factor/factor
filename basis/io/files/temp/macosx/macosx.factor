@@ -27,7 +27,7 @@ CONSTANT: factor-bundle-name "org.factorcode.Factor"
     factor-bundle-name append-path ;
 
 : first-existing ( paths -- path )
-    [ exists? ] find nip
+    [ file-exists? ] find nip
     [ "no user cache directory found" throw ] unless* ; inline
 
 PRIVATE>

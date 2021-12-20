@@ -81,7 +81,7 @@ PEG: parse-log-line ( string -- entry ) log-line-parser ;
     ] { } make ;
 
 : parse-log-file ( service -- entries )
-    log-path 1 log# dup exists?
+    log-path 1 log# dup file-exists?
     [ utf8 file-lines parse-log ] [ drop f ] if ;
 
 GENERIC: log-timestamp. ( date -- )

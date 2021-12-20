@@ -9,7 +9,7 @@ IN: vocabs.files
 
 : vocab-tests-dir ( vocab -- paths )
     dup vocab-dir "tests" append-path vocab-append-path [
-        dup exists? [
+        dup file-exists? [
             dup directory-files [ ".factor" tail? ] filter
             [ append-path ] with map
         ] [ drop f ] if
@@ -18,7 +18,7 @@ IN: vocabs.files
 : vocab-tests ( vocab -- paths )
     vocab-name ".private" ?tail drop
     [
-        [ vocab-tests-path [ dup exists? [ , ] [ drop ] if ] when* ]
+        [ vocab-tests-path [ dup file-exists? [ , ] [ drop ] if ] when* ]
         [ vocab-tests-dir % ] bi
     ] { } make ;
 

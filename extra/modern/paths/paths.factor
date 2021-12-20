@@ -43,7 +43,7 @@ CONSTANT: core-broken-vocabs
         extra-vocabs
     ] { } append-outputs-as ;
 
-: filter-exists ( seq -- seq' ) [ exists? ] filter ;
+: filter-exists ( seq -- seq' ) [ file-exists? ] filter ;
 
 ! These paths have syntax errors on purpose...
 : reject-some-paths ( seq -- seq' )

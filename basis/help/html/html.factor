@@ -145,7 +145,7 @@ M: pathname url-of
     "@2x" over subseq? [ "." split1-last "@2x." glue ] unless ;
 
 : ?copy-file ( from to -- )
-    dup exists? [ 2drop ] [ copy-file ] if ;
+    dup file-exists? [ 2drop ] [ copy-file ] if ;
 
 : cache-images ( body -- body' )
     dup [

@@ -43,7 +43,7 @@ ERROR: can't-deploy-library-file library ;
 
 : make-boot-image ( -- )
     ! If stage1 image doesn't exist, create one.
-    my-boot-image-name resource-path exists?
+    my-boot-image-name resource-path file-exists?
     [ make-my-image ] unless ;
 
 : staging-image-name ( profile -- name )
@@ -77,7 +77,7 @@ ERROR: can't-deploy-library-file library ;
     ] { } make ;
 
 : make-staging-image ( profile -- )
-    { } [ suffix ] accumulate* [ staging-image-name exists? ] reject
+    { } [ suffix ] accumulate* [ staging-image-name file-exists? ] reject
     [ staging-command-line ] map
     [ vm-path swap run-factor ] each ;
 

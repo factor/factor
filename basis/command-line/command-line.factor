@@ -41,7 +41,7 @@ SYMBOL: command-line
 
 : load-vocab-roots ( -- )
     "user-init" get [
-        "~/.factor-roots" dup exists? [
+        "~/.factor-roots" dup file-exists? [
             utf8 file-lines harvest [ add-vocab-root ] each
         ] [ drop ] if
         "roots" get [

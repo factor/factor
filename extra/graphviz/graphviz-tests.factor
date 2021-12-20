@@ -51,7 +51,7 @@ SYMBOLS: supported-layouts supported-formats ;
     ] with-test-directory ;
 
 : preview-smoke-test ( graph -- pass? )
-    [ exists? ] with-preview ;
+    [ file-exists? ] with-preview ;
 
 : K_n ( n -- graph )
     <graph>
