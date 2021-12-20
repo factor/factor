@@ -266,7 +266,7 @@ HELP: <zero-square-matrix>
 
 HELP: <diagonal-matrix>
 { $values { "diagonal-seq" sequence } { "matrix" matrix } }
-{ $description "Creates a matrix with the specified main diagonal. This word has the opposite effect of " { $link anti-diagonal } "." }
+{ $description "Creates a matrix with the specified main diagonal. This word has the opposite effect of " { $link main-diagonal } "." }
 { $notes "To use a diagonal starting in the lower right, reverse the input sequence before calling this word." }
 { $examples
     { $example
@@ -278,7 +278,7 @@ HELP: <diagonal-matrix>
 
 HELP: <anti-diagonal-matrix>
 { $values { "diagonal-seq" sequence } { "matrix" matrix } }
-{ $description "Creates a matrix with the specified anti-diagonal. This word has the opposite effect of " { $link main-diagonal } "." }
+{ $description "Creates a matrix with the specified anti-diagonal. This word has the opposite effect of " { $link anti-diagonal } "." }
 { $notes "To use a diagonal starting in the lower left, reverse the input sequence before calling this word." }
 { $examples
     { $example
