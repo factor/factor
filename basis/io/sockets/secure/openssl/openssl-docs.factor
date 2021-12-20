@@ -27,22 +27,21 @@ HELP: do-ssl-connect
 HELP: do-ssl-read
 { $values
   { "buffer" buffer }
-  { "ssl" SSL }
+  { "ssl-handle" ssl-handle }
   { "event/f" { $maybe "a symbol indicating the desired operation" } } }
 { $description "Reads from the ssl connection to the buffer." } ;
 
 HELP: do-ssl-write
 { $values
   { "buffer" buffer }
-  { "ssl" SSL }
+  { "ssl-handle" ssl-handle }
   { "event/f" { $maybe "a symbol indicating the desired operation" } } }
 { $description "Writes from the buffer to the ssl connection." } ;
 
 HELP: check-ssl-error
 { $values
-  { "ssl" SSL }
+  { "ssl-handle" ssl-handle }
   { "ret" "error code returned by an SSL function" }
-  { "extra-cases/f" { $maybe "an assoc of error codes and quotations" } }
   { "event/f" { $maybe "a symbol indicating the desired operation" } }
 }
 { $description "Checks if the last SSL function returned successfully or not. If so, returns " { $link f } " or a symbol, " { $link +input+ } " or " { $link +output+ } ", that indicates the socket operation required by libssl." } ;
