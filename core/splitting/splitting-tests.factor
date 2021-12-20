@@ -24,21 +24,21 @@ USING: ascii kernel math sequences splitting strings tools.test ;
 { "Beginning and end" f } [ "Beginning and end" "eginning " ?tail ] unit-test
 
 { { "This" "is" "a" "split" "sentence" } }
-[ "This is a split sentence" " " split ]
+[ "This is a split sentence" words ]
 unit-test
 
 { { "OneWord" } }
-[ "OneWord" " " split ]
+[ "OneWord" words ]
 unit-test
 
 { { "a" "b" "c" "d" "e" "f" } }
 [ "aXbYcXdYeXf" "XY" split ] unit-test
 
 { { "" "" } }
-[ " " " " split ] unit-test
+[ " " words ] unit-test
 
 { { "hey" } }
-[ "hey" " " split ] unit-test
+[ "hey" words ] unit-test
 
 { "Hello world" t } [ "Hello world\n" "\n" ?tail ] unit-test
 { "Hello world" f } [ "Hello world" "\n" ?tail ] unit-test

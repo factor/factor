@@ -1375,7 +1375,7 @@ SYMBOL: last-opcode
     ! Process the list of strings, which should make
     ! up an 8080 instruction, and output a quotation
     ! that would implement that instruction.
-    dup " " join instruction-quotations
+    dup unwords instruction-quotations
     [
        "_" join [ "emulate-" % % ] "" make create-word-in
        dup last-instruction set-global

@@ -58,7 +58,7 @@ IN: http.client.tests
         "content-type: text/html; charset=UTF-8"
         "date: Wed, 12 Oct 2011 18:57:49 GMT"
         "server: Factor http.server"
-    } [ "\n" join ] [ "\r\n" join ] bi
+    } [ unlines ] [ "\r\n" join ] bi
     [ [ read-response ] with-string-reader ] same?
 ] unit-test
 

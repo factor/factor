@@ -87,19 +87,19 @@ CONSTANT: morse-code-table $[
 <PRIVATE
 
 : word>morse ( str -- morse )
-    [ ch>morse ] { } map-as " " join ;
+    [ ch>morse ] { } map-as unwords ;
 
 : sentence>morse ( str -- morse )
-    " " split [ word>morse ] map " / " join ;
+    words [ word>morse ] map " / " join ;
 
 : trim-blanks ( str -- newstr )
     [ blank? ] trim ; inline
 
 : morse>word ( morse -- str )
-    " " split [ morse>ch ] "" map-as ;
+    words [ morse>ch ] "" map-as ;
 
 : morse>sentence ( morse -- sentence )
-    "/" split [ trim-blanks morse>word ] map " " join ;
+    "/" split [ trim-blanks morse>word ] map unwords ;
 
 : replace-underscores ( str -- str' )
     [ dup CHAR: _ = [ drop CHAR: - ] when ] map ;

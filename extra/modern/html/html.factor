@@ -187,12 +187,12 @@ GENERIC: write-html ( tag -- )
 
 M: doctype write-html
     [ open>> % ]
-    [ values>> [ >value ] map " " join [ " " % % ] unless-empty ]
+    [ values>> [ >value ] map unwords [ " " % % ] unless-empty ]
     [ close>> % ] tri ;
 
 
 : write-props ( seq -- )
-    [ dup array? [ first2 >value "=" glue ] [ >value ] if ] map " " join [ " " % % ] unless-empty ;
+    [ dup array? [ first2 >value "=" glue ] [ >value ] if ] map unwords [ " " % % ] unless-empty ;
 
 M: open-tag write-html
     {

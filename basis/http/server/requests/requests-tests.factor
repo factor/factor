@@ -155,6 +155,6 @@ hello
         "connection: close"
         "host: 127.0.0.1:55532"
         "user-agent: Factor http.client"
-    } [ "\n" join ] [ "\r\n" join ] bi
+    } [ unlines ] [ "\r\n" join ] bi
     [ string>request ] same?
 ] unit-test

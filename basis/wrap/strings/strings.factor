@@ -15,10 +15,10 @@ IN: wrap.strings
     lines [ split-line ] map! ;
 
 : join-elements ( wrapped-lines -- lines )
-    [ " " join ] map! ;
+    [ unwords ] map! ;
 
 : join-lines ( strings -- string )
-    "\n" join ;
+    unlines ;
 
 PRIVATE>
 

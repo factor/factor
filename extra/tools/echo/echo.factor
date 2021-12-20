@@ -9,7 +9,7 @@ IN: tools.echo
     [ first "-n" = ] keep over [ rest ] when ;
 
 : echo-args ( args -- )
-    -n? " " join write [ nl ] unless ;
+    -n? unwords write [ nl ] unless ;
 
 : run-echo ( -- )
     command-line get [ nl ] [ echo-args ] if-empty ;

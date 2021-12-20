@@ -32,7 +32,7 @@ M: integer speak number>text speak-text ;
     command-line get [
         [ speak ] each-line
     ] [
-        " " join speak
+        unwords speak
     ] if-empty ;
 
 MAIN: speak-main

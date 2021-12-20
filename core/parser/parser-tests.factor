@@ -431,7 +431,7 @@ DEFER: foo
         "GENERIC: change-combination ( obj a -- b )"
         "M: integer change-combination 2drop 1 ;"
         "M: array change-combination 2drop 2 ;"
-    } "\n" join <string-reader> "change-combination-test" parse-stream drop
+    } unlines <string-reader> "change-combination-test" parse-stream drop
 ] unit-test
 
 { } [
@@ -441,7 +441,7 @@ DEFER: foo
         "GENERIC#: change-combination 1 ( obj a -- b )"
         "M: integer change-combination 2drop 1 ;"
         "M: array change-combination 2drop 2 ;"
-    } "\n" join <string-reader> "change-combination-test" parse-stream drop
+    } unlines <string-reader> "change-combination-test" parse-stream drop
 ] unit-test
 
 { 2 } [

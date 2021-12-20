@@ -57,7 +57,7 @@ CONSTANT: revalidate-url-key "__u"
 : validation-failed ( -- * )
     post-request? revalidate-url and [
         begin-conversation
-        nested-forms-key param " " split harvest nested-forms cset
+        nested-forms-key param words harvest nested-forms cset
         form get form cset
         <continue-conversation>
     ] [ <400> ] if*

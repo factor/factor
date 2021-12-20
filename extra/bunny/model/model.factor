@@ -9,7 +9,7 @@ SPECIALIZED-ARRAY: c:uint
 IN: bunny.model
 
 : numbers ( str -- seq )
-    " " split [ string>number ] map sift ;
+    words [ string>number ] map sift ;
 
 : (parse-model) ( vs is -- vs is )
     readln [
