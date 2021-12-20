@@ -297,7 +297,7 @@ M: revision feed-entry-url id>> revision-url ;
                 [ "new" [ from-object ] nest-form ]
                 bi*
             ]
-            [ [ content>> lines ] bi@ lcs-diff "diff" set-value ]
+            [ [ content>> split-lines ] bi@ lcs-diff "diff" set-value ]
             2bi
         ] >>init
 

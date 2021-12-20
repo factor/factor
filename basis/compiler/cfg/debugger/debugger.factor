@@ -54,7 +54,7 @@ M: ##phi insn.
 M: insn insn. ( insn -- )
     tuple>array unclip-last insn-number. [
         dup string? [ ] [ unparse ] if
-    ] map unwords write nl ;
+    ] map join-words write nl ;
 
 : block-header. ( bb -- )
     [ number>> ] [ kill-block?>> "(k)" "" ? ] bi

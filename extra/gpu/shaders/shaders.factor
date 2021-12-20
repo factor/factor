@@ -332,7 +332,7 @@ SYMBOL: padding-no
 : replace-log-line-numbers ( object log -- log' )
     "\n" split harvest
     [ replace-log-line-number ] with map
-    unlines ;
+    join-lines ;
 
 : gl-shader-kind ( shader-kind -- shader-kind )
     {

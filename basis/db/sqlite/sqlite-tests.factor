@@ -5,7 +5,7 @@ math.parser namespaces sequences sorting splitting tools.test ;
 IN: db.sqlite.tests
 
 : normalize ( str -- str' )
-    " \n" split harvest unwords ;
+    " \n" split harvest join-words ;
 
 ! delete-trigger-restrict
 ${

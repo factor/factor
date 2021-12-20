@@ -13,7 +13,7 @@ TUPLE: label < aligned-gadget text font ;
 SLOT: string
 
 M: label string>>
-    text>> dup string? [ unlines ] unless ; inline
+    text>> dup string? [ join-lines ] unless ; inline
 
 <PRIVATE
 
@@ -22,7 +22,7 @@ PREDICATE: string-array < array [ string? ] all? ;
 PRIVATE>
 
 : ?string-lines ( string -- string/array )
-    CHAR: \n over member-eq? [ lines ] when ;
+    CHAR: \n over member-eq? [ split-lines ] when ;
 
 M: label string<<
     [

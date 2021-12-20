@@ -15,7 +15,7 @@ IN: vocabs.platforms
 
 : parse-platform-section ( string suffix -- )
     [
-        [ [ lines parse-lines ] curry with-nested-compilation-unit ]
+        [ [ split-lines parse-lines ] curry with-nested-compilation-unit ]
         curry
     ] dip with-vocabulary drop ; inline
 

@@ -29,7 +29,7 @@ gb18030 "GB18030" register-encoding
 TUPLE: range ufirst ulast bfirst blast ;
 
 : b>byte-array ( string -- byte-array )
-    words [ hex> ] B{ } map-as ;
+    split-words [ hex> ] B{ } map-as ;
 
 : add-range ( contained ranges -- )
     [

@@ -161,7 +161,7 @@ M: interactor stream-readln
 M:: interactor stream-read-unsafe ( n buf interactor -- count )
     n [ 0 ] [
         drop
-        interactor interactor-read dup [ unlines ] when
+        interactor interactor-read dup [ join-lines ] when
         n short [ head-slice 0 buf copy ] keep
     ] if-zero ;
 
@@ -176,7 +176,7 @@ M: interactor stream-read1
 M: interactor stream-read-until
     swap '[
         _ interactor-read [
-            unlines CHAR: \n suffix
+            join-lines CHAR: \n suffix
             [ _ member? ] dupd find
             [ [ head ] when* ] dip dup not
         ] [ f f f ] if*

@@ -27,7 +27,7 @@ IN: txon
 DEFER: name/values
 
 : (parse-value) ( string -- values )
-    decode-value lines
+    decode-value split-lines
     [ "" ] [ dup length 1 = [ first ] when ] if-empty ;
 
 : parse-value ( string -- remain value )
@@ -66,12 +66,12 @@ PRIVATE>
 GENERIC: >txon ( object -- string )
 
 M: sequence >txon
-    [ >txon ] map unlines ;
+    [ >txon ] map join-lines ;
 
 M: assoc >txon
     >alist [
         first2 [ encode-value ] [ >txon ] bi* "%s:`%s`" sprintf
-    ] map unlines ;
+    ] map join-lines ;
 
 M: string >txon
     encode-value ;

@@ -99,7 +99,7 @@ M: f print-element drop ;
     ] ($block) ; inline
 
 : $code ( element -- )
-    unlines dup <input> [ write ] ($code) ;
+    join-lines dup <input> [ write ] ($code) ;
 
 : $syntax ( element -- ) "Syntax" $heading $code ;
 
@@ -122,7 +122,7 @@ M: f print-element drop ;
     "Examples" $heading print-element ;
 
 : $example ( element -- )
-    unclip-last [ unlines ] dip over <input> [
+    unclip-last [ join-lines ] dip over <input> [
         [ print ] [ output-style get format ] bi*
     ] ($code) ;
 

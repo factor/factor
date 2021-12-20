@@ -341,7 +341,7 @@ PRIVATE>
 SYMBOL: nested-examples
 
 : example-using ( using -- )
-    unwords "example-using" [
+    join-words "example-using" [
         nested-examples get 4 0 ? CHAR: \s <string> "example-indent" [
             "${example-indent}\"Example:\"
 ${example-indent}{ $example \"USING: ${example-using} ;\"

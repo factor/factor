@@ -78,7 +78,7 @@ CONSTANT: IMAP4_SSL_PORT 993
 
 ! Special parsing
 : parse-items ( seq -- items )
-    first words 2 tail ;
+    first split-words 2 tail ;
 
 : parse-list-folders ( str -- folder )
     [[ \* LIST \(([^\)]+)\) "([^"]+)" "?([^"]+)"?]] pcre:findall
@@ -95,11 +95,11 @@ CONSTANT: IMAP4_SSL_PORT 993
 
 : parse-status ( seq -- assoc )
     first [[ \* STATUS "[^"]+" \(([^\)]+)\)]] pcre:findall first last last
-    words 2 group [ string>number ] assoc-map ;
+    split-words 2 group [ string>number ] assoc-map ;
 
 : parse-store-mail-line ( str -- pair/f )
     [[ \(FLAGS \(([^\)]+)\) UID (\d+)\)]] pcre:findall [ f ] [
-        first rest values first2 [ words ] dip string>number swap 2array
+        first rest values first2 [ split-words ] dip string>number swap 2array
     ] if-empty ;
 
 : parse-store-mail ( seq -- assoc )
@@ -144,7 +144,7 @@ PRIVATE>
     drop ;
 
 : status-folder ( mailbox keys -- assoc )
-    [ >utf7imap4 ] dip unwords "STATUS \"%s\" (%s)" sprintf
+    [ >utf7imap4 ] dip join-words "STATUS \"%s\" (%s)" sprintf
     "" command-response parse-status ;
 
 : close-folder ( -- )

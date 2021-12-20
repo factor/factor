@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io kernel math sequences ;
+USING: io kernel math sequences splitting ;
 IN: rosetta-code.sierpinski-triangle
 
 ! http://rosettacode.org/wiki/Sierpinski_triangle
@@ -31,7 +31,7 @@ IN: rosetta-code.sierpinski-triangle
     [ drop [ dup " " glue ] map ] 2bi append ;
 
 : (sierpinski) ( triangle spaces n -- triangle' )
-    dup 0 = [ 2drop unlines ] [
+    dup 0 = [ 2drop join-lines ] [
         [
             [ iterate-triangle ]
             [ nip dup append ] 2bi

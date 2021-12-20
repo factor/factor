@@ -91,4 +91,4 @@ M: sequence sha1-escape-strings ( seq -- strs )
     [ sha1-escape-string ] { } map-as ;
 
 M: string sha1-escape-strings ( str -- strs )
-    lines sha1-escape-strings ;
+    split-lines sha1-escape-strings ;

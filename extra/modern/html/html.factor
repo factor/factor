@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.short-circuit
 generalizations kernel make math modern modern.slices multiline
-sequences sequences.extras strings unicode ;
+sequences sequences.extras splitting strings unicode ;
 IN: modern.html
 
 TUPLE: tag name open-close-delimiter props children ;
@@ -187,12 +187,12 @@ GENERIC: write-html ( tag -- )
 
 M: doctype write-html
     [ open>> % ]
-    [ values>> [ >value ] map unwords [ " " % % ] unless-empty ]
+    [ values>> [ >value ] map join-words [ " " % % ] unless-empty ]
     [ close>> % ] tri ;
 
 
 : write-props ( seq -- )
-    [ dup array? [ first2 >value "=" glue ] [ >value ] if ] map unwords [ " " % % ] unless-empty ;
+    [ dup array? [ first2 >value "=" glue ] [ >value ] if ] map join-words [ " " % % ] unless-empty ;
 
 M: open-tag write-html
     {

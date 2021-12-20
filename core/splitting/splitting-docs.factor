@@ -21,7 +21,7 @@ ARTICLE: "sequences-split" "Splitting sequences"
     split-when-slice
 }
 "Splitting a string into lines:"
-{ $subsections lines }
+{ $subsections split-lines }
 "Replacing subsequences with another subsequence:"
 { $subsections replace } ;
 
@@ -94,7 +94,7 @@ HELP: ?tail-slice
 { $values { "seq" sequence } { "end" sequence } { "newseq" slice } { "?" boolean } }
 { $description "Like " { $link ?tail } ", except the resulting sequence is a " { $link slice } "." } ;
 
-HELP: lines
+HELP: split-lines
 { $values { "seq" sequence } { "seq'" { $sequence string } } }
 { $description "Splits a string along line breaks." }
 { $examples

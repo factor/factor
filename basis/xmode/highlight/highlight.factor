@@ -70,5 +70,5 @@ M: vocab highlight.
     vocab-source-path highlight. ;
 
 M: word highlight.
-    [ see ] with-string-writer lines
+    [ see ] with-string-writer split-lines
     "factor" highlight-lines ;

@@ -60,7 +60,7 @@ USE: io.streams.string
             "INSTANCE: sequence mixin-forget-test"
             "GENERIC: mixin-forget-test-g ( x -- y )"
             "M: mixin-forget-test mixin-forget-test-g ;"
-        } unlines <string-reader> "mixin-forget-test"
+        } join-lines <string-reader> "mixin-forget-test"
         parse-stream drop
     ] unit-test
 
@@ -75,7 +75,7 @@ USE: io.streams.string
             "INSTANCE: hashtable mixin-forget-test"
             "GENERIC: mixin-forget-test-g ( x -- y )"
             "M: mixin-forget-test mixin-forget-test-g ;"
-        } unlines <string-reader> "mixin-forget-test"
+        } join-lines <string-reader> "mixin-forget-test"
         parse-stream drop
     ] unit-test
 

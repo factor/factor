@@ -29,7 +29,7 @@ SYMBOL: bootstrap-time
     "bootstrap." prepend require ;
 
 : load-components ( -- )
-    "include" "exclude" [ get-global words harvest ] bi@ diff
+    "include" "exclude" [ get-global split-words harvest ] bi@ diff
     [ load-component ] each ;
 
 : print-time ( us -- )

@@ -19,7 +19,7 @@ IN: unicode.collation.tests
 
 : collation-test-lines ( -- lines )
     "vocab:unicode/UCA/CollationTest_SHIFTED.txt.zip"
-    binary file-contents uncompress utf8 decode lines
+    binary file-contents uncompress utf8 decode split-lines
     [ "#" head? ] reject harvest ;
 
 : parse-collation-test-shifted ( -- lines )

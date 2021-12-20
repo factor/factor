@@ -108,8 +108,8 @@ CONSTANT: doc-start { 0 0 }
 : with-undo ( ..a document quot: ( ..a document -- ..b ) -- ..b )
     [ t >>inside-undo? ] dip keep f >>inside-undo? drop ; inline
 
-: split-lines ( str -- seq )
-    [ lines ] keep ?last
+: ?split-lines ( str -- seq )
+    [ split-lines ] keep ?last
     [ "\r\n" member? ] [ t ] if*
     [ "" suffix ] when ;
 
@@ -117,7 +117,7 @@ PRIVATE>
 
 :: doc-range ( from to document -- string )
     from to [ [ from to ] dip document (doc-range) ] map-lines
-    unlines ;
+    join-lines ;
 
 : add-undo ( edit document -- )
     dup inside-undo?>> [ 2drop ] [
@@ -127,7 +127,7 @@ PRIVATE>
 
 :: set-doc-range ( string from to document -- )
     from to = string empty? and [
-        string split-lines :> new-lines
+        string ?split-lines :> new-lines
         new-lines from text+loc :> new-to
         from to document doc-range :> old-string
         old-string string from to new-to <edit> document add-undo
@@ -137,7 +137,7 @@ PRIVATE>
 
 :: set-doc-range* ( string from to document -- )
     from to = string empty? and [
-        string split-lines :> new-lines
+        string ?split-lines :> new-lines
         new-lines from text+loc :> new-to
         new-lines from to document [ (set-doc-range) ] models:change-model
         new-to document update-locs

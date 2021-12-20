@@ -78,7 +78,7 @@ CONSTANT: URL V{ }
 : gemini-print ( url body meta -- )
     f pre [
         PAGE delete-all
-        gemini-charset decode lines [
+        gemini-charset decode split-lines [
             { [ pre get not ] [ "=>" ?head ] } 0&& [
                 swap gemini-link present over 2array PAGE push
                 PAGE length swap "[%s] %s\n" printf

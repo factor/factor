@@ -117,7 +117,7 @@ M: anonymous-union instance?
     members>> [ instance? ] with any? ;
 
 M: anonymous-union class-name
-    members>> [ class-name ] map unwords ;
+    members>> [ class-name ] map join-words ;
 
 M: union-class normalize-class
     class-members <anonymous-union> normalize-class ;
