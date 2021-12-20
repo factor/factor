@@ -14,7 +14,7 @@ IN: tools.deploy.config.editor
     parse-fresh [ first assoc-union ] unless-empty ;
 
 : set-deploy-config ( assoc vocab -- )
-    [ [ unparse-use ] without-limits lines ] dip
+    [ [ unparse-use ] without-limits split-lines ] dip
     "deploy.factor" set-vocab-file-lines ;
 
 : set-deploy-flag ( value key vocab -- )

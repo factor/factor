@@ -21,7 +21,7 @@ IN: db.postgresql.lib
 
 : (postgresql-error-message) ( handle -- str )
     PQerrorMessage
-    "\n" split [ [ blank? ] trim ] map unlines ;
+    "\n" split [ [ blank? ] trim ] map join-lines ;
 
 : postgresql-error-message ( -- str )
     db-connection get handle>> (postgresql-error-message) ;

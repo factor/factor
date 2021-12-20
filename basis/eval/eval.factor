@@ -6,7 +6,7 @@ parser.notes splitting ;
 IN: eval
 
 : parse-string ( str -- quot )
-    [ lines parse-lines ] with-compilation-unit ;
+    [ split-lines parse-lines ] with-compilation-unit ;
 
 : (eval) ( str effect -- )
     [ parse-string ] dip call-effect ; inline

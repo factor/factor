@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators combinators.smart csv
 grouping http.client interval-maps io.encodings.ascii io.files
 io.files.temp io.launcher io.pathnames ip-parser kernel math
-math.parser memoize sequences strings ;
+math.parser sequences splitting strings ;
 IN: geo-ip
 
 : db-path ( -- path ) "IpToCountry.csv" cache-file ;
@@ -33,7 +33,7 @@ TUPLE: ip-entry from to registry assigned city cntry country ;
 
 MEMO: ip-db ( -- seq )
     download-db ascii file-lines
-    [ "#" head? ] reject unlines string>csv
+    [ "#" head? ] reject join-lines string>csv
     [ parse-ip-entry ] map ;
 
 : filter-overlaps ( alist -- alist' )

@@ -34,7 +34,7 @@ TUPLE: maxlicense max-count current-count times ;
 
 : out? ( line -- ? ) [ "OUT" ] dip subseq? ; inline
 
-: line-time ( line -- time ) words harvest fourth ; inline
+: line-time ( line -- time ) split-words harvest fourth ; inline
 
 : update-max-count ( max -- max' )
     dup [ current-count>> ] [ max-count>> ] bi >

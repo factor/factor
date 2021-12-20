@@ -108,7 +108,7 @@ DEFER: (parse-paragraph)
     [ cut-slice ] [ f ] if* swap ;
 
 :: (take-until) ( state delimiter accum -- string/f state' )
-    state empty? [ accum unlines f ] [
+    state empty? [ accum join-lines f ] [
         state unclip-slice :> ( rest first )
         first delimiter split1 :> ( before after )
         before accum push
@@ -203,7 +203,7 @@ DEFER: (parse-paragraph)
     } case ;
 
 : parse-farkup ( string -- farkup )
-    lines [ dup empty? not ] [ parse-item ] produce nip sift ;
+    split-lines [ dup empty? not ] [ parse-item ] produce nip sift ;
 
 CONSTANT: invalid-url "javascript:alert('Invalid URL in farkup');"
 
@@ -217,7 +217,7 @@ CONSTANT: invalid-url "javascript:alert('Invalid URL in farkup');"
     } cond ;
 
 : render-code ( string mode -- xml )
-    [ lines ] dip htmlize-lines
+    [ split-lines ] dip htmlize-lines
     [XML <pre><-></pre> XML] ;
 
 GENERIC: (write-farkup) ( farkup -- xml )

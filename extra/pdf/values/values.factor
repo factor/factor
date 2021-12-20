@@ -59,7 +59,7 @@ M: font pdf-value
         } cleave
         "/BaseFont " prepend ,
         ">>" ,
-    ] { } make unlines ;
+    ] { } make join-lines ;
 
 M: timestamp pdf-value
     "%Y%m%d%H%M%S" strftime "D:" prepend ;

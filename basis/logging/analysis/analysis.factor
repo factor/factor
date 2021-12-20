@@ -56,7 +56,7 @@ SYMBOL: message-histogram
     [
         [ first name>> write bl ]
         [ second write ": " write ]
-        [ third unlines write ]
+        [ third join-lines write ]
         tri
     ] histogram.
     nl nl

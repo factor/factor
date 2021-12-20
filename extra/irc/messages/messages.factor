@@ -68,7 +68,7 @@ PREDICATE: ctcp < privmsg
 PREDICATE: action < ctcp trailing>> rest "ACTION" head? ;
 
 M: rpl-names post-process-irc-message ( rpl-names -- )
-    [ [ blank? ] trim words ] change-nicks drop ;
+    [ [ ascii:blank? ] trim split-words ] change-nicks drop ;
 
 M: ctcp post-process-irc-message ( ctcp -- )
     [ rest but-last ] change-text drop ;

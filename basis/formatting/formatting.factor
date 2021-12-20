@@ -201,7 +201,7 @@ MACRO: sprintf ( format-string -- quot )
           [ >time ]
           [ year>> number>string ]
        } cleave
-    ] output>array unwords ; inline
+    ] output>array join-words ; inline
 
 : week-of-year ( timestamp day -- n )
     [ dup clone 1 >>month 1 >>day day-of-week dup ] dip > [ 7 swap - ] when

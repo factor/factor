@@ -79,7 +79,7 @@ M: string >ckf >upper 1 cut (>ckf) ;
 M: integer >ckf ;
 
 : parse-cards ( string -- seq )
-    words [ >ckf ] map ;
+    split-words [ >ckf ] map ;
 
 : flush? ( cards -- ? )
     0xF000 [ bitand ] reduce 0 = not ;

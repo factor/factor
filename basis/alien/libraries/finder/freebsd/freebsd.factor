@@ -7,7 +7,7 @@ IN: alien.libraries.finder.freebsd
 
 : parse-ldconfig-lines ( string -- triple )
     [ ":-" split1 [ drop ] dip
-    "=>" split1 [ [ blank? ] trim ] bi@
+    "=>" split1 [ [ unicode:blank? ] trim ] bi@
       2array
    ] map ;
 

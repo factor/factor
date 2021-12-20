@@ -31,7 +31,7 @@ M: pathname present string>> ;
 M: callable present
     [ "[ ]" ] [
         [ drop "[ " ]
-        [ [ present ] map unwords ]
+        [ [ present ] map join-words ]
         [ drop " ]" ] tri 3append
     ] if-empty ;
 
