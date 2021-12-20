@@ -28,11 +28,8 @@ M: secure (accept)
         addrspec>> (accept) [ |dispose f <ssl-socket> ] dip
     ] with-destructors ;
 
-: try-ssl-shutdown ( ssl-handle -- event )
-    dup handle>> SSL_shutdown check-ssl-error ;
-
 : (shutdown) ( ssl-handle -- )
-    dup try-ssl-shutdown
+    dup dup handle>> SSL_shutdown check-ssl-error
     [ dupd wait-for-fd (shutdown) ] [ drop ] if* ;
 
 M: ssl-handle shutdown
