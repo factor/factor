@@ -24,7 +24,7 @@ SYMBOL: build-images-destination
     image-path parent-directory [
         { "git" "rev-parse" "--abbrev-ref" "HEAD" }
         utf8 <process-reader> stream-contents
-        [ blank? ] trim-tail
+        [ unicode:blank? ] trim-tail
     ] with-directory ;
 
 : git-branch-destination ( -- dest )

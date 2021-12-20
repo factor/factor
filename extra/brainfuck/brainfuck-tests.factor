@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: brainfuck io.streams.string kernel literals math
-math.parser math.ranges sequences tools.test ;
+math.parser math.ranges sequences splitting tools.test ;
 
 [ "+" run-brainfuck ] must-infer
 [ "+" get-brainfuck ] must-infer

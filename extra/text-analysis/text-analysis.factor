@@ -11,7 +11,7 @@ IN: text-analysis
 <PRIVATE
 
 : trimmed ( seq -- seq )
-    [ [ blank? ] trim ] map harvest ;
+    [ [ unicode:blank? ] trim ] map harvest ;
 
 : split-paragraphs ( str -- seq )
     R/ \r?\n\r?\n/ re-split trimmed ;
@@ -111,7 +111,7 @@ TUPLE: text-analysis #paragraphs #sentences #chars #words
     {
         [ split-paragraphs length ]
         [ split-sentences length ]
-        [ [ blank? not ] count ]
+        [ [ unicode:blank? not ] count ]
         [ split-words ]
     } cleave {
         [ length ]
