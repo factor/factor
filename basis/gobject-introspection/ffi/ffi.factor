@@ -26,7 +26,7 @@ IN: gobject-introspection.ffi
     (CREATE-C-TYPE) [ typedef ] keep ;
 
 : alias-c-type-name ( alias -- c-type-name )
-    ! <workaround for alises w/o c:type (Atk)
+    ! <workaround for aliases w/o c:type (Atk)
     [ c-type>> ] [ name>> ] bi or ;
     ! workaround>
     ! c-type>> ;
