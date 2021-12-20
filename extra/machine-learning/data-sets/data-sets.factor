@@ -23,7 +23,7 @@ C: <data-set> data-set
     utf8 file-contents ;
 
 : load-tabular-file ( name -- lines )
-    load-file [ blank? ] trim string-lines
+    load-file [ blank? ] trim lines
     [ [ blank? ] split-when harvest ] map harvest ;
 
 : numerify ( table -- data names )

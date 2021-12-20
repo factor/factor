@@ -108,7 +108,7 @@ M: p pdf-render
 
 M: p pdf-width
     [ style>> set-style ] keep
-    [ font>> ] [ string>> ] bi* string-lines
+    [ font>> ] [ string>> ] bi* lines
     [ dupd text-width ] map nip supremum ;
 
 
@@ -141,7 +141,7 @@ M: text pdf-render
 
 M: text pdf-width
     [ style>> set-style ] keep
-    [ font>> ] [ string>> ] bi* string-lines
+    [ font>> ] [ string>> ] bi* lines
     [ dupd text-width ] map nip supremum ;
 
 

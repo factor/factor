@@ -5,5 +5,5 @@ tools.test ;
 IN: io.streams.counting.tests
 
 { 1306 0 } [
-    "resource:LICENSE.txt" utf8 <file-reader> [ contents ] with-counting-stream nipd
+    "resource:LICENSE.txt" utf8 <file-reader> [ read-contents ] with-counting-stream nipd
 ] unit-test

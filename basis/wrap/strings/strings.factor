@@ -12,7 +12,7 @@ IN: wrap.strings
     swap [ 0 over length <element> prefix ] when* ;
 
 : split-lines ( string -- elements-lines )
-    string-lines [ split-line ] map! ;
+    lines [ split-line ] map! ;
 
 : join-elements ( wrapped-lines -- lines )
     [ " " join ] map! ;

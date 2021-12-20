@@ -109,7 +109,7 @@ IN: text-to-pdf
     ] { } make "\n" join ;
 
 : string>lines ( str -- lines )
-    "\t" split "    " join string-lines
+    "\t" split "    " join lines
     [ [ " " ] when-empty ] map ;
 
 : lines>pages ( lines -- pages )

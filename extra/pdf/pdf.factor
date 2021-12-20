@@ -6,7 +6,7 @@ USING: io.files io.styles kernel pdf.layout sequences splitting ;
 IN: pdf
 
 : text-to-pdf ( str -- pdf )
-    string-lines [
+    lines [
         H{ { font-name "monospace" } { font-size 10 } } <p>
     ] map pdf>string ;
 

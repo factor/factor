@@ -22,7 +22,7 @@ PREDICATE: string-array < array [ string? ] all? ;
 PRIVATE>
 
 : ?string-lines ( string -- string/array )
-    CHAR: \n over member-eq? [ string-lines ] when ;
+    CHAR: \n over member-eq? [ lines ] when ;
 
 M: label string<<
     [

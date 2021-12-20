@@ -109,7 +109,7 @@ CONSTANT: doc-start { 0 0 }
     [ t >>inside-undo? ] dip keep f >>inside-undo? drop ; inline
 
 : split-lines ( str -- seq )
-    [ string-lines ] keep ?last
+    [ lines ] keep ?last
     [ "\r\n" member? ] [ t ] if*
     [ "" suffix ] when ;
 
