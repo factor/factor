@@ -318,7 +318,7 @@ M: table pdf-width
         "/Type /Catalog"
         "/Pages 15 0 R"
         ">>"
-    } "\n" join ;
+    } unlines ;
 
 : pdf-pages ( n -- str )
     [
@@ -332,7 +332,7 @@ M: table pdf-width
             "/Kids [ " "]" surround ,
         ] bi
         ">>" ,
-    ] { } make "\n" join ;
+    ] { } make unlines ;
 
 : pdf-page ( n -- page )
     [
@@ -347,7 +347,7 @@ M: table pdf-width
         "/F10 12 0 R /F11 13 0 R /F12 14 0 R" ,
         ">> >>" ,
         ">>" ,
-    ] { } make "\n" join ;
+    ] { } make unlines ;
 
 : pdf-trailer ( objects -- str )
     [
@@ -366,7 +366,7 @@ M: table pdf-width
         "startxref" ,
         [ length 1 + ] map-sum 9 + "%d" sprintf ,
         "%%EOF" ,
-    ] { } make "\n" join ;
+    ] { } make unlines ;
 
 SYMBOLS: pdf-producer pdf-author pdf-creator ;
 
@@ -425,7 +425,7 @@ TUPLE: pdf info pages fonts ;
     dup length [1,b] zip [ first2 pdf-object ] map ;
 
 : objects>pdf ( objects -- str )
-    [ "\n" join "\n" append "%PDF-1.4\n" ]
+    [ unlines "\n" append "%PDF-1.4\n" ]
     [ pdf-trailer ] bi surround ;
 
 ! Rename to pdf>string, have it take a <pdf> object?

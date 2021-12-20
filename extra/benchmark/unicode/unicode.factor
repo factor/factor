@@ -4,7 +4,7 @@ USING: kernel math random sequences strings unicode ;
 IN: benchmark.unicode
 
 : crazy-unicode-string ( -- string )
-    8 [ 8 0xffff random-integers ] replicate " " join ;
+    8 [ 8 0xffff random-integers ] replicate unwords ;
 
 : unicode-benchmark ( -- )
     crazy-unicode-string 8 [

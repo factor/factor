@@ -79,7 +79,7 @@ name target ;
 
 : parse-list ( ftp-response -- ftp-response )
     dup strings>>
-    [ " " split harvest ] map
+    [ words harvest ] map
     dup length {
         { 11 [ parse-list-11 ] }
         { 9 [ parse-list-11 ] }

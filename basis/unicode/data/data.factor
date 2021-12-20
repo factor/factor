@@ -100,7 +100,7 @@ PRIVATE>
 
 : (process-decomposed) ( data -- alist )
     5 swap (process-data)
-    [ " " split [ hex> ] map ] assoc-map ;
+    [ words [ hex> ] map ] assoc-map ;
 
 : exclusions-file ( -- filename )
     "vocab:unicode/UCD/CompositionExclusions.txt" ;
@@ -157,7 +157,7 @@ PRIVATE>
     ] H{ } assoc-map-as ;
 
 : multihex ( hexstring -- string )
-    " " split [ hex> ] map sift ;
+    words [ hex> ] map sift ;
 
 PRIVATE>
 

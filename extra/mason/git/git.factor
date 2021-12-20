@@ -8,7 +8,7 @@ IN: mason.git
 
 : git-id ( -- id )
     { "git" "show" } utf8 [ lines ] with-process-reader
-    first " " split second ;
+    first words second ;
 
 <PRIVATE
 

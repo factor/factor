@@ -80,7 +80,7 @@ TUPLE: meeting-place count mailbox ;
     ] if ;
 
 : number>chameneos-string ( n -- string )
-    number>string string>digits [ number>text ] { } map-as " " join ;
+    number>string string>digits [ number>text ] { } map-as unwords ;
 
 : chameneos-redux ( n colors -- )
     [ <meeting-place> ] [ make-creatures ] bi*

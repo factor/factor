@@ -13,7 +13,7 @@ IN: irc.messages.parser
 : split-message ( string -- prefix command parameters trailing )
     ":" ?head [ " " split1 ] [ f swap ] if
     ":" split1
-    [ " " split harvest unclip swap ] dip ;
+    [ words harvest unclip swap ] dip ;
 
 : sender ( irc-message -- sender )
     prefix>> [ ":" ?head drop "!" split-at-first drop ] [ f ] if* ;

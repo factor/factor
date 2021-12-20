@@ -66,12 +66,12 @@ PRIVATE>
 GENERIC: >txon ( object -- string )
 
 M: sequence >txon
-    [ >txon ] map "\n" join ;
+    [ >txon ] map unlines ;
 
 M: assoc >txon
     >alist [
         first2 [ encode-value ] [ >txon ] bi* "%s:`%s`" sprintf
-    ] map "\n" join ;
+    ] map unlines ;
 
 M: string >txon
     encode-value ;

@@ -51,7 +51,7 @@ M: multiple-choice-question generate-question*
     [ n>> ] [ generator>> ] bi
     '[ _ generate-question* ] replicate ;
 
-: trim-blanks ( seq -- seq' ) " " split harvest " " join ;
+: trim-blanks ( seq -- seq' ) words harvest unwords ;
 : first-n-letters ( n -- seq ) <iota> [ CHAR: a + 1string ] map ;
 : alphabet-zip ( seq -- zip ) [ length <iota> [ CHAR: a + 1string ] { } map-as ] keep zip ;
 M: question parse-response drop trim-blanks ;
@@ -96,7 +96,7 @@ CONSTANT: stack-shufflers { dup 2dup drop 2drop swap over rot -rot roll -roll 2d
 M: stack-shuffler generate-question*
     n-shufflers>> [ stack-shufflers random ] [ ] replicate-as
     [ inputs first-n-letters ] keep
-    '[ _ _ with-datastack " " join ] ;
+    '[ _ _ with-datastack unwords ] ;
 
 M: question ask-question generated>> . ;
 M: string-response ask-question generated>> . ;

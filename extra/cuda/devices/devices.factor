@@ -51,7 +51,7 @@ IN: cuda.devices
         [ "Memory: " write cuda-device-memory number>string print ]
         [
             "Capability: " write
-            cuda-device-capability [ number>string ] map " " join print
+            cuda-device-capability [ number>string ] map unwords print
         ]
         [ "Properties: " write cuda-device-properties . ]
         [

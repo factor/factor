@@ -15,7 +15,7 @@ IN: 99-bottles
             [ bottles "of beer.\nTake one down, pass it around," ]
             [ 1 - bottles [ >lower ] dip "of beer on the wall." ]
         } cleave
-    ] output>array " " join print nl ;
+    ] output>array unwords print nl ;
 
 : last-verse ( -- )
     "No more bottles of beer on the wall, no more bottles of beer." print

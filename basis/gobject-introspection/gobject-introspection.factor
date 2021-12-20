@@ -11,7 +11,7 @@ ERROR: gir-not-found name paths ;
 
 M: gir-not-found summary
     [ name>> "“" "” file not found on paths:\n" surround ]
-    [ paths>> "\n" join ] bi
+    [ paths>> unlines ] bi
     "\n\nUse the existing path or declare GIR_DIRS environment variable"
     3append ;
 

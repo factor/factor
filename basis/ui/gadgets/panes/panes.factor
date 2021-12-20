@@ -353,7 +353,7 @@ M: paragraph pane-line
     { presented image-style } pick '[ _ key? ] any? [
         pane-text
     ] [
-        [ " " split ] 2dip
+        [ words ] 2dip
         [ pane-bl ] [ pane-text ] bi-curry bi-curry
         interleave
     ] if ;

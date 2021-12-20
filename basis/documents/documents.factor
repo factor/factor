@@ -117,7 +117,7 @@ PRIVATE>
 
 :: doc-range ( from to document -- string )
     from to [ [ from to ] dip document (doc-range) ] map-lines
-    "\n" join ;
+    unlines ;
 
 : add-undo ( edit document -- )
     dup inside-undo?>> [ 2drop ] [

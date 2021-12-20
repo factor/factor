@@ -71,7 +71,7 @@ M: f cell-dim 2drop 0 0 0 ;
 M: f draw-cell 2drop ;
 
 : single-line ( str -- str' )
-    dup [ "\r\n" member? ] any? [ lines " " join ] when ;
+    dup [ "\r\n" member? ] any? [ lines unwords ] when ;
 
 M: string cell-dim single-line text-dim first2 ceiling 0 ;
 M: string draw-cell single-line draw-text ;

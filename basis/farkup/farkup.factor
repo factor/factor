@@ -108,7 +108,7 @@ DEFER: (parse-paragraph)
     [ cut-slice ] [ f ] if* swap ;
 
 :: (take-until) ( state delimiter accum -- string/f state' )
-    state empty? [ accum "\n" join f ] [
+    state empty? [ accum unlines f ] [
         state unclip-slice :> ( rest first )
         first delimiter split1 :> ( before after )
         before accum push

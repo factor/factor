@@ -96,7 +96,7 @@ IN: sequences.tests
 { 4 V{ 1 2 3 } } [ 4 V{ 1 4 2 5 3 6 } [ dupd > ] filter! ] unit-test
 
 { "hello world how are you" }
-[ { "hello" "world" "how" "are" "you" } " " join ] unit-test
+[ { "hello" "world" "how" "are" "you" } unwords ] unit-test
 
 { "hello world how are you" }
 [ { "hello" "world" "how" "are" "you" } " " "" join-as ] unit-test

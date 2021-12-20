@@ -14,7 +14,7 @@ M: integer-expr expr>str value>> number>string ;
 
 M: reference-expr expr>str value>> unparse ;
 
-M: sequence expr>str [ unparse ] map " " join ;
+M: sequence expr>str [ unparse ] map unwords ;
 
 M: object expr>str unparse ;
 

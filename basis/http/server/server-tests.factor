@@ -38,7 +38,7 @@ io.streams.string kernel math peg sequences tools.test urls ;
         "connection: close"
         "host: 127.0.0.1:55532"
         "user-agent: Factor http.client"
-    } [ "\n" join ] [ "\r\n" join ] bi
+    } [ unlines ] [ "\r\n" join ] bi
     [ [ read-request ] with-string-reader ] same?
 ] unit-test
 

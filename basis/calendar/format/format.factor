@@ -73,7 +73,7 @@ M: timestamp day.
     [ number>string ] [ month-name ] bi* swap " " glue 20 center. ;
 
 : days-header. ( -- )
-    day-abbreviations2 " " join print ;
+    day-abbreviations2 unwords print ;
 
 : days. ( year month -- )
     [ 1 (day-of-week) dup [ "   " write ] times ]
@@ -238,7 +238,7 @@ M: integer elapsed-time
             [ first [ /mod ] [ dup ] if* ] [ second ] bi swap
             dup 0 > [ number>string prepend , ] [ 2drop ] if
         ] each drop
-    ] { } make [ "0s" ] [ reverse " " join ] if-empty ;
+    ] { } make [ "0s" ] [ reverse unwords ] if-empty ;
 
 M: real elapsed-time
     >integer elapsed-time ;

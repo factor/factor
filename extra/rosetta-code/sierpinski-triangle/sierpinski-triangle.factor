@@ -31,7 +31,7 @@ IN: rosetta-code.sierpinski-triangle
     [ drop [ dup " " glue ] map ] 2bi append ;
 
 : (sierpinski) ( triangle spaces n -- triangle' )
-    dup 0 = [ 2drop "\n" join ] [
+    dup 0 = [ 2drop unlines ] [
         [
             [ iterate-triangle ]
             [ nip dup append ] 2bi

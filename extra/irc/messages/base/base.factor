@@ -80,9 +80,9 @@ M: irc-message set-irc-command
     {
         [ prefix>> ]
         [ command>> ]
-        [ parameters>> " " join ]
+        [ parameters>> unwords ]
         [ trailing>> dup [ CHAR: : prefix ] when ]
-    } cleave 4array sift " " join ;
+    } cleave 4array sift unwords ;
 
 <PRIVATE
 : ?define-irc-parameters ( class slot-names -- )

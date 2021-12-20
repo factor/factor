@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators command-line io kernel make
 math math.functions math.parser math.primes math.ranges
-namespaces sequences sequences.product sorting ;
+namespaces sequences sequences.product sorting splitting ;
 IN: math.primes.factors
 
 <PRIVATE
@@ -56,7 +56,7 @@ PRIVATE>
 : unix-factor ( string -- )
     dup string>number [
         [ ": " append write ]
-        [ factors [ number>string ] map " " join print ] bi*
+        [ factors [ number>string ] map unwords print ] bi*
     ] [
         "factor: `" "' is not a valid positive integer" surround print
     ] if* flush ;

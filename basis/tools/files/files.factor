@@ -25,7 +25,7 @@ IN: tools.files
         dup year>> dup now year>> =
         [ drop listing-time ] [ nip number>string ] if
         5 CHAR: \s pad-head
-    ] tri 3array " " join ;
+    ] tri 3array unwords ;
 
 : read>string ( ? -- string ) "r" "-" ? ; inline
 
