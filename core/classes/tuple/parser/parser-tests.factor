@@ -1,6 +1,6 @@
 USING: accessors classes.tuple.parser lexer words classes
 sequences math kernel slots tools.test parser compiler.units
-arrays classes.tuple eval multiline ;
+arrays classes.tuple eval multiline splitting ;
 IN: classes.tuple.parser.tests
 
 TUPLE: test-1 ;

@@ -54,13 +54,13 @@ tools.test vectors vocabs ;
 { { 2 4 6 } } [ { 1 2 3 4 5 6 } odd-indices ] unit-test
 
 { "a b c d e" }
-[ "a      b  \t \n \r  c   d \n    e   " [ blank? ] " " compact ] unit-test
+[ "a      b  \t \n \r  c   d \n    e   " [ ascii:blank? ] " " compact ] unit-test
 
 { " a b c d e " }
-[ " a      b  c   d    e   " [ blank? ] " " collapse ] unit-test
+[ " a      b  c   d    e   " [ ascii:blank? ] " " collapse ] unit-test
 
 { { "hello," " " "world!" " " " " } }
-[ "hello, world!  " [ blank? ] slice-when [ >string ] map ] unit-test
+[ "hello, world!  " [ ascii:blank? ] slice-when [ >string ] map ] unit-test
 
 { t }
 [ "abc" sequence>slice slice? ] unit-test
@@ -123,15 +123,15 @@ tools.test vectors vocabs ;
 { "ADEBFC" } [ { "ABC" "D" "EF" } round-robin >string ] unit-test
 
 { { } } [ "ABC" [ ] { } trim-as ] unit-test
-{ "ABC" } [ { 32 65 66 67 32 } [ blank? ] "" trim-as ] unit-test
+{ "ABC" } [ { 32 65 66 67 32 } [ ascii:blank? ] "" trim-as ] unit-test
 
-{ t } [ "ABC" dup [ blank? ] ?trim [ identity-hashcode ] same? ] unit-test
-{ "ABC" } [ " ABC " [ blank? ] ?trim ] unit-test
+{ t } [ "ABC" dup [ ascii:blank? ] ?trim [ identity-hashcode ] same? ] unit-test
+{ "ABC" } [ " ABC " [ ascii:blank? ] ?trim ] unit-test
 
-{ t } [ "ABC" dup [ blank? ] ?trim-head [ identity-hashcode ] same? ] unit-test
-{ t } [ "ABC" dup [ blank? ] ?trim-tail [ identity-hashcode ] same? ] unit-test
-{ "ABC " } [ " ABC " [ blank? ] ?trim-head ] unit-test
-{ " ABC" } [ " ABC " [ blank? ] ?trim-tail ] unit-test
+{ t } [ "ABC" dup [ ascii:blank? ] ?trim-head [ identity-hashcode ] same? ] unit-test
+{ t } [ "ABC" dup [ ascii:blank? ] ?trim-tail [ identity-hashcode ] same? ] unit-test
+{ "ABC " } [ " ABC " [ ascii:blank? ] ?trim-head ] unit-test
+{ " ABC" } [ " ABC " [ ascii:blank? ] ?trim-tail ] unit-test
 
 { "" } [ "" "" "" unsurround ] unit-test
 { "" } [ "  " " " " " unsurround ] unit-test
@@ -211,10 +211,10 @@ tools.test vectors vocabs ;
 { "cdef" } [ 2 f "abcdef" subseq* ] unit-test
 { "cd" } [ -4 -2 "abcdef" subseq* ] unit-test
 
-{ "foo" "" } [ "foo" [ blank? ] cut-when ] unit-test
-{ "foo" " " } [ "foo " [ blank? ] cut-when ] unit-test
-{ "" " foo" } [ " foo" [ blank? ] cut-when ] unit-test
-{ "foo" " bar" } [ "foo bar" [ blank? ] cut-when ] unit-test
+{ "foo" "" } [ "foo" [ ascii:blank? ] cut-when ] unit-test
+{ "foo" " " } [ "foo " [ ascii:blank? ] cut-when ] unit-test
+{ "" " foo" } [ " foo" [ ascii:blank? ] cut-when ] unit-test
+{ "foo" " bar" } [ "foo bar" [ ascii:blank? ] cut-when ] unit-test
 
 { { 4 0 3 1 2 } } [ { 0 4 1 3 2 } 5 <iota> [ nth* ] curry map ] unit-test
 

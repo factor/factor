@@ -16,10 +16,10 @@ CONSTANT: mach-map {
 
 : parse-ldconfig-lines ( string -- triple )
     [
-        "=>" split1 [ [ blank? ] trim ] bi@
+        "=>" split1 [ [ unicode:blank? ] trim ] bi@
         [
             " " split1 [ "()" in? ] trim "," split
-            [ [ blank? ] trim ] map
+            [ [ unicode:blank? ] trim ] map
             [ ": Linux" swap subseq? ] reject
         ] dip 3array
     ] map ;

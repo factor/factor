@@ -16,7 +16,7 @@ TUPLE: help-webapp < dispatcher ;
     <page-action>
         { help-webapp "search" } >>template
         [
-            "search" param [ blank? ] trim [
+            "search" param [ unicode:blank? ] trim [
                 help-dir [
                     [ article-apropos links "articles" set-value ]
                     [ word-apropos links "words" set-value ]
