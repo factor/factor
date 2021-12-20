@@ -25,7 +25,7 @@ IN: io.files.acls.macosx
     clear-errno
     ACL_TYPE_EXTENDED acl_get_file dup [
         errno ENOENT = [
-            [ path exists? ] preserve-errno
+            [ path file-exists? ] preserve-errno
             [ drop f ] [ throw-errno ] if
         ] [
             throw-errno

@@ -85,7 +85,7 @@ M: linux terminfo-relative-path ( name -- path )
 
 : terminfo-path ( name -- path )
     terminfo-relative-path TERMINFO-DIRS [ swap append-path ] with map
-    [ exists? ] find nip ;
+    [ file-exists? ] find nip ;
 
 : terminfo-names-for-path ( path -- names )
     [
@@ -94,7 +94,7 @@ M: linux terminfo-relative-path ( name -- path )
     ] with-directory-entries ;
 
 MEMO: terminfo-names ( -- names )
-    TERMINFO-DIRS [ exists? ] filter
+    TERMINFO-DIRS [ file-exists? ] filter
     [ terminfo-names-for-path ] map concat ;
 
 <PRIVATE

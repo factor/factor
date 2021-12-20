@@ -12,7 +12,7 @@ IN: tools.cat
     '[ _ stream-write ] each-stream-block ;
 
 : cat-file ( path -- )
-    dup exists? [
+    dup file-exists? [
         binary [ cat-stream ] with-file-reader
     ] [ "%s: not found\n" printf flush ] if ;
 

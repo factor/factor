@@ -33,11 +33,11 @@ M: gir-not-found summary
     ] { } make ;
 
 :: resolve-gir-path ( path -- path )
-    path exists?
+    path file-exists?
     [ path ] [
         current-vocab-dirs custom-gir-dirs system-gir-dirs
         3append sift :> paths
-        paths [ path append-path exists? ] find nip
+        paths [ path append-path file-exists? ] find nip
         [ path append-path ] [ path paths gir-not-found ] if*
     ] if ;
 

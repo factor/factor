@@ -32,7 +32,7 @@ io.pathnames kernel namespaces sequences strings tools.test ;
 { t } [
     [
         [ ] with-unique-directory
-        [ exists? ] [ delete-tree ] bi
+        [ file-exists? ] [ delete-tree ] bi
     ] with-temp-directory
 ] unit-test
 

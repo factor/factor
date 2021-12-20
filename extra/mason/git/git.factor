@@ -78,7 +78,7 @@ PRIVATE>
 
 : git-clone-or-pull ( -- id )
     ! Must be run from builds-dir.
-    "factor" exists? [
+    "factor" file-exists? [
         check-repository [
             "factor" [
                 [ git-pull-cmd short-running-process ]

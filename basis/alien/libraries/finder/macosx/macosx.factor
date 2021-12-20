@@ -122,7 +122,7 @@ PRIVATE>
 : dyld-find ( name -- path/f )
     dyld-search-paths [
         {
-            { [ dup exists? ] [ file-info regular-file? ] }
+            { [ dup file-exists? ] [ file-info regular-file? ] }
             { [ use-dyld-shared-cache? ] [ _dyld_shared_cache_contains_path ] }
             [ drop f ]
         } cond

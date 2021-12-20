@@ -13,7 +13,7 @@ CONSTANT: mkdir-mode flags{ USER-ALL GROUP-ALL OTHER-ALL } ! 0o777
 
 M: unix touch-file
     normalize-path
-    dup exists? [ touch ] [
+    dup file-exists? [ touch ] [
         touch-mode file-mode open-file close-file
     ] if ;
 

@@ -186,7 +186,7 @@ icon-data [ default-icon-data ] initialize
     dup vocab-dir { "icon.png" "icon.ico" } [
         append-path vocab-append-path
     ] 2with map default-icon-path suffix
-    [ exists? ] find nip binary file-contents ;
+    [ file-exists? ] find nip binary file-contents ;
 
 : load-icon ( -- )
     icon-data get [

@@ -17,7 +17,7 @@ CONSTANT: url URL" http://downloads.factorcode.org/images/master/"
     download-checksums at ;
 
 : need-new-image? ( image -- ? )
-    dup exists?
+    dup file-exists?
     [ [ file-checksum ] [ download-checksum ] bi = not ]
     [ drop t ]
     if ;

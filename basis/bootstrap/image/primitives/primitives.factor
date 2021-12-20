@@ -220,7 +220,7 @@ CONSTANT: all-primitives {
     {
         "io.files.private"
         {
-            { "(exists?)" ( path -- ? ) "existsp" { string } { object } f }
+            { "(file-exists?)" ( path -- ? ) "existsp" { string } { object } f }
         }
     }
     {

@@ -68,7 +68,7 @@ PRIVATE>
 : download-to-directory ( url directory -- )
     dup make-directories
     [
-        dup { [ download-name exists? ] [ file-stem exists? ] } 1|| [
+        dup { [ download-name file-exists? ] [ file-stem file-exists? ] } 1|| [
             drop
         ] [
             download
@@ -107,7 +107,7 @@ PRIVATE>
             "http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz"
         }
         [ [ "resource:datasets/" download-to-directory ] parallel-each ]
-        [ [ dup file-stem exists? [ drop ] [ file-name gzip-decompress-file ] if ] each ]
+        [ [ dup file-stem file-exists? [ drop ] [ file-name gzip-decompress-file ] if ] each ]
         [ [ file-stem binary file-contents ] map ] tri
         first4 {
             [ mnist-data>array ]

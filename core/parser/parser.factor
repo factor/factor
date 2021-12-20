@@ -246,6 +246,6 @@ print-use-hook [ [ ] ] initialize
     parse-file call( -- ) ;
 
 : ?run-file ( path -- )
-    dup exists? [ run-file ] [ drop ] if ;
+    dup file-exists? [ run-file ] [ drop ] if ;
 
 ERROR: version-control-merge-conflict ;

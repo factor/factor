@@ -283,7 +283,7 @@ PRIVATE>
     ] with-file-writer ;
 
 : ?download-to ( url file -- )
-    dup exists? [ 2drop ] [ download-to ] if ;
+    dup file-exists? [ 2drop ] [ download-to ] if ;
 
 : download ( url -- )
     dup download-name download-to ;

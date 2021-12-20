@@ -34,7 +34,7 @@ ERROR: not-found-in-roots path ;
 <PRIVATE
 
 : find-root-for ( path -- path/f )
-    vocab-roots get [ prepend-path exists? ] with find nip ;
+    vocab-roots get [ prepend-path file-exists? ] with find nip ;
 
 M: string vocab-path
     dup find-root-for [ prepend-path ] [ not-found-in-roots ] if* ;

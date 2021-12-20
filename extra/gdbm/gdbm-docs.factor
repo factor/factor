@@ -39,7 +39,7 @@ HELP: gdbm-error-message
 { $values { "error" gdbm-error } { "msg" string } }
 { $description "Returns error message in human readable format." } ;
 
-HELP: exists?
+HELP: file-exists?
 { $values { "key" object } { "?" boolean } }
 { $description "Searches for a particular key without retreiving it." } ;
 
@@ -133,7 +133,7 @@ $nl
 "All interaction with gdbm database should be realized using special combinator which automates all work for database initialisation and cleanup. All initialisation options are passed to combinator with a database configuration object."
 { $subsections gdbm <gdbm> with-gdbm }
 "For actual record manipulation the following words are used:"
-{ $subsections insert exists? fetch delete }
+{ $subsections insert file-exists? fetch delete }
 
 { $heading "Sequential access" }
 "It is possible to iterate through all records in the database with"

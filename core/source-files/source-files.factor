@@ -33,7 +33,7 @@ main ;
 
 : reset-checksums ( -- )
     source-files get [
-        over exists? [
+        over file-exists? [
             [ utf8 file-lines ] dip record-checksum
         ] [ 2drop ] if
     ] assoc-each ;

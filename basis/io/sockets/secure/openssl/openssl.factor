@@ -74,7 +74,7 @@ PRIVATE>
 ERROR: file-expected path ;
 
 : ensure-exists ( path -- path )
-    dup exists? [ file-expected ] unless ; inline
+    dup file-exists? [ file-expected ] unless ; inline
 
 : ssl-file-path ( path -- path' )
     absolute-path ensure-exists ;

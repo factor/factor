@@ -18,7 +18,7 @@ M: dummy-monitor dispose*
 
 M: mock-io-backend (monitor)
     nip
-    over exists? [
+    over file-exists? [
         dummy-monitor new-monitor
         dummy-monitor-created get [ 1 + ] change-i drop
     ] [

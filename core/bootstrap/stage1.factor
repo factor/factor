@@ -45,7 +45,7 @@ load-help? off
         init-resource-path
 
         "resource:basis/bootstrap/stage2.factor"
-        dup exists? [
+        dup file-exists? [
             run-file
         ] [
             "Cannot find " write write "." print

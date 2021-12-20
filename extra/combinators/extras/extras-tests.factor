@@ -34,9 +34,9 @@ splitting tools.test ;
 { "123" "1" } [ "1" "123" [ length ] [ < ] swap-when ] unit-test
 
 
-{ t } [ "resource:" [ exists? ] ?1arg >boolean ] unit-test
-{ f } [ f [ exists? ] ?1arg ] unit-test
-{ f } [ "/homeasdfasdf123123" [ exists? ] ?1arg ] unit-test
+{ t } [ "resource:" [ file-exists? ] ?1arg >boolean ] unit-test
+{ f } [ f [ file-exists? ] ?1arg ] unit-test
+{ f } [ "/homeasdfasdf123123" [ file-exists? ] ?1arg ] unit-test
 
 { "hi " "there" } [
     "hi there" {
