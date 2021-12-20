@@ -12,7 +12,7 @@ IN: alien.libraries.finder.freebsd
    ] map ;
 
 : load-ldconfig-cache ( -- seq )
-    "/sbin/ldconfig -r" utf8 [ lines ] with-process-reader
+    "/sbin/ldconfig -r" utf8 [ read-lines ] with-process-reader
     rest parse-ldconfig-lines ;
 
 : name-matches? ( lib double -- ? )

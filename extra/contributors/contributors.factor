@@ -22,7 +22,7 @@ CONSTANT: aliases {
 : changelog ( -- authors )
     image-path parent-directory [
         "git log --no-merges --pretty=format:%an"
-        utf8 [ lines ] with-process-reader
+        utf8 [ read-lines ] with-process-reader
     ] with-directory ;
 
 : merge-aliases ( authors -- authors' )
