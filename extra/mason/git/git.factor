@@ -7,7 +7,7 @@ splitting ;
 IN: mason.git
 
 : git-id ( -- id )
-    { "git" "show" } utf8 [ lines ] with-process-reader
+    { "git" "show" } utf8 [ read-lines ] with-process-reader
     first words second ;
 
 <PRIVATE
@@ -57,7 +57,7 @@ IN: mason.git
     { "git" "status" "--porcelain" } ;
 
 : git-status ( -- seq )
-    git-status-cmd utf8 [ lines ] with-process-reader ;
+    git-status-cmd utf8 [ read-lines ] with-process-reader ;
 
 : check-repository ( -- seq )
     "factor" [ git-status ] with-directory ;
