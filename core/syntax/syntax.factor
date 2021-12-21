@@ -10,8 +10,8 @@ generic.math generic.parser generic.standard hash-sets
 hashtables hashtables.identity io.pathnames kernel lexer
 locals.errors locals.parser macros math memoize namespaces
 parser quotations sbufs sequences slots source-files splitting
-strings strings.parser vectors vocabs.parser words words.alias
-words.constant words.symbol ;
+strings strings.parser vectors vocabs.loader vocabs.parser words
+words.alias words.constant words.symbol ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -46,6 +46,8 @@ IN: bootstrap.syntax
     "<PRIVATE" [ begin-private ] define-core-syntax
 
     "PRIVATE>" [ end-private ] define-core-syntax
+
+    "REUSE:" [ scan-token reload ] define-core-syntax
 
     "USE:" [ scan-token use-vocab ] define-core-syntax
 
