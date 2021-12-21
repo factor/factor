@@ -151,7 +151,7 @@ MEMO: glossary ( -- assoc )
             dup number?
             [ number>string ]
             [ glossary ?at drop ] if
-        ] map " " join
+        ] map join-words
     ] map "/" join ;
 
 : parse-timestamp ( str -- str' )
@@ -701,7 +701,7 @@ sky-condition raw ;
     [ re-visibility matches? ] find-one
     [ parse-visibility pick visibility<< ] when*
 
-    [ re-rvr matches? ] find-all " " join
+    [ re-rvr matches? ] find-all join-words
     [ parse-rvr ] map ", " join pick rvr<<
 
     [ re-weather matches? ] find-all
@@ -727,7 +727,7 @@ sky-condition raw ;
     [ re-visibility matches? ] find-one
     [ parse-visibility pick visibility<< ] when*
 
-    [ re-rvr matches? ] find-all " " join
+    [ re-rvr matches? ] find-all join-words
     [ parse-rvr ] map ", " join pick rvr<<
 
     [ re-weather matches? ] find-all

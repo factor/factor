@@ -280,7 +280,7 @@ M: postgresql-db-connection compound
     } case ;
 
 M: postgresql-db-connection parse-db-error
-    "\n" split dup length {
+    split-lines dup length {
         { 1 [ first parse-postgresql-sql-error ] }
         { 2 [ concat parse-postgresql-sql-error ] }
         { 3 [

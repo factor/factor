@@ -115,7 +115,7 @@ unit-test
             [ parse-fresh drop ] with-compilation-unit
             [
                 "prettyprint.tests" lookup-word see
-            ] with-string-writer "\n" split but-last
+            ] with-string-writer split-lines but-last
         ] keep =
     ] with-interactive-vocabs ;
 
@@ -151,7 +151,7 @@ M: object method-layout ;
         ""
     }
 } [
-    [ \ method-layout see-methods ] with-string-writer "\n" split
+    [ \ method-layout see-methods ] with-string-writer split-lines
 ] unit-test
 
 : soft-break-test ( -- str )
@@ -253,7 +253,7 @@ M: class-see-layout class-see-layout ;
         ""
     }
 } [
-    [ \ class-see-layout see ] with-string-writer "\n" split
+    [ \ class-see-layout see ] with-string-writer split-lines
 ] unit-test
 
 {
@@ -263,7 +263,7 @@ M: class-see-layout class-see-layout ;
         ""
     }
 } [
-    [ \ class-see-layout see-methods ] with-string-writer "\n" split
+    [ \ class-see-layout see-methods ] with-string-writer split-lines
 ] unit-test
 
 { } [ \ in>> synopsis drop ] unit-test
@@ -333,7 +333,7 @@ TUPLE: tuple-with-declared-slot { x integer } ;
         ""
     }
 } [
-    [ \ tuple-with-declared-slot see ] with-string-writer "\n" split
+    [ \ tuple-with-declared-slot see ] with-string-writer split-lines
 ] unit-test
 
 TUPLE: tuple-with-read-only-slot { x read-only } ;
@@ -345,7 +345,7 @@ TUPLE: tuple-with-read-only-slot { x read-only } ;
         ""
     }
 } [
-    [ \ tuple-with-read-only-slot see ] with-string-writer "\n" split
+    [ \ tuple-with-read-only-slot see ] with-string-writer split-lines
 ] unit-test
 
 TUPLE: tuple-with-initial-slot { x initial: 123 } ;
@@ -357,7 +357,7 @@ TUPLE: tuple-with-initial-slot { x initial: 123 } ;
         ""
     }
 } [
-    [ \ tuple-with-initial-slot see ] with-string-writer "\n" split
+    [ \ tuple-with-initial-slot see ] with-string-writer split-lines
 ] unit-test
 
 TUPLE: tuple-with-initial-declared-slot { x integer initial: 123 } ;
@@ -371,7 +371,7 @@ TUPLE: tuple-with-initial-declared-slot { x integer initial: 123 } ;
         ""
     }
 } [
-    [ \ tuple-with-initial-declared-slot see ] with-string-writer "\n" split
+    [ \ tuple-with-initial-declared-slot see ] with-string-writer split-lines
 ] unit-test
 
 TUPLE: final-tuple ; final
@@ -383,7 +383,7 @@ TUPLE: final-tuple ; final
         ""
     }
 } [
-    [ \ final-tuple see ] with-string-writer "\n" split
+    [ \ final-tuple see ] with-string-writer split-lines
 ] unit-test
 
 { "H{ { 1 2 } }\n" } [ [ H{ { 1 2 } } short. ] with-string-writer ] unit-test
