@@ -1,22 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel hashtables calendar random assocs
-namespaces make splitting sequences sorting math.order present
-io.files io.directories io.encodings.ascii
-syndication farkup
-html.components html.forms
-http.server
-http.server.dispatchers
-furnace.actions
-furnace.utilities
-furnace.recaptcha
-furnace.redirection
-furnace.auth
-furnace.auth.login
-furnace.boilerplate
-furnace.syndication
-validators
-db.types db.tuples lcs urls ;
+USING: accessors calendar db.tuples db.types farkup
+furnace.actions furnace.auth furnace.boilerplate
+furnace.recaptcha furnace.redirection furnace.syndication
+furnace.utilities html.forms http.server.dispatchers kernel lcs
+make namespaces present random sequences sorting splitting urls
+validators ;
 IN: webapps.wiki
 
 : wiki-url ( rest path -- url )
