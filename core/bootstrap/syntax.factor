@@ -51,6 +51,7 @@ IN: bootstrap.syntax
         "T{"
         "UNION:"
         "INTERSECTION:"
+        "REUSE:"
         "USE:"
         "UNUSE:"
         "USING:"
