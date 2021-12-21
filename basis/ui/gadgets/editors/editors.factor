@@ -636,7 +636,7 @@ PRIVATE>
 <PRIVATE
 
 : join-lines ( string -- string' )
-    "\n" split
+    split-lines
     [ rest-slice [ [ blank? ] trim-head-slice ] map! drop ]
     [ but-last-slice [ [ blank? ] trim-tail-slice ] map! drop ]
     [ join-words ]

@@ -17,7 +17,7 @@ IN: graphviz.tests
     ] [
         nip output>>
         "Use one of: " split1 nip "\n" ?tail drop
-        " " split
+        split-words
     ] recover ;
 
 ! http://www.graphviz.org/Download_macos.php#comment-474

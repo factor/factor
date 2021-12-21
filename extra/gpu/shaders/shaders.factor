@@ -330,7 +330,7 @@ SYMBOL: padding-no
     ] [ nip ] if ":" join ;
 
 : replace-log-line-numbers ( object log -- log' )
-    "\n" split harvest
+    split-lines harvest
     [ replace-log-line-number ] with map
     join-lines ;
 

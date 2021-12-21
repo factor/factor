@@ -27,7 +27,7 @@ IN: io.crlf
     CHAR: \r swap remove ;
 
 : lf>crlf ( str -- str' )
-    "\n" split "\r\n" join ;
+    split-lines "\r\n" join ;
 
 :: stream-read1-ignoring-crlf ( stream -- ch )
     stream stream-read1 dup "\r\n" member?
