@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators command-line eval io io.pathnames kernel
-layouts math math.parser namespaces system vocabs.loader ;
+layouts math math.parser namespaces parser system vocabs.loader ;
 IN: command-line.startup
 
 : help? ( -- ? )
@@ -19,6 +19,7 @@ Options:
         -run=listener   run terminal listener
         -run=ui.tools   run Factor development UI
     -e=<code>           evaluate <code>
+    -ea=<code>          evaluate <code> with auto-use
     -no-user-init       suppress loading of .factor-rc
     -datastack=<int>    datastack size in KiB [" write cell 32 * number>string write "]
     -retainstack=<int>  retainstack size in KiB [" write cell 32 * number>string write "]
@@ -49,8 +50,9 @@ from within Factor for more information.
         [
             load-vocab-roots
             run-user-init
-            "e" get script get or [
+            "e" get "ea" get script get or or [
                 "e" get [ eval( -- ) ] when*
+                "ea" get [ t auto-use? [ eval( -- ) ] with-variable ] when*
                 script get [ run-script ] when*
             ] [
                 "run" get run

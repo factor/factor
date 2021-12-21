@@ -105,12 +105,13 @@ IN: bootstrap.syntax
     "POSTPONE:" [ scan-word suffix! ] define-core-syntax
     "\\" [ scan-word <wrapper> suffix! ] define-core-syntax
     "M\\" [ scan-word scan-word lookup-method <wrapper> suffix! ] define-core-syntax
-    "inline" [ last-word make-inline ] define-core-syntax
-    "recursive" [ last-word make-recursive ] define-core-syntax
-    "foldable" [ last-word make-foldable ] define-core-syntax
-    "flushable" [ last-word make-flushable ] define-core-syntax
+    "auto-use" [ auto-use? on ] define-core-syntax
     "delimiter" [ last-word t "delimiter" set-word-prop ] define-core-syntax
     "deprecated" [ last-word make-deprecated ] define-core-syntax
+    "flushable" [ last-word make-flushable ] define-core-syntax
+    "foldable" [ last-word make-foldable ] define-core-syntax
+    "inline" [ last-word make-inline ] define-core-syntax
+    "recursive" [ last-word make-recursive ] define-core-syntax
 
     "SYNTAX:" [
         scan-new-word parse-definition define-syntax
