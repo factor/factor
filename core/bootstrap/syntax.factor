@@ -67,6 +67,7 @@ IN: bootstrap.syntax
         "\\"
         "M\\"
         "]"
+        "auto-use"
         "delimiter"
         "deprecated"
         "f"
