@@ -74,7 +74,7 @@ XML-NS: foo http://blah.com
     three
   </item>
 </doc>" } [
-    "one two three" split-Words
+    "one two three" split-words
     [ [XML <item><-></item> XML] ] map
     <XML <doc><-></doc> XML> pprint-xml>string
 ] unit-test
