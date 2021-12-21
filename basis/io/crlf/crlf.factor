@@ -26,8 +26,9 @@ IN: io.crlf
 : crlf>lf ( str -- str' )
     CHAR: \r swap remove ;
 
+! Note: can't use split-lines here
 : lf>crlf ( str -- str' )
-    split-lines "\r\n" join ;
+    "\n" split "\r\n" join ;
 
 :: stream-read1-ignoring-crlf ( stream -- ch )
     stream stream-read1 dup "\r\n" member?

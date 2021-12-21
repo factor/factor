@@ -115,7 +115,7 @@ unit-test
             [ parse-fresh drop ] with-compilation-unit
             [
                 "prettyprint.tests" lookup-word see
-            ] with-string-writer split-lines but-last
+            ] with-string-writer split-lines
         ] keep =
     ] with-interactive-vocabs ;
 
@@ -148,7 +148,6 @@ M: object method-layout ;
         ""
         "USING: kernel prettyprint.tests ;"
         "M: object method-layout ;"
-        ""
     }
 } [
     [ \ method-layout see-methods ] with-string-writer split-lines
@@ -250,7 +249,6 @@ M: class-see-layout class-see-layout ;
         ""
         "IN: prettyprint.tests"
         "GENERIC: class-see-layout ( x -- y )"
-        ""
     }
 } [
     [ \ class-see-layout see ] with-string-writer split-lines
@@ -260,7 +258,6 @@ M: class-see-layout class-see-layout ;
     {
         "USING: prettyprint.tests ;"
         "M: class-see-layout class-see-layout ;"
-        ""
     }
 } [
     [ \ class-see-layout see-methods ] with-string-writer split-lines
@@ -330,7 +327,6 @@ TUPLE: tuple-with-declared-slot { x integer } ;
         "USING: math ;"
         "IN: prettyprint.tests"
         "TUPLE: tuple-with-declared-slot { x integer initial: 0 } ;"
-        ""
     }
 } [
     [ \ tuple-with-declared-slot see ] with-string-writer split-lines
@@ -342,7 +338,6 @@ TUPLE: tuple-with-read-only-slot { x read-only } ;
     {
         "IN: prettyprint.tests"
         "TUPLE: tuple-with-read-only-slot { x read-only } ;"
-        ""
     }
 } [
     [ \ tuple-with-read-only-slot see ] with-string-writer split-lines
@@ -354,7 +349,6 @@ TUPLE: tuple-with-initial-slot { x initial: 123 } ;
     {
         "IN: prettyprint.tests"
         "TUPLE: tuple-with-initial-slot { x initial: 123 } ;"
-        ""
     }
 } [
     [ \ tuple-with-initial-slot see ] with-string-writer split-lines
@@ -368,7 +362,6 @@ TUPLE: tuple-with-initial-declared-slot { x integer initial: 123 } ;
         "IN: prettyprint.tests"
         "TUPLE: tuple-with-initial-declared-slot"
         "    { x integer initial: 123 } ;"
-        ""
     }
 } [
     [ \ tuple-with-initial-declared-slot see ] with-string-writer split-lines
@@ -380,7 +373,6 @@ TUPLE: final-tuple ; final
     {
         "IN: prettyprint.tests"
         "TUPLE: final-tuple ; final"
-        ""
     }
 } [
     [ \ final-tuple see ] with-string-writer split-lines

@@ -107,7 +107,7 @@ PY-METHODS: code =>
         ArgumentParser dup
         "--foo" >py H{ { "help" "badger" } } >py add_argument
         format_help py>
-    ] with-destructors [ blank? ] s:trim words "badger" swap in?
+    ] with-destructors [ blank? ] s:trim string-words "badger" swap in?
 ] py-test
 
 { t } [
