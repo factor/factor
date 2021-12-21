@@ -32,6 +32,9 @@ CONSTANT: ignored-words {
     $nl
 }
 
+: (word-help) ( word -- content )
+    dup "help" word-prop [ ] [ word-help* ] ?if ;
+
 GENERIC: write-object* ( object -- )
 M: string write-object* write ;
 M: pair write-object* first2 write-object ;
@@ -118,12 +121,12 @@ M: word-help-coverage summary
     } cond ?remove-$values ;
 
 : word-defines-sections ( word -- seq )
-    "help" word-prop [ ignored-words member? not ] filter [ ?first ] map ;
+    (word-help) [ ignored-words member? ] reject [ ?first ] map ;
 
 ! only words that need examples, need to have them nonempty
 ! not defining examples is not the same as an empty { $examples }
 : empty-examples? ( word -- ? )
-    "help" word-prop \ $examples swap elements [ f ] [ first rest empty? ] if-empty ;
+    (word-help) \ $examples swap elements [ f ] [ first rest empty? ] if-empty ;
 
 : missing-sections ( word -- missing )
     [ should-define ] [ word-defines-sections ] bi diff ;
@@ -136,7 +139,7 @@ PRIVATE>
 GENERIC: <word-help-coverage> ( word -- coverage )
 M: word <word-help-coverage>
     dup [ missing-sections ] [ empty-examples? ] bi
-    2dup 2array { { } f } =
+    2dup [ empty? ] bi@ and
     word-help-coverage boa ; inline
 
 M: string <word-help-coverage>
