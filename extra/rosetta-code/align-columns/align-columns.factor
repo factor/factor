@@ -44,7 +44,7 @@ Further,$allow$for$each$word$in$a$column$to$be$either$left$
 justified,$right$justified,$or$center$justified$within$its$column."
 
 : split-and-pad ( text -- lines )
-    "\n" split [ "$" split harvest ] map
+    split-lines [ "$" split harvest ] map
     dup longest length
     '[ _ "" pad-tail ] map ;
 

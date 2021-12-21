@@ -51,7 +51,7 @@ SYMBOL: vocab-articles
     [
         '[
             _ rest [
-                but-last "\n" join
+                but-last join-lines
                 eval-with-stack
                 "\n" ?tail drop
             ] keep

@@ -137,7 +137,7 @@ CONSTRUCTOR: <tree> tree ( -- obj ) ;
         [ hash>> "commit " prepend print ]
         [ author>> "Author: " prepend split-words 2 head* join-words print ]
         [ author>> split-words git-date>string "Date:   " prepend print ]
-        [ message>> "\n" split [ "    " prepend ] map join-lines nl print nl ]
+        [ message>> split-lines [ "    " prepend ] map join-lines nl print nl ]
     } cleave ;
 
 ERROR: unknown-field name parameter ;

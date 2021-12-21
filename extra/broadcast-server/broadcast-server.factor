@@ -64,7 +64,7 @@ SINGLETONS: command data ;
             ] [
                 [
                     receive-socket>> receive
-                    [ utf8 decode "\n" split parse-lines ] dip
+                    [ utf8 decode split-lines parse-lines ] dip
                 ] keep handle-data t
             ] if
         ] loop

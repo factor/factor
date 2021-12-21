@@ -208,7 +208,7 @@ TUPLE: proc-stat
 TUPLE: proc-cpu-stat name user nice system idle iowait irq softirq steal guest guest-nice ;
 
 : line>cpu ( string -- cpu )
-    " " split
+    split-words
     unclip-slice
     [ [ [ CHAR: \s = ] trim string>number ] map ] dip prefix
     [ proc-cpu-stat boa ] input<sequence ;

@@ -113,7 +113,7 @@ DEFER: (parse-paragraph)
         first delimiter split1 :> ( before after )
         before accum push
         after [
-            accum "\n" join
+            accum join-lines
             rest after prefix
         ] [
             rest delimiter accum (take-until)

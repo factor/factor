@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs base64 calendar calendar.format
-checksums.hmac checksums.sha combinators combinators.smart
-formatting fry http http.client json.reader json.writer kernel
-locals make math.parser namespaces random sequences ;
+checksums.hmac checksums.sha combinators.smart formatting http
+http.client json.reader json.writer kernel make math.parser
+namespaces random sequences splitting ;
 
 IN: visionect
 
@@ -24,7 +24,7 @@ SYMBOL: visionect-api-secret
         [ "content-type" header ]
         [ "date" header ]
         [ url>> path>> ]
-    } cleave>array "\n" join
+    } cleave>array join-lines
     visionect-api-secret get sha-256 hmac-bytes >base64
     visionect-api-key get ":" rot 3append ;
 
