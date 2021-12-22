@@ -316,7 +316,7 @@ fixup-ducet-for-tibetan
             [ [ primary>> ] append-weights { 0 } ]
             [ [ secondary>> ] append-weights { 0 } ]
             [ [ tertiary>> ] append-weights { 0 } ]
-            [ [ [ secondary>> ] [ tertiary>> ] bi [ zero? ] bi@ and not ] filter [ variable-weight ] map ]
+            [ [ [ secondary>> ] [ tertiary>> ] bi [ zero? ] both? ] reject [ variable-weight ] map ]
         } cleave
     ] { } append-outputs-as ;
 

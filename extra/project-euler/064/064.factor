@@ -116,7 +116,7 @@ C: <cont-frac> cont-frac
 
 : try-all ( -- n )
     2 10000 [a,b]
-    [ perfect-square? not ] filter
+    [ perfect-square? ] reject
     [ find-period ] map
     [ odd? ] filter
     length ;
