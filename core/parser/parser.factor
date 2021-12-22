@@ -31,11 +31,15 @@ SYMBOL: auto-use?
 : ignore-forwards ( seq -- seq' )
     [ forward-reference? ] reject ;
 
+<PRIVATE
+
 : private? ( word -- ? ) vocabulary>> ".private" tail? ;
 
 : use-first-word? ( words -- ? )
     [ length 1 = ] [ ?first dup [ private? not ] [ ] ?if ] bi and
     auto-use? get and ;
+
+PRIVATE>
 
 ! True branch is a singleton public word with no name conflicts
 ! False branch, singleton private words need confirmation regardless
