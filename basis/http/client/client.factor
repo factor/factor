@@ -1,13 +1,13 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors ascii assocs calendar combinators
+USING: accessors arrays ascii assocs calendar combinators
 combinators.short-circuit destructors environment hashtables
-http http.client.post-data http.parsers io io.crlf io.encodings
-io.encodings.ascii io.encodings.binary io.encodings.iana
-io.encodings.string io.files io.pathnames io.sockets
-io.sockets.secure io.timeouts kernel math math.order math.parser
-mime.types namespaces present sequences splitting urls
-vocabs.loader ;
+http http.client.post-data http.parsers http.websockets io
+io.crlf io.encodings io.encodings.ascii io.encodings.binary
+io.encodings.iana io.encodings.string io.files io.pathnames
+io.sockets io.sockets.secure io.timeouts kernel math math.order
+math.parser mime.types namespaces present sequences splitting
+urls vocabs.loader ;
 IN: http.client
 
 ERROR: too-many-redirects ;
@@ -218,32 +218,40 @@ SYMBOL: redirects
         pick no-proxy? [ nip ] [ [ request-url ] dip derive-url ] if
     ] [ nip ] if check-proxy ;
 
-: (with-http-request) ( request quot: ( chunk -- ) -- response )
-    swap ?default-proxy
-    request [
-        <request-socket> [
-            [
-                [ in>> ] [ out>> ] bi
-                [ ?https-tunnel ] with-streams*
-            ]
-            [
-                out>>
-                [ request get write-request ]
-                with-output-stream*
-            ] [
-                in>> [
-                    read-response dup redirect?
-                    request get redirects>> 0 > and [ t ] [
-                        [ nip response set ]
-                        [ read-response-body ]
-                        [ ]
-                        2tri f
-                    ] if
-                ] with-input-stream*
-            ] tri
-        ] with-disposal
-        [ do-redirect ] [ nip ] if
-    ] with-variable ; inline recursive
+SYMBOL: request-socket
+: (with-http-request) ( request quot: ( chunk -- ) -- response/websocket )
+    [
+        swap ?default-proxy
+        request [
+            <request-socket> |dispose
+            dup request-socket [
+                [
+                    [ in>> ] [ out>> ] bi
+                    [ ?https-tunnel ] with-streams*
+                ]
+                [
+                    out>>
+                    [ request get write-request ]
+                    with-output-stream*
+                ] [
+                    in>> [
+                        read-response {
+                            { [ dup redirect? request get redirects>> 0 > and ] [ request-socket get &dispose drop t ] }
+                            { [ dup check-websocket-upgraded? ] [ request-socket get 2array f ] }
+                            [
+                                request-socket get &dispose drop
+                                [ nip response set ]
+                                [ read-response-body ]
+                                [ ]
+                                2tri f
+                            ]
+                        } cond
+                    ] with-input-stream*
+                ] tri
+            ] with-variable
+            [ do-redirect ] [ nip ] if
+        ] with-variable
+    ] with-destructors ; inline recursive
 
 : <client-request> ( url method -- request )
     <request>
@@ -258,9 +266,14 @@ PRIVATE>
 : with-http-request ( request quot: ( chunk -- ) -- response )
     with-http-request* check-response ; inline
 
-: http-request* ( request -- response data )
+: http-request* ( request -- response data/websocket-stream )
     BV{ } clone [ '[ _ push-all ] with-http-request* ] keep
-    B{ } like over content-encoding>> decode [ >>body ] keep ;
+    over array? [
+        drop first2
+    ] [
+        B{ } like
+        over content-encoding>> decode [ >>body ] keep
+    ] if ;
 
 : http-request ( request -- response data )
     http-request* [ check-response ] dip ;
