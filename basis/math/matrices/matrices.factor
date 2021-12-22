@@ -2,18 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.singleton columns combinators
 combinators.short-circuit combinators.smart formatting fry
-<<<<<<< HEAD
 grouping kernel locals math math.bits math.functions math.order
 math.private math.ranges math.statistics math.vectors
 math.vectors.private sequences sequences.deep sequences.private
 slots.private summary ;
-=======
-grouping kernel kernel.private locals math math.bits
-math.functions math.order math.private math.ranges
-math.statistics math.vectors math.vectors.private sequences
-sequences.deep sequences.extras sequences.private slots.private
-summary ;
->>>>>>> 0ac3067a26 (vnorm rename)
 IN: math.matrices
 
 ! defined here because of issue #1943
@@ -283,14 +275,14 @@ DEFER: matrix-set-nths
         [ [ sq ] map-sum ] map-sum sqrt
     ] if ; inline foldable
 
-M: zero-matrix l1-norm drop 0 ; inline
-M: matrix l1-norm matrix-l1-norm ; inline
+! XXX: M: zero-matrix l1-norm drop 0 ; inline
+! XXX: M: matrix l1-norm matrix-l1-norm ; inline
 
-M: zero-matrix l2-norm drop 0 ; inline
-M: matrix l2-norm matrix-l2-norm ; inline
+! XXX: M: zero-matrix l2-norm drop 0 ; inline
+! XXX: M: matrix l2-norm matrix-l2-norm ; inline
 
-M: zero-matrix l-infinity-norm drop 0 ; inline
-M: matrix l-infinity-norm matrix-l-infinity-norm ; inline
+! XXX: M: zero-matrix l-infinity-norm drop 0 ; inline
+! XXX: M: matrix l-infinity-norm matrix-l-infinity-norm ; inline
 
 ALIAS: frobenius-norm matrix-l2-norm
 ALIAS: hilbert-schmidt-norm matrix-l2-norm
@@ -303,8 +295,8 @@ ALIAS: hilbert-schmidt-norm matrix-l2-norm
 : matrix-p-norm-entrywise ( m p -- n )
     [ flatten1 V{ } like ] dip p-norm-default ; inline
 
-M: zero-matrix p-norm-default 2drop 0 ; inline
-M: matrix p-norm-default matrix-p-norm-entrywise ; inline
+! XXX: M: zero-matrix p-norm-default 2drop 0 ; inline
+! XXX: M: matrix p-norm-default matrix-p-norm-entrywise ; inline
 
 : matrix-p-norm ( m p -- n )
     over zero-matrix? [ 2drop 0 ] [
@@ -316,8 +308,8 @@ M: matrix p-norm-default matrix-p-norm-entrywise ; inline
         } cond
     ] if ; inline foldable
 
-M: zero-matrix p-norm 2drop 0 ; inline
-M: matrix p-norm matrix-p-norm ; inline
+! XXX: M: zero-matrix p-norm 2drop 0 ; inline
+! XXX: M: matrix p-norm matrix-p-norm ; inline
 
 : matrix-normalize ( m -- m' )
     dup zero-matrix? [

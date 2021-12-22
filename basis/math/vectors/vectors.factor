@@ -225,22 +225,18 @@ M: object hdot [ conjugate * ] [ + ] 2map-reduce ; inline
 GENERIC: norm-sq ( v -- x )
 M: object norm-sq [ absq ] [ + ] map-reduce ; inline
 
-GENERIC: l1-norm ( k -- x )
-M: object l1-norm [ abs ] map-sum ; inline
+: l1-norm ( k -- x ) [ abs ] map-sum ; inline
 
-GENERIC: l2-norm ( k -- x )
-M: object l2-norm norm-sq sqrt ; inline
+: l2-norm ( k -- x ) norm-sq sqrt ; inline
+
 ALIAS: norm l2-norm
 
-GENERIC: l-infinity-norm ( k -- x )
-M: object l-infinity-norm supremum ; inline
+: l-infinity-norm ( k -- x ) supremum ; inline
 
-GENERIC#: p-norm-default 1 ( k p -- x )
-M: object p-norm-default
+: p-norm-default ( k p -- x )
     [ [ [ abs ] dip ^ ] curry map-sum ] keep recip ^ ; inline
 
-GENERIC#: p-norm 1 ( k p -- x )
-M: object p-norm
+: p-norm ( k p -- x )
     {
         { [ dup 1 = ] [ drop l1-norm ] }
         { [ dup 2 = ] [ drop l2-norm ] }
