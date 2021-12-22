@@ -105,7 +105,7 @@ ERROR: unhandled-git-version n ;
 
 : changed-index-by-sha1 ( -- seq )
     git-index-contents entries>>
-    [ [ sha1>> ] [ name>> path>git-object bytes>hex-string ] bi = not ] filter ;
+    [ [ sha1>> ] [ name>> path>git-object bytes>hex-string ] bi = ] reject ;
 
 : changed-index-by-mtime ( -- seq )
     git-index-contents entries>>

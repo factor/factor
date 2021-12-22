@@ -398,9 +398,9 @@ commutative-ops [
 
 { f } [ empty-interval interval-zero? ] unit-test
 
-{ f } [ -1/0. 1/0. [ empty-interval interval-contains? ] bi@ or ] unit-test
+{ f f } [ -1/0. 1/0. [ empty-interval interval-contains? ] bi@ ] unit-test
 
-{ t } [ -1/0. 1/0. [ full-interval interval-contains? ] bi@ and ] unit-test
+{ t t } [ -1/0. 1/0. [ full-interval interval-contains? ] bi@ ] unit-test
 
 ! Interval bitand
 ${ 0 0xaf [a,b] } [ 0 0xff [a,b] 0 0xaf [a,b] interval-bitand ] unit-test
