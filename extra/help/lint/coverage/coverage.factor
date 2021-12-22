@@ -139,8 +139,7 @@ PRIVATE>
 GENERIC: <word-help-coverage> ( word -- coverage )
 M: word <word-help-coverage>
     dup [ missing-sections ] [ empty-examples? ] bi
-    2dup [ empty? ] bi@ and
-    word-help-coverage boa ; inline
+    2dup [ empty? ] both? word-help-coverage boa ; inline
 
 M: string <word-help-coverage>
     find-word <word-help-coverage> ; inline
