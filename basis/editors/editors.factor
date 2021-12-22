@@ -10,7 +10,7 @@ IN: editors
 SYMBOL: editor-class
 
 : available-editors ( -- seq )
-    "editors" disk-child-vocab-names ;
+    "editors" disk-child-vocab-names [ ".private" tail? ] reject ;
 
 : editor-restarts ( -- alist )
     available-editors
