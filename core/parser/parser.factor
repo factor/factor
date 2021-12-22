@@ -28,10 +28,10 @@ SYMBOL: auto-use?
         [ "Added \"" "\" vocabulary to search path" surround note. ] bi
     ] [ create-word-in ] if ;
 
+<PRIVATE
+
 : ignore-forwards ( seq -- seq' )
     [ forward-reference? ] reject ;
-
-<PRIVATE
 
 : private? ( word -- ? ) vocabulary>> ".private" tail? ;
 
