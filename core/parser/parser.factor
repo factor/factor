@@ -28,8 +28,6 @@ SYMBOL: auto-use?
         [ "Added \"" "\" vocabulary to search path" surround note. ] bi
     ] [ create-word-in ] if ;
 
-<PRIVATE
-
 : ignore-forwards ( seq -- seq' )
     [ forward-reference? ] reject ;
 
@@ -38,8 +36,6 @@ SYMBOL: auto-use?
 : use-first-word? ( words -- ? )
     [ length 1 = ] [ ?first dup [ private? not ] [ ] ?if ] bi and
     auto-use? get and ;
-
-PRIVATE>
 
 ! True branch is a singleton public word with no name conflicts
 ! False branch, singleton private words need confirmation regardless
